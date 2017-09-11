@@ -1,0 +1,27 @@
+#ifndef GEAROENIX_NUFRAG_VULKAN_SURFAE_HPP
+#define GEAROENIX_NUFRAG_VULKAN_SURFAE_HPP
+#include "vk-linker.hpp"
+#include <memory>
+namespace gearoenix {
+namespace nufrag {
+namespace system {
+class Application;
+}
+namespace render {
+class Instance;
+class Surface {
+private:
+	std::shared_ptr<Instance> instance;
+	VkSurfaceKHR vulkan_data;
+    system::Application *sys_app;
+public:
+	Surface(const std::shared_ptr<Instance> &instance, system::Application *sys_app);
+	~Surface();
+	const std::shared_ptr<Instance> &get_instance() const;
+	const VkSurfaceKHR &get_vulkan_data() const;
+    const system::Application *get_sys_app() const;
+};
+}
+}
+}
+#endif
