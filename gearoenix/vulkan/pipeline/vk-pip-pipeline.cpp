@@ -1,29 +1,31 @@
 #include "vk-pip-pipeline.hpp"
 #include "../../core/cr-application.hpp"
 #include "../../core/cr-static.hpp"
-#include "../../system/sys-file.hpp"
 #include "../../system/sys-app.hpp"
-#include "../device/vk-dev-physical.hpp"
+#include "../../system/sys-file.hpp"
 #include "../device/vk-dev-logical.hpp"
+#include "../device/vk-dev-physical.hpp"
 #include "../shader/vk-shader-diffuse-colored.hpp"
 #include "../shader/vk-shader-manager.hpp"
-#include "../vk-render-pass.hpp"
-#include "../vk-swapchain.hpp"
-#include "../vk-instance.hpp"
-#include "../vk-surface.hpp"
 #include "../vk-check.hpp"
-#include "vk-pip-layout.hpp"
+#include "../vk-instance.hpp"
+#include "../vk-render-pass.hpp"
+#include "../vk-surface.hpp"
+#include "../vk-swapchain.hpp"
 #include "vk-pip-cache.hpp"
+#include "vk-pip-layout.hpp"
 #include <fstream>
 
 gearoenix::render::pipeline::Pipeline::Pipeline(
-        const std::shared_ptr<Cache> &cache,
-        const std::shared_ptr<Layout> &layout,
-        const std::shared_ptr<RenderPass> &render_pass,
-        std::shared_ptr<shader::Manager> &shader_manager) :
-    cache(cache), layout(layout), render_pass(render_pass) {
-    auto &d = cache->get_logical_device();
-    auto &l = d->get_physical_device()->get_instance()->get_linker();
+    const std::shared_ptr<Cache>& cache, const std::shared_ptr<Layout>& layout,
+    const std::shared_ptr<RenderPass>& render_pass,
+    std::shared_ptr<shader::Manager>& shader_manager)
+    : cache(cache)
+    , layout(layout)
+    , render_pass(render_pass)
+{
+    auto& d = cache->get_logical_device();
+    auto& l = d->get_physical_device()->get_instance()->get_linker();
     VkGraphicsPipelineCreateInfo pipeline_create_info;
     setz(pipeline_create_info);
     pipeline_create_info.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
@@ -53,7 +55,8 @@ gearoenix::render::pipeline::Pipeline::Pipeline(
     viewport_state.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
     viewport_state.viewportCount = 1;
     viewport_state.scissorCount = 1;
-    const VkDynamicState dynamic_state_enables[] = {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
+    const VkDynamicState dynamic_state_enables[] = { VK_DYNAMIC_STATE_VIEWPORT,
+        VK_DYNAMIC_STATE_SCISSOR };
     VkPipelineDynamicStateCreateInfo dynamic_state;
     setz(dynamic_state);
     dynamic_state.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
@@ -92,8 +95,9 @@ gearoenix::render::pipeline::Pipeline::Pipeline(
     vertex_input_state.pVertexBindingDescriptions = &vertex_input_binding;
     vertex_input_state.vertexAttributeDescriptionCount = 2;
     vertex_input_state.pVertexAttributeDescriptions = vertex_attribute;
-    const char *stage_name = "main";
-    diffuse = std::static_pointer_cast<shader::DiffuseColored>(shader_manager->get_shader(d, 1));
+    const char* stage_name = "main";
+    diffuse = std::static_pointer_cast<shader::DiffuseColored>(
+        shader_manager->get_shader(d, 1));
     VkPipelineShaderStageCreateInfo shader_stages[DIFFUSE_COLORED_MODULE_COUNT];
     setz(shader_stages);
     shader_stages[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
@@ -116,15 +120,19 @@ gearoenix::render::pipeline::Pipeline::Pipeline(
     pipeline_create_info.renderPass = render_pass->get_vulkan_data();
     pipeline_create_info.pDynamicState = &dynamic_state;
     VKC(l->vkCreateGraphicsPipelines(
-            d->get_vulkan_data(), cache->get_vulkan_data(), 1, &pipeline_create_info, nullptr, &vulkan_data));
+        d->get_vulkan_data(), cache->get_vulkan_data(), 1, &pipeline_create_info,
+        nullptr, &vulkan_data));
 }
 
-gearoenix::render::pipeline::Pipeline::~Pipeline() {
-    auto &d = cache->get_logical_device();
-    auto &l = d->get_physical_device()->get_instance()->get_linker();
+gearoenix::render::pipeline::Pipeline::~Pipeline()
+{
+    auto& d = cache->get_logical_device();
+    auto& l = d->get_physical_device()->get_instance()->get_linker();
     l->vkDestroyPipeline(d->get_vulkan_data(), vulkan_data, nullptr);
 }
 
-const VkPipeline &gearoenix::render::pipeline::Pipeline::get_vulkan_data() const {
+const VkPipeline& gearoenix::render::pipeline::Pipeline::get_vulkan_data()
+    const
+{
     return vulkan_data;
 }

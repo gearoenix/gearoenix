@@ -9,18 +9,26 @@
 #include <fstream>
 namespace gearoenix {
 namespace system {
-class Log {
-public:
-	static std::ofstream info;
-	static std::ofstream debug;
-	static std::ofstream error;
-};
+    class Log {
+    public:
+        static std::ofstream info;
+        static std::ofstream debug;
+        static std::ofstream error;
+    };
 }
 }
-#define LOGI(s) gearoenix::system::Log::info << APPLICATION_NAME << " " << s << " " << __FILE__ << " " << __LINE__ << std::endl;
-#define LOGD(s) gearoenix::system::Log::debug << APPLICATION_NAME << " " << s << " " << __FILE__ << " " << __LINE__ << std::endl;
-#define LOGE(s) gearoenix::system::Log::error << APPLICATION_NAME << " " << s << " " << __FILE__ << " " << __LINE__ << std::endl;
-#define LOGF(s) LOGE(s); std::terminate();
+#define LOGI(s)                                                         \
+    gearoenix::system::Log::info << APPLICATION_NAME << " " << s << " " \
+                                 << __FILE__ << " " << __LINE__ << std::endl;
+#define LOGD(s)                                                          \
+    gearoenix::system::Log::debug << APPLICATION_NAME << " " << s << " " \
+                                  << __FILE__ << " " << __LINE__ << std::endl;
+#define LOGE(s)                                                          \
+    gearoenix::system::Log::error << APPLICATION_NAME << " " << s << " " \
+                                  << __FILE__ << " " << __LINE__ << std::endl;
+#define LOGF(s) \
+    LOGE(s);    \
+    std::terminate();
 #endif // IN_ANDROID
 #else // LOG_ENABLED
 #endif // LOG_ENABLED

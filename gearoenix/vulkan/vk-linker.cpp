@@ -7,9 +7,10 @@
 #include <Windows.h>
 #endif
 
-gearoenix::render::Linker::Linker() {
+gearoenix::render::Linker::Linker()
+{
 #ifdef IN_WINDOWS
-	auto libvulkan = LoadLibrary("vulkan-1.dll");
+    auto libvulkan = LoadLibrary("vulkan-1.dll");
 #else
     void* libvulkan = dlopen("libvulkan.so", RTLD_NOW | RTLD_LOCAL);
 #endif
@@ -196,8 +197,8 @@ gearoenix::render::Linker::Linker() {
     VKL(vkCreateAndroidSurfaceKHR);
 #endif
 #ifdef VK_USE_PLATFORM_WIN32_KHR
-	VKL(vkCreateWin32SurfaceKHR);
-	VKL(vkGetPhysicalDeviceWin32PresentationSupportKHR);
+    VKL(vkCreateWin32SurfaceKHR);
+    VKL(vkGetPhysicalDeviceWin32PresentationSupportKHR);
 #endif
 #ifdef USE_DEBUG_EXTENTIONS
     VKL(vkCreateDebugReportCallbackEXT);

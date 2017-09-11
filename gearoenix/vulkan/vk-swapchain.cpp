@@ -1,70 +1,83 @@
 #include "vk-swapchain.hpp"
-#include "vk-check.hpp"
-#include "vk-instance.hpp"
-#include "vk-surface.hpp"
+#include "../core/cr-static.hpp"
 #include "device/vk-dev-logical.hpp"
 #include "device/vk-dev-physical.hpp"
 #include "image/vk-img-image.hpp"
 #include "image/vk-img-view.hpp"
 #include "sync/vk-sync-semaphore.hpp"
-#include "../core/cr-static.hpp"
+#include "vk-check.hpp"
+#include "vk-instance.hpp"
+#include "vk-surface.hpp"
 
 #define DEBUG_SWAPCHAIN
 
-gearoenix::render::Swapchain::Swapchain(const std::shared_ptr<device::Logical> &d)
-    : logical_device(d) {
+gearoenix::render::Swapchain::Swapchain(
+    const std::shared_ptr<device::Logical>& d)
+    : logical_device(d)
+{
     initialize();
 }
 
-gearoenix::render::Swapchain::~Swapchain() {
+gearoenix::render::Swapchain::~Swapchain()
+{
     image_views.clear();
-    auto &l = logical_device->get_physical_device()->get_instance()->get_linker();
-    l->vkDestroySwapchainKHR(logical_device->get_vulkan_data(), vulkan_data, nullptr);
+    auto& l = logical_device->get_physical_device()->get_instance()->get_linker();
+    l->vkDestroySwapchainKHR(logical_device->get_vulkan_data(), vulkan_data,
+        nullptr);
 }
 
-const VkSwapchainKHR &gearoenix::render::Swapchain::get_vulkan_data() const {
+const VkSwapchainKHR& gearoenix::render::Swapchain::get_vulkan_data() const
+{
     return vulkan_data;
 }
 
-const VkSurfaceFormatKHR &gearoenix::render::Swapchain::get_chosen_format() const {
+const VkSurfaceFormatKHR& gearoenix::render::Swapchain::get_chosen_format()
+    const
+{
     return chosen_format;
 }
 
-std::vector<std::shared_ptr<gearoenix::render::image::View> >
-gearoenix::render::Swapchain::get_image_views() const {
+std::vector<std::shared_ptr<gearoenix::render::image::View>>
+gearoenix::render::Swapchain::get_image_views() const
+{
     return image_views;
 }
 
-const std::shared_ptr<gearoenix::render::device::Logical> &
-gearoenix::render::Swapchain::get_logical_device() const {
+const std::shared_ptr<gearoenix::render::device::Logical>& gearoenix::render::Swapchain::get_logical_device() const
+{
     return logical_device;
 }
 
-
-uint32_t gearoenix::render::Swapchain::get_next_image_index(const std::shared_ptr<sync::Semaphore> &semaphore) {
-    auto &l = logical_device->get_physical_device()->get_instance()->get_linker();
+uint32_t gearoenix::render::Swapchain::get_next_image_index(
+    const std::shared_ptr<sync::Semaphore>& semaphore)
+{
+    auto& l = logical_device->get_physical_device()->get_instance()->get_linker();
     uint32_t image_index = 0;
-    VkResult r = l->vkAcquireNextImageKHR(logical_device->get_vulkan_data(), vulkan_data, UINT64_MAX, semaphore->get_vulkan_data(), nullptr, &image_index);
-    if(r == VK_ERROR_OUT_OF_DATE_KHR || r == VK_ERROR_INITIALIZATION_FAILED) {
+    VkResult r = l->vkAcquireNextImageKHR(
+        logical_device->get_vulkan_data(), vulkan_data, UINT64_MAX,
+        semaphore->get_vulkan_data(), nullptr, &image_index);
+    if (r == VK_ERROR_OUT_OF_DATE_KHR || r == VK_ERROR_INITIALIZATION_FAILED) {
         return 0xffffffff;
-//        initialize();
+        //        initialize();
     } else {
         VKC(r);
     }
     return image_index;
 }
 
-void gearoenix::render::Swapchain::initialize() {
-    auto &d = logical_device;
-    auto &p = d->get_physical_device();
-    auto &s = p->get_surface();
-    auto &i = p->get_instance();
-    auto &l = i->get_linker();
+void gearoenix::render::Swapchain::initialize()
+{
+    auto& d = logical_device;
+    auto& p = d->get_physical_device();
+    auto& s = p->get_surface();
+    auto& i = p->get_instance();
+    auto& l = i->get_linker();
     auto caps = p->get_surface_capabilities();
     auto formats = p->get_surface_formats();
     auto old_swapchain = vulkan_data;
     uint32_t chosen_format_index;
-    for (chosen_format_index = 0; chosen_format_index < formats.size(); chosen_format_index++) {
+    for (chosen_format_index = 0; chosen_format_index < formats.size();
+         chosen_format_index++) {
         if (formats[chosen_format_index].format == VK_FORMAT_R8G8B8A8_UNORM)
             break;
     }
@@ -79,8 +92,8 @@ void gearoenix::render::Swapchain::initialize() {
     }
     uint32_t image_usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
     VkFormatProperties format_props;
-    l->vkGetPhysicalDeviceFormatProperties(p->get_vulkan_data(), chosen_format.format,
-                                           &format_props);
+    l->vkGetPhysicalDeviceFormatProperties(p->get_vulkan_data(),
+        chosen_format.format, &format_props);
     if (format_props.optimalTilingFeatures & VK_FORMAT_FEATURE_BLIT_DST_BIT) {
         image_usage |= VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
     }
@@ -112,18 +125,22 @@ void gearoenix::render::Swapchain::initialize() {
     } else {
         LOGF(std::string("Error composite is unknown."));
     }
-    VKC(l->vkCreateSwapchainKHR(d->get_vulkan_data(), &swapchain_create_info, 0, &vulkan_data));
+    VKC(l->vkCreateSwapchainKHR(d->get_vulkan_data(), &swapchain_create_info, 0,
+        &vulkan_data));
     uint32_t count = 0;
-    VKC(l->vkGetSwapchainImagesKHR(d->get_vulkan_data(), vulkan_data, &count, nullptr));
+    VKC(l->vkGetSwapchainImagesKHR(d->get_vulkan_data(), vulkan_data, &count,
+        nullptr));
     std::vector<VkImage> images(count);
-    VKC(l->vkGetSwapchainImagesKHR(d->get_vulkan_data(), vulkan_data, &count, images.data()));
+    VKC(l->vkGetSwapchainImagesKHR(d->get_vulkan_data(), vulkan_data, &count,
+        images.data()));
     image_views.resize(count);
     for (uint32_t i = 0; i < count; ++i) {
-        image_views[i] = std::shared_ptr<image::View>(
-                    new image::View(std::shared_ptr<image::Image>(new image::Image(d, images[i])),
-                                    chosen_format.format));
+        image_views[i] = std::shared_ptr<image::View>(new image::View(
+            std::shared_ptr<image::Image>(new image::Image(d, images[i])),
+            chosen_format.format));
     }
-    if(0 != old_swapchain) {
-        l->vkDestroySwapchainKHR(logical_device->get_vulkan_data(), old_swapchain, nullptr);
+    if (0 != old_swapchain) {
+        l->vkDestroySwapchainKHR(logical_device->get_vulkan_data(), old_swapchain,
+            nullptr);
     }
 }

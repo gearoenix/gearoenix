@@ -1,7 +1,7 @@
 #ifndef GEAROEMIX_CORE_STATIC_HPP
 #define GEAROEMIX_CORE_STATIC_HPP
 #ifndef countof
-#define countof(x) (sizeof(x)/sizeof(x[0]))
+#define countof(x) (sizeof(x) / sizeof(x[0]))
 #ifdef setz
 #error "setz already defined"
 #endif
