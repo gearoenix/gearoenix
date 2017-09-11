@@ -1,6 +1,6 @@
-#ifndef GEAROENIX_NUFRAG_RENDER_ENGINE_HPP
-#define GEAROENIX_NUFRAG_RENDER_ENGINE_HPP
-#include "../core/build-configuration.hpp"
+#ifndef GEAROENIX_RENDER_ENGINE_HPP
+#define GEAROENIX_RENDER_ENGINE_HPP
+#include "../core/cr-build-configuration.hpp"
 #ifdef USE_VULKAN
 #include "../vulkan/vk-engine.hpp"
 #elif USE_DIRECT

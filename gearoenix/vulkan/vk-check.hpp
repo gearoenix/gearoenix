@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include "vk-linker.hpp"
-#include "../system/log.hpp"
+#include "../system/sys-log.hpp"
 
 #define VKC(func) { \
     VkResult res = func; \

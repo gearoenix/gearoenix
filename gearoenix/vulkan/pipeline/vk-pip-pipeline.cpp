@@ -1,8 +1,7 @@
 #include "vk-pip-pipeline.hpp"
-#include "../../core/application.hpp"
-#include "../../core/static.hpp"
+#include "../../core/cr-application.hpp"
+#include "../../core/cr-static.hpp"
 #include "../../system/sys-file.hpp"
-#include "../../system/resource.hpp"
 #include "../../system/sys-app.hpp"
 #include "../device/vk-dev-physical.hpp"
 #include "../device/vk-dev-logical.hpp"
@@ -17,7 +16,7 @@
 #include "vk-pip-cache.hpp"
 #include <fstream>
 
-gearoenix::nufrag::render::pipeline::Pipeline::Pipeline(
+gearoenix::render::pipeline::Pipeline::Pipeline(
         const std::shared_ptr<Cache> &cache,
         const std::shared_ptr<Layout> &layout,
         const std::shared_ptr<RenderPass> &render_pass,
@@ -120,12 +119,12 @@ gearoenix::nufrag::render::pipeline::Pipeline::Pipeline(
             d->get_vulkan_data(), cache->get_vulkan_data(), 1, &pipeline_create_info, nullptr, &vulkan_data));
 }
 
-gearoenix::nufrag::render::pipeline::Pipeline::~Pipeline() {
+gearoenix::render::pipeline::Pipeline::~Pipeline() {
     auto &d = cache->get_logical_device();
     auto &l = d->get_physical_device()->get_instance()->get_linker();
     l->vkDestroyPipeline(d->get_vulkan_data(), vulkan_data, nullptr);
 }
 
-const VkPipeline &gearoenix::nufrag::render::pipeline::Pipeline::get_vulkan_data() const {
+const VkPipeline &gearoenix::render::pipeline::Pipeline::get_vulkan_data() const {
     return vulkan_data;
 }

@@ -1,11 +1,10 @@
-#ifndef GEAROENIX_NUFRAG_VULKAN_FRAMEBUFFER_HPP
-#define GEAROENIX_NUFRAG_VULKAN_FRAMEBUFFER_HPP
+#ifndef GEAROENIX_VULKAN_FRAMEBUFFER_HPP
+#define GEAROENIX_VULKAN_FRAMEBUFFER_HPP
 
 #include <memory>
 #include "vk-linker.hpp"
 
 namespace gearoenix {
-namespace nufrag {
 namespace render {
 namespace image {
 class View;
@@ -28,7 +27,6 @@ public:
 
     const VkFramebuffer &get_vulkan_data() const;
 };
-}
 }
 }
 #endif

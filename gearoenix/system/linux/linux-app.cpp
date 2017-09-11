@@ -1,13 +1,13 @@
 #include "linux-app.hpp"
 #ifdef IN_LINUX
-#include "../../core/application.hpp"
+#include "../../core/cr-application.hpp"
 #include "../../render/render-engine.hpp"
 #include "../sys-file.hpp"
-#include "../log.hpp"
+#include "../sys-log.hpp"
 #define WINDOW_WIDTH  800
 #define WINDOW_HEIGHT 600
 
-gearoenix::nufrag::system::Application::Application() {
+gearoenix::system::Application::Application() {
     const xcb_setup_t *setup;
 	xcb_screen_iterator_t iter;
 	int scr;
@@ -59,12 +59,12 @@ gearoenix::nufrag::system::Application::Application() {
 	/// todo intialize in here
 }
 
-gearoenix::nufrag::system::Application::~Application() {
+gearoenix::system::Application::~Application() {
 	core_app = nullptr;
 	render_engine = nullptr;
 }
 
-void gearoenix::nufrag::system::Application::execute() {
+void gearoenix::system::Application::execute() {
     xcb_flush(connection);
 	while (!quit) {
 		// auto tStart = std::chrono::high_resolution_clock::now();
@@ -125,27 +125,27 @@ void gearoenix::nufrag::system::Application::execute() {
 	// vkDeviceWaitIdle(device);
 }
 
-xcb_connection_t *gearoenix::nufrag::system::Application::get_connection() const {
+xcb_connection_t *gearoenix::system::Application::get_connection() const {
     return connection;
 }
 
-xcb_window_t gearoenix::nufrag::system::Application::get_window() const {
+xcb_window_t gearoenix::system::Application::get_window() const {
     return window;
 }
 
-const std::shared_ptr<gearoenix::nufrag::system::File> gearoenix::nufrag::system::Application::get_asset() const {
+const std::shared_ptr<gearoenix::system::File> gearoenix::system::Application::get_asset() const {
     return asset;
 }
 
-const std::shared_ptr<gearoenix::nufrag::core::Application> &gearoenix::nufrag::system::Application::get_core_app() const {
+const std::shared_ptr<gearoenix::core::Application> &gearoenix::system::Application::get_core_app() const {
     return core_app;
 }
 
-const std::shared_ptr<gearoenix::nufrag::render::Engine> &gearoenix::nufrag::system::Application::get_render_engine() const {
+const std::shared_ptr<gearoenix::render::Engine> &gearoenix::system::Application::get_render_engine() const {
     return render_engine;
 }
 
-void gearoenix::nufrag::system::Application::handle(const xcb_generic_event_t *event) {
+void gearoenix::system::Application::handle(const xcb_generic_event_t *event) {
     switch (event->response_type & 0x7f) {
     case XCB_CONFIGURE_NOTIFY:
         LOGE("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFfff");
@@ -154,7 +154,7 @@ void gearoenix::nufrag::system::Application::handle(const xcb_generic_event_t *e
 }
 
 int main(int, char **) {
-    auto app = new gearoenix::nufrag::system::Application();
+    auto app = new gearoenix::system::Application();
     app->execute();
 	delete app;
     return 0;

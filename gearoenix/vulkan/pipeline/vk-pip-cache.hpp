@@ -1,9 +1,8 @@
-#ifndef GEAROENIX_NUFRAG_VULKAN_PIPELINE_CACHE_HPP
-#define GEAROENIX_NUFRAG_VULKAN_PIPELINE_CACHE_HPP
+#ifndef GEAROENIX_VULKAN_PIPELINE_CACHE_HPP
+#define GEAROENIX_VULKAN_PIPELINE_CACHE_HPP
 #include <memory>
 #include "../vk-linker.hpp"
 namespace gearoenix {
-namespace nufrag {
 namespace render {
 namespace device {
 class Logical;
@@ -22,6 +21,5 @@ public:
 };
 } // namespace pipeline
 } // namespace render
-} // namespace nufrag
 } // namespace gearoenix
-#endif // GEAROENIX_NUFRAG_RENDER_PIPELINE_CACHE_HPP
+#endif // GEAROENIX_RENDER_PIPELINE_CACHE_HPP

@@ -5,9 +5,9 @@
 #include "../device/vk-dev-physical.hpp"
 #include "../command/vk-cmd-pool.hpp"
 #include "../command/vk-cmd-buffer.hpp"
-#include "../../core/static.hpp"
+#include "../../core/cr-static.hpp"
 
-gearoenix::nufrag::render::buffer::Buffer::Buffer(
+gearoenix::render::buffer::Buffer::Buffer(
 		const std::shared_ptr<command::Pool> &pool,
 		const void     *data,    const unsigned int data_size,
 		const uint32_t *indices, const unsigned int indices_count):
@@ -84,7 +84,7 @@ gearoenix::nufrag::render::buffer::Buffer::Buffer(
 	l->vkFreeMemory(logical_device->get_vulkan_data(), staging_buffers.indices.memory, nullptr);
 }
 
-gearoenix::nufrag::render::buffer::Buffer::~Buffer() {
+gearoenix::render::buffer::Buffer::~Buffer() {
 	auto &l = logical_device->get_physical_device()->get_instance()->get_linker();
 	l->vkDestroyBuffer(logical_device->get_vulkan_data(), vertices_buffer, nullptr);
 	l->vkDestroyBuffer(logical_device->get_vulkan_data(), indices_buffer, nullptr);
@@ -92,7 +92,7 @@ gearoenix::nufrag::render::buffer::Buffer::~Buffer() {
 	l->vkFreeMemory(logical_device->get_vulkan_data(), indices_memory, nullptr);
 }
 
-void gearoenix::nufrag::render::buffer::Buffer::map_memory_type_to_index(
+void gearoenix::render::buffer::Buffer::map_memory_type_to_index(
         uint32_t typeBits, VkFlags requirements_mask, uint32_t *typeIndex) {
     VkPhysicalDeviceMemoryProperties memoryProperties;
     auto &l = logical_device->get_physical_device()->get_instance()->get_linker();
@@ -111,14 +111,14 @@ void gearoenix::nufrag::render::buffer::Buffer::map_memory_type_to_index(
     }
 }
 
-const VkBuffer &gearoenix::nufrag::render::buffer::Buffer::get_vertex_buffer() const {
+const VkBuffer &gearoenix::render::buffer::Buffer::get_vertex_buffer() const {
 	return vertices_buffer;
 }
 
-const VkBuffer &gearoenix::nufrag::render::buffer::Buffer::get_index_buffer() const {
+const VkBuffer &gearoenix::render::buffer::Buffer::get_index_buffer() const {
 	return indices_buffer;
 }
 
-const unsigned int &gearoenix::nufrag::render::buffer::Buffer::get_indices_count() const {
+const unsigned int &gearoenix::render::buffer::Buffer::get_indices_count() const {
     return indices_count;
 }

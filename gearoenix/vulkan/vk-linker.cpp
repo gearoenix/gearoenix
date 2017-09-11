@@ -1,5 +1,5 @@
 #include "vk-linker.hpp"
-#include "../system/log.hpp"
+#include "../system/sys-log.hpp"
 #include <string>
 #if defined(IN_LINUX) || defined(IN_ANDROID)
 #include <dlfcn.h>
@@ -7,7 +7,7 @@
 #include <Windows.h>
 #endif
 
-gearoenix::nufrag::render::Linker::Linker() {
+gearoenix::render::Linker::Linker() {
 #ifdef IN_WINDOWS
 	auto libvulkan = LoadLibrary("vulkan-1.dll");
 #else

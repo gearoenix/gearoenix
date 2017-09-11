@@ -1,10 +1,9 @@
-#ifndef GEAROENIX_NUFRAG_VULKAN_BUFFER_BUFFER_HPP
-#define GEAROENIX_NUFRAG_VULKAN_BUFFER_BUFFER_HPP
+#ifndef GEAROENIX_VULKAN_BUFFER_BUFFER_HPP
+#define GEAROENIX_VULKAN_BUFFER_BUFFER_HPP
 #include "../vk-linker.hpp"
 #include <memory>
 #include <vector>
 namespace gearoenix {
-namespace nufrag {
 namespace render {
 namespace device {
 class Logical;
@@ -33,7 +32,6 @@ public:
 	const VkBuffer &get_index_buffer() const;
     const unsigned int &get_indices_count() const;
 };
-}
 }
 }
 }

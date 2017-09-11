@@ -1,10 +1,9 @@
-#ifndef GEAROENIX_NUFRAG_VULKAN_SHADER_SHADER_HPP
-#define GEAROENIX_NUFRAG_VULKAN_SHADER_SHADER_HPP
+#ifndef GEAROENIX_VULKAN_SHADER_SHADER_HPP
+#define GEAROENIX_VULKAN_SHADER_SHADER_HPP
 #include <memory>
 #include <vector>
 #include "../vk-linker.hpp"
 namespace gearoenix {
-namespace nufrag {
 namespace system {
 class File;
 }
@@ -26,6 +25,5 @@ public:
 };
 } // namespace shader
 } // namespace render
-} // namespace nufrag
 } // namespace gearoenix
-#endif // GEAROENIX_NUFRAG_RENDER_SHADER_HPP
+#endif // GEAROENIX_RENDER_SHADER_HPP

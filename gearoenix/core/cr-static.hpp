@@ -1,5 +1,5 @@
-#ifndef GEAROEMIX_NUFRAG_CORE_STATIC_HPP
-#define GEAROEMIX_NUFRAG_CORE_STATIC_HPP
+#ifndef GEAROEMIX_CORE_STATIC_HPP
+#define GEAROEMIX_CORE_STATIC_HPP
 #ifndef countof
 #define countof(x) (sizeof(x)/sizeof(x[0]))
 #ifdef setz

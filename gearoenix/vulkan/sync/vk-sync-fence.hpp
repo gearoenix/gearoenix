@@ -1,9 +1,8 @@
-#ifndef GEAROENIX_NUFRAG_VULKAN_FENCE_HPP
-#define GEAROENIX_NUFRAG_VULKAN_FENCE_HPP
+#ifndef GEAROENIX_VULKAN_FENCE_HPP
+#define GEAROENIX_VULKAN_FENCE_HPP
 #include <memory>
 #include "../vk-linker.hpp"
 namespace gearoenix {
-namespace nufrag {
 namespace render {
 namespace device {
 class Logical;
@@ -19,7 +18,6 @@ public:
 	void wait();
 	const VkFence &get_vulkan_data() const;
 };
-}
 }
 }
 }

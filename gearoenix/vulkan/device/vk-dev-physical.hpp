@@ -1,10 +1,9 @@
-#ifndef GEAROENIX_NUFRAG_VULKAN_DEVICE_PHYSICAL_HPP
-#define GEAROENIX_NUFRAG_VULKAN_DEVICE_PHYSICAL_HPP
+#ifndef GEAROENIX_VULKAN_DEVICE_PHYSICAL_HPP
+#define GEAROENIX_VULKAN_DEVICE_PHYSICAL_HPP
 #include "../vk-linker.hpp"
 #include <memory>
 #include <vector>
 namespace gearoenix {
-namespace nufrag {
 namespace render {
 class Instance;
 class Surface;
@@ -38,7 +37,6 @@ public:
 	VkFormat get_supported_depth_format() const;
 	uint32_t get_memory_type_index(uint32_t type_bits, uint32_t properties) const;
 };
-}
 }
 }
 }

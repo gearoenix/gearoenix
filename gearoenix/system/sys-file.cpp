@@ -1,7 +1,6 @@
 #include "sys-file.hpp"
 #include "sys-app.hpp"
-#include "resource.hpp"
-#include "log.hpp"
+#include "sys-log.hpp"
 
 #ifdef IN_ANDROID
 
@@ -9,7 +8,7 @@
 
 #endif
 
-void gearoenix::nufrag::system::File::check_endian_compatibility() {
+void gearoenix::system::File::check_endian_compatibility() {
     unsigned int system_endian = 1;
     uint8_t resource_endian;
     read(resource_endian);
@@ -17,7 +16,7 @@ void gearoenix::nufrag::system::File::check_endian_compatibility() {
 //    LOGE(std::string("endian is: ") + std::to_string(is_endian_compatible));
 }
 
-gearoenix::nufrag::system::File::File(system::Application *sys_app)
+gearoenix::system::File::File(system::Application *sys_app)
 #if defined(IN_LINUX) || defined(IN_WINDOWS)
     : sys_app(sys_app) {
     file.open("data.gx3d", std::ios::binary | std::ios::in);
@@ -38,13 +37,13 @@ gearoenix::nufrag::system::File::File(system::Application *sys_app)
 check_endian_compatibility();
 }
 
-gearoenix::nufrag::system::File::~File() {}
+gearoenix::system::File::~File() {}
 
-bool gearoenix::nufrag::system::File::get_endian_compatibility() const {
+bool gearoenix::system::File::get_endian_compatibility() const {
     return is_endian_compatible;
 }
 
-unsigned int gearoenix::nufrag::system::File::read(void *data, size_t length) {
+unsigned int gearoenix::system::File::read(void *data, size_t length) {
 #ifdef IN_ANDROID
     return static_cast<unsigned int>(AAsset_read(file, data, length));
 #elif defined(IN_LINUX) || defined(IN_WINDOWS)
@@ -55,7 +54,7 @@ unsigned int gearoenix::nufrag::system::File::read(void *data, size_t length) {
 #endif
 }
 
-void gearoenix::nufrag::system::File::seek(unsigned int offset) {
+void gearoenix::system::File::seek(unsigned int offset) {
 #if defined(IN_LINUX) || defined(IN_WINDOWS)
     file.seekg(offset, std::ios::beg);
 #elif defined(IN_ANDROID)

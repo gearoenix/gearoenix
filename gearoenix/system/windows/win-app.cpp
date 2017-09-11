@@ -8,11 +8,11 @@
 #include "../../core/application.hpp"
 #include <string>
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR pCmdLine, int nCmdShow) {
-	std::shared_ptr<gearoenix::nufrag::system::Application> app(
-		new gearoenix::nufrag::system::Application(hInstance, hPrevInstance, pCmdLine, nCmdShow));
+    std::shared_ptr<gearoenix::system::Application> app(
+        new gearoenix::system::Application(hInstance, hPrevInstance, pCmdLine, nCmdShow));
 	return app->execute();
 }
-int gearoenix::nufrag::system::Application::execute() {
+int gearoenix::system::Application::execute() {
 	MSG msg;
 	while (running) {
 		while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
@@ -25,11 +25,11 @@ int gearoenix::nufrag::system::Application::execute() {
 	return (int)msg.wParam;
 }
 
-const HINSTANCE & gearoenix::nufrag::system::Application::get_hinstance() const {
+const HINSTANCE & gearoenix::system::Application::get_hinstance() const {
 	return instance;
 }
 
-LRESULT CALLBACK gearoenix::nufrag::system::Application::process_callback(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+LRESULT CALLBACK gearoenix::system::Application::process_callback(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	auto sys_app = reinterpret_cast<Application *>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
 	if (WM_CREATE == uMsg) {
 		auto create_structure = reinterpret_cast<CREATESTRUCT *>(lParam);
@@ -43,7 +43,7 @@ LRESULT CALLBACK gearoenix::nufrag::system::Application::process_callback(HWND h
 	return sys_app->handle_message(hWnd, uMsg, wParam, lParam);
 }
 
-LRESULT gearoenix::nufrag::system::Application::handle_message(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+LRESULT gearoenix::system::Application::handle_message(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	switch (uMsg) {
 	case WM_CLOSE:
 		/// TODO: proper termination
@@ -175,7 +175,7 @@ LRESULT gearoenix::nufrag::system::Application::handle_message(HWND hWnd, UINT u
 	return (DefWindowProc(hWnd, uMsg, wParam, lParam));
 }
 
-gearoenix::nufrag::system::Application::Application(
+gearoenix::system::Application::Application(
 	HINSTANCE hInstance,
 	HINSTANCE hPrevInstance,
 	LPSTR     pCmdLine,
@@ -258,8 +258,8 @@ gearoenix::nufrag::system::Application::Application(
 	UpdateWindow(window);
 }
 
-gearoenix::nufrag::system::Application::~Application() {}
-const HWND & gearoenix::nufrag::system::Application::get_hwnd() const {
+gearoenix::system::Application::~Application() {}
+const HWND & gearoenix::system::Application::get_hwnd() const {
 	return window;
 }
 #endif 

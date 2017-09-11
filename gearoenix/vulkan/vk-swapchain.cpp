@@ -7,41 +7,41 @@
 #include "image/vk-img-image.hpp"
 #include "image/vk-img-view.hpp"
 #include "sync/vk-sync-semaphore.hpp"
-#include "../core/static.hpp"
+#include "../core/cr-static.hpp"
 
 #define DEBUG_SWAPCHAIN
 
-gearoenix::nufrag::render::Swapchain::Swapchain(const std::shared_ptr<device::Logical> &d)
+gearoenix::render::Swapchain::Swapchain(const std::shared_ptr<device::Logical> &d)
     : logical_device(d) {
     initialize();
 }
 
-gearoenix::nufrag::render::Swapchain::~Swapchain() {
+gearoenix::render::Swapchain::~Swapchain() {
     image_views.clear();
     auto &l = logical_device->get_physical_device()->get_instance()->get_linker();
     l->vkDestroySwapchainKHR(logical_device->get_vulkan_data(), vulkan_data, nullptr);
 }
 
-const VkSwapchainKHR &gearoenix::nufrag::render::Swapchain::get_vulkan_data() const {
+const VkSwapchainKHR &gearoenix::render::Swapchain::get_vulkan_data() const {
     return vulkan_data;
 }
 
-const VkSurfaceFormatKHR &gearoenix::nufrag::render::Swapchain::get_chosen_format() const {
+const VkSurfaceFormatKHR &gearoenix::render::Swapchain::get_chosen_format() const {
     return chosen_format;
 }
 
-std::vector<std::shared_ptr<gearoenix::nufrag::render::image::View> >
-gearoenix::nufrag::render::Swapchain::get_image_views() const {
+std::vector<std::shared_ptr<gearoenix::render::image::View> >
+gearoenix::render::Swapchain::get_image_views() const {
     return image_views;
 }
 
-const std::shared_ptr<gearoenix::nufrag::render::device::Logical> &
-gearoenix::nufrag::render::Swapchain::get_logical_device() const {
+const std::shared_ptr<gearoenix::render::device::Logical> &
+gearoenix::render::Swapchain::get_logical_device() const {
     return logical_device;
 }
 
 
-uint32_t gearoenix::nufrag::render::Swapchain::get_next_image_index(const std::shared_ptr<sync::Semaphore> &semaphore) {
+uint32_t gearoenix::render::Swapchain::get_next_image_index(const std::shared_ptr<sync::Semaphore> &semaphore) {
     auto &l = logical_device->get_physical_device()->get_instance()->get_linker();
     uint32_t image_index = 0;
     VkResult r = l->vkAcquireNextImageKHR(logical_device->get_vulkan_data(), vulkan_data, UINT64_MAX, semaphore->get_vulkan_data(), nullptr, &image_index);
@@ -54,7 +54,7 @@ uint32_t gearoenix::nufrag::render::Swapchain::get_next_image_index(const std::s
     return image_index;
 }
 
-void gearoenix::nufrag::render::Swapchain::initialize() {
+void gearoenix::render::Swapchain::initialize() {
     auto &d = logical_device;
     auto &p = d->get_physical_device();
     auto &s = p->get_surface();

@@ -1,9 +1,8 @@
-#ifndef GEAROENIX_NUFRAG_VULKAN_SURFAE_HPP
-#define GEAROENIX_NUFRAG_VULKAN_SURFAE_HPP
+#ifndef GEAROENIX_VULKAN_SURFAE_HPP
+#define GEAROENIX_VULKAN_SURFAE_HPP
 #include "vk-linker.hpp"
 #include <memory>
 namespace gearoenix {
-namespace nufrag {
 namespace system {
 class Application;
 }
@@ -21,7 +20,6 @@ public:
 	const VkSurfaceKHR &get_vulkan_data() const;
     const system::Application *get_sys_app() const;
 };
-}
 }
 }
 #endif

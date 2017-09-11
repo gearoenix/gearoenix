@@ -1,4 +1,4 @@
-#include "../../core/build-configuration.hpp"
+#include "../../core/cr-build-configuration.hpp"
 
 #ifdef IN_ANDROID
 
@@ -10,7 +10,7 @@
 #include "../log.hpp"
 #include "../sys-file.hpp"
 
-void gearoenix::nufrag::system::Application::handle_cmd(android_app *app, int32_t cmd) {
+void gearoenix::system::Application::handle_cmd(android_app *app, int32_t cmd) {
     auto sys_app = reinterpret_cast<Application *>(app->userData);
     if (sys_app != nullptr) {
         sys_app->handle(cmd);
@@ -27,7 +27,7 @@ void gearoenix::nufrag::system::Application::handle_cmd(android_app *app, int32_
 
 void android_main(struct android_app *app) {
     app_dummy();
-    app->onAppCmd = gearoenix::nufrag::system::Application::handle_cmd;
+    app->onAppCmd = gearoenix::system::Application::handle_cmd;
     int events;
     android_poll_source *source;
     do {
@@ -39,34 +39,34 @@ void android_main(struct android_app *app) {
             break;
         }
     } while (app->destroyRequested == 0);
-    auto sys_app = reinterpret_cast<gearoenix::nufrag::system::Application *>(app->userData);
+    auto sys_app = reinterpret_cast<gearoenix::system::Application *>(app->userData);
     sys_app->execute();
     delete sys_app;
 }
 
-gearoenix::nufrag::system::Application::Application(android_app *and_app) : and_app(and_app) {
+gearoenix::system::Application::Application(android_app *and_app) : and_app(and_app) {
 }
 
-gearoenix::nufrag::system::Application::~Application() {
+gearoenix::system::Application::~Application() {
     render_engine = nullptr;
     core_app = nullptr;
 }
 
-android_app *gearoenix::nufrag::system::Application::get_android_app() const {
+android_app *gearoenix::system::Application::get_android_app() const {
     return and_app;
 }
 
-const std::shared_ptr<gearoenix::nufrag::core::Application> &
-gearoenix::nufrag::system::Application::get_core_app() const {
+const std::shared_ptr<gearoenix::core::Application> &
+gearoenix::system::Application::get_core_app() const {
     return core_app;
 }
 
-const std::shared_ptr<gearoenix::nufrag::render::Engine> &
-gearoenix::nufrag::system::Application::get_render_engine() const {
+const std::shared_ptr<gearoenix::render::Engine> &
+gearoenix::system::Application::get_render_engine() const {
     return render_engine;
 }
 
-void gearoenix::nufrag::system::Application::execute() {
+void gearoenix::system::Application::execute() {
     std::lock_guard<std::mutex> exe_lock(execution_lock);
     init();
     int events;
@@ -84,12 +84,12 @@ void gearoenix::nufrag::system::Application::execute() {
     (void) exe_lock;
 }
 
-const std::shared_ptr<gearoenix::nufrag::system::File> &
-gearoenix::nufrag::system::Application::get_asset() const {
+const std::shared_ptr<gearoenix::system::File> &
+gearoenix::system::Application::get_asset() const {
     return asset;
 }
 
-void gearoenix::nufrag::system::Application::handle(int32_t cmd) {
+void gearoenix::system::Application::handle(int32_t cmd) {
     switch (cmd) {
         case APP_CMD_LOST_FOCUS:
             if(core_app != nullptr) core_app->terminate();
@@ -111,7 +111,7 @@ void gearoenix::nufrag::system::Application::handle(int32_t cmd) {
     }
 }
 
-void gearoenix::nufrag::system::Application::init() {
+void gearoenix::system::Application::init() {
     asset = std::shared_ptr<File>(new File(this));
     render_engine = std::shared_ptr<render::Engine>(new render::Engine(this));
     core_app = std::shared_ptr<core::Application>(new core::Application(this));

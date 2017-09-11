@@ -1,9 +1,8 @@
-#ifndef GEAROENIX_NUFRAG_RENDER_DESCRIPTOR_POOL_HPP
-#define GEAROENIX_NUFRAG_RENDER_DESCRIPTOR_POOL_HPP
+#ifndef GEAROENIX_RENDER_DESCRIPTOR_POOL_HPP
+#define GEAROENIX_RENDER_DESCRIPTOR_POOL_HPP
 #include "../vk-linker.hpp"
 #include <memory>
 namespace gearoenix {
-namespace nufrag {
 namespace render {
 namespace device {
 class Logical;
@@ -22,6 +21,5 @@ public:
 };
 } // namespace descriptor
 } // namespace render
-} // namespace nufrag
 } // namespace gearoenix
-#endif // GEAROENIX_NUFRAG_RENDER_DESCRIPTOR_POOL_HPP
+#endif // GEAROENIX_RENDER_DESCRIPTOR_POOL_HPP

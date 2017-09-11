@@ -1,9 +1,8 @@
-#ifndef GEAROENIX_NUFRAG_VULKAN_SHADER_DIFFUSE_COLORED_HPP
-#define GEAROENIX_NUFRAG_VULKAN_SHADER_DIFFUSE_COLORED_HPP
+#ifndef GEAROENIX_VULKAN_SHADER_DIFFUSE_COLORED_HPP
+#define GEAROENIX_VULKAN_SHADER_DIFFUSE_COLORED_HPP
 #define DIFFUSE_COLORED_MODULE_COUNT 2
 #include "vk-shader.hpp"
 namespace gearoenix {
-namespace nufrag {
 namespace render {
 namespace shader {
 class DiffuseColored: public Shader {
@@ -17,6 +16,5 @@ public:
 };
 } // namespace shader
 } // namespace render
-} // namespace nufrag
 } // namespace gearoenix
 #endif

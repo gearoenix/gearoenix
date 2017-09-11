@@ -1,5 +1,5 @@
 #include "and-log.hpp"
-#include "../../core/build-configuration.hpp"
+#include "../../core/cr-build-configuration.hpp"
 #ifdef IN_ANDROID
 
 #endif

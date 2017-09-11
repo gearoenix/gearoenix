@@ -1,5 +1,5 @@
 #pragma once
-#include "../core/build-configuration.hpp"
+#include "../core/cr-build-configuration.hpp"
 #ifdef IN_ANDROID
 #define VK_USE_PLATFORM_ANDROID_KHR
 #elif defined(IN_LINUX)
@@ -15,7 +15,6 @@
 #define VK_NO_PROTOTYPES 1
 #include <vulkan/vulkan.h>
 namespace gearoenix {
-namespace nufrag {
 namespace render {
 class Linker {
 public:
@@ -228,6 +227,5 @@ public:
 	PFN_vkDebugReportMessageEXT vkDebugReportMessageEXT;
 #endif
 };
-}
 }
 }

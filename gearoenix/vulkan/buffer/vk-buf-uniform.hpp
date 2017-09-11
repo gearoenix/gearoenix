@@ -1,9 +1,8 @@
-#ifndef GEAROENIX_NUFRAG_VULKAN_BUFFER_UNIFORM_HPP
-#define GEAROENIX_NUFRAG_VULKAN_BUFFER_UNIFORM_HPP
+#ifndef GEAROENIX_VULKAN_BUFFER_UNIFORM_HPP
+#define GEAROENIX_VULKAN_BUFFER_UNIFORM_HPP
 #include <memory>
 #include "../vk-linker.hpp"
 namespace gearoenix {
-namespace nufrag {
 namespace render {
 namespace command {
 class Pool;
@@ -34,6 +33,5 @@ public:
 };
 } // namespace buffer
 } // namespace render
-} // namespace nufrag
 } // namespace gearoenix
-#endif // GEAROENIX_NUFRAG_RENDER_BUFFER_UNIFORM_HPP
+#endif // GEAROENIX_RENDER_BUFFER_UNIFORM_HPP

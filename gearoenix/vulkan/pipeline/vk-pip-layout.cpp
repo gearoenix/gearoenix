@@ -2,9 +2,9 @@
 #include "../device/vk-dev-logical.hpp"
 #include "../device/vk-dev-physical.hpp"
 #include "../vk-instance.hpp"
-#include "../../core/static.hpp"
+#include "../../core/cr-static.hpp"
 #include "../vk-check.hpp"
-gearoenix::nufrag::render::pipeline::Layout::Layout(const std::shared_ptr<device::Logical> &logical_device):
+gearoenix::render::pipeline::Layout::Layout(const std::shared_ptr<device::Logical> &logical_device):
     logical_device(logical_device) {
     auto &l = logical_device->get_physical_device()->get_instance()->get_linker();
     VkDescriptorSetLayoutBinding layout_binding;
@@ -26,18 +26,18 @@ gearoenix::nufrag::render::pipeline::Layout::Layout(const std::shared_ptr<device
     VKC(l->vkCreatePipelineLayout(logical_device->get_vulkan_data(), &pipeline_layout_create_info, nullptr, &vulkan_data));
 }
 
-gearoenix::nufrag::render::pipeline::Layout::~Layout() {
+gearoenix::render::pipeline::Layout::~Layout() {
     auto &l = logical_device->get_physical_device()->get_instance()->get_linker();
     l->vkDestroyPipelineLayout(logical_device->get_vulkan_data(), vulkan_data, nullptr);
     l->vkDestroyDescriptorSetLayout(logical_device->get_vulkan_data(), descriptor_set_layout, nullptr);
 }
 
 
-const VkPipelineLayout &gearoenix::nufrag::render::pipeline::Layout::get_vulkan_data() const {
+const VkPipelineLayout &gearoenix::render::pipeline::Layout::get_vulkan_data() const {
     return vulkan_data;
 }
 
 
-const VkDescriptorSetLayout &gearoenix::nufrag::render::pipeline::Layout::get_descriptor_set_layout() const {
+const VkDescriptorSetLayout &gearoenix::render::pipeline::Layout::get_descriptor_set_layout() const {
     return descriptor_set_layout;
 }

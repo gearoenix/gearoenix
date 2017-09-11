@@ -1,9 +1,9 @@
 #include "vk-shader-manager.hpp"
 #include "vk-shader-diffuse-colored.hpp"
 #include "../../system/sys-file.hpp"
-#include "../../system/log.hpp"
+#include "../../system/sys-log.hpp"
 
-gearoenix::nufrag::render::shader::Manager::Manager(std::shared_ptr<system::File> file)
+gearoenix::render::shader::Manager::Manager(std::shared_ptr<system::File> file)
         : asset_file(file) {
     uint16_t count;
     asset_file->read(count);
@@ -20,8 +20,8 @@ gearoenix::nufrag::render::shader::Manager::Manager(std::shared_ptr<system::File
     }
 }
 
-std::shared_ptr<gearoenix::nufrag::render::shader::Shader>
-gearoenix::nufrag::render::shader::Manager::get_shader(
+std::shared_ptr<gearoenix::render::shader::Shader>
+gearoenix::render::shader::Manager::get_shader(
         const std::shared_ptr<device::Logical> &logical_device, uint16_t id) {
     auto iter = cached.find(id);
     if (iter != cached.end() && !(iter->second.expired())) {

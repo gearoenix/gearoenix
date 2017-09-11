@@ -2,9 +2,9 @@
 #include "../device/vk-dev-logical.hpp"
 #include "../device/vk-dev-physical.hpp"
 #include "../vk-instance.hpp"
-#include "../../core/static.hpp"
+#include "../../core/cr-static.hpp"
 #include "../vk-check.hpp"
-gearoenix::nufrag::render::pipeline::Cache::Cache(const std::shared_ptr<device::Logical> &logical_device): logical_device(logical_device) {
+gearoenix::render::pipeline::Cache::Cache(const std::shared_ptr<device::Logical> &logical_device): logical_device(logical_device) {
     auto &l = logical_device->get_physical_device()->get_instance()->get_linker();
     VkPipelineCacheCreateInfo pipeline_cache_create_info;
     setz(pipeline_cache_create_info);
@@ -12,15 +12,15 @@ gearoenix::nufrag::render::pipeline::Cache::Cache(const std::shared_ptr<device::
     VKC(l->vkCreatePipelineCache(logical_device->get_vulkan_data(), &pipeline_cache_create_info, nullptr, &vulkan_data));
 }
 
-gearoenix::nufrag::render::pipeline::Cache::~Cache(){
+gearoenix::render::pipeline::Cache::~Cache(){
     auto &l = logical_device->get_physical_device()->get_instance()->get_linker();
     l->vkDestroyPipelineCache(logical_device->get_vulkan_data(), vulkan_data, nullptr);
 }
 
-const std::shared_ptr<gearoenix::nufrag::render::device::Logical> &gearoenix::nufrag::render::pipeline::Cache::get_logical_device() const {
+const std::shared_ptr<gearoenix::render::device::Logical> &gearoenix::render::pipeline::Cache::get_logical_device() const {
     return logical_device;
 }
 
-const VkPipelineCache &gearoenix::nufrag::render::pipeline::Cache::get_vulkan_data() const {
+const VkPipelineCache &gearoenix::render::pipeline::Cache::get_vulkan_data() const {
     return vulkan_data;
 }

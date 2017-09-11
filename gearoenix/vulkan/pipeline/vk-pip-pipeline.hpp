@@ -1,10 +1,9 @@
-#ifndef GEAROENIX_NUFRAG_VULKAN_PIPELINE_PIPELINE_HPP
-#define GEAROENIX_NUFRAG_VULKAN_PIPELINE_PIPELINE_HPP
+#ifndef GEAROENIX_VULKAN_PIPELINE_PIPELINE_HPP
+#define GEAROENIX_VULKAN_PIPELINE_PIPELINE_HPP
 #include <memory>
 #include <string>
 #include "../vk-linker.hpp"
 namespace gearoenix {
-namespace nufrag {
 namespace core {
 class Application;
 }
@@ -41,7 +40,6 @@ public:
     ~Pipeline();
 	const VkPipeline &get_vulkan_data() const;
 };
-}
 }
 }
 }

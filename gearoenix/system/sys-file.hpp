@@ -1,11 +1,11 @@
-#ifndef GEAROENIX_NUFRAG_SYSTEM_FILE_HPP
-#define GEAROENIX_NUFRAG_SYSTEM_FILE_HPP
+#ifndef GEAROENIX_SYSTEM_FILE_HPP
+#define GEAROENIX_SYSTEM_FILE_HPP
 
 #include <string>
 #include <memory>
 #include <vector>
 #include <map>
-#include "../core/build-configuration.hpp"
+#include "../core/cr-build-configuration.hpp"
 
 #if defined(IN_LINUX) || defined(IN_WINDOWS)
 #include <fstream>
@@ -17,10 +17,8 @@
 #error "Unimplemented yet!"
 #endif
 namespace gearoenix {
-namespace nufrag {
 namespace system {
 class Application;
-
 class File {
 private:
 #if defined(IN_LINUX) || defined(IN_WINDOWS)
@@ -77,7 +75,6 @@ public:
         correct_endianess(&data);
     }
 };
-}
 }
 }
 #endif

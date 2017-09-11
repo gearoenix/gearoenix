@@ -2,9 +2,9 @@
 #include "../vk-instance.hpp"
 #include "../vk-check.hpp"
 #include "../vk-surface.hpp"
-#include "../../core/static.hpp"
+#include "../../core/cr-static.hpp"
 
-int gearoenix::nufrag::render::device::Physical::is_good(const VkPhysicalDevice &gpu) {
+int gearoenix::render::device::Physical::is_good(const VkPhysicalDevice &gpu) {
 	auto &l = surface->get_instance()->get_linker();
 	uint32_t queue_count = 0;
 	l->vkGetPhysicalDeviceQueueFamilyProperties(gpu, &queue_count, NULL);
@@ -73,7 +73,7 @@ int gearoenix::nufrag::render::device::Physical::is_good(const VkPhysicalDevice 
 	return -1;
 }
 
-gearoenix::nufrag::render::device::Physical::Physical(const std::shared_ptr<Surface> &surface): surface(surface) {
+gearoenix::render::device::Physical::Physical(const std::shared_ptr<Surface> &surface): surface(surface) {
 	auto &instance = surface->get_instance();
 	auto &l = instance->get_linker();
 	uint32_t gpu_count = 0;
@@ -121,17 +121,17 @@ gearoenix::nufrag::render::device::Physical::Physical(const std::shared_ptr<Surf
 	}
 }
 
-gearoenix::nufrag::render::device::Physical::~Physical() {}
+gearoenix::render::device::Physical::~Physical() {}
 
-const VkPhysicalDeviceMemoryProperties &gearoenix::nufrag::render::device::Physical::get_memory_properties() const {
+const VkPhysicalDeviceMemoryProperties &gearoenix::render::device::Physical::get_memory_properties() const {
 	return memory_properties;
 }
 
-const std::shared_ptr<gearoenix::nufrag::render::Instance> & gearoenix::nufrag::render::device::Physical::get_instance() const {
+const std::shared_ptr<gearoenix::render::Instance> & gearoenix::render::device::Physical::get_instance() const {
 	return surface->get_instance();
 }
 
-std::shared_ptr<VkSurfaceCapabilitiesKHR> gearoenix::nufrag::render::device::Physical::get_surface_capabilities() const {
+std::shared_ptr<VkSurfaceCapabilitiesKHR> gearoenix::render::device::Physical::get_surface_capabilities() const {
 	VkSurfaceCapabilitiesKHR *caps = new VkSurfaceCapabilitiesKHR;
 	setz(*caps);
 	surface->get_instance()->get_linker()->vkGetPhysicalDeviceSurfaceCapabilitiesKHR(
@@ -139,7 +139,7 @@ std::shared_ptr<VkSurfaceCapabilitiesKHR> gearoenix::nufrag::render::device::Phy
 	return std::shared_ptr<VkSurfaceCapabilitiesKHR>(caps);
 }
 
-std::vector<VkSurfaceFormatKHR> gearoenix::nufrag::render::device::Physical::get_surface_formats() const {
+std::vector<VkSurfaceFormatKHR> gearoenix::render::device::Physical::get_surface_formats() const {
 	uint32_t count = 0;
 	surface->get_instance()->get_linker()->vkGetPhysicalDeviceSurfaceFormatsKHR(vulkan_data, surface->get_vulkan_data(), &count, 0);
 	std::vector<VkSurfaceFormatKHR> formats(count);
@@ -147,31 +147,31 @@ std::vector<VkSurfaceFormatKHR> gearoenix::nufrag::render::device::Physical::get
 	return formats;
 }
 
-const std::shared_ptr<gearoenix::nufrag::render::Surface> &gearoenix::nufrag::render::device::Physical::get_surface() const {
+const std::shared_ptr<gearoenix::render::Surface> &gearoenix::render::device::Physical::get_surface() const {
 	return surface;
 }
 
-const VkPhysicalDevice &gearoenix::nufrag::render::device::Physical::get_vulkan_data() const {
+const VkPhysicalDevice &gearoenix::render::device::Physical::get_vulkan_data() const {
 	return vulkan_data;
 }
 
-uint32_t gearoenix::nufrag::render::device::Physical::get_graphics_queue_node_index() const {
+uint32_t gearoenix::render::device::Physical::get_graphics_queue_node_index() const {
 	return graphics_queue_node_index;
 }
 
-uint32_t gearoenix::nufrag::render::device::Physical::get_transfer_queue_node_index() const {
+uint32_t gearoenix::render::device::Physical::get_transfer_queue_node_index() const {
 	return transfer_queue_node_index;
 }
 
-uint32_t gearoenix::nufrag::render::device::Physical::get_compute_queue_node_index() const {
+uint32_t gearoenix::render::device::Physical::get_compute_queue_node_index() const {
 	return compute_queue_node_index;
 }
 
-uint32_t gearoenix::nufrag::render::device::Physical::get_present_queue_node_index() const {
+uint32_t gearoenix::render::device::Physical::get_present_queue_node_index() const {
 	return present_queue_node_index;
 }
 
-VkFormat gearoenix::nufrag::render::device::Physical::get_supported_depth_format() const {
+VkFormat gearoenix::render::device::Physical::get_supported_depth_format() const {
 	auto &l = surface->get_instance()->get_linker();
 	std::vector<VkFormat> depth_formats = {
 		VK_FORMAT_D32_SFLOAT_S8_UINT,
@@ -191,7 +191,7 @@ VkFormat gearoenix::nufrag::render::device::Physical::get_supported_depth_format
 	return VK_FORMAT_UNDEFINED;
 }
 
-uint32_t gearoenix::nufrag::render::device::Physical::get_memory_type_index(uint32_t type_bits, uint32_t properties) const {
+uint32_t gearoenix::render::device::Physical::get_memory_type_index(uint32_t type_bits, uint32_t properties) const {
 	for(uint32_t i = 0; i < memory_properties.memoryTypeCount; ++i) {
 		if((type_bits & 1) == 1) {
 			if(((memory_properties.memoryTypes[i].propertyFlags) & properties) == properties) {

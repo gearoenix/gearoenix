@@ -1,9 +1,8 @@
-#ifndef GEAROENIX_NUFRAG_VULKAN_IMAGE_VIEW_HPP
-#define GEAROENIX_NUFRAG_VULKAN_IMAGE_VIEW_HPP
+#ifndef GEAROENIX_VULKAN_IMAGE_VIEW_HPP
+#define GEAROENIX_VULKAN_IMAGE_VIEW_HPP
 #include <memory>
 #include "../vk-linker.hpp"
 namespace gearoenix {
-namespace nufrag {
 namespace render {
 namespace memory {
 class Pool;
@@ -25,7 +24,6 @@ public:
 	const std::shared_ptr<Image> &get_image() const;
 	const VkImageView &get_vulkan_data() const;
 };
-}
 }
 }
 }

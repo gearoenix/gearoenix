@@ -24,13 +24,13 @@
 #include "vk-check.hpp"
 #include "vk-framebuffer.hpp"
 #include "vk-render-pass.hpp"
-#include "../core/application.hpp"
-#include "../core/static.hpp"
-#include "../system/log.hpp"
+#include "../core/cr-application.hpp"
+#include "../core/cr-static.hpp"
+#include "../system/sys-log.hpp"
 #include "../system/sys-app.hpp"
 #include "../system/sys-file.hpp"
 
-gearoenix::nufrag::render::Engine::Engine(system::Application *sys_app) : sys_app(sys_app) {
+gearoenix::render::Engine::Engine(system::Application *sys_app) : sys_app(sys_app) {
     linker = std::shared_ptr<Linker>(new Linker);
     instance = std::shared_ptr<Instance>(new Instance(linker));
     surface = std::shared_ptr<Surface>(new Surface(instance, this->sys_app));
@@ -91,9 +91,9 @@ gearoenix::nufrag::render::Engine::Engine(system::Application *sys_app) : sys_ap
     setup_draw_buffers();
 }
 
-gearoenix::nufrag::render::Engine::~Engine() {}
+gearoenix::render::Engine::~Engine() {}
 
-void gearoenix::nufrag::render::Engine::window_changed() {
+void gearoenix::render::Engine::window_changed() {
     logical_device->wait_to_finish();
     swapchain->initialize();
     depth_stencil = image::View::create_depth_stencil(mem_pool);
@@ -108,7 +108,7 @@ void gearoenix::nufrag::render::Engine::window_changed() {
     setup_draw_buffers();
 }
 
-void gearoenix::nufrag::render::Engine::update() {
+void gearoenix::render::Engine::update() {
     uint32_t current_buffer = swapchain->get_next_image_index(present_complete_semaphore);
     if(current_buffer == 0xffffffff) {
         window_changed();
@@ -139,7 +139,7 @@ void gearoenix::nufrag::render::Engine::update() {
     VKC(linker->vkQueuePresentKHR(logical_device->get_graphic_queue(), &present_info));
 }
 
-void gearoenix::nufrag::render::Engine::terminate() {
+void gearoenix::render::Engine::terminate() {
     logical_device->wait_to_finish();
     wait_fences.clear();
     render_complete_semaphore = nullptr;
@@ -165,7 +165,7 @@ void gearoenix::nufrag::render::Engine::terminate() {
     linker = nullptr;
 }
 
-void gearoenix::nufrag::render::Engine::setup_draw_buffers() {
+void gearoenix::render::Engine::setup_draw_buffers() {
     VkClearValue clear_values[2];
     clear_values[0].color = {{0.4f, 0.4f, 0.4f, 1.0f}};
     clear_values[1].color = {{1.0f, 0.0f, 0.0f, 0.0f}};

@@ -1,11 +1,11 @@
 #include "vk-des-pool.hpp"
-#include "../../core/static.hpp"
+#include "../../core/cr-static.hpp"
 #include "../device/vk-dev-logical.hpp"
 #include "../device/vk-dev-physical.hpp"
 #include "../vk-instance.hpp"
 #include "../vk-check.hpp"
 
-gearoenix::nufrag::render::descriptor::Pool::Pool(const std::shared_ptr<device::Logical> &logical_device): logical_device(logical_device) {
+gearoenix::render::descriptor::Pool::Pool(const std::shared_ptr<device::Logical> &logical_device): logical_device(logical_device) {
     auto &l = logical_device->get_physical_device()->get_instance()->get_linker();
     VkDescriptorPoolSize type_counts;
     setz(type_counts);
@@ -20,15 +20,15 @@ gearoenix::nufrag::render::descriptor::Pool::Pool(const std::shared_ptr<device::
     VKC(l->vkCreateDescriptorPool(logical_device->get_vulkan_data(), &descriptor_pool_info, nullptr, &vulkan_data));
 }
 
-gearoenix::nufrag::render::descriptor::Pool::~Pool() {
+gearoenix::render::descriptor::Pool::~Pool() {
     auto &l = logical_device->get_physical_device()->get_instance()->get_linker();
     l->vkDestroyDescriptorPool(logical_device->get_vulkan_data(), vulkan_data, nullptr);
 }
 
-const std::shared_ptr<gearoenix::nufrag::render::device::Logical> &gearoenix::nufrag::render::descriptor::Pool::get_logical_device() const {
+const std::shared_ptr<gearoenix::render::device::Logical> &gearoenix::render::descriptor::Pool::get_logical_device() const {
     return logical_device;
 }
 
-const VkDescriptorPool &gearoenix::nufrag::render::descriptor::Pool::get_vulkan_data() const {
+const VkDescriptorPool &gearoenix::render::descriptor::Pool::get_vulkan_data() const {
     return vulkan_data;
 }

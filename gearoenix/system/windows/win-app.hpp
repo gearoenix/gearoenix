@@ -1,12 +1,11 @@
-#ifndef GEAROENIX_NUFRAG_SYSTEM_WINDOWS_WIN_APP_HPP
-#define GEAROENIX_NUFRAG_SYSTEM_WINDOWS_WIN_APP_HPP
-#include "../../core/build-configuration.hpp"
+#ifndef GEAROENIX_SYSTEM_WINDOWS_WIN_APP_HPP
+#define GEAROENIX_SYSTEM_WINDOWS_WIN_APP_HPP
+#include "../../core/cr-build-configuration.hpp"
 #ifdef IN_WINDOWS
 #include <Windows.h>
 #include <memory>
 #include "../../render/render-engine.hpp"
 namespace gearoenix {
-namespace nufrag {
 namespace core {
 class Application;
 }
@@ -30,7 +29,6 @@ public:
 	const std::shared_ptr<core::Application> &get_core_app()      const;
 	const std::shared_ptr<render::Engine>    &get_render_engine() const;
 };
-}
 }
 }
 #endif

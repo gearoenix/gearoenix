@@ -1,9 +1,8 @@
-#ifndef GEAROENIX_NUFRAG_VULKAN_SYNC_SEMAPHORE_HPP
-#define GEAROENIX_NUFRAG_VULKAN_SYNC_SEMAPHORE_HPP
+#ifndef GEAROENIX_VULKAN_SYNC_SEMAPHORE_HPP
+#define GEAROENIX_VULKAN_SYNC_SEMAPHORE_HPP
 #include "../vk-linker.hpp"
 #include <memory>
 namespace gearoenix {
-namespace nufrag {
 namespace render {
 namespace device {
 class Logical;
@@ -22,6 +21,5 @@ public:
 };
 } // namespace sync
 } // namespace render
-} // namespace nufrag
 } // namespace gearoenix
-#endif // GEAROENIX_NUFRAG_RENDER_SYNC_SEMAPHORE_HPP
+#endif // GEAROENIX_RENDER_SYNC_SEMAPHORE_HPP

@@ -1,10 +1,9 @@
-#ifndef GEAROENIX_NUFRAG_VULKAN_SWAPCHAIN_HPP
-#define GEAROENIX_NUFRAG_VULKAN_SWAPCHAIN_HPP
+#ifndef GEAROENIX_VULKAN_SWAPCHAIN_HPP
+#define GEAROENIX_VULKAN_SWAPCHAIN_HPP
 #include <memory>
 #include <vector>
 #include "vk-linker.hpp"
 namespace gearoenix {
-namespace nufrag {
 namespace render {
 namespace device {
 class Logical;
@@ -31,7 +30,6 @@ public:
     uint32_t get_next_image_index(const std::shared_ptr<sync::Semaphore> &semaphore);
     void initialize();
 };
-}
 }
 }
 #endif

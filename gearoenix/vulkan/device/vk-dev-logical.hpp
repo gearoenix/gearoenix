@@ -1,9 +1,8 @@
-#ifndef GEAROENIX_NUFRAG_VULKAN_DEVICE_LOGICAL_HPP
-#define GEAROENIX_NUFRAG_VULKAN_DEVICE_LOGICAL_HPP
+#ifndef GEAROENIX_VULKAN_DEVICE_LOGICAL_HPP
+#define GEAROENIX_VULKAN_DEVICE_LOGICAL_HPP
 #include "../vk-linker.hpp"
 #include <memory>
 namespace gearoenix {
-namespace nufrag {
 namespace render {
 namespace device {
 class Physical;
@@ -20,7 +19,6 @@ public:
 	const VkQueue &get_graphic_queue() const;
     void wait_to_finish();
 };
-}
 }
 }
 }

@@ -1,10 +1,9 @@
-#ifndef GEAROENIX_NUFRAG_VULKAN_COMMAND_BUFFER_HPP
-#define GEAROENIX_NUFRAG_VULKAN_COMMAND_BUFFER_HPP
+#ifndef GEAROENIX_VULKAN_COMMAND_BUFFER_HPP
+#define GEAROENIX_VULKAN_COMMAND_BUFFER_HPP
 #include "../vk-linker.hpp"
 #include <memory>
 #include <vector>
 namespace gearoenix {
-namespace nufrag {
 namespace render {
 namespace command {
 class Pool;
@@ -24,7 +23,6 @@ public:
     void set_viewport(const VkViewport &viewport);
     void set_scissor(const VkRect2D &scissor);
 };
-}
 }
 }
 }

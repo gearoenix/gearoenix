@@ -1,9 +1,8 @@
-#ifndef GEAROENIX_NUFRAG_VULKAN_DESCRIPTOR_SET_HPP
-#define GEAROENIX_NUFRAG_VULKAN_DESCRIPTOR_SET_HPP
+#ifndef GEAROENIX_VULKAN_DESCRIPTOR_SET_HPP
+#define GEAROENIX_VULKAN_DESCRIPTOR_SET_HPP
 #include "../vk-linker.hpp"
 #include <memory>
 namespace gearoenix {
-namespace nufrag {
 namespace render {
 namespace buffer {
 class Uniform;
@@ -31,7 +30,5 @@ public:
 
 } // namespace descriptor
 } // namespace render
-} // namespace nufrag
 } // namespace gearoenix
-
-#endif // GEAROENIX_NUFRAG_RENDER_DESCRIPTOR_SET_HPP
+#endif // GEAROENIX_RENDER_DESCRIPTOR_SET_HPP

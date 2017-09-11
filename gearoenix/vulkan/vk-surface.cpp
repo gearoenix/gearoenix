@@ -1,7 +1,7 @@
 #include "vk-surface.hpp"
-#include "../core/build-configuration.hpp"
-#include "../core/application.hpp"
-#include "../core/static.hpp"
+#include "../core/cr-build-configuration.hpp"
+#include "../core/cr-application.hpp"
+#include "../core/cr-static.hpp"
 #include "../system/sys-app.hpp"
 #include "vk-check.hpp"
 #include "vk-instance.hpp"
@@ -9,7 +9,7 @@
 #ifdef IN_ANDROID
 #include <android_native_app_glue.h>
 #endif
-gearoenix::nufrag::render::Surface::Surface(const std::shared_ptr<Instance> &instance, system::Application *sys_app): instance(instance), sys_app(sys_app) {
+gearoenix::render::Surface::Surface(const std::shared_ptr<Instance> &instance, system::Application *sys_app): instance(instance), sys_app(sys_app) {
 #ifdef IN_ANDROID
     VkAndroidSurfaceCreateInfoKHR create_info;
     std::memset(&create_info, 0, sizeof(create_info));
@@ -38,19 +38,19 @@ gearoenix::nufrag::render::Surface::Surface(const std::shared_ptr<Instance> &ins
 #endif
 }
 
-gearoenix::nufrag::render::Surface::~Surface() {
+gearoenix::render::Surface::~Surface() {
     instance->get_linker()->vkDestroySurfaceKHR(instance->get_vulkan_data(), vulkan_data, 0);
 }
 
-const std::shared_ptr<gearoenix::nufrag::render::Instance> &
-gearoenix::nufrag::render::Surface::get_instance() const {
+const std::shared_ptr<gearoenix::render::Instance> &
+gearoenix::render::Surface::get_instance() const {
     return instance;
 }
 
-const VkSurfaceKHR &gearoenix::nufrag::render::Surface::get_vulkan_data() const {
+const VkSurfaceKHR &gearoenix::render::Surface::get_vulkan_data() const {
     return vulkan_data;
 }
 
-const gearoenix::nufrag::system::Application *gearoenix::nufrag::render::Surface::get_sys_app() const {
+const gearoenix::system::Application *gearoenix::render::Surface::get_sys_app() const {
     return sys_app;
 }

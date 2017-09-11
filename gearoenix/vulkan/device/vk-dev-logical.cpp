@@ -2,9 +2,9 @@
 #include "vk-dev-physical.hpp"
 #include "../vk-check.hpp"
 #include "../vk-instance.hpp"
-#include "../../core/static.hpp"
+#include "../../core/cr-static.hpp"
 
-gearoenix::nufrag::render::device::Logical::Logical(const std::shared_ptr<Physical> &p):
+gearoenix::render::device::Logical::Logical(const std::shared_ptr<Physical> &p):
         physical_device(p) {
     const char *device_extensions[] = { 
 		VK_KHR_SWAPCHAIN_EXTENSION_NAME
@@ -44,26 +44,26 @@ gearoenix::nufrag::render::device::Logical::Logical(const std::shared_ptr<Physic
 
 }
 
-gearoenix::nufrag::render::device::Logical::~Logical() {
+gearoenix::render::device::Logical::~Logical() {
     auto &l = physical_device->get_instance()->get_linker();
     l->vkDestroyDevice(vulkan_data, nullptr);
 }
 
-const std::shared_ptr<gearoenix::nufrag::render::device::Physical> &
-gearoenix::nufrag::render::device::Logical::get_physical_device() const {
+const std::shared_ptr<gearoenix::render::device::Physical> &
+gearoenix::render::device::Logical::get_physical_device() const {
     return physical_device;
 }
 
-const VkDevice &gearoenix::nufrag::render::device::Logical::get_vulkan_data() const {
+const VkDevice &gearoenix::render::device::Logical::get_vulkan_data() const {
     return vulkan_data;
 }
 
 
-const VkQueue &gearoenix::nufrag::render::device::Logical::get_graphic_queue() const {
+const VkQueue &gearoenix::render::device::Logical::get_graphic_queue() const {
 	return vk_graphic_queue;
 }
 
-void gearoenix::nufrag::render::device::Logical::wait_to_finish() {
+void gearoenix::render::device::Logical::wait_to_finish() {
     auto &l = physical_device->get_instance()->get_linker();
     l->vkDeviceWaitIdle(vulkan_data);
 }

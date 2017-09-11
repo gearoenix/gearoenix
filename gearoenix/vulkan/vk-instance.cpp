@@ -2,7 +2,7 @@
 #include "vk-check.hpp"
 #include <vector>
 #include <sstream>
-#include "../core/static.hpp"
+#include "../core/cr-static.hpp"
 #ifdef VULKAN_INSTANCE_DEBUG
 static VkBool32 VKAPI_PTR vkDebugReportCallbackEX_impl(
         VkDebugReportFlagsEXT flags,
@@ -145,15 +145,15 @@ static VkBool32 VKAPI_PTR vkDebugReportCallbackEX_impl(
 }
 #endif
 
-gearoenix::nufrag::render::Instance::Instance(const std::shared_ptr<Linker> &l): linker(l) {
+gearoenix::render::Instance::Instance(const std::shared_ptr<Linker> &l): linker(l) {
     VkApplicationInfo app_info;
     std::memset(&app_info, 0, sizeof(app_info));
     app_info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
     app_info.apiVersion = VK_MAKE_VERSION(1, 0, 0);
     app_info.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
     app_info.engineVersion = VK_MAKE_VERSION(1, 0, 0);
-    app_info.pApplicationName = "Seeki Walki";
-    app_info.pEngineName = "NuFrag";
+    app_info.pApplicationName = "Demo App";
+    app_info.pEngineName = "Gearoenix";
     const char *instance_extensions[] = {
             VK_KHR_SURFACE_EXTENSION_NAME,
 #ifdef IN_ANDROID
@@ -247,18 +247,18 @@ gearoenix::nufrag::render::Instance::Instance(const std::shared_ptr<Linker> &l):
     VKC(l->vkCreateDebugReportCallbackEXT(vulkan_data, &dbg_info, nullptr, &report_callback));
 }
 
-gearoenix::nufrag::render::Instance::~Instance() {
+gearoenix::render::Instance::~Instance() {
 #ifdef VULKAN_INSTANCE_DEBUG
 	linker->vkDestroyDebugReportCallbackEXT(vulkan_data, report_callback, nullptr);
 #endif
     linker->vkDestroyInstance(vulkan_data, 0);
 }
 
-const std::shared_ptr<gearoenix::nufrag::render::Linker> &
-gearoenix::nufrag::render::Instance::get_linker() const {
+const std::shared_ptr<gearoenix::render::Linker> &
+gearoenix::render::Instance::get_linker() const {
     return linker;
 }
 
-const VkInstance &gearoenix::nufrag::render::Instance::get_vulkan_data() const {
+const VkInstance &gearoenix::render::Instance::get_vulkan_data() const {
     return vulkan_data;
 }

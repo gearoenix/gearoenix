@@ -1,5 +1,5 @@
-#ifndef GEAROENIX_NUFRAG_CORE_BUILD_CONFIGURATION_HPP
-#define GEAROENIX_NUFRAG_CORE_BUILD_CONFIGURATION_HPP
+#ifndef GEAROENIX_CORE_BUILD_CONFIGURATION_HPP
+#define GEAROENIX_CORE_BUILD_CONFIGURATION_HPP
 /// Platform definition --------------------------------------------------------------------------
 #ifdef ANDROID
 #define IN_ANDROID
@@ -11,7 +11,7 @@
 /// Graphic API choosing -------------------------------------------------------------------------
 #define USE_VULKAN
 /// Application constant definitions -------------------------------------------------------------
-#define APPLICATION_NAME "Seeki Walki"
+#define APPLICATION_NAME "Gearoenix Demo App"
 /// Application compilation mode -----------------------------------------------------------------
 #define DEBUG_MODE
 /// Application features -------------------------------------------------------------------------

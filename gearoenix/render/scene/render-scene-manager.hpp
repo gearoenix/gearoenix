@@ -1,10 +1,9 @@
-#ifndef GEAROENIX_NUFRAG_RENDER_SCENE_MANAGER_HPP
-#define GEAROENIX_NUFRAG_RENDER_SCENE_MANAGER_HPP
+#ifndef GEAROENIX_RENDER_SCENE_MANAGER_HPP
+#define GEAROENIX_RENDER_SCENE_MANAGER_HPP
 #include <memory>
 #include <map>
 #include <vector>
 namespace gearoenix {
-namespace nufrag {
 namespace system {
 class File;
 }
@@ -27,6 +26,5 @@ public:
 };
 } // namespace scene
 } // namespace render
-} // namespace nufrag
 } // namespace gearoenix
-#endif // GEAROENIX_NUFRAG_RENDER_SCENE_MANAGER_HPP
+#endif // GEAROENIX_RENDER_SCENE_MANAGER_HPP

@@ -1,5 +1,5 @@
 #include "vk-des-set.hpp"
-#include "../../core/static.hpp"
+#include "../../core/cr-static.hpp"
 #include "../pipeline/vk-pip-layout.hpp"
 #include "../buffer/vk-buf-uniform.hpp"
 #include "../device/vk-dev-logical.hpp"
@@ -8,7 +8,7 @@
 #include "../vk-check.hpp"
 #include "vk-des-pool.hpp"
 
-gearoenix::nufrag::render::descriptor::Set::Set(
+gearoenix::render::descriptor::Set::Set(
         const std::shared_ptr<Pool> &pool,
         const std::shared_ptr<pipeline::Layout> &pipeline_layout,
         const std::shared_ptr<buffer::Uniform> &uniform):
@@ -37,9 +37,9 @@ gearoenix::nufrag::render::descriptor::Set::Set(
     l->vkUpdateDescriptorSets(d->get_vulkan_data(), 1, &write_descriptor_set, 0, nullptr);
 }
 
-gearoenix::nufrag::render::descriptor::Set::~Set() {
+gearoenix::render::descriptor::Set::~Set() {
 }
 
-const VkDescriptorSet &gearoenix::nufrag::render::descriptor::Set::get_vulkan_data() const {
+const VkDescriptorSet &gearoenix::render::descriptor::Set::get_vulkan_data() const {
     return vulkan_data;
 }

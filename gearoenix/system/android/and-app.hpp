@@ -1,12 +1,11 @@
-#ifndef GEAROENIX_NUFRAG_SYSTEM_ANDROID_APPLICATION_HPP
-#define GEAROENIX_NUFRAG_SYSTEM_ANDROID_APPLICATION_HPP
-#include "../../core/build-configuration.hpp"
+#ifndef GEAROENIX_SYSTEM_ANDROID_APPLICATION_HPP
+#define GEAROENIX_SYSTEM_ANDROID_APPLICATION_HPP
+#include "../../core/cr-build-configuration.hpp"
 #ifdef IN_ANDROID
 #include <memory>
 #include <mutex>
 struct android_app;
 namespace gearoenix {
-namespace nufrag {
 namespace render {
 class Engine;
 }
@@ -37,6 +36,5 @@ public:
 };
 }
 }
-}
 #endif // IN_ANDROID
-#endif // GEAROENIX_NUFRAG_SYSTEM_ANDROID_HPP
+#endif // GEAROENIX_SYSTEM_ANDROID_HPP

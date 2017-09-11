@@ -6,9 +6,9 @@
 #include "../memory/vk-mem-memory.hpp"
 #include "../vk-instance.hpp"
 #include "../vk-check.hpp"
-#include "../../core/static.hpp"
+#include "../../core/cr-static.hpp"
 
-gearoenix::nufrag::render::image::View::View(const std::shared_ptr<Image> &img, const VkFormat &format) : img(img) {
+gearoenix::render::image::View::View(const std::shared_ptr<Image> &img, const VkFormat &format) : img(img) {
 	auto &l = img->get_logical_device()->get_physical_device()->get_instance()->get_linker();
 	VkImageViewCreateInfo view_create_info;
 	setz(view_create_info);
@@ -26,17 +26,17 @@ gearoenix::nufrag::render::image::View::View(const std::shared_ptr<Image> &img, 
 	VKC(l->vkCreateImageView(img->get_logical_device()->get_vulkan_data(), &view_create_info, 0, &vulkan_data));
 }
 
-gearoenix::nufrag::render::image::View::View(const std::shared_ptr<Image> &img, const VkImageViewCreateInfo &info) : img(img) {
+gearoenix::render::image::View::View(const std::shared_ptr<Image> &img, const VkImageViewCreateInfo &info) : img(img) {
     auto &l = img->get_logical_device()->get_physical_device()->get_instance()->get_linker();
     VKC(l->vkCreateImageView(img->get_logical_device()->get_vulkan_data(), &info, 0, &vulkan_data));
 }
 
-gearoenix::nufrag::render::image::View::~View() {
+gearoenix::render::image::View::~View() {
 	auto &l = img->get_logical_device()->get_physical_device()->get_instance()->get_linker();
 	l->vkDestroyImageView(img->get_logical_device()->get_vulkan_data(), vulkan_data, 0);
 }
 
-std::shared_ptr<gearoenix::nufrag::render::image::View> gearoenix::nufrag::render::image::View::create_depth_stencil(const std::shared_ptr<memory::Pool> &mem_pool) {
+std::shared_ptr<gearoenix::render::image::View> gearoenix::render::image::View::create_depth_stencil(const std::shared_ptr<memory::Pool> &mem_pool) {
     auto &d = mem_pool->get_logical_device();
     auto &p = d->get_physical_device();
 	auto depth_format = p->get_supported_depth_format();
@@ -68,11 +68,11 @@ std::shared_ptr<gearoenix::nufrag::render::image::View> gearoenix::nufrag::rende
     return std::shared_ptr<View>(new View(img, depth_stencil_view_info));
 }
 
-const std::shared_ptr<gearoenix::nufrag::render::image::Image> &
-gearoenix::nufrag::render::image::View::get_image() const {
+const std::shared_ptr<gearoenix::render::image::Image> &
+gearoenix::render::image::View::get_image() const {
 	return img;
 }
 
-const VkImageView &gearoenix::nufrag::render::image::View::get_vulkan_data() const {
+const VkImageView &gearoenix::render::image::View::get_vulkan_data() const {
 	return vulkan_data;
 }

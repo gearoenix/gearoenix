@@ -1,8 +1,7 @@
-#ifndef GEAROENIX_NUFRAG_CORE_APPLICATION_HPP
-#define GEAROENIX_NUFRAG_CORE_APPLICATION_HPP
+#ifndef GEAROENIX_CORE_APPLICATION_HPP
+#define GEAROENIX_CORE_APPLICATION_HPP
 #include <memory>
 namespace gearoenix {
-namespace nufrag {
 namespace system {
 class Application;
 }
@@ -16,7 +15,6 @@ public:
     void update();
 	void terminate();
 };
-}
 }
 }
 #endif

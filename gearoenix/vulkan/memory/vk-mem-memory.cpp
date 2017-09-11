@@ -5,9 +5,9 @@
 #include "../image/vk-img-image.hpp"
 #include "../vk-instance.hpp"
 #include "../vk-check.hpp"
-#include "../../core/static.hpp"
+#include "../../core/cr-static.hpp"
 
-gearoenix::nufrag::render::memory::Memory::Memory(const std::shared_ptr<Pool> &pool, const VkMemoryRequirements &req, const VkMemoryPropertyFlagBits &properties) : pool(pool) {
+gearoenix::render::memory::Memory::Memory(const std::shared_ptr<Pool> &pool, const VkMemoryRequirements &req, const VkMemoryPropertyFlagBits &properties) : pool(pool) {
     auto &d = pool->get_logical_device();
     auto &p = d->get_physical_device();
     auto &l = p->get_instance()->get_linker();
@@ -19,12 +19,12 @@ gearoenix::nufrag::render::memory::Memory::Memory(const std::shared_ptr<Pool> &p
     VKC(l->vkAllocateMemory(d->get_vulkan_data(), &mem_alloc, nullptr, &vulkan_data));
 }
 
-gearoenix::nufrag::render::memory::Memory::~Memory() {
+gearoenix::render::memory::Memory::~Memory() {
     auto &d = pool->get_logical_device();
     auto &l = d->get_physical_device()->get_instance()->get_linker();
     l->vkFreeMemory(d->get_vulkan_data(), vulkan_data, nullptr);
 }
 
-const VkDeviceMemory &gearoenix::nufrag::render::memory::Memory::get_vulkan_data() const {
+const VkDeviceMemory &gearoenix::render::memory::Memory::get_vulkan_data() const {
     return vulkan_data;
 }

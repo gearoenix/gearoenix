@@ -1,14 +1,13 @@
-#ifndef GEAROENIX_NUFRAG_VULKAN_INSTANCE_HPP
-#define GEAROENIX_NUFRAG_VULKAN_INSTANCE_HPP
+#ifndef GEAROENIX_VULKAN_INSTANCE_HPP
+#define GEAROENIX_VULKAN_INSTANCE_HPP
 #include "vk-linker.hpp"
 #include <memory>
 #include <set>
-#include "../core/build-configuration.hpp"
+#include "../core/cr-build-configuration.hpp"
 #ifdef DEBUG_MODE
 #define VULKAN_INSTANCE_DEBUG
 #endif
 namespace gearoenix {
-namespace nufrag {
 namespace render {
 class Instance {
 private:
@@ -23,7 +22,6 @@ public:
 	const std::shared_ptr<Linker> &get_linker() const;
 	const VkInstance &get_vulkan_data() const;
 };
-}
 }
 }
 #endif

@@ -4,9 +4,9 @@
 #include "device/vk-dev-logical.hpp"
 #include "device/vk-dev-physical.hpp"
 #include "vk-swapchain.hpp"
-#include "../core/static.hpp"
+#include "../core/cr-static.hpp"
 
-gearoenix::nufrag::render::RenderPass::RenderPass(
+gearoenix::render::RenderPass::RenderPass(
         const std::shared_ptr<Swapchain> &swapchain): swapchain(swapchain) {
 	auto &d = swapchain->get_logical_device();
 	auto &p = d->get_physical_device();
@@ -72,13 +72,13 @@ gearoenix::nufrag::render::RenderPass::RenderPass(
 			d->get_vulkan_data(), &render_pass_create_info, 0, &vulkan_data));
 }
 
-gearoenix::nufrag::render::RenderPass::~RenderPass() {
+gearoenix::render::RenderPass::~RenderPass() {
     auto &d = swapchain->get_logical_device();
     auto &p = d->get_physical_device();
     auto &l = p->get_instance()->get_linker();
     l->vkDestroyRenderPass(d->get_vulkan_data(), vulkan_data, nullptr);
 }
 
-const VkRenderPass &gearoenix::nufrag::render::RenderPass::get_vulkan_data() const {
+const VkRenderPass &gearoenix::render::RenderPass::get_vulkan_data() const {
     return vulkan_data;
 }

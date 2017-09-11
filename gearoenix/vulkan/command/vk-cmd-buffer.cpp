@@ -1,4 +1,4 @@
-#include "../../core/build-configuration.hpp"
+#include "../../core/cr-build-configuration.hpp"
 #ifdef DEBUG_MODE
 #define VK_CMD_BUFF_DEBUG
 #endif
@@ -9,9 +9,9 @@
 #include "../sync/vk-sync-fence.hpp"
 #include "../device/vk-dev-logical.hpp"
 #include "../device/vk-dev-physical.hpp"
-#include "../../core/static.hpp"
+#include "../../core/cr-static.hpp"
 
-gearoenix::nufrag::render::command::Buffer::Buffer(const std::shared_ptr<Pool> &pool): pool(pool) {
+gearoenix::render::command::Buffer::Buffer(const std::shared_ptr<Pool> &pool): pool(pool) {
 	auto &l = pool->get_logical_device()->get_physical_device()->get_instance()->get_linker();
 	linker = l;
 	VkCommandBufferAllocateInfo cmd_buf_allocate_info;
@@ -27,7 +27,7 @@ gearoenix::nufrag::render::command::Buffer::Buffer(const std::shared_ptr<Pool> &
 	VKC(l->vkBeginCommandBuffer(vulkan_data, &cmd_buf_info));
 }
 
-gearoenix::nufrag::render::command::Buffer::~Buffer() {
+gearoenix::render::command::Buffer::~Buffer() {
 	if(not_flushed) {
 		flush();
 	}
@@ -35,12 +35,12 @@ gearoenix::nufrag::render::command::Buffer::~Buffer() {
 	linker->vkFreeCommandBuffers(d->get_vulkan_data(), pool->get_vulkan_data(), 1, &vulkan_data);
 }
 
-void gearoenix::nufrag::render::command::Buffer::copy_buffer(VkBuffer src, VkBuffer des, const VkBufferCopy &region) {
+void gearoenix::render::command::Buffer::copy_buffer(VkBuffer src, VkBuffer des, const VkBufferCopy &region) {
 	linker->vkCmdCopyBuffer(vulkan_data, src, des, 1, &region);
 	not_flushed = true;
 }
 
-void gearoenix::nufrag::render::command::Buffer::flush() {
+void gearoenix::render::command::Buffer::flush() {
 	not_flushed = false;
 	auto &d = pool->get_logical_device();
     sync::Fence fence(d);
@@ -54,18 +54,18 @@ void gearoenix::nufrag::render::command::Buffer::flush() {
 	fence.wait();
 }
 
-const VkCommandBuffer &gearoenix::nufrag::render::command::Buffer::get_vulkan_data() const {
+const VkCommandBuffer &gearoenix::render::command::Buffer::get_vulkan_data() const {
 	return vulkan_data;
 }
 
-void gearoenix::nufrag::render::command::Buffer::begin_render_pass_with_info(const VkRenderPassBeginInfo &render_pass_begin_info) {
+void gearoenix::render::command::Buffer::begin_render_pass_with_info(const VkRenderPassBeginInfo &render_pass_begin_info) {
     linker->vkCmdBeginRenderPass(vulkan_data, &render_pass_begin_info, VK_SUBPASS_CONTENTS_INLINE);
 }
 
-void gearoenix::nufrag::render::command::Buffer::set_viewport(const VkViewport &viewport) {
+void gearoenix::render::command::Buffer::set_viewport(const VkViewport &viewport) {
     linker->vkCmdSetViewport(vulkan_data, 0, 1, &viewport);
 }
 
-void gearoenix::nufrag::render::command::Buffer::set_scissor(const VkRect2D &scissor) {
+void gearoenix::render::command::Buffer::set_scissor(const VkRect2D &scissor) {
     linker->vkCmdSetScissor(vulkan_data, 0, 1, &scissor);
 }

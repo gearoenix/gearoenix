@@ -1,9 +1,8 @@
-#ifndef GEAROENIX_NUFRAG_VULKAN_ENGINE_HPP
-#define GEAROENIX_NUFRAG_VULKAN_ENGINE_HPP
+#ifndef GEAROENIX_VULKAN_ENGINE_HPP
+#define GEAROENIX_VULKAN_ENGINE_HPP
 #include <memory>
 #include <vector>
 namespace gearoenix {
-namespace nufrag {
 namespace core {
 class Application;
 }
@@ -87,7 +86,6 @@ public:
     void update();
     void terminate();
 };
-}
 }
 }
 #endif

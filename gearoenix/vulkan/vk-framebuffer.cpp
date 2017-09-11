@@ -6,9 +6,9 @@
 #include "image/vk-img-view.hpp"
 #include "vk-render-pass.hpp"
 #include "vk-instance.hpp"
-#include "../core/static.hpp"
+#include "../core/cr-static.hpp"
 
-gearoenix::nufrag::render::Framebuffer::Framebuffer(
+gearoenix::render::Framebuffer::Framebuffer(
         const std::shared_ptr<image::View> &view,
         const std::shared_ptr<image::View> &depth,
         const std::shared_ptr<RenderPass> &render_pass) :
@@ -32,13 +32,13 @@ gearoenix::nufrag::render::Framebuffer::Framebuffer(
     VKC(l->vkCreateFramebuffer(d->get_vulkan_data(), &fb_create_info, 0, &vulkan_data));
 }
 
-gearoenix::nufrag::render::Framebuffer::~Framebuffer() {
+gearoenix::render::Framebuffer::~Framebuffer() {
     auto &d = view->get_image()->get_logical_device();
     auto &p = d->get_physical_device();
     auto &l = p->get_instance()->get_linker();
     l->vkDestroyFramebuffer(d->get_vulkan_data(), vulkan_data, nullptr);
 }
 
-const VkFramebuffer &gearoenix::nufrag::render::Framebuffer::get_vulkan_data() const {
+const VkFramebuffer &gearoenix::render::Framebuffer::get_vulkan_data() const {
     return vulkan_data;
 }

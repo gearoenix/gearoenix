@@ -1,11 +1,10 @@
-#ifndef GEAROENIX_NUFRAG_SYSTEM_LINUX_APPLICATION_HPP
-#define GEAROENIX_NUFRAG_SYSTEM_LINUX_APPLICATION_HPP
-#include "../../core/build-configuration.hpp"
+#ifndef GEAROENIX_SYSTEM_LINUX_APPLICATION_HPP
+#define GEAROENIX_SYSTEM_LINUX_APPLICATION_HPP
+#include "../../core/cr-build-configuration.hpp"
 #ifdef IN_LINUX
 #include <xcb/xcb.h>
 #include <memory>
 namespace gearoenix {
-namespace nufrag {
 namespace core {
 class Application;
 }
@@ -35,7 +34,6 @@ public:
 	const std::shared_ptr<core::Application> &get_core_app() const;
 	const std::shared_ptr<render::Engine> &get_render_engine() const;
 };
-}
 }
 }
 #endif

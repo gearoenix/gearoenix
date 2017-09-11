@@ -1,7 +1,7 @@
-#include "../../core/build-configuration.hpp"
+#include "../../core/cr-build-configuration.hpp"
 #ifdef USE_VULKAN
 #include "vk-buf-uniform.hpp"
-#include "../../core/static.hpp"
+#include "../../core/cr-static.hpp"
 #include "../device/vk-dev-logical.hpp"
 #include "../device/vk-dev-physical.hpp"
 #include "../memory/vk-mem-pool.hpp"
@@ -9,7 +9,7 @@
 #include "../vk-instance.hpp"
 #include "../vk-linker.hpp"
 #include "../vk-check.hpp"
-gearoenix::nufrag::render::buffer::Uniform::Uniform(std::shared_ptr<memory::Pool> &pool, int data_size):
+gearoenix::render::buffer::Uniform::Uniform(std::shared_ptr<memory::Pool> &pool, int data_size):
     logical_device(pool->get_logical_device()),
     data_size(static_cast<VkDeviceSize>(data_size)) {
     auto &p = logical_device->get_physical_device();
@@ -37,12 +37,12 @@ gearoenix::nufrag::render::buffer::Uniform::Uniform(std::shared_ptr<memory::Pool
     VKC(l->vkBindBufferMemory(logical_device->get_vulkan_data(), vulkan_data, mem->get_vulkan_data(), 0));
 }
 
-gearoenix::nufrag::render::buffer::Uniform::~Uniform() {
+gearoenix::render::buffer::Uniform::~Uniform() {
     auto &l = logical_device->get_physical_device()->get_instance()->get_linker();
     l->vkDestroyBuffer(logical_device->get_vulkan_data(), vulkan_data, nullptr);
 }
 
-void gearoenix::nufrag::render::buffer::Uniform::update(const void *data) {
+void gearoenix::render::buffer::Uniform::update(const void *data) {
     auto &l = logical_device->get_physical_device()->get_instance()->get_linker();
     void *buffer_data;
     VKC(l->vkMapMemory(logical_device->get_vulkan_data(), mem->get_vulkan_data(), 0, data_size, 0, &buffer_data));
@@ -53,19 +53,19 @@ void gearoenix::nufrag::render::buffer::Uniform::update(const void *data) {
     l->vkUnmapMemory(logical_device->get_vulkan_data(), mem->get_vulkan_data());
 }
 
-const std::shared_ptr<gearoenix::nufrag::render::device::Logical> &gearoenix::nufrag::render::buffer::Uniform::get_logical_device() const {
+const std::shared_ptr<gearoenix::render::device::Logical> &gearoenix::render::buffer::Uniform::get_logical_device() const {
 return logical_device;
 }
 
-const std::shared_ptr<gearoenix::nufrag::render::memory::Memory> &gearoenix::nufrag::render::buffer::Uniform::get_memory() const {
+const std::shared_ptr<gearoenix::render::memory::Memory> &gearoenix::render::buffer::Uniform::get_memory() const {
     return mem;
 }
 
-const VkBuffer &gearoenix::nufrag::render::buffer::Uniform::get_vulkan_data() const {
+const VkBuffer &gearoenix::render::buffer::Uniform::get_vulkan_data() const {
     return vulkan_data;
 }
 
-const VkDeviceSize &gearoenix::nufrag::render::buffer::Uniform::get_data_size() const {
+const VkDeviceSize &gearoenix::render::buffer::Uniform::get_data_size() const {
     return data_size;
 }
 

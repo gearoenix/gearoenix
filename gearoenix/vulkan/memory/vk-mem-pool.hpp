@@ -1,8 +1,7 @@
-#ifndef GEAROENIX_NUFRAG_VULKAN_MEMORY_POOL_HPP
-#define GEAROENIX_NUFRAG_VULKAN_MEMORY_POOL_HPP
+#ifndef GEAROENIX_VULKAN_MEMORY_POOL_HPP
+#define GEAROENIX_VULKAN_MEMORY_POOL_HPP
 #include <memory>
 namespace gearoenix {
-namespace nufrag {
 namespace render {
 namespace device {
 class Logical;
@@ -18,6 +17,5 @@ public:
 };
 } // namespace memory
 } // namespace render
-} // namespace nufrag
 } // namespace gearoenix
-#endif // GEAROENIX_NUFRAG_RENDER_MEMORY_POOL_H
+#endif // GEAROENIX_RENDER_MEMORY_POOL_H

@@ -1,9 +1,8 @@
-#ifndef GEAROENIX_NUFRAG_VULKAN_SHADER_MANAGER_HPP
-#define GEAROENIX_NUFRAG_VULKAN_SHADER_MANAGER_HPP
+#ifndef GEAROENIX_VULKAN_SHADER_MANAGER_HPP
+#define GEAROENIX_VULKAN_SHADER_MANAGER_HPP
 #include <memory>
 #include <map>
 namespace gearoenix {
-namespace nufrag {
 namespace system {
 class File;
 }
@@ -25,6 +24,5 @@ public:
 };
 } // namespace shader
 } // namespace render
-} // namespace nufrag
 } // namespace gearoenix
-#endif // GEAROENIX_NUFRAG_VULKAN_SHADER_MANAGER_HPP
+#endif // GEAROENIX_VULKAN_SHADER_MANAGER_HPP
