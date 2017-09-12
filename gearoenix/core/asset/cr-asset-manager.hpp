@@ -1,19 +1,15 @@
-#ifndef CRASSET_HPP
-#define CRASSET_HPP
-
-
+#ifndef GEAROENIX_CORE_ASSET_MANAGER_HPP
+#define GEAROENIX_CORE_ASSET_MANAGER_HPP
 namespace gearoenix {
 namespace core {
 namespace asset {
-
-class Asset
+class Manager
 {
 public:
-    Asset();
+    Manager();
+    ~Manager();
 };
-
 } // namespace asset
 } // namespace core
 } // namespace gearoenix
-
-#endif // CRASSET_HPP
+#endif // GEAROENIX_CORE_ASSET_MANAGER_HPP
