@@ -1,5 +1,6 @@
 #ifndef GEAROENIX_CORE_CACHE_CACHER_HPP
 #define GEAROENIX_CORE_CACHE_CACHER_HPP
+#include "../../system/sys-log.hpp"
 #include "../cr-types.hpp"
 #include <functional>
 #include <map>
@@ -15,6 +16,8 @@ namespace core {
         public:
             template <class T>
             std::shared_ptr<T> get(Id id, std::function<T()>);
+            template <class T>
+            std::shared_ptr<T> get(Id id) const;
         };
     } // namespace asset
 } // namespace core
@@ -36,6 +39,23 @@ std::shared_ptr<T> gearoenix::core::cache::Cacher::get(Id id, std::function<T()>
         std::shared_ptr<T> cached = new_fun();
         found = cached;
         return cached;
+    }
+}
+
+template <class T>
+std::shared_ptr<T> gearoenix::core::cache::Cacher::get(Id id) const
+{
+    auto search = cacheds.find(id);
+    if (search == cached.end()) {
+        LOGF("Object with id: " << id << ", has not been cached.");
+        return nullptr;
+    }
+    auto& found = search->second;
+    if (auto cached = found.lock()) {
+        return std::static_pointer_cast<T>(cached);
+    } else {
+        LOGF("Object with id: " << id << ", cached but it has been expired.");
+        return nullptr;
     }
 }
 
