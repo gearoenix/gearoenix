@@ -1,7 +1,6 @@
-#include "render-shader.hpp"
 #include "../../core/cr-types.hpp"
 #include "../../system/sys-file.hpp"
-#include "../../system/sys-log.hpp"
+#include "render-shader.hpp"
 gearoenix::render::shader::Shader::Shader() {}
 std::shared_ptr<gearoenix::render::shader::Shader> gearoenix::render::shader::Shader::read(std::shared_ptr<system::File>& file)
 {
@@ -12,6 +11,4 @@ std::shared_ptr<gearoenix::render::shader::Shader> gearoenix::render::shader::Sh
         return break;
     }
     }
-    LOGF("Unexpected!");
-    return nullptr;
 }
