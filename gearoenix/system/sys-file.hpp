@@ -55,7 +55,7 @@ namespace system {
         void check_endian_compatibility();
 
     public:
-        File(system::Application* sys_app);
+        File(system::Application* sys_app, const std::string& name);
         ~File();
         bool get_endian_compatibility() const;
         unsigned int read(void* data, size_t length);

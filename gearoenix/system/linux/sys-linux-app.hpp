@@ -21,8 +21,8 @@ namespace system {
         xcb_window_t window;
         xcb_intern_atom_reply_t* atom_wm_delete_window;
         std::shared_ptr<File> asset;
-        std::shared_ptr<core::Application> core_app;
-        std::shared_ptr<render::Engine> render_engine;
+        core::Application* core_app;
+        render::Engine* render_engine;
         void handle(const xcb_generic_event_t* event);
 
     public:
@@ -32,8 +32,9 @@ namespace system {
         xcb_connection_t* get_connection() const;
         xcb_window_t get_window() const;
         const std::shared_ptr<File> get_asset() const;
-        const std::shared_ptr<core::Application>& get_core_app() const;
-        const std::shared_ptr<render::Engine>& get_render_engine() const;
+        const core::Application* get_core_app() const;
+        const render::Engine* get_render_engine() const;
+        render::Engine* get_render_engine();
     };
 }
 }

@@ -1,7 +1,5 @@
 #ifndef GEAROENIX_CORE_CACHE_CACHED_HPP
 #define GEAROENIX_CORE_CACHE_CACHED_HPP
-#include <map>
-#include <memory>
 namespace gearoenix {
 namespace core {
     namespace cache {

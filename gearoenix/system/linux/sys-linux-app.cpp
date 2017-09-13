@@ -1,4 +1,4 @@
-#include "linux-app.hpp"
+#include "sys-linux-app.hpp"
 #ifdef IN_LINUX
 #include "../../core/cr-application.hpp"
 #include "../../render/render-engine.hpp"
@@ -43,9 +43,9 @@ gearoenix::system::Application::Application()
         window_title.c_str());
     free(reply);
     xcb_map_window(connection, window);
-    asset = std::shared_ptr<File>(new File(this));
-    render_engine = std::shared_ptr<render::Engine>(new render::Engine(this));
-    core_app = std::shared_ptr<core::Application>(new core::Application(this));
+    //    asset = std::shared_ptr<File>(new File(this));
+    render_engine = new render::Engine(this);
+    core_app = new core::Application(this);
     /// todo intialize in here
 }
 
@@ -131,12 +131,17 @@ gearoenix::system::Application::get_asset() const
     return asset;
 }
 
-const std::shared_ptr<gearoenix::core::Application>& gearoenix::system::Application::get_core_app() const
+const gearoenix::core::Application* gearoenix::system::Application::get_core_app() const
 {
     return core_app;
 }
 
-const std::shared_ptr<gearoenix::render::Engine>& gearoenix::system::Application::get_render_engine() const
+const gearoenix::render::Engine* gearoenix::system::Application::get_render_engine() const
+{
+    return render_engine;
+}
+
+gearoenix::render::Engine* gearoenix::system::Application::get_render_engine()
 {
     return render_engine;
 }

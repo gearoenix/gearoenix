@@ -14,7 +14,7 @@ void gearoenix::core::cache::file::Sparse::read_offsets()
         Id id;
         Offset o;
         file->read(id);
-        filr->read(o);
+        file->read(o);
         offsets[id] = o;
     }
 }

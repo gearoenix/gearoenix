@@ -17,11 +17,11 @@ void gearoenix::system::File::check_endian_compatibility()
     //    LOGE(std::string("endian is: ") + std::to_string(is_endian_compatible));
 }
 
-gearoenix::system::File::File(system::Application* sys_app)
+gearoenix::system::File::File(system::Application* sys_app, const std::string& name)
 #if defined(IN_LINUX) || defined(IN_WINDOWS)
     : sys_app(sys_app)
 {
-    file.open("data.gx3d", std::ios::binary | std::ios::in);
+    file.open(name, std::ios::binary | std::ios::in);
     if (!file.is_open()) {
         LOGF("Error in opening assets file.");
     }

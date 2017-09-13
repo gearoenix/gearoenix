@@ -2,20 +2,20 @@
 #define GEAROENIX_CORE_CACHE_CACHER_HPP
 #include "../../system/sys-log.hpp"
 #include "../cr-types.hpp"
+#include "cr-cache-cached.hpp"
 #include <functional>
 #include <map>
 #include <memory>
 namespace gearoenix {
 namespace core {
     namespace cache {
-        class Cached;
         class Cacher {
         private:
             std::map<Id, std::weak_ptr<Cached>> cacheds;
 
         public:
             template <class T>
-            std::shared_ptr<T> get(Id id, std::function<T()>);
+            std::shared_ptr<T> get(Id id, std::function<std::shared_ptr<T>()>);
             template <class T>
             std::shared_ptr<T> get(Id id) const;
         };
@@ -24,21 +24,21 @@ namespace core {
 } // namespace gearoenix
 
 template <class T>
-std::shared_ptr<T> gearoenix::core::cache::Cacher::get(Id id, std::function<T()> new_fun)
+std::shared_ptr<T> gearoenix::core::cache::Cacher::get(Id id, std::function<std::shared_ptr<T>()> new_fun)
 {
     auto search = cacheds.find(id);
-    if (search == cached.end()) {
-        std::shared_ptr<T> cached = new_fun();
-        cacheds[id] = cached;
-        return cached;
+    if (search == cacheds.end()) {
+        std::shared_ptr<T> new_item = new_fun();
+        cacheds[id] = new_item;
+        return new_item;
     }
     auto& found = search->second;
     if (auto cached = found.lock()) {
         return std::static_pointer_cast<T>(cached);
     } else {
-        std::shared_ptr<T> cached = new_fun();
-        found = cached;
-        return cached;
+        std::shared_ptr<T> new_item = new_fun();
+        found = new_item;
+        return new_item;
     }
 }
 
@@ -46,7 +46,7 @@ template <class T>
 std::shared_ptr<T> gearoenix::core::cache::Cacher::get(Id id) const
 {
     auto search = cacheds.find(id);
-    if (search == cached.end()) {
+    if (search == cacheds.end()) {
         LOGF("Object with id: " << id << ", has not been cached.");
         return nullptr;
     }

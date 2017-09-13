@@ -1,13 +1,11 @@
 #ifndef GEAROENIX_CORE_CACHE_FILE_HPP
 #define GEAROENIX_CORE_CACHE_FILE_HPP
+#include "../../../system/sys-file.hpp"
 #include "../../../system/sys-log.hpp"
 #include "../../cr-build-configuration.hpp"
 #include "../cr-cache-cacher.hpp"
 #include <vector>
 namespace gearoenix {
-namespace system {
-    class File;
-}
 namespace core {
     namespace cache {
         namespace file {
@@ -21,7 +19,9 @@ namespace core {
                 File(std::shared_ptr<system::File> file);
                 void read_offsets();
                 template <class T>
-                std::shared_ptr<T> get(Id id, std::function<T()>);
+                std::shared_ptr<T> get(Id id, std::function<std::shared_ptr<T>()>);
+                template <class T>
+                std::shared_ptr<T> get(Id id) const;
             };
         } // namespace file
     } // namespace cache
@@ -29,9 +29,9 @@ namespace core {
 } // namespace gearoenix
 
 template <class T>
-std::shared_ptr<T> gearoenix::core::cache::file::File::get(Id id, std::function<T()> new_fun)
+std::shared_ptr<T> gearoenix::core::cache::file::File::get(Id id, std::function<std::shared_ptr<T>()> new_fun)
 {
-    return cacher.get(id, [new_fun, this] {
+    std::function<std::shared_ptr<T>()> fn_new = [new_fun, this, id] {
 #ifdef DEBUG_MODE
         if (id >= offsets.size()) {
             LOGE("object with id: " << id << ", not found in table of offsets.");
@@ -39,7 +39,14 @@ std::shared_ptr<T> gearoenix::core::cache::file::File::get(Id id, std::function<
 #endif
         file->seek(offsets[id]);
         return new_fun();
-    });
+    };
+    return cacher.get<T>(id, fn_new);
+}
+
+template <class T>
+std::shared_ptr<T> gearoenix::core::cache::file::File::get(Id id) const
+{
+    return cacher.get<T>(id);
 }
 
 #endif // GEAROENIX_CORE_CACHE_FILE_HPP
