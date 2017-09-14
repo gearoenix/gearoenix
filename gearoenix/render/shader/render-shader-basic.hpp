@@ -1,16 +1,15 @@
-#ifndef GEAROEMIX_RENDER_SHADER_SHADER_HPP
-#define GEAROEMIX_RENDER_SHADER_SHADER_HPP
-#include "../../core/asset/cr-asset.hpp"
-#include <memory>
+#ifndef GEAROEMIX_RENDER_SHADER_BASIC_HPP
+#define GEAROEMIX_RENDER_SHADER_BASIC_HPP
+#include "render-shader.hpp"
 namespace gearoenix {
 namespace system {
     class File;
 }
 namespace render {
     namespace shader {
-        class Shader : public core::asset::Asset {
+        class Basic : public Shader {
         private:
-            Shader();
+            Basic();
 
         public:
             static std::shared_ptr<Shader> read(std::shared_ptr<system::File>& file);
