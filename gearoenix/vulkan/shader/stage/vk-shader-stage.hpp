@@ -1,0 +1,27 @@
+#ifndef GEAROEMIX_VULKAN_SHADER_STAGE_STAGE_HPP
+#define GEAROEMIX_VULKAN_SHADER_STAGE_STAGE_HPP
+#include "../../vk-linker.hpp"
+#include <vector>
+namespace gearoenix {
+namespace render {
+    class Engine;
+    namespace device {
+        class Logical;
+    }
+    namespace shader {
+        namespace stage {
+            class Stage {
+            private:
+                VkShaderModule vulkan_data;
+                device::Logical* device;
+
+            public:
+                Stage(std::vector<unsigned char>& data, Engine* engine);
+                ~Stage();
+                VkShaderModule get_vulkan_data() const;
+            };
+        }
+    }
+}
+}
+#endif

@@ -11,15 +11,16 @@ namespace gearoenix {
 namespace render {
     class Instance {
     private:
-        std::shared_ptr<Linker> linker;
+        Linker* linker;
         VkInstance vulkan_data;
 #ifdef VULKAN_INSTANCE_DEBUG
         VkDebugReportCallbackEXT report_callback;
 #endif
     public:
-        Instance(const std::shared_ptr<Linker>& l);
+        Instance(Linker* l);
         ~Instance();
-        const std::shared_ptr<Linker>& get_linker() const;
+        const Linker* get_linker() const;
+        Linker* get_linker();
         const VkInstance& get_vulkan_data() const;
     };
 }

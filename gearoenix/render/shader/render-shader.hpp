@@ -7,13 +7,15 @@ namespace system {
     class File;
 }
 namespace render {
+    class Engine;
     namespace shader {
         class Shader : public core::asset::Asset {
         private:
+        protected:
             Shader();
 
         public:
-            static std::shared_ptr<Shader> read(std::shared_ptr<system::File>& file);
+            static std::shared_ptr<Shader> read(std::shared_ptr<system::File>& file, Engine* engine);
         };
     }
 }

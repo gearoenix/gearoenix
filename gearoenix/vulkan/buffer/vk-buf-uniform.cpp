@@ -14,8 +14,8 @@ gearoenix::render::buffer::Uniform::Uniform(std::shared_ptr<memory::Pool>& pool,
     : logical_device(pool->get_logical_device())
     , data_size(static_cast<VkDeviceSize>(data_size))
 {
-    auto& p = logical_device->get_physical_device();
-    auto& l = p->get_instance()->get_linker();
+    auto p = logical_device->get_physical_device();
+    auto l = p->get_instance()->get_linker();
     VkMemoryRequirements mem_reqs;
     setz(mem_reqs);
     VkBufferCreateInfo buffer_info;
@@ -46,13 +46,13 @@ gearoenix::render::buffer::Uniform::Uniform(std::shared_ptr<memory::Pool>& pool,
 
 gearoenix::render::buffer::Uniform::~Uniform()
 {
-    auto& l = logical_device->get_physical_device()->get_instance()->get_linker();
+    auto l = logical_device->get_physical_device()->get_instance()->get_linker();
     l->vkDestroyBuffer(logical_device->get_vulkan_data(), vulkan_data, nullptr);
 }
 
 void gearoenix::render::buffer::Uniform::update(const void* data)
 {
-    auto& l = logical_device->get_physical_device()->get_instance()->get_linker();
+    auto l = logical_device->get_physical_device()->get_instance()->get_linker();
     void* buffer_data;
     VKC(l->vkMapMemory(logical_device->get_vulkan_data(), mem->get_vulkan_data(),
         0, data_size, 0, &buffer_data));

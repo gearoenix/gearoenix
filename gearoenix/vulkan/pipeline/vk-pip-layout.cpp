@@ -8,7 +8,7 @@ gearoenix::render::pipeline::Layout::Layout(
     const std::shared_ptr<device::Logical>& logical_device)
     : logical_device(logical_device)
 {
-    auto& l = logical_device->get_physical_device()->get_instance()->get_linker();
+    auto l = logical_device->get_physical_device()->get_instance()->get_linker();
     VkDescriptorSetLayoutBinding layout_binding;
     setz(layout_binding);
     layout_binding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
@@ -34,7 +34,7 @@ gearoenix::render::pipeline::Layout::Layout(
 
 gearoenix::render::pipeline::Layout::~Layout()
 {
-    auto& l = logical_device->get_physical_device()->get_instance()->get_linker();
+    auto l = logical_device->get_physical_device()->get_instance()->get_linker();
     l->vkDestroyPipelineLayout(logical_device->get_vulkan_data(), vulkan_data,
         nullptr);
     l->vkDestroyDescriptorSetLayout(logical_device->get_vulkan_data(),

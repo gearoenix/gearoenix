@@ -16,16 +16,17 @@ namespace render {
     }
     class Swapchain {
     private:
-        std::shared_ptr<device::Logical> logical_device;
+        device::Logical* logical_device;
         VkSurfaceFormatKHR chosen_format;
         VkSwapchainKHR vulkan_data = 0;
         std::vector<std::shared_ptr<image::View>> image_views;
 
     public:
-        Swapchain(const std::shared_ptr<device::Logical>& d);
+        Swapchain(device::Logical* d);
         ~Swapchain();
         const VkSwapchainKHR& get_vulkan_data() const;
-        const std::shared_ptr<device::Logical>& get_logical_device() const;
+        const device::Logical* get_logical_device() const;
+        device::Logical* get_logical_device();
         const VkSurfaceFormatKHR& get_chosen_format() const;
         std::vector<std::shared_ptr<image::View>> get_image_views() const;
         uint32_t get_next_image_index(

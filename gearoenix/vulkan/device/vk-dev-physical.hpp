@@ -9,7 +9,7 @@ namespace render {
     class Surface;
     namespace device {
         class Physical {
-            std::shared_ptr<Surface> surface;
+            Surface* surface;
             VkPhysicalDevice vulkan_data;
             VkPhysicalDeviceProperties properties;
             VkPhysicalDeviceFeatures features;
@@ -23,13 +23,13 @@ namespace render {
             int is_good(const VkPhysicalDevice& gpu);
 
         public:
-            Physical(const std::shared_ptr<Surface>& surface);
+            Physical(Surface* surface);
             ~Physical();
             const VkPhysicalDeviceMemoryProperties& get_memory_properties() const;
             std::shared_ptr<VkSurfaceCapabilitiesKHR> get_surface_capabilities() const;
             std::vector<VkSurfaceFormatKHR> get_surface_formats() const;
-            const std::shared_ptr<Surface>& get_surface() const;
-            const std::shared_ptr<Instance>& get_instance() const;
+            const Surface* get_surface() const;
+            const Instance* get_instance() const;
             const VkPhysicalDevice& get_vulkan_data() const;
             uint32_t get_graphics_queue_node_index() const;
             uint32_t get_transfer_queue_node_index() const;

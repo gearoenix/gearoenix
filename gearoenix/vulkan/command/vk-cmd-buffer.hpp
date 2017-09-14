@@ -10,7 +10,7 @@ namespace render {
         class Buffer {
         private:
             std::shared_ptr<Pool> pool;
-            std::shared_ptr<Linker> linker;
+            Linker* linker;
             VkCommandBuffer vulkan_data;
             bool not_flushed = false;
 

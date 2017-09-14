@@ -6,7 +6,7 @@
 
 int gearoenix::render::device::Physical::is_good(const VkPhysicalDevice& gpu)
 {
-    auto& l = surface->get_instance()->get_linker();
+    auto l = surface->get_instance()->get_linker();
     uint32_t queue_count = 0;
     l->vkGetPhysicalDeviceQueueFamilyProperties(gpu, &queue_count, NULL);
     if (queue_count == 0) {
@@ -71,12 +71,11 @@ int gearoenix::render::device::Physical::is_good(const VkPhysicalDevice& gpu)
     return -1;
 }
 
-gearoenix::render::device::Physical::Physical(
-    const std::shared_ptr<Surface>& surface)
+gearoenix::render::device::Physical::Physical(Surface* surface)
     : surface(surface)
 {
-    auto& instance = surface->get_instance();
-    auto& l = instance->get_linker();
+    auto instance = surface->get_instance();
+    auto l = instance->get_linker();
     uint32_t gpu_count = 0;
     VKC(l->vkEnumeratePhysicalDevices(instance->get_vulkan_data(), &gpu_count,
         0));
@@ -137,7 +136,7 @@ gearoenix::render::device::Physical::get_memory_properties() const
     return memory_properties;
 }
 
-const std::shared_ptr<gearoenix::render::Instance>& gearoenix::render::device::Physical::get_instance() const
+const gearoenix::render::Instance* gearoenix::render::device::Physical::get_instance() const
 {
     return surface->get_instance();
 }
@@ -166,7 +165,7 @@ gearoenix::render::device::Physical::get_surface_formats() const
     return formats;
 }
 
-const std::shared_ptr<gearoenix::render::Surface>& gearoenix::render::device::Physical::get_surface() const
+const gearoenix::render::Surface* gearoenix::render::device::Physical::get_surface() const
 {
     return surface;
 }
@@ -204,7 +203,7 @@ uint32_t gearoenix::render::device::Physical::get_present_queue_node_index()
 VkFormat gearoenix::render::device::Physical::get_supported_depth_format()
     const
 {
-    auto& l = surface->get_instance()->get_linker();
+    auto l = surface->get_instance()->get_linker();
     std::vector<VkFormat> depth_formats = {
         VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D32_SFLOAT,
         VK_FORMAT_D24_UNORM_S8_UINT, VK_FORMAT_D16_UNORM_S8_UINT,

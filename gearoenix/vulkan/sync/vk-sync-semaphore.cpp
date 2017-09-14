@@ -9,7 +9,7 @@ gearoenix::render::sync::Semaphore::Semaphore(
     const std::shared_ptr<device::Logical>& logical_device)
     : logical_device(logical_device)
 {
-    auto& l = logical_device->get_physical_device()->get_instance()->get_linker();
+    auto l = logical_device->get_physical_device()->get_instance()->get_linker();
     VkSemaphoreCreateInfo semaphore_create_info;
     setz(semaphore_create_info);
     semaphore_create_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
@@ -19,7 +19,7 @@ gearoenix::render::sync::Semaphore::Semaphore(
 
 gearoenix::render::sync::Semaphore::~Semaphore()
 {
-    auto& l = logical_device->get_physical_device()->get_instance()->get_linker();
+    auto l = logical_device->get_physical_device()->get_instance()->get_linker();
     l->vkDestroySemaphore(logical_device->get_vulkan_data(), vulkan_data,
         nullptr);
 }

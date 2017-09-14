@@ -8,14 +8,14 @@ namespace render {
         class Physical;
         class Logical {
         private:
-            std::shared_ptr<Physical> physical_device;
+            Physical* physical_device;
             VkDevice vulkan_data;
             VkQueue vk_graphic_queue;
 
         public:
-            Logical(const std::shared_ptr<Physical>& p);
+            Logical(Physical* p);
             ~Logical();
-            const std::shared_ptr<Physical>& get_physical_device() const;
+            const Physical* get_physical_device() const;
             const VkDevice& get_vulkan_data() const;
             const VkQueue& get_graphic_queue() const;
             void wait_to_finish();

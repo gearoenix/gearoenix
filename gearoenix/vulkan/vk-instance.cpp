@@ -141,11 +141,11 @@ static VkBool32 VKAPI_PTR vkDebugReportCallbackEX_impl(
 }
 #endif
 
-gearoenix::render::Instance::Instance(const std::shared_ptr<Linker>& l)
+gearoenix::render::Instance::Instance(Linker* l)
     : linker(l)
 {
     VkApplicationInfo app_info;
-    std::memset(&app_info, 0, sizeof(app_info));
+    setz(app_info);
     app_info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
     app_info.apiVersion = VK_MAKE_VERSION(1, 0, 0);
     app_info.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
@@ -252,7 +252,11 @@ gearoenix::render::Instance::~Instance()
     linker->vkDestroyInstance(vulkan_data, 0);
 }
 
-const std::shared_ptr<gearoenix::render::Linker>& gearoenix::render::Instance::get_linker() const
+const gearoenix::render::Linker* gearoenix::render::Instance::get_linker() const
+{
+    return linker;
+}
+gearoenix::render::Linker* gearoenix::render::Instance::get_linker()
 {
     return linker;
 }

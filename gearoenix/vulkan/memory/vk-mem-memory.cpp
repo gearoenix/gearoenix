@@ -13,8 +13,8 @@ gearoenix::render::memory::Memory::Memory(
     : pool(pool)
 {
     auto& d = pool->get_logical_device();
-    auto& p = d->get_physical_device();
-    auto& l = p->get_instance()->get_linker();
+    auto p = d->get_physical_device();
+    auto l = p->get_instance()->get_linker();
     VkMemoryAllocateInfo mem_alloc;
     setz(mem_alloc);
     mem_alloc.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
@@ -26,8 +26,8 @@ gearoenix::render::memory::Memory::Memory(
 
 gearoenix::render::memory::Memory::~Memory()
 {
-    auto& d = pool->get_logical_device();
-    auto& l = d->get_physical_device()->get_instance()->get_linker();
+    auto d = pool->get_logical_device();
+    auto l = d->get_physical_device()->get_instance()->get_linker();
     l->vkFreeMemory(d->get_vulkan_data(), vulkan_data, nullptr);
 }
 

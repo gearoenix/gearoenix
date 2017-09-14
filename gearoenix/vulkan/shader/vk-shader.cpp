@@ -9,7 +9,7 @@
 void gearoenix::render::shader::Shader::delete_module(
     const VkShaderModule& module)
 {
-    auto& l = logical_device->get_physical_device()->get_instance()->get_linker();
+    auto l = logical_device->get_physical_device()->get_instance()->get_linker();
     l->vkDestroyShaderModule(logical_device->get_vulkan_data(), module, nullptr);
 }
 
@@ -25,7 +25,7 @@ void gearoenix::render::shader::Shader::fetch(
 VkShaderModule gearoenix::render::shader::Shader::load(
     std::shared_ptr<system::File>& file)
 {
-    auto& l = logical_device->get_physical_device()->get_instance()->get_linker();
+    auto l = logical_device->get_physical_device()->get_instance()->get_linker();
     std::vector<uint8_t> spirv;
     fetch(file, spirv);
     LOGI(std::string("shader size is: ") + std::to_string(spirv.size()));

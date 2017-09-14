@@ -11,8 +11,7 @@
 
 #define DEBUG_SWAPCHAIN
 
-gearoenix::render::Swapchain::Swapchain(
-    const std::shared_ptr<device::Logical>& d)
+gearoenix::render::Swapchain::Swapchain(device::Logical* d)
     : logical_device(d)
 {
     initialize();
@@ -21,7 +20,7 @@ gearoenix::render::Swapchain::Swapchain(
 gearoenix::render::Swapchain::~Swapchain()
 {
     image_views.clear();
-    auto& l = logical_device->get_physical_device()->get_instance()->get_linker();
+    auto l = logical_device->get_physical_device()->get_instance()->get_linker();
     l->vkDestroySwapchainKHR(logical_device->get_vulkan_data(), vulkan_data,
         nullptr);
 }
@@ -43,7 +42,7 @@ gearoenix::render::Swapchain::get_image_views() const
     return image_views;
 }
 
-const std::shared_ptr<gearoenix::render::device::Logical>& gearoenix::render::Swapchain::get_logical_device() const
+const gearoenix::render::device::Logical* gearoenix::render::Swapchain::get_logical_device() const
 {
     return logical_device;
 }
@@ -51,7 +50,7 @@ const std::shared_ptr<gearoenix::render::device::Logical>& gearoenix::render::Sw
 uint32_t gearoenix::render::Swapchain::get_next_image_index(
     const std::shared_ptr<sync::Semaphore>& semaphore)
 {
-    auto& l = logical_device->get_physical_device()->get_instance()->get_linker();
+    auto l = logical_device->get_physical_device()->get_instance()->get_linker();
     uint32_t image_index = 0;
     VkResult r = l->vkAcquireNextImageKHR(
         logical_device->get_vulkan_data(), vulkan_data, UINT64_MAX,
@@ -67,11 +66,11 @@ uint32_t gearoenix::render::Swapchain::get_next_image_index(
 
 void gearoenix::render::Swapchain::initialize()
 {
-    auto& d = logical_device;
-    auto& p = d->get_physical_device();
-    auto& s = p->get_surface();
-    auto& i = p->get_instance();
-    auto& l = i->get_linker();
+    auto d = logical_device;
+    auto p = d->get_physical_device();
+    auto s = p->get_surface();
+    auto i = p->get_instance();
+    auto l = i->get_linker();
     auto caps = p->get_surface_capabilities();
     auto formats = p->get_surface_formats();
     auto old_swapchain = vulkan_data;
@@ -135,9 +134,10 @@ void gearoenix::render::Swapchain::initialize()
         images.data()));
     image_views.resize(count);
     for (uint32_t i = 0; i < count; ++i) {
-        image_views[i] = std::shared_ptr<image::View>(new image::View(
-            std::shared_ptr<image::Image>(new image::Image(d, images[i])),
-            chosen_format.format));
+        LOGF("Error unimplimented");
+        //        image_views[i] = std::shared_ptr<image::View>(new image::View(
+        //            std::shared_ptr<image::Image>(new image::Image(d, images[i])),
+        //            chosen_format.format));
     }
     if (0 != old_swapchain) {
         l->vkDestroySwapchainKHR(logical_device->get_vulkan_data(), old_swapchain,

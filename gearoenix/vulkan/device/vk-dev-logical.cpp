@@ -4,11 +4,11 @@
 #include "../vk-instance.hpp"
 #include "vk-dev-physical.hpp"
 
-gearoenix::render::device::Logical::Logical(const std::shared_ptr<Physical>& p)
+gearoenix::render::device::Logical::Logical(Physical* p)
     : physical_device(p)
 {
     const char* device_extensions[] = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
-    auto& l = physical_device->get_instance()->get_linker();
+    auto l = physical_device->get_instance()->get_linker();
     std::vector<VkDeviceQueueCreateInfo> queue_create_infos;
     float queue_priorities[] = { 1.0f };
     // TODO: create as many as possible queue to separate independent works as
@@ -48,11 +48,11 @@ gearoenix::render::device::Logical::Logical(const std::shared_ptr<Physical>& p)
 
 gearoenix::render::device::Logical::~Logical()
 {
-    auto& l = physical_device->get_instance()->get_linker();
+    auto l = physical_device->get_instance()->get_linker();
     l->vkDestroyDevice(vulkan_data, nullptr);
 }
 
-const std::shared_ptr<gearoenix::render::device::Physical>& gearoenix::render::device::Logical::get_physical_device() const
+const gearoenix::render::device::Physical* gearoenix::render::device::Logical::get_physical_device() const
 {
     return physical_device;
 }
@@ -69,6 +69,6 @@ const VkQueue& gearoenix::render::device::Logical::get_graphic_queue() const
 
 void gearoenix::render::device::Logical::wait_to_finish()
 {
-    auto& l = physical_device->get_instance()->get_linker();
+    auto l = physical_device->get_instance()->get_linker();
     l->vkDeviceWaitIdle(vulkan_data);
 }

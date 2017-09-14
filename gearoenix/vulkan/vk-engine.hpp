@@ -54,30 +54,17 @@ namespace render {
     class Engine {
     private:
         system::Application* sys_app;
-        std::shared_ptr<Linker> linker;
-        std::shared_ptr<Instance> instance;
-        std::shared_ptr<Surface> surface;
-        std::shared_ptr<device::Physical> physical_device;
-        std::shared_ptr<device::Logical> logical_device;
-        std::shared_ptr<Swapchain> swapchain;
-        std::shared_ptr<memory::Pool> mem_pool;
-        std::shared_ptr<image::View> depth_stencil;
-        std::shared_ptr<RenderPass> render_pass;
-        std::vector<std::shared_ptr<Framebuffer>> framebuffers;
-        std::shared_ptr<command::Pool> graphic_cmd_pool;
-        std::shared_ptr<shader::Manager> shader_manager;
-        // for this example
-        std::shared_ptr<buffer::Buffer> mesh_buff;
-        std::shared_ptr<buffer::Uniform> uniform;
-        std::shared_ptr<pipeline::Layout> pipeline_layout;
-        std::shared_ptr<pipeline::Cache> pipeline_cache;
-        std::shared_ptr<pipeline::Pipeline> pipeline;
-        std::shared_ptr<descriptor::Pool> descriptor_pool;
-        std::shared_ptr<descriptor::Set> descriptor_set;
-        std::shared_ptr<sync::Semaphore> present_complete_semaphore;
-        std::shared_ptr<sync::Semaphore> render_complete_semaphore;
-        std::vector<std::shared_ptr<sync::Fence>> wait_fences;
-        std::vector<std::shared_ptr<command::Buffer>> draw_buffers;
+        Linker* linker;
+        Instance* instance;
+        Surface* surface;
+        device::Physical* physical_device;
+        device::Logical* logical_device;
+        Swapchain* swapchain;
+        memory::Pool* mem_pool;
+        image::View* depth_stencil;
+        RenderPass* render_pass;
+        //        std::vector<Framebuffer> framebuffers;
+        command::Pool* graphic_cmd_pool;
         void setup_draw_buffers();
 
     public:
@@ -86,6 +73,8 @@ namespace render {
         void window_changed();
         void update();
         void terminate();
+        const device::Logical* get_logical_device() const;
+        device::Logical* get_logical_device();
     };
 }
 }

@@ -22,4 +22,6 @@ gearoenix::render::scene::Manager::~Manager()
     offsets.clear();
 }
 
-std::shared_ptr<gearoenix::render::scene::Scene>& gearoenix::render::scene::Manager::get_scene(uint16_t id) {}
+std::shared_ptr<gearoenix::render::scene::Scene>& gearoenix::render::scene::Manager::get_scene(uint16_t id)
+{
+}

@@ -21,7 +21,7 @@ gearoenix::render::image::Image::Image(
     const VkImageCreateInfo& info, const std::shared_ptr<memory::Pool>& pool)
     : logical_device(logical_device)
 {
-    auto& l = logical_device->get_physical_device()->get_instance()->get_linker();
+    auto l = logical_device->get_physical_device()->get_instance()->get_linker();
     VKC(l->vkCreateImage(logical_device->get_vulkan_data(), &info, nullptr,
         &vulkan_data));
     VkMemoryRequirements mem_requirements;
@@ -37,7 +37,7 @@ gearoenix::render::image::Image::Image(
 gearoenix::render::image::Image::~Image()
 {
     if (mem != nullptr) {
-        auto& l = logical_device->get_physical_device()->get_instance()->get_linker();
+        auto l = logical_device->get_physical_device()->get_instance()->get_linker();
         l->vkDestroyImage(logical_device->get_vulkan_data(), vulkan_data, nullptr);
     }
 }

@@ -16,8 +16,8 @@ gearoenix::render::descriptor::Set::Set(
     , pipeline_layout(pipeline_layout)
     , uniform(uniform)
 {
-    auto& d = pool->get_logical_device();
-    auto& l = d->get_physical_device()->get_instance()->get_linker();
+    auto d = pool->get_logical_device();
+    auto l = d->get_physical_device()->get_instance()->get_linker();
     VkDescriptorSetAllocateInfo alloc_info;
     setz(alloc_info);
     alloc_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;

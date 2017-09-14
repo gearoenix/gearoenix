@@ -9,7 +9,7 @@
 #ifdef IN_ANDROID
 #include <android_native_app_glue.h>
 #endif
-gearoenix::render::Surface::Surface(const std::shared_ptr<Instance>& instance,
+gearoenix::render::Surface::Surface(Instance* instance,
     system::Application* sys_app)
     : instance(instance)
     , sys_app(sys_app)
@@ -48,7 +48,7 @@ gearoenix::render::Surface::~Surface()
         vulkan_data, 0);
 }
 
-const std::shared_ptr<gearoenix::render::Instance>& gearoenix::render::Surface::get_instance() const
+const gearoenix::render::Instance* gearoenix::render::Surface::get_instance() const
 {
     return instance;
 }
