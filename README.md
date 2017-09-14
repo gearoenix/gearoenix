@@ -1,4 +1,4 @@
-# Gearoenix fame engine
+# Gearoenix game engine
 C++ game engine with modern low level APIs like: Vulkan, Metal, Directx12. This
 game engine is continuer of the
 [Vulkust](https://github.com/Hossein-Noroozpour/vulkust)
