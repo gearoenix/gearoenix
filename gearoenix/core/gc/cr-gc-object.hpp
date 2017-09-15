@@ -4,22 +4,22 @@ namespace gearoenix {
 namespace core {
     namespace gc {
         class Gc;
-        class GcObject {
+        class Object {
             friend class Gc;
 
         private:
-            GcObject(int size);
+            Gc* garbage_collector;
 
         protected:
             int size;
             int offset;
-            Gc* garbage_collector;
+            int end;
 
         public:
-            GcObject(int size, Gc* garbage_collector);
-            ~GcObject();
+            Object();
+            ~Object();
         };
     }
 }
 }
-#endif // GEAROENIX_CORE_GC_GC_HPP
+#endif // GEAROENIX_CORE_GC_OBJECT_HPP

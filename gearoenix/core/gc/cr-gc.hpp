@@ -18,15 +18,15 @@ namespace core {
         class Range;
         class Gc : public GcObject {
         private:
-            std::map<unsigned int, list::List<Range>*> free_sizes;
+            std::map<unsigned int, std::map<unsigned int, Range>> free_sizes;
             std::mutex* lock;
-            list::List<GcObject>* objects;
+            list::List<Object*>* objects;
 
         protected:
         public:
-            Gc(int size, Gc* parent);
-            Gc(int size);
+            Gc(unsigned int size);
             ~Gc();
+            void allocate(Object* obj);
         };
     }
 }
