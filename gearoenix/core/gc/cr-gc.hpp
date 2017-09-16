@@ -15,11 +15,16 @@ namespace core {
         template <typename T>
         class Range;
         class Gc : public Object {
+            friend class Object;
+
         private:
             std::map<unsigned int, std::map<unsigned int, Range>> free_ranges;
             std::mutex lock;
             // is owner of objects
             list::List<Object*>* objects;
+            void remove_range(const Range& r);
+            void add_range(const Range& r);
+            void deallocate(Object* obj);
 
         protected:
         public:

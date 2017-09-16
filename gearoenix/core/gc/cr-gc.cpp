@@ -3,7 +3,59 @@
 #include "../list/cr-list-node.hpp"
 #include "../list/cr-list.hpp"
 #include "cr-gc-range.hpp"
+#include <utility>
 #define DEBUG_GC
+void gearoenix::core::gc::Gc::remove_range(const Range& r)
+{
+    const unsigned int start_offset = r.start->get_value()->end;
+    const unsigned int range_size = (r.end->get_value()->offset) - start_offset;
+    if (0 == range_size) {
+        return;
+    }
+    auto search = free_ranges.find(range_size);
+    if (free_ranges.end() == search) {
+        LOGF("Unexpected");
+    }
+    auto& ranges = search->second;
+    auto range_search = ranges.find(start_offset);
+    if (ranges.end() == range_search) {
+        LOGF("Unexpected");
+    }
+    ranges.erase(range_search);
+    if (ranges.empty()) {
+        free_ranges.erase(search);
+    }
+}
+
+void gearoenix::core::gc::Gc::add_range(const Range& r)
+{
+    const unsigned int start_offset = r.start->get_value()->end;
+    const unsigned int range_size = (r.end->get_value()->offset) - start_offset;
+    if (range_size == 0) {
+        return;
+    }
+    auto search = free_ranges.upper_bound(range_size - 1);
+    if (range_size == search->first) {
+        search->second[start_offset] = r;
+        return;
+    }
+    std::map<unsigned int, Range> m;
+    m[start_offset] = r;
+    free_ranges.insert(search, std::make_pair(range_size, m));
+}
+
+void gearoenix::core::gc::Gc::deallocate(Object* obj)
+{
+    std::lock_guard<std::mutex>(lock);
+    list::Node<Object*>* obj_node = obj->node;
+    list::Node<Object*>* start_node = obj_node->get_previous();
+    list::Node<Object*>* end_node = obj_node->get_next();
+    remove_range(Range(start_node, obj_node));
+    remove_range(Range(obj_node, end_node));
+    delete obj_node;
+    add_range(Range(start_node, end_node));
+}
+
 gearoenix::core::gc::Gc::Gc(int size)
     : Object(size)
     , objects(new list::List<Object*>)
@@ -22,7 +74,9 @@ gearoenix::core::gc::Gc::~Gc()
 {
     std::lock_guard<std::mutex>(lock);
     for (auto node = objects->get_front(); node != nullptr; node = node->get_next()) {
-        delete node->get_value();
+        Object* obj = node->get_value();
+        obj->garbage_collector = nullptr;
+        delete obj;
     }
     delete objects;
     free_ranges.clear();
@@ -30,8 +84,12 @@ gearoenix::core::gc::Gc::~Gc()
 
 void gearoenix::core::gc::Gc::allocate(Object* obj)
 {
-    obj->garbage_collector = this;
     std::lock_guard<std::mutex>(lock);
+#ifdef DEBUG_GC
+    if (0 == obj->size) {
+        LOGF("Wrong object size! (0 size)");
+    }
+#endif
     auto search = free_ranges.upper_bound(obj->size - 1);
 #ifdef DEBUG_GC
     if (search == free_ranges.end()) {
@@ -41,26 +99,16 @@ void gearoenix::core::gc::Gc::allocate(Object* obj)
         LOGF("Unexpected");
     }
 #endif
-    auto range = search->second.begin();
-    obj->offset = range->second->start->get_value()->end;
+    auto range_search = search->second.begin();
+    Range& range = range->second;
+    list::Node<Object*>* start_node = range.start;
+    list::Node<Object*>* end_node = range.end;
+    start_node->add_as_next(obj);
+    list::Node<Object*>* obj_node = start_node->get_next();
+    obj->garbage_collector = this;
+    obj->node = obj_node;
+    obj->offset = start_node->get_value()->end;
     obj->end = (obj->size) + (obj->offset);
-    list::Node<Object*>* end_node = range->second->end;
-    search->second.erase(range);
-    range->second->start->add_as_next(obj);
-    if (search->second.empty()) {
-        free_ranges.erase(search);
-    }
-    unsigned int range_size = (obj->end) - (end_node->get_value()->start);
-    if (0 == range_size) {
-        return;
-    }
-    Range r(end_node->get_previous(), end_node);
-    auto insert_search = free_ranges.find(range_size - 1);
-    if (insert_search->first == range_size) {
-        insert_search->second[obj->end] = r;
-        return;
-    }
-    std::map<unsigned int, Range> m;
-    m[obj->end] = r;
-    free_ranges.insert(insert_search, m);
+    remove_range(range);
+    add_range(Range(obj_node, end_node));
 }

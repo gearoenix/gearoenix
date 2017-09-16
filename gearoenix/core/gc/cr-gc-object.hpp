@@ -2,6 +2,10 @@
 #define GEAROENIX_CORE_GC_OBJECT_HPP
 namespace gearoenix {
 namespace core {
+    namespace list {
+        template <class T>
+        class Node;
+    }
     namespace gc {
         class Gc;
         class Object {
@@ -9,6 +13,7 @@ namespace core {
 
         private:
             Gc* garbage_collector = nullptr;
+            list::Node<Object*>* node = nullptr;
             unsigned int size;
             unsigned int offset = 0;
             unsigned int end;
