@@ -32,7 +32,7 @@ namespace core {
             T& get_value();
             const T& get_value() const;
             void add_as_previous(const T& previous_value);
-            void add_as_chid(const T& next_value);
+            void add_as_next(const T& next_value);
         };
     }
 }

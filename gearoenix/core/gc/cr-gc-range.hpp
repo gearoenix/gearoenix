@@ -12,12 +12,15 @@ namespace core {
         class Node;
     }
     namespace gc {
-        class GcObject;
+        class Gc;
+        class Object;
         class Range {
+            friend class Gc;
+
         private:
-            list::Node<GcObject>* start;
-            list::Node<GcObject>* end;
-            Range(list::Node<GcObject>* start, list::Node<GcObject>* end);
+            list::Node<Object*>* start;
+            list::Node<Object*>* end;
+            Range(list::Node<Object*>* start, list::Node<Object*>* end);
 
         protected:
         public:

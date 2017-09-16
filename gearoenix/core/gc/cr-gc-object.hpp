@@ -8,15 +8,14 @@ namespace core {
             friend class Gc;
 
         private:
-            Gc* garbage_collector;
+            Gc* garbage_collector = nullptr;
+            unsigned int size;
+            unsigned int offset = 0;
+            unsigned int end;
 
         protected:
-            int size;
-            int offset;
-            int end;
-
         public:
-            Object();
+            Object(unsigned int size);
             ~Object();
         };
     }

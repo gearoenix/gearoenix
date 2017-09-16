@@ -2,9 +2,7 @@
 #define GEAROENIX_CORE_GC_GC_HPP
 #include "cr-gc-object.hpp"
 #include <map>
-namespace std {
-class mutex;
-}
+#include <mutex>
 namespace gearoenix {
 namespace core {
     namespace list {
@@ -16,10 +14,11 @@ namespace core {
     namespace gc {
         template <typename T>
         class Range;
-        class Gc : public GcObject {
+        class Gc : public Object {
         private:
-            std::map<unsigned int, std::map<unsigned int, Range>> free_sizes;
-            std::mutex* lock;
+            std::map<unsigned int, std::map<unsigned int, Range>> free_ranges;
+            std::mutex lock;
+            // is owner of objects
             list::List<Object*>* objects;
 
         protected:
