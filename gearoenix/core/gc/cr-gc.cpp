@@ -46,7 +46,7 @@ void gearoenix::core::gc::Gc::add_range(const Range& r)
 
 void gearoenix::core::gc::Gc::deallocate(Object* obj)
 {
-    std::lock_guard<std::mutex>(lock);
+    std::lock_guard<std::mutex> lg(lock);
     list::Node<Object*>* obj_node = obj->node;
     list::Node<Object*>* start_node = obj_node->get_previous();
     list::Node<Object*>* end_node = obj_node->get_next();
@@ -56,7 +56,7 @@ void gearoenix::core::gc::Gc::deallocate(Object* obj)
     add_range(Range(start_node, end_node));
 }
 
-gearoenix::core::gc::Gc::Gc(int size)
+gearoenix::core::gc::Gc::Gc(unsigned int size)
     : Object(size)
     , objects(new list::List<Object*>)
 {
@@ -64,7 +64,7 @@ gearoenix::core::gc::Gc::Gc(int size)
     Object* end = new Object(0);
     objects->add_front(start);
     objects->add_end(end);
-    Range r(start, end);
+    Range r(objects->get_front(), objects->get_end());
     std::map<unsigned int, Range> ranges;
     ranges[0] = r;
     free_ranges[size] = ranges;
@@ -72,7 +72,7 @@ gearoenix::core::gc::Gc::Gc(int size)
 
 gearoenix::core::gc::Gc::~Gc()
 {
-    std::lock_guard<std::mutex>(lock);
+    std::lock_guard<std::mutex> lg(lock);
     for (auto node = objects->get_front(); node != nullptr; node = node->get_next()) {
         Object* obj = node->get_value();
         obj->garbage_collector = nullptr;
@@ -84,7 +84,7 @@ gearoenix::core::gc::Gc::~Gc()
 
 void gearoenix::core::gc::Gc::allocate(Object* obj)
 {
-    std::lock_guard<std::mutex>(lock);
+    std::lock_guard<std::mutex> lg(lock);
 #ifdef DEBUG_GC
     if (0 == obj->size) {
         LOGF("Wrong object size! (0 size)");
@@ -100,7 +100,7 @@ void gearoenix::core::gc::Gc::allocate(Object* obj)
     }
 #endif
     auto range_search = search->second.begin();
-    Range& range = range->second;
+    Range& range = range_search->second;
     list::Node<Object*>* start_node = range.start;
     list::Node<Object*>* end_node = range.end;
     start_node->add_as_next(obj);

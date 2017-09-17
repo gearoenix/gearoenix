@@ -4,7 +4,7 @@ namespace gearoenix {
 namespace core {
     namespace list {
         template <class T>
-        class List<T>;
+        class List;
         template <class T>
         class Node {
             friend class List<T>;
@@ -39,14 +39,17 @@ namespace core {
 }
 
 template <class T>
-gearoenix::core::list::Node::Node(
-    const T& valuse, List<T>* root, Node<T>* previous, Node<T>* next)
+gearoenix::core::list::Node<T>::Node(
+    const T& value, List<T>* root, Node<T>* previous, Node<T>* next)
     : value(value)
+    , root(root)
+    , previous(previous)
+    , next(next)
 {
 }
 
 template <class T>
-gearoenix::core::list::Node::~Node()
+gearoenix::core::list::Node<T>::~Node()
 {
     if (previous != nullptr) {
         previous->next = next;
@@ -61,55 +64,55 @@ gearoenix::core::list::Node::~Node()
 }
 
 template <class T>
-gearoenix::core::list::Node* gearoenix::core::list::Node::get_previous()
+gearoenix::core::list::Node<T>* gearoenix::core::list::Node<T>::get_previous()
 {
     return previous;
 }
 
 template <class T>
-const gearoenix::core::list::Node* gearoenix::core::list::Node::get_previous() const
+const gearoenix::core::list::Node<T>* gearoenix::core::list::Node<T>::get_previous() const
 {
     return previous;
 }
 
 template <class T>
-gearoenix::core::list::Node* gearoenix::core::list::Node::get_next()
+gearoenix::core::list::Node<T>* gearoenix::core::list::Node<T>::get_next()
 {
     return next;
 }
 
 template <class T>
-const gearoenix::core::list::Node* get_next() const
+const gearoenix::core::list::Node<T>* gearoenix::core::list::Node<T>::get_next() const
 {
     return next;
 }
 
 template <class T>
-gearoenix::core::list::List* gearoenix::core::list::Node::get_root()
+gearoenix::core::list::List<T>* gearoenix::core::list::Node<T>::get_root()
 {
     return root;
 }
 
 template <class T>
-const gearoenix::core::list::List* gearoenix::core::list::Node::get_root() const
+const gearoenix::core::list::List<T>* gearoenix::core::list::Node<T>::get_root() const
 {
     return root;
 }
 
 template <class T>
-T& gearoenix::core::list::Node::get_value()
+T& gearoenix::core::list::Node<T>::get_value()
 {
     return value;
 }
 
 template <class T>
-const T& gearoenix::core::list::Node::get_value() const
+const T& gearoenix::core::list::Node<T>::get_value() const
 {
     return value;
 }
 
 template <class T>
-void gearoenix::core::list::Node::add_as_previous(const T& previous_value)
+void gearoenix::core::list::Node<T>::add_as_previous(const T& previous_value)
 {
     Node<T>* new_node = new Node(previous_value);
     new_node->next = this;
@@ -124,7 +127,7 @@ void gearoenix::core::list::Node::add_as_previous(const T& previous_value)
 }
 
 template <class T>
-void gearoenix::core::list::Node::add_as_chid(const T& next_value)
+void gearoenix::core::list::Node<T>::add_as_next(const T& next_value)
 {
     Node<T>* new_node = new Node(next_value);
     new_node->next = next;

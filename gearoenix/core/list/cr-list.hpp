@@ -6,6 +6,8 @@ namespace core {
     namespace list {
         template <class T>
         class List {
+            friend class Node<T>;
+
         private:
             Node<T>* front;
             Node<T>* end;
@@ -26,49 +28,49 @@ namespace core {
 }
 
 template <class T>
-gearoenix::core::list::List::List()
+gearoenix::core::list::List<T>::List()
     : front(nullptr)
     , end(nullptr)
 {
 }
 
 template <class T>
-gearoenix::core::list::List::~List()
+gearoenix::core::list::List<T>::~List()
 {
     Node<T>* node = front;
     while (node != nullptr) {
         Node<T>* tmp = node;
-        node = node->child;
+        node = node->next;
         delete tmp;
     }
 }
 
 template <class T>
-gearoenix::core::list::Node<T>* gearoenix::core::list::List::get_front()
+gearoenix::core::list::Node<T>* gearoenix::core::list::List<T>::get_front()
 {
     return front;
 }
 
 template <class T>
-const gearoenix::core::list::Node<T>* gearoenix::core::list::List::get_front() const
+const gearoenix::core::list::Node<T>* gearoenix::core::list::List<T>::get_front() const
 {
     return front;
 }
 
 template <class T>
-gearoenix::core::list::Node<T>* gearoenix::core::list::List::get_end()
+gearoenix::core::list::Node<T>* gearoenix::core::list::List<T>::get_end()
 {
     return end;
 }
 
 template <class T>
-const gearoenix::core::list::Node<T>* gearoenix::core::list::List::get_end() const
+const gearoenix::core::list::Node<T>* gearoenix::core::list::List<T>::get_end() const
 {
     return end;
 }
 
 template <class T>
-void gearoenix::core::list::List::add_front(const T& val)
+void gearoenix::core::list::List<T>::add_front(const T& val)
 {
     if (front != nullptr) {
         front->add_as_previous(val);
@@ -79,7 +81,7 @@ void gearoenix::core::list::List::add_front(const T& val)
 }
 
 template <class T>
-void gearoenix::core::list::List::get_end(const T& val)
+void gearoenix::core::list::List<T>::add_end(const T& val)
 {
     if (end != nullptr) {
         end->add_as_next(val);

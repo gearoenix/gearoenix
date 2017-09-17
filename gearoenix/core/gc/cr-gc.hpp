@@ -12,7 +12,6 @@ namespace core {
         class Node;
     }
     namespace gc {
-        template <typename T>
         class Range;
         class Gc : public Object {
             friend class Object;
