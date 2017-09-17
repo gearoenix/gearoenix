@@ -3,9 +3,9 @@
 #ifdef DEBUG_MODE
 #define WIN_DEBUG
 #endif
-#include "../../core/application.hpp"
-#include "../../core/static.hpp"
-#include "../log.hpp"
+#include "../../core/cr-application.hpp"
+#include "../../core/cr-static.hpp"
+#include "../sys-log.hpp"
 #include <string>
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     LPSTR pCmdLine, int nCmdShow)
@@ -176,8 +176,8 @@ LRESULT gearoenix::system::Application::handle_message(HWND hWnd, UINT uMsg,
         break;
     case WM_SHOWWINDOW:
         if (nullptr == core_app) {
-            render_engine = std::shared_ptr<render::Engine>(new render::Engine(this));
-            core_app = std::shared_ptr<core::Application>(new core::Application(this));
+            render_engine = new render::Engine(this);
+            core_app = new core::Application(this);
         }
         break;
     case WM_ENTERSIZEMOVE:

@@ -2,6 +2,7 @@
 #define GEAROENIX_CORE_ASSET_MANAGER_HPP
 #include "../cr-types.hpp"
 #include <memory>
+#include <string>
 namespace gearoenix {
 namespace audio {
     class Audio;

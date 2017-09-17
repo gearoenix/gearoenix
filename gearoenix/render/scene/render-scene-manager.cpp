@@ -24,4 +24,6 @@ gearoenix::render::scene::Manager::~Manager()
 
 std::shared_ptr<gearoenix::render::scene::Scene>& gearoenix::render::scene::Manager::get_scene(uint16_t id)
 {
+    // temporary
+    return std::shared_ptr<Scene>(nullptr);
 }
