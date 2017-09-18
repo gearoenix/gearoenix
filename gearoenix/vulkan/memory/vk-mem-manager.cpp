@@ -23,13 +23,21 @@ gearoenix::render::memory::Manager::Manager(
     }
     mem = new Memory(logical_device, size, mem_place, memory_flags);
 }
+
 gearoenix::render::memory::Manager::~Manager()
 {
     delete mem;
 }
 
-gearoenix::render::memory::Memory* gearoenix::render::memory::Manager::get_memory() { return mem; }
-const gearoenix::render::memory::Memory* gearoenix::render::memory::Manager::get_memory() const { return mem; }
+gearoenix::render::memory::Memory* gearoenix::render::memory::Manager::get_memory()
+{
+    return mem;
+}
+
+const gearoenix::render::memory::Memory* gearoenix::render::memory::Manager::get_memory() const
+{
+    return mem;
+}
 
 gearoenix::render::memory::SubMemory* gearoenix::render::memory::Manager::create_submemory(unsigned int size)
 {
