@@ -16,6 +16,7 @@ namespace render {
             Logical(Physical* p);
             ~Logical();
             const Physical* get_physical_device() const;
+            Physical* get_physical_device();
             const VkDevice& get_vulkan_data() const;
             const VkQueue& get_graphic_queue() const;
             void wait_to_finish();

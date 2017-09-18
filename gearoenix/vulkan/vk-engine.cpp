@@ -14,7 +14,7 @@
 #include "device/vk-dev-physical.hpp"
 #include "image/vk-img-image.hpp"
 #include "image/vk-img-view.hpp"
-#include "memory/vk-mem-pool.hpp"
+#include "memory/vk-mem-manager.hpp"
 #include "pipeline/vk-pip-cache.hpp"
 #include "pipeline/vk-pip-layout.hpp"
 #include "pipeline/vk-pip-pipeline.hpp"

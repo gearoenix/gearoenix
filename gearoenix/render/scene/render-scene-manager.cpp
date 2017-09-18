@@ -1,7 +1,7 @@
 #include "render-scene-manager.hpp"
 #include "../../system/sys-file.hpp"
 #include "../render-engine.hpp"
-//#include "render-scene.hpp"
+#include "render-scene.hpp"
 
 gearoenix::render::scene::Manager::Manager(
     Engine* engine, const std::shared_ptr<system::File>& asset)
@@ -22,8 +22,8 @@ gearoenix::render::scene::Manager::~Manager()
     offsets.clear();
 }
 
-std::shared_ptr<gearoenix::render::scene::Scene>& gearoenix::render::scene::Manager::get_scene(uint16_t id)
+std::shared_ptr<gearoenix::render::scene::Scene>& gearoenix::render::scene::Manager::get_scene(uint16_t)
 {
     // temporary
-    return std::shared_ptr<Scene>(nullptr);
+    return tmp;
 }

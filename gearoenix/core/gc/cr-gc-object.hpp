@@ -14,11 +14,12 @@ namespace core {
         private:
             Gc* garbage_collector = nullptr;
             list::Node<Object*>* node = nullptr;
+
+        protected:
             unsigned int size;
             unsigned int offset = 0;
             unsigned int end;
 
-        protected:
         public:
             Object(unsigned int size);
             ~Object();

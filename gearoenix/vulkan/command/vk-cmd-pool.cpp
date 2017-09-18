@@ -9,7 +9,7 @@ gearoenix::render::command::Pool::Pool(
     const std::shared_ptr<device::Logical>& logical_device)
     : logical_device(logical_device)
 {
-    auto p = logical_device->get_physical_device();
+    const device::Physical* p = logical_device->get_physical_device();
     auto l = p->get_instance()->get_linker();
     VkCommandPoolCreateInfo vk_cmd_pool_info;
     setz(vk_cmd_pool_info);

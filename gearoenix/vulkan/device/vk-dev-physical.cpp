@@ -233,3 +233,19 @@ uint32_t gearoenix::render::device::Physical::get_memory_type_index(
     }
     LOGF(std::string("Could not find the requsted memory type."));
 }
+
+unsigned int gearoenix::render::device::Physical::get_max_memory_alignment() const
+{
+    auto& limits = properties.limits;
+    return std::max(
+        std::max(
+            std::max(
+                limits.minMemoryMapAlignment,
+                limits.minStorageBufferOffsetAlignment),
+            std::max(
+                limits.minTexelBufferOffsetAlignment,
+                limits.minUniformBufferOffsetAlignment)),
+        std::max(
+            limits.optimalBufferCopyOffsetAlignment,
+            limits.optimalBufferCopyRowPitchAlignment));
+}

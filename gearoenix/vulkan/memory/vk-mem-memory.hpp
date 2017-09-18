@@ -1,26 +1,26 @@
-#ifndef GEAROENIX_VULKAN_MEMORY_MEMORY_Hpp
-#define GEAROENIX_VULKAN_MEMORY_MEMORY_Hpp
+#ifndef GEAROENIX_VULKAN_MEMORY_MEMORY_HPP
+#define GEAROENIX_VULKAN_MEMORY_MEMORY_HPP
 #include "../vk-linker.hpp"
-#include <memory>
 namespace gearoenix {
 namespace render {
-    namespace image {
-        class Image;
+    namespace device {
+        class Logical;
     }
     namespace memory {
-        class Pool;
         class Memory {
+        public:
         private:
-            std::shared_ptr<Pool> pool;
+            device::Logical* logical_device;
             VkDeviceMemory vulkan_data;
 
         public:
-            Memory(const std::shared_ptr<Pool>& pool, const VkMemoryRequirements& req,
-                const VkMemoryPropertyFlagBits& properties = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+            Memory(device::Logical* logical_device, VkDeviceSize size, uint32_t place, uint32_t memory_flags);
             ~Memory();
-            const VkDeviceMemory& get_vulkan_data() const;
+            const device::Logical* get_logical_device() const;
+            device::Logical* get_logical_device();
+            const VkDeviceMemory& get_vulkan_data();
         };
     } // namespace memory
 } // namespace render
 } // namespace gearoenix
-#endif // GEAROENIX_RENDER_MEMORY_POOL_H
+#endif // GEAROENIX_VULKAN_MEMORY_MEMORY_HPP

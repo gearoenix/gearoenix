@@ -17,6 +17,8 @@ namespace render {
             std::shared_ptr<system::File> asset;
             std::map<uint16_t, std::weak_ptr<Scene>> cached;
             std::vector<uint32_t> offsets;
+            //temporary
+            std::shared_ptr<Scene> tmp;
 
         public:
             Manager(Engine* engine, const std::shared_ptr<system::File>& asset);

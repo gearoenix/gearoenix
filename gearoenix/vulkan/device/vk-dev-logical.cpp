@@ -56,6 +56,10 @@ const gearoenix::render::device::Physical* gearoenix::render::device::Logical::g
 {
     return physical_device;
 }
+gearoenix::render::device::Physical* gearoenix::render::device::Logical::get_physical_device()
+{
+    return physical_device;
+}
 
 const VkDevice& gearoenix::render::device::Logical::get_vulkan_data() const
 {

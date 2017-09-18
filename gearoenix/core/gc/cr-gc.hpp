@@ -26,10 +26,11 @@ namespace core {
             void deallocate(Object* obj);
 
         protected:
+            void allocate(Object* obj);
+
         public:
             Gc(unsigned int size);
             ~Gc();
-            void allocate(Object* obj);
         };
     }
 }
