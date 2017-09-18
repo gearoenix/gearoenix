@@ -5,7 +5,6 @@
 namespace gearoenix {
 namespace render {
     namespace memory {
-        class Pool;
     }
     namespace device {
         class Logical;
@@ -21,8 +20,7 @@ namespace render {
             View(const std::shared_ptr<Image>& img, const VkFormat& format);
             View(const std::shared_ptr<Image>& img, const VkImageViewCreateInfo& info);
             ~View();
-            static std::shared_ptr<View> create_depth_stencil(
-                const std::shared_ptr<memory::Pool>& mem_pool);
+            static View* create_depth_stencil(device::Logical* logical_device);
             const std::shared_ptr<Image>& get_image() const;
             const VkImageView& get_vulkan_data() const;
         };

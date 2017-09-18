@@ -38,8 +38,7 @@ gearoenix::render::Engine::Engine(system::Application* sys_app)
     physical_device = new device::Physical(surface);
     logical_device = new device::Logical(physical_device);
     swapchain = new Swapchain(logical_device);
-    //    mem_pool = std::shared_ptr<memory::Pool>(new memory::Pool(logical_device));
-    //    depth_stencil = image::View::create_depth_stencil(mem_pool);
+    depth_stencil = image::View::create_depth_stencil(logical_device);
     //    render_pass = new RenderPass(swapchain);
     //    auto frame_views = swapchain->get_image_views();
     //    framebuffers.resize(frame_views.size());
