@@ -63,7 +63,7 @@ namespace render {
         memory::Pool* mem_pool;
         image::View* depth_stencil;
         RenderPass* render_pass;
-        //        std::vector<Framebuffer> framebuffers;
+        std::vector<Framebuffer*> framebuffers;
         command::Pool* graphic_cmd_pool;
         void setup_draw_buffers();
 

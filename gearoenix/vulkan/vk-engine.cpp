@@ -40,14 +40,12 @@ gearoenix::render::Engine::Engine(system::Application* sys_app)
     swapchain = new Swapchain(logical_device);
     depth_stencil = image::View::create_depth_stencil(logical_device);
     render_pass = new RenderPass(swapchain);
-    //    auto frame_views = swapchain->get_image_views();
-    //    framebuffers.resize(frame_views.size());
-    //    for (uint32_t i = 0; i < frame_views.size(); ++i) {
-    //        framebuffers[i] = std::shared_ptr<Framebuffer>(
-    //            new Framebuffer(frame_views[i], depth_stencil, render_pass));
-    //    }
-    //    //    LOGE(std::string("reached"));
-    //    graphic_cmd_pool = std::shared_ptr<command::Pool>(new command::Pool(logical_device));
+    const std::vector<image::View*>& frame_views = swapchain->get_image_views();
+    framebuffers.resize(frame_views.size());
+    for (unsigned int i = 0; i < frame_views.size(); ++i) {
+        framebuffers[i] = new Framebuffer(frame_views[i], depth_stencil, render_pass);
+    }
+    graphic_cmd_pool = new command::Pool(logical_device);
     //    shader_manager = std::shared_ptr<shader::Manager>(
     //        new shader::Manager(sys_app->get_asset()));
     //    //    LOGE(std::string("reached"));
