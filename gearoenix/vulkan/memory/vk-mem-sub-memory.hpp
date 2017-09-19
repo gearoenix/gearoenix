@@ -8,6 +8,7 @@ namespace render {
         private:
         public:
             SubMemory(unsigned int size);
+            ~SubMemory();
         };
     } // namespace memory
 } // namespace render

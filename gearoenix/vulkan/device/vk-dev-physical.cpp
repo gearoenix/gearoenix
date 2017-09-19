@@ -74,8 +74,8 @@ int gearoenix::render::device::Physical::is_good(const VkPhysicalDevice& gpu)
 gearoenix::render::device::Physical::Physical(Surface* surface)
     : surface(surface)
 {
-    auto instance = surface->get_instance();
-    auto l = instance->get_linker();
+    const Instance* instance = surface->get_instance();
+    const Linker* l = instance->get_linker();
     uint32_t gpu_count = 0;
     VKC(l->vkEnumeratePhysicalDevices(instance->get_vulkan_data(), &gpu_count,
         0));
@@ -126,6 +126,8 @@ gearoenix::render::device::Physical::Physical(Surface* surface)
     for (auto& s : supported_extensions) {
         LOGI(std::string("    ") + s);
     }
+    l->vkGetPhysicalDeviceSurfaceCapabilitiesKHR(
+        vulkan_data, surface->get_vulkan_data(), &surface_capabilities);
 }
 
 gearoenix::render::device::Physical::~Physical() {}
@@ -141,16 +143,11 @@ const gearoenix::render::Instance* gearoenix::render::device::Physical::get_inst
     return surface->get_instance();
 }
 
-std::shared_ptr<VkSurfaceCapabilitiesKHR>
+const VkSurfaceCapabilitiesKHR&
 gearoenix::render::device::Physical::get_surface_capabilities() const
 {
-    VkSurfaceCapabilitiesKHR* caps = new VkSurfaceCapabilitiesKHR;
-    setz(*caps);
-    surface->get_instance()
-        ->get_linker()
-        ->vkGetPhysicalDeviceSurfaceCapabilitiesKHR(
-            vulkan_data, surface->get_vulkan_data(), caps);
-    return std::shared_ptr<VkSurfaceCapabilitiesKHR>(caps);
+
+    return surface_capabilities;
 }
 
 std::vector<VkSurfaceFormatKHR>

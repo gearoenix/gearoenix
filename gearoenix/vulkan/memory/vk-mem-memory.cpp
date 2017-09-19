@@ -5,16 +5,11 @@
 #include "../vk-check.hpp"
 #include "../vk-instance.hpp"
 gearoenix::render::memory::Memory::Memory(
-    device::Logical* logical_device, VkDeviceSize size, uint32_t place, uint32_t memory_flags)
+    device::Logical* logical_device, const VkMemoryRequirements& mem_reqs, uint32_t place)
     : logical_device(logical_device)
 {
     const device::Physical* pdev = logical_device->get_physical_device();
     const Linker* l = pdev->get_instance()->get_linker();
-    VkMemoryRequirements mem_reqs;
-    setz(mem_reqs);
-    mem_reqs.size = size;
-    mem_reqs.alignment = pdev->get_max_memory_alignment();
-    mem_reqs.memoryTypeBits = memory_flags;
     VkMemoryAllocateInfo mem_alloc;
     setz(mem_alloc);
     mem_alloc.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;

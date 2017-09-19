@@ -71,7 +71,7 @@ void gearoenix::render::Swapchain::initialize()
     auto s = p->get_surface();
     auto i = p->get_instance();
     auto l = i->get_linker();
-    auto caps = p->get_surface_capabilities();
+    const VkSurfaceCapabilitiesKHR& caps = p->get_surface_capabilities();
     auto formats = p->get_surface_formats();
     auto old_swapchain = vulkan_data;
     uint32_t chosen_format_index;
@@ -85,9 +85,9 @@ void gearoenix::render::Swapchain::initialize()
         chosen_format_index = 0;
     }
     chosen_format = formats[chosen_format_index];
-    auto swapchain_images_count = caps->minImageCount + 1;
-    if ((caps->maxImageCount > 0) && (swapchain_images_count > caps->maxImageCount)) {
-        swapchain_images_count = caps->maxImageCount;
+    auto swapchain_images_count = caps.minImageCount + 1;
+    if ((caps.maxImageCount > 0) && (swapchain_images_count > caps.maxImageCount)) {
+        swapchain_images_count = caps.maxImageCount;
     }
     uint32_t image_usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
     VkFormatProperties format_props;
@@ -103,7 +103,7 @@ void gearoenix::render::Swapchain::initialize()
     swapchain_create_info.minImageCount = swapchain_images_count;
     swapchain_create_info.imageFormat = chosen_format.format;
     swapchain_create_info.imageColorSpace = chosen_format.colorSpace;
-    swapchain_create_info.imageExtent = caps->currentExtent;
+    swapchain_create_info.imageExtent = caps.currentExtent;
     swapchain_create_info.imageUsage = image_usage;
     swapchain_create_info.preTransform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
     swapchain_create_info.imageArrayLayers = 1;
@@ -111,15 +111,15 @@ void gearoenix::render::Swapchain::initialize()
     swapchain_create_info.presentMode = VK_PRESENT_MODE_FIFO_KHR;
     swapchain_create_info.oldSwapchain = old_swapchain;
     swapchain_create_info.clipped = VK_TRUE;
-    if ((caps->supportedCompositeAlpha & VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR) != 0) {
+    if ((caps.supportedCompositeAlpha & VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR) != 0) {
         swapchain_create_info.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
-    } else if ((caps->supportedCompositeAlpha & VK_COMPOSITE_ALPHA_INHERIT_BIT_KHR) != 0) {
+    } else if ((caps.supportedCompositeAlpha & VK_COMPOSITE_ALPHA_INHERIT_BIT_KHR) != 0) {
         swapchain_create_info.compositeAlpha = VK_COMPOSITE_ALPHA_INHERIT_BIT_KHR;
-    } else if ((caps->supportedCompositeAlpha & VK_COMPOSITE_ALPHA_PRE_MULTIPLIED_BIT_KHR) != 0) {
+    } else if ((caps.supportedCompositeAlpha & VK_COMPOSITE_ALPHA_PRE_MULTIPLIED_BIT_KHR) != 0) {
         swapchain_create_info.compositeAlpha = VK_COMPOSITE_ALPHA_PRE_MULTIPLIED_BIT_KHR;
-    } else if ((caps->supportedCompositeAlpha & VK_COMPOSITE_ALPHA_POST_MULTIPLIED_BIT_KHR) != 0) {
+    } else if ((caps.supportedCompositeAlpha & VK_COMPOSITE_ALPHA_POST_MULTIPLIED_BIT_KHR) != 0) {
         swapchain_create_info.compositeAlpha = VK_COMPOSITE_ALPHA_POST_MULTIPLIED_BIT_KHR;
-    } else if ((caps->supportedCompositeAlpha & VK_COMPOSITE_ALPHA_FLAG_BITS_MAX_ENUM_KHR) != 0) {
+    } else if ((caps.supportedCompositeAlpha & VK_COMPOSITE_ALPHA_FLAG_BITS_MAX_ENUM_KHR) != 0) {
         swapchain_create_info.compositeAlpha = VK_COMPOSITE_ALPHA_FLAG_BITS_MAX_ENUM_KHR;
     } else {
         LOGF(std::string("Error composite is unknown."));

@@ -8,26 +8,28 @@ namespace render {
         class Logical;
     }
     namespace memory {
-        class Pool;
+        class SubMemory;
+        class Manager;
         class Memory;
     }
     namespace image {
         class Image {
         private:
-            std::shared_ptr<device::Logical> logical_device;
+            device::Logical* logical_device;
             VkImage vulkan_data;
-            std::shared_ptr<memory::Memory> mem;
+            memory::Memory* mem = nullptr;
+            memory::SubMemory* submem = nullptr;
 
         public:
-            Image(const std::shared_ptr<device::Logical>& logical_device,
+            Image(device::Logical* logical_device,
                 const VkImage& vulkan_data,
-                const std::shared_ptr<memory::Memory>& mem = nullptr);
-            Image(const std::shared_ptr<device::Logical>& logical_device,
+                memory::Memory* mem = nullptr);
+            Image(device::Logical* logical_device,
                 const VkImageCreateInfo& info,
-                const std::shared_ptr<memory::Pool>& pool);
+                memory::Manager* mem_manager = nullptr);
             ~Image();
             const VkImage& get_vulkan_data() const;
-            const std::shared_ptr<device::Logical>& get_logical_device() const;
+            const device::Logical* get_logical_device() const;
         };
     }
 }

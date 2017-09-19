@@ -6,9 +6,9 @@
 #include "../vk-instance.hpp"
 #include "vk-mem-memory.hpp"
 #include "vk-mem-sub-memory.hpp"
-gearoenix::render::memory::Manager::Manager(
-    device::Logical* logical_device, unsigned int size, const Place& place, uint32_t memory_flags)
-    : Gc(size)
+gearoenix::render::memory::Manager::Manager(device::Logical* logical_device, const VkMemoryRequirements& mem_reqs, const Place& place)
+    : Gc(mem_reqs.size)
+    , mem_reqs(mem_reqs)
 {
     uint32_t mem_place;
     switch (place) {
@@ -21,7 +21,7 @@ gearoenix::render::memory::Manager::Manager(
     default:
         LOGF("Unexpected");
     }
-    mem = new Memory(logical_device, size, mem_place, memory_flags);
+    mem = new Memory(logical_device, mem_reqs, mem_place);
 }
 
 gearoenix::render::memory::Manager::~Manager()

@@ -10,18 +10,19 @@ namespace render {
     namespace memory {
         class Memory;
         class SubMemory;
-        class Manager : core::gc::Gc {
+        class Manager : public core::gc::Gc {
         public:
             typedef enum {
                 GPU_LOCAL,
                 CPU_COHERENT,
             } Place;
+            VkMemoryRequirements mem_reqs;
 
         private:
             Memory* mem;
 
         public:
-            Manager(device::Logical* logical_device, unsigned int size, const Place& place = GPU_LOCAL, uint32_t memory_flags = 0);
+            Manager(device::Logical* logical_device, const VkMemoryRequirements& mem_reqs, const Place& place = GPU_LOCAL);
             ~Manager();
             Memory* get_memory();
             const Memory* get_memory() const;

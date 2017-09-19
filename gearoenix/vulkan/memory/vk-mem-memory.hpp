@@ -14,8 +14,8 @@ namespace render {
             VkDeviceMemory vulkan_data;
 
         public:
-            Memory(device::Logical* logical_device, VkDeviceSize size, uint32_t place, uint32_t memory_flags);
-            ~Memory();
+            Memory(device::Logical* logical_device, const VkMemoryRequirements& mem_req, uint32_t place = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+            virtual ~Memory();
             const device::Logical* get_logical_device() const;
             device::Logical* get_logical_device();
             const VkDeviceMemory& get_vulkan_data();

@@ -14,6 +14,7 @@ namespace render {
             VkPhysicalDeviceProperties properties;
             VkPhysicalDeviceFeatures features;
             VkPhysicalDeviceMemoryProperties memory_properties;
+            VkSurfaceCapabilitiesKHR surface_capabilities;
             std::vector<VkQueueFamilyProperties> queue_family_properties;
             std::vector<std::string> supported_extensions;
             uint32_t graphics_queue_node_index = UINT32_MAX;
@@ -26,7 +27,7 @@ namespace render {
             Physical(Surface* surface);
             ~Physical();
             const VkPhysicalDeviceMemoryProperties& get_memory_properties() const;
-            std::shared_ptr<VkSurfaceCapabilitiesKHR> get_surface_capabilities() const;
+            const VkSurfaceCapabilitiesKHR& get_surface_capabilities() const;
             std::vector<VkSurfaceFormatKHR> get_surface_formats() const;
             const Surface* get_surface() const;
             const Instance* get_instance() const;
