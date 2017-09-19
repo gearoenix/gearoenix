@@ -12,11 +12,11 @@ namespace render {
     class Swapchain;
     class RenderPass {
     private:
-        std::shared_ptr<Swapchain> swapchain;
+        Swapchain* swapchain;
         VkRenderPass vulkan_data;
 
     public:
-        RenderPass(const std::shared_ptr<Swapchain>& swapchain);
+        RenderPass(Swapchain* swapchain);
         ~RenderPass();
         const VkRenderPass& get_vulkan_data() const;
     };

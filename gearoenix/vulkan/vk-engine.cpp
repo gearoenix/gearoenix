@@ -39,7 +39,7 @@ gearoenix::render::Engine::Engine(system::Application* sys_app)
     logical_device = new device::Logical(physical_device);
     swapchain = new Swapchain(logical_device);
     depth_stencil = image::View::create_depth_stencil(logical_device);
-    //    render_pass = new RenderPass(swapchain);
+    render_pass = new RenderPass(swapchain);
     //    auto frame_views = swapchain->get_image_views();
     //    framebuffers.resize(frame_views.size());
     //    for (uint32_t i = 0; i < frame_views.size(); ++i) {

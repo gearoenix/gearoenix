@@ -19,6 +19,9 @@ gearoenix::render::Swapchain::Swapchain(device::Logical* d)
 
 gearoenix::render::Swapchain::~Swapchain()
 {
+    for (image::View* v : image_views) {
+        delete v;
+    }
     image_views.clear();
     auto l = logical_device->get_physical_device()->get_instance()->get_linker();
     l->vkDestroySwapchainKHR(logical_device->get_vulkan_data(), vulkan_data,
@@ -36,13 +39,18 @@ const VkSurfaceFormatKHR& gearoenix::render::Swapchain::get_chosen_format()
     return chosen_format;
 }
 
-std::vector<std::shared_ptr<gearoenix::render::image::View>>
+const std::vector<gearoenix::render::image::View*>&
 gearoenix::render::Swapchain::get_image_views() const
 {
     return image_views;
 }
 
 const gearoenix::render::device::Logical* gearoenix::render::Swapchain::get_logical_device() const
+{
+    return logical_device;
+}
+
+gearoenix::render::device::Logical* gearoenix::render::Swapchain::get_logical_device()
 {
     return logical_device;
 }
@@ -134,10 +142,7 @@ void gearoenix::render::Swapchain::initialize()
         images.data()));
     image_views.resize(count);
     for (uint32_t i = 0; i < count; ++i) {
-        LOGF("Error unimplimented");
-        //        image_views[i] = std::shared_ptr<image::View>(new image::View(
-        //            std::shared_ptr<image::Image>(new image::Image(d, images[i])),
-        //            chosen_format.format));
+        image_views[i] = new image::View(new image::Image(d, images[i]), chosen_format.format);
     }
     if (0 != old_swapchain) {
         l->vkDestroySwapchainKHR(logical_device->get_vulkan_data(), old_swapchain,

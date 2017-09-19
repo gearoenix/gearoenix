@@ -8,14 +8,12 @@
 #include "../vk-check.hpp"
 #include "../vk-instance.hpp"
 
-//gearoenix::render::image::Image::Image(
-//    const std::shared_ptr<device::Logical>& logical_device,
-//    const VkImage& vulkan_data, const std::shared_ptr<memory::Memory>& mem)
-//    : logical_device(logical_device)
-//    , vulkan_data(vulkan_data)
-//    , mem(mem)
-//{
-//}
+gearoenix::render::image::Image::Image(device::Logical* logical_device, const VkImage& vulkan_data, memory::Memory* mem)
+    : logical_device(logical_device)
+    , vulkan_data(vulkan_data)
+    , mem(mem)
+{
+}
 
 gearoenix::render::image::Image::Image(device::Logical* logical_device, const VkImageCreateInfo& info, memory::Manager* mem_mgr)
     : logical_device(logical_device)

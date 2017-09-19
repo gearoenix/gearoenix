@@ -7,30 +7,26 @@
 #include "../vk-instance.hpp"
 #include "vk-img-image.hpp"
 
-//gearoenix::render::image::View::View(const std::shared_ptr<Image>& img,
-//    const VkFormat& format)
-//    : img(img)
-//{
-//    auto l = img->get_logical_device()
-//                 ->get_physical_device()
-//                 ->get_instance()
-//                 ->get_linker();
-//    VkImageViewCreateInfo view_create_info;
-//    setz(view_create_info);
-//    view_create_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-//    view_create_info.image = img->get_vulkan_data();
-//    view_create_info.viewType = VK_IMAGE_VIEW_TYPE_2D;
-//    view_create_info.format = format;
-//    view_create_info.components.r = VK_COMPONENT_SWIZZLE_R;
-//    view_create_info.components.g = VK_COMPONENT_SWIZZLE_G;
-//    view_create_info.components.b = VK_COMPONENT_SWIZZLE_B;
-//    view_create_info.components.a = VK_COMPONENT_SWIZZLE_A;
-//    view_create_info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-//    view_create_info.subresourceRange.levelCount = 1;
-//    view_create_info.subresourceRange.layerCount = 1;
-//    VKC(l->vkCreateImageView(img->get_logical_device()->get_vulkan_data(),
-//        &view_create_info, 0, &vulkan_data));
-//}
+gearoenix::render::image::View::View(Image* img, const VkFormat& format)
+    : img(img)
+{
+    const device::Logical* d = img->get_logical_device();
+    const Linker* l = d->get_physical_device()->get_instance()->get_linker();
+    VkImageViewCreateInfo view_create_info;
+    setz(view_create_info);
+    view_create_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+    view_create_info.image = img->get_vulkan_data();
+    view_create_info.viewType = VK_IMAGE_VIEW_TYPE_2D;
+    view_create_info.format = format;
+    view_create_info.components.r = VK_COMPONENT_SWIZZLE_R;
+    view_create_info.components.g = VK_COMPONENT_SWIZZLE_G;
+    view_create_info.components.b = VK_COMPONENT_SWIZZLE_B;
+    view_create_info.components.a = VK_COMPONENT_SWIZZLE_A;
+    view_create_info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    view_create_info.subresourceRange.levelCount = 1;
+    view_create_info.subresourceRange.layerCount = 1;
+    VKC(l->vkCreateImageView(d->get_vulkan_data(), &view_create_info, 0, &vulkan_data));
+}
 
 gearoenix::render::image::View::View(Image* img,
     const VkImageViewCreateInfo& info)
@@ -48,6 +44,7 @@ gearoenix::render::image::View::~View()
     const Linker* l = d->get_physical_device()->get_instance()->get_linker();
     const VkDevice vk_dev = d->get_vulkan_data();
     l->vkDestroyImageView(vk_dev, vulkan_data, 0);
+    delete img;
 }
 
 gearoenix::render::image::View* gearoenix::render::image::View::create_depth_stencil(device::Logical* d)
