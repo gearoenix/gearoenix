@@ -52,13 +52,7 @@ gearoenix::render::Engine::Engine(system::Application* sys_app)
     for (uint32_t i = 0; i < frame_views.size(); ++i) {
         wait_fences[i] = new sync::Fence(logical_device, true);
     }
-    //    pipeline_layout = std::shared_ptr<pipeline::Layout>(new pipeline::Layout(logical_device));
-    //    pipeline_cache = std::shared_ptr<pipeline::Cache>(new pipeline::Cache(logical_device));
-    //    pipeline = std::shared_ptr<pipeline::Pipeline>(new pipeline::Pipeline(
-    //        pipeline_cache, pipeline_layout, render_pass, shader_manager));
-    //    descriptor_pool = std::shared_ptr<descriptor::Pool>(new descriptor::Pool(logical_device));
-    //    descriptor_set = std::shared_ptr<descriptor::Set>(
-    //        new descriptor::Set(descriptor_pool, pipeline_layout, uniform));
+
     //    setup_draw_buffers();
 }
 
