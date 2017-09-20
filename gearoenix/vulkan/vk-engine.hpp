@@ -67,6 +67,7 @@ namespace render {
         command::Pool* graphic_cmd_pool;
         sync::Semaphore* present_complete_semaphore;
         sync::Semaphore* render_complete_semaphore;
+        std::vector<sync::Fence*> wait_fences;
         void setup_draw_buffers();
 
     public:

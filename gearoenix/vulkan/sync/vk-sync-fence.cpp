@@ -9,8 +9,7 @@
 #include "../vk-instance.hpp"
 #include "../vk-render-pass.hpp"
 
-gearoenix::render::sync::Fence::Fence(
-    const std::shared_ptr<device::Logical>& logical_device, bool signaled)
+gearoenix::render::sync::Fence::Fence(device::Logical* logical_device, bool signaled)
     : logical_device(logical_device)
 {
     VkFenceCreateInfo fence_create_info;

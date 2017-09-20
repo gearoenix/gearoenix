@@ -48,6 +48,10 @@ gearoenix::render::Engine::Engine(system::Application* sys_app)
     graphic_cmd_pool = new command::Pool(logical_device);
     present_complete_semaphore = new sync::Semaphore(logical_device);
     render_complete_semaphore = new sync::Semaphore(logical_device);
+    wait_fences.resize(frame_views.size());
+    for (uint32_t i = 0; i < frame_views.size(); ++i) {
+        wait_fences[i] = new sync::Fence(logical_device, true);
+    }
     //    pipeline_layout = std::shared_ptr<pipeline::Layout>(new pipeline::Layout(logical_device));
     //    pipeline_cache = std::shared_ptr<pipeline::Cache>(new pipeline::Cache(logical_device));
     //    pipeline = std::shared_ptr<pipeline::Pipeline>(new pipeline::Pipeline(
@@ -55,10 +59,6 @@ gearoenix::render::Engine::Engine(system::Application* sys_app)
     //    descriptor_pool = std::shared_ptr<descriptor::Pool>(new descriptor::Pool(logical_device));
     //    descriptor_set = std::shared_ptr<descriptor::Set>(
     //        new descriptor::Set(descriptor_pool, pipeline_layout, uniform));
-    //    wait_fences.resize(frame_views.size());
-    //    for (uint32_t i = 0; i < frame_views.size(); ++i) {
-    //        wait_fences[i] = std::shared_ptr<sync::Fence>(new sync::Fence(logical_device, true));
-    //    }
     //    setup_draw_buffers();
 }
 
@@ -121,29 +121,36 @@ void gearoenix::render::Engine::update()
 
 void gearoenix::render::Engine::terminate()
 {
-    //    logical_device->wait_to_finish();
-    //    wait_fences.clear();
-    //    render_complete_semaphore = nullptr;
-    //    present_complete_semaphore = nullptr;
-    //    descriptor_set = nullptr;
-    //    descriptor_pool = nullptr;
-    //    pipeline = nullptr;
-    //    pipeline_cache = nullptr;
-    //    pipeline_layout = nullptr;
-    //    uniform = nullptr;
-    //    mesh_buff = nullptr;
-    //    shader_manager = nullptr;
-    //    graphic_cmd_pool = nullptr;
-    //    framebuffers.clear();
-    //    render_pass = nullptr;
-    //    depth_stencil = nullptr;
-    //    mem_pool = nullptr;
-    //    swapchain = nullptr;
-    //    logical_device = nullptr;
-    //    physical_device = nullptr;
-    //    surface = nullptr;
-    //    instance = nullptr;
-    //    linker = nullptr;
+    logical_device->wait_to_finish();
+
+    for (sync::Fence* f : wait_fences)
+        delete f;
+    wait_fences.clear();
+    delete render_complete_semaphore;
+    render_complete_semaphore = nullptr;
+    delete present_complete_semaphore;
+    present_complete_semaphore = nullptr;
+    delete graphic_cmd_pool;
+    graphic_cmd_pool = nullptr;
+    for (Framebuffer* f : framebuffers)
+        delete f;
+    framebuffers.clear();
+    delete render_pass;
+    render_pass = nullptr;
+    delete depth_stencil;
+    depth_stencil = nullptr;
+    delete swapchain;
+    swapchain = nullptr;
+    delete logical_device;
+    logical_device = nullptr;
+    delete physical_device;
+    physical_device = nullptr;
+    delete surface;
+    surface = nullptr;
+    delete instance;
+    instance = nullptr;
+    delete linker;
+    linker = nullptr;
 }
 
 void gearoenix::render::Engine::setup_draw_buffers()
