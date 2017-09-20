@@ -65,6 +65,8 @@ namespace render {
         RenderPass* render_pass;
         std::vector<Framebuffer*> framebuffers;
         command::Pool* graphic_cmd_pool;
+        sync::Semaphore* present_complete_semaphore;
+        sync::Semaphore* render_complete_semaphore;
         void setup_draw_buffers();
 
     public:

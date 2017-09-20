@@ -46,31 +46,8 @@ gearoenix::render::Engine::Engine(system::Application* sys_app)
         framebuffers[i] = new Framebuffer(frame_views[i], depth_stencil, render_pass);
     }
     graphic_cmd_pool = new command::Pool(logical_device);
-    //    shader_manager = std::shared_ptr<shader::Manager>(
-    //        new shader::Manager(sys_app->get_asset()));
-    //    //    LOGE(std::string("reached"));
-    //    const float vertices[] = {
-    //        1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f,
-    //        0.0f, 1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-    //    };
-    //    const uint32_t indices[] = {
-    //        0, 1, 2,
-    //    };
-    //    mesh_buff = std::shared_ptr<buffer::Buffer>(new buffer::Buffer(
-    //        graphic_cmd_pool, vertices, sizeof(vertices), indices, countof(indices)));
-    //    const float uniform_data[] = {
-    //        1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-    //        0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-
-    //        1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-    //        0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-
-    //        1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-    //        0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-    //    };
-    //    uniform = std::shared_ptr<buffer::Uniform>(
-    //        new buffer::Uniform(mem_pool, sizeof(uniform_data)));
-    //    uniform->update(uniform_data);
+    present_complete_semaphore = new sync::Semaphore(logical_device);
+    render_complete_semaphore = new sync::Semaphore(logical_device);
     //    pipeline_layout = std::shared_ptr<pipeline::Layout>(new pipeline::Layout(logical_device));
     //    pipeline_cache = std::shared_ptr<pipeline::Cache>(new pipeline::Cache(logical_device));
     //    pipeline = std::shared_ptr<pipeline::Pipeline>(new pipeline::Pipeline(
@@ -78,8 +55,6 @@ gearoenix::render::Engine::Engine(system::Application* sys_app)
     //    descriptor_pool = std::shared_ptr<descriptor::Pool>(new descriptor::Pool(logical_device));
     //    descriptor_set = std::shared_ptr<descriptor::Set>(
     //        new descriptor::Set(descriptor_pool, pipeline_layout, uniform));
-    //    present_complete_semaphore = std::shared_ptr<sync::Semaphore>(new sync::Semaphore(logical_device));
-    //    render_complete_semaphore = std::shared_ptr<sync::Semaphore>(new sync::Semaphore(logical_device));
     //    wait_fences.resize(frame_views.size());
     //    for (uint32_t i = 0; i < frame_views.size(); ++i) {
     //        wait_fences[i] = std::shared_ptr<sync::Fence>(new sync::Fence(logical_device, true));
