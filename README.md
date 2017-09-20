@@ -61,3 +61,33 @@ features, like `auto` (it increases compile time and in addition it can
 sometimes cause some unexpected results and It can slow down (or sometimes stop)
 code intelligences of the IDEs), so I'm try to not use them most of the
 times.
+
+## GPU Memory management
+
+GPU APIs (like Vulkan, Metal, ...) lake lots of necessary features for memory
+management (e.g. `memmove`, etc) so writing a full featured memory manager in
+these APIs is sometimes very costly and in most of the cases can even have
+several performance penalties. In Gearoenix, I tried to develop a customized
+memory manager that does not do some of the performance costing stuffs that
+other available memory allocators do, like memory consolidation, collocation
+and expansion.
+The Idea behind Gearoenix GPU memory management is:
+- Performance of allocating and deallocating.
+- Minimizing any external or internal synchronization cost.
+- Removing memory waste in auxiliary memory in RAM.
+- Trade off between fragmentation and performance.
+
+It adds some responsibilities on the hands of game developers:
+- It puts deallocation in the hands of the user of allocated memory instead
+of doing deallocation via reference counting or other stuffs.
+- If a game developer wants to use VRAM he/she must specify amount of the memory
+he/she is going to use, because Gearoenix does not do any expansion in VRAM.
+
+(Disclaimer: this allocator is not the best general purpose solution but it is good enough for the use of Gearoenix.)
+
+
+## License
+You can do whatever you want to do as long as you take responsibility of all of
+its consequences, **But** If you used it and it was useful for you, please make
+an acknowledgment and promotion for this project and me, I'm really need that
+because I'm currently seeking for a job in the graphic and game-engine fields.
