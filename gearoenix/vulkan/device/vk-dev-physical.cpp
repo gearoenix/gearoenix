@@ -143,6 +143,11 @@ const gearoenix::render::Instance* gearoenix::render::device::Physical::get_inst
     return surface->get_instance();
 }
 
+gearoenix::render::Instance* gearoenix::render::device::Physical::get_instance()
+{
+    return surface->get_instance();
+}
+
 const VkSurfaceCapabilitiesKHR&
 gearoenix::render::device::Physical::get_surface_capabilities() const
 {

@@ -31,6 +31,7 @@ namespace render {
             std::vector<VkSurfaceFormatKHR> get_surface_formats() const;
             const Surface* get_surface() const;
             const Instance* get_instance() const;
+            Instance* get_instance();
             const VkPhysicalDevice& get_vulkan_data() const;
             uint32_t get_graphics_queue_node_index() const;
             uint32_t get_transfer_queue_node_index() const;

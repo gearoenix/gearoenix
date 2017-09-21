@@ -41,7 +41,7 @@ const gearoenix::render::memory::Memory* gearoenix::render::memory::Manager::get
 
 gearoenix::render::memory::SubMemory* gearoenix::render::memory::Manager::create_submemory(unsigned int size)
 {
-    SubMemory* submem = new SubMemory(size);
+    SubMemory* submem = new SubMemory(size, mem);
     allocate(submem);
     return submem;
 }

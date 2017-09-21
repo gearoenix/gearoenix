@@ -19,6 +19,7 @@ namespace render {
             system::Application* sys_app);
         ~Surface();
         const Instance* get_instance() const;
+        Instance* get_instance();
         const VkSurfaceKHR& get_vulkan_data() const;
         const system::Application* get_sys_app() const;
     };

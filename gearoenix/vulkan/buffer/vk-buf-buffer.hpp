@@ -1,16 +1,34 @@
-#ifndef GEAROENIX_VULKAN_BUFFER_MANAGER_HPP
-#define GEAROENIX_VULKAN_BUFFER_MANAGER_HPP
-#include "../../core/gc/cr-gc.hpp"
+#ifndef GEAROENIX_VULKAN_BUFFER_BUFFER_HPP
+#define GEAROENIX_VULKAN_BUFFER_BUFFER_HPP
 #include "../vk-linker.hpp"
 namespace gearoenix {
 namespace render {
-    namespace buffer {
+    namespace command {
         class Buffer;
-        class SubBuffer;
-        class Manager {
+    }
+    namespace device {
+        class Logical;
+    }
+    namespace memory {
+        class Manager;
+        class SubMemory;
+    }
+    namespace buffer {
+        class Buffer {
         private:
+            device::Logical* device;
+            memory::SubMemory* smem;
+            void* buffer_data;
+            VkBuffer vulkan_data;
+
         public:
-            Manager();
+            Buffer(
+                memory::Manager* mem_mgr, unsigned int size,
+                uint32_t usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
+            ~Buffer();
+            const VkBuffer& get_vulkan_data() const;
+            void copy(command::Buffer* command, Buffer* src);
+            void push_memory_barrier(command::Buffer* command) const;
         };
     }
 }

@@ -13,3 +13,13 @@ gearoenix::core::gc::Object::~Object()
         garbage_collector->deallocate(this);
     }
 }
+
+unsigned int gearoenix::core::gc::Object::get_offset() const
+{
+    return offset;
+}
+
+unsigned int gearoenix::core::gc::Object::get_size() const
+{
+    return size;
+}

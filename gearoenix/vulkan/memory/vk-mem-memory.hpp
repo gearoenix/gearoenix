@@ -12,6 +12,7 @@ namespace render {
         private:
             device::Logical* logical_device;
             VkDeviceMemory vulkan_data;
+            bool is_in_gpu;
 
         public:
             Memory(device::Logical* logical_device, const VkMemoryRequirements& mem_req, uint32_t place = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
@@ -19,6 +20,7 @@ namespace render {
             const device::Logical* get_logical_device() const;
             device::Logical* get_logical_device();
             const VkDeviceMemory& get_vulkan_data();
+            bool get_is_in_gpu() const;
         };
     } // namespace memory
 } // namespace render

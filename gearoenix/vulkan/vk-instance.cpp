@@ -4,6 +4,7 @@
 #include <sstream>
 #include <vector>
 #ifdef VULKAN_INSTANCE_DEBUG
+
 static VkBool32 VKAPI_PTR vkDebugReportCallbackEX_impl(
     VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objectType,
     uint64_t object, size_t location, int32_t messageCode,
@@ -252,11 +253,12 @@ gearoenix::render::Instance::~Instance()
     linker->vkDestroyInstance(vulkan_data, 0);
 }
 
-const gearoenix::render::Linker* gearoenix::render::Instance::get_linker() const
+gearoenix::render::Linker* gearoenix::render::Instance::get_linker()
 {
     return linker;
 }
-gearoenix::render::Linker* gearoenix::render::Instance::get_linker()
+
+const gearoenix::render::Linker* gearoenix::render::Instance::get_linker() const
 {
     return linker;
 }

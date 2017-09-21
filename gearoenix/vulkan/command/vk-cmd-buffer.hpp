@@ -9,13 +9,13 @@ namespace render {
         class Pool;
         class Buffer {
         private:
-            std::shared_ptr<Pool> pool;
+            Pool* pool;
             Linker* linker;
             VkCommandBuffer vulkan_data;
             bool not_flushed = false;
 
         public:
-            Buffer(const std::shared_ptr<Pool>& pool);
+            Buffer(Pool* pool);
             ~Buffer();
             void copy_buffer(VkBuffer src, VkBuffer des, const VkBufferCopy& region);
             void flush();

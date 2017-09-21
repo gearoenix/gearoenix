@@ -4,11 +4,15 @@
 namespace gearoenix {
 namespace render {
     namespace memory {
+        class Memory;
         class SubMemory : public core::gc::Object {
         private:
+            Memory* mem;
+
         public:
-            SubMemory(unsigned int size);
+            SubMemory(unsigned int size, Memory* mem);
             ~SubMemory();
+            const Memory* get_memory() const;
         };
     } // namespace memory
 } // namespace render

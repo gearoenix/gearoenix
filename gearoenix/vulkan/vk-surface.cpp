@@ -53,6 +53,11 @@ const gearoenix::render::Instance* gearoenix::render::Surface::get_instance() co
     return instance;
 }
 
+gearoenix::render::Instance* gearoenix::render::Surface::get_instance()
+{
+    return instance;
+}
+
 const VkSurfaceKHR& gearoenix::render::Surface::get_vulkan_data() const
 {
     return vulkan_data;
