@@ -22,7 +22,7 @@ namespace core {
 
         public:
             Object(unsigned int size);
-            ~Object();
+            virtual ~Object();
             unsigned int get_offset() const;
             unsigned int get_size() const;
         };

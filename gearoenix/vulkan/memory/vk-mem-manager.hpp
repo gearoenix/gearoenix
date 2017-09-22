@@ -12,14 +12,14 @@ namespace render {
         class SubMemory;
         class Manager : public core::gc::Gc {
         public:
-            typedef enum {
+            typedef enum : unsigned int {
                 GPU_LOCAL,
                 CPU_COHERENT,
             } Place;
-            VkMemoryRequirements mem_reqs;
 
         private:
             Memory* mem;
+            VkMemoryRequirements mem_reqs;
 
         public:
             Manager(device::Logical* logical_device, const VkMemoryRequirements& mem_reqs, const Place& place = GPU_LOCAL);
