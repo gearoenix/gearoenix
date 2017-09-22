@@ -73,3 +73,26 @@ void gearoenix::render::buffer::Buffer::push_memory_barrier(command::Buffer*) co
 {
     LOGF("Unimplemented");
 }
+
+uint32_t gearoenix::render::buffer::Buffer::get_memory_type_bits(device::Logical* device, bool in_gpu)
+{
+    const device::Physical* p = device->get_physical_device();
+    const Instance* ins = p->get_instance();
+    const Linker* l = ins->get_linker();
+    const VkDevice vkdev = device->get_vulkan_data();
+    VkBufferCreateInfo vertex_buffer_info;
+    setz(vertex_buffer_info);
+    vertex_buffer_info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+    vertex_buffer_info.size = 1024 * 1024;
+    if (in_gpu) {
+        vertex_buffer_info.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
+    } else {
+        vertex_buffer_info.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+    }
+    VkBuffer vulkan_data;
+    VKC(l->vkCreateBuffer(vkdev, &vertex_buffer_info, nullptr, &vulkan_data));
+    VkMemoryRequirements memreqs;
+    l->vkGetBufferMemoryRequirements(vkdev, vulkan_data, &memreqs);
+    l->vkDestroyBuffer(vkdev, vulkan_data, nullptr);
+    return memreqs.memoryTypeBits;
+}

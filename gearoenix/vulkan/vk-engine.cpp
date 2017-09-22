@@ -4,8 +4,7 @@
 #include "../system/sys-app.hpp"
 #include "../system/sys-file.hpp"
 #include "../system/sys-log.hpp"
-#include "buffer/vk-buf-buffer.hpp"
-#include "buffer/vk-buf-uniform.hpp"
+#include "buffer/vk-buf-manager.hpp"
 #include "command/vk-cmd-buffer.hpp"
 #include "command/vk-cmd-pool.hpp"
 #include "descriptor/vk-des-pool.hpp"
@@ -52,7 +51,8 @@ gearoenix::render::Engine::Engine(system::Application* sys_app)
     for (uint32_t i = 0; i < frame_views.size(); ++i) {
         wait_fences[i] = new sync::Fence(logical_device, true);
     }
-
+    vmemmgr = new memory::Manager(logical_device, 1024 * 1024 * 4);
+    vbufmgr = new buffer::Manager(vmemmgr, 2 * 1024 * 1024);
     //    setup_draw_buffers();
 }
 

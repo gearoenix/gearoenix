@@ -29,6 +29,7 @@ namespace render {
             const VkBuffer& get_vulkan_data() const;
             void copy(command::Buffer* command, Buffer* src);
             void push_memory_barrier(command::Buffer* command) const;
+            static uint32_t get_memory_type_bits(device::Logical* device, bool in_gpu);
         };
     }
 }

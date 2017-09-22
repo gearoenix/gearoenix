@@ -12,8 +12,7 @@ namespace system {
 }
 namespace render {
     namespace buffer {
-        class Buffer;
-        class Uniform;
+        class Manager;
     }
     namespace command {
         class Buffer;
@@ -31,14 +30,9 @@ namespace render {
         class View;
     }
     namespace memory {
-        class Pool;
+        class Manager;
     }
     namespace pipeline {
-        class Cache;
-        class Layout;
-        class Pipeline;
-    }
-    namespace shader {
         class Manager;
     }
     namespace sync {
@@ -60,7 +54,6 @@ namespace render {
         device::Physical* physical_device;
         device::Logical* logical_device;
         Swapchain* swapchain;
-        memory::Pool* mem_pool;
         image::View* depth_stencil;
         RenderPass* render_pass;
         std::vector<Framebuffer*> framebuffers;
@@ -68,6 +61,8 @@ namespace render {
         sync::Semaphore* present_complete_semaphore;
         sync::Semaphore* render_complete_semaphore;
         std::vector<sync::Fence*> wait_fences;
+        memory::Manager* vmemmgr;
+        buffer::Manager* vbufmgr;
         void setup_draw_buffers();
 
     public:

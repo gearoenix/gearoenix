@@ -22,7 +22,7 @@ namespace render {
             VkMemoryRequirements mem_reqs;
 
         public:
-            Manager(device::Logical* logical_device, const VkMemoryRequirements& mem_reqs, const Place& place = GPU_LOCAL);
+            Manager(device::Logical* logical_device, unsigned int size, const Place& place = GPU_LOCAL);
             ~Manager();
             Memory* get_memory();
             const Memory* get_memory() const;
