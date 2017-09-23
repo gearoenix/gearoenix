@@ -1,27 +1,41 @@
 #ifndef GEAROENIX_RENDER_DESCRIPTOR_MANAGER_HPP
 #define GEAROENIX_RENDER_DESCRIPTOR_MANAGER_HPP
+#include "../../render/shader/render-shader.hpp"
 #include "../vk-linker.hpp"
+#include <memory>
 namespace gearoenix {
+namespace core {
+    namespace cache {
+        class Cacher;
+    }
+}
 namespace render {
     namespace device {
         class Logical;
     }
+    namespace buffer {
+        class Manager;
+    }
     namespace descriptor {
+        class Pool;
+        class Set;
         class Manager {
-        public:
-            const static uint32_t TYPE_COUNT;
-
         private:
-            device::Logical* logical_device;
-            VkDescriptorPool vulkan_data;
+            device::Logical* dev;
+            core::cache::Cacher* cacher;
+            Pool* pool;
+            buffer::Manager* bufmgr;
 
         public:
-            Pool(device::Logical* logical_device);
-            ~Pool();
+            Manager(buffer::Manager* bufmgr);
+            ~Manager();
             const device::Logical* get_logical_device() const;
-            const VkDescriptorPool& get_vulkan_data() const;
+            const buffer::Manager* get_buffer_manager() const;
+            const Pool* get_pool() const;
+            std::shared_ptr<Set> get_set(shader::Id sid);
+            std::shared_ptr<Set> get_cached_set(shader::Id sid) const;
         };
     } // namespace descriptor
 } // namespace render
 } // namespace gearoenix
-#endif // GEAROENIX_RENDER_DESCRIPTOR_POOL_HPP
+#endif // GEAROENIX_RENDER_DESCRIPTOR_MANAGER_HPP
