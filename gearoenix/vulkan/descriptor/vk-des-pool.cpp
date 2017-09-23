@@ -5,7 +5,7 @@
 #include "../vk-check.hpp"
 #include "../vk-instance.hpp"
 
-uint32_t gearoenix::render::descriptor::Pool::TYPE_COUNT = 2;
+const uint32_t gearoenix::render::descriptor::Pool::TYPE_COUNT = 2;
 
 gearoenix::render::descriptor::Pool::Pool(device::Logical* logical_device)
     : logical_device(logical_device)

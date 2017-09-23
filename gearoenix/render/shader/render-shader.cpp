@@ -17,3 +17,15 @@ std::shared_ptr<gearoenix::render::shader::Shader> gearoenix::render::shader::Sh
     LOGF("Unexpected!");
     return nullptr;
 }
+
+const std::vector<gearoenix::render::shader::Shader::ResourceDescription>
+gearoenix::render::shader::Shader::get_resources_descriptions(IdType id)
+{
+    switch (id) {
+    case WHITE:
+        return { { { ResourceDescription::VERTEX }, 1, ResourceDescription::UNIFORM } };
+    case DIRECTIONAL_TEXTURED_SPECULATED_NOCUBE_FULLSHADOW_OPAQUE:
+        LOGF("Unimplemented!");
+    }
+    LOGF("Unexpected! id: " << id);
+}

@@ -1,29 +1,26 @@
 #ifndef GEAROENIX_VULKAN_DESCRIPTOR_SET_HPP
 #define GEAROENIX_VULKAN_DESCRIPTOR_SET_HPP
 #include "../vk-linker.hpp"
-#include <memory>
 namespace gearoenix {
 namespace render {
-    namespace buffer {
-        class Uniform;
-    }
-    namespace pipeline {
-        class Layout;
-    }
     namespace descriptor {
         class Pool;
         class Set {
         private:
-            std::shared_ptr<Pool> pool;
-            std::shared_ptr<pipeline::Layout> pipeline_layout;
-            std::shared_ptr<buffer::Uniform> uniform;
+            Pool* pool;
+            VkDescriptorSetLayout layout;
+            unsigned int layouts_count;
             VkDescriptorSet vulkan_data;
 
         public:
-            Set(const std::shared_ptr<Pool>& pool,
-                const std::shared_ptr<pipeline::Layout>& pipeline_layout,
-                const std::shared_ptr<buffer::Uniform>& uniform);
+            Set(
+                uint64_t shader_id,
+                Pool* pool,
+                const VkDescriptorBufferInfo& buff_info);
             ~Set();
+            const Pool* get_pool() const;
+            unsigned int get_layouts_count() const;
+            const VkDescriptorSetLayout* get_layouts() const;
             const VkDescriptorSet& get_vulkan_data() const;
         };
 
