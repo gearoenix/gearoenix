@@ -20,8 +20,9 @@ namespace render {
                 const VkDescriptorBufferInfo& buff_info);
             ~Set();
             const Pool* get_pool() const;
+            Pool* get_pool();
             unsigned int get_layouts_count() const;
-            const VkDescriptorSetLayout* get_layouts() const;
+            const VkDescriptorSetLayout& get_layout() const;
             const VkDescriptorSet& get_vulkan_data() const;
         };
 

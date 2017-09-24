@@ -19,6 +19,7 @@ namespace render {
             Pool(device::Logical* logical_device);
             ~Pool();
             const device::Logical* get_logical_device() const;
+            device::Logical* get_logical_device();
             const VkDescriptorPool& get_vulkan_data() const;
         };
     } // namespace descriptor

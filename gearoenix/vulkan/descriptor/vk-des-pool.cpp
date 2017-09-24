@@ -39,6 +39,11 @@ const gearoenix::render::device::Logical* gearoenix::render::descriptor::Pool::g
     return logical_device;
 }
 
+gearoenix::render::device::Logical* gearoenix::render::descriptor::Pool::get_logical_device()
+{
+    return logical_device;
+}
+
 const VkDescriptorPool& gearoenix::render::descriptor::Pool::get_vulkan_data()
     const
 {

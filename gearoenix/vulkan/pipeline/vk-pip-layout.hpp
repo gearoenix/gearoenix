@@ -1,24 +1,28 @@
 #ifndef GEAROENIX_RENDER_PIPELINE_LAYOUT_HPP
 #define GEAROENIX_RENDER_PIPELINE_LAYOUT_HPP
 #include "../vk-linker.hpp"
-#include <memory>
 namespace gearoenix {
 namespace render {
     namespace device {
         class Logical;
     }
+    namespace descriptor {
+        class Set;
+    }
     namespace pipeline {
         class Layout {
         private:
-            std::shared_ptr<device::Logical> logical_device;
-            VkDescriptorSetLayout descriptor_set_layout;
+            device::Logical* dev;
+            descriptor::Set* desset;
             VkPipelineLayout vulkan_data;
 
         public:
-            Layout(const std::shared_ptr<device::Logical>& logical_device);
+            Layout(descriptor::Set* desset);
             ~Layout();
             const VkPipelineLayout& get_vulkan_data() const;
-            const VkDescriptorSetLayout& get_descriptor_set_layout() const;
+            const descriptor::Set* get_descriptor_set() const;
+            descriptor::Set* get_descriptor_set();
+            const device::Logical* get_device() const;
         };
     } // namespace pipeline
 } // namespace render

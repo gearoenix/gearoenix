@@ -77,3 +77,18 @@ const VkDescriptorSet& gearoenix::render::descriptor::Set::get_vulkan_data() con
 {
     return vulkan_data;
 }
+
+const VkDescriptorSetLayout& gearoenix::render::descriptor::Set::get_layout() const
+{
+    return layout;
+}
+
+const gearoenix::render::descriptor::Pool* gearoenix::render::descriptor::Set::get_pool() const
+{
+    return pool;
+}
+
+gearoenix::render::descriptor::Pool* gearoenix::render::descriptor::Set::get_pool()
+{
+    return pool;
+}
