@@ -1,11 +1,12 @@
 #ifndef GEAROENIX_VULKAN_DESCRIPTOR_SET_HPP
 #define GEAROENIX_VULKAN_DESCRIPTOR_SET_HPP
+#include "../../core/cache/cr-cache-cached.hpp"
 #include "../vk-linker.hpp"
 namespace gearoenix {
 namespace render {
     namespace descriptor {
         class Pool;
-        class Set {
+        class Set : public core::cache::Cached {
         private:
             Pool* pool;
             VkDescriptorSetLayout layout;

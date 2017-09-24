@@ -40,7 +40,8 @@ namespace render {
             } ResourceDescription;
 
             static std::shared_ptr<Shader> read(std::shared_ptr<system::File>& file, Engine* engine);
-            static const std::vector<ResourceDescription> get_resources_descriptions(IdType id);
+            static const std::vector<ResourceDescription> get_resources_descriptions(Id id);
+            static unsigned int get_uniform_size(Id id);
         };
     }
 }

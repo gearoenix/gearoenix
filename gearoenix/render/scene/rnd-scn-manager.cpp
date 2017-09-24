@@ -1,7 +1,7 @@
-#include "render-scene-manager.hpp"
+#include "rnd-scn-manager.hpp"
 #include "../../system/sys-file.hpp"
-#include "../render-engine.hpp"
-#include "render-scene.hpp"
+#include "../rnd-engine.hpp"
+#include "rnd-scn-scene.hpp"
 
 gearoenix::render::scene::Manager::Manager(
     Engine* engine, const std::shared_ptr<system::File>& asset)

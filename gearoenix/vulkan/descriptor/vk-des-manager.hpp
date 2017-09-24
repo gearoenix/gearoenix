@@ -1,6 +1,6 @@
 #ifndef GEAROENIX_RENDER_DESCRIPTOR_MANAGER_HPP
 #define GEAROENIX_RENDER_DESCRIPTOR_MANAGER_HPP
-#include "../../render/shader/render-shader.hpp"
+#include "../../render/shader/rnd-shd-shader.hpp"
 #include "../vk-linker.hpp"
 #include <memory>
 namespace gearoenix {

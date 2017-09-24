@@ -1,8 +1,9 @@
-#include "render-shader-basic.hpp"
+#include "rnd-shd-basic.hpp"
 #include "../../core/cr-types.hpp"
 #include "../../system/sys-file.hpp"
-#include "stage/render-shader-stage-fragment.hpp"
-#include "stage/render-shader-stage-vertex.hpp"
+#include "stage/rnd-shd-stg-fragment.hpp"
+#include "stage/rnd-shd-stg-vertex.hpp"
+
 gearoenix::render::shader::Basic::Basic(std::shared_ptr<system::File>& file, Engine* engine)
 {
     std::vector<std::uint8_t> data;

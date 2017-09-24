@@ -31,6 +31,11 @@ const gearoenix::render::buffer::Buffer* gearoenix::render::buffer::Manager::get
     return buff;
 }
 
+gearoenix::render::buffer::Buffer* gearoenix::render::buffer::Manager::get_buffer()
+{
+    return buff;
+}
+
 gearoenix::render::buffer::SubBuffer* gearoenix::render::buffer::Manager::create_subbuffer(unsigned int size)
 {
     SubBuffer* subbuff = new SubBuffer(size, buff);

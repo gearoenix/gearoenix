@@ -74,6 +74,16 @@ void gearoenix::render::buffer::Buffer::push_memory_barrier(command::Buffer*) co
     LOGF("Unimplemented");
 }
 
+const gearoenix::render::device::Logical* gearoenix::render::buffer::Buffer::get_logical_device() const
+{
+    return device;
+}
+
+gearoenix::render::device::Logical* gearoenix::render::buffer::Buffer::get_logical_device()
+{
+    return device;
+}
+
 uint32_t gearoenix::render::buffer::Buffer::get_memory_type_bits(device::Logical* device, bool in_gpu)
 {
     const device::Physical* p = device->get_physical_device();

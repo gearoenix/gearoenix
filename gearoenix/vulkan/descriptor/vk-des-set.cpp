@@ -1,6 +1,6 @@
 #include "vk-des-set.hpp"
 #include "../../core/cr-static.hpp"
-#include "../../render/shader/render-shader.hpp"
+#include "../../render/shader/rnd-shd-shader.hpp"
 #include "../device/vk-dev-logical.hpp"
 #include "../device/vk-dev-physical.hpp"
 #include "../pipeline/vk-pip-layout.hpp"
@@ -18,7 +18,7 @@ gearoenix::render::descriptor::Set::Set(
     const VkDevice vkdev = d->get_vulkan_data();
     const Linker* l = d->get_physical_device()->get_instance()->get_linker();
     const std::vector<shader::Shader::ResourceDescription> shader_resources = shader::Shader::get_resources_descriptions(
-        static_cast<shader::Shader::IdType>(shader_id));
+        static_cast<shader::Id>(shader_id));
     unsigned int shader_resources_size = shader_resources.size();
     std::vector<VkDescriptorSetLayoutBinding> layout_bindings(shader_resources_size);
     for (unsigned int i = 0; i < shader_resources_size; ++i) {

@@ -1,6 +1,6 @@
 #ifndef GEAROEMIX_RENDER_SHADER_BASIC_HPP
 #define GEAROEMIX_RENDER_SHADER_BASIC_HPP
-#include "render-shader.hpp"
+#include "rnd-shd-shader.hpp"
 namespace gearoenix {
 namespace render {
     namespace shader {

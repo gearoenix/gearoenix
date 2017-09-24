@@ -26,6 +26,7 @@ namespace render {
             Manager(memory::Manager* mem_mgr, unsigned int size, Usage usage = (Usage)(VERTEX | INDEX | UNIFORM));
             ~Manager();
             const Buffer* get_buffer() const;
+            Buffer* get_buffer();
             SubBuffer* create_subbuffer(unsigned int size);
         };
     }

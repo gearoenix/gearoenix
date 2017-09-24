@@ -17,7 +17,6 @@
 #include "pipeline/vk-pip-cache.hpp"
 #include "pipeline/vk-pip-layout.hpp"
 #include "pipeline/vk-pip-pipeline.hpp"
-#include "shader/vk-shader-manager.hpp"
 #include "sync/vk-sync-fence.hpp"
 #include "sync/vk-sync-semaphore.hpp"
 #include "vk-check.hpp"
