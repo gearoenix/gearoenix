@@ -125,10 +125,10 @@ xcb_window_t gearoenix::system::Application::get_window() const
     return window;
 }
 
-const std::shared_ptr<gearoenix::system::File>
-gearoenix::system::Application::get_asset() const
+gearoenix::core::asset::Manager*
+gearoenix::system::Application::get_asset_manager()
 {
-    return asset;
+    return assetmgr;
 }
 
 const gearoenix::core::Application* gearoenix::system::Application::get_core_app() const

@@ -7,6 +7,9 @@
 namespace gearoenix {
 namespace core {
     class Application;
+    namespace asset {
+        class Manager;
+    }
 }
 namespace render {
     class Engine;
@@ -20,7 +23,7 @@ namespace system {
         xcb_screen_t* screen;
         xcb_window_t window;
         xcb_intern_atom_reply_t* atom_wm_delete_window;
-        std::shared_ptr<File> asset;
+        core::asset::Manager* assetmgr;
         core::Application* core_app;
         render::Engine* render_engine;
         void handle(const xcb_generic_event_t* event);
@@ -31,7 +34,7 @@ namespace system {
         void execute();
         xcb_connection_t* get_connection() const;
         xcb_window_t get_window() const;
-        const std::shared_ptr<File> get_asset() const;
+        core::asset::Manager* get_asset_manager();
         const core::Application* get_core_app() const;
         const render::Engine* get_render_engine() const;
         render::Engine* get_render_engine();

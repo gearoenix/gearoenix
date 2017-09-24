@@ -14,9 +14,7 @@
 #include "image/vk-img-image.hpp"
 #include "image/vk-img-view.hpp"
 #include "memory/vk-mem-manager.hpp"
-#include "pipeline/vk-pip-cache.hpp"
-#include "pipeline/vk-pip-layout.hpp"
-#include "pipeline/vk-pip-pipeline.hpp"
+#include "pipeline/vk-pip-manager.hpp"
 #include "sync/vk-sync-fence.hpp"
 #include "sync/vk-sync-semaphore.hpp"
 #include "vk-check.hpp"
@@ -52,6 +50,7 @@ gearoenix::render::Engine::Engine(system::Application* sys_app)
     }
     vmemmgr = new memory::Manager(logical_device, 1024 * 1024 * 4);
     vbufmgr = new buffer::Manager(vmemmgr, 2 * 1024 * 1024);
+    pipmgr = new pipeline::Manager(this);
     //    setup_draw_buffers();
 }
 
@@ -115,7 +114,9 @@ void gearoenix::render::Engine::update()
 void gearoenix::render::Engine::terminate()
 {
     logical_device->wait_to_finish();
-
+    delete pipmgr;
+    delete vbufmgr;
+    delete vmemmgr;
     for (sync::Fence* f : wait_fences)
         delete f;
     wait_fences.clear();
@@ -208,7 +209,23 @@ gearoenix::render::device::Logical* gearoenix::render::Engine::get_logical_devic
 {
     return logical_device;
 }
+
 const gearoenix::render::device::Logical* gearoenix::render::Engine::get_logical_device() const
 {
     return logical_device;
+}
+
+gearoenix::render::RenderPass* gearoenix::render::Engine::get_render_pass()
+{
+    return render_pass;
+}
+
+gearoenix::render::buffer::Manager* gearoenix::render::Engine::get_buffer_manager()
+{
+    return vbufmgr;
+}
+
+gearoenix::system::Application* gearoenix::render::Engine::get_system_application()
+{
+    return sys_app;
 }

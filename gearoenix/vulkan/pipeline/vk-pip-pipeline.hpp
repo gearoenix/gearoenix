@@ -1,8 +1,8 @@
 #ifndef GEAROENIX_VULKAN_PIPELINE_PIPELINE_HPP
 #define GEAROENIX_VULKAN_PIPELINE_PIPELINE_HPP
+#include "../../core/cache/cr-cache-cached.hpp"
 #include "../../render/shader/rnd-shd-shader.hpp"
 #include "../vk-linker.hpp"
-
 namespace gearoenix {
 namespace core {
     class Application;
@@ -18,7 +18,7 @@ namespace render {
     namespace pipeline {
         class Cache;
         class Layout;
-        class Pipeline {
+        class Pipeline : public core::cache::Cached {
         private:
             shader::Id sid;
             device::Logical* dev;

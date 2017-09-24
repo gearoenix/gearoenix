@@ -22,10 +22,6 @@ namespace render {
         class Physical;
         class Logical;
     }
-    namespace descriptor {
-        class Pool;
-        class Set;
-    }
     namespace image {
         class View;
     }
@@ -63,6 +59,7 @@ namespace render {
         std::vector<sync::Fence*> wait_fences;
         memory::Manager* vmemmgr;
         buffer::Manager* vbufmgr;
+        pipeline::Manager* pipmgr;
         void setup_draw_buffers();
 
     public:
@@ -73,6 +70,9 @@ namespace render {
         void terminate();
         const device::Logical* get_logical_device() const;
         device::Logical* get_logical_device();
+        RenderPass* get_render_pass();
+        buffer::Manager* get_buffer_manager();
+        system::Application* get_system_application();
     };
 }
 }

@@ -1,43 +1,35 @@
-#ifndef GEAROENIX_VULKAN_PIPELINE_PIPELINE_HPP
-#define GEAROENIX_VULKAN_PIPELINE_PIPELINE_HPP
-#include "../vk-linker.hpp"
+#ifndef GEAROENIX_VULKAN_PIPELINE_MANAGER_HPP
+#define GEAROENIX_VULKAN_PIPELINE_MANAGER_HPP
+#include "../../render/shader/rnd-shd-shader.hpp"
 #include <memory>
-#include <string>
 namespace gearoenix {
 namespace core {
-    class Application;
+    namespace cache {
+        class Cacher;
+    }
 }
 namespace render {
-    namespace device {
-        class Logical;
-    }
-    namespace shader {
-        class DiffuseColored;
+    class Engine;
+    namespace descriptor {
         class Manager;
-        class Shader;
     }
     class RenderPass;
-    class Swapchain;
     namespace pipeline {
         class Cache;
-        class Layout;
-        class Pipeline {
+        class Pipeline;
+        class Manager {
         private:
-            std::shared_ptr<Cache> cache;
-            std::shared_ptr<Layout> layout;
-            std::shared_ptr<RenderPass> render_pass;
-            std::shared_ptr<shader::DiffuseColored> diffuse;
-            VkPipeline vulkan_data;
+            Cache* cache;
+            RenderPass* rndpass;
+            core::cache::Cacher* cacher;
+            descriptor::Manager* desmgr;
+            Engine* engine;
 
         public:
-            enum ShaderType { VERTEX_SHADER,
-                FRAGMENT_SHADER };
-            Pipeline(const std::shared_ptr<Cache>& cache,
-                const std::shared_ptr<Layout>& layout,
-                const std::shared_ptr<RenderPass>& render_pass,
-                std::shared_ptr<shader::Manager>& shader_manager);
-            ~Pipeline();
-            const VkPipeline& get_vulkan_data() const;
+            Manager(Engine* engine);
+            ~Manager();
+            std::shared_ptr<Pipeline> get_pipeline(shader::Id sid);
+            std::shared_ptr<Pipeline> get_cached_pipeline(shader::Id sid);
         };
     }
 }
