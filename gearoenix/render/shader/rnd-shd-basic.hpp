@@ -1,6 +1,7 @@
 #ifndef GEAROEMIX_RENDER_SHADER_BASIC_HPP
 #define GEAROEMIX_RENDER_SHADER_BASIC_HPP
 #include "rnd-shd-shader.hpp"
+
 namespace gearoenix {
 namespace render {
     namespace shader {
@@ -14,9 +15,15 @@ namespace render {
         private:
             stage::Vertex* vertex;
             stage::Fragment* fragment;
-            Basic(std::shared_ptr<system::File>& file, Engine* engine);
+            static const std::vector<stage::Id> stages_ids;
+
+            Basic(system::File* file, Engine* engine);
 
         public:
+            ~Basic();
+            const std::vector<stage::Id>& get_stages_ids() const;
+            const stage::Stage* get_stage(stage::Id id) const;
+            stage::Stage* get_stage(stage::Id id);
         };
     }
 }

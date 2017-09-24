@@ -6,4 +6,20 @@
 #else
 #error "Not implemented"
 #endif // USE_*
+namespace gearoenix {
+namespace render {
+    namespace shader {
+        namespace stage {
+
+            typedef enum {
+                VERTEX,
+                FRAGMENT,
+                // Add whenever needed
+            } Id;
+
+            class Stage;
+        }
+    }
+}
+}
 #endif // GEAROEMIX_RENDER_SHADER_STAGE_STAGE_HPP

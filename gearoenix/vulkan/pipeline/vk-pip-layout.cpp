@@ -7,7 +7,7 @@
 #include "../vk-check.hpp"
 #include "../vk-instance.hpp"
 
-gearoenix::render::pipeline::Layout::Layout(descriptor::Set* desset)
+gearoenix::render::pipeline::Layout::Layout(const std::shared_ptr<descriptor::Set>& desset)
     : dev(desset->get_pool()->get_logical_device())
     , desset(desset)
 {
@@ -37,12 +37,7 @@ const VkPipelineLayout& gearoenix::render::pipeline::Layout::get_vulkan_data()
     return vulkan_data;
 }
 
-const gearoenix::render::descriptor::Set* gearoenix::render::pipeline::Layout::get_descriptor_set() const
-{
-    return desset;
-}
-
-gearoenix::render::descriptor::Set* gearoenix::render::pipeline::Layout::get_descriptor_set()
+const std::shared_ptr<gearoenix::render::descriptor::Set>& gearoenix::render::pipeline::Layout::get_descriptor_set() const
 {
     return desset;
 }

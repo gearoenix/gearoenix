@@ -32,13 +32,13 @@ gearoenix::render::descriptor::Set::Set(
         }
         layout_bindings[i].descriptorCount = shader_resources[i].count;
         layout_bindings[i].stageFlags = 0;
-        for (const shader::Shader::ResourceDescription::BindingStage& binding_stage :
+        for (const shader::stage::Id& binding_stage :
             shader_resources[i].binding_stages) {
             switch (binding_stage) {
-            case shader::Shader::ResourceDescription::VERTEX:
+            case shader::stage::VERTEX:
                 layout_bindings[i].stageFlags |= VK_SHADER_STAGE_VERTEX_BIT;
                 break;
-            case shader::Shader::ResourceDescription::FRAGMENT:
+            case shader::stage::FRAGMENT:
                 layout_bindings[i].stageFlags |= VK_SHADER_STAGE_FRAGMENT_BIT;
                 break;
             default:

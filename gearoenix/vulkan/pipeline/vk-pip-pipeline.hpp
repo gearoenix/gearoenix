@@ -1,8 +1,8 @@
 #ifndef GEAROENIX_VULKAN_PIPELINE_PIPELINE_HPP
 #define GEAROENIX_VULKAN_PIPELINE_PIPELINE_HPP
+#include "../../render/shader/rnd-shd-shader.hpp"
 #include "../vk-linker.hpp"
-#include <memory>
-#include <string>
+
 namespace gearoenix {
 namespace core {
     class Application;
@@ -11,31 +11,30 @@ namespace render {
     namespace device {
         class Logical;
     }
-    namespace shader {
-        class DiffuseColored;
-        class Manager;
-        class Shader;
+    namespace descriptor {
+        class Set;
     }
     class RenderPass;
-    class Swapchain;
     namespace pipeline {
         class Cache;
         class Layout;
         class Pipeline {
         private:
-            std::shared_ptr<Cache> cache;
-            std::shared_ptr<Layout> layout;
-            std::shared_ptr<RenderPass> render_pass;
-            std::shared_ptr<shader::DiffuseColored> diffuse;
+            shader::Id sid;
+            device::Logical* dev;
+            Cache* cache;
+            Layout* layout;
+            RenderPass* rndpass;
+            std::shared_ptr<shader::Shader> shd;
+            std::shared_ptr<descriptor::Set> desset;
             VkPipeline vulkan_data;
 
         public:
-            enum ShaderType { VERTEX_SHADER,
-                FRAGMENT_SHADER };
-            Pipeline(const std::shared_ptr<Cache>& cache,
-                const std::shared_ptr<Layout>& layout,
-                const std::shared_ptr<RenderPass>& render_pass,
-                std::shared_ptr<shader::Manager>& shader_manager);
+            Pipeline(shader::Id sid,
+                Cache* cache,
+                RenderPass* rndpass,
+                const std::shared_ptr<shader::Shader>& shd,
+                const std::shared_ptr<descriptor::Set>& desset);
             ~Pipeline();
             const VkPipeline& get_vulkan_data() const;
         };
