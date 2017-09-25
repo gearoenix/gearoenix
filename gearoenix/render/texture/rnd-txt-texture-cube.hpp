@@ -8,9 +8,9 @@ namespace system {
 namespace render {
     class Engine;
     namespace texture {
-        class Texture2D : public Texture {
+        class TextureCube : public Texture {
         public:
-            Texture2D(system::File* file, Engine* engine);
+            TextureCube(system::File* file, Engine* engine);
         };
     }
 }
