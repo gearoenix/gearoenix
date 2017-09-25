@@ -13,10 +13,10 @@ namespace core {
             private:
                 Cacher cacher;
                 std::vector<Offset> offsets;
-                std::shared_ptr<system::File> file;
+                system::File* file;
 
             public:
-                File(std::shared_ptr<system::File> file);
+                File(system::File* file);
                 void read_offsets();
                 template <class T>
                 std::shared_ptr<T> get(Id id, std::function<std::shared_ptr<T>()>);

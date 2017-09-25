@@ -44,14 +44,14 @@ namespace core {
         private:
             system::Application* sys_app = nullptr;
             render::Engine* render_engine = nullptr;
-            std::shared_ptr<system::File> file = nullptr;
-            std::shared_ptr<cache::file::Sparse> shaders = nullptr;
-            std::shared_ptr<cache::file::File> cameras = nullptr;
-            std::shared_ptr<cache::file::File> audios = nullptr;
-            std::shared_ptr<cache::file::File> lights = nullptr;
-            std::shared_ptr<cache::file::File> textures = nullptr;
-            std::shared_ptr<cache::file::File> models = nullptr;
-            std::shared_ptr<cache::file::File> scenes = nullptr;
+            system::File* file = nullptr;
+            cache::file::Sparse* shaders = nullptr;
+            cache::file::File* cameras = nullptr;
+            cache::file::File* audios = nullptr;
+            cache::file::File* lights = nullptr;
+            cache::file::File* textures = nullptr;
+            cache::file::File* models = nullptr;
+            cache::file::File* scenes = nullptr;
 
         public:
             Manager(system::Application* sys_app, const std::string& file);

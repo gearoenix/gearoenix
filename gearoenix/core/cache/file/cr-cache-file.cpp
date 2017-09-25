@@ -1,7 +1,7 @@
 #include "cr-cache-file.hpp"
 #include "../../../system/sys-file.hpp"
 
-gearoenix::core::cache::file::File::File(std::shared_ptr<system::File> file)
+gearoenix::core::cache::file::File::File(system::File* file)
     : file(file)
 {
 }
