@@ -45,18 +45,18 @@ gearoenix::system::Application::Application()
     xcb_map_window(connection, window);
     //    asset = std::shared_ptr<File>(new File(this));
     render_engine = new render::Engine(this);
-    core_app = new core::Application(this);
     /// todo intialize in here
 }
 
 gearoenix::system::Application::~Application()
 {
-    core_app = nullptr;
-    render_engine = nullptr;
+    delete core_app;
+    delete render_engine;
 }
 
-void gearoenix::system::Application::execute()
+void gearoenix::system::Application::execute(core::Application* ca)
 {
+    core_app = ca;
     xcb_flush(connection);
     while (!quit) {
         // auto tStart = std::chrono::high_resolution_clock::now();
@@ -153,13 +153,5 @@ void gearoenix::system::Application::handle(const xcb_generic_event_t* event)
         LOGE("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFfff");
         render_engine->window_changed();
     }
-}
-
-int main(int, char**)
-{
-    auto app = new gearoenix::system::Application();
-    app->execute();
-    delete app;
-    return 0;
 }
 #endif

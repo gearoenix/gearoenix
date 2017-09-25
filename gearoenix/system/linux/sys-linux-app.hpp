@@ -2,7 +2,6 @@
 #define GEAROENIX_SYSTEM_LINUX_APPLICATION_HPP
 #include "../../core/cr-build-configuration.hpp"
 #ifdef IN_LINUX
-#include <memory>
 #include <xcb/xcb.h>
 namespace gearoenix {
 namespace core {
@@ -31,7 +30,7 @@ namespace system {
     public:
         Application();
         ~Application();
-        void execute();
+        void execute(core::Application* ca);
         xcb_connection_t* get_connection() const;
         xcb_window_t get_window() const;
         core::asset::Manager* get_asset_manager();
