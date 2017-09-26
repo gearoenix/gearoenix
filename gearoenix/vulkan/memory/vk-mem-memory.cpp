@@ -43,7 +43,7 @@ gearoenix::render::device::Logical* gearoenix::render::memory::Memory::get_logic
     return logical_device;
 }
 
-const VkDeviceMemory& gearoenix::render::memory::Memory::get_vulkan_data()
+const VkDeviceMemory& gearoenix::render::memory::Memory::get_vulkan_data() const
 {
     return vulkan_data;
 }

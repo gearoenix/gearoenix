@@ -248,6 +248,8 @@ unsigned int gearoenix::render::device::Physical::get_max_memory_alignment() con
                 limits.minTexelBufferOffsetAlignment,
                 limits.minUniformBufferOffsetAlignment)),
         std::max(
-            limits.optimalBufferCopyOffsetAlignment,
-            limits.optimalBufferCopyRowPitchAlignment));
+            std::max(
+                limits.optimalBufferCopyOffsetAlignment,
+                limits.optimalBufferCopyRowPitchAlignment),
+            limits.bufferImageGranularity));
 }

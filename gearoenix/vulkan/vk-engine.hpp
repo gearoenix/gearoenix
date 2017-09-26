@@ -1,6 +1,8 @@
 #ifndef GEAROENIX_VULKAN_ENGINE_HPP
 #define GEAROENIX_VULKAN_ENGINE_HPP
+#include <functional>
 #include <memory>
+#include <mutex>
 #include <vector>
 namespace gearoenix {
 namespace core {
@@ -62,6 +64,8 @@ namespace render {
         memory::Manager* cmemmgr;
         buffer::Manager* cbufmgr;
         pipeline::Manager* pipmgr;
+        std::mutex todos_mutex;
+        std::vector<std::function<void(command::Buffer*)>> todos;
         void setup_draw_buffers();
 
     public:
@@ -70,11 +74,16 @@ namespace render {
         void window_changed();
         void update();
         void terminate();
+        const Linker* get_linker() const;
         const device::Logical* get_logical_device() const;
         device::Logical* get_logical_device();
         RenderPass* get_render_pass();
-        buffer::Manager* get_buffer_manager();
+        buffer::Manager* get_v_buffer_manager();
+        buffer::Manager* get_cpu_buffer_manager();
         system::Application* get_system_application();
+        memory::Manager* get_v_memory_manager();
+        memory::Manager* get_cpu_memory_manager();
+        void push_todo(std::function<void(command::Buffer*)> fun);
     };
 }
 }

@@ -207,6 +207,11 @@ void gearoenix::render::Engine::setup_draw_buffers()
     //    }
 }
 
+const gearoenix::render::Linker* gearoenix::render::Engine::get_linker() const
+{
+    return linker;
+}
+
 gearoenix::render::device::Logical* gearoenix::render::Engine::get_logical_device()
 {
     return logical_device;
@@ -222,12 +227,34 @@ gearoenix::render::RenderPass* gearoenix::render::Engine::get_render_pass()
     return render_pass;
 }
 
-gearoenix::render::buffer::Manager* gearoenix::render::Engine::get_buffer_manager()
+gearoenix::render::buffer::Manager* gearoenix::render::Engine::get_v_buffer_manager()
 {
     return vbufmgr;
+}
+
+gearoenix::render::buffer::Manager* gearoenix::render::Engine::get_cpu_buffer_manager()
+{
+    return cbufmgr;
 }
 
 gearoenix::system::Application* gearoenix::render::Engine::get_system_application()
 {
     return sys_app;
+}
+
+gearoenix::render::memory::Manager* gearoenix::render::Engine::get_v_memory_manager()
+{
+    return vmemmgr;
+}
+
+gearoenix::render::memory::Manager* gearoenix::render::Engine::get_cpu_memory_manager()
+{
+    return cmemmgr;
+}
+
+void gearoenix::render::Engine::push_todo(std::function<void(command::Buffer*)> fun)
+{
+    std::lock_guard<std::mutex> lock(todos_mutex);
+    todos.push_back(fun);
+    (void)lock;
 }

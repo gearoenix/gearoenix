@@ -11,7 +11,7 @@ gearoenix::render::pipeline::Manager::Manager(Engine* engine)
     : cache(new Cache(engine->get_logical_device()))
     , rndpass(engine->get_render_pass())
     , cacher(new core::cache::Cacher())
-    , desmgr(new descriptor::Manager(engine->get_buffer_manager()))
+    , desmgr(new descriptor::Manager(engine->get_v_buffer_manager()))
     , engine(engine)
 {
 }

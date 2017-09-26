@@ -32,6 +32,7 @@ namespace render {
             const device::Logical* get_logical_device() const;
             device::Logical* get_logical_device();
             static uint32_t get_memory_type_bits(device::Logical* device, bool in_gpu);
+            void write(const void* data, unsigned int data_size, unsigned int offset);
         };
     }
 }

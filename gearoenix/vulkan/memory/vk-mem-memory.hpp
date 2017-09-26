@@ -19,7 +19,7 @@ namespace render {
             virtual ~Memory();
             const device::Logical* get_logical_device() const;
             device::Logical* get_logical_device();
-            const VkDeviceMemory& get_vulkan_data();
+            const VkDeviceMemory& get_vulkan_data() const;
             bool get_is_in_gpu() const;
         };
     } // namespace memory

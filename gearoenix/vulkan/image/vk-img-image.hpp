@@ -4,6 +4,12 @@
 #include <memory>
 namespace gearoenix {
 namespace render {
+    namespace buffer {
+        class SubBuffer;
+    }
+    namespace command {
+        class Buffer;
+    }
     namespace device {
         class Logical;
     }
@@ -19,6 +25,8 @@ namespace render {
             VkImage vulkan_data;
             memory::Memory* mem = nullptr;
             memory::SubMemory* submem = nullptr;
+            uint32_t img_width, img_height;
+            VkFormat fmt;
 
         public:
             Image(device::Logical* logical_device,
@@ -30,6 +38,10 @@ namespace render {
             ~Image();
             const VkImage& get_vulkan_data() const;
             const device::Logical* get_logical_device() const;
+            void transit(command::Buffer* c, const VkImageLayout& old_lyt, const VkImageLayout& new_lyt);
+            void transit_for_writing(command::Buffer* c);
+            void copy_from_buffer(command::Buffer* c, buffer::SubBuffer* b);
+            void transit_for_reading(command::Buffer* c);
         };
     }
 }

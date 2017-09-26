@@ -13,6 +13,7 @@ namespace render {
             SubBuffer(unsigned int size, Buffer* buff);
             ~SubBuffer();
             const Buffer* get_buffer() const;
+            void write(const void* data, unsigned int data_size);
         };
     } // namespace buffer
 } // namespace render
