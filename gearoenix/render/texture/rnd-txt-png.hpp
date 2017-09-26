@@ -10,7 +10,13 @@ namespace render {
     namespace texture {
         class PNG {
         public:
-            void decode(system::File* file, Engine* engine, std::vector<unsigned char>& decoded_data, unsigned int& width, unsigned int& height, unsigned int& channels);
+            static void decode(
+                system::File* file,
+                Engine* engine,
+                std::vector<unsigned char>& decoded_data,
+                unsigned int& width,
+                unsigned int& height,
+                unsigned int& channels);
         };
     }
 }

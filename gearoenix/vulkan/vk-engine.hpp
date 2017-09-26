@@ -59,6 +59,8 @@ namespace render {
         std::vector<sync::Fence*> wait_fences;
         memory::Manager* vmemmgr;
         buffer::Manager* vbufmgr;
+        memory::Manager* cmemmgr;
+        buffer::Manager* cbufmgr;
         pipeline::Manager* pipmgr;
         void setup_draw_buffers();
 

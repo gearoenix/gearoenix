@@ -28,7 +28,13 @@ static bool validate(gearoenix::system::File* file)
     return (is_png == 0);
 }
 
-void gearoenix::render::texture::PNG::decode(system::File* file, Engine*, std::vector<unsigned char>& data, unsigned int& img_width, unsigned int& img_height, unsigned int& channels)
+void gearoenix::render::texture::PNG::decode(
+    system::File* file,
+    Engine*,
+    std::vector<unsigned char>& data,
+    unsigned int& img_width,
+    unsigned int& img_height,
+    unsigned int& channels)
 {
     if (!validate(file)) {
         LOGF("Png is not validated.");

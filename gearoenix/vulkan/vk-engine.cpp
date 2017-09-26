@@ -49,7 +49,9 @@ gearoenix::render::Engine::Engine(system::Application* sys_app)
         wait_fences[i] = new sync::Fence(logical_device, true);
     }
     vmemmgr = new memory::Manager(logical_device, 1024 * 1024 * 4);
+    cmemmgr = new memory::Manager(logical_device, 1024 * 1024 * 4, memory::Manager::CPU_COHERENT);
     vbufmgr = new buffer::Manager(vmemmgr, 2 * 1024 * 1024);
+    cbufmgr = new buffer::Manager(cmemmgr, 2 * 1024 * 1024);
     pipmgr = new pipeline::Manager(this);
     //    setup_draw_buffers();
 }
