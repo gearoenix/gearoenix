@@ -4,6 +4,8 @@ namespace gearoenix {
 namespace core {
     namespace cache {
         class Cached {
+        public:
+            virtual ~Cached();
         };
     } // namespace asset
 } // namespace core

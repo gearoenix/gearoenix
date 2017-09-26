@@ -25,8 +25,9 @@ namespace render {
             VkImage vulkan_data;
             memory::Memory* mem = nullptr;
             memory::SubMemory* submem = nullptr;
-            uint32_t img_width, img_height;
-            VkFormat fmt;
+            uint32_t img_width = 0;
+            uint32_t img_height = 0;
+            VkFormat fmt = VK_FORMAT_UNDEFINED;
 
         public:
             Image(device::Logical* logical_device,
@@ -42,6 +43,7 @@ namespace render {
             void transit_for_writing(command::Buffer* c);
             void copy_from_buffer(command::Buffer* c, buffer::SubBuffer* b);
             void transit_for_reading(command::Buffer* c);
+            VkFormat get_format() const;
         };
     }
 }

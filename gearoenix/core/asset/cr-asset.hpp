@@ -7,6 +7,7 @@ namespace core {
         class Asset : public cache::Cached {
         private:
         public:
+            virtual ~Asset();
         };
     } // namespace asset
 } // namespace core

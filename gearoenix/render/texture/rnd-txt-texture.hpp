@@ -6,6 +6,7 @@ namespace render {
     namespace texture {
         class Texture : public core::asset::Asset {
         public:
+            virtual ~Texture();
         };
     }
 }

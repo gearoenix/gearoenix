@@ -151,3 +151,12 @@ void gearoenix::render::image::Image::transit_for_reading(command::Buffer* c)
 {
     transit(c, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
+
+VkFormat gearoenix::render::image::Image::get_format() const
+{
+#ifdef DEBUG_MODE
+    if (fmt == VK_FORMAT_UNDEFINED)
+        LOGF("Unexpected");
+#endif
+    return fmt;
+}

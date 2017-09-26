@@ -65,7 +65,8 @@ namespace render {
         buffer::Manager* cbufmgr;
         pipeline::Manager* pipmgr;
         std::mutex todos_mutex;
-        std::vector<std::function<void(command::Buffer*)>> todos;
+        std::vector<std::function<std::function<void()>(command::Buffer*)>> todos;
+        std::vector<std::vector<std::function<void()>>> frames_cleanups;
         void setup_draw_buffers();
 
     public:
@@ -83,7 +84,7 @@ namespace render {
         system::Application* get_system_application();
         memory::Manager* get_v_memory_manager();
         memory::Manager* get_cpu_memory_manager();
-        void push_todo(std::function<void(command::Buffer*)> fun);
+        void push_todo(std::function<std::function<void()>(command::Buffer*)> fun);
     };
 }
 }

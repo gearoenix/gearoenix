@@ -26,12 +26,22 @@ gearoenix::render::texture::Texture2D::Texture2D(system::File* file, Engine* eng
     buffer::Manager* stbuf = engine->get_cpu_buffer_manager();
     buffer::SubBuffer* sstbuf = stbuf->create_subbuffer(pixels.size());
     sstbuf->write(pixels.data(), pixels.size());
-    std::function<void(command::Buffer*)> todo = [this, img, l, sstbuf](command::Buffer* c) {
+    std::function<std::function<void()>(command::Buffer*)> todo = [this, img, l, sstbuf](command::Buffer* c) {
         img->transit_for_writing(c);
         img->copy_from_buffer(c, sstbuf);
         img->transit_for_reading(c);
+        std::function<void()> fn = [sstbuf] {
+            delete sstbuf;
+        };
+        return fn;
     };
     engine->push_todo(todo);
+    iv = new image::View(img, img->get_format());
+}
+
+gearoenix::render::texture::Texture2D::~Texture2D()
+{
+    delete iv;
 }
 
 uint32_t gearoenix::render::texture::Texture2D::get_memory_type_bits(Engine* engine)

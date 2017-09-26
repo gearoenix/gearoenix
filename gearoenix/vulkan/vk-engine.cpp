@@ -77,6 +77,23 @@ void gearoenix::render::Engine::window_changed()
 
 void gearoenix::render::Engine::update()
 {
+    // Do command buffer initializing
+    // Get current frame number
+    unsigned int current_frame = 0;
+    for (std::function<void()>& fn : frames_cleanups[current_frame]) {
+        fn();
+    }
+    frames_cleanups[current_frame].clear();
+    std::vector<std::function<std::function<void()>(command::Buffer*)>> temp_todos;
+    todos_mutex.lock();
+    std::move(todos.begin(), todos.end(), std::back_inserter(temp_todos));
+    todos.clear();
+    todos_mutex.unlock();
+    for (std::function<std::function<void()>(command::Buffer*)>& fn : temp_todos) {
+        frames_cleanups[current_frame].push_back(fn(nullptr /* TODO */));
+    }
+    temp_todos.clear();
+
     //    uint32_t current_buffer = swapchain->get_next_image_index(present_complete_semaphore);
     //    if (current_buffer == 0xffffffff) {
     //        window_changed();
@@ -252,7 +269,7 @@ gearoenix::render::memory::Manager* gearoenix::render::Engine::get_cpu_memory_ma
     return cmemmgr;
 }
 
-void gearoenix::render::Engine::push_todo(std::function<void(command::Buffer*)> fun)
+void gearoenix::render::Engine::push_todo(std::function<std::function<void()>(command::Buffer*)> fun)
 {
     std::lock_guard<std::mutex> lock(todos_mutex);
     todos.push_back(fun);
