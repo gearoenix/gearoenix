@@ -27,6 +27,7 @@ namespace render {
             {
                 typedef enum : unsigned int {
                     UNIFORM,
+                    SAMPER2D
                     // Add whenever needed
                 } Type;
                 std::vector<stage::Id> binding_stages;
