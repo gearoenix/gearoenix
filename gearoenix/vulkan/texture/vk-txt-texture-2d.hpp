@@ -13,9 +13,11 @@ namespace render {
     }
     class Engine;
     namespace texture {
+        class Sampler2D;
         class Texture2D : public Texture {
         private:
             image::View* iv;
+            Sampler2D* smp;
 
         public:
             Texture2D(system::File* file, Engine* engine);

@@ -37,6 +37,9 @@ namespace render {
         class Fence;
         class Semaphore;
     }
+    namespace texture {
+        class Sampler2D;
+    }
     class Framebuffer;
     class Instance;
     class Linker;
@@ -64,6 +67,7 @@ namespace render {
         memory::Manager* cmemmgr;
         buffer::Manager* cbufmgr;
         pipeline::Manager* pipmgr;
+        texture::Sampler2D* sampler_2d;
         std::mutex todos_mutex;
         std::vector<std::function<std::function<void()>(command::Buffer*)>> todos;
         std::vector<std::vector<std::function<void()>>> frames_cleanups;
@@ -84,6 +88,8 @@ namespace render {
         system::Application* get_system_application();
         memory::Manager* get_v_memory_manager();
         memory::Manager* get_cpu_memory_manager();
+        const texture::Sampler2D* get_sampler_2d() const;
+        texture::Sampler2D* get_sampler_2d();
         void push_todo(std::function<std::function<void()>(command::Buffer*)> fun);
     };
 }

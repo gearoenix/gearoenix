@@ -17,6 +17,7 @@
 #include "pipeline/vk-pip-manager.hpp"
 #include "sync/vk-sync-fence.hpp"
 #include "sync/vk-sync-semaphore.hpp"
+#include "texture/vk-txt-sampler-2d.hpp"
 #include "vk-check.hpp"
 #include "vk-framebuffer.hpp"
 #include "vk-instance.hpp"
@@ -53,6 +54,7 @@ gearoenix::render::Engine::Engine(system::Application* sys_app)
     vbufmgr = new buffer::Manager(vmemmgr, 2 * 1024 * 1024);
     cbufmgr = new buffer::Manager(cmemmgr, 2 * 1024 * 1024);
     pipmgr = new pipeline::Manager(this);
+    sampler_2d = new texture::Sampler2D(logical_device);
     //    setup_draw_buffers();
 }
 
@@ -132,10 +134,21 @@ void gearoenix::render::Engine::update()
 
 void gearoenix::render::Engine::terminate()
 {
+    // TODO think about todos
+    // TODO think about cleanups
     logical_device->wait_to_finish();
+    delete sampler_2d;
+    sampler_2d = nullptr;
     delete pipmgr;
+    pipmgr = nullptr;
+    delete cbufmgr;
+    cbufmgr = nullptr;
     delete vbufmgr;
+    vbufmgr = nullptr;
+    delete cmemmgr;
+    cmemmgr = nullptr;
     delete vmemmgr;
+    vmemmgr = nullptr;
     for (sync::Fence* f : wait_fences)
         delete f;
     wait_fences.clear();
@@ -267,6 +280,16 @@ gearoenix::render::memory::Manager* gearoenix::render::Engine::get_v_memory_mana
 gearoenix::render::memory::Manager* gearoenix::render::Engine::get_cpu_memory_manager()
 {
     return cmemmgr;
+}
+
+const gearoenix::render::texture::Sampler2D* gearoenix::render::Engine::get_sampler_2d() const
+{
+    return sampler_2d;
+}
+
+gearoenix::render::texture::Sampler2D* gearoenix::render::Engine::get_sampler_2d()
+{
+    return sampler_2d;
 }
 
 void gearoenix::render::Engine::push_todo(std::function<std::function<void()>(command::Buffer*)> fun)

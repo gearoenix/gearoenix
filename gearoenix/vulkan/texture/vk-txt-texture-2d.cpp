@@ -37,6 +37,7 @@ gearoenix::render::texture::Texture2D::Texture2D(system::File* file, Engine* eng
     };
     engine->push_todo(todo);
     iv = new image::View(img, img->get_format());
+    smp = engine->get_sampler_2d();
 }
 
 gearoenix::render::texture::Texture2D::~Texture2D()
