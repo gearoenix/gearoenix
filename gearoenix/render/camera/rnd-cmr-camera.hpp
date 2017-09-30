@@ -1,13 +1,9 @@
 #ifndef GEAROEMIX_RENDER_CAMERA_CAMERA_HPP
 #define GEAROEMIX_RENDER_CAMERA_CAMERA_HPP
 #include "../../core/asset/cr-asset.hpp"
+#include "../../math/math-matrix.hpp"
+#include "../../math/math-vector.hpp"
 namespace gearoenix {
-namespace math {
-    template <class T>
-    class Vec3;
-    template <class T>
-    class Mat4x4;
-}
 namespace system {
     class File;
 }
@@ -15,15 +11,40 @@ namespace render {
     namespace camera {
         class Camera : public core::asset::Asset {
         protected:
-            math::Vec3<float>* loc;
-            math::Mat4x4<float>* view;
             float start;
             float end;
+            math::Vec3 x;
+            math::Vec3 y;
+            math::Vec3 z;
+            math::Vec3 l;
+            math::Mat4x4 vwl;
+            math::Mat4x4 v;
+            math::Mat4x4 p;
+            math::Mat4x4 vp;
             Camera(system::File* f);
 
         public:
             virtual ~Camera();
             static Camera* read(system::File* f);
+            void translate(const math::Vec3& vec);
+            void move(const math::Vec3& vec);
+            void move_forward(const float& spd);
+            void move_sideward(const float& spd);
+            void rotate_local_x(const float& rad);
+            void rotate_local_y(const float& rad);
+            void rotate_local_z(const float& rad);
+            void rotate_local(const float& rad, const math::Vec3& vec);
+            void rotate_global_x(const float& rad);
+            void rotate_global_y(const float& rad);
+            void rotate_global_z(const float& rad);
+            void rotate_global(const float& rad, const math::Vec3& vec);
+            void rotate_look_at(const float& rad, const math::Vec3& vec, const math::Vec3& p);
+            const math::Mat4x4& get_view_projection() const;
+            const math::Mat4x4& get_zero_located_view() const;
+            const math::Vec3& get_location() const;
+            void copy_location(math::Vec3& v) const;
+            virtual bool in_sight(const math::Vec3& location, const float& radius) = 0;
+            virtual void window_size_changed() = 0;
         };
     }
 }

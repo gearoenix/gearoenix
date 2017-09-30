@@ -80,6 +80,15 @@ namespace system {
             read(&data, sizeof(T));
             correct_endianess(&data);
         }
+
+        template <typename T>
+        void read()
+        {
+            T data;
+            read(&data, sizeof(T));
+            correct_endianess(&data);
+            return data;
+        }
     };
 }
 }
