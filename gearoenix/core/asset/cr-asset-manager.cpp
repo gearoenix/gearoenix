@@ -38,30 +38,26 @@ void gearoenix::core::asset::Manager::initialize()
 std::shared_ptr<gearoenix::render::shader::Shader> gearoenix::core::asset::Manager::get_shader(Id id)
 {
     std::function<std::shared_ptr<render::shader::Shader>()> fn_new = [this] {
-        LOGF("Not implemented.");
-        return nullptr;
+        return render::shader::Shader::read(file, render_engine);
     };
     return shaders->get<render::shader::Shader>(id, fn_new);
 }
 
 std::shared_ptr<gearoenix::render::shader::Shader> gearoenix::core::asset::Manager::get_cached_shader(Id id) const
 {
-    LOGF("Not implemented.");
     return shaders->get<gearoenix::render::shader::Shader>(id);
 }
 
 std::shared_ptr<gearoenix::render::camera::Camera> gearoenix::core::asset::Manager::get_camera(Id id)
 {
     std::function<std::shared_ptr<render::camera::Camera>()> fn_new = [this] {
-        LOGF("Not implemented.");
-        return nullptr;
+        return std::shared_ptr<render::camera::Camera>(render::camera::Camera::read(file, sys_app));
     };
     return cameras->get(id, fn_new);
 }
 
 std::shared_ptr<gearoenix::render::camera::Camera> gearoenix::core::asset::Manager::get_cached_camera(Id id) const
 {
-    LOGF("Not implemented.");
     return cameras->get<gearoenix::render::camera::Camera>(id);
 }
 

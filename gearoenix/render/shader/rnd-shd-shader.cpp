@@ -22,6 +22,7 @@ std::shared_ptr<gearoenix::render::shader::Shader> gearoenix::render::shader::Sh
 {
     core::Id shader_type;
     file->read(shader_type);
+    LOGE("TODO");
     switch (shader_type) {
     case (1): {
         return std::shared_ptr<Shader>(new Basic(file, engine));
