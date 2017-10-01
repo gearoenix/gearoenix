@@ -86,7 +86,7 @@ void gearoenix::math::Vec2::operator/=(const Vec2& a)
 const gearoenix::core::Real& gearoenix::math::Vec2::operator[](const unsigned int i) const
 {
 #ifdef DEBUG_MODE
-    if (i > 2)
+    if (i > 1)
         LOGF("Out of range access");
 #endif
     return vec[i];
@@ -95,7 +95,7 @@ const gearoenix::core::Real& gearoenix::math::Vec2::operator[](const unsigned in
 gearoenix::core::Real& gearoenix::math::Vec2::operator[](const unsigned int i)
 {
 #ifdef DEBUG_MODE
-    if (i > 2)
+    if (i > 1)
         LOGF("Out of range access");
 #endif
     return vec[i];
@@ -138,9 +138,9 @@ void gearoenix::math::Vec2::print() const
     LOGI("Vec2(" << vec[0] << ", " << vec[1] << ")");
 }
 
-const gearoenix::math::Vec3 X(1.0f, 0.0f, 0.0f);
-const gearoenix::math::Vec3 Y(0.0f, 1.0f, 0.0f);
-const gearoenix::math::Vec3 Z(0.0f, 0.0f, 1.0f);
+const gearoenix::math::Vec3 gearoenix::math::Vec3::X(1.0f, 0.0f, 0.0f);
+const gearoenix::math::Vec3 gearoenix::math::Vec3::Y(0.0f, 1.0f, 0.0f);
+const gearoenix::math::Vec3 gearoenix::math::Vec3::Z(0.0f, 0.0f, 1.0f);
 
 gearoenix::math::Vec3::Vec3()
 {
@@ -230,6 +230,24 @@ void gearoenix::math::Vec3::operator/=(const Vec3& a)
     vec[2] /= a.vec[2];
 }
 
+const gearoenix::core::Real& gearoenix::math::Vec3::operator[](const unsigned int i) const
+{
+#ifdef DEBUG_MODE
+    if (i > 2)
+        LOGF("Out of range access");
+#endif
+    return vec[i];
+}
+
+gearoenix::core::Real& gearoenix::math::Vec3::operator[](const unsigned int i)
+{
+#ifdef DEBUG_MODE
+    if (i > 2)
+        LOGF("Out of range access");
+#endif
+    return vec[i];
+}
+
 gearoenix::math::Vec3 gearoenix::math::Vec3::operator-() const
 {
     return Vec3(-vec[0], -vec[1], -vec[2]);
@@ -302,6 +320,24 @@ gearoenix::math::Vec4::Vec4(core::Real e)
     vec[1] = e;
     vec[2] = e;
     vec[3] = e;
+}
+
+const gearoenix::core::Real& gearoenix::math::Vec4::operator[](const unsigned int i) const
+{
+#ifdef DEBUG_MODE
+    if (i > 3)
+        LOGF("Out of range access");
+#endif
+    return vec[i];
+}
+
+gearoenix::core::Real& gearoenix::math::Vec4::operator[](const unsigned int i)
+{
+#ifdef DEBUG_MODE
+    if (i > 3)
+        LOGF("Out of range access");
+#endif
+    return vec[i];
 }
 
 gearoenix::core::Real gearoenix::math::Vec4::dot(const Vec4& o) const

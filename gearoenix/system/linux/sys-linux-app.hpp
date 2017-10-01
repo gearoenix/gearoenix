@@ -2,6 +2,7 @@
 #define GEAROENIX_SYSTEM_LINUX_APPLICATION_HPP
 #include "../../core/cr-build-configuration.hpp"
 #ifdef IN_LINUX
+#include "../../core/cr-types.hpp"
 #include <xcb/xcb.h>
 namespace gearoenix {
 namespace core {
@@ -37,6 +38,7 @@ namespace system {
         const core::Application* get_core_app() const;
         const render::Engine* get_render_engine() const;
         render::Engine* get_render_engine();
+        core::Real get_screen_ratio() const;
     };
 }
 }

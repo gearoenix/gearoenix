@@ -107,6 +107,19 @@ void gearoenix::math::Mat4x4::operator=(const Mat4x4& m)
     }
 }
 
+void gearoenix::math::Mat4x4::operator*=(const Mat4x4& m)
+{
+    Mat4x4 r;
+    for (int i = 0, ri = 0; i < 16; i += 4) {
+        for (int j = 0; j < 4; j++, ri++) {
+            r.mat[ri] = m.mat[i] * mat[j] + m.mat[i + 1] * mat[j + 4] + m.mat[i + 2] * mat[j + 8] + m.mat[i + 3] * mat[j + 12];
+        }
+    }
+    for (int i = 0; i < 16; ++i) {
+        mat[i] = r.mat[i];
+    }
+}
+
 void gearoenix::math::Mat4x4::scale3x3(const core::Real& s)
 {
     mat[0] *= s;

@@ -1,8 +1,12 @@
 #include "rnd-cmr-camera.hpp"
+#include "../../system/sys-app.hpp"
 #include "../../system/sys-file.hpp"
+#include "../../system/sys-log.hpp"
+#include "rnd-cmr-perspective.hpp"
 
-gearoenix::render::camera::Camera::Camera(system::File* f)
-    : vwl(math::Mat4x4::look_at(
+gearoenix::render::camera::Camera::Camera(system::File* f, system::Application* sysapp)
+    : screen_ratio(sysapp->get_screen_ratio())
+    , vwl(math::Mat4x4::look_at(
           math::Vec3(0.0f, 0.0f, 0.0f),
           math::Vec3(0.0f, 0.0f, -1.0f),
           math::Vec3(0.0f, 1.0f, 0.0f)))
@@ -30,6 +34,20 @@ gearoenix::render::camera::Camera::~Camera()
 {
 }
 
+gearoenix::render::camera::Camera* gearoenix::render::camera::Camera::read(system::File* f, system::Application* sysapp)
+{
+    core::Id camt;
+    f->read(camt);
+    switch (camt) {
+    case 1:
+        return new Perspective(f, sysapp);
+        break;
+    default:
+        LOGF("Unexpected");
+        break;
+    }
+}
+
 void gearoenix::render::camera::Camera::translate(const math::Vec3& vec)
 {
     l += vec;
@@ -44,7 +62,7 @@ void gearoenix::render::camera::Camera::move(const math::Vec3& vec)
     vp = p * v;
 }
 
-void gearoenix::render::camera::Camera::rotate_local_x(const float& rad)
+void gearoenix::render::camera::Camera::rotate_local_x(const core::Real rad)
 {
     math::Mat4x4 rot = math::Mat4x4::rotation(x, -rad);
     math::Mat4x4 irot = math::Mat4x4::rotation(x, rad);
@@ -55,7 +73,7 @@ void gearoenix::render::camera::Camera::rotate_local_x(const float& rad)
     vp = p * v;
 }
 
-void gearoenix::render::camera::Camera::rotate_local_y(const float& rad)
+void gearoenix::render::camera::Camera::rotate_local_y(const core::Real rad)
 {
     math::Mat4x4 rot = math::Mat4x4::rotation(y, -rad);
     math::Mat4x4 irot = math::Mat4x4::rotation(y, rad);
@@ -66,7 +84,7 @@ void gearoenix::render::camera::Camera::rotate_local_y(const float& rad)
     vp = p * v;
 }
 
-void gearoenix::render::camera::Camera::rotate_local_z(const float& rad)
+void gearoenix::render::camera::Camera::rotate_local_z(const core::Real rad)
 {
     math::Mat4x4 rot = math::Mat4x4::rotation(z, -rad);
     math::Mat4x4 irot = math::Mat4x4::rotation(z, rad);
@@ -77,7 +95,7 @@ void gearoenix::render::camera::Camera::rotate_local_z(const float& rad)
     vp = p * v;
 }
 
-void gearoenix::render::camera::Camera::rotate_local(const float& rad, const math::Vec3& vec)
+void gearoenix::render::camera::Camera::rotate_local(const core::Real rad, const math::Vec3& vec)
 {
     math::Mat4x4 rot = math::Mat4x4::rotation(vec, -rad);
     math::Mat4x4 irot = math::Mat4x4::rotation(vec, rad);
@@ -89,7 +107,7 @@ void gearoenix::render::camera::Camera::rotate_local(const float& rad, const mat
     vp = p * v;
 }
 
-void gearoenix::render::camera::Camera::rotate_global_x(const float& rad)
+void gearoenix::render::camera::Camera::rotate_global_x(const core::Real rad)
 {
     math::Mat4x4 rot = math::Mat4x4::rotation(math::Vec3::X, -rad);
     math::Mat4x4 irot = math::Mat4x4::rotation(math::Vec3::X, rad);
@@ -101,7 +119,7 @@ void gearoenix::render::camera::Camera::rotate_global_x(const float& rad)
     vp = p * v;
 }
 
-void gearoenix::render::camera::Camera::rotate_global_y(const float& rad)
+void gearoenix::render::camera::Camera::rotate_global_y(const core::Real rad)
 {
     math::Mat4x4 rot = math::Mat4x4::rotation(math::Vec3::Y, -rad);
     math::Mat4x4 irot = math::Mat4x4::rotation(math::Vec3::Y, rad);
@@ -113,7 +131,7 @@ void gearoenix::render::camera::Camera::rotate_global_y(const float& rad)
     vp = p * v;
 }
 
-void gearoenix::render::camera::Camera::rotate_global_z(const float& rad)
+void gearoenix::render::camera::Camera::rotate_global_z(const core::Real rad)
 {
     math::Mat4x4 rot = math::Mat4x4::rotation(math::Vec3::Z, -rad);
     math::Mat4x4 irot = math::Mat4x4::rotation(math::Vec3::Z, rad);
@@ -125,7 +143,7 @@ void gearoenix::render::camera::Camera::rotate_global_z(const float& rad)
     vp = p * v;
 }
 
-void gearoenix::render::camera::Camera::rotate_global(const float& rad, const math::Vec3& vec)
+void gearoenix::render::camera::Camera::rotate_global(const core::Real rad, const math::Vec3& vec)
 {
     math::Mat4x4 rot = math::Mat4x4::rotation(vec, -rad);
     math::Mat4x4 rot2 = math::Mat4x4::rotation(vec, rad);
@@ -160,7 +178,7 @@ void gearoenix::render::camera::Camera::copy_location(math::Vec3& v) const
     v[2] = l[2];
 }
 
-void gearoenix::render::camera::Camera::rotate_look_at(const float& rad, const math::Vec3& vec, const math::Vec3& point)
+void gearoenix::render::camera::Camera::rotate_look_at(const core::Real rad, const math::Vec3& vec, const math::Vec3& point)
 {
     math::Mat4x4 rot = math::Mat4x4::rotation(vec, -rad);
     math::Mat4x4 rot2 = math::Mat4x4::rotation(vec, rad);
@@ -185,7 +203,7 @@ void gearoenix::render::camera::Camera::rotate_look_at(const float& rad, const m
     vp = p * v;
 }
 
-void gearoenix::render::camera::Camera::move_forward(const float& spd)
+void gearoenix::render::camera::Camera::move_forward(const core::Real spd)
 {
     math::Vec3 vec = z * spd;
     l += vec;
@@ -193,7 +211,7 @@ void gearoenix::render::camera::Camera::move_forward(const float& spd)
     vp = p * v;
 }
 
-void gearoenix::render::camera::Camera::move_sideward(const float& spd)
+void gearoenix::render::camera::Camera::move_sideward(const core::Real spd)
 {
     math::Vec3 vec = x * spd;
     l += vec;

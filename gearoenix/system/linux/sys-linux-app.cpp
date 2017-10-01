@@ -154,4 +154,10 @@ void gearoenix::system::Application::handle(const xcb_generic_event_t* event)
         render_engine->window_changed();
     }
 }
+
+gearoenix::core::Real gearoenix::system::Application::get_screen_ratio() const
+{
+    LOGE("TODO");
+    return 1.7f;
+}
 #endif
