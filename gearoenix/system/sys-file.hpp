@@ -2,6 +2,8 @@
 #define GEAROENIX_SYSTEM_FILE_HPP
 
 #include "../core/cr-build-configuration.hpp"
+#include "../core/cr-types.hpp"
+#include "../system/sys-log.hpp"
 #include <map>
 #include <memory>
 #include <string>
@@ -62,16 +64,24 @@ namespace system {
         void seek(unsigned int offset);
 
         template <typename T>
-        unsigned int read(std::vector<T>& data)
+        void read(std::vector<T>& data)
         {
-            unsigned int result = read(data.data(), data.size() * sizeof(T));
-            unsigned int count = result / sizeof(T);
+            core::Count c;
+            read(c);
+            data.resize(c);
+            size_t s = c * sizeof(T);
+#ifdef DEBUG_MODE
+            if (read(reinterpret_cast<void*>(data.data()), s) != s) {
+                LOGF("Unexpected");
+            }
+#else
+            read(reinterpret_cast<void*>(data.data()), s);
+#endif
             if (is_endian_compatible)
-                return count;
-            for (unsigned int i = 0; i < count; ++i) {
+                return;
+            for (unsigned int i = 0; i < c; ++i) {
                 change_endianess(&(data[i]));
             }
-            return count;
         }
 
         template <typename T>
