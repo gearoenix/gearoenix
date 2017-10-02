@@ -8,6 +8,12 @@ namespace render {
         private:
             core::Real h_angle;
             core::Real v_angle;
+            core::Real tanhang;
+            core::Real sinhang;
+            core::Real icoshang;
+            core::Real tanvang;
+            core::Real sinvang;
+            core::Real icosvang;
 
         public:
             Perspective(system::File* f, system::Application* app);

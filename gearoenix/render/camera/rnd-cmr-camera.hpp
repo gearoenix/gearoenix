@@ -15,6 +15,8 @@ namespace render {
             core::Real start;
             core::Real end;
             core::Real screen_ratio;
+            core::Real c_width;
+            core::Real c_height;
             math::Vec3 x;
             math::Vec3 y;
             math::Vec3 z;

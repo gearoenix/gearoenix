@@ -14,7 +14,9 @@ gearoenix::audio::Audio::~Audio() {}
 
 gearoenix::audio::Audio* gearoenix::audio::Audio::read(system::File* f)
 {
-    switch (f->read<core::Id>()) {
+    core::Id audio_type;
+    f->read(audio_type);
+    switch (audio_type) {
     case 10:
         return new Music(f);
     case 20:

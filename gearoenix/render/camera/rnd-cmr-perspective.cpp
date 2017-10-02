@@ -6,33 +6,38 @@ gearoenix::render::camera::Perspective::Perspective(system::File* f, system::App
     : Camera(f, app)
 {
     f->read(h_angle);
-    core::Real w = std::tan(h_angle) * start;
-    core::Real h = w / screen_ratio;
-    v_angle = std::atan(h / start);
-    p = math::Mat4x4::perspective(w, h, start, end);
+    c_width = std::tan(h_angle) * start;
+    c_height = c_width / screen_ratio;
+    v_angle = std::atan(c_height / start);
+    p = math::Mat4x4::perspective(c_width, c_height, start, end);
     vp = p * v;
+    tanhang = std::tan(h_angle);
+    sinhang = std::sin(h_angle);
+    icoshang = 1.0f / std::cos(h_angle);
+    tanvang = std::tan(v_angle);
+    sinvang = std::sin(v_angle);
+    icosvang = 1.0f / std::cos(v_angle);
 }
 
 bool gearoenix::render::camera::Perspective::in_sight(const math::Vec3& location, const core::Real radius)
 {
-    math::Vec3 eye2cnt = location - l;
-    math::Vec2 ll(eye2cnt[0], eye2cnt[1]);
-    core::Real lll = ll.length();
-    ll /= lll;
-    math::Vec2 z(this->z[0], this->z[1]);
-    core::Real a = std::acos(z.dot(ll));
-    core::Real ar = std::asin(radius / lll);
-    if (a > ar + h_angle)
+    math::Vec3 el = location - l;
+    core::Real ezl = z.dot(el);
+    math::Vec3 ez = z * ezl;
+    math::Vec3 lez = location - ez;
+    core::Real wel = lez.dot(x);
+    core::Real wcz = wel * tanhang;
+    core::Real ezpl = wcz + ezl;
+    core::Real ws = sinhang * ezpl;
+    core::Real w = icoshang * wel;
+    if (w > ws + radius)
         return false;
-    ll[0] = eye2cnt[2];
-    ll[1] = eye2cnt[1];
-    lll = ll.length();
-    ll /= lll;
-    z[0] = this->z[2];
-    z[1] = this->z[1];
-    a = std::acos(z.dot(ll));
-    ar = std::asin(radius / lll);
-    return a < ar + v_angle;
+    wel = lez.dot(y);
+    wcz = wel * tanvang;
+    ezpl = wcz + ezl;
+    ws = sinvang * ezpl;
+    w = icosvang * wel;
+    return w < ws + radius;
 }
 
 void gearoenix::render::camera::Perspective::window_size_changed()

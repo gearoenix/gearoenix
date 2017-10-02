@@ -64,15 +64,13 @@ std::shared_ptr<gearoenix::render::camera::Camera> gearoenix::core::asset::Manag
 std::shared_ptr<gearoenix::audio::Audio> gearoenix::core::asset::Manager::get_audio(Id id)
 {
     std::function<std::shared_ptr<audio::Audio>()> fn_new = [this] {
-        LOGF("Not implemented.");
-        return nullptr;
+        return std::shared_ptr<gearoenix::audio::Audio>(gearoenix::audio::Audio::read(file));
     };
     return audios->get(id, fn_new);
 }
 
 std::shared_ptr<gearoenix::audio::Audio> gearoenix::core::asset::Manager::get_cached_audio(Id id)
 {
-    LOGF("Not implemented.");
     return audios->get<audio::Audio>(id);
 }
 

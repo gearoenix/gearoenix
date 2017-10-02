@@ -258,6 +258,11 @@ gearoenix::core::Real gearoenix::math::Vec3::length() const
     return core::Real(sqrt(vec[0] * vec[0] + vec[1] * vec[1] + vec[2] * vec[2]));
 }
 
+gearoenix::core::Real gearoenix::math::Vec3::square_length() const
+{
+    return vec[0] * vec[0] + vec[1] * vec[1] + vec[2] * vec[2];
+}
+
 gearoenix::core::Real gearoenix::math::Vec3::square_distance(const Vec3& a) const
 {
     core::Real t = a.vec[0] - vec[0];
