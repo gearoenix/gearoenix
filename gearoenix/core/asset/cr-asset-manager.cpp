@@ -77,15 +77,13 @@ std::shared_ptr<gearoenix::audio::Audio> gearoenix::core::asset::Manager::get_ca
 std::shared_ptr<gearoenix::render::light::Light> gearoenix::core::asset::Manager::get_light(Id id)
 {
     std::function<std::shared_ptr<render::light::Light>()> fn_new = [this] {
-        LOGF("Not implemented.");
-        return nullptr;
+        return std::shared_ptr<render::light::Light>(render::light::Light::read(file));
     };
     return lights->get<render::light::Light>(id, fn_new);
 }
 
 std::shared_ptr<gearoenix::render::light::Light> gearoenix::core::asset::Manager::get_cached_light(Id id) const
 {
-    LOGF("Not implemented.");
     return lights->get<render::light::Light>(id);
 }
 
