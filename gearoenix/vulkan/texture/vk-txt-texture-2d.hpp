@@ -4,6 +4,9 @@
 #include "../vk-linker.hpp"
 
 namespace gearoenix {
+namespace core {
+    class EndCaller;
+}
 namespace system {
     class File;
 }
@@ -20,7 +23,7 @@ namespace render {
             Sampler2D* smp;
 
         public:
-            Texture2D(system::File* file, Engine* engine);
+            Texture2D(system::File* file, Engine* engine, core::EndCaller* end);
             ~Texture2D();
             static uint32_t get_memory_type_bits(Engine* engine);
             static void fill_info(VkImageCreateInfo& info, unsigned int img_width, unsigned int img_height, unsigned int channels);

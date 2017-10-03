@@ -87,18 +87,16 @@ std::shared_ptr<gearoenix::render::light::Light> gearoenix::core::asset::Manager
     return lights->get<render::light::Light>(id);
 }
 
-std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::core::asset::Manager::get_texture(Id id)
+std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::core::asset::Manager::get_texture(Id id, core::EndCaller* end)
 {
-    std::function<std::shared_ptr<render::texture::Texture>()> fn_new = [this] {
-        LOGF("Not implemented.");
-        return nullptr;
+    std::function<std::shared_ptr<render::texture::Texture>()> fn_new = [this, end] {
+        return std::shared_ptr<render::texture::Texture>(render::texture::Texture::read(file, render_engine, end));
     };
     return textures->get<render::texture::Texture>(id, fn_new);
 }
 
 std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::core::asset::Manager::get_cached_texture(Id id) const
 {
-    LOGF("Not implemented.");
     return textures->get<render::texture::Texture>(id);
 }
 

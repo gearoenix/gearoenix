@@ -7,6 +7,9 @@ namespace gearoenix {
 namespace audio {
     class Audio;
 }
+namespace core {
+    class EndCaller;
+}
 namespace render {
     class Engine;
     namespace camera {
@@ -64,7 +67,7 @@ namespace core {
             std::shared_ptr<audio::Audio> get_cached_audio(Id id);
             std::shared_ptr<render::light::Light> get_light(Id id);
             std::shared_ptr<render::light::Light> get_cached_light(Id id) const;
-            std::shared_ptr<render::texture::Texture> get_texture(Id id);
+            std::shared_ptr<render::texture::Texture> get_texture(Id id, core::EndCaller* end);
             std::shared_ptr<render::texture::Texture> get_cached_texture(Id id) const;
             std::shared_ptr<render::model::Model> get_model(Id id);
             std::shared_ptr<render::model::Model> get_cached_model(Id id) const;

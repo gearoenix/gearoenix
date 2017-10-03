@@ -1,4 +1,5 @@
 #include "vk-txt-texture-2d.hpp"
+#include "../../core/cr-end-caller.hpp"
 #include "../../core/cr-static.hpp"
 #include "../../render/texture/rnd-txt-png.hpp"
 #include "../../system/sys-log.hpp"
@@ -12,7 +13,7 @@
 #include "../vk-check.hpp"
 #include "../vk-engine.hpp"
 
-gearoenix::render::texture::Texture2D::Texture2D(system::File* file, Engine* engine)
+gearoenix::render::texture::Texture2D::Texture2D(system::File* file, Engine* engine, core::EndCaller* end)
 {
     const Linker* l = engine->get_linker();
     std::vector<unsigned char> pixels;
@@ -26,18 +27,21 @@ gearoenix::render::texture::Texture2D::Texture2D(system::File* file, Engine* eng
     buffer::Manager* stbuf = engine->get_cpu_buffer_manager();
     buffer::SubBuffer* sstbuf = stbuf->create_subbuffer(pixels.size());
     sstbuf->write(pixels.data(), pixels.size());
-    std::function<std::function<void()>(command::Buffer*)> todo = [this, img, l, sstbuf](command::Buffer* c) {
-        img->transit_for_writing(c);
-        img->copy_from_buffer(c, sstbuf);
-        img->transit_for_reading(c);
-        std::function<void()> fn = [sstbuf] {
-            delete sstbuf;
-        };
-        return fn;
-    };
-    engine->push_todo(todo);
     iv = new image::View(img, img->get_format());
     smp = engine->get_sampler_2d();
+    std::function<std::function<void()>(command::Buffer*)> todo =
+        [this, img, l, sstbuf, end](command::Buffer* c) {
+            img->transit_for_writing(c);
+            img->copy_from_buffer(c, sstbuf);
+            img->transit_for_reading(c);
+            std::function<void()> fn = [sstbuf, end] {
+                delete sstbuf;
+                if (nullptr != end)
+                    end->remove();
+            };
+            return fn;
+        };
+    engine->push_todo(todo);
 }
 
 gearoenix::render::texture::Texture2D::~Texture2D()
