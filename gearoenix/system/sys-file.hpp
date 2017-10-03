@@ -92,12 +92,19 @@ namespace system {
         }
 
         template <typename T>
-        void read()
+        T read()
         {
             T data;
             read(&data, sizeof(T));
             correct_endianess(&data);
             return data;
+        }
+
+        bool read_bool()
+        {
+            uint8_t data;
+            read(&data, 1);
+            return data != 0;
         }
     };
 }
