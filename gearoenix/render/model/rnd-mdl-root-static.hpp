@@ -16,6 +16,7 @@ namespace render {
 
         public:
             RootStatic(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c);
+            ~RootStatic();
         };
     }
 }

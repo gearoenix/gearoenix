@@ -87,7 +87,7 @@ std::shared_ptr<gearoenix::render::light::Light> gearoenix::core::asset::Manager
     return lights->get<render::light::Light>(id);
 }
 
-std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::core::asset::Manager::get_texture(Id id, core::EndCaller* end)
+std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::core::asset::Manager::get_texture(Id id, std::shared_ptr<EndCaller> end)
 {
     std::function<std::shared_ptr<render::texture::Texture>()> fn_new = [this, end] {
         return std::shared_ptr<render::texture::Texture>(render::texture::Texture::read(file, render_engine, end));
@@ -100,7 +100,7 @@ std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::core::asset::Man
     return textures->get<render::texture::Texture>(id);
 }
 
-std::shared_ptr<gearoenix::render::model::Model> gearoenix::core::asset::Manager::get_model(Id id, EndCaller* e)
+std::shared_ptr<gearoenix::render::model::Model> gearoenix::core::asset::Manager::get_model(Id id, std::shared_ptr<EndCaller> e)
 {
     std::function<std::shared_ptr<render::model::Model>()> fn_new = [this, e] {
         return std::shared_ptr<render::model::Model>(render::model::Model::read(file, render_engine, e));

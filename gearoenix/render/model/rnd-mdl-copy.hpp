@@ -16,7 +16,7 @@ namespace render {
             std::shared_ptr<RootStatic> rs;
 
         public:
-            Copy(system::File* f, Engine* e, core::EndCaller* c);
+            Copy(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c);
         };
     }
 }
