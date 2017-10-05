@@ -1,4 +1,5 @@
 #include "math-matrix.hpp"
+#include "../system/sys-file.hpp"
 #include "math-vector.hpp"
 #include <cmath>
 
@@ -64,6 +65,11 @@ gearoenix::math::Mat4x4::Mat4x4(
     mat[13] = e13;
     mat[14] = e14;
     mat[15] = e15;
+}
+
+gearoenix::math::Mat4x4::Mat4x4(system::File* f)
+{
+    read(f);
 }
 
 gearoenix::math::Mat4x4::Mat4x4(const Mat4x4& m)
@@ -182,6 +188,12 @@ void gearoenix::math::Mat4x4::set_location(const Vec3& location)
     mat[12] = location[0];
     mat[13] = location[1];
     mat[14] = location[2];
+}
+
+void gearoenix::math::Mat4x4::read(system::File* f)
+{
+    for (int i = 0; i < 16; ++i)
+        f->read(mat[i]);
 }
 
 gearoenix::math::Mat4x4 gearoenix::math::Mat4x4::inversed() const

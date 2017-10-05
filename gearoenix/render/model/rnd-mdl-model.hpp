@@ -16,6 +16,7 @@ namespace render {
             Model();
 
         public:
+            virtual ~Model();
             static Model* read(system::File* f, Engine* e, core::EndCaller* c);
         };
     }

@@ -67,3 +67,15 @@ void gearoenix::system::File::seek(unsigned int offset)
 #error "Error not implemented yet!"
 #endif
 }
+
+unsigned int gearoenix::system::File::tell()
+{
+
+#if defined(IN_LINUX) || defined(IN_WINDOWS)
+    return file.tellg();
+#elif defined(IN_ANDROID)
+#error "Not implemented yet"
+#else
+#error "Error not implemented yet!"
+#endif
+}

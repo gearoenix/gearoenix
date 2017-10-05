@@ -100,11 +100,10 @@ std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::core::asset::Man
     return textures->get<render::texture::Texture>(id);
 }
 
-std::shared_ptr<gearoenix::render::model::Model> gearoenix::core::asset::Manager::get_model(Id id)
+std::shared_ptr<gearoenix::render::model::Model> gearoenix::core::asset::Manager::get_model(Id id, EndCaller* e)
 {
-    std::function<std::shared_ptr<render::model::Model>()> fn_new = [this] {
-        LOGF("Not implemented.");
-        return nullptr;
+    std::function<std::shared_ptr<render::model::Model>()> fn_new = [this, e] {
+        return std::shared_ptr<render::model::Model>(render::model::Model::read(file, render_engine, e));
     };
     return models->get<render::model::Model>(id, fn_new);
 }

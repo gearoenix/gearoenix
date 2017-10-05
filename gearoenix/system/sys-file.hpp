@@ -62,6 +62,7 @@ namespace system {
         bool get_endian_compatibility() const;
         unsigned int read(void* data, size_t length);
         void seek(unsigned int offset);
+        unsigned int tell();
 
         template <typename T>
         void read(std::vector<T>& data)
