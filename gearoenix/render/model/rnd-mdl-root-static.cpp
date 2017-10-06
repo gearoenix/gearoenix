@@ -1,9 +1,10 @@
 #include "rnd-mdl-root-static.hpp"
 #include "../../core/cr-end-caller.hpp"
 #include "../../system/sys-file.hpp"
+#include "../mesh/rnd-msh-occ.hpp"
 
 gearoenix::render::model::RootStatic::RootStatic(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c)
-    : occmesh(new OccMesh(f, e, c))
+    : occmesh(new mesh::Occ(f, e, c))
 {
     core::Count cc;
     f->read(cc);

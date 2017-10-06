@@ -3,6 +3,9 @@
 #include "../../core/gc/cr-gc-object.hpp"
 namespace gearoenix {
 namespace render {
+    namespace command {
+        class Buffer;
+    }
     namespace buffer {
         class Buffer;
         class SubBuffer : public core::gc::Object {
@@ -14,6 +17,7 @@ namespace render {
             ~SubBuffer();
             const Buffer* get_buffer() const;
             void write(const void* data, unsigned int data_size);
+            void copy_from(command::Buffer* cb, SubBuffer* sb);
         };
     } // namespace buffer
 } // namespace render

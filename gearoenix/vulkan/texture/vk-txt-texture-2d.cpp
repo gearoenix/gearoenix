@@ -13,7 +13,7 @@
 #include "../vk-check.hpp"
 #include "../vk-engine.hpp"
 
-gearoenix::render::texture::Texture2D::Texture2D(system::File* file, Engine* engine, core::EndCaller* end)
+gearoenix::render::texture::Texture2D::Texture2D(system::File* file, Engine* engine, std::shared_ptr<core::EndCaller> end)
 {
     const Linker* l = engine->get_linker();
     std::vector<unsigned char> pixels;
@@ -36,8 +36,7 @@ gearoenix::render::texture::Texture2D::Texture2D(system::File* file, Engine* eng
             img->transit_for_reading(c);
             std::function<void()> fn = [sstbuf, end] {
                 delete sstbuf;
-                if (nullptr != end)
-                    end->remove();
+                (void)end;
             };
             return fn;
         };
