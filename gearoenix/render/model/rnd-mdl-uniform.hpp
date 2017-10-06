@@ -11,8 +11,8 @@ namespace render {
 
         public:
             Uniform();
-            inline math::Mat4x4& get_m();
-            inline const math::Mat4x4& get_m() const;
+            math::Mat4x4& get_m();
+            const math::Mat4x4& get_m() const;
         };
     }
 }

@@ -52,6 +52,7 @@ namespace render {
             static const std::vector<ResourceDescription>& get_resources_descriptions(Id id);
             static const std::vector<VertexAttribute>& get_vertex_atributes(Id id);
             static unsigned int get_uniform_size(Id id);
+            static unsigned int get_vertex_real_count(Id id);
         };
     }
 }

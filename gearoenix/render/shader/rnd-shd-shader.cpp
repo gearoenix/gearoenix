@@ -65,3 +65,14 @@ const std::vector<gearoenix::render::shader::VertexAttribute>& gearoenix::render
     }
     LOGF("Unexpected! id: " << id);
 }
+
+unsigned int gearoenix::render::shader::Shader::get_vertex_real_count(Id id)
+{
+    switch (id) {
+    case WHITE:
+        return 3;
+    case DIRECTIONAL_TEXTURED_SPECULATED_NOCUBE_FULLSHADOW_OPAQUE:
+        return 8;
+    }
+    LOGF("Unexpected! id: " << id);
+}
