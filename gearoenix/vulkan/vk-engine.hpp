@@ -1,5 +1,6 @@
 #ifndef GEAROENIX_VULKAN_ENGINE_HPP
 #define GEAROENIX_VULKAN_ENGINE_HPP
+#include "../core/cr-types.hpp"
 #include <functional>
 #include <memory>
 #include <mutex>
@@ -32,6 +33,9 @@ namespace render {
     }
     namespace pipeline {
         class Manager;
+    }
+    namespace scene {
+        class Scene;
     }
     namespace sync {
         class Fence;
@@ -71,6 +75,7 @@ namespace render {
         std::mutex todos_mutex;
         std::vector<std::function<std::function<void()>(command::Buffer*)>> todos;
         std::vector<std::vector<std::function<void()>>> frames_cleanups;
+        std::vector<std::shared_ptr<scene::Scene>> loaded_scene;
         void setup_draw_buffers();
 
     public:
@@ -88,11 +93,12 @@ namespace render {
         system::Application* get_system_application();
         memory::Manager* get_v_memory_manager();
         memory::Manager* get_cpu_memory_manager();
-        pipeline::Manager* get_pipeline_manager();
         const pipeline::Manager* get_pipeline_manager() const;
+        pipeline::Manager* get_pipeline_manager();
         const texture::Sampler2D* get_sampler_2d() const;
         texture::Sampler2D* get_sampler_2d();
         unsigned int get_frames_count() const;
+        void load_scene(core::Id scene_id, std::function<void()> on_load = [] {});
         void push_todo(std::function<std::function<void()>(command::Buffer*)> fun);
     };
 }

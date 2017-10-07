@@ -24,8 +24,8 @@ gearoenix::render::material::Material* gearoenix::render::material::Material::re
     switch (sid) {
     case shader::WHITE:
         return new White(f, e);
-        //    case shader::DIRECTIONAL_TEXTURED_SPECULATED_NOCUBE_FULLSHADOW_OPAQUE:
-        //        return new DirectionalTexturedSpeculatedNocubeFullshadowOpaque(f, e);
+    case shader::DIRECTIONAL_TEXTURED_SPECULATED_NOCUBE_FULLSHADOW_OPAQUE:
+        LOGF("Unimplemented");
     }
-    LOGF("Unimplemented/Unexpected");
+    LOGF("Unexpected");
 }

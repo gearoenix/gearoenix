@@ -24,18 +24,14 @@ gearoenix::render::scene::Scene::Scene(system::File* f, Engine* e, std::shared_p
     std::vector<core::Id> model_ids;
     f->read(model_ids);
     models.resize(model_ids.size());
-    for (size_t i = 0; i < camera_ids.size(); ++i) {
+    for (size_t i = 0; i < camera_ids.size(); ++i)
         cameras[i] = amgr->get_camera(camera_ids[i]);
-    }
-    for (size_t i = 0; i < audio_ids.size(); ++i) {
+    for (size_t i = 0; i < audio_ids.size(); ++i)
         audios[i] = amgr->get_audio(audio_ids[i]);
-    }
-    for (size_t i = 0; i < light_ids.size(); ++i) {
+    for (size_t i = 0; i < light_ids.size(); ++i)
         lights[i] = amgr->get_light(light_ids[i]);
-    }
-    for (size_t i = 0; i < model_ids.size(); ++i) {
+    for (size_t i = 0; i < model_ids.size(); ++i)
         models[i] = amgr->get_model(model_ids[i], c);
-    }
 }
 
 gearoenix::render::scene::Scene::~Scene()
@@ -46,7 +42,8 @@ gearoenix::render::scene::Scene::~Scene()
     models.clear();
 }
 
-gearoenix::render::scene::Scene* gearoenix::render::scene::Scene::read(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c)
+gearoenix::render::scene::Scene* gearoenix::render::scene::Scene::read(
+    system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c)
 {
     return new Scene(f, e, c);
 }

@@ -1,5 +1,7 @@
 #include "vk-engine.hpp"
+#include "../core/asset/cr-asset-manager.hpp"
 #include "../core/cr-application.hpp"
+#include "../core/cr-end-caller.hpp"
 #include "../core/cr-static.hpp"
 #include "../system/sys-app.hpp"
 #include "../system/sys-file.hpp"
@@ -304,6 +306,12 @@ gearoenix::render::texture::Sampler2D* gearoenix::render::Engine::get_sampler_2d
 unsigned int gearoenix::render::Engine::get_frames_count() const
 {
     return framebuffers.size();
+}
+
+void gearoenix::render::Engine::load_scene(core::Id scene_id, std::function<void()> on_load)
+{
+    sys_app->get_asset_manager()->get_scene(
+        scene_id, std::shared_ptr<core::EndCaller>(new core::EndCaller(on_load)));
 }
 
 void gearoenix::render::Engine::push_todo(std::function<std::function<void()>(command::Buffer*)> fun)
