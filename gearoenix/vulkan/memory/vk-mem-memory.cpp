@@ -13,9 +13,11 @@ gearoenix::render::memory::Memory::Memory(
     case VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT:
         is_in_gpu = true;
         break;
-    default:
-        LOGF("Unimplemented");
+    case VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT:
+        is_in_gpu = false;
         break;
+    default:
+        LOGF("Unexpected");
     }
     const device::Physical* pdev = logical_device->get_physical_device();
     const Linker* l = pdev->get_instance()->get_linker();

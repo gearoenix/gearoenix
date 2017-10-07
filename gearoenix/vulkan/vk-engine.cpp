@@ -39,16 +39,15 @@ gearoenix::render::Engine::Engine(system::Application* sys_app)
     render_pass = new RenderPass(swapchain);
     const std::vector<image::View*>& frame_views = swapchain->get_image_views();
     framebuffers.resize(frame_views.size());
+    wait_fences.resize(frame_views.size());
+    frames_cleanups.resize(frame_views.size());
     for (unsigned int i = 0; i < frame_views.size(); ++i) {
         framebuffers[i] = new Framebuffer(frame_views[i], depth_stencil, render_pass);
+        wait_fences[i] = new sync::Fence(logical_device, true);
     }
     graphic_cmd_pool = new command::Pool(logical_device);
     present_complete_semaphore = new sync::Semaphore(logical_device);
     render_complete_semaphore = new sync::Semaphore(logical_device);
-    wait_fences.resize(frame_views.size());
-    for (uint32_t i = 0; i < frame_views.size(); ++i) {
-        wait_fences[i] = new sync::Fence(logical_device, true);
-    }
     vmemmgr = new memory::Manager(logical_device, 1024 * 1024 * 4);
     cmemmgr = new memory::Manager(logical_device, 1024 * 1024 * 4, memory::Manager::CPU_COHERENT);
     vbufmgr = new buffer::Manager(vmemmgr, 2 * 1024 * 1024);

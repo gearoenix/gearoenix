@@ -32,6 +32,9 @@ gearoenix::render::device::Logical::Logical(Physical* p)
         //		LOGE(std::string("queue node index added is ") +
         // std::to_string(int(q)));
     }
+    VkPhysicalDeviceFeatures device_features;
+    setz(device_features);
+    device_features.samplerAnisotropy = VK_TRUE;
     VkDeviceCreateInfo device_create_info;
     setz(device_create_info);
     device_create_info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
@@ -39,6 +42,7 @@ gearoenix::render::device::Logical::Logical(Physical* p)
     device_create_info.pQueueCreateInfos = queue_create_infos.data();
     device_create_info.enabledExtensionCount = countof(device_extensions);
     device_create_info.ppEnabledExtensionNames = device_extensions;
+    device_create_info.pEnabledFeatures = &device_features;
     VKC(l->vkCreateDevice(physical_device->get_vulkan_data(), &device_create_info,
         0, &vulkan_data));
     l->vkGetDeviceQueue(vulkan_data,
