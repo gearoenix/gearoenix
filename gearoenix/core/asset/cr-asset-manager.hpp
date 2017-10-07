@@ -71,7 +71,7 @@ namespace core {
             std::shared_ptr<render::texture::Texture> get_cached_texture(Id id) const;
             std::shared_ptr<render::model::Model> get_model(Id id, std::shared_ptr<EndCaller> e);
             std::shared_ptr<render::model::Model> get_cached_model(Id id) const;
-            std::shared_ptr<render::scene::Scene> get_scene(Id id);
+            std::shared_ptr<render::scene::Scene> get_scene(Id id, std::shared_ptr<EndCaller> e);
             std::shared_ptr<render::scene::Scene> get_cached_scene(Id id) const;
         };
     } // namespace asset

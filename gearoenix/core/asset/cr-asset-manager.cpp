@@ -10,6 +10,7 @@
 #include "../../system/sys-app.hpp"
 #include "../cache/file/cr-cache-file-sparse.hpp"
 #include "../cache/file/cr-cache-file.hpp"
+
 gearoenix::core::asset::Manager::Manager(system::Application* sys_app, const std::string& name)
     : sys_app(sys_app)
     , render_engine(sys_app->get_render_engine())
@@ -110,21 +111,18 @@ std::shared_ptr<gearoenix::render::model::Model> gearoenix::core::asset::Manager
 
 std::shared_ptr<gearoenix::render::model::Model> gearoenix::core::asset::Manager::get_cached_model(Id id) const
 {
-    LOGF("Not implemented.");
     return models->get<render::model::Model>(id);
 }
 
-std::shared_ptr<gearoenix::render::scene::Scene> gearoenix::core::asset::Manager::get_scene(Id id)
+std::shared_ptr<gearoenix::render::scene::Scene> gearoenix::core::asset::Manager::get_scene(Id id, std::shared_ptr<EndCaller> e)
 {
-    std::function<std::shared_ptr<render::scene::Scene>()> fn_new = [this] {
-        LOGF("Not implemented.");
-        return nullptr;
+    std::function<std::shared_ptr<render::scene::Scene>()> fn_new = [this, e] {
+        return std::shared_ptr<render::scene::Scene>(render::scene::Scene::read(file, render_engine, e));
     };
     return scenes->get<render::scene::Scene>(id, fn_new);
 }
 
 std::shared_ptr<gearoenix::render::scene::Scene> gearoenix::core::asset::Manager::get_cached_scene(Id id) const
 {
-    LOGF("Not implemented.");
     return scenes->get<render::scene::Scene>(id);
 }
