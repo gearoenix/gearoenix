@@ -7,7 +7,7 @@
 
 gearoenix::render::mesh::Mesh::Mesh(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c)
 {
-    mat = material::Material::read(f, e, c);
+    mat = material::Material::read(f, e);
     buf = new buffer::Mesh(mat->get_vertex_elements_count(), f, e, c);
 }
 

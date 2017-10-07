@@ -282,6 +282,16 @@ gearoenix::render::memory::Manager* gearoenix::render::Engine::get_cpu_memory_ma
     return cmemmgr;
 }
 
+gearoenix::render::pipeline::Manager* gearoenix::render::Engine::get_pipeline_manager()
+{
+    return pipmgr;
+}
+
+const gearoenix::render::pipeline::Manager* gearoenix::render::Engine::get_pipeline_manager() const
+{
+    return pipmgr;
+}
+
 const gearoenix::render::texture::Sampler2D* gearoenix::render::Engine::get_sampler_2d() const
 {
     return sampler_2d;
@@ -290,6 +300,11 @@ const gearoenix::render::texture::Sampler2D* gearoenix::render::Engine::get_samp
 gearoenix::render::texture::Sampler2D* gearoenix::render::Engine::get_sampler_2d()
 {
     return sampler_2d;
+}
+
+unsigned int gearoenix::render::Engine::get_frames_count() const
+{
+    return framebuffers.size();
 }
 
 void gearoenix::render::Engine::push_todo(std::function<std::function<void()>(command::Buffer*)> fun)

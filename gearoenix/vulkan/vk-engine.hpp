@@ -88,8 +88,11 @@ namespace render {
         system::Application* get_system_application();
         memory::Manager* get_v_memory_manager();
         memory::Manager* get_cpu_memory_manager();
+        pipeline::Manager* get_pipeline_manager();
+        const pipeline::Manager* get_pipeline_manager() const;
         const texture::Sampler2D* get_sampler_2d() const;
         texture::Sampler2D* get_sampler_2d();
+        unsigned int get_frames_count() const;
         void push_todo(std::function<std::function<void()>(command::Buffer*)> fun);
     };
 }
