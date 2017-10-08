@@ -8,9 +8,6 @@ namespace render {
     }
     namespace descriptor {
         class Pool {
-        public:
-            const static uint32_t TYPE_COUNT;
-
         private:
             device::Logical* logical_device;
             VkDescriptorPool vulkan_data;

@@ -8,21 +8,19 @@ namespace render {
         class Logical;
     }
     namespace descriptor {
-        class Set;
+        class SetLayout;
     }
     namespace pipeline {
         class Layout {
         private:
-            device::Logical* dev;
-            std::shared_ptr<descriptor::Set> desset;
+            descriptor::SetLayout* dessetlay;
             VkPipelineLayout vulkan_data;
 
         public:
-            Layout(const std::shared_ptr<descriptor::Set>& desset);
+            Layout(descriptor::SetLayout* dessetlay);
             ~Layout();
             const VkPipelineLayout& get_vulkan_data() const;
-            const std::shared_ptr<descriptor::Set>& get_descriptor_set() const;
-            const device::Logical* get_device() const;
+            const descriptor::SetLayout* get_descriptor_set_layout() const;
         };
     } // namespace pipeline
 } // namespace render

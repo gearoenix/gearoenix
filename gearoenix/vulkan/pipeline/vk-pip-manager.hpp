@@ -10,10 +10,10 @@ namespace core {
 }
 namespace render {
     class Engine;
-    namespace descriptor {
-        class Manager;
-    }
     class RenderPass;
+    namespace descriptor {
+        class Pool;
+    }
     namespace pipeline {
         class Cache;
         class Pipeline;
@@ -21,8 +21,8 @@ namespace render {
         private:
             Cache* cache;
             RenderPass* rndpass;
+            descriptor::Pool* despool;
             core::cache::Cacher* cacher;
-            descriptor::Manager* desmgr;
             Engine* engine;
 
         public:

@@ -14,10 +14,8 @@ namespace render {
             VkDescriptorSet vulkan_data;
 
         public:
-            Set(
-                uint64_t shader_id,
-                Pool* pool,
-                const VkDescriptorBufferInfo& buff_info);
+            Set(Pool* pool, const VkDescriptorBufferInfo& buff_info);
+            Set(Pool* pool, const VkDescriptorBufferInfo& buff_info, const VkDescriptorImageInfo& img_info);
             ~Set();
             const Pool* get_pool() const;
             Pool* get_pool();

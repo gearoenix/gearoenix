@@ -2,7 +2,8 @@
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../core/cache/cr-cache-cacher.hpp"
 #include "../../system/sys-app.hpp"
-#include "../descriptor/vk-des-manager.hpp"
+#include "../descriptor/vk-des-pool.hpp"
+#include "../descriptor/vk-des-set-layout.hpp"
 #include "../vk-engine.hpp"
 #include "vk-pip-cache.hpp"
 #include "vk-pip-pipeline.hpp"
@@ -10,16 +11,16 @@
 gearoenix::render::pipeline::Manager::Manager(Engine* engine)
     : cache(new Cache(engine->get_logical_device()))
     , rndpass(engine->get_render_pass())
+    , despool(new descriptor::Pool(engine->get_logical_device()))
     , cacher(new core::cache::Cacher())
-    , desmgr(new descriptor::Manager(engine->get_v_buffer_manager()))
     , engine(engine)
 {
 }
 
 gearoenix::render::pipeline::Manager::~Manager()
 {
-    delete desmgr;
     delete cacher;
+    delete despool;
     delete cache;
 }
 
@@ -30,7 +31,7 @@ std::shared_ptr<gearoenix::render::pipeline::Pipeline> gearoenix::render::pipeli
             new Pipeline(
                 sid, cache, rndpass,
                 engine->get_system_application()->get_asset_manager()->get_shader(sid),
-                desmgr->get_set(sid)));
+                new descriptor::SetLayout(engine->get_logical_device(), sid)));
     };
     return cacher->get(static_cast<core::Id>(sid), fn_new);
 }

@@ -12,7 +12,7 @@ namespace render {
         class Logical;
     }
     namespace descriptor {
-        class Set;
+        class SetLayout;
     }
     class RenderPass;
     namespace pipeline {
@@ -23,10 +23,10 @@ namespace render {
             shader::Id sid;
             device::Logical* dev;
             Cache* cache;
+            descriptor::SetLayout* dessetlay;
             Layout* layout;
             RenderPass* rndpass;
             std::shared_ptr<shader::Shader> shd;
-            std::shared_ptr<descriptor::Set> desset;
             VkPipeline vulkan_data;
 
         public:
@@ -34,7 +34,7 @@ namespace render {
                 Cache* cache,
                 RenderPass* rndpass,
                 const std::shared_ptr<shader::Shader>& shd,
-                const std::shared_ptr<descriptor::Set>& desset);
+                descriptor::SetLayout* dessetlay);
             ~Pipeline();
             const VkPipeline& get_vulkan_data() const;
         };

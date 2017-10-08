@@ -4,6 +4,7 @@
 #include "../../render/shader/rnd-shd-shader.hpp"
 #include "../../system/sys-app.hpp"
 #include "../../system/sys-file.hpp"
+#include "../descriptor/vk-des-set-layout.hpp"
 #include "../device/vk-dev-logical.hpp"
 #include "../device/vk-dev-physical.hpp"
 #include "../vk-check.hpp"
@@ -14,18 +15,19 @@
 #include "vk-pip-cache.hpp"
 #include "vk-pip-layout.hpp"
 
-gearoenix::render::pipeline::Pipeline::Pipeline(shader::Id sid,
+gearoenix::render::pipeline::Pipeline::Pipeline(
+    shader::Id sid,
     Cache* cache,
     RenderPass* rndpass,
     const std::shared_ptr<shader::Shader>& shd,
-    const std::shared_ptr<descriptor::Set>& desset)
+    descriptor::SetLayout* dessetlay)
     : sid(sid)
     , dev(cache->get_logical_device())
     , cache(cache)
-    , layout(new Layout(desset))
+    , dessetlay(dessetlay)
+    , layout(new Layout(dessetlay))
     , rndpass(rndpass)
     , shd(shd)
-    , desset(desset)
 {
     const VkDevice vkdev = dev->get_vulkan_data();
     const device::Physical* p = dev->get_physical_device();
@@ -157,6 +159,7 @@ gearoenix::render::pipeline::Pipeline::~Pipeline()
     const device::Physical* p = dev->get_physical_device();
     const Linker* l = p->get_instance()->get_linker();
     l->vkDestroyPipeline(dev->get_vulkan_data(), vulkan_data, nullptr);
+    delete dessetlay;
     delete layout;
 }
 
