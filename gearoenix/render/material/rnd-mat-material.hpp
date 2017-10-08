@@ -3,6 +3,9 @@
 #include "../shader/rnd-shd-shader.hpp"
 #include <memory>
 namespace gearoenix {
+namespace core {
+    class EndCaller;
+}
 namespace system {
     class File;
 }
@@ -25,7 +28,7 @@ namespace render {
         public:
             virtual ~Material();
             virtual unsigned int get_vertex_elements_count() const = 0;
-            static Material* read(system::File* f, Engine* e);
+            static Material* read(system::File* f, Engine* e, std::shared_ptr<gearoenix::core::EndCaller> end);
         };
     }
 }

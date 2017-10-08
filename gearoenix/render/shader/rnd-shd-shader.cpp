@@ -2,6 +2,7 @@
 #include "../../core/cr-types.hpp"
 #include "../../system/sys-file.hpp"
 #include "../../system/sys-log.hpp"
+#include "../material/rnd-mat-directional-textured-speculated-nocube-fullshadow-opaque.hpp"
 #include "../material/rnd-mat-white.hpp"
 #include "rnd-shd-basic.hpp"
 
@@ -50,7 +51,7 @@ unsigned int gearoenix::render::shader::Shader::get_uniform_size(Id id)
     case WHITE:
         return sizeof(material::White::Uniform);
     case DIRECTIONAL_TEXTURED_SPECULATED_NOCUBE_FULLSHADOW_OPAQUE:
-        LOGF("Unimplemented!");
+        return sizeof(material::DirectionalTexturedSpeculatedNocubeFullshadowOpaque::Uniform);
     }
     LOGF("Unexpected! id: " << id);
 }

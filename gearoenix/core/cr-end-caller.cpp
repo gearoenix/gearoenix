@@ -9,3 +9,8 @@ gearoenix::core::EndCaller::~EndCaller()
 {
     f();
 }
+
+std::shared_ptr<gearoenix::core::EndCaller> gearoenix::core::EndCaller::create(std::function<void()> f)
+{
+    return std::shared_ptr<EndCaller>(new EndCaller(f));
+}

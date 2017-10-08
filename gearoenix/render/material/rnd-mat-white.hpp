@@ -15,9 +15,9 @@ namespace render {
             Uniform u;
 
         public:
-            White(system::File*, Engine* e);
-            unsigned int get_vertex_elements_count() const;
+            White(Engine* e);
             ~White();
+            unsigned int get_vertex_elements_count() const;
         };
     }
 }

@@ -1,6 +1,6 @@
 #include "rnd-mat-white.hpp"
 
-gearoenix::render::material::White::White(system::File*, Engine* e)
+gearoenix::render::material::White::White(Engine* e)
     : Material(shader::WHITE, sizeof(u), e)
 {
 }
