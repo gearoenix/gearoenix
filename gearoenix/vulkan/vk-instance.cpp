@@ -183,13 +183,15 @@ gearoenix::render::Instance::Instance(Linker* l)
     const char* google_unique = "VK_LAYER_GOOGLE_unique_objects";
     const std::string lunarg_trace("VK_LAYER_LUNARG_vktrace");
     const std::string lunarg_api_dump("VK_LAYER_LUNARG_api_dump");
+    const std::string steam32("VK_LAYER_VALVE_steam_overlay_32");
+    const std::string steam64("VK_LAYER_VALVE_steam_overlay_64");
     // const std::string renderdoc_capture("VK_LAYER_RENDERDOC_Capture");
     // const std::string lunarg_screenshot("VK_LAYER_LUNARG_screenshot");
     // const std::string lunarg_monitor("VK_LAYER_LUNARG_monitor");
     // removing annoying layers
     for (auto iter = instance_layers.begin(); iter != instance_layers.end();) {
         const std::string layer_name(*iter);
-        if (layer_name == lunarg_trace || layer_name == lunarg_api_dump
+        if (layer_name == lunarg_trace || layer_name == lunarg_api_dump || layer_name == steam32 || layer_name == steam64
             //|| layer_name == renderdoc_capture
             //|| layer_name == lunarg_screenshot
             //|| layer_name == lunarg_monitor
