@@ -13,7 +13,6 @@
 
 gearoenix::core::asset::Manager::Manager(system::Application* sys_app, const std::string& name)
     : sys_app(sys_app)
-    , render_engine(sys_app->get_render_engine())
     , file(new system::File(sys_app, name))
     , shaders(new cache::file::Sparse(file))
     , cameras(new cache::file::File(file))
@@ -27,6 +26,7 @@ gearoenix::core::asset::Manager::Manager(system::Application* sys_app, const std
 
 void gearoenix::core::asset::Manager::initialize()
 {
+    render_engine = sys_app->get_render_engine();
     shaders->read_offsets();
     cameras->read_offsets();
     audios->read_offsets();

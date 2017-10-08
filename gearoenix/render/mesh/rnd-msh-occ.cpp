@@ -8,8 +8,9 @@ gearoenix::render::mesh::Occ::Occ(system::File* f, Engine* e, std::shared_ptr<co
     shader::Id sid;
     f->read(sid);
 #ifdef DEBUG_MODE
-    if (sid != 0)
+    if (sid != 0) {
         LOGF("Unexpected");
+    }
 #endif
     unsigned int vec = shader::Shader::get_vertex_real_count(sid);
     buf = new buffer::Mesh(vec, f, e, c);

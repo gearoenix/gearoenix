@@ -225,7 +225,7 @@ gearoenix::math::Mat4x4 gearoenix::math::Mat4x4::look_at(const Vec3& position, c
     Vec3 x = up.cross(z).normalized();
     Vec3 y = z.cross(x);
     Mat4x4 m;
-    m.mat[0] = -x[0];
+    m.mat[0] = -(x[0]);
     m.mat[1] = y[0];
     m.mat[2] = -z[0];
     m.mat[3] = core::Real(0.0);

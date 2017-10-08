@@ -1,5 +1,6 @@
 #include "sys-linux-app.hpp"
 #ifdef IN_LINUX
+#include "../../core/asset/cr-asset-manager.hpp"
 #include "../../core/cr-application.hpp"
 #include "../../render/rnd-engine.hpp"
 #include "../sys-file.hpp"
@@ -43,8 +44,9 @@ gearoenix::system::Application::Application()
         window_title.c_str());
     free(reply);
     xcb_map_window(connection, window);
-    //    asset = std::shared_ptr<File>(new File(this));
+    assetmgr = new core::asset::Manager(this, "data.gx3d");
     render_engine = new render::Engine(this);
+    assetmgr->initialize();
     /// todo intialize in here
 }
 
@@ -52,6 +54,7 @@ gearoenix::system::Application::~Application()
 {
     delete core_app;
     delete render_engine;
+    delete assetmgr;
 }
 
 void gearoenix::system::Application::execute(core::Application* ca)

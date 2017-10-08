@@ -14,7 +14,7 @@ namespace render {
     namespace shader {
         typedef enum : core::Id {
             WHITE = 0,
-            DIRECTIONAL_TEXTURED_SPECULATED_NOCUBE_FULLSHADOW_OPAQUE = 0XFFFFFFFF, // TODO change this
+            DIRECTIONAL_TEXTURED_SPECULATED_NOCUBE_FULLSHADOW_OPAQUE = 144679237557682176,
         } Id;
         typedef enum {
             VEC3F32,

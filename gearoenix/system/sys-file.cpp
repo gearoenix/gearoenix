@@ -70,7 +70,6 @@ void gearoenix::system::File::seek(unsigned int offset)
 
 unsigned int gearoenix::system::File::tell()
 {
-
 #if defined(IN_LINUX) || defined(IN_WINDOWS)
     return file.tellg();
 #elif defined(IN_ANDROID)

@@ -233,8 +233,9 @@ void gearoenix::math::Vec3::operator/=(const Vec3& a)
 const gearoenix::core::Real& gearoenix::math::Vec3::operator[](const unsigned int i) const
 {
 #ifdef DEBUG_MODE
-    if (i > 2)
+    if (i > 2) {
         LOGF("Out of range access");
+    }
 #endif
     return vec[i];
 }
@@ -242,8 +243,9 @@ const gearoenix::core::Real& gearoenix::math::Vec3::operator[](const unsigned in
 gearoenix::core::Real& gearoenix::math::Vec3::operator[](const unsigned int i)
 {
 #ifdef DEBUG_MODE
-    if (i > 2)
+    if (i > 2) {
         LOGF("Out of range access");
+    }
 #endif
     return vec[i];
 }
