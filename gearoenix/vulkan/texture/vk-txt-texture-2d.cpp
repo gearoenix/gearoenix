@@ -2,6 +2,7 @@
 #include "../../core/cr-end-caller.hpp"
 #include "../../core/cr-static.hpp"
 #include "../../render/texture/rnd-txt-png.hpp"
+#include "../../system/sys-file.hpp"
 #include "../../system/sys-log.hpp"
 #include "../buffer/vk-buf-manager.hpp"
 #include "../buffer/vk-buf-sub-buffer.hpp"
@@ -18,6 +19,7 @@ gearoenix::render::texture::Texture2D::Texture2D(system::File* file, Engine* eng
     const Linker* l = engine->get_linker();
     std::vector<unsigned char> pixels;
     unsigned int img_width, img_height, channels;
+    LOGE("location " << file->tell());
     PNG::decode(file, engine, pixels, img_width, img_height, channels);
     VkImageCreateInfo image_info;
     device::Logical* dev = engine->get_logical_device();

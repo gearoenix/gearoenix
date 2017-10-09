@@ -36,6 +36,11 @@ void gearoenix::core::asset::Manager::initialize()
     scenes->read_offsets();
 }
 
+gearoenix::system::File* gearoenix::core::asset::Manager::get_file()
+{
+    return file;
+}
+
 std::shared_ptr<gearoenix::render::shader::Shader> gearoenix::core::asset::Manager::get_shader(Id id)
 {
     std::function<std::shared_ptr<render::shader::Shader>()> fn_new = [this] {

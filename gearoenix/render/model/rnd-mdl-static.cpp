@@ -6,6 +6,7 @@
 gearoenix::render::model::Static::Static(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c)
     : mesh(new mesh::Mesh(f, e, c))
 {
+    LOGE("location: " << f->tell());
     core::Count cc;
     f->read(cc);
     children.resize(cc);

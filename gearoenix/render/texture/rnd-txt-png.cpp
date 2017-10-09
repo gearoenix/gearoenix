@@ -36,6 +36,7 @@ void gearoenix::render::texture::PNG::decode(
     unsigned int& img_height,
     unsigned int& channels)
 {
+    LOGI("PNG file size is: " << file->read<core::Count>());
     if (!validate(file)) {
         LOGF("Png is not validated.");
     }
@@ -43,6 +44,7 @@ void gearoenix::render::texture::PNG::decode(
     if (png_ptr == NULL) {
         LOGF("Png initialization error.");
     }
+    png_set_read_fn(png_ptr, (png_voidp)file, png_data_reader);
     png_infop info_ptr = png_create_info_struct(png_ptr);
     if (info_ptr == NULL) {
         png_destroy_read_struct(&png_ptr, (png_infopp)0, (png_infopp)0);
@@ -55,7 +57,6 @@ void gearoenix::render::texture::PNG::decode(
             delete[] row_ptrs;
         LOGF("Png parsing error.");
     }
-    png_set_read_fn(png_ptr, (png_voidp)file, png_data_reader);
     png_set_sig_bytes(png_ptr, GEAROENIX_PNG_SIGNATURE_SIZE);
     png_read_info(png_ptr, info_ptr);
     img_width = png_get_image_width(png_ptr, info_ptr);

@@ -59,6 +59,7 @@ namespace core {
         public:
             Manager(system::Application* sys_app, const std::string& file);
             void initialize();
+            system::File* get_file();
             std::shared_ptr<render::shader::Shader> get_shader(Id id);
             std::shared_ptr<render::shader::Shader> get_cached_shader(Id id) const;
             std::shared_ptr<render::camera::Camera> get_camera(Id id);
