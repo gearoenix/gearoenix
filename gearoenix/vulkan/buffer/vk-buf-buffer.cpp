@@ -110,8 +110,9 @@ uint32_t gearoenix::render::buffer::Buffer::get_memory_type_bits(device::Logical
 void gearoenix::render::buffer::Buffer::write(const void* data, unsigned int data_size, unsigned int offset)
 {
 #ifdef DEBUG_MODE
-    if (nullptr == buffer_data)
+    if (nullptr == buffer_data) {
         LOGF("Unexpected");
+    }
 #endif
     std::memcpy((void*)((size_t)buffer_data + (size_t)offset), data, data_size);
 }

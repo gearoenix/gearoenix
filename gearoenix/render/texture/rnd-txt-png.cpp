@@ -13,8 +13,9 @@
 static void png_data_reader(png_structp png_ptr, png_bytep data, png_size_t length)
 {
     png_voidp io_ptr = png_get_io_ptr(png_ptr);
-    if (io_ptr == nullptr)
+    if (io_ptr == nullptr) {
         LOGF("Unexpected");
+    }
     gearoenix::system::File* f = reinterpret_cast<gearoenix::system::File*>(io_ptr);
     f->read(data, length);
 }
