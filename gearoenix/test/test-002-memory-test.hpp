@@ -15,6 +15,8 @@ public:
     MemoryVisualizer(gearoenix::core::gc::Gc* mmgr);
     ~MemoryVisualizer();
     void remove(unsigned int id);
+    void visualize();
+    void create_submemory(unsigned int s);
 
 private:
     Gtk::Grid grid;
@@ -22,8 +24,6 @@ private:
     Gdk::RGBA fc[2];
     gearoenix::core::gc::Gc* mmgr;
     std::vector<LObj> idobj;
-
-    void visualize(double min_size);
 };
 
 class MainWindow : public Gtk::Window {

@@ -19,21 +19,24 @@ MemoryVisualizer::MemoryVisualizer(gearoenix::core::gc::Gc* mmgr)
     fc[0].set_rgba_u(0xffff, 0, 0);
     fc[1].set_rgba_u(0, 0xffff, 0);
 
-    visualize(400.0);
+    set_vexpand(true);
+    set_hexpand(true);
 }
 
 MemoryVisualizer::~MemoryVisualizer()
 {
+    for (auto& o : idobj)
+        delete o.l;
+    delete mmgr;
 }
 
 void MemoryVisualizer::remove(unsigned int)
 {
 }
 
-void MemoryVisualizer::visualize(double min_size)
+void MemoryVisualizer::visualize()
 {
-    set_vexpand(true);
-    set_hexpand(true);
+    double min_size = get_width();
     grid = Gtk::Grid();
     for (LObj& lo : idobj) {
         delete lo.l;
@@ -136,6 +139,7 @@ MainWindow::MainWindow()
     set_vexpand(false);
     set_resizable(false);
     show_all();
+    memvis.visualize();
 }
 
 MainWindow::~MainWindow()
