@@ -62,6 +62,7 @@ gearoenix::core::gc::Gc::Gc(unsigned int size)
 {
     Object* start = new Object(0);
     Object* end = new Object(0);
+    end->offset = size;
     objects->add_front(start);
     objects->add_end(end);
     Range r(objects->get_front(), objects->get_end());

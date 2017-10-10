@@ -18,10 +18,12 @@ public:
 
 private:
     Gtk::Grid grid;
+    Gdk::RGBA ec[2];
+    Gdk::RGBA fc[2];
     gearoenix::core::gc::Gc* mmgr;
     std::vector<LObj> idobj;
 
-    void visualize();
+    void visualize(double min_size);
 };
 
 class MainWindow : public Gtk::Window {
