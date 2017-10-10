@@ -21,23 +21,30 @@ MemoryVisualizer::MemoryVisualizer(gearoenix::core::gc::Gc* mmgr)
 
     set_vexpand(true);
     set_hexpand(true);
+
+    grid.set_vexpand(true);
+    grid.set_hexpand(true);
+    add(grid);
 }
 
 MemoryVisualizer::~MemoryVisualizer()
 {
-    for (auto& o : idobj)
-        delete o.l;
-    delete mmgr;
+    cleanup();
 }
 
-void MemoryVisualizer::remove(unsigned int)
+void MemoryVisualizer::remove(unsigned int oid)
 {
+    delete idobj[oid].o;
+    for (auto& o : idobj)
+        delete o.l;
+    idobj.clear();
+    visualize();
 }
 
 void MemoryVisualizer::visualize()
 {
     double min_size = get_width();
-    grid = Gtk::Grid();
+    grid.remove_row(0);
     for (LObj& lo : idobj) {
         delete lo.l;
     }
@@ -76,6 +83,7 @@ void MemoryVisualizer::visualize()
             idobj.push_back(lo);
             sizes.push_back(osize);
         }
+        last_end = offset + osize;
     }
     double coefsize = min_size / total_size;
     if (coefsize * smallest_rng < MIN_WID) {
@@ -85,17 +93,47 @@ void MemoryVisualizer::visualize()
         unsigned int ws = (unsigned int)(double(sizes[i]) * coefsize);
         idobj[i].l->set_size_request(ws, 95);
         if (nullptr == idobj[i].o) {
-            idobj[i].l->set_tooltip_text("Free space");
+            idobj[i].l->set_tooltip_text(Glib::ustring::compose("Free space\nSize: %1", sizes[i]));
             idobj[i].l->override_background_color(ec[i & 1]);
         } else {
-            idobj[i].l->set_tooltip_text(Glib::ustring::compose("Allocated submemory with id: %d", i));
+            idobj[i].l->set_tooltip_text(Glib::ustring::compose(
+                "Allocated submemory\nId: %1\nSize: %2\nOffset: %3\nEnd: %4", i,
+                idobj[i].o->get_size(), idobj[i].o->get_offset(), idobj[i].o->get_end()));
             idobj[i].l->override_background_color(fc[i & 1]);
         }
     }
-    grid.set_vexpand(true);
-    grid.set_hexpand(true);
-    add(grid);
     show_all();
+}
+
+void MemoryVisualizer::set_memory_manager(gearoenix::core::gc::Gc* mmgr)
+{
+    cleanup();
+    this->mmgr = mmgr;
+    visualize();
+}
+
+gearoenix::core::gc::Gc* MemoryVisualizer::get_memory_manager()
+{
+    return mmgr;
+}
+
+void MemoryVisualizer::cleanup()
+{
+    for (auto& o : idobj)
+        delete o.l;
+    idobj.clear();
+    if (nullptr != mmgr)
+        delete mmgr;
+}
+
+void MemoryVisualizer::create_submemory(unsigned int s)
+{
+    gearoenix::core::gc::Object* gobj = new gearoenix::core::gc::Object(s);
+    mmgr->allocate(gobj);
+    for (auto& o : idobj)
+        delete o.l;
+    idobj.clear();
+    visualize();
 }
 
 MainWindow::MainWindow()
@@ -112,6 +150,10 @@ MainWindow::MainWindow()
     l_create_main_memory.set_halign(Gtk::ALIGN_START);
     l_create_submemory.set_halign(Gtk::ALIGN_START);
     l_deallocate_submemory.set_halign(Gtk::ALIGN_START);
+
+    b_create_main_memory.signal_clicked().connect(sigc::mem_fun(this, &MainWindow::on_create_main_memory_clicked));
+    b_create_submemory.signal_clicked().connect(sigc::mem_fun(this, &MainWindow::on_create_submemory_clicked));
+    b_deallocate_submemory.signal_clicked().connect(sigc::mem_fun(this, &MainWindow::on_deallocate_submemory_clicked));
 
     grid.attach(l_create_main_memory, 0, 0, 1, 1);
     grid.attach(e_create_main_memory, 1, 0, 1, 1);
@@ -140,10 +182,32 @@ MainWindow::MainWindow()
     set_resizable(false);
     show_all();
     memvis.visualize();
+    show_all();
 }
 
 MainWindow::~MainWindow()
 {
+}
+
+void MainWindow::on_create_main_memory_clicked()
+{
+    unsigned int memsize = atoi(e_create_main_memory.get_text().c_str());
+    memvis.set_memory_manager(new gearoenix::core::gc::Gc(memsize));
+    show_all();
+}
+
+void MainWindow::on_create_submemory_clicked()
+{
+    unsigned int memsize = atoi(e_create_submemory.get_text().c_str());
+    memvis.create_submemory(memsize);
+    show_all();
+}
+
+void MainWindow::on_deallocate_submemory_clicked()
+{
+    unsigned int memid = atoi(e_deallocate_submemory.get_text().c_str());
+    memvis.remove(memid);
+    show_all();
 }
 
 int main(int argc, char* argv[])

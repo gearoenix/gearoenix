@@ -23,3 +23,8 @@ unsigned int gearoenix::core::gc::Object::get_size() const
 {
     return size;
 }
+
+unsigned int gearoenix::core::gc::Object::get_end() const
+{
+    return end;
+}

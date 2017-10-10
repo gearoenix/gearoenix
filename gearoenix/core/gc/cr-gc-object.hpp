@@ -25,6 +25,7 @@ namespace core {
             virtual ~Object();
             unsigned int get_offset() const;
             unsigned int get_size() const;
+            unsigned int get_end() const;
         };
     }
 }

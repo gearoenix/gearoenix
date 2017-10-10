@@ -17,8 +17,12 @@ public:
     void remove(unsigned int id);
     void visualize();
     void create_submemory(unsigned int s);
+    void set_memory_manager(gearoenix::core::gc::Gc* mmgr);
+    gearoenix::core::gc::Gc* get_memory_manager();
 
 private:
+    void cleanup();
+
     Gtk::Grid grid;
     Gdk::RGBA ec[2];
     Gdk::RGBA fc[2];
