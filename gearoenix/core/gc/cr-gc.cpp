@@ -112,3 +112,8 @@ void gearoenix::core::gc::Gc::allocate(Object* obj)
     remove_range(range);
     add_range(Range(obj_node, end_node));
 }
+
+gearoenix::core::list::List<gearoenix::core::gc::Object*>* gearoenix::core::gc::Gc::get_objects()
+{
+    return objects;
+}

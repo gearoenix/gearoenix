@@ -2,8 +2,27 @@
 #define GEAROENIX_TEST_002
 #include "config.hpp"
 #ifdef TEST002
-
+#include "../core/gc/cr-gc.hpp"
 #include <gtkmm.h>
+
+struct LObj {
+    Gtk::Label* l;
+    gearoenix::core::gc::Object* o;
+};
+
+class MemoryVisualizer : public Gtk::ScrolledWindow {
+public:
+    MemoryVisualizer(gearoenix::core::gc::Gc* mmgr);
+    ~MemoryVisualizer();
+    void remove(unsigned int id);
+
+private:
+    Gtk::Grid grid;
+    gearoenix::core::gc::Gc* mmgr;
+    std::vector<LObj> idobj;
+
+    void visualize();
+};
 
 class MainWindow : public Gtk::Window {
 public:
@@ -14,6 +33,7 @@ private:
     void on_create_main_memory_clicked();
     void on_create_submemory_clicked();
     void on_deallocate_submemory_clicked();
+
     Gtk::Button b_create_main_memory;
     Gtk::Button b_create_submemory;
     Gtk::Button b_deallocate_submemory;
@@ -24,6 +44,9 @@ private:
     Gtk::Entry e_create_submemory;
     Gtk::Entry e_deallocate_submemory;
     Gtk::Grid grid;
+
+    MemoryVisualizer memvis;
 };
+
 #endif
 #endif

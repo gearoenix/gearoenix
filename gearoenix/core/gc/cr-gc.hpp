@@ -31,6 +31,7 @@ namespace core {
         public:
             Gc(unsigned int size);
             ~Gc();
+            list::List<Object*>* get_objects();
         };
     }
 }
