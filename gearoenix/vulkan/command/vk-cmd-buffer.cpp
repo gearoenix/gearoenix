@@ -27,10 +27,6 @@ gearoenix::render::command::Buffer::Buffer(Pool* pool)
     cmd_buf_allocate_info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
     cmd_buf_allocate_info.commandBufferCount = 1;
     VKC(l->vkAllocateCommandBuffers(vkdev, &cmd_buf_allocate_info, &vulkan_data));
-    VkCommandBufferBeginInfo cmd_buf_info;
-    setz(cmd_buf_info);
-    cmd_buf_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-    VKC(l->vkBeginCommandBuffer(vulkan_data, &cmd_buf_info));
 }
 
 gearoenix::render::command::Buffer::~Buffer()
@@ -42,6 +38,14 @@ gearoenix::render::command::Buffer::~Buffer()
     VkDevice vd = d->get_vulkan_data();
     VkCommandPool vp = pool->get_vulkan_data();
     linker->vkFreeCommandBuffers(vd, vp, 1, &vulkan_data);
+}
+
+void gearoenix::render::command::Buffer::begin()
+{
+    VkCommandBufferBeginInfo cmd_buf_info;
+    setz(cmd_buf_info);
+    cmd_buf_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    VKC(linker->vkBeginCommandBuffer(vulkan_data, &cmd_buf_info));
 }
 
 void gearoenix::render::command::Buffer::copy_buffer(
@@ -89,4 +93,14 @@ void gearoenix::render::command::Buffer::set_viewport(
 void gearoenix::render::command::Buffer::set_scissor(const VkRect2D& scissor)
 {
     linker->vkCmdSetScissor(vulkan_data, 0, 1, &scissor);
+}
+
+void gearoenix::render::command::Buffer::end()
+{
+    VKC(linker->vkEndCommandBuffer(vulkan_data));
+}
+
+void gearoenix::render::command::Buffer::end_render_pass()
+{
+    linker->vkCmdEndRenderPass(vulkan_data);
 }

@@ -95,6 +95,11 @@ void gearoenix::render::texture::PNG::decode(
         png_set_tRNS_to_alpha(png_ptr);
         channels += 1;
     }
+    if (channels == 3) {
+        png_set_add_alpha(png_ptr, 0xFF, PNG_FILLER_AFTER);
+        LOGE("Unsure whenever you got the result of texture it is ok to remove this.");
+        channels = 4;
+    }
     row_ptrs = new png_bytep[img_height];
     data.resize(img_width * img_height * bitdepth * channels / 8);
     const unsigned int stride = img_width * bitdepth * channels / 8;

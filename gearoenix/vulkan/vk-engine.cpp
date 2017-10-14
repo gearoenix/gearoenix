@@ -40,20 +40,22 @@ gearoenix::render::Engine::Engine(system::Application* sys_app)
     depth_stencil = image::View::create_depth_stencil(logical_device);
     render_pass = new RenderPass(swapchain);
     const std::vector<image::View*>& frame_views = swapchain->get_image_views();
+    graphic_cmd_pool = new command::Pool(logical_device);
     framebuffers.resize(frame_views.size());
     wait_fences.resize(frame_views.size());
     frames_cleanups.resize(frame_views.size());
+    cmd_bufs.resize(frame_views.size());
     for (unsigned int i = 0; i < frame_views.size(); ++i) {
         framebuffers[i] = new Framebuffer(frame_views[i], depth_stencil, render_pass);
         wait_fences[i] = new sync::Fence(logical_device, true);
+        cmd_bufs[i] = new command::Buffer(graphic_cmd_pool);
     }
-    graphic_cmd_pool = new command::Pool(logical_device);
     present_complete_semaphore = new sync::Semaphore(logical_device);
     render_complete_semaphore = new sync::Semaphore(logical_device);
-    vmemmgr = new memory::Manager(logical_device, 1024 * 1024 * 4);
-    cmemmgr = new memory::Manager(logical_device, 1024 * 1024 * 4, memory::Manager::CPU_COHERENT);
-    vbufmgr = new buffer::Manager(vmemmgr, 2 * 1024 * 1024);
-    cbufmgr = new buffer::Manager(cmemmgr, 2 * 1024 * 1024);
+    vmemmgr = new memory::Manager(logical_device, 1024 * 1024 * 10);
+    cmemmgr = new memory::Manager(logical_device, 1024 * 1024 * 10, memory::Manager::CPU_COHERENT);
+    vbufmgr = new buffer::Manager(vmemmgr, 4 * 1024 * 1024);
+    cbufmgr = new buffer::Manager(cmemmgr, 10 * 1024 * 1024);
     pipmgr = new pipeline::Manager(this);
     sampler_2d = new texture::Sampler2D(logical_device);
     //    setup_draw_buffers();
@@ -80,57 +82,105 @@ void gearoenix::render::Engine::window_changed()
 
 void gearoenix::render::Engine::update()
 {
-    // Do command buffer initializing
-    // Get current frame number
-    unsigned int current_frame = 0;
-    for (std::function<void()>& fn : frames_cleanups[current_frame]) {
+    LOGE("TODO: it can be much much better remove all duplicate calls, remove same initializations.");
+    const VkDevice vkdev = logical_device->get_vulkan_data();
+    const VkQueue vkqu = logical_device->get_graphic_queue();
+    current_frame = swapchain->get_next_image_index(present_complete_semaphore);
+    if (current_frame == 0xffffffff) {
+        window_changed();
+        return;
+    }
+    const VkFence vkcurfnc = wait_fences[current_frame]->get_vulkan_data();
+    command::Buffer* gcmd = cmd_bufs[current_frame];
+    gcmd->begin();
+    VKC(linker->vkWaitForFences(vkdev, 1, &vkcurfnc, 1, UINT64_MAX));
+    VKC(linker->vkResetFences(vkdev, 1, &vkcurfnc));
+
+    std::vector<std::function<void()>>& cur_frames_cleanup = frames_cleanups[current_frame];
+    for (std::function<void()>& fn : cur_frames_cleanup) {
         fn();
     }
-    frames_cleanups[current_frame].clear();
+    cur_frames_cleanup.clear();
     std::vector<std::function<std::function<void()>(command::Buffer*)>> temp_todos;
     todos_mutex.lock();
     std::move(todos.begin(), todos.end(), std::back_inserter(temp_todos));
     todos.clear();
     todos_mutex.unlock();
     for (std::function<std::function<void()>(command::Buffer*)>& fn : temp_todos) {
-        frames_cleanups[current_frame].push_back(fn(nullptr /* TODO */));
+        frames_cleanups[current_frame].push_back(fn(gcmd));
     }
-    temp_todos.clear();
 
-    //    uint32_t current_buffer = swapchain->get_next_image_index(present_complete_semaphore);
-    //    if (current_buffer == 0xffffffff) {
-    //        window_changed();
-    //        return;
-    //    }
-    //    VKC(linker->vkWaitForFences(logical_device->get_vulkan_data(), 1,
-    //        &(wait_fences[current_buffer]->get_vulkan_data()),
-    //        1, UINT64_MAX));
-    //    VKC(linker->vkResetFences(logical_device->get_vulkan_data(), 1,
-    //        &(wait_fences[current_buffer]->get_vulkan_data())));
-    //    uint32_t wait_stage_mask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-    //    VkSubmitInfo submit_info;
-    //    setz(submit_info);
-    //    submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    //    submit_info.pWaitDstStageMask = &wait_stage_mask;
-    //    submit_info.pWaitSemaphores = &(present_complete_semaphore->get_vulkan_data());
-    //    submit_info.waitSemaphoreCount = 1;
-    //    submit_info.pSignalSemaphores = &(render_complete_semaphore->get_vulkan_data());
-    //    submit_info.signalSemaphoreCount = 1;
-    //    submit_info.pCommandBuffers = &(draw_buffers[current_buffer]->get_vulkan_data());
-    //    submit_info.commandBufferCount = 1;
-    //    VKC(linker->vkQueueSubmit(logical_device->get_graphic_queue(), 1,
-    //        &submit_info,
-    //        wait_fences[current_buffer]->get_vulkan_data()));
-    //    VkPresentInfoKHR present_info;
-    //    setz(present_info);
-    //    present_info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
-    //    present_info.swapchainCount = 1;
-    //    present_info.pSwapchains = &(swapchain->get_vulkan_data());
-    //    present_info.pImageIndices = &current_buffer;
-    //    present_info.pWaitSemaphores = &(render_complete_semaphore->get_vulkan_data());
-    //    present_info.waitSemaphoreCount = 1;
-    //    VKC(linker->vkQueuePresentKHR(logical_device->get_graphic_queue(),
-    //        &present_info));
+    VkClearValue clear_values[2];
+    clear_values[0].color = { { 0.4f, 0.4f, 0.4f, 1.0f } };
+    clear_values[1].color = { { 1.0f, 0.0f, 0.0f, 0.0f } };
+    const VkSurfaceCapabilitiesKHR& surface_caps = physical_device->get_surface_capabilities();
+    VkRenderPassBeginInfo render_pass_begin_info;
+    setz(render_pass_begin_info);
+    render_pass_begin_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+    render_pass_begin_info.renderPass = render_pass->get_vulkan_data();
+    render_pass_begin_info.renderArea.offset.x = 0;
+    render_pass_begin_info.renderArea.offset.y = 0;
+    render_pass_begin_info.renderArea.extent.width = surface_caps.currentExtent.width;
+    render_pass_begin_info.renderArea.extent.height = surface_caps.currentExtent.height;
+    render_pass_begin_info.clearValueCount = countof(clear_values);
+    render_pass_begin_info.pClearValues = clear_values;
+    render_pass_begin_info.framebuffer = framebuffers[current_frame]->get_vulkan_data();
+    gcmd->begin_render_pass_with_info(render_pass_begin_info);
+    VkViewport viewport;
+    viewport.x = 0.0;
+    viewport.y = 0.0;
+    viewport.height = static_cast<float>(surface_caps.currentExtent.height);
+    viewport.width = static_cast<float>(surface_caps.currentExtent.width);
+    viewport.minDepth = 0.0;
+    viewport.maxDepth = 1.0;
+    gcmd->set_viewport(viewport);
+    VkRect2D scissor;
+    scissor.extent.width = surface_caps.currentExtent.width;
+    scissor.extent.height = surface_caps.currentExtent.height;
+    scissor.offset.x = 0;
+    scissor.offset.y = 0;
+    gcmd->set_scissor(scissor);
+
+    //    linker->vkCmdBindDescriptorSets(
+    //        draw_command->get_vulkan_data(), VK_PIPELINE_BIND_POINT_GRAPHICS,
+    //        pipeline_layout->get_vulkan_data(), 0, 1,
+    //        &(descriptor_set->get_vulkan_data()), 0, nullptr);
+    //    linker->vkCmdBindPipeline(draw_command->get_vulkan_data(),
+    //        VK_PIPELINE_BIND_POINT_GRAPHICS,
+    //        pipeline->get_vulkan_data());
+    //    VkDeviceSize offsets = 0;
+    //    linker->vkCmdBindVertexBuffers(draw_command->get_vulkan_data(), 0, 1,
+    //        &(mesh_buff->get_vertex_buffer()), &offsets);
+    //    linker->vkCmdBindIndexBuffer(draw_command->get_vulkan_data(),
+    //        mesh_buff->get_index_buffer(), 0,
+    //        VK_INDEX_TYPE_UINT32);
+    //    linker->vkCmdDrawIndexed(draw_command->get_vulkan_data(),
+    //        mesh_buff->get_indices_count(), 1, 0, 0, 1);
+
+    gcmd->end_render_pass();
+    gcmd->end();
+
+    uint32_t wait_stage_mask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    VkSubmitInfo submit_info;
+    setz(submit_info);
+    submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submit_info.pWaitDstStageMask = &wait_stage_mask;
+    submit_info.pWaitSemaphores = &(present_complete_semaphore->get_vulkan_data());
+    submit_info.waitSemaphoreCount = 1;
+    submit_info.pSignalSemaphores = &(render_complete_semaphore->get_vulkan_data());
+    submit_info.signalSemaphoreCount = 1;
+    submit_info.pCommandBuffers = &gcmd->get_vulkan_data();
+    submit_info.commandBufferCount = 1;
+    VKC(linker->vkQueueSubmit(vkqu, 1, &submit_info, vkcurfnc));
+    VkPresentInfoKHR present_info;
+    setz(present_info);
+    present_info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+    present_info.swapchainCount = 1;
+    present_info.pSwapchains = &(swapchain->get_vulkan_data());
+    present_info.pImageIndices = &current_frame;
+    present_info.pWaitSemaphores = &(render_complete_semaphore->get_vulkan_data());
+    present_info.waitSemaphoreCount = 1;
+    VKC(linker->vkQueuePresentKHR(vkqu, &present_info));
 }
 
 void gearoenix::render::Engine::terminate()

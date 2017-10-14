@@ -17,6 +17,8 @@ namespace render {
         public:
             Buffer(Pool* pool);
             ~Buffer();
+            void begin();
+            void reset();
             void copy_buffer(VkBuffer src, VkBuffer des, const VkBufferCopy& region);
             void flush();
             const VkCommandBuffer& get_vulkan_data() const;
@@ -24,6 +26,8 @@ namespace render {
                 const VkRenderPassBeginInfo& render_pass_begin_info);
             void set_viewport(const VkViewport& viewport);
             void set_scissor(const VkRect2D& scissor);
+            void end();
+            void end_render_pass();
         };
     }
 }

@@ -89,8 +89,7 @@ void gearoenix::render::texture::Texture2D::fill_info(
         image_info.format = VK_FORMAT_R8G8B8A8_UNORM;
         break;
     case 3:
-        image_info.format = VK_FORMAT_R8G8B8_UNORM;
-        break;
+        LOGF("TODO in far future, because it is not good for now.");
     default:
         LOGF("Unexpected/Unimplemented");
     }

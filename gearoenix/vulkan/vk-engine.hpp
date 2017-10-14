@@ -72,10 +72,12 @@ namespace render {
         buffer::Manager* cbufmgr;
         pipeline::Manager* pipmgr;
         texture::Sampler2D* sampler_2d;
+        std::vector<command::Buffer*> cmd_bufs;
         std::mutex todos_mutex;
         std::vector<std::function<std::function<void()>(command::Buffer*)>> todos;
         std::vector<std::vector<std::function<void()>>> frames_cleanups;
         std::vector<std::shared_ptr<scene::Scene>> loaded_scene;
+        uint32_t current_frame;
         void setup_draw_buffers();
 
     public:

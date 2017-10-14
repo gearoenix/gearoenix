@@ -56,7 +56,7 @@ gearoenix::render::device::Logical* gearoenix::render::Swapchain::get_logical_de
 }
 
 uint32_t gearoenix::render::Swapchain::get_next_image_index(
-    const std::shared_ptr<sync::Semaphore>& semaphore)
+    const sync::Semaphore* semaphore)
 {
     auto l = logical_device->get_physical_device()->get_instance()->get_linker();
     uint32_t image_index = 0;
@@ -65,7 +65,6 @@ uint32_t gearoenix::render::Swapchain::get_next_image_index(
         semaphore->get_vulkan_data(), nullptr, &image_index);
     if (r == VK_ERROR_OUT_OF_DATE_KHR || r == VK_ERROR_INITIALIZATION_FAILED) {
         return 0xffffffff;
-        //        initialize();
     } else {
         VKC(r);
     }

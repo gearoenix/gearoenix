@@ -155,8 +155,9 @@ void gearoenix::render::image::Image::transit_for_reading(command::Buffer* c)
 VkFormat gearoenix::render::image::Image::get_format() const
 {
 #ifdef DEBUG_MODE
-    if (fmt == VK_FORMAT_UNDEFINED)
+    if (fmt == VK_FORMAT_UNDEFINED) {
         LOGF("Unexpected");
+    }
 #endif
     return fmt;
 }

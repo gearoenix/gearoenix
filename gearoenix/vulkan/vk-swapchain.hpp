@@ -29,8 +29,7 @@ namespace render {
         device::Logical* get_logical_device();
         const VkSurfaceFormatKHR& get_chosen_format() const;
         const std::vector<image::View*>& get_image_views() const;
-        uint32_t get_next_image_index(
-            const std::shared_ptr<sync::Semaphore>& semaphore);
+        uint32_t get_next_image_index(const sync::Semaphore* semaphore);
         void initialize();
     };
 }
