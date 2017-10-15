@@ -26,7 +26,7 @@ gearoenix::system::Application::Application()
     window = xcb_generate_id(connection);
     value_mask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK;
     value_list[0] = screen->black_pixel;
-    value_list[1] = XCB_EVENT_MASK_KEY_RELEASE | XCB_EVENT_MASK_KEY_PRESS | XCB_EVENT_MASK_EXPOSURE | XCB_EVENT_MASK_STRUCTURE_NOTIFY | XCB_EVENT_MASK_POINTER_MOTION | XCB_EVENT_MASK_BUTTON_PRESS | XCB_EVENT_MASK_BUTTON_RELEASE;
+    value_list[1] = XCB_EVENT_MASK_KEY_RELEASE | XCB_EVENT_MASK_KEY_PRESS | XCB_EVENT_MASK_EXPOSURE | XCB_EVENT_MASK_STRUCTURE_NOTIFY | XCB_EVENT_MASK_POINTER_MOTION | XCB_EVENT_MASK_BUTTON_PRESS | XCB_EVENT_MASK_BUTTON_RELEASE | XCB_EVENT_MASK_RESIZE_REDIRECT;
     xcb_create_window(connection, XCB_COPY_FROM_PARENT, window, screen->root, 0,
         0, WINDOW_WIDTH, WINDOW_HEIGHT, 0,
         XCB_WINDOW_CLASS_INPUT_OUTPUT, screen->root_visual,
@@ -153,14 +153,20 @@ void gearoenix::system::Application::handle(const xcb_generic_event_t* event)
 {
     switch (event->response_type & 0x7f) {
     case XCB_CONFIGURE_NOTIFY:
-        LOGE("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFfff");
         render_engine->window_changed();
+        break;
+    case XCB_RESIZE_REQUEST: {
+        const xcb_resize_request_event_t* resize = reinterpret_cast<const xcb_resize_request_event_t*>(event);
+        if (resize->width > 0 && resize->height > 0) {
+            winratio = static_cast<core::Real>(resize->width) / static_cast<core::Real>(resize->height);
+        }
+        break;
+    }
     }
 }
 
-gearoenix::core::Real gearoenix::system::Application::get_screen_ratio() const
+gearoenix::core::Real gearoenix::system::Application::get_window_ratio() const
 {
-    LOGE("TODO");
-    return 1.7f;
+    return winratio;
 }
 #endif

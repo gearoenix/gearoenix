@@ -5,7 +5,7 @@
 #include "rnd-cmr-perspective.hpp"
 
 gearoenix::render::camera::Camera::Camera(system::File* f, system::Application* sysapp)
-    : screen_ratio(nullptr == sysapp ? 1.0f : sysapp->get_screen_ratio())
+    : screen_ratio(nullptr == sysapp ? 1.0f : sysapp->get_window_ratio())
     , vwl(math::Mat4x4::look_at(
           math::Vec3(0.0f, 0.0f, 0.0f),
           math::Vec3(0.0f, 0.0f, -1.0f),

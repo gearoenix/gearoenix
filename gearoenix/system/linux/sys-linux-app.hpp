@@ -19,6 +19,7 @@ namespace system {
     class Application {
     private:
         bool quit = false;
+        core::Real winratio = 1.7;
         xcb_connection_t* connection;
         xcb_screen_t* screen;
         xcb_window_t window;
@@ -38,7 +39,7 @@ namespace system {
         const core::Application* get_core_app() const;
         const render::Engine* get_render_engine() const;
         render::Engine* get_render_engine();
-        core::Real get_screen_ratio() const;
+        core::Real get_window_ratio() const;
     };
 }
 }
