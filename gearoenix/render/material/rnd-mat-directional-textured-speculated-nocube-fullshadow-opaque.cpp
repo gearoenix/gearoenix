@@ -4,6 +4,7 @@
 #include "../../system/sys-app.hpp"
 #include "../../system/sys-file.hpp"
 #include "../rnd-engine.hpp"
+#include "../shader/rnd-shd-resources.hpp"
 #include "../texture/rnd-txt-texture-2d.hpp"
 
 gearoenix::render::material::DirectionalTexturedSpeculatedNocubeFullshadowOpaque::DirectionalTexturedSpeculatedNocubeFullshadowOpaque(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> end)
@@ -15,8 +16,8 @@ gearoenix::render::material::DirectionalTexturedSpeculatedNocubeFullshadowOpaque
     u.spec_color.read(f);
     f->read(u.spec_factor);
     core::asset::Manager* astmgr = e->get_system_application()->get_asset_manager();
-    std::function<void()> fun = [this, end] {
-        LOGE("todo: descriptors must be initialized int here.");
+    std::function<void()> fun = [this, end, e] {
+        shdrsc = new shader::Resources(e, pl.get(), ub, t.get());
         (void)end;
     };
     unsigned int curloc = f->tell();
@@ -24,7 +25,10 @@ gearoenix::render::material::DirectionalTexturedSpeculatedNocubeFullshadowOpaque
     f->seek(curloc);
 }
 
-gearoenix::render::material::DirectionalTexturedSpeculatedNocubeFullshadowOpaque::~DirectionalTexturedSpeculatedNocubeFullshadowOpaque() {}
+gearoenix::render::material::DirectionalTexturedSpeculatedNocubeFullshadowOpaque::~DirectionalTexturedSpeculatedNocubeFullshadowOpaque()
+{
+    delete shdrsc;
+}
 
 unsigned int gearoenix::render::material::DirectionalTexturedSpeculatedNocubeFullshadowOpaque::get_vertex_elements_count() const
 {

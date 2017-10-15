@@ -5,6 +5,7 @@
 namespace gearoenix {
 namespace render {
     namespace descriptor {
+        class SetLayout;
         class Pool;
         class Set : public core::cache::Cached {
         private:
@@ -14,8 +15,8 @@ namespace render {
             VkDescriptorSet vulkan_data;
 
         public:
-            Set(Pool* pool, const VkDescriptorBufferInfo& buff_info);
-            Set(Pool* pool, const VkDescriptorBufferInfo& buff_info, const VkDescriptorImageInfo& img_info);
+            Set(Pool* pool, SetLayout* lay, const VkDescriptorBufferInfo& buff_info);
+            Set(Pool* pool, SetLayout* lay, const VkDescriptorBufferInfo& buff_info, const VkDescriptorImageInfo& img_info);
             ~Set();
             const Pool* get_pool() const;
             Pool* get_pool();

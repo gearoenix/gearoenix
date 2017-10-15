@@ -37,6 +37,7 @@ namespace render {
                 descriptor::SetLayout* dessetlay);
             ~Pipeline();
             const VkPipeline& get_vulkan_data() const;
+            descriptor::SetLayout* get_descriptor_set_layout();
         };
     }
 }

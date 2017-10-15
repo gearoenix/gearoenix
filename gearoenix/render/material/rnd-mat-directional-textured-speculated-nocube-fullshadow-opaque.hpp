@@ -9,6 +9,9 @@ namespace core {
     class EndCaller;
 }
 namespace render {
+    namespace shader {
+        class Resources;
+    }
     namespace texture {
         class Texture2D;
     }
@@ -27,6 +30,7 @@ namespace render {
         private:
             Uniform u;
             std::shared_ptr<texture::Texture2D> t;
+            shader::Resources* shdrsc;
 
         public:
             DirectionalTexturedSpeculatedNocubeFullshadowOpaque(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> end);

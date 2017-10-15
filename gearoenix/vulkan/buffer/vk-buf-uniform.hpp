@@ -18,6 +18,10 @@ namespace render {
         public:
             Uniform(unsigned int us, Engine* e);
             ~Uniform();
+            const SubBuffer* const* get_vbuf() const;
+            const SubBuffer* const* get_cbuf() const;
+            unsigned int get_count() const;
+            unsigned int get_size() const;
         };
     } // namespace buffer
 } // namespace render

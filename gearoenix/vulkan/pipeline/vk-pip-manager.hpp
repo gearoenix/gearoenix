@@ -30,6 +30,7 @@ namespace render {
             ~Manager();
             std::shared_ptr<Pipeline> get_pipeline(shader::Id sid);
             std::shared_ptr<Pipeline> get_cached_pipeline(shader::Id sid);
+            descriptor::Pool* get_descriptor_pool();
         };
     }
 }

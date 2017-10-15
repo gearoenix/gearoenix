@@ -30,7 +30,6 @@ gearoenix::render::texture::Texture2D::Texture2D(system::File* file, Engine* eng
     buffer::SubBuffer* sstbuf = stbuf->create_subbuffer(pixels.size());
     sstbuf->write(pixels.data(), pixels.size());
     iv = new image::View(img, img->get_format());
-    smp = engine->get_sampler_2d();
     std::function<std::function<void()>(command::Buffer*)> todo =
         [this, img, l, sstbuf, end](command::Buffer* c) {
             img->transit_for_writing(c);
@@ -48,6 +47,11 @@ gearoenix::render::texture::Texture2D::Texture2D(system::File* file, Engine* eng
 gearoenix::render::texture::Texture2D::~Texture2D()
 {
     delete iv;
+}
+
+gearoenix::render::image::View* gearoenix::render::texture::Texture2D::get_view()
+{
+    return iv;
 }
 
 uint32_t gearoenix::render::texture::Texture2D::get_memory_type_bits(Engine* engine)

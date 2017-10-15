@@ -40,3 +40,8 @@ std::shared_ptr<gearoenix::render::pipeline::Pipeline> gearoenix::render::pipeli
 {
     return cacher->get<Pipeline>(sid);
 }
+
+gearoenix::render::descriptor::Pool* gearoenix::render::pipeline::Manager::get_descriptor_pool()
+{
+    return despool;
+}

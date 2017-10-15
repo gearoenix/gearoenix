@@ -168,3 +168,8 @@ const VkPipeline& gearoenix::render::pipeline::Pipeline::get_vulkan_data()
 {
     return vulkan_data;
 }
+
+gearoenix::render::descriptor::SetLayout* gearoenix::render::pipeline::Pipeline::get_descriptor_set_layout()
+{
+    return dessetlay;
+}

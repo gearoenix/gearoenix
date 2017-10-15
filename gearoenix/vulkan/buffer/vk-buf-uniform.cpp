@@ -29,3 +29,23 @@ gearoenix::render::buffer::Uniform::~Uniform()
     delete[] cbuf;
     delete[] vbuf;
 }
+
+const gearoenix::render::buffer::SubBuffer* const* gearoenix::render::buffer::Uniform::get_vbuf() const
+{
+    return vbuf;
+}
+
+const gearoenix::render::buffer::SubBuffer* const* gearoenix::render::buffer::Uniform::get_cbuf() const
+{
+    return cbuf;
+}
+
+unsigned int gearoenix::render::buffer::Uniform::get_count() const
+{
+    return uc;
+}
+
+unsigned int gearoenix::render::buffer::Uniform::get_size() const
+{
+    return us;
+}
