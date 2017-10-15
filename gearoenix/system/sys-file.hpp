@@ -88,7 +88,13 @@ namespace system {
         template <typename T>
         void read(T& data)
         {
+#ifdef DEBUG_MODE
+            if (sizeof(T) != read(&data, sizeof(T))) {
+                LOGF("Unexpected");
+            }
+#else
             read(&data, sizeof(T));
+#endif
             correct_endianess(&data);
         }
 
@@ -96,15 +102,20 @@ namespace system {
         T read()
         {
             T data;
-            read(&data, sizeof(T));
-            correct_endianess(&data);
+            read(data);
             return data;
         }
 
         bool read_bool()
         {
             uint8_t data;
+#ifdef DEBUG_MODE
+            if (1 != read(&data, 1)) {
+                LOGF("Unexpected");
+            }
+#else
             read(&data, 1);
+#endif
             return data != 0;
         }
     };

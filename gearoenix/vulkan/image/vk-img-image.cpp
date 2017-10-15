@@ -117,17 +117,17 @@ void gearoenix::render::image::Image::copy_from_buffer(command::Buffer* c, buffe
     VkBufferImageCopy region;
     setz(region);
     region.bufferOffset = b->get_offset();
-    switch (fmt) {
-    case VK_FORMAT_R8G8B8A8_UNORM:
-        region.bufferRowLength = 4 * img_width;
-        break;
-    case VK_FORMAT_R8G8B8_UNORM:
-        region.bufferRowLength = 3 * img_width;
-        break;
-    default:
-        LOGF("Unexpected");
-    }
-    region.bufferImageHeight = img_height;
+    //    switch (fmt) {
+    //    case VK_FORMAT_R8G8B8A8_UNORM:
+    //        region.bufferRowLength = 4 * img_width;
+    //        break;
+    //    case VK_FORMAT_R8G8B8_UNORM:
+    //        region.bufferRowLength = 3 * img_width;
+    //        break;
+    //    default:
+    //        LOGF("Unexpected");
+    //    }
+    //    region.bufferImageHeight = img_height;
     region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
     region.imageSubresource.mipLevel = 0;
     region.imageSubresource.baseArrayLayer = 0;
