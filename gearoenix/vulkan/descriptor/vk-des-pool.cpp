@@ -13,16 +13,16 @@ gearoenix::render::descriptor::Pool::Pool(device::Logical* logical_device)
     VkDescriptorPoolSize type_counts[2];
     setz(type_counts[0]);
     type_counts[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    type_counts[0].descriptorCount = 1;
+    type_counts[0].descriptorCount = 3;
     setz(type_counts[1]);
     type_counts[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    type_counts[1].descriptorCount = 1;
+    type_counts[1].descriptorCount = 3;
     VkDescriptorPoolCreateInfo descriptor_pool_info;
     setz(descriptor_pool_info);
     descriptor_pool_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
     descriptor_pool_info.poolSizeCount = countof(type_counts);
     descriptor_pool_info.pPoolSizes = type_counts;
-    descriptor_pool_info.maxSets = 2;
+    descriptor_pool_info.maxSets = 3;
     VKC(l->vkCreateDescriptorPool(logical_device->get_vulkan_data(),
         &descriptor_pool_info, nullptr, &vulkan_data));
 }

@@ -21,6 +21,7 @@ namespace render {
             memory::Manager* mem_mgr;
             Buffer* buff;
             Usage usage;
+            unsigned int align, coalign, decoalign;
 
         public:
             Manager(memory::Manager* mem_mgr, unsigned int size, Usage usage = (Usage)(VERTEX | INDEX | UNIFORM));

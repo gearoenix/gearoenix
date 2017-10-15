@@ -36,7 +36,7 @@ gearoenix::render::shader::Resources::Resources(Engine* e, pipeline::Pipeline* p
         inf.offset = u->get_vbuf()[i]->get_offset();
         inf.range = u->get_size();
         VkDescriptorImageInfo imginf;
-        setz(inf);
+        setz(imginf);
         imginf.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
         imginf.imageView = t->get_view()->get_vulkan_data();
         imginf.sampler = e->get_sampler_2d()->get_vulkan_data();

@@ -253,3 +253,8 @@ unsigned int gearoenix::render::device::Physical::get_max_memory_alignment() con
                 limits.optimalBufferCopyRowPitchAlignment),
             limits.bufferImageGranularity));
 }
+
+const VkPhysicalDeviceProperties& gearoenix::render::device::Physical::get_properties() const
+{
+    return properties;
+}

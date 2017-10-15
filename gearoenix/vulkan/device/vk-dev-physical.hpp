@@ -40,6 +40,7 @@ namespace render {
             VkFormat get_supported_depth_format() const;
             uint32_t get_memory_type_index(uint32_t type_bits, uint32_t properties) const;
             unsigned int get_max_memory_alignment() const;
+            const VkPhysicalDeviceProperties& get_properties() const;
         };
     }
 }
