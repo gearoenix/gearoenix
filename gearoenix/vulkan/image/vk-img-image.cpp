@@ -36,7 +36,7 @@ gearoenix::render::image::Image::Image(device::Logical* logical_device, const Vk
         VKC(l->vkBindImageMemory(vk_dev, vulkan_data, mem->get_vulkan_data(), 0));
     } else {
         submem = mem_mgr->create_submemory(mem_requirements.size);
-        VKC(l->vkBindImageMemory(vk_dev, vulkan_data, submem->get_memory()->get_vulkan_data(), 0));
+        VKC(l->vkBindImageMemory(vk_dev, vulkan_data, submem->get_memory()->get_vulkan_data(), submem->get_offset()));
     }
 }
 

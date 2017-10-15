@@ -28,12 +28,12 @@ gearoenix::render::material::Material* gearoenix::render::material::Material::re
 {
     shader::Id sid;
     f->read(sid);
-    LOGE("location: " << f->tell());
+    //    LOGE("location: " << f->tell());
     switch (sid) {
     case shader::WHITE:
         return new White(e);
     case shader::DIRECTIONAL_TEXTURED_SPECULATED_NOCUBE_FULLSHADOW_OPAQUE:
-        LOGE("location: " << f->tell());
+        //        LOGE("location: " << f->tell());
         return new DirectionalTexturedSpeculatedNocubeFullshadowOpaque(f, e, end);
     }
     LOGF("Unexpected");

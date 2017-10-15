@@ -19,12 +19,13 @@ gearoenix::render::texture::Texture2D::Texture2D(system::File* file, Engine* eng
     const Linker* l = engine->get_linker();
     std::vector<unsigned char> pixels;
     unsigned int img_width, img_height, channels;
-    LOGE("location " << file->tell());
+    //    LOGE("location " << file->tell());
     PNG::decode(file, engine, pixels, img_width, img_height, channels);
     VkImageCreateInfo image_info;
     device::Logical* dev = engine->get_logical_device();
     memory::Manager* vmemmgr = engine->get_v_memory_manager();
     fill_info(image_info, img_width, img_height, channels);
+    LOGE("reached");
     image::Image* img = new image::Image(dev, image_info, vmemmgr);
     buffer::Manager* stbuf = engine->get_cpu_buffer_manager();
     buffer::SubBuffer* sstbuf = stbuf->create_subbuffer(pixels.size());

@@ -11,7 +11,7 @@ gearoenix::render::material::DirectionalTexturedSpeculatedNocubeFullshadowOpaque
 {
     core::Id texid;
     f->read(texid);
-    LOGE("location: " << f->tell());
+    //    LOGE("location: " << f->tell());
     u.spec_color.read(f);
     f->read(u.spec_factor);
     core::asset::Manager* astmgr = e->get_system_application()->get_asset_manager();

@@ -18,6 +18,7 @@ namespace render {
             } Place;
 
         private:
+            unsigned int align, comalign, decomalign;
             Memory* mem;
             VkMemoryRequirements mem_reqs;
 

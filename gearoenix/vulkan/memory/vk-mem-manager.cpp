@@ -9,6 +9,9 @@
 #include "vk-mem-sub-memory.hpp"
 gearoenix::render::memory::Manager::Manager(device::Logical* logical_device, unsigned int size, const Place& place)
     : Gc(size)
+    , align(logical_device->get_physical_device()->get_max_memory_alignment())
+    , comalign(align - 1)
+    , decomalign(~comalign)
 {
     mem_reqs.alignment = logical_device->get_physical_device()->get_max_memory_alignment();
     mem_reqs.memoryTypeBits = 0;
@@ -46,6 +49,9 @@ const gearoenix::render::memory::Memory* gearoenix::render::memory::Manager::get
 
 gearoenix::render::memory::SubMemory* gearoenix::render::memory::Manager::create_submemory(unsigned int size)
 {
+    if ((comalign & size) != 0) {
+        size = (decomalign & size) + align;
+    }
     SubMemory* submem = new SubMemory(size, mem);
     allocate(submem);
     return submem;
