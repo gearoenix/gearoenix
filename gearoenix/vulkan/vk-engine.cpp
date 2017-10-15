@@ -91,10 +91,12 @@ void gearoenix::render::Engine::update()
         return;
     }
     const VkFence vkcurfnc = wait_fences[current_frame]->get_vulkan_data();
-    command::Buffer* gcmd = cmd_bufs[current_frame];
-    gcmd->begin();
+
     VKC(linker->vkWaitForFences(vkdev, 1, &vkcurfnc, 1, UINT64_MAX));
     VKC(linker->vkResetFences(vkdev, 1, &vkcurfnc));
+
+    command::Buffer* gcmd = cmd_bufs[current_frame];
+    gcmd->begin();
 
     std::vector<std::function<void()>>& cur_frames_cleanup = frames_cleanups[current_frame];
     for (std::function<void()>& fn : cur_frames_cleanup) {
