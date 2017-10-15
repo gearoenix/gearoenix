@@ -160,6 +160,7 @@ void gearoenix::system::Application::handle(const xcb_generic_event_t* event)
         if (resize->width > 0 && resize->height > 0) {
             winratio = static_cast<core::Real>(resize->width) / static_cast<core::Real>(resize->height);
         }
+        render_engine->window_changed();
         break;
     }
     }
