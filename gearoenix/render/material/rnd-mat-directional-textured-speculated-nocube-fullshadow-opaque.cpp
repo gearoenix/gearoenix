@@ -34,3 +34,7 @@ unsigned int gearoenix::render::material::DirectionalTexturedSpeculatedNocubeFul
 {
     return shader::Shader::get_vertex_real_count(shader::DIRECTIONAL_TEXTURED_SPECULATED_NOCUBE_FULLSHADOW_OPAQUE);
 }
+
+void gearoenix::render::material::DirectionalTexturedSpeculatedNocubeFullshadowOpaque::update(const model::Uniform& muni)
+{
+}

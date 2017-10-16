@@ -27,13 +27,12 @@ namespace render {
             std::shared_ptr<pipeline::Pipeline> pl;
             buffer::Uniform* ub;
             Material(shader::Id sid, unsigned int us, Engine* e);
-            virtual void sub_bind() = 0;
 
         public:
             virtual ~Material();
             virtual unsigned int get_vertex_elements_count() const = 0;
             virtual void update(const model::Uniform& muni) = 0;
-            void bind();
+            virtual void bind() = 0;
             static Material* read(system::File* f, Engine* e, std::shared_ptr<gearoenix::core::EndCaller> end);
         };
     }
