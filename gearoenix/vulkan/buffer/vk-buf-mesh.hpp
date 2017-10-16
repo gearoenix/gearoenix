@@ -27,6 +27,8 @@ namespace render {
         public:
             Mesh(unsigned int vertex_elements_count, system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c);
             ~Mesh();
+            void bind();
+            void draw();
         };
     } // namespace buffer
 } // namespace render

@@ -3,11 +3,11 @@
 #include "../../system/sys-file.hpp"
 #include "../buffer/rnd-buf-mesh.hpp"
 #include "../material/rnd-mat-material.hpp"
+#include "../model/rnd-mdl-uniform.hpp"
 #include "../rnd-engine.hpp"
 
 gearoenix::render::mesh::Mesh::Mesh(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c)
 {
-
     //    LOGE("location: " << f->tell());
     mat = material::Material::read(f, e, c);
     buf = new buffer::Mesh(mat->get_vertex_elements_count(), f, e, c);
@@ -17,4 +17,12 @@ gearoenix::render::mesh::Mesh::~Mesh()
 {
     delete mat;
     delete buf;
+}
+
+void gearoenix::render::mesh::Mesh::draw(const model::Uniform& mu)
+{
+    mat->update(mu);
+    mat->bind();
+    buf->bind();
+    buf->draw();
 }

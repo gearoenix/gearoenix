@@ -22,6 +22,7 @@ void gearoenix::render::model::Static::draw(const std::shared_ptr<camera::Camera
 
 void gearoenix::render::model::Static::draw(const std::shared_ptr<camera::Camera>& cam, const Uniform& pu)
 {
+    //    mesh->
     for (Model* m : children) {
         m->draw(cam, pu);
     }

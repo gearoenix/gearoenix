@@ -13,11 +13,13 @@ namespace render {
 
         private:
             Uniform u;
+            void sub_bind();
 
         public:
             White(Engine* e);
             ~White();
             unsigned int get_vertex_elements_count() const;
+            void update(const model::Uniform& muni);
         };
     }
 }

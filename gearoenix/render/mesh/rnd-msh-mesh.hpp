@@ -16,6 +16,9 @@ namespace render {
     namespace material {
         class Material;
     }
+    namespace model {
+        class Uniform;
+    }
     namespace mesh {
         class Mesh {
         private:
@@ -25,6 +28,7 @@ namespace render {
         public:
             Mesh(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c);
             ~Mesh();
+            void draw(const model::Uniform& mu);
         };
     }
 }

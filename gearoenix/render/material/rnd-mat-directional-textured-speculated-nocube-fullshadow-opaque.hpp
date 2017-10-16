@@ -31,11 +31,13 @@ namespace render {
             Uniform u;
             std::shared_ptr<texture::Texture2D> t;
             shader::Resources* shdrsc;
+            void sub_bind();
 
         public:
             DirectionalTexturedSpeculatedNocubeFullshadowOpaque(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> end);
             ~DirectionalTexturedSpeculatedNocubeFullshadowOpaque();
             unsigned int get_vertex_elements_count() const;
+            void update(const model::Uniform& muni);
         };
     }
 }
