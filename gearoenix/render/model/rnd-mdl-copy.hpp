@@ -17,6 +17,8 @@ namespace render {
 
         public:
             Copy(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c);
+            void draw(const std::shared_ptr<camera::Camera>& cam);
+            void draw(const std::shared_ptr<camera::Camera>& cam, const Uniform&);
         };
     }
 }

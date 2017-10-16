@@ -32,11 +32,14 @@ namespace render {
             std::vector<std::shared_ptr<audio::Audio>> audios;
             std::vector<std::shared_ptr<light::Light>> lights;
             std::vector<std::shared_ptr<model::Model>> models;
+            Engine* e;
+            unsigned int curcam = 0;
 
         protected:
             Scene(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c);
 
         public:
+            virtual void draw();
             virtual ~Scene();
             static Scene* read(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c);
         };

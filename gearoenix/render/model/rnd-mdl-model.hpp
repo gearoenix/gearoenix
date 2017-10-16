@@ -11,7 +11,11 @@ namespace system {
 }
 namespace render {
     class Engine;
+    namespace camera {
+        class Camera;
+    }
     namespace model {
+        class Uniform;
         class Model : public core::asset::Asset {
         protected:
             Model();
@@ -19,6 +23,8 @@ namespace render {
 
         public:
             virtual ~Model();
+            virtual void draw(const std::shared_ptr<camera::Camera>& cam) = 0;
+            virtual void draw(const std::shared_ptr<camera::Camera>& cam, const Uniform& pu) = 0;
             static Model* read(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c);
         };
     }

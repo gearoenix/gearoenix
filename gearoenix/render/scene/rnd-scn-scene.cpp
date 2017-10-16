@@ -10,6 +10,7 @@
 #include "../rnd-engine.hpp"
 
 gearoenix::render::scene::Scene::Scene(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c)
+    : e(e)
 {
     core::asset::Manager* amgr = e->get_system_application()->get_asset_manager();
     std::vector<core::Id> camera_ids;
@@ -46,4 +47,12 @@ gearoenix::render::scene::Scene* gearoenix::render::scene::Scene::read(
     system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c)
 {
     return new Scene(f, e, c);
+}
+
+void gearoenix::render::scene::Scene::draw()
+{
+    const std::shared_ptr<camera::Camera>& cam = cameras[curcam];
+    for (std::shared_ptr<model::Model>& m : models) {
+        m->draw(cam);
+    }
 }
