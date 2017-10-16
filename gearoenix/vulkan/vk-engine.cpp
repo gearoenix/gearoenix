@@ -360,10 +360,16 @@ unsigned int gearoenix::render::Engine::get_frames_count() const
     return framebuffers.size();
 }
 
-void gearoenix::render::Engine::load_scene(core::Id scene_id, std::function<void()> on_load)
+unsigned int gearoenix::render::Engine::load_scene(core::Id scene_id, std::function<void(unsigned int)> on_load)
 {
-    sys_app->get_asset_manager()->get_scene(
-        scene_id, std::shared_ptr<core::EndCaller>(new core::EndCaller(on_load)));
+    unsigned int result = loaded_scenes.size();
+    SceneInfo si;
+    si.scene = sys_app->get_asset_manager()->get_scene(scene_id, core::EndCaller::create(
+                                                                     [result, on_load] {
+                                                                         on_load(result);
+                                                                     }));
+    loaded_scenes.push_back(si);
+    return result;
 }
 
 void gearoenix::render::Engine::push_todo(std::function<std::function<void()>(command::Buffer*)> fun)

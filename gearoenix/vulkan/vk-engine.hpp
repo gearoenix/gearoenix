@@ -52,6 +52,11 @@ namespace render {
     class Swapchain;
     class Engine {
     private:
+        typedef struct {
+            std::shared_ptr<scene::Scene> scene;
+            bool renderable = true;
+        } SceneInfo;
+
         system::Application* sys_app;
         Linker* linker;
         Instance* instance;
@@ -76,7 +81,7 @@ namespace render {
         std::mutex todos_mutex;
         std::vector<std::function<std::function<void()>(command::Buffer*)>> todos;
         std::vector<std::vector<std::function<void()>>> frames_cleanups;
-        std::vector<std::shared_ptr<scene::Scene>> loaded_scene;
+        std::vector<SceneInfo> loaded_scenes;
         uint32_t current_frame;
         void setup_draw_buffers();
 
@@ -100,7 +105,7 @@ namespace render {
         const texture::Sampler2D* get_sampler_2d() const;
         texture::Sampler2D* get_sampler_2d();
         unsigned int get_frames_count() const;
-        void load_scene(core::Id scene_id, std::function<void()> on_load = [] {});
+        unsigned int load_scene(core::Id scene_id, std::function<void(unsigned int)> on_load = [](unsigned int) {});
         void push_todo(std::function<std::function<void()>(command::Buffer*)> fun);
     };
 }
