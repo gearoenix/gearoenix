@@ -49,10 +49,21 @@ gearoenix::render::scene::Scene* gearoenix::render::scene::Scene::read(
     return new Scene(f, e, c);
 }
 
+void gearoenix::render::scene::Scene::commit()
+{
+    for (std::shared_ptr<model::Model>& m : models) {
+        m->commit(this);
+    }
+}
+
 void gearoenix::render::scene::Scene::draw()
 {
-    const std::shared_ptr<camera::Camera>& cam = cameras[curcam];
     for (std::shared_ptr<model::Model>& m : models) {
-        m->draw(cam);
+        m->draw();
     }
+}
+
+const gearoenix::render::camera::Camera* gearoenix::render::scene::Scene::get_current_camera() const
+{
+    cameras[curcam].get();
 }

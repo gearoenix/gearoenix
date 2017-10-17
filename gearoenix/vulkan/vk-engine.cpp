@@ -42,21 +42,26 @@ gearoenix::render::Engine::Engine(system::Application* sys_app)
     render_pass = new RenderPass(swapchain);
     const std::vector<image::View*>& frame_views = swapchain->get_image_views();
     graphic_cmd_pool = new command::Pool(logical_device);
-    framebuffers.resize(frame_views.size());
-    wait_fences.resize(frame_views.size());
-    frames_cleanups.resize(frame_views.size());
-    cmd_bufs.resize(frame_views.size());
-    for (unsigned int i = 0; i < frame_views.size(); ++i) {
+    vmemmgr = new memory::Manager(logical_device, 1024 * 1024 * 10);
+    cmemmgr = new memory::Manager(logical_device, 1024 * 1024 * 10, memory::Manager::CPU_COHERENT);
+    vbufmgr = new buffer::Manager(vmemmgr, 5 * 1024 * 1024);
+    cbufmgr = new buffer::Manager(cmemmgr, 10 * 1024 * 1024);
+    frames_count = frame_views.size();
+    framebuffers.resize(frames_count);
+    wait_fences.resize(frames_count);
+    frames_cleanups.resize(frames_count);
+    cmd_bufs.resize(frames_count);
+    ucbufmgr.resize(frames_count);
+    uvbufmgr.resize(frames_count);
+    for (unsigned int i = 0; i < frames_count; ++i) {
         framebuffers[i] = new Framebuffer(frame_views[i], depth_stencil, render_pass);
         wait_fences[i] = new sync::Fence(logical_device, true);
         cmd_bufs[i] = new command::Buffer(graphic_cmd_pool);
+        ucbufmgr[i] = new buffer::Manager(1024 * 1024, cbufmgr);
+        uvbufmgr[i] = new buffer::Manager(1024 * 1024, vbufmgr);
     }
     present_complete_semaphore = new sync::Semaphore(logical_device);
     render_complete_semaphore = new sync::Semaphore(logical_device);
-    vmemmgr = new memory::Manager(logical_device, 1024 * 1024 * 10);
-    cmemmgr = new memory::Manager(logical_device, 1024 * 1024 * 10, memory::Manager::CPU_COHERENT);
-    vbufmgr = new buffer::Manager(vmemmgr, 4 * 1024 * 1024);
-    cbufmgr = new buffer::Manager(cmemmgr, 10 * 1024 * 1024);
     pipmgr = new pipeline::Manager(this);
     sampler_2d = new texture::Sampler2D(logical_device);
     //    setup_draw_buffers();
@@ -71,8 +76,8 @@ void gearoenix::render::Engine::window_changed()
     //    depth_stencil = image::View::create_depth_stencil(mem_pool);
     //    render_pass = std::shared_ptr<RenderPass>(new RenderPass(swapchain));
     //    auto frame_views = swapchain->get_image_views();
-    //    framebuffers.resize(frame_views.size());
-    //    for (uint32_t i = 0; i < frame_views.size(); ++i) {
+    //    framebuffers.resize(frames_count);
+    //    for (uint32_t i = 0; i < frames_count; ++i) {
     //        framebuffers[i] = std::shared_ptr<Framebuffer>(
     //            new Framebuffer(frame_views[i], depth_stencil, render_pass));
     //    }
@@ -112,6 +117,11 @@ void gearoenix::render::Engine::update()
     for (std::function<std::function<void()>(command::Buffer*)>& fn : temp_todos) {
         frames_cleanups[current_frame].push_back(fn(gcmd));
     }
+
+    for (std::shared_ptr<scene::Scene>& s : loaded_scenes) {
+        s->commit();
+    }
+    LOGF("TODO: place memory/buffer/image barriers in here.");
 
     VkClearValue clear_values[2];
     clear_values[0].color = { { 0.4f, 0.4f, 0.4f, 1.0f } };
@@ -193,6 +203,12 @@ void gearoenix::render::Engine::terminate()
     // TODO think about todos
     // TODO think about cleanups
     logical_device->wait_to_finish();
+    for (buffer::Manager* u : uvbufmgr)
+        delete u;
+    for (buffer::Manager* u : ucbufmgr)
+        delete u;
+    for (command::Buffer* c : cmd_bufs)
+        delete c;
     delete sampler_2d;
     sampler_2d = nullptr;
     delete pipmgr;
@@ -313,7 +329,7 @@ gearoenix::render::RenderPass* gearoenix::render::Engine::get_render_pass()
     return render_pass;
 }
 
-gearoenix::render::buffer::Manager* gearoenix::render::Engine::get_v_buffer_manager()
+gearoenix::render::buffer::Manager* gearoenix::render::Engine::get_gpu_buffer_manager()
 {
     return vbufmgr;
 }
@@ -321,6 +337,16 @@ gearoenix::render::buffer::Manager* gearoenix::render::Engine::get_v_buffer_mana
 gearoenix::render::buffer::Manager* gearoenix::render::Engine::get_cpu_buffer_manager()
 {
     return cbufmgr;
+}
+
+gearoenix::render::buffer::Manager* gearoenix::render::Engine::get_uniform_gpu_buffer_manager(unsigned int i)
+{
+    return uvbufmgr[i];
+}
+
+gearoenix::render::buffer::Manager* gearoenix::render::Engine::get_uniform_cpu_buffer_manager(unsigned int i)
+{
+    return ucbufmgr[i];
 }
 
 gearoenix::system::Application* gearoenix::render::Engine::get_system_application()
@@ -366,12 +392,7 @@ unsigned int gearoenix::render::Engine::get_frames_count() const
 unsigned int gearoenix::render::Engine::load_scene(core::Id scene_id, std::function<void(unsigned int)> on_load)
 {
     unsigned int result = loaded_scenes.size();
-    loaded_scenes.push_back(sys_app
-                                ->get_asset_manager()
-                                ->get_scene(scene_id, core::EndCaller::create(
-                                                          [result, on_load] {
-                                                              on_load(result);
-                                                          })));
+    loaded_scenes.push_back(sys_app->get_asset_manager()->get_scene(scene_id, core::EndCaller::create([result, on_load] { on_load(result); })));
     return result;
 }
 
@@ -380,4 +401,14 @@ void gearoenix::render::Engine::push_todo(std::function<std::function<void()>(co
     std::lock_guard<std::mutex> lock(todos_mutex);
     todos.push_back(fun);
     (void)lock;
+}
+
+unsigned int gearoenix::render::Engine::get_current_frame_index() const
+{
+    return current_frame;
+}
+
+gearoenix::render::command::Buffer* gearoenix::render::Engine::get_current_command_buffer()
+{
+    return cmd_bufs[current_frame];
 }

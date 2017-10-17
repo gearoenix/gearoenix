@@ -30,6 +30,9 @@ namespace system {
     LOGE(s);    \
     std::terminate();
 #endif // IN_ANDROID
+#define TODO LOGE("TODO")
+#define UNEXPECTED LOGF("Unexpected")
+#define UNIMPLEMENTED LOGF("Unimplemented")
 #else // LOG_ENABLED
 #endif // LOG_ENABLED
 #endif // GEAROENIX_SYSTEM_LOG_HPP

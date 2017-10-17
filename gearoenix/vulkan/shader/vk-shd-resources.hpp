@@ -18,6 +18,7 @@ namespace render {
     namespace shader {
         class Resources {
         private:
+            Engine* e;
             descriptor::Set** dessets;
             unsigned int dc;
 
@@ -25,6 +26,7 @@ namespace render {
             Resources(Engine* e, pipeline::Pipeline* pip, buffer::Uniform* u);
             Resources(Engine* e, pipeline::Pipeline* pip, buffer::Uniform* u, texture::Texture2D* t);
             ~Resources();
+            void bind(pipeline::Pipeline* pip);
         };
     }
 }

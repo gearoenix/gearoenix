@@ -12,6 +12,7 @@
 
 gearoenix::render::material::Material::Material(shader::Id sid, unsigned int us, Engine* e)
     : ub(new buffer::Uniform(us, e))
+    , e(e)
 {
     system::File* f = e->get_system_application()->get_asset_manager()->get_file();
     unsigned int curloc = f->tell();

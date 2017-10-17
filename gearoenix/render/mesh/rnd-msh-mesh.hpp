@@ -17,7 +17,10 @@ namespace render {
         class Material;
     }
     namespace model {
-        class Uniform;
+        class Model;
+    }
+    namespace scene {
+        class Scene;
     }
     namespace mesh {
         class Mesh {
@@ -28,7 +31,7 @@ namespace render {
         public:
             Mesh(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c);
             ~Mesh();
-            void draw(const model::Uniform& mu);
+            void draw(const scene::Scene* s, const model::Model* m);
         };
     }
 }

@@ -27,3 +27,13 @@ gearoenix::render::model::Model* gearoenix::render::model::Model::read(system::F
     else
         return new RootStatic(f, e, c);
 }
+
+const gearoenix::math::Mat4x4& gearoenix::render::model::Model::get_m() const
+{
+    return m;
+}
+
+const gearoenix::math::Mat4x4& gearoenix::render::model::Model::get_mvp() const
+{
+    return mvp;
+}

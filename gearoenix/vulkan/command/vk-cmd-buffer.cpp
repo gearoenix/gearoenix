@@ -104,3 +104,12 @@ void gearoenix::render::command::Buffer::end_render_pass()
 {
     linker->vkCmdEndRenderPass(vulkan_data);
 }
+
+void gearoenix::render::command::Buffer::bind_descriptor_set(
+    VkPipelineBindPoint pipeline_bind_point,
+    VkPipelineLayout pipeline_layout,
+    uint32_t first_set,
+    const VkDescriptorSet& desset)
+{
+    linker->vkCmdBindDescriptorSets(vulkan_data, pipeline_bind_point, pipeline_layout, first_set, 1, &desset, 0, nullptr);
+}

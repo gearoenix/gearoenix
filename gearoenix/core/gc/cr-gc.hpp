@@ -24,11 +24,14 @@ namespace core {
             void remove_range(const Range& r);
             void add_range(const Range& r);
             void deallocate(Object* obj);
+            void initialize();
+
+        protected:
+            void allocate(Object* obj);
 
         public:
-            Gc(unsigned int size);
+            Gc(unsigned int size, Gc* parent = nullptr);
             virtual ~Gc();
-            void allocate(Object* obj);
             list::List<Object*>* get_objects();
         };
     }

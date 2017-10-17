@@ -4,6 +4,12 @@
 #include "../vk-linker.hpp"
 namespace gearoenix {
 namespace render {
+    namespace command {
+        class Buffer;
+    }
+    namespace pipeline {
+        class Pipeline;
+    }
     namespace descriptor {
         class SetLayout;
         class Pool;
@@ -23,6 +29,7 @@ namespace render {
             unsigned int get_layouts_count() const;
             const VkDescriptorSetLayout& get_layout() const;
             const VkDescriptorSet& get_vulkan_data() const;
+            void bind(pipeline::Pipeline* p, command::Buffer* c);
         };
 
     } // namespace descriptor

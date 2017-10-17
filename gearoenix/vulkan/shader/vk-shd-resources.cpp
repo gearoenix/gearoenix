@@ -12,6 +12,7 @@
 #include "../vk-engine.hpp"
 
 gearoenix::render::shader::Resources::Resources(Engine* e, pipeline::Pipeline* pip, buffer::Uniform* u)
+    : e(e)
 {
     dc = u->get_count();
     dessets = new descriptor::Set*[dc];
@@ -26,6 +27,7 @@ gearoenix::render::shader::Resources::Resources(Engine* e, pipeline::Pipeline* p
 }
 
 gearoenix::render::shader::Resources::Resources(Engine* e, pipeline::Pipeline* pip, buffer::Uniform* u, texture::Texture2D* t)
+    : e(e)
 {
     dc = u->get_count();
     dessets = new descriptor::Set*[dc];
@@ -50,4 +52,10 @@ gearoenix::render::shader::Resources::~Resources()
         delete dessets[i];
     }
     delete[] dessets;
+}
+
+void gearoenix::render::shader::Resources::bind(pipeline::Pipeline* p)
+{
+    command::Buffer* c = e->get_current_command_buffer();
+    dessets[e->get_current_frame_index()]->bind(p, c);
 }

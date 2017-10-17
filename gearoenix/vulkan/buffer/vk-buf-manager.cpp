@@ -29,9 +29,22 @@ gearoenix::render::buffer::Manager::Manager(memory::Manager* mem_mgr, unsigned i
     buff = new Buffer(mem_mgr, size, buf_usage);
 }
 
+gearoenix::render::buffer::Manager::Manager(unsigned int size, Manager* parent)
+    : Gc(size, parent)
+    , mem_mgr(parent->mem_mgr)
+    , buff(parent->buff)
+    , usage(parent->usage)
+    , align(parent->align)
+    , coalign(parent->coalign)
+    , decoalign(parent->decoalign)
+    , parent(parent)
+{
+}
+
 gearoenix::render::buffer::Manager::~Manager()
 {
-    delete buff;
+    if (nullptr != parent)
+        delete buff;
 }
 
 const gearoenix::render::buffer::Buffer* gearoenix::render::buffer::Manager::get_buffer() const

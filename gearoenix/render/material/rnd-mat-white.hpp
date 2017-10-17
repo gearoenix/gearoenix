@@ -4,6 +4,9 @@
 #include "rnd-mat-material.hpp"
 namespace gearoenix {
 namespace render {
+    namespace shader {
+        class Resources;
+    }
     namespace material {
         class White : public Material {
         public:
@@ -13,13 +16,15 @@ namespace render {
 
         private:
             Uniform u;
+            shader::Resources* shdrsc;
             void sub_bind();
 
         public:
             White(Engine* e);
             ~White();
             unsigned int get_vertex_elements_count() const;
-            void update(const model::Uniform& muni);
+            void update(const scene::Scene* s, const model::Model* m);
+            void bind();
         };
     }
 }

@@ -3,6 +3,8 @@
 #include "../../core/cr-end-caller.hpp"
 #include "../../system/sys-app.hpp"
 #include "../../system/sys-file.hpp"
+#include "../buffer/rnd-buf-uniform.hpp"
+#include "../model/rnd-mdl-model.hpp"
 #include "../rnd-engine.hpp"
 #include "../shader/rnd-shd-resources.hpp"
 #include "../texture/rnd-txt-texture-2d.hpp"
@@ -35,6 +37,14 @@ unsigned int gearoenix::render::material::DirectionalTexturedSpeculatedNocubeFul
     return shader::Shader::get_vertex_real_count(shader::DIRECTIONAL_TEXTURED_SPECULATED_NOCUBE_FULLSHADOW_OPAQUE);
 }
 
-void gearoenix::render::material::DirectionalTexturedSpeculatedNocubeFullshadowOpaque::update(const model::Uniform& muni)
+void gearoenix::render::material::DirectionalTexturedSpeculatedNocubeFullshadowOpaque::update(const scene::Scene*, const model::Model* m)
 {
+    u.mvp = m->get_mvp();
+    u.m = m->get_m();
+    ub->update(&u, sizeof(Uniform));
+}
+
+void gearoenix::render::material::DirectionalTexturedSpeculatedNocubeFullshadowOpaque::bind()
+{
+    shdrsc->bind(pl.get());
 }

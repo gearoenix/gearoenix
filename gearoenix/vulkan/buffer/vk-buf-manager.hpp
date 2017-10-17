@@ -22,9 +22,11 @@ namespace render {
             Buffer* buff;
             Usage usage;
             unsigned int align, coalign, decoalign;
+            Manager* parent = nullptr;
 
         public:
             Manager(memory::Manager* mem_mgr, unsigned int size, Usage usage = (Usage)(VERTEX | INDEX | UNIFORM));
+            Manager(unsigned int size, Manager* parent);
             ~Manager();
             const Buffer* get_buffer() const;
             Buffer* get_buffer();

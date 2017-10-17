@@ -68,8 +68,10 @@ namespace render {
         std::vector<sync::Fence*> wait_fences;
         memory::Manager* vmemmgr;
         buffer::Manager* vbufmgr;
+        std::vector<buffer::Manager*> uvbufmgr;
         memory::Manager* cmemmgr;
         buffer::Manager* cbufmgr;
+        std::vector<buffer::Manager*> ucbufmgr;
         pipeline::Manager* pipmgr;
         texture::Sampler2D* sampler_2d;
         std::vector<command::Buffer*> cmd_bufs;
@@ -77,7 +79,8 @@ namespace render {
         std::vector<std::function<std::function<void()>(command::Buffer*)>> todos;
         std::vector<std::vector<std::function<void()>>> frames_cleanups;
         std::vector<std::shared_ptr<scene::Scene>> loaded_scenes;
-        uint32_t current_frame;
+        uint32_t current_frame = 9999999;
+        uint32_t frames_count = 9999999;
         void setup_draw_buffers();
 
     public:
@@ -90,8 +93,10 @@ namespace render {
         const device::Logical* get_logical_device() const;
         device::Logical* get_logical_device();
         RenderPass* get_render_pass();
-        buffer::Manager* get_v_buffer_manager();
+        buffer::Manager* get_gpu_buffer_manager();
         buffer::Manager* get_cpu_buffer_manager();
+        buffer::Manager* get_uniform_gpu_buffer_manager(unsigned int i);
+        buffer::Manager* get_uniform_cpu_buffer_manager(unsigned int i);
         system::Application* get_system_application();
         memory::Manager* get_v_memory_manager();
         memory::Manager* get_cpu_memory_manager();
@@ -100,6 +105,8 @@ namespace render {
         const texture::Sampler2D* get_sampler_2d() const;
         texture::Sampler2D* get_sampler_2d();
         unsigned int get_frames_count() const;
+        unsigned int get_current_frame_index() const;
+        command::Buffer* get_current_command_buffer();
         unsigned int load_scene(core::Id scene_id, std::function<void(unsigned int)> on_load = [](unsigned int) {});
         void push_todo(std::function<std::function<void()>(command::Buffer*)> fun);
     };

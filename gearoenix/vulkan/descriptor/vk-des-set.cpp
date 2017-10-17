@@ -1,9 +1,11 @@
 #include "vk-des-set.hpp"
 #include "../../core/cr-static.hpp"
 #include "../../render/shader/rnd-shd-shader.hpp"
+#include "../command/vk-cmd-buffer.hpp"
 #include "../device/vk-dev-logical.hpp"
 #include "../device/vk-dev-physical.hpp"
 #include "../pipeline/vk-pip-layout.hpp"
+#include "../pipeline/vk-pip-pipeline.hpp"
 #include "../vk-check.hpp"
 #include "../vk-instance.hpp"
 #include "vk-des-pool.hpp"
@@ -90,4 +92,13 @@ const gearoenix::render::descriptor::Pool* gearoenix::render::descriptor::Set::g
 gearoenix::render::descriptor::Pool* gearoenix::render::descriptor::Set::get_pool()
 {
     return pool;
+}
+
+void gearoenix::render::descriptor::Set::bind(pipeline::Pipeline* p, command::Buffer* c)
+{
+    c->bind_descriptor_set(
+        VK_PIPELINE_BIND_POINT_GRAPHICS,
+        p->get_layout()->get_vulkan_data(),
+        0,
+        vulkan_data);
 }

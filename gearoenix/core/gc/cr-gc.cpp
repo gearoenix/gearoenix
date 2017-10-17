@@ -56,19 +56,25 @@ void gearoenix::core::gc::Gc::deallocate(Object* obj)
     add_range(Range(start_node, end_node));
 }
 
-gearoenix::core::gc::Gc::Gc(unsigned int size)
-    : Object(size)
-    , objects(new list::List<Object*>)
+void gearoenix::core::gc::Gc::initialize()
 {
+    objects = new list::List<Object*>;
     Object* start = new Object(0);
     Object* end = new Object(0);
-    end->offset = size;
+    end->offset = this->end;
     objects->add_front(start);
     objects->add_end(end);
     Range r(objects->get_front(), objects->get_end());
     std::map<unsigned int, Range> ranges;
     ranges[0] = r;
     free_ranges[size] = ranges;
+}
+
+gearoenix::core::gc::Gc::Gc(unsigned int size, Gc* parent)
+    : Object(size)
+{
+    parent->allocate(this);
+    initialize();
 }
 
 gearoenix::core::gc::Gc::~Gc()

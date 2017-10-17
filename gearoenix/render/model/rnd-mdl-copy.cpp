@@ -6,12 +6,12 @@
 #include "../../system/sys-file.hpp"
 #include "../camera/rnd-cmr-camera.hpp"
 #include "../rnd-engine.hpp"
+#include "../scene/rnd-scn-scene.hpp"
 #include "rnd-mdl-root-static.hpp"
-#include "rnd-mdl-uniform.hpp"
 
 gearoenix::render::model::Copy::Copy(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c)
 {
-    u.get_m().read(f);
+    m.read(f);
     core::Id rsid;
     f->read(rsid);
     unsigned int cp = f->tell();
@@ -19,13 +19,18 @@ gearoenix::render::model::Copy::Copy(system::File* f, Engine* e, std::shared_ptr
     f->seek(cp);
 }
 
-void gearoenix::render::model::Copy::draw(const std::shared_ptr<camera::Camera>& cam)
+void gearoenix::render::model::Copy::commit(const scene::Scene* s)
 {
-    u.get_mvp() = cam->get_view_projection() * u.get_m();
-    rs->draw(cam, u);
+    mvp = s->get_current_camera()->get_view_projection() * m;
+    rs->commit(s, this);
 }
 
-void gearoenix::render::model::Copy::draw(const std::shared_ptr<camera::Camera>& cam, const Uniform&)
+void gearoenix::render::model::Copy::commit(const scene::Scene* s, const Model*)
 {
-    draw(cam);
+    commit(s);
+}
+
+void gearoenix::render::model::Copy::draw()
+{
+    UNIMPLEMENTED;
 }

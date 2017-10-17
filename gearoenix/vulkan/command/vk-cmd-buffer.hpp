@@ -28,6 +28,11 @@ namespace render {
             void set_scissor(const VkRect2D& scissor);
             void end();
             void end_render_pass();
+            void bind_descriptor_set(
+                VkPipelineBindPoint pipeline_bind_point,
+                VkPipelineLayout pipeline_layout,
+                uint32_t first_set,
+                const VkDescriptorSet& desset);
         };
     }
 }

@@ -3,7 +3,6 @@
 #include "../../system/sys-file.hpp"
 #include "../buffer/rnd-buf-mesh.hpp"
 #include "../material/rnd-mat-material.hpp"
-#include "../model/rnd-mdl-uniform.hpp"
 #include "../rnd-engine.hpp"
 
 gearoenix::render::mesh::Mesh::Mesh(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c)
@@ -19,9 +18,9 @@ gearoenix::render::mesh::Mesh::~Mesh()
     delete buf;
 }
 
-void gearoenix::render::mesh::Mesh::draw(const model::Uniform& mu)
+void gearoenix::render::mesh::Mesh::draw(const scene::Scene* s, const model::Model* m)
 {
-    mat->update(mu);
+    mat->update(s, m);
     mat->bind();
     buf->bind();
     buf->draw();

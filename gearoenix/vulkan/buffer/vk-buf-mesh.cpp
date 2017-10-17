@@ -11,7 +11,7 @@
 gearoenix::render::buffer::Mesh::Mesh(unsigned int vertex_elements_count, system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c)
 {
     Manager* cm = e->get_cpu_buffer_manager();
-    Manager* vm = e->get_v_buffer_manager();
+    Manager* vm = e->get_gpu_buffer_manager();
     core::Count cnt;
     f->read(cnt);
     vc = cnt;

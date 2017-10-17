@@ -11,8 +11,9 @@ gearoenix::render::buffer::Uniform::Uniform(unsigned int us, Engine* e)
     , uc(e->get_frames_count())
     , vbuf(new SubBuffer*[uc])
     , cbuf(new SubBuffer*[uc])
+    , e(e)
 {
-    Manager* vbm = e->get_v_buffer_manager();
+    Manager* vbm = e->get_gpu_buffer_manager();
     Manager* cbm = e->get_cpu_buffer_manager();
     for (unsigned int i = 0; i < uc; ++i) {
         vbuf[i] = vbm->create_subbuffer(us);
@@ -48,4 +49,10 @@ unsigned int gearoenix::render::buffer::Uniform::get_count() const
 unsigned int gearoenix::render::buffer::Uniform::get_size() const
 {
     return us;
+}
+
+void gearoenix::render::buffer::Uniform::update(const void* data, unsigned int data_size)
+{
+    unsigned int frmind = e->get_current_frame_index();
+    cbuf[frmind]->write(data, data_size);
 }

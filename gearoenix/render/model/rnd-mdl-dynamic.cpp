@@ -3,10 +3,11 @@
 #include "../../system/sys-file.hpp"
 #include "../camera/rnd-cmr-camera.hpp"
 #include "../mesh/rnd-msh-occ.hpp"
+#include "../scene/rnd-scn-scene.hpp"
 
 gearoenix::render::model::Dynamic::Dynamic(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c)
 {
-    u.get_m().read(f);
+    m.read(f);
     //    LOGE("location: " << f->tell());
     occmesh = new mesh::Occ(f, e, c);
     core::Count cc;
@@ -18,15 +19,23 @@ gearoenix::render::model::Dynamic::Dynamic(system::File* f, Engine* e, std::shar
         children[i] = Model::read_child(f, e, c);
 }
 
-void gearoenix::render::model::Dynamic::draw(const std::shared_ptr<camera::Camera>& cam)
+void gearoenix::render::model::Dynamic::commit(const scene::Scene* s)
 {
-    u.get_mvp() = cam->get_view_projection() * u.get_m();
+    mvp = s->get_current_camera()->get_view_projection() * m;
     for (Model* m : children) {
-        m->draw(cam, u);
+        m->commit(s, this);
     }
 }
 
-void gearoenix::render::model::Dynamic::draw(const std::shared_ptr<camera::Camera>& cam, const Uniform&)
+void gearoenix::render::model::Dynamic::commit(const scene::Scene* s, const Model*)
 {
-    draw(cam);
+    commit(s);
+}
+
+void gearoenix::render::model::Dynamic::draw()
+{
+    LOGE("TODO: do occlusion culling.");
+    for (Model* m : children) {
+        m->draw();
+    }
 }

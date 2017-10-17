@@ -39,9 +39,11 @@ namespace render {
             Scene(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c);
 
         public:
+            virtual void commit();
             virtual void draw();
             virtual ~Scene();
             static Scene* read(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c);
+            const camera::Camera* get_current_camera() const;
         };
     }
 }

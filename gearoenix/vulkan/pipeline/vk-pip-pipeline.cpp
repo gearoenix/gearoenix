@@ -173,3 +173,8 @@ gearoenix::render::descriptor::SetLayout* gearoenix::render::pipeline::Pipeline:
 {
     return dessetlay;
 }
+
+const gearoenix::render::pipeline::Layout* gearoenix::render::pipeline::Pipeline::get_layout() const
+{
+    return layout;
+}

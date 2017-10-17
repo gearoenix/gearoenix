@@ -14,6 +14,7 @@ namespace render {
             unsigned int uc;
             SubBuffer** vbuf;
             SubBuffer** cbuf;
+            Engine* e;
 
         public:
             Uniform(unsigned int us, Engine* e);
@@ -22,6 +23,7 @@ namespace render {
             const SubBuffer* const* get_cbuf() const;
             unsigned int get_count() const;
             unsigned int get_size() const;
+            void update(const void* data, unsigned int data_size);
         };
     } // namespace buffer
 } // namespace render
