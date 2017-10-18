@@ -197,9 +197,9 @@ void gearoenix::render::Engine::update()
     scissor.offset.x = 0;
     scissor.offset.y = 0;
     gcmd->set_scissor(scissor);
-    //    for (std::shared_ptr<scene::Scene>& s : loaded_scenes) {
-    //        s->draw();
-    //    }
+    for (std::shared_ptr<scene::Scene>& s : loaded_scenes) {
+        s->draw();
+    }
     //    linker->vkCmdBindDescriptorSets(
     //        draw_command->get_vulkan_data(), VK_PIPELINE_BIND_POINT_GRAPHICS,
     //        pipeline_layout->get_vulkan_data(), 0, 1,
@@ -436,7 +436,10 @@ unsigned int gearoenix::render::Engine::get_frames_count() const
 unsigned int gearoenix::render::Engine::load_scene(core::Id scene_id, std::function<void(unsigned int)> on_load)
 {
     unsigned int result = loaded_scenes.size();
-    loaded_scenes.push_back(sys_app->get_asset_manager()->get_scene(scene_id, core::EndCaller::create([result, on_load] { on_load(result); })));
+    loaded_scenes.push_back(sys_app->get_asset_manager()->get_scene(scene_id, core::EndCaller::create([this, result, on_load] {
+        loaded_scenes[result]->set_renderable(true);
+        on_load(result);
+    })));
     return result;
 }
 

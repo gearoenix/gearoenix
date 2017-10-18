@@ -58,12 +58,19 @@ void gearoenix::render::scene::Scene::commit()
 
 void gearoenix::render::scene::Scene::draw()
 {
-    for (std::shared_ptr<model::Model>& m : models) {
-        m->draw();
+    if (renderable) {
+        for (std::shared_ptr<model::Model>& m : models) {
+            m->draw();
+        }
     }
 }
 
 const gearoenix::render::camera::Camera* gearoenix::render::scene::Scene::get_current_camera() const
 {
     return cameras[curcam].get();
+}
+
+void gearoenix::render::scene::Scene::set_renderable(bool b)
+{
+    renderable = b;
 }
