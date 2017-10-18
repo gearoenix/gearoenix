@@ -65,5 +65,5 @@ void gearoenix::render::scene::Scene::draw()
 
 const gearoenix::render::camera::Camera* gearoenix::render::scene::Scene::get_current_camera() const
 {
-    cameras[curcam].get();
+    return cameras[curcam].get();
 }
