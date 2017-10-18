@@ -18,9 +18,13 @@ gearoenix::render::mesh::Mesh::~Mesh()
     delete buf;
 }
 
-void gearoenix::render::mesh::Mesh::draw(const scene::Scene* s, const model::Model* m)
+void gearoenix::render::mesh::Mesh::commit(const scene::Scene* s, const model::Model* m)
 {
     mat->update(s, m);
+}
+
+void gearoenix::render::mesh::Mesh::draw()
+{
     mat->bind();
     buf->bind();
     buf->draw();

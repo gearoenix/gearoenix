@@ -4,11 +4,13 @@
 #include "../../system/sys-log.hpp"
 #include "../command/vk-cmd-buffer.hpp"
 #include "../vk-engine.hpp"
+#include "vk-buf-buffer.hpp"
 #include "vk-buf-manager.hpp"
 #include "vk-buf-sub-buffer.hpp"
 #include <functional>
 
 gearoenix::render::buffer::Mesh::Mesh(unsigned int vertex_elements_count, system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c)
+    : e(e)
 {
     Manager* cm = e->get_cpu_buffer_manager();
     Manager* vm = e->get_gpu_buffer_manager();
@@ -50,4 +52,19 @@ gearoenix::render::buffer::Mesh::~Mesh()
 {
     delete vrtbuf;
     delete indbuf;
+}
+
+void gearoenix::render::buffer::Mesh::bind()
+{
+    command::Buffer* c = e->get_current_command_buffer();
+    VkDeviceSize offset = vrtbuf->get_offset();
+    c->bind_vertex_buffers(vrtbuf->get_buffer()->get_vulkan_data(), offset);
+    offset = indbuf->get_offset();
+    c->bind_index_buffer(indbuf->get_buffer()->get_vulkan_data(), offset);
+}
+
+void gearoenix::render::buffer::Mesh::draw()
+{
+    command::Buffer* c = e->get_current_command_buffer();
+    c->draw_indexed(ic);
 }

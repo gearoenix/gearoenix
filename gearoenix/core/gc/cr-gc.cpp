@@ -73,7 +73,8 @@ void gearoenix::core::gc::Gc::initialize()
 gearoenix::core::gc::Gc::Gc(unsigned int size, Gc* parent)
     : Object(size)
 {
-    parent->allocate(this);
+    if (nullptr != parent)
+        parent->allocate(this);
     initialize();
 }
 

@@ -7,6 +7,7 @@
 #include "../system/sys-app.hpp"
 #include "../system/sys-file.hpp"
 #include "../system/sys-log.hpp"
+#include "buffer/vk-buf-buffer.hpp"
 #include "buffer/vk-buf-manager.hpp"
 #include "command/vk-cmd-buffer.hpp"
 #include "command/vk-cmd-pool.hpp"
@@ -121,7 +122,50 @@ void gearoenix::render::Engine::update()
     for (std::shared_ptr<scene::Scene>& s : loaded_scenes) {
         s->commit();
     }
-    LOGF("TODO: place memory/buffer/image barriers in here.");
+
+    //////////////////////////////////////////////////////////////////////////////////////
+    VkBufferMemoryBarrier buffer_memory_barrier;
+    setz(buffer_memory_barrier);
+    buffer_memory_barrier.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
+    buffer_memory_barrier.srcAccessMask = VK_ACCESS_UNIFORM_READ_BIT;
+    buffer_memory_barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+    buffer_memory_barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+    buffer_memory_barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+    buffer_memory_barrier.buffer = uvbufmgr[current_frame]->get_buffer()->get_vulkan_data();
+    buffer_memory_barrier.size = (VkDeviceSize)uvbufmgr[current_frame]->get_size();
+    buffer_memory_barrier.offset = (VkDeviceSize)uvbufmgr[current_frame]->get_offset();
+    linker->vkCmdPipelineBarrier(
+        gcmd->get_vulkan_data(), // command buffer
+        VK_PIPELINE_STAGE_VERTEX_SHADER_BIT, // srcStageMask
+        VK_PIPELINE_STAGE_TRANSFER_BIT, // dstStageMask
+        0, // dependencyFlags
+        0, // memoryBarrierCount
+        nullptr, // pMemoryBarriers
+        1, // bufferMemoryBarrierCount
+        &buffer_memory_barrier, // pBufferMemoryBarriers
+        0, // imageMemoryBarrierCount
+        nullptr // pImageMemoryBarriers
+        );
+    VkBufferCopy unicpyinf;
+    unicpyinf.dstOffset = uvbufmgr[current_frame]->get_offset();
+    unicpyinf.srcOffset = ucbufmgr[current_frame]->get_offset();
+    unicpyinf.size = uvbufmgr[current_frame]->get_size();
+    gcmd->copy_buffer(cbufmgr->get_buffer()->get_vulkan_data(), vbufmgr->get_buffer()->get_vulkan_data(), unicpyinf);
+    buffer_memory_barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+    buffer_memory_barrier.dstAccessMask = VK_ACCESS_UNIFORM_READ_BIT;
+    linker->vkCmdPipelineBarrier(
+        gcmd->get_vulkan_data(), // command buffer
+        VK_PIPELINE_STAGE_TRANSFER_BIT, // srcStageMask
+        VK_PIPELINE_STAGE_VERTEX_SHADER_BIT, // dstStageMask
+        0, // dependencyFlags
+        0, // memoryBarrierCount
+        nullptr, // pMemoryBarriers
+        1, // bufferMemoryBarrierCount
+        &buffer_memory_barrier, // pBufferMemoryBarriers
+        0, // imageMemoryBarrierCount
+        nullptr // pImageMemoryBarriers
+        );
+    //////////////////////////////////////////////////////////////////////////////////
 
     VkClearValue clear_values[2];
     clear_values[0].color = { { 0.4f, 0.4f, 0.4f, 1.0f } };
@@ -153,9 +197,9 @@ void gearoenix::render::Engine::update()
     scissor.offset.x = 0;
     scissor.offset.y = 0;
     gcmd->set_scissor(scissor);
-    for (std::shared_ptr<scene::Scene>& s : loaded_scenes) {
-        s->draw();
-    }
+    //    for (std::shared_ptr<scene::Scene>& s : loaded_scenes) {
+    //        s->draw();
+    //    }
     //    linker->vkCmdBindDescriptorSets(
     //        draw_command->get_vulkan_data(), VK_PIPELINE_BIND_POINT_GRAPHICS,
     //        pipeline_layout->get_vulkan_data(), 0, 1,

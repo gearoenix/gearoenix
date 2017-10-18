@@ -33,6 +33,9 @@ namespace render {
                 VkPipelineLayout pipeline_layout,
                 uint32_t first_set,
                 const VkDescriptorSet& desset);
+            void bind_vertex_buffers(VkBuffer buf, VkDeviceSize offset);
+            void bind_index_buffer(VkBuffer buf, VkDeviceSize offset);
+            void draw_indexed(VkDeviceSize count);
         };
     }
 }

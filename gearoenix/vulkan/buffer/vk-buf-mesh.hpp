@@ -23,6 +23,7 @@ namespace render {
             unsigned int vs; // I have doubt, it is necessary to keep this I will see it near future
             unsigned int ic;
             unsigned int is; // I have doubt, it is necessary to keep this I will see it near future
+            Engine* e;
 
         public:
             Mesh(unsigned int vertex_elements_count, system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c);

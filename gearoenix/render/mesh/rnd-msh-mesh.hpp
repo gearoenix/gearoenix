@@ -31,7 +31,8 @@ namespace render {
         public:
             Mesh(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c);
             ~Mesh();
-            void draw(const scene::Scene* s, const model::Model* m);
+            void commit(const scene::Scene* s, const model::Model* m);
+            void draw();
         };
     }
 }

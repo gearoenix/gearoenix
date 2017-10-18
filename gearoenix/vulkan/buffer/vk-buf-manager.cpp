@@ -43,7 +43,7 @@ gearoenix::render::buffer::Manager::Manager(unsigned int size, Manager* parent)
 
 gearoenix::render::buffer::Manager::~Manager()
 {
-    if (nullptr != parent)
+    if (nullptr == parent)
         delete buff;
 }
 

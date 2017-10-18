@@ -113,3 +113,18 @@ void gearoenix::render::command::Buffer::bind_descriptor_set(
 {
     linker->vkCmdBindDescriptorSets(vulkan_data, pipeline_bind_point, pipeline_layout, first_set, 1, &desset, 0, nullptr);
 }
+
+void gearoenix::render::command::Buffer::bind_vertex_buffers(VkBuffer buf, VkDeviceSize offset)
+{
+    linker->vkCmdBindVertexBuffers(vulkan_data, 0, 1, &buf, &offset);
+}
+
+void gearoenix::render::command::Buffer::bind_index_buffer(VkBuffer buf, VkDeviceSize offset)
+{
+    linker->vkCmdBindIndexBuffer(vulkan_data, buf, offset, VK_INDEX_TYPE_UINT32);
+}
+
+void gearoenix::render::command::Buffer::draw_indexed(VkDeviceSize count)
+{
+    linker->vkCmdDrawIndexed(vulkan_data, count, 1, 0, 0, 1);
+}

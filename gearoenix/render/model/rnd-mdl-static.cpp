@@ -33,5 +33,5 @@ void gearoenix::render::model::Static::commit(const scene::Scene* s, const Model
 
 void gearoenix::render::model::Static::draw()
 {
-    UNIMPLEMENTED;
+    mesh->draw();
 }
