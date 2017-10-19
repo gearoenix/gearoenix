@@ -5,6 +5,7 @@
 #include "../../system/sys-file.hpp"
 #include "../buffer/rnd-buf-uniform.hpp"
 #include "../model/rnd-mdl-model.hpp"
+#include "../pipeline/rnd-pip-pipeline.hpp"
 #include "../rnd-engine.hpp"
 #include "../shader/rnd-shd-resources.hpp"
 #include "../texture/rnd-txt-texture-2d.hpp"
@@ -47,4 +48,5 @@ void gearoenix::render::material::DirectionalTexturedSpeculatedNocubeFullshadowO
 void gearoenix::render::material::DirectionalTexturedSpeculatedNocubeFullshadowOpaque::bind()
 {
     shdrsc->bind(pl.get());
+    pl->bind();
 }

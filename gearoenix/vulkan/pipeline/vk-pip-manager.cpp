@@ -31,7 +31,7 @@ std::shared_ptr<gearoenix::render::pipeline::Pipeline> gearoenix::render::pipeli
             new Pipeline(
                 sid, cache, rndpass,
                 engine->get_system_application()->get_asset_manager()->get_shader(sid),
-                new descriptor::SetLayout(engine->get_logical_device(), sid)));
+                new descriptor::SetLayout(engine->get_logical_device(), sid), engine));
     };
     return cacher->get(static_cast<core::Id>(sid), fn_new);
 }

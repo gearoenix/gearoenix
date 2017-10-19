@@ -31,9 +31,6 @@ gearoenix::render::command::Buffer::Buffer(Pool* pool)
 
 gearoenix::render::command::Buffer::~Buffer()
 {
-    if (not_flushed) {
-        flush();
-    }
     device::Logical* d = pool->get_logical_device();
     VkDevice vd = d->get_vulkan_data();
     VkCommandPool vp = pool->get_vulkan_data();
@@ -52,12 +49,10 @@ void gearoenix::render::command::Buffer::copy_buffer(
     VkBuffer src, VkBuffer des, const VkBufferCopy& region)
 {
     linker->vkCmdCopyBuffer(vulkan_data, src, des, 1, &region);
-    not_flushed = true;
 }
 
 void gearoenix::render::command::Buffer::flush()
 {
-    not_flushed = false;
     device::Logical* d = pool->get_logical_device();
     sync::Fence fence(d);
     VKC(linker->vkEndCommandBuffer(vulkan_data));
@@ -103,6 +98,11 @@ void gearoenix::render::command::Buffer::end()
 void gearoenix::render::command::Buffer::end_render_pass()
 {
     linker->vkCmdEndRenderPass(vulkan_data);
+}
+
+void gearoenix::render::command::Buffer::bind_pipeline(VkPipeline pip)
+{
+    linker->vkCmdBindPipeline(vulkan_data, VK_PIPELINE_BIND_POINT_GRAPHICS, pip);
 }
 
 void gearoenix::render::command::Buffer::bind_descriptor_set(

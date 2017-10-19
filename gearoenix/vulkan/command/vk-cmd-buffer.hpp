@@ -12,7 +12,6 @@ namespace render {
             Pool* pool;
             Linker* linker;
             VkCommandBuffer vulkan_data;
-            bool not_flushed = false;
 
         public:
             Buffer(Pool* pool);
@@ -28,6 +27,7 @@ namespace render {
             void set_scissor(const VkRect2D& scissor);
             void end();
             void end_render_pass();
+            void bind_pipeline(VkPipeline pip);
             void bind_descriptor_set(
                 VkPipelineBindPoint pipeline_bind_point,
                 VkPipelineLayout pipeline_layout,

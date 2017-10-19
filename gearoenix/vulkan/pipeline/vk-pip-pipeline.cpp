@@ -4,10 +4,12 @@
 #include "../../render/shader/rnd-shd-shader.hpp"
 #include "../../system/sys-app.hpp"
 #include "../../system/sys-file.hpp"
+#include "../command/vk-cmd-buffer.hpp"
 #include "../descriptor/vk-des-set-layout.hpp"
 #include "../device/vk-dev-logical.hpp"
 #include "../device/vk-dev-physical.hpp"
 #include "../vk-check.hpp"
+#include "../vk-engine.hpp"
 #include "../vk-instance.hpp"
 #include "../vk-render-pass.hpp"
 #include "../vk-surface.hpp"
@@ -15,12 +17,11 @@
 #include "vk-pip-cache.hpp"
 #include "vk-pip-layout.hpp"
 
-gearoenix::render::pipeline::Pipeline::Pipeline(
-    shader::Id sid,
+gearoenix::render::pipeline::Pipeline::Pipeline(shader::Id sid,
     Cache* cache,
     RenderPass* rndpass,
     const std::shared_ptr<shader::Shader>& shd,
-    descriptor::SetLayout* dessetlay)
+    descriptor::SetLayout* dessetlay, Engine* eng)
     : sid(sid)
     , dev(cache->get_logical_device())
     , cache(cache)
@@ -28,6 +29,7 @@ gearoenix::render::pipeline::Pipeline::Pipeline(
     , layout(new Layout(dessetlay))
     , rndpass(rndpass)
     , shd(shd)
+    , eng(eng)
 {
     const VkDevice vkdev = dev->get_vulkan_data();
     const device::Physical* p = dev->get_physical_device();
@@ -177,4 +179,9 @@ gearoenix::render::descriptor::SetLayout* gearoenix::render::pipeline::Pipeline:
 const gearoenix::render::pipeline::Layout* gearoenix::render::pipeline::Pipeline::get_layout() const
 {
     return layout;
+}
+
+void gearoenix::render::pipeline::Pipeline::bind()
+{
+    eng->get_current_command_buffer()->bind_pipeline(vulkan_data);
 }

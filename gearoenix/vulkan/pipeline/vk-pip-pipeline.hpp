@@ -28,17 +28,20 @@ namespace render {
             RenderPass* rndpass;
             std::shared_ptr<shader::Shader> shd;
             VkPipeline vulkan_data;
+            Engine* eng;
 
         public:
             Pipeline(shader::Id sid,
                 Cache* cache,
                 RenderPass* rndpass,
                 const std::shared_ptr<shader::Shader>& shd,
-                descriptor::SetLayout* dessetlay);
+                descriptor::SetLayout* dessetlay,
+                Engine* eng);
             ~Pipeline();
             const VkPipeline& get_vulkan_data() const;
             descriptor::SetLayout* get_descriptor_set_layout();
             const Layout* get_layout() const;
+            void bind();
         };
     }
 }
