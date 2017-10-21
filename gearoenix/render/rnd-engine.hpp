@@ -3,8 +3,8 @@
 #include "../core/cr-build-configuration.hpp"
 #ifdef USE_VULKAN
 #include "../vulkan/vk-engine.hpp"
-#elif USE_DIRECT
-#include "../directx12/dr-engine.hpp"
+#elif defined(USE_OPENGL)
+#include "../opengl/gl-engine.hpp"
 #else
 #error "Not implemented"
 #endif

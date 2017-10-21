@@ -4,6 +4,12 @@
 #ifdef IN_LINUX
 #include "../../core/cr-types.hpp"
 #include <xcb/xcb.h>
+#ifdef USE_OPENGL
+#include <GL/gl.h>
+#include <GL/glx.h>
+#include <X11/Xlib-xcb.h>
+#include <X11/Xlib.h>
+#endif
 namespace gearoenix {
 namespace core {
     class Application;
@@ -23,6 +29,11 @@ namespace system {
         xcb_connection_t* connection;
         xcb_screen_t* screen;
         xcb_window_t window;
+#ifdef USE_OPENGL
+        Display* display;
+        GLXDrawable drawable;
+        GLXWindow glxwindow;
+#endif
         xcb_intern_atom_reply_t* atom_wm_delete_window;
         core::asset::Manager* assetmgr;
         core::Application* core_app;

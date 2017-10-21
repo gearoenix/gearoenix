@@ -3,6 +3,8 @@
 #include "../../core/cr-build-configuration.hpp"
 #ifdef USE_VULKAN
 #include "../../vulkan/texture/vk-txt-texture-2d.hpp"
+#elif defined(USE_OPENGL)
+#include "../../opengl/texture/gl-txt-2d.hpp"
 #else
 #error "Unimplemented"
 #endif

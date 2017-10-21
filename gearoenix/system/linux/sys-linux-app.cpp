@@ -10,27 +10,78 @@
 
 gearoenix::system::Application::Application()
 {
+    int scr;
+#ifdef USE_OPENGL
+    int default_screen;
+    display = XOpenDisplay(0);
+    if (!display) {
+        LOGF("Can't open display");
+    }
+    default_screen = DefaultScreen(display);
+    connection = XGetXCBConnection(display);
+    if (!connection) {
+        XCloseDisplay(display);
+        LOGF("Can't get xcb connection from display");
+    }
+    XSetEventQueueOwner(display, XCBOwnsEventQueue);
+    scr = default_screen;
+#else
     const xcb_setup_t* setup;
     xcb_screen_iterator_t iter;
-    int scr;
     connection = xcb_connect(NULL, &scr);
     if (connection == NULL) {
         LOGF("Could not find a compatible Vulkan ICD!");
     }
+#endif
     setup = xcb_get_setup(connection);
     iter = xcb_setup_roots_iterator(setup);
     while (scr-- > 0)
         xcb_screen_next(&iter);
     screen = iter.data;
-    uint32_t value_mask, value_list[32];
     window = xcb_generate_id(connection);
+    uint32_t value_mask, value_list[32];
+#ifdef USE_OPENGL
+    int visualID = 0;
+    GLXFBConfig* fb_configs = 0;
+    int num_fb_configs = 0;
+    fb_configs = glXGetFBConfigs(display, default_screen, &num_fb_configs);
+    if (!fb_configs || num_fb_configs == 0) {
+        LOGF("glXGetFBConfigs failed");
+    }
+    GLXFBConfig fb_config = fb_configs[0];
+    glXGetFBConfigAttrib(display, fb_config, GLX_VISUAL_ID, &visualID);
+    GLXContext context = glXCreateNewContext(display, fb_config, GLX_RGBA_TYPE, 0, True);
+    if (!context) {
+        LOGF("glXCreateNewContext failed");
+    }
+    xcb_colormap_t colormap = xcb_generate_id(connection);
+    xcb_create_colormap(connection, XCB_COLORMAP_ALLOC_NONE, colormap, screen->root, visualID);
+    value_list[0] = XCB_EVENT_MASK_EXPOSURE | XCB_EVENT_MASK_KEY_PRESS;
+    value_list[1] = colormap;
+    value_list[2] = 0;
+    value_mask = XCB_CW_EVENT_MASK | XCB_CW_COLORMAP;
+#else
     value_mask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK;
     value_list[0] = screen->black_pixel;
     value_list[1] = XCB_EVENT_MASK_KEY_RELEASE | XCB_EVENT_MASK_KEY_PRESS | XCB_EVENT_MASK_EXPOSURE | XCB_EVENT_MASK_STRUCTURE_NOTIFY | XCB_EVENT_MASK_POINTER_MOTION | XCB_EVENT_MASK_BUTTON_PRESS | XCB_EVENT_MASK_BUTTON_RELEASE | XCB_EVENT_MASK_RESIZE_REDIRECT;
-    xcb_create_window(connection, XCB_COPY_FROM_PARENT, window, screen->root, 0,
-        0, WINDOW_WIDTH, WINDOW_HEIGHT, 0,
-        XCB_WINDOW_CLASS_INPUT_OUTPUT, screen->root_visual,
-        value_mask, value_list);
+#endif
+    xcb_create_window(
+        connection,
+        XCB_COPY_FROM_PARENT,
+        window,
+        screen->root,
+        0, 0,
+        WINDOW_WIDTH, WINDOW_HEIGHT,
+        0,
+        XCB_WINDOW_CLASS_INPUT_OUTPUT,
+#ifdef USE_OPENGL
+        visualID,
+#elif defined(USE_VULKAN)
+        screen->root_visual,
+#endif
+        value_mask,
+        value_list);
+
     /* Magic code that will send notification when window is destroyed */
     xcb_intern_atom_cookie_t cookie = xcb_intern_atom(connection, 1, 12, "WM_PROTOCOLS");
     xcb_intern_atom_reply_t* reply = xcb_intern_atom_reply(connection, cookie, 0);
@@ -44,10 +95,23 @@ gearoenix::system::Application::Application()
         window_title.c_str());
     free(reply);
     xcb_map_window(connection, window);
-    assetmgr = new core::asset::Manager(this, "data.gx3d");
-    render_engine = new render::Engine(this);
-    assetmgr->initialize();
-    /// todo intialize in here
+#ifdef USE_OPENGL
+    glxwindow = glXCreateWindow(display, fb_config, window, 0);
+    if (!window) {
+        xcb_destroy_window(connection, window);
+        glXDestroyContext(display, context);
+        LOGF("glXDestroyContext failed.");
+    }
+    drawable = glxwindow;
+    if (!glXMakeContextCurrent(display, drawable, drawable, context)) {
+        xcb_destroy_window(connection, window);
+        glXDestroyContext(display, context);
+        LOGF("glXMakeContextCurrent failed");
+    }
+#endif
+    //    assetmgr = new core::asset::Manager(this, "data.gx3d");
+    //    render_engine = new render::Engine(this);
+    //    assetmgr->initialize();
 }
 
 gearoenix::system::Application::~Application()
@@ -62,11 +126,6 @@ void gearoenix::system::Application::execute(core::Application* ca)
     core_app = ca;
     xcb_flush(connection);
     while (!quit) {
-        // auto tStart = std::chrono::high_resolution_clock::now();
-        // if (viewUpdated) {
-        // 	viewUpdated = false;
-        // 	viewChanged();
-        // }
         xcb_generic_event_t* event;
         while ((event = xcb_poll_for_event(connection))) {
             if ((XCB_DESTROY_NOTIFY == (event->response_type & 0x7f)) || ((XCB_CLIENT_MESSAGE == (event->response_type & 0x7f)) && ((*(xcb_client_message_event_t*)event).data.data32[0] == (*atom_wm_delete_window).atom))) {
@@ -76,45 +135,23 @@ void gearoenix::system::Application::execute(core::Application* ca)
             free(event);
         }
         core_app->update();
-        render_engine->update();
-        // render();
-        // frameCounter++;
-        // auto tEnd = std::chrono::high_resolution_clock::now();
-        // auto tDiff = std::chrono::duration<double, std::milli>(tEnd -
-        // tStart).count();
-        // frameTimer = tDiff / 1000.0f;
-        // camera.update(frameTimer);
-        // if (camera.moving())
-        // {
-        // 	viewUpdated = true;
-        // }
-        // // Convert to clamped timer value
-        // if (!paused)
-        // {
-        // 	timer += timerSpeed * frameTimer;
-        // 	if (timer > 1.0)
-        // 	{
-        // 		timer -= 1.0f;
-        // 	}
-        // }
-        // fpsTimer += (float)tDiff;
-        // if (fpsTimer > 1000.0f)
-        // {
-        // 	if (!enableTextOverlay)
-        // 	{
-        // 		std::string windowTitle = getWindowTitle();
-        // 		xcb_change_property(connection, XCB_PROP_MODE_REPLACE,
-        // 			window, XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8,
-        // 			windowTitle.size(), windowTitle.c_str());
-        // 	}
-        // 	lastFPS = frameCounter;
-        // 	updateTextOverlay();
-        // 	fpsTimer = 0.0f;
-        // 	frameCounter = 0;
-        // }
+//        render_engine->update();
+#ifdef USE_OPENGL
+        glClearColor(0.2, 0.4, 0.9, 1.0);
+        glClear(GL_COLOR_BUFFER_BIT);
+        glXSwapBuffers(display, drawable);
+#endif
     }
     core_app->terminate();
     render_engine->terminate();
+#ifdef USE_OPENGL
+    glXDestroyWindow(display, glxwindow);
+#endif
+    xcb_destroy_window(connection, window);
+#ifdef USE_OPENGL
+    glXDestroyContext(display, context);
+    XCloseDisplay(display);
+#endif
     // vkDeviceWaitIdle(device);
 }
 

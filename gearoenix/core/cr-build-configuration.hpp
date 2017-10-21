@@ -17,6 +17,9 @@
 //#define USE_OPENGL_4
 //#define USE_D3DX12
 //#define USE_METAL
+#if defined(USE_OPENGL_ES3) || defined(USE_OPENGL_ES2) || defined(USE_OPENGL_4)
+#define USE_OPENGL
+#endif
 /// Application constant definitions
 /// -------------------------------------------------------------
 #define APPLICATION_NAME "Gearoenix Demo App"

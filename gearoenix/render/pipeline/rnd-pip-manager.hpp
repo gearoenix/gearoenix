@@ -3,6 +3,8 @@
 #include "../../core/cr-build-configuration.hpp"
 #ifdef USE_VULKAN
 #include "../../vulkan/pipeline/vk-pip-manager.hpp"
+#elif defined(USE_OPENGL)
+#include "../../opengl/pipeline/gl-pip-manager.hpp"
 #else
 #error "Not implemented yet"
 #endif

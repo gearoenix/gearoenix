@@ -3,6 +3,8 @@
 #include "../../core/cr-build-configuration.hpp"
 #ifdef USE_VULKAN
 #include "../../vulkan/buffer/vk-buf-uniform.hpp"
+#elif defined(USE_OPENGL)
+#include "../../opengl/buffer/gl-buf-uniform.hpp"
 #else
 #error "Not implemented yet"
 #endif
