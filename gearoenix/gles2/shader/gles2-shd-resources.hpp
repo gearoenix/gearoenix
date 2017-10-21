@@ -1,7 +1,7 @@
 #ifndef GEAROENIX_OPENGL_SHADER_RESOURCES_HPP
 #define GEAROENIX_OPENGL_SHADER_RESOURCES_HPP
 #include "../../core/cr-build-configuration.hpp"
-#ifdef USE_OPENGL
+#ifdef USE_OPENGL_ES2
 namespace gearoenix {
 namespace render {
     class Engine;

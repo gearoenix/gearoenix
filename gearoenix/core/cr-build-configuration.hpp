@@ -10,22 +10,19 @@
 #elif defined(__unix__)
 #define IN_LINUX
 //#define USE_VULKAN
-#define USE_OPENGL_4
+//#define USE_OPENGL_4
 //#define USE_OPENGL_ES3
-//#define USE_OPENGL_ES2
+#define USE_OPENGL_ES2
 #elif defined(WIN32) || defined(WIN64) || defined(_WIN32) || defined(_WIN64)
 #define IN_WINDOWS
 //#define USE_VULKAN
-#define USE_OPENGL_4
+//#define USE_OPENGL_4
 //#define USE_OPENGL_ES3
 //#define USE_OPENGL_ES2
 #else
 #error "Not implemetned yet."
 #endif
 #define USE_SDL
-#if defined(USE_OPENGL_ES3) || defined(USE_OPENGL_ES2) || defined(USE_OPENGL_4)
-#define USE_OPENGL
-#endif
 /// Application constant definitions
 /// -------------------------------------------------------------
 #define APPLICATION_NAME "Gearoenix Demo App"

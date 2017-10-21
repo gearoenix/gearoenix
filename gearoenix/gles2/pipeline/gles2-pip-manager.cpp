@@ -1,5 +1,5 @@
-#include "gl-pip-manager.hpp"
-#ifdef USE_OPENGL
+#include "gles2-pip-manager.hpp"
+#ifdef USE_OPENGL_ES2
 #include "../../system/sys-log.hpp"
 gearoenix::render::pipeline::Manager::Manager(Engine*)
 {

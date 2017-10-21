@@ -1,5 +1,5 @@
-#include "gl-pip-pipeline.hpp"
-#ifdef USE_OPENGL
+#include "gles2-pip-pipeline.hpp"
+#ifdef USE_OPENGL_ES2
 #include "../../system/sys-log.hpp"
 gearoenix::render::pipeline::Pipeline::Pipeline(
     shader::Id,

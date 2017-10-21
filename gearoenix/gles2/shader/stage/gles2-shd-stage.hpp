@@ -1,7 +1,7 @@
 #ifndef GEAROEMIX_OPENGL_SHADER_STAGE_STAGE_HPP
 #define GEAROEMIX_OPENGL_SHADER_STAGE_STAGE_HPP
 #include "../../../core/cr-build-configuration.hpp"
-#ifdef USE_OPENGL
+#ifdef USE_OPENGL_ES2
 #include <vector>
 namespace gearoenix {
 namespace render {

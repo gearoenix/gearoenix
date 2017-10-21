@@ -1,5 +1,5 @@
-#include "gl-buf-uniform.hpp"
-#ifdef USE_OPENGL
+#include "gles2-buf-uniform.hpp"
+#ifdef USE_OPENGL_ES2
 #include "../../system/sys-log.hpp"
 
 gearoenix::render::buffer::Uniform::Uniform(unsigned int, Engine*)

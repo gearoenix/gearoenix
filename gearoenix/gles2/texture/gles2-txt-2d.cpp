@@ -1,5 +1,5 @@
-#include "gl-txt-2d.hpp"
-#ifdef USE_OPENGL
+#include "gles2-txt-2d.hpp"
+#ifdef USE_OPENGL_ES2
 #include "../../system/sys-log.hpp"
 
 gearoenix::render::texture::Texture2D::Texture2D(system::File*, Engine*, std::shared_ptr<core::EndCaller>)

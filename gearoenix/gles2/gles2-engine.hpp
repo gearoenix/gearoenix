@@ -1,10 +1,10 @@
-#ifndef GEAROENIX_OPENGL_ENGINE_HPP
-#define GEAROENIX_OPENGL_ENGINE_HPP
+#ifndef GEAROENIX_GLES2_ENGINE_HPP
+#define GEAROENIX_GLES2_ENGINE_HPP
 #include "../core/cr-build-configuration.hpp"
-#ifdef USE_OPENGL
+#ifdef USE_OPENGL_ES2
 #include "../render/rnd-engine.hpp"
 namespace gearoenix {
-namespace opengl4 {
+namespace gles2 {
     class Engine : public render::Engine {
     private:
     public:
@@ -13,7 +13,6 @@ namespace opengl4 {
         void window_changed();
         void update();
         void terminate();
-        static bool is_supported();
     };
 }
 }

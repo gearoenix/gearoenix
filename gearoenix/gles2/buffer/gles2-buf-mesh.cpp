@@ -1,5 +1,5 @@
-#include "gl-buf-mesh.hpp"
-#ifdef USE_OPENGL
+#include "gles2-buf-mesh.hpp"
+#ifdef USE_OPENGL_ES2
 #include "../../system/sys-log.hpp"
 
 gearoenix::render::buffer::Mesh::Mesh(unsigned int, system::File*, Engine*, std::shared_ptr<core::EndCaller>)

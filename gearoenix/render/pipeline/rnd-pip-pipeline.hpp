@@ -3,8 +3,8 @@
 #include "../../core/cr-build-configuration.hpp"
 #ifdef USE_VULKAN
 #include "../../vulkan/pipeline/vk-pip-pipeline.hpp"
-#elif defined(USE_OPENGL)
-#include "../../opengl4/pipeline/gl-pip-pipeline.hpp"
+#elif defined(USE_OPENGL_ES2)
+#include "../../gles2/pipeline/gles2-pip-pipeline.hpp"
 #else
 #error "Not implemented yet"
 #endif

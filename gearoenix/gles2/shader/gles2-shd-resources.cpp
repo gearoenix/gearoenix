@@ -1,5 +1,5 @@
-#include "gl-shd-resources.hpp"
-#ifdef USE_OPENGL
+#include "gles2-shd-resources.hpp"
+#ifdef USE_OPENGL_ES2
 #include "../../system/sys-log.hpp"
 gearoenix::render::shader::Resources::Resources(Engine*, pipeline::Pipeline*, buffer::Uniform*)
 {

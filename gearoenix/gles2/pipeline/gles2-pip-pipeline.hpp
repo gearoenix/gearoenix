@@ -1,7 +1,7 @@
 #ifndef GEAROENIX_OPENGL_PIPELINE_PIPELINE_HPP
 #define GEAROENIX_OPENGL_PIPELINE_PIPELINE_HPP
 #include "../../core/cr-build-configuration.hpp"
-#ifdef USE_OPENGL
+#ifdef USE_OPENGL_ES2
 #include "../../core/cache/cr-cache-cached.hpp"
 #include "../../render/shader/rnd-shd-shader.hpp"
 namespace gearoenix {

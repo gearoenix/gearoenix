@@ -3,8 +3,8 @@
 #include "../../../core/cr-build-configuration.hpp"
 #ifdef USE_VULKAN
 #include "../../../vulkan/shader/stage/vk-shader-stage.hpp"
-#elif defined(USE_OPENGL)
-#include "../../../opengl4/shader/stage/gl-shd-stage.hpp"
+#elif defined(USE_OPENGL_ES2)
+#include "../../../gles2/shader/stage/gles2-shd-stage.hpp"
 #else
 #error "Not implemented"
 #endif // USE_*

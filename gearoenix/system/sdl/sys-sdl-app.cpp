@@ -1,5 +1,6 @@
 #include "sys-sdl-app.hpp"
 #ifdef USE_SDL
+#include "../../gles2/gles2-engine.hpp"
 #include "../sys-log.hpp"
 #include <SDL2/SDL_opengles2.h>
 
@@ -26,6 +27,8 @@ gearoenix::system::Application::Application()
         SDL_WINDOW_OPENGL);
     gl_context = SDL_GL_CreateContext(window);
     SDL_AddEventWatch(event_receiver, this);
+    SDL_GL_MakeCurrent(window, gl_context);
+    render_engine = new gles2::Engine(this);
 }
 
 gearoenix::system::Application::~Application()
@@ -36,7 +39,6 @@ gearoenix::system::Application::~Application()
 void gearoenix::system::Application::execute(core::Application* app)
 {
     core_app = app;
-    SDL_GL_MakeCurrent(window, gl_context);
     while (running) {
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
@@ -44,8 +46,7 @@ void gearoenix::system::Application::execute(core::Application* app)
                 running = false;
             }
         }
-        glClearColor(0.3f, 0.4f, 0.1f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        render_engine->update();
         SDL_GL_SwapWindow(window);
     }
     SDL_DelEventWatch(event_receiver, this);
