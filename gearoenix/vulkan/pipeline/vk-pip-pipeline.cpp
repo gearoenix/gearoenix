@@ -1,4 +1,5 @@
 #include "vk-pip-pipeline.hpp"
+#ifdef USE_VULKAN
 #include "../../core/cr-application.hpp"
 #include "../../core/cr-static.hpp"
 #include "../../render/shader/rnd-shd-shader.hpp"
@@ -185,3 +186,4 @@ void gearoenix::render::pipeline::Pipeline::bind()
 {
     eng->get_current_command_buffer()->bind_pipeline(vulkan_data);
 }
+#endif

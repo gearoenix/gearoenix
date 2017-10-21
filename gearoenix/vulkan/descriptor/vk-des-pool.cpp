@@ -1,4 +1,5 @@
 #include "vk-des-pool.hpp"
+#ifdef USE_VULKAN
 #include "../../core/cr-static.hpp"
 #include "../device/vk-dev-logical.hpp"
 #include "../device/vk-dev-physical.hpp"
@@ -50,3 +51,4 @@ const VkDescriptorPool& gearoenix::render::descriptor::Pool::get_vulkan_data()
 {
     return vulkan_data;
 }
+#endif

@@ -1,3 +1,5 @@
+#include "vk-shader-stage.hpp"
+#ifdef USE_VULKAN
 #include "../../../core/cr-static.hpp"
 #include "../../../render/rnd-engine.hpp"
 #include "../../../render/shader/stage/rnd-shd-stg-stage.hpp"
@@ -28,3 +30,4 @@ VkShaderModule gearoenix::render::shader::stage::Stage::get_vulkan_data() const
 {
     return vulkan_data;
 }
+#endif

@@ -1,4 +1,5 @@
 #include "vk-pip-layout.hpp"
+#ifdef USE_VULKAN
 #include "../../core/cr-static.hpp"
 #include "../descriptor/vk-des-pool.hpp"
 #include "../descriptor/vk-des-set-layout.hpp"
@@ -41,3 +42,4 @@ const gearoenix::render::descriptor::SetLayout* gearoenix::render::pipeline::Lay
 {
     return dessetlay;
 }
+#endif

@@ -1,5 +1,7 @@
 #ifndef GEAROENIX_VULKAN_SWAPCHAIN_HPP
 #define GEAROENIX_VULKAN_SWAPCHAIN_HPP
+#include "../core/cr-build-configuration.hpp"
+#ifdef USE_VULKAN
 #include "vk-linker.hpp"
 #include <memory>
 #include <vector>
@@ -34,4 +36,5 @@ namespace render {
     };
 }
 }
+#endif
 #endif

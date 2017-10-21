@@ -1,5 +1,7 @@
 #ifndef GEAROENIX_VULKAN_DEVICE_PHYSICAL_HPP
 #define GEAROENIX_VULKAN_DEVICE_PHYSICAL_HPP
+#include "../../core/cr-build-configuration.hpp"
+#ifdef USE_VULKAN
 #include "../vk-linker.hpp"
 #include <memory>
 #include <vector>
@@ -45,4 +47,5 @@ namespace render {
     }
 }
 }
+#endif
 #endif

@@ -1,4 +1,5 @@
 #include "vk-linker.hpp"
+#ifdef USE_VULKAN
 #include "../system/sys-log.hpp"
 #include <string>
 #if defined(IN_LINUX) || defined(IN_ANDROID)
@@ -207,3 +208,4 @@ gearoenix::render::Linker::Linker()
 #endif
 }
 #undef VKL
+#endif

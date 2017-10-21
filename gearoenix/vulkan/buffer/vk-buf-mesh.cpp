@@ -1,4 +1,5 @@
 #include "vk-buf-mesh.hpp"
+#ifdef USE_VULKAN
 #include "../../core/cr-end-caller.hpp"
 #include "../../system/sys-file.hpp"
 #include "../../system/sys-log.hpp"
@@ -68,3 +69,4 @@ void gearoenix::render::buffer::Mesh::draw()
     command::Buffer* c = e->get_current_command_buffer();
     c->draw_indexed(ic);
 }
+#endif

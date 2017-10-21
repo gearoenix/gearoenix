@@ -1,4 +1,5 @@
 #include "vk-swapchain.hpp"
+#ifdef USE_VULKAN
 #include "../core/cr-static.hpp"
 #include "device/vk-dev-logical.hpp"
 #include "device/vk-dev-physical.hpp"
@@ -148,3 +149,4 @@ void gearoenix::render::Swapchain::initialize()
             nullptr);
     }
 }
+#endif

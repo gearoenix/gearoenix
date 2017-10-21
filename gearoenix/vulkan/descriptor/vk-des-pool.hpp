@@ -1,5 +1,7 @@
 #ifndef GEAROENIX_RENDER_DESCRIPTOR_POOL_HPP
 #define GEAROENIX_RENDER_DESCRIPTOR_POOL_HPP
+#include "../../core/cr-build-configuration.hpp"
+#ifdef USE_VULKAN
 #include "../vk-linker.hpp"
 namespace gearoenix {
 namespace render {
@@ -22,4 +24,5 @@ namespace render {
     } // namespace descriptor
 } // namespace render
 } // namespace gearoenix
+#endif
 #endif // GEAROENIX_RENDER_DESCRIPTOR_POOL_HPP

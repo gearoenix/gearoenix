@@ -11,6 +11,8 @@
 gearoenix::system::Application::Application()
 {
     int scr;
+    const xcb_setup_t* setup;
+    xcb_screen_iterator_t iter;
 #ifdef USE_OPENGL
     int default_screen;
     display = XOpenDisplay(0);
@@ -26,8 +28,6 @@ gearoenix::system::Application::Application()
     XSetEventQueueOwner(display, XCBOwnsEventQueue);
     scr = default_screen;
 #else
-    const xcb_setup_t* setup;
-    xcb_screen_iterator_t iter;
     connection = xcb_connect(NULL, &scr);
     if (connection == NULL) {
         LOGF("Could not find a compatible Vulkan ICD!");
@@ -50,7 +50,7 @@ gearoenix::system::Application::Application()
     }
     GLXFBConfig fb_config = fb_configs[0];
     glXGetFBConfigAttrib(display, fb_config, GLX_VISUAL_ID, &visualID);
-    GLXContext context = glXCreateNewContext(display, fb_config, GLX_RGBA_TYPE, 0, True);
+    context = glXCreateNewContext(display, fb_config, GLX_RGBA_TYPE, 0, True);
     if (!context) {
         LOGF("glXCreateNewContext failed");
     }
@@ -137,7 +137,7 @@ void gearoenix::system::Application::execute(core::Application* ca)
         core_app->update();
 //        render_engine->update();
 #ifdef USE_OPENGL
-        glClearColor(0.2, 0.4, 0.9, 1.0);
+        glClearColor(0.9, 0.9, 0.9, 1.0);
         glClear(GL_COLOR_BUFFER_BIT);
         glXSwapBuffers(display, drawable);
 #endif

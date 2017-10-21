@@ -1,4 +1,5 @@
 #include "vk-shd-resources.hpp"
+#ifdef USE_VULKAN
 #include "../../core/cr-static.hpp"
 #include "../buffer/vk-buf-buffer.hpp"
 #include "../buffer/vk-buf-sub-buffer.hpp"
@@ -59,3 +60,4 @@ void gearoenix::render::shader::Resources::bind(pipeline::Pipeline* p)
     command::Buffer* c = e->get_current_command_buffer();
     dessets[e->get_current_frame_index()]->bind(p, c);
 }
+#endif

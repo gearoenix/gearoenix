@@ -1,4 +1,5 @@
 #include "vk-mem-sub-memory.hpp"
+#ifdef USE_VULKAN
 
 gearoenix::render::memory::SubMemory::SubMemory(unsigned int size, Memory* mem)
     : core::gc::Object(size)
@@ -14,3 +15,4 @@ const gearoenix::render::memory::Memory* gearoenix::render::memory::SubMemory::g
 {
     return mem;
 }
+#endif

@@ -1,5 +1,7 @@
 #ifndef GEAROENIX_VULKAN_ENGINE_HPP
 #define GEAROENIX_VULKAN_ENGINE_HPP
+#include "../core/cr-build-configuration.hpp"
+#ifdef USE_VULKAN
 #include "../core/cr-types.hpp"
 #include <functional>
 #include <memory>
@@ -112,4 +114,5 @@ namespace render {
     };
 }
 }
+#endif
 #endif

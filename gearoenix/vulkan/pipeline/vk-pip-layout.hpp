@@ -1,5 +1,7 @@
 #ifndef GEAROENIX_RENDER_PIPELINE_LAYOUT_HPP
 #define GEAROENIX_RENDER_PIPELINE_LAYOUT_HPP
+#include "../../core/cr-build-configuration.hpp"
+#ifdef USE_VULKAN
 #include "../vk-linker.hpp"
 #include <memory>
 namespace gearoenix {
@@ -25,4 +27,5 @@ namespace render {
     } // namespace pipeline
 } // namespace render
 } // namespace gearoenix
+#endif
 #endif // GEAROENIX_RENDER_PIPELINE_LAYOUT_HPP

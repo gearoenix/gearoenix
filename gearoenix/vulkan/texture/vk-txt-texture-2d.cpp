@@ -1,4 +1,5 @@
 #include "vk-txt-texture-2d.hpp"
+#ifdef USE_VULKAN
 #include "../../core/cr-end-caller.hpp"
 #include "../../core/cr-static.hpp"
 #include "../../render/texture/rnd-txt-png.hpp"
@@ -103,3 +104,4 @@ void gearoenix::render::texture::Texture2D::fill_info(
     image_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
     image_info.samples = VK_SAMPLE_COUNT_1_BIT;
 }
+#endif

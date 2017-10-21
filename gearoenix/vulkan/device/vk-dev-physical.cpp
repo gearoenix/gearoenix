@@ -1,4 +1,5 @@
 #include "vk-dev-physical.hpp"
+#ifdef USE_VULKAN
 #include "../../core/cr-static.hpp"
 #include "../vk-check.hpp"
 #include "../vk-instance.hpp"
@@ -258,3 +259,4 @@ const VkPhysicalDeviceProperties& gearoenix::render::device::Physical::get_prope
 {
     return properties;
 }
+#endif

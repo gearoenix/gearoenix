@@ -1,5 +1,7 @@
 #ifndef GEAROENIX_VULKAN_MEMORY_MANAGER_HPP
 #define GEAROENIX_VULKAN_MEMORY_MANAGER_HPP
+#include "../../core/cr-build-configuration.hpp"
+#ifdef USE_VULKAN
 #include "../../core/gc/cr-gc.hpp"
 #include "../vk-linker.hpp"
 namespace gearoenix {
@@ -32,4 +34,5 @@ namespace render {
     } // namespace memory
 } // namespace render
 } // namespace gearoenix
+#endif
 #endif // GEAROENIX_VULKAN_MEMORY_MANAGER_HPP

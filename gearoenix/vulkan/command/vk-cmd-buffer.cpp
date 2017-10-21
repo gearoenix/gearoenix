@@ -1,4 +1,5 @@
-#include "../../core/cr-build-configuration.hpp"
+#include "vk-cmd-buffer.hpp"
+#ifdef USE_VULKAN
 #ifdef DEBUG_MODE
 #define VK_CMD_BUFF_DEBUG
 #endif
@@ -8,7 +9,6 @@
 #include "../sync/vk-sync-fence.hpp"
 #include "../vk-check.hpp"
 #include "../vk-instance.hpp"
-#include "vk-cmd-buffer.hpp"
 #include "vk-cmd-pool.hpp"
 
 gearoenix::render::command::Buffer::Buffer(Pool* pool)
@@ -128,3 +128,4 @@ void gearoenix::render::command::Buffer::draw_indexed(VkDeviceSize count)
 {
     linker->vkCmdDrawIndexed(vulkan_data, count, 1, 0, 0, 1);
 }
+#endif

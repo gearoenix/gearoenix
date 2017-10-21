@@ -33,6 +33,7 @@ namespace system {
         Display* display;
         GLXDrawable drawable;
         GLXWindow glxwindow;
+        GLXContext context;
 #endif
         xcb_intern_atom_reply_t* atom_wm_delete_window;
         core::asset::Manager* assetmgr;

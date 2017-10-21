@@ -1,5 +1,7 @@
 #ifndef GEAROEMIX_VULKAN_SHADER_STAGE_VERTEX_HPP
 #define GEAROEMIX_VULKAN_SHADER_STAGE_VERTEX_HPP
+#include "../../../core/cr-build-configuration.hpp"
+#ifdef USE_VULKAN
 #include "vk-shader-stage.hpp"
 namespace gearoenix {
 namespace render {
@@ -15,4 +17,5 @@ namespace render {
     }
 }
 }
+#endif
 #endif

@@ -1,6 +1,7 @@
 #ifndef GEAROENIX_VULKAN_INSTANCE_HPP
 #define GEAROENIX_VULKAN_INSTANCE_HPP
 #include "../core/cr-build-configuration.hpp"
+#ifdef USE_VULKAN
 #include "vk-linker.hpp"
 #include <memory>
 #include <set>
@@ -25,4 +26,5 @@ namespace render {
     };
 }
 }
+#endif
 #endif

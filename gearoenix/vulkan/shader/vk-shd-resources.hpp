@@ -1,5 +1,7 @@
 #ifndef GEAROENIX_VULKAN_SHADER_RESOURCES_HPP
 #define GEAROENIX_VULKAN_SHADER_RESOURCES_HPP
+#include "../../core/cr-build-configuration.hpp"
+#ifdef USE_VULKAN
 namespace gearoenix {
 namespace render {
     class Engine;
@@ -31,4 +33,5 @@ namespace render {
     }
 }
 }
+#endif
 #endif

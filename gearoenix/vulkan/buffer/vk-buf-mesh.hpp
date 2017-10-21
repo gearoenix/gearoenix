@@ -1,5 +1,7 @@
 #ifndef GEAROENIX_VULKAN_BUFFER_MESH_HPP
 #define GEAROENIX_VULKAN_BUFFER_MESH_HPP
+#include "../../core/cr-build-configuration.hpp"
+#ifdef USE_VULKAN
 #include <memory>
 namespace gearoenix {
 namespace core {
@@ -34,4 +36,5 @@ namespace render {
     } // namespace buffer
 } // namespace render
 } // namespace gearoenix
+#endif
 #endif // GEAROENIX_VULKAN_BUFFER_MESH_HPP

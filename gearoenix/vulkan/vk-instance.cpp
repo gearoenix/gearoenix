@@ -1,4 +1,5 @@
 #include "vk-instance.hpp"
+#ifdef USE_VULKAN
 #include "../core/cr-static.hpp"
 #include "vk-check.hpp"
 #include <sstream>
@@ -269,3 +270,4 @@ const VkInstance& gearoenix::render::Instance::get_vulkan_data() const
 {
     return vulkan_data;
 }
+#endif

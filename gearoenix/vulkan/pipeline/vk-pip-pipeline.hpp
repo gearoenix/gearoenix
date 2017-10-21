@@ -1,5 +1,7 @@
 #ifndef GEAROENIX_VULKAN_PIPELINE_PIPELINE_HPP
 #define GEAROENIX_VULKAN_PIPELINE_PIPELINE_HPP
+#include "../../core/cr-build-configuration.hpp"
+#ifdef USE_VULKAN
 #include "../../core/cache/cr-cache-cached.hpp"
 #include "../../render/shader/rnd-shd-shader.hpp"
 #include "../vk-linker.hpp"
@@ -46,4 +48,5 @@ namespace render {
     }
 }
 }
+#endif
 #endif

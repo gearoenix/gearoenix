@@ -1,5 +1,7 @@
 #ifndef GEAROENIX_VULKAN_BUFFER_BUFFER_HPP
 #define GEAROENIX_VULKAN_BUFFER_BUFFER_HPP
+#include "../../core/cr-build-configuration.hpp"
+#ifdef USE_VULKAN
 #include "../vk-linker.hpp"
 namespace gearoenix {
 namespace render {
@@ -37,4 +39,5 @@ namespace render {
     }
 }
 }
+#endif
 #endif

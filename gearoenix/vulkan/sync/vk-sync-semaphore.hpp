@@ -1,5 +1,7 @@
 #ifndef GEAROENIX_VULKAN_SYNC_SEMAPHORE_HPP
 #define GEAROENIX_VULKAN_SYNC_SEMAPHORE_HPP
+#include "../../core/cr-build-configuration.hpp"
+#ifdef USE_VULKAN
 #include "../vk-linker.hpp"
 namespace gearoenix {
 namespace render {
@@ -21,4 +23,5 @@ namespace render {
     } // namespace sync
 } // namespace render
 } // namespace gearoenix
+#endif
 #endif // GEAROENIX_RENDER_SYNC_SEMAPHORE_HPP

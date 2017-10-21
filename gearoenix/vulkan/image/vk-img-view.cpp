@@ -1,4 +1,5 @@
 #include "vk-img-view.hpp"
+#ifdef USE_VULKAN
 #include "../../core/cr-static.hpp"
 #include "../device/vk-dev-logical.hpp"
 #include "../device/vk-dev-physical.hpp"
@@ -93,3 +94,4 @@ const VkImageView& gearoenix::render::image::View::get_vulkan_data() const
 {
     return vulkan_data;
 }
+#endif

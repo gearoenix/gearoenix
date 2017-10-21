@@ -1,5 +1,7 @@
 #ifndef GEAROENIX_VULKAN_BUFFER_MANAGER_HPP
 #define GEAROENIX_VULKAN_BUFFER_MANAGER_HPP
+#include "../../core/cr-build-configuration.hpp"
+#ifdef USE_VULKAN
 #include "../../core/gc/cr-gc.hpp"
 namespace gearoenix {
 namespace render {
@@ -35,4 +37,5 @@ namespace render {
     }
 }
 }
+#endif
 #endif

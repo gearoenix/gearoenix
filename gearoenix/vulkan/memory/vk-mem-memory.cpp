@@ -1,4 +1,5 @@
 #include "vk-mem-memory.hpp"
+#ifdef USE_VULKAN
 #include "../../core/cr-static.hpp"
 #include "../device/vk-dev-logical.hpp"
 #include "../device/vk-dev-physical.hpp"
@@ -54,3 +55,4 @@ bool gearoenix::render::memory::Memory::get_is_in_gpu() const
 {
     return is_in_gpu;
 }
+#endif

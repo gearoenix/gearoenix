@@ -1,4 +1,5 @@
 #include "vk-des-set-layout.hpp"
+#ifdef USE_VULKAN
 #include "../../core/cr-static.hpp"
 #include "../device/vk-dev-logical.hpp"
 #include "../device/vk-dev-physical.hpp"
@@ -70,3 +71,4 @@ const VkDescriptorSetLayout& gearoenix::render::descriptor::SetLayout::get_vulka
 {
     return vulkan_data;
 }
+#endif

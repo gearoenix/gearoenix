@@ -1,4 +1,5 @@
 #include "vk-surface.hpp"
+#ifdef USE_VULKAN
 #include "../core/cr-application.hpp"
 #include "../core/cr-build-configuration.hpp"
 #include "../core/cr-static.hpp"
@@ -68,3 +69,4 @@ const gearoenix::system::Application* gearoenix::render::Surface::get_sys_app()
 {
     return sys_app;
 }
+#endif

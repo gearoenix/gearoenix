@@ -1,4 +1,5 @@
 #include "vk-buf-uniform.hpp"
+#ifdef USE_VULKAN
 #include "../../system/sys-file.hpp"
 #include "../../system/sys-log.hpp"
 #include "../command/vk-cmd-buffer.hpp"
@@ -56,3 +57,4 @@ void gearoenix::render::buffer::Uniform::update(const void* data, unsigned int d
     unsigned int frmind = e->get_current_frame_index();
     cbuf[frmind]->write(data, data_size);
 }
+#endif

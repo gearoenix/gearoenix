@@ -1,4 +1,5 @@
 #include "vk-des-set.hpp"
+#ifdef USE_VULKAN
 #include "../../core/cr-static.hpp"
 #include "../../render/shader/rnd-shd-shader.hpp"
 #include "../command/vk-cmd-buffer.hpp"
@@ -102,3 +103,4 @@ void gearoenix::render::descriptor::Set::bind(pipeline::Pipeline* p, command::Bu
         0,
         vulkan_data);
 }
+#endif

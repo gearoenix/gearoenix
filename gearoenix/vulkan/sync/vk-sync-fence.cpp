@@ -1,4 +1,5 @@
 #include "vk-sync-fence.hpp"
+#ifdef USE_VULKAN
 #include "../../core/cr-build-configuration.hpp"
 #include "../../core/cr-static.hpp"
 #include "../device/vk-dev-logical.hpp"
@@ -46,3 +47,4 @@ const VkFence& gearoenix::render::sync::Fence::get_vulkan_data() const
 {
     return vulkan_data;
 }
+#endif

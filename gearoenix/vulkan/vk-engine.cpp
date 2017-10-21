@@ -1,4 +1,5 @@
 #include "vk-engine.hpp"
+#ifdef USE_VULKAN
 #include "../core/asset/cr-asset-manager.hpp"
 #include "../core/cr-application.hpp"
 #include "../core/cr-end-caller.hpp"
@@ -459,3 +460,4 @@ gearoenix::render::command::Buffer* gearoenix::render::Engine::get_current_comma
 {
     return cmd_bufs[current_frame];
 }
+#endif

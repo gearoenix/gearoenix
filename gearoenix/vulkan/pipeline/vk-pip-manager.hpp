@@ -1,5 +1,7 @@
 #ifndef GEAROENIX_VULKAN_PIPELINE_MANAGER_HPP
 #define GEAROENIX_VULKAN_PIPELINE_MANAGER_HPP
+#include "../../core/cr-build-configuration.hpp"
+#ifdef USE_VULKAN
 #include "../../render/shader/rnd-shd-shader.hpp"
 #include <memory>
 namespace gearoenix {
@@ -35,4 +37,5 @@ namespace render {
     }
 }
 }
+#endif
 #endif

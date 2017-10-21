@@ -1,5 +1,7 @@
 #ifndef GEAROENIX_VULKAN_DESCRIPTOR_SET_HPP
 #define GEAROENIX_VULKAN_DESCRIPTOR_SET_HPP
+#include "../../core/cr-build-configuration.hpp"
+#ifdef USE_VULKAN
 #include "../../core/cache/cr-cache-cached.hpp"
 #include "../vk-linker.hpp"
 namespace gearoenix {
@@ -35,4 +37,5 @@ namespace render {
     } // namespace descriptor
 } // namespace render
 } // namespace gearoenix
+#endif
 #endif // GEAROENIX_RENDER_DESCRIPTOR_SET_HPP

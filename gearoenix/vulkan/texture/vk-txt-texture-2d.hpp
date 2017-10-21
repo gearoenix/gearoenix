@@ -1,5 +1,7 @@
 #ifndef GEAROENIX_VULKAN_TEXTURE_2D_HPP
 #define GEAROENIX_VULKAN_TEXTURE_2D_HPP
+#include "../../core/cr-build-configuration.hpp"
+#ifdef USE_VULKAN
 #include "../../render/texture/rnd-txt-texture.hpp"
 #include "../vk-linker.hpp"
 #include <memory>
@@ -31,4 +33,5 @@ namespace render {
     }
 }
 }
+#endif
 #endif

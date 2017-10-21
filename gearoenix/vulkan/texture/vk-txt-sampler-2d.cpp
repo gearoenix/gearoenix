@@ -1,4 +1,5 @@
 #include "vk-txt-sampler-2d.hpp"
+#ifdef USE_VULKAN
 #include "../../core/cr-static.hpp"
 #include "../device/vk-dev-logical.hpp"
 #include "../device/vk-dev-physical.hpp"
@@ -44,3 +45,4 @@ const VkSampler& gearoenix::render::texture::Sampler2D::get_vulkan_data() const
 {
     return vulkan_data;
 }
+#endif

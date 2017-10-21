@@ -1,4 +1,5 @@
 #include "vk-img-image.hpp"
+#ifdef USE_VULKAN
 #include "../../core/cr-static.hpp"
 #include "../buffer/vk-buf-buffer.hpp"
 #include "../buffer/vk-buf-sub-buffer.hpp"
@@ -161,3 +162,4 @@ VkFormat gearoenix::render::image::Image::get_format() const
 #endif
     return fmt;
 }
+#endif

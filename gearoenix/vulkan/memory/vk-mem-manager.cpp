@@ -1,4 +1,5 @@
 #include "vk-mem-manager.hpp"
+#ifdef USE_VULKAN
 #include "../../core/cr-static.hpp"
 #include "../buffer/vk-buf-buffer.hpp"
 #include "../device/vk-dev-logical.hpp"
@@ -56,3 +57,4 @@ gearoenix::render::memory::SubMemory* gearoenix::render::memory::Manager::create
     allocate(submem);
     return submem;
 }
+#endif

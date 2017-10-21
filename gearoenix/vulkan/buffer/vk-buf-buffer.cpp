@@ -1,4 +1,5 @@
 #include "vk-buf-buffer.hpp"
+#ifdef USE_VULKAN
 #include "../../core/cr-static.hpp"
 #include "../command/vk-cmd-buffer.hpp"
 #include "../command/vk-cmd-pool.hpp"
@@ -116,3 +117,4 @@ void gearoenix::render::buffer::Buffer::write(const void* data, unsigned int dat
 #endif
     std::memcpy((void*)((size_t)buffer_data + (size_t)offset), data, data_size);
 }
+#endif

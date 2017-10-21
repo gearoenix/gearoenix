@@ -1,4 +1,5 @@
 #include "vk-dev-logical.hpp"
+#ifdef USE_VULKAN
 #include "../../core/cr-static.hpp"
 #include "../vk-check.hpp"
 #include "../vk-instance.hpp"
@@ -80,3 +81,4 @@ void gearoenix::render::device::Logical::wait_to_finish()
     auto l = physical_device->get_instance()->get_linker();
     l->vkDeviceWaitIdle(vulkan_data);
 }
+#endif

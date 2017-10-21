@@ -1,5 +1,7 @@
-#pragma once
+#ifndef GEAROENIX_VULKAN_LINKER_HPP
+#define GEAROENIX_VULKAN_LINKER_HPP
 #include "../core/cr-build-configuration.hpp"
+#ifdef USE_VULKAN
 #ifdef IN_ANDROID
 #define VK_USE_PLATFORM_ANDROID_KHR
 #elif defined(IN_LINUX)
@@ -243,3 +245,5 @@ namespace render {
     };
 }
 }
+#endif
+#endif

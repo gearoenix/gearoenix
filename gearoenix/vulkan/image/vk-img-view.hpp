@@ -1,5 +1,7 @@
 #ifndef GEAROENIX_VULKAN_IMAGE_VIEW_HPP
 #define GEAROENIX_VULKAN_IMAGE_VIEW_HPP
+#include "../../core/cr-build-configuration.hpp"
+#ifdef USE_VULKAN
 #include "../vk-linker.hpp"
 namespace gearoenix {
 namespace render {
@@ -27,4 +29,5 @@ namespace render {
     }
 }
 }
+#endif
 #endif

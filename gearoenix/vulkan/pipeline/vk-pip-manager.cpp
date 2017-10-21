@@ -1,4 +1,5 @@
 #include "vk-pip-manager.hpp"
+#ifdef USE_VULKAN
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../core/cache/cr-cache-cacher.hpp"
 #include "../../system/sys-app.hpp"
@@ -45,3 +46,4 @@ gearoenix::render::descriptor::Pool* gearoenix::render::pipeline::Manager::get_d
 {
     return despool;
 }
+#endif

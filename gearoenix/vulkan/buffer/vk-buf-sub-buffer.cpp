@@ -1,4 +1,5 @@
 #include "vk-buf-sub-buffer.hpp"
+#ifdef USE_VULKAN
 #include "../../system/sys-log.hpp"
 #include "../command/vk-cmd-buffer.hpp"
 #include "vk-buf-buffer.hpp"
@@ -36,3 +37,4 @@ void gearoenix::render::buffer::SubBuffer::copy_from(command::Buffer* cb, SubBuf
     bc.srcOffset = sb->offset;
     cb->copy_buffer(sb->buff->get_vulkan_data(), buff->get_vulkan_data(), bc);
 }
+#endif

@@ -1,4 +1,5 @@
 #include "vk-buf-manager.hpp"
+#ifdef USE_VULKAN
 #include "../device/vk-dev-logical.hpp"
 #include "../device/vk-dev-physical.hpp"
 #include "../memory/vk-mem-manager.hpp"
@@ -65,3 +66,4 @@ gearoenix::render::buffer::SubBuffer* gearoenix::render::buffer::Manager::create
     allocate(subbuff);
     return subbuff;
 }
+#endif

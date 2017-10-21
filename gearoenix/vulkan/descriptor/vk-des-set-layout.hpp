@@ -1,5 +1,7 @@
 #ifndef GEAROENIX_VULKAN_DESCRIPTOR_SET_LAYOUT_HPP
 #define GEAROENIX_VULKAN_DESCRIPTOR_SET_LAYOUT_HPP
+#include "../../core/cr-build-configuration.hpp"
+#ifdef USE_VULKAN
 #include "../../render/shader/rnd-shd-shader.hpp"
 #include "../vk-linker.hpp"
 namespace gearoenix {
@@ -23,4 +25,5 @@ namespace render {
     } // namespace descriptor
 } // namespace render
 } // namespace gearoenix
+#endif
 #endif // GEAROENIX_RENDER_DESCRIPTOR_SET_LAYOUT_HPP

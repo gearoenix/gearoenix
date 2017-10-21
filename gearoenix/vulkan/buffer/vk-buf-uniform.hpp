@@ -1,5 +1,7 @@
 #ifndef GEAROENIX_VULKAN_BUFFER_UNIFORM_HPP
 #define GEAROENIX_VULKAN_BUFFER_UNIFORM_HPP
+#include "../../core/cr-build-configuration.hpp"
+#ifdef USE_VULKAN
 namespace gearoenix {
 namespace system {
     class File;
@@ -28,4 +30,5 @@ namespace render {
     } // namespace buffer
 } // namespace render
 } // namespace gearoenix
+#endif
 #endif // GEAROENIX_VULKAN_BUFFER_UNIFORM_HPP

@@ -1,4 +1,7 @@
-#pragma once
+#ifndef GEAROENIX_VULKAN_CHECK_HPP
+#define GEAROENIX_VULKAN_CHECK_HPP
+#include "../core/cr-build-configuration.hpp"
+#ifdef USE_VULKAN
 #include "../system/sys-log.hpp"
 #include "vk-linker.hpp"
 #include <string>
@@ -10,3 +13,6 @@
             LOGF(std::string("Error in vulkan, result is ") + std::to_string(res) + "."); \
         }                                                                                 \
     }
+
+#endif
+#endif
