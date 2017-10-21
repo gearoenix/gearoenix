@@ -126,6 +126,26 @@ void gearoenix::math::Mat4x4::operator*=(const Mat4x4& m)
     }
 }
 
+const gearoenix::core::Real& gearoenix::math::Mat4x4::operator[](const unsigned int i) const
+{
+#ifdef DEBUG_MODE
+    if (i > 15) {
+        UNEXPECTED;
+    }
+#endif
+    return mat[i];
+}
+
+gearoenix::core::Real& gearoenix::math::Mat4x4::operator[](const unsigned int i)
+{
+#ifdef DEBUG_MODE
+    if (i > 15) {
+        UNEXPECTED;
+    }
+#endif
+    return mat[i];
+}
+
 void gearoenix::math::Mat4x4::scale3x3(const core::Real& s)
 {
     mat[0] *= s;

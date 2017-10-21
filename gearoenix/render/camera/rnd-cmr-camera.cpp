@@ -28,6 +28,8 @@ gearoenix::render::camera::Camera::Camera(system::File* f, system::Application* 
     z = r * math::Vec3::Z;
     vwl *= rr;
     v = vwl * math::Mat4x4::translator(l);
+    f->read(start);
+    f->read(end);
 }
 
 gearoenix::render::camera::Camera::~Camera()

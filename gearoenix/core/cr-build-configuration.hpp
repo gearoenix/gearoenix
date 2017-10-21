@@ -11,7 +11,12 @@
 #endif
 /// Graphic API choosing
 /// -------------------------------------------------------------------------
-#define USE_VULKAN
+//#define USE_VULKAN
+#define USE_OPENGL_ES3
+//#define USE_OPENGL_ES2
+//#define USE_OPENGL_4
+//#define USE_D3DX12
+//#define USE_METAL
 /// Application constant definitions
 /// -------------------------------------------------------------
 #define APPLICATION_NAME "Gearoenix Demo App"

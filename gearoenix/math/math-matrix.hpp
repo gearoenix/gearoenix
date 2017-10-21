@@ -28,6 +28,8 @@ namespace math {
         Mat4x4 operator*(const Mat4x4& m) const;
         void operator=(const Mat4x4& m);
         void operator*=(const Mat4x4& m);
+        const core::Real& operator[](const unsigned int i) const;
+        core::Real& operator[](const unsigned int i);
         void scale3x3(const core::Real& s);
         void scale3x3(const core::Real& a, const core::Real& b, const core::Real& c);
         void scale4x3(const core::Real& s);

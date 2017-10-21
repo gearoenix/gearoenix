@@ -5,6 +5,7 @@
 gearoenix::render::camera::Perspective::Perspective(system::File* f, system::Application* app)
     : Camera(f, app)
 {
+    v[14] = -v[14];
     f->read(h_angle);
     c_width = std::tan(h_angle) * start;
     c_height = c_width / screen_ratio;
