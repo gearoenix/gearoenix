@@ -4,7 +4,7 @@
 #ifdef USE_VULKAN
 #include "../../vulkan/shader/vk-shd-resources.hpp"
 #elif defined(USE_OPENGL)
-#include "../../opengl/shader/gl-shd-resources.hpp"
+#include "../../opengl4/shader/gl-shd-resources.hpp"
 #else
 #error "Unimplemented"
 #endif

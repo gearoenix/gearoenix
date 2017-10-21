@@ -4,7 +4,7 @@
 #ifdef USE_VULKAN
 #include "../../vulkan/buffer/vk-buf-mesh.hpp"
 #elif defined(USE_OPENGL)
-#include "../../opengl/buffer/gl-buf-mesh.hpp"
+#include "../../opengl4/buffer/gl-buf-mesh.hpp"
 #else
 #error "Not implemented yet"
 #endif

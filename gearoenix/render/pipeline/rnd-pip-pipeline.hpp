@@ -4,7 +4,7 @@
 #ifdef USE_VULKAN
 #include "../../vulkan/pipeline/vk-pip-pipeline.hpp"
 #elif defined(USE_OPENGL)
-#include "../../opengl/pipeline/gl-pip-pipeline.hpp"
+#include "../../opengl4/pipeline/gl-pip-pipeline.hpp"
 #else
 #error "Not implemented yet"
 #endif

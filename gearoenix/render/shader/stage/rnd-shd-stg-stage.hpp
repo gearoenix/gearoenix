@@ -4,7 +4,7 @@
 #ifdef USE_VULKAN
 #include "../../../vulkan/shader/stage/vk-shader-stage.hpp"
 #elif defined(USE_OPENGL)
-#include "../../../opengl/shader/stage/gl-shd-stage.hpp"
+#include "../../../opengl4/shader/stage/gl-shd-stage.hpp"
 #else
 #error "Not implemented"
 #endif // USE_*

@@ -7,9 +7,9 @@
 TestApp::TestApp(gearoenix::system::Application* sys_app)
     : gearoenix::core::Application::Application(sys_app)
 {
-    sys_app->get_render_engine()->load_scene(0, [](unsigned int index) {
-        LOGI(index << "Loaded.");
-    });
+    //    sys_app->get_render_engine()->load_scene(0, [](unsigned int index) {
+    //        LOGI(index << "Loaded.");
+    //    });
 }
 
 TestApp::~TestApp() {}

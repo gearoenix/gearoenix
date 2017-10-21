@@ -4,7 +4,7 @@
 #ifdef USE_VULKAN
 #include "../../vulkan/texture/vk-txt-texture-2d.hpp"
 #elif defined(USE_OPENGL)
-#include "../../opengl/texture/gl-txt-2d.hpp"
+#include "../../opengl4/texture/gl-txt-2d.hpp"
 #else
 #error "Unimplemented"
 #endif
