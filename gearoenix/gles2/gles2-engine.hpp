@@ -6,10 +6,16 @@
 #include <SDL2/SDL_opengles2.h>
 namespace gearoenix {
 namespace gles2 {
+    namespace shader {
+        class DirectionalColoredSpeculatedNocubeNoshadowOpaque;
+    }
     class Engine : public render::Engine {
     private:
         GLuint shadow_map_texture;
         GLuint shadow_map_framebuffer;
+
+        GLuint vbo, ibo;
+        shader::DirectionalColoredSpeculatedNocubeNoshadowOpaque* shd;
 
     public:
         Engine(system::Application* sys_app);

@@ -49,7 +49,22 @@ gearoenix::gles2::Engine::Engine(system::Application* sysapp)
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glViewport(0, 0, width, height);
     glScissor(0, 0, width, height);
-    shader::DirectionalColoredSpeculatedNocubeNoshadowOpaque* shd = new shader::DirectionalColoredSpeculatedNocubeNoshadowOpaque();
+
+    const GLfloat vertices[] = {
+        0.0f, 1.0f, -0.5f, 0.0f, 0.0f, 1.0f,
+        1.0f, 0.0f, -0.5f, 0.0f, 0.0f, 1.0f,
+        -1.0f, 0.0f, -0.5f, 0.0f, 0.0f, 1.0f,
+    };
+    const GLushort indices[] = {
+        0, 2, 1,
+    };
+    glGenBuffers(1, &vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glGenBuffers(1, &ibo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    shd = new shader::DirectionalColoredSpeculatedNocubeNoshadowOpaque();
 }
 
 gearoenix::gles2::Engine::~Engine()
@@ -65,6 +80,10 @@ void gearoenix::gles2::Engine::window_changed()
 void gearoenix::gles2::Engine::update()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+    shd->use();
+    glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, 0);
 }
 
 void gearoenix::gles2::Engine::terminate()

@@ -5,8 +5,8 @@ gearoenix::gles2::shader::DirectionalColoredSpeculatedNocubeNoshadowOpaque::Dire
 {
     create_program();
     std::string pvs =
-        //            "precision mediump sampler2D;\n"
-        //            "precision mediump float;\n"
+        //"precision mediump sampler2D;\n"
+        //"precision mediump float;\n"
         "attribute vec3 vertex;\n"
         "attribute vec3 normal;\n"
         "varying vec3 pos;\n"
@@ -20,8 +20,8 @@ gearoenix::gles2::shader::DirectionalColoredSpeculatedNocubeNoshadowOpaque::Dire
         "    gl_Position = mvp * vec4(vertex, 1.0);\n"
         "}\n";
     std::string pfs =
-        //            "precision mediump sampler2D;\n"
-        //            "precision mediump float;\n"
+        //"precision mediump sampler2D;\n"
+        //"precision mediump float;\n"
         "varying vec3 pos;\n"
         "varying vec3 nrm;\n"
         "uniform vec3 color;\n"
