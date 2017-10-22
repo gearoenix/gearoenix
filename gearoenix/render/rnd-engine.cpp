@@ -26,3 +26,10 @@ gearoenix::render::pipeline::Manager* gearoenix::render::Engine::get_pipeline_ma
 {
     return pipmgr;
 }
+
+void gearoenix::render::Engine::add_load_function(std::function<void()> fun)
+{
+    std::lock_guard<std::mutex> lock(load_functions_mutex);
+    load_functions.push_back(fun);
+    (void)lock;
+}

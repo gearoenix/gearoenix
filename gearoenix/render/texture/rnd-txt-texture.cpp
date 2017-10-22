@@ -13,10 +13,10 @@ gearoenix::render::texture::Texture* gearoenix::render::texture::Texture::read(s
     f->read(t);
     switch (t) {
     case 10:
-        return new Texture2D(f, e, c);
+        return e->create_texture_2d(f, c);
     case 20: {
-        LOGF("Cube texture is not implemented yet.");
+        UNIMPLEMENTED;
     }
     }
-    LOGF("Unexected");
+    UNEXPECTED;
 }

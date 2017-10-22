@@ -15,6 +15,9 @@ namespace gles2 {
     namespace shader {
         class DirectionalColoredSpeculatedNocubeNoshadowOpaque;
     }
+    namespace texture {
+        class Texture2D;
+    }
     class Engine : public render::Engine {
     private:
         GLuint shadow_map_texture;
@@ -23,6 +26,7 @@ namespace gles2 {
         GLuint vbo, ibo;
         shader::DirectionalColoredSpeculatedNocubeNoshadowOpaque* shd;
         std::shared_ptr<render::camera::Camera> cam;
+        std::shared_ptr<texture::Texture2D> txt;
 
     public:
         Engine(system::Application* sys_app);
@@ -30,6 +34,7 @@ namespace gles2 {
         void window_changed();
         void update();
         void terminate();
+        render::texture::Texture2D* create_texture_2d(system::File* file, std::shared_ptr<core::EndCaller> c);
     };
 }
 }

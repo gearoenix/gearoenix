@@ -2,7 +2,8 @@
 #define GEAROENIX_OPENGL_TEXTURE_2D_HPP
 #include "../../core/cr-build-configuration.hpp"
 #ifdef USE_OPENGL_ES2
-#include "../../render/texture/rnd-txt-texture.hpp"
+#include "../../render/texture/rnd-txt-texture-2d.hpp"
+#include <SDL2/SDL_opengles2.h>
 #include <memory>
 namespace gearoenix {
 namespace core {
@@ -11,21 +12,17 @@ namespace core {
 namespace system {
     class File;
 }
-namespace render {
-    namespace image {
-        class View;
-    }
+namespace gles2 {
     class Engine;
     namespace texture {
-        class Sampler2D;
-        class Texture2D : public Texture {
+        class Texture2D : public render::texture::Texture2D {
         private:
+            GLuint texture_object;
+
         public:
             Texture2D(system::File* file, Engine* engine, std::shared_ptr<core::EndCaller> end);
             ~Texture2D();
-            image::View* get_view();
-            static uint32_t get_memory_type_bits(Engine* engine);
-            //            static void fill_info(VkImageCreateInfo& info, unsigned int img_width, unsigned int img_height, unsigned int channels);
+            void bind(GLenum texture_unit);
         };
     }
 }

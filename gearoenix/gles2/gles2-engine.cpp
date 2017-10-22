@@ -5,6 +5,7 @@
 #include "../system/sys-app.hpp"
 #include "../system/sys-log.hpp"
 #include "shader/gles2-shd-directional-colored-speculated-nocube-noshadow-opaque.hpp"
+#include "texture/gles2-txt-2d.hpp"
 
 gearoenix::gles2::Engine::Engine(system::Application* sysapp)
     : render::Engine(sysapp)
@@ -87,6 +88,17 @@ void gearoenix::gles2::Engine::update()
         cam = sysapp->get_asset_manager()->get_camera(0);
     }
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    std::vector<std::function<void()>> temp_functions;
+    load_functions_mutex.lock();
+    std::move(load_functions.begin(), load_functions.end(), std::back_inserter(temp_functions));
+    load_functions.clear();
+    load_functions_mutex.unlock();
+    for (std::function<void()>& f : temp_functions) {
+        f();
+    }
+    temp_functions.clear();
+    ///////////////////////////////////////////////////////////////////////////////////////////////
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
     shd->use();
@@ -97,6 +109,11 @@ void gearoenix::gles2::Engine::update()
 void gearoenix::gles2::Engine::terminate()
 {
     TODO;
+}
+
+gearoenix::render::texture::Texture2D* gearoenix::gles2::Engine::create_texture_2d(system::File* file, std::shared_ptr<core::EndCaller> c)
+{
+    return new texture::Texture2D(file, this, c);
 }
 
 #endif
