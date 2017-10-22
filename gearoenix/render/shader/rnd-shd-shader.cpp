@@ -6,6 +6,11 @@
 #include "../material/rnd-mat-white.hpp"
 #include "rnd-shd-basic.hpp"
 
+const std::vector<gearoenix::render::shader::stage::Id> gearoenix::render::shader::Shader::graphic_2_stage = {
+    gearoenix::render::shader::stage::VERTEX,
+    gearoenix::render::shader::stage::FRAGMENT
+};
+
 const std::vector<gearoenix::render::shader::ResourceDescription>
     gearoenix::render::shader::Shader::buffer_rsc_des = {
         { { gearoenix::render::shader::stage::VERTEX },

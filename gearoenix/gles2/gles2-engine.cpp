@@ -2,6 +2,7 @@
 #ifdef USE_OPENGL_ES2
 #include "../system/sys-app.hpp"
 #include "../system/sys-log.hpp"
+#include "shader/gles2-shd-directional-colored-speculated-nocube-noshadow-opaque.hpp"
 
 gearoenix::gles2::Engine::Engine(system::Application* sysapp)
     : render::Engine(sysapp)
@@ -48,6 +49,7 @@ gearoenix::gles2::Engine::Engine(system::Application* sysapp)
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glViewport(0, 0, width, height);
     glScissor(0, 0, width, height);
+    shader::DirectionalColoredSpeculatedNocubeNoshadowOpaque* shd = new shader::DirectionalColoredSpeculatedNocubeNoshadowOpaque();
 }
 
 gearoenix::gles2::Engine::~Engine()

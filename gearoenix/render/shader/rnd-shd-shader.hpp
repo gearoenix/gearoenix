@@ -44,6 +44,7 @@ namespace render {
             static const std::vector<VertexAttribute> has_pos_nrm_uv;
 
         protected:
+            static const std::vector<stage::Id> graphic_2_stage;
             Shader();
 
         public:
