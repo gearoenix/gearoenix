@@ -10,8 +10,8 @@ gearoenix::gles2::Engine::Engine(system::Application* sysapp)
     : render::Engine(sysapp)
 {
     glClearColor(0.3f, 0.3f, 0.3f, 1.f);
-    //    glEnable(GL_CULL_FACE);
-    //    glCullFace(GL_BACK);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_DEPTH_TEST);
@@ -39,8 +39,8 @@ gearoenix::gles2::Engine::Engine(system::Application* sysapp)
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
         UNEXPECTED;
     }
-    //    glEnable(GL_CULL_FACE);
-    //    glCullFace(GL_BACK);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_DEPTH_TEST);
@@ -67,12 +67,6 @@ gearoenix::gles2::Engine::Engine(system::Application* sysapp)
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
     shd = new shader::DirectionalColoredSpeculatedNocubeNoshadowOpaque();
-    vp = math::Mat4x4::look_at(
-        math::Vec3(0.0f, 0.0f, 0.0f),
-        math::Vec3(0.0f, 0.0f, -1.0f),
-        math::Vec3(0.0f, 1.0f, 0.0f));
-    vp = math::Mat4x4::perspective(1.7f, 1.0f, 0.1f, 100.0f) * vp;
-    vp *= math::Mat4x4::translator(math::Vec3(0.0f, 0.0f, 0.0f));
 }
 
 gearoenix::gles2::Engine::~Engine()
@@ -96,7 +90,6 @@ void gearoenix::gles2::Engine::update()
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
     shd->use();
-    //    shd->set_mvp(vp.get_data());
     shd->set_mvp(cam->get_view_projection().get_data());
     glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, 0);
 }

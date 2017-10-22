@@ -2,7 +2,6 @@
 #define GEAROENIX_GLES2_ENGINE_HPP
 #include "../core/cr-build-configuration.hpp"
 #ifdef USE_OPENGL_ES2
-#include "../math/math-matrix.hpp"
 #include "../render/rnd-engine.hpp"
 #include <SDL2/SDL_opengles2.h>
 #include <memory>
@@ -24,7 +23,6 @@ namespace gles2 {
         GLuint vbo, ibo;
         shader::DirectionalColoredSpeculatedNocubeNoshadowOpaque* shd;
         std::shared_ptr<render::camera::Camera> cam;
-        math::Mat4x4 vp;
 
     public:
         Engine(system::Application* sys_app);
