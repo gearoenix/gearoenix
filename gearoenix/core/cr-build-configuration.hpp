@@ -18,11 +18,12 @@
 //#define USE_VULKAN
 //#define USE_OPENGL_4
 //#define USE_OPENGL_ES3
-//#define USE_OPENGL_ES2
+#define USE_OPENGL_ES2
 #else
 #error "Not implemetned yet."
 #endif
 #define USE_SDL
+//#define USE_GLFW
 /// Application constant definitions
 /// -------------------------------------------------------------
 #define APPLICATION_NAME "Gearoenix Demo App"

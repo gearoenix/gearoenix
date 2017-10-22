@@ -91,4 +91,20 @@ gearoenix::core::Real gearoenix::system::Application::get_window_ratio() const
     return 1.7f;
 }
 
+unsigned int gearoenix::system::Application::get_width() const
+{
+    int w, h;
+    SDL_GetWindowSize(window, &w, &h);
+    (void)h;
+    return static_cast<unsigned int>(w);
+}
+
+unsigned int gearoenix::system::Application::get_height() const
+{
+    int w, h;
+    SDL_GetWindowSize(window, &w, &h);
+    (void)w;
+    return static_cast<unsigned int>(h);
+}
+
 #endif
