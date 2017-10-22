@@ -4,7 +4,6 @@
 #ifdef USE_OPENGL_ES2
 #include "gles2-shader.hpp"
 #include <SDL2/SDL_opengles2.h>
-#include <glm/vec3.hpp>
 namespace gearoenix {
 namespace gles2 {
     namespace shader {
@@ -27,6 +26,7 @@ namespace gles2 {
             const std::vector<render::shader::stage::Id>& get_stages_ids() const;
             const render::shader::stage::Stage* get_stage(render::shader::stage::Id id) const;
             render::shader::stage::Stage* get_stage(render::shader::stage::Id id);
+            void set_mvp(const GLfloat* data);
         };
     }
 }

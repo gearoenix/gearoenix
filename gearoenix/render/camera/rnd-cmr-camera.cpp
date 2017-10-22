@@ -27,7 +27,7 @@ gearoenix::render::camera::Camera::Camera(system::File* f, system::Application* 
     y = r * math::Vec3::Y;
     z = r * math::Vec3::Z;
     vwl *= rr;
-    v = vwl * math::Mat4x4::translator(l);
+    v = vwl * math::Mat4x4::translator(-l);
     f->read(start);
     f->read(end);
 }
@@ -160,7 +160,7 @@ void gearoenix::render::camera::Camera::rotate_global(const core::Real rad, cons
 
 const gearoenix::math::Mat4x4& gearoenix::render::camera::Camera::get_view_projection() const
 {
-    return v;
+    return vp;
 }
 
 const gearoenix::math::Mat4x4& gearoenix::render::camera::Camera::get_zero_located_view() const

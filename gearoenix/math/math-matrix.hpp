@@ -42,6 +42,7 @@ namespace math {
         core::Real determinant() const;
         Mat4x4 inversed() const;
         Mat4x4 transposed() const;
+        const core::Real* get_data() const;
         static Mat4x4 look_at(const Vec3& position, const Vec3& target, const Vec3& up);
         static Mat4x4 rotation(const Vec3& v, core::Real degree);
         static Mat4x4 translator(const Vec3& v);

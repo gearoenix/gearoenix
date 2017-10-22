@@ -23,6 +23,7 @@ namespace gles2 {
         public:
             Shader();
             virtual ~Shader();
+            virtual void set_mvp(const GLfloat* data) = 0;
         };
     }
 }

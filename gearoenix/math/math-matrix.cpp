@@ -376,3 +376,8 @@ gearoenix::math::Mat4x4 gearoenix::math::Mat4x4::transposed() const
     }
     return r;
 }
+
+const gearoenix::core::Real* gearoenix::math::Mat4x4::get_data() const
+{
+    return mat;
+}

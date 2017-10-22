@@ -92,4 +92,9 @@ gearoenix::render::shader::stage::Stage* gearoenix::gles2::shader::DirectionalCo
     return nullptr;
 }
 
+void gearoenix::gles2::shader::DirectionalColoredSpeculatedNocubeNoshadowOpaque::set_mvp(const GLfloat* data)
+{
+    glUniformMatrix4fv(mvp, 1, GL_FALSE, data);
+}
+
 #endif
