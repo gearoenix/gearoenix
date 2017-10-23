@@ -90,7 +90,10 @@ void gearoenix::gles2::shader::Shader::end_object(const GLuint& shader_object)
     glDeleteShader(shader_object);
 }
 
-gearoenix::gles2::shader::Shader::Shader() {}
+gearoenix::gles2::shader::Shader::Shader()
+{
+    create_program();
+}
 
 gearoenix::gles2::shader::Shader::~Shader() {}
 

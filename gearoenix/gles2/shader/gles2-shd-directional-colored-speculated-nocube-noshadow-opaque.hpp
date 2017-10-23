@@ -12,7 +12,10 @@ namespace gles2 {
             GLuint mvp;
             GLuint m;
             GLuint sun;
+            GLuint sun_color;
             GLuint eye;
+            GLuint spec_color;
+            GLuint spec_factor;
             GLuint color;
             GLuint vtx_shd;
             GLuint frg_shd;
@@ -27,6 +30,12 @@ namespace gles2 {
             const render::shader::stage::Stage* get_stage(render::shader::stage::Id id) const;
             render::shader::stage::Stage* get_stage(render::shader::stage::Id id);
             void set_mvp(const GLfloat* data);
+            void set_m(const GLfloat* data);
+            void set_sun(const GLfloat* data);
+            void set_sun_color(const GLfloat* data);
+            void set_eye(const GLfloat* data);
+            void set_spec_color(const GLfloat data);
+            void set_spec_factor(GLfloat data);
         };
     }
 }

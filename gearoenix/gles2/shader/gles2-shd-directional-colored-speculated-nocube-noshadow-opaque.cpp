@@ -3,7 +3,6 @@
 #include "../../system/sys-log.hpp"
 gearoenix::gles2::shader::DirectionalColoredSpeculatedNocubeNoshadowOpaque::DirectionalColoredSpeculatedNocubeNoshadowOpaque()
 {
-    create_program();
     std::string pvs =
         //"precision mediump sampler2D;\n"
         //"precision mediump float;\n"
@@ -59,9 +58,10 @@ void gearoenix::gles2::shader::DirectionalColoredSpeculatedNocubeNoshadowOpaque:
     glUseProgram(shader_program);
     glEnableVertexAttribArray(vtx_att_ind);
     glEnableVertexAttribArray(nrm_att_ind);
+    //////////////////////////////////////////////////////
     glVertexAttribPointer(vtx_att_ind, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void*)0);
     glVertexAttribPointer(nrm_att_ind, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
-
+    ///////////////////////////////////////////////////////
     const GLfloat data[] = {
         1.0f, 0.0f, 0.0f, 0.0f,
         0.0f, 1.0f, 0.0f, 0.0f,

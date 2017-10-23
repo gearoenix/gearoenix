@@ -14,6 +14,7 @@ namespace render {
 namespace gles2 {
     namespace shader {
         class DirectionalColoredSpeculatedNocubeNoshadowOpaque;
+        class DirectionalTexturedSpeculatedNocubeNoshadowOpaque;
     }
     namespace texture {
         class Texture2D;
@@ -24,7 +25,7 @@ namespace gles2 {
         GLuint shadow_map_framebuffer;
 
         GLuint vbo, ibo;
-        shader::DirectionalColoredSpeculatedNocubeNoshadowOpaque* shd;
+        shader::DirectionalTexturedSpeculatedNocubeNoshadowOpaque* shd = nullptr;
         std::shared_ptr<render::camera::Camera> cam;
         std::shared_ptr<texture::Texture2D> txt;
 

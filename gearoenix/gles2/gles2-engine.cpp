@@ -1,10 +1,11 @@
 #include "gles2-engine.hpp"
 #ifdef USE_OPENGL_ES2
 #include "../core/asset/cr-asset-manager.hpp"
+#include "../core/cr-end-caller.hpp"
 #include "../render/camera/rnd-cmr-camera.hpp"
 #include "../system/sys-app.hpp"
 #include "../system/sys-log.hpp"
-#include "shader/gles2-shd-directional-colored-speculated-nocube-noshadow-opaque.hpp"
+#include "shader/gles2-shd-directional-textured-speculated-nocube-noshadow-opaque.hpp"
 #include "texture/gles2-txt-2d.hpp"
 
 gearoenix::gles2::Engine::Engine(system::Application* sysapp)
@@ -54,9 +55,9 @@ gearoenix::gles2::Engine::Engine(system::Application* sysapp)
     glScissor(0, 0, width, height);
 
     const GLfloat vertices[] = {
-        0.0f, 1.0f, -0.5f, 0.0f, 0.0f, 1.0f,
-        1.0f, 0.0f, -0.5f, 0.0f, 0.0f, 1.0f,
-        -1.0f, 0.0f, -0.5f, 0.0f, 0.0f, 1.0f,
+        0.0f, 1.0f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
+        1.0f, 0.0f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f,
+        -1.0f, 0.0f, -0.5f, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f,
     };
     const GLushort indices[] = {
         0, 2, 1,
@@ -67,7 +68,6 @@ gearoenix::gles2::Engine::Engine(system::Application* sysapp)
     glGenBuffers(1, &ibo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-    shd = new shader::DirectionalColoredSpeculatedNocubeNoshadowOpaque();
 }
 
 gearoenix::gles2::Engine::~Engine()
@@ -86,6 +86,9 @@ void gearoenix::gles2::Engine::update()
     if (first_happen) {
         first_happen = false;
         cam = sysapp->get_asset_manager()->get_camera(0);
+        txt = std::static_pointer_cast<texture::Texture2D>(sysapp->get_asset_manager()->get_texture(0, core::EndCaller::create([this] {
+            shd = new shader::DirectionalTexturedSpeculatedNocubeNoshadowOpaque();
+        })));
     }
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -99,11 +102,14 @@ void gearoenix::gles2::Engine::update()
     }
     temp_functions.clear();
     ///////////////////////////////////////////////////////////////////////////////////////////////
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-    shd->use();
-    shd->set_mvp(cam->get_view_projection().get_data());
-    glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, 0);
+    if (shd != nullptr) {
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+        shd->use();
+        txt->bind(GL_TEXTURE0);
+        shd->set_mvp(cam->get_view_projection().get_data());
+        glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, 0);
+    }
 }
 
 void gearoenix::gles2::Engine::terminate()
