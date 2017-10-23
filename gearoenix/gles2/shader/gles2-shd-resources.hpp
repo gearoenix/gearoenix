@@ -20,9 +20,8 @@ namespace gles2 {
         private:
         public:
             Resources(Engine* e, pipeline::Pipeline* pip, buffer::Uniform* u);
-            Resources(Engine* e, pipeline::Pipeline* pip, buffer::Uniform* u, texture::Texture2D* t);
             ~Resources();
-            void bind(pipeline::Pipeline* pip);
+            void bind();
         };
     }
 }

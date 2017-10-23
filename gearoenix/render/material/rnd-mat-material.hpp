@@ -30,7 +30,7 @@ namespace render {
             std::shared_ptr<pipeline::Pipeline> pl;
             buffer::Uniform* ub;
             Engine* e;
-            Material(shader::Id sid, unsigned int us, Engine* e);
+            Material(shader::Id sid, unsigned int us, Engine* e, std::shared_ptr<core::EndCaller> end);
 
         public:
             virtual ~Material();

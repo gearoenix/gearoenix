@@ -29,8 +29,6 @@ namespace gles2 {
             ~DirectionalTexturedSpeculatedNocubeNoshadowOpaque();
             void use();
             const std::vector<render::shader::stage::Id>& get_stages_ids() const;
-            const render::shader::stage::Stage* get_stage(render::shader::stage::Id id) const;
-            render::shader::stage::Stage* get_stage(render::shader::stage::Id id);
             void set_mvp(const GLfloat* data);
             void set_m(const GLfloat* data);
             void set_sun(const GLfloat* data);

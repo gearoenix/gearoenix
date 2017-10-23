@@ -81,18 +81,6 @@ const std::vector<gearoenix::render::shader::stage::Id>& gearoenix::gles2::shade
     return graphic_2_stage;
 }
 
-const gearoenix::render::shader::stage::Stage* gearoenix::gles2::shader::DirectionalColoredSpeculatedNocubeNoshadowOpaque::get_stage(render::shader::stage::Id) const
-{
-    UNIMPLEMENTED;
-    return nullptr;
-}
-
-gearoenix::render::shader::stage::Stage* gearoenix::gles2::shader::DirectionalColoredSpeculatedNocubeNoshadowOpaque::get_stage(render::shader::stage::Id)
-{
-    UNIMPLEMENTED;
-    return nullptr;
-}
-
 void gearoenix::gles2::shader::DirectionalColoredSpeculatedNocubeNoshadowOpaque::set_mvp(const GLfloat* data)
 {
     glUniformMatrix4fv(mvp, 1, GL_FALSE, data);

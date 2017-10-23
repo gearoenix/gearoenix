@@ -14,17 +14,23 @@ namespace system {
     class File;
 }
 namespace render {
+    namespace buffer {
+        class Mesh;
+        class Uniform;
+    }
     namespace pipeline {
         class Manager;
-    }
-    namespace texture {
-        class Texture2D;
+        class Pipeline;
     }
     namespace scene {
         class Scene;
     }
     namespace shader {
         class Shader;
+        class Resources;
+    }
+    namespace texture {
+        class Texture2D;
     }
     class Engine {
     private:
@@ -43,12 +49,16 @@ namespace render {
         virtual void update() = 0;
         virtual void terminate() = 0;
         virtual texture::Texture2D* create_texture_2d(system::File* file, std::shared_ptr<core::EndCaller> c) = 0;
+        virtual buffer::Mesh* create_mesh(unsigned int vec, system::File* file, std::shared_ptr<core::EndCaller> c) = 0;
+        virtual buffer::Uniform* create_uniform(unsigned int s, std::shared_ptr<core::EndCaller> c) = 0;
         virtual shader::Shader* create_shader(core::Id sid, system::File* file, std::shared_ptr<core::EndCaller> c) = 0;
+        virtual shader::Resources* create_shader_resources(core::Id sid, pipeline::Pipeline* p, std::shared_ptr<core::EndCaller> c) = 0;
+        virtual pipeline::Pipeline* create_pipeline(core::Id sid, std::shared_ptr<core::EndCaller> c) = 0;
+        const pipeline::Manager* get_pipeline_manager() const;
+        pipeline::Manager* get_pipeline_manager();
         void add_load_function(std::function<void()> fun);
         const system::Application* get_system_application() const;
         system::Application* get_system_application();
-        const pipeline::Manager* get_pipeline_manager() const;
-        pipeline::Manager* get_pipeline_manager();
         void load_scene(core::Id scene_id, std::function<void(unsigned int)> on_load);
     };
 }

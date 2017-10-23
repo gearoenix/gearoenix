@@ -20,7 +20,7 @@ namespace render {
             void sub_bind();
 
         public:
-            White(Engine* e);
+            White(Engine* e, std::shared_ptr<core::EndCaller> end);
             ~White();
             unsigned int get_vertex_elements_count() const;
             void update(const scene::Scene* s, const model::Model* m);

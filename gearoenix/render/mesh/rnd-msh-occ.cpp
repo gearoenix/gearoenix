@@ -1,6 +1,7 @@
 #include "rnd-msh-occ.hpp"
 #include "../../system/sys-file.hpp"
 #include "../buffer/rnd-buf-mesh.hpp"
+#include "../rnd-engine.hpp"
 #include "../shader/rnd-shd-shader.hpp"
 
 gearoenix::render::mesh::Occ::Occ(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c)
@@ -13,7 +14,7 @@ gearoenix::render::mesh::Occ::Occ(system::File* f, Engine* e, std::shared_ptr<co
     }
 #endif
     unsigned int vec = shader::Shader::get_vertex_real_count(sid);
-    buf = new buffer::Mesh(vec, f, e, c);
+    buf = e->create_mesh(vec, f, c);
 }
 
 gearoenix::render::mesh::Occ::~Occ()

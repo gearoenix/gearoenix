@@ -2,12 +2,13 @@
 #include "../../system/sys-log.hpp"
 #include "../buffer/rnd-buf-uniform.hpp"
 #include "../model/rnd-mdl-model.hpp"
+#include "../rnd-engine.hpp"
 #include "../shader/rnd-shd-resources.hpp"
 
-gearoenix::render::material::White::White(Engine* e)
-    : Material(shader::WHITE, sizeof(u), e)
+gearoenix::render::material::White::White(Engine* e, std::shared_ptr<core::EndCaller> end)
+    : Material(shader::WHITE, sizeof(u), e, end)
 {
-    shdrsc = new shader::Resources(e, pl.get(), ub);
+    shdrsc = e->create_shader_resources(shader::WHITE, pl.get(), end);
 }
 
 gearoenix::render::material::White::~White() {}
@@ -25,5 +26,5 @@ void gearoenix::render::material::White::update(const scene::Scene*, const model
 
 void gearoenix::render::material::White::bind()
 {
-    shdrsc->bind(pl.get());
+    shdrsc->bind();
 }

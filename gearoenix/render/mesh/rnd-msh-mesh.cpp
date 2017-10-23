@@ -9,7 +9,7 @@ gearoenix::render::mesh::Mesh::Mesh(system::File* f, Engine* e, std::shared_ptr<
 {
     //    LOGE("location: " << f->tell());
     mat = material::Material::read(f, e, c);
-    buf = new buffer::Mesh(mat->get_vertex_elements_count(), f, e, c);
+    buf = e->create_mesh(mat->get_vertex_elements_count(), f, c);
 }
 
 gearoenix::render::mesh::Mesh::~Mesh()

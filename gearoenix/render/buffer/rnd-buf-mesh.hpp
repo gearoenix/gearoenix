@@ -17,8 +17,7 @@ namespace render {
 
         private:
         public:
-            Mesh(unsigned int vertex_elements_count, system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c);
-            ~Mesh();
+            virtual ~Mesh();
             virtual void bind() = 0;
             virtual void draw() = 0;
         };

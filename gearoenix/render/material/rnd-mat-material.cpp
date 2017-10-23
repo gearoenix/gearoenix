@@ -10,13 +10,13 @@
 #include "rnd-mat-directional-textured-speculated-nocube-fullshadow-opaque.hpp"
 #include "rnd-mat-white.hpp"
 
-gearoenix::render::material::Material::Material(shader::Id sid, unsigned int us, Engine* e)
-    : ub(new buffer::Uniform(us, e))
+gearoenix::render::material::Material::Material(shader::Id sid, unsigned int us, Engine* e, std::shared_ptr<core::EndCaller> end)
+    : ub(e->create_uniform(us, end))
     , e(e)
 {
     system::File* f = e->get_system_application()->get_asset_manager()->get_file();
     unsigned int curloc = f->tell();
-    pl = e->get_pipeline_manager()->get_pipeline(sid);
+    pl = e->get_pipeline_manager()->get_pipeline(sid, end);
     f->seek(curloc);
 }
 
@@ -32,7 +32,7 @@ gearoenix::render::material::Material* gearoenix::render::material::Material::re
     //    LOGE("location: " << f->tell());
     switch (sid) {
     case shader::WHITE:
-        return new White(e);
+        return new White(e, end);
     case shader::DIRECTIONAL_TEXTURED_SPECULATED_NOCUBE_FULLSHADOW_OPAQUE:
         //        LOGE("location: " << f->tell());
         return new DirectionalTexturedSpeculatedNocubeFullshadowOpaque(f, e, end);

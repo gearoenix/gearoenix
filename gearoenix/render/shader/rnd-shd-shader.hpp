@@ -2,7 +2,6 @@
 #define GEAROEMIX_RENDER_SHADER_SHADER_HPP
 #include "../../core/asset/cr-asset.hpp"
 #include "../../core/cr-types.hpp"
-#include "stage/rnd-shd-stg-stage.hpp"
 #include <memory>
 #include <vector>
 namespace gearoenix {
@@ -19,6 +18,13 @@ namespace render {
             WHITE = 0,
             DIRECTIONAL_TEXTURED_SPECULATED_NOCUBE_FULLSHADOW_OPAQUE = 144679237557682176,
         } Id;
+        namespace stage {
+
+            typedef enum : core::Id {
+                FRAGMENT = 0,
+                VERTEX = 1,
+            } Id;
+        }
 
         typedef enum {
             VEC3F32,
@@ -53,8 +59,6 @@ namespace render {
         public:
             virtual ~Shader();
             virtual const std::vector<stage::Id>& get_stages_ids() const = 0;
-            virtual const stage::Stage* get_stage(stage::Id id) const = 0;
-            virtual stage::Stage* get_stage(stage::Id id) = 0;
             static std::shared_ptr<Shader> read(core::Id sid, system::File* file, Engine* engine, std::shared_ptr<core::EndCaller> end);
             static const std::vector<ResourceDescription>& get_resources_descriptions(Id id);
             static const std::vector<VertexAttribute>& get_vertex_atributes(Id id);

@@ -8,7 +8,7 @@ namespace render {
         private:
         public:
             Uniform(Engine*);
-            ~Uniform();
+            virtual ~Uniform();
             virtual void update(const void*, unsigned int) = 0;
         };
     } // namespace buffer

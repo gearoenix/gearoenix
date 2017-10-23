@@ -3,8 +3,7 @@
 #include "../../system/sys-log.hpp"
 #include "../gles2-engine.hpp"
 
-gearoenix::gles2::buffer::Mesh::Mesh(unsigned int vec, system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c)
-    : render::buffer::Mesh(vec, f, e, c)
+gearoenix::gles2::buffer::Mesh::Mesh(unsigned int, system::File*, Engine*, std::shared_ptr<core::EndCaller>)
 {
     UNIMPLEMENTED;
 }

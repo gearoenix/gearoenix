@@ -18,13 +18,11 @@ namespace render {
             Engine* e = nullptr;
             pipeline::Pipeline* pip = nullptr;
             buffer::Uniform* u = nullptr;
-            texture::Texture2D* t = nullptr;
 
         public:
             Resources(Engine* e, pipeline::Pipeline* pip, buffer::Uniform* u);
-            Resources(Engine* e, pipeline::Pipeline* pip, buffer::Uniform* u, texture::Texture2D* t);
             virtual ~Resources();
-            virtual void bind(pipeline::Pipeline* pip) = 0;
+            virtual void bind() = 0;
         };
     }
 }

@@ -2,6 +2,7 @@
 #include "../core/asset/cr-asset-manager.hpp"
 #include "../core/cr-end-caller.hpp"
 #include "../system/sys-app.hpp"
+#include "pipeline/rnd-pip-manager.hpp"
 #include "scene/rnd-scn-scene.hpp"
 
 gearoenix::render::Engine::Engine(system::Application* system_application)
@@ -9,7 +10,10 @@ gearoenix::render::Engine::Engine(system::Application* system_application)
 {
 }
 
-gearoenix::render::Engine::~Engine() {}
+gearoenix::render::Engine::~Engine()
+{
+    delete pipmgr;
+}
 
 const gearoenix::system::Application* gearoenix::render::Engine::get_system_application() const
 {
