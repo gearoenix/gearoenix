@@ -1,9 +1,10 @@
-#ifndef GEAROENIX_OPENGL_SHADER_RESOURCES_HPP
-#define GEAROENIX_OPENGL_SHADER_RESOURCES_HPP
+#ifndef GEAROENIX_GLES2_SHADER_RESOURCES_HPP
+#define GEAROENIX_GLES2_SHADER_RESOURCES_HPP
 #include "../../core/cr-build-configuration.hpp"
 #ifdef USE_OPENGL_ES2
+#include "../../render/shader/rnd-shd-resources.hpp"
 namespace gearoenix {
-namespace render {
+namespace gles2 {
     class Engine;
     namespace buffer {
         class Uniform;
@@ -15,7 +16,7 @@ namespace render {
         class Texture2D;
     }
     namespace shader {
-        class Resources {
+        class Resources : public render::shader::Resources {
         private:
         public:
             Resources(Engine* e, pipeline::Pipeline* pip, buffer::Uniform* u);

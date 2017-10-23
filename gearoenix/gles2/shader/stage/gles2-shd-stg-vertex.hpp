@@ -4,7 +4,7 @@
 #ifdef USE_OPENGL_ES2
 #include "gles2-shd-stage.hpp"
 namespace gearoenix {
-namespace render {
+namespace gles2 {
     class Engine;
     namespace shader {
         namespace stage {

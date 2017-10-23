@@ -1,24 +1,23 @@
 #include "gles2-shd-resources.hpp"
 #ifdef USE_OPENGL_ES2
 #include "../../system/sys-log.hpp"
-gearoenix::render::shader::Resources::Resources(Engine*, pipeline::Pipeline*, buffer::Uniform*)
+gearoenix::gles2::shader::Resources::Resources(Engine* e, pipeline::Pipeline* p, buffer::Uniform* u)
+    : render::shader::Resources(e, p, u)
 {
-    TODO;
 }
 
-gearoenix::render::shader::Resources::Resources(Engine*, pipeline::Pipeline*, buffer::Uniform*, texture::Texture2D*)
+gearoenix::gles2::shader::Resources::Resources(Engine* e, pipeline::Pipeline* p, buffer::Uniform* u, texture::Texture2D* t)
+    : render::shader::Resources(e, p, u, t)
 {
-    TODO;
 }
 
-gearoenix::render::shader::Resources::~Resources()
+gearoenix::gles2::shader::Resources::~Resources()
 {
-    TODO;
 }
 
-void gearoenix::render::shader::Resources::bind(pipeline::Pipeline*)
+void gearoenix::gles2::shader::Resources::bind(pipeline::Pipeline*)
 {
-    TODO;
+    UNIMPLEMENTED;
 }
 
 #endif

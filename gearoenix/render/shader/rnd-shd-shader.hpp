@@ -6,6 +6,9 @@
 #include <memory>
 #include <vector>
 namespace gearoenix {
+namespace core {
+    class EndCaller;
+}
 namespace system {
     class File;
 }
@@ -52,7 +55,7 @@ namespace render {
             virtual const std::vector<stage::Id>& get_stages_ids() const = 0;
             virtual const stage::Stage* get_stage(stage::Id id) const = 0;
             virtual stage::Stage* get_stage(stage::Id id) = 0;
-            static std::shared_ptr<Shader> read(system::File* file, Engine* engine);
+            static std::shared_ptr<Shader> read(core::Id sid, system::File* file, Engine* engine, std::shared_ptr<core::EndCaller> end);
             static const std::vector<ResourceDescription>& get_resources_descriptions(Id id);
             static const std::vector<VertexAttribute>& get_vertex_atributes(Id id);
             static unsigned int get_uniform_size(Id id);

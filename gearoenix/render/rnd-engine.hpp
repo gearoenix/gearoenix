@@ -1,5 +1,6 @@
 #ifndef GEAROENIX_RENDER_ENGINE_HPP
 #define GEAROENIX_RENDER_ENGINE_HPP
+#include "../core/cr-types.hpp"
 #include <functional>
 #include <memory>
 #include <mutex>
@@ -19,6 +20,12 @@ namespace render {
     namespace texture {
         class Texture2D;
     }
+    namespace scene {
+        class Scene;
+    }
+    namespace shader {
+        class Shader;
+    }
     class Engine {
     private:
     protected:
@@ -26,6 +33,8 @@ namespace render {
         pipeline::Manager* pipmgr;
         std::mutex load_functions_mutex;
         std::vector<std::function<void()>> load_functions;
+        std::mutex loaded_scenes_mutex;
+        std::vector<std::shared_ptr<scene::Scene>> loaded_scenes;
 
     public:
         Engine(system::Application* system_application);
@@ -34,11 +43,13 @@ namespace render {
         virtual void update() = 0;
         virtual void terminate() = 0;
         virtual texture::Texture2D* create_texture_2d(system::File* file, std::shared_ptr<core::EndCaller> c) = 0;
+        virtual shader::Shader* create_shader(core::Id sid, system::File* file, std::shared_ptr<core::EndCaller> c) = 0;
         void add_load_function(std::function<void()> fun);
         const system::Application* get_system_application() const;
         system::Application* get_system_application();
         const pipeline::Manager* get_pipeline_manager() const;
         pipeline::Manager* get_pipeline_manager();
+        void load_scene(core::Id scene_id, std::function<void(unsigned int)> on_load);
     };
 }
 }

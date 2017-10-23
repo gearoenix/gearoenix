@@ -1,11 +1,17 @@
 #ifndef GEAROENIX_RENDER_BUFFER_UNIFORM_HPP
 #define GEAROENIX_RENDER_BUFFER_UNIFORM_HPP
-#include "../../core/cr-build-configuration.hpp"
-#ifdef USE_VULKAN
-#include "../../vulkan/buffer/vk-buf-uniform.hpp"
-#elif defined(USE_OPENGL_ES2)
-#include "../../gles2/buffer/gles2-buf-uniform.hpp"
-#else
-#error "Not implemented yet"
-#endif
+namespace gearoenix {
+namespace render {
+    class Engine;
+    namespace buffer {
+        class Uniform {
+        private:
+        public:
+            Uniform(Engine*);
+            ~Uniform();
+            virtual void update(const void*, unsigned int) = 0;
+        };
+    } // namespace buffer
+} // namespace render
+} // namespace gearoenix
 #endif // GEAROENIX_RENDER_BUFFER_UNIFORM_HPP

@@ -1,28 +1,21 @@
-#ifndef GEAROENIX_OPENGL_BUFFER_UNIFORM_HPP
-#define GEAROENIX_OPENGL_BUFFER_UNIFORM_HPP
+#ifndef GEAROENIX_GLES2_BUFFER_UNIFORM_HPP
+#define GEAROENIX_GLES2_BUFFER_UNIFORM_HPP
 #include "../../core/cr-build-configuration.hpp"
 #ifdef USE_OPENGL_ES2
+#include "../../render/buffer/rnd-buf-uniform.hpp"
 namespace gearoenix {
-namespace system {
-    class File;
-}
-namespace render {
+namespace gles2 {
     class Engine;
     namespace buffer {
-        class SubBuffer;
-        class Uniform {
+        class Uniform : public render::buffer::Uniform {
         private:
         public:
-            Uniform(unsigned int, Engine*);
+            Uniform(Engine*);
             ~Uniform();
-            const SubBuffer* const* get_vbuf() const;
-            const SubBuffer* const* get_cbuf() const;
-            unsigned int get_count() const;
-            unsigned int get_size() const;
-            void update(const void*, unsigned int);
+            void update(const void* data, unsigned int data_size);
         };
     } // namespace buffer
-} // namespace render
+} // namespace gles2
 } // namespace gearoenix
 #endif
-#endif // GEAROENIX_OPENGL_BUFFER_UNIFORM_HPP
+#endif // GEAROENIX_GLES2_BUFFER_UNIFORM_HPP

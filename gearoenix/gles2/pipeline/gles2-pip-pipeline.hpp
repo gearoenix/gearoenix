@@ -1,37 +1,18 @@
-#ifndef GEAROENIX_OPENGL_PIPELINE_PIPELINE_HPP
-#define GEAROENIX_OPENGL_PIPELINE_PIPELINE_HPP
+#ifndef GEAROENIX_GLES2_PIPELINE_PIPELINE_HPP
+#define GEAROENIX_GLES2_PIPELINE_PIPELINE_HPP
 #include "../../core/cr-build-configuration.hpp"
 #ifdef USE_OPENGL_ES2
-#include "../../core/cache/cr-cache-cached.hpp"
-#include "../../render/shader/rnd-shd-shader.hpp"
+#include "../../render/pipeline/rnd-pip-pipeline.hpp"
 namespace gearoenix {
-namespace core {
-    class Application;
-}
-namespace render {
-    namespace device {
-        class Logical;
-    }
-    namespace descriptor {
-        class SetLayout;
-    }
-    class RenderPass;
+namespace gles2 {
+    class Engine;
     namespace pipeline {
-        class Cache;
-        class Layout;
-        class Pipeline : public core::cache::Cached {
+        class Pipeline : public render::pipeline::Pipeline {
         private:
         public:
-            Pipeline(shader::Id sid,
-                Cache* cache,
-                RenderPass* rndpass,
-                const std::shared_ptr<shader::Shader>& shd,
-                descriptor::SetLayout* dessetlay,
-                Engine* eng);
-            ~Pipeline();
-            descriptor::SetLayout* get_descriptor_set_layout();
-            const Layout* get_layout() const;
-            void bind();
+            Pipeline(core::Id sid, Engine* eng);
+            virtual ~Pipeline();
+            virtual void bind() = 0;
         };
     }
 }

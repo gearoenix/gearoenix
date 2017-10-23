@@ -41,10 +41,10 @@ gearoenix::system::File* gearoenix::core::asset::Manager::get_file()
     return file;
 }
 
-std::shared_ptr<gearoenix::render::shader::Shader> gearoenix::core::asset::Manager::get_shader(Id id)
+std::shared_ptr<gearoenix::render::shader::Shader> gearoenix::core::asset::Manager::get_shader(Id id, std::shared_ptr<EndCaller> end)
 {
-    std::function<std::shared_ptr<render::shader::Shader>()> fn_new = [this] {
-        return render::shader::Shader::read(file, render_engine);
+    std::function<std::shared_ptr<render::shader::Shader>()> fn_new = [this, id, end] {
+        return render::shader::Shader::read(id, file, render_engine, end);
     };
     return shaders->get<render::shader::Shader>(id, fn_new);
 }

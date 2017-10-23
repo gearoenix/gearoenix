@@ -1,11 +1,21 @@
 #ifndef GEAROENIX_RENDER_PIPELINE_PIPELINE_HPP
 #define GEAROENIX_RENDER_PIPELINE_PIPELINE_HPP
-#include "../../core/cr-build-configuration.hpp"
-#ifdef USE_VULKAN
-#include "../../vulkan/pipeline/vk-pip-pipeline.hpp"
-#elif defined(USE_OPENGL_ES2)
-#include "../../gles2/pipeline/gles2-pip-pipeline.hpp"
-#else
-#error "Not implemented yet"
-#endif
+#include "../../core/cache/cr-cache-cached.hpp"
+#include "../../core/cr-types.hpp"
+namespace gearoenix {
+namespace render {
+    class Engine;
+    namespace pipeline {
+        class Pipeline : public core::cache::Cached {
+        protected:
+            Engine* eng;
+
+        public:
+            Pipeline(core::Id sid, Engine* eng);
+            virtual ~Pipeline();
+            virtual void bind() = 0;
+        };
+    }
+}
+}
 #endif // GEAROENIX_RENDER_PIPELINE_PIPELINE_HPP

@@ -4,7 +4,7 @@
 #include "../../system/sys-log.hpp"
 #include "../material/rnd-mat-directional-textured-speculated-nocube-fullshadow-opaque.hpp"
 #include "../material/rnd-mat-white.hpp"
-#include "rnd-shd-basic.hpp"
+#include "../rnd-engine.hpp"
 
 const std::vector<gearoenix::render::shader::stage::Id> gearoenix::render::shader::Shader::graphic_2_stage = {
     gearoenix::render::shader::stage::VERTEX,
@@ -56,18 +56,9 @@ gearoenix::render::shader::Shader::Shader() {}
 
 gearoenix::render::shader::Shader::~Shader() {}
 
-std::shared_ptr<gearoenix::render::shader::Shader> gearoenix::render::shader::Shader::read(system::File* file, Engine* engine)
+std::shared_ptr<gearoenix::render::shader::Shader> gearoenix::render::shader::Shader::read(core::Id sid, system::File* file, Engine* engine, std::shared_ptr<core::EndCaller> end)
 {
-    core::Id shader_type;
-    file->read(shader_type);
-    switch (shader_type) {
-    case 1: {
-        return std::shared_ptr<Shader>(new Basic(file, engine));
-        break;
-    }
-    }
-    LOGF("Unexpected!");
-    return nullptr;
+    return std::shared_ptr<Shader>(engine->create_shader(sid, file, end));
 }
 
 const std::vector<gearoenix::render::shader::ResourceDescription>& gearoenix::render::shader::Shader::get_resources_descriptions(Id id)

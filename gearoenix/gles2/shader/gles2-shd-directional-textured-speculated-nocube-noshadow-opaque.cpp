@@ -1,76 +1,84 @@
 #include "gles2-shd-directional-textured-speculated-nocube-noshadow-opaque.hpp"
 #ifdef USE_OPENGL_ES2
 #include "../../system/sys-log.hpp"
+#include "../gles2-engine.hpp"
 
-gearoenix::gles2::shader::DirectionalTexturedSpeculatedNocubeNoshadowOpaque::DirectionalTexturedSpeculatedNocubeNoshadowOpaque()
+gearoenix::gles2::shader::DirectionalTexturedSpeculatedNocubeNoshadowOpaque::DirectionalTexturedSpeculatedNocubeNoshadowOpaque(Engine* eng, std::shared_ptr<core::EndCaller> end)
+    : Shader(eng, end)
 {
-    std::string pvs =
-        //			"precision highp sampler2D;\n"
-        //			"precision highp float;\n"
-        "attribute vec3 vertex;\n"
-        "attribute vec3 normal;\n"
-        "attribute vec2 uv;\n"
-        "varying vec2 out_uv;\n"
-        "varying vec3 out_normal;\n"
-        "varying vec3 out_pos;\n"
-        "uniform mat4 mvp;\n"
-        "uniform mat4 m;\n"
-        "void main()\n"
-        "{\n"
-        "    out_uv = uv;\n"
-        "    out_normal = normalize((m * vec4(normal, 0.0)).xyz);\n"
-        "    vec4 pos = vec4(vertex, 1.0);\n"
-        "    out_pos = (m * pos).xyz;\n"
-        "    gl_Position = mvp * pos;\n"
-        "}\n";
-    std::string pfs =
-        //			"precision highp sampler2D;\n"
-        //			"precision highp float;\n"
-        "varying vec2 out_uv;\n"
-        "varying vec3 out_normal;\n"
-        "varying vec3 out_pos;\n"
-        "uniform vec3 sun;\n"
-        "uniform vec3 sun_color;\n"
-        "uniform vec3 eye;\n"
-        "uniform vec3 spec_color;\n"
-        "uniform float spec_factor;\n"
-        "uniform vec3 ambl_color;\n"
-        "uniform sampler2D txt;\n"
-        "void main()\n"
-        "{\n"
-        "    float diffuse = -dot(sun, out_normal);\n"
-        "    vec3 reflected = reflect(sun, out_normal);\n"
-        "    float speculare = dot(normalize(eye - out_pos), reflected);\n"
-        "    float diff_fac = smoothstep(0.2, 0.4, diffuse) * 0.5;\n"
-        "    float spec_fac = smoothstep(0.7, 0.9, speculare) * spec_factor;\n"
-        "    vec3 txt_color = texture2D(txt, out_uv).xyz;\n"
-        "    vec3 ambl_light = txt_color * ambl_color;\n"
-        "    vec3 diff_color = txt_color * diff_fac * sun_color;\n"
-        "    vec3 spc_color = spec_color * spec_fac;\n"
-        "    gl_FragColor = vec4(diff_color + ambl_light + spc_color, 1.0);\n"
-        "}\n";
-    vtx_shd = add_shader_to_program(pvs, GL_VERTEX_SHADER);
-    frg_shd = add_shader_to_program(pfs, GL_FRAGMENT_SHADER);
-    run();
-    vtx_att_ind = glGetAttribLocation(shader_program, "vertex");
-    nrm_att_ind = glGetAttribLocation(shader_program, "normal");
-    uv_att_ind = glGetAttribLocation(shader_program, "uv");
-    mvp = get_uniform_location("mvp");
-    m = get_uniform_location("m");
-    sun = get_uniform_location("sun");
-    sun_color = get_uniform_location("sun_color");
-    eye = get_uniform_location("eye");
-    spec_color = get_uniform_location("spec_color");
-    spec_factor = get_uniform_location("spec_factor");
-    ambl_color = get_uniform_location("ambl_color");
-    txt = get_uniform_location("txt");
+    eng->add_load_function([this, end] {
+        create_program();
+        const std::string pvs =
+            //"precision highp sampler2D;\n"
+            //"precision highp float;\n"
+            "attribute vec3 vertex;\n"
+            "attribute vec3 normal;\n"
+            "attribute vec2 uv;\n"
+            "varying vec2 out_uv;\n"
+            "varying vec3 out_normal;\n"
+            "varying vec3 out_pos;\n"
+            "uniform mat4 mvp;\n"
+            "uniform mat4 m;\n"
+            "void main()\n"
+            "{\n"
+            "    out_uv = uv;\n"
+            "    out_normal = normalize((m * vec4(normal, 0.0)).xyz);\n"
+            "    vec4 pos = vec4(vertex, 1.0);\n"
+            "    out_pos = (m * pos).xyz;\n"
+            "    gl_Position = mvp * pos;\n"
+            "}\n";
+        const std::string pfs =
+            //"precision highp sampler2D;\n"
+            //"precision highp float;\n"
+            "varying vec2 out_uv;\n"
+            "varying vec3 out_normal;\n"
+            "varying vec3 out_pos;\n"
+            "uniform vec3 sun;\n"
+            "uniform vec3 sun_color;\n"
+            "uniform vec3 eye;\n"
+            "uniform vec3 spec_color;\n"
+            "uniform float spec_factor;\n"
+            "uniform vec3 ambl_color;\n"
+            "uniform sampler2D txt;\n"
+            "void main()\n"
+            "{\n"
+            "    float diffuse = -dot(sun, out_normal);\n"
+            "    vec3 reflected = reflect(sun, out_normal);\n"
+            "    float speculare = dot(normalize(eye - out_pos), reflected);\n"
+            "    float diff_fac = smoothstep(0.2, 0.4, diffuse) * 0.5;\n"
+            "    float spec_fac = smoothstep(0.7, 0.9, speculare) * spec_factor;\n"
+            "    vec3 txt_color = texture2D(txt, out_uv).xyz;\n"
+            "    vec3 ambl_light = txt_color * ambl_color;\n"
+            "    vec3 diff_color = txt_color * diff_fac * sun_color;\n"
+            "    vec3 spc_color = spec_color * spec_fac;\n"
+            "    gl_FragColor = vec4(diff_color + ambl_light + spc_color, 1.0);\n"
+            "}\n";
+        vtx_shd = add_shader_to_program(pvs, GL_VERTEX_SHADER);
+        frg_shd = add_shader_to_program(pfs, GL_FRAGMENT_SHADER);
+        run();
+        vtx_att_ind = glGetAttribLocation(shader_program, "vertex");
+        nrm_att_ind = glGetAttribLocation(shader_program, "normal");
+        uv_att_ind = glGetAttribLocation(shader_program, "uv");
+        mvp = get_uniform_location("mvp");
+        m = get_uniform_location("m");
+        sun = get_uniform_location("sun");
+        sun_color = get_uniform_location("sun_color");
+        eye = get_uniform_location("eye");
+        spec_color = get_uniform_location("spec_color");
+        spec_factor = get_uniform_location("spec_factor");
+        ambl_color = get_uniform_location("ambl_color");
+        txt = get_uniform_location("txt");
+        (void)end;
+    });
 }
 
 gearoenix::gles2::shader::DirectionalTexturedSpeculatedNocubeNoshadowOpaque::~DirectionalTexturedSpeculatedNocubeNoshadowOpaque()
 {
-    end_object(vtx_shd);
-    end_object(frg_shd);
-    end_program();
+    eng->add_load_function([this] {
+        end_object(vtx_shd);
+        end_object(frg_shd);
+        end_program();
+    });
 }
 
 void gearoenix::gles2::shader::DirectionalTexturedSpeculatedNocubeNoshadowOpaque::use()
@@ -85,6 +93,7 @@ void gearoenix::gles2::shader::DirectionalTexturedSpeculatedNocubeNoshadowOpaque
     glVertexAttribPointer(uv_att_ind, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*)(6 * sizeof(GLfloat)));
     ////////////////////////////////////////
     glUniform1i(txt, 0);
+    //Tempppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp
     const GLfloat data1[] = {
         1.0f, 0.0f, 0.0f, 0.0f,
         0.0f, 1.0f, 0.0f, 0.0f,

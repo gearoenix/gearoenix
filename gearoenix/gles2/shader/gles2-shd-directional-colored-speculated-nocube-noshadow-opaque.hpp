@@ -23,7 +23,7 @@ namespace gles2 {
             GLint nrm_att_ind;
 
         public:
-            DirectionalColoredSpeculatedNocubeNoshadowOpaque();
+            DirectionalColoredSpeculatedNocubeNoshadowOpaque(Engine* eng, std::shared_ptr<core::EndCaller> end);
             ~DirectionalColoredSpeculatedNocubeNoshadowOpaque();
             void use();
             const std::vector<render::shader::stage::Id>& get_stages_ids() const;

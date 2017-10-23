@@ -25,7 +25,7 @@ namespace gles2 {
             GLint uv_att_ind;
 
         public:
-            DirectionalTexturedSpeculatedNocubeNoshadowOpaque();
+            DirectionalTexturedSpeculatedNocubeNoshadowOpaque(Engine* eng, std::shared_ptr<core::EndCaller> end);
             ~DirectionalTexturedSpeculatedNocubeNoshadowOpaque();
             void use();
             const std::vector<render::shader::stage::Id>& get_stages_ids() const;

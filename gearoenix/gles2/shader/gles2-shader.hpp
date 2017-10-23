@@ -7,9 +7,11 @@
 #include <string>
 namespace gearoenix {
 namespace gles2 {
+    class Engine;
     namespace shader {
         class Shader : public render::shader::Shader {
         protected:
+            Engine* eng;
             GLuint shader_program;
             void create_program();
             void run();
@@ -21,7 +23,7 @@ namespace gles2 {
             void end_object(const GLuint& shader_object);
 
         public:
-            Shader();
+            Shader(Engine* eng, std::shared_ptr<core::EndCaller> end);
             virtual ~Shader();
             virtual void set_mvp(const GLfloat* data) = 0;
         };

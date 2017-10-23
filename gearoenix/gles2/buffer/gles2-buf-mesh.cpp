@@ -1,25 +1,27 @@
 #include "gles2-buf-mesh.hpp"
 #ifdef USE_OPENGL_ES2
 #include "../../system/sys-log.hpp"
+#include "../gles2-engine.hpp"
 
-gearoenix::render::buffer::Mesh::Mesh(unsigned int, system::File*, Engine*, std::shared_ptr<core::EndCaller>)
+gearoenix::gles2::buffer::Mesh::Mesh(unsigned int vec, system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c)
+    : render::buffer::Mesh(vec, f, e, c)
 {
-    TODO;
+    UNIMPLEMENTED;
 }
 
-gearoenix::render::buffer::Mesh::~Mesh()
+gearoenix::gles2::buffer::Mesh::~Mesh()
 {
-    TODO;
+    UNIMPLEMENTED;
 }
 
-void gearoenix::render::buffer::Mesh::bind()
+void gearoenix::gles2::buffer::Mesh::bind()
 {
-    TODO;
+    UNIMPLEMENTED;
 }
 
-void gearoenix::render::buffer::Mesh::draw()
+void gearoenix::gles2::buffer::Mesh::draw()
 {
-    TODO;
+    UNIMPLEMENTED;
 }
 
 #endif

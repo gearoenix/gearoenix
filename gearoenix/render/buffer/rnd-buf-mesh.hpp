@@ -1,11 +1,28 @@
 #ifndef GEAROENIX_RENDER_BUFFER_MESH_HPP
 #define GEAROENIX_RENDER_BUFFER_MESH_HPP
-#include "../../core/cr-build-configuration.hpp"
-#ifdef USE_VULKAN
-#include "../../vulkan/buffer/vk-buf-mesh.hpp"
-#elif defined(USE_OPENGL_ES2)
-#include "../../gles2/buffer/gles2-buf-mesh.hpp"
-#else
-#error "Not implemented yet"
-#endif
+#include <memory>
+namespace gearoenix {
+namespace core {
+    class EndCaller;
+}
+namespace system {
+    class File;
+}
+namespace render {
+    class Engine;
+    namespace buffer {
+        class Mesh {
+        public:
+            typedef uint32_t IndexType;
+
+        private:
+        public:
+            Mesh(unsigned int vertex_elements_count, system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c);
+            ~Mesh();
+            virtual void bind() = 0;
+            virtual void draw() = 0;
+        };
+    } // namespace buffer
+} // namespace render
+} // namespace gearoenix
 #endif // GEAROENIX_RENDER_BUFFER_MESH_HPP

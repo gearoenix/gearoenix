@@ -1,31 +1,20 @@
 #include "gles2-pip-pipeline.hpp"
 #ifdef USE_OPENGL_ES2
 #include "../../system/sys-log.hpp"
-gearoenix::render::pipeline::Pipeline::Pipeline(
-    shader::Id,
-    Cache*,
-    RenderPass*,
-    const std::shared_ptr<shader::Shader>&,
-    descriptor::SetLayout*,
-    Engine*)
+gearoenix::gles2::pipeline::Pipeline::Pipeline(core::Id sid, Engine* eng)
+    : render::pipeline::Pipeline(sid, reinterpret_cast<render::Engine*>(eng))
 {
     TODO;
 }
 
-gearoenix::render::pipeline::Pipeline::~Pipeline() { TODO; }
-
-gearoenix::render::descriptor::SetLayout* gearoenix::render::pipeline::Pipeline::get_descriptor_set_layout()
+gearoenix::gles2::pipeline::Pipeline::~Pipeline()
 {
     TODO;
-    return nullptr;
 }
 
-const gearoenix::render::pipeline::Layout* gearoenix::render::pipeline::Pipeline::get_layout() const
+void gearoenix::render::pipeline::Pipeline::bind()
 {
-    TODO;
-    return nullptr;
+    UNIMPLEMENTED;
 }
-
-void gearoenix::render::pipeline::Pipeline::bind() { TODO; }
 
 #endif

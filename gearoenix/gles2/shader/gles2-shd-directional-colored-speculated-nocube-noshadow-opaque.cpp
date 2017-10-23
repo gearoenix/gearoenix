@@ -1,7 +1,8 @@
 #include "gles2-shd-directional-colored-speculated-nocube-noshadow-opaque.hpp"
 #ifdef USE_OPENGL_ES2
 #include "../../system/sys-log.hpp"
-gearoenix::gles2::shader::DirectionalColoredSpeculatedNocubeNoshadowOpaque::DirectionalColoredSpeculatedNocubeNoshadowOpaque()
+gearoenix::gles2::shader::DirectionalColoredSpeculatedNocubeNoshadowOpaque::DirectionalColoredSpeculatedNocubeNoshadowOpaque(Engine* eng, std::shared_ptr<core::EndCaller> end)
+    : Shader(eng, end)
 {
     std::string pvs =
         //"precision mediump sampler2D;\n"

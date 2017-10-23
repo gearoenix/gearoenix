@@ -24,11 +24,6 @@ namespace gles2 {
         GLuint shadow_map_texture;
         GLuint shadow_map_framebuffer;
 
-        GLuint vbo, ibo;
-        shader::DirectionalTexturedSpeculatedNocubeNoshadowOpaque* shd = nullptr;
-        std::shared_ptr<render::camera::Camera> cam;
-        std::shared_ptr<texture::Texture2D> txt;
-
     public:
         Engine(system::Application* sys_app);
         ~Engine();
@@ -36,6 +31,7 @@ namespace gles2 {
         void update();
         void terminate();
         render::texture::Texture2D* create_texture_2d(system::File* file, std::shared_ptr<core::EndCaller> c);
+        render::shader::Shader* create_shader(core::Id sid, system::File* file, std::shared_ptr<core::EndCaller> c);
     };
 }
 }

@@ -2,43 +2,20 @@
 #ifdef USE_OPENGL_ES2
 #include "../../system/sys-log.hpp"
 
-gearoenix::render::buffer::Uniform::Uniform(unsigned int, Engine*)
+gearoenix::gles2::buffer::Uniform::Uniform(Engine* eng)
+    : render::buffer::Uniform(reinterpret_cast<render::Engine*>(eng))
 {
-    TODO;
+    UNIMPLEMENTED;
 }
 
-gearoenix::render::buffer::Uniform::~Uniform()
+gearoenix::gles2::buffer::Uniform::~Uniform()
 {
-    TODO;
+    UNIMPLEMENTED;
 }
 
-const gearoenix::render::buffer::SubBuffer* const* gearoenix::render::buffer::Uniform::get_vbuf() const
+void gearoenix::gles2::buffer::Uniform::update(const void*, unsigned int)
 {
-    TODO;
-    return nullptr;
-}
-
-const gearoenix::render::buffer::SubBuffer* const* gearoenix::render::buffer::Uniform::get_cbuf() const
-{
-    TODO;
-    return nullptr;
-}
-
-unsigned int gearoenix::render::buffer::Uniform::get_count() const
-{
-    TODO;
-    return 0;
-}
-
-unsigned int gearoenix::render::buffer::Uniform::get_size() const
-{
-    TODO;
-    return 0;
-}
-
-void gearoenix::render::buffer::Uniform::update(const void*, unsigned int)
-{
-    TODO;
+    UNIMPLEMENTED;
 }
 
 #endif

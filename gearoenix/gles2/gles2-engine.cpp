@@ -5,6 +5,7 @@
 #include "../render/camera/rnd-cmr-camera.hpp"
 #include "../system/sys-app.hpp"
 #include "../system/sys-log.hpp"
+#include "shader/gles2-shd-directional-colored-speculated-nocube-noshadow-opaque.hpp"
 #include "shader/gles2-shd-directional-textured-speculated-nocube-noshadow-opaque.hpp"
 #include "texture/gles2-txt-2d.hpp"
 
@@ -53,21 +54,6 @@ gearoenix::gles2::Engine::Engine(system::Application* sysapp)
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glViewport(0, 0, width, height);
     glScissor(0, 0, width, height);
-
-    const GLfloat vertices[] = {
-        0.0f, 1.0f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
-        1.0f, 0.0f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f,
-        -1.0f, 0.0f, -0.5f, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f,
-    };
-    const GLushort indices[] = {
-        0, 2, 1,
-    };
-    glGenBuffers(1, &vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    glGenBuffers(1, &ibo);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 }
 
 gearoenix::gles2::Engine::~Engine()
@@ -82,14 +68,6 @@ void gearoenix::gles2::Engine::window_changed()
 
 void gearoenix::gles2::Engine::update()
 {
-    static bool first_happen = true;
-    if (first_happen) {
-        first_happen = false;
-        cam = sysapp->get_asset_manager()->get_camera(0);
-        txt = std::static_pointer_cast<texture::Texture2D>(sysapp->get_asset_manager()->get_texture(0, core::EndCaller::create([this] {
-            shd = new shader::DirectionalTexturedSpeculatedNocubeNoshadowOpaque();
-        })));
-    }
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     ///////////////////////////////////////////////////////////////////////////////////////////////
     std::vector<std::function<void()>> temp_functions;
@@ -102,14 +80,6 @@ void gearoenix::gles2::Engine::update()
     }
     temp_functions.clear();
     ///////////////////////////////////////////////////////////////////////////////////////////////
-    if (shd != nullptr) {
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-        shd->use();
-        txt->bind(GL_TEXTURE0);
-        shd->set_mvp(cam->get_view_projection().get_data());
-        glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, 0);
-    }
 }
 
 void gearoenix::gles2::Engine::terminate()
@@ -120,6 +90,20 @@ void gearoenix::gles2::Engine::terminate()
 gearoenix::render::texture::Texture2D* gearoenix::gles2::Engine::create_texture_2d(system::File* file, std::shared_ptr<core::EndCaller> c)
 {
     return new texture::Texture2D(file, this, c);
+}
+
+gearoenix::render::shader::Shader* gearoenix::gles2::Engine::create_shader(core::Id sid, system::File*, std::shared_ptr<core::EndCaller> c)
+{
+    switch (sid) {
+    case render::shader::DIRECTIONAL_TEXTURED_SPECULATED_NOCUBE_FULLSHADOW_OPAQUE:
+        return new shader::DirectionalTexturedSpeculatedNocubeNoshadowOpaque(this, c);
+        break;
+    case render::shader::WHITE:
+        UNIMPLEMENTED;
+        break;
+    default:
+        UNEXPECTED;
+    }
 }
 
 #endif
