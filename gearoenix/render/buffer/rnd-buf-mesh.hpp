@@ -13,8 +13,6 @@ namespace render {
     namespace buffer {
         class Mesh {
         public:
-            typedef uint32_t IndexType;
-
         private:
         public:
             virtual ~Mesh();

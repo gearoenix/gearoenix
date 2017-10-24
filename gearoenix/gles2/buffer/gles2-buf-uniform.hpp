@@ -9,10 +9,13 @@ namespace gles2 {
     namespace buffer {
         class Uniform : public render::buffer::Uniform {
         private:
+            unsigned char* data = nullptr;
+
         public:
-            Uniform(Engine*);
+            Uniform(unsigned int s, Engine*);
             ~Uniform();
-            void update(const void* data, unsigned int data_size);
+            void update(const void* src, unsigned int data_size);
+            void* get_data();
         };
     } // namespace buffer
 } // namespace gles2

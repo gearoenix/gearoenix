@@ -9,6 +9,11 @@
 #include "../rnd-engine.hpp"
 #include "../texture/rnd-txt-texture-2d.hpp"
 
+gearoenix::render::material::DirectionalTexturedSpeculatedNocubeFullshadowOpaque::Resources::Resources(Engine* e, pipeline::Pipeline* pip, buffer::Uniform* u)
+    : shader::Resources(e, pip, u)
+{
+}
+
 void gearoenix::render::material::DirectionalTexturedSpeculatedNocubeFullshadowOpaque::Resources::set_texture(texture::Texture2D* t)
 {
     txt = t;
@@ -25,7 +30,7 @@ gearoenix::render::material::DirectionalTexturedSpeculatedNocubeFullshadowOpaque
     core::asset::Manager* astmgr = e->get_system_application()->get_asset_manager();
     std::function<void()> fun = [this, end, e] {
         shdrsc = reinterpret_cast<Resources*>(e->create_shader_resources(
-            shader::DIRECTIONAL_TEXTURED_SPECULATED_NOCUBE_FULLSHADOW_OPAQUE, pl.get(), end));
+            shader::DIRECTIONAL_TEXTURED_SPECULATED_NOCUBE_FULLSHADOW_OPAQUE, pl.get(), ub, end));
         shdrsc->set_texture(t.get());
     };
     unsigned int curloc = f->tell();

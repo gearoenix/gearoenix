@@ -64,6 +64,7 @@ namespace math {
         void operator/=(const Vec3& a);
         const core::Real& operator[](const unsigned int i) const;
         core::Real& operator[](const unsigned int i);
+        core::Real* data();
         core::Real length() const;
         core::Real square_length() const;
         core::Real square_distance(const Vec3& a) const;

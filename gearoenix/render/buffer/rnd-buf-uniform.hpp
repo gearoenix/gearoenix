@@ -10,6 +10,7 @@ namespace render {
             Uniform(Engine*);
             virtual ~Uniform();
             virtual void update(const void*, unsigned int) = 0;
+            virtual void* get_data() = 0;
         };
     } // namespace buffer
 } // namespace render

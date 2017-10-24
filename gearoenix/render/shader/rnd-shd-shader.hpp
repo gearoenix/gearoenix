@@ -59,6 +59,7 @@ namespace render {
         public:
             virtual ~Shader();
             virtual const std::vector<stage::Id>& get_stages_ids() const = 0;
+            virtual void use() = 0;
             static std::shared_ptr<Shader> read(core::Id sid, system::File* file, Engine* engine, std::shared_ptr<core::EndCaller> end);
             static const std::vector<ResourceDescription>& get_resources_descriptions(Id id);
             static const std::vector<VertexAttribute>& get_vertex_atributes(Id id);

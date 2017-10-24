@@ -4,37 +4,35 @@
 gearoenix::gles2::shader::DirectionalColoredSpeculatedNocubeNoshadowOpaque::DirectionalColoredSpeculatedNocubeNoshadowOpaque(Engine* eng, std::shared_ptr<core::EndCaller> end)
     : Shader(eng, end)
 {
-    std::string pvs =
-        //"precision mediump sampler2D;\n"
-        //"precision mediump float;\n"
-        "attribute vec3 vertex;\n"
-        "attribute vec3 normal;\n"
-        "varying vec3 pos;\n"
-        "varying vec3 nrm;\n"
-        "uniform mat4 mvp;\n"
-        "uniform mat4 m;\n"
-        "void main()\n"
-        "{\n"
-        "    pos = (m * vec4(vertex, 1.0)).xyz;\n"
-        "    nrm = normalize((m * vec4(normal, 0.0)).xyz);\n"
-        "    gl_Position = mvp * vec4(vertex, 1.0);\n"
-        "}\n";
-    std::string pfs =
-        //"precision mediump sampler2D;\n"
-        //"precision mediump float;\n"
-        "varying vec3 pos;\n"
-        "varying vec3 nrm;\n"
-        "uniform vec3 color;\n"
-        "uniform vec3 sun;\n"
-        "uniform vec3 eye;\n"
-        "void main()\n"
-        "{\n"
-        "    float diff = -dot(nrm, sun);\n"
-        "    float spec = dot(reflect(sun, nrm), normalize(eye - pos));"
-        "    spec = smoothstep(0.8, 0.9, spec);\n"
-        "    diff = smoothstep(0.0, 0.2, diff) * (1.0 - 0.5) + 0.5;\n"
-        "    gl_FragColor = vec4(color * diff + vec3(spec), 1.0);\n"
-        "}\n";
+    std::string pvs = "precision highp sampler2D;\n"
+                      "precision highp float;\n"
+                      "attribute vec3 vertex;\n"
+                      "attribute vec3 normal;\n"
+                      "varying vec3 pos;\n"
+                      "varying vec3 nrm;\n"
+                      "uniform mat4 mvp;\n"
+                      "uniform mat4 m;\n"
+                      "void main()\n"
+                      "{\n"
+                      "    pos = (m * vec4(vertex, 1.0)).xyz;\n"
+                      "    nrm = normalize((m * vec4(normal, 0.0)).xyz);\n"
+                      "    gl_Position = mvp * vec4(vertex, 1.0);\n"
+                      "}\n";
+    std::string pfs = "precision highp sampler2D;\n"
+                      "precision highp float;\n"
+                      "varying vec3 pos;\n"
+                      "varying vec3 nrm;\n"
+                      "uniform vec3 color;\n"
+                      "uniform vec3 sun;\n"
+                      "uniform vec3 eye;\n"
+                      "void main()\n"
+                      "{\n"
+                      "    float diff = -dot(nrm, sun);\n"
+                      "    float spec = dot(reflect(sun, nrm), normalize(eye - pos));"
+                      "    spec = smoothstep(0.8, 0.9, spec);\n"
+                      "    diff = smoothstep(0.0, 0.2, diff) * (1.0 - 0.5) + 0.5;\n"
+                      "    gl_FragColor = vec4(color * diff + vec3(spec), 1.0);\n"
+                      "}\n";
     vtx_shd = add_shader_to_program(pvs, GL_VERTEX_SHADER);
     frg_shd = add_shader_to_program(pfs, GL_FRAGMENT_SHADER);
     run();

@@ -8,7 +8,7 @@
 gearoenix::render::material::White::White(Engine* e, std::shared_ptr<core::EndCaller> end)
     : Material(shader::WHITE, sizeof(u), e, end)
 {
-    shdrsc = e->create_shader_resources(shader::WHITE, pl.get(), end);
+    shdrsc = e->create_shader_resources(shader::WHITE, pl.get(), ub, end);
 }
 
 gearoenix::render::material::White::~White() {}

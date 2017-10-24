@@ -34,7 +34,6 @@ void gearoenix::render::model::Dynamic::commit(const scene::Scene* s, const Mode
 
 void gearoenix::render::model::Dynamic::draw()
 {
-    LOGE("TODO: do occlusion culling.");
     for (Model* m : children) {
         m->draw();
     }

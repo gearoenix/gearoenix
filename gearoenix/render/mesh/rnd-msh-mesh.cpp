@@ -25,7 +25,7 @@ void gearoenix::render::mesh::Mesh::commit(const scene::Scene* s, const model::M
 
 void gearoenix::render::mesh::Mesh::draw()
 {
-    mat->bind();
     buf->bind();
+    mat->bind();
     buf->draw();
 }

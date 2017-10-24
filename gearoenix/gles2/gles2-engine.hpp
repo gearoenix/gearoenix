@@ -6,19 +6,7 @@
 #include <SDL2/SDL_opengles2.h>
 #include <memory>
 namespace gearoenix {
-namespace render {
-    namespace camera {
-        class Camera;
-    }
-}
 namespace gles2 {
-    namespace shader {
-        class DirectionalColoredSpeculatedNocubeNoshadowOpaque;
-        class DirectionalTexturedSpeculatedNocubeNoshadowOpaque;
-    }
-    namespace texture {
-        class Texture2D;
-    }
     class Engine : public render::Engine {
     private:
         GLuint shadow_map_texture;
@@ -31,7 +19,11 @@ namespace gles2 {
         void update();
         void terminate();
         render::texture::Texture2D* create_texture_2d(system::File* file, std::shared_ptr<core::EndCaller> c);
+        render::buffer::Mesh* create_mesh(unsigned int vec, system::File* file, std::shared_ptr<core::EndCaller> c);
+        render::buffer::Uniform* create_uniform(unsigned int s, std::shared_ptr<core::EndCaller> c);
         render::shader::Shader* create_shader(core::Id sid, system::File* file, std::shared_ptr<core::EndCaller> c);
+        render::shader::Resources* create_shader_resources(core::Id sid, render::pipeline::Pipeline* p, render::buffer::Uniform* ub, std::shared_ptr<core::EndCaller> c);
+        render::pipeline::Pipeline* create_pipeline(core::Id sid, std::shared_ptr<core::EndCaller> c);
     };
 }
 }

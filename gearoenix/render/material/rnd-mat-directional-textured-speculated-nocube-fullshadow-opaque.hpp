@@ -17,20 +17,22 @@ namespace render {
         class DirectionalTexturedSpeculatedNocubeFullshadowOpaque : public Material {
         public:
             class Resources : public shader::Resources {
-            private:
+            protected:
                 texture::Texture2D* txt;
 
             public:
-                //                Resources(Engine* e, pipeline::Pipeline* pip, buffer::Uniform* u);
+                Resources(Engine* e, pipeline::Pipeline* pip, buffer::Uniform* u);
                 void set_texture(texture::Texture2D* t);
             };
             typedef struct {
                 math::Mat4x4 mvp;
                 math::Mat4x4 m;
-                math::Mat4x4 sun;
-                math::Vec3 sun_dir;
+                math::Vec3 sun;
+                math::Vec3 sun_color;
                 math::Vec3 spec_color;
                 core::Real spec_factor;
+                math::Vec3 ambl_color;
+                math::Vec3 eye_color;
             } Uniform;
 
         private:

@@ -3,8 +3,13 @@
 #include "../core/asset/cr-asset-manager.hpp"
 #include "../core/cr-end-caller.hpp"
 #include "../render/camera/rnd-cmr-camera.hpp"
+#include "../render/pipeline/rnd-pip-manager.hpp"
+#include "../render/scene/rnd-scn-scene.hpp"
 #include "../system/sys-app.hpp"
 #include "../system/sys-log.hpp"
+#include "buffer/gles2-buf-mesh.hpp"
+#include "buffer/gles2-buf-uniform.hpp"
+#include "pipeline/gles2-pip-pipeline.hpp"
 #include "shader/gles2-shd-directional-colored-speculated-nocube-noshadow-opaque.hpp"
 #include "shader/gles2-shd-directional-textured-speculated-nocube-noshadow-opaque.hpp"
 #include "texture/gles2-txt-2d.hpp"
@@ -13,8 +18,8 @@ gearoenix::gles2::Engine::Engine(system::Application* sysapp)
     : render::Engine(sysapp)
 {
     glClearColor(0.3f, 0.3f, 0.3f, 1.f);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
+    //    glEnable(GL_CULL_FACE);
+    //    glCullFace(GL_BACK);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_DEPTH_TEST);
@@ -42,8 +47,8 @@ gearoenix::gles2::Engine::Engine(system::Application* sysapp)
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
         UNEXPECTED;
     }
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
+    //    glEnable(GL_CULL_FACE);
+    //    glCullFace(GL_BACK);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_DEPTH_TEST);
@@ -54,6 +59,7 @@ gearoenix::gles2::Engine::Engine(system::Application* sysapp)
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glViewport(0, 0, width, height);
     glScissor(0, 0, width, height);
+    pipmgr = new render::pipeline::Manager(this);
 }
 
 gearoenix::gles2::Engine::~Engine()
@@ -80,6 +86,12 @@ void gearoenix::gles2::Engine::update()
     }
     temp_functions.clear();
     ///////////////////////////////////////////////////////////////////////////////////////////////
+    for (std::shared_ptr<render::scene::Scene>& scene : loaded_scenes) {
+        scene->commit();
+    }
+    for (std::shared_ptr<render::scene::Scene>& scene : loaded_scenes) {
+        scene->draw();
+    }
 }
 
 void gearoenix::gles2::Engine::terminate()
@@ -90,6 +102,16 @@ void gearoenix::gles2::Engine::terminate()
 gearoenix::render::texture::Texture2D* gearoenix::gles2::Engine::create_texture_2d(system::File* file, std::shared_ptr<core::EndCaller> c)
 {
     return new texture::Texture2D(file, this, c);
+}
+
+gearoenix::render::buffer::Mesh* gearoenix::gles2::Engine::create_mesh(unsigned int vec, system::File* file, std::shared_ptr<core::EndCaller> c)
+{
+    return new buffer::Mesh(vec, file, this, c);
+}
+
+gearoenix::render::buffer::Uniform* gearoenix::gles2::Engine::create_uniform(unsigned int s, std::shared_ptr<core::EndCaller>)
+{
+    return new buffer::Uniform(s, this);
 }
 
 gearoenix::render::shader::Shader* gearoenix::gles2::Engine::create_shader(core::Id sid, system::File*, std::shared_ptr<core::EndCaller> c)
@@ -104,6 +126,28 @@ gearoenix::render::shader::Shader* gearoenix::gles2::Engine::create_shader(core:
     default:
         UNEXPECTED;
     }
+}
+
+gearoenix::render::shader::Resources* gearoenix::gles2::Engine::create_shader_resources(core::Id sid, render::pipeline::Pipeline* p, render::buffer::Uniform* ub, std::shared_ptr<core::EndCaller>)
+{
+    switch (sid) {
+    case render::shader::DIRECTIONAL_TEXTURED_SPECULATED_NOCUBE_FULLSHADOW_OPAQUE:
+        return new shader::DirectionalTexturedSpeculatedNocubeNoshadowOpaque::Resources(
+            this,
+            reinterpret_cast<pipeline::Pipeline*>(p),
+            reinterpret_cast<buffer::Uniform*>(ub));
+        break;
+    case render::shader::WHITE:
+        UNIMPLEMENTED;
+        break;
+    default:
+        UNEXPECTED;
+    }
+}
+
+gearoenix::render::pipeline::Pipeline* gearoenix::gles2::Engine::create_pipeline(core::Id sid, std::shared_ptr<core::EndCaller> c)
+{
+    return new pipeline::Pipeline(sid, this, c);
 }
 
 #endif

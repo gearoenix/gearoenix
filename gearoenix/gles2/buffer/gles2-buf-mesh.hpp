@@ -3,6 +3,7 @@
 #include "../../core/cr-build-configuration.hpp"
 #ifdef USE_OPENGL_ES2
 #include "../../render/buffer/rnd-buf-mesh.hpp"
+#include <SDL2/SDL_opengles2.h>
 namespace gearoenix {
 namespace gles2 {
     class Engine;
@@ -10,6 +11,9 @@ namespace gles2 {
         class Mesh : public render::buffer::Mesh {
         public:
         private:
+            GLuint vbo, ibo;
+            GLsizei ic;
+
         public:
             Mesh(unsigned int vertex_elements_count, system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c);
             ~Mesh();

@@ -1,58 +1,88 @@
 #include "gles2-shd-directional-textured-speculated-nocube-noshadow-opaque.hpp"
 #ifdef USE_OPENGL_ES2
 #include "../../system/sys-log.hpp"
+#include "../buffer/gles2-buf-uniform.hpp"
 #include "../gles2-engine.hpp"
+#include "../pipeline/gles2-pip-pipeline.hpp"
+#include "../texture/gles2-txt-2d.hpp"
+
+gearoenix::gles2::shader::DirectionalTexturedSpeculatedNocubeNoshadowOpaque::Resources::Resources(Engine* e, pipeline::Pipeline* pip, buffer::Uniform* u)
+    : render::material::DirectionalTexturedSpeculatedNocubeFullshadowOpaque::Resources(e, pip, u)
+{
+}
+
+void gearoenix::gles2::shader::DirectionalTexturedSpeculatedNocubeNoshadowOpaque::Resources::bind()
+{
+    render::material::DirectionalTexturedSpeculatedNocubeFullshadowOpaque::Uniform* data = reinterpret_cast<render::material::DirectionalTexturedSpeculatedNocubeFullshadowOpaque::Uniform*>(u->get_data());
+    DirectionalTexturedSpeculatedNocubeNoshadowOpaque* shd = reinterpret_cast<DirectionalTexturedSpeculatedNocubeNoshadowOpaque*>(pip->get_shader());
+    shd->use();
+    //    shd->set_ambl_color(data->ambl_color.data());
+    shd->set_ambl_color(math::Vec3(1.0f).data());
+    //    shd->set_eye(data->eye_color.data());
+    shd->set_eye(math::Vec3(1.0f).data());
+    //    shd->set_m(data->m.data());
+    shd->set_m(math::Mat4x4().data());
+    //    shd->set_mvp(data->mvp.data());
+    shd->set_mvp(math::Mat4x4().data());
+    //    shd->set_spec_color(data->spec_color.data());
+    shd->set_spec_color(math::Vec3(1.0f).data());
+    //    shd->set_spec_factor(data->spec_factor);
+    shd->set_spec_factor(1.0f);
+    //    shd->set_sun(data->sun.data());
+    shd->set_sun(math::Vec3(1.0f).data());
+    //    shd->set_sun_color(data->sun_color.data());
+    shd->set_sun_color(math::Vec3(1.0f).data());
+    reinterpret_cast<texture::Texture2D*>(txt)->bind(GL_TEXTURE0);
+}
 
 gearoenix::gles2::shader::DirectionalTexturedSpeculatedNocubeNoshadowOpaque::DirectionalTexturedSpeculatedNocubeNoshadowOpaque(Engine* eng, std::shared_ptr<core::EndCaller> end)
     : Shader(eng, end)
 {
     eng->add_load_function([this, end] {
         create_program();
-        const std::string pvs =
-            //"precision highp sampler2D;\n"
-            //"precision highp float;\n"
-            "attribute vec3 vertex;\n"
-            "attribute vec3 normal;\n"
-            "attribute vec2 uv;\n"
-            "varying vec2 out_uv;\n"
-            "varying vec3 out_normal;\n"
-            "varying vec3 out_pos;\n"
-            "uniform mat4 mvp;\n"
-            "uniform mat4 m;\n"
-            "void main()\n"
-            "{\n"
-            "    out_uv = uv;\n"
-            "    out_normal = normalize((m * vec4(normal, 0.0)).xyz);\n"
-            "    vec4 pos = vec4(vertex, 1.0);\n"
-            "    out_pos = (m * pos).xyz;\n"
-            "    gl_Position = mvp * pos;\n"
-            "}\n";
-        const std::string pfs =
-            //"precision highp sampler2D;\n"
-            //"precision highp float;\n"
-            "varying vec2 out_uv;\n"
-            "varying vec3 out_normal;\n"
-            "varying vec3 out_pos;\n"
-            "uniform vec3 sun;\n"
-            "uniform vec3 sun_color;\n"
-            "uniform vec3 eye;\n"
-            "uniform vec3 spec_color;\n"
-            "uniform float spec_factor;\n"
-            "uniform vec3 ambl_color;\n"
-            "uniform sampler2D txt;\n"
-            "void main()\n"
-            "{\n"
-            "    float diffuse = -dot(sun, out_normal);\n"
-            "    vec3 reflected = reflect(sun, out_normal);\n"
-            "    float speculare = dot(normalize(eye - out_pos), reflected);\n"
-            "    float diff_fac = smoothstep(0.2, 0.4, diffuse) * 0.5;\n"
-            "    float spec_fac = smoothstep(0.7, 0.9, speculare) * spec_factor;\n"
-            "    vec3 txt_color = texture2D(txt, out_uv).xyz;\n"
-            "    vec3 ambl_light = txt_color * ambl_color;\n"
-            "    vec3 diff_color = txt_color * diff_fac * sun_color;\n"
-            "    vec3 spc_color = spec_color * spec_fac;\n"
-            "    gl_FragColor = vec4(diff_color + ambl_light + spc_color, 1.0);\n"
-            "}\n";
+        const std::string pvs = "precision highp sampler2D;\n"
+                                "precision highp float;\n"
+                                "attribute vec3 vertex;\n"
+                                "attribute vec3 normal;\n"
+                                "attribute vec2 uv;\n"
+                                "varying vec2 out_uv;\n"
+                                "varying vec3 out_normal;\n"
+                                "varying vec3 out_pos;\n"
+                                "uniform mat4 mvp;\n"
+                                "uniform mat4 m;\n"
+                                "void main()\n"
+                                "{\n"
+                                "    out_uv = uv;\n"
+                                "    out_normal = normalize((m * vec4(normal, 0.0)).xyz);\n"
+                                "    vec4 pos = vec4(vertex, 1.0);\n"
+                                "    out_pos = (m * pos).xyz;\n"
+                                "    gl_Position = mvp * pos;\n"
+                                "}\n";
+        const std::string pfs = "precision highp sampler2D;\n"
+                                "precision highp float;\n"
+                                "varying vec2 out_uv;\n"
+                                "varying vec3 out_normal;\n"
+                                "varying vec3 out_pos;\n"
+                                "uniform vec3 sun;\n"
+                                "uniform vec3 sun_color;\n"
+                                "uniform vec3 eye;\n"
+                                "uniform vec3 spec_color;\n"
+                                "uniform float spec_factor;\n"
+                                "uniform vec3 ambl_color;\n"
+                                "uniform sampler2D txt;\n"
+                                "void main()\n"
+                                "{\n"
+                                "    float diffuse = -dot(sun, out_normal);\n"
+                                "    vec3 reflected = reflect(sun, out_normal);\n"
+                                "    float speculare = dot(normalize(eye - out_pos), reflected);\n"
+                                "    float diff_fac = smoothstep(0.2, 0.4, diffuse) * 0.5;\n"
+                                "    float spec_fac = smoothstep(0.7, 0.9, speculare) * spec_factor;\n"
+                                "    vec3 txt_color = texture2D(txt, out_uv).xyz;\n"
+                                "    vec3 ambl_light = txt_color * ambl_color;\n"
+                                "    vec3 diff_color = txt_color * diff_fac * sun_color;\n"
+                                "    vec3 spc_color = spec_color * spec_fac;\n"
+                                "    gl_FragColor = vec4(diff_color + ambl_light + spc_color, 1.0);\n"
+                                "}\n";
         vtx_shd = add_shader_to_program(pvs, GL_VERTEX_SHADER);
         frg_shd = add_shader_to_program(pfs, GL_FRAGMENT_SHADER);
         run();

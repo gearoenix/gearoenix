@@ -2,12 +2,26 @@
 #define GEAROENIX_GLES2_SHADER_DIRECTIONAL_TEXTURED_SPECULATED_NOCUBE_NOSHADOW_OPAQUE
 #include "../../core/cr-build-configuration.hpp"
 #ifdef USE_OPENGL_ES2
+#include "../../render/material/rnd-mat-directional-textured-speculated-nocube-fullshadow-opaque.hpp"
 #include "gles2-shader.hpp"
 #include <SDL2/SDL_opengles2.h>
 namespace gearoenix {
 namespace gles2 {
+    namespace buffer {
+        class Uniform;
+    }
+    namespace pipeline {
+        class Pipeline;
+    }
     namespace shader {
         class DirectionalTexturedSpeculatedNocubeNoshadowOpaque : public Shader {
+        public:
+            class Resources : public render::material::DirectionalTexturedSpeculatedNocubeFullshadowOpaque::Resources {
+            public:
+                Resources(Engine* e, pipeline::Pipeline* pip, buffer::Uniform* u);
+                void bind();
+            };
+
         protected:
             GLuint mvp;
             GLuint m;

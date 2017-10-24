@@ -20,6 +20,19 @@ gearoenix::system::Application::Application()
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
         LOGF("Failed to initialize SDL: " << SDL_GetError());
     }
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+    SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
+    SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
+    SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
+    SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
+    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+    //    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+    //    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 2);
+    SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
     window = SDL_CreateWindow(
         APPLICATION_NAME,
         SDL_WINDOWPOS_CENTERED,
@@ -27,7 +40,13 @@ gearoenix::system::Application::Application()
         DEFAULT_WINDOW_WIDTH,
         DEFAULT_WINDOW_HEIGHT,
         SDL_WINDOW_OPENGL);
+    if (!window) {
+        LOGF("Couldn't create window: " << SDL_GetError());
+    }
     gl_context = SDL_GL_CreateContext(window);
+    if (!gl_context) {
+        LOGF("Couldn't create context: " << SDL_GetError());
+    }
     SDL_AddEventWatch(event_receiver, this);
     SDL_GL_MakeCurrent(window, gl_context);
     render_engine = new gles2::Engine(this);
@@ -52,6 +71,7 @@ void gearoenix::system::Application::execute(core::Application* app)
                 running = false;
             }
         }
+        //        SDL_GL_MakeCurrent(window, gl_context);
         render_engine->update();
         SDL_GL_SwapWindow(window);
     }
