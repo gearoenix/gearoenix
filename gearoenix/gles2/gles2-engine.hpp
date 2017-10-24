@@ -3,7 +3,7 @@
 #include "../core/cr-build-configuration.hpp"
 #ifdef USE_OPENGL_ES2
 #include "../render/rnd-engine.hpp"
-#include <SDL2/SDL_opengles2.h>
+#include "gles2.hpp"
 #include <memory>
 namespace gearoenix {
 namespace gles2 {

@@ -3,8 +3,8 @@
 #include "../../core/cr-build-configuration.hpp"
 #ifdef USE_OPENGL_ES2
 #include "../../render/material/rnd-mat-directional-textured-speculated-nocube-fullshadow-opaque.hpp"
+#include "../gles2.hpp"
 #include "gles2-shader.hpp"
-#include <SDL2/SDL_opengles2.h>
 namespace gearoenix {
 namespace gles2 {
     namespace buffer {

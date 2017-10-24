@@ -3,9 +3,6 @@
 #include "rnd-mdl-model.hpp"
 #include <memory>
 namespace gearoenix {
-namespace math {
-    class Mat4x4;
-}
 namespace render {
     namespace model {
         class RootStatic;

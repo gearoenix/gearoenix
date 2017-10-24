@@ -20,6 +20,7 @@ gearoenix::system::Application::Application()
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
         LOGF("Failed to initialize SDL: " << SDL_GetError());
     }
+    SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
@@ -30,9 +31,6 @@ gearoenix::system::Application::Application()
     SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-    //    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
-    //    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 2);
-    SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
     window = SDL_CreateWindow(
         APPLICATION_NAME,
         SDL_WINDOWPOS_CENTERED,

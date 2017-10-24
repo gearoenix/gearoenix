@@ -1,11 +1,12 @@
 #include "sys-glfw.hpp"
 #ifdef USE_GLFW
+#include "../../core/asset/cr-asset-manager.hpp"
 #include "../../gles2/gles2-engine.hpp"
 #include "../sys-log.hpp"
 
 std::map<GLFWwindow*, gearoenix::system::Application*> gearoenix::system::Application::event_mapper;
 
-void gearoenix::frag::ui::MainWindow::onErrorEvent(int error_number, const char* error_description)
+void gearoenix::system::Application::on_error_event(int error_number, const char* error_description)
 {
     LOGF("Error number is: " << error_number << "Error description: " << error_description);
 }
@@ -189,10 +190,20 @@ void gearoenix::system::Application::on_change_size_event(GLFWwindow*, int, int)
 
 gearoenix::system::Application::Application()
 {
-    glfwSetErrorCallback(onErrorEvent);
+    glfwSetErrorCallback(on_error_event);
     if (!glfwInit()) {
         UNEXPECTED;
     }
+    glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
+    glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
+    glfwWindowHint(GLFW_SAMPLES, 8);
+    glfwWindowHint(GLFW_RED_BITS, 8);
+    glfwWindowHint(GLFW_GREEN_BITS, 8);
+    glfwWindowHint(GLFW_BLUE_BITS, 8);
+    glfwWindowHint(GLFW_ALPHA_BITS, 8);
+    glfwWindowHint(GLFW_DEPTH_BITS, 32);
+    glfwWindowHint(GLFW_STENCIL_BITS, 8);
 #ifdef DEBUG_MODE
     window = glfwCreateWindow(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT, APPLICATION_NAME, 0, NULL);
 #else
@@ -215,93 +226,8 @@ gearoenix::system::Application::Application()
     glfwSetCursorPosCallback(window, on_cursor_move_event);
     glfwSetScrollCallback(window, on_scroll);
     glfwGetFramebufferSize(window, &win_width, &win_height);
-
-    //#ifdef FRAG_USE_OPENGL_ES_2
-    //    GLuint shadowMapRenderBuffer;
-    //    glGenRenderbuffers(1, &shadowMapRenderBuffer);
-    //    FRAG_CHECK_FOR_GRAPHIC_API_ERROR
-    //            glBindRenderbuffer(GL_RENDERBUFFER, shadowMapRenderBuffer);
-    //    FRAG_CHECK_FOR_GRAPHIC_API_ERROR
-    //            glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, 1024, 1024);
-    //    FRAG_CHECK_FOR_GRAPHIC_API_ERROR
-    //        #endif
-    //            glBindFramebuffer(GL_FRAMEBUFFER, shadowMapFrameBuffer);
-    //    glGenTextures(1, &shadowMapTexture);
-    //    glBindTexture(GL_TEXTURE_2D, shadowMapTexture);
-    //#ifdef FRAG_USE_OPENGL_ES_2
-    //    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, shadowMapRenderBuffer);
-    //    FRAG_CHECK_FOR_GRAPHIC_API_ERROR
-    //            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1024, 1024, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-    //    FRAG_CHECK_FOR_GRAPHIC_API_ERROR
-    //        #else
-    //    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16, 1024, 1024, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
-    //#endif
-    //    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    //    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    //    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    //    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    //#ifndef FRAG_USE_OPENGL_ES_2
-    //    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
-    //    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
-    //#endif
-    //#ifdef FRAG_USE_OPENGL_ES_2
-    //    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, shadowMapTexture, 0);
-    //    FRAG_CHECK_FOR_GRAPHIC_API_ERROR
-    //        #else
-    //    glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, shadowMapTexture, 0);
-    //    glDrawBuffer(GL_NONE);
-    //#endif
-    //    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-    //    {
-    //        FRAG_LOG_ERROR("Error: FrameBufferObject is not complete!");
-    //        FRAG_TERMINATE;
-    //    }
-    //    glEnable(GL_CULL_FACE);
-    //    glCullFace(GL_BACK);
-    //    glEnable(GL_BLEND);
-    //    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    //    glEnable(GL_DEPTH_TEST);
-    //    glEnable(GL_SCISSOR_TEST);
-    //    glEnable(GL_STENCIL_TEST);
-    //#if !defined(FRAG_USE_OPENGL_ES_2) && !defined(FRAG_USE_OPENGL_ES_3)
-    //    glEnable(GL_ALPHA_TEST);
-    //#endif
-    //    glViewport(0, 0, 1024, 1024);
-    //    glScissor(0, 0, 1024, 1024);
-    //    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    //    glViewport(0, 0, width, height);
-    //    glScissor(0, 0, width, height);
-    //    core::ContextManager::ioThreadInitialized.lock();
-    //    core::ContextManager::auThreadInitialized.lock();
-    //    Container::initialize();
-    //    application->initialize();
-    //#ifndef ANDROID
-    //    glfwSetFramebufferSizeCallback(window, onChangeSizeEvent);
-    //#ifndef FRAG_TEST_MODE
-    ////	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    //#endif
-    //    while(!glfwWindowShouldClose(window))
-    //    {
-    //        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-    //        core::ContextManager::glSynchronizer.lock();
-    //        for(auto &f: core::ContextManager::glActions)
-    //        {
-    //            f();
-    //        }
-    //        core::ContextManager::glActions.clear();
-    //        core::ContextManager::glSynchronizer.release();
-    //        application->update();
-    //        glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-    //        Container::render();
-    //        glFinish();
-    //        glfwSwapBuffers(window);
-    //        glfwPollEvents();
-    //    }
-    //    application->terminate();
-    //    core::ContextManager::terminate();
-    //    glfwDestroyWindow(window);
-    //    glfwTerminate();
-    //#endif
+    astmgr = new core::asset::Manager(this, "data.gx3d");
+    astmgr->initialize();
 }
 
 gearoenix::system::Application::~Application()
@@ -312,20 +238,15 @@ gearoenix::system::Application::~Application()
 void gearoenix::system::Application::execute(core::Application* app)
 {
     core_app = app;
-    while (running) {
-        SDL_Event event;
-        while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_QUIT) {
-                running = false;
-            }
-        }
+    glfwSetFramebufferSizeCallback(window, on_change_size_event);
+    while (!glfwWindowShouldClose(window)) {
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         render_engine->update();
-        SDL_GL_SwapWindow(window);
+        glfwSwapBuffers(window);
+        glfwPollEvents();
     }
-    SDL_DelEventWatch(event_receiver, this);
-    SDL_GL_DeleteContext(gl_context);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
+    glfwDestroyWindow(window);
+    glfwTerminate();
 }
 
 const gearoenix::core::Application* gearoenix::system::Application::get_core_app() const
@@ -366,18 +287,12 @@ gearoenix::core::Real gearoenix::system::Application::get_window_ratio() const
 
 unsigned int gearoenix::system::Application::get_width() const
 {
-    int w, h;
-    SDL_GetWindowSize(window, &w, &h);
-    (void)h;
-    return static_cast<unsigned int>(w);
+    return static_cast<unsigned int>(win_width);
 }
 
 unsigned int gearoenix::system::Application::get_height() const
 {
-    int w, h;
-    SDL_GetWindowSize(window, &w, &h);
-    (void)w;
-    return static_cast<unsigned int>(h);
+    return static_cast<unsigned int>(win_height);
 }
 
 #endif
