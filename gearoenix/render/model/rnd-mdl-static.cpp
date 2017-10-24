@@ -18,14 +18,12 @@ gearoenix::render::model::Static::Static(system::File* f, Engine* e, std::shared
 
 void gearoenix::render::model::Static::commit(const scene::Scene* s)
 {
-    mvp = s->get_current_camera()->get_view_projection() * m;
-    for (Model* m : children) {
-        m->commit(s, this);
-    }
+    UNEXPECTED;
 }
 
 void gearoenix::render::model::Static::commit(const scene::Scene* s, const Model* parent)
 {
+    mesh->commit(s, parent);
     for (Model* m : children) {
         m->commit(s, parent);
     }

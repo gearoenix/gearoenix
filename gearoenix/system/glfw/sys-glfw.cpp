@@ -176,16 +176,11 @@ void gearoenix::system::Application::on_scroll(GLFWwindow*, double, double)
     //    application->zoom(float(y));
 }
 
-void gearoenix::system::Application::on_change_size_event(GLFWwindow*, int, int)
+void gearoenix::system::Application::on_change_size_event(GLFWwindow* winid, int w, int h)
 {
+    event_mapper[winid]->win_width = w;
+    event_mapper[winid]->win_height = h;
     TODO;
-    //    (void) window;
-    //    windowWidth = float(width);
-    //    windowHeight = float(height);
-    //    glViewport(0, 0, width, height);
-    //    glScissor(0, 0, width, height);
-    //    Container::windowSizeChanged(width, height);
-    //    application->windowSizeChaned(windowWidth, windowHeight);
 }
 
 gearoenix::system::Application::Application()
@@ -197,7 +192,7 @@ gearoenix::system::Application::Application()
     glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
     glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
-    glfwWindowHint(GLFW_SAMPLES, 8);
+    glfwWindowHint(GLFW_SAMPLES, 16);
     glfwWindowHint(GLFW_RED_BITS, 8);
     glfwWindowHint(GLFW_GREEN_BITS, 8);
     glfwWindowHint(GLFW_BLUE_BITS, 8);
@@ -240,7 +235,6 @@ void gearoenix::system::Application::execute(core::Application* app)
     core_app = app;
     glfwSetFramebufferSizeCallback(window, on_change_size_event);
     while (!glfwWindowShouldClose(window)) {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         render_engine->update();
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -281,8 +275,7 @@ const gearoenix::core::asset::Manager* gearoenix::system::Application::get_asset
 
 gearoenix::core::Real gearoenix::system::Application::get_window_ratio() const
 {
-    TODO;
-    return 1.7f;
+    return static_cast<core::Real>(win_width) / static_cast<core::Real>(win_height);
 }
 
 unsigned int gearoenix::system::Application::get_width() const

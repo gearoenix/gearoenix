@@ -23,7 +23,8 @@ namespace system {
         render::Engine* render_engine = nullptr;
         core::asset::Manager* astmgr = nullptr;
         GLFWwindow* window = nullptr;
-        int win_width, win_height;
+        int win_width = DEFAULT_WINDOW_WIDTH;
+        int win_height = DEFAULT_WINDOW_HEIGHT;
         static std::map<GLFWwindow*, Application*> event_mapper;
         static void on_error_event(int error_number, const char* error_description);
         static void on_cursor_move_event(GLFWwindow* window, double x, double y);

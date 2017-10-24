@@ -22,7 +22,7 @@ void gearoenix::gles2::shader::DirectionalTexturedSpeculatedNocubeNoshadowOpaque
     shd->set_eye(math::Vec3(1.0f).data());
     //    shd->set_m(data->m.data());
     shd->set_m(math::Mat4x4().data());
-    //    shd->set_mvp(data->mvp.data());
+    //        shd->set_mvp(data->mvp.data());
     shd->set_mvp(math::Mat4x4().data());
     //    shd->set_spec_color(data->spec_color.data());
     shd->set_spec_color(math::Vec3(1.0f).data());

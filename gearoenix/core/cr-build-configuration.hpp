@@ -22,8 +22,8 @@
 #else
 #error "Not implemetned yet."
 #endif
-#define USE_SDL
-//#define USE_GLFW
+//#define USE_SDL
+#define USE_GLFW
 /// Application constant definitions
 /// -------------------------------------------------------------
 #define APPLICATION_NAME "Gearoenix Demo App"

@@ -14,10 +14,14 @@
 #include "shader/gles2-shd-directional-textured-speculated-nocube-noshadow-opaque.hpp"
 #include "texture/gles2-txt-2d.hpp"
 
+//#define INTA_TEST001
+
+#ifdef INTA_TEST001
 static GLuint vbo, ibo;
 static std::shared_ptr<gearoenix::gles2::shader::DirectionalTexturedSpeculatedNocubeNoshadowOpaque> shd;
 static std::shared_ptr<gearoenix::render::camera::Camera> cam;
 static std::shared_ptr<gearoenix::gles2::texture::Texture2D> txt;
+#endif
 
 gearoenix::gles2::Engine::Engine(system::Application* sysapp)
     : render::Engine(sysapp)
@@ -65,11 +69,11 @@ gearoenix::gles2::Engine::Engine(system::Application* sysapp)
     glViewport(0, 0, width, height);
     glScissor(0, 0, width, height);
     pipmgr = new render::pipeline::Manager(this);
-
+#ifdef INTA_TEST001
     const GLfloat vertices[] = {
-        0.0f, 1.0f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
-        1.0f, 0.0f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f,
-        -1.0f, 0.0f, -0.5f, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f,
+        0.0f, 1.0f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 2.0f,
+        1.0f, 0.0f, -0.5f, 0.0f, 0.0f, 1.0f, 2.0f, 0.0f,
+        -1.0f, 0.0f, -0.5f, 0.0f, 0.0f, 1.0f, -2.0f, 0.0f,
     };
     const GLushort indices[] = {
         0, 2, 1,
@@ -80,6 +84,7 @@ gearoenix::gles2::Engine::Engine(system::Application* sysapp)
     glGenBuffers(1, &ibo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+#endif
 }
 
 gearoenix::gles2::Engine::~Engine()
@@ -94,7 +99,7 @@ void gearoenix::gles2::Engine::window_changed()
 
 void gearoenix::gles2::Engine::update()
 {
-    // TEMP // TEMP // TEMP // TEMP // TEMP // TEMP // TEMP // TEMP // TEMP // TEMP // TEMP // TEMP //
+#ifdef INTA_TEST001
     static int first_happen = 0;
     if (first_happen == 0) {
         ++first_happen;
@@ -107,7 +112,7 @@ void gearoenix::gles2::Engine::update()
             sysapp->get_asset_manager()->get_texture(
                 0, core::EndCaller::create([&] { ++first_happen; })));
     }
-    // Temp End // Temp End // Temp End // Temp End // Temp End // Temp End // Temp End // Temp End //
+#endif
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     ///////////////////////////////////////////////////////////////////////////////////////////////
     std::vector<std::function<void()>> temp_functions;
@@ -119,22 +124,24 @@ void gearoenix::gles2::Engine::update()
         f();
     }
     temp_functions.clear();
-    // TEMP // TEMP // TEMP // TEMP // TEMP // TEMP // TEMP // TEMP // TEMP // TEMP // TEMP // TEMP //
+#ifdef INTA_TEST001
     if (first_happen == 3) {
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
         shd->use();
-        txt->bind(GL_TEXTURE0);
         shd->set_mvp(cam->get_view_projection().data());
+        //        shd->set_mvp(math::Mat4x4().data());
+        txt->bind(GL_TEXTURE0);
         glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, 0);
     }
-    // Temp End // Temp End // Temp End // Temp End // Temp End // Temp End // Temp End // Temp End //
-    //    for (std::shared_ptr<render::scene::Scene>& scene : loaded_scenes) {
-    //        scene->commit();
-    //    }
-    //    for (std::shared_ptr<render::scene::Scene>& scene : loaded_scenes) {
-    //        scene->draw();
-    //    }
+#else
+    for (std::shared_ptr<render::scene::Scene>& scene : loaded_scenes) {
+        scene->commit();
+    }
+    for (std::shared_ptr<render::scene::Scene>& scene : loaded_scenes) {
+        scene->draw();
+    }
+#endif
 }
 
 void gearoenix::gles2::Engine::terminate()
