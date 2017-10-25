@@ -1,6 +1,7 @@
 #ifndef GEAROEMIX_RENDER_SCENE_SCENE_HPP
 #define GEAROEMIX_RENDER_SCENE_SCENE_HPP
 #include "../../core/asset/cr-asset.hpp"
+#include "../../math/math-vector.hpp"
 #include <memory>
 #include <vector>
 
@@ -21,6 +22,7 @@ namespace render {
     }
     namespace light {
         class Light;
+        class Sun;
     }
     namespace model {
         class Model;
@@ -35,6 +37,7 @@ namespace render {
             Engine* e;
             unsigned int curcam = 0;
             bool renderable = false;
+            math::Vec3 ambient_light = math::Vec3(0.2f, 0.2f, 0.2f);
 
         protected:
             Scene(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c);
@@ -45,6 +48,8 @@ namespace render {
             virtual ~Scene();
             static Scene* read(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c);
             const camera::Camera* get_current_camera() const;
+            const math::Vec3& get_ambient_light() const;
+            const light::Sun* get_sun() const;
             void set_renderable(bool);
         };
     }

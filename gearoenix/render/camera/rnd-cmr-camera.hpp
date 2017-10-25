@@ -46,6 +46,9 @@ namespace render {
             const math::Mat4x4& get_view_projection() const;
             const math::Mat4x4& get_zero_located_view() const;
             const math::Vec3& get_location() const;
+            const math::Vec3& get_x() const;
+            const math::Vec3& get_y() const;
+            const math::Vec3& get_z() const;
             void copy_location(math::Vec3& v) const;
             virtual bool in_sight(const math::Vec3& location, const core::Real radius) = 0;
             virtual void window_size_changed() = 0;

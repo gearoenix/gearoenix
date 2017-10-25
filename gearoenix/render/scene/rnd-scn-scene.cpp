@@ -6,6 +6,7 @@
 #include "../../system/sys-file.hpp"
 #include "../camera/rnd-cmr-camera.hpp"
 #include "../light/rnd-lt-light.hpp"
+#include "../light/rnd-lt-sun.hpp"
 #include "../model/rnd-mdl-model.hpp"
 #include "../rnd-engine.hpp"
 
@@ -25,6 +26,7 @@ gearoenix::render::scene::Scene::Scene(system::File* f, Engine* e, std::shared_p
     std::vector<core::Id> model_ids;
     f->read(model_ids);
     models.resize(model_ids.size());
+    ambient_light.read(f);
     for (size_t i = 0; i < camera_ids.size(); ++i)
         cameras[i] = amgr->get_camera(camera_ids[i]);
     for (size_t i = 0; i < audio_ids.size(); ++i)
@@ -68,6 +70,16 @@ void gearoenix::render::scene::Scene::draw()
 const gearoenix::render::camera::Camera* gearoenix::render::scene::Scene::get_current_camera() const
 {
     return cameras[curcam].get();
+}
+
+const gearoenix::math::Vec3& gearoenix::render::scene::Scene::get_ambient_light() const
+{
+    return ambient_light;
+}
+
+const gearoenix::render::light::Sun* gearoenix::render::scene::Scene::get_sun() const
+{
+    return reinterpret_cast<light::Sun*>(lights[0].get());
 }
 
 void gearoenix::render::scene::Scene::set_renderable(bool b)

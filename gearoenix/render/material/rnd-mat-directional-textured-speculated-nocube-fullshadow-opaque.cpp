@@ -4,9 +4,12 @@
 #include "../../system/sys-app.hpp"
 #include "../../system/sys-file.hpp"
 #include "../buffer/rnd-buf-uniform.hpp"
+#include "../camera/rnd-cmr-camera.hpp"
+#include "../light/rnd-lt-sun.hpp"
 #include "../model/rnd-mdl-model.hpp"
 #include "../pipeline/rnd-pip-pipeline.hpp"
 #include "../rnd-engine.hpp"
+#include "../scene/rnd-scn-scene.hpp"
 #include "../texture/rnd-txt-texture-2d.hpp"
 
 gearoenix::render::material::DirectionalTexturedSpeculatedNocubeFullshadowOpaque::Resources::Resources(Engine* e, pipeline::Pipeline* pip, buffer::Uniform* u)
@@ -48,10 +51,14 @@ unsigned int gearoenix::render::material::DirectionalTexturedSpeculatedNocubeFul
     return shader::Shader::get_vertex_real_count(shader::DIRECTIONAL_TEXTURED_SPECULATED_NOCUBE_FULLSHADOW_OPAQUE);
 }
 
-void gearoenix::render::material::DirectionalTexturedSpeculatedNocubeFullshadowOpaque::update(const scene::Scene*, const model::Model* m)
+void gearoenix::render::material::DirectionalTexturedSpeculatedNocubeFullshadowOpaque::update(const scene::Scene* s, const model::Model* m)
 {
-    u.mvp = m->get_mvp();
+    u.ambl_color = s->get_ambient_light();
+    u.eye = s->get_current_camera()->get_location();
     u.m = m->get_m();
+    u.mvp = m->get_mvp();
+    u.sun = s->get_sun()->get_direction();
+    u.sun_color = s->get_sun()->get_color();
     ub->update(&u, sizeof(Uniform));
 }
 

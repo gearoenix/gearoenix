@@ -173,6 +173,21 @@ const gearoenix::math::Vec3& gearoenix::render::camera::Camera::get_location() c
     return l;
 }
 
+const gearoenix::math::Vec3& gearoenix::render::camera::Camera::get_x() const
+{
+    return x;
+}
+
+const gearoenix::math::Vec3& gearoenix::render::camera::Camera::get_y() const
+{
+    return y;
+}
+
+const gearoenix::math::Vec3& gearoenix::render::camera::Camera::get_z() const
+{
+    return z;
+}
+
 void gearoenix::render::camera::Camera::copy_location(math::Vec3& v) const
 {
     v[0] = l[0];

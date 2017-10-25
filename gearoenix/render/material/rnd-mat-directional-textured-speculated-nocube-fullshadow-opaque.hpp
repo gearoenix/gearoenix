@@ -32,7 +32,7 @@ namespace render {
                 math::Vec3 spec_color;
                 core::Real spec_factor;
                 math::Vec3 ambl_color;
-                math::Vec3 eye_color;
+                math::Vec3 eye;
             } Uniform;
 
         private:

@@ -16,21 +16,23 @@ void gearoenix::gles2::shader::DirectionalTexturedSpeculatedNocubeNoshadowOpaque
     render::material::DirectionalTexturedSpeculatedNocubeFullshadowOpaque::Uniform* data = reinterpret_cast<render::material::DirectionalTexturedSpeculatedNocubeFullshadowOpaque::Uniform*>(u->get_data());
     DirectionalTexturedSpeculatedNocubeNoshadowOpaque* shd = reinterpret_cast<DirectionalTexturedSpeculatedNocubeNoshadowOpaque*>(pip->get_shader());
     shd->use();
-    //    shd->set_ambl_color(data->ambl_color.data());
+
+    //shd->set_ambl_color(data->ambl_color.data());
+    //shd->set_eye(data->eye_color.data());
+    shd->set_m(data->m.data());
+    shd->set_mvp(data->mvp.data());
+    //shd->set_spec_color(data->spec_color.data());
+    //shd->set_spec_factor(data->spec_factor);
+    //shd->set_sun(data->sun.data());
+    //shd->set_sun_color(data->sun_color.data());
+
     shd->set_ambl_color(math::Vec3(1.0f).data());
-    //    shd->set_eye(data->eye_color.data());
     shd->set_eye(math::Vec3(1.0f).data());
-    //    shd->set_m(data->m.data());
-    shd->set_m(math::Mat4x4().data());
-    //        shd->set_mvp(data->mvp.data());
-    shd->set_mvp(math::Mat4x4().data());
-    //    shd->set_spec_color(data->spec_color.data());
+    //shd->set_m(math::Mat4x4().data());
+    //shd->set_mvp(math::Mat4x4().data());
     shd->set_spec_color(math::Vec3(1.0f).data());
-    //    shd->set_spec_factor(data->spec_factor);
     shd->set_spec_factor(1.0f);
-    //    shd->set_sun(data->sun.data());
     shd->set_sun(math::Vec3(1.0f).data());
-    //    shd->set_sun_color(data->sun_color.data());
     shd->set_sun_color(math::Vec3(1.0f).data());
     reinterpret_cast<texture::Texture2D*>(txt)->bind(GL_TEXTURE0);
 }

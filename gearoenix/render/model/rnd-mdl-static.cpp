@@ -16,7 +16,7 @@ gearoenix::render::model::Static::Static(system::File* f, Engine* e, std::shared
         children[i] = Model::read_child(f, e, c);
 }
 
-void gearoenix::render::model::Static::commit(const scene::Scene* s)
+void gearoenix::render::model::Static::commit(const scene::Scene*)
 {
     UNEXPECTED;
 }
