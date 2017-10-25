@@ -6,7 +6,7 @@ gearoenix::render::camera::Perspective::Perspective(system::File* f, system::App
     : Camera(f, app)
 {
     f->read(h_angle);
-    c_width = std::tan(h_angle) * start;
+    c_width = std::tan(h_angle) * start * 2.0f;
     c_height = c_width / screen_ratio;
     v_angle = std::atan(c_height / start);
     p = math::Mat4x4::perspective(c_width, c_height, start, end);
