@@ -1,8 +1,9 @@
 #!/bin/sh
-output="$HOME/Documents/Projects/SDL"
-sdl_src_zip="$HOME/Documents/Libraries/SDL2.zip"
+# libsdl
+output="$HOME/Documents/Libraries/SDL"
+sdl_src_zip="$HOME/Documents/Libraries/SDL2-*.zip"
 if [ -d "$output" ]; then
-  echo "Previous output deleted."
+  echo "Previous sdl2 compilation process output deleted."
   rm -rf $output
 fi
 symroot="symroot=$output/release"
@@ -31,3 +32,17 @@ xcodebuild OTHER_CFLAGS="-fembed-bitcode" ONLY_ACTIVE_ARCH=NO -arch arm64 \
   -arch armv7 $proj $sdk_device $conf_release -scheme='$scheme' build $symroot
 lipo $build_dir/Release-iphonesimulator/libSDL2.a \
   $build_dir/Release-iphoneos/libSDL2.a -create -output $output/libSDL2.a
+# libpng
+output="$HOME/Documents/Libraries/PNG"
+png_src_zip="$HOME/Documents/Libraries/libpng-*.tar.xz"
+if [ -d "$output" ]; then
+  echo "Previous png compilation process output deleted."
+  rm -rf $output
+fi
+mkdir -p $output
+cd $output
+tar xf $png_src_zip
+cd *
+png_src=$PWD
+cp scripts/makefile.darwin Makefile
+make -j `sysctl -n hw.ncpu`

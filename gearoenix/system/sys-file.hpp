@@ -9,7 +9,7 @@
 #include <string>
 #include <vector>
 
-#if defined(IN_LINUX) || defined(IN_WINDOWS)
+#ifdef IN_DESKTOP
 #include <fstream>
 #elif defined(IN_ANDROID)
 
@@ -23,7 +23,7 @@ namespace system {
     class Application;
     class File {
     private:
-#if defined(IN_LINUX) || defined(IN_WINDOWS)
+#ifdef IN_DESKTOP
         system::Application* sys_app;
         std::ifstream file;
 #elif defined(IN_ANDROID)
