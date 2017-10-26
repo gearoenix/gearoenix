@@ -36,3 +36,4 @@
 
 # Vim
 *.swp
+.DS_store

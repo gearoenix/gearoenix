@@ -3,6 +3,7 @@
 #include "../../system/sys-file.hpp"
 #include "../../system/sys-log.hpp"
 #include "../gles2-engine.hpp"
+#include "../gles2.hpp"
 
 gearoenix::gles2::buffer::Mesh::Mesh(unsigned int vec, system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c)
 {

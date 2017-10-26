@@ -3,8 +3,8 @@
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../core/cr-application.hpp"
 #include "../../gles2/gles2-engine.hpp"
+#include "../../gles2/gles2.hpp"
 #include "../sys-log.hpp"
-#include <SDL2/SDL_opengles2.h>
 
 int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_Event* event)
 {

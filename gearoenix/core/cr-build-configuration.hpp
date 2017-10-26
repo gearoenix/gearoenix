@@ -22,11 +22,22 @@
 //#define USE_OPENGL_ES3
 #define USE_OPENGL_ES2
 #elif defined(__APPLE__)
+#include "TargetConditionals.h"
+#if defined(TARGET_IPHONE_SIMULATOR) || defined(TARGET_OS_IPHONE)
+#define IN_IOS
+//#define USE_METAL
+//#define USE_VULKAN
+//#define USE_OPENGL_ES3
+#define USE_OPENGL_ES2
+#elif defined(TARGET_OS_MAC)
 #define IN_MAC
 //#define USE_METAL
 //#define USE_VULKAN
 //#define USE_OPENGL_41
 //#define USE_OPENGL_33
+#else
+#error "Unknown Apple platform"
+#endif
 #else
 #error "Not implemetned yet."
 #endif

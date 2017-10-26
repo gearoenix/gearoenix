@@ -3,7 +3,11 @@
 #include "../../core/cr-build-configuration.hpp"
 #ifdef USE_SDL
 #include "../../core/cr-types.hpp"
+#ifdef IN_IOS
+#include <SDL.h>
+#else
 #include <SDL2/SDL.h>
+#endif
 namespace gearoenix {
 namespace core {
     namespace asset {

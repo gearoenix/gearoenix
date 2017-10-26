@@ -9,12 +9,14 @@
 #include <string>
 #include <vector>
 
-#ifdef IN_DESKTOP
+#if defined(IN_DESKTOP) || defined(IN_IOS)
+#define USE_STD_FILE
+#endif
+
+#ifdef USE_STD_FILE
 #include <fstream>
 #elif defined(IN_ANDROID)
-
 #include <android/asset_manager.h>
-
 #else
 #error "Unimplemented yet!"
 #endif
@@ -23,7 +25,7 @@ namespace system {
     class Application;
     class File {
     private:
-#ifdef IN_DESKTOP
+#ifdef USE_STD_FILE
         system::Application* sys_app;
         std::ifstream file;
 #elif defined(IN_ANDROID)

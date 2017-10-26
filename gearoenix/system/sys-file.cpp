@@ -1,11 +1,11 @@
 #include "sys-file.hpp"
 #include "sys-app.hpp"
 #include "sys-log.hpp"
-
-#ifdef IN_ANDROID
-
+#ifdef IN_IOS
+#import <Foundation/Foundation.h>
+//#import "../apple/sys-apl.mm"
+#elif defined(IN_ANDROID)
 #include <android_native_app_glue.h>
-
 #endif
 
 void gearoenix::system::File::check_endian_compatibility()
@@ -18,10 +18,24 @@ void gearoenix::system::File::check_endian_compatibility()
 }
 
 gearoenix::system::File::File(system::Application* sys_app, const std::string& name)
-#if defined(IN_LINUX) || defined(IN_WINDOWS)
+#ifdef USE_STD_FILE
     : sys_app(sys_app)
 {
-    file.open(name, std::ios::binary | std::ios::in);
+    std::string file_path = name;
+#ifdef IN_IOS
+    @autoreleasepool {
+        NSBundle *b = [NSBundle mainBundle];
+        NSString *dir = [b resourcePath];
+        NSString *f_name = [NSString stringWithCString:
+                            name.c_str() encoding:[NSString defaultCStringEncoding]];
+        NSArray *parts = [NSArray arrayWithObjects:
+                          dir, @"assets", f_name, (void *)nil];
+        NSString *path = [NSString pathWithComponents:parts];
+        const char *cpath = [path fileSystemRepresentation];
+        file_path = std::string(cpath);
+    }
+#endif
+    file.open(file_path, std::ios::binary | std::ios::in);
     if (!file.is_open()) {
         LOGF("Error in opening assets file.");
     }
@@ -49,7 +63,7 @@ unsigned int gearoenix::system::File::read(void* data, size_t length)
 {
 #ifdef IN_ANDROID
     return static_cast<unsigned int>(AAsset_read(file, data, length));
-#elif defined(IN_LINUX) || defined(IN_WINDOWS)
+#elif defined(USE_STD_FILE)
     file.read(reinterpret_cast<char*>(data), length);
     return static_cast<unsigned int>(file.gcount());
 #else
@@ -59,7 +73,7 @@ unsigned int gearoenix::system::File::read(void* data, size_t length)
 
 void gearoenix::system::File::seek(unsigned int offset)
 {
-#if defined(IN_LINUX) || defined(IN_WINDOWS)
+#if defined(USE_STD_FILE)
     file.seekg(offset, std::ios::beg);
 #elif defined(IN_ANDROID)
     AAsset_seek(file, offset, SEEK_SET);
@@ -70,7 +84,7 @@ void gearoenix::system::File::seek(unsigned int offset)
 
 unsigned int gearoenix::system::File::tell()
 {
-#if defined(IN_LINUX) || defined(IN_WINDOWS)
+#if defined(USE_STD_FILE)
     return file.tellg();
 #elif defined(IN_ANDROID)
 #error "Not implemented yet"
