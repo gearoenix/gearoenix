@@ -24,15 +24,9 @@ gearoenix::system::File::File(system::Application* sys_app, const std::string& n
     std::string file_path = name;
 #ifdef IN_IOS
     @autoreleasepool {
-        NSBundle *b = [NSBundle mainBundle];
-        NSString *dir = [b resourcePath];
-        NSString *f_name = [NSString stringWithCString:
-                            name.c_str() encoding:[NSString defaultCStringEncoding]];
-        NSArray *parts = [NSArray arrayWithObjects:
-                          dir, @"assets", f_name, (void *)nil];
-        NSString *path = [NSString pathWithComponents:parts];
-        const char *cpath = [path fileSystemRepresentation];
-        file_path = std::string(cpath);
+//        NSString *f_name = [NSString stringWithCString:name.c_str() encoding:[NSString defaultCStringEncoding]];
+        NSString *path = [[NSBundle mainBundle] pathForResource:@"data" ofType:@"gx3d"];
+        file_path = std::string([path fileSystemRepresentation]);
     }
 #endif
     file.open(file_path, std::ios::binary | std::ios::in);

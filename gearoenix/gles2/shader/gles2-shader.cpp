@@ -51,8 +51,9 @@ void gearoenix::gles2::shader::Shader::link()
 
 void gearoenix::gles2::shader::Shader::validate()
 {
-    GLint is_success = 0;
     glValidateProgram(shader_program);
+#ifndef IN_IOS
+    GLint is_success = 0;
     glGetProgramiv(shader_program, GL_VALIDATE_STATUS, &is_success);
     if (!is_success) {
         GLint max_length = 0;
@@ -62,6 +63,7 @@ void gearoenix::gles2::shader::Shader::validate()
         glGetProgramInfoLog(shader_program, max_length, NULL, &(info_log[0]));
         LOGF("Invalid shader program: " << info_log);
     }
+#endif
     glUseProgram(shader_program);
 }
 
