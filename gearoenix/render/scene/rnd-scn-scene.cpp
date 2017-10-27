@@ -72,6 +72,11 @@ const gearoenix::render::camera::Camera* gearoenix::render::scene::Scene::get_cu
     return cameras[curcam].get();
 }
 
+gearoenix::render::camera::Camera* gearoenix::render::scene::Scene::get_current_camera()
+{
+    return cameras[curcam].get();
+}
+
 const gearoenix::math::Vec3& gearoenix::render::scene::Scene::get_ambient_light() const
 {
     return ambient_light;

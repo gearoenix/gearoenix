@@ -6,11 +6,25 @@
 #include "../../gles2/gles2.hpp"
 #include "../sys-log.hpp"
 
+const gearoenix::core::Real gearoenix::system::Application::rotate_epsilon = 3.14f / 180.0f;
+const gearoenix::core::Real gearoenix::system::Application::zoom_epsilon = 0.00001f;
+
 int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_Event* event)
 {
     Application* o = reinterpret_cast<Application*>(user_data);
-    if (event->type == SDL_APP_WILLENTERBACKGROUND) {
-        o->running = false;
+    switch (event->type) {
+        case SDL_APP_WILLENTERBACKGROUND:
+            o->running = false;
+            break;
+        case SDL_MULTIGESTURE:
+            if(event->mgesture.dTheta > rotate_epsilon) {
+                
+            } else if (event->mgesture.dDist > zoom_epsilon) {
+                
+            }
+        default:
+            LOGE("Unhandled event " << event->type);
+            break;
     }
     return 1;
 }

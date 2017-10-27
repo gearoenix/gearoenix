@@ -21,6 +21,8 @@ namespace render {
 namespace system {
     class Application {
     private:
+        const static core::Real rotate_epsilon;
+        const static core::Real zoom_epsilon;
         core::Application* core_app = nullptr;
         render::Engine* render_engine = nullptr;
         core::asset::Manager* astmgr = nullptr;

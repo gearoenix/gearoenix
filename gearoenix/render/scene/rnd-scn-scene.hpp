@@ -48,6 +48,7 @@ namespace render {
             virtual ~Scene();
             static Scene* read(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c);
             const camera::Camera* get_current_camera() const;
+            camera::Camera* get_current_camera();
             const math::Vec3& get_ambient_light() const;
             const light::Sun* get_sun() const;
             void set_renderable(bool);

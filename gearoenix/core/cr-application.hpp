@@ -1,5 +1,6 @@
 #ifndef GEAROENIX_CORE_APPLICATION_HPP
 #define GEAROENIX_CORE_APPLICATION_HPP
+#include "cr-types.hpp"
 namespace gearoenix {
 namespace system {
     class Application;
@@ -14,6 +15,8 @@ namespace core {
         virtual ~Application();
         virtual void update() = 0;
         virtual void terminate() = 0;
+        virtual void on_zoom(Real d);
+        virtual void on_rotate(Real d);
     };
 }
 }

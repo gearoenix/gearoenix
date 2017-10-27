@@ -4,6 +4,7 @@
 #include "../system/sys-app.hpp"
 #include "pipeline/rnd-pip-manager.hpp"
 #include "scene/rnd-scn-scene.hpp"
+#include "../system/sys-log.hpp"
 
 gearoenix::render::Engine::Engine(system::Application* system_application)
     : sysapp(system_application)
@@ -42,10 +43,21 @@ void gearoenix::render::Engine::add_load_function(std::function<void()> fun)
     (void)lock;
 }
 
+const std::shared_ptr<gearoenix::render::scene::Scene>& gearoenix::render::Engine::get_scene(unsigned int scene_index) const
+{
+#ifdef DEBUG_MODE
+    if (scene_index > (unsigned int) loaded_scenes.size())
+    {
+        UNEXPECTED;
+    }
+#endif
+    return loaded_scenes[scene_index];
+}
+
 void gearoenix::render::Engine::load_scene(core::Id scene_id, std::function<void(unsigned int)> on_load)
 {
     std::lock_guard<std::mutex> lock(loaded_scenes_mutex);
-    unsigned int result = loaded_scenes.size();
+    unsigned int result = (unsigned int) loaded_scenes.size();
     loaded_scenes.push_back(sysapp->get_asset_manager()->get_scene(scene_id, core::EndCaller::create([this, result, on_load] {
         loaded_scenes[result]->set_renderable(true);
         on_load(result);
