@@ -17,7 +17,7 @@ int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_
 
 gearoenix::system::Application::Application()
 {
-    if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
+    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
         LOGF("Failed to initialize SDL: " << SDL_GetError());
     }
     SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
@@ -37,7 +37,7 @@ gearoenix::system::Application::Application()
         SDL_WINDOWPOS_CENTERED,
         DEFAULT_WINDOW_WIDTH,
         DEFAULT_WINDOW_HEIGHT,
-        SDL_WINDOW_OPENGL);
+        SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN);
     if (!window) {
         LOGF("Couldn't create window: " << SDL_GetError());
     }

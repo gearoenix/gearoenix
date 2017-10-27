@@ -9,8 +9,11 @@ namespace gearoenix {
 namespace gles2 {
     class Engine : public render::Engine {
     private:
-        GLuint shadow_map_texture;
-        GLuint shadow_map_framebuffer;
+        GLuint shadow_map_color = 0;
+        GLuint shadow_map_depth = 0;
+        GLuint shadow_map_framebuffer = 0;
+        GLuint render_depth = 0;
+        GLuint render_framebuffer = 0;
 
     public:
         Engine(system::Application* sys_app);
