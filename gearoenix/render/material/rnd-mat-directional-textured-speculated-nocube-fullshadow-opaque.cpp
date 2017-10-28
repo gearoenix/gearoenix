@@ -12,6 +12,9 @@
 #include "../scene/rnd-scn-scene.hpp"
 #include "../texture/rnd-txt-texture-2d.hpp"
 
+const gearoenix::core::Id gearoenix::render::material::DirectionalTexturedSpeculatedNocubeFullshadowOpaque::SHADER_ID =
+
+
 gearoenix::render::material::DirectionalTexturedSpeculatedNocubeFullshadowOpaque::Resources::Resources(Engine* e, pipeline::Pipeline* pip, buffer::Uniform* u)
     : shader::Resources(e, pip, u)
 {

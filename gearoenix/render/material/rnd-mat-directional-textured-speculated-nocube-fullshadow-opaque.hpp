@@ -16,6 +16,7 @@ namespace render {
     namespace material {
         class DirectionalTexturedSpeculatedNocubeFullshadowOpaque : public Material {
         public:
+            const static core::Id SHADER_ID;
             class Resources : public shader::Resources {
             protected:
                 texture::Texture2D* txt;
