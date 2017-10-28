@@ -18,9 +18,9 @@ int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_
             break;
         case SDL_MULTIGESTURE:
             if(event->mgesture.dTheta > rotate_epsilon) {
-                
+                o->core_app->on_rotate(event->mgesture.dTheta);
             } else if (event->mgesture.dDist > zoom_epsilon) {
-                
+                o->core_app->on_zoom(event->mgesture.dDist);
             }
         default:
             LOGE("Unhandled event " << event->type);

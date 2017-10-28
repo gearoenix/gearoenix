@@ -24,7 +24,7 @@ void TestApp::terminate() {}
 
 void TestApp::on_zoom(gearoenix::core::Real d)
 {
-    cam->move_forward(d * 0.0001f);
+    cam->move_forward(d);
 }
 
 void TestApp::on_rotate(gearoenix::core::Real d)

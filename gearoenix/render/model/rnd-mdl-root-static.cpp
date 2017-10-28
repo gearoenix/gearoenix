@@ -10,9 +10,9 @@ gearoenix::render::model::RootStatic::RootStatic(system::File* f, Engine* e, std
 {
     core::Count cc;
     f->read(cc);
-    children.resize(cc);
+    children.resize((size_t)cc);
     for (core::Count i = 0; i < cc; ++i)
-        children[i] = Model::read_child(f, e, c);
+        children[(size_t) i] = Model::read_child(f, e, c);
 }
 
 gearoenix::render::model::RootStatic::~RootStatic()

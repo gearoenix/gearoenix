@@ -79,7 +79,7 @@ void gearoenix::system::File::seek(unsigned int offset)
 unsigned int gearoenix::system::File::tell()
 {
 #if defined(USE_STD_FILE)
-    return file.tellg();
+    return (unsigned int) file.tellg();
 #elif defined(IN_ANDROID)
 #error "Not implemented yet"
 #else
