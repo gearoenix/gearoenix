@@ -3,6 +3,7 @@
 #include "../../system/sys-file.hpp"
 #include "../../system/sys-log.hpp"
 #include "../material/rnd-mat-directional-textured-speculated-nocube-fullshadow-opaque.hpp"
+#include "../material/rnd-mat-solid-colored-notspeculated-nocube-shadeless-opaque.hpp"
 #include "../material/rnd-mat-white.hpp"
 #include "../rnd-engine.hpp"
 
@@ -64,43 +65,46 @@ std::shared_ptr<gearoenix::render::shader::Shader> gearoenix::render::shader::Sh
 const std::vector<gearoenix::render::shader::ResourceDescription>& gearoenix::render::shader::Shader::get_resources_descriptions(Id id)
 {
     switch (id) {
-    case WHITE:
+    case WHITE_POSITION:
         return buffer_rsc_des;
-    case DIRECTIONAL_TEXTURED_SPECULATED_NOCUBE_FULLSHADOW_OPAQUE:
-        return textured_rsc_des;
+    case SOLID_COLORED_NOTSPECULATED_NOCUBE_SHADELESS_OPAQUE:
+        return buffer_rsc_des;
+    default:
+        LOGF("Unexpected! id: " << id);
     }
-    LOGF("Unexpected! id: " << id);
 }
 
 unsigned int gearoenix::render::shader::Shader::get_uniform_size(Id id)
 {
     switch (id) {
-    case WHITE:
+    case WHITE_POSITION:
         return sizeof(material::White::Uniform);
-    case DIRECTIONAL_TEXTURED_SPECULATED_NOCUBE_FULLSHADOW_OPAQUE:
-        return sizeof(material::DirectionalTexturedSpeculatedNocubeFullshadowOpaque::Uniform);
+    case SOLID_COLORED_NOTSPECULATED_NOCUBE_SHADELESS_OPAQUE:
+        return sizeof(material::SolidColoredNotspeculatedNocubeShadelessOpaque::Uniform);
+    default:
+        LOGF("Unexpected! id: " << id);
     }
-    LOGF("Unexpected! id: " << id);
 }
 
 const std::vector<gearoenix::render::shader::VertexAttribute>& gearoenix::render::shader::Shader::get_vertex_atributes(Id id)
 {
     switch (id) {
-    case WHITE:
+    case WHITE_POSITION:
         return has_pos;
-    case DIRECTIONAL_TEXTURED_SPECULATED_NOCUBE_FULLSHADOW_OPAQUE:
-        return has_pos_nrm_uv;
+    case SOLID_COLORED_NOTSPECULATED_NOCUBE_SHADELESS_OPAQUE:
+        return has_pos;
+    default:
+        LOGF("Unexpected! id: " << id);
     }
-    LOGF("Unexpected! id: " << id);
 }
 
 unsigned int gearoenix::render::shader::Shader::get_vertex_real_count(Id id)
 {
     switch (id) {
-    case WHITE:
+    case WHITE_POSITION:
+    case SOLID_COLORED_NOTSPECULATED_NOCUBE_SHADELESS_OPAQUE:
         return 3;
-    case DIRECTIONAL_TEXTURED_SPECULATED_NOCUBE_FULLSHADOW_OPAQUE:
-        return 8;
+    default:
+        LOGF("Unexpected! id: " << id);
     }
-    LOGF("Unexpected! id: " << id);
 }

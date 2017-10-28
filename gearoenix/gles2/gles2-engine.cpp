@@ -174,10 +174,22 @@ gearoenix::render::buffer::Uniform* gearoenix::gles2::Engine::create_uniform(uns
 gearoenix::render::shader::Shader* gearoenix::gles2::Engine::create_shader(core::Id sid, system::File*, std::shared_ptr<core::EndCaller> c)
 {
     switch (sid) {
-    case render::shader::DIRECTIONAL_TEXTURED_SPECULATED_NOCUBE_FULLSHADOW_OPAQUE:
-        return new shader::DirectionalTexturedSpeculatedNocubeNoshadowOpaque(this, c);
+    //    case render::shader::DIRECTIONAL_TEXTURED_SPECULATED_NOCUBE_FULLSHADOW_OPAQUE:
+    //        return new shader::DirectionalTexturedSpeculatedNocubeFullshadowOpaque(this, c);
+    //        break;
+    case render::shader::WHITE_POSITION:
+        UNIMPLEMENTED;
         break;
-    case render::shader::WHITE:
+    case render::shader::WHITE_POSITION_NORMAL:
+        UNIMPLEMENTED;
+        break;
+    case render::shader::WHITE_POSITION_UV:
+        UNIMPLEMENTED;
+        break;
+    case render::shader::WHITE_POSITION_NORMAL_UV:
+        UNIMPLEMENTED;
+        break;
+    case render::shader::SOLID_COLORED_NOTSPECULATED_NOCUBE_SHADELESS_OPAQUE:
         UNIMPLEMENTED;
         break;
     default:
@@ -188,13 +200,22 @@ gearoenix::render::shader::Shader* gearoenix::gles2::Engine::create_shader(core:
 gearoenix::render::shader::Resources* gearoenix::gles2::Engine::create_shader_resources(core::Id sid, render::pipeline::Pipeline* p, render::buffer::Uniform* ub, std::shared_ptr<core::EndCaller>)
 {
     switch (sid) {
-    case render::shader::DIRECTIONAL_TEXTURED_SPECULATED_NOCUBE_FULLSHADOW_OPAQUE:
-        return new shader::DirectionalTexturedSpeculatedNocubeNoshadowOpaque::Resources(
-            this,
-            reinterpret_cast<pipeline::Pipeline*>(p),
-            reinterpret_cast<buffer::Uniform*>(ub));
+    //    case render::shader::DIRECTIONAL_TEXTURED_SPECULATED_NOCUBE_FULLSHADOW_OPAQUE:
+    //        return new shader::DirectionalTexturedSpeculatedNocubeNoshadowOpaque::Resources(
+    //            this,
+    //            reinterpret_cast<pipeline::Pipeline*>(p),
+    //            reinterpret_cast<buffer::Uniform*>(ub));
+    //        break;
+    case render::shader::WHITE_POSITION:
+        UNIMPLEMENTED;
         break;
-    case render::shader::WHITE:
+    case render::shader::WHITE_POSITION_NORMAL:
+        UNIMPLEMENTED;
+        break;
+    case render::shader::WHITE_POSITION_UV:
+        UNIMPLEMENTED;
+        break;
+    case render::shader::WHITE_POSITION_NORMAL_UV:
         UNIMPLEMENTED;
         break;
     default:

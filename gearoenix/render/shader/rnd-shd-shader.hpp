@@ -15,8 +15,11 @@ namespace render {
     class Engine;
     namespace shader {
         typedef enum : core::Id {
-            WHITE = 0,
-            DIRECTIONAL_TEXTURED_SPECULATED_NOCUBE_FULLSHADOW_OPAQUE = 144679237557682176,
+            WHITE_POSITION = 0,
+            WHITE_POSITION_NORMAL = 1,
+            WHITE_POSITION_UV = 2,
+            WHITE_POSITION_NORMAL_UV = 3,
+            SOLID_COLORED_NOTSPECULATED_NOCUBE_SHADELESS_OPAQUE = 201000,
         } Id;
         namespace stage {
 
