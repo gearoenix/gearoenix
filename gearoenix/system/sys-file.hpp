@@ -71,8 +71,8 @@ namespace system {
         {
             core::Count c;
             read(c);
-            data.resize((size_t) c);
-            size_t s = (size_t) (c * sizeof(T));
+            data.resize((size_t)c);
+            size_t s = (size_t)(c * sizeof(T));
 #ifdef DEBUG_MODE
             if (read(reinterpret_cast<void*>(data.data()), s) != s) {
                 LOGF("Unexpected");

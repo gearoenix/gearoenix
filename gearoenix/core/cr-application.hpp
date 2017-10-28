@@ -7,6 +7,17 @@ namespace system {
 }
 namespace core {
     class Application {
+    public:
+        enum MouseButton {
+            LEFT,
+            RIGHT,
+            MIDDLE,
+        };
+        enum ButtonAction {
+            PRESS,
+            RELEASE,
+        };
+
     protected:
         system::Application* sys_app;
 
@@ -17,6 +28,9 @@ namespace core {
         virtual void terminate() = 0;
         virtual void on_zoom(Real d);
         virtual void on_rotate(Real d);
+        virtual void on_scroll(Real d);
+        virtual void on_mouse(MouseButton mb, ButtonAction ba, Real x, Real y);
+        virtual void on_mouse_move(Real dx, Real dy);
     };
 }
 }

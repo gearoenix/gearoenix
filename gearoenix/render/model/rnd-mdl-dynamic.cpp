@@ -13,10 +13,10 @@ gearoenix::render::model::Dynamic::Dynamic(system::File* f, Engine* e, std::shar
     core::Count cc;
     f->read(cc);
     //    LOGE("location: " << f->tell());
-    children.resize((size_t) cc);
+    children.resize((size_t)cc);
     //    LOGE("location: " << f->tell());
     for (core::Count i = 0; i < cc; ++i)
-        children[(size_t) i] = Model::read_child(f, e, c);
+        children[(size_t)i] = Model::read_child(f, e, c);
 }
 
 void gearoenix::render::model::Dynamic::commit(const scene::Scene* s)

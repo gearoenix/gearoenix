@@ -24,8 +24,8 @@ gearoenix::system::File::File(system::Application* sys_app, const std::string& n
     std::string file_path = name;
 #ifdef IN_IOS
     @autoreleasepool {
-//        NSString *f_name = [NSString stringWithCString:name.c_str() encoding:[NSString defaultCStringEncoding]];
-        NSString *path = [[NSBundle mainBundle] pathForResource:@"data" ofType:@"gx3d"];
+        //        NSString *f_name = [NSString stringWithCString:name.c_str() encoding:[NSString defaultCStringEncoding]];
+        NSString* path = [[NSBundle mainBundle] pathForResource:@"data" ofType:@"gx3d"];
         file_path = std::string([path fileSystemRepresentation]);
     }
 #endif
@@ -79,7 +79,7 @@ void gearoenix::system::File::seek(unsigned int offset)
 unsigned int gearoenix::system::File::tell()
 {
 #if defined(USE_STD_FILE)
-    return (unsigned int) file.tellg();
+    return (unsigned int)file.tellg();
 #elif defined(IN_ANDROID)
 #error "Not implemented yet"
 #else

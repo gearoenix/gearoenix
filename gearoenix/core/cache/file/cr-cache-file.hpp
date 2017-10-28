@@ -37,7 +37,7 @@ std::shared_ptr<T> gearoenix::core::cache::file::File::get(Id id, std::function<
             LOGF("object with id: " << id << ", not found in table of offsets.");
         }
 #endif
-        file->seek((unsigned int) offsets[(size_t)id]);
+        file->seek((unsigned int)offsets[(size_t)id]);
         return new_fun();
     };
     return cacher.get<T>(id, fn_new);

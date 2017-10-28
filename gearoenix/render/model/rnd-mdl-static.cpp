@@ -11,7 +11,7 @@ gearoenix::render::model::Static::Static(system::File* f, Engine* e, std::shared
     //    LOGE("location: " << f->tell());
     core::Count cc;
     f->read(cc);
-    children.resize((size_t) cc);
+    children.resize((size_t)cc);
     for (core::Count i = 0; i < cc; ++i)
         children[(size_t)i] = Model::read_child(f, e, c);
 }

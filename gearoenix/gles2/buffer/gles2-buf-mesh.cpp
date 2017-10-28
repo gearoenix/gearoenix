@@ -10,28 +10,27 @@ gearoenix::gles2::buffer::Mesh::Mesh(unsigned int vec, system::File* f, Engine* 
     core::Count cnt;
     f->read(cnt);
     core::Count vsec = cnt * vec;
-    std::vector<core::Real> vd((size_t) vsec);
-    unsigned int vds = (unsigned int) (vsec * sizeof(core::Real));
+    std::vector<core::Real> vd((size_t)vsec);
+    unsigned int vds = (unsigned int)(vsec * sizeof(core::Real));
     unsigned int vs = vds;
-    for (core::Count i = 0; i < vsec; ++i)
-    {
-        f->read(vd[(size_t) i]);
+    for (core::Count i = 0; i < vsec; ++i) {
+        f->read(vd[(size_t)i]);
     }
     f->read(cnt);
-    ic = (GLsizei) cnt;
-    std::vector<GLushort> idata((size_t) cnt);
+    ic = (GLsizei)cnt;
+    std::vector<GLushort> idata((size_t)cnt);
     for (core::Count i = 0; i < cnt; ++i)
-        idata[(size_t) i] = static_cast<GLushort>(f->read<uint32_t>());
-    unsigned int ids = (unsigned int) (cnt * sizeof(GLushort));
+        idata[(size_t)i] = static_cast<GLushort>(f->read<uint32_t>());
+    unsigned int ids = (unsigned int)(cnt * sizeof(GLushort));
     unsigned int is = ids;
     std::function<void()> todo = [this, vd, idata, vs, is, c] {
-//        for (core::Real r : vd) {
-//            LOGI(r);
-//        }
-//        LOGI("***********************************************");
-//        for (GLushort i : idata) {
-//            LOGI(i);
-//        }
+        //        for (core::Real r : vd) {
+        //            LOGI(r);
+        //        }
+        //        LOGI("***********************************************");
+        //        for (GLushort i : idata) {
+        //            LOGI(i);
+        //        }
 
         //const GLfloat vertices[] = {
         //    0.0f, 1.0f, -0.1f, 0.0f, 0.0f, 1.0f, 0.0f, 2.0f,
