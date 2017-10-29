@@ -1,5 +1,5 @@
-#ifndef GEAROEMIX_RENDER_MATERIAL_SOLID_COLORED_NOTSPECULATED_NOCUBE_SHADELESS_OPAQUE_HPP
-#define GEAROEMIX_RENDER_MATERIAL_SOLID_COLORED_NOTSPECULATED_NOCUBE_SHADELESS_OPAQUE_HPP
+#ifndef GEAROEMIX_RENDER_MATERIAL_SHADELESS_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE_HPP
+#define GEAROEMIX_RENDER_MATERIAL_SHADELESS_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE_HPP
 #include "../../math/math-matrix.hpp"
 #include "../../math/math-vector.hpp"
 #include "../shader/rnd-shd-resources.hpp"
@@ -14,7 +14,7 @@ namespace render {
         class Texture2D;
     }
     namespace material {
-        class SolidColoredNotspeculatedNocubeShadelessOpaque : public Material {
+        class ShadelessColoredMatteNonreflectiveShadowlessOpaque : public Material {
         public:
             const static core::Id SHADER_ID;
             class Resources : public shader::Resources {
@@ -32,8 +32,8 @@ namespace render {
             Resources* shdrsc;
 
         public:
-            SolidColoredNotspeculatedNocubeShadelessOpaque(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> end);
-            ~SolidColoredNotspeculatedNocubeShadelessOpaque();
+            ShadelessColoredMatteNonreflectiveShadowlessOpaque(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> end);
+            ~ShadelessColoredMatteNonreflectiveShadowlessOpaque();
             unsigned int get_vertex_elements_count() const;
             void update(const scene::Scene* s, const model::Model* m);
             void bind();

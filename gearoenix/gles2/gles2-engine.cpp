@@ -10,8 +10,8 @@
 #include "buffer/gles2-buf-mesh.hpp"
 #include "buffer/gles2-buf-uniform.hpp"
 #include "pipeline/gles2-pip-pipeline.hpp"
-#include "shader/gles2-shd-directional-colored-speculated-nocube-noshadow-opaque.hpp"
-#include "shader/gles2-shd-directional-textured-speculated-nocube-noshadow-opaque.hpp"
+#include "shader/gles2-shd-directional-colored-speculated-nonreflective-shadowless-opaque.hpp"
+#include "shader/gles2-shd-directional-textured-speculated-nonreflective-shadowless-opaque.hpp"
 #include "texture/gles2-txt-2d.hpp"
 
 #define SHADOW_MAP
@@ -173,23 +173,18 @@ gearoenix::render::buffer::Uniform* gearoenix::gles2::Engine::create_uniform(uns
 
 gearoenix::render::shader::Shader* gearoenix::gles2::Engine::create_shader(core::Id sid, system::File*, std::shared_ptr<core::EndCaller> c)
 {
-    switch (sid) {
-    //    case render::shader::DIRECTIONAL_TEXTURED_SPECULATED_NOCUBE_FULLSHADOW_OPAQUE:
-    //        return new shader::DirectionalTexturedSpeculatedNocubeFullshadowOpaque(this, c);
-    //        break;
-    case render::shader::WHITE_POSITION:
+    render::shader::Id shader_id = static_cast<render::shader::Id>(sid);
+    switch (shader_id) {
+    case render::shader::WHITE_POS:
         UNIMPLEMENTED;
         break;
-    case render::shader::WHITE_POSITION_NORMAL:
+    case render::shader::WHITE_POS_NRM:
         UNIMPLEMENTED;
         break;
-    case render::shader::WHITE_POSITION_UV:
+    case render::shader::WHITE_POS_UV:
         UNIMPLEMENTED;
         break;
-    case render::shader::WHITE_POSITION_NORMAL_UV:
-        UNIMPLEMENTED;
-        break;
-    case render::shader::SOLID_COLORED_NOTSPECULATED_NOCUBE_SHADELESS_OPAQUE:
+    case render::shader::WHITE_POS_NRM_UV:
         UNIMPLEMENTED;
         break;
     default:
@@ -200,22 +195,16 @@ gearoenix::render::shader::Shader* gearoenix::gles2::Engine::create_shader(core:
 gearoenix::render::shader::Resources* gearoenix::gles2::Engine::create_shader_resources(core::Id sid, render::pipeline::Pipeline* p, render::buffer::Uniform* ub, std::shared_ptr<core::EndCaller>)
 {
     switch (sid) {
-    //    case render::shader::DIRECTIONAL_TEXTURED_SPECULATED_NOCUBE_FULLSHADOW_OPAQUE:
-    //        return new shader::DirectionalTexturedSpeculatedNocubeNoshadowOpaque::Resources(
-    //            this,
-    //            reinterpret_cast<pipeline::Pipeline*>(p),
-    //            reinterpret_cast<buffer::Uniform*>(ub));
-    //        break;
-    case render::shader::WHITE_POSITION:
+    case render::shader::WHITE_POS:
         UNIMPLEMENTED;
         break;
-    case render::shader::WHITE_POSITION_NORMAL:
+    case render::shader::WHITE_POS_NRM:
         UNIMPLEMENTED;
         break;
-    case render::shader::WHITE_POSITION_UV:
+    case render::shader::WHITE_POS_UV:
         UNIMPLEMENTED;
         break;
-    case render::shader::WHITE_POSITION_NORMAL_UV:
+    case render::shader::WHITE_POS_NRM_UV:
         UNIMPLEMENTED;
         break;
     default:

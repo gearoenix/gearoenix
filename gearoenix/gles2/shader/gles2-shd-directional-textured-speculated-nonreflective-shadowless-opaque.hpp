@@ -1,8 +1,8 @@
-#ifndef GEAROENIX_GLES2_SHADER_DIRECTIONAL_TEXTURED_SPECULATED_NOCUBE_NOSHADOW_OPAQUE
-#define GEAROENIX_GLES2_SHADER_DIRECTIONAL_TEXTURED_SPECULATED_NOCUBE_NOSHADOW_OPAQUE
+#ifndef GEAROENIX_GLES2_SHADER_DIRECTIONAL_TEXTURED_SPECULATED_NOCUBE_NOSHADOW_OPAQUE_HPP
+#define GEAROENIX_GLES2_SHADER_DIRECTIONAL_TEXTURED_SPECULATED_NOCUBE_NOSHADOW_OPAQUE_HPP
 #include "../../core/cr-build-configuration.hpp"
 #ifdef USE_OPENGL_ES2
-#include "../../render/material/rnd-mat-directional-textured-speculated-nocube-fullshadow-opaque.hpp"
+#include "../../render/material/rnd-mat-directional-textured-speculated-nonreflective-full-opaque.hpp"
 #include "../gles2.hpp"
 #include "gles2-shader.hpp"
 namespace gearoenix {
@@ -14,9 +14,9 @@ namespace gles2 {
         class Pipeline;
     }
     namespace shader {
-        class DirectionalTexturedSpeculatedNocubeNoshadowOpaque : public Shader {
+        class DirectionalTexturedSpeculatedNonreflectiveShadowlessOpaque : public Shader {
         public:
-            class Resources : public render::material::DirectionalTexturedSpeculatedNocubeFullshadowOpaque::Resources {
+            class Resources : public render::material::DirectionalTexturedSpeculatedNonreflectiveFullOpaque::Resources {
             public:
                 Resources(Engine* e, pipeline::Pipeline* pip, buffer::Uniform* u);
                 void bind();
@@ -39,8 +39,8 @@ namespace gles2 {
             GLint uv_att_ind;
 
         public:
-            DirectionalTexturedSpeculatedNocubeNoshadowOpaque(Engine* eng, std::shared_ptr<core::EndCaller> end);
-            ~DirectionalTexturedSpeculatedNocubeNoshadowOpaque();
+            DirectionalTexturedSpeculatedNonreflectiveShadowlessOpaque(Engine* eng, std::shared_ptr<core::EndCaller> end);
+            ~DirectionalTexturedSpeculatedNonreflectiveShadowlessOpaque();
             void use();
             const std::vector<render::shader::stage::Id>& get_stages_ids() const;
             void set_mvp(const GLfloat* data);

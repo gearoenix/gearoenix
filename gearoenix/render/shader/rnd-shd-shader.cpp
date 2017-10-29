@@ -2,8 +2,8 @@
 #include "../../core/cr-types.hpp"
 #include "../../system/sys-file.hpp"
 #include "../../system/sys-log.hpp"
-#include "../material/rnd-mat-directional-textured-speculated-nocube-fullshadow-opaque.hpp"
-#include "../material/rnd-mat-solid-colored-notspeculated-nocube-shadeless-opaque.hpp"
+#include "../material/rnd-mat-directional-textured-speculated-nonreflective-full-opaque.hpp"
+#include "../material/rnd-mat-shadeless-colored-matte-nonreflective-shadowless-opaque.hpp"
 #include "../material/rnd-mat-white.hpp"
 #include "../rnd-engine.hpp"
 
@@ -65,22 +65,18 @@ std::shared_ptr<gearoenix::render::shader::Shader> gearoenix::render::shader::Sh
 const std::vector<gearoenix::render::shader::ResourceDescription>& gearoenix::render::shader::Shader::get_resources_descriptions(Id id)
 {
     switch (id) {
-    case WHITE_POSITION:
-        return buffer_rsc_des;
-    case SOLID_COLORED_NOTSPECULATED_NOCUBE_SHADELESS_OPAQUE:
+    case WHITE_POS:
         return buffer_rsc_des;
     default:
         LOGF("Unexpected! id: " << id);
     }
 }
 
-unsigned int gearoenix::render::shader::Shader::get_uniform_size(Id id)
+unsigned int gearoenix::render::shader::Shader::get_uniform_size(core::Id id)
 {
     switch (id) {
-    case WHITE_POSITION:
+    case WHITE_POS:
         return sizeof(material::White::Uniform);
-    case SOLID_COLORED_NOTSPECULATED_NOCUBE_SHADELESS_OPAQUE:
-        return sizeof(material::SolidColoredNotspeculatedNocubeShadelessOpaque::Uniform);
     default:
         LOGF("Unexpected! id: " << id);
     }
@@ -89,20 +85,17 @@ unsigned int gearoenix::render::shader::Shader::get_uniform_size(Id id)
 const std::vector<gearoenix::render::shader::VertexAttribute>& gearoenix::render::shader::Shader::get_vertex_atributes(Id id)
 {
     switch (id) {
-    case WHITE_POSITION:
-        return has_pos;
-    case SOLID_COLORED_NOTSPECULATED_NOCUBE_SHADELESS_OPAQUE:
+    case WHITE_POS:
         return has_pos;
     default:
         LOGF("Unexpected! id: " << id);
     }
 }
 
-unsigned int gearoenix::render::shader::Shader::get_vertex_real_count(Id id)
+unsigned int gearoenix::render::shader::Shader::get_vertex_real_count(core::Id id)
 {
     switch (id) {
-    case WHITE_POSITION:
-    case SOLID_COLORED_NOTSPECULATED_NOCUBE_SHADELESS_OPAQUE:
+    case WHITE_POS:
         return 3;
     default:
         LOGF("Unexpected! id: " << id);

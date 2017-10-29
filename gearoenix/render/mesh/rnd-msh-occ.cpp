@@ -9,7 +9,7 @@ gearoenix::render::mesh::Occ::Occ(system::File* f, Engine* e, std::shared_ptr<co
     shader::Id sid;
     f->read(sid);
 #ifdef DEBUG_MODE
-    if (sid != 0) {
+    if (sid != shader::WHITE_POS) {
         LOGF("Unexpected");
     }
 #endif

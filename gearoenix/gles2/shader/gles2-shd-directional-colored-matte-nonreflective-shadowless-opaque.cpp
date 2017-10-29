@@ -1,7 +1,7 @@
-#include "gles2-shd-directional-colored-speculated-nocube-noshadow-opaque.hpp"
+#include "gles2-shd-directional-colored-speculated-nonreflective-shadowless-opaque.hpp"
 #ifdef USE_OPENGL_ES2
 #include "../../system/sys-log.hpp"
-gearoenix::gles2::shader::DirectionalColoredSpeculatedNocubeNoshadowOpaque::DirectionalColoredSpeculatedNocubeNoshadowOpaque(Engine* eng, std::shared_ptr<core::EndCaller> end)
+gearoenix::gles2::shader::DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque::DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque(Engine* eng, std::shared_ptr<core::EndCaller> end)
     : Shader(eng, end)
 {
     std::string pvs = "precision highp sampler2D;\n"
@@ -45,14 +45,14 @@ gearoenix::gles2::shader::DirectionalColoredSpeculatedNocubeNoshadowOpaque::Dire
     color = get_uniform_location("color");
 }
 
-gearoenix::gles2::shader::DirectionalColoredSpeculatedNocubeNoshadowOpaque::~DirectionalColoredSpeculatedNocubeNoshadowOpaque()
+gearoenix::gles2::shader::DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque::~DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque()
 {
     end_object(vtx_shd);
     end_object(frg_shd);
     end_program();
 }
 
-void gearoenix::gles2::shader::DirectionalColoredSpeculatedNocubeNoshadowOpaque::use()
+void gearoenix::gles2::shader::DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque::use()
 {
     glUseProgram(shader_program);
     glEnableVertexAttribArray(vtx_att_ind);
@@ -74,12 +74,12 @@ void gearoenix::gles2::shader::DirectionalColoredSpeculatedNocubeNoshadowOpaque:
     glUniform3fv(color, 1, data);
 }
 
-const std::vector<gearoenix::render::shader::stage::Id>& gearoenix::gles2::shader::DirectionalColoredSpeculatedNocubeNoshadowOpaque::get_stages_ids() const
+const std::vector<gearoenix::render::shader::stage::Id>& gearoenix::gles2::shader::DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque::get_stages_ids() const
 {
     return graphic_2_stage;
 }
 
-void gearoenix::gles2::shader::DirectionalColoredSpeculatedNocubeNoshadowOpaque::set_mvp(const GLfloat* data)
+void gearoenix::gles2::shader::DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque::set_mvp(const GLfloat* data)
 {
     glUniformMatrix4fv(mvp, 1, GL_FALSE, data);
 }

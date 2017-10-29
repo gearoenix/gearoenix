@@ -1,5 +1,5 @@
-#ifndef GEAROENIX_GLES2_SHADER_DIRECTIONAL_COLORED_SPECULATED_NOCUBE_NOSHADOW_OPAQUE
-#define GEAROENIX_GLES2_SHADER_DIRECTIONAL_COLORED_SPECULATED_NOCUBE_NOSHADOW_OPAQUE
+#ifndef GEAROENIX_GLES2_SHADER_DIRECTIONAL_COLORED_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE_HPP
+#define GEAROENIX_GLES2_SHADER_DIRECTIONAL_COLORED_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE_HPP
 #include "../../core/cr-build-configuration.hpp"
 #ifdef USE_OPENGL_ES2
 #include "../gles2.hpp"
@@ -7,7 +7,7 @@
 namespace gearoenix {
 namespace gles2 {
     namespace shader {
-        class DirectionalColoredSpeculatedNocubeNoshadowOpaque : public Shader {
+        class DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque : public Shader {
         protected:
             GLuint mvp;
             GLuint m;
@@ -23,8 +23,8 @@ namespace gles2 {
             GLint nrm_att_ind;
 
         public:
-            DirectionalColoredSpeculatedNocubeNoshadowOpaque(Engine* eng, std::shared_ptr<core::EndCaller> end);
-            ~DirectionalColoredSpeculatedNocubeNoshadowOpaque();
+            DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque(Engine* eng, std::shared_ptr<core::EndCaller> end);
+            ~DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque();
             void use();
             const std::vector<render::shader::stage::Id>& get_stages_ids() const;
             void set_mvp(const GLfloat* data);

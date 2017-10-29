@@ -10,6 +10,7 @@ namespace render {
     namespace material {
         class White : public Material {
         public:
+            const static core::Id SHADER_ID;
             typedef struct {
                 math::Mat4x4 mvp;
             } Uniform;
