@@ -1,8 +1,8 @@
-#ifndef GEAROENIX_GLES2_SHADER_DIRECTIONAL_TEXTURED_SPECULATED_NOCUBE_NOSHADOW_OPAQUE_HPP
-#define GEAROENIX_GLES2_SHADER_DIRECTIONAL_TEXTURED_SPECULATED_NOCUBE_NOSHADOW_OPAQUE_HPP
+#ifndef GEAROENIX_GLES2_SHADER_DIRECTIONAL_TEXTURED_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE_HPP
+#define GEAROENIX_GLES2_SHADER_DIRECTIONAL_TEXTURED_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE_HPP
 #include "../../core/cr-build-configuration.hpp"
 #ifdef USE_OPENGL_ES2
-#include "../../render/material/rnd-mat-directional-textured-speculated-nonreflective-full-opaque.hpp"
+#include "../../render/material/rnd-mat-directional-textured-speculated-nonreflective-shadowless-opaque.hpp"
 #include "../gles2.hpp"
 #include "gles2-shader.hpp"
 namespace gearoenix {
@@ -16,7 +16,7 @@ namespace gles2 {
     namespace shader {
         class DirectionalTexturedSpeculatedNonreflectiveShadowlessOpaque : public Shader {
         public:
-            class Resources : public render::material::DirectionalTexturedSpeculatedNonreflectiveFullOpaque::Resources {
+            class Resources : public render::material::DirectionalTexturedSpeculatedNonreflectiveShadowlessOpaque::Resources {
             public:
                 Resources(Engine* e, pipeline::Pipeline* pip, buffer::Uniform* u);
                 void bind();

@@ -7,13 +7,13 @@
 #include "../texture/gles2-txt-2d.hpp"
 
 gearoenix::gles2::shader::DirectionalTexturedSpeculatedNonreflectiveShadowlessOpaque::Resources::Resources(Engine* e, pipeline::Pipeline* pip, buffer::Uniform* u)
-    : render::material::DirectionalTexturedSpeculatedNonreflectiveFullOpaque::Resources(e, pip, u)
+    : render::material::DirectionalTexturedSpeculatedNonreflectiveShadowlessOpaque::Resources(e, pip, u)
 {
 }
 
 void gearoenix::gles2::shader::DirectionalTexturedSpeculatedNonreflectiveShadowlessOpaque::Resources::bind()
 {
-    render::material::DirectionalTexturedSpeculatedNonreflectiveFullOpaque::Uniform* data = reinterpret_cast<render::material::DirectionalTexturedSpeculatedNonreflectiveFullOpaque::Uniform*>(u->get_data());
+    render::material::DirectionalTexturedSpeculatedNonreflectiveShadowlessOpaque::Uniform* data = reinterpret_cast<render::material::DirectionalTexturedSpeculatedNonreflectiveShadowlessOpaque::Uniform*>(u->get_data());
     DirectionalTexturedSpeculatedNonreflectiveShadowlessOpaque* shd = reinterpret_cast<DirectionalTexturedSpeculatedNonreflectiveShadowlessOpaque*>(pip->get_shader());
     shd->use();
 

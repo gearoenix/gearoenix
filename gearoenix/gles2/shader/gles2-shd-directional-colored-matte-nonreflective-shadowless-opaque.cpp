@@ -1,9 +1,33 @@
-#include "gles2-shd-directional-colored-speculated-nonreflective-shadowless-opaque.hpp"
+#include "gles2-shd-directional-colored-matte-nonreflective-shadowless-opaque.hpp"
 #ifdef USE_OPENGL_ES2
 #include "../../system/sys-log.hpp"
-gearoenix::gles2::shader::DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque::DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque(Engine* eng, std::shared_ptr<core::EndCaller> end)
+#include "../buffer/gles2-buf-uniform.hpp"
+#include "../gles2-engine.hpp"
+#include "../pipeline/gles2-pip-pipeline.hpp"
+
+gearoenix::gles2::shader::DirectionalColoredMatteNonreflectiveShadowlessOpaque::Resources::Resources(Engine* e, pipeline::Pipeline* pip, buffer::Uniform* u)
+    : render::material::DirectionalColoredMatteNonreflectiveShadowlessOpaque::Resources(e, pip, u)
+{
+}
+
+void gearoenix::gles2::shader::DirectionalColoredMatteNonreflectiveShadowlessOpaque::Resources::bind()
+{
+    render::material::DirectionalColoredMatteNonreflectiveShadowlessOpaque::Uniform* data = reinterpret_cast<render::material::DirectionalColoredMatteNonreflectiveShadowlessOpaque::Uniform*>(u->get_data());
+    DirectionalColoredMatteNonreflectiveShadowlessOpaque* shd = reinterpret_cast<DirectionalColoredMatteNonreflectiveShadowlessOpaque*>(pip->get_shader());
+    shd->use();
+    shd->set_ambl_color(data->ambl_color.data());
+    shd->set_color(data->color.data());
+    shd->set_m(data->m.data());
+    shd->set_mvp(data->mvp.data());
+    shd->set_sun(data->sun.data());
+    shd->set_sun_color(data->sun_color.data());
+}
+
+gearoenix::gles2::shader::DirectionalColoredMatteNonreflectiveShadowlessOpaque::DirectionalColoredMatteNonreflectiveShadowlessOpaque(Engine* eng, std::shared_ptr<core::EndCaller> end)
     : Shader(eng, end)
 {
+  eng->add_load_function([this, end] {
+      create_program();
     std::string pvs = "precision highp sampler2D;\n"
                       "precision highp float;\n"
                       "attribute vec3 vertex;\n"
@@ -24,14 +48,15 @@ gearoenix::gles2::shader::DirectionalColoredSpeculatedNonreflectiveShadowlessOpa
                       "varying vec3 nrm;\n"
                       "uniform vec3 color;\n"
                       "uniform vec3 sun;\n"
-                      "uniform vec3 eye;\n"
+                      "uniform vec3 sun_color;\n"
+                      "uniform vec3 ambl_color;\n"
                       "void main()\n"
                       "{\n"
                       "    float diff = -dot(nrm, sun);\n"
-                      "    float spec = dot(reflect(sun, nrm), normalize(eye - pos));"
-                      "    spec = smoothstep(0.8, 0.9, spec);\n"
-                      "    diff = smoothstep(0.0, 0.2, diff) * (1.0 - 0.5) + 0.5;\n"
-                      "    gl_FragColor = vec4(color * diff + vec3(spec), 1.0);\n"
+                      "    diff = smoothstep(0.0, 0.3, diff) * 0.5;\n"
+                      "    vec3 final_color = sun_color * color * diff;\n"
+                      "    final_color += ambl_color * color;\n"
+                      "    gl_FragColor = vec4(final_color, 1.0);\n"
                       "}\n";
     vtx_shd = add_shader_to_program(pvs, GL_VERTEX_SHADER);
     frg_shd = add_shader_to_program(pfs, GL_FRAGMENT_SHADER);
@@ -41,18 +66,21 @@ gearoenix::gles2::shader::DirectionalColoredSpeculatedNonreflectiveShadowlessOpa
     mvp = get_uniform_location("mvp");
     m = get_uniform_location("m");
     sun = get_uniform_location("sun");
-    eye = get_uniform_location("eye");
+    sun_color = get_uniform_location("sun_color");
     color = get_uniform_location("color");
+    ambl_color = get_uniform_location("ambl_color");
+    (void)end;
+});
 }
 
-gearoenix::gles2::shader::DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque::~DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque()
+gearoenix::gles2::shader::DirectionalColoredMatteNonreflectiveShadowlessOpaque::~DirectionalColoredMatteNonreflectiveShadowlessOpaque()
 {
     end_object(vtx_shd);
     end_object(frg_shd);
     end_program();
 }
 
-void gearoenix::gles2::shader::DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque::use()
+void gearoenix::gles2::shader::DirectionalColoredMatteNonreflectiveShadowlessOpaque::use()
 {
     glUseProgram(shader_program);
     glEnableVertexAttribArray(vtx_att_ind);
@@ -60,28 +88,41 @@ void gearoenix::gles2::shader::DirectionalColoredSpeculatedNonreflectiveShadowle
     //////////////////////////////////////////////////////
     glVertexAttribPointer(vtx_att_ind, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void*)0);
     glVertexAttribPointer(nrm_att_ind, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
-    ///////////////////////////////////////////////////////
-    const GLfloat data[] = {
-        1.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 1.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 1.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 1.0f,
-    };
-    glUniformMatrix4fv(mvp, 1, GL_FALSE, data);
-    glUniformMatrix4fv(m, 1, GL_FALSE, data);
-    glUniform3fv(sun, 1, data);
-    glUniform3fv(eye, 1, data);
-    glUniform3fv(color, 1, data);
 }
 
-const std::vector<gearoenix::render::shader::stage::Id>& gearoenix::gles2::shader::DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque::get_stages_ids() const
+const std::vector<gearoenix::render::shader::stage::Id>& gearoenix::gles2::shader::DirectionalColoredMatteNonreflectiveShadowlessOpaque::get_stages_ids() const
 {
     return graphic_2_stage;
 }
 
-void gearoenix::gles2::shader::DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque::set_mvp(const GLfloat* data)
+void gearoenix::gles2::shader::DirectionalColoredMatteNonreflectiveShadowlessOpaque::set_mvp(const GLfloat* data)
 {
     glUniformMatrix4fv(mvp, 1, GL_FALSE, data);
+}
+
+void gearoenix::gles2::shader::DirectionalColoredMatteNonreflectiveShadowlessOpaque::set_m(const GLfloat* data)
+{
+    glUniformMatrix4fv(m, 1, GL_FALSE, data);
+}
+
+void gearoenix::gles2::shader::DirectionalColoredMatteNonreflectiveShadowlessOpaque::set_sun(const GLfloat* data)
+{
+    glUniform3fv(sun, 1, data);
+}
+
+void gearoenix::gles2::shader::DirectionalColoredMatteNonreflectiveShadowlessOpaque::set_sun_color(const GLfloat* data)
+{
+    glUniform3fv(sun_color, 1, data);
+}
+
+void gearoenix::gles2::shader::DirectionalColoredMatteNonreflectiveShadowlessOpaque::set_color(const GLfloat* data)
+{
+    glUniform3fv(color, 1, data);
+}
+
+void gearoenix::gles2::shader::DirectionalColoredMatteNonreflectiveShadowlessOpaque::set_ambl_color(const GLfloat* data)
+{
+    glUniform3fv(ambl_color, 1, data);
 }
 
 #endif

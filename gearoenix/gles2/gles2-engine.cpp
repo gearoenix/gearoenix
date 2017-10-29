@@ -11,6 +11,7 @@
 #include "buffer/gles2-buf-uniform.hpp"
 #include "pipeline/gles2-pip-pipeline.hpp"
 #include "shader/gles2-shd-directional-colored-speculated-nonreflective-shadowless-opaque.hpp"
+#include "shader/gles2-shd-directional-colored-matte-nonreflective-shadowless-opaque.hpp"
 #include "shader/gles2-shd-directional-textured-speculated-nonreflective-shadowless-opaque.hpp"
 #include "texture/gles2-txt-2d.hpp"
 
@@ -187,6 +188,8 @@ gearoenix::render::shader::Shader* gearoenix::gles2::Engine::create_shader(core:
     case render::shader::WHITE_POS_NRM_UV:
         UNIMPLEMENTED;
         break;
+    case render::shader::DIRECTIONAL_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
+            return new shader::DirectionalColoredMatteNonreflectiveShadowlessOpaque(this, c);
     default:
         UNEXPECTED;
     }
@@ -204,9 +207,13 @@ gearoenix::render::shader::Resources* gearoenix::gles2::Engine::create_shader_re
     case render::shader::WHITE_POS_UV:
         UNIMPLEMENTED;
         break;
-    case render::shader::WHITE_POS_NRM_UV:
-        UNIMPLEMENTED;
-        break;
+        case render::shader::WHITE_POS_NRM_UV:
+            UNIMPLEMENTED;
+            break;
+        case render::shader::DIRECTIONAL_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
+            return new shader::DirectionalColoredMatteNonreflectiveShadowlessOpaque::Resources(
+                   this, reinterpret_cast<pipeline::Pipeline*>(p),
+                   reinterpret_cast<buffer::Uniform*>(ub));
     default:
         UNEXPECTED;
     }

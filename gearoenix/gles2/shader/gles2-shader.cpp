@@ -42,10 +42,10 @@ void gearoenix::gles2::shader::Shader::link()
     if (is_success == 0) {
         GLint max_length = 0;
         glGetProgramiv(shader_program, GL_INFO_LOG_LENGTH, &max_length);
-        std::string info_log;
+        std::vector<GLchar> info_log;
         info_log.resize(max_length);
         glGetProgramInfoLog(shader_program, max_length, NULL, &(info_log[0]));
-        LOGF("Error linking shader program: " << info_log);
+        LOGF("Error linking shader program: " << &(info_log[0]));
     }
 }
 
