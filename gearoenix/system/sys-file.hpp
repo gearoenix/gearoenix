@@ -26,9 +26,9 @@ namespace system {
     class File {
     private:
 #ifdef USE_STD_FILE
-        system::Application* sys_app;
         std::ifstream file;
 #elif defined(IN_ANDROID)
+        system::Application* sys_app;
         AAsset* file;
 #else
 #error "Unimplemented yet!"

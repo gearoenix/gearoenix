@@ -17,9 +17,9 @@ void gearoenix::system::File::check_endian_compatibility()
     //    LOGE(std::string("endian is: ") + std::to_string(is_endian_compatible));
 }
 
-gearoenix::system::File::File(system::Application* sys_app, const std::string& name)
+gearoenix::system::File::File
 #ifdef USE_STD_FILE
-    : sys_app(sys_app)
+    (system::Application*, const std::string& name)
 {
     std::string file_path = name;
 #ifdef IN_IOS
@@ -34,6 +34,8 @@ gearoenix::system::File::File(system::Application* sys_app, const std::string& n
         LOGF("Error in opening assets file.");
     }
 #elif defined(IN_ANDROID)
+    (system::Application* sys_app, const std::string& name)
+    : sys_app(sys_app)
 {
     file = AAssetManager_open(sys_app->get_android_app()->activity->assetManager,
         "data.gx3d", AASSET_MODE_BUFFER);

@@ -34,10 +34,10 @@ namespace render {
             std::vector<std::shared_ptr<audio::Audio>> audios;
             std::vector<std::shared_ptr<light::Light>> lights;
             std::vector<std::shared_ptr<model::Model>> models;
-            Engine* e;
             unsigned int curcam = 0;
             bool renderable = false;
             math::Vec3 ambient_light = math::Vec3(0.2f, 0.2f, 0.2f);
+            //Engine* e;
 
         protected:
             Scene(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c);

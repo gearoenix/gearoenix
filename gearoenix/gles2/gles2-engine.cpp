@@ -14,6 +14,7 @@
 #include "shader/gles2-shd-directional-colored-speculated-nonreflective-shadowless-opaque.hpp"
 #include "shader/gles2-shd-directional-textured-speculated-nonreflective-shadowless-opaque.hpp"
 #include "texture/gles2-txt-2d.hpp"
+#include "texture/gles2-txt-cube.hpp"
 
 #define SHADOW_MAP
 //#define INTA_TEST001
@@ -160,6 +161,11 @@ void gearoenix::gles2::Engine::terminate()
 gearoenix::render::texture::Texture2D* gearoenix::gles2::Engine::create_texture_2d(system::File* file, std::shared_ptr<core::EndCaller> c)
 {
     return new texture::Texture2D(file, this, c);
+}
+
+gearoenix::render::texture::Cube* gearoenix::gles2::Engine::create_texture_cube(system::File* file, std::shared_ptr<core::EndCaller> c)
+{
+    return new texture::Cube(file, this, c);
 }
 
 gearoenix::render::buffer::Mesh* gearoenix::gles2::Engine::create_mesh(unsigned int vec, system::File* file, std::shared_ptr<core::EndCaller> c)

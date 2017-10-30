@@ -1,9 +1,14 @@
-#ifndef GEAROEMIX_RENDER_TEXTURE_TEXTURE2D_HPP
-#define GEAROEMIX_RENDER_TEXTURE_TEXTURE2D_HPP
-#include "../../core/cr-build-configuration.hpp"
-#ifdef USE_VULKAN
-#include "../../vulkan/texture/vk-txt-texture-cube.hpp"
-#else
-#error "Unimplemented"
-#endif
+#ifndef GEAROEMIX_RENDER_TEXTURE_CUBE_HPP
+#define GEAROEMIX_RENDER_TEXTURE_CUBE_HPP
+#include "rnd-txt-texture.hpp"
+namespace gearoenix {
+namespace render {
+    namespace texture {
+        class Cube : public Texture {
+        public:
+            virtual ~Cube();
+        };
+    }
+}
+}
 #endif

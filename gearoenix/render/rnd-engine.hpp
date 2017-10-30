@@ -31,6 +31,7 @@ namespace render {
     }
     namespace texture {
         class Texture2D;
+        class Cube;
     }
     class Engine {
     private:
@@ -49,6 +50,7 @@ namespace render {
         virtual void update() = 0;
         virtual void terminate() = 0;
         virtual texture::Texture2D* create_texture_2d(system::File* file, std::shared_ptr<core::EndCaller> c) = 0;
+        virtual texture::Cube* create_texture_cube(system::File* file, std::shared_ptr<core::EndCaller> c) = 0;
         virtual buffer::Mesh* create_mesh(unsigned int vec, system::File* file, std::shared_ptr<core::EndCaller> c) = 0;
         virtual buffer::Uniform* create_uniform(unsigned int s, std::shared_ptr<core::EndCaller> c) = 0;
         virtual shader::Shader* create_shader(core::Id sid, system::File* file, std::shared_ptr<core::EndCaller> c) = 0;

@@ -22,6 +22,7 @@ namespace gles2 {
         void update();
         void terminate();
         render::texture::Texture2D* create_texture_2d(system::File* file, std::shared_ptr<core::EndCaller> c);
+        render::texture::Cube* create_texture_cube(system::File* file, std::shared_ptr<core::EndCaller> c);
         render::buffer::Mesh* create_mesh(unsigned int vec, system::File* file, std::shared_ptr<core::EndCaller> c);
         render::buffer::Uniform* create_uniform(unsigned int s, std::shared_ptr<core::EndCaller> c);
         render::shader::Shader* create_shader(core::Id sid, system::File* file, std::shared_ptr<core::EndCaller> c);
