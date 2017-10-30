@@ -25,15 +25,6 @@ void gearoenix::gles2::shader::DirectionalTexturedSpeculatedNonreflectiveShadowl
     shd->set_spec_factor(data->spec_factor);
     shd->set_sun(data->sun.data());
     shd->set_sun_color(data->sun_color.data());
-
-    //    shd->set_ambl_color(math::Vec3(1.0f).data());
-    //    shd->set_eye(math::Vec3(1.0f).data());
-    //shd->set_m(math::Mat4x4().data());
-    //shd->set_mvp(math::Mat4x4().data());
-    //    shd->set_spec_color(math::Vec3(1.0f).data());
-    //    shd->set_spec_factor(1.0f);
-    //    shd->set_sun(math::Vec3(1.0f).data());
-    //    shd->set_sun_color(math::Vec3(1.0f).data());
     reinterpret_cast<texture::Texture2D*>(txt)->bind(GL_TEXTURE0);
 }
 
@@ -76,8 +67,8 @@ gearoenix::gles2::shader::DirectionalTexturedSpeculatedNonreflectiveShadowlessOp
                                 "{\n"
                                 "    float diffuse = dot(sun, out_normal);\n"
                                 "    vec3 reflected = reflect(sun, out_normal);\n"
-                                "    float speculare = dot(normalize(eye - out_pos), reflected);\n"
-                                "    float diff_fac = smoothstep(0.2, 0.4, diffuse) * 0.5;\n"
+                                "    float speculare = -dot(normalize(eye - out_pos), reflected);\n"
+                                "    float diff_fac = smoothstep(0.0, 0.3, diffuse);\n"
                                 "    float spec_fac = smoothstep(0.7, 0.9, speculare) * spec_factor;\n"
                                 "    vec3 txt_color = texture2D(txt, out_uv).xyz;\n"
                                 "    vec3 ambl_light = txt_color * ambl_color;\n"
@@ -123,29 +114,7 @@ void gearoenix::gles2::shader::DirectionalTexturedSpeculatedNonreflectiveShadowl
     glVertexAttribPointer(vtx_att_ind, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*)0);
     glVertexAttribPointer(nrm_att_ind, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
     glVertexAttribPointer(uv_att_ind, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*)(6 * sizeof(GLfloat)));
-    ////////////////////////////////////////
     glUniform1i(txt, 0);
-    //Tempppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp
-    const GLfloat data1[] = {
-        1.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 1.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 1.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 1.0f,
-    };
-    const GLfloat data2[] = {
-        1.0f, 1.0f, 1.0f,
-    };
-    const GLfloat data3[] = {
-        0.3f, 0.3f, 0.3f,
-    };
-    glUniformMatrix4fv(mvp, 1, GL_FALSE, data1);
-    glUniformMatrix4fv(m, 1, GL_FALSE, data1);
-    glUniform3fv(sun, 1, data1);
-    glUniform3fv(sun_color, 1, data2);
-    glUniform3fv(eye, 1, data1);
-    glUniform3fv(spec_color, 1, data2);
-    glUniform1f(spec_factor, 0.2f);
-    glUniform3fv(ambl_color, 1, data3);
 }
 
 const std::vector<gearoenix::render::shader::stage::Id>& gearoenix::gles2::shader::DirectionalTexturedSpeculatedNonreflectiveShadowlessOpaque::get_stages_ids() const

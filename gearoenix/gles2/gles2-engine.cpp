@@ -190,6 +190,8 @@ gearoenix::render::shader::Shader* gearoenix::gles2::Engine::create_shader(core:
         break;
     case render::shader::DIRECTIONAL_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
         return new shader::DirectionalColoredMatteNonreflectiveShadowlessOpaque(this, c);
+    case render::shader::DIRECTIONAL_COLORED_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE:
+        return new shader::DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque(this, c);
     default:
         UNEXPECTED;
     }
@@ -197,6 +199,8 @@ gearoenix::render::shader::Shader* gearoenix::gles2::Engine::create_shader(core:
 
 gearoenix::render::shader::Resources* gearoenix::gles2::Engine::create_shader_resources(core::Id sid, render::pipeline::Pipeline* p, render::buffer::Uniform* ub, std::shared_ptr<core::EndCaller>)
 {
+    pipeline::Pipeline* pip = reinterpret_cast<pipeline::Pipeline*>(p);
+    buffer::Uniform* u = reinterpret_cast<buffer::Uniform*>(ub);
     switch (sid) {
     case render::shader::WHITE_POS:
         UNIMPLEMENTED;
@@ -211,9 +215,9 @@ gearoenix::render::shader::Resources* gearoenix::gles2::Engine::create_shader_re
         UNIMPLEMENTED;
         break;
     case render::shader::DIRECTIONAL_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
-        return new shader::DirectionalColoredMatteNonreflectiveShadowlessOpaque::Resources(
-            this, reinterpret_cast<pipeline::Pipeline*>(p),
-            reinterpret_cast<buffer::Uniform*>(ub));
+        return new shader::DirectionalColoredMatteNonreflectiveShadowlessOpaque::Resources(this, pip, u);
+    case render::shader::DIRECTIONAL_COLORED_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE:
+        return new shader::DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque::Resources(this, pip, u);
     default:
         UNEXPECTED;
     }

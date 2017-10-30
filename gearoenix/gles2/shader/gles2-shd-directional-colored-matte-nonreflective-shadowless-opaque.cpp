@@ -53,9 +53,9 @@ gearoenix::gles2::shader::DirectionalColoredMatteNonreflectiveShadowlessOpaque::
                           "void main()\n"
                           "{\n"
                           "    float diff = dot(nrm, sun);\n"
-                          "    diff = smoothstep(0.0, 0.3, diff) * 0.5;\n"
+                          "    diff = smoothstep(0.0, 0.3, diff);\n"
                           "    vec3 final_color = sun_color * color * diff;\n"
-                          "    final_color += ambl_color * color;\n"
+                          "    final_color += ambl_color;\n"
                           "    gl_FragColor = vec4(final_color, 1.0);\n"
                           "}\n";
         vtx_shd = add_shader_to_program(pvs, GL_VERTEX_SHADER);
@@ -63,11 +63,11 @@ gearoenix::gles2::shader::DirectionalColoredMatteNonreflectiveShadowlessOpaque::
         run();
         vtx_att_ind = glGetAttribLocation(shader_program, "vertex");
         nrm_att_ind = glGetAttribLocation(shader_program, "normal");
-        mvp = get_uniform_location("mvp");
         m = get_uniform_location("m");
+        mvp = get_uniform_location("mvp");
         sun = get_uniform_location("sun");
-        sun_color = get_uniform_location("sun_color");
         color = get_uniform_location("color");
+        sun_color = get_uniform_location("sun_color");
         ambl_color = get_uniform_location("ambl_color");
         (void)end;
     });

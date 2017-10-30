@@ -14,15 +14,14 @@ gearoenix::render::camera::Camera::Camera(system::File* f, system::Application* 
     l.read(f);
     float d;
     f->read(d);
-    math::Mat4x4 r = math::Mat4x4::rotation(
-        math::Vec3::X, d);
+    math::Mat4x4 r = math::Mat4x4::rotation(math::Vec3::X, d);
+    math::Mat4x4 rr = math::Mat4x4::rotation(math::Vec3::X, -d);
     f->read(d);
-    r *= math::Mat4x4::rotation(
-        math::Vec3::Y, d);
+    r = math::Mat4x4::rotation(math::Vec3::Y, d) * r;
+    rr *= math::Mat4x4::rotation(math::Vec3::Y, -d);
     f->read(d);
-    r *= math::Mat4x4::rotation(
-        math::Vec3::Z, d);
-    math::Mat4x4 rr = r.inversed();
+    r = math::Mat4x4::rotation(math::Vec3::Z, d) * r;
+    rr *= math::Mat4x4::rotation(math::Vec3::Z, -d);
     x = r * math::Vec3::X;
     y = r * math::Vec3::Y;
     z = r * math::Vec3::Z;

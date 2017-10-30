@@ -38,7 +38,7 @@ unsigned int gearoenix::render::material::DirectionalColoredMatteNonreflectiveSh
 
 void gearoenix::render::material::DirectionalColoredMatteNonreflectiveShadowlessOpaque::update(const scene::Scene* s, const model::Model* m)
 {
-    u.ambl_color = s->get_ambient_light();
+    u.ambl_color = s->get_ambient_light() * u.color;
     u.m = m->get_m();
     u.mvp = m->get_mvp();
     u.sun = s->get_sun()->get_direction();

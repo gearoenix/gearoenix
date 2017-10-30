@@ -8,6 +8,7 @@
 #include "../pipeline/rnd-pip-pipeline.hpp"
 #include "../rnd-engine.hpp"
 #include "rnd-mat-directional-colored-matte-nonreflective-shadowless-opaque.hpp"
+#include "rnd-mat-directional-colored-speculated-nonreflective-shadowless-opaque.hpp"
 #include "rnd-mat-directional-textured-speculated-nonreflective-full-opaque.hpp"
 #include "rnd-mat-shadeless-colored-matte-nonreflective-shadowless-opaque.hpp"
 #include "rnd-mat-white.hpp"
@@ -40,6 +41,8 @@ gearoenix::render::material::Material* gearoenix::render::material::Material::re
         return new ShadelessColoredMatteNonreflectiveShadowlessOpaque(f, e, end);
     case shader::DIRECTIONAL_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
         return new DirectionalColoredMatteNonreflectiveShadowlessOpaque(f, e, end);
+    case shader::DIRECTIONAL_COLORED_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE:
+        return new DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque(f, e, end);
     default:
         UNIMPLEMENTED;
     }
