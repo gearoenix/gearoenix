@@ -7,12 +7,12 @@
 #include "gles2-shader.hpp"
 namespace gearoenix {
 namespace gles2 {
-  namespace buffer {
-      class Uniform;
-  }
-  namespace pipeline {
-      class Pipeline;
-  }
+    namespace buffer {
+        class Uniform;
+    }
+    namespace pipeline {
+        class Pipeline;
+    }
     namespace shader {
         class DirectionalColoredMatteNonreflectiveShadowlessOpaque : public Shader {
         public:
@@ -21,6 +21,7 @@ namespace gles2 {
                 Resources(Engine* e, pipeline::Pipeline* pip, buffer::Uniform* u);
                 void bind();
             };
+
         protected:
             GLuint mvp;
             GLuint m;
@@ -38,8 +39,8 @@ namespace gles2 {
             ~DirectionalColoredMatteNonreflectiveShadowlessOpaque();
             void use();
             const std::vector<render::shader::stage::Id>& get_stages_ids() const;
-            void set_ambl_color(const GLfloat *data);
-            void set_color(const GLfloat *data);
+            void set_ambl_color(const GLfloat* data);
+            void set_color(const GLfloat* data);
             void set_mvp(const GLfloat* data);
             void set_m(const GLfloat* data);
             void set_sun(const GLfloat* data);

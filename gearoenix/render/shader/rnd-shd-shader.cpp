@@ -97,8 +97,8 @@ unsigned int gearoenix::render::shader::Shader::get_vertex_real_count(core::Id i
     switch (id) {
     case WHITE_POS:
         return 3;
-        case DIRECTIONAL_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
-            return 6;
+    case DIRECTIONAL_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
+        return 6;
     default:
         LOGF("Unexpected! id: " << id);
     }

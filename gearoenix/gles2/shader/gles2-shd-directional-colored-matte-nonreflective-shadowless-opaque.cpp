@@ -26,51 +26,51 @@ void gearoenix::gles2::shader::DirectionalColoredMatteNonreflectiveShadowlessOpa
 gearoenix::gles2::shader::DirectionalColoredMatteNonreflectiveShadowlessOpaque::DirectionalColoredMatteNonreflectiveShadowlessOpaque(Engine* eng, std::shared_ptr<core::EndCaller> end)
     : Shader(eng, end)
 {
-  eng->add_load_function([this, end] {
-      create_program();
-    std::string pvs = "precision highp sampler2D;\n"
-                      "precision highp float;\n"
-                      "attribute vec3 vertex;\n"
-                      "attribute vec3 normal;\n"
-                      "varying vec3 pos;\n"
-                      "varying vec3 nrm;\n"
-                      "uniform mat4 mvp;\n"
-                      "uniform mat4 m;\n"
-                      "void main()\n"
-                      "{\n"
-                      "    pos = (m * vec4(vertex, 1.0)).xyz;\n"
-                      "    nrm = normalize((m * vec4(normal, 0.0)).xyz);\n"
-                      "    gl_Position = mvp * vec4(vertex, 1.0);\n"
-                      "}\n";
-    std::string pfs = "precision highp sampler2D;\n"
-                      "precision highp float;\n"
-                      "varying vec3 pos;\n"
-                      "varying vec3 nrm;\n"
-                      "uniform vec3 color;\n"
-                      "uniform vec3 sun;\n"
-                      "uniform vec3 sun_color;\n"
-                      "uniform vec3 ambl_color;\n"
-                      "void main()\n"
-                      "{\n"
-                      "    float diff = -dot(nrm, sun);\n"
-                      "    diff = smoothstep(0.0, 0.3, diff) * 0.5;\n"
-                      "    vec3 final_color = sun_color * color * diff;\n"
-                      "    final_color += ambl_color * color;\n"
-                      "    gl_FragColor = vec4(final_color, 1.0);\n"
-                      "}\n";
-    vtx_shd = add_shader_to_program(pvs, GL_VERTEX_SHADER);
-    frg_shd = add_shader_to_program(pfs, GL_FRAGMENT_SHADER);
-    run();
-    vtx_att_ind = glGetAttribLocation(shader_program, "vertex");
-    nrm_att_ind = glGetAttribLocation(shader_program, "normal");
-    mvp = get_uniform_location("mvp");
-    m = get_uniform_location("m");
-    sun = get_uniform_location("sun");
-    sun_color = get_uniform_location("sun_color");
-    color = get_uniform_location("color");
-    ambl_color = get_uniform_location("ambl_color");
-    (void)end;
-});
+    eng->add_load_function([this, end] {
+        create_program();
+        std::string pvs = "precision highp sampler2D;\n"
+                          "precision highp float;\n"
+                          "attribute vec3 vertex;\n"
+                          "attribute vec3 normal;\n"
+                          "varying vec3 pos;\n"
+                          "varying vec3 nrm;\n"
+                          "uniform mat4 mvp;\n"
+                          "uniform mat4 m;\n"
+                          "void main()\n"
+                          "{\n"
+                          "    pos = (m * vec4(vertex, 1.0)).xyz;\n"
+                          "    nrm = normalize((m * vec4(normal, 0.0)).xyz);\n"
+                          "    gl_Position = mvp * vec4(vertex, 1.0);\n"
+                          "}\n";
+        std::string pfs = "precision highp sampler2D;\n"
+                          "precision highp float;\n"
+                          "varying vec3 pos;\n"
+                          "varying vec3 nrm;\n"
+                          "uniform vec3 color;\n"
+                          "uniform vec3 sun;\n"
+                          "uniform vec3 sun_color;\n"
+                          "uniform vec3 ambl_color;\n"
+                          "void main()\n"
+                          "{\n"
+                          "    float diff = dot(nrm, sun);\n"
+                          "    diff = smoothstep(0.0, 0.3, diff) * 0.5;\n"
+                          "    vec3 final_color = sun_color * color * diff;\n"
+                          "    final_color += ambl_color * color;\n"
+                          "    gl_FragColor = vec4(final_color, 1.0);\n"
+                          "}\n";
+        vtx_shd = add_shader_to_program(pvs, GL_VERTEX_SHADER);
+        frg_shd = add_shader_to_program(pfs, GL_FRAGMENT_SHADER);
+        run();
+        vtx_att_ind = glGetAttribLocation(shader_program, "vertex");
+        nrm_att_ind = glGetAttribLocation(shader_program, "normal");
+        mvp = get_uniform_location("mvp");
+        m = get_uniform_location("m");
+        sun = get_uniform_location("sun");
+        sun_color = get_uniform_location("sun_color");
+        color = get_uniform_location("color");
+        ambl_color = get_uniform_location("ambl_color");
+        (void)end;
+    });
 }
 
 gearoenix::gles2::shader::DirectionalColoredMatteNonreflectiveShadowlessOpaque::~DirectionalColoredMatteNonreflectiveShadowlessOpaque()

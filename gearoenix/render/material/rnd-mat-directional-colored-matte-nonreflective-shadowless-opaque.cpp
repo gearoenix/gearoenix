@@ -19,9 +19,10 @@ gearoenix::render::material::DirectionalColoredMatteNonreflectiveShadowlessOpaqu
 {
 }
 
-gearoenix::render::material::DirectionalColoredMatteNonreflectiveShadowlessOpaque::DirectionalColoredMatteNonreflectiveShadowlessOpaque(system::File*, Engine* e, std::shared_ptr<core::EndCaller> end)
+gearoenix::render::material::DirectionalColoredMatteNonreflectiveShadowlessOpaque::DirectionalColoredMatteNonreflectiveShadowlessOpaque(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> end)
     : Material(SHADER_ID, sizeof(u), e, end)
 {
+    u.color.read(f);
     shdrsc = reinterpret_cast<Resources*>(e->create_shader_resources(SHADER_ID, pl.get(), ub, end));
 }
 
@@ -41,6 +42,7 @@ void gearoenix::render::material::DirectionalColoredMatteNonreflectiveShadowless
     u.m = m->get_m();
     u.mvp = m->get_mvp();
     u.sun = s->get_sun()->get_direction();
+    u.sun_color = s->get_sun()->get_color();
     ub->update(&u, sizeof(Uniform));
 }
 

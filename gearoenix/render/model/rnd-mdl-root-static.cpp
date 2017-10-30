@@ -40,5 +40,8 @@ void gearoenix::render::model::RootStatic::commit(const scene::Scene* s, const M
 
 void gearoenix::render::model::RootStatic::draw()
 {
-    UNIMPLEMENTED;
+    TODO;
+    for (Model* m : children) {
+        m->draw();
+    }
 }

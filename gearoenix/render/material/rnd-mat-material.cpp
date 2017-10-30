@@ -7,9 +7,9 @@
 #include "../pipeline/rnd-pip-manager.hpp"
 #include "../pipeline/rnd-pip-pipeline.hpp"
 #include "../rnd-engine.hpp"
+#include "rnd-mat-directional-colored-matte-nonreflective-shadowless-opaque.hpp"
 #include "rnd-mat-directional-textured-speculated-nonreflective-full-opaque.hpp"
 #include "rnd-mat-shadeless-colored-matte-nonreflective-shadowless-opaque.hpp"
-#include "rnd-mat-directional-colored-matte-nonreflective-shadowless-opaque.hpp"
 #include "rnd-mat-white.hpp"
 
 gearoenix::render::material::Material::Material(core::Id sid, unsigned int us, Engine* e, std::shared_ptr<core::EndCaller> end)
@@ -36,10 +36,10 @@ gearoenix::render::material::Material* gearoenix::render::material::Material::re
     case shader::WHITE_POS:
         TODO;
         return new White(e, end);
-        case shader::SHADELESS_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
-            return new ShadelessColoredMatteNonreflectiveShadowlessOpaque(f, e, end);
-        case shader::DIRECTIONAL_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
-            return new DirectionalColoredMatteNonreflectiveShadowlessOpaque(f, e, end);
+    case shader::SHADELESS_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
+        return new ShadelessColoredMatteNonreflectiveShadowlessOpaque(f, e, end);
+    case shader::DIRECTIONAL_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
+        return new DirectionalColoredMatteNonreflectiveShadowlessOpaque(f, e, end);
     default:
         UNIMPLEMENTED;
     }

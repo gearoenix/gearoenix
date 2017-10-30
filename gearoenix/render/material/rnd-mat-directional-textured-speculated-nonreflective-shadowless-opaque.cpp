@@ -12,8 +12,7 @@
 #include "../scene/rnd-scn-scene.hpp"
 #include "../texture/rnd-txt-texture-2d.hpp"
 
-const gearoenix::core::Id gearoenix::render::material::DirectionalTexturedSpeculatedNonreflectiveShadowlessOpaque::SHADER_ID =
-    gearoenix::render::shader::DIRECTIONAL_TEXTURED_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE;
+const gearoenix::core::Id gearoenix::render::material::DirectionalTexturedSpeculatedNonreflectiveShadowlessOpaque::SHADER_ID = gearoenix::render::shader::DIRECTIONAL_TEXTURED_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE;
 
 gearoenix::render::material::DirectionalTexturedSpeculatedNonreflectiveShadowlessOpaque::Resources::Resources(Engine* e, pipeline::Pipeline* pip, buffer::Uniform* u)
     : shader::Resources(e, pip, u)
