@@ -32,8 +32,8 @@ gearoenix::gles2::texture::Cube::Cube(system::File* file, Engine* eng, std::shar
             GL_TEXTURE_CUBE_MAP_NEGATIVE_Z,
             GL_TEXTURE_CUBE_MAP_POSITIVE_X,
             GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
+            GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
             GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
-            GL_TEXTURE_CUBE_MAP_NEGATIVE_Y
         };
         for (int i = 0; i < FACES_COUNT; ++i) {
             switch (imgc[i]) {

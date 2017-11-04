@@ -32,5 +32,5 @@ void gearoenix::render::model::Copy::commit(const scene::Scene* s, const Model*)
 
 void gearoenix::render::model::Copy::draw()
 {
-    UNIMPLEMENTED;
+    rs->draw();
 }
