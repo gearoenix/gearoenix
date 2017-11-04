@@ -11,6 +11,7 @@
 #include "rnd-mat-directional-colored-speculated-nonreflective-shadowless-opaque.hpp"
 #include "rnd-mat-directional-textured-speculated-nonreflective-full-opaque.hpp"
 #include "rnd-mat-shadeless-colored-matte-nonreflective-shadowless-opaque.hpp"
+#include "rnd-mat-shadeless-cube-matte-nonreflective-shadowless-opaque.hpp"
 #include "rnd-mat-white.hpp"
 
 gearoenix::render::material::Material::Material(core::Id sid, unsigned int us, Engine* e, std::shared_ptr<core::EndCaller> end)
@@ -43,6 +44,8 @@ gearoenix::render::material::Material* gearoenix::render::material::Material::re
         return new DirectionalColoredMatteNonreflectiveShadowlessOpaque(f, e, end);
     case shader::DIRECTIONAL_COLORED_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE:
         return new DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque(f, e, end);
+    case shader::SHADELESS_CUBE_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
+        return new ShadelessCubeMatteNonreflectiveShadowlessOpaque(f, e, end);
     default:
         UNIMPLEMENTED;
     }

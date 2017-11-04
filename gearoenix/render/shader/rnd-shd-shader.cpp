@@ -95,6 +95,7 @@ const std::vector<gearoenix::render::shader::VertexAttribute>& gearoenix::render
 unsigned int gearoenix::render::shader::Shader::get_vertex_real_count(core::Id id)
 {
     switch (id) {
+    case SHADELESS_CUBE_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
     case WHITE_POS:
         return 3;
     case DIRECTIONAL_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
