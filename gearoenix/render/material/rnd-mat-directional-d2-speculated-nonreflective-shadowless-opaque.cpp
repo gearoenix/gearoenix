@@ -1,4 +1,4 @@
-#include "rnd-mat-directional-textured-speculated-nonreflective-full-opaque.hpp"
+#include "rnd-mat-directional-d2-speculated-nonreflective-shadowless-opaque.hpp"
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../core/cr-end-caller.hpp"
 #include "../../system/sys-app.hpp"
@@ -12,24 +12,24 @@
 #include "../scene/rnd-scn-scene.hpp"
 #include "../texture/rnd-txt-texture-2d.hpp"
 
-const gearoenix::core::Id gearoenix::render::material::DirectionalTexturedSpeculatedNonreflectiveFullOpaque::SHADER_ID = gearoenix::render::shader::DIRECTIONAL_D2_SPECULATED_NONREFLECTIVE_FULL_OPAQUE;
+const gearoenix::core::Id gearoenix::render::material::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque::SHADER_ID = gearoenix::render::shader::DIRECTIONAL_D2_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE;
 
-gearoenix::render::material::DirectionalTexturedSpeculatedNonreflectiveFullOpaque::Resources::Resources(Engine* e, pipeline::Pipeline* pip, buffer::Uniform* u)
+gearoenix::render::material::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque::Resources::Resources(Engine* e, pipeline::Pipeline* pip, buffer::Uniform* u)
     : shader::Resources(e, pip, u)
 {
 }
 
-void gearoenix::render::material::DirectionalTexturedSpeculatedNonreflectiveFullOpaque::Resources::set_texture(texture::Texture2D* t)
+void gearoenix::render::material::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque::Resources::set_texture(texture::Texture2D* t)
 {
     txt = t;
 }
 
-gearoenix::render::material::DirectionalTexturedSpeculatedNonreflectiveFullOpaque::DirectionalTexturedSpeculatedNonreflectiveFullOpaque(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> end)
+gearoenix::render::material::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> end)
     : Material(SHADER_ID, sizeof(u), e, end)
 {
     core::Id texid;
     f->read(texid);
-    //    LOGE("location: " << f->tell());
+    //LOGE("location: " << f->tell());
     u.spec_color.read(f);
     u.spec_factors.read(f);
     core::asset::Manager* astmgr = e->get_system_application()->get_asset_manager();
@@ -42,17 +42,17 @@ gearoenix::render::material::DirectionalTexturedSpeculatedNonreflectiveFullOpaqu
     f->seek(curloc);
 }
 
-gearoenix::render::material::DirectionalTexturedSpeculatedNonreflectiveFullOpaque::~DirectionalTexturedSpeculatedNonreflectiveFullOpaque()
+gearoenix::render::material::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque::~DirectionalD2SpeculatedNonreflectiveShadowlessOpaque()
 {
     delete shdrsc;
 }
 
-unsigned int gearoenix::render::material::DirectionalTexturedSpeculatedNonreflectiveFullOpaque::get_vertex_elements_count() const
+unsigned int gearoenix::render::material::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque::get_vertex_elements_count() const
 {
     return shader::Shader::get_vertex_real_count(SHADER_ID);
 }
 
-void gearoenix::render::material::DirectionalTexturedSpeculatedNonreflectiveFullOpaque::update(const scene::Scene* s, const model::Model* m)
+void gearoenix::render::material::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque::update(const scene::Scene* s, const model::Model* m)
 {
     u.ambl_color = s->get_ambient_light();
     u.eye = s->get_current_camera()->get_location();
@@ -63,7 +63,7 @@ void gearoenix::render::material::DirectionalTexturedSpeculatedNonreflectiveFull
     ub->update(&u, sizeof(Uniform));
 }
 
-void gearoenix::render::material::DirectionalTexturedSpeculatedNonreflectiveFullOpaque::bind()
+void gearoenix::render::material::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque::bind()
 {
     shdrsc->bind();
 }

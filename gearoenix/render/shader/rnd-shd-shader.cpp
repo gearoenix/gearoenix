@@ -2,7 +2,7 @@
 #include "../../core/cr-types.hpp"
 #include "../../system/sys-file.hpp"
 #include "../../system/sys-log.hpp"
-#include "../material/rnd-mat-directional-textured-speculated-nonreflective-full-opaque.hpp"
+#include "../material/rnd-mat-directional-d2-speculated-nonreflective-full-opaque.hpp"
 #include "../material/rnd-mat-shadeless-colored-matte-nonreflective-shadowless-opaque.hpp"
 #include "../material/rnd-mat-white.hpp"
 #include "../rnd-engine.hpp"
@@ -95,12 +95,17 @@ const std::vector<gearoenix::render::shader::VertexAttribute>& gearoenix::render
 unsigned int gearoenix::render::shader::Shader::get_vertex_real_count(core::Id id)
 {
     switch (id) {
+    case SHADELESS_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
     case SHADELESS_CUBE_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
     case WHITE_POS:
         return 3;
+    case SHADELESS_D2_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
+        return 5;
     case DIRECTIONAL_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
     case DIRECTIONAL_COLORED_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE:
         return 6;
+    case DIRECTIONAL_D2_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE:
+        return 8;
     default:
         LOGF("Unexpected! id: " << id);
     }

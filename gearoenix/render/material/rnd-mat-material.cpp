@@ -9,9 +9,11 @@
 #include "../rnd-engine.hpp"
 #include "rnd-mat-directional-colored-matte-nonreflective-shadowless-opaque.hpp"
 #include "rnd-mat-directional-colored-speculated-nonreflective-shadowless-opaque.hpp"
-#include "rnd-mat-directional-textured-speculated-nonreflective-full-opaque.hpp"
+#include "rnd-mat-directional-d2-speculated-nonreflective-full-opaque.hpp"
+#include "rnd-mat-directional-d2-speculated-nonreflective-shadowless-opaque.hpp"
 #include "rnd-mat-shadeless-colored-matte-nonreflective-shadowless-opaque.hpp"
 #include "rnd-mat-shadeless-cube-matte-nonreflective-shadowless-opaque.hpp"
+#include "rnd-mat-shadeless-d2-matte-nonreflective-shadowless-opaque.hpp"
 #include "rnd-mat-white.hpp"
 
 gearoenix::render::material::Material::Material(core::Id sid, unsigned int us, Engine* e, std::shared_ptr<core::EndCaller> end)
@@ -38,14 +40,18 @@ gearoenix::render::material::Material* gearoenix::render::material::Material::re
     case shader::WHITE_POS:
         TODO;
         return new White(e, end);
-    case shader::SHADELESS_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
-        return new ShadelessColoredMatteNonreflectiveShadowlessOpaque(f, e, end);
     case shader::DIRECTIONAL_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
         return new DirectionalColoredMatteNonreflectiveShadowlessOpaque(f, e, end);
     case shader::DIRECTIONAL_COLORED_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE:
         return new DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque(f, e, end);
+    case shader::DIRECTIONAL_D2_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE:
+        return new DirectionalD2SpeculatedNonreflectiveShadowlessOpaque(f, e, end);
+    case shader::SHADELESS_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
+        return new ShadelessColoredMatteNonreflectiveShadowlessOpaque(f, e, end);
     case shader::SHADELESS_CUBE_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
         return new ShadelessCubeMatteNonreflectiveShadowlessOpaque(f, e, end);
+    case shader::SHADELESS_D2_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
+        return new ShadelessD2MatteNonreflectiveShadowlessOpaque(f, e, end);
     default:
         UNIMPLEMENTED;
     }

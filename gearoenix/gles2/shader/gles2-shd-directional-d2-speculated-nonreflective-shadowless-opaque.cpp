@@ -1,4 +1,4 @@
-#include "gles2-shd-directional-textured-speculated-nonreflective-shadowless-opaque.hpp"
+#include "gles2-shd-directional-d2-speculated-nonreflective-shadowless-opaque.hpp"
 #ifdef USE_OPENGL_ES2
 #include "../../system/sys-log.hpp"
 #include "../buffer/gles2-buf-uniform.hpp"
@@ -6,15 +6,15 @@
 #include "../pipeline/gles2-pip-pipeline.hpp"
 #include "../texture/gles2-txt-2d.hpp"
 
-gearoenix::gles2::shader::DirectionalTexturedSpeculatedNonreflectiveShadowlessOpaque::Resources::Resources(Engine* e, pipeline::Pipeline* pip, buffer::Uniform* u)
-    : render::material::DirectionalTexturedSpeculatedNonreflectiveShadowlessOpaque::Resources(e, pip, u)
+gearoenix::gles2::shader::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque::Resources::Resources(Engine* e, pipeline::Pipeline* pip, buffer::Uniform* u)
+    : render::material::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque::Resources(e, pip, u)
 {
 }
 
-void gearoenix::gles2::shader::DirectionalTexturedSpeculatedNonreflectiveShadowlessOpaque::Resources::bind()
+void gearoenix::gles2::shader::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque::Resources::bind()
 {
-    render::material::DirectionalTexturedSpeculatedNonreflectiveShadowlessOpaque::Uniform* data = reinterpret_cast<render::material::DirectionalTexturedSpeculatedNonreflectiveShadowlessOpaque::Uniform*>(u->get_data());
-    DirectionalTexturedSpeculatedNonreflectiveShadowlessOpaque* shd = reinterpret_cast<DirectionalTexturedSpeculatedNonreflectiveShadowlessOpaque*>(pip->get_shader());
+    render::material::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque::Uniform* data = reinterpret_cast<render::material::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque::Uniform*>(u->get_data());
+    DirectionalD2SpeculatedNonreflectiveShadowlessOpaque* shd = reinterpret_cast<DirectionalD2SpeculatedNonreflectiveShadowlessOpaque*>(pip->get_shader());
     shd->use();
 
     shd->set_ambl_color(data->ambl_color.data());
@@ -28,7 +28,7 @@ void gearoenix::gles2::shader::DirectionalTexturedSpeculatedNonreflectiveShadowl
     reinterpret_cast<texture::Texture2D*>(txt)->bind(GL_TEXTURE0);
 }
 
-gearoenix::gles2::shader::DirectionalTexturedSpeculatedNonreflectiveShadowlessOpaque::DirectionalTexturedSpeculatedNonreflectiveShadowlessOpaque(Engine* eng, std::shared_ptr<core::EndCaller> end)
+gearoenix::gles2::shader::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque(Engine* eng, std::shared_ptr<core::EndCaller> end)
     : Shader(eng, end)
 {
     eng->add_load_function([this, end] {
@@ -95,7 +95,7 @@ gearoenix::gles2::shader::DirectionalTexturedSpeculatedNonreflectiveShadowlessOp
     });
 }
 
-gearoenix::gles2::shader::DirectionalTexturedSpeculatedNonreflectiveShadowlessOpaque::~DirectionalTexturedSpeculatedNonreflectiveShadowlessOpaque()
+gearoenix::gles2::shader::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque::~DirectionalD2SpeculatedNonreflectiveShadowlessOpaque()
 {
     eng->add_load_function([this] {
         end_object(vtx_shd);
@@ -104,7 +104,7 @@ gearoenix::gles2::shader::DirectionalTexturedSpeculatedNonreflectiveShadowlessOp
     });
 }
 
-void gearoenix::gles2::shader::DirectionalTexturedSpeculatedNonreflectiveShadowlessOpaque::use()
+void gearoenix::gles2::shader::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque::use()
 {
     glUseProgram(shader_program);
     glEnableVertexAttribArray(vtx_att_ind);
@@ -117,47 +117,47 @@ void gearoenix::gles2::shader::DirectionalTexturedSpeculatedNonreflectiveShadowl
     glUniform1i(txt, 0);
 }
 
-const std::vector<gearoenix::render::shader::stage::Id>& gearoenix::gles2::shader::DirectionalTexturedSpeculatedNonreflectiveShadowlessOpaque::get_stages_ids() const
+const std::vector<gearoenix::render::shader::stage::Id>& gearoenix::gles2::shader::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque::get_stages_ids() const
 {
     return graphic_2_stage;
 }
 
-void gearoenix::gles2::shader::DirectionalTexturedSpeculatedNonreflectiveShadowlessOpaque::set_mvp(const GLfloat* data)
+void gearoenix::gles2::shader::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque::set_mvp(const GLfloat* data)
 {
     glUniformMatrix4fv(mvp, 1, GL_FALSE, data);
 }
 
-void gearoenix::gles2::shader::DirectionalTexturedSpeculatedNonreflectiveShadowlessOpaque::set_m(const GLfloat* data)
+void gearoenix::gles2::shader::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque::set_m(const GLfloat* data)
 {
     glUniformMatrix4fv(m, 1, GL_FALSE, data);
 }
 
-void gearoenix::gles2::shader::DirectionalTexturedSpeculatedNonreflectiveShadowlessOpaque::set_sun(const GLfloat* data)
+void gearoenix::gles2::shader::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque::set_sun(const GLfloat* data)
 {
     glUniform3fv(sun, 1, data);
 }
 
-void gearoenix::gles2::shader::DirectionalTexturedSpeculatedNonreflectiveShadowlessOpaque::set_sun_color(const GLfloat* data)
+void gearoenix::gles2::shader::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque::set_sun_color(const GLfloat* data)
 {
     glUniform3fv(sun_color, 1, data);
 }
 
-void gearoenix::gles2::shader::DirectionalTexturedSpeculatedNonreflectiveShadowlessOpaque::set_eye(const GLfloat* data)
+void gearoenix::gles2::shader::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque::set_eye(const GLfloat* data)
 {
     glUniform3fv(eye, 1, data);
 }
 
-void gearoenix::gles2::shader::DirectionalTexturedSpeculatedNonreflectiveShadowlessOpaque::set_spec_color(const GLfloat* data)
+void gearoenix::gles2::shader::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque::set_spec_color(const GLfloat* data)
 {
     glUniform3fv(spec_color, 1, data);
 }
 
-void gearoenix::gles2::shader::DirectionalTexturedSpeculatedNonreflectiveShadowlessOpaque::set_spec_factors(const GLfloat* data)
+void gearoenix::gles2::shader::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque::set_spec_factors(const GLfloat* data)
 {
     glUniform3fv(spec_factors, 1, data);
 }
 
-void gearoenix::gles2::shader::DirectionalTexturedSpeculatedNonreflectiveShadowlessOpaque::set_ambl_color(const GLfloat* data)
+void gearoenix::gles2::shader::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque::set_ambl_color(const GLfloat* data)
 {
     glUniform3fv(ambl_color, 1, data);
 }

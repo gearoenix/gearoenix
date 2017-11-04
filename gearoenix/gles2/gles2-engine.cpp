@@ -12,8 +12,10 @@
 #include "pipeline/gles2-pip-pipeline.hpp"
 #include "shader/gles2-shd-directional-colored-matte-nonreflective-shadowless-opaque.hpp"
 #include "shader/gles2-shd-directional-colored-speculated-nonreflective-shadowless-opaque.hpp"
-#include "shader/gles2-shd-directional-textured-speculated-nonreflective-shadowless-opaque.hpp"
+#include "shader/gles2-shd-directional-d2-speculated-nonreflective-shadowless-opaque.hpp"
+#include "shader/gles2-shd-shadeless-colored-matte-nonreflective-shadowless-opaque.hpp"
 #include "shader/gles2-shd-shadeless-cube-matte-nonreflective-shadowless-opaque.hpp"
+#include "shader/gles2-shd-shadeless-d2-matte-nonreflective-shadowless-opaque.hpp"
 #include "texture/gles2-txt-2d.hpp"
 #include "texture/gles2-txt-cube.hpp"
 
@@ -199,8 +201,14 @@ gearoenix::render::shader::Shader* gearoenix::gles2::Engine::create_shader(core:
         return new shader::DirectionalColoredMatteNonreflectiveShadowlessOpaque(this, c);
     case render::shader::DIRECTIONAL_COLORED_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE:
         return new shader::DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque(this, c);
+    case render::shader::DIRECTIONAL_D2_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE:
+        return new shader::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque(this, c);
+    case render::shader::SHADELESS_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
+        return new shader::ShadelessColoredMatteNonreflectiveShadowlessOpaque(this, c);
     case render::shader::SHADELESS_CUBE_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
         return new shader::ShadelessCubeMatteNonreflectiveShadowlessOpaque(this, c);
+    case render::shader::SHADELESS_D2_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
+        return new shader::ShadelessD2MatteNonreflectiveShadowlessOpaque(this, c);
     default:
         UNEXPECTED;
     }
@@ -227,8 +235,14 @@ gearoenix::render::shader::Resources* gearoenix::gles2::Engine::create_shader_re
         return new shader::DirectionalColoredMatteNonreflectiveShadowlessOpaque::Resources(this, pip, u);
     case render::shader::DIRECTIONAL_COLORED_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE:
         return new shader::DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque::Resources(this, pip, u);
+    case render::shader::DIRECTIONAL_D2_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE:
+        return new shader::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque::Resources(this, pip, u);
+    case render::shader::SHADELESS_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
+        return new shader::ShadelessColoredMatteNonreflectiveShadowlessOpaque::Resources(this, pip, u);
     case render::shader::SHADELESS_CUBE_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
         return new shader::ShadelessCubeMatteNonreflectiveShadowlessOpaque::Resources(this, pip, u);
+    case render::shader::SHADELESS_D2_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
+        return new shader::ShadelessD2MatteNonreflectiveShadowlessOpaque::Resources(this, pip, u);
     default:
         UNEXPECTED;
     }

@@ -1,8 +1,8 @@
-#ifndef GEAROENIX_GLES2_SHADER_DIRECTIONAL_TEXTURED_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE_HPP
-#define GEAROENIX_GLES2_SHADER_DIRECTIONAL_TEXTURED_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE_HPP
+#ifndef GEAROENIX_GLES2_SHADER_DIRECTIONAL_D2_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE_HPP
+#define GEAROENIX_GLES2_SHADER_DIRECTIONAL_D2_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE_HPP
 #include "../../core/cr-build-configuration.hpp"
 #ifdef USE_OPENGL_ES2
-#include "../../render/material/rnd-mat-directional-textured-speculated-nonreflective-shadowless-opaque.hpp"
+#include "../../render/material/rnd-mat-directional-d2-speculated-nonreflective-shadowless-opaque.hpp"
 #include "../gles2.hpp"
 #include "gles2-shader.hpp"
 namespace gearoenix {
@@ -14,9 +14,9 @@ namespace gles2 {
         class Pipeline;
     }
     namespace shader {
-        class DirectionalTexturedSpeculatedNonreflectiveShadowlessOpaque : public Shader {
+        class DirectionalD2SpeculatedNonreflectiveShadowlessOpaque : public Shader {
         public:
-            class Resources : public render::material::DirectionalTexturedSpeculatedNonreflectiveShadowlessOpaque::Resources {
+            class Resources : public render::material::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque::Resources {
             public:
                 Resources(Engine* e, pipeline::Pipeline* pip, buffer::Uniform* u);
                 void bind();
@@ -39,8 +39,8 @@ namespace gles2 {
             GLint uv_att_ind;
 
         public:
-            DirectionalTexturedSpeculatedNonreflectiveShadowlessOpaque(Engine* eng, std::shared_ptr<core::EndCaller> end);
-            ~DirectionalTexturedSpeculatedNonreflectiveShadowlessOpaque();
+            DirectionalD2SpeculatedNonreflectiveShadowlessOpaque(Engine* eng, std::shared_ptr<core::EndCaller> end);
+            ~DirectionalD2SpeculatedNonreflectiveShadowlessOpaque();
             void use();
             const std::vector<render::shader::stage::Id>& get_stages_ids() const;
             void set_mvp(const GLfloat* data);
