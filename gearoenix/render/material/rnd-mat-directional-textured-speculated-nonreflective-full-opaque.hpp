@@ -31,7 +31,7 @@ namespace render {
                 math::Vec3 sun;
                 math::Vec3 sun_color;
                 math::Vec3 spec_color;
-                core::Real spec_factor;
+                math::Vec3 spec_factors;
                 math::Vec3 ambl_color;
                 math::Vec3 eye;
             } Uniform;

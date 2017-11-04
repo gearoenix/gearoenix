@@ -12,7 +12,7 @@
 #include "../scene/rnd-scn-scene.hpp"
 #include "../texture/rnd-txt-texture-2d.hpp"
 
-const gearoenix::core::Id gearoenix::render::material::DirectionalTexturedSpeculatedNonreflectiveShadowlessOpaque::SHADER_ID = gearoenix::render::shader::DIRECTIONAL_TEXTURED_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE;
+const gearoenix::core::Id gearoenix::render::material::DirectionalTexturedSpeculatedNonreflectiveShadowlessOpaque::SHADER_ID = gearoenix::render::shader::DIRECTIONAL_D2_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE;
 
 gearoenix::render::material::DirectionalTexturedSpeculatedNonreflectiveShadowlessOpaque::Resources::Resources(Engine* e, pipeline::Pipeline* pip, buffer::Uniform* u)
     : shader::Resources(e, pip, u)
@@ -31,7 +31,7 @@ gearoenix::render::material::DirectionalTexturedSpeculatedNonreflectiveShadowles
     f->read(texid);
     //LOGE("location: " << f->tell());
     u.spec_color.read(f);
-    f->read(u.spec_factor);
+    u.spec_factors.read(f);
     core::asset::Manager* astmgr = e->get_system_application()->get_asset_manager();
     std::function<void()> fun = [this, end, e] {
         shdrsc = reinterpret_cast<Resources*>(e->create_shader_resources(SHADER_ID, pl.get(), ub, end));

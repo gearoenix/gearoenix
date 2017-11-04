@@ -29,7 +29,7 @@ namespace gles2 {
             GLuint sun_color;
             GLuint eye;
             GLuint spec_color;
-            GLuint spec_factor;
+            GLuint spec_factors;
             GLuint color;
             GLuint ambl_color;
             GLuint vtx_shd;
@@ -48,7 +48,7 @@ namespace gles2 {
             void set_sun_color(const GLfloat* data);
             void set_eye(const GLfloat* data);
             void set_spec_color(const GLfloat* data);
-            void set_spec_factor(GLfloat data);
+            void set_spec_factors(const GLfloat* data);
             void set_color(const GLfloat* data);
             void set_ambl_color(const GLfloat* data);
         };

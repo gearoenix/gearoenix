@@ -21,7 +21,7 @@ void gearoenix::gles2::shader::DirectionalColoredSpeculatedNonreflectiveShadowle
     shd->set_m(data->m.data());
     shd->set_mvp(data->mvp.data());
     shd->set_spec_color(data->spec_color.data());
-    shd->set_spec_factor(data->spec_factor);
+    shd->set_spec_factors(data->spec_factors.data());
     shd->set_sun(data->sun.data());
     shd->set_sun_color(data->sun_color.data());
 }
@@ -54,13 +54,13 @@ gearoenix::gles2::shader::DirectionalColoredSpeculatedNonreflectiveShadowlessOpa
                                 "uniform vec3 sun_color;\n"
                                 "uniform vec3 eye;\n"
                                 "uniform vec3 spec_color;\n"
-                                "uniform float spec_factor;\n"
+                                "uniform vec3 spec_factors;\n"
                                 "uniform vec3 ambl_color;\n"
                                 "void main()\n"
                                 "{\n"
                                 "    float diff = dot(nrm, sun);\n"
                                 "    float spec = -dot(normalize(reflect(sun, nrm)), normalize(eye - pos));\n"
-                                "    spec = smoothstep(0.7, 0.9, spec) * spec_factor;\n"
+                                "    spec = smoothstep(spec_factors[0], spec_factors[1], spec) * spec_factors[2];\n"
                                 "    diff = smoothstep(0.0, 0.3, diff);\n"
                                 "    vec3 final_color = diff * sun_color * color;\n"
                                 "    final_color += spec * spec_color;\n"
@@ -80,7 +80,7 @@ gearoenix::gles2::shader::DirectionalColoredSpeculatedNonreflectiveShadowlessOpa
         sun_color = get_uniform_location("sun_color");
         ambl_color = get_uniform_location("ambl_color");
         spec_color = get_uniform_location("spec_color");
-        spec_factor = get_uniform_location("spec_factor");
+        spec_factors = get_uniform_location("spec_factors");
         (void)end;
     });
 }
@@ -142,9 +142,9 @@ void gearoenix::gles2::shader::DirectionalColoredSpeculatedNonreflectiveShadowle
     glUniform3fv(spec_color, 1, data);
 }
 
-void gearoenix::gles2::shader::DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque::set_spec_factor(const GLfloat data)
+void gearoenix::gles2::shader::DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque::set_spec_factors(const GLfloat* data)
 {
-    glUniform1f(spec_factor, data);
+    glUniform3fv(spec_factors, 1, data);
 }
 
 void gearoenix::gles2::shader::DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque::set_eye(const GLfloat* data)

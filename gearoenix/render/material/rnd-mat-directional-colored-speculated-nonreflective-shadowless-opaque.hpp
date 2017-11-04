@@ -28,7 +28,7 @@ namespace render {
                 math::Vec3 sun_color = math::Vec3(1.0f, 1.0f, 1.0f);
                 math::Vec3 eye = math::Vec3(0.0f, 0.0f, 0.0f);
                 math::Vec3 spec_color = math::Vec3(1.0f, 1.0f, 1.0f);
-                core::Real spec_factor = 0.5f;
+                math::Vec3 spec_factors = math::Vec3(0.5f, 0.5f, 0.5f);
                 math::Vec3 ambl_color = math::Vec3(0.2f, 0.2f, 0.2f);
                 math::Vec3 color = math::Vec3(0.3f, 0.02f, 0.02f);
             } Uniform;

@@ -24,7 +24,7 @@ gearoenix::render::material::DirectionalColoredSpeculatedNonreflectiveShadowless
 {
     u.color.read(f);
     u.spec_color.read(f);
-    f->read(u.spec_factor);
+    u.spec_factors.read(f);
     shdrsc = reinterpret_cast<Resources*>(e->create_shader_resources(SHADER_ID, pl.get(), ub, end));
 }
 

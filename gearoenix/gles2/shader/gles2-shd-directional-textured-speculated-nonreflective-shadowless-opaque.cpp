@@ -22,7 +22,7 @@ void gearoenix::gles2::shader::DirectionalTexturedSpeculatedNonreflectiveShadowl
     shd->set_m(data->m.data());
     shd->set_mvp(data->mvp.data());
     shd->set_spec_color(data->spec_color.data());
-    shd->set_spec_factor(data->spec_factor);
+    shd->set_spec_factors(data->spec_factors.data());
     shd->set_sun(data->sun.data());
     shd->set_sun_color(data->sun_color.data());
     reinterpret_cast<texture::Texture2D*>(txt)->bind(GL_TEXTURE0);
@@ -60,7 +60,7 @@ gearoenix::gles2::shader::DirectionalTexturedSpeculatedNonreflectiveShadowlessOp
                                 "uniform vec3 sun_color;\n"
                                 "uniform vec3 eye;\n"
                                 "uniform vec3 spec_color;\n"
-                                "uniform float spec_factor;\n"
+                                "uniform vec3 spec_factors;\n"
                                 "uniform vec3 ambl_color;\n"
                                 "uniform sampler2D txt;\n"
                                 "void main()\n"
@@ -69,7 +69,7 @@ gearoenix::gles2::shader::DirectionalTexturedSpeculatedNonreflectiveShadowlessOp
                                 "    vec3 reflected = reflect(sun, out_normal);\n"
                                 "    float speculare = -dot(normalize(eye - out_pos), reflected);\n"
                                 "    float diff_fac = smoothstep(0.0, 0.3, diffuse);\n"
-                                "    float spec_fac = smoothstep(0.7, 0.9, speculare) * spec_factor;\n"
+                                "    float spec_fac = smoothstep(spec_factors[0], spec_factors[1], speculare) * spec_factors[2];\n"
                                 "    vec3 txt_color = texture2D(txt, out_uv).xyz;\n"
                                 "    vec3 ambl_light = txt_color * ambl_color;\n"
                                 "    vec3 diff_color = txt_color * diff_fac * sun_color;\n"
@@ -88,7 +88,7 @@ gearoenix::gles2::shader::DirectionalTexturedSpeculatedNonreflectiveShadowlessOp
         sun_color = get_uniform_location("sun_color");
         eye = get_uniform_location("eye");
         spec_color = get_uniform_location("spec_color");
-        spec_factor = get_uniform_location("spec_factor");
+        spec_factors = get_uniform_location("spec_factors");
         ambl_color = get_uniform_location("ambl_color");
         txt = get_uniform_location("txt");
         (void)end;
@@ -152,9 +152,9 @@ void gearoenix::gles2::shader::DirectionalTexturedSpeculatedNonreflectiveShadowl
     glUniform3fv(spec_color, 1, data);
 }
 
-void gearoenix::gles2::shader::DirectionalTexturedSpeculatedNonreflectiveShadowlessOpaque::set_spec_factor(GLfloat data)
+void gearoenix::gles2::shader::DirectionalTexturedSpeculatedNonreflectiveShadowlessOpaque::set_spec_factors(const GLfloat* data)
 {
-    glUniform1f(spec_factor, data);
+    glUniform3fv(spec_factors, 1, data);
 }
 
 void gearoenix::gles2::shader::DirectionalTexturedSpeculatedNonreflectiveShadowlessOpaque::set_ambl_color(const GLfloat* data)
