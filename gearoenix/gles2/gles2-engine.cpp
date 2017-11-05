@@ -11,6 +11,7 @@
 #include "buffer/gles2-buf-uniform.hpp"
 #include "pipeline/gles2-pip-pipeline.hpp"
 #include "shader/gles2-shd-directional-colored-matte-nonreflective-shadowless-opaque.hpp"
+#include "shader/gles2-shd-directional-colored-speculated-baked-shadowless-opaque.hpp"
 #include "shader/gles2-shd-directional-colored-speculated-nonreflective-shadowless-opaque.hpp"
 #include "shader/gles2-shd-directional-d2-speculated-nonreflective-shadowless-opaque.hpp"
 #include "shader/gles2-shd-shadeless-colored-matte-nonreflective-shadowless-opaque.hpp"
@@ -199,6 +200,8 @@ gearoenix::render::shader::Shader* gearoenix::gles2::Engine::create_shader(core:
         break;
     case render::shader::DIRECTIONAL_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
         return new shader::DirectionalColoredMatteNonreflectiveShadowlessOpaque(this, c);
+    case render::shader::DIRECTIONAL_COLORED_SPECULATED_BAKED_SHADOWLESS_OPAQUE:
+        return new shader::DirectionalColoredSpeculatedBakedShadowlessOpaque(this, c);
     case render::shader::DIRECTIONAL_COLORED_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE:
         return new shader::DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque(this, c);
     case render::shader::DIRECTIONAL_D2_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE:
@@ -233,6 +236,8 @@ gearoenix::render::shader::Resources* gearoenix::gles2::Engine::create_shader_re
         break;
     case render::shader::DIRECTIONAL_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
         return new shader::DirectionalColoredMatteNonreflectiveShadowlessOpaque::Resources(this, pip, u);
+    case render::shader::DIRECTIONAL_COLORED_SPECULATED_BAKED_SHADOWLESS_OPAQUE:
+        return new shader::DirectionalColoredSpeculatedBakedShadowlessOpaque::Resources(this, pip, u);
     case render::shader::DIRECTIONAL_COLORED_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE:
         return new shader::DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque::Resources(this, pip, u);
     case render::shader::DIRECTIONAL_D2_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE:
