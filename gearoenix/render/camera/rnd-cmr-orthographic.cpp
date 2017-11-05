@@ -8,7 +8,7 @@ gearoenix::render::camera::Orthographic::Orthographic(system::File* f, system::A
     f->read(aspects_size);
     c_width = aspects_size * screen_ratio;
     c_height = aspects_size;
-    p = math::Mat4x4::orthographic(c_width, c_height, start, end);
+    p = math::Mat4x4::orthographic(c_width * 2.0f, c_height * 2.0f, start, end);
     vp = p * v;
 }
 

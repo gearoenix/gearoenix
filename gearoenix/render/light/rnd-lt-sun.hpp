@@ -18,6 +18,8 @@ namespace render {
             ~Sun();
             const math::Vec3& get_direction() const;
             const math::Vec3& get_color() const;
+            const camera::Orthographic* get_camera() const;
+            camera::Orthographic* get_camera();
         };
     }
 }

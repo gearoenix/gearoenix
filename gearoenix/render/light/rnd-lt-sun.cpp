@@ -22,3 +22,13 @@ const gearoenix::math::Vec3& gearoenix::render::light::Sun::get_color() const
 {
     return color;
 }
+
+const gearoenix::render::camera::Orthographic* gearoenix::render::light::Sun::get_camera() const
+{
+    return cam;
+}
+
+gearoenix::render::camera::Orthographic* gearoenix::render::light::Sun::get_camera()
+{
+    return cam;
+}

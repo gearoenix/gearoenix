@@ -5,6 +5,7 @@
 #include "../../system/sys-app.hpp"
 #include "../../system/sys-file.hpp"
 #include "../camera/rnd-cmr-camera.hpp"
+#include "../camera/rnd-cmr-orthographic.hpp"
 #include "../light/rnd-lt-light.hpp"
 #include "../light/rnd-lt-sun.hpp"
 #include "../model/rnd-mdl-model.hpp"
@@ -69,11 +70,13 @@ void gearoenix::render::scene::Scene::draw()
 
 const gearoenix::render::camera::Camera* gearoenix::render::scene::Scene::get_current_camera() const
 {
+    //    return reinterpret_cast<const light::Sun*>(lights[0].get())->get_camera();
     return cameras[curcam].get();
 }
 
 gearoenix::render::camera::Camera* gearoenix::render::scene::Scene::get_current_camera()
 {
+    //    return reinterpret_cast<light::Sun*>(lights[0].get())->get_camera();
     return cameras[curcam].get();
 }
 
