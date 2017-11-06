@@ -36,6 +36,8 @@ namespace render {
             ~Mesh();
             void commit(const scene::Scene* s, const model::Model* m);
             void draw(texture::Texture2D* shadow_texture);
+            const material::Material* get_material() const;
+            material::Material* get_material();
         };
     }
 }

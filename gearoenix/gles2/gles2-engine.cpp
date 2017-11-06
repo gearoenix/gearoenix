@@ -158,6 +158,8 @@ void gearoenix::gles2::Engine::update()
         glScissor(0, 0, (GLfloat)shadow_map_aspect, (GLfloat)shadow_map_aspect);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
+        scene->cast_shadow();
+
         glBindRenderbuffer(GL_RENDERBUFFER, render_depth);
         glBindFramebuffer(GL_FRAMEBUFFER, render_framebuffer);
         glViewport(0, 0, win_width, win_height);

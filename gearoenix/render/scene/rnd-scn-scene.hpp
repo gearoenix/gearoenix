@@ -2,6 +2,7 @@
 #define GEAROEMIX_RENDER_SCENE_SCENE_HPP
 #include "../../core/asset/cr-asset.hpp"
 #include "../../math/math-vector.hpp"
+#include <map>
 #include <memory>
 #include <vector>
 
@@ -36,19 +37,25 @@ namespace render {
             std::vector<std::shared_ptr<camera::Camera>> cameras;
             std::vector<std::shared_ptr<audio::Audio>> audios;
             std::vector<std::shared_ptr<light::Light>> lights;
-            std::vector<std::shared_ptr<model::Model>> models;
+            std::map<core::Id, std::shared_ptr<model::Model>> models;
+            std::map<core::Id, std::map<core::Id, model::Model*>> shadow_caster_models;
+            std::map<core::Id, std::map<core::Id, model::Model*>> opaque_models;
+            std::map<core::Id, std::map<core::Id, model::Model*>> transparent_models;
             unsigned int curcam = 0;
             bool renderable = false;
             math::Vec3 ambient_light = math::Vec3(0.2f, 0.2f, 0.2f);
             //Engine* e;
 
+            void add_model(core::Id id, model::Model* m);
+
         protected:
             Scene(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c);
 
         public:
-            virtual void commit();
-            virtual void draw(texture::Texture2D* shadow_texture);
-            virtual ~Scene();
+            void commit();
+            void cast_shadow();
+            void draw(texture::Texture2D* shadow_texture);
+            ~Scene();
             static Scene* read(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c);
             const camera::Camera* get_current_camera() const;
             camera::Camera* get_current_camera();
