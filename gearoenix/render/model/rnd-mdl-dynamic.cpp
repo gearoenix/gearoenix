@@ -32,9 +32,9 @@ void gearoenix::render::model::Dynamic::commit(const scene::Scene* s, const Mode
     commit(s);
 }
 
-void gearoenix::render::model::Dynamic::draw()
+void gearoenix::render::model::Dynamic::draw(texture::Texture2D* shadow_texture)
 {
     for (Model* m : children) {
-        m->draw();
+        m->draw(shadow_texture);
     }
 }

@@ -23,9 +23,9 @@ void gearoenix::render::mesh::Mesh::commit(const scene::Scene* s, const model::M
     mat->update(s, m);
 }
 
-void gearoenix::render::mesh::Mesh::draw()
+void gearoenix::render::mesh::Mesh::draw(texture::Texture2D* shadow_texture)
 {
     buf->bind();
-    mat->bind();
+    mat->bind(shadow_texture);
     buf->draw();
 }

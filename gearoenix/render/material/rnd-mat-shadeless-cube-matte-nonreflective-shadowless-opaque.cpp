@@ -56,7 +56,7 @@ void gearoenix::render::material::ShadelessCubeMatteNonreflectiveShadowlessOpaqu
     ub->update(&u, sizeof(Uniform));
 }
 
-void gearoenix::render::material::ShadelessCubeMatteNonreflectiveShadowlessOpaque::bind()
+void gearoenix::render::material::ShadelessCubeMatteNonreflectiveShadowlessOpaque::bind(texture::Texture2D*)
 {
     shdrsc->bind();
 }

@@ -25,7 +25,7 @@ namespace render {
             ~White();
             unsigned int get_vertex_elements_count() const;
             void update(const scene::Scene* s, const model::Model* m);
-            void bind();
+            void bind(texture::Texture2D* shadow_texture);
         };
     }
 }

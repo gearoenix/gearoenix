@@ -19,6 +19,9 @@ namespace render {
     namespace scene {
         class Scene;
     }
+    namespace texture {
+        class Texture2D;
+    }
     namespace model {
         class Uniform;
         class Model : public core::asset::Asset {
@@ -32,7 +35,7 @@ namespace render {
             virtual ~Model();
             virtual void commit(const scene::Scene* s) = 0;
             virtual void commit(const scene::Scene* s, const Model* parent) = 0;
-            virtual void draw() = 0;
+            virtual void draw(texture::Texture2D* shadow_texture) = 0;
             const math::Mat4x4& get_m() const;
             const math::Mat4x4& get_mvp() const;
             static Model* read(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c);

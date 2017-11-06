@@ -22,6 +22,9 @@ namespace render {
     namespace scene {
         class Scene;
     }
+    namespace texture {
+        class Texture2D;
+    }
     namespace mesh {
         class Mesh {
         private:
@@ -32,7 +35,7 @@ namespace render {
             Mesh(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c);
             ~Mesh();
             void commit(const scene::Scene* s, const model::Model* m);
-            void draw();
+            void draw(texture::Texture2D* shadow_texture);
         };
     }
 }

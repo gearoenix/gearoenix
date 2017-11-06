@@ -26,7 +26,7 @@ void gearoenix::render::material::White::update(const scene::Scene*, const model
     ub->update(&u, sizeof(Uniform));
 }
 
-void gearoenix::render::material::White::bind()
+void gearoenix::render::material::White::bind(texture::Texture2D*)
 {
     shdrsc->bind();
 }

@@ -8,6 +8,9 @@ namespace render {
     namespace mesh {
         class Mesh;
     }
+    namespace texture {
+        class Texture2D;
+    }
     namespace model {
         class Static : public Model {
         private:
@@ -18,7 +21,7 @@ namespace render {
             Static(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c);
             void commit(const scene::Scene* s);
             void commit(const scene::Scene* s, const Model*);
-            void draw();
+            void draw(texture::Texture2D* shadow_texture);
         };
     }
 }

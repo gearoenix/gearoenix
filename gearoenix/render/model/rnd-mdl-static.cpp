@@ -29,7 +29,7 @@ void gearoenix::render::model::Static::commit(const scene::Scene* s, const Model
     }
 }
 
-void gearoenix::render::model::Static::draw()
+void gearoenix::render::model::Static::draw(texture::Texture2D* shadow_texture)
 {
-    mesh->draw();
+    mesh->draw(shadow_texture);
 }

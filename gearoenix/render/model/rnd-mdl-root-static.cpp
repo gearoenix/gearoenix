@@ -38,10 +38,10 @@ void gearoenix::render::model::RootStatic::commit(const scene::Scene* s, const M
     }
 }
 
-void gearoenix::render::model::RootStatic::draw()
+void gearoenix::render::model::RootStatic::draw(texture::Texture2D* shadow_texture)
 {
     TODO;
     for (Model* m : children) {
-        m->draw();
+        m->draw(shadow_texture);
     }
 }

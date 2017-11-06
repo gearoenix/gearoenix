@@ -30,7 +30,7 @@ void gearoenix::render::model::Copy::commit(const scene::Scene* s, const Model*)
     commit(s);
 }
 
-void gearoenix::render::model::Copy::draw()
+void gearoenix::render::model::Copy::draw(texture::Texture2D* shadow_texture)
 {
-    rs->draw();
+    rs->draw(shadow_texture);
 }

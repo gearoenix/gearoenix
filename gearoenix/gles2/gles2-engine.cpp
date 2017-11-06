@@ -164,7 +164,7 @@ void gearoenix::gles2::Engine::update()
         glScissor(0, 0, win_width, win_height);
         glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-        scene->draw();
+        scene->draw(shadow_map_texture);
     }
 #endif
 }

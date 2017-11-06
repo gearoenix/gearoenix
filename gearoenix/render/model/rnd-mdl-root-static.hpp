@@ -8,6 +8,9 @@ namespace render {
     namespace mesh {
         class Occ;
     }
+    namespace texture {
+        class Texture2D;
+    }
     namespace model {
         class RootStatic : public Model {
         private:
@@ -19,7 +22,7 @@ namespace render {
             ~RootStatic();
             void commit(const scene::Scene* s);
             void commit(const scene::Scene* s, const Model* parent);
-            void draw();
+            void draw(texture::Texture2D* shadow_texture);
         };
     }
 }

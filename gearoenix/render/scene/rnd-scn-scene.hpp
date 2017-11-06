@@ -27,6 +27,9 @@ namespace render {
     namespace model {
         class Model;
     }
+    namespace texture {
+        class Texture2D;
+    }
     namespace scene {
         class Scene : public core::asset::Asset {
         private:
@@ -44,7 +47,7 @@ namespace render {
 
         public:
             virtual void commit();
-            virtual void draw();
+            virtual void draw(texture::Texture2D* shadow_texture);
             virtual ~Scene();
             static Scene* read(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c);
             const camera::Camera* get_current_camera() const;

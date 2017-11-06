@@ -59,11 +59,11 @@ void gearoenix::render::scene::Scene::commit()
     }
 }
 
-void gearoenix::render::scene::Scene::draw()
+void gearoenix::render::scene::Scene::draw(texture::Texture2D* shadow_texture)
 {
     if (renderable) {
         for (std::shared_ptr<model::Model>& m : models) {
-            m->draw();
+            m->draw(shadow_texture);
         }
     }
 }
