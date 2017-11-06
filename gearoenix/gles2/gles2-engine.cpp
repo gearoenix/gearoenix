@@ -152,6 +152,11 @@ void gearoenix::gles2::Engine::update()
         scene->commit();
     }
     for (std::shared_ptr<render::scene::Scene>& scene : loaded_scenes) {
+        glBindRenderbuffer(GL_RENDERBUFFER, shadow_map_depth);
+        glBindFramebuffer(GL_FRAMEBUFFER, shadow_map_framebuffer);
+
+        glBindRenderbuffer(GL_RENDERBUFFER, render_depth);
+        glBindFramebuffer(GL_FRAMEBUFFER, render_framebuffer);
         scene->draw();
     }
 #endif
