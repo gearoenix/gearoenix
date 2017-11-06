@@ -34,7 +34,6 @@ gearoenix::gles2::Engine::Engine(system::Application* sysapp)
     : render::Engine(sysapp)
 {
     glClearColor(0.3f, 0.3f, 0.3f, 1.f);
-    float win_width, win_height;
     win_width = sysapp->get_width();
     win_height = sysapp->get_height();
     glGetIntegerv(GL_FRAMEBUFFER_BINDING, (GLint*)&render_framebuffer);
@@ -43,12 +42,12 @@ gearoenix::gles2::Engine::Engine(system::Application* sysapp)
     glGenFramebuffers(1, &shadow_map_framebuffer);
     glGenRenderbuffers(1, &shadow_map_depth);
     glBindRenderbuffer(GL_RENDERBUFFER, shadow_map_depth);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, 1024, 1024);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, shadow_map_aspect, shadow_map_aspect);
     glBindFramebuffer(GL_FRAMEBUFFER, shadow_map_framebuffer);
     glGenTextures(1, &shadow_map_color);
     glBindTexture(GL_TEXTURE_2D, shadow_map_color);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, shadow_map_depth);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1024, 1024, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, shadow_map_aspect, shadow_map_aspect, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -64,13 +63,14 @@ gearoenix::gles2::Engine::Engine(system::Application* sysapp)
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_SCISSOR_TEST);
     glEnable(GL_STENCIL_TEST);
-    glViewport(0, 0, 1024.0, 1024.0);
-    glScissor(0, 0, 1024.0, 1024.0);
+    glViewport(0, 0, (GLfloat)shadow_map_aspect, (GLfloat)shadow_map_aspect);
+    glScissor(0, 0, (GLfloat)shadow_map_aspect, (GLfloat)shadow_map_aspect);
     glBindRenderbuffer(GL_RENDERBUFFER, render_depth);
     glBindFramebuffer(GL_FRAMEBUFFER, render_framebuffer);
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
         UNEXPECTED;
     }
+    shadow_map_texture = new texture::Texture2D(shadow_map_color);
 #endif
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
@@ -126,7 +126,7 @@ void gearoenix::gles2::Engine::update()
                 0, core::EndCaller::create([&] { ++first_happen; })));
     }
 #endif
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT);
     ///////////////////////////////////////////////////////////////////////////////////////////////
     std::vector<std::function<void()>> temp_functions;
     load_functions_mutex.lock();
@@ -154,9 +154,16 @@ void gearoenix::gles2::Engine::update()
     for (std::shared_ptr<render::scene::Scene>& scene : loaded_scenes) {
         glBindRenderbuffer(GL_RENDERBUFFER, shadow_map_depth);
         glBindFramebuffer(GL_FRAMEBUFFER, shadow_map_framebuffer);
+        glViewport(0, 0, (GLfloat)shadow_map_aspect, (GLfloat)shadow_map_aspect);
+        glScissor(0, 0, (GLfloat)shadow_map_aspect, (GLfloat)shadow_map_aspect);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
         glBindRenderbuffer(GL_RENDERBUFFER, render_depth);
         glBindFramebuffer(GL_FRAMEBUFFER, render_framebuffer);
+        glViewport(0, 0, win_width, win_height);
+        glScissor(0, 0, win_width, win_height);
+        glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
         scene->draw();
     }
 #endif

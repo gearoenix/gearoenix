@@ -32,6 +32,11 @@ gearoenix::gles2::texture::Texture2D::Texture2D(system::File* file, Engine* eng,
     eng->add_load_function(loadf);
 }
 
+gearoenix::gles2::texture::Texture2D::Texture2D(GLuint txtobj)
+    : texture_object(txtobj)
+{
+}
+
 gearoenix::gles2::texture::Texture2D::~Texture2D()
 {
     glBindTexture(GL_TEXTURE_2D, 0);

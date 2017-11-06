@@ -7,13 +7,20 @@
 #include <memory>
 namespace gearoenix {
 namespace gles2 {
+    namespace texture {
+        class Texture2D;
+    }
     class Engine : public render::Engine {
     private:
         GLuint shadow_map_color = 0;
         GLuint shadow_map_depth = 0;
         GLuint shadow_map_framebuffer = 0;
+        GLuint shadow_map_aspect = 1024;
+        texture::Texture2D* shadow_map_texture = nullptr;
         GLuint render_depth = 0;
         GLuint render_framebuffer = 0;
+        GLfloat win_width;
+        GLfloat win_height;
 
     public:
         Engine(system::Application* sys_app);

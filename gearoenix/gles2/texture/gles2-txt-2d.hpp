@@ -21,6 +21,7 @@ namespace gles2 {
 
         public:
             Texture2D(system::File* file, Engine* engine, std::shared_ptr<core::EndCaller> end);
+            Texture2D(GLuint txtobj);
             ~Texture2D();
             void bind(GLenum texture_unit);
         };
