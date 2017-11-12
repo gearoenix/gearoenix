@@ -14,22 +14,9 @@
 #include "../rnd-engine.hpp"
 #include "../shader/rnd-shd-shader.hpp"
 
-void gearoenix::render::scene::Scene::add_model(core::Id id, model::Model* m)
+void gearoenix::render::scene::Scene::add_model(core::Id id, std::weak_ptr<model::Model> m)
 {
-    mesh::Mesh* draw_mesh = m->get_draw_mesh();
-    if (nullptr != draw_mesh) {
-        material::Material* mat = draw_mesh->get_material();
-        if (mat->is_shadow_caster()) {
-            core::Id scid = mat->get_shadow_caster_id();
-            shadow_caster_models[scid].push_back(m);
-        }
-        core::Id shid = mat->get_shader_id();
-        if (mat->is_transparent()) {
-            transparent_models[shid].push_back(m);
-        } else {
-            opaque_models[shid].push_back(m);
-        }
-    }
+    UNIMPLEMENTED;
 }
 
 gearoenix::render::scene::Scene::Scene(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c)
@@ -47,7 +34,6 @@ gearoenix::render::scene::Scene::Scene(system::File* f, Engine* e, std::shared_p
     lights.resize(light_ids.size());
     std::vector<core::Id> model_ids;
     f->read(model_ids);
-    models.resize(model_ids.size());
     ambient_light.read(f);
     for (size_t i = 0; i < camera_ids.size(); ++i)
         cameras[i] = amgr->get_camera(camera_ids[i]);
@@ -56,9 +42,8 @@ gearoenix::render::scene::Scene::Scene(system::File* f, Engine* e, std::shared_p
     for (size_t i = 0; i < light_ids.size(); ++i)
         lights[i] = amgr->get_light(light_ids[i]);
     for (size_t i = 0; i < model_ids.size(); ++i) {
-        models[i] = amgr->get_model(model_ids[i], c);
-        add_model(model_ids[i], models[i].get());
-        const std::vector<model::Model*>& cm = m->get_children();
+        root_models[model_ids[i]] = amgr->get_model(model_ids[i], c);
+        add_model(model_ids[i], root_models[i]);
     }
 }
 
@@ -67,7 +52,7 @@ gearoenix::render::scene::Scene::~Scene()
     cameras.clear();
     audios.clear();
     lights.clear();
-    models.clear();
+    root_models.clear();
 }
 
 gearoenix::render::scene::Scene* gearoenix::render::scene::Scene::read(
@@ -78,7 +63,8 @@ gearoenix::render::scene::Scene* gearoenix::render::scene::Scene::read(
 
 void gearoenix::render::scene::Scene::commit()
 {
-    for (std::shared_ptr<model::Model>& m : models) {
+    for (auto& p : root_models) {
+        std::shared_ptr<model::Model>& m = p.second;
         m->commit(this);
     }
 }
@@ -90,8 +76,8 @@ void gearoenix::render::scene::Scene::cast_shadow()
 void gearoenix::render::scene::Scene::draw(texture::Texture2D* shadow_texture)
 {
     if (renderable) {
-        for (std::shared_ptr<model::Model>& m : models) {
-            m->draw(shadow_texture);
+        for (auto& m : root_models) {
+            m.second->draw(shadow_texture);
         }
     }
 }

@@ -1,7 +1,7 @@
 #ifndef GEAROENIX_RENDER_MESH_MESH_HPP
 #define GEAROENIX_RENDER_MESH_MESH_HPP
-#include <memory>
 #include "../../core/asset/cr-asset.hpp"
+#include <memory>
 namespace gearoenix {
 namespace core {
     class EndCaller;

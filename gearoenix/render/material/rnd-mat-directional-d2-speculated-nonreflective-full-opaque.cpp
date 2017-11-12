@@ -63,7 +63,7 @@ void gearoenix::render::material::DirectionalD2SpeculatedNonreflectiveFullOpaque
     ub->update(&u, sizeof(Uniform));
 }
 
-void gearoenix::render::material::DirectionalD2SpeculatedNonreflectiveFullOpaque::bind()
+void gearoenix::render::material::DirectionalD2SpeculatedNonreflectiveFullOpaque::bind(texture::Texture2D* shadow_texture)
 {
     shdrsc->bind();
 }
