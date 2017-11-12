@@ -2,6 +2,7 @@
 #include "../../audio/au-audio.hpp"
 #include "../../render/camera/rnd-cmr-camera.hpp"
 #include "../../render/light/rnd-lt-light.hpp"
+#include "../../render/mesh/rnd-msh-mesh.hpp"
 #include "../../render/model/rnd-mdl-model.hpp"
 #include "../../render/rnd-engine.hpp"
 #include "../../render/scene/rnd-scn-scene.hpp"
@@ -106,10 +107,23 @@ std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::core::asset::Man
     return textures->get<render::texture::Texture>(id);
 }
 
+std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::core::asset::Manager::get_mesh(Id id, std::shared_ptr<EndCaller> e)
+{
+    std::function<std::shared_ptr<render::mesh::Mesh>()> fn_new = [this, e] {
+        return std::shared_ptr<render::mesh::Mesh>(new render::mesh::Mesh(file, render_engine, e));
+    };
+    return meshes->get<render::mesh::Mesh>(id, fn_new);
+}
+
+std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::core::asset::Manager::get_cached_mesh(Id id) const
+{
+    return meshes->get<render::mesh::Mesh>(id);
+}
+
 std::shared_ptr<gearoenix::render::model::Model> gearoenix::core::asset::Manager::get_model(Id id, std::shared_ptr<EndCaller> e)
 {
     std::function<std::shared_ptr<render::model::Model>()> fn_new = [this, e] {
-        return std::shared_ptr<render::model::Model>(render::model::Model::read(file, render_engine, e));
+        return std::shared_ptr<render::model::Model>(new render::model::Model(file, render_engine, e));
     };
     return models->get<render::model::Model>(id, fn_new);
 }

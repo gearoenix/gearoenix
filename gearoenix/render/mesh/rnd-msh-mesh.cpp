@@ -7,25 +7,22 @@
 
 gearoenix::render::mesh::Mesh::Mesh(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c)
 {
-    //    LOGE("location: " << f->tell());
-    mat = material::Material::read(f, e, c);
-    buf = e->create_mesh(mat->get_vertex_elements_count(), f, c);
+    core::Count vertex_elements_count;
+    f->read(vertex_elements_count);
+    buf = e->create_mesh(vertex_elements_count, f, c);
 }
 
 gearoenix::render::mesh::Mesh::~Mesh()
 {
-    delete mat;
     delete buf;
 }
 
-void gearoenix::render::mesh::Mesh::commit(const scene::Scene* s, const model::Model* m)
-{
-    mat->update(s, m);
-}
-
-void gearoenix::render::mesh::Mesh::draw(texture::Texture2D* shadow_texture)
+void gearoenix::render::mesh::Mesh::bind()
 {
     buf->bind();
-    mat->bind(shadow_texture);
+}
+
+void gearoenix::render::mesh::Mesh::draw()
+{
     buf->draw();
 }
