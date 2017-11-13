@@ -38,7 +38,9 @@ namespace render {
         private:
             math::Mat4x4 m;
             math::Mat4x4 mvp;
+            // mesh_id -> (mesh, material)
             std::map<core::Id, std::tuple<std::shared_ptr<mesh::Mesh>, std::shared_ptr<material::Material>>> meshes;
+            // model_id -> model
             std::map<core::Id, std::shared_ptr<Model>> children;
 
         public:

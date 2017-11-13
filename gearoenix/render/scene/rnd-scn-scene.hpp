@@ -46,17 +46,18 @@ namespace render {
             std::vector<std::shared_ptr<light::Light>> lights;
             std::map<core::Id, std::shared_ptr<model::Model>> root_models;
             std::map<core::Id, std::weak_ptr<model::Model>> all_models;
-            // shader_id -> model_id -> Mesh
-            std::map<core::Id, std::map<core::Id, std::weak_ptr<mesh::Mesh>>> shadow_caster_models;
-            // shader_id -> model_id -> (Material , Mesh)
-            std::map<core::Id, std::map<core::Id, std::tuple<std::weak_ptr<material::Material>, std::weak_ptr<mesh::Mesh>>>> opaque_models;
-            std::map<core::Id, std::map<core::Id, std::tuple<std::weak_ptr<material::Material>, std::weak_ptr<mesh::Mesh>>>> transparent_models;
+            // shadow_caster_shader_id -> model_id -> mesh_id
+            std::map<core::Id, std::map<core::Id, core::Id>> shadow_caster_models;
+            // shader_id -> model_id -> mesh_id
+            std::map<core::Id, std::map<core::Id, core::Id>> opaque_models;
+            // shader_id -> model_id -> mesh_id
+            std::map<core::Id, std::map<core::Id, core::Id>> transparent_models;
             unsigned int curcam = 0;
             bool renderable = false;
             math::Vec3 ambient_light = math::Vec3(0.2f, 0.2f, 0.2f);
             //Engine* e;
 
-            void add_model(core::Id id, std::weak_ptr<model::Model> m);
+            void add_model(core::Id id, std::shared_ptr<model::Model> m);
 
         protected:
             Scene(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c);

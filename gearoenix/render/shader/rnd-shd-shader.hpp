@@ -1037,6 +1037,9 @@ namespace render {
             static std::shared_ptr<Shader> read(core::Id sid, system::File* file, Engine* engine, std::shared_ptr<core::EndCaller> end);
             static const std::vector<ResourceDescription>& get_resources_descriptions(Id id);
             static const std::vector<VertexAttribute>& get_vertex_atributes(Id id);
+            static bool is_shadow_caster(core::Id sid);
+            static bool is_transparent(core::Id sid);
+            static core::Id get_shadow_caster_shader_id(core::Id sid);
             static unsigned int get_uniform_size(core::Id id);
             static unsigned int get_vertex_real_count(core::Id id);
         };

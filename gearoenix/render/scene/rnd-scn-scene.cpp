@@ -14,9 +14,34 @@
 #include "../rnd-engine.hpp"
 #include "../shader/rnd-shd-shader.hpp"
 
-void gearoenix::render::scene::Scene::add_model(core::Id id, std::weak_ptr<model::Model> m)
+void gearoenix::render::scene::Scene::add_model(core::Id id, std::shared_ptr<model::Model> m)
 {
-    UNIMPLEMENTED;
+    all_models[id] = m;
+    const std::map<core::Id, std::shared_ptr<model::Model>>& children = m->get_children();
+    for(const std::pair<core::Id, std::shared_ptr<model::Model>>& child: children)
+    {
+        add_model(child.first, child.second);
+    }
+    const std::map<core::Id, std::tuple<std::shared_ptr<mesh::Mesh>, std::shared_ptr<material::Material>>>& meshes = m->get_meshes();
+    for(const std::pair<core::Id, std::tuple<std::shared_ptr<mesh::Mesh>, std::shared_ptr<material::Material>>>& mp: meshes)
+    {
+        core::Id msh = mp.first;
+        const std::shared_ptr<material::Material>& mtr = std::get<1>(mp.second);
+        core::Id shdid = mtr->get_shader_id();
+        if(shader::Shader::is_shadow_caster(shdid))
+        {
+            core::Id shdcstid = shader::Shader::get_shadow_caster_shader_id(shdid);
+            shadow_caster_models[shdcstid][id] = msh;
+        }
+        if(shader::Shader::is_transparent(shdid))
+        {
+            transparent_models[shdid][id] = msh;
+        }
+        else
+        {
+            opaque_models[shdid][id] = msh;
+        }
+    }
 }
 
 gearoenix::render::scene::Scene::Scene(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c)
