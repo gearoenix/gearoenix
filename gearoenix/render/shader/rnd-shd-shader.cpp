@@ -92,6 +92,49 @@ const std::vector<gearoenix::render::shader::VertexAttribute>& gearoenix::render
     }
 }
 
+bool gearoenix::render::shader::Shader::is_shadow_caster(core::Id sid)
+{
+    switch(sid)
+    {
+    case DIRECTIONAL_COLORED_MATTE_BAKED_CASTER_CUTOFF:
+        return true;
+    case DIRECTIONAL_COLORED_MATTE_BAKED_SHADOWLESS_CUTOFF:
+        return false;
+    default:
+        UNIMPLEMENTED;
+    }
+}
+
+bool gearoenix::render::shader::Shader::is_transparent(core::Id sid)
+{
+    switch(sid)
+    {
+    case DIRECTIONAL_COLORED_MATTE_BAKED_CASTER_CUTOFF:
+        return false;
+    case DIRECTIONAL_COLORED_MATTE_BAKED_CASTER_TRANSPARENT:
+        return false;
+    default:
+        UNIMPLEMENTED;
+    }
+}
+
+gearoenix::core::Id gearoenix::render::shader::Shader::get_shadow_caster_shader_id(core::Id sid)
+{
+    switch(get_vertex_real_count(sid))
+    {
+    case 3:
+        return WHITE_POS;
+    case 5:
+        return WHITE_POS_UV;
+    case 6:
+        return WHITE_POS_NRM;
+    case 8:
+        return WHITE_POS_NRM_UV;
+    default:
+        UNEXPECTED;
+    }
+}
+
 unsigned int gearoenix::render::shader::Shader::get_vertex_real_count(core::Id id)
 {
     switch (id) {

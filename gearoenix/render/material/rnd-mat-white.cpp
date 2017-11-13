@@ -20,6 +20,11 @@ unsigned int gearoenix::render::material::White::get_vertex_elements_count() con
     return shader::Shader::get_vertex_real_count(SHADER_ID);
 }
 
+gearoenix::core::Id gearoenix::render::material::White::get_shader_id() const
+{
+    return SHADER_ID;
+}
+
 void gearoenix::render::material::White::update(const scene::Scene*, const model::Model* m)
 {
     u.mvp = m->get_mvp();

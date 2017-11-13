@@ -41,6 +41,7 @@ namespace render {
             DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> end);
             ~DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque();
             unsigned int get_vertex_elements_count() const;
+            core::Id get_shader_id() const;
             void update(const scene::Scene* s, const model::Model* m);
             void bind(texture::Texture2D* shadow_texture);
         };

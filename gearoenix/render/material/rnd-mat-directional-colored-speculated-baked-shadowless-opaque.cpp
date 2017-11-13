@@ -53,6 +53,11 @@ unsigned int gearoenix::render::material::DirectionalColoredSpeculatedBakedShado
     return shader::Shader::get_vertex_real_count(SHADER_ID);
 }
 
+gearoenix::core::Id gearoenix::render::material::DirectionalColoredSpeculatedBakedShadowlessOpaque::get_shader_id() const
+{
+    return SHADER_ID;
+}
+
 void gearoenix::render::material::DirectionalColoredSpeculatedBakedShadowlessOpaque::update(const scene::Scene* s, const model::Model* m)
 {
     u.ambl_color = s->get_ambient_light() * u.color;

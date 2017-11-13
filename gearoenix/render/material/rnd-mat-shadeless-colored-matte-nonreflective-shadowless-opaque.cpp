@@ -36,6 +36,11 @@ unsigned int gearoenix::render::material::ShadelessColoredMatteNonreflectiveShad
     return shader::Shader::get_vertex_real_count(SHADER_ID);
 }
 
+gearoenix::core::Id gearoenix::render::material::ShadelessColoredMatteNonreflectiveShadowlessOpaque::get_shader_id() const
+{
+    return SHADER_ID;
+}
+
 void gearoenix::render::material::ShadelessColoredMatteNonreflectiveShadowlessOpaque::update(const scene::Scene*, const model::Model* m)
 {
     u.mvp = m->get_mvp();

@@ -52,6 +52,11 @@ unsigned int gearoenix::render::material::DirectionalD2SpeculatedNonreflectiveSh
     return shader::Shader::get_vertex_real_count(SHADER_ID);
 }
 
+gearoenix::core::Id gearoenix::render::material::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque::get_shader_id() const
+{
+    return SHADER_ID;
+}
+
 void gearoenix::render::material::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque::update(const scene::Scene* s, const model::Model* m)
 {
     u.ambl_color = s->get_ambient_light();
