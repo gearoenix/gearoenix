@@ -75,7 +75,7 @@ namespace system {
             size_t s = (size_t)(c * sizeof(T));
 #ifdef DEBUG_MODE
             if (read(reinterpret_cast<void*>(data.data()), s) != s) {
-                LOGF("Unexpected");
+                UNEXPECTED;
             }
 #else
             read(reinterpret_cast<void*>(data.data()), s);
@@ -92,7 +92,7 @@ namespace system {
         {
 #ifdef DEBUG_MODE
             if (sizeof(T) != read(&data, sizeof(T))) {
-                LOGF("Unexpected");
+                UNEXPECTED;
             }
 #else
             read(&data, sizeof(T));

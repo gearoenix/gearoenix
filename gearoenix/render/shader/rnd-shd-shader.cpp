@@ -94,11 +94,16 @@ const std::vector<gearoenix::render::shader::VertexAttribute>& gearoenix::render
 
 bool gearoenix::render::shader::Shader::is_shadow_caster(core::Id sid)
 {
-    switch(sid)
+    shader::Id shdid = static_cast<shader::Id>(sid);
+    switch(shdid)
     {
     case DIRECTIONAL_COLORED_MATTE_BAKED_CASTER_CUTOFF:
         return true;
     case DIRECTIONAL_COLORED_MATTE_BAKED_SHADOWLESS_CUTOFF:
+    case DIRECTIONAL_COLORED_SPECULATED_BAKED_SHADOWLESS_OPAQUE:
+    case DIRECTIONAL_D2_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE:
+    case SHADELESS_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
+    case SHADELESS_D2_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
         return false;
     default:
         UNIMPLEMENTED;
@@ -107,12 +112,17 @@ bool gearoenix::render::shader::Shader::is_shadow_caster(core::Id sid)
 
 bool gearoenix::render::shader::Shader::is_transparent(core::Id sid)
 {
-    switch(sid)
+    shader::Id shdid = static_cast<shader::Id>(sid);
+    switch(shdid)
     {
     case DIRECTIONAL_COLORED_MATTE_BAKED_CASTER_CUTOFF:
+    case DIRECTIONAL_COLORED_SPECULATED_BAKED_SHADOWLESS_OPAQUE:
+    case DIRECTIONAL_D2_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE:
+    case SHADELESS_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
+    case SHADELESS_D2_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
         return false;
     case DIRECTIONAL_COLORED_MATTE_BAKED_CASTER_TRANSPARENT:
-        return false;
+        return true;
     default:
         UNIMPLEMENTED;
     }

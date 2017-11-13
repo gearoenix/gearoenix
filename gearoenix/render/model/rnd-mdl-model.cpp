@@ -7,6 +7,7 @@
 
 gearoenix::render::model::Model::Model(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c)
 {
+    LOGE(f->tell());
     m.read(f);
     core::Count mesh_count = 0;
     f->read(mesh_count);

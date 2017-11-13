@@ -20,6 +20,7 @@ gearoenix::core::asset::Manager::Manager(system::Application* sys_app, const std
     , audios(new cache::file::File(file))
     , lights(new cache::file::File(file))
     , textures(new cache::file::File(file))
+    , meshes(new cache::file::File(file))
     , models(new cache::file::File(file))
     , scenes(new cache::file::File(file))
 {
@@ -33,6 +34,7 @@ void gearoenix::core::asset::Manager::initialize()
     audios->read_offsets();
     lights->read_offsets();
     textures->read_offsets();
+    meshes->read_offsets();
     models->read_offsets();
     scenes->read_offsets();
 }
