@@ -215,6 +215,7 @@ gearoenix::render::shader::Shader* gearoenix::gles2::Engine::create_shader(core:
     case render::shader::DIRECTIONAL_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
         return new shader::DirectionalColoredMatteNonreflectiveShadowlessOpaque(this, c);
     case render::shader::DIRECTIONAL_COLORED_SPECULATED_BAKED_SHADOWLESS_OPAQUE:
+    case render::shader::DIRECTIONAL_COLORED_SPECULATED_BAKED_CASTER_OPAQUE:
         return new shader::DirectionalColoredSpeculatedBakedShadowlessOpaque(this, c);
     case render::shader::DIRECTIONAL_COLORED_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE:
         return new shader::DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque(this, c);
@@ -250,6 +251,7 @@ gearoenix::render::shader::Resources* gearoenix::gles2::Engine::create_shader_re
         break;
     case render::shader::DIRECTIONAL_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
         return new shader::DirectionalColoredMatteNonreflectiveShadowlessOpaque::Resources(this, pip, u);
+    case render::shader::DIRECTIONAL_COLORED_SPECULATED_BAKED_CASTER_OPAQUE:
     case render::shader::DIRECTIONAL_COLORED_SPECULATED_BAKED_SHADOWLESS_OPAQUE:
         return new shader::DirectionalColoredSpeculatedBakedShadowlessOpaque::Resources(this, pip, u);
     case render::shader::DIRECTIONAL_COLORED_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE:

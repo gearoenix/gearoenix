@@ -44,7 +44,8 @@ gearoenix::render::material::Material* gearoenix::render::material::Material::re
     case shader::DIRECTIONAL_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
         return new DirectionalColoredMatteNonreflectiveShadowlessOpaque(f, e, end);
     case shader::DIRECTIONAL_COLORED_SPECULATED_BAKED_SHADOWLESS_OPAQUE:
-        return new DirectionalColoredSpeculatedBakedShadowlessOpaque(f, e, end);
+    case shader::DIRECTIONAL_COLORED_SPECULATED_BAKED_CASTER_OPAQUE:
+        return new DirectionalColoredSpeculatedBakedShadowlessOpaque(sid, f, e, end);
     case shader::DIRECTIONAL_COLORED_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE:
         return new DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque(f, e, end);
     case shader::DIRECTIONAL_D2_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE:

@@ -16,7 +16,6 @@ namespace render {
     namespace material {
         class DirectionalColoredSpeculatedBakedShadowlessOpaque : public Material {
         public:
-            const static core::Id SHADER_ID;
             class Resources : public shader::Resources {
             protected:
                 texture::Cube* env;
@@ -39,12 +38,13 @@ namespace render {
             } Uniform;
 
         private:
+            const core::Id SHADER_ID;
             Uniform u;
             std::shared_ptr<texture::Cube> env;
             Resources* shdrsc;
 
         public:
-            DirectionalColoredSpeculatedBakedShadowlessOpaque(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> end);
+            DirectionalColoredSpeculatedBakedShadowlessOpaque(core::Id shdid, system::File* f, Engine* e, std::shared_ptr<core::EndCaller> end);
             ~DirectionalColoredSpeculatedBakedShadowlessOpaque();
             unsigned int get_vertex_elements_count() const;
             core::Id get_shader_id() const;

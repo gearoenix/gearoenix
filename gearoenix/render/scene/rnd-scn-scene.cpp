@@ -88,7 +88,7 @@ gearoenix::render::scene::Scene* gearoenix::render::scene::Scene::read(
 
 void gearoenix::render::scene::Scene::commit()
 {
-    for (auto& p : root_models) {
+    for (std::pair<const core::Id, std::shared_ptr<model::Model>>& p : root_models) {
         std::shared_ptr<model::Model>& m = p.second;
         m->commit(this);
     }
@@ -101,7 +101,7 @@ void gearoenix::render::scene::Scene::cast_shadow()
 void gearoenix::render::scene::Scene::draw(texture::Texture2D* shadow_texture)
 {
     if (renderable) {
-        for (auto& m : root_models) {
+        for (std::pair<const core::Id, std::shared_ptr<model::Model>>& m : root_models) {
             m.second->draw(shadow_texture);
         }
     }

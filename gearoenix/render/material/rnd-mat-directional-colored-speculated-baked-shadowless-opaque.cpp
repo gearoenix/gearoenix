@@ -12,8 +12,6 @@
 #include "../scene/rnd-scn-scene.hpp"
 #include "../texture/rnd-txt-texture-cube.hpp"
 
-const gearoenix::core::Id gearoenix::render::material::DirectionalColoredSpeculatedBakedShadowlessOpaque::SHADER_ID = gearoenix::render::shader::DIRECTIONAL_COLORED_SPECULATED_BAKED_SHADOWLESS_OPAQUE;
-
 gearoenix::render::material::DirectionalColoredSpeculatedBakedShadowlessOpaque::Resources::Resources(Engine* e, pipeline::Pipeline* pip, buffer::Uniform* u)
     : shader::Resources(e, pip, u)
 {
@@ -24,8 +22,9 @@ void gearoenix::render::material::DirectionalColoredSpeculatedBakedShadowlessOpa
     env = t;
 }
 
-gearoenix::render::material::DirectionalColoredSpeculatedBakedShadowlessOpaque::DirectionalColoredSpeculatedBakedShadowlessOpaque(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> end)
-    : Material(SHADER_ID, sizeof(u), e, end)
+gearoenix::render::material::DirectionalColoredSpeculatedBakedShadowlessOpaque::DirectionalColoredSpeculatedBakedShadowlessOpaque(core::Id shdid, system::File* f, Engine* e, std::shared_ptr<core::EndCaller> end)
+    : Material(shdid, sizeof(u), e, end),
+      SHADER_ID(shdid)
 {
     u.color.read(f);
     u.spec_color.read(f);
