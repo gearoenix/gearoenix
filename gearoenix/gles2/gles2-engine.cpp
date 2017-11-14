@@ -200,16 +200,16 @@ gearoenix::render::shader::Shader* gearoenix::gles2::Engine::create_shader(core:
 {
     render::shader::Id shader_id = static_cast<render::shader::Id>(sid);
     switch (shader_id) {
-    case render::shader::WHITE_POS:
+    case render::shader::DEPTH_POS:
         UNIMPLEMENTED;
         break;
-    case render::shader::WHITE_POS_NRM:
+    case render::shader::DEPTH_POS_NRM:
         UNIMPLEMENTED;
         break;
-    case render::shader::WHITE_POS_UV:
+    case render::shader::DEPTH_POS_UV:
         UNIMPLEMENTED;
         break;
-    case render::shader::WHITE_POS_NRM_UV:
+    case render::shader::DEPTH_POS_NRM_UV:
         UNIMPLEMENTED;
         break;
     case render::shader::DIRECTIONAL_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
@@ -237,16 +237,16 @@ gearoenix::render::shader::Resources* gearoenix::gles2::Engine::create_shader_re
     pipeline::Pipeline* pip = reinterpret_cast<pipeline::Pipeline*>(p);
     buffer::Uniform* u = reinterpret_cast<buffer::Uniform*>(ub);
     switch (sid) {
-    case render::shader::WHITE_POS:
+    case render::shader::DEPTH_POS:
         UNIMPLEMENTED;
         break;
-    case render::shader::WHITE_POS_NRM:
+    case render::shader::DEPTH_POS_NRM:
         UNIMPLEMENTED;
         break;
-    case render::shader::WHITE_POS_UV:
+    case render::shader::DEPTH_POS_UV:
         UNIMPLEMENTED;
         break;
-    case render::shader::WHITE_POS_NRM_UV:
+    case render::shader::DEPTH_POS_NRM_UV:
         UNIMPLEMENTED;
         break;
     case render::shader::DIRECTIONAL_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:

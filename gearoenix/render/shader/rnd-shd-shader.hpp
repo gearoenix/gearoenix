@@ -987,10 +987,10 @@ namespace render {
             SHADELESS_D3_SPECULATED_REALTIME_SHADOWLESS_CUTOFF = 1421,
             SHADELESS_D3_SPECULATED_REALTIME_SHADOWLESS_OPAQUE = 557,
             SHADELESS_D3_SPECULATED_REALTIME_SHADOWLESS_TRANSPARENT = 989,
-            WHITE_POS = 0,
-            WHITE_POS_NRM = 1,
-            WHITE_POS_NRM_UV = 3,
-            WHITE_POS_UV = 2,
+            DEPTH_POS = 0,
+            DEPTH_POS_NRM = 1,
+            DEPTH_POS_NRM_UV = 3,
+            DEPTH_POS_UV = 2,
         };
         namespace stage {
 

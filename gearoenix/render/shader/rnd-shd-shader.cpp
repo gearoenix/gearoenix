@@ -4,7 +4,7 @@
 #include "../../system/sys-log.hpp"
 #include "../material/rnd-mat-directional-d2-speculated-nonreflective-full-opaque.hpp"
 #include "../material/rnd-mat-shadeless-colored-matte-nonreflective-shadowless-opaque.hpp"
-#include "../material/rnd-mat-white.hpp"
+#include "../material/rnd-mat-depth.hpp"
 #include "../rnd-engine.hpp"
 
 const std::vector<gearoenix::render::shader::stage::Id> gearoenix::render::shader::Shader::graphic_2_stage = {
@@ -65,7 +65,7 @@ std::shared_ptr<gearoenix::render::shader::Shader> gearoenix::render::shader::Sh
 const std::vector<gearoenix::render::shader::ResourceDescription>& gearoenix::render::shader::Shader::get_resources_descriptions(Id id)
 {
     switch (id) {
-    case WHITE_POS:
+    case DEPTH_POS:
         return buffer_rsc_des;
     default:
         LOGF("Unexpected! id: " << id);
@@ -75,8 +75,8 @@ const std::vector<gearoenix::render::shader::ResourceDescription>& gearoenix::re
 unsigned int gearoenix::render::shader::Shader::get_uniform_size(core::Id id)
 {
     switch (id) {
-    case WHITE_POS:
-        return sizeof(material::White::Uniform);
+    case DEPTH_POS:
+        return sizeof(material::Depth::Uniform);
     default:
         LOGF("Unexpected! id: " << id);
     }
@@ -85,7 +85,7 @@ unsigned int gearoenix::render::shader::Shader::get_uniform_size(core::Id id)
 const std::vector<gearoenix::render::shader::VertexAttribute>& gearoenix::render::shader::Shader::get_vertex_atributes(Id id)
 {
     switch (id) {
-    case WHITE_POS:
+    case DEPTH_POS:
         return has_pos;
     default:
         LOGF("Unexpected! id: " << id);
@@ -135,13 +135,13 @@ gearoenix::core::Id gearoenix::render::shader::Shader::get_shadow_caster_shader_
     switch(get_vertex_real_count(sid))
     {
     case 3:
-        return WHITE_POS;
+        return DEPTH_POS;
     case 5:
-        return WHITE_POS_UV;
+        return DEPTH_POS_UV;
     case 6:
-        return WHITE_POS_NRM;
+        return DEPTH_POS_NRM;
     case 8:
-        return WHITE_POS_NRM_UV;
+        return DEPTH_POS_NRM_UV;
     default:
         UNEXPECTED;
     }
@@ -152,7 +152,7 @@ unsigned int gearoenix::render::shader::Shader::get_vertex_real_count(core::Id i
     switch (id) {
     case SHADELESS_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
     case SHADELESS_CUBE_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
-    case WHITE_POS:
+    case DEPTH_POS:
         return 3;
     case SHADELESS_D2_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
         return 5;

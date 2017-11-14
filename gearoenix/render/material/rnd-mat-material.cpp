@@ -15,7 +15,7 @@
 #include "rnd-mat-shadeless-colored-matte-nonreflective-shadowless-opaque.hpp"
 #include "rnd-mat-shadeless-cube-matte-nonreflective-shadowless-opaque.hpp"
 #include "rnd-mat-shadeless-d2-matte-nonreflective-shadowless-opaque.hpp"
-#include "rnd-mat-white.hpp"
+#include "rnd-mat-depth.hpp"
 
 gearoenix::render::material::Material::Material(core::Id sid, unsigned int us, Engine* e, std::shared_ptr<core::EndCaller> end)
     : ub(e->create_uniform(us, end))
@@ -38,9 +38,9 @@ gearoenix::render::material::Material* gearoenix::render::material::Material::re
     f->read(sid);
     //    LOGE("location: " << f->tell());
     switch (sid) {
-    case shader::WHITE_POS:
+    case shader::DEPTH_POS:
         TODO;
-        return new White(e, end);
+        return new Depth(e, end);
     case shader::DIRECTIONAL_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
         return new DirectionalColoredMatteNonreflectiveShadowlessOpaque(f, e, end);
     case shader::DIRECTIONAL_COLORED_SPECULATED_BAKED_SHADOWLESS_OPAQUE:

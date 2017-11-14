@@ -48,6 +48,7 @@ namespace render {
             std::map<core::Id, std::weak_ptr<model::Model>> all_models;
             // shadow_caster_shader_id -> model_id -> mesh_id
             std::map<core::Id, std::map<core::Id, core::Id>> shadow_caster_models;
+            std::map<core::Id, std::shared_ptr<material::Material>> shadow_caster_materials;
             // shader_id -> model_id -> mesh_id
             std::map<core::Id, std::map<core::Id, core::Id>> opaque_models;
             // shader_id -> model_id -> mesh_id

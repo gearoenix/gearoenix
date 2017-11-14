@@ -70,6 +70,7 @@ gearoenix::render::scene::Scene::Scene(system::File* f, Engine* e, std::shared_p
         root_models[model_ids[i]] = amgr->get_model(model_ids[i], c);
         add_model(model_ids[i], root_models[i]);
     }
+
 }
 
 gearoenix::render::scene::Scene::~Scene()
@@ -96,6 +97,7 @@ void gearoenix::render::scene::Scene::commit()
 
 void gearoenix::render::scene::Scene::cast_shadow()
 {
+
 }
 
 void gearoenix::render::scene::Scene::draw(texture::Texture2D* shadow_texture)
