@@ -5,12 +5,16 @@
 #include "../rnd-engine.hpp"
 #include "../shader/rnd-shd-resources.hpp"
 
-const gearoenix::core::Id gearoenix::render::material::Depth::SHADER_ID = gearoenix::render::shader::DEPTH_POS;
-
-gearoenix::render::material::Depth::Depth(Engine* e, std::shared_ptr<core::EndCaller> end)
-    : Material(SHADER_ID, sizeof(u), e, end)
+gearoenix::render::material::Depth::Resources::Resources(Engine* e, pipeline::Pipeline* pip, buffer::Uniform* u)
+    : shader::Resources(e, pip, u)
 {
-    shdrsc = e->create_shader_resources(SHADER_ID, pl.get(), ub, end);
+}
+
+gearoenix::render::material::Depth::Depth(core::Id shdid, Engine* e, std::shared_ptr<core::EndCaller> end)
+    : Material(shdid, sizeof(u), e, end)
+    , SHADER_ID(shdid)
+{
+    shdrsc = reinterpret_cast<Resources*>(e->create_shader_resources(SHADER_ID, pl.get(), ub, end));
 }
 
 gearoenix::render::material::Depth::~Depth() {}

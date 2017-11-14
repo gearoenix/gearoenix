@@ -39,12 +39,14 @@ gearoenix::render::material::Material* gearoenix::render::material::Material::re
     //    LOGE("location: " << f->tell());
     switch (sid) {
     case shader::DEPTH_POS:
-        TODO;
-        return new Depth(e, end);
+    case shader::DEPTH_POS_NRM:
+    case shader::DEPTH_POS_NRM_UV:
+    case shader::DEPTH_POS_UV:
+        return new Depth(sid, e, end);
     case shader::DIRECTIONAL_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
         return new DirectionalColoredMatteNonreflectiveShadowlessOpaque(f, e, end);
-    case shader::DIRECTIONAL_COLORED_SPECULATED_BAKED_SHADOWLESS_OPAQUE:
     case shader::DIRECTIONAL_COLORED_SPECULATED_BAKED_CASTER_OPAQUE:
+    case shader::DIRECTIONAL_COLORED_SPECULATED_BAKED_SHADOWLESS_OPAQUE:
         return new DirectionalColoredSpeculatedBakedShadowlessOpaque(sid, f, e, end);
     case shader::DIRECTIONAL_COLORED_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE:
         return new DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque(f, e, end);
