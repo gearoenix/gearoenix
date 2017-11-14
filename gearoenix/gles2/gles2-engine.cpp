@@ -10,6 +10,7 @@
 #include "buffer/gles2-buf-mesh.hpp"
 #include "buffer/gles2-buf-uniform.hpp"
 #include "pipeline/gles2-pip-pipeline.hpp"
+#include "shader/gles2-shd-depth.hpp"
 #include "shader/gles2-shd-directional-colored-matte-nonreflective-shadowless-opaque.hpp"
 #include "shader/gles2-shd-directional-colored-speculated-baked-shadowless-opaque.hpp"
 #include "shader/gles2-shd-directional-colored-speculated-nonreflective-shadowless-opaque.hpp"
@@ -201,17 +202,10 @@ gearoenix::render::shader::Shader* gearoenix::gles2::Engine::create_shader(core:
     render::shader::Id shader_id = static_cast<render::shader::Id>(sid);
     switch (shader_id) {
     case render::shader::DEPTH_POS:
-        UNIMPLEMENTED;
-        break;
     case render::shader::DEPTH_POS_NRM:
-        UNIMPLEMENTED;
-        break;
-    case render::shader::DEPTH_POS_UV:
-        UNIMPLEMENTED;
-        break;
     case render::shader::DEPTH_POS_NRM_UV:
-        UNIMPLEMENTED;
-        break;
+    case render::shader::DEPTH_POS_UV:
+        return new shader::Depth(shader_id, this, c);
     case render::shader::DIRECTIONAL_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
         return new shader::DirectionalColoredMatteNonreflectiveShadowlessOpaque(this, c);
     case render::shader::DIRECTIONAL_COLORED_SPECULATED_BAKED_SHADOWLESS_OPAQUE:
@@ -238,17 +232,10 @@ gearoenix::render::shader::Resources* gearoenix::gles2::Engine::create_shader_re
     buffer::Uniform* u = reinterpret_cast<buffer::Uniform*>(ub);
     switch (sid) {
     case render::shader::DEPTH_POS:
-        UNIMPLEMENTED;
-        break;
     case render::shader::DEPTH_POS_NRM:
-        UNIMPLEMENTED;
-        break;
-    case render::shader::DEPTH_POS_UV:
-        UNIMPLEMENTED;
-        break;
     case render::shader::DEPTH_POS_NRM_UV:
-        UNIMPLEMENTED;
-        break;
+    case render::shader::DEPTH_POS_UV:
+        return new shader::Depth::Resources(this, pip, u);
     case render::shader::DIRECTIONAL_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
         return new shader::DirectionalColoredMatteNonreflectiveShadowlessOpaque::Resources(this, pip, u);
     case render::shader::DIRECTIONAL_COLORED_SPECULATED_BAKED_CASTER_OPAQUE:

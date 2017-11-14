@@ -1,8 +1,8 @@
 #ifndef GEAROEMIX_RENDER_MATERIAL_DEPTH_HPP
 #define GEAROEMIX_RENDER_MATERIAL_DEPTH_HPP
 #include "../../math/math-matrix.hpp"
-#include "rnd-mat-material.hpp"
 #include "../shader/rnd-shd-resources.hpp"
+#include "rnd-mat-material.hpp"
 namespace gearoenix {
 namespace render {
     namespace material {

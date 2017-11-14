@@ -1,8 +1,11 @@
 #include "rnd-mat-depth.hpp"
 #include "../../system/sys-log.hpp"
 #include "../buffer/rnd-buf-uniform.hpp"
+#include "../camera/rnd-cmr-orthographic.hpp"
+#include "../light/rnd-lt-sun.hpp"
 #include "../model/rnd-mdl-model.hpp"
 #include "../rnd-engine.hpp"
+#include "../scene/rnd-scn-scene.hpp"
 #include "../shader/rnd-shd-resources.hpp"
 
 gearoenix::render::material::Depth::Resources::Resources(Engine* e, pipeline::Pipeline* pip, buffer::Uniform* u)
@@ -29,9 +32,9 @@ gearoenix::core::Id gearoenix::render::material::Depth::get_shader_id() const
     return SHADER_ID;
 }
 
-void gearoenix::render::material::Depth::update(const scene::Scene*, const model::Model* m)
+void gearoenix::render::material::Depth::update(const scene::Scene* s, const model::Model* m)
 {
-    u.mvp = m->get_mvp();
+    u.mvp = s->get_sun()->get_camera()->get_view_projection() * m->get_m();
     ub->update(&u, sizeof(Uniform));
 }
 

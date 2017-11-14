@@ -21,6 +21,7 @@ namespace render {
         class Camera;
     }
     namespace material {
+        class Depth;
         class Material;
     }
     namespace mesh {
@@ -38,8 +39,12 @@ namespace render {
         private:
             math::Mat4x4 m;
             math::Mat4x4 mvp;
-            // mesh_id -> (mesh, material)
-            std::map<core::Id, std::tuple<std::shared_ptr<mesh::Mesh>, std::shared_ptr<material::Material>>> meshes;
+            // mesh_id -> (mesh, material, shadow_caster_material)
+            std::map<core::Id,
+                std::tuple<std::shared_ptr<mesh::Mesh>,
+                    std::shared_ptr<material::Material>,
+                    std::shared_ptr<material::Depth>>>
+                meshes;
             // model_id -> model
             std::map<core::Id, std::shared_ptr<Model>> children;
 
@@ -49,7 +54,7 @@ namespace render {
             void commit(const scene::Scene* s);
             void draw(texture::Texture2D* shadow_texture);
             const std::map<core::Id, std::shared_ptr<Model>>& get_children() const;
-            const std::map<core::Id, std::tuple<std::shared_ptr<mesh::Mesh>, std::shared_ptr<material::Material>>>& get_meshes() const;
+            const std::map<core::Id, std::tuple<std::shared_ptr<mesh::Mesh>, std::shared_ptr<material::Material>, std::shared_ptr<material::Depth>>>& get_meshes() const;
             const math::Mat4x4& get_m() const;
             const math::Mat4x4& get_mvp() const;
         };

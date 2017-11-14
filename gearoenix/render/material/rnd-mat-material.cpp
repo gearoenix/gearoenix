@@ -7,6 +7,7 @@
 #include "../pipeline/rnd-pip-manager.hpp"
 #include "../pipeline/rnd-pip-pipeline.hpp"
 #include "../rnd-engine.hpp"
+#include "rnd-mat-depth.hpp"
 #include "rnd-mat-directional-colored-matte-nonreflective-shadowless-opaque.hpp"
 #include "rnd-mat-directional-colored-speculated-baked-shadowless-opaque.hpp"
 #include "rnd-mat-directional-colored-speculated-nonreflective-shadowless-opaque.hpp"
@@ -15,7 +16,6 @@
 #include "rnd-mat-shadeless-colored-matte-nonreflective-shadowless-opaque.hpp"
 #include "rnd-mat-shadeless-cube-matte-nonreflective-shadowless-opaque.hpp"
 #include "rnd-mat-shadeless-d2-matte-nonreflective-shadowless-opaque.hpp"
-#include "rnd-mat-depth.hpp"
 
 gearoenix::render::material::Material::Material(core::Id sid, unsigned int us, Engine* e, std::shared_ptr<core::EndCaller> end)
     : ub(e->create_uniform(us, end))

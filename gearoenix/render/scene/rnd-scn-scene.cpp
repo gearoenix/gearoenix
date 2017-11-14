@@ -8,6 +8,7 @@
 #include "../camera/rnd-cmr-orthographic.hpp"
 #include "../light/rnd-lt-light.hpp"
 #include "../light/rnd-lt-sun.hpp"
+#include "../material/rnd-mat-depth.hpp"
 #include "../material/rnd-mat-material.hpp"
 #include "../mesh/rnd-msh-mesh.hpp"
 #include "../model/rnd-mdl-model.hpp"
@@ -18,27 +19,21 @@ void gearoenix::render::scene::Scene::add_model(core::Id id, std::shared_ptr<mod
 {
     all_models[id] = m;
     const std::map<core::Id, std::shared_ptr<model::Model>>& children = m->get_children();
-    for(const std::pair<core::Id, std::shared_ptr<model::Model>>& child: children)
-    {
+    for (const std::pair<core::Id, std::shared_ptr<model::Model>>& child : children) {
         add_model(child.first, child.second);
     }
-    const std::map<core::Id, std::tuple<std::shared_ptr<mesh::Mesh>, std::shared_ptr<material::Material>>>& meshes = m->get_meshes();
-    for(const std::pair<core::Id, std::tuple<std::shared_ptr<mesh::Mesh>, std::shared_ptr<material::Material>>>& mp: meshes)
-    {
+    const std::map<core::Id, std::tuple<std::shared_ptr<mesh::Mesh>, std::shared_ptr<material::Material>, std::shared_ptr<material::Depth>>>& meshes = m->get_meshes();
+    for (const std::pair<core::Id, std::tuple<std::shared_ptr<mesh::Mesh>, std::shared_ptr<material::Material>, std::shared_ptr<material::Depth>>>& mp : meshes) {
         core::Id msh = mp.first;
         const std::shared_ptr<material::Material>& mtr = std::get<1>(mp.second);
         core::Id shdid = mtr->get_shader_id();
-        if(shader::Shader::is_shadow_caster(shdid))
-        {
+        if (shader::Shader::is_shadow_caster(shdid)) {
             core::Id shdcstid = shader::Shader::get_shadow_caster_shader_id(shdid);
             shadow_caster_models[shdcstid][id] = msh;
         }
-        if(shader::Shader::is_transparent(shdid))
-        {
+        if (shader::Shader::is_transparent(shdid)) {
             transparent_models[shdid][id] = msh;
-        }
-        else
-        {
+        } else {
             opaque_models[shdid][id] = msh;
         }
     }
@@ -70,7 +65,6 @@ gearoenix::render::scene::Scene::Scene(system::File* f, Engine* e, std::shared_p
         root_models[model_ids[i]] = amgr->get_model(model_ids[i], c);
         add_model(model_ids[i], root_models[i]);
     }
-
 }
 
 gearoenix::render::scene::Scene::~Scene()
@@ -97,7 +91,9 @@ void gearoenix::render::scene::Scene::commit()
 
 void gearoenix::render::scene::Scene::cast_shadow()
 {
-
+    if (renderable) {
+        UNIMPLEMENTED;
+    }
 }
 
 void gearoenix::render::scene::Scene::draw(texture::Texture2D* shadow_texture)

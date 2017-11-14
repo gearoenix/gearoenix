@@ -2,9 +2,9 @@
 #include "../../core/cr-types.hpp"
 #include "../../system/sys-file.hpp"
 #include "../../system/sys-log.hpp"
+#include "../material/rnd-mat-depth.hpp"
 #include "../material/rnd-mat-directional-d2-speculated-nonreflective-full-opaque.hpp"
 #include "../material/rnd-mat-shadeless-colored-matte-nonreflective-shadowless-opaque.hpp"
-#include "../material/rnd-mat-depth.hpp"
 #include "../rnd-engine.hpp"
 
 const std::vector<gearoenix::render::shader::stage::Id> gearoenix::render::shader::Shader::graphic_2_stage = {
@@ -95,8 +95,7 @@ const std::vector<gearoenix::render::shader::VertexAttribute>& gearoenix::render
 bool gearoenix::render::shader::Shader::is_shadow_caster(core::Id sid)
 {
     shader::Id shdid = static_cast<shader::Id>(sid);
-    switch(shdid)
-    {
+    switch (shdid) {
     case DIRECTIONAL_COLORED_MATTE_BAKED_CASTER_CUTOFF:
     case DIRECTIONAL_COLORED_SPECULATED_BAKED_CASTER_OPAQUE:
         return true;
@@ -114,8 +113,7 @@ bool gearoenix::render::shader::Shader::is_shadow_caster(core::Id sid)
 bool gearoenix::render::shader::Shader::is_transparent(core::Id sid)
 {
     shader::Id shdid = static_cast<shader::Id>(sid);
-    switch(shdid)
-    {
+    switch (shdid) {
     case DIRECTIONAL_COLORED_MATTE_BAKED_CASTER_CUTOFF:
     case DIRECTIONAL_COLORED_SPECULATED_BAKED_CASTER_OPAQUE:
     case DIRECTIONAL_COLORED_SPECULATED_BAKED_SHADOWLESS_OPAQUE:
@@ -132,8 +130,7 @@ bool gearoenix::render::shader::Shader::is_transparent(core::Id sid)
 
 gearoenix::core::Id gearoenix::render::shader::Shader::get_shadow_caster_shader_id(core::Id sid)
 {
-    switch(get_vertex_real_count(sid))
-    {
+    switch (get_vertex_real_count(sid)) {
     case 3:
         return DEPTH_POS;
     case 5:
@@ -150,12 +147,13 @@ gearoenix::core::Id gearoenix::render::shader::Shader::get_shadow_caster_shader_
 unsigned int gearoenix::render::shader::Shader::get_vertex_real_count(core::Id id)
 {
     switch (id) {
+    case DEPTH_POS:
     case SHADELESS_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
     case SHADELESS_CUBE_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
-    case DEPTH_POS:
         return 3;
     case SHADELESS_D2_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
         return 5;
+    case DEPTH_POS_NRM:
     case DIRECTIONAL_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
     case DIRECTIONAL_COLORED_SPECULATED_BAKED_CASTER_OPAQUE:
     case DIRECTIONAL_COLORED_SPECULATED_BAKED_SHADOWLESS_OPAQUE:

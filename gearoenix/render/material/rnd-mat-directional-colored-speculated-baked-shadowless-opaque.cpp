@@ -23,8 +23,8 @@ void gearoenix::render::material::DirectionalColoredSpeculatedBakedShadowlessOpa
 }
 
 gearoenix::render::material::DirectionalColoredSpeculatedBakedShadowlessOpaque::DirectionalColoredSpeculatedBakedShadowlessOpaque(core::Id shdid, system::File* f, Engine* e, std::shared_ptr<core::EndCaller> end)
-    : Material(shdid, sizeof(u), e, end),
-      SHADER_ID(shdid)
+    : Material(shdid, sizeof(u), e, end)
+    , SHADER_ID(shdid)
 {
     u.color.read(f);
     u.spec_color.read(f);
