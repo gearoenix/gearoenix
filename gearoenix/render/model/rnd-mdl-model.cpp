@@ -4,6 +4,9 @@
 #include "../../system/sys-file.hpp"
 #include "../material/rnd-mat-material.hpp"
 #include "../rnd-engine.hpp"
+#include "../scene/rnd-scn-scene.hpp"
+#include "../camera/rnd-cmr-camera.hpp"
+#include "../mesh/rnd-msh-mesh.hpp"
 
 gearoenix::render::model::Model::Model(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c)
 {
@@ -37,12 +40,32 @@ gearoenix::render::model::Model::~Model() {}
 
 void gearoenix::render::model::Model::commit(const scene::Scene* s)
 {
-    UNIMPLEMENTED;
+    LOGE("TODO this function have two part, "
+         "firts is math part and second is graphic related stuff, "
+         "math part must move to physice-engine.");
+    mvp = s->get_current_camera()->get_view_projection() * m;
+    for(std::pair<const core::Id, std::tuple<std::shared_ptr<mesh::Mesh>, std::shared_ptr<material::Material>>>& mshmtr: meshes)
+    {
+        std::get<1>(mshmtr.second)->update(s, this);
+    }
+    for(std::pair<const core::Id, std::shared_ptr<Model>>& cm: children)
+    {
+        cm.second->commit(s);
+    }
 }
 
 void gearoenix::render::model::Model::draw(texture::Texture2D* shadow_texture)
 {
-    UNIMPLEMENTED;
+    for(std::pair<const core::Id, std::tuple<std::shared_ptr<mesh::Mesh>, std::shared_ptr<material::Material>>>& mshmtr: meshes)
+    {
+        std::get<0>(mshmtr.second)->bind();
+        std::get<1>(mshmtr.second)->bind(shadow_texture);
+        std::get<0>(mshmtr.second)->draw();
+    }
+    for(std::pair<const core::Id, std::shared_ptr<Model>>& cm: children)
+    {
+        cm.second->draw(shadow_texture);
+    }
 }
 
 const std::map<gearoenix::core::Id, std::shared_ptr<gearoenix::render::model::Model>>& gearoenix::render::model::Model::get_children() const
