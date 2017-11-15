@@ -24,6 +24,11 @@ void gearoenix::render::material::DirectionalD2SpeculatedNonreflectiveFullOpaque
     txt = t;
 }
 
+void gearoenix::render::material::DirectionalD2SpeculatedNonreflectiveFullOpaque::Resources::set_shadow_texture(texture::Texture2D* t)
+{
+    shdtxt = t;
+}
+
 gearoenix::render::material::DirectionalD2SpeculatedNonreflectiveFullOpaque::DirectionalD2SpeculatedNonreflectiveFullOpaque(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> end)
     : Material(SHADER_ID, sizeof(u), e, end)
 {
@@ -52,6 +57,11 @@ unsigned int gearoenix::render::material::DirectionalD2SpeculatedNonreflectiveFu
     return shader::Shader::get_vertex_real_count(SHADER_ID);
 }
 
+gearoenix::core::Id gearoenix::render::material::DirectionalD2SpeculatedNonreflectiveFullOpaque::get_shader_id() const
+{
+    return SHADER_ID;
+}
+
 void gearoenix::render::material::DirectionalD2SpeculatedNonreflectiveFullOpaque::update(const scene::Scene* s, const model::Model* m)
 {
     u.ambl_color = s->get_ambient_light();
@@ -65,5 +75,6 @@ void gearoenix::render::material::DirectionalD2SpeculatedNonreflectiveFullOpaque
 
 void gearoenix::render::material::DirectionalD2SpeculatedNonreflectiveFullOpaque::bind(texture::Texture2D* shadow_texture)
 {
+    shdrsc->set_texture(shadow_texture);
     shdrsc->bind();
 }

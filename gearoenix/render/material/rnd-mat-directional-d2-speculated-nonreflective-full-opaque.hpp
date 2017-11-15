@@ -20,10 +20,12 @@ namespace render {
             class Resources : public shader::Resources {
             protected:
                 texture::Texture2D* txt;
+                texture::Texture2D* shdtxt;
 
             public:
                 Resources(Engine* e, pipeline::Pipeline* pip, buffer::Uniform* u);
                 void set_texture(texture::Texture2D* t);
+                void set_shadow_texture(texture::Texture2D* t);
             };
             typedef struct {
                 math::Mat4x4 mvp;
@@ -45,6 +47,7 @@ namespace render {
             DirectionalD2SpeculatedNonreflectiveFullOpaque(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> end);
             ~DirectionalD2SpeculatedNonreflectiveFullOpaque();
             unsigned int get_vertex_elements_count() const;
+            core::Id get_shader_id() const;
             void update(const scene::Scene* s, const model::Model* m);
             void bind(texture::Texture2D* shadow_texture);
         };
