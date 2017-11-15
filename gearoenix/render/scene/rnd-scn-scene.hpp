@@ -4,6 +4,7 @@
 #include "../../math/math-vector.hpp"
 #include <map>
 #include <memory>
+#include <set>
 #include <tuple>
 #include <vector>
 
@@ -47,12 +48,11 @@ namespace render {
             std::map<core::Id, std::shared_ptr<model::Model>> root_models;
             std::map<core::Id, std::weak_ptr<model::Model>> all_models;
             // shadow_caster_shader_id -> model_id -> mesh_id
-            std::map<core::Id, std::map<core::Id, core::Id>> shadow_caster_models;
-            std::map<core::Id, std::shared_ptr<material::Material>> shadow_caster_materials;
+            std::map<core::Id, std::map<core::Id, std::set<core::Id>>> shadow_caster_models;
             // shader_id -> model_id -> mesh_id
-            std::map<core::Id, std::map<core::Id, core::Id>> opaque_models;
+            std::map<core::Id, std::map<core::Id, std::set<core::Id>>> opaque_models;
             // shader_id -> model_id -> mesh_id
-            std::map<core::Id, std::map<core::Id, core::Id>> transparent_models;
+            std::map<core::Id, std::map<core::Id, std::set<core::Id>>> transparent_models;
             unsigned int curcam = 0;
             bool renderable = false;
             math::Vec3 ambient_light = math::Vec3(0.2f, 0.2f, 0.2f);

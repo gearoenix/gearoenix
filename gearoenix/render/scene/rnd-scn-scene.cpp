@@ -29,12 +29,12 @@ void gearoenix::render::scene::Scene::add_model(core::Id id, std::shared_ptr<mod
         core::Id shdid = mtr->get_shader_id();
         if (shader::Shader::is_shadow_caster(shdid)) {
             core::Id shdcstid = shader::Shader::get_shadow_caster_shader_id(shdid);
-            shadow_caster_models[shdcstid][id] = msh;
+            shadow_caster_models[shdcstid][id].insert(msh);
         }
         if (shader::Shader::is_transparent(shdid)) {
-            transparent_models[shdid][id] = msh;
+            transparent_models[shdid][id].insert(msh);
         } else {
-            opaque_models[shdid][id] = msh;
+            opaque_models[shdid][id].insert(msh);
         }
     }
 }
@@ -92,16 +92,33 @@ void gearoenix::render::scene::Scene::commit()
 void gearoenix::render::scene::Scene::cast_shadow()
 {
     if (renderable) {
-        UNIMPLEMENTED;
+        for (std::pair<const core::Id, std::map<core::Id, std::set<core::Id>>>& pshd : shadow_caster_models) {
+            for (std::pair<const core::Id, std::set<core::Id>>& pmdl : pshd.second) {
+                for (const core::Id mshid : pmdl.second) {
+                    if (std::shared_ptr<model::Model> mdl = all_models[pmdl.first].lock()) {
+                        mdl->cast_shadow(mshid);
+                    }
+                }
+            }
+        }
     }
 }
 
 void gearoenix::render::scene::Scene::draw(texture::Texture2D* shadow_texture)
 {
     if (renderable) {
-        for (std::pair<const core::Id, std::shared_ptr<model::Model>>& m : root_models) {
-            m.second->draw(shadow_texture);
+        for (std::pair<const core::Id, std::map<core::Id, std::set<core::Id>>>& pshd : opaque_models) {
+            for (std::pair<const core::Id, std::set<core::Id>>& pmdl : pshd.second) {
+                for (const core::Id mshid : pmdl.second) {
+                    if (std::shared_ptr<model::Model> mdl = all_models[pmdl.first].lock()) {
+                        mdl->draw(mshid, shadow_texture);
+                    }
+                }
+            }
         }
+        //        for (std::pair<const core::Id, std::shared_ptr<model::Model>>& m : root_models) {
+        //            m.second->draw(shadow_texture);
+        //        }
     }
 }
 

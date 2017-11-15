@@ -52,7 +52,8 @@ namespace render {
             Model(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c);
             ~Model();
             void commit(const scene::Scene* s);
-            void draw(texture::Texture2D* shadow_texture);
+            void draw(core::Id mesh_id, texture::Texture2D* shadow_texture);
+            void cast_shadow(core::Id mesh_id);
             const std::map<core::Id, std::shared_ptr<Model>>& get_children() const;
             const std::map<core::Id, std::tuple<std::shared_ptr<mesh::Mesh>, std::shared_ptr<material::Material>, std::shared_ptr<material::Depth>>>& get_meshes() const;
             const math::Mat4x4& get_m() const;
