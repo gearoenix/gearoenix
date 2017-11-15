@@ -116,21 +116,19 @@ void gearoenix::render::scene::Scene::draw(texture::Texture2D* shadow_texture)
                 }
             }
         }
-        //        for (std::pair<const core::Id, std::shared_ptr<model::Model>>& m : root_models) {
-        //            m.second->draw(shadow_texture);
-        //        }
+        LOGE("TODO it needs to render transparent object with order of their depth.");
     }
 }
 
 const gearoenix::render::camera::Camera* gearoenix::render::scene::Scene::get_current_camera() const
 {
-    //    return reinterpret_cast<const light::Sun*>(lights[0].get())->get_camera();
+    //return reinterpret_cast<const light::Sun*>(lights[0].get())->get_camera();
     return cameras[curcam].get();
 }
 
 gearoenix::render::camera::Camera* gearoenix::render::scene::Scene::get_current_camera()
 {
-    //    return reinterpret_cast<light::Sun*>(lights[0].get())->get_camera();
+    //return reinterpret_cast<light::Sun*>(lights[0].get())->get_camera();
     return cameras[curcam].get();
 }
 
