@@ -14,6 +14,7 @@
 #include "shader/gles2-shd-directional-colored-matte-nonreflective-shadowless-opaque.hpp"
 #include "shader/gles2-shd-directional-colored-speculated-baked-shadowless-opaque.hpp"
 #include "shader/gles2-shd-directional-colored-speculated-nonreflective-shadowless-opaque.hpp"
+#include "shader/gles2-shd-directional-d2-speculated-nonreflective-full-opaque.hpp"
 #include "shader/gles2-shd-directional-d2-speculated-nonreflective-shadowless-opaque.hpp"
 #include "shader/gles2-shd-shadeless-colored-matte-nonreflective-shadowless-opaque.hpp"
 #include "shader/gles2-shd-shadeless-cube-matte-nonreflective-shadowless-opaque.hpp"
@@ -34,7 +35,7 @@ static std::shared_ptr<gearoenix::gles2::texture::Texture2D> txt;
 gearoenix::gles2::Engine::Engine(system::Application* sysapp)
     : render::Engine(sysapp)
 {
-    glClearColor(0.3f, 0.3f, 0.3f, 1.f);
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     win_width = sysapp->get_width();
     win_height = sysapp->get_height();
     glGetIntegerv(GL_FRAMEBUFFER_BINDING, (GLint*)&render_framebuffer);
@@ -98,6 +99,9 @@ gearoenix::gles2::Engine::Engine(system::Application* sysapp)
     glGenBuffers(1, &ibo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+#endif
+#ifdef GLES2_PROFILING
+    prof_last_time_draw = std::chrono::high_resolution_clock::now();
 #endif
 }
 
@@ -170,6 +174,19 @@ void gearoenix::gles2::Engine::update()
         scene->draw(shadow_map_texture);
     }
 #endif
+#ifdef GLES2_PROFILING
+    auto now = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>(now - prof_last_time_draw);
+    prof_frames_time += time_span.count();
+    prof_frames_count++;
+    if (prof_frames_count > 1999) {
+        prof_frames_time = 2000.0 / prof_frames_time;
+        LOGI("Average frame per second in 2000 loop is: " << prof_frames_time);
+        prof_frames_count = 0;
+        prof_frames_time = 0.0f;
+    }
+    prof_last_time_draw = now;
+#endif
 }
 
 void gearoenix::gles2::Engine::terminate()
@@ -213,6 +230,8 @@ gearoenix::render::shader::Shader* gearoenix::gles2::Engine::create_shader(core:
         return new shader::DirectionalColoredSpeculatedBakedShadowlessOpaque(this, c);
     case render::shader::DIRECTIONAL_COLORED_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE:
         return new shader::DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque(this, c);
+    case render::shader::DIRECTIONAL_D2_SPECULATED_NONREFLECTIVE_FULL_OPAQUE:
+        return new shader::DirectionalD2SpeculatedNonreflectiveFullOpaque(this, c);
     case render::shader::DIRECTIONAL_D2_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE:
         return new shader::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque(this, c);
     case render::shader::SHADELESS_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
@@ -243,6 +262,8 @@ gearoenix::render::shader::Resources* gearoenix::gles2::Engine::create_shader_re
         return new shader::DirectionalColoredSpeculatedBakedShadowlessOpaque::Resources(this, pip, u);
     case render::shader::DIRECTIONAL_COLORED_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE:
         return new shader::DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque::Resources(this, pip, u);
+    case render::shader::DIRECTIONAL_D2_SPECULATED_NONREFLECTIVE_FULL_OPAQUE:
+        return new shader::DirectionalD2SpeculatedNonreflectiveFullOpaque::Resources(this, pip, u);
     case render::shader::DIRECTIONAL_D2_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE:
         return new shader::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque::Resources(this, pip, u);
     case render::shader::SHADELESS_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:

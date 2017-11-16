@@ -21,7 +21,11 @@ namespace gles2 {
         GLuint render_framebuffer = 0;
         GLfloat win_width;
         GLfloat win_height;
-
+#ifdef GLES2_PROFILING
+        unsigned int prof_frames_count = 0;
+        std::chrono::high_resolution_clock::time_point prof_last_time_draw;
+        double prof_frames_time = 0.0;
+#endif
     public:
         Engine(system::Application* sys_app);
         ~Engine();

@@ -25,7 +25,9 @@ void gearoenix::gles2::shader::DirectionalD2SpeculatedNonreflectiveFullOpaque::R
     shd->set_spec_factors(data->spec_factors.data());
     shd->set_sun(data->sun.data());
     shd->set_sun_color(data->sun_color.data());
+    shd->set_dbm(data->dbm.data());
     reinterpret_cast<texture::Texture2D*>(txt)->bind(GL_TEXTURE0);
+    reinterpret_cast<texture::Texture2D*>(shdtxt)->bind(GL_TEXTURE1);
 }
 
 gearoenix::gles2::shader::DirectionalD2SpeculatedNonreflectiveFullOpaque::DirectionalD2SpeculatedNonreflectiveFullOpaque(Engine* eng, std::shared_ptr<core::EndCaller> end)
@@ -41,14 +43,24 @@ gearoenix::gles2::shader::DirectionalD2SpeculatedNonreflectiveFullOpaque::Direct
                                 "varying vec2 out_uv;\n"
                                 "varying vec3 out_normal;\n"
                                 "varying vec3 out_pos;\n"
+                                "varying vec3 out_shd;\n"
+                                "varying vec3 reflected;\n"
+                                "varying float diffuse;\n"
+                                "varying float bias;\n"
                                 "uniform mat4 mvp;\n"
                                 "uniform mat4 m;\n"
+                                "uniform mat4 dbm;\n"
+                                "uniform vec3 sun;\n"
                                 "void main()\n"
                                 "{\n"
                                 "    out_uv = uv;\n"
                                 "    out_normal = normalize((m * vec4(normal, 0.0)).xyz);\n"
+                                "    diffuse = dot(sun, out_normal);\n"
+                                "    reflected = reflect(sun, out_normal);\n"
                                 "    vec4 pos = vec4(vertex, 1.0);\n"
                                 "    out_pos = (m * pos).xyz;\n"
+                                "    out_shd = (dbm * pos).xyz;\n"
+                                "    bias = clamp(0.005 * tan(acos(abs(diffuse))), 0.0, 0.01);\n"
                                 "    gl_Position = mvp * pos;\n"
                                 "}\n";
         const std::string pfs = "precision highp sampler2D;\n"
@@ -56,6 +68,10 @@ gearoenix::gles2::shader::DirectionalD2SpeculatedNonreflectiveFullOpaque::Direct
                                 "varying vec2 out_uv;\n"
                                 "varying vec3 out_normal;\n"
                                 "varying vec3 out_pos;\n"
+                                "varying vec3 out_shd;\n"
+                                "varying vec3 reflected;\n"
+                                "varying float diffuse;\n"
+                                "varying float bias;\n"
                                 "uniform vec3 sun;\n"
                                 "uniform vec3 sun_color;\n"
                                 "uniform vec3 eye;\n"
@@ -63,18 +79,35 @@ gearoenix::gles2::shader::DirectionalD2SpeculatedNonreflectiveFullOpaque::Direct
                                 "uniform vec3 spec_factors;\n"
                                 "uniform vec3 ambl_color;\n"
                                 "uniform sampler2D txt;\n"
+                                "uniform sampler2D shdtxt;\n"
                                 "void main()\n"
                                 "{\n"
-                                "    float diffuse = dot(sun, out_normal);\n"
-                                "    vec3 reflected = reflect(sun, out_normal);\n"
-                                "    float speculare = -dot(normalize(eye - out_pos), reflected);\n"
-                                "    float diff_fac = smoothstep(0.0, 0.3, diffuse);\n"
-                                "    float spec_fac = smoothstep(spec_factors[0], spec_factors[1], speculare) * spec_factors[2];\n"
                                 "    vec3 txt_color = texture2D(txt, out_uv).xyz;\n"
                                 "    vec3 ambl_light = txt_color * ambl_color;\n"
-                                "    vec3 diff_color = txt_color * diff_fac * sun_color;\n"
-                                "    vec3 spc_color = spec_color * spec_fac;\n"
-                                "    gl_FragColor = vec4(diff_color + ambl_light + spc_color, 1.0);\n"
+                                "    float diff_fac = smoothstep(0.2, 0.5, diffuse);\n"
+                                "    if(diff_fac < 0.001)\n"
+                                "    {\n"
+                                "        gl_FragColor = vec4(ambl_light, 1.0);\n"
+                                "    }\n"
+                                "    else\n"
+                                "    {\n"
+                                "        vec4 v = texture2D(shdtxt, out_shd.xy);\n"
+                                "        float d = v.y;\n"
+                                "        d /= 256.0;\n"
+                                "        d += v.x;\n"
+                                "        if(d < out_shd.z - bias)\n"
+                                "        {\n"
+                                "            gl_FragColor = vec4(ambl_light, 1.0);\n"
+                                "        }\n"
+                                "        else\n"
+                                "        {\n"
+                                "            float speculare = -dot(normalize(eye - out_pos), reflected);\n"
+                                "            float spec_fac = smoothstep(spec_factors[0], spec_factors[1], speculare) * spec_factors[2];\n"
+                                "            vec3 diff_color = txt_color * diff_fac * sun_color;\n"
+                                "            vec3 spc_color = spec_color * spec_fac;\n"
+                                "            gl_FragColor = vec4(diff_color + ambl_light + spc_color, 1.0);\n"
+                                "        }\n"
+                                "    }\n"
                                 "}\n";
         vtx_shd = add_shader_to_program(pvs, GL_VERTEX_SHADER);
         frg_shd = add_shader_to_program(pfs, GL_FRAGMENT_SHADER);
@@ -90,7 +123,9 @@ gearoenix::gles2::shader::DirectionalD2SpeculatedNonreflectiveFullOpaque::Direct
         spec_color = get_uniform_location("spec_color");
         spec_factors = get_uniform_location("spec_factors");
         ambl_color = get_uniform_location("ambl_color");
+        dbm = get_uniform_location("dbm");
         txt = get_uniform_location("txt");
+        shdtxt = get_uniform_location("shdtxt");
         (void)end;
     });
 }
@@ -115,6 +150,7 @@ void gearoenix::gles2::shader::DirectionalD2SpeculatedNonreflectiveFullOpaque::u
     glVertexAttribPointer(nrm_att_ind, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
     glVertexAttribPointer(uv_att_ind, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*)(6 * sizeof(GLfloat)));
     glUniform1i(txt, 0);
+    glUniform1i(shdtxt, 1);
 }
 
 const std::vector<gearoenix::render::shader::stage::Id>& gearoenix::gles2::shader::DirectionalD2SpeculatedNonreflectiveFullOpaque::get_stages_ids() const
@@ -160,5 +196,10 @@ void gearoenix::gles2::shader::DirectionalD2SpeculatedNonreflectiveFullOpaque::s
 void gearoenix::gles2::shader::DirectionalD2SpeculatedNonreflectiveFullOpaque::set_ambl_color(const GLfloat* data)
 {
     glUniform3fv(ambl_color, 1, data);
+}
+
+void gearoenix::gles2::shader::DirectionalD2SpeculatedNonreflectiveFullOpaque::set_dbm(const GLfloat* data)
+{
+    glUniformMatrix4fv(dbm, 1, GL_FALSE, data);
 }
 #endif

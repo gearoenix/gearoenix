@@ -30,6 +30,7 @@ namespace render {
             typedef struct {
                 math::Mat4x4 mvp;
                 math::Mat4x4 m;
+                math::Mat4x4 dbm;
                 math::Vec3 sun;
                 math::Vec3 sun_color;
                 math::Vec3 spec_color;

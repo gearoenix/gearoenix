@@ -5,6 +5,7 @@
 #include "../../system/sys-file.hpp"
 #include "../buffer/rnd-buf-uniform.hpp"
 #include "../camera/rnd-cmr-camera.hpp"
+#include "../camera/rnd-cmr-orthographic.hpp"
 #include "../light/rnd-lt-sun.hpp"
 #include "../model/rnd-mdl-model.hpp"
 #include "../pipeline/rnd-pip-pipeline.hpp"
@@ -70,11 +71,17 @@ void gearoenix::render::material::DirectionalD2SpeculatedNonreflectiveFullOpaque
     u.mvp = m->get_mvp();
     u.sun = s->get_sun()->get_direction();
     u.sun_color = s->get_sun()->get_color();
+    u.dbm = math::Mat4x4(
+                0.5, 0.0, 0.0, 0.0,
+                0.0, 0.5, 0.0, 0.0,
+                0.0, 0.0, 0.5, 0.0,
+                0.5, 0.5, 0.5, 1.0)
+        * s->get_sun()->get_camera()->get_view_projection() * u.m;
     ub->update(&u, sizeof(Uniform));
 }
 
 void gearoenix::render::material::DirectionalD2SpeculatedNonreflectiveFullOpaque::bind(texture::Texture2D* shadow_texture)
 {
-    shdrsc->set_texture(shadow_texture);
+    shdrsc->set_shadow_texture(shadow_texture);
     shdrsc->bind();
 }

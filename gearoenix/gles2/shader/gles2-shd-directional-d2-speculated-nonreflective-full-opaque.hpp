@@ -31,7 +31,9 @@ namespace gles2 {
             GLuint spec_color;
             GLuint spec_factors;
             GLuint ambl_color;
+            GLuint dbm;
             GLuint txt;
+            GLuint shdtxt;
             GLuint vtx_shd;
             GLuint frg_shd;
             GLint vtx_att_ind;
@@ -51,6 +53,7 @@ namespace gles2 {
             void set_spec_color(const GLfloat* data);
             void set_spec_factors(const GLfloat* data);
             void set_ambl_color(const GLfloat* data);
+            void set_dbm(const GLfloat* data);
         };
     }
 }

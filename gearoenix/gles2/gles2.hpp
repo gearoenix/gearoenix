@@ -27,3 +27,5 @@
             LOGF("Unknown error.");                               \
         }                                                         \
     }
+
+#define GLES2_PROFILING
