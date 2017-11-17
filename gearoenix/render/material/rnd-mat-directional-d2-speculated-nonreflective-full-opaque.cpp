@@ -71,12 +71,7 @@ void gearoenix::render::material::DirectionalD2SpeculatedNonreflectiveFullOpaque
     u.mvp = m->get_mvp();
     u.sun = s->get_sun()->get_direction();
     u.sun_color = s->get_sun()->get_color();
-    u.dbm = math::Mat4x4(
-                0.5, 0.0, 0.0, 0.0,
-                0.0, 0.5, 0.0, 0.0,
-                0.0, 0.0, 0.5, 0.0,
-                0.5, 0.5, 0.5, 1.0)
-        * s->get_sun()->get_camera()->get_view_projection() * u.m;
+    u.db = s->get_sun()->get_bias();
     ub->update(&u, sizeof(Uniform));
 }
 
