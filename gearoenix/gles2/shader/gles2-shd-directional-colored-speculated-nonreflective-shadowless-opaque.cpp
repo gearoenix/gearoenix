@@ -61,7 +61,7 @@ gearoenix::gles2::shader::DirectionalColoredSpeculatedNonreflectiveShadowlessOpa
                                 "    float diff = dot(nrm, sun);\n"
                                 "    float spec = -dot(normalize(reflect(sun, nrm)), normalize(eye - pos));\n"
                                 "    spec = smoothstep(spec_factors[0], spec_factors[1], spec) * spec_factors[2];\n"
-                                "    diff = smoothstep(0.0, 0.3, diff);\n"
+                                "    diff = smoothstep(0.2, 0.5, diff);\n"
                                 "    vec3 final_color = diff * sun_color * color;\n"
                                 "    final_color += spec * spec_color;\n"
                                 "    final_color += ambl_color;\n"

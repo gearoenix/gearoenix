@@ -58,7 +58,7 @@ gearoenix::gles2::shader::DirectionalD2SpeculatedNonreflectiveFullOpaque::Direct
                                 "    vec3 reflected = reflect(sun, world_normal);\n"
                                 "    out_uv = uv;\n"
                                 "    out_diffuse = dot(sun, world_normal);\n"
-                                "    out_speculare = -dot(normalize(eye - world_position.xyz), reflected);\n"
+                                "    out_speculare = dot(normalize(world_position.xyz - eye), reflected);\n"
                                 "    out_shd = (db * world_position).xyz;\n"
                                 "    out_bias = clamp(0.005 * tan(acos(abs(out_diffuse))), 0.0, 0.01);\n"
                                 "    gl_Position = mvp * position;\n"

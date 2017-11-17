@@ -53,7 +53,7 @@ gearoenix::gles2::shader::DirectionalColoredMatteNonreflectiveShadowlessOpaque::
                           "void main()\n"
                           "{\n"
                           "    float diff = dot(nrm, sun);\n"
-                          "    diff = smoothstep(0.0, 0.3, diff);\n"
+                          "    diff = smoothstep(0.2, 0.5, diff);\n"
                           "    vec3 final_color = sun_color * color * diff;\n"
                           "    final_color += ambl_color;\n"
                           "    gl_FragColor = vec4(final_color, 1.0);\n"
