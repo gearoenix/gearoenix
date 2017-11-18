@@ -23,7 +23,7 @@ namespace gles2 {
             };
 
         protected:
-            GLuint mvp;
+            GLuint vp;
             GLuint m;
             GLuint sun;
             GLuint sun_color;
@@ -45,7 +45,7 @@ namespace gles2 {
             ~DirectionalD2SpeculatedNonreflectiveFullOpaque();
             void use();
             const std::vector<render::shader::stage::Id>& get_stages_ids() const;
-            void set_mvp(const GLfloat* data);
+            void set_vp(const GLfloat* data);
             void set_m(const GLfloat* data);
             void set_sun(const GLfloat* data);
             void set_sun_color(const GLfloat* data);

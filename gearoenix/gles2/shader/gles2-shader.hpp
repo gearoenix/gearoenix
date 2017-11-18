@@ -25,7 +25,6 @@ namespace gles2 {
         public:
             Shader(Engine* eng, std::shared_ptr<core::EndCaller> end);
             virtual ~Shader();
-            virtual void set_mvp(const GLfloat* data) = 0;
         };
     }
 }

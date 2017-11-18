@@ -41,6 +41,8 @@ namespace render {
             virtual void bind(texture::Texture2D* shadow_texture) = 0;
             virtual unsigned int get_vertex_elements_count() const = 0;
             virtual core::Id get_shader_id() const = 0;
+            virtual bool needs_mvp() const = 0;
+            virtual bool needs_dbm() const = 0;
             static Material* read(system::File* f, Engine* e, std::shared_ptr<gearoenix::core::EndCaller> end);
         };
     }

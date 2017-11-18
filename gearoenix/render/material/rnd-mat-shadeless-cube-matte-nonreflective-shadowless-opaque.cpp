@@ -54,6 +54,16 @@ gearoenix::core::Id gearoenix::render::material::ShadelessCubeMatteNonreflective
     return SHADER_ID;
 }
 
+bool gearoenix::render::material::ShadelessCubeMatteNonreflectiveShadowlessOpaque::needs_mvp() const
+{
+    return true;
+}
+
+bool gearoenix::render::material::ShadelessCubeMatteNonreflectiveShadowlessOpaque::needs_dbm() const
+{
+    return false;
+}
+
 void gearoenix::render::material::ShadelessCubeMatteNonreflectiveShadowlessOpaque::update(const scene::Scene*, const model::Model* m)
 {
     u.mvp = m->get_mvp();

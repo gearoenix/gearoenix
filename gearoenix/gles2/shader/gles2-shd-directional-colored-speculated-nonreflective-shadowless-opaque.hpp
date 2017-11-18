@@ -23,14 +23,13 @@ namespace gles2 {
             };
 
         protected:
-            GLuint mvp;
+            GLuint vp;
             GLuint m;
             GLuint sun;
             GLuint sun_color;
             GLuint eye;
             GLuint spec_color;
             GLuint spec_factors;
-            GLuint color;
             GLuint ambl_color;
             GLuint vtx_shd;
             GLuint frg_shd;
@@ -42,14 +41,13 @@ namespace gles2 {
             ~DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque();
             void use();
             const std::vector<render::shader::stage::Id>& get_stages_ids() const;
-            void set_mvp(const GLfloat* data);
+            void set_vp(const GLfloat* data);
             void set_m(const GLfloat* data);
             void set_sun(const GLfloat* data);
             void set_sun_color(const GLfloat* data);
             void set_eye(const GLfloat* data);
             void set_spec_color(const GLfloat* data);
             void set_spec_factors(const GLfloat* data);
-            void set_color(const GLfloat* data);
             void set_ambl_color(const GLfloat* data);
         };
     }

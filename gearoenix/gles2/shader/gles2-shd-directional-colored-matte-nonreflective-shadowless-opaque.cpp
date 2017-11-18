@@ -16,7 +16,6 @@ void gearoenix::gles2::shader::DirectionalColoredMatteNonreflectiveShadowlessOpa
     DirectionalColoredMatteNonreflectiveShadowlessOpaque* shd = reinterpret_cast<DirectionalColoredMatteNonreflectiveShadowlessOpaque*>(pip->get_shader());
     shd->use();
     shd->set_ambl_color(data->ambl_color.data());
-    shd->set_color(data->color.data());
     shd->set_m(data->m.data());
     shd->set_mvp(data->mvp.data());
     shd->set_sun(data->sun.data());
@@ -32,29 +31,25 @@ gearoenix::gles2::shader::DirectionalColoredMatteNonreflectiveShadowlessOpaque::
                           "precision highp float;\n"
                           "attribute vec3 vertex;\n"
                           "attribute vec3 normal;\n"
-                          "varying vec3 pos;\n"
-                          "varying vec3 nrm;\n"
+                          "varying float out_diffuse;\n"
                           "uniform mat4 mvp;\n"
                           "uniform mat4 m;\n"
+                          "uniform vec3 sun;\n"
                           "void main()\n"
                           "{\n"
-                          "    pos = (m * vec4(vertex, 1.0)).xyz;\n"
-                          "    nrm = normalize((m * vec4(normal, 0.0)).xyz);\n"
+                          "    vec3 world_normal = normalize((m * vec4(normal, 0.0)).xyz);\n"
+                          "    out_diffuse = dot(sun, world_normal);\n"
                           "    gl_Position = mvp * vec4(vertex, 1.0);\n"
                           "}\n";
         std::string pfs = "precision highp sampler2D;\n"
                           "precision highp float;\n"
-                          "varying vec3 pos;\n"
-                          "varying vec3 nrm;\n"
-                          "uniform vec3 color;\n"
-                          "uniform vec3 sun;\n"
+                          "varying float out_diffuse;\n"
                           "uniform vec3 sun_color;\n"
                           "uniform vec3 ambl_color;\n"
                           "void main()\n"
                           "{\n"
-                          "    float diff = dot(nrm, sun);\n"
-                          "    diff = smoothstep(0.2, 0.5, diff);\n"
-                          "    vec3 final_color = sun_color * color * diff;\n"
+                          "    float diff = smoothstep(0.2, 0.5, out_diffuse);\n"
+                          "    vec3 final_color = sun_color * diff;\n"
                           "    final_color += ambl_color;\n"
                           "    gl_FragColor = vec4(final_color, 1.0);\n"
                           "}\n";
@@ -66,7 +61,6 @@ gearoenix::gles2::shader::DirectionalColoredMatteNonreflectiveShadowlessOpaque::
         m = get_uniform_location("m");
         mvp = get_uniform_location("mvp");
         sun = get_uniform_location("sun");
-        color = get_uniform_location("color");
         sun_color = get_uniform_location("sun_color");
         ambl_color = get_uniform_location("ambl_color");
         (void)end;
@@ -113,11 +107,6 @@ void gearoenix::gles2::shader::DirectionalColoredMatteNonreflectiveShadowlessOpa
 void gearoenix::gles2::shader::DirectionalColoredMatteNonreflectiveShadowlessOpaque::set_sun_color(const GLfloat* data)
 {
     glUniform3fv(sun_color, 1, data);
-}
-
-void gearoenix::gles2::shader::DirectionalColoredMatteNonreflectiveShadowlessOpaque::set_color(const GLfloat* data)
-{
-    glUniform3fv(color, 1, data);
 }
 
 void gearoenix::gles2::shader::DirectionalColoredMatteNonreflectiveShadowlessOpaque::set_ambl_color(const GLfloat* data)

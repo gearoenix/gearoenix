@@ -16,10 +16,9 @@ void gearoenix::gles2::shader::DirectionalColoredSpeculatedBakedShadowlessOpaque
     DirectionalColoredSpeculatedBakedShadowlessOpaque* shd = reinterpret_cast<DirectionalColoredSpeculatedBakedShadowlessOpaque*>(pip->get_shader());
     shd->use();
     shd->set_ambl_color(data->ambl_color.data());
-    shd->set_color(data->color.data());
     shd->set_eye(data->eye.data());
     shd->set_m(data->m.data());
-    shd->set_mvp(data->mvp.data());
+    shd->set_vp(data->vp.data());
     shd->set_spec_color(data->spec_color.data());
     shd->set_spec_factors(data->spec_factors.data());
     shd->set_sun(data->sun.data());
@@ -39,27 +38,26 @@ gearoenix::gles2::shader::DirectionalColoredSpeculatedBakedShadowlessOpaque::Dir
                                 "varying float out_diffuse;\n"
                                 "varying float out_speculare;\n"
                                 "varying vec3 out_eye_reflected;\n"
-                                "uniform mat4 mvp;\n"
+                                "uniform mat4 vp;\n"
                                 "uniform mat4 m;\n"
                                 "uniform vec3 eye;\n"
                                 "uniform vec3 sun;\n"
                                 "void main()\n"
                                 "{\n"
-                                "    vec3 world_position = (m * vec4(vertex, 1.0)).xyz;\n"
+                                "    vec4 world_position = m * vec4(vertex, 1.0);\n"
                                 "    vec3 world_normal = normalize((m * vec4(normal, 0.0)).xyz);\n"
-                                "    vec3 eye_direction = normalize(world_position - eye);\n"
+                                "    vec3 eye_direction = normalize(world_position.xyz - eye);\n"
                                 "    out_eye_reflected = reflect(eye_direction, world_normal);\n"
                                 "    vec3 reflected = reflect(sun, world_normal);\n"
                                 "    out_diffuse = dot(sun, world_normal);\n"
                                 "    out_speculare = dot(eye_direction, reflected);\n"
-                                "    gl_Position = mvp * vec4(vertex, 1.0);\n"
+                                "    gl_Position = vp * world_position;\n"
                                 "}\n";
         const std::string pfs = "precision highp samplerCube;\n"
                                 "precision highp float;\n"
                                 "varying float out_diffuse;\n"
                                 "varying float out_speculare;\n"
                                 "varying vec3 out_eye_reflected;\n"
-                                "uniform vec3 color;\n"
                                 "uniform vec3 sun_color;\n"
                                 "uniform vec3 spec_color;\n"
                                 "uniform vec3 spec_factors;\n"
@@ -71,7 +69,7 @@ gearoenix::gles2::shader::DirectionalColoredSpeculatedBakedShadowlessOpaque::Dir
                                 "    vec3 env_color = textureCube(rfl_env, out_eye_reflected).xyz;\n"
                                 "    float spec = smoothstep(spec_factors[0], spec_factors[1], out_speculare) * spec_factors[2];\n"
                                 "    float diff = smoothstep(0.2, 0.5, out_diffuse);\n"
-                                "    vec3 final_color = diff * sun_color * color;\n"
+                                "    vec3 final_color = diff * sun_color;\n"
                                 "    final_color = mix(final_color, env_color, rfl_fac);\n"
                                 "    final_color += spec * spec_color;\n"
                                 "    final_color += ambl_color;\n"
@@ -83,10 +81,9 @@ gearoenix::gles2::shader::DirectionalColoredSpeculatedBakedShadowlessOpaque::Dir
         vtx_att_ind = glGetAttribLocation(shader_program, "vertex");
         nrm_att_ind = glGetAttribLocation(shader_program, "normal");
         m = get_uniform_location("m");
-        mvp = get_uniform_location("mvp");
+        vp = get_uniform_location("vp");
         sun = get_uniform_location("sun");
         eye = get_uniform_location("eye");
-        color = get_uniform_location("color");
         sun_color = get_uniform_location("sun_color");
         ambl_color = get_uniform_location("ambl_color");
         spec_color = get_uniform_location("spec_color");
@@ -119,9 +116,9 @@ const std::vector<gearoenix::render::shader::stage::Id>& gearoenix::gles2::shade
     return graphic_2_stage;
 }
 
-void gearoenix::gles2::shader::DirectionalColoredSpeculatedBakedShadowlessOpaque::set_mvp(const GLfloat* data)
+void gearoenix::gles2::shader::DirectionalColoredSpeculatedBakedShadowlessOpaque::set_vp(const GLfloat* data)
 {
-    glUniformMatrix4fv(mvp, 1, GL_FALSE, data);
+    glUniformMatrix4fv(vp, 1, GL_FALSE, data);
 }
 
 void gearoenix::gles2::shader::DirectionalColoredSpeculatedBakedShadowlessOpaque::set_m(const GLfloat* data)
@@ -137,11 +134,6 @@ void gearoenix::gles2::shader::DirectionalColoredSpeculatedBakedShadowlessOpaque
 void gearoenix::gles2::shader::DirectionalColoredSpeculatedBakedShadowlessOpaque::set_sun_color(const GLfloat* data)
 {
     glUniform3fv(sun_color, 1, data);
-}
-
-void gearoenix::gles2::shader::DirectionalColoredSpeculatedBakedShadowlessOpaque::set_color(const GLfloat* data)
-{
-    glUniform3fv(color, 1, data);
 }
 
 void gearoenix::gles2::shader::DirectionalColoredSpeculatedBakedShadowlessOpaque::set_ambl_color(const GLfloat* data)

@@ -63,12 +63,22 @@ gearoenix::core::Id gearoenix::render::material::DirectionalD2SpeculatedNonrefle
     return SHADER_ID;
 }
 
+bool gearoenix::render::material::DirectionalD2SpeculatedNonreflectiveFullOpaque::needs_mvp() const
+{
+    return false;
+}
+
+bool gearoenix::render::material::DirectionalD2SpeculatedNonreflectiveFullOpaque::needs_dbm() const
+{
+    return false;
+}
+
 void gearoenix::render::material::DirectionalD2SpeculatedNonreflectiveFullOpaque::update(const scene::Scene* s, const model::Model* m)
 {
     u.ambl_color = s->get_ambient_light();
     u.eye = s->get_current_camera()->get_location();
     u.m = m->get_m();
-    u.mvp = m->get_mvp();
+    u.vp = s->get_current_camera()->get_view_projection();
     u.sun = s->get_sun()->get_direction();
     u.sun_color = s->get_sun()->get_color();
     u.db = s->get_sun()->get_bias();

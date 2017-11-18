@@ -27,7 +27,6 @@ namespace gles2 {
             GLuint m;
             GLuint sun;
             GLuint sun_color;
-            GLuint color;
             GLuint ambl_color;
             GLuint vtx_shd;
             GLuint frg_shd;
@@ -40,7 +39,6 @@ namespace gles2 {
             void use();
             const std::vector<render::shader::stage::Id>& get_stages_ids() const;
             void set_ambl_color(const GLfloat* data);
-            void set_color(const GLfloat* data);
             void set_mvp(const GLfloat* data);
             void set_m(const GLfloat* data);
             void set_sun(const GLfloat* data);

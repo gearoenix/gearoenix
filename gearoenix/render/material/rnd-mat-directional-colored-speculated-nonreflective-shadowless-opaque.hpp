@@ -22,7 +22,7 @@ namespace render {
                 Resources(Engine* e, pipeline::Pipeline* pip, buffer::Uniform* u);
             };
             typedef struct {
-                math::Mat4x4 mvp;
+                math::Mat4x4 vp;
                 math::Mat4x4 m;
                 math::Vec3 sun = math::Vec3(0.0f, 0.0f, -1.0f);
                 math::Vec3 sun_color = math::Vec3(1.0f, 1.0f, 1.0f);
@@ -30,11 +30,11 @@ namespace render {
                 math::Vec3 spec_color = math::Vec3(1.0f, 1.0f, 1.0f);
                 math::Vec3 spec_factors = math::Vec3(0.5f, 0.5f, 0.5f);
                 math::Vec3 ambl_color = math::Vec3(0.2f, 0.2f, 0.2f);
-                math::Vec3 color = math::Vec3(0.3f, 0.02f, 0.02f);
             } Uniform;
 
         private:
             Uniform u;
+            math::Vec3 color = math::Vec3(0.3f, 0.02f, 0.02f);
             Resources* shdrsc;
 
         public:
@@ -42,6 +42,8 @@ namespace render {
             ~DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque();
             unsigned int get_vertex_elements_count() const;
             core::Id get_shader_id() const;
+            bool needs_mvp() const;
+            bool needs_dbm() const;
             void update(const scene::Scene* s, const model::Model* m);
             void bind(texture::Texture2D* shadow_texture);
         };

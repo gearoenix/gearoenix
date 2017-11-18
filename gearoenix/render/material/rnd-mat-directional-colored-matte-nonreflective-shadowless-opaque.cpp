@@ -22,7 +22,7 @@ gearoenix::render::material::DirectionalColoredMatteNonreflectiveShadowlessOpaqu
 gearoenix::render::material::DirectionalColoredMatteNonreflectiveShadowlessOpaque::DirectionalColoredMatteNonreflectiveShadowlessOpaque(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> end)
     : Material(SHADER_ID, sizeof(u), e, end)
 {
-    u.color.read(f);
+    color.read(f);
     shdrsc = reinterpret_cast<Resources*>(e->create_shader_resources(SHADER_ID, pl.get(), ub, end));
 }
 
@@ -40,14 +40,23 @@ gearoenix::core::Id gearoenix::render::material::DirectionalColoredMatteNonrefle
 {
     return SHADER_ID;
 }
+bool gearoenix::render::material::DirectionalColoredMatteNonreflectiveShadowlessOpaque::needs_mvp() const
+{
+    return true;
+}
+
+bool gearoenix::render::material::DirectionalColoredMatteNonreflectiveShadowlessOpaque::needs_dbm() const
+{
+    return false;
+}
 
 void gearoenix::render::material::DirectionalColoredMatteNonreflectiveShadowlessOpaque::update(const scene::Scene* s, const model::Model* m)
 {
-    u.ambl_color = s->get_ambient_light() * u.color;
+    u.ambl_color = s->get_ambient_light() * color;
     u.m = m->get_m();
     u.mvp = m->get_mvp();
     u.sun = s->get_sun()->get_direction();
-    u.sun_color = s->get_sun()->get_color();
+    u.sun_color = s->get_sun()->get_color() * color;
     ub->update(&u, sizeof(Uniform));
 }
 

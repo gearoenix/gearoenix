@@ -20,7 +20,7 @@ void gearoenix::gles2::shader::DirectionalD2SpeculatedNonreflectiveShadowlessOpa
     shd->set_ambl_color(data->ambl_color.data());
     shd->set_eye(data->eye.data());
     shd->set_m(data->m.data());
-    shd->set_mvp(data->mvp.data());
+    shd->set_vp(data->vp.data());
     shd->set_spec_color(data->spec_color.data());
     shd->set_spec_factors(data->spec_factors.data());
     shd->set_sun(data->sun.data());
@@ -41,7 +41,7 @@ gearoenix::gles2::shader::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque::
                                 "varying vec2 out_uv;\n"
                                 "varying float out_diffuse;\n"
                                 "varying float out_speculare;\n"
-                                "uniform mat4 mvp;\n"
+                                "uniform mat4 vp;\n"
                                 "uniform mat4 m;\n"
                                 "uniform vec3 sun;\n"
                                 "uniform vec3 eye;\n"
@@ -54,7 +54,7 @@ gearoenix::gles2::shader::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque::
                                 "    out_uv = uv;\n"
                                 "    out_diffuse = dot(sun, world_normal);\n"
                                 "    out_speculare = -dot(normalize(eye - world_position.xyz), reflected);\n"
-                                "    gl_Position = mvp * position;\n"
+                                "    gl_Position = vp * world_position;\n"
                                 "}\n";
         const std::string pfs = "precision highp sampler2D;\n"
                                 "precision highp float;\n"
@@ -82,7 +82,7 @@ gearoenix::gles2::shader::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque::
         vtx_att_ind = glGetAttribLocation(shader_program, "vertex");
         nrm_att_ind = glGetAttribLocation(shader_program, "normal");
         uv_att_ind = glGetAttribLocation(shader_program, "uv");
-        mvp = get_uniform_location("mvp");
+        vp = get_uniform_location("vp");
         m = get_uniform_location("m");
         sun = get_uniform_location("sun");
         sun_color = get_uniform_location("sun_color");
@@ -122,9 +122,9 @@ const std::vector<gearoenix::render::shader::stage::Id>& gearoenix::gles2::shade
     return graphic_2_stage;
 }
 
-void gearoenix::gles2::shader::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque::set_mvp(const GLfloat* data)
+void gearoenix::gles2::shader::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque::set_vp(const GLfloat* data)
 {
-    glUniformMatrix4fv(mvp, 1, GL_FALSE, data);
+    glUniformMatrix4fv(vp, 1, GL_FALSE, data);
 }
 
 void gearoenix::gles2::shader::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque::set_m(const GLfloat* data)

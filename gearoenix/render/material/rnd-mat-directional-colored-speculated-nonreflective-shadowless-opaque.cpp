@@ -22,7 +22,7 @@ gearoenix::render::material::DirectionalColoredSpeculatedNonreflectiveShadowless
 gearoenix::render::material::DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque::DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> end)
     : Material(SHADER_ID, sizeof(u), e, end)
 {
-    u.color.read(f);
+    color.read(f);
     u.spec_color.read(f);
     u.spec_factors.read(f);
     shdrsc = reinterpret_cast<Resources*>(e->create_shader_resources(SHADER_ID, pl.get(), ub, end));
@@ -43,13 +43,23 @@ gearoenix::core::Id gearoenix::render::material::DirectionalColoredSpeculatedNon
     return SHADER_ID;
 }
 
+bool gearoenix::render::material::DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque::needs_mvp() const
+{
+    return false;
+}
+
+bool gearoenix::render::material::DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque::needs_dbm() const
+{
+    return false;
+}
+
 void gearoenix::render::material::DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque::update(const scene::Scene* s, const model::Model* m)
 {
-    u.ambl_color = s->get_ambient_light() * u.color;
+    u.ambl_color = s->get_ambient_light() * color;
     u.m = m->get_m();
-    u.mvp = m->get_mvp();
+    u.vp = s->get_current_camera()->get_view_projection();
     u.sun = s->get_sun()->get_direction();
-    u.sun_color = s->get_sun()->get_color();
+    u.sun_color = s->get_sun()->get_color() * color;
     u.eye = s->get_current_camera()->get_location();
     ub->update(&u, sizeof(Uniform));
 }

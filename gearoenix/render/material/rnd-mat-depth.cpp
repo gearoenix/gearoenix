@@ -32,6 +32,16 @@ gearoenix::core::Id gearoenix::render::material::Depth::get_shader_id() const
     return SHADER_ID;
 }
 
+bool gearoenix::render::material::Depth::needs_mvp() const
+{
+    return true;
+}
+
+bool gearoenix::render::material::Depth::needs_dbm() const
+{
+    return false;
+}
+
 void gearoenix::render::material::Depth::update(const scene::Scene* s, const model::Model* m)
 {
     u.mvp = s->get_sun()->get_camera()->get_view_projection() * m->get_m();

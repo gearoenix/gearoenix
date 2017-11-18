@@ -26,7 +26,7 @@ namespace render {
                 void set_texture(texture::Texture2D* t);
             };
             typedef struct {
-                math::Mat4x4 mvp;
+                math::Mat4x4 vp;
                 math::Mat4x4 m;
                 math::Vec3 sun;
                 math::Vec3 sun_color;
@@ -46,6 +46,8 @@ namespace render {
             ~DirectionalD2SpeculatedNonreflectiveShadowlessOpaque();
             unsigned int get_vertex_elements_count() const;
             core::Id get_shader_id() const;
+            bool needs_mvp() const;
+            bool needs_dbm() const;
             void update(const scene::Scene* s, const model::Model* m);
             void bind(texture::Texture2D* shadow_texture);
         };
