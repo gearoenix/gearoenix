@@ -12,8 +12,6 @@
 #include "../scene/rnd-scn-scene.hpp"
 #include "../texture/rnd-txt-texture-2d.hpp"
 
-const gearoenix::core::Id gearoenix::render::material::ShadelessD2MatteNonreflectiveShadowlessOpaque::SHADER_ID = gearoenix::render::shader::SHADELESS_D2_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE;
-
 gearoenix::render::material::ShadelessD2MatteNonreflectiveShadowlessOpaque::Resources::Resources(Engine* e, pipeline::Pipeline* pip, buffer::Uniform* u)
     : shader::Resources(e, pip, u)
 {
@@ -24,8 +22,9 @@ void gearoenix::render::material::ShadelessD2MatteNonreflectiveShadowlessOpaque:
     txt2d = t2d;
 }
 
-gearoenix::render::material::ShadelessD2MatteNonreflectiveShadowlessOpaque::ShadelessD2MatteNonreflectiveShadowlessOpaque(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> end)
-    : Material(SHADER_ID, sizeof(u), e, end)
+gearoenix::render::material::ShadelessD2MatteNonreflectiveShadowlessOpaque::ShadelessD2MatteNonreflectiveShadowlessOpaque(core::Id sid, system::File* f, Engine* e, std::shared_ptr<core::EndCaller> end)
+    : Material(sid, sizeof(u), e, end)
+    , SHADER_ID(sid)
 {
     core::Id texid;
     f->read(texid);

@@ -16,7 +16,6 @@ namespace render {
     namespace material {
         class ShadelessD2MatteNonreflectiveShadowlessOpaque : public Material {
         public:
-            const static core::Id SHADER_ID;
             class Resources : public shader::Resources {
             protected:
                 texture::Texture2D* txt2d;
@@ -30,12 +29,13 @@ namespace render {
             } Uniform;
 
         private:
+            const core::Id SHADER_ID;
             Uniform u;
             Resources* shdrsc;
             std::shared_ptr<texture::Texture2D> txt2d;
 
         public:
-            ShadelessD2MatteNonreflectiveShadowlessOpaque(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> end);
+            ShadelessD2MatteNonreflectiveShadowlessOpaque(core::Id sid, system::File* f, Engine* e, std::shared_ptr<core::EndCaller> end);
             ~ShadelessD2MatteNonreflectiveShadowlessOpaque();
             unsigned int get_vertex_elements_count() const;
             core::Id get_shader_id() const;
