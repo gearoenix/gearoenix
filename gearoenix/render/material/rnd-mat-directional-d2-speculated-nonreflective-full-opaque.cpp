@@ -75,12 +75,12 @@ bool gearoenix::render::material::DirectionalD2SpeculatedNonreflectiveFullOpaque
 void gearoenix::render::material::DirectionalD2SpeculatedNonreflectiveFullOpaque::update(const scene::Scene* s, const model::Model* m)
 {
     u.ambl_color = s->get_ambient_light();
+    u.db = s->get_sun()->get_bias();
     u.eye = s->get_current_camera()->get_location();
     u.m = m->get_m();
-    u.vp = s->get_current_camera()->get_view_projection();
     u.sun = s->get_sun()->get_direction();
     u.sun_color = s->get_sun()->get_color();
-    u.db = s->get_sun()->get_bias();
+    u.vp = s->get_current_camera()->get_view_projection();
     ub->update(&u, sizeof(Uniform));
 }
 

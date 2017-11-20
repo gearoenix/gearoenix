@@ -15,6 +15,7 @@
 #include "shader/gles2-shd-directional-colored-speculated-baked-full-opaque.hpp"
 #include "shader/gles2-shd-directional-colored-speculated-baked-shadowless-opaque.hpp"
 #include "shader/gles2-shd-directional-colored-speculated-nonreflective-shadowless-opaque.hpp"
+#include "shader/gles2-shd-directional-d2-speculated-baked-full-opaque.hpp"
 #include "shader/gles2-shd-directional-d2-speculated-nonreflective-full-opaque.hpp"
 #include "shader/gles2-shd-directional-d2-speculated-nonreflective-shadowless-opaque.hpp"
 #include "shader/gles2-shd-shadeless-colored-matte-nonreflective-shadowless-opaque.hpp"
@@ -233,6 +234,8 @@ gearoenix::render::shader::Shader* gearoenix::gles2::Engine::create_shader(core:
         return new shader::DirectionalColoredSpeculatedBakedFullOpaque(this, c);
     case render::shader::DIRECTIONAL_COLORED_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE:
         return new shader::DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque(this, c);
+    case render::shader::DIRECTIONAL_D2_SPECULATED_BAKED_FULL_OPAQUE:
+        return new shader::DirectionalD2SpeculatedBakedFullOpaque(this, c);
     case render::shader::DIRECTIONAL_D2_SPECULATED_NONREFLECTIVE_FULL_OPAQUE:
         return new shader::DirectionalD2SpeculatedNonreflectiveFullOpaque(this, c);
     case render::shader::DIRECTIONAL_D2_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE:
@@ -267,6 +270,8 @@ gearoenix::render::shader::Resources* gearoenix::gles2::Engine::create_shader_re
         return new shader::DirectionalColoredSpeculatedBakedFullOpaque::Resources(this, pip, u);
     case render::shader::DIRECTIONAL_COLORED_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE:
         return new shader::DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque::Resources(this, pip, u);
+    case render::shader::DIRECTIONAL_D2_SPECULATED_BAKED_FULL_OPAQUE:
+        return new shader::DirectionalD2SpeculatedBakedFullOpaque::Resources(this, pip, u);
     case render::shader::DIRECTIONAL_D2_SPECULATED_NONREFLECTIVE_FULL_OPAQUE:
         return new shader::DirectionalD2SpeculatedNonreflectiveFullOpaque::Resources(this, pip, u);
     case render::shader::DIRECTIONAL_D2_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE:

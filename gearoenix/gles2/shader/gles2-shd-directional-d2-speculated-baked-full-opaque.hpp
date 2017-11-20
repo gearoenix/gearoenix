@@ -1,8 +1,8 @@
-#ifndef GEAROENIX_GLES2_SHADER_DIRECTIONAL_D2_SPECULATED_NONREFLECTIVE_FULL_OPAQUE_HPP
-#define GEAROENIX_GLES2_SHADER_DIRECTIONAL_D2_SPECULATED_NONREFLECTIVE_FULL_OPAQUE_HPP
+#ifndef GEAROENIX_GLES2_SHADER_DIRECTIONAL_D2_SPECULATED_BAKED_FULL_OPAQUE_HPP
+#define GEAROENIX_GLES2_SHADER_DIRECTIONAL_D2_SPECULATED_BAKED_FULL_OPAQUE_HPP
 #include "../../core/cr-build-configuration.hpp"
 #ifdef USE_OPENGL_ES2
-#include "../../render/material/rnd-mat-directional-d2-speculated-nonreflective-full-opaque.hpp"
+#include "../../render/material/rnd-mat-directional-d2-speculated-baked-full-opaque.hpp"
 #include "../gles2.hpp"
 #include "gles2-shader.hpp"
 namespace gearoenix {
@@ -14,9 +14,9 @@ namespace gles2 {
         class Pipeline;
     }
     namespace shader {
-        class DirectionalD2SpeculatedNonreflectiveFullOpaque : public Shader {
+        class DirectionalD2SpeculatedBakedFullOpaque : public Shader {
         public:
-            class Resources : public render::material::DirectionalD2SpeculatedNonreflectiveFullOpaque::Resources {
+            class Resources : public render::material::DirectionalD2SpeculatedBakedFullOpaque::Resources {
             public:
                 Resources(Engine* e, pipeline::Pipeline* pip, buffer::Uniform* u);
                 void bind();
@@ -27,12 +27,14 @@ namespace gles2 {
             GLuint db;
             GLuint eye;
             GLuint m;
+            GLuint rfl_fac;
             GLuint spec_color;
             GLuint spec_factors;
             GLuint sun;
             GLuint sun_color;
             GLuint vp;
 
+            GLuint rfl_env;
             GLuint txt;
             GLuint shdtxt;
 
@@ -44,8 +46,8 @@ namespace gles2 {
             GLint uv_att_ind;
 
         public:
-            DirectionalD2SpeculatedNonreflectiveFullOpaque(Engine* eng, std::shared_ptr<core::EndCaller> end);
-            ~DirectionalD2SpeculatedNonreflectiveFullOpaque();
+            DirectionalD2SpeculatedBakedFullOpaque(Engine* eng, std::shared_ptr<core::EndCaller> end);
+            ~DirectionalD2SpeculatedBakedFullOpaque();
             void use();
             const std::vector<render::shader::stage::Id>& get_stages_ids() const;
             void set_vp(const GLfloat* data);
@@ -57,6 +59,7 @@ namespace gles2 {
             void set_spec_factors(const GLfloat* data);
             void set_ambl_color(const GLfloat* data);
             void set_db(const GLfloat* data);
+            void set_rfl_fac(const GLfloat data);
         };
     }
 }
