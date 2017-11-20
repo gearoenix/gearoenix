@@ -12,6 +12,7 @@
 #include "../rnd-engine.hpp"
 #include "../scene/rnd-scn-scene.hpp"
 #include "../texture/rnd-txt-texture-2d.hpp"
+#include "../texture/rnd-txt-texture-cube.hpp"
 
 const gearoenix::core::Id gearoenix::render::material::DirectionalColoredSpeculatedBakedFullOpaque::SHADER_ID = gearoenix::render::shader::DIRECTIONAL_COLORED_SPECULATED_BAKED_FULL_OPAQUE;
 
@@ -78,12 +79,12 @@ bool gearoenix::render::material::DirectionalColoredSpeculatedBakedFullOpaque::n
 void gearoenix::render::material::DirectionalColoredSpeculatedBakedFullOpaque::update(const scene::Scene* s, const model::Model* m)
 {
     u.ambl_color = s->get_ambient_light() * color;
-    u.eye = s->get_current_camera()->get_location();
+    u.db = s->get_sun()->get_bias();
     u.m = m->get_m();
-    u.vp = s->get_current_camera()->get_view_projection();
     u.sun = s->get_sun()->get_direction();
     u.sun_color = s->get_sun()->get_color() * color;
-    u.db = s->get_sun()->get_bias();
+    u.eye = s->get_current_camera()->get_location();
+    u.vp = s->get_current_camera()->get_view_projection();
     ub->update(&u, sizeof(Uniform));
 }
 

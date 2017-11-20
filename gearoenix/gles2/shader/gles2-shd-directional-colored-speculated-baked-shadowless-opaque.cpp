@@ -4,6 +4,7 @@
 #include "../buffer/gles2-buf-uniform.hpp"
 #include "../gles2-engine.hpp"
 #include "../pipeline/gles2-pip-pipeline.hpp"
+#include "../texture/gles2-txt-cube.hpp"
 
 gearoenix::gles2::shader::DirectionalColoredSpeculatedBakedShadowlessOpaque::Resources::Resources(Engine* e, pipeline::Pipeline* pip, buffer::Uniform* u)
     : render::material::DirectionalColoredSpeculatedBakedShadowlessOpaque::Resources(e, pip, u)
@@ -15,15 +16,18 @@ void gearoenix::gles2::shader::DirectionalColoredSpeculatedBakedShadowlessOpaque
     render::material::DirectionalColoredSpeculatedBakedShadowlessOpaque::Uniform* data = reinterpret_cast<render::material::DirectionalColoredSpeculatedBakedShadowlessOpaque::Uniform*>(u->get_data());
     DirectionalColoredSpeculatedBakedShadowlessOpaque* shd = reinterpret_cast<DirectionalColoredSpeculatedBakedShadowlessOpaque*>(pip->get_shader());
     shd->use();
+
     shd->set_ambl_color(data->ambl_color.data());
     shd->set_eye(data->eye.data());
     shd->set_m(data->m.data());
-    shd->set_vp(data->vp.data());
+    shd->set_rfl_fac(data->rfl_fac);
     shd->set_spec_color(data->spec_color.data());
     shd->set_spec_factors(data->spec_factors.data());
     shd->set_sun(data->sun.data());
     shd->set_sun_color(data->sun_color.data());
-    shd->set_rfl_fac(data->rfl_fac);
+    shd->set_vp(data->vp.data());
+
+    reinterpret_cast<texture::Cube*>(env)->bind(GL_TEXTURE0);
 }
 
 gearoenix::gles2::shader::DirectionalColoredSpeculatedBakedShadowlessOpaque::DirectionalColoredSpeculatedBakedShadowlessOpaque(Engine* eng, std::shared_ptr<core::EndCaller> end)
@@ -77,18 +81,22 @@ gearoenix::gles2::shader::DirectionalColoredSpeculatedBakedShadowlessOpaque::Dir
                                 "}\n";
         vtx_shd = add_shader_to_program(pvs, GL_VERTEX_SHADER);
         frg_shd = add_shader_to_program(pfs, GL_FRAGMENT_SHADER);
+
         run();
+
         vtx_att_ind = glGetAttribLocation(shader_program, "vertex");
         nrm_att_ind = glGetAttribLocation(shader_program, "normal");
-        m = get_uniform_location("m");
-        vp = get_uniform_location("vp");
-        sun = get_uniform_location("sun");
-        eye = get_uniform_location("eye");
-        sun_color = get_uniform_location("sun_color");
+
         ambl_color = get_uniform_location("ambl_color");
+        eye = get_uniform_location("eye");
+        rfl_fac = get_uniform_location("rfl_fac");
+        m = get_uniform_location("m");
         spec_color = get_uniform_location("spec_color");
         spec_factors = get_uniform_location("spec_factors");
-        rfl_fac = get_uniform_location("rfl_fac");
+        sun = get_uniform_location("sun");
+        sun_color = get_uniform_location("sun_color");
+        vp = get_uniform_location("vp");
+
         rfl_env = get_uniform_location("rfl_env");
         (void)end;
     });
@@ -96,9 +104,11 @@ gearoenix::gles2::shader::DirectionalColoredSpeculatedBakedShadowlessOpaque::Dir
 
 gearoenix::gles2::shader::DirectionalColoredSpeculatedBakedShadowlessOpaque::~DirectionalColoredSpeculatedBakedShadowlessOpaque()
 {
-    end_object(vtx_shd);
-    end_object(frg_shd);
-    end_program();
+    eng->add_load_function([this] {
+        end_object(vtx_shd);
+        end_object(frg_shd);
+        end_program();
+    });
 }
 
 void gearoenix::gles2::shader::DirectionalColoredSpeculatedBakedShadowlessOpaque::use()
@@ -109,6 +119,7 @@ void gearoenix::gles2::shader::DirectionalColoredSpeculatedBakedShadowlessOpaque
     //////////////////////////////////////////////////////
     glVertexAttribPointer(vtx_att_ind, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void*)0);
     glVertexAttribPointer(nrm_att_ind, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
+    glUniform1i(rfl_fac, 0);
 }
 
 const std::vector<gearoenix::render::shader::stage::Id>& gearoenix::gles2::shader::DirectionalColoredSpeculatedBakedShadowlessOpaque::get_stages_ids() const

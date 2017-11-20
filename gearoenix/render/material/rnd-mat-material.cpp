@@ -9,6 +9,7 @@
 #include "../rnd-engine.hpp"
 #include "rnd-mat-depth.hpp"
 #include "rnd-mat-directional-colored-matte-nonreflective-shadowless-opaque.hpp"
+#include "rnd-mat-directional-colored-speculated-baked-full-opaque.hpp"
 #include "rnd-mat-directional-colored-speculated-baked-shadowless-opaque.hpp"
 #include "rnd-mat-directional-colored-speculated-nonreflective-shadowless-opaque.hpp"
 #include "rnd-mat-directional-d2-speculated-nonreflective-full-opaque.hpp"
@@ -48,6 +49,8 @@ gearoenix::render::material::Material* gearoenix::render::material::Material::re
     case shader::DIRECTIONAL_COLORED_SPECULATED_BAKED_CASTER_OPAQUE:
     case shader::DIRECTIONAL_COLORED_SPECULATED_BAKED_SHADOWLESS_OPAQUE:
         return new DirectionalColoredSpeculatedBakedShadowlessOpaque(sid, f, e, end);
+    case shader::DIRECTIONAL_COLORED_SPECULATED_BAKED_FULL_OPAQUE:
+        return new DirectionalColoredSpeculatedBakedFullOpaque(f, e, end);
     case shader::DIRECTIONAL_COLORED_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE:
         return new DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque(f, e, end);
     case shader::DIRECTIONAL_D2_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE:

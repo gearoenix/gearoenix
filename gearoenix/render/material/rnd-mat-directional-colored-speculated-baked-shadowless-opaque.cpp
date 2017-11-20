@@ -71,10 +71,10 @@ void gearoenix::render::material::DirectionalColoredSpeculatedBakedShadowlessOpa
 {
     u.ambl_color = s->get_ambient_light() * color;
     u.m = m->get_m();
-    u.vp = s->get_current_camera()->get_view_projection();
     u.sun = s->get_sun()->get_direction();
     u.sun_color = s->get_sun()->get_color() * color;
     u.eye = s->get_current_camera()->get_location();
+    u.vp = s->get_current_camera()->get_view_projection();
     ub->update(&u, sizeof(Uniform));
 }
 

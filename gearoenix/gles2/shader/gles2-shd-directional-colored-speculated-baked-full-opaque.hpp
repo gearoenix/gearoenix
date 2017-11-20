@@ -23,22 +23,25 @@ namespace gles2 {
             };
 
         protected:
-            GLuint vp;
-            GLuint m;
-            GLuint sun;
-            GLuint sun_color;
-            GLuint eye;
-            GLuint spec_color;
-            GLuint spec_factors;
             GLuint ambl_color;
             GLuint db;
-            GLuint txt;
+            GLuint eye;
+            GLuint m;
+            GLuint rfl_fac;
+            GLuint spec_color;
+            GLuint spec_factors;
+            GLuint sun;
+            GLuint sun_color;
+            GLuint vp;
+
+            GLuint rfl_env;
             GLuint shdtxt;
+
             GLuint vtx_shd;
             GLuint frg_shd;
+
             GLint vtx_att_ind;
             GLint nrm_att_ind;
-            GLint uv_att_ind;
 
         public:
             DirectionalColoredSpeculatedBakedFullOpaque(Engine* eng, std::shared_ptr<core::EndCaller> end);
@@ -54,6 +57,7 @@ namespace gles2 {
             void set_spec_factors(const GLfloat* data);
             void set_ambl_color(const GLfloat* data);
             void set_db(const GLfloat* data);
+            void set_rfl_fac(const GLfloat data);
         };
     }
 }

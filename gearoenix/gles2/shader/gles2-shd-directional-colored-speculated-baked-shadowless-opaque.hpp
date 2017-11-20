@@ -23,18 +23,21 @@ namespace gles2 {
             };
 
         protected:
-            GLuint vp;
-            GLuint m;
-            GLuint sun;
-            GLuint sun_color;
+            GLuint ambl_color;
             GLuint eye;
+            GLuint m;
+            GLuint rfl_fac;
             GLuint spec_color;
             GLuint spec_factors;
-            GLuint ambl_color;
-            GLuint rfl_fac;
+            GLuint sun;
+            GLuint sun_color;
+            GLuint vp;
+
             GLuint rfl_env;
+
             GLuint vtx_shd;
             GLuint frg_shd;
+
             GLint vtx_att_ind;
             GLint nrm_att_ind;
 
