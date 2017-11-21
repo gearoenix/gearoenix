@@ -12,11 +12,9 @@ namespace render {
         public:
             static void decode(
                 system::File* file,
-                Engine* engine,
                 std::vector<unsigned char>& decoded_data,
                 unsigned int& width,
-                unsigned int& height,
-                unsigned int& channels);
+                unsigned int& height);
         };
     }
 }

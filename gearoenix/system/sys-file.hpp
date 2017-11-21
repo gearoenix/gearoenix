@@ -28,7 +28,7 @@ namespace system {
 #ifdef USE_STD_FILE
         std::ifstream file;
 #elif defined(IN_ANDROID)
-        system::Application* sys_app;
+        //system::Application* sys_app;
         AAsset* file;
 #else
 #error "Unimplemented yet!"

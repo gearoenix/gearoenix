@@ -1,60 +1,39 @@
-#include "../../core/cr-build-configuration.hpp"
-
+#include "sys-and-app.hpp"
 #ifdef IN_ANDROID
-
-#include "../../core/application.hpp"
-#include "../../render/render-engine.hpp"
-#include "../log.hpp"
+#include "../../core/cr-application.hpp"
+#include "../../render/rnd-engine.hpp"
 #include "../sys-file.hpp"
-#include "and-app.hpp"
+#include "../sys-log.hpp"
 #include <android_native_app_glue.h>
 #include <string>
 
 void gearoenix::system::Application::handle_cmd(android_app* app, int32_t cmd)
 {
-    auto sys_app = reinterpret_cast<Application*>(app->userData);
-    if (sys_app != nullptr) {
-        sys_app->handle(cmd);
-        return;
-    }
-    switch (cmd) {
-    case APP_CMD_INIT_WINDOW:
-        app->userData = new Application(app);
-        break;
-    default:
-        LOGI(std::string("event not handled: ") + std::to_string(cmd));
-    }
-}
-
-void android_main(struct android_app* app)
-{
-    app_dummy();
-    app->onAppCmd = gearoenix::system::Application::handle_cmd;
-    int events;
-    android_poll_source* source;
-    do {
-        if (ALooper_pollAll(1, nullptr, &events, (void**)&source) >= 0) {
-            if (source != nullptr)
-                source->process(app, source);
-        }
-        if (app->userData != nullptr) {
-            break;
-        }
-    } while (app->destroyRequested == 0);
-    auto sys_app = reinterpret_cast<gearoenix::system::Application*>(app->userData);
-    sys_app->execute();
-    delete sys_app;
+    Application* sys_app = reinterpret_cast<Application*>(app->userData);
+    sys_app->handle(cmd);
 }
 
 gearoenix::system::Application::Application(android_app* and_app)
     : and_app(and_app)
 {
+    and_app->userData = this;
+    and_app->onAppCmd = gearoenix::system::Application::handle_cmd;
+    int events;
+    android_poll_source* source;
+    do {
+        if (ALooper_pollAll(1, nullptr, &events, (void**)&source) >= 0) {
+            if (source != nullptr)
+                source->process(and_app, source);
+        }
+    } while (and_app->destroyRequested == 0);
 }
 
 gearoenix::system::Application::~Application()
 {
-    render_engine = nullptr;
+    delete core_app;
     core_app = nullptr;
+    delete render_engine;
+    render_engine = nullptr;
 }
 
 android_app* gearoenix::system::Application::get_android_app() const
@@ -62,72 +41,122 @@ android_app* gearoenix::system::Application::get_android_app() const
     return and_app;
 }
 
-const std::shared_ptr<gearoenix::core::Application>& gearoenix::system::Application::get_core_app() const
+const gearoenix::core::Application* gearoenix::system::Application::get_core_app() const
 {
     return core_app;
 }
 
-const std::shared_ptr<gearoenix::render::Engine>& gearoenix::system::Application::get_render_engine() const
+gearoenix::core::Application* gearoenix::system::Application::get_core_app()
+{
+    return core_app;
+}
+
+const gearoenix::render::Engine* gearoenix::system::Application::get_render_engine() const
 {
     return render_engine;
 }
 
-void gearoenix::system::Application::execute()
+gearoenix::render::Engine* gearoenix::system::Application::get_render_engine()
 {
-    std::lock_guard<std::mutex> exe_lock(execution_lock);
-    init();
+    return render_engine;
+}
+
+const gearoenix::core::asset::Manager* gearoenix::system::Application::get_asset_manager() const
+{
+    return astmgr;
+}
+
+gearoenix::core::asset::Manager* gearoenix::system::Application::get_asset_manager()
+{
+    return astmgr;
+}
+
+gearoenix::core::Real gearoenix::system::Application::get_window_ratio() const
+{
+    return ((gearoenix::core::Real)win_width) / ((gearoenix::core::Real)win_height);
+}
+
+unsigned int gearoenix::system::Application::get_width() const
+{
+    return win_width;
+}
+
+unsigned int gearoenix::system::Application::get_height() const
+{
+    return win_height;
+}
+
+void gearoenix::system::Application::execute(core::Application* app)
+{
+    core_app = app;
     int events;
     android_poll_source* source;
     do {
-        if (ALooper_pollAll(is_active ? 0 : 1, nullptr, &events,
+        if (ALooper_pollAll(0, nullptr, &events,
                 (void**)&source)
             >= 0) {
             if (source != nullptr)
                 source->process(and_app, source);
         }
-        if (is_active) {
-            render_engine->update();
-            core_app->update();
-        }
-    } while (and_app->destroyRequested == 0 && is_alive);
-    (void)exe_lock;
-}
-
-const std::shared_ptr<gearoenix::system::File>& gearoenix::system::Application::get_asset() const
-{
-    return asset;
+    } while (and_app->destroyRequested == 0);
 }
 
 void gearoenix::system::Application::handle(int32_t cmd)
 {
     switch (cmd) {
+    case APP_CMD_INIT_WINDOW:
+        if (and_app->window != nullptr) {
+            const EGLint attribs[] = {
+                EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
+                EGL_BLUE_SIZE, 8,
+                EGL_GREEN_SIZE, 8,
+                EGL_RED_SIZE, 8,
+                EGL_NONE
+            };
+            EGLint w, h, format;
+            EGLint num_configs;
+            EGLConfig config;
+            display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
+            eglInitialize(display, 0, 0);
+            eglChooseConfig(display, attribs, nullptr, 0, &num_configs);
+            std::unique_ptr<EGLConfig[]> supported_configs(new EGLConfig[num_configs]);
+            eglChooseConfig(display, attribs, supported_configs.get(), num_configs, &num_configs);
+            if (num_configs == 0)
+                UNEXPECTED;
+            int i = 0;
+            for (; i < num_configs; i++) {
+                EGLConfig& cfg = supported_configs[i];
+                EGLint r, g, b, d;
+                if (eglGetConfigAttrib(display, cfg, EGL_RED_SIZE, &r) && eglGetConfigAttrib(display, cfg, EGL_GREEN_SIZE, &g) && eglGetConfigAttrib(display, cfg, EGL_BLUE_SIZE, &b) && eglGetConfigAttrib(display, cfg, EGL_DEPTH_SIZE, &d) && r == 8 && g == 8 && b == 8 && d == 24) {
+
+                    config = supported_configs[i];
+                    break;
+                }
+            }
+            if (i == num_configs) {
+                config = supported_configs[0];
+            }
+            eglGetConfigAttrib(display, config, EGL_NATIVE_VISUAL_ID, &format);
+            surface = eglCreateWindowSurface(display, config, this->and_app->window, NULL);
+            context = eglCreateContext(display, config, NULL, NULL);
+            if (eglMakeCurrent(display, surface, surface, context) == EGL_FALSE) {
+                LOGF("Unable to eglMakeCurrent");
+            }
+            eglQuerySurface(display, surface, EGL_WIDTH, &w);
+            eglQuerySurface(display, surface, EGL_HEIGHT, &h);
+            win_width = (unsigned int)w;
+            win_height = (unsigned int)h;
+        }
+        break;
     case APP_CMD_LOST_FOCUS:
         if (core_app != nullptr)
             core_app->terminate();
         if (render_engine != nullptr)
             render_engine->terminate();
-        asset = nullptr;
-        core_app = nullptr;
-        render_engine = nullptr;
-        is_active = false;
-        break;
-    case APP_CMD_INIT_WINDOW:
-        if (!is_active) {
-            init();
-            render_engine->window_changed();
-            is_active = true;
-        }
         break;
     default:
-        LOGI(std::string("event not handled: ") + std::to_string(cmd));
+        LOGI("event not handled: " << cmd);
     }
-}
-
-void gearoenix::system::Application::init()
-{
-    asset = std::shared_ptr<File>(new File(this));
-    render_engine = std::shared_ptr<render::Engine>(new render::Engine(this));
-    core_app = std::shared_ptr<core::Application>(new core::Application(this));
 }
 
 #endif

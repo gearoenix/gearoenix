@@ -1,6 +1,10 @@
 #ifndef GEAROENIX_CORE_APPLICATION_HPP
 #define GEAROENIX_CORE_APPLICATION_HPP
+#include "cr-build-configuration.hpp"
 #include "cr-types.hpp"
+#ifdef IN_ANDROID
+#include <android_native_app_glue.h>
+#endif
 namespace gearoenix {
 namespace system {
     class Application;
@@ -34,7 +38,7 @@ namespace core {
     };
 }
 }
-
+#ifndef IN_ANDROID
 #define GEAROENIX_START(CoreApp)                                                    \
     int main(int, char**)                                                           \
     {                                                                               \
@@ -44,4 +48,14 @@ namespace core {
         delete app;                                                                 \
         return 0;                                                                   \
     }
+#else
+#define GEAROENIX_START(CoreApp)                                                         \
+    void android_main(struct android_app* state)                                         \
+    {                                                                                    \
+        gearoenix::system::Application* app = new gearoenix::system::Application(state); \
+        CoreApp* core_app = new CoreApp(app);                                            \
+        app->execute(core_app);                                                          \
+        delete app;                                                                      \
+    }
+#endif
 #endif

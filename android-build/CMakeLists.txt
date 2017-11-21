@@ -90,6 +90,7 @@ add_library(
     ${APP_SRC_DIR}/gearoenix/render/scene/rnd-scn-scene.cpp
     ${APP_SRC_DIR}/gearoenix/render/shader/rnd-shd-resources.cpp
     ${APP_SRC_DIR}/gearoenix/render/shader/rnd-shd-shader.cpp
+    ${APP_SRC_DIR}/gearoenix/render/texture/rnd-txt-lodepng.cpp
     ${APP_SRC_DIR}/gearoenix/render/texture/rnd-txt-png.cpp
     ${APP_SRC_DIR}/gearoenix/render/texture/rnd-txt-texture-2d.cpp
     ${APP_SRC_DIR}/gearoenix/render/texture/rnd-txt-texture-cube.cpp
@@ -156,5 +157,5 @@ target_link_libraries(
     android
     native_app_glue
     EGL
-    GLESv1_CM
+    GLESv2
     log)

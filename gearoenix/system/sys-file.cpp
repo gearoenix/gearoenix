@@ -35,7 +35,7 @@ gearoenix::system::File::File
     }
 #elif defined(IN_ANDROID)
     (system::Application* sys_app, const std::string& name)
-    : sys_app(sys_app)
+//: sys_app(sys_app)
 {
     file = AAssetManager_open(sys_app->get_android_app()->activity->assetManager,
         "data.gx3d", AASSET_MODE_BUFFER);
@@ -83,7 +83,7 @@ unsigned int gearoenix::system::File::tell()
 #if defined(USE_STD_FILE)
     return (unsigned int)file.tellg();
 #elif defined(IN_ANDROID)
-#error "Not implemented yet"
+    return (unsigned int)AAsset_seek(file, 0, SEEK_CUR);
 #else
 #error "Error not implemented yet!"
 #endif

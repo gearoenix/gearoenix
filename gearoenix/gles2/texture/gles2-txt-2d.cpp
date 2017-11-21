@@ -7,25 +7,16 @@
 gearoenix::gles2::texture::Texture2D::Texture2D(system::File* file, Engine* eng, std::shared_ptr<core::EndCaller> end)
 {
     std::vector<unsigned char> img_data;
-    unsigned int imgw, imgh, imgc;
-    render::texture::PNG::decode(file, eng, img_data, imgw, imgh, imgc);
-    std::function<void()> loadf = [this, imgw, imgh, imgc, img_data, end] {
+    unsigned int imgw, imgh;
+    render::texture::PNG::decode(file, img_data, imgw, imgh);
+    std::function<void()> loadf = [this, imgw, imgh, img_data, end] {
         glGenTextures(1, &texture_object);
         glBindTexture(GL_TEXTURE_2D, texture_object);
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        switch (imgc) {
-        case 4:
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, imgw, imgh, 0, GL_RGBA, GL_UNSIGNED_BYTE, (void*)img_data.data());
-            break;
-        case 3:
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, imgw, imgh, 0, GL_RGB, GL_UNSIGNED_BYTE, (void*)img_data.data());
-            break;
-        default:
-            UNEXPECTED;
-        }
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, imgw, imgh, 0, GL_RGBA, GL_UNSIGNED_BYTE, (void*)img_data.data());
         glGenerateMipmap(GL_TEXTURE_2D);
         (void)end;
     };
