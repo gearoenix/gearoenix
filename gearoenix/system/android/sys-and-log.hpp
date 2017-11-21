@@ -2,23 +2,25 @@
 #define GEAROENIX_SYSTEM_ANDROID_LOG_HPP
 #include "../../core/cr-build-configuration.hpp"
 #ifdef IN_ANDROID
+#include <sstream>
 #include <android/log.h>
-#define LOGI(s)                                             \
-    __android_log_print(ANDROID_LOG_INFO, APPLICATION_NAME, \
-        "%s ----- in file: %s %d", (s).c_str(), __FILE__,   \
-        __LINE__);
-#define LOGD(s)                                              \
-    __android_log_print(ANDROID_LOG_DEBUG, APPLICATION_NAME, \
-        "%s ----- in file: %s %d", (s).c_str(), __FILE__,    \
-        __LINE__);
-#define LOGE(s)                                              \
-    __android_log_print(ANDROID_LOG_ERROR, APPLICATION_NAME, \
-        "%s ----- in file: %s %d", (s).c_str(), __FILE__,    \
-        __LINE__);
-#define LOGF(s)                                              \
-    __android_log_print(ANDROID_LOG_FATAL, APPLICATION_NAME, \
-        "%s ----- in file: %s %d", (s).c_str(), __FILE__,    \
-        __LINE__);                                           \
-    std::terminate();
+
+void gearoenix_android_log_print(
+  android_LogPriority prio, const std::stringstream& str)
+{
+  __android_log_print(prio, APPLICATION_NAME, "%s", str.str().c_str());
+}
+
+#define LOG(p, s) { \
+  std::stringstream stringstream; \
+  stringstream << __FILE__ << " " << __LINE__ << ":"; \
+  stringstream << s; \
+  gearoenix_android_log_print(p, stringstream); \
+}
+
+#define LOGI(s) LOG(ANDROID_LOG_INFO, s)
+#define LOGE(s) LOG(ANDROID_LOG_ERROR, s)
+#define LOGF(s) LOG(ANDROID_LOG_FATAL, s); std::terminate();
+
 #endif
 #endif

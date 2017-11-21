@@ -1,57 +1,160 @@
-#cmake_minimum_required(VERSION 3.4.1)
-#set(APP_GLUE_DIR ${ANDROID_NDK}/sources/android/native_app_glue)
-#include_directories(${APP_GLUE_DIR})
-#add_library( app-glue STATIC ${APP_GLUE_DIR}/android_native_app_glue.c)
-## set(VK_VAL_LAYER_SRC_DIR ${ANDROID_NDK}/sources/third_party/vulkan/src)
-#set(APP_SRC_DIR ../)
-#add_library(
-#    main SHARED
-#    ${APP_SRC_DIR}/gearoenix/core/application.cpp
-#    ${APP_SRC_DIR}/gearoenix/core/build-configuration.cpp
-#    ${APP_SRC_DIR}/gearoenix/core/static.cpp
-#    ${APP_SRC_DIR}/gearoenix/directx12/d12-engine.cpp
-#    ${APP_SRC_DIR}/gearoenix/render/render-engine.cpp
-#    ${APP_SRC_DIR}/gearoenix/system/android/and-app.cpp
-#    ${APP_SRC_DIR}/gearoenix/system/android/and-log.cpp
-#    ${APP_SRC_DIR}/gearoenix/system/linux/linux-app.cpp
-#    ${APP_SRC_DIR}/gearoenix/system/windows/win-app.cpp
-#    ${APP_SRC_DIR}/gearoenix/system/windows/win-log.cpp
-#    ${APP_SRC_DIR}/gearoenix/system/log.cpp
-#    ${APP_SRC_DIR}/gearoenix/system/resource.cpp
-#    ${APP_SRC_DIR}/gearoenix/system/sys-app.cpp
-#    ${APP_SRC_DIR}/gearoenix/system/sys-file.cpp
-#    ${APP_SRC_DIR}/gearoenix/vulkan/buffer/vk-buf-buffer.cpp
-#    ${APP_SRC_DIR}/gearoenix/vulkan/buffer/vk-buf-uniform.cpp
-#    ${APP_SRC_DIR}/gearoenix/vulkan/command/vk-cmd-buffer.cpp
-#    ${APP_SRC_DIR}/gearoenix/vulkan/command/vk-cmd-pool.cpp
-#    ${APP_SRC_DIR}/gearoenix/vulkan/descriptor/vk-des-pool.cpp
-#    ${APP_SRC_DIR}/gearoenix/vulkan/descriptor/vk-des-set.cpp
-#    ${APP_SRC_DIR}/gearoenix/vulkan/device/vk-dev-logical.cpp
-#    ${APP_SRC_DIR}/gearoenix/vulkan/device/vk-dev-physical.cpp
-#    ${APP_SRC_DIR}/gearoenix/vulkan/image/vk-img-image.cpp
-#    ${APP_SRC_DIR}/gearoenix/vulkan/image/vk-img-view.cpp
-#    ${APP_SRC_DIR}/gearoenix/vulkan/memory/vk-mem-memory.cpp
-#    ${APP_SRC_DIR}/gearoenix/vulkan/memory/vk-mem-pool.cpp
-#    ${APP_SRC_DIR}/gearoenix/vulkan/pipeline/vk-pip-cache.cpp
-#    ${APP_SRC_DIR}/gearoenix/vulkan/pipeline/vk-pip-layout.cpp
-#    ${APP_SRC_DIR}/gearoenix/vulkan/pipeline/vk-pip-pipeline.cpp
-#    ${APP_SRC_DIR}/gearoenix/vulkan/shader/vk-shader-diffuse-colored.cpp
-#    ${APP_SRC_DIR}/gearoenix/vulkan/shader/vk-shader-manager.cpp
-#    ${APP_SRC_DIR}/gearoenix/vulkan/shader/vk-shader.cpp
-#    ${APP_SRC_DIR}/gearoenix/vulkan/sync/vk-sync-fence.cpp
-#    ${APP_SRC_DIR}/gearoenix/vulkan/sync/vk-sync-semaphore.cpp
-#    ${APP_SRC_DIR}/gearoenix/vulkan/vk-check.cpp
-#    ${APP_SRC_DIR}/gearoenix/vulkan/vk-engine.cpp
-#    ${APP_SRC_DIR}/gearoenix/vulkan/vk-framebuffer.cpp
-#    ${APP_SRC_DIR}/gearoenix/vulkan/vk-instance.cpp
-#    ${APP_SRC_DIR}/gearoenix/vulkan/vk-linker.cpp
-#    ${APP_SRC_DIR}/gearoenix/vulkan/vk-render-pass.cpp
-#    ${APP_SRC_DIR}/gearoenix/vulkan/vk-surface.cpp
-#    ${APP_SRC_DIR}/gearoenix/vulkan/vk-swapchain.cpp
-#)
-#set(VK_VAL_LAYER_SRC_DIR ${ANDROID_NDK}/sources/third_party/vulkan/src)
-#include_directories(${VK_VAL_LAYER_SRC_DIR}/include)
+cmake_minimum_required(VERSION 3.4.1)
 
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -O3 -Wall -Werror \
-#  -Wno-unused-variable -frtti -fexceptions")
-#target_link_libraries(main app-glue log android vulkan)
+set(${CMAKE_C_FLAGS}, "${CMAKE_C_FLAGS}")
+
+add_library(
+    native_app_glue
+    STATIC
+    ${ANDROID_NDK}/sources/android/native_app_glue/android_native_app_glue.c)
+
+set(
+    CMAKE_CXX_FLAGS
+    "${CMAKE_CXX_FLAGS} -std=c++14 -Ofast -Wall -Werror")
+set(
+    CMAKE_SHARED_LINKER_FLAGS
+    "${CMAKE_SHARED_LINKER_FLAGS} -u ANativeActivity_onCreate")
+
+set(APP_SRC_DIR ../)
+
+add_library(
+    native-activity
+    SHARED
+    ${APP_SRC_DIR}/gearoenix/audio/au-audio.cpp
+    ${APP_SRC_DIR}/gearoenix/audio/au-music.cpp
+    ${APP_SRC_DIR}/gearoenix/audio/au-speaker.cpp
+    ${APP_SRC_DIR}/gearoenix/core/asset/cr-asset-manager.cpp
+    ${APP_SRC_DIR}/gearoenix/core/asset/cr-asset.cpp
+    ${APP_SRC_DIR}/gearoenix/core/cache/file/cr-cache-file-sparse.cpp
+    ${APP_SRC_DIR}/gearoenix/core/cache/file/cr-cache-file.cpp
+    ${APP_SRC_DIR}/gearoenix/core/cache/cr-cache-cached.cpp
+    ${APP_SRC_DIR}/gearoenix/core/cache/cr-cache-cacher.cpp
+    ${APP_SRC_DIR}/gearoenix/core/gc/cr-gc-object.cpp
+    ${APP_SRC_DIR}/gearoenix/core/gc/cr-gc-range.cpp
+    ${APP_SRC_DIR}/gearoenix/core/gc/cr-gc.cpp
+    ${APP_SRC_DIR}/gearoenix/core/list/cr-list-node.cpp
+    ${APP_SRC_DIR}/gearoenix/core/list/cr-list.cpp
+    ${APP_SRC_DIR}/gearoenix/core/cr-application.cpp
+    ${APP_SRC_DIR}/gearoenix/core/cr-build-configuration.cpp
+    ${APP_SRC_DIR}/gearoenix/core/cr-end-caller.cpp
+    ${APP_SRC_DIR}/gearoenix/core/cr-event.cpp
+    ${APP_SRC_DIR}/gearoenix/core/cr-static.cpp
+    ${APP_SRC_DIR}/gearoenix/directx12/d12-engine.cpp
+    ${APP_SRC_DIR}/gearoenix/gles2/buffer/gles2-buf-mesh.cpp
+    ${APP_SRC_DIR}/gearoenix/gles2/buffer/gles2-buf-uniform.cpp
+    ${APP_SRC_DIR}/gearoenix/gles2/pipeline/gles2-pip-pipeline.cpp
+    ${APP_SRC_DIR}/gearoenix/gles2/shader/gles2-shader.cpp
+    ${APP_SRC_DIR}/gearoenix/gles2/shader/gles2-shd-depth.cpp
+    ${APP_SRC_DIR}/gearoenix/gles2/shader/gles2-shd-directional-colored-matte-nonreflective-shadowless-opaque.cpp
+    ${APP_SRC_DIR}/gearoenix/gles2/shader/gles2-shd-directional-colored-speculated-baked-full-opaque.cpp
+    ${APP_SRC_DIR}/gearoenix/gles2/shader/gles2-shd-directional-colored-speculated-baked-shadowless-opaque.cpp
+    ${APP_SRC_DIR}/gearoenix/gles2/shader/gles2-shd-directional-colored-speculated-nonreflective-shadowless-opaque.cpp
+    ${APP_SRC_DIR}/gearoenix/gles2/shader/gles2-shd-directional-d2-speculated-baked-full-opaque.cpp
+    ${APP_SRC_DIR}/gearoenix/gles2/shader/gles2-shd-directional-d2-speculated-nonreflective-full-opaque.cpp
+    ${APP_SRC_DIR}/gearoenix/gles2/shader/gles2-shd-directional-d2-speculated-nonreflective-shadowless-opaque.cpp
+    ${APP_SRC_DIR}/gearoenix/gles2/shader/gles2-shd-resources.cpp
+    ${APP_SRC_DIR}/gearoenix/gles2/shader/gles2-shd-shadeless-colored-matte-nonreflective-shadowless-opaque.cpp
+    ${APP_SRC_DIR}/gearoenix/gles2/shader/gles2-shd-shadeless-cube-matte-nonreflective-shadowless-opaque.cpp
+    ${APP_SRC_DIR}/gearoenix/gles2/shader/gles2-shd-shadeless-d2-matte-nonreflective-shadowless-opaque.cpp
+    ${APP_SRC_DIR}/gearoenix/gles2/texture/gles2-txt-2d.cpp
+    ${APP_SRC_DIR}/gearoenix/gles2/texture/gles2-txt-cube.cpp
+    ${APP_SRC_DIR}/gearoenix/gles2/gles2-engine.cpp
+    ${APP_SRC_DIR}/gearoenix/math/math-matrix.cpp
+    ${APP_SRC_DIR}/gearoenix/math/math-vector.cpp
+    ${APP_SRC_DIR}/gearoenix/render/buffer/rnd-buf-buffer.cpp
+    ${APP_SRC_DIR}/gearoenix/render/buffer/rnd-buf-manager.cpp
+    ${APP_SRC_DIR}/gearoenix/render/buffer/rnd-buf-mesh.cpp
+    ${APP_SRC_DIR}/gearoenix/render/buffer/rnd-buf-sub-buffer.cpp
+    ${APP_SRC_DIR}/gearoenix/render/buffer/rnd-buf-uniform.cpp
+    ${APP_SRC_DIR}/gearoenix/render/camera/rnd-cmr-camera.cpp
+    ${APP_SRC_DIR}/gearoenix/render/camera/rnd-cmr-orthographic.cpp
+    ${APP_SRC_DIR}/gearoenix/render/camera/rnd-cmr-perspective.cpp
+    ${APP_SRC_DIR}/gearoenix/render/light/rnd-lt-light.cpp
+    ${APP_SRC_DIR}/gearoenix/render/light/rnd-lt-sun.cpp
+    ${APP_SRC_DIR}/gearoenix/render/material/rnd-mat-depth.cpp
+    ${APP_SRC_DIR}/gearoenix/render/material/rnd-mat-directional-colored-matte-nonreflective-shadowless-opaque.cpp
+    ${APP_SRC_DIR}/gearoenix/render/material/rnd-mat-directional-colored-speculated-baked-full-opaque.cpp
+    ${APP_SRC_DIR}/gearoenix/render/material/rnd-mat-directional-colored-speculated-baked-shadowless-opaque.cpp
+    ${APP_SRC_DIR}/gearoenix/render/material/rnd-mat-directional-colored-speculated-nonreflective-shadowless-opaque.cpp
+    ${APP_SRC_DIR}/gearoenix/render/material/rnd-mat-directional-d2-speculated-baked-full-opaque.cpp
+    ${APP_SRC_DIR}/gearoenix/render/material/rnd-mat-directional-d2-speculated-nonreflective-full-opaque.cpp
+    ${APP_SRC_DIR}/gearoenix/render/material/rnd-mat-directional-d2-speculated-nonreflective-shadowless-opaque.cpp
+    ${APP_SRC_DIR}/gearoenix/render/material/rnd-mat-material.cpp
+    ${APP_SRC_DIR}/gearoenix/render/material/rnd-mat-shadeless-colored-matte-nonreflective-shadowless-opaque.cpp
+    ${APP_SRC_DIR}/gearoenix/render/material/rnd-mat-shadeless-cube-matte-nonreflective-shadowless-opaque.cpp
+    ${APP_SRC_DIR}/gearoenix/render/material/rnd-mat-shadeless-d2-matte-nonreflective-shadowless-opaque.cpp
+    ${APP_SRC_DIR}/gearoenix/render/mesh/rnd-msh-mesh.cpp
+    ${APP_SRC_DIR}/gearoenix/render/mesh/rnd-msh-occ.cpp
+    ${APP_SRC_DIR}/gearoenix/render/model/rnd-mdl-model.cpp
+    ${APP_SRC_DIR}/gearoenix/render/pipeline/rnd-pip-manager.cpp
+    ${APP_SRC_DIR}/gearoenix/render/pipeline/rnd-pip-pipeline.cpp
+    ${APP_SRC_DIR}/gearoenix/render/scene/rnd-scn-scene.cpp
+    ${APP_SRC_DIR}/gearoenix/render/shader/rnd-shd-resources.cpp
+    ${APP_SRC_DIR}/gearoenix/render/shader/rnd-shd-shader.cpp
+    ${APP_SRC_DIR}/gearoenix/render/texture/rnd-txt-png.cpp
+    ${APP_SRC_DIR}/gearoenix/render/texture/rnd-txt-texture-2d.cpp
+    ${APP_SRC_DIR}/gearoenix/render/texture/rnd-txt-texture-cube.cpp
+    ${APP_SRC_DIR}/gearoenix/render/texture/rnd-txt-texture.cpp
+    ${APP_SRC_DIR}/gearoenix/render/rnd-engine.cpp
+    ${APP_SRC_DIR}/gearoenix/system/android/sys-and-app.cpp
+    ${APP_SRC_DIR}/gearoenix/system/android/sys-and-log.cpp
+    ${APP_SRC_DIR}/gearoenix/system/glfw/sys-glfw.cpp
+    ${APP_SRC_DIR}/gearoenix/system/sdl/sys-sdl-app.cpp
+    ${APP_SRC_DIR}/gearoenix/system/sys-app.cpp
+    ${APP_SRC_DIR}/gearoenix/system/sys-file.cpp
+    ${APP_SRC_DIR}/gearoenix/system/sys-log.cpp
+    ${APP_SRC_DIR}/gearoenix/test/test-001-scene-free-camera.cpp
+    ${APP_SRC_DIR}/gearoenix/test/test-002-memory-test.cpp
+    ${APP_SRC_DIR}/gearoenix/test/test-003-math.cpp
+    ${APP_SRC_DIR}/gearoenix/vulkan/buffer/vk-buf-buffer.cpp
+    ${APP_SRC_DIR}/gearoenix/vulkan/buffer/vk-buf-manager.cpp
+    ${APP_SRC_DIR}/gearoenix/vulkan/buffer/vk-buf-mesh.cpp
+    ${APP_SRC_DIR}/gearoenix/vulkan/buffer/vk-buf-sub-buffer.cpp
+    ${APP_SRC_DIR}/gearoenix/vulkan/buffer/vk-buf-uniform.cpp
+    ${APP_SRC_DIR}/gearoenix/vulkan/command/vk-cmd-buffer.cpp
+    ${APP_SRC_DIR}/gearoenix/vulkan/command/vk-cmd-pool.cpp
+    ${APP_SRC_DIR}/gearoenix/vulkan/descriptor/vk-des-pool.cpp
+    ${APP_SRC_DIR}/gearoenix/vulkan/descriptor/vk-des-set-layout.cpp
+    ${APP_SRC_DIR}/gearoenix/vulkan/descriptor/vk-des-set.cpp
+    ${APP_SRC_DIR}/gearoenix/vulkan/device/vk-dev-logical.cpp
+    ${APP_SRC_DIR}/gearoenix/vulkan/device/vk-dev-physical.cpp
+    ${APP_SRC_DIR}/gearoenix/vulkan/image/vk-img-image.cpp
+    ${APP_SRC_DIR}/gearoenix/vulkan/image/vk-img-view.cpp
+    ${APP_SRC_DIR}/gearoenix/vulkan/memory/vk-mem-manager.cpp
+    ${APP_SRC_DIR}/gearoenix/vulkan/memory/vk-mem-memory.cpp
+    ${APP_SRC_DIR}/gearoenix/vulkan/memory/vk-mem-sub-memory.cpp
+    ${APP_SRC_DIR}/gearoenix/vulkan/pipeline/vk-pip-cache.cpp
+    ${APP_SRC_DIR}/gearoenix/vulkan/pipeline/vk-pip-layout.cpp
+    ${APP_SRC_DIR}/gearoenix/vulkan/pipeline/vk-pip-manager.cpp
+    ${APP_SRC_DIR}/gearoenix/vulkan/pipeline/vk-pip-pipeline.cpp
+    ${APP_SRC_DIR}/gearoenix/vulkan/shader/stage/vk-shader-stage-fragment.cpp
+    ${APP_SRC_DIR}/gearoenix/vulkan/shader/stage/vk-shader-stage-vertex.cpp
+    ${APP_SRC_DIR}/gearoenix/vulkan/shader/stage/vk-shader-stage.cpp
+    ${APP_SRC_DIR}/gearoenix/vulkan/shader/vk-shd-resources.cpp
+    ${APP_SRC_DIR}/gearoenix/vulkan/sync/vk-sync-fence.cpp
+    ${APP_SRC_DIR}/gearoenix/vulkan/sync/vk-sync-semaphore.cpp
+    ${APP_SRC_DIR}/gearoenix/vulkan/texture/vk-txt-sampler-2d.cpp
+    ${APP_SRC_DIR}/gearoenix/vulkan/texture/vk-txt-texture-2d.cpp
+    ${APP_SRC_DIR}/gearoenix/vulkan/texture/vk-txt-texture-3d.cpp
+    ${APP_SRC_DIR}/gearoenix/vulkan/texture/vk-txt-texture-cube.cpp
+    ${APP_SRC_DIR}/gearoenix/vulkan/vk-check.cpp
+    ${APP_SRC_DIR}/gearoenix/vulkan/vk-engine.cpp
+    ${APP_SRC_DIR}/gearoenix/vulkan/vk-framebuffer.cpp
+    ${APP_SRC_DIR}/gearoenix/vulkan/vk-instance.cpp
+    ${APP_SRC_DIR}/gearoenix/vulkan/vk-linker.cpp
+    ${APP_SRC_DIR}/gearoenix/vulkan/vk-render-pass.cpp
+    ${APP_SRC_DIR}/gearoenix/vulkan/vk-surface.cpp
+    ${APP_SRC_DIR}/gearoenix/vulkan/vk-swapchain.cpp
+)
+
+target_include_directories(
+    native-activity
+    PRIVATE
+    ${ANDROID_NDK}/sources/android/native_app_glue)
+
+target_link_libraries(
+    native-activity
+    android
+    native_app_glue
+    EGL
+    GLESv1_CM
+    log)

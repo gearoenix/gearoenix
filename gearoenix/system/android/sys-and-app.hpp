@@ -17,9 +17,8 @@ namespace system {
     class Application {
     private:
         android_app* and_app;
-        std::shared_ptr<File> asset;
-        std::shared_ptr<render::Engine> render_engine;
-        std::shared_ptr<core::Application> core_app;
+        render::Engine* render_engine;
+        core::Application* core_app;
         std::mutex execution_lock;
         bool is_alive = true, is_active = true;
         void handle(int32_t cmd);
@@ -30,9 +29,10 @@ namespace system {
         ~Application();
         void execute();
         android_app* get_android_app() const;
-        const std::shared_ptr<core::Application>& get_core_app() const;
-        const std::shared_ptr<render::Engine>& get_render_engine() const;
-        const std::shared_ptr<File>& get_asset() const;
+        const core::Application* get_core_app() const;
+        core::Application* get_core_app();
+        const render::Engine* get_render_engine() const;
+        render::Engine* get_render_engine();
         static void handle_cmd(android_app* app, int32_t cmd);
     };
 }

@@ -5,7 +5,9 @@
 #include "sdl/sys-sdl-app.hpp"
 #elif defined(USE_GLFW)
 #include "glfw/sys-glfw.hpp"
+#elif defined(IN_ANDROID)
+#include "android/sys-and-app.hpp"
 #else
 #error "Unimplemented"
-#endif // IN_ANDROID
+#endif
 #endif // GEAROENIX_SYSTEM_APPLICATION_HPP

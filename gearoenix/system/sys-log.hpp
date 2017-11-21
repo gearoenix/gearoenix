@@ -4,7 +4,7 @@
 #ifdef LOG_ENABLED
 #include <exception>
 #ifdef IN_ANDROID
-#include "android/and-log.hpp"
+#include "android/sys-and-log.hpp"
 #else
 #include <fstream>
 namespace gearoenix {

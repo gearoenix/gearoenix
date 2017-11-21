@@ -43,9 +43,9 @@
 #endif
 #if defined(IN_WINDOWS) || defined(IN_LINUX) || defined(IN_MAC)
 #define IN_DESKTOP
-#endif
 #define USE_SDL
 //#define USE_GLFW
+#endif
 /// Application constant definitions
 /// -------------------------------------------------------------
 #define APPLICATION_NAME "Gearoenix Demo App"
