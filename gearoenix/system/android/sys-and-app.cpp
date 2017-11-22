@@ -121,8 +121,9 @@ void gearoenix::system::Application::handle(int32_t cmd)
             eglChooseConfig(display, attribs, nullptr, 0, &num_configs);
             std::unique_ptr<EGLConfig[]> supported_configs(new EGLConfig[num_configs]);
             eglChooseConfig(display, attribs, supported_configs.get(), num_configs, &num_configs);
-            if (num_configs == 0)
+            if (num_configs == 0) {
                 UNEXPECTED;
+            }
             int i = 0;
             for (; i < num_configs; i++) {
                 EGLConfig& cfg = supported_configs[i];
