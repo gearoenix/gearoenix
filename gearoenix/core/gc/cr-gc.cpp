@@ -14,12 +14,12 @@ void gearoenix::core::gc::Gc::remove_range(const Range& r)
     }
     auto search = free_ranges.find(range_size);
     if (free_ranges.end() == search) {
-        LOGF("Unexpected");
+        GXLOGF("Unexpected");
     }
     auto& ranges = search->second;
     auto range_search = ranges.find(start_offset);
     if (ranges.end() == range_search) {
-        LOGF("Unexpected");
+        GXLOGF("Unexpected");
     }
     ranges.erase(range_search);
     if (ranges.empty()) {
@@ -95,16 +95,16 @@ void gearoenix::core::gc::Gc::allocate(Object* obj)
     std::lock_guard<std::mutex> lg(lock);
 #ifdef DEBUG_GC
     if (0 == obj->size) {
-        LOGF("Wrong object size! (0 size)");
+        GXLOGF("Wrong object size! (0 size)");
     }
 #endif
     auto search = free_ranges.upper_bound(obj->size - 1);
 #ifdef DEBUG_GC
     if (search == free_ranges.end()) {
-        LOGF("Out of space in GC");
+        GXLOGF("Out of space in GC");
     }
     if (search->second.empty()) {
-        LOGF("Unexpected");
+        GXLOGF("Unexpected");
     }
 #endif
     auto range_search = search->second.begin();

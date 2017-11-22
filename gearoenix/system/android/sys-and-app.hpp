@@ -5,7 +5,9 @@
 #include "../../core/cr-types.hpp"
 #include <EGL/egl.h>
 #include <GLES/gl.h>
-struct android_app;
+#include <android_native_app_glue.h>
+#include <gestureDetector.h>
+
 namespace gearoenix {
 namespace render {
     class Engine;
@@ -28,9 +30,14 @@ namespace system {
         EGLSurface surface;
         EGLContext context;
         EGLDisplay display;
-        void handle(std::int32_t cmd);
+        core::Real x = 0.0f, y = 0.0f, w = 0.0f;
+        ndk_helper::PinchDetector pinch_detector;
+        ndk_helper::DragDetector drag_detector;
+        void handle(int32_t cmd);
+        int32_t handle(AInputEvent* e);
         void init();
         static void handle_cmd(android_app* app, int32_t cmd);
+        static int32_t handle_input(android_app* app, AInputEvent* e);
 
     public:
         Application(struct android_app* and_app);

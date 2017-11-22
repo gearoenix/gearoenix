@@ -31,7 +31,7 @@ gearoenix::system::File::File
 #endif
     file.open(file_path, std::ios::binary | std::ios::in);
     if (!file.is_open()) {
-        LOGF("Error in opening assets file.");
+        GXLOGF("Error in opening assets file.");
     }
 #elif defined(IN_ANDROID)
     (system::Application* sys_app, const std::string& name)
@@ -40,7 +40,7 @@ gearoenix::system::File::File
     file = AAssetManager_open(sys_app->get_android_app()->activity->assetManager,
         name.c_str(), AASSET_MODE_BUFFER);
     if (file == nullptr) {
-        LOGF("Asset not found! " << name);
+        GXLOGF("Asset not found! " << name);
     }
 #else
 #error "Unimplemented!"

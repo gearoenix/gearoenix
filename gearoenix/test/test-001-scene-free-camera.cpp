@@ -12,7 +12,7 @@ TestApp::TestApp(gearoenix::system::Application* sys_app)
 {
     sys_app->get_render_engine()->load_scene(1, [this](unsigned int index) {
         cam = eng->get_scene(index)->get_current_camera();
-        LOGI(index << "Loaded.");
+        GXLOGI(index << "Loaded.");
     });
 }
 
@@ -56,10 +56,10 @@ void TestApp::on_mouse(MouseButton mb, ButtonAction ba, gearoenix::core::Real, g
 
 void TestApp::on_mouse_move(gearoenix::core::Real dx, gearoenix::core::Real dy)
 {
-    if (left_mouse_down) {
-        cam->rotate_local_x(dy * 0.001f);
-        cam->rotate_global_z(dx * 0.001f);
-    }
+    // if (left_mouse_down) {
+    cam->rotate_local_x(dy * 0.001f);
+    cam->rotate_global_z(dx * 0.001f);
+    // }
 }
 
 GEAROENIX_START(TestApp)

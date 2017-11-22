@@ -6,7 +6,6 @@
 #include "../../render/rnd-engine.hpp"
 #include "../sys-file.hpp"
 #include "../sys-log.hpp"
-#include <android_native_app_glue.h>
 #include <string>
 
 void gearoenix::system::Application::handle_cmd(android_app* app, int32_t cmd)
@@ -15,11 +14,62 @@ void gearoenix::system::Application::handle_cmd(android_app* app, int32_t cmd)
     sys_app->handle(cmd);
 }
 
+int32_t gearoenix::system::Application::handle_input(android_app* a, AInputEvent* e)
+{
+    Application* sys_app = reinterpret_cast<Application*>(a->userData);
+    return sys_app->handle(e);
+}
+
+int32_t gearoenix::system::Application::handle(AInputEvent* e)
+{
+    ndk_helper::Vec2 p1, p2;
+    core::Real w1, w2;
+    ndk_helper::GESTURE_STATE pinch_state = pinch_detector.Detect(e);
+    ndk_helper::GESTURE_STATE drag_state = drag_detector.Detect(e);
+    switch (pinch_state) {
+    case ndk_helper::GESTURE_STATE_START:
+        TODO;
+        pinch_detector.GetPointers(p1, p2);
+        w = (p1 - p2).Length();
+        return 1;
+    case ndk_helper::GESTURE_STATE_MOVE:
+        pinch_detector.GetPointers(p1, p2);
+        w2 = (p1 - p2).Length();
+        core_app->on_scroll((w2 - w) * 0.03f);
+        w = w2;
+        return 1;
+    }
+    switch (drag_state) {
+    case ndk_helper::GESTURE_STATE_START:
+        TODO;
+        drag_detector.GetPointer(p1);
+        p1.Value(x, y);
+        core_app->on_mouse(
+            core::Application::MouseButton::LEFT,
+            core::Application::ButtonAction::PRESS, x, y);
+        return 1;
+    case ndk_helper::GESTURE_STATE_MOVE:
+        drag_detector.GetPointer(p1);
+        p1.Value(w1, w2);
+        core_app->on_mouse_move(w1 - x, w2 - y);
+        x = w1;
+        y = w2;
+        return 1;
+    case ndk_helper::GESTURE_STATE_END:
+        core_app->on_mouse(
+            core::Application::MouseButton::LEFT,
+            core::Application::ButtonAction::RELEASE, x, y);
+        return 1;
+    }
+    return 0;
+}
+
 gearoenix::system::Application::Application(android_app* and_app)
     : and_app(and_app)
 {
     and_app->userData = this;
     and_app->onAppCmd = gearoenix::system::Application::handle_cmd;
+    and_app->onInputEvent = gearoenix::system::Application::handle_input;
     int events;
     android_poll_source* source;
     do {
@@ -95,16 +145,19 @@ void gearoenix::system::Application::execute(core::Application* app)
     core_app = app;
     int events;
     android_poll_source* source;
+    if (eglMakeCurrent(display, surface, surface, context) == EGL_FALSE) {
+        GXLOGF("Unable to eglMakeCurrent");
+    }
     do {
         if (ALooper_pollAll(1, nullptr, &events,
                 (void**)&source)
             >= 0) {
             if (source != nullptr)
                 source->process(and_app, source);
-            core_app->update();
-            render_engine->update();
-            eglSwapBuffers(display, surface);
         }
+        core_app->update();
+        render_engine->update();
+        eglSwapBuffers(display, surface);
     } while (and_app->destroyRequested == 0);
 }
 
@@ -154,7 +207,7 @@ void gearoenix::system::Application::handle(int32_t cmd)
             };
             context = eglCreateContext(display, config, NULL, attrib_list);
             if (eglMakeCurrent(display, surface, surface, context) == EGL_FALSE) {
-                LOGF("Unable to eglMakeCurrent");
+                GXLOGF("Unable to eglMakeCurrent");
             }
             eglQuerySurface(display, surface, EGL_WIDTH, &w);
             eglQuerySurface(display, surface, EGL_HEIGHT, &h);
@@ -172,7 +225,7 @@ void gearoenix::system::Application::handle(int32_t cmd)
             render_engine->terminate();
         break;
     default:
-        LOGI("event not handled: " << cmd);
+        GXLOGI("event not handled: " << cmd);
     }
 }
 

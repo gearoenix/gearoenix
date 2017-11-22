@@ -87,7 +87,7 @@ const gearoenix::core::Real& gearoenix::math::Vec2::operator[](const unsigned in
 {
 #ifdef DEBUG_MODE
     if (i > 1)
-        LOGF("Out of range access");
+        GXLOGF("Out of range access");
 #endif
     return vec[i];
 }
@@ -96,7 +96,7 @@ gearoenix::core::Real& gearoenix::math::Vec2::operator[](const unsigned int i)
 {
 #ifdef DEBUG_MODE
     if (i > 1)
-        LOGF("Out of range access");
+        GXLOGF("Out of range access");
 #endif
     return vec[i];
 }
@@ -135,7 +135,7 @@ void gearoenix::math::Vec2::read(system::File* f)
 
 void gearoenix::math::Vec2::print() const
 {
-    LOGI("Vec2(" << vec[0] << ", " << vec[1] << ")");
+    GXLOGI("Vec2(" << vec[0] << ", " << vec[1] << ")");
 }
 
 const gearoenix::math::Vec3 gearoenix::math::Vec3::X(1.0f, 0.0f, 0.0f);
@@ -234,7 +234,7 @@ const gearoenix::core::Real& gearoenix::math::Vec3::operator[](const unsigned in
 {
 #ifdef DEBUG_MODE
     if (i > 2) {
-        LOGF("Out of range access");
+        GXLOGF("Out of range access");
     }
 #endif
     return vec[i];
@@ -244,7 +244,7 @@ gearoenix::core::Real& gearoenix::math::Vec3::operator[](const unsigned int i)
 {
 #ifdef DEBUG_MODE
     if (i > 2) {
-        LOGF("Out of range access");
+        GXLOGF("Out of range access");
     }
 #endif
     return vec[i];
@@ -315,7 +315,7 @@ void gearoenix::math::Vec3::read(system::File* f)
 }
 void gearoenix::math::Vec3::print() const
 {
-    LOGI("Vec2(" << vec[0] << ", " << vec[1] << ", " << vec[2] << ")");
+    GXLOGI("Vec2(" << vec[0] << ", " << vec[1] << ", " << vec[2] << ")");
 }
 
 gearoenix::math::Vec4::Vec4(core::Real x, core::Real y, core::Real z, core::Real w)
@@ -338,7 +338,7 @@ const gearoenix::core::Real& gearoenix::math::Vec4::operator[](const unsigned in
 {
 #ifdef DEBUG_MODE
     if (i > 3)
-        LOGF("Out of range access");
+        GXLOGF("Out of range access");
 #endif
     return vec[i];
 }
@@ -347,7 +347,7 @@ gearoenix::core::Real& gearoenix::math::Vec4::operator[](const unsigned int i)
 {
 #ifdef DEBUG_MODE
     if (i > 3)
-        LOGF("Out of range access");
+        GXLOGF("Out of range access");
 #endif
     return vec[i];
 }

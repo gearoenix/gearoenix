@@ -47,14 +47,14 @@ std::shared_ptr<T> gearoenix::core::cache::Cacher::get(Id id) const
 {
     auto search = cacheds.find(id);
     if (search == cacheds.end()) {
-        LOGF("Object with id: " << id << ", has not been cached.");
+        GXLOGF("Object with id: " << id << ", has not been cached.");
         return nullptr;
     }
     auto& found = search->second;
     if (auto cached = found.lock()) {
         return std::static_pointer_cast<T>(cached);
     } else {
-        LOGF("Object with id: " << id << ", cached but it has been expired.");
+        GXLOGF("Object with id: " << id << ", cached but it has been expired.");
         return nullptr;
     }
 }

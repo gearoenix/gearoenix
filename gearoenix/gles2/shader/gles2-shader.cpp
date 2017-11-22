@@ -6,7 +6,7 @@ void gearoenix::gles2::shader::Shader::create_program()
 {
     shader_program = glCreateProgram();
     if (shader_program == 0) {
-        LOGF("Error creating shader program.");
+        GXLOGF("Error creating shader program.");
     }
 }
 
@@ -14,7 +14,7 @@ GLuint gearoenix::gles2::shader::Shader::add_shader_to_program(const std::string
 {
     GLuint shader_obj = glCreateShader(shader_type);
     if (shader_obj == 0) {
-        LOGF("Error creating shader type.");
+        GXLOGF("Error creating shader type.");
     }
     const char* chtemp = shd.c_str();
     const GLint uintemp = (GLint)shd.length();
@@ -28,7 +28,7 @@ GLuint gearoenix::gles2::shader::Shader::add_shader_to_program(const std::string
         std::vector<GLchar> info_log;
         info_log.resize(sts_size);
         glGetShaderInfoLog(shader_obj, sts_size, NULL, &(info_log[0]));
-        LOGF("Error compiling shader type. Info: " << &(info_log[0]));
+        GXLOGF("Error compiling shader type. Info: " << &(info_log[0]));
     }
     glAttachShader(shader_program, shader_obj);
     return shader_obj;
@@ -45,7 +45,7 @@ void gearoenix::gles2::shader::Shader::link()
         std::vector<GLchar> info_log;
         info_log.resize(max_length);
         glGetProgramInfoLog(shader_program, max_length, NULL, &(info_log[0]));
-        LOGF("Error linking shader program: " << &(info_log[0]));
+        GXLOGF("Error linking shader program: " << &(info_log[0]));
     }
 }
 
@@ -60,7 +60,7 @@ void gearoenix::gles2::shader::Shader::validate()
         std::string info_log;
         info_log.resize(max_length);
         glGetProgramInfoLog(shader_program, max_length, NULL, &(info_log[0]));
-        LOGF("Invalid shader program: " << info_log);
+        GXLOGF("Invalid shader program: " << info_log);
     }
     glUseProgram(shader_program);
 }

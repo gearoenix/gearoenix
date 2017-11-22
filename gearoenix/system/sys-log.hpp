@@ -17,22 +17,22 @@ namespace system {
     };
 }
 }
-#define LOGI(s)                                                         \
+#define GXLOGI(s)                                                       \
     gearoenix::system::Log::info << APPLICATION_NAME << " " << s << " " \
                                  << __FILE__ << " " << __LINE__ << std::endl;
-#define LOGD(s)                                                          \
+#define GXLOGD(s)                                                        \
     gearoenix::system::Log::debug << APPLICATION_NAME << " " << s << " " \
                                   << __FILE__ << " " << __LINE__ << std::endl;
-#define LOGE(s)                                                          \
+#define GXLOGE(s)                                                        \
     gearoenix::system::Log::error << APPLICATION_NAME << " " << s << " " \
                                   << __FILE__ << " " << __LINE__ << std::endl;
-#define LOGF(s) \
-    LOGE(s);    \
+#define GXLOGF(s) \
+    GXLOGE(s);    \
     std::terminate();
 #endif // IN_ANDROID
-#define TODO LOGE("TODO")
-#define UNEXPECTED LOGF("Unexpected")
-#define UNIMPLEMENTED LOGF("Unimplemented")
+#define TODO GXLOGE("TODO")
+#define UNEXPECTED GXLOGF("Unexpected")
+#define UNIMPLEMENTED GXLOGF("Unimplemented")
 #else // LOG_ENABLED
 #endif // LOG_ENABLED
 #endif // GEAROENIX_SYSTEM_LOG_HPP

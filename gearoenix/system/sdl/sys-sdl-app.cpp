@@ -66,7 +66,7 @@ int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_
         }
         break;
     default:
-        LOGE("Unhandled event " << event->type);
+        GXLOGE("Unhandled event " << event->type);
         break;
     }
     return 1;
@@ -75,7 +75,7 @@ int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_
 gearoenix::system::Application::Application()
 {
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
-        LOGF("Failed to initialize SDL: " << SDL_GetError());
+        GXLOGF("Failed to initialize SDL: " << SDL_GetError());
     }
     SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
@@ -96,11 +96,11 @@ gearoenix::system::Application::Application()
         DEFAULT_WINDOW_HEIGHT,
         SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP);
     if (!window) {
-        LOGF("Couldn't create window: " << SDL_GetError());
+        GXLOGF("Couldn't create window: " << SDL_GetError());
     }
     gl_context = SDL_GL_CreateContext(window);
     if (!gl_context) {
-        LOGF("Couldn't create context: " << SDL_GetError());
+        GXLOGF("Couldn't create context: " << SDL_GetError());
     }
     SDL_AddEventWatch(event_receiver, this);
     SDL_GL_MakeCurrent(window, gl_context);

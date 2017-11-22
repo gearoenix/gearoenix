@@ -25,7 +25,7 @@ gearoenix::gles2::shader::Depth::Depth(core::Id sid, Engine* eng, std::shared_pt
 {
     eng->add_load_function([this, end] {
         create_program();
-        LOGE("TODO I can disable blending and then i can use alpha part too.")
+        GXLOGE("TODO I can disable blGXLOGEng and then i can use alpha part too.")
         const std::string pvs = "precision highp float;\n"
                                 "attribute vec3 vertex;\n"
                                 "uniform mat4 mvp;\n"

@@ -68,7 +68,7 @@ const std::vector<gearoenix::render::shader::ResourceDescription>& gearoenix::re
     case DEPTH_POS:
         return buffer_rsc_des;
     default:
-        LOGF("Unexpected! id: " << id);
+        GXLOGF("Unexpected! id: " << id);
     }
 }
 
@@ -78,7 +78,7 @@ unsigned int gearoenix::render::shader::Shader::get_uniform_size(core::Id id)
     case DEPTH_POS:
         return sizeof(material::Depth::Uniform);
     default:
-        LOGF("Unexpected! id: " << id);
+        GXLOGF("Unexpected! id: " << id);
     }
 }
 
@@ -88,7 +88,7 @@ const std::vector<gearoenix::render::shader::VertexAttribute>& gearoenix::render
     case DEPTH_POS:
         return has_pos;
     default:
-        LOGF("Unexpected! id: " << id);
+        GXLOGF("Unexpected! id: " << id);
     }
 }
 
@@ -176,6 +176,6 @@ unsigned int gearoenix::render::shader::Shader::get_vertex_real_count(core::Id i
     case DIRECTIONAL_D2_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE:
         return 8;
     default:
-        LOGF("Unexpected! id: " << id);
+        GXLOGF("Unexpected! id: " << id);
     }
 }

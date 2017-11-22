@@ -34,7 +34,7 @@ std::shared_ptr<T> gearoenix::core::cache::file::File::get(Id id, std::function<
     std::function<std::shared_ptr<T>()> fn_new = [new_fun, this, id] {
 #ifdef DEBUG_MODE
         if (id >= offsets.size()) {
-            LOGF("object with id: " << id << ", not found in table of offsets.");
+            GXLOGF("object with id: " << id << ", not found in table of offsets.");
         }
 #endif
         file->seek((unsigned int)offsets[(size_t)id]);

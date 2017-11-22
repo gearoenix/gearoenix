@@ -113,7 +113,7 @@ namespace system {
             uint8_t data;
 #ifdef DEBUG_MODE
             if (1 != read(&data, 1)) {
-                LOGF("Unexpected");
+                GXLOGF("Unexpected");
             }
 #else
             read(&data, 1);

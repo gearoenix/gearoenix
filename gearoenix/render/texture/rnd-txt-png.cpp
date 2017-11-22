@@ -20,6 +20,6 @@ void gearoenix::render::texture::PNG::decode(
     file->read(png);
     unsigned error = lodepng::decode(data, img_width, img_height, png);
     if (error) {
-        LOGF("decoder error " << error << ": " << lodepng_error_text(error));
+        GXLOGF("decoder error " << error << ": " << lodepng_error_text(error));
     }
 }

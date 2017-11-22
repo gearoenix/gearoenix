@@ -14,5 +14,5 @@ gearoenix::render::light::Light* gearoenix::render::light::Light::read(system::F
     case 10:
         return new Sun(f);
     }
-    LOGF("Unexpected");
+    GXLOGF("Unexpected");
 }

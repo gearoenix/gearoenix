@@ -18,7 +18,7 @@ gearoenix::gles2::pipeline::Pipeline::~Pipeline()
 void gearoenix::gles2::pipeline::Pipeline::bind()
 {
     shd->use();
-    LOGE("It can be better.");
+    GXLOGE("It can be better.");
 }
 
 #endif

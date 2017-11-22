@@ -44,7 +44,7 @@ gearoenix::render::camera::Camera* gearoenix::render::camera::Camera::read(syste
         return new Perspective(f, sysapp);
         break;
     default:
-        LOGF("Unexpected");
+        GXLOGF("Unexpected");
         break;
     }
 }

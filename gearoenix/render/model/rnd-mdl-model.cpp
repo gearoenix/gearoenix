@@ -11,7 +11,7 @@
 
 gearoenix::render::model::Model::Model(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c)
 {
-    LOGE(f->tell());
+    GXLOGE(f->tell());
     m.read(f);
     core::Count mesh_count = 0;
     f->read(mesh_count);
@@ -49,9 +49,9 @@ gearoenix::render::model::Model::~Model() {}
 
 void gearoenix::render::model::Model::commit(const scene::Scene* s)
 {
-    LOGE("TODO this function have two part, "
-         "firts is math part and second is graphic related stuff, "
-         "math part must move to physice-engine.");
+    GXLOGE("TODO this function have two part, "
+           "firts is math part and second is graphic related stuff, "
+           "math part must move to physice-engine.");
     mvp = s->get_current_camera()->get_view_projection() * m;
     for (std::pair<const core::Id, std::tuple<std::shared_ptr<mesh::Mesh>, std::shared_ptr<material::Material>, std::shared_ptr<material::Depth>>>& mshmtr : meshes) {
         std::get<1>(mshmtr.second)->update(s, this);

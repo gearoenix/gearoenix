@@ -183,7 +183,7 @@ void gearoenix::gles2::Engine::update()
     prof_frames_count++;
     if (prof_frames_count > 1999) {
         prof_frames_time = 2000.0 / prof_frames_time;
-        LOGI("Average frame per second in 2000 loop is: " << prof_frames_time);
+        GXLOGI("Average frame per second in 2000 loop is: " << prof_frames_time);
         prof_frames_count = 0;
         prof_frames_time = 0.0f;
     }

@@ -1,18 +1,22 @@
 cmake_minimum_required(VERSION 3.4.1)
 
 set(${CMAKE_C_FLAGS}, "${CMAKE_C_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Ofast -Wall -Werror")
+set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -u ANativeActivity_onCreate")
+set(NDK_HELPER_DIR "${ANDROID_NDK}/sources/android/ndk_helper")
+set(APP_GLUE "${ANDROID_NDK}/sources/android/native_app_glue")
 
 add_library(
-    native_app_glue
+    native-app-glue
     STATIC
-    ${ANDROID_NDK}/sources/android/native_app_glue/android_native_app_glue.c)
+    ${APP_GLUE}/android_native_app_glue.c )
 
-set(
-    CMAKE_CXX_FLAGS
-    "${CMAKE_CXX_FLAGS} -std=c++14 -Ofast -Wall -Werror")
-set(
-    CMAKE_SHARED_LINKER_FLAGS
-    "${CMAKE_SHARED_LINKER_FLAGS} -u ANativeActivity_onCreate")
+add_library(
+    ndk-helper
+    STATIC
+    ${NDK_HELPER_DIR}/gestureDetector.cpp
+    ${NDK_HELPER_DIR}/JNIHelper.cpp
+    ${NDK_HELPER_DIR}/vecmath.cpp )
 
 set(APP_SRC_DIR ../)
 
@@ -148,14 +152,21 @@ add_library(
 )
 
 target_include_directories(
+    ndk-helper
+    PRIVATE
+    ${APP_GLUE} )
+
+target_include_directories(
     native-activity
     PRIVATE
-    ${ANDROID_NDK}/sources/android/native_app_glue)
+    ${APP_GLUE}
+    ${NDK_HELPER_DIR} )
 
 target_link_libraries(
     native-activity
     android
-    native_app_glue
+    native-app-glue
+    ndk-helper
     EGL
     GLESv2
     log)

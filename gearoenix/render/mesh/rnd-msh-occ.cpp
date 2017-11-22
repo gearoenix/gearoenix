@@ -10,7 +10,7 @@ gearoenix::render::mesh::Occ::Occ(system::File* f, Engine* e, std::shared_ptr<co
     f->read(sid);
 #ifdef DEBUG_MODE
     if (sid != shader::DEPTH_POS) {
-        LOGF("Unexpected");
+        GXLOGF("Unexpected");
     }
 #endif
     unsigned int vec = shader::Shader::get_vertex_real_count(sid);

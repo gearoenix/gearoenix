@@ -7,7 +7,7 @@ gearoenix::audio::Audio::Audio(system::File* f)
 {
     std::vector<uint8_t> bytes;
     f->read(bytes);
-    LOGE("TODO");
+    GXLOGE("TODO");
 }
 
 gearoenix::audio::Audio::~Audio() {}
@@ -22,5 +22,5 @@ gearoenix::audio::Audio* gearoenix::audio::Audio::read(system::File* f)
     case 20:
         return new Speaker(f);
     }
-    LOGF("Unexpected");
+    GXLOGF("Unexpected");
 }

@@ -34,7 +34,7 @@ std::shared_ptr<T> gearoenix::core::cache::file::Sparse::get(Id id, std::functio
 #ifdef DEBUG_MODE
         auto search = offsets.find(id);
         if (search == offsets.end()) {
-            LOGF("object with id: " << id << ", not found in table of offsets.");
+            GXLOGF("object with id: " << id << ", not found in table of offsets.");
         }
         file->seek((unsigned int)search->second);
 #else

@@ -5,7 +5,7 @@
 #include <android/log.h>
 #include <sstream>
 
-#define LOG(p, s)                                                                   \
+#define GXLOG(p, s)                                                                 \
     {                                                                               \
         std::stringstream stringstream;                                             \
         stringstream << __FILE__ << " " << __LINE__ << ": ";                        \
@@ -13,10 +13,10 @@
         __android_log_print(p, APPLICATION_NAME, "%s", stringstream.str().c_str()); \
     }
 
-#define LOGI(s) LOG(ANDROID_LOG_INFO, s)
-#define LOGE(s) LOG(ANDROID_LOG_ERROR, s)
-#define LOGF(s)                \
-    LOG(ANDROID_LOG_FATAL, s); \
+#define GXLOGI(s) GXLOG(ANDROID_LOG_INFO, s)
+#define GXLOGE(s) GXLOG(ANDROID_LOG_ERROR, s)
+#define GXLOGF(s)                \
+    GXLOG(ANDROID_LOG_FATAL, s); \
     std::terminate();
 
 #endif
