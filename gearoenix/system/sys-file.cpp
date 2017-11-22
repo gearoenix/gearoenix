@@ -38,9 +38,9 @@ gearoenix::system::File::File
 //: sys_app(sys_app)
 {
     file = AAssetManager_open(sys_app->get_android_app()->activity->assetManager,
-        "data.gx3d", AASSET_MODE_BUFFER);
+        name.c_str(), AASSET_MODE_BUFFER);
     if (file == nullptr) {
-        LOGF(std::string("asset not found!"));
+        LOGF("Asset not found! " << name);
     }
 #else
 #error "Unimplemented!"

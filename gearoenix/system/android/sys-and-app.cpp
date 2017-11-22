@@ -1,6 +1,8 @@
 #include "sys-and-app.hpp"
 #ifdef IN_ANDROID
+#include "../../core/asset/cr-asset-manager.hpp"
 #include "../../core/cr-application.hpp"
+#include "../../gles2/gles2-engine.hpp"
 #include "../../render/rnd-engine.hpp"
 #include "../sys-file.hpp"
 #include "../sys-log.hpp"
@@ -25,6 +27,8 @@ gearoenix::system::Application::Application(android_app* and_app)
             if (source != nullptr)
                 source->process(and_app, source);
         }
+        if (render_engine != nullptr)
+            break;
     } while (and_app->destroyRequested == 0);
 }
 
@@ -92,11 +96,14 @@ void gearoenix::system::Application::execute(core::Application* app)
     int events;
     android_poll_source* source;
     do {
-        if (ALooper_pollAll(0, nullptr, &events,
+        if (ALooper_pollAll(1, nullptr, &events,
                 (void**)&source)
             >= 0) {
             if (source != nullptr)
                 source->process(and_app, source);
+            core_app->update();
+            render_engine->update();
+            eglSwapBuffers(display, surface);
         }
     } while (and_app->destroyRequested == 0);
 }
@@ -105,12 +112,14 @@ void gearoenix::system::Application::handle(int32_t cmd)
 {
     switch (cmd) {
     case APP_CMD_INIT_WINDOW:
-        if (and_app->window != nullptr) {
+        if (and_app->window != nullptr && this->render_engine == nullptr) {
             const EGLint attribs[] = {
-                EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
+                EGL_SURFACE_TYPE, EGL_OPENGL_ES2_BIT,
                 EGL_BLUE_SIZE, 8,
                 EGL_GREEN_SIZE, 8,
                 EGL_RED_SIZE, 8,
+                EGL_ALPHA_SIZE, 8,
+                EGL_DEPTH_SIZE, 24,
                 EGL_NONE
             };
             EGLint w, h, format;
@@ -139,7 +148,11 @@ void gearoenix::system::Application::handle(int32_t cmd)
             }
             eglGetConfigAttrib(display, config, EGL_NATIVE_VISUAL_ID, &format);
             surface = eglCreateWindowSurface(display, config, this->and_app->window, NULL);
-            context = eglCreateContext(display, config, NULL, NULL);
+            const EGLint attrib_list[] = {
+                EGL_CONTEXT_CLIENT_VERSION, 2,
+                EGL_NONE
+            };
+            context = eglCreateContext(display, config, NULL, attrib_list);
             if (eglMakeCurrent(display, surface, surface, context) == EGL_FALSE) {
                 LOGF("Unable to eglMakeCurrent");
             }
@@ -147,6 +160,9 @@ void gearoenix::system::Application::handle(int32_t cmd)
             eglQuerySurface(display, surface, EGL_HEIGHT, &h);
             win_width = (unsigned int)w;
             win_height = (unsigned int)h;
+            render_engine = new gles2::Engine(this);
+            astmgr = new core::asset::Manager(this, "data.gx3d");
+            astmgr->initialize();
         }
         break;
     case APP_CMD_LOST_FOCUS:

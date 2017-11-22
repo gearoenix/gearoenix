@@ -8,7 +8,7 @@
 #define LOG(p, s)                                                                   \
     {                                                                               \
         std::stringstream stringstream;                                             \
-        stringstream << __FILE__ << " " << __LINE__ << ":";                         \
+        stringstream << __FILE__ << " " << __LINE__ << ": ";                        \
         stringstream << s;                                                          \
         __android_log_print(p, APPLICATION_NAME, "%s", stringstream.str().c_str()); \
     }

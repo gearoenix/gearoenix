@@ -19,6 +19,7 @@ void gearoenix::render::texture::PNG::decode(
     std::vector<unsigned char> png;
     file->read(png);
     unsigned error = lodepng::decode(data, img_width, img_height, png);
-    if (error)
+    if (error) {
         LOGF("decoder error " << error << ": " << lodepng_error_text(error));
+    }
 }
