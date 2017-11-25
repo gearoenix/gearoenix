@@ -4,10 +4,12 @@
 #include <functional>
 #include <memory>
 #include <mutex>
+#include <thread>
 #include <vector>
 namespace gearoenix {
 namespace core {
     class EndCaller;
+    class Semaphore;
 }
 namespace system {
     class Application;
@@ -42,6 +44,13 @@ namespace render {
         std::vector<std::function<void()>> load_functions;
         std::mutex loaded_scenes_mutex;
         std::vector<std::shared_ptr<scene::Scene>> loaded_scenes;
+        std::mutex scene_loader_mutex;
+        std::vector<std::function<void()>> scene_loader_functions;
+        core::Semaphore* scene_loader_signaler;
+        std::thread scene_loader;
+        volatile bool scene_loader_continue = true;
+
+        void scene_loader_function();
 
     public:
         Engine(system::Application* system_application);

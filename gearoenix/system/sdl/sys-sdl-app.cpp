@@ -171,6 +171,7 @@ const gearoenix::core::asset::Manager* gearoenix::system::Application::get_asset
 gearoenix::core::Real gearoenix::system::Application::get_window_ratio() const
 {
     int w, h;
+    TODO; // move following function out of this, because this function gonna call in other threads
     SDL_GetWindowSize(window, &w, &h);
     return static_cast<core::Real>(w) / static_cast<core::Real>(h);
 }

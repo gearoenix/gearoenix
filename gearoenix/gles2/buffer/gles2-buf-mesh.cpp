@@ -24,30 +24,6 @@ gearoenix::gles2::buffer::Mesh::Mesh(unsigned int vec, system::File* f, Engine* 
     unsigned int ids = (unsigned int)(cnt * sizeof(GLushort));
     unsigned int is = ids;
     std::function<void()> todo = [this, vd, idata, vs, is, c] {
-        //        for (core::Real r : vd) {
-        //            LOGI(r);
-        //        }
-        //        LOGI("***********************************************");
-        //        for (GLushort i : idata) {
-        //            LOGI(i);
-        //        }
-
-        //const GLfloat vertices[] = {
-        //    0.0f, 1.0f, -0.1f, 0.0f, 0.0f, 1.0f, 0.0f, 2.0f,
-        //    1.0f, 0.0f, -0.1f, 0.0f, 0.0f, 1.0f, 2.0f, 0.0f,
-        //    -1.0f, 0.0f, -0.1f, 0.0f, 0.0f, 1.0f, -2.0f, 0.0f,
-        //};
-        //const GLushort indices[] = {
-        //    0, 2, 1,
-        //};
-        //glGenBuffers(1, &vbo);
-        //glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        //glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-        //glGenBuffers(1, &ibo);
-        //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-        //glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-        //ic = 3;
-
         glGenBuffers(1, &vbo);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBufferData(GL_ARRAY_BUFFER, vs, vd.data(), GL_STATIC_DRAW);
