@@ -39,6 +39,8 @@ namespace render {
         private:
             math::Mat4x4 m;
             math::Mat4x4 mvp;
+            math::Vec3 occloc;
+            core::Real occrds;
             // mesh_id -> (mesh, material, shadow_caster_material)
             std::map<core::Id,
                 std::tuple<std::shared_ptr<mesh::Mesh>,

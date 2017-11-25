@@ -12,6 +12,8 @@
 gearoenix::render::model::Model::Model(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c)
 {
     m.read(f);
+    occloc.read(f);
+    f->read(occrds);
     core::Count mesh_count = 0;
     f->read(mesh_count);
     std::vector<core::Id> mesh_ids(mesh_count);
