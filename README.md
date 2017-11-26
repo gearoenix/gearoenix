@@ -5,20 +5,22 @@ An in-house game engine with experimental approach.
 Design and decision making in development process of this project is business
 oriented, it means: I'm developing a game with it and development of this
 project is dependent on the needs of that game and I design and develop a new
-feature whenever my game needs a new feature in the engine, sometimes in the
+feature whenever my game needs that new feature in the engine, sometimes in the
 design and or implementation I makes decisions that are mostly related to my
-game and urge of getting result, but I never ever disregards best practices in
+game and urge of getting results, but I never ever disregards best practices in
 its development.
 
-One of the appearance of this development process in engine is, in first engine
-was getting developed with `Vulkan API` but because of lake of market share, I
-decided to suspend `Vulkan` part and continue with `OpenGL ES 2`.
+One of the appearance of this development process in engine is, at very start,
+this engine was getting developed with `Vulkan API` but because of lake of
+market share and slow development, I decided to suspend `Vulkan` part and
+continue with `OpenGL ES 2`.
 
 ## Features
 - It is cross-platform (already tested on Linux, Android, iOS but, It can easily
 compile for Windows, MacOS, WebAssembly)
-- It has `OpenGL` and `Vulkan(WIP)` backends but ready to have `Metal` in
-  future (because it is successor of Vulkust game engine).
+- It has `OpenGL` and `Vulkan(WIP)` backends but also it is ready to have
+  `Metal` in future (because of its nature of being successor of Vulkust game
+  engine).
 - It has its own file format for importing scenes data in to game. This file
   format help the engine to have better performance in loading a scene and
   reduce the size of the data.
