@@ -2,6 +2,7 @@
 #include "../core/asset/cr-asset-manager.hpp"
 #include "../core/cr-end-caller.hpp"
 #include "../core/cr-semaphore.hpp"
+#include "../physics/phs-engine.hpp"
 #include "../system/sys-app.hpp"
 #include "../system/sys-log.hpp"
 #include "pipeline/rnd-pip-manager.hpp"
@@ -26,13 +27,16 @@ void gearoenix::render::Engine::scene_loader_function()
 
 gearoenix::render::Engine::Engine(system::Application* system_application)
     : sysapp(system_application)
+    , physics_engine(new physics::Engine())
 {
     scene_loader_signaler = new core::Semaphore();
     scene_loader = std::thread(std::bind(&Engine::scene_loader_function, this));
+    physics_engine->update();
 }
 
 gearoenix::render::Engine::~Engine()
 {
+    delete physics_engine;
     scene_loader_continue = false;
     scene_loader_signaler->release();
     scene_loader.join();

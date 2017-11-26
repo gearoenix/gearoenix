@@ -11,6 +11,9 @@ namespace core {
     class EndCaller;
     class Semaphore;
 }
+namespace physics {
+    class Engine;
+}
 namespace system {
     class Application;
     class File;
@@ -49,6 +52,7 @@ namespace render {
         core::Semaphore* scene_loader_signaler;
         std::thread scene_loader;
         volatile bool scene_loader_continue = true;
+        physics::Engine* physics_engine = nullptr;
 
         void scene_loader_function();
 
