@@ -4,6 +4,9 @@
 #include "../../math/math-matrix.hpp"
 #include "../../math/math-vector.hpp"
 namespace gearoenix {
+namespace physics {
+    class Kernel;
+}
 namespace system {
     class Application;
     class File;
@@ -11,7 +14,10 @@ namespace system {
 namespace render {
     namespace camera {
         class Camera : public core::asset::Asset {
+            friend class physics::Kernel;
+
         protected:
+            bool moved = true;
             core::Real start;
             core::Real end;
             core::Real screen_ratio;

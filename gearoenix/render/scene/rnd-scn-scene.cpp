@@ -81,6 +81,11 @@ gearoenix::render::scene::Scene* gearoenix::render::scene::Scene::read(
     return new Scene(f, e, c);
 }
 
+const std::map<gearoenix::core::Id, std::weak_ptr<gearoenix::render::model::Model>>& gearoenix::render::scene::Scene::get_all_models() const
+{
+    return all_models;
+}
+
 void gearoenix::render::scene::Scene::commit()
 {
     for (std::pair<const core::Id, std::shared_ptr<model::Model>>& p : root_models) {

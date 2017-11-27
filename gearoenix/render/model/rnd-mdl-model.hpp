@@ -12,6 +12,9 @@ namespace gearoenix {
 namespace core {
     class EndCaller;
 }
+namespace physics {
+    class Kernel;
+}
 namespace system {
     class File;
 }
@@ -36,11 +39,22 @@ namespace render {
     namespace model {
         class Uniform;
         class Model : public core::asset::Asset {
+            friend class physics::Kernel;
+
         private:
+            bool has_shadow_caster = true;
+            bool has_transparent = true;
+            bool is_in_sun = true;
+            bool is_in_camera = true;
+            bool moved = true;
             math::Mat4x4 m;
+            bool needs_mvp = true;
             math::Mat4x4 mvp;
+            bool needs_dbm = true;
+            math::Mat4x4 dbm;
             math::Vec3 occloc;
             core::Real occrds;
+            core::Real distcam;
             // mesh_id -> (mesh, material, shadow_caster_material)
             std::map<core::Id,
                 std::tuple<std::shared_ptr<mesh::Mesh>,

@@ -27,10 +27,11 @@ void gearoenix::render::Engine::scene_loader_function()
 
 gearoenix::render::Engine::Engine(system::Application* system_application)
     : sysapp(system_application)
-    , physics_engine(new physics::Engine())
 {
+
     scene_loader_signaler = new core::Semaphore();
     scene_loader = std::thread(std::bind(&Engine::scene_loader_function, this));
+    physics_engine = new physics::Engine(this);
     physics_engine->update();
 }
 
@@ -79,6 +80,11 @@ const std::shared_ptr<gearoenix::render::scene::Scene>& gearoenix::render::Engin
     }
 #endif
     return loaded_scenes[scene_index];
+}
+
+const std::vector<std::shared_ptr<gearoenix::render::scene::Scene>>& gearoenix::render::Engine::get_all_scenes() const
+{
+    return loaded_scenes;
 }
 
 void gearoenix::render::Engine::load_scene(core::Id scene_id, std::function<void(unsigned int)> on_load)

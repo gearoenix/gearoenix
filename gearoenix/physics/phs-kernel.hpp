@@ -7,10 +7,11 @@
 #include <vector>
 namespace gearoenix {
 namespace physics {
+    class Engine;
     class Kernel {
     private:
         const unsigned int thread_index;
-        const unsigned int threads_count;
+        Engine* engine;
         std::condition_variable cv;
         std::mutex cvm;
         std::thread thread;
@@ -19,7 +20,7 @@ namespace physics {
 
     protected:
     public:
-        Kernel(const unsigned int thread_index, const unsigned int threads_count);
+        Kernel(const unsigned int thread_index, Engine* engine);
         ~Kernel();
         void signal();
     };

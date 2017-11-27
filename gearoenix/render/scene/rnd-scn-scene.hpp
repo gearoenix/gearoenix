@@ -15,6 +15,9 @@ namespace audio {
 namespace core {
     class EndCaller;
 }
+namespace physics {
+    class Kernel;
+}
 namespace system {
     class File;
 }
@@ -41,11 +44,14 @@ namespace render {
     }
     namespace scene {
         class Scene : public core::asset::Asset {
+            friend class physics::Kernel;
+
         private:
             std::vector<std::shared_ptr<camera::Camera>> cameras;
             std::vector<std::shared_ptr<audio::Audio>> audios;
             std::vector<std::shared_ptr<light::Light>> lights;
             std::map<core::Id, std::shared_ptr<model::Model>> root_models;
+            bool all_models_needs_cleaning = false;
             std::map<core::Id, std::weak_ptr<model::Model>> all_models;
             // shadow_caster_shader_id -> model_id -> mesh_id
             std::map<core::Id, std::map<core::Id, std::set<core::Id>>> shadow_caster_models;
@@ -69,6 +75,7 @@ namespace render {
             void draw(texture::Texture2D* shadow_texture);
             ~Scene();
             static Scene* read(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c);
+            const std::map<core::Id, std::weak_ptr<model::Model>>& get_all_models() const;
             const camera::Camera* get_current_camera() const;
             camera::Camera* get_current_camera();
             const math::Vec3& get_ambient_light() const;

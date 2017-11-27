@@ -75,6 +75,7 @@ namespace render {
         const system::Application* get_system_application() const;
         system::Application* get_system_application();
         const std::shared_ptr<scene::Scene>& get_scene(unsigned int scene_index) const;
+        const std::vector<std::shared_ptr<scene::Scene>>& get_all_scenes() const;
         void load_scene(core::Id scene_id, std::function<void(unsigned int)> on_load);
     };
 }
