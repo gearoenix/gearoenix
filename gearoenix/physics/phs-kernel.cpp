@@ -1,5 +1,7 @@
 #include "phs-kernel.hpp"
 #include "../render/camera/rnd-cmr-camera.hpp"
+#include "../render/camera/rnd-cmr-orthographic.hpp"
+#include "../render/light/rnd-lt-sun.hpp"
 #include "../render/model/rnd-mdl-model.hpp"
 #include "../render/rnd-engine.hpp"
 #include "../render/scene/rnd-scn-scene.hpp"
@@ -17,7 +19,6 @@ void gearoenix::physics::Kernel::run()
         std::cout << s;
         const std::vector<std::shared_ptr<render::scene::Scene>>& scenes = engine->render_engine->get_all_scenes();
         for (const std::shared_ptr<render::scene::Scene>& scene : scenes) {
-            render::camera::Camera* camera = scene->get_current_camera();
             const std::map<core::Id, std::weak_ptr<render::model::Model>>& models = scene->get_all_models();
             unsigned int model_index = 0;
             for (const std::pair<core::Id, std::weak_ptr<render::model::Model>>& id_model : models) {
@@ -28,17 +29,7 @@ void gearoenix::physics::Kernel::run()
                     scene->all_models_needs_cleaning = true;
                     continue;
                 }
-                if (camera->moved || model->moved) {
-                    model->is_in_camera = camera->in_sight(model->occloc, model->occrds);
-                    if (model->is_in_camera) {
-                        if (model->needs_mvp) {
-                            model->mvp = camera->get_view_projection() * model->m;
-                        }
-                        if (model->has_transparent) {
-                            model->distcam = (camera->l - model->occloc).square_length();
-                        }
-                    }
-                }
+                model->commit(scene.get());
             }
         }
     }

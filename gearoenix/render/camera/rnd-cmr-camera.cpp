@@ -234,3 +234,8 @@ void gearoenix::render::camera::Camera::move_sideward(const core::Real spd)
     v = vwl * math::Mat4x4::translator(-l);
     vp = p * v;
 }
+
+bool gearoenix::render::camera::Camera::get_changed() const
+{
+    return changed;
+}

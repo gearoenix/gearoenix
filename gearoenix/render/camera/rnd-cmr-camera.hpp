@@ -17,7 +17,7 @@ namespace render {
             friend class physics::Kernel;
 
         protected:
-            bool moved = true;
+            bool changed = true;
             core::Real start;
             core::Real end;
             core::Real screen_ratio;
@@ -56,6 +56,7 @@ namespace render {
             const math::Vec3& get_y() const;
             const math::Vec3& get_z() const;
             void copy_location(math::Vec3& v) const;
+            bool get_changed() const;
             virtual bool in_sight(const math::Vec3& location, const core::Real radius) = 0;
             virtual void window_size_changed() = 0;
         };

@@ -46,13 +46,15 @@ namespace render {
             bool has_transparent = true;
             bool is_in_sun = true;
             bool is_in_camera = true;
-            bool moved = true;
+            bool changed = true;
+            // be careful about scaling because it gonna scale radius too.
             math::Mat4x4 m;
             bool needs_mvp = true;
             math::Mat4x4 mvp;
             bool needs_dbm = true;
             math::Mat4x4 dbm;
             math::Vec3 occloc;
+            // be careful about scaling because it gonna scale radius too.
             core::Real occrds;
             core::Real distcam;
             // mesh_id -> (mesh, material, shadow_caster_material)

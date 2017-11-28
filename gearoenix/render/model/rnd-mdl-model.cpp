@@ -3,6 +3,7 @@
 #include "../../system/sys-app.hpp"
 #include "../../system/sys-file.hpp"
 #include "../camera/rnd-cmr-camera.hpp"
+#include "../camera/rnd-cmr-orthographic.hpp"
 #include "../material/rnd-mat-depth.hpp"
 #include "../material/rnd-mat-material.hpp"
 #include "../mesh/rnd-msh-mesh.hpp"
@@ -50,19 +51,43 @@ gearoenix::render::model::Model::~Model() {}
 
 void gearoenix::render::model::Model::commit(const scene::Scene* s)
 {
-    GXLOGE("TODO this function have two part, "
-           "firts is math part and second is graphic related stuff, "
-           "math part must move to physice-engine.");
-    mvp = s->get_current_camera()->get_view_projection() * m;
-    for (std::pair<const core::Id, std::tuple<std::shared_ptr<mesh::Mesh>, std::shared_ptr<material::Material>, std::shared_ptr<material::Depth>>>& mshmtr : meshes) {
-        std::get<1>(mshmtr.second)->update(s, this);
-        std::shared_ptr<material::Depth>& dp = std::get<2>(mshmtr.second);
-        if (nullptr != dp) {
-            dp->update(s, this);
+    const render::camera::Camera* camera = s->get_current_camera();
+    const render::light::Sun* sun = scene->get_sun();
+    const render::camera::Orthographic* suncam = sun->get_camera();
+    bool moccloc_not_initialized = true;
+    math::Vec3 moccloc;
+    if (camera->get_changed() || changed) {
+        moccloc = m * occloc;
+        moccloc_not_initialized = false;
+        is_in_camera = camera->in_sight(moccloc, occrds);
+        if (is_in_camera) {
+            if (needs_mvp) {
+                mvp = camera->get_view_projection() * m;
+            }
+            if (has_transparent) {
+                distcam = (camera->get_location() - moccloc).square_length();
+            }
+            for (std::pair<const core::Id, std::tuple<std::shared_ptr<mesh::Mesh>, std::shared_ptr<material::Material>, std::shared_ptr<material::Depth>>>& mshmtr : meshes) {
+                std::get<1>(mshmtr.second)->update(s, this);
+            }
         }
     }
-    for (std::pair<const core::Id, std::shared_ptr<Model>>& cm : children) {
-        cm.second->commit(s);
+    if (has_shadow_caster && (suncam->get_changed() || moved)) {
+        if (moccloc_not_initialized) {
+            moccloc = m * occloc;
+        }
+        is_in_sun = suncam->in_sight(moccloc, occrds);
+        if (is_in_sun) {
+            if (needs_dbm) {
+                dbm = sun->get_bias() * m;
+            }
+            for (std::pair<const core::Id, std::tuple<std::shared_ptr<mesh::Mesh>, std::shared_ptr<material::Material>, std::shared_ptr<material::Depth>>>& mshmtr : meshes) {
+                std::shared_ptr<material::Depth>& dp = std::get<2>(mshmtr.second);
+                if (nullptr != dp) {
+                    dp->update(s, this);
+                }
+            }
+        }
     }
 }
 
