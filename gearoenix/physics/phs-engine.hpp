@@ -23,6 +23,7 @@ namespace physics {
         Engine(render::Engine* rndeng);
         ~Engine();
         void update();
+        void wait();
     };
 }
 }

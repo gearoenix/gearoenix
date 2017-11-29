@@ -32,3 +32,11 @@ void gearoenix::physics::Engine::update()
         kernels[i]->signal();
     }
 }
+
+void gearoenix::physics::Engine::wait()
+{
+    for (unsigned int i = 0; i < threads_count; ++i) {
+        signaller->lock();
+    }
+    std::cout << "physics update ended.\n";
+}

@@ -17,7 +17,7 @@ namespace render {
 
         public:
             Perspective(system::File* f, system::Application* app);
-            bool in_sight(const math::Vec3& location, const core::Real radius);
+            bool in_sight(const math::Vec3& location, const core::Real radius) const;
             void window_size_changed();
         };
     }

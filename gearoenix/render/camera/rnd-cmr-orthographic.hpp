@@ -11,7 +11,7 @@ namespace render {
         protected:
         public:
             Orthographic(system::File* f, system::Application* sysapp);
-            bool in_sight(const math::Vec3& location, const core::Real radius);
+            bool in_sight(const math::Vec3& location, const core::Real radius) const;
             void window_size_changed();
         };
     }

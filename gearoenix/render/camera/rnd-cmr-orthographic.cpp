@@ -12,7 +12,7 @@ gearoenix::render::camera::Orthographic::Orthographic(system::File* f, system::A
     vp = p * v;
 }
 
-bool gearoenix::render::camera::Orthographic::in_sight(const math::Vec3& location, const core::Real radius)
+bool gearoenix::render::camera::Orthographic::in_sight(const math::Vec3& location, const core::Real radius) const
 {
     math::Vec3 el = location - l;
     math::Vec3 ez = z * (z.dot(el));

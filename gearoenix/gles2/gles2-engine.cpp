@@ -2,6 +2,7 @@
 #ifdef USE_OPENGL_ES2
 #include "../core/asset/cr-asset-manager.hpp"
 #include "../core/cr-end-caller.hpp"
+#include "../physics/phs-engine.hpp"
 #include "../render/camera/rnd-cmr-camera.hpp"
 #include "../render/pipeline/rnd-pip-manager.hpp"
 #include "../render/scene/rnd-scn-scene.hpp"
@@ -155,9 +156,10 @@ void gearoenix::gles2::Engine::update()
         glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, 0);
     }
 #else
-    for (std::shared_ptr<render::scene::Scene>& scene : loaded_scenes) {
-        scene->commit();
-    }
+    //    for (std::shared_ptr<render::scene::Scene>& scene : loaded_scenes) {
+    //        scene->commit();
+    //    }
+    physics_engine->wait();
     for (std::shared_ptr<render::scene::Scene>& scene : loaded_scenes) {
         glBindRenderbuffer(GL_RENDERBUFFER, shadow_map_depth);
         glBindFramebuffer(GL_FRAMEBUFFER, shadow_map_framebuffer);
@@ -175,6 +177,7 @@ void gearoenix::gles2::Engine::update()
 
         scene->draw(shadow_map_texture);
     }
+    physics_engine->update();
 #endif
 #ifdef GLES2_PROFILING
     auto now = std::chrono::high_resolution_clock::now();

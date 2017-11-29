@@ -4,11 +4,13 @@
 #include "../../system/sys-file.hpp"
 #include "../camera/rnd-cmr-camera.hpp"
 #include "../camera/rnd-cmr-orthographic.hpp"
+#include "../light/rnd-lt-sun.hpp"
 #include "../material/rnd-mat-depth.hpp"
 #include "../material/rnd-mat-material.hpp"
 #include "../mesh/rnd-msh-mesh.hpp"
 #include "../rnd-engine.hpp"
 #include "../scene/rnd-scn-scene.hpp"
+#include <iostream>
 
 gearoenix::render::model::Model::Model(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c)
 {
@@ -52,7 +54,7 @@ gearoenix::render::model::Model::~Model() {}
 void gearoenix::render::model::Model::commit(const scene::Scene* s)
 {
     const render::camera::Camera* camera = s->get_current_camera();
-    const render::light::Sun* sun = scene->get_sun();
+    const render::light::Sun* sun = s->get_sun();
     const render::camera::Orthographic* suncam = sun->get_camera();
     bool moccloc_not_initialized = true;
     math::Vec3 moccloc;
@@ -70,9 +72,10 @@ void gearoenix::render::model::Model::commit(const scene::Scene* s)
             for (std::pair<const core::Id, std::tuple<std::shared_ptr<mesh::Mesh>, std::shared_ptr<material::Material>, std::shared_ptr<material::Depth>>>& mshmtr : meshes) {
                 std::get<1>(mshmtr.second)->update(s, this);
             }
+            std::cout << "\n\nis in camera\n\n";
         }
     }
-    if (has_shadow_caster && (suncam->get_changed() || moved)) {
+    if (has_shadow_caster && (suncam->get_changed() || changed)) {
         if (moccloc_not_initialized) {
             moccloc = m * occloc;
         }
@@ -93,10 +96,12 @@ void gearoenix::render::model::Model::commit(const scene::Scene* s)
 
 void gearoenix::render::model::Model::draw(core::Id mesh_id, texture::Texture2D* shadow_texture)
 {
-    std::tuple<std::shared_ptr<mesh::Mesh>, std::shared_ptr<material::Material>, std::shared_ptr<material::Depth>>& mshmtr = meshes[mesh_id];
-    std::get<0>(mshmtr)->bind();
-    std::get<1>(mshmtr)->bind(shadow_texture);
-    std::get<0>(mshmtr)->draw();
+    if (is_in_camera) {
+        std::tuple<std::shared_ptr<mesh::Mesh>, std::shared_ptr<material::Material>, std::shared_ptr<material::Depth>>& mshmtr = meshes[mesh_id];
+        std::get<0>(mshmtr)->bind();
+        std::get<1>(mshmtr)->bind(shadow_texture);
+        std::get<0>(mshmtr)->draw();
+    }
 }
 
 void gearoenix::render::model::Model::cast_shadow(core::Id mesh_id)

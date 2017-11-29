@@ -1,4 +1,5 @@
 #include "phs-kernel.hpp"
+#include "../core/cr-semaphore.hpp"
 #include "../render/camera/rnd-cmr-camera.hpp"
 #include "../render/camera/rnd-cmr-orthographic.hpp"
 #include "../render/light/rnd-lt-sun.hpp"
@@ -32,6 +33,7 @@ void gearoenix::physics::Kernel::run()
                 model->commit(scene.get());
             }
         }
+        engine->signaller->release();
     }
     alive = true;
 }
