@@ -38,6 +38,7 @@ compile for Windows, MacOS, WebAssembly)
 - Different type of cameras: Perspective, Orthographic
 - Graphic pipeline management to cache and reduce number of switches and
   increasing performance.
+- Multithreaded occlusion culling. 
 - Variety of materials:
   - Lighting: Shadeless / Directional / Normal-mapped
   - Texturing: Colored / 2D / 3D / Cube
