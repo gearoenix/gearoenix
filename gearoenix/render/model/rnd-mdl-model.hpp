@@ -56,6 +56,7 @@ namespace render {
             math::Mat4x4 sunmvp;
             math::Vec3 occloc;
             // be careful about scaling because it gonna scale radius too.
+            math::Vec3 occrdss;
             core::Real occrds;
             core::Real distcam;
             // mesh_id -> (mesh, material, shadow_caster_material)

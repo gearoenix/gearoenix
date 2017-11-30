@@ -6,10 +6,12 @@ gearoenix::render::camera::Perspective::Perspective(system::File* f, system::App
     : Camera(f, app)
 {
     f->read(h_angle);
-    c_width = std::tan(h_angle) * start;
+    tanhang = std::tan(h_angle);
+    one_coshang = 1.0f / std::cos(h_angle);
+    c_width = tanhang * start;
     c_height = c_width / screen_ratio;
     tanvang = c_height / start;
-    tanhang = c_width / start;
+    one_cosvang = 1.0f / std::cos(std::atan(tanhang));
     p = math::Mat4x4::perspective(c_width * 2.0f, c_height * 2.0f, start, end);
     vp = p * v;
 }
@@ -24,10 +26,10 @@ bool gearoenix::render::camera::Perspective::in_sight(const math::Vec3& location
         return false;
     math::Vec3 eye_on_z_plane = eye - (z * (-eye_z));
     core::Real eye_on_x = std::abs(eye_on_z_plane.dot(x));
-    if (((eye_on_x - radius) / eye_z) > tanhang)
+    if (eye_on_x - (radius * one_coshang) > tanhang * eye_z)
         return false;
     core::Real eye_on_y = std::abs(eye_on_z_plane.dot(y));
-    if (((eye_on_y - radius) / eye_z) > tanvang)
+    if (eye_on_y - (radius * one_cosvang) > tanvang * eye_z)
         return false;
 
     return true;

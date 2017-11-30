@@ -9,6 +9,8 @@ namespace render {
             core::Real h_angle;
             core::Real tanhang;
             core::Real tanvang;
+            core::Real one_coshang;
+            core::Real one_cosvang;
 
         public:
             Perspective(system::File* f, system::Application* app);

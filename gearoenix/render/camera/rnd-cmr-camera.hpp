@@ -57,6 +57,7 @@ namespace render {
             const math::Vec3& get_z() const;
             void copy_location(math::Vec3& v) const;
             bool get_changed() const;
+            void clean();
             virtual bool in_sight(const math::Vec3& location, const core::Real radius) const = 0;
             virtual void window_size_changed() = 0;
         };

@@ -54,6 +54,7 @@ gearoenix::render::camera::Camera* gearoenix::render::camera::Camera::read(syste
 
 void gearoenix::render::camera::Camera::translate(const math::Vec3& vec)
 {
+    changed = true;
     l += vec;
     v = v * math::Mat4x4::translator(-vec);
     vp = p * v;
@@ -61,6 +62,7 @@ void gearoenix::render::camera::Camera::translate(const math::Vec3& vec)
 
 void gearoenix::render::camera::Camera::move(const math::Vec3& vec)
 {
+    changed = true;
     l = vec;
     v = vwl * math::Mat4x4::translator(-vec);
     vp = p * v;
@@ -68,6 +70,7 @@ void gearoenix::render::camera::Camera::move(const math::Vec3& vec)
 
 void gearoenix::render::camera::Camera::rotate_local_x(const core::Real rad)
 {
+    changed = true;
     math::Mat4x4 rot = math::Mat4x4::rotation(x, -rad);
     math::Mat4x4 irot = math::Mat4x4::rotation(x, rad);
     y = irot * y;
@@ -79,6 +82,7 @@ void gearoenix::render::camera::Camera::rotate_local_x(const core::Real rad)
 
 void gearoenix::render::camera::Camera::rotate_local_y(const core::Real rad)
 {
+    changed = true;
     math::Mat4x4 rot = math::Mat4x4::rotation(y, -rad);
     math::Mat4x4 irot = math::Mat4x4::rotation(y, rad);
     x = irot * x;
@@ -90,6 +94,7 @@ void gearoenix::render::camera::Camera::rotate_local_y(const core::Real rad)
 
 void gearoenix::render::camera::Camera::rotate_local_z(const core::Real rad)
 {
+    changed = true;
     math::Mat4x4 rot = math::Mat4x4::rotation(z, -rad);
     math::Mat4x4 irot = math::Mat4x4::rotation(z, rad);
     x = irot * x;
@@ -101,6 +106,7 @@ void gearoenix::render::camera::Camera::rotate_local_z(const core::Real rad)
 
 void gearoenix::render::camera::Camera::rotate_local(const core::Real rad, const math::Vec3& vec)
 {
+    changed = true;
     math::Mat4x4 rot = math::Mat4x4::rotation(vec, -rad);
     math::Mat4x4 irot = math::Mat4x4::rotation(vec, rad);
     x = irot * x;
@@ -113,6 +119,7 @@ void gearoenix::render::camera::Camera::rotate_local(const core::Real rad, const
 
 void gearoenix::render::camera::Camera::rotate_global_x(const core::Real rad)
 {
+    changed = true;
     math::Mat4x4 rot = math::Mat4x4::rotation(math::Vec3::X, -rad);
     math::Mat4x4 irot = math::Mat4x4::rotation(math::Vec3::X, rad);
     x = irot * x;
@@ -125,6 +132,7 @@ void gearoenix::render::camera::Camera::rotate_global_x(const core::Real rad)
 
 void gearoenix::render::camera::Camera::rotate_global_y(const core::Real rad)
 {
+    changed = true;
     math::Mat4x4 rot = math::Mat4x4::rotation(math::Vec3::Y, -rad);
     math::Mat4x4 irot = math::Mat4x4::rotation(math::Vec3::Y, rad);
     x = irot * x;
@@ -137,6 +145,7 @@ void gearoenix::render::camera::Camera::rotate_global_y(const core::Real rad)
 
 void gearoenix::render::camera::Camera::rotate_global_z(const core::Real rad)
 {
+    changed = true;
     math::Mat4x4 rot = math::Mat4x4::rotation(math::Vec3::Z, -rad);
     math::Mat4x4 irot = math::Mat4x4::rotation(math::Vec3::Z, rad);
     x = irot * x;
@@ -149,6 +158,7 @@ void gearoenix::render::camera::Camera::rotate_global_z(const core::Real rad)
 
 void gearoenix::render::camera::Camera::rotate_global(const core::Real rad, const math::Vec3& vec)
 {
+    changed = true;
     math::Mat4x4 rot = math::Mat4x4::rotation(vec, -rad);
     math::Mat4x4 rot2 = math::Mat4x4::rotation(vec, rad);
     x = rot2 * x;
@@ -199,6 +209,7 @@ void gearoenix::render::camera::Camera::copy_location(math::Vec3& v) const
 
 void gearoenix::render::camera::Camera::rotate_look_at(const core::Real rad, const math::Vec3& vec, const math::Vec3& point)
 {
+    changed = true;
     math::Mat4x4 rot = math::Mat4x4::rotation(vec, -rad);
     math::Mat4x4 rot2 = math::Mat4x4::rotation(vec, rad);
     l = (rot2 * (l - point)) + point;
@@ -224,6 +235,7 @@ void gearoenix::render::camera::Camera::rotate_look_at(const core::Real rad, con
 
 void gearoenix::render::camera::Camera::move_forward(const core::Real spd)
 {
+    changed = true;
     math::Vec3 vec = z * spd;
     l += vec;
     v = v * math::Mat4x4::translator(-vec);
@@ -232,6 +244,7 @@ void gearoenix::render::camera::Camera::move_forward(const core::Real spd)
 
 void gearoenix::render::camera::Camera::move_sideward(const core::Real spd)
 {
+    changed = true;
     math::Vec3 vec = x * spd;
     l += vec;
     v = vwl * math::Mat4x4::translator(-l);
@@ -241,4 +254,9 @@ void gearoenix::render::camera::Camera::move_sideward(const core::Real spd)
 bool gearoenix::render::camera::Camera::get_changed() const
 {
     return changed;
+}
+
+void gearoenix::render::camera::Camera::clean()
+{
+    changed = false;
 }

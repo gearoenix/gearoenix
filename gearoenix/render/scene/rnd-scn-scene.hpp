@@ -83,6 +83,7 @@ namespace render {
             bool get_ambient_light_changed() const;
             const light::Sun* get_sun() const;
             void set_renderable(bool);
+            void clean();
         };
     }
 }

@@ -156,3 +156,15 @@ void gearoenix::render::scene::Scene::set_renderable(bool b)
 {
     renderable = b;
 }
+
+void gearoenix::render::scene::Scene::clean()
+{
+    if (all_models_needs_cleaning) {
+        all_models_needs_cleaning = false;
+        for (auto iter = all_models.begin(); iter != all_models.end(); ++iter) {
+            if (iter->second.expired()) {
+                iter = all_models.erase(iter);
+            }
+        }
+    }
+}

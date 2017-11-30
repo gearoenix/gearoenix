@@ -160,6 +160,7 @@ void gearoenix::gles2::Engine::update()
     //        scene->commit();
     //    }
     physics_engine->wait();
+
     for (std::shared_ptr<render::scene::Scene>& scene : loaded_scenes) {
         glBindRenderbuffer(GL_RENDERBUFFER, shadow_map_depth);
         glBindFramebuffer(GL_FRAMEBUFFER, shadow_map_framebuffer);
