@@ -6,24 +6,32 @@ gearoenix::render::camera::Orthographic::Orthographic(system::File* f, system::A
     : Camera(f, sysapp)
 {
     f->read(aspects_size);
-    c_width = aspects_size * screen_ratio;
-    c_height = aspects_size;
+    c_width = aspects_size;
+    c_height = aspects_size / screen_ratio;
     p = math::Mat4x4::orthographic(c_width * 2.0f, c_height * 2.0f, start, end);
     vp = p * v;
 }
 
 bool gearoenix::render::camera::Orthographic::in_sight(const math::Vec3& location, const core::Real radius) const
 {
-    math::Vec3 el = location - l;
-    math::Vec3 ez = z * (z.dot(el));
-    math::Vec3 ezl = location - ez;
-    core::Real w = ezl.dot(x);
-    core::Real h = ezl.dot(y);
-    if (w > c_width + radius)
+    math::Vec3 eye = location - l;
+    core::Real eye_z = -(eye.dot(z));
+    if (eye_z < 0.0f)
+        return eye.square_length() < (radius * radius);
+    if (eye_z - radius > end)
         return false;
-    return h < c_height + radius;
+    math::Vec3 eye_on_z_plane = eye - (z * (-eye_z));
+    core::Real eye_on_x = std::abs(eye_on_z_plane.dot(x));
+    if (eye_on_x - radius > c_width)
+        return false;
+    core::Real eye_on_y = std::abs(eye_on_z_plane.dot(y));
+    if (eye_on_y - radius > c_height)
+        return false;
+
+    return true;
 }
 
 void gearoenix::render::camera::Orthographic::window_size_changed()
 {
+    UNIMPLEMENTED;
 }

@@ -2,6 +2,7 @@
 #include "../../system/sys-app.hpp"
 #include "../../system/sys-file.hpp"
 #include "../../system/sys-log.hpp"
+#include "rnd-cmr-orthographic.hpp"
 #include "rnd-cmr-perspective.hpp"
 
 gearoenix::render::camera::Camera::Camera(system::File* f, system::Application* sysapp)
@@ -43,6 +44,8 @@ gearoenix::render::camera::Camera* gearoenix::render::camera::Camera::read(syste
     case 1:
         return new Perspective(f, sysapp);
         break;
+    case 2:
+        return new Orthographic(f, sysapp);
     default:
         GXLOGF("Unexpected");
         break;
