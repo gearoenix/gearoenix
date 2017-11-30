@@ -106,10 +106,12 @@ void gearoenix::render::model::Model::draw(core::Id mesh_id, texture::Texture2D*
 
 void gearoenix::render::model::Model::cast_shadow(core::Id mesh_id)
 {
-    std::tuple<std::shared_ptr<mesh::Mesh>, std::shared_ptr<material::Material>, std::shared_ptr<material::Depth>>& mshmtr = meshes[mesh_id];
-    std::get<0>(mshmtr)->bind();
-    std::get<2>(mshmtr)->bind(nullptr);
-    std::get<0>(mshmtr)->draw();
+    if (is_in_sun) {
+        std::tuple<std::shared_ptr<mesh::Mesh>, std::shared_ptr<material::Material>, std::shared_ptr<material::Depth>>& mshmtr = meshes[mesh_id];
+        std::get<0>(mshmtr)->bind();
+        std::get<2>(mshmtr)->bind(nullptr);
+        std::get<0>(mshmtr)->draw();
+    }
 }
 
 const std::map<gearoenix::core::Id, std::shared_ptr<gearoenix::render::model::Model>>& gearoenix::render::model::Model::get_children() const
