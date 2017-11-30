@@ -49,9 +49,9 @@ namespace render {
             bool changed = true;
             // be careful about scaling because it gonna scale radius too.
             math::Mat4x4 m;
-            bool needs_mvp = true;
+            bool needs_mvp = false;
             math::Mat4x4 mvp;
-            bool needs_dbm = true;
+            bool needs_dbm = false;
             math::Mat4x4 dbm;
             math::Mat4x4 sunmvp;
             math::Vec3 occloc;

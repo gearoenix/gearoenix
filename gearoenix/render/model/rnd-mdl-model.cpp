@@ -29,9 +29,13 @@ gearoenix::render::model::Model::Model(system::File* f, Engine* e, std::shared_p
                 shader::Shader::get_shadow_caster_shader_id(mat->get_shader_id()),
                 e, c));
             materials[mesh_ids[i]] = std::make_tuple(mat, dp);
+            has_shadow_caster = true;
         } else {
             materials[mesh_ids[i]] = std::make_tuple(mat, nullptr);
         }
+        has_transparent = shader::Shader::is_transparent(mat->get_shader_id());
+        needs_mvp |= mat->needs_mvp();
+        needs_dbm |= mat->needs_dbm();
     }
     core::Count children_count = 0;
     f->read(children_count);
@@ -53,19 +57,19 @@ gearoenix::render::model::Model::~Model() {}
 
 void gearoenix::render::model::Model::commit(const scene::Scene* s)
 {
-    const render::camera::Camera* camera = s->get_current_camera();
+    const camera::Camera* cam = s->get_current_camera();
     bool moccloc_not_initialized = true;
     math::Vec3 moccloc;
-    if (camera->get_changed() || changed) {
+    if (cam->get_changed() || changed) {
         moccloc = m * occloc;
         moccloc_not_initialized = false;
-        is_in_camera = camera->in_sight(moccloc, occrds);
+        is_in_camera = cam->in_sight(moccloc, occrds);
         if (is_in_camera) {
             if (needs_mvp) {
-                mvp = camera->get_view_projection() * m;
+                mvp = cam->get_view_projection() * m;
             }
             if (has_transparent) {
-                distcam = (camera->get_location() - moccloc).square_length();
+                distcam = (cam->get_location() - moccloc).square_length();
             }
             for (std::pair<const core::Id, std::tuple<std::shared_ptr<mesh::Mesh>, std::shared_ptr<material::Material>, std::shared_ptr<material::Depth>>>& mshmtr : meshes) {
                 std::get<1>(mshmtr.second)->update(s, this);
@@ -74,8 +78,8 @@ void gearoenix::render::model::Model::commit(const scene::Scene* s)
         }
     }
     if (has_shadow_caster) {
-        const render::light::Sun* sun = s->get_sun();
-        const render::camera::Orthographic* suncam = sun->get_camera();
+        const light::Sun* sun = s->get_sun();
+        const camera::Orthographic* suncam = sun->get_camera();
         if (suncam->get_changed() || changed) {
             if (moccloc_not_initialized) {
                 moccloc = m * occloc;
@@ -95,6 +99,7 @@ void gearoenix::render::model::Model::commit(const scene::Scene* s)
             }
         }
     }
+    changed = false;
 }
 
 void gearoenix::render::model::Model::draw(core::Id mesh_id, texture::Texture2D* shadow_texture)
