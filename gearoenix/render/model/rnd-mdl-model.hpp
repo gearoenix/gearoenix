@@ -53,6 +53,7 @@ namespace render {
             math::Mat4x4 mvp;
             bool needs_dbm = true;
             math::Mat4x4 dbm;
+            math::Mat4x4 sunmvp;
             math::Vec3 occloc;
             // be careful about scaling because it gonna scale radius too.
             core::Real occrds;
@@ -76,6 +77,7 @@ namespace render {
             const std::map<core::Id, std::tuple<std::shared_ptr<mesh::Mesh>, std::shared_ptr<material::Material>, std::shared_ptr<material::Depth>>>& get_meshes() const;
             const math::Mat4x4& get_m() const;
             const math::Mat4x4& get_mvp() const;
+            const math::Mat4x4& get_sun_mvp() const;
         };
     }
 }

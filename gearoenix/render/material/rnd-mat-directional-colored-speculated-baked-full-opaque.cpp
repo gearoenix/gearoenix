@@ -78,13 +78,18 @@ bool gearoenix::render::material::DirectionalColoredSpeculatedBakedFullOpaque::n
 
 void gearoenix::render::material::DirectionalColoredSpeculatedBakedFullOpaque::update(const scene::Scene* s, const model::Model* m)
 {
-    u.ambl_color = s->get_ambient_light() * color;
-    u.db = s->get_sun()->get_bias();
+    if (color_changed || s->get_ambient_light_changed())
+        u.ambl_color = s->get_ambient_light() * color;
+    const light::Sun* sun = s->get_sun();
+    u.db = sun->get_bias();
     u.m = m->get_m();
-    u.sun = s->get_sun()->get_direction();
-    u.sun_color = s->get_sun()->get_color() * color;
-    u.eye = s->get_current_camera()->get_location();
-    u.vp = s->get_current_camera()->get_view_projection();
+    u.sun = sun->get_direction();
+    if (color_changed || sun->get_color_changed())
+        u.sun_color = sun->get_color() * color;
+    const camera::Camera* cam = s->get_current_camera();
+    u.eye = cam->get_location();
+    u.vp = cam->get_view_projection();
+    color_changed = false;
     ub->update(&u, sizeof(Uniform));
 }
 

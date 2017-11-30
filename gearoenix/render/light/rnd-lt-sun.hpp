@@ -12,6 +12,7 @@ namespace render {
         class Sun : public Light {
         private:
             camera::Orthographic* cam;
+            bool color_changed = true;
             math::Vec3 color;
             math::Mat4x4 db;
 
@@ -20,6 +21,7 @@ namespace render {
             ~Sun();
             const math::Vec3& get_direction() const;
             const math::Vec3& get_color() const;
+            bool get_color_changed() const;
             const math::Mat4x4& get_bias() const;
             const camera::Orthographic* get_camera() const;
         };

@@ -54,8 +54,6 @@ gearoenix::render::model::Model::~Model() {}
 void gearoenix::render::model::Model::commit(const scene::Scene* s)
 {
     const render::camera::Camera* camera = s->get_current_camera();
-    const render::light::Sun* sun = s->get_sun();
-    const render::camera::Orthographic* suncam = sun->get_camera();
     bool moccloc_not_initialized = true;
     math::Vec3 moccloc;
     if (camera->get_changed() || changed) {
@@ -75,19 +73,24 @@ void gearoenix::render::model::Model::commit(const scene::Scene* s)
             std::cout << "\n\nis in camera\n\n";
         }
     }
-    if (has_shadow_caster && (suncam->get_changed() || changed)) {
-        if (moccloc_not_initialized) {
-            moccloc = m * occloc;
-        }
-        is_in_sun = suncam->in_sight(moccloc, occrds);
-        if (is_in_sun) {
-            if (needs_dbm) {
-                dbm = sun->get_bias() * m;
+    if (has_shadow_caster) {
+        const render::light::Sun* sun = s->get_sun();
+        const render::camera::Orthographic* suncam = sun->get_camera();
+        if (suncam->get_changed() || changed) {
+            if (moccloc_not_initialized) {
+                moccloc = m * occloc;
             }
-            for (std::pair<const core::Id, std::tuple<std::shared_ptr<mesh::Mesh>, std::shared_ptr<material::Material>, std::shared_ptr<material::Depth>>>& mshmtr : meshes) {
-                std::shared_ptr<material::Depth>& dp = std::get<2>(mshmtr.second);
-                if (nullptr != dp) {
-                    dp->update(s, this);
+            is_in_sun = suncam->in_sight(moccloc, occrds);
+            if (is_in_sun) {
+                sunmvp = sun->get_camera()->get_view_projection() * m;
+                if (needs_dbm) {
+                    dbm = sun->get_bias() * m;
+                }
+                for (std::pair<const core::Id, std::tuple<std::shared_ptr<mesh::Mesh>, std::shared_ptr<material::Material>, std::shared_ptr<material::Depth>>>& mshmtr : meshes) {
+                    std::shared_ptr<material::Depth>& dp = std::get<2>(mshmtr.second);
+                    if (nullptr != dp) {
+                        dp->update(s, this);
+                    }
                 }
             }
         }
@@ -136,4 +139,9 @@ const gearoenix::math::Mat4x4& gearoenix::render::model::Model::get_m() const
 const gearoenix::math::Mat4x4& gearoenix::render::model::Model::get_mvp() const
 {
     return mvp;
+}
+
+const gearoenix::math::Mat4x4& gearoenix::render::model::Model::get_sun_mvp() const
+{
+    return sunmvp;
 }

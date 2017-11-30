@@ -29,6 +29,11 @@ const gearoenix::math::Vec3& gearoenix::render::light::Sun::get_color() const
     return color;
 }
 
+bool gearoenix::render::light::Sun::get_color_changed() const
+{
+    return color_changed;
+}
+
 const gearoenix::math::Mat4x4& gearoenix::render::light::Sun::get_bias() const
 {
     return db;

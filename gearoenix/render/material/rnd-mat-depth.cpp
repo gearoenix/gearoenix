@@ -42,9 +42,9 @@ bool gearoenix::render::material::Depth::needs_dbm() const
     return false;
 }
 
-void gearoenix::render::material::Depth::update(const scene::Scene* s, const model::Model* m)
+void gearoenix::render::material::Depth::update(const scene::Scene*, const model::Model* m)
 {
-    u.mvp = s->get_sun()->get_camera()->get_view_projection() * m->get_m();
+    u.mvp = m->get_sun_mvp();
     ub->update(&u, sizeof(Uniform));
 }
 

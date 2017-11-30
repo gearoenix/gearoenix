@@ -52,11 +52,17 @@ bool gearoenix::render::material::DirectionalColoredMatteNonreflectiveShadowless
 
 void gearoenix::render::material::DirectionalColoredMatteNonreflectiveShadowlessOpaque::update(const scene::Scene* s, const model::Model* m)
 {
-    u.ambl_color = s->get_ambient_light() * color;
+    if (s->get_ambient_light_changed() || color_changed) {
+        u.ambl_color = s->get_ambient_light() * color;
+    }
     u.m = m->get_m();
     u.mvp = m->get_mvp();
-    u.sun = s->get_sun()->get_direction();
-    u.sun_color = s->get_sun()->get_color() * color;
+    const light::Sun* sun = s->get_sun();
+    u.sun = sun->get_direction();
+    if (color_changed || sun->get_color_changed()) {
+        u.sun_color = sun->get_color() * color;
+    }
+    color_changed = false;
     ub->update(&u, sizeof(Uniform));
 }
 

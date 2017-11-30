@@ -61,6 +61,7 @@ namespace render {
             std::map<core::Id, std::map<core::Id, std::set<core::Id>>> transparent_models;
             unsigned int curcam = 0;
             bool renderable = false;
+            bool ambient_light_changed = true;
             math::Vec3 ambient_light = math::Vec3(0.2f, 0.2f, 0.2f);
             //Engine* e;
 
@@ -79,6 +80,7 @@ namespace render {
             const camera::Camera* get_current_camera() const;
             camera::Camera* get_current_camera();
             const math::Vec3& get_ambient_light() const;
+            bool get_ambient_light_changed() const;
             const light::Sun* get_sun() const;
             void set_renderable(bool);
         };

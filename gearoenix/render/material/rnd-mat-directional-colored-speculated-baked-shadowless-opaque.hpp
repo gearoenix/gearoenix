@@ -39,6 +39,7 @@ namespace render {
         private:
             const core::Id SHADER_ID;
             Uniform u;
+            bool color_changed = true;
             math::Vec3 color = math::Vec3(0.3f, 0.02f, 0.02f);
             std::shared_ptr<texture::Cube> env;
             Resources* shdrsc;

@@ -69,12 +69,14 @@ bool gearoenix::render::material::DirectionalD2SpeculatedNonreflectiveShadowless
 
 void gearoenix::render::material::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque::update(const scene::Scene* s, const model::Model* m)
 {
+    const camera::Camera* cam = s->get_current_camera();
+    const light::Sun* sun = s->get_sun();
     u.ambl_color = s->get_ambient_light();
-    u.eye = s->get_current_camera()->get_location();
+    u.eye = cam->get_location();
     u.m = m->get_m();
-    u.vp = s->get_current_camera()->get_view_projection();
-    u.sun = s->get_sun()->get_direction();
-    u.sun_color = s->get_sun()->get_color();
+    u.vp = cam->get_view_projection();
+    u.sun = sun->get_direction();
+    u.sun_color = sun->get_color();
     ub->update(&u, sizeof(Uniform));
 }
 

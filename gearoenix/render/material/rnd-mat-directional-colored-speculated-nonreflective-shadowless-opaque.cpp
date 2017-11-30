@@ -55,12 +55,17 @@ bool gearoenix::render::material::DirectionalColoredSpeculatedNonreflectiveShado
 
 void gearoenix::render::material::DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque::update(const scene::Scene* s, const model::Model* m)
 {
-    u.ambl_color = s->get_ambient_light() * color;
+    if (color_changed || s->get_ambient_light_changed())
+        u.ambl_color = s->get_ambient_light() * color;
     u.m = m->get_m();
-    u.vp = s->get_current_camera()->get_view_projection();
-    u.sun = s->get_sun()->get_direction();
-    u.sun_color = s->get_sun()->get_color() * color;
-    u.eye = s->get_current_camera()->get_location();
+    const camera::Camera* cam = s->get_current_camera();
+    u.vp = cam->get_view_projection();
+    u.eye = cam->get_location();
+    const light::Sun* sun = s->get_sun();
+    u.sun = sun->get_direction();
+    if (color_changed || sun->get_color_changed())
+        u.sun_color = sun->get_color() * color;
+    color_changed = true;
     ub->update(&u, sizeof(Uniform));
 }
 

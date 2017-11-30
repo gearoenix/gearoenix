@@ -142,6 +142,11 @@ const gearoenix::math::Vec3& gearoenix::render::scene::Scene::get_ambient_light(
     return ambient_light;
 }
 
+bool gearoenix::render::scene::Scene::get_ambient_light_changed() const
+{
+    return ambient_light_changed;
+}
+
 const gearoenix::render::light::Sun* gearoenix::render::scene::Scene::get_sun() const
 {
     return reinterpret_cast<light::Sun*>(lights[0].get());

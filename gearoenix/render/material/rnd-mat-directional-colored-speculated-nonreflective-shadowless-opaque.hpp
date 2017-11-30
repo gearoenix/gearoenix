@@ -34,6 +34,7 @@ namespace render {
 
         private:
             Uniform u;
+            bool color_changed = true;
             math::Vec3 color = math::Vec3(0.3f, 0.02f, 0.02f);
             Resources* shdrsc;
 
