@@ -41,6 +41,7 @@ add_library(
     ${APP_SRC_DIR}/gearoenix/core/cr-build-configuration.cpp
     ${APP_SRC_DIR}/gearoenix/core/cr-end-caller.cpp
     ${APP_SRC_DIR}/gearoenix/core/cr-event.cpp
+    ${APP_SRC_DIR}/gearoenix/core/cr-semaphore.cpp
     ${APP_SRC_DIR}/gearoenix/core/cr-static.cpp
     ${APP_SRC_DIR}/gearoenix/directx12/d12-engine.cpp
     ${APP_SRC_DIR}/gearoenix/gles2/buffer/gles2-buf-mesh.cpp
@@ -64,6 +65,8 @@ add_library(
     ${APP_SRC_DIR}/gearoenix/gles2/gles2-engine.cpp
     ${APP_SRC_DIR}/gearoenix/math/math-matrix.cpp
     ${APP_SRC_DIR}/gearoenix/math/math-vector.cpp
+    ${APP_SRC_DIR}/gearoenix/physics/phs-engine.cpp
+    ${APP_SRC_DIR}/gearoenix/physics/phs-kernel.cpp
     ${APP_SRC_DIR}/gearoenix/render/buffer/rnd-buf-buffer.cpp
     ${APP_SRC_DIR}/gearoenix/render/buffer/rnd-buf-manager.cpp
     ${APP_SRC_DIR}/gearoenix/render/buffer/rnd-buf-mesh.cpp

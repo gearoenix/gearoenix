@@ -2,19 +2,15 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 27
-    buildToolsVersion "27.0.1"
     defaultConfig {
         applicationId "com.gearoenix.demo"
-        minSdkVersion 24
-        targetSdkVersion 25
+        minSdkVersion 9
+        targetSdkVersion 14
         versionCode 1
         versionName "1.0"
-        shaders {
-            glslcArgs.addAll(['-c', '-g'])
-        }
         externalNativeBuild {
             cmake {
-                abiFilters "armeabi-v7a" //, 'arm64-v8a', 'x86', 'x86_64'
+                abiFilters "armeabi" //, "armeabi-v7a", 'arm64-v8a', 'x86', 'x86_64'
                 arguments '-DANDROID_TOOLCHAIN=clang', '-DANDROID_STL=c++_static'
             }
         }
@@ -27,7 +23,7 @@ android {
     }
     externalNativeBuild {
         cmake {
-            path "CMakeLists.txt"
+            path "../../../Projects/gearoenix/android-build/CMakeLists.txt"
         }
     }
 }
