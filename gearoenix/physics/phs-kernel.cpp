@@ -13,8 +13,7 @@
 void gearoenix::physics::Kernel::run()
 {
     while (alive) {
-        std::unique_lock<std::mutex> ul(cvm);
-        cv.wait(ul);
+        signaller->lock();
         const unsigned int threads_count = engine->threads_count;
         std::string s = std::to_string(thread_index) + " of " + std::to_string(threads_count) + "\n";
         std::cout << s;
@@ -42,6 +41,7 @@ gearoenix::physics::Kernel::Kernel(const unsigned int thread_index, Engine* engi
     : thread_index(thread_index)
     , engine(engine)
 {
+    signaller = new core::Semaphore();
     thread = std::thread(std::bind(&Kernel::run, this));
 }
 
@@ -49,7 +49,7 @@ gearoenix::physics::Kernel::~Kernel()
 {
     alive = false;
     do {
-        cv.notify_one();
+        signaller->release();
         std::this_thread::yield();
     } while (!alive);
     thread.join();
@@ -57,5 +57,5 @@ gearoenix::physics::Kernel::~Kernel()
 
 void gearoenix::physics::Kernel::signal()
 {
-    cv.notify_one();
+    signaller->release();
 }
