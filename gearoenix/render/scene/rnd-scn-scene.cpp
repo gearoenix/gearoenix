@@ -121,7 +121,7 @@ void gearoenix::render::scene::Scene::draw(texture::Texture2D* shadow_texture)
                 }
             }
         }
-        GXLOGE("TODO it needs to render transparent object with order of their depth.");
+        //GXLOGE("TODO it needs to render transparent object with order of their depth.");
     }
 }
 

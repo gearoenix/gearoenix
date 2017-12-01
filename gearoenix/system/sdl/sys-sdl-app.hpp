@@ -23,6 +23,7 @@ namespace system {
     private:
         const static core::Real rotate_epsilon;
         const static core::Real zoom_epsilon;
+        unsigned int win_width, win_height;
         core::Application* core_app = nullptr;
         render::Engine* render_engine = nullptr;
         core::asset::Manager* astmgr = nullptr;

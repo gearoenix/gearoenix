@@ -104,6 +104,10 @@ gearoenix::system::Application::Application()
     }
     SDL_AddEventWatch(event_receiver, this);
     SDL_GL_MakeCurrent(window, gl_context);
+    int w, h;
+    SDL_GetWindowSize(window, &w, &h);
+    win_width = (unsigned int)w;
+    win_height = (unsigned int)h;
     render_engine = new gles2::Engine(this);
     astmgr = new core::asset::Manager(this, "data.gx3d");
     astmgr->initialize();
@@ -170,26 +174,17 @@ const gearoenix::core::asset::Manager* gearoenix::system::Application::get_asset
 
 gearoenix::core::Real gearoenix::system::Application::get_window_ratio() const
 {
-    int w, h;
-    TODO; // move following function out of this, because this function gonna call in other threads
-    SDL_GetWindowSize(window, &w, &h);
-    return static_cast<core::Real>(w) / static_cast<core::Real>(h);
+    return static_cast<core::Real>(win_width) / static_cast<core::Real>(win_height);
 }
 
 unsigned int gearoenix::system::Application::get_width() const
 {
-    int w, h;
-    SDL_GetWindowSize(window, &w, &h);
-    (void)h;
-    return static_cast<unsigned int>(w);
+    return win_width;
 }
 
 unsigned int gearoenix::system::Application::get_height() const
 {
-    int w, h;
-    SDL_GetWindowSize(window, &w, &h);
-    (void)w;
-    return static_cast<unsigned int>(h);
+    return win_height;
 }
 
 #endif
