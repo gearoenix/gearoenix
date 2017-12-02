@@ -24,6 +24,7 @@ gearoenix::physics::Engine::~Engine()
         delete kernels[i];
     }
     delete[] kernels;
+    delete signaller;
 }
 
 void gearoenix::physics::Engine::update()
