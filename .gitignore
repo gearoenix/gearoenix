@@ -37,3 +37,6 @@
 # Vim
 *.swp
 .DS_store
+
+output/
+assets/
