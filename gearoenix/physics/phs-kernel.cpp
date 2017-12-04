@@ -53,6 +53,7 @@ gearoenix::physics::Kernel::~Kernel()
         std::this_thread::yield();
     } while (!alive);
     thread.join();
+    delete signaller;
 }
 
 void gearoenix::physics::Kernel::signal()
