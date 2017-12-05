@@ -9,7 +9,7 @@
 #include <string>
 #include <vector>
 
-#if defined(IN_DESKTOP) || defined(IN_IOS)
+#if defined(IN_DESKTOP) || defined(IN_IOS) || defined(IN_WEB)
 #define USE_STD_FILE
 #endif
 

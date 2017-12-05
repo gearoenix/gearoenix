@@ -44,6 +44,7 @@ namespace system {
         void execute(core::Application* app);
 #ifdef IN_WEB
         static void loop();
+        void main_loop();
 #endif
         const core::Application* get_core_app() const;
         core::Application* get_core_app();

@@ -7,6 +7,11 @@
 //#define USE_VULKAN
 //#define USE_OPENGL_ES3
 #define USE_OPENGL_ES2
+#elif defined(__EMSCRIPTEN__)
+#define IN_WEB
+//#define USE_OPENGL_ES3
+#define USE_OPENGL_ES2
+#define USE_SDL
 #elif defined(__unix__)
 #define IN_LINUX
 //#define USE_VULKAN
@@ -48,11 +53,6 @@
 #else
 #error "Unknown Apple platform"
 #endif
-#elif defined(__EMSCRIPTEN__)
-#define IN_WEB
-//#define USE_OPENGL_ES3
-#define USE_OPENGL_ES2
-#define USE_SDL
 #else
 #error "Not implemetned yet."
 #endif

@@ -1,3 +1,4 @@
+#include "../core/cr-build-configuration.hpp"
 #ifdef USE_SDL
 #ifndef IN_IOS
 #include <SDL2/SDL_opengles2.h>

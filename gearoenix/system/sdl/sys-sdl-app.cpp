@@ -5,6 +5,7 @@
 #include "../../gles2/gles2-engine.hpp"
 #include "../../gles2/gles2.hpp"
 #include "../sys-log.hpp"
+#include <iostream>
 
 #ifdef IN_WEB
 gearoenix::system::Application* gearoenix::system::Application::app = nullptr;
@@ -77,6 +78,8 @@ int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_
 
 gearoenix::system::Application::Application()
 {
+    std::cout << "started!started!started!started!started!" << std::endl;
+    GXLOGI("started!started!started!started!started!started!started!started!");
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
         GXLOGF("Failed to initialize SDL: " << SDL_GetError());
     }
@@ -97,7 +100,7 @@ gearoenix::system::Application::Application()
         SDL_WINDOWPOS_CENTERED,
         DEFAULT_WINDOW_WIDTH,
         DEFAULT_WINDOW_HEIGHT,
-        SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP);
+        SDL_WINDOW_OPENGL  | SDL_WINDOW_SHOWN );
     if (!window) {
         GXLOGF("Couldn't create window: " << SDL_GetError());
     }
@@ -133,7 +136,11 @@ void gearoenix::system::Application::execute(core::Application* app)
 
 void gearoenix::system::Application::loop()
 {
+  app->main_loop();
+}
 
+void gearoenix::system::Application::main_loop()
+{
 #else
     while (running) {
 #endif

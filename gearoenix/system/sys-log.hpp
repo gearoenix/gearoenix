@@ -5,6 +5,16 @@
 #include <exception>
 #ifdef IN_ANDROID
 #include "android/sys-and-log.hpp"
+#elif defined(IN_WEB)
+#include <iostream>
+#define GXLOGI(s)                                                       \
+    std::cout << APPLICATION_NAME << " " << s << " " << __FILE__ << " " \
+              << __LINE__ << std::endl;
+#define GXLOGD(s) GXLOGI(s)
+#define GXLOGE(s)                                                              \
+    std::cout << APPLICATION_NAME << " ERROR: " << s << " " << __FILE__ << " " \
+              << __LINE__ << std::endl;
+#define GXLOGF(s) GXLOGE(s); std::terminate();
 #else
 #include <fstream>
 namespace gearoenix {
