@@ -48,6 +48,15 @@ namespace core {
         delete app;                                                                 \
         return 0;                                                                   \
     }
+#elif defined(IN_WEB)
+#define GEAROENIX_START(CoreApp)                                                    \
+    int main(int, char**)                                                           \
+    {                                                                               \
+        gearoenix::system::Application* app = new gearoenix::system::Application(); \
+        CoreApp* core_app = new CoreApp(app);                                       \
+        app->execute(core_app);                                                     \
+        return 0;                                                                   \
+    }
 #else
 #define GEAROENIX_START(CoreApp)                                                         \
     void android_main(struct android_app* state)                                         \

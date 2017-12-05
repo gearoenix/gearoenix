@@ -5,6 +5,9 @@
 #include "../../core/cr-types.hpp"
 #ifdef IN_IOS
 #include <SDL.h>
+#elif defined(__EMSCRIPTEN__)
+#include <SDL.h>
+#include <emscripten.h>
 #else
 #include <SDL2/SDL.h>
 #endif
@@ -21,6 +24,9 @@ namespace render {
 namespace system {
     class Application {
     private:
+#ifdef IN_WEB
+        static Application* app;
+#endif
         const static core::Real rotate_epsilon;
         const static core::Real zoom_epsilon;
         unsigned int win_width, win_height;
@@ -36,6 +42,9 @@ namespace system {
         Application();
         ~Application();
         void execute(core::Application* app);
+#ifdef IN_WEB
+        static void loop();
+#endif
         const core::Application* get_core_app() const;
         core::Application* get_core_app();
         const render::Engine* get_render_engine() const;

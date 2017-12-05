@@ -6,6 +6,9 @@
 #include "../../gles2/gles2.hpp"
 #include "../sys-log.hpp"
 
+#ifdef IN_WEB
+gearoenix::system::Application* gearoenix::system::Application::app = nullptr;
+#endif
 const gearoenix::core::Real gearoenix::system::Application::rotate_epsilon = 3.14f / 180.0f;
 const gearoenix::core::Real gearoenix::system::Application::zoom_epsilon = 0.00001f;
 
@@ -123,23 +126,35 @@ gearoenix::system::Application::~Application()
 void gearoenix::system::Application::execute(core::Application* app)
 {
     core_app = app;
+#ifdef IN_WEB
+    Application::app = this;
+    emscripten_set_main_loop(Application::loop, 0, true);
+}
+
+void gearoenix::system::Application::loop()
+{
+
+#else
     while (running) {
-        SDL_Event event;
-        while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_QUIT) {
-                running = false;
-            }
+#endif
+    SDL_Event event;
+    while (SDL_PollEvent(&event)) {
+        if (event.type == SDL_QUIT) {
+            running = false;
         }
-        //        SDL_GL_MakeCurrent(window, gl_context);
-        render_engine->update();
-        SDL_GL_SwapWindow(window);
     }
-    core_app->terminate();
-    render_engine->terminate();
-    SDL_DelEventWatch(event_receiver, this);
-    SDL_GL_DeleteContext(gl_context);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
+    //        SDL_GL_MakeCurrent(window, gl_context);
+    render_engine->update();
+    SDL_GL_SwapWindow(window);
+#ifndef IN_WEB
+}
+core_app->terminate();
+render_engine->terminate();
+SDL_DelEventWatch(event_receiver, this);
+SDL_GL_DeleteContext(gl_context);
+SDL_DestroyWindow(window);
+SDL_Quit();
+#endif
 }
 
 const gearoenix::core::Application* gearoenix::system::Application::get_core_app() const

@@ -14,6 +14,9 @@
 //#define USE_OPENGL_33
 //#define USE_OPENGL_ES3
 #define USE_OPENGL_ES2
+#define IN_DESKTOP
+#define USE_SDL
+//#define USE_GLFW
 #elif defined(WIN32) || defined(WIN64) || defined(_WIN32) || defined(_WIN64)
 #define IN_WINDOWS
 //#define USE_VULKAN
@@ -21,6 +24,9 @@
 //#define USE_OPENGL_33
 //#define USE_OPENGL_ES3
 #define USE_OPENGL_ES2
+#define IN_DESKTOP
+#define USE_SDL
+//#define USE_GLFW
 #elif defined(__APPLE__)
 #include "TargetConditionals.h"
 #if defined(TARGET_IPHONE_SIMULATOR) || defined(TARGET_OS_IPHONE)
@@ -29,22 +35,26 @@
 //#define USE_VULKAN
 //#define USE_OPENGL_ES3
 #define USE_OPENGL_ES2
+#define USE_SDL
 #elif defined(TARGET_OS_MAC)
 #define IN_MAC
 //#define USE_METAL
 //#define USE_VULKAN
 //#define USE_OPENGL_41
 //#define USE_OPENGL_33
-#else
-#error "Unknown Apple platform"
-#endif
-#else
-#error "Not implemetned yet."
-#endif
-#if defined(IN_WINDOWS) || defined(IN_LINUX) || defined(IN_MAC)
 #define IN_DESKTOP
 #define USE_SDL
 //#define USE_GLFW
+#else
+#error "Unknown Apple platform"
+#endif
+#elif defined(__EMSCRIPTEN__)
+#define IN_WEB
+//#define USE_OPENGL_ES3
+#define USE_OPENGL_ES2
+#define USE_SDL
+#else
+#error "Not implemetned yet."
 #endif
 /// Application constant definitions
 /// -------------------------------------------------------------
