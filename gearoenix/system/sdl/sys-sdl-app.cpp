@@ -100,7 +100,7 @@ gearoenix::system::Application::Application()
         SDL_WINDOWPOS_CENTERED,
         DEFAULT_WINDOW_WIDTH,
         DEFAULT_WINDOW_HEIGHT,
-        SDL_WINDOW_OPENGL  | SDL_WINDOW_SHOWN );
+        SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
     if (!window) {
         GXLOGF("Couldn't create window: " << SDL_GetError());
     }
@@ -136,7 +136,7 @@ void gearoenix::system::Application::execute(core::Application* app)
 
 void gearoenix::system::Application::loop()
 {
-  app->main_loop();
+    app->main_loop();
 }
 
 void gearoenix::system::Application::main_loop()
