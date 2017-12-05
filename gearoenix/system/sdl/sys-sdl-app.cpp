@@ -83,6 +83,7 @@ gearoenix::system::Application::Application()
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
         GXLOGF("Failed to initialize SDL: " << SDL_GetError());
     }
+    GXLOGI("started!started!started!started!started!started!started!started!");
     SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
@@ -94,6 +95,7 @@ gearoenix::system::Application::Application()
     SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+    GXLOGI("started!started!started!started!started!started!started!started!");
     window = SDL_CreateWindow(
         APPLICATION_NAME,
         SDL_WINDOWPOS_CENTERED,
@@ -101,6 +103,7 @@ gearoenix::system::Application::Application()
         DEFAULT_WINDOW_WIDTH,
         DEFAULT_WINDOW_HEIGHT,
         SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
+    GXLOGI("started!started!started!started!started!started!started!started!");
     if (!window) {
         GXLOGF("Couldn't create window: " << SDL_GetError());
     }
@@ -110,13 +113,18 @@ gearoenix::system::Application::Application()
     }
     SDL_AddEventWatch(event_receiver, this);
     SDL_GL_MakeCurrent(window, gl_context);
+    GXLOGI("started!started!started!started!started!started!started!started!");
     int w, h;
     SDL_GetWindowSize(window, &w, &h);
     win_width = (unsigned int)w;
     win_height = (unsigned int)h;
+    GXLOGI("started!started!started!started!started!started!started!started!");
     render_engine = new gles2::Engine(this);
+    GXLOGI("started!started!started!started!started!started!started!started!");
     astmgr = new core::asset::Manager(this, "data.gx3d");
+    GXLOGI("started!started!started!started!started!started!started!started!");
     astmgr->initialize();
+    GXLOGI("started!started!started!started!started!started!started!started!");
 }
 
 gearoenix::system::Application::~Application()
@@ -141,6 +149,8 @@ void gearoenix::system::Application::loop()
 
 void gearoenix::system::Application::main_loop()
 {
+
+    GXLOGI("started!started!started!started!started!started!started!started!");
 #else
     while (running) {
 #endif

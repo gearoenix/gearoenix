@@ -69,4 +69,7 @@
 #define DEFAULT_WINDOW_WIDTH 800
 #define DEFAULT_WINDOW_HEIGHT 600
 #endif
+#ifndef IN_WEB
+#define THREAD_SUPPORTED
+#endif
 #endif

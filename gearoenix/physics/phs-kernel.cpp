@@ -12,15 +12,20 @@
 
 void gearoenix::physics::Kernel::run()
 {
+#ifdef THREAD_SUPPORTED
     while (alive) {
         signaller->lock();
         const unsigned int threads_count = engine->threads_count;
-        std::string s = std::to_string(thread_index) + " of " + std::to_string(threads_count) + "\n";
+#else
+    const unsigned int threads_count = 1;
+    const unsigned int thread_index = 0;
+#endif
+        std::string s = "\n" + std::to_string(thread_index) + " of " + std::to_string(threads_count) + "\n";
         std::cout << s;
+        unsigned int model_index = 0;
         const std::vector<std::shared_ptr<render::scene::Scene>>& scenes = engine->render_engine->get_all_scenes();
         for (const std::shared_ptr<render::scene::Scene>& scene : scenes) {
             const std::map<core::Id, std::weak_ptr<render::model::Model>>& models = scene->get_all_models();
-            unsigned int model_index = 0;
             for (const std::pair<core::Id, std::weak_ptr<render::model::Model>>& id_model : models) {
                 if (((model_index++) % threads_count) != thread_index)
                     continue;
@@ -32,21 +37,32 @@ void gearoenix::physics::Kernel::run()
                 model->commit(scene.get());
             }
         }
+#ifdef THREAD_SUPPORTED
         engine->signaller->release();
     }
     alive = true;
+#endif
 }
 
-gearoenix::physics::Kernel::Kernel(const unsigned int thread_index, Engine* engine)
-    : thread_index(thread_index)
-    , engine(engine)
+gearoenix::physics::Kernel::Kernel(
+#ifdef THREAD_SUPPORTED
+    const unsigned int thread_index,
+#endif
+    Engine* engine)
+    : engine(engine)
+#ifdef THREAD_SUPPORTED
+    , thread_index(thread_index)
+#endif
 {
+#ifdef THREAD_SUPPORTED
     signaller = new core::Semaphore();
     thread = std::thread(std::bind(&Kernel::run, this));
+#endif
 }
 
 gearoenix::physics::Kernel::~Kernel()
 {
+#ifdef THREAD_SUPPORTED
     alive = false;
     do {
         signaller->release();
@@ -54,9 +70,14 @@ gearoenix::physics::Kernel::~Kernel()
     } while (!alive);
     thread.join();
     delete signaller;
+#endif
 }
 
 void gearoenix::physics::Kernel::signal()
 {
+#ifdef THREAD_SUPPORTED
     signaller->release();
+#else
+        run();
+#endif
 }

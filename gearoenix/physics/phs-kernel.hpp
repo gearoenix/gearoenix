@@ -1,26 +1,35 @@
 #ifndef GEAROENIX_PHYSICS_KERNEL_HPP
 #define GEAROENIX_PHYSICS_KERNEL_HPP
+#include "../core/cr-build-configuration.hpp"
+#ifdef THREAD_SUPPORTED
 #include <thread>
-#include <tuple>
-#include <vector>
+#endif
 namespace gearoenix {
+#ifdef THREAD_SUPPORTED
 namespace core {
     class Semaphore;
 }
+#endif
 namespace physics {
     class Engine;
     class Kernel {
     private:
-        const unsigned int thread_index;
         Engine* engine;
+#ifdef THREAD_SUPPORTED
+        const unsigned int thread_index;
         core::Semaphore* signaller;
         std::thread thread;
         volatile bool alive = true;
+#endif
         void run();
 
     protected:
     public:
-        Kernel(const unsigned int thread_index, Engine* engine);
+        Kernel(
+#ifdef THREAD_SUPPORTED
+            const unsigned int thread_index,
+#endif
+            Engine* engine);
         ~Kernel();
         void signal();
     };

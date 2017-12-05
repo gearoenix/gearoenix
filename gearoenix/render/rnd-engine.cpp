@@ -10,6 +10,7 @@
 #include <functional>
 #include <thread>
 
+#ifdef THREAD_SUPPORTED
 void gearoenix::render::Engine::scene_loader_function()
 {
     while (scene_loader_continue) {
@@ -24,13 +25,17 @@ void gearoenix::render::Engine::scene_loader_function()
         }
     }
 }
+#endif
 
 gearoenix::render::Engine::Engine(system::Application* system_application)
     : sysapp(system_application)
 {
 
+    GXLOGI("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
+#ifdef THREAD_SUPPORTED
     scene_loader_signaler = new core::Semaphore();
     scene_loader = std::thread(std::bind(&Engine::scene_loader_function, this));
+#endif
     physics_engine = new physics::Engine(this);
     physics_engine->update();
 }
@@ -38,10 +43,12 @@ gearoenix::render::Engine::Engine(system::Application* system_application)
 gearoenix::render::Engine::~Engine()
 {
     delete physics_engine;
+#ifdef THREAD_SUPPORTED
     scene_loader_continue = false;
     scene_loader_signaler->release();
     scene_loader.join();
     delete scene_loader_signaler;
+#endif
     delete pipmgr;
 }
 
@@ -67,9 +74,10 @@ gearoenix::render::pipeline::Manager* gearoenix::render::Engine::get_pipeline_ma
 
 void gearoenix::render::Engine::add_load_function(std::function<void()> fun)
 {
+#ifdef THREAD_SUPPORTED
     std::lock_guard<std::mutex> lock(load_functions_mutex);
+#endif
     load_functions.push_back(fun);
-    (void)lock;
 }
 
 const std::shared_ptr<gearoenix::render::scene::Scene>& gearoenix::render::Engine::get_scene(unsigned int scene_index) const
@@ -89,16 +97,20 @@ const std::vector<std::shared_ptr<gearoenix::render::scene::Scene>>& gearoenix::
 
 void gearoenix::render::Engine::load_scene(core::Id scene_id, std::function<void(unsigned int)> on_load)
 {
+#ifdef THREAD_SUPPORTED
     scene_loader_mutex.lock();
     scene_loader_functions.push_back([this, scene_id, on_load] {
         loaded_scenes_mutex.lock();
+#endif
         unsigned int result = (unsigned int)loaded_scenes.size();
         loaded_scenes.push_back(sysapp->get_asset_manager()->get_scene(scene_id, core::EndCaller::create([this, result, on_load] {
             loaded_scenes[result]->set_renderable(true);
             on_load(result);
         })));
+#ifdef THREAD_SUPPORTED
         loaded_scenes_mutex.unlock();
     });
     scene_loader_mutex.unlock();
     scene_loader_signaler->release();
+#endif
 }

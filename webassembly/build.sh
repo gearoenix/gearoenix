@@ -24,12 +24,12 @@ find ../gearoenix/ -iname *.cpp | while read line; do
   cppfile=${line:13}
   cppfile=${cppfile//"/"/"-"}
   echo "compiling header file $line to $cppfile.bc"
-  em++ -std=c++14 -s USE_SDL=2 -g -c $line -o $cppfile.bc
+  em++ -std=c++14 -s USE_SDL=2 -s USE_PTHREADS=1 -s PTHREAD_POOL_SIZE=8 -s PTHREAD_HINT_NUM_CORES=8 --emrun -O3 -c $line -o $cppfile.bc
 done
-em++ -std=c++14 -s USE_SDL=2 --embed-file data.gx3d -g *.bc -o index.html
+em++ -std=c++14 -s USE_SDL=2 -s USE_PTHREADS=1 -s PTHREAD_POOL_SIZE=8 -s PTHREAD_HINT_NUM_CORES=8 --emrun --embed-file data.gx3d -O3 *.bc -o index.html
 rm *.bc
 
-
+# -s WASM=1 -s BINARYEN=1
 
 # if [ $1 == "d" ]; then
 #   emcc -std=c++14 -s USE_SDL=2 --embed-file data.gx3d -o index.html -g $cpps

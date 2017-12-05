@@ -1,15 +1,20 @@
 #ifndef GEAROENIX_RENDER_ENGINE_HPP
 #define GEAROENIX_RENDER_ENGINE_HPP
+#include "../core/cr-build-configuration.hpp"
 #include "../core/cr-types.hpp"
 #include <functional>
 #include <memory>
+#ifdef THREAD_SUPPORTED
 #include <mutex>
 #include <thread>
+#endif
 #include <vector>
 namespace gearoenix {
 namespace core {
     class EndCaller;
+#ifdef THREAD_SUPPORTED
     class Semaphore;
+#endif
 }
 namespace physics {
     class Engine;
@@ -43,18 +48,19 @@ namespace render {
     protected:
         system::Application* sysapp;
         pipeline::Manager* pipmgr;
+#ifdef THREAD_SUPPORTED
         std::mutex load_functions_mutex;
-        std::vector<std::function<void()>> load_functions;
         std::mutex loaded_scenes_mutex;
-        std::vector<std::shared_ptr<scene::Scene>> loaded_scenes;
         std::mutex scene_loader_mutex;
-        std::vector<std::function<void()>> scene_loader_functions;
         core::Semaphore* scene_loader_signaler;
         std::thread scene_loader;
         volatile bool scene_loader_continue = true;
-        physics::Engine* physics_engine = nullptr;
-
         void scene_loader_function();
+        std::vector<std::function<void()>> scene_loader_functions;
+#endif
+        std::vector<std::function<void()>> load_functions;
+        std::vector<std::shared_ptr<scene::Scene>> loaded_scenes;
+        physics::Engine* physics_engine = nullptr;
 
     public:
         Engine(system::Application* system_application);

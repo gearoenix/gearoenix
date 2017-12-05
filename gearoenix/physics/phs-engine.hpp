@@ -1,5 +1,6 @@
 #ifndef GEAROENIX_PHYSICS_ENGINE_HPP
 #define GEAROENIX_PHYSICS_ENGINE_HPP
+#include "../core/cr-build-configuration.hpp"
 namespace gearoenix {
 namespace core {
     class Semaphore;
@@ -13,10 +14,14 @@ namespace physics {
         friend class Kernel;
 
     private:
-        const unsigned int threads_count = 4;
         render::Engine* render_engine;
+#ifdef THREAD_SUPPORTED
+        const unsigned int threads_count = 4;
         core::Semaphore* signaller;
         Kernel** kernels;
+#else
+        Kernel* kernel;
+#endif
 
     protected:
     public:

@@ -1,37 +1,39 @@
 #include "cr-semaphore.hpp"
-
+#ifdef THREAD_SUPPORTED
 gearoenix::core::Semaphore::Semaphore(int count)
+    : count(count)
 {
-#ifdef IN_WINDOWS
-    sem = CreateSemaphore(NULL, count, MAXLONG32, NULL);
-#else
-    sem_init(&sem, 0, count);
-#endif
 }
 
-gearoenix::core::Semaphore::~Semaphore()
-{
-#ifdef IN_WINDOWS
-    CloseHandle(sem);
-#else
-    sem_destroy(&sem);
-#endif
-}
+gearoenix::core::Semaphore::~Semaphore() {}
 
 void gearoenix::core::Semaphore::lock()
 {
-#ifdef IN_WINDOWS
-    WaitForSingleObject(sem, INFINITE);
-#else
-    sem_wait(&sem);
-#endif
+    m_count.lock();
+    if (count > 0) {
+        --count;
+        m_count.unlock();
+        return;
+    }
+    Lock l(new LockData);
+    q.push(l);
+    std::unique_lock<std::mutex> lock(l->m);
+    m_count.unlock();
+    l->c.wait(lock);
+    l->locked = false;
 }
 
 void gearoenix::core::Semaphore::release()
 {
-#ifdef IN_WINDOWS
-    ReleaseSemaphore(sem, 1, NULL);
-#else
-    sem_post(&sem);
-#endif
+    std::lock_guard<std::mutex> lock(m_count);
+    if (q.size() < 1) {
+        ++count;
+        return;
+    }
+    Lock& l = q.front();
+    do {
+        l->c.notify_all();
+    } while (l->locked);
+    q.pop();
 }
+#endif

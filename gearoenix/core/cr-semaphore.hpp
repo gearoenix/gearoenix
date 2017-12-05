@@ -1,20 +1,24 @@
 #ifndef GEAROENIX_CORE_SEMAPHORE_HPP
 #define GEAROENIX_CORE_SEMAPHORE_HPP
-#ifdef IN_WINDOWS
-#include <windows.h>
-#else
-#include <semaphore.h>
-#endif
+#include "cr-build-configuration.hpp"
+#ifdef THREAD_SUPPORTED
+#include <condition_variable>
+#include <mutex>
+#include <queue>
 
 namespace gearoenix {
 namespace core {
     class Semaphore {
     private:
-#ifdef IN_WINDOWS
-        HANDLE sem;
-#else
-        sem_t sem;
-#endif
+        struct LockData {
+            std::mutex m;
+            std::condition_variable c;
+            volatile bool locked = true;
+        };
+        typedef std::shared_ptr<LockData> Lock;
+        std::mutex m_count;
+        std::queue<Lock> q;
+        volatile int count;
 
     public:
         Semaphore(int count = 0);
@@ -24,4 +28,5 @@ namespace core {
     };
 }
 }
+#endif
 #endif

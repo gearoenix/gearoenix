@@ -5,6 +5,9 @@
 #include "../render/rnd-engine.hpp"
 #include "gles2.hpp"
 #include <memory>
+#ifdef GLES2_PROFILING
+#include <chrono>
+#endif
 namespace gearoenix {
 namespace gles2 {
     namespace texture {

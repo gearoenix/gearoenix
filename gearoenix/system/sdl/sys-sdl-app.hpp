@@ -5,7 +5,7 @@
 #include "../../core/cr-types.hpp"
 #ifdef IN_IOS
 #include <SDL.h>
-#elif defined(__EMSCRIPTEN__)
+#elif defined(IN_WEB)
 #include <SDL.h>
 #include <emscripten.h>
 #else
