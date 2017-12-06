@@ -57,6 +57,14 @@ continue with `OpenGL ES 2`.
 [This is WebAssembly demo of game. (Of course I know it is not complete.)](https://hossein-noroozpour.github.io/gearoenix-static-files/web-demo/index.html)
 
 
+# How to Build?
+The build process is a little complicated, because it is an in-house game
+engine. But there are several helper scripts, like mac-build.sh and
+webassembly/build.sh but still you can not create a useful thing with it,
+because game engine have specific file format that can be created with my
+blender exporter plugin. you desperately want to build it, you can contact me
+with email. hossein.noroozpour@gmail.com
+
 ## License
 You can do whatever you want to do as long as you take responsibility of all of
 its consequences, **But** If you used it and it was useful for you, please make
