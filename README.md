@@ -16,8 +16,8 @@ market share and slow development, I decided to suspend `Vulkan` part and
 continue with `OpenGL ES 2`.
 
 ## Features
-- It is cross-platform (already tested on Linux, Android, iOS but, It can easily
-compile for Windows, MacOS, WebAssembly)
+- It is cross-platform (already tested on Linux, Android, iOS and WebAssembly
+  but, It can easily compile for Windows, MacOS, ...)
 - It has `OpenGL` and `Vulkan(WIP)` backends but also it is ready to have
   `Metal` in future (because of its nature of being successor of Vulkust game
   engine).
@@ -52,10 +52,9 @@ compile for Windows, MacOS, WebAssembly)
     of materials are not developed in engine. If you want any of them you can
     contact me or very easily implement them.)
 
-## Web Demo
-This is WebAssembly demo of game. (Of course I know it is not complete.)  
 
-<iframe  width="800" height="600" frameborder="0" src="https://hossein-noroozpour.github.io/gearoenix-static-files/web-demo/index.html"></iframe>
+## Web Demo
+[This is WebAssembly demo of game. (Of course I know it is not complete.)](https://hossein-noroozpour.github.io/gearoenix-static-files/web-demo/index.html)
 
 
 ## License
