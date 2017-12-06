@@ -55,7 +55,9 @@ compile for Windows, MacOS, WebAssembly)
 ## Web Demo
 This is WebAssembly demo of game. (Of course I know it is not complete.)  
 
-<iframe  width="800" height="600" frameborder="0" src="https://hossein-noroozpour.github.io/gearoenix-static-files/web-demo/index.html">Downloading Web Demo ...</iframe>
+```
+<iframe  width="800" height="600" frameborder="0" src="https://hossein-noroozpour.github.io/gearoenix-static-files/web-demo/index.html"> Downloading Web Demo ... </iframe>
+```
 
 ## License
 You can do whatever you want to do as long as you take responsibility of all of
