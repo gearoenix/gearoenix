@@ -75,7 +75,7 @@ void gearoenix::render::model::Model::commit(const scene::Scene* s)
             for (std::pair<const core::Id, std::tuple<std::shared_ptr<mesh::Mesh>, std::shared_ptr<material::Material>, std::shared_ptr<material::Depth>>>& mshmtr : meshes) {
                 std::get<1>(mshmtr.second)->update(s, this);
             }
-            std::cout << "\n\nis in camera\n\n";
+            // std::cout << "\n\nis in camera\n\n";
         }
     }
     if (has_shadow_caster) {

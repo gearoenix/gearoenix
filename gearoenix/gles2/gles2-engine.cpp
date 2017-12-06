@@ -38,14 +38,12 @@ static std::shared_ptr<gearoenix::gles2::texture::Texture2D> txt;
 gearoenix::gles2::Engine::Engine(system::Application* sysapp)
     : render::Engine(sysapp)
 {
-    GXLOGI("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     win_width = sysapp->get_width();
     win_height = sysapp->get_height();
     glGetIntegerv(GL_FRAMEBUFFER_BINDING, (GLint*)&render_framebuffer);
     glGetIntegerv(GL_RENDERBUFFER_BINDING, (GLint*)&render_depth);
 #ifdef SHADOW_MAP
-    GXLOGI("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
     glGenFramebuffers(1, &shadow_map_framebuffer);
     glGenRenderbuffers(1, &shadow_map_depth);
     glBindRenderbuffer(GL_RENDERBUFFER, shadow_map_depth);
@@ -63,7 +61,6 @@ gearoenix::gles2::Engine::Engine(system::Application* sysapp)
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
         UNEXPECTED;
     }
-    GXLOGI("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
     glEnable(GL_BLEND);
@@ -80,7 +77,6 @@ gearoenix::gles2::Engine::Engine(system::Application* sysapp)
     }
     shadow_map_texture = new texture::Texture2D(shadow_map_color);
 #endif
-    GXLOGI("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
     glEnable(GL_BLEND);
@@ -90,9 +86,7 @@ gearoenix::gles2::Engine::Engine(system::Application* sysapp)
     glEnable(GL_STENCIL_TEST);
     glViewport(0, 0, win_width, win_height);
     glScissor(0, 0, win_width, win_height);
-    GXLOGI("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
     pipmgr = new render::pipeline::Manager(this);
-    GXLOGI("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
 #ifdef INTA_TEST001
     const GLfloat vertices[] = {
         0.0f, 1.0f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 2.0f,
@@ -140,7 +134,6 @@ void gearoenix::gles2::Engine::update()
                 0, core::EndCaller::create([&] { ++first_happen; })));
     }
 #endif
-    GXLOGI("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
     glClear(GL_COLOR_BUFFER_BIT);
     ///////////////////////////////////////////////////////////////////////////////////////////////
     std::vector<std::function<void()>> temp_functions;
@@ -170,9 +163,7 @@ void gearoenix::gles2::Engine::update()
     //    for (std::shared_ptr<render::scene::Scene>& scene : loaded_scenes) {
     //        scene->commit();
     //    }
-    GXLOGI("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
     physics_engine->wait();
-    GXLOGI("1111111111111111111111111111111111111111111111111111111111");
 
     for (std::shared_ptr<render::scene::Scene>& scene : loaded_scenes) {
         glBindRenderbuffer(GL_RENDERBUFFER, shadow_map_depth);
@@ -180,7 +171,6 @@ void gearoenix::gles2::Engine::update()
         glViewport(0, 0, (GLfloat)shadow_map_aspect, (GLfloat)shadow_map_aspect);
         glScissor(0, 0, (GLfloat)shadow_map_aspect, (GLfloat)shadow_map_aspect);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-        GXLOGI("222222222222222222222222222222222222222222222222222222222");
 
         scene->cast_shadow();
 
@@ -192,7 +182,6 @@ void gearoenix::gles2::Engine::update()
 
         scene->draw(shadow_map_texture);
     }
-    GXLOGI("33333333333333333333333333333333333333333333333333333333333333333");
     physics_engine->update();
 #endif
 #ifdef GLES2_PROFILING

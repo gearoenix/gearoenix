@@ -38,7 +38,7 @@ compile for Windows, MacOS, WebAssembly)
 - Different type of cameras: Perspective, Orthographic
 - Graphic pipeline management to cache and reduce number of switches and
   increasing performance.
-- Multithreaded occlusion culling. 
+- Multithreaded occlusion culling.
 - Variety of materials:
   - Lighting: Shadeless / Directional / Normal-mapped
   - Texturing: Colored / 2D / 3D / Cube
@@ -51,6 +51,11 @@ compile for Windows, MacOS, WebAssembly)
   - (Note: All of the materials are developed in blender-plugin but few number
     of materials are not developed in engine. If you want any of them you can
     contact me or very easily implement them.)
+
+## Web Demo
+This is WebAssembly demo of game. (Of course I know it is not complete.)  
+<iframe src="https://raw.githubusercontent.com/Hossein-Noroozpour/gearoenix-static-files/master/web-demo/index.html">
+    </iframe>
 
 ## License
 You can do whatever you want to do as long as you take responsibility of all of

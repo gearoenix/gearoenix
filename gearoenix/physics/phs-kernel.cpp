@@ -20,8 +20,8 @@ void gearoenix::physics::Kernel::run()
     const unsigned int threads_count = 1;
     const unsigned int thread_index = 0;
 #endif
-        std::string s = "\n" + std::to_string(thread_index) + " of " + std::to_string(threads_count) + "\n";
-        std::cout << s;
+        // std::string s = "\n" + std::to_string(thread_index) + " of " + std::to_string(threads_count) + "\n";
+        // std::cout << s;
         unsigned int model_index = 0;
         const std::vector<std::shared_ptr<render::scene::Scene>>& scenes = engine->render_engine->get_all_scenes();
         for (const std::shared_ptr<render::scene::Scene>& scene : scenes) {
