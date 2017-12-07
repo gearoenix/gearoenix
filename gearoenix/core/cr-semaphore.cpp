@@ -1,5 +1,6 @@
 #include "cr-semaphore.hpp"
 #ifdef THREAD_SUPPORTED
+#include <thread>
 gearoenix::core::Semaphore::Semaphore(int count)
     : count(count)
 {
@@ -33,6 +34,7 @@ void gearoenix::core::Semaphore::release()
     Lock& l = q.front();
     do {
         l->c.notify_all();
+        std::this_thread::yield();
     } while (l->locked);
     q.pop();
 }

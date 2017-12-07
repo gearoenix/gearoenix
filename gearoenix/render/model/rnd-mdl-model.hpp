@@ -42,10 +42,10 @@ namespace render {
             friend class physics::Kernel;
 
         private:
-            bool has_shadow_caster = true;
-            bool has_transparent = true;
-            bool is_in_sun = true;
-            bool is_in_camera = true;
+            bool has_shadow_caster = false;
+            bool has_transparent = false;
+            bool is_in_sun = false;
+            bool is_in_camera = false;
             bool changed = true;
             // be careful about scaling because it gonna scale radius too.
             math::Mat4x4 m;

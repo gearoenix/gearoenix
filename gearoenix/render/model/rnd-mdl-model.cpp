@@ -34,7 +34,7 @@ gearoenix::render::model::Model::Model(system::File* f, Engine* e, std::shared_p
         } else {
             materials[mesh_ids[i]] = std::make_tuple(mat, nullptr);
         }
-        has_transparent = shader::Shader::is_transparent(mat->get_shader_id());
+        has_transparent |= shader::Shader::is_transparent(mat->get_shader_id());
         needs_mvp |= mat->needs_mvp();
         needs_dbm |= mat->needs_dbm();
     }

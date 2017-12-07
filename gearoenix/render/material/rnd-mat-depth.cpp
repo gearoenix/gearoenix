@@ -20,7 +20,10 @@ gearoenix::render::material::Depth::Depth(core::Id shdid, Engine* e, std::shared
     shdrsc = reinterpret_cast<Resources*>(e->create_shader_resources(SHADER_ID, pl.get(), ub, end));
 }
 
-gearoenix::render::material::Depth::~Depth() {}
+gearoenix::render::material::Depth::~Depth()
+{
+    delete shdrsc;
+}
 
 unsigned int gearoenix::render::material::Depth::get_vertex_elements_count() const
 {

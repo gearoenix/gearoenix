@@ -110,7 +110,9 @@ gearoenix::gles2::Engine::Engine(system::Application* sysapp)
 
 gearoenix::gles2::Engine::~Engine()
 {
-    TODO;
+    glDeleteFramebuffers(1, &shadow_map_framebuffer);
+    glDeleteRenderbuffers(1, &shadow_map_depth);
+    delete shadow_map_texture;
 }
 
 void gearoenix::gles2::Engine::window_changed()

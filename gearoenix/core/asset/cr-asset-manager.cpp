@@ -26,6 +26,29 @@ gearoenix::core::asset::Manager::Manager(system::Application* sys_app, const std
 {
 }
 
+gearoenix::core::asset::Manager::~Manager()
+{
+    delete file;
+    delete shaders;
+    delete cameras;
+    delete audios;
+    delete lights;
+    delete textures;
+    delete meshes;
+    delete models;
+    delete scenes;
+
+    file = nullptr;
+    shaders = nullptr;
+    cameras = nullptr;
+    audios = nullptr;
+    lights = nullptr;
+    textures = nullptr;
+    meshes = nullptr;
+    models = nullptr;
+    scenes = nullptr;
+}
+
 void gearoenix::core::asset::Manager::initialize()
 {
     render_engine = sys_app->get_render_engine();

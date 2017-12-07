@@ -62,6 +62,7 @@ namespace core {
 
         public:
             Manager(system::Application* sys_app, const std::string& file);
+            ~Manager();
             void initialize();
             system::File* get_file();
             std::shared_ptr<render::shader::Shader> get_shader(Id id, std::shared_ptr<EndCaller> end);
