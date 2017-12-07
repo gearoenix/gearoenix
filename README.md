@@ -53,17 +53,35 @@ continue with `OpenGL ES 2`.
     contact me or very easily implement them.)
 
 
-## Web Demo
-[This is WebAssembly demo of game. (Of course I know it is not complete.)](https://hossein-noroozpour.github.io/gearoenix-static-files/web-demo/index.html)
-
+## Demos
+I'm developing gearoenix and a game with it, and I'm little on the urge, do not
+expect a full functioning AAA game from me :D.
+- [This is WebAssembly demo of game.](https://hossein-noroozpour.github.io/gearoenix-static-files/web-demo/index.html)
+- [This is Android one.](https://hossein-noroozpour.github.io/gearoenix-static-files/android/android.7z)
+- [This is Linux one.](https://hossein-noroozpour.github.io/gearoenix-static-files/linux/linux.7z)
 
 # How to Build?
-The build process is a little complicated, because it is an in-house game
-engine. But there are several helper scripts, like mac-build.sh and
-webassembly/build.sh but still you can not create a useful thing with it,
-because game engine have specific file format that can be created with my
-blender exporter plugin. you desperately want to build it, you can contact me
-with email. hossein.noroozpour@gmail.com
+
+- Linux:
+  - Star this project (:D)
+  - Git clone this repository
+  - Install sdl2 development package in your Linux distribution.
+  - Open your lovely IDE, I personally use Qt Creator.
+  - Add all there gearoenix folder to your project and easily compile it.
+  - If you are building the default test of gearoenix you need a static file
+    download it from
+    [here](https://hossein-noroozpour.github.io/gearoenix-static-files/data.gx3d)
+    and place it in the directory of executable.
+  - Run it!
+
+
+In other platform, the build process is a little complicated, because first I
+don't have time to provide tools for it, second, gearoenix is changing a lot and
+third, it is an in-house game engine. But there are several helper scripts,
+like mac-build.sh and webassembly/build.sh but still you can not create a
+useful thing with it, because game engine have specific file format that can
+be created with my blender exporter plugin. If you desperately want to build it,
+you can contact me with email. hossein.noroozpour@gmail.com
 
 ## License
 You can do whatever you want to do as long as you take responsibility of all of
