@@ -28,7 +28,7 @@ find ../gearoenix/ -iname *.cpp | while read line; do
         -Oz -c $line -o $cppfile.bc
 done
 em++ -std=c++14 -s WASM=1 -s BINARYEN=1 -s USE_SDL=2 -s NO_EXIT_RUNTIME=1 \
-    --embed-file data.gx3d --shell-file ../assets/index.html \
+    --embed-file data.gx3d --shell-file ../webassembly/index.html \
     -Oz *.bc -o index.html
 rm *.bc
 
