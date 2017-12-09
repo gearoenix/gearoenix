@@ -1,20 +1,6 @@
 # Gearoenix Game Engine
 An in-house game engine with experimental approach.
 
-## Development Process
-Design and decision making in development process of this project is business
-oriented, it means: I'm developing a game with it and development of this
-project is dependent on the needs of that game and I design and develop a new
-feature whenever my game needs that new feature in the engine, sometimes in the
-design and or implementation I makes decisions that are mostly related to my
-game and urge of getting results, but I never ever disregards best practices in
-its development.
-
-One of the appearance of this development process in engine is, at very start,
-this engine was getting developed with `Vulkan API` but because of lake of
-market share and slow development, I decided to suspend `Vulkan` part and
-continue with `OpenGL ES 2`.
-
 ## Features
 - It is cross-platform (already tested on Linux, Android, iOS and WebAssembly
   but, It can easily compile for Windows, MacOS, ...)
@@ -67,7 +53,8 @@ expect a full functioning AAA game from me :D.
   - Git clone this repository
   - Install sdl2 development package in your Linux distribution.
   - Open your lovely IDE, I personally use Qt Creator.
-  - Add all there gearoenix folder to your project and easily compile it.
+  - Add all the gearoenix folder to your project.
+  - Add SDL2 and GL and pthread support to your compiler settings.
   - If you are building the default test of gearoenix you need a static file
     download it from
     [here](https://hossein-noroozpour.github.io/gearoenix-static-files/data.gx3d)
@@ -82,6 +69,20 @@ like mac-build.sh and webassembly/build.sh but still you can not create a
 useful thing with it, because game engine have specific file format that can
 be created with my blender exporter plugin. If you desperately want to build it,
 you can contact me with email. hossein.noroozpour@gmail.com
+
+## Development Process
+Design and decision making in development process of this project is business
+oriented, it means: I'm developing a game with it and development of this
+project is dependent on the needs of that game and I design and develop a new
+feature whenever my game needs that new feature in the engine, sometimes in the
+design and or implementation I makes decisions that are mostly related to my
+game and urge of getting results, but I never ever disregards best practices in
+its development.
+
+One of the appearance of this development process in engine is, at very start,
+this engine was getting developed with `Vulkan API` but because of lake of
+market share and slow development, I decided to suspend `Vulkan` part and
+continue with `OpenGL ES 2`.
 
 ## License
 You can do whatever you want to do as long as you take responsibility of all of
