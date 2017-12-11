@@ -11,6 +11,7 @@
 #include "../rnd-engine.hpp"
 #include "../scene/rnd-scn-scene.hpp"
 #include <iostream>
+#include <algorithm>
 
 gearoenix::render::model::Model::Model(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c)
 {

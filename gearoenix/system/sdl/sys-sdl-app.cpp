@@ -31,34 +31,34 @@ int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_
         }
         break;
     case SDL_MOUSEWHEEL:
-        o->core_app->on_scroll(event->wheel.y);
+        o->core_app->on_scroll((core::Real) event->wheel.y);
         break;
     case SDL_MOUSEMOTION:
-        o->core_app->on_mouse_move(event->motion.xrel, event->motion.yrel);
+        o->core_app->on_mouse_move((core::Real) event->motion.xrel, (core::Real) event->motion.yrel);
         break;
     case SDL_MOUSEBUTTONDOWN:
         switch (event->button.button) {
         case SDL_BUTTON_LEFT:
-            o->core_app->on_mouse(core::Application::MouseButton::LEFT, core::Application::ButtonAction::PRESS, event->button.x, event->button.y);
+            o->core_app->on_mouse(core::Application::MouseButton::LEFT, core::Application::ButtonAction::PRESS, (core::Real) event->button.x, (core::Real) event->button.y);
             break;
         case SDL_BUTTON_RIGHT:
-            o->core_app->on_mouse(core::Application::MouseButton::RIGHT, core::Application::ButtonAction::PRESS, event->button.x, event->button.y);
+            o->core_app->on_mouse(core::Application::MouseButton::RIGHT, core::Application::ButtonAction::PRESS, (core::Real) event->button.x, (core::Real) event->button.y);
             break;
         case SDL_BUTTON_MIDDLE:
-            o->core_app->on_mouse(core::Application::MouseButton::MIDDLE, core::Application::ButtonAction::PRESS, event->button.x, event->button.y);
+            o->core_app->on_mouse(core::Application::MouseButton::MIDDLE, core::Application::ButtonAction::PRESS, (core::Real) event->button.x, (core::Real) event->button.y);
             break;
         }
         break;
     case SDL_MOUSEBUTTONUP:
         switch (event->button.button) {
         case SDL_BUTTON_LEFT:
-            o->core_app->on_mouse(core::Application::MouseButton::LEFT, core::Application::ButtonAction::RELEASE, event->button.x, event->button.y);
+            o->core_app->on_mouse(core::Application::MouseButton::LEFT, core::Application::ButtonAction::RELEASE, (core::Real) event->button.x, (core::Real) event->button.y);
             break;
         case SDL_BUTTON_RIGHT:
-            o->core_app->on_mouse(core::Application::MouseButton::RIGHT, core::Application::ButtonAction::RELEASE, event->button.x, event->button.y);
+            o->core_app->on_mouse(core::Application::MouseButton::RIGHT, core::Application::ButtonAction::RELEASE, (core::Real) event->button.x, (core::Real) event->button.y);
             break;
         case SDL_BUTTON_MIDDLE:
-            o->core_app->on_mouse(core::Application::MouseButton::MIDDLE, core::Application::ButtonAction::RELEASE, event->button.x, event->button.y);
+            o->core_app->on_mouse(core::Application::MouseButton::MIDDLE, core::Application::ButtonAction::RELEASE, (core::Real) event->button.x, (core::Real) event->button.y);
             break;
         }
         break;

@@ -39,8 +39,8 @@ gearoenix::gles2::Engine::Engine(system::Application* sysapp)
     : render::Engine(sysapp)
 {
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-    win_width = sysapp->get_width();
-    win_height = sysapp->get_height();
+    win_width = (GLfloat) sysapp->get_width();
+    win_height = (GLfloat) sysapp->get_height();
     glGetIntegerv(GL_FRAMEBUFFER_BINDING, (GLint*)&render_framebuffer);
     glGetIntegerv(GL_RENDERBUFFER_BINDING, (GLint*)&render_depth);
 #ifdef SHADOW_MAP
@@ -68,8 +68,8 @@ gearoenix::gles2::Engine::Engine(system::Application* sysapp)
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_SCISSOR_TEST);
     glEnable(GL_STENCIL_TEST);
-    glViewport(0, 0, (GLfloat)shadow_map_aspect, (GLfloat)shadow_map_aspect);
-    glScissor(0, 0, (GLfloat)shadow_map_aspect, (GLfloat)shadow_map_aspect);
+    glViewport(0, 0, shadow_map_aspect, shadow_map_aspect);
+    glScissor(0, 0, shadow_map_aspect, shadow_map_aspect);
     glBindRenderbuffer(GL_RENDERBUFFER, render_depth);
     glBindFramebuffer(GL_FRAMEBUFFER, render_framebuffer);
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
@@ -84,8 +84,8 @@ gearoenix::gles2::Engine::Engine(system::Application* sysapp)
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_SCISSOR_TEST);
     glEnable(GL_STENCIL_TEST);
-    glViewport(0, 0, win_width, win_height);
-    glScissor(0, 0, win_width, win_height);
+    glViewport(0, 0, (GLsizei) win_width, (GLsizei) win_height);
+    glScissor(0, 0, (GLsizei) win_width, (GLsizei) win_height);
     pipmgr = new render::pipeline::Manager(this);
 #ifdef INTA_TEST001
     const GLfloat vertices[] = {
@@ -170,16 +170,16 @@ void gearoenix::gles2::Engine::update()
     for (std::shared_ptr<render::scene::Scene>& scene : loaded_scenes) {
         glBindRenderbuffer(GL_RENDERBUFFER, shadow_map_depth);
         glBindFramebuffer(GL_FRAMEBUFFER, shadow_map_framebuffer);
-        glViewport(0, 0, (GLfloat)shadow_map_aspect, (GLfloat)shadow_map_aspect);
-        glScissor(0, 0, (GLfloat)shadow_map_aspect, (GLfloat)shadow_map_aspect);
+        glViewport(0, 0, shadow_map_aspect, shadow_map_aspect);
+        glScissor(0, 0, shadow_map_aspect, shadow_map_aspect);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
         scene->cast_shadow();
 
         glBindRenderbuffer(GL_RENDERBUFFER, render_depth);
         glBindFramebuffer(GL_FRAMEBUFFER, render_framebuffer);
-        glViewport(0, 0, win_width, win_height);
-        glScissor(0, 0, win_width, win_height);
+        glViewport(0, 0, (GLsizei)win_width, (GLsizei)win_height);
+        glScissor(0, 0, (GLsizei)win_width, (GLsizei)win_height);
         glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
         scene->draw(shadow_map_texture);

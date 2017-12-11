@@ -1,8 +1,8 @@
 #include "../core/cr-build-configuration.hpp"
 #ifdef USE_SDL
-#ifndef IN_IOS
+#ifdef IN_LINUX
 #include <SDL2/SDL_opengles2.h>
-#else
+#elif defined(IN_IOS) || defined(IN_WINDOWS)
 #include <SDL_opengles2.h>
 #endif
 #elif defined(USE_GLFW)

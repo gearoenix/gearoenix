@@ -9,7 +9,7 @@ gearoenix::render::mesh::Mesh::Mesh(system::File* f, Engine* e, std::shared_ptr<
 {
     core::Count vertex_elements_count;
     f->read(vertex_elements_count);
-    buf = e->create_mesh(vertex_elements_count, f, c);
+    buf = e->create_mesh((unsigned int) vertex_elements_count, f, c);
 }
 
 gearoenix::render::mesh::Mesh::~Mesh()

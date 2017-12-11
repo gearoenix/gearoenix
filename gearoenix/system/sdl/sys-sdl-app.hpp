@@ -3,13 +3,13 @@
 #include "../../core/cr-build-configuration.hpp"
 #ifdef USE_SDL
 #include "../../core/cr-types.hpp"
-#ifdef IN_IOS
+#if defined(IN_IOS) || defined(IN_WINDOWS) || defined(IN_WEB)
 #include <SDL.h>
-#elif defined(IN_WEB)
-#include <SDL.h>
-#include <emscripten.h>
 #else
 #include <SDL2/SDL.h>
+#endif
+#ifdef IN_WEB
+#include <emscripten.h>
 #endif
 namespace gearoenix {
 namespace core {
