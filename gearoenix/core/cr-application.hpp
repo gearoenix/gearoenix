@@ -58,6 +58,16 @@ namespace core {
         app->execute(core_app);                                                          \
         delete app;                                                                      \
     }
+#elif defined(IN_WINDOWS)
+#define GEAROENIX_START(CoreApp)                                                    \
+	int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)                            \
+	{                                                                               \
+		gearoenix::system::Application* app = new gearoenix::system::Application(); \
+		CoreApp* core_app = new CoreApp(app);                                       \
+		app->execute(core_app);                                                     \
+		delete app;                                                                 \
+		return 0;                                                                   \
+	}
 #else
 #define GEAROENIX_START(CoreApp)                                                    \
 	int main(int, char**)                                                           \
