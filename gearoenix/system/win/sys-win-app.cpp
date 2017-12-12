@@ -187,8 +187,8 @@ gearoenix::system::Application::Application()
 	wc.lpszClassName = APPLICATION_NAME;
 	wc.cbSize = sizeof(WNDCLASSEX);
 	RegisterClassEx(&wc);
-	int screen_width = GetSystemMetrics(SM_CXSCREEN);
-	int screen_height = GetSystemMetrics(SM_CYSCREEN);
+	screen_width = GetSystemMetrics(SM_CXSCREEN);
+	screen_height = GetSystemMetrics(SM_CYSCREEN);
 #ifdef GEAROENIX_FULLSCREEN
 	DEVMODE screen_settings;
 	setz(screen_settings);
@@ -306,3 +306,8 @@ unsigned int gearoenix::system::Application::get_height() const
 }
 
 #endif // USE_WINAPI
+
+HWND gearoenix::system::Application::get_window()
+{
+	return window;
+}

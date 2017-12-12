@@ -36,6 +36,7 @@ namespace gearoenix {
 			core::Real get_window_ratio() const;
 			unsigned int get_width() const;
 			unsigned int get_height() const;
+			HWND get_window();
 		};
 	}
 }

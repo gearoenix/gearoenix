@@ -4,6 +4,9 @@
 #ifdef USE_DIRECTX11
 #include "../render/rnd-engine.hpp"
 #include <memory>
+#include <dxgi.h>
+#include <d3dcommon.h>
+#include <d3d11.h>
 #ifdef PROFILING_MODE
 #include <chrono>
 #endif
@@ -14,6 +17,15 @@ namespace gearoenix {
 		}
 		class Engine : public render::Engine {
 		private:
+			unsigned int graphic_memory_size;
+			IDXGISwapChain* p_swapchain;
+			ID3D11Device* p_device;
+			ID3D11DeviceContext* p_immediate_context;
+			ID3D11RenderTargetView* p_render_target_view;
+			ID3D11Texture2D* p_depth_stencil_buffer;
+			ID3D11DepthStencilState* p_depth_stencil_state;
+			ID3D11DepthStencilView* p_depth_stencil_view;
+			ID3D11RasterizerState* p_raster_state;
 #ifdef PROFILING_MODE
 			unsigned int prof_frames_count = 0;
 			std::chrono::high_resolution_clock::time_point prof_last_time_draw;
