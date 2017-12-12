@@ -294,4 +294,15 @@ gearoenix::core::Real gearoenix::system::Application::get_window_ratio() const
 	return ((core::Real) screen_width) / ((core::Real) screen_height);
 }
 
+
+unsigned int gearoenix::system::Application::get_width() const
+{
+	return (unsigned int)screen_width;
+}
+
+unsigned int gearoenix::system::Application::get_height() const
+{
+	return (unsigned int)screen_height;
+}
+
 #endif // USE_WINAPI
