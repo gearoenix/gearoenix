@@ -41,7 +41,7 @@ An in-house game engine with experimental approach.
 
 ## Demos
 I'm developing gearoenix and a game with it, and I'm little on the urge, do not
-expect a full functioning AAA game from me :D.
+expect a full functioning AAA game as a demo from me :D.
 - [This is WebAssembly demo of game.](https://hossein-noroozpour.github.io/gearoenix-static-files/web-demo/index.html)
 - [This is Android one.](https://hossein-noroozpour.github.io/gearoenix-static-files/android/android.7z)
 - [This is Linux one.](https://hossein-noroozpour.github.io/gearoenix-static-files/linux/linux.7z)
