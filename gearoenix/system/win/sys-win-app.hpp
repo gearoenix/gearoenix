@@ -18,9 +18,11 @@ namespace gearoenix {
 		class Application {
 		private:
 			int screen_width, screen_height;
+			render::Engine* render_engine;
 			HINSTANCE instance;
 			HWND window;
 			bool running = true;
+			bool window_is_up = false;
 			static LRESULT CALLBACK wnd_proc(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam);
 			LRESULT CALLBACK handler(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam);
 		public:

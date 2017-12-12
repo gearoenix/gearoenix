@@ -29,7 +29,6 @@
 #define USE_DIRECTX11
 //#define USE_OPENGL_41
 //#define USE_OPENGL_33
-//#define USE_OPENGL_ES2
 #define IN_DESKTOP
 //#define USE_SDL
 //#define USE_GLFW

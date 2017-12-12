@@ -4,6 +4,19 @@
 //#define GEAROENIX_NO_CURSOR
 #include "../../core/cr-static.hpp"
 #include "../sys-log.hpp"
+#ifdef USE_VULKAN
+#include "../../vulkan/vk-engine.hpp"
+#elif defined(USE_DIRECTX12)
+#include "../../dx12/dx12-engine.hpp"
+#elif defined(USE_DIRECTX11)
+#include "../../dx11/dx11-engine.hpp"
+#elif defined(USE_OPENGL_41)
+#include "../../gl41/gl41-engine.hpp"
+#elif defined(USE_OPENGL_33)
+#include "../../gl31/gl31-engine.hpp"
+#else
+#error "Unexpected API"
+#endif
 LRESULT CALLBACK gearoenix::system::Application::wnd_proc(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam)
 {
 	auto sys_app = reinterpret_cast<Application*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
@@ -142,10 +155,7 @@ LRESULT CALLBACK gearoenix::system::Application::handler(HWND hwnd, UINT umessag
 		//}
 		break;
 	case WM_SHOWWINDOW:
-		//if (nullptr == core_app) {
-		//	render_engine = new render::Engine(this);
-		//	core_app = new core::Application(this);
-		//}
+		window_is_up = true;
 		break;
 	case WM_ENTERSIZEMOVE:
 		// resizing = true;
@@ -203,6 +213,27 @@ gearoenix::system::Application::Application()
 #ifdef GEAROENIX_NO_CURSOR
 	ShowCursor(false);
 #endif
+	while (!window_is_up) {
+		MSG msg;
+		GetMessage(&msg, NULL, 0, 0);
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
+#ifdef USE_VULKAN
+	render_engine = new vulkan::Engine(this);
+#elif defined(USE_DIRECTX12)
+#error "Unimplemented Graphic API"
+#elif defined(USE_DIRECTX11)
+	render_engine = new dx11::Engine(this);
+#elif defined(USE_OPENGL_41)
+#error "Unimplemented Graphic API"
+#elif defined(USE_OPENGL_33)
+#error "Unimplemented Graphic API"
+#else
+#error "Unexpected API"
+#endif
+	//astmgr = new core::asset::Manager(this, "data.gx3d");
+	//astmgr->initialize();
 }
 
 gearoenix::system::Application::~Application()
