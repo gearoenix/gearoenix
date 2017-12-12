@@ -7,6 +7,8 @@
 #include "glfw/sys-glfw.hpp"
 #elif defined(IN_ANDROID)
 #include "android/sys-and-app.hpp"
+#elif defined(USE_WINAPI)
+#include "win/sys-win-app.hpp"
 #else
 #error "Unimplemented"
 #endif

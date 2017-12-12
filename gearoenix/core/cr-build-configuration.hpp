@@ -25,13 +25,15 @@
 #elif defined(WIN32) || defined(WIN64) || defined(_WIN32) || defined(_WIN64)
 #define IN_WINDOWS
 //#define USE_VULKAN
+//#define USE_DIRECTX12
+#define USE_DIRECTX11
 //#define USE_OPENGL_41
 //#define USE_OPENGL_33
-//#define USE_OPENGL_ES3
-#define USE_OPENGL_ES2
+//#define USE_OPENGL_ES2
 #define IN_DESKTOP
-#define USE_SDL
+//#define USE_SDL
 //#define USE_GLFW
+#define USE_WINAPI
 #elif defined(__APPLE__)
 #include "TargetConditionals.h"
 #if defined(TARGET_IPHONE_SIMULATOR) || defined(TARGET_OS_IPHONE)
