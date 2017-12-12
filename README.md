@@ -84,6 +84,16 @@ this engine was getting developed with `Vulkan API` but because of lake of
 market share and slow development, I decided to suspend `Vulkan` part and
 continue with `OpenGL ES 2`.
 
+## TODOs
+Sorted in order of importance.
+- Direct3D 11 (just started, because I saw the OpenGLES-X is not welcome
+  anymore in Windows).
+- Physics:
+    - Collision detection 50% (blender part is down)
+    - Rigid body 00%
+- Vulkan (WIP 40%)
+
+
 ## License
 You can do whatever you want to do as long as you take responsibility of all of
 its consequences, **But** If you used it and it was useful for you, please make
