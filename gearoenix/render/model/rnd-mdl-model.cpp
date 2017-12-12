@@ -1,5 +1,6 @@
 #include "rnd-mdl-model.hpp"
 #include "../../core/asset/cr-asset-manager.hpp"
+#include "../../core/cr-static.hpp"
 #include "../../system/sys-app.hpp"
 #include "../../system/sys-file.hpp"
 #include "../camera/rnd-cmr-camera.hpp"
@@ -11,14 +12,13 @@
 #include "../rnd-engine.hpp"
 #include "../scene/rnd-scn-scene.hpp"
 #include <iostream>
-#include <algorithm>
 
 gearoenix::render::model::Model::Model(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c)
 {
     m.read(f);
     occloc.read(f);
     occrdss.read(f);
-    occrds = std::max(std::max(occrdss[0], occrdss[1]), occrdss[2]);
+    occrds = max(max(occrdss[0], occrdss[1]), occrdss[2]);
     core::Count mesh_count = 0;
     f->read(mesh_count);
     std::vector<core::Id> mesh_ids(mesh_count);
