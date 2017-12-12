@@ -6,16 +6,18 @@
 #include "../sys-log.hpp"
 #ifdef USE_VULKAN
 #include "../../vulkan/vk-engine.hpp"
-#elif defined(USE_DIRECTX12)
+#endif
+#ifdef USE_DIRECTX12
 #include "../../dx12/dx12-engine.hpp"
-#elif defined(USE_DIRECTX11)
+#endif
+#ifdef USE_DIRECTX11
 #include "../../dx11/dx11-engine.hpp"
-#elif defined(USE_OPENGL_41)
+#endif
+#ifdef USE_OPENGL_41
 #include "../../gl41/gl41-engine.hpp"
-#elif defined(USE_OPENGL_33)
+#endif
+#ifdef USE_OPENGL_33
 #include "../../gl31/gl31-engine.hpp"
-#else
-#error "Unexpected API"
 #endif
 LRESULT CALLBACK gearoenix::system::Application::wnd_proc(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam)
 {
@@ -220,18 +222,33 @@ gearoenix::system::Application::Application()
 		DispatchMessage(&msg);
 	}
 #ifdef USE_VULKAN
-	render_engine = new vulkan::Engine(this);
-#elif defined(USE_DIRECTX12)
-#error "Unimplemented Graphic API"
-#elif defined(USE_DIRECTX11)
-	render_engine = new dx11::Engine(this);
-#elif defined(USE_OPENGL_41)
-#error "Unimplemented Graphic API"
-#elif defined(USE_OPENGL_33)
-#error "Unimplemented Graphic API"
-#else
-#error "Unexpected API"
+	if (vulkan::Engine::is_supported())
+		render_engine = new vulkan::Engine(this);
+	else
 #endif
+#ifdef USE_DIRECTX12
+	if (dx12::Engine::is_supported())
+		render_engine = new dx12::Engine(this);
+	else
+#endif
+#ifdef USE_DIRECTX11
+	if (dx11::Engine::is_supported())
+		render_engine = new dx11::Engine(this);
+	else
+#endif
+#ifdef USE_OPENGL_41
+	if (gl41::Engine::is_supported())
+		render_engine = new gl41::Engine(this);
+	else
+#endif
+#ifdef USE_OPENGL_33
+	if (gl33::Engine::is_supported())
+		render_engine = new gl33::Engine(this);
+	else
+#endif
+	{
+		GXLOGF("No suitable API found.");
+	}
 	//astmgr = new core::asset::Manager(this, "data.gx3d");
 	//astmgr->initialize();
 }
@@ -248,7 +265,7 @@ void gearoenix::system::Application::execute(core::Application* core_app)
 			DispatchMessage(&msg);
 		}
 		//core_app->update();
-		//render_engine->update();
+		render_engine->update();
 	}
 }
 

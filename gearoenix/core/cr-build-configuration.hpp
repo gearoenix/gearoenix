@@ -73,4 +73,5 @@
 #ifndef IN_WEB
 #define THREAD_SUPPORTED
 #endif
+#define PROFILING_MODE
 #endif
