@@ -5,7 +5,20 @@
 #include "../system/sys-app.hpp"
 #include <cstdlib>
 #include "../core/cr-static.hpp"
-
+#include "../math/math-vector.hpp"
+#include "../math/math-matrix.hpp"
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+namespace gearoenix {
+	struct VertexType {
+		math::Vec3 position;
+		math::Vec3 color;
+	};
+	static ID3D11Buffer* p_vertex_buffer = nullptr;
+	static ID3D11Buffer* p_index_buffer = nullptr;
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
 gearoenix::dx11::Engine::Engine(system::Application* sys_app): render::Engine(sys_app)
 {
 	IDXGIFactory* factory;
@@ -162,25 +175,108 @@ gearoenix::dx11::Engine::Engine(system::Application* sys_app): render::Engine(sy
 	viewport.TopLeftX = 0.0f;
 	viewport.TopLeftY = 0.0f;
 	p_immediate_context->RSSetViewports(1, &viewport);
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////
+	const VertexType vertices[3] = {
+		{ { -1.0f, -1.0f, 0.0f }, { 1.0f, 0.0f, 0.0f } },
+		{ { 0.0f, 1.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } },
+		{ { 1.0f, -1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f } },
+	};
+	const unsigned long indices[3] = { 0, 1, 3 };
+	GXLOGE("Doubt in index type.");
+	D3D11_BUFFER_DESC vertex_buffer_desc, index_buffer_desc;
+	D3D11_SUBRESOURCE_DATA vertex_data, index_data;
+
+	setz(vertex_buffer_desc);
+	vertex_buffer_desc.Usage = D3D11_USAGE_DEFAULT;
+	vertex_buffer_desc.ByteWidth = sizeof(vertex_buffer_desc);
+	vertex_buffer_desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	
+	setz(vertex_data);
+	vertex_data.pSysMem = vertices;
+
+	if (FAILED(p_device->CreateBuffer(&vertex_buffer_desc, &vertex_data, &p_vertex_buffer))) {
+		GXLOGF("Failed to create vertex buffer.");
+	}
+
+	setz(index_buffer_desc);
+	index_buffer_desc.Usage = D3D11_USAGE_DEFAULT;
+	index_buffer_desc.ByteWidth = sizeof(indices);
+	index_buffer_desc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+
+	setz(index_data);
+	index_data.pSysMem = indices;
+
+	if (FAILED(p_device->CreateBuffer(&index_buffer_desc, &index_data, &p_index_buffer))) {
+		GXLOGF("Failed to create index buffer.");
+	}
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 }
 
 gearoenix::dx11::Engine::~Engine()
-{}
+{
+	terminate();
+}
 
 bool gearoenix::dx11::Engine::is_supported()
 {
-	// TODO it must become better in future
+	GXLOGE("TODO it must become better in future.");
 	return true;
 }
 
 void gearoenix::dx11::Engine::window_changed()
-{}
+{
+	TODO;
+}
 
 void gearoenix::dx11::Engine::update()
-{}
+{
+	p_immediate_context->ClearRenderTargetView(p_render_target_view, clear_color);
+	p_immediate_context->ClearDepthStencilView(p_depth_stencil_view, D3D11_CLEAR_DEPTH, 1.0f, 0);
+	// scene render in here
+	/////////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////
+	const unsigned int stride = sizeof(VertexType);
+	const unsigned int offset = 0;
+	p_immediate_context->IASetVertexBuffers(0, 1, &p_vertex_buffer, &stride, &offset);
+	p_immediate_context->IASetIndexBuffer(p_index_buffer, DXGI_FORMAT_R32_UINT, 0);
+	p_immediate_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	/////////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////
+	p_swapchain->Present(1, 0);
+}
 
 void gearoenix::dx11::Engine::terminate()
-{}
+{
+	if (p_swapchain == nullptr)
+		return;
+	p_swapchain->SetFullscreenState(false, NULL);
+	////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////
+	p_index_buffer->Release();
+	p_index_buffer = nullptr;
+	p_vertex_buffer->Release();
+	p_vertex_buffer = nullptr;
+	////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////
+	p_raster_state->Release();
+	p_raster_state = nullptr;
+	p_depth_stencil_view->Release();
+	p_depth_stencil_view = nullptr;
+	p_depth_stencil_state->Release();
+	p_depth_stencil_state = nullptr;
+	p_depth_stencil_buffer->Release();
+	p_depth_stencil_buffer = nullptr;
+	p_render_target_view->Release();
+	p_render_target_view = nullptr;
+	p_immediate_context->Release();
+	p_immediate_context = nullptr;
+	p_device->Release();
+	p_device = nullptr;
+	p_swapchain->Release();
+	p_swapchain = nullptr;
+}
 
 gearoenix::render::texture::Texture2D* gearoenix::dx11::Engine::create_texture_2d(system::File* file, std::shared_ptr<core::EndCaller> c)
 {

@@ -18,14 +18,15 @@ namespace gearoenix {
 		class Engine : public render::Engine {
 		private:
 			unsigned int graphic_memory_size;
-			IDXGISwapChain* p_swapchain;
-			ID3D11Device* p_device;
-			ID3D11DeviceContext* p_immediate_context;
-			ID3D11RenderTargetView* p_render_target_view;
-			ID3D11Texture2D* p_depth_stencil_buffer;
-			ID3D11DepthStencilState* p_depth_stencil_state;
-			ID3D11DepthStencilView* p_depth_stencil_view;
-			ID3D11RasterizerState* p_raster_state;
+			float clear_color[4] = {0.0f, 0.0f, 0.0f, 1.0f};
+			IDXGISwapChain* p_swapchain = nullptr;
+			ID3D11Device* p_device = nullptr;
+			ID3D11DeviceContext* p_immediate_context = nullptr;
+			ID3D11RenderTargetView* p_render_target_view = nullptr;
+			ID3D11Texture2D* p_depth_stencil_buffer = nullptr;
+			ID3D11DepthStencilState* p_depth_stencil_state = nullptr;
+			ID3D11DepthStencilView* p_depth_stencil_view = nullptr;
+			ID3D11RasterizerState* p_raster_state = nullptr;
 #ifdef PROFILING_MODE
 			unsigned int prof_frames_count = 0;
 			std::chrono::high_resolution_clock::time_point prof_last_time_draw;
