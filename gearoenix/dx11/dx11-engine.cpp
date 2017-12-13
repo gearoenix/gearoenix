@@ -4,6 +4,7 @@
 #include <vector>
 #include "../system/sys-app.hpp"
 #include <cstdlib>
+#include <d3dcompiler.h>
 #include "../core/cr-static.hpp"
 #include "../math/math-vector.hpp"
 #include "../math/math-matrix.hpp"
@@ -16,6 +17,13 @@ namespace gearoenix {
 	};
 	static ID3D11Buffer* p_vertex_buffer = nullptr;
 	static ID3D11Buffer* p_index_buffer = nullptr;
+	static ID3D11Buffer* p_uniform_buffer = nullptr;
+	static ID3D11VertexShader* p_vertex_shader = nullptr;
+	static ID3D11PixelShader* p_fragment_shader = nullptr;
+	static ID3D11InputLayout* p_input_layout = nullptr;
+	struct UniformBufferType {
+		math::Mat4x4 mvp;
+	};
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -210,6 +218,120 @@ gearoenix::dx11::Engine::Engine(system::Application* sys_app): render::Engine(sy
 	if (FAILED(p_device->CreateBuffer(&index_buffer_desc, &index_data, &p_index_buffer))) {
 		GXLOGF("Failed to create index buffer.");
 	}
+
+	ID3DBlob* error_message = nullptr;
+	ID3DBlob* vertex_shader_code = nullptr;
+	ID3DBlob* fragment_shader_code = nullptr;
+	D3D11_INPUT_ELEMENT_DESC polygon_layout[2];
+
+	const char p_vertex_src_data[] =
+		"cbuffer UniformBuffer {\n"
+		"    matrix mvp;\n"
+		"};\n"
+		"struct VertexInputType {\n"
+		"    float3 position : POSITION;\n"
+		"    float3 color : COLOR;\n"
+		"};\n"
+		"struct PixelInputType\n"
+		"{\n"
+		"    float4 position : SV_POSITION;\n"
+		"    float4 color : COLOR;\n"
+		"};\n"
+		"PixelInputType main(VertexInputType input) {\n"
+		"    PixelInputType output;\n"
+		"    input.position.w = 1.0f;\n"
+		"    output.position = mul(input.position, mvp);\n"
+		"    output.color = input.color;\n"
+		"    return output;\n"
+		"}\n"
+		;
+	const char p_fragment_src_data[] =
+		"struct PixelInputType {\n"
+		"    float4 position : SV_POSITION;\n"
+		"    float4 color : COLOR;\n"
+		"};\n"
+		"float4 main(PixelInputType input) : SV_TARGET {\n"
+		"	return input.color;\n"
+		"}\n"
+		;
+
+	if (FAILED(D3DCompile2(
+		p_vertex_src_data,
+		sizeof(p_vertex_src_data),
+		nullptr,
+		nullptr,
+		nullptr,
+		"main",
+		"vs_5_0",
+		D3DCOMPILE_OPTIMIZATION_LEVEL3 | D3DCOMPILE_WARNINGS_ARE_ERRORS | D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_PACK_MATRIX_COLUMN_MAJOR,
+		0,
+		0,
+		nullptr,
+		0,
+		&vertex_shader_code,
+		&error_message
+	))) {
+		GXLOGF("Error in compiling shader " << ((const char *)(error_message->GetBufferPointer())));
+	}
+
+	if (FAILED(D3DCompile2(
+		p_fragment_src_data,
+		sizeof(p_fragment_src_data),
+		nullptr,
+		nullptr,
+		nullptr,
+		"main",
+		"ps_5_0",
+		D3DCOMPILE_OPTIMIZATION_LEVEL3 | D3DCOMPILE_WARNINGS_ARE_ERRORS | D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_PACK_MATRIX_COLUMN_MAJOR,
+		0,
+		0,
+		nullptr,
+		0,
+		&fragment_shader_code,
+		&error_message
+	))) {
+		GXLOGF("Error in compiling shader " << ((const char *)(error_message->GetBufferPointer())));
+	}
+	if (FAILED(p_device->CreateVertexShader(vertex_shader_code->GetBufferPointer(), vertex_shader_code->GetBufferSize(), NULL, &p_vertex_shader))) {
+		UNEXPECTED;
+	}
+	if (FAILED(p_device->CreatePixelShader(fragment_shader_code->GetBufferPointer(), fragment_shader_code->GetBufferSize(), NULL, &p_fragment_shader))) {
+		UNEXPECTED;
+	}
+
+	setz(polygon_layout[0]);
+	polygon_layout[0].SemanticName = "POSITION";
+	polygon_layout[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+	polygon_layout[0].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+
+	setz(polygon_layout[1]);
+	polygon_layout[1].SemanticName = "COLOR";
+	polygon_layout[1].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	polygon_layout[1].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+	polygon_layout[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+
+	if (FAILED(p_device->CreateInputLayout(polygon_layout, countof(polygon_layout), vertex_shader_code->GetBufferPointer(),
+		vertex_shader_code->GetBufferSize(), &p_input_layout))) {
+		UNEXPECTED;
+	}
+
+	vertex_shader_code->Release();
+	vertex_shader_code = nullptr;
+
+	fragment_shader_code->Release();
+	fragment_shader_code = nullptr;
+
+
+	D3D11_BUFFER_DESC uniform_buffer_desc;
+	setz(uniform_buffer_desc);
+	uniform_buffer_desc.Usage = D3D11_USAGE_DYNAMIC;
+	uniform_buffer_desc.ByteWidth = sizeof(UniformBufferType);
+	uniform_buffer_desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	uniform_buffer_desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+
+	if (FAILED(p_device->CreateBuffer(&uniform_buffer_desc, NULL, &p_uniform_buffer))) {
+		UNEXPECTED;
+	}
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 }
@@ -254,6 +376,14 @@ void gearoenix::dx11::Engine::terminate()
 	p_swapchain->SetFullscreenState(false, NULL);
 	////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////
+	p_uniform_buffer->Release();
+	p_uniform_buffer = nullptr;
+	p_input_layout->Release();
+	p_input_layout = 0;
+	p_fragment_shader->Release();
+	p_fragment_shader = nullptr;
+	p_vertex_shader->Release();
+	p_vertex_shader = nullptr;
 	p_index_buffer->Release();
 	p_index_buffer = nullptr;
 	p_vertex_buffer->Release();
