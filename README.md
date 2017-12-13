@@ -48,6 +48,10 @@ expect a full functioning AAA game as a demo from me :D.
 
 # How to Build?
 
+Currently due to adding `Direct3D11` master branch is unstable refer to commit
+`5af5290a79fb70a0544ac8e4731b280c005da2c7` for building, soon master gonna be
+stabilized again.
+
 - Linux:
   - Star this project (:D)
   - Git clone this repository
@@ -60,6 +64,9 @@ expect a full functioning AAA game as a demo from me :D.
     [here](https://hossein-noroozpour.github.io/gearoenix-static-files/data.gx3d)
     and place it in the directory of executable.
   - Run it!
+
+  Or
+  - use linux-build.sh script.
 
 
 In other platform, the build process is a little complicated, because first I
