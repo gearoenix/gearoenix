@@ -77,6 +77,18 @@ useful thing with it, because game engine have specific file format that can
 be created with my blender exporter plugin. If you desperately want to build it,
 you can contact me with email. hossein.noroozpour@gmail.com
 
+## Code Design
+ - I do not use modern features of C++ unless add a great value to my work
+   because most of the new features have overhead like `shared_ptr` (runtime
+   overhead) or `auto` (compile time overhead), but actually I use a lot of
+   modern stuff C++ stuff.
+ - Compile time is important because I run the project even after a small
+   change.
+ - I'm using `clang-format` with style of `WebKit` to rule the all of format
+   stuffs, the `push.sh` do this and it only run in my Linux desktop at home
+   (because of changes in different versions of `clang-format`).
+ - ... (todo)
+
 ## Development Process
 Design and decision making in development process of this project is business
 oriented, it means: I'm developing a game with it and development of this

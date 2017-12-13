@@ -190,14 +190,14 @@ gearoenix::dx11::Engine::Engine(system::Application* sys_app): render::Engine(sy
 		{ { 0.0f, 1.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } },
 		{ { 1.0f, -1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f } },
 	};
-	const unsigned long indices[3] = { 0, 1, 3 };
+	const std::uint32_t indices[3] = { 0, 1, 2 };
 	GXLOGE("Doubt in index type.");
 	D3D11_BUFFER_DESC vertex_buffer_desc, index_buffer_desc;
 	D3D11_SUBRESOURCE_DATA vertex_data, index_data;
 
 	setz(vertex_buffer_desc);
 	vertex_buffer_desc.Usage = D3D11_USAGE_DEFAULT;
-	vertex_buffer_desc.ByteWidth = sizeof(vertex_buffer_desc);
+	vertex_buffer_desc.ByteWidth = sizeof(vertices);
 	vertex_buffer_desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	
 	setz(vertex_data);
@@ -235,12 +235,11 @@ gearoenix::dx11::Engine::Engine(system::Application* sys_app): render::Engine(sy
 		"struct PixelInputType\n"
 		"{\n"
 		"    float4 position : SV_POSITION;\n"
-		"    float4 color : COLOR;\n"
+		"    float3 color : COLOR;\n"
 		"};\n"
 		"PixelInputType main(VertexInputType input) {\n"
 		"    PixelInputType output;\n"
-		"    input.position.w = 1.0f;\n"
-		"    output.position = mul(input.position, mvp);\n"
+		"    output.position = mul(float4(input.position, 1.0), mvp);\n"
 		"    output.color = input.color;\n"
 		"    return output;\n"
 		"}\n"
@@ -248,10 +247,10 @@ gearoenix::dx11::Engine::Engine(system::Application* sys_app): render::Engine(sy
 	const char p_fragment_src_data[] =
 		"struct PixelInputType {\n"
 		"    float4 position : SV_POSITION;\n"
-		"    float4 color : COLOR;\n"
+		"    float3 color : COLOR;\n"
 		"};\n"
 		"float4 main(PixelInputType input) : SV_TARGET {\n"
-		"	return input.color;\n"
+		"	return float4(input.color, 1.0);\n"
 		"}\n"
 		;
 
@@ -274,6 +273,7 @@ gearoenix::dx11::Engine::Engine(system::Application* sys_app): render::Engine(sy
 		GXLOGF("Error in compiling shader " << ((const char *)(error_message->GetBufferPointer())));
 	}
 
+	error_message = nullptr;
 	if (FAILED(D3DCompile2(
 		p_fragment_src_data,
 		sizeof(p_fragment_src_data),
@@ -306,12 +306,16 @@ gearoenix::dx11::Engine::Engine(system::Application* sys_app): render::Engine(sy
 
 	setz(polygon_layout[1]);
 	polygon_layout[1].SemanticName = "COLOR";
-	polygon_layout[1].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	polygon_layout[1].Format = DXGI_FORMAT_R32G32B32_FLOAT;
 	polygon_layout[1].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
 	polygon_layout[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 
-	if (FAILED(p_device->CreateInputLayout(polygon_layout, countof(polygon_layout), vertex_shader_code->GetBufferPointer(),
-		vertex_shader_code->GetBufferSize(), &p_input_layout))) {
+	if (FAILED(p_device->CreateInputLayout(
+		polygon_layout, 
+		countof(polygon_layout), 
+		vertex_shader_code->GetBufferPointer(),
+		vertex_shader_code->GetBufferSize(), 
+		&p_input_layout))) {
 		UNEXPECTED;
 	}
 
@@ -364,6 +368,20 @@ void gearoenix::dx11::Engine::update()
 	p_immediate_context->IASetVertexBuffers(0, 1, &p_vertex_buffer, &stride, &offset);
 	p_immediate_context->IASetIndexBuffer(p_index_buffer, DXGI_FORMAT_R32_UINT, 0);
 	p_immediate_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	D3D11_MAPPED_SUBRESOURCE mapped_resource;
+	if (FAILED(p_immediate_context->Map(p_uniform_buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped_resource))) {
+		UNEXPECTED;
+	}
+	UniformBufferType* data_ptr = (UniformBufferType*) mapped_resource.pData;
+	data_ptr->mvp = math::Mat4x4();
+	p_immediate_context->Unmap(p_uniform_buffer, 0);
+	unsigned int buffer_number = 0;
+	p_immediate_context->VSSetConstantBuffers(buffer_number, 1, &p_uniform_buffer);
+	p_immediate_context->IASetInputLayout(p_input_layout);
+	p_immediate_context->VSSetShader(p_vertex_shader, NULL, 0);
+	p_immediate_context->PSSetShader(p_fragment_shader, NULL, 0);
+	p_immediate_context->DrawIndexed(3, 0, 0);
 	/////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////
 	p_swapchain->Present(1, 0);

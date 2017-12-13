@@ -254,7 +254,9 @@ gearoenix::system::Application::Application()
 }
 
 gearoenix::system::Application::~Application()
-{}
+{
+	TODO; // do cleaning, I think it is better to do it in some special event in stead of here. 
+}
 
 void gearoenix::system::Application::execute(core::Application* core_app)
 {
