@@ -262,7 +262,7 @@ gearoenix::dx11::Engine::Engine(system::Application* sys_app): render::Engine(sy
 		nullptr,
 		"main",
 		"vs_5_0",
-		D3DCOMPILE_OPTIMIZATION_LEVEL3 | D3DCOMPILE_WARNINGS_ARE_ERRORS | D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_PACK_MATRIX_COLUMN_MAJOR,
+		D3DCOMPILE_OPTIMIZATION_LEVEL3 | D3DCOMPILE_WARNINGS_ARE_ERRORS | D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_PACK_MATRIX_ROW_MAJOR,
 		0,
 		0,
 		nullptr,
@@ -282,7 +282,7 @@ gearoenix::dx11::Engine::Engine(system::Application* sys_app): render::Engine(sy
 		nullptr,
 		"main",
 		"ps_5_0",
-		D3DCOMPILE_OPTIMIZATION_LEVEL3 | D3DCOMPILE_WARNINGS_ARE_ERRORS | D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_PACK_MATRIX_COLUMN_MAJOR,
+		D3DCOMPILE_OPTIMIZATION_LEVEL3 | D3DCOMPILE_WARNINGS_ARE_ERRORS | D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_PACK_MATRIX_ROW_MAJOR,
 		0,
 		0,
 		nullptr,
@@ -374,7 +374,13 @@ void gearoenix::dx11::Engine::update()
 		UNEXPECTED;
 	}
 	UniformBufferType* data_ptr = (UniformBufferType*) mapped_resource.pData;
-	data_ptr->mvp = math::Mat4x4();
+	data_ptr->mvp = 
+		math::Mat4x4::perspective(2.0f, 1.0f, 1.0f, 10.0f) *
+		math::Mat4x4::look_at(
+			math::Vec3(0.0f, 0.0f, 4.0f), 
+			math::Vec3(0.0f, 0.0f, 0.0f), 
+			math::Vec3(0.0f, 1.0f, 0.0f)) *
+		math::Mat4x4();
 	p_immediate_context->Unmap(p_uniform_buffer, 0);
 	unsigned int buffer_number = 0;
 	p_immediate_context->VSSetConstantBuffers(buffer_number, 1, &p_uniform_buffer);
@@ -428,36 +434,43 @@ void gearoenix::dx11::Engine::terminate()
 
 gearoenix::render::texture::Texture2D* gearoenix::dx11::Engine::create_texture_2d(system::File* file, std::shared_ptr<core::EndCaller> c)
 {
+	UNIMPLEMENTED;
 	return nullptr;
 }
 
 gearoenix::render::texture::Cube* gearoenix::dx11::Engine::create_texture_cube(system::File* file, std::shared_ptr<core::EndCaller> c)
 {
+	UNIMPLEMENTED;
 	return nullptr;
 }
 
 gearoenix::render::buffer::Mesh* gearoenix::dx11::Engine::create_mesh(unsigned int vec, system::File* file, std::shared_ptr<core::EndCaller> c)
 {
+	UNIMPLEMENTED;
 	return nullptr;
 }
 
 gearoenix::render::buffer::Uniform* gearoenix::dx11::Engine::create_uniform(unsigned int s, std::shared_ptr<core::EndCaller> c)
 {
+	UNIMPLEMENTED;
 	return nullptr;
 }
 
 gearoenix::render::shader::Shader* gearoenix::dx11::Engine::create_shader(core::Id sid, system::File* file, std::shared_ptr<core::EndCaller> c)
 {
+	UNIMPLEMENTED;
 	return nullptr;
 }
 
 gearoenix::render::shader::Resources* gearoenix::dx11::Engine::create_shader_resources(core::Id sid, render::pipeline::Pipeline* p, render::buffer::Uniform* ub, std::shared_ptr<core::EndCaller> c)
 {
+	UNIMPLEMENTED;
 	return nullptr;
 }
 
 gearoenix::render::pipeline::Pipeline* gearoenix::dx11::Engine::create_pipeline(core::Id sid, std::shared_ptr<core::EndCaller> c)
 {
+	UNIMPLEMENTED;
 	return nullptr;
 }
 
