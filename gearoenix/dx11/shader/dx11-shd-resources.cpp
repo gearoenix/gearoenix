@@ -1,5 +1,5 @@
 #include "gles2-shd-resources.hpp"
-#ifdef USE_OPENGL_ES2
+#ifdef USE_DIRECTX11
 #include "../../system/sys-log.hpp"
 
 #include "../buffer/gles2-buf-uniform.hpp"

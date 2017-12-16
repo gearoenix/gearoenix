@@ -1,7 +1,7 @@
 #ifndef GEAROENIX_OPENGL_TEXTURE_CUBE_HPP
 #define GEAROENIX_OPENGL_TEXTURE_CUBE_HPP
 #include "../../core/cr-build-configuration.hpp"
-#ifdef USE_OPENGL_ES2
+#ifdef USE_DIRECTX11
 #include "../../render/texture/rnd-txt-texture-cube.hpp"
 #include "../gles2.hpp"
 #include <memory>

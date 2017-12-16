@@ -1,5 +1,5 @@
 #include "gles2-shader.hpp"
-#ifdef USE_OPENGL_ES2
+#ifdef USE_DIRECTX11
 #include "../../system/sys-log.hpp"
 
 void gearoenix::gles2::shader::Shader::create_program()

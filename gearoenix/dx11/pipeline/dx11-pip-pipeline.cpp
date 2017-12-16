@@ -1,24 +1,25 @@
-#include "gles2-pip-pipeline.hpp"
-#ifdef USE_OPENGL_ES2
+#include "dx11-pip-pipeline.hpp"
+#ifdef USE_DIRECTX11
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../system/sys-app.hpp"
 #include "../../system/sys-log.hpp"
-#include "../gles2-engine.hpp"
-#include "../shader/gles2-shader.hpp"
+#include "../dx11-engine.hpp"
+#include "../shader/dx11-shader.hpp"
 
-gearoenix::gles2::pipeline::Pipeline::Pipeline(core::Id sid, Engine* eng, std::shared_ptr<core::EndCaller> call)
+gearoenix::dx11::pipeline::Pipeline::Pipeline(
+    core::Id sid, Engine* eng, std::shared_ptr<core::EndCaller> call)
     : render::pipeline::Pipeline(sid, eng, call)
 {
 }
 
-gearoenix::gles2::pipeline::Pipeline::~Pipeline()
+gearoenix::dx11::pipeline::Pipeline::~Pipeline()
 {
 }
 
-void gearoenix::gles2::pipeline::Pipeline::bind()
+void gearoenix::dx11::pipeline::Pipeline::bind()
 {
     shd->use();
-    GXLOGE("It can be better.");
+    TODO;
 }
 
 #endif

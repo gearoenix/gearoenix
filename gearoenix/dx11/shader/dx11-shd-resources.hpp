@@ -1,7 +1,7 @@
 #ifndef GEAROENIX_GLES2_SHADER_RESOURCES_HPP
 #define GEAROENIX_GLES2_SHADER_RESOURCES_HPP
 #include "../../core/cr-build-configuration.hpp"
-#ifdef USE_OPENGL_ES2
+#ifdef USE_DIRECTX11
 #include "../../render/shader/rnd-shd-resources.hpp"
 namespace gearoenix {
 namespace gles2 {

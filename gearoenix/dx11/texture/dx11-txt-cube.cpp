@@ -1,5 +1,5 @@
 #include "gles2-txt-cube.hpp"
-#ifdef USE_OPENGL_ES2
+#ifdef USE_DIRECTX11
 #include "../../render/texture/rnd-txt-png.hpp"
 #include "../../system/sys-file.hpp"
 #include "../../system/sys-log.hpp"

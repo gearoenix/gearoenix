@@ -1,7 +1,7 @@
 #ifndef GEAROENIX_GLES2_SHADER_SHADELESS_D2_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE_HPP
 #define GEAROENIX_GLES2_SHADER_SHADELESS_D2_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE_HPP
 #include "../../core/cr-build-configuration.hpp"
-#ifdef USE_OPENGL_ES2
+#ifdef USE_DIRECTX11
 #include "../../render/material/rnd-mat-shadeless-d2-matte-nonreflective-shadowless-opaque.hpp"
 #include "../gles2.hpp"
 #include "gles2-shader.hpp"

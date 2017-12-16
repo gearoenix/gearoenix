@@ -1,5 +1,5 @@
 #include "gles2-shd-directional-d2-speculated-nonreflective-shadowless-opaque.hpp"
-#ifdef USE_OPENGL_ES2
+#ifdef USE_DIRECTX11
 #include "../../system/sys-log.hpp"
 #include "../buffer/gles2-buf-uniform.hpp"
 #include "../gles2-engine.hpp"
