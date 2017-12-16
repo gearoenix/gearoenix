@@ -39,8 +39,8 @@ gearoenix::gles2::Engine::Engine(system::Application* sysapp)
     : render::Engine(sysapp)
 {
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-    win_width = (GLfloat) sysapp->get_width();
-    win_height = (GLfloat) sysapp->get_height();
+    win_width = (GLfloat)sysapp->get_width();
+    win_height = (GLfloat)sysapp->get_height();
     glGetIntegerv(GL_FRAMEBUFFER_BINDING, (GLint*)&render_framebuffer);
     glGetIntegerv(GL_RENDERBUFFER_BINDING, (GLint*)&render_depth);
 #ifdef SHADOW_MAP
@@ -84,8 +84,8 @@ gearoenix::gles2::Engine::Engine(system::Application* sysapp)
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_SCISSOR_TEST);
     glEnable(GL_STENCIL_TEST);
-    glViewport(0, 0, (GLsizei) win_width, (GLsizei) win_height);
-    glScissor(0, 0, (GLsizei) win_width, (GLsizei) win_height);
+    glViewport(0, 0, (GLsizei)win_width, (GLsizei)win_height);
+    glScissor(0, 0, (GLsizei)win_width, (GLsizei)win_height);
     pipmgr = new render::pipeline::Manager(this);
 #ifdef INTA_TEST001
     const GLfloat vertices[] = {

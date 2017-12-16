@@ -48,6 +48,10 @@ expect a full functioning AAA game as a demo from me :D.
 
 # How to Build?
 
+Currently due to adding `Direct3D11` master branch is unstable refer to commit
+`5af5290a79fb70a0544ac8e4731b280c005da2c7` for building, soon master gonna be
+stabilized again.
+
 - Linux:
   - Star this project (:D)
   - Git clone this repository
@@ -61,6 +65,9 @@ expect a full functioning AAA game as a demo from me :D.
     and place it in the directory of executable.
   - Run it!
 
+  Or
+  - use linux-build.sh script.
+
 
 In other platform, the build process is a little complicated, because first I
 don't have time to provide tools for it, second, gearoenix is changing a lot and
@@ -69,6 +76,18 @@ like mac-build.sh and webassembly/build.sh but still you can not create a
 useful thing with it, because game engine have specific file format that can
 be created with my blender exporter plugin. If you desperately want to build it,
 you can contact me with email. hossein.noroozpour@gmail.com
+
+## Code Design
+ - I do not use modern features of C++ unless add a great value to my work
+   because most of the new features have overhead like `shared_ptr` (runtime
+   overhead) or `auto` (compile time overhead), but actually I use a lot of
+   modern stuff C++ stuff.
+ - Compile time is important because I run the project even after a small
+   change.
+ - I'm using `clang-format` with style of `WebKit` to rule the all of format
+   stuffs, the `push.sh` do this and it only run in my Linux desktop at home
+   (because of changes in different versions of `clang-format`).
+ - ... (todo)
 
 ## Development Process
 Design and decision making in development process of this project is business
