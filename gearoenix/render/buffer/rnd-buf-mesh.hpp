@@ -12,9 +12,11 @@ namespace render {
     class Engine;
     namespace buffer {
         class Mesh {
+        protected:
+            Engine* engine;
+
         public:
-        private:
-        public:
+            Mesh(Engine* engine);
             virtual ~Mesh();
             virtual void bind() = 0;
             virtual void draw() = 0;

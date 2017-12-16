@@ -6,6 +6,8 @@ namespace render {
     namespace buffer {
         class Uniform {
         private:
+            Engine* engine;
+
         public:
             Uniform(Engine*);
             virtual ~Uniform();
