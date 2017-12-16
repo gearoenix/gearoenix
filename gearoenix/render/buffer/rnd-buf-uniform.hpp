@@ -5,7 +5,7 @@ namespace render {
     class Engine;
     namespace buffer {
         class Uniform {
-        private:
+        protected:
             Engine* engine;
 
         public:

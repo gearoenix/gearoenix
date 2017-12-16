@@ -1,27 +1,27 @@
-#ifndef GEAROENIX_GLES2_SHADER_COMPILER_HPP
-#define GEAROENIX_GLES2_SHADER_COMPILER_HPP
+#ifndef GEAROENIX_DX11_SHADER_COMPILER_HPP
+#define GEAROENIX_DX11_SHADER_COMPILER_HPP
 #include "../../core/cr-build-configuration.hpp"
 #ifdef USE_DIRECTX11
 #include "../../render/shader/rnd-shd-shader.hpp"
-#include "../gles2.hpp"
 #include <string>
+#include <vector>
+#include <d3d11.h>
 namespace gearoenix {
-namespace gles2 {
+namespace dx11 {
     class Engine;
     namespace shader {
         class Shader : public render::shader::Shader {
         protected:
-            Engine* eng;
-            GLuint shader_program;
-            void create_program();
+            Engine* eng = nullptr;
+			ID3D11VertexShader* vtxshd = nullptr;
+			ID3D11PixelShader* frgshd = nullptr;
+			ID3D11InputLayout* inlay = nullptr;
             void run();
-            void link();
-            void validate();
-            GLuint add_shader_to_program(const std::string& shd, const GLenum& shader_type);
-            GLuint get_uniform_location(const std::string& name);
-            void end_program();
-            void end_object(const GLuint& shader_object);
-
+			void compile_shader(
+				const std::string& shd,
+				const render::shader::stage::Id& shader_type,
+				std::vector<D3D11_INPUT_ELEMENT_DESC> polygon_layout = {}
+			);
         public:
             Shader(Engine* eng, std::shared_ptr<core::EndCaller> end);
             virtual ~Shader();

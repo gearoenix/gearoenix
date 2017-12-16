@@ -46,6 +46,10 @@ namespace dx11 {
         render::shader::Shader* create_shader(core::Id sid, system::File* file, std::shared_ptr<core::EndCaller> c);
         render::shader::Resources* create_shader_resources(core::Id sid, render::pipeline::Pipeline* p, render::buffer::Uniform* ub, std::shared_ptr<core::EndCaller> c);
         render::pipeline::Pipeline* create_pipeline(core::Id sid, std::shared_ptr<core::EndCaller> c);
+		ID3D11Device* get_device();
+		const ID3D11Device* get_device() const;
+		ID3D11DeviceContext* get_context();
+		const ID3D11DeviceContext* get_context() const;
     };
 }
 }

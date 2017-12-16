@@ -1,100 +1,85 @@
-#include "gles2-shader.hpp"
+#include "dx11-shader.hpp"
 #ifdef USE_DIRECTX11
 #include "../../system/sys-log.hpp"
+#include "../dx11-engine.hpp"
+#include "../dx11-check.hpp"
+#include <d3dcompiler.h>
 
-void gearoenix::gles2::shader::Shader::create_program()
+void gearoenix::dx11::shader::Shader::run()
 {
-    shader_program = glCreateProgram();
-    if (shader_program == 0) {
-        GXLOGF("Error creating shader program.");
-    }
+	ID3D11DeviceContext* ctx = eng->get_context();
+	ctx->IASetInputLayout(inlay);
+	ctx->VSSetShader(vtxshd, NULL, 0);
+	ctx->PSSetShader(frgshd, NULL, 0);
 }
 
-GLuint gearoenix::gles2::shader::Shader::add_shader_to_program(const std::string& shd, const GLenum& shader_type)
+void gearoenix::dx11::shader::Shader::compile_shader(
+	const std::string& shd, 
+	const render::shader::stage::Id& shader_typ,
+	std::vector<D3D11_INPUT_ELEMENT_DESC> polygon_layout = {})
 {
-    GLuint shader_obj = glCreateShader(shader_type);
-    if (shader_obj == 0) {
-        GXLOGF("Error creating shader type.");
-    }
-    const char* chtemp = shd.c_str();
-    const GLint uintemp = (GLint)shd.length();
-    glShaderSource(shader_obj, 1, &(chtemp), &(uintemp));
-    glCompileShader(shader_obj);
-    GLint success;
-    glGetShaderiv(shader_obj, GL_COMPILE_STATUS, &success);
-    if (!success) {
-        GLint sts_size;
-        glGetShaderiv(shader_obj, GL_INFO_LOG_LENGTH, &sts_size);
-        std::vector<GLchar> info_log;
-        info_log.resize(sts_size);
-        glGetShaderInfoLog(shader_obj, sts_size, NULL, &(info_log[0]));
-        GXLOGF("Error compiling shader type. Info: " << &(info_log[0]));
-    }
-    glAttachShader(shader_program, shader_obj);
-    return shader_obj;
+	ID3DBlob* shdcd = nullptr;
+	ID3DBlob* shderr = nullptr;
+	std::string version;
+	switch (shader_typ)
+	{
+	case render::shader::stage::Id::VERTEX:
+		version = "vs_5_0";
+		break;
+	case render::shader::stage::Id::FRAGMENT:
+		version = "ps_5_0";
+		break;
+	default:
+		UNEXPECTED;
+		break;
+	}
+	if (FAILED(D3DCompile2(
+		shd.c_str(), shd.size(),
+		nullptr, nullptr, nullptr,
+		"main", version.c_str(),
+		D3DCOMPILE_OPTIMIZATION_LEVEL3 | 
+		D3DCOMPILE_WARNINGS_ARE_ERRORS | 
+		D3DCOMPILE_ENABLE_STRICTNESS | 
+		D3DCOMPILE_PACK_MATRIX_ROW_MAJOR,
+		0, 0, nullptr, 0, &shdcd, &shderr))){
+		GXLOGF("Error in compiling shader " << ((const char*)(shderr->GetBufferPointer())));
+	}
+	switch (shader_typ)
+	{
+	case render::shader::stage::Id::VERTEX:
+		GXHRCHK(eng->get_device()->CreateVertexShader(
+			shdcd->GetBufferPointer(), shdcd->GetBufferSize(), NULL, &vtxshd));
+		GXHRCHK(eng->get_device()->CreateInputLayout(
+			polygon_layout.data(),
+			polygon_layout.size(),
+			shdcd->GetBufferPointer(),
+			shdcd->GetBufferSize(),
+			&inlay));
+		break;
+	case render::shader::stage::Id::FRAGMENT:
+		GXHRCHK(eng->get_device()->CreatePixelShader(shdcd->GetBufferPointer(), shdcd->GetBufferSize(), NULL, &frgshd));
+		break;
+	default:
+		UNEXPECTED;
+		break;
+	}
+	shdcd->Release();
 }
 
-void gearoenix::gles2::shader::Shader::link()
-{
-    GLint is_success = 0;
-    glLinkProgram(shader_program);
-    glGetProgramiv(shader_program, GL_LINK_STATUS, &is_success);
-    if (is_success == 0) {
-        GLint max_length = 0;
-        glGetProgramiv(shader_program, GL_INFO_LOG_LENGTH, &max_length);
-        std::vector<GLchar> info_log;
-        info_log.resize(max_length);
-        glGetProgramInfoLog(shader_program, max_length, NULL, &(info_log[0]));
-        GXLOGF("Error linking shader program: " << &(info_log[0]));
-    }
-}
-
-void gearoenix::gles2::shader::Shader::validate()
-{
-    glValidateProgram(shader_program);
-    GLint is_success = 0;
-    glGetProgramiv(shader_program, GL_VALIDATE_STATUS, &is_success);
-    if (!is_success) {
-        GLint max_length = 0;
-        glGetProgramiv(shader_program, GL_INFO_LOG_LENGTH, &max_length);
-        std::string info_log;
-        info_log.resize(max_length);
-        glGetProgramInfoLog(shader_program, max_length, NULL, &(info_log[0]));
-        GXLOGF("Invalid shader program: " << info_log);
-    }
-    glUseProgram(shader_program);
-}
-
-void gearoenix::gles2::shader::Shader::run()
-{
-    link();
-    validate();
-}
-
-GLuint gearoenix::gles2::shader::Shader::get_uniform_location(const std::string& uname)
-{
-    GLuint result = glGetUniformLocation(shader_program, &(uname[0]));
-    if (result == 0xFFFFFFFF) {
-        UNEXPECTED;
-    }
-    return result;
-}
-
-void gearoenix::gles2::shader::Shader::end_program()
-{
-    glDeleteProgram(shader_program);
-}
-
-void gearoenix::gles2::shader::Shader::end_object(const GLuint& shader_object)
-{
-    glDeleteShader(shader_object);
-}
-
-gearoenix::gles2::shader::Shader::Shader(Engine* eng, std::shared_ptr<core::EndCaller>)
+gearoenix::dx11::shader::Shader::Shader(Engine* eng, std::shared_ptr<core::EndCaller>)
     : eng(eng)
 {
+
 }
 
-gearoenix::gles2::shader::Shader::~Shader() {}
+gearoenix::dx11::shader::Shader::~Shader() {
+	inlay->Release();
+	frgshd->Release();
+	vtxshd->Release();
+	vtxshd = nullptr;
+	frgshd = nullptr;
+	inlay = nullptr;
+	eng = nullptr;
+}
 
 #endif

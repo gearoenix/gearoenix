@@ -467,4 +467,25 @@ gearoenix::render::pipeline::Pipeline* gearoenix::dx11::Engine::create_pipeline(
     return nullptr;
 }
 
+ID3D11Device * gearoenix::dx11::Engine::get_device()
+{
+	return p_device;
+}
+
+const ID3D11Device * gearoenix::dx11::Engine::get_device() const
+{
+	return p_device;
+}
+
+
+ID3D11DeviceContext* gearoenix::dx11::Engine::get_context()
+{
+	return p_immediate_context;
+}
+
+const ID3D11DeviceContext* gearoenix::dx11::Engine::get_context() const
+{
+	return p_immediate_context;
+}
+
 #endif
