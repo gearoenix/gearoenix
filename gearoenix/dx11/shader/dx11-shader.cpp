@@ -65,7 +65,7 @@ void* gearoenix::dx11::shader::Shader::compile_shader(
 		break;
 	}
 	shdcd->Release();
-	shderr->Release();
+	if(shderr != nullptr) shderr->Release();
 	return nullptr;
 }
 

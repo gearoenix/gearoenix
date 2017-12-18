@@ -13,10 +13,10 @@ namespace render {
 
 class TestApp : public gearoenix::core::Application {
 private:
-    //gearoenix::render::Engine* eng;
-    //gearoenix::render::camera::Camera* cam;
-    //bool left_mouse_down = false;
-    //unsigned int scene_id = 0;
+    gearoenix::render::Engine* eng;
+    gearoenix::render::camera::Camera* cam;
+    bool left_mouse_down = false;
+    unsigned int scene_id = 0;
 
 public:
     TestApp(gearoenix::system::Application* sys_app);

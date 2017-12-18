@@ -6,16 +6,20 @@
 #include "../dx11-check.hpp"
 #include <cstring>
 
-gearoenix::dx11::buffer::Uniform::Uniform(unsigned int s, Engine* eng)
+gearoenix::dx11::buffer::Uniform::Uniform(unsigned int s, Engine* eng, std::shared_ptr<core::EndCaller> c)
     : render::buffer::Uniform(eng)
 {
-    D3D11_BUFFER_DESC desc;
-    setz(desc);
-    desc.Usage = D3D11_USAGE_DYNAMIC;
-    desc.ByteWidth = s;
-    desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-    desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	GXHRCHK(eng->get_device()->CreateBuffer(&desc, NULL, &ub));
+	eng->add_load_function([this, eng, s, c]() -> void {
+		D3D11_BUFFER_DESC desc;
+		setz(desc);
+		desc.Usage = D3D11_USAGE_DYNAMIC;
+		desc.ByteWidth = ((s & 15) == 0) ? s : (s & (~((UINT) 15))) + 16;
+		desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+		desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+		ID3D11Device* dev = eng->get_device();
+		GXHRCHK(dev->CreateBuffer(&desc, nullptr, &ub));
+		(void)c;
+	});
 }
 
 gearoenix::dx11::buffer::Uniform::~Uniform()

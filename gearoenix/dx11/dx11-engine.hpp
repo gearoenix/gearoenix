@@ -17,8 +17,8 @@ namespace dx11 {
     }
     class Engine : public render::Engine {
     private:
-        unsigned int graphic_memory_size;
-        float clear_color[4] = { 1.0f, 0.0f, 0.0f, 1.0f };
+        unsigned int graphic_memory_size = 0;
+        float clear_color[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
         IDXGISwapChain* p_swapchain = nullptr;
         ID3D11Device* p_device = nullptr;
         ID3D11DeviceContext* p_immediate_context = nullptr;

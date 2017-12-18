@@ -5,26 +5,33 @@
 #include "../math/math-vector.hpp"
 #include "../system/sys-app.hpp"
 #include "../system/sys-log.hpp"
+#include "../physics/phs-engine.hpp"
+#include "../render/scene/rnd-scn-scene.hpp"
+#include "buffer/dx11-buf-mesh.hpp"
+#include "buffer/dx11-buf-uniform.hpp"
+#include "shader/dx11-shd-shadeless-colored-matte-nonreflective-shadowless-opaque.hpp"
+#include "pipeline/dx11-pip-pipeline.hpp"
+#include "../render/pipeline/rnd-pip-manager.hpp"
 #include <cstdlib>
 #include <d3dcompiler.h>
 #include <vector>
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-namespace gearoenix {
-struct VertexType {
-    math::Vec3 position;
-    math::Vec3 color;
-};
-static ID3D11Buffer* p_vertex_buffer = nullptr;
-static ID3D11Buffer* p_index_buffer = nullptr;
-static ID3D11Buffer* p_uniform_buffer = nullptr;
-static ID3D11VertexShader* p_vertex_shader = nullptr;
-static ID3D11PixelShader* p_fragment_shader = nullptr;
-static ID3D11InputLayout* p_input_layout = nullptr;
-struct UniformBufferType {
-    math::Mat4x4 mvp;
-};
-}
+//namespace gearoenix {
+//struct VertexType {
+//    math::Vec3 position;
+//    math::Vec3 color;
+//};
+//static ID3D11Buffer* p_vertex_buffer = nullptr;
+//static ID3D11Buffer* p_index_buffer = nullptr;
+//static ID3D11Buffer* p_uniform_buffer = nullptr;
+//static ID3D11VertexShader* p_vertex_shader = nullptr;
+//static ID3D11PixelShader* p_fragment_shader = nullptr;
+//static ID3D11InputLayout* p_input_layout = nullptr;
+//struct UniformBufferType {
+//    math::Mat4x4 mvp;
+//};
+//}
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 gearoenix::dx11::Engine::Engine(system::Application* sys_app)
@@ -185,9 +192,13 @@ gearoenix::dx11::Engine::Engine(system::Application* sys_app)
     viewport.TopLeftX = 0.0f;
     viewport.TopLeftY = 0.0f;
     p_immediate_context->RSSetViewports(1, &viewport);
+	pipmgr = new render::pipeline::Manager(this);
+	//--------------------------------------------------------------------------------------------------------
+
+	//--------------------------------------------------------------------------------------------------------
     //////////////////////////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////////////////////////////////
-    const VertexType vertices[3] = {
+    /*const VertexType vertices[3] = {
         { { -1.0f, -1.0f, 0.0f }, { 1.0f, 0.0f, 0.0f } },
         { { 0.0f, 1.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } },
         { { 1.0f, -1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f } },
@@ -329,7 +340,7 @@ gearoenix::dx11::Engine::Engine(system::Application* sys_app)
 
     if (FAILED(p_device->CreateBuffer(&uniform_buffer_desc, NULL, &p_uniform_buffer))) {
         UNEXPECTED;
-    }
+    }*/
     //////////////////////////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////////////////////////////////
 }
@@ -353,11 +364,20 @@ void gearoenix::dx11::Engine::window_changed()
 void gearoenix::dx11::Engine::update()
 {
     p_immediate_context->ClearRenderTargetView(p_render_target_view, clear_color);
-    p_immediate_context->ClearDepthStencilView(p_depth_stencil_view, D3D11_CLEAR_DEPTH, 1.0f, 0);
+	do_load_functions();
+	//--------------------------------------------------------------------------------------------------------
+	physics_engine->wait();
+	for (std::shared_ptr<render::scene::Scene>& scene : loaded_scenes) {
+		//scene->cast_shadow();
+		p_immediate_context->ClearDepthStencilView(p_depth_stencil_view, D3D11_CLEAR_DEPTH, 1.0f, 0);
+		scene->draw(nullptr);
+	}
+	physics_engine->update();
+	//--------------------------------------------------------------------------------------------------------
     // scene render in here
     /////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////
-    const unsigned int stride = sizeof(VertexType);
+    /*const unsigned int stride = sizeof(VertexType);
     const unsigned int offset = 0;
     p_immediate_context->IASetVertexBuffers(0, 1, &p_vertex_buffer, &stride, &offset);
     p_immediate_context->IASetIndexBuffer(p_index_buffer, DXGI_FORMAT_R32_UINT, 0);
@@ -380,7 +400,7 @@ void gearoenix::dx11::Engine::update()
     p_immediate_context->IASetInputLayout(p_input_layout);
     p_immediate_context->VSSetShader(p_vertex_shader, NULL, 0);
     p_immediate_context->PSSetShader(p_fragment_shader, NULL, 0);
-    p_immediate_context->DrawIndexed(3, 0, 0);
+    p_immediate_context->DrawIndexed(3, 0, 0);*/
     /////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////
     p_swapchain->Present(1, 0);
@@ -393,18 +413,18 @@ void gearoenix::dx11::Engine::terminate()
     p_swapchain->SetFullscreenState(false, NULL);
     ////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////
-    p_uniform_buffer->Release();
-    p_uniform_buffer = nullptr;
-    p_input_layout->Release();
-    p_input_layout = 0;
-    p_fragment_shader->Release();
-    p_fragment_shader = nullptr;
-    p_vertex_shader->Release();
-    p_vertex_shader = nullptr;
-    p_index_buffer->Release();
-    p_index_buffer = nullptr;
-    p_vertex_buffer->Release();
-    p_vertex_buffer = nullptr;
+    //p_uniform_buffer->Release();
+    //p_uniform_buffer = nullptr;
+    //p_input_layout->Release();
+    //p_input_layout = 0;
+    //p_fragment_shader->Release();
+    //p_fragment_shader = nullptr;
+    //p_vertex_shader->Release();
+    //p_vertex_shader = nullptr;
+    //p_index_buffer->Release();
+    //p_index_buffer = nullptr;
+    //p_vertex_buffer->Release();
+    //p_vertex_buffer = nullptr;
     ////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////
     p_raster_state->Release();
@@ -439,32 +459,47 @@ gearoenix::render::texture::Cube* gearoenix::dx11::Engine::create_texture_cube(s
 
 gearoenix::render::buffer::Mesh* gearoenix::dx11::Engine::create_mesh(unsigned int vec, system::File* file, std::shared_ptr<core::EndCaller> c)
 {
-    UNIMPLEMENTED;
-    return nullptr;
+    return new buffer::Mesh(vec, file, this, c);
 }
 
 gearoenix::render::buffer::Uniform* gearoenix::dx11::Engine::create_uniform(unsigned int s, std::shared_ptr<core::EndCaller> c)
 {
-    UNIMPLEMENTED;
-    return nullptr;
+	return new buffer::Uniform(s, this, c);
 }
 
 gearoenix::render::shader::Shader* gearoenix::dx11::Engine::create_shader(core::Id sid, system::File* file, std::shared_ptr<core::EndCaller> c)
 {
-    UNIMPLEMENTED;
+	render::shader::Id shader_id = (render::shader::Id) sid;
+	switch (shader_id)
+	{
+	case render::shader::Id::SHADELESS_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
+		return new shader::ShadelessColoredMatteNonreflectiveShadowlessOpaque(this, c);
+	default:
+		UNIMPLEMENTED;
+		break;
+	}
     return nullptr;
 }
 
 gearoenix::render::shader::Resources* gearoenix::dx11::Engine::create_shader_resources(core::Id sid, render::pipeline::Pipeline* p, render::buffer::Uniform* ub, std::shared_ptr<core::EndCaller> c)
 {
-    UNIMPLEMENTED;
-    return nullptr;
+	pipeline::Pipeline* pip = reinterpret_cast<pipeline::Pipeline*>(p);
+	buffer::Uniform* u = reinterpret_cast<buffer::Uniform*>(ub);
+	render::shader::Id shader_id = (render::shader::Id) sid;
+	switch (shader_id)
+	{
+	case render::shader::Id::SHADELESS_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
+		return new shader::ShadelessColoredMatteNonreflectiveShadowlessOpaque::Resources(this, pip, u);
+	default:
+		UNIMPLEMENTED;
+		break;
+	}
+	return nullptr;
 }
 
 gearoenix::render::pipeline::Pipeline* gearoenix::dx11::Engine::create_pipeline(core::Id sid, std::shared_ptr<core::EndCaller> c)
 {
-    UNIMPLEMENTED;
-    return nullptr;
+    return new pipeline::Pipeline(sid, this, c);
 }
 
 ID3D11Device * gearoenix::dx11::Engine::get_device()

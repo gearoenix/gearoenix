@@ -13,7 +13,7 @@ namespace dx11 {
             ID3D11Buffer* ub = nullptr;
 
         public:
-            Uniform(unsigned int s, Engine*);
+            Uniform(unsigned int s, Engine*, std::shared_ptr<core::EndCaller> c);
             ~Uniform();
             void update(const void* src, unsigned int data_size);
             void* get_data();

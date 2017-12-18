@@ -4,6 +4,8 @@
 //#define GEAROENIX_NO_CURSOR
 #include "../../core/cr-static.hpp"
 #include "../sys-log.hpp"
+#include "../../core/cr-application.hpp"
+#include "../../core/asset/cr-asset-manager.hpp"
 #ifdef USE_VULKAN
 #include "../../vulkan/vk-engine.hpp"
 #endif
@@ -249,46 +251,47 @@ gearoenix::system::Application::Application()
     {
         GXLOGF("No suitable API found.");
     }
-    //astmgr = new core::asset::Manager(this, "data.gx3d");
-    //astmgr->initialize();
+    astmgr = new core::asset::Manager(this, "data.gx3d");
+    astmgr->initialize();
 }
 
 gearoenix::system::Application::~Application()
 {
-    TODO; // do cleaning, I think it is better to do it in some special event in stead of here.
+    TODO; // do cleaning, I think it is better to do it in some special event instead of here.
 }
 
 void gearoenix::system::Application::execute(core::Application* core_app)
 {
+	this->core_app = core_app;
     MSG msg;
     while (running) {
         while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
             TranslateMessage(&msg);
             DispatchMessage(&msg);
         }
-        //core_app->update();
+        core_app->update();
         render_engine->update();
     }
 }
 
 gearoenix::render::Engine* gearoenix::system::Application::get_render_engine()
 {
-    return nullptr;
+    return render_engine;
 }
 
 const gearoenix::render::Engine* gearoenix::system::Application::get_render_engine() const
 {
-    return nullptr;
+    return render_engine;
 }
 
 gearoenix::core::asset::Manager* gearoenix::system::Application::get_asset_manager()
 {
-    return nullptr;
+    return astmgr;
 }
 
 const gearoenix::core::asset::Manager* gearoenix::system::Application::get_asset_manager() const
 {
-    return nullptr;
+    return astmgr;
 }
 
 gearoenix::core::Real gearoenix::system::Application::get_window_ratio() const
@@ -306,9 +309,9 @@ unsigned int gearoenix::system::Application::get_height() const
     return (unsigned int)screen_height;
 }
 
-#endif // USE_WINAPI
-
 HWND gearoenix::system::Application::get_window()
 {
-    return window;
+	return window;
 }
+
+#endif // USE_WINAPI

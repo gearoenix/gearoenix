@@ -62,6 +62,8 @@ namespace render {
         std::vector<std::shared_ptr<scene::Scene>> loaded_scenes;
         physics::Engine* physics_engine = nullptr;
 
+		void do_load_functions();
+
     public:
         Engine(system::Application* system_application);
         virtual ~Engine();
