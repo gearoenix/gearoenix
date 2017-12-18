@@ -13,10 +13,10 @@ void gearoenix::dx11::shader::Shader::run()
 	ctx->PSSetShader(frgshd, NULL, 0);
 }
 
-void gearoenix::dx11::shader::Shader::compile_shader(
+void* gearoenix::dx11::shader::Shader::compile_shader(
 	const std::string& shd, 
 	const render::shader::stage::Id& shader_typ,
-	std::vector<D3D11_INPUT_ELEMENT_DESC> polygon_layout = {})
+	std::vector<D3D11_INPUT_ELEMENT_DESC> polygon_layout)
 {
 	ID3DBlob* shdcd = nullptr;
 	ID3DBlob* shderr = nullptr;
@@ -51,7 +51,7 @@ void gearoenix::dx11::shader::Shader::compile_shader(
 			shdcd->GetBufferPointer(), shdcd->GetBufferSize(), NULL, &vtxshd));
 		GXHRCHK(eng->get_device()->CreateInputLayout(
 			polygon_layout.data(),
-			polygon_layout.size(),
+			(UINT) polygon_layout.size(),
 			shdcd->GetBufferPointer(),
 			shdcd->GetBufferSize(),
 			&inlay));
@@ -60,10 +60,13 @@ void gearoenix::dx11::shader::Shader::compile_shader(
 		GXHRCHK(eng->get_device()->CreatePixelShader(shdcd->GetBufferPointer(), shdcd->GetBufferSize(), NULL, &frgshd));
 		break;
 	default:
+		// todo add support for other shaders and then return ther pointer
 		UNEXPECTED;
 		break;
 	}
 	shdcd->Release();
+	shderr->Release();
+	return nullptr;
 }
 
 gearoenix::dx11::shader::Shader::Shader(Engine* eng, std::shared_ptr<core::EndCaller>)

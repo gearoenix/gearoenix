@@ -1,21 +1,21 @@
-#include "gles2-shd-resources.hpp"
+#include "dx11-shd-resources.hpp"
 #ifdef USE_DIRECTX11
 #include "../../system/sys-log.hpp"
 
-#include "../buffer/gles2-buf-uniform.hpp"
-#include "../gles2-engine.hpp"
-#include "../pipeline/gles2-pip-pipeline.hpp"
+#include "../buffer/dx11-buf-uniform.hpp"
+#include "../dx11-engine.hpp"
+#include "../pipeline/dx11-pip-pipeline.hpp"
 
-gearoenix::gles2::shader::Resources::Resources(Engine* e, pipeline::Pipeline* p, buffer::Uniform* u)
+gearoenix::dx11::shader::Resources::Resources(Engine* e, pipeline::Pipeline* p, buffer::Uniform* u)
     : render::shader::Resources(e, p, u)
 {
 }
 
-gearoenix::gles2::shader::Resources::~Resources()
+gearoenix::dx11::shader::Resources::~Resources()
 {
 }
 
-void gearoenix::gles2::shader::Resources::bind()
+void gearoenix::dx11::shader::Resources::bind()
 {
     UNIMPLEMENTED;
 }

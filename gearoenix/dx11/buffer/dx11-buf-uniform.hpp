@@ -17,6 +17,8 @@ namespace dx11 {
             ~Uniform();
             void update(const void* src, unsigned int data_size);
             void* get_data();
+			void set_for_vertex_shader();
+			void set_for_fragment_shader();
         };
     } // namespace buffer
 } // namespace dx11

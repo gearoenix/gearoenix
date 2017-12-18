@@ -4,7 +4,7 @@
 #ifdef USE_DIRECTX11
 #include "../../render/shader/rnd-shd-resources.hpp"
 namespace gearoenix {
-namespace gles2 {
+namespace dx11 {
     class Engine;
     namespace buffer {
         class Uniform;

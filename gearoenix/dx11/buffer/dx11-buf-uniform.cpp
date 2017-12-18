@@ -42,4 +42,16 @@ void* gearoenix::dx11::buffer::Uniform::get_data()
     return nullptr;
 }
 
+void gearoenix::dx11::buffer::Uniform::set_for_vertex_shader()
+{
+	ID3D11DeviceContext* ctx = reinterpret_cast<Engine*>(engine)->get_context();
+	ctx->VSSetConstantBuffers(0, 1, &ub);
+}
+
+void gearoenix::dx11::buffer::Uniform::set_for_fragment_shader()
+{
+	ID3D11DeviceContext* ctx = reinterpret_cast<Engine*>(engine)->get_context();
+	ctx->PSSetConstantBuffers(0, 1, &ub);
+}
+
 #endif

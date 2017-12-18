@@ -1,12 +1,11 @@
-#ifndef GEAROENIX_GLES2_SHADER_DEPTH_HPP
-#define GEAROENIX_GLES2_SHADER_DEPTH_HPP
+#ifndef GEAROENIX_DX11_SHADER_DEPTH_POSITION_HPP
+#define GEAROENIX_DX11_SHADER_DEPTH_POSITION_HPP
 #include "../../core/cr-build-configuration.hpp"
 #ifdef USE_DIRECTX11
 #include "../../render/material/rnd-mat-depth.hpp"
-#include "../gles2.hpp"
-#include "gles2-shader.hpp"
+#include "dx11-shader.hpp"
 namespace gearoenix {
-namespace gles2 {
+namespace dx11 {
     namespace buffer {
         class Uniform;
     }
@@ -23,18 +22,12 @@ namespace gles2 {
             };
 
         protected:
-            GLuint mvp;
-            GLuint vtx_shd;
-            GLuint frg_shd;
-            GLuint vtx_stride = 3 * sizeof(GLfloat);
-            GLint vtx_att_ind;
 
         public:
-            Depth(core::Id sid, Engine* eng, std::shared_ptr<core::EndCaller> end);
+            Depth(Engine* eng, std::shared_ptr<core::EndCaller> end);
             ~Depth();
             void use();
             const std::vector<render::shader::stage::Id>& get_stages_ids() const;
-            void set_mvp(const GLfloat* data);
         };
     }
 }

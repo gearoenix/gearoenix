@@ -17,7 +17,7 @@ namespace dx11 {
 			ID3D11PixelShader* frgshd = nullptr;
 			ID3D11InputLayout* inlay = nullptr;
             void run();
-			void compile_shader(
+			void* compile_shader(
 				const std::string& shd,
 				const render::shader::stage::Id& shader_type,
 				std::vector<D3D11_INPUT_ELEMENT_DESC> polygon_layout = {}

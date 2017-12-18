@@ -4,11 +4,13 @@
 #include "../../system/sys-log.hpp"
 #include "../dx11-check.hpp"
 #include "../dx11-engine.hpp"
+#include "../../core/cr-static.hpp"
 
 gearoenix::dx11::buffer::Mesh::Mesh(
     unsigned int vec, system::File* f,
     Engine* e, std::shared_ptr<core::EndCaller> c)
-    : stride(vec * sizeof(core::Real))
+    : render::buffer::Mesh(e)
+	, stride(vec * sizeof(core::Real))
 {
     core::Count cnt;
     f->read(cnt);
@@ -23,7 +25,7 @@ gearoenix::dx11::buffer::Mesh::Mesh(
     std::vector<std::uint32_t> idata((size_t)cnt);
     for (core::Count i = 0; i < cnt; ++i)
         f->read(idata[(size_t)i]);
-    unsigned int is = (unsigned int)(cnt * sizeof(GLushort));
+    unsigned int is = (unsigned int)(cnt * sizeof(std::uint32_t));
     ID3D11Device* dev = e->get_device();
     D3D11_BUFFER_DESC desc;
     D3D11_SUBRESOURCE_DATA buf_data;
@@ -50,7 +52,7 @@ gearoenix::dx11::buffer::Mesh::~Mesh()
 void gearoenix::dx11::buffer::Mesh::bind()
 {
     const unsigned int offset = 0;
-    ID3D11DeviceContext* ctx = engine->get_context();
+    ID3D11DeviceContext* ctx = reinterpret_cast<Engine*>(engine)->get_context();
     ctx->IASetVertexBuffers(0, 1, &vb, &stride, &offset);
     ctx->IASetIndexBuffer(ib, DXGI_FORMAT_R32_UINT, 0);
     ctx->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -58,7 +60,7 @@ void gearoenix::dx11::buffer::Mesh::bind()
 
 void gearoenix::dx11::buffer::Mesh::draw()
 {
-    engine->get_context()->DrawIndexed(ic, 0, 0);
+	reinterpret_cast<Engine*>(engine)->get_context()->DrawIndexed(ic, 0, 0);
 }
 
 #endif

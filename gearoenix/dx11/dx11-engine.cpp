@@ -193,7 +193,6 @@ gearoenix::dx11::Engine::Engine(system::Application* sys_app)
         { { 1.0f, -1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f } },
     };
     const std::uint32_t indices[3] = { 0, 1, 2 };
-    GXLOGE("Doubt in index type.");
     D3D11_BUFFER_DESC vertex_buffer_desc, index_buffer_desc;
     D3D11_SUBRESOURCE_DATA vertex_data, index_data;
 
@@ -369,10 +368,11 @@ void gearoenix::dx11::Engine::update()
         UNEXPECTED;
     }
     UniformBufferType* data_ptr = (UniformBufferType*)mapped_resource.pData;
-    data_ptr->mvp = math::Mat4x4::perspective(2.0f, 1.0f, 1.0f, 10.0f) * math::Mat4x4::look_at(
-                                                                             math::Vec3(0.0f, 0.0f, 4.0f),
-                                                                             math::Vec3(0.0f, 0.0f, 0.0f),
-                                                                             math::Vec3(0.0f, 1.0f, 0.0f))
+    data_ptr->mvp = math::Mat4x4::perspective(2.0f, 1.0f, 1.0f, 10.0f) * 
+		math::Mat4x4::look_at(
+			math::Vec3(0.0f, 0.0f, 4.0f),
+			math::Vec3(0.0f, 0.0f, 0.0f),
+			math::Vec3(0.0f, 1.0f, 0.0f))
         * math::Mat4x4();
     p_immediate_context->Unmap(p_uniform_buffer, 0);
     unsigned int buffer_number = 0;
