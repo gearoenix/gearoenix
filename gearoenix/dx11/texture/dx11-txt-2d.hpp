@@ -17,13 +17,12 @@ namespace dx11 {
     namespace texture {
         class Texture2D : public render::texture::Texture2D {
         private:
-            GLuint texture_object;
+			ID3D11ShaderResourceView* srv = nullptr;
 
         public:
             Texture2D(system::File* file, Engine* engine, std::shared_ptr<core::EndCaller> end);
-            Texture2D(GLuint txtobj);
             ~Texture2D();
-            void bind(GLenum texture_unit);
+			const ID3D11ShaderResourceView* get_shader_resource_view();
         };
     }
 }

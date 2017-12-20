@@ -1,43 +1,53 @@
-#include "gles2-txt-2d.hpp"
+#include "dx11-txt-2d.hpp"
 #ifdef USE_DIRECTX11
 #include "../../render/texture/rnd-txt-png.hpp"
 #include "../../system/sys-log.hpp"
-#include "../gles2-engine.hpp"
+#include "../dx11-engine.hpp"
+#include "../../core/cr-static.hpp"
+#include "../dx11-check.hpp"
 
-gearoenix::gles2::texture::Texture2D::Texture2D(system::File* file, Engine* eng, std::shared_ptr<core::EndCaller> end)
+gearoenix::dx11::texture::Texture2D::Texture2D(system::File* file, Engine* eng, std::shared_ptr<core::EndCaller> end)
 {
     std::vector<unsigned char> img_data;
     unsigned int imgw, imgh;
     render::texture::PNG::decode(file, img_data, imgw, imgh);
-    std::function<void()> loadf = [this, imgw, imgh, img_data, end] {
-        glGenTextures(1, &texture_object);
-        glBindTexture(GL_TEXTURE_2D, texture_object);
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, imgw, imgh, 0, GL_RGBA, GL_UNSIGNED_BYTE, (void*)img_data.data());
-        glGenerateMipmap(GL_TEXTURE_2D);
-        (void)end;
-    };
-    eng->add_load_function(loadf);
+	D3D11_TEXTURE2D_DESC desc;
+	setz(desc);
+	desc.Width = imgw;
+	desc.Height = imgh;
+	desc.ArraySize = 1;
+	desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	desc.SampleDesc.Count = 1;
+	desc.Usage= D3D11_USAGE_IMMUTABLE;
+	desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+	desc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
+	D3D11_SHADER_RESOURCE_VIEW_DESC sdesc;
+	setz(sdesc);
+	sdesc.Format = desc.Format;
+	sdesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	sdesc.Texture2D.MipLevels = -1;
+    eng->add_load_function([this, eng, desc, sdesc, img_data, end] () -> void {
+		D3D11_SUBRESOURCE_DATA subsrcdata;
+		subsrcdata.pSysMem = img_data.data();
+		subsrcdata.SysMemPitch = desc.Width * 4;
+		ID3D11Device* dev = eng->get_device();
+		ID3D11Texture2D* txt = nullptr;
+		GXHRCHK(dev->CreateTexture2D(&desc, &subsrcdata, &txt));
+		GXHRCHK(dev->CreateShaderResourceView(txt, &sdesc, &srv));
+		eng->get_context()->GenerateMips(srv);
+		txt->Release();
+		(void)end;
+	});
 }
 
-gearoenix::gles2::texture::Texture2D::Texture2D(GLuint txtobj)
-    : texture_object(txtobj)
+gearoenix::dx11::texture::Texture2D::~Texture2D()
 {
+	srv->Release();
 }
 
-gearoenix::gles2::texture::Texture2D::~Texture2D()
+const ID3D11ShaderResourceView* gearoenix::dx11::texture::Texture2D::get_shader_resource_view()
 {
-    glBindTexture(GL_TEXTURE_2D, 0);
-    glDeleteTextures(1, &texture_object);
-}
-
-void gearoenix::gles2::texture::Texture2D::bind(GLenum texture_unit)
-{
-    glActiveTexture(texture_unit);
-    glBindTexture(GL_TEXTURE_2D, texture_object);
+	return srv;
 }
 
 #endif
