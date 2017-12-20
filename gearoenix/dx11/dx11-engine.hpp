@@ -14,11 +14,13 @@ namespace gearoenix {
 namespace dx11 {
     namespace texture {
         class Texture2D;
+		class Sampler;
     }
     class Engine : public render::Engine {
     private:
         unsigned int graphic_memory_size = 0;
         float clear_color[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+		texture::Sampler* sampler = nullptr;
         IDXGISwapChain* p_swapchain = nullptr;
         ID3D11Device* p_device = nullptr;
         ID3D11DeviceContext* p_immediate_context = nullptr;
@@ -50,6 +52,8 @@ namespace dx11 {
 		const ID3D11Device* get_device() const;
 		ID3D11DeviceContext* get_context();
 		const ID3D11DeviceContext* get_context() const;
+		texture::Sampler* get_sampler();
+		const texture::Sampler* get_sampler() const;
     };
 }
 }

@@ -1,87 +1,90 @@
-//#include "gles2-shd-shadeless-d2-matte-nonreflective-shadowless-opaque.hpp"
-//#ifdef USE_DIRECTX11
-//#include "../../system/sys-log.hpp"
-//#include "../buffer/gles2-buf-uniform.hpp"
-//#include "../gles2-engine.hpp"
-//#include "../pipeline/gles2-pip-pipeline.hpp"
-//#include "../texture/gles2-txt-2d.hpp"
-//
-//gearoenix::gles2::shader::ShadelessD2MatteNonreflectiveShadowlessOpaque::Resources::Resources(Engine* e, pipeline::Pipeline* pip, buffer::Uniform* u)
-//    : render::material::ShadelessD2MatteNonreflectiveShadowlessOpaque::Resources(e, pip, u)
-//{
-//}
-//
-//void gearoenix::gles2::shader::ShadelessD2MatteNonreflectiveShadowlessOpaque::Resources::bind()
-//{
-//    render::material::ShadelessD2MatteNonreflectiveShadowlessOpaque::Uniform* data = reinterpret_cast<render::material::ShadelessD2MatteNonreflectiveShadowlessOpaque::Uniform*>(u->get_data());
-//    ShadelessD2MatteNonreflectiveShadowlessOpaque* shd = reinterpret_cast<ShadelessD2MatteNonreflectiveShadowlessOpaque*>(pip->get_shader());
-//    shd->use();
-//    shd->set_mvp(data->mvp.data());
-//    reinterpret_cast<texture::Texture2D*>(txt2d)->bind(GL_TEXTURE0);
-//}
-//
-//gearoenix::gles2::shader::ShadelessD2MatteNonreflectiveShadowlessOpaque::ShadelessD2MatteNonreflectiveShadowlessOpaque(Engine* eng, std::shared_ptr<core::EndCaller> end)
-//    : Shader(eng, end)
-//{
-//    eng->add_load_function([this, end] {
-//        create_program();
-//        const std::string pvs = "precision highp sampler2D;\n"
-//                                "precision highp float;\n"
-//                                "attribute vec3 vertex;\n"
-//                                "attribute vec2 uv;\n"
-//                                "varying vec2 out_uv;\n"
-//                                "uniform mat4 mvp;\n"
-//                                "void main()\n"
-//                                "{\n"
-//                                "    out_uv = uv;\n"
-//                                "    gl_Position = mvp * vec4(vertex, 1.0);\n"
-//                                "}\n";
-//        const std::string pfs = "precision highp sampler2D;\n"
-//                                "precision highp float;\n"
-//                                "varying vec2 out_uv;\n"
-//                                "uniform sampler2D txt2d;\n"
-//                                "void main()\n"
-//                                "{\n"
-//                                "    gl_FragColor = vec4(texture2D(txt2d, out_uv).xyz, 1.0);\n"
-//                                "}\n";
-//        vtx_shd = add_shader_to_program(pvs, GL_VERTEX_SHADER);
-//        frg_shd = add_shader_to_program(pfs, GL_FRAGMENT_SHADER);
-//        run();
-//        vtx_att_ind = glGetAttribLocation(shader_program, "vertex");
-//        uv_att_ind = glGetAttribLocation(shader_program, "uv");
-//        mvp = get_uniform_location("mvp");
-//        txt2d = get_uniform_location("txt2d");
-//        (void)end;
-//    });
-//}
-//
-//gearoenix::gles2::shader::ShadelessD2MatteNonreflectiveShadowlessOpaque::~ShadelessD2MatteNonreflectiveShadowlessOpaque()
-//{
-//    eng->add_load_function([this] {
-//        end_object(vtx_shd);
-//        end_object(frg_shd);
-//        end_program();
-//    });
-//}
-//
-//void gearoenix::gles2::shader::ShadelessD2MatteNonreflectiveShadowlessOpaque::use()
-//{
-//    glUseProgram(shader_program);
-//    glEnableVertexAttribArray(vtx_att_ind);
-//    glEnableVertexAttribArray(uv_att_ind);
-//    ////////////////////////////////////////////////////////////
-//    glVertexAttribPointer(vtx_att_ind, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)0);
-//    glVertexAttribPointer(uv_att_ind, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
-//    glUniform1i(txt2d, 0);
-//}
-//
-//const std::vector<gearoenix::render::shader::stage::Id>& gearoenix::gles2::shader::ShadelessD2MatteNonreflectiveShadowlessOpaque::get_stages_ids() const
-//{
-//    return graphic_2_stage;
-//}
-//
-//void gearoenix::gles2::shader::ShadelessD2MatteNonreflectiveShadowlessOpaque::set_mvp(const GLfloat* data)
-//{
-//    glUniformMatrix4fv(mvp, 1, GL_FALSE, data);
-//}
-//#endif
+#include "dx11-shd-shadeless-d2-matte-nonreflective-shadowless-opaque.hpp"
+#ifdef USE_DIRECTX11
+#include "../../system/sys-log.hpp"
+#include "../buffer/dx11-buf-uniform.hpp"
+#include "../dx11-engine.hpp"
+#include "../pipeline/dx11-pip-pipeline.hpp"
+#include "../texture/dx11-txt-2d.hpp"
+#include "../../core/cr-static.hpp"
+#include "../texture/dx11-txt-sampler.hpp"
+
+gearoenix::dx11::shader::ShadelessD2MatteNonreflectiveShadowlessOpaque::Resources::Resources(Engine* e, pipeline::Pipeline* pip, buffer::Uniform* u)
+    : render::material::ShadelessD2MatteNonreflectiveShadowlessOpaque::Resources(e, pip, u)
+{
+}
+
+void gearoenix::dx11::shader::ShadelessD2MatteNonreflectiveShadowlessOpaque::Resources::bind()
+{
+	buffer::Uniform* uniform = reinterpret_cast<buffer::Uniform*>(u);
+    ShadelessD2MatteNonreflectiveShadowlessOpaque* shd = reinterpret_cast<ShadelessD2MatteNonreflectiveShadowlessOpaque*>(pip->get_shader());
+	uniform->set_for_vertex_shader();
+	reinterpret_cast<const texture::Texture2D*>(txt2d)->bind(0);
+    shd->use();
+}
+
+gearoenix::dx11::shader::ShadelessD2MatteNonreflectiveShadowlessOpaque::ShadelessD2MatteNonreflectiveShadowlessOpaque(Engine* eng, std::shared_ptr<core::EndCaller> end)
+    : Shader(eng, end)
+{
+	eng->add_load_function([this, eng, end]() -> void {
+		// todo Shader compilation must move to blender part.
+		const char p_vertex_src_data[] =
+			"cbuffer UniformBuffer {\n"
+			"    matrix mvp;\n"
+			"};\n"
+			"struct VertexInputType {\n"
+			"    float3 position : POSITION;\n"
+			"    float2 texcoord : TEXCOORD0;\n"
+			"};\n"
+			"struct PixelInputType\n"
+			"{\n"
+			"    float4 position : SV_POSITION;\n"
+			"    float2 texcoord : TEXCOORD0;\n"
+			"};\n"
+			"PixelInputType main(VertexInputType input) {\n"
+			"    PixelInputType output;\n"
+			"    output.position = mul(float4(input.position, 1.0), mvp);\n"
+			"    output.texcoord = input.texcoord;\n"
+			"    return output;\n"
+			"}\n";
+		std::vector<D3D11_INPUT_ELEMENT_DESC> desc(2);
+		setz(desc[0]);
+		desc[0].SemanticName = "POSITION";
+		desc[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+		desc[0].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+		setz(desc[1]);
+		desc[1].SemanticName = "TEXCOORD0";
+		desc[1].Format = DXGI_FORMAT_R32G32_FLOAT;
+		desc[1].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+		desc[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+		compile_shader(p_vertex_src_data, render::shader::stage::VERTEX, desc);
+		// todo Shader compilation must move to blender part.
+		const char p_fragment_src_data[] =
+			"Texture2D texture;\n"
+			"SamplerState sample;\n"
+			"struct PixelInputType {\n"
+			"    float4 position : SV_POSITION;\n"
+			"    float2 texcoord : TEXCOORD0;\n"
+			"};\n"
+			"float4 main(PixelInputType input) : SV_TARGET {\n"
+			"	return texture.Sample(sample, input.texcoord);\n"
+			"}\n";
+		compile_shader(p_fragment_src_data, render::shader::stage::FRAGMENT);
+		(void)end;
+	});
+}
+
+gearoenix::dx11::shader::ShadelessD2MatteNonreflectiveShadowlessOpaque::~ShadelessD2MatteNonreflectiveShadowlessOpaque()
+{}
+
+void gearoenix::dx11::shader::ShadelessD2MatteNonreflectiveShadowlessOpaque::use()
+{
+	run();
+	Engine* engine = reinterpret_cast<Engine*>(eng);
+	engine->get_sampler()->bind(0);
+}
+
+const std::vector<gearoenix::render::shader::stage::Id>& gearoenix::dx11::shader::ShadelessD2MatteNonreflectiveShadowlessOpaque::get_stages_ids() const
+{
+    return graphic_2_stage;
+}
+#endif

@@ -12,6 +12,7 @@
 #include "shader/dx11-shd-shadeless-colored-matte-nonreflective-shadowless-opaque.hpp"
 #include "pipeline/dx11-pip-pipeline.hpp"
 #include "../render/pipeline/rnd-pip-manager.hpp"
+#include "texture/dx11-txt-sampler.hpp"
 #include <cstdlib>
 #include <d3dcompiler.h>
 #include <vector>
@@ -192,6 +193,7 @@ gearoenix::dx11::Engine::Engine(system::Application* sys_app)
     viewport.TopLeftX = 0.0f;
     viewport.TopLeftY = 0.0f;
     p_immediate_context->RSSetViewports(1, &viewport);
+	sampler = new texture::Sampler(this);
 	pipmgr = new render::pipeline::Manager(this);
 	//--------------------------------------------------------------------------------------------------------
 
@@ -427,6 +429,8 @@ void gearoenix::dx11::Engine::terminate()
     //p_vertex_buffer = nullptr;
     ////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////
+	delete sampler;
+	sampler = nullptr;
     p_raster_state->Release();
     p_raster_state = nullptr;
     p_depth_stencil_view->Release();
@@ -521,6 +525,16 @@ ID3D11DeviceContext* gearoenix::dx11::Engine::get_context()
 const ID3D11DeviceContext* gearoenix::dx11::Engine::get_context() const
 {
 	return p_immediate_context;
+}
+
+gearoenix::dx11::texture::Sampler * gearoenix::dx11::Engine::get_sampler()
+{
+	return sampler;
+}
+
+const gearoenix::dx11::texture::Sampler * gearoenix::dx11::Engine::get_sampler() const 
+{
+	return sampler;
 }
 
 #endif

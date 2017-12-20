@@ -6,7 +6,8 @@
 #include "../../core/cr-static.hpp"
 #include "../dx11-check.hpp"
 
-gearoenix::dx11::texture::Texture2D::Texture2D(system::File* file, Engine* eng, std::shared_ptr<core::EndCaller> end)
+gearoenix::dx11::texture::Texture2D::Texture2D(system::File* file, Engine* eng, std::shared_ptr<core::EndCaller> end):
+	engine(eng)
 {
     std::vector<unsigned char> img_data;
     unsigned int imgw, imgh;
@@ -26,15 +27,15 @@ gearoenix::dx11::texture::Texture2D::Texture2D(system::File* file, Engine* eng, 
 	sdesc.Format = desc.Format;
 	sdesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 	sdesc.Texture2D.MipLevels = -1;
-    eng->add_load_function([this, eng, desc, sdesc, img_data, end] () -> void {
+    eng->add_load_function([this, desc, sdesc, img_data, end] () -> void {
 		D3D11_SUBRESOURCE_DATA subsrcdata;
 		subsrcdata.pSysMem = img_data.data();
 		subsrcdata.SysMemPitch = desc.Width * 4;
-		ID3D11Device* dev = eng->get_device();
+		ID3D11Device* dev = engine->get_device();
 		ID3D11Texture2D* txt = nullptr;
 		GXHRCHK(dev->CreateTexture2D(&desc, &subsrcdata, &txt));
 		GXHRCHK(dev->CreateShaderResourceView(txt, &sdesc, &srv));
-		eng->get_context()->GenerateMips(srv);
+		engine->get_context()->GenerateMips(srv);
 		txt->Release();
 		(void)end;
 	});
@@ -45,9 +46,12 @@ gearoenix::dx11::texture::Texture2D::~Texture2D()
 	srv->Release();
 }
 
-const ID3D11ShaderResourceView* gearoenix::dx11::texture::Texture2D::get_shader_resource_view()
+const ID3D11ShaderResourceView* gearoenix::dx11::texture::Texture2D::get_shader_resource_view() const
 {
 	return srv;
 }
 
+void gearoenix::dx11::texture::Texture2D::bind(unsigned int slot) const {
+	engine->get_context()->PSSetShaderResources(slot, 1, &srv);
+}
 #endif
