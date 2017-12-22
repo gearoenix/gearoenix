@@ -33,12 +33,12 @@ gearoenix::dx11::shader::ShadelessD2MatteNonreflectiveShadowlessOpaque::Shadeles
 			"};\n"
 			"struct VertexInputType {\n"
 			"    float3 position : POSITION;\n"
-			"    float2 texcoord : TEXCOORD0;\n"
+			"    float2 texcoord : TEXCOORD;\n"
 			"};\n"
 			"struct PixelInputType\n"
 			"{\n"
 			"    float4 position : SV_POSITION;\n"
-			"    float2 texcoord : TEXCOORD0;\n"
+			"    float2 texcoord : TEXCOORD;\n"
 			"};\n"
 			"PixelInputType main(VertexInputType input) {\n"
 			"    PixelInputType output;\n"
@@ -52,21 +52,21 @@ gearoenix::dx11::shader::ShadelessD2MatteNonreflectiveShadowlessOpaque::Shadeles
 		desc[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
 		desc[0].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 		setz(desc[1]);
-		desc[1].SemanticName = "TEXCOORD0";
+		desc[1].SemanticName = "TEXCOORD";
 		desc[1].Format = DXGI_FORMAT_R32G32_FLOAT;
 		desc[1].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
 		desc[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 		compile_shader(p_vertex_src_data, render::shader::stage::VERTEX, desc);
 		// todo Shader compilation must move to blender part.
 		const char p_fragment_src_data[] =
-			"Texture2D texture;\n"
-			"SamplerState sample;\n"
+			"Texture2D txt;\n"
+			"SamplerState smp;\n"
 			"struct PixelInputType {\n"
 			"    float4 position : SV_POSITION;\n"
-			"    float2 texcoord : TEXCOORD0;\n"
+			"    float2 texcoord : TEXCOORD;\n"
 			"};\n"
 			"float4 main(PixelInputType input) : SV_TARGET {\n"
-			"	return texture.Sample(sample, input.texcoord);\n"
+			"	return txt.Sample(smp, input.texcoord);\n"
 			"}\n";
 		compile_shader(p_fragment_src_data, render::shader::stage::FRAGMENT);
 		(void)end;

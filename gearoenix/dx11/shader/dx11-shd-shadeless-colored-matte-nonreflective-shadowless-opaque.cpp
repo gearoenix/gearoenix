@@ -42,12 +42,12 @@ gearoenix::dx11::shader::ShadelessColoredMatteNonreflectiveShadowlessOpaque::Sha
 			"    output.position = mul(float4(input.position, 1.0), mvp);\n"
 			"    return output;\n"
 			"}\n";
-		D3D11_INPUT_ELEMENT_DESC desc;
-		setz(desc);
-		desc.SemanticName = "POSITION";
-		desc.Format = DXGI_FORMAT_R32G32B32_FLOAT;
-		desc.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-		compile_shader(p_vertex_src_data, render::shader::stage::VERTEX, { desc });
+		std::vector<D3D11_INPUT_ELEMENT_DESC> desc(1);
+		setz(desc[0]);
+		desc[0].SemanticName = "POSITION";
+		desc[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+		desc[0].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+		compile_shader(p_vertex_src_data, render::shader::stage::VERTEX, desc);
 
 		// todo Shader compilation must move to blender part.
 		const char p_fragment_src_data[] =

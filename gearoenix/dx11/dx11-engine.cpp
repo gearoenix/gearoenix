@@ -10,9 +10,12 @@
 #include "buffer/dx11-buf-mesh.hpp"
 #include "buffer/dx11-buf-uniform.hpp"
 #include "shader/dx11-shd-shadeless-colored-matte-nonreflective-shadowless-opaque.hpp"
+#include "shader/dx11-shd-shadeless-d2-matte-nonreflective-shadowless-opaque.hpp"
 #include "pipeline/dx11-pip-pipeline.hpp"
 #include "../render/pipeline/rnd-pip-manager.hpp"
 #include "texture/dx11-txt-sampler.hpp"
+#include "texture/dx11-txt-2d.hpp"
+#include "texture/dx11-txt-cube.hpp"
 #include <cstdlib>
 #include <d3dcompiler.h>
 #include <vector>
@@ -114,8 +117,15 @@ gearoenix::dx11::Engine::Engine(system::Application* sys_app)
     swap_chain_desc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
     swap_chain_desc.Flags = 0;
 
-    if (FAILED(D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, 0, &feature_level, 1,
-            D3D11_SDK_VERSION, &swap_chain_desc, &p_swapchain, &p_device, NULL, &p_immediate_context))) {
+	UINT device_flag =
+#ifdef DEBUG_MODE
+		D3D11_CREATE_DEVICE_DEBUG;
+#else
+		D3D11_CREATE_DEVICE_DISABLE_GPU_TIMEOUT;
+#endif
+    if (FAILED(D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, device_flag,
+		&feature_level, 1, D3D11_SDK_VERSION, &swap_chain_desc, &p_swapchain, 
+		&p_device, NULL, &p_immediate_context))) {
         GXLOGF("Can not create requested contex.");
     }
     if (FAILED(p_swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&back_buffer_ptr))) {
@@ -451,14 +461,12 @@ void gearoenix::dx11::Engine::terminate()
 
 gearoenix::render::texture::Texture2D* gearoenix::dx11::Engine::create_texture_2d(system::File* file, std::shared_ptr<core::EndCaller> c)
 {
-    UNIMPLEMENTED;
-    return nullptr;
+	return new texture::Texture2D(file, this, c);
 }
 
 gearoenix::render::texture::Cube* gearoenix::dx11::Engine::create_texture_cube(system::File* file, std::shared_ptr<core::EndCaller> c)
 {
-    UNIMPLEMENTED;
-    return nullptr;
+	return new texture::Cube(file, this, c);
 }
 
 gearoenix::render::buffer::Mesh* gearoenix::dx11::Engine::create_mesh(unsigned int vec, system::File* file, std::shared_ptr<core::EndCaller> c)
@@ -478,6 +486,8 @@ gearoenix::render::shader::Shader* gearoenix::dx11::Engine::create_shader(core::
 	{
 	case render::shader::Id::SHADELESS_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
 		return new shader::ShadelessColoredMatteNonreflectiveShadowlessOpaque(this, c);
+	case render::shader::Id::SHADELESS_D2_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
+		return new shader::ShadelessD2MatteNonreflectiveShadowlessOpaque(this, c);
 	default:
 		UNIMPLEMENTED;
 		break;
@@ -494,6 +504,8 @@ gearoenix::render::shader::Resources* gearoenix::dx11::Engine::create_shader_res
 	{
 	case render::shader::Id::SHADELESS_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
 		return new shader::ShadelessColoredMatteNonreflectiveShadowlessOpaque::Resources(this, pip, u);
+	case render::shader::Id::SHADELESS_D2_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
+		return new shader::ShadelessD2MatteNonreflectiveShadowlessOpaque::Resources(this, pip, u);
 	default:
 		UNIMPLEMENTED;
 		break;

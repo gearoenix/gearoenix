@@ -47,6 +47,7 @@ void* gearoenix::dx11::shader::Shader::compile_shader(
 	switch (shader_typ)
 	{
 	case render::shader::stage::Id::VERTEX:
+	{
 		GXHRCHK(eng->get_device()->CreateVertexShader(
 			shdcd->GetBufferPointer(), shdcd->GetBufferSize(), NULL, &vtxshd));
 		GXHRCHK(eng->get_device()->CreateInputLayout(
@@ -56,8 +57,10 @@ void* gearoenix::dx11::shader::Shader::compile_shader(
 			shdcd->GetBufferSize(),
 			&inlay));
 		break;
+	}
 	case render::shader::stage::Id::FRAGMENT:
-		GXHRCHK(eng->get_device()->CreatePixelShader(shdcd->GetBufferPointer(), shdcd->GetBufferSize(), NULL, &frgshd));
+		GXHRCHK(eng->get_device()->CreatePixelShader(
+			shdcd->GetBufferPointer(), shdcd->GetBufferSize(), NULL, &frgshd));
 		break;
 	default:
 		// todo add support for other shaders and then return ther pointer
