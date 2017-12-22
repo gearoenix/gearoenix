@@ -16,6 +16,7 @@
 #include "texture/dx11-txt-sampler.hpp"
 #include "texture/dx11-txt-2d.hpp"
 #include "texture/dx11-txt-cube.hpp"
+#include "dx11-check.hpp"
 #include <cstdlib>
 #include <d3dcompiler.h>
 #include <vector>
@@ -105,8 +106,8 @@ gearoenix::dx11::Engine::Engine(system::Application* sys_app)
     swap_chain_desc.BufferDesc.RefreshRate.Denominator = denominator;
     swap_chain_desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
     swap_chain_desc.OutputWindow = sysapp->get_window();
-    swap_chain_desc.SampleDesc.Count = 1;
-    swap_chain_desc.SampleDesc.Quality = 0;
+    swap_chain_desc.SampleDesc.Count = 8;
+    swap_chain_desc.SampleDesc.Quality = 1;
 #ifdef GEAROENIX_FULLSCREEN
     swap_chain_desc.Windowed = false;
 #else
@@ -123,11 +124,26 @@ gearoenix::dx11::Engine::Engine(system::Application* sys_app)
 #else
 		D3D11_CREATE_DEVICE_DISABLE_GPU_TIMEOUT;
 #endif
-    if (FAILED(D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, device_flag,
+	GXHRCHK(D3D11CreateDevice(
+		nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, device_flag,
+		&feature_level, 1, D3D11_SDK_VERSION,
+		&p_device, nullptr, nullptr));
+	p_device->CheckMultisampleQualityLevels(
+		swap_chain_desc.BufferDesc.Format,
+		swap_chain_desc.SampleDesc.Count,
+		&(swap_chain_desc.SampleDesc.Quality));
+	--(swap_chain_desc.SampleDesc.Quality);
+	p_device->Release();
+	p_device = nullptr;
+	GXHRCHK(D3D11CreateDeviceAndSwapChain(
+		nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, device_flag,
+		&feature_level, 1, D3D11_SDK_VERSION, &swap_chain_desc, &p_swapchain,
+		&p_device, nullptr, &p_immediate_context));
+    /*if (FAILED(D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, device_flag,
 		&feature_level, 1, D3D11_SDK_VERSION, &swap_chain_desc, &p_swapchain, 
 		&p_device, NULL, &p_immediate_context))) {
         GXLOGF("Can not create requested contex.");
-    }
+    }*/
     if (FAILED(p_swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&back_buffer_ptr))) {
         UNEXPECTED;
     }
@@ -143,8 +159,7 @@ gearoenix::dx11::Engine::Engine(system::Application* sys_app)
     depth_buffer_desc.MipLevels = 1;
     depth_buffer_desc.ArraySize = 1;
     depth_buffer_desc.Format = DXGI_FORMAT_D32_FLOAT;
-    depth_buffer_desc.SampleDesc.Count = 1;
-    depth_buffer_desc.SampleDesc.Quality = 0;
+    depth_buffer_desc.SampleDesc = swap_chain_desc.SampleDesc;
     depth_buffer_desc.Usage = D3D11_USAGE_DEFAULT;
     depth_buffer_desc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
     depth_buffer_desc.CPUAccessFlags = 0;
@@ -173,7 +188,7 @@ gearoenix::dx11::Engine::Engine(system::Application* sys_app)
     p_immediate_context->OMSetDepthStencilState(p_depth_stencil_state, 1);
     setz(depth_stencil_view_desc);
     depth_stencil_view_desc.Format = depth_buffer_desc.Format;
-    depth_stencil_view_desc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+    depth_stencil_view_desc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DMS;
     depth_stencil_view_desc.Texture2D.MipSlice = 0;
     if (FAILED(p_device->CreateDepthStencilView(p_depth_stencil_buffer, &depth_stencil_view_desc, &p_depth_stencil_view))) {
         GXLOGF("Failed to create depth stencil view.");

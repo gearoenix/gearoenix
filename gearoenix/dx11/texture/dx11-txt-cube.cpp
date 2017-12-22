@@ -11,22 +11,20 @@
 
 gearoenix::dx11::texture::Cube::Cube(system::File* file, Engine* eng, std::shared_ptr<core::EndCaller> end)
 {
-    std::vector<unsigned char> img_data;
+	std::vector<std::vector<unsigned char> > img_data(FACES_COUNT);
 	unsigned int imgw, imgh;
     std::vector<core::Offset> img_offs(5);
     for (int i = 0; i < 5; ++i) {
         file->read(img_offs[i]);
     }
-    render::texture::PNG::decode(file, img_data, imgw, imgh);
-    for (int i = 1; i < FACES_COUNT; ++i) {
+    render::texture::PNG::decode(file, img_data[0], imgw, imgh);
+    for (int i = 1; i < FACES_COUNT;) {
         file->seek((unsigned int)img_offs[i - 1]);
-		std::vector<unsigned char> tmp_img_data;
 		unsigned int tmpimgw, tmpimgh;
-        render::texture::PNG::decode(file, tmp_img_data, tmpimgw, tmpimgh);
-		if (imgw != tmpimgw || imgw != tmpimgh || img_data.size() != tmp_img_data.size()) {
+        render::texture::PNG::decode(file, img_data[++i], tmpimgw, tmpimgh);
+		if (imgw != tmpimgw || imgw != tmpimgh) {
 			UNEXPECTED;
 		}
-		img_data.insert(img_data.end(), tmp_img_data.begin(), tmp_img_data.end());
     }
 	D3D11_TEXTURE2D_DESC desc;
 	setz(desc);
@@ -35,8 +33,8 @@ gearoenix::dx11::texture::Cube::Cube(system::File* file, Engine* eng, std::share
 	desc.ArraySize = FACES_COUNT;
 	desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	desc.SampleDesc.Count = 1;
-	desc.Usage = D3D11_USAGE_IMMUTABLE;
-	desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+	desc.Usage = D3D11_USAGE_DEFAULT;
+	desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
 	desc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS | D3D11_RESOURCE_MISC_TEXTURECUBE;
 	D3D11_SHADER_RESOURCE_VIEW_DESC sdesc;
 	setz(sdesc);
@@ -50,6 +48,9 @@ gearoenix::dx11::texture::Cube::Cube(system::File* file, Engine* eng, std::share
 		ID3D11Device* dev = eng->get_device();
 		ID3D11Texture2D* txt = nullptr;
 		GXHRCHK(dev->CreateTexture2D(&desc, &subsrcdata, &txt));
+		for(unsigned int i = 0; i < FACES_COUNT; ++i)
+			engine->get_context()->UpdateSubresource(
+				txt, i, nullptr, img_data[i].data(), desc.Width * 4, 0);
 		GXHRCHK(dev->CreateShaderResourceView(txt, &sdesc, &srv));
 		eng->get_context()->GenerateMips(srv);
 		txt->Release();
@@ -67,4 +68,7 @@ const ID3D11ShaderResourceView* gearoenix::dx11::texture::Cube::get_shader_resou
 	return srv;
 }
 
+void gearoenix::dx11::texture::Cube::bind(unsigned int slot) const {
+	engine->get_context()->PSSetShaderResources(slot, 1, &srv);
+}
 #endif
