@@ -142,14 +142,13 @@ gearoenix::dx11::Engine::Engine(system::Application* sys_app)
     depth_buffer_desc.Height = sysapp->get_height();
     depth_buffer_desc.MipLevels = 1;
     depth_buffer_desc.ArraySize = 1;
-    depth_buffer_desc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+    depth_buffer_desc.Format = DXGI_FORMAT_D32_FLOAT;
     depth_buffer_desc.SampleDesc.Count = 1;
     depth_buffer_desc.SampleDesc.Quality = 0;
     depth_buffer_desc.Usage = D3D11_USAGE_DEFAULT;
     depth_buffer_desc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
     depth_buffer_desc.CPUAccessFlags = 0;
     depth_buffer_desc.MiscFlags = 0;
-    GXLOGE("TODO I like 32bit depth buffer.");
     if (FAILED(p_device->CreateTexture2D(&depth_buffer_desc, NULL, &p_depth_stencil_buffer))) {
         GXLOGF("Can not create texture 2d of depth stencil buffer.");
     }
@@ -173,7 +172,7 @@ gearoenix::dx11::Engine::Engine(system::Application* sys_app)
     }
     p_immediate_context->OMSetDepthStencilState(p_depth_stencil_state, 1);
     setz(depth_stencil_view_desc);
-    depth_stencil_view_desc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+    depth_stencil_view_desc.Format = depth_buffer_desc.Format;
     depth_stencil_view_desc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
     depth_stencil_view_desc.Texture2D.MipSlice = 0;
     if (FAILED(p_device->CreateDepthStencilView(p_depth_stencil_buffer, &depth_stencil_view_desc, &p_depth_stencil_view))) {
@@ -187,7 +186,7 @@ gearoenix::dx11::Engine::Engine(system::Application* sys_app)
     raster_desc.DepthBiasClamp = 0.0f;
     raster_desc.DepthClipEnable = true;
     raster_desc.FillMode = D3D11_FILL_SOLID;
-    raster_desc.FrontCounterClockwise = false;
+    raster_desc.FrontCounterClockwise = true;
     raster_desc.MultisampleEnable = false;
     raster_desc.ScissorEnable = false;
     raster_desc.SlopeScaledDepthBias = 0.0f;
