@@ -106,8 +106,7 @@ gearoenix::dx11::Engine::Engine(system::Application* sys_app)
     swap_chain_desc.BufferDesc.RefreshRate.Denominator = denominator;
     swap_chain_desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
     swap_chain_desc.OutputWindow = sysapp->get_window();
-    swap_chain_desc.SampleDesc.Count = 8;
-    swap_chain_desc.SampleDesc.Quality = 1;
+    swap_chain_desc.SampleDesc.Count = 1;
 #ifdef GEAROENIX_FULLSCREEN
     swap_chain_desc.Windowed = false;
 #else
@@ -128,11 +127,20 @@ gearoenix::dx11::Engine::Engine(system::Application* sys_app)
 		nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, device_flag,
 		&feature_level, 1, D3D11_SDK_VERSION,
 		&p_device, nullptr, nullptr));
-	p_device->CheckMultisampleQualityLevels(
-		swap_chain_desc.BufferDesc.Format,
-		swap_chain_desc.SampleDesc.Count,
-		&(swap_chain_desc.SampleDesc.Quality));
-	--(swap_chain_desc.SampleDesc.Quality);
+	for (unsigned int i = D3D11_MAX_MULTISAMPLE_SAMPLE_COUNT; i > 0; --i)
+	{
+		swap_chain_desc.SampleDesc.Count = i;
+		UINT sample_quality;
+		p_device->CheckMultisampleQualityLevels(
+			swap_chain_desc.BufferDesc.Format,
+			i, &sample_quality);
+		if (sample_quality > 0)
+		{
+			swap_chain_desc.SampleDesc.Quality = sample_quality - 1;
+			swap_chain_desc.SampleDesc.Count = i;
+			break;
+		}
+	}
 	p_device->Release();
 	p_device = nullptr;
 	GXHRCHK(D3D11CreateDeviceAndSwapChain(
