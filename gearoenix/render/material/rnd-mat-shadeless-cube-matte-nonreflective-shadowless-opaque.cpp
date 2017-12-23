@@ -33,6 +33,7 @@ gearoenix::render::material::ShadelessCubeMatteNonreflectiveShadowlessOpaque::Sh
     std::function<void()> fun = [this, end, e] {
         shdrsc = reinterpret_cast<Resources*>(e->create_shader_resources(SHADER_ID, pl.get(), ub, end));
         shdrsc->set_cube_texture(ctxt.get());
+		(void)end;
     };
     unsigned int curloc = f->tell();
     ctxt = std::static_pointer_cast<texture::Cube>(astmgr->get_texture(texid, core::EndCaller::create(fun)));

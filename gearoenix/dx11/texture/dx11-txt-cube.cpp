@@ -31,27 +31,38 @@ gearoenix::dx11::texture::Cube::Cube(system::File* file, Engine* eng, std::share
     setz(desc);
     desc.Width = imgw;
     desc.Height = imgh;
+	desc.MipLevels = 1;
     desc.ArraySize = FACES_COUNT;
     desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
     desc.SampleDesc.Count = 1;
-    desc.Usage = D3D11_USAGE_DEFAULT;
-    desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
-    desc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS | D3D11_RESOURCE_MISC_TEXTURECUBE;
+    desc.Usage = D3D11_USAGE_IMMUTABLE;
+    desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+    desc.MiscFlags = D3D11_RESOURCE_MISC_TEXTURECUBE;
     D3D11_SHADER_RESOURCE_VIEW_DESC sdesc;
     setz(sdesc);
     sdesc.Format = desc.Format;
     sdesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
-    sdesc.TextureCube.MipLevels = -1;
+    sdesc.TextureCube.MipLevels = 1;
     eng->add_load_function([this, desc, sdesc, img_data, end]() -> void {
         ID3D11Device* dev = engine->get_device();
         ID3D11DeviceContext* ctx = engine->get_context();
         ID3D11Texture2D* txt = nullptr;
-        GXHRCHK(dev->CreateTexture2D(&desc, nullptr, &txt));
-        for (unsigned int i = 0; i < FACES_COUNT; ++i)
-            ctx->UpdateSubresource(
-                txt, i, nullptr, img_data[i].data(), desc.Width * 4, 0);
+		D3D11_SUBRESOURCE_DATA facesdata[FACES_COUNT];
+		GXSETARRZ(facesdata);
+		facesdata[0].pSysMem = img_data[2].data();
+		facesdata[0].SysMemPitch = desc.Width * 4;
+		facesdata[1].pSysMem = img_data[3].data();
+		facesdata[1].SysMemPitch = desc.Width * 4;
+		facesdata[2].pSysMem = img_data[5].data();
+		facesdata[2].SysMemPitch = desc.Width * 4;
+		facesdata[3].pSysMem = img_data[4].data();
+		facesdata[3].SysMemPitch = desc.Width * 4;
+		facesdata[4].pSysMem = img_data[0].data();
+		facesdata[4].SysMemPitch = desc.Width * 4;
+		facesdata[5].pSysMem = img_data[1].data();
+		facesdata[5].SysMemPitch = desc.Width * 4;
+		GXHRCHK(dev->CreateTexture2D(&desc, facesdata, &txt));
         GXHRCHK(dev->CreateShaderResourceView(txt, &sdesc, &srv));
-        ctx->GenerateMips(srv);
         txt->Release();
         (void)end;
     });
