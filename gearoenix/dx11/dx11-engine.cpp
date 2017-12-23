@@ -89,16 +89,8 @@ gearoenix::dx11::Engine::Engine(system::Application* sys_app)
 	}
 adapter_found_label:
     if(adapter_output != nullptr) adapter_output->Release();
+	if (adapter != nullptr) adapter->Release();
 	if (factory != nullptr) factory->Release();
-
-	const D3D_FEATURE_LEVEL feature_level = D3D_FEATURE_LEVEL_11_0;
-	ID3D11Texture2D* back_buffer_ptr;
-	D3D11_TEXTURE2D_DESC depth_buffer_desc;
-	D3D11_DEPTH_STENCIL_DESC depth_stencil_desc;
-	D3D11_DEPTH_STENCIL_VIEW_DESC depth_stencil_view_desc;
-	D3D11_RASTERIZER_DESC raster_desc;
-	D3D11_VIEWPORT viewport;
-
 	DXGI_SWAP_CHAIN_DESC swap_chain_desc;
     setz(swap_chain_desc);
     swap_chain_desc.BufferCount = 1;
@@ -126,6 +118,7 @@ adapter_found_label:
 #else
         D3D11_CREATE_DEVICE_DISABLE_GPU_TIMEOUT;
 #endif
+	const D3D_FEATURE_LEVEL feature_level = D3D_FEATURE_LEVEL_11_0;
 	D3D_DRIVER_TYPE driver_type = D3D_DRIVER_TYPE_HARDWARE;
 	if (FAILED(D3D11CreateDevice(
 		nullptr, driver_type, nullptr, device_flag,
@@ -134,7 +127,7 @@ adapter_found_label:
 #ifdef DEBUG_MODE
 		driver_type = D3D_DRIVER_TYPE_REFERENCE;
 		GXHRCHK(D3D11CreateDevice(
-			adapter, driver_type, nullptr, device_flag,
+			nullptr, driver_type, nullptr, device_flag,
 			&feature_level, 1, D3D11_SDK_VERSION,
 			&p_device, nullptr, nullptr));
 #endif
@@ -146,43 +139,25 @@ adapter_found_label:
             swap_chain_desc.BufferDesc.Format,
             i, &sample_quality);
         if (sample_quality > 0) {
-            swap_chain_desc.SampleDesc.Quality = sample_quality - 1;
+			--sample_quality;
+            swap_chain_desc.SampleDesc.Quality = sample_quality;
             swap_chain_desc.SampleDesc.Count = i;
-            break;
+            GXLOGD("count " << i << ",  quality: " << sample_quality);
+			break;
         }
     }
     p_device->Release();
     p_device = nullptr;
-#ifdef DEBUG_MODE
-	if (driver_type == D3D_DRIVER_TYPE_HARDWARE) {
-		GXHRCHK(D3D11CreateDeviceAndSwapChain(
-			nullptr, driver_type, nullptr, device_flag,
-			&feature_level, 1, D3D11_SDK_VERSION, &swap_chain_desc, &p_swapchain,
-			&p_device, nullptr, &p_immediate_context));
-	}
-	else {
-		GXHRCHK(D3D11CreateDeviceAndSwapChain(
-			adapter, driver_type, nullptr, device_flag,
-			&feature_level, 1, D3D11_SDK_VERSION, &swap_chain_desc, &p_swapchain,
-			&p_device, nullptr, &p_immediate_context));
-	}
-#else
 	GXHRCHK(D3D11CreateDeviceAndSwapChain(
-		nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, device_flag,
+		nullptr, driver_type, nullptr, device_flag,
 		&feature_level, 1, D3D11_SDK_VERSION, &swap_chain_desc, &p_swapchain,
 		&p_device, nullptr, &p_immediate_context));
-#endif
-	if (adapter != nullptr) adapter->Release();
-	adapter == nullptr;
-    if (FAILED(p_swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&back_buffer_ptr))) {
-        UNEXPECTED;
-    }
-    if (FAILED(p_device->CreateRenderTargetView(back_buffer_ptr, NULL, &p_render_target_view))) {
-        GXLOGE("Failed to create render target view.")
-    }
+	ID3D11Texture2D* back_buffer_ptr;
+	GXHRCHK(p_swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&back_buffer_ptr));
+	GXHRCHK(p_device->CreateRenderTargetView(back_buffer_ptr, NULL, &p_render_target_view));
     back_buffer_ptr->Release();
     back_buffer_ptr = nullptr;
-
+	D3D11_TEXTURE2D_DESC depth_buffer_desc;
     setz(depth_buffer_desc);
     depth_buffer_desc.Width = sysapp->get_width();
     depth_buffer_desc.Height = sysapp->get_height();
@@ -194,9 +169,8 @@ adapter_found_label:
     depth_buffer_desc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
     depth_buffer_desc.CPUAccessFlags = 0;
     depth_buffer_desc.MiscFlags = 0;
-    if (FAILED(p_device->CreateTexture2D(&depth_buffer_desc, NULL, &p_depth_stencil_buffer))) {
-        GXLOGF("Can not create texture 2d of depth stencil buffer.");
-    }
+	GXHRCHK(p_device->CreateTexture2D(&depth_buffer_desc, NULL, &p_depth_stencil_buffer));
+	D3D11_DEPTH_STENCIL_DESC depth_stencil_desc;
     setz(depth_stencil_desc);
     depth_stencil_desc.DepthEnable = true;
     depth_stencil_desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
@@ -212,18 +186,16 @@ adapter_found_label:
     depth_stencil_desc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
     depth_stencil_desc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
     depth_stencil_desc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
-    if (FAILED(p_device->CreateDepthStencilState(&depth_stencil_desc, &p_depth_stencil_state))) {
-        GXLOGF("Failed to create depth stencil state");
-    }
+	GXHRCHK(p_device->CreateDepthStencilState(&depth_stencil_desc, &p_depth_stencil_state));
     p_immediate_context->OMSetDepthStencilState(p_depth_stencil_state, 1);
+	D3D11_DEPTH_STENCIL_VIEW_DESC depth_stencil_view_desc;
     setz(depth_stencil_view_desc);
     depth_stencil_view_desc.Format = depth_buffer_desc.Format;
     depth_stencil_view_desc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DMS;
     depth_stencil_view_desc.Texture2D.MipSlice = 0;
-    if (FAILED(p_device->CreateDepthStencilView(p_depth_stencil_buffer, &depth_stencil_view_desc, &p_depth_stencil_view))) {
-        GXLOGF("Failed to create depth stencil view.");
-    }
+	GXHRCHK(p_device->CreateDepthStencilView(p_depth_stencil_buffer, &depth_stencil_view_desc, &p_depth_stencil_view));
     p_immediate_context->OMSetRenderTargets(1, &p_render_target_view, p_depth_stencil_view);
+	D3D11_RASTERIZER_DESC raster_desc;
     setz(raster_desc);
     raster_desc.AntialiasedLineEnable = false;
     raster_desc.CullMode = D3D11_CULL_BACK;
@@ -235,11 +207,9 @@ adapter_found_label:
     raster_desc.MultisampleEnable = false;
     raster_desc.ScissorEnable = false;
     raster_desc.SlopeScaledDepthBias = 0.0f;
-    GXLOGE("TODO in future support Antialiasing, Multisampling");
-    if (FAILED(p_device->CreateRasterizerState(&raster_desc, &p_raster_state))) {
-        GXLOGF("Failed to create raster state.");
-    }
+	GXHRCHK(p_device->CreateRasterizerState(&raster_desc, &p_raster_state));
     p_immediate_context->RSSetState(p_raster_state);
+	D3D11_VIEWPORT viewport;
     viewport.Width = (float)sysapp->get_width();
     viewport.Height = (float)sysapp->get_height();
     viewport.MinDepth = 0.0f;
