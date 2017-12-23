@@ -68,10 +68,10 @@ void gearoenix::render::material::ShadelessCubeMatteNonreflectiveShadowlessOpaqu
 {
     u.mvp = m->get_mvp();
     u.m = m->get_m();
-    ub->update(&u, sizeof(Uniform));
 }
 
 void gearoenix::render::material::ShadelessCubeMatteNonreflectiveShadowlessOpaque::bind(texture::Texture2D*)
 {
+	ub->update(&u, sizeof(Uniform));
     shdrsc->bind();
 }

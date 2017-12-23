@@ -30,7 +30,7 @@ gearoenix::gles2::shader::ShadelessCubeMatteNonreflectiveShadowlessOpaque::Shade
                                 "precision highp float;\n"
                                 "attribute vec3 vertex;\n"
                                 "varying vec3 out_pos;\n"
-                                "uniform mat4 vp;\n" // TODO this does not need mvp any more
+                                "uniform mat4 mvp;\n"
                                 "uniform mat4 m;\n"
                                 "void main()\n"
                                 "{\n"

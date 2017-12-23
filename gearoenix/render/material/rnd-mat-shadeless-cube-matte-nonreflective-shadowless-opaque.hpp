@@ -26,8 +26,8 @@ namespace render {
                 void set_cube_texture(texture::Cube* ct);
             };
             typedef struct {
-                math::Mat4x4 mvp;
                 math::Mat4x4 m;
+                math::Mat4x4 mvp;
             } Uniform;
 
         private:

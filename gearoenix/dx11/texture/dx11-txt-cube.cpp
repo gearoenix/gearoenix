@@ -10,6 +10,7 @@
 #define FACES_COUNT 6
 
 gearoenix::dx11::texture::Cube::Cube(system::File* file, Engine* eng, std::shared_ptr<core::EndCaller> end)
+	:engine(eng)
 {
 	std::vector<std::vector<unsigned char> > img_data(FACES_COUNT);
 	unsigned int imgw, imgh;
@@ -18,10 +19,10 @@ gearoenix::dx11::texture::Cube::Cube(system::File* file, Engine* eng, std::share
         file->read(img_offs[i]);
     }
     render::texture::PNG::decode(file, img_data[0], imgw, imgh);
-    for (int i = 1; i < FACES_COUNT;) {
+    for (int i = 1; i < FACES_COUNT; ++i) {
         file->seek((unsigned int)img_offs[i - 1]);
 		unsigned int tmpimgw, tmpimgh;
-        render::texture::PNG::decode(file, img_data[++i], tmpimgw, tmpimgh);
+        render::texture::PNG::decode(file, img_data[i], tmpimgw, tmpimgh);
 		if (imgw != tmpimgw || imgw != tmpimgh) {
 			UNEXPECTED;
 		}
@@ -41,18 +42,16 @@ gearoenix::dx11::texture::Cube::Cube(system::File* file, Engine* eng, std::share
 	sdesc.Format = desc.Format;
 	sdesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
 	sdesc.TextureCube.MipLevels = -1;
-    eng->add_load_function([&, eng, desc, sdesc, img_data, end]() -> void {
-		D3D11_SUBRESOURCE_DATA subsrcdata;
-		subsrcdata.pSysMem = img_data.data();
-		subsrcdata.SysMemPitch = desc.Width * 4;
-		ID3D11Device* dev = eng->get_device();
+    eng->add_load_function([this, desc, sdesc, img_data, end]() -> void {
+		ID3D11Device* dev = engine->get_device();
+		ID3D11DeviceContext* ctx = engine->get_context();
 		ID3D11Texture2D* txt = nullptr;
-		GXHRCHK(dev->CreateTexture2D(&desc, &subsrcdata, &txt));
+		GXHRCHK(dev->CreateTexture2D(&desc, nullptr, &txt));
 		for(unsigned int i = 0; i < FACES_COUNT; ++i)
-			engine->get_context()->UpdateSubresource(
+			ctx->UpdateSubresource(
 				txt, i, nullptr, img_data[i].data(), desc.Width * 4, 0);
 		GXHRCHK(dev->CreateShaderResourceView(txt, &sdesc, &srv));
-		eng->get_context()->GenerateMips(srv);
+		ctx->GenerateMips(srv);
 		txt->Release();
 		(void)end;
 	});

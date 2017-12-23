@@ -30,7 +30,7 @@ gearoenix::dx11::shader::ShadelessCubeMatteNonreflectiveShadowlessOpaque::Shadel
 		const char p_vertex_src_data[] =
 			"cbuffer UniformBuffer {\n"
 			"    matrix m;\n"
-			"    matrix vp;\n"
+			"    matrix mvp;\n"
 			"};\n"
 			"struct VertexInputType {\n"
 			"    float3 position : POSITION;\n"
@@ -42,9 +42,8 @@ gearoenix::dx11::shader::ShadelessCubeMatteNonreflectiveShadowlessOpaque::Shadel
 			"};\n"
 			"PixelInputType main(VertexInputType input) {\n"
 			"    PixelInputType output;\n"
-			"    output.position = mul(float4(input.position, 1.0), m);\n"
-			"    output.texcoord = output.position.xyz;\n"
-			"    output.position = mul(output.position, vp);\n"
+			"    output.position = mul(float4(input.position, 1.0), mvp);\n"
+			"    output.texcoord = mul(float4(input.position, 0.0), m).xyz;\n"
 			"    return output;\n"
 			"}\n";
 		std::vector<D3D11_INPUT_ELEMENT_DESC> desc(1);

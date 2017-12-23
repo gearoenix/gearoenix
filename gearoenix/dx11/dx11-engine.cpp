@@ -10,6 +10,7 @@
 #include "buffer/dx11-buf-mesh.hpp"
 #include "buffer/dx11-buf-uniform.hpp"
 #include "shader/dx11-shd-shadeless-colored-matte-nonreflective-shadowless-opaque.hpp"
+#include "shader/dx11-shd-shadeless-cube-matte-nonreflective-shadowless-opaque.hpp"
 #include "shader/dx11-shd-shadeless-d2-matte-nonreflective-shadowless-opaque.hpp"
 #include "pipeline/dx11-pip-pipeline.hpp"
 #include "../render/pipeline/rnd-pip-manager.hpp"
@@ -147,11 +148,6 @@ gearoenix::dx11::Engine::Engine(system::Application* sys_app)
 		nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, device_flag,
 		&feature_level, 1, D3D11_SDK_VERSION, &swap_chain_desc, &p_swapchain,
 		&p_device, nullptr, &p_immediate_context));
-    /*if (FAILED(D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, device_flag,
-		&feature_level, 1, D3D11_SDK_VERSION, &swap_chain_desc, &p_swapchain, 
-		&p_device, NULL, &p_immediate_context))) {
-        GXLOGF("Can not create requested contex.");
-    }*/
     if (FAILED(p_swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&back_buffer_ptr))) {
         UNEXPECTED;
     }
@@ -508,6 +504,8 @@ gearoenix::render::shader::Shader* gearoenix::dx11::Engine::create_shader(core::
 	{
 	case render::shader::Id::SHADELESS_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
 		return new shader::ShadelessColoredMatteNonreflectiveShadowlessOpaque(this, c);
+	case render::shader::Id::SHADELESS_CUBE_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
+		return new shader::ShadelessCubeMatteNonreflectiveShadowlessOpaque(this, c);
 	case render::shader::Id::SHADELESS_D2_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
 		return new shader::ShadelessD2MatteNonreflectiveShadowlessOpaque(this, c);
 	default:
@@ -526,6 +524,8 @@ gearoenix::render::shader::Resources* gearoenix::dx11::Engine::create_shader_res
 	{
 	case render::shader::Id::SHADELESS_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
 		return new shader::ShadelessColoredMatteNonreflectiveShadowlessOpaque::Resources(this, pip, u);
+	case render::shader::Id::SHADELESS_CUBE_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
+		return new shader::ShadelessCubeMatteNonreflectiveShadowlessOpaque::Resources(this, pip, u);
 	case render::shader::Id::SHADELESS_D2_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
 		return new shader::ShadelessD2MatteNonreflectiveShadowlessOpaque::Resources(this, pip, u);
 	default:

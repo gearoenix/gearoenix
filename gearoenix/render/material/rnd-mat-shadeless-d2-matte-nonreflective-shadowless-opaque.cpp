@@ -66,10 +66,10 @@ bool gearoenix::render::material::ShadelessD2MatteNonreflectiveShadowlessOpaque:
 void gearoenix::render::material::ShadelessD2MatteNonreflectiveShadowlessOpaque::update(const scene::Scene*, const model::Model* m)
 {
     u.mvp = m->get_mvp();
-    ub->update(&u, sizeof(Uniform));
 }
 
 void gearoenix::render::material::ShadelessD2MatteNonreflectiveShadowlessOpaque::bind(texture::Texture2D*)
 {
+    ub->update(&u, sizeof(Uniform));
     shdrsc->bind();
 }
