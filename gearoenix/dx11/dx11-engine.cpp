@@ -43,61 +43,63 @@
 gearoenix::dx11::Engine::Engine(system::Application* sys_app)
     : render::Engine(sys_app)
 {
-    IDXGIFactory* factory;
-    IDXGIAdapter* adapter;
-    IDXGIOutput* adapter_output;
-    unsigned int num_modes, i, numerator, denominator;
-    DXGI_ADAPTER_DESC adapter_desc;
-    DXGI_SWAP_CHAIN_DESC swap_chain_desc;
-    const D3D_FEATURE_LEVEL feature_level = D3D_FEATURE_LEVEL_11_0;
-    ID3D11Texture2D* back_buffer_ptr;
-    D3D11_TEXTURE2D_DESC depth_buffer_desc;
-    D3D11_DEPTH_STENCIL_DESC depth_stencil_desc;
-    D3D11_DEPTH_STENCIL_VIEW_DESC depth_stencil_view_desc;
-    D3D11_RASTERIZER_DESC raster_desc;
-    D3D11_VIEWPORT viewport;
-    if (FAILED(CreateDXGIFactory(__uuidof(IDXGIFactory), (void**)&factory))) {
-        GXLOGF("CreateDXGIFactory failed.");
-    }
-    if (FAILED(factory->EnumAdapters(0, &adapter))) {
-        GXLOGF("EnumAdapters failed.");
-    }
-    if (FAILED(adapter->EnumOutputs(0, &adapter_output))) {
-        GXLOGF("EnumOutputs failed.");
-    }
-    if (FAILED(adapter_output->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &num_modes, NULL))) {
-        GXLOGF("GetDisplayModeList failed.");
-    }
-    std::vector<DXGI_MODE_DESC> display_mode_list(num_modes);
-    if (FAILED(adapter_output->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &num_modes, &(display_mode_list[0])))) {
-        GXLOGF("GetDisplayModeList failed.");
-    }
-    for (i = 0; i < num_modes; i++) {
-        if (display_mode_list[i].Width == sysapp->get_width()) {
-            if (display_mode_list[i].Height == sysapp->get_height()) {
-                numerator = display_mode_list[i].RefreshRate.Numerator;
-                denominator = display_mode_list[i].RefreshRate.Denominator;
-            }
-        }
-    }
+    IDXGIFactory* factory = nullptr;
+    IDXGIAdapter* adapter = nullptr;
+    IDXGIOutput* adapter_output = nullptr;
+    UINT numerator = 0U, denominator = 0U;
+	GXHRCHK(CreateDXGIFactory(__uuidof(IDXGIFactory), (void**)&factory));
+	for (UINT adapter_index = 0; 
+		factory->EnumAdapters(adapter_index, &adapter) != DXGI_ERROR_NOT_FOUND;
+		++adapter_index, adapter->Release(), adapter = nullptr) {
+		DXGI_ADAPTER_DESC adapter_desc;
+		GXHRCHK(adapter->GetDesc(&adapter_desc));
+		graphic_memory_size = (unsigned int) adapter_desc.DedicatedVideoMemory;
+		char video_card_description[128];
+		size_t strlen;
+		if (wcstombs_s(&strlen, video_card_description, 128, adapter_desc.Description, 128) != 0) {
+			UNEXPECTED;
+		}
+		for (size_t i = strlen; i < 128; ++i)
+			video_card_description[i] = 0;
+		GXLOGD("Video Card Description: " << video_card_description);
+		for (UINT adpout_index = 0;
+			adapter->EnumOutputs(adpout_index, &adapter_output) != DXGI_ERROR_NOT_FOUND;
+			++adpout_index, adapter_output->Release(), adapter_output = nullptr) {
+			UINT num_modes = 0;
+			if (FAILED(adapter_output->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &num_modes, NULL))) {
+				continue;
+			}
+			if (num_modes == 0) {
+				continue;
+			}
+			std::vector<DXGI_MODE_DESC> display_mode_list(num_modes);
+			if (FAILED(adapter_output->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &num_modes, &(display_mode_list[0])))) {
+				continue;
+			}
+			for (UINT i = 0; i < num_modes; i++) {
+				if (display_mode_list[i].Width == sysapp->get_width()) {
+					if (display_mode_list[i].Height == sysapp->get_height()) {
+						numerator = display_mode_list[i].RefreshRate.Numerator;
+						denominator = display_mode_list[i].RefreshRate.Denominator;
+					}
+				}
+			}
+			goto adapter_found_label;
+		}
+	}
+adapter_found_label:
+    if(adapter_output != nullptr) adapter_output->Release();
+	if (factory != nullptr) factory->Release();
 
-    if (FAILED(adapter->GetDesc(&adapter_desc))) {
-        GXLOGF("getting adapter description failed.");
-    }
-    graphic_memory_size = (unsigned int)adapter_desc.DedicatedVideoMemory;
-    char video_card_description[128];
-    size_t strlen;
-    if (wcstombs_s(&strlen, video_card_description, 128, adapter_desc.Description, 128) != 0) {
-        UNEXPECTED;
-    }
-    for (size_t i = strlen; i < 128; ++i)
-        video_card_description[i] = 0;
-    GXLOGD("Video Card Description: " << video_card_description);
+	const D3D_FEATURE_LEVEL feature_level = D3D_FEATURE_LEVEL_11_0;
+	ID3D11Texture2D* back_buffer_ptr;
+	D3D11_TEXTURE2D_DESC depth_buffer_desc;
+	D3D11_DEPTH_STENCIL_DESC depth_stencil_desc;
+	D3D11_DEPTH_STENCIL_VIEW_DESC depth_stencil_view_desc;
+	D3D11_RASTERIZER_DESC raster_desc;
+	D3D11_VIEWPORT viewport;
 
-    adapter_output->Release();
-    adapter->Release();
-    factory->Release();
-
+	DXGI_SWAP_CHAIN_DESC swap_chain_desc;
     setz(swap_chain_desc);
     swap_chain_desc.BufferCount = 1;
     swap_chain_desc.BufferDesc.Width = sysapp->get_width();
@@ -124,10 +126,19 @@ gearoenix::dx11::Engine::Engine(system::Application* sys_app)
 #else
         D3D11_CREATE_DEVICE_DISABLE_GPU_TIMEOUT;
 #endif
-    GXHRCHK(D3D11CreateDevice(
-        nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, device_flag,
-        &feature_level, 1, D3D11_SDK_VERSION,
-        &p_device, nullptr, nullptr));
+	D3D_DRIVER_TYPE driver_type = D3D_DRIVER_TYPE_HARDWARE;
+	if (FAILED(D3D11CreateDevice(
+		nullptr, driver_type, nullptr, device_flag,
+		&feature_level, 1, D3D11_SDK_VERSION,
+		&p_device, nullptr, nullptr))) {
+#ifdef DEBUG_MODE
+		driver_type = D3D_DRIVER_TYPE_REFERENCE;
+		GXHRCHK(D3D11CreateDevice(
+			adapter, driver_type, nullptr, device_flag,
+			&feature_level, 1, D3D11_SDK_VERSION,
+			&p_device, nullptr, nullptr));
+#endif
+	}
     for (unsigned int i = D3D11_MAX_MULTISAMPLE_SAMPLE_COUNT; i > 0; --i) {
         swap_chain_desc.SampleDesc.Count = i;
         UINT sample_quality;
@@ -142,10 +153,27 @@ gearoenix::dx11::Engine::Engine(system::Application* sys_app)
     }
     p_device->Release();
     p_device = nullptr;
-    GXHRCHK(D3D11CreateDeviceAndSwapChain(
-        nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, device_flag,
-        &feature_level, 1, D3D11_SDK_VERSION, &swap_chain_desc, &p_swapchain,
-        &p_device, nullptr, &p_immediate_context));
+#ifdef DEBUG_MODE
+	if (driver_type == D3D_DRIVER_TYPE_HARDWARE) {
+		GXHRCHK(D3D11CreateDeviceAndSwapChain(
+			nullptr, driver_type, nullptr, device_flag,
+			&feature_level, 1, D3D11_SDK_VERSION, &swap_chain_desc, &p_swapchain,
+			&p_device, nullptr, &p_immediate_context));
+	}
+	else {
+		GXHRCHK(D3D11CreateDeviceAndSwapChain(
+			adapter, driver_type, nullptr, device_flag,
+			&feature_level, 1, D3D11_SDK_VERSION, &swap_chain_desc, &p_swapchain,
+			&p_device, nullptr, &p_immediate_context));
+	}
+#else
+	GXHRCHK(D3D11CreateDeviceAndSwapChain(
+		nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, device_flag,
+		&feature_level, 1, D3D11_SDK_VERSION, &swap_chain_desc, &p_swapchain,
+		&p_device, nullptr, &p_immediate_context));
+#endif
+	if (adapter != nullptr) adapter->Release();
+	adapter == nullptr;
     if (FAILED(p_swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&back_buffer_ptr))) {
         UNEXPECTED;
     }
