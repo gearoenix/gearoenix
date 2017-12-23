@@ -102,16 +102,24 @@ LRESULT CALLBACK gearoenix::system::Application::handler(HWND hwnd, UINT umessag
 		//}
 		break;
 	case WM_RBUTTONDOWN:
-		core_app->on_mouse(core::Application::MouseButton::RIGHT, core::Application::ButtonAction::PRESS, (core::Real)LOWORD(lparam), (core::Real)HIWORD(lparam));
+		mouse_prepos_x = LOWORD(lparam);
+		mouse_prepos_y = HIWORD(lparam);
+		core_app->on_mouse(core::Application::MouseButton::RIGHT, core::Application::ButtonAction::PRESS, (core::Real)mouse_prepos_x, (core::Real)mouse_prepos_y);
 		break;
 	case WM_LBUTTONDOWN:
-		core_app->on_mouse(core::Application::MouseButton::LEFT, core::Application::ButtonAction::PRESS, ((core::Real)LOWORD(lparam)) * 0.00001f, ((core::Real)HIWORD(lparam)) * 0.00001f);
+		mouse_prepos_x = LOWORD(lparam);
+		mouse_prepos_y = HIWORD(lparam);
+		core_app->on_mouse(core::Application::MouseButton::LEFT, core::Application::ButtonAction::PRESS, (core::Real)mouse_prepos_x, (core::Real)mouse_prepos_y);
 		break;
 	case WM_MBUTTONDOWN:
-		core_app->on_mouse(core::Application::MouseButton::MIDDLE, core::Application::ButtonAction::PRESS, (core::Real)LOWORD(lparam), (core::Real)HIWORD(lparam));
+		mouse_prepos_x = LOWORD(lparam);
+		mouse_prepos_y = HIWORD(lparam);
+		core_app->on_mouse(core::Application::MouseButton::MIDDLE, core::Application::ButtonAction::PRESS, (core::Real)mouse_prepos_x, (core::Real)mouse_prepos_y);
 		break;
 	case WM_LBUTTONUP:
-		core_app->on_mouse(core::Application::MouseButton::LEFT, core::Application::ButtonAction::RELEASE, ((core::Real)LOWORD(lparam)) * 0.00001f, ((core::Real)HIWORD(lparam)) * 0.00001f);
+		mouse_prepos_x = LOWORD(lparam);
+		mouse_prepos_y = HIWORD(lparam);
+		core_app->on_mouse(core::Application::MouseButton::LEFT, core::Application::ButtonAction::RELEASE, (core::Real)mouse_prepos_x, (core::Real)mouse_prepos_y);
 		break;
 	case WM_MOUSEWHEEL: {
 		short wheel_delta = GET_WHEEL_DELTA_WPARAM(wparam);
@@ -119,42 +127,12 @@ LRESULT CALLBACK gearoenix::system::Application::handler(HWND hwnd, UINT umessag
 		break;
 	}
 	case WM_MOUSEMOVE: {
-		int32_t posx = LOWORD(lparam);
-		int32_t posy = HIWORD(lparam);
-		core_app->on_mouse_move((core::Real)posx, (core::Real)posy);
+		UINT posx = LOWORD(lparam);
+		UINT posy = HIWORD(lparam);
+		core_app->on_mouse_move((core::Real)mouse_prepos_x - (core::Real)posx, (core::Real)mouse_prepos_y - (core::Real)posy);
+		mouse_prepos_x = posx;
+		mouse_prepos_y = posy;
 	}
-					   if (wparam & MK_RBUTTON) {
-						   // int32_t posx = LOWORD(lParam);
-						   // int32_t posy = HIWORD(lParam);
-						   // zoom += (mousePos.y - (float)posy) * .005f * zoomSpeed;
-						   // camera.translate(glm::vec3(-0.0f, 0.0f, (mousePos.y - (float)posy) *
-						   // .005f * zoomSpeed));
-						   // mousePos = glm::vec2((float)posx, (float)posy);
-						   // viewUpdated = true;
-					   }
-					   if (wparam & MK_LBUTTON) {
-						   // int32_t posx = LOWORD(lParam);
-						   // int32_t posy = HIWORD(lParam);
-						   // rotation.x += (mousePos.y - (float)posy) * 1.25f * rotationSpeed;
-						   // rotation.y -= (mousePos.x - (float)posx) * 1.25f * rotationSpeed;
-						   // camera.rotate(glm::vec3((mousePos.y - (float)posy) *
-						   // camera.rotationSpeed, -(mousePos.x - (float)posx) *
-						   // camera.rotationSpeed, 0.0f));
-						   // mousePos = glm::vec2((float)posx, (float)posy);
-						   // viewUpdated = true;
-					   }
-					   if (wparam & MK_MBUTTON) {
-						   // int32_t posx = LOWORD(lParam);
-						   // int32_t posy = HIWORD(lParam);
-						   // cameraPos.x -= (mousePos.x - (float)posx) * 0.01f;
-						   // cameraPos.y -= (mousePos.y - (float)posy) * 0.01f;
-						   // camera.translate(glm::vec3(-(mousePos.x - (float)posx) * 0.01f,
-						   // -(mousePos.y - (float)posy) * 0.01f, 0.0f));
-						   // viewUpdated = true;
-						   // mousePos.x = (float)posx;
-						   // mousePos.y = (float)posy;
-					   }
-					   break;
 	case WM_SIZE:
 		// if ((prepared) && (wParam != SIZE_MINIMIZED))
 		//{
@@ -209,7 +187,7 @@ gearoenix::system::Application::Application()
     screen_settings.dmBitsPerPel = 32;
     screen_settings.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
     ChangeDisplaySettings(&screen_settings, CDS_FULLSCREEN);
-    posX = posY = 0;
+    pos_x = pos_y = 0;
 #else
     screen_width = DEFAULT_WINDOW_WIDTH;
     screen_height = DEFAULT_WINDOW_HEIGHT;
