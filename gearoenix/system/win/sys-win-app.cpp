@@ -38,31 +38,33 @@ LRESULT CALLBACK gearoenix::system::Application::wnd_proc(HWND hwnd, UINT umessa
 
 LRESULT CALLBACK gearoenix::system::Application::handler(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam)
 {
-    switch (umessage) {
-    case WM_CLOSE:
-        /// TODO: proper termination
-        running = false;
-        DestroyWindow(hwnd);
-        PostQuitMessage(0);
-        break;
-    case WM_PAINT:
-        ValidateRect(hwnd, NULL);
-        break;
-    case WM_KEYDOWN:
-        switch (wparam) {
-        case 0x50: /// p
-            /// TODO pause
-            break;
-        case VK_F1:
-            /*if (enableTextOverlay) {
+	switch (umessage) {
+	case WM_CLOSE:
+		/// TODO: proper termination
+		running = false;
+		DestroyWindow(hwnd);
+		PostQuitMessage(0);
+		break;
+	case WM_PAINT:
+		ValidateRect(hwnd, NULL);
+		break;
+	case WM_KEYDOWN:
+		switch (wparam) {
+		case 0x50: /// p
+			/// TODO pause
+			break;
+		case VK_F1:
+			/*if (enableTextOverlay) {
 			textOverlay->visible = !textOverlay->visible;
 			}*/
-            break;
-        case VK_ESCAPE:
-            PostQuitMessage(0);
-            break;
-        }
-        /*if (camera.firstperson) {
+			break;
+		case VK_ESCAPE:
+			running = false;
+			DestroyWindow(hwnd);
+			PostQuitMessage(0);
+			break;
+		}
+		/*if (camera.firstperson) {
 		switch (wParam)
 		{
 		case KEY_W:
@@ -79,95 +81,102 @@ LRESULT CALLBACK gearoenix::system::Application::handler(HWND hwnd, UINT umessag
 		break;
 		}
 		}*/
-        break;
-    case WM_KEYUP:
-        // if (camera.firstperson) {
-        //	switch (wParam)
-        //	{
-        //	case 0x57: // W
-        //		camera.keys.up = false;
-        //		break;
-        //	case 0x53: // S
-        //		camera.keys.down = false;
-        //		break;
-        //	case 0x41: // A
-        //		camera.keys.left = false;
-        //		break;
-        //	case 0x44: // D
-        //		camera.keys.right = false;
-        //		break;
-        //	}
-        //}
-        break;
-    case WM_RBUTTONDOWN:
-    case WM_LBUTTONDOWN:
-    case WM_MBUTTONDOWN:
-        // mousePos.x = (float)LOWORD(lParam);
-        // mousePos.y = (float)HIWORD(lParam);
-        break;
-    case WM_MOUSEWHEEL: {
-        // short wheelDelta = GET_WHEEL_DELTA_WPARAM(wParam);
-        // zoom += (float)wheelDelta * 0.005f * zoomSpeed;
-        // camera.translate(glm::vec3(0.0f, 0.0f, (float)wheelDelta * 0.005f *
-        // zoomSpeed));
-        // viewUpdated = true;
-        break;
-    }
-    case WM_MOUSEMOVE:
-        if (wparam & MK_RBUTTON) {
-            // int32_t posx = LOWORD(lParam);
-            // int32_t posy = HIWORD(lParam);
-            // zoom += (mousePos.y - (float)posy) * .005f * zoomSpeed;
-            // camera.translate(glm::vec3(-0.0f, 0.0f, (mousePos.y - (float)posy) *
-            // .005f * zoomSpeed));
-            // mousePos = glm::vec2((float)posx, (float)posy);
-            // viewUpdated = true;
-        }
-        if (wparam & MK_LBUTTON) {
-            // int32_t posx = LOWORD(lParam);
-            // int32_t posy = HIWORD(lParam);
-            // rotation.x += (mousePos.y - (float)posy) * 1.25f * rotationSpeed;
-            // rotation.y -= (mousePos.x - (float)posx) * 1.25f * rotationSpeed;
-            // camera.rotate(glm::vec3((mousePos.y - (float)posy) *
-            // camera.rotationSpeed, -(mousePos.x - (float)posx) *
-            // camera.rotationSpeed, 0.0f));
-            // mousePos = glm::vec2((float)posx, (float)posy);
-            // viewUpdated = true;
-        }
-        if (wparam & MK_MBUTTON) {
-            // int32_t posx = LOWORD(lParam);
-            // int32_t posy = HIWORD(lParam);
-            // cameraPos.x -= (mousePos.x - (float)posx) * 0.01f;
-            // cameraPos.y -= (mousePos.y - (float)posy) * 0.01f;
-            // camera.translate(glm::vec3(-(mousePos.x - (float)posx) * 0.01f,
-            // -(mousePos.y - (float)posy) * 0.01f, 0.0f));
-            // viewUpdated = true;
-            // mousePos.x = (float)posx;
-            // mousePos.y = (float)posy;
-        }
-        break;
-    case WM_SIZE:
-        // if ((prepared) && (wParam != SIZE_MINIMIZED))
-        //{
-        //	if ((resizing) || ((wParam == SIZE_MAXIMIZED) || (wParam ==
-        // SIZE_RESTORED)))
-        //	{
-        //		destWidth = LOWORD(lParam);
-        //		destHeight = HIWORD(lParam);
-        //		windowResize();
-        //	}
-        //}
-        break;
-    case WM_SHOWWINDOW:
-        window_is_up = true;
-        break;
-    case WM_ENTERSIZEMOVE:
-        // resizing = true;
-        break;
-    case WM_EXITSIZEMOVE:
-        // resizing = false;
-        break;
-    }
+		break;
+	case WM_KEYUP:
+		// if (camera.firstperson) {
+		//	switch (wParam)
+		//	{
+		//	case 0x57: // W
+		//		camera.keys.up = false;
+		//		break;
+		//	case 0x53: // S
+		//		camera.keys.down = false;
+		//		break;
+		//	case 0x41: // A
+		//		camera.keys.left = false;
+		//		break;
+		//	case 0x44: // D
+		//		camera.keys.right = false;
+		//		break;
+		//	}
+		//}
+		break;
+	case WM_RBUTTONDOWN:
+		core_app->on_mouse(core::Application::MouseButton::RIGHT, core::Application::ButtonAction::PRESS, (core::Real)LOWORD(lparam), (core::Real)HIWORD(lparam));
+		break;
+	case WM_LBUTTONDOWN:
+		core_app->on_mouse(core::Application::MouseButton::LEFT, core::Application::ButtonAction::PRESS, ((core::Real)LOWORD(lparam)) * 0.00001f, ((core::Real)HIWORD(lparam)) * 0.00001f);
+		break;
+	case WM_MBUTTONDOWN:
+		core_app->on_mouse(core::Application::MouseButton::MIDDLE, core::Application::ButtonAction::PRESS, (core::Real)LOWORD(lparam), (core::Real)HIWORD(lparam));
+		break;
+	case WM_LBUTTONUP:
+		core_app->on_mouse(core::Application::MouseButton::LEFT, core::Application::ButtonAction::RELEASE, ((core::Real)LOWORD(lparam)) * 0.00001f, ((core::Real)HIWORD(lparam)) * 0.00001f);
+		break;
+	case WM_MOUSEWHEEL: {
+		short wheel_delta = GET_WHEEL_DELTA_WPARAM(wparam);
+		core_app->on_scroll(((core::Real)wheel_delta) * 0.01f);
+		break;
+	}
+	case WM_MOUSEMOVE: {
+		int32_t posx = LOWORD(lparam);
+		int32_t posy = HIWORD(lparam);
+		core_app->on_mouse_move((core::Real)posx, (core::Real)posy);
+	}
+					   if (wparam & MK_RBUTTON) {
+						   // int32_t posx = LOWORD(lParam);
+						   // int32_t posy = HIWORD(lParam);
+						   // zoom += (mousePos.y - (float)posy) * .005f * zoomSpeed;
+						   // camera.translate(glm::vec3(-0.0f, 0.0f, (mousePos.y - (float)posy) *
+						   // .005f * zoomSpeed));
+						   // mousePos = glm::vec2((float)posx, (float)posy);
+						   // viewUpdated = true;
+					   }
+					   if (wparam & MK_LBUTTON) {
+						   // int32_t posx = LOWORD(lParam);
+						   // int32_t posy = HIWORD(lParam);
+						   // rotation.x += (mousePos.y - (float)posy) * 1.25f * rotationSpeed;
+						   // rotation.y -= (mousePos.x - (float)posx) * 1.25f * rotationSpeed;
+						   // camera.rotate(glm::vec3((mousePos.y - (float)posy) *
+						   // camera.rotationSpeed, -(mousePos.x - (float)posx) *
+						   // camera.rotationSpeed, 0.0f));
+						   // mousePos = glm::vec2((float)posx, (float)posy);
+						   // viewUpdated = true;
+					   }
+					   if (wparam & MK_MBUTTON) {
+						   // int32_t posx = LOWORD(lParam);
+						   // int32_t posy = HIWORD(lParam);
+						   // cameraPos.x -= (mousePos.x - (float)posx) * 0.01f;
+						   // cameraPos.y -= (mousePos.y - (float)posy) * 0.01f;
+						   // camera.translate(glm::vec3(-(mousePos.x - (float)posx) * 0.01f,
+						   // -(mousePos.y - (float)posy) * 0.01f, 0.0f));
+						   // viewUpdated = true;
+						   // mousePos.x = (float)posx;
+						   // mousePos.y = (float)posy;
+					   }
+					   break;
+	case WM_SIZE:
+		// if ((prepared) && (wParam != SIZE_MINIMIZED))
+		//{
+		//	if ((resizing) || ((wParam == SIZE_MAXIMIZED) || (wParam ==
+		// SIZE_RESTORED)))
+		//	{
+		//		destWidth = LOWORD(lParam);
+		//		destHeight = HIWORD(lParam);
+		//		windowResize();
+		//	}
+		//}
+		break;
+	case WM_SHOWWINDOW:
+		window_is_up = true;
+		break;
+	case WM_ENTERSIZEMOVE:
+		// resizing = true;
+		break;
+	case WM_EXITSIZEMOVE:
+		// resizing = false;
+		break;
+	}
     return (DefWindowProc(hwnd, umessage, wparam, lparam));
 }
 
