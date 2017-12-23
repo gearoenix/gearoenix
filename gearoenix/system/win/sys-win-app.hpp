@@ -19,8 +19,8 @@ namespace system {
     private:
         int screen_width, screen_height;
         render::Engine* render_engine = nullptr;
-		core::asset::Manager* astmgr = nullptr;
-		core::Application* core_app = nullptr;
+        core::asset::Manager* astmgr = nullptr;
+        core::Application* core_app = nullptr;
         HINSTANCE instance;
         HWND window;
         bool running = true;

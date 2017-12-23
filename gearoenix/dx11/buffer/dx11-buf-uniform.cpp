@@ -2,24 +2,24 @@
 #ifdef USE_DIRECTX11
 #include "../../core/cr-static.hpp"
 #include "../../system/sys-log.hpp"
-#include "../dx11-engine.hpp"
 #include "../dx11-check.hpp"
+#include "../dx11-engine.hpp"
 #include <cstring>
 
 gearoenix::dx11::buffer::Uniform::Uniform(unsigned int s, Engine* eng, std::shared_ptr<core::EndCaller> c)
     : render::buffer::Uniform(eng)
 {
-	eng->add_load_function([this, eng, s, c]() -> void {
-		D3D11_BUFFER_DESC desc;
-		setz(desc);
-		desc.Usage = D3D11_USAGE_DYNAMIC;
-		desc.ByteWidth = ((s & 15) == 0) ? s : (s & (~((UINT) 15))) + 16;
-		desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-		desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-		ID3D11Device* dev = eng->get_device();
-		GXHRCHK(dev->CreateBuffer(&desc, nullptr, &ub));
-		(void)c;
-	});
+    eng->add_load_function([this, eng, s, c]() -> void {
+        D3D11_BUFFER_DESC desc;
+        setz(desc);
+        desc.Usage = D3D11_USAGE_DYNAMIC;
+        desc.ByteWidth = ((s & 15) == 0) ? s : (s & (~((UINT)15))) + 16;
+        desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+        desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+        ID3D11Device* dev = eng->get_device();
+        GXHRCHK(dev->CreateBuffer(&desc, nullptr, &ub));
+        (void)c;
+    });
 }
 
 gearoenix::dx11::buffer::Uniform::~Uniform()
@@ -39,23 +39,23 @@ void gearoenix::dx11::buffer::Uniform::update(const void* src, unsigned int size
 
 void* gearoenix::dx11::buffer::Uniform::get_data()
 {
-    // this should not be called because, 
-	// it does/can not expose its data, 
-	// it can temporary map and then must unmap its data immidiately.
+    // this should not be called because,
+    // it does/can not expose its data,
+    // it can temporary map and then must unmap its data immidiately.
     UNEXPECTED;
     return nullptr;
 }
 
 void gearoenix::dx11::buffer::Uniform::set_for_vertex_shader()
 {
-	ID3D11DeviceContext* ctx = reinterpret_cast<Engine*>(engine)->get_context();
-	ctx->VSSetConstantBuffers(0, 1, &ub);
+    ID3D11DeviceContext* ctx = reinterpret_cast<Engine*>(engine)->get_context();
+    ctx->VSSetConstantBuffers(0, 1, &ub);
 }
 
 void gearoenix::dx11::buffer::Uniform::set_for_fragment_shader()
 {
-	ID3D11DeviceContext* ctx = reinterpret_cast<Engine*>(engine)->get_context();
-	ctx->PSSetConstantBuffers(0, 1, &ub);
+    ID3D11DeviceContext* ctx = reinterpret_cast<Engine*>(engine)->get_context();
+    ctx->PSSetConstantBuffers(0, 1, &ub);
 }
 
 #endif

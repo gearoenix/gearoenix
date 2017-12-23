@@ -78,7 +78,7 @@ int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_
 
 gearoenix::system::Application::Application()
 {
-    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
+    if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
         GXLOGF("Failed to initialize SDL: " << SDL_GetError());
     }
     SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
@@ -108,6 +108,7 @@ gearoenix::system::Application::Application()
     }
     SDL_AddEventWatch(event_receiver, this);
     SDL_GL_MakeCurrent(window, gl_context);
+    //    glEnable(GL_MULTISAMPLE);
     int w, h;
     SDL_GetWindowSize(window, &w, &h);
     win_width = (unsigned int)w;

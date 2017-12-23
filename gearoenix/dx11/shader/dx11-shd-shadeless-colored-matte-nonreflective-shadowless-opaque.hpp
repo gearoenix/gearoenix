@@ -22,7 +22,6 @@ namespace dx11 {
             };
 
         protected:
-
         public:
             ShadelessColoredMatteNonreflectiveShadowlessOpaque(Engine* eng, std::shared_ptr<core::EndCaller> end);
             ~ShadelessColoredMatteNonreflectiveShadowlessOpaque();

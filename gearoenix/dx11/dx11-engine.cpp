@@ -3,21 +3,21 @@
 #include "../core/cr-static.hpp"
 #include "../math/math-matrix.hpp"
 #include "../math/math-vector.hpp"
+#include "../physics/phs-engine.hpp"
+#include "../render/pipeline/rnd-pip-manager.hpp"
+#include "../render/scene/rnd-scn-scene.hpp"
 #include "../system/sys-app.hpp"
 #include "../system/sys-log.hpp"
-#include "../physics/phs-engine.hpp"
-#include "../render/scene/rnd-scn-scene.hpp"
 #include "buffer/dx11-buf-mesh.hpp"
 #include "buffer/dx11-buf-uniform.hpp"
+#include "dx11-check.hpp"
+#include "pipeline/dx11-pip-pipeline.hpp"
 #include "shader/dx11-shd-shadeless-colored-matte-nonreflective-shadowless-opaque.hpp"
 #include "shader/dx11-shd-shadeless-cube-matte-nonreflective-shadowless-opaque.hpp"
 #include "shader/dx11-shd-shadeless-d2-matte-nonreflective-shadowless-opaque.hpp"
-#include "pipeline/dx11-pip-pipeline.hpp"
-#include "../render/pipeline/rnd-pip-manager.hpp"
-#include "texture/dx11-txt-sampler.hpp"
 #include "texture/dx11-txt-2d.hpp"
 #include "texture/dx11-txt-cube.hpp"
-#include "dx11-check.hpp"
+#include "texture/dx11-txt-sampler.hpp"
 #include <cstdlib>
 #include <d3dcompiler.h>
 #include <vector>
@@ -118,36 +118,34 @@ gearoenix::dx11::Engine::Engine(system::Application* sys_app)
     swap_chain_desc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
     swap_chain_desc.Flags = 0;
 
-	UINT device_flag =
+    UINT device_flag =
 #ifdef DEBUG_MODE
-		D3D11_CREATE_DEVICE_DEBUG;
+        D3D11_CREATE_DEVICE_DEBUG;
 #else
-		D3D11_CREATE_DEVICE_DISABLE_GPU_TIMEOUT;
+        D3D11_CREATE_DEVICE_DISABLE_GPU_TIMEOUT;
 #endif
-	GXHRCHK(D3D11CreateDevice(
-		nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, device_flag,
-		&feature_level, 1, D3D11_SDK_VERSION,
-		&p_device, nullptr, nullptr));
-	for (unsigned int i = D3D11_MAX_MULTISAMPLE_SAMPLE_COUNT; i > 0; --i)
-	{
-		swap_chain_desc.SampleDesc.Count = i;
-		UINT sample_quality;
-		p_device->CheckMultisampleQualityLevels(
-			swap_chain_desc.BufferDesc.Format,
-			i, &sample_quality);
-		if (sample_quality > 0)
-		{
-			swap_chain_desc.SampleDesc.Quality = sample_quality - 1;
-			swap_chain_desc.SampleDesc.Count = i;
-			break;
-		}
-	}
-	p_device->Release();
-	p_device = nullptr;
-	GXHRCHK(D3D11CreateDeviceAndSwapChain(
-		nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, device_flag,
-		&feature_level, 1, D3D11_SDK_VERSION, &swap_chain_desc, &p_swapchain,
-		&p_device, nullptr, &p_immediate_context));
+    GXHRCHK(D3D11CreateDevice(
+        nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, device_flag,
+        &feature_level, 1, D3D11_SDK_VERSION,
+        &p_device, nullptr, nullptr));
+    for (unsigned int i = D3D11_MAX_MULTISAMPLE_SAMPLE_COUNT; i > 0; --i) {
+        swap_chain_desc.SampleDesc.Count = i;
+        UINT sample_quality;
+        p_device->CheckMultisampleQualityLevels(
+            swap_chain_desc.BufferDesc.Format,
+            i, &sample_quality);
+        if (sample_quality > 0) {
+            swap_chain_desc.SampleDesc.Quality = sample_quality - 1;
+            swap_chain_desc.SampleDesc.Count = i;
+            break;
+        }
+    }
+    p_device->Release();
+    p_device = nullptr;
+    GXHRCHK(D3D11CreateDeviceAndSwapChain(
+        nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, device_flag,
+        &feature_level, 1, D3D11_SDK_VERSION, &swap_chain_desc, &p_swapchain,
+        &p_device, nullptr, &p_immediate_context));
     if (FAILED(p_swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&back_buffer_ptr))) {
         UNEXPECTED;
     }
@@ -221,11 +219,11 @@ gearoenix::dx11::Engine::Engine(system::Application* sys_app)
     viewport.TopLeftX = 0.0f;
     viewport.TopLeftY = 0.0f;
     p_immediate_context->RSSetViewports(1, &viewport);
-	sampler = new texture::Sampler(this);
-	pipmgr = new render::pipeline::Manager(this);
-	//--------------------------------------------------------------------------------------------------------
+    sampler = new texture::Sampler(this);
+    pipmgr = new render::pipeline::Manager(this);
+    //--------------------------------------------------------------------------------------------------------
 
-	//--------------------------------------------------------------------------------------------------------
+    //--------------------------------------------------------------------------------------------------------
     //////////////////////////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////////////////////////////////
     /*const VertexType vertices[3] = {
@@ -394,16 +392,16 @@ void gearoenix::dx11::Engine::window_changed()
 void gearoenix::dx11::Engine::update()
 {
     p_immediate_context->ClearRenderTargetView(p_render_target_view, clear_color);
-	do_load_functions();
-	//--------------------------------------------------------------------------------------------------------
-	physics_engine->wait();
-	for (std::shared_ptr<render::scene::Scene>& scene : loaded_scenes) {
-		//scene->cast_shadow();
-		p_immediate_context->ClearDepthStencilView(p_depth_stencil_view, D3D11_CLEAR_DEPTH, 1.0f, 0);
-		scene->draw(nullptr);
-	}
-	physics_engine->update();
-	//--------------------------------------------------------------------------------------------------------
+    do_load_functions();
+    //--------------------------------------------------------------------------------------------------------
+    physics_engine->wait();
+    for (std::shared_ptr<render::scene::Scene>& scene : loaded_scenes) {
+        //scene->cast_shadow();
+        p_immediate_context->ClearDepthStencilView(p_depth_stencil_view, D3D11_CLEAR_DEPTH, 1.0f, 0);
+        scene->draw(nullptr);
+    }
+    physics_engine->update();
+    //--------------------------------------------------------------------------------------------------------
     // scene render in here
     /////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////
@@ -457,8 +455,8 @@ void gearoenix::dx11::Engine::terminate()
     //p_vertex_buffer = nullptr;
     ////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////
-	delete sampler;
-	sampler = nullptr;
+    delete sampler;
+    sampler = nullptr;
     p_raster_state->Release();
     p_raster_state = nullptr;
     p_depth_stencil_view->Release();
@@ -479,12 +477,12 @@ void gearoenix::dx11::Engine::terminate()
 
 gearoenix::render::texture::Texture2D* gearoenix::dx11::Engine::create_texture_2d(system::File* file, std::shared_ptr<core::EndCaller> c)
 {
-	return new texture::Texture2D(file, this, c);
+    return new texture::Texture2D(file, this, c);
 }
 
 gearoenix::render::texture::Cube* gearoenix::dx11::Engine::create_texture_cube(system::File* file, std::shared_ptr<core::EndCaller> c)
 {
-	return new texture::Cube(file, this, c);
+    return new texture::Cube(file, this, c);
 }
 
 gearoenix::render::buffer::Mesh* gearoenix::dx11::Engine::create_mesh(unsigned int vec, system::File* file, std::shared_ptr<core::EndCaller> c)
@@ -494,45 +492,43 @@ gearoenix::render::buffer::Mesh* gearoenix::dx11::Engine::create_mesh(unsigned i
 
 gearoenix::render::buffer::Uniform* gearoenix::dx11::Engine::create_uniform(unsigned int s, std::shared_ptr<core::EndCaller> c)
 {
-	return new buffer::Uniform(s, this, c);
+    return new buffer::Uniform(s, this, c);
 }
 
 gearoenix::render::shader::Shader* gearoenix::dx11::Engine::create_shader(core::Id sid, system::File* file, std::shared_ptr<core::EndCaller> c)
 {
-	render::shader::Id shader_id = (render::shader::Id) sid;
-	switch (shader_id)
-	{
-	case render::shader::Id::SHADELESS_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
-		return new shader::ShadelessColoredMatteNonreflectiveShadowlessOpaque(this, c);
-	case render::shader::Id::SHADELESS_CUBE_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
-		return new shader::ShadelessCubeMatteNonreflectiveShadowlessOpaque(this, c);
-	case render::shader::Id::SHADELESS_D2_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
-		return new shader::ShadelessD2MatteNonreflectiveShadowlessOpaque(this, c);
-	default:
-		UNIMPLEMENTED;
-		break;
-	}
+    render::shader::Id shader_id = (render::shader::Id)sid;
+    switch (shader_id) {
+    case render::shader::Id::SHADELESS_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
+        return new shader::ShadelessColoredMatteNonreflectiveShadowlessOpaque(this, c);
+    case render::shader::Id::SHADELESS_CUBE_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
+        return new shader::ShadelessCubeMatteNonreflectiveShadowlessOpaque(this, c);
+    case render::shader::Id::SHADELESS_D2_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
+        return new shader::ShadelessD2MatteNonreflectiveShadowlessOpaque(this, c);
+    default:
+        UNIMPLEMENTED;
+        break;
+    }
     return nullptr;
 }
 
 gearoenix::render::shader::Resources* gearoenix::dx11::Engine::create_shader_resources(core::Id sid, render::pipeline::Pipeline* p, render::buffer::Uniform* ub, std::shared_ptr<core::EndCaller> c)
 {
-	pipeline::Pipeline* pip = reinterpret_cast<pipeline::Pipeline*>(p);
-	buffer::Uniform* u = reinterpret_cast<buffer::Uniform*>(ub);
-	render::shader::Id shader_id = (render::shader::Id) sid;
-	switch (shader_id)
-	{
-	case render::shader::Id::SHADELESS_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
-		return new shader::ShadelessColoredMatteNonreflectiveShadowlessOpaque::Resources(this, pip, u);
-	case render::shader::Id::SHADELESS_CUBE_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
-		return new shader::ShadelessCubeMatteNonreflectiveShadowlessOpaque::Resources(this, pip, u);
-	case render::shader::Id::SHADELESS_D2_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
-		return new shader::ShadelessD2MatteNonreflectiveShadowlessOpaque::Resources(this, pip, u);
-	default:
-		UNIMPLEMENTED;
-		break;
-	}
-	return nullptr;
+    pipeline::Pipeline* pip = reinterpret_cast<pipeline::Pipeline*>(p);
+    buffer::Uniform* u = reinterpret_cast<buffer::Uniform*>(ub);
+    render::shader::Id shader_id = (render::shader::Id)sid;
+    switch (shader_id) {
+    case render::shader::Id::SHADELESS_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
+        return new shader::ShadelessColoredMatteNonreflectiveShadowlessOpaque::Resources(this, pip, u);
+    case render::shader::Id::SHADELESS_CUBE_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
+        return new shader::ShadelessCubeMatteNonreflectiveShadowlessOpaque::Resources(this, pip, u);
+    case render::shader::Id::SHADELESS_D2_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
+        return new shader::ShadelessD2MatteNonreflectiveShadowlessOpaque::Resources(this, pip, u);
+    default:
+        UNIMPLEMENTED;
+        break;
+    }
+    return nullptr;
 }
 
 gearoenix::render::pipeline::Pipeline* gearoenix::dx11::Engine::create_pipeline(core::Id sid, std::shared_ptr<core::EndCaller> c)
@@ -540,35 +536,34 @@ gearoenix::render::pipeline::Pipeline* gearoenix::dx11::Engine::create_pipeline(
     return new pipeline::Pipeline(sid, this, c);
 }
 
-ID3D11Device * gearoenix::dx11::Engine::get_device()
+ID3D11Device* gearoenix::dx11::Engine::get_device()
 {
-	return p_device;
+    return p_device;
 }
 
-const ID3D11Device * gearoenix::dx11::Engine::get_device() const
+const ID3D11Device* gearoenix::dx11::Engine::get_device() const
 {
-	return p_device;
+    return p_device;
 }
-
 
 ID3D11DeviceContext* gearoenix::dx11::Engine::get_context()
 {
-	return p_immediate_context;
+    return p_immediate_context;
 }
 
 const ID3D11DeviceContext* gearoenix::dx11::Engine::get_context() const
 {
-	return p_immediate_context;
+    return p_immediate_context;
 }
 
-gearoenix::dx11::texture::Sampler * gearoenix::dx11::Engine::get_sampler()
+gearoenix::dx11::texture::Sampler* gearoenix::dx11::Engine::get_sampler()
 {
-	return sampler;
+    return sampler;
 }
 
-const gearoenix::dx11::texture::Sampler * gearoenix::dx11::Engine::get_sampler() const 
+const gearoenix::dx11::texture::Sampler* gearoenix::dx11::Engine::get_sampler() const
 {
-	return sampler;
+    return sampler;
 }
 
 #endif

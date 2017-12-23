@@ -18,7 +18,7 @@ gearoenix::render::model::Model::Model(system::File* f, Engine* e, std::shared_p
     m.read(f);
     occloc.read(f);
     occrdss.read(f);
-    occrds = max(max(occrdss[0], occrdss[1]), occrdss[2]);
+    occrds = gxmax(gxmax(occrdss[0], occrdss[1]), occrdss[2]);
     core::Count mesh_count = 0;
     f->read(mesh_count);
     std::vector<core::Id> mesh_ids(mesh_count);

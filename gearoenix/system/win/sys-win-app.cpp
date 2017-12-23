@@ -2,10 +2,10 @@
 #ifdef USE_WINAPI
 //#define GEAROENIX_FULLSCREEN
 //#define GEAROENIX_NO_CURSOR
+#include "../../core/asset/cr-asset-manager.hpp"
+#include "../../core/cr-application.hpp"
 #include "../../core/cr-static.hpp"
 #include "../sys-log.hpp"
-#include "../../core/cr-application.hpp"
-#include "../../core/asset/cr-asset-manager.hpp"
 #ifdef USE_VULKAN
 #include "../../vulkan/vk-engine.hpp"
 #endif
@@ -262,7 +262,7 @@ gearoenix::system::Application::~Application()
 
 void gearoenix::system::Application::execute(core::Application* core_app)
 {
-	this->core_app = core_app;
+    this->core_app = core_app;
     MSG msg;
     while (running) {
         while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
@@ -311,7 +311,7 @@ unsigned int gearoenix::system::Application::get_height() const
 
 HWND gearoenix::system::Application::get_window()
 {
-	return window;
+    return window;
 }
 
 #endif // USE_WINAPI

@@ -74,18 +74,18 @@ gearoenix::render::pipeline::Manager* gearoenix::render::Engine::get_pipeline_ma
 
 void gearoenix::render::Engine::do_load_functions()
 {
-	std::vector<std::function<void()>> temp_functions;
-	#ifdef THREAD_SUPPORTED
-	load_functions_mutex.lock();
-	#endif
-	std::move(load_functions.begin(), load_functions.end(), std::back_inserter(temp_functions));
-	load_functions.clear();
-	#ifdef THREAD_SUPPORTED
-	load_functions_mutex.unlock();
-	#endif
-	for (std::function<void()>& f : temp_functions) {
-		f();
-	}
+    std::vector<std::function<void()>> temp_functions;
+#ifdef THREAD_SUPPORTED
+    load_functions_mutex.lock();
+#endif
+    std::move(load_functions.begin(), load_functions.end(), std::back_inserter(temp_functions));
+    load_functions.clear();
+#ifdef THREAD_SUPPORTED
+    load_functions_mutex.unlock();
+#endif
+    for (std::function<void()>& f : temp_functions) {
+        f();
+    }
 }
 void gearoenix::render::Engine::add_load_function(std::function<void()> fun)
 {

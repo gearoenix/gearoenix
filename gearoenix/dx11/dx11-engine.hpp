@@ -14,13 +14,13 @@ namespace gearoenix {
 namespace dx11 {
     namespace texture {
         class Texture2D;
-		class Sampler;
+        class Sampler;
     }
     class Engine : public render::Engine {
     private:
         unsigned int graphic_memory_size = 0;
         float clear_color[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-		texture::Sampler* sampler = nullptr;
+        texture::Sampler* sampler = nullptr;
         IDXGISwapChain* p_swapchain = nullptr;
         ID3D11Device* p_device = nullptr;
         ID3D11DeviceContext* p_immediate_context = nullptr;
@@ -48,12 +48,12 @@ namespace dx11 {
         render::shader::Shader* create_shader(core::Id sid, system::File* file, std::shared_ptr<core::EndCaller> c);
         render::shader::Resources* create_shader_resources(core::Id sid, render::pipeline::Pipeline* p, render::buffer::Uniform* ub, std::shared_ptr<core::EndCaller> c);
         render::pipeline::Pipeline* create_pipeline(core::Id sid, std::shared_ptr<core::EndCaller> c);
-		ID3D11Device* get_device();
-		const ID3D11Device* get_device() const;
-		ID3D11DeviceContext* get_context();
-		const ID3D11DeviceContext* get_context() const;
-		texture::Sampler* get_sampler();
-		const texture::Sampler* get_sampler() const;
+        ID3D11Device* get_device();
+        const ID3D11Device* get_device() const;
+        ID3D11DeviceContext* get_context();
+        const ID3D11DeviceContext* get_context() const;
+        texture::Sampler* get_sampler();
+        const texture::Sampler* get_sampler() const;
     };
 }
 }

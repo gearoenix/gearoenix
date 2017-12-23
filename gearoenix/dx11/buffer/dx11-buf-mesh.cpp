@@ -1,16 +1,16 @@
 #include "dx11-buf-mesh.hpp"
 #ifdef USE_DIRECTX11
+#include "../../core/cr-static.hpp"
 #include "../../system/sys-file.hpp"
 #include "../../system/sys-log.hpp"
 #include "../dx11-check.hpp"
 #include "../dx11-engine.hpp"
-#include "../../core/cr-static.hpp"
 
 gearoenix::dx11::buffer::Mesh::Mesh(
     unsigned int vec, system::File* f,
     Engine* e, std::shared_ptr<core::EndCaller> c)
     : render::buffer::Mesh(e)
-	, stride(vec * sizeof(core::Real))
+    , stride(vec * sizeof(core::Real))
 {
     core::Count cnt;
     f->read(cnt);
@@ -60,7 +60,7 @@ void gearoenix::dx11::buffer::Mesh::bind()
 
 void gearoenix::dx11::buffer::Mesh::draw()
 {
-	reinterpret_cast<Engine*>(engine)->get_context()->DrawIndexed(ic, 0, 0);
+    reinterpret_cast<Engine*>(engine)->get_context()->DrawIndexed(ic, 0, 0);
 }
 
 #endif

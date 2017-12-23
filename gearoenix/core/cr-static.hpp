@@ -3,8 +3,8 @@
 #ifndef countof
 #define countof(x) (sizeof(x) / sizeof(x[0]))
 #endif
-#ifndef max
-#define max(x, y) (((x) > (y)) ? (x) : (y))
+#ifndef gxmax
+#define gxmax(x, y) (((x) > (y)) ? (x) : (y))
 #endif
 #ifdef setz
 #error "setz already defined"

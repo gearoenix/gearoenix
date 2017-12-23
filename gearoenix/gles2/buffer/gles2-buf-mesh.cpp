@@ -6,6 +6,7 @@
 #include "../gles2.hpp"
 
 gearoenix::gles2::buffer::Mesh::Mesh(unsigned int vec, system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c)
+    : render::buffer::Mesh(e)
 {
     core::Count cnt;
     f->read(cnt);
