@@ -94,7 +94,7 @@ void gearoenix::render::material::DirectionalColoredSpeculatedBakedFullOpaque::u
 
 void gearoenix::render::material::DirectionalColoredSpeculatedBakedFullOpaque::bind(texture::Texture2D* shadow_texture)
 {
-	ub->update(&u, sizeof(Uniform));
+    ub->update(&u, sizeof(Uniform));
     shdrsc->set_shadow_texture(shadow_texture);
     shdrsc->bind();
 }

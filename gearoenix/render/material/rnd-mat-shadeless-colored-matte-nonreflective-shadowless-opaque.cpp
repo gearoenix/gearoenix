@@ -18,8 +18,8 @@ gearoenix::render::material::ShadelessColoredMatteNonreflectiveShadowlessOpaque:
 }
 
 gearoenix::render::material::ShadelessColoredMatteNonreflectiveShadowlessOpaque::ShadelessColoredMatteNonreflectiveShadowlessOpaque(core::Id sid, system::File* f, Engine* e, std::shared_ptr<core::EndCaller> end)
-    : SHADER_ID(sid)
-	, Material(sid, sizeof(u), e, end)
+    : Material(sid, sizeof(u), e, end)
+    , SHADER_ID(sid)
 {
     u.color.read(f);
     shdrsc = reinterpret_cast<Resources*>(e->create_shader_resources(SHADER_ID, pl.get(), ub, end));

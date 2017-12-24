@@ -38,33 +38,33 @@ LRESULT CALLBACK gearoenix::system::Application::wnd_proc(HWND hwnd, UINT umessa
 
 LRESULT CALLBACK gearoenix::system::Application::handler(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam)
 {
-	switch (umessage) {
-	case WM_CLOSE:
-		/// TODO: proper termination
-		running = false;
-		DestroyWindow(hwnd);
-		PostQuitMessage(0);
-		break;
-	case WM_PAINT:
-		ValidateRect(hwnd, NULL);
-		break;
-	case WM_KEYDOWN:
-		switch (wparam) {
-		case 0x50: /// p
-			/// TODO pause
-			break;
-		case VK_F1:
-			/*if (enableTextOverlay) {
+    switch (umessage) {
+    case WM_CLOSE:
+        /// TODO: proper termination
+        running = false;
+        DestroyWindow(hwnd);
+        PostQuitMessage(0);
+        break;
+    case WM_PAINT:
+        ValidateRect(hwnd, NULL);
+        break;
+    case WM_KEYDOWN:
+        switch (wparam) {
+        case 0x50: /// p
+            /// TODO pause
+            break;
+        case VK_F1:
+            /*if (enableTextOverlay) {
 			textOverlay->visible = !textOverlay->visible;
 			}*/
-			break;
-		case VK_ESCAPE:
-			running = false;
-			DestroyWindow(hwnd);
-			PostQuitMessage(0);
-			break;
-		}
-		/*if (camera.firstperson) {
+            break;
+        case VK_ESCAPE:
+            running = false;
+            DestroyWindow(hwnd);
+            PostQuitMessage(0);
+            break;
+        }
+        /*if (camera.firstperson) {
 		switch (wParam)
 		{
 		case KEY_W:
@@ -81,79 +81,79 @@ LRESULT CALLBACK gearoenix::system::Application::handler(HWND hwnd, UINT umessag
 		break;
 		}
 		}*/
-		break;
-	case WM_KEYUP:
-		// if (camera.firstperson) {
-		//	switch (wParam)
-		//	{
-		//	case 0x57: // W
-		//		camera.keys.up = false;
-		//		break;
-		//	case 0x53: // S
-		//		camera.keys.down = false;
-		//		break;
-		//	case 0x41: // A
-		//		camera.keys.left = false;
-		//		break;
-		//	case 0x44: // D
-		//		camera.keys.right = false;
-		//		break;
-		//	}
-		//}
-		break;
-	case WM_RBUTTONDOWN:
-		mouse_prepos_x = LOWORD(lparam);
-		mouse_prepos_y = HIWORD(lparam);
-		core_app->on_mouse(core::Application::MouseButton::RIGHT, core::Application::ButtonAction::PRESS, (core::Real)mouse_prepos_x, (core::Real)mouse_prepos_y);
-		break;
-	case WM_LBUTTONDOWN:
-		mouse_prepos_x = LOWORD(lparam);
-		mouse_prepos_y = HIWORD(lparam);
-		core_app->on_mouse(core::Application::MouseButton::LEFT, core::Application::ButtonAction::PRESS, (core::Real)mouse_prepos_x, (core::Real)mouse_prepos_y);
-		break;
-	case WM_MBUTTONDOWN:
-		mouse_prepos_x = LOWORD(lparam);
-		mouse_prepos_y = HIWORD(lparam);
-		core_app->on_mouse(core::Application::MouseButton::MIDDLE, core::Application::ButtonAction::PRESS, (core::Real)mouse_prepos_x, (core::Real)mouse_prepos_y);
-		break;
-	case WM_LBUTTONUP:
-		mouse_prepos_x = LOWORD(lparam);
-		mouse_prepos_y = HIWORD(lparam);
-		core_app->on_mouse(core::Application::MouseButton::LEFT, core::Application::ButtonAction::RELEASE, (core::Real)mouse_prepos_x, (core::Real)mouse_prepos_y);
-		break;
-	case WM_MOUSEWHEEL:
-		core_app->on_scroll(((core::Real)GET_WHEEL_DELTA_WPARAM(wparam)) * 0.01f);
-		break;
-	case WM_MOUSEMOVE: {
-		UINT posx = LOWORD(lparam);
-		UINT posy = HIWORD(lparam);
-		core_app->on_mouse_move((core::Real)mouse_prepos_x - (core::Real)posx, (core::Real)mouse_prepos_y - (core::Real)posy);
-		mouse_prepos_x = posx;
-		mouse_prepos_y = posy;
-		break;
-	}
-	case WM_SIZE:
-		// if ((prepared) && (wParam != SIZE_MINIMIZED))
-		//{
-		//	if ((resizing) || ((wParam == SIZE_MAXIMIZED) || (wParam ==
-		// SIZE_RESTORED)))
-		//	{
-		//		destWidth = LOWORD(lParam);
-		//		destHeight = HIWORD(lParam);
-		//		windowResize();
-		//	}
-		//}
-		break;
-	case WM_SHOWWINDOW:
-		window_is_up = true;
-		break;
-	case WM_ENTERSIZEMOVE:
-		// resizing = true;
-		break;
-	case WM_EXITSIZEMOVE:
-		// resizing = false;
-		break;
-	}
+        break;
+    case WM_KEYUP:
+        // if (camera.firstperson) {
+        //	switch (wParam)
+        //	{
+        //	case 0x57: // W
+        //		camera.keys.up = false;
+        //		break;
+        //	case 0x53: // S
+        //		camera.keys.down = false;
+        //		break;
+        //	case 0x41: // A
+        //		camera.keys.left = false;
+        //		break;
+        //	case 0x44: // D
+        //		camera.keys.right = false;
+        //		break;
+        //	}
+        //}
+        break;
+    case WM_RBUTTONDOWN:
+        mouse_prepos_x = LOWORD(lparam);
+        mouse_prepos_y = HIWORD(lparam);
+        core_app->on_mouse(core::Application::MouseButton::RIGHT, core::Application::ButtonAction::PRESS, (core::Real)mouse_prepos_x, (core::Real)mouse_prepos_y);
+        break;
+    case WM_LBUTTONDOWN:
+        mouse_prepos_x = LOWORD(lparam);
+        mouse_prepos_y = HIWORD(lparam);
+        core_app->on_mouse(core::Application::MouseButton::LEFT, core::Application::ButtonAction::PRESS, (core::Real)mouse_prepos_x, (core::Real)mouse_prepos_y);
+        break;
+    case WM_MBUTTONDOWN:
+        mouse_prepos_x = LOWORD(lparam);
+        mouse_prepos_y = HIWORD(lparam);
+        core_app->on_mouse(core::Application::MouseButton::MIDDLE, core::Application::ButtonAction::PRESS, (core::Real)mouse_prepos_x, (core::Real)mouse_prepos_y);
+        break;
+    case WM_LBUTTONUP:
+        mouse_prepos_x = LOWORD(lparam);
+        mouse_prepos_y = HIWORD(lparam);
+        core_app->on_mouse(core::Application::MouseButton::LEFT, core::Application::ButtonAction::RELEASE, (core::Real)mouse_prepos_x, (core::Real)mouse_prepos_y);
+        break;
+    case WM_MOUSEWHEEL:
+        core_app->on_scroll(((core::Real)GET_WHEEL_DELTA_WPARAM(wparam)) * 0.01f);
+        break;
+    case WM_MOUSEMOVE: {
+        UINT posx = LOWORD(lparam);
+        UINT posy = HIWORD(lparam);
+        core_app->on_mouse_move((core::Real)mouse_prepos_x - (core::Real)posx, (core::Real)mouse_prepos_y - (core::Real)posy);
+        mouse_prepos_x = posx;
+        mouse_prepos_y = posy;
+        break;
+    }
+    case WM_SIZE:
+        // if ((prepared) && (wParam != SIZE_MINIMIZED))
+        //{
+        //	if ((resizing) || ((wParam == SIZE_MAXIMIZED) || (wParam ==
+        // SIZE_RESTORED)))
+        //	{
+        //		destWidth = LOWORD(lParam);
+        //		destHeight = HIWORD(lParam);
+        //		windowResize();
+        //	}
+        //}
+        break;
+    case WM_SHOWWINDOW:
+        window_is_up = true;
+        break;
+    case WM_ENTERSIZEMOVE:
+        // resizing = true;
+        break;
+    case WM_EXITSIZEMOVE:
+        // resizing = false;
+        break;
+    }
     return (DefWindowProc(hwnd, umessage, wparam, lparam));
 }
 

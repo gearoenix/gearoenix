@@ -87,7 +87,7 @@ void gearoenix::render::material::DirectionalD2SpeculatedNonreflectiveFullOpaque
 
 void gearoenix::render::material::DirectionalD2SpeculatedNonreflectiveFullOpaque::bind(texture::Texture2D* shadow_texture)
 {
-	ub->update(&u, sizeof(Uniform));
+    ub->update(&u, sizeof(Uniform));
     shdrsc->set_shadow_texture(shadow_texture);
     shdrsc->bind();
 }

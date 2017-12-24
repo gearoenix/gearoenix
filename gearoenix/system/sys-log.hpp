@@ -14,10 +14,11 @@
 #define GXLOGE(s)                                                              \
     std::cout << APPLICATION_NAME << " ERROR: " << s << " " << __FILE__ << " " \
               << __LINE__ << std::endl;
-#define GXLOGF(s) {  \
-    GXLOGE(s);       \
-    std::terminate();\
-}
+#define GXLOGF(s)         \
+    {                     \
+        GXLOGE(s);        \
+        std::terminate(); \
+    }
 #else
 #include <fstream>
 namespace gearoenix {
@@ -30,22 +31,26 @@ namespace system {
     };
 }
 }
-#define GXLOGI(s) {                                                           \
-    gearoenix::system::Log::info << APPLICATION_NAME << " " << s << " "       \
-                                 << __FILE__ << " " << __LINE__ << std::endl; \
-}
-#define GXLOGD(s) {                                                           \
-    gearoenix::system::Log::debug << APPLICATION_NAME << " " << s << " "      \
-                                  << __FILE__ << " " << __LINE__ << std::endl;\
-}
-#define GXLOGE(s) {                                                           \
-    gearoenix::system::Log::error << APPLICATION_NAME << " " << s << " "      \
-                                  << __FILE__ << " " << __LINE__ << std::endl;\
-}
-#define GXLOGF(s) {   \
-    GXLOGE(s);        \
-    std::terminate(); \
-}
+#define GXLOGI(s)                                                                 \
+    {                                                                             \
+        gearoenix::system::Log::info << APPLICATION_NAME << " " << s << " "       \
+                                     << __FILE__ << " " << __LINE__ << std::endl; \
+    }
+#define GXLOGD(s)                                                                  \
+    {                                                                              \
+        gearoenix::system::Log::debug << APPLICATION_NAME << " " << s << " "       \
+                                      << __FILE__ << " " << __LINE__ << std::endl; \
+    }
+#define GXLOGE(s)                                                                  \
+    {                                                                              \
+        gearoenix::system::Log::error << APPLICATION_NAME << " " << s << " "       \
+                                      << __FILE__ << " " << __LINE__ << std::endl; \
+    }
+#define GXLOGF(s)         \
+    {                     \
+        GXLOGE(s);        \
+        std::terminate(); \
+    }
 #endif // IN_ANDROID
 #define TODO GXLOGE("TODO")
 #define UNEXPECTED GXLOGF("Unexpected")

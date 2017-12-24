@@ -99,7 +99,7 @@ void gearoenix::render::material::DirectionalD2SpeculatedBakedFullOpaque::update
 
 void gearoenix::render::material::DirectionalD2SpeculatedBakedFullOpaque::bind(texture::Texture2D* shadow_texture)
 {
-	ub->update(&u, sizeof(Uniform));
+    ub->update(&u, sizeof(Uniform));
     shdrsc->set_shadow_texture(shadow_texture);
     shdrsc->bind();
 }

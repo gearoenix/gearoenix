@@ -28,16 +28,16 @@ namespace dx11 {
         ID3D11Texture2D* main_dsb = nullptr;
         ID3D11DepthStencilState* main_dss = nullptr;
         ID3D11DepthStencilView* main_dsv = nullptr;
-		D3D11_VIEWPORT main_viewport;
+        D3D11_VIEWPORT main_viewport;
         ID3D11RasterizerState* raster = nullptr;
-		ID3D11RenderTargetView* shadow_rtv = nullptr;
-		ID3D11Texture2D* shadow_dsb = nullptr;
-		ID3D11DepthStencilView* shadow_dsv = nullptr;
-		D3D11_VIEWPORT shadow_viewport;
-		texture::Texture2D *shadow_txt = nullptr;
-		void initial_shadow();
-		void start_shadow_casting();
-		void terminate_shadow();
+        ID3D11RenderTargetView* shadow_rtv = nullptr;
+        ID3D11Texture2D* shadow_dsb = nullptr;
+        ID3D11DepthStencilView* shadow_dsv = nullptr;
+        D3D11_VIEWPORT shadow_viewport;
+        texture::Texture2D* shadow_txt = nullptr;
+        void initial_shadow();
+        void start_shadow_casting();
+        void terminate_shadow();
 #ifdef PROFILING_MODE
         unsigned int prof_frames_count = 0;
         std::chrono::high_resolution_clock::time_point prof_last_time_draw;

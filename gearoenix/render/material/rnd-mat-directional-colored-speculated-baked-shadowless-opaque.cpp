@@ -84,6 +84,6 @@ void gearoenix::render::material::DirectionalColoredSpeculatedBakedShadowlessOpa
 
 void gearoenix::render::material::DirectionalColoredSpeculatedBakedShadowlessOpaque::bind(texture::Texture2D*)
 {
-	ub->update(&u, sizeof(Uniform));
+    ub->update(&u, sizeof(Uniform));
     shdrsc->bind();
 }

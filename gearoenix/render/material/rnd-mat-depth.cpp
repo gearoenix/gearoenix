@@ -52,6 +52,6 @@ void gearoenix::render::material::Depth::update(const scene::Scene*, const model
 
 void gearoenix::render::material::Depth::bind(texture::Texture2D*)
 {
-	ub->update(&u, sizeof(Uniform));
+    ub->update(&u, sizeof(Uniform));
     shdrsc->bind();
 }

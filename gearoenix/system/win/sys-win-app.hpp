@@ -25,7 +25,7 @@ namespace system {
         HWND window;
         bool running = true;
         bool window_is_up = false;
-		UINT mouse_prepos_x = 0, mouse_prepos_y = 0;
+        UINT mouse_prepos_x = 0, mouse_prepos_y = 0;
         static LRESULT CALLBACK wnd_proc(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam);
         LRESULT CALLBACK handler(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam);
 
