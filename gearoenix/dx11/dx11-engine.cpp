@@ -23,9 +23,10 @@
 #include <d3dcompiler.h>
 #include <vector>
 
+#define SHADOW_WIDTH 1024
+
 void gearoenix::dx11::Engine::initial_shadow()
 {
-#define SHADOW_WIDTH 1024
     D3D11_TEXTURE2D_DESC tdesc;
     GXSETZ(tdesc);
     tdesc.Width = SHADOW_WIDTH;
@@ -258,14 +259,13 @@ adapter_found_label:
     context->OMSetRenderTargets(1, &main_rtv, main_dsv);
     D3D11_RASTERIZER_DESC raster_desc;
     GXSETZ(raster_desc);
-    raster_desc.AntialiasedLineEnable = false;
+    raster_desc.AntialiasedLineEnable = true;
     raster_desc.CullMode = D3D11_CULL_BACK;
-    raster_desc.DepthBias = 0;
     raster_desc.DepthBiasClamp = 0.0f;
     raster_desc.DepthClipEnable = true;
     raster_desc.FillMode = D3D11_FILL_SOLID;
     raster_desc.FrontCounterClockwise = true;
-    raster_desc.MultisampleEnable = false;
+    raster_desc.MultisampleEnable = true;
     raster_desc.ScissorEnable = false;
     raster_desc.SlopeScaledDepthBias = 0.0f;
     GXHRCHK(device->CreateRasterizerState(&raster_desc, &raster));
