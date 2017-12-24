@@ -66,10 +66,10 @@ void gearoenix::render::material::DirectionalColoredSpeculatedNonreflectiveShado
     if (color_changed || sun->get_color_changed())
         u.sun_color = sun->get_color() * color;
     color_changed = true;
-    ub->update(&u, sizeof(Uniform));
 }
 
 void gearoenix::render::material::DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque::bind(texture::Texture2D*)
 {
+	ub->update(&u, sizeof(Uniform));
     shdrsc->bind();
 }

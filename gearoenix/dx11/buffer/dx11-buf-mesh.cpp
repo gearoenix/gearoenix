@@ -29,8 +29,8 @@ gearoenix::dx11::buffer::Mesh::Mesh(
     ID3D11Device* dev = e->get_device();
     D3D11_BUFFER_DESC desc;
     D3D11_SUBRESOURCE_DATA buf_data;
-    setz(desc);
-    setz(buf_data);
+    GXSETZ(desc);
+    GXSETZ(buf_data);
     desc.Usage = D3D11_USAGE_IMMUTABLE;
     desc.ByteWidth = vs;
     desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;

@@ -63,10 +63,10 @@ void gearoenix::render::material::DirectionalColoredMatteNonreflectiveShadowless
         u.sun_color = sun->get_color() * color;
     }
     color_changed = false;
-    ub->update(&u, sizeof(Uniform));
 }
 
 void gearoenix::render::material::DirectionalColoredMatteNonreflectiveShadowlessOpaque::bind(texture::Texture2D*)
 {
+	ub->update(&u, sizeof(Uniform));
     shdrsc->bind();
 }

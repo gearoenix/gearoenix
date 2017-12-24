@@ -16,7 +16,7 @@ namespace render {
     namespace material {
         class ShadelessColoredMatteNonreflectiveShadowlessOpaque : public Material {
         public:
-            const static core::Id SHADER_ID;
+            const core::Id SHADER_ID;
             class Resources : public shader::Resources {
             public:
                 Resources(Engine* e, pipeline::Pipeline* pip, buffer::Uniform* u);
@@ -31,7 +31,7 @@ namespace render {
             Resources* shdrsc;
 
         public:
-            ShadelessColoredMatteNonreflectiveShadowlessOpaque(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> end);
+            ShadelessColoredMatteNonreflectiveShadowlessOpaque(core::Id sid, system::File* f, Engine* e, std::shared_ptr<core::EndCaller> end);
             ~ShadelessColoredMatteNonreflectiveShadowlessOpaque();
             unsigned int get_vertex_elements_count() const;
             core::Id get_shader_id() const;

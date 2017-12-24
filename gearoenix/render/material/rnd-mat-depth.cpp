@@ -48,10 +48,10 @@ bool gearoenix::render::material::Depth::needs_dbm() const
 void gearoenix::render::material::Depth::update(const scene::Scene*, const model::Model* m)
 {
     u.mvp = m->get_sun_mvp();
-    ub->update(&u, sizeof(Uniform));
 }
 
 void gearoenix::render::material::Depth::bind(texture::Texture2D*)
 {
+	ub->update(&u, sizeof(Uniform));
     shdrsc->bind();
 }

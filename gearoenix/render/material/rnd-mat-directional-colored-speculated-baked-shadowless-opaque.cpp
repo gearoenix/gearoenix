@@ -80,10 +80,10 @@ void gearoenix::render::material::DirectionalColoredSpeculatedBakedShadowlessOpa
     u.eye = cam->get_location();
     u.vp = cam->get_view_projection();
     color_changed = false;
-    ub->update(&u, sizeof(Uniform));
 }
 
 void gearoenix::render::material::DirectionalColoredSpeculatedBakedShadowlessOpaque::bind(texture::Texture2D*)
 {
+	ub->update(&u, sizeof(Uniform));
     shdrsc->bind();
 }

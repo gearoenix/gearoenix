@@ -121,17 +121,16 @@ LRESULT CALLBACK gearoenix::system::Application::handler(HWND hwnd, UINT umessag
 		mouse_prepos_y = HIWORD(lparam);
 		core_app->on_mouse(core::Application::MouseButton::LEFT, core::Application::ButtonAction::RELEASE, (core::Real)mouse_prepos_x, (core::Real)mouse_prepos_y);
 		break;
-	case WM_MOUSEWHEEL: {
-		short wheel_delta = GET_WHEEL_DELTA_WPARAM(wparam);
-		core_app->on_scroll(((core::Real)wheel_delta) * 0.01f);
+	case WM_MOUSEWHEEL:
+		core_app->on_scroll(((core::Real)GET_WHEEL_DELTA_WPARAM(wparam)) * 0.01f);
 		break;
-	}
 	case WM_MOUSEMOVE: {
 		UINT posx = LOWORD(lparam);
 		UINT posy = HIWORD(lparam);
 		core_app->on_mouse_move((core::Real)mouse_prepos_x - (core::Real)posx, (core::Real)mouse_prepos_y - (core::Real)posy);
 		mouse_prepos_x = posx;
 		mouse_prepos_y = posy;
+		break;
 	}
 	case WM_SIZE:
 		// if ((prepared) && (wParam != SIZE_MINIMIZED))
@@ -180,7 +179,7 @@ gearoenix::system::Application::Application()
     screen_height = GetSystemMetrics(SM_CYSCREEN);
 #ifdef GEAROENIX_FULLSCREEN
     DEVMODE screen_settings;
-    setz(screen_settings);
+    GXSETZ(screen_settings);
     screen_settings.dmSize = sizeof(screen_settings);
     screen_settings.dmPelsWidth = (unsigned long)screen_width;
     screen_settings.dmPelsHeight = (unsigned long)screen_height;

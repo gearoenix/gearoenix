@@ -95,11 +95,11 @@ void gearoenix::render::material::DirectionalD2SpeculatedBakedFullOpaque::update
     u.sun = sun->get_direction();
     u.sun_color = sun->get_color();
     u.vp = cam->get_view_projection();
-    ub->update(&u, sizeof(Uniform));
 }
 
 void gearoenix::render::material::DirectionalD2SpeculatedBakedFullOpaque::bind(texture::Texture2D* shadow_texture)
 {
+	ub->update(&u, sizeof(Uniform));
     shdrsc->set_shadow_texture(shadow_texture);
     shdrsc->bind();
 }

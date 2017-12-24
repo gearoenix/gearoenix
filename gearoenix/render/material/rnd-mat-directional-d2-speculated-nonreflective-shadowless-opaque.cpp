@@ -77,10 +77,10 @@ void gearoenix::render::material::DirectionalD2SpeculatedNonreflectiveShadowless
     u.vp = cam->get_view_projection();
     u.sun = sun->get_direction();
     u.sun_color = sun->get_color();
-    ub->update(&u, sizeof(Uniform));
 }
 
 void gearoenix::render::material::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque::bind(texture::Texture2D*)
 {
+	ub->update(&u, sizeof(Uniform));
     shdrsc->bind();
 }

@@ -12,6 +12,7 @@
 #include "buffer/dx11-buf-uniform.hpp"
 #include "dx11-check.hpp"
 #include "pipeline/dx11-pip-pipeline.hpp"
+#include "shader/dx11-shd-depth.hpp"
 #include "shader/dx11-shd-shadeless-colored-matte-nonreflective-shadowless-opaque.hpp"
 #include "shader/dx11-shd-shadeless-cube-matte-nonreflective-shadowless-opaque.hpp"
 #include "shader/dx11-shd-shadeless-d2-matte-nonreflective-shadowless-opaque.hpp"
@@ -21,25 +22,82 @@
 #include <cstdlib>
 #include <d3dcompiler.h>
 #include <vector>
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//namespace gearoenix {
-//struct VertexType {
-//    math::Vec3 position;
-//    math::Vec3 color;
-//};
-//static ID3D11Buffer* p_vertex_buffer = nullptr;
-//static ID3D11Buffer* p_index_buffer = nullptr;
-//static ID3D11Buffer* p_uniform_buffer = nullptr;
-//static ID3D11VertexShader* p_vertex_shader = nullptr;
-//static ID3D11PixelShader* p_fragment_shader = nullptr;
-//static ID3D11InputLayout* p_input_layout = nullptr;
-//struct UniformBufferType {
-//    math::Mat4x4 mvp;
-//};
-//}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void gearoenix::dx11::Engine::initial_shadow()
+{
+#define SHADOW_WIDTH 1024
+	D3D11_TEXTURE2D_DESC tdesc;
+	GXSETZ(tdesc);
+	tdesc.Width = SHADOW_WIDTH;
+	tdesc.Height = SHADOW_WIDTH;
+	tdesc.MipLevels = 1;
+	tdesc.ArraySize = 1;
+	tdesc.Format = DXGI_FORMAT_R32_FLOAT;
+	tdesc.SampleDesc.Count = 1;
+	tdesc.Usage = D3D11_USAGE_DEFAULT;
+	tdesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
+	ID3D11Texture2D* txt = nullptr;
+	GXHRCHK(device->CreateTexture2D(&tdesc, nullptr, &txt));
+	D3D11_RENDER_TARGET_VIEW_DESC rdesc;
+	GXSETZ(rdesc);
+	rdesc.Format = tdesc.Format;
+	rdesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+	rdesc.Texture2D.MipSlice = 0;
+	GXHRCHK(device->CreateRenderTargetView(txt, &rdesc, &shadow_rtv));
+	D3D11_SHADER_RESOURCE_VIEW_DESC sdesc;
+	GXSETZ(sdesc);
+	sdesc.Format = tdesc.Format;
+	sdesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	sdesc.Texture2D.MipLevels = 1;
+	ID3D11ShaderResourceView* shadow_srv;
+	GXHRCHK(device->CreateShaderResourceView(txt, &sdesc, &shadow_srv));
+	shadow_txt = new texture::Texture2D(this, shadow_srv);
+	GXSETZ(tdesc);
+	tdesc.Width = SHADOW_WIDTH;
+	tdesc.Height = SHADOW_WIDTH;
+	tdesc.MipLevels = 1;
+	tdesc.ArraySize = 1;
+	tdesc.Format = DXGI_FORMAT_D32_FLOAT;
+	tdesc.SampleDesc.Count = 1;
+	tdesc.Usage = D3D11_USAGE_DEFAULT;
+	tdesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+	GXHRCHK(device->CreateTexture2D(&tdesc, nullptr, &shadow_dsb));
+	D3D11_DEPTH_STENCIL_VIEW_DESC ddesc;
+	GXSETZ(ddesc);
+	ddesc.Format = tdesc.Format;
+	ddesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+	ddesc.Texture2D.MipSlice = 0;
+	GXHRCHK(device->CreateDepthStencilView(shadow_dsb, &ddesc, &shadow_dsv));
+	shadow_viewport.Width = (float)SHADOW_WIDTH;
+	shadow_viewport.Height = (float)SHADOW_WIDTH;
+	shadow_viewport.MinDepth = 0.0f;
+	shadow_viewport.MaxDepth = 1.0f;
+	shadow_viewport.TopLeftX = 0.0f;
+	shadow_viewport.TopLeftY = 0.0f;
+	txt->Release();
+}
+
+void gearoenix::dx11::Engine::start_shadow_casting()
+{
+	context->OMSetRenderTargets(1, &shadow_rtv, shadow_dsv);
+	context->RSSetViewports(1, &shadow_viewport);
+	const float color[4] = { 0.0, 0.0, 0.0, 1.0 };
+	context->ClearRenderTargetView(shadow_rtv, color);
+	context->ClearDepthStencilView(shadow_dsv, D3D11_CLEAR_DEPTH, 1.0f, 0);
+}
+
+void gearoenix::dx11::Engine::terminate_shadow()
+{
+	shadow_dsv->Release();
+	shadow_dsv = nullptr;
+	shadow_dsb->Release();
+	shadow_dsb = nullptr;
+	shadow_rtv->Release();
+	shadow_rtv = nullptr;
+	delete shadow_txt;
+	shadow_txt = nullptr;
+}
+
 gearoenix::dx11::Engine::Engine(system::Application* sys_app)
     : render::Engine(sys_app)
 {
@@ -92,7 +150,7 @@ adapter_found_label:
 	if (adapter != nullptr) adapter->Release();
 	if (factory != nullptr) factory->Release();
 	DXGI_SWAP_CHAIN_DESC swap_chain_desc;
-    setz(swap_chain_desc);
+    GXSETZ(swap_chain_desc);
     swap_chain_desc.BufferCount = 1;
     swap_chain_desc.BufferDesc.Width = sysapp->get_width();
     swap_chain_desc.BufferDesc.Height = sysapp->get_height();
@@ -123,19 +181,19 @@ adapter_found_label:
 	if (FAILED(D3D11CreateDevice(
 		nullptr, driver_type, nullptr, device_flag,
 		&feature_level, 1, D3D11_SDK_VERSION,
-		&p_device, nullptr, nullptr))) {
+		&device, nullptr, nullptr))) {
 #ifdef DEBUG_MODE
 		driver_type = D3D_DRIVER_TYPE_REFERENCE;
 		GXHRCHK(D3D11CreateDevice(
 			nullptr, driver_type, nullptr, device_flag,
 			&feature_level, 1, D3D11_SDK_VERSION,
-			&p_device, nullptr, nullptr));
+			&device, nullptr, nullptr));
 #endif
 	}
     for (unsigned int i = D3D11_MAX_MULTISAMPLE_SAMPLE_COUNT; i > 0; --i) {
         swap_chain_desc.SampleDesc.Count = i;
         UINT sample_quality;
-        p_device->CheckMultisampleQualityLevels(
+        device->CheckMultisampleQualityLevels(
             swap_chain_desc.BufferDesc.Format,
             i, &sample_quality);
         if (sample_quality > 0) {
@@ -146,19 +204,19 @@ adapter_found_label:
 			break;
         }
     }
-    p_device->Release();
-    p_device = nullptr;
+    device->Release();
+    device = nullptr;
 	GXHRCHK(D3D11CreateDeviceAndSwapChain(
 		nullptr, driver_type, nullptr, device_flag,
-		&feature_level, 1, D3D11_SDK_VERSION, &swap_chain_desc, &p_swapchain,
-		&p_device, nullptr, &p_immediate_context));
+		&feature_level, 1, D3D11_SDK_VERSION, &swap_chain_desc, &swapchain,
+		&device, nullptr, &context));
 	ID3D11Texture2D* back_buffer_ptr;
-	GXHRCHK(p_swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&back_buffer_ptr));
-	GXHRCHK(p_device->CreateRenderTargetView(back_buffer_ptr, NULL, &p_render_target_view));
+	GXHRCHK(swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&back_buffer_ptr));
+	GXHRCHK(device->CreateRenderTargetView(back_buffer_ptr, NULL, &main_rtv));
     back_buffer_ptr->Release();
     back_buffer_ptr = nullptr;
 	D3D11_TEXTURE2D_DESC depth_buffer_desc;
-    setz(depth_buffer_desc);
+    GXSETZ(depth_buffer_desc);
     depth_buffer_desc.Width = sysapp->get_width();
     depth_buffer_desc.Height = sysapp->get_height();
     depth_buffer_desc.MipLevels = 1;
@@ -169,9 +227,9 @@ adapter_found_label:
     depth_buffer_desc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
     depth_buffer_desc.CPUAccessFlags = 0;
     depth_buffer_desc.MiscFlags = 0;
-	GXHRCHK(p_device->CreateTexture2D(&depth_buffer_desc, NULL, &p_depth_stencil_buffer));
+	GXHRCHK(device->CreateTexture2D(&depth_buffer_desc, NULL, &main_dsb));
 	D3D11_DEPTH_STENCIL_DESC depth_stencil_desc;
-    setz(depth_stencil_desc);
+    GXSETZ(depth_stencil_desc);
     depth_stencil_desc.DepthEnable = true;
     depth_stencil_desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
     depth_stencil_desc.DepthFunc = D3D11_COMPARISON_LESS;
@@ -186,17 +244,17 @@ adapter_found_label:
     depth_stencil_desc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
     depth_stencil_desc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
     depth_stencil_desc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
-	GXHRCHK(p_device->CreateDepthStencilState(&depth_stencil_desc, &p_depth_stencil_state));
-    p_immediate_context->OMSetDepthStencilState(p_depth_stencil_state, 1);
+	GXHRCHK(device->CreateDepthStencilState(&depth_stencil_desc, &main_dss));
+    context->OMSetDepthStencilState(main_dss, 1);
 	D3D11_DEPTH_STENCIL_VIEW_DESC depth_stencil_view_desc;
-    setz(depth_stencil_view_desc);
+    GXSETZ(depth_stencil_view_desc);
     depth_stencil_view_desc.Format = depth_buffer_desc.Format;
     depth_stencil_view_desc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DMS;
     depth_stencil_view_desc.Texture2D.MipSlice = 0;
-	GXHRCHK(p_device->CreateDepthStencilView(p_depth_stencil_buffer, &depth_stencil_view_desc, &p_depth_stencil_view));
-    p_immediate_context->OMSetRenderTargets(1, &p_render_target_view, p_depth_stencil_view);
+	GXHRCHK(device->CreateDepthStencilView(main_dsb, &depth_stencil_view_desc, &main_dsv));
+    context->OMSetRenderTargets(1, &main_rtv, main_dsv);
 	D3D11_RASTERIZER_DESC raster_desc;
-    setz(raster_desc);
+    GXSETZ(raster_desc);
     raster_desc.AntialiasedLineEnable = false;
     raster_desc.CullMode = D3D11_CULL_BACK;
     raster_desc.DepthBias = 0;
@@ -207,168 +265,18 @@ adapter_found_label:
     raster_desc.MultisampleEnable = false;
     raster_desc.ScissorEnable = false;
     raster_desc.SlopeScaledDepthBias = 0.0f;
-	GXHRCHK(p_device->CreateRasterizerState(&raster_desc, &p_raster_state));
-    p_immediate_context->RSSetState(p_raster_state);
-	D3D11_VIEWPORT viewport;
-    viewport.Width = (float)sysapp->get_width();
-    viewport.Height = (float)sysapp->get_height();
-    viewport.MinDepth = 0.0f;
-    viewport.MaxDepth = 1.0f;
-    viewport.TopLeftX = 0.0f;
-    viewport.TopLeftY = 0.0f;
-    p_immediate_context->RSSetViewports(1, &viewport);
+	GXHRCHK(device->CreateRasterizerState(&raster_desc, &raster));
+    context->RSSetState(raster);
+    main_viewport.Width = (float)sysapp->get_width();
+    main_viewport.Height = (float)sysapp->get_height();
+    main_viewport.MinDepth = 0.0f;
+    main_viewport.MaxDepth = 1.0f;
+    main_viewport.TopLeftX = 0.0f;
+    main_viewport.TopLeftY = 0.0f;
+    context->RSSetViewports(1, &main_viewport);
     sampler = new texture::Sampler(this);
     pipmgr = new render::pipeline::Manager(this);
-    //--------------------------------------------------------------------------------------------------------
-
-    //--------------------------------------------------------------------------------------------------------
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /*const VertexType vertices[3] = {
-        { { -1.0f, -1.0f, 0.0f }, { 1.0f, 0.0f, 0.0f } },
-        { { 0.0f, 1.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } },
-        { { 1.0f, -1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f } },
-    };
-    const std::uint32_t indices[3] = { 0, 1, 2 };
-    D3D11_BUFFER_DESC vertex_buffer_desc, index_buffer_desc;
-    D3D11_SUBRESOURCE_DATA vertex_data, index_data;
-
-    setz(vertex_buffer_desc);
-    vertex_buffer_desc.Usage = D3D11_USAGE_DEFAULT;
-    vertex_buffer_desc.ByteWidth = sizeof(vertices);
-    vertex_buffer_desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-
-    setz(vertex_data);
-    vertex_data.pSysMem = vertices;
-
-    if (FAILED(p_device->CreateBuffer(&vertex_buffer_desc, &vertex_data, &p_vertex_buffer))) {
-        GXLOGF("Failed to create vertex buffer.");
-    }
-
-    setz(index_buffer_desc);
-    index_buffer_desc.Usage = D3D11_USAGE_DEFAULT;
-    index_buffer_desc.ByteWidth = sizeof(indices);
-    index_buffer_desc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-
-    setz(index_data);
-    index_data.pSysMem = indices;
-
-    if (FAILED(p_device->CreateBuffer(&index_buffer_desc, &index_data, &p_index_buffer))) {
-        GXLOGF("Failed to create index buffer.");
-    }
-
-    ID3DBlob* error_message = nullptr;
-    ID3DBlob* vertex_shader_code = nullptr;
-    ID3DBlob* fragment_shader_code = nullptr;
-    D3D11_INPUT_ELEMENT_DESC polygon_layout[2];
-
-    const char p_vertex_src_data[] = "cbuffer UniformBuffer {\n"
-                                     "    matrix mvp;\n"
-                                     "};\n"
-                                     "struct VertexInputType {\n"
-                                     "    float3 position : POSITION;\n"
-                                     "    float3 color : COLOR;\n"
-                                     "};\n"
-                                     "struct PixelInputType\n"
-                                     "{\n"
-                                     "    float4 position : SV_POSITION;\n"
-                                     "    float3 color : COLOR;\n"
-                                     "};\n"
-                                     "PixelInputType main(VertexInputType input) {\n"
-                                     "    PixelInputType output;\n"
-                                     "    output.position = mul(float4(input.position, 1.0), mvp);\n"
-                                     "    output.color = input.color;\n"
-                                     "    return output;\n"
-                                     "}\n";
-    const char p_fragment_src_data[] = "struct PixelInputType {\n"
-                                       "    float4 position : SV_POSITION;\n"
-                                       "    float3 color : COLOR;\n"
-                                       "};\n"
-                                       "float4 main(PixelInputType input) : SV_TARGET {\n"
-                                       "	return float4(input.color, 1.0);\n"
-                                       "}\n";
-
-    if (FAILED(D3DCompile2(
-            p_vertex_src_data,
-            sizeof(p_vertex_src_data),
-            nullptr,
-            nullptr,
-            nullptr,
-            "main",
-            "vs_5_0",
-            D3DCOMPILE_OPTIMIZATION_LEVEL3 | D3DCOMPILE_WARNINGS_ARE_ERRORS | D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_PACK_MATRIX_ROW_MAJOR,
-            0,
-            0,
-            nullptr,
-            0,
-            &vertex_shader_code,
-            &error_message))) {
-        GXLOGF("Error in compiling shader " << ((const char*)(error_message->GetBufferPointer())));
-    }
-
-    error_message = nullptr;
-    if (FAILED(D3DCompile2(
-            p_fragment_src_data,
-            sizeof(p_fragment_src_data),
-            nullptr,
-            nullptr,
-            nullptr,
-            "main",
-            "ps_5_0",
-            D3DCOMPILE_OPTIMIZATION_LEVEL3 | D3DCOMPILE_WARNINGS_ARE_ERRORS | D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_PACK_MATRIX_ROW_MAJOR,
-            0,
-            0,
-            nullptr,
-            0,
-            &fragment_shader_code,
-            &error_message))) {
-        GXLOGF("Error in compiling shader " << ((const char*)(error_message->GetBufferPointer())));
-    }
-    if (FAILED(p_device->CreateVertexShader(vertex_shader_code->GetBufferPointer(), vertex_shader_code->GetBufferSize(), NULL, &p_vertex_shader))) {
-        UNEXPECTED;
-    }
-    if (FAILED(p_device->CreatePixelShader(fragment_shader_code->GetBufferPointer(), fragment_shader_code->GetBufferSize(), NULL, &p_fragment_shader))) {
-        UNEXPECTED;
-    }
-
-    setz(polygon_layout[0]);
-    polygon_layout[0].SemanticName = "POSITION";
-    polygon_layout[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-    polygon_layout[0].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-
-    setz(polygon_layout[1]);
-    polygon_layout[1].SemanticName = "COLOR";
-    polygon_layout[1].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-    polygon_layout[1].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
-    polygon_layout[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-
-    if (FAILED(p_device->CreateInputLayout(
-            polygon_layout,
-            countof(polygon_layout),
-            vertex_shader_code->GetBufferPointer(),
-            vertex_shader_code->GetBufferSize(),
-            &p_input_layout))) {
-        UNEXPECTED;
-    }
-
-    vertex_shader_code->Release();
-    vertex_shader_code = nullptr;
-
-    fragment_shader_code->Release();
-    fragment_shader_code = nullptr;
-
-    D3D11_BUFFER_DESC uniform_buffer_desc;
-    setz(uniform_buffer_desc);
-    uniform_buffer_desc.Usage = D3D11_USAGE_DYNAMIC;
-    uniform_buffer_desc.ByteWidth = sizeof(UniformBufferType);
-    uniform_buffer_desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-    uniform_buffer_desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-
-    if (FAILED(p_device->CreateBuffer(&uniform_buffer_desc, NULL, &p_uniform_buffer))) {
-        UNEXPECTED;
-    }*/
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////
+	initial_shadow();
 }
 
 gearoenix::dx11::Engine::~Engine()
@@ -389,88 +297,44 @@ void gearoenix::dx11::Engine::window_changed()
 
 void gearoenix::dx11::Engine::update()
 {
-    p_immediate_context->ClearRenderTargetView(p_render_target_view, clear_color);
+    context->ClearRenderTargetView(main_rtv, clear_color);
     do_load_functions();
-    //--------------------------------------------------------------------------------------------------------
     physics_engine->wait();
     for (std::shared_ptr<render::scene::Scene>& scene : loaded_scenes) {
-        //scene->cast_shadow();
-        p_immediate_context->ClearDepthStencilView(p_depth_stencil_view, D3D11_CLEAR_DEPTH, 1.0f, 0);
+		start_shadow_casting();
+        scene->cast_shadow();
+		context->OMSetRenderTargets(1, &main_rtv, main_dsv);
+		context->RSSetViewports(1, &main_viewport);
+		context->ClearDepthStencilView(main_dsv, D3D11_CLEAR_DEPTH, 1.0f, 0);
         scene->draw(nullptr);
     }
     physics_engine->update();
-    //--------------------------------------------------------------------------------------------------------
-    // scene render in here
-    /////////////////////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////////////////
-    /*const unsigned int stride = sizeof(VertexType);
-    const unsigned int offset = 0;
-    p_immediate_context->IASetVertexBuffers(0, 1, &p_vertex_buffer, &stride, &offset);
-    p_immediate_context->IASetIndexBuffer(p_index_buffer, DXGI_FORMAT_R32_UINT, 0);
-    p_immediate_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-    D3D11_MAPPED_SUBRESOURCE mapped_resource;
-    if (FAILED(p_immediate_context->Map(p_uniform_buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped_resource))) {
-        UNEXPECTED;
-    }
-    UniformBufferType* data_ptr = (UniformBufferType*)mapped_resource.pData;
-    data_ptr->mvp = math::Mat4x4::perspective(2.0f, 1.0f, 1.0f, 10.0f) * 
-		math::Mat4x4::look_at(
-			math::Vec3(0.0f, 0.0f, 4.0f),
-			math::Vec3(0.0f, 0.0f, 0.0f),
-			math::Vec3(0.0f, 1.0f, 0.0f))
-        * math::Mat4x4();
-    p_immediate_context->Unmap(p_uniform_buffer, 0);
-    unsigned int buffer_number = 0;
-    p_immediate_context->VSSetConstantBuffers(buffer_number, 1, &p_uniform_buffer);
-    p_immediate_context->IASetInputLayout(p_input_layout);
-    p_immediate_context->VSSetShader(p_vertex_shader, NULL, 0);
-    p_immediate_context->PSSetShader(p_fragment_shader, NULL, 0);
-    p_immediate_context->DrawIndexed(3, 0, 0);*/
-    /////////////////////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////////////////
-    p_swapchain->Present(1, 0);
+    swapchain->Present(1, 0);
 }
 
 void gearoenix::dx11::Engine::terminate()
 {
-    if (p_swapchain == nullptr)
+    if (swapchain == nullptr)
         return;
-    p_swapchain->SetFullscreenState(false, NULL);
-    ////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////////////////
-    //p_uniform_buffer->Release();
-    //p_uniform_buffer = nullptr;
-    //p_input_layout->Release();
-    //p_input_layout = 0;
-    //p_fragment_shader->Release();
-    //p_fragment_shader = nullptr;
-    //p_vertex_shader->Release();
-    //p_vertex_shader = nullptr;
-    //p_index_buffer->Release();
-    //p_index_buffer = nullptr;
-    //p_vertex_buffer->Release();
-    //p_vertex_buffer = nullptr;
-    ////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////////////////
+    swapchain->SetFullscreenState(false, NULL);
     delete sampler;
     sampler = nullptr;
-    p_raster_state->Release();
-    p_raster_state = nullptr;
-    p_depth_stencil_view->Release();
-    p_depth_stencil_view = nullptr;
-    p_depth_stencil_state->Release();
-    p_depth_stencil_state = nullptr;
-    p_depth_stencil_buffer->Release();
-    p_depth_stencil_buffer = nullptr;
-    p_render_target_view->Release();
-    p_render_target_view = nullptr;
-    p_immediate_context->Release();
-    p_immediate_context = nullptr;
-    p_device->Release();
-    p_device = nullptr;
-    p_swapchain->Release();
-    p_swapchain = nullptr;
+    raster->Release();
+    raster = nullptr;
+    main_dsv->Release();
+    main_dsv = nullptr;
+    main_dss->Release();
+    main_dss = nullptr;
+    main_dsb->Release();
+    main_dsb = nullptr;
+    main_rtv->Release();
+    main_rtv = nullptr;
+    context->Release();
+    context = nullptr;
+    device->Release();
+    device = nullptr;
+    swapchain->Release();
+    swapchain = nullptr;
 }
 
 gearoenix::render::texture::Texture2D* gearoenix::dx11::Engine::create_texture_2d(system::File* file, std::shared_ptr<core::EndCaller> c)
@@ -497,7 +361,13 @@ gearoenix::render::shader::Shader* gearoenix::dx11::Engine::create_shader(core::
 {
     render::shader::Id shader_id = (render::shader::Id)sid;
     switch (shader_id) {
-    case render::shader::Id::SHADELESS_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
+	case render::shader::DEPTH_POS:
+	case render::shader::DEPTH_POS_NRM:
+	case render::shader::DEPTH_POS_NRM_UV:
+	case render::shader::DEPTH_POS_UV:
+		return new shader::Depth(this, c);
+	case render::shader::Id::SHADELESS_COLORED_MATTE_NONREFLECTIVE_CASTER_OPAQUE:
+	case render::shader::Id::SHADELESS_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
         return new shader::ShadelessColoredMatteNonreflectiveShadowlessOpaque(this, c);
     case render::shader::Id::SHADELESS_CUBE_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
         return new shader::ShadelessCubeMatteNonreflectiveShadowlessOpaque(this, c);
@@ -516,7 +386,13 @@ gearoenix::render::shader::Resources* gearoenix::dx11::Engine::create_shader_res
     buffer::Uniform* u = reinterpret_cast<buffer::Uniform*>(ub);
     render::shader::Id shader_id = (render::shader::Id)sid;
     switch (shader_id) {
-    case render::shader::Id::SHADELESS_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
+	case render::shader::DEPTH_POS:
+	case render::shader::DEPTH_POS_NRM:
+	case render::shader::DEPTH_POS_NRM_UV:
+	case render::shader::DEPTH_POS_UV:
+		return new shader::Depth::Resources(this, pip, u);
+	case render::shader::Id::SHADELESS_COLORED_MATTE_NONREFLECTIVE_CASTER_OPAQUE:
+	case render::shader::Id::SHADELESS_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
         return new shader::ShadelessColoredMatteNonreflectiveShadowlessOpaque::Resources(this, pip, u);
     case render::shader::Id::SHADELESS_CUBE_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
         return new shader::ShadelessCubeMatteNonreflectiveShadowlessOpaque::Resources(this, pip, u);
@@ -536,22 +412,22 @@ gearoenix::render::pipeline::Pipeline* gearoenix::dx11::Engine::create_pipeline(
 
 ID3D11Device* gearoenix::dx11::Engine::get_device()
 {
-    return p_device;
+    return device;
 }
 
 const ID3D11Device* gearoenix::dx11::Engine::get_device() const
 {
-    return p_device;
+    return device;
 }
 
 ID3D11DeviceContext* gearoenix::dx11::Engine::get_context()
 {
-    return p_immediate_context;
+    return context;
 }
 
 const ID3D11DeviceContext* gearoenix::dx11::Engine::get_context() const
 {
-    return p_immediate_context;
+    return context;
 }
 
 gearoenix::dx11::texture::Sampler* gearoenix::dx11::Engine::get_sampler()

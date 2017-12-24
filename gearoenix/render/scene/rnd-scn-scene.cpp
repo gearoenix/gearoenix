@@ -133,7 +133,7 @@ const gearoenix::render::camera::Camera* gearoenix::render::scene::Scene::get_cu
 
 gearoenix::render::camera::Camera* gearoenix::render::scene::Scene::get_current_camera()
 {
-    //return reinterpret_cast<light::Sun*>(lights[0].get())->get_camera();
+    //return const_cast<camera::Camera*>(reinterpret_cast<const camera::Camera*>(reinterpret_cast<light::Sun*>(lights[0].get())->get_camera()));
     return cameras[curcam].get();
 }
 

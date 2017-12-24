@@ -21,7 +21,8 @@ namespace dx11 {
             ID3D11ShaderResourceView* srv = nullptr;
 
         public:
-            Texture2D(system::File* file, Engine* engine, std::shared_ptr<core::EndCaller> end);
+            Texture2D(_Notnull_ system::File* file, _Notnull_ Engine* engine, std::shared_ptr<core::EndCaller> end);
+			Texture2D(_Notnull_ Engine* engine, _Notnull_ ID3D11ShaderResourceView* srv);
             ~Texture2D();
             const ID3D11ShaderResourceView* get_shader_resource_view() const;
             void bind(unsigned int slot = 0) const;

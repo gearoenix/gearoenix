@@ -46,7 +46,7 @@ gearoenix::dx11::shader::ShadelessCubeMatteNonreflectiveShadowlessOpaque::Shadel
                                          "    return output;\n"
                                          "}\n";
         std::vector<D3D11_INPUT_ELEMENT_DESC> desc(1);
-        setz(desc[0]);
+        GXSETZ(desc[0]);
         desc[0].SemanticName = "POSITION";
         desc[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
         desc[0].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;

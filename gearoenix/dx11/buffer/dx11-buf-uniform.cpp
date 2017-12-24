@@ -11,7 +11,7 @@ gearoenix::dx11::buffer::Uniform::Uniform(unsigned int s, Engine* eng, std::shar
 {
     eng->add_load_function([this, eng, s, c]() -> void {
         D3D11_BUFFER_DESC desc;
-        setz(desc);
+        GXSETZ(desc);
         desc.Usage = D3D11_USAGE_DYNAMIC;
         desc.ByteWidth = ((s & 15) == 0) ? s : (s & (~((UINT)15))) + 16;
         desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;

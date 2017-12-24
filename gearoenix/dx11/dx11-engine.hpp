@@ -19,16 +19,25 @@ namespace dx11 {
     class Engine : public render::Engine {
     private:
         unsigned int graphic_memory_size = 0;
-        float clear_color[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+        const float clear_color[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
         texture::Sampler* sampler = nullptr;
-        IDXGISwapChain* p_swapchain = nullptr;
-        ID3D11Device* p_device = nullptr;
-        ID3D11DeviceContext* p_immediate_context = nullptr;
-        ID3D11RenderTargetView* p_render_target_view = nullptr;
-        ID3D11Texture2D* p_depth_stencil_buffer = nullptr;
-        ID3D11DepthStencilState* p_depth_stencil_state = nullptr;
-        ID3D11DepthStencilView* p_depth_stencil_view = nullptr;
-        ID3D11RasterizerState* p_raster_state = nullptr;
+        IDXGISwapChain* swapchain = nullptr;
+        ID3D11Device* device = nullptr;
+        ID3D11DeviceContext* context = nullptr;
+        ID3D11RenderTargetView* main_rtv = nullptr;
+        ID3D11Texture2D* main_dsb = nullptr;
+        ID3D11DepthStencilState* main_dss = nullptr;
+        ID3D11DepthStencilView* main_dsv = nullptr;
+		D3D11_VIEWPORT main_viewport;
+        ID3D11RasterizerState* raster = nullptr;
+		ID3D11RenderTargetView* shadow_rtv = nullptr;
+		ID3D11Texture2D* shadow_dsb = nullptr;
+		ID3D11DepthStencilView* shadow_dsv = nullptr;
+		D3D11_VIEWPORT shadow_viewport;
+		texture::Texture2D *shadow_txt = nullptr;
+		void initial_shadow();
+		void start_shadow_casting();
+		void terminate_shadow();
 #ifdef PROFILING_MODE
         unsigned int prof_frames_count = 0;
         std::chrono::high_resolution_clock::time_point prof_last_time_draw;

@@ -10,6 +10,6 @@
 #error "setz already defined"
 #endif
 #include <cstring>
-#define setz(x) std::memset(&(x), 0, sizeof((x)))
+#define GXSETZ(x) std::memset(&(x), 0, sizeof((x)))
 #define GXSETARRZ(x) std::memset((x), 0, sizeof((x)))
 #endif

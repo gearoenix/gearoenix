@@ -28,7 +28,7 @@ gearoenix::dx11::texture::Cube::Cube(system::File* file, Engine* eng, std::share
         }
     }
     D3D11_TEXTURE2D_DESC desc;
-    setz(desc);
+    GXSETZ(desc);
     desc.Width = imgw;
     desc.Height = imgh;
 	desc.MipLevels = 1;
@@ -39,7 +39,7 @@ gearoenix::dx11::texture::Cube::Cube(system::File* file, Engine* eng, std::share
     desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
     desc.MiscFlags = D3D11_RESOURCE_MISC_TEXTURECUBE;
     D3D11_SHADER_RESOURCE_VIEW_DESC sdesc;
-    setz(sdesc);
+    GXSETZ(sdesc);
     sdesc.Format = desc.Format;
     sdesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
     sdesc.TextureCube.MipLevels = 1;

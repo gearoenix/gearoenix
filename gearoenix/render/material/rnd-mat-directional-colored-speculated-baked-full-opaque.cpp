@@ -90,11 +90,11 @@ void gearoenix::render::material::DirectionalColoredSpeculatedBakedFullOpaque::u
     u.eye = cam->get_location();
     u.vp = cam->get_view_projection();
     color_changed = false;
-    ub->update(&u, sizeof(Uniform));
 }
 
 void gearoenix::render::material::DirectionalColoredSpeculatedBakedFullOpaque::bind(texture::Texture2D* shadow_texture)
 {
+	ub->update(&u, sizeof(Uniform));
     shdrsc->set_shadow_texture(shadow_texture);
     shdrsc->bind();
 }
