@@ -13,7 +13,9 @@
 #include "dx11-check.hpp"
 #include "pipeline/dx11-pip-pipeline.hpp"
 #include "shader/dx11-shd-depth.hpp"
+#include "shader/dx11-shd-directional-colored-speculated-baked-full-opaque.hpp"
 #include "shader/dx11-shd-directional-d2-speculated-nonreflective-full-opaque.hpp"
+#include "shader/dx11-shd-directional-d2-speculated-nonreflective-shadowless-opaque.hpp"
 #include "shader/dx11-shd-shadeless-colored-matte-nonreflective-shadowless-opaque.hpp"
 #include "shader/dx11-shd-shadeless-cube-matte-nonreflective-shadowless-opaque.hpp"
 #include "shader/dx11-shd-shadeless-d2-matte-nonreflective-shadowless-opaque.hpp"
@@ -372,14 +374,19 @@ gearoenix::render::shader::Shader* gearoenix::dx11::Engine::create_shader(core::
     case render::shader::DEPTH_POS_NRM_UV:
     case render::shader::DEPTH_POS_UV:
         return new shader::Depth(this, c);
+	case render::shader::DIRECTIONAL_COLORED_SPECULATED_BAKED_FULL_OPAQUE:
+		return new shader::DirectionalColoredSpeculatedBakedFullOpaque(this, c);
 	case render::shader::DIRECTIONAL_D2_SPECULATED_NONREFLECTIVE_FULL_OPAQUE:
 		return new shader::DirectionalD2SpeculatedNonreflectiveFullOpaque(this, c);
+	case render::shader::DIRECTIONAL_D2_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE:
+		return new shader::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque(this, c);
     case render::shader::Id::SHADELESS_COLORED_MATTE_NONREFLECTIVE_CASTER_OPAQUE:
     case render::shader::Id::SHADELESS_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
         return new shader::ShadelessColoredMatteNonreflectiveShadowlessOpaque(this, c);
     case render::shader::Id::SHADELESS_CUBE_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
         return new shader::ShadelessCubeMatteNonreflectiveShadowlessOpaque(this, c);
-    case render::shader::Id::SHADELESS_D2_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
+	case render::shader::Id::SHADELESS_D2_MATTE_NONREFLECTIVE_CASTER_OPAQUE:
+	case render::shader::Id::SHADELESS_D2_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
         return new shader::ShadelessD2MatteNonreflectiveShadowlessOpaque(this, c);
     default:
         UNIMPLEMENTED;
@@ -399,14 +406,19 @@ gearoenix::render::shader::Resources* gearoenix::dx11::Engine::create_shader_res
     case render::shader::DEPTH_POS_NRM_UV:
     case render::shader::DEPTH_POS_UV:
         return new shader::Depth::Resources(this, pip, u);
+	case render::shader::DIRECTIONAL_COLORED_SPECULATED_BAKED_FULL_OPAQUE:
+		return new shader::DirectionalColoredSpeculatedBakedFullOpaque::Resources(this, pip, u);
 	case render::shader::DIRECTIONAL_D2_SPECULATED_NONREFLECTIVE_FULL_OPAQUE:
 		return new shader::DirectionalD2SpeculatedNonreflectiveFullOpaque::Resources(this, pip, u);
+	case render::shader::DIRECTIONAL_D2_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE:
+		return new shader::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque::Resources(this, pip, u);
     case render::shader::Id::SHADELESS_COLORED_MATTE_NONREFLECTIVE_CASTER_OPAQUE:
     case render::shader::Id::SHADELESS_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
         return new shader::ShadelessColoredMatteNonreflectiveShadowlessOpaque::Resources(this, pip, u);
     case render::shader::Id::SHADELESS_CUBE_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
         return new shader::ShadelessCubeMatteNonreflectiveShadowlessOpaque::Resources(this, pip, u);
-    case render::shader::Id::SHADELESS_D2_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
+	case render::shader::Id::SHADELESS_D2_MATTE_NONREFLECTIVE_CASTER_OPAQUE:
+	case render::shader::Id::SHADELESS_D2_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
         return new shader::ShadelessD2MatteNonreflectiveShadowlessOpaque::Resources(this, pip, u);
     default:
         UNIMPLEMENTED;

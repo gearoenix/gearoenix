@@ -25,22 +25,27 @@ namespace render {
                 void set_baked_env(texture::Cube* t);
             };
             typedef struct {
-                math::Mat4x4 vp;
+                math::Vec4 ambl_color;
+                math::Vec3 eye;
+				core::Real padding1;
                 math::Mat4x4 m;
-                math::Vec3 sun = math::Vec3(0.0f, 0.0f, -1.0f);
-                math::Vec3 sun_color = math::Vec3(1.0f, 1.0f, 1.0f);
-                math::Vec3 eye = math::Vec3(0.0f, 0.0f, 0.0f);
-                math::Vec3 spec_color = math::Vec3(1.0f, 1.0f, 1.0f);
-                math::Vec3 spec_factors = math::Vec3(0.5f, 0.5f, 0.5f);
-                math::Vec3 ambl_color = math::Vec3(0.2f, 0.2f, 0.2f);
-                core::Real rfl_fac = 0.5f;
+                core::Real rfl_fac;
+				math::Vec3 padding2;
+                math::Vec3 spec_color;
+				core::Real padding3;
+                math::Vec3 spec_factors;
+				core::Real padding4;
+                math::Vec3 sun;
+				core::Real padding5;
+                math::Vec4 sun_color;
+                math::Mat4x4 vp;
             } Uniform;
 
         private:
             const core::Id SHADER_ID;
             Uniform u;
             bool color_changed = true;
-            math::Vec3 color = math::Vec3(0.3f, 0.02f, 0.02f);
+            math::Vec4 color;
             std::shared_ptr<texture::Cube> env;
             Resources* shdrsc;
 

@@ -24,15 +24,16 @@ namespace render {
             typedef struct {
                 math::Mat4x4 mvp;
                 math::Mat4x4 m;
-                math::Vec3 sun = math::Vec3(0.6f, 0.7f, 0.8f);
-                math::Vec3 sun_color = math::Vec3(0.6f, 0.7f, 0.8f);
-                math::Vec3 ambl_color = math::Vec3(0.6f, 0.7f, 0.8f);
+                math::Vec3 sun;
+				core::Real padding1;
+                math::Vec4 sun_color;
+                math::Vec4 ambl_color;
             } Uniform;
 
         private:
             Uniform u;
             bool color_changed = true;
-            math::Vec3 color = math::Vec3(0.6f, 0.7f, 0.8f);
+            math::Vec4 color;
             Resources* shdrsc;
 
         public:

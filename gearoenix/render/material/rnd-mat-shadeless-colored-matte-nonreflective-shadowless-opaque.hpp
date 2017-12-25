@@ -23,7 +23,7 @@ namespace render {
             };
             typedef struct {
                 math::Mat4x4 mvp;
-                math::Vec3 color;
+                math::Vec4 color;
             } Uniform;
 
         private:

@@ -26,14 +26,20 @@ namespace render {
                 void set_texture(texture::Texture2D* t);
             };
             typedef struct {
-                math::Mat4x4 vp;
-                math::Mat4x4 m;
-                math::Vec3 sun;
-                math::Vec3 sun_color;
-                math::Vec3 spec_color;
-                math::Vec3 spec_factors;
                 math::Vec3 ambl_color;
+				core::Real padding1;
                 math::Vec3 eye;
+				core::Real padding2;
+                math::Mat4x4 m;
+                math::Vec3 spec_color;
+				core::Real padding3;
+                math::Vec3 spec_factors;
+				core::Real padding4;
+                math::Vec3 sun;
+				core::Real padding5;
+                math::Vec3 sun_color;
+				core::Real padding6;
+                math::Mat4x4 vp;
             } Uniform;
 
         private:

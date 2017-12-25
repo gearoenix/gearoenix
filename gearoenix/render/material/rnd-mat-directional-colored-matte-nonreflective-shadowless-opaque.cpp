@@ -23,6 +23,8 @@ gearoenix::render::material::DirectionalColoredMatteNonreflectiveShadowlessOpaqu
     : Material(SHADER_ID, sizeof(u), e, end)
 {
     color.read(f);
+	u.ambl_color.w(color.w());
+	u.sun_color.w(color.w());
     shdrsc = reinterpret_cast<Resources*>(e->create_shader_resources(SHADER_ID, pl.get(), ub, end));
 }
 
@@ -53,14 +55,14 @@ bool gearoenix::render::material::DirectionalColoredMatteNonreflectiveShadowless
 void gearoenix::render::material::DirectionalColoredMatteNonreflectiveShadowlessOpaque::update(const scene::Scene* s, const model::Model* m)
 {
     if (s->get_ambient_light_changed() || color_changed) {
-        u.ambl_color = s->get_ambient_light() * color;
+        u.ambl_color.xyz(s->get_ambient_light() * color.xyz());
     }
     u.m = m->get_m();
     u.mvp = m->get_mvp();
     const light::Sun* sun = s->get_sun();
     u.sun = sun->get_direction();
     if (color_changed || sun->get_color_changed()) {
-        u.sun_color = sun->get_color() * color;
+        u.sun_color.xyz(sun->get_color() * color.xyz());
     }
     color_changed = false;
 }

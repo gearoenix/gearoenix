@@ -28,22 +28,27 @@ namespace render {
                 void set_shadow_texture(texture::Texture2D* t);
             };
             typedef struct {
-                math::Vec3 ambl_color;
+                math::Vec4 ambl_color;
                 math::Mat4x4 db;
                 math::Vec3 eye;
+				core::Real padding2;
                 math::Mat4x4 m;
-                core::Real rfl_fac = 0.5f;
+                core::Real rfl_fac;
+				math::Vec3 padding3;
                 math::Vec3 spec_color;
+				core::Real padding4;
                 math::Vec3 spec_factors;
+				core::Real padding5;
                 math::Vec3 sun;
-                math::Vec3 sun_color;
+				core::Real padding6;
+                math::Vec4 sun_color;
                 math::Mat4x4 vp;
             } Uniform;
 
         private:
             Uniform u;
             bool color_changed = true;
-            math::Vec3 color = math::Vec3(0.3f, 0.02f, 0.02f);
+            math::Vec4 color;
             std::shared_ptr<texture::Cube> env;
             Resources* shdrsc;
 

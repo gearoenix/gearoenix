@@ -82,14 +82,21 @@ namespace math {
         core::Real vec[4];
 
     public:
+		Vec4();
         Vec4(core::Real e);
-        Vec4(core::Real x, core::Real y, core::Real z, core::Real w);
+		Vec4(core::Real x, core::Real y, core::Real z, core::Real w);
+		Vec4(const Vec3& v, core::Real w);
+		Vec3 xyz() const;
+		void xyz(const Vec3& v);
+		core::Real w() const;
+		void w(core::Real);
         const core::Real& operator[](const unsigned int i) const;
         core::Real& operator[](const unsigned int i);
         core::Real dot(const Vec4& o) const;
         Vec4 cross(const Vec4& o) const;
         Vec4 normalized() const;
         void normalize();
+		void read(system::File* f);
     };
 }
 }

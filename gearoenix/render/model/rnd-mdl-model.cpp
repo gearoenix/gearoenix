@@ -63,7 +63,7 @@ void gearoenix::render::model::Model::commit(const scene::Scene* s)
     bool moccloc_not_initialized = true;
     math::Vec3 moccloc;
     if (cam->get_changed() || changed) {
-        moccloc = m * occloc;
+        moccloc = m * occloc; // todo cache its calculation.
         moccloc_not_initialized = false;
         is_in_camera = cam->in_sight(moccloc, occrds);
         if (is_in_camera) {

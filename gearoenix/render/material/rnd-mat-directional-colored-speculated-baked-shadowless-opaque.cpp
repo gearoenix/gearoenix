@@ -27,6 +27,8 @@ gearoenix::render::material::DirectionalColoredSpeculatedBakedShadowlessOpaque::
     , SHADER_ID(shdid)
 {
     color.read(f);
+	u.ambl_color.w(color.w());
+	u.sun_color.w(color.w());
     u.spec_color.read(f);
     u.spec_factors.read(f);
     f->read(u.rfl_fac);
@@ -70,12 +72,12 @@ bool gearoenix::render::material::DirectionalColoredSpeculatedBakedShadowlessOpa
 void gearoenix::render::material::DirectionalColoredSpeculatedBakedShadowlessOpaque::update(const scene::Scene* s, const model::Model* m)
 {
     if (color_changed || s->get_ambient_light_changed())
-        u.ambl_color = s->get_ambient_light() * color;
+        u.ambl_color.xyz(s->get_ambient_light() * color.xyz());
     u.m = m->get_m();
     const light::Sun* sun = s->get_sun();
     u.sun = sun->get_direction();
     if (color_changed || sun->get_color_changed())
-        u.sun_color = sun->get_color() * color;
+        u.sun_color.xyz(sun->get_color() * color.xyz());
     const camera::Camera* cam = s->get_current_camera();
     u.eye = cam->get_location();
     u.vp = cam->get_view_projection();
