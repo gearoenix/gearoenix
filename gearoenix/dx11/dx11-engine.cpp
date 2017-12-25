@@ -309,7 +309,7 @@ void gearoenix::dx11::Engine::update()
         context->OMSetRenderTargets(1, &main_rtv, main_dsv);
         context->RSSetViewports(1, &main_viewport);
         context->ClearDepthStencilView(main_dsv, D3D11_CLEAR_DEPTH, 1.0f, 0);
-        scene->draw(nullptr);
+        scene->draw(shadow_txt);
     }
     physics_engine->update();
     swapchain->Present(1, 0);

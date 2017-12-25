@@ -28,15 +28,15 @@ namespace render {
                 void set_shadow_texture(texture::Texture2D* t);
             };
             typedef struct {
-                math::Mat4x4 vp;
-                math::Mat4x4 m;
+				math::Vec3 ambl_color;
                 math::Mat4x4 db;
-                math::Vec3 sun;
-                math::Vec3 sun_color;
+				math::Vec3 eye;
+                math::Mat4x4 m;
                 math::Vec3 spec_color;
                 math::Vec3 spec_factors;
-                math::Vec3 ambl_color;
-                math::Vec3 eye;
+                math::Vec3 sun;
+                math::Vec3 sun_color;
+                math::Mat4x4 vp;
             } Uniform;
 
         private:
