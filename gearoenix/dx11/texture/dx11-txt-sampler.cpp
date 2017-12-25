@@ -10,9 +10,9 @@ gearoenix::dx11::texture::Sampler::Sampler(Engine* engine)
     D3D11_SAMPLER_DESC sampdes;
     GXSETZ(sampdes);
     sampdes.Filter = D3D11_FILTER_ANISOTROPIC;
-    sampdes.AddressU = D3D11_TEXTURE_ADDRESS_MIRROR;
-    sampdes.AddressV = D3D11_TEXTURE_ADDRESS_MIRROR;
-    sampdes.AddressW = D3D11_TEXTURE_ADDRESS_MIRROR;
+    sampdes.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+    sampdes.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+    sampdes.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
     sampdes.MipLODBias = 0.0f;
     sampdes.MaxAnisotropy = 16;
     sampdes.ComparisonFunc = D3D11_COMPARISON_ALWAYS;

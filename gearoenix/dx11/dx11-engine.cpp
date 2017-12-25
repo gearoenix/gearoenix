@@ -81,6 +81,8 @@ void gearoenix::dx11::Engine::initial_shadow()
 
 void gearoenix::dx11::Engine::start_shadow_casting()
 {
+	ID3D11ShaderResourceView * const null[2] = { nullptr, nullptr };
+	for (UINT i = 0; i < 2; ++i) context->PSSetShaderResources(i, 2, null);
     context->OMSetRenderTargets(1, &shadow_rtv, shadow_dsv);
     context->RSSetViewports(1, &shadow_viewport);
     const float color[4] = { 0.0, 0.0, 0.0, 1.0 };

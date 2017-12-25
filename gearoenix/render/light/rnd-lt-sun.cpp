@@ -1,5 +1,7 @@
 #include "rnd-lt-sun.hpp"
 #include "../camera/rnd-cmr-orthographic.hpp"
+#include "../../core/cr-build-configuration.hpp"
+
 
 gearoenix::render::light::Sun::Sun(system::File* f)
     : Light(f)
@@ -9,8 +11,13 @@ gearoenix::render::light::Sun::Sun(system::File* f)
     db = math::Mat4x4(
              0.5, 0.0, 0.0, 0.0,
              0.0, 0.5, 0.0, 0.0,
-             0.0, 0.0, 0.5, 0.0,
-             0.5, 0.5, 0.5, 1.0)
+#ifdef IN_WINDOWS
+             0.0, 0.0, 1.0, 0.0,
+             0.5, 0.5, 0.0, 1.0)
+#else
+		0.0, 0.0, 0.5, 0.0,
+		0.5, 0.5, 0.5, 1.0)
+#endif
         * cam->get_view_projection();
 }
 

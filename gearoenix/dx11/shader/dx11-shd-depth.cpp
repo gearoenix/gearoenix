@@ -51,7 +51,7 @@ gearoenix::dx11::shader::Depth::Depth(Engine* eng, std::shared_ptr<core::EndCall
                                            "    float4 position : SV_POSITION;\n"
                                            "};\n"
                                            "float main(PixelInputType input) : SV_TARGET {\n"
-                                           "	return input.position.z / input.position.w;\n"
+                                           "	return input.position.z;\n"
                                            "}\n";
         compile_shader(p_fragment_src_data, render::shader::stage::FRAGMENT);
         (void)end;
