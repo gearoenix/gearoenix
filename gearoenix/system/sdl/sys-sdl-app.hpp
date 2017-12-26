@@ -3,7 +3,7 @@
 #include "../../core/cr-build-configuration.hpp"
 #ifdef USE_SDL
 #include "../../core/cr-types.hpp"
-#if defined(IN_IOS) || defined(IN_WINDOWS) || defined(IN_WEB)
+#if defined(IN_IOS) || defined(IN_WINDOWS) || defined(IN_WEB) || defined(IN_MAC)
 #include <SDL.h>
 #else
 #include <SDL2/SDL.h>

@@ -12,6 +12,7 @@ if [[ $arg_sdl = $1 || $arg_sdl = $2 ]]; then
   fi
   symroot="symroot=$output/release"
   sdk_device="-sdk iphoneos"
+  sdk_mac="-sdk macosx"
   sdk_simulator="-sdk iphonesimulator"
   conf_debug="-configuration Debug"
   conf_release="-configuration Release"
@@ -20,7 +21,7 @@ if [[ $arg_sdl = $1 || $arg_sdl = $2 ]]; then
   unzip "$sdl_src_zip"
   cd *
   cd Xcode-iOS/SDL
-  build_dir=$PWD/build
+  ios_build_dir=$PWD/build
   scheme="libSDL"
   proj="-project SDL.xcodeproj"
   # xcodebuild OTHER_CFLAGS="-fembed-bitcode" OTHER_LDFLAGS="-lobjc" \
@@ -34,8 +35,13 @@ if [[ $arg_sdl = $1 || $arg_sdl = $2 ]]; then
   #   -scheme="$scheme" build $symroot
   xcodebuild OTHER_CFLAGS="-fembed-bitcode" ONLY_ACTIVE_ARCH=NO -arch arm64 \
     -arch armv7 $proj $sdk_device $conf_release -scheme='$scheme' build $symroot
-  lipo $build_dir/Release-iphonesimulator/libSDL2.a \
-    $build_dir/Release-iphoneos/libSDL2.a -create -output $output/libSDL2.a
+  cd ../../Xcode/SDL
+  mac_build_dir=$PWD/build
+  xcodebuild OTHER_CFLAGS="-fembed-bitcode" ONLY_ACTIVE_ARCH=NO -arch x86_64 \
+    -arch i386 $proj $sdk_mac $conf_release -scheme='$scheme' build $symroot
+  lipo $ios_build_dir/Release-iphonesimulator/libSDL2.a \
+       $ios_build_dir/Release-iphoneos/libSDL2.a \
+       -create -output $output/libSDL2.a
 fi;
 # libpng
 if [[ $arg_png = $1 || $arg_png = $2 ]]; then

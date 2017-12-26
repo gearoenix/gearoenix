@@ -35,25 +35,26 @@
 #define USE_WINAPI
 #elif defined(__APPLE__)
 #include "TargetConditionals.h"
-#if defined(TARGET_IPHONE_SIMULATOR) || defined(TARGET_OS_IPHONE)
+#if TARGET_OS_IPHONE
 #define IN_IOS
 //#define USE_METAL
 //#define USE_VULKAN
 //#define USE_OPENGL_ES3
 #define USE_OPENGL_ES2
 #define USE_SDL
-#elif defined(TARGET_OS_MAC)
+#elif TARGET_OS_MAC 
 #define IN_MAC
 //#define USE_METAL
 //#define USE_VULKAN
 //#define USE_OPENGL_41
 //#define USE_OPENGL_33
+#define USE_OPENGL_ES2
 #define IN_DESKTOP
 #define USE_SDL
 //#define USE_GLFW
 #else
 #error "Unknown Apple platform"
-#endif
+#endif // IOS MAC
 #else
 #error "Not implemetned yet."
 #endif
