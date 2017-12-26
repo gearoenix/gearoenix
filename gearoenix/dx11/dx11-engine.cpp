@@ -378,10 +378,10 @@ gearoenix::render::shader::Shader* gearoenix::dx11::Engine::create_shader(core::
         return new shader::Depth(this, c);
     case render::shader::DIRECTIONAL_COLORED_SPECULATED_BAKED_FULL_OPAQUE:
         return new shader::DirectionalColoredSpeculatedBakedFullOpaque(this, c);
-	case render::shader::DIRECTIONAL_D2_SPECULATED_BAKED_FULL_OPAQUE:
-		return new shader::DirectionalD2SpeculatedBakedFullOpaque(this, c);
-	case render::shader::DIRECTIONAL_D2_SPECULATED_NONREFLECTIVE_FULL_OPAQUE:
-		return new shader::DirectionalD2SpeculatedNonreflectiveFullOpaque(this, c);
+    case render::shader::DIRECTIONAL_D2_SPECULATED_BAKED_FULL_OPAQUE:
+        return new shader::DirectionalD2SpeculatedBakedFullOpaque(this, c);
+    case render::shader::DIRECTIONAL_D2_SPECULATED_NONREFLECTIVE_FULL_OPAQUE:
+        return new shader::DirectionalD2SpeculatedNonreflectiveFullOpaque(this, c);
     case render::shader::DIRECTIONAL_D2_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE:
         return new shader::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque(this, c);
     case render::shader::Id::SHADELESS_COLORED_MATTE_NONREFLECTIVE_CASTER_OPAQUE:
@@ -412,8 +412,8 @@ gearoenix::render::shader::Resources* gearoenix::dx11::Engine::create_shader_res
         return new shader::Depth::Resources(this, pip, u);
     case render::shader::DIRECTIONAL_COLORED_SPECULATED_BAKED_FULL_OPAQUE:
         return new shader::DirectionalColoredSpeculatedBakedFullOpaque::Resources(this, pip, u);
-	case render::shader::DIRECTIONAL_D2_SPECULATED_BAKED_FULL_OPAQUE:
-		return new shader::DirectionalD2SpeculatedBakedFullOpaque::Resources(this, pip, u);
+    case render::shader::DIRECTIONAL_D2_SPECULATED_BAKED_FULL_OPAQUE:
+        return new shader::DirectionalD2SpeculatedBakedFullOpaque::Resources(this, pip, u);
     case render::shader::DIRECTIONAL_D2_SPECULATED_NONREFLECTIVE_FULL_OPAQUE:
         return new shader::DirectionalD2SpeculatedNonreflectiveFullOpaque::Resources(this, pip, u);
     case render::shader::DIRECTIONAL_D2_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE:

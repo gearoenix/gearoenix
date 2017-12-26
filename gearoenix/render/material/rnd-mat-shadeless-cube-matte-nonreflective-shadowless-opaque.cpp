@@ -38,7 +38,8 @@ gearoenix::render::material::ShadelessCubeMatteNonreflectiveShadowlessOpaque::Sh
     unsigned int curloc = f->tell();
     ctxt = std::static_pointer_cast<texture::Cube>(astmgr->get_texture(texid, core::EndCaller::create(fun)));
     f->seek(curloc);
-	if (shdrsc != nullptr) shdrsc->set_cube_texture(ctxt.get());
+    if (shdrsc != nullptr)
+        shdrsc->set_cube_texture(ctxt.get());
 }
 
 gearoenix::render::material::ShadelessCubeMatteNonreflectiveShadowlessOpaque::~ShadelessCubeMatteNonreflectiveShadowlessOpaque()

@@ -32,21 +32,21 @@ namespace render {
             };
             typedef struct {
                 math::Vec3 ambl_color;
-				core::Real ambl_alpha = 1.0f; // this is a temporary workaround in future this must be fed by blender.
+                core::Real ambl_alpha = 1.0f; // this is a temporary workaround in future this must be fed by blender.
                 math::Mat4x4 db;
                 math::Vec3 eye;
-				core::Real padding1;
+                core::Real padding1;
                 math::Mat4x4 m;
                 core::Real rfl_fac = 0.5f;
-				math::Vec3 padding2;
+                math::Vec3 padding2;
                 math::Vec3 spec_color;
-				core::Real spec_alpha = 1.0f; // this is a temporary workaround in future this must be fed by blender.
+                core::Real spec_alpha = 1.0f; // this is a temporary workaround in future this must be fed by blender.
                 math::Vec3 spec_factors;
-				core::Real padding3;
+                core::Real padding3;
                 math::Vec3 sun;
-				core::Real padding4;
+                core::Real padding4;
                 math::Vec3 sun_color;
-				core::Real padding5 = 1.0f;
+                core::Real padding5 = 1.0f;
                 math::Mat4x4 vp;
             } Uniform;
 
