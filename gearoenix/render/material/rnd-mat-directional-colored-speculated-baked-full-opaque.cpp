@@ -50,6 +50,7 @@ gearoenix::render::material::DirectionalColoredSpeculatedBakedFullOpaque::Direct
     unsigned int curloc = f->tell();
     env = std::static_pointer_cast<texture::Cube>(astmgr->get_texture(texid, core::EndCaller::create(fun)));
     f->seek(curloc);
+	if (nullptr != shdrsc) shdrsc->set_baked_env(env.get());
 }
 
 gearoenix::render::material::DirectionalColoredSpeculatedBakedFullOpaque::~DirectionalColoredSpeculatedBakedFullOpaque()
