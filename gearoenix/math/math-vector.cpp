@@ -320,56 +320,57 @@ void gearoenix::math::Vec3::print() const
 
 gearoenix::math::Vec4::Vec4()
 {
-	vec[0] = 0.0f;
-	vec[1] = 0.0f;
-	vec[2] = 0.0f;
-	vec[3] = 1.0f;
+    vec[0] = 0.0f;
+    vec[1] = 0.0f;
+    vec[2] = 0.0f;
+    vec[3] = 1.0f;
 }
 
 gearoenix::math::Vec4::Vec4(core::Real x, core::Real y, core::Real z, core::Real w)
 {
-	vec[0] = x;
-	vec[1] = y;
-	vec[2] = z;
-	vec[3] = w;
+    vec[0] = x;
+    vec[1] = y;
+    vec[2] = z;
+    vec[3] = w;
 }
 
 gearoenix::math::Vec4::Vec4(core::Real e)
 {
-	vec[0] = e;
-	vec[1] = e;
-	vec[2] = e;
-	vec[3] = e;
+    vec[0] = e;
+    vec[1] = e;
+    vec[2] = e;
+    vec[3] = e;
 }
 
 gearoenix::math::Vec4::Vec4(const Vec3& v, core::Real w)
 {
-	vec[0] = v[0];
-	vec[1] = v[1];
-	vec[2] = v[2];
-	vec[3] = w;
+    vec[0] = v[0];
+    vec[1] = v[1];
+    vec[2] = v[2];
+    vec[3] = w;
 }
 
 gearoenix::math::Vec3 gearoenix::math::Vec4::xyz() const
 {
-	return Vec3(vec[0], vec[1], vec[2]);
+    return Vec3(vec[0], vec[1], vec[2]);
 }
 
 void gearoenix::math::Vec4::xyz(const Vec3& v)
 {
-	vec[0] = v[0]; 
-	vec[1] = v[1]; 
-	vec[2] = v[2];;
+    vec[0] = v[0];
+    vec[1] = v[1];
+    vec[2] = v[2];
+    ;
 }
 
 gearoenix::core::Real gearoenix::math::Vec4::w() const
 {
-	return vec[3];
+    return vec[3];
 }
 
 void gearoenix::math::Vec4::w(core::Real e)
 {
-	vec[3] = e;
+    vec[3] = e;
 }
 
 const gearoenix::core::Real& gearoenix::math::Vec4::operator[](const unsigned int i) const
@@ -412,8 +413,13 @@ gearoenix::math::Vec4 gearoenix::math::Vec4::normalized() const
 
 void gearoenix::math::Vec4::read(system::File* f)
 {
-	f->read(vec[0]);
-	f->read(vec[1]);
-	f->read(vec[2]);
-	f->read(vec[3]);
+    f->read(vec[0]);
+    f->read(vec[1]);
+    f->read(vec[2]);
+    f->read(vec[3]);
+}
+
+const gearoenix::core::Real* gearoenix::math::Vec4::data() const
+{
+    return vec;
 }

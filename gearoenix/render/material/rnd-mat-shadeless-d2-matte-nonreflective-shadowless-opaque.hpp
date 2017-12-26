@@ -31,7 +31,7 @@ namespace render {
         private:
             const core::Id SHADER_ID;
             Uniform u;
-            Resources* shdrsc;
+            Resources* shdrsc = nullptr;
             std::shared_ptr<texture::Texture2D> txt2d;
 
         public:

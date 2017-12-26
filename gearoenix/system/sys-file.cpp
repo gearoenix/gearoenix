@@ -61,7 +61,12 @@ unsigned int gearoenix::system::File::read(void* data, size_t length)
     return static_cast<unsigned int>(AAsset_read(file, data, length));
 #elif defined(USE_STD_FILE)
     file.read(reinterpret_cast<char*>(data), length);
-    return static_cast<unsigned int>(file.gcount());
+    unsigned int result = static_cast<unsigned int>(file.gcount());
+#ifdef DEBUG_MODE
+    if (result != (unsigned int)length)
+        UNEXPECTED;
+#endif
+    return result;
 #else
 #error "Error not implemented yet!"
 #endif

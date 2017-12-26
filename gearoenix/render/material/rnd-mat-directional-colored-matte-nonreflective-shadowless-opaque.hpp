@@ -25,7 +25,7 @@ namespace render {
                 math::Mat4x4 mvp;
                 math::Mat4x4 m;
                 math::Vec3 sun;
-				core::Real padding1;
+                core::Real padding1;
                 math::Vec4 sun_color;
                 math::Vec4 ambl_color;
             } Uniform;

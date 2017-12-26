@@ -35,8 +35,8 @@ gearoenix::render::material::DirectionalColoredSpeculatedBakedFullOpaque::Direct
     : Material(SHADER_ID, sizeof(u), e, end)
 {
     color.read(f);
-	u.ambl_color.w(color.w());
-	u.sun_color.w(color.w());
+    u.ambl_color.w(color.w());
+    u.sun_color.w(color.w());
     u.spec_color.read(f);
     u.spec_factors.read(f);
     f->read(u.rfl_fac);

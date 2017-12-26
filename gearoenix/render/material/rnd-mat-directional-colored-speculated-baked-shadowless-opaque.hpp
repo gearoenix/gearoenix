@@ -27,16 +27,16 @@ namespace render {
             typedef struct {
                 math::Vec4 ambl_color;
                 math::Vec3 eye;
-				core::Real padding1;
+                core::Real padding1;
                 math::Mat4x4 m;
                 core::Real rfl_fac;
-				math::Vec3 padding2;
+                math::Vec3 padding2;
                 math::Vec3 spec_color;
-				core::Real padding3;
+                core::Real padding3;
                 math::Vec3 spec_factors;
-				core::Real padding4;
+                core::Real padding4;
                 math::Vec3 sun;
-				core::Real padding5;
+                core::Real padding5;
                 math::Vec4 sun_color;
                 math::Mat4x4 vp;
             } Uniform;

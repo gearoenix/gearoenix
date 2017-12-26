@@ -23,8 +23,8 @@ gearoenix::render::material::DirectionalColoredMatteNonreflectiveShadowlessOpaqu
     : Material(SHADER_ID, sizeof(u), e, end)
 {
     color.read(f);
-	u.ambl_color.w(color.w());
-	u.sun_color.w(color.w());
+    u.ambl_color.w(color.w());
+    u.sun_color.w(color.w());
     shdrsc = reinterpret_cast<Resources*>(e->create_shader_resources(SHADER_ID, pl.get(), ub, end));
 }
 
