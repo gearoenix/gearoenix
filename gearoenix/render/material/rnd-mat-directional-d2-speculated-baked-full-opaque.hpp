@@ -31,16 +31,23 @@ namespace render {
                 void set_shadow_texture(texture::Texture2D* t);
             };
             typedef struct {
-                math::Mat4x4 vp;
-                math::Mat4x4 m;
-                math::Mat4x4 db;
-                math::Vec3 sun;
-                math::Vec3 sun_color;
-                math::Vec3 spec_color;
-                math::Vec3 spec_factors;
                 math::Vec3 ambl_color;
+				core::Real ambl_alpha = 1.0f; // this is a temporary workaround in future this must be fed by blender.
+                math::Mat4x4 db;
                 math::Vec3 eye;
+				core::Real padding1;
+                math::Mat4x4 m;
                 core::Real rfl_fac = 0.5f;
+				math::Vec3 padding2;
+                math::Vec3 spec_color;
+				core::Real spec_alpha = 1.0f; // this is a temporary workaround in future this must be fed by blender.
+                math::Vec3 spec_factors;
+				core::Real padding3;
+                math::Vec3 sun;
+				core::Real padding4;
+                math::Vec3 sun_color;
+				core::Real padding5 = 1.0f;
+                math::Mat4x4 vp;
             } Uniform;
 
         private:

@@ -36,7 +36,7 @@ namespace render {
                 core::Real rfl_fac;
                 math::Vec3 padding3;
                 math::Vec3 spec_color;
-                core::Real padding4;
+                core::Real spec_alpha = 1.0f; // this is temporary in future this must be feed by blender part
                 math::Vec3 spec_factors;
                 core::Real padding5;
                 math::Vec3 sun;

@@ -104,7 +104,7 @@ gearoenix::dx11::shader::DirectionalColoredSpeculatedBakedFullOpaque::Directiona
                            "    float spec_fac = smoothstep(spec_factors.x, spec_factors.y, input.speculare) * spec_factors.z;\n"
                            "    float4 final_color = float4(sun_color.xyz * diff_fac + ambl_color.xyz, sun_color.w);\n"
                            "    final_color = lerp(final_color, env_color, rfl_fac.x);\n"
-                           "    final_color.xyz += spec_color.xyz * spec_fac;\n"
+                           "    final_color += spec_color * spec_fac;\n"
                            "    return final_color;\n"
                            "}\n";
         std::vector<D3D11_INPUT_ELEMENT_DESC> desc(2);

@@ -1,235 +1,155 @@
-//#include "gles2-shd-directional-d2-speculated-baked-full-opaque.hpp"
-//#ifdef USE_DIRECTX11
-//#include "../../system/sys-log.hpp"
-//#include "../buffer/gles2-buf-uniform.hpp"
-//#include "../gles2-engine.hpp"
-//#include "../pipeline/gles2-pip-pipeline.hpp"
-//#include "../texture/gles2-txt-2d.hpp"
-//#include "../texture/gles2-txt-cube.hpp"
-//
-//gearoenix::gles2::shader::DirectionalD2SpeculatedBakedFullOpaque::Resources::Resources(Engine* e, pipeline::Pipeline* pip, buffer::Uniform* u)
-//    : render::material::DirectionalD2SpeculatedBakedFullOpaque::Resources(e, pip, u)
-//{
-//}
-//
-//void gearoenix::gles2::shader::DirectionalD2SpeculatedBakedFullOpaque::Resources::bind()
-//{
-//    render::material::DirectionalD2SpeculatedBakedFullOpaque::Uniform* data = reinterpret_cast<render::material::DirectionalD2SpeculatedBakedFullOpaque::Uniform*>(u->get_data());
-//    DirectionalD2SpeculatedBakedFullOpaque* shd = reinterpret_cast<DirectionalD2SpeculatedBakedFullOpaque*>(pip->get_shader());
-//    shd->use();
-//
-//    shd->set_ambl_color(data->ambl_color.data());
-//    shd->set_db(data->db.data());
-//    shd->set_eye(data->eye.data());
-//    shd->set_m(data->m.data());
-//    shd->set_rfl_fac(data->rfl_fac);
-//    shd->set_spec_color(data->spec_color.data());
-//    shd->set_spec_factors(data->spec_factors.data());
-//    shd->set_sun(data->sun.data());
-//    shd->set_sun_color(data->sun_color.data());
-//    shd->set_vp(data->vp.data());
-//
-//    reinterpret_cast<texture::Cube*>(env)->bind(GL_TEXTURE0);
-//    reinterpret_cast<texture::Texture2D*>(txt)->bind(GL_TEXTURE1);
-//    reinterpret_cast<texture::Texture2D*>(shdtxt)->bind(GL_TEXTURE2);
-//}
-//
-//gearoenix::gles2::shader::DirectionalD2SpeculatedBakedFullOpaque::DirectionalD2SpeculatedBakedFullOpaque(Engine* eng, std::shared_ptr<core::EndCaller> end)
-//    : Shader(eng, end)
-//{
-//    eng->add_load_function([this, end] {
-//        create_program();
-//        const std::string pvs = "precision highp sampler2D;\n"
-//                                "precision highp samplerCube;\n"
-//                                "precision highp float;\n"
-//                                "attribute vec3 vertex;\n"
-//                                "attribute vec3 normal;\n"
-//                                "attribute vec2 uv;\n"
-//                                "varying vec2 out_uv;\n"
-//                                "varying vec3 out_shd;\n"
-//                                "varying float out_diffuse;\n"
-//                                "varying float out_speculare;\n"
-//                                "varying vec3 out_eye_reflected;\n"
-//                                "varying float out_bias;\n"
-//                                "uniform mat4 vp;\n"
-//                                "uniform mat4 m;\n"
-//                                "uniform mat4 db;\n"
-//                                "uniform vec3 sun;\n"
-//                                "uniform vec3 eye;\n"
-//                                "void main()\n"
-//                                "{\n"
-//                                "    out_uv = uv;\n"
-//                                "    vec4 position = vec4(vertex, 1.0);\n"
-//                                "    vec4 world_position = m * position;\n"
-//                                "    vec3 world_normal = normalize((m * vec4(normal, 0.0)).xyz);\n"
-//                                "    vec3 eye_direction = normalize(world_position.xyz - eye);\n"
-//                                "    vec3 reflected = reflect(sun, world_normal);\n"
-//                                "    out_eye_reflected = reflect(eye_direction, world_normal);\n"
-//                                "    out_diffuse = dot(sun, world_normal);\n"
-//                                "    out_speculare = dot(eye_direction, reflected);\n"
-//                                "    out_shd = (db * world_position).xyz;\n"
-//                                "    out_bias = clamp(0.005 * tan(acos(abs(out_diffuse))), 0.0, 0.01);\n"
-//                                "    gl_Position = vp * world_position;\n"
-//                                "}\n";
-//        const std::string pfs = "precision highp sampler2D;\n"
-//                                "precision highp samplerCube;\n"
-//                                "precision highp float;\n"
-//                                "varying vec2 out_uv;\n"
-//                                "varying vec3 out_shd;\n"
-//                                "varying float out_diffuse;\n"
-//                                "varying float out_speculare;\n"
-//                                "varying vec3 out_eye_reflected;\n"
-//                                "varying float out_bias;\n"
-//                                "uniform vec3 sun_color;\n"
-//                                "uniform vec3 spec_color;\n"
-//                                "uniform vec3 spec_factors;\n"
-//                                "uniform vec3 ambl_color;\n"
-//                                "uniform float rfl_fac;\n"
-//                                "uniform samplerCube rfl_env;\n"
-//                                "uniform sampler2D txt;\n"
-//                                "uniform sampler2D shdtxt;\n"
-//                                "void main()\n"
-//                                "{\n"
-//                                "    vec3 txt_color = texture2D(txt, out_uv).xyz;\n"
-//                                "    vec3 ambl_light = txt_color * ambl_color;\n"
-//                                "    vec3 env_color = textureCube(rfl_env, out_eye_reflected).xyz;\n"
-//                                "    float diff_fac = smoothstep(0.2, 0.5, out_diffuse);\n"
-//                                "    if(diff_fac < 0.001)\n"
-//                                "    {\n"
-//                                "        gl_FragColor = vec4(ambl_light + (env_color * rfl_fac), 1.0);\n"
-//                                "    }\n"
-//                                "    else\n"
-//                                "    {\n"
-//                                "        vec4 v = texture2D(shdtxt, out_shd.xy);\n"
-//                                "        float d = v.y;\n"
-//                                "        d /= 256.0;\n"
-//                                "        d += v.x;\n"
-//                                "        if(d < out_shd.z - out_bias)\n"
-//                                "        {\n"
-//                                "            gl_FragColor = vec4(ambl_light + (env_color * rfl_fac), 1.0);\n"
-//                                "        }\n"
-//                                "        else\n"
-//                                "        {\n"
-//                                "            float spec_fac = smoothstep(spec_factors[0], spec_factors[1], out_speculare) * spec_factors[2];\n"
-//                                "            vec3 final_color = diff_fac * txt_color * sun_color;\n"
-//                                "            final_color = mix(final_color, env_color, rfl_fac);\n"
-//                                "            final_color += spec_color * spec_fac;\n"
-//                                "            final_color += ambl_light;\n"
-//                                "            gl_FragColor = vec4(final_color, 1.0);\n"
-//                                "        }\n"
-//                                "    }\n"
-//                                "}\n";
-//        vtx_shd = add_shader_to_program(pvs, GL_VERTEX_SHADER);
-//        frg_shd = add_shader_to_program(pfs, GL_FRAGMENT_SHADER);
-//
-//        link();
-//
-//        glUseProgram(shader_program);
-//
-//        vtx_att_ind = glGetAttribLocation(shader_program, "vertex");
-//        nrm_att_ind = glGetAttribLocation(shader_program, "normal");
-//        uv_att_ind = glGetAttribLocation(shader_program, "uv");
-//
-//        ambl_color = get_uniform_location("ambl_color");
-//        db = get_uniform_location("db");
-//        eye = get_uniform_location("eye");
-//        m = get_uniform_location("m");
-//        rfl_fac = get_uniform_location("rfl_fac");
-//        spec_color = get_uniform_location("spec_color");
-//        spec_factors = get_uniform_location("spec_factors");
-//        sun = get_uniform_location("sun");
-//        sun_color = get_uniform_location("sun_color");
-//        vp = get_uniform_location("vp");
-//
-//        rfl_env = get_uniform_location("rfl_env");
-//        txt = get_uniform_location("txt");
-//        shdtxt = get_uniform_location("shdtxt");
-//
-//        glUniform1i(rfl_env, 0);
-//        glUniform1i(txt, 1);
-//        glUniform1i(shdtxt, 2);
-//
-//        validate();
-//        (void)end;
-//    });
-//}
-//
-//gearoenix::gles2::shader::DirectionalD2SpeculatedBakedFullOpaque::~DirectionalD2SpeculatedBakedFullOpaque()
-//{
-//    eng->add_load_function([this] {
-//        end_object(vtx_shd);
-//        end_object(frg_shd);
-//        end_program();
-//    });
-//}
-//
-//void gearoenix::gles2::shader::DirectionalD2SpeculatedBakedFullOpaque::use()
-//{
-//    glUseProgram(shader_program);
-//    glEnableVertexAttribArray(vtx_att_ind);
-//    glEnableVertexAttribArray(nrm_att_ind);
-//    glEnableVertexAttribArray(uv_att_ind);
-//    ////////////////////////////////////////////////////////////
-//    glVertexAttribPointer(vtx_att_ind, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*)0);
-//    glVertexAttribPointer(nrm_att_ind, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
-//    glVertexAttribPointer(uv_att_ind, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*)(6 * sizeof(GLfloat)));
-//    glUniform1i(rfl_env, 0);
-//    glUniform1i(txt, 1);
-//    glUniform1i(shdtxt, 2);
-//}
-//
-//const std::vector<gearoenix::render::shader::stage::Id>& gearoenix::gles2::shader::DirectionalD2SpeculatedBakedFullOpaque::get_stages_ids() const
-//{
-//    return graphic_2_stage;
-//}
-//
-//void gearoenix::gles2::shader::DirectionalD2SpeculatedBakedFullOpaque::set_vp(const GLfloat* data)
-//{
-//    glUniformMatrix4fv(vp, 1, GL_FALSE, data);
-//}
-//
-//void gearoenix::gles2::shader::DirectionalD2SpeculatedBakedFullOpaque::set_m(const GLfloat* data)
-//{
-//    glUniformMatrix4fv(m, 1, GL_FALSE, data);
-//}
-//
-//void gearoenix::gles2::shader::DirectionalD2SpeculatedBakedFullOpaque::set_sun(const GLfloat* data)
-//{
-//    glUniform3fv(sun, 1, data);
-//}
-//
-//void gearoenix::gles2::shader::DirectionalD2SpeculatedBakedFullOpaque::set_sun_color(const GLfloat* data)
-//{
-//    glUniform3fv(sun_color, 1, data);
-//}
-//
-//void gearoenix::gles2::shader::DirectionalD2SpeculatedBakedFullOpaque::set_eye(const GLfloat* data)
-//{
-//    glUniform3fv(eye, 1, data);
-//}
-//
-//void gearoenix::gles2::shader::DirectionalD2SpeculatedBakedFullOpaque::set_spec_color(const GLfloat* data)
-//{
-//    glUniform3fv(spec_color, 1, data);
-//}
-//
-//void gearoenix::gles2::shader::DirectionalD2SpeculatedBakedFullOpaque::set_spec_factors(const GLfloat* data)
-//{
-//    glUniform3fv(spec_factors, 1, data);
-//}
-//
-//void gearoenix::gles2::shader::DirectionalD2SpeculatedBakedFullOpaque::set_ambl_color(const GLfloat* data)
-//{
-//    glUniform3fv(ambl_color, 1, data);
-//}
-//
-//void gearoenix::gles2::shader::DirectionalD2SpeculatedBakedFullOpaque::set_db(const GLfloat* data)
-//{
-//    glUniformMatrix4fv(db, 1, GL_FALSE, data);
-//}
-//
-//void gearoenix::gles2::shader::DirectionalD2SpeculatedBakedFullOpaque::set_rfl_fac(const GLfloat data)
-//{
-//    glUniform1f(rfl_fac, data);
-//}
-//#endif
+#include "dx11-shd-directional-d2-speculated-baked-full-opaque.hpp"
+#ifdef USE_DIRECTX11
+#include "../../core/cr-static.hpp"
+#include "../../system/sys-log.hpp"
+#include "../buffer/dx11-buf-uniform.hpp"
+#include "../dx11-engine.hpp"
+#include "../pipeline/dx11-pip-pipeline.hpp"
+#include "../texture/dx11-txt-2d.hpp"
+#include "../texture/dx11-txt-cube.hpp"
+#include "../texture/dx11-txt-sampler.hpp"
+
+gearoenix::dx11::shader::DirectionalD2SpeculatedBakedFullOpaque::Resources::Resources(Engine* e, pipeline::Pipeline* pip, buffer::Uniform* u)
+    : render::material::DirectionalD2SpeculatedBakedFullOpaque::Resources(e, pip, u)
+{
+}
+
+void gearoenix::dx11::shader::DirectionalD2SpeculatedBakedFullOpaque::Resources::bind()
+{
+	buffer::Uniform* uniform = reinterpret_cast<buffer::Uniform*>(u);
+    DirectionalD2SpeculatedBakedFullOpaque* shd = reinterpret_cast<DirectionalD2SpeculatedBakedFullOpaque*>(pip->get_shader()); 
+	uniform->set_for_vertex_shader();
+	uniform->set_for_fragment_shader();
+    reinterpret_cast<texture::Texture2D*>(txt)->bind(0);
+    reinterpret_cast<texture::Cube*>(env)->bind(1);
+    reinterpret_cast<texture::Texture2D*>(shdtxt)->bind(2);
+    shd->use();
+}
+
+gearoenix::dx11::shader::DirectionalD2SpeculatedBakedFullOpaque::DirectionalD2SpeculatedBakedFullOpaque(Engine* eng, std::shared_ptr<core::EndCaller> end)
+    : Shader(eng, end)
+{
+    eng->add_load_function([this, end] {
+		const char pvs[] =
+			"struct VertexInputType {\n"
+			"    float3 position : POSITION;\n"
+			"    float3 normal   : NORMAL;\n"
+			"    float2 texcoord : TEXCOORD;\n"
+			"};\n"
+			"struct PixelInputType {\n"
+			"    float4 position      : SV_POSITION;\n"
+			"    float2 texcoord      : TEXCOORD0;\n"
+			"    float3 shadow        : TEXCOORD1;\n"
+			"    float3 reflected_eye : TEXCOORD2;\n"
+			"    float  diffuse       : DIFFUSE;\n"
+			"    float  speculare     : SPECULARE;\n"
+			"    float  bias          : BIAS;\n"
+			"};\n"
+			"cbuffer UniformBuffer {\n"
+			"    float4 ambl_color;\n"
+			"    matrix db;\n"
+			"    float4 eye;\n"
+			"    matrix m;\n"
+			"    float4 rfl_fac;\n"
+			"    float4 spec_color;\n"
+			"    float4 spec_factors;\n"
+			"    float4 sun;\n"
+			"    float4 sun_color;\n"
+			"    matrix vp;\n"
+			"};\n"
+			"PixelInputType main(VertexInputType input) {\n"
+			"    PixelInputType output;\n"
+			"    float4 position = float4(input.position, 1.0);\n"
+			"    float4 world_position = mul(position, m);\n"
+			"    float3 world_normal = normalize(mul(float4(input.normal, 0.0), m).xyz);\n"
+			"    float3 eye_direction = normalize(world_position.xyz - eye.xyz);\n"
+			"    float3 reflected = reflect(sun.xyz, world_normal);\n"
+			"    output.reflected_eye = reflect(eye_direction, world_normal);\n"
+			"    output.diffuse = dot(sun.xyz, world_normal);\n"
+			"    output.speculare = dot(eye_direction, reflected);\n"
+			"    output.shadow = mul(world_position, db).xyz;\n"
+			"    output.bias = clamp(0.005 * tan(acos(abs(output.diffuse))), 0.0, 0.01);\n"
+			"    output.position = mul(world_position, vp);\n"
+			"    output.texcoord = input.texcoord;\n"
+			"    return output;\n"
+			"}\n";
+		const char pfs[] =
+			"struct PixelInputType {\n"
+			"    float4 position      : SV_POSITION;\n"
+			"    float2 texcoord      : TEXCOORD0;\n"
+			"    float3 shadow        : TEXCOORD1;\n"
+			"    float3 reflected_eye : TEXCOORD2;\n"
+			"    float  diffuse       : DIFFUSE;\n"
+			"    float  speculare     : SPECULARE;\n"
+			"    float  bias          : BIAS;\n"
+			"};\n"
+			"cbuffer UniformBuffer {\n"
+			"    float4 ambl_color;\n"
+			"    matrix db;\n"
+			"    float4 eye;\n"
+			"    matrix m;\n"
+			"    float4 rfl_fac;\n"
+			"    float4 spec_color;\n"
+			"    float4 spec_factors;\n"
+			"    float4 sun;\n"
+			"    float4 sun_color;\n"
+			"    matrix vp;\n"
+			"};\n"
+			"Texture2D   txt     : register(t0);\n"
+			"TextureCube rfl_env : register(t1);\n"
+			"Texture2D   shdtxt  : register(t2);\n"
+			"SamplerState smp;\n"
+			"float4 main(PixelInputType input) : SV_TARGET {\n"
+			"    float4 env_color = rfl_env.Sample(smp, input.reflected_eye);\n"
+			"    float4 txt_color = txt.Sample(smp, input.texcoord);\n"
+			"    float4 amb_color = txt_color * ambl_color;\n"
+			"    float diff_fac = smoothstep(0.2, 0.5, input.diffuse);\n"
+			"    if(\n"
+			"            diff_fac < 0.001 ||\n"
+			"            (\n"
+			"                input.shadow.x > 0.0 && input.shadow.x < 1.0 &&\n"
+			"                input.shadow.y > 0.0 && input.shadow.y < 1.0 &&\n"
+			"                shdtxt.Sample(smp, input.shadow.xy).x < input.shadow.z - input.bias))\n"
+			"        return lerp(amb_color, env_color, rfl_fac.x);\n"
+			"    float spec_fac = smoothstep(spec_factors.x, spec_factors.y, input.speculare) * spec_factors.z;\n"
+			"    float4 final_color = float4(txt_color.xyz * sun_color.xyz * diff_fac + ambl_color.xyz, amb_color.w);\n"
+			"    final_color = lerp(final_color, env_color, rfl_fac.x);\n"
+			"    final_color += spec_color * spec_fac;\n"
+			"    return final_color;\n"
+			"}\n";
+		std::vector<D3D11_INPUT_ELEMENT_DESC> desc(3);
+		GXSETZ(desc[0]);
+		desc[0].SemanticName = "POSITION";
+		desc[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+		desc[0].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+		GXSETZ(desc[1]);
+		desc[1].SemanticName = "NORMAL";
+		desc[1].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+		desc[1].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+		desc[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+		GXSETZ(desc[2]);
+		desc[2].SemanticName = "TEXCOORD";
+		desc[2].Format = DXGI_FORMAT_R32G32_FLOAT;
+		desc[2].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+		desc[2].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+		compile_shader(pvs, render::shader::stage::VERTEX, desc);
+		compile_shader(pfs, render::shader::stage::FRAGMENT);
+        (void)end;
+    });
+}
+
+gearoenix::dx11::shader::DirectionalD2SpeculatedBakedFullOpaque::~DirectionalD2SpeculatedBakedFullOpaque()
+{}
+
+void gearoenix::dx11::shader::DirectionalD2SpeculatedBakedFullOpaque::use()
+{
+	run();
+	Engine* engine = reinterpret_cast<Engine*>(eng);
+	engine->get_sampler()->bind(0);
+}
+
+const std::vector<gearoenix::render::shader::stage::Id>& gearoenix::dx11::shader::DirectionalD2SpeculatedBakedFullOpaque::get_stages_ids() const
+{
+    return graphic_2_stage;
+}
+#endif
