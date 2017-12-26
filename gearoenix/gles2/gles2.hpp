@@ -2,6 +2,9 @@
 #ifdef USE_SDL
 #ifdef IN_LINUX
 #include <SDL2/SDL_opengles2.h>
+#elif defined(IN_MAC)
+#define GL_GLEXT_PROTOTYPES 1
+#include <SDL_opengl.h>
 #elif defined(IN_IOS) || defined(IN_WINDOWS)
 #include <SDL_opengles2.h>
 #endif
