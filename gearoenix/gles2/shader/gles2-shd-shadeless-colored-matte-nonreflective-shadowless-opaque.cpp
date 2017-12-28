@@ -25,14 +25,16 @@ gearoenix::gles2::shader::ShadelessColoredMatteNonreflectiveShadowlessOpaque::Sh
 {
     eng->add_load_function([this, end] {
         create_program();
-        const std::string pvs = "precision highp float;\n"
+        const std::string pvs = "#version 100\n"
+                                "precision highp float;\n"
                                 "attribute vec3 vertex;\n"
                                 "uniform mat4 mvp;\n"
                                 "void main()\n"
                                 "{\n"
                                 "    gl_Position = mvp * vec4(vertex, 1.0);\n"
                                 "}\n";
-        const std::string pfs = "precision highp float;\n"
+        const std::string pfs = "#version 100\n"
+                                "precision highp float;\n"
                                 "uniform vec3 color;\n"
                                 "void main()\n"
                                 "{\n"

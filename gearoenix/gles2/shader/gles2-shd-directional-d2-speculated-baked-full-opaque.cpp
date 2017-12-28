@@ -39,7 +39,8 @@ gearoenix::gles2::shader::DirectionalD2SpeculatedBakedFullOpaque::DirectionalD2S
 {
     eng->add_load_function([this, end] {
         create_program();
-        const std::string pvs = "precision highp sampler2D;\n"
+        const std::string pvs = "#version 100\n"
+                                "precision highp sampler2D;\n"
                                 "precision highp samplerCube;\n"
                                 "precision highp float;\n"
                                 "attribute vec3 vertex;\n"
@@ -71,7 +72,8 @@ gearoenix::gles2::shader::DirectionalD2SpeculatedBakedFullOpaque::DirectionalD2S
                                 "    out_bias = clamp(0.005 * tan(acos(abs(out_diffuse))), 0.0, 0.01);\n"
                                 "    gl_Position = vp * world_position;\n"
                                 "}\n";
-        const std::string pfs = "precision highp sampler2D;\n"
+        const std::string pfs = "#version 100\n"
+                                "precision highp sampler2D;\n"
                                 "precision highp samplerCube;\n"
                                 "precision highp float;\n"
                                 "varying vec2 out_uv;\n"
@@ -148,8 +150,7 @@ gearoenix::gles2::shader::DirectionalD2SpeculatedBakedFullOpaque::DirectionalD2S
         glUniform1i(rfl_env, 0);
         glUniform1i(txt, 1);
         glUniform1i(shdtxt, 2);
-
-        validate();
+        
         (void)end;
     });
 }

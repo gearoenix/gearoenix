@@ -36,6 +36,8 @@ namespace system {
         SDL_Window* window = nullptr;
         SDL_GLContext gl_context;
         bool running = true;
+        core::Id supported_engine;
+        void create_context();
         static int SDLCALL event_receiver(void* user_data, SDL_Event* event);
 
     public:

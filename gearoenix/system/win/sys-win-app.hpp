@@ -28,6 +28,7 @@ namespace system {
         UINT mouse_prepos_x = 0, mouse_prepos_y = 0;
         static LRESULT CALLBACK wnd_proc(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam);
         LRESULT CALLBACK handler(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam);
+        core::Real supported_engine;
 
     public:
         Application();

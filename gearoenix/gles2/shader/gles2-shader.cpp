@@ -68,7 +68,7 @@ void gearoenix::gles2::shader::Shader::validate()
 void gearoenix::gles2::shader::Shader::run()
 {
     link();
-    validate();
+    glUseProgram(shader_program);
 }
 
 GLuint gearoenix::gles2::shader::Shader::get_uniform_location(const std::string& uname)

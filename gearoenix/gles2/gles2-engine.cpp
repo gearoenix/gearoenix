@@ -30,7 +30,7 @@
 
 #ifdef INTA_TEST001
 static GLuint vbo, ibo;
-static std::shared_ptr<gearoenix::gles2::shader::DirectionalTexturedSpeculatedNocubeNoshadowOpaque> shd;
+static std::shared_ptr<gearoenix::gles2::shader::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque> shd;
 static std::shared_ptr<gearoenix::render::camera::Camera> cam;
 static std::shared_ptr<gearoenix::gles2::texture::Texture2D> txt;
 #endif
@@ -127,13 +127,13 @@ void gearoenix::gles2::Engine::update()
     if (first_happen == 0) {
         ++first_happen;
         cam = sysapp->get_asset_manager()->get_camera(0);
-        shd = std::static_pointer_cast<shader::DirectionalTexturedSpeculatedNocubeNoshadowOpaque>(
+        shd = std::static_pointer_cast<shader::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque>(
             sysapp->get_asset_manager()->get_shader(
-                render::shader::DIRECTIONAL_TEXTURED_SPECULATED_NOCUBE_FULLSHADOW_OPAQUE,
+                render::shader::DIRECTIONAL_D2_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE,
                 core::EndCaller::create([&] { ++first_happen; })));
         txt = std::static_pointer_cast<texture::Texture2D>(
             sysapp->get_asset_manager()->get_texture(
-                0, core::EndCaller::create([&] { ++first_happen; })));
+                7, core::EndCaller::create([&] { ++first_happen; })));
     }
 #endif
     glClear(GL_COLOR_BUFFER_BIT);
@@ -156,7 +156,7 @@ void gearoenix::gles2::Engine::update()
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
         shd->use();
-        shd->set_mvp(cam->get_view_projection().data());
+        shd->set_vp(cam->get_view_projection().data());
         //        shd->set_mvp(math::Mat4x4().data());
         txt->bind(GL_TEXTURE0);
         glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, 0);

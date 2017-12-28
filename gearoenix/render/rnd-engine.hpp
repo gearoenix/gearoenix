@@ -44,8 +44,21 @@ namespace render {
         class Cube;
     }
     class Engine {
+    public:
+        enum EngineType : core::Id {
+            VULKAN,
+            OPENGL_43,
+            OPENGL_33,
+            OPENGL_ES3,
+            OPENGL_ES2,
+            DIRECTX_11,
+            DIRECTX_12,
+            METAL,
+            UNKNOWN,
+        };
     private:
     protected:
+        EngineType engine_type = EngineType::UNKNOWN;
         system::Application* sysapp;
         pipeline::Manager* pipmgr;
 #ifdef THREAD_SUPPORTED

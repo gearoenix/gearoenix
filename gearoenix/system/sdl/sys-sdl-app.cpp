@@ -13,6 +13,58 @@ gearoenix::system::Application* gearoenix::system::Application::app = nullptr;
 const gearoenix::core::Real gearoenix::system::Application::rotate_epsilon = 3.14f / 180.0f;
 const gearoenix::core::Real gearoenix::system::Application::zoom_epsilon = 0.00001f;
 
+void gearoenix::system::Application::create_context()
+{
+#ifdef IN_DESKTOP
+    gl_context = SDL_GL_CreateContext(window);
+    if (gl_context != nullptr) {
+        supported_engine = render::Engine::EngineType::OPENGL_43;
+        glEnable(GL_MULTISAMPLE);
+        GXLOGD("Machine is capable if OpenGL 4.3");
+        return;
+    }
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    gl_context = SDL_GL_CreateContext(window);
+    if (gl_context != nullptr) {
+        supported_engine = render::Engine::EngineType::OPENGL_33;
+        glEnable(GL_MULTISAMPLE);
+        GXLOGD("Machine is capable if OpenGL 3.3");
+        return;
+    }
+#endif
+#ifdef USE_OPENGL_ES3
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+    gl_context = SDL_GL_CreateContext(window);
+    if (gl_context != nullptr) {
+        supported_engine = render::Engine::EngineType::OPENGL_ES3;
+        glEnable(GL_MULTISAMPLE);
+        GXLOGD("Machine is capable if OpenGL ES 3.0");
+        return;
+    }
+#endif
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+    gl_context = SDL_GL_CreateContext(window);
+    if (gl_context != nullptr) {
+        supported_engine = render::Engine::EngineType::OPENGL_ES2;
+        GXLOGD("Machine is capable if OpenGL ES 2.0");
+        return;
+    }
+    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
+    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
+    gl_context = SDL_GL_CreateContext(window);
+    if (gl_context != nullptr) {
+        supported_engine = render::Engine::EngineType::OPENGL_ES2;
+        GXLOGD("Machine is capable if OpenGL ES 2.0");
+        return;
+    }
+    GXLOGF("No usable API find in the host machine.");
+}
+
 int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_Event* event)
 {
     // It's gonna implement whenever needed and as much as needed.
@@ -82,33 +134,37 @@ gearoenix::system::Application::Application()
         GXLOGF("Failed to initialize SDL: " << SDL_GetError());
     }
     SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 2);
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
-    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 32);
+    SDL_SetHint(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandescapeRight");
+    SDL_DisplayMode display_mode;
+    SDL_GetCurrentDisplayMode(0, &display_mode);
     window = SDL_CreateWindow(
         APPLICATION_NAME,
         SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED,
-        DEFAULT_WINDOW_WIDTH,
-        DEFAULT_WINDOW_HEIGHT,
-        SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN_DESKTOP);
+        display_mode.w,
+        display_mode.h,
+        SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN |
+        SDL_WINDOW_BORDERLESS | SDL_WINDOW_FULLSCREEN_DESKTOP |
+        SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
     if (!window) {
         GXLOGF("Couldn't create window: " << SDL_GetError());
     }
-    gl_context = SDL_GL_CreateContext(window);
-    if (!gl_context) {
-        GXLOGF("Couldn't create context: " << SDL_GetError());
-    }
+    create_context();
+    
     SDL_AddEventWatch(event_receiver, this);
     SDL_GL_MakeCurrent(window, gl_context);
-    //    glEnable(GL_MULTISAMPLE);
     int w, h;
     SDL_GetWindowSize(window, &w, &h);
     win_width = (unsigned int)w;

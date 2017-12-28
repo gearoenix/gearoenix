@@ -25,7 +25,8 @@ gearoenix::gles2::shader::ShadelessD2MatteNonreflectiveShadowlessOpaque::Shadele
 {
     eng->add_load_function([this, end] {
         create_program();
-        const std::string pvs = "precision highp sampler2D;\n"
+        const std::string pvs = "#version 100\n"
+                                "precision highp sampler2D;\n"
                                 "precision highp float;\n"
                                 "attribute vec3 vertex;\n"
                                 "attribute vec2 uv;\n"
@@ -36,7 +37,8 @@ gearoenix::gles2::shader::ShadelessD2MatteNonreflectiveShadowlessOpaque::Shadele
                                 "    out_uv = uv;\n"
                                 "    gl_Position = mvp * vec4(vertex, 1.0);\n"
                                 "}\n";
-        const std::string pfs = "precision highp sampler2D;\n"
+        const std::string pfs = "#version 100\n"
+                                "precision highp sampler2D;\n"
                                 "precision highp float;\n"
                                 "varying vec2 out_uv;\n"
                                 "uniform sampler2D txt2d;\n"

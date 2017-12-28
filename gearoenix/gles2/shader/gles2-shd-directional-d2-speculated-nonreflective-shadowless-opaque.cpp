@@ -33,7 +33,8 @@ gearoenix::gles2::shader::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque::
 {
     eng->add_load_function([this, end] {
         create_program();
-        const std::string pvs = "precision highp sampler2D;\n"
+        const std::string pvs = "#version 100\n"
+                                "precision highp sampler2D;\n"
                                 "precision highp float;\n"
                                 "attribute vec3 vertex;\n"
                                 "attribute vec3 normal;\n"
@@ -56,7 +57,8 @@ gearoenix::gles2::shader::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque::
                                 "    out_speculare = -dot(normalize(eye - world_position.xyz), reflected);\n"
                                 "    gl_Position = vp * world_position;\n"
                                 "}\n";
-        const std::string pfs = "precision highp sampler2D;\n"
+        const std::string pfs = "#version 100\n"
+                                "precision highp sampler2D;\n"
                                 "precision highp float;\n"
                                 "varying vec2 out_uv;\n"
                                 "varying float out_diffuse;\n"

@@ -26,7 +26,8 @@ gearoenix::gles2::shader::Depth::Depth(core::Id sid, Engine* eng, std::shared_pt
     eng->add_load_function([this, end] {
         create_program();
         GXLOGE("TODO I can disable blGXLOGEng and then i can use alpha part too.")
-        const std::string pvs = "precision highp float;\n"
+        const std::string pvs = "#version 100\n"
+                                "precision highp float;\n"
                                 "attribute vec3 vertex;\n"
                                 "uniform mat4 mvp;\n"
                                 "varying float depth;\n"
@@ -35,7 +36,8 @@ gearoenix::gles2::shader::Depth::Depth(core::Id sid, Engine* eng, std::shared_pt
                                 "    gl_Position = mvp * vec4(vertex, 1.0);\n"
                                 "    depth = (gl_Position.z * 0.5) + 0.5;\n"
                                 "}\n";
-        const std::string pfs = "precision highp float;\n"
+        const std::string pfs = "#version 100\n"
+                                "precision highp float;\n"
                                 "varying float depth;\n"
                                 "void main()\n"
                                 "{\n"

@@ -26,7 +26,8 @@ gearoenix::gles2::shader::ShadelessCubeMatteNonreflectiveShadowlessOpaque::Shade
 {
     eng->add_load_function([this, end] {
         create_program();
-        const std::string pvs = "precision highp samplerCube;\n"
+        const std::string pvs = "#version 100\n"
+                                "precision highp samplerCube;\n"
                                 "precision highp float;\n"
                                 "attribute vec3 vertex;\n"
                                 "varying vec3 out_pos;\n"
@@ -37,7 +38,8 @@ gearoenix::gles2::shader::ShadelessCubeMatteNonreflectiveShadowlessOpaque::Shade
                                 "    out_pos = (m * vec4(vertex, 0.0)).xyz;\n"
                                 "    gl_Position = mvp * vec4(vertex, 1.0);\n"
                                 "}\n";
-        const std::string pfs = "precision highp samplerCube;\n"
+        const std::string pfs = "#version 100\n"
+                                "precision highp samplerCube;\n"
                                 "precision highp float;\n"
                                 "varying vec3 out_pos;\n"
                                 "uniform samplerCube ctxt;\n"
