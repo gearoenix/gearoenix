@@ -63,7 +63,7 @@ void gearoenix::system::Application::create_window()
 
 void gearoenix::system::Application::create_context()
 {
-#ifdef IN_DESKTOP
+#ifdef USE_OPENGL_43
     gl_context = SDL_GL_CreateContext(window);
     if (gl_context != nullptr) {
         supported_engine = render::Engine::EngineType::OPENGL_43;
@@ -71,6 +71,8 @@ void gearoenix::system::Application::create_context()
         GXLOGD("Machine is capable if OpenGL 4.3");
         return;
     }
+#endif
+#ifdef USE_OPENGL_33
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     gl_context = SDL_GL_CreateContext(window);
