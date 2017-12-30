@@ -21,10 +21,11 @@ void gearoenix::gles2::shader::ShadelessCubeMatteNonreflectiveShadowlessOpaque::
     reinterpret_cast<texture::Cube*>(ctxt)->bind(GL_TEXTURE0);
 }
 
-gearoenix::gles2::shader::ShadelessCubeMatteNonreflectiveShadowlessOpaque::ShadelessCubeMatteNonreflectiveShadowlessOpaque(Engine* eng, std::shared_ptr<core::EndCaller> end)
+gearoenix::gles2::shader::ShadelessCubeMatteNonreflectiveShadowlessOpaque::ShadelessCubeMatteNonreflectiveShadowlessOpaque(Engine* eng, core::EndCaller<core::EndCallerIgnore> end)
     : Shader(eng, end)
 {
     eng->add_load_function([this, end] {
+        CHECK_FOR_GRAPHIC_API_ERROR;
         create_program();
         const std::string pvs = "#version 100\n"
                                 "precision highp samplerCube;\n"
@@ -55,6 +56,7 @@ gearoenix::gles2::shader::ShadelessCubeMatteNonreflectiveShadowlessOpaque::Shade
         m = get_uniform_location("m");
         ctxt = get_uniform_location("ctxt");
         (void)end;
+        CHECK_FOR_GRAPHIC_API_ERROR;
     });
 }
 

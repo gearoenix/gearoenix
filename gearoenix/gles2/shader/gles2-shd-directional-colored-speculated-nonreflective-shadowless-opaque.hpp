@@ -2,6 +2,7 @@
 #define GEAROENIX_GLES2_SHADER_DIRECTIONAL_COLORED_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE_HPP
 #include "../../core/cr-build-configuration.hpp"
 #ifdef USE_OPENGL_ES2
+#include "../../core/cr-end-caller.hpp"
 #include "../../render/material/rnd-mat-directional-colored-speculated-nonreflective-shadowless-opaque.hpp"
 #include "../gles2.hpp"
 #include "gles2-shader.hpp"
@@ -37,7 +38,7 @@ namespace gles2 {
             GLint nrm_att_ind;
 
         public:
-            DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque(Engine* eng, std::shared_ptr<core::EndCaller> end);
+            DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque(Engine* eng, core::EndCaller<core::EndCallerIgnore> end);
             ~DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque();
             void use();
             const std::vector<render::shader::stage::Id>& get_stages_ids() const;

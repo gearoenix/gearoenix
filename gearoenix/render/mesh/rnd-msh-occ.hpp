@@ -1,10 +1,8 @@
 #ifndef GEAROENIX_RENDER_MESH_OCC_HPP
 #define GEAROENIX_RENDER_MESH_OCC_HPP
 #include <memory>
+#include "../../core/cr-end-caller.hpp"
 namespace gearoenix {
-namespace core {
-    class EndCaller;
-}
 namespace system {
     class File;
 }
@@ -19,7 +17,7 @@ namespace render {
             buffer::Mesh* buf;
 
         public:
-            Occ(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c);
+            Occ(system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
             ~Occ();
         };
     }

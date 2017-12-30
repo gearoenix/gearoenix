@@ -13,11 +13,13 @@ gearoenix::render::material::Depth::Resources::Resources(Engine* e, pipeline::Pi
 {
 }
 
-gearoenix::render::material::Depth::Depth(core::Id shdid, Engine* e, std::shared_ptr<core::EndCaller> end)
+gearoenix::render::material::Depth::Depth(core::Id shdid, Engine* e, core::EndCaller<core::EndCallerIgnore> end)
     : Material(shdid, sizeof(u), e, end)
     , SHADER_ID(shdid)
 {
+    e->add_load_function([this, e, end]()-> void {
     shdrsc = reinterpret_cast<Resources*>(e->create_shader_resources(SHADER_ID, pl.get(), ub, end));
+        });
 }
 
 gearoenix::render::material::Depth::~Depth()

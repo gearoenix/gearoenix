@@ -3,12 +3,10 @@
 #include "../../math/math-matrix.hpp"
 #include "../../math/math-vector.hpp"
 #include "../shader/rnd-shd-resources.hpp"
+#include "../../core/cr-end-caller.hpp"
 #include "rnd-mat-material.hpp"
 #include <memory>
 namespace gearoenix {
-namespace core {
-    class EndCaller;
-}
 namespace render {
     namespace texture {
         class Texture2D;
@@ -43,7 +41,7 @@ namespace render {
             Resources* shdrsc;
 
         public:
-            DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> end);
+            DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque(system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> end);
             ~DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque();
             unsigned int get_vertex_elements_count() const;
             core::Id get_shader_id() const;

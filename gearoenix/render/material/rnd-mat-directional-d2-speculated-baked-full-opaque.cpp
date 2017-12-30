@@ -36,7 +36,7 @@ void gearoenix::render::material::DirectionalD2SpeculatedBakedFullOpaque::Resour
     shdtxt = t;
 }
 
-gearoenix::render::material::DirectionalD2SpeculatedBakedFullOpaque::DirectionalD2SpeculatedBakedFullOpaque(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> end)
+gearoenix::render::material::DirectionalD2SpeculatedBakedFullOpaque::DirectionalD2SpeculatedBakedFullOpaque(system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> end)
     : Material(SHADER_ID, sizeof(u), e, end)
 {
     core::Id tex2did;
@@ -47,15 +47,14 @@ gearoenix::render::material::DirectionalD2SpeculatedBakedFullOpaque::Directional
     core::Id texid;
     f->read(texid);
     core::asset::Manager* astmgr = e->get_system_application()->get_asset_manager();
-    std::function<void()> fun = [this, end, e] {
-        shdrsc = reinterpret_cast<Resources*>(e->create_shader_resources(SHADER_ID, pl.get(), ub, end));
-        shdrsc->set_baked_env(env.get());
-        shdrsc->set_texture(txt.get());
-    };
-    std::shared_ptr<core::EndCaller> end_caller(new core::EndCaller(fun));
     unsigned int curloc = f->tell();
-    txt = std::static_pointer_cast<texture::Texture2D>(astmgr->get_texture(tex2did, end_caller));
-    env = std::static_pointer_cast<texture::Cube>(astmgr->get_texture(texid, end_caller));
+    txt = std::static_pointer_cast<texture::Texture2D>(astmgr->get_texture(tex2did, core::EndCaller<render::texture::Texture>([end] (std::shared_ptr<render::texture::Texture>) -> void {})));
+    env = std::static_pointer_cast<texture::Cube>(astmgr->get_texture(texid, core::EndCaller<render::texture::Texture>([end] (std::shared_ptr<render::texture::Texture>) -> void {})));
+    e->add_load_function([this, end, e] () -> void {
+        shdrsc = reinterpret_cast<Resources*>(e->create_shader_resources(SHADER_ID, pl.get(), ub, end));
+        shdrsc->set_texture(txt.get());
+        shdrsc->set_baked_env(env.get());
+    });
     f->seek(curloc);
 }
 

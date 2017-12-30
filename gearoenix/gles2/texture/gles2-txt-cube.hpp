@@ -6,9 +6,6 @@
 #include "../gles2.hpp"
 #include <memory>
 namespace gearoenix {
-namespace core {
-    class EndCaller;
-}
 namespace system {
     class File;
 }
@@ -20,7 +17,7 @@ namespace gles2 {
             GLuint texture_object;
 
         public:
-            Cube(system::File* file, Engine* engine, std::shared_ptr<core::EndCaller> end);
+            Cube(system::File* file, Engine* engine, core::EndCaller<core::EndCallerIgnore> end);
             ~Cube();
             void bind(GLenum texture_unit);
         };

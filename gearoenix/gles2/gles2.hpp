@@ -1,11 +1,12 @@
 #include "../core/cr-build-configuration.hpp"
+#ifdef USE_OPENGL_ES2
 #ifdef USE_SDL
 #ifdef IN_LINUX
-#include <SDL2/SDL_opengles2.h>
+#include <SDL2/SDL_opengles.h>
 #elif defined(IN_MAC)
 #define GL_GLEXT_PROTOTYPES 1
 #include <SDL_opengl.h>
-#elif defined(IN_IOS) || defined(IN_WINDOWS)
+#elif defined(IN_IOS)
 #include <SDL_opengles2.h>
 #endif
 #elif defined(USE_GLFW)
@@ -16,23 +17,19 @@
 #else
 #error "Not implemented yet!"
 #endif
-#define CHECK_FOR_GRAPHIC_API_ERROR                               \
-    {                                                             \
-        GLenum glError = glGetError();                            \
-        if (GL_NO_ERROR == glError) {                             \
-        } else if (GL_INVALID_ENUM == glError) {                  \
-            LOGF("Invalid enum error.");                          \
-        } else if (GL_INVALID_VALUE == glError) {                 \
-            LOGF("Invalid value error.");                         \
-        } else if (GL_INVALID_OPERATION == glError) {             \
-            LOGF("Invalid operation error.");                     \
-        } else if (GL_INVALID_FRAMEBUFFER_OPERATION == glError) { \
-            LOGF("Invalid framebuffer operation error.");         \
-        } else if (GL_OUT_OF_MEMORY == glError) {                 \
-            LOGF("Out of memory error.");                         \
-        } else {                                                  \
-            LOGF("Unknown error.");                               \
-        }                                                         \
-    }
-
+#ifdef DEBUG_MODE
+#define CHECK_FOR_GRAPHIC_API_ERROR \
+switch(glGetError()) { \
+case GL_NO_ERROR: GXLOGI("No error found."); break; \
+case GL_INVALID_ENUM: GXLOGF("Invalid enum"); \
+case GL_INVALID_VALUE: GXLOGF("Invalid value"); \
+case GL_INVALID_OPERATION: GXLOGF("Invalid operation"); \
+case GL_INVALID_FRAMEBUFFER_OPERATION: GXLOGF("Invalid framebuffer operation error."); \
+case GL_OUT_OF_MEMORY: GXLOGF("Out of memory error."); \
+default: GXLOGF("Unknown error."); \
+}
 #define GLES2_PROFILING
+#else
+#define CHECK_FOR_GRAPHIC_API_ERROR
+#endif // debug mode
+#endif // opengl es 2

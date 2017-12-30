@@ -34,7 +34,7 @@ void gearoenix::gles2::shader::DirectionalD2SpeculatedBakedFullOpaque::Resources
     reinterpret_cast<texture::Texture2D*>(shdtxt)->bind(GL_TEXTURE2);
 }
 
-gearoenix::gles2::shader::DirectionalD2SpeculatedBakedFullOpaque::DirectionalD2SpeculatedBakedFullOpaque(Engine* eng, std::shared_ptr<core::EndCaller> end)
+gearoenix::gles2::shader::DirectionalD2SpeculatedBakedFullOpaque::DirectionalD2SpeculatedBakedFullOpaque(Engine* eng, core::EndCaller<core::EndCallerIgnore> end)
     : Shader(eng, end)
 {
     eng->add_load_function([this, end] {

@@ -19,13 +19,13 @@ void gearoenix::gles2::shader::Depth::Resources::bind()
     shd->set_mvp(data->mvp.data());
 }
 
-gearoenix::gles2::shader::Depth::Depth(core::Id sid, Engine* eng, std::shared_ptr<core::EndCaller> end)
+gearoenix::gles2::shader::Depth::Depth(core::Id sid, Engine* eng, core::EndCaller<core::EndCallerIgnore> end)
     : Shader(eng, end)
     , vtx_stride(Shader::get_vertex_real_count(sid) * sizeof(GLfloat))
 {
     eng->add_load_function([this, end] {
         create_program();
-        GXLOGE("TODO I can disable blGXLOGEng and then i can use alpha part too.")
+        GXLOGE("TODO I can disable blending and then i can use alpha part too.")
         const std::string pvs = "#version 100\n"
                                 "precision highp float;\n"
                                 "attribute vec3 vertex;\n"
@@ -66,7 +66,6 @@ void gearoenix::gles2::shader::Depth::use()
 {
     glUseProgram(shader_program);
     glEnableVertexAttribArray(vtx_att_ind);
-    ////////////////////////////////////////////////////////////
     glVertexAttribPointer(vtx_att_ind, 3, GL_FLOAT, GL_FALSE, vtx_stride, (void*)0);
 }
 

@@ -13,7 +13,7 @@
 #include "../scene/rnd-scn-scene.hpp"
 #include <iostream>
 
-gearoenix::render::model::Model::Model(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c)
+gearoenix::render::model::Model::Model(system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
 {
     m.read(f);
     occloc.read(f);
@@ -48,10 +48,10 @@ gearoenix::render::model::Model::Model(system::File* f, Engine* e, std::shared_p
     core::asset::Manager* astmgr = e->get_system_application()->get_asset_manager();
     for (core::Id mesh_id : mesh_ids) {
         const std::tuple<std::shared_ptr<material::Material>, std::shared_ptr<material::Depth>>& mat = materials[mesh_id];
-        meshes[mesh_id] = std::make_tuple(astmgr->get_mesh(mesh_id, c), std::get<0>(mat), std::get<1>(mat));
+        meshes[mesh_id] = std::make_tuple(astmgr->get_mesh(mesh_id, core::EndCaller<mesh::Mesh>([c](std::shared_ptr<mesh::Mesh>)->void{})), std::get<0>(mat), std::get<1>(mat));
     }
     for (core::Id model_id : model_children) {
-        children[model_id] = astmgr->get_model(model_id, c);
+        children[model_id] = astmgr->get_model(model_id, core::EndCaller<model::Model>([c](std::shared_ptr<Model>)->void{}));
     }
 }
 

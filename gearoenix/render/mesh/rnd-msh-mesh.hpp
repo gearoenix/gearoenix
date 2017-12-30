@@ -1,11 +1,9 @@
 #ifndef GEAROENIX_RENDER_MESH_MESH_HPP
 #define GEAROENIX_RENDER_MESH_MESH_HPP
 #include "../../core/asset/cr-asset.hpp"
+#include "../../core/cr-end-caller.hpp"
 #include <memory>
 namespace gearoenix {
-namespace core {
-    class EndCaller;
-}
 namespace system {
     class File;
 }
@@ -32,7 +30,7 @@ namespace render {
             buffer::Mesh* buf;
 
         public:
-            Mesh(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c);
+            Mesh(system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
             ~Mesh();
             void bind();
             void draw();

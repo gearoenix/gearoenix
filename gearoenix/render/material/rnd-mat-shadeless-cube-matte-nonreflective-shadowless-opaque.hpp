@@ -6,9 +6,6 @@
 #include "rnd-mat-material.hpp"
 #include <memory>
 namespace gearoenix {
-namespace core {
-    class EndCaller;
-}
 namespace render {
     namespace texture {
         class Cube;
@@ -36,7 +33,7 @@ namespace render {
             std::shared_ptr<texture::Cube> ctxt;
 
         public:
-            ShadelessCubeMatteNonreflectiveShadowlessOpaque(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> end);
+            ShadelessCubeMatteNonreflectiveShadowlessOpaque(system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> end);
             ~ShadelessCubeMatteNonreflectiveShadowlessOpaque();
             unsigned int get_vertex_elements_count() const;
             core::Id get_shader_id() const;

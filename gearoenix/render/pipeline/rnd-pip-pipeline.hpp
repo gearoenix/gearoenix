@@ -2,11 +2,9 @@
 #define GEAROENIX_RENDER_PIPELINE_PIPELINE_HPP
 #include "../../core/cache/cr-cache-cached.hpp"
 #include "../../core/cr-types.hpp"
+#include "../../core/cr-end-caller.hpp"
 #include <memory>
 namespace gearoenix {
-namespace core {
-    class EndCaller;
-}
 namespace render {
     class Engine;
     namespace shader {
@@ -19,7 +17,7 @@ namespace render {
             std::shared_ptr<shader::Shader> shd;
 
         public:
-            Pipeline(core::Id sid, Engine* eng, std::shared_ptr<gearoenix::core::EndCaller> call);
+            Pipeline(core::Id sid, Engine* eng, core::EndCaller<core::EndCallerIgnore> call);
             virtual ~Pipeline();
             virtual void bind() = 0;
             shader::Shader* get_shader();

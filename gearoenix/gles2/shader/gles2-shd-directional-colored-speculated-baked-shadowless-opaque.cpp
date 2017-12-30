@@ -30,10 +30,11 @@ void gearoenix::gles2::shader::DirectionalColoredSpeculatedBakedShadowlessOpaque
     reinterpret_cast<texture::Cube*>(env)->bind(GL_TEXTURE0);
 }
 
-gearoenix::gles2::shader::DirectionalColoredSpeculatedBakedShadowlessOpaque::DirectionalColoredSpeculatedBakedShadowlessOpaque(Engine* eng, std::shared_ptr<core::EndCaller> end)
+gearoenix::gles2::shader::DirectionalColoredSpeculatedBakedShadowlessOpaque::DirectionalColoredSpeculatedBakedShadowlessOpaque(Engine* eng, core::EndCaller<core::EndCallerIgnore> end)
     : Shader(eng, end)
 {
     eng->add_load_function([this, end] {
+        CHECK_FOR_GRAPHIC_API_ERROR;
         create_program();
         const std::string pvs = "precision highp samplerCube;\n"
                                 "precision highp float;\n"
@@ -98,6 +99,7 @@ gearoenix::gles2::shader::DirectionalColoredSpeculatedBakedShadowlessOpaque::Dir
         vp = get_uniform_location("vp");
 
         rfl_env = get_uniform_location("rfl_env");
+        CHECK_FOR_GRAPHIC_API_ERROR;
         (void)end;
     });
 }

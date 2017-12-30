@@ -22,7 +22,7 @@ void gearoenix::gles2::shader::DirectionalColoredMatteNonreflectiveShadowlessOpa
     shd->set_sun_color(data->sun_color.data());
 }
 
-gearoenix::gles2::shader::DirectionalColoredMatteNonreflectiveShadowlessOpaque::DirectionalColoredMatteNonreflectiveShadowlessOpaque(Engine* eng, std::shared_ptr<core::EndCaller> end)
+gearoenix::gles2::shader::DirectionalColoredMatteNonreflectiveShadowlessOpaque::DirectionalColoredMatteNonreflectiveShadowlessOpaque(Engine* eng, core::EndCaller<core::EndCallerIgnore> end)
     : Shader(eng, end)
 {
     eng->add_load_function([this, end] {

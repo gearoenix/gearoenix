@@ -6,9 +6,6 @@
 #include "rnd-mat-material.hpp"
 #include <memory>
 namespace gearoenix {
-namespace core {
-    class EndCaller;
-}
 namespace render {
     namespace texture {
         class Cube;
@@ -53,7 +50,7 @@ namespace render {
             Resources* shdrsc;
 
         public:
-            DirectionalColoredSpeculatedBakedFullOpaque(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> end);
+            DirectionalColoredSpeculatedBakedFullOpaque(system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> end);
             ~DirectionalColoredSpeculatedBakedFullOpaque();
             unsigned int get_vertex_elements_count() const;
             core::Id get_shader_id() const;

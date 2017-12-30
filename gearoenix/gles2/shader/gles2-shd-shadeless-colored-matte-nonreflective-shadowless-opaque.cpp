@@ -20,7 +20,7 @@ void gearoenix::gles2::shader::ShadelessColoredMatteNonreflectiveShadowlessOpaqu
     shd->set_color(data->color.data());
 }
 
-gearoenix::gles2::shader::ShadelessColoredMatteNonreflectiveShadowlessOpaque::ShadelessColoredMatteNonreflectiveShadowlessOpaque(Engine* eng, std::shared_ptr<core::EndCaller> end)
+gearoenix::gles2::shader::ShadelessColoredMatteNonreflectiveShadowlessOpaque::ShadelessColoredMatteNonreflectiveShadowlessOpaque(Engine* eng, core::EndCaller<core::EndCallerIgnore> end)
     : Shader(eng, end)
 {
     eng->add_load_function([this, end] {

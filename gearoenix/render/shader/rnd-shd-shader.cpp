@@ -57,9 +57,9 @@ gearoenix::render::shader::Shader::Shader() {}
 
 gearoenix::render::shader::Shader::~Shader() {}
 
-std::shared_ptr<gearoenix::render::shader::Shader> gearoenix::render::shader::Shader::read(core::Id sid, system::File* file, Engine* engine, std::shared_ptr<core::EndCaller> end)
+gearoenix::render::shader::Shader* gearoenix::render::shader::Shader::read(core::Id sid, system::File* file, Engine* engine, core::EndCaller<core::EndCallerIgnore> end)
 {
-    return std::shared_ptr<Shader>(engine->create_shader(sid, file, end));
+    return engine->create_shader(sid, file, end);
 }
 
 const std::vector<gearoenix::render::shader::ResourceDescription>& gearoenix::render::shader::Shader::get_resources_descriptions(Id id)

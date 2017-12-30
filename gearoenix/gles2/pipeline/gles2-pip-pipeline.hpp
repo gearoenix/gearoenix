@@ -5,9 +5,6 @@
 #include "../../render/pipeline/rnd-pip-pipeline.hpp"
 #include <memory>
 namespace gearoenix {
-namespace core {
-    class EndCaller;
-}
 namespace gles2 {
     class Engine;
     namespace shader {
@@ -17,7 +14,7 @@ namespace gles2 {
         class Pipeline : public render::pipeline::Pipeline {
         private:
         public:
-            Pipeline(core::Id sid, Engine* eng, std::shared_ptr<core::EndCaller> call);
+            Pipeline(core::Id sid, Engine* eng, core::EndCaller<core::EndCallerIgnore> call);
             ~Pipeline();
             void bind();
         };

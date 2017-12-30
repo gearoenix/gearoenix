@@ -22,7 +22,7 @@ void gearoenix::render::material::DirectionalColoredSpeculatedBakedShadowlessOpa
     env = t;
 }
 
-gearoenix::render::material::DirectionalColoredSpeculatedBakedShadowlessOpaque::DirectionalColoredSpeculatedBakedShadowlessOpaque(core::Id shdid, system::File* f, Engine* e, std::shared_ptr<core::EndCaller> end)
+gearoenix::render::material::DirectionalColoredSpeculatedBakedShadowlessOpaque::DirectionalColoredSpeculatedBakedShadowlessOpaque(core::Id shdid, system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> end)
     : Material(shdid, sizeof(u), e, end)
     , SHADER_ID(shdid)
 {
@@ -35,12 +35,11 @@ gearoenix::render::material::DirectionalColoredSpeculatedBakedShadowlessOpaque::
     core::Id texid;
     f->read(texid);
     core::asset::Manager* astmgr = e->get_system_application()->get_asset_manager();
-    std::function<void()> fun = [this, end, e] {
-        shdrsc = reinterpret_cast<Resources*>(e->create_shader_resources(SHADER_ID, pl.get(), ub, end));
-        shdrsc->set_baked_env(env.get());
-    };
     unsigned int curloc = f->tell();
-    env = std::static_pointer_cast<texture::Cube>(astmgr->get_texture(texid, core::EndCaller::create(fun)));
+    env = std::static_pointer_cast<texture::Cube>(astmgr->get_texture(texid, core::EndCaller<render::texture::Texture>([this, end, e] (std::shared_ptr<render::texture::Texture> asset) -> void {
+        shdrsc = reinterpret_cast<Resources*>(e->create_shader_resources(SHADER_ID, pl.get(), ub, end));
+        shdrsc->set_baked_env(reinterpret_cast<texture::Cube*>(asset.get()));
+    })));
     f->seek(curloc);
 }
 

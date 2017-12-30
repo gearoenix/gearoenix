@@ -11,6 +11,7 @@
 #include "../../system/sys-app.hpp"
 #include "../cache/file/cr-cache-file-sparse.hpp"
 #include "../cache/file/cr-cache-file.hpp"
+#include "../cr-end-caller.hpp"
 
 gearoenix::core::asset::Manager::Manager(system::Application* sys_app, const std::string& name)
     : sys_app(sys_app)
@@ -67,12 +68,13 @@ gearoenix::system::File* gearoenix::core::asset::Manager::get_file()
     return file;
 }
 
-std::shared_ptr<gearoenix::render::shader::Shader> gearoenix::core::asset::Manager::get_shader(Id id, std::shared_ptr<EndCaller> end)
+std::shared_ptr<gearoenix::render::shader::Shader> gearoenix::core::asset::Manager::get_shader(Id id, EndCaller<render::shader::Shader> end)
 {
-    std::function<std::shared_ptr<render::shader::Shader>()> fn_new = [this, id, end] {
-        return render::shader::Shader::read(id, file, render_engine, end);
-    };
-    return shaders->get<render::shader::Shader>(id, fn_new);
+    auto result = shaders->get<render::shader::Shader>(id, [this, id, end]() -> std::shared_ptr<render::shader::Shader> {
+        return std::shared_ptr<render::shader::Shader>(render::shader::Shader::read(id, file, render_engine, EndCaller<EndCallerIgnore>([end](std::shared_ptr<EndCallerIgnore>)->void {})));
+    });
+    end.set_data(result);
+    return result;
 }
 
 std::shared_ptr<gearoenix::render::shader::Shader> gearoenix::core::asset::Manager::get_cached_shader(Id id) const
@@ -119,12 +121,13 @@ std::shared_ptr<gearoenix::render::light::Light> gearoenix::core::asset::Manager
     return lights->get<render::light::Light>(id);
 }
 
-std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::core::asset::Manager::get_texture(Id id, std::shared_ptr<EndCaller> end)
+std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::core::asset::Manager::get_texture(Id id, EndCaller<render::texture::Texture> end)
 {
-    std::function<std::shared_ptr<render::texture::Texture>()> fn_new = [this, end] {
-        return std::shared_ptr<render::texture::Texture>(render::texture::Texture::read(file, render_engine, end));
-    };
-    return textures->get<render::texture::Texture>(id, fn_new);
+    auto result = textures->get<render::texture::Texture>(id, [this, end] () ->  std::shared_ptr<render::texture::Texture> {
+        return std::shared_ptr<render::texture::Texture>(render::texture::Texture::read(file, render_engine, EndCaller<EndCallerIgnore>([end] (std::shared_ptr<EndCallerIgnore>) -> void {})));
+    });
+    end.set_data(result);
+    return result;
 }
 
 std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::core::asset::Manager::get_cached_texture(Id id) const
@@ -132,12 +135,13 @@ std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::core::asset::Man
     return textures->get<render::texture::Texture>(id);
 }
 
-std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::core::asset::Manager::get_mesh(Id id, std::shared_ptr<EndCaller> e)
+std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::core::asset::Manager::get_mesh(Id id, EndCaller<render::mesh::Mesh> end)
 {
-    std::function<std::shared_ptr<render::mesh::Mesh>()> fn_new = [this, e] {
-        return std::shared_ptr<render::mesh::Mesh>(new render::mesh::Mesh(file, render_engine, e));
-    };
-    return meshes->get<render::mesh::Mesh>(id, fn_new);
+    auto result = meshes->get<render::mesh::Mesh>(id, [this, end]() -> std::shared_ptr<render::mesh::Mesh> {
+        return std::shared_ptr<render::mesh::Mesh>(new render::mesh::Mesh(file, render_engine, EndCaller<EndCallerIgnore>([end](std::shared_ptr<EndCallerIgnore>)->void {})));
+    });
+    end.set_data(result);
+    return result;
 }
 
 std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::core::asset::Manager::get_cached_mesh(Id id) const
@@ -145,12 +149,13 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::core::asset::Manager::
     return meshes->get<render::mesh::Mesh>(id);
 }
 
-std::shared_ptr<gearoenix::render::model::Model> gearoenix::core::asset::Manager::get_model(Id id, std::shared_ptr<EndCaller> e)
+std::shared_ptr<gearoenix::render::model::Model> gearoenix::core::asset::Manager::get_model(Id id, EndCaller<render::model::Model> end)
 {
-    std::function<std::shared_ptr<render::model::Model>()> fn_new = [this, e] {
-        return std::shared_ptr<render::model::Model>(new render::model::Model(file, render_engine, e));
-    };
-    return models->get<render::model::Model>(id, fn_new);
+    auto result = models->get<render::model::Model>(id, [this, end] () -> std::shared_ptr<render::model::Model> {
+        return std::shared_ptr<render::model::Model>(new render::model::Model(file, render_engine, EndCaller<EndCallerIgnore>([end](std::shared_ptr<EndCallerIgnore>)->void {})));
+    });
+    end.set_data(result);
+    return result;
 }
 
 std::shared_ptr<gearoenix::render::model::Model> gearoenix::core::asset::Manager::get_cached_model(Id id) const
@@ -158,12 +163,13 @@ std::shared_ptr<gearoenix::render::model::Model> gearoenix::core::asset::Manager
     return models->get<render::model::Model>(id);
 }
 
-std::shared_ptr<gearoenix::render::scene::Scene> gearoenix::core::asset::Manager::get_scene(Id id, std::shared_ptr<EndCaller> e)
+std::shared_ptr<gearoenix::render::scene::Scene> gearoenix::core::asset::Manager::get_scene(Id id, EndCaller<render::scene::Scene> end)
 {
-    std::function<std::shared_ptr<render::scene::Scene>()> fn_new = [this, e] {
-        return std::shared_ptr<render::scene::Scene>(render::scene::Scene::read(file, render_engine, e));
-    };
-    return scenes->get<render::scene::Scene>(id, fn_new);
+    auto result = scenes->get<render::scene::Scene>(id, [this, end]() -> std::shared_ptr<render::scene::Scene> {
+        return std::shared_ptr<render::scene::Scene>(render::scene::Scene::read(file, render_engine, EndCaller<EndCallerIgnore>([end](std::shared_ptr<EndCallerIgnore>)->void{})));
+    });
+    end.set_data(result);
+    return result;
 }
 
 std::shared_ptr<gearoenix::render::scene::Scene> gearoenix::core::asset::Manager::get_cached_scene(Id id) const

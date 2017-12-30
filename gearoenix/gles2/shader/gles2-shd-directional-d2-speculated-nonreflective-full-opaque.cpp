@@ -31,7 +31,7 @@ void gearoenix::gles2::shader::DirectionalD2SpeculatedNonreflectiveFullOpaque::R
     reinterpret_cast<texture::Texture2D*>(shdtxt)->bind(GL_TEXTURE1);
 }
 
-gearoenix::gles2::shader::DirectionalD2SpeculatedNonreflectiveFullOpaque::DirectionalD2SpeculatedNonreflectiveFullOpaque(Engine* eng, std::shared_ptr<core::EndCaller> end)
+gearoenix::gles2::shader::DirectionalD2SpeculatedNonreflectiveFullOpaque::DirectionalD2SpeculatedNonreflectiveFullOpaque(Engine* eng, core::EndCaller<core::EndCallerIgnore> end)
     : Shader(eng, end)
 {
     eng->add_load_function([this, end] {

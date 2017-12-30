@@ -19,7 +19,7 @@
 #include "rnd-mat-shadeless-cube-matte-nonreflective-shadowless-opaque.hpp"
 #include "rnd-mat-shadeless-d2-matte-nonreflective-shadowless-opaque.hpp"
 
-gearoenix::render::material::Material::Material(core::Id sid, unsigned int us, Engine* e, std::shared_ptr<core::EndCaller> end)
+gearoenix::render::material::Material::Material(core::Id sid, unsigned int us, Engine* e, core::EndCaller<core::EndCallerIgnore> end)
     : ub(e->create_uniform(us, end))
     , e(e)
 {
@@ -34,7 +34,7 @@ gearoenix::render::material::Material::~Material()
     delete ub;
 }
 
-gearoenix::render::material::Material* gearoenix::render::material::Material::read(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> end)
+gearoenix::render::material::Material* gearoenix::render::material::Material::read(system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> end)
 {
     shader::Id sid;
     f->read(sid);

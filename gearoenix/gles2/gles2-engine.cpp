@@ -25,16 +25,6 @@
 #include "texture/gles2-txt-2d.hpp"
 #include "texture/gles2-txt-cube.hpp"
 
-#define SHADOW_MAP
-//#define INTA_TEST001
-
-#ifdef INTA_TEST001
-static GLuint vbo, ibo;
-static std::shared_ptr<gearoenix::gles2::shader::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque> shd;
-static std::shared_ptr<gearoenix::render::camera::Camera> cam;
-static std::shared_ptr<gearoenix::gles2::texture::Texture2D> txt;
-#endif
-
 gearoenix::gles2::Engine::Engine(system::Application* sysapp)
     : render::Engine(sysapp)
 {
@@ -43,7 +33,6 @@ gearoenix::gles2::Engine::Engine(system::Application* sysapp)
     win_height = (GLfloat)sysapp->get_height();
     glGetIntegerv(GL_FRAMEBUFFER_BINDING, (GLint*)&render_framebuffer);
     glGetIntegerv(GL_RENDERBUFFER_BINDING, (GLint*)&render_depth);
-#ifdef SHADOW_MAP
     glGenFramebuffers(1, &shadow_map_framebuffer);
     glGenRenderbuffers(1, &shadow_map_depth);
     glBindRenderbuffer(GL_RENDERBUFFER, shadow_map_depth);
@@ -58,9 +47,7 @@ gearoenix::gles2::Engine::Engine(system::Application* sysapp)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, shadow_map_color, 0);
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-        UNEXPECTED;
-    }
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) UNEXPECTED;
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
     glEnable(GL_BLEND);
@@ -72,11 +59,8 @@ gearoenix::gles2::Engine::Engine(system::Application* sysapp)
     glScissor(0, 0, shadow_map_aspect, shadow_map_aspect);
     glBindRenderbuffer(GL_RENDERBUFFER, render_depth);
     glBindFramebuffer(GL_FRAMEBUFFER, render_framebuffer);
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-        UNEXPECTED;
-    }
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) UNEXPECTED;
     shadow_map_texture = new texture::Texture2D(shadow_map_color);
-#endif
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
     glEnable(GL_BLEND);
@@ -87,22 +71,6 @@ gearoenix::gles2::Engine::Engine(system::Application* sysapp)
     glViewport(0, 0, (GLsizei)win_width, (GLsizei)win_height);
     glScissor(0, 0, (GLsizei)win_width, (GLsizei)win_height);
     pipmgr = new render::pipeline::Manager(this);
-#ifdef INTA_TEST001
-    const GLfloat vertices[] = {
-        0.0f, 1.0f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 2.0f,
-        1.0f, 0.0f, -0.5f, 0.0f, 0.0f, 1.0f, 2.0f, 0.0f,
-        -1.0f, 0.0f, -0.5f, 0.0f, 0.0f, 1.0f, -2.0f, 0.0f,
-    };
-    const GLushort indices[] = {
-        0, 2, 1,
-    };
-    glGenBuffers(1, &vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    glGenBuffers(1, &ibo);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-#endif
 #ifdef GLES2_PROFILING
     prof_last_time_draw = std::chrono::high_resolution_clock::now();
 #endif
@@ -122,70 +90,24 @@ void gearoenix::gles2::Engine::window_changed()
 
 void gearoenix::gles2::Engine::update()
 {
-#ifdef INTA_TEST001
-    static int first_happen = 0;
-    if (first_happen == 0) {
-        ++first_happen;
-        cam = sysapp->get_asset_manager()->get_camera(0);
-        shd = std::static_pointer_cast<shader::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque>(
-            sysapp->get_asset_manager()->get_shader(
-                render::shader::DIRECTIONAL_D2_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE,
-                core::EndCaller::create([&] { ++first_happen; })));
-        txt = std::static_pointer_cast<texture::Texture2D>(
-            sysapp->get_asset_manager()->get_texture(
-                7, core::EndCaller::create([&] { ++first_happen; })));
-    }
-#endif
     glClear(GL_COLOR_BUFFER_BIT);
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    std::vector<std::function<void()>> temp_functions;
-#ifdef THREAD_SUPPORTED
-    load_functions_mutex.lock();
-#endif
-    std::move(load_functions.begin(), load_functions.end(), std::back_inserter(temp_functions));
-    load_functions.clear();
-#ifdef THREAD_SUPPORTED
-    load_functions_mutex.unlock();
-#endif
-    for (std::function<void()>& f : temp_functions) {
-        f();
-    }
-    temp_functions.clear();
-#ifdef INTA_TEST001
-    if (first_happen == 3) {
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-        shd->use();
-        shd->set_vp(cam->get_view_projection().data());
-        //        shd->set_mvp(math::Mat4x4().data());
-        txt->bind(GL_TEXTURE0);
-        glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, 0);
-    }
-#else
-    //    for (std::shared_ptr<render::scene::Scene>& scene : loaded_scenes) {
-    //        scene->commit();
-    //    }
+    do_load_functions();
     physics_engine->wait();
-
     for (std::shared_ptr<render::scene::Scene>& scene : loaded_scenes) {
         glBindRenderbuffer(GL_RENDERBUFFER, shadow_map_depth);
         glBindFramebuffer(GL_FRAMEBUFFER, shadow_map_framebuffer);
         glViewport(0, 0, shadow_map_aspect, shadow_map_aspect);
         glScissor(0, 0, shadow_map_aspect, shadow_map_aspect);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
         scene->cast_shadow();
-
         glBindRenderbuffer(GL_RENDERBUFFER, render_depth);
         glBindFramebuffer(GL_FRAMEBUFFER, render_framebuffer);
         glViewport(0, 0, (GLsizei)win_width, (GLsizei)win_height);
         glScissor(0, 0, (GLsizei)win_width, (GLsizei)win_height);
         glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
         scene->draw(shadow_map_texture);
     }
     physics_engine->update();
-#endif
 #ifdef GLES2_PROFILING
     auto now = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>(now - prof_last_time_draw);
@@ -206,27 +128,27 @@ void gearoenix::gles2::Engine::terminate()
     TODO;
 }
 
-gearoenix::render::texture::Texture2D* gearoenix::gles2::Engine::create_texture_2d(system::File* file, std::shared_ptr<core::EndCaller> c)
+gearoenix::render::texture::Texture2D* gearoenix::gles2::Engine::create_texture_2d(system::File* file, core::EndCaller<core::EndCallerIgnore> c)
 {
     return new texture::Texture2D(file, this, c);
 }
 
-gearoenix::render::texture::Cube* gearoenix::gles2::Engine::create_texture_cube(system::File* file, std::shared_ptr<core::EndCaller> c)
+gearoenix::render::texture::Cube* gearoenix::gles2::Engine::create_texture_cube(system::File* file, core::EndCaller<core::EndCallerIgnore> c)
 {
     return new texture::Cube(file, this, c);
 }
 
-gearoenix::render::buffer::Mesh* gearoenix::gles2::Engine::create_mesh(unsigned int vec, system::File* file, std::shared_ptr<core::EndCaller> c)
+gearoenix::render::buffer::Mesh* gearoenix::gles2::Engine::create_mesh(unsigned int vec, system::File* file, core::EndCaller<core::EndCallerIgnore> c)
 {
     return new buffer::Mesh(vec, file, this, c);
 }
 
-gearoenix::render::buffer::Uniform* gearoenix::gles2::Engine::create_uniform(unsigned int s, std::shared_ptr<core::EndCaller>)
+gearoenix::render::buffer::Uniform* gearoenix::gles2::Engine::create_uniform(unsigned int s, core::EndCaller<core::EndCallerIgnore>)
 {
     return new buffer::Uniform(s, this);
 }
 
-gearoenix::render::shader::Shader* gearoenix::gles2::Engine::create_shader(core::Id sid, system::File*, std::shared_ptr<core::EndCaller> c)
+gearoenix::render::shader::Shader* gearoenix::gles2::Engine::create_shader(core::Id sid, system::File*, core::EndCaller<core::EndCallerIgnore> c)
 {
     render::shader::Id shader_id = static_cast<render::shader::Id>(sid);
     switch (shader_id) {
@@ -263,7 +185,7 @@ gearoenix::render::shader::Shader* gearoenix::gles2::Engine::create_shader(core:
     }
 }
 
-gearoenix::render::shader::Resources* gearoenix::gles2::Engine::create_shader_resources(core::Id sid, render::pipeline::Pipeline* p, render::buffer::Uniform* ub, std::shared_ptr<core::EndCaller>)
+gearoenix::render::shader::Resources* gearoenix::gles2::Engine::create_shader_resources(core::Id sid, render::pipeline::Pipeline* p, render::buffer::Uniform* ub, core::EndCaller<core::EndCallerIgnore>)
 {
     pipeline::Pipeline* pip = reinterpret_cast<pipeline::Pipeline*>(p);
     buffer::Uniform* u = reinterpret_cast<buffer::Uniform*>(ub);
@@ -301,7 +223,7 @@ gearoenix::render::shader::Resources* gearoenix::gles2::Engine::create_shader_re
     }
 }
 
-gearoenix::render::pipeline::Pipeline* gearoenix::gles2::Engine::create_pipeline(core::Id sid, std::shared_ptr<core::EndCaller> c)
+gearoenix::render::pipeline::Pipeline* gearoenix::gles2::Engine::create_pipeline(core::Id sid, core::EndCaller<core::EndCallerIgnore> c)
 {
     return new pipeline::Pipeline(sid, this, c);
 }

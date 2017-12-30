@@ -2,9 +2,6 @@
 #define GEAROENIX_RENDER_BUFFER_MESH_HPP
 #include <memory>
 namespace gearoenix {
-namespace core {
-    class EndCaller;
-}
 namespace system {
     class File;
 }

@@ -24,21 +24,19 @@ void gearoenix::render::material::DirectionalD2SpeculatedNonreflectiveShadowless
     txt = t;
 }
 
-gearoenix::render::material::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> end)
+gearoenix::render::material::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque(system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> end)
     : Material(SHADER_ID, sizeof(u), e, end)
 {
     core::Id texid;
     f->read(texid);
-    //LOGE("location: " << f->tell());
     u.spec_color.read(f);
     u.spec_factors.read(f);
     core::asset::Manager* astmgr = e->get_system_application()->get_asset_manager();
-    std::function<void()> fun = [this, end, e] {
-        shdrsc = reinterpret_cast<Resources*>(e->create_shader_resources(SHADER_ID, pl.get(), ub, end));
-        shdrsc->set_texture(t.get());
-    };
     unsigned int curloc = f->tell();
-    t = std::static_pointer_cast<texture::Texture2D>(astmgr->get_texture(texid, core::EndCaller::create(fun)));
+    t = std::static_pointer_cast<texture::Texture2D>(astmgr->get_texture(texid, core::EndCaller<render::texture::Texture>([this, end, e] (std::shared_ptr<render::texture::Texture> asset) -> void {
+        shdrsc = reinterpret_cast<Resources*>(e->create_shader_resources(SHADER_ID, pl.get(), ub, end));
+        shdrsc->set_texture(reinterpret_cast<texture::Texture2D*>(asset.get()));
+    })));
     f->seek(curloc);
 }
 

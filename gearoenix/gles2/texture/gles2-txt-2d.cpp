@@ -4,7 +4,7 @@
 #include "../../system/sys-log.hpp"
 #include "../gles2-engine.hpp"
 
-gearoenix::gles2::texture::Texture2D::Texture2D(system::File* file, Engine* eng, std::shared_ptr<core::EndCaller> end)
+gearoenix::gles2::texture::Texture2D::Texture2D(system::File* file, Engine* eng, core::EndCaller<core::EndCallerIgnore> end)
 {
     std::vector<unsigned char> img_data;
     unsigned int imgw, imgh;

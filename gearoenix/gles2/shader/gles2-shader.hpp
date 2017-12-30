@@ -2,6 +2,7 @@
 #define GEAROENIX_GLES2_SHADER_COMPILER_HPP
 #include "../../core/cr-build-configuration.hpp"
 #ifdef USE_OPENGL_ES2
+#include "../../core/cr-end-caller.hpp"
 #include "../../render/shader/rnd-shd-shader.hpp"
 #include "../gles2.hpp"
 #include <string>
@@ -23,7 +24,7 @@ namespace gles2 {
             void end_object(const GLuint& shader_object);
 
         public:
-            Shader(Engine* eng, std::shared_ptr<core::EndCaller> end);
+            Shader(Engine* eng, core::EndCaller<core::EndCallerIgnore> end);
             virtual ~Shader();
         };
     }

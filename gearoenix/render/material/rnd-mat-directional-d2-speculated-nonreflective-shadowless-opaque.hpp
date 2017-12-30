@@ -6,9 +6,6 @@
 #include "rnd-mat-material.hpp"
 #include <memory>
 namespace gearoenix {
-namespace core {
-    class EndCaller;
-}
 namespace render {
     namespace texture {
         class Texture2D;
@@ -48,7 +45,7 @@ namespace render {
             Resources* shdrsc;
 
         public:
-            DirectionalD2SpeculatedNonreflectiveShadowlessOpaque(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> end);
+            DirectionalD2SpeculatedNonreflectiveShadowlessOpaque(system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> end);
             ~DirectionalD2SpeculatedNonreflectiveShadowlessOpaque();
             unsigned int get_vertex_elements_count() const;
             core::Id get_shader_id() const;

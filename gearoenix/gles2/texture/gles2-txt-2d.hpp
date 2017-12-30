@@ -6,9 +6,6 @@
 #include "../gles2.hpp"
 #include <memory>
 namespace gearoenix {
-namespace core {
-    class EndCaller;
-}
 namespace system {
     class File;
 }
@@ -20,7 +17,7 @@ namespace gles2 {
             GLuint texture_object;
 
         public:
-            Texture2D(system::File* file, Engine* engine, std::shared_ptr<core::EndCaller> end);
+            Texture2D(system::File* file, Engine* engine, core::EndCaller<core::EndCallerIgnore> end);
             Texture2D(GLuint txtobj);
             ~Texture2D();
             void bind(GLenum texture_unit);

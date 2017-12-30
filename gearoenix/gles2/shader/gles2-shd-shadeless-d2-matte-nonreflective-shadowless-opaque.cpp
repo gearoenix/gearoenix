@@ -20,10 +20,12 @@ void gearoenix::gles2::shader::ShadelessD2MatteNonreflectiveShadowlessOpaque::Re
     reinterpret_cast<texture::Texture2D*>(txt2d)->bind(GL_TEXTURE0);
 }
 
-gearoenix::gles2::shader::ShadelessD2MatteNonreflectiveShadowlessOpaque::ShadelessD2MatteNonreflectiveShadowlessOpaque(Engine* eng, std::shared_ptr<core::EndCaller> end)
+gearoenix::gles2::shader::ShadelessD2MatteNonreflectiveShadowlessOpaque::ShadelessD2MatteNonreflectiveShadowlessOpaque(Engine* eng, core::EndCaller<core::EndCallerIgnore> end)
     : Shader(eng, end)
 {
     eng->add_load_function([this, end] {
+        
+        CHECK_FOR_GRAPHIC_API_ERROR;
         create_program();
         const std::string pvs = "#version 100\n"
                                 "precision highp sampler2D;\n"
@@ -54,6 +56,7 @@ gearoenix::gles2::shader::ShadelessD2MatteNonreflectiveShadowlessOpaque::Shadele
         mvp = get_uniform_location("mvp");
         txt2d = get_uniform_location("txt2d");
         (void)end;
+        CHECK_FOR_GRAPHIC_API_ERROR;
     });
 }
 

@@ -2,9 +2,6 @@
 #define GEAROENIX_RENDER_BUFFER_UNIFORM_HPP
 #include <memory>
 namespace gearoenix {
-namespace core {
-    class EndCaller;
-}
 namespace render {
     class Engine;
     namespace buffer {

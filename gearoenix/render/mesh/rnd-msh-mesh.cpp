@@ -5,7 +5,7 @@
 #include "../material/rnd-mat-material.hpp"
 #include "../rnd-engine.hpp"
 
-gearoenix::render::mesh::Mesh::Mesh(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c)
+gearoenix::render::mesh::Mesh::Mesh(system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
 {
     core::Count vertex_elements_count;
     f->read(vertex_elements_count);

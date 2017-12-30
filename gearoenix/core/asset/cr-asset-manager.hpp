@@ -1,14 +1,12 @@
 #ifndef GEAROENIX_CORE_ASSET_MANAGER_HPP
 #define GEAROENIX_CORE_ASSET_MANAGER_HPP
 #include "../cr-types.hpp"
+#include "../cr-end-caller.hpp"
 #include <memory>
 #include <string>
 namespace gearoenix {
 namespace audio {
     class Audio;
-}
-namespace core {
-    class EndCaller;
 }
 namespace render {
     class Engine;
@@ -65,7 +63,7 @@ namespace core {
             ~Manager();
             void initialize();
             system::File* get_file();
-            std::shared_ptr<render::shader::Shader> get_shader(Id id, std::shared_ptr<EndCaller> end);
+            std::shared_ptr<render::shader::Shader> get_shader(Id id, EndCaller<render::shader::Shader> end);
             std::shared_ptr<render::shader::Shader> get_cached_shader(Id id) const;
             std::shared_ptr<render::camera::Camera> get_camera(Id id);
             std::shared_ptr<render::camera::Camera> get_cached_camera(Id id) const;
@@ -73,13 +71,13 @@ namespace core {
             std::shared_ptr<audio::Audio> get_cached_audio(Id id);
             std::shared_ptr<render::light::Light> get_light(Id id);
             std::shared_ptr<render::light::Light> get_cached_light(Id id) const;
-            std::shared_ptr<render::texture::Texture> get_texture(Id id, std::shared_ptr<EndCaller> end);
+            std::shared_ptr<render::texture::Texture> get_texture(Id id, EndCaller<render::texture::Texture> end);
             std::shared_ptr<render::texture::Texture> get_cached_texture(Id id) const;
-            std::shared_ptr<render::mesh::Mesh> get_mesh(Id id, std::shared_ptr<EndCaller> e);
+            std::shared_ptr<render::mesh::Mesh> get_mesh(Id id, EndCaller<render::mesh::Mesh> e);
             std::shared_ptr<render::mesh::Mesh> get_cached_mesh(Id id) const;
-            std::shared_ptr<render::model::Model> get_model(Id id, std::shared_ptr<EndCaller> e);
+            std::shared_ptr<render::model::Model> get_model(Id id, EndCaller<render::model::Model> e);
             std::shared_ptr<render::model::Model> get_cached_model(Id id) const;
-            std::shared_ptr<render::scene::Scene> get_scene(Id id, std::shared_ptr<EndCaller> e);
+            std::shared_ptr<render::scene::Scene> get_scene(Id id, EndCaller<render::scene::Scene> e);
             std::shared_ptr<render::scene::Scene> get_cached_scene(Id id) const;
         };
     } // namespace asset

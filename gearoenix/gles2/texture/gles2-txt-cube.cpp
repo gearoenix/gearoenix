@@ -7,7 +7,7 @@
 
 #define FACES_COUNT 6
 
-gearoenix::gles2::texture::Cube::Cube(system::File* file, Engine* eng, std::shared_ptr<core::EndCaller> end)
+gearoenix::gles2::texture::Cube::Cube(system::File* file, Engine* eng, core::EndCaller<core::EndCallerIgnore> end)
 {
     std::vector<std::vector<unsigned char>> img_data(FACES_COUNT);
     std::vector<unsigned int> imgw(FACES_COUNT), imgh(FACES_COUNT);
@@ -40,7 +40,6 @@ gearoenix::gles2::texture::Cube::Cube(system::File* file, Engine* eng, std::shar
         }
         glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
         (void)end;
-        return;
     };
     eng->add_load_function(loadf);
 }

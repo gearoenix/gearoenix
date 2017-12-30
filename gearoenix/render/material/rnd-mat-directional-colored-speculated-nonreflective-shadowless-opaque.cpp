@@ -19,13 +19,15 @@ gearoenix::render::material::DirectionalColoredSpeculatedNonreflectiveShadowless
 {
 }
 
-gearoenix::render::material::DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque::DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> end)
+gearoenix::render::material::DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque::DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque(system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> end)
     : Material(SHADER_ID, sizeof(u), e, end)
 {
     color.read(f);
     u.spec_color.read(f);
     u.spec_factors.read(f);
+    e->add_load_function([this, e, end]()-> void {
     shdrsc = reinterpret_cast<Resources*>(e->create_shader_resources(SHADER_ID, pl.get(), ub, end));
+    });
 }
 
 gearoenix::render::material::DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque::~DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque()

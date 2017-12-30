@@ -17,12 +17,14 @@ gearoenix::render::material::ShadelessColoredMatteNonreflectiveShadowlessOpaque:
 {
 }
 
-gearoenix::render::material::ShadelessColoredMatteNonreflectiveShadowlessOpaque::ShadelessColoredMatteNonreflectiveShadowlessOpaque(core::Id sid, system::File* f, Engine* e, std::shared_ptr<core::EndCaller> end)
+gearoenix::render::material::ShadelessColoredMatteNonreflectiveShadowlessOpaque::ShadelessColoredMatteNonreflectiveShadowlessOpaque(core::Id sid, system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> end)
     : Material(sid, sizeof(u), e, end)
     , SHADER_ID(sid)
 {
     u.color.read(f);
+    e->add_load_function([this, e, end]()-> void {
     shdrsc = reinterpret_cast<Resources*>(e->create_shader_resources(SHADER_ID, pl.get(), ub, end));
+    });
 }
 
 gearoenix::render::material::ShadelessColoredMatteNonreflectiveShadowlessOpaque::~ShadelessColoredMatteNonreflectiveShadowlessOpaque()

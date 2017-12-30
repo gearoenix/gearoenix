@@ -2,12 +2,10 @@
 #define GEAROEMIX_RENDER_SHADER_SHADER_HPP
 #include "../../core/asset/cr-asset.hpp"
 #include "../../core/cr-types.hpp"
+#include "../../core/cr-end-caller.hpp"
 #include <memory>
 #include <vector>
 namespace gearoenix {
-namespace core {
-    class EndCaller;
-}
 namespace system {
     class File;
 }
@@ -1034,7 +1032,7 @@ namespace render {
             virtual ~Shader();
             virtual const std::vector<stage::Id>& get_stages_ids() const = 0;
             virtual void use() = 0;
-            static std::shared_ptr<Shader> read(core::Id sid, system::File* file, Engine* engine, std::shared_ptr<core::EndCaller> end);
+            static Shader* read(core::Id sid, system::File* file, Engine* engine, core::EndCaller<core::EndCallerIgnore> end);
             static const std::vector<ResourceDescription>& get_resources_descriptions(Id id);
             static const std::vector<VertexAttribute>& get_vertex_atributes(Id id);
             static bool is_shadow_caster(core::Id sid);

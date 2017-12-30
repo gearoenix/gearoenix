@@ -34,7 +34,7 @@ namespace gles2 {
             GLint nrm_att_ind;
 
         public:
-            DirectionalColoredMatteNonreflectiveShadowlessOpaque(Engine* eng, std::shared_ptr<core::EndCaller> end);
+            DirectionalColoredMatteNonreflectiveShadowlessOpaque(Engine* eng, core::EndCaller<core::EndCallerIgnore> end);
             ~DirectionalColoredMatteNonreflectiveShadowlessOpaque();
             void use();
             const std::vector<render::shader::stage::Id>& get_stages_ids() const;

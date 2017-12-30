@@ -4,6 +4,8 @@
 #include "../../core/cr-application.hpp"
 #include "../../gles2/gles2-engine.hpp"
 #include "../../gles2/gles2.hpp"
+#include "../../gles3/gles3-engine.hpp"
+#include "../../gles3/gles3.hpp"
 #include "../sys-log.hpp"
 #include <iostream>
 
@@ -59,7 +61,7 @@ void gearoenix::system::Application::create_context()
     gl_context = SDL_GL_CreateContext(window);
     if (gl_context != nullptr) {
         supported_engine = render::Engine::EngineType::OPENGL_ES2;
-        GXLOGD("Machine is capable if OpenGL ES 2.0");
+        GXLOGD("Machine is capable if weak OpenGL ES 2.0");
         return;
     }
     GXLOGF("No usable API find in the host machine.");
@@ -157,7 +159,7 @@ gearoenix::system::Application::Application()
         display_mode.h,
         SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN |
         SDL_WINDOW_BORDERLESS | SDL_WINDOW_FULLSCREEN_DESKTOP |
-        SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
+        SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
     if (!window) {
         GXLOGF("Couldn't create window: " << SDL_GetError());
     }
@@ -167,9 +169,17 @@ gearoenix::system::Application::Application()
     SDL_GL_MakeCurrent(window, gl_context);
     int w, h;
     SDL_GetWindowSize(window, &w, &h);
+    SDL_GL_GetDrawableSize(window, &w, &h);
     win_width = (unsigned int)w;
     win_height = (unsigned int)h;
-    render_engine = new gles2::Engine(this);
+#ifdef USE_OPENGL_ES2
+    if(supported_engine == render::Engine::OPENGL_ES2) render_engine = new gles2::Engine(this);
+#else
+    if(supported_engine != render::Engine::OPENGL_ES2) render_engine = new gles3::Engine(this);
+#endif
+#ifdef DEBUG_MODE
+    if(render_engine == nullptr) UNEXPECTED;
+#endif
     astmgr = new core::asset::Manager(this, "data.gx3d");
     astmgr->initialize();
 }

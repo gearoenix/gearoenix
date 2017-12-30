@@ -6,9 +6,6 @@
 #include "rnd-mat-material.hpp"
 #include <memory>
 namespace gearoenix {
-namespace core {
-    class EndCaller;
-}
 namespace render {
     namespace texture {
         class Texture2D;
@@ -35,7 +32,7 @@ namespace render {
             std::shared_ptr<texture::Texture2D> txt2d;
 
         public:
-            ShadelessD2MatteNonreflectiveShadowlessOpaque(core::Id sid, system::File* f, Engine* e, std::shared_ptr<core::EndCaller> end);
+            ShadelessD2MatteNonreflectiveShadowlessOpaque(core::Id sid, system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> end);
             ~ShadelessD2MatteNonreflectiveShadowlessOpaque();
             unsigned int get_vertex_elements_count() const;
             core::Id get_shader_id() const;

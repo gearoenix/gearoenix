@@ -2,6 +2,7 @@
 #define GEAROEMIX_RENDER_SCENE_SCENE_HPP
 #include "../../core/asset/cr-asset.hpp"
 #include "../../math/math-vector.hpp"
+#include "../../core/cr-end-caller.hpp"
 #include <map>
 #include <memory>
 #include <set>
@@ -11,9 +12,6 @@
 namespace gearoenix {
 namespace audio {
     class Audio;
-}
-namespace core {
-    class EndCaller;
 }
 namespace physics {
     class Kernel;
@@ -68,14 +66,14 @@ namespace render {
             void add_model(core::Id id, std::shared_ptr<model::Model> m);
 
         protected:
-            Scene(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c);
+            Scene(system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
 
         public:
             void commit();
             void cast_shadow();
             void draw(texture::Texture2D* shadow_texture);
             ~Scene();
-            static Scene* read(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c);
+            static Scene* read(system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
             const std::map<core::Id, std::weak_ptr<model::Model>>& get_all_models() const;
             const camera::Camera* get_current_camera() const;
             camera::Camera* get_current_camera();

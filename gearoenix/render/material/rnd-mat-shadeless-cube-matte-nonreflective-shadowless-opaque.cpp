@@ -24,22 +24,19 @@ void gearoenix::render::material::ShadelessCubeMatteNonreflectiveShadowlessOpaqu
     ctxt = t;
 }
 
-gearoenix::render::material::ShadelessCubeMatteNonreflectiveShadowlessOpaque::ShadelessCubeMatteNonreflectiveShadowlessOpaque(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> end)
+gearoenix::render::material::ShadelessCubeMatteNonreflectiveShadowlessOpaque::ShadelessCubeMatteNonreflectiveShadowlessOpaque(system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> end)
     : Material(SHADER_ID, sizeof(u), e, end)
 {
     core::Id texid;
     f->read(texid);
     core::asset::Manager* astmgr = e->get_system_application()->get_asset_manager();
-    std::function<void()> fun = [this, end, e] {
-        shdrsc = reinterpret_cast<Resources*>(e->create_shader_resources(SHADER_ID, pl.get(), ub, end));
-        shdrsc->set_cube_texture(ctxt.get());
-        (void)end;
-    };
     unsigned int curloc = f->tell();
-    ctxt = std::static_pointer_cast<texture::Cube>(astmgr->get_texture(texid, core::EndCaller::create(fun)));
+    ctxt = std::static_pointer_cast<texture::Cube>(astmgr->get_texture(texid, core::EndCaller<render::texture::Texture>([this, end, e] (std::shared_ptr<render::texture::Texture> asset) -> void {
+        shdrsc = reinterpret_cast<Resources*>(e->create_shader_resources(SHADER_ID, pl.get(), ub, end));
+        shdrsc->set_cube_texture(reinterpret_cast<texture::Cube*>(asset.get()));
+        (void)end;
+    })));
     f->seek(curloc);
-    if (shdrsc != nullptr)
-        shdrsc->set_cube_texture(ctxt.get());
 }
 
 gearoenix::render::material::ShadelessCubeMatteNonreflectiveShadowlessOpaque::~ShadelessCubeMatteNonreflectiveShadowlessOpaque()

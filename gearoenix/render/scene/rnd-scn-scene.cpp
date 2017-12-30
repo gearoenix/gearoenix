@@ -39,7 +39,7 @@ void gearoenix::render::scene::Scene::add_model(core::Id id, std::shared_ptr<mod
     }
 }
 
-gearoenix::render::scene::Scene::Scene(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c)
+gearoenix::render::scene::Scene::Scene(system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
 //: e(e)
 {
     core::asset::Manager* amgr = e->get_system_application()->get_asset_manager();
@@ -62,7 +62,7 @@ gearoenix::render::scene::Scene::Scene(system::File* f, Engine* e, std::shared_p
     for (size_t i = 0; i < light_ids.size(); ++i)
         lights[i] = amgr->get_light(light_ids[i]);
     for (size_t i = 0; i < model_ids.size(); ++i) {
-        root_models[model_ids[i]] = amgr->get_model(model_ids[i], c);
+        root_models[model_ids[i]] = amgr->get_model(model_ids[i], core::EndCaller<model::Model>([c](std::shared_ptr<model::Model>)->void{}));
         add_model(model_ids[i], root_models[i]);
     }
 }
@@ -76,7 +76,7 @@ gearoenix::render::scene::Scene::~Scene()
 }
 
 gearoenix::render::scene::Scene* gearoenix::render::scene::Scene::read(
-    system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c)
+    system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
 {
     return new Scene(f, e, c);
 }

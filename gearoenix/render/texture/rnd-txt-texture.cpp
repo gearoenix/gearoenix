@@ -7,7 +7,7 @@
 
 gearoenix::render::texture::Texture::~Texture() {}
 
-gearoenix::render::texture::Texture* gearoenix::render::texture::Texture::read(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c)
+gearoenix::render::texture::Texture* gearoenix::render::texture::Texture::read(system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
 {
     //    LOGE("textell: " << f->tell());
     core::Id t;

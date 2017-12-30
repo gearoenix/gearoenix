@@ -5,9 +5,9 @@
 #include "../../system/sys-log.hpp"
 #include "../rnd-engine.hpp"
 
-gearoenix::render::pipeline::Pipeline::Pipeline(core::Id sid, Engine* eng, std::shared_ptr<core::EndCaller> call)
+gearoenix::render::pipeline::Pipeline::Pipeline(core::Id sid, Engine* eng, core::EndCaller<core::EndCallerIgnore> call)
     : eng(eng)
-    , shd(eng->get_system_application()->get_asset_manager()->get_shader(sid, call))
+, shd(eng->get_system_application()->get_asset_manager()->get_shader(sid, core::EndCaller<shader::Shader>([call](std::shared_ptr<shader::Shader>)->void {})))
 {
 }
 

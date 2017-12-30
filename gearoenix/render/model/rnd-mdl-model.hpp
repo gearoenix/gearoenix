@@ -4,14 +4,12 @@
 #include "../../core/cr-types.hpp"
 #include "../../math/math-matrix.hpp"
 #include "../../math/math-vector.hpp"
+#include "../../core/cr-end-caller.hpp"
 #include <map>
 #include <memory>
 #include <tuple>
 #include <vector>
 namespace gearoenix {
-namespace core {
-    class EndCaller;
-}
 namespace physics {
     class Kernel;
 }
@@ -69,7 +67,7 @@ namespace render {
             std::map<core::Id, std::shared_ptr<Model>> children;
 
         public:
-            Model(system::File* f, Engine* e, std::shared_ptr<core::EndCaller> c);
+            Model(system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
             ~Model();
             void commit(const scene::Scene* s);
             void draw(core::Id mesh_id, texture::Texture2D* shadow_texture);
