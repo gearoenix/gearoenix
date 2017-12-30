@@ -6,9 +6,6 @@
 #include <d3d11.h>
 #include <memory>
 namespace gearoenix {
-namespace core {
-    class EndCaller;
-}
 namespace system {
     class File;
 }
@@ -21,7 +18,7 @@ namespace dx11 {
             ID3D11ShaderResourceView* srv = nullptr;
 
         public:
-            Cube(system::File* file, Engine* engine, std::shared_ptr<core::EndCaller> end);
+            Cube(system::File* file, Engine* engine, core::EndCaller<core::EndCallerIgnore> end);
             ~Cube();
             const ID3D11ShaderResourceView* get_shader_resource_view();
             void bind(unsigned int slot = 0) const;

@@ -2,6 +2,7 @@
 #define GEAROENIX_DX11_BUFFER_UNIFORM_HPP
 #include "../../core/cr-build-configuration.hpp"
 #ifdef USE_DIRECTX11
+#include "../../core/cr-end-caller.hpp"
 #include "../../render/buffer/rnd-buf-uniform.hpp"
 #include <d3d11.h>
 namespace gearoenix {
@@ -13,7 +14,7 @@ namespace dx11 {
             ID3D11Buffer* ub = nullptr;
 
         public:
-            Uniform(unsigned int s, Engine*, std::shared_ptr<core::EndCaller> c);
+            Uniform(unsigned int s, Engine*, core::EndCaller<core::EndCallerIgnore> c);
             ~Uniform();
             void update(const void* src, unsigned int data_size);
             void* get_data();

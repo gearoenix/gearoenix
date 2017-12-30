@@ -23,7 +23,7 @@ namespace dx11 {
 
         protected:
         public:
-            Depth(Engine* eng, std::shared_ptr<core::EndCaller> end);
+            Depth(Engine* eng, core::EndCaller<core::EndCallerIgnore> end);
             ~Depth();
             void use();
             const std::vector<render::shader::stage::Id>& get_stages_ids() const;

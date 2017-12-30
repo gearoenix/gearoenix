@@ -67,7 +67,7 @@ void* gearoenix::dx11::shader::Shader::compile_shader(
     return nullptr;
 }
 
-gearoenix::dx11::shader::Shader::Shader(Engine* eng, std::shared_ptr<core::EndCaller>)
+gearoenix::dx11::shader::Shader::Shader(Engine* eng, core::EndCaller<core::EndCallerIgnore>)
     : eng(eng)
 {
 }

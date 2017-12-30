@@ -22,7 +22,7 @@ namespace dx11 {
             };
 
         public:
-            DirectionalColoredSpeculatedBakedFullOpaque(Engine* eng, std::shared_ptr<core::EndCaller> end);
+            DirectionalColoredSpeculatedBakedFullOpaque(Engine* eng, core::EndCaller<core::EndCallerIgnore> end);
             ~DirectionalColoredSpeculatedBakedFullOpaque();
             void use();
             const std::vector<render::shader::stage::Id>& get_stages_ids() const;

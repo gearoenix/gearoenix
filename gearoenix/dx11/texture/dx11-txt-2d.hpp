@@ -6,9 +6,6 @@
 #include <d3d11.h>
 #include <memory>
 namespace gearoenix {
-namespace core {
-    class EndCaller;
-}
 namespace system {
     class File;
 }
@@ -21,7 +18,7 @@ namespace dx11 {
             ID3D11ShaderResourceView* srv = nullptr;
 
         public:
-            Texture2D(_Notnull_ system::File* file, _Notnull_ Engine* engine, std::shared_ptr<core::EndCaller> end);
+            Texture2D(_Notnull_ system::File* file, _Notnull_ Engine* engine, core::EndCaller<core::EndCallerIgnore> end);
             Texture2D(_Notnull_ Engine* engine, _Notnull_ ID3D11ShaderResourceView* srv);
             ~Texture2D();
             const ID3D11ShaderResourceView* get_shader_resource_view() const;

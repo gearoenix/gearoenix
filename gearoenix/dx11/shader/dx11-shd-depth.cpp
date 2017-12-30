@@ -19,7 +19,7 @@ void gearoenix::dx11::shader::Depth::Resources::bind()
     shd->use();
 }
 
-gearoenix::dx11::shader::Depth::Depth(Engine* eng, std::shared_ptr<core::EndCaller> end)
+gearoenix::dx11::shader::Depth::Depth(Engine* eng, core::EndCaller<core::EndCallerIgnore> end)
     : Shader(eng, end)
 {
     eng->add_load_function([this, eng, end]() -> void {

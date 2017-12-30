@@ -347,27 +347,27 @@ void gearoenix::dx11::Engine::terminate()
     swapchain = nullptr;
 }
 
-gearoenix::render::texture::Texture2D* gearoenix::dx11::Engine::create_texture_2d(system::File* file, std::shared_ptr<core::EndCaller> c)
+gearoenix::render::texture::Texture2D* gearoenix::dx11::Engine::create_texture_2d(system::File* file, core::EndCaller<core::EndCallerIgnore> c)
 {
     return new texture::Texture2D(file, this, c);
 }
 
-gearoenix::render::texture::Cube* gearoenix::dx11::Engine::create_texture_cube(system::File* file, std::shared_ptr<core::EndCaller> c)
+gearoenix::render::texture::Cube* gearoenix::dx11::Engine::create_texture_cube(system::File* file, core::EndCaller<core::EndCallerIgnore> c)
 {
     return new texture::Cube(file, this, c);
 }
 
-gearoenix::render::buffer::Mesh* gearoenix::dx11::Engine::create_mesh(unsigned int vec, system::File* file, std::shared_ptr<core::EndCaller> c)
+gearoenix::render::buffer::Mesh* gearoenix::dx11::Engine::create_mesh(unsigned int vec, system::File* file, core::EndCaller<core::EndCallerIgnore> c)
 {
     return new buffer::Mesh(vec, file, this, c);
 }
 
-gearoenix::render::buffer::Uniform* gearoenix::dx11::Engine::create_uniform(unsigned int s, std::shared_ptr<core::EndCaller> c)
+gearoenix::render::buffer::Uniform* gearoenix::dx11::Engine::create_uniform(unsigned int s, core::EndCaller<core::EndCallerIgnore> c)
 {
     return new buffer::Uniform(s, this, c);
 }
 
-gearoenix::render::shader::Shader* gearoenix::dx11::Engine::create_shader(core::Id sid, system::File* file, std::shared_ptr<core::EndCaller> c)
+gearoenix::render::shader::Shader* gearoenix::dx11::Engine::create_shader(core::Id sid, system::File* file, core::EndCaller<core::EndCallerIgnore> c)
 {
     render::shader::Id shader_id = (render::shader::Id)sid;
     switch (shader_id) {
@@ -399,7 +399,7 @@ gearoenix::render::shader::Shader* gearoenix::dx11::Engine::create_shader(core::
     return nullptr;
 }
 
-gearoenix::render::shader::Resources* gearoenix::dx11::Engine::create_shader_resources(core::Id sid, render::pipeline::Pipeline* p, render::buffer::Uniform* ub, std::shared_ptr<core::EndCaller> c)
+gearoenix::render::shader::Resources* gearoenix::dx11::Engine::create_shader_resources(core::Id sid, render::pipeline::Pipeline* p, render::buffer::Uniform* ub, core::EndCaller<core::EndCallerIgnore> c)
 {
     pipeline::Pipeline* pip = reinterpret_cast<pipeline::Pipeline*>(p);
     buffer::Uniform* u = reinterpret_cast<buffer::Uniform*>(ub);
@@ -433,7 +433,7 @@ gearoenix::render::shader::Resources* gearoenix::dx11::Engine::create_shader_res
     return nullptr;
 }
 
-gearoenix::render::pipeline::Pipeline* gearoenix::dx11::Engine::create_pipeline(core::Id sid, std::shared_ptr<core::EndCaller> c)
+gearoenix::render::pipeline::Pipeline* gearoenix::dx11::Engine::create_pipeline(core::Id sid, core::EndCaller<core::EndCallerIgnore> c)
 {
     return new pipeline::Pipeline(sid, this, c);
 }

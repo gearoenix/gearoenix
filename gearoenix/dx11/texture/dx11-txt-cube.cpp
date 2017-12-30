@@ -9,7 +9,7 @@
 
 #define FACES_COUNT 6
 
-gearoenix::dx11::texture::Cube::Cube(system::File* file, Engine* eng, std::shared_ptr<core::EndCaller> end)
+gearoenix::dx11::texture::Cube::Cube(system::File* file, Engine* eng, core::EndCaller<core::EndCallerIgnore> end)
     : engine(eng)
 {
     std::vector<std::vector<unsigned char>> img_data(FACES_COUNT);

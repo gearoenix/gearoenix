@@ -23,7 +23,7 @@ namespace dx11 {
                 std::vector<D3D11_INPUT_ELEMENT_DESC> polygon_layout = {});
 
         public:
-            Shader(Engine* eng, std::shared_ptr<core::EndCaller> end);
+            Shader(Engine* eng, core::EndCaller<core::EndCallerIgnore> end);
             virtual ~Shader();
         };
     }

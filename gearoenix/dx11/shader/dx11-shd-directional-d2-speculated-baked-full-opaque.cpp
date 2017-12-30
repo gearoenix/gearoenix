@@ -26,7 +26,7 @@ void gearoenix::dx11::shader::DirectionalD2SpeculatedBakedFullOpaque::Resources:
     shd->use();
 }
 
-gearoenix::dx11::shader::DirectionalD2SpeculatedBakedFullOpaque::DirectionalD2SpeculatedBakedFullOpaque(Engine* eng, std::shared_ptr<core::EndCaller> end)
+gearoenix::dx11::shader::DirectionalD2SpeculatedBakedFullOpaque::DirectionalD2SpeculatedBakedFullOpaque(Engine* eng, core::EndCaller<core::EndCallerIgnore> end)
     : Shader(eng, end)
 {
     eng->add_load_function([this, end] {

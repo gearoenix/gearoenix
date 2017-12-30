@@ -6,7 +6,7 @@
 #include "../dx11-engine.hpp"
 #include <cstring>
 
-gearoenix::dx11::buffer::Uniform::Uniform(unsigned int s, Engine* eng, std::shared_ptr<core::EndCaller> c)
+gearoenix::dx11::buffer::Uniform::Uniform(unsigned int s, Engine* eng, core::EndCaller<core::EndCallerIgnore> c)
     : render::buffer::Uniform(eng)
 {
     eng->add_load_function([this, eng, s, c]() -> void {

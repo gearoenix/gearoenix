@@ -4,9 +4,6 @@
 #ifdef USE_DIRECTX11
 #include <d3d11.h>
 namespace gearoenix {
-namespace core {
-    class EndCaller;
-}
 namespace system {
     class File;
 }

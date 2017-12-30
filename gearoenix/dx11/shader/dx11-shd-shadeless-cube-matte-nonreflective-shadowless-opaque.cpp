@@ -22,7 +22,7 @@ void gearoenix::dx11::shader::ShadelessCubeMatteNonreflectiveShadowlessOpaque::R
     shd->use();
 }
 
-gearoenix::dx11::shader::ShadelessCubeMatteNonreflectiveShadowlessOpaque::ShadelessCubeMatteNonreflectiveShadowlessOpaque(Engine* eng, std::shared_ptr<core::EndCaller> end)
+gearoenix::dx11::shader::ShadelessCubeMatteNonreflectiveShadowlessOpaque::ShadelessCubeMatteNonreflectiveShadowlessOpaque(Engine* eng, core::EndCaller<core::EndCallerIgnore> end)
     : Shader(eng, end)
 {
     eng->add_load_function([this, eng, end]() -> void {

@@ -5,9 +5,6 @@
 #include "../../render/pipeline/rnd-pip-pipeline.hpp"
 #include <memory>
 namespace gearoenix {
-namespace core {
-    class EndCaller;
-}
 namespace dx11 {
     class Engine;
     namespace shader {
@@ -20,7 +17,7 @@ namespace dx11 {
             Pipeline(
                 core::Id sid,
                 Engine* eng,
-                std::shared_ptr<core::EndCaller> call);
+				core::EndCaller<core::EndCallerIgnore> call);
             ~Pipeline();
             void bind();
         };

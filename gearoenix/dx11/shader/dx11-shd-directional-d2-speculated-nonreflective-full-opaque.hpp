@@ -22,7 +22,7 @@ namespace dx11 {
             };
 
         public:
-            DirectionalD2SpeculatedNonreflectiveFullOpaque(Engine* eng, std::shared_ptr<core::EndCaller> end);
+            DirectionalD2SpeculatedNonreflectiveFullOpaque(Engine* eng, core::EndCaller<core::EndCallerIgnore> end);
             ~DirectionalD2SpeculatedNonreflectiveFullOpaque();
             void use();
             const std::vector<render::shader::stage::Id>& get_stages_ids() const;
