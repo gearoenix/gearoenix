@@ -6,7 +6,7 @@
 #elif defined(IN_MAC)
 #define GL_GLEXT_PROTOTYPES 1
 #include <SDL_opengl.h>
-#elif defined(IN_IOS)
+#elif defined(IN_IOS) || defined(IN_WEB)
 #include <SDL_opengles2.h>
 #endif
 #elif defined(USE_GLFW)

@@ -21,7 +21,7 @@ namespace dx11 {
             Mesh(
                 unsigned int vertex_elements_count,
                 system::File* f, Engine* e,
-				core::EndCaller<core::EndCallerIgnore> c);
+                core::EndCaller<core::EndCallerIgnore> c);
             ~Mesh();
             void bind();
             void draw();

@@ -25,7 +25,8 @@ void TestApp::terminate() {}
 
 void TestApp::on_zoom(gearoenix::core::Real d)
 {
-    if(cam != nullptr) cam->move_forward(d); // only for demo, this is not good practice
+    if (cam != nullptr)
+        cam->move_forward(d); // only for demo, this is not good practice
 }
 
 void TestApp::on_rotate(gearoenix::core::Real)
@@ -34,7 +35,8 @@ void TestApp::on_rotate(gearoenix::core::Real)
 
 void TestApp::on_scroll(gearoenix::core::Real d)
 {
-	if (cam != nullptr) cam->move_forward(d * 0.3f);
+    if (cam != nullptr)
+        cam->move_forward(d * 0.3f);
 }
 
 void TestApp::on_mouse(MouseButton mb, ButtonAction ba, gearoenix::core::Real, gearoenix::core::Real)
@@ -57,11 +59,11 @@ void TestApp::on_mouse(MouseButton mb, ButtonAction ba, gearoenix::core::Real, g
 
 void TestApp::on_mouse_move(gearoenix::core::Real dx, gearoenix::core::Real dy)
 {
-	if (cam != nullptr)
-    if (left_mouse_down) {
-        cam->rotate_local_x(dy * 0.001f);
-        cam->rotate_global_z(dx * 0.001f);
-    }
+    if (cam != nullptr)
+        if (left_mouse_down) {
+            cam->rotate_local_x(dy * 0.001f);
+            cam->rotate_global_z(dx * 0.001f);
+        }
 }
 
 GEAROENIX_START(TestApp)

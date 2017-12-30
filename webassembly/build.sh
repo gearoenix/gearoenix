@@ -1,4 +1,6 @@
 #!/bin/bash
+clear
+clear
 process="$0"
 build_name="build.sh"
 gearoenix_dir="${process%$build_name}.."
@@ -12,8 +14,6 @@ cd $output_dir
 find ./ -type f -not -name 'data.gx3d' -delete
 # cpps=$(find ../ -iname *.hpp -o -iname *.cpp | xargs echo)
 source $EMSCRIPTEN_SDK/emsdk_env.sh
-clear
-clear
 # find ../gearoenix/ -iname *.hpp | while read line; do
 #   hpp=${line:13}
 #   hpp=${hpp//"/"/"-"}
@@ -25,11 +25,13 @@ find ../gearoenix/ -iname *.cpp | while read line; do
   cppfile=${cppfile//"/"/"-"}
   echo "compiling header file $line to $cppfile.bc"
   em++ -std=c++14 -s WASM=1 -s BINARYEN=1 -s USE_SDL=2 -s NO_EXIT_RUNTIME=1 \
-        -Oz -c $line -o $cppfile.bc
+       -s ALLOW_MEMORY_GROWTH=1 \
+       -Oz -c $line -o $cppfile.bc
 done
 em++ -std=c++14 -s WASM=1 -s BINARYEN=1 -s USE_SDL=2 -s NO_EXIT_RUNTIME=1 \
-    --embed-file data.gx3d --shell-file ../webassembly/index.html \
-    -Oz *.bc -o index.html
+     -s ALLOW_MEMORY_GROWTH=1 --embed-file data.gx3d \
+     --shell-file ../webassembly/index.html \
+     -Oz *.bc -o index.html
 rm *.bc
 
 # -s WASM=1 -s BINARYEN=1
