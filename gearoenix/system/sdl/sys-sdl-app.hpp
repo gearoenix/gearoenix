@@ -37,6 +37,7 @@ namespace system {
         SDL_GLContext gl_context;
         bool running = true;
         core::Id supported_engine;
+        void create_window();
         void create_context();
         static int SDLCALL event_receiver(void* user_data, SDL_Event* event);
 
@@ -57,6 +58,7 @@ namespace system {
         core::Real get_window_ratio() const;
         unsigned int get_width() const;
         unsigned int get_height() const;
+        core::Id get_supported_engine() const;
     };
 }
 }

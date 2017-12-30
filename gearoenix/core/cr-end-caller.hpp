@@ -1,9 +1,9 @@
 #ifndef GEAROENIX_CORE_END_CALLER_HPP
 #define GEAROENIX_CORE_END_CALLER_HPP
+#include "../system/sys-log.hpp"
+#include "cr-build-configuration.hpp"
 #include <functional>
 #include <memory>
-#include "cr-build-configuration.hpp"
-#include "../system/sys-log.hpp"
 
 namespace gearoenix {
 namespace core {
@@ -14,22 +14,33 @@ namespace core {
         public:
             std::function<void(std::shared_ptr<T>)> f;
             std::shared_ptr<T> data = nullptr;
-            Caller(std::function<void(std::shared_ptr<T>)> f): f(f){}
-            ~Caller() {
+            Caller(std::function<void(std::shared_ptr<T>)> f)
+                : f(f)
+            {
+            }
+            ~Caller()
+            {
 #ifdef DEBUG_MODE
-                if(nullptr == data) UNEXPECTED;
+                if (nullptr == data)
+                    UNEXPECTED;
 #endif
                 f(data);
             }
         };
         std::shared_ptr<Caller> caller;
+
     public:
-        EndCaller(std::function<void(std::shared_ptr<T>)> f): caller(new Caller(f)) {}
-        void set_data(std::shared_ptr<T> data) {
+        EndCaller(std::function<void(std::shared_ptr<T>)> f)
+            : caller(new Caller(f))
+        {
+        }
+        void set_data(std::shared_ptr<T> data)
+        {
             caller->data = data;
         }
     };
-    typedef struct {} EndCallerIgnore;
+    typedef struct {
+    } EndCallerIgnore;
 #ifdef DEBUG_MODE
     template <>
     class EndCaller<EndCallerIgnore> {
@@ -38,15 +49,24 @@ namespace core {
         public:
             std::function<void(std::shared_ptr<EndCallerIgnore>)> f;
             std::shared_ptr<EndCallerIgnore> data = nullptr;
-            Caller(std::function<void(std::shared_ptr<EndCallerIgnore>)> f): f(f){}
-            ~Caller() {
+            Caller(std::function<void(std::shared_ptr<EndCallerIgnore>)> f)
+                : f(f)
+            {
+            }
+            ~Caller()
+            {
                 f(data);
             }
         };
         std::shared_ptr<Caller> caller;
+
     public:
-        EndCaller(std::function<void(std::shared_ptr<EndCallerIgnore>)> f): caller(new Caller(f)) {}
-        void set_data(std::shared_ptr<EndCallerIgnore> data) {
+        EndCaller(std::function<void(std::shared_ptr<EndCallerIgnore>)> f)
+            : caller(new Caller(f))
+        {
+        }
+        void set_data(std::shared_ptr<EndCallerIgnore> data)
+        {
             caller->data = data;
         }
     };

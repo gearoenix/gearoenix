@@ -1,9 +1,9 @@
 #ifndef GEAROEMIX_RENDER_MATERIAL_DIRECTIONAL_COLORED_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE_HPP
 #define GEAROEMIX_RENDER_MATERIAL_DIRECTIONAL_COLORED_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE_HPP
+#include "../../core/cr-end-caller.hpp"
 #include "../../math/math-matrix.hpp"
 #include "../../math/math-vector.hpp"
 #include "../shader/rnd-shd-resources.hpp"
-#include "../../core/cr-end-caller.hpp"
 #include "rnd-mat-material.hpp"
 #include <memory>
 namespace gearoenix {

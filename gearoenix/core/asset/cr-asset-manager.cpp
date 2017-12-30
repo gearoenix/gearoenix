@@ -71,7 +71,7 @@ gearoenix::system::File* gearoenix::core::asset::Manager::get_file()
 std::shared_ptr<gearoenix::render::shader::Shader> gearoenix::core::asset::Manager::get_shader(Id id, EndCaller<render::shader::Shader> end)
 {
     auto result = shaders->get<render::shader::Shader>(id, [this, id, end]() -> std::shared_ptr<render::shader::Shader> {
-        return std::shared_ptr<render::shader::Shader>(render::shader::Shader::read(id, file, render_engine, EndCaller<EndCallerIgnore>([end](std::shared_ptr<EndCallerIgnore>)->void {})));
+        return std::shared_ptr<render::shader::Shader>(render::shader::Shader::read(id, file, render_engine, EndCaller<EndCallerIgnore>([end](std::shared_ptr<EndCallerIgnore>) -> void {})));
     });
     end.set_data(result);
     return result;
@@ -123,8 +123,8 @@ std::shared_ptr<gearoenix::render::light::Light> gearoenix::core::asset::Manager
 
 std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::core::asset::Manager::get_texture(Id id, EndCaller<render::texture::Texture> end)
 {
-    auto result = textures->get<render::texture::Texture>(id, [this, end] () ->  std::shared_ptr<render::texture::Texture> {
-        return std::shared_ptr<render::texture::Texture>(render::texture::Texture::read(file, render_engine, EndCaller<EndCallerIgnore>([end] (std::shared_ptr<EndCallerIgnore>) -> void {})));
+    auto result = textures->get<render::texture::Texture>(id, [this, end]() -> std::shared_ptr<render::texture::Texture> {
+        return std::shared_ptr<render::texture::Texture>(render::texture::Texture::read(file, render_engine, EndCaller<EndCallerIgnore>([end](std::shared_ptr<EndCallerIgnore>) -> void {})));
     });
     end.set_data(result);
     return result;
@@ -138,7 +138,7 @@ std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::core::asset::Man
 std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::core::asset::Manager::get_mesh(Id id, EndCaller<render::mesh::Mesh> end)
 {
     auto result = meshes->get<render::mesh::Mesh>(id, [this, end]() -> std::shared_ptr<render::mesh::Mesh> {
-        return std::shared_ptr<render::mesh::Mesh>(new render::mesh::Mesh(file, render_engine, EndCaller<EndCallerIgnore>([end](std::shared_ptr<EndCallerIgnore>)->void {})));
+        return std::shared_ptr<render::mesh::Mesh>(new render::mesh::Mesh(file, render_engine, EndCaller<EndCallerIgnore>([end](std::shared_ptr<EndCallerIgnore>) -> void {})));
     });
     end.set_data(result);
     return result;
@@ -151,8 +151,8 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::core::asset::Manager::
 
 std::shared_ptr<gearoenix::render::model::Model> gearoenix::core::asset::Manager::get_model(Id id, EndCaller<render::model::Model> end)
 {
-    auto result = models->get<render::model::Model>(id, [this, end] () -> std::shared_ptr<render::model::Model> {
-        return std::shared_ptr<render::model::Model>(new render::model::Model(file, render_engine, EndCaller<EndCallerIgnore>([end](std::shared_ptr<EndCallerIgnore>)->void {})));
+    auto result = models->get<render::model::Model>(id, [this, end]() -> std::shared_ptr<render::model::Model> {
+        return std::shared_ptr<render::model::Model>(new render::model::Model(file, render_engine, EndCaller<EndCallerIgnore>([end](std::shared_ptr<EndCallerIgnore>) -> void {})));
     });
     end.set_data(result);
     return result;
@@ -166,7 +166,7 @@ std::shared_ptr<gearoenix::render::model::Model> gearoenix::core::asset::Manager
 std::shared_ptr<gearoenix::render::scene::Scene> gearoenix::core::asset::Manager::get_scene(Id id, EndCaller<render::scene::Scene> end)
 {
     auto result = scenes->get<render::scene::Scene>(id, [this, end]() -> std::shared_ptr<render::scene::Scene> {
-        return std::shared_ptr<render::scene::Scene>(render::scene::Scene::read(file, render_engine, EndCaller<EndCallerIgnore>([end](std::shared_ptr<EndCallerIgnore>)->void{})));
+        return std::shared_ptr<render::scene::Scene>(render::scene::Scene::read(file, render_engine, EndCaller<EndCallerIgnore>([end](std::shared_ptr<EndCallerIgnore>) -> void {})));
     });
     end.set_data(result);
     return result;

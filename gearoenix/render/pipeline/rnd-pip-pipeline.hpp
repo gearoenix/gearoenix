@@ -1,8 +1,8 @@
 #ifndef GEAROENIX_RENDER_PIPELINE_PIPELINE_HPP
 #define GEAROENIX_RENDER_PIPELINE_PIPELINE_HPP
 #include "../../core/cache/cr-cache-cached.hpp"
-#include "../../core/cr-types.hpp"
 #include "../../core/cr-end-caller.hpp"
+#include "../../core/cr-types.hpp"
 #include <memory>
 namespace gearoenix {
 namespace render {

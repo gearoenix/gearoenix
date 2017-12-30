@@ -62,7 +62,7 @@ gearoenix::render::scene::Scene::Scene(system::File* f, Engine* e, core::EndCall
     for (size_t i = 0; i < light_ids.size(); ++i)
         lights[i] = amgr->get_light(light_ids[i]);
     for (size_t i = 0; i < model_ids.size(); ++i) {
-        root_models[model_ids[i]] = amgr->get_model(model_ids[i], core::EndCaller<model::Model>([c](std::shared_ptr<model::Model>)->void{}));
+        root_models[model_ids[i]] = amgr->get_model(model_ids[i], core::EndCaller<model::Model>([c](std::shared_ptr<model::Model>) -> void {}));
         add_model(model_ids[i], root_models[i]);
     }
 }

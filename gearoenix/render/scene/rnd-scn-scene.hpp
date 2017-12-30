@@ -1,8 +1,8 @@
 #ifndef GEAROEMIX_RENDER_SCENE_SCENE_HPP
 #define GEAROEMIX_RENDER_SCENE_SCENE_HPP
 #include "../../core/asset/cr-asset.hpp"
-#include "../../math/math-vector.hpp"
 #include "../../core/cr-end-caller.hpp"
+#include "../../math/math-vector.hpp"
 #include <map>
 #include <memory>
 #include <set>

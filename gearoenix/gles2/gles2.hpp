@@ -18,16 +18,24 @@
 #error "Not implemented yet!"
 #endif
 #ifdef DEBUG_MODE
-#define CHECK_FOR_GRAPHIC_API_ERROR \
-switch(glGetError()) { \
-case GL_NO_ERROR: GXLOGI("No error found."); break; \
-case GL_INVALID_ENUM: GXLOGF("Invalid enum"); \
-case GL_INVALID_VALUE: GXLOGF("Invalid value"); \
-case GL_INVALID_OPERATION: GXLOGF("Invalid operation"); \
-case GL_INVALID_FRAMEBUFFER_OPERATION: GXLOGF("Invalid framebuffer operation error."); \
-case GL_OUT_OF_MEMORY: GXLOGF("Out of memory error."); \
-default: GXLOGF("Unknown error."); \
-}
+#define CHECK_FOR_GRAPHIC_API_ERROR                     \
+    switch (glGetError()) {                             \
+    case GL_NO_ERROR:                                   \
+        GXLOGI("No error found.");                      \
+        break;                                          \
+    case GL_INVALID_ENUM:                               \
+        GXLOGF("Invalid enum");                         \
+    case GL_INVALID_VALUE:                              \
+        GXLOGF("Invalid value");                        \
+    case GL_INVALID_OPERATION:                          \
+        GXLOGF("Invalid operation");                    \
+    case GL_INVALID_FRAMEBUFFER_OPERATION:              \
+        GXLOGF("Invalid framebuffer operation error."); \
+    case GL_OUT_OF_MEMORY:                              \
+        GXLOGF("Out of memory error.");                 \
+    default:                                            \
+        GXLOGF("Unknown error.");                       \
+    }
 #define GLES2_PROFILING
 #else
 #define CHECK_FOR_GRAPHIC_API_ERROR

@@ -17,7 +17,7 @@ gearoenix::gles3::buffer::Mesh::Mesh(unsigned int vec, system::File* f, Engine* 
         f->read(vd[(size_t)i]);
     }
     f->read(cnt);
-    ic = (GLuint) cnt;
+    ic = (GLuint)cnt;
     std::vector<GLuint> idata((size_t)cnt);
     for (core::Count i = 0; i < cnt; ++i)
         idata[(size_t)i] = (GLuint)f->read<std::uint32_t>();
@@ -28,7 +28,7 @@ gearoenix::gles3::buffer::Mesh::Mesh(unsigned int vec, system::File* f, Engine* 
         glGenBuffers(1, &vbo);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBufferData(GL_ARRAY_BUFFER, vs, vd.data(), GL_STATIC_DRAW);
-        for(int rvec = vec, vapi = 0; rvec > 0; rvec -= 3, ++vapi) {
+        for (int rvec = vec, vapi = 0; rvec > 0; rvec -= 3, ++vapi) {
             glEnableVertexAttribArray(vapi);
             glVertexAttribPointer(vapi, rvec > 2 ? 3 : rvec, GL_FLOAT, GL_FALSE, vec * sizeof(GLfloat), (void*)(vapi * 3 * sizeof(GLfloat)));
         }
@@ -55,7 +55,7 @@ gearoenix::gles3::buffer::Mesh::~Mesh()
 
 void gearoenix::gles3::buffer::Mesh::bind()
 {
-//    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+    //    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 }
 
 void gearoenix::gles3::buffer::Mesh::draw()

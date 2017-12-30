@@ -47,7 +47,8 @@ gearoenix::gles2::Engine::Engine(system::Application* sysapp)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, shadow_map_color, 0);
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) UNEXPECTED;
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        UNEXPECTED;
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
     glEnable(GL_BLEND);
@@ -59,7 +60,8 @@ gearoenix::gles2::Engine::Engine(system::Application* sysapp)
     glScissor(0, 0, shadow_map_aspect, shadow_map_aspect);
     glBindRenderbuffer(GL_RENDERBUFFER, render_depth);
     glBindFramebuffer(GL_FRAMEBUFFER, render_framebuffer);
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) UNEXPECTED;
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        UNEXPECTED;
     shadow_map_texture = new texture::Texture2D(shadow_map_color);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);

@@ -1,7 +1,7 @@
 #ifndef GEAROENIX_RENDER_PIPELINE_MANAGER_HPP
 #define GEAROENIX_RENDER_PIPELINE_MANAGER_HPP
-#include "../../core/cr-types.hpp"
 #include "../../core/cr-end-caller.hpp"
+#include "../../core/cr-types.hpp"
 #include <memory>
 namespace gearoenix {
 namespace core {

@@ -122,8 +122,8 @@ void gearoenix::render::Engine::load_scene(core::Id scene_id, std::function<void
         loaded_scenes_mutex->lock();
 #endif
         unsigned int result = (unsigned int)loaded_scenes.size();
-        loaded_scenes.push_back(sysapp->get_asset_manager()->get_scene(scene_id, core::EndCaller<scene::Scene>([this, result, on_load] (std::shared_ptr<scene::Scene> asset) -> void {
-            scene::Scene *loaded_scene = reinterpret_cast<scene::Scene*>(asset.get());
+        loaded_scenes.push_back(sysapp->get_asset_manager()->get_scene(scene_id, core::EndCaller<scene::Scene>([this, result, on_load](std::shared_ptr<scene::Scene> asset) -> void {
+            scene::Scene* loaded_scene = reinterpret_cast<scene::Scene*>(asset.get());
             loaded_scene->set_renderable(true);
             on_load(result);
         })));

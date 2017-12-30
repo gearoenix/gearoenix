@@ -1,8 +1,8 @@
 #ifndef GEAROEMIX_RENDER_SHADER_SHADER_HPP
 #define GEAROEMIX_RENDER_SHADER_SHADER_HPP
 #include "../../core/asset/cr-asset.hpp"
-#include "../../core/cr-types.hpp"
 #include "../../core/cr-end-caller.hpp"
+#include "../../core/cr-types.hpp"
 #include <memory>
 #include <vector>
 namespace gearoenix {

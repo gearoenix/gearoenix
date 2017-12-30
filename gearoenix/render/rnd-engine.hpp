@@ -1,8 +1,8 @@
 #ifndef GEAROENIX_RENDER_ENGINE_HPP
 #define GEAROENIX_RENDER_ENGINE_HPP
 #include "../core/cr-build-configuration.hpp"
-#include "../core/cr-types.hpp"
 #include "../core/cr-end-caller.hpp"
+#include "../core/cr-types.hpp"
 #include <functional>
 #include <memory>
 #ifdef THREAD_SUPPORTED
@@ -55,6 +55,7 @@ namespace render {
             METAL,
             UNKNOWN,
         };
+
     private:
     protected:
         EngineType engine_type = EngineType::UNKNOWN;

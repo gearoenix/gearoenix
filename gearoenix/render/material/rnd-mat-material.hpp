@@ -1,7 +1,7 @@
 #ifndef GEAROEMIX_RENDER_MATERIAL_MATERIAL_HPP
 #define GEAROEMIX_RENDER_MATERIAL_MATERIAL_HPP
-#include "../shader/rnd-shd-shader.hpp"
 #include "../../core/cr-end-caller.hpp"
+#include "../shader/rnd-shd-shader.hpp"
 #include <memory>
 namespace gearoenix {
 namespace system {

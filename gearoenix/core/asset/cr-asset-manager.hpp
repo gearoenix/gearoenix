@@ -1,7 +1,7 @@
 #ifndef GEAROENIX_CORE_ASSET_MANAGER_HPP
 #define GEAROENIX_CORE_ASSET_MANAGER_HPP
-#include "../cr-types.hpp"
 #include "../cr-end-caller.hpp"
+#include "../cr-types.hpp"
 #include <memory>
 #include <string>
 namespace gearoenix {

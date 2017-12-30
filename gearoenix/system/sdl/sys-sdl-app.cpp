@@ -15,6 +15,52 @@ gearoenix::system::Application* gearoenix::system::Application::app = nullptr;
 const gearoenix::core::Real gearoenix::system::Application::rotate_epsilon = 3.14f / 180.0f;
 const gearoenix::core::Real gearoenix::system::Application::zoom_epsilon = 0.00001f;
 
+void gearoenix::system::Application::create_window()
+{
+    std::uint32_t flags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN | SDL_WINDOW_BORDERLESS | SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE |
+#if defined(IN_MAC) || defined(IN_IOS)
+        SDL_WINDOW_ALLOW_HIGHDPI |
+#endif
+        0;
+    window = SDL_CreateWindow(
+        APPLICATION_NAME,
+        SDL_WINDOWPOS_CENTERED,
+        SDL_WINDOWPOS_CENTERED,
+        win_width,
+        win_height,
+        flags);
+    if (nullptr != window) {
+        GXLOGI("Best window created.");
+        return;
+    }
+    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
+    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
+    window = SDL_CreateWindow(
+        APPLICATION_NAME,
+        SDL_WINDOWPOS_CENTERED,
+        SDL_WINDOWPOS_CENTERED,
+        win_width,
+        win_height,
+        flags);
+    if (nullptr != window) {
+        GXLOGI("Window with disabled multisamples created.");
+        return;
+    }
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+    window = SDL_CreateWindow(
+        APPLICATION_NAME,
+        SDL_WINDOWPOS_CENTERED,
+        SDL_WINDOWPOS_CENTERED,
+        win_width,
+        win_height,
+        flags);
+    if (nullptr != window) {
+        GXLOGI("Window with minimum rquirement created.");
+        return;
+    }
+    GXLOGF("Can not create window with minimum requirements");
+}
+
 void gearoenix::system::Application::create_context()
 {
 #ifdef IN_DESKTOP
@@ -136,50 +182,69 @@ gearoenix::system::Application::Application()
         GXLOGF("Failed to initialize SDL: " << SDL_GetError());
     }
     SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
+#if defined(USE_OPENGL_43) || defined(USE_OPENGL_33)
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+#elif defined(USE_OPENGL_ES3) || defined(USE_OPENGL_ES2)
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+#else
+#error "Unexpected"
+#endif
+#ifdef USE_OPENGL_43
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+#elif defined(USE_OPENGL_33)
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+#elif defined(USE_OPENGL_ES3)
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+#elif defined(USE_OPENGL_ES2)
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+#else
+#error "Unexpected"
+#endif
+#if defined(USE_OPENGL_43) || defined(USE_OPENGL_33) || defined(USE_OPENGL_ES3)
+#ifdef IN_LINUX
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+#else
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 32);
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
-    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 2);
+    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 16);
+#endif
+#elif defined(USE_OPENGL_ES2)
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+#else
+#error "Unexpected"
+#endif
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
-    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 32);
     SDL_SetHint(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandescapeRight");
     SDL_DisplayMode display_mode;
     SDL_GetCurrentDisplayMode(0, &display_mode);
-    window = SDL_CreateWindow(
-        APPLICATION_NAME,
-        SDL_WINDOWPOS_CENTERED,
-        SDL_WINDOWPOS_CENTERED,
-        display_mode.w,
-        display_mode.h,
-        SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN |
-        SDL_WINDOW_BORDERLESS | SDL_WINDOW_FULLSCREEN_DESKTOP |
-        SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
-    if (!window) {
-        GXLOGF("Couldn't create window: " << SDL_GetError());
-    }
+    win_width = display_mode.w;
+    win_height = display_mode.h;
+    create_window();
     create_context();
-    
     SDL_AddEventWatch(event_receiver, this);
     SDL_GL_MakeCurrent(window, gl_context);
     int w, h;
-    SDL_GetWindowSize(window, &w, &h);
     SDL_GL_GetDrawableSize(window, &w, &h);
     win_width = (unsigned int)w;
     win_height = (unsigned int)h;
 #ifdef USE_OPENGL_ES2
-    if(supported_engine == render::Engine::OPENGL_ES2) render_engine = new gles2::Engine(this);
+    if (supported_engine == render::Engine::OPENGL_ES2)
+        render_engine = new gles2::Engine(this);
 #else
-    if(supported_engine != render::Engine::OPENGL_ES2) render_engine = new gles3::Engine(this);
+    if (supported_engine != render::Engine::OPENGL_ES2)
+        render_engine = new gles3::Engine(this);
 #endif
-#ifdef DEBUG_MODE
-    if(render_engine == nullptr) UNEXPECTED;
-#endif
+    if (render_engine == nullptr)
+        UNEXPECTED;
     astmgr = new core::asset::Manager(this, "data.gx3d");
     astmgr->initialize();
 }
@@ -272,6 +337,11 @@ unsigned int gearoenix::system::Application::get_width() const
 unsigned int gearoenix::system::Application::get_height() const
 {
     return win_height;
+}
+
+gearoenix::core::Id gearoenix::system::Application::get_supported_engine() const
+{
+    return supported_engine;
 }
 
 #endif

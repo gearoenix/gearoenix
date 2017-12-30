@@ -134,7 +134,7 @@ gearoenix::gles3::shader::DirectionalColoredSpeculatedBakedFullOpaque::Direction
 
         glUniform1i(rfl_env, 0);
         glUniform1i(shdtxt, 1);
-        
+
         (void)end;
     });
 }

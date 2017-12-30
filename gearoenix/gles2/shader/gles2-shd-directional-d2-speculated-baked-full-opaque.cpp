@@ -150,7 +150,7 @@ gearoenix::gles2::shader::DirectionalD2SpeculatedBakedFullOpaque::DirectionalD2S
         glUniform1i(rfl_env, 0);
         glUniform1i(txt, 1);
         glUniform1i(shdtxt, 2);
-        
+
         (void)end;
     });
 }
