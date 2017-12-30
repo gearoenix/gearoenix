@@ -1,12 +1,13 @@
 # Gearoenix Game Engine
-An in-house game engine with experimental approach.
+An in-house game engine.
 
 ## Features
-- It is cross-platform (already tested on Linux, Android, iOS and WebAssembly
-  and Windows(Directx11) )
-- It has `OpenGL ES2`, `Directx11` and `Vulkan(WIP)` backends but also it is
-  ready to have `Metal` in future (because of its nature of being successor of
-  [Vulkust](https://github.com/Hossein-Noroozpour/vulkust) game engine).
+- It is cross-platform (already tested on Linux(Ubuntu, Fedora), MacOS,
+  Windows, Android, iOS and WebAssembly)
+- It has `OpenGL ES2`, `OpenGL ES3`, `Directx11` and `Vulkan(WIP)` backends
+  but also it is ready to have `Metal` in future (because, its design is
+  based on my previous game engine,
+  [Vulkust](https://github.com/Hossein-Noroozpour/vulkust)).
 - It has its own file format for importing scenes data in to game. This file
   format help the engine to have better performance in loading a scene and
   reduce the size of the data.
@@ -15,8 +16,8 @@ An in-house game engine with experimental approach.
 - Asset management that cache assets for reducing load time.
 - Supports variety of textures:
   - 2D texture
-  - 3D texture (Implemented in blender part, but it is not developed in engine
-    yet)
+  - 3D texture (WIP, Implemented in blender part, but it is not developed in
+    engine yet)
   - Cube texture
 - Painless cross-platform mathematic structures.
 - Lighting
@@ -54,9 +55,9 @@ debug mode of code, but still have great performance.
   - Star this project (:D)
   - Git clone this repository
   - Install sdl2 development package in your Linux distribution.
-  - Open your lovely IDE, I personally use Qt Creator.
+  - Open your beloved IDE, I personally use Qt Creator.
   - Add all the gearoenix folder to your project.
-  - Add SDL2 and GL and pthread support to your compiler settings.
+  - Add SDL2, GL and pthread support to your compiler settings.
   - If you are building the default test of gearoenix you need a static file
     download it from
     [here](https://hossein-noroozpour.github.io/gearoenix-static-files/data.gx3d)
@@ -78,8 +79,8 @@ you can contact me with email. hossein.noroozpour@gmail.com
 ## Code Design
  - I do not use modern features of C++ unless add a great value to my work
    because most of the new features have overhead like `shared_ptr` (runtime
-   overhead) or `auto` (compile time overhead), but actually I use a lot of
-   modern stuff C++ stuff.
+   overhead) or `auto` (compile time overhead), but actually I'm using a lot of
+   modern stuff C++ stuff in Gearoenix.
  - Compile time is important because I run the project even after a small
    change.
  - I'm using `clang-format` with style of `WebKit` to rule all of the format
@@ -98,7 +99,7 @@ its development.
 One of the appearance of this development process in engine is, at very start,
 this engine was getting developed with `Vulkan API` but because of lake of
 market share and slow development, I decided to suspend `Vulkan` part and
-continue with `OpenGL ES 2` and `Directx11` (for Windows).
+continue with `OpenGL ES 2/3` and `Directx11` (for Windows).
 
 ## TODOs
 Sorted in order of importance.
@@ -106,12 +107,12 @@ Sorted in order of importance.
     - Collision detection 50% (blender part is down)
     - Rigid body 00%
 - 3D Audio (00%)
-- OpenGL ES 3 (00%)
 - Vulkan (WIP 40%)
 - Metal (00%)
 
 ## License
-You can do whatever you want to do as long as you take responsibility of all of
+You can do whatever you want to do with it as long as you take responsibility
+of all of
 its consequences, **But** If you used it and it was useful for you, please make
 an acknowledgment and promotion for this project and me, I'm really need that
 because I'm currently seeking for a job in the graphic and game-engine fields.
