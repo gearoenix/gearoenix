@@ -1,4 +1,4 @@
-#include "config.hpp"
+#include "test-config.hpp"
 #ifdef TEST001
 #include "../core/cr-application.hpp"
 

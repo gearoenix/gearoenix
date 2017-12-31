@@ -1,4 +1,4 @@
-#include "config.hpp"
+#include "test-config.hpp"
 #ifdef TEST003
 #include "../math/math-matrix.hpp"
 #include "../math/math-vector.hpp"

@@ -250,6 +250,11 @@ gearoenix::core::Real& gearoenix::math::Vec3::operator[](const unsigned int i)
     return vec[i];
 }
 
+gearoenix::math::Vec2 gearoenix::math::Vec3::xy() const
+{
+    return Vec2(vec[0], vec[1]);
+}
+
 gearoenix::core::Real* gearoenix::math::Vec3::data()
 {
     return vec;
