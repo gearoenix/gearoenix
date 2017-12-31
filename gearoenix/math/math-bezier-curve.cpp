@@ -4,52 +4,36 @@
 #include <cmath>
 #include <random>
 
-void gearoenix::math::CubicBezierCurve2D::create_smooth_nonoverlaping_blunt(const int points_count, bool closed)
+void gearoenix::math::CubicBezierCurve2D::create_smooth_nonoverlaping_blunt_closed(const int points_count)
 {
-    const int cnt = closed ? points_count - 1 : points_count;
-    const core::Real d = 3.14f / core::Real(cnt);
-    const core::Real d2 = 2.0f * d;
-    const core::Real cl = std::tan(d);
-    for (int i = 0; i < cnt; ++i) {
-    }
+    // some mine tricks, becareful it has license
     std::random_device r;
     std::default_random_engine e1(r());
-    std::uniform_real_distribution<core::Real> ud1(-1.0f, 0.3f);
-    std::uniform_real_distribution<core::Real> ud2(0.3f, 1.0f);
+    std::uniform_real_distribution<core::Real> ud1(0.8f, 1.2f);
+    std::uniform_real_distribution<core::Real> ud2(0.5f, 1.5f);
     std::uniform_real_distribution<core::Real> ud3(-1.36f, 1.36f);
-    Vec2 v;
-    Vec2 lp;
-    {
-        const Vec2 v1(ud1(e1) * ud2(e1), ud1(e1) * ud2(e1));
-        v = v1.normalized();
-        const Vec2 p1(ud1(e1) * ud2(e1), ud1(e1) * ud2(e1));
-        const Vec2 p2 = p1 + v1;
-        const Vec2 p3 = p2 + (v * ud2(e1));
-        points[0].in = p1;
-        points[0].position = p2;
-        points[0].out = p3;
-        lp = p3;
+    const int cnt = points_count - 1;
+    core::Real d = 3.14f / core::Real(cnt);
+    const core::Real d2 = 2.0f * d;
+    const core::Real cl = std::tan(d);
+    d = 0.0f;
+    for (int i = 0; i < cnt; ++i, d += d2) {
+        const core::Real sin = std::sin(d);
+        const core::Real cos = std::cos(d);
+        Point& p = points[i];
+        const core::Real rad = ud2(e1);
+        const core::Real x = cos * rad;
+        const core::Real y = sin * rad;
+        p.position[0] = x;
+        p.position[1] = y;
+        const core::Real cl1 = cl * ud1(e1);
+        const core::Real cl2 = cl * ud1(e1);
+        p.in[0] = x + sin * cl1;
+        p.in[1] = y - cos * cl1;
+        p.out[0] = x - sin * cl2;
+        p.out[1] = y + cos * cl2;
     }
-    auto randv = [&]() {
-        const core::Real th = 3.14f + ud3(e1);
-        const core::Real sin = std::sin(th);
-        const core::Real cos = std::cos(th);
-        v = Vec2(v[0] * cos - v[1] * sin, v[1] * sin + v[1] * cos);
-    };
-    for (int i = 1; i < cnt; ++i) {
-        randv();
-        const Vec2 p1 = lp + v * (ud2(e1) + 0.3f);
-        randv();
-        const Vec2 p2 = p1 + v * ud2(e1);
-        const Vec2 p3 = p2 + v * ud2(e1);
-        points[i].in = p1;
-        points[i].position = p2;
-        points[i].out = p3;
-        lp = p3;
-    }
-    if (closed) {
-        points[cnt] = points[0];
-    }
+    points[cnt] = points[0];
 }
 
 gearoenix::math::CubicBezierCurve2D::CubicBezierCurve2D()
@@ -72,14 +56,11 @@ gearoenix::math::CubicBezierCurve2D::CubicBezierCurve2D(const int points_count, 
     if (points_count == 0)
         UNEXPECTED;
 #endif
-    // only 2 case scenarios from 16 are needed right now, others are todo when needed
-    if (!smooth)
+    // only 1 case scenario from 16 is needed right now, others are todo when needed
+    if (smooth && !overlapable && !fast_curvable && closed)
+        create_smooth_nonoverlaping_blunt_closed(points_count);
+    else
         UNIMPLEMENTED;
-    if (overlapable)
-        UNIMPLEMENTED;
-    if (fast_curvable)
-        UNIMPLEMENTED;
-    create_smooth_nonoverlaping_blunt(points_count, closed);
 }
 
 void gearoenix::math::CubicBezierCurve2D::normalize()

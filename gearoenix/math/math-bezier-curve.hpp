@@ -17,7 +17,7 @@ namespace math {
 
     private:
         std::vector<Point> points;
-        void create_smooth_nonoverlaping_blunt(const int points_count, bool closed);
+        void create_smooth_nonoverlaping_blunt_closed(const int points_count);
 
     public:
         CubicBezierCurve2D();
