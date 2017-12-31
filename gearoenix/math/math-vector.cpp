@@ -116,6 +116,16 @@ gearoenix::core::Real gearoenix::math::Vec2::length() const
     return core::Real(sqrt(vec[0] * vec[0] + vec[1] * vec[1]));
 }
 
+gearoenix::core::Real gearoenix::math::Vec2::distance(const Vec2& a) const
+{
+    core::Real t1 = vec[0] - a.vec[0];
+    t1 *= t1;
+    core::Real t2 = vec[1] - a.vec[1];
+    t2 *= t2;
+    t1 += t2;
+    return std::sqrt(t1);
+}
+
 gearoenix::core::Real gearoenix::math::Vec2::square_distance(const Vec2& a) const
 {
     core::Real t = a.vec[0] - vec[0];
@@ -125,6 +135,12 @@ gearoenix::core::Real gearoenix::math::Vec2::square_distance(const Vec2& a) cons
     t *= t;
     d += t;
     return d;
+}
+
+gearoenix::math::Vec2 gearoenix::math::Vec2::normalized() const
+{
+    core::Real l(sqrt(vec[0] * vec[0] + vec[1] * vec[1]));
+    return Vec2(vec[0] / l, vec[1] / l);
 }
 
 void gearoenix::math::Vec2::read(system::File* f)

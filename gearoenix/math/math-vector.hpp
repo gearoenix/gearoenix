@@ -32,6 +32,7 @@ namespace math {
         core::Real& operator[](const unsigned int i);
         core::Real dot(const Vec2& o) const;
         core::Real length() const;
+        core::Real distance(const Vec2& a) const;
         core::Real square_distance(const Vec2& a) const;
         Vec2 normalized() const;
         void normalize();

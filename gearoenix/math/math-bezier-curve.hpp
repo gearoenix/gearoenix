@@ -7,24 +7,24 @@ namespace system {
     class File;
 }
 namespace math {
-    struct Vec2;
-    struct Vec3;
-    struct Vec4;
-    struct CubicBezierCurve3D {
+    struct CubicBezierCurve2D {
     public:
         struct Point {
-            math::Vec3 position;
-            math::Vec3 in;
-            math::Vec3 out;
+            math::Vec2 position;
+            math::Vec2 in;
+            math::Vec2 out;
         };
 
     private:
         std::vector<Point> points;
+        void create_smooth_nonoverlaping_blunt(const int points_count, bool closed);
 
     public:
-        CubicBezierCurve3D();
-        CubicBezierCurve3D(int points_count);
-        void set_point(int index, const Point& p);
+        CubicBezierCurve2D();
+        CubicBezierCurve2D(const int points_count);
+        CubicBezierCurve2D(const int points_count, const bool smooth, const bool overlapable, const bool fast_curvable, const bool closed);
+        void normalize();
+        void set_point(const int index, const Point& p);
         void render(std::uint32_t* pixels, const int img_width, const int img_height, const std::uint32_t color = 0XFFFFFFFF);
     };
 }

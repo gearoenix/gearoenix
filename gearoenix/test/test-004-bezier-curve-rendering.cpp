@@ -1,24 +1,19 @@
 #include "test-004-bezier-curve-rendering.hpp"
 #ifdef TEST004
 #include "../math/math-bezier-curve.hpp"
-#include <random>
+#include "../render/texture/rnd-txt-lodepng.hpp"
 
 int main()
 {
-    std::random_device r;
-    std::default_random_engine e1(r());
-    std::uniform_real_distribution<gearoenix::core::Real> ud(-1.0f, 1.0f);
-    const int points_count = 5;
-    gearoenix::math::CubicBezierCurve3D curve(points_count);
-    gearoenix::math::CubicBezierCurve3D::Point p;
-    for (int i = 0; i < points_count; ++i) {
-        p.position[0] = ud(e1);
-        p.position[1] = ud(e1);
-        p.in[0] = ud(e1);
-        p.in[1] = ud(e1);
-        p.out[0] = ud(e1);
-        p.out[1] = ud(e1);
-        curve.set_point(i, p);
+    for (int imgi = 0; imgi < 100; ++imgi) {
+        gearoenix::math::CubicBezierCurve2D curve(5, true, false, false, false);
+        curve.normalize();
+        std::vector<unsigned char> pixels(1024 * 1024 * 4);
+        std::uint64_t* data = (std::uint64_t*)pixels.data();
+        for (int i = 0; i < 1024 * 512; ++i)
+            data[i] = 0xFF000000FF000000;
+        curve.render((std::uint32_t*)data, 1024, 1024);
+        lodepng::encode(std::string("out") + std::to_string(imgi) + ".png", pixels, 1024, 1024);
     }
     return 0;
 }
