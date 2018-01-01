@@ -154,6 +154,62 @@ void gearoenix::math::Vec2::print() const
     GXLOGI("Vec2(" << vec[0] << ", " << vec[1] << ")");
 }
 
+bool gearoenix::math::Vec2::intersect(const Vec2& s11, const Vec2& s12, const Vec2& s21, const Vec2& s22, Vec2& i)
+{
+    core::Real maxxs1, minxs1;
+    if (s11.vec[0] > s12.vec[0]) {
+        maxxs1 = s11.vec[0];
+        minxs1 = s12.vec[0];
+    } else {
+        minxs1 = s11.vec[0];
+        maxxs1 = s12.vec[0];
+    }
+    core::Real maxxs2, minxs2;
+    if (s21.vec[0] > s22.vec[0]) {
+        maxxs2 = s21.vec[0];
+        minxs2 = s22.vec[0];
+    } else {
+        minxs2 = s21.vec[0];
+        maxxs2 = s22.vec[0];
+    }
+    if (minxs1 > maxxs2 || minxs2 > maxxs1)
+        return false;
+    core::Real maxys1, minys1;
+    if (s11.vec[1] > s12.vec[1]) {
+        maxys1 = s11.vec[1];
+        minys1 = s12.vec[1];
+    } else {
+        minys1 = s11.vec[1];
+        maxys1 = s12.vec[1];
+    }
+    core::Real maxys2, minys2;
+    if (s21.vec[1] > s22.vec[1]) {
+        maxys2 = s21.vec[1];
+        minys2 = s22.vec[1];
+    } else {
+        minys2 = s21.vec[1];
+        maxys2 = s22.vec[1];
+    }
+    if (minys1 > maxys2 || minys2 > maxys1)
+        return false;
+    const core::Real ax = s12.vec[0] - s11.vec[0];
+    const core::Real ay = s12.vec[1] - s11.vec[1];
+    const core::Real bx = s22.vec[0] - s21.vec[0];
+    const core::Real by = s22.vec[1] - s21.vec[1];
+    const core::Real det = ax * by - ay * bx;
+    if (det < 0.0001f && det > -0.0001f)
+        return false;
+    const core::Real dx = s21.vec[0] - s11.vec[0];
+    const core::Real dy = s21.vec[1] - s11.vec[1];
+    const core::Real r = (dx * by - dy * bx) / det;
+    const core::Real s = (ax * dy - ay * dx) / det;
+    if (r < 0.0f || r > 1.0f || s < 0.0f || s > 1.0f)
+        return false;
+    i.vec[0] = ax * r + s11.vec[0];
+    i.vec[1] = ay * r + s11.vec[1];
+    return true;
+}
+
 const gearoenix::math::Vec3 gearoenix::math::Vec3::X(1.0f, 0.0f, 0.0f);
 const gearoenix::math::Vec3 gearoenix::math::Vec3::Y(0.0f, 1.0f, 0.0f);
 const gearoenix::math::Vec3 gearoenix::math::Vec3::Z(0.0f, 0.0f, 1.0f);

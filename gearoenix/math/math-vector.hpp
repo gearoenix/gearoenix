@@ -38,6 +38,7 @@ namespace math {
         void normalize();
         void read(system::File* f);
         void print() const;
+        static bool intersect(const Vec2& s11, const Vec2& s12, const Vec2& s21, const Vec2& s22, Vec2& i);
     };
 
     struct Vec3 {
