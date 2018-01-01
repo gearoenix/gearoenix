@@ -1,4 +1,8 @@
 #include <cstdint>
+
+#define GX_POS_EPSILON 0.0001
+#define GX_NEG_EPSILON -0.0001
+
 namespace gearoenix {
 namespace core {
     typedef std::uint64_t Id;

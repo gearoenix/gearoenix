@@ -3,6 +3,55 @@
 #include "math-vector.hpp"
 #include <cmath>
 
+gearoenix::math::Mat2x2::Mat2x2()
+{
+    mat[0] = 1.0f;
+    mat[1] = 0.0f;
+    mat[2] = 0.0f;
+    mat[3] = 1.0f;
+}
+
+gearoenix::math::Mat2x2::Mat2x2(const core::Real dia_e)
+{
+    mat[0] = dia_e;
+    mat[1] = 0.0f;
+    mat[2] = 0.0f;
+    mat[3] = dia_e;
+}
+
+gearoenix::math::Mat2x2::Mat2x2(
+    const core::Real e0, const core::Real e1,
+    const core::Real e2, const core::Real e3)
+{
+    mat[0] = e0;
+    mat[1] = e1;
+    mat[2] = e2;
+    mat[3] = e3;
+}
+
+bool gearoenix::math::Mat2x2::invert()
+{
+    const core::Real det = mat[0] * mat[3] - mat[1] * mat[2];
+    if (det < GX_POS_EPSILON && det > GX_NEG_EPSILON)
+        return false;
+    core::Real tmp = mat[0];
+    mat[0] = mat[3];
+    mat[3] = tmp;
+    mat[1] = -mat[1];
+    mat[2] = -mat[2];
+    tmp = 1.0f / det;
+    mat[0] *= tmp;
+    mat[1] *= tmp;
+    mat[2] *= tmp;
+    mat[3] *= tmp;
+    return true;
+}
+
+gearoenix::math::Vec2 gearoenix::math::Mat2x2::operator*(const Vec2& v) const
+{
+    return Vec2(mat[0] * v[0] + mat[1] * v[1], mat[2] * v[0] + mat[3] * v[1]);
+}
+
 gearoenix::math::Mat4x4::Mat4x4(core::Real e)
 {
     mat[0] = e;

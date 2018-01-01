@@ -9,6 +9,19 @@ namespace math {
     struct Vec2;
     struct Vec3;
     struct Vec4;
+    // becareful this is column major
+    struct Mat2x2 {
+    private:
+        core::Real mat[4];
+
+    public:
+        Mat2x2();
+        Mat2x2(const core::Real dia_e);
+        Mat2x2(const core::Real e0, const core::Real e1,
+            const core::Real e2, const core::Real e3);
+        bool invert();
+        Vec2 operator*(const Vec2& v) const;
+    };
     struct Mat4x4 {
     private:
         core::Real mat[16];

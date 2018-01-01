@@ -2,6 +2,7 @@
 #include "../core/cr-build-configuration.hpp"
 #include "../system/sys-file.hpp"
 #include "../system/sys-log.hpp"
+#include "math-matrix.hpp"
 #include <cmath>
 
 gearoenix::math::Vec2::Vec2()
@@ -192,21 +193,19 @@ bool gearoenix::math::Vec2::intersect(const Vec2& s11, const Vec2& s12, const Ve
     }
     if (minys1 > maxys2 || minys2 > maxys1)
         return false;
-    const core::Real ax = s12.vec[0] - s11.vec[0];
-    const core::Real ay = s12.vec[1] - s11.vec[1];
-    const core::Real bx = s22.vec[0] - s21.vec[0];
-    const core::Real by = s22.vec[1] - s21.vec[1];
-    const core::Real det = ax * by - ay * bx;
-    if (det < 0.0001f && det > -0.0001f)
+    // s11 + s0 * v0 == s21 + s1 * v1
+    // s21 - s11 = s0 * v0 - s1 * v1
+    // d = | v0 v1 | * s
+    Vec2 v0 = s12 - s11;
+    Vec2 v1 = s22 - s21;
+    Mat2x2 m(v0.vec[0], -v1.vec[0], v0.vec[1], -v1.vec[1]);
+    if (!m.invert())
         return false;
-    const core::Real dx = s21.vec[0] - s11.vec[0];
-    const core::Real dy = s21.vec[1] - s11.vec[1];
-    const core::Real r = (dx * by - dy * bx) / det;
-    const core::Real s = (ax * dy - ay * dx) / det;
-    if (r < 0.0f || r > 1.0f || s < 0.0f || s > 1.0f)
+    const Vec2 d = s21 - s11;
+    const Vec2 s = m * d;
+    if (s.vec[0] < 0.0f || s.vec[0] > 1.0f || s.vec[1] < 0.0f || s.vec[1] > 1.0f)
         return false;
-    i.vec[0] = ax * r + s11.vec[0];
-    i.vec[1] = ay * r + s11.vec[1];
+    i = v0 * s.vec[0] + s11;
     return true;
 }
 

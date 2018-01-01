@@ -12,7 +12,6 @@ void gearoenix::math::CubicBezierCurve2D::create_smooth_nonoverlaping_blunt_clos
     std::uniform_real_distribution<core::Real> ud1(0.8f, 1.3f);
     std::uniform_real_distribution<core::Real> ud2(0.6f, 1.3f);
     const int cnt = points.size() - 1;
-    GXLOGD("cnt " << cnt);
     const core::Real d = 3.14f / core::Real(cnt);
     const core::Real d2 = 2.0f * d;
     const core::Real cl = std::tan(d);
@@ -34,7 +33,6 @@ void gearoenix::math::CubicBezierCurve2D::create_smooth_nonoverlaping_blunt_clos
     for (int pnti = 0, pntj = 1; pnti < cnt; ++pnti, ++pntj) {
         Vec2 inter;
         if (Vec2::intersect(points[pnti].position, points[pnti].out, points[pntj].in, points[pntj].position, inter)) {
-            GXLOGD("intersect in points[" << pnti << "] points[" << pntj << "] Vec2(" << inter[0] << ", " << inter[1] << ")");
             points[pnti].out = inter;
             if (pnti == 0)
                 points[cnt].out = inter;
@@ -42,23 +40,7 @@ void gearoenix::math::CubicBezierCurve2D::create_smooth_nonoverlaping_blunt_clos
             if (pntj == cnt)
                 points[0].in = inter;
         }
-        GXLOGD("i is " << pnti << " j is " << pntj);
     }
-    //    Vec2 inter;
-    //    if(Vec2::intersect(points[0].out, points[0].in, points[1].out, points[1].in, inter))
-    //    {
-    //        GXLOGD("intersect in points[" << 0 << "] points[" << 1 << "] Vec2(" << inter[0] << ", " << inter[1] << ")");
-    //        points[0].in = inter;
-    //        points[cnt].in = inter;
-    //        points[1].out = inter;
-    //    }
-    //    if(Vec2::intersect(points[cnt - 1].position, points[cnt - 1].in, points[cnt].out, points[cnt].position, inter))
-    //    {
-    //        GXLOGD("intersect in points[" << cnt << "] points[" << cnt - 1 << "] Vec2(" << inter[0] << ", " << inter[1] << ")");
-    //        points[cnt - 1].in = inter;
-    //        points[cnt].out = inter;
-    //        points[0].out = inter;
-    //    }
 }
 
 gearoenix::math::CubicBezierCurve2D::CubicBezierCurve2D()
