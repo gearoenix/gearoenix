@@ -172,7 +172,7 @@ void gearoenix::math::CubicBezierCurve2D::render(std::uint32_t* pixels, const in
                 {
                     const int ppw = int(prpt[0]) + pw;
                     const int pph = int(prpt[1]) + ph;
-                    pixels[pph * img_height + ppw] = is_poly ? 0xff0000ff : color;
+                    pixels[pph * img_height + ppw] = is_poly ? 0xffff0000 : color;
                 }
                 {
                     const int ppw = pw - int(prpt[0]);
