@@ -7,7 +7,7 @@
 int main()
 {
     for (int imgi = 0; imgi < 100; ++imgi) {
-        gearoenix::math::CubicBezierCurve2D curve(21, true, false, false, true);
+        gearoenix::math::CubicBezierCurve2D curve(9, true, false, false, true);
         curve.normalize();
         std::vector<unsigned char> pixels(1024 * 1024 * 4);
         std::uint64_t* data = (std::uint64_t*)pixels.data();

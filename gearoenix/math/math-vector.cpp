@@ -144,6 +144,14 @@ gearoenix::math::Vec2 gearoenix::math::Vec2::normalized() const
     return Vec2(vec[0] / l, vec[1] / l);
 }
 
+void gearoenix::math::Vec2::normalize()
+{
+    core::Real l(sqrt(vec[0] * vec[0] + vec[1] * vec[1]));
+    l = 1.0f / l;
+    vec[0] *= l;
+    vec[1] *= l;
+}
+
 void gearoenix::math::Vec2::read(system::File* f)
 {
     f->read(vec[0]);

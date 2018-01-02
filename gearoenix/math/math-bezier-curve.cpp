@@ -6,7 +6,7 @@
 
 void gearoenix::math::CubicBezierCurve2D::create_smooth_nonoverlaping_blunt_closed()
 {
-    // some mine tricks, becareful it has license
+    // some mine tricks, becareful it has license! :D
     std::random_device r;
     std::default_random_engine e1(r());
     std::uniform_real_distribution<core::Real> ud1(0.8f, 1.3f);
@@ -115,6 +115,8 @@ void gearoenix::math::CubicBezierCurve2D::set_point(const int index, const Point
 
 void gearoenix::math::CubicBezierCurve2D::render(std::uint32_t* pixels, const int img_width, const int img_height, const std::uint32_t color)
 {
+    // todo add framized rendering instead of whole scaling
+    // todo: it is not very optimized, its speed is not that bad, but in future optimize it.
     if (points.size() == 0)
         return;
     const int cw = img_width / 2;
@@ -124,6 +126,7 @@ void gearoenix::math::CubicBezierCurve2D::render(std::uint32_t* pixels, const in
     const core::Real coef = chf * cwf;
     const int cnt = points.size() - 1;
     const std::uint32_t axis_color = 0xFF80F04F;
+    core::Real polylen = 0.0f;
     for (int i = 0; i < cnt;) {
         const math::Vec2& p1 = points[i].position;
         const math::Vec2& p2 = points[i].out;
@@ -135,7 +138,8 @@ void gearoenix::math::CubicBezierCurve2D::render(std::uint32_t* pixels, const in
         tstep += p3.distance(p4);
         tstep *= coef;
         tstep = 1.0f / tstep;
-        for (core::Real t = 0.0f; t < 1.0; t += tstep) {
+        Vec2 prep = p1;
+        for (core::Real t = tstep; t <= 1.0f; t += tstep) {
             const core::Real nt = 1.0f - t;
             const core::Real nt2 = nt * nt;
             const core::Real nt3 = nt2 * nt;
@@ -149,8 +153,82 @@ void gearoenix::math::CubicBezierCurve2D::render(std::uint32_t* pixels, const in
             const int pw = int(cwf * p[0]) + cw;
             const int ph = int(chf * p[1]) + ch;
             pixels[ph * img_height + pw] = color;
+            math::Vec2 prp = p - prep;
+            polylen += prp.length();
+            bool is_poly = false;
+            if (polylen > 0.02) {
+                if (polylen > 0.03) {
+                    polylen = 0.0f;
+                }
+                is_poly = true;
+            }
+            prep = p;
+            prp.normalize();
+            core::Real tmp = prp[0];
+            prp[0] = -prp[1];
+            prp[1] = tmp;
+            math::Vec2 prpt = prp;
+            for (int pi = 0; pi < 20; ++pi, prpt += prp) {
+                {
+                    const int ppw = int(prpt[0]) + pw;
+                    const int pph = int(prpt[1]) + ph;
+                    pixels[pph * img_height + ppw] = is_poly ? 0xff0000ff : color;
+                }
+                {
+                    const int ppw = pw - int(prpt[0]);
+                    const int pph = ph - int(prpt[1]);
+                    pixels[pph * img_height + ppw] = is_poly ? 0xff0000ff : color;
+                }
+            }
+        }
+    }
+    for (int i = 0; i < cnt;) {
+        const math::Vec2& p1 = points[i].position;
+        const math::Vec2& p2 = points[i].out;
+        const math::Vec2& p3 = points[++i].in;
+        const math::Vec2& p4 = points[i].position;
+        core::Real tstep = p1.distance(p2);
+        tstep += p2.distance(p3);
+        tstep += p3.distance(p4);
+        tstep *= coef;
+        tstep = 1.0f / tstep;
+        //        Vec2 prep = p1;
+        for (core::Real t = tstep; t <= 1.0f; t += tstep) {
+            const core::Real nt = 1.0f - t;
+            //            const core::Real nt2 = nt * nt;
+            //            const core::Real nt3 = nt2 * nt;
+            //            const core::Real t2 = t * t;
+            //            const core::Real t3 = t2 * t;
+            //            const core::Real ntt23 = nt * t2 * 3.0f;
+            //            const core::Real nt2t3 = nt2 * t * 3.0f;
+            //            math::Vec2 p = p1 * nt3 + p2 * nt2t3 + p3 * ntt23 + p4 * t3;
+            //            if (p[0] < -1.0f || p[0] > 1.0f || p[1] < -1.0f || p[1] > 1.0f)
+            //                continue;
+            //            const int pw = int(cwf * p[0]) + cw;
+            //            const int ph = int(chf * p[1]) + ch;
+            //            pixels[ph * img_height + pw] = color;
+            //            math::Vec2 prp = p - prep;
+            //            prep = p;
+            //            prp.normalize();
+            //            core::Real tmp = prp[0];
+            //            prp[0] = -prp[1];
+            //            prp[1] = tmp;
+            //            math::Vec2 prpt = prp;
+            //            for(int pi = 0; pi < 10; ++pi, prpt += prp)
+            //            {
+            //                {
+            //                    const int ppw = int(prpt[0]) + pw;
+            //                    const int pph = int(prpt[1]) + ph;
+            //                    pixels[pph * img_height + ppw] = 0XFFFF0000;
+            //                }
+            //                {
+            //                    const int ppw = pw - int(prpt[0]);
+            //                    const int pph = ph - int(prpt[1]);
+            //                    pixels[pph * img_height + ppw] = 0XFFFF0000;
+            //                }
+            //            }
             /////////// temporary
-            p = p1 * nt + p2 * t;
+            math::Vec2 p = p1 * nt + p2 * t;
             if (p[0] < -1.0f || p[0] > 1.0f || p[1] < -1.0f || p[1] > 1.0f)
                 continue;
             int tpw = int(cwf * p[0]) + cw;
