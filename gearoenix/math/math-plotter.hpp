@@ -13,10 +13,10 @@ namespace math {
 
         private:
             const std::uint32_t color;
-            std::vector<std::tuple<int, int>> indices = { std::make_tuple(0, 0) };
+            std::vector<std::tuple<int, int>> indices;
 
         public:
-            Brush(const int thickness = 0, const std::uint32_t color = 0XFFFFFFFF);
+            Brush(const int thickness = 1, const std::uint32_t color = 0XFFFFFFFF);
         };
 
     private:

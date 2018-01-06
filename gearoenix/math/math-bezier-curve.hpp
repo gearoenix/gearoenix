@@ -23,7 +23,7 @@ namespace math {
         CubicBezierCurve2D();
         CubicBezierCurve2D(const int points_count);
         CubicBezierCurve2D(const int points_count, const bool smooth, const bool overlapable, const bool fast_curvable, const bool closed);
-        void normalize();
+        void normalize(const core::Real scale = 1.0f);
         void set_point(const int index, const Point& p);
         void render(std::uint32_t* pixels, const int img_width, const int img_height, const std::uint32_t color = 0XFFFFFFFF);
     };
