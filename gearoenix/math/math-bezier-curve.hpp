@@ -7,7 +7,7 @@ namespace system {
     class File;
 }
 namespace math {
-    struct CubicBezierCurve2D {
+    class CubicBezierCurve2D {
     public:
         struct Point {
             math::Vec2 position;
