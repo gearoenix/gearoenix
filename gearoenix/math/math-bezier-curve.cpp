@@ -121,10 +121,9 @@ void gearoenix::math::CubicBezierCurve2D::render(std::uint32_t* pixels, const in
     if (points.size() == 0)
         return;
     Plotter plotter(pixels, img_width, img_height);
-    Plotter::Brush brush1(10, color);
-    Plotter::Brush brush2(1, 0XFF0000FF);
+    const Plotter::Brush brush1(10, color);
+    const Plotter::Brush brush2(1, 0XFF00FF00);
     const int cnt = points.size() - 1;
-    //    core::Real polylen = 0.0f;
     for (int i = 0; i < cnt;) {
         const math::Vec2& p1 = points[i].position;
         const math::Vec2& p2 = points[i].out;
@@ -135,8 +134,7 @@ void gearoenix::math::CubicBezierCurve2D::render(std::uint32_t* pixels, const in
         tstep += p2.distance(p3);
         tstep += p3.distance(p4);
         tstep = 1.0f / tstep;
-        //        Vec2 prep = p1;
-        for (core::Real t = tstep; t <= 1.0f; t += tstep) {
+        for (core::Real t = tstep; t < 1.0f; t += tstep) {
             const core::Real nt = 1.0f - t;
             const core::Real nt2 = nt * nt;
             const core::Real nt3 = nt2 * nt;
@@ -146,101 +144,61 @@ void gearoenix::math::CubicBezierCurve2D::render(std::uint32_t* pixels, const in
             const core::Real nt2t3 = nt2 * t * 3.0f;
             math::Vec2 p = p1 * nt3 + p2 * nt2t3 + p3 * ntt23 + p4 * t3;
             plotter.draw_point(p, brush1);
-            //            if (p[0] < -1.0f || p[0] > 1.0f || p[1] < -1.0f || p[1] > 1.0f)
-            //                continue;
-            //            const int pw = int(cwf * p[0]) + cw;
-            //            const int ph = int(chf * p[1]) + ch;
-            //            pixels[ph * img_height + pw] = color;
-            //            math::Vec2 prp = p - prep;
-            //            polylen += prp.length();
-            //            bool is_poly = false;
-            //            if (polylen > 0.02) {
-            //                if (polylen > 0.03) {
-            //                    polylen = 0.0f;
-            //                }
-            //                is_poly = true;
-            //            }
-            //            prep = p;
-            //            prp.normalize();
-            //            core::Real tmp = prp[0];
-            //            prp[0] = -prp[1];
-            //            prp[1] = tmp;
-            //            math::Vec2 prpt = prp;
-            //            for (int pi = 0; pi < 20; ++pi, prpt += prp) {
-            //                {
-            //                    const int ppw = int(prpt[0]) + pw;
-            //                    const int pph = int(prpt[1]) + ph;
-            //                    pixels[pph * img_height + ppw] = is_poly ? 0xffff0000 : color;
-            //                }
-            //                {
-            //                    const int ppw = pw - int(prpt[0]);
-            //                    const int pph = ph - int(prpt[1]);
-            //                    pixels[pph * img_height + ppw] = is_poly ? 0xff0000ff : color;
-            //                }
-            //            }
         }
     }
+    //---------------------- for debug
     const int points_count = points.size();
     for (int i = 0; i < points_count; ++i) {
         plotter.draw_line(points[i].in, points[i].out, brush2);
-        //        const math::Vec2& p1 = points[i].position;
-        //        const math::Vec2& p2 = points[i].out;
-        //        const math::Vec2& p3 = points[++i].in;
-        //        const math::Vec2& p4 = points[i].position;
-        //        core::Real tstep = p1.distance(p2);
-        //        tstep += p2.distance(p3);
-        //        tstep += p3.distance(p4);
-        //        tstep *= coef;
-        //        tstep = 1.0f / tstep;
-        //        Vec2 prep = p1;
-        //        for (core::Real t = tstep; t <= 1.0f; t += tstep) {
-        //            const core::Real nt = 1.0f - t;
-        //            const core::Real nt2 = nt * nt;
-        //            const core::Real nt3 = nt2 * nt;
-        //            const core::Real t2 = t * t;
-        //            const core::Real t3 = t2 * t;
-        //            const core::Real ntt23 = nt * t2 * 3.0f;
-        //            const core::Real nt2t3 = nt2 * t * 3.0f;
-        //            math::Vec2 p = p1 * nt3 + p2 * nt2t3 + p3 * ntt23 + p4 * t3;
-        //            if (p[0] < -1.0f || p[0] > 1.0f || p[1] < -1.0f || p[1] > 1.0f)
-        //                continue;
-        //            const int pw = int(cwf * p[0]) + cw;
-        //            const int ph = int(chf * p[1]) + ch;
-        //            pixels[ph * img_height + pw] = color;
-        //            math::Vec2 prp = p - prep;
-        //            prep = p;
-        //            prp.normalize();
-        //            core::Real tmp = prp[0];
-        //            prp[0] = -prp[1];
-        //            prp[1] = tmp;
-        //            math::Vec2 prpt = prp;
-        //            for(int pi = 0; pi < 10; ++pi, prpt += prp)
-        //            {
-        //                {
-        //                    const int ppw = int(prpt[0]) + pw;
-        //                    const int pph = int(prpt[1]) + ph;
-        //                    pixels[pph * img_height + ppw] = 0XFFFF0000;
-        //                }
-        //                {
-        //                    const int ppw = pw - int(prpt[0]);
-        //                    const int pph = ph - int(prpt[1]);
-        //                    pixels[pph * img_height + ppw] = 0XFFFF0000;
-        //                }
-        //            }
-        /////////// temporary
-        //            math::Vec2 p = p1 * nt + p2 * t;
-        //            if (p[0] < -1.0f || p[0] > 1.0f || p[1] < -1.0f || p[1] > 1.0f)
-        //                continue;
-        //            int tpw = int(cwf * p[0]) + cw;
-        //            int tph = int(chf * p[1]) + ch;
-        //            pixels[tph * img_height + tpw] = axis_color;
-        //            p = p3 * nt + p4 * t;
-        //            if (p[0] < -1.0f || p[0] > 1.0f || p[1] < -1.0f || p[1] > 1.0f)
-        //                continue;
-        //            tpw = int(cwf * p[0]) + cw;
-        //            tph = int(chf * p[1]) + ch;
-        //            pixels[tph * img_height + tpw] = axis_color;
-        ////////// temporary
-        //        }
+    }
+    //++++++++++++++++++++++ temporary
+    std::vector<Point> mappoints;
+    const Plotter::Brush brush3(1, 0XFFFF0000);
+    const Plotter::Brush brush4(1, 0XFF0000FF);
+    core::Real polylen = 0.0f;
+    for (int i = 0; i < cnt;) {
+        const math::Vec2& p1 = points[i].position;
+        const math::Vec2& p2 = points[i].out;
+        const math::Vec2& p3 = points[++i].in;
+        const math::Vec2& p4 = points[i].position;
+        // todo add occlusion culling
+        core::Real tstep = p1.distance(p2);
+        tstep += p2.distance(p3);
+        tstep += p3.distance(p4);
+        tstep = 2.0f / tstep;
+        Vec2 prep = p1;
+        for (core::Real t = tstep; t < 1.0f; t += tstep) {
+            const core::Real nt = 1.0f - t;
+            const core::Real nt2 = nt * nt;
+            const core::Real nt3 = nt2 * nt;
+            const core::Real t2 = t * t;
+            const core::Real t3 = t2 * t;
+            const core::Real ntt23 = nt * t2 * 3.0f;
+            const core::Real nt2t3 = nt2 * t * 3.0f;
+            const math::Vec2 p = p1 * nt3 + p2 * nt2t3 + p3 * ntt23 + p4 * t3;
+            math::Vec2 prp = p - prep;
+            const core::Real len = prp.length();
+            polylen += len;
+            if (polylen > 20.0f && len != 0.0f) {
+                const core::Real ilen = 1.0f / len;
+                polylen = 0.0f;
+                prep = p;
+                prp *= ilen;
+                core::Real tmp = prp[0];
+                prp[0] = -prp[1];
+                prp[1] = tmp;
+                Point curpnt;
+                const Vec2 prpt = (prp * 10.0f);
+                curpnt.in = p + prpt;
+                curpnt.position = p;
+                curpnt.out = p - prpt;
+                mappoints.push_back(curpnt);
+            }
+        }
+    }
+    const int prp_count = mappoints.size();
+    for (int i = 0; i < prp_count; ++i) {
+        plotter.draw_line(mappoints[i].in, mappoints[i].position, brush3);
+        plotter.draw_line(mappoints[i].out, mappoints[i].position, brush4);
     }
 }
