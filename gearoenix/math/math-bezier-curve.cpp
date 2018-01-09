@@ -146,12 +146,12 @@ void gearoenix::math::CubicBezierCurve2D::render(std::uint32_t* pixels, const in
             plotter.draw_point(p, brush1);
         }
     }
-    //---------------------- for debug
+    //---------------------- for debug (it will be removed in near future)
     const int points_count = points.size();
     for (int i = 0; i < points_count; ++i) {
         plotter.draw_line(points[i].in, points[i].out, brush2);
     }
-    //++++++++++++++++++++++ temporary
+    //++++++++++++++++++++++ temporary (it will be removed in near future)
     std::vector<Point> mappoints;
     const Plotter::Brush brush3(1, 0XFFFF0000);
     const Plotter::Brush brush4(1, 0XFF0000FF);
@@ -219,11 +219,4 @@ void gearoenix::math::CubicBezierCurve2D::render(std::uint32_t* pixels, const in
         plotter.draw_line(mmapp[i].in, mmapp[i].position, brush3);
         plotter.draw_line(mmapp[i].out, mmapp[i].position, brush4);
     }
-
-    //
-    //    for (int i = 0; i < prp_count; ++i) {
-    //        plotter.draw_line(mappoints[i].in, mappoints[i].position, brush3);
-    //        plotter.draw_line(mappoints[i].out, mappoints[i].position, brush4);
-    //    }
-    //
 }
