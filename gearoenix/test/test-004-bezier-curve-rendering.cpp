@@ -1,10 +1,16 @@
 #include "test-004-bezier-curve-rendering.hpp"
 #ifdef TEST004
+#include "../core/cr-build-configuration.hpp"
 #include "../math/math-bezier-curve.hpp"
 #include "../render/texture/rnd-txt-lodepng.hpp"
 #include "../system/sys-log.hpp"
 
+#ifndef IN_WINDOWS
 int main()
+#else
+#include <Windows.h>
+int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
+#endif
 {
     for (int imgi = 0; imgi < 100; ++imgi) {
         gearoenix::math::CubicBezierCurve2D curve(9, true, false, false, true);
