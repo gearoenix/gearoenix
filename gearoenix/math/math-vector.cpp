@@ -107,6 +107,11 @@ gearoenix::core::Real gearoenix::math::Vec2::dot(const Vec2& o) const
     return (vec[0] * o.vec[0]) + (vec[1] * o.vec[1]);
 }
 
+gearoenix::core::Real gearoenix::math::Vec2::cross(const Vec2& o) const
+{
+    return vec[0] * o.vec[1] - vec[1] * o.vec[0];
+}
+
 gearoenix::math::Vec2 gearoenix::math::Vec2::operator-() const
 {
     return Vec2(-vec[0], -vec[1]);

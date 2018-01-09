@@ -197,8 +197,33 @@ void gearoenix::math::CubicBezierCurve2D::render(std::uint32_t* pixels, const in
         }
     }
     const int prp_count = mappoints.size();
-    for (int i = 0; i < prp_count; ++i) {
-        plotter.draw_line(mappoints[i].in, mappoints[i].position, brush3);
-        plotter.draw_line(mappoints[i].out, mappoints[i].position, brush4);
+    Vec2 pathdir;
+    Vec2 laspos = mappoints[0].position;
+    std::vector<Point> mmapp;
+    mmapp.push_back(mappoints[cnt]);
+    mmapp.push_back(mappoints[0]);
+    pathdir = laspos - mappoints[cnt].position;
+    pathdir.normalize();
+    for (int i = 1; i < prp_count; ++i) {
+        const Vec2& p1 = mappoints[i].position;
+        const Vec2 curdir = p1 - laspos;
+        const core::Real dv = std::abs(curdir.cross(pathdir));
+        laspos = mappoints[i].position;
+        if (dv > 0.5f) {
+            pathdir = curdir;
+            pathdir.normalize();
+            mmapp.push_back(mappoints[i]);
+        }
     }
+    for (int i = 0; i < (int)mmapp.size(); ++i) {
+        plotter.draw_line(mmapp[i].in, mmapp[i].position, brush3);
+        plotter.draw_line(mmapp[i].out, mmapp[i].position, brush4);
+    }
+
+    //
+    //    for (int i = 0; i < prp_count; ++i) {
+    //        plotter.draw_line(mappoints[i].in, mappoints[i].position, brush3);
+    //        plotter.draw_line(mappoints[i].out, mappoints[i].position, brush4);
+    //    }
+    //
 }
