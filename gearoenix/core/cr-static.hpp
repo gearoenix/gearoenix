@@ -3,8 +3,13 @@
 #ifndef countof
 #define countof(x) (sizeof(x) / sizeof(x[0]))
 #endif
-#ifndef gxmax
-#define gxmax(x, y) (((x) > (y)) ? (x) : (y))
+#include "cr-types.hpp"
+#define GXISZERO(x) (((x) < (GX_POS_EPSILON)) && ((x) > (GX_NEG_EPSILON)))
+#ifndef GXMAX
+#define GXMAX(x, y) (((x) > (y)) ? (x) : (y))
+#endif
+#ifndef GXMIN
+#define GXMIN(x, y) (((x) < (y)) ? (x) : (y))
 #endif
 #ifdef setz
 #error "setz already defined"

@@ -1,5 +1,6 @@
 #ifndef GEAROEMIX_MATH_TRIANGLE_HPP
 #define GEAROEMIX_MATH_TRIANGLE_HPP
+#include "math-aabb.hpp"
 #include "math-ray.hpp"
 #include "math-vector.hpp"
 namespace gearoenix {
@@ -11,9 +12,12 @@ namespace math {
     private:
         Vec3 head;
         Vec3 edge[2];
+        Aabb3 box;
 
     public:
         static const core::Real epsilon;
+        Triangle3();
+        Triangle3(const Vec3& p1, const Vec3& p2, const Vec3& p3);
         bool intersect(const Ray3& r, const core::Real tmin, Vec3& out_factors) const;
     };
 }

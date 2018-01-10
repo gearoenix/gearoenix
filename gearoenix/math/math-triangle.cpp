@@ -2,6 +2,18 @@
 
 const gearoenix::core::Real gearoenix::math::Triangle3::epsilon = 0.001f;
 
+gearoenix::math::Triangle3::Triangle3() {}
+
+gearoenix::math::Triangle3::Triangle3(const Vec3& p1, const Vec3& p2, const Vec3& p3)
+    : head(p1)
+{
+    edge[0] = p2 - p1;
+    edge[1] = p3 - p1;
+    box.reset(p1);
+    box.put(p2);
+    box.put(p3);
+}
+
 bool gearoenix::math::Triangle3::intersect(const Ray3& r, const core::Real tmin, Vec3& out_factors) const
 {
     const Vec3 pvec = r.d.cross(edge[1]);
