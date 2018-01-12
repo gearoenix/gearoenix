@@ -17,6 +17,7 @@ namespace core {
             friend class Object;
 
         private:
+            // size -> offset -> range
             std::map<unsigned int, std::map<unsigned int, Range>> free_ranges;
             std::mutex lock;
             // is owner of objects
@@ -27,9 +28,8 @@ namespace core {
             void initialize();
 
         protected:
-            void allocate(Object* obj);
-
         public:
+            void allocate(Object* obj);
             Gc(unsigned int size, Gc* parent = nullptr);
             virtual ~Gc();
             list::List<Object*>* get_objects();

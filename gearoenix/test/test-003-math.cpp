@@ -49,7 +49,7 @@ void check(glm::mat4& m1, gearoenix::math::Mat4x4& m2)
         float f2 = std::abs(glm::value_ptr(m1)[i] + m2[i]);
         if (f1 / f2 > 0.01f) {
             for (int j = 0; j < 16; ++j)
-                LOGE(glm::value_ptr(m1)[j] << ", " << m2[j]);
+                GXLOGE(glm::value_ptr(m1)[j] << ", " << m2[j]);
             UNEXPECTED;
         }
     }
@@ -62,7 +62,7 @@ int main()
     glm::vec3 v1, v3;
     gearoenix::math::Vec3 v2, v4;
     float f;
-    LOGI("Rotation test");
+    GXLOGI("Rotation test");
     for (int i = 0; i < 1000; ++i) {
         f = dis(gen);
         rv(v1, v2);
@@ -70,8 +70,8 @@ int main()
         PROF(m2 = gearoenix::math::Mat4x4::rotation(v2, f), gt);
         check(m1, m2);
     }
-    LOGI("Inversion test");
-    LOGI("glmt " << glmt << ", gt " << gt);
+    GXLOGI("Inversion test");
+    GXLOGI("glmt " << glmt << ", gt " << gt);
     for (int i = 0; i < 1000; ++i) {
         f = dis(gen);
         rm(m1, m2);
@@ -79,6 +79,6 @@ int main()
         PROF(m2 = m2.inversed(), gt);
         check(m1, m2);
     }
-    LOGI("glmt " << glmt << ", gt " << gt);
+    GXLOGI("glmt " << glmt << ", gt " << gt);
 }
 #endif
