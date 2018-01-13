@@ -1,6 +1,6 @@
 #include "math-triangle.hpp"
-
-const gearoenix::core::Real gearoenix::math::Triangle3::epsilon = 0.001f;
+#include "../core/cr-static.hpp"
+#include "math-ray.hpp"
 
 gearoenix::math::Triangle3::Triangle3() {}
 
@@ -9,16 +9,13 @@ gearoenix::math::Triangle3::Triangle3(const Vec3& p1, const Vec3& p2, const Vec3
 {
     edge[0] = p2 - p1;
     edge[1] = p3 - p1;
-    box.reset(p1);
-    box.put(p2);
-    box.put(p3);
 }
 
 bool gearoenix::math::Triangle3::intersect(const Ray3& r, const core::Real tmin, Vec3& out_factors) const
 {
     const Vec3 pvec = r.d.cross(edge[1]);
     const core::Real det = edge[0].dot(pvec);
-    if (det < epsilon && det > -epsilon) {
+    if (GXISZERO(det)) {
         return false;
     }
     const core::Real inv_det = 1.0f / det;
@@ -34,7 +31,7 @@ bool gearoenix::math::Triangle3::intersect(const Ray3& r, const core::Real tmin,
     }
     const core::Real t = edge[1].dot(qvec) * inv_det; // Set distance along ray to intersection
     if (t < tmin) {
-        if (t > epsilon) {
+        if (t > GXPOSEPSILON) {
             out_factors[0] = t;
             out_factors[1] = u;
             out_factors[2] = v;

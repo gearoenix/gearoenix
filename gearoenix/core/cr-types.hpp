@@ -1,7 +1,7 @@
 #include <cstdint>
 
-#define GX_POS_EPSILON 0.0001
-#define GX_NEG_EPSILON -GX_POS_EPSILON
+#define GXPOSEPSILON 0.0001
+#define GX_NEG_EPSILON -GXPOSEPSILON
 
 namespace gearoenix {
 namespace core {

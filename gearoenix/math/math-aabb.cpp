@@ -5,6 +5,12 @@
 
 gearoenix::math::Aabb3::Aabb3() {}
 
+gearoenix::math::Aabb3::Aabb3(const Vec3& max, const Vec3& min)
+    : a(max)
+    , b(min)
+{
+}
+
 void gearoenix::math::Aabb3::reset(const Vec3& p)
 {
     for (int i = 0; i < 3; ++i) {
@@ -45,5 +51,6 @@ bool gearoenix::math::Aabb3::test(const Ray3& ray, core::Real& tmin_result)
         tmin_result = tmin;
         return true;
     }
+
     return false;
 }

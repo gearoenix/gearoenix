@@ -1,18 +1,16 @@
 #ifndef GEAROEMIX_MATH_TRIANGLE_HPP
 #define GEAROEMIX_MATH_TRIANGLE_HPP
-#include "math-aabb.hpp"
-#include "math-ray.hpp"
 #include "math-vector.hpp"
 namespace gearoenix {
 namespace system {
     class File;
 }
 namespace math {
+    struct Ray3;
     struct Triangle3 {
     private:
         Vec3 head;
         Vec3 edge[2];
-        Aabb3 box;
 
     public:
         static const core::Real epsilon;

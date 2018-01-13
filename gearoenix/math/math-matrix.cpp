@@ -32,7 +32,7 @@ gearoenix::math::Mat2x2::Mat2x2(
 bool gearoenix::math::Mat2x2::invert()
 {
     const core::Real det = mat[0] * mat[3] - mat[1] * mat[2];
-    if (det < GX_POS_EPSILON && det > GX_NEG_EPSILON)
+    if (det < GXPOSEPSILON && det > GX_NEG_EPSILON)
         return false;
     core::Real tmp = mat[0];
     mat[0] = mat[3];
