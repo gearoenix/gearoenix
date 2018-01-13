@@ -91,7 +91,7 @@ int main()
             (dis(gen) > 0.5f ? -1 : 1) * (dis(gen) * 100.0f + 1.1f),
             (dis(gen) > 0.5f ? -1 : 1) * (dis(gen) * 100.0f + 1.1f));
         gearoenix::math::Ray3 ray(rayo, (-rayo).normalized());
-        gearoenix::math::Aabb3 aabb(gearoenix::math::Vec3(1.0f, 1.0f, 1.0f), gearoenix::math::Vec3(-1.0f, -1.0f, -1.0f));
+        gearoenix::math::Aabb3 aabb(gearoenix::math::Vec3(0.0f, 1.0f, 1.0f), gearoenix::math::Vec3(0.0f, -1.0f, -1.0f));
         gearoenix::core::Real tmin;
         bool hit = aabb.test(ray, tmin);
         if (!hit) {

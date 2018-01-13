@@ -47,7 +47,7 @@ bool gearoenix::math::Aabb3::test(const Ray3& ray, core::Real& tmin_result)
         tmax = GXMIN(tmax, mxf);
         tmin = GXMAX(tmin, mnf);
     }
-    if ((tmax > tmin) && tmax > 0.0f) {
+    if ((tmax >= tmin) && tmax > 0.0f) {
         tmin_result = tmin;
         return true;
     }
