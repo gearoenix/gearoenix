@@ -2,6 +2,7 @@
 #include "../../audio/au-audio.hpp"
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../core/cr-end-caller.hpp"
+#include "../../physics/constraint/phs-cns-constraint.hpp"
 #include "../../system/sys-app.hpp"
 #include "../../system/sys-file.hpp"
 #include "../camera/rnd-cmr-camera.hpp"
@@ -70,6 +71,10 @@ gearoenix::render::scene::Scene::Scene(system::File* f, Engine* e, core::EndCall
     for (size_t i = 0; i < constraint_ids.size(); ++i) {
         core::Id cons_id = constraint_ids[i];
         root_constraints[cons_id] = amgr->get_constriants(cons_id, core::EndCaller<physics::constraint::Constraint>([c](std::shared_ptr<physics::constraint::Constraint>) -> void {}));
+        const std::vector<std::pair<core::Id, std::shared_ptr<model::Model>>> models = root_constraints[cons_id]->get_all_models();
+        for (const std::pair<const core::Id, const std::shared_ptr<model::Model>>& model : models) {
+            add_model(model.first, model.second);
+        }
     }
 }
 

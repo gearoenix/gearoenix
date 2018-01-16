@@ -4,16 +4,11 @@
 #include "../../core/cr-end-caller.hpp"
 #include "../../core/cr-types.hpp"
 #include "phs-cns-constraint.hpp"
+#include <map>
 #include <memory>
 #include <vector>
 
 namespace gearoenix {
-namespace render {
-    class Model;
-}
-namespace system {
-    class File;
-}
 namespace physics {
     namespace constraint {
         class Placer : public Constraint {
@@ -24,12 +19,13 @@ namespace physics {
             } Type;
             Type t = UNKNOWN;
             core::Real* parameters = nullptr;
-            std::vector<std::shared_ptr<render::Model>> models;
+            std::map<core::Id, std::shared_ptr<render::model::Model>> models;
 
         public:
-            Placer(system::File* f, core::EndCaller<core::EndCallerIgnore> c);
+            Placer(system::File* f, render::Engine* render_engine, core::EndCaller<core::EndCallerIgnore> c);
             virtual ~Placer();
-            void on_event(const core::event::Event* e);
+            virtual const std::vector<std::pair<core::Id, std::shared_ptr<render::model::Model>>> get_all_models() const;
+            virtual void on_event(const core::event::Event* e);
         };
     }
 }

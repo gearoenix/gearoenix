@@ -24,6 +24,7 @@ gearoenix::core::asset::Manager::Manager(system::Application* sys_app, const std
     , textures(new cache::file::File(file))
     , meshes(new cache::file::File(file))
     , models(new cache::file::File(file))
+    , constraints(new cache::file::File(file))
     , scenes(new cache::file::File(file))
 {
 }
@@ -38,6 +39,7 @@ gearoenix::core::asset::Manager::~Manager()
     delete textures;
     delete meshes;
     delete models;
+    delete constraints;
     delete scenes;
 
     file = nullptr;
@@ -48,6 +50,7 @@ gearoenix::core::asset::Manager::~Manager()
     textures = nullptr;
     meshes = nullptr;
     models = nullptr;
+    constraints = nullptr;
     scenes = nullptr;
 }
 
@@ -61,6 +64,7 @@ void gearoenix::core::asset::Manager::initialize()
     textures->read_offsets();
     meshes->read_offsets();
     models->read_offsets();
+    constraints->read_offsets();
     scenes->read_offsets();
 }
 
@@ -166,8 +170,8 @@ std::shared_ptr<gearoenix::render::model::Model> gearoenix::core::asset::Manager
 
 std::shared_ptr<gearoenix::physics::constraint::Constraint> gearoenix::core::asset::Manager::get_constriants(Id id, EndCaller<physics::constraint::Constraint> end)
 {
-    auto result = models->get<physics::constraint::Constraint>(id, [this, end]() -> std::shared_ptr<physics::constraint::Constraint> {
-        return std::shared_ptr<physics::constraint::Constraint>(physics::constraint::Constraint::read(file, EndCaller<EndCallerIgnore>([end](std::shared_ptr<EndCallerIgnore>) -> void {})));
+    auto result = constraints->get<physics::constraint::Constraint>(id, [this, end]() -> std::shared_ptr<physics::constraint::Constraint> {
+        return std::shared_ptr<physics::constraint::Constraint>(physics::constraint::Constraint::read(file, render_engine, EndCaller<EndCallerIgnore>([end](std::shared_ptr<EndCallerIgnore>) -> void {})));
     });
     end.set_data(result);
     return result;
@@ -175,7 +179,7 @@ std::shared_ptr<gearoenix::physics::constraint::Constraint> gearoenix::core::ass
 
 std::shared_ptr<gearoenix::physics::constraint::Constraint> gearoenix::core::asset::Manager::get_cached_constraints(Id id) const
 {
-    return models->get<physics::constraint::Constraint>(id);
+    return constraints->get<physics::constraint::Constraint>(id);
 }
 
 std::shared_ptr<gearoenix::render::scene::Scene> gearoenix::core::asset::Manager::get_scene(Id id, EndCaller<render::scene::Scene> end)

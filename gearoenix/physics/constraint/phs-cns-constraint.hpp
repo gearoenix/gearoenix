@@ -3,10 +3,18 @@
 #include "../../core/asset/cr-asset.hpp"
 #include "../../core/cr-end-caller.hpp"
 #include "../../core/cr-types.hpp"
+#include <memory>
+#include <vector>
 namespace gearoenix {
 namespace core {
     namespace event {
         class Event;
+    }
+}
+namespace render {
+    class Engine;
+    namespace model {
+        class Model;
     }
 }
 namespace system {
@@ -32,7 +40,8 @@ namespace physics {
         public:
             virtual ~Constraint();
             virtual void on_event(const core::event::Event* e) = 0;
-            static Constraint* read(system::File* f, core::EndCaller<core::EndCallerIgnore> c);
+            virtual const std::vector<std::pair<core::Id, std::shared_ptr<render::model::Model>>> get_all_models() const = 0;
+            static Constraint* read(system::File* f, render::Engine* render_engine, core::EndCaller<core::EndCallerIgnore> c);
             Placer* to_placer();
             const Placer* to_placer() const;
         };

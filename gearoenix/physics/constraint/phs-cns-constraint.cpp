@@ -12,13 +12,13 @@ gearoenix::physics::constraint::Constraint::~Constraint()
 {
 }
 
-gearoenix::physics::constraint::Constraint* gearoenix::physics::constraint::Constraint::read(system::File* f, core::EndCaller<core::EndCallerIgnore> c)
+gearoenix::physics::constraint::Constraint* gearoenix::physics::constraint::Constraint::read(system::File* f, render::Engine* render_engine, core::EndCaller<core::EndCallerIgnore> c)
 {
     Type t;
     f->read(t);
     switch (t) {
     case PLACER:
-        return new Placer(f, c);
+        return new Placer(f, render_engine, c);
     default:
         UNEXPECTED;
     }
