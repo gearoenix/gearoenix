@@ -9,11 +9,13 @@ gearoenix::physics::constraint::Placer::Placer(system::File* f, render::Engine* 
     : Constraint(PLACER)
 {
     f->read(t);
+    f->read(ratio);
     switch (t) {
     case DOWN_MIDDLE:
         parameters = new core::Real[2];
         f->read(parameters[0]);
         f->read(parameters[1]);
+        next_size = 2.0f * (render_engine->get_system_application()->get_window_ratio() - parameters[0]);
         break;
     default:
         UNEXPECTED;
@@ -33,8 +35,26 @@ gearoenix::physics::constraint::Placer::~Placer()
     parameters = nullptr;
 }
 
+void gearoenix::physics::constraint::Placer::apply()
+{
+    if (applied)
+        return;
+    Constraint::apply();
+    switch (t) {
+    case DOWN_MIDDLE: {
+        const core::Real scale = next_size / size;
+        const core::Real current_ break;
+    }
+    default:
+        break;
+    }
+
+    TODO;
+}
+
 void gearoenix::physics::constraint::Placer::on_event(const core::event::Event*)
 {
+    applied = false;
     TODO;
 }
 

@@ -10,7 +10,7 @@ TestApp::TestApp(gearoenix::system::Application* sys_app)
     : gearoenix::core::Application::Application(sys_app)
     , eng(sys_app->get_render_engine())
 {
-    sys_app->get_render_engine()->load_scene(1, [this](unsigned int index) -> void {
+    sys_app->get_render_engine()->load_scene(2, [this](unsigned int index) -> void {
         scene_id = index;
         cam = eng->get_scene(index)->get_current_camera();
         GXLOGI(index << "Loaded.");

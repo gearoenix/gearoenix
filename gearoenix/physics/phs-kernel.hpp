@@ -22,6 +22,7 @@ namespace physics {
         volatile bool alive = true;
 #endif
         void run();
+        void apply_constraints();
 
     protected:
     public:

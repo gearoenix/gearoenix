@@ -46,7 +46,7 @@ gearoenix::gles2::shader::ShadelessD2MatteNonreflectiveShadowlessOpaque::Shadele
                                 "uniform sampler2D txt2d;\n"
                                 "void main()\n"
                                 "{\n"
-                                "    gl_FragColor = vec4(texture2D(txt2d, out_uv).xyz, 1.0);\n"
+                                "    gl_FragColor = texture2D(txt2d, out_uv);\n"
                                 "}\n";
         vtx_shd = add_shader_to_program(pvs, GL_VERTEX_SHADER);
         frg_shd = add_shader_to_program(pfs, GL_FRAGMENT_SHADER);

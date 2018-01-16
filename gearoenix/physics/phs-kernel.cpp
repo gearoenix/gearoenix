@@ -6,6 +6,7 @@
 #include "../render/model/rnd-mdl-model.hpp"
 #include "../render/rnd-engine.hpp"
 #include "../render/scene/rnd-scn-scene.hpp"
+#include "constraint/phs-cns-constraint.hpp"
 #include "phs-engine.hpp"
 #include <functional>
 #include <iostream>
@@ -22,6 +23,7 @@ void gearoenix::physics::Kernel::run()
 #endif
         // std::string s = "\n" + std::to_string(thread_index) + " of " + std::to_string(threads_count) + "\n";
         // std::cout << s;
+        apply_constraints();
         unsigned int model_index = 0;
         const std::vector<std::shared_ptr<render::scene::Scene>>& scenes = engine->render_engine->get_all_scenes();
         for (const std::shared_ptr<render::scene::Scene>& scene : scenes) {
@@ -42,6 +44,25 @@ void gearoenix::physics::Kernel::run()
     }
     alive = true;
 #endif
+}
+
+void gearoenix::physics::Kernel::apply_constraints()
+{
+#ifdef THREAD_SUPPORTED
+    const unsigned int threads_count = engine->threads_count;
+    unsigned int item_index = 0;
+#endif
+    const std::vector<std::shared_ptr<render::scene::Scene>>& scenes = engine->render_engine->get_all_scenes();
+    for (const std::shared_ptr<render::scene::Scene>& scene : scenes) {
+        const std::map<core::Id, std::shared_ptr<constraint::Constraint>>& constraints = scene->get_all_root_constraints();
+        for (const std::pair<core::Id, std::shared_ptr<constraint::Constraint>>& id_constraint : constraints) {
+#ifdef THREAD_SUPPORTED
+            if (((item_index++) % threads_count) != thread_index)
+                continue;
+#endif
+            id_constraint.second->apply();
+        }
+    }
 }
 
 gearoenix::physics::Kernel::Kernel(

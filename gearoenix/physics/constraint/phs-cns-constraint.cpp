@@ -12,6 +12,11 @@ gearoenix::physics::constraint::Constraint::~Constraint()
 {
 }
 
+void gearoenix::physics::constraint::Constraint::apply()
+{
+    applied = true;
+}
+
 gearoenix::physics::constraint::Constraint* gearoenix::physics::constraint::Constraint::read(system::File* f, render::Engine* render_engine, core::EndCaller<core::EndCallerIgnore> c)
 {
     Type t;

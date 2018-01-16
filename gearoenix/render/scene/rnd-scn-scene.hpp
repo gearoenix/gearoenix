@@ -84,6 +84,7 @@ namespace render {
             ~Scene();
             static Scene* read(system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
             const std::map<core::Id, std::weak_ptr<model::Model>>& get_all_models() const;
+            const std::map<core::Id, std::shared_ptr<physics::constraint::Constraint>>& get_all_root_constraints() const;
             const camera::Camera* get_current_camera() const;
             camera::Camera* get_current_camera();
             const math::Vec3& get_ambient_light() const;

@@ -19,11 +19,16 @@ namespace physics {
             } Type;
             Type t = UNKNOWN;
             core::Real* parameters = nullptr;
+            core::Real ratio = 1.0f;
+            core::Real size = 2.0f;
+            core::Real next_size = 2.0f;
+            core::Real x = 0.0f, y = 0.0f;
             std::map<core::Id, std::shared_ptr<render::model::Model>> models;
 
         public:
             Placer(system::File* f, render::Engine* render_engine, core::EndCaller<core::EndCallerIgnore> c);
             virtual ~Placer();
+            virtual void apply();
             virtual const std::vector<std::pair<core::Id, std::shared_ptr<render::model::Model>>> get_all_models() const;
             virtual void on_event(const core::event::Event* e);
         };
