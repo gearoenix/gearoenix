@@ -12,10 +12,12 @@ namespace render {
             core::Real one_coshang;
             core::Real one_cosvang;
 
+            void on_ratio_change();
+
         public:
             Perspective(system::File* f, system::Application* app);
             bool in_sight(const math::Vec3& location, const core::Real radius) const;
-            void window_size_changed();
+            void on_event(const core::event::Event& e);
         };
     }
 }

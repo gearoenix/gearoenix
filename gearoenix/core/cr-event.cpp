@@ -23,3 +23,23 @@ gearoenix::core::event::Event::Type gearoenix::core::event::WindowResize::get_ty
 {
     return WINDOW_RESIZE;
 }
+
+gearoenix::core::Real gearoenix::core::event::WindowResize::get_previous_width() const
+{
+    return pre_width;
+}
+
+gearoenix::core::Real gearoenix::core::event::WindowResize::get_previous_height() const
+{
+    return pre_height;
+}
+
+gearoenix::core::Real gearoenix::core::event::WindowResize::get_current_width() const
+{
+    return cur_width;
+}
+
+gearoenix::core::Real gearoenix::core::event::WindowResize::get_current_height() const
+{
+    return cur_height;
+}

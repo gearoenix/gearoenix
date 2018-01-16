@@ -11,6 +11,9 @@
 #include <vector>
 namespace gearoenix {
 namespace core {
+    namespace event {
+        class Event;
+    }
 #ifdef THREAD_SUPPORTED
     class Semaphore;
 #endif
@@ -90,6 +93,7 @@ namespace render {
         virtual shader::Shader* create_shader(core::Id sid, system::File* file, core::EndCaller<core::EndCallerIgnore> c) = 0;
         virtual shader::Resources* create_shader_resources(core::Id sid, pipeline::Pipeline* p, buffer::Uniform* ub, core::EndCaller<core::EndCallerIgnore> c) = 0;
         virtual pipeline::Pipeline* create_pipeline(core::Id sid, core::EndCaller<core::EndCallerIgnore> c) = 0;
+        virtual void on_event(const core::event::Event& e);
         const pipeline::Manager* get_pipeline_manager() const;
         pipeline::Manager* get_pipeline_manager();
         void add_load_function(std::function<void()> fun);

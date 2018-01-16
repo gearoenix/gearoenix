@@ -53,6 +53,13 @@ gearoenix::render::Engine::~Engine()
     delete pipmgr;
 }
 
+void gearoenix::render::Engine::on_event(const core::event::Event& e)
+{
+    for (auto iter = loaded_scenes.begin(); iter != loaded_scenes.end(); ++iter) {
+        (*iter)->on_event(e);
+    }
+}
+
 const gearoenix::system::Application* gearoenix::render::Engine::get_system_application() const
 {
     return sysapp;

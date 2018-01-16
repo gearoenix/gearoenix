@@ -2,6 +2,7 @@
 #ifdef USE_SDL
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../core/cr-application.hpp"
+#include "../../core/cr-event.hpp"
 #include "../../gles2/gles2-engine.hpp"
 #include "../../gles2/gles2.hpp"
 #include "../../gles3/gles3-engine.hpp"
@@ -17,7 +18,12 @@ const gearoenix::core::Real gearoenix::system::Application::zoom_epsilon = 0.000
 
 void gearoenix::system::Application::create_window()
 {
-    std::uint32_t flags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN | SDL_WINDOW_BORDERLESS | SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE |
+    std::uint32_t flags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN |
+#ifdef GEAROENIX_FULLSCREEN
+        SDL_WINDOW_FULLSCREEN | SDL_WINDOW_BORDERLESS | SDL_WINDOW_FULLSCREEN_DESKTOP |
+#else
+        SDL_WINDOW_RESIZABLE |
+#endif
 #if defined(IN_MAC) || defined(IN_IOS)
         SDL_WINDOW_ALLOW_HIGHDPI |
 #endif
@@ -171,6 +177,20 @@ int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_
             o->core_app->on_zoom(event->mgesture.dDist);
         }
         break;
+    case SDL_WINDOWEVENT:
+        switch (event->window.event) {
+        case SDL_WINDOWEVENT_RESIZED: {
+            const core::event::WindowResize e(o->win_width, o->win_height, event->window.data1, event->window.data2);
+            o->render_engine->on_event(e);
+            o->win_width = event->window.data1;
+            o->win_height = event->window.data2;
+            break;
+        }
+        default:
+            TODO;
+            break;
+        }
+        break;
     default:
         GXLOGE("Unhandled event " << event->type);
         break;
@@ -226,10 +246,15 @@ gearoenix::system::Application::Application()
     SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
     SDL_SetHint(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandescapeRight");
+#ifdef GEAROENIX_FULLSCREEN
     SDL_DisplayMode display_mode;
     SDL_GetCurrentDisplayMode(0, &display_mode);
     win_width = display_mode.w;
     win_height = display_mode.h;
+#else
+    win_width = GEAROENIX_DEFAULT_WINDOW_WIDTH;
+    win_height = GEAROENIX_DEFAULT_WINDOW_HEIGHT;
+#endif
     create_window();
     create_context();
     SDL_AddEventWatch(event_receiver, this);

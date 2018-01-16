@@ -179,3 +179,10 @@ void gearoenix::render::scene::Scene::clean()
         }
     }
 }
+
+void gearoenix::render::scene::Scene::on_event(const core::event::Event& e)
+{
+    for (const std::shared_ptr<camera::Camera>& cam : cameras) {
+        cam->on_event(e);
+    }
+}

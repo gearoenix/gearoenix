@@ -24,6 +24,10 @@ namespace core {
         public:
             WindowResize(Real pre_width, Real pre_height, Real cur_width, Real cur_height);
             Type get_type() const;
+            Real get_previous_width() const;
+            Real get_previous_height() const;
+            Real get_current_width() const;
+            Real get_current_height() const;
         };
     }
 }

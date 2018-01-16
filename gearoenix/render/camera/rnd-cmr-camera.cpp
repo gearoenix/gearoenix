@@ -1,4 +1,5 @@
 #include "rnd-cmr-camera.hpp"
+#include "../../core/cr-event.hpp"
 #include "../../system/sys-app.hpp"
 #include "../../system/sys-file.hpp"
 #include "../../system/sys-log.hpp"
@@ -259,4 +260,12 @@ bool gearoenix::render::camera::Camera::get_changed() const
 void gearoenix::render::camera::Camera::clean()
 {
     changed = false;
+}
+
+void gearoenix::render::camera::Camera::on_event(const core::event::Event& e)
+{
+    const core::event::WindowResize* event = e.to_window_resize();
+    if (nullptr != event) {
+        screen_ratio = event->get_current_width() / event->get_current_height();
+    }
 }

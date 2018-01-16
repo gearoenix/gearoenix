@@ -30,8 +30,3 @@ bool gearoenix::render::camera::Orthographic::in_sight(const math::Vec3& locatio
 
     return true;
 }
-
-void gearoenix::render::camera::Orthographic::window_size_changed()
-{
-    UNIMPLEMENTED;
-}

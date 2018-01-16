@@ -15,10 +15,10 @@
 #elif defined(__unix__)
 #define IN_LINUX
 //#define USE_VULKAN
-#define USE_OPENGL_43
-#define USE_OPENGL_33
-#define USE_OPENGL_ES3
-//#define USE_OPENGL_ES2
+//#define USE_OPENGL_43
+//#define USE_OPENGL_33
+//#define USE_OPENGL_ES3
+#define USE_OPENGL_ES2
 #define IN_DESKTOP
 #define USE_SDL
 //#define USE_GLFW
@@ -68,12 +68,12 @@
 /// -------------------------------------------------------------------------
 #ifdef DEBUG_MODE
 #define LOG_ENABLED
-#define DEFAULT_WINDOW_WIDTH 800
-#define DEFAULT_WINDOW_HEIGHT 600
+#define GEAROENIX_DEFAULT_WINDOW_WIDTH 800
+#define GEAROENIX_DEFAULT_WINDOW_HEIGHT 600
 #else
 #define GEAROENIX_FULLSCREEN
 #endif
-#define GEAROENIX_FULLSCREEN
+//#define GEAROENIX_FULLSCREEN
 #ifndef IN_WEB
 #define THREAD_SUPPORTED
 #endif

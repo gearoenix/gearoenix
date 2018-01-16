@@ -4,6 +4,11 @@
 #include "../../math/math-matrix.hpp"
 #include "../../math/math-vector.hpp"
 namespace gearoenix {
+namespace core {
+    namespace event {
+        class Event;
+    }
+}
 namespace physics {
     class Kernel;
 }
@@ -59,7 +64,7 @@ namespace render {
             bool get_changed() const;
             void clean();
             virtual bool in_sight(const math::Vec3& location, const core::Real radius) const = 0;
-            virtual void window_size_changed() = 0;
+            virtual void on_event(const core::event::Event& e);
         };
     }
 }

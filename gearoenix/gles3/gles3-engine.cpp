@@ -2,6 +2,7 @@
 #ifdef USE_OPENGL_ES3
 #include "../core/asset/cr-asset-manager.hpp"
 #include "../core/cr-end-caller.hpp"
+#include "../core/cr-event.hpp"
 #include "../physics/phs-engine.hpp"
 #include "../render/camera/rnd-cmr-camera.hpp"
 #include "../render/pipeline/rnd-pip-manager.hpp"
@@ -228,6 +229,16 @@ gearoenix::render::shader::Resources* gearoenix::gles3::Engine::create_shader_re
 gearoenix::render::pipeline::Pipeline* gearoenix::gles3::Engine::create_pipeline(core::Id sid, core::EndCaller<core::EndCallerIgnore> c)
 {
     return new pipeline::Pipeline(sid, this, c);
+}
+
+void gearoenix::gles3::Engine::on_event(const core::event::Event& e)
+{
+    render::Engine::on_event(e);
+    const core::event::WindowResize* event = e.to_window_resize();
+    if (nullptr != event) {
+        win_width = event->get_current_width();
+        win_height = event->get_current_height();
+    }
 }
 
 #endif

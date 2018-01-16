@@ -1,6 +1,16 @@
 #include "rnd-cmr-perspective.hpp"
+#include "../../core/cr-event.hpp"
 #include "../../system/sys-file.hpp"
 #include <cmath>
+
+void gearoenix::render::camera::Perspective::on_ratio_change()
+{
+    c_height = c_width / screen_ratio;
+    tanvang = c_height / start;
+    one_cosvang = 1.0f / std::cos(std::atan(tanhang));
+    p = math::Mat4x4::perspective(c_width * 2.0f, c_height * 2.0f, start, end);
+    vp = p * v;
+}
 
 gearoenix::render::camera::Perspective::Perspective(system::File* f, system::Application* app)
     : Camera(f, app)
@@ -9,11 +19,7 @@ gearoenix::render::camera::Perspective::Perspective(system::File* f, system::App
     tanhang = std::tan(h_angle);
     one_coshang = 1.0f / std::cos(h_angle);
     c_width = tanhang * start;
-    c_height = c_width / screen_ratio;
-    tanvang = c_height / start;
-    one_cosvang = 1.0f / std::cos(std::atan(tanhang));
-    p = math::Mat4x4::perspective(c_width * 2.0f, c_height * 2.0f, start, end);
-    vp = p * v;
+    on_ratio_change();
 }
 
 bool gearoenix::render::camera::Perspective::in_sight(const math::Vec3& location, const core::Real radius) const
@@ -35,7 +41,11 @@ bool gearoenix::render::camera::Perspective::in_sight(const math::Vec3& location
     return true;
 }
 
-void gearoenix::render::camera::Perspective::window_size_changed()
+void gearoenix::render::camera::Perspective::on_event(const core::event::Event& e)
 {
-    UNIMPLEMENTED;
+    Camera::on_event(e);
+    const core::event::WindowResize* event = e.to_window_resize();
+    if (nullptr != event) {
+        on_ratio_change();
+    }
 }

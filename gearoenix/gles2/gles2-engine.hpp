@@ -42,6 +42,7 @@ namespace gles2 {
         render::shader::Shader* create_shader(core::Id sid, system::File* file, core::EndCaller<core::EndCallerIgnore> c);
         render::shader::Resources* create_shader_resources(core::Id sid, render::pipeline::Pipeline* p, render::buffer::Uniform* ub, core::EndCaller<core::EndCallerIgnore> c);
         render::pipeline::Pipeline* create_pipeline(core::Id sid, core::EndCaller<core::EndCallerIgnore> c);
+        void on_event(const core::event::Event& e);
     };
 }
 }

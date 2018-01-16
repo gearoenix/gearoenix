@@ -13,6 +13,11 @@ namespace gearoenix {
 namespace audio {
     class Audio;
 }
+namespace core {
+    namespace event {
+        class Event;
+    }
+}
 namespace physics {
     class Kernel;
     namespace constraint {
@@ -86,6 +91,7 @@ namespace render {
             const light::Sun* get_sun() const;
             void set_renderable(bool);
             void clean();
+            void on_event(const core::event::Event& e);
         };
     }
 }
