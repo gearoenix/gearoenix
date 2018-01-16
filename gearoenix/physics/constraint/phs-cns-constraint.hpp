@@ -1,20 +1,42 @@
 #ifndef GEAROENIX_PHYSICS_CONSTRAINT_CONSTRAINT_HPP
 #define GEAROENIX_PHYSICS_CONSTRAINT_CONSTRAINT_HPP
+#include "../../core/asset/cr-asset.hpp"
+#include "../../core/cr-end-caller.hpp"
+#include "../../core/cr-types.hpp"
 namespace gearoenix {
-	namespace core {
-		namespace event {
-			class Event;
-		}
-	}
-	namespace physics {
-		namespace constraint {
-			class Constraint {
-			private:
-			public:
-				virtual ~Constraint();
-				virtual void on_event(const core::event::Event* e) = 0;
-			};
-		}
-	}
+namespace core {
+    namespace event {
+        class Event;
+    }
+}
+namespace system {
+    class File;
+}
+namespace physics {
+    namespace constraint {
+        class Placer;
+        class Constraint : public core::asset::Asset {
+        public:
+            typedef enum : core::Id {
+                PLACER = 1,
+                TRACKER = 2,
+                SPRING = 3,
+                SPRING_JOINT = 4,
+                UNKNOWN = 0XFFFFFFFFFFFFFFFF,
+            } Type;
+
+        protected:
+            Type t = UNKNOWN;
+            Constraint(Type t);
+
+        public:
+            virtual ~Constraint();
+            virtual void on_event(const core::event::Event* e) = 0;
+            static Constraint* read(system::File* f, core::EndCaller<core::EndCallerIgnore> c);
+            Placer* to_placer();
+            const Placer* to_placer() const;
+        };
+    }
+}
 }
 #endif

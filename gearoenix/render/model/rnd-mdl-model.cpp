@@ -1,6 +1,7 @@
 #include "rnd-mdl-model.hpp"
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../core/cr-static.hpp"
+#include "../../physics/collider/phs-collider.hpp"
 #include "../../system/sys-app.hpp"
 #include "../../system/sys-file.hpp"
 #include "../camera/rnd-cmr-camera.hpp"
@@ -39,12 +40,9 @@ gearoenix::render::model::Model::Model(system::File* f, Engine* e, core::EndCall
         needs_mvp |= mat->needs_mvp();
         needs_dbm |= mat->needs_dbm();
     }
-    core::Count children_count = 0;
-    f->read(children_count);
-    std::vector<core::Id> model_children(children_count);
-    for (core::Count i = 0; i < children_count; ++i) {
-        f->read(model_children[i]);
-    }
+    std::vector<core::Id> model_children;
+    f->read(model_children);
+    collider = physics::collider::Collider::read(f);
     core::asset::Manager* astmgr = e->get_system_application()->get_asset_manager();
     for (core::Id mesh_id : mesh_ids) {
         const std::tuple<std::shared_ptr<material::Material>, std::shared_ptr<material::Depth>>& mat = materials[mesh_id];

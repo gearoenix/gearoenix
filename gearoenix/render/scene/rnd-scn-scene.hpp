@@ -15,6 +15,9 @@ namespace audio {
 }
 namespace physics {
     class Kernel;
+    namespace constraint {
+        class Constraint;
+    }
 }
 namespace system {
     class File;
@@ -49,6 +52,7 @@ namespace render {
             std::vector<std::shared_ptr<audio::Audio>> audios;
             std::vector<std::shared_ptr<light::Light>> lights;
             std::map<core::Id, std::shared_ptr<model::Model>> root_models;
+            std::map<core::Id, std::shared_ptr<physics::constraint::Constraint>> root_constraints;
             bool all_models_needs_cleaning = false;
             std::map<core::Id, std::weak_ptr<model::Model>> all_models;
             // shadow_caster_shader_id -> model_id -> mesh_id

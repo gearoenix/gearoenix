@@ -8,6 +8,11 @@ namespace gearoenix {
 namespace audio {
     class Audio;
 }
+namespace physics {
+    namespace constraint {
+        class Constraint;
+    }
+}
 namespace render {
     class Engine;
     namespace camera {
@@ -56,6 +61,7 @@ namespace core {
             cache::file::File* textures = nullptr;
             cache::file::File* meshes = nullptr;
             cache::file::File* models = nullptr;
+            cache::file::File* constraints = nullptr;
             cache::file::File* scenes = nullptr;
 
         public:
@@ -77,6 +83,8 @@ namespace core {
             std::shared_ptr<render::mesh::Mesh> get_cached_mesh(Id id) const;
             std::shared_ptr<render::model::Model> get_model(Id id, EndCaller<render::model::Model> e);
             std::shared_ptr<render::model::Model> get_cached_model(Id id) const;
+            std::shared_ptr<physics::constraint::Constraint> get_constriants(Id id, EndCaller<physics::constraint::Constraint> e);
+            std::shared_ptr<physics::constraint::Constraint> get_cached_constraints(Id id) const;
             std::shared_ptr<render::scene::Scene> get_scene(Id id, EndCaller<render::scene::Scene> e);
             std::shared_ptr<render::scene::Scene> get_cached_scene(Id id) const;
         };

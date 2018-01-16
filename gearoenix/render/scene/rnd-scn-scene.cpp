@@ -54,6 +54,8 @@ gearoenix::render::scene::Scene::Scene(system::File* f, Engine* e, core::EndCall
     lights.resize(light_ids.size());
     std::vector<core::Id> model_ids;
     f->read(model_ids);
+    std::vector<core::Id> constraint_ids;
+    f->read(constraint_ids);
     ambient_light.read(f);
     for (size_t i = 0; i < camera_ids.size(); ++i)
         cameras[i] = amgr->get_camera(camera_ids[i]);
@@ -64,6 +66,10 @@ gearoenix::render::scene::Scene::Scene(system::File* f, Engine* e, core::EndCall
     for (size_t i = 0; i < model_ids.size(); ++i) {
         root_models[model_ids[i]] = amgr->get_model(model_ids[i], core::EndCaller<model::Model>([c](std::shared_ptr<model::Model>) -> void {}));
         add_model(model_ids[i], root_models[i]);
+    }
+    for (size_t i = 0; i < constraint_ids.size(); ++i) {
+        core::Id cons_id = constraint_ids[i];
+        root_constraints[cons_id] = amgr->get_constriants(cons_id, core::EndCaller<physics::constraint::Constraint>([c](std::shared_ptr<physics::constraint::Constraint>) -> void {}));
     }
 }
 

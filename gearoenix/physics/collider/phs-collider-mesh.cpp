@@ -1,6 +1,6 @@
 #include "phs-collider-mesh.hpp"
-#include "../math/math-matrix.hpp"
-#include "../system/sys-file.hpp"
+#include "../../math/math-matrix.hpp"
+#include "../../system/sys-file.hpp"
 
 gearoenix::physics::collider::Mesh::Mesh(system::File* in)
     : Collider(Type::MESH)

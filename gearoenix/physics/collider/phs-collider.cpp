@@ -1,6 +1,6 @@
 #include "phs-collider.hpp"
-#include "../system/sys-file.hpp"
-#include "../system/sys-log.hpp"
+#include "../../system/sys-file.hpp"
+#include "../../system/sys-log.hpp"
 #include "phs-collider-mesh.hpp"
 
 gearoenix::physics::collider::Collider::Collider(Type t)

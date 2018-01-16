@@ -1,5 +1,6 @@
 #include "cr-asset-manager.hpp"
 #include "../../audio/au-audio.hpp"
+#include "../../physics/constraint/phs-cns-placer.hpp"
 #include "../../render/camera/rnd-cmr-camera.hpp"
 #include "../../render/light/rnd-lt-light.hpp"
 #include "../../render/mesh/rnd-msh-mesh.hpp"
@@ -161,6 +162,20 @@ std::shared_ptr<gearoenix::render::model::Model> gearoenix::core::asset::Manager
 std::shared_ptr<gearoenix::render::model::Model> gearoenix::core::asset::Manager::get_cached_model(Id id) const
 {
     return models->get<render::model::Model>(id);
+}
+
+std::shared_ptr<gearoenix::physics::constraint::Constraint> gearoenix::core::asset::Manager::get_constriants(Id id, EndCaller<physics::constraint::Constraint> end)
+{
+    auto result = models->get<physics::constraint::Constraint>(id, [this, end]() -> std::shared_ptr<physics::constraint::Constraint> {
+        return std::shared_ptr<physics::constraint::Constraint>(physics::constraint::Constraint::read(file, EndCaller<EndCallerIgnore>([end](std::shared_ptr<EndCallerIgnore>) -> void {})));
+    });
+    end.set_data(result);
+    return result;
+}
+
+std::shared_ptr<gearoenix::physics::constraint::Constraint> gearoenix::core::asset::Manager::get_cached_constraints(Id id) const
+{
+    return models->get<physics::constraint::Constraint>(id);
 }
 
 std::shared_ptr<gearoenix::render::scene::Scene> gearoenix::core::asset::Manager::get_scene(Id id, EndCaller<render::scene::Scene> end)

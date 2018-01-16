@@ -1,6 +1,6 @@
 #ifndef GEAROENIX_PHYSICS_COLLIDER_HPP
 #define GEAROENIX_PHYSICS_COLLIDER_HPP
-#include "../core/cr-types.hpp"
+#include "../../core/cr-types.hpp"
 namespace gearoenix {
 namespace system {
     class File;

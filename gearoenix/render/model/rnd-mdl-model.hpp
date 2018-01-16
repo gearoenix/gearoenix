@@ -12,6 +12,9 @@
 namespace gearoenix {
 namespace physics {
     class Kernel;
+    namespace collider {
+        class Collider;
+    }
 }
 namespace system {
     class File;
@@ -65,6 +68,7 @@ namespace render {
                 meshes;
             // model_id -> model
             std::map<core::Id, std::shared_ptr<Model>> children;
+            physics::collider::Collider* collider = nullptr;
 
         public:
             Model(system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
