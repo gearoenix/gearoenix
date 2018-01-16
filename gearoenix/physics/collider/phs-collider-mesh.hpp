@@ -1,9 +1,9 @@
 #ifndef GEAROENIX_PHYSICS_COLLIDER_MESH_HPP
 #define GEAROENIX_PHYSICS_COLLIDER_MESH_HPP
-#include "../core/cr-types.hpp"
-#include "../math/math-aabb.hpp"
-#include "../math/math-triangle.hpp"
-#include "../math/math-vector.hpp"
+#include "../../core/cr-types.hpp"
+#include "../../math/math-aabb.hpp"
+#include "../../math/math-triangle.hpp"
+#include "../../math/math-vector.hpp"
 #include "phs-collider.hpp"
 #include <vector>
 namespace gearoenix {
