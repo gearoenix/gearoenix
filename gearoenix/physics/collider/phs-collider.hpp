@@ -2,6 +2,9 @@
 #define GEAROENIX_PHYSICS_COLLIDER_HPP
 #include "../../core/cr-types.hpp"
 namespace gearoenix {
+namespace math {
+    struct Mat4x4;
+}
 namespace system {
     class File;
 }
@@ -21,6 +24,7 @@ namespace physics {
 
         public:
             static Collider* read(system::File* in);
+            virtual void update(const math::Mat4x4& m) = 0;
         };
     }
 }

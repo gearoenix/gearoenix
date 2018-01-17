@@ -60,6 +60,9 @@ void gearoenix::render::model::Model::commit(const scene::Scene* s)
     const camera::Camera* cam = s->get_current_camera();
     bool moccloc_not_initialized = true;
     math::Vec3 moccloc;
+    if (nullptr != collider && changed) {
+        collider->update(m);
+    }
     if (cam->get_changed() || changed) {
         moccloc = m * occloc; // todo cache its calculation.
         moccloc_not_initialized = false;
@@ -160,10 +163,5 @@ void gearoenix::render::model::Model::translate(const math::Vec3& t)
 void gearoenix::render::model::Model::global_scale(const core::Real s)
 {
     m.scale4x3(s);
-    //    m = math::Mat4x4(
-    //                s, 0.0f, 0.0f, 0.0f,
-    //                0.0f, s, 0.0f, 0.0f,
-    //                0.0f, 0.0f, s, 0.0f,
-    //                0.0f, 0.0f, 0.0f, 1.0f) * m;
     changed = true;
 }
