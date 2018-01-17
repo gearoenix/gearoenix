@@ -17,6 +17,7 @@ private:
     gearoenix::render::camera::Camera* cam;
     bool left_mouse_down = false;
     unsigned int scene_id = 0;
+    unsigned int gui_scene_id = 0;
 
 public:
     TestApp(gearoenix::system::Application* sys_app);

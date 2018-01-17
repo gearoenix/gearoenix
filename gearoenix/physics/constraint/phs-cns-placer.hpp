@@ -3,6 +3,7 @@
 
 #include "../../core/cr-end-caller.hpp"
 #include "../../core/cr-types.hpp"
+#include "../../math/math-vector.hpp"
 #include "phs-cns-constraint.hpp"
 #include <map>
 #include <memory>
@@ -21,8 +22,9 @@ namespace physics {
             core::Real* parameters = nullptr;
             core::Real ratio = 1.0f;
             core::Real size = 2.0f;
-            core::Real next_size = 2.0f;
-            core::Real x = 0.0f, y = 0.0f;
+            core::Real next_size;
+            math::Vec3 position = math::Vec3(0.0f, 0.0f, 0.0f);
+            math::Vec3 next_position;
             std::map<core::Id, std::shared_ptr<render::model::Model>> models;
 
         public:
@@ -30,7 +32,7 @@ namespace physics {
             virtual ~Placer();
             virtual void apply();
             virtual const std::vector<std::pair<core::Id, std::shared_ptr<render::model::Model>>> get_all_models() const;
-            virtual void on_event(const core::event::Event* e);
+            virtual void on_event(const core::event::Event& e);
         };
     }
 }

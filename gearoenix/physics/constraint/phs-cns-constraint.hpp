@@ -40,7 +40,7 @@ namespace physics {
 
         public:
             virtual ~Constraint();
-            virtual void on_event(const core::event::Event* e) = 0;
+            virtual void on_event(const core::event::Event& e) = 0;
             virtual const std::vector<std::pair<core::Id, std::shared_ptr<render::model::Model>>> get_all_models() const = 0;
             virtual void apply();
             static Constraint* read(system::File* f, render::Engine* render_engine, core::EndCaller<core::EndCallerIgnore> c);

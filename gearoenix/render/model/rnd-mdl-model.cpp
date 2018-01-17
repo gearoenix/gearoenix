@@ -150,3 +150,20 @@ const gearoenix::math::Mat4x4& gearoenix::render::model::Model::get_sun_mvp() co
 {
     return sunmvp;
 }
+
+void gearoenix::render::model::Model::translate(const math::Vec3& t)
+{
+    m.translate(t);
+    changed = true;
+}
+
+void gearoenix::render::model::Model::global_scale(const core::Real s)
+{
+    m.scale4x3(s);
+    //    m = math::Mat4x4(
+    //                s, 0.0f, 0.0f, 0.0f,
+    //                0.0f, s, 0.0f, 0.0f,
+    //                0.0f, 0.0f, s, 0.0f,
+    //                0.0f, 0.0f, 0.0f, 1.0f) * m;
+    changed = true;
+}

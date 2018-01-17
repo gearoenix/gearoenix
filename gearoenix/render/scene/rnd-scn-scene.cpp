@@ -70,7 +70,10 @@ gearoenix::render::scene::Scene::Scene(system::File* f, Engine* e, core::EndCall
     }
     for (size_t i = 0; i < constraint_ids.size(); ++i) {
         core::Id cons_id = constraint_ids[i];
-        root_constraints[cons_id] = amgr->get_constriants(cons_id, core::EndCaller<physics::constraint::Constraint>([c](std::shared_ptr<physics::constraint::Constraint>) -> void {}));
+        root_constraints[cons_id] = amgr->get_constriants(
+            cons_id,
+            core::EndCaller<physics::constraint::Constraint>(
+                [c](std::shared_ptr<physics::constraint::Constraint>) -> void {}));
         const std::vector<std::pair<core::Id, std::shared_ptr<model::Model>>> models = root_constraints[cons_id]->get_all_models();
         for (const std::pair<const core::Id, const std::shared_ptr<model::Model>>& model : models) {
             add_model(model.first, model.second);
@@ -95,6 +98,11 @@ gearoenix::render::scene::Scene* gearoenix::render::scene::Scene::read(
 const std::map<gearoenix::core::Id, std::weak_ptr<gearoenix::render::model::Model>>& gearoenix::render::scene::Scene::get_all_models() const
 {
     return all_models;
+}
+
+const std::map<gearoenix::core::Id, std::shared_ptr<gearoenix::physics::constraint::Constraint>>& gearoenix::render::scene::Scene::get_all_root_constraints() const
+{
+    return root_constraints;
 }
 
 void gearoenix::render::scene::Scene::commit()
@@ -184,5 +192,8 @@ void gearoenix::render::scene::Scene::on_event(const core::event::Event& e)
 {
     for (const std::shared_ptr<camera::Camera>& cam : cameras) {
         cam->on_event(e);
+    }
+    for (const std::pair<core::Id, std::shared_ptr<physics::constraint::Constraint>>& con : root_constraints) {
+        con.second->on_event(e);
     }
 }

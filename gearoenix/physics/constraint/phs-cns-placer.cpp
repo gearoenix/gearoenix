@@ -1,5 +1,7 @@
 #include "phs-cns-placer.hpp"
 #include "../../core/asset/cr-asset-manager.hpp"
+#include "../../core/cr-event.hpp"
+#include "../../render/model/rnd-mdl-model.hpp"
 #include "../../render/rnd-engine.hpp"
 #include "../../system/sys-app.hpp"
 #include "../../system/sys-file.hpp"
@@ -16,6 +18,9 @@ gearoenix::physics::constraint::Placer::Placer(system::File* f, render::Engine* 
         f->read(parameters[0]);
         f->read(parameters[1]);
         next_size = 2.0f * (render_engine->get_system_application()->get_window_ratio() - parameters[0]);
+        next_position[0] = 0.0f;
+        next_position[1] = (next_size / (ratio * 2.0f)) + parameters[1] - 1.0f;
+        next_position[2] = 0.0f;
         break;
     default:
         UNEXPECTED;
@@ -42,20 +47,37 @@ void gearoenix::physics::constraint::Placer::apply()
     Constraint::apply();
     switch (t) {
     case DOWN_MIDDLE: {
+        for (const std::pair<core::Id, std::shared_ptr<render::model::Model>>& id_model : models)
+            id_model.second->translate(-position);
         const core::Real scale = next_size / size;
-        const core::Real current_ break;
-    }
-    default:
+        for (const std::pair<core::Id, std::shared_ptr<render::model::Model>>& id_model : models)
+            id_model.second->global_scale(scale);
+        for (const std::pair<core::Id, std::shared_ptr<render::model::Model>>& id_model : models)
+            id_model.second->translate(next_position);
+        position = next_position;
+        size = next_size;
         break;
     }
-
-    TODO;
+    default:
+        UNEXPECTED;
+    }
 }
 
-void gearoenix::physics::constraint::Placer::on_event(const core::event::Event*)
+void gearoenix::physics::constraint::Placer::on_event(const core::event::Event& e)
 {
     applied = false;
-    TODO;
+    switch (t) {
+    case DOWN_MIDDLE: {
+        const core::event::WindowResize* we = e.to_window_resize();
+        if (nullptr != we) {
+            next_size = 2.0f * ((we->get_current_width() / we->get_current_height()) - parameters[0]);
+            next_position[1] = (next_size / (ratio * 2.0f)) + parameters[1] - 1.0f;
+        }
+        break;
+    }
+    default:
+        UNEXPECTED;
+    }
 }
 
 const std::vector<std::pair<gearoenix::core::Id, std::shared_ptr<gearoenix::render::model::Model>>> gearoenix::physics::constraint::Placer::get_all_models() const

@@ -237,6 +237,13 @@ void gearoenix::math::Mat4x4::scale4x3(const core::Real& s)
     mat[14] *= s;
 }
 
+void gearoenix::math::Mat4x4::translate(const Vec3& v)
+{
+    mat[12] += v[0];
+    mat[13] += v[1];
+    mat[14] += v[2];
+}
+
 gearoenix::core::Real gearoenix::math::Mat4x4::determinant() const
 {
     return (+mat[0] * (+mat[5] * (mat[10] * mat[15] - mat[11] * mat[14]) - mat[9] * (mat[6] * mat[15] - mat[7] * mat[14]) + mat[13] * (mat[6] * mat[11] - mat[7] * mat[10]))
