@@ -10,15 +10,13 @@
 gearoenix::gles2::texture::Cube::Cube(system::File* file, Engine* eng, core::EndCaller<core::EndCallerIgnore> end)
 {
     std::vector<std::vector<unsigned char>> img_data(FACES_COUNT);
-    std::vector<unsigned int> imgw(FACES_COUNT), imgh(FACES_COUNT);
-    std::vector<core::Offset> img_offs(5);
-    for (int i = 0; i < 5; ++i) {
-        file->read(img_offs[i]);
-    }
-    render::texture::PNG::decode(file, img_data[0], imgw[0], imgh[0]);
+    unsigned int imgw, imgh;
+    render::texture::PNG::decode(file, img_data[0], imgw, imgh);
     for (int i = 1; i < FACES_COUNT; ++i) {
-        file->seek((unsigned int)img_offs[i - 1]);
-        render::texture::PNG::decode(file, img_data[i], imgw[i], imgh[i]);
+        unsigned int iimgw, iimgh;
+        render::texture::PNG::decode(file, img_data[i], iimgw, iimgh);
+        if (iimgw != imgw || iimgh != imgh)
+            UNEXPECTED;
     }
     static const GLenum faces[] = {
         GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
@@ -36,7 +34,7 @@ gearoenix::gles2::texture::Cube::Cube(system::File* file, Engine* eng, core::End
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); //GL_MIRRORED_REPEAT
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         for (int i = 0; i < FACES_COUNT; ++i) {
-            glTexImage2D(faces[i], 0, GL_RGBA, imgw[i], imgh[i], 0, GL_RGBA, GL_UNSIGNED_BYTE, (void*)img_data[i].data());
+            glTexImage2D(faces[i], 0, GL_RGBA, imgw, imgh, 0, GL_RGBA, GL_UNSIGNED_BYTE, (void*)img_data[i].data());
         }
         glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
         (void)end;

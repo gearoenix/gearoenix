@@ -13,11 +13,15 @@ gearoenix::render::texture::Texture* gearoenix::render::texture::Texture::read(s
     core::Id t;
     f->read(t);
     switch (t) {
-    case 10:
+    case 1:
+    case 5:
+    case 6:
         return e->create_texture_2d(f, c);
-    case 20: {
+    case 3:
+    case 4:
         return e->create_texture_cube(f, c);
+    default:
+        UNEXPECTED;
     }
-    }
-    UNEXPECTED;
+    return nullptr;
 }

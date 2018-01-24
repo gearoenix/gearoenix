@@ -31,6 +31,7 @@ namespace render {
 
         public:
             Mesh(system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
+            static Mesh* read(system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
             ~Mesh();
             void bind();
             void draw();

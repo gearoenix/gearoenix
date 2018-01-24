@@ -72,6 +72,7 @@ namespace render {
 
         public:
             Model(system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
+            static Model* read(system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
             ~Model();
             void commit(const scene::Scene* s);
             void draw(core::Id mesh_id, texture::Texture2D* shadow_texture);
