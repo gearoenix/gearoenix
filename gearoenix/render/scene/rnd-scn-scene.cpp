@@ -43,6 +43,7 @@ void gearoenix::render::scene::Scene::add_model(core::Id id, std::shared_ptr<mod
 gearoenix::render::scene::Scene::Scene(system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
 //: e(e)
 {
+    ambient_light.read(f);
     core::asset::Manager* amgr = e->get_system_application()->get_asset_manager();
     std::vector<core::Id> camera_ids;
     f->read(camera_ids);
@@ -57,7 +58,6 @@ gearoenix::render::scene::Scene::Scene(system::File* f, Engine* e, core::EndCall
     f->read(model_ids);
     std::vector<core::Id> constraint_ids;
     f->read(constraint_ids);
-    ambient_light.read(f);
     for (size_t i = 0; i < camera_ids.size(); ++i)
         cameras[i] = amgr->get_camera(camera_ids[i]);
     for (size_t i = 0; i < audio_ids.size(); ++i)
@@ -92,7 +92,15 @@ gearoenix::render::scene::Scene::~Scene()
 gearoenix::render::scene::Scene* gearoenix::render::scene::Scene::read(
     system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
 {
-    return new Scene(f, e, c);
+    core::Id t;
+    f->read(t);
+    switch (t) {
+    case 1:
+    case 2:
+        return new Scene(f, e, c);
+    default:
+        UNEXPECTED;
+    }
 }
 
 const std::map<gearoenix::core::Id, std::weak_ptr<gearoenix::render::model::Model>>& gearoenix::render::scene::Scene::get_all_models() const

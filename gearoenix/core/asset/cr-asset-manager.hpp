@@ -43,6 +43,7 @@ namespace system {
 }
 namespace core {
     namespace cache {
+        class Cacher;
         namespace file {
             class File;
             class Sparse;
@@ -54,7 +55,7 @@ namespace core {
             system::Application* sys_app = nullptr;
             render::Engine* render_engine = nullptr;
             system::File* file = nullptr;
-            cache::file::Sparse* shaders = nullptr;
+            cache::Cacher* shaders = nullptr;
             cache::file::File* cameras = nullptr;
             cache::file::File* audios = nullptr;
             cache::file::File* lights = nullptr;

@@ -12,6 +12,19 @@ gearoenix::render::mesh::Mesh::Mesh(system::File* f, Engine* e, core::EndCaller<
     buf = e->create_mesh((unsigned int)vertex_elements_count, f, c);
 }
 
+gearoenix::render::mesh::Mesh* gearoenix::render::mesh::Mesh::read(system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
+{
+    core::Id t;
+    f->read(t);
+    switch (t) {
+    case 1:
+        return new Mesh(f, e, c);
+    default:
+        UNEXPECTED;
+    }
+    return nullptr;
+}
+
 gearoenix::render::mesh::Mesh::~Mesh()
 {
     delete buf;
