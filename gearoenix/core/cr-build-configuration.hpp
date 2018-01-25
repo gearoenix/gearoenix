@@ -47,7 +47,7 @@
 //#define USE_METAL
 //#define USE_VULKAN
 //#define USE_OPENGL_43
-//#define USE_OPENGL_33
+#define USE_OPENGL_33
 #define USE_OPENGL_ES3
 #define IN_DESKTOP
 #define USE_SDL
