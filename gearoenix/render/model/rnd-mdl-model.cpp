@@ -17,16 +17,19 @@
 gearoenix::render::model::Model::Model(system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
 {
     m.read(f);
-    occloc.read(f);
     occrdss.read(f);
-    occrds = GXMAX(GXMAX(occrdss[0], occrdss[1]), occrdss[2]);
-    core::Count mesh_count = 0;
-    f->read(mesh_count);
-    std::vector<core::Id> mesh_ids(mesh_count);
+    occloc.read(f);
+    collider = physics::collider::Collider::read(f);
+    std::vector<core::Id> model_children;
+    f->read(model_children);
+    std::vector<core::Id> mesh_ids;
+    f->read(mesh_ids);
+    occrds = GXMAX(occrdss[0], occrdss[1]);
+    occrds = GXMAX(occrds, occrdss[2]);
+    core::Count mesh_count = mesh_ids.size();
     std::map<core::Id, std::tuple<std::shared_ptr<material::Material>, std::shared_ptr<material::Depth>>> materials;
     for (core::Count i = 0; i < mesh_count; ++i) {
         std::shared_ptr<material::Material> mat(material::Material::read(f, e, c));
-        f->read(mesh_ids[i]);
         if (shader::Shader::is_shadow_caster(mat->get_shader_id())) {
             std::shared_ptr<material::Depth> dp(new material::Depth(
                 shader::Shader::get_shadow_caster_shader_id(mat->get_shader_id()),
@@ -40,9 +43,6 @@ gearoenix::render::model::Model::Model(system::File* f, Engine* e, core::EndCall
         needs_mvp |= mat->needs_mvp();
         needs_dbm |= mat->needs_dbm();
     }
-    std::vector<core::Id> model_children;
-    f->read(model_children);
-    collider = physics::collider::Collider::read(f);
     core::asset::Manager* astmgr = e->get_system_application()->get_asset_manager();
     for (core::Id mesh_id : mesh_ids) {
         const std::tuple<std::shared_ptr<material::Material>, std::shared_ptr<material::Depth>>& mat = materials[mesh_id];
@@ -51,6 +51,20 @@ gearoenix::render::model::Model::Model(system::File* f, Engine* e, core::EndCall
     for (core::Id model_id : model_children) {
         children[model_id] = astmgr->get_model(model_id, core::EndCaller<model::Model>([c](std::shared_ptr<Model>) -> void {}));
     }
+}
+
+gearoenix::render::model::Model* gearoenix::render::model::Model::read(system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
+{
+    core::Id t;
+    f->read(t);
+    switch (t) {
+    case 1:
+    case 2:
+        return new gearoenix::render::model::Model(f, e, c);
+    default:
+        UNEXPECTED;
+    }
+    return nullptr;
 }
 
 gearoenix::render::model::Model::~Model() {}

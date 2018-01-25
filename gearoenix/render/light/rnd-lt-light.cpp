@@ -11,8 +11,10 @@ gearoenix::render::light::Light* gearoenix::render::light::Light::read(system::F
     core::Id light_type;
     f->read(light_type);
     switch (light_type) {
-    case 10:
+    case 1:
         return new Sun(f);
+    default:
+        UNEXPECTED;
     }
-    GXLOGF("Unexpected");
+    return nullptr;
 }
