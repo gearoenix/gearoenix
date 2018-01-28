@@ -21,6 +21,9 @@ namespace system {
 }
 namespace render {
     class Engine;
+    namespace animation {
+        class Animation;
+    }
     namespace camera {
         class Camera;
     }
@@ -42,7 +45,14 @@ namespace render {
         class Model : public core::asset::Asset {
             friend class physics::Kernel;
 
-        private:
+        public:
+            enum ModelType {
+                BASIC = 1,
+                WIDGET = 2,
+                UNKNOWN = 0XFFFFFFFFFFFFFFFF,
+            };
+
+        protected:
             bool has_shadow_caster = false;
             bool has_transparent = false;
             bool is_in_sun = false;
@@ -68,12 +78,13 @@ namespace render {
                 meshes;
             // model_id -> model
             std::map<core::Id, std::shared_ptr<Model>> children;
+            std::vector<animation::Animation*> animations;
             physics::collider::Collider* collider = nullptr;
 
         public:
             Model(system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
             static Model* read(system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
-            ~Model();
+            virtual ~Model();
             void commit(const scene::Scene* s);
             void draw(core::Id mesh_id, texture::Texture2D* shadow_texture);
             void cast_shadow(core::Id mesh_id);

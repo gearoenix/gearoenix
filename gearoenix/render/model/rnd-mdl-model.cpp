@@ -4,6 +4,7 @@
 #include "../../physics/collider/phs-collider.hpp"
 #include "../../system/sys-app.hpp"
 #include "../../system/sys-file.hpp"
+#include "../animation/rnd-anm-animation.hpp"
 #include "../camera/rnd-cmr-camera.hpp"
 #include "../camera/rnd-cmr-orthographic.hpp"
 #include "../light/rnd-lt-sun.hpp"
@@ -12,6 +13,7 @@
 #include "../mesh/rnd-msh-mesh.hpp"
 #include "../rnd-engine.hpp"
 #include "../scene/rnd-scn-scene.hpp"
+#include "../widget/rnd-wdg-widget.hpp"
 #include <iostream>
 
 gearoenix::render::model::Model::Model(system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
@@ -58,16 +60,22 @@ gearoenix::render::model::Model* gearoenix::render::model::Model::read(system::F
     core::Id t;
     f->read(t);
     switch (t) {
-    case 1:
-    case 2:
-        return new gearoenix::render::model::Model(f, e, c);
+    case WIDGET:
+        return widget::Widget::read(f, e, c);
+    case BASIC:
+        return new Model(f, e, c);
     default:
         UNEXPECTED;
     }
     return nullptr;
 }
 
-gearoenix::render::model::Model::~Model() {}
+gearoenix::render::model::Model::~Model()
+{
+    for (animation::Animation* a : animations)
+        delete a;
+    animations.clear();
+}
 
 void gearoenix::render::model::Model::commit(const scene::Scene* s)
 {
