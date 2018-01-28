@@ -93,6 +93,7 @@ void gearoenix::gles3::Engine::window_changed()
 
 void gearoenix::gles3::Engine::update()
 {
+    update_time();
     glClear(GL_COLOR_BUFFER_BIT);
     do_load_functions();
     physics_engine->wait();

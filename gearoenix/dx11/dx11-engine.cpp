@@ -307,6 +307,7 @@ void gearoenix::dx11::Engine::window_changed()
 
 void gearoenix::dx11::Engine::update()
 {
+    update_time();
     context->ClearRenderTargetView(main_rtv, clear_color);
     do_load_functions();
     physics_engine->wait();

@@ -3,6 +3,7 @@
 #include "../core/cr-build-configuration.hpp"
 #include "../core/cr-end-caller.hpp"
 #include "../core/cr-types.hpp"
+#include <chrono>
 #include <functional>
 #include <memory>
 #ifdef THREAD_SUPPORTED
@@ -64,6 +65,8 @@ namespace render {
         EngineType engine_type = EngineType::UNKNOWN;
         system::Application* sysapp;
         pipeline::Manager* pipmgr;
+        std::chrono::steady_clock::time_point now_time;
+        std::chrono::duration<core::Real> delta_time;
 #ifdef THREAD_SUPPORTED
         core::Semaphore* load_functions_mutex;
         core::Semaphore* loaded_scenes_mutex;
@@ -102,6 +105,9 @@ namespace render {
         const std::shared_ptr<scene::Scene>& get_scene(unsigned int scene_index) const;
         const std::vector<std::shared_ptr<scene::Scene>>& get_all_scenes() const;
         void load_scene(core::Id scene_id, std::function<void(unsigned int)> on_load);
+        void update_time();
+        const std::chrono::steady_clock::time_point& get_now_time() const;
+        const std::chrono::steady_clock::time_point& get_delta_time() const;
     };
 }
 }
