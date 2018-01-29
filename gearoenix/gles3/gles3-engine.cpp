@@ -2,7 +2,8 @@
 #ifdef USE_OPENGL_ES3
 #include "../core/asset/cr-asset-manager.hpp"
 #include "../core/cr-end-caller.hpp"
-#include "../core/cr-event.hpp"
+#include "../core/event/cr-evn-event.hpp"
+#include "../core/event/cr-evn-window-resize.hpp"
 #include "../physics/phs-engine.hpp"
 #include "../render/camera/rnd-cmr-camera.hpp"
 #include "../render/pipeline/rnd-pip-manager.hpp"
