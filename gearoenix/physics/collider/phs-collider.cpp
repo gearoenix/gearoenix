@@ -8,6 +8,8 @@ gearoenix::physics::collider::Collider::Collider(Type t)
 {
 }
 
+gearoenix::physics::collider::Collider::~Collider() {}
+
 gearoenix::physics::collider::Collider* gearoenix::physics::collider::Collider::read(system::File* in)
 {
     core::Id collider_type_id;

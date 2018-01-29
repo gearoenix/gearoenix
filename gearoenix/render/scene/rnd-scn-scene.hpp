@@ -52,7 +52,14 @@ namespace render {
         class Scene : public core::asset::Asset {
             friend class physics::Kernel;
 
+        public:
+            typedef enum : core::Id {
+                GAME = 1,
+                UI = 2,
+            } SceneType;
+
         private:
+            const SceneType scene_type;
             std::vector<std::shared_ptr<camera::Camera>> cameras;
             std::vector<std::shared_ptr<audio::Audio>> audios;
             std::vector<std::shared_ptr<light::Light>> lights;
@@ -75,13 +82,13 @@ namespace render {
             void add_model(core::Id id, std::shared_ptr<model::Model> m);
 
         protected:
-            Scene(system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
+            Scene(SceneType t, system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
 
         public:
             void commit();
             void cast_shadow();
             void draw(texture::Texture2D* shadow_texture);
-            ~Scene();
+            virtual ~Scene();
             static Scene* read(system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
             const std::map<core::Id, std::weak_ptr<model::Model>>& get_all_models() const;
             const std::map<core::Id, std::shared_ptr<physics::constraint::Constraint>>& get_all_root_constraints() const;
@@ -92,7 +99,7 @@ namespace render {
             const light::Sun* get_sun() const;
             void set_renderable(bool);
             void clean();
-            void on_event(const core::event::Event& e);
+            virtual void on_event(const core::event::Event& e);
         };
     }
 }

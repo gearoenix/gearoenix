@@ -15,6 +15,7 @@
 #include "../model/rnd-mdl-model.hpp"
 #include "../rnd-engine.hpp"
 #include "../shader/rnd-shd-shader.hpp"
+#include "rnd-scn-ui.hpp"
 
 void gearoenix::render::scene::Scene::add_model(core::Id id, std::shared_ptr<model::Model> m)
 {
@@ -40,7 +41,8 @@ void gearoenix::render::scene::Scene::add_model(core::Id id, std::shared_ptr<mod
     }
 }
 
-gearoenix::render::scene::Scene::Scene(system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
+gearoenix::render::scene::Scene::Scene(SceneType t, system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
+    : scene_type(t)
 //: e(e)
 {
     ambient_light.read(f);
@@ -95,9 +97,10 @@ gearoenix::render::scene::Scene* gearoenix::render::scene::Scene::read(
     core::Id t;
     f->read(t);
     switch (t) {
-    case 1:
-    case 2:
-        return new Scene(f, e, c);
+    case SceneType::GAME:
+        return new Scene(SceneType::GAME, f, e, c);
+    case SceneType::UI:
+        return new Ui(f, e, c);
     default:
         UNEXPECTED;
     }

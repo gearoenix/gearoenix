@@ -21,9 +21,6 @@ namespace system {
 }
 namespace render {
     class Engine;
-    namespace animation {
-        class Animation;
-    }
     namespace camera {
         class Camera;
     }
@@ -78,7 +75,6 @@ namespace render {
                 meshes;
             // model_id -> model
             std::map<core::Id, std::shared_ptr<Model>> children;
-            std::vector<animation::Animation*> animations;
             physics::collider::Collider* collider = nullptr;
 
         public:

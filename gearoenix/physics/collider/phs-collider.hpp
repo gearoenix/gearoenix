@@ -23,6 +23,7 @@ namespace physics {
             Collider() = delete;
 
         public:
+            virtual ~Collider();
             static Collider* read(system::File* in);
             virtual void update(const math::Mat4x4& m) = 0;
         };

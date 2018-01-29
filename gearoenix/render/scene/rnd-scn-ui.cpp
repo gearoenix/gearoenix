@@ -1,0 +1,12 @@
+#include "rnd-scn-ui.hpp"
+
+gearoenix::render::scene::Ui::Ui(system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
+    : Scene(Scene::SceneType::UI, f, e, c)
+{
+}
+
+void gearoenix::render::scene::Ui::on_event(const core::event::Event& e)
+{
+    Scene::on_event(e);
+    // todo
+}

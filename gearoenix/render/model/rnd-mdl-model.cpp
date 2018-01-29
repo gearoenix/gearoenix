@@ -4,7 +4,6 @@
 #include "../../physics/collider/phs-collider.hpp"
 #include "../../system/sys-app.hpp"
 #include "../../system/sys-file.hpp"
-#include "../animation/rnd-anm-animation.hpp"
 #include "../camera/rnd-cmr-camera.hpp"
 #include "../camera/rnd-cmr-orthographic.hpp"
 #include "../light/rnd-lt-sun.hpp"
@@ -72,9 +71,9 @@ gearoenix::render::model::Model* gearoenix::render::model::Model::read(system::F
 
 gearoenix::render::model::Model::~Model()
 {
-    for (animation::Animation* a : animations)
-        delete a;
-    animations.clear();
+    if (collider != nullptr)
+        delete collider;
+    collider = nullptr;
 }
 
 void gearoenix::render::model::Model::commit(const scene::Scene* s)
