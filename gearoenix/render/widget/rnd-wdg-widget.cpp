@@ -3,7 +3,7 @@
 #include "rnd-wdg-button.hpp"
 
 gearoenix::render::widget::Widget::Widget(system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
-    : model::Model(f, e, c)
+    : model::Model(ModelType::WIDGET, f, e, c)
 {
 }
 

@@ -25,6 +25,8 @@ namespace physics {
             Mesh(system::File* in);
             ~Mesh();
             void update(const math::Mat4x4& m);
+			bool hit(const math::Ray3& r, core::Real& distance_from_origin) const;
+			bool hit(const math::Ray3& r, core::Real& distance_from_origin, math::Vec2& factors) const;
         };
     }
 }

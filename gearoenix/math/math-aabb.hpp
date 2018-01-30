@@ -13,7 +13,7 @@ namespace math {
         Aabb3(const Vec3& max, const Vec3& min);
         void reset(const Vec3& p);
         void put(const Vec3& p);
-        bool test(const Ray3& r, core::Real& tmin);
+        bool test(const Ray3& r, core::Real& tmin) const;
     };
 }
 }

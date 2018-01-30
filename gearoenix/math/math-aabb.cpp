@@ -28,7 +28,7 @@ void gearoenix::math::Aabb3::put(const Vec3& p)
             b[i] = p[i];
 }
 
-bool gearoenix::math::Aabb3::test(const Ray3& ray, core::Real& tmin_result)
+bool gearoenix::math::Aabb3::test(const Ray3& ray, core::Real& tmin_result) const
 {
     const math::Vec3& ro = ray.get_origin();
     const math::Vec3& rd = ray.get_direction();
@@ -48,8 +48,10 @@ bool gearoenix::math::Aabb3::test(const Ray3& ray, core::Real& tmin_result)
         tmin = GXMAX(tmin, mnf);
     }
     if ((tmax >= tmin) && tmax > 0.0f) {
-        tmin_result = tmin;
-        return true;
+		if (tmin_result > tmin) {
+			tmin_result = tmin;
+			return true;
+		}
     }
 
     return false;

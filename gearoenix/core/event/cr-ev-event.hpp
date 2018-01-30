@@ -31,9 +31,9 @@ namespace core {
         public:
             virtual ~Event();
             EventType get_type() const;
-            const button::Button* to_button() const;
-            const movement::Movement* to_movement() const;
-            const WindowResize* to_window_resize() const;
+            const button::Button& to_button() const;
+            const movement::Movement& to_movement() const;
+            const WindowResize& to_window_resize() const;
         };
     }
 }

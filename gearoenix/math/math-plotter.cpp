@@ -36,8 +36,8 @@ gearoenix::math::Plotter::Plotter(std::uint32_t* const pixels, const int img_wid
 
 void gearoenix::math::Plotter::draw_point(const Vec2& pos, const Brush& b)
 {
-    const int x = std::round(pos[0]);
-    const int y = std::round(pos[1]);
+    const int x = static_cast<int>(std::round(pos[0]));
+    const int y = static_cast<int>(std::round(pos[1]));
     plot(x, y, b);
 }
 

@@ -3,6 +3,8 @@
 #include "../../core/asset/cr-asset.hpp"
 #include "../../math/math-matrix.hpp"
 #include "../../math/math-vector.hpp"
+#include "../../math/math-ray.hpp"
+
 namespace gearoenix {
 namespace core {
     namespace event {
@@ -65,6 +67,7 @@ namespace render {
             void clean();
             virtual bool in_sight(const math::Vec3& location, const core::Real radius) const = 0;
             virtual void on_event(const core::event::Event& e);
+			virtual math::Ray3 create_ray3(const core::Real x, const core::Real y) const = 0;
         };
     }
 }

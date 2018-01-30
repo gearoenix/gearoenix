@@ -31,7 +31,7 @@ bool gearoenix::math::Triangle3::intersect(const Ray3& r, const core::Real tmin,
     }
     const core::Real t = edge[1].dot(qvec) * inv_det; // Set distance along ray to intersection
     if (t < tmin) {
-        if (t > GXPOSEPSILON) {
+        if (t > 0.0f) {
             out_factors[0] = t;
             out_factors[1] = u;
             out_factors[2] = v;

@@ -14,13 +14,8 @@ gearoenix::dx11::texture::Cube::Cube(system::File* file, Engine* eng, core::EndC
 {
     std::vector<std::vector<unsigned char>> img_data(FACES_COUNT);
     unsigned int imgw, imgh;
-    std::vector<core::Offset> img_offs(5);
-    for (int i = 0; i < 5; ++i) {
-        file->read(img_offs[i]);
-    }
     render::texture::PNG::decode(file, img_data[0], imgw, imgh);
     for (int i = 1; i < FACES_COUNT; ++i) {
-        file->seek((unsigned int)img_offs[i - 1]);
         unsigned int tmpimgw, tmpimgh;
         render::texture::PNG::decode(file, img_data[i], tmpimgw, tmpimgh);
         if (imgw != tmpimgw || imgw != tmpimgh) {

@@ -15,7 +15,8 @@
 #include "../widget/rnd-wdg-widget.hpp"
 #include <iostream>
 
-gearoenix::render::model::Model::Model(system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
+gearoenix::render::model::Model::Model(ModelType t, system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
+	:model_type(t)
 {
     m.read(f);
     occrdss.read(f);
@@ -62,7 +63,7 @@ gearoenix::render::model::Model* gearoenix::render::model::Model::read(system::F
     case WIDGET:
         return widget::Widget::read(f, e, c);
     case BASIC:
-        return new Model(f, e, c);
+        return new Model(ModelType::BASIC, f, e, c);
     default:
         UNEXPECTED;
     }
@@ -185,4 +186,15 @@ void gearoenix::render::model::Model::global_scale(const core::Real s)
 {
     m.scale4x3(s);
     changed = true;
+}
+
+gearoenix::render::model::Model::ModelType gearoenix::render::model::Model::get_type() const
+{
+	return model_type;
+}
+
+bool gearoenix::render::model::Model::hit(const math::Ray3 & r, core::Real& d) const
+{
+	if (nullptr == collider) return false;
+	return collider->hit(r, d);
 }

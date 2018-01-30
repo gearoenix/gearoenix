@@ -39,8 +39,16 @@ bool gearoenix::render::camera::Orthographic::in_sight(const math::Vec3& locatio
 void gearoenix::render::camera::Orthographic::on_event(const core::event::Event& e)
 {
     Camera::on_event(e);
-    const core::event::WindowResize* event = e.to_window_resize();
-    if (nullptr != event) {
-        on_ratio_change();
-    }
+	if (e.get_type() == core::event::Event::EventType::WINDOW_RESIZE)
+		on_ratio_change();
+}
+
+gearoenix::math::Ray3 gearoenix::render::camera::Orthographic::create_ray3(const core::Real x, const core::Real y) const
+{
+	math::Vec3 dir = -(z * start);
+	math::Vec3 origin = (this->x * x) + (this->y * y) + dir + l;
+	dir.normalize();
+	origin.print();
+	dir.print();
+	return math::Ray3(origin, dir);
 }

@@ -5,6 +5,7 @@
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../core/cr-application.hpp"
 #include "../../core/cr-static.hpp"
+#include "../../core/event/cr-ev-bt-mouse.hpp"
 #include "../sys-log.hpp"
 #ifdef USE_VULKAN
 #include "../../vulkan/vk-engine.hpp"
@@ -101,33 +102,80 @@ LRESULT CALLBACK gearoenix::system::Application::handler(HWND hwnd, UINT umessag
         //	}
         //}
         break;
-    case WM_RBUTTONDOWN:
-        mouse_prepos_x = LOWORD(lparam);
-        mouse_prepos_y = HIWORD(lparam);
-        core_app->on_mouse(core::Application::MouseButton::RIGHT, core::Application::ButtonAction::PRESS, (core::Real)mouse_prepos_x, (core::Real)mouse_prepos_y);
-        break;
-    case WM_LBUTTONDOWN:
-        mouse_prepos_x = LOWORD(lparam);
-        mouse_prepos_y = HIWORD(lparam);
-        core_app->on_mouse(core::Application::MouseButton::LEFT, core::Application::ButtonAction::PRESS, (core::Real)mouse_prepos_x, (core::Real)mouse_prepos_y);
-        break;
-    case WM_MBUTTONDOWN:
-        mouse_prepos_x = LOWORD(lparam);
-        mouse_prepos_y = HIWORD(lparam);
-        core_app->on_mouse(core::Application::MouseButton::MIDDLE, core::Application::ButtonAction::PRESS, (core::Real)mouse_prepos_x, (core::Real)mouse_prepos_y);
-        break;
-    case WM_LBUTTONUP:
-        mouse_prepos_x = LOWORD(lparam);
-        mouse_prepos_y = HIWORD(lparam);
-        core_app->on_mouse(core::Application::MouseButton::LEFT, core::Application::ButtonAction::RELEASE, (core::Real)mouse_prepos_x, (core::Real)mouse_prepos_y);
-        break;
+	case WM_LBUTTONDBLCLK:
+	case WM_MBUTTONDBLCLK:
+	case WM_RBUTTONDBLCLK:
+	case WM_LBUTTONDOWN:
+	case WM_MBUTTONDOWN:
+	case WM_RBUTTONDOWN:
+	case WM_LBUTTONUP:
+	case WM_MBUTTONUP:
+	case WM_RBUTTONUP:
+	{
+		mouse_prepos_x = LOWORD(lparam);
+		mouse_prepos_y = HIWORD(lparam);
+		core::Real hh = (core::Real) screen_height * 0.5f;
+		core::Real rhh = 1.0f / hh;
+		core::Real x = (core::Real) mouse_prepos_x;
+		x *= rhh;
+		x -= get_window_ratio();
+		core::Real y = (core::Real) mouse_prepos_y;
+		y -= hh;
+		y *= rhh;
+		core::event::button::Button::KeyType k;
+		switch (umessage) {
+		case WM_LBUTTONDBLCLK:
+		case WM_LBUTTONDOWN:
+		case WM_LBUTTONUP:
+			k = core::event::button::Button::KeyType::LEFT;
+			break;
+		case WM_RBUTTONDBLCLK:
+		case WM_RBUTTONDOWN:
+		case WM_RBUTTONUP:
+			k = core::event::button::Button::KeyType::RIGHT;
+			break;
+		case WM_MBUTTONDBLCLK:
+		case WM_MBUTTONDOWN:
+		case WM_MBUTTONUP:
+			k = core::event::button::Button::KeyType::MIDDLE;
+			break;
+		default:
+			k = core::event::button::Button::KeyType::LEFT;
+			break;
+		}
+		core::event::button::Button::ActionType a;
+		switch (umessage) {
+		case WM_LBUTTONDBLCLK:
+		case WM_MBUTTONDBLCLK:
+		case WM_RBUTTONDBLCLK:
+			a = core::event::button::Button::ActionType::DOUBLE;
+			break;
+		case WM_LBUTTONDOWN:
+		case WM_MBUTTONDOWN:
+		case WM_RBUTTONDOWN:
+			a = core::event::button::Button::ActionType::PRESS;
+			break;
+		case WM_LBUTTONUP:
+		case WM_MBUTTONUP:
+		case WM_RBUTTONUP:
+			a = core::event::button::Button::ActionType::RELEASE;
+			break;
+		default:
+			a = core::event::button::Button::ActionType::PRESS;
+			break;
+		}
+		core::event::button::Mouse e(k, a, x, y);
+		core_app->on_event(e);
+		render_engine->on_event(e);
+		break;
+	}
     case WM_MOUSEWHEEL:
-        core_app->on_scroll(((core::Real)GET_WHEEL_DELTA_WPARAM(wparam)) * 0.01f);
+        //core_app->on_scroll(((core::Real)GET_WHEEL_DELTA_WPARAM(wparam)) * 0.01f);
         break;
     case WM_MOUSEMOVE: {
         UINT posx = LOWORD(lparam);
         UINT posy = HIWORD(lparam);
-        core_app->on_mouse_move((core::Real)mouse_prepos_x - (core::Real)posx, (core::Real)mouse_prepos_y - (core::Real)posy);
+        //core_app->on_mouse_move((core::Real)mouse_prepos_x - (core::Real)posx, (core::Real)mouse_prepos_y - (core::Real)posy);
         mouse_prepos_x = posx;
         mouse_prepos_y = posy;
         break;

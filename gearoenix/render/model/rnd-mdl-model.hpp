@@ -10,6 +10,9 @@
 #include <tuple>
 #include <vector>
 namespace gearoenix {
+	namespace math {
+		struct Ray3;
+	}
 namespace physics {
     class Kernel;
     namespace collider {
@@ -43,13 +46,14 @@ namespace render {
             friend class physics::Kernel;
 
         public:
-            enum ModelType {
+            typedef enum: core::Id {
                 BASIC = 1,
                 WIDGET = 2,
                 UNKNOWN = 0XFFFFFFFFFFFFFFFF,
-            };
+            } ModelType;
 
         protected:
+			const ModelType model_type;
             bool has_shadow_caster = false;
             bool has_transparent = false;
             bool is_in_sun = false;
@@ -76,9 +80,8 @@ namespace render {
             // model_id -> model
             std::map<core::Id, std::shared_ptr<Model>> children;
             physics::collider::Collider* collider = nullptr;
-
+            Model(ModelType t, system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
         public:
-            Model(system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
             static Model* read(system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
             virtual ~Model();
             void commit(const scene::Scene* s);
@@ -91,6 +94,8 @@ namespace render {
             const math::Mat4x4& get_sun_mvp() const;
             void translate(const math::Vec3& t);
             void global_scale(const core::Real s);
+			ModelType get_type() const;
+			bool hit(const math::Ray3& r, core::Real& distance_from_origin) const;
         };
     }
 }

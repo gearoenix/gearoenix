@@ -13,8 +13,8 @@ namespace core {
                 const core::Real y;
 
             public:
-                Mouse(KeyType k, core::Real x, core::Real y);
-                ~Mouse();
+                Mouse(KeyType k, ActionType a, core::Real x, core::Real y);
+                virtual ~Mouse();
                 core::Real get_x() const;
                 core::Real get_y() const;
             };

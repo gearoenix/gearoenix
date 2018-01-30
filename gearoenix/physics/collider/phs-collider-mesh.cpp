@@ -1,5 +1,6 @@
 #include "phs-collider-mesh.hpp"
 #include "../../math/math-matrix.hpp"
+#include "../../math/math-ray.hpp"
 #include "../../system/sys-file.hpp"
 
 gearoenix::physics::collider::Mesh::Mesh(system::File* in)
@@ -32,4 +33,27 @@ void gearoenix::physics::collider::Mesh::update(const math::Mat4x4& m)
         box.put(p3);
         ts[i] = math::Triangle3(p1, p2, p3);
     }
+}
+
+bool gearoenix::physics::collider::Mesh::hit(const math::Ray3 & r, core::Real & d) const
+{
+	math::Vec2 fs;
+	return hit(r, d, fs);
+}
+
+bool gearoenix::physics::collider::Mesh::hit(const math::Ray3 & r, core::Real & d, math::Vec2 & fs) const
+{
+	core::Real tmpd = d;
+	if (!box.test(r, tmpd)) {
+		bool result = false;
+		for (const math::Triangle3& t : ts) {
+			math::Vec3 mfs;
+			if (t.intersect(r, d, mfs)) {
+				fs = mfs.xy();
+				d = mfs[0];
+			}
+		}
+		return result;
+	}
+	return false;
 }

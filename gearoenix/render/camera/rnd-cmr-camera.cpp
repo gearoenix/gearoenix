@@ -265,8 +265,8 @@ void gearoenix::render::camera::Camera::clean()
 
 void gearoenix::render::camera::Camera::on_event(const core::event::Event& e)
 {
-    const core::event::WindowResize* event = e.to_window_resize();
-    if (nullptr != event) {
-        screen_ratio = event->get_current_width() / event->get_current_height();
+	if (e.get_type() == core::event::Event::EventType::WINDOW_RESIZE) {
+		const core::event::WindowResize& event = e.to_window_resize();
+        screen_ratio = event.get_current_width() / event.get_current_height();
     }
 }

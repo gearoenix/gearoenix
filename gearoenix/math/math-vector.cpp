@@ -401,6 +401,15 @@ gearoenix::math::Vec3 gearoenix::math::Vec3::normalized() const
     return Vec3(vec[0] / len, vec[1] / len, vec[2] / len);
 }
 
+void gearoenix::math::Vec3::normalize()
+{
+	core::Real l(sqrt(vec[0] * vec[0] + vec[1] * vec[1] + vec[2] * vec[2]));
+	l = 1.0f / l;
+	vec[0] *= l;
+	vec[1] *= l;
+	vec[2] *= l;
+}
+
 void gearoenix::math::Vec3::read(system::File* f)
 {
     f->read(vec[0]);
@@ -409,7 +418,7 @@ void gearoenix::math::Vec3::read(system::File* f)
 }
 void gearoenix::math::Vec3::print() const
 {
-    GXLOGI("Vec2(" << vec[0] << ", " << vec[1] << ", " << vec[2] << ")");
+    GXLOGI("Vec3(" << vec[0] << ", " << vec[1] << ", " << vec[2] << ")");
 }
 
 gearoenix::math::Vec4::Vec4()

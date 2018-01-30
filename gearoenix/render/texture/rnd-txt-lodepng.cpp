@@ -798,7 +798,7 @@ unsigned lodepng_huffman_code_lengths(unsigned* lengths, const unsigned* frequen
 
     if (numcodes == 0)
         return 80; /*error: a tree of 0 symbols is not supposed to be made*/
-    if ((1u << maxbitlen) < numcodes)
+    if ((size_t(1) << maxbitlen) < numcodes)
         return 80; /*error: represent all symbols*/
 
     leaves = (BPMNode*)lodepng_malloc(numcodes * sizeof(*leaves));
@@ -1504,12 +1504,12 @@ static void updateHashChain(Hash* hash, size_t wpos, unsigned hashval, unsigned 
     hash->val[wpos] = (int)hashval;
     if (hash->head[hashval] != -1)
         hash->chain[wpos] = hash->head[hashval];
-    hash->head[hashval] = wpos;
+    hash->head[hashval] = (int) wpos;
 
     hash->zeros[wpos] = numzeros;
     if (hash->headz[numzeros] != -1)
         hash->chainz[wpos] = hash->headz[numzeros];
-    hash->headz[numzeros] = wpos;
+    hash->headz[numzeros] = (int)wpos;
 }
 
 /*
@@ -1582,7 +1582,7 @@ static unsigned encodeLZ77(uivector* out, Hash* hash,
         for (;;) {
             if (chainlength++ >= maxchainlength)
                 break;
-            current_offset = hashpos <= wpos ? wpos - hashpos : wpos - hashpos + windowsize;
+            current_offset = hashpos <= wpos ? (unsigned int) wpos - hashpos : (unsigned int) wpos - hashpos + windowsize;
 
             if (current_offset < prev_offset)
                 break; /*stop when went completely around the circular buffer*/
@@ -3504,7 +3504,7 @@ unsigned lodepng_convert(unsigned char* out, const unsigned char* in,
     if (mode_out->colortype == LCT_PALETTE) {
         size_t palettesize = mode_out->palettesize;
         const unsigned char* palette = mode_out->palette;
-        size_t palsize = 1u << mode_out->bitdepth;
+        size_t palsize = size_t(1) << mode_out->bitdepth;
         /*if the user specified output palette but did not give the values, assume
     they want the values of the input color type (assuming that one is palette).
     Note that we never create a new palette ourselves.*/
@@ -3517,7 +3517,7 @@ unsigned lodepng_convert(unsigned char* out, const unsigned char* in,
         color_tree_init(&tree);
         for (i = 0; i != palsize; ++i) {
             const unsigned char* p = &palette[i * 4];
-            color_tree_add(&tree, p[0], p[1], p[2], p[3], i);
+            color_tree_add(&tree, p[0], p[1], p[2], p[3], (unsigned int) i);
         }
     }
 
@@ -4308,7 +4308,7 @@ static unsigned readChunk_tEXt(LodePNGInfo* info, const unsigned char* data, siz
 
         string2_begin = length + 1; /*skip keyword null terminator*/
 
-        length = chunkLength < string2_begin ? 0 : chunkLength - string2_begin;
+        length = chunkLength < string2_begin ? 0 : (unsigned int) chunkLength - string2_begin;
         str = (char*)lodepng_malloc(length + 1);
         if (!str)
             CERROR_BREAK(error, 83); /*alloc fail*/
@@ -4365,7 +4365,7 @@ static unsigned readChunk_zTXt(LodePNGInfo* info, const LodePNGDecompressSetting
         if (string2_begin > chunkLength)
             CERROR_BREAK(error, 75); /*no null termination, corrupt?*/
 
-        length = chunkLength - string2_begin;
+        length = (unsigned int) chunkLength - string2_begin;
         /*will fail if zlib error, e.g. if length is too small*/
         error = zlib_decompress(&decoded.data, &decoded.size,
             (unsigned char*)(&data[string2_begin]),
@@ -4459,7 +4459,7 @@ static unsigned readChunk_iTXt(LodePNGInfo* info, const LodePNGDecompressSetting
         /*read the actual text*/
         begin += length + 1;
 
-        length = chunkLength < begin ? 0 : chunkLength - begin;
+        length = chunkLength < begin ? 0 : (unsigned int) chunkLength - begin;
 
         if (compressed) {
             /*will fail if zlib error, e.g. if length is too small*/
@@ -5401,7 +5401,7 @@ static unsigned filter(unsigned char* out, const unsigned char* in, unsigned w, 
         for (y = 0; y != h; ++y) /*try the 5 filter types*/
         {
             for (type = 0; type != 5; ++type) {
-                unsigned testsize = linebytes;
+                unsigned testsize = (unsigned) linebytes;
                 /*if(testsize > 8) testsize /= 8;*/ /*it already works good enough by testing a part of the row*/
 
                 filterScanline(attempt[type], &in[y * linebytes], prevline, linebytes, bytewidth, type);
