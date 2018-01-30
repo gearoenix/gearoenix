@@ -29,5 +29,6 @@ public:
     void on_scroll(gearoenix::core::Real d);
     void on_mouse(MouseButton mb, ButtonAction ba, gearoenix::core::Real x, gearoenix::core::Real y);
     void on_mouse_move(gearoenix::core::Real dx, gearoenix::core::Real dy);
+    void on_event(const gearoenix::core::event::Event& e);
 };
 #endif

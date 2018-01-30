@@ -12,6 +12,9 @@ namespace system {
     class Application;
 }
 namespace core {
+    namespace event {
+        class Event;
+    }
     class Application {
     public:
         enum MouseButton {
@@ -32,11 +35,7 @@ namespace core {
         virtual ~Application();
         virtual void update() = 0;
         virtual void terminate() = 0;
-        virtual void on_zoom(Real d);
-        virtual void on_rotate(Real d);
-        virtual void on_scroll(Real d);
-        virtual void on_mouse(MouseButton mb, ButtonAction ba, Real x, Real y);
-        virtual void on_mouse_move(Real dx, Real dy);
+        virtual void on_event(const event::Event& e) = 0;
     };
 }
 }
@@ -68,7 +67,7 @@ namespace core {
         delete app;                                                                 \
         return 0;                                                                   \
     }
-#else
+#elif defined(IN_LINUX)
 #define GEAROENIX_START(CoreApp)                                                    \
     int main(int, char**)                                                           \
     {                                                                               \
@@ -78,5 +77,7 @@ namespace core {
         delete app;                                                                 \
         return 0;                                                                   \
     }
+#else
+#error "Unexpected platform."
 #endif
 #endif

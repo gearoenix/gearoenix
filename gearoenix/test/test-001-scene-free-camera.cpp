@@ -70,5 +70,9 @@ void TestApp::on_mouse_move(gearoenix::core::Real dx, gearoenix::core::Real dy)
         }
 }
 
+void TestApp::on_event(const gearoenix::core::event::Event&)
+{
+}
+
 GEAROENIX_START(TestApp)
 #endif

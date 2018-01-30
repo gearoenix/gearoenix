@@ -1,6 +1,7 @@
 #include "phs-cns-placer.hpp"
 #include "../../core/asset/cr-asset-manager.hpp"
-#include "../../core/cr-event.hpp"
+#include "../../core/event/cr-ev-event.hpp"
+#include "../../core/event/cr-ev-window-resize.hpp"
 #include "../../render/model/rnd-mdl-model.hpp"
 #include "../../render/rnd-engine.hpp"
 #include "../../system/sys-app.hpp"

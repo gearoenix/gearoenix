@@ -1,5 +1,6 @@
 #include "rnd-cmr-camera.hpp"
-#include "../../core/cr-event.hpp"
+#include "../../core/event/cr-ev-event.hpp"
+#include "../../core/event/cr-ev-window-resize.hpp"
 #include "../../system/sys-app.hpp"
 #include "../../system/sys-file.hpp"
 #include "../../system/sys-log.hpp"
