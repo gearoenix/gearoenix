@@ -77,7 +77,7 @@ namespace render {
             bool renderable = false;
             bool ambient_light_changed = true;
             math::Vec3 ambient_light = math::Vec3(0.2f, 0.2f, 0.2f);
-            //Engine* e;
+            Engine* const render_engine;
             void add_model(core::Id id, std::shared_ptr<model::Model> m);
             Scene(SceneType t, system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
 

@@ -17,6 +17,7 @@ namespace math {
         Triangle3();
         Triangle3(const Vec3& p1, const Vec3& p2, const Vec3& p3);
         bool intersect(const Ray3& r, const core::Real tmin, Vec3& out_factors) const;
+        void print() const;
     };
 }
 }

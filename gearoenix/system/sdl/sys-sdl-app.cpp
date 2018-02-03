@@ -2,6 +2,7 @@
 #ifdef USE_SDL
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../core/cr-application.hpp"
+#include "../../core/event/cr-ev-bt-mouse.hpp"
 #include "../../core/event/cr-ev-event.hpp"
 #include "../../core/event/cr-ev-window-resize.hpp"
 #include "../../gles2/gles2-engine.hpp"
@@ -146,32 +147,35 @@ int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_
     case SDL_MOUSEMOTION:
         // o->core_app->on_mouse_move((core::Real)event->motion.xrel, (core::Real)event->motion.yrel);
         break;
-    case SDL_MOUSEBUTTONDOWN:
-        switch (event->button.button) {
-        case SDL_BUTTON_LEFT:
-            // o->core_app->on_mouse(core::Application::MouseButton::LEFT, core::Application::ButtonAction::PRESS, (core::Real)event->button.x, (core::Real)event->button.y);
-            break;
-        case SDL_BUTTON_RIGHT:
-            // o->core_app->on_mouse(core::Application::MouseButton::RIGHT, core::Application::ButtonAction::PRESS, (core::Real)event->button.x, (core::Real)event->button.y);
-            break;
-        case SDL_BUTTON_MIDDLE:
-            // o->core_app->on_mouse(core::Application::MouseButton::MIDDLE, core::Application::ButtonAction::PRESS, (core::Real)event->button.x, (core::Real)event->button.y);
-            break;
-        }
-        break;
     case SDL_MOUSEBUTTONUP:
-        switch (event->button.button) {
-        case SDL_BUTTON_LEFT:
-            // o->core_app->on_mouse(core::Application::MouseButton::LEFT, core::Application::ButtonAction::RELEASE, (core::Real)event->button.x, (core::Real)event->button.y);
+    case SDL_MOUSEBUTTONDOWN: {
+        core::event::button::Button::ActionType a = core::event::button::Button::ActionType::PRESS;
+        switch (event->type) {
+        case SDL_MOUSEBUTTONUP:
+            a = core::event::button::Button::ActionType::RELEASE;
             break;
-        case SDL_BUTTON_RIGHT:
-            // o->core_app->on_mouse(core::Application::MouseButton::RIGHT, core::Application::ButtonAction::RELEASE, (core::Real)event->button.x, (core::Real)event->button.y);
-            break;
-        case SDL_BUTTON_MIDDLE:
-            // o->core_app->on_mouse(core::Application::MouseButton::MIDDLE, core::Application::ButtonAction::RELEASE, (core::Real)event->button.x, (core::Real)event->button.y);
+        default:
             break;
         }
+        core::event::button::Button::KeyType k = core::event::button::Button::KeyType::LEFT;
+        switch (event->button.button) {
+        case SDL_BUTTON_RIGHT:
+            k = core::event::button::Button::KeyType::RIGHT;
+            break;
+        case SDL_BUTTON_MIDDLE:
+            k = core::event::button::Button::KeyType::MIDDLE;
+            break;
+        default:
+            break;
+        }
+        const core::Real ihh = 2.0f / (core::Real)o->win_height;
+        const core::Real x = (((core::Real)event->button.x) * ihh) - o->get_window_ratio();
+        const core::Real y = 1.0f - (((core::Real)event->button.y) * ihh);
+        core::event::button::Mouse e(k, a, x, y);
+        o->core_app->on_event(e);
+        o->render_engine->on_event(e);
         break;
+    }
     case SDL_MULTIGESTURE:
         if (event->mgesture.dTheta > rotate_epsilon || event->mgesture.dTheta < -rotate_epsilon) {
             // o->core_app->on_rotate(event->mgesture.dTheta);

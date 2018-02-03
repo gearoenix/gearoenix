@@ -4,16 +4,20 @@
 
 gearoenix::core::Id gearoenix::physics::animation::Animation::last_id = 0;
 
-gearoenix::physics::animation::Animation::Animation(Type t, const std::function<void(core::Real)>& a, const std::chrono::milliseconds& d)
+gearoenix::physics::animation::Animation::Animation(Type t, const std::function<void(core::Real, core::Real)>& a, const std::chrono::milliseconds& d, std::function<void()> on_delete)
     : animation_type(t)
     , action(a)
+    , on_delete(on_delete)
     , start(std::chrono::steady_clock::now())
     , duration(std::chrono::duration_cast<std::chrono::steady_clock::time_point::duration>(d))
     , end(start + duration)
 {
 }
 
-gearoenix::physics::animation::Animation::~Animation() {}
+gearoenix::physics::animation::Animation::~Animation()
+{
+    on_delete();
+}
 
 void gearoenix::physics::animation::Animation::set_start(const std::chrono::steady_clock::time_point& t)
 {
@@ -21,6 +25,8 @@ void gearoenix::physics::animation::Animation::set_start(const std::chrono::stea
     if (start > end)
         UNEXPECTED;
 #endif
+    if (start < t)
+        ended = false;
     start = t;
     end = start + duration;
 }
@@ -31,23 +37,39 @@ void gearoenix::physics::animation::Animation::set_end(const std::chrono::steady
     if (start > end)
         UNEXPECTED;
 #endif
+    if (end < t)
+        ended = false;
     end = t;
     duration = end - start;
 }
 
 void gearoenix::physics::animation::Animation::set_duration(const std::chrono::steady_clock::time_point::duration& d)
 {
+    if (duration < d)
+        ended = false;
     duration = d;
     end = start + duration;
 }
 
-bool gearoenix::physics::animation::Animation::apply(const std::chrono::steady_clock::time_point& now)
+bool gearoenix::physics::animation::Animation::apply(
+    const std::chrono::steady_clock::time_point& now,
+    const core::Real delta_millisecond)
 {
-    action(std::chrono::duration_cast<std::chrono::duration<core::Real>>(now - start).count());
+    action(std::chrono::duration_cast<std::chrono::duration<core::Real>>(now - start).count(), delta_millisecond);
     return false;
+}
+
+gearoenix::core::Id gearoenix::physics::animation::Animation::get_id() const
+{
+    return last_id;
 }
 
 gearoenix::physics::animation::Animation::Type gearoenix::physics::animation::Animation::get_type() const
 {
     return animation_type;
+}
+
+bool gearoenix::physics::animation::Animation::is_ended() const
+{
+    return ended;
 }

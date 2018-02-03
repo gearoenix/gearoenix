@@ -4,7 +4,7 @@
 namespace gearoenix {
 namespace math {
     struct Mat4x4;
-	struct Ray3;
+    struct Ray3;
 }
 namespace system {
     class File;
@@ -27,7 +27,8 @@ namespace physics {
             virtual ~Collider();
             static Collider* read(system::File* in);
             virtual void update(const math::Mat4x4& m) = 0;
-			virtual bool hit(const math::Ray3& r, core::Real& distance_from_origin) const = 0;
+            virtual bool hit(const math::Ray3& r, core::Real& distance_from_origin) const = 0;
+            virtual void print() const = 0;
         };
     }
 }

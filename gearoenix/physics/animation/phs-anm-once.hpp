@@ -6,9 +6,9 @@ namespace physics {
         class Once : public Animation {
         protected:
         public:
-            Once(const std::function<void(core::Real)>& action, const std::chrono::milliseconds& duration);
+            Once(const std::function<void(core::Real, core::Real)>& action, const std::chrono::milliseconds& duration, std::function<void()> on_delete = []() -> void {});
             virtual ~Once();
-            virtual bool apply(const std::chrono::steady_clock::time_point& now);
+            virtual bool apply(const std::chrono::steady_clock::time_point& now, const core::Real delta_millisecond);
         };
     }
 }

@@ -108,6 +108,7 @@ namespace render {
         void update_time();
         const std::chrono::steady_clock::time_point& get_now_time() const;
         const std::chrono::steady_clock::time_point& get_delta_time() const;
+        physics::Engine* get_physics_engine();
     };
 }
 }

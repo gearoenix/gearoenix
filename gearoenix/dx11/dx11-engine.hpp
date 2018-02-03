@@ -27,14 +27,14 @@ namespace dx11 {
         ID3D11RenderTargetView* main_rtv = nullptr;
         ID3D11Texture2D* main_dsb = nullptr;
         ID3D11DepthStencilState* main_dss = nullptr;
-		ID3D11BlendState* main_bs = nullptr;
+        ID3D11BlendState* main_bs = nullptr;
         ID3D11DepthStencilView* main_dsv = nullptr;
         D3D11_VIEWPORT main_viewport;
         ID3D11RasterizerState* raster = nullptr;
         ID3D11RenderTargetView* shadow_rtv = nullptr;
         ID3D11Texture2D* shadow_dsb = nullptr;
         ID3D11DepthStencilView* shadow_dsv = nullptr;
-		ID3D11BlendState* shadow_bs = nullptr;
+        ID3D11BlendState* shadow_bs = nullptr;
         D3D11_VIEWPORT shadow_viewport;
         texture::Texture2D* shadow_txt = nullptr;
         void initial_shadow();

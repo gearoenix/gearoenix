@@ -75,7 +75,7 @@ void gearoenix::math::CubicBezierCurve2D::normalize(const core::Real scale)
 {
     const core::Real scale2 = 0.9f * scale;
     const core::Real scale3 = 0.05f * scale;
-    const int points_count = (int) points.size();
+    const int points_count = (int)points.size();
     if (points_count == 0)
         return;
     core::Real maxx = points[0].in[0], minx = points[0].in[0];
@@ -123,7 +123,7 @@ void gearoenix::math::CubicBezierCurve2D::render(std::uint32_t* pixels, const in
     Plotter plotter(pixels, img_width, img_height);
     const Plotter::Brush brush1(10, color);
     const Plotter::Brush brush2(1, 0XFF00FF00);
-    const int cnt = (int) points.size() - 1;
+    const int cnt = (int)points.size() - 1;
     for (int i = 0; i < cnt;) {
         const math::Vec2& p1 = points[i].position;
         const math::Vec2& p2 = points[i].out;
@@ -147,7 +147,7 @@ void gearoenix::math::CubicBezierCurve2D::render(std::uint32_t* pixels, const in
         }
     }
     //---------------------- for debug (it will be removed in near future)
-    const int points_count = (int) points.size();
+    const int points_count = (int)points.size();
     for (int i = 0; i < points_count; ++i) {
         plotter.draw_line(points[i].in, points[i].out, brush2);
     }
@@ -196,7 +196,7 @@ void gearoenix::math::CubicBezierCurve2D::render(std::uint32_t* pixels, const in
             }
         }
     }
-    const int prp_count = (int) mappoints.size();
+    const int prp_count = (int)mappoints.size();
     Vec2 pathdir;
     Vec2 laspos = mappoints[0].position;
     std::vector<Point> mmapp;

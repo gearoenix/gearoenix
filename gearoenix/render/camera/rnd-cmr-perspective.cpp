@@ -45,16 +45,14 @@ bool gearoenix::render::camera::Perspective::in_sight(const math::Vec3& location
 void gearoenix::render::camera::Perspective::on_event(const core::event::Event& e)
 {
     Camera::on_event(e);
-	if(e.get_type() == core::event::Event::EventType::WINDOW_RESIZE)
+    if (e.get_type() == core::event::Event::EventType::WINDOW_RESIZE)
         on_ratio_change();
 }
 
 gearoenix::math::Ray3 gearoenix::render::camera::Perspective::create_ray3(const core::Real x, const core::Real y) const
 {
-	math::Vec3 dir = (this->x * x) + (this->y * y) - (z * start);
-	math::Vec3 origin = dir + l;
-	dir.normalize();
-	origin.print();
-	dir.print();
-	return math::Ray3(origin, dir);
+    math::Vec3 dir = (this->x * x) + (this->y * y) - (z * start);
+    math::Vec3 origin = dir + l;
+    dir.normalize();
+    return math::Ray3(origin, dir);
 }

@@ -1,5 +1,6 @@
 #include "math-triangle.hpp"
 #include "../core/cr-static.hpp"
+#include "../system/sys-log.hpp"
 #include "math-ray.hpp"
 
 gearoenix::math::Triangle3::Triangle3() {}
@@ -39,4 +40,14 @@ bool gearoenix::math::Triangle3::intersect(const Ray3& r, const core::Real tmin,
         }
     }
     return false;
+}
+
+void gearoenix::math::Triangle3::print() const
+{
+    GXLOGI("head:");
+    head.print();
+    GXLOGI("edge[0]:");
+    edge[0].print();
+    GXLOGI("edge[1]:");
+    edge[1].print();
 }

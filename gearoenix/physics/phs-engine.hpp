@@ -3,6 +3,7 @@
 #include "../core/cr-build-configuration.hpp"
 #include "../core/cr-types.hpp"
 #include <map>
+#include <memory>
 namespace gearoenix {
 namespace core {
     class Semaphore;
@@ -22,7 +23,7 @@ namespace physics {
         render::Engine* render_engine;
         // owner
         // if animation return true on its apply its gonna be deleted
-        std::map<core::Id, animation::Animation*> animations;
+        std::map<core::Id, std::shared_ptr<animation::Animation>> animations;
         bool animations_need_cleaning = false;
 #ifdef THREAD_SUPPORTED
         const unsigned int threads_count = 4;
@@ -36,10 +37,10 @@ namespace physics {
     public:
         Engine(render::Engine* rndeng);
         ~Engine();
-        // engine gonna delete it whenever animation return true on its apply function
-        void add_animation(animation::Animation* a);
+        // engine gonna remove it from its active animations, caller must take care of its deleteing
+        void add_animation(std::shared_ptr<animation::Animation> a);
         // caller must take care of deleting
-        void remove_animation(animation::Animation* a);
+        void remove_animation(std::shared_ptr<animation::Animation> a);
         void update();
         void wait();
     };

@@ -80,11 +80,11 @@ void gearoenix::dx11::Engine::initial_shadow()
     shadow_viewport.TopLeftX = 0.0f;
     shadow_viewport.TopLeftY = 0.0f;
     txt->Release();
-	D3D11_BLEND_DESC blend_desc;
-	GXSETZ(blend_desc);
-	blend_desc.RenderTarget[0].BlendEnable = false;
-	blend_desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
-	GXHRCHK(device->CreateBlendState(&blend_desc, &shadow_bs));
+    D3D11_BLEND_DESC blend_desc;
+    GXSETZ(blend_desc);
+    blend_desc.RenderTarget[0].BlendEnable = false;
+    blend_desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+    GXHRCHK(device->CreateBlendState(&blend_desc, &shadow_bs));
 }
 
 void gearoenix::dx11::Engine::start_shadow_casting()
@@ -96,7 +96,7 @@ void gearoenix::dx11::Engine::start_shadow_casting()
     context->RSSetViewports(1, &shadow_viewport);
     context->ClearRenderTargetView(shadow_rtv, clear_color);
     context->ClearDepthStencilView(shadow_dsv, D3D11_CLEAR_DEPTH, 1.0f, 0);
-	context->OMSetBlendState(shadow_bs, clear_color, 0XFFFFFFFF);
+    context->OMSetBlendState(shadow_bs, clear_color, 0XFFFFFFFF);
 }
 
 void gearoenix::dx11::Engine::terminate_shadow()
@@ -109,8 +109,8 @@ void gearoenix::dx11::Engine::terminate_shadow()
     shadow_rtv = nullptr;
     delete shadow_txt;
     shadow_txt = nullptr;
-	delete shadow_bs;
-	shadow_bs = nullptr;
+    delete shadow_bs;
+    shadow_bs = nullptr;
 }
 
 gearoenix::dx11::Engine::Engine(system::Application* sys_app)
@@ -264,17 +264,17 @@ adapter_found_label:
     depth_stencil_desc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
     GXHRCHK(device->CreateDepthStencilState(&depth_stencil_desc, &main_dss));
     context->OMSetDepthStencilState(main_dss, 1);
-	D3D11_BLEND_DESC blend_desc;
-	GXSETZ(blend_desc);
-	blend_desc.RenderTarget[0].BlendEnable = true; 
-	blend_desc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
-	blend_desc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
-	blend_desc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
-	blend_desc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
-	blend_desc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
-	blend_desc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
-	blend_desc.RenderTarget[0].RenderTargetWriteMask = 0X0F;
-	GXHRCHK(device->CreateBlendState(&blend_desc, &main_bs));
+    D3D11_BLEND_DESC blend_desc;
+    GXSETZ(blend_desc);
+    blend_desc.RenderTarget[0].BlendEnable = true;
+    blend_desc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+    blend_desc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+    blend_desc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+    blend_desc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+    blend_desc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+    blend_desc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+    blend_desc.RenderTarget[0].RenderTargetWriteMask = 0X0F;
+    GXHRCHK(device->CreateBlendState(&blend_desc, &main_bs));
     D3D11_DEPTH_STENCIL_VIEW_DESC depth_stencil_view_desc;
     GXSETZ(depth_stencil_view_desc);
     depth_stencil_view_desc.Format = depth_buffer_desc.Format;
@@ -335,7 +335,7 @@ void gearoenix::dx11::Engine::update()
         context->OMSetRenderTargets(1, &main_rtv, main_dsv);
         context->RSSetViewports(1, &main_viewport);
         context->ClearDepthStencilView(main_dsv, D3D11_CLEAR_DEPTH, 1.0f, 0);
-		context->OMSetBlendState(main_bs, clear_color, 0XFFFFFFFF);
+        context->OMSetBlendState(main_bs, clear_color, 0XFFFFFFFF);
         scene->draw(shadow_txt);
     }
     physics_engine->update();
@@ -346,9 +346,9 @@ void gearoenix::dx11::Engine::terminate()
 {
     if (swapchain == nullptr)
         return;
-	terminate_shadow();
-	delete main_bs;
-	main_bs = nullptr;
+    terminate_shadow();
+    delete main_bs;
+    main_bs = nullptr;
     swapchain->SetFullscreenState(false, NULL);
     delete sampler;
     sampler = nullptr;

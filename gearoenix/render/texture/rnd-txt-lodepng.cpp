@@ -1504,7 +1504,7 @@ static void updateHashChain(Hash* hash, size_t wpos, unsigned hashval, unsigned 
     hash->val[wpos] = (int)hashval;
     if (hash->head[hashval] != -1)
         hash->chain[wpos] = hash->head[hashval];
-    hash->head[hashval] = (int) wpos;
+    hash->head[hashval] = (int)wpos;
 
     hash->zeros[wpos] = numzeros;
     if (hash->headz[numzeros] != -1)
@@ -1582,7 +1582,7 @@ static unsigned encodeLZ77(uivector* out, Hash* hash,
         for (;;) {
             if (chainlength++ >= maxchainlength)
                 break;
-            current_offset = hashpos <= wpos ? (unsigned int) wpos - hashpos : (unsigned int) wpos - hashpos + windowsize;
+            current_offset = hashpos <= wpos ? (unsigned int)wpos - hashpos : (unsigned int)wpos - hashpos + windowsize;
 
             if (current_offset < prev_offset)
                 break; /*stop when went completely around the circular buffer*/
@@ -3517,7 +3517,7 @@ unsigned lodepng_convert(unsigned char* out, const unsigned char* in,
         color_tree_init(&tree);
         for (i = 0; i != palsize; ++i) {
             const unsigned char* p = &palette[i * 4];
-            color_tree_add(&tree, p[0], p[1], p[2], p[3], (unsigned int) i);
+            color_tree_add(&tree, p[0], p[1], p[2], p[3], (unsigned int)i);
         }
     }
 
@@ -4308,7 +4308,7 @@ static unsigned readChunk_tEXt(LodePNGInfo* info, const unsigned char* data, siz
 
         string2_begin = length + 1; /*skip keyword null terminator*/
 
-        length = chunkLength < string2_begin ? 0 : (unsigned int) chunkLength - string2_begin;
+        length = chunkLength < string2_begin ? 0 : (unsigned int)chunkLength - string2_begin;
         str = (char*)lodepng_malloc(length + 1);
         if (!str)
             CERROR_BREAK(error, 83); /*alloc fail*/
@@ -4365,7 +4365,7 @@ static unsigned readChunk_zTXt(LodePNGInfo* info, const LodePNGDecompressSetting
         if (string2_begin > chunkLength)
             CERROR_BREAK(error, 75); /*no null termination, corrupt?*/
 
-        length = (unsigned int) chunkLength - string2_begin;
+        length = (unsigned int)chunkLength - string2_begin;
         /*will fail if zlib error, e.g. if length is too small*/
         error = zlib_decompress(&decoded.data, &decoded.size,
             (unsigned char*)(&data[string2_begin]),
@@ -4459,7 +4459,7 @@ static unsigned readChunk_iTXt(LodePNGInfo* info, const LodePNGDecompressSetting
         /*read the actual text*/
         begin += length + 1;
 
-        length = chunkLength < begin ? 0 : (unsigned int) chunkLength - begin;
+        length = chunkLength < begin ? 0 : (unsigned int)chunkLength - begin;
 
         if (compressed) {
             /*will fail if zlib error, e.g. if length is too small*/
@@ -5401,7 +5401,7 @@ static unsigned filter(unsigned char* out, const unsigned char* in, unsigned w, 
         for (y = 0; y != h; ++y) /*try the 5 filter types*/
         {
             for (type = 0; type != 5; ++type) {
-                unsigned testsize = (unsigned) linebytes;
+                unsigned testsize = (unsigned)linebytes;
                 /*if(testsize > 8) testsize /= 8;*/ /*it already works good enough by testing a part of the row*/
 
                 filterScanline(attempt[type], &in[y * linebytes], prevline, linebytes, bytewidth, type);

@@ -102,73 +102,72 @@ LRESULT CALLBACK gearoenix::system::Application::handler(HWND hwnd, UINT umessag
         //	}
         //}
         break;
-	case WM_LBUTTONDBLCLK:
-	case WM_MBUTTONDBLCLK:
-	case WM_RBUTTONDBLCLK:
-	case WM_LBUTTONDOWN:
-	case WM_MBUTTONDOWN:
-	case WM_RBUTTONDOWN:
-	case WM_LBUTTONUP:
-	case WM_MBUTTONUP:
-	case WM_RBUTTONUP:
-	{
-		mouse_prepos_x = LOWORD(lparam);
-		mouse_prepos_y = HIWORD(lparam);
-		core::Real hh = (core::Real) screen_height * 0.5f;
-		core::Real rhh = 1.0f / hh;
-		core::Real x = (core::Real) mouse_prepos_x;
-		x *= rhh;
-		x -= get_window_ratio();
-		core::Real y = (core::Real) mouse_prepos_y;
-		y -= hh;
-		y *= rhh;
-		core::event::button::Button::KeyType k;
-		switch (umessage) {
-		case WM_LBUTTONDBLCLK:
-		case WM_LBUTTONDOWN:
-		case WM_LBUTTONUP:
-			k = core::event::button::Button::KeyType::LEFT;
-			break;
-		case WM_RBUTTONDBLCLK:
-		case WM_RBUTTONDOWN:
-		case WM_RBUTTONUP:
-			k = core::event::button::Button::KeyType::RIGHT;
-			break;
-		case WM_MBUTTONDBLCLK:
-		case WM_MBUTTONDOWN:
-		case WM_MBUTTONUP:
-			k = core::event::button::Button::KeyType::MIDDLE;
-			break;
-		default:
-			k = core::event::button::Button::KeyType::LEFT;
-			break;
-		}
-		core::event::button::Button::ActionType a;
-		switch (umessage) {
-		case WM_LBUTTONDBLCLK:
-		case WM_MBUTTONDBLCLK:
-		case WM_RBUTTONDBLCLK:
-			a = core::event::button::Button::ActionType::DOUBLE;
-			break;
-		case WM_LBUTTONDOWN:
-		case WM_MBUTTONDOWN:
-		case WM_RBUTTONDOWN:
-			a = core::event::button::Button::ActionType::PRESS;
-			break;
-		case WM_LBUTTONUP:
-		case WM_MBUTTONUP:
-		case WM_RBUTTONUP:
-			a = core::event::button::Button::ActionType::RELEASE;
-			break;
-		default:
-			a = core::event::button::Button::ActionType::PRESS;
-			break;
-		}
-		core::event::button::Mouse e(k, a, x, y);
-		core_app->on_event(e);
-		render_engine->on_event(e);
-		break;
-	}
+    case WM_LBUTTONDBLCLK:
+    case WM_MBUTTONDBLCLK:
+    case WM_RBUTTONDBLCLK:
+    case WM_LBUTTONDOWN:
+    case WM_MBUTTONDOWN:
+    case WM_RBUTTONDOWN:
+    case WM_LBUTTONUP:
+    case WM_MBUTTONUP:
+    case WM_RBUTTONUP: {
+        mouse_prepos_x = LOWORD(lparam);
+        mouse_prepos_y = HIWORD(lparam);
+        core::Real hh = (core::Real)screen_height * 0.5f;
+        core::Real rhh = 1.0f / hh;
+        core::Real x = (core::Real)mouse_prepos_x;
+        x *= rhh;
+        x -= get_window_ratio();
+        core::Real y = (core::Real)mouse_prepos_y;
+        y -= hh;
+        y *= rhh;
+        core::event::button::Button::KeyType k;
+        switch (umessage) {
+        case WM_LBUTTONDBLCLK:
+        case WM_LBUTTONDOWN:
+        case WM_LBUTTONUP:
+            k = core::event::button::Button::KeyType::LEFT;
+            break;
+        case WM_RBUTTONDBLCLK:
+        case WM_RBUTTONDOWN:
+        case WM_RBUTTONUP:
+            k = core::event::button::Button::KeyType::RIGHT;
+            break;
+        case WM_MBUTTONDBLCLK:
+        case WM_MBUTTONDOWN:
+        case WM_MBUTTONUP:
+            k = core::event::button::Button::KeyType::MIDDLE;
+            break;
+        default:
+            k = core::event::button::Button::KeyType::LEFT;
+            break;
+        }
+        core::event::button::Button::ActionType a;
+        switch (umessage) {
+        case WM_LBUTTONDBLCLK:
+        case WM_MBUTTONDBLCLK:
+        case WM_RBUTTONDBLCLK:
+            a = core::event::button::Button::ActionType::DOUBLE;
+            break;
+        case WM_LBUTTONDOWN:
+        case WM_MBUTTONDOWN:
+        case WM_RBUTTONDOWN:
+            a = core::event::button::Button::ActionType::PRESS;
+            break;
+        case WM_LBUTTONUP:
+        case WM_MBUTTONUP:
+        case WM_RBUTTONUP:
+            a = core::event::button::Button::ActionType::RELEASE;
+            break;
+        default:
+            a = core::event::button::Button::ActionType::PRESS;
+            break;
+        }
+        core::event::button::Mouse e(k, a, x, y);
+        core_app->on_event(e);
+        render_engine->on_event(e);
+        break;
+    }
     case WM_MOUSEWHEEL:
         //core_app->on_scroll(((core::Real)GET_WHEEL_DELTA_WPARAM(wparam)) * 0.01f);
         break;

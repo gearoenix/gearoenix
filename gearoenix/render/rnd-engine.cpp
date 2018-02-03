@@ -148,3 +148,8 @@ void gearoenix::render::Engine::update_time()
     delta_time = std::chrono::steady_clock::now() - now_time;
     now_time = std::chrono::steady_clock::now();
 }
+
+gearoenix::physics::Engine* gearoenix::render::Engine::get_physics_engine()
+{
+    return physics_engine;
+}

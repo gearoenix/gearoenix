@@ -16,7 +16,7 @@
 #include <iostream>
 
 gearoenix::render::model::Model::Model(ModelType t, system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
-	:model_type(t)
+    : model_type(t)
 {
     m.read(f);
     occrdss.read(f);
@@ -188,13 +188,40 @@ void gearoenix::render::model::Model::global_scale(const core::Real s)
     changed = true;
 }
 
-gearoenix::render::model::Model::ModelType gearoenix::render::model::Model::get_type() const
+void gearoenix::render::model::Model::local_scale(const core::Real s)
 {
-	return model_type;
+    m.scale3x3(s);
+    changed = true;
 }
 
-bool gearoenix::render::model::Model::hit(const math::Ray3 & r, core::Real& d) const
+gearoenix::render::model::Model::ModelType gearoenix::render::model::Model::get_type() const
 {
-	if (nullptr == collider) return false;
-	return collider->hit(r, d);
+    return model_type;
+}
+
+bool gearoenix::render::model::Model::hit(const math::Ray3& r, core::Real& d) const
+{
+    if (nullptr == collider)
+        return false;
+    return collider->hit(r, d);
+}
+
+const gearoenix::physics::collider::Collider* gearoenix::render::model::Model::get_collider() const
+{
+    return collider;
+}
+
+void gearoenix::render::model::Model::push_state()
+{
+    state.push_back(m);
+}
+
+void gearoenix::render::model::Model::pop_state()
+{
+    const size_t len = state.size();
+    if (0 == len)
+        return;
+    m = state[len - 1];
+    state.pop_back();
+    changed = true;
 }

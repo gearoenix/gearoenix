@@ -6,6 +6,7 @@
 #include "../render/model/rnd-mdl-model.hpp"
 #include "../render/rnd-engine.hpp"
 #include "../render/scene/rnd-scn-scene.hpp"
+#include "animation/phs-anm-animation.hpp"
 #include "constraint/phs-cns-constraint.hpp"
 #include "phs-engine.hpp"
 #include <functional>
@@ -21,8 +22,11 @@ void gearoenix::physics::Kernel::run()
     const unsigned int threads_count = 1;
     const unsigned int thread_index = 0;
 #endif
+        now = std::chrono::steady_clock::now();
+        delta_time = std::chrono::duration_cast<std::chrono::duration<core::Real>>(now - last_update).count();
         // std::string s = "\n" + std::to_string(thread_index) + " of " + std::to_string(threads_count) + "\n";
         // std::cout << s;
+        apply_animations();
         apply_constraints();
         unsigned int model_index = 0;
         const std::vector<std::shared_ptr<render::scene::Scene>>& scenes = engine->render_engine->get_all_scenes();
@@ -39,11 +43,28 @@ void gearoenix::physics::Kernel::run()
                 model->commit(scene.get());
             }
         }
+        last_update = now;
 #ifdef THREAD_SUPPORTED
         engine->signaller->release();
     }
     alive = true;
 #endif
+}
+
+void gearoenix::physics::Kernel::apply_animations()
+{
+#ifdef THREAD_SUPPORTED
+    const unsigned int threads_count = engine->threads_count;
+    unsigned int item_index = 0;
+#endif
+    for (const std::pair<core::Id, std::shared_ptr<animation::Animation>>& id_animation : engine->animations) {
+#ifdef THREAD_SUPPORTED
+        if (((item_index++) % threads_count) != thread_index)
+            continue;
+#endif
+        if (id_animation.second->apply(now, delta_time))
+            engine->animations_need_cleaning = true;
+    }
 }
 
 void gearoenix::physics::Kernel::apply_constraints()

@@ -43,7 +43,7 @@ void gearoenix::render::scene::Scene::add_model(core::Id id, std::shared_ptr<mod
 
 gearoenix::render::scene::Scene::Scene(SceneType t, system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
     : scene_type(t)
-//: e(e)
+    , render_engine(e)
 {
     ambient_light.read(f);
     core::asset::Manager* amgr = e->get_system_application()->get_asset_manager();

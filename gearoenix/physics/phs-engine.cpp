@@ -1,7 +1,8 @@
 #include "phs-engine.hpp"
 #include "../core/cr-semaphore.hpp"
+#include "../system/sys-log.hpp"
+#include "animation/phs-anm-animation.hpp"
 #include "phs-kernel.hpp"
-#include <iostream>
 
 #ifdef THREAD_SUPPORTED
 gearoenix::physics::Engine::Engine(render::Engine* rndeng)
@@ -16,7 +17,6 @@ gearoenix::physics::Engine::Engine(render::Engine* rndeng)
         kernels[i] = new Kernel(i, this);
     }
     std::this_thread::yield();
-    std::cout << "\nThreads created.\n";
 }
 #else
 gearoenix::physics::Engine::Engine(render::Engine* rndeng)
@@ -29,7 +29,6 @@ gearoenix::physics::Engine::Engine(render::Engine* rndeng)
 gearoenix::physics::Engine::~Engine()
 {
 #ifdef THREAD_SUPPORTED
-    std::cout << "\nThreads are gonna be deleted.\n";
     for (unsigned int i = 0; i < threads_count; ++i) {
         delete kernels[i];
     }
@@ -38,6 +37,15 @@ gearoenix::physics::Engine::~Engine()
 #else
     delete kernel;
 #endif
+}
+
+void gearoenix::physics::Engine::add_animation(std::shared_ptr<animation::Animation> a)
+{
+#ifdef DEBUG_MODE
+    if (animations.find(a->get_id()) != animations.end())
+        UNEXPECTED;
+#endif
+    animations[a->get_id()] = a;
 }
 
 void gearoenix::physics::Engine::update()
@@ -59,4 +67,14 @@ void gearoenix::physics::Engine::wait()
 #else
     kernel->signal();
 #endif
+    if (animations_need_cleaning) {
+        animations_need_cleaning = false;
+        for (std::map<core::Id, std::shared_ptr<animation::Animation>>::iterator iter = animations.begin(); iter != animations.end();) {
+            if (iter->second->is_ended()) {
+                iter = animations.erase(iter);
+            } else {
+                ++iter;
+            }
+        }
+    }
 }

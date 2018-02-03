@@ -40,24 +40,26 @@ namespace core {
                     L2,
                     // todo others will added when needed
                 } KeyType;
-				typedef enum : core::Id {
-					PRESS,
-					RELEASE,
-					DOUBLE,
-				} ActionType;
+                typedef enum : core::Id {
+                    PRESS,
+                    RELEASE,
+                    DOUBLE,
+                } ActionType;
+
             private:
                 const ButtonType button_type;
                 const KeyType key_type;
-				const ActionType action_type;
+                const ActionType action_type;
+
             protected:
                 Button(ButtonType t, KeyType k, ActionType a);
 
             public:
                 virtual ~Button();
                 ButtonType get_type() const;
-				KeyType get_key() const;
-				ActionType get_action() const;
-				const Mouse& to_mouse() const;
+                KeyType get_key() const;
+                ActionType get_action() const;
+                const Mouse& to_mouse() const;
             };
         }
     }

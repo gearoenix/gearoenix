@@ -35,25 +35,35 @@ void gearoenix::physics::collider::Mesh::update(const math::Mat4x4& m)
     }
 }
 
-bool gearoenix::physics::collider::Mesh::hit(const math::Ray3 & r, core::Real & d) const
+bool gearoenix::physics::collider::Mesh::hit(const math::Ray3& r, core::Real& d) const
 {
-	math::Vec2 fs;
-	return hit(r, d, fs);
+    math::Vec2 fs;
+    return hit(r, d, fs);
 }
 
-bool gearoenix::physics::collider::Mesh::hit(const math::Ray3 & r, core::Real & d, math::Vec2 & fs) const
+bool gearoenix::physics::collider::Mesh::hit(const math::Ray3& r, core::Real& d, math::Vec2& fs) const
 {
-	core::Real tmpd = d;
-	if (!box.test(r, tmpd)) {
-		bool result = false;
-		for (const math::Triangle3& t : ts) {
-			math::Vec3 mfs;
-			if (t.intersect(r, d, mfs)) {
-				fs = mfs.xy();
-				d = mfs[0];
-			}
-		}
-		return result;
-	}
-	return false;
+    core::Real tmpd = d;
+    if (box.test(r, tmpd)) {
+        bool result = false;
+        for (const math::Triangle3& t : ts) {
+            math::Vec3 mfs;
+            if (t.intersect(r, d, mfs)) {
+                fs = mfs.xy();
+                d = mfs[0];
+                result = true;
+            }
+        }
+        return result;
+    }
+    return false;
+}
+
+void gearoenix::physics::collider::Mesh::print() const
+{
+    GXLOGI("Begin of collider print:");
+    for (const math::Triangle3& t : ts) {
+        t.print();
+    }
+    GXLOGI("End of collider print.");
 }

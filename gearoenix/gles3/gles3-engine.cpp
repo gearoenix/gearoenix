@@ -236,10 +236,10 @@ gearoenix::render::pipeline::Pipeline* gearoenix::gles3::Engine::create_pipeline
 void gearoenix::gles3::Engine::on_event(const core::event::Event& e)
 {
     render::Engine::on_event(e);
-    const core::event::WindowResize* event = e.to_window_resize();
-    if (nullptr != event) {
-        win_width = event->get_current_width();
-        win_height = event->get_current_height();
+    if (core::event::Event::WINDOW_RESIZE == e.get_type()) {
+        const core::event::WindowResize& event = e.to_window_resize();
+        win_width = event.get_current_width();
+        win_height = event.get_current_height();
     }
 }
 
