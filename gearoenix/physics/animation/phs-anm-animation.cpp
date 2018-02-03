@@ -2,10 +2,11 @@
 #include "../../core/cr-build-configuration.hpp"
 #include "../../system/sys-log.hpp"
 
-gearoenix::core::Id gearoenix::physics::animation::Animation::last_id = 0;
+volatile gearoenix::core::Id gearoenix::physics::animation::Animation::last_id = 0;
 
 gearoenix::physics::animation::Animation::Animation(Type t, const std::function<void(core::Real, core::Real)>& a, const std::chrono::milliseconds& d, std::function<void()> on_delete)
-    : animation_type(t)
+    : my_id(last_id++)
+    , animation_type(t)
     , action(a)
     , on_delete(on_delete)
     , start(std::chrono::steady_clock::now())
@@ -72,4 +73,9 @@ gearoenix::physics::animation::Animation::Type gearoenix::physics::animation::An
 bool gearoenix::physics::animation::Animation::is_ended() const
 {
     return ended;
+}
+
+void gearoenix::physics::animation::Animation::set_on_delete(std::function<void()> f)
+{
+    on_delete = f;
 }

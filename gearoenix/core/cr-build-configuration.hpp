@@ -73,7 +73,7 @@
 #else
 #define GEAROENIX_FULLSCREEN
 #endif
-#define GEAROENIX_FULLSCREEN
+//#define GEAROENIX_FULLSCREEN
 #ifndef IN_WEB
 #define THREAD_SUPPORTED
 #endif

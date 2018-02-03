@@ -1,6 +1,7 @@
 #ifndef GEAROEMIX_RENDER_SCENE_UI_HPP
 #define GEAROEMIX_RENDER_SCENE_UI_HPP
 #include "rnd-scn-scene.hpp"
+#include <chrono>
 
 namespace gearoenix {
 namespace physics {
@@ -18,7 +19,8 @@ namespace render {
             friend class Scene;
 
         protected:
-            std::pair<std::shared_ptr<widget::Widget>, std::shared_ptr<physics::animation::Animation>> pressed;
+            const static std::chrono::milliseconds press_animation_time;
+            std::tuple<std::shared_ptr<widget::Widget>, std::shared_ptr<physics::animation::Animation>, std::chrono::steady_clock::time_point> pressed;
             Ui(system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
             std::shared_ptr<widget::Widget> find_widget_under_cursor(core::Real x, core::Real y);
 

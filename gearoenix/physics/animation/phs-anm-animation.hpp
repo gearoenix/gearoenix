@@ -16,8 +16,8 @@ namespace physics {
             } Type;
 
         protected:
-            static core::Id last_id;
-            const core::Id my_id = last_id++;
+            static volatile core::Id last_id;
+            const core::Id my_id;
             const Type animation_type;
             // milliseconds from start, delta time
             std::function<void(core::Real, core::Real)> action;
@@ -39,6 +39,7 @@ namespace physics {
             core::Id get_id() const;
             Type get_type() const;
             bool is_ended() const;
+            void set_on_delete(std::function<void()> f);
         };
     }
 }

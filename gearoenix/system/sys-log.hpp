@@ -56,5 +56,12 @@ namespace system {
 #define UNEXPECTED GXLOGF("Unexpected")
 #define UNIMPLEMENTED GXLOGF("Unimplemented")
 #else // LOG_ENABLED
+#define GXLOGI(s) ;
+#define GXLOGD(s) ;
+#define GXLOGE(s) ;
+#define GXLOGF(s) std::terminate();
+#define TODO ;
+#define UNEXPECTED std::terminate();
+#define UNIMPLEMENTED std::terminate();
 #endif // LOG_ENABLED
 #endif // GEAROENIX_SYSTEM_LOG_HPP

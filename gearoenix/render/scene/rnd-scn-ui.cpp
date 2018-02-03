@@ -10,6 +10,8 @@
 #include "../widget/rnd-wdg-widget.hpp"
 #include <limits>
 
+const std::chrono::milliseconds gearoenix::render::scene::Ui::press_animation_time = std::chrono::milliseconds(200);
+
 gearoenix::render::scene::Ui::Ui(system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
     : Scene(Scene::SceneType::UI, f, e, c)
 {
@@ -49,7 +51,8 @@ void gearoenix::render::scene::Ui::on_event(const core::event::Event& e)
                 switch (be.get_action()) {
                 case core::event::button::Button::ActionType::PRESS: {
                     std::shared_ptr<widget::Widget> hitmptr = find_widget_under_cursor(mbe.get_x(), mbe.get_y());
-                    if (nullptr != hitmptr) {
+                    if (nullptr != hitmptr && (hitmptr != std::get<0>(pressed) || std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - std::get<2>(pressed)) > 2 * press_animation_time)) {
+                        physics::Engine* phseng = render_engine->get_physics_engine();
                         std::shared_ptr<physics::animation::Animation> anim(
                             new physics::animation::Once(
                                 [hitmptr](core::Real st, core::Real) -> void {
@@ -57,29 +60,35 @@ void gearoenix::render::scene::Ui::on_event(const core::event::Event& e)
                                     hitmptr->push_state();
                                     hitmptr->local_scale(1.0f - st);
                                 },
-                                std::chrono::milliseconds(200)));
-                        pressed = std::make_pair(hitmptr, anim);
-                        render_engine->get_physics_engine()->add_animation(anim);
+                                press_animation_time));
+                        anim->set_on_delete(
+                            [hitmptr, phseng]() -> void {
+                                hitmptr->push_state();
+                                std::shared_ptr<physics::animation::Animation> anim2(
+                                    new physics::animation::Once(
+                                        [hitmptr](core::Real st, core::Real) -> void {
+                                            hitmptr->pop_state();
+                                            hitmptr->push_state();
+                                            hitmptr->local_scale(1.0f / (1.0f - st));
+                                        },
+                                        press_animation_time,
+                                        [hitmptr]() -> void {
+                                            hitmptr->pop_state();
+                                            hitmptr->pop_state();
+                                            hitmptr->pop_state();
+                                            hitmptr->pop_state();
+                                        }));
+                                phseng->add_animation(anim2);
+                            });
+                        phseng->add_animation(anim);
+                        pressed = std::make_tuple(hitmptr, anim, std::chrono::steady_clock::now());
                     }
                     break;
                 }
                 case core::event::button::Button::ActionType::RELEASE: {
                     std::shared_ptr<widget::Widget> hitmptr = find_widget_under_cursor(mbe.get_x(), mbe.get_y());
-                    if (hitmptr == pressed.first) {
-                        hitmptr->push_state();
-                        std::shared_ptr<physics::animation::Animation> anim(
-                            new physics::animation::Once(
-                                [hitmptr](core::Real st, core::Real) -> void {
-                                    hitmptr->pop_state();
-                                    hitmptr->push_state();
-                                    hitmptr->local_scale(1.0f / (1.0f - st));
-                                },
-                                std::chrono::milliseconds(200),
-                                [hitmptr]() -> void {
-                                    hitmptr->pop_state();
-                                    hitmptr->pop_state();
-                                }));
-                        render_engine->get_physics_engine()->add_animation(anim);
+                    if (nullptr != hitmptr && hitmptr == std::get<0>(pressed)) {
+                        pressed = std::make_tuple(hitmptr, nullptr, std::chrono::steady_clock::now() - std::chrono::duration_cast<std::chrono::steady_clock::duration>(press_animation_time));
                     }
                     break;
                 }
