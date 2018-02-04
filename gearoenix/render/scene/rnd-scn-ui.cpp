@@ -1,6 +1,7 @@
 #include "rnd-scn-ui.hpp"
 #include "../../core/event/cr-ev-bt-mouse.hpp"
 #include "../../core/event/cr-ev-event.hpp"
+#include "../../core/event/cr-ev-mv-mouse.hpp"
 #include "../../physics/animation/phs-anm-once.hpp"
 #include "../../physics/collider/phs-collider.hpp"
 #include "../../physics/phs-engine.hpp"
@@ -28,17 +29,16 @@ void gearoenix::render::scene::Ui::on_event(const core::event::Event& e)
             case core::event::button::Button::KeyType::LEFT:
                 switch (be.get_action()) {
                 case core::event::button::Button::ActionType::PRESS: {
-                    const core::Id hitmptr = find_widget_under_cursor(mbe.get_x(), mbe.get_y());
-                    if (hitmptr == (core::Id)-1)
+                    pressed = find_widget_under_cursor(mbe.get_x(), mbe.get_y());
+                    if (pressed == (core::Id)-1)
                         break;
                     std::shared_ptr<widget::Widget> hitw;
-                    if (auto hitm = all_models[hitmptr].lock()) {
+                    if (auto hitm = all_models[pressed].lock()) {
                         hitw = std::static_pointer_cast<widget::Widget>(hitm);
                     } else {
                         break;
                     }
-                    pressed = hitmptr;
-                    hitw->state_change(widget::Widget::EventType::PRESS, hitmptr);
+                    hitw->state_change(widget::Widget::EventType::PRESS, pressed);
                     break;
                 }
                 case core::event::button::Button::ActionType::RELEASE: {
@@ -62,6 +62,23 @@ void gearoenix::render::scene::Ui::on_event(const core::event::Event& e)
             default:
                 break;
             }
+            break;
+        }
+        default:
+            break;
+        }
+        break;
+    }
+    case core::event::Event::EventType::MOVEMENT: {
+        const core::event::movement::Movement& me = e.to_movement();
+        switch (me.get_type()) {
+        case core::event::movement::Movement::MovementType::MOUSE: {
+            const core::event::movement::Mouse& mme = me.to_mouse();
+            const core::Id hitmptr = find_widget_under_cursor(mme.get_x(), mme.get_y());
+            if (mouse_overed != hitmptr && mouse_overed != (core::Id)-1)
+                if (auto hitm = all_models[mouse_overed].lock())
+                    std::static_pointer_cast<widget::Widget>(hitm)->state_change(widget::Widget::EventType::MOVE_OUT, mouse_overed);
+            mouse_overed = hitmptr;
             break;
         }
         default:

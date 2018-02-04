@@ -7,6 +7,7 @@ namespace gearoenix {
 namespace core {
     namespace event {
         namespace movement {
+            class Mouse;
             class Movement : public Event {
             public:
                 typedef enum : core::Id {
@@ -23,6 +24,7 @@ namespace core {
             public:
                 virtual ~Movement();
                 MovementType get_type() const;
+                const Mouse& to_mouse() const;
             };
         }
     }

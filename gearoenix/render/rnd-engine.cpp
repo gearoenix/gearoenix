@@ -44,12 +44,20 @@ gearoenix::render::Engine::Engine(system::Application* system_application)
 
 gearoenix::render::Engine::~Engine()
 {
+    loaded_scenes.clear();
     delete physics_engine;
 #ifdef THREAD_SUPPORTED
     scene_loader_continue = false;
     scene_loader_signaler->release();
     scene_loader.join();
     delete scene_loader_signaler;
+    scene_loader_signaler = nullptr;
+    delete scene_loader_mutex;
+    scene_loader_mutex = nullptr;
+    delete loaded_scenes_mutex;
+    loaded_scenes_mutex = nullptr;
+    delete load_functions_mutex;
+    load_functions_mutex = nullptr;
 #endif
     delete pipmgr;
 }

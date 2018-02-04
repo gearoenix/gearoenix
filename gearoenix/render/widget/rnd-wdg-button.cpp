@@ -27,30 +27,6 @@ void gearoenix::render::widget::Button::press_effect()
                     local_scale(scl);
                 },
                 std::chrono::duration_cast<std::chrono::milliseconds>(press_animation_time_duration)));
-        physics::Engine* phseng = render_engine->get_physics_engine();
-        phseng->add_animation(anim);
-        break;
-    }
-    case EffectState::IN_MIDDLE_OF_PRESS:
-        break;
-    case EffectState::PRESSED:
-        break;
-    case EffectState::IN_MIDDLE_OF_RELEASE:
-        break;
-    default:
-        break;
-    }
-}
-
-void gearoenix::render::widget::Button::release_effect()
-{
-    switch (effect_state) {
-    case EffectState::NO_ANIM:
-        break;
-    case EffectState::IN_MIDDLE_OF_PRESS:
-    case EffectState::PRESSED:
-        if (nullptr == anim)
-            break;
         anim->set_on_delete(
             [this]() -> void {
                 physics::Engine* phseng = render_engine->get_physics_engine();
@@ -69,16 +45,29 @@ void gearoenix::render::widget::Button::release_effect()
                         }));
                 phseng->add_animation(anim2);
             });
-        anim = nullptr;
+        physics::Engine* phseng = render_engine->get_physics_engine();
+        phseng->add_animation(anim);
+        break;
+    }
+    case EffectState::IN_MIDDLE_OF_PRESS:
+        break;
+    case EffectState::PRESSED:
         break;
     case EffectState::IN_MIDDLE_OF_RELEASE:
+        break;
     default:
         break;
     }
 }
 
+void gearoenix::render::widget::Button::release_effect()
+{
+    anim = nullptr;
+}
+
 void gearoenix::render::widget::Button::cancel_effect()
 {
+    anim = nullptr;
 }
 
 gearoenix::render::widget::Button::Button(system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)

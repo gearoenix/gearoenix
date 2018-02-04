@@ -10,3 +10,13 @@ gearoenix::core::event::movement::Mouse::Mouse(core::Real x, core::Real y, core:
     , dy(y - pre_y)
 {
 }
+
+gearoenix::core::Real gearoenix::core::event::movement::Mouse::get_x() const
+{
+    return x;
+}
+
+gearoenix::core::Real gearoenix::core::event::movement::Mouse::get_y() const
+{
+    return y;
+}
