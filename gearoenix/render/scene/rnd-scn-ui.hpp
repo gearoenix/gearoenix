@@ -19,13 +19,12 @@ namespace render {
             friend class Scene;
 
         protected:
-            const static std::chrono::milliseconds press_animation_time;
-            std::tuple<std::shared_ptr<widget::Widget>, std::shared_ptr<physics::animation::Animation>, std::chrono::steady_clock::time_point> pressed;
+            core::Id pressed = (core::Id)-1;
             Ui(system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
-            std::shared_ptr<widget::Widget> find_widget_under_cursor(core::Real x, core::Real y);
 
         public:
             virtual void on_event(const core::event::Event& e);
+            core::Id find_widget_under_cursor(core::Real x, core::Real y);
         };
     }
 }

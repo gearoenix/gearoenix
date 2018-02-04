@@ -81,6 +81,7 @@ namespace render {
             std::map<core::Id, std::shared_ptr<Model>> children;
             physics::collider::Collider* collider = nullptr;
             std::vector<math::Mat4x4> state;
+            Engine* const render_engine = nullptr;
             Model(ModelType t, system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
 
         public:

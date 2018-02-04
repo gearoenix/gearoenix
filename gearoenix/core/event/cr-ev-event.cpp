@@ -41,3 +41,12 @@ const gearoenix::core::event::WindowResize& gearoenix::core::event::Event::to_wi
 #endif
     return *reinterpret_cast<const event::WindowResize*>(this);
 }
+
+const gearoenix::core::event::ui::Ui& gearoenix::core::event::Event::to_ui() const
+{
+#ifdef DEBUG_MODE
+    if (UI != event_type)
+        UNEXPECTED;
+#endif
+    return *reinterpret_cast<const ui::Ui*>(this);
+}

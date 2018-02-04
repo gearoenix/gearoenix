@@ -30,6 +30,7 @@ namespace system {
         const static core::Real rotate_epsilon;
         const static core::Real zoom_epsilon;
         unsigned int win_width, win_height;
+        core::Real screen_ratio, half_height_inversed, pre_x, pre_y;
         core::Application* core_app = nullptr;
         render::Engine* render_engine = nullptr;
         core::asset::Manager* astmgr = nullptr;
@@ -58,6 +59,8 @@ namespace system {
         core::Real get_window_ratio() const;
         unsigned int get_width() const;
         unsigned int get_height() const;
+        core::Real convert_x_to_ratio(int x) const;
+        core::Real convert_y_to_ratio(int y) const;
         core::Id get_supported_engine() const;
     };
 }

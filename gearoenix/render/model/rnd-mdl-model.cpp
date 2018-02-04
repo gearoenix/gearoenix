@@ -17,6 +17,7 @@
 
 gearoenix::render::model::Model::Model(ModelType t, system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
     : model_type(t)
+    , render_engine(e)
 {
     m.read(f);
     occrdss.read(f);

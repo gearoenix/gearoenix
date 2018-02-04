@@ -4,6 +4,7 @@
 #include "../../core/cr-application.hpp"
 #include "../../core/event/cr-ev-bt-mouse.hpp"
 #include "../../core/event/cr-ev-event.hpp"
+#include "../../core/event/cr-ev-mv-mouse.hpp"
 #include "../../core/event/cr-ev-window-resize.hpp"
 #include "../../gles2/gles2-engine.hpp"
 #include "../../gles2/gles2.hpp"
@@ -144,9 +145,16 @@ int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_
         // todo
         // o->core_app->on_scroll((core::Real)event->wheel.y);
         break;
-    case SDL_MOUSEMOTION:
-        // o->core_app->on_mouse_move((core::Real)event->motion.xrel, (core::Real)event->motion.yrel);
+    case SDL_MOUSEMOTION: {
+        const core::Real x = o->convert_x_to_ratio(event->button.x);
+        const core::Real y = o->convert_y_to_ratio(event->button.y);
+        core::event::movement::Mouse e(x, y, o->pre_x, o->pre_y);
+        o->render_engine->on_event(e);
+        o->core_app->on_event(e);
+        o->pre_x = x;
+        o->pre_y = y;
         break;
+    }
     case SDL_MOUSEBUTTONUP:
     case SDL_MOUSEBUTTONDOWN: {
         core::event::button::Button::ActionType a = core::event::button::Button::ActionType::PRESS;
@@ -168,12 +176,11 @@ int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_
         default:
             break;
         }
-        const core::Real ihh = 2.0f / (core::Real)o->win_height;
-        const core::Real x = (((core::Real)event->button.x) * ihh) - o->get_window_ratio();
-        const core::Real y = 1.0f - (((core::Real)event->button.y) * ihh);
+        const core::Real x = o->convert_x_to_ratio(event->button.x);
+        const core::Real y = o->convert_y_to_ratio(event->button.y);
         core::event::button::Mouse e(k, a, x, y);
-        o->core_app->on_event(e);
         o->render_engine->on_event(e);
+        o->core_app->on_event(e);
         break;
     }
     case SDL_MULTIGESTURE:
@@ -190,6 +197,8 @@ int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_
             o->render_engine->on_event(e);
             o->win_width = event->window.data1;
             o->win_height = event->window.data2;
+            o->screen_ratio = (core::Real)o->win_width / (core::Real)o->win_height;
+            o->half_height_inversed = 2.0f / (core::Real)o->win_height;
             break;
         }
         default:
@@ -269,6 +278,11 @@ gearoenix::system::Application::Application()
     SDL_GL_GetDrawableSize(window, &w, &h);
     win_width = (unsigned int)w;
     win_height = (unsigned int)h;
+    screen_ratio = (core::Real)win_width / (core::Real)win_height;
+    half_height_inversed = 2.0f / (core::Real)win_height;
+    SDL_GetMouseState(&w, &h);
+    pre_x = convert_x_to_ratio(w);
+    pre_y = convert_y_to_ratio(h);
 #ifdef USE_OPENGL_ES2
     if (supported_engine == render::Engine::OPENGL_ES2)
         render_engine = new gles2::Engine(this);
@@ -359,7 +373,7 @@ const gearoenix::core::asset::Manager* gearoenix::system::Application::get_asset
 
 gearoenix::core::Real gearoenix::system::Application::get_window_ratio() const
 {
-    return static_cast<core::Real>(win_width) / static_cast<core::Real>(win_height);
+    return screen_ratio;
 }
 
 unsigned int gearoenix::system::Application::get_width() const
@@ -375,6 +389,16 @@ unsigned int gearoenix::system::Application::get_height() const
 gearoenix::core::Id gearoenix::system::Application::get_supported_engine() const
 {
     return supported_engine;
+}
+
+gearoenix::core::Real gearoenix::system::Application::convert_x_to_ratio(int x) const
+{
+    return (((core::Real)x) * half_height_inversed) - screen_ratio;
+}
+
+gearoenix::core::Real gearoenix::system::Application::convert_y_to_ratio(int y) const
+{
+    return 1.0f - (((core::Real)y) * half_height_inversed);
 }
 
 #endif
