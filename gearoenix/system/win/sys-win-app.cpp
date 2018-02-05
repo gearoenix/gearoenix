@@ -6,6 +6,7 @@
 #include "../../core/cr-application.hpp"
 #include "../../core/cr-static.hpp"
 #include "../../core/event/cr-ev-bt-mouse.hpp"
+#include "../../core/event/cr-ev-mv-mouse.hpp"
 #include "../sys-log.hpp"
 #ifdef USE_VULKAN
 #include "../../vulkan/vk-engine.hpp"
@@ -111,16 +112,10 @@ LRESULT CALLBACK gearoenix::system::Application::handler(HWND hwnd, UINT umessag
     case WM_LBUTTONUP:
     case WM_MBUTTONUP:
     case WM_RBUTTONUP: {
-        mouse_prepos_x = LOWORD(lparam);
-        mouse_prepos_y = HIWORD(lparam);
-        core::Real hh = (core::Real)screen_height * 0.5f;
-        core::Real rhh = 1.0f / hh;
-        core::Real x = (core::Real)mouse_prepos_x;
-        x *= rhh;
-        x -= get_window_ratio();
-        core::Real y = (core::Real)mouse_prepos_y;
-        y -= hh;
-        y *= rhh;
+        mouse_pre_x_pixel = LOWORD(lparam);
+        mouse_pre_y_pixel = HIWORD(lparam);
+        const core::Real x = pixel_to_normal_pos_x(mouse_pre_x_pixel);
+        const core::Real y = pixel_to_normal_pos_y(mouse_pre_y_pixel);
         core::event::button::Button::KeyType k;
         switch (umessage) {
         case WM_LBUTTONDBLCLK:
@@ -164,8 +159,8 @@ LRESULT CALLBACK gearoenix::system::Application::handler(HWND hwnd, UINT umessag
             break;
         }
         core::event::button::Mouse e(k, a, x, y);
-        core_app->on_event(e);
         render_engine->on_event(e);
+        core_app->on_event(e);
         break;
     }
     case WM_MOUSEWHEEL:
@@ -174,12 +169,19 @@ LRESULT CALLBACK gearoenix::system::Application::handler(HWND hwnd, UINT umessag
     case WM_MOUSEMOVE: {
         UINT posx = LOWORD(lparam);
         UINT posy = HIWORD(lparam);
-        //core_app->on_mouse_move((core::Real)mouse_prepos_x - (core::Real)posx, (core::Real)mouse_prepos_y - (core::Real)posy);
-        mouse_prepos_x = posx;
-        mouse_prepos_y = posy;
+		core::Real x = pixel_to_normal_pos_x(posx);
+		core::Real y = pixel_to_normal_pos_y(posy);
+		core::event::movement::Mouse e(x, y, mouse_pre_x, mouse_pre_y);
+		render_engine->on_event(e);
+		core_app->on_event(e);
+        mouse_pre_x_pixel = posx;
+        mouse_pre_y_pixel = posy;
+		mouse_pre_x = x;
+		mouse_pre_y = y;
         break;
     }
     case WM_SIZE:
+
         // if ((prepared) && (wParam != SIZE_MINIMIZED))
         //{
         //	if ((resizing) || ((wParam == SIZE_MAXIMIZED) || (wParam ==
@@ -202,6 +204,16 @@ LRESULT CALLBACK gearoenix::system::Application::handler(HWND hwnd, UINT umessag
         break;
     }
     return (DefWindowProc(hwnd, umessage, wparam, lparam));
+}
+
+gearoenix::core::Real gearoenix::system::Application::pixel_to_normal_pos_x(int x) const
+{
+	return (((core::Real) x) * half_height_inversed) - screen_ratio;
+}
+
+gearoenix::core::Real gearoenix::system::Application::pixel_to_normal_pos_y(int y) const
+{
+	return 1.0f - (((core::Real) y) * half_height_inversed);
 }
 
 gearoenix::system::Application::Application()
@@ -235,8 +247,8 @@ gearoenix::system::Application::Application()
     ChangeDisplaySettings(&screen_settings, CDS_FULLSCREEN);
     pos_x = pos_y = 0;
 #else
-    screen_width = DEFAULT_WINDOW_WIDTH;
-    screen_height = DEFAULT_WINDOW_HEIGHT;
+    screen_width = GEAROENIX_DEFAULT_WINDOW_WIDTH;
+    screen_height = GEAROENIX_DEFAULT_WINDOW_HEIGHT;
     pos_x = (GetSystemMetrics(SM_CXSCREEN) - screen_width) / 2;
     pos_y = (GetSystemMetrics(SM_CYSCREEN) - screen_height) / 2;
 #endif
@@ -247,6 +259,8 @@ gearoenix::system::Application::Application()
     SetForegroundWindow(window);
     SetFocus(window);
     UpdateWindow(window);
+	screen_ratio = (core::Real) screen_width / (core::Real) screen_height;
+	half_height_inversed = 2.0f / (core::Real) screen_height;
 #ifdef GEAROENIX_NO_CURSOR
     ShowCursor(false);
 #endif
@@ -286,6 +300,17 @@ gearoenix::system::Application::Application()
     }
     astmgr = new core::asset::Manager(this, "data.gx3d");
     astmgr->initialize();
+	POINT p;
+	if (GetCursorPos(&p))
+	{
+		if (ScreenToClient(window, &p))
+		{
+			mouse_pre_x_pixel = p.x;
+			mouse_pre_y_pixel = p.y;
+			mouse_pre_x = pixel_to_normal_pos_x(mouse_pre_x_pixel);
+			mouse_pre_y = pixel_to_normal_pos_y(mouse_pre_y_pixel);
+		}
+	}
 }
 
 gearoenix::system::Application::~Application()
@@ -305,6 +330,10 @@ void gearoenix::system::Application::execute(core::Application* core_app)
         core_app->update();
         render_engine->update();
     }
+	delete core_app;
+	core_app = nullptr;
+	delete render_engine;
+	render_engine = nullptr;
 }
 
 gearoenix::render::Engine* gearoenix::system::Application::get_render_engine()
@@ -315,6 +344,16 @@ gearoenix::render::Engine* gearoenix::system::Application::get_render_engine()
 const gearoenix::render::Engine* gearoenix::system::Application::get_render_engine() const
 {
     return render_engine;
+}
+
+gearoenix::core::Application* gearoenix::system::Application::get_core_app()
+{
+	return core_app;
+}
+
+const gearoenix::core::Application* gearoenix::system::Application::get_core_app() const
+{
+	return core_app;
 }
 
 gearoenix::core::asset::Manager* gearoenix::system::Application::get_asset_manager()

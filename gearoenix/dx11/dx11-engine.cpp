@@ -109,7 +109,7 @@ void gearoenix::dx11::Engine::terminate_shadow()
     shadow_rtv = nullptr;
     delete shadow_txt;
     shadow_txt = nullptr;
-    delete shadow_bs;
+    shadow_bs->Release();
     shadow_bs = nullptr;
 }
 
@@ -347,7 +347,7 @@ void gearoenix::dx11::Engine::terminate()
     if (swapchain == nullptr)
         return;
     terminate_shadow();
-    delete main_bs;
+    main_bs->Release();
     main_bs = nullptr;
     swapchain->SetFullscreenState(false, NULL);
     delete sampler;
