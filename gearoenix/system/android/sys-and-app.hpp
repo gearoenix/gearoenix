@@ -27,17 +27,20 @@ namespace system {
         core::Application* core_app = nullptr;
         core::asset::Manager* astmgr = nullptr;
         unsigned int win_width, win_height;
+        core::Real screen_ratio, half_height_inversed;
         EGLSurface surface;
         EGLContext context;
         EGLDisplay display;
         core::Real x = 0.0f, y = 0.0f, w = 0.0f;
         ndk_helper::PinchDetector pinch_detector;
         ndk_helper::DragDetector drag_detector;
+        ndk_helper::TapDetector tap_detector;
         void handle(int32_t cmd);
         int32_t handle(AInputEvent* e);
-        void init();
         static void handle_cmd(android_app* app, int32_t cmd);
         static int32_t handle_input(android_app* app, AInputEvent* e);
+        core::Real convert_pixel_x_to_normalized(int x);
+        core::Real convert_pixel_y_to_normalized(int y);
 
     public:
         Application(struct android_app* and_app);

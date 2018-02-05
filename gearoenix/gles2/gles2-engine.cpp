@@ -94,6 +94,7 @@ void gearoenix::gles2::Engine::window_changed()
 
 void gearoenix::gles2::Engine::update()
 {
+    CHECK_FOR_GRAPHIC_API_ERROR
     update_time();
     glClear(GL_COLOR_BUFFER_BIT);
     do_load_functions();

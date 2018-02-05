@@ -21,7 +21,6 @@
 #define CHECK_FOR_GRAPHIC_API_ERROR                     \
     switch (glGetError()) {                             \
     case GL_NO_ERROR:                                   \
-        GXLOGI("No error found.");                      \
         break;                                          \
     case GL_INVALID_ENUM:                               \
         GXLOGF("Invalid enum");                         \

@@ -14,6 +14,7 @@ const std::chrono::duration<gearoenix::core::Real> gearoenix::render::widget::Bu
 
 void gearoenix::render::widget::Button::press_effect()
 {
+    std::lock_guard<std::mutex> lg(effect_locker);
     switch (effect_state) {
     case EffectState::NO_ANIM: {
         effect_state = EffectState::IN_MIDDLE_OF_PRESS;
@@ -62,6 +63,7 @@ void gearoenix::render::widget::Button::press_effect()
 
 void gearoenix::render::widget::Button::release_effect()
 {
+    std::lock_guard<std::mutex> lg(effect_locker);
     anim = nullptr;
 }
 

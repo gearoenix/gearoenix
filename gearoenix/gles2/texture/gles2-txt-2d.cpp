@@ -12,7 +12,7 @@ gearoenix::gles2::texture::Texture2D::Texture2D(system::File* file, Engine* eng,
     std::function<void()> loadf = [this, imgw, imgh, img_data, end] {
         glGenTextures(1, &texture_object);
         glBindTexture(GL_TEXTURE_2D, texture_object);
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);

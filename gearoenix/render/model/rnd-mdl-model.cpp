@@ -19,6 +19,7 @@ gearoenix::render::model::Model::Model(ModelType t, system::File* f, Engine* e, 
     : model_type(t)
     , render_engine(e)
 {
+    std::lock_guard<std::mutex> lg(locker);
     m.read(f);
     occrdss.read(f);
     occloc.read(f);
@@ -73,6 +74,7 @@ gearoenix::render::model::Model* gearoenix::render::model::Model::read(system::F
 
 gearoenix::render::model::Model::~Model()
 {
+    std::lock_guard<std::mutex> lg(locker);
     if (collider != nullptr)
         delete collider;
     collider = nullptr;
@@ -80,6 +82,7 @@ gearoenix::render::model::Model::~Model()
 
 void gearoenix::render::model::Model::commit(const scene::Scene* s)
 {
+    std::lock_guard<std::mutex> lg(locker);
     const camera::Camera* cam = s->get_current_camera();
     bool moccloc_not_initialized = true;
     math::Vec3 moccloc;
@@ -130,6 +133,7 @@ void gearoenix::render::model::Model::commit(const scene::Scene* s)
 
 void gearoenix::render::model::Model::draw(core::Id mesh_id, texture::Texture2D* shadow_texture)
 {
+    std::lock_guard<std::mutex> lg(locker);
     if (is_in_camera) {
         std::tuple<std::shared_ptr<mesh::Mesh>, std::shared_ptr<material::Material>, std::shared_ptr<material::Depth>>& mshmtr = meshes[mesh_id];
         std::get<0>(mshmtr)->bind();
@@ -140,6 +144,7 @@ void gearoenix::render::model::Model::draw(core::Id mesh_id, texture::Texture2D*
 
 void gearoenix::render::model::Model::cast_shadow(core::Id mesh_id)
 {
+    std::lock_guard<std::mutex> lg(locker);
     if (is_in_sun) {
         std::tuple<std::shared_ptr<mesh::Mesh>, std::shared_ptr<material::Material>, std::shared_ptr<material::Depth>>& mshmtr = meshes[mesh_id];
         std::get<0>(mshmtr)->bind();
@@ -179,18 +184,21 @@ const gearoenix::math::Mat4x4& gearoenix::render::model::Model::get_sun_mvp() co
 
 void gearoenix::render::model::Model::translate(const math::Vec3& t)
 {
+    std::lock_guard<std::mutex> lg(locker);
     m.translate(t);
     changed = true;
 }
 
 void gearoenix::render::model::Model::global_scale(const core::Real s)
 {
+    std::lock_guard<std::mutex> lg(locker);
     m.scale4x3(s);
     changed = true;
 }
 
 void gearoenix::render::model::Model::local_scale(const core::Real s)
 {
+    std::lock_guard<std::mutex> lg(locker);
     m.scale3x3(s);
     changed = true;
 }
@@ -200,8 +208,9 @@ gearoenix::render::model::Model::ModelType gearoenix::render::model::Model::get_
     return model_type;
 }
 
-bool gearoenix::render::model::Model::hit(const math::Ray3& r, core::Real& d) const
+bool gearoenix::render::model::Model::hit(const math::Ray3& r, core::Real& d)
 {
+    std::lock_guard<std::mutex> lg(locker);
     if (nullptr == collider)
         return false;
     return collider->hit(r, d);
@@ -214,11 +223,13 @@ const gearoenix::physics::collider::Collider* gearoenix::render::model::Model::g
 
 void gearoenix::render::model::Model::push_state()
 {
+    std::lock_guard<std::mutex> lg(locker);
     state.push_back(m);
 }
 
 void gearoenix::render::model::Model::pop_state()
 {
+    std::lock_guard<std::mutex> lg(locker);
     const size_t len = state.size();
     if (0 == len)
         return;

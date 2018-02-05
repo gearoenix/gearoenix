@@ -32,44 +32,47 @@
 
 void gearoenix::dx11::Engine::initial_screen()
 {
-	ID3D11Texture2D* back_buffer_ptr;
-	GXHRCHK(swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&back_buffer_ptr));
-	context->OMSetRenderTargets(0, nullptr, nullptr);
-	GXHRCHK(device->CreateRenderTargetView(back_buffer_ptr, NULL, &main_rtv));
-	back_buffer_ptr->Release();
-	back_buffer_ptr = nullptr;
-	D3D11_TEXTURE2D_DESC depth_buffer_desc;
-	GXSETZ(depth_buffer_desc);
-	depth_buffer_desc.Width = sysapp->get_width();
-	depth_buffer_desc.Height = sysapp->get_height();
-	depth_buffer_desc.MipLevels = 1;
-	depth_buffer_desc.ArraySize = 1;
-	depth_buffer_desc.Format = DXGI_FORMAT_D32_FLOAT;
-	depth_buffer_desc.SampleDesc = sample;
-	depth_buffer_desc.Usage = D3D11_USAGE_DEFAULT;
-	depth_buffer_desc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-	depth_buffer_desc.CPUAccessFlags = 0;
-	depth_buffer_desc.MiscFlags = 0;
-	GXHRCHK(device->CreateTexture2D(&depth_buffer_desc, NULL, &main_dsb));
-	D3D11_DEPTH_STENCIL_VIEW_DESC depth_stencil_view_desc;
-	GXSETZ(depth_stencil_view_desc);
-	depth_stencil_view_desc.Format = depth_buffer_desc.Format;
-	depth_stencil_view_desc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DMS;
-	depth_stencil_view_desc.Texture2D.MipSlice = 0;
-	GXHRCHK(device->CreateDepthStencilView(main_dsb, &depth_stencil_view_desc, &main_dsv));
-	context->OMSetRenderTargets(1, &main_rtv, main_dsv);
-	main_viewport.Width = (float)sysapp->get_width();
-	main_viewport.Height = (float)sysapp->get_height();
+    ID3D11Texture2D* back_buffer_ptr;
+    GXHRCHK(swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&back_buffer_ptr));
+    context->OMSetRenderTargets(0, nullptr, nullptr);
+    GXHRCHK(device->CreateRenderTargetView(back_buffer_ptr, NULL, &main_rtv));
+    back_buffer_ptr->Release();
+    back_buffer_ptr = nullptr;
+    D3D11_TEXTURE2D_DESC depth_buffer_desc;
+    GXSETZ(depth_buffer_desc);
+    depth_buffer_desc.Width = sysapp->get_width();
+    depth_buffer_desc.Height = sysapp->get_height();
+    depth_buffer_desc.MipLevels = 1;
+    depth_buffer_desc.ArraySize = 1;
+    depth_buffer_desc.Format = DXGI_FORMAT_D32_FLOAT;
+    depth_buffer_desc.SampleDesc = sample;
+    depth_buffer_desc.Usage = D3D11_USAGE_DEFAULT;
+    depth_buffer_desc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+    depth_buffer_desc.CPUAccessFlags = 0;
+    depth_buffer_desc.MiscFlags = 0;
+    GXHRCHK(device->CreateTexture2D(&depth_buffer_desc, NULL, &main_dsb));
+    D3D11_DEPTH_STENCIL_VIEW_DESC depth_stencil_view_desc;
+    GXSETZ(depth_stencil_view_desc);
+    depth_stencil_view_desc.Format = depth_buffer_desc.Format;
+    depth_stencil_view_desc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DMS;
+    depth_stencil_view_desc.Texture2D.MipSlice = 0;
+    GXHRCHK(device->CreateDepthStencilView(main_dsb, &depth_stencil_view_desc, &main_dsv));
+    context->OMSetRenderTargets(1, &main_rtv, main_dsv);
+    main_viewport.Width = (float)sysapp->get_width();
+    main_viewport.Height = (float)sysapp->get_height();
 }
 
 void gearoenix::dx11::Engine::terminate_screen()
 {
-	if (nullptr != main_rtv) main_rtv->Release();
-	main_rtv = nullptr;
-	if (nullptr != main_dsb) main_dsb->Release();
-	main_dsb = nullptr;
-	if (nullptr != main_dsv) main_dsv->Release();
-	main_dsv = nullptr;
+    if (nullptr != main_rtv)
+        main_rtv->Release();
+    main_rtv = nullptr;
+    if (nullptr != main_dsb)
+        main_dsb->Release();
+    main_dsb = nullptr;
+    if (nullptr != main_dsv)
+        main_dsv->Release();
+    main_dsv = nullptr;
 }
 
 void gearoenix::dx11::Engine::initial_shadow()
@@ -159,8 +162,8 @@ void gearoenix::dx11::Engine::terminate_shadow()
 gearoenix::dx11::Engine::Engine(system::Application* sys_app)
     : render::Engine(sys_app)
 {
-	GXSETZ(sample);
-	sample.Count = 1;
+    GXSETZ(sample);
+    sample.Count = 1;
     IDXGIFactory* factory = nullptr;
     IDXGIAdapter* adapter = nullptr;
     IDXGIOutput* adapter_output = nullptr;
@@ -267,14 +270,14 @@ adapter_found_label:
             break;
         }
     }
-	sample = swap_chain_desc.SampleDesc;
+    sample = swap_chain_desc.SampleDesc;
     device->Release();
     device = nullptr;
     GXHRCHK(D3D11CreateDeviceAndSwapChain(
         nullptr, driver_type, nullptr, device_flag,
         &feature_level, 1, D3D11_SDK_VERSION, &swap_chain_desc, &swapchain,
         &device, nullptr, &context));
-	initial_screen();
+    initial_screen();
     D3D11_DEPTH_STENCIL_DESC depth_stencil_desc;
     GXSETZ(depth_stencil_desc);
     depth_stencil_desc.DepthEnable = true;
@@ -367,7 +370,7 @@ void gearoenix::dx11::Engine::terminate()
     if (swapchain == nullptr)
         return;
     terminate_shadow();
-	terminate_screen();
+    terminate_screen();
     main_bs->Release();
     main_bs = nullptr;
     swapchain->SetFullscreenState(false, NULL);
@@ -508,12 +511,12 @@ const gearoenix::dx11::texture::Sampler* gearoenix::dx11::Engine::get_sampler() 
 
 void gearoenix::dx11::Engine::on_event(const core::event::Event& e)
 {
-	render::Engine::on_event(e);
-	if (e.get_type() == core::event::Event::EventType::WINDOW_RESIZE) {
-		terminate_screen();
-		GXHRCHK(swapchain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0));
-		initial_screen();
-	}
+    render::Engine::on_event(e);
+    if (e.get_type() == core::event::Event::EventType::WINDOW_RESIZE) {
+        terminate_screen();
+        GXHRCHK(swapchain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0));
+        initial_screen();
+    }
 }
 
 #endif

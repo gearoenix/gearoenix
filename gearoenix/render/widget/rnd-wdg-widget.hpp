@@ -27,6 +27,9 @@ namespace render {
                 MOVE_OUT,
             } EventType;
 
+        private:
+            std::mutex event_locker;
+
         protected:
             StateType state_type = StateType::NORMAL;
             Widget(system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
