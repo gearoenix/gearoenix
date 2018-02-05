@@ -17,7 +17,7 @@ void gearoenix::render::widget::Button::press_effect()
     switch (effect_state) {
     case EffectState::NO_ANIM: {
         effect_state = EffectState::IN_MIDDLE_OF_PRESS;
-        push_state();
+        //push_state();
         anim = std::shared_ptr<physics::animation::Animation>(
             new physics::animation::Once(
                 [this](core::Real st, core::Real) -> void {
@@ -40,7 +40,7 @@ void gearoenix::render::widget::Button::press_effect()
                         },
                         std::chrono::duration_cast<std::chrono::milliseconds>(press_animation_time_duration),
                         [this]() -> void {
-                            pop_state();
+                            //pop_state();
                             effect_state = EffectState::NO_ANIM;
                         }));
                 phseng->add_animation(anim2);

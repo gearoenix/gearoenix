@@ -17,22 +17,24 @@ namespace render {
 namespace system {
     class Application {
     private:
-        int screen_width, screen_height;
+        int screen_width, screen_height, border_width, title_bar_height;
+		core::Real screen_ratio, half_height_inversed;
         render::Engine* render_engine = nullptr;
         core::asset::Manager* astmgr = nullptr;
         core::Application* core_app = nullptr;
         HINSTANCE instance;
         HWND window;
         bool running = true;
-        bool window_is_up = false;
-        UINT mouse_pre_x_pixel = 0, mouse_pre_y_pixel = 0;
-		core::Real mouse_pre_x = 0.0f, mouse_pre_y = 0.0f;
-		core::Real screen_ratio, half_height_inversed;
+        bool window_is_up = false, resizing = true;
+        UINT mouse_x_pixel = 0, mouse_y_pixel = 0;
+		core::Real mouse_x = 0.0f, mouse_y = 0.0f;
         core::Real supported_engine;
         static LRESULT CALLBACK wnd_proc(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam);
         LRESULT CALLBACK handler(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam);
 		core::Real pixel_to_normal_pos_x(int x) const;
 		core::Real pixel_to_normal_pos_y(int y) const;
+		void update_mouse_position();
+		void update_screen_sizes();
 
     public:
         Application();
