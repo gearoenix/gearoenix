@@ -177,16 +177,13 @@ LRESULT CALLBACK gearoenix::system::Application::handler(HWND hwnd, UINT umessag
 	{
 		if (!window_is_up || wparam == SIZE_MINIMIZED) break;
 		if (!resizing && wparam != SIZE_MAXIMIZED && wparam != SIZE_RESTORED) break;
-		int dest_width = LOWORD(lparam);
-		int dest_height = HIWORD(lparam);
+		core::Real pre_screen_width = (core::Real) screen_width;
+		core::Real pre_screen_height = (core::Real) screen_height;
+		update_screen_sizes();
 		const core::event::WindowResize e(
-			(core::Real) screen_width, (core::Real) screen_height, 
-			(core::Real) dest_width, (core::Real) dest_height);
+			pre_screen_width, pre_screen_height, 
+			(core::Real) screen_width, (core::Real) screen_height);
 		render_engine->on_event(e);
-		screen_width = dest_width;
-		screen_height = dest_height;
-		screen_ratio = (core::Real) screen_width / (core::Real) screen_height;
-		half_height_inversed = 2.0f / (core::Real) screen_height;
 		break;
 	}
     case WM_SHOWWINDOW:
