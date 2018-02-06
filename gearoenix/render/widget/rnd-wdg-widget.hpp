@@ -28,7 +28,7 @@ namespace render {
             } EventType;
 
         private:
-            std::mutex event_locker;
+            //std::mutex event_locker;
 
         protected:
             StateType state_type = StateType::NORMAL;

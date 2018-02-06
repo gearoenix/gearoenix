@@ -42,7 +42,7 @@ gearoenix::render::widget::Widget::~Widget()
 
 void gearoenix::render::widget::Widget::state_change(EventType e, core::Id my_id)
 {
-    std::lock_guard<std::mutex> lg(event_locker);
+    //std::lock_guard<std::mutex> lg(event_locker);
     core::Application* coreapp = render_engine->get_system_application()->get_core_app();
     switch (state_type) {
     case StateType::NORMAL:
@@ -75,5 +75,5 @@ void gearoenix::render::widget::Widget::state_change(EventType e, core::Id my_id
     default:
         break;
     }
-    (void)lg;
+    //(void)lg;
 }

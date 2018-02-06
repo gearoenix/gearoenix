@@ -60,7 +60,7 @@ namespace render {
             bool is_in_sun = false;
             bool is_in_camera = false;
             bool changed = true;
-            std::mutex locker;
+            //std::mutex locker;
             // be careful about scaling because it gonna scale radius too.
             math::Mat4x4 m;
             bool needs_mvp = false;

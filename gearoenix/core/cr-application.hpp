@@ -67,7 +67,7 @@ namespace core {
         delete app;                                                                 \
         return 0;                                                                   \
     }
-#elif defined(IN_LINUX)
+#elif defined(IN_LINUX) || defined(IN_MAC) || defined(IN_IOS)
 #define GEAROENIX_START(CoreApp)                                                    \
     int main(int, char**)                                                           \
     {                                                                               \

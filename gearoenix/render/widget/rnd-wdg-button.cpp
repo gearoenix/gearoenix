@@ -18,20 +18,20 @@ const gearoenix::core::Real gearoenix::render::widget::Button::max_scale_inverse
 
 void gearoenix::render::widget::Button::press_effect()
 {
-    std::lock_guard<std::mutex> lg(effect_locker);
+    //std::lock_guard<std::mutex> lg(effect_locker);
     switch (effect_state) {
     case EffectState::NO_ANIM: {
         effect_state = EffectState::IN_MIDDLE_OF_PRESS;
-        push_state();
+        //push_state();
         anim = std::shared_ptr<physics::animation::Animation>(
             new physics::animation::Once(
                 [this](core::Real st, core::Real) -> void {
-                    std::lock_guard<std::mutex> lg(effect_locker);
+                    //std::lock_guard<std::mutex> lg(effect_locker);
                     const core::Real cursz = 1.0f - (st * press_animation_time_inversed) * max_scale_inversed_reduction;
                     const core::Real scl = cursz / current_size;
                     current_size = cursz;
 #ifdef DEBUG_EFFECT
-                    if (st > press_animation_time || current_size > max_scale || max_scale_inversed > current_size)
+                    if (st < 0.0f || st > press_animation_time || current_size > max_scale || max_scale_inversed > current_size)
                         UNEXPECTED;
 #endif
                     local_scale(scl);
@@ -43,20 +43,20 @@ void gearoenix::render::widget::Button::press_effect()
                 std::shared_ptr<physics::animation::Animation> anim2(
                     new physics::animation::Once(
                         [this](core::Real st, core::Real) -> void {
-                            std::lock_guard<std::mutex> lg(effect_locker);
+                            //std::lock_guard<std::mutex> lg(effect_locker);
                             const core::Real cursz = max_scale_inversed + (st * press_animation_time_inversed) * max_scale_inversed_reduction;
                             const core::Real scl = cursz / current_size;
                             current_size = cursz;
 #ifdef DEBUG_EFFECT
-                            if (st > press_animation_time || current_size > max_scale || max_scale_inversed > current_size)
+                            if (st < 0.0f || st > press_animation_time || current_size > max_scale || max_scale_inversed > current_size)
                                 UNEXPECTED;
 #endif
                             local_scale(scl);
                         },
                         std::chrono::duration_cast<std::chrono::milliseconds>(press_animation_time_duration),
                         [this]() -> void {
-                            std::lock_guard<std::mutex> lg(effect_locker);
-                            pop_state();
+                            //std::lock_guard<std::mutex> lg(effect_locker);
+                            //pop_state();
                             effect_state = EffectState::NO_ANIM;
                         }));
                 phseng->add_animation(anim2);
@@ -78,7 +78,7 @@ void gearoenix::render::widget::Button::press_effect()
 
 void gearoenix::render::widget::Button::release_effect()
 {
-    std::lock_guard<std::mutex> lg(effect_locker);
+    //std::lock_guard<std::mutex> lg(effect_locker);
     switch (effect_state) {
     case EffectState::NO_ANIM:
         break;
@@ -96,7 +96,7 @@ void gearoenix::render::widget::Button::release_effect()
 
 void gearoenix::render::widget::Button::cancel_effect()
 {
-    std::lock_guard<std::mutex> lg(effect_locker);
+    //std::lock_guard<std::mutex> lg(effect_locker);
     switch (effect_state) {
     case EffectState::NO_ANIM:
         break;
