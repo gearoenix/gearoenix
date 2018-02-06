@@ -62,7 +62,7 @@ bool gearoenix::physics::animation::Animation::apply(
 
 gearoenix::core::Id gearoenix::physics::animation::Animation::get_id() const
 {
-    return last_id;
+    return my_id;
 }
 
 gearoenix::physics::animation::Animation::Type gearoenix::physics::animation::Animation::get_type() const
