@@ -18,10 +18,11 @@ void gearoenix::render::widget::Button::press_effect()
     switch (effect_state) {
     case EffectState::NO_ANIM: {
         effect_state = EffectState::IN_MIDDLE_OF_PRESS;
-        //push_state();
+        push_state();
         anim = std::shared_ptr<physics::animation::Animation>(
             new physics::animation::Once(
                 [this](core::Real st, core::Real) -> void {
+                    std::lock_guard<std::mutex> lg(effect_locker);
                     const core::Real cursz = 1.0f - (st * press_animation_time_inversed) * max_scale_inversed_reduction;
                     const core::Real scl = cursz / current_size;
                     current_size = cursz;
@@ -34,6 +35,7 @@ void gearoenix::render::widget::Button::press_effect()
                 std::shared_ptr<physics::animation::Animation> anim2(
                     new physics::animation::Once(
                         [this](core::Real st, core::Real) -> void {
+                            std::lock_guard<std::mutex> lg(effect_locker);
                             const core::Real cursz = max_scale_inversed + (st * press_animation_time_inversed) * max_scale_inversed_reduction;
                             const core::Real scl = cursz / current_size;
                             current_size = cursz;
@@ -41,7 +43,8 @@ void gearoenix::render::widget::Button::press_effect()
                         },
                         std::chrono::duration_cast<std::chrono::milliseconds>(press_animation_time_duration),
                         [this]() -> void {
-                            //pop_state();
+                            std::lock_guard<std::mutex> lg(effect_locker);
+                            pop_state();
                             effect_state = EffectState::NO_ANIM;
                         }));
                 phseng->add_animation(anim2);
@@ -64,12 +67,37 @@ void gearoenix::render::widget::Button::press_effect()
 void gearoenix::render::widget::Button::release_effect()
 {
     std::lock_guard<std::mutex> lg(effect_locker);
-    anim = nullptr;
+    switch (effect_state) {
+    case EffectState::NO_ANIM:
+        break;
+    case EffectState::IN_MIDDLE_OF_PRESS:
+        anim = nullptr;
+        break;
+    case EffectState::PRESSED:
+        break;
+    case EffectState::IN_MIDDLE_OF_RELEASE:
+        break;
+    default:
+        break;
+    }
 }
 
 void gearoenix::render::widget::Button::cancel_effect()
 {
-    anim = nullptr;
+    std::lock_guard<std::mutex> lg(effect_locker);
+    switch (effect_state) {
+    case EffectState::NO_ANIM:
+        break;
+    case EffectState::IN_MIDDLE_OF_PRESS:
+        anim = nullptr;
+        break;
+    case EffectState::PRESSED:
+        break;
+    case EffectState::IN_MIDDLE_OF_RELEASE:
+        break;
+    default:
+        break;
+    }
 }
 
 gearoenix::render::widget::Button::Button(system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)

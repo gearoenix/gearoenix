@@ -42,6 +42,10 @@ gearoenix::physics::Engine::~Engine()
 void gearoenix::physics::Engine::add_animation(std::shared_ptr<animation::Animation> a)
 {
     std::lock_guard<std::mutex> lg(pending_animations_locker);
+#ifdef DEBUG_MODE
+    if (animations.find(a->get_id()) != animations.end())
+        UNEXPECTED;
+#endif
     pending_animations.push_back(a);
 }
 
@@ -76,12 +80,16 @@ void gearoenix::physics::Engine::wait()
     }
     {
         std::lock_guard<std::mutex> lg(pending_animations_locker);
-        for (const std::shared_ptr<animation::Animation>& a : pending_animations) {
+        for (const std::shared_ptr<animation::Animation>& an : pending_animations) {
 #ifdef DEBUG_MODE
-            if (animations.find(a->get_id()) != animations.end())
-                UNEXPECTED;
+            {
+                const std::map<core::Id, std::shared_ptr<animation::Animation>>::iterator iter = animations.find(an->get_id());
+                if (iter != animations.end())
+                    if (iter->second->get_id() == an->get_id())
+                        UNEXPECTED;
+            }
 #endif
-            animations[a->get_id()] = a;
+            animations[an->get_id()] = an;
         }
         pending_animations.clear();
     }

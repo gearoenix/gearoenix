@@ -1,4 +1,5 @@
 #include "../../core/cr-types.hpp"
+#include <atomic>
 #include <chrono>
 #include <functional>
 
@@ -16,7 +17,7 @@ namespace physics {
             } Type;
 
         protected:
-            static volatile core::Id last_id;
+            static volatile std::atomic<core::Id> last_id;
             const core::Id my_id;
             const Type animation_type;
             // milliseconds from start, delta time

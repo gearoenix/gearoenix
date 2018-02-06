@@ -2,10 +2,10 @@
 #include "../../core/cr-build-configuration.hpp"
 #include "../../system/sys-log.hpp"
 
-volatile gearoenix::core::Id gearoenix::physics::animation::Animation::last_id = 0;
+volatile std::atomic<gearoenix::core::Id> gearoenix::physics::animation::Animation::last_id(0);
 
 gearoenix::physics::animation::Animation::Animation(Type t, const std::function<void(core::Real, core::Real)>& a, const std::chrono::milliseconds& d, std::function<void()> on_delete)
-    : my_id(last_id++)
+    : my_id(last_id.fetch_add(1))
     , animation_type(t)
     , action(a)
     , on_delete(on_delete)

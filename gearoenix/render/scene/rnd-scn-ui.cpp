@@ -42,17 +42,16 @@ void gearoenix::render::scene::Ui::on_event(const core::event::Event& e)
                     break;
                 }
                 case core::event::button::Button::ActionType::RELEASE: {
-                    const core::Id hitmptr = find_widget_under_cursor(mbe.get_x(), mbe.get_y());
-                    if (hitmptr == (core::Id)-1)
+                    if ((core::Id)-1 == pressed)
                         break;
                     std::shared_ptr<widget::Widget> hitw;
-                    if (auto hitm = all_models[hitmptr].lock()) {
+                    if (auto hitm = all_models[pressed].lock()) {
                         hitw = std::static_pointer_cast<widget::Widget>(hitm);
                     } else {
                         break;
                     }
+                    hitw->state_change(widget::Widget::EventType::RELEASE, pressed);
                     pressed = (core::Id)-1;
-                    hitw->state_change(widget::Widget::EventType::RELEASE, hitmptr);
                     break;
                 }
                 default:
