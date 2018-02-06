@@ -17,8 +17,8 @@ namespace physics {
     class Kernel {
     private:
         Engine* engine;
-        std::chrono::steady_clock::time_point last_update = std::chrono::steady_clock::now();
-        std::chrono::steady_clock::time_point now;
+        std::chrono::system_clock::time_point last_update = std::chrono::system_clock::now();
+        std::chrono::system_clock::time_point now;
         core::Real delta_time;
 #ifdef THREAD_SUPPORTED
         const unsigned int thread_index;

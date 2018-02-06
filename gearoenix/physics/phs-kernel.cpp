@@ -22,7 +22,7 @@ void gearoenix::physics::Kernel::run()
     const unsigned int threads_count = 1;
     const unsigned int thread_index = 0;
 #endif
-        now = std::chrono::steady_clock::now();
+        now = std::chrono::system_clock::now();
         delta_time = std::chrono::duration_cast<std::chrono::duration<core::Real>>(now - last_update).count();
         // std::string s = "\n" + std::to_string(thread_index) + " of " + std::to_string(threads_count) + "\n";
         // std::cout << s;

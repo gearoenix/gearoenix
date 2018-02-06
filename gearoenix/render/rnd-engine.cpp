@@ -39,7 +39,7 @@ gearoenix::render::Engine::Engine(system::Application* system_application)
 #endif
     physics_engine = new physics::Engine(this);
     physics_engine->update();
-    now_time = std::chrono::steady_clock::now();
+    now_time = std::chrono::system_clock::now();
 }
 
 gearoenix::render::Engine::~Engine()
@@ -153,8 +153,8 @@ void gearoenix::render::Engine::load_scene(core::Id scene_id, std::function<void
 
 void gearoenix::render::Engine::update_time()
 {
-    delta_time = std::chrono::steady_clock::now() - now_time;
-    now_time = std::chrono::steady_clock::now();
+    delta_time = std::chrono::system_clock::now() - now_time;
+    now_time = std::chrono::system_clock::now();
 }
 
 gearoenix::physics::Engine* gearoenix::render::Engine::get_physics_engine()
