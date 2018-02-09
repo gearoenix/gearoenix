@@ -1,7 +1,7 @@
 #include "cr-ev-ui-ui.hpp"
 
 gearoenix::core::event::ui::Ui::Ui(ActionType action_type, core::Id widget_id)
-    : Event(Event::EventType::UI)
+    : Event(Event::From::UI)
     , action_type(action_type)
     , widget_id(widget_id)
 {

@@ -3,6 +3,7 @@
 #include "../core/asset/cr-asset-manager.hpp"
 #include "../core/cr-end-caller.hpp"
 #include "../core/event/cr-ev-event.hpp"
+#include "../core/event/cr-ev-sys-system.hpp"
 #include "../core/event/cr-ev-window-resize.hpp"
 #include "../physics/phs-engine.hpp"
 #include "../render/camera/rnd-cmr-camera.hpp"
@@ -27,8 +28,7 @@
 #include "texture/gles2-txt-2d.hpp"
 #include "texture/gles2-txt-cube.hpp"
 
-gearoenix::gles2::Engine::Engine(system::Application* sysapp)
-    : render::Engine(sysapp)
+void gearoenix::gles2::Engine::initialize()
 {
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     win_width = (GLfloat)sysapp->get_width();
@@ -80,11 +80,15 @@ gearoenix::gles2::Engine::Engine(system::Application* sysapp)
 #endif
 }
 
+gearoenix::gles2::Engine::Engine(system::Application* sysapp)
+    : render::Engine(sysapp)
+{
+    initialize();
+}
+
 gearoenix::gles2::Engine::~Engine()
 {
-    glDeleteFramebuffers(1, &shadow_map_framebuffer);
-    glDeleteRenderbuffers(1, &shadow_map_depth);
-    delete shadow_map_texture;
+    terminate();
 }
 
 void gearoenix::gles2::Engine::window_changed()
@@ -95,23 +99,22 @@ void gearoenix::gles2::Engine::window_changed()
 void gearoenix::gles2::Engine::update()
 {
     CHECK_FOR_GRAPHIC_API_ERROR
-    update_time();
     glClear(GL_COLOR_BUFFER_BIT);
     do_load_functions();
     physics_engine->wait();
-    for (std::shared_ptr<render::scene::Scene>& scene : loaded_scenes) {
+    for (std::pair<const core::Id, std::shared_ptr<render::scene::Scene>>& scene : loaded_scenes) {
         glBindRenderbuffer(GL_RENDERBUFFER, shadow_map_depth);
         glBindFramebuffer(GL_FRAMEBUFFER, shadow_map_framebuffer);
         glViewport(0, 0, shadow_map_aspect, shadow_map_aspect);
         glScissor(0, 0, shadow_map_aspect, shadow_map_aspect);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-        scene->cast_shadow();
+        scene.second->cast_shadow();
         glBindRenderbuffer(GL_RENDERBUFFER, render_depth);
         glBindFramebuffer(GL_FRAMEBUFFER, render_framebuffer);
         glViewport(0, 0, (GLsizei)win_width, (GLsizei)win_height);
         glScissor(0, 0, (GLsizei)win_width, (GLsizei)win_height);
         glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-        scene->draw(shadow_map_texture);
+        scene.second->draw(shadow_map_texture);
     }
     physics_engine->update();
 #ifdef GLES2_PROFILING
@@ -131,7 +134,14 @@ void gearoenix::gles2::Engine::update()
 
 void gearoenix::gles2::Engine::terminate()
 {
-    TODO;
+    if (shadow_map_texture != nullptr) {
+        glDeleteFramebuffers(1, &shadow_map_framebuffer);
+        shadow_map_framebuffer = 0;
+        glDeleteRenderbuffers(1, &shadow_map_depth);
+        shadow_map_depth = 0;
+        delete shadow_map_texture;
+        shadow_map_texture = nullptr;
+    }
 }
 
 gearoenix::render::texture::Texture2D* gearoenix::gles2::Engine::create_texture_2d(system::File* file, core::EndCaller<core::EndCallerIgnore> c)
@@ -237,10 +247,31 @@ gearoenix::render::pipeline::Pipeline* gearoenix::gles2::Engine::create_pipeline
 void gearoenix::gles2::Engine::on_event(const core::event::Event& e)
 {
     render::Engine::on_event(e);
-    if (e.get_type() == core::event::Event::EventType::WINDOW_RESIZE) {
+    switch (e.get_type()) {
+    case core::event::Event::From::SYSTEM: {
+        const core::event::system::System& se = e.to_system();
+        switch (se.get_action()) {
+        case core::event::system::System::Action::UNLOAD: {
+            terminate();
+            break;
+        }
+        case core::event::system::System::Action::RELOAD: {
+            initialize();
+            break;
+        }
+        default:
+            break;
+        }
+        break;
+    }
+    case core::event::Event::From::WINDOW_RESIZE: {
         const core::event::WindowResize& event = e.to_window_resize();
         win_width = event.get_current_width();
         win_height = event.get_current_height();
+        break;
+    }
+    default:
+        break;
     }
 }
 

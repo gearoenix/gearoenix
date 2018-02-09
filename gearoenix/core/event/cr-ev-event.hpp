@@ -12,33 +12,42 @@ namespace core {
         namespace movement {
             class Movement;
         }
+        namespace system {
+            class System;
+        }
         namespace ui {
             class Ui;
         }
         class WindowResize;
         class Event {
         public:
-            typedef enum : core::Id {
-                WINDOW_RESIZE = 1,
-                BUTTON = 2,
-                MOVEMENT = 3,
-                UI = 4,
-                USER_DEFINED = 5,
-            } EventType;
+            class From {
+            public:
+                typedef enum : core::Id {
+                    BUTTON = 1,
+                    MOVEMENT = 2,
+                    SYSTEM = 3,
+                    UI = 4,
+                    USER_DEFINED = 5,
+                    WINDOW_RESIZE = 6,
+                    UNDEFINED = 0XFFFFFFFFFFFFFFFF,
+                } Type;
+            };
 
         private:
-            const EventType event_type;
+            const From::Type event_type;
 
         protected:
-            Event(EventType t);
+            Event(From::Type t);
 
         public:
             virtual ~Event();
-            EventType get_type() const;
+            From::Type get_type() const;
             const button::Button& to_button() const;
             const movement::Movement& to_movement() const;
-            const WindowResize& to_window_resize() const;
+            const system::System& to_system() const;
             const ui::Ui& to_ui() const;
+            const WindowResize& to_window_resize() const;
         };
     }
 }

@@ -12,8 +12,7 @@
 #elif defined(USE_GLFW)
 #include <GL/glew.h>
 #elif defined(IN_ANDROID)
-#include <EGL/egl.h>
-#include <GLES2/gl2.h>
+#include <GLContext.h>
 #else
 #error "Not implemented yet!"
 #endif

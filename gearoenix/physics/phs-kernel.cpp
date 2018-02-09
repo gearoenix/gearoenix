@@ -29,8 +29,9 @@ void gearoenix::physics::Kernel::run()
         apply_animations();
         apply_constraints();
         unsigned int model_index = 0;
-        const std::vector<std::shared_ptr<render::scene::Scene>>& scenes = engine->render_engine->get_all_scenes();
-        for (const std::shared_ptr<render::scene::Scene>& scene : scenes) {
+        const std::map<core::Id, std::shared_ptr<render::scene::Scene>>& scenes = engine->render_engine->get_all_scenes();
+        for (const std::pair<core::Id, std::shared_ptr<render::scene::Scene>>& id_scene : scenes) {
+            const std::shared_ptr<render::scene::Scene>& scene = id_scene.second;
             const std::map<core::Id, std::weak_ptr<render::model::Model>>& models = scene->get_all_models();
             for (const std::pair<core::Id, std::weak_ptr<render::model::Model>>& id_model : models) {
                 if (((model_index++) % threads_count) != thread_index)
@@ -73,8 +74,9 @@ void gearoenix::physics::Kernel::apply_constraints()
     const unsigned int threads_count = engine->threads_count;
     unsigned int item_index = 0;
 #endif
-    const std::vector<std::shared_ptr<render::scene::Scene>>& scenes = engine->render_engine->get_all_scenes();
-    for (const std::shared_ptr<render::scene::Scene>& scene : scenes) {
+    const std::map<core::Id, std::shared_ptr<render::scene::Scene>>& scenes = engine->render_engine->get_all_scenes();
+    for (const std::pair<core::Id, std::shared_ptr<render::scene::Scene>>& id_scene : scenes) {
+        const std::shared_ptr<render::scene::Scene>& scene = id_scene.second;
         const std::map<core::Id, std::shared_ptr<constraint::Constraint>>& constraints = scene->get_all_root_constraints();
         for (const std::pair<core::Id, std::shared_ptr<constraint::Constraint>>& id_constraint : constraints) {
 #ifdef THREAD_SUPPORTED
@@ -97,7 +99,7 @@ gearoenix::physics::Kernel::Kernel(
 #endif
 {
 #ifdef THREAD_SUPPORTED
-    signaller = new core::Semaphore();
+    signaller = new core::Semaphore(1);
     thread = std::thread(std::bind(&Kernel::run, this));
 #endif
 }

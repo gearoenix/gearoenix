@@ -16,7 +16,9 @@ add_library(
     STATIC
     ${NDK_HELPER_DIR}/gestureDetector.cpp
     ${NDK_HELPER_DIR}/JNIHelper.cpp
-    ${NDK_HELPER_DIR}/vecmath.cpp )
+    ${NDK_HELPER_DIR}/vecmath.cpp
+    ${NDK_HELPER_DIR}/GLContext.cpp
+    ${NDK_HELPER_DIR}/gl3stub.c )
 
 set(APP_SRC_DIR ../gearoenix)
 
@@ -37,6 +39,7 @@ add_library(
     ${APP_SRC_DIR}/core/event/cr-ev-event.cpp 
     ${APP_SRC_DIR}/core/event/cr-ev-mv-mouse.cpp 
     ${APP_SRC_DIR}/core/event/cr-ev-mv-movement.cpp 
+    ${APP_SRC_DIR}/core/event/cr-ev-sys-system.cpp 
     ${APP_SRC_DIR}/core/event/cr-ev-ui-ui.cpp 
     ${APP_SRC_DIR}/core/event/cr-ev-window-resize.cpp 
     ${APP_SRC_DIR}/core/gc/cr-gc-object.cpp 

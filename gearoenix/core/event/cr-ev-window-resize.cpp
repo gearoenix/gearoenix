@@ -1,7 +1,7 @@
 #include "cr-ev-window-resize.hpp"
 
 gearoenix::core::event::WindowResize::WindowResize(Real pre_width, Real pre_height, Real cur_width, Real cur_height)
-    : Event(Event::EventType::WINDOW_RESIZE)
+    : Event(Event::From::WINDOW_RESIZE)
     , pre_width(pre_width)
     , pre_height(pre_height)
     , cur_width(cur_width)

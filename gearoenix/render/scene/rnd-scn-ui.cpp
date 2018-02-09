@@ -20,7 +20,7 @@ void gearoenix::render::scene::Ui::on_event(const core::event::Event& e)
 {
     Scene::on_event(e);
     switch (e.get_type()) {
-    case core::event::Event::EventType::BUTTON: {
+    case core::event::Event::From::BUTTON: {
         const core::event::button::Button& be = e.to_button();
         switch (be.get_type()) {
         case core::event::button::Button::ButtonType::MOUSE: {
@@ -68,7 +68,7 @@ void gearoenix::render::scene::Ui::on_event(const core::event::Event& e)
         }
         break;
     }
-    case core::event::Event::EventType::MOVEMENT: {
+    case core::event::Event::From::MOVEMENT: {
         const core::event::movement::Movement& me = e.to_movement();
         switch (me.get_type()) {
         case core::event::movement::Movement::MovementType::MOUSE: {
