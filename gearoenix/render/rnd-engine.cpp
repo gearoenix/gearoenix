@@ -71,7 +71,7 @@ void gearoenix::render::Engine::clear()
     }
 }
 
-void gearoenix::render::Engine::on_event(const core::event::Event& e)
+void gearoenix::render::Engine::on_event(core::event::Event& e)
 {
     switch (e.get_type()) {
     case core::event::Event::From::SYSTEM: {

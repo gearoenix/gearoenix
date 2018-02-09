@@ -20,6 +20,16 @@ gearoenix::core::event::Event::From::Type gearoenix::core::event::Event::get_typ
     return event_type;
 }
 
+bool gearoenix::core::event::Event::is_taken() const
+{
+    return taken;
+}
+
+void gearoenix::core::event::Event::take()
+{
+    taken = true;
+}
+
 const gearoenix::core::event::button::Button& gearoenix::core::event::Event::to_button() const
 {
 #ifdef DEBUG_MODE

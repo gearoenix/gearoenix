@@ -16,7 +16,7 @@ gearoenix::render::scene::Ui::Ui(system::File* f, Engine* e, core::EndCaller<cor
 {
 }
 
-void gearoenix::render::scene::Ui::on_event(const core::event::Event& e)
+void gearoenix::render::scene::Ui::on_event(core::event::Event& e)
 {
     Scene::on_event(e);
     switch (e.get_type()) {
@@ -32,26 +32,34 @@ void gearoenix::render::scene::Ui::on_event(const core::event::Event& e)
                     pressed = find_widget_under_cursor(mbe.get_x(), mbe.get_y());
                     if (pressed == (core::Id)-1)
                         break;
+                    const auto& id_model = all_models.find(pressed);
+                    if (id_model == all_models.end())
+                        break;
                     std::shared_ptr<widget::Widget> hitw;
-                    if (auto hitm = all_models[pressed].lock()) {
+                    if (auto hitm = id_model->second.lock()) {
                         hitw = std::static_pointer_cast<widget::Widget>(hitm);
                     } else {
                         break;
                     }
                     hitw->state_change(widget::Widget::EventType::PRESS, pressed);
+                    e.take();
                     break;
                 }
                 case core::event::button::Button::ActionType::RELEASE: {
                     if ((core::Id)-1 == pressed)
                         break;
+                    const auto& id_model = all_models.find(pressed);
+                    if (id_model == all_models.end())
+                        break;
                     std::shared_ptr<widget::Widget> hitw;
-                    if (auto hitm = all_models[pressed].lock()) {
+                    if (auto hitm = id_model->second.lock()) {
                         hitw = std::static_pointer_cast<widget::Widget>(hitm);
                     } else {
                         break;
                     }
                     hitw->state_change(widget::Widget::EventType::RELEASE, pressed);
                     pressed = (core::Id)-1;
+                    e.take();
                     break;
                 }
                 default:
@@ -74,9 +82,14 @@ void gearoenix::render::scene::Ui::on_event(const core::event::Event& e)
         case core::event::movement::Movement::MovementType::MOUSE: {
             const core::event::movement::Mouse& mme = me.to_mouse();
             const core::Id hitmptr = find_widget_under_cursor(mme.get_x(), mme.get_y());
-            if (mouse_overed != hitmptr && mouse_overed != (core::Id)-1)
-                if (auto hitm = all_models[mouse_overed].lock())
+            if (mouse_overed != hitmptr && mouse_overed != (core::Id)-1) {
+                const auto& id_model = all_models.find(mouse_overed);
+                if (id_model == all_models.end())
+                    break;
+                if (auto hitm = id_model->second.lock()) {
                     std::static_pointer_cast<widget::Widget>(hitm)->state_change(widget::Widget::EventType::MOVE_OUT, mouse_overed);
+                }
+            }
             mouse_overed = hitmptr;
             break;
         }

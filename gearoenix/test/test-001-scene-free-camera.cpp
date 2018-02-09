@@ -1,5 +1,7 @@
 #include "test-001-scene-free-camera.hpp"
 #ifdef TEST001
+#include "../core/event/cr-ev-bt-mouse.hpp"
+#include "../core/event/cr-ev-mv-mouse.hpp"
 #include "../core/event/cr-ev-sys-system.hpp"
 #include "../render/camera/rnd-cmr-camera.hpp"
 #include "../render/rnd-engine.hpp"
@@ -11,7 +13,9 @@ TestApp::TestApp(gearoenix::system::Application* sys_app)
     : gearoenix::core::Application::Application(sys_app)
     , rndeng(sys_app->get_render_engine())
 {
-    rndeng->load_scene(0, [this]() -> void {});
+    rndeng->load_scene(0, [this]() -> void {
+        cam = rndeng->get_scene(0)->get_current_camera();
+    });
     rndeng->load_scene(1, [this]() -> void {});
 }
 
@@ -21,49 +25,6 @@ void TestApp::update() {}
 
 void TestApp::terminate() {}
 
-//void TestApp::on_zoom(gearoenix::core::Real d)
-//{
-//    if (cam != nullptr)
-//        cam->move_forward(d); // only for demo, this is not good practice
-//}
-
-//void TestApp::on_rotate(gearoenix::core::Real)
-//{
-//}
-
-//void TestApp::on_scroll(gearoenix::core::Real d)
-//{
-//    if (cam != nullptr)
-//        cam->move_forward(d * 0.3f);
-//}
-
-//void TestApp::on_mouse(MouseButton mb, ButtonAction ba, gearoenix::core::Real, gearoenix::core::Real)
-//{
-//    switch (mb) {
-//    case MouseButton::LEFT:
-//        switch (ba) {
-//        case ButtonAction::PRESS:
-//            left_mouse_down = true;
-//            break;
-//        case ButtonAction::RELEASE:
-//            left_mouse_down = false;
-//            break;
-//        }
-//        break;
-//    default:
-//        break;
-//    }
-//}
-
-//void TestApp::on_mouse_move(gearoenix::core::Real dx, gearoenix::core::Real dy)
-//{
-//    if (cam != nullptr)
-//        if (left_mouse_down) {
-//            cam->rotate_local_x(dy * 0.001f);
-//            cam->rotate_global_z(dx * 0.001f);
-//        }
-//}
-
 void TestApp::on_event(const gearoenix::core::event::Event& e)
 {
     switch (e.get_type()) {
@@ -72,6 +33,7 @@ void TestApp::on_event(const gearoenix::core::event::Event& e)
         switch (se.get_action()) {
         case gearoenix::core::event::system::System::Action::RELOAD:
             rndeng->load_scene(0, [this]() -> void {
+                cam = rndeng->get_scene(0)->get_current_camera();
                 rndeng->load_scene(1, [this]() -> void {});
             });
 
@@ -80,6 +42,50 @@ void TestApp::on_event(const gearoenix::core::event::Event& e)
             break;
         }
         break;
+    }
+    case gearoenix::core::event::Event::From::BUTTON: {
+        const gearoenix::core::event::button::Button& be = e.to_button();
+        switch (be.get_type()) {
+        case gearoenix::core::event::button::Button::MOUSE: {
+            switch (be.get_key()) {
+            case gearoenix::core::event::button::Button::LEFT:
+                switch (be.get_action()) {
+                case gearoenix::core::event::button::Button::PRESS:
+                    if (be.is_taken())
+                        break;
+                    left_mouse_down = true;
+                    break;
+                case gearoenix::core::event::button::Button::RELEASE:
+                    left_mouse_down = false;
+                    break;
+                default:
+                    break;
+                }
+                break;
+            default:
+                break;
+            }
+            break;
+        }
+        default:
+            break;
+        }
+        break;
+    }
+    case gearoenix::core::event::Event::From::MOVEMENT: {
+        const gearoenix::core::event::movement::Movement& me = e.to_movement();
+        switch (me.get_type()) {
+        case gearoenix::core::event::movement::Movement::MOUSE: {
+            const gearoenix::core::event::movement::Mouse& mme = me.to_mouse();
+            if (left_mouse_down) {
+                cam->rotate_local_x(mme.get_dy() * 0.1f);
+                cam->rotate_global_z(mme.get_dx() * 0.1f);
+            }
+            break;
+        }
+        default:
+            break;
+        }
     }
     default:
         break;

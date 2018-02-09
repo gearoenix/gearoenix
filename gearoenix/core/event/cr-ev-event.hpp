@@ -35,6 +35,7 @@ namespace core {
             };
 
         private:
+            bool taken = false;
             const From::Type event_type;
 
         protected:
@@ -43,6 +44,8 @@ namespace core {
         public:
             virtual ~Event();
             From::Type get_type() const;
+            bool is_taken() const;
+            void take();
             const button::Button& to_button() const;
             const movement::Movement& to_movement() const;
             const system::System& to_system() const;

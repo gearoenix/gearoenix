@@ -14,8 +14,8 @@ namespace render {
 class TestApp : public gearoenix::core::Application {
 private:
     gearoenix::render::Engine* rndeng;
-    //    gearoenix::render::camera::Camera* cam;
-    //    bool left_mouse_down = false;
+    gearoenix::render::camera::Camera* cam;
+    bool left_mouse_down = false;
     unsigned int scene_id = 0;
     unsigned int gui_scene_id = 1;
 

@@ -244,7 +244,7 @@ gearoenix::render::pipeline::Pipeline* gearoenix::gles2::Engine::create_pipeline
     return new pipeline::Pipeline(sid, this, c);
 }
 
-void gearoenix::gles2::Engine::on_event(const core::event::Event& e)
+void gearoenix::gles2::Engine::on_event(core::event::Event& e)
 {
     render::Engine::on_event(e);
     switch (e.get_type()) {
