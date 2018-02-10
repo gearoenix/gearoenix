@@ -4,6 +4,7 @@
 #include "../../core/cr-application.hpp"
 #include "../../core/event/cr-ev-bt-mouse.hpp"
 #include "../../core/event/cr-ev-mv-mouse.hpp"
+#include "../../core/event/cr-ev-sys-system.hpp"
 #include "../../gles2/gles2-engine.hpp"
 #include "../../render/rnd-engine.hpp"
 #include "../sys-file.hpp"
@@ -13,16 +14,16 @@
 void gearoenix::system::Application::handle_cmd(android_app* app, int32_t cmd)
 {
     Application* sys_app = reinterpret_cast<Application*>(app->userData);
-    sys_app->handle(cmd);
+    sys_app->handle(app, cmd);
 }
 
 int32_t gearoenix::system::Application::handle_input(android_app* a, AInputEvent* e)
 {
     Application* sys_app = reinterpret_cast<Application*>(a->userData);
-    return sys_app->handle(e);
+    return sys_app->handle(a, e);
 }
 
-int32_t gearoenix::system::Application::handle(AInputEvent* e)
+int32_t gearoenix::system::Application::handle(android_app* app, AInputEvent* e)
 {
     ndk_helper::Vec2 p1, p2;
     core::Real w1, w2;
@@ -114,6 +115,7 @@ int32_t gearoenix::system::Application::handle(AInputEvent* e)
 
 gearoenix::system::Application::Application(android_app* and_app)
     : and_app(and_app)
+    , gl_ctx(ndk_helper::GLContext::GetInstance())
 {
     and_app->userData = this;
     and_app->onAppCmd = gearoenix::system::Application::handle_cmd;
@@ -121,7 +123,7 @@ gearoenix::system::Application::Application(android_app* and_app)
     int events;
     android_poll_source* source;
     do {
-        if (ALooper_pollAll(1, nullptr, &events, (void**)&source) >= 0) {
+        if (ALooper_pollAll(-1, nullptr, &events, (void**)&source) >= 0) {
             if (source != nullptr)
                 source->process(and_app, source);
         }
@@ -132,10 +134,6 @@ gearoenix::system::Application::Application(android_app* and_app)
 
 gearoenix::system::Application::~Application()
 {
-    delete core_app;
-    core_app = nullptr;
-    delete render_engine;
-    render_engine = nullptr;
 }
 
 android_app* gearoenix::system::Application::get_android_app() const
@@ -193,87 +191,98 @@ void gearoenix::system::Application::execute(core::Application* app)
     core_app = app;
     int events;
     android_poll_source* source;
-    if (eglMakeCurrent(display, surface, surface, context) == EGL_FALSE) {
-        GXLOGF("Unable to eglMakeCurrent");
-    }
     do {
-        if (ALooper_pollAll(1, nullptr, &events,
+        if (ALooper_pollAll(active ? 0 : -1, nullptr, &events,
                 (void**)&source)
             >= 0) {
             if (source != nullptr)
                 source->process(and_app, source);
         }
-        core_app->update();
-        render_engine->update();
-        eglSwapBuffers(display, surface);
+        if (active) {
+            core_app->update();
+            render_engine->update();
+            if (gl_ctx->Swap() != EGL_SUCCESS) {
+                GXLOGE("reached");
+                core::event::system::System eul(core::event::system::System::Action::UNLOAD);
+                core_app->on_event(eul);
+                render_engine->on_event(eul);
+                core::event::system::System erl(core::event::system::System::Action::RELOAD);
+                core_app->on_event(erl);
+                render_engine->on_event(erl);
+                GXLOGE("reached");
+            }
+        }
     } while (and_app->destroyRequested == 0);
+    active = false;
+    core_app->terminate();
+    render_engine->terminate();
+    delete core_app;
+    core_app = nullptr;
+    delete render_engine;
+    render_engine = nullptr;
+    delete astmgr;
+    astmgr = nullptr;
+    gl_ctx->Invalidate();
+    gl_ctx = nullptr;
+    delete and_app;
+    and_app = nullptr;
+    return;
 }
 
-void gearoenix::system::Application::handle(int32_t cmd)
+void gearoenix::system::Application::handle(android_app* a, int32_t cmd)
 {
     switch (cmd) {
     case APP_CMD_INIT_WINDOW:
-        if (and_app->window != nullptr && this->render_engine == nullptr) {
-            const EGLint attribs[] = {
-                EGL_SURFACE_TYPE, EGL_OPENGL_ES2_BIT,
-                EGL_BLUE_SIZE, 8,
-                EGL_GREEN_SIZE, 8,
-                EGL_RED_SIZE, 8,
-                EGL_ALPHA_SIZE, 8,
-                EGL_DEPTH_SIZE, 24,
-                EGL_NONE
-            };
-            EGLint w, h, format;
-            EGLint num_configs;
-            EGLConfig config;
-            display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
-            eglInitialize(display, 0, 0);
-            eglChooseConfig(display, attribs, nullptr, 0, &num_configs);
-            std::unique_ptr<EGLConfig[]> supported_configs(new EGLConfig[num_configs]);
-            eglChooseConfig(display, attribs, supported_configs.get(), num_configs, &num_configs);
-            if (num_configs == 0) {
+        if (and_app->window != nullptr) {
+            if (render_engine == nullptr) {
+                gl_ctx->Init(and_app->window);
+                win_width = (unsigned int)gl_ctx->GetScreenWidth();
+                win_height = (unsigned int)gl_ctx->GetScreenHeight();
+                screen_ratio = (core::Real)win_width / (core::Real)win_height;
+                half_height_inversed = 2.0f / (core::Real)win_height;
+                render_engine = new gles2::Engine(this);
+                astmgr = new core::asset::Manager(this, "data.gx3d");
+                astmgr->initialize();
+            } else if (a->window != and_app->window) {
+                GXLOGE("reached");
+                core::event::system::System eul(core::event::system::System::Action::UNLOAD);
+                core_app->on_event(eul);
+                render_engine->on_event(eul);
+                gl_ctx->Invalidate();
+                and_app = a;
+                gl_ctx->Init(a->window);
+                core::event::system::System erl(core::event::system::System::Action::RELOAD);
+                core_app->on_event(erl);
+                render_engine->on_event(erl);
+                GXLOGE("reached");
+            } else if (EGL_SUCCESS == gl_ctx->Resume(a->window)) {
+                GXLOGE("reached");
+                core::event::system::System eul(core::event::system::System::Action::UNLOAD);
+                core_app->on_event(eul);
+                render_engine->on_event(eul);
+                core::event::system::System erl(core::event::system::System::Action::RELOAD);
+                core_app->on_event(erl);
+                render_engine->on_event(erl);
+                GXLOGE("reached");
+            } else
                 UNEXPECTED;
-            }
-            int i = 0;
-            for (; i < num_configs; i++) {
-                EGLConfig& cfg = supported_configs[i];
-                EGLint r, g, b, d;
-                if (eglGetConfigAttrib(display, cfg, EGL_RED_SIZE, &r) && eglGetConfigAttrib(display, cfg, EGL_GREEN_SIZE, &g) && eglGetConfigAttrib(display, cfg, EGL_BLUE_SIZE, &b) && eglGetConfigAttrib(display, cfg, EGL_DEPTH_SIZE, &d) && r == 8 && g == 8 && b == 8 && d == 24) {
-
-                    config = supported_configs[i];
-                    break;
-                }
-            }
-            if (i == num_configs) {
-                config = supported_configs[0];
-            }
-            eglGetConfigAttrib(display, config, EGL_NATIVE_VISUAL_ID, &format);
-            surface = eglCreateWindowSurface(display, config, this->and_app->window, NULL);
-            const EGLint attrib_list[] = {
-                EGL_CONTEXT_CLIENT_VERSION, 2,
-                EGL_NONE
-            };
-            context = eglCreateContext(display, config, NULL, attrib_list);
-            if (eglMakeCurrent(display, surface, surface, context) == EGL_FALSE) {
-                GXLOGF("Unable to eglMakeCurrent");
-            }
-            eglQuerySurface(display, surface, EGL_WIDTH, &w);
-            eglQuerySurface(display, surface, EGL_HEIGHT, &h);
-            win_width = (unsigned int)w;
-            win_height = (unsigned int)h;
+            win_width = (unsigned int)gl_ctx->GetScreenWidth();
+            win_height = (unsigned int)gl_ctx->GetScreenHeight();
             screen_ratio = (core::Real)win_width / (core::Real)win_height;
             half_height_inversed = 2.0f / (core::Real)win_height;
-            render_engine = new gles2::Engine(this);
-            astmgr = new core::asset::Manager(this, "data.gx3d");
-            astmgr->initialize();
+            active = true;
         }
         break;
-    case APP_CMD_LOST_FOCUS:
-        if (core_app != nullptr)
-            core_app->terminate();
-        if (render_engine != nullptr)
-            render_engine->terminate();
+    case APP_CMD_TERM_WINDOW: {
+        if (core_app == nullptr || render_engine == nullptr)
+            break;
+        active = false;
+        core::event::system::System eul(core::event::system::System::Action::UNLOAD);
+        core_app->on_event(eul);
+        render_engine->on_event(eul);
+        gl_ctx->Suspend();
         break;
+    }
     default:
         GXLOGI("event not handled: " << cmd);
     }

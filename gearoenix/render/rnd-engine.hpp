@@ -9,6 +9,8 @@
 #ifdef THREAD_SUPPORTED
 #include <thread>
 #endif
+#include <map>
+#include <set>
 #include <vector>
 namespace gearoenix {
 namespace core {
@@ -65,8 +67,6 @@ namespace render {
         EngineType engine_type = EngineType::UNKNOWN;
         system::Application* sysapp;
         pipeline::Manager* pipmgr;
-        std::chrono::system_clock::time_point now_time;
-        std::chrono::duration<core::Real> delta_time;
 #ifdef THREAD_SUPPORTED
         core::Semaphore* load_functions_mutex;
         core::Semaphore* loaded_scenes_mutex;
@@ -78,13 +78,13 @@ namespace render {
         std::vector<std::function<void()>> scene_loader_functions;
 #endif
         std::vector<std::function<void()>> load_functions;
-        std::vector<std::shared_ptr<scene::Scene>> loaded_scenes;
+        std::map<core::Id, std::shared_ptr<scene::Scene>> loaded_scenes;
         physics::Engine* physics_engine = nullptr;
-
         void do_load_functions();
+        void clear();
+        Engine(system::Application* system_application);
 
     public:
-        Engine(system::Application* system_application);
         virtual ~Engine();
         virtual void window_changed() = 0;
         virtual void update() = 0;
@@ -96,18 +96,15 @@ namespace render {
         virtual shader::Shader* create_shader(core::Id sid, system::File* file, core::EndCaller<core::EndCallerIgnore> c) = 0;
         virtual shader::Resources* create_shader_resources(core::Id sid, pipeline::Pipeline* p, buffer::Uniform* ub, core::EndCaller<core::EndCallerIgnore> c) = 0;
         virtual pipeline::Pipeline* create_pipeline(core::Id sid, core::EndCaller<core::EndCallerIgnore> c) = 0;
-        virtual void on_event(const core::event::Event& e);
+        virtual void on_event(core::event::Event& e);
         const pipeline::Manager* get_pipeline_manager() const;
         pipeline::Manager* get_pipeline_manager();
         void add_load_function(std::function<void()> fun);
         const system::Application* get_system_application() const;
         system::Application* get_system_application();
-        const std::shared_ptr<scene::Scene>& get_scene(unsigned int scene_index) const;
-        const std::vector<std::shared_ptr<scene::Scene>>& get_all_scenes() const;
-        void load_scene(core::Id scene_id, std::function<void(unsigned int)> on_load);
-        void update_time();
-        const std::chrono::system_clock::time_point& get_now_time() const;
-        const std::chrono::system_clock::time_point& get_delta_time() const;
+        const std::shared_ptr<scene::Scene>& get_scene(core::Id scene_id) const;
+        const std::map<core::Id, std::shared_ptr<scene::Scene>>& get_all_scenes() const;
+        void load_scene(core::Id scene_id, std::function<void()> on_load);
         physics::Engine* get_physics_engine();
     };
 }

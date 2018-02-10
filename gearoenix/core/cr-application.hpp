@@ -17,16 +17,6 @@ namespace core {
     }
     class Application {
     public:
-        enum MouseButton {
-            LEFT,
-            RIGHT,
-            MIDDLE,
-        };
-        enum ButtonAction {
-            PRESS,
-            RELEASE,
-        };
-
     protected:
         system::Application* sys_app;
 

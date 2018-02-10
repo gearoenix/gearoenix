@@ -4,7 +4,7 @@
 #include "cr-ev-mv-mouse.hpp"
 
 gearoenix::core::event::movement::Movement::Movement(MovementType t)
-    : Event(EventType::MOVEMENT)
+    : Event(From::MOVEMENT)
     , movement_type(t)
 {
 }

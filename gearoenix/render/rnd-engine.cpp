@@ -2,6 +2,8 @@
 #include "../core/asset/cr-asset-manager.hpp"
 #include "../core/cr-end-caller.hpp"
 #include "../core/cr-semaphore.hpp"
+#include "../core/event/cr-ev-event.hpp"
+#include "../core/event/cr-ev-sys-system.hpp"
 #include "../physics/phs-engine.hpp"
 #include "../system/sys-app.hpp"
 #include "../system/sys-log.hpp"
@@ -38,34 +40,76 @@ gearoenix::render::Engine::Engine(system::Application* system_application)
     scene_loader = std::thread(std::bind(&Engine::scene_loader_function, this));
 #endif
     physics_engine = new physics::Engine(this);
-    physics_engine->update();
-    now_time = std::chrono::system_clock::now();
 }
 
 gearoenix::render::Engine::~Engine()
 {
-    loaded_scenes.clear();
-    delete physics_engine;
-#ifdef THREAD_SUPPORTED
-    scene_loader_continue = false;
-    scene_loader_signaler->release();
-    scene_loader.join();
-    delete scene_loader_signaler;
-    scene_loader_signaler = nullptr;
-    delete scene_loader_mutex;
-    scene_loader_mutex = nullptr;
-    delete loaded_scenes_mutex;
-    loaded_scenes_mutex = nullptr;
-    delete load_functions_mutex;
-    load_functions_mutex = nullptr;
-#endif
-    delete pipmgr;
+    clear();
 }
 
-void gearoenix::render::Engine::on_event(const core::event::Event& e)
+void gearoenix::render::Engine::clear()
 {
+    if (pipmgr != nullptr) {
+        loaded_scenes.clear();
+        delete physics_engine;
+        physics_engine = nullptr;
+#ifdef THREAD_SUPPORTED
+        scene_loader_continue = false;
+        scene_loader_signaler->release();
+        scene_loader.join();
+        delete scene_loader_signaler;
+        scene_loader_signaler = nullptr;
+        delete scene_loader_mutex;
+        scene_loader_mutex = nullptr;
+        delete loaded_scenes_mutex;
+        loaded_scenes_mutex = nullptr;
+        delete load_functions_mutex;
+        load_functions_mutex = nullptr;
+#endif
+        delete pipmgr;
+        pipmgr = nullptr;
+    }
+}
+
+void gearoenix::render::Engine::on_event(core::event::Event& e)
+{
+    switch (e.get_type()) {
+    case core::event::Event::From::SYSTEM: {
+        const core::event::system::System& se = e.to_system();
+        switch (se.get_action()) {
+        case core::event::system::System::Action::UNLOAD: {
+            delete pipmgr;
+            pipmgr = nullptr;
+            loaded_scenes.clear();
+            TODO; // it can become better, instead of complete deleting unload it.
+            delete physics_engine;
+            physics_engine = nullptr;
+            load_functions.clear();
+#ifdef THREAD_SUPPORTED
+            scene_loader_functions.clear();
+#endif
+            break;
+        }
+        case core::event::system::System::Action::RELOAD: {
+
+#ifdef THREAD_SUPPORTED
+            scene_loader_functions.clear();
+#endif
+            physics_engine = new physics::Engine(this);
+            load_functions.clear();
+            loaded_scenes.clear();
+            break;
+        }
+        default:
+            break;
+        }
+        break;
+    }
+    default:
+        break;
+    }
     for (auto iter = loaded_scenes.begin(); iter != loaded_scenes.end(); ++iter) {
-        (*iter)->on_event(e);
+        iter->second->on_event(e);
     }
 }
 
@@ -115,46 +159,47 @@ void gearoenix::render::Engine::add_load_function(std::function<void()> fun)
 #endif
 }
 
-const std::shared_ptr<gearoenix::render::scene::Scene>& gearoenix::render::Engine::get_scene(unsigned int scene_index) const
+const std::shared_ptr<gearoenix::render::scene::Scene>& gearoenix::render::Engine::get_scene(core::Id scene_id) const
 {
 #ifdef DEBUG_MODE
-    if (scene_index > (unsigned int)loaded_scenes.size()) {
+    std::map<core::Id, std::shared_ptr<gearoenix::render::scene::Scene>>::const_iterator f = loaded_scenes.find(scene_id);
+    if (f == loaded_scenes.end())
         UNEXPECTED;
-    }
+    return f->second;
+#else
+    return loaded_scenes[scene_id];
 #endif
-    return loaded_scenes[scene_index];
 }
 
-const std::vector<std::shared_ptr<gearoenix::render::scene::Scene>>& gearoenix::render::Engine::get_all_scenes() const
+const std::map<gearoenix::core::Id, std::shared_ptr<gearoenix::render::scene::Scene>>& gearoenix::render::Engine::get_all_scenes() const
 {
     return loaded_scenes;
 }
 
-void gearoenix::render::Engine::load_scene(core::Id scene_id, std::function<void(unsigned int)> on_load)
+void gearoenix::render::Engine::load_scene(core::Id scene_id, std::function<void()> on_load)
 {
 #ifdef THREAD_SUPPORTED
     scene_loader_mutex->lock();
     scene_loader_functions.push_back([this, scene_id, on_load] {
         loaded_scenes_mutex->lock();
 #endif
-        unsigned int result = (unsigned int)loaded_scenes.size();
-        loaded_scenes.push_back(sysapp->get_asset_manager()->get_scene(scene_id, core::EndCaller<scene::Scene>([this, result, on_load](std::shared_ptr<scene::Scene> asset) -> void {
-            scene::Scene* loaded_scene = reinterpret_cast<scene::Scene*>(asset.get());
-            loaded_scene->set_renderable(true);
-            on_load(result);
-        })));
+#ifdef DEBUG_MODE
+        if (loaded_scenes.find(scene_id) != loaded_scenes.end())
+            UNEXPECTED;
+#endif
+        loaded_scenes[scene_id] = sysapp->get_asset_manager()->get_scene(
+            scene_id, core::EndCaller<scene::Scene>(
+                          [this, on_load](std::shared_ptr<scene::Scene> asset) -> void {
+                              scene::Scene* loaded_scene = asset.get();
+                              loaded_scene->set_renderable(true);
+                              on_load();
+                          }));
 #ifdef THREAD_SUPPORTED
         loaded_scenes_mutex->release();
     });
     scene_loader_mutex->release();
     scene_loader_signaler->release();
 #endif
-}
-
-void gearoenix::render::Engine::update_time()
-{
-    delta_time = std::chrono::system_clock::now() - now_time;
-    now_time = std::chrono::system_clock::now();
 }
 
 gearoenix::physics::Engine* gearoenix::render::Engine::get_physics_engine()
