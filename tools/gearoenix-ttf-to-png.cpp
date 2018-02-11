@@ -1,7 +1,12 @@
+#include "../gearoenix/render/texture/rnd-txt-lodepng.hpp"
 #define STB_TRUETYPE_IMPLEMENTATION
-#include "rnd-txt-lodepng.hpp"
-#include "stb_truetype.h"
+#include "../external/stb/stb_truetype.h"
+#include <cmath>
+#include <cstring>
 #include <iostream>
+
+#define ATLAS_ASPECT 512
+#define MAIN_ASPECT 1024
 
 int main()
 {
@@ -17,7 +22,7 @@ int main()
     unsigned char* atlas_data = new unsigned char[1 << 20];
     stbtt_BakeFontBitmap(
         ttbuffer, 0, // font location (use offset=0 for plain .ttf)
-        100, // height of font in pixels
+        180, // height of font in pixels
         atlas_data, 1024, 1024, // bitmap to be filled in
         first_char, num_chars, // characters to bake
         bkchar);
@@ -47,30 +52,60 @@ int main()
         if (cur_h > max_h)
             max_h = cur_h;
     }
+    std::cout << "max width: " << max_w << ", max height: " << max_h << std::endl;
+    unsigned char* final_image = new unsigned char[ATLAS_ASPECT * ATLAS_ASPECT * 4];
+    std::memset(final_image, 0, ATLAS_ASPECT * ATLAS_ASPECT * 4);
     const float max_a = max_h > max_w ? max_h : max_w;
     const float rootnchar = std::ceil(std::sqrt((float)num_chars));
     const float slot_a = 1.0f / rootnchar;
-    const float scale = 1.0f / ((rootnchar + 1.0f) * max_a);
-    auto place_finder = [bkchar, slot_a, scale](int index, float& w, float& h, float& pw, float& ph) -> void {
+    const float iscale = (rootnchar + 1.0f) * max_a;
+    const float scale = 1.0f / iscale;
+    auto place_finder = [bkchar, slot_a, scale](int index, float& w, float& h, float& pw, float& ph, float& x0, float& y0) -> void {
         stbtt_aligned_quad q;
         float xx = 0.0f, yy = 0.0f;
-        stbtt_GetBakedQuad(bkchar, 1024, 1024, i, &xx, &yy, &q, 1);
+        stbtt_GetBakedQuad(bkchar, 1024, 1024, index, &xx, &yy, &q, 1);
         w = (q.s1 - q.s0) * scale;
         h = (q.t1 - q.t0) * scale;
         pw = (slot_a - w) * 0.5f;
         ph = (slot_a - h) * 0.5f;
+        x0 = q.s0 * (float)MAIN_ASPECT;
+        y0 = q.t0 * (float)MAIN_ASPECT;
     };
-
+    float tmp1, tmp2, tmp3, tmp4, tmp5, tmp6, tmp7;
+    place_finder(((int)'A') - first_char, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6);
+    const float charApadv = tmp4;
     for (int i = 0; i < num_chars; ++i) {
-        stbtt_aligned_quad q;
-        float xx = 0.0f, yy = 0.0f;
-        stbtt_GetBakedQuad(bkchar, 1024, 1024, i, &xx, &yy, &q, 1);
-        const float w = (q.s1 - q.s0) * scale;
-        const float h = (q.t1 - q.t0) * scale;
-        const float pw = (slot_a - w) * 0.5f;
-        const float ph = (slot_a - h) * 0.5f;
+        float w, h, pw, ph, x0, y0;
+        place_finder(i, w, h, pw, ph, x0, y0);
+        const char curchar = (char)(num_chars + first_char);
+        const float row = slot_a * ((float)i);
+        float tmp;
+        const float x = std::modf(row, &tmp) + pw;
+        const float y = slot_a * tmp + ph;
+        const int pxw = (int)std::round(((float)ATLAS_ASPECT) * w);
+        const int pxh = (int)std::round(((float)ATLAS_ASPECT) * h);
+        const int pxxi = (int)std::round(((float)ATLAS_ASPECT) * x);
+        const int pxyi = (int)std::round(((float)ATLAS_ASPECT) * y);
+        for (int xi = 0; xi < pxw; ++xi) {
+            for (int yi = 0; yi < pxh; ++yi) {
+                const int atspxxi = (int)std::round(((float)xi) * iscale * ((float)MAIN_ASPECT / (float)ATLAS_ASPECT) + x0);
+                const int atspxyi = (int)std::round(((float)yi) * iscale * ((float)MAIN_ASPECT / (float)ATLAS_ASPECT) + y0);
+                const int atspxi = atspxyi * MAIN_ASPECT + atspxxi;
+                const int pxi = (pxxi + xi + (pxyi + yi) * ATLAS_ASPECT) << 2;
+                if (atlas_data[atspxi] == 0) {
+                    final_image[pxi] = 0;
+                    final_image[pxi + 1] = 0;
+                    final_image[pxi + 2] = 0;
+                    final_image[pxi + 3] = 0;
+                } else {
+                    final_image[pxi] = 0XFF;
+                    final_image[pxi + 1] = 0XFF;
+                    final_image[pxi + 2] = 0XFF;
+                    final_image[pxi + 3] = atlas_data[atspxi];
+                }
+            }
+        }
     }
-
     for (int i = 0; i < num_chars; ++i) {
         stbtt_aligned_quad q;
         float xx = 0.0f, yy = 0.0f;
@@ -104,6 +139,7 @@ int main()
             imgdata[++indx] = 0XFF;
         }
     }
-    lodepng::encode("out.png", imgdata, 1024, 1024);
+    lodepng::encode("stage1.png", imgdata, 1024, 1024);
+    lodepng::encode("final.png", final_image, ATLAS_ASPECT, ATLAS_ASPECT);
     return 0;
 }
