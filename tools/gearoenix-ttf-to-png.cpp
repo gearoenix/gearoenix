@@ -8,12 +8,16 @@
 #define ATLAS_ASPECT 512
 #define MAIN_ASPECT 1024
 
-int main()
+int main(int argc, char** argv)
 {
+    if (argc < 3) {
+        std::cerr << "Usage is: gearoenix-ttf-to-png.exe <input ttf file> <output png file>" << std::endl;
+        std::exit(-1);
+    }
     const int first_char = 33, num_chars = 94;
     stbtt_bakedchar* bkchar = new stbtt_bakedchar[960];
     unsigned char* ttbuffer = new unsigned char[24 << 20];
-    FILE* fd = fopen("font.ttf", "rb");
+    FILE* fd = fopen(argv[1], "rb");
     if (fd == NULL) {
         std::cerr << "File not found." << std::endl;
         std::exit(-1);
@@ -22,10 +26,11 @@ int main()
     unsigned char* atlas_data = new unsigned char[1 << 20];
     stbtt_BakeFontBitmap(
         ttbuffer, 0, // font location (use offset=0 for plain .ttf)
-        180, // height of font in pixels
-        atlas_data, 1024, 1024, // bitmap to be filled in
+        160, // height of font in pixels
+        atlas_data, MAIN_ASPECT, MAIN_ASPECT, // bitmap to be filled in
         first_char, num_chars, // characters to bake
         bkchar);
+#ifdef DEBUG_MODE_FONT
     unsigned char* imgdata = new unsigned char[4 << 20];
     for (int i = 0, j = 0; i < 4 << 20; ++i, ++j) {
         if (atlas_data[j] != 0) {
@@ -40,11 +45,12 @@ int main()
             imgdata[++i] = 0X0;
         }
     }
+#endif
     float max_w = 0.0f, max_h = 0.0f;
     for (int i = 0; i < num_chars; ++i) {
         stbtt_aligned_quad q;
         float xx = 0.0f, yy = 0.0f;
-        stbtt_GetBakedQuad(bkchar, 1024, 1024, i, &xx, &yy, &q, 1);
+        stbtt_GetBakedQuad(bkchar, MAIN_ASPECT, MAIN_ASPECT, i, &xx, &yy, &q, 1);
         const float cur_w = q.s1 - q.s0;
         const float cur_h = q.t1 - q.t0;
         if (cur_w > max_w)
@@ -58,12 +64,12 @@ int main()
     const float max_a = max_h > max_w ? max_h : max_w;
     const float rootnchar = std::ceil(std::sqrt((float)num_chars));
     const float slot_a = 1.0f / rootnchar;
-    const float iscale = (rootnchar + 1.0f) * max_a;
+    const float iscale = (rootnchar + 2.0f) * max_a;
     const float scale = 1.0f / iscale;
     auto place_finder = [bkchar, slot_a, scale](int index, float& w, float& h, float& pw, float& ph, float& x0, float& y0) -> void {
         stbtt_aligned_quad q;
         float xx = 0.0f, yy = 0.0f;
-        stbtt_GetBakedQuad(bkchar, 1024, 1024, index, &xx, &yy, &q, 1);
+        stbtt_GetBakedQuad(bkchar, MAIN_ASPECT, MAIN_ASPECT, index, &xx, &yy, &q, 1);
         w = (q.s1 - q.s0) * scale;
         h = (q.t1 - q.t0) * scale;
         pw = (slot_a - w) * 0.5f;
@@ -71,13 +77,57 @@ int main()
         x0 = q.s0 * (float)MAIN_ASPECT;
         y0 = q.t0 * (float)MAIN_ASPECT;
     };
-    float tmp1, tmp2, tmp3, tmp4, tmp5, tmp6, tmp7;
+    float tmp1, tmp2, tmp3, tmp4, tmp5, tmp6;
     place_finder(((int)'A') - first_char, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6);
-    const float charApadv = tmp4;
+    const float char_cap_a_padv = tmp4;
+    place_finder(((int)'.') - first_char, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6);
+    const float char_dot_padv = slot_a - (tmp2 + char_cap_a_padv);
+    place_finder(((int)':') - first_char, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6);
+    const float char_dcom_padv = slot_a - (tmp2 + char_cap_a_padv);
+    place_finder(((int)'a') - first_char, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6);
+    const float char_lit_a_padv = slot_a - (tmp2 + char_cap_a_padv);
+    place_finder(((int)'i') - first_char, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6);
+    const float char_lit_i_padv = slot_a - (tmp2 + char_cap_a_padv);
     for (int i = 0; i < num_chars; ++i) {
         float w, h, pw, ph, x0, y0;
         place_finder(i, w, h, pw, ph, x0, y0);
-        const char curchar = (char)(num_chars + first_char);
+        const char curchar = (char)(i + first_char);
+        switch (curchar) {
+        case '!':
+            ph = slot_a - (h + char_cap_a_padv);
+            break;
+        case '"':
+        case '\'':
+        case '`':
+        case 'Q':
+            ph = char_cap_a_padv;
+            break;
+        case '.':
+        case ',':
+            ph = char_dot_padv;
+            break;
+        case ':':
+        case ';':
+            ph = char_dcom_padv;
+            break;
+        case 'i':
+        case 'j':
+            ph = char_lit_i_padv;
+            break;
+        case 'b':
+        case 'd':
+        case 'f':
+        case 'h':
+        case 'k':
+        case 'l':
+        case 't':
+            ph = slot_a - (h + char_cap_a_padv);
+            break;
+        default:
+            if ('a' <= curchar && curchar <= 'z')
+                ph = char_lit_a_padv;
+            break;
+        }
         const float row = slot_a * ((float)i);
         float tmp;
         const float x = std::modf(row, &tmp) + pw;
@@ -106,40 +156,49 @@ int main()
             }
         }
     }
+#ifdef DEBUG_MODE_FONT
+    for (int i = 0, pxi = 0; i < (int)rootnchar; ++i, pxi = (i * ATLAS_ASPECT * (ATLAS_ASPECT / ((int)rootnchar))) << 2)
+        for (int j = 0; j < ATLAS_ASPECT; ++j, ++pxi) {
+            final_image[pxi] = 0XFF;
+            final_image[++pxi] = 0X00;
+            final_image[++pxi] = 0X00;
+            final_image[++pxi] = 0XFF;
+        }
     for (int i = 0; i < num_chars; ++i) {
         stbtt_aligned_quad q;
         float xx = 0.0f, yy = 0.0f;
-        stbtt_GetBakedQuad(bkchar, 1024, 1024, i, &xx, &yy, &q, 1); //1=opengl & d3d10+,0=d3d9
-        const int qt0 = (int)(q.t0 * 1024.0f);
-        const int qt1 = (int)(q.t1 * 1024.0f);
-        const int qs0 = (int)(q.s0 * 1024.0f);
-        const int qs1 = (int)(q.s1 * 1024.0f);
+        stbtt_GetBakedQuad(bkchar, MAIN_ASPECT, MAIN_ASPECT, i, &xx, &yy, &q, 1); //1=opengl & d3d10+,0=d3d9
+        const int qt0 = (int)(q.t0 * ((float)MAIN_ASPECT));
+        const int qt1 = (int)(q.t1 * ((float)MAIN_ASPECT));
+        const int qs0 = (int)(q.s0 * ((float)MAIN_ASPECT));
+        const int qs1 = (int)(q.s1 * ((float)MAIN_ASPECT));
         for (int y = qt0; y < qt1; ++y) {
-            int indx = (qs0 + y * 1024) << 2;
+            int indx = (qs0 + y * MAIN_ASPECT) << 2;
             imgdata[indx] = 0XFF;
             imgdata[++indx] = 0X00;
             imgdata[++indx] = 0X00;
             imgdata[++indx] = 0XFF;
-            indx = (qs1 + y * 1024) << 2;
+            indx = (qs1 + y * MAIN_ASPECT) << 2;
             imgdata[indx] = 0XFF;
             imgdata[++indx] = 0X00;
             imgdata[++indx] = 0X00;
             imgdata[++indx] = 0XFF;
         }
         for (int x = qs0; x < qs1; ++x) {
-            int indx = (x + qt0 * 1024) << 2;
+            int indx = (x + qt0 * MAIN_ASPECT) << 2;
             imgdata[indx] = 0XFF;
             imgdata[++indx] = 0X00;
             imgdata[++indx] = 0X00;
             imgdata[++indx] = 0XFF;
-            indx = (x + qt1 * 1024) << 2;
+            indx = (x + qt1 * MAIN_ASPECT) << 2;
             imgdata[indx] = 0XFF;
             imgdata[++indx] = 0X00;
             imgdata[++indx] = 0X00;
             imgdata[++indx] = 0XFF;
         }
     }
-    lodepng::encode("stage1.png", imgdata, 1024, 1024);
-    lodepng::encode("final.png", final_image, ATLAS_ASPECT, ATLAS_ASPECT);
+    lodepng::encode("stage1.png", imgdata, MAIN_ASPECT, MAIN_ASPECT);
+#endif
+    lodepng::encode(argv[2], final_image, ATLAS_ASPECT, ATLAS_ASPECT);
     return 0;
 }
