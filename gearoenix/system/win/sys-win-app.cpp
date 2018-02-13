@@ -181,7 +181,7 @@ LRESULT CALLBACK gearoenix::system::Application::handler(HWND hwnd, UINT umessag
         core::Real pre_screen_width = (core::Real)screen_width;
         core::Real pre_screen_height = (core::Real)screen_height;
         update_screen_sizes();
-        const core::event::WindowResize e(
+        core::event::WindowResize e(
             pre_screen_width, pre_screen_height,
             (core::Real)screen_width, (core::Real)screen_height);
         render_engine->on_event(e);

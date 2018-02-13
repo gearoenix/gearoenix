@@ -68,7 +68,7 @@ namespace dx11 {
         const ID3D11DeviceContext* get_context() const;
         texture::Sampler* get_sampler();
         const texture::Sampler* get_sampler() const;
-        void on_event(const core::event::Event& e);
+        void on_event(core::event::Event& e);
     };
 }
 }

@@ -348,11 +348,11 @@ void gearoenix::dx11::Engine::window_changed()
 
 void gearoenix::dx11::Engine::update()
 {
-    update_time();
     context->ClearRenderTargetView(main_rtv, clear_color);
     do_load_functions();
     physics_engine->wait();
-    for (std::shared_ptr<render::scene::Scene>& scene : loaded_scenes) {
+    for (const std::pair<core::Id, std::shared_ptr<render::scene::Scene> >& id_scene : loaded_scenes) {
+		const std::shared_ptr<render::scene::Scene>& scene = id_scene.second;
         start_shadow_casting();
         scene->cast_shadow();
         context->OMSetRenderTargets(1, &main_rtv, main_dsv);
@@ -509,10 +509,10 @@ const gearoenix::dx11::texture::Sampler* gearoenix::dx11::Engine::get_sampler() 
     return sampler;
 }
 
-void gearoenix::dx11::Engine::on_event(const core::event::Event& e)
+void gearoenix::dx11::Engine::on_event(core::event::Event& e)
 {
     render::Engine::on_event(e);
-    if (e.get_type() == core::event::Event::EventType::WINDOW_RESIZE) {
+    if (e.get_type() == core::event::Event::From::WINDOW_RESIZE) {
         terminate_screen();
         GXHRCHK(swapchain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0));
         initial_screen();
