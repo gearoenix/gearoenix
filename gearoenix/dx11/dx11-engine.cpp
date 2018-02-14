@@ -351,8 +351,8 @@ void gearoenix::dx11::Engine::update()
     context->ClearRenderTargetView(main_rtv, clear_color);
     do_load_functions();
     physics_engine->wait();
-    for (const std::pair<core::Id, std::shared_ptr<render::scene::Scene> >& id_scene : loaded_scenes) {
-		const std::shared_ptr<render::scene::Scene>& scene = id_scene.second;
+    for (const std::pair<core::Id, std::shared_ptr<render::scene::Scene>>& id_scene : loaded_scenes) {
+        const std::shared_ptr<render::scene::Scene>& scene = id_scene.second;
         start_shadow_casting();
         scene->cast_shadow();
         context->OMSetRenderTargets(1, &main_rtv, main_dsv);
