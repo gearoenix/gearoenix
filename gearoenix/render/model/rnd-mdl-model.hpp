@@ -82,10 +82,10 @@ namespace render {
             physics::collider::Collider* collider = nullptr;
             std::vector<math::Mat4x4> state;
             Engine* const render_engine = nullptr;
-            Model(ModelType t, system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
+            Model(ModelType t, system::file::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
 
         public:
-            static Model* read(system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
+            static Model* read(system::file::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
             virtual ~Model();
             void commit(const scene::Scene* s);
             void draw(core::Id mesh_id, texture::Texture2D* shadow_texture);

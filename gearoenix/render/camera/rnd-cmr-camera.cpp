@@ -2,12 +2,12 @@
 #include "../../core/event/cr-ev-event.hpp"
 #include "../../core/event/cr-ev-window-resize.hpp"
 #include "../../system/sys-app.hpp"
-#include "../../system/sys-file.hpp"
+#include "../../system/file/sys-fl-file.hpp"
 #include "../../system/sys-log.hpp"
 #include "rnd-cmr-orthographic.hpp"
 #include "rnd-cmr-perspective.hpp"
 
-gearoenix::render::camera::Camera::Camera(system::File* f, system::Application* sysapp)
+gearoenix::render::camera::Camera::Camera(system::file::File* f, system::Application* sysapp)
     : screen_ratio(nullptr == sysapp ? 1.0f : sysapp->get_window_ratio())
     , vwl(math::Mat4x4::look_at(
           math::Vec3(0.0f, 0.0f, 0.0f),
@@ -38,7 +38,7 @@ gearoenix::render::camera::Camera::~Camera()
 {
 }
 
-gearoenix::render::camera::Camera* gearoenix::render::camera::Camera::read(system::File* f, system::Application* sysapp)
+gearoenix::render::camera::Camera* gearoenix::render::camera::Camera::read(system::file::File* f, system::Application* sysapp)
 {
     core::Id camt;
     f->read(camt);

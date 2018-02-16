@@ -41,7 +41,7 @@ namespace render {
             virtual core::Id get_shader_id() const = 0;
             virtual bool needs_mvp() const = 0;
             virtual bool needs_dbm() const = 0;
-            static Material* read(system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> end);
+            static Material* read(system::file::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> end);
         };
     }
 }

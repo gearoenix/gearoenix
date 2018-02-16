@@ -5,7 +5,9 @@
 #include <memory>
 namespace gearoenix {
 namespace system {
+namespace file {
     class File;
+}
 }
 namespace render {
     class Engine;
@@ -30,8 +32,8 @@ namespace render {
             buffer::Mesh* buf;
 
         public:
-            Mesh(system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
-            static Mesh* read(system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
+            Mesh(system::file::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
+            static Mesh* read(system::file::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
             ~Mesh();
             void bind();
             void draw();

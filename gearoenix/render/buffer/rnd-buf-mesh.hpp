@@ -3,7 +3,9 @@
 #include <memory>
 namespace gearoenix {
 namespace system {
+namespace file {
     class File;
+}
 }
 namespace render {
     class Engine;

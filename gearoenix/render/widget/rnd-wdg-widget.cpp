@@ -2,11 +2,11 @@
 #include "../../core/cr-application.hpp"
 #include "../../core/event/cr-ev-ui-ui.hpp"
 #include "../../system/sys-app.hpp"
-#include "../../system/sys-file.hpp"
+#include "../../system/file/sys-fl-file.hpp"
 #include "../rnd-engine.hpp"
 #include "rnd-wdg-button.hpp"
 
-gearoenix::render::widget::Widget::Widget(system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
+gearoenix::render::widget::Widget::Widget(system::file::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
     : model::Model(ModelType::WIDGET, f, e, c)
 {
 }
@@ -23,7 +23,7 @@ void gearoenix::render::widget::Widget::cancel_effect()
 {
 }
 
-gearoenix::render::widget::Widget* gearoenix::render::widget::Widget::read(system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
+gearoenix::render::widget::Widget* gearoenix::render::widget::Widget::read(system::file::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
 {
     core::Id t;
     f->read(t);

@@ -45,7 +45,7 @@ namespace render {
             Resources* shdrsc;
 
         public:
-            DirectionalD2SpeculatedNonreflectiveShadowlessOpaque(system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> end);
+            DirectionalD2SpeculatedNonreflectiveShadowlessOpaque(system::file::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> end);
             ~DirectionalD2SpeculatedNonreflectiveShadowlessOpaque();
             unsigned int get_vertex_elements_count() const;
             core::Id get_shader_id() const;

@@ -1,13 +1,13 @@
 #include "gles3-txt-cube.hpp"
 #ifdef USE_OPENGL_ES3
 #include "../../render/texture/rnd-txt-png.hpp"
-#include "../../system/sys-file.hpp"
+#include "../../system/file/sys-fl-file.hpp"
 #include "../../system/sys-log.hpp"
 #include "../gles3-engine.hpp"
 
 #define FACES_COUNT 6
 
-gearoenix::gles3::texture::Cube::Cube(system::File* file, Engine* eng, core::EndCaller<core::EndCallerIgnore> end)
+gearoenix::gles3::texture::Cube::Cube(system::file::File* file, Engine* eng, core::EndCaller<core::EndCallerIgnore> end)
 {
     std::vector<std::vector<unsigned char>> img_data(FACES_COUNT);
     unsigned int imgw, imgh;

@@ -54,7 +54,7 @@ namespace render {
             Resources* shdrsc;
 
         public:
-            DirectionalD2SpeculatedBakedFullOpaque(system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> end);
+            DirectionalD2SpeculatedBakedFullOpaque(system::file::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> end);
             ~DirectionalD2SpeculatedBakedFullOpaque();
             unsigned int get_vertex_elements_count() const;
             core::Id get_shader_id() const;

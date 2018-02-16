@@ -1,7 +1,7 @@
 #include "cr-cache-file-sparse.hpp"
-#include "../../../system/sys-file.hpp"
+#include "../../../system/file/sys-fl-file.hpp"
 
-gearoenix::core::cache::file::Sparse::Sparse(system::File* file)
+gearoenix::core::cache::file::Sparse::Sparse(system::file::File* file)
     : file(file)
 {
 }

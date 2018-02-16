@@ -3,7 +3,7 @@
 #include "../../core/cr-end-caller.hpp"
 #include "../../core/cr-static.hpp"
 #include "../../render/texture/rnd-txt-png.hpp"
-#include "../../system/sys-file.hpp"
+#include "../../system/file/sys-fl-file.hpp"
 #include "../../system/sys-log.hpp"
 #include "../buffer/vk-buf-manager.hpp"
 #include "../buffer/vk-buf-sub-buffer.hpp"
@@ -15,7 +15,7 @@
 #include "../vk-check.hpp"
 #include "../vk-engine.hpp"
 
-gearoenix::render::texture::Texture2D::Texture2D(system::File* file, Engine* engine, std::shared_ptr<core::EndCaller> end)
+gearoenix::render::texture::Texture2D::Texture2D(system::file::File* file, Engine* engine, std::shared_ptr<core::EndCaller> end)
 {
     const Linker* l = engine->get_linker();
     std::vector<unsigned char> pixels;

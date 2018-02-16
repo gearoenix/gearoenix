@@ -34,7 +34,7 @@ namespace render {
             Resources* shdrsc;
 
         public:
-            DirectionalColoredMatteNonreflectiveShadowlessOpaque(system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> end);
+            DirectionalColoredMatteNonreflectiveShadowlessOpaque(system::file::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> end);
             ~DirectionalColoredMatteNonreflectiveShadowlessOpaque();
             unsigned int get_vertex_elements_count() const;
             core::Id get_shader_id() const;

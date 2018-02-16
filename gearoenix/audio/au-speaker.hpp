@@ -6,7 +6,7 @@ namespace audio {
     class Speaker : public Audio {
     private:
     public:
-        Speaker(system::File* f);
+        Speaker(system::file::File* f);
     };
 } // namespace audio
 } // namespace gearoenix

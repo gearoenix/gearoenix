@@ -1,9 +1,9 @@
-#ifndef GEAROENIX_SYSTEM_FILE_HPP
-#define GEAROENIX_SYSTEM_FILE_HPP
+#ifndef GEAROENIX_SYSTEM_FILE_FILE_HPP
+#define GEAROENIX_SYSTEM_FILE_FILE_HPP
 
-#include "../core/cr-build-configuration.hpp"
-#include "../core/cr-types.hpp"
-#include "../system/sys-log.hpp"
+#include "../../core/cr-build-configuration.hpp"
+#include "../../core/cr-types.hpp"
+#include "../../system/sys-log.hpp"
 #include <map>
 #include <memory>
 #include <string>
@@ -23,6 +23,7 @@
 namespace gearoenix {
 namespace system {
     class Application;
+    namespace file {
     class File {
     private:
 #ifdef USE_STD_FILE
@@ -121,6 +122,7 @@ namespace system {
             return data != 0;
         }
     };
+}
 }
 }
 #endif

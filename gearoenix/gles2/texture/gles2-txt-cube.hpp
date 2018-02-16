@@ -17,7 +17,7 @@ namespace gles2 {
             GLuint texture_object;
 
         public:
-            Cube(system::File* file, Engine* engine, core::EndCaller<core::EndCallerIgnore> end);
+            Cube(system::file::File* file, Engine* engine, core::EndCaller<core::EndCallerIgnore> end);
             ~Cube();
             void bind(GLenum texture_unit);
         };

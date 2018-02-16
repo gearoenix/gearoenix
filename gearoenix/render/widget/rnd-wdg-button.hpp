@@ -38,7 +38,7 @@ namespace render {
             void cancel_effect();
 
         public:
-            Button(system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
+            Button(system::file::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
             virtual ~Button();
         };
     }

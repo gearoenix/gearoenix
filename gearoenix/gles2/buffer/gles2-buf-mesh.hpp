@@ -16,7 +16,7 @@ namespace gles2 {
             GLsizei ic;
 
         public:
-            Mesh(unsigned int vertex_elements_count, system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
+            Mesh(unsigned int vertex_elements_count, system::file::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
             ~Mesh();
             void bind();
             void draw();

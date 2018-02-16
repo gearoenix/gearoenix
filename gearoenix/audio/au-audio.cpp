@@ -1,9 +1,9 @@
 #include "au-audio.hpp"
-#include "../system/sys-file.hpp"
+#include "../system/file/sys-fl-file.hpp"
 #include "au-music.hpp"
 #include "au-speaker.hpp"
 
-gearoenix::audio::Audio::Audio(system::File* f)
+gearoenix::audio::Audio::Audio(system::file::File* f)
 {
     std::vector<uint8_t> bytes;
     f->read(bytes);
@@ -12,7 +12,7 @@ gearoenix::audio::Audio::Audio(system::File* f)
 
 gearoenix::audio::Audio::~Audio() {}
 
-gearoenix::audio::Audio* gearoenix::audio::Audio::read(system::File* f)
+gearoenix::audio::Audio* gearoenix::audio::Audio::read(system::file::File* f)
 {
     core::Id audio_type;
     f->read(audio_type);

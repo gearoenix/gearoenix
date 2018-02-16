@@ -47,7 +47,7 @@ namespace render {
             Resources* shdrsc;
 
         public:
-            DirectionalColoredSpeculatedBakedShadowlessOpaque(core::Id shdid, system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> end);
+            DirectionalColoredSpeculatedBakedShadowlessOpaque(core::Id shdid, system::file::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> end);
             ~DirectionalColoredSpeculatedBakedShadowlessOpaque();
             unsigned int get_vertex_elements_count() const;
             core::Id get_shader_id() const;

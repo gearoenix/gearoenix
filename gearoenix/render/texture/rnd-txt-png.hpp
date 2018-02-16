@@ -3,7 +3,9 @@
 #include <vector>
 namespace gearoenix {
 namespace system {
+namespace file {
     class File;
+}
 }
 namespace render {
     class Engine;
@@ -11,7 +13,7 @@ namespace render {
         class PNG {
         public:
             static void decode(
-                system::File* file,
+                system::file::File* file,
                 std::vector<unsigned char>& decoded_data,
                 unsigned int& width,
                 unsigned int& height);

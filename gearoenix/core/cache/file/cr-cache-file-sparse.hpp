@@ -1,6 +1,6 @@
 #ifndef GEAROENIX_CORE_CACHE_FILE_SPARSE_HPP
 #define GEAROENIX_CORE_CACHE_FILE_SPARSE_HPP
-#include "../../../system/sys-file.hpp"
+#include "../../../system/file/sys-fl-file.hpp"
 #include "../../../system/sys-log.hpp"
 #include "../../cr-build-configuration.hpp"
 #include "../cr-cache-cacher.hpp"
@@ -12,10 +12,10 @@ namespace core {
             private:
                 Cacher cacher;
                 std::map<Id, Offset> offsets;
-                system::File* file;
+                system::file::File* file;
 
             public:
-                Sparse(system::File* file);
+                Sparse(system::file::File* file);
                 void read_offsets();
                 template <class T>
                 std::shared_ptr<T> get(Id id, std::function<std::shared_ptr<T>()>);

@@ -70,7 +70,7 @@ void gearoenix::render::widget::Button::cancel_effect()
     anim = nullptr;
 }
 
-gearoenix::render::widget::Button::Button(system::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
+gearoenix::render::widget::Button::Button(system::file::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
     : Widget(f, e, c)
 {
 }

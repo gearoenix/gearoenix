@@ -17,7 +17,7 @@
 
 gearoenix::core::asset::Manager::Manager(system::Application* sys_app, const std::string& name)
     : sys_app(sys_app)
-    , file(new system::File(sys_app, name))
+    , file(new system::file::File(sys_app, name))
     , shaders(new cache::Cacher())
     , cameras(new cache::file::File(file))
     , audios(new cache::file::File(file))
@@ -68,7 +68,7 @@ void gearoenix::core::asset::Manager::initialize()
     scenes->read_offsets();
 }
 
-gearoenix::system::File* gearoenix::core::asset::Manager::get_file()
+gearoenix::system::file::File* gearoenix::core::asset::Manager::get_file()
 {
     return file;
 }

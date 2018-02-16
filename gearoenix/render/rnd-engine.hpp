@@ -24,7 +24,9 @@ namespace physics {
 }
 namespace system {
     class Application;
+    namespace file {
     class File;
+    }
 }
 namespace render {
     namespace buffer {
@@ -89,11 +91,11 @@ namespace render {
         virtual void window_changed() = 0;
         virtual void update() = 0;
         virtual void terminate() = 0;
-        virtual texture::Texture2D* create_texture_2d(system::File* file, core::EndCaller<core::EndCallerIgnore> c) = 0;
-        virtual texture::Cube* create_texture_cube(system::File* file, core::EndCaller<core::EndCallerIgnore> c) = 0;
-        virtual buffer::Mesh* create_mesh(unsigned int vec, system::File* file, core::EndCaller<core::EndCallerIgnore> c) = 0;
+        virtual texture::Texture2D* create_texture_2d(system::file::File* file, core::EndCaller<core::EndCallerIgnore> c) = 0;
+        virtual texture::Cube* create_texture_cube(system::file::File* file, core::EndCaller<core::EndCallerIgnore> c) = 0;
+        virtual buffer::Mesh* create_mesh(unsigned int vec, system::file::File* file, core::EndCaller<core::EndCallerIgnore> c) = 0;
         virtual buffer::Uniform* create_uniform(unsigned int s, core::EndCaller<core::EndCallerIgnore> c) = 0;
-        virtual shader::Shader* create_shader(core::Id sid, system::File* file, core::EndCaller<core::EndCallerIgnore> c) = 0;
+        virtual shader::Shader* create_shader(core::Id sid, system::file::File* file, core::EndCaller<core::EndCallerIgnore> c) = 0;
         virtual shader::Resources* create_shader_resources(core::Id sid, pipeline::Pipeline* p, buffer::Uniform* ub, core::EndCaller<core::EndCallerIgnore> c) = 0;
         virtual pipeline::Pipeline* create_pipeline(core::Id sid, core::EndCaller<core::EndCallerIgnore> c) = 0;
         virtual void on_event(const core::event::Event& e);
