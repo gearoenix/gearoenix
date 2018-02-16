@@ -1,8 +1,8 @@
 #include "rnd-mat-directional-d2-speculated-nonreflective-full-opaque.hpp"
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../core/cr-end-caller.hpp"
+#include "../../system/stream/sys-stm-stream.hpp"
 #include "../../system/sys-app.hpp"
-#include "../../system/file/sys-fl-file.hpp"
 #include "../buffer/rnd-buf-uniform.hpp"
 #include "../camera/rnd-cmr-camera.hpp"
 #include "../camera/rnd-cmr-orthographic.hpp"
@@ -30,7 +30,7 @@ void gearoenix::render::material::DirectionalD2SpeculatedNonreflectiveFullOpaque
     shdtxt = t;
 }
 
-gearoenix::render::material::DirectionalD2SpeculatedNonreflectiveFullOpaque::DirectionalD2SpeculatedNonreflectiveFullOpaque(system::file::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> end)
+gearoenix::render::material::DirectionalD2SpeculatedNonreflectiveFullOpaque::DirectionalD2SpeculatedNonreflectiveFullOpaque(system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> end)
     : Material(SHADER_ID, sizeof(u), e, end)
 {
     core::Id texid;

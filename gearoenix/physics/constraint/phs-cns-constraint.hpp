@@ -18,9 +18,9 @@ namespace render {
     }
 }
 namespace system {
-namespace file {
-    class File;
-}
+    namespace stream {
+        class Stream;
+    }
 }
 namespace physics {
     namespace constraint {
@@ -45,7 +45,7 @@ namespace physics {
             virtual void on_event(const core::event::Event& e) = 0;
             virtual const std::vector<std::pair<core::Id, std::shared_ptr<render::model::Model>>> get_all_models() const = 0;
             virtual void apply();
-            static Constraint* read(system::file::File* f, render::Engine* render_engine, core::EndCaller<core::EndCallerIgnore> c);
+            static Constraint* read(system::stream::Stream* f, render::Engine* render_engine, core::EndCaller<core::EndCallerIgnore> c);
             Placer* to_placer();
             const Placer* to_placer() const;
         };

@@ -1,6 +1,6 @@
 #include "rnd-shd-shader.hpp"
 #include "../../core/cr-types.hpp"
-#include "../../system/file/sys-fl-file.hpp"
+#include "../../system/stream/sys-stm-stream.hpp"
 #include "../../system/sys-log.hpp"
 #include "../material/rnd-mat-depth.hpp"
 #include "../material/rnd-mat-directional-d2-speculated-nonreflective-full-opaque.hpp"
@@ -57,7 +57,7 @@ gearoenix::render::shader::Shader::Shader() {}
 
 gearoenix::render::shader::Shader::~Shader() {}
 
-gearoenix::render::shader::Shader* gearoenix::render::shader::Shader::read(core::Id sid, system::file::File* file, Engine* engine, core::EndCaller<core::EndCallerIgnore> end)
+gearoenix::render::shader::Shader* gearoenix::render::shader::Shader::read(core::Id sid, system::stream::Stream* file, Engine* engine, core::EndCaller<core::EndCallerIgnore> end)
 {
     return engine->create_shader(sid, file, end);
 }

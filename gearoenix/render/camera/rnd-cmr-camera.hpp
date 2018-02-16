@@ -38,11 +38,11 @@ namespace render {
             math::Mat4x4 v;
             math::Mat4x4 p;
             math::Mat4x4 vp;
-            Camera(system::file::File* f, system::Application* sysapp);
+            Camera(system::stream::Stream* f, system::Application* sysapp);
 
         public:
             virtual ~Camera();
-            static Camera* read(system::file::File* f, system::Application* sysapp);
+            static Camera* read(system::stream::Stream* f, system::Application* sysapp);
             void translate(const math::Vec3& vec);
             void move(const math::Vec3& vec);
             void move_forward(const core::Real spd);

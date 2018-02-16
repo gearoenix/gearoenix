@@ -3,9 +3,9 @@
 #include "../core/cr-types.hpp"
 namespace gearoenix {
 namespace system {
-namespace file {
-    class File;
-}
+    namespace stream {
+        class Stream;
+    }
 }
 namespace math {
     struct Mat4x4;
@@ -40,7 +40,7 @@ namespace math {
         core::Real square_distance(const Vec2& a) const;
         Vec2 normalized() const;
         void normalize();
-        void read(system::file::File* f);
+        void read(system::stream::Stream* f);
         void print() const;
         static bool intersect(const Vec2& s11, const Vec2& s12, const Vec2& s21, const Vec2& s22, Vec2& i);
     };
@@ -80,7 +80,7 @@ namespace math {
         Vec3 cross(const Vec3& o) const;
         Vec3 normalized() const;
         void normalize();
-        void read(system::file::File* f);
+        void read(system::stream::Stream* f);
         void print() const;
     };
 
@@ -103,7 +103,7 @@ namespace math {
         Vec4 cross(const Vec4& o) const;
         Vec4 normalized() const;
         void normalize();
-        void read(system::file::File* f);
+        void read(system::stream::Stream* f);
         const core::Real* data() const;
     };
 }

@@ -15,7 +15,7 @@ namespace gles3 {
             GLuint vao, vbo, ibo, ic;
 
         public:
-            Mesh(unsigned int vertex_elements_count, system::file::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
+            Mesh(unsigned int vertex_elements_count, system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
             ~Mesh();
             void bind();
             void draw();

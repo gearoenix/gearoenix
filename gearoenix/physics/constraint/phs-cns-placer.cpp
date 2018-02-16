@@ -4,11 +4,11 @@
 #include "../../core/event/cr-ev-window-resize.hpp"
 #include "../../render/model/rnd-mdl-model.hpp"
 #include "../../render/rnd-engine.hpp"
+#include "../../system/stream/sys-stm-stream.hpp"
 #include "../../system/sys-app.hpp"
-#include "../../system/file/sys-fl-file.hpp"
 #include "../../system/sys-log.hpp"
 
-gearoenix::physics::constraint::Placer::Placer(system::file::File* f, render::Engine* render_engine, core::EndCaller<core::EndCallerIgnore> c)
+gearoenix::physics::constraint::Placer::Placer(system::stream::Stream* f, render::Engine* render_engine, core::EndCaller<core::EndCallerIgnore> c)
     : Constraint(PLACER)
 {
     f->read(t);

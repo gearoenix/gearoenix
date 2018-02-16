@@ -20,7 +20,7 @@ namespace render {
             std::shared_ptr<texture::Texture2D> baked_texture;
 
         public:
-            Font2D(core::Id my_id, system::file::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
+            Font2D(core::Id my_id, system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
             ~Font2D();
         };
     }

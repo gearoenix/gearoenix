@@ -32,7 +32,7 @@ namespace render {
             std::shared_ptr<texture::Texture2D> txt2d;
 
         public:
-            ShadelessD2MatteNonreflectiveShadowlessOpaque(core::Id sid, system::file::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> end);
+            ShadelessD2MatteNonreflectiveShadowlessOpaque(core::Id sid, system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> end);
             ~ShadelessD2MatteNonreflectiveShadowlessOpaque();
             unsigned int get_vertex_elements_count() const;
             core::Id get_shader_id() const;

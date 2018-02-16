@@ -1,5 +1,5 @@
 #include "phs-collider.hpp"
-#include "../../system/file/sys-fl-file.hpp"
+#include "../../system/stream/sys-stm-stream.hpp"
 #include "../../system/sys-log.hpp"
 #include "phs-collider-mesh.hpp"
 
@@ -10,7 +10,7 @@ gearoenix::physics::collider::Collider::Collider(Type t)
 
 gearoenix::physics::collider::Collider::~Collider() {}
 
-gearoenix::physics::collider::Collider* gearoenix::physics::collider::Collider::read(system::file::File* in)
+gearoenix::physics::collider::Collider* gearoenix::physics::collider::Collider::read(system::stream::Stream* in)
 {
     core::Id collider_type_id;
     in->read(collider_type_id);

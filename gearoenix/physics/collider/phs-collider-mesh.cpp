@@ -1,9 +1,9 @@
 #include "phs-collider-mesh.hpp"
 #include "../../math/math-matrix.hpp"
 #include "../../math/math-ray.hpp"
-#include "../../system/file/sys-fl-file.hpp"
+#include "../../system/stream/sys-stm-stream.hpp"
 
-gearoenix::physics::collider::Mesh::Mesh(system::file::File* in)
+gearoenix::physics::collider::Mesh::Mesh(system::stream::Stream* in)
     : Collider(Type::MESH)
 {
     const core::Count cnt = in->read<core::Count>();

@@ -1,5 +1,5 @@
 #include "math-matrix.hpp"
-#include "../system/file/sys-fl-file.hpp"
+#include "../system/stream/sys-stm-stream.hpp"
 #include "math-vector.hpp"
 #include <cmath>
 
@@ -116,7 +116,7 @@ gearoenix::math::Mat4x4::Mat4x4(
     mat[15] = e15;
 }
 
-gearoenix::math::Mat4x4::Mat4x4(system::file::File* f)
+gearoenix::math::Mat4x4::Mat4x4(system::stream::Stream* f)
 {
     read(f);
 }
@@ -266,7 +266,7 @@ void gearoenix::math::Mat4x4::set_location(const Vec3& location)
     mat[14] = location[2];
 }
 
-void gearoenix::math::Mat4x4::read(system::file::File* f)
+void gearoenix::math::Mat4x4::read(system::stream::Stream* f)
 {
     for (int i = 0; i < 16; ++i)
         f->read(mat[i]);

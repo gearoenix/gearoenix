@@ -28,7 +28,7 @@ namespace physics {
             std::map<core::Id, std::shared_ptr<render::model::Model>> models;
 
         public:
-            Placer(system::file::File* f, render::Engine* render_engine, core::EndCaller<core::EndCallerIgnore> c);
+            Placer(system::stream::Stream* f, render::Engine* render_engine, core::EndCaller<core::EndCallerIgnore> c);
             virtual ~Placer();
             virtual void apply();
             virtual const std::vector<std::pair<core::Id, std::shared_ptr<render::model::Model>>> get_all_models() const;

@@ -1,6 +1,6 @@
 #include "rnd-txt-png.hpp"
 #include "../../core/cr-build-configuration.hpp"
-#include "../../system/file/sys-fl-file.hpp"
+#include "../../system/stream/sys-stm-stream.hpp"
 #include "../../system/sys-log.hpp"
 #define STB_IMAGE_IMPLEMENTATION
 #define STBI_NO_STDIO
@@ -15,7 +15,7 @@
 #endif
 
 void gearoenix::render::texture::PNG::decode(
-    system::file::File* file,
+    system::stream::Stream* file,
     std::vector<unsigned char>& data,
     unsigned int& img_width,
     unsigned int& img_height)
@@ -23,12 +23,12 @@ void gearoenix::render::texture::PNG::decode(
     std::vector<unsigned char> png;
     file->read(png);
     int iw, ih, channels;
-    unsigned char *dd = stbi_load_from_memory(png.data(), png.size(), &iw, &ih, &channels, 4);
+    unsigned char* dd = stbi_load_from_memory(png.data(), png.size(), &iw, &ih, &channels, 4);
     if (dd == nullptr) {
         GXLOGF("PNG decoder error.");
     }
-    img_width = (unsigned int) iw;
-    img_height = (unsigned int) ih;
+    img_width = (unsigned int)iw;
+    img_height = (unsigned int)ih;
     const unsigned int img_size = img_width * img_height * 4;
     data.resize(img_size);
     std::memcpy(&(data[0]), dd, img_size);

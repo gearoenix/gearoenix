@@ -6,7 +6,7 @@
 #include "../dx11-check.hpp"
 #include "../dx11-engine.hpp"
 
-gearoenix::dx11::texture::Texture2D::Texture2D(system::file::File* file, Engine* eng, core::EndCaller<core::EndCallerIgnore> end)
+gearoenix::dx11::texture::Texture2D::Texture2D(system::stream::Stream* file, Engine* eng, core::EndCaller<core::EndCallerIgnore> end)
     : engine(eng)
 {
     std::vector<unsigned char> img_data;

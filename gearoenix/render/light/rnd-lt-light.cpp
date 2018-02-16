@@ -1,12 +1,12 @@
 #include "rnd-lt-light.hpp"
-#include "../../system/file/sys-fl-file.hpp"
+#include "../../system/stream/sys-stm-stream.hpp"
 #include "rnd-lt-sun.hpp"
 
-gearoenix::render::light::Light::Light(system::file::File*) {}
+gearoenix::render::light::Light::Light(system::stream::Stream*) {}
 
 gearoenix::render::light::Light::~Light() {}
 
-gearoenix::render::light::Light* gearoenix::render::light::Light::read(system::file::File* f)
+gearoenix::render::light::Light* gearoenix::render::light::Light::read(system::stream::Stream* f)
 {
     core::Id light_type;
     f->read(light_type);

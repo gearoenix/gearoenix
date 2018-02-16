@@ -39,8 +39,8 @@ namespace render {
 }
 namespace system {
     class Application;
-    namespace file {
-    class File;
+    namespace stream {
+        class Stream;
     }
 }
 namespace core {
@@ -56,7 +56,7 @@ namespace core {
         private:
             system::Application* sys_app = nullptr;
             render::Engine* render_engine = nullptr;
-            system::file::File* file = nullptr;
+            system::stream::Stream* file = nullptr;
             cache::Cacher* shaders = nullptr;
             cache::file::File* cameras = nullptr;
             cache::file::File* audios = nullptr;
@@ -71,7 +71,7 @@ namespace core {
             Manager(system::Application* sys_app, const std::string& file);
             ~Manager();
             void initialize();
-            system::file::File* get_file();
+            system::stream::Stream* get_file();
             std::shared_ptr<render::shader::Shader> get_shader(Id id, EndCaller<render::shader::Shader> end);
             std::shared_ptr<render::shader::Shader> get_cached_shader(Id id) const;
             std::shared_ptr<render::camera::Camera> get_camera(Id id);

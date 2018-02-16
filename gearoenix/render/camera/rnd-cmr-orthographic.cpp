@@ -1,6 +1,6 @@
 #include "rnd-cmr-orthographic.hpp"
 #include "../../core/event/cr-ev-event.hpp"
-#include "../../system/file/sys-fl-file.hpp"
+#include "../../system/stream/sys-stm-stream.hpp"
 #include <cmath>
 
 void gearoenix::render::camera::Orthographic::on_ratio_change()
@@ -10,7 +10,7 @@ void gearoenix::render::camera::Orthographic::on_ratio_change()
     vp = p * v;
 }
 
-gearoenix::render::camera::Orthographic::Orthographic(system::file::File* f, system::Application* sysapp)
+gearoenix::render::camera::Orthographic::Orthographic(system::stream::Stream* f, system::Application* sysapp)
     : Camera(f, sysapp)
 {
     f->read(aspects_size);

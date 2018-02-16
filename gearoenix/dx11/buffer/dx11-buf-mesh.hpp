@@ -20,7 +20,7 @@ namespace dx11 {
         public:
             Mesh(
                 unsigned int vertex_elements_count,
-                system::file::File* f, Engine* e,
+                system::stream::Stream* f, Engine* e,
                 core::EndCaller<core::EndCallerIgnore> c);
             ~Mesh();
             void bind();

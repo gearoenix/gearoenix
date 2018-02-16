@@ -2,7 +2,7 @@
 #include "../../core/cr-build-configuration.hpp"
 #include "../camera/rnd-cmr-orthographic.hpp"
 
-gearoenix::render::light::Sun::Sun(system::file::File* f)
+gearoenix::render::light::Sun::Sun(system::stream::Stream* f)
     : Light(f)
     , cam(new camera::Orthographic(f, nullptr))
 {

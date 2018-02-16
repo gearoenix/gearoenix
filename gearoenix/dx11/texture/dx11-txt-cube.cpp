@@ -2,14 +2,14 @@
 #ifdef USE_DIRECTX11
 #include "../../core/cr-static.hpp"
 #include "../../render/texture/rnd-txt-png.hpp"
-#include "../../system/file/sys-fl-file.hpp"
+#include "../../system/stream/sys-fl-file.hpp"
 #include "../../system/sys-log.hpp"
 #include "../dx11-check.hpp"
 #include "../dx11-engine.hpp"
 
 #define FACES_COUNT 6
 
-gearoenix::dx11::texture::Cube::Cube(system::file::File* file, Engine* eng, core::EndCaller<core::EndCallerIgnore> end)
+gearoenix::dx11::texture::Cube::Cube(system::stream::Stream* file, Engine* eng, core::EndCaller<core::EndCallerIgnore> end)
     : engine(eng)
 {
     std::vector<std::vector<unsigned char>> img_data(FACES_COUNT);

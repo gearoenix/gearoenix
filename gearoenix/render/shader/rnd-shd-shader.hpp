@@ -7,9 +7,9 @@
 #include <vector>
 namespace gearoenix {
 namespace system {
-namespace file {
-    class File;
-}
+    namespace stream {
+        class Stream;
+    }
 }
 namespace render {
     class Engine;
@@ -1034,7 +1034,7 @@ namespace render {
             virtual ~Shader();
             virtual const std::vector<stage::Id>& get_stages_ids() const = 0;
             virtual void use() = 0;
-            static Shader* read(core::Id sid, system::file::File* file, Engine* engine, core::EndCaller<core::EndCallerIgnore> end);
+            static Shader* read(core::Id sid, system::stream::Stream* file, Engine* engine, core::EndCaller<core::EndCallerIgnore> end);
             static const std::vector<ResourceDescription>& get_resources_descriptions(Id id);
             static const std::vector<VertexAttribute>& get_vertex_atributes(Id id);
             static bool is_shadow_caster(core::Id sid);

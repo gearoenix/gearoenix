@@ -1,18 +1,18 @@
 #include "rnd-msh-mesh.hpp"
 #include "../../core/cr-end-caller.hpp"
-#include "../../system/file/sys-fl-file.hpp"
+#include "../../system/stream/sys-stm-stream.hpp"
 #include "../buffer/rnd-buf-mesh.hpp"
 #include "../material/rnd-mat-material.hpp"
 #include "../rnd-engine.hpp"
 
-gearoenix::render::mesh::Mesh::Mesh(system::file::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
+gearoenix::render::mesh::Mesh::Mesh(system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
 {
     core::Count vertex_elements_count;
     f->read(vertex_elements_count);
     buf = e->create_mesh((unsigned int)vertex_elements_count, f, c);
 }
 
-gearoenix::render::mesh::Mesh* gearoenix::render::mesh::Mesh::read(system::file::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
+gearoenix::render::mesh::Mesh* gearoenix::render::mesh::Mesh::read(system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
 {
     core::Id t;
     f->read(t);

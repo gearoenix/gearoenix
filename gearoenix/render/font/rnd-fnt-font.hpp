@@ -5,9 +5,9 @@
 #include "../../core/cr-types.hpp"
 namespace gearoenix {
 namespace system {
-namespace file {
-    class File;
-}
+    namespace stream {
+        class Stream;
+    }
 }
 namespace render {
     class Engine;
@@ -29,7 +29,7 @@ namespace render {
 
         public:
             virtual ~Font();
-            static Font* read(core::Id font_id, system::file::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
+            static Font* read(core::Id font_id, system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
         };
     }
 }

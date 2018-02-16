@@ -4,9 +4,9 @@
 #include <memory>
 namespace gearoenix {
 namespace system {
-namespace file {
-    class File;
-}
+    namespace stream {
+        class Stream;
+    }
 }
 namespace render {
     class Engine;
@@ -19,7 +19,7 @@ namespace render {
             buffer::Mesh* buf;
 
         public:
-            Occ(system::file::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
+            Occ(system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
             ~Occ();
         };
     }

@@ -22,7 +22,7 @@ namespace physics {
             math::Aabb3 box;
 
         public:
-            Mesh(system::file::File* in);
+            Mesh(system::stream::Stream* in);
             ~Mesh();
             void update(const math::Mat4x4& m);
             bool hit(const math::Ray3& r, core::Real& distance_from_origin) const;

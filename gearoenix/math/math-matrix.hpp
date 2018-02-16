@@ -3,9 +3,9 @@
 #include "../core/cr-types.hpp"
 namespace gearoenix {
 namespace system {
-namespace file {
-    class File;
-}
+    namespace stream {
+        class Stream;
+    }
 }
 namespace math {
     struct Vec2;
@@ -36,7 +36,7 @@ namespace math {
             core::Real e4, core::Real e5, core::Real e6, core::Real e7,
             core::Real e8, core::Real e9, core::Real e10, core::Real e11,
             core::Real e12, core::Real e13, core::Real e14, core::Real e15);
-        Mat4x4(system::file::File* f);
+        Mat4x4(system::stream::Stream* f);
         Mat4x4(const Mat4x4& m);
         Vec3 operator*(const Vec3& v) const;
         Vec4 operator*(const Vec4& v) const;
@@ -53,7 +53,7 @@ namespace math {
         void set_location(const Vec3& location);
         void inverse();
         void transpose();
-        void read(system::file::File* f);
+        void read(system::stream::Stream* f);
         core::Real determinant() const;
         Mat4x4 inversed() const;
         Mat4x4 transposed() const;

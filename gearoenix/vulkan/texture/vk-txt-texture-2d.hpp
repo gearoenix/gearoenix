@@ -24,7 +24,7 @@ namespace render {
             image::View* iv;
 
         public:
-            Texture2D(system::file::File* file, Engine* engine, std::shared_ptr<core::EndCaller> end);
+            Texture2D(system::stream::Stream* file, Engine* engine, std::shared_ptr<core::EndCaller> end);
             ~Texture2D();
             image::View* get_view();
             static uint32_t get_memory_type_bits(Engine* engine);

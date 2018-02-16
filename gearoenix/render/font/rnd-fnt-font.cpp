@@ -1,5 +1,5 @@
 #include "rnd-fnt-font.hpp"
-#include "../../system/file/sys-fl-file.hpp"
+#include "../../system/stream/sys-stm-stream.hpp"
 #include "rnd-fnt-2d.hpp"
 
 gearoenix::render::font::Font::Font(core::Id my_id, Shape::Type t)
@@ -12,7 +12,7 @@ gearoenix::render::font::Font::~Font()
 {
 }
 
-gearoenix::render::font::Font* gearoenix::render::font::Font::read(core::Id font_id, system::file::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
+gearoenix::render::font::Font* gearoenix::render::font::Font::read(core::Id font_id, system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
 {
     Shape::Type font_type;
     f->read(font_type);

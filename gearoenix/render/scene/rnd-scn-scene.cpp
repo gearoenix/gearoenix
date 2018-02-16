@@ -3,8 +3,8 @@
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../core/cr-end-caller.hpp"
 #include "../../physics/constraint/phs-cns-constraint.hpp"
+#include "../../system/stream/sys-stm-stream.hpp"
 #include "../../system/sys-app.hpp"
-#include "../../system/file/sys-fl-file.hpp"
 #include "../camera/rnd-cmr-camera.hpp"
 #include "../camera/rnd-cmr-orthographic.hpp"
 #include "../light/rnd-lt-light.hpp"
@@ -41,7 +41,7 @@ void gearoenix::render::scene::Scene::add_model(core::Id id, std::shared_ptr<mod
     }
 }
 
-gearoenix::render::scene::Scene::Scene(SceneType t, system::file::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
+gearoenix::render::scene::Scene::Scene(SceneType t, system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
     : scene_type(t)
     , render_engine(e)
 {
@@ -92,7 +92,7 @@ gearoenix::render::scene::Scene::~Scene()
 }
 
 gearoenix::render::scene::Scene* gearoenix::render::scene::Scene::read(
-    system::file::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
+    system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
 {
     core::Id t;
     f->read(t);

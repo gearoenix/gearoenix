@@ -21,7 +21,7 @@ namespace render {
         protected:
             core::Id pressed = (core::Id)-1;
             core::Id mouse_overed = (core::Id)-1;
-            Ui(system::file::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
+            Ui(system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
 
         public:
             virtual void on_event(const core::event::Event& e);

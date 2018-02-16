@@ -1,7 +1,7 @@
 #include "vk-buf-mesh.hpp"
 #ifdef USE_VULKAN
 #include "../../core/cr-end-caller.hpp"
-#include "../../system/file/sys-fl-file.hpp"
+#include "../../system/stream/sys-fl-file.hpp"
 #include "../../system/sys-log.hpp"
 #include "../command/vk-cmd-buffer.hpp"
 #include "../vk-engine.hpp"
@@ -10,7 +10,7 @@
 #include "vk-buf-sub-buffer.hpp"
 #include <functional>
 
-gearoenix::render::buffer::Mesh::Mesh(unsigned int vertex_elements_count, system::file::File* f, Engine* e, std::shared_ptr<core::EndCaller> c)
+gearoenix::render::buffer::Mesh::Mesh(unsigned int vertex_elements_count, system::stream::Stream* f, Engine* e, std::shared_ptr<core::EndCaller> c)
     : e(e)
 {
     Manager* cm = e->get_cpu_buffer_manager();

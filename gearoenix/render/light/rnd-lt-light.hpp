@@ -3,19 +3,19 @@
 #include "../../core/asset/cr-asset.hpp"
 namespace gearoenix {
 namespace system {
-namespace file {
-    class File;
-}
+    namespace stream {
+        class Stream;
+    }
 }
 namespace render {
     namespace light {
         class Light : public core::asset::Asset {
         protected:
-            Light(system::file::File* f);
+            Light(system::stream::Stream* f);
 
         public:
             virtual ~Light();
-            static Light* read(system::file::File* f);
+            static Light* read(system::stream::Stream* f);
         };
     }
 }

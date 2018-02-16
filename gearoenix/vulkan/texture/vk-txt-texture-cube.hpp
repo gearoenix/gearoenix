@@ -12,7 +12,7 @@ namespace render {
     namespace texture {
         class TextureCube : public Texture {
         public:
-            TextureCube(system::file::File* file, Engine* engine);
+            TextureCube(system::stream::Stream* file, Engine* engine);
         };
     }
 }

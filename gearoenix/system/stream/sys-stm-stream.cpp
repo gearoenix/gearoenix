@@ -1,4 +1,4 @@
-#include "sys-fl-file.hpp"
+#include "sys-stm-stream.hpp"
 #include "../sys-app.hpp"
 #include "../sys-log.hpp"
 #ifdef IN_IOS
@@ -8,7 +8,7 @@
 #include <android_native_app_glue.h>
 #endif
 
-void gearoenix::system::file::File::check_endian_compatibility()
+void gearoenix::system::stream::Stream::check_endian_compatibility()
 {
     unsigned int system_endian = 1;
     uint8_t resource_endian;
@@ -17,7 +17,7 @@ void gearoenix::system::file::File::check_endian_compatibility()
     //    LOGE(std::string("endian is: ") + std::to_string(is_endian_compatible));
 }
 
-gearoenix::system::file::File::File
+gearoenix::system::stream::Stream::Stream
 #ifdef USE_STD_FILE
     (system::Application*, const std::string& name)
 {
@@ -48,14 +48,14 @@ gearoenix::system::file::File::File
     check_endian_compatibility();
 }
 
-gearoenix::system::file::File::~File() {}
+gearoenix::system::stream::Stream::~Stream() {}
 
-bool gearoenix::system::file::File::get_endian_compatibility() const
+bool gearoenix::system::stream::Stream::get_endian_compatibility() const
 {
     return is_endian_compatible;
 }
 
-unsigned int gearoenix::system::file::File::read(void* data, size_t length)
+unsigned int gearoenix::system::stream::Stream::read(void* data, size_t length)
 {
 #ifdef IN_ANDROID
     return static_cast<unsigned int>(AAsset_read(file, data, length));
@@ -72,7 +72,7 @@ unsigned int gearoenix::system::file::File::read(void* data, size_t length)
 #endif
 }
 
-void gearoenix::system::file::File::seek(unsigned int offset)
+void gearoenix::system::stream::Stream::seek(unsigned int offset)
 {
 #if defined(USE_STD_FILE)
     file.seekg(offset, std::ios::beg);
@@ -83,7 +83,7 @@ void gearoenix::system::file::File::seek(unsigned int offset)
 #endif
 }
 
-unsigned int gearoenix::system::file::File::tell()
+unsigned int gearoenix::system::stream::Stream::tell()
 {
 #if defined(USE_STD_FILE)
     return (unsigned int)file.tellg();

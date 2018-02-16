@@ -1,8 +1,8 @@
 #include "rnd-mat-material.hpp"
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../core/cr-end-caller.hpp"
+#include "../../system/stream/sys-stm-stream.hpp"
 #include "../../system/sys-app.hpp"
-#include "../../system/file/sys-fl-file.hpp"
 #include "../buffer/rnd-buf-uniform.hpp"
 #include "../pipeline/rnd-pip-manager.hpp"
 #include "../pipeline/rnd-pip-pipeline.hpp"
@@ -23,7 +23,7 @@ gearoenix::render::material::Material::Material(core::Id sid, unsigned int us, E
     : ub(e->create_uniform(us, end))
     , e(e)
 {
-    system::file::File* f = e->get_system_application()->get_asset_manager()->get_file();
+    system::stream::Stream* f = e->get_system_application()->get_asset_manager()->get_file();
     unsigned int curloc = f->tell();
     pl = e->get_pipeline_manager()->get_pipeline(sid, end);
     f->seek(curloc);
@@ -34,7 +34,7 @@ gearoenix::render::material::Material::~Material()
     delete ub;
 }
 
-gearoenix::render::material::Material* gearoenix::render::material::Material::read(system::file::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> end)
+gearoenix::render::material::Material* gearoenix::render::material::Material::read(system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> end)
 {
     shader::Id sid;
     f->read(sid);

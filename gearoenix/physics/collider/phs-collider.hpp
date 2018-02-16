@@ -7,9 +7,9 @@ namespace math {
     struct Ray3;
 }
 namespace system {
-namespace file {
-    class File;
-}
+    namespace stream {
+        class Stream;
+    }
 }
 namespace physics {
     namespace collider {
@@ -27,7 +27,7 @@ namespace physics {
 
         public:
             virtual ~Collider();
-            static Collider* read(system::file::File* in);
+            static Collider* read(system::stream::Stream* in);
             virtual void update(const math::Mat4x4& m) = 0;
             virtual bool hit(const math::Ray3& r, core::Real& distance_from_origin) const = 0;
             virtual void print() const = 0;

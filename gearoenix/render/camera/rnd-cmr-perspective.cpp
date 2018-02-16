@@ -1,7 +1,7 @@
 #include "rnd-cmr-perspective.hpp"
 #include "../../core/event/cr-ev-event.hpp"
 #include "../../core/event/cr-ev-window-resize.hpp"
-#include "../../system/file/sys-fl-file.hpp"
+#include "../../system/stream/sys-stm-stream.hpp"
 #include <cmath>
 
 void gearoenix::render::camera::Perspective::on_ratio_change()
@@ -13,7 +13,7 @@ void gearoenix::render::camera::Perspective::on_ratio_change()
     vp = p * v;
 }
 
-gearoenix::render::camera::Perspective::Perspective(system::file::File* f, system::Application* app)
+gearoenix::render::camera::Perspective::Perspective(system::stream::Stream* f, system::Application* app)
     : Camera(f, app)
 {
     f->read(h_angle);

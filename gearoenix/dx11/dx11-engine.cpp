@@ -370,17 +370,17 @@ void gearoenix::dx11::Engine::terminate()
     swapchain = nullptr;
 }
 
-gearoenix::render::texture::Texture2D* gearoenix::dx11::Engine::create_texture_2d(system::file::File* file, core::EndCaller<core::EndCallerIgnore> c)
+gearoenix::render::texture::Texture2D* gearoenix::dx11::Engine::create_texture_2d(system::stream::Stream* file, core::EndCaller<core::EndCallerIgnore> c)
 {
     return new texture::Texture2D(file, this, c);
 }
 
-gearoenix::render::texture::Cube* gearoenix::dx11::Engine::create_texture_cube(system::file::File* file, core::EndCaller<core::EndCallerIgnore> c)
+gearoenix::render::texture::Cube* gearoenix::dx11::Engine::create_texture_cube(system::stream::Stream* file, core::EndCaller<core::EndCallerIgnore> c)
 {
     return new texture::Cube(file, this, c);
 }
 
-gearoenix::render::buffer::Mesh* gearoenix::dx11::Engine::create_mesh(unsigned int vec, system::file::File* file, core::EndCaller<core::EndCallerIgnore> c)
+gearoenix::render::buffer::Mesh* gearoenix::dx11::Engine::create_mesh(unsigned int vec, system::stream::Stream* file, core::EndCaller<core::EndCallerIgnore> c)
 {
     return new buffer::Mesh(vec, file, this, c);
 }
@@ -390,7 +390,7 @@ gearoenix::render::buffer::Uniform* gearoenix::dx11::Engine::create_uniform(unsi
     return new buffer::Uniform(s, this, c);
 }
 
-gearoenix::render::shader::Shader* gearoenix::dx11::Engine::create_shader(core::Id sid, system::file::File* file, core::EndCaller<core::EndCallerIgnore> c)
+gearoenix::render::shader::Shader* gearoenix::dx11::Engine::create_shader(core::Id sid, system::stream::Stream* file, core::EndCaller<core::EndCallerIgnore> c)
 {
     render::shader::Id shader_id = (render::shader::Id)sid;
     switch (shader_id) {

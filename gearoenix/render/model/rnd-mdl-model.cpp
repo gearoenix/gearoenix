@@ -2,8 +2,8 @@
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../core/cr-static.hpp"
 #include "../../physics/collider/phs-collider.hpp"
+#include "../../system/stream/sys-stm-stream.hpp"
 #include "../../system/sys-app.hpp"
-#include "../../system/file/sys-fl-file.hpp"
 #include "../camera/rnd-cmr-camera.hpp"
 #include "../camera/rnd-cmr-orthographic.hpp"
 #include "../light/rnd-lt-sun.hpp"
@@ -15,7 +15,7 @@
 #include "../widget/rnd-wdg-widget.hpp"
 #include <iostream>
 
-gearoenix::render::model::Model::Model(ModelType t, system::file::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
+gearoenix::render::model::Model::Model(ModelType t, system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
     : model_type(t)
     , render_engine(e)
 {
@@ -56,7 +56,7 @@ gearoenix::render::model::Model::Model(ModelType t, system::file::File* f, Engin
     }
 }
 
-gearoenix::render::model::Model* gearoenix::render::model::Model::read(system::file::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
+gearoenix::render::model::Model* gearoenix::render::model::Model::read(system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
 {
     core::Id t;
     f->read(t);

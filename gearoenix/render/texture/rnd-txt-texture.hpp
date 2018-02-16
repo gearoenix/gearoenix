@@ -5,9 +5,9 @@
 #include <memory>
 namespace gearoenix {
 namespace system {
-namespace file {
-    class File;
-}
+    namespace stream {
+        class Stream;
+    }
 }
 namespace render {
     class Engine;
@@ -15,7 +15,7 @@ namespace render {
         class Texture : public core::asset::Asset {
         public:
             virtual ~Texture();
-            static Texture* read(system::file::File* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
+            static Texture* read(system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
         };
     }
 }
