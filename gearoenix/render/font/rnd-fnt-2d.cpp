@@ -1,6 +1,9 @@
 #include "rnd-fnt-2d.hpp"
 #include "../../system/stream/sys-stm-local.hpp"
 #include "../../system/stream/sys-stm-memory.hpp"
+#ifdef IN_WINDOWS
+#define STBI_MSC_SECURE_CRT
+#endif
 #define STB_TRUETYPE_IMPLEMENTATION
 #include "../../../external/stb/stb_truetype.h"
 #define STBI_WRITE_NO_STDIO
@@ -8,6 +11,7 @@
 #include "../../../external/stb/stb_image_write.h"
 #include "../rnd-engine.hpp"
 #include "../texture/rnd-txt-texture-2d.hpp"
+#include <string>
 
 #define BAKED_ASPECT 1024
 #define FIRST_CHAR 33
@@ -40,7 +44,7 @@ gearoenix::render::font::Font2D::Font2D(core::Id my_id, system::stream::Stream* 
         std::vector<unsigned char> atlas_data(BAKED_ASPECT * BAKED_ASPECT);
         stbtt_BakeFontBitmap(
             ttbuffer.data(), 0,
-            BAKED_ASPECT / root_nchar,
+            (float)BAKED_ASPECT / (float)root_nchar,
             &(atlas_data[0]), BAKED_ASPECT, BAKED_ASPECT,
             FIRST_CHAR, NUM_CHARS,
             &(bkchar[0]));
@@ -60,7 +64,7 @@ gearoenix::render::font::Font2D::Font2D(core::Id my_id, system::stream::Stream* 
         core::Count pngsize = 0;
         m.write(&pngsize, sizeof(pngsize));
         baked_file.write(&pngsize, sizeof(pngsize));
-        const unsigned int pngsizepos = baked_file.tell();
+        const unsigned int pngsizepos = (unsigned int)baked_file.tell();
         PngWriterContext pngctx;
         pngctx.m = &m;
         pngctx.l = &baked_file;

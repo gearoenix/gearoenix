@@ -36,6 +36,8 @@ namespace system {
         void execute(core::Application* core_app);
         render::Engine* get_render_engine();
         const render::Engine* get_render_engine() const;
+        core::Application* get_core_app();
+        const core::Application* get_core_app() const;
         core::asset::Manager* get_asset_manager();
         const core::asset::Manager* get_asset_manager() const;
         core::Real get_window_ratio() const;

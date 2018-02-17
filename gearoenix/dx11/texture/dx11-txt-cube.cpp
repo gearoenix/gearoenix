@@ -2,7 +2,7 @@
 #ifdef USE_DIRECTX11
 #include "../../core/cr-static.hpp"
 #include "../../render/texture/rnd-txt-png.hpp"
-#include "../../system/stream/sys-fl-file.hpp"
+#include "../../system/stream/sys-stm-stream.hpp"
 #include "../../system/sys-log.hpp"
 #include "../dx11-check.hpp"
 #include "../dx11-engine.hpp"

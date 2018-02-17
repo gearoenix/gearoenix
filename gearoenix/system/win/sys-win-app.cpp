@@ -235,8 +235,8 @@ gearoenix::system::Application::Application()
     ChangeDisplaySettings(&screen_settings, CDS_FULLSCREEN);
     pos_x = pos_y = 0;
 #else
-    screen_width = DEFAULT_WINDOW_WIDTH;
-    screen_height = DEFAULT_WINDOW_HEIGHT;
+    screen_width = GEAROENIX_DEFAULT_WINDOW_WIDTH;
+    screen_height = GEAROENIX_DEFAULT_WINDOW_HEIGHT;
     pos_x = (GetSystemMetrics(SM_CXSCREEN) - screen_width) / 2;
     pos_y = (GetSystemMetrics(SM_CYSCREEN) - screen_height) / 2;
 #endif
@@ -315,6 +315,16 @@ gearoenix::render::Engine* gearoenix::system::Application::get_render_engine()
 const gearoenix::render::Engine* gearoenix::system::Application::get_render_engine() const
 {
     return render_engine;
+}
+
+gearoenix::core::Application* gearoenix::system::Application::get_core_app()
+{
+    return core_app;
+}
+
+const gearoenix::core::Application* gearoenix::system::Application::get_core_app() const
+{
+    return core_app;
 }
 
 gearoenix::core::asset::Manager* gearoenix::system::Application::get_asset_manager()
