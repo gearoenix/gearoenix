@@ -5,6 +5,7 @@
 #include "../../system/sys-app.hpp"
 #include "../rnd-engine.hpp"
 #include "rnd-wdg-button.hpp"
+#include "rnd-wdg-text.hpp"
 
 gearoenix::render::widget::Widget::Widget(system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
     : model::Model(ModelType::WIDGET, f, e, c)
@@ -30,6 +31,8 @@ gearoenix::render::widget::Widget* gearoenix::render::widget::Widget::read(syste
     switch (t) {
     case BUTTON:
         return new Button(f, e, c);
+    case TEXT:
+        return new Text(f, e, c);
     default:
         UNEXPECTED;
     }

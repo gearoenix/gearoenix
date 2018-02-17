@@ -18,6 +18,9 @@ namespace render {
     namespace camera {
         class Camera;
     }
+    namespace font {
+        class Font;
+    }
     namespace light {
         class Light;
     }
@@ -62,6 +65,7 @@ namespace core {
             cache::file::File* audios = nullptr;
             cache::file::File* lights = nullptr;
             cache::file::File* textures = nullptr;
+            cache::file::File* fonts = nullptr;
             cache::file::File* meshes = nullptr;
             cache::file::File* models = nullptr;
             cache::file::File* constraints = nullptr;
@@ -82,6 +86,8 @@ namespace core {
             std::shared_ptr<render::light::Light> get_cached_light(Id id) const;
             std::shared_ptr<render::texture::Texture> get_texture(Id id, EndCaller<render::texture::Texture> end);
             std::shared_ptr<render::texture::Texture> get_cached_texture(Id id) const;
+            std::shared_ptr<render::font::Font> get_font(Id id, EndCaller<render::texture::Texture> end);
+            std::shared_ptr<render::font::Font> get_cached_font(Id id) const;
             std::shared_ptr<render::mesh::Mesh> get_mesh(Id id, EndCaller<render::mesh::Mesh> e);
             std::shared_ptr<render::mesh::Mesh> get_cached_mesh(Id id) const;
             std::shared_ptr<render::model::Model> get_model(Id id, EndCaller<render::model::Model> e);

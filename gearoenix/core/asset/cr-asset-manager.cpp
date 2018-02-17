@@ -24,6 +24,7 @@ gearoenix::core::asset::Manager::Manager(system::Application* sys_app, const std
     , audios(new cache::file::File(file))
     , lights(new cache::file::File(file))
     , textures(new cache::file::File(file))
+    , fonts(new cache::file::File(file))
     , meshes(new cache::file::File(file))
     , models(new cache::file::File(file))
     , constraints(new cache::file::File(file))
@@ -38,6 +39,7 @@ gearoenix::core::asset::Manager::~Manager()
     delete cameras;
     delete audios;
     delete lights;
+    delete fonts;
     delete textures;
     delete meshes;
     delete models;
@@ -49,6 +51,7 @@ gearoenix::core::asset::Manager::~Manager()
     cameras = nullptr;
     audios = nullptr;
     lights = nullptr;
+    fonts = nullptr;
     textures = nullptr;
     meshes = nullptr;
     models = nullptr;
@@ -63,6 +66,7 @@ void gearoenix::core::asset::Manager::initialize()
     audios->read_offsets();
     lights->read_offsets();
     textures->read_offsets();
+    fonts->read_offsets();
     meshes->read_offsets();
     models->read_offsets();
     constraints->read_offsets();
