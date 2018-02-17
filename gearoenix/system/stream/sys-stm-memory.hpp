@@ -14,10 +14,10 @@ namespace system {
         public:
             Memory();
             ~Memory();
-            unsigned int read(void* data, size_t length);
-            unsigned int write(const void* data, size_t length);
-            void seek(unsigned int offset);
-            unsigned int tell();
+            core::Count read(void* data, core::Count length);
+            core::Count write(const void* data, core::Count length);
+            void seek(core::Count offset);
+            core::Count tell();
         };
     }
 }

@@ -1,5 +1,6 @@
 #include "rnd-lt-light.hpp"
 #include "../../system/stream/sys-stm-stream.hpp"
+#include "../../system/sys-log.hpp"
 #include "rnd-lt-sun.hpp"
 
 gearoenix::render::light::Light::Light(system::stream::Stream*) {}

@@ -2,6 +2,7 @@
 #include "../../math/math-matrix.hpp"
 #include "../../math/math-ray.hpp"
 #include "../../system/stream/sys-stm-stream.hpp"
+#include "../../system/sys-log.hpp"
 
 gearoenix::physics::collider::Mesh::Mesh(system::stream::Stream* in)
     : Collider(Type::MESH)

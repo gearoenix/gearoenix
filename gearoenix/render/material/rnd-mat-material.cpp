@@ -1,7 +1,7 @@
 #include "rnd-mat-material.hpp"
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../core/cr-end-caller.hpp"
-#include "../../system/stream/sys-stm-stream.hpp"
+#include "../../system/stream/sys-stm-asset.hpp"
 #include "../../system/sys-app.hpp"
 #include "../buffer/rnd-buf-uniform.hpp"
 #include "../pipeline/rnd-pip-manager.hpp"

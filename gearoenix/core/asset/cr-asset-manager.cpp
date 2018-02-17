@@ -9,6 +9,7 @@
 #include "../../render/scene/rnd-scn-scene.hpp"
 #include "../../render/shader/rnd-shd-shader.hpp"
 #include "../../render/texture/rnd-txt-texture.hpp"
+#include "../../system/stream/sys-stm-asset.hpp"
 #include "../../system/sys-app.hpp"
 #include "../cache/cr-cache-cacher.hpp"
 #include "../cache/file/cr-cache-file-sparse.hpp"
@@ -17,7 +18,7 @@
 
 gearoenix::core::asset::Manager::Manager(system::Application* sys_app, const std::string& name)
     : sys_app(sys_app)
-    , file(new system::stream::Stream(sys_app, name))
+    , file(new system::stream::Asset(sys_app, name))
     , shaders(new cache::Cacher())
     , cameras(new cache::file::File(file))
     , audios(new cache::file::File(file))
@@ -68,7 +69,7 @@ void gearoenix::core::asset::Manager::initialize()
     scenes->read_offsets();
 }
 
-gearoenix::system::stream::Stream* gearoenix::core::asset::Manager::get_file()
+gearoenix::system::stream::Asset* gearoenix::core::asset::Manager::get_file()
 {
     return file;
 }

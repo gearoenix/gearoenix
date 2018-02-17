@@ -1,5 +1,6 @@
 #include "au-audio.hpp"
 #include "../system/stream/sys-stm-stream.hpp"
+#include "../system/sys-log.hpp"
 #include "au-music.hpp"
 #include "au-speaker.hpp"
 
@@ -7,7 +8,7 @@ gearoenix::audio::Audio::Audio(system::stream::Stream* f)
 {
     std::vector<uint8_t> bytes;
     f->read(bytes);
-    GXLOGE("TODO");
+    TODO;
 }
 
 gearoenix::audio::Audio::~Audio() {}
@@ -22,5 +23,5 @@ gearoenix::audio::Audio* gearoenix::audio::Audio::read(system::stream::Stream* f
     case 20:
         return new Speaker(f);
     }
-    GXLOGF("Unexpected");
+    UNEXPECTED;
 }

@@ -1,6 +1,6 @@
+#include "sys-stm-asset.hpp"
 #include "../sys-app.hpp"
 #include "../sys-log.hpp"
-#include "sys-stm-stream.hpp"
 #ifdef IN_IOS
 #import <Foundation/Foundation.h>
 //#import "../apple/sys-apl.mm"
@@ -8,16 +8,28 @@
 #include <android_native_app_glue.h>
 #endif
 
-void gearoenix::system::stream::Stream::check_endian_compatibility()
+void gearoenix::system::stream::Asset::built_in_type_read(void* data, core::Count length)
+{
+    read(data, length);
+    if (is_endian_compatible)
+        return;
+    std::uint8_t* c_data = reinterpret_cast<std::uint8_t*>(data);
+    for (int i = 0, j = length - 1; i < j; ++i, --j) {
+        std::uint8_t tmp = c_data[i];
+        c_data[i] = c_data[j];
+        c_data[j] = tmp;
+    }
+}
+
+void gearoenix::system::stream::Asset::check_endian_compatibility()
 {
     unsigned int system_endian = 1;
     uint8_t resource_endian;
-    read(resource_endian);
+    Stream::read(resource_endian);
     is_endian_compatible = (resource_endian == ((uint8_t*)(&system_endian))[0]);
-    //    LOGE(std::string("endian is: ") + std::to_string(is_endian_compatible));
 }
 
-gearoenix::system::stream::Stream::Stream
+gearoenix::system::stream::Asset::Asset
 #ifdef USE_STD_FILE
     (system::Application*, const std::string& name)
 {
@@ -48,31 +60,39 @@ gearoenix::system::stream::Stream::Stream
     check_endian_compatibility();
 }
 
-gearoenix::system::stream::Stream::~Stream() {}
+gearoenix::system::stream::Asset::~Asset()
+{
+    TODO; //android asset free check
+}
 
-bool gearoenix::system::stream::Stream::get_endian_compatibility() const
+bool gearoenix::system::stream::Asset::get_endian_compatibility() const
 {
     return is_endian_compatible;
 }
 
-unsigned int gearoenix::system::stream::Stream::read(void* data, size_t length)
+gearoenix::core::Count gearoenix::system::stream::Asset::read(void* data, core::Count length)
 {
 #ifdef IN_ANDROID
-    return static_cast<unsigned int>(AAsset_read(file, data, length));
+    core::Count result = static_cast<core::Count result>(AAsset_read(file, data, length));
 #elif defined(USE_STD_FILE)
     file.read(reinterpret_cast<char*>(data), length);
-    unsigned int result = static_cast<unsigned int>(file.gcount());
-#ifdef DEBUG_MODE
-    if (result != (unsigned int)length)
-        UNEXPECTED;
-#endif
-    return result;
+    core::Count result = static_cast<core::Count>(file.gcount());
 #else
 #error "Error not implemented yet!"
 #endif
+#ifdef DEBUG_MODE
+    if (result != length)
+        UNEXPECTED;
+#endif
+    return result;
 }
 
-void gearoenix::system::stream::Stream::seek(unsigned int offset)
+gearoenix::core::Count gearoenix::system::stream::Asset::write(const void*, core::Count)
+{
+    UNEXPECTED;
+}
+
+void gearoenix::system::stream::Asset::seek(core::Count offset)
 {
 #if defined(USE_STD_FILE)
     file.seekg(offset, std::ios::beg);
@@ -83,12 +103,12 @@ void gearoenix::system::stream::Stream::seek(unsigned int offset)
 #endif
 }
 
-unsigned int gearoenix::system::stream::Stream::tell()
+gearoenix::core::Count gearoenix::system::stream::Asset::tell()
 {
 #if defined(USE_STD_FILE)
-    return (unsigned int)file.tellg();
+    return (core::Count)file.tellg();
 #elif defined(IN_ANDROID)
-    return (unsigned int)AAsset_seek(file, 0, SEEK_CUR);
+    return (core::Count)AAsset_seek(file, 0, SEEK_CUR);
 #else
 #error "Error not implemented yet!"
 #endif

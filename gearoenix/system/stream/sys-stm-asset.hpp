@@ -1,11 +1,7 @@
-#ifndef GEAROENIX_SYSTEM_FILE_FILE_HPP
-#define GEAROENIX_SYSTEM_FILE_FILE_HPP
-
+#ifndef GEAROENIX_SYSTEM_STREAM_ASSET_HPP
+#define GEAROENIX_SYSTEM_STREAM_ASSET_HPP
 #include "../../core/cr-build-configuration.hpp"
-#include "../../core/cr-types.hpp"
-#include "../../system/sys-log.hpp"
-#include <map>
-#include <memory>
+#include "sys-stm-stream.hpp"
 #include <string>
 #include <vector>
 
@@ -18,13 +14,13 @@
 #elif defined(IN_ANDROID)
 #include <android/asset_manager.h>
 #else
-#error "Unimplemented yet!"
+#error "Not implemented yet!"
 #endif
 namespace gearoenix {
 namespace system {
     class Application;
     namespace stream {
-        class Stream {
+        class Asset : public Stream {
         private:
 #ifdef USE_STD_FILE
             std::ifstream file;
@@ -32,95 +28,20 @@ namespace system {
             //system::Application* sys_app;
             AAsset* file;
 #else
-#error "Unimplemented yet!"
+#error "Not implemented yet!"
 #endif
             bool is_endian_compatible = true;
-
-            template <typename T>
-            void change_endianess(T* data)
-            {
-                uint8_t* c_data = reinterpret_cast<uint8_t*>(data);
-                for (int i = 0, j = sizeof(T) - 1; i < j; ++i, --j) {
-                    uint8_t tmp = c_data[i];
-                    c_data[i] = c_data[j];
-                    c_data[j] = tmp;
-                }
-            }
-
-            template <typename T>
-            void correct_endianess(T* data)
-            {
-                if (is_endian_compatible || sizeof(T) == 1) {
-                    return;
-                } else {
-                    change_endianess(data);
-                }
-            }
-
             void check_endian_compatibility();
+            void built_in_type_read(void* data, core::Count length);
 
         public:
-            Stream(system::Application* sys_app, const std::string& name);
-            ~Stream();
+            Asset(system::Application* sys_app, const std::string& name);
+            ~Asset();
             bool get_endian_compatibility() const;
-            unsigned int read(void* data, size_t length);
-            void seek(unsigned int offset);
-            unsigned int tell();
-
-            template <typename T>
-            void read(std::vector<T>& data)
-            {
-                core::Count c;
-                read(c);
-                data.resize((size_t)c);
-                size_t s = (size_t)(c * sizeof(T));
-#ifdef DEBUG_MODE
-                if (read(reinterpret_cast<void*>(data.data()), s) != s) {
-                    UNEXPECTED;
-                }
-#else
-                read(reinterpret_cast<void*>(data.data()), s);
-#endif
-                if (is_endian_compatible)
-                    return;
-                for (unsigned int i = 0; i < c; ++i) {
-                    change_endianess(&(data[i]));
-                }
-            }
-
-            template <typename T>
-            void read(T& data)
-            {
-#ifdef DEBUG_MODE
-                if (sizeof(T) != read(&data, sizeof(T))) {
-                    UNEXPECTED;
-                }
-#else
-                read(&data, sizeof(T));
-#endif
-                correct_endianess(&data);
-            }
-
-            template <typename T>
-            T read()
-            {
-                T data;
-                read(data);
-                return data;
-            }
-
-            bool read_bool()
-            {
-                uint8_t data;
-#ifdef DEBUG_MODE
-                if (1 != read(&data, 1)) {
-                    GXLOGF("Unexpected");
-                }
-#else
-                read(&data, 1);
-#endif
-                return data != 0;
-            }
+            core::Count read(void* data, core::Count length);
+            core::Count write(const void* data, core::Count length);
+            void seek(core::Count offset);
+            core::Count tell();
         };
     }
 }
