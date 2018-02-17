@@ -14,7 +14,7 @@ void gearoenix::system::stream::Asset::built_in_type_read(void* data, core::Coun
     if (is_endian_compatible)
         return;
     std::uint8_t* c_data = reinterpret_cast<std::uint8_t*>(data);
-    for (int i = 0, j = length - 1; i < j; ++i, --j) {
+    for (core::Count i = 0, j = length - 1; i < j; ++i, --j) {
         std::uint8_t tmp = c_data[i];
         c_data[i] = c_data[j];
         c_data[j] = tmp;

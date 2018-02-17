@@ -43,7 +43,7 @@ gearoenix::render::material::DirectionalColoredSpeculatedBakedFullOpaque::Direct
     core::Id texid;
     f->read(texid);
     core::asset::Manager* astmgr = e->get_system_application()->get_asset_manager();
-    unsigned int curloc = f->tell();
+    core::Count curloc = f->tell();
     env = std::static_pointer_cast<texture::Cube>(astmgr->get_texture(texid, core::EndCaller<render::texture::Texture>([this, end, e](std::shared_ptr<render::texture::Texture> asset) -> void {
         shdrsc = reinterpret_cast<Resources*>(e->create_shader_resources(SHADER_ID, pl.get(), ub, end));
         shdrsc->set_baked_env(reinterpret_cast<texture::Cube*>(asset.get()));

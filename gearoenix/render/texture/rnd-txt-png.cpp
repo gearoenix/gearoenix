@@ -23,7 +23,7 @@ void gearoenix::render::texture::PNG::decode(
     std::vector<unsigned char> png;
     file->read(png);
     int iw, ih, channels;
-    unsigned char* dd = stbi_load_from_memory(png.data(), png.size(), &iw, &ih, &channels, 4);
+    unsigned char* dd = stbi_load_from_memory(png.data(), (int)png.size(), &iw, &ih, &channels, 4);
     if (dd == nullptr) {
         GXLOGF("PNG decoder error.");
     }

@@ -47,7 +47,7 @@ gearoenix::render::material::DirectionalD2SpeculatedBakedFullOpaque::Directional
     core::Id texid;
     f->read(texid);
     core::asset::Manager* astmgr = e->get_system_application()->get_asset_manager();
-    unsigned int curloc = f->tell();
+    core::Count curloc = f->tell();
     txt = std::static_pointer_cast<texture::Texture2D>(astmgr->get_texture(tex2did, core::EndCaller<render::texture::Texture>([end](std::shared_ptr<render::texture::Texture>) -> void {})));
     env = std::static_pointer_cast<texture::Cube>(astmgr->get_texture(texid, core::EndCaller<render::texture::Texture>([end](std::shared_ptr<render::texture::Texture>) -> void {})));
     e->add_load_function([this, end, e]() -> void {

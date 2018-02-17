@@ -24,7 +24,7 @@ gearoenix::render::material::Material::Material(core::Id sid, unsigned int us, E
     , e(e)
 {
     system::stream::Stream* f = e->get_system_application()->get_asset_manager()->get_file();
-    unsigned int curloc = f->tell();
+    core::Count curloc = f->tell();
     pl = e->get_pipeline_manager()->get_pipeline(sid, end);
     f->seek(curloc);
 }
