@@ -1,5 +1,5 @@
-#ifndef GEAROENIX_SYSTEM_FILE_MEMORY_HPP
-#define GEAROENIX_SYSTEM_FILE_MEMORY_HPP
+#ifndef GEAROENIX_SYSTEM_STREAM_MEMORY_HPP
+#define GEAROENIX_SYSTEM_STREAM_MEMORY_HPP
 
 #include "sys-stm-stream.hpp"
 #include <vector>
@@ -10,6 +10,7 @@ namespace system {
         class Memory : public Stream {
         private:
             std::vector<unsigned char> data;
+            core::Count index = 0;
 
         public:
             Memory();

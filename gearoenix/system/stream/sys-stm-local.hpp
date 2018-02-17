@@ -1,5 +1,5 @@
-#ifndef GEAROENIX_SYSTEM_FILE_LOCAL_HPP
-#define GEAROENIX_SYSTEM_FILE_LOCAL_HPP
+#ifndef GEAROENIX_SYSTEM_STREAM_LOCAL_HPP
+#define GEAROENIX_SYSTEM_STREAM_LOCAL_HPP
 
 #include "sys-stm-stream.hpp"
 #include <fstream>
@@ -9,7 +9,7 @@ namespace system {
     namespace stream {
         class Local : public Stream {
         private:
-            std::ifstream file;
+            std::fstream file;
 
         public:
             Local(const std::string& name, bool writable = false);
