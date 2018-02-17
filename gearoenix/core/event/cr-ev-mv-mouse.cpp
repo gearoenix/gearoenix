@@ -20,3 +20,7 @@ gearoenix::core::Real gearoenix::core::event::movement::Mouse::get_y() const
 {
     return y;
 }
+
+gearoenix::core::Real gearoenix::core::event::movement::Mouse::get_dx() const { return dx; }
+
+gearoenix::core::Real gearoenix::core::event::movement::Mouse::get_dy() const { return dy; }

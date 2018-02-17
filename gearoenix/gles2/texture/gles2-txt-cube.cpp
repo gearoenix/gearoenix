@@ -29,14 +29,17 @@ gearoenix::gles2::texture::Cube::Cube(system::stream::Stream* file, Engine* eng,
     std::function<void()> loadf = [&, imgw, imgh, img_data, end]() -> void {
         glGenTextures(1, &texture_object);
         glBindTexture(GL_TEXTURE_CUBE_MAP, texture_object);
-        glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); //GL_MIRRORED_REPEAT
+        glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        //CHECK_FOR_GRAPHIC_API_ERROR
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); //GL_MllIRRORED_REPEAT
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         for (int i = 0; i < FACES_COUNT; ++i) {
             glTexImage2D(faces[i], 0, GL_RGBA, imgw, imgh, 0, GL_RGBA, GL_UNSIGNED_BYTE, (void*)img_data[i].data());
         }
         glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+        glGetError();
+        //CHECK_FOR_GRAPHIC_API_ERROR
         (void)end;
     };
     eng->add_load_function(loadf);

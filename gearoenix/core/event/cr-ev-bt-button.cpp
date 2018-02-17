@@ -3,7 +3,7 @@
 #include "cr-ev-bt-mouse.hpp"
 
 gearoenix::core::event::button::Button::Button(ButtonType t, KeyType k, ActionType a)
-    : Event(EventType::BUTTON)
+    : Event(From::BUTTON)
     , button_type(t)
     , key_type(k)
     , action_type(a)

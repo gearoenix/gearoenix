@@ -24,6 +24,7 @@ namespace gles2 {
         GLuint render_framebuffer = 0;
         GLfloat win_width;
         GLfloat win_height;
+        void initialize();
 #ifdef GLES2_PROFILING
         unsigned int prof_frames_count = 0;
         std::chrono::high_resolution_clock::time_point prof_last_time_draw;
@@ -42,7 +43,7 @@ namespace gles2 {
         render::shader::Shader* create_shader(core::Id sid, system::stream::Stream* file, core::EndCaller<core::EndCallerIgnore> c);
         render::shader::Resources* create_shader_resources(core::Id sid, render::pipeline::Pipeline* p, render::buffer::Uniform* ub, core::EndCaller<core::EndCallerIgnore> c);
         render::pipeline::Pipeline* create_pipeline(core::Id sid, core::EndCaller<core::EndCallerIgnore> c);
-        void on_event(const core::event::Event& e);
+        void on_event(core::event::Event& e);
     };
 }
 }

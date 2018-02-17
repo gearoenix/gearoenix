@@ -24,7 +24,7 @@ namespace render {
             Ui(system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
 
         public:
-            virtual void on_event(const core::event::Event& e);
+            virtual void on_event(core::event::Event& e);
             core::Id find_widget_under_cursor(core::Real x, core::Real y);
         };
     }

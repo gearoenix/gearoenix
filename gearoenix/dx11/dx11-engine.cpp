@@ -1,6 +1,7 @@
 #include "dx11-engine.hpp"
 #ifdef USE_DIRECTX11
 #include "../core/cr-static.hpp"
+#include "../core/event/cr-ev-window-resize.hpp"
 #include "../math/math-matrix.hpp"
 #include "../math/math-vector.hpp"
 #include "../physics/phs-engine.hpp"
@@ -28,6 +29,51 @@
 #include <vector>
 
 #define SHADOW_WIDTH 1024
+
+void gearoenix::dx11::Engine::initial_screen()
+{
+    ID3D11Texture2D* back_buffer_ptr;
+    GXHRCHK(swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&back_buffer_ptr));
+    context->OMSetRenderTargets(0, nullptr, nullptr);
+    GXHRCHK(device->CreateRenderTargetView(back_buffer_ptr, NULL, &main_rtv));
+    back_buffer_ptr->Release();
+    back_buffer_ptr = nullptr;
+    D3D11_TEXTURE2D_DESC depth_buffer_desc;
+    GXSETZ(depth_buffer_desc);
+    depth_buffer_desc.Width = sysapp->get_width();
+    depth_buffer_desc.Height = sysapp->get_height();
+    depth_buffer_desc.MipLevels = 1;
+    depth_buffer_desc.ArraySize = 1;
+    depth_buffer_desc.Format = DXGI_FORMAT_D32_FLOAT;
+    depth_buffer_desc.SampleDesc = sample;
+    depth_buffer_desc.Usage = D3D11_USAGE_DEFAULT;
+    depth_buffer_desc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+    depth_buffer_desc.CPUAccessFlags = 0;
+    depth_buffer_desc.MiscFlags = 0;
+    GXHRCHK(device->CreateTexture2D(&depth_buffer_desc, NULL, &main_dsb));
+    D3D11_DEPTH_STENCIL_VIEW_DESC depth_stencil_view_desc;
+    GXSETZ(depth_stencil_view_desc);
+    depth_stencil_view_desc.Format = depth_buffer_desc.Format;
+    depth_stencil_view_desc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DMS;
+    depth_stencil_view_desc.Texture2D.MipSlice = 0;
+    GXHRCHK(device->CreateDepthStencilView(main_dsb, &depth_stencil_view_desc, &main_dsv));
+    context->OMSetRenderTargets(1, &main_rtv, main_dsv);
+    main_viewport.Width = (float)sysapp->get_width();
+    main_viewport.Height = (float)sysapp->get_height();
+}
+
+void gearoenix::dx11::Engine::terminate_screen()
+{
+    if (nullptr != main_rtv)
+        main_rtv->Release();
+    main_rtv = nullptr;
+    if (nullptr != main_dsb)
+        main_dsb->Release();
+    main_dsb = nullptr;
+    if (nullptr != main_dsv)
+        main_dsv->Release();
+    main_dsv = nullptr;
+}
 
 void gearoenix::dx11::Engine::initial_shadow()
 {
@@ -109,13 +155,15 @@ void gearoenix::dx11::Engine::terminate_shadow()
     shadow_rtv = nullptr;
     delete shadow_txt;
     shadow_txt = nullptr;
-    delete shadow_bs;
+    shadow_bs->Release();
     shadow_bs = nullptr;
 }
 
 gearoenix::dx11::Engine::Engine(system::Application* sys_app)
     : render::Engine(sys_app)
 {
+    GXSETZ(sample);
+    sample.Count = 1;
     IDXGIFactory* factory = nullptr;
     IDXGIAdapter* adapter = nullptr;
     IDXGIOutput* adapter_output = nullptr;
@@ -177,7 +225,7 @@ adapter_found_label:
     swap_chain_desc.BufferDesc.RefreshRate.Denominator = denominator;
     swap_chain_desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
     swap_chain_desc.OutputWindow = sysapp->get_window();
-    swap_chain_desc.SampleDesc.Count = 1;
+    swap_chain_desc.SampleDesc = sample;
 #ifdef GEAROENIX_FULLSCREEN
     swap_chain_desc.Windowed = false;
 #else
@@ -222,30 +270,14 @@ adapter_found_label:
             break;
         }
     }
+    sample = swap_chain_desc.SampleDesc;
     device->Release();
     device = nullptr;
     GXHRCHK(D3D11CreateDeviceAndSwapChain(
         nullptr, driver_type, nullptr, device_flag,
         &feature_level, 1, D3D11_SDK_VERSION, &swap_chain_desc, &swapchain,
         &device, nullptr, &context));
-    ID3D11Texture2D* back_buffer_ptr;
-    GXHRCHK(swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&back_buffer_ptr));
-    GXHRCHK(device->CreateRenderTargetView(back_buffer_ptr, NULL, &main_rtv));
-    back_buffer_ptr->Release();
-    back_buffer_ptr = nullptr;
-    D3D11_TEXTURE2D_DESC depth_buffer_desc;
-    GXSETZ(depth_buffer_desc);
-    depth_buffer_desc.Width = sysapp->get_width();
-    depth_buffer_desc.Height = sysapp->get_height();
-    depth_buffer_desc.MipLevels = 1;
-    depth_buffer_desc.ArraySize = 1;
-    depth_buffer_desc.Format = DXGI_FORMAT_D32_FLOAT;
-    depth_buffer_desc.SampleDesc = swap_chain_desc.SampleDesc;
-    depth_buffer_desc.Usage = D3D11_USAGE_DEFAULT;
-    depth_buffer_desc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-    depth_buffer_desc.CPUAccessFlags = 0;
-    depth_buffer_desc.MiscFlags = 0;
-    GXHRCHK(device->CreateTexture2D(&depth_buffer_desc, NULL, &main_dsb));
+    initial_screen();
     D3D11_DEPTH_STENCIL_DESC depth_stencil_desc;
     GXSETZ(depth_stencil_desc);
     depth_stencil_desc.DepthEnable = true;
@@ -275,13 +307,6 @@ adapter_found_label:
     blend_desc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
     blend_desc.RenderTarget[0].RenderTargetWriteMask = 0X0F;
     GXHRCHK(device->CreateBlendState(&blend_desc, &main_bs));
-    D3D11_DEPTH_STENCIL_VIEW_DESC depth_stencil_view_desc;
-    GXSETZ(depth_stencil_view_desc);
-    depth_stencil_view_desc.Format = depth_buffer_desc.Format;
-    depth_stencil_view_desc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DMS;
-    depth_stencil_view_desc.Texture2D.MipSlice = 0;
-    GXHRCHK(device->CreateDepthStencilView(main_dsb, &depth_stencil_view_desc, &main_dsv));
-    context->OMSetRenderTargets(1, &main_rtv, main_dsv);
     D3D11_RASTERIZER_DESC raster_desc;
     GXSETZ(raster_desc);
     raster_desc.AntialiasedLineEnable = true;
@@ -295,8 +320,6 @@ adapter_found_label:
     raster_desc.SlopeScaledDepthBias = 0.0f;
     GXHRCHK(device->CreateRasterizerState(&raster_desc, &raster));
     context->RSSetState(raster);
-    main_viewport.Width = (float)sysapp->get_width();
-    main_viewport.Height = (float)sysapp->get_height();
     main_viewport.MinDepth = 0.0f;
     main_viewport.MaxDepth = 1.0f;
     main_viewport.TopLeftX = 0.0f;
@@ -325,11 +348,11 @@ void gearoenix::dx11::Engine::window_changed()
 
 void gearoenix::dx11::Engine::update()
 {
-    update_time();
     context->ClearRenderTargetView(main_rtv, clear_color);
     do_load_functions();
     physics_engine->wait();
-    for (std::shared_ptr<render::scene::Scene>& scene : loaded_scenes) {
+    for (const std::pair<core::Id, std::shared_ptr<render::scene::Scene>>& id_scene : loaded_scenes) {
+        const std::shared_ptr<render::scene::Scene>& scene = id_scene.second;
         start_shadow_casting();
         scene->cast_shadow();
         context->OMSetRenderTargets(1, &main_rtv, main_dsv);
@@ -347,21 +370,16 @@ void gearoenix::dx11::Engine::terminate()
     if (swapchain == nullptr)
         return;
     terminate_shadow();
-    delete main_bs;
+    terminate_screen();
+    main_bs->Release();
     main_bs = nullptr;
     swapchain->SetFullscreenState(false, NULL);
     delete sampler;
     sampler = nullptr;
     raster->Release();
     raster = nullptr;
-    main_dsv->Release();
-    main_dsv = nullptr;
     main_dss->Release();
     main_dss = nullptr;
-    main_dsb->Release();
-    main_dsb = nullptr;
-    main_rtv->Release();
-    main_rtv = nullptr;
     context->Release();
     context = nullptr;
     device->Release();
@@ -489,6 +507,16 @@ gearoenix::dx11::texture::Sampler* gearoenix::dx11::Engine::get_sampler()
 const gearoenix::dx11::texture::Sampler* gearoenix::dx11::Engine::get_sampler() const
 {
     return sampler;
+}
+
+void gearoenix::dx11::Engine::on_event(core::event::Event& e)
+{
+    render::Engine::on_event(e);
+    if (e.get_type() == core::event::Event::From::WINDOW_RESIZE) {
+        terminate_screen();
+        GXHRCHK(swapchain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0));
+        initial_screen();
+    }
 }
 
 #endif

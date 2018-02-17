@@ -55,6 +55,10 @@ namespace system {
 #define TODO GXLOGE("TODO")
 #define UNEXPECTED GXLOGF("Unexpected")
 #define UNIMPLEMENTED GXLOGF("Unimplemented")
+#define GXASSERT(x) \
+    if ((x) == 0)   \
+    UNEXPECTED
+#define GXREACHED GXLOGI("REACHED-------------------------------------------")
 #else // LOG_ENABLED
 #define GXLOGI(s) ;
 #define GXLOGD(s) ;

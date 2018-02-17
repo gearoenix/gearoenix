@@ -38,5 +38,10 @@
 *.swp
 .DS_store
 
+# assets
+*.png
+*.ttf
+
 output/
 assets/
+

@@ -15,9 +15,11 @@
 
 #define GXLOGI(s) GXLOG(ANDROID_LOG_INFO, s)
 #define GXLOGE(s) GXLOG(ANDROID_LOG_ERROR, s)
-#define GXLOGF(s)                \
-    GXLOG(ANDROID_LOG_FATAL, s); \
-    std::terminate();
+#define GXLOGF(s)                    \
+    {                                \
+        GXLOG(ANDROID_LOG_FATAL, s); \
+        std::terminate();            \
+    }
 
 #endif
 #endif

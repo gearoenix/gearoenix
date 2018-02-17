@@ -37,6 +37,9 @@ namespace dx11 {
         ID3D11BlendState* shadow_bs = nullptr;
         D3D11_VIEWPORT shadow_viewport;
         texture::Texture2D* shadow_txt = nullptr;
+        DXGI_SAMPLE_DESC sample;
+        void initial_screen();
+        void terminate_screen();
         void initial_shadow();
         void start_shadow_casting();
         void terminate_shadow();
@@ -65,6 +68,7 @@ namespace dx11 {
         const ID3D11DeviceContext* get_context() const;
         texture::Sampler* get_sampler();
         const texture::Sampler* get_sampler() const;
+        void on_event(core::event::Event& e);
     };
 }
 }

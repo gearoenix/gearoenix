@@ -12,7 +12,7 @@ gearoenix::physics::animation::Once::~Once()
 {
 }
 
-bool gearoenix::physics::animation::Once::apply(const std::chrono::steady_clock::time_point& now, const core::Real delta_millisecond)
+bool gearoenix::physics::animation::Once::apply(const std::chrono::system_clock::time_point& now, const core::Real delta_millisecond)
 {
     if (now > end) {
         ended = true;

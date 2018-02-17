@@ -193,12 +193,13 @@ int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_
     case SDL_WINDOWEVENT:
         switch (event->window.event) {
         case SDL_WINDOWEVENT_RESIZED: {
-            const core::event::WindowResize e(o->win_width, o->win_height, event->window.data1, event->window.data2);
-            o->render_engine->on_event(e);
+            core::event::WindowResize e(o->win_width, o->win_height, event->window.data1, event->window.data2);
             o->win_width = event->window.data1;
             o->win_height = event->window.data2;
             o->screen_ratio = (core::Real)o->win_width / (core::Real)o->win_height;
             o->half_height_inversed = 2.0f / (core::Real)o->win_height;
+            o->render_engine->on_event(e);
+            o->core_app->on_event(e);
             break;
         }
         default:

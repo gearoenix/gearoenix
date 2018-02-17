@@ -39,7 +39,7 @@ bool gearoenix::render::camera::Orthographic::in_sight(const math::Vec3& locatio
 void gearoenix::render::camera::Orthographic::on_event(const core::event::Event& e)
 {
     Camera::on_event(e);
-    if (e.get_type() == core::event::Event::EventType::WINDOW_RESIZE)
+    if (e.get_type() == core::event::Event::From::WINDOW_RESIZE)
         on_ratio_change();
 }
 

@@ -2,6 +2,9 @@
 #ifdef IN_ANDROID
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../core/cr-application.hpp"
+#include "../../core/event/cr-ev-bt-mouse.hpp"
+#include "../../core/event/cr-ev-mv-mouse.hpp"
+#include "../../core/event/cr-ev-sys-system.hpp"
 #include "../../gles2/gles2-engine.hpp"
 #include "../../render/rnd-engine.hpp"
 #include "../sys-file.hpp"
@@ -11,61 +14,108 @@
 void gearoenix::system::Application::handle_cmd(android_app* app, int32_t cmd)
 {
     Application* sys_app = reinterpret_cast<Application*>(app->userData);
-    sys_app->handle(cmd);
+    sys_app->handle(app, cmd);
 }
 
 int32_t gearoenix::system::Application::handle_input(android_app* a, AInputEvent* e)
 {
     Application* sys_app = reinterpret_cast<Application*>(a->userData);
-    return sys_app->handle(e);
+    return sys_app->handle(a, e);
 }
 
-int32_t gearoenix::system::Application::handle(AInputEvent* e)
+int32_t gearoenix::system::Application::handle(android_app* app, AInputEvent* e)
 {
     ndk_helper::Vec2 p1, p2;
     core::Real w1, w2;
     ndk_helper::GESTURE_STATE pinch_state = pinch_detector.Detect(e);
     ndk_helper::GESTURE_STATE drag_state = drag_detector.Detect(e);
-    switch (pinch_state) {
-    case ndk_helper::GESTURE_STATE_START:
-        TODO;
-        pinch_detector.GetPointers(p1, p2);
-        w = (p1 - p2).Length();
-        return 1;
-    case ndk_helper::GESTURE_STATE_MOVE:
-        pinch_detector.GetPointers(p1, p2);
-        w2 = (p1 - p2).Length();
-        core_app->on_scroll((w2 - w) * 0.03f);
-        w = w2;
+    ndk_helper::GESTURE_STATE tap_state = tap_detector.Detect(e);
+    //    switch (pinch_state) {
+    //        case ndk_helper::GESTURE_STATE_START: TODO;
+    //            pinch_detector.GetPointers(p1, p2);
+    //            w = (p1 - p2).Length();
+    //            return 1;
+    //        case ndk_helper::GESTURE_STATE_MOVE:
+    //            pinch_detector.GetPointers(p1, p2);
+    //            w2 = (p1 - p2).Length();
+    ////        core_app->on_scroll((w2 - w) * 0.03f);
+    //            w = w2;
+    //            return 1;
+    //        default:
+    //            break;
+    //    }
+    //    switch (drag_state) {
+    //        case ndk_helper::GESTURE_STATE_START: {
+    //            TODO;
+    //            drag_detector.GetPointer(p1);
+    //            p1.Value(x, y);
+    //            x = convert_pixel_x_to_normalized((int) x);
+    //            y = convert_pixel_y_to_normalized((int) y);
+    //            core::event::button::Mouse me(
+    //                    core::event::button::Button::LEFT,
+    //                    core::event::button::Button::PRESS,
+    //                    x, y
+    //            );
+    //            render_engine->on_event(me);
+    //            core_app->on_event(me);
+    //            return 1;
+    //        }
+    //        case ndk_helper::GESTURE_STATE_MOVE: {
+    //            drag_detector.GetPointer(p1);
+    //            p1.Value(w1, w2);
+    //            w1 = convert_pixel_x_to_normalized((int) w1);
+    //            w2 = convert_pixel_y_to_normalized((int) w2);
+    //            core::event::movement::Mouse me(w1, w2, x, y);
+    //            render_engine->on_event(me);
+    //            core_app->on_event(me);
+    //            x = w1;
+    //            y = w2;
+    //            return 1;
+    //        }
+    //        case ndk_helper::GESTURE_STATE_END: {
+    //            drag_detector.GetPointer(p1);
+    //            p1.Value(x, y);
+    //            x = convert_pixel_x_to_normalized((int) x);
+    //            y = convert_pixel_y_to_normalized((int) y);
+    //            core::event::button::Mouse me(
+    //                    core::event::button::Button::LEFT,
+    //                    core::event::button::Button::RELEASE,
+    //                    x, y
+    //            );
+    //            render_engine->on_event(me);
+    //            core_app->on_event(me);
+    //            return 1;
+    //        }
+    //        default:
+    //            break;
+    //    }
+    switch (tap_state) {
+    case ndk_helper::GESTURE_STATE_ACTION: {
+        x = convert_pixel_x_to_normalized((int)AMotionEvent_getX(e, 0));
+        y = convert_pixel_y_to_normalized((int)AMotionEvent_getY(e, 0));
+        core::event::button::Mouse me(
+            core::event::button::Button::LEFT,
+            core::event::button::Button::PRESS,
+            x, y);
+        render_engine->on_event(me);
+        core_app->on_event(me);
+        core::event::button::Mouse me1(
+            core::event::button::Button::LEFT,
+            core::event::button::Button::RELEASE,
+            x, y);
+        render_engine->on_event(me1);
+        core_app->on_event(me1);
         return 1;
     }
-    switch (drag_state) {
-    case ndk_helper::GESTURE_STATE_START:
-        TODO;
-        drag_detector.GetPointer(p1);
-        p1.Value(x, y);
-        core_app->on_mouse(
-            core::Application::MouseButton::LEFT,
-            core::Application::ButtonAction::PRESS, x, y);
-        return 1;
-    case ndk_helper::GESTURE_STATE_MOVE:
-        drag_detector.GetPointer(p1);
-        p1.Value(w1, w2);
-        core_app->on_mouse_move(w1 - x, w2 - y);
-        x = w1;
-        y = w2;
-        return 1;
-    case ndk_helper::GESTURE_STATE_END:
-        core_app->on_mouse(
-            core::Application::MouseButton::LEFT,
-            core::Application::ButtonAction::RELEASE, x, y);
-        return 1;
+    default:
+        break;
     }
     return 0;
 }
 
 gearoenix::system::Application::Application(android_app* and_app)
     : and_app(and_app)
+    , gl_ctx(ndk_helper::GLContext::GetInstance())
 {
     and_app->userData = this;
     and_app->onAppCmd = gearoenix::system::Application::handle_cmd;
@@ -73,7 +123,7 @@ gearoenix::system::Application::Application(android_app* and_app)
     int events;
     android_poll_source* source;
     do {
-        if (ALooper_pollAll(1, nullptr, &events, (void**)&source) >= 0) {
+        if (ALooper_pollAll(-1, nullptr, &events, (void**)&source) >= 0) {
             if (source != nullptr)
                 source->process(and_app, source);
         }
@@ -84,10 +134,6 @@ gearoenix::system::Application::Application(android_app* and_app)
 
 gearoenix::system::Application::~Application()
 {
-    delete core_app;
-    core_app = nullptr;
-    delete render_engine;
-    render_engine = nullptr;
 }
 
 android_app* gearoenix::system::Application::get_android_app() const
@@ -127,7 +173,7 @@ gearoenix::core::asset::Manager* gearoenix::system::Application::get_asset_manag
 
 gearoenix::core::Real gearoenix::system::Application::get_window_ratio() const
 {
-    return ((gearoenix::core::Real)win_width) / ((gearoenix::core::Real)win_height);
+    return screen_ratio;
 }
 
 unsigned int gearoenix::system::Application::get_width() const
@@ -145,88 +191,111 @@ void gearoenix::system::Application::execute(core::Application* app)
     core_app = app;
     int events;
     android_poll_source* source;
-    if (eglMakeCurrent(display, surface, surface, context) == EGL_FALSE) {
-        GXLOGF("Unable to eglMakeCurrent");
-    }
     do {
-        if (ALooper_pollAll(1, nullptr, &events,
+        if (ALooper_pollAll(active ? 0 : -1, nullptr, &events,
                 (void**)&source)
             >= 0) {
             if (source != nullptr)
                 source->process(and_app, source);
         }
-        core_app->update();
-        render_engine->update();
-        eglSwapBuffers(display, surface);
+        if (active) {
+            core_app->update();
+            render_engine->update();
+            if (gl_ctx->Swap() != EGL_SUCCESS) {
+                GXLOGE("reached");
+                core::event::system::System eul(core::event::system::System::Action::UNLOAD);
+                core_app->on_event(eul);
+                render_engine->on_event(eul);
+                core::event::system::System erl(core::event::system::System::Action::RELOAD);
+                core_app->on_event(erl);
+                render_engine->on_event(erl);
+                GXLOGE("reached");
+            }
+        }
     } while (and_app->destroyRequested == 0);
+    active = false;
+    core_app->terminate();
+    render_engine->terminate();
+    delete core_app;
+    core_app = nullptr;
+    delete render_engine;
+    render_engine = nullptr;
+    delete astmgr;
+    astmgr = nullptr;
+    gl_ctx->Invalidate();
+    gl_ctx = nullptr;
+    delete and_app;
+    and_app = nullptr;
+    return;
 }
 
-void gearoenix::system::Application::handle(int32_t cmd)
+void gearoenix::system::Application::handle(android_app* a, int32_t cmd)
 {
     switch (cmd) {
     case APP_CMD_INIT_WINDOW:
-        if (and_app->window != nullptr && this->render_engine == nullptr) {
-            const EGLint attribs[] = {
-                EGL_SURFACE_TYPE, EGL_OPENGL_ES2_BIT,
-                EGL_BLUE_SIZE, 8,
-                EGL_GREEN_SIZE, 8,
-                EGL_RED_SIZE, 8,
-                EGL_ALPHA_SIZE, 8,
-                EGL_DEPTH_SIZE, 24,
-                EGL_NONE
-            };
-            EGLint w, h, format;
-            EGLint num_configs;
-            EGLConfig config;
-            display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
-            eglInitialize(display, 0, 0);
-            eglChooseConfig(display, attribs, nullptr, 0, &num_configs);
-            std::unique_ptr<EGLConfig[]> supported_configs(new EGLConfig[num_configs]);
-            eglChooseConfig(display, attribs, supported_configs.get(), num_configs, &num_configs);
-            if (num_configs == 0) {
+        if (and_app->window != nullptr) {
+            if (render_engine == nullptr) {
+                gl_ctx->Init(and_app->window);
+                win_width = (unsigned int)gl_ctx->GetScreenWidth();
+                win_height = (unsigned int)gl_ctx->GetScreenHeight();
+                screen_ratio = (core::Real)win_width / (core::Real)win_height;
+                half_height_inversed = 2.0f / (core::Real)win_height;
+                render_engine = new gles2::Engine(this);
+                astmgr = new core::asset::Manager(this, "data.gx3d");
+                astmgr->initialize();
+            } else if (a->window != and_app->window) {
+                GXLOGE("reached");
+                core::event::system::System eul(core::event::system::System::Action::UNLOAD);
+                core_app->on_event(eul);
+                render_engine->on_event(eul);
+                gl_ctx->Invalidate();
+                and_app = a;
+                gl_ctx->Init(a->window);
+                core::event::system::System erl(core::event::system::System::Action::RELOAD);
+                core_app->on_event(erl);
+                render_engine->on_event(erl);
+                GXLOGE("reached");
+            } else if (EGL_SUCCESS == gl_ctx->Resume(a->window)) {
+                GXLOGE("reached");
+                core::event::system::System eul(core::event::system::System::Action::UNLOAD);
+                core_app->on_event(eul);
+                render_engine->on_event(eul);
+                core::event::system::System erl(core::event::system::System::Action::RELOAD);
+                core_app->on_event(erl);
+                render_engine->on_event(erl);
+                GXLOGE("reached");
+            } else
                 UNEXPECTED;
-            }
-            int i = 0;
-            for (; i < num_configs; i++) {
-                EGLConfig& cfg = supported_configs[i];
-                EGLint r, g, b, d;
-                if (eglGetConfigAttrib(display, cfg, EGL_RED_SIZE, &r) && eglGetConfigAttrib(display, cfg, EGL_GREEN_SIZE, &g) && eglGetConfigAttrib(display, cfg, EGL_BLUE_SIZE, &b) && eglGetConfigAttrib(display, cfg, EGL_DEPTH_SIZE, &d) && r == 8 && g == 8 && b == 8 && d == 24) {
-
-                    config = supported_configs[i];
-                    break;
-                }
-            }
-            if (i == num_configs) {
-                config = supported_configs[0];
-            }
-            eglGetConfigAttrib(display, config, EGL_NATIVE_VISUAL_ID, &format);
-            surface = eglCreateWindowSurface(display, config, this->and_app->window, NULL);
-            const EGLint attrib_list[] = {
-                EGL_CONTEXT_CLIENT_VERSION, 2,
-                EGL_NONE
-            };
-            context = eglCreateContext(display, config, NULL, attrib_list);
-            if (eglMakeCurrent(display, surface, surface, context) == EGL_FALSE) {
-                GXLOGF("Unable to eglMakeCurrent");
-            }
-            eglQuerySurface(display, surface, EGL_WIDTH, &w);
-            eglQuerySurface(display, surface, EGL_HEIGHT, &h);
-            win_width = (unsigned int)w;
-            win_height = (unsigned int)h;
-            render_engine = new gles2::Engine(this);
-            astmgr = new core::asset::Manager(this, "data.gx3d");
-            astmgr->initialize();
+            win_width = (unsigned int)gl_ctx->GetScreenWidth();
+            win_height = (unsigned int)gl_ctx->GetScreenHeight();
+            screen_ratio = (core::Real)win_width / (core::Real)win_height;
+            half_height_inversed = 2.0f / (core::Real)win_height;
+            active = true;
         }
         break;
-    case APP_CMD_LOST_FOCUS:
-        if (core_app != nullptr)
-            core_app->terminate();
-        if (render_engine != nullptr)
-            render_engine->terminate();
+    case APP_CMD_TERM_WINDOW: {
+        if (core_app == nullptr || render_engine == nullptr)
+            break;
+        active = false;
+        core::event::system::System eul(core::event::system::System::Action::UNLOAD);
+        core_app->on_event(eul);
+        render_engine->on_event(eul);
+        gl_ctx->Suspend();
         break;
+    }
     default:
         GXLOGI("event not handled: " << cmd);
     }
+}
+
+gearoenix::core::Real gearoenix::system::Application::convert_pixel_x_to_normalized(int x)
+{
+    return ((((core::Real)x) * half_height_inversed) - screen_ratio);
+}
+
+gearoenix::core::Real gearoenix::system::Application::convert_pixel_y_to_normalized(int y)
+{
+    return (1.0f - (((core::Real)y) * half_height_inversed));
 }
 
 #endif

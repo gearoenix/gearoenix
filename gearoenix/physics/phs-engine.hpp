@@ -4,6 +4,8 @@
 #include "../core/cr-types.hpp"
 #include <map>
 #include <memory>
+#include <mutex>
+#include <vector>
 namespace gearoenix {
 namespace core {
     class Semaphore;
@@ -24,6 +26,8 @@ namespace physics {
         // owner
         // if animation return true on its apply its gonna be deleted
         std::map<core::Id, std::shared_ptr<animation::Animation>> animations;
+        std::mutex pending_animations_locker;
+        std::vector<std::shared_ptr<animation::Animation>> pending_animations;
         bool animations_need_cleaning = false;
 #ifdef THREAD_SUPPORTED
         const unsigned int threads_count = 4;

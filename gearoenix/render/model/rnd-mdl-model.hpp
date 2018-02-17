@@ -7,6 +7,7 @@
 #include "../../math/math-vector.hpp"
 #include <map>
 #include <memory>
+#include <mutex>
 #include <tuple>
 #include <vector>
 namespace gearoenix {
@@ -59,6 +60,7 @@ namespace render {
             bool is_in_sun = false;
             bool is_in_camera = false;
             bool changed = true;
+            //std::mutex locker;
             // be careful about scaling because it gonna scale radius too.
             math::Mat4x4 m;
             bool needs_mvp = false;
@@ -99,7 +101,7 @@ namespace render {
             void global_scale(const core::Real s);
             void local_scale(const core::Real s);
             ModelType get_type() const;
-            bool hit(const math::Ray3& r, core::Real& distance_from_origin) const;
+            bool hit(const math::Ray3& r, core::Real& distance_from_origin);
             const physics::collider::Collider* get_collider() const;
             void push_state();
             void pop_state();

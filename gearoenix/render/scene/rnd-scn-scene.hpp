@@ -96,7 +96,7 @@ namespace render {
             const light::Sun* get_sun() const;
             void set_renderable(bool);
             void clean();
-            virtual void on_event(const core::event::Event& e);
+            virtual void on_event(core::event::Event& e);
         };
     }
 }
