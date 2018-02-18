@@ -34,6 +34,10 @@ namespace core {
             : caller(new Caller(f))
         {
         }
+        EndCaller(const EndCaller& o)
+        : caller(o.caller)
+        {
+        }
         void set_data(std::shared_ptr<T> data)
         {
             caller->data = data;

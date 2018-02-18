@@ -94,11 +94,11 @@ void gearoenix::gles3::Engine::window_changed()
 
 void gearoenix::gles3::Engine::update()
 {
-    update_time();
     glClear(GL_COLOR_BUFFER_BIT);
     do_load_functions();
     physics_engine->wait();
-    for (std::shared_ptr<render::scene::Scene>& scene : loaded_scenes) {
+    for (const std::pair<core::Id, std::shared_ptr<render::scene::Scene>>& id_scene: loaded_scenes) {
+        const std::shared_ptr<render::scene::Scene>& scene = id_scene.second;
         glBindRenderbuffer(GL_RENDERBUFFER, shadow_map_depth);
         glBindFramebuffer(GL_FRAMEBUFFER, shadow_map_framebuffer);
         glViewport(0, 0, shadow_map_aspect, shadow_map_aspect);
@@ -233,10 +233,10 @@ gearoenix::render::pipeline::Pipeline* gearoenix::gles3::Engine::create_pipeline
     return new pipeline::Pipeline(sid, this, c);
 }
 
-void gearoenix::gles3::Engine::on_event(const core::event::Event& e)
+void gearoenix::gles3::Engine::on_event(core::event::Event& e)
 {
     render::Engine::on_event(e);
-    if (core::event::Event::WINDOW_RESIZE == e.get_type()) {
+    if (core::event::Event::From::WINDOW_RESIZE == e.get_type()) {
         const core::event::WindowResize& event = e.to_window_resize();
         win_width = event.get_current_width();
         win_height = event.get_current_height();

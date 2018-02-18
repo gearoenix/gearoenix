@@ -57,7 +57,7 @@ gearoenix::render::widget::Text::Text(system::stream::Stream* s, Engine* e, core
     , align(s->read<Alignment::Type>())
 {
     fnt = std::static_pointer_cast<font::Font2D>(e->get_system_application()->get_asset_manager()->get_font(s->read<core::Id>(), core::EndCaller<font::Font>([c](std::shared_ptr<font::Font>) -> void {})));
-    std::pair<core::Id, std::shared_ptr<mesh::Mesh>> id_mesh = create_text_mesh(c);
+    //std::pair<core::Id, std::shared_ptr<mesh::Mesh>> id_mesh = create_text_mesh(c);
 }
 
 gearoenix::render::widget::Text::~Text() {}

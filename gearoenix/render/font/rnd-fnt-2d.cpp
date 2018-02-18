@@ -12,6 +12,7 @@
 #include "../rnd-engine.hpp"
 #include "../texture/rnd-txt-texture-2d.hpp"
 #include <string>
+#include <cmath>
 
 #define BAKED_ASPECT 1024
 #define FIRST_CHAR 33
