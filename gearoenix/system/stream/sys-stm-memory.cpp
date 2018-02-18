@@ -10,12 +10,12 @@ gearoenix::system::stream::Memory::~Memory() {}
 gearoenix::core::Count gearoenix::system::stream::Memory::read(void* d, core::Count length)
 {
     const core::Count sz = length + index;
-    const core::Count result = sz > data.size() ? data.size() - index : length;
+    const core::Count result = sz > mem_data.size() ? mem_data.size() - index : length;
 #ifdef DEBUG_MODE
     if (0 == result)
         UNEXPECTED;
 #endif
-    std::memcpy(d, &(data[index]), result);
+    std::memcpy(d, &(mem_data[index]), result);
     index += result;
     return result;
 }
@@ -23,9 +23,9 @@ gearoenix::core::Count gearoenix::system::stream::Memory::read(void* d, core::Co
 gearoenix::core::Count gearoenix::system::stream::Memory::write(const void* d, core::Count length)
 {
     const core::Count sz = length + index;
-    if (sz > data.size())
-        data.resize(sz);
-    std::memcpy(&(data[index]), d, length);
+    if (sz > mem_data.size())
+        mem_data.resize(sz);
+    std::memcpy(&(mem_data[index]), d, length);
     index = sz;
     return length;
 }
@@ -33,7 +33,7 @@ gearoenix::core::Count gearoenix::system::stream::Memory::write(const void* d, c
 void gearoenix::system::stream::Memory::seek(core::Count offset)
 {
 #ifdef DEBUG_MODE
-    if (offset > data.size())
+    if (offset > mem_data.size())
         UNEXPECTED;
 #endif
     index = offset;

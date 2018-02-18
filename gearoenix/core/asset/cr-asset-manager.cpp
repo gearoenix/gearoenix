@@ -16,6 +16,7 @@
 #include "../cache/file/cr-cache-file-sparse.hpp"
 #include "../cache/file/cr-cache-file.hpp"
 #include "../cr-end-caller.hpp"
+#include "../cr-static.hpp"
 
 gearoenix::core::asset::Manager::Manager(system::Application* sys_app, const std::string& name)
     : sys_app(sys_app)
@@ -63,15 +64,21 @@ gearoenix::core::asset::Manager::~Manager()
 void gearoenix::core::asset::Manager::initialize()
 {
     render_engine = sys_app->get_render_engine();
-    cameras->read_offsets();
-    audios->read_offsets();
-    lights->read_offsets();
-    textures->read_offsets();
-    fonts->read_offsets();
-    meshes->read_offsets();
-    models->read_offsets();
-    constraints->read_offsets();
-    scenes->read_offsets();
+    Id lid = 0, tmp;
+#define GXHELP(x)                      \
+    x->read_offsets();                 \
+    tmp = (Id)x->get_offsets().size(); \
+    lid = GXMAX(lid, tmp);
+    GXHELP(cameras);
+    GXHELP(audios);
+    GXHELP(lights);
+    GXHELP(textures);
+    GXHELP(fonts);
+    GXHELP(meshes);
+    GXHELP(models);
+    GXHELP(constraints);
+    GXHELP(scenes);
+    last_id.store(lid);
 }
 
 gearoenix::system::stream::Asset* gearoenix::core::asset::Manager::get_file()
@@ -214,4 +221,9 @@ std::shared_ptr<gearoenix::render::scene::Scene> gearoenix::core::asset::Manager
 std::shared_ptr<gearoenix::render::scene::Scene> gearoenix::core::asset::Manager::get_cached_scene(Id id) const
 {
     return scenes->get<render::scene::Scene>(id);
+}
+
+gearoenix::core::Id gearoenix::core::asset::Manager::create_id()
+{
+    return last_id.fetch_add(1);
 }

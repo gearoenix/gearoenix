@@ -22,6 +22,7 @@ namespace core {
                 std::shared_ptr<T> get(Id id, std::function<std::shared_ptr<T>()>);
                 template <class T>
                 std::shared_ptr<T> get(Id id) const;
+                const std::vector<Offset>& get_offsets() const;
             };
         } // namespace file
     } // namespace cache

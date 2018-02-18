@@ -56,6 +56,12 @@ namespace system {
                 read(data);
                 return data;
             }
+
+            template <typename T>
+            void write(const T& d)
+            {
+                write(&d, sizeof(T));
+            }
         };
     }
 }

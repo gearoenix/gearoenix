@@ -10,3 +10,8 @@ void gearoenix::core::cache::file::File::read_offsets()
 {
     file->read(offsets);
 }
+
+const std::vector<gearoenix::core::Offset>& gearoenix::core::cache::file::File::get_offsets() const
+{
+    return offsets;
+}

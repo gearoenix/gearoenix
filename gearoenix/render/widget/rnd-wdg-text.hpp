@@ -6,6 +6,7 @@ namespace gearoenix {
 namespace render {
     namespace font {
         class Font;
+        class Font2D;
     }
     namespace widget {
         class Text : public Widget {
@@ -30,7 +31,9 @@ namespace render {
         private:
             std::string text;
             Alignment::Type align;
-            std::shared_ptr<font::Font> fnt;
+            std::shared_ptr<font::Font2D> fnt;
+
+            std::pair<core::Id, std::shared_ptr<mesh::Mesh>> create_text_mesh(core::EndCaller<core::EndCallerIgnore> c);
 
         public:
             Text(system::stream::Stream* s, Engine* e, core::EndCaller<core::EndCallerIgnore> c);

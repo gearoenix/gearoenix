@@ -10,18 +10,20 @@ namespace render {
     }
     namespace font {
         class Font2D : public Font {
-        private:
-            static const unsigned int starting_char, ending_char, chars_count;
+        public:
             struct LetterProperties {
                 math::Vec2 uv_min, uv_max;
                 math::Vec2 pos_min, pos_max;
             };
+
+        private:
             std::vector<LetterProperties> letters_properties;
             std::shared_ptr<texture::Texture2D> baked_texture;
 
         public:
             Font2D(core::Id my_id, system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
             ~Font2D();
+            const LetterProperties& get_letter_properties(char c) const;
         };
     }
 }

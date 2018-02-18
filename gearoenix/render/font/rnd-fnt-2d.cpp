@@ -86,3 +86,8 @@ gearoenix::render::font::Font2D::Font2D(core::Id my_id, system::stream::Stream* 
 gearoenix::render::font::Font2D::~Font2D()
 {
 }
+
+const gearoenix::render::font::Font2D::LetterProperties& gearoenix::render::font::Font2D::get_letter_properties(char c) const
+{
+    return letters_properties[((unsigned int)c) - FIRST_CHAR];
+}

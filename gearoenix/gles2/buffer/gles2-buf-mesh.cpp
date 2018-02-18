@@ -20,7 +20,7 @@ gearoenix::gles2::buffer::Mesh::Mesh(unsigned int vec, system::stream::Stream* f
     ic = (GLsizei)cnt;
     std::vector<GLushort> idata((size_t)cnt);
     for (core::Count i = 0; i < cnt; ++i)
-        idata[(size_t)i] = static_cast<GLushort>(f->read<uint32_t>());
+        idata[(size_t)i] = static_cast<GLushort>(f->read<std::uint32_t>());
     unsigned int is = (unsigned int)(cnt * sizeof(GLushort));
     std::function<void()> todo = [this, vd, idata, vs, is, c] {
         glGenBuffers(1, &vbo);

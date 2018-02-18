@@ -17,7 +17,7 @@ gearoenix::render::mesh::Mesh* gearoenix::render::mesh::Mesh::read(system::strea
     core::Id t;
     f->read(t);
     switch (t) {
-    case 1:
+    case Geo::BASIC:
         return new Mesh(f, e, c);
     default:
         UNEXPECTED;

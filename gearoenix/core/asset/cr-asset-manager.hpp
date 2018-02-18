@@ -2,6 +2,7 @@
 #define GEAROENIX_CORE_ASSET_MANAGER_HPP
 #include "../cr-end-caller.hpp"
 #include "../cr-types.hpp"
+#include <atomic>
 #include <memory>
 #include <string>
 namespace gearoenix {
@@ -70,6 +71,7 @@ namespace core {
             cache::file::File* models = nullptr;
             cache::file::File* constraints = nullptr;
             cache::file::File* scenes = nullptr;
+            std::atomic<Id> last_id;
 
         public:
             Manager(system::Application* sys_app, const std::string& file);
@@ -96,6 +98,7 @@ namespace core {
             std::shared_ptr<physics::constraint::Constraint> get_cached_constraints(Id id) const;
             std::shared_ptr<render::scene::Scene> get_scene(Id id, EndCaller<render::scene::Scene> e);
             std::shared_ptr<render::scene::Scene> get_cached_scene(Id id) const;
+            Id create_id();
         };
     } // namespace asset
 } // namespace core
