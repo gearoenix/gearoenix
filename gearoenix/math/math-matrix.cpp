@@ -1,6 +1,6 @@
 #include "math-matrix.hpp"
-#include "../system/stream/sys-stm-stream.hpp"
 #include "../core/cr-build-configuration.hpp"
+#include "../system/stream/sys-stm-stream.hpp"
 #include "../system/sys-log.hpp"
 #include "math-vector.hpp"
 #include <cmath>

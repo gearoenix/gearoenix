@@ -3,8 +3,10 @@
 #include "../sys-log.hpp"
 
 gearoenix::system::stream::Local::Local(const std::string& name, bool writable)
-    : file(name, std::ios::binary | (writable ? std::ios::out | std::ios::in : std::ios::in))
+    : file(name, std::ios::binary | (writable ? std::ios::out : std::ios::in))
 {
+    if (!file.is_open())
+        UNEXPECTED;
 }
 
 gearoenix::system::stream::Local::~Local()

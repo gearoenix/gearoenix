@@ -2,6 +2,7 @@
 #include "../../audio/au-audio.hpp"
 #include "../../physics/constraint/phs-cns-placer.hpp"
 #include "../../render/camera/rnd-cmr-camera.hpp"
+#include "../../render/font/rnd-fnt-font.hpp"
 #include "../../render/light/rnd-lt-light.hpp"
 #include "../../render/mesh/rnd-msh-mesh.hpp"
 #include "../../render/model/rnd-mdl-model.hpp"
@@ -143,6 +144,20 @@ std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::core::asset::Man
 std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::core::asset::Manager::get_cached_texture(Id id) const
 {
     return textures->get<render::texture::Texture>(id);
+}
+
+std::shared_ptr<gearoenix::render::font::Font> gearoenix::core::asset::Manager::get_font(Id id, EndCaller<render::font::Font> end)
+{
+    auto result = fonts->get<render::font::Font>(id, [this, id, end]() -> std::shared_ptr<render::font::Font> {
+        return std::shared_ptr<render::font::Font>(render::font::Font::read(id, file, render_engine, EndCaller<EndCallerIgnore>([end](std::shared_ptr<EndCallerIgnore>) -> void {})));
+    });
+    end.set_data(result);
+    return result;
+}
+
+std::shared_ptr<gearoenix::render::font::Font> gearoenix::core::asset::Manager::get_cached_font(Id id) const
+{
+    return fonts->get<render::font::Font>(id);
 }
 
 std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::core::asset::Manager::get_mesh(Id id, EndCaller<render::mesh::Mesh> end)

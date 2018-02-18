@@ -62,9 +62,9 @@ gearoenix::render::font::Font2D::Font2D(core::Id my_id, system::stream::Stream* 
         baked_file.write(letters_properties.data(), letters_properties.size());
         system::stream::Memory m;
         core::Count pngsize = 0;
+        const core::Count pngsizepos = baked_file.tell();
         m.write(&pngsize, sizeof(pngsize));
         baked_file.write(&pngsize, sizeof(pngsize));
-        const unsigned int pngsizepos = (unsigned int)baked_file.tell();
         PngWriterContext pngctx;
         pngctx.m = &m;
         pngctx.l = &baked_file;

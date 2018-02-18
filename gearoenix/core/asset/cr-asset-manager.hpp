@@ -86,7 +86,7 @@ namespace core {
             std::shared_ptr<render::light::Light> get_cached_light(Id id) const;
             std::shared_ptr<render::texture::Texture> get_texture(Id id, EndCaller<render::texture::Texture> end);
             std::shared_ptr<render::texture::Texture> get_cached_texture(Id id) const;
-            std::shared_ptr<render::font::Font> get_font(Id id, EndCaller<render::texture::Texture> end);
+            std::shared_ptr<render::font::Font> get_font(Id id, EndCaller<render::font::Font> end);
             std::shared_ptr<render::font::Font> get_cached_font(Id id) const;
             std::shared_ptr<render::mesh::Mesh> get_mesh(Id id, EndCaller<render::mesh::Mesh> e);
             std::shared_ptr<render::mesh::Mesh> get_cached_mesh(Id id) const;
