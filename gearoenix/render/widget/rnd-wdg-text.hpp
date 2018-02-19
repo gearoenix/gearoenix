@@ -32,8 +32,9 @@ namespace render {
             std::string text;
             Alignment::Type align;
             std::shared_ptr<font::Font2D> fnt;
-
-            std::pair<core::Id, std::shared_ptr<mesh::Mesh>> create_text_mesh(core::EndCaller<core::EndCallerIgnore> c);
+            std::shared_ptr<mesh::Mesh> msh;
+            core::Id mesh_id;
+            void create_text_mesh(core::EndCaller<core::EndCallerIgnore> c);
 
         public:
             Text(system::stream::Stream* s, Engine* e, core::EndCaller<core::EndCallerIgnore> c);

@@ -6,7 +6,7 @@
 #include "../mesh/rnd-msh-mesh.hpp"
 #include "../rnd-engine.hpp"
 
-std::pair<gearoenix::core::Id, std::shared_ptr<gearoenix::render::mesh::Mesh>> gearoenix::render::widget::Text::create_text_mesh(core::EndCaller<core::EndCallerIgnore> c)
+void gearoenix::render::widget::Text::create_text_mesh(core::EndCaller<core::EndCallerIgnore> c)
 {
     system::stream::Memory ms;
     system::stream::Stream& s = ms;
@@ -47,8 +47,8 @@ std::pair<gearoenix::core::Id, std::shared_ptr<gearoenix::render::mesh::Mesh>> g
         s.write(index + 3);
     }
     s.seek(0);
-    core::Id mesh_id = render_engine->get_system_application()->get_asset_manager()->create_id();
-    return std::make_pair(mesh_id, std::shared_ptr<mesh::Mesh>(mesh::Mesh::read(&s, render_engine, c)));
+    mesh_id = render_engine->get_system_application()->get_asset_manager()->create_id();
+    msh = std::shared_ptr<mesh::Mesh>(mesh::Mesh::read(&s, render_engine, c));
     //    return std::make_pair(0, nullptr);
 }
 
@@ -62,8 +62,8 @@ gearoenix::render::widget::Text::Text(system::stream::Stream* s, Engine* e, core
             s->read<core::Id>(), core::EndCaller<font::Font>(
                                      [c](std::shared_ptr<font::Font>) -> void {
                                      })));
-    std::this_thread::sleep_for(std::chrono::seconds(5));
-    std::pair<core::Id, std::shared_ptr<mesh::Mesh>> id_meshdddd = create_text_mesh(c);
+    std::this_thread::sleep_for(std::chrono::seconds(2));
+    create_text_mesh(c);
 }
 
 gearoenix::render::widget::Text::~Text() {}
