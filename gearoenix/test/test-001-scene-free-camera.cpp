@@ -13,9 +13,9 @@ TestApp::TestApp(gearoenix::system::Application* sys_app)
     : gearoenix::core::Application::Application(sys_app)
     , rndeng(sys_app->get_render_engine())
 {
-    rndeng->load_scene(0, [this]() -> void {
-        cam = rndeng->get_scene(0)->get_current_camera();
-    });
+    //    rndeng->load_scene(0, [this]() -> void {
+    //        cam = rndeng->get_scene(0)->get_current_camera();
+    //    });
     rndeng->load_scene(1, [this]() -> void {});
 }
 

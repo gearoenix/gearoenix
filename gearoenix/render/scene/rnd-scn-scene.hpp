@@ -60,9 +60,9 @@ namespace render {
 
         protected:
             const SceneType scene_type;
-            std::vector<std::shared_ptr<camera::Camera>> cameras;
-            std::vector<std::shared_ptr<audio::Audio>> audios;
-            std::vector<std::shared_ptr<light::Light>> lights;
+            std::map<core::Id, std::shared_ptr<camera::Camera>> cameras;
+            std::map<core::Id, std::shared_ptr<audio::Audio>> audios;
+            std::map<core::Id, std::shared_ptr<light::Light>> lights;
             std::map<core::Id, std::shared_ptr<model::Model>> root_models;
             std::map<core::Id, std::shared_ptr<physics::constraint::Constraint>> root_constraints;
             bool all_models_needs_cleaning = false;
@@ -73,7 +73,8 @@ namespace render {
             std::map<core::Id, std::map<core::Id, std::set<core::Id>>> opaque_models;
             // shader_id -> model_id -> mesh_id
             std::map<core::Id, std::map<core::Id, std::set<core::Id>>> transparent_models;
-            unsigned int curcam = 0;
+            core::Id cam_id = 0;
+            core::Id sun_id = 0;
             bool renderable = false;
             bool ambient_light_changed = true;
             math::Vec3 ambient_light = math::Vec3(0.2f, 0.2f, 0.2f);
@@ -97,6 +98,7 @@ namespace render {
             void set_renderable(bool);
             void clean();
             virtual void on_event(core::event::Event& e);
+            bool is_renderable() const;
         };
     }
 }

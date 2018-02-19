@@ -23,9 +23,15 @@ gearoenix::core::Count gearoenix::system::stream::Memory::read(void* d, core::Co
 gearoenix::core::Count gearoenix::system::stream::Memory::write(const void* d, core::Count length)
 {
     const core::Count sz = length + index;
-    if (sz > mem_data.size())
-        mem_data.resize(sz);
-    std::memcpy(&(mem_data[index]), d, length);
+    if (sz <= mem_data.size()) {
+        std::memcpy(&(mem_data[index]), d, length);
+        return length;
+    }
+    const core::Count li = ((core::Count)mem_data.size()) - index;
+    std::memcpy(&(mem_data[index]), d, li);
+    const char* cd = (const char*)d;
+    for (core::Count i = li; i < length; ++i)
+        mem_data.push_back(cd[i]);
     index = sz;
     return length;
 }

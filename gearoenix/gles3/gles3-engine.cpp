@@ -97,7 +97,7 @@ void gearoenix::gles3::Engine::update()
     glClear(GL_COLOR_BUFFER_BIT);
     do_load_functions();
     physics_engine->wait();
-    for (const std::pair<core::Id, std::shared_ptr<render::scene::Scene>>& id_scene: loaded_scenes) {
+    for (const std::pair<core::Id, std::shared_ptr<render::scene::Scene>>& id_scene : loaded_scenes) {
         const std::shared_ptr<render::scene::Scene>& scene = id_scene.second;
         glBindRenderbuffer(GL_RENDERBUFFER, shadow_map_depth);
         glBindFramebuffer(GL_FRAMEBUFFER, shadow_map_framebuffer);

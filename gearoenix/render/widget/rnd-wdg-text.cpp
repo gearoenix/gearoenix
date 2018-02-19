@@ -48,7 +48,8 @@ std::pair<gearoenix::core::Id, std::shared_ptr<gearoenix::render::mesh::Mesh>> g
     }
     s.seek(0);
     core::Id mesh_id = render_engine->get_system_application()->get_asset_manager()->create_id();
-    return std::make_pair(mesh_id, std::shared_ptr<mesh::Mesh>(mesh::Mesh::read(&s, render_engine, c)));
+    //    return std::make_pair(mesh_id, std::shared_ptr<mesh::Mesh>(mesh::Mesh::read(&s, render_engine, c)));
+    return std::make_pair(0, nullptr);
 }
 
 gearoenix::render::widget::Text::Text(system::stream::Stream* s, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
@@ -56,8 +57,13 @@ gearoenix::render::widget::Text::Text(system::stream::Stream* s, Engine* e, core
     , text(s->read_string())
     , align(s->read<Alignment::Type>())
 {
-    fnt = std::static_pointer_cast<font::Font2D>(e->get_system_application()->get_asset_manager()->get_font(s->read<core::Id>(), core::EndCaller<font::Font>([c](std::shared_ptr<font::Font>) -> void {})));
-    //std::pair<core::Id, std::shared_ptr<mesh::Mesh>> id_mesh = create_text_mesh(c);
+    fnt = std::static_pointer_cast<font::Font2D>(
+        e->get_system_application()->get_asset_manager()->get_font(
+            s->read<core::Id>(), core::EndCaller<font::Font>(
+                                     [c](std::shared_ptr<font::Font>) -> void {
+                                     })));
+    std::this_thread::sleep_for(std::chrono::seconds(2));
+    std::pair<core::Id, std::shared_ptr<mesh::Mesh>> id_meshdddd = create_text_mesh(c);
 }
 
 gearoenix::render::widget::Text::~Text() {}

@@ -49,37 +49,41 @@ gearoenix::render::scene::Scene::Scene(SceneType t, system::stream::Stream* f, E
     core::asset::Manager* amgr = e->get_system_application()->get_asset_manager();
     std::vector<core::Id> camera_ids;
     f->read(camera_ids);
-    cameras.resize(camera_ids.size());
+    cam_id = camera_ids[0];
     std::vector<core::Id> audio_ids;
     f->read(audio_ids);
-    audios.resize(audio_ids.size());
     std::vector<core::Id> light_ids;
     f->read(light_ids);
-    lights.resize(light_ids.size());
+    sun_id = light_ids[0];
     std::vector<core::Id> model_ids;
     f->read(model_ids);
     std::vector<core::Id> constraint_ids;
     f->read(constraint_ids);
-    for (size_t i = 0; i < camera_ids.size(); ++i)
-        cameras[i] = amgr->get_camera(camera_ids[i]);
-    for (size_t i = 0; i < audio_ids.size(); ++i)
-        audios[i] = amgr->get_audio(audio_ids[i]);
-    for (size_t i = 0; i < light_ids.size(); ++i)
-        lights[i] = amgr->get_light(light_ids[i]);
-    for (size_t i = 0; i < model_ids.size(); ++i) {
-        root_models[model_ids[i]] = amgr->get_model(model_ids[i], core::EndCaller<model::Model>([c](std::shared_ptr<model::Model>) -> void {}));
-        add_model(model_ids[i], root_models[model_ids[i]]);
+    for (const core::Id i : camera_ids)
+        cameras[i] = amgr->get_camera(i);
+    for (const core::Id i : audio_ids)
+        audios[i] = amgr->get_audio(i);
+    for (const core::Id i : light_ids)
+        lights[i] = amgr->get_light(i);
+    for (const core::Id i : model_ids) {
+        amgr->get_model(
+            i,
+            core::EndCaller<model::Model>(
+                [c, i, this](std::shared_ptr<model::Model> mdl) -> void {
+                    root_models[i] = mdl;
+                    add_model(i, mdl);
+                }));
     }
-    for (size_t i = 0; i < constraint_ids.size(); ++i) {
-        core::Id cons_id = constraint_ids[i];
+    for (const core::Id cons_id : constraint_ids) {
         root_constraints[cons_id] = amgr->get_constriants(
             cons_id,
             core::EndCaller<physics::constraint::Constraint>(
-                [c](std::shared_ptr<physics::constraint::Constraint>) -> void {}));
-        const std::vector<std::pair<core::Id, std::shared_ptr<model::Model>>> models = root_constraints[cons_id]->get_all_models();
-        for (const std::pair<const core::Id, const std::shared_ptr<model::Model>>& model : models) {
-            add_model(model.first, model.second);
-        }
+                [c, this](std::shared_ptr<physics::constraint::Constraint> cnst) -> void {
+                    const std::vector<std::pair<core::Id, std::shared_ptr<model::Model>>> models = cnst->get_all_models();
+                    for (const std::pair<const core::Id, const std::shared_ptr<model::Model>>& model : models) {
+                        add_model(model.first, model.second);
+                    }
+                }));
     }
 }
 
@@ -158,13 +162,16 @@ void gearoenix::render::scene::Scene::draw(texture::Texture2D* shadow_texture)
 const gearoenix::render::camera::Camera* gearoenix::render::scene::Scene::get_current_camera() const
 {
     //    return reinterpret_cast<const light::Sun*>(lights[0].get())->get_camera();
-    return cameras[curcam].get();
+    const std::map<core::Id, std::shared_ptr<camera::Camera>>::const_iterator c = cameras.find(cam_id);
+    if (c == cameras.end())
+        UNEXPECTED;
+    return c->second.get();
 }
 
 gearoenix::render::camera::Camera* gearoenix::render::scene::Scene::get_current_camera()
 {
     //    return const_cast<camera::Camera*>(reinterpret_cast<const camera::Camera*>(reinterpret_cast<light::Sun*>(lights[0].get())->get_camera()));
-    return cameras[curcam].get();
+    return cameras[cam_id].get();
 }
 
 const gearoenix::math::Vec3& gearoenix::render::scene::Scene::get_ambient_light() const
@@ -179,7 +186,11 @@ bool gearoenix::render::scene::Scene::get_ambient_light_changed() const
 
 const gearoenix::render::light::Sun* gearoenix::render::scene::Scene::get_sun() const
 {
-    return reinterpret_cast<light::Sun*>(lights[0].get());
+    const std::map<core::Id, std::shared_ptr<light::Light>>::const_iterator c = lights.find(sun_id);
+    if (c == lights.end())
+        UNEXPECTED;
+    std::shared_ptr<light::Sun> sun = std::static_pointer_cast<light::Sun>(c->second);
+    return sun.get();
 }
 
 void gearoenix::render::scene::Scene::set_renderable(bool b)
@@ -201,10 +212,16 @@ void gearoenix::render::scene::Scene::clean()
 
 void gearoenix::render::scene::Scene::on_event(core::event::Event& e)
 {
-    for (const std::shared_ptr<camera::Camera>& cam : cameras) {
+    for (const std::pair<core::Id, std::shared_ptr<camera::Camera>>& id_cam : cameras) {
+        const std::shared_ptr<camera::Camera>& cam = id_cam.second;
         cam->on_event(e);
     }
     for (const std::pair<core::Id, std::shared_ptr<physics::constraint::Constraint>>& con : root_constraints) {
         con.second->on_event(e);
     }
+}
+
+bool gearoenix::render::scene::Scene::is_renderable() const
+{
+    return renderable;
 }

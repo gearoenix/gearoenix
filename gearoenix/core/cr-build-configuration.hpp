@@ -16,9 +16,9 @@
 #define IN_LINUX
 //#define USE_VULKAN
 //#define USE_OPENGL_43
-//#define USE_OPENGL_33
-//#define USE_OPENGL_ES3
-#define USE_OPENGL_ES2
+#define USE_OPENGL_33
+#define USE_OPENGL_ES3
+//#define USE_OPENGL_ES2
 #define IN_DESKTOP
 #define USE_SDL
 //#define USE_GLFW

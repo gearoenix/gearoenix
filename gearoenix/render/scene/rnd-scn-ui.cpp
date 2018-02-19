@@ -105,7 +105,7 @@ void gearoenix::render::scene::Ui::on_event(core::event::Event& e)
 
 gearoenix::core::Id gearoenix::render::scene::Ui::find_widget_under_cursor(core::Real x, core::Real y)
 {
-    math::Ray3 r = cameras[curcam]->create_ray3(x, y);
+    math::Ray3 r = cameras[cam_id]->create_ray3(x, y);
     core::Real tmin = std::numeric_limits<core::Real>::max();
     core::Id hitmptr = (core::Id)-1;
     for (std::map<core::Id, std::weak_ptr<model::Model>>::iterator pidm = all_models.begin(); pidm != all_models.end();) {

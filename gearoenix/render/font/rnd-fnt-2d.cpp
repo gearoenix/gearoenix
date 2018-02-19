@@ -11,8 +11,8 @@
 #include "../../../external/stb/stb_image_write.h"
 #include "../rnd-engine.hpp"
 #include "../texture/rnd-txt-texture-2d.hpp"
-#include <string>
 #include <cmath>
+#include <string>
 
 #define BAKED_ASPECT 1024
 #define FIRST_CHAR 33
