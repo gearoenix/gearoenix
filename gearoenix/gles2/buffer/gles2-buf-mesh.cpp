@@ -37,11 +37,15 @@ gearoenix::gles2::buffer::Mesh::~Mesh()
 {
     if (vbo == 0)
         return;
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glDeleteBuffers(1, &vbo);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    glDeleteBuffers(1, &ibo);
-    vbo = 0;
+    engine->add_load_function([this]() -> void {
+        if (vbo == 0)
+            return;
+        //    glBindBuffer(GL_ARRAY_BUFFER, 0);
+        //    glDeleteBuffers(1, &vbo);
+        //    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+        //    glDeleteBuffers(1, &ibo);
+        //    vbo = 0;
+    });
 }
 
 void gearoenix::gles2::buffer::Mesh::bind()
