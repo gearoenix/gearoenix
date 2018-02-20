@@ -225,3 +225,16 @@ bool gearoenix::render::scene::Scene::is_renderable() const
 {
     return renderable;
 }
+
+void gearoenix::render::scene::Scene::add_mesh(core::Id mesh_id, core::Id model_id, std::shared_ptr<material::Material> mat, std::shared_ptr<material::Material> dp)
+{
+    if (nullptr != dp) {
+        shadow_caster_models[dp->get_shader_id()][model_id].insert(mesh_id);
+    }
+    const core::Id mat_id = mat->get_shader_id();
+    if (shader::Shader::is_transparent(mat_id)) {
+        transparent_models[mat_id][model_id].insert(mesh_id);
+    } else {
+        opaque_models[mat_id][model_id].insert(mesh_id);
+    }
+}

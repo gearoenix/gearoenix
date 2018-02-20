@@ -3,11 +3,12 @@
 #include "../../system/stream/sys-stm-memory.hpp"
 #include "../../system/sys-app.hpp"
 #include "../font/rnd-fnt-2d.hpp"
+#include "../material/rnd-mat-depth.hpp"
+#include "../material/rnd-mat-material.hpp"
+#include "../material/rnd-mat-shadeless-d2-matte-nonreflective-shadowless-opaque.hpp"
 #include "../mesh/rnd-msh-mesh.hpp"
 #include "../rnd-engine.hpp"
-#include "../material/rnd-mat-material.hpp"
 #include "../shader/rnd-shd-shader.hpp"
-#include "../material/rnd-mat-shadeless-d2-matte-nonreflective-shadowless-opaque.hpp"
 
 void gearoenix::render::widget::Text::create_text_mesh(core::EndCaller<core::EndCallerIgnore> c)
 {
@@ -43,8 +44,8 @@ void gearoenix::render::widget::Text::create_text_mesh(core::EndCaller<core::End
     for (size_t i = 0; i < text.size(); ++i) {
         std::uint32_t index = (std::uint32_t)i << 2;
         s.write(index);
-        s.write(index + 1);
         s.write(index + 2);
+        s.write(index + 1);
         s.write(index + 1);
         s.write(index + 2);
         s.write(index + 3);
@@ -65,19 +66,22 @@ gearoenix::render::widget::Text::Text(system::stream::Stream* s, Engine* e, core
                                      [c](std::shared_ptr<font::Font>) -> void {
                                      })));
     create_text_mesh(c);
-    std::shared_ptr<material::Material> mat(material::ShadelessD2MatteNonreflectiveShadowlessOpaque(shader::SHADELESS_D2_MATTE_NONREFLECTIVE_SHADOWLESS_TRANSPARENT, txt2d, e, c));
+    std::shared_ptr<material::Material> mat(
+        new material::ShadelessD2MatteNonreflectiveShadowlessOpaque(
+            shader::SHADELESS_D2_MATTE_NONREFLECTIVE_SHADOWLESS_TRANSPARENT,
+            fnt->get_baked_texture(), e, c));
+    std::shared_ptr<material::Depth> dp = nullptr;
     if (shader::Shader::is_shadow_caster(mat->get_shader_id())) {
-        std::shared_ptr<material::Depth> dp(new material::Depth(
-                                                                shader::Shader::get_shadow_caster_shader_id(mat->get_shader_id()),
-                                                                e, c));
-        materials[mesh_ids[i]] = std::make_tuple(mat, dp);
+        dp = std::shared_ptr<material::Depth>(
+            new material::Depth(
+                shader::Shader::get_shadow_caster_shader_id(mat->get_shader_id()),
+                e, c));
         has_shadow_caster = true;
-    } else {
-        materials[mesh_ids[i]] = std::make_tuple(mat, nullptr);
     }
     has_transparent |= shader::Shader::is_transparent(mat->get_shader_id());
     needs_mvp |= mat->needs_mvp();
     needs_dbm |= mat->needs_dbm();
+    meshes[mesh_id] = std::make_tuple(msh, mat, dp);
 }
 
 gearoenix::render::widget::Text::~Text() {}

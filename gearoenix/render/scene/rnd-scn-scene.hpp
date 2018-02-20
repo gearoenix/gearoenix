@@ -99,6 +99,7 @@ namespace render {
             void clean();
             virtual void on_event(core::event::Event& e);
             bool is_renderable() const;
+            void add_mesh(core::Id mesh_id, core::Id model_id, std::shared_ptr<material::Material> mat, std::shared_ptr<material::Material> dp);
         };
     }
 }

@@ -92,3 +92,8 @@ const gearoenix::render::font::Font2D::LetterProperties& gearoenix::render::font
 {
     return letters_properties[((unsigned int)c) - FIRST_CHAR];
 }
+
+const std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::font::Font2D::get_baked_texture() const
+{
+    return baked_texture;
+}

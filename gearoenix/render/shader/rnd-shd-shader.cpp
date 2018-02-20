@@ -110,6 +110,7 @@ bool gearoenix::render::shader::Shader::is_shadow_caster(core::Id sid)
     case SHADELESS_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
     case SHADELESS_CUBE_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
     case SHADELESS_D2_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
+    case SHADELESS_D2_MATTE_NONREFLECTIVE_SHADOWLESS_TRANSPARENT:
         return false;
     default:
         UNIMPLEMENTED;
@@ -134,6 +135,7 @@ bool gearoenix::render::shader::Shader::is_transparent(core::Id sid)
     case SHADELESS_D2_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
         return false;
     case DIRECTIONAL_COLORED_MATTE_BAKED_CASTER_TRANSPARENT:
+    case SHADELESS_D2_MATTE_NONREFLECTIVE_SHADOWLESS_TRANSPARENT:
         return true;
     default:
         UNIMPLEMENTED;
