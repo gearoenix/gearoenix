@@ -60,7 +60,7 @@ gearoenix::render::font::Font2D::Font2D(core::Id my_id, system::stream::Stream* 
             lp.uv_min = math::Vec2(q.s0, q.t0);
             letters_properties[i] = lp;
         }
-        baked_file.write(letters_properties.data(), letters_properties.size());
+        baked_file.write(letters_properties.data(), letters_properties.size() * sizeof(LetterProperties));
         system::stream::Memory m;
         core::Count pngsize = 0;
         const core::Count pngsizepos = baked_file.tell();
@@ -79,7 +79,7 @@ gearoenix::render::font::Font2D::Font2D(core::Id my_id, system::stream::Stream* 
         baked_texture = std::shared_ptr<texture::Texture2D>(e->create_texture_2d(&m, core::EndCaller<core::EndCallerIgnore>([c](std::shared_ptr<core::EndCallerIgnore>) -> void {})));
     } else {
         system::stream::Local baked_file(baked_file_name);
-        baked_file.read(&(letters_properties[0]), letters_properties.size());
+        baked_file.read(&(letters_properties[0]), letters_properties.size() * sizeof(LetterProperties));
         baked_texture = std::shared_ptr<texture::Texture2D>(e->create_texture_2d(&baked_file, core::EndCaller<core::EndCallerIgnore>([c](std::shared_ptr<core::EndCallerIgnore>) -> void {})));
     }
 }

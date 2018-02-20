@@ -432,6 +432,7 @@ gearoenix::render::shader::Shader* gearoenix::dx11::Engine::create_shader(core::
         return new shader::ShadelessCubeMatteNonreflectiveShadowlessOpaque(this, c);
     case render::shader::Id::SHADELESS_D2_MATTE_NONREFLECTIVE_CASTER_OPAQUE:
     case render::shader::Id::SHADELESS_D2_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
+    case render::shader::Id::SHADELESS_D2_MATTE_NONREFLECTIVE_SHADOWLESS_TRANSPARENT:
         return new shader::ShadelessD2MatteNonreflectiveShadowlessOpaque(this, c);
     default:
         UNIMPLEMENTED;
@@ -466,6 +467,7 @@ gearoenix::render::shader::Resources* gearoenix::dx11::Engine::create_shader_res
         return new shader::ShadelessCubeMatteNonreflectiveShadowlessOpaque::Resources(this, pip, u);
     case render::shader::Id::SHADELESS_D2_MATTE_NONREFLECTIVE_CASTER_OPAQUE:
     case render::shader::Id::SHADELESS_D2_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
+    case render::shader::Id::SHADELESS_D2_MATTE_NONREFLECTIVE_SHADOWLESS_TRANSPARENT:
         return new shader::ShadelessD2MatteNonreflectiveShadowlessOpaque::Resources(this, pip, u);
     default:
         UNIMPLEMENTED;

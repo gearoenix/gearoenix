@@ -38,6 +38,13 @@
 *.swp
 .DS_store
 
+# MSVC
+*.TMP
+*.tmp
+
+# gedit
+~*
+
 # assets
 *.png
 *.ttf

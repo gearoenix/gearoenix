@@ -22,31 +22,31 @@ void gearoenix::render::widget::Text::create_text_mesh(core::EndCaller<core::End
 
         s.write(lp.pos_min);
         s.write<core::Real>(0.0f);
-        s.write(lp.uv_min);
+        s.write(lp.uv_min[0]);
+        s.write(lp.uv_max[1]);
+
+        s.write(lp.pos_max[0]);
+        s.write(lp.pos_min[1]);
+        s.write<core::Real>(0.0f);
+        s.write(lp.uv_max);
+
+        s.write(lp.pos_max);
+        s.write<core::Real>(0.0f);
+        s.write(lp.uv_max[0]);
+        s.write(lp.uv_min[1]);
 
         s.write(lp.pos_min[0]);
         s.write(lp.pos_max[1]);
         s.write<core::Real>(0.0f);
-        s.write(lp.uv_min[0]);
-        s.write(lp.uv_max[1]);
-
-        s.write(lp.pos_min[1]);
-        s.write(lp.pos_max[0]);
-        s.write<core::Real>(0.0f);
-        s.write(lp.uv_min[1]);
-        s.write(lp.uv_max[0]);
-
-        s.write(lp.pos_max);
-        s.write<core::Real>(0.0f);
-        s.write(lp.uv_max);
+        s.write(lp.uv_min);
     }
     s.write<core::Count>(6 * text.size());
     for (size_t i = 0; i < text.size(); ++i) {
         std::uint32_t index = (std::uint32_t)i << 2;
         s.write(index);
+        s.write(index + 1);
         s.write(index + 2);
-        s.write(index + 1);
-        s.write(index + 1);
+        s.write(index);
         s.write(index + 2);
         s.write(index + 3);
     }
@@ -68,7 +68,7 @@ gearoenix::render::widget::Text::Text(system::stream::Stream* s, Engine* e, core
     create_text_mesh(c);
     std::shared_ptr<material::Material> mat(
         new material::ShadelessD2MatteNonreflectiveShadowlessOpaque(
-            shader::SHADELESS_D2_MATTE_NONREFLECTIVE_SHADOWLESS_TRANSPARENT,
+            shader::SHADELESS_D2_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE,
             fnt->get_baked_texture(), e, c));
     std::shared_ptr<material::Depth> dp = nullptr;
     if (shader::Shader::is_shadow_caster(mat->get_shader_id())) {
@@ -82,6 +82,8 @@ gearoenix::render::widget::Text::Text(system::stream::Stream* s, Engine* e, core
     needs_mvp |= mat->needs_mvp();
     needs_dbm |= mat->needs_dbm();
     meshes[mesh_id] = std::make_tuple(msh, mat, dp);
+    m.scale4x3(0.05f);
+    GXLOGI("mesh id is " << mesh_id);
 }
 
 gearoenix::render::widget::Text::~Text() {}
