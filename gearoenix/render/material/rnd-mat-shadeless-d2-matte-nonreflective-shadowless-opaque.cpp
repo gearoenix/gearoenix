@@ -23,8 +23,8 @@ void gearoenix::render::material::ShadelessD2MatteNonreflectiveShadowlessOpaque:
 }
 
 gearoenix::render::material::ShadelessD2MatteNonreflectiveShadowlessOpaque::ShadelessD2MatteNonreflectiveShadowlessOpaque(core::Id sid, system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> end)
-    : Material(sid, sizeof(u), e, end)
-    , SHADER_ID(sid)
+: Material(sid, sizeof(u), e, end)
+, SHADER_ID(sid)
 {
     core::Id texid;
     f->read(texid);
@@ -35,6 +35,15 @@ gearoenix::render::material::ShadelessD2MatteNonreflectiveShadowlessOpaque::Shad
         shdrsc->set_texture_2d(reinterpret_cast<texture::Texture2D*>(asset.get()));
     })));
     f->seek(curloc);
+}
+
+gearoenix::render::material::ShadelessD2MatteNonreflectiveShadowlessOpaque::ShadelessD2MatteNonreflectiveShadowlessOpaque(core::Id sid, std::shared_ptr<texture::Texture2D> txt2d, Engine* e, core::EndCaller<core::EndCallerIgnore> end)
+: Material(sid, sizeof(u), e, end)
+, SHADER_ID(sid)
+, txt2d(txt2d)
+{
+    shdrsc = reinterpret_cast<Resources*>(e->create_shader_resources(SHADER_ID, pl.get(), ub, end));
+    shdrsc->set_texture_2d(reinterpret_cast<texture::Texture2D*>(txt2d.get()));
 }
 
 gearoenix::render::material::ShadelessD2MatteNonreflectiveShadowlessOpaque::~ShadelessD2MatteNonreflectiveShadowlessOpaque()

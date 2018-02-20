@@ -5,6 +5,9 @@
 #include "../font/rnd-fnt-2d.hpp"
 #include "../mesh/rnd-msh-mesh.hpp"
 #include "../rnd-engine.hpp"
+#include "../material/rnd-mat-material.hpp"
+#include "../shader/rnd-shd-shader.hpp"
+#include "../material/rnd-mat-shadeless-d2-matte-nonreflective-shadowless-opaque.hpp"
 
 void gearoenix::render::widget::Text::create_text_mesh(core::EndCaller<core::EndCallerIgnore> c)
 {
@@ -49,7 +52,6 @@ void gearoenix::render::widget::Text::create_text_mesh(core::EndCaller<core::End
     s.seek(0);
     mesh_id = render_engine->get_system_application()->get_asset_manager()->create_id();
     msh = std::shared_ptr<mesh::Mesh>(mesh::Mesh::read(&s, render_engine, c));
-    //    return std::make_pair(0, nullptr);
 }
 
 gearoenix::render::widget::Text::Text(system::stream::Stream* s, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
@@ -62,8 +64,20 @@ gearoenix::render::widget::Text::Text(system::stream::Stream* s, Engine* e, core
             s->read<core::Id>(), core::EndCaller<font::Font>(
                                      [c](std::shared_ptr<font::Font>) -> void {
                                      })));
-    std::this_thread::sleep_for(std::chrono::seconds(2));
     create_text_mesh(c);
+    std::shared_ptr<material::Material> mat(material::ShadelessD2MatteNonreflectiveShadowlessOpaque(shader::SHADELESS_D2_MATTE_NONREFLECTIVE_SHADOWLESS_TRANSPARENT, txt2d, e, c));
+    if (shader::Shader::is_shadow_caster(mat->get_shader_id())) {
+        std::shared_ptr<material::Depth> dp(new material::Depth(
+                                                                shader::Shader::get_shadow_caster_shader_id(mat->get_shader_id()),
+                                                                e, c));
+        materials[mesh_ids[i]] = std::make_tuple(mat, dp);
+        has_shadow_caster = true;
+    } else {
+        materials[mesh_ids[i]] = std::make_tuple(mat, nullptr);
+    }
+    has_transparent |= shader::Shader::is_transparent(mat->get_shader_id());
+    needs_mvp |= mat->needs_mvp();
+    needs_dbm |= mat->needs_dbm();
 }
 
 gearoenix::render::widget::Text::~Text() {}
