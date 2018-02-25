@@ -52,9 +52,10 @@ gearoenix::render::font::Font2D::Font2D(core::Id my_id, system::stream::Stream* 
             &(atlas_data[0]), BAKED_ASPECT, BAKED_ASPECT,
             FIRST_CHAR, NUM_CHARS,
             &(bkchar[0]));
+        float yy = 0.0f;
         for (int i = 0; i < NUM_CHARS; ++i) {
+            float xx = 0.0f;
             stbtt_aligned_quad q;
-            float xx = 0.0f, yy = 0.0f;
             stbtt_GetBakedQuad(bkchar.data(), BAKED_ASPECT, BAKED_ASPECT, i, &xx, &yy, &q, 1);
             LetterProperties lp;
             lp.pos_max = math::Vec2(q.x1, q.y1);

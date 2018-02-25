@@ -27,20 +27,90 @@ void gearoenix::render::widget::Text::create_text_mesh(core::EndCaller<core::End
         core::Real w = 0.0f, h = 0.0f;
     };
     std::vector<CharacterVerices> cvs(text_size);
+    std::map<char, font::Font2D::LetterProperties> lps;
+    core::Real textw = 0.0f;
+    for (const char c : text) {
+        const font::Font2D::LetterProperties& lp = fnt->get_letter_properties(c);
+        lps[c] = lp;
+        textw += lp.pos_max[0] - lp.pos_min[0];
+    }
+    core::Real starting_x;
+    core::Real mxy = -std::numeric_limits<core::Real>::max();
+    core::Real mny = std::numeric_limits<core::Real>::max();
+    for (std::pair<const char, font::Font2D::LetterProperties>& cp : lps) {
+        const core::Real xy = cp.second.pos_max[1];
+        const core::Real ny = cp.second.pos_min[1];
+        if (xy > mxy) {
+            mxy = xy;
+        }
+        if (mny > ny) {
+            mny = ny;
+        }
+    }
+    const core::Real scale = 1.0f / (mxy - mny);
+    textw *= scale;
+    for (std::pair<const char, font::Font2D::LetterProperties>& cp : lps) {
+        cp.second.pos_max[1] -= mxy;
+        cp.second.pos_min[1] -= mxy;
+        cp.second.pos_max *= scale;
+        cp.second.pos_min *= scale;
+    }
+    switch (align) {
+    case Alignment::CENTER_BOTTOM:
+    case Alignment::CENTER_MIDDLE:
+    case Alignment::CENTER_TOP:
+        starting_x = textw * -0.5f;
+        break;
+    case Alignment::LEFT_BOTTOM:
+    case Alignment::LEFT_MIDDLE:
+    case Alignment::LEFT_TOP:
+        starting_x = 0.0f;
+        break;
+    case Alignment::RIGHT_BOTTOM:
+    case Alignment::RIGHT_MIDDLE:
+    case Alignment::RIGHT_TOP:
+        starting_x = -textw;
+        break;
+    default:
+        UNEXPECTED;
+    }
+    core::Real starting_y;
+    switch (align) {
+    case Alignment::CENTER_BOTTOM:
+    case Alignment::LEFT_BOTTOM:
+    case Alignment::RIGHT_BOTTOM:
+        starting_y = 1.0f;
+        break;
+    case Alignment::CENTER_MIDDLE:
+    case Alignment::LEFT_MIDDLE:
+    case Alignment::RIGHT_MIDDLE:
+        starting_y = 0.5f;
+        break;
+    case Alignment::CENTER_TOP:
+    case Alignment::LEFT_TOP:
+    case Alignment::RIGHT_TOP:
+        starting_y = 0.0f;
+        break;
+    default:
+        UNEXPECTED;
+    }
     for (core::Count i = 0; i < text_size; ++i) {
         const char c = text[i];
-        const font::Font2D::LetterProperties& lp = fnt->get_letter_properties(c);
+        const font::Font2D::LetterProperties& lp = lps[c];
+        const math::Vec3 pos_min(lp.pos_min[0] + starting_x, lp.pos_min[1] + starting_y, 0.0f);
+        const math::Vec3 pos_max(lp.pos_max[0] + starting_x, lp.pos_max[1] + starting_y, 0.0f);
+        starting_x += lp.pos_max[0] - lp.pos_min[0];
 
-        cvs[i].v[0].pos = math::Vec3(lp.pos_min, 0.0f);
+        cvs[i].v[0].pos = pos_min;
         cvs[i].v[0].uv = math::Vec2(lp.uv_min[0], lp.uv_max[1]);
 
-        cvs[i].v[1].pos = math::Vec3(lp.pos_max[0], lp.pos_min[1], 0.0f);
+        cvs[i].v[1].pos = math::Vec3(pos_max[0], pos_min[1], 0.0f);
         cvs[i].v[1].uv = lp.uv_max;
 
-        cvs[i].v[2].pos = math::Vec3(lp.pos_max, 0.0f);
+        cvs[i].v[2].pos = pos_max;
         cvs[i].v[2].uv = math::Vec2(lp.uv_max[0], lp.uv_min[1]);
 
-        cvs[i].v[3].pos = math::Vec3(lp.pos_min[0], lp.pos_max[1], 0.0f);
+        cvs[i].v[3].pos = math::Vec3(pos_min[0], pos_max[1], 0.0f);
         cvs[i].v[3].uv = lp.uv_min;
     }
     for (core::Count i = 0; i < text_size; ++i) {
@@ -88,7 +158,6 @@ gearoenix::render::widget::Text::Text(system::stream::Stream* s, Engine* e, core
     needs_mvp |= mat->needs_mvp();
     needs_dbm |= mat->needs_dbm();
     meshes[mesh_id] = std::make_tuple(msh, mat, dp);
-    m.scale4x3(0.05f);
     GXLOGI("mesh id is " << mesh_id);
 }
 
