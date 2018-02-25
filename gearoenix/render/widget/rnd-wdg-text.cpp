@@ -14,34 +14,40 @@ void gearoenix::render::widget::Text::create_text_mesh(core::EndCaller<core::End
 {
     system::stream::Memory ms;
     system::stream::Stream& s = ms;
+    const core::Count text_size = (core::Count)text.size();
     s.write(mesh::Mesh::Geo::BASIC);
     s.write<core::Count>(5);
-    s.write<core::Count>(4 * text.size());
-    for (const char c : text) {
+    s.write<core::Count>(4 * text_size);
+    struct Vertex {
+        math::Vec3 pos = math::Vec3(0.0f);
+        math::Vec2 uv = math::Vec2(0.0f);
+    };
+    struct CharacterVerices {
+        Vertex v[4];
+        core::Real w = 0.0f, h = 0.0f;
+    };
+    std::vector<CharacterVerices> cvs(text_size);
+    for (core::Count i = 0; i < text_size; ++i) {
+        const char c = text[i];
         const font::Font2D::LetterProperties& lp = fnt->get_letter_properties(c);
 
-        s.write(lp.pos_min);
-        s.write<core::Real>(0.0f);
-        s.write(lp.uv_min[0]);
-        s.write(lp.uv_max[1]);
+        cvs[i].v[0].pos = math::Vec3(lp.pos_min, 0.0f);
+        cvs[i].v[0].uv = math::Vec2(lp.uv_min[0], lp.uv_max[1]);
 
-        s.write(lp.pos_max[0]);
-        s.write(lp.pos_min[1]);
-        s.write<core::Real>(0.0f);
-        s.write(lp.uv_max);
+        cvs[i].v[1].pos = math::Vec3(lp.pos_max[0], lp.pos_min[1], 0.0f);
+        cvs[i].v[1].uv = lp.uv_max;
 
-        s.write(lp.pos_max);
-        s.write<core::Real>(0.0f);
-        s.write(lp.uv_max[0]);
-        s.write(lp.uv_min[1]);
+        cvs[i].v[2].pos = math::Vec3(lp.pos_max, 0.0f);
+        cvs[i].v[2].uv = math::Vec2(lp.uv_max[0], lp.uv_min[1]);
 
-        s.write(lp.pos_min[0]);
-        s.write(lp.pos_max[1]);
-        s.write<core::Real>(0.0f);
-        s.write(lp.uv_min);
+        cvs[i].v[3].pos = math::Vec3(lp.pos_min[0], lp.pos_max[1], 0.0f);
+        cvs[i].v[3].uv = lp.uv_min;
     }
-    s.write<core::Count>(6 * text.size());
-    for (size_t i = 0; i < text.size(); ++i) {
+    for (core::Count i = 0; i < text_size; ++i) {
+        s.write(cvs[i].v);
+    }
+    s.write<core::Count>(6 * text_size);
+    for (core::Real i = 0; i < text_size; ++i) {
         std::uint32_t index = (std::uint32_t)i << 2;
         s.write(index);
         s.write(index + 1);
