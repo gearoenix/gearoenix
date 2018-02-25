@@ -252,11 +252,11 @@ gearoenix::math::Vec3::Vec3(core::Real e)
     vec[2] = e;
 }
 
-gearoenix::math::Vec3::Vec3(math::Vec2 o, core::Real e)
+gearoenix::math::Vec3::Vec3(const math::Vec2& o, core::Real e)
 {
     vec[0] = o[0];
     vec[1] = o[1];
-    vec[3] = e;
+    vec[2] = e;
 }
 
 gearoenix::math::Vec3::Vec3(const Vec3& v)

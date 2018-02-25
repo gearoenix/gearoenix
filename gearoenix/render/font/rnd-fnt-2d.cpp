@@ -6,6 +6,9 @@
 #endif
 #define STB_TRUETYPE_IMPLEMENTATION
 #include "../../../external/stb/stb_truetype.h"
+#ifdef IN_WINDOWS
+#define STBI_MSC_SECURE_CRT
+#endif
 #define STBI_WRITE_NO_STDIO
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "../../../external/stb/stb_image_write.h"

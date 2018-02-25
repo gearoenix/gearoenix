@@ -55,7 +55,7 @@ namespace math {
         static const Vec3 Z;
         Vec3();
         Vec3(core::Real e);
-        Vec3(math::Vec2 o, core::Real e);
+        Vec3(const math::Vec2& o, core::Real e);
         Vec3(core::Real x, core::Real y, core::Real z);
         Vec3(const Vec3& v);
         Vec3 operator-() const;
