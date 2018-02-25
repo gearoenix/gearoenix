@@ -35,26 +35,26 @@ void gearoenix::render::widget::Text::create_text_mesh(core::EndCaller<core::End
         textw += lp.pos_max[0] - lp.pos_min[0];
     }
     core::Real starting_x;
-    core::Real mxy = -std::numeric_limits<core::Real>::max();
-    core::Real mny = std::numeric_limits<core::Real>::max();
-    for (std::pair<const char, font::Font2D::LetterProperties>& cp : lps) {
-        const core::Real xy = cp.second.pos_max[1];
-        const core::Real ny = cp.second.pos_min[1];
-        if (xy > mxy) {
-            mxy = xy;
-        }
-        if (mny > ny) {
-            mny = ny;
-        }
-    }
-    const core::Real scale = 1.0f / (mxy - mny);
-    textw *= scale;
-    for (std::pair<const char, font::Font2D::LetterProperties>& cp : lps) {
-        cp.second.pos_max[1] -= mxy;
-        cp.second.pos_min[1] -= mxy;
-        cp.second.pos_max *= scale;
-        cp.second.pos_min *= scale;
-    }
+    //    core::Real mxy = -std::numeric_limits<core::Real>::max();
+    //    core::Real mny = std::numeric_limits<core::Real>::max();
+    //    for (std::pair<const char, font::Font2D::LetterProperties>& cp : lps) {
+    //        const core::Real xy = cp.second.pos_max[1];
+    //        const core::Real ny = cp.second.pos_min[1];
+    //        if (xy > mxy) {
+    //            mxy = xy;
+    //        }
+    //        if (mny > ny) {
+    //            mny = ny;
+    //        }
+    //    }
+    //    const core::Real scale = 1.0f / (mxy - mny);
+    //    textw *= scale;
+    //    for (std::pair<const char, font::Font2D::LetterProperties>& cp : lps) {
+    //        cp.second.pos_max[1] -= mxy;
+    //        cp.second.pos_min[1] -= mxy;
+    //        cp.second.pos_max *= scale;
+    //        cp.second.pos_min *= scale;
+    //    }
     switch (align) {
     case Alignment::CENTER_BOTTOM:
     case Alignment::CENTER_MIDDLE:

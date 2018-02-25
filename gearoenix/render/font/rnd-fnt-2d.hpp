@@ -15,6 +15,10 @@ namespace render {
                 math::Vec2 uv_min, uv_max;
                 math::Vec2 pos_min, pos_max;
             };
+            static const int baked_aspect;
+            static const int first_character;
+            static const int last_character;
+            static const int characters_count;
 
         private:
             std::vector<LetterProperties> letters_properties;
