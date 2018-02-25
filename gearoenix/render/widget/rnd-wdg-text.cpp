@@ -17,7 +17,7 @@ void gearoenix::render::widget::Text::create_text_mesh(core::EndCaller<core::End
     const core::Count text_size = (core::Count)text.size();
     s.write(mesh::Mesh::Geo::BASIC);
     s.write<core::Count>(5);
-    s.write<core::Count>(4 * text_size);
+    s.write(text_size * 4);
     struct Vertex {
         math::Vec3 pos = math::Vec3(0.0f);
         math::Vec2 uv = math::Vec2(0.0f);
@@ -46,7 +46,7 @@ void gearoenix::render::widget::Text::create_text_mesh(core::EndCaller<core::End
     for (core::Count i = 0; i < text_size; ++i) {
         s.write(cvs[i].v);
     }
-    s.write<core::Count>(6 * text_size);
+    s.write(text_size * 6);
     for (core::Real i = 0; i < text_size; ++i) {
         std::uint32_t index = (std::uint32_t)i << 2;
         s.write(index);
