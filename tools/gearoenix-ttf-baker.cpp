@@ -14,6 +14,7 @@
 #include <fstream>
 #include <iostream>
 #include <limits>
+#include <string>
 #include <vector>
 
 static void png_write_function(void* context, void* data, int size)

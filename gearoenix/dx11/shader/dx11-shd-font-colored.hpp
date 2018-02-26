@@ -3,10 +3,9 @@
 #include "../../core/cr-build-configuration.hpp"
 #ifdef USE_DIRECTX11
 #include "../../render/material/rnd-mat-font-colored.hpp"
-#include "../gles2.hpp"
-#include "gles2-shader.hpp"
+#include "dx11-shader.hpp"
 namespace gearoenix {
-namespace gles2 {
+namespace dx11 {
     namespace buffer {
         class Uniform;
     }
@@ -22,22 +21,11 @@ namespace gles2 {
                 void bind();
             };
 
-        protected:
-            GLuint mvp;
-            GLuint color;
-            GLuint txt2d;
-            GLuint vtx_shd;
-            GLuint frg_shd;
-            GLint vtx_att_ind;
-            GLint uv_att_ind;
-
         public:
             FontColored(Engine* eng, core::EndCaller<core::EndCallerIgnore> end);
             ~FontColored();
             void use();
             const std::vector<render::shader::stage::Id>& get_stages_ids() const;
-            void set_mvp(const GLfloat* data);
-            void set_color(const GLfloat* data);
         };
     }
 }
