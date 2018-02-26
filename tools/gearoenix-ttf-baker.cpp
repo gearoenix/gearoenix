@@ -91,19 +91,343 @@ int main(const int argc, const char* const* const argv)
         lp.pos_max[1] = pad_y;
         lp.pos_min[1] += trn_y;
     };
-    //        core::Real cap_a_base = letters_properties[((int)'A') - FIRST_CHAR].pos_min[1];
+    auto btm_placer = [&](int lpi, gearoenix::core::Real btm) -> void {
+        auto& lp = lps[lpi];
+        const gearoenix::core::Real trn_y = btm - lp.pos_min[1];
+        lp.pos_min[1] = btm;
+        lp.pos_max[1] += trn_y;
+    };
+    auto top_placer = [&](int lpi, gearoenix::core::Real top) -> void {
+        auto& lp = lps[lpi];
+        const gearoenix::core::Real trn_y = top - lp.pos_max[1];
+        lp.pos_max[1] = top;
+        lp.pos_min[1] += trn_y;
+    };
+    const int cap_a_lpi = ((int)'A') - gearoenix::render::font::Font2D::first_character;
+    const int cap_i_lpi = ((int)'I') - gearoenix::render::font::Font2D::first_character;
+    const int cap_o_lpi = ((int)'O') - gearoenix::render::font::Font2D::first_character;
+    const int lit_a_lpi = ((int)'a') - gearoenix::render::font::Font2D::first_character;
+    const int lit_i_lpi = ((int)'i') - gearoenix::render::font::Font2D::first_character;
+    const int lit_x_lpi = ((int)'x') - gearoenix::render::font::Font2D::first_character;
+    const int dot_lpi = ((int)'.') - gearoenix::render::font::Font2D::first_character;
+    const int comma_lpi = ((int)',') - gearoenix::render::font::Font2D::first_character;
+    const int semic_lpi = ((int)';') - gearoenix::render::font::Font2D::first_character;
+    mid_placer(cap_a_lpi);
+    const auto cap_a_bottom = lps[cap_a_lpi].pos_min[1];
+    const auto cap_a_top = lps[cap_a_lpi].pos_max[1];
+    btm_placer(cap_i_lpi, cap_a_bottom);
+    const auto cap_i_top = lps[cap_i_lpi].pos_max[1];
+    mid_placer(cap_o_lpi);
+    const auto cap_o_top = lps[cap_o_lpi].pos_max[1];
+    btm_placer(lit_a_lpi, cap_a_bottom);
+    const auto lit_a_top = lps[lit_a_lpi].pos_max[1];
+    btm_placer(lit_i_lpi, cap_a_bottom);
+    const auto lit_i_top = lps[lit_i_lpi].pos_max[1];
+    btm_placer(dot_lpi, cap_a_bottom);
+    const auto dot_top = lps[dot_lpi].pos_max[1];
+    top_placer(comma_lpi, dot_top);
+    const auto comma_bottom = lps[comma_lpi].pos_min[1];
+    btm_placer(semic_lpi, comma_bottom);
+    const auto semic_top = lps[semic_lpi].pos_max[1];
+    btm_placer(lit_x_lpi, cap_a_bottom);
+    const auto lit_x_top = lps[lit_x_lpi].pos_max[1];
     for (int lpi = 0, ci = gearoenix::render::font::Font2D::first_character; lpi < gearoenix::render::font::Font2D::characters_count; ++lpi, ++ci) {
-        mid_placer(lpi);
+        switch ((char)ci) {
+        case ' ':
+            break;
+        case '!':
+            btm_placer(lpi, cap_a_bottom);
+            break;
+        case '"':
+            top_placer(lpi, cap_a_top);
+            break;
+        case '#':
+            mid_placer(lpi);
+            break;
+        case '$':
+            mid_placer(lpi);
+            break;
+        case '%':
+            btm_placer(lpi, cap_a_bottom);
+            break;
+        case '&':
+            mid_placer(lpi);
+            break;
+        case '\'':
+            mid_placer(lpi);
+            break;
+        case '(':
+            mid_placer(lpi);
+            break;
+        case ')':
+            mid_placer(lpi);
+            break;
+        case '*':
+            mid_placer(lpi);
+            break;
+        case '+':
+            mid_placer(lpi);
+            break;
+        case ',':
+            break;
+        case '-':
+            mid_placer(lpi);
+            break;
+        case '.':
+            break;
+        case '/':
+            mid_placer(lpi);
+            break;
+        case '0':
+            mid_placer(lpi);
+            break;
+        case '1':
+            btm_placer(lpi, cap_a_bottom);
+            break;
+        case '2':
+            btm_placer(lpi, cap_a_bottom);
+            break;
+        case '3':
+            mid_placer(lpi);
+            break;
+        case '4':
+            btm_placer(lpi, cap_a_bottom);
+            break;
+        case '5':
+            mid_placer(lpi);
+            break;
+        case '6':
+            mid_placer(lpi);
+            break;
+        case '7':
+            btm_placer(lpi, cap_a_bottom);
+            break;
+        case '8':
+            mid_placer(lpi);
+            break;
+        case '9':
+            mid_placer(lpi);
+            break;
+        case ':':
+            top_placer(lpi, semic_top);
+            break;
+        case ';':
+            break;
+        case '<':
+            mid_placer(lpi);
+            break;
+        case '=':
+            mid_placer(lpi);
+            break;
+        case '>':
+            mid_placer(lpi);
+            break;
+        case '?':
+            btm_placer(lpi, cap_a_bottom);
+            break;
+        case '@':
+            btm_placer(lpi, cap_a_bottom);
+            break;
+        case 'A':
+            break;
+        case 'B':
+            btm_placer(lpi, cap_a_bottom);
+            break;
+        case 'C':
+            mid_placer(lpi);
+            break;
+        case 'D':
+            btm_placer(lpi, cap_a_bottom);
+            break;
+        case 'E':
+            btm_placer(lpi, cap_a_bottom);
+            break;
+        case 'F':
+            btm_placer(lpi, cap_a_bottom);
+            break;
+        case 'G':
+            mid_placer(lpi);
+            break;
+        case 'H':
+            btm_placer(lpi, cap_a_bottom);
+            break;
+        case 'I':
+            btm_placer(lpi, cap_a_bottom);
+            break;
+        case 'J':
+            top_placer(lpi, cap_i_top);
+            break;
+        case 'K':
+            btm_placer(lpi, cap_a_bottom);
+            break;
+        case 'L':
+            btm_placer(lpi, cap_a_bottom);
+            break;
+        case 'M':
+            btm_placer(lpi, cap_a_bottom);
+            break;
+        case 'N':
+            btm_placer(lpi, cap_a_bottom);
+            break;
+        case 'O':
+            break;
+        case 'P':
+            btm_placer(lpi, cap_a_bottom);
+            break;
+        case 'Q':
+            top_placer(lpi, cap_o_top);
+            break;
+        case 'R':
+            btm_placer(lpi, cap_a_bottom);
+            break;
+        case 'S':
+            mid_placer(lpi);
+            break;
+        case 'T':
+            btm_placer(lpi, cap_a_bottom);
+            break;
+        case 'U':
+            mid_placer(lpi);
+            break;
+        case 'V':
+            btm_placer(lpi, cap_a_bottom);
+            break;
+        case 'W':
+            btm_placer(lpi, cap_a_bottom);
+            break;
+        case 'X':
+            btm_placer(lpi, cap_a_bottom);
+            break;
+        case 'Y':
+            btm_placer(lpi, cap_a_bottom);
+            break;
+        case 'Z':
+            btm_placer(lpi, cap_a_bottom);
+            break;
+        case '[':
+            mid_placer(lpi);
+            break;
+        case '\\':
+            mid_placer(lpi);
+            break;
+        case ']':
+            mid_placer(lpi);
+            break;
+        case '^':
+            top_placer(lpi, cap_a_top);
+            break;
+        case '_':
+            btm_placer(lpi, cap_a_bottom);
+            break;
+        case '`':
+            top_placer(lpi, cap_a_top);
+            break;
+        case 'a':
+            break;
+        case 'b':
+            btm_placer(lpi, cap_a_bottom);
+            break;
+        case 'c':
+            btm_placer(lpi, cap_a_bottom);
+            break;
+        case 'd':
+            btm_placer(lpi, cap_a_bottom);
+            break;
+        case 'e':
+            btm_placer(lpi, cap_a_bottom);
+            break;
+        case 'f':
+            btm_placer(lpi, cap_a_bottom);
+            break;
+        case 'g':
+            top_placer(lpi, lit_a_top);
+            break;
+        case 'h':
+            btm_placer(lpi, cap_a_bottom);
+            break;
+        case 'i':
+            btm_placer(lpi, cap_a_bottom);
+            break;
+        case 'j':
+            top_placer(lpi, lit_i_top);
+            break;
+        case 'k':
+            btm_placer(lpi, cap_a_bottom);
+            break;
+        case 'l':
+            btm_placer(lpi, cap_a_bottom);
+            break;
+        case 'm':
+            btm_placer(lpi, cap_a_bottom);
+            break;
+        case 'n':
+            btm_placer(lpi, cap_a_bottom);
+            break;
+        case 'o':
+            btm_placer(lpi, cap_a_bottom);
+            break;
+        case 'p':
+            top_placer(lpi, lit_a_top);
+            break;
+        case 'q':
+            top_placer(lpi, lit_a_top);
+            break;
+        case 'r':
+            btm_placer(lpi, cap_a_bottom);
+            break;
+        case 's':
+            btm_placer(lpi, cap_a_bottom);
+            break;
+        case 't':
+            btm_placer(lpi, cap_a_bottom);
+            break;
+        case 'u':
+            btm_placer(lpi, cap_a_bottom);
+            break;
+        case 'v':
+            btm_placer(lpi, cap_a_bottom);
+            break;
+        case 'w':
+            btm_placer(lpi, cap_a_bottom);
+            break;
+        case 'x':
+            break;
+        case 'y':
+            top_placer(lpi, lit_x_top);
+            break;
+        case 'z':
+            btm_placer(lpi, cap_a_bottom);
+            break;
+        case '{':
+            mid_placer(lpi);
+            break;
+        case '|':
+            mid_placer(lpi);
+            break;
+        case '}':
+            mid_placer(lpi);
+            break;
+        case '~':
+            mid_placer(lpi);
+            break;
+        default:
+            mid_placer(lpi);
+            break;
+        }
     }
-
     std::ofstream baked_file(argv[2], std::ios::binary | std::ios::out);
     baked_file.write(reinterpret_cast<const char*>(lps.data()), sizeof(lps[0]) * lps.size());
+    gearoenix::core::Count png_size = 0;
+    const auto png_size_pos = baked_file.tellp();
+    baked_file.write(reinterpret_cast<const char*>(&png_size), sizeof(png_size));
     stbi_write_png_to_func(
         png_write_function,
         &baked_file,
         gearoenix::render::font::Font2D::baked_aspect,
         gearoenix::render::font::Font2D::baked_aspect,
         1, atlas_data.data(), 0);
-
+    png_size = baked_file.tellp() - png_size_pos;
+    baked_file.seekp(png_size_pos);
+    baked_file.write(reinterpret_cast<const char*>(&png_size), sizeof(png_size));
     return 0;
 }

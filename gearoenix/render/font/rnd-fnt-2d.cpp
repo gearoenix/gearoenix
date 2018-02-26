@@ -13,7 +13,9 @@ const int gearoenix::render::font::Font2D::characters_count = (gearoenix::render
 
 gearoenix::render::font::Font2D::Font2D(core::Id my_id, system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
     : Font(my_id, Shape::D2)
+    , letters_properties(characters_count)
 {
+    f->read<core::Count>();
     f->read(&(letters_properties[0]), letters_properties.size() * sizeof(LetterProperties));
     baked_texture = std::shared_ptr<texture::Texture2D>(e->create_texture_2d(f, core::EndCaller<core::EndCallerIgnore>([c](std::shared_ptr<core::EndCallerIgnore>) -> void {})));
 }

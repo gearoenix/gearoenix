@@ -48,6 +48,7 @@
 # assets
 *.png
 *.ttf
+*.txt
 
 output/
 assets/
