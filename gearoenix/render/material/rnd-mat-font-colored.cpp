@@ -17,14 +17,34 @@ gearoenix::render::material::FontColored::Resources::Resources(Engine* e, pipeli
 {
 }
 
+void gearoenix::render::material::FontColored::Resources::set_texture_2d(texture::Texture2D* t2d)
+{
+    txt2d = t2d;
+}
+
 gearoenix::render::material::FontColored::FontColored(core::Id sid, system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> end)
     : Material(sid, sizeof(u), e, end)
     , SHADER_ID(sid)
 {
     u.color.read(f);
-    e->add_load_function([this, e, end]() -> void {
+    core::Id texid;
+    f->read(texid);
+    core::asset::Manager* astmgr = e->get_system_application()->get_asset_manager();
+    core::Count curloc = f->tell();
+    txt2d = std::static_pointer_cast<texture::Texture2D>(astmgr->get_texture(texid, core::EndCaller<texture::Texture>([this, end, e](std::shared_ptr<texture::Texture> asset) -> void {
         shdrsc = reinterpret_cast<Resources*>(e->create_shader_resources(SHADER_ID, pl.get(), ub, end));
-    });
+        shdrsc->set_texture_2d(reinterpret_cast<texture::Texture2D*>(asset.get()));
+    })));
+    f->seek(curloc);
+}
+
+gearoenix::render::material::FontColored::FontColored(core::Id sid, std::shared_ptr<texture::Texture2D> txt2d, Engine* e, core::EndCaller<core::EndCallerIgnore> end)
+    : Material(sid, sizeof(u), e, end)
+    , SHADER_ID(sid)
+    , txt2d(txt2d)
+{
+    shdrsc = reinterpret_cast<Resources*>(e->create_shader_resources(SHADER_ID, pl.get(), ub, end));
+    shdrsc->set_texture_2d(reinterpret_cast<texture::Texture2D*>(txt2d.get()));
 }
 
 gearoenix::render::material::FontColored::~FontColored()

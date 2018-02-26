@@ -4,8 +4,8 @@
 #include "../../system/sys-app.hpp"
 #include "../font/rnd-fnt-2d.hpp"
 #include "../material/rnd-mat-depth.hpp"
+#include "../material/rnd-mat-font-colored.hpp"
 #include "../material/rnd-mat-material.hpp"
-#include "../material/rnd-mat-shadeless-d2-matte-nonreflective-shadowless-opaque.hpp"
 #include "../mesh/rnd-msh-mesh.hpp"
 #include "../rnd-engine.hpp"
 #include "../shader/rnd-shd-shader.hpp"
@@ -35,26 +35,6 @@ void gearoenix::render::widget::Text::create_text_mesh(core::EndCaller<core::End
         textw += lp.pos_max[0] - lp.pos_min[0];
     }
     core::Real starting_x;
-    //    core::Real mxy = -std::numeric_limits<core::Real>::max();
-    //    core::Real mny = std::numeric_limits<core::Real>::max();
-    //    for (std::pair<const char, font::Font2D::LetterProperties>& cp : lps) {
-    //        const core::Real xy = cp.second.pos_max[1];
-    //        const core::Real ny = cp.second.pos_min[1];
-    //        if (xy > mxy) {
-    //            mxy = xy;
-    //        }
-    //        if (mny > ny) {
-    //            mny = ny;
-    //        }
-    //    }
-    //    const core::Real scale = 1.0f / (mxy - mny);
-    //    textw *= scale;
-    //    for (std::pair<const char, font::Font2D::LetterProperties>& cp : lps) {
-    //        cp.second.pos_max[1] -= mxy;
-    //        cp.second.pos_min[1] -= mxy;
-    //        cp.second.pos_max *= scale;
-    //        cp.second.pos_min *= scale;
-    //    }
     switch (align) {
     case Alignment::CENTER_BOTTOM:
     case Alignment::CENTER_MIDDLE:
@@ -142,10 +122,7 @@ gearoenix::render::widget::Text::Text(system::stream::Stream* s, Engine* e, core
                                      [c](std::shared_ptr<font::Font>) -> void {
                                      })));
     create_text_mesh(c);
-    std::shared_ptr<material::Material> mat(
-        new material::ShadelessD2MatteNonreflectiveShadowlessOpaque(
-            shader::SHADELESS_D2_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE,
-            fnt->get_baked_texture(), e, c));
+    std::shared_ptr<material::Material> mat(new material::FontColored(shader::FONT_COLORED, fnt->get_baked_texture(), e, c));
     std::shared_ptr<material::Depth> dp = nullptr;
     if (shader::Shader::is_shadow_caster(mat->get_shader_id())) {
         dp = std::shared_ptr<material::Depth>(
@@ -158,7 +135,6 @@ gearoenix::render::widget::Text::Text(system::stream::Stream* s, Engine* e, core
     needs_mvp |= mat->needs_mvp();
     needs_dbm |= mat->needs_dbm();
     meshes[mesh_id] = std::make_tuple(msh, mat, dp);
-    GXLOGI("mesh id is " << mesh_id);
 }
 
 gearoenix::render::widget::Text::~Text() {}

@@ -16,20 +16,26 @@ namespace render {
         public:
             const core::Id SHADER_ID;
             class Resources : public shader::Resources {
+            protected:
+                texture::Texture2D* txt2d;
+
             public:
                 Resources(Engine* e, pipeline::Pipeline* pip, buffer::Uniform* u);
+                void set_texture_2d(texture::Texture2D* t2d);
             };
             typedef struct {
                 math::Mat4x4 mvp;
-                math::Vec4 color;
+                math::Vec4 color = math::Vec4(1.0f);
             } Uniform;
 
         private:
             Uniform u;
             Resources* shdrsc;
+            std::shared_ptr<texture::Texture2D> txt2d;
 
         public:
             FontColored(core::Id sid, system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> end);
+            FontColored(core::Id sid, std::shared_ptr<texture::Texture2D> txt2d, Engine* e, core::EndCaller<core::EndCallerIgnore> end);
             ~FontColored();
             unsigned int get_vertex_elements_count() const;
             core::Id get_shader_id() const;

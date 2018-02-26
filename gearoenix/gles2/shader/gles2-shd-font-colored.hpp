@@ -25,9 +25,11 @@ namespace gles2 {
         protected:
             GLuint mvp;
             GLuint color;
+            GLuint txt2d;
             GLuint vtx_shd;
             GLuint frg_shd;
             GLint vtx_att_ind;
+            GLint uv_att_ind;
 
         public:
             FontColored(Engine* eng, core::EndCaller<core::EndCallerIgnore> end);
