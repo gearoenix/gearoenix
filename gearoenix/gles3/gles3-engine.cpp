@@ -21,6 +21,7 @@
 #include "shader/gles3-shd-directional-d2-speculated-baked-full-opaque.hpp"
 #include "shader/gles3-shd-directional-d2-speculated-nonreflective-full-opaque.hpp"
 #include "shader/gles3-shd-directional-d2-speculated-nonreflective-shadowless-opaque.hpp"
+#include "shader/gles3-shd-font-colored.hpp"
 #include "shader/gles3-shd-shadeless-colored-matte-nonreflective-shadowless-opaque.hpp"
 #include "shader/gles3-shd-shadeless-cube-matte-nonreflective-shadowless-opaque.hpp"
 #include "shader/gles3-shd-shadeless-d2-matte-nonreflective-shadowless-opaque.hpp"
@@ -177,6 +178,8 @@ gearoenix::render::shader::Shader* gearoenix::gles3::Engine::create_shader(core:
         return new shader::DirectionalD2SpeculatedNonreflectiveFullOpaque(this, c);
     case render::shader::DIRECTIONAL_D2_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE:
         return new shader::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque(this, c);
+    case render::shader::FONT_COLORED:
+        return new shader::FontColored(this, c);
     case render::shader::SHADELESS_COLORED_MATTE_NONREFLECTIVE_CASTER_OPAQUE:
     case render::shader::SHADELESS_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
         return new shader::ShadelessColoredMatteNonreflectiveShadowlessOpaque(this, c);
@@ -215,6 +218,8 @@ gearoenix::render::shader::Resources* gearoenix::gles3::Engine::create_shader_re
         return new shader::DirectionalD2SpeculatedNonreflectiveFullOpaque::Resources(this, pip, u);
     case render::shader::DIRECTIONAL_D2_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE:
         return new shader::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque::Resources(this, pip, u);
+    case render::shader::FONT_COLORED:
+        return new shader::FontColored::Resources(this, pip, u);
     case render::shader::SHADELESS_COLORED_MATTE_NONREFLECTIVE_CASTER_OPAQUE:
     case render::shader::SHADELESS_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
         return new shader::ShadelessColoredMatteNonreflectiveShadowlessOpaque::Resources(this, pip, u);
