@@ -82,3 +82,8 @@ void gearoenix::render::material::FontColored::bind(texture::Texture2D*)
     ub->update(&u, sizeof(Uniform));
     shdrsc->bind();
 }
+
+void gearoenix::render::material::FontColored::set_color(const math::Vec4& color)
+{
+    u.color = color;
+}

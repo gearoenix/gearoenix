@@ -43,6 +43,7 @@ namespace render {
             bool needs_dbm() const;
             void update(const scene::Scene* s, const model::Model* m);
             void bind(texture::Texture2D* shadow_texture);
+            void set_color(const math::Vec4& color);
         };
     }
 }

@@ -39,12 +39,12 @@ gearoenix::gles3::shader::FontColored::FontColored(Engine* eng, core::EndCaller<
         const std::string pfs = "#version 330\n"
                                 "in vec2 out_uv;\n"
                                 "out vec4 frag_color;\n"
-                                "uniform vec3 color;\n"
+                                "uniform vec4 color;\n"
                                 "uniform sampler2D txt2d;\n"
                                 "void main()\n"
                                 "{\n"
-                                "    vec3 final_color = texture(txt2d, out_uv).xyz * color;\n"
-                                "    frag_color = vec4(final_color, final_color.x);\n"
+                                "    vec4 txt_color = texture(txt2d, out_uv);\n"
+                                "    frag_color = vec4(txt_color.xyz * color.xyz, txt_color.x * color.w);\n"
                                 "}\n";
         vtx_shd = add_shader_to_program(pvs, GL_VERTEX_SHADER);
         frg_shd = add_shader_to_program(pfs, GL_FRAGMENT_SHADER);
@@ -85,6 +85,6 @@ void gearoenix::gles3::shader::FontColored::set_mvp(const GLfloat* data)
 
 void gearoenix::gles3::shader::FontColored::set_color(const GLfloat* data)
 {
-    glUniform3fv(color, 1, data);
+    glUniform4fv(color, 1, data);
 }
 #endif

@@ -116,13 +116,20 @@ gearoenix::render::widget::Text::Text(system::stream::Stream* s, Engine* e, core
     , text(s->read_string())
     , align(s->read<Alignment::Type>())
 {
+    core::Id font_id;
+    s->read(font_id);
+    s->read<core::Id>();
+    math::Vec4 color;
+    color.read(s);
     fnt = std::static_pointer_cast<font::Font2D>(
         e->get_system_application()->get_asset_manager()->get_font(
-            s->read<core::Id>(), core::EndCaller<font::Font>(
-                                     [c](std::shared_ptr<font::Font>) -> void {
-                                     })));
+            font_id, core::EndCaller<font::Font>(
+                         [c](std::shared_ptr<font::Font>) -> void {
+                         })));
     create_text_mesh(c);
-    std::shared_ptr<material::Material> mat(new material::FontColored(shader::FONT_COLORED, fnt->get_baked_texture(), e, c));
+    material::FontColored* font_mat = new material::FontColored(shader::FONT_COLORED, fnt->get_baked_texture(), e, c);
+    font_mat->set_color(color);
+    std::shared_ptr<material::Material> mat(font_mat);
     std::shared_ptr<material::Depth> dp = nullptr;
     if (shader::Shader::is_shadow_caster(mat->get_shader_id())) {
         dp = std::shared_ptr<material::Depth>(
