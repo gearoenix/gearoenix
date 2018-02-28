@@ -35,10 +35,10 @@ gearoenix::gles2::shader::ShadelessColoredMatteNonreflectiveShadowlessOpaque::Sh
                                 "}\n";
         const std::string pfs = "#version 100\n"
                                 "precision highp float;\n"
-                                "uniform vec3 color;\n"
+                                "uniform vec4 color;\n"
                                 "void main()\n"
                                 "{\n"
-                                "    gl_FragColor = vec4(color, 1.0);\n"
+                                "    gl_FragColor = color;\n"
                                 "}\n";
         vtx_shd = add_shader_to_program(pvs, GL_VERTEX_SHADER);
         frg_shd = add_shader_to_program(pfs, GL_FRAGMENT_SHADER);
@@ -79,6 +79,6 @@ void gearoenix::gles2::shader::ShadelessColoredMatteNonreflectiveShadowlessOpaqu
 
 void gearoenix::gles2::shader::ShadelessColoredMatteNonreflectiveShadowlessOpaque::set_color(const GLfloat* data)
 {
-    glUniform3fv(color, 1, data);
+    glUniform4fv(color, 1, data);
 }
 #endif

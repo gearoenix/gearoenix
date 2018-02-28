@@ -2,6 +2,7 @@
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../core/cr-static.hpp"
 #include "../../physics/collider/phs-collider.hpp"
+#include "../../system/stream/sys-stm-asset.hpp"
 #include "../../system/stream/sys-stm-stream.hpp"
 #include "../../system/sys-app.hpp"
 #include "../camera/rnd-cmr-camera.hpp"
@@ -48,6 +49,8 @@ gearoenix::render::model::Model::Model(ModelType t, system::stream::Stream* f, E
         needs_dbm |= mat->needs_dbm();
     }
     core::asset::Manager* astmgr = e->get_system_application()->get_asset_manager();
+    system::stream::Asset* asset_file = astmgr->get_file();
+    core::Count last_pos = asset_file->tell();
     for (core::Id mesh_id : mesh_ids) {
         const std::tuple<std::shared_ptr<material::Material>, std::shared_ptr<material::Depth>>& mat = materials[mesh_id];
         meshes[mesh_id] = std::make_tuple(astmgr->get_mesh(mesh_id, core::EndCaller<mesh::Mesh>([c](std::shared_ptr<mesh::Mesh>) -> void {})), std::get<0>(mat), std::get<1>(mat));
@@ -55,6 +58,7 @@ gearoenix::render::model::Model::Model(ModelType t, system::stream::Stream* f, E
     for (core::Id model_id : model_children) {
         children[model_id] = astmgr->get_model(model_id, core::EndCaller<model::Model>([c](std::shared_ptr<Model>) -> void {}));
     }
+    asset_file->seek(last_pos);
 }
 
 gearoenix::render::model::Model* gearoenix::render::model::Model::read(system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
@@ -98,7 +102,7 @@ void gearoenix::render::model::Model::commit(const scene::Scene* s)
                 mvp = cam->get_view_projection() * m;
             }
             if (has_transparent) {
-                distcam = (cam->get_location() - moccloc).square_length();
+                distcam = cam->get_distance(moccloc);
             }
             for (std::pair<const core::Id, std::tuple<std::shared_ptr<mesh::Mesh>, std::shared_ptr<material::Material>, std::shared_ptr<material::Depth>>>& mshmtr : meshes) {
                 std::get<1>(mshmtr.second)->update(s, this);
@@ -186,6 +190,8 @@ void gearoenix::render::model::Model::translate(const math::Vec3& t)
 {
     //std::lock_guard<std::mutex> lg(locker);
     m.translate(t);
+    for (std::pair<const core::Id, std::shared_ptr<Model>>& pmdl : children)
+        pmdl.second->translate(t);
     changed = true;
 }
 
@@ -193,6 +199,8 @@ void gearoenix::render::model::Model::global_scale(const core::Real s)
 {
     //std::lock_guard<std::mutex> lg(locker);
     m.scale4x3(s);
+    for (std::pair<const core::Id, std::shared_ptr<Model>>& pmdl : children)
+        pmdl.second->global_scale(s);
     changed = true;
 }
 
@@ -200,6 +208,8 @@ void gearoenix::render::model::Model::local_scale(const core::Real s)
 {
     //std::lock_guard<std::mutex> lg(locker);
     m.scale3x3(s);
+    for (std::pair<const core::Id, std::shared_ptr<Model>>& pmdl : children)
+        pmdl.second->local_scale(s);
     changed = true;
 }
 
@@ -236,4 +246,9 @@ void gearoenix::render::model::Model::pop_state()
     m = state[len - 1];
     state.pop_back();
     changed = true;
+}
+
+gearoenix::core::Real gearoenix::render::model::Model::get_distance_from_camera() const
+{
+    return distcam;
 }

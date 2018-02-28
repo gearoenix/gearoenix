@@ -62,6 +62,7 @@ gearoenix::render::material::Material* gearoenix::render::material::Material::re
         return new DirectionalD2SpeculatedNonreflectiveShadowlessOpaque(f, e, end);
     case shader::SHADELESS_COLORED_MATTE_NONREFLECTIVE_CASTER_OPAQUE:
     case shader::SHADELESS_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
+    case shader::SHADELESS_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_TRANSPARENT:
         return new ShadelessColoredMatteNonreflectiveShadowlessOpaque(sid, f, e, end);
     case shader::SHADELESS_CUBE_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
         return new ShadelessCubeMatteNonreflectiveShadowlessOpaque(f, e, end);

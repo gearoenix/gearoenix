@@ -34,7 +34,7 @@ void gearoenix::render::scene::Scene::add_model(core::Id id, std::shared_ptr<mod
             shadow_caster_models[shdcstid][id].insert(msh);
         }
         if (shader::Shader::is_transparent(shdid)) {
-            transparent_models[shdid][id].insert(msh);
+            transparent_models[id].insert(msh);
         } else {
             opaque_models[shdid][id].insert(msh);
         }
@@ -148,14 +148,28 @@ void gearoenix::render::scene::Scene::draw(texture::Texture2D* shadow_texture)
     if (renderable) {
         for (std::pair<const core::Id, std::map<core::Id, std::set<core::Id>>>& pshd : opaque_models) {
             for (std::pair<const core::Id, std::set<core::Id>>& pmdl : pshd.second) {
-                for (const core::Id mshid : pmdl.second) {
-                    if (std::shared_ptr<model::Model> mdl = all_models[pmdl.first].lock()) {
+                if (std::shared_ptr<model::Model> mdl = all_models[pmdl.first].lock()) {
+                    for (const core::Id mshid : pmdl.second) {
                         mdl->draw(mshid, shadow_texture);
                     }
                 }
             }
         }
-        //GXLOGE("TODO it needs to render transparent object with order of their depth.");
+        std::map<core::Real, std::map<core::Id, std::set<core::Id>>, std::greater<core::Real>> sorted_models;
+        for (std::pair<const core::Id, std::set<core::Id>>& pmdl : transparent_models) {
+            if (std::shared_ptr<model::Model> mdl = all_models[pmdl.first].lock()) {
+                sorted_models[mdl->get_distance_from_camera()][pmdl.first] = pmdl.second;
+            }
+        }
+        for (std::pair<const core::Real, std::map<core::Id, std::set<core::Id>>> pdis : sorted_models) {
+            for (std::pair<const core::Id, std::set<core::Id>>& pmdl : pdis.second) {
+                if (std::shared_ptr<model::Model> mdl = all_models[pmdl.first].lock()) {
+                    for (const core::Id mshid : pmdl.second) {
+                        mdl->draw(mshid, shadow_texture);
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -233,7 +247,7 @@ void gearoenix::render::scene::Scene::add_mesh(core::Id mesh_id, core::Id model_
     }
     const core::Id mat_id = mat->get_shader_id();
     if (shader::Shader::is_transparent(mat_id)) {
-        transparent_models[mat_id][model_id].insert(mesh_id);
+        transparent_models[model_id].insert(mesh_id);
     } else {
         opaque_models[mat_id][model_id].insert(mesh_id);
     }

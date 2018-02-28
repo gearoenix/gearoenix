@@ -56,3 +56,8 @@ gearoenix::math::Ray3 gearoenix::render::camera::Perspective::create_ray3(const 
     dir.normalize();
     return math::Ray3(origin, dir);
 }
+
+gearoenix::core::Real gearoenix::render::camera::Perspective::get_distance(const math::Vec3 model_location) const
+{
+    return (model_location - l).square_length();
+}

@@ -105,6 +105,7 @@ namespace render {
             const physics::collider::Collider* get_collider() const;
             void push_state();
             void pop_state();
+            core::Real get_distance_from_camera() const;
         };
     }
 }

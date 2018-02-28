@@ -193,6 +193,7 @@ gearoenix::render::shader::Shader* gearoenix::gles2::Engine::create_shader(core:
         return new shader::FontColored(this, c);
     case render::shader::SHADELESS_COLORED_MATTE_NONREFLECTIVE_CASTER_OPAQUE:
     case render::shader::SHADELESS_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
+    case render::shader::SHADELESS_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_TRANSPARENT:
         return new shader::ShadelessColoredMatteNonreflectiveShadowlessOpaque(this, c);
     case render::shader::SHADELESS_CUBE_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
         return new shader::ShadelessCubeMatteNonreflectiveShadowlessOpaque(this, c);
@@ -234,6 +235,7 @@ gearoenix::render::shader::Resources* gearoenix::gles2::Engine::create_shader_re
         return new shader::FontColored::Resources(this, pip, u);
     case render::shader::SHADELESS_COLORED_MATTE_NONREFLECTIVE_CASTER_OPAQUE:
     case render::shader::SHADELESS_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
+    case render::shader::SHADELESS_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_TRANSPARENT:
         return new shader::ShadelessColoredMatteNonreflectiveShadowlessOpaque::Resources(this, pip, u);
     case render::shader::SHADELESS_CUBE_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
         return new shader::ShadelessCubeMatteNonreflectiveShadowlessOpaque::Resources(this, pip, u);

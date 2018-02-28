@@ -49,3 +49,8 @@ gearoenix::math::Ray3 gearoenix::render::camera::Orthographic::create_ray3(const
     math::Vec3 origin = (this->x * x) + (this->y * y) + (dir * start) + l;
     return math::Ray3(origin, dir);
 }
+
+gearoenix::core::Real gearoenix::render::camera::Orthographic::get_distance(const math::Vec3 model_location) const
+{
+    return -((model_location - l).dot(z));
+}

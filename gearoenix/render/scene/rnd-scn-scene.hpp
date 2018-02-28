@@ -71,8 +71,8 @@ namespace render {
             std::map<core::Id, std::map<core::Id, std::set<core::Id>>> shadow_caster_models;
             // shader_id -> model_id -> mesh_id
             std::map<core::Id, std::map<core::Id, std::set<core::Id>>> opaque_models;
-            // shader_id -> model_id -> mesh_id
-            std::map<core::Id, std::map<core::Id, std::set<core::Id>>> transparent_models;
+            // model_id -> mesh_id
+            std::map<core::Id, std::set<core::Id>> transparent_models;
             core::Id cam_id = 0;
             core::Id sun_id = 0;
             bool renderable = false;
