@@ -68,7 +68,7 @@
 /// -------------------------------------------------------------------------
 #ifdef DEBUG_MODE
 #define LOG_ENABLED
-#define GEAROENIX_DEFAULT_WINDOW_WIDTH 800
+#define GEAROENIX_DEFAULT_WINDOW_WIDTH 1020
 #define GEAROENIX_DEFAULT_WINDOW_HEIGHT 600
 #else
 #define GEAROENIX_FULLSCREEN

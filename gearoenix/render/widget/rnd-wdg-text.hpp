@@ -31,6 +31,7 @@ namespace render {
         private:
             std::string text;
             Alignment::Type align;
+            core::Real space_character, space_word, space_line;
             std::shared_ptr<font::Font2D> fnt;
             std::shared_ptr<mesh::Mesh> msh;
             core::Id mesh_id;

@@ -32,7 +32,9 @@ void gearoenix::render::widget::Text::create_text_mesh(core::EndCaller<core::End
     for (const char c : text) {
         const font::Font2D::LetterProperties& lp = fnt->get_letter_properties(c);
         lps[c] = lp;
-        textw += lp.pos_max[0] - lp.pos_min[0];
+        textw += lp.pos_max[0] - lp.pos_min[0] + space_character;
+        if (c == ' ')
+            textw += space_word;
     }
     core::Real starting_x;
     switch (align) {
@@ -79,7 +81,9 @@ void gearoenix::render::widget::Text::create_text_mesh(core::EndCaller<core::End
         const font::Font2D::LetterProperties& lp = lps[c];
         const math::Vec3 pos_min(lp.pos_min[0] + starting_x, lp.pos_min[1] + starting_y, 0.0f);
         const math::Vec3 pos_max(lp.pos_max[0] + starting_x, lp.pos_max[1] + starting_y, 0.0f);
-        starting_x += lp.pos_max[0] - lp.pos_min[0];
+        starting_x += lp.pos_max[0] - lp.pos_min[0] + space_character;
+        if (c == ' ')
+            starting_x += space_word;
 
         cvs[i].v[0].pos = pos_min;
         cvs[i].v[0].uv = math::Vec2(lp.uv_min[0], lp.uv_max[1]);
@@ -115,6 +119,9 @@ gearoenix::render::widget::Text::Text(system::stream::Stream* s, Engine* e, core
     : Widget(s, e, c)
     , text(s->read_string())
     , align(s->read<Alignment::Type>())
+    , space_character(s->read<core::Real>())
+    , space_word(s->read<core::Real>())
+    , space_line(s->read<core::Real>())
 {
     core::Id font_id;
     s->read(font_id);
