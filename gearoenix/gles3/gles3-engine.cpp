@@ -182,11 +182,13 @@ gearoenix::render::shader::Shader* gearoenix::gles3::Engine::create_shader(core:
         return new shader::FontColored(this, c);
     case render::shader::SHADELESS_COLORED_MATTE_NONREFLECTIVE_CASTER_OPAQUE:
     case render::shader::SHADELESS_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
+    case render::shader::SHADELESS_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_TRANSPARENT:
         return new shader::ShadelessColoredMatteNonreflectiveShadowlessOpaque(this, c);
     case render::shader::SHADELESS_CUBE_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
         return new shader::ShadelessCubeMatteNonreflectiveShadowlessOpaque(this, c);
     case render::shader::SHADELESS_D2_MATTE_NONREFLECTIVE_CASTER_OPAQUE:
     case render::shader::SHADELESS_D2_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
+    case render::shader::SHADELESS_D2_MATTE_NONREFLECTIVE_SHADOWLESS_TRANSPARENT:
         return new shader::ShadelessD2MatteNonreflectiveShadowlessOpaque(this, c);
     default:
         UNEXPECTED;
@@ -222,11 +224,13 @@ gearoenix::render::shader::Resources* gearoenix::gles3::Engine::create_shader_re
         return new shader::FontColored::Resources(this, pip, u);
     case render::shader::SHADELESS_COLORED_MATTE_NONREFLECTIVE_CASTER_OPAQUE:
     case render::shader::SHADELESS_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
+    case render::shader::SHADELESS_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_TRANSPARENT:
         return new shader::ShadelessColoredMatteNonreflectiveShadowlessOpaque::Resources(this, pip, u);
     case render::shader::SHADELESS_CUBE_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
         return new shader::ShadelessCubeMatteNonreflectiveShadowlessOpaque::Resources(this, pip, u);
     case render::shader::SHADELESS_D2_MATTE_NONREFLECTIVE_CASTER_OPAQUE:
     case render::shader::SHADELESS_D2_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
+    case render::shader::SHADELESS_D2_MATTE_NONREFLECTIVE_SHADOWLESS_TRANSPARENT:
         return new shader::ShadelessD2MatteNonreflectiveShadowlessOpaque::Resources(this, pip, u);
     default:
         UNEXPECTED;

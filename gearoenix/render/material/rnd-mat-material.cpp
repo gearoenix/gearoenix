@@ -68,6 +68,7 @@ gearoenix::render::material::Material* gearoenix::render::material::Material::re
         return new ShadelessCubeMatteNonreflectiveShadowlessOpaque(f, e, end);
     case shader::SHADELESS_D2_MATTE_NONREFLECTIVE_CASTER_OPAQUE:
     case shader::SHADELESS_D2_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
+    case shader::SHADELESS_D2_MATTE_NONREFLECTIVE_SHADOWLESS_TRANSPARENT:
         return new ShadelessD2MatteNonreflectiveShadowlessOpaque(sid, f, e, end);
     default:
         UNIMPLEMENTED;

@@ -20,7 +20,8 @@ gearoenix::render::Framebuffer::Framebuffer(image::View* view, image::View* dept
     const Linker* l = p->get_instance()->get_linker();
     const VkSurfaceCapabilitiesKHR& cap = p->get_surface_capabilities();
     VkImageView attachments[2] = {
-        view->get_vulkan_data(), depth->get_vulkan_data(),
+        view->get_vulkan_data(),
+        depth->get_vulkan_data(),
     };
     VkFramebufferCreateInfo fb_create_info;
     setz(fb_create_info);

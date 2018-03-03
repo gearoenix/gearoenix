@@ -188,12 +188,11 @@ void gearoenix::render::Engine::load_scene(core::Id scene_id, std::function<void
             UNEXPECTED;
 #endif
         sysapp->get_asset_manager()->get_scene(
-            scene_id, core::EndCaller<scene::Scene>(
-                          [this, on_load, scene_id](std::shared_ptr<scene::Scene> asset) -> void {
-                              loaded_scenes[scene_id] = asset;
-                              asset->set_renderable(true);
-                              on_load();
-                          }));
+            scene_id, core::EndCaller<scene::Scene>([this, on_load, scene_id](std::shared_ptr<scene::Scene> asset) -> void {
+                loaded_scenes[scene_id] = asset;
+                asset->set_renderable(true);
+                on_load();
+            }));
 #ifdef THREAD_SUPPORTED
         loaded_scenes_mutex->release();
     });
