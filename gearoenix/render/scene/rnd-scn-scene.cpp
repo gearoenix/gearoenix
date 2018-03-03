@@ -161,7 +161,7 @@ void gearoenix::render::scene::Scene::draw(texture::Texture2D* shadow_texture)
                 sorted_models[mdl->get_distance_from_camera()][pmdl.first] = pmdl.second;
             }
         }
-        for (std::pair<const core::Real, std::map<core::Id, std::set<core::Id>>> pdis : sorted_models) {
+        for (std::pair<const core::Real, std::map<core::Id, std::set<core::Id>>>& pdis : sorted_models) {
             for (std::pair<const core::Id, std::set<core::Id>>& pmdl : pdis.second) {
                 if (std::shared_ptr<model::Model> mdl = all_models[pmdl.first].lock()) {
                     for (const core::Id mshid : pmdl.second) {

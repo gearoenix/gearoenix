@@ -88,14 +88,13 @@ void gearoenix::render::model::Model::commit(const scene::Scene* s)
 {
     //std::lock_guard<std::mutex> lg(locker);
     const camera::Camera* cam = s->get_current_camera();
-    bool moccloc_not_initialized = true;
-    math::Vec3 moccloc;
-    if (nullptr != collider && changed) {
-        collider->update(m);
+    if (changed) {
+        if (nullptr != collider) {
+            collider->update(m);
+            moccloc = m * occloc;
+        }
     }
     if (cam->get_changed() || changed) {
-        moccloc = m * occloc; // todo cache its calculation.
-        moccloc_not_initialized = false;
         is_in_camera = cam->in_sight(moccloc, occrds);
         if (is_in_camera) {
             if (needs_mvp) {
@@ -114,9 +113,6 @@ void gearoenix::render::model::Model::commit(const scene::Scene* s)
         const light::Sun* sun = s->get_sun();
         const camera::Orthographic* suncam = sun->get_camera();
         if (suncam->get_changed() || changed) {
-            if (moccloc_not_initialized) {
-                moccloc = m * occloc;
-            }
             is_in_sun = suncam->in_sight(moccloc, occrds);
             if (is_in_sun) {
                 sunmvp = sun->get_camera()->get_view_projection() * m;
@@ -189,28 +185,32 @@ const gearoenix::math::Mat4x4& gearoenix::render::model::Model::get_sun_mvp() co
 void gearoenix::render::model::Model::translate(const math::Vec3& t)
 {
     //std::lock_guard<std::mutex> lg(locker);
+    changed = true;
     m.translate(t);
     for (std::pair<const core::Id, std::shared_ptr<Model>>& pmdl : children)
         pmdl.second->translate(t);
-    changed = true;
 }
 
 void gearoenix::render::model::Model::global_scale(const core::Real s)
 {
     //std::lock_guard<std::mutex> lg(locker);
+    changed = true;
+    occrds *= s;
+    occrdss *= s;
     m.scale4x3(s);
     for (std::pair<const core::Id, std::shared_ptr<Model>>& pmdl : children)
         pmdl.second->global_scale(s);
-    changed = true;
 }
 
 void gearoenix::render::model::Model::local_scale(const core::Real s)
 {
     //std::lock_guard<std::mutex> lg(locker);
+    changed = true;
     m.scale3x3(s);
+    occrds *= s;
+    occrdss *= s;
     for (std::pair<const core::Id, std::shared_ptr<Model>>& pmdl : children)
         pmdl.second->local_scale(s);
-    changed = true;
 }
 
 gearoenix::render::model::Model::ModelType gearoenix::render::model::Model::get_type() const
@@ -235,6 +235,7 @@ void gearoenix::render::model::Model::push_state()
 {
     //std::lock_guard<std::mutex> lg(locker);
     state.push_back(m);
+    UNIMPLEMENTED; // other things are in the state of a model it must decide later
 }
 
 void gearoenix::render::model::Model::pop_state()
@@ -246,6 +247,7 @@ void gearoenix::render::model::Model::pop_state()
     m = state[len - 1];
     state.pop_back();
     changed = true;
+    UNIMPLEMENTED; // other things are in the state of a model it must decide later
 }
 
 gearoenix::core::Real gearoenix::render::model::Model::get_distance_from_camera() const
