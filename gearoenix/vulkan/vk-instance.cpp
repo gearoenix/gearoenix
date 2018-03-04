@@ -196,7 +196,7 @@ gearoenix::render::Instance::Instance(Linker* l)
             //|| layer_name == renderdoc_capture
             //|| layer_name == lunarg_screenshot
             //|| layer_name == lunarg_monitor
-        ) {
+            ) {
             iter = instance_layers.erase(iter);
         } else {
             ++iter;

@@ -146,7 +146,7 @@ void gearoenix::render::Engine::update()
         &buffer_memory_barrier, // pBufferMemoryBarriers
         0, // imageMemoryBarrierCount
         nullptr // pImageMemoryBarriers
-    );
+        );
     VkBufferCopy unicpyinf;
     unicpyinf.dstOffset = uvbufmgr[current_frame]->get_offset();
     unicpyinf.srcOffset = ucbufmgr[current_frame]->get_offset();
@@ -165,7 +165,7 @@ void gearoenix::render::Engine::update()
         &buffer_memory_barrier, // pBufferMemoryBarriers
         0, // imageMemoryBarrierCount
         nullptr // pImageMemoryBarriers
-    );
+        );
     //////////////////////////////////////////////////////////////////////////////////
 
     VkClearValue clear_values[2];
