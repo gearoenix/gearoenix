@@ -20,9 +20,6 @@ namespace physics {
         class Collider;
     }
 }
-namespace system {
-    class File;
-}
 namespace render {
     class Engine;
     namespace camera {

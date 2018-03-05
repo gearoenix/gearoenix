@@ -9,6 +9,7 @@
 #include "../../render/rnd-engine.hpp"
 #include "../../render/scene/rnd-scn-scene.hpp"
 #include "../../render/shader/rnd-shd-shader.hpp"
+#include "../../render/skybox/rnd-sky-skybox.hpp"
 #include "../../render/texture/rnd-txt-texture.hpp"
 #include "../../system/stream/sys-stm-asset.hpp"
 #include "../../system/sys-app.hpp"
@@ -29,6 +30,7 @@ gearoenix::core::asset::Manager::Manager(system::Application* sys_app, const std
     , fonts(new cache::file::File(file))
     , meshes(new cache::file::File(file))
     , models(new cache::file::File(file))
+    , skyboxes(new cache::file::File(file))
     , constraints(new cache::file::File(file))
     , scenes(new cache::file::File(file))
 {
@@ -45,6 +47,7 @@ gearoenix::core::asset::Manager::~Manager()
     delete textures;
     delete meshes;
     delete models;
+    delete skyboxes;
     delete constraints;
     delete scenes;
 
@@ -57,6 +60,7 @@ gearoenix::core::asset::Manager::~Manager()
     textures = nullptr;
     meshes = nullptr;
     models = nullptr;
+    skyboxes = nullptr;
     constraints = nullptr;
     scenes = nullptr;
 }
@@ -76,6 +80,7 @@ void gearoenix::core::asset::Manager::initialize()
     GXHELP(fonts);
     GXHELP(meshes);
     GXHELP(models);
+    GXHELP(skyboxes);
     GXHELP(constraints);
     GXHELP(scenes);
     last_id.store(lid);
@@ -193,6 +198,20 @@ std::shared_ptr<gearoenix::render::model::Model> gearoenix::core::asset::Manager
 std::shared_ptr<gearoenix::render::model::Model> gearoenix::core::asset::Manager::get_cached_model(Id id) const
 {
     return models->get<render::model::Model>(id);
+}
+
+std::shared_ptr<gearoenix::render::skybox::Skybox> gearoenix::core::asset::Manager::get_skybox(Id id, EndCaller<render::skybox::Skybox> e)
+{
+    auto result = skyboxes->get<render::skybox::Skybox>(id, [this, e]() -> std::shared_ptr<render::skybox::Skybox> {
+        return std::shared_ptr<render::skybox::Skybox>(render::skybox::Skybox::read(file, render_engine, EndCaller<EndCallerIgnore>([e](std::shared_ptr<EndCallerIgnore>) -> void {})));
+    });
+    e.set_data(result);
+    return result;
+}
+
+std::shared_ptr<gearoenix::render::skybox::Skybox> gearoenix::core::asset::Manager::get_cached_skybox(Id id) const
+{
+    return skyboxes->get<render::skybox::Skybox>(id);
 }
 
 std::shared_ptr<gearoenix::physics::constraint::Constraint> gearoenix::core::asset::Manager::get_constriants(Id id, EndCaller<physics::constraint::Constraint> end)

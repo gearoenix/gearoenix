@@ -31,6 +31,9 @@ namespace render {
     namespace model {
         class Model;
     }
+    namespace skybox {
+        class Skybox;
+    }
     namespace scene {
         class Scene;
     }
@@ -69,6 +72,7 @@ namespace core {
             cache::file::File* fonts = nullptr;
             cache::file::File* meshes = nullptr;
             cache::file::File* models = nullptr;
+            cache::file::File* skyboxes = nullptr;
             cache::file::File* constraints = nullptr;
             cache::file::File* scenes = nullptr;
             std::atomic<Id> last_id;
@@ -94,6 +98,8 @@ namespace core {
             std::shared_ptr<render::mesh::Mesh> get_cached_mesh(Id id) const;
             std::shared_ptr<render::model::Model> get_model(Id id, EndCaller<render::model::Model> e);
             std::shared_ptr<render::model::Model> get_cached_model(Id id) const;
+            std::shared_ptr<render::skybox::Skybox> get_skybox(Id id, EndCaller<render::skybox::Skybox> e);
+            std::shared_ptr<render::skybox::Skybox> get_cached_skybox(Id id) const;
             std::shared_ptr<physics::constraint::Constraint> get_constriants(Id id, EndCaller<physics::constraint::Constraint> e);
             std::shared_ptr<physics::constraint::Constraint> get_cached_constraints(Id id) const;
             std::shared_ptr<render::scene::Scene> get_scene(Id id, EndCaller<render::scene::Scene> e);

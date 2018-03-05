@@ -57,6 +57,8 @@ gearoenix::render::scene::Scene::Scene(SceneType t, system::stream::Stream* f, E
     sun_id = light_ids[0];
     std::vector<core::Id> model_ids;
     f->read(model_ids);
+    const bool has_skybox = f->read_bool();
+    const core::Id skybox_id = has_skybox ? f->read<core::Id>() : 0;
     std::vector<core::Id> constraint_ids;
     f->read(constraint_ids);
     for (const core::Id i : camera_ids)
@@ -85,6 +87,7 @@ gearoenix::render::scene::Scene::Scene(SceneType t, system::stream::Stream* f, E
                     }
                 }));
     }
+    skybox = has_skybox ? amgr->get_skybox(skybox_id, core::EndCaller<skybox::Skybox>([c](std::shared_ptr<skybox::Skybox>) -> void {})) : nullptr;
 }
 
 gearoenix::render::scene::Scene::~Scene()
