@@ -15,6 +15,7 @@
 #include "../model/rnd-mdl-model.hpp"
 #include "../rnd-engine.hpp"
 #include "../shader/rnd-shd-shader.hpp"
+#include "../skybox/rnd-sky-skybox.hpp"
 #include "rnd-scn-ui.hpp"
 
 void gearoenix::render::scene::Scene::add_model(core::Id id, std::shared_ptr<model::Model> m)
@@ -123,14 +124,6 @@ const std::map<gearoenix::core::Id, std::shared_ptr<gearoenix::physics::constrai
     return root_constraints;
 }
 
-void gearoenix::render::scene::Scene::commit()
-{
-    for (std::pair<const core::Id, std::shared_ptr<model::Model>>& p : root_models) {
-        std::shared_ptr<model::Model>& m = p.second;
-        m->commit(this);
-    }
-}
-
 void gearoenix::render::scene::Scene::cast_shadow()
 {
     if (renderable) {
@@ -144,6 +137,14 @@ void gearoenix::render::scene::Scene::cast_shadow()
             }
         }
     }
+}
+
+void gearoenix::render::scene::Scene::draw_sky()
+{
+    if (nullptr == skybox)
+        return;
+    skybox->update(this);
+    skybox->draw();
 }
 
 void gearoenix::render::scene::Scene::draw(texture::Texture2D* shadow_texture)

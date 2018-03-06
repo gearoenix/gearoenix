@@ -26,6 +26,7 @@
 #include "shader/gles2-shd-shadeless-colored-matte-nonreflective-shadowless-opaque.hpp"
 #include "shader/gles2-shd-shadeless-cube-matte-nonreflective-shadowless-opaque.hpp"
 #include "shader/gles2-shd-shadeless-d2-matte-nonreflective-shadowless-opaque.hpp"
+#include "shader/gles2-shd-skybox-basic.hpp"
 #include "texture/gles2-txt-2d.hpp"
 #include "texture/gles2-txt-cube.hpp"
 
@@ -115,6 +116,11 @@ void gearoenix::gles2::Engine::update()
         glViewport(0, 0, (GLsizei)win_width, (GLsizei)win_height);
         glScissor(0, 0, (GLsizei)win_width, (GLsizei)win_height);
         glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        glDisable(GL_DEPTH_TEST);
+        glDepthMask(GL_FALSE);
+        scene.second->draw_sky();
+        glEnable(GL_DEPTH_TEST);
+        glDepthMask(GL_TRUE);
         scene.second->draw(shadow_map_texture);
     }
     physics_engine->update();
@@ -201,6 +207,8 @@ gearoenix::render::shader::Shader* gearoenix::gles2::Engine::create_shader(core:
     case render::shader::SHADELESS_D2_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
     case render::shader::SHADELESS_D2_MATTE_NONREFLECTIVE_SHADOWLESS_TRANSPARENT:
         return new shader::ShadelessD2MatteNonreflectiveShadowlessOpaque(this, c);
+    case render::shader::SKYBOX_BASIC:
+        return new shader::SkyboxBasic(this, c);
     default:
         UNEXPECTED;
     }
@@ -243,6 +251,8 @@ gearoenix::render::shader::Resources* gearoenix::gles2::Engine::create_shader_re
     case render::shader::SHADELESS_D2_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
     case render::shader::SHADELESS_D2_MATTE_NONREFLECTIVE_SHADOWLESS_TRANSPARENT:
         return new shader::ShadelessD2MatteNonreflectiveShadowlessOpaque::Resources(this, pip, u);
+    case render::shader::SKYBOX_BASIC:
+        return new shader::SkyboxBasic::Resources(this, pip, u);
     default:
         UNEXPECTED;
     }

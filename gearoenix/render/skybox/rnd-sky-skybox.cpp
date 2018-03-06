@@ -4,6 +4,7 @@
 #include "../../system/sys-app.hpp"
 #include "../../system/sys-log.hpp"
 #include "../material/rnd-mat-skybox-basic.hpp"
+#include "../mesh/rnd-msh-mesh.hpp"
 #include "../rnd-engine.hpp"
 
 gearoenix::render::skybox::Skybox::Skybox(system::stream::Stream* s, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
@@ -27,4 +28,16 @@ gearoenix::render::skybox::Skybox* gearoenix::render::skybox::Skybox::read(syste
     default:
         UNEXPECTED;
     }
+}
+
+void gearoenix::render::skybox::Skybox::draw()
+{
+    msh->bind();
+    mat->bind(nullptr);
+    msh->draw();
+}
+
+void gearoenix::render::skybox::Skybox::update(const scene::Scene* s)
+{
+    mat->update(s, nullptr);
 }

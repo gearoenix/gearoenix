@@ -18,6 +18,9 @@ namespace render {
     namespace mesh {
         class Mesh;
     }
+    namespace scene {
+        class Scene;
+    }
     class Engine;
     namespace skybox {
         class Skybox : public core::asset::Asset {
@@ -30,6 +33,8 @@ namespace render {
             Skybox(system::stream::Stream* s, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
             ~Skybox();
             static Skybox* read(system::stream::Stream* s, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
+            void draw();
+            void update(const scene::Scene* s);
         };
     }
 }

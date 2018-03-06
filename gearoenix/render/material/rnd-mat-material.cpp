@@ -18,6 +18,7 @@
 #include "rnd-mat-shadeless-colored-matte-nonreflective-shadowless-opaque.hpp"
 #include "rnd-mat-shadeless-cube-matte-nonreflective-shadowless-opaque.hpp"
 #include "rnd-mat-shadeless-d2-matte-nonreflective-shadowless-opaque.hpp"
+#include "rnd-mat-skybox-basic.hpp"
 
 gearoenix::render::material::Material::Material(core::Id sid, unsigned int us, Engine* e, core::EndCaller<core::EndCallerIgnore> end)
     : ub(e->create_uniform(us, end))
@@ -70,6 +71,8 @@ gearoenix::render::material::Material* gearoenix::render::material::Material::re
     case shader::SHADELESS_D2_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
     case shader::SHADELESS_D2_MATTE_NONREFLECTIVE_SHADOWLESS_TRANSPARENT:
         return new ShadelessD2MatteNonreflectiveShadowlessOpaque(sid, f, e, end);
+    case shader::SKYBOX_BASIC:
+        return new SkyboxBasic(f, e, end);
     default:
         UNIMPLEMENTED;
     }

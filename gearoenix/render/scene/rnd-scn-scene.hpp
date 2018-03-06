@@ -87,8 +87,8 @@ namespace render {
             Scene(SceneType t, system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
 
         public:
-            void commit();
             void cast_shadow();
+            void draw_sky();
             void draw(texture::Texture2D* shadow_texture);
             virtual ~Scene();
             static Scene* read(system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
