@@ -268,6 +268,13 @@ void gearoenix::math::Mat4x4::set_location(const Vec3& location)
     mat[14] = location[2];
 }
 
+void gearoenix::math::Mat4x4::get_location(Vec3& location) const
+{
+    location[0] = mat[12];
+    location[1] = mat[13];
+    location[2] = mat[14];
+}
+
 void gearoenix::math::Mat4x4::read(system::stream::Stream* f)
 {
     for (int i = 0; i < 16; ++i)

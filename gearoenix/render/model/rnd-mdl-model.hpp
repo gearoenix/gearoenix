@@ -95,6 +95,8 @@ namespace render {
             const math::Mat4x4& get_m() const;
             const math::Mat4x4& get_mvp() const;
             const math::Mat4x4& get_sun_mvp() const;
+            void get_location(math::Vec3& l) const;
+            void set_location(const math::Vec3& l);
             void translate(const math::Vec3& t);
             void global_scale(const core::Real s);
             void local_scale(const core::Real s);

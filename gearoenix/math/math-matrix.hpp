@@ -51,6 +51,7 @@ namespace math {
         void translate(const Vec3& v);
         void set_location_zero();
         void set_location(const Vec3& location);
+        void get_location(Vec3& location) const;
         void inverse();
         void transpose();
         void read(system::stream::Stream* f);

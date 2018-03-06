@@ -182,35 +182,53 @@ const gearoenix::math::Mat4x4& gearoenix::render::model::Model::get_sun_mvp() co
     return sunmvp;
 }
 
+void gearoenix::render::model::Model::get_location(math::Vec3& v) const
+{
+    m.get_location(v);
+}
+
+void gearoenix::render::model::Model::set_location(const math::Vec3& l)
+{
+    m.set_location(l);
+    changed = true;
+}
+
 void gearoenix::render::model::Model::translate(const math::Vec3& t)
 {
     //std::lock_guard<std::mutex> lg(locker);
-    changed = true;
     m.translate(t);
     for (std::pair<const core::Id, std::shared_ptr<Model>>& pmdl : children)
         pmdl.second->translate(t);
+    changed = true;
 }
 
 void gearoenix::render::model::Model::global_scale(const core::Real s)
 {
     //std::lock_guard<std::mutex> lg(locker);
-    changed = true;
     occrds *= s;
     occrdss *= s;
     m.scale4x3(s);
     for (std::pair<const core::Id, std::shared_ptr<Model>>& pmdl : children)
         pmdl.second->global_scale(s);
+    changed = true;
 }
 
 void gearoenix::render::model::Model::local_scale(const core::Real s)
 {
     //std::lock_guard<std::mutex> lg(locker);
-    changed = true;
     m.scale3x3(s);
     occrds *= s;
     occrdss *= s;
-    for (std::pair<const core::Id, std::shared_ptr<Model>>& pmdl : children)
-        pmdl.second->local_scale(s);
+    math::Vec3 fetched;
+    m.get_location(fetched);
+    const math::Vec3 o = fetched;
+    for (std::pair<const core::Id, std::shared_ptr<Model>>& pmdl : children) {
+        const std::shared_ptr<Model>& child = pmdl.second;
+        child->get_location(fetched);
+        child->set_location((fetched - o) * s + o);
+        child->local_scale(s);
+    }
+    changed = true;
 }
 
 gearoenix::render::model::Model::ModelType gearoenix::render::model::Model::get_type() const
