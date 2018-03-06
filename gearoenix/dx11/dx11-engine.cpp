@@ -22,6 +22,7 @@
 #include "shader/dx11-shd-shadeless-colored-matte-nonreflective-shadowless-opaque.hpp"
 #include "shader/dx11-shd-shadeless-cube-matte-nonreflective-shadowless-opaque.hpp"
 #include "shader/dx11-shd-shadeless-d2-matte-nonreflective-shadowless-opaque.hpp"
+#include "shader/dx11-shd-skybox-basic.hpp"
 #include "texture/dx11-txt-2d.hpp"
 #include "texture/dx11-txt-cube.hpp"
 #include "texture/dx11-txt-sampler.hpp"
@@ -360,6 +361,8 @@ void gearoenix::dx11::Engine::update()
         context->RSSetViewports(1, &main_viewport);
         context->ClearDepthStencilView(main_dsv, D3D11_CLEAR_DEPTH, 1.0f, 0);
         context->OMSetBlendState(main_bs, clear_color, 0XFFFFFFFF);
+		scene->draw_sky();
+		context->ClearDepthStencilView(main_dsv, D3D11_CLEAR_DEPTH, 1.0f, 0);
         scene->draw(shadow_txt);
     }
     physics_engine->update();
@@ -436,8 +439,10 @@ gearoenix::render::shader::Shader* gearoenix::dx11::Engine::create_shader(core::
         return new shader::ShadelessCubeMatteNonreflectiveShadowlessOpaque(this, c);
     case render::shader::Id::SHADELESS_D2_MATTE_NONREFLECTIVE_CASTER_OPAQUE:
     case render::shader::Id::SHADELESS_D2_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
-    case render::shader::Id::SHADELESS_D2_MATTE_NONREFLECTIVE_SHADOWLESS_TRANSPARENT:
-        return new shader::ShadelessD2MatteNonreflectiveShadowlessOpaque(this, c);
+	case render::shader::Id::SHADELESS_D2_MATTE_NONREFLECTIVE_SHADOWLESS_TRANSPARENT:
+		return new shader::ShadelessD2MatteNonreflectiveShadowlessOpaque(this, c);
+	case render::shader::Id::SKYBOX_BASIC:
+		return new shader::SkyboxBasic(this, c);
     default:
         UNIMPLEMENTED;
         break;
@@ -476,6 +481,8 @@ gearoenix::render::shader::Resources* gearoenix::dx11::Engine::create_shader_res
     case render::shader::Id::SHADELESS_D2_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
     case render::shader::Id::SHADELESS_D2_MATTE_NONREFLECTIVE_SHADOWLESS_TRANSPARENT:
         return new shader::ShadelessD2MatteNonreflectiveShadowlessOpaque::Resources(this, pip, u);
+	case render::shader::Id::SKYBOX_BASIC:
+		return new shader::SkyboxBasic::Resources(this, pip, u);
     default:
         UNIMPLEMENTED;
         break;
