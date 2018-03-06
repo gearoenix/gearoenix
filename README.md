@@ -1,5 +1,5 @@
 # Gearoenix Game Engine
-An in-house game engine.
+An in-house game engine that tries to be applicable for other use-cases.
 
 ## Features
 - It is cross-platform (already tested on Linux(Ubuntu, Fedora), MacOS,
@@ -11,8 +11,10 @@ An in-house game engine.
 - It has its own file format for importing scenes data in to game. This file
   format help the engine to have better performance in loading a scene and
   reduce the size of the data.
-- It has its own blender file exporter that try to force best practices in data
-  creation and have control over content creation.
+- It has its own
+  [blender file exporter](https://github.com/Hossein-Noroozpour/gearoenix-blender)
+  that try to force best practices in data creation and have control
+  over content creation.
 - Asset management that cache assets for reducing load time.
 - Supports variety of textures:
   - 2D texture
@@ -22,6 +24,8 @@ An in-house game engine.
 - Painless cross-platform mathematic structures.
 - Lighting
 - Shadowing
+- Skyboxing
+- Fast font displaying mechanism.
 - Different type of cameras: Perspective, Orthographic
 - Graphic pipeline management to cache and reduce number of switches and
   increasing performance.
@@ -50,43 +54,56 @@ debug mode of code, but still have great performance.
 - [This is Linux demo](https://hossein-noroozpour.github.io/gearoenix-static-files/linux/linux.7z)
 
 ## How to Build?
+- Star this project (:D)
+- Git clone this repository
+- Fetch its sub-modules.
+- This game engine, itself can easily added to your project and compile along
+  your game code but In some platforms it needs dependencies that you must
+  provide.
+- There is a rule that apply in overall of the engine:
+  - I always you the latest available technologies, so If you want to use it,
+    you have to be as update as possible.
+- For MacOS, iOS and Linux you need SDL2.
+  - For MacOS and iOS, you need a little knowledge of SDL2 compilation for
+    these platforms and also I have put a helper script (`ios-build.sh`),
+    this can help you a little bit.
+  - In Linux you have an easier path, only install SDL2 developer package from
+    your distributor.
+- In Linux in in addition to SDL2 you needs `clang++`.
+- In MacOS you needs XCode.
+- In Windows you need Visual Studio and full functioning Directx11 SDK.
+- For Android, Android Studio and NDK.
+- Run it!
+- There are some build scripts like `linux-build.sh` it helps you to find
+  your path.
+- However, If you had problem you can contact me.
 
-- Linux:
-  - Star this project (:D)
-  - Git clone this repository
-  - Install sdl2 development package in your Linux distribution.
-  - Open your beloved IDE, I personally use Qt Creator.
-  - Add all the gearoenix folder to your project.
-  - Add SDL2, GL and pthread support to your compiler settings.
-  - If you are building the default test of gearoenix you need a static file
-    download it from
-    [here](https://hossein-noroozpour.github.io/gearoenix-static-files/data.gx3d)
-    and place it in the directory of executable.
-  - Run it!
-
-  Or
-  - Use linux-build.sh script.
-
-
-In other platform, the build process is a little complicated, because first I
-don't have time to provide tools for it, second, gearoenix is changing a lot and
-third, it is an in-house game engine. But there are several helper scripts,
-like `ios-build.sh` and `webassembly/build.sh` but still you can not create a
-useful thing with it, because game engine have specific file format that can
-be created with my blender exporter plugin. If you desperately want to build it,
-you can contact me with email. hossein.noroozpour@gmail.com
-
-## Code Design
- - I do not use modern features of C++ unless add a great value to my work
-   because most of the new features have overhead like `shared_ptr` (runtime
-   overhead) or `auto` (compile time overhead), but actually I'm using a lot of
-   modern stuff C++ stuff in Gearoenix.
- - Compile time is important because I run the project even after a small
-   change.
- - I'm using `clang-format` with style of `WebKit` to rule all of the format
-   stuffs, the `push.sh` do this and it only run in my Linux desktop at home
-   (because of changes in different versions of `clang-format`).
- - ... (todo)
+## Design pattern
+- Code design and design patterns of the project are based on modern C++.
+- Design patterns of Gearoenix are influenced by lots several other design
+  patterns, but
+  it has its own patterns so If you want to make a change in it you must study
+  its code (and that is really easy :D).
+- In most of the time, I try to not use modern features of C++,
+  unless those feature add a great
+  **design, performance, maintainability**
+  value to my work
+  because most of the new features have overhead like `shared_ptr` (runtime
+  overhead) or `auto` (compile time overhead), but actually I'm using a lot of
+  modern C++ stuff in Gearoenix.
+- Compile time is important because I run the project even after a small
+  change and engine gonna be used with its source code.
+- I'm using `clang-format` with style of `WebKit` to rule all of the format
+  stuffs, the `push.sh` do this and it only run in my Linux desktop at home
+  (because of changes in different versions of `clang-format`).
+- Gearoenix has a monomorphism interface over system application.
+  This interface implemented for:
+  SDL2, Android NDK and Windows API.
+- There is a polymorphism interface over render engine. For example in runtime
+  based on the machine that application is running on, Gearoenix can decide to
+  use which render engine. Current implementations are:
+  GLES2, GL3, Directx11 and Vulkan(WIP)
+- More is todo.
 
 ## Development Process
 Design and decision making in development process of this project is dependent
@@ -114,5 +131,5 @@ Sorted in order of importance.
 You can do whatever you want to do with it as long as you take responsibility
 of all of
 its consequences, **But** If you used it and it was useful for you, please make
-an acknowledgment and promotion for this project and me, I'm really need that
+an acknowledgment and promotion for this project and me, I'm really need that,
 because I'm currently seeking for a job in the graphic and game-engine fields.
