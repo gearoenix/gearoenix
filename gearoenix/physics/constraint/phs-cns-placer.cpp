@@ -14,7 +14,7 @@ gearoenix::physics::constraint::Placer::Placer(system::stream::Stream* f, render
     f->read(t);
     switch (t) {
     case DOWN_MIDDLE:
-        parameters = new core::Real[5];
+        parameters.resize(5);
         // 0 -> x-middle
         // 1 -> y-down
         // 2 -> ratio
@@ -23,20 +23,21 @@ gearoenix::physics::constraint::Placer::Placer(system::stream::Stream* f, render
         f->read(parameters[2]);
         f->read(parameters[0]);
         f->read(parameters[1]);
+        parameters[3] = 2.0f;
         parameters[4] = 2.0f * (render_engine->get_system_application()->get_window_ratio() - parameters[0]);
         next_position[1] = (parameters[4] / (parameters[2] * 2.0f)) + parameters[1] - 1.0f;
         break;
     case LEFT:
-        parameters = new core::Real[1];
-        f->read(parameters[0]);
-        position[0] = 1.0f;
-        next_position[0] = render_engine->get_system_application()->get_window_ratio() - parameters[0];
-        break;
-    case RIGHT:
-        parameters = new core::Real[1];
+        parameters.resize(1);
         f->read(parameters[0]);
         position[0] = -1.0f;
         next_position[0] = parameters[0] - render_engine->get_system_application()->get_window_ratio();
+        break;
+    case RIGHT:
+        parameters.resize(1);
+        f->read(parameters[0]);
+        position[0] = 1.0f;
+        next_position[0] = render_engine->get_system_application()->get_window_ratio() - parameters[0];
         break;
     default:
         UNEXPECTED;
@@ -51,9 +52,6 @@ gearoenix::physics::constraint::Placer::Placer(system::stream::Stream* f, render
 
 gearoenix::physics::constraint::Placer::~Placer()
 {
-    if (nullptr != parameters)
-        delete[] parameters;
-    parameters = nullptr;
 }
 
 void gearoenix::physics::constraint::Placer::apply()

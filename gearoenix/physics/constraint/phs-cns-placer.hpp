@@ -20,7 +20,7 @@ namespace physics {
                 RIGHT = 8,
             } Type;
             Type t = (Type)0XFFFFFFFFFFFFFFFF;
-            core::Real* parameters = nullptr;
+            std::vector<core::Real> parameters;
             math::Vec3 position = math::Vec3(0.0f, 0.0f, 0.0f);
             math::Vec3 next_position = math::Vec3(0.0f, 0.0f, 0.0f);
             std::map<core::Id, std::shared_ptr<render::model::Model>> models;
