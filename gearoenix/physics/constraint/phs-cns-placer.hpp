@@ -16,15 +16,13 @@ namespace physics {
         private:
             typedef enum : core::Id {
                 DOWN_MIDDLE = 33,
-                UNKNOWN = 0XFFFFFFFFFFFFFFFF,
+                LEFT = 4,
+                RIGHT = 8,
             } Type;
-            Type t = UNKNOWN;
+            Type t = (Type)0XFFFFFFFFFFFFFFFF;
             core::Real* parameters = nullptr;
-            core::Real ratio = 1.0f;
-            core::Real size = 2.0f;
-            core::Real next_size;
             math::Vec3 position = math::Vec3(0.0f, 0.0f, 0.0f);
-            math::Vec3 next_position;
+            math::Vec3 next_position = math::Vec3(0.0f, 0.0f, 0.0f);
             std::map<core::Id, std::shared_ptr<render::model::Model>> models;
 
         public:

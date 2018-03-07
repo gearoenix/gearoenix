@@ -12,16 +12,31 @@ gearoenix::physics::constraint::Placer::Placer(system::stream::Stream* f, render
     : Constraint(PLACER)
 {
     f->read(t);
-    f->read(ratio);
     switch (t) {
     case DOWN_MIDDLE:
-        parameters = new core::Real[2];
+        parameters = new core::Real[5];
+        // 0 -> x-middle
+        // 1 -> y-down
+        // 2 -> ratio
+        // 3 -> size
+        // 4 -> next_size
+        f->read(parameters[2]);
         f->read(parameters[0]);
         f->read(parameters[1]);
-        next_size = 2.0f * (render_engine->get_system_application()->get_window_ratio() - parameters[0]);
-        next_position[0] = 0.0f;
-        next_position[1] = (next_size / (ratio * 2.0f)) + parameters[1] - 1.0f;
-        next_position[2] = 0.0f;
+        parameters[4] = 2.0f * (render_engine->get_system_application()->get_window_ratio() - parameters[0]);
+        next_position[1] = (parameters[4] / (parameters[2] * 2.0f)) + parameters[1] - 1.0f;
+        break;
+    case LEFT:
+        parameters = new core::Real[1];
+        f->read(parameters[0]);
+        position[0] = 1.0f;
+        next_position[0] = render_engine->get_system_application()->get_window_ratio() - parameters[0];
+        break;
+    case RIGHT:
+        parameters = new core::Real[1];
+        f->read(parameters[0]);
+        position[0] = -1.0f;
+        next_position[0] = parameters[0] - render_engine->get_system_application()->get_window_ratio();
         break;
     default:
         UNEXPECTED;
@@ -50,32 +65,46 @@ void gearoenix::physics::constraint::Placer::apply()
     case DOWN_MIDDLE: {
         for (const std::pair<core::Id, std::shared_ptr<render::model::Model>>& id_model : models)
             id_model.second->translate(-position);
-        const core::Real scale = next_size / size;
+        const core::Real scale = parameters[4] / parameters[3];
         for (const std::pair<core::Id, std::shared_ptr<render::model::Model>>& id_model : models)
             id_model.second->global_scale(scale);
         for (const std::pair<core::Id, std::shared_ptr<render::model::Model>>& id_model : models)
             id_model.second->translate(next_position);
-        position = next_position;
-        size = next_size;
+        parameters[3] = parameters[4];
+        break;
+    }
+    case RIGHT:
+    case LEFT: {
+        const math::Vec3 trn = next_position - position;
+        for (const std::pair<core::Id, std::shared_ptr<render::model::Model>>& id_model : models)
+            id_model.second->translate(trn);
         break;
     }
     default:
         UNEXPECTED;
     }
+    position = next_position;
 }
 
 void gearoenix::physics::constraint::Placer::on_event(const core::event::Event& e)
 {
+    if (e.get_type() != core::event::Event::From::WINDOW_RESIZE)
+        return;
+    const core::event::WindowResize& we = e.to_window_resize();
+    applied = false;
+    const core::Real screen_ratio = we.get_current_width() / we.get_current_height();
     switch (t) {
     case DOWN_MIDDLE: {
-        if (e.get_type() == core::event::Event::From::WINDOW_RESIZE) {
-            const core::event::WindowResize& we = e.to_window_resize();
-            next_size = 2.0f * ((we.get_current_width() / we.get_current_height()) - parameters[0]);
-            next_position[1] = (next_size / (ratio * 2.0f)) + parameters[1] - 1.0f;
-            applied = false;
-        }
+        parameters[4] = 2.0f * (screen_ratio - parameters[0]);
+        next_position[1] = (parameters[4] / (parameters[2] * 2.0f)) + parameters[1] - 1.0f;
         break;
     }
+    case LEFT:
+        next_position[0] = parameters[0] - screen_ratio;
+        break;
+    case RIGHT:
+        next_position[0] = screen_ratio - parameters[0];
+        break;
     default:
         UNEXPECTED;
     }
