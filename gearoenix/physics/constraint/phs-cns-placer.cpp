@@ -66,13 +66,13 @@ void gearoenix::physics::constraint::Placer::apply()
 
 void gearoenix::physics::constraint::Placer::on_event(const core::event::Event& e)
 {
-    applied = false;
     switch (t) {
     case DOWN_MIDDLE: {
         if (e.get_type() == core::event::Event::From::WINDOW_RESIZE) {
             const core::event::WindowResize& we = e.to_window_resize();
             next_size = 2.0f * ((we.get_current_width() / we.get_current_height()) - parameters[0]);
             next_position[1] = (next_size / (ratio * 2.0f)) + parameters[1] - 1.0f;
+            applied = false;
         }
         break;
     }
