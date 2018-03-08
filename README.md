@@ -61,7 +61,7 @@ debug mode of code, but still have great performance.
   your game code but In some platforms it needs dependencies that you must
   provide.
 - There is a rule that apply in overall of the engine:
-  - I always you the latest available technologies, so If you want to use it,
+  - I always use the latest available technologies, so If you want to use it,
     you have to be as update as possible.
 - For MacOS, iOS and Linux you need SDL2.
   - For MacOS and iOS, you need a little knowledge of SDL2 compilation for
@@ -76,7 +76,7 @@ debug mode of code, but still have great performance.
 - Run it!
 - There are some build scripts like `linux-build.sh` it helps you to find
   your path.
-- However, If you had problem you can contact me.
+- However, If you have problem with its build you can contact me.
 
 ## Design pattern
 - Code design and design patterns of the project are based on modern C++.
