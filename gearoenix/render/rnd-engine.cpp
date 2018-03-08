@@ -201,6 +201,22 @@ void gearoenix::render::Engine::load_scene(core::Id scene_id, std::function<void
 #endif
 }
 
+void gearoenix::render::Engine::delete_scene(core::Id scene_id)
+{
+#ifdef THREAD_SUPPORTED
+    loaded_scenes_mutex->lock();
+#endif
+    auto search = loaded_scenes.find(scene_id);
+#ifdef DEBUG_MODE
+    if (loaded_scenes.end() == search)
+        UNEXPECTED;
+#endif
+    loaded_scenes.erase(search);
+#ifdef THREAD_SUPPORTED
+    loaded_scenes_mutex->release();
+#endif
+}
+
 gearoenix::physics::Engine* gearoenix::render::Engine::get_physics_engine()
 {
     return physics_engine;

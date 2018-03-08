@@ -3,6 +3,7 @@
 #include "../core/event/cr-ev-bt-mouse.hpp"
 #include "../core/event/cr-ev-mv-mouse.hpp"
 #include "../core/event/cr-ev-sys-system.hpp"
+#include "../core/event/cr-ev-ui-ui.hpp"
 #include "../render/camera/rnd-cmr-camera.hpp"
 #include "../render/rnd-engine.hpp"
 #include "../render/scene/rnd-scn-scene.hpp"
@@ -86,6 +87,21 @@ void TestApp::on_event(const gearoenix::core::event::Event& e)
         default:
             break;
         }
+        break;
+    }
+    case gearoenix::core::event::Event::From::UI: {
+        const gearoenix::core::event::ui::Ui& ue = e.to_ui();
+        if (ue.get_action() == gearoenix::core::event::ui::Ui::ActionType::CLICKED) {
+            if (ue.get_widget() == 18) {
+                rndeng->load_scene(0, [this]() -> void {
+                    cam = rndeng->get_scene(0)->get_current_camera();
+                    rndeng->delete_scene(1);
+                    rndeng->delete_scene(2);
+                });
+                //rndeng->load_scene(1, [this]() -> void {});
+            }
+        }
+        break;
     }
     default:
         break;

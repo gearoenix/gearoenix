@@ -107,6 +107,7 @@ namespace render {
         const std::shared_ptr<scene::Scene>& get_scene(core::Id scene_id) const;
         const std::map<core::Id, std::shared_ptr<scene::Scene>>& get_all_scenes() const;
         void load_scene(core::Id scene_id, std::function<void()> on_load);
+        void delete_scene(core::Id scene_id);
         physics::Engine* get_physics_engine();
     };
 }
