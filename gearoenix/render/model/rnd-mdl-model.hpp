@@ -58,6 +58,8 @@ namespace render {
             bool is_in_camera = false;
             bool changed = true;
             //std::mutex locker;
+            bool is_rigid_body;
+            bool is_dynamic_rigid_body;
             // be careful about scaling because it gonna scale radius too.
             math::Mat4x4 m;
             bool needs_mvp = false;

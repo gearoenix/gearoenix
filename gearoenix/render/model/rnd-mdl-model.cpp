@@ -29,6 +29,11 @@ gearoenix::render::model::Model::Model(ModelType t, system::stream::Stream* f, E
     f->read(model_children);
     std::vector<core::Id> mesh_ids;
     f->read(mesh_ids);
+    is_rigid_body = f->read_bool();
+    if (is_rigid_body)
+        is_dynamic_rigid_body = f->read_bool();
+    else
+        is_dynamic_rigid_body = false;
     occrds = GXMAX(occrdss[0], occrdss[1]);
     occrds = GXMAX(occrds, occrdss[2]);
     core::Count mesh_count = mesh_ids.size();
