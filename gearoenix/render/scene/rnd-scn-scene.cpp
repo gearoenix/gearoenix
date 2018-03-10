@@ -62,6 +62,16 @@ gearoenix::render::scene::Scene::Scene(SceneType t, system::stream::Stream* f, E
     const core::Id skybox_id = has_skybox ? f->read<core::Id>() : 0;
     std::vector<core::Id> constraint_ids;
     f->read(constraint_ids);
+    const bool has_griding = f->read_bool();
+    const core::Real up_bound = has_griding ? f->read<core::Real>() : 0.0f;
+    const core::Real down_bound = has_griding ? f->read<core::Real>() : 0.0f;
+    const core::Real left_bound = has_griding ? f->read<core::Real>() : 0.0f;
+    const core::Real right_bound = has_griding ? f->read<core::Real>() : 0.0f;
+    const core::Real front_bound = has_griding ? f->read<core::Real>() : 0.0f;
+    const core::Real back_bound = has_griding ? f->read<core::Real>() : 0.0f;
+    const std::uint16_t grid_x_count = has_griding ? f->read<std::uint16_t>() : 0;
+    const std::uint16_t grid_y_count = has_griding ? f->read<std::uint16_t>() : 0;
+    const std::uint16_t grid_z_count = has_griding ? f->read<std::uint16_t>() : 0;
     for (const core::Id i : camera_ids)
         cameras[i] = amgr->get_camera(i);
     for (const core::Id i : audio_ids)
