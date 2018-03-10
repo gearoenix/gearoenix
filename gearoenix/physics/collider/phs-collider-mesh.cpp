@@ -8,13 +8,11 @@ gearoenix::physics::collider::Mesh::Mesh(system::stream::Stream* in)
     : Collider(Type::MESH)
 {
     const core::Count cnt = in->read<core::Count>();
-    ps.resize(cnt);
-    ts.resize(cnt);
-    for (unsigned int i = 0; i < cnt; ++i) {
-        for (unsigned int j = 0; j < 3; ++j) {
-            ps[i].p[j].read(in);
-        }
-    }
+    vertices.resize(cnt);
+    for (core::Count i = 0; i < cnt; ++i)
+        vertices[i].read(in);
+    in->read(indices);
+    ts.resize(indices.size());
 }
 
 gearoenix::physics::collider::Mesh::~Mesh()
@@ -23,12 +21,19 @@ gearoenix::physics::collider::Mesh::~Mesh()
 
 void gearoenix::physics::collider::Mesh::update(const math::Mat4x4& m)
 {
-    box.reset(ps[0].p[0]);
-    const size_t cnt = ps.size();
-    for (size_t i = 0; i < cnt; ++i) {
-        math::Vec3 p1 = m * (ps[i].p[0]);
-        math::Vec3 p2 = m * (ps[i].p[1]);
-        math::Vec3 p3 = m * (ps[i].p[2]);
+    const size_t vscnt = vertices.size();
+    std::vector<math::Vec3> transformed_vertices(vscnt);
+    for (size_t i = 0; i < vscnt; ++i) {
+        transformed_vertices[i] = m * vertices[i];
+    }
+    box.reset(transformed_vertices[0]);
+    const size_t cnt = indices.size();
+    for (std::uint16_t i = 0; i < cnt; ++i) {
+        const math::Vec3& p1 = transformed_vertices[indices[i]];
+        ++i;
+        const math::Vec3& p2 = transformed_vertices[indices[i]];
+        ++i;
+        const math::Vec3& p3 = transformed_vertices[indices[i]];
         box.put(p1);
         box.put(p2);
         box.put(p3);

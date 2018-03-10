@@ -14,10 +14,8 @@ namespace physics {
     namespace collider {
         class Mesh : public Collider {
         private:
-            typedef struct {
-                math::Vec3 p[3];
-            } Triangle;
-            std::vector<Triangle> ps;
+            std::vector<std::uint32_t> indices;
+            std::vector<math::Vec3> vertices;
             std::vector<math::Triangle3> ts;
             math::Aabb3 box;
 
