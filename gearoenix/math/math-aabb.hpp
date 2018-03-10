@@ -14,6 +14,7 @@ namespace math {
         void reset(const Vec3& p);
         void put(const Vec3& p);
         bool test(const Ray3& r, core::Real& tmin) const;
+        bool test(const Aabb3& o, Aabb3& intersection) const;
     };
 }
 }

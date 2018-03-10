@@ -56,3 +56,24 @@ bool gearoenix::math::Aabb3::test(const Ray3& ray, core::Real& tmin_result) cons
 
     return false;
 }
+
+bool gearoenix::math::Aabb3::test(const Aabb3& o, Aabb3& intersection) const
+{
+    int equals = 0;
+    for (int i = 0; i < 3; ++i) {
+        const core::Real eb = b[i];
+        const core::Real oeb = o.b[i];
+        const core::Real ieb = GXMAX(eb, oeb);
+        const core::Real ea = a[i];
+        const core::Real oea = o.a[i];
+        const core::Real iea = GXMIN(ea, oea);
+        intersection.a[i] = iea;
+        intersection.b[i] = ieb;
+        if (ieb == iea) {
+            ++equals;
+        } else if (ieb > iea) {
+            return false;
+        }
+    }
+    return equals < 3;
+}
