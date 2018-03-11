@@ -68,6 +68,16 @@ void TestApp::on_event(const gearoenix::core::event::Event& e)
             }
             break;
         }
+		case gearoenix::core::event::button::Button::KEYBOARD:
+			switch (be.get_key())
+			{
+			case gearoenix::core::event::button::Button::UP:
+				UNEXPECTED;
+				break;
+			default:
+				break;
+			}
+			break;
         default:
             break;
         }
@@ -94,9 +104,12 @@ void TestApp::on_event(const gearoenix::core::event::Event& e)
         if (ue.get_action() == gearoenix::core::event::ui::Ui::ActionType::CLICKED) {
             if (ue.get_widget() == 18) {
                 rndeng->load_scene(0, [this]() -> void {
-                    cam = rndeng->get_scene(0)->get_current_camera();
+					const auto& scene = rndeng->get_scene(0);
+                    cam = scene->get_current_camera();
+					scene->add_model(0);
                     rndeng->delete_scene(1);
                     rndeng->delete_scene(2);
+					state = State::GAME;
                 });
                 //rndeng->load_scene(1, [this]() -> void {});
             }

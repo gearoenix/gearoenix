@@ -5,6 +5,7 @@
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../core/cr-application.hpp"
 #include "../../core/cr-static.hpp"
+#include "../../core/event/cr-ev-bt-keyboard.hpp"
 #include "../../core/event/cr-ev-bt-mouse.hpp"
 #include "../../core/event/cr-ev-mv-mouse.hpp"
 #include "../../core/event/cr-ev-window-resize.hpp"
@@ -41,6 +42,7 @@ LRESULT CALLBACK gearoenix::system::Application::wnd_proc(HWND hwnd, UINT umessa
 
 LRESULT CALLBACK gearoenix::system::Application::handler(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam)
 {
+	core::event::Event *event = nullptr;
     switch (umessage) {
     case WM_CLOSE:
         /// TODO: proper termination
@@ -53,6 +55,12 @@ LRESULT CALLBACK gearoenix::system::Application::handler(HWND hwnd, UINT umessag
         break;
     case WM_KEYDOWN:
         switch (wparam) {
+		case VK_UP: {
+			event = new core::event::button::Keyboard(
+				core::event::button::Button::KeyType::UP, 
+				core::event::button::Button::ActionType::PRESS);
+			break;
+		}
         case 0x50: /// p
             /// TODO pause
             break;
@@ -197,6 +205,11 @@ LRESULT CALLBACK gearoenix::system::Application::handler(HWND hwnd, UINT umessag
         resizing = false;
         break;
     }
+	if (event != nullptr) {
+		render_engine->on_event(*event);
+		core_app->on_event(*event);
+		delete event;
+	}
     return (DefWindowProc(hwnd, umessage, wparam, lparam));
 }
 

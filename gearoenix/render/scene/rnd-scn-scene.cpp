@@ -268,6 +268,9 @@ void gearoenix::render::scene::Scene::add_model(core::Id model_id, core::EndCall
 		model_id,
 		core::EndCaller<model::Model>(
 			[c, model_id, this](std::shared_ptr<model::Model> mdl) -> void {
+#ifdef DEBUG_MODE
+		if (root_models.find(model_id) != root_models.end()) UNEXPECTED;
+#endif
 		root_models[model_id] = mdl;
 		add_model(model_id, mdl);
 	}));

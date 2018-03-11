@@ -16,8 +16,14 @@ private:
     gearoenix::render::Engine* rndeng;
     gearoenix::render::camera::Camera* cam;
     bool left_mouse_down = false;
-    unsigned int scene_id = 0;
-    unsigned int gui_scene_id = 1;
+	class State {
+	public:
+		typedef enum {
+			GARAGE,
+			GAME,
+		} Type;
+	};
+	State::Type state = State::GARAGE;
 
 public:
     TestApp(gearoenix::system::Application* sys_app);
