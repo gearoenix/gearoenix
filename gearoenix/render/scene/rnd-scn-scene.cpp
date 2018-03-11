@@ -79,13 +79,7 @@ gearoenix::render::scene::Scene::Scene(SceneType t, system::stream::Stream* f, E
     for (const core::Id i : light_ids)
         lights[i] = amgr->get_light(i);
     for (const core::Id i : model_ids) {
-        amgr->get_model(
-            i,
-            core::EndCaller<model::Model>(
-                [c, i, this](std::shared_ptr<model::Model> mdl) -> void {
-                    root_models[i] = mdl;
-                    add_model(i, mdl);
-                }));
+		add_model(i, c);
     }
     for (const core::Id cons_id : constraint_ids) {
         root_constraints[cons_id] = amgr->get_constriants(
@@ -265,4 +259,16 @@ void gearoenix::render::scene::Scene::add_mesh(core::Id mesh_id, core::Id model_
     } else {
         opaque_models[mat_id][model_id].insert(mesh_id);
     }
+}
+
+void gearoenix::render::scene::Scene::add_model(core::Id model_id, core::EndCaller<core::EndCallerIgnore> c)
+{
+	core::asset::Manager* amgr = render_engine->get_system_application()->get_asset_manager();
+	amgr->get_model(
+		model_id,
+		core::EndCaller<model::Model>(
+			[c, model_id, this](std::shared_ptr<model::Model> mdl) -> void {
+		root_models[model_id] = mdl;
+		add_model(model_id, mdl);
+	}));
 }
