@@ -2,6 +2,7 @@
 #ifdef USE_SDL
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../core/cr-application.hpp"
+#include "../../core/event/cr-ev-bt-keyboard.hpp"
 #include "../../core/event/cr-ev-bt-mouse.hpp"
 #include "../../core/event/cr-ev-event.hpp"
 #include "../../core/event/cr-ev-mv-mouse.hpp"
@@ -124,16 +125,26 @@ void gearoenix::system::Application::create_context()
     GXLOGF("No usable API find in the host machine.");
 }
 
-int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_Event* event)
+int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_Event* e)
 {
     // It's gonna implement whenever needed and as much as needed.
     Application* o = reinterpret_cast<Application*>(user_data);
-    switch (event->type) {
+    core::event::Event* event = nullptr;
+    switch (e->type) {
     case SDL_APP_WILLENTERBACKGROUND:
         o->running = false;
         break;
     case SDL_KEYDOWN:
-        switch (event->key.keysym.sym) {
+        switch (e->key.keysym.sym) {
+        case SDLK_LEFT:
+            event = new core::event::button::Keyboard(core::event::button::Keyboard::LEFT, core::event::button::Keyboard::PRESS);
+            break;
+        case SDLK_RIGHT:
+            event = new core::event::button::Keyboard(core::event::button::Keyboard::RIGHT, core::event::button::Keyboard::PRESS);
+            break;
+        case SDLK_UP:
+            event = new core::event::button::Keyboard(core::event::button::Keyboard::UP, core::event::button::Keyboard::PRESS);
+            break;
         case SDLK_ESCAPE:
             o->running = false;
             break;
@@ -146,11 +157,9 @@ int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_
         // o->core_app->on_scroll((core::Real)event->wheel.y);
         break;
     case SDL_MOUSEMOTION: {
-        const core::Real x = o->convert_x_to_ratio(event->button.x);
-        const core::Real y = o->convert_y_to_ratio(event->button.y);
-        core::event::movement::Mouse e(x, y, o->pre_x, o->pre_y);
-        o->render_engine->on_event(e);
-        o->core_app->on_event(e);
+        const core::Real x = o->convert_x_to_ratio(e->button.x);
+        const core::Real y = o->convert_y_to_ratio(e->button.y);
+        event = new core::event::movement::Mouse(x, y, o->pre_x, o->pre_y);
         o->pre_x = x;
         o->pre_y = y;
         break;
@@ -158,7 +167,7 @@ int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_
     case SDL_MOUSEBUTTONUP:
     case SDL_MOUSEBUTTONDOWN: {
         core::event::button::Button::ActionType a = core::event::button::Button::ActionType::PRESS;
-        switch (event->type) {
+        switch (e->type) {
         case SDL_MOUSEBUTTONUP:
             a = core::event::button::Button::ActionType::RELEASE;
             break;
@@ -166,7 +175,7 @@ int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_
             break;
         }
         core::event::button::Button::KeyType k = core::event::button::Button::KeyType::LEFT;
-        switch (event->button.button) {
+        switch (e->button.button) {
         case SDL_BUTTON_RIGHT:
             k = core::event::button::Button::KeyType::RIGHT;
             break;
@@ -176,40 +185,40 @@ int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_
         default:
             break;
         }
-        const core::Real x = o->convert_x_to_ratio(event->button.x);
-        const core::Real y = o->convert_y_to_ratio(event->button.y);
-        core::event::button::Mouse e(k, a, x, y);
-        o->render_engine->on_event(e);
-        o->core_app->on_event(e);
+        const core::Real x = o->convert_x_to_ratio(e->button.x);
+        const core::Real y = o->convert_y_to_ratio(e->button.y);
+        event = new core::event::button::Mouse(k, a, x, y);
         break;
     }
     case SDL_MULTIGESTURE:
-        if (event->mgesture.dTheta > rotate_epsilon || event->mgesture.dTheta < -rotate_epsilon) {
+        if (e->mgesture.dTheta > rotate_epsilon || e->mgesture.dTheta < -rotate_epsilon) {
             // o->core_app->on_rotate(event->mgesture.dTheta);
-        } else if (event->mgesture.dDist > zoom_epsilon || event->mgesture.dDist < -zoom_epsilon) {
+        } else if (e->mgesture.dDist > zoom_epsilon || e->mgesture.dDist < -zoom_epsilon) {
             // o->core_app->on_zoom(event->mgesture.dDist);
         }
         break;
     case SDL_WINDOWEVENT:
-        switch (event->window.event) {
-        case SDL_WINDOWEVENT_RESIZED: {
-            core::event::WindowResize e(o->win_width, o->win_height, event->window.data1, event->window.data2);
-            o->win_width = event->window.data1;
-            o->win_height = event->window.data2;
+        switch (e->window.event) {
+        case SDL_WINDOWEVENT_RESIZED:
+            event = new core::event::WindowResize(o->win_width, o->win_height, e->window.data1, e->window.data2);
+            o->win_width = e->window.data1;
+            o->win_height = e->window.data2;
             o->screen_ratio = (core::Real)o->win_width / (core::Real)o->win_height;
             o->half_height_inversed = 2.0f / (core::Real)o->win_height;
-            o->render_engine->on_event(e);
-            o->core_app->on_event(e);
             break;
-        }
         default:
             TODO;
             break;
         }
         break;
     default:
-        GXLOGE("Unhandled event " << event->type);
+        GXLOGE("Unhandled event " << e->type);
         break;
+    }
+    if (event != nullptr) {
+        o->render_engine->on_event(*event);
+        o->core_app->on_event(*event);
+        delete event;
     }
     return 1;
 }

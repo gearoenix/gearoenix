@@ -17,7 +17,8 @@ gearoenix::physics::animation::Animation::Animation(Type t, const std::function<
 
 gearoenix::physics::animation::Animation::~Animation()
 {
-    on_delete();
+    if (!terminated)
+        on_delete();
 }
 
 void gearoenix::physics::animation::Animation::set_start(const std::chrono::system_clock::time_point& t)
@@ -56,6 +57,8 @@ bool gearoenix::physics::animation::Animation::apply(
     const std::chrono::system_clock::time_point& now,
     const core::Real delta_millisecond)
 {
+    if (terminated)
+        return true;
     action(std::chrono::duration_cast<std::chrono::duration<core::Real>>(now - start).count(), delta_millisecond);
     return false;
 }
@@ -78,4 +81,9 @@ bool gearoenix::physics::animation::Animation::is_ended() const
 void gearoenix::physics::animation::Animation::set_on_delete(std::function<void()> f)
 {
     on_delete = f;
+}
+
+void gearoenix::physics::animation::Animation::terminate()
+{
+    terminated = true;
 }

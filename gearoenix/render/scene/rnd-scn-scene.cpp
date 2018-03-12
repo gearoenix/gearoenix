@@ -79,7 +79,7 @@ gearoenix::render::scene::Scene::Scene(SceneType t, system::stream::Stream* f, E
     for (const core::Id i : light_ids)
         lights[i] = amgr->get_light(i);
     for (const core::Id i : model_ids) {
-		add_model(i, c);
+        add_model(i, c);
     }
     for (const core::Id cons_id : constraint_ids) {
         root_constraints[cons_id] = amgr->get_constriants(
@@ -263,15 +263,28 @@ void gearoenix::render::scene::Scene::add_mesh(core::Id mesh_id, core::Id model_
 
 void gearoenix::render::scene::Scene::add_model(core::Id model_id, core::EndCaller<core::EndCallerIgnore> c)
 {
-	core::asset::Manager* amgr = render_engine->get_system_application()->get_asset_manager();
-	amgr->get_model(
-		model_id,
-		core::EndCaller<model::Model>(
-			[c, model_id, this](std::shared_ptr<model::Model> mdl) -> void {
+    core::asset::Manager* amgr = render_engine->get_system_application()->get_asset_manager();
+    amgr->get_model(
+        model_id,
+        core::EndCaller<model::Model>(
+            [c, model_id, this](std::shared_ptr<model::Model> mdl) -> void {
 #ifdef DEBUG_MODE
-		if (root_models.find(model_id) != root_models.end()) UNEXPECTED;
+                if (root_models.find(model_id) != root_models.end())
+                    UNEXPECTED;
 #endif
-		root_models[model_id] = mdl;
-		add_model(model_id, mdl);
-	}));
+                root_models[model_id] = mdl;
+                add_model(model_id, mdl);
+            }));
+}
+
+std::weak_ptr<gearoenix::render::model::Model> gearoenix::render::scene::Scene::get_model(core::Id model_id)
+{
+#ifdef DEBUG_MODE
+    std::map<core::Id, std::weak_ptr<model::Model>>::iterator search = all_models.find(model_id);
+    if (all_models.end() == search)
+        UNEXPECTED;
+    return search->second;
+#else
+    return all_models[model_id];
+#endif
 }

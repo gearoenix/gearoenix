@@ -34,6 +34,7 @@ namespace render {
             volatile core::Real current_size = 1.0f;
             EffectState::Type effect_state = EffectState::NO_ANIM;
             std::shared_ptr<physics::animation::Animation> anim;
+            std::weak_ptr<physics::animation::Animation> latest_anim;
             void press_effect();
             void release_effect();
             void cancel_effect();

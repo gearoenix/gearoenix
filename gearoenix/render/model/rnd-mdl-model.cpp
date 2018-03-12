@@ -22,6 +22,7 @@ gearoenix::render::model::Model::Model(ModelType t, system::stream::Stream* f, E
 {
     //std::lock_guard<std::mutex> lg(locker);
     m.read(f);
+    initialize_axis(m);
     occrdss.read(f);
     occloc.read(f);
     collider = physics::collider::Collider::read(f);
@@ -96,8 +97,8 @@ void gearoenix::render::model::Model::commit(const scene::Scene* s)
     if (changed) {
         if (nullptr != collider) {
             collider->update(m);
-            moccloc = m * occloc;
         }
+        moccloc = m * occloc;
     }
     if (cam->get_changed() || changed) {
         is_in_camera = cam->in_sight(moccloc, occrds);
@@ -276,4 +277,49 @@ void gearoenix::render::model::Model::pop_state()
 gearoenix::core::Real gearoenix::render::model::Model::get_distance_from_camera() const
 {
     return distcam;
+}
+
+void gearoenix::render::model::Model::global_rotate(const core::Real d, const math::Vec3& axis)
+{
+    math::Mat4x4 r;
+    Transferable::local_rotate(d, axis, r);
+    m = r * m;
+    for (std::pair<const core::Id, std::shared_ptr<Model>>& pmdl : children) {
+        pmdl.second->global_rotate(r);
+    }
+    changed = true;
+}
+
+void gearoenix::render::model::Model::global_rotate(const math::Mat4x4& rm)
+{
+    Transferable::global_rotate(rm);
+    m = rm * m;
+    for (std::pair<const core::Id, std::shared_ptr<Model>>& pmdl : children) {
+        pmdl.second->global_rotate(rm);
+    }
+    changed = true;
+}
+
+void gearoenix::render::model::Model::local_x_rotate(const core::Real)
+{
+    UNIMPLEMENTED;
+}
+
+void gearoenix::render::model::Model::local_y_rotate(const core::Real)
+{
+    UNIMPLEMENTED;
+}
+
+void gearoenix::render::model::Model::local_z_rotate(const core::Real d)
+{
+    math::Mat4x4 r;
+    Transferable::local_z_rotate(d, r);
+    m = m * r;
+    math::Vec3 l;
+    m.get_location(l);
+    for (std::pair<const core::Id, std::shared_ptr<Model>>& pmdl : children) {
+        physics::Transferable* cmdl = pmdl.second.get();
+        cmdl->global_rotate(d, z_axis, l);
+    }
+    changed = true;
 }

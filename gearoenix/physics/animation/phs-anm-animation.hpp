@@ -24,6 +24,7 @@ namespace physics {
             std::function<void(core::Real, core::Real)> action;
             std::function<void()> on_delete;
             bool ended = false;
+            bool terminated = false;
             std::chrono::system_clock::time_point start;
             std::chrono::system_clock::time_point::duration duration;
             std::chrono::system_clock::time_point end;
@@ -41,6 +42,7 @@ namespace physics {
             Type get_type() const;
             bool is_ended() const;
             void set_on_delete(std::function<void()> f);
+            void terminate();
         };
     }
 }

@@ -5,6 +5,7 @@
 #include "../../core/cr-types.hpp"
 #include "../../math/math-matrix.hpp"
 #include "../../math/math-vector.hpp"
+#include "../../physics/phs-transformable.hpp"
 #include <map>
 #include <memory>
 #include <mutex>
@@ -40,7 +41,7 @@ namespace render {
     }
     namespace model {
         class Uniform;
-        class Model : public core::asset::Asset {
+        class Model : public core::asset::Asset, public physics::Transferable {
             friend class physics::Kernel;
 
         public:
@@ -89,25 +90,31 @@ namespace render {
         public:
             static Model* read(system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
             virtual ~Model();
+            ModelType get_type() const;
             void commit(const scene::Scene* s);
             void draw(core::Id mesh_id, texture::Texture2D* shadow_texture);
             void cast_shadow(core::Id mesh_id);
+            void push_state();
+            void pop_state();
             const std::map<core::Id, std::shared_ptr<Model>>& get_children() const;
             const std::map<core::Id, std::tuple<std::shared_ptr<mesh::Mesh>, std::shared_ptr<material::Material>, std::shared_ptr<material::Depth>>>& get_meshes() const;
             const math::Mat4x4& get_m() const;
             const math::Mat4x4& get_mvp() const;
             const math::Mat4x4& get_sun_mvp() const;
+            const physics::collider::Collider* get_collider() const;
+            bool hit(const math::Ray3& r, core::Real& distance_from_origin);
+            core::Real get_distance_from_camera() const;
+            // Transformable---------------------------------------------------------
             void get_location(math::Vec3& l) const;
             void set_location(const math::Vec3& l);
             void translate(const math::Vec3& t);
+            void global_rotate(const core::Real d, const math::Vec3& axis);
+            void global_rotate(const math::Mat4x4& rm);
+            void local_x_rotate(const core::Real d);
+            void local_y_rotate(const core::Real d);
+            void local_z_rotate(const core::Real d);
             void global_scale(const core::Real s);
             void local_scale(const core::Real s);
-            ModelType get_type() const;
-            bool hit(const math::Ray3& r, core::Real& distance_from_origin);
-            const physics::collider::Collider* get_collider() const;
-            void push_state();
-            void pop_state();
-            core::Real get_distance_from_camera() const;
         };
     }
 }

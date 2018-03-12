@@ -8,6 +8,9 @@ namespace render {
     namespace camera {
         class Camera;
     }
+    namespace model {
+        class Model;
+    }
 }
 }
 
@@ -15,15 +18,16 @@ class TestApp : public gearoenix::core::Application {
 private:
     gearoenix::render::Engine* rndeng;
     gearoenix::render::camera::Camera* cam;
+    gearoenix::render::model::Model* mdl;
     bool left_mouse_down = false;
-	class State {
-	public:
-		typedef enum {
-			GARAGE,
-			GAME,
-		} Type;
-	};
-	State::Type state = State::GARAGE;
+    class State {
+    public:
+        typedef enum {
+            GARAGE,
+            GAME,
+        } Type;
+    };
+    State::Type state = State::GARAGE;
 
 public:
     TestApp(gearoenix::system::Application* sys_app);

@@ -60,6 +60,7 @@ void gearoenix::render::widget::Button::press_effect()
                             effect_state = EffectState::NO_ANIM;
                         }));
                 phseng->add_animation(anim2);
+                latest_anim = anim2;
             });
         physics::Engine* phseng = render_engine->get_physics_engine();
         phseng->add_animation(anim);
@@ -117,4 +118,14 @@ gearoenix::render::widget::Button::Button(system::stream::Stream* f, Engine* e, 
 {
 }
 
-gearoenix::render::widget::Button::~Button() {}
+gearoenix::render::widget::Button::~Button()
+{
+    if (anim != nullptr) {
+        anim->terminate();
+        anim = nullptr;
+    }
+    if (anim = latest_anim.lock()) {
+        anim->terminate();
+        anim = nullptr;
+    }
+}

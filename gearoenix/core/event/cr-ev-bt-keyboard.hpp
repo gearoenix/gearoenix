@@ -9,9 +9,8 @@ namespace core {
         namespace button {
             class Keyboard : public Button {
             private:
-
             public:
-				Keyboard(KeyType k, ActionType a);
+                Keyboard(KeyType k, ActionType a);
                 virtual ~Keyboard();
             };
         }
