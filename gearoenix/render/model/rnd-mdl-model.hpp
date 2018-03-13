@@ -57,7 +57,6 @@ namespace render {
             bool has_transparent = false;
             bool is_in_sun = false;
             bool is_in_camera = false;
-            bool changed = true;
             //std::mutex locker;
             bool is_rigid_body;
             bool is_dynamic_rigid_body;
@@ -110,6 +109,7 @@ namespace render {
             void translate(const math::Vec3& t);
             void global_rotate(const core::Real d, const math::Vec3& axis);
             void global_rotate(const math::Mat4x4& rm);
+            void local_rotate(const core::Real d, const math::Vec3& axis);
             void local_x_rotate(const core::Real d);
             void local_y_rotate(const core::Real d);
             void local_z_rotate(const core::Real d);

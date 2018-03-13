@@ -70,7 +70,7 @@ void gearoenix::render::material::DirectionalD2SpeculatedNonreflectiveShadowless
     const camera::Camera* cam = s->get_current_camera();
     const light::Sun* sun = s->get_sun();
     u.ambl_color = s->get_ambient_light();
-    u.eye = cam->get_location();
+    cam->get_location(u.eye);
     u.m = m->get_m();
     u.vp = cam->get_view_projection();
     u.sun = sun->get_direction();

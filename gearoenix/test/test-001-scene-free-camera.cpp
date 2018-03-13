@@ -18,7 +18,7 @@ TestApp::TestApp(gearoenix::system::Application* sys_app)
     rndeng->load_scene(1, [this]() -> void {
         const auto& scene = rndeng->get_scene(1);
         cam = scene->get_current_camera();
-        mdl = scene->get_model(0).lock().get();
+        mdl = scene->get_model(1).lock().get();
     });
     rndeng->load_scene(2, [this]() -> void {});
 }
@@ -40,7 +40,6 @@ void TestApp::on_event(const gearoenix::core::event::Event& e)
                 cam = rndeng->get_scene(0)->get_current_camera();
                 rndeng->load_scene(1, [this]() -> void {});
             });
-
             break;
         default:
             break;
@@ -97,8 +96,8 @@ void TestApp::on_event(const gearoenix::core::event::Event& e)
         case gearoenix::core::event::movement::Movement::MOUSE: {
             const gearoenix::core::event::movement::Mouse& mme = me.to_mouse();
             if (left_mouse_down) {
-                cam->rotate_local_x(mme.get_dy() * 0.1f);
-                cam->rotate_global_z(mme.get_dx() * 0.1f);
+                cam->local_x_rotate(mme.get_dy() * 0.1f);
+                cam->global_rotate(mme.get_dx() * 0.1f, gearoenix::math::Vec3::Z);
             }
             break;
         }
@@ -110,11 +109,11 @@ void TestApp::on_event(const gearoenix::core::event::Event& e)
     case gearoenix::core::event::Event::From::UI: {
         const gearoenix::core::event::ui::Ui& ue = e.to_ui();
         if (ue.get_action() == gearoenix::core::event::ui::Ui::ActionType::CLICKED) {
-            if (ue.get_widget() == 18) {
+            if (ue.get_widget() == 19) {
                 rndeng->load_scene(0, [this]() -> void {
                     const auto& scene = rndeng->get_scene(0);
                     cam = scene->get_current_camera();
-                    scene->add_model(0);
+                    scene->add_model(1);
                     rndeng->delete_scene(1);
                     rndeng->delete_scene(2);
                     state = State::GAME;

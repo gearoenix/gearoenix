@@ -65,7 +65,9 @@ bool gearoenix::render::material::SkyboxBasic::needs_dbm() const
 void gearoenix::render::material::SkyboxBasic::update(const scene::Scene* s, const model::Model*)
 {
     const camera::Camera* cam = s->get_current_camera();
-    u.vp = cam->get_view_projection() * math::Mat4x4::translator(cam->get_location());
+    math::Vec3 l;
+    cam->get_location(l);
+    u.vp = cam->get_view_projection() * math::Mat4x4::translator(l);
 }
 
 void gearoenix::render::material::SkyboxBasic::bind(texture::Texture2D*)

@@ -6,6 +6,7 @@ namespace physics {
     class Transferable {
     private:
     protected:
+        bool transformed = true;
         math::Vec3 x_axis, y_axis, z_axis;
         void local_x_rotate(const core::Real d, math::Mat4x4& rm);
         void local_y_rotate(const core::Real d, math::Mat4x4& rm);
@@ -16,6 +17,11 @@ namespace physics {
     public:
         Transferable();
         virtual ~Transferable();
+        const math::Vec3& get_x_axis() const;
+        const math::Vec3& get_y_axis() const;
+        const math::Vec3& get_z_axis() const;
+        bool is_transformed() const;
+        virtual void commit_transformation();
         virtual void get_location(math::Vec3& l) const = 0;
         virtual void set_location(const math::Vec3& l) = 0;
         virtual void translate(const math::Vec3& t) = 0;
@@ -25,6 +31,7 @@ namespace physics {
         virtual void global_rotate(const core::Real d, const math::Vec3& axis, const math::Vec3& location);
         virtual void global_rotate(const core::Real d, const math::Vec3& axis) = 0;
         virtual void global_rotate(const math::Mat4x4& rm);
+        virtual void local_rotate(const core::Real d, const math::Vec3& axis) = 0;
         virtual void local_x_rotate(const core::Real d) = 0;
         virtual void local_y_rotate(const core::Real d) = 0;
         virtual void local_z_rotate(const core::Real d) = 0;

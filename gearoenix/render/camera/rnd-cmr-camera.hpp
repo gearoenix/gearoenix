@@ -4,6 +4,7 @@
 #include "../../math/math-matrix.hpp"
 #include "../../math/math-ray.hpp"
 #include "../../math/math-vector.hpp"
+#include "../../physics/phs-transformable.hpp"
 
 namespace gearoenix {
 namespace core {
@@ -20,19 +21,15 @@ namespace system {
 }
 namespace render {
     namespace camera {
-        class Camera : public core::asset::Asset {
+        class Camera : public core::asset::Asset, public physics::Transferable {
             friend class physics::Kernel;
 
         protected:
-            bool changed = true;
             core::Real start;
             core::Real end;
             core::Real screen_ratio;
             core::Real c_width;
             core::Real c_height;
-            math::Vec3 x;
-            math::Vec3 y;
-            math::Vec3 z;
             math::Vec3 l;
             math::Mat4x4 vwl;
             math::Mat4x4 v;
@@ -43,32 +40,27 @@ namespace render {
         public:
             virtual ~Camera();
             static Camera* read(system::stream::Stream* f, system::Application* sysapp);
-            void translate(const math::Vec3& vec);
-            void move(const math::Vec3& vec);
-            void move_forward(const core::Real spd);
-            void move_sideward(const core::Real spd);
-            void rotate_local_x(const core::Real rad);
-            void rotate_local_y(const core::Real rad);
-            void rotate_local_z(const core::Real rad);
-            void rotate_local(const core::Real rad, const math::Vec3& vec);
-            void rotate_global_x(const core::Real rad);
-            void rotate_global_y(const core::Real rad);
-            void rotate_global_z(const core::Real rad);
-            void rotate_global(const core::Real rad, const math::Vec3& vec);
-            void rotate_look_at(const core::Real rad, const math::Vec3& vec, const math::Vec3& p);
+            void look_at(const math::Vec3& target, const math::Vec3& up);
+            void look_at(const math::Vec3& origin, const math::Vec3& target, const math::Vec3& up);
             const math::Mat4x4& get_view_projection() const;
             const math::Mat4x4& get_zero_located_view() const;
-            const math::Vec3& get_location() const;
-            const math::Vec3& get_x() const;
-            const math::Vec3& get_y() const;
-            const math::Vec3& get_z() const;
-            void copy_location(math::Vec3& v) const;
-            bool get_changed() const;
-            void clean();
-            virtual bool in_sight(const math::Vec3& location, const core::Real radius) const = 0;
             virtual void on_event(const core::event::Event& e);
+            virtual bool in_sight(const math::Vec3& location, const core::Real radius) const = 0;
             virtual math::Ray3 create_ray3(const core::Real x, const core::Real y) const = 0;
             virtual core::Real get_distance(const math::Vec3 model_location) const = 0;
+            // Transformable---------------------------------------------------------------
+            void get_location(math::Vec3& l) const;
+            void set_location(const math::Vec3& l);
+            void translate(const math::Vec3& t);
+            void global_rotate(const core::Real d, const math::Vec3& axis, const math::Vec3& location);
+            void global_rotate(const core::Real d, const math::Vec3& axis);
+            void global_rotate(const math::Mat4x4& rm);
+            void local_rotate(const core::Real d, const math::Vec3& axis);
+            void local_x_rotate(const core::Real d);
+            void local_y_rotate(const core::Real d);
+            void local_z_rotate(const core::Real d);
+            void global_scale(const core::Real s);
+            void local_scale(const core::Real s);
         };
     }
 }

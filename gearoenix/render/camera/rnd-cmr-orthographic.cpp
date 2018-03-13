@@ -21,16 +21,16 @@ gearoenix::render::camera::Orthographic::Orthographic(system::stream::Stream* f,
 bool gearoenix::render::camera::Orthographic::in_sight(const math::Vec3& location, const core::Real radius) const
 {
     math::Vec3 eye = location - l;
-    core::Real eye_z = -(eye.dot(z));
+    core::Real eye_z = -(eye.dot(z_axis));
     if (eye_z < 0.0f)
         return eye.square_length() < (radius * radius);
     if (eye_z - radius > end)
         return false;
-    math::Vec3 eye_on_z_plane = eye - (z * (-eye_z));
-    core::Real eye_on_x = std::abs(eye_on_z_plane.dot(x));
+    math::Vec3 eye_on_z_plane = eye - (z_axis * (-eye_z));
+    core::Real eye_on_x = std::abs(eye_on_z_plane.dot(x_axis));
     if (eye_on_x - radius > c_width)
         return false;
-    core::Real eye_on_y = std::abs(eye_on_z_plane.dot(y));
+    core::Real eye_on_y = std::abs(eye_on_z_plane.dot(y_axis));
     if (eye_on_y - radius > c_height)
         return false;
     return true;
@@ -45,12 +45,12 @@ void gearoenix::render::camera::Orthographic::on_event(const core::event::Event&
 
 gearoenix::math::Ray3 gearoenix::render::camera::Orthographic::create_ray3(const core::Real x, const core::Real y) const
 {
-    math::Vec3 dir = -z;
-    math::Vec3 origin = (this->x * x) + (this->y * y) + (dir * start) + l;
+    math::Vec3 dir = -z_axis;
+    math::Vec3 origin = (x_axis * x) + (y_axis * y) + (dir * start) + l;
     return math::Ray3(origin, dir);
 }
 
 gearoenix::core::Real gearoenix::render::camera::Orthographic::get_distance(const math::Vec3 model_location) const
 {
-    return -((model_location - l).dot(z));
+    return -((model_location - l).dot(z_axis));
 }

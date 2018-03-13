@@ -26,16 +26,16 @@ gearoenix::render::camera::Perspective::Perspective(system::stream::Stream* f, s
 bool gearoenix::render::camera::Perspective::in_sight(const math::Vec3& location, const core::Real radius) const
 {
     math::Vec3 eye = location - l;
-    core::Real eye_z = -(z.dot(eye));
+    core::Real eye_z = -(z_axis.dot(eye));
     if (eye_z < 0.0f)
         return eye.square_length() < (radius * radius);
     if (eye_z - radius > end)
         return false;
-    math::Vec3 eye_on_z_plane = eye - (z * (-eye_z));
-    core::Real eye_on_x = std::abs(eye_on_z_plane.dot(x));
+    math::Vec3 eye_on_z_plane = eye - (z_axis * (-eye_z));
+    core::Real eye_on_x = std::abs(eye_on_z_plane.dot(x_axis));
     if (eye_on_x - (radius * one_coshang) > tanhang * eye_z)
         return false;
-    core::Real eye_on_y = std::abs(eye_on_z_plane.dot(y));
+    core::Real eye_on_y = std::abs(eye_on_z_plane.dot(y_axis));
     if (eye_on_y - (radius * one_cosvang) > tanvang * eye_z)
         return false;
 
@@ -51,7 +51,7 @@ void gearoenix::render::camera::Perspective::on_event(const core::event::Event& 
 
 gearoenix::math::Ray3 gearoenix::render::camera::Perspective::create_ray3(const core::Real x, const core::Real y) const
 {
-    math::Vec3 dir = (this->x * x) + (this->y * y) - (z * start);
+    math::Vec3 dir = (x_axis * x) + (y_axis * y) - (z_axis * start);
     math::Vec3 origin = dir + l;
     dir.normalize();
     return math::Ray3(origin, dir);

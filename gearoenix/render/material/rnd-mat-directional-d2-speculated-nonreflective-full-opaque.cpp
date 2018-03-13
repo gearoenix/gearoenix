@@ -77,7 +77,7 @@ void gearoenix::render::material::DirectionalD2SpeculatedNonreflectiveFullOpaque
     const light::Sun* sun = s->get_sun();
     u.ambl_color = s->get_ambient_light();
     u.db = sun->get_bias();
-    u.eye = cam->get_location();
+    cam->get_location(u.eye);
     u.m = m->get_m();
     u.sun = sun->get_direction();
     u.sun_color = sun->get_color();

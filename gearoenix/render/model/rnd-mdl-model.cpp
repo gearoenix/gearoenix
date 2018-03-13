@@ -94,13 +94,13 @@ void gearoenix::render::model::Model::commit(const scene::Scene* s)
 {
     //std::lock_guard<std::mutex> lg(locker);
     const camera::Camera* cam = s->get_current_camera();
-    if (changed) {
+    if (transformed) {
         if (nullptr != collider) {
             collider->update(m);
         }
         moccloc = m * occloc;
     }
-    if (cam->get_changed() || changed) {
+    if (cam->is_transformed() || transformed) {
         is_in_camera = cam->in_sight(moccloc, occrds);
         if (is_in_camera) {
             if (needs_mvp) {
@@ -118,7 +118,7 @@ void gearoenix::render::model::Model::commit(const scene::Scene* s)
     if (has_shadow_caster) {
         const light::Sun* sun = s->get_sun();
         const camera::Orthographic* suncam = sun->get_camera();
-        if (suncam->get_changed() || changed) {
+        if (suncam->is_transformed() || transformed) {
             is_in_sun = suncam->in_sight(moccloc, occrds);
             if (is_in_sun) {
                 sunmvp = sun->get_camera()->get_view_projection() * m;
@@ -134,7 +134,7 @@ void gearoenix::render::model::Model::commit(const scene::Scene* s)
             }
         }
     }
-    changed = false;
+    transformed = false;
 }
 
 void gearoenix::render::model::Model::draw(core::Id mesh_id, texture::Texture2D* shadow_texture)
@@ -196,7 +196,7 @@ void gearoenix::render::model::Model::get_location(math::Vec3& v) const
 void gearoenix::render::model::Model::set_location(const math::Vec3& l)
 {
     m.set_location(l);
-    changed = true;
+    transformed = true;
 }
 
 void gearoenix::render::model::Model::translate(const math::Vec3& t)
@@ -205,7 +205,7 @@ void gearoenix::render::model::Model::translate(const math::Vec3& t)
     m.translate(t);
     for (std::pair<const core::Id, std::shared_ptr<Model>>& pmdl : children)
         pmdl.second->translate(t);
-    changed = true;
+    transformed = true;
 }
 
 void gearoenix::render::model::Model::global_scale(const core::Real s)
@@ -216,7 +216,7 @@ void gearoenix::render::model::Model::global_scale(const core::Real s)
     m.scale4x3(s);
     for (std::pair<const core::Id, std::shared_ptr<Model>>& pmdl : children)
         pmdl.second->global_scale(s);
-    changed = true;
+    transformed = true;
 }
 
 void gearoenix::render::model::Model::local_scale(const core::Real s)
@@ -234,7 +234,7 @@ void gearoenix::render::model::Model::local_scale(const core::Real s)
         child->set_location((fetched - o) * s + o);
         child->local_scale(s);
     }
-    changed = true;
+    transformed = true;
 }
 
 gearoenix::render::model::Model::ModelType gearoenix::render::model::Model::get_type() const
@@ -270,7 +270,7 @@ void gearoenix::render::model::Model::pop_state()
         return;
     m = state[len - 1];
     state.pop_back();
-    changed = true;
+    transformed = true;
     UNIMPLEMENTED; // other things are in the state of a model it must decide later
 }
 
@@ -287,7 +287,7 @@ void gearoenix::render::model::Model::global_rotate(const core::Real d, const ma
     for (std::pair<const core::Id, std::shared_ptr<Model>>& pmdl : children) {
         pmdl.second->global_rotate(r);
     }
-    changed = true;
+    transformed = true;
 }
 
 void gearoenix::render::model::Model::global_rotate(const math::Mat4x4& rm)
@@ -297,7 +297,12 @@ void gearoenix::render::model::Model::global_rotate(const math::Mat4x4& rm)
     for (std::pair<const core::Id, std::shared_ptr<Model>>& pmdl : children) {
         pmdl.second->global_rotate(rm);
     }
-    changed = true;
+    transformed = true;
+}
+
+void gearoenix::render::model::Model::local_rotate(const core::Real, const math::Vec3&)
+{
+    UNIMPLEMENTED;
 }
 
 void gearoenix::render::model::Model::local_x_rotate(const core::Real)
@@ -321,5 +326,5 @@ void gearoenix::render::model::Model::local_z_rotate(const core::Real d)
         physics::Transferable* cmdl = pmdl.second.get();
         cmdl->global_rotate(d, z_axis, l);
     }
-    changed = true;
+    transformed = true;
 }

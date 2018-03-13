@@ -87,7 +87,7 @@ void gearoenix::render::material::DirectionalColoredSpeculatedBakedFullOpaque::u
     if (color_changed || sun->get_color_changed())
         u.sun_color.xyz(sun->get_color() * color.xyz());
     const camera::Camera* cam = s->get_current_camera();
-    u.eye = cam->get_location();
+    cam->get_location(u.eye);
     u.vp = cam->get_view_projection();
     color_changed = false;
 }

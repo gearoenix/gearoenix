@@ -53,6 +53,31 @@ gearoenix::physics::Transferable::~Transferable()
 {
 }
 
+const gearoenix::math::Vec3& gearoenix::physics::Transferable::get_x_axis() const
+{
+    return x_axis;
+}
+
+const gearoenix::math::Vec3& gearoenix::physics::Transferable::get_y_axis() const
+{
+    return y_axis;
+}
+
+const gearoenix::math::Vec3& gearoenix::physics::Transferable::get_z_axis() const
+{
+    return z_axis;
+}
+
+bool gearoenix::physics::Transferable::is_transformed() const
+{
+    return transformed;
+}
+
+void gearoenix::physics::Transferable::commit_transformation()
+{
+    transformed = false;
+}
+
 void gearoenix::physics::Transferable::local_x_translate(const core::Real t)
 {
     translate(x_axis * t);

@@ -122,6 +122,6 @@ void gearoenix::physics::Kernel::signal()
 #ifdef THREAD_SUPPORTED
     signaller->release();
 #else
-        run();
+    run();
 #endif
 }
