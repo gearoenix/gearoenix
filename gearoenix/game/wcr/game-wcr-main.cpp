@@ -18,7 +18,7 @@ GameApp::GameApp(gearoenix::system::Application* sys_app)
     rndeng->load_scene(1, [this]() -> void {
         const auto& scene = rndeng->get_scene(1);
         cam = scene->get_current_camera();
-        mdl = scene->get_model(1).lock().get();
+        mdl = scene->get_model(1).lock();
     });
     rndeng->load_scene(2, [this]() -> void {});
 }

@@ -93,7 +93,7 @@ gearoenix::render::model::Model::~Model()
 void gearoenix::render::model::Model::commit(const scene::Scene* s)
 {
     //std::lock_guard<std::mutex> lg(locker);
-    const camera::Camera* cam = s->get_current_camera();
+    const std::shared_ptr<camera::Camera>& cam = s->get_current_camera();
     if (transformed) {
         if (nullptr != collider) {
             collider->update(m);

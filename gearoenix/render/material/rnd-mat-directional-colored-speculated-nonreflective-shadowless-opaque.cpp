@@ -60,7 +60,7 @@ void gearoenix::render::material::DirectionalColoredSpeculatedNonreflectiveShado
     if (color_changed || s->get_ambient_light_changed())
         u.ambl_color.xyz(s->get_ambient_light() * color.xyz());
     u.m = m->get_m();
-    const camera::Camera* cam = s->get_current_camera();
+    const std::shared_ptr<camera::Camera>& cam = s->get_current_camera();
     u.vp = cam->get_view_projection();
     cam->get_location(u.eye);
     const light::Sun* sun = s->get_sun();

@@ -181,19 +181,14 @@ void gearoenix::render::scene::Scene::draw(texture::Texture2D* shadow_texture)
     }
 }
 
-const gearoenix::render::camera::Camera* gearoenix::render::scene::Scene::get_current_camera() const
-{
-    //    return reinterpret_cast<const light::Sun*>(lights[0].get())->get_camera();
-    const std::map<core::Id, std::shared_ptr<camera::Camera>>::const_iterator c = cameras.find(cam_id);
-    if (c == cameras.end())
-        UNEXPECTED;
-    return c->second.get();
-}
-
-gearoenix::render::camera::Camera* gearoenix::render::scene::Scene::get_current_camera()
+const std::shared_ptr<gearoenix::render::camera::Camera>& gearoenix::render::scene::Scene::get_current_camera() const
 {
     //    return const_cast<camera::Camera*>(reinterpret_cast<const camera::Camera*>(reinterpret_cast<light::Sun*>(lights[0].get())->get_camera()));
-    return cameras[cam_id].get();
+	auto search = cameras.find(cam_id);
+#ifdef DEBUG_MODE
+	if (search == cameras.end()) UNEXPECTED;
+#endif
+	return search->second;
 }
 
 const gearoenix::math::Vec3& gearoenix::render::scene::Scene::get_ambient_light() const

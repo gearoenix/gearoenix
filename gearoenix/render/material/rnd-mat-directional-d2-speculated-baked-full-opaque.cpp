@@ -88,7 +88,7 @@ void gearoenix::render::material::DirectionalD2SpeculatedBakedFullOpaque::update
     u.ambl_color = s->get_ambient_light();
     const light::Sun* sun = s->get_sun();
     u.db = sun->get_bias();
-    const camera::Camera* cam = s->get_current_camera();
+    const std::shared_ptr<camera::Camera>& cam = s->get_current_camera();
     cam->get_location(u.eye);
     u.m = m->get_m();
     u.sun = sun->get_direction();

@@ -73,7 +73,7 @@ bool gearoenix::render::material::DirectionalD2SpeculatedNonreflectiveFullOpaque
 
 void gearoenix::render::material::DirectionalD2SpeculatedNonreflectiveFullOpaque::update(const scene::Scene* s, const model::Model* m)
 {
-    const camera::Camera* cam = s->get_current_camera();
+    const std::shared_ptr<camera::Camera>& cam = s->get_current_camera();
     const light::Sun* sun = s->get_sun();
     u.ambl_color = s->get_ambient_light();
     u.db = sun->get_bias();
