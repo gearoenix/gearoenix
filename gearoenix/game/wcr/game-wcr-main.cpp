@@ -1,17 +1,17 @@
-#include "test-001-scene-free-camera.hpp"
-#ifdef TEST001
-#include "../core/event/cr-ev-bt-mouse.hpp"
-#include "../core/event/cr-ev-mv-mouse.hpp"
-#include "../core/event/cr-ev-sys-system.hpp"
-#include "../core/event/cr-ev-ui-ui.hpp"
-#include "../render/camera/rnd-cmr-camera.hpp"
-#include "../render/model/rnd-mdl-model.hpp"
-#include "../render/rnd-engine.hpp"
-#include "../render/scene/rnd-scn-scene.hpp"
-#include "../system/sys-app.hpp"
-#include "../system/sys-log.hpp"
+#include "game-wcr-main.hpp"
+#ifdef GAME_WCR
+#include "../../core/event/cr-ev-bt-mouse.hpp"
+#include "../../core/event/cr-ev-mv-mouse.hpp"
+#include "../../core/event/cr-ev-sys-system.hpp"
+#include "../../core/event/cr-ev-ui-ui.hpp"
+#include "../../render/camera/rnd-cmr-camera.hpp"
+#include "../../render/model/rnd-mdl-model.hpp"
+#include "../../render/rnd-engine.hpp"
+#include "../../render/scene/rnd-scn-scene.hpp"
+#include "../../system/sys-app.hpp"
+#include "../../system/sys-log.hpp"
 
-TestApp::TestApp(gearoenix::system::Application* sys_app)
+GameApp::GameApp(gearoenix::system::Application* sys_app)
     : gearoenix::core::Application::Application(sys_app)
     , rndeng(sys_app->get_render_engine())
 {
@@ -23,13 +23,13 @@ TestApp::TestApp(gearoenix::system::Application* sys_app)
     rndeng->load_scene(2, [this]() -> void {});
 }
 
-TestApp::~TestApp() {}
+GameApp::~GameApp() {}
 
-void TestApp::update() {}
+void GameApp::update() {}
 
-void TestApp::terminate() {}
+void GameApp::terminate() {}
 
-void TestApp::on_event(const gearoenix::core::event::Event& e)
+void GameApp::on_event(const gearoenix::core::event::Event& e)
 {
     switch (e.get_type()) {
     case gearoenix::core::event::Event::From::SYSTEM: {
@@ -128,5 +128,5 @@ void TestApp::on_event(const gearoenix::core::event::Event& e)
     }
 }
 
-GEAROENIX_START(TestApp)
+GEAROENIX_START(GameApp)
 #endif

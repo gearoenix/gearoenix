@@ -15,8 +15,8 @@ namespace physics {
     namespace constraint {
         class TrackerSpringJointSpring : public Constraint {
         private:
-            std::weak_ptr<body::Rigid> active;
-            std::weak_ptr<body::Rigid> passive;
+            std::shared_ptr<body::Rigid> active;
+            std::shared_ptr<body::Rigid> passive;
             core::Real k;
             math::Vec3 angle;
             core::Real joint_k;
@@ -24,6 +24,13 @@ namespace physics {
 
         public:
             TrackerSpringJointSpring(system::stream::Stream* f, render::Engine* render_engine, core::EndCaller<core::EndCallerIgnore> c);
+			TrackerSpringJointSpring(
+				const std::shared_ptr<body::Rigid> active,
+				const std::shared_ptr<body::Rigid> passive,
+				const core::Real k,
+				const math::Vec3& angle,
+				const core::Real joint_k,
+				const core::Real length);
             virtual ~TrackerSpringJointSpring();
             virtual void apply(core::Real delta_time);
         };

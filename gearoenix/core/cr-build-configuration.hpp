@@ -64,6 +64,8 @@
 /// Application compilation mode
 /// -----------------------------------------------------------------
 #define DEBUG_MODE
+//#define TEST_MODE
+#define GAME_MODE
 /// Application features
 /// -------------------------------------------------------------------------
 #ifdef DEBUG_MODE

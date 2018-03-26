@@ -16,17 +16,23 @@ gearoenix::physics::constraint::TrackerSpringJointSpring::TrackerSpringJointSpri
     UNIMPLEMENTED;
 }
 
+gearoenix::physics::constraint::TrackerSpringJointSpring::TrackerSpringJointSpring(const std::shared_ptr<body::Rigid> active, const std::shared_ptr<body::Rigid> passive, const core::Real k, const math::Vec3 & angle, const core::Real joint_k, const core::Real length)
+	: Constraint(TRACKER_SPRING_JOINT_SPRING)
+	, active(active)
+	, passive(passive)
+	, k(k)
+	, angle(angle)
+	, joint_k(joint_k)
+	, length(length)
+{
+}
+
 gearoenix::physics::constraint::TrackerSpringJointSpring::~TrackerSpringJointSpring()
 {
 }
 
 void gearoenix::physics::constraint::TrackerSpringJointSpring::apply(core::Real)
 {
-    std::shared_ptr<body::Rigid> active, passive;
-    if (!(active = this->active.lock()) || !(passive = this->passive.lock()) || active == nullptr || passive == nullptr) {
-        alive = false;
-        return;
-    }
     math::Vec3 actpos, paspos;
     active->get_location(actpos);
     passive->get_location(paspos);
