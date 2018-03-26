@@ -1,5 +1,6 @@
 #include "phs-cns-tracker-spring-joint-spring.hpp"
 #include "../../core/asset/cr-asset-manager.hpp"
+#include "../../core/cr-static.hpp"
 #include "../../core/event/cr-ev-event.hpp"
 #include "../../core/event/cr-ev-window-resize.hpp"
 #include "../../render/model/rnd-mdl-model.hpp"
@@ -7,6 +8,7 @@
 #include "../../system/stream/sys-stm-stream.hpp"
 #include "../../system/sys-app.hpp"
 #include "../../system/sys-log.hpp"
+#include "../body/phs-bd-rigid.hpp"
 
 gearoenix::physics::constraint::TrackerSpringJointSpring::TrackerSpringJointSpring(system::stream::Stream* f, render::Engine* render_engine, core::EndCaller<core::EndCallerIgnore> c)
     : Constraint(PLACER)
@@ -54,32 +56,28 @@ gearoenix::physics::constraint::TrackerSpringJointSpring::~TrackerSpringJointSpr
 {
 }
 
-void gearoenix::physics::constraint::TrackerSpringJointSpring::apply()
+void gearoenix::physics::constraint::TrackerSpringJointSpring::apply(core::Real delta_time)
 {
-    //    if (applied)
-    //        return;
-    //    Constraint::apply();
-    //    switch (t) {
-    //    case DOWN_MIDDLE: {
-    //        for (const std::pair<core::Id, std::shared_ptr<render::model::Model>>& id_model : models)
-    //            id_model.second->translate(-position);
-    //        const core::Real scale = parameters[4] / parameters[3];
-    //        for (const std::pair<core::Id, std::shared_ptr<render::model::Model>>& id_model : models)
-    //            id_model.second->global_scale(scale);
-    //        for (const std::pair<core::Id, std::shared_ptr<render::model::Model>>& id_model : models)
-    //            id_model.second->translate(next_position);
-    //        parameters[3] = parameters[4];
-    //        break;
-    //    }
-    //    case RIGHT:
-    //    case LEFT: {
-    //        const math::Vec3 trn = next_position - position;
-    //        for (const std::pair<core::Id, std::shared_ptr<render::model::Model>>& id_model : models)
-    //            id_model.second->translate(trn);
-    //        break;
-    //    }
-    //    default:
-    //        UNEXPECTED;
-    //    }
-    //    position = next_position;
+    std::shared_ptr<body::Rigid> active, passive;
+    if (!(active = this->active.lock()) || !(passive = this->passive.lock()) || active == nullptr || passive == nullptr) {
+        alive = false;
+        return;
+    }
+    math::Vec3 actpos, paspos;
+    active->get_location(actpos);
+    passive->get_location(paspos);
+    math::Vec3 direction = actpos - paspos;
+    const core::Real distance = direction.length();
+    direction /= distance;
+    const core::Real delta_length = length - distance;
+    if (delta_length > GXPOSEPSILON) {
+        const core::Real tracker_force = delta_length * k;
+        passive->apply_force_on_origin(direction * tracker_force);
+    }
+    const math::Vec3 cur_angle = ((active->get_x_axis() * angle[0]) + (active->get_y_axis() * angle[1]) + (active->get_z_axis() * angle[2])).normalized();
+    const core::Real disang = 1.0f - direction.dot(cur_angle);
+    if (disang > GXPOSEPSILON) {
+        const core::Real angular_force = disang * joint_k;
+        passive->apply_force_on_origin(direction.cross(cur_angle).cross(direction) * angular_force);
+    }
 }

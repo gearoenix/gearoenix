@@ -18,14 +18,14 @@ namespace physics {
             std::weak_ptr<body::Rigid> active;
             std::weak_ptr<body::Rigid> passive;
             core::Real k;
+            math::Vec3 angle;
+            core::Real joint_k;
             core::Real length;
-            core::Real active_joint_k;
-            core::Real passive_joint_k;
 
         public:
             TrackerSpringJointSpring(system::stream::Stream* f, render::Engine* render_engine, core::EndCaller<core::EndCallerIgnore> c);
             virtual ~TrackerSpringJointSpring();
-            virtual void apply();
+            virtual void apply(core::Real delta_time);
         };
     }
 }

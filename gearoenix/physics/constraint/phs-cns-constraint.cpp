@@ -12,7 +12,12 @@ gearoenix::physics::constraint::Constraint::~Constraint()
 {
 }
 
-void gearoenix::physics::constraint::Constraint::apply()
+bool gearoenix::physics::constraint::Constraint::is_alive() const
+{
+    return alive;
+}
+
+void gearoenix::physics::constraint::Constraint::apply(core::Real)
 {
     applied = true;
 }

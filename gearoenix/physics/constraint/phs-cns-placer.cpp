@@ -54,11 +54,11 @@ gearoenix::physics::constraint::Placer::~Placer()
 {
 }
 
-void gearoenix::physics::constraint::Placer::apply()
+void gearoenix::physics::constraint::Placer::apply(core::Real delta_time)
 {
     if (applied)
         return;
-    Constraint::apply();
+    Constraint::apply(delta_time);
     switch (t) {
     case DOWN_MIDDLE: {
         for (const std::pair<core::Id, std::shared_ptr<render::model::Model>>& id_model : models)

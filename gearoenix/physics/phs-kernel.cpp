@@ -83,7 +83,7 @@ void gearoenix::physics::Kernel::apply_constraints()
             if (((item_index++) % threads_count) != thread_index)
                 continue;
 #endif
-            id_constraint.second->apply();
+            id_constraint.second->apply(delta_time);
         }
     }
 }

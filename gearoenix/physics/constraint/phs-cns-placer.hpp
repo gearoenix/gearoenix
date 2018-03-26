@@ -28,7 +28,7 @@ namespace physics {
         public:
             Placer(system::stream::Stream* f, render::Engine* render_engine, core::EndCaller<core::EndCallerIgnore> c);
             virtual ~Placer();
-            virtual void apply();
+            virtual void apply(core::Real delta_time);
             virtual const std::vector<std::pair<core::Id, std::shared_ptr<render::model::Model>>> get_all_models() const;
             virtual void on_event(const core::event::Event& e);
         };
