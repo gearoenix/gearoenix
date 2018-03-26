@@ -298,6 +298,12 @@ gearoenix::math::Vec3 gearoenix::math::Vec3::operator/(const Vec3& a) const
     return Vec3(vec[0] / a.vec[0], vec[1] / a.vec[1], vec[2] / a.vec[2]);
 }
 
+gearoenix::math::Vec3 gearoenix::math::Vec3::operator/(const core::Real a) const
+{
+    const core::Real ia = 1.0f / a;
+    return Vec3(vec[0] * ia, vec[1] * ia, vec[2] * ia);
+}
+
 void gearoenix::math::Vec3::operator+=(const Vec3& a)
 {
     vec[0] += a.vec[0];
@@ -324,6 +330,14 @@ void gearoenix::math::Vec3::operator/=(const Vec3& a)
     vec[0] /= a.vec[0];
     vec[1] /= a.vec[1];
     vec[2] /= a.vec[2];
+}
+
+void gearoenix::math::Vec3::operator/=(const core::Real a)
+{
+    const core::Real ia = 1.0f / a;
+    vec[0] *= ia;
+    vec[1] *= ia;
+    vec[2] *= ia;
 }
 
 const gearoenix::core::Real& gearoenix::math::Vec3::operator[](const unsigned int i) const

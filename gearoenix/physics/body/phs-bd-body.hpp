@@ -19,9 +19,9 @@ namespace physics {
         private:
         protected:
             const Behaviour::Type body_type;
+            Body(const Behaviour::Type body_type);
 
         public:
-            Body(const Behaviour::Type body_type);
             virtual ~Body();
             Behaviour::Type get_type() const;
         };

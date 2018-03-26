@@ -29,16 +29,14 @@ namespace physics {
         public:
             typedef enum : core::Id {
                 PLACER = 1,
-                TRACKER = 2,
-                SPRING = 3,
-                SPRING_JOINT = 4,
-                UNKNOWN = 0XFFFFFFFFFFFFFFFF,
+                TRACKER_SPRING_JOINT_SPRING = 2,
+                LOOKER = 3,
             } Type;
 
         protected:
             bool applied = false;
             bool alive = true;
-            Type t = UNKNOWN;
+            const Type t;
             Constraint(Type t);
 
         public:

@@ -10,53 +10,17 @@
 #include "../../system/sys-log.hpp"
 #include "../body/phs-bd-rigid.hpp"
 
-gearoenix::physics::constraint::TrackerSpringJointSpring::TrackerSpringJointSpring(system::stream::Stream* f, render::Engine* render_engine, core::EndCaller<core::EndCallerIgnore> c)
-    : Constraint(PLACER)
+gearoenix::physics::constraint::TrackerSpringJointSpring::TrackerSpringJointSpring(system::stream::Stream*, render::Engine*, core::EndCaller<core::EndCallerIgnore>)
+    : Constraint(TRACKER_SPRING_JOINT_SPRING)
 {
-    //    f->read(t);
-    //    switch (t) {
-    //    case DOWN_MIDDLE:
-    //        parameters.resize(5);
-    //        // 0 -> x-middle
-    //        // 1 -> y-down
-    //        // 2 -> ratio
-    //        // 3 -> size
-    //        // 4 -> next_size
-    //        f->read(parameters[2]);
-    //        f->read(parameters[0]);
-    //        f->read(parameters[1]);
-    //        parameters[3] = 2.0f;
-    //        parameters[4] = 2.0f * (render_engine->get_system_application()->get_window_ratio() - parameters[0]);
-    //        next_position[1] = (parameters[4] / (parameters[2] * 2.0f)) + parameters[1] - 1.0f;
-    //        break;
-    //    case LEFT:
-    //        parameters.resize(1);
-    //        f->read(parameters[0]);
-    //        position[0] = -1.0f;
-    //        next_position[0] = parameters[0] - render_engine->get_system_application()->get_window_ratio();
-    //        break;
-    //    case RIGHT:
-    //        parameters.resize(1);
-    //        f->read(parameters[0]);
-    //        position[0] = 1.0f;
-    //        next_position[0] = render_engine->get_system_application()->get_window_ratio() - parameters[0];
-    //        break;
-    //    default:
-    //        UNEXPECTED;
-    //    }
-    //    std::vector<core::Id> model_ids;
-    //    f->read(model_ids);
-    //    core::asset::Manager* asmgr = render_engine->get_system_application()->get_asset_manager();
-    //    for (const core::Id model_id : model_ids) {
-    //        models[model_id] = asmgr->get_model(model_id, core::EndCaller<render::model::Model>([c](std::shared_ptr<render::model::Model>) -> void {}));
-    //    }
+    UNIMPLEMENTED;
 }
 
 gearoenix::physics::constraint::TrackerSpringJointSpring::~TrackerSpringJointSpring()
 {
 }
 
-void gearoenix::physics::constraint::TrackerSpringJointSpring::apply(core::Real delta_time)
+void gearoenix::physics::constraint::TrackerSpringJointSpring::apply(core::Real)
 {
     std::shared_ptr<body::Rigid> active, passive;
     if (!(active = this->active.lock()) || !(passive = this->passive.lock()) || active == nullptr || passive == nullptr) {

@@ -64,11 +64,13 @@ namespace math {
         Vec3 operator*(const Vec3& a) const;
         Vec3 operator*(const core::Real& a) const;
         Vec3 operator/(const Vec3& a) const;
+        Vec3 operator/(const core::Real a) const;
         void operator=(const Vec3& v);
         void operator+=(const Vec3& a);
         void operator-=(const Vec3& a);
         void operator*=(const Vec3& a);
         void operator/=(const Vec3& a);
+        void operator/=(const core::Real a);
         const core::Real& operator[](const unsigned int i) const;
         core::Real& operator[](const unsigned int i);
         Vec2 xy() const;
