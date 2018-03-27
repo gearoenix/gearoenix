@@ -24,15 +24,17 @@ namespace physics {
 
         public:
             TrackerSpringJointSpring(system::stream::Stream* f, render::Engine* render_engine, core::EndCaller<core::EndCallerIgnore> c);
-			TrackerSpringJointSpring(
-				const std::shared_ptr<body::Rigid> active,
-				const std::shared_ptr<body::Rigid> passive,
-				const core::Real k,
-				const math::Vec3& angle,
-				const core::Real joint_k,
-				const core::Real length);
-            virtual ~TrackerSpringJointSpring();
-            virtual void apply(core::Real delta_time);
+            TrackerSpringJointSpring(
+                const std::shared_ptr<body::Rigid> active,
+                const std::shared_ptr<body::Rigid> passive,
+                const core::Real k,
+                const math::Vec3& angle,
+                const core::Real joint_k,
+                const core::Real length);
+            ~TrackerSpringJointSpring();
+            void on_event(const core::event::Event& e);
+            const std::vector<std::pair<core::Id, std::shared_ptr<render::model::Model>>> get_all_models() const;
+            void apply(core::Real delta_time);
         };
     }
 }

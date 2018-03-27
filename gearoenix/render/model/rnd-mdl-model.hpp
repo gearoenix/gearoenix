@@ -5,7 +5,7 @@
 #include "../../core/cr-types.hpp"
 #include "../../math/math-matrix.hpp"
 #include "../../math/math-vector.hpp"
-#include "../../physics/body/phs-bd-rigid.hpp"
+#include "../../physics/phs-transformable.hpp"
 #include <map>
 #include <memory>
 #include <mutex>
@@ -41,14 +41,13 @@ namespace render {
     }
     namespace model {
         class Uniform;
-        class Model : public core::asset::Asset, public physics::body::Rigid {
+        class Model : public core::asset::Asset, public physics::Transferable {
             friend class physics::Kernel;
 
         public:
             typedef enum : core::Id {
                 BASIC = 1,
                 WIDGET = 2,
-                UNKNOWN = 0XFFFFFFFFFFFFFFFF,
             } ModelType;
 
         protected:

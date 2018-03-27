@@ -105,6 +105,7 @@ namespace render {
             void add_mesh(core::Id mesh_id, core::Id model_id, std::shared_ptr<material::Material> mat, std::shared_ptr<material::Material> dp);
             void add_model(core::Id model_id, core::EndCaller<core::EndCallerIgnore> c = core::EndCaller<core::EndCallerIgnore>([](std::shared_ptr<core::EndCallerIgnore>) -> void {}));
             std::weak_ptr<model::Model> get_model(core::Id model_id);
+            void add_constraint(core::Id id, const std::shared_ptr<physics::constraint::Constraint>& cns);
         };
     }
 }

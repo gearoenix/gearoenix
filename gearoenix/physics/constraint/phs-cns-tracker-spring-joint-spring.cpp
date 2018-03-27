@@ -16,14 +16,14 @@ gearoenix::physics::constraint::TrackerSpringJointSpring::TrackerSpringJointSpri
     UNIMPLEMENTED;
 }
 
-gearoenix::physics::constraint::TrackerSpringJointSpring::TrackerSpringJointSpring(const std::shared_ptr<body::Rigid> active, const std::shared_ptr<body::Rigid> passive, const core::Real k, const math::Vec3 & angle, const core::Real joint_k, const core::Real length)
-	: Constraint(TRACKER_SPRING_JOINT_SPRING)
-	, active(active)
-	, passive(passive)
-	, k(k)
-	, angle(angle)
-	, joint_k(joint_k)
-	, length(length)
+gearoenix::physics::constraint::TrackerSpringJointSpring::TrackerSpringJointSpring(const std::shared_ptr<body::Rigid> active, const std::shared_ptr<body::Rigid> passive, const core::Real k, const math::Vec3& angle, const core::Real joint_k, const core::Real length)
+    : Constraint(TRACKER_SPRING_JOINT_SPRING)
+    , active(active)
+    , passive(passive)
+    , k(k)
+    , angle(angle)
+    , joint_k(joint_k)
+    , length(length)
 {
 }
 
@@ -31,11 +31,21 @@ gearoenix::physics::constraint::TrackerSpringJointSpring::~TrackerSpringJointSpr
 {
 }
 
+void gearoenix::physics::constraint::TrackerSpringJointSpring::on_event(const core::event::Event&)
+{
+}
+
+const std::vector<std::pair<gearoenix::core::Id, std::shared_ptr<gearoenix::render::model::Model>>> gearoenix::physics::constraint::TrackerSpringJointSpring::get_all_models() const
+{
+    // maybe in future its need a change
+    return std::vector<std::pair<gearoenix::core::Id, std::shared_ptr<gearoenix::render::model::Model>>>();
+}
+
 void gearoenix::physics::constraint::TrackerSpringJointSpring::apply(core::Real)
 {
     math::Vec3 actpos, paspos;
-    active->get_location(actpos);
-    passive->get_location(paspos);
+    active->get_body_obj()->get_location(actpos);
+    passive->get_body_obj()->get_location(paspos);
     math::Vec3 direction = actpos - paspos;
     const core::Real distance = direction.length();
     direction /= distance;
@@ -44,7 +54,7 @@ void gearoenix::physics::constraint::TrackerSpringJointSpring::apply(core::Real)
         const core::Real tracker_force = delta_length * k;
         passive->apply_force_on_origin(direction * tracker_force);
     }
-    const math::Vec3 cur_angle = ((active->get_x_axis() * angle[0]) + (active->get_y_axis() * angle[1]) + (active->get_z_axis() * angle[2])).normalized();
+    const math::Vec3 cur_angle = ((active->get_body_obj()->get_x_axis() * angle[0]) + (active->get_body_obj()->get_y_axis() * angle[1]) + (active->get_body_obj()->get_z_axis() * angle[2])).normalized();
     const core::Real disang = 1.0f - direction.dot(cur_angle);
     if (disang > GXPOSEPSILON) {
         const core::Real angular_force = disang * joint_k;

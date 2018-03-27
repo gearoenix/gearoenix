@@ -1,7 +1,7 @@
 #include "phs-bd-rigid.hpp"
 
-gearoenix::physics::body::Rigid::Rigid()
-    : Body(Behaviour::RIGID)
+gearoenix::physics::body::Rigid::Rigid(const std::shared_ptr<Transferable>& body_obj)
+    : Body(Behaviour::RIGID, body_obj)
 {
 }
 

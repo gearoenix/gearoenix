@@ -1,9 +1,12 @@
 #include "game-wcr-main.hpp"
 #ifdef GAME_WCR
+#include "../../core/asset/cr-asset-manager.hpp"
 #include "../../core/event/cr-ev-bt-mouse.hpp"
 #include "../../core/event/cr-ev-mv-mouse.hpp"
 #include "../../core/event/cr-ev-sys-system.hpp"
 #include "../../core/event/cr-ev-ui-ui.hpp"
+#include "../../physics/body/phs-bd-rigid.hpp"
+#include "../../physics/constraint/phs-cns-tracker-spring-joint-spring.hpp"
 #include "../../render/camera/rnd-cmr-camera.hpp"
 #include "../../render/model/rnd-mdl-model.hpp"
 #include "../../render/rnd-engine.hpp"
@@ -116,6 +119,16 @@ void GameApp::on_event(const gearoenix::core::event::Event& e)
                     scene->add_model(1);
                     rndeng->delete_scene(1);
                     rndeng->delete_scene(2);
+
+                    std::shared_ptr<gearoenix::physics::constraint::TrackerSpringJointSpring> cns(
+                        new gearoenix::physics::constraint::TrackerSpringJointSpring(
+                            std::shared_ptr<gearoenix::physics::body::Rigid>(new gearoenix::physics::body::Rigid(mdl)),
+                            std::shared_ptr<gearoenix::physics::body::Rigid>(new gearoenix::physics::body::Rigid(cam)),
+                            1.0f,
+                            gearoenix::math::Vec3(0.0f, -0.5f, 0.4f).normalized(),
+                            1.0f, 2.0f));
+                    gearoenix::core::asset::Manager* astmgr = rndeng->get_system_application()->get_asset_manager();
+                    scene->add_constraint(astmgr->create_id(), cns);
                     state = State::GAME;
                 });
                 //rndeng->load_scene(1, [this]() -> void {});

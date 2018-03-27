@@ -82,15 +82,7 @@ gearoenix::render::scene::Scene::Scene(SceneType t, system::stream::Stream* f, E
         add_model(i, c);
     }
     for (const core::Id cons_id : constraint_ids) {
-        root_constraints[cons_id] = amgr->get_constriants(
-            cons_id,
-            core::EndCaller<physics::constraint::Constraint>(
-                [c, this](std::shared_ptr<physics::constraint::Constraint> cnst) -> void {
-                    const std::vector<std::pair<core::Id, std::shared_ptr<model::Model>>> models = cnst->get_all_models();
-                    for (const std::pair<const core::Id, const std::shared_ptr<model::Model>>& model : models) {
-                        add_model(model.first, model.second);
-                    }
-                }));
+        add_constraint(cons_id, amgr->get_constriants(cons_id, core::EndCaller<physics::constraint::Constraint>([c](std::shared_ptr<physics::constraint::Constraint>) -> void {})));
     }
     skybox = has_skybox ? amgr->get_skybox(skybox_id, core::EndCaller<skybox::Skybox>([c](std::shared_ptr<skybox::Skybox>) -> void {})) : nullptr;
 }
@@ -184,11 +176,12 @@ void gearoenix::render::scene::Scene::draw(texture::Texture2D* shadow_texture)
 const std::shared_ptr<gearoenix::render::camera::Camera>& gearoenix::render::scene::Scene::get_current_camera() const
 {
     //    return const_cast<camera::Camera*>(reinterpret_cast<const camera::Camera*>(reinterpret_cast<light::Sun*>(lights[0].get())->get_camera()));
-	auto search = cameras.find(cam_id);
+    auto search = cameras.find(cam_id);
 #ifdef DEBUG_MODE
-	if (search == cameras.end()) UNEXPECTED;
+    if (search == cameras.end())
+        UNEXPECTED;
 #endif
-	return search->second;
+    return search->second;
 }
 
 const gearoenix::math::Vec3& gearoenix::render::scene::Scene::get_ambient_light() const
@@ -282,4 +275,18 @@ std::weak_ptr<gearoenix::render::model::Model> gearoenix::render::scene::Scene::
 #else
     return all_models[model_id];
 #endif
+}
+
+void gearoenix::render::scene::Scene::add_constraint(core::Id id, const std::shared_ptr<physics::constraint::Constraint>& cns)
+{
+#ifdef DEBUG_MODE
+    std::map<core::Id, std::shared_ptr<physics::constraint::Constraint>>::iterator search = root_constraints.find(id);
+    if (root_constraints.end() != search)
+        UNEXPECTED;
+#endif
+    root_constraints[id] = cns;
+    const std::vector<std::pair<core::Id, std::shared_ptr<model::Model>>> models = cns->get_all_models();
+    for (const std::pair<const core::Id, const std::shared_ptr<model::Model>>& model : models) {
+        add_model(model.first, model.second);
+    }
 }

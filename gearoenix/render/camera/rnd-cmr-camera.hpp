@@ -4,7 +4,7 @@
 #include "../../math/math-matrix.hpp"
 #include "../../math/math-ray.hpp"
 #include "../../math/math-vector.hpp"
-#include "../../physics/body/phs-bd-rigid.hpp"
+#include "../../physics/phs-transformable.hpp"
 
 namespace gearoenix {
 namespace core {
@@ -21,7 +21,7 @@ namespace system {
 }
 namespace render {
     namespace camera {
-        class Camera : public core::asset::Asset, public physics::body::Rigid {
+        class Camera : public core::asset::Asset, public physics::Transferable {
             friend class physics::Kernel;
 
         protected:

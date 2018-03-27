@@ -1,11 +1,12 @@
 #ifndef GEAROENIX_PHYSICS_BODY_BODY_HPP
 #define GEAROENIX_PHYSICS_BODY_BODY_HPP
 #include "../../math/math-vector.hpp"
-#include "../phs-transformable.hpp"
+#include <memory>
 namespace gearoenix {
 namespace physics {
+    class Transferable;
     namespace body {
-        class Body : public Transferable {
+        class Body {
         public:
             class Behaviour {
             public:
@@ -19,11 +20,13 @@ namespace physics {
         private:
         protected:
             const Behaviour::Type body_type;
-            Body(const Behaviour::Type body_type);
+            const std::shared_ptr<Transferable> body_obj;
+            Body(const Behaviour::Type body_type, const std::shared_ptr<Transferable>& body_obj);
 
         public:
             virtual ~Body();
             Behaviour::Type get_type() const;
+            const std::shared_ptr<Transferable>& get_body_obj() const;
         };
     }
 }
