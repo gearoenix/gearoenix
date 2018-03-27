@@ -20,6 +20,9 @@ namespace core {
 }
 namespace physics {
     class Kernel;
+    namespace body {
+        class Rigid;
+    }
     namespace constraint {
         class Constraint;
     }
@@ -71,6 +74,7 @@ namespace render {
             std::map<core::Id, std::shared_ptr<physics::constraint::Constraint>> root_constraints;
             bool all_models_needs_cleaning = false;
             std::map<core::Id, std::weak_ptr<model::Model>> all_models;
+            std::map<core::Id, std::weak_ptr<physics::body::Rigid>> all_rigid_bodies;
             // shadow_caster_shader_id -> model_id -> mesh_id
             std::map<core::Id, std::map<core::Id, std::set<core::Id>>> shadow_caster_models;
             // shader_id -> model_id -> mesh_id
