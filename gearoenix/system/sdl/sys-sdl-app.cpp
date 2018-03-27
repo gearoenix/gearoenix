@@ -152,6 +152,7 @@ int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_
             break;
         }
         break;
+#ifdef IN_IOS
         case SDL_FINGERDOWN:{
             const core::Real x = (e->tfinger.x - 0.5f) * 2.0f * o->screen_ratio;
             const core::Real y = (0.5f - e->tfinger.y) * 2.0f;
@@ -182,6 +183,7 @@ int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_
             o->pre_y = y;
             break;
         }
+#endif
     case SDL_MOUSEWHEEL:
         // todo
         // o->core_app->on_scroll((core::Real)event->wheel.y);
