@@ -16,6 +16,7 @@
 #include <limits>
 #include <string>
 #include <vector>
+#include <cmath>
 
 static void png_write_function(void* context, void* data, int size)
 {

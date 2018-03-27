@@ -152,6 +152,36 @@ int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_
             break;
         }
         break;
+        case SDL_FINGERDOWN:{
+            const core::Real x = (e->tfinger.x - 0.5f) * 2.0f * o->screen_ratio;
+            const core::Real y = (0.5f - e->tfinger.y) * 2.0f;
+            event = new core::event::button::Mouse(
+                                                   core::event::button::Button::KeyType::LEFT,
+                                                   core::event::button::Button::ActionType::PRESS,
+                                                   x, y);
+            o->pre_x = x;
+            o->pre_y = y;
+            break;
+        }
+        case SDL_FINGERUP:{
+            const core::Real x = (e->tfinger.x - 0.5f) * 2.0f * o->screen_ratio;
+            const core::Real y = (0.5f - e->tfinger.y) * 2.0f;
+            event = new core::event::button::Mouse(
+                                                   core::event::button::Button::KeyType::LEFT,
+                                                   core::event::button::Button::ActionType::RELEASE,
+                                                   x, y);
+            o->pre_x = x;
+            o->pre_y = y;
+            break;
+        }
+        case SDL_FINGERMOTION: {
+            const core::Real x = (e->tfinger.x - 0.5f) * 2.0f * o->screen_ratio;
+            const core::Real y = (0.5f - e->tfinger.y) * 2.0f;
+            event = new core::event::movement::Mouse(x, y, o->pre_x, o->pre_y);
+            o->pre_x = x;
+            o->pre_y = y;
+            break;
+        }
     case SDL_MOUSEWHEEL:
         // todo
         // o->core_app->on_scroll((core::Real)event->wheel.y);
