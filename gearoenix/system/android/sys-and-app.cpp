@@ -24,90 +24,37 @@ int32_t gearoenix::system::Application::handle_input(android_app* a, AInputEvent
 
 int32_t gearoenix::system::Application::handle(android_app* app, AInputEvent* e)
 {
-    ndk_helper::Vec2 p1, p2;
-    core::Real w1, w2;
-    ndk_helper::GESTURE_STATE pinch_state = pinch_detector.Detect(e);
-    ndk_helper::GESTURE_STATE drag_state = drag_detector.Detect(e);
-    ndk_helper::GESTURE_STATE tap_state = tap_detector.Detect(e);
-    //    switch (pinch_state) {
-    //        case ndk_helper::GESTURE_STATE_START: TODO;
-    //            pinch_detector.GetPointers(p1, p2);
-    //            w = (p1 - p2).Length();
-    //            return 1;
-    //        case ndk_helper::GESTURE_STATE_MOVE:
-    //            pinch_detector.GetPointers(p1, p2);
-    //            w2 = (p1 - p2).Length();
-    ////        core_app->on_scroll((w2 - w) * 0.03f);
-    //            w = w2;
-    //            return 1;
-    //        default:
-    //            break;
-    //    }
-    //    switch (drag_state) {
-    //        case ndk_helper::GESTURE_STATE_START: {
-    //            TODO;
-    //            drag_detector.GetPointer(p1);
-    //            p1.Value(x, y);
-    //            x = convert_pixel_x_to_normalized((int) x);
-    //            y = convert_pixel_y_to_normalized((int) y);
-    //            core::event::button::Mouse me(
-    //                    core::event::button::Button::LEFT,
-    //                    core::event::button::Button::PRESS,
-    //                    x, y
-    //            );
-    //            render_engine->on_event(me);
-    //            core_app->on_event(me);
-    //            return 1;
-    //        }
-    //        case ndk_helper::GESTURE_STATE_MOVE: {
-    //            drag_detector.GetPointer(p1);
-    //            p1.Value(w1, w2);
-    //            w1 = convert_pixel_x_to_normalized((int) w1);
-    //            w2 = convert_pixel_y_to_normalized((int) w2);
-    //            core::event::movement::Mouse me(w1, w2, x, y);
-    //            render_engine->on_event(me);
-    //            core_app->on_event(me);
-    //            x = w1;
-    //            y = w2;
-    //            return 1;
-    //        }
-    //        case ndk_helper::GESTURE_STATE_END: {
-    //            drag_detector.GetPointer(p1);
-    //            p1.Value(x, y);
-    //            x = convert_pixel_x_to_normalized((int) x);
-    //            y = convert_pixel_y_to_normalized((int) y);
-    //            core::event::button::Mouse me(
-    //                    core::event::button::Button::LEFT,
-    //                    core::event::button::Button::RELEASE,
-    //                    x, y
-    //            );
-    //            render_engine->on_event(me);
-    //            core_app->on_event(me);
-    //            return 1;
-    //        }
-    //        default:
-    //            break;
-    //    }
-    switch (tap_state) {
-    case ndk_helper::GESTURE_STATE_ACTION: {
-        x = convert_pixel_x_to_normalized((int)AMotionEvent_getX(e, 0));
-        y = convert_pixel_y_to_normalized((int)AMotionEvent_getY(e, 0));
-        core::event::button::Mouse me(
+    core::event::Event* gxe = nullptr;
+    int32_t action = AMotionEvent_getAction(e);
+    int32_t flags = action & AMOTION_EVENT_ACTION_MASK;
+    const core::Real curx = convert_pixel_x_to_normalized((int)AMotionEvent_getX(e, 0));
+    const core::Real cury = convert_pixel_y_to_normalized((int)AMotionEvent_getY(e, 0));
+    switch (flags) {
+    case AMOTION_EVENT_ACTION_DOWN:
+        gxe = new core::event::button::Mouse(
             core::event::button::Button::LEFT,
             core::event::button::Button::PRESS,
-            x, y);
-        render_engine->on_event(me);
-        core_app->on_event(me);
-        core::event::button::Mouse me1(
+            curx, cury);
+        break;
+    case AMOTION_EVENT_ACTION_MOVE:
+        gxe = new core::event::movement::Mouse(
+            curx, cury, x, y);
+        break;
+    case AMOTION_EVENT_ACTION_UP:
+        gxe = new core::event::button::Mouse(
             core::event::button::Button::LEFT,
             core::event::button::Button::RELEASE,
-            x, y);
-        render_engine->on_event(me1);
-        core_app->on_event(me1);
-        return 1;
-    }
+            curx, cury);
+        break;
     default:
         break;
+    }
+    x = curx;
+    y = cury;
+    if (nullptr != gxe) {
+        render_engine->on_event(*gxe);
+        core_app->on_event(*gxe);
+        return 1;
     }
     return 0;
 }
