@@ -21,8 +21,8 @@ void gearoenix::gles3::shader::FontColored::Resources::bind()
     reinterpret_cast<texture::Texture2D*>(txt2d)->bind(GL_TEXTURE0);
 }
 
-gearoenix::gles3::shader::FontColored::FontColored(Engine* eng, core::EndCaller<core::EndCallerIgnore> end)
-    : Shader(eng, end)
+gearoenix::gles3::shader::FontColored::FontColored(core::Id my_id, Engine* eng, core::EndCaller<core::EndCallerIgnore> end)
+    : Shader(my_id, eng, end)
 {
     eng->add_load_function([this, end] {
         create_program();

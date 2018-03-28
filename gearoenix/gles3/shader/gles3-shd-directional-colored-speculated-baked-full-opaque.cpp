@@ -33,8 +33,8 @@ void gearoenix::gles3::shader::DirectionalColoredSpeculatedBakedFullOpaque::Reso
     reinterpret_cast<texture::Texture2D*>(shdtxt)->bind(GL_TEXTURE1);
 }
 
-gearoenix::gles3::shader::DirectionalColoredSpeculatedBakedFullOpaque::DirectionalColoredSpeculatedBakedFullOpaque(Engine* eng, core::EndCaller<core::EndCallerIgnore> end)
-    : Shader(eng, end)
+gearoenix::gles3::shader::DirectionalColoredSpeculatedBakedFullOpaque::DirectionalColoredSpeculatedBakedFullOpaque(core::Id my_id, Engine* eng, core::EndCaller<core::EndCallerIgnore> end)
+    : Shader(my_id, eng, end)
 {
     eng->add_load_function([this, end] {
         create_program();
@@ -114,9 +114,6 @@ gearoenix::gles3::shader::DirectionalColoredSpeculatedBakedFullOpaque::Direction
         link();
 
         glUseProgram(shader_program);
-
-        vtx_att_ind = glGetAttribLocation(shader_program, "vertex");
-        nrm_att_ind = glGetAttribLocation(shader_program, "normal");
 
         ambl_color = get_uniform_location("ambl_color");
         db = get_uniform_location("db");

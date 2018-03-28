@@ -4,7 +4,8 @@
 #include "../../system/sys-log.hpp"
 #include "../gles3-engine.hpp"
 
-gearoenix::gles3::texture::Texture2D::Texture2D(system::stream::Stream* file, Engine* eng, core::EndCaller<core::EndCallerIgnore> end)
+gearoenix::gles3::texture::Texture2D::Texture2D(core::Id my_id, system::stream::Stream* file, Engine* eng, core::EndCaller<core::EndCallerIgnore> end)
+    : render::texture::Texture2D(my_id)
 {
     std::vector<unsigned char> img_data;
     unsigned int imgw, imgh;
@@ -23,8 +24,9 @@ gearoenix::gles3::texture::Texture2D::Texture2D(system::stream::Stream* file, En
     eng->add_load_function(loadf);
 }
 
-gearoenix::gles3::texture::Texture2D::Texture2D(GLuint txtobj)
-    : texture_object(txtobj)
+gearoenix::gles3::texture::Texture2D::Texture2D(core::Id my_id, GLuint txtobj)
+    : render::texture::Texture2D(my_id)
+    , texture_object(txtobj)
 {
 }
 
