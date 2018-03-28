@@ -18,7 +18,7 @@ namespace dx11 {
             ID3D11ShaderResourceView* srv = nullptr;
 
         public:
-            Cube(system::stream::Stream* file, Engine* engine, core::EndCaller<core::EndCallerIgnore> end);
+            Cube(core::Id my_id, system::stream::Stream* file, Engine* engine, core::EndCaller<core::EndCallerIgnore> end);
             ~Cube();
             const ID3D11ShaderResourceView* get_shader_resource_view();
             void bind(unsigned int slot = 0) const;

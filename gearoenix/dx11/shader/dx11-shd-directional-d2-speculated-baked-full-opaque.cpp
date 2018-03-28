@@ -26,8 +26,8 @@ void gearoenix::dx11::shader::DirectionalD2SpeculatedBakedFullOpaque::Resources:
     shd->use();
 }
 
-gearoenix::dx11::shader::DirectionalD2SpeculatedBakedFullOpaque::DirectionalD2SpeculatedBakedFullOpaque(Engine* eng, core::EndCaller<core::EndCallerIgnore> end)
-    : Shader(eng, end)
+gearoenix::dx11::shader::DirectionalD2SpeculatedBakedFullOpaque::DirectionalD2SpeculatedBakedFullOpaque(core::Id my_id, Engine* eng, core::EndCaller<core::EndCallerIgnore> end)
+    : Shader(my_id, eng, end)
 {
     eng->add_load_function([this, end] {
         const char pvs[] = "struct VertexInputType {\n"

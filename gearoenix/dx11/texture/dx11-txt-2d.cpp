@@ -6,8 +6,9 @@
 #include "../dx11-check.hpp"
 #include "../dx11-engine.hpp"
 
-gearoenix::dx11::texture::Texture2D::Texture2D(system::stream::Stream* file, Engine* eng, core::EndCaller<core::EndCallerIgnore> end)
-    : engine(eng)
+gearoenix::dx11::texture::Texture2D::Texture2D(core::Id my_id, system::stream::Stream* file, Engine* eng, core::EndCaller<core::EndCallerIgnore> end)
+    : render::texture::Texture2D(my_id)
+	, engine(eng)
 {
     std::vector<unsigned char> img_data;
     unsigned int imgw, imgh;
@@ -39,8 +40,9 @@ gearoenix::dx11::texture::Texture2D::Texture2D(system::stream::Stream* file, Eng
     });
 }
 
-gearoenix::dx11::texture::Texture2D::Texture2D(Engine* eng, ID3D11ShaderResourceView* srv)
-    : engine(eng)
+gearoenix::dx11::texture::Texture2D::Texture2D(core::Id my_id, Engine* eng, ID3D11ShaderResourceView* srv)
+    : render::texture::Texture2D(my_id)
+	, engine(eng)
     , srv(srv)
 {
 }

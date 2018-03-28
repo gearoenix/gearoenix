@@ -20,8 +20,8 @@ void gearoenix::dx11::shader::ShadelessColoredMatteNonreflectiveShadowlessOpaque
     shd->use();
 }
 
-gearoenix::dx11::shader::ShadelessColoredMatteNonreflectiveShadowlessOpaque::ShadelessColoredMatteNonreflectiveShadowlessOpaque(Engine* eng, core::EndCaller<core::EndCallerIgnore> end)
-    : Shader(eng, end)
+gearoenix::dx11::shader::ShadelessColoredMatteNonreflectiveShadowlessOpaque::ShadelessColoredMatteNonreflectiveShadowlessOpaque(core::Id my_id, Engine* eng, core::EndCaller<core::EndCallerIgnore> end)
+    : Shader(my_id, eng, end)
 {
     eng->add_load_function([this, eng, end]() -> void {
         // todo Shader compilation must move to blender part.
