@@ -49,7 +49,7 @@
 *.png
 *.ttf
 *.txt
+!CMakeLists.txt
 
 output/
 assets/
-

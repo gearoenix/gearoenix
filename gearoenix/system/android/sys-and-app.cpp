@@ -7,7 +7,6 @@
 #include "../../core/event/cr-ev-sys-system.hpp"
 #include "../../gles2/gles2-engine.hpp"
 #include "../../render/rnd-engine.hpp"
-#include "../sys-file.hpp"
 #include "../sys-log.hpp"
 #include <string>
 
@@ -240,9 +239,10 @@ void gearoenix::system::Application::handle(android_app* a, int32_t cmd)
                 win_height = (unsigned int)gl_ctx->GetScreenHeight();
                 screen_ratio = (core::Real)win_width / (core::Real)win_height;
                 half_height_inversed = 2.0f / (core::Real)win_height;
-                render_engine = new gles2::Engine(this);
                 astmgr = new core::asset::Manager(this, "data.gx3d");
                 astmgr->initialize();
+                render_engine = new gles2::Engine(this);
+                astmgr->set_render_engine(render_engine);
             } else if (a->window != and_app->window) {
                 GXLOGE("reached");
                 core::event::system::System eul(core::event::system::System::Action::UNLOAD);

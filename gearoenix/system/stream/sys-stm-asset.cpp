@@ -73,7 +73,7 @@ bool gearoenix::system::stream::Asset::get_endian_compatibility() const
 gearoenix::core::Count gearoenix::system::stream::Asset::read(void* data, core::Count length)
 {
 #ifdef IN_ANDROID
-    core::Count result = static_cast<core::Count result>(AAsset_read(file, data, length));
+    core::Count result = static_cast<core::Count>(AAsset_read(file, data, length));
 #elif defined(USE_STD_FILE)
     file.read(reinterpret_cast<char*>(data), length);
     core::Count result = static_cast<core::Count>(file.gcount());
