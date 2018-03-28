@@ -3,17 +3,20 @@
 #include "../../system/sys-log.hpp"
 #include "rnd-lt-sun.hpp"
 
-gearoenix::render::light::Light::Light(system::stream::Stream*) {}
+gearoenix::render::light::Light::Light(core::Id my_id, system::stream::Stream*, Engine*)
+    : core::asset::Asset(my_id, core::asset::Asset::AssetType::LIGHT)
+{
+}
 
 gearoenix::render::light::Light::~Light() {}
 
-gearoenix::render::light::Light* gearoenix::render::light::Light::read(system::stream::Stream* f)
+gearoenix::render::light::Light* gearoenix::render::light::Light::read(core::Id my_id, system::stream::Stream* f, Engine* e)
 {
     core::Id light_type;
     f->read(light_type);
     switch (light_type) {
     case 1:
-        return new Sun(f);
+        return new Sun(my_id, f, e);
     default:
         UNEXPECTED;
     }

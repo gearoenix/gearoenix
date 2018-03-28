@@ -23,8 +23,9 @@ namespace physics {
             core::Real length;
 
         public:
-            TrackerSpringJointSpring(system::stream::Stream* f, render::Engine* render_engine, core::EndCaller<core::EndCallerIgnore> c);
+            TrackerSpringJointSpring(core::Id my_id, system::stream::Stream* f, render::Engine* render_engine, core::EndCaller<core::EndCallerIgnore> c);
             TrackerSpringJointSpring(
+                core::Id my_id,
                 const std::shared_ptr<body::Rigid> active,
                 const std::shared_ptr<body::Rigid> passive,
                 const core::Real k,

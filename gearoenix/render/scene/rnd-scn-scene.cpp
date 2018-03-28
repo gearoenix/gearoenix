@@ -42,8 +42,9 @@ void gearoenix::render::scene::Scene::add_model(core::Id id, std::shared_ptr<mod
     }
 }
 
-gearoenix::render::scene::Scene::Scene(SceneType t, system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
-    : scene_type(t)
+gearoenix::render::scene::Scene::Scene(core::Id my_id, SceneType t, system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
+    : core::asset::Asset(my_id, core::asset::Asset::AssetType::SCENE)
+    , scene_type(t)
     , render_engine(e)
 {
     ambient_light.read(f);
@@ -96,15 +97,16 @@ gearoenix::render::scene::Scene::~Scene()
 }
 
 gearoenix::render::scene::Scene* gearoenix::render::scene::Scene::read(
+    core::Id my_id,
     system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
 {
     core::Id t;
     f->read(t);
     switch (t) {
     case SceneType::GAME:
-        return new Scene(SceneType::GAME, f, e, c);
+        return new Scene(my_id, SceneType::GAME, f, e, c);
     case SceneType::UI:
-        return new Ui(f, e, c);
+        return new Ui(my_id, f, e, c);
     default:
         UNEXPECTED;
     }

@@ -37,14 +37,14 @@ namespace physics {
             bool applied = false;
             bool alive = true;
             const Type t;
-            Constraint(Type t);
+            Constraint(core::Id my_id, Type t);
 
         public:
             virtual ~Constraint();
             virtual void on_event(const core::event::Event& e) = 0;
             virtual const std::vector<std::pair<core::Id, std::shared_ptr<render::model::Model>>> get_all_models() const = 0;
             virtual void apply(core::Real delta_time);
-            static Constraint* read(system::stream::Stream* f, render::Engine* render_engine, core::EndCaller<core::EndCallerIgnore> c);
+            static Constraint* read(core::Id my_id, system::stream::Stream* f, render::Engine* render_engine, core::EndCaller<core::EndCallerIgnore> c);
             bool is_alive() const;
             Placer* to_placer();
             const Placer* to_placer() const;

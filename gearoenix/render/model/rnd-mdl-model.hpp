@@ -83,10 +83,10 @@ namespace render {
             physics::collider::Collider* collider = nullptr;
             std::vector<math::Mat4x4> state;
             Engine* const render_engine = nullptr;
-            Model(ModelType t, system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
+            Model(core::Id my_id, ModelType t, system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
 
         public:
-            static Model* read(system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
+            static Model* read(core::Id my_id, system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
             virtual ~Model();
             ModelType get_type() const;
             void commit(const scene::Scene* s);

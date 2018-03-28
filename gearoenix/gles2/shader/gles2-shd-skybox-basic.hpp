@@ -30,7 +30,7 @@ namespace gles2 {
             GLint vtx_att_ind;
 
         public:
-            SkyboxBasic(Engine* eng, core::EndCaller<core::EndCallerIgnore> end);
+            SkyboxBasic(core::Id my_id, Engine* eng, core::EndCaller<core::EndCallerIgnore> end);
             ~SkyboxBasic();
             void use();
             const std::vector<render::shader::stage::Id>& get_stages_ids() const;

@@ -24,7 +24,6 @@ namespace render {
 
         protected:
             const Shape::Type font_type;
-            const core::Id my_id;
             Font(core::Id my_id, Shape::Type t);
 
         public:

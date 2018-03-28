@@ -36,8 +36,8 @@ namespace gles2 {
         void window_changed();
         void update();
         void terminate();
-        render::texture::Texture2D* create_texture_2d(system::stream::Stream* file, core::EndCaller<core::EndCallerIgnore> c);
-        render::texture::Cube* create_texture_cube(system::stream::Stream* file, core::EndCaller<core::EndCallerIgnore> c);
+        render::texture::Texture2D* create_texture_2d(core::Id id, system::stream::Stream* file, core::EndCaller<core::EndCallerIgnore> c);
+        render::texture::Cube* create_texture_cube(core::Id id, system::stream::Stream* file, core::EndCaller<core::EndCallerIgnore> c);
         render::buffer::Mesh* create_mesh(unsigned int vec, system::stream::Stream* file, core::EndCaller<core::EndCallerIgnore> c);
         render::buffer::Uniform* create_uniform(unsigned int s, core::EndCaller<core::EndCallerIgnore> c);
         render::shader::Shader* create_shader(core::Id sid, system::stream::Stream* file, core::EndCaller<core::EndCallerIgnore> c);

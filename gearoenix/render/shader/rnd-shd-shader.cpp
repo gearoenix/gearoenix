@@ -53,7 +53,10 @@ const std::vector<gearoenix::render::shader::VertexAttribute>
         gearoenix::render::shader::VEC2F32
     };
 
-gearoenix::render::shader::Shader::Shader() {}
+gearoenix::render::shader::Shader::Shader(core::Id my_id)
+    : core::asset::Asset(my_id, core::asset::Asset::AssetType::SHADER)
+{
+}
 
 gearoenix::render::shader::Shader::~Shader() {}
 

@@ -17,7 +17,7 @@ namespace render {
             math::Mat4x4 db;
 
         public:
-            Sun(system::stream::Stream* f);
+            Sun(core::Id my_id, system::stream::Stream* f, Engine* e);
             ~Sun();
             const math::Vec3& get_direction() const;
             const math::Vec3& get_color() const;

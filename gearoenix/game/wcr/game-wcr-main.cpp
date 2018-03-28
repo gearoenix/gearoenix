@@ -119,15 +119,13 @@ void GameApp::on_event(const gearoenix::core::event::Event& e)
                     scene->add_model(1);
                     rndeng->delete_scene(1);
                     rndeng->delete_scene(2);
-
+                    gearoenix::core::asset::Manager* astmgr = rndeng->get_system_application()->get_asset_manager();
                     std::shared_ptr<gearoenix::physics::constraint::TrackerSpringJointSpring> cns(
                         new gearoenix::physics::constraint::TrackerSpringJointSpring(
+                            astmgr->create_id(),
                             std::shared_ptr<gearoenix::physics::body::Rigid>(new gearoenix::physics::body::Rigid(mdl)),
                             std::shared_ptr<gearoenix::physics::body::Rigid>(new gearoenix::physics::body::Rigid(cam)),
-                            1.0f,
-                            gearoenix::math::Vec3(0.0f, -0.5f, 0.4f).normalized(),
-                            1.0f, 2.0f));
-                    gearoenix::core::asset::Manager* astmgr = rndeng->get_system_application()->get_asset_manager();
+                            1.0f, gearoenix::math::Vec3(0.0f, -0.5f, 0.4f).normalized(), 1.0f, 2.0f));
                     scene->add_constraint(astmgr->create_id(), cns);
                     state = State::GAME;
                 });

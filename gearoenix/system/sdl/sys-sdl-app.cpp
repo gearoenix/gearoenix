@@ -153,36 +153,36 @@ int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_
         }
         break;
 #ifdef IN_IOS
-        case SDL_FINGERDOWN:{
-            const core::Real x = (e->tfinger.x - 0.5f) * 2.0f * o->screen_ratio;
-            const core::Real y = (0.5f - e->tfinger.y) * 2.0f;
-            event = new core::event::button::Mouse(
-                                                   core::event::button::Button::KeyType::LEFT,
-                                                   core::event::button::Button::ActionType::PRESS,
-                                                   x, y);
-            o->pre_x = x;
-            o->pre_y = y;
-            break;
-        }
-        case SDL_FINGERUP:{
-            const core::Real x = (e->tfinger.x - 0.5f) * 2.0f * o->screen_ratio;
-            const core::Real y = (0.5f - e->tfinger.y) * 2.0f;
-            event = new core::event::button::Mouse(
-                                                   core::event::button::Button::KeyType::LEFT,
-                                                   core::event::button::Button::ActionType::RELEASE,
-                                                   x, y);
-            o->pre_x = x;
-            o->pre_y = y;
-            break;
-        }
-        case SDL_FINGERMOTION: {
-            const core::Real x = (e->tfinger.x - 0.5f) * 2.0f * o->screen_ratio;
-            const core::Real y = (0.5f - e->tfinger.y) * 2.0f;
-            event = new core::event::movement::Mouse(x, y, o->pre_x, o->pre_y);
-            o->pre_x = x;
-            o->pre_y = y;
-            break;
-        }
+    case SDL_FINGERDOWN: {
+        const core::Real x = (e->tfinger.x - 0.5f) * 2.0f * o->screen_ratio;
+        const core::Real y = (0.5f - e->tfinger.y) * 2.0f;
+        event = new core::event::button::Mouse(
+            core::event::button::Button::KeyType::LEFT,
+            core::event::button::Button::ActionType::PRESS,
+            x, y);
+        o->pre_x = x;
+        o->pre_y = y;
+        break;
+    }
+    case SDL_FINGERUP: {
+        const core::Real x = (e->tfinger.x - 0.5f) * 2.0f * o->screen_ratio;
+        const core::Real y = (0.5f - e->tfinger.y) * 2.0f;
+        event = new core::event::button::Mouse(
+            core::event::button::Button::KeyType::LEFT,
+            core::event::button::Button::ActionType::RELEASE,
+            x, y);
+        o->pre_x = x;
+        o->pre_y = y;
+        break;
+    }
+    case SDL_FINGERMOTION: {
+        const core::Real x = (e->tfinger.x - 0.5f) * 2.0f * o->screen_ratio;
+        const core::Real y = (0.5f - e->tfinger.y) * 2.0f;
+        event = new core::event::movement::Mouse(x, y, o->pre_x, o->pre_y);
+        o->pre_x = x;
+        o->pre_y = y;
+        break;
+    }
 #endif
     case SDL_MOUSEWHEEL:
         // todo
@@ -325,6 +325,8 @@ gearoenix::system::Application::Application()
     SDL_GetMouseState(&w, &h);
     pre_x = convert_x_to_ratio(w);
     pre_y = convert_y_to_ratio(h);
+    astmgr = new core::asset::Manager(this, "data.gx3d");
+    astmgr->initialize();
 #ifdef USE_OPENGL_ES2
     if (supported_engine == render::Engine::OPENGL_ES2)
         render_engine = new gles2::Engine(this);
@@ -334,8 +336,7 @@ gearoenix::system::Application::Application()
 #endif
     if (render_engine == nullptr)
         UNEXPECTED;
-    astmgr = new core::asset::Manager(this, "data.gx3d");
-    astmgr->initialize();
+    astmgr->set_render_engine(render_engine);
 }
 
 gearoenix::system::Application::~Application()

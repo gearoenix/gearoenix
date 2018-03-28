@@ -5,9 +5,14 @@
 #include "rnd-txt-texture-2d.hpp"
 #include "rnd-txt-texture-cube.hpp"
 
+gearoenix::render::texture::Texture::Texture(core::Id my_id)
+    : core::asset::Asset(my_id, core::asset::Asset::AssetType::TEXTURE)
+{
+}
+
 gearoenix::render::texture::Texture::~Texture() {}
 
-gearoenix::render::texture::Texture* gearoenix::render::texture::Texture::read(system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
+gearoenix::render::texture::Texture* gearoenix::render::texture::Texture::read(core::Id my_id, system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
 {
     //    LOGE("textell: " << f->tell());
     core::Id t;
@@ -16,10 +21,10 @@ gearoenix::render::texture::Texture* gearoenix::render::texture::Texture::read(s
     case 1:
     case 5:
     case 6:
-        return e->create_texture_2d(f, c);
+        return e->create_texture_2d(my_id, f, c);
     case 3:
     case 4:
-        return e->create_texture_cube(f, c);
+        return e->create_texture_cube(my_id, f, c);
     default:
         UNEXPECTED;
     }

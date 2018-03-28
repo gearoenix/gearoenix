@@ -66,7 +66,7 @@ void gearoenix::gles2::Engine::initialize()
     glBindFramebuffer(GL_FRAMEBUFFER, render_framebuffer);
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         UNEXPECTED;
-    shadow_map_texture = new texture::Texture2D(shadow_map_color);
+    shadow_map_texture = new texture::Texture2D(sysapp->get_asset_manager()->create_id(), shadow_map_color);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
     glEnable(GL_BLEND);
@@ -151,14 +151,14 @@ void gearoenix::gles2::Engine::terminate()
     }
 }
 
-gearoenix::render::texture::Texture2D* gearoenix::gles2::Engine::create_texture_2d(system::stream::Stream* file, core::EndCaller<core::EndCallerIgnore> c)
+gearoenix::render::texture::Texture2D* gearoenix::gles2::Engine::create_texture_2d(core::Id id, system::stream::Stream* file, core::EndCaller<core::EndCallerIgnore> c)
 {
-    return new texture::Texture2D(file, this, c);
+    return new texture::Texture2D(id, file, this, c);
 }
 
-gearoenix::render::texture::Cube* gearoenix::gles2::Engine::create_texture_cube(system::stream::Stream* file, core::EndCaller<core::EndCallerIgnore> c)
+gearoenix::render::texture::Cube* gearoenix::gles2::Engine::create_texture_cube(core::Id id, system::stream::Stream* file, core::EndCaller<core::EndCallerIgnore> c)
 {
-    return new texture::Cube(file, this, c);
+    return new texture::Cube(id, file, this, c);
 }
 
 gearoenix::render::buffer::Mesh* gearoenix::gles2::Engine::create_mesh(unsigned int vec, system::stream::Stream* file, core::EndCaller<core::EndCallerIgnore> c)
@@ -181,34 +181,34 @@ gearoenix::render::shader::Shader* gearoenix::gles2::Engine::create_shader(core:
     case render::shader::DEPTH_POS_UV:
         return new shader::Depth(shader_id, this, c);
     case render::shader::DIRECTIONAL_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
-        return new shader::DirectionalColoredMatteNonreflectiveShadowlessOpaque(this, c);
+        return new shader::DirectionalColoredMatteNonreflectiveShadowlessOpaque(sid, this, c);
     case render::shader::DIRECTIONAL_COLORED_SPECULATED_BAKED_CASTER_OPAQUE:
     case render::shader::DIRECTIONAL_COLORED_SPECULATED_BAKED_SHADOWLESS_OPAQUE:
-        return new shader::DirectionalColoredSpeculatedBakedShadowlessOpaque(this, c);
+        return new shader::DirectionalColoredSpeculatedBakedShadowlessOpaque(sid, this, c);
     case render::shader::DIRECTIONAL_COLORED_SPECULATED_BAKED_FULL_OPAQUE:
-        return new shader::DirectionalColoredSpeculatedBakedFullOpaque(this, c);
+        return new shader::DirectionalColoredSpeculatedBakedFullOpaque(sid, this, c);
     case render::shader::DIRECTIONAL_COLORED_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE:
-        return new shader::DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque(this, c);
+        return new shader::DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque(sid, this, c);
     case render::shader::DIRECTIONAL_D2_SPECULATED_BAKED_FULL_OPAQUE:
-        return new shader::DirectionalD2SpeculatedBakedFullOpaque(this, c);
+        return new shader::DirectionalD2SpeculatedBakedFullOpaque(sid, this, c);
     case render::shader::DIRECTIONAL_D2_SPECULATED_NONREFLECTIVE_FULL_OPAQUE:
-        return new shader::DirectionalD2SpeculatedNonreflectiveFullOpaque(this, c);
+        return new shader::DirectionalD2SpeculatedNonreflectiveFullOpaque(sid, this, c);
     case render::shader::DIRECTIONAL_D2_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE:
-        return new shader::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque(this, c);
+        return new shader::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque(sid, this, c);
     case render::shader::FONT_COLORED:
-        return new shader::FontColored(this, c);
+        return new shader::FontColored(sid, this, c);
     case render::shader::SHADELESS_COLORED_MATTE_NONREFLECTIVE_CASTER_OPAQUE:
     case render::shader::SHADELESS_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
     case render::shader::SHADELESS_COLORED_MATTE_NONREFLECTIVE_SHADOWLESS_TRANSPARENT:
-        return new shader::ShadelessColoredMatteNonreflectiveShadowlessOpaque(this, c);
+        return new shader::ShadelessColoredMatteNonreflectiveShadowlessOpaque(sid, this, c);
     case render::shader::SHADELESS_CUBE_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
-        return new shader::ShadelessCubeMatteNonreflectiveShadowlessOpaque(this, c);
+        return new shader::ShadelessCubeMatteNonreflectiveShadowlessOpaque(sid, this, c);
     case render::shader::SHADELESS_D2_MATTE_NONREFLECTIVE_CASTER_OPAQUE:
     case render::shader::SHADELESS_D2_MATTE_NONREFLECTIVE_SHADOWLESS_OPAQUE:
     case render::shader::SHADELESS_D2_MATTE_NONREFLECTIVE_SHADOWLESS_TRANSPARENT:
-        return new shader::ShadelessD2MatteNonreflectiveShadowlessOpaque(this, c);
+        return new shader::ShadelessD2MatteNonreflectiveShadowlessOpaque(sid, this, c);
     case render::shader::SKYBOX_BASIC:
-        return new shader::SkyboxBasic(this, c);
+        return new shader::SkyboxBasic(sid, this, c);
     default:
         UNEXPECTED;
     }

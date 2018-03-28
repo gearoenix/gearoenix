@@ -20,8 +20,8 @@ void gearoenix::gles2::shader::ShadelessD2MatteNonreflectiveShadowlessOpaque::Re
     reinterpret_cast<texture::Texture2D*>(txt2d)->bind(GL_TEXTURE0);
 }
 
-gearoenix::gles2::shader::ShadelessD2MatteNonreflectiveShadowlessOpaque::ShadelessD2MatteNonreflectiveShadowlessOpaque(Engine* eng, core::EndCaller<core::EndCallerIgnore> end)
-    : Shader(eng, end)
+gearoenix::gles2::shader::ShadelessD2MatteNonreflectiveShadowlessOpaque::ShadelessD2MatteNonreflectiveShadowlessOpaque(core::Id my_id, Engine* eng, core::EndCaller<core::EndCallerIgnore> end)
+    : Shader(my_id, eng, end)
 {
     eng->add_load_function([this, end] {
         create_program();

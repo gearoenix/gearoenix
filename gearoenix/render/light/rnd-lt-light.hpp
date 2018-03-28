@@ -8,14 +8,15 @@ namespace system {
     }
 }
 namespace render {
+    class Engine;
     namespace light {
         class Light : public core::asset::Asset {
         protected:
-            Light(system::stream::Stream* f);
+            Light(core::Id my_id, system::stream::Stream* f, Engine* e);
 
         public:
             virtual ~Light();
-            static Light* read(system::stream::Stream* f);
+            static Light* read(core::Id my_id, system::stream::Stream* f, Engine* e);
         };
     }
 }

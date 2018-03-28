@@ -113,8 +113,8 @@ void gearoenix::render::widget::Button::cancel_effect()
     }
 }
 
-gearoenix::render::widget::Button::Button(system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
-    : Widget(f, e, c)
+gearoenix::render::widget::Button::Button(core::Id my_id, system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
+    : Widget(my_id, f, e, c)
 {
 }
 

@@ -88,14 +88,14 @@ namespace render {
             math::Vec3 ambient_light = math::Vec3(0.2f, 0.2f, 0.2f);
             Engine* const render_engine;
             void add_model(core::Id id, std::shared_ptr<model::Model> m);
-            Scene(SceneType t, system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
+            Scene(core::Id my_id, SceneType t, system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
 
         public:
             void cast_shadow();
             void draw_sky();
             void draw(texture::Texture2D* shadow_texture);
             virtual ~Scene();
-            static Scene* read(system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
+            static Scene* read(core::Id my_id, system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
             const std::map<core::Id, std::weak_ptr<model::Model>>& get_all_models() const;
             const std::map<core::Id, std::shared_ptr<physics::constraint::Constraint>>& get_all_root_constraints() const;
             const std::shared_ptr<camera::Camera>& get_current_camera() const;

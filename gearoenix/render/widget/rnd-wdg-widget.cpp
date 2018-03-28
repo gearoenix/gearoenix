@@ -7,8 +7,8 @@
 #include "rnd-wdg-button.hpp"
 #include "rnd-wdg-text.hpp"
 
-gearoenix::render::widget::Widget::Widget(system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
-    : model::Model(ModelType::WIDGET, f, e, c)
+gearoenix::render::widget::Widget::Widget(core::Id my_id, system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
+    : model::Model(my_id, ModelType::WIDGET, f, e, c)
 {
 }
 
@@ -24,15 +24,15 @@ void gearoenix::render::widget::Widget::cancel_effect()
 {
 }
 
-gearoenix::render::widget::Widget* gearoenix::render::widget::Widget::read(system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
+gearoenix::render::widget::Widget* gearoenix::render::widget::Widget::read(core::Id my_id, system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
 {
     core::Id t;
     f->read(t);
     switch (t) {
     case BUTTON:
-        return new Button(f, e, c);
+        return new Button(my_id, f, e, c);
     case TEXT:
-        return new Text(f, e, c);
+        return new Text(my_id, f, e, c);
     default:
         UNEXPECTED;
     }
@@ -43,7 +43,7 @@ gearoenix::render::widget::Widget::~Widget()
 {
 }
 
-void gearoenix::render::widget::Widget::state_change(EventType e, core::Id my_id)
+void gearoenix::render::widget::Widget::state_change(EventType e)
 {
     //std::lock_guard<std::mutex> lg(event_locker);
     core::Application* coreapp = render_engine->get_system_application()->get_core_app();
@@ -53,7 +53,7 @@ void gearoenix::render::widget::Widget::state_change(EventType e, core::Id my_id
         case EventType::PRESS:
             state_type = StateType::PRESSED;
             press_effect();
-            coreapp->on_event(core::event::ui::Ui(core::event::ui::Ui::ActionType::PRESSED, my_id));
+            coreapp->on_event(core::event::ui::Ui(core::event::ui::Ui::ActionType::PRESSED, asset_id));
             break;
         default:
             break;
@@ -64,12 +64,12 @@ void gearoenix::render::widget::Widget::state_change(EventType e, core::Id my_id
         case EventType::RELEASE:
             state_type = StateType::NORMAL;
             release_effect();
-            coreapp->on_event(core::event::ui::Ui(core::event::ui::Ui::ActionType::CLICKED, my_id));
+            coreapp->on_event(core::event::ui::Ui(core::event::ui::Ui::ActionType::CLICKED, asset_id));
             break;
         case EventType::MOVE_OUT:
             state_type = StateType::NORMAL;
             cancel_effect();
-            coreapp->on_event(core::event::ui::Ui(core::event::ui::Ui::ActionType::CANCELED, my_id));
+            coreapp->on_event(core::event::ui::Ui(core::event::ui::Ui::ActionType::CANCELED, asset_id));
             break;
         default:
             break;

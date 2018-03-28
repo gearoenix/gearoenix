@@ -38,7 +38,7 @@ namespace render {
             void create_text_mesh(core::EndCaller<core::EndCallerIgnore> c);
 
         public:
-            Text(system::stream::Stream* s, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
+            Text(core::Id my_id, system::stream::Stream* s, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
             ~Text();
         };
     }

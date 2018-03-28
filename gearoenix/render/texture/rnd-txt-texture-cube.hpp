@@ -5,6 +5,9 @@ namespace gearoenix {
 namespace render {
     namespace texture {
         class Cube : public Texture {
+        protected:
+            Cube(core::Id my_id);
+
         public:
             virtual ~Cube();
         };

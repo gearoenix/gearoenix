@@ -67,7 +67,6 @@ gearoenix::core::asset::Manager::~Manager()
 
 void gearoenix::core::asset::Manager::initialize()
 {
-    render_engine = sys_app->get_render_engine();
     Id lid = 0, tmp;
 #define GXHELP(x)                      \
     x->read_offsets();                 \
@@ -84,6 +83,11 @@ void gearoenix::core::asset::Manager::initialize()
     GXHELP(constraints);
     GXHELP(scenes);
     last_id.store(lid);
+}
+
+void gearoenix::core::asset::Manager::set_render_engine(render::Engine* rndeng)
+{
+    render_engine = rndeng;
 }
 
 gearoenix::system::stream::Asset* gearoenix::core::asset::Manager::get_file()
@@ -107,8 +111,8 @@ std::shared_ptr<gearoenix::render::shader::Shader> gearoenix::core::asset::Manag
 
 std::shared_ptr<gearoenix::render::camera::Camera> gearoenix::core::asset::Manager::get_camera(Id id)
 {
-    std::function<std::shared_ptr<render::camera::Camera>()> fn_new = [this] {
-        return std::shared_ptr<render::camera::Camera>(render::camera::Camera::read(file, sys_app));
+    std::function<std::shared_ptr<render::camera::Camera>()> fn_new = [this, id] {
+        return std::shared_ptr<render::camera::Camera>(render::camera::Camera::read(id, file, sys_app));
     };
     return cameras->get(id, fn_new);
 }
@@ -120,8 +124,8 @@ std::shared_ptr<gearoenix::render::camera::Camera> gearoenix::core::asset::Manag
 
 std::shared_ptr<gearoenix::audio::Audio> gearoenix::core::asset::Manager::get_audio(Id id)
 {
-    std::function<std::shared_ptr<audio::Audio>()> fn_new = [this] {
-        return std::shared_ptr<gearoenix::audio::Audio>(gearoenix::audio::Audio::read(file));
+    std::function<std::shared_ptr<audio::Audio>()> fn_new = [this, id] {
+        return std::shared_ptr<gearoenix::audio::Audio>(gearoenix::audio::Audio::read(id, file));
     };
     return audios->get(id, fn_new);
 }
@@ -133,8 +137,8 @@ std::shared_ptr<gearoenix::audio::Audio> gearoenix::core::asset::Manager::get_ca
 
 std::shared_ptr<gearoenix::render::light::Light> gearoenix::core::asset::Manager::get_light(Id id)
 {
-    std::function<std::shared_ptr<render::light::Light>()> fn_new = [this] {
-        return std::shared_ptr<render::light::Light>(render::light::Light::read(file));
+    std::function<std::shared_ptr<render::light::Light>()> fn_new = [this, id] {
+        return std::shared_ptr<render::light::Light>(render::light::Light::read(id, file, render_engine));
     };
     return lights->get<render::light::Light>(id, fn_new);
 }
@@ -146,8 +150,8 @@ std::shared_ptr<gearoenix::render::light::Light> gearoenix::core::asset::Manager
 
 std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::core::asset::Manager::get_texture(Id id, EndCaller<render::texture::Texture> end)
 {
-    auto result = textures->get<render::texture::Texture>(id, [this, end]() -> std::shared_ptr<render::texture::Texture> {
-        return std::shared_ptr<render::texture::Texture>(render::texture::Texture::read(file, render_engine, EndCaller<EndCallerIgnore>([end](std::shared_ptr<EndCallerIgnore>) -> void {})));
+    auto result = textures->get<render::texture::Texture>(id, [this, end, id]() -> std::shared_ptr<render::texture::Texture> {
+        return std::shared_ptr<render::texture::Texture>(render::texture::Texture::read(id, file, render_engine, EndCaller<EndCallerIgnore>([end](std::shared_ptr<EndCallerIgnore>) -> void {})));
     });
     end.set_data(result);
     return result;
@@ -174,8 +178,8 @@ std::shared_ptr<gearoenix::render::font::Font> gearoenix::core::asset::Manager::
 
 std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::core::asset::Manager::get_mesh(Id id, EndCaller<render::mesh::Mesh> end)
 {
-    auto result = meshes->get<render::mesh::Mesh>(id, [this, end]() -> std::shared_ptr<render::mesh::Mesh> {
-        return std::shared_ptr<render::mesh::Mesh>(render::mesh::Mesh::read(file, render_engine, EndCaller<EndCallerIgnore>([end](std::shared_ptr<EndCallerIgnore>) -> void {})));
+    auto result = meshes->get<render::mesh::Mesh>(id, [this, end, id]() -> std::shared_ptr<render::mesh::Mesh> {
+        return std::shared_ptr<render::mesh::Mesh>(render::mesh::Mesh::read(id, file, render_engine, EndCaller<EndCallerIgnore>([end](std::shared_ptr<EndCallerIgnore>) -> void {})));
     });
     end.set_data(result);
     return result;
@@ -188,8 +192,8 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::core::asset::Manager::
 
 std::shared_ptr<gearoenix::render::model::Model> gearoenix::core::asset::Manager::get_model(Id id, EndCaller<render::model::Model> end)
 {
-    auto result = models->get<render::model::Model>(id, [this, end]() -> std::shared_ptr<render::model::Model> {
-        return std::shared_ptr<render::model::Model>(render::model::Model::read(file, render_engine, EndCaller<EndCallerIgnore>([end](std::shared_ptr<EndCallerIgnore>) -> void {})));
+    auto result = models->get<render::model::Model>(id, [this, end, id]() -> std::shared_ptr<render::model::Model> {
+        return std::shared_ptr<render::model::Model>(render::model::Model::read(id, file, render_engine, EndCaller<EndCallerIgnore>([end](std::shared_ptr<EndCallerIgnore>) -> void {})));
     });
     end.set_data(result);
     return result;
@@ -202,8 +206,8 @@ std::shared_ptr<gearoenix::render::model::Model> gearoenix::core::asset::Manager
 
 std::shared_ptr<gearoenix::render::skybox::Skybox> gearoenix::core::asset::Manager::get_skybox(Id id, EndCaller<render::skybox::Skybox> e)
 {
-    auto result = skyboxes->get<render::skybox::Skybox>(id, [this, e]() -> std::shared_ptr<render::skybox::Skybox> {
-        return std::shared_ptr<render::skybox::Skybox>(render::skybox::Skybox::read(file, render_engine, EndCaller<EndCallerIgnore>([e](std::shared_ptr<EndCallerIgnore>) -> void {})));
+    auto result = skyboxes->get<render::skybox::Skybox>(id, [this, e, id]() -> std::shared_ptr<render::skybox::Skybox> {
+        return std::shared_ptr<render::skybox::Skybox>(render::skybox::Skybox::read(id, file, render_engine, EndCaller<EndCallerIgnore>([e](std::shared_ptr<EndCallerIgnore>) -> void {})));
     });
     e.set_data(result);
     return result;
@@ -216,8 +220,8 @@ std::shared_ptr<gearoenix::render::skybox::Skybox> gearoenix::core::asset::Manag
 
 std::shared_ptr<gearoenix::physics::constraint::Constraint> gearoenix::core::asset::Manager::get_constriants(Id id, EndCaller<physics::constraint::Constraint> end)
 {
-    auto result = constraints->get<physics::constraint::Constraint>(id, [this, end]() -> std::shared_ptr<physics::constraint::Constraint> {
-        return std::shared_ptr<physics::constraint::Constraint>(physics::constraint::Constraint::read(file, render_engine, EndCaller<EndCallerIgnore>([end](std::shared_ptr<EndCallerIgnore>) -> void {})));
+    auto result = constraints->get<physics::constraint::Constraint>(id, [this, end, id]() -> std::shared_ptr<physics::constraint::Constraint> {
+        return std::shared_ptr<physics::constraint::Constraint>(physics::constraint::Constraint::read(id, file, render_engine, EndCaller<EndCallerIgnore>([end](std::shared_ptr<EndCallerIgnore>) -> void {})));
     });
     end.set_data(result);
     return result;
@@ -230,8 +234,8 @@ std::shared_ptr<gearoenix::physics::constraint::Constraint> gearoenix::core::ass
 
 std::shared_ptr<gearoenix::render::scene::Scene> gearoenix::core::asset::Manager::get_scene(Id id, EndCaller<render::scene::Scene> end)
 {
-    auto result = scenes->get<render::scene::Scene>(id, [this, end]() -> std::shared_ptr<render::scene::Scene> {
-        return std::shared_ptr<render::scene::Scene>(render::scene::Scene::read(file, render_engine, EndCaller<EndCallerIgnore>([end](std::shared_ptr<EndCallerIgnore>) -> void {})));
+    auto result = scenes->get<render::scene::Scene>(id, [this, end, id]() -> std::shared_ptr<render::scene::Scene> {
+        return std::shared_ptr<render::scene::Scene>(render::scene::Scene::read(id, file, render_engine, EndCaller<EndCallerIgnore>([end](std::shared_ptr<EndCallerIgnore>) -> void {})));
     });
     end.set_data(result);
     return result;

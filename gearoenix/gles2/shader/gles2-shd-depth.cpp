@@ -20,7 +20,7 @@ void gearoenix::gles2::shader::Depth::Resources::bind()
 }
 
 gearoenix::gles2::shader::Depth::Depth(core::Id sid, Engine* eng, core::EndCaller<core::EndCallerIgnore> end)
-    : Shader(eng, end)
+    : Shader(sid, eng, end)
     , vtx_stride(Shader::get_vertex_real_count(sid) * sizeof(GLfloat))
 {
     eng->add_load_function([this, end] {

@@ -90,8 +90,9 @@ void gearoenix::gles2::shader::Shader::end_object(const GLuint& shader_object)
     glDeleteShader(shader_object);
 }
 
-gearoenix::gles2::shader::Shader::Shader(Engine* eng, core::EndCaller<core::EndCallerIgnore>)
-    : eng(eng)
+gearoenix::gles2::shader::Shader::Shader(core::Id my_id, Engine* eng, core::EndCaller<core::EndCallerIgnore>)
+    : render::shader::Shader(my_id)
+    , eng(eng)
 {
 }
 

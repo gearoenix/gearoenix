@@ -10,14 +10,14 @@
 #include "../../system/sys-log.hpp"
 #include "../body/phs-bd-rigid.hpp"
 
-gearoenix::physics::constraint::TrackerSpringJointSpring::TrackerSpringJointSpring(system::stream::Stream*, render::Engine*, core::EndCaller<core::EndCallerIgnore>)
-    : Constraint(TRACKER_SPRING_JOINT_SPRING)
+gearoenix::physics::constraint::TrackerSpringJointSpring::TrackerSpringJointSpring(core::Id my_id, system::stream::Stream*, render::Engine*, core::EndCaller<core::EndCallerIgnore>)
+    : Constraint(my_id, TRACKER_SPRING_JOINT_SPRING)
 {
     UNIMPLEMENTED;
 }
 
-gearoenix::physics::constraint::TrackerSpringJointSpring::TrackerSpringJointSpring(const std::shared_ptr<body::Rigid> active, const std::shared_ptr<body::Rigid> passive, const core::Real k, const math::Vec3& angle, const core::Real joint_k, const core::Real length)
-    : Constraint(TRACKER_SPRING_JOINT_SPRING)
+gearoenix::physics::constraint::TrackerSpringJointSpring::TrackerSpringJointSpring(core::Id my_id, const std::shared_ptr<body::Rigid> active, const std::shared_ptr<body::Rigid> passive, const core::Real k, const math::Vec3& angle, const core::Real joint_k, const core::Real length)
+    : Constraint(my_id, TRACKER_SPRING_JOINT_SPRING)
     , active(active)
     , passive(passive)
     , k(k)

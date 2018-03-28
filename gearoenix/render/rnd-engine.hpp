@@ -52,7 +52,7 @@ namespace render {
     }
     class Engine {
     public:
-        enum EngineType : core::Id {
+        typedef enum : core::Id {
             VULKAN,
             OPENGL_43,
             OPENGL_33,
@@ -61,12 +61,11 @@ namespace render {
             DIRECTX_11,
             DIRECTX_12,
             METAL,
-            UNKNOWN,
-        };
+        } EngineType;
 
     private:
     protected:
-        EngineType engine_type = EngineType::UNKNOWN;
+        EngineType engine_type = (EngineType)0xFFFFFFFFFFFFFFFF;
         system::Application* sysapp;
         pipeline::Manager* pipmgr;
 #ifdef THREAD_SUPPORTED
@@ -91,8 +90,8 @@ namespace render {
         virtual void window_changed() = 0;
         virtual void update() = 0;
         virtual void terminate() = 0;
-        virtual texture::Texture2D* create_texture_2d(system::stream::Stream* file, core::EndCaller<core::EndCallerIgnore> c) = 0;
-        virtual texture::Cube* create_texture_cube(system::stream::Stream* file, core::EndCaller<core::EndCallerIgnore> c) = 0;
+        virtual texture::Texture2D* create_texture_2d(core::Id id, system::stream::Stream* file, core::EndCaller<core::EndCallerIgnore> c) = 0;
+        virtual texture::Cube* create_texture_cube(core::Id id, system::stream::Stream* file, core::EndCaller<core::EndCallerIgnore> c) = 0;
         virtual buffer::Mesh* create_mesh(unsigned int vec, system::stream::Stream* file, core::EndCaller<core::EndCallerIgnore> c) = 0;
         virtual buffer::Uniform* create_uniform(unsigned int s, core::EndCaller<core::EndCallerIgnore> c) = 0;
         virtual shader::Shader* create_shader(core::Id sid, system::stream::Stream* file, core::EndCaller<core::EndCallerIgnore> c) = 0;

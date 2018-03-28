@@ -40,7 +40,7 @@ namespace render {
             void cancel_effect();
 
         public:
-            Button(system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
+            Button(core::Id my_id, system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
             virtual ~Button();
         };
     }

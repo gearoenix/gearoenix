@@ -1,10 +1,15 @@
 #include "rnd-lt-sun.hpp"
+#include "../../core/asset/cr-asset-manager.hpp"
 #include "../../core/cr-build-configuration.hpp"
+#include "../../system/sys-app.hpp"
 #include "../camera/rnd-cmr-orthographic.hpp"
+#include "../rnd-engine.hpp"
 
-gearoenix::render::light::Sun::Sun(system::stream::Stream* f)
-    : Light(f)
-    , cam(new camera::Orthographic(f, nullptr))
+gearoenix::render::light::Sun::Sun(core::Id my_id, system::stream::Stream* f, Engine* e)
+    : Light(my_id, f, e)
+    , cam(new camera::Orthographic(
+          e->get_system_application()->get_asset_manager()->create_id(),
+          f, nullptr))
 {
     color.read(f);
     db = math::Mat4x4(

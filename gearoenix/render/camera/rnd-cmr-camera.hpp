@@ -35,11 +35,11 @@ namespace render {
             math::Mat4x4 v;
             math::Mat4x4 p;
             math::Mat4x4 vp;
-            Camera(system::stream::Stream* f, system::Application* sysapp);
+            Camera(core::Id my_id, system::stream::Stream* f, system::Application* sysapp);
 
         public:
             virtual ~Camera();
-            static Camera* read(system::stream::Stream* f, system::Application* sysapp);
+            static Camera* read(core::Id my_id, system::stream::Stream* f, system::Application* sysapp);
             void look_at(const math::Vec3& target, const math::Vec3& up);
             void look_at(const math::Vec3& origin, const math::Vec3& target, const math::Vec3& up);
             const math::Mat4x4& get_view_projection() const;

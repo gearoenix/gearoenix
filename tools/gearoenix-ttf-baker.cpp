@@ -10,13 +10,13 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "../external/stb/stb_image_write.h"
 
+#include <cmath>
 #include <exception>
 #include <fstream>
 #include <iostream>
 #include <limits>
 #include <string>
 #include <vector>
-#include <cmath>
 
 static void png_write_function(void* context, void* data, int size)
 {

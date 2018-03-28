@@ -16,8 +16,9 @@
 #include "../widget/rnd-wdg-widget.hpp"
 #include <iostream>
 
-gearoenix::render::model::Model::Model(ModelType t, system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
-    : model_type(t)
+gearoenix::render::model::Model::Model(core::Id my_id, ModelType t, system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
+    : core::asset::Asset(my_id, core::asset::Asset::AssetType::MODEL)
+    , model_type(t)
     , render_engine(e)
 {
     //std::lock_guard<std::mutex> lg(locker);
@@ -67,15 +68,15 @@ gearoenix::render::model::Model::Model(ModelType t, system::stream::Stream* f, E
     asset_file->seek(last_pos);
 }
 
-gearoenix::render::model::Model* gearoenix::render::model::Model::read(system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
+gearoenix::render::model::Model* gearoenix::render::model::Model::read(core::Id my_id, system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
 {
     core::Id t;
     f->read(t);
     switch (t) {
     case WIDGET:
-        return widget::Widget::read(f, e, c);
+        return widget::Widget::read(my_id, f, e, c);
     case BASIC:
-        return new Model(ModelType::BASIC, f, e, c);
+        return new Model(my_id, ModelType::BASIC, f, e, c);
     default:
         UNEXPECTED;
     }

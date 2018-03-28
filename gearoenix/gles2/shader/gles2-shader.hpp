@@ -24,7 +24,7 @@ namespace gles2 {
             void end_object(const GLuint& shader_object);
 
         public:
-            Shader(Engine* eng, core::EndCaller<core::EndCallerIgnore> end);
+            Shader(core::Id my_id, Engine* eng, core::EndCaller<core::EndCallerIgnore> end);
             virtual ~Shader();
         };
     }

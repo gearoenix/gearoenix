@@ -21,8 +21,8 @@ void gearoenix::gles2::shader::ShadelessCubeMatteNonreflectiveShadowlessOpaque::
     reinterpret_cast<texture::Cube*>(ctxt)->bind(GL_TEXTURE0);
 }
 
-gearoenix::gles2::shader::ShadelessCubeMatteNonreflectiveShadowlessOpaque::ShadelessCubeMatteNonreflectiveShadowlessOpaque(Engine* eng, core::EndCaller<core::EndCallerIgnore> end)
-    : Shader(eng, end)
+gearoenix::gles2::shader::ShadelessCubeMatteNonreflectiveShadowlessOpaque::ShadelessCubeMatteNonreflectiveShadowlessOpaque(core::Id my_id, Engine* eng, core::EndCaller<core::EndCallerIgnore> end)
+    : Shader(my_id, eng, end)
 {
     eng->add_load_function([this, end] {
         CHECK_FOR_GRAPHIC_API_ERROR;

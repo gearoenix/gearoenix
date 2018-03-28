@@ -81,6 +81,7 @@ namespace core {
             Manager(system::Application* sys_app, const std::string& file);
             ~Manager();
             void initialize();
+            void set_render_engine(render::Engine* rndeng);
             system::stream::Asset* get_file();
             std::shared_ptr<render::shader::Shader> get_shader(Id id, EndCaller<render::shader::Shader> end);
             std::shared_ptr<render::shader::Shader> get_cached_shader(Id id) const;

@@ -112,11 +112,11 @@ void gearoenix::render::widget::Text::create_text_mesh(core::EndCaller<core::End
     }
     s.seek(0);
     mesh_id = render_engine->get_system_application()->get_asset_manager()->create_id();
-    msh = std::shared_ptr<mesh::Mesh>(mesh::Mesh::read(&s, render_engine, c));
+    msh = std::shared_ptr<mesh::Mesh>(mesh::Mesh::read(mesh_id, &s, render_engine, c));
 }
 
-gearoenix::render::widget::Text::Text(system::stream::Stream* s, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
-    : Widget(s, e, c)
+gearoenix::render::widget::Text::Text(core::Id my_id, system::stream::Stream* s, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
+    : Widget(my_id, s, e, c)
     , text(s->read_string())
     , align(s->read<Alignment::Type>())
     , space_character(s->read<core::Real>())

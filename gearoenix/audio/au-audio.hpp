@@ -11,11 +11,11 @@ namespace audio {
     class Audio : public core::asset::Asset {
     private:
     protected:
-        Audio(system::stream::Stream* f);
+        Audio(core::Id my_id, system::stream::Stream* f);
 
     public:
         virtual ~Audio();
-        static Audio* read(system::stream::Stream* f);
+        static Audio* read(core::Id my_id, system::stream::Stream* f);
     };
 } // namespace audio
 } // namespace gearoenix

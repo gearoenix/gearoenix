@@ -33,8 +33,8 @@ void gearoenix::gles2::shader::DirectionalColoredSpeculatedBakedFullOpaque::Reso
     reinterpret_cast<texture::Texture2D*>(shdtxt)->bind(GL_TEXTURE1);
 }
 
-gearoenix::gles2::shader::DirectionalColoredSpeculatedBakedFullOpaque::DirectionalColoredSpeculatedBakedFullOpaque(Engine* eng, core::EndCaller<core::EndCallerIgnore> end)
-    : Shader(eng, end)
+gearoenix::gles2::shader::DirectionalColoredSpeculatedBakedFullOpaque::DirectionalColoredSpeculatedBakedFullOpaque(core::Id my_id, Engine* eng, core::EndCaller<core::EndCallerIgnore> end)
+    : Shader(my_id, eng, end)
 {
     eng->add_load_function([this, end] {
         CHECK_FOR_GRAPHIC_API_ERROR;

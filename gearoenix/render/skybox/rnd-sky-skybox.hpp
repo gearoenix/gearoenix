@@ -30,9 +30,9 @@ namespace render {
             material::SkyboxBasic* mat = nullptr;
 
         public:
-            Skybox(system::stream::Stream* s, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
+            Skybox(core::Id my_id, system::stream::Stream* s, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
             ~Skybox();
-            static Skybox* read(system::stream::Stream* s, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
+            static Skybox* read(core::Id my_id, system::stream::Stream* s, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
             void draw();
             void update(const scene::Scene* s);
         };

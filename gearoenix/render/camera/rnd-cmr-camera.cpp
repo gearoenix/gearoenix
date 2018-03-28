@@ -7,8 +7,9 @@
 #include "rnd-cmr-orthographic.hpp"
 #include "rnd-cmr-perspective.hpp"
 
-gearoenix::render::camera::Camera::Camera(system::stream::Stream* f, system::Application* sysapp)
-    : screen_ratio(nullptr == sysapp ? 1.0f : sysapp->get_window_ratio())
+gearoenix::render::camera::Camera::Camera(core::Id my_id, system::stream::Stream* f, system::Application* sysapp)
+    : core::asset::Asset(my_id, core::asset::Asset::AssetType::CAMERA)
+    , screen_ratio(nullptr == sysapp ? 1.0f : sysapp->get_window_ratio())
     , vwl(math::Mat4x4::look_at(
           math::Vec3(0.0f, 0.0f, 0.0f),
           math::Vec3(0.0f, 0.0f, -1.0f),
@@ -38,16 +39,16 @@ gearoenix::render::camera::Camera::~Camera()
 {
 }
 
-gearoenix::render::camera::Camera* gearoenix::render::camera::Camera::read(system::stream::Stream* f, system::Application* sysapp)
+gearoenix::render::camera::Camera* gearoenix::render::camera::Camera::read(core::Id my_id, system::stream::Stream* f, system::Application* sysapp)
 {
     core::Id camt;
     f->read(camt);
     switch (camt) {
     case 1:
-        return new Perspective(f, sysapp);
+        return new Perspective(my_id, f, sysapp);
         break;
     case 2:
-        return new Orthographic(f, sysapp);
+        return new Orthographic(my_id, f, sysapp);
     default:
         GXLOGF("Unexpected");
         break;

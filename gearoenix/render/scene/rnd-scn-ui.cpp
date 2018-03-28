@@ -11,8 +11,8 @@
 #include "../widget/rnd-wdg-widget.hpp"
 #include <limits>
 
-gearoenix::render::scene::Ui::Ui(system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
-    : Scene(Scene::SceneType::UI, f, e, c)
+gearoenix::render::scene::Ui::Ui(core::Id my_id, system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
+    : Scene(my_id, Scene::SceneType::UI, f, e, c)
 {
 }
 
@@ -41,7 +41,7 @@ void gearoenix::render::scene::Ui::on_event(core::event::Event& e)
                     } else {
                         break;
                     }
-                    hitw->state_change(widget::Widget::EventType::PRESS, pressed);
+                    hitw->state_change(widget::Widget::EventType::PRESS);
                     e.take();
                     break;
                 }
@@ -57,7 +57,7 @@ void gearoenix::render::scene::Ui::on_event(core::event::Event& e)
                     } else {
                         break;
                     }
-                    hitw->state_change(widget::Widget::EventType::RELEASE, pressed);
+                    hitw->state_change(widget::Widget::EventType::RELEASE);
                     pressed = (core::Id)-1;
                     e.take();
                     break;
@@ -87,7 +87,7 @@ void gearoenix::render::scene::Ui::on_event(core::event::Event& e)
                 if (id_model == all_models.end())
                     break;
                 if (auto hitm = id_model->second.lock()) {
-                    std::static_pointer_cast<widget::Widget>(hitm)->state_change(widget::Widget::EventType::MOVE_OUT, mouse_overed);
+                    std::static_pointer_cast<widget::Widget>(hitm)->state_change(widget::Widget::EventType::MOVE_OUT);
                 }
             }
             mouse_overed = hitmptr;

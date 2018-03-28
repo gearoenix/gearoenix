@@ -13,8 +13,8 @@ void gearoenix::render::camera::Perspective::on_ratio_change()
     vp = p * v;
 }
 
-gearoenix::render::camera::Perspective::Perspective(system::stream::Stream* f, system::Application* app)
-    : Camera(f, app)
+gearoenix::render::camera::Perspective::Perspective(core::Id my_id, system::stream::Stream* f, system::Application* app)
+    : Camera(my_id, f, app)
 {
     f->read(h_angle);
     tanhang = std::tan(h_angle);

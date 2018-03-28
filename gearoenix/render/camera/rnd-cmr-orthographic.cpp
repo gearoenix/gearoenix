@@ -10,8 +10,8 @@ void gearoenix::render::camera::Orthographic::on_ratio_change()
     vp = p * v;
 }
 
-gearoenix::render::camera::Orthographic::Orthographic(system::stream::Stream* f, system::Application* sysapp)
-    : Camera(f, sysapp)
+gearoenix::render::camera::Orthographic::Orthographic(core::Id my_id, system::stream::Stream* f, system::Application* sysapp)
+    : Camera(my_id, f, sysapp)
 {
     f->read(aspects_size);
     c_height = aspects_size;

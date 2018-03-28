@@ -3,8 +3,9 @@
 #include "../../system/sys-log.hpp"
 #include "phs-cns-placer.hpp"
 
-gearoenix::physics::constraint::Constraint::Constraint(Type t)
-    : t(t)
+gearoenix::physics::constraint::Constraint::Constraint(core::Id my_id, Type t)
+    : core::asset::Asset(my_id, core::asset::Asset::AssetType::CONSTRAINT)
+    , t(t)
 {
 }
 
@@ -22,13 +23,13 @@ void gearoenix::physics::constraint::Constraint::apply(core::Real)
     applied = true;
 }
 
-gearoenix::physics::constraint::Constraint* gearoenix::physics::constraint::Constraint::read(system::stream::Stream* f, render::Engine* render_engine, core::EndCaller<core::EndCallerIgnore> c)
+gearoenix::physics::constraint::Constraint* gearoenix::physics::constraint::Constraint::read(core::Id my_id, system::stream::Stream* f, render::Engine* render_engine, core::EndCaller<core::EndCallerIgnore> c)
 {
     Type t;
     f->read(t);
     switch (t) {
     case PLACER:
-        return new Placer(f, render_engine, c);
+        return new Placer(my_id, f, render_engine, c);
     default:
         UNEXPECTED;
     }

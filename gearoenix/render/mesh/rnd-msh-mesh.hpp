@@ -41,8 +41,8 @@ namespace render {
             buffer::Mesh* buf;
 
         public:
-            Mesh(system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
-            static Mesh* read(system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
+            Mesh(core::Id my_id, system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
+            static Mesh* read(core::Id my_id, system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
             ~Mesh();
             void bind();
             void draw();

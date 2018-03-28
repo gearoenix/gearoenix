@@ -8,8 +8,8 @@
 #include "../../system/sys-app.hpp"
 #include "../../system/sys-log.hpp"
 
-gearoenix::physics::constraint::Placer::Placer(system::stream::Stream* f, render::Engine* render_engine, core::EndCaller<core::EndCallerIgnore> c)
-    : Constraint(PLACER)
+gearoenix::physics::constraint::Placer::Placer(core::Id my_id, system::stream::Stream* f, render::Engine* render_engine, core::EndCaller<core::EndCallerIgnore> c)
+    : Constraint(my_id, PLACER)
 {
     f->read(t);
     switch (t) {

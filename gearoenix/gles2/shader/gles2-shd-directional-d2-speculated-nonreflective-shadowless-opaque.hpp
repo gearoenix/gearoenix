@@ -39,7 +39,7 @@ namespace gles2 {
             GLint uv_att_ind;
 
         public:
-            DirectionalD2SpeculatedNonreflectiveShadowlessOpaque(Engine* eng, core::EndCaller<core::EndCallerIgnore> end);
+            DirectionalD2SpeculatedNonreflectiveShadowlessOpaque(core::Id my_id, Engine* eng, core::EndCaller<core::EndCallerIgnore> end);
             ~DirectionalD2SpeculatedNonreflectiveShadowlessOpaque();
             void use();
             const std::vector<render::shader::stage::Id>& get_stages_ids() const;

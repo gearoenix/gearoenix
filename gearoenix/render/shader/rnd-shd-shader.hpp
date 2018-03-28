@@ -1030,7 +1030,7 @@ namespace render {
 
         protected:
             static const std::vector<stage::Id> graphic_2_stage;
-            Shader();
+            Shader(core::Id my_id);
 
         public:
             virtual ~Shader();

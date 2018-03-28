@@ -13,9 +13,12 @@ namespace render {
     class Engine;
     namespace texture {
         class Texture : public core::asset::Asset {
+        protected:
+            Texture(core::Id my_id);
+
         public:
             virtual ~Texture();
-            static Texture* read(system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
+            static Texture* read(core::Id my_id, system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
         };
     }
 }
