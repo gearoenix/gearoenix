@@ -30,7 +30,7 @@ namespace gles3 {
             GLint vtx_att_ind;
 
         public:
-            Depth(core::Id sid, Engine* eng, core::EndCaller<core::EndCallerIgnore> end);
+            Depth(core::Id sid, Engine* eng, core::sync::EndCaller<core::sync::EndCallerIgnore> end);
             ~Depth();
             void use();
             const std::vector<render::shader::stage::Id>& get_stages_ids() const;

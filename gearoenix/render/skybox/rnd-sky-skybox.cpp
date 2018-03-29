@@ -7,12 +7,12 @@
 #include "../mesh/rnd-msh-mesh.hpp"
 #include "../rnd-engine.hpp"
 
-gearoenix::render::skybox::Skybox::Skybox(core::Id my_id, system::stream::Stream* s, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
+gearoenix::render::skybox::Skybox::Skybox(core::Id my_id, system::stream::Stream* s, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> c)
     : core::asset::Asset(my_id, core::asset::Asset::AssetType::SKYBOX)
     , mesh_id(s->read<core::Id>())
     , mat(static_cast<material::SkyboxBasic*>(material::Material::read(s, e, c)))
 {
-    msh = e->get_system_application()->get_asset_manager()->get_mesh(mesh_id, core::EndCaller<mesh::Mesh>([c](std::shared_ptr<mesh::Mesh>) -> void {}));
+    msh = e->get_system_application()->get_asset_manager()->get_mesh(mesh_id, core::sync::EndCaller<mesh::Mesh>([c](std::shared_ptr<mesh::Mesh>) -> void {}));
 }
 
 gearoenix::render::skybox::Skybox::~Skybox()
@@ -20,7 +20,7 @@ gearoenix::render::skybox::Skybox::~Skybox()
     delete mat;
 }
 
-gearoenix::render::skybox::Skybox* gearoenix::render::skybox::Skybox::read(core::Id my_id, system::stream::Stream* s, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
+gearoenix::render::skybox::Skybox* gearoenix::render::skybox::Skybox::read(core::Id my_id, system::stream::Stream* s, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> c)
 {
     switch (s->read<core::Id>()) {
     case 1:

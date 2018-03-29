@@ -33,7 +33,7 @@ namespace render {
             std::shared_ptr<texture::Cube> ctxt;
 
         public:
-            ShadelessCubeMatteNonreflectiveShadowlessOpaque(system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> end);
+            ShadelessCubeMatteNonreflectiveShadowlessOpaque(system::stream::Stream* f, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> end);
             ~ShadelessCubeMatteNonreflectiveShadowlessOpaque();
             unsigned int get_vertex_elements_count() const;
             core::Id get_shader_id() const;

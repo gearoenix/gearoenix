@@ -60,7 +60,7 @@ gearoenix::render::shader::Shader::Shader(core::Id my_id)
 
 gearoenix::render::shader::Shader::~Shader() {}
 
-gearoenix::render::shader::Shader* gearoenix::render::shader::Shader::read(core::Id sid, system::stream::Stream* file, Engine* engine, core::EndCaller<core::EndCallerIgnore> end)
+gearoenix::render::shader::Shader* gearoenix::render::shader::Shader::read(core::Id sid, system::stream::Stream* file, Engine* engine, core::sync::EndCaller<core::sync::EndCallerIgnore> end)
 {
     return engine->create_shader(sid, file, end);
 }

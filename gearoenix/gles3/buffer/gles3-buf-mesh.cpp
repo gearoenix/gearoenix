@@ -5,7 +5,7 @@
 #include "../gles3-engine.hpp"
 #include "../gles3.hpp"
 
-gearoenix::gles3::buffer::Mesh::Mesh(unsigned int vec, system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
+gearoenix::gles3::buffer::Mesh::Mesh(unsigned int vec, system::stream::Stream* f, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> c)
     : render::buffer::Mesh(e)
 {
     core::Count cnt;

@@ -7,7 +7,7 @@
 #include "../shader/dx11-shader.hpp"
 
 gearoenix::dx11::pipeline::Pipeline::Pipeline(
-    core::Id sid, Engine* eng, core::EndCaller<core::EndCallerIgnore> call)
+    core::Id sid, Engine* eng, core::sync::EndCaller<core::sync::EndCallerIgnore> call)
     : render::pipeline::Pipeline(sid, eng, call)
 {
 }

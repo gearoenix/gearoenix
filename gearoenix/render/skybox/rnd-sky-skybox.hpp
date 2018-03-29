@@ -1,8 +1,8 @@
 #ifndef GEAROENIX_RENDER_SKYBOX_SKYBOX_HPP
 #define GEAROENIX_RENDER_SKYBOX_SKYBOX_HPP
 #include "../../core/asset/cr-asset.hpp"
-#include "../../core/cr-end-caller.hpp"
 #include "../../core/cr-types.hpp"
+#include "../../core/sync/cr-sync-end-caller.hpp"
 #include <memory>
 
 namespace gearoenix {
@@ -30,9 +30,9 @@ namespace render {
             material::SkyboxBasic* mat = nullptr;
 
         public:
-            Skybox(core::Id my_id, system::stream::Stream* s, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
+            Skybox(core::Id my_id, system::stream::Stream* s, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> c);
             ~Skybox();
-            static Skybox* read(core::Id my_id, system::stream::Stream* s, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
+            static Skybox* read(core::Id my_id, system::stream::Stream* s, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> c);
             void draw();
             void update(const scene::Scene* s);
         };

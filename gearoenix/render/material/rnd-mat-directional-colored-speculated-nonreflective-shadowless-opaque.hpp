@@ -1,6 +1,6 @@
 #ifndef GEAROEMIX_RENDER_MATERIAL_DIRECTIONAL_COLORED_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE_HPP
 #define GEAROEMIX_RENDER_MATERIAL_DIRECTIONAL_COLORED_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE_HPP
-#include "../../core/cr-end-caller.hpp"
+#include "../../core/sync/cr-sync-end-caller.hpp"
 #include "../../math/math-matrix.hpp"
 #include "../../math/math-vector.hpp"
 #include "../shader/rnd-shd-resources.hpp"
@@ -41,7 +41,7 @@ namespace render {
             Resources* shdrsc;
 
         public:
-            DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque(system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> end);
+            DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque(system::stream::Stream* f, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> end);
             ~DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque();
             unsigned int get_vertex_elements_count() const;
             core::Id get_shader_id() const;

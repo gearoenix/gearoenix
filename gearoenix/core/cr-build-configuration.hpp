@@ -75,9 +75,6 @@
 #else
 #define GEAROENIX_FULLSCREEN
 #endif
-//#define GEAROENIX_FULLSCREEN
-#ifndef IN_WEB
-#define THREAD_SUPPORTED
-#endif
+//#define GEAROENIX_FULLSCREEN // For frocing fullscreen mode
 #define PROFILING_MODE
 #endif

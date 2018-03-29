@@ -1,10 +1,10 @@
 #include "gles2-engine.hpp"
 #ifdef USE_OPENGL_ES2
 #include "../core/asset/cr-asset-manager.hpp"
-#include "../core/cr-end-caller.hpp"
 #include "../core/event/cr-ev-event.hpp"
 #include "../core/event/cr-ev-sys-system.hpp"
 #include "../core/event/cr-ev-window-resize.hpp"
+#include "../core/sync/cr-sync-end-caller.hpp"
 #include "../physics/phs-engine.hpp"
 #include "../render/camera/rnd-cmr-camera.hpp"
 #include "../render/pipeline/rnd-pip-manager.hpp"
@@ -151,27 +151,27 @@ void gearoenix::gles2::Engine::terminate()
     }
 }
 
-gearoenix::render::texture::Texture2D* gearoenix::gles2::Engine::create_texture_2d(core::Id id, system::stream::Stream* file, core::EndCaller<core::EndCallerIgnore> c)
+gearoenix::render::texture::Texture2D* gearoenix::gles2::Engine::create_texture_2d(core::Id id, system::stream::Stream* file, core::sync::EndCaller<core::sync::EndCallerIgnore> c)
 {
     return new texture::Texture2D(id, file, this, c);
 }
 
-gearoenix::render::texture::Cube* gearoenix::gles2::Engine::create_texture_cube(core::Id id, system::stream::Stream* file, core::EndCaller<core::EndCallerIgnore> c)
+gearoenix::render::texture::Cube* gearoenix::gles2::Engine::create_texture_cube(core::Id id, system::stream::Stream* file, core::sync::EndCaller<core::sync::EndCallerIgnore> c)
 {
     return new texture::Cube(id, file, this, c);
 }
 
-gearoenix::render::buffer::Mesh* gearoenix::gles2::Engine::create_mesh(unsigned int vec, system::stream::Stream* file, core::EndCaller<core::EndCallerIgnore> c)
+gearoenix::render::buffer::Mesh* gearoenix::gles2::Engine::create_mesh(unsigned int vec, system::stream::Stream* file, core::sync::EndCaller<core::sync::EndCallerIgnore> c)
 {
     return new buffer::Mesh(vec, file, this, c);
 }
 
-gearoenix::render::buffer::Uniform* gearoenix::gles2::Engine::create_uniform(unsigned int s, core::EndCaller<core::EndCallerIgnore>)
+gearoenix::render::buffer::Uniform* gearoenix::gles2::Engine::create_uniform(unsigned int s, core::sync::EndCaller<core::sync::EndCallerIgnore>)
 {
     return new buffer::Uniform(s, this);
 }
 
-gearoenix::render::shader::Shader* gearoenix::gles2::Engine::create_shader(core::Id sid, system::stream::Stream*, core::EndCaller<core::EndCallerIgnore> c)
+gearoenix::render::shader::Shader* gearoenix::gles2::Engine::create_shader(core::Id sid, system::stream::Stream*, core::sync::EndCaller<core::sync::EndCallerIgnore> c)
 {
     render::shader::Id shader_id = static_cast<render::shader::Id>(sid);
     switch (shader_id) {
@@ -214,7 +214,7 @@ gearoenix::render::shader::Shader* gearoenix::gles2::Engine::create_shader(core:
     }
 }
 
-gearoenix::render::shader::Resources* gearoenix::gles2::Engine::create_shader_resources(core::Id sid, render::pipeline::Pipeline* p, render::buffer::Uniform* ub, core::EndCaller<core::EndCallerIgnore>)
+gearoenix::render::shader::Resources* gearoenix::gles2::Engine::create_shader_resources(core::Id sid, render::pipeline::Pipeline* p, render::buffer::Uniform* ub, core::sync::EndCaller<core::sync::EndCallerIgnore>)
 {
     pipeline::Pipeline* pip = reinterpret_cast<pipeline::Pipeline*>(p);
     buffer::Uniform* u = reinterpret_cast<buffer::Uniform*>(ub);
@@ -258,7 +258,7 @@ gearoenix::render::shader::Resources* gearoenix::gles2::Engine::create_shader_re
     }
 }
 
-gearoenix::render::pipeline::Pipeline* gearoenix::gles2::Engine::create_pipeline(core::Id sid, core::EndCaller<core::EndCallerIgnore> c)
+gearoenix::render::pipeline::Pipeline* gearoenix::gles2::Engine::create_pipeline(core::Id sid, core::sync::EndCaller<core::sync::EndCallerIgnore> c)
 {
     return new pipeline::Pipeline(sid, this, c);
 }

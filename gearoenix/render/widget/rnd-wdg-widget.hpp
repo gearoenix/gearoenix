@@ -32,14 +32,14 @@ namespace render {
 
         protected:
             StateType state_type = StateType::NORMAL;
-            Widget(core::Id my_id, system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
+            Widget(core::Id my_id, system::stream::Stream* f, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> c);
             // at the end it must send event
             virtual void press_effect();
             virtual void release_effect();
             virtual void cancel_effect();
 
         public:
-            static Widget* read(core::Id my_id, system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
+            static Widget* read(core::Id my_id, system::stream::Stream* f, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> c);
             virtual ~Widget();
             void state_change(EventType e);
         };

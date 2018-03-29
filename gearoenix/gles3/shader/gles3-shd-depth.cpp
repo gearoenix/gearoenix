@@ -19,7 +19,7 @@ void gearoenix::gles3::shader::Depth::Resources::bind()
     shd->set_mvp(data->mvp.data());
 }
 
-gearoenix::gles3::shader::Depth::Depth(core::Id sid, Engine* eng, core::EndCaller<core::EndCallerIgnore> end)
+gearoenix::gles3::shader::Depth::Depth(core::Id sid, Engine* eng, core::sync::EndCaller<core::sync::EndCallerIgnore> end)
     : Shader(sid, eng, end)
     , vtx_stride(Shader::get_vertex_real_count(sid) * sizeof(GLfloat))
 {

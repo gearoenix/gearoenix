@@ -8,7 +8,7 @@
 #include "../../system/sys-app.hpp"
 #include "../../system/sys-log.hpp"
 
-gearoenix::physics::constraint::Placer::Placer(core::Id my_id, system::stream::Stream* f, render::Engine* render_engine, core::EndCaller<core::EndCallerIgnore> c)
+gearoenix::physics::constraint::Placer::Placer(core::Id my_id, system::stream::Stream* f, render::Engine* render_engine, core::sync::EndCaller<core::sync::EndCallerIgnore> c)
     : Constraint(my_id, PLACER)
 {
     f->read(t);
@@ -46,7 +46,7 @@ gearoenix::physics::constraint::Placer::Placer(core::Id my_id, system::stream::S
     f->read(model_ids);
     core::asset::Manager* asmgr = render_engine->get_system_application()->get_asset_manager();
     for (const core::Id model_id : model_ids) {
-        models[model_id] = asmgr->get_model(model_id, core::EndCaller<render::model::Model>([c](std::shared_ptr<render::model::Model>) -> void {}));
+        models[model_id] = asmgr->get_model(model_id, core::sync::EndCaller<render::model::Model>([c](std::shared_ptr<render::model::Model>) -> void {}));
     }
 }
 

@@ -16,7 +16,6 @@
 #include "../cache/cr-cache-cacher.hpp"
 #include "../cache/file/cr-cache-file-sparse.hpp"
 #include "../cache/file/cr-cache-file.hpp"
-#include "../cr-end-caller.hpp"
 #include "../cr-static.hpp"
 
 gearoenix::core::asset::Manager::Manager(system::Application* sys_app, const std::string& name)
@@ -95,10 +94,10 @@ gearoenix::system::stream::Asset* gearoenix::core::asset::Manager::get_file()
     return file;
 }
 
-std::shared_ptr<gearoenix::render::shader::Shader> gearoenix::core::asset::Manager::get_shader(Id id, EndCaller<render::shader::Shader> end)
+std::shared_ptr<gearoenix::render::shader::Shader> gearoenix::core::asset::Manager::get_shader(Id id, sync::EndCaller<render::shader::Shader> end)
 {
     auto result = shaders->get<render::shader::Shader>(id, [this, id, end]() -> std::shared_ptr<render::shader::Shader> {
-        return std::shared_ptr<render::shader::Shader>(render::shader::Shader::read(id, nullptr, render_engine, EndCaller<EndCallerIgnore>([end](std::shared_ptr<EndCallerIgnore>) -> void {})));
+        return std::shared_ptr<render::shader::Shader>(render::shader::Shader::read(id, nullptr, render_engine, sync::EndCaller<sync::EndCallerIgnore>([end](std::shared_ptr<sync::EndCallerIgnore>) -> void {})));
     });
     end.set_data(result);
     return result;
@@ -148,10 +147,10 @@ std::shared_ptr<gearoenix::render::light::Light> gearoenix::core::asset::Manager
     return lights->get<render::light::Light>(id);
 }
 
-std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::core::asset::Manager::get_texture(Id id, EndCaller<render::texture::Texture> end)
+std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::core::asset::Manager::get_texture(Id id, sync::EndCaller<render::texture::Texture> end)
 {
     auto result = textures->get<render::texture::Texture>(id, [this, end, id]() -> std::shared_ptr<render::texture::Texture> {
-        return std::shared_ptr<render::texture::Texture>(render::texture::Texture::read(id, file, render_engine, EndCaller<EndCallerIgnore>([end](std::shared_ptr<EndCallerIgnore>) -> void {})));
+        return std::shared_ptr<render::texture::Texture>(render::texture::Texture::read(id, file, render_engine, sync::EndCaller<sync::EndCallerIgnore>([end](std::shared_ptr<sync::EndCallerIgnore>) -> void {})));
     });
     end.set_data(result);
     return result;
@@ -162,10 +161,10 @@ std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::core::asset::Man
     return textures->get<render::texture::Texture>(id);
 }
 
-std::shared_ptr<gearoenix::render::font::Font> gearoenix::core::asset::Manager::get_font(Id id, EndCaller<render::font::Font> end)
+std::shared_ptr<gearoenix::render::font::Font> gearoenix::core::asset::Manager::get_font(Id id, sync::EndCaller<render::font::Font> end)
 {
     auto result = fonts->get<render::font::Font>(id, [this, id, end]() -> std::shared_ptr<render::font::Font> {
-        return std::shared_ptr<render::font::Font>(render::font::Font::read(id, file, render_engine, EndCaller<EndCallerIgnore>([end](std::shared_ptr<EndCallerIgnore>) -> void {})));
+        return std::shared_ptr<render::font::Font>(render::font::Font::read(id, file, render_engine, sync::EndCaller<sync::EndCallerIgnore>([end](std::shared_ptr<sync::EndCallerIgnore>) -> void {})));
     });
     end.set_data(result);
     return result;
@@ -176,10 +175,10 @@ std::shared_ptr<gearoenix::render::font::Font> gearoenix::core::asset::Manager::
     return fonts->get<render::font::Font>(id);
 }
 
-std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::core::asset::Manager::get_mesh(Id id, EndCaller<render::mesh::Mesh> end)
+std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::core::asset::Manager::get_mesh(Id id, sync::EndCaller<render::mesh::Mesh> end)
 {
     auto result = meshes->get<render::mesh::Mesh>(id, [this, end, id]() -> std::shared_ptr<render::mesh::Mesh> {
-        return std::shared_ptr<render::mesh::Mesh>(render::mesh::Mesh::read(id, file, render_engine, EndCaller<EndCallerIgnore>([end](std::shared_ptr<EndCallerIgnore>) -> void {})));
+        return std::shared_ptr<render::mesh::Mesh>(render::mesh::Mesh::read(id, file, render_engine, sync::EndCaller<sync::EndCallerIgnore>([end](std::shared_ptr<sync::EndCallerIgnore>) -> void {})));
     });
     end.set_data(result);
     return result;
@@ -190,10 +189,10 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::core::asset::Manager::
     return meshes->get<render::mesh::Mesh>(id);
 }
 
-std::shared_ptr<gearoenix::render::model::Model> gearoenix::core::asset::Manager::get_model(Id id, EndCaller<render::model::Model> end)
+std::shared_ptr<gearoenix::render::model::Model> gearoenix::core::asset::Manager::get_model(Id id, sync::EndCaller<render::model::Model> end)
 {
     auto result = models->get<render::model::Model>(id, [this, end, id]() -> std::shared_ptr<render::model::Model> {
-        return std::shared_ptr<render::model::Model>(render::model::Model::read(id, file, render_engine, EndCaller<EndCallerIgnore>([end](std::shared_ptr<EndCallerIgnore>) -> void {})));
+        return std::shared_ptr<render::model::Model>(render::model::Model::read(id, file, render_engine, sync::EndCaller<sync::EndCallerIgnore>([end](std::shared_ptr<sync::EndCallerIgnore>) -> void {})));
     });
     end.set_data(result);
     return result;
@@ -204,10 +203,10 @@ std::shared_ptr<gearoenix::render::model::Model> gearoenix::core::asset::Manager
     return models->get<render::model::Model>(id);
 }
 
-std::shared_ptr<gearoenix::render::skybox::Skybox> gearoenix::core::asset::Manager::get_skybox(Id id, EndCaller<render::skybox::Skybox> e)
+std::shared_ptr<gearoenix::render::skybox::Skybox> gearoenix::core::asset::Manager::get_skybox(Id id, sync::EndCaller<render::skybox::Skybox> e)
 {
     auto result = skyboxes->get<render::skybox::Skybox>(id, [this, e, id]() -> std::shared_ptr<render::skybox::Skybox> {
-        return std::shared_ptr<render::skybox::Skybox>(render::skybox::Skybox::read(id, file, render_engine, EndCaller<EndCallerIgnore>([e](std::shared_ptr<EndCallerIgnore>) -> void {})));
+        return std::shared_ptr<render::skybox::Skybox>(render::skybox::Skybox::read(id, file, render_engine, sync::EndCaller<sync::EndCallerIgnore>([e](std::shared_ptr<sync::EndCallerIgnore>) -> void {})));
     });
     e.set_data(result);
     return result;
@@ -218,10 +217,10 @@ std::shared_ptr<gearoenix::render::skybox::Skybox> gearoenix::core::asset::Manag
     return skyboxes->get<render::skybox::Skybox>(id);
 }
 
-std::shared_ptr<gearoenix::physics::constraint::Constraint> gearoenix::core::asset::Manager::get_constriants(Id id, EndCaller<physics::constraint::Constraint> end)
+std::shared_ptr<gearoenix::physics::constraint::Constraint> gearoenix::core::asset::Manager::get_constriants(Id id, sync::EndCaller<physics::constraint::Constraint> end)
 {
     auto result = constraints->get<physics::constraint::Constraint>(id, [this, end, id]() -> std::shared_ptr<physics::constraint::Constraint> {
-        return std::shared_ptr<physics::constraint::Constraint>(physics::constraint::Constraint::read(id, file, render_engine, EndCaller<EndCallerIgnore>([end](std::shared_ptr<EndCallerIgnore>) -> void {})));
+        return std::shared_ptr<physics::constraint::Constraint>(physics::constraint::Constraint::read(id, file, render_engine, sync::EndCaller<sync::EndCallerIgnore>([end](std::shared_ptr<sync::EndCallerIgnore>) -> void {})));
     });
     end.set_data(result);
     return result;
@@ -232,10 +231,10 @@ std::shared_ptr<gearoenix::physics::constraint::Constraint> gearoenix::core::ass
     return constraints->get<physics::constraint::Constraint>(id);
 }
 
-std::shared_ptr<gearoenix::render::scene::Scene> gearoenix::core::asset::Manager::get_scene(Id id, EndCaller<render::scene::Scene> end)
+std::shared_ptr<gearoenix::render::scene::Scene> gearoenix::core::asset::Manager::get_scene(Id id, sync::EndCaller<render::scene::Scene> end)
 {
     auto result = scenes->get<render::scene::Scene>(id, [this, end, id]() -> std::shared_ptr<render::scene::Scene> {
-        return std::shared_ptr<render::scene::Scene>(render::scene::Scene::read(id, file, render_engine, EndCaller<EndCallerIgnore>([end](std::shared_ptr<EndCallerIgnore>) -> void {})));
+        return std::shared_ptr<render::scene::Scene>(render::scene::Scene::read(id, file, render_engine, sync::EndCaller<sync::EndCallerIgnore>([end](std::shared_ptr<sync::EndCallerIgnore>) -> void {})));
     });
     end.set_data(result);
     return result;

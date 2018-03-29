@@ -1,8 +1,8 @@
 #ifndef GEAROENIX_PHYSICS_CONSTRAINT_CONSTRAINT_HPP
 #define GEAROENIX_PHYSICS_CONSTRAINT_CONSTRAINT_HPP
 #include "../../core/asset/cr-asset.hpp"
-#include "../../core/cr-end-caller.hpp"
 #include "../../core/cr-types.hpp"
+#include "../../core/sync/cr-sync-end-caller.hpp"
 #include <memory>
 #include <vector>
 namespace gearoenix {
@@ -48,7 +48,7 @@ namespace physics {
             virtual const std::vector<std::pair<core::Id, std::shared_ptr<render::model::Model>>> get_all_models() const = 0;
             virtual const std::vector<std::shared_ptr<body::Body>> get_all_bodies() const;
             virtual void apply(core::Real delta_time);
-            static Constraint* read(core::Id my_id, system::stream::Stream* f, render::Engine* render_engine, core::EndCaller<core::EndCallerIgnore> c);
+            static Constraint* read(core::Id my_id, system::stream::Stream* f, render::Engine* render_engine, core::sync::EndCaller<core::sync::EndCallerIgnore> c);
             bool is_alive() const;
             Placer* to_placer();
             const Placer* to_placer() const;

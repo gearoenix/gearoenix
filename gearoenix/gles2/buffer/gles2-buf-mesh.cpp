@@ -5,7 +5,7 @@
 #include "../gles2-engine.hpp"
 #include "../gles2.hpp"
 
-gearoenix::gles2::buffer::Mesh::Mesh(unsigned int vec, system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
+gearoenix::gles2::buffer::Mesh::Mesh(unsigned int vec, system::stream::Stream* f, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> c)
     : render::buffer::Mesh(e)
 {
     core::Count cnt;

@@ -13,7 +13,7 @@ gearoenix::render::material::Depth::Resources::Resources(Engine* e, pipeline::Pi
 {
 }
 
-gearoenix::render::material::Depth::Depth(core::Id shdid, Engine* e, core::EndCaller<core::EndCallerIgnore> end)
+gearoenix::render::material::Depth::Depth(core::Id shdid, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> end)
     : Material(shdid, sizeof(u), e, end)
     , SHADER_ID(shdid)
 {

@@ -17,7 +17,7 @@ namespace gles3 {
             GLuint texture_object;
 
         public:
-            Cube(core::Id my_id, system::stream::Stream* file, Engine* engine, core::EndCaller<core::EndCallerIgnore> end);
+            Cube(core::Id my_id, system::stream::Stream* file, Engine* engine, core::sync::EndCaller<core::sync::EndCallerIgnore> end);
             ~Cube();
             void bind(GLenum texture_unit);
         };

@@ -1,6 +1,6 @@
 #include "rnd-mat-directional-colored-speculated-baked-full-opaque.hpp"
 #include "../../core/asset/cr-asset-manager.hpp"
-#include "../../core/cr-end-caller.hpp"
+#include "../../core/sync/cr-sync-end-caller.hpp"
 #include "../../system/stream/sys-stm-stream.hpp"
 #include "../../system/sys-app.hpp"
 #include "../buffer/rnd-buf-uniform.hpp"
@@ -31,7 +31,7 @@ void gearoenix::render::material::DirectionalColoredSpeculatedBakedFullOpaque::R
     shdtxt = t;
 }
 
-gearoenix::render::material::DirectionalColoredSpeculatedBakedFullOpaque::DirectionalColoredSpeculatedBakedFullOpaque(system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> end)
+gearoenix::render::material::DirectionalColoredSpeculatedBakedFullOpaque::DirectionalColoredSpeculatedBakedFullOpaque(system::stream::Stream* f, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> end)
     : Material(SHADER_ID, sizeof(u), e, end)
 {
     color.read(f);
@@ -44,7 +44,7 @@ gearoenix::render::material::DirectionalColoredSpeculatedBakedFullOpaque::Direct
     f->read(texid);
     core::asset::Manager* astmgr = e->get_system_application()->get_asset_manager();
     core::Count curloc = f->tell();
-    env = std::static_pointer_cast<texture::Cube>(astmgr->get_texture(texid, core::EndCaller<render::texture::Texture>([this, end, e](std::shared_ptr<render::texture::Texture> asset) -> void {
+    env = std::static_pointer_cast<texture::Cube>(astmgr->get_texture(texid, core::sync::EndCaller<render::texture::Texture>([this, end, e](std::shared_ptr<render::texture::Texture> asset) -> void {
         shdrsc = reinterpret_cast<Resources*>(e->create_shader_resources(SHADER_ID, pl.get(), ub, end));
         shdrsc->set_baked_env(reinterpret_cast<texture::Cube*>(asset.get()));
     })));

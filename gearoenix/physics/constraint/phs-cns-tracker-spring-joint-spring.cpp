@@ -10,7 +10,7 @@
 #include "../../system/sys-log.hpp"
 #include "../body/phs-bd-rigid.hpp"
 
-gearoenix::physics::constraint::TrackerSpringJointSpring::TrackerSpringJointSpring(core::Id my_id, system::stream::Stream*, render::Engine*, core::EndCaller<core::EndCallerIgnore>)
+gearoenix::physics::constraint::TrackerSpringJointSpring::TrackerSpringJointSpring(core::Id my_id, system::stream::Stream*, render::Engine*, core::sync::EndCaller<core::sync::EndCallerIgnore>)
     : Constraint(my_id, TRACKER_SPRING_JOINT_SPRING)
 {
     UNIMPLEMENTED;

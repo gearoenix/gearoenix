@@ -1,7 +1,7 @@
 #ifndef GEAROEMIX_RENDER_SCENE_SCENE_HPP
 #define GEAROEMIX_RENDER_SCENE_SCENE_HPP
 #include "../../core/asset/cr-asset.hpp"
-#include "../../core/cr-end-caller.hpp"
+#include "../../core/sync/cr-sync-end-caller.hpp"
 #include "../../math/math-vector.hpp"
 #include <map>
 #include <memory>
@@ -89,15 +89,14 @@ namespace render {
             bool ambient_light_changed = true;
             math::Vec3 ambient_light = math::Vec3(0.2f, 0.2f, 0.2f);
             Engine* const render_engine;
-            void add_model(core::Id id, std::shared_ptr<model::Model> m);
-            Scene(core::Id my_id, SceneType t, system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
+            Scene(core::Id my_id, SceneType t, system::stream::Stream* f, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> c);
 
         public:
             void cast_shadow();
             void draw_sky();
             void draw(texture::Texture2D* shadow_texture);
             virtual ~Scene();
-            static Scene* read(core::Id my_id, system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
+            static Scene* read(core::Id my_id, system::stream::Stream* f, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> c);
             const std::map<core::Id, std::weak_ptr<model::Model>>& get_all_models() const;
             const std::map<core::Id, std::shared_ptr<physics::constraint::Constraint>>& get_all_root_constraints() const;
             const std::shared_ptr<camera::Camera>& get_current_camera() const;
@@ -109,9 +108,10 @@ namespace render {
             virtual void on_event(core::event::Event& e);
             bool is_renderable() const;
             void add_mesh(core::Id mesh_id, core::Id model_id, std::shared_ptr<material::Material> mat, std::shared_ptr<material::Material> dp);
-            void add_model(core::Id model_id, core::EndCaller<core::EndCallerIgnore> c = core::EndCaller<core::EndCallerIgnore>([](std::shared_ptr<core::EndCallerIgnore>) -> void {}));
+            void add_model(core::Id model_id, core::sync::EndCaller<core::sync::EndCallerIgnore> c = core::sync::EndCaller<core::sync::EndCallerIgnore>([](std::shared_ptr<core::sync::EndCallerIgnore>) -> void {}));
+            void add_model(const std::shared_ptr<model::Model>& m);
             std::weak_ptr<model::Model> get_model(core::Id model_id);
-            void add_constraint(core::Id id, const std::shared_ptr<physics::constraint::Constraint>& cns);
+            void add_constraint(const std::shared_ptr<physics::constraint::Constraint>& cns);
             void add_body(const std::shared_ptr<physics::body::Body>& b);
         };
     }

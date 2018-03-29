@@ -2,8 +2,8 @@
 #ifdef USE_VULKAN
 #include "../core/asset/cr-asset-manager.hpp"
 #include "../core/cr-application.hpp"
-#include "../core/cr-end-caller.hpp"
 #include "../core/cr-static.hpp"
+#include "../core/sync/cr-sync-end-caller.hpp"
 #include "../render/scene/rnd-scn-scene.hpp"
 #include "../system/stream/sys-fl-file.hpp"
 #include "../system/sys-app.hpp"
@@ -437,7 +437,7 @@ unsigned int gearoenix::render::Engine::get_frames_count() const
 unsigned int gearoenix::render::Engine::load_scene(core::Id scene_id, std::function<void(unsigned int)> on_load)
 {
     unsigned int result = loaded_scenes.size();
-    loaded_scenes.push_back(sys_app->get_asset_manager()->get_scene(scene_id, core::EndCaller::create([this, result, on_load] {
+    loaded_scenes.push_back(sys_app->get_asset_manager()->get_scene(scene_id, core::sync::EndCaller::create([this, result, on_load] {
         loaded_scenes[result]->set_renderable(true);
         on_load(result);
     })));

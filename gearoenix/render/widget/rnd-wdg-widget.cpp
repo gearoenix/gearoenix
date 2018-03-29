@@ -7,7 +7,7 @@
 #include "rnd-wdg-button.hpp"
 #include "rnd-wdg-text.hpp"
 
-gearoenix::render::widget::Widget::Widget(core::Id my_id, system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
+gearoenix::render::widget::Widget::Widget(core::Id my_id, system::stream::Stream* f, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> c)
     : model::Model(my_id, ModelType::WIDGET, f, e, c)
 {
 }
@@ -24,7 +24,7 @@ void gearoenix::render::widget::Widget::cancel_effect()
 {
 }
 
-gearoenix::render::widget::Widget* gearoenix::render::widget::Widget::read(core::Id my_id, system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
+gearoenix::render::widget::Widget* gearoenix::render::widget::Widget::read(core::Id my_id, system::stream::Stream* f, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> c)
 {
     core::Id t;
     f->read(t);

@@ -14,7 +14,7 @@ namespace gles3 {
         class Pipeline : public render::pipeline::Pipeline {
         private:
         public:
-            Pipeline(core::Id sid, Engine* eng, core::EndCaller<core::EndCallerIgnore> call);
+            Pipeline(core::Id sid, Engine* eng, core::sync::EndCaller<core::sync::EndCallerIgnore> call);
             ~Pipeline();
             void bind();
         };

@@ -1,8 +1,8 @@
 #ifndef GEAROENIX_PHYSICS_CONSTRAINT_PLACER_HPP
 #define GEAROENIX_PHYSICS_CONSTRAINT_PLACER_HPP
 
-#include "../../core/cr-end-caller.hpp"
 #include "../../core/cr-types.hpp"
+#include "../../core/sync/cr-sync-end-caller.hpp"
 #include "../../math/math-vector.hpp"
 #include "phs-cns-constraint.hpp"
 #include <map>
@@ -26,7 +26,7 @@ namespace physics {
             std::map<core::Id, std::shared_ptr<render::model::Model>> models;
 
         public:
-            Placer(core::Id my_id, system::stream::Stream* f, render::Engine* render_engine, core::EndCaller<core::EndCallerIgnore> c);
+            Placer(core::Id my_id, system::stream::Stream* f, render::Engine* render_engine, core::sync::EndCaller<core::sync::EndCallerIgnore> c);
             virtual ~Placer();
             virtual void apply(core::Real delta_time);
             virtual const std::vector<std::pair<core::Id, std::shared_ptr<render::model::Model>>> get_all_models() const;

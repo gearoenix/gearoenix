@@ -1,6 +1,6 @@
 #ifndef GEAROENIX_RENDER_MESH_OCC_HPP
 #define GEAROENIX_RENDER_MESH_OCC_HPP
-#include "../../core/cr-end-caller.hpp"
+#include "../../core/sync/cr-sync-end-caller.hpp"
 #include <memory>
 namespace gearoenix {
 namespace system {
@@ -19,7 +19,7 @@ namespace render {
             buffer::Mesh* buf;
 
         public:
-            Occ(system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
+            Occ(system::stream::Stream* f, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> c);
             ~Occ();
         };
     }

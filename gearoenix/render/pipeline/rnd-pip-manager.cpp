@@ -14,7 +14,7 @@ gearoenix::render::pipeline::Manager::~Manager()
     delete csh;
 }
 
-std::shared_ptr<gearoenix::render::pipeline::Pipeline> gearoenix::render::pipeline::Manager::get_pipeline(core::Id sid, core::EndCaller<core::EndCallerIgnore> end)
+std::shared_ptr<gearoenix::render::pipeline::Pipeline> gearoenix::render::pipeline::Manager::get_pipeline(core::Id sid, core::sync::EndCaller<core::sync::EndCallerIgnore> end)
 {
     return csh->get<Pipeline>(sid, [this, sid, end]() -> std::shared_ptr<Pipeline> {
         return std::shared_ptr<Pipeline>(eng->create_pipeline(sid, end));

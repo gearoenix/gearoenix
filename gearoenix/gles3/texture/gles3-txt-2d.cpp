@@ -4,7 +4,7 @@
 #include "../../system/sys-log.hpp"
 #include "../gles3-engine.hpp"
 
-gearoenix::gles3::texture::Texture2D::Texture2D(core::Id my_id, system::stream::Stream* file, Engine* eng, core::EndCaller<core::EndCallerIgnore> end)
+gearoenix::gles3::texture::Texture2D::Texture2D(core::Id my_id, system::stream::Stream* file, Engine* eng, core::sync::EndCaller<core::sync::EndCallerIgnore> end)
     : render::texture::Texture2D(my_id)
 {
     std::vector<unsigned char> img_data;

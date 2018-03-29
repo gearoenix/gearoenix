@@ -34,7 +34,7 @@
 //            GLint nrm_att_ind;
 //
 //        public:
-//            DirectionalColoredMatteNonreflectiveShadowlessOpaque(Engine* eng, std::shared_ptr<core::EndCaller> end);
+//            DirectionalColoredMatteNonreflectiveShadowlessOpaque(Engine* eng, std::shared_ptr<core::sync::EndCaller> end);
 //            ~DirectionalColoredMatteNonreflectiveShadowlessOpaque();
 //            void use();
 //            const std::vector<render::shader::stage::Id>& get_stages_ids() const;

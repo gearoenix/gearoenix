@@ -1,8 +1,8 @@
 #ifndef GEAROENIX_PHYSICS_CONSTRAINT_TRACKER_SPRING_JOINT_SPRING_HPP
 #define GEAROENIX_PHYSICS_CONSTRAINT_TRACKER_SPRING_JOINT_SPRING_HPP
 
-#include "../../core/cr-end-caller.hpp"
 #include "../../core/cr-types.hpp"
+#include "../../core/sync/cr-sync-end-caller.hpp"
 #include "../../math/math-vector.hpp"
 #include "phs-cns-constraint.hpp"
 #include <memory>
@@ -23,7 +23,7 @@ namespace physics {
             core::Real length;
 
         public:
-            TrackerSpringJointSpring(core::Id my_id, system::stream::Stream* f, render::Engine* render_engine, core::EndCaller<core::EndCallerIgnore> c);
+            TrackerSpringJointSpring(core::Id my_id, system::stream::Stream* f, render::Engine* render_engine, core::sync::EndCaller<core::sync::EndCallerIgnore> c);
             TrackerSpringJointSpring(
                 core::Id my_id,
                 const std::shared_ptr<body::Rigid> active,

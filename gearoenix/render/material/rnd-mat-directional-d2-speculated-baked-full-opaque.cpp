@@ -1,6 +1,6 @@
 #include "rnd-mat-directional-d2-speculated-baked-full-opaque.hpp"
 #include "../../core/asset/cr-asset-manager.hpp"
-#include "../../core/cr-end-caller.hpp"
+#include "../../core/sync/cr-sync-end-caller.hpp"
 #include "../../system/stream/sys-stm-stream.hpp"
 #include "../../system/sys-app.hpp"
 #include "../buffer/rnd-buf-uniform.hpp"
@@ -36,7 +36,7 @@ void gearoenix::render::material::DirectionalD2SpeculatedBakedFullOpaque::Resour
     shdtxt = t;
 }
 
-gearoenix::render::material::DirectionalD2SpeculatedBakedFullOpaque::DirectionalD2SpeculatedBakedFullOpaque(system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> end)
+gearoenix::render::material::DirectionalD2SpeculatedBakedFullOpaque::DirectionalD2SpeculatedBakedFullOpaque(system::stream::Stream* f, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> end)
     : Material(SHADER_ID, sizeof(u), e, end)
 {
     core::Id tex2did;
@@ -48,8 +48,8 @@ gearoenix::render::material::DirectionalD2SpeculatedBakedFullOpaque::Directional
     f->read(texid);
     core::asset::Manager* astmgr = e->get_system_application()->get_asset_manager();
     core::Count curloc = f->tell();
-    txt = std::static_pointer_cast<texture::Texture2D>(astmgr->get_texture(tex2did, core::EndCaller<render::texture::Texture>([end](std::shared_ptr<render::texture::Texture>) -> void {})));
-    env = std::static_pointer_cast<texture::Cube>(astmgr->get_texture(texid, core::EndCaller<render::texture::Texture>([end](std::shared_ptr<render::texture::Texture>) -> void {})));
+    txt = std::static_pointer_cast<texture::Texture2D>(astmgr->get_texture(tex2did, core::sync::EndCaller<render::texture::Texture>([end](std::shared_ptr<render::texture::Texture>) -> void {})));
+    env = std::static_pointer_cast<texture::Cube>(astmgr->get_texture(texid, core::sync::EndCaller<render::texture::Texture>([end](std::shared_ptr<render::texture::Texture>) -> void {})));
     e->add_load_function([this, end, e]() -> void {
         shdrsc = reinterpret_cast<Resources*>(e->create_shader_resources(SHADER_ID, pl.get(), ub, end));
         shdrsc->set_texture(txt.get());

@@ -6,7 +6,7 @@
 #include "../dx11-check.hpp"
 #include "../dx11-engine.hpp"
 
-gearoenix::dx11::texture::Texture2D::Texture2D(core::Id my_id, system::stream::Stream* file, Engine* eng, core::EndCaller<core::EndCallerIgnore> end)
+gearoenix::dx11::texture::Texture2D::Texture2D(core::Id my_id, system::stream::Stream* file, Engine* eng, core::sync::EndCaller<core::sync::EndCallerIgnore> end)
     : render::texture::Texture2D(my_id)
     , engine(eng)
 {

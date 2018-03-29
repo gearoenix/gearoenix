@@ -7,7 +7,7 @@
 
 #define FACES_COUNT 6
 
-gearoenix::gles2::texture::Cube::Cube(core::Id my_id, system::stream::Stream* file, Engine* eng, core::EndCaller<core::EndCallerIgnore> end)
+gearoenix::gles2::texture::Cube::Cube(core::Id my_id, system::stream::Stream* file, Engine* eng, core::sync::EndCaller<core::sync::EndCallerIgnore> end)
     : render::texture::Cube(my_id)
 {
     std::vector<std::vector<unsigned char>> img_data(FACES_COUNT);

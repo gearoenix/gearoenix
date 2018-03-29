@@ -1,6 +1,6 @@
 #ifndef GEAROEMIX_RENDER_MATERIAL_MATERIAL_HPP
 #define GEAROEMIX_RENDER_MATERIAL_MATERIAL_HPP
-#include "../../core/cr-end-caller.hpp"
+#include "../../core/sync/cr-sync-end-caller.hpp"
 #include "../shader/rnd-shd-shader.hpp"
 #include <memory>
 namespace gearoenix {
@@ -31,7 +31,7 @@ namespace render {
             std::shared_ptr<pipeline::Pipeline> pl;
             buffer::Uniform* ub;
             Engine* e;
-            Material(core::Id sid, unsigned int us, Engine* e, core::EndCaller<core::EndCallerIgnore> end);
+            Material(core::Id sid, unsigned int us, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> end);
 
         public:
             virtual ~Material();
@@ -41,7 +41,7 @@ namespace render {
             virtual core::Id get_shader_id() const = 0;
             virtual bool needs_mvp() const = 0;
             virtual bool needs_dbm() const = 0;
-            static Material* read(system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> end);
+            static Material* read(system::stream::Stream* f, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> end);
         };
     }
 }

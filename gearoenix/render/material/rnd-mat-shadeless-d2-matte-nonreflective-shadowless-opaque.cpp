@@ -1,6 +1,6 @@
 #include "rnd-mat-shadeless-d2-matte-nonreflective-shadowless-opaque.hpp"
 #include "../../core/asset/cr-asset-manager.hpp"
-#include "../../core/cr-end-caller.hpp"
+#include "../../core/sync/cr-sync-end-caller.hpp"
 #include "../../system/stream/sys-stm-stream.hpp"
 #include "../../system/sys-app.hpp"
 #include "../buffer/rnd-buf-uniform.hpp"
@@ -22,7 +22,7 @@ void gearoenix::render::material::ShadelessD2MatteNonreflectiveShadowlessOpaque:
     txt2d = t2d;
 }
 
-gearoenix::render::material::ShadelessD2MatteNonreflectiveShadowlessOpaque::ShadelessD2MatteNonreflectiveShadowlessOpaque(core::Id sid, system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> end)
+gearoenix::render::material::ShadelessD2MatteNonreflectiveShadowlessOpaque::ShadelessD2MatteNonreflectiveShadowlessOpaque(core::Id sid, system::stream::Stream* f, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> end)
     : Material(sid, sizeof(u), e, end)
     , SHADER_ID(sid)
 {
@@ -30,14 +30,14 @@ gearoenix::render::material::ShadelessD2MatteNonreflectiveShadowlessOpaque::Shad
     f->read(texid);
     core::asset::Manager* astmgr = e->get_system_application()->get_asset_manager();
     core::Count curloc = f->tell();
-    txt2d = std::static_pointer_cast<texture::Texture2D>(astmgr->get_texture(texid, core::EndCaller<texture::Texture>([this, end, e](std::shared_ptr<texture::Texture> asset) -> void {
+    txt2d = std::static_pointer_cast<texture::Texture2D>(astmgr->get_texture(texid, core::sync::EndCaller<texture::Texture>([this, end, e](std::shared_ptr<texture::Texture> asset) -> void {
         shdrsc = reinterpret_cast<Resources*>(e->create_shader_resources(SHADER_ID, pl.get(), ub, end));
         shdrsc->set_texture_2d(reinterpret_cast<texture::Texture2D*>(asset.get()));
     })));
     f->seek(curloc);
 }
 
-gearoenix::render::material::ShadelessD2MatteNonreflectiveShadowlessOpaque::ShadelessD2MatteNonreflectiveShadowlessOpaque(core::Id sid, std::shared_ptr<texture::Texture2D> txt2d, Engine* e, core::EndCaller<core::EndCallerIgnore> end)
+gearoenix::render::material::ShadelessD2MatteNonreflectiveShadowlessOpaque::ShadelessD2MatteNonreflectiveShadowlessOpaque(core::Id sid, std::shared_ptr<texture::Texture2D> txt2d, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> end)
     : Material(sid, sizeof(u), e, end)
     , SHADER_ID(sid)
     , txt2d(txt2d)

@@ -20,7 +20,7 @@ void gearoenix::gles3::shader::ShadelessColoredMatteNonreflectiveShadowlessOpaqu
     shd->set_color(data->color.data());
 }
 
-gearoenix::gles3::shader::ShadelessColoredMatteNonreflectiveShadowlessOpaque::ShadelessColoredMatteNonreflectiveShadowlessOpaque(core::Id my_id, Engine* eng, core::EndCaller<core::EndCallerIgnore> end)
+gearoenix::gles3::shader::ShadelessColoredMatteNonreflectiveShadowlessOpaque::ShadelessColoredMatteNonreflectiveShadowlessOpaque(core::Id my_id, Engine* eng, core::sync::EndCaller<core::sync::EndCallerIgnore> end)
     : Shader(my_id, eng, end)
 {
     eng->add_load_function([this, end] {

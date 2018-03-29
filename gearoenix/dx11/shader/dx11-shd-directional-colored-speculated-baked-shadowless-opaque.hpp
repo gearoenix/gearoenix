@@ -42,7 +42,7 @@
 ////            GLint nrm_att_ind;
 ////
 ////        public:
-////            DirectionalColoredSpeculatedBakedShadowlessOpaque(Engine* eng, std::shared_ptr<core::EndCaller> end);
+////            DirectionalColoredSpeculatedBakedShadowlessOpaque(Engine* eng, std::shared_ptr<core::sync::EndCaller> end);
 ////            ~DirectionalColoredSpeculatedBakedShadowlessOpaque();
 ////            void use();
 ////            const std::vector<render::shader::stage::Id>& get_stages_ids() const;

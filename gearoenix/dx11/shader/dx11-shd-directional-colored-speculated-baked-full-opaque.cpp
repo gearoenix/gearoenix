@@ -25,7 +25,7 @@ void gearoenix::dx11::shader::DirectionalColoredSpeculatedBakedFullOpaque::Resou
     shd->use();
 }
 
-gearoenix::dx11::shader::DirectionalColoredSpeculatedBakedFullOpaque::DirectionalColoredSpeculatedBakedFullOpaque(core::Id my_id, Engine* eng, core::EndCaller<core::EndCallerIgnore> end)
+gearoenix::dx11::shader::DirectionalColoredSpeculatedBakedFullOpaque::DirectionalColoredSpeculatedBakedFullOpaque(core::Id my_id, Engine* eng, core::sync::EndCaller<core::sync::EndCallerIgnore> end)
     : Shader(my_id, eng, end)
 {
     eng->add_load_function([this, end] {

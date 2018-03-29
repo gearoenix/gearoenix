@@ -34,8 +34,8 @@ namespace render {
             std::shared_ptr<texture::Texture2D> txt2d;
 
         public:
-            FontColored(core::Id sid, system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> end);
-            FontColored(core::Id sid, std::shared_ptr<texture::Texture2D> txt2d, Engine* e, core::EndCaller<core::EndCallerIgnore> end);
+            FontColored(core::Id sid, system::stream::Stream* f, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> end);
+            FontColored(core::Id sid, std::shared_ptr<texture::Texture2D> txt2d, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> end);
             ~FontColored();
             unsigned int get_vertex_elements_count() const;
             core::Id get_shader_id() const;

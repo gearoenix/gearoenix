@@ -1,7 +1,7 @@
 #ifndef GEAROENIX_RENDER_PIPELINE_MANAGER_HPP
 #define GEAROENIX_RENDER_PIPELINE_MANAGER_HPP
-#include "../../core/cr-end-caller.hpp"
 #include "../../core/cr-types.hpp"
+#include "../../core/sync/cr-sync-end-caller.hpp"
 #include <memory>
 namespace gearoenix {
 namespace core {
@@ -21,7 +21,7 @@ namespace render {
         public:
             Manager(Engine* engine);
             ~Manager();
-            std::shared_ptr<Pipeline> get_pipeline(core::Id sid, core::EndCaller<core::EndCallerIgnore> end);
+            std::shared_ptr<Pipeline> get_pipeline(core::Id sid, core::sync::EndCaller<core::sync::EndCallerIgnore> end);
             std::shared_ptr<Pipeline> get_cached_pipeline(core::Id sid) const;
         };
     }

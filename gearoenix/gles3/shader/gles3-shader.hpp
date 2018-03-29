@@ -2,7 +2,7 @@
 #define GEAROENIX_gles3_SHADER_COMPILER_HPP
 #include "../../core/cr-build-configuration.hpp"
 #ifdef USE_OPENGL_ES3
-#include "../../core/cr-end-caller.hpp"
+#include "../../core/sync/cr-sync-end-caller.hpp"
 #include "../../render/shader/rnd-shd-shader.hpp"
 #include "../gles3.hpp"
 #include <string>
@@ -24,7 +24,7 @@ namespace gles3 {
             void end_object(const GLuint& shader_object);
 
         public:
-            Shader(core::Id my_id, Engine* eng, core::EndCaller<core::EndCallerIgnore> end);
+            Shader(core::Id my_id, Engine* eng, core::sync::EndCaller<core::sync::EndCallerIgnore> end);
             virtual ~Shader();
         };
     }

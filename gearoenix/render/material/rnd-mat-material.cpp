@@ -1,6 +1,6 @@
 #include "rnd-mat-material.hpp"
 #include "../../core/asset/cr-asset-manager.hpp"
-#include "../../core/cr-end-caller.hpp"
+#include "../../core/sync/cr-sync-end-caller.hpp"
 #include "../../system/stream/sys-stm-asset.hpp"
 #include "../../system/sys-app.hpp"
 #include "../buffer/rnd-buf-uniform.hpp"
@@ -20,7 +20,7 @@
 #include "rnd-mat-shadeless-d2-matte-nonreflective-shadowless-opaque.hpp"
 #include "rnd-mat-skybox-basic.hpp"
 
-gearoenix::render::material::Material::Material(core::Id sid, unsigned int us, Engine* e, core::EndCaller<core::EndCallerIgnore> end)
+gearoenix::render::material::Material::Material(core::Id sid, unsigned int us, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> end)
     : ub(e->create_uniform(us, end))
     , e(e)
 {
@@ -35,7 +35,7 @@ gearoenix::render::material::Material::~Material()
     delete ub;
 }
 
-gearoenix::render::material::Material* gearoenix::render::material::Material::read(system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> end)
+gearoenix::render::material::Material* gearoenix::render::material::Material::read(system::stream::Stream* f, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> end)
 {
     shader::Id sid;
     f->read(sid);

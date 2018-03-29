@@ -50,7 +50,7 @@ namespace render {
             Resources* shdrsc;
 
         public:
-            DirectionalColoredSpeculatedBakedFullOpaque(system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> end);
+            DirectionalColoredSpeculatedBakedFullOpaque(system::stream::Stream* f, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> end);
             ~DirectionalColoredSpeculatedBakedFullOpaque();
             unsigned int get_vertex_elements_count() const;
             core::Id get_shader_id() const;

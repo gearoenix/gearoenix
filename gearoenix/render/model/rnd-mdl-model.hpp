@@ -1,8 +1,8 @@
 #ifndef GEAROEMIX_RENDER_MODEL_MODEL_HPP
 #define GEAROEMIX_RENDER_MODEL_MODEL_HPP
 #include "../../core/asset/cr-asset.hpp"
-#include "../../core/cr-end-caller.hpp"
 #include "../../core/cr-types.hpp"
+#include "../../core/sync/cr-sync-end-caller.hpp"
 #include "../../math/math-matrix.hpp"
 #include "../../math/math-vector.hpp"
 #include "../../physics/phs-transformable.hpp"
@@ -83,10 +83,10 @@ namespace render {
             physics::collider::Collider* collider = nullptr;
             std::vector<math::Mat4x4> state;
             Engine* const render_engine = nullptr;
-            Model(core::Id my_id, ModelType t, system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
+            Model(core::Id my_id, ModelType t, system::stream::Stream* f, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> c);
 
         public:
-            static Model* read(core::Id my_id, system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
+            static Model* read(core::Id my_id, system::stream::Stream* f, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> c);
             virtual ~Model();
             ModelType get_type() const;
             void commit(const scene::Scene* s);

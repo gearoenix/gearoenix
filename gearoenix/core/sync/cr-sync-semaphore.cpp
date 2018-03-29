@@ -1,14 +1,13 @@
-#include "cr-semaphore.hpp"
-#ifdef THREAD_SUPPORTED
+#include "cr-sync-semaphore.hpp"
 #include <thread>
-gearoenix::core::Semaphore::Semaphore(int count)
+gearoenix::core::sync::Semaphore::Semaphore(int count)
     : count(count)
 {
 }
 
-gearoenix::core::Semaphore::~Semaphore() {}
+gearoenix::core::sync::Semaphore::~Semaphore() {}
 
-void gearoenix::core::Semaphore::lock()
+void gearoenix::core::sync::Semaphore::lock()
 {
     m_count.lock();
     if (count > 0) {
@@ -24,7 +23,7 @@ void gearoenix::core::Semaphore::lock()
     l->locked = false;
 }
 
-void gearoenix::core::Semaphore::release()
+void gearoenix::core::sync::Semaphore::release()
 {
     std::lock_guard<std::mutex> lock(m_count);
     if (q.size() < 1) {
@@ -38,4 +37,3 @@ void gearoenix::core::Semaphore::release()
     } while (l->locked);
     q.pop();
 }
-#endif

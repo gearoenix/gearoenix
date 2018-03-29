@@ -4,7 +4,7 @@
 #include "../rnd-engine.hpp"
 #include "../shader/rnd-shd-shader.hpp"
 
-gearoenix::render::mesh::Occ::Occ(system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
+gearoenix::render::mesh::Occ::Occ(system::stream::Stream* f, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> c)
 {
     shader::Id sid;
     f->read(sid);

@@ -14,7 +14,7 @@ namespace gles2 {
             GLuint texture_object;
 
         public:
-            Texture2D(core::Id my_id, system::stream::Stream* file, Engine* engine, core::EndCaller<core::EndCallerIgnore> end);
+            Texture2D(core::Id my_id, system::stream::Stream* file, Engine* engine, core::sync::EndCaller<core::sync::EndCallerIgnore> end);
             Texture2D(core::Id my_id, GLuint txtobj);
             ~Texture2D();
             void bind(GLenum texture_unit);

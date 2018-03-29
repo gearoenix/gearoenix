@@ -23,7 +23,7 @@ namespace render {
             void sub_bind();
 
         public:
-            Depth(core::Id shdid, Engine* e, core::EndCaller<core::EndCallerIgnore> end);
+            Depth(core::Id shdid, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> end);
             ~Depth();
             unsigned int get_vertex_elements_count() const;
             core::Id get_shader_id() const;

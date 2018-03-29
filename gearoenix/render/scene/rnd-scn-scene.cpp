@@ -1,7 +1,7 @@
 #include "rnd-scn-scene.hpp"
 #include "../../audio/au-audio.hpp"
 #include "../../core/asset/cr-asset-manager.hpp"
-#include "../../core/cr-end-caller.hpp"
+#include "../../core/sync/cr-sync-end-caller.hpp"
 #include "../../physics/body/phs-bd-body.hpp"
 #include "../../physics/constraint/phs-cns-constraint.hpp"
 #include "../../system/stream/sys-stm-stream.hpp"
@@ -19,12 +19,12 @@
 #include "../skybox/rnd-sky-skybox.hpp"
 #include "rnd-scn-ui.hpp"
 
-void gearoenix::render::scene::Scene::add_model(core::Id id, std::shared_ptr<model::Model> m)
+void gearoenix::render::scene::Scene::add_model(const std::shared_ptr<model::Model>& m)
 {
-    all_models[id] = m;
+    all_models[m->get_asset_id()] = m;
     const std::map<core::Id, std::shared_ptr<model::Model>>& children = m->get_children();
     for (const std::pair<core::Id, std::shared_ptr<model::Model>>& child : children) {
-        add_model(child.first, child.second);
+        add_model(child.second);
     }
     const std::map<core::Id, std::tuple<std::shared_ptr<mesh::Mesh>, std::shared_ptr<material::Material>, std::shared_ptr<material::Depth>>>& meshes = m->get_meshes();
     for (const std::pair<core::Id, std::tuple<std::shared_ptr<mesh::Mesh>, std::shared_ptr<material::Material>, std::shared_ptr<material::Depth>>>& mp : meshes) {
@@ -33,17 +33,17 @@ void gearoenix::render::scene::Scene::add_model(core::Id id, std::shared_ptr<mod
         core::Id shdid = mtr->get_shader_id();
         if (shader::Shader::is_shadow_caster(shdid)) {
             core::Id shdcstid = shader::Shader::get_shadow_caster_shader_id(shdid);
-            shadow_caster_models[shdcstid][id].insert(msh);
+            shadow_caster_models[shdcstid][m->get_asset_id()].insert(msh);
         }
         if (shader::Shader::is_transparent(shdid)) {
-            transparent_models[id].insert(msh);
+            transparent_models[m->get_asset_id()].insert(msh);
         } else {
-            opaque_models[shdid][id].insert(msh);
+            opaque_models[shdid][m->get_asset_id()].insert(msh);
         }
     }
 }
 
-gearoenix::render::scene::Scene::Scene(core::Id my_id, SceneType t, system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
+gearoenix::render::scene::Scene::Scene(core::Id my_id, SceneType t, system::stream::Stream* f, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> c)
     : core::asset::Asset(my_id, core::asset::Asset::AssetType::SCENE)
     , scene_type(t)
     , render_engine(e)
@@ -84,9 +84,9 @@ gearoenix::render::scene::Scene::Scene(core::Id my_id, SceneType t, system::stre
         add_model(i, c);
     }
     for (const core::Id cons_id : constraint_ids) {
-        add_constraint(cons_id, amgr->get_constriants(cons_id, core::EndCaller<physics::constraint::Constraint>([c](std::shared_ptr<physics::constraint::Constraint>) -> void {})));
+        add_constraint(amgr->get_constriants(cons_id, core::sync::EndCaller<physics::constraint::Constraint>([c](std::shared_ptr<physics::constraint::Constraint>) -> void {})));
     }
-    skybox = has_skybox ? amgr->get_skybox(skybox_id, core::EndCaller<skybox::Skybox>([c](std::shared_ptr<skybox::Skybox>) -> void {})) : nullptr;
+    skybox = has_skybox ? amgr->get_skybox(skybox_id, core::sync::EndCaller<skybox::Skybox>([c](std::shared_ptr<skybox::Skybox>) -> void {})) : nullptr;
 }
 
 gearoenix::render::scene::Scene::~Scene()
@@ -99,7 +99,7 @@ gearoenix::render::scene::Scene::~Scene()
 
 gearoenix::render::scene::Scene* gearoenix::render::scene::Scene::read(
     core::Id my_id,
-    system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
+    system::stream::Stream* f, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> c)
 {
     core::Id t;
     f->read(t);
@@ -252,19 +252,19 @@ void gearoenix::render::scene::Scene::add_mesh(core::Id mesh_id, core::Id model_
     }
 }
 
-void gearoenix::render::scene::Scene::add_model(core::Id model_id, core::EndCaller<core::EndCallerIgnore> c)
+void gearoenix::render::scene::Scene::add_model(core::Id model_id, core::sync::EndCaller<core::sync::EndCallerIgnore> c)
 {
     core::asset::Manager* amgr = render_engine->get_system_application()->get_asset_manager();
     amgr->get_model(
         model_id,
-        core::EndCaller<model::Model>(
+        core::sync::EndCaller<model::Model>(
             [c, model_id, this](std::shared_ptr<model::Model> mdl) -> void {
 #ifdef DEBUG_MODE
                 if (root_models.find(model_id) != root_models.end())
                     UNEXPECTED;
 #endif
                 root_models[model_id] = mdl;
-                add_model(model_id, mdl);
+                add_model(mdl);
             }));
 }
 
@@ -280,17 +280,17 @@ std::weak_ptr<gearoenix::render::model::Model> gearoenix::render::scene::Scene::
 #endif
 }
 
-void gearoenix::render::scene::Scene::add_constraint(core::Id id, const std::shared_ptr<physics::constraint::Constraint>& cns)
+void gearoenix::render::scene::Scene::add_constraint(const std::shared_ptr<physics::constraint::Constraint>& cns)
 {
 #ifdef DEBUG_MODE
-    std::map<core::Id, std::shared_ptr<physics::constraint::Constraint>>::iterator search = root_constraints.find(id);
+    std::map<core::Id, std::shared_ptr<physics::constraint::Constraint>>::iterator search = root_constraints.find(cns->get_asset_id());
     if (root_constraints.end() != search)
         UNEXPECTED;
 #endif
-    root_constraints[id] = cns;
+    root_constraints[cns->get_asset_id()] = cns;
     const std::vector<std::pair<core::Id, std::shared_ptr<model::Model>>> models = cns->get_all_models();
     for (const std::pair<const core::Id, const std::shared_ptr<model::Model>>& model : models) {
-        add_model(model.first, model.second);
+        add_model(model.second);
     }
     const std::vector<std::shared_ptr<physics::body::Body>> bodies = cns->get_all_bodies();
     for (const std::shared_ptr<physics::body::Body>& b : bodies) {

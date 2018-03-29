@@ -17,7 +17,7 @@ namespace dx11 {
             Pipeline(
                 core::Id sid,
                 Engine* eng,
-                core::EndCaller<core::EndCallerIgnore> call);
+                core::sync::EndCaller<core::sync::EndCallerIgnore> call);
             ~Pipeline();
             void bind();
         };

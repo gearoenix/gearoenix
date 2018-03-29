@@ -8,7 +8,7 @@
 
 gearoenix::dx11::buffer::Mesh::Mesh(
     unsigned int vec, system::stream::Stream* f,
-    Engine* e, core::EndCaller<core::EndCallerIgnore> c)
+    Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> c)
     : render::buffer::Mesh(e)
     , stride(vec * sizeof(core::Real))
 {

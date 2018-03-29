@@ -11,7 +11,7 @@
 #include "../widget/rnd-wdg-widget.hpp"
 #include <limits>
 
-gearoenix::render::scene::Ui::Ui(core::Id my_id, system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
+gearoenix::render::scene::Ui::Ui(core::Id my_id, system::stream::Stream* f, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> c)
     : Scene(my_id, Scene::SceneType::UI, f, e, c)
 {
 }

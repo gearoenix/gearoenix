@@ -16,7 +16,7 @@
 #include "../widget/rnd-wdg-widget.hpp"
 #include <iostream>
 
-gearoenix::render::model::Model::Model(core::Id my_id, ModelType t, system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
+gearoenix::render::model::Model::Model(core::Id my_id, ModelType t, system::stream::Stream* f, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> c)
     : core::asset::Asset(my_id, core::asset::Asset::AssetType::MODEL)
     , model_type(t)
     , render_engine(e)
@@ -60,15 +60,15 @@ gearoenix::render::model::Model::Model(core::Id my_id, ModelType t, system::stre
     core::Count last_pos = asset_file->tell();
     for (core::Id mesh_id : mesh_ids) {
         const std::tuple<std::shared_ptr<material::Material>, std::shared_ptr<material::Depth>>& mat = materials[mesh_id];
-        meshes[mesh_id] = std::make_tuple(astmgr->get_mesh(mesh_id, core::EndCaller<mesh::Mesh>([c](std::shared_ptr<mesh::Mesh>) -> void {})), std::get<0>(mat), std::get<1>(mat));
+        meshes[mesh_id] = std::make_tuple(astmgr->get_mesh(mesh_id, core::sync::EndCaller<mesh::Mesh>([c](std::shared_ptr<mesh::Mesh>) -> void {})), std::get<0>(mat), std::get<1>(mat));
     }
     for (core::Id model_id : model_children) {
-        children[model_id] = astmgr->get_model(model_id, core::EndCaller<model::Model>([c](std::shared_ptr<Model>) -> void {}));
+        children[model_id] = astmgr->get_model(model_id, core::sync::EndCaller<model::Model>([c](std::shared_ptr<Model>) -> void {}));
     }
     asset_file->seek(last_pos);
 }
 
-gearoenix::render::model::Model* gearoenix::render::model::Model::read(core::Id my_id, system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
+gearoenix::render::model::Model* gearoenix::render::model::Model::read(core::Id my_id, system::stream::Stream* f, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> c)
 {
     core::Id t;
     f->read(t);

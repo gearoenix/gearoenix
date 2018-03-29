@@ -32,7 +32,7 @@ namespace render {
             std::shared_ptr<texture::Cube> ctxt;
 
         public:
-            SkyboxBasic(system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> end);
+            SkyboxBasic(system::stream::Stream* f, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> end);
             ~SkyboxBasic();
             unsigned int get_vertex_elements_count() const;
             core::Id get_shader_id() const;

@@ -8,7 +8,9 @@
 #include <vector>
 namespace gearoenix {
 namespace core {
-    class Semaphore;
+    namespace sync {
+        class Semaphore;
+    }
 }
 namespace render {
     class Engine;
@@ -29,13 +31,9 @@ namespace physics {
         std::mutex pending_animations_locker;
         std::vector<std::shared_ptr<animation::Animation>> pending_animations;
         bool animations_need_cleaning = false;
-#ifdef THREAD_SUPPORTED
         const unsigned int threads_count = 4;
-        core::Semaphore* signaller;
+        core::sync::Semaphore* signaller;
         Kernel** kernels;
-#else
-        Kernel* kernel;
-#endif
 
     protected:
     public:

@@ -10,7 +10,7 @@
 #include "../rnd-engine.hpp"
 #include "../shader/rnd-shd-shader.hpp"
 
-void gearoenix::render::widget::Text::create_text_mesh(core::EndCaller<core::EndCallerIgnore> c)
+void gearoenix::render::widget::Text::create_text_mesh(core::sync::EndCaller<core::sync::EndCallerIgnore> c)
 {
     system::stream::Memory ms;
     system::stream::Stream& s = ms;
@@ -115,7 +115,7 @@ void gearoenix::render::widget::Text::create_text_mesh(core::EndCaller<core::End
     msh = std::shared_ptr<mesh::Mesh>(mesh::Mesh::read(mesh_id, &s, render_engine, c));
 }
 
-gearoenix::render::widget::Text::Text(core::Id my_id, system::stream::Stream* s, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
+gearoenix::render::widget::Text::Text(core::Id my_id, system::stream::Stream* s, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> c)
     : Widget(my_id, s, e, c)
     , text(s->read_string())
     , align(s->read<Alignment::Type>())
@@ -130,7 +130,7 @@ gearoenix::render::widget::Text::Text(core::Id my_id, system::stream::Stream* s,
     color.read(s);
     fnt = std::static_pointer_cast<font::Font2D>(
         e->get_system_application()->get_asset_manager()->get_font(
-            font_id, core::EndCaller<font::Font>([c](std::shared_ptr<font::Font>) -> void {
+            font_id, core::sync::EndCaller<font::Font>([c](std::shared_ptr<font::Font>) -> void {
             })));
     create_text_mesh(c);
     material::FontColored* font_mat = new material::FontColored(shader::FONT_COLORED, fnt->get_baked_texture(), e, c);

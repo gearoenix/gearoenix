@@ -25,7 +25,7 @@ namespace render {
             std::shared_ptr<texture::Texture2D> baked_texture;
 
         public:
-            Font2D(core::Id my_id, system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
+            Font2D(core::Id my_id, system::stream::Stream* f, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> c);
             ~Font2D();
             const LetterProperties& get_letter_properties(char c) const;
             const std::shared_ptr<texture::Texture2D> get_baked_texture() const;

@@ -13,7 +13,7 @@ const int gearoenix::render::font::Font2D::first_character = 32;
 const int gearoenix::render::font::Font2D::last_character = 126;
 const int gearoenix::render::font::Font2D::characters_count = (gearoenix::render::font::Font2D::last_character - gearoenix::render::font::Font2D::first_character) + 1;
 
-gearoenix::render::font::Font2D::Font2D(core::Id my_id, system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
+gearoenix::render::font::Font2D::Font2D(core::Id my_id, system::stream::Stream* f, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> c)
     : Font(my_id, Shape::D2)
     , letters_properties(characters_count)
 {
@@ -22,7 +22,7 @@ gearoenix::render::font::Font2D::Font2D(core::Id my_id, system::stream::Stream* 
     baked_texture = std::shared_ptr<texture::Texture2D>(
         e->create_texture_2d(
             e->get_system_application()->get_asset_manager()->create_id(),
-            f, core::EndCaller<core::EndCallerIgnore>([c](std::shared_ptr<core::EndCallerIgnore>) -> void {})));
+            f, core::sync::EndCaller<core::sync::EndCallerIgnore>([c](std::shared_ptr<core::sync::EndCallerIgnore>) -> void {})));
 }
 
 gearoenix::render::font::Font2D::~Font2D()

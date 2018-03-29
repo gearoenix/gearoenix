@@ -12,7 +12,7 @@ gearoenix::render::font::Font::~Font()
 {
 }
 
-gearoenix::render::font::Font* gearoenix::render::font::Font::read(core::Id font_id, system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c)
+gearoenix::render::font::Font* gearoenix::render::font::Font::read(core::Id font_id, system::stream::Stream* f, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> c)
 {
     Shape::Type font_type;
     f->read(font_type);

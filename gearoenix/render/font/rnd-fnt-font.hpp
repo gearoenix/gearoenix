@@ -1,8 +1,8 @@
 #ifndef GEAROEMIX_RENDER_FONT_FONT_HPP
 #define GEAROEMIX_RENDER_FONT_FONT_HPP
 #include "../../core/asset/cr-asset.hpp"
-#include "../../core/cr-end-caller.hpp"
 #include "../../core/cr-types.hpp"
+#include "../../core/sync/cr-sync-end-caller.hpp"
 namespace gearoenix {
 namespace system {
     namespace stream {
@@ -28,7 +28,7 @@ namespace render {
 
         public:
             virtual ~Font();
-            static Font* read(core::Id font_id, system::stream::Stream* f, Engine* e, core::EndCaller<core::EndCallerIgnore> c);
+            static Font* read(core::Id font_id, system::stream::Stream* f, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> c);
         };
     }
 }

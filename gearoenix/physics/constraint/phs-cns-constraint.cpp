@@ -28,7 +28,7 @@ void gearoenix::physics::constraint::Constraint::apply(core::Real)
     applied = true;
 }
 
-gearoenix::physics::constraint::Constraint* gearoenix::physics::constraint::Constraint::read(core::Id my_id, system::stream::Stream* f, render::Engine* render_engine, core::EndCaller<core::EndCallerIgnore> c)
+gearoenix::physics::constraint::Constraint* gearoenix::physics::constraint::Constraint::read(core::Id my_id, system::stream::Stream* f, render::Engine* render_engine, core::sync::EndCaller<core::sync::EndCallerIgnore> c)
 {
     Type t;
     f->read(t);

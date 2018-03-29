@@ -22,7 +22,7 @@ namespace dx11 {
             };
 
         public:
-            DirectionalD2SpeculatedBakedFullOpaque(core::Id my_id, Engine* eng, core::EndCaller<core::EndCallerIgnore> end);
+            DirectionalD2SpeculatedBakedFullOpaque(core::Id my_id, Engine* eng, core::sync::EndCaller<core::sync::EndCallerIgnore> end);
             ~DirectionalD2SpeculatedBakedFullOpaque();
             void use();
             const std::vector<render::shader::stage::Id>& get_stages_ids() const;

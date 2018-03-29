@@ -44,7 +44,7 @@ namespace gles2 {
             GLint nrm_att_ind;
 
         public:
-            DirectionalColoredSpeculatedBakedFullOpaque(core::Id my_id, Engine* eng, core::EndCaller<core::EndCallerIgnore> end);
+            DirectionalColoredSpeculatedBakedFullOpaque(core::Id my_id, Engine* eng, core::sync::EndCaller<core::sync::EndCallerIgnore> end);
             ~DirectionalColoredSpeculatedBakedFullOpaque();
             void use();
             const std::vector<render::shader::stage::Id>& get_stages_ids() const;

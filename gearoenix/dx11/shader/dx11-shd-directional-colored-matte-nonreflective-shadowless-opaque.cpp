@@ -22,7 +22,7 @@
 //    shd->set_sun_color(data->sun_color.data());
 //}
 //
-//gearoenix::gles2::shader::DirectionalColoredMatteNonreflectiveShadowlessOpaque::DirectionalColoredMatteNonreflectiveShadowlessOpaque(Engine* eng, std::shared_ptr<core::EndCaller> end)
+//gearoenix::gles2::shader::DirectionalColoredMatteNonreflectiveShadowlessOpaque::DirectionalColoredMatteNonreflectiveShadowlessOpaque(Engine* eng, std::shared_ptr<core::sync::EndCaller> end)
 //    : Shader(eng, end)
 //{
 //    eng->add_load_function([this, end] {
