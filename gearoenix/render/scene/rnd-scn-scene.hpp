@@ -21,6 +21,7 @@ namespace core {
 namespace physics {
     class Kernel;
     namespace body {
+        class Body;
         class Rigid;
     }
     namespace constraint {
@@ -70,11 +71,12 @@ namespace render {
             std::map<core::Id, std::shared_ptr<audio::Audio>> audios;
             std::map<core::Id, std::shared_ptr<light::Light>> lights;
             std::map<core::Id, std::shared_ptr<model::Model>> root_models;
+            std::map<core::Id, std::shared_ptr<physics::body::Body>> root_bodies;
             std::shared_ptr<skybox::Skybox> skybox;
             std::map<core::Id, std::shared_ptr<physics::constraint::Constraint>> root_constraints;
             bool all_models_needs_cleaning = false;
             std::map<core::Id, std::weak_ptr<model::Model>> all_models;
-            std::map<core::Id, std::weak_ptr<physics::body::Rigid>> all_rigid_bodies;
+            std::map<core::Id, std::weak_ptr<physics::body::Body>> all_bodies;
             // shadow_caster_shader_id -> model_id -> mesh_id
             std::map<core::Id, std::map<core::Id, std::set<core::Id>>> shadow_caster_models;
             // shader_id -> model_id -> mesh_id
@@ -110,6 +112,7 @@ namespace render {
             void add_model(core::Id model_id, core::EndCaller<core::EndCallerIgnore> c = core::EndCaller<core::EndCallerIgnore>([](std::shared_ptr<core::EndCallerIgnore>) -> void {}));
             std::weak_ptr<model::Model> get_model(core::Id model_id);
             void add_constraint(core::Id id, const std::shared_ptr<physics::constraint::Constraint>& cns);
+            void add_body(const std::shared_ptr<physics::body::Body>& b);
         };
     }
 }

@@ -8,7 +8,7 @@
 
 gearoenix::dx11::texture::Texture2D::Texture2D(core::Id my_id, system::stream::Stream* file, Engine* eng, core::EndCaller<core::EndCallerIgnore> end)
     : render::texture::Texture2D(my_id)
-	, engine(eng)
+    , engine(eng)
 {
     std::vector<unsigned char> img_data;
     unsigned int imgw, imgh;
@@ -42,7 +42,7 @@ gearoenix::dx11::texture::Texture2D::Texture2D(core::Id my_id, system::stream::S
 
 gearoenix::dx11::texture::Texture2D::Texture2D(core::Id my_id, Engine* eng, ID3D11ShaderResourceView* srv)
     : render::texture::Texture2D(my_id)
-	, engine(eng)
+    , engine(eng)
     , srv(srv)
 {
 }

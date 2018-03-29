@@ -13,6 +13,11 @@ gearoenix::physics::constraint::Constraint::~Constraint()
 {
 }
 
+const std::vector<std::shared_ptr<gearoenix::physics::body::Body>> gearoenix::physics::constraint::Constraint::get_all_bodies() const
+{
+    return std::vector<std::shared_ptr<body::Body>>();
+}
+
 bool gearoenix::physics::constraint::Constraint::is_alive() const
 {
     return alive;

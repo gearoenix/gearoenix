@@ -308,8 +308,8 @@ gearoenix::system::Application::Application()
     }
     update_screen_sizes();
     update_mouse_position();
-	astmgr = new core::asset::Manager(this, "data.gx3d");
-	astmgr->initialize();
+    astmgr = new core::asset::Manager(this, "data.gx3d");
+    astmgr->initialize();
 #ifdef USE_VULKAN
     if (vulkan::Engine::is_supported())
         render_engine = new vulkan::Engine(this);
@@ -338,7 +338,7 @@ gearoenix::system::Application::Application()
     {
         GXLOGF("No suitable API found.");
     }
-	astmgr->set_render_engine(render_engine);
+    astmgr->set_render_engine(render_engine);
 }
 
 gearoenix::system::Application::~Application()

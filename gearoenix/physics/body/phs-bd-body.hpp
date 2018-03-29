@@ -1,12 +1,12 @@
 #ifndef GEAROENIX_PHYSICS_BODY_BODY_HPP
 #define GEAROENIX_PHYSICS_BODY_BODY_HPP
-#include "../../math/math-vector.hpp"
+#include "../../core/asset/cr-asset.hpp"
 #include <memory>
 namespace gearoenix {
 namespace physics {
     class Transferable;
     namespace body {
-        class Body {
+        class Body : public core::asset::Asset {
         public:
             class Behaviour {
             public:
@@ -21,7 +21,7 @@ namespace physics {
         protected:
             const Behaviour::Type body_type;
             const std::shared_ptr<Transferable> body_obj;
-            Body(const Behaviour::Type body_type, const std::shared_ptr<Transferable>& body_obj);
+            Body(const core::Id my_id, const Behaviour::Type body_type, const std::shared_ptr<Transferable>& body_obj);
 
         public:
             virtual ~Body();

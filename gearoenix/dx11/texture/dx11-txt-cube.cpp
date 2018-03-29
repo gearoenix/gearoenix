@@ -11,7 +11,7 @@
 
 gearoenix::dx11::texture::Cube::Cube(core::Id my_id, system::stream::Stream* file, Engine* eng, core::EndCaller<core::EndCallerIgnore> end)
     : render::texture::Cube(my_id)
-	, engine(eng)
+    , engine(eng)
 {
     std::vector<std::vector<unsigned char>> img_data(FACES_COUNT);
     unsigned int imgw, imgh;

@@ -69,7 +69,7 @@ void* gearoenix::dx11::shader::Shader::compile_shader(
 
 gearoenix::dx11::shader::Shader::Shader(core::Id my_id, Engine* eng, core::EndCaller<core::EndCallerIgnore>)
     : render::shader::Shader(my_id)
-	, eng(eng)
+    , eng(eng)
 {
 }
 

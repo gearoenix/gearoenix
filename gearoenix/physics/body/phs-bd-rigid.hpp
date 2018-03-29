@@ -19,7 +19,7 @@ namespace physics {
             bool active = false;
 
         public:
-            Rigid(const std::shared_ptr<Transferable>& body_obj);
+            Rigid(const core::Id my_id, const std::shared_ptr<Transferable>& body_obj);
             virtual ~Rigid();
             void apply_force_on_origin(const math::Vec3& force);
             void apply_force(const math::Vec3& force, const math::Vec3& point);

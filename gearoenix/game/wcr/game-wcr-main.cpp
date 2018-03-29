@@ -120,13 +120,18 @@ void GameApp::on_event(const gearoenix::core::event::Event& e)
                     rndeng->delete_scene(1);
                     rndeng->delete_scene(2);
                     gearoenix::core::asset::Manager* astmgr = rndeng->get_system_application()->get_asset_manager();
+                    gearoenix::core::Id cnsid = astmgr->create_id();
+                    gearoenix::core::Id camrigid = astmgr->create_id();
+                    gearoenix::core::Id mdlrigid = astmgr->create_id();
+                    std::shared_ptr<gearoenix::physics::body::Rigid> mdlrig(new gearoenix::physics::body::Rigid(mdlrigid, mdl));
+                    scene->add_body(mdlrig);
+                    std::shared_ptr<gearoenix::physics::body::Rigid> camrig(new gearoenix::physics::body::Rigid(camrigid, cam));
+                    scene->add_body(camrig);
                     std::shared_ptr<gearoenix::physics::constraint::TrackerSpringJointSpring> cns(
                         new gearoenix::physics::constraint::TrackerSpringJointSpring(
-                            astmgr->create_id(),
-                            std::shared_ptr<gearoenix::physics::body::Rigid>(new gearoenix::physics::body::Rigid(mdl)),
-                            std::shared_ptr<gearoenix::physics::body::Rigid>(new gearoenix::physics::body::Rigid(cam)),
+                            cnsid, mdlrig, camrig,
                             1.0f, gearoenix::math::Vec3(0.0f, -0.5f, 0.4f).normalized(), 1.0f, 2.0f));
-                    scene->add_constraint(astmgr->create_id(), cns);
+                    scene->add_constraint(cnsid, cns);
                     state = State::GAME;
                 });
                 //rndeng->load_scene(1, [this]() -> void {});

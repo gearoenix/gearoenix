@@ -2,6 +2,7 @@
 #include "../../audio/au-audio.hpp"
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../core/cr-end-caller.hpp"
+#include "../../physics/body/phs-bd-body.hpp"
 #include "../../physics/constraint/phs-cns-constraint.hpp"
 #include "../../system/stream/sys-stm-stream.hpp"
 #include "../../system/sys-app.hpp"
@@ -291,4 +292,18 @@ void gearoenix::render::scene::Scene::add_constraint(core::Id id, const std::sha
     for (const std::pair<const core::Id, const std::shared_ptr<model::Model>>& model : models) {
         add_model(model.first, model.second);
     }
+    const std::vector<std::shared_ptr<physics::body::Body>> bodies = cns->get_all_bodies();
+    for (const std::shared_ptr<physics::body::Body>& b : bodies) {
+        all_bodies[b->get_asset_id()] = b;
+    }
+}
+
+void gearoenix::render::scene::Scene::add_body(const std::shared_ptr<physics::body::Body>& b)
+{
+#ifdef DEBUG_MODE
+    std::map<core::Id, std::shared_ptr<physics::body::Body>>::iterator search = root_bodies.find(b->get_asset_id());
+    if (root_bodies.end() != search)
+        UNEXPECTED;
+#endif
+    root_bodies[b->get_asset_id()] = b;
 }

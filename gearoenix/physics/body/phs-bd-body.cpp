@@ -1,7 +1,8 @@
 #include "phs-bd-body.hpp"
 
-gearoenix::physics::body::Body::Body(const Behaviour::Type body_type, const std::shared_ptr<Transferable>& body_obj)
-    : body_type(body_type)
+gearoenix::physics::body::Body::Body(const core::Id my_id, const Behaviour::Type body_type, const std::shared_ptr<Transferable>& body_obj)
+    : core::asset::Asset(my_id, core::asset::Asset::AssetType::BODY)
+    , body_type(body_type)
     , body_obj(body_obj)
 {
 }

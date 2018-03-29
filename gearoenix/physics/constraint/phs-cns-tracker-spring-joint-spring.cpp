@@ -41,6 +41,14 @@ const std::vector<std::pair<gearoenix::core::Id, std::shared_ptr<gearoenix::rend
     return std::vector<std::pair<gearoenix::core::Id, std::shared_ptr<gearoenix::render::model::Model>>>();
 }
 
+const std::vector<std::shared_ptr<gearoenix::physics::body::Body>> gearoenix::physics::constraint::TrackerSpringJointSpring::get_all_bodies() const
+{
+    std::vector<std::shared_ptr<body::Body>> v(2);
+    v[0] = active;
+    v[1] = passive;
+    return v;
+}
+
 void gearoenix::physics::constraint::TrackerSpringJointSpring::apply(core::Real)
 {
     math::Vec3 actpos, paspos;
