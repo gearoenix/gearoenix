@@ -6,7 +6,7 @@ namespace physics {
     class Transferable {
     private:
     protected:
-        bool transformed = true;
+        volatile bool transformed = true;
         math::Vec3 x_axis, y_axis, z_axis;
         void local_x_rotate(const core::Real d, math::Mat4x4& rm);
         void local_y_rotate(const core::Real d, math::Mat4x4& rm);

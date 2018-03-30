@@ -10,6 +10,7 @@ namespace gearoenix {
 namespace core {
     namespace sync {
         class Semaphore;
+		class StopPoint;
     }
 }
 namespace render {
@@ -34,6 +35,7 @@ namespace physics {
         const unsigned int threads_count = 4;
         core::sync::Semaphore* signaller;
         Kernel** kernels;
+		core::sync::StopPoint* kernels_piont = nullptr;
 
     protected:
     public:

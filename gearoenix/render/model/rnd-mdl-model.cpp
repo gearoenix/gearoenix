@@ -95,13 +95,15 @@ void gearoenix::render::model::Model::commit(const scene::Scene* s)
 {
     //std::lock_guard<std::mutex> lg(locker);
     const std::shared_ptr<camera::Camera>& cam = s->get_current_camera();
-    if (transformed) {
+	const bool localized_transformed = transformed;
+    if (localized_transformed) {
+		transformed = false;
         if (nullptr != collider) {
             collider->update(m);
         }
         moccloc = m * occloc;
     }
-    if (cam->is_transformed() || transformed) {
+    if (cam->is_transformed() || localized_transformed) {
         is_in_camera = cam->in_sight(moccloc, occrds);
         if (is_in_camera) {
             if (needs_mvp) {
@@ -119,7 +121,7 @@ void gearoenix::render::model::Model::commit(const scene::Scene* s)
     if (has_shadow_caster) {
         const light::Sun* sun = s->get_sun();
         const camera::Orthographic* suncam = sun->get_camera();
-        if (suncam->is_transformed() || transformed) {
+        if (suncam->is_transformed() || localized_transformed) {
             is_in_sun = suncam->in_sight(moccloc, occrds);
             if (is_in_sun) {
                 sunmvp = sun->get_camera()->get_view_projection() * m;
@@ -135,7 +137,7 @@ void gearoenix::render::model::Model::commit(const scene::Scene* s)
             }
         }
     }
-    transformed = false;
+		
 }
 
 void gearoenix::render::model::Model::draw(core::Id mesh_id, texture::Texture2D* shadow_texture)

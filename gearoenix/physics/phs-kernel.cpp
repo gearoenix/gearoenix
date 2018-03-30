@@ -1,5 +1,6 @@
 #include "phs-kernel.hpp"
 #include "../core/sync/cr-sync-semaphore.hpp"
+#include "../core/sync/cr-sync-stop-point.hpp"
 #include "../render/camera/rnd-cmr-camera.hpp"
 #include "../render/camera/rnd-cmr-orthographic.hpp"
 #include "../render/light/rnd-lt-sun.hpp"
@@ -16,33 +17,24 @@ void gearoenix::physics::Kernel::run()
 {
     while (alive) {
         signaller->lock();
-        const unsigned int threads_count = engine->threads_count;
-        now = std::chrono::system_clock::now();
-        delta_time = std::chrono::duration_cast<std::chrono::duration<core::Real>>(now - last_update).count();
-        // std::string s = "\n" + std::to_string(thread_index) + " of " + std::to_string(threads_count) + "\n";
-        // std::cout << s;
+		update();
         apply_animations();
+		engine->kernels_piont->all_reach();
         apply_constraints();
-        unsigned int model_index = 0;
-        const std::map<core::Id, std::shared_ptr<render::scene::Scene>>& scenes = engine->render_engine->get_all_scenes();
-        for (const std::pair<core::Id, std::shared_ptr<render::scene::Scene>> id_scene : scenes) {
-            const std::shared_ptr<render::scene::Scene>& scene = id_scene.second;
-            const std::map<core::Id, std::weak_ptr<render::model::Model>>& models = scene->get_all_models();
-            for (const std::pair<core::Id, std::weak_ptr<render::model::Model>> id_model : models) {
-                if (((model_index++) % threads_count) != thread_index)
-                    continue;
-                std::shared_ptr<render::model::Model> model;
-                if (!(model = std::get<1>(id_model).lock())) {
-                    scene->all_models_needs_cleaning = true;
-                    continue;
-                }
-                model->commit(scene.get());
-            }
-        }
-        last_update = now;
+		engine->kernels_piont->all_reach();
+		apply_bodies();
+		engine->kernels_piont->all_reach();
+		apply_models();
         engine->signaller->release();
     }
     alive = true;
+}
+
+void gearoenix::physics::Kernel::update()
+{
+	now = std::chrono::system_clock::now();
+	delta_time = std::chrono::duration_cast<std::chrono::duration<core::Real>>(now - last_update).count();
+	last_update = now;
 }
 
 void gearoenix::physics::Kernel::apply_animations()
@@ -71,6 +63,31 @@ void gearoenix::physics::Kernel::apply_constraints()
             id_constraint.second->apply(delta_time);
         }
     }
+}
+
+void gearoenix::physics::Kernel::apply_bodies()
+{
+}
+
+void gearoenix::physics::Kernel::apply_models()
+{
+	const unsigned int threads_count = engine->threads_count;
+	unsigned int model_index = 0;
+	const std::map<core::Id, std::shared_ptr<render::scene::Scene>>& scenes = engine->render_engine->get_all_scenes();
+	for (const std::pair<core::Id, std::shared_ptr<render::scene::Scene>> id_scene : scenes) {
+		const std::shared_ptr<render::scene::Scene>& scene = id_scene.second;
+		const std::map<core::Id, std::weak_ptr<render::model::Model>>& models = scene->get_all_models();
+		for (const std::pair<core::Id, std::weak_ptr<render::model::Model>> id_model : models) {
+			if (((model_index++) % threads_count) != thread_index)
+				continue;
+			std::shared_ptr<render::model::Model> model;
+			if (!(model = std::get<1>(id_model).lock())) {
+				scene->all_models_needs_cleaning = true;
+				continue;
+			}
+			model->commit(scene.get());
+		}
+	}
 }
 
 gearoenix::physics::Kernel::Kernel(const unsigned int thread_index, Engine* engine)

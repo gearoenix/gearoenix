@@ -1,6 +1,5 @@
 #ifndef GEAROENIX_CORE_SYNC_STOP_POINT_HPP
 #define GEAROENIX_CORE_SYNC_STOP_POINT_HPP
-#include "../cr-build-configuration.hpp"
 #include <mutex>
 
 namespace gearoenix {
@@ -9,9 +8,9 @@ namespace core {
         class Semaphore;
         class StopPoint {
         private:
-            Semaphore* sem;
+            Semaphore* sem = nullptr;
             const int stoper;
-            volatile int counter = 0;
+            volatile int counter = 1;
             std::mutex counter_lock;
 
         public:
