@@ -17,7 +17,7 @@ void gearoenix::core::sync::StopPoint::all_reach()
     counter_lock.lock();
     counter++;
     if (counter == stoper) {
-        counter = 1;
+        counter = 0;
         for (int i = 1; i < stoper; ++i)
             sem->release();
         counter_lock.unlock();

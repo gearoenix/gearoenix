@@ -35,7 +35,9 @@ namespace physics {
         const unsigned int threads_count = 4;
         core::sync::Semaphore* signaller;
         Kernel** kernels;
-		core::sync::StopPoint* kernels_piont = nullptr;
+		core::sync::StopPoint* kernels_piont_animations = nullptr;
+		core::sync::StopPoint* kernels_piont_constraints = nullptr;
+		core::sync::StopPoint* kernels_piont_bodies = nullptr;
 
     protected:
     public:

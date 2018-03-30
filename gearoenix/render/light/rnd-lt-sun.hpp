@@ -11,7 +11,7 @@ namespace render {
     namespace light {
         class Sun : public Light {
         private:
-            camera::Orthographic* cam;
+            camera::Orthographic* cam = nullptr;
             bool color_changed = true;
             math::Vec3 color;
             math::Mat4x4 db;

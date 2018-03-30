@@ -46,9 +46,9 @@ gearoenix::render::Engine::~Engine()
 void gearoenix::render::Engine::clear()
 {
     if (pipmgr != nullptr) {
-        loaded_scenes.clear();
         delete physics_engine;
         physics_engine = nullptr;
+        loaded_scenes.clear();
         scene_loader_continue = false;
         scene_loader_signaler->release();
         scene_loader.join();

@@ -17,13 +17,14 @@ void gearoenix::physics::Kernel::run()
 {
     while (alive) {
         signaller->lock();
+		if (!alive) break;
 		update();
         apply_animations();
-		engine->kernels_piont->all_reach();
+		engine->kernels_piont_animations->all_reach();
         apply_constraints();
-		engine->kernels_piont->all_reach();
+		engine->kernels_piont_constraints->all_reach();
 		apply_bodies();
-		engine->kernels_piont->all_reach();
+		engine->kernels_piont_bodies->all_reach();
 		apply_models();
         engine->signaller->release();
     }

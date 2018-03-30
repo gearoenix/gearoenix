@@ -10,7 +10,7 @@ namespace core {
         private:
             Semaphore* sem = nullptr;
             const int stoper;
-            volatile int counter = 1;
+            volatile int counter = 0;
             std::mutex counter_lock;
 
         public:

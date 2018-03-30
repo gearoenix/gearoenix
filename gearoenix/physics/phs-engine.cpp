@@ -11,7 +11,9 @@ gearoenix::physics::Engine::Engine(render::Engine* rndeng)
 {
     // because of some compiler &/| std problems it is here instead of initializer list
     const_cast<unsigned int&>(threads_count) = std::thread::hardware_concurrency() > 4 ? std::thread::hardware_concurrency() : 4;
-	kernels_piont = new core::sync::StopPoint(threads_count);
+	kernels_piont_animations = new core::sync::StopPoint(threads_count);
+	kernels_piont_constraints = new core::sync::StopPoint(threads_count);
+	kernels_piont_bodies = new core::sync::StopPoint(threads_count);
     kernels = new Kernel*[threads_count];
     for (unsigned int i = 0; i < threads_count; ++i) {
         kernels[i] = new Kernel(i, this);
@@ -26,7 +28,9 @@ gearoenix::physics::Engine::~Engine()
     }
     delete[] kernels;
     delete signaller;
-	delete kernels_piont;
+	delete kernels_piont_animations;
+	delete kernels_piont_constraints;
+	delete kernels_piont_bodies;
 }
 
 void gearoenix::physics::Engine::add_animation(std::shared_ptr<animation::Animation> a)
