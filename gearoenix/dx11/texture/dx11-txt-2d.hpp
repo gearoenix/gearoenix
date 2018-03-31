@@ -14,7 +14,6 @@ namespace dx11 {
     namespace texture {
         class Texture2D : public render::texture::Texture2D {
         private:
-            Engine* engine = nullptr;
             ID3D11ShaderResourceView* srv = nullptr;
 
         public:

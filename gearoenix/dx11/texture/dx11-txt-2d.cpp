@@ -7,8 +7,7 @@
 #include "../dx11-engine.hpp"
 
 gearoenix::dx11::texture::Texture2D::Texture2D(core::Id my_id, system::stream::Stream* file, Engine* eng, core::sync::EndCaller<core::sync::EndCallerIgnore> end)
-    : render::texture::Texture2D(my_id)
-    , engine(eng)
+    : render::texture::Texture2D(my_id, eng)
 {
     std::vector<unsigned char> img_data;
     unsigned int imgw, imgh;
@@ -29,20 +28,19 @@ gearoenix::dx11::texture::Texture2D::Texture2D(core::Id my_id, system::stream::S
     sdesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
     sdesc.Texture2D.MipLevels = -1;
     eng->add_load_function([this, desc, sdesc, img_data, end]() -> void {
-        ID3D11Device* dev = engine->get_device();
+        ID3D11Device* dev = static_cast<Engine*>(render_engine)->get_device();
         ID3D11Texture2D* txt = nullptr;
         GXHRCHK(dev->CreateTexture2D(&desc, nullptr, &txt));
-        engine->get_context()->UpdateSubresource(txt, 0, nullptr, img_data.data(), desc.Width * 4, 0);
+		static_cast<Engine*>(render_engine)->get_context()->UpdateSubresource(txt, 0, nullptr, img_data.data(), desc.Width * 4, 0);
         GXHRCHK(dev->CreateShaderResourceView(txt, &sdesc, &srv));
-        engine->get_context()->GenerateMips(srv);
+		static_cast<Engine*>(render_engine)->get_context()->GenerateMips(srv);
         txt->Release();
         (void)end;
     });
 }
 
 gearoenix::dx11::texture::Texture2D::Texture2D(core::Id my_id, Engine* eng, ID3D11ShaderResourceView* srv)
-    : render::texture::Texture2D(my_id)
-    , engine(eng)
+    : render::texture::Texture2D(my_id, eng)
     , srv(srv)
 {
 }
@@ -60,6 +58,6 @@ const ID3D11ShaderResourceView* gearoenix::dx11::texture::Texture2D::get_shader_
 
 void gearoenix::dx11::texture::Texture2D::bind(unsigned int slot) const
 {
-    engine->get_context()->PSSetShaderResources(slot, 1, &srv);
+	static_cast<Engine*>(render_engine)->get_context()->PSSetShaderResources(slot, 1, &srv);
 }
 #endif

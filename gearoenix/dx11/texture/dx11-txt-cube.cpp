@@ -10,8 +10,7 @@
 #define FACES_COUNT 6
 
 gearoenix::dx11::texture::Cube::Cube(core::Id my_id, system::stream::Stream* file, Engine* eng, core::sync::EndCaller<core::sync::EndCallerIgnore> end)
-    : render::texture::Cube(my_id)
-    , engine(eng)
+    : render::texture::Cube(my_id, eng)
 {
     std::vector<std::vector<unsigned char>> img_data(FACES_COUNT);
     unsigned int imgw, imgh;
@@ -40,8 +39,8 @@ gearoenix::dx11::texture::Cube::Cube(core::Id my_id, system::stream::Stream* fil
     sdesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
     sdesc.TextureCube.MipLevels = 1;
     eng->add_load_function([this, desc, sdesc, img_data, end]() -> void {
-        ID3D11Device* dev = engine->get_device();
-        ID3D11DeviceContext* ctx = engine->get_context();
+        ID3D11Device* dev = static_cast<Engine*>(render_engine)->get_device();
+        ID3D11DeviceContext* ctx = reinterpret_cast<Engine*>(render_engine)->get_context();
         ID3D11Texture2D* txt = nullptr;
         D3D11_SUBRESOURCE_DATA facesdata[FACES_COUNT];
         GXSETARRZ(facesdata);
@@ -76,6 +75,6 @@ const ID3D11ShaderResourceView* gearoenix::dx11::texture::Cube::get_shader_resou
 
 void gearoenix::dx11::texture::Cube::bind(unsigned int slot) const
 {
-    engine->get_context()->PSSetShaderResources(slot, 1, &srv);
+	reinterpret_cast<Engine*>(render_engine)->get_context()->PSSetShaderResources(slot, 1, &srv);
 }
 #endif

@@ -14,7 +14,6 @@ namespace dx11 {
     namespace texture {
         class Cube : public render::texture::Cube {
         private:
-            Engine* engine = nullptr;
             ID3D11ShaderResourceView* srv = nullptr;
 
         public:
