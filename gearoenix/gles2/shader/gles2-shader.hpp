@@ -20,8 +20,8 @@ namespace gles2 {
             void validate();
             GLuint add_shader_to_program(const std::string& shd, const GLenum& shader_type);
             GLuint get_uniform_location(const std::string& name);
-            void end_program();
-            void end_object(const GLuint& shader_object);
+            static void end_program(const GLuint shader_program);
+            static void end_object(const GLuint shader_object);
 
         public:
             Shader(core::Id my_id, Engine* eng, core::sync::EndCaller<core::sync::EndCallerIgnore> end);

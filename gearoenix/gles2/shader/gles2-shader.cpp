@@ -80,12 +80,12 @@ GLuint gearoenix::gles2::shader::Shader::get_uniform_location(const std::string&
     return result;
 }
 
-void gearoenix::gles2::shader::Shader::end_program()
+void gearoenix::gles2::shader::Shader::end_program(const GLuint shader_program)
 {
     glDeleteProgram(shader_program);
 }
 
-void gearoenix::gles2::shader::Shader::end_object(const GLuint& shader_object)
+void gearoenix::gles2::shader::Shader::end_object(const GLuint shader_object)
 {
     glDeleteShader(shader_object);
 }

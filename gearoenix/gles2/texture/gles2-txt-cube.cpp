@@ -8,7 +8,7 @@
 #define FACES_COUNT 6
 
 gearoenix::gles2::texture::Cube::Cube(core::Id my_id, system::stream::Stream* file, Engine* eng, core::sync::EndCaller<core::sync::EndCallerIgnore> end)
-    : render::texture::Cube(my_id)
+    : render::texture::Cube(my_id, eng)
 {
     std::vector<std::vector<unsigned char>> img_data(FACES_COUNT);
     unsigned int imgw, imgh;
@@ -48,8 +48,14 @@ gearoenix::gles2::texture::Cube::Cube(core::Id my_id, system::stream::Stream* fi
 
 gearoenix::gles2::texture::Cube::~Cube()
 {
-    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
-    glDeleteTextures(1, &texture_object);
+    if (texture_object == 0)
+        return;
+    const GLuint c_texture_object = texture_object;
+    render_engine->add_load_function([c_texture_object] {
+        glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+        glDeleteTextures(1, &c_texture_object);
+    });
+    texture_object = 0;
 }
 
 void gearoenix::gles2::texture::Cube::bind(GLenum texture_unit)
