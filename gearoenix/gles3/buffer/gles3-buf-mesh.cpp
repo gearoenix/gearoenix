@@ -44,17 +44,20 @@ gearoenix::gles3::buffer::Mesh::~Mesh()
 {
     if (vbo == 0)
         return;
-    engine->add_load_function([this]() -> void {
-        if (vbo == 0)
-            return;
+    const GLuint c_vbo = vbo;
+    const GLuint c_ibo = ibo;
+    const GLuint c_vao = vao;
+    engine->add_load_function([c_vbo, c_vao, c_ibo]() -> void {
         glBindVertexArray(0);
-        glDeleteVertexArrays(1, &vao);
+        glDeleteVertexArrays(1, &c_vao);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glDeleteBuffers(1, &vbo);
+        glDeleteBuffers(1, &c_vbo);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-        glDeleteBuffers(1, &ibo);
-        vbo = 0;
+        glDeleteBuffers(1, &c_ibo);
     });
+    vbo = 0;
+    ibo = 0;
+    vao = 0;
 }
 
 void gearoenix::gles3::buffer::Mesh::bind()

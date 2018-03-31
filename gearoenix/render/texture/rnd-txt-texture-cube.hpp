@@ -6,7 +6,7 @@ namespace render {
     namespace texture {
         class Cube : public Texture {
         protected:
-            Cube(core::Id my_id);
+            Cube(core::Id my_id, Engine* e);
 
         public:
             virtual ~Cube();

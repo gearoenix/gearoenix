@@ -5,8 +5,9 @@
 #include "rnd-txt-texture-2d.hpp"
 #include "rnd-txt-texture-cube.hpp"
 
-gearoenix::render::texture::Texture::Texture(core::Id my_id)
+gearoenix::render::texture::Texture::Texture(core::Id my_id, Engine* e)
     : core::asset::Asset(my_id, core::asset::Asset::AssetType::TEXTURE)
+    , render_engine(e)
 {
 }
 

@@ -23,11 +23,11 @@ namespace physics {
         std::thread thread;
         volatile bool alive = true;
         void run();
-		void update();
+        void update();
         void apply_animations();
         void apply_constraints();
-		void apply_bodies();
-		void apply_models();
+        void apply_bodies();
+        void apply_models();
 
     protected:
     public:

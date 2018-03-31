@@ -18,7 +18,7 @@ namespace gles3 {
 
         public:
             Texture2D(core::Id my_id, system::stream::Stream* file, Engine* engine, core::sync::EndCaller<core::sync::EndCallerIgnore> end);
-            Texture2D(core::Id my_id, GLuint txtobj);
+            Texture2D(core::Id my_id, GLuint txtobj, Engine* e);
             ~Texture2D();
             void bind(GLenum texture_unit);
         };

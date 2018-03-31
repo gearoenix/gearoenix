@@ -148,28 +148,33 @@ void gearoenix::render::scene::Scene::draw_sky()
 
 void gearoenix::render::scene::Scene::draw(texture::Texture2D* shadow_texture)
 {
-    if (renderable) {
-        for (std::pair<const core::Id, std::map<core::Id, std::set<core::Id>>>& pshd : opaque_models) {
-            for (std::pair<const core::Id, std::set<core::Id>>& pmdl : pshd.second) {
-                if (std::shared_ptr<model::Model> mdl = all_models[pmdl.first].lock()) {
-                    for (const core::Id mshid : pmdl.second) {
-                        mdl->draw(mshid, shadow_texture);
-                    }
+    if (!renderable)
+        return;
+    for (std::pair<const core::Id, std::map<core::Id, std::set<core::Id>>>& pshd : opaque_models) {
+        for (std::pair<const core::Id, std::set<core::Id>>& pmdl : pshd.second) {
+            if (std::shared_ptr<model::Model> mdl = all_models[pmdl.first].lock()) {
+                for (const core::Id mshid : pmdl.second) {
+                    mdl->draw(mshid, shadow_texture);
                 }
             }
         }
-        std::map<core::Real, std::map<core::Id, std::set<core::Id>>, std::greater<core::Real>> sorted_models;
-        for (std::pair<const core::Id, std::set<core::Id>>& pmdl : transparent_models) {
-            if (std::shared_ptr<model::Model> mdl = all_models[pmdl.first].lock()) {
-                sorted_models[mdl->get_distance_from_camera()][pmdl.first] = pmdl.second;
+    }
+    std::map<core::Real, std::map<core::Id, std::set<core::Id>>, std::greater<core::Real>> sorted_models;
+    for (std::pair<const core::Id, std::set<core::Id>>& pmdl : transparent_models) {
+        if (std::shared_ptr<model::Model> mdl = all_models[pmdl.first].lock()) {
+            if (mdl->get_is_in_camera()) {
+                const core::Real camdis = mdl->get_distance_from_camera();
+                if (camdis > 0.0f) {
+                    sorted_models[camdis][pmdl.first] = pmdl.second;
+                }
             }
         }
-        for (std::pair<const core::Real, std::map<core::Id, std::set<core::Id>>>& pdis : sorted_models) {
-            for (std::pair<const core::Id, std::set<core::Id>>& pmdl : pdis.second) {
-                if (std::shared_ptr<model::Model> mdl = all_models[pmdl.first].lock()) {
-                    for (const core::Id mshid : pmdl.second) {
-                        mdl->draw(mshid, shadow_texture);
-                    }
+    }
+    for (std::pair<const core::Real, std::map<core::Id, std::set<core::Id>>>& pdis : sorted_models) {
+        for (std::pair<const core::Id, std::set<core::Id>>& pmdl : pdis.second) {
+            if (std::shared_ptr<model::Model> mdl = all_models[pmdl.first].lock()) {
+                for (const core::Id mshid : pmdl.second) {
+                    mdl->draw(mshid, shadow_texture);
                 }
             }
         }
@@ -270,14 +275,10 @@ void gearoenix::render::scene::Scene::add_model(core::Id model_id, core::sync::E
 
 std::weak_ptr<gearoenix::render::model::Model> gearoenix::render::scene::Scene::get_model(core::Id model_id)
 {
-#ifdef DEBUG_MODE
     std::map<core::Id, std::weak_ptr<model::Model>>::iterator search = all_models.find(model_id);
     if (all_models.end() == search)
-        UNEXPECTED;
+        return std::shared_ptr<model::Model>(nullptr);
     return search->second;
-#else
-    return all_models[model_id];
-#endif
 }
 
 void gearoenix::render::scene::Scene::add_constraint(const std::shared_ptr<physics::constraint::Constraint>& cns)

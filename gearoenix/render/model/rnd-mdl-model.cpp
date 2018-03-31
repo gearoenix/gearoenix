@@ -95,9 +95,9 @@ void gearoenix::render::model::Model::commit(const scene::Scene* s)
 {
     //std::lock_guard<std::mutex> lg(locker);
     const std::shared_ptr<camera::Camera>& cam = s->get_current_camera();
-	const bool localized_transformed = transformed;
+    const bool localized_transformed = transformed;
     if (localized_transformed) {
-		transformed = false;
+        transformed = false;
         if (nullptr != collider) {
             collider->update(m);
         }
@@ -137,7 +137,6 @@ void gearoenix::render::model::Model::commit(const scene::Scene* s)
             }
         }
     }
-		
 }
 
 void gearoenix::render::model::Model::draw(core::Id mesh_id, texture::Texture2D* shadow_texture)
@@ -251,6 +250,11 @@ bool gearoenix::render::model::Model::hit(const math::Ray3& r, core::Real& d)
     if (nullptr == collider)
         return false;
     return collider->hit(r, d);
+}
+
+bool gearoenix::render::model::Model::get_is_in_camera() const
+{
+    return is_in_camera;
 }
 
 const gearoenix::physics::collider::Collider* gearoenix::render::model::Model::get_collider() const

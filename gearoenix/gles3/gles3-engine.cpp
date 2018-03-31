@@ -66,7 +66,7 @@ gearoenix::gles3::Engine::Engine(system::Application* sysapp)
     glBindFramebuffer(GL_FRAMEBUFFER, render_framebuffer);
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         UNEXPECTED;
-    shadow_map_texture = new texture::Texture2D(sysapp->get_asset_manager()->create_id(), shadow_map_color);
+    shadow_map_texture = new texture::Texture2D(sysapp->get_asset_manager()->create_id(), shadow_map_color, this);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
     glEnable(GL_BLEND);

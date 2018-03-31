@@ -6,7 +6,7 @@ namespace render {
     namespace texture {
         class Texture2D : public Texture {
         protected:
-            Texture2D(core::Id my_id);
+            Texture2D(core::Id my_id, Engine* e);
 
         public:
             virtual ~Texture2D();

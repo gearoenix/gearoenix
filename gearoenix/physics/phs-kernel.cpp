@@ -17,15 +17,16 @@ void gearoenix::physics::Kernel::run()
 {
     while (alive) {
         signaller->lock();
-		if (!alive) break;
-		update();
+        if (!alive)
+            break;
+        update();
         apply_animations();
-		engine->kernels_piont_animations->all_reach();
+        engine->kernels_piont_animations->all_reach();
         apply_constraints();
-		engine->kernels_piont_constraints->all_reach();
-		apply_bodies();
-		engine->kernels_piont_bodies->all_reach();
-		apply_models();
+        engine->kernels_piont_constraints->all_reach();
+        apply_bodies();
+        engine->kernels_piont_bodies->all_reach();
+        apply_models();
         engine->signaller->release();
     }
     alive = true;
@@ -33,9 +34,9 @@ void gearoenix::physics::Kernel::run()
 
 void gearoenix::physics::Kernel::update()
 {
-	now = std::chrono::system_clock::now();
-	delta_time = std::chrono::duration_cast<std::chrono::duration<core::Real>>(now - last_update).count();
-	last_update = now;
+    now = std::chrono::system_clock::now();
+    delta_time = std::chrono::duration_cast<std::chrono::duration<core::Real>>(now - last_update).count();
+    last_update = now;
 }
 
 void gearoenix::physics::Kernel::apply_animations()
@@ -72,23 +73,23 @@ void gearoenix::physics::Kernel::apply_bodies()
 
 void gearoenix::physics::Kernel::apply_models()
 {
-	const unsigned int threads_count = engine->threads_count;
-	unsigned int model_index = 0;
-	const std::map<core::Id, std::shared_ptr<render::scene::Scene>>& scenes = engine->render_engine->get_all_scenes();
-	for (const std::pair<core::Id, std::shared_ptr<render::scene::Scene>> id_scene : scenes) {
-		const std::shared_ptr<render::scene::Scene>& scene = id_scene.second;
-		const std::map<core::Id, std::weak_ptr<render::model::Model>>& models = scene->get_all_models();
-		for (const std::pair<core::Id, std::weak_ptr<render::model::Model>> id_model : models) {
-			if (((model_index++) % threads_count) != thread_index)
-				continue;
-			std::shared_ptr<render::model::Model> model;
-			if (!(model = std::get<1>(id_model).lock())) {
-				scene->all_models_needs_cleaning = true;
-				continue;
-			}
-			model->commit(scene.get());
-		}
-	}
+    const unsigned int threads_count = engine->threads_count;
+    unsigned int model_index = 0;
+    const std::map<core::Id, std::shared_ptr<render::scene::Scene>>& scenes = engine->render_engine->get_all_scenes();
+    for (const std::pair<core::Id, std::shared_ptr<render::scene::Scene>> id_scene : scenes) {
+        const std::shared_ptr<render::scene::Scene>& scene = id_scene.second;
+        const std::map<core::Id, std::weak_ptr<render::model::Model>>& models = scene->get_all_models();
+        for (const std::pair<core::Id, std::weak_ptr<render::model::Model>> id_model : models) {
+            if (((model_index++) % threads_count) != thread_index)
+                continue;
+            std::shared_ptr<render::model::Model> model;
+            if (!(model = std::get<1>(id_model).lock())) {
+                scene->all_models_needs_cleaning = true;
+                continue;
+            }
+            model->commit(scene.get());
+        }
+    }
 }
 
 gearoenix::physics::Kernel::Kernel(const unsigned int thread_index, Engine* engine)

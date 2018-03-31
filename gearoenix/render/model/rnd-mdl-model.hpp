@@ -101,6 +101,7 @@ namespace render {
             const math::Mat4x4& get_sun_mvp() const;
             const physics::collider::Collider* get_collider() const;
             bool hit(const math::Ray3& r, core::Real& distance_from_origin);
+            bool get_is_in_camera() const;
             core::Real get_distance_from_camera() const;
             // Transformable---------------------------------------------------------
             void get_location(math::Vec3& l) const;

@@ -60,11 +60,19 @@ gearoenix::gles3::shader::ShadelessCubeMatteNonreflectiveShadowlessOpaque::Shade
 
 gearoenix::gles3::shader::ShadelessCubeMatteNonreflectiveShadowlessOpaque::~ShadelessCubeMatteNonreflectiveShadowlessOpaque()
 {
-    eng->add_load_function([this] {
-        end_object(vtx_shd);
-        end_object(frg_shd);
-        end_program();
+    if (vtx_shd == 0)
+        return;
+    const GLuint c_vtx_shd = vtx_shd;
+    const GLuint c_frg_shd = frg_shd;
+    const GLuint c_shader_program = shader_program;
+    eng->add_load_function([c_vtx_shd, c_frg_shd, c_shader_program] {
+        end_object(c_vtx_shd);
+        end_object(c_frg_shd);
+        end_program(c_shader_program);
     });
+    vtx_shd = 0;
+    frg_shd = 0;
+    shader_program = 0;
 }
 
 void gearoenix::gles3::shader::ShadelessCubeMatteNonreflectiveShadowlessOpaque::use()

@@ -14,7 +14,8 @@ namespace render {
     namespace texture {
         class Texture : public core::asset::Asset {
         protected:
-            Texture(core::Id my_id);
+            Engine* const render_engine;
+            Texture(core::Id my_id, Engine* e);
 
         public:
             virtual ~Texture();

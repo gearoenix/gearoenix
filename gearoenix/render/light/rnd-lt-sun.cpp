@@ -29,11 +29,10 @@ gearoenix::render::light::Sun::Sun(core::Id my_id, system::stream::Stream* f, En
 
 gearoenix::render::light::Sun::~Sun()
 {
-	if (nullptr != cam) {
-		delete cam;
-		cam = nullptr;
-	}
-
+    if (nullptr != cam) {
+        delete cam;
+        cam = nullptr;
+    }
 }
 
 const gearoenix::math::Vec3& gearoenix::render::light::Sun::get_direction() const

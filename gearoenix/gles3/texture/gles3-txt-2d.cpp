@@ -5,7 +5,7 @@
 #include "../gles3-engine.hpp"
 
 gearoenix::gles3::texture::Texture2D::Texture2D(core::Id my_id, system::stream::Stream* file, Engine* eng, core::sync::EndCaller<core::sync::EndCallerIgnore> end)
-    : render::texture::Texture2D(my_id)
+    : render::texture::Texture2D(my_id, eng)
 {
     std::vector<unsigned char> img_data;
     unsigned int imgw, imgh;
@@ -24,16 +24,22 @@ gearoenix::gles3::texture::Texture2D::Texture2D(core::Id my_id, system::stream::
     eng->add_load_function(loadf);
 }
 
-gearoenix::gles3::texture::Texture2D::Texture2D(core::Id my_id, GLuint txtobj)
-    : render::texture::Texture2D(my_id)
+gearoenix::gles3::texture::Texture2D::Texture2D(core::Id my_id, GLuint txtobj, Engine* e)
+    : render::texture::Texture2D(my_id, e)
     , texture_object(txtobj)
 {
 }
 
 gearoenix::gles3::texture::Texture2D::~Texture2D()
 {
-    glBindTexture(GL_TEXTURE_2D, 0);
-    glDeleteTextures(1, &texture_object);
+    if (texture_object == 0)
+        return;
+    const GLuint c_texture_object = texture_object;
+    render_engine->add_load_function([c_texture_object] {
+        glBindTexture(GL_TEXTURE_2D, 0);
+        glDeleteTextures(1, &c_texture_object);
+    });
+    texture_object = 0;
 }
 
 void gearoenix::gles3::texture::Texture2D::bind(GLenum texture_unit)
