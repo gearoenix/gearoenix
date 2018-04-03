@@ -55,62 +55,41 @@ LRESULT CALLBACK gearoenix::system::Application::handler(HWND hwnd, UINT umessag
         break;
     case WM_KEYDOWN:
         switch (wparam) {
-        case VK_UP: {
-            event = new core::event::button::Keyboard(
-                core::event::button::Button::KeyType::UP,
-                core::event::button::Button::ActionType::PRESS);
-            break;
-        }
-        case 0x50: /// p
-            /// TODO pause
-            break;
+		case VK_DOWN:
+			event = new core::event::button::Keyboard(
+				core::event::button::Button::KeyType::DOWN,
+				core::event::button::Button::ActionType::PRESS);
+			break;
+		case VK_LEFT:
+			event = new core::event::button::Keyboard(
+				core::event::button::Button::KeyType::LEFT,
+				core::event::button::Button::ActionType::PRESS);
+			break;
+		case VK_RIGHT:
+			event = new core::event::button::Keyboard(
+				core::event::button::Button::KeyType::RIGHT,
+				core::event::button::Button::ActionType::PRESS);
+			break;
+		case VK_UP:
+			event = new core::event::button::Keyboard(
+				core::event::button::Button::KeyType::UP,
+				core::event::button::Button::ActionType::PRESS);
+			break;
         case VK_F1:
-            /*if (enableTextOverlay) {
-			textOverlay->visible = !textOverlay->visible;
-			}*/
+			//event = new core::event::button::Keyboard(
+			//	core::event::button::Button::KeyType::F1,
+			//	core::event::button::Button::ActionType::PRESS);
             break;
         case VK_ESCAPE:
             running = false;
             DestroyWindow(hwnd);
             PostQuitMessage(0);
             break;
+		default:
+			break;
         }
-        /*if (camera.firstperson) {
-		switch (wParam)
-		{
-		case KEY_W:
-		camera.keys.up = true;
-		break;
-		case KEY_S:
-		camera.keys.down = true;
-		break;
-		case KEY_A:
-		camera.keys.left = true;
-		break;
-		case KEY_D:
-		camera.keys.right = true;
-		break;
-		}
-		}*/
         break;
     case WM_KEYUP:
-        // if (camera.firstperson) {
-        //	switch (wParam)
-        //	{
-        //	case 0x57: // W
-        //		camera.keys.up = false;
-        //		break;
-        //	case 0x53: // S
-        //		camera.keys.down = false;
-        //		break;
-        //	case 0x41: // A
-        //		camera.keys.left = false;
-        //		break;
-        //	case 0x44: // D
-        //		camera.keys.right = false;
-        //		break;
-        //	}
-        //}
         break;
     case WM_LBUTTONDBLCLK:
     case WM_MBUTTONDBLCLK:

@@ -4,7 +4,7 @@
 #define countof(x) (sizeof(x) / sizeof(x[0]))
 #endif
 #include "cr-types.hpp"
-#define GXISZERO(x) (((x) < (GXPOSEPSILON)) && ((x) > (GX_NEG_EPSILON)))
+#define GXISZERO(x) (((x) < (GXPOSEPSILON)) && ((x) > (GXNEGEPSILON)))
 #ifndef GXMAX
 #define GXMAX(x, y) (((x) > (y)) ? (x) : (y))
 #endif

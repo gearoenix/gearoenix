@@ -25,7 +25,7 @@ namespace physics {
 
         public:
             virtual ~Body();
-            Behaviour::Type get_type() const;
+            Behaviour::Type get_body_type() const;
             const std::shared_ptr<Transferable>& get_body_obj() const;
         };
     }

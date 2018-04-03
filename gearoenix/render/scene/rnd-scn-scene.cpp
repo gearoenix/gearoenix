@@ -118,6 +118,11 @@ const std::map<gearoenix::core::Id, std::weak_ptr<gearoenix::render::model::Mode
     return all_models;
 }
 
+const std::map<gearoenix::core::Id, std::weak_ptr<gearoenix::physics::body::Body>>& gearoenix::render::scene::Scene::get_all_bodies() const
+{
+	return all_bodies;
+}
+
 const std::map<gearoenix::core::Id, std::shared_ptr<gearoenix::physics::constraint::Constraint>>& gearoenix::render::scene::Scene::get_all_root_constraints() const
 {
     return root_constraints;
