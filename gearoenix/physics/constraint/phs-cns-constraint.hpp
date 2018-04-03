@@ -14,7 +14,7 @@ namespace core {
 namespace render {
     class Engine;
     namespace model {
-        class Model;
+        class Dynamic;
     }
 }
 namespace system {
@@ -45,7 +45,7 @@ namespace physics {
         public:
             virtual ~Constraint();
             virtual void on_event(const core::event::Event& e) = 0;
-            virtual const std::vector<std::pair<core::Id, std::shared_ptr<render::model::Model>>> get_all_models() const = 0;
+            virtual const std::vector<std::pair<core::Id, std::shared_ptr<render::model::Dynamic>>> get_all_models() const = 0;
             virtual const std::vector<std::shared_ptr<body::Body>> get_all_bodies() const;
             virtual void apply(core::Real delta_time);
             static Constraint* read(core::Id my_id, system::stream::Stream* f, render::Engine* render_engine, core::sync::EndCaller<core::sync::EndCallerIgnore> c);

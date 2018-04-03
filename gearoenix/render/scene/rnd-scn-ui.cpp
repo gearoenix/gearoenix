@@ -110,7 +110,7 @@ gearoenix::core::Id gearoenix::render::scene::Ui::find_widget_under_cursor(core:
     core::Id hitmptr = (core::Id)-1;
     for (std::map<core::Id, std::weak_ptr<model::Model>>::iterator pidm = all_models.begin(); pidm != all_models.end();) {
         if (const std::shared_ptr<model::Model> m = pidm->second.lock()) {
-            if (m->get_type() != model::Model::ModelType::WIDGET) {
+            if (m->get_render_model_type() != model::Model::RenderModel::WIDGET) {
                 ++pidm;
                 continue;
             }

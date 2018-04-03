@@ -14,28 +14,24 @@
 #include "../rnd-engine.hpp"
 #include "../scene/rnd-scn-scene.hpp"
 #include "../widget/rnd-wdg-widget.hpp"
+#include "rnd-mdl-dynamic.hpp"
+#include "rnd-mdl-static.hpp"
 #include <iostream>
 
-gearoenix::render::model::Model::Model(core::Id my_id, ModelType t, system::stream::Stream* f, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> c)
+gearoenix::render::model::Model::Model(core::Id my_id, RenderModel::Type t, system::stream::Stream* f, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> c)
     : core::asset::Asset(my_id, core::asset::Asset::AssetType::MODEL)
-    , model_type(t)
+    , render_model_type(t)
     , render_engine(e)
 {
     //std::lock_guard<std::mutex> lg(locker);
     m.read(f);
-    initialize_axis(m);
     occrdss.read(f);
     occloc.read(f);
-    collider = physics::collider::Collider::read(f);
+    collider = std::shared_ptr<physics::collider::Collider>(physics::collider::Collider::read(f));
     std::vector<core::Id> model_children;
     f->read(model_children);
     std::vector<core::Id> mesh_ids;
     f->read(mesh_ids);
-    is_rigid_body = f->read_bool();
-    if (is_rigid_body)
-        is_dynamic_rigid_body = f->read_bool();
-    else
-        is_dynamic_rigid_body = false;
     occrds = GXMAX(occrdss[0], occrdss[1]);
     occrds = GXMAX(occrds, occrdss[2]);
     core::Count mesh_count = mesh_ids.size();
@@ -73,10 +69,12 @@ gearoenix::render::model::Model* gearoenix::render::model::Model::read(core::Id 
     core::Id t;
     f->read(t);
     switch (t) {
-    case WIDGET:
+    case RenderModel::WIDGET:
         return widget::Widget::read(my_id, f, e, c);
-    case BASIC:
-        return new Model(my_id, ModelType::BASIC, f, e, c);
+    case RenderModel::DYNAMIC:
+        return new Dynamic(my_id, f, e, c);
+    case RenderModel::STATIC:
+        return new Static(my_id, f, e, c);
     default:
         UNEXPECTED;
     }
@@ -86,9 +84,6 @@ gearoenix::render::model::Model* gearoenix::render::model::Model::read(core::Id 
 gearoenix::render::model::Model::~Model()
 {
     //std::lock_guard<std::mutex> lg(locker);
-    if (collider != nullptr)
-        delete collider;
-    collider = nullptr;
 }
 
 void gearoenix::render::model::Model::commit(const scene::Scene* s)
@@ -190,58 +185,9 @@ const gearoenix::math::Mat4x4& gearoenix::render::model::Model::get_sun_mvp() co
     return sunmvp;
 }
 
-void gearoenix::render::model::Model::get_location(math::Vec3& v) const
+gearoenix::render::model::Model::RenderModel::Type gearoenix::render::model::Model::get_type() const
 {
-    m.get_location(v);
-}
-
-void gearoenix::render::model::Model::set_location(const math::Vec3& l)
-{
-    m.set_location(l);
-    transformed = true;
-}
-
-void gearoenix::render::model::Model::translate(const math::Vec3& t)
-{
-    //std::lock_guard<std::mutex> lg(locker);
-    m.translate(t);
-    for (std::pair<const core::Id, std::shared_ptr<Model>>& pmdl : children)
-        pmdl.second->translate(t);
-    transformed = true;
-}
-
-void gearoenix::render::model::Model::global_scale(const core::Real s)
-{
-    //std::lock_guard<std::mutex> lg(locker);
-    occrds *= s;
-    occrdss *= s;
-    m.scale4x3(s);
-    for (std::pair<const core::Id, std::shared_ptr<Model>>& pmdl : children)
-        pmdl.second->global_scale(s);
-    transformed = true;
-}
-
-void gearoenix::render::model::Model::local_scale(const core::Real s)
-{
-    //std::lock_guard<std::mutex> lg(locker);
-    m.scale3x3(s);
-    occrds *= s;
-    occrdss *= s;
-    math::Vec3 fetched;
-    m.get_location(fetched);
-    const math::Vec3 o = fetched;
-    for (std::pair<const core::Id, std::shared_ptr<Model>>& pmdl : children) {
-        const std::shared_ptr<Model>& child = pmdl.second;
-        child->get_location(fetched);
-        child->set_location((fetched - o) * s + o);
-        child->local_scale(s);
-    }
-    transformed = true;
-}
-
-gearoenix::render::model::Model::ModelType gearoenix::render::model::Model::get_type() const
-{
-    return model_type;
+    return render_model_type;
 }
 
 bool gearoenix::render::model::Model::hit(const math::Ray3& r, core::Real& d)
@@ -257,81 +203,12 @@ bool gearoenix::render::model::Model::get_is_in_camera() const
     return is_in_camera;
 }
 
-const gearoenix::physics::collider::Collider* gearoenix::render::model::Model::get_collider() const
+const std::shared_ptr<gearoenix::physics::collider::Collider>& gearoenix::render::model::Model::get_collider() const
 {
     return collider;
-}
-
-void gearoenix::render::model::Model::push_state()
-{
-    //std::lock_guard<std::mutex> lg(locker);
-    state.push_back(m);
-    UNIMPLEMENTED; // other things are in the state of a model it must decide later
-}
-
-void gearoenix::render::model::Model::pop_state()
-{
-    //std::lock_guard<std::mutex> lg(locker);
-    const size_t len = state.size();
-    if (0 == len)
-        return;
-    m = state[len - 1];
-    state.pop_back();
-    transformed = true;
-    UNIMPLEMENTED; // other things are in the state of a model it must decide later
 }
 
 gearoenix::core::Real gearoenix::render::model::Model::get_distance_from_camera() const
 {
     return distcam;
-}
-
-void gearoenix::render::model::Model::global_rotate(const core::Real d, const math::Vec3& axis)
-{
-    math::Mat4x4 r;
-    Transferable::local_rotate(d, axis, r);
-    m = r * m;
-    for (std::pair<const core::Id, std::shared_ptr<Model>>& pmdl : children) {
-        pmdl.second->global_rotate(r);
-    }
-    transformed = true;
-}
-
-void gearoenix::render::model::Model::global_rotate(const math::Mat4x4& rm)
-{
-    Transferable::global_rotate(rm);
-    m = rm * m;
-    for (std::pair<const core::Id, std::shared_ptr<Model>>& pmdl : children) {
-        pmdl.second->global_rotate(rm);
-    }
-    transformed = true;
-}
-
-void gearoenix::render::model::Model::local_rotate(const core::Real, const math::Vec3&)
-{
-    UNIMPLEMENTED;
-}
-
-void gearoenix::render::model::Model::local_x_rotate(const core::Real)
-{
-    UNIMPLEMENTED;
-}
-
-void gearoenix::render::model::Model::local_y_rotate(const core::Real)
-{
-    UNIMPLEMENTED;
-}
-
-void gearoenix::render::model::Model::local_z_rotate(const core::Real d)
-{
-    math::Mat4x4 r;
-    Transferable::local_z_rotate(d, r);
-    m = m * r;
-    math::Vec3 l;
-    m.get_location(l);
-    for (std::pair<const core::Id, std::shared_ptr<Model>>& pmdl : children) {
-        physics::Transferable* cmdl = pmdl.second.get();
-        cmdl->global_rotate(d, z_axis, l);
-    }
-    transformed = true;
 }

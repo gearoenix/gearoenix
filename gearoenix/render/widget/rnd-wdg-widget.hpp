@@ -1,10 +1,10 @@
 #ifndef GEAROEMIX_RENDER_WIDGET_WIDGET_HPP
 #define GEAROEMIX_RENDER_WIDGET_WIDGET_HPP
-#include "../model/rnd-mdl-model.hpp"
+#include "../model/rnd-mdl-dynamic.hpp"
 namespace gearoenix {
 namespace render {
     namespace widget {
-        class Widget : public model::Model {
+        class Widget : public model::Dynamic {
             friend class physics::Kernel;
 
         public:
