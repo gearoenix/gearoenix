@@ -31,9 +31,9 @@ gearoenix::dx11::texture::Texture2D::Texture2D(core::Id my_id, system::stream::S
         ID3D11Device* dev = static_cast<Engine*>(render_engine)->get_device();
         ID3D11Texture2D* txt = nullptr;
         GXHRCHK(dev->CreateTexture2D(&desc, nullptr, &txt));
-		static_cast<Engine*>(render_engine)->get_context()->UpdateSubresource(txt, 0, nullptr, img_data.data(), desc.Width * 4, 0);
+        static_cast<Engine*>(render_engine)->get_context()->UpdateSubresource(txt, 0, nullptr, img_data.data(), desc.Width * 4, 0);
         GXHRCHK(dev->CreateShaderResourceView(txt, &sdesc, &srv));
-		static_cast<Engine*>(render_engine)->get_context()->GenerateMips(srv);
+        static_cast<Engine*>(render_engine)->get_context()->GenerateMips(srv);
         txt->Release();
         (void)end;
     });
@@ -58,6 +58,6 @@ const ID3D11ShaderResourceView* gearoenix::dx11::texture::Texture2D::get_shader_
 
 void gearoenix::dx11::texture::Texture2D::bind(unsigned int slot) const
 {
-	static_cast<Engine*>(render_engine)->get_context()->PSSetShaderResources(slot, 1, &srv);
+    static_cast<Engine*>(render_engine)->get_context()->PSSetShaderResources(slot, 1, &srv);
 }
 #endif

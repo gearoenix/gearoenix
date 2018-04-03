@@ -75,6 +75,6 @@ const ID3D11ShaderResourceView* gearoenix::dx11::texture::Cube::get_shader_resou
 
 void gearoenix::dx11::texture::Cube::bind(unsigned int slot) const
 {
-	reinterpret_cast<Engine*>(render_engine)->get_context()->PSSetShaderResources(slot, 1, &srv);
+    reinterpret_cast<Engine*>(render_engine)->get_context()->PSSetShaderResources(slot, 1, &srv);
 }
 #endif

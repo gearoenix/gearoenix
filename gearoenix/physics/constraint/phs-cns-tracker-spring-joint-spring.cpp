@@ -3,7 +3,7 @@
 #include "../../core/cr-static.hpp"
 #include "../../core/event/cr-ev-event.hpp"
 #include "../../core/event/cr-ev-window-resize.hpp"
-#include "../../render/model/rnd-mdl-model.hpp"
+#include "../../render/model/rnd-mdl-dynamic.hpp"
 #include "../../render/rnd-engine.hpp"
 #include "../../system/stream/sys-stm-stream.hpp"
 #include "../../system/sys-app.hpp"
@@ -35,10 +35,10 @@ void gearoenix::physics::constraint::TrackerSpringJointSpring::on_event(const co
 {
 }
 
-const std::vector<std::pair<gearoenix::core::Id, std::shared_ptr<gearoenix::render::model::Model>>> gearoenix::physics::constraint::TrackerSpringJointSpring::get_all_models() const
+const std::vector<std::pair<gearoenix::core::Id, std::shared_ptr<gearoenix::render::model::Dynamic>>> gearoenix::physics::constraint::TrackerSpringJointSpring::get_all_models() const
 {
     // maybe in future its need a change
-    return std::vector<std::pair<gearoenix::core::Id, std::shared_ptr<gearoenix::render::model::Model>>>();
+    return std::vector<std::pair<gearoenix::core::Id, std::shared_ptr<gearoenix::render::model::Dynamic>>>();
 }
 
 const std::vector<std::shared_ptr<gearoenix::physics::body::Body>> gearoenix::physics::constraint::TrackerSpringJointSpring::get_all_bodies() const

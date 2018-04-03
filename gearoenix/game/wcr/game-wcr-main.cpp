@@ -8,7 +8,7 @@
 #include "../../physics/body/phs-bd-rigid.hpp"
 #include "../../physics/constraint/phs-cns-tracker-spring-joint-spring.hpp"
 #include "../../render/camera/rnd-cmr-camera.hpp"
-#include "../../render/model/rnd-mdl-model.hpp"
+#include "../../render/model/rnd-mdl-dynamic.hpp"
 #include "../../render/rnd-engine.hpp"
 #include "../../render/scene/rnd-scn-scene.hpp"
 #include "../../system/sys-app.hpp"
@@ -21,7 +21,7 @@ GameApp::GameApp(gearoenix::system::Application* sys_app)
     rndeng->load_scene(1, [this]() -> void {
         const auto& scene = rndeng->get_scene(1);
         cam = scene->get_current_camera();
-        mdl = scene->get_model(1).lock();
+        mdl = std::static_pointer_cast<gearoenix::render::model::Dynamic>(scene->get_model(1).lock());
     });
     rndeng->load_scene(2, [this]() -> void {});
 }

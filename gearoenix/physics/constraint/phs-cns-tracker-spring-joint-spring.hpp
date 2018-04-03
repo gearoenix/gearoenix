@@ -34,7 +34,7 @@ namespace physics {
                 const core::Real length);
             ~TrackerSpringJointSpring();
             void on_event(const core::event::Event& e);
-            const std::vector<std::pair<core::Id, std::shared_ptr<render::model::Model>>> get_all_models() const;
+            const std::vector<std::pair<core::Id, std::shared_ptr<render::model::Dynamic>>> get_all_models() const;
             const std::vector<std::shared_ptr<body::Body>> get_all_bodies() const;
             void apply(core::Real delta_time);
         };

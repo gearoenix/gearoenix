@@ -8,7 +8,7 @@
 #include "rnd-wdg-text.hpp"
 
 gearoenix::render::widget::Widget::Widget(core::Id my_id, system::stream::Stream* f, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> c)
-    : model::Model(my_id, ModelType::WIDGET, f, e, c)
+    : model::Dynamic(my_id, f, e, c, RenderModel::WIDGET)
 {
 }
 
