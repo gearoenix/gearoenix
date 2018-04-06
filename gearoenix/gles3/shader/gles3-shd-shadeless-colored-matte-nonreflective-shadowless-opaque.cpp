@@ -13,8 +13,8 @@ gearoenix::gles3::shader::ShadelessColoredMatteNonreflectiveShadowlessOpaque::Re
 
 void gearoenix::gles3::shader::ShadelessColoredMatteNonreflectiveShadowlessOpaque::Resources::bind()
 {
-    render::material::ShadelessColoredMatteNonreflectiveShadowlessOpaque::Uniform* data = reinterpret_cast<render::material::ShadelessColoredMatteNonreflectiveShadowlessOpaque::Uniform*>(u->get_data());
-    ShadelessColoredMatteNonreflectiveShadowlessOpaque* shd = reinterpret_cast<ShadelessColoredMatteNonreflectiveShadowlessOpaque*>(pip->get_shader());
+    render::material::ShadelessColoredMatteNonreflectiveShadowlessOpaque::Uniform* data = static_cast<render::material::ShadelessColoredMatteNonreflectiveShadowlessOpaque::Uniform*>(u->get_data());
+    ShadelessColoredMatteNonreflectiveShadowlessOpaque* shd = static_cast<ShadelessColoredMatteNonreflectiveShadowlessOpaque*>(pip->get_shader());
     shd->use();
     shd->set_mvp(data->mvp.data());
     shd->set_color(data->color.data());

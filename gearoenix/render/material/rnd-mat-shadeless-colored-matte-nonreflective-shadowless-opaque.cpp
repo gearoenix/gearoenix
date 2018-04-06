@@ -23,7 +23,7 @@ gearoenix::render::material::ShadelessColoredMatteNonreflectiveShadowlessOpaque:
 {
     u.color.read(f);
     e->add_load_function([this, e, end]() -> void {
-        shdrsc = reinterpret_cast<Resources*>(e->create_shader_resources(SHADER_ID, pl.get(), ub, end));
+        shdrsc = static_cast<Resources*>(e->create_shader_resources(SHADER_ID, pl.get(), ub, end));
     });
 }
 

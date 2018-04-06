@@ -13,12 +13,12 @@ gearoenix::gles2::shader::FontColored::Resources::Resources(Engine* e, pipeline:
 
 void gearoenix::gles2::shader::FontColored::Resources::bind()
 {
-    render::material::FontColored::Uniform* data = reinterpret_cast<render::material::FontColored::Uniform*>(u->get_data());
-    FontColored* shd = reinterpret_cast<FontColored*>(pip->get_shader());
+    render::material::FontColored::Uniform* data = static_cast<render::material::FontColored::Uniform*>(u->get_data());
+    FontColored* shd = static_cast<FontColored*>(pip->get_shader());
     shd->use();
     shd->set_mvp(data->mvp.data());
     shd->set_color(data->color.data());
-    reinterpret_cast<texture::Texture2D*>(txt2d)->bind(GL_TEXTURE0);
+    static_cast<texture::Texture2D*>(txt2d)->bind(GL_TEXTURE0);
 }
 
 gearoenix::gles2::shader::FontColored::FontColored(core::Id my_id, Engine* eng, core::sync::EndCaller<core::sync::EndCallerIgnore> end)

@@ -31,8 +31,8 @@ gearoenix::render::material::ShadelessD2MatteNonreflectiveShadowlessOpaque::Shad
     core::asset::Manager* astmgr = e->get_system_application()->get_asset_manager();
     core::Count curloc = f->tell();
     txt2d = std::static_pointer_cast<texture::Texture2D>(astmgr->get_texture(texid, core::sync::EndCaller<texture::Texture>([this, end, e](std::shared_ptr<texture::Texture> asset) -> void {
-        shdrsc = reinterpret_cast<Resources*>(e->create_shader_resources(SHADER_ID, pl.get(), ub, end));
-        shdrsc->set_texture_2d(reinterpret_cast<texture::Texture2D*>(asset.get()));
+        shdrsc = static_cast<Resources*>(e->create_shader_resources(SHADER_ID, pl.get(), ub, end));
+        shdrsc->set_texture_2d(static_cast<texture::Texture2D*>(asset.get()));
     })));
     f->seek(curloc);
 }
@@ -42,8 +42,8 @@ gearoenix::render::material::ShadelessD2MatteNonreflectiveShadowlessOpaque::Shad
     , SHADER_ID(sid)
     , txt2d(txt2d)
 {
-    shdrsc = reinterpret_cast<Resources*>(e->create_shader_resources(SHADER_ID, pl.get(), ub, end));
-    shdrsc->set_texture_2d(reinterpret_cast<texture::Texture2D*>(txt2d.get()));
+    shdrsc = static_cast<Resources*>(e->create_shader_resources(SHADER_ID, pl.get(), ub, end));
+    shdrsc->set_texture_2d(static_cast<texture::Texture2D*>(txt2d.get()));
 }
 
 gearoenix::render::material::ShadelessD2MatteNonreflectiveShadowlessOpaque::~ShadelessD2MatteNonreflectiveShadowlessOpaque()

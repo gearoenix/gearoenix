@@ -13,11 +13,11 @@ gearoenix::gles3::shader::ShadelessD2MatteNonreflectiveShadowlessOpaque::Resourc
 
 void gearoenix::gles3::shader::ShadelessD2MatteNonreflectiveShadowlessOpaque::Resources::bind()
 {
-    render::material::ShadelessD2MatteNonreflectiveShadowlessOpaque::Uniform* data = reinterpret_cast<render::material::ShadelessD2MatteNonreflectiveShadowlessOpaque::Uniform*>(u->get_data());
-    ShadelessD2MatteNonreflectiveShadowlessOpaque* shd = reinterpret_cast<ShadelessD2MatteNonreflectiveShadowlessOpaque*>(pip->get_shader());
+    render::material::ShadelessD2MatteNonreflectiveShadowlessOpaque::Uniform* data = static_cast<render::material::ShadelessD2MatteNonreflectiveShadowlessOpaque::Uniform*>(u->get_data());
+    ShadelessD2MatteNonreflectiveShadowlessOpaque* shd = static_cast<ShadelessD2MatteNonreflectiveShadowlessOpaque*>(pip->get_shader());
     shd->use();
     shd->set_mvp(data->mvp.data());
-    reinterpret_cast<texture::Texture2D*>(txt2d)->bind(GL_TEXTURE0);
+    static_cast<texture::Texture2D*>(txt2d)->bind(GL_TEXTURE0);
 }
 
 gearoenix::gles3::shader::ShadelessD2MatteNonreflectiveShadowlessOpaque::ShadelessD2MatteNonreflectiveShadowlessOpaque(core::Id my_id, Engine* eng, core::sync::EndCaller<core::sync::EndCallerIgnore> end)

@@ -52,7 +52,7 @@ gearoenix::dx11::buffer::Mesh::~Mesh()
 void gearoenix::dx11::buffer::Mesh::bind()
 {
     const unsigned int offset = 0;
-    ID3D11DeviceContext* ctx = reinterpret_cast<Engine*>(engine)->get_context();
+    ID3D11DeviceContext* ctx = static_cast<Engine*>(engine)->get_context();
     ctx->IASetVertexBuffers(0, 1, &vb, &stride, &offset);
     ctx->IASetIndexBuffer(ib, DXGI_FORMAT_R32_UINT, 0);
     ctx->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -60,7 +60,7 @@ void gearoenix::dx11::buffer::Mesh::bind()
 
 void gearoenix::dx11::buffer::Mesh::draw()
 {
-    reinterpret_cast<Engine*>(engine)->get_context()->DrawIndexed(ic, 0, 0);
+    static_cast<Engine*>(engine)->get_context()->DrawIndexed(ic, 0, 0);
 }
 
 #endif

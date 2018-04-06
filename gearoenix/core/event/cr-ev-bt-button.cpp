@@ -33,5 +33,5 @@ const gearoenix::core::event::button::Mouse& gearoenix::core::event::button::But
     if (MOUSE != button_type)
         UNEXPECTED;
 #endif
-    return *reinterpret_cast<const Mouse*>(this);
+    return *static_cast<const Mouse*>(this);
 }

@@ -453,8 +453,8 @@ gearoenix::render::shader::Shader* gearoenix::dx11::Engine::create_shader(core::
 
 gearoenix::render::shader::Resources* gearoenix::dx11::Engine::create_shader_resources(core::Id sid, render::pipeline::Pipeline* p, render::buffer::Uniform* ub, core::sync::EndCaller<core::sync::EndCallerIgnore> c)
 {
-    pipeline::Pipeline* pip = reinterpret_cast<pipeline::Pipeline*>(p);
-    buffer::Uniform* u = reinterpret_cast<buffer::Uniform*>(ub);
+    pipeline::Pipeline* pip = static_cast<pipeline::Pipeline*>(p);
+    buffer::Uniform* u = static_cast<buffer::Uniform*>(ub);
     render::shader::Id shader_id = (render::shader::Id)sid;
     switch (shader_id) {
     case render::shader::DEPTH_POS:

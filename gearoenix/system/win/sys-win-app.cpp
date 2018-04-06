@@ -27,11 +27,11 @@
 #endif
 LRESULT CALLBACK gearoenix::system::Application::wnd_proc(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam)
 {
-    auto sys_app = reinterpret_cast<Application*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
+    auto sys_app = static_cast<Application*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
     if (WM_CREATE == umessage) {
-        CREATESTRUCT* create_structure = reinterpret_cast<CREATESTRUCT*>(lparam);
-        sys_app = reinterpret_cast<Application*>(create_structure->lpCreateParams);
-        SetWindowLongPtr(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(sys_app));
+        CREATESTRUCT* create_structure = static_cast<CREATESTRUCT*>(lparam);
+        sys_app = static_cast<Application*>(create_structure->lpCreateParams);
+        SetWindowLongPtr(hwnd, GWLP_USERDATA, static_cast<LONG_PTR>(sys_app));
     }
     if (nullptr == sys_app) {
         GXLOGE("Unexpected message for nullptr sys app uMsg is: " << umessage);
@@ -55,38 +55,38 @@ LRESULT CALLBACK gearoenix::system::Application::handler(HWND hwnd, UINT umessag
         break;
     case WM_KEYDOWN:
         switch (wparam) {
-		case VK_DOWN:
-			event = new core::event::button::Keyboard(
-				core::event::button::Button::KeyType::DOWN,
-				core::event::button::Button::ActionType::PRESS);
-			break;
-		case VK_LEFT:
-			event = new core::event::button::Keyboard(
-				core::event::button::Button::KeyType::LEFT,
-				core::event::button::Button::ActionType::PRESS);
-			break;
-		case VK_RIGHT:
-			event = new core::event::button::Keyboard(
-				core::event::button::Button::KeyType::RIGHT,
-				core::event::button::Button::ActionType::PRESS);
-			break;
-		case VK_UP:
-			event = new core::event::button::Keyboard(
-				core::event::button::Button::KeyType::UP,
-				core::event::button::Button::ActionType::PRESS);
-			break;
+        case VK_DOWN:
+            event = new core::event::button::Keyboard(
+                core::event::button::Button::KeyType::DOWN,
+                core::event::button::Button::ActionType::PRESS);
+            break;
+        case VK_LEFT:
+            event = new core::event::button::Keyboard(
+                core::event::button::Button::KeyType::LEFT,
+                core::event::button::Button::ActionType::PRESS);
+            break;
+        case VK_RIGHT:
+            event = new core::event::button::Keyboard(
+                core::event::button::Button::KeyType::RIGHT,
+                core::event::button::Button::ActionType::PRESS);
+            break;
+        case VK_UP:
+            event = new core::event::button::Keyboard(
+                core::event::button::Button::KeyType::UP,
+                core::event::button::Button::ActionType::PRESS);
+            break;
         case VK_F1:
-			//event = new core::event::button::Keyboard(
-			//	core::event::button::Button::KeyType::F1,
-			//	core::event::button::Button::ActionType::PRESS);
+            //event = new core::event::button::Keyboard(
+            //	core::event::button::Button::KeyType::F1,
+            //	core::event::button::Button::ActionType::PRESS);
             break;
         case VK_ESCAPE:
             running = false;
             DestroyWindow(hwnd);
             PostQuitMessage(0);
             break;
-		default:
-			break;
+        default:
+            break;
         }
         break;
     case WM_KEYUP:

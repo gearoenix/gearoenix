@@ -30,7 +30,7 @@ gearoenix::dx11::buffer::Uniform::~Uniform()
 
 void gearoenix::dx11::buffer::Uniform::update(const void* src, unsigned int size)
 {
-    ID3D11DeviceContext* ctx = reinterpret_cast<Engine*>(engine)->get_context();
+    ID3D11DeviceContext* ctx = static_cast<Engine*>(engine)->get_context();
     D3D11_MAPPED_SUBRESOURCE mapped_resource;
     GXHRCHK(ctx->Map(ub, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped_resource));
     std::memcpy(mapped_resource.pData, src, size);
@@ -48,13 +48,13 @@ void* gearoenix::dx11::buffer::Uniform::get_data()
 
 void gearoenix::dx11::buffer::Uniform::set_for_vertex_shader()
 {
-    ID3D11DeviceContext* ctx = reinterpret_cast<Engine*>(engine)->get_context();
+    ID3D11DeviceContext* ctx = static_cast<Engine*>(engine)->get_context();
     ctx->VSSetConstantBuffers(0, 1, &ub);
 }
 
 void gearoenix::dx11::buffer::Uniform::set_for_fragment_shader()
 {
-    ID3D11DeviceContext* ctx = reinterpret_cast<Engine*>(engine)->get_context();
+    ID3D11DeviceContext* ctx = static_cast<Engine*>(engine)->get_context();
     ctx->PSSetConstantBuffers(0, 1, &ub);
 }
 

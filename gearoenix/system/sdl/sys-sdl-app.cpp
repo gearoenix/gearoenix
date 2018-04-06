@@ -128,7 +128,7 @@ void gearoenix::system::Application::create_context()
 int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_Event* e)
 {
     // It's gonna implement whenever needed and as much as needed.
-    Application* o = reinterpret_cast<Application*>(user_data);
+    Application* o = static_cast<Application*>(user_data);
     core::event::Event* event = nullptr;
     switch (e->type) {
     case SDL_APP_WILLENTERBACKGROUND:

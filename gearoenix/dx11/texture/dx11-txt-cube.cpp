@@ -40,7 +40,7 @@ gearoenix::dx11::texture::Cube::Cube(core::Id my_id, system::stream::Stream* fil
     sdesc.TextureCube.MipLevels = 1;
     eng->add_load_function([this, desc, sdesc, img_data, end]() -> void {
         ID3D11Device* dev = static_cast<Engine*>(render_engine)->get_device();
-        ID3D11DeviceContext* ctx = reinterpret_cast<Engine*>(render_engine)->get_context();
+        ID3D11DeviceContext* ctx = static_cast<Engine*>(render_engine)->get_context();
         ID3D11Texture2D* txt = nullptr;
         D3D11_SUBRESOURCE_DATA facesdata[FACES_COUNT];
         GXSETARRZ(facesdata);
@@ -75,6 +75,6 @@ const ID3D11ShaderResourceView* gearoenix::dx11::texture::Cube::get_shader_resou
 
 void gearoenix::dx11::texture::Cube::bind(unsigned int slot) const
 {
-    reinterpret_cast<Engine*>(render_engine)->get_context()->PSSetShaderResources(slot, 1, &srv);
+    static_cast<Engine*>(render_engine)->get_context()->PSSetShaderResources(slot, 1, &srv);
 }
 #endif

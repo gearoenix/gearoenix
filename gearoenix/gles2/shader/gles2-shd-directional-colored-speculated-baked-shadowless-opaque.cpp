@@ -13,8 +13,8 @@ gearoenix::gles2::shader::DirectionalColoredSpeculatedBakedShadowlessOpaque::Res
 
 void gearoenix::gles2::shader::DirectionalColoredSpeculatedBakedShadowlessOpaque::Resources::bind()
 {
-    render::material::DirectionalColoredSpeculatedBakedShadowlessOpaque::Uniform* data = reinterpret_cast<render::material::DirectionalColoredSpeculatedBakedShadowlessOpaque::Uniform*>(u->get_data());
-    DirectionalColoredSpeculatedBakedShadowlessOpaque* shd = reinterpret_cast<DirectionalColoredSpeculatedBakedShadowlessOpaque*>(pip->get_shader());
+    render::material::DirectionalColoredSpeculatedBakedShadowlessOpaque::Uniform* data = static_cast<render::material::DirectionalColoredSpeculatedBakedShadowlessOpaque::Uniform*>(u->get_data());
+    DirectionalColoredSpeculatedBakedShadowlessOpaque* shd = static_cast<DirectionalColoredSpeculatedBakedShadowlessOpaque*>(pip->get_shader());
     shd->use();
 
     shd->set_ambl_color(data->ambl_color.data());
@@ -27,7 +27,7 @@ void gearoenix::gles2::shader::DirectionalColoredSpeculatedBakedShadowlessOpaque
     shd->set_sun_color(data->sun_color.data());
     shd->set_vp(data->vp.data());
 
-    reinterpret_cast<texture::Cube*>(env)->bind(GL_TEXTURE0);
+    static_cast<texture::Cube*>(env)->bind(GL_TEXTURE0);
 }
 
 gearoenix::gles2::shader::DirectionalColoredSpeculatedBakedShadowlessOpaque::DirectionalColoredSpeculatedBakedShadowlessOpaque(core::Id my_id, Engine* eng, core::sync::EndCaller<core::sync::EndCallerIgnore> end)

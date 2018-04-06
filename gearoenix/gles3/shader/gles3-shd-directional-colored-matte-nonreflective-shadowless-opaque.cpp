@@ -12,8 +12,8 @@ gearoenix::gles3::shader::DirectionalColoredMatteNonreflectiveShadowlessOpaque::
 
 void gearoenix::gles3::shader::DirectionalColoredMatteNonreflectiveShadowlessOpaque::Resources::bind()
 {
-    render::material::DirectionalColoredMatteNonreflectiveShadowlessOpaque::Uniform* data = reinterpret_cast<render::material::DirectionalColoredMatteNonreflectiveShadowlessOpaque::Uniform*>(u->get_data());
-    DirectionalColoredMatteNonreflectiveShadowlessOpaque* shd = reinterpret_cast<DirectionalColoredMatteNonreflectiveShadowlessOpaque*>(pip->get_shader());
+    render::material::DirectionalColoredMatteNonreflectiveShadowlessOpaque::Uniform* data = static_cast<render::material::DirectionalColoredMatteNonreflectiveShadowlessOpaque::Uniform*>(u->get_data());
+    DirectionalColoredMatteNonreflectiveShadowlessOpaque* shd = static_cast<DirectionalColoredMatteNonreflectiveShadowlessOpaque*>(pip->get_shader());
     shd->use();
     shd->set_ambl_color(data->ambl_color.data());
     shd->set_m(data->m.data());

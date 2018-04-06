@@ -43,13 +43,13 @@ gearoenix::physics::constraint::Constraint* gearoenix::physics::constraint::Cons
 gearoenix::physics::constraint::Placer* gearoenix::physics::constraint::Constraint::to_placer()
 {
     if (t == PLACER)
-        return reinterpret_cast<Placer*>(this);
+        return static_cast<Placer*>(this);
     return nullptr;
 }
 
 const gearoenix::physics::constraint::Placer* gearoenix::physics::constraint::Constraint::to_placer() const
 {
     if (t == PLACER)
-        return reinterpret_cast<const Placer*>(this);
+        return static_cast<const Placer*>(this);
     return nullptr;
 }

@@ -12,8 +12,8 @@ gearoenix::gles2::shader::DirectionalColoredSpeculatedNonreflectiveShadowlessOpa
 
 void gearoenix::gles2::shader::DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque::Resources::bind()
 {
-    render::material::DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque::Uniform* data = reinterpret_cast<render::material::DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque::Uniform*>(u->get_data());
-    DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque* shd = reinterpret_cast<DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque*>(pip->get_shader());
+    render::material::DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque::Uniform* data = static_cast<render::material::DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque::Uniform*>(u->get_data());
+    DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque* shd = static_cast<DirectionalColoredSpeculatedNonreflectiveShadowlessOpaque*>(pip->get_shader());
     shd->use();
     shd->set_ambl_color(data->ambl_color.data());
     shd->set_eye(data->eye.data());

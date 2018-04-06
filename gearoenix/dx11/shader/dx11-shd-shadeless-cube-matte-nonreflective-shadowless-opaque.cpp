@@ -15,10 +15,10 @@ gearoenix::dx11::shader::ShadelessCubeMatteNonreflectiveShadowlessOpaque::Resour
 
 void gearoenix::dx11::shader::ShadelessCubeMatteNonreflectiveShadowlessOpaque::Resources::bind()
 {
-    buffer::Uniform* uniform = reinterpret_cast<buffer::Uniform*>(u);
-    ShadelessCubeMatteNonreflectiveShadowlessOpaque* shd = reinterpret_cast<ShadelessCubeMatteNonreflectiveShadowlessOpaque*>(pip->get_shader());
+    buffer::Uniform* uniform = static_cast<buffer::Uniform*>(u);
+    ShadelessCubeMatteNonreflectiveShadowlessOpaque* shd = static_cast<ShadelessCubeMatteNonreflectiveShadowlessOpaque*>(pip->get_shader());
     uniform->set_for_vertex_shader();
-    reinterpret_cast<const texture::Cube*>(ctxt)->bind(0);
+    static_cast<const texture::Cube*>(ctxt)->bind(0);
     shd->use();
 }
 
@@ -73,7 +73,7 @@ gearoenix::dx11::shader::ShadelessCubeMatteNonreflectiveShadowlessOpaque::~Shade
 void gearoenix::dx11::shader::ShadelessCubeMatteNonreflectiveShadowlessOpaque::use()
 {
     run();
-    Engine* engine = reinterpret_cast<Engine*>(eng);
+    Engine* engine = static_cast<Engine*>(eng);
     engine->get_sampler()->bind(0);
 }
 

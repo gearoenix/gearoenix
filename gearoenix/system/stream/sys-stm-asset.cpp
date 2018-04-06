@@ -13,7 +13,7 @@ void gearoenix::system::stream::Asset::built_in_type_read(void* data, core::Coun
     read(data, length);
     if (is_endian_compatible)
         return;
-    std::uint8_t* c_data = reinterpret_cast<std::uint8_t*>(data);
+    std::uint8_t* c_data = static_cast<std::uint8_t*>(data);
     for (core::Count i = 0, j = length - 1; i < j; ++i, --j) {
         std::uint8_t tmp = c_data[i];
         c_data[i] = c_data[j];
@@ -75,7 +75,7 @@ gearoenix::core::Count gearoenix::system::stream::Asset::read(void* data, core::
 #ifdef IN_ANDROID
     core::Count result = static_cast<core::Count>(AAsset_read(file, data, length));
 #elif defined(USE_STD_FILE)
-    file.read(reinterpret_cast<char*>(data), length);
+    file.read(static_cast<char*>(data), length);
     core::Count result = static_cast<core::Count>(file.gcount());
 #else
 #error "Error not implemented yet!"

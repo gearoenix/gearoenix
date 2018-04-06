@@ -19,9 +19,9 @@ gearoenix::render::Linker::Linker()
         LOGF(std::string("Error no Vulkan is available."));
     }
 #ifdef IN_WINDOWS
-#define VKL(x) x = reinterpret_cast<PFN_##x>(GetProcAddress(libvulkan, #x))
+#define VKL(x) x = static_cast<PFN_##x>(GetProcAddress(libvulkan, #x))
 #else
-#define VKL(x) x = reinterpret_cast<PFN_##x>(dlsym(libvulkan, #x))
+#define VKL(x) x = static_cast<PFN_##x>(dlsym(libvulkan, #x))
 #endif
     VKL(vkCreateInstance);
     VKL(vkDestroyInstance);

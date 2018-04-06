@@ -15,7 +15,7 @@ gearoenix::render::shader::stage::Stage::Stage(std::vector<unsigned char>& data,
     setz(module_create_info);
     module_create_info.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
     module_create_info.codeSize = data.size();
-    module_create_info.pCode = reinterpret_cast<const std::uint32_t*>(data.data());
+    module_create_info.pCode = static_cast<const std::uint32_t*>(data.data());
     auto l = device->get_physical_device()->get_instance()->get_linker();
     VKC(l->vkCreateShaderModule(device->get_vulkan_data(), &module_create_info, nullptr, &vulkan_data));
 }

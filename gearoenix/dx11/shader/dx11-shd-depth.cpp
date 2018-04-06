@@ -13,8 +13,8 @@ gearoenix::dx11::shader::Depth::Resources::Resources(Engine* e, pipeline::Pipeli
 
 void gearoenix::dx11::shader::Depth::Resources::bind()
 {
-    buffer::Uniform* uniform = reinterpret_cast<buffer::Uniform*>(u);
-    Depth* shd = reinterpret_cast<Depth*>(pip->get_shader());
+    buffer::Uniform* uniform = static_cast<buffer::Uniform*>(u);
+    Depth* shd = static_cast<Depth*>(pip->get_shader());
     uniform->set_for_vertex_shader();
     shd->use();
 }

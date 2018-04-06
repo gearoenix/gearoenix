@@ -89,45 +89,47 @@ gearoenix::render::model::Model::~Model()
 void gearoenix::render::model::Model::commit(const scene::Scene* s)
 {
     //std::lock_guard<std::mutex> lg(locker);
+    if (s->get_current_camera()->is_transformed()) {
+        commit_camera_changes(s);
+    }
+    if (s->get_sun()->get_camera()->is_transformed()) {
+        commit_lights_changes(s);
+    }
+}
+
+void gearoenix::render::model::Model::commit_camera_changes(const scene::Scene* s)
+{
     const std::shared_ptr<camera::Camera>& cam = s->get_current_camera();
-    const bool localized_transformed = transformed;
-    if (localized_transformed) {
-        transformed = false;
-        if (nullptr != collider) {
-            collider->update(m);
+    is_in_camera = cam->in_sight(moccloc, occrds);
+    if (is_in_camera) {
+        if (needs_mvp) {
+            mvp = cam->get_view_projection() * m;
         }
-        moccloc = m * occloc;
-    }
-    if (cam->is_transformed() || localized_transformed) {
-        is_in_camera = cam->in_sight(moccloc, occrds);
-        if (is_in_camera) {
-            if (needs_mvp) {
-                mvp = cam->get_view_projection() * m;
-            }
-            if (has_transparent) {
-                distcam = cam->get_distance(moccloc);
-            }
-            for (std::pair<const core::Id, std::tuple<std::shared_ptr<mesh::Mesh>, std::shared_ptr<material::Material>, std::shared_ptr<material::Depth>>>& mshmtr : meshes) {
-                std::get<1>(mshmtr.second)->update(s, this);
-            }
-            // std::cout << "\n\nis in camera\n\n";
+        if (has_transparent) {
+            distcam = cam->get_distance(moccloc);
         }
+        for (std::pair<const core::Id, std::tuple<std::shared_ptr<mesh::Mesh>, std::shared_ptr<material::Material>, std::shared_ptr<material::Depth>>>& mshmtr : meshes) {
+            std::get<1>(mshmtr.second)->update(s, this);
+        }
+        // std::cout << "\n\nis in camera\n\n";
     }
+}
+
+void gearoenix::render::model::Model::commit_lights_changes(const scene::Scene* s)
+{
     if (has_shadow_caster) {
         const light::Sun* sun = s->get_sun();
         const camera::Orthographic* suncam = sun->get_camera();
-        if (suncam->is_transformed() || localized_transformed) {
-            is_in_sun = suncam->in_sight(moccloc, occrds);
-            if (is_in_sun) {
-                sunmvp = sun->get_camera()->get_view_projection() * m;
-                if (needs_dbm) {
-                    dbm = sun->get_bias() * m;
-                }
-                for (std::pair<const core::Id, std::tuple<std::shared_ptr<mesh::Mesh>, std::shared_ptr<material::Material>, std::shared_ptr<material::Depth>>>& mshmtr : meshes) {
-                    std::shared_ptr<material::Depth>& dp = std::get<2>(mshmtr.second);
-                    if (nullptr != dp) {
-                        dp->update(s, this);
-                    }
+        is_in_sun = suncam->in_sight(moccloc, occrds);
+        if (is_in_sun) {
+            sunmvp = sun->get_camera()->get_view_projection() * m;
+            if (needs_dbm) {
+                dbm = sun->get_bias() * m;
+            }
+            for (std::pair<const core::Id, std::tuple<std::shared_ptr<mesh::Mesh>, std::shared_ptr<material::Material>, std::shared_ptr<material::Depth>>>& mshmtr : meshes) {
+                std::shared_ptr<material::Depth>& dp = std::get<2>(mshmtr.second);
+                if (nullptr != dp) {
+                    dp->update(s, this);
                 }
             }
         }
@@ -185,7 +187,7 @@ const gearoenix::math::Mat4x4& gearoenix::render::model::Model::get_sun_mvp() co
     return sunmvp;
 }
 
-gearoenix::render::model::Model::RenderModel::Type gearoenix::render::model::Model::get_type() const
+gearoenix::render::model::Model::RenderModel::Type gearoenix::render::model::Model::get_render_model_type() const
 {
     return render_model_type;
 }

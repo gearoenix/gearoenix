@@ -205,8 +205,8 @@ gearoenix::render::shader::Shader* gearoenix::gles3::Engine::create_shader(core:
 
 gearoenix::render::shader::Resources* gearoenix::gles3::Engine::create_shader_resources(core::Id sid, render::pipeline::Pipeline* p, render::buffer::Uniform* ub, core::sync::EndCaller<core::sync::EndCallerIgnore>)
 {
-    pipeline::Pipeline* pip = reinterpret_cast<pipeline::Pipeline*>(p);
-    buffer::Uniform* u = reinterpret_cast<buffer::Uniform*>(ub);
+    pipeline::Pipeline* pip = static_cast<pipeline::Pipeline*>(p);
+    buffer::Uniform* u = static_cast<buffer::Uniform*>(ub);
     switch (sid) {
     case render::shader::DEPTH_POS:
     case render::shader::DEPTH_POS_NRM:

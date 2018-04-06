@@ -15,10 +15,10 @@ gearoenix::dx11::shader::ShadelessD2MatteNonreflectiveShadowlessOpaque::Resource
 
 void gearoenix::dx11::shader::ShadelessD2MatteNonreflectiveShadowlessOpaque::Resources::bind()
 {
-    buffer::Uniform* uniform = reinterpret_cast<buffer::Uniform*>(u);
-    ShadelessD2MatteNonreflectiveShadowlessOpaque* shd = reinterpret_cast<ShadelessD2MatteNonreflectiveShadowlessOpaque*>(pip->get_shader());
+    buffer::Uniform* uniform = static_cast<buffer::Uniform*>(u);
+    ShadelessD2MatteNonreflectiveShadowlessOpaque* shd = static_cast<ShadelessD2MatteNonreflectiveShadowlessOpaque*>(pip->get_shader());
     uniform->set_for_vertex_shader();
-    reinterpret_cast<const texture::Texture2D*>(txt2d)->bind(0);
+    static_cast<const texture::Texture2D*>(txt2d)->bind(0);
     shd->use();
 }
 
@@ -78,7 +78,7 @@ gearoenix::dx11::shader::ShadelessD2MatteNonreflectiveShadowlessOpaque::~Shadele
 void gearoenix::dx11::shader::ShadelessD2MatteNonreflectiveShadowlessOpaque::use()
 {
     run();
-    Engine* engine = reinterpret_cast<Engine*>(eng);
+    Engine* engine = static_cast<Engine*>(eng);
     engine->get_sampler()->bind(0);
 }
 

@@ -15,12 +15,12 @@ gearoenix::dx11::shader::DirectionalD2SpeculatedNonreflectiveFullOpaque::Resourc
 
 void gearoenix::dx11::shader::DirectionalD2SpeculatedNonreflectiveFullOpaque::Resources::bind()
 {
-    buffer::Uniform* uniform = reinterpret_cast<buffer::Uniform*>(u);
-    DirectionalD2SpeculatedNonreflectiveFullOpaque* shd = reinterpret_cast<DirectionalD2SpeculatedNonreflectiveFullOpaque*>(pip->get_shader());
+    buffer::Uniform* uniform = static_cast<buffer::Uniform*>(u);
+    DirectionalD2SpeculatedNonreflectiveFullOpaque* shd = static_cast<DirectionalD2SpeculatedNonreflectiveFullOpaque*>(pip->get_shader());
     uniform->set_for_vertex_shader();
     uniform->set_for_fragment_shader();
-    reinterpret_cast<texture::Texture2D*>(txt)->bind(0);
-    reinterpret_cast<texture::Texture2D*>(shdtxt)->bind(1);
+    static_cast<texture::Texture2D*>(txt)->bind(0);
+    static_cast<texture::Texture2D*>(shdtxt)->bind(1);
     shd->use();
 }
 
@@ -134,7 +134,7 @@ gearoenix::dx11::shader::DirectionalD2SpeculatedNonreflectiveFullOpaque::~Direct
 void gearoenix::dx11::shader::DirectionalD2SpeculatedNonreflectiveFullOpaque::use()
 {
     run();
-    Engine* engine = reinterpret_cast<Engine*>(eng);
+    Engine* engine = static_cast<Engine*>(eng);
     engine->get_sampler()->bind(0);
 }
 

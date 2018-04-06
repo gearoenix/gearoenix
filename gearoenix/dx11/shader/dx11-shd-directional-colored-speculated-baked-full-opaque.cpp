@@ -16,12 +16,12 @@ gearoenix::dx11::shader::DirectionalColoredSpeculatedBakedFullOpaque::Resources:
 
 void gearoenix::dx11::shader::DirectionalColoredSpeculatedBakedFullOpaque::Resources::bind()
 {
-    buffer::Uniform* uniform = reinterpret_cast<buffer::Uniform*>(u);
-    DirectionalColoredSpeculatedBakedFullOpaque* shd = reinterpret_cast<DirectionalColoredSpeculatedBakedFullOpaque*>(pip->get_shader());
+    buffer::Uniform* uniform = static_cast<buffer::Uniform*>(u);
+    DirectionalColoredSpeculatedBakedFullOpaque* shd = static_cast<DirectionalColoredSpeculatedBakedFullOpaque*>(pip->get_shader());
     uniform->set_for_vertex_shader();
     uniform->set_for_fragment_shader();
-    reinterpret_cast<texture::Cube*>(env)->bind(0);
-    reinterpret_cast<texture::Texture2D*>(shdtxt)->bind(1);
+    static_cast<texture::Cube*>(env)->bind(0);
+    static_cast<texture::Texture2D*>(shdtxt)->bind(1);
     shd->use();
 }
 
@@ -130,7 +130,7 @@ gearoenix::dx11::shader::DirectionalColoredSpeculatedBakedFullOpaque::~Direction
 void gearoenix::dx11::shader::DirectionalColoredSpeculatedBakedFullOpaque::use()
 {
     run();
-    Engine* engine = reinterpret_cast<Engine*>(eng);
+    Engine* engine = static_cast<Engine*>(eng);
     engine->get_sampler()->bind(0);
 }
 

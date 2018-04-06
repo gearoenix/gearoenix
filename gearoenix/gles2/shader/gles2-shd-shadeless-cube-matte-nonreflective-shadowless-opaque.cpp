@@ -13,12 +13,12 @@ gearoenix::gles2::shader::ShadelessCubeMatteNonreflectiveShadowlessOpaque::Resou
 
 void gearoenix::gles2::shader::ShadelessCubeMatteNonreflectiveShadowlessOpaque::Resources::bind()
 {
-    render::material::ShadelessCubeMatteNonreflectiveShadowlessOpaque::Uniform* data = reinterpret_cast<render::material::ShadelessCubeMatteNonreflectiveShadowlessOpaque::Uniform*>(u->get_data());
-    ShadelessCubeMatteNonreflectiveShadowlessOpaque* shd = reinterpret_cast<ShadelessCubeMatteNonreflectiveShadowlessOpaque*>(pip->get_shader());
+    render::material::ShadelessCubeMatteNonreflectiveShadowlessOpaque::Uniform* data = static_cast<render::material::ShadelessCubeMatteNonreflectiveShadowlessOpaque::Uniform*>(u->get_data());
+    ShadelessCubeMatteNonreflectiveShadowlessOpaque* shd = static_cast<ShadelessCubeMatteNonreflectiveShadowlessOpaque*>(pip->get_shader());
     shd->use();
     shd->set_mvp(data->mvp.data());
     shd->set_m(data->m.data());
-    reinterpret_cast<texture::Cube*>(ctxt)->bind(GL_TEXTURE0);
+    static_cast<texture::Cube*>(ctxt)->bind(GL_TEXTURE0);
 }
 
 gearoenix::gles2::shader::ShadelessCubeMatteNonreflectiveShadowlessOpaque::ShadelessCubeMatteNonreflectiveShadowlessOpaque(core::Id my_id, Engine* eng, core::sync::EndCaller<core::sync::EndCallerIgnore> end)

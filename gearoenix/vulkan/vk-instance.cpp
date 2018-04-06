@@ -231,7 +231,7 @@ gearoenix::render::Instance::Instance(Linker* l)
     VKC(l->vkCreateInstance(&instance_create_info, 0, &vulkan_data));
 #define VKL(fun_name)                                          \
     if ((l->fun_name) == 0) {                                  \
-        l->fun_name = reinterpret_cast<PFN_##fun_name>(        \
+        l->fun_name = static_cast<PFN_##fun_name>(             \
             l->vkGetInstanceProcAddr(vulkan_data, #fun_name)); \
     }
     VKL(vkCreateDebugReportCallbackEXT);

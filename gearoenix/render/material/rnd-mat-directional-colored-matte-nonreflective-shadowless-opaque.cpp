@@ -26,7 +26,7 @@ gearoenix::render::material::DirectionalColoredMatteNonreflectiveShadowlessOpaqu
     u.ambl_color.w(color.w());
     u.sun_color.w(color.w());
     e->add_load_function([this, e, end]() -> void {
-        shdrsc = reinterpret_cast<Resources*>(e->create_shader_resources(SHADER_ID, pl.get(), ub, end));
+        shdrsc = static_cast<Resources*>(e->create_shader_resources(SHADER_ID, pl.get(), ub, end));
     });
 }
 

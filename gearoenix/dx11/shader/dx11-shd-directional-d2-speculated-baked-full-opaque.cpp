@@ -16,13 +16,13 @@ gearoenix::dx11::shader::DirectionalD2SpeculatedBakedFullOpaque::Resources::Reso
 
 void gearoenix::dx11::shader::DirectionalD2SpeculatedBakedFullOpaque::Resources::bind()
 {
-    buffer::Uniform* uniform = reinterpret_cast<buffer::Uniform*>(u);
-    DirectionalD2SpeculatedBakedFullOpaque* shd = reinterpret_cast<DirectionalD2SpeculatedBakedFullOpaque*>(pip->get_shader());
+    buffer::Uniform* uniform = static_cast<buffer::Uniform*>(u);
+    DirectionalD2SpeculatedBakedFullOpaque* shd = static_cast<DirectionalD2SpeculatedBakedFullOpaque*>(pip->get_shader());
     uniform->set_for_vertex_shader();
     uniform->set_for_fragment_shader();
-    reinterpret_cast<texture::Texture2D*>(txt)->bind(0);
-    reinterpret_cast<texture::Cube*>(env)->bind(1);
-    reinterpret_cast<texture::Texture2D*>(shdtxt)->bind(2);
+    static_cast<texture::Texture2D*>(txt)->bind(0);
+    static_cast<texture::Cube*>(env)->bind(1);
+    static_cast<texture::Texture2D*>(shdtxt)->bind(2);
     shd->use();
 }
 
@@ -143,7 +143,7 @@ gearoenix::dx11::shader::DirectionalD2SpeculatedBakedFullOpaque::~DirectionalD2S
 void gearoenix::dx11::shader::DirectionalD2SpeculatedBakedFullOpaque::use()
 {
     run();
-    Engine* engine = reinterpret_cast<Engine*>(eng);
+    Engine* engine = static_cast<Engine*>(eng);
     engine->get_sampler()->bind(0);
 }
 

@@ -13,8 +13,8 @@ gearoenix::dx11::shader::ShadelessColoredMatteNonreflectiveShadowlessOpaque::Res
 
 void gearoenix::dx11::shader::ShadelessColoredMatteNonreflectiveShadowlessOpaque::Resources::bind()
 {
-    buffer::Uniform* uniform = reinterpret_cast<buffer::Uniform*>(u);
-    ShadelessColoredMatteNonreflectiveShadowlessOpaque* shd = reinterpret_cast<ShadelessColoredMatteNonreflectiveShadowlessOpaque*>(pip->get_shader());
+    buffer::Uniform* uniform = static_cast<buffer::Uniform*>(u);
+    ShadelessColoredMatteNonreflectiveShadowlessOpaque* shd = static_cast<ShadelessColoredMatteNonreflectiveShadowlessOpaque*>(pip->get_shader());
     uniform->set_for_vertex_shader();
     uniform->set_for_fragment_shader();
     shd->use();

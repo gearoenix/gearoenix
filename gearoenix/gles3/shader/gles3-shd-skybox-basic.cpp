@@ -13,11 +13,11 @@ gearoenix::gles3::shader::SkyboxBasic::Resources::Resources(Engine* e, pipeline:
 
 void gearoenix::gles3::shader::SkyboxBasic::Resources::bind()
 {
-    render::material::SkyboxBasic::Uniform* data = reinterpret_cast<render::material::SkyboxBasic::Uniform*>(u->get_data());
-    SkyboxBasic* shd = reinterpret_cast<SkyboxBasic*>(pip->get_shader());
+    render::material::SkyboxBasic::Uniform* data = static_cast<render::material::SkyboxBasic::Uniform*>(u->get_data());
+    SkyboxBasic* shd = static_cast<SkyboxBasic*>(pip->get_shader());
     shd->use();
     shd->set_vp(data->vp.data());
-    reinterpret_cast<texture::Cube*>(ctxt)->bind(GL_TEXTURE0);
+    static_cast<texture::Cube*>(ctxt)->bind(GL_TEXTURE0);
 }
 
 gearoenix::gles3::shader::SkyboxBasic::SkyboxBasic(core::Id my_id, Engine* eng, core::sync::EndCaller<core::sync::EndCallerIgnore> end)

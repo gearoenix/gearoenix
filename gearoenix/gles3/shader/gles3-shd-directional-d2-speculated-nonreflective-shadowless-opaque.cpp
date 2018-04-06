@@ -13,8 +13,8 @@ gearoenix::gles3::shader::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque::
 
 void gearoenix::gles3::shader::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque::Resources::bind()
 {
-    render::material::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque::Uniform* data = reinterpret_cast<render::material::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque::Uniform*>(u->get_data());
-    DirectionalD2SpeculatedNonreflectiveShadowlessOpaque* shd = reinterpret_cast<DirectionalD2SpeculatedNonreflectiveShadowlessOpaque*>(pip->get_shader());
+    render::material::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque::Uniform* data = static_cast<render::material::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque::Uniform*>(u->get_data());
+    DirectionalD2SpeculatedNonreflectiveShadowlessOpaque* shd = static_cast<DirectionalD2SpeculatedNonreflectiveShadowlessOpaque*>(pip->get_shader());
     shd->use();
 
     shd->set_ambl_color(data->ambl_color.data());
@@ -25,7 +25,7 @@ void gearoenix::gles3::shader::DirectionalD2SpeculatedNonreflectiveShadowlessOpa
     shd->set_spec_factors(data->spec_factors.data());
     shd->set_sun(data->sun.data());
     shd->set_sun_color(data->sun_color.data());
-    reinterpret_cast<texture::Texture2D*>(txt)->bind(GL_TEXTURE0);
+    static_cast<texture::Texture2D*>(txt)->bind(GL_TEXTURE0);
 }
 
 gearoenix::gles3::shader::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque::DirectionalD2SpeculatedNonreflectiveShadowlessOpaque(core::Id my_id, Engine* eng, core::sync::EndCaller<core::sync::EndCallerIgnore> end)

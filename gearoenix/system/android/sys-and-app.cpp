@@ -12,13 +12,13 @@
 
 void gearoenix::system::Application::handle_cmd(android_app* app, int32_t cmd)
 {
-    Application* sys_app = reinterpret_cast<Application*>(app->userData);
+    Application* sys_app = static_cast<Application*>(app->userData);
     sys_app->handle(app, cmd);
 }
 
 int32_t gearoenix::system::Application::handle_input(android_app* a, AInputEvent* e)
 {
-    Application* sys_app = reinterpret_cast<Application*>(a->userData);
+    Application* sys_app = static_cast<Application*>(a->userData);
     return sys_app->handle(a, e);
 }
 

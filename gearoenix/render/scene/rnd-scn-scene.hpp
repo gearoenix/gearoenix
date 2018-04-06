@@ -97,8 +97,8 @@ namespace render {
             void draw(texture::Texture2D* shadow_texture);
             virtual ~Scene();
             static Scene* read(core::Id my_id, system::stream::Stream* f, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> c);
-			const std::map<core::Id, std::weak_ptr<model::Model>>& get_all_models() const;
-			const std::map<core::Id, std::weak_ptr<physics::body::Body>>& get_all_bodies() const;
+            const std::map<core::Id, std::weak_ptr<model::Model>>& get_all_models() const;
+            const std::map<core::Id, std::weak_ptr<physics::body::Body>>& get_all_bodies() const;
             const std::map<core::Id, std::shared_ptr<physics::constraint::Constraint>>& get_all_root_constraints() const;
             const std::shared_ptr<camera::Camera>& get_current_camera() const;
             const math::Vec3& get_ambient_light() const;

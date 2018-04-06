@@ -14,11 +14,11 @@ gearoenix::dx11::shader::FontColored::Resources::Resources(Engine* e, pipeline::
 
 void gearoenix::dx11::shader::FontColored::Resources::bind()
 {
-    buffer::Uniform* uniform = reinterpret_cast<buffer::Uniform*>(u);
-    FontColored* shd = reinterpret_cast<FontColored*>(pip->get_shader());
+    buffer::Uniform* uniform = static_cast<buffer::Uniform*>(u);
+    FontColored* shd = static_cast<FontColored*>(pip->get_shader());
     uniform->set_for_vertex_shader();
     uniform->set_for_fragment_shader();
-    reinterpret_cast<const texture::Texture2D*>(txt2d)->bind(0);
+    static_cast<const texture::Texture2D*>(txt2d)->bind(0);
     shd->use();
 }
 

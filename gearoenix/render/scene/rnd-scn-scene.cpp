@@ -13,6 +13,7 @@
 #include "../material/rnd-mat-depth.hpp"
 #include "../material/rnd-mat-material.hpp"
 #include "../mesh/rnd-msh-mesh.hpp"
+#include "../model/rnd-mdl-dynamic.hpp"
 #include "../model/rnd-mdl-model.hpp"
 #include "../rnd-engine.hpp"
 #include "../shader/rnd-shd-shader.hpp"
@@ -120,7 +121,7 @@ const std::map<gearoenix::core::Id, std::weak_ptr<gearoenix::render::model::Mode
 
 const std::map<gearoenix::core::Id, std::weak_ptr<gearoenix::physics::body::Body>>& gearoenix::render::scene::Scene::get_all_bodies() const
 {
-	return all_bodies;
+    return all_bodies;
 }
 
 const std::map<gearoenix::core::Id, std::shared_ptr<gearoenix::physics::constraint::Constraint>>& gearoenix::render::scene::Scene::get_all_root_constraints() const
@@ -188,7 +189,7 @@ void gearoenix::render::scene::Scene::draw(texture::Texture2D* shadow_texture)
 
 const std::shared_ptr<gearoenix::render::camera::Camera>& gearoenix::render::scene::Scene::get_current_camera() const
 {
-    //    return const_cast<camera::Camera*>(reinterpret_cast<const camera::Camera*>(reinterpret_cast<light::Sun*>(lights[0].get())->get_camera()));
+    //    return const_cast<camera::Camera*>(static_cast<const camera::Camera*>(static_cast<light::Sun*>(lights[0].get())->get_camera()));
     auto search = cameras.find(cam_id);
 #ifdef DEBUG_MODE
     if (search == cameras.end())
@@ -294,9 +295,9 @@ void gearoenix::render::scene::Scene::add_constraint(const std::shared_ptr<physi
         UNEXPECTED;
 #endif
     root_constraints[cns->get_asset_id()] = cns;
-    const std::vector<std::pair<core::Id, std::shared_ptr<model::Model>>> models = cns->get_all_models();
-    for (const std::pair<const core::Id, const std::shared_ptr<model::Model>>& model : models) {
-        add_model(model.second);
+    const std::vector<std::pair<core::Id, std::shared_ptr<model::Dynamic>>> models = cns->get_all_models();
+    for (const std::pair<const core::Id, const std::shared_ptr<model::Dynamic>>& model : models) {
+        add_model(std::static_pointer_cast<model::Model>(model.second));
     }
     const std::vector<std::shared_ptr<physics::body::Body>> bodies = cns->get_all_bodies();
     for (const std::shared_ptr<physics::body::Body>& b : bodies) {

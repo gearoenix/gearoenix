@@ -13,8 +13,8 @@ gearoenix::gles2::shader::Depth::Resources::Resources(Engine* e, pipeline::Pipel
 
 void gearoenix::gles2::shader::Depth::Resources::bind()
 {
-    render::material::Depth::Uniform* data = reinterpret_cast<render::material::Depth::Uniform*>(u->get_data());
-    Depth* shd = reinterpret_cast<Depth*>(pip->get_shader());
+    render::material::Depth::Uniform* data = static_cast<render::material::Depth::Uniform*>(u->get_data());
+    Depth* shd = static_cast<Depth*>(pip->get_shader());
     shd->use();
     shd->set_mvp(data->mvp.data());
 }

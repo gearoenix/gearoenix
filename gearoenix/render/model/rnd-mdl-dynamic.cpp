@@ -1,19 +1,5 @@
 #include "rnd-mdl-dynamic.hpp"
-// #include "../../core/asset/cr-asset-manager.hpp"
-// #include "../../core/cr-static.hpp"
-// #include "../../physics/collider/phs-collider.hpp"
-// #include "../../system/stream/sys-stm-asset.hpp"
-// #include "../../system/stream/sys-stm-stream.hpp"
-// #include "../../system/sys-app.hpp"
-// #include "../camera/rnd-cmr-camera.hpp"
-// #include "../camera/rnd-cmr-orthographic.hpp"
-// #include "../light/rnd-lt-sun.hpp"
-// #include "../material/rnd-mat-depth.hpp"
-// #include "../material/rnd-mat-material.hpp"
-// #include "../mesh/rnd-msh-mesh.hpp"
-// #include "../rnd-engine.hpp"
-// #include "../scene/rnd-scn-scene.hpp"
-// #include "../widget/rnd-wdg-widget.hpp"
+#include "../../physics/collider/phs-collider.hpp"
 
 gearoenix::render::model::Dynamic::Dynamic(
     core::Id my_id,
@@ -27,6 +13,21 @@ gearoenix::render::model::Dynamic::Dynamic(
 }
 
 gearoenix::render::model::Dynamic::~Dynamic() {}
+
+void gearoenix::render::model::Dynamic::commit(const scene::Scene* s)
+{
+    //std::lock_guard<std::mutex> lg(locker);
+    Model::commit(s);
+    if (transformed) {
+        transformed = false;
+        if (nullptr != collider) {
+            collider->update(m);
+        }
+        moccloc = m * occloc;
+        commit_camera_changes(s);
+        commit_lights_changes(s);
+    }
+}
 
 void gearoenix::render::model::Dynamic::get_location(math::Vec3& v) const
 {

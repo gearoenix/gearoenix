@@ -15,10 +15,10 @@ gearoenix::dx11::shader::SkyboxBasic::Resources::Resources(Engine* e, pipeline::
 
 void gearoenix::dx11::shader::SkyboxBasic::Resources::bind()
 {
-    buffer::Uniform* uniform = reinterpret_cast<buffer::Uniform*>(u);
-    SkyboxBasic* shd = reinterpret_cast<SkyboxBasic*>(pip->get_shader());
+    buffer::Uniform* uniform = static_cast<buffer::Uniform*>(u);
+    SkyboxBasic* shd = static_cast<SkyboxBasic*>(pip->get_shader());
     uniform->set_for_vertex_shader();
-    reinterpret_cast<const texture::Cube*>(ctxt)->bind(0);
+    static_cast<const texture::Cube*>(ctxt)->bind(0);
     shd->use();
 }
 
@@ -72,7 +72,7 @@ gearoenix::dx11::shader::SkyboxBasic::~SkyboxBasic()
 void gearoenix::dx11::shader::SkyboxBasic::use()
 {
     run();
-    Engine* engine = reinterpret_cast<Engine*>(eng);
+    Engine* engine = static_cast<Engine*>(eng);
     engine->get_sampler()->bind(0);
 }
 

@@ -22,6 +22,7 @@ namespace render {
                 core::sync::EndCaller<core::sync::EndCallerIgnore> c,
                 const RenderModel::Type t = RenderModel::DYNAMIC);
             virtual ~Dynamic();
+            void commit(const scene::Scene* s);
             void push_model_state();
             void pop_model_state();
             // Transformable---------------------------------------------------------

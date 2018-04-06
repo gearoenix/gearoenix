@@ -51,7 +51,7 @@ gearoenix::render::material::DirectionalD2SpeculatedBakedFullOpaque::Directional
     txt = std::static_pointer_cast<texture::Texture2D>(astmgr->get_texture(tex2did, core::sync::EndCaller<render::texture::Texture>([end](std::shared_ptr<render::texture::Texture>) -> void {})));
     env = std::static_pointer_cast<texture::Cube>(astmgr->get_texture(texid, core::sync::EndCaller<render::texture::Texture>([end](std::shared_ptr<render::texture::Texture>) -> void {})));
     e->add_load_function([this, end, e]() -> void {
-        shdrsc = reinterpret_cast<Resources*>(e->create_shader_resources(SHADER_ID, pl.get(), ub, end));
+        shdrsc = static_cast<Resources*>(e->create_shader_resources(SHADER_ID, pl.get(), ub, end));
         shdrsc->set_texture(txt.get());
         shdrsc->set_baked_env(env.get());
     });

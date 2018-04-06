@@ -8,9 +8,9 @@
 #include "../render/rnd-engine.hpp"
 #include "../render/scene/rnd-scn-scene.hpp"
 #include "animation/phs-anm-animation.hpp"
-#include "constraint/phs-cns-constraint.hpp"
 #include "body/phs-bd-body.hpp"
 #include "body/phs-bd-rigid.hpp"
+#include "constraint/phs-cns-constraint.hpp"
 #include "phs-engine.hpp"
 #include <functional>
 #include <iostream>
@@ -71,23 +71,23 @@ void gearoenix::physics::Kernel::apply_constraints()
 
 void gearoenix::physics::Kernel::apply_bodies()
 {
-	const unsigned int threads_count = engine->threads_count;
-	unsigned int item_index = 0;
-	const std::map<core::Id, std::shared_ptr<render::scene::Scene>>& scenes = engine->render_engine->get_all_scenes();
-	for (const std::pair<core::Id, std::shared_ptr<render::scene::Scene>> id_scene : scenes) {
-		const std::shared_ptr<render::scene::Scene>& scene = id_scene.second;
-		const std::map<core::Id, std::weak_ptr<body::Body>>& ids_bodies = scene->get_all_bodies();
-		for (const std::pair<core::Id, std::weak_ptr<body::Body>>& id_body : ids_bodies) {
-			if (((item_index++) % threads_count) != thread_index)
-				continue;
-			if (std::shared_ptr<body::Body> b = id_body.second.lock()) {
-				if (body::Body::Behaviour::RIGID == b->get_body_type()) {
-					std::shared_ptr<body::Rigid> rigid = std::static_pointer_cast<body::Rigid>(b);
-					rigid->apply_time(delta_time);
-				}
-			}
-		}
-	}
+    const unsigned int threads_count = engine->threads_count;
+    unsigned int item_index = 0;
+    const std::map<core::Id, std::shared_ptr<render::scene::Scene>>& scenes = engine->render_engine->get_all_scenes();
+    for (const std::pair<core::Id, std::shared_ptr<render::scene::Scene>> id_scene : scenes) {
+        const std::shared_ptr<render::scene::Scene>& scene = id_scene.second;
+        const std::map<core::Id, std::weak_ptr<body::Body>>& ids_bodies = scene->get_all_bodies();
+        for (const std::pair<core::Id, std::weak_ptr<body::Body>>& id_body : ids_bodies) {
+            if (((item_index++) % threads_count) != thread_index)
+                continue;
+            if (std::shared_ptr<body::Body> b = id_body.second.lock()) {
+                if (body::Body::Behaviour::RIGID == b->get_body_type()) {
+                    std::shared_ptr<body::Rigid> rigid = std::static_pointer_cast<body::Rigid>(b);
+                    rigid->apply_time(delta_time);
+                }
+            }
+        }
+    }
 }
 
 void gearoenix::physics::Kernel::apply_models()

@@ -86,7 +86,9 @@ namespace render {
             static Model* read(core::Id my_id, system::stream::Stream* f, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> c);
             virtual ~Model();
             RenderModel::Type get_render_model_type() const;
-            void commit(const scene::Scene* s);
+            virtual void commit(const scene::Scene* s);
+            void commit_camera_changes(const scene::Scene* s);
+            void commit_lights_changes(const scene::Scene* s);
             void draw(core::Id mesh_id, texture::Texture2D* shadow_texture);
             void cast_shadow(core::Id mesh_id);
             const std::map<core::Id, std::shared_ptr<Model>>& get_children() const;
