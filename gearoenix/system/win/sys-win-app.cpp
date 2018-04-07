@@ -27,11 +27,11 @@
 #endif
 LRESULT CALLBACK gearoenix::system::Application::wnd_proc(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam)
 {
-    auto sys_app = static_cast<Application*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
+    auto sys_app = reinterpret_cast<Application*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
     if (WM_CREATE == umessage) {
-        CREATESTRUCT* create_structure = static_cast<CREATESTRUCT*>(lparam);
+        CREATESTRUCT* create_structure = reinterpret_cast<CREATESTRUCT*>(lparam);
         sys_app = static_cast<Application*>(create_structure->lpCreateParams);
-        SetWindowLongPtr(hwnd, GWLP_USERDATA, static_cast<LONG_PTR>(sys_app));
+        SetWindowLongPtr(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(sys_app));
     }
     if (nullptr == sys_app) {
         GXLOGE("Unexpected message for nullptr sys app uMsg is: " << umessage);
