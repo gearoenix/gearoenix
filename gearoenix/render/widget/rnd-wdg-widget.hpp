@@ -9,10 +9,9 @@ namespace render {
 
         public:
             enum Type : core::Id {
-                BUTTON = 3,
-                EDIT = 5,
-                TEXT = 4,
-                UNKNOWN = 0XFFFFFFFFFFFFFFFF,
+                BUTTON = 1,
+                EDIT = 2,
+                TEXT = 3,
             };
 
             typedef enum : core::Id {

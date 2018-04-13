@@ -45,8 +45,8 @@ namespace render {
             class RenderModel {
             public:
                 typedef enum : core::Id {
-                    STATIC = 1,
-                    DYNAMIC = 2,
+                    DYNAMIC = 1,
+                    STATIC = 2,
                     WIDGET = 3,
                 } Type;
             };
