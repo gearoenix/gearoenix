@@ -1,5 +1,5 @@
 #include "test-config.hpp"
-#ifdef TEST001
+#ifdef GX_TEST001
 #include "../core/cr-application.hpp"
 
 namespace gearoenix {

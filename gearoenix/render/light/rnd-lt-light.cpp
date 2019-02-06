@@ -18,7 +18,7 @@ gearoenix::render::light::Light* gearoenix::render::light::Light::read(core::Id 
     case 1:
         return new Sun(my_id, f, e);
     default:
-        UNEXPECTED;
+        GXUNEXPECTED;
     }
     return nullptr;
 }

@@ -1,5 +1,5 @@
 #include "gles2-shd-directional-colored-speculated-baked-full-opaque.hpp"
-#ifdef USE_OPENGL_ES2
+#ifdef GX_USE_OPENGL_ES2
 #include "../../system/sys-log.hpp"
 #include "../buffer/gles2-buf-uniform.hpp"
 #include "../gles2-engine.hpp"
@@ -37,7 +37,7 @@ gearoenix::gles2::shader::DirectionalColoredSpeculatedBakedFullOpaque::Direction
     : Shader(my_id, eng, end)
 {
     eng->add_load_function([this, end] {
-        CHECK_FOR_GRAPHIC_API_ERROR;
+        GX_CHECK_FOR_GRAPHIC_API_ERROR;
         create_program();
         const std::string pvs = "#version 100\n"
                                 "precision highp sampler2D;\n"
@@ -142,7 +142,7 @@ gearoenix::gles2::shader::DirectionalColoredSpeculatedBakedFullOpaque::Direction
         glUniform1i(shdtxt, 1);
 
         (void)end;
-        CHECK_FOR_GRAPHIC_API_ERROR;
+        GX_CHECK_FOR_GRAPHIC_API_ERROR;
     });
 }
 

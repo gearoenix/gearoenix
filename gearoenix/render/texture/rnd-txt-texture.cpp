@@ -27,7 +27,7 @@ gearoenix::render::texture::Texture* gearoenix::render::texture::Texture::read(c
     case 4:
         return e->create_texture_cube(my_id, f, c);
     default:
-        UNEXPECTED;
+        GXUNEXPECTED;
     }
     return nullptr;
 }

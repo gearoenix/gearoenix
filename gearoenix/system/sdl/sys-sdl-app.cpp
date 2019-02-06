@@ -1,7 +1,8 @@
 #include "sys-sdl-app.hpp"
-#ifdef USE_SDL
+#ifdef GX_USE_SDL
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../core/cr-application.hpp"
+#include "../../core/cr-types.hpp"
 #include "../../core/event/cr-ev-bt-keyboard.hpp"
 #include "../../core/event/cr-ev-bt-mouse.hpp"
 #include "../../core/event/cr-ev-event.hpp"
@@ -23,17 +24,17 @@ const gearoenix::core::Real gearoenix::system::Application::zoom_epsilon = 0.000
 void gearoenix::system::Application::create_window()
 {
     std::uint32_t flags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN |
-#ifdef GEAROENIX_FULLSCREEN
+#ifdef GX_FULLSCREEN
         SDL_WINDOW_FULLSCREEN | SDL_WINDOW_BORDERLESS | SDL_WINDOW_FULLSCREEN_DESKTOP |
 #else
         SDL_WINDOW_RESIZABLE |
 #endif
-#if defined(IN_MAC) || defined(IN_IOS)
+#if defined(GX_IN_MAC) || defined(GX_IN_IOS)
         SDL_WINDOW_ALLOW_HIGHDPI |
 #endif
         0;
     window = SDL_CreateWindow(
-        APPLICATION_NAME,
+        GX_APP_NAME,
         SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED,
         win_width,
@@ -46,7 +47,7 @@ void gearoenix::system::Application::create_window()
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
     window = SDL_CreateWindow(
-        APPLICATION_NAME,
+        GX_APP_NAME,
         SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED,
         win_width,
@@ -58,7 +59,7 @@ void gearoenix::system::Application::create_window()
     }
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
     window = SDL_CreateWindow(
-        APPLICATION_NAME,
+        GX_APP_NAME,
         SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED,
         win_width,
@@ -73,7 +74,7 @@ void gearoenix::system::Application::create_window()
 
 void gearoenix::system::Application::create_context()
 {
-#ifdef USE_OPENGL_43
+#ifdef GX_USE_OPENGL_43
     gl_context = SDL_GL_CreateContext(window);
     if (gl_context != nullptr) {
         supported_engine = render::Engine::EngineType::OPENGL_43;
@@ -82,7 +83,7 @@ void gearoenix::system::Application::create_context()
         return;
     }
 #endif
-#ifdef USE_OPENGL_33
+#ifdef GX_USE_OPENGL_33
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     gl_context = SDL_GL_CreateContext(window);
@@ -93,7 +94,7 @@ void gearoenix::system::Application::create_context()
         return;
     }
 #endif
-#ifdef USE_OPENGL_ES3
+#ifdef GX_USE_OPENGL_ES3
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
     gl_context = SDL_GL_CreateContext(window);
@@ -152,7 +153,7 @@ int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_
             break;
         }
         break;
-#ifdef IN_IOS
+#ifdef GX_IN_IOS
     case SDL_FINGERDOWN: {
         const core::Real x = (e->tfinger.x - 0.5f) * 2.0f * o->screen_ratio;
         const core::Real y = (0.5f - e->tfinger.y) * 2.0f;
@@ -232,14 +233,18 @@ int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_
     case SDL_WINDOWEVENT:
         switch (e->window.event) {
         case SDL_WINDOWEVENT_RESIZED:
-            event = new core::event::WindowResize(o->win_width, o->win_height, e->window.data1, e->window.data2);
+            event = new core::event::WindowResize(
+				(core::Real) o->win_width, 
+				(core::Real) o->win_height, 
+				(core::Real) e->window.data1, 
+				(core::Real) e->window.data2);
             o->win_width = e->window.data1;
             o->win_height = e->window.data2;
             o->screen_ratio = (core::Real)o->win_width / (core::Real)o->win_height;
             o->half_height_inversed = 2.0f / (core::Real)o->win_height;
             break;
         default:
-            TODO;
+            GXTODO;
             break;
         }
         break;
@@ -261,37 +266,37 @@ gearoenix::system::Application::Application()
         GXLOGF("Failed to initialize SDL: " << SDL_GetError());
     }
     SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
-#if defined(USE_OPENGL_43) || defined(USE_OPENGL_33)
+#if defined(GX_USE_OPENGL_43) || defined(GX_USE_OPENGL_33)
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-#elif defined(USE_OPENGL_ES3) || defined(USE_OPENGL_ES2)
+#elif defined(GX_USE_OPENGL_ES3) || defined(GX_USE_OPENGL_ES2)
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
 #else
-#error "Unexpected"
+#error "Uexpected graphic api!"
 #endif
-#ifdef USE_OPENGL_43
+#ifdef GX_USE_OPENGL_43
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-#elif defined(USE_OPENGL_33)
+#elif defined(GX_USE_OPENGL_33)
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-#elif defined(USE_OPENGL_ES3)
+#elif defined(GX_USE_OPENGL_ES3)
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
-#elif defined(USE_OPENGL_ES2)
+#elif defined(GX_USE_OPENGL_ES2)
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
 #else
-#error "Unexpected"
+#error "Uexpected graphic api!"
 #endif
-#if defined(USE_OPENGL_43) || defined(USE_OPENGL_33) || defined(USE_OPENGL_ES3)
-#ifdef IN_LINUX
+#if defined(GX_USE_OPENGL_43) || defined(GX_USE_OPENGL_33) || defined(GX_USE_OPENGL_ES3)
+#ifdef GX_IN_LINUX
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 #else
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 32);
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 16);
 #endif
-#elif defined(USE_OPENGL_ES2)
+#elif defined(GX_USE_OPENGL_ES2)
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 #else
 #error "Unexpected"
@@ -303,7 +308,7 @@ gearoenix::system::Application::Application()
     SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
     SDL_SetHint(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandescapeRight");
-#ifdef GEAROENIX_FULLSCREEN
+#ifdef GX_FULLSCREEN
     SDL_DisplayMode display_mode;
     SDL_GetCurrentDisplayMode(0, &display_mode);
     win_width = display_mode.w;
@@ -314,6 +319,12 @@ gearoenix::system::Application::Application()
 #endif
     create_window();
     create_context();
+#ifdef GX_IN_DESKTOP
+	const GLenum glew_error = glewInit();
+	if (glew_error != GLEW_OK) {
+		GXLOGF("Error initializing GLEW! " << glewGetErrorString(glew_error));
+	}
+#endif
     SDL_AddEventWatch(event_receiver, this);
     SDL_GL_MakeCurrent(window, gl_context);
     int w, h;
@@ -327,7 +338,7 @@ gearoenix::system::Application::Application()
     pre_y = convert_y_to_ratio(h);
     astmgr = new core::asset::Manager(this, "data.gx3d");
     astmgr->initialize();
-#ifdef USE_OPENGL_ES2
+#ifdef GX_USE_OPENGL_ES2
     if (supported_engine == render::Engine::OPENGL_ES2)
         render_engine = new gles2::Engine(this);
 #else
@@ -335,7 +346,7 @@ gearoenix::system::Application::Application()
         render_engine = new gles3::Engine(this);
 #endif
     if (render_engine == nullptr)
-        UNEXPECTED;
+		GXUNEXPECTED;
     astmgr->set_render_engine(render_engine);
 }
 
@@ -349,7 +360,7 @@ gearoenix::system::Application::~Application()
 void gearoenix::system::Application::execute(core::Application* app)
 {
     core_app = app;
-#ifdef IN_WEB
+#ifdef GX_IN_WEB
     Application::app = this;
     emscripten_set_main_loop(Application::loop, 0, true);
 }
@@ -373,7 +384,7 @@ void gearoenix::system::Application::main_loop()
     //        SDL_GL_MakeCurrent(window, gl_context);
     render_engine->update();
     SDL_GL_SwapWindow(window);
-#ifndef IN_WEB
+#ifndef GX_IN_WEB
 }
 core_app->terminate();
 render_engine->terminate();

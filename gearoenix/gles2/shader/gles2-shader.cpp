@@ -1,5 +1,5 @@
 #include "gles2-shader.hpp"
-#ifdef USE_OPENGL_ES2
+#ifdef GX_USE_OPENGL_ES2
 #include "../../system/sys-log.hpp"
 
 void gearoenix::gles2::shader::Shader::create_program()
@@ -75,7 +75,7 @@ GLuint gearoenix::gles2::shader::Shader::get_uniform_location(const std::string&
 {
     GLuint result = glGetUniformLocation(shader_program, &(uname[0]));
     if (result == 0xFFFFFFFF) {
-        UNEXPECTED;
+		GXUNEXPECTED;
     }
     return result;
 }

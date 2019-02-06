@@ -1,7 +1,7 @@
 #ifndef GEAROENIX_DX11_PIPELINE_PIPELINE_HPP
 #define GEAROENIX_DX11_PIPELINE_PIPELINE_HPP
 #include "../../core/cr-build-configuration.hpp"
-#ifdef USE_DIRECTX11
+#ifdef GX_USE_DIRECTX11
 #include "../../render/pipeline/rnd-pip-pipeline.hpp"
 #include <memory>
 namespace gearoenix {

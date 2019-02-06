@@ -45,7 +45,7 @@ LRESULT CALLBACK gearoenix::system::Application::handler(HWND hwnd, UINT umessag
     core::event::Event* event = nullptr;
     switch (umessage) {
     case WM_CLOSE:
-        /// TODO: proper termination
+        /// GXTODO: proper termination
         running = false;
         DestroyWindow(hwnd);
         PostQuitMessage(0);
@@ -322,7 +322,7 @@ gearoenix::system::Application::Application()
 
 gearoenix::system::Application::~Application()
 {
-    TODO; // do cleaning, I think it is better to do it in some special event instead of here.
+    GXTODO; // do cleaning, I think it is better to do it in some special event instead of here.
 }
 
 void gearoenix::system::Application::execute(core::Application* core_app)

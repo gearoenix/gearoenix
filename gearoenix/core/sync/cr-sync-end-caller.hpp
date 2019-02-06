@@ -21,9 +21,9 @@ namespace core {
                 }
                 ~Caller()
                 {
-#ifdef DEBUG_MODE
+#ifdef GX_DEBUG_MODE
                     if (nullptr == data)
-                        UNEXPECTED;
+                        GXUNEXPECTED;
 #endif
                     f(data);
                 }
@@ -46,7 +46,7 @@ namespace core {
         };
         typedef struct {
         } EndCallerIgnore;
-#ifdef DEBUG_MODE
+#ifdef GX_DEBUG_MODE
         template <>
         class EndCaller<EndCallerIgnore> {
         private:

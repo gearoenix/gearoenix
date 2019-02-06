@@ -23,9 +23,9 @@ gearoenix::physics::animation::Animation::~Animation()
 
 void gearoenix::physics::animation::Animation::set_start(const std::chrono::system_clock::time_point& t)
 {
-#ifdef DEBUG_MODE
+#ifdef GX_DEBUG_MODE
     if (start > end)
-        UNEXPECTED;
+        GXUNEXPECTED;
 #endif
     if (start < t)
         ended = false;
@@ -35,9 +35,9 @@ void gearoenix::physics::animation::Animation::set_start(const std::chrono::syst
 
 void gearoenix::physics::animation::Animation::set_end(const std::chrono::system_clock::time_point& t)
 {
-#ifdef DEBUG_MODE
+#ifdef GX_DEBUG_MODE
     if (start > end)
-        UNEXPECTED;
+        GXUNEXPECTED;
 #endif
     if (end < t)
         ended = false;

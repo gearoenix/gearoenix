@@ -46,7 +46,7 @@ void gearoenix::render::model::Dynamic::translate(const math::Vec3& t)
     m.translate(t);
     for (std::pair<const core::Id, std::shared_ptr<Model>>& pmdl : children) {
         if (pmdl.second->get_render_model_type() == RenderModel::STATIC) {
-            UNEXPECTED; // dynamic model can not have static model child
+            GXUNEXPECTED; // dynamic model can not have static model child
         } else {
             std::static_pointer_cast<Dynamic>(pmdl.second)->translate(t);
         }
@@ -63,7 +63,7 @@ void gearoenix::render::model::Dynamic::global_scale(const core::Real s)
     m.scale4x3(s);
     for (std::pair<const core::Id, std::shared_ptr<Model>>& pmdl : children)
         if (pmdl.second->get_render_model_type() == RenderModel::STATIC) {
-            UNEXPECTED; // dynamic model can not have static model child
+            GXUNEXPECTED; // dynamic model can not have static model child
         } else {
             std::static_pointer_cast<Dynamic>(pmdl.second)->global_scale(s);
         }
@@ -81,7 +81,7 @@ void gearoenix::render::model::Dynamic::local_scale(const core::Real s)
     const math::Vec3 o = fetched;
     for (std::pair<const core::Id, std::shared_ptr<Model>>& pmdl : children) {
         if (pmdl.second->get_render_model_type() == RenderModel::STATIC) {
-            UNEXPECTED; // dynamic model can not have static model child
+            GXUNEXPECTED; // dynamic model can not have static model child
         }
         const std::shared_ptr<Dynamic> child = std::static_pointer_cast<Dynamic>(pmdl.second);
         child->get_location(fetched);
@@ -94,13 +94,13 @@ void gearoenix::render::model::Dynamic::local_scale(const core::Real s)
 void gearoenix::render::model::Dynamic::push_model_state()
 {
     //std::lock_guard<std::mutex> lg(locker);
-    UNIMPLEMENTED; // other things are in the state of a model it must decide later
+    GXUNIMPLEMENTED; // other things are in the state of a model it must decide later
 }
 
 void gearoenix::render::model::Dynamic::pop_model_state()
 {
     //std::lock_guard<std::mutex> lg(locker);
-    UNIMPLEMENTED; // other things are in the state of a model it must decide later
+    GXUNIMPLEMENTED; // other things are in the state of a model it must decide later
 }
 
 void gearoenix::render::model::Dynamic::global_rotate(const core::Real d, const math::Vec3& axis)
@@ -110,7 +110,7 @@ void gearoenix::render::model::Dynamic::global_rotate(const core::Real d, const 
     m = r * m;
     for (std::pair<const core::Id, std::shared_ptr<Model>>& pmdl : children)
         if (pmdl.second->get_render_model_type() == RenderModel::STATIC) {
-            UNEXPECTED; // dynamic model can not have static model child
+            GXUNEXPECTED; // dynamic model can not have static model child
         } else {
             std::static_pointer_cast<Dynamic>(pmdl.second)->global_rotate(r);
         }
@@ -123,7 +123,7 @@ void gearoenix::render::model::Dynamic::global_rotate(const math::Mat4x4& rm)
     m = rm * m;
     for (std::pair<const core::Id, std::shared_ptr<Model>>& pmdl : children)
         if (pmdl.second->get_render_model_type() == RenderModel::STATIC) {
-            UNEXPECTED; // dynamic model can not have static model child
+            GXUNEXPECTED; // dynamic model can not have static model child
         } else {
             std::static_pointer_cast<Dynamic>(pmdl.second)->global_rotate(rm);
         }
@@ -132,17 +132,17 @@ void gearoenix::render::model::Dynamic::global_rotate(const math::Mat4x4& rm)
 
 void gearoenix::render::model::Dynamic::local_rotate(const core::Real, const math::Vec3&)
 {
-    UNIMPLEMENTED;
+    GXUNIMPLEMENTED;
 }
 
 void gearoenix::render::model::Dynamic::local_x_rotate(const core::Real)
 {
-    UNIMPLEMENTED;
+    GXUNIMPLEMENTED;
 }
 
 void gearoenix::render::model::Dynamic::local_y_rotate(const core::Real)
 {
-    UNIMPLEMENTED;
+    GXUNIMPLEMENTED;
 }
 
 void gearoenix::render::model::Dynamic::local_z_rotate(const core::Real d)
@@ -154,7 +154,7 @@ void gearoenix::render::model::Dynamic::local_z_rotate(const core::Real d)
     m.get_location(l);
     for (std::pair<const core::Id, std::shared_ptr<Model>>& pmdl : children)
         if (pmdl.second->get_render_model_type() == RenderModel::STATIC) {
-            UNEXPECTED; // dynamic model can not have static model child
+            GXUNEXPECTED; // dynamic model can not have static model child
         } else {
             physics::Transferable* cmdl = std::static_pointer_cast<Dynamic>(pmdl.second).get();
             cmdl->global_rotate(d, z_axis, l);

@@ -51,24 +51,24 @@ gearoenix::math::CubicBezierCurve2D::CubicBezierCurve2D()
 gearoenix::math::CubicBezierCurve2D::CubicBezierCurve2D(const int points_count)
     : points(points_count)
 {
-#ifdef DEBUG_MODE
+#ifdef GX_DEBUG_MODE
     if (points_count == 0)
-        UNEXPECTED;
+        GXUNEXPECTED;
 #endif
 }
 
 gearoenix::math::CubicBezierCurve2D::CubicBezierCurve2D(const int points_count, const bool smooth, const bool overlapable, const bool fast_curvable, const bool closed)
     : points(points_count)
 {
-#ifdef DEBUG_MODE
+#ifdef GX_DEBUG_MODE
     if (points_count == 0)
-        UNEXPECTED;
+        GXUNEXPECTED;
 #endif
     // only 1 case scenario from 16 is needed right now, others are todo when needed
     if (smooth && !overlapable && !fast_curvable && closed)
         create_smooth_nonoverlaping_blunt_closed();
     else
-        UNIMPLEMENTED;
+        GXUNIMPLEMENTED;
 }
 
 void gearoenix::math::CubicBezierCurve2D::normalize(const core::Real scale)

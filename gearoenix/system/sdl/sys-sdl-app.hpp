@@ -1,14 +1,10 @@
 #ifndef GEAROENIX_SYSTEM_SDL_APP_HPP
 #define GEAROENIX_SYSTEM_SDL_APP_HPP
 #include "../../core/cr-build-configuration.hpp"
-#ifdef USE_SDL
+#ifdef GX_USE_SDL
 #include "../../core/cr-types.hpp"
-#if defined(IN_IOS) || defined(IN_WINDOWS) || defined(IN_WEB) || defined(IN_MAC)
 #include <SDL.h>
-#else
-#include <SDL2/SDL.h>
-#endif
-#ifdef IN_WEB
+#ifdef GX_IN_WEB
 #include <emscripten.h>
 #endif
 namespace gearoenix {
@@ -24,7 +20,7 @@ namespace render {
 namespace system {
     class Application {
     private:
-#ifdef IN_WEB
+#ifdef GX_IN_WEB
         static Application* app;
 #endif
         const static core::Real rotate_epsilon;
@@ -46,7 +42,7 @@ namespace system {
         Application();
         ~Application();
         void execute(core::Application* app);
-#ifdef IN_WEB
+#ifdef GX_IN_WEB
         static void loop();
         void main_loop();
 #endif

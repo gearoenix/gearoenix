@@ -1,5 +1,5 @@
 #include "../game-config.hpp"
-#ifdef GAME_WCR
+#ifdef GX_GAME_WCR
 #include "../../core/cr-application.hpp"
 #include <memory>
 

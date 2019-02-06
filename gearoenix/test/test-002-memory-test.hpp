@@ -1,7 +1,7 @@
 #ifndef GEAROENIX_TEST_002
 #define GEAROENIX_TEST_002
 #include "test-config.hpp"
-#ifdef TEST002
+#ifdef GX_TEST002
 #include "../core/gc/cr-gc.hpp"
 #include <gtkmm.h>
 

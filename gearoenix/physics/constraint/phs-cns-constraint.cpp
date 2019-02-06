@@ -36,7 +36,7 @@ gearoenix::physics::constraint::Constraint* gearoenix::physics::constraint::Cons
     case PLACER:
         return new Placer(my_id, f, render_engine, c);
     default:
-        UNEXPECTED;
+        GXUNEXPECTED;
     }
 }
 

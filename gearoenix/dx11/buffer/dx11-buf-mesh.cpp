@@ -1,5 +1,5 @@
 #include "dx11-buf-mesh.hpp"
-#ifdef USE_DIRECTX11
+#ifdef GX_USE_DIRECTX11
 #include "../../core/cr-static.hpp"
 #include "../../system/stream/sys-stm-stream.hpp"
 #include "../../system/sys-log.hpp"

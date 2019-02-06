@@ -118,7 +118,7 @@ bool gearoenix::render::shader::Shader::is_shadow_caster(core::Id sid)
     case SHADELESS_D2_MATTE_NONREFLECTIVE_SHADOWLESS_TRANSPARENT:
         return false;
     default:
-        UNIMPLEMENTED;
+        GXUNIMPLEMENTED;
     }
 }
 
@@ -145,7 +145,7 @@ bool gearoenix::render::shader::Shader::is_transparent(core::Id sid)
     case SHADELESS_D2_MATTE_NONREFLECTIVE_SHADOWLESS_TRANSPARENT:
         return true;
     default:
-        UNIMPLEMENTED;
+        GXUNIMPLEMENTED;
     }
 }
 
@@ -161,7 +161,7 @@ gearoenix::core::Id gearoenix::render::shader::Shader::get_shadow_caster_shader_
     case 8:
         return DEPTH_POS_NRM_UV;
     default:
-        UNEXPECTED;
+        GXUNEXPECTED;
     }
 }
 

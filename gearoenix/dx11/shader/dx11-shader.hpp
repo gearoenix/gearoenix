@@ -1,7 +1,7 @@
 #ifndef GEAROENIX_DX11_SHADER_COMPILER_HPP
 #define GEAROENIX_DX11_SHADER_COMPILER_HPP
 #include "../../core/cr-build-configuration.hpp"
-#ifdef USE_DIRECTX11
+#ifdef GX_USE_DIRECTX11
 #include "../../render/shader/rnd-shd-shader.hpp"
 #include <d3d11.h>
 #include <string>

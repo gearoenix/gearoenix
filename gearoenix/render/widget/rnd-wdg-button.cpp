@@ -5,7 +5,7 @@
 #include "../rnd-engine.hpp"
 #include "../scene/rnd-scn-scene.hpp"
 
-#ifdef DEBUG_MODE
+#ifdef GX_DEBUG_MODE
 #define DEBUG_EFFECT
 #endif
 
@@ -37,7 +37,7 @@ void gearoenix::render::widget::Button::press_effect()
             }
         }
         if (this_mdl == nullptr)
-            UNEXPECTED;
+            GXUNEXPECTED;
         const std::shared_ptr<Button> shared_this = std::static_pointer_cast<Button>(this_mdl);
         anim = std::shared_ptr<physics::animation::Animation>(
             new physics::animation::Once(
@@ -48,7 +48,7 @@ void gearoenix::render::widget::Button::press_effect()
                     shared_this->current_size = cursz;
 #ifdef DEBUG_EFFECT
                     if (st < 0.0f || st > press_animation_time || shared_this->current_size > max_scale || max_scale_inversed > shared_this->current_size)
-                        UNEXPECTED;
+                        GXUNEXPECTED;
 #endif
                     shared_this->local_scale(scl);
                 },
@@ -65,7 +65,7 @@ void gearoenix::render::widget::Button::press_effect()
                             shared_this->current_size = cursz;
 #ifdef DEBUG_EFFECT
                             if (st < 0.0f || st > press_animation_time || shared_this->current_size > max_scale || max_scale_inversed > shared_this->current_size)
-                                UNEXPECTED;
+                                GXUNEXPECTED;
 #endif
                             shared_this->local_scale(scl);
                         },

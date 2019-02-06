@@ -76,7 +76,7 @@ gearoenix::render::model::Model* gearoenix::render::model::Model::read(core::Id 
     case RenderModel::STATIC:
         return new Static(my_id, f, e, c);
     default:
-        UNEXPECTED;
+        GXUNEXPECTED;
     }
     return nullptr;
 }

@@ -40,7 +40,7 @@ gearoenix::physics::constraint::Placer::Placer(core::Id my_id, system::stream::S
         next_position[0] = render_engine->get_system_application()->get_window_ratio() - parameters[0];
         break;
     default:
-        UNEXPECTED;
+        GXUNEXPECTED;
     }
     std::vector<core::Id> model_ids;
     f->read(model_ids);
@@ -48,7 +48,7 @@ gearoenix::physics::constraint::Placer::Placer(core::Id my_id, system::stream::S
     for (const core::Id model_id : model_ids) {
         std::shared_ptr<render::model::Model> mdl = asmgr->get_model(model_id, core::sync::EndCaller<render::model::Model>([c](std::shared_ptr<render::model::Model>) -> void {}));
         if (render::model::Model::RenderModel::STATIC == mdl->get_render_model_type())
-            UNEXPECTED;
+            GXUNEXPECTED;
         models[model_id] = std::static_pointer_cast<render::model::Dynamic>(mdl);
     }
 }
@@ -82,7 +82,7 @@ void gearoenix::physics::constraint::Placer::apply(core::Real delta_time)
         break;
     }
     default:
-        UNEXPECTED;
+        GXUNEXPECTED;
     }
     position = next_position;
 }
@@ -107,7 +107,7 @@ void gearoenix::physics::constraint::Placer::on_event(const core::event::Event& 
         next_position[0] = screen_ratio - parameters[0];
         break;
     default:
-        UNEXPECTED;
+        GXUNEXPECTED;
     }
 }
 

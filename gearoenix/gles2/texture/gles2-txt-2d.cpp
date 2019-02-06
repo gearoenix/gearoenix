@@ -1,5 +1,5 @@
 #include "gles2-txt-2d.hpp"
-#ifdef USE_OPENGL_ES2
+#ifdef GX_USE_OPENGL_ES2
 #include "../../render/texture/rnd-txt-png.hpp"
 #include "../../system/sys-log.hpp"
 #include "../gles2-engine.hpp"

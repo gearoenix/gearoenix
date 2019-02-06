@@ -32,45 +32,45 @@ void gearoenix::core::event::Event::take()
 
 const gearoenix::core::event::button::Button& gearoenix::core::event::Event::to_button() const
 {
-#ifdef DEBUG_MODE
+#ifdef GX_DEBUG_MODE
     if (From::BUTTON != event_type)
-        UNEXPECTED;
+        GXUNEXPECTED;
 #endif
     return *static_cast<const button::Button*>(this);
 }
 
 const gearoenix::core::event::movement::Movement& gearoenix::core::event::Event::to_movement() const
 {
-#ifdef DEBUG_MODE
+#ifdef GX_DEBUG_MODE
     if (From::MOVEMENT != event_type)
-        UNEXPECTED;
+        GXUNEXPECTED;
 #endif
     return *static_cast<const movement::Movement*>(this);
 }
 
 const gearoenix::core::event::system::System& gearoenix::core::event::Event::to_system() const
 {
-#ifdef DEBUG_MODE
+#ifdef GX_DEBUG_MODE
     if (From::SYSTEM != event_type)
-        UNEXPECTED;
+        GXUNEXPECTED;
 #endif
     return *static_cast<const system::System*>(this);
 }
 
 const gearoenix::core::event::ui::Ui& gearoenix::core::event::Event::to_ui() const
 {
-#ifdef DEBUG_MODE
+#ifdef GX_DEBUG_MODE
     if (From::UI != event_type)
-        UNEXPECTED;
+        GXUNEXPECTED;
 #endif
     return *static_cast<const ui::Ui*>(this);
 }
 
 const gearoenix::core::event::WindowResize& gearoenix::core::event::Event::to_window_resize() const
 {
-#ifdef DEBUG_MODE
+#ifdef GX_DEBUG_MODE
     if (From::WINDOW_RESIZE != event_type)
-        UNEXPECTED;
+        GXUNEXPECTED;
 #endif
     return *static_cast<const event::WindowResize*>(this);
 }

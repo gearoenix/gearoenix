@@ -86,7 +86,7 @@ void gearoenix::math::Vec2::operator/=(const Vec2& a)
 
 const gearoenix::core::Real& gearoenix::math::Vec2::operator[](const unsigned int i) const
 {
-#ifdef DEBUG_MODE
+#ifdef GX_DEBUG_MODE
     if (i > 1)
         GXLOGF("Out of range access");
 #endif
@@ -95,7 +95,7 @@ const gearoenix::core::Real& gearoenix::math::Vec2::operator[](const unsigned in
 
 gearoenix::core::Real& gearoenix::math::Vec2::operator[](const unsigned int i)
 {
-#ifdef DEBUG_MODE
+#ifdef GX_DEBUG_MODE
     if (i > 1)
         GXLOGF("Out of range access");
 #endif
@@ -342,7 +342,7 @@ void gearoenix::math::Vec3::operator/=(const core::Real a)
 
 const gearoenix::core::Real& gearoenix::math::Vec3::operator[](const unsigned int i) const
 {
-#ifdef DEBUG_MODE
+#ifdef GX_DEBUG_MODE
     if (i > 2) {
         GXLOGF("Out of range access");
     }
@@ -352,7 +352,7 @@ const gearoenix::core::Real& gearoenix::math::Vec3::operator[](const unsigned in
 
 gearoenix::core::Real& gearoenix::math::Vec3::operator[](const unsigned int i)
 {
-#ifdef DEBUG_MODE
+#ifdef GX_DEBUG_MODE
     if (i > 2) {
         GXLOGF("Out of range access");
     }
@@ -499,7 +499,7 @@ void gearoenix::math::Vec4::w(core::Real e)
 
 const gearoenix::core::Real& gearoenix::math::Vec4::operator[](const unsigned int i) const
 {
-#ifdef DEBUG_MODE
+#ifdef GX_DEBUG_MODE
     if (i > 3)
         GXLOGF("Out of range access");
 #endif
@@ -508,7 +508,7 @@ const gearoenix::core::Real& gearoenix::math::Vec4::operator[](const unsigned in
 
 gearoenix::core::Real& gearoenix::math::Vec4::operator[](const unsigned int i)
 {
-#ifdef DEBUG_MODE
+#ifdef GX_DEBUG_MODE
     if (i > 3)
         GXLOGF("Out of range access");
 #endif

@@ -179,9 +179,9 @@ void gearoenix::math::Mat4x4::operator*=(const Mat4x4& m)
 
 const gearoenix::core::Real& gearoenix::math::Mat4x4::operator[](const unsigned int i) const
 {
-#ifdef DEBUG_MODE
+#ifdef GX_DEBUG_MODE
     if (i > 15) {
-        UNEXPECTED;
+        GXUNEXPECTED;
     }
 #endif
     return mat[i];
@@ -189,9 +189,9 @@ const gearoenix::core::Real& gearoenix::math::Mat4x4::operator[](const unsigned 
 
 gearoenix::core::Real& gearoenix::math::Mat4x4::operator[](const unsigned int i)
 {
-#ifdef DEBUG_MODE
+#ifdef GX_DEBUG_MODE
     if (i > 15) {
-        UNEXPECTED;
+        GXUNEXPECTED;
     }
 #endif
     return mat[i];
@@ -391,7 +391,7 @@ gearoenix::math::Mat4x4 gearoenix::math::Mat4x4::translator(const Vec3& v)
 
 gearoenix::math::Mat4x4 gearoenix::math::Mat4x4::orthographic(core::Real width, core::Real height, core::Real near, core::Real far)
 {
-#ifdef IN_WINDOWS
+#ifdef GX_IN_WINDOWS
     Mat4x4 r;
     r.mat[0] = core::Real(2.0 / width);
     r.mat[1] = core::Real(0.0);
@@ -434,7 +434,7 @@ gearoenix::math::Mat4x4 gearoenix::math::Mat4x4::orthographic(core::Real width, 
 
 gearoenix::math::Mat4x4 gearoenix::math::Mat4x4::perspective(core::Real width, core::Real height, core::Real near, core::Real far)
 {
-#ifdef IN_WINDOWS
+#ifdef GX_IN_WINDOWS
     Mat4x4 r;
     r.mat[0] = core::Real((2.0 * near) / width);
     r.mat[1] = core::Real(0.0);

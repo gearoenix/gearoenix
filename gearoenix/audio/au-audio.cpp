@@ -9,7 +9,7 @@ gearoenix::audio::Audio::Audio(core::Id my_id, system::stream::Stream* f)
 {
     std::vector<uint8_t> bytes;
     f->read(bytes);
-    TODO;
+    GXTODO;
 }
 
 gearoenix::audio::Audio::~Audio() {}
@@ -24,5 +24,5 @@ gearoenix::audio::Audio* gearoenix::audio::Audio::read(core::Id my_id, system::s
     case 20:
         return new Speaker(my_id, f);
     }
-    UNEXPECTED;
+    GXUNEXPECTED;
 }

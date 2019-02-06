@@ -21,7 +21,7 @@ gearoenix::render::mesh::Mesh* gearoenix::render::mesh::Mesh::read(core::Id my_i
     case Geo::BASIC:
         return new Mesh(my_id, f, e, c);
     default:
-        UNEXPECTED;
+        GXUNEXPECTED;
     }
     return nullptr;
 }

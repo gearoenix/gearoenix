@@ -5,13 +5,13 @@
 #include <string>
 #include <vector>
 
-#if defined(IN_DESKTOP) || defined(IN_IOS) || defined(IN_WEB)
-#define USE_STD_FILE
+#if defined(GX_IN_DESKTOP) || defined(GX_IN_IOS) || defined(GX_IN_WEB)
+#define GX_USE_STD_FILE
 #endif
 
-#ifdef USE_STD_FILE
+#ifdef GX_USE_STD_FILE
 #include <fstream>
-#elif defined(IN_ANDROID)
+#elif defined(GX_IN_ANDROID)
 #include <android/asset_manager.h>
 #else
 #error "Not implemented yet!"
@@ -22,13 +22,13 @@ namespace system {
     namespace stream {
         class Asset : public Stream {
         private:
-#ifdef USE_STD_FILE
+#ifdef GX_USE_STD_FILE
             std::ifstream file;
-#elif defined(IN_ANDROID)
+#elif defined(GX_IN_ANDROID)
             //system::Application* sys_app;
             AAsset* file;
 #else
-#error "Not implemented yet!"
+#error "File usage is not specified!"
 #endif
             bool is_endian_compatible = true;
             void check_endian_compatibility();

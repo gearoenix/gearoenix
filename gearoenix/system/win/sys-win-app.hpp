@@ -1,7 +1,7 @@
 #ifndef GEAROENIX_SYSTEM_WINDOWS_APPLICATION_HPP
 #define GEAROENIX_SYSTEM_WINDOWS_APPLICATION_HPP
 #include "../../core/cr-build-configuration.hpp"
-#ifdef USE_WINAPI
+#ifdef GX_USE_WINAPI
 #include "../../core/cr-types.hpp"
 #include <Windows.h>
 namespace gearoenix {

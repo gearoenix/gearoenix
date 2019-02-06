@@ -1,7 +1,7 @@
 #ifndef GEAROENIX_GLES2_SHADER_DIRECTIONAL_D2_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE_HPP
 #define GEAROENIX_GLES2_SHADER_DIRECTIONAL_D2_SPECULATED_NONREFLECTIVE_SHADOWLESS_OPAQUE_HPP
 #include "../../core/cr-build-configuration.hpp"
-#ifdef USE_OPENGL_ES2
+#ifdef GX_USE_OPENGL_ES2
 #include "../../render/material/rnd-mat-directional-d2-speculated-nonreflective-shadowless-opaque.hpp"
 #include "../gles2.hpp"
 #include "gles2-shader.hpp"

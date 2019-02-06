@@ -19,7 +19,7 @@ gearoenix::dx11::pipeline::Pipeline::~Pipeline()
 void gearoenix::dx11::pipeline::Pipeline::bind()
 {
     shd->use();
-    TODO;
+    GXTODO;
 }
 
 #endif

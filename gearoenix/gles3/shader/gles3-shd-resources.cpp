@@ -17,7 +17,7 @@ gearoenix::gles3::shader::Resources::~Resources()
 
 void gearoenix::gles3::shader::Resources::bind()
 {
-    UNIMPLEMENTED;
+    GXUNIMPLEMENTED;
 }
 
 #endif

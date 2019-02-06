@@ -245,8 +245,8 @@ void gearoenix::render::Engine::update()
 
 void gearoenix::render::Engine::terminate()
 {
-    // TODO think about todos
-    // TODO think about cleanups
+    // GXTODO think about todos
+    // GXTODO think about cleanups
     logical_device->wait_to_finish();
     for (buffer::Manager* u : uvbufmgr)
         delete u;

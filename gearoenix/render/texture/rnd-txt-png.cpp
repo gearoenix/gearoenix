@@ -10,7 +10,7 @@
 
 #define GEAROENIX_PNG_SIGNATURE_SIZE 8
 
-#ifdef DEBUG_MODE
+#ifdef GX_DEBUG_MODE
 #define GEAROENIX_PNG_DEC_DEBUG
 #endif
 

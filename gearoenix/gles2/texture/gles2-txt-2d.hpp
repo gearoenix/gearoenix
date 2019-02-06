@@ -1,7 +1,7 @@
 #ifndef GEAROENIX_OPENGL_TEXTURE_2D_HPP
 #define GEAROENIX_OPENGL_TEXTURE_2D_HPP
 #include "../../core/cr-build-configuration.hpp"
-#ifdef USE_OPENGL_ES2
+#ifdef GX_USE_OPENGL_ES2
 #include "../../render/texture/rnd-txt-texture-2d.hpp"
 #include "../gles2.hpp"
 #include <memory>

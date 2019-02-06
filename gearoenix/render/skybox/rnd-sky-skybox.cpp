@@ -27,7 +27,7 @@ gearoenix::render::skybox::Skybox* gearoenix::render::skybox::Skybox::read(core:
         return new Skybox(my_id, s, e, c);
         break;
     default:
-        UNEXPECTED;
+        GXUNEXPECTED;
     }
 }
 

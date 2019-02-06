@@ -1,11 +1,11 @@
 #ifndef GEAROENIX_SYSTEM_LOG_HPP
 #define GEAROENIX_SYSTEM_LOG_HPP
 #include "../core/cr-build-configuration.hpp"
-#ifdef LOG_ENABLED
+#ifdef GX_LOG_ENABLED
 #include <exception>
-#ifdef IN_ANDROID
+#ifdef GX_IN_ANDROID
 #include "android/sys-and-log.hpp"
-#elif defined(IN_WEB)
+#elif defined(GX_IN_WEB)
 #include <iostream>
 #define GXLOGI(s)                                                       \
     std::cout << APPLICATION_NAME << " " << s << " " << __FILE__ << " " \
@@ -33,17 +33,17 @@ namespace system {
 }
 #define GXLOGI(s)                                                                 \
     {                                                                             \
-        gearoenix::system::Log::info << APPLICATION_NAME << " " << s << " "       \
+        gearoenix::system::Log::info << GX_APP_NAME << " " << s << " "       \
                                      << __FILE__ << " " << __LINE__ << std::endl; \
     }
 #define GXLOGD(s)                                                                  \
     {                                                                              \
-        gearoenix::system::Log::debug << APPLICATION_NAME << " " << s << " "       \
+        gearoenix::system::Log::debug << GX_APP_NAME << " " << s << " "       \
                                       << __FILE__ << " " << __LINE__ << std::endl; \
     }
 #define GXLOGE(s)                                                                  \
     {                                                                              \
-        gearoenix::system::Log::error << APPLICATION_NAME << " " << s << " "       \
+        gearoenix::system::Log::error << GX_APP_NAME << " " << s << " "       \
                                       << __FILE__ << " " << __LINE__ << std::endl; \
     }
 #define GXLOGF(s)         \
@@ -52,20 +52,20 @@ namespace system {
         std::terminate(); \
     }
 #endif // IN_ANDROID
-#define TODO GXLOGE("TODO")
-#define UNEXPECTED GXLOGF("Unexpected")
-#define UNIMPLEMENTED GXLOGF("Unimplemented")
+#define GXTODO GXLOGE("TODO")
+#define GXUNEXPECTED GXLOGF("Unexpected")
+#define GXUNIMPLEMENTED GXLOGF("Unimplemented")
 #define GXASSERT(x) \
     if ((x) == 0)   \
-    UNEXPECTED
+    GXUNEXPECTED
 #define GXREACHED GXLOGI("REACHED-------------------------------------------")
-#else // LOG_ENABLED
+#else // GX_LOG_ENABLED
 #define GXLOGI(s) ;
 #define GXLOGD(s) ;
 #define GXLOGE(s) ;
 #define GXLOGF(s) std::terminate();
-#define TODO ;
-#define UNEXPECTED std::terminate();
-#define UNIMPLEMENTED std::terminate();
+#define GXTODO ;
+#define GXUNEXPECTED std::terminate();
+#define GXUNIMPLEMENTED std::terminate();
 #endif // LOG_ENABLED
 #endif // GEAROENIX_SYSTEM_LOG_HPP

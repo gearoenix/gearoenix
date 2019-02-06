@@ -1,5 +1,5 @@
 #include "gles2-buf-uniform.hpp"
-#ifdef USE_OPENGL_ES2
+#ifdef GX_USE_OPENGL_ES2
 #include "../../system/sys-log.hpp"
 #include "../gles2-engine.hpp"
 #include <cstring>

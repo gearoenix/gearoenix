@@ -29,9 +29,9 @@ gearoenix::core::event::button::Button::ActionType gearoenix::core::event::butto
 
 const gearoenix::core::event::button::Mouse& gearoenix::core::event::button::Button::to_mouse() const
 {
-#ifdef DEBUG_MODE
+#ifdef GX_DEBUG_MODE
     if (MOUSE != button_type)
-        UNEXPECTED;
+        GXUNEXPECTED;
 #endif
     return *static_cast<const Mouse*>(this);
 }

@@ -149,7 +149,7 @@ void gearoenix::render::camera::Camera::global_rotate(const core::Real rad, cons
 
 void gearoenix::render::camera::Camera::global_rotate(const math::Mat4x4& rm)
 {
-    UNEXPECTED; // it has performance penalty
+    GXUNEXPECTED; // it has performance penalty
     math::Mat4x4 irot = rm.inversed();
     x_axis = irot * x_axis;
     y_axis = irot * y_axis;
@@ -178,7 +178,7 @@ void gearoenix::render::camera::Camera::get_location(math::Vec3& location) const
 
 void gearoenix::render::camera::Camera::set_location(const math::Vec3&)
 {
-    UNIMPLEMENTED;
+    GXUNIMPLEMENTED;
 }
 
 void gearoenix::render::camera::Camera::look_at(const math::Vec3& target, const math::Vec3& up)
@@ -214,10 +214,10 @@ void gearoenix::render::camera::Camera::on_event(const core::event::Event& e)
 
 void gearoenix::render::camera::Camera::global_scale(const core::Real)
 {
-    UNEXPECTED;
+    GXUNEXPECTED;
 }
 
 void gearoenix::render::camera::Camera::local_scale(const core::Real)
 {
-    UNEXPECTED;
+    GXUNEXPECTED;
 }

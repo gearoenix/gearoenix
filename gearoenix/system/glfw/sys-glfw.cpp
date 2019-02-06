@@ -23,40 +23,40 @@ void gearoenix::system::Application::on_key_event(GLFWwindow* window, int key, i
             glfwSetWindowShouldClose(window, GL_TRUE);
             break;
         case (GLFW_KEY_F1):
-            TODO;
+            GXTODO;
             break;
         case (GLFW_KEY_F2):
-            TODO;
+            GXTODO;
             break;
         case (GLFW_KEY_W):
-            TODO;
+            GXTODO;
             break;
         case (GLFW_KEY_A):
-            TODO;
+            GXTODO;
             break;
         case (GLFW_KEY_S):
-            TODO;
+            GXTODO;
             break;
         case (GLFW_KEY_D):
-            TODO;
+            GXTODO;
             break;
         case (GLFW_KEY_UP):
-            TODO;
+            GXTODO;
             break;
         case (GLFW_KEY_DOWN):
-            TODO;
+            GXTODO;
             break;
         case (GLFW_KEY_LEFT):
-            TODO;
+            GXTODO;
             break;
         case (GLFW_KEY_RIGHT):
-            TODO;
+            GXTODO;
             break;
         case (GLFW_KEY_PAGE_UP):
-            TODO;
+            GXTODO;
             break;
         case (GLFW_KEY_PAGE_DOWN):
-            TODO;
+            GXTODO;
             break;
         default:
             break;
@@ -67,28 +67,28 @@ void gearoenix::system::Application::on_key_event(GLFWwindow* window, int key, i
         case (GLFW_KEY_ESCAPE):
             break;
         case (GLFW_KEY_W):
-            TODO;
+            GXTODO;
             break;
         case (GLFW_KEY_A):
-            TODO;
+            GXTODO;
             break;
         case (GLFW_KEY_S):
-            TODO;
+            GXTODO;
             break;
         case (GLFW_KEY_D):
-            TODO;
+            GXTODO;
             break;
         case (GLFW_KEY_UP):
-            TODO;
+            GXTODO;
             break;
         case (GLFW_KEY_DOWN):
-            TODO;
+            GXTODO;
             break;
         case (GLFW_KEY_LEFT):
-            TODO;
+            GXTODO;
             break;
         case (GLFW_KEY_RIGHT):
-            TODO;
+            GXTODO;
             break;
         default:
             break;
@@ -103,7 +103,7 @@ void gearoenix::system::Application::on_key_event(GLFWwindow* window, int key, i
 
 void gearoenix::system::Application::on_mouse_key_event(GLFWwindow*, int, int, int)
 {
-    TODO;
+    GXTODO;
     //    (void) window;
     //    (void) mods;
     //    float ex = float(((lastCursorXposition / windowWidth) - 0.5f) * (windowWidth / windowHeight));
@@ -153,7 +153,7 @@ void gearoenix::system::Application::on_mouse_key_event(GLFWwindow*, int, int, i
 
 void gearoenix::system::Application::on_cursor_move_event(GLFWwindow*, double, double)
 {
-    TODO;
+    GXTODO;
     //    (void) window;
     //    float ex = float(((x / windowWidth) - 0.5f) * (windowWidth / windowHeight));
     //    float ey = float(-((y / windowHeight) - 0.5f));
@@ -172,7 +172,7 @@ void gearoenix::system::Application::on_cursor_move_event(GLFWwindow*, double, d
 
 void gearoenix::system::Application::on_scroll(GLFWwindow*, double, double)
 {
-    TODO;
+    GXTODO;
     //    application->zoom(float(y));
 }
 
@@ -180,7 +180,7 @@ void gearoenix::system::Application::on_change_size_event(GLFWwindow* winid, int
 {
     event_mapper[winid]->win_width = w;
     event_mapper[winid]->win_height = h;
-    TODO;
+    GXTODO;
 }
 
 gearoenix::system::Application::Application()
@@ -227,7 +227,7 @@ gearoenix::system::Application::Application()
 
 gearoenix::system::Application::~Application()
 {
-    TODO;
+    GXTODO;
 }
 
 void gearoenix::system::Application::execute(core::Application* app)

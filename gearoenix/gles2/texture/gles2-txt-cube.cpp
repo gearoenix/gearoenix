@@ -1,23 +1,23 @@
 #include "gles2-txt-cube.hpp"
-#ifdef USE_OPENGL_ES2
+#ifdef GX_USE_OPENGL_ES2
 #include "../../render/texture/rnd-txt-png.hpp"
 #include "../../system/stream/sys-stm-stream.hpp"
 #include "../../system/sys-log.hpp"
 #include "../gles2-engine.hpp"
 
-#define FACES_COUNT 6
+#define GX_FACES_COUNT 6
 
 gearoenix::gles2::texture::Cube::Cube(core::Id my_id, system::stream::Stream* file, Engine* eng, core::sync::EndCaller<core::sync::EndCallerIgnore> end)
     : render::texture::Cube(my_id, eng)
 {
-    std::vector<std::vector<unsigned char>> img_data(FACES_COUNT);
+    std::vector<std::vector<unsigned char>> img_data(GX_FACES_COUNT);
     unsigned int imgw, imgh;
     render::texture::PNG::decode(file, img_data[0], imgw, imgh);
-    for (int i = 1; i < FACES_COUNT; ++i) {
+    for (int i = 1; i < GX_FACES_COUNT; ++i) {
         unsigned int iimgw, iimgh;
         render::texture::PNG::decode(file, img_data[i], iimgw, iimgh);
         if (iimgw != imgw || iimgh != imgh)
-            UNEXPECTED;
+			GXUNEXPECTED;
     }
     static const GLenum faces[] = {
         GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
@@ -32,15 +32,15 @@ gearoenix::gles2::texture::Cube::Cube(core::Id my_id, system::stream::Stream* fi
         glBindTexture(GL_TEXTURE_CUBE_MAP, texture_object);
         glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        //CHECK_FOR_GRAPHIC_API_ERROR
+        //GX_CHECK_FOR_GRAPHIC_API_ERROR
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); //GL_MllIRRORED_REPEAT
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        for (int i = 0; i < FACES_COUNT; ++i) {
+        for (int i = 0; i < GX_FACES_COUNT; ++i) {
             glTexImage2D(faces[i], 0, GL_RGBA, imgw, imgh, 0, GL_RGBA, GL_UNSIGNED_BYTE, (void*)img_data[i].data());
         }
         glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
         glGetError();
-        //CHECK_FOR_GRAPHIC_API_ERROR
+        //GX_CHECK_FOR_GRAPHIC_API_ERROR
         (void)end;
     };
     eng->add_load_function(loadf);

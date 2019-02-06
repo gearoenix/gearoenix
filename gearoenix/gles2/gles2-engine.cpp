@@ -1,5 +1,5 @@
 #include "gles2-engine.hpp"
-#ifdef USE_OPENGL_ES2
+#ifdef GX_USE_OPENGL_ES2
 #include "../core/asset/cr-asset-manager.hpp"
 #include "../core/event/cr-ev-event.hpp"
 #include "../core/event/cr-ev-sys-system.hpp"
@@ -52,7 +52,7 @@ void gearoenix::gles2::Engine::initialize()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, shadow_map_color, 0);
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-        UNEXPECTED;
+		GXUNEXPECTED;
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
     glEnable(GL_BLEND);
@@ -65,7 +65,7 @@ void gearoenix::gles2::Engine::initialize()
     glBindRenderbuffer(GL_RENDERBUFFER, render_depth);
     glBindFramebuffer(GL_FRAMEBUFFER, render_framebuffer);
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-        UNEXPECTED;
+        GXUNEXPECTED;
     shadow_map_texture = new texture::Texture2D(sysapp->get_asset_manager()->create_id(), shadow_map_color, this);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
@@ -95,12 +95,12 @@ gearoenix::gles2::Engine::~Engine()
 
 void gearoenix::gles2::Engine::window_changed()
 {
-    TODO;
+    GXTODO;
 }
 
 void gearoenix::gles2::Engine::update()
 {
-    CHECK_FOR_GRAPHIC_API_ERROR;
+    GX_CHECK_FOR_GRAPHIC_API_ERROR;
     glClear(GL_COLOR_BUFFER_BIT);
     do_load_functions();
     physics_engine->wait();
@@ -210,7 +210,7 @@ gearoenix::render::shader::Shader* gearoenix::gles2::Engine::create_shader(core:
     case render::shader::SKYBOX_BASIC:
         return new shader::SkyboxBasic(sid, this, c);
     default:
-        UNEXPECTED;
+        GXUNEXPECTED;
     }
 }
 
@@ -254,7 +254,7 @@ gearoenix::render::shader::Resources* gearoenix::gles2::Engine::create_shader_re
     case render::shader::SKYBOX_BASIC:
         return new shader::SkyboxBasic::Resources(this, pip, u);
     default:
-        UNEXPECTED;
+        GXUNEXPECTED;
     }
 }
 

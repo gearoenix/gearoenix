@@ -1,7 +1,7 @@
 #include "../core/cr-build-configuration.hpp"
-#ifdef USE_OPENGL_ES3
-#ifdef USE_SDL
-#ifdef IN_LINUX // for sdl platforms
+#ifdef GX_USE_OPENGL_ES3
+#ifdef GX_USE_SDL
+#ifdef GX_IN_LINUX // for sdl platforms
 #define GL_GLEXT_PROTOTYPES 1
 #include <SDL2/SDL_opengl.h>
 #elif defined(IN_DESKTOP)

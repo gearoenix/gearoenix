@@ -1,7 +1,7 @@
 #ifndef GEAROENIX_SYSTEM_GLFW_APP_HPP
 #define GEAROENIX_SYSTEM_GLFW_APP_HPP
 #include "../../core/cr-build-configuration.hpp"
-#ifdef USE_GLFW
+#ifdef GX_USE_GLFW
 #include "../../core/cr-types.hpp"
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>

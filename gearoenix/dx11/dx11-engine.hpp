@@ -1,13 +1,13 @@
 #ifndef GEAROENIX_DIRECTX11_ENGINE_HPP
 #define GEAROENIX_DIRECTX11_ENGINE_HPP
 #include "../core/cr-build-configuration.hpp"
-#ifdef USE_DIRECTX11
+#ifdef GX_USE_DIRECTX11
 #include "../render/rnd-engine.hpp"
 #include <d3d11.h>
 #include <d3dcommon.h>
 #include <dxgi.h>
 #include <memory>
-#ifdef PROFILING_MODE
+#ifdef GX_PROFILING_MODE
 #include <chrono>
 #endif
 namespace gearoenix {
@@ -43,7 +43,7 @@ namespace dx11 {
         void initial_shadow();
         void start_shadow_casting();
         void terminate_shadow();
-#ifdef PROFILING_MODE
+#ifdef GX_PROFILING_MODE
         unsigned int prof_frames_count = 0;
         std::chrono::high_resolution_clock::time_point prof_last_time_draw;
         double prof_frames_time = 0.0;

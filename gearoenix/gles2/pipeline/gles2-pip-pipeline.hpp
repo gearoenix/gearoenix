@@ -1,7 +1,7 @@
 #ifndef GEAROENIX_GLES2_PIPELINE_PIPELINE_HPP
 #define GEAROENIX_GLES2_PIPELINE_PIPELINE_HPP
 #include "../../core/cr-build-configuration.hpp"
-#ifdef USE_OPENGL_ES2
+#ifdef GX_USE_OPENGL_ES2
 #include "../../render/pipeline/rnd-pip-pipeline.hpp"
 #include <memory>
 namespace gearoenix {

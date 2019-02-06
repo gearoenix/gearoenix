@@ -1,5 +1,5 @@
 #include "game-wcr-main.hpp"
-#ifdef GAME_WCR
+#ifdef GX_GAME_WCR
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../core/event/cr-ev-bt-mouse.hpp"
 #include "../../core/event/cr-ev-mv-mouse.hpp"

@@ -20,6 +20,6 @@ gearoenix::physics::collider::Collider* gearoenix::physics::collider::Collider::
     case Type::MESH:
         return new Mesh(in);
     default:
-        UNEXPECTED;
+        GXUNEXPECTED;
     }
 }

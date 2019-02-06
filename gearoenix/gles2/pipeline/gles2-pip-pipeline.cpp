@@ -1,5 +1,5 @@
 #include "gles2-pip-pipeline.hpp"
-#ifdef USE_OPENGL_ES2
+#ifdef GX_USE_OPENGL_ES2
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../system/sys-app.hpp"
 #include "../../system/sys-log.hpp"

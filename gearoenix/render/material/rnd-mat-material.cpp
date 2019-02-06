@@ -74,6 +74,6 @@ gearoenix::render::material::Material* gearoenix::render::material::Material::re
     case shader::SKYBOX_BASIC:
         return new SkyboxBasic(f, e, end);
     default:
-        UNIMPLEMENTED;
+        GXUNIMPLEMENTED;
     }
 }

@@ -11,9 +11,9 @@ gearoenix::core::Count gearoenix::system::stream::Memory::read(void* d, core::Co
 {
     const core::Count sz = length + index;
     const core::Count result = sz > mem_data.size() ? mem_data.size() - index : length;
-#ifdef DEBUG_MODE
+#ifdef GX_DEBUG_MODE
     if (0 == result)
-        UNEXPECTED;
+        GXUNEXPECTED;
 #endif
     std::memcpy(d, &(mem_data[index]), result);
     index += result;
@@ -39,9 +39,9 @@ gearoenix::core::Count gearoenix::system::stream::Memory::write(const void* d, c
 
 void gearoenix::system::stream::Memory::seek(core::Count offset)
 {
-#ifdef DEBUG_MODE
+#ifdef GX_DEBUG_MODE
     if (offset > mem_data.size())
-        UNEXPECTED;
+        GXUNEXPECTED;
 #endif
     index = offset;
 }

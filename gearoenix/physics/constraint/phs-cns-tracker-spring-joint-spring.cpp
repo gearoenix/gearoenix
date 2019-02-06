@@ -13,7 +13,7 @@
 gearoenix::physics::constraint::TrackerSpringJointSpring::TrackerSpringJointSpring(core::Id my_id, system::stream::Stream*, render::Engine*, core::sync::EndCaller<core::sync::EndCallerIgnore>)
     : Constraint(my_id, TRACKER_SPRING_JOINT_SPRING)
 {
-    UNIMPLEMENTED;
+    GXUNIMPLEMENTED;
 }
 
 gearoenix::physics::constraint::TrackerSpringJointSpring::TrackerSpringJointSpring(core::Id my_id, const std::shared_ptr<body::Rigid> active, const std::shared_ptr<body::Rigid> passive, const core::Real k, const math::Vec3& angle, const core::Real joint_k, const core::Real length)

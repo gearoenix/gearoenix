@@ -1,23 +1,23 @@
 #include "../core/cr-build-configuration.hpp"
-#ifdef USE_OPENGL_ES2
-#ifdef USE_SDL
-#ifdef IN_LINUX
-#include <SDL2/SDL_opengles2.h>
-#elif defined(IN_MAC)
-#define GL_GLEXT_PROTOTYPES 1
-#include <SDL_opengl.h>
-#elif defined(IN_IOS) || defined(IN_WEB)
-#include <SDL_opengles2.h>
-#endif
-#elif defined(USE_GLFW)
+#ifdef GX_USE_OPENGL_ES2
+
+// Declaring gl data
+#if defined(GX_IN_DESKTOP)
+#define GLEW_STATIC 
 #include <GL/glew.h>
-#elif defined(IN_ANDROID)
-#include <GLContext.h>
+#include <SDL_opengl.h>
+#elif defined(GX_IN_IOS) || defined(GX_IN_WEB) || defined(GX_IN_ANDROID)
+#include <SDL_opengles2.h>
 #else
-#error "Not implemented yet!"
+#error "Unexpected platform! Other platforms are not implemented yet."
 #endif
-#ifdef DEBUG_MODE
-#define CHECK_FOR_GRAPHIC_API_ERROR                     \
+
+#ifdef GX_DEBUG_MODE
+#define GX_DEBUG_GLES2
+#endif
+
+#ifdef GX_DEBUG_GLES2
+#define GX_CHECK_FOR_GRAPHIC_API_ERROR                  \
     switch (glGetError()) {                             \
     case GL_NO_ERROR:                                   \
         break;                                          \
@@ -34,8 +34,10 @@
     default:                                            \
         GXLOGF("Unknown error.");                       \
     }
-#define GLES2_PROFILING
 #else
-#define CHECK_FOR_GRAPHIC_API_ERROR
-#endif // debug mode
+#define GX_CHECK_FOR_GRAPHIC_API_ERROR
+#endif
+
+#define GX_GLES2_PROFILING
+
 #endif // opengl es 2

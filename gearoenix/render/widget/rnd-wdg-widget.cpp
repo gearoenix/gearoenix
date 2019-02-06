@@ -34,7 +34,7 @@ gearoenix::render::widget::Widget* gearoenix::render::widget::Widget::read(core:
     case TEXT:
         return new Text(my_id, f, e, c);
     default:
-        UNEXPECTED;
+        GXUNEXPECTED;
     }
     return nullptr;
 }

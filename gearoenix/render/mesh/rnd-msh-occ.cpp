@@ -8,7 +8,7 @@ gearoenix::render::mesh::Occ::Occ(system::stream::Stream* f, Engine* e, core::sy
 {
     shader::Id sid;
     f->read(sid);
-#ifdef DEBUG_MODE
+#ifdef GX_DEBUG_MODE
     if (sid != shader::DEPTH_POS) {
         GXLOGF("Unexpected");
     }

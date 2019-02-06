@@ -1,7 +1,7 @@
 #ifndef GEAROENIX_SYSTEM_ANDROID_LOG_HPP
 #define GEAROENIX_SYSTEM_ANDROID_LOG_HPP
 #include "../../core/cr-build-configuration.hpp"
-#ifdef IN_ANDROID
+#ifdef GX_IN_ANDROID
 #include <android/log.h>
 #include <sstream>
 

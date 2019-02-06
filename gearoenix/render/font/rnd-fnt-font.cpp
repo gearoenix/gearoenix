@@ -21,10 +21,10 @@ gearoenix::render::font::Font* gearoenix::render::font::Font::read(core::Id font
         return new Font2D(font_id, f, e, c);
         break;
     case Shape::D3:
-        UNIMPLEMENTED;
+        GXUNIMPLEMENTED;
         break;
     default:
-        UNEXPECTED;
+        GXUNEXPECTED;
     }
     return nullptr;
 }

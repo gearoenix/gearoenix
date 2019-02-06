@@ -1,5 +1,5 @@
 #include "dx11-buf-uniform.hpp"
-#ifdef USE_DIRECTX11
+#ifdef GX_USE_DIRECTX11
 #include "../../core/cr-static.hpp"
 #include "../../system/sys-log.hpp"
 #include "../dx11-check.hpp"

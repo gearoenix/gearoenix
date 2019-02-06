@@ -1,5 +1,5 @@
 #include "dx11-engine.hpp"
-#ifdef USE_DIRECTX11
+#ifdef GX_USE_DIRECTX11
 #include "../core/asset/cr-asset-manager.hpp"
 #include "../core/cr-static.hpp"
 #include "../core/event/cr-ev-window-resize.hpp"
@@ -346,7 +346,7 @@ bool gearoenix::dx11::Engine::is_supported()
 
 void gearoenix::dx11::Engine::window_changed()
 {
-    TODO;
+    GXTODO;
 }
 
 void gearoenix::dx11::Engine::update()
@@ -445,7 +445,7 @@ gearoenix::render::shader::Shader* gearoenix::dx11::Engine::create_shader(core::
     case render::shader::Id::SKYBOX_BASIC:
         return new shader::SkyboxBasic(sid, this, c);
     default:
-        UNIMPLEMENTED;
+        GXUNIMPLEMENTED;
         break;
     }
     return nullptr;
@@ -485,7 +485,7 @@ gearoenix::render::shader::Resources* gearoenix::dx11::Engine::create_shader_res
     case render::shader::Id::SKYBOX_BASIC:
         return new shader::SkyboxBasic::Resources(this, pip, u);
     default:
-        UNIMPLEMENTED;
+        GXUNIMPLEMENTED;
         break;
     }
     return nullptr;

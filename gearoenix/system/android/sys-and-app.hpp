@@ -1,7 +1,7 @@
 #ifndef GEAROENIX_SYSTEM_ANDROID_APPLICATION_HPP
 #define GEAROENIX_SYSTEM_ANDROID_APPLICATION_HPP
 #include "../../core/cr-build-configuration.hpp"
-#ifdef IN_ANDROID
+#ifdef GX_IN_ANDROID
 #include "../../core/cr-types.hpp"
 #include <EGL/egl.h>
 #include <GLContext.h>

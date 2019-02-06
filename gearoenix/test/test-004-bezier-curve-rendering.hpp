@@ -1,5 +1,5 @@
 #include "test-config.hpp"
-#ifdef TEST004
+#ifdef GX_TEST004
 
 int main();
 

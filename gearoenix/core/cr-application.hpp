@@ -2,9 +2,9 @@
 #define GEAROENIX_CORE_APPLICATION_HPP
 #include "cr-build-configuration.hpp"
 #include "cr-types.hpp"
-#ifdef IN_ANDROID
+#ifdef GX_IN_ANDROID
 #include <android_native_app_glue.h>
-#elif defined(IN_WINDOWS)
+#elif defined(GX_IN_WINDOWS)
 #include <Windows.h>
 #endif
 namespace gearoenix {
@@ -29,7 +29,7 @@ namespace core {
     };
 }
 }
-#ifdef IN_WEB
+#ifdef GX_IN_WEB
 #define GEAROENIX_START(CoreApp)                                                    \
     int main(int, char**)                                                           \
     {                                                                               \
@@ -38,7 +38,7 @@ namespace core {
         app->execute(core_app);                                                     \
         return 0;                                                                   \
     }
-#elif defined(IN_ANDROID)
+#elif defined(GX_IN_ANDROID)
 #define GEAROENIX_START(CoreApp)                                                         \
     void android_main(struct android_app* state)                                         \
     {                                                                                    \
@@ -47,7 +47,7 @@ namespace core {
         app->execute(core_app);                                                          \
         delete app;                                                                      \
     }
-#elif defined(IN_WINDOWS)
+#elif defined(GX_IN_WINDOWS)
 #define GEAROENIX_START(CoreApp)                                                    \
     int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)                            \
     {                                                                               \
@@ -57,7 +57,7 @@ namespace core {
         delete app;                                                                 \
         return 0;                                                                   \
     }
-#elif defined(IN_LINUX) || defined(IN_MAC) || defined(IN_IOS)
+#elif defined(GX_IN_LINUX) || defined(GX_IN_MAC) || defined(GX_IN_IOS)
 #define GEAROENIX_START(CoreApp)                                                    \
     int main(int, char**)                                                           \
     {                                                                               \

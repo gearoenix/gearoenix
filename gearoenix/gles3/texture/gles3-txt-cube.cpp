@@ -1,5 +1,5 @@
 #include "gles3-txt-cube.hpp"
-#ifdef USE_OPENGL_ES3
+#ifdef GX_USE_OPENGL_ES3
 #include "../../render/texture/rnd-txt-png.hpp"
 #include "../../system/stream/sys-stm-stream.hpp"
 #include "../../system/sys-log.hpp"

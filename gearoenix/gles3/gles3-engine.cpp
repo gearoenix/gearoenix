@@ -91,7 +91,7 @@ gearoenix::gles3::Engine::~Engine()
 
 void gearoenix::gles3::Engine::window_changed()
 {
-    TODO;
+    GXTODO;
 }
 
 void gearoenix::gles3::Engine::update()
@@ -137,7 +137,7 @@ void gearoenix::gles3::Engine::update()
 
 void gearoenix::gles3::Engine::terminate()
 {
-    TODO;
+    GXTODO;
 }
 
 gearoenix::render::texture::Texture2D* gearoenix::gles3::Engine::create_texture_2d(core::Id my_id, system::stream::Stream* file, core::sync::EndCaller<core::sync::EndCallerIgnore> c)

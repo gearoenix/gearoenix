@@ -30,11 +30,11 @@ void gearoenix::system::stream::Asset::check_endian_compatibility()
 }
 
 gearoenix::system::stream::Asset::Asset
-#ifdef USE_STD_FILE
+#ifdef GX_USE_STD_FILE
     (system::Application*, const std::string& name)
 {
     std::string file_path = name;
-#ifdef IN_IOS
+#ifdef GX_IN_IOS
     @autoreleasepool {
         //        NSString *f_name = [NSString stringWithCString:name.c_str() encoding:[NSString defaultCStringEncoding]];
         NSString* path = [[NSBundle mainBundle] pathForResource:@"data" ofType:@"gx3d"];
@@ -45,7 +45,7 @@ gearoenix::system::stream::Asset::Asset
     if (!file.is_open()) {
         GXLOGF("Error in opening assets file.");
     }
-#elif defined(IN_ANDROID)
+#elif defined(GX_IN_ANDROID)
     (system::Application* sys_app, const std::string& name)
 //: sys_app(sys_app)
 {
@@ -55,14 +55,14 @@ gearoenix::system::stream::Asset::Asset
         GXLOGF("Asset not found! " << name);
     }
 #else
-#error "Unimplemented!"
+#error "Unexpected file interface!"
 #endif
     check_endian_compatibility();
 }
 
 gearoenix::system::stream::Asset::~Asset()
 {
-    TODO; //android asset free check
+    GXTODO; //android asset free check
 }
 
 bool gearoenix::system::stream::Asset::get_endian_compatibility() const
@@ -72,44 +72,44 @@ bool gearoenix::system::stream::Asset::get_endian_compatibility() const
 
 gearoenix::core::Count gearoenix::system::stream::Asset::read(void* data, core::Count length)
 {
-#ifdef IN_ANDROID
+#ifdef GX_IN_ANDROID
     core::Count result = static_cast<core::Count>(AAsset_read(file, data, length));
-#elif defined(USE_STD_FILE)
+#elif defined(GX_USE_STD_FILE)
     file.read(static_cast<char*>(data), length);
     core::Count result = static_cast<core::Count>(file.gcount());
 #else
-#error "Error not implemented yet!"
+#error "Unexpected file interface"
 #endif
-#ifdef DEBUG_MODE
+#ifdef GX_DEBUG_MODE
     if (result != length)
-        UNEXPECTED;
+        GXUNEXPECTED;
 #endif
     return result;
 }
 
 gearoenix::core::Count gearoenix::system::stream::Asset::write(const void*, core::Count)
 {
-    UNEXPECTED;
+    GXUNEXPECTED;
 }
 
 void gearoenix::system::stream::Asset::seek(core::Count offset)
 {
-#if defined(USE_STD_FILE)
+#if defined(GX_USE_STD_FILE)
     file.seekg(offset, std::ios::beg);
-#elif defined(IN_ANDROID)
+#elif defined(GX_IN_ANDROID)
     AAsset_seek(file, offset, SEEK_SET);
 #else
-#error "Error not implemented yet!"
+#error "Unexpected file interface"
 #endif
 }
 
 gearoenix::core::Count gearoenix::system::stream::Asset::tell()
 {
-#if defined(USE_STD_FILE)
+#if defined(GX_USE_STD_FILE)
     return (core::Count)file.tellg();
-#elif defined(IN_ANDROID)
+#elif defined(GX_IN_ANDROID)
     return (core::Count)AAsset_seek(file, 0, SEEK_CUR);
 #else
-#error "Error not implemented yet!"
+#error "Unexpected file interface"
 #endif
 }

@@ -75,7 +75,7 @@ void gearoenix::render::Engine::on_event(core::event::Event& e)
             delete pipmgr;
             pipmgr = nullptr;
             loaded_scenes.clear();
-            TODO; // it can become better, instead of complete deleting unload it.
+            GXTODO; // it can become better, instead of complete deleting unload it.
             delete physics_engine;
             physics_engine = nullptr;
             load_functions.clear();
@@ -142,10 +142,10 @@ void gearoenix::render::Engine::add_load_function(std::function<void()> fun)
 
 const std::shared_ptr<gearoenix::render::scene::Scene>& gearoenix::render::Engine::get_scene(core::Id scene_id) const
 {
-#ifdef DEBUG_MODE
+#ifdef GX_DEBUG_MODE
     std::map<core::Id, std::shared_ptr<gearoenix::render::scene::Scene>>::const_iterator f = loaded_scenes.find(scene_id);
     if (f == loaded_scenes.end())
-        UNEXPECTED;
+        GXUNEXPECTED;
     return f->second;
 #else
     return loaded_scenes[scene_id];
@@ -162,9 +162,9 @@ void gearoenix::render::Engine::load_scene(core::Id scene_id, std::function<void
     scene_loader_mutex->lock();
     scene_loader_functions.push_back([this, scene_id, on_load] {
         loaded_scenes_mutex->lock();
-#ifdef DEBUG_MODE
+#ifdef GX_DEBUG_MODE
         if (loaded_scenes.find(scene_id) != loaded_scenes.end())
-            UNEXPECTED;
+            GXUNEXPECTED;
 #endif
         sysapp->get_asset_manager()->get_scene(
             scene_id, core::sync::EndCaller<scene::Scene>([this, on_load, scene_id](std::shared_ptr<scene::Scene> asset) -> void {
@@ -182,9 +182,9 @@ void gearoenix::render::Engine::delete_scene(core::Id scene_id)
 {
     loaded_scenes_mutex->lock();
     auto search = loaded_scenes.find(scene_id);
-#ifdef DEBUG_MODE
+#ifdef GX_DEBUG_MODE
     if (loaded_scenes.end() == search)
-        UNEXPECTED;
+        GXUNEXPECTED;
 #endif
     loaded_scenes.erase(search);
     loaded_scenes_mutex->release();

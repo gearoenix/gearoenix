@@ -12,7 +12,7 @@ gearoenix::render::device::Logical::Logical(Physical* p)
     auto l = physical_device->get_instance()->get_linker();
     std::vector<VkDeviceQueueCreateInfo> queue_create_infos;
     float queue_priorities[] = { 1.0f };
-    // TODO: create as many as possible queue to separate independent works as
+    // GXTODO: create as many as possible queue to separate independent works as
     // many as possible
     // on the queues but it is not required currently
     std::set<uint32_t> queue_index_set;

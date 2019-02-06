@@ -18,7 +18,7 @@ gearoenix::render::memory::Manager::Manager(device::Logical* logical_device, uns
     mem_reqs.memoryTypeBits = 0;
     mem_reqs.memoryTypeBits |= buffer::Buffer::get_memory_type_bits(logical_device, place == GPU_LOCAL);
     mem_reqs.size = size;
-    // TODO
+    // GXTODO
     uint32_t mem_place;
     switch (place) {
     case GPU_LOCAL:

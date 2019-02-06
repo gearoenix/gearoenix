@@ -6,7 +6,7 @@ gearoenix::system::stream::Local::Local(const std::string& name, bool writable)
     : file(name, std::ios::binary | (writable ? std::ios::out : std::ios::in))
 {
     if (!file.is_open())
-        UNEXPECTED;
+        GXUNEXPECTED;
 }
 
 gearoenix::system::stream::Local::~Local()
@@ -17,9 +17,9 @@ gearoenix::core::Count gearoenix::system::stream::Local::read(void* data, core::
 {
     file.read((char*)data, length);
     const core::Count result = (core::Count)file.gcount();
-#ifdef DEBUG_MODE
+#ifdef GX_DEBUG_MODE
     if (0 == result)
-        UNEXPECTED;
+        GXUNEXPECTED;
 #endif
     file.seekp(file.tellg());
     return result;
@@ -30,9 +30,9 @@ gearoenix::core::Count gearoenix::system::stream::Local::write(const void* data,
     const core::Count before = (core::Count)file.tellp();
     file.write((const char*)data, length);
     const core::Count result = ((core::Count)file.tellp()) - before;
-#ifdef DEBUG_MODE
+#ifdef GX_DEBUG_MODE
     if (0 == result)
-        UNEXPECTED;
+        GXUNEXPECTED;
 #endif
     file.seekg(file.tellp());
     return result;

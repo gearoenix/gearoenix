@@ -33,7 +33,7 @@ template <class T>
 std::shared_ptr<T> gearoenix::core::cache::file::File::get(Id id, std::function<std::shared_ptr<T>()> new_fun)
 {
     std::function<std::shared_ptr<T>()> fn_new = [new_fun, this, id] {
-#ifdef DEBUG_MODE
+#ifdef GX_DEBUG_MODE
         if (id >= offsets.size()) {
             GXLOGF("object with id: " << id << ", not found in table of offsets.");
         }

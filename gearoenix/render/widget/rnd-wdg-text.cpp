@@ -54,7 +54,7 @@ void gearoenix::render::widget::Text::create_text_mesh(core::sync::EndCaller<cor
         starting_x = -textw;
         break;
     default:
-        UNEXPECTED;
+        GXUNEXPECTED;
     }
     core::Real starting_y;
     switch (align) {
@@ -74,7 +74,7 @@ void gearoenix::render::widget::Text::create_text_mesh(core::sync::EndCaller<cor
         starting_y = 0.0f;
         break;
     default:
-        UNEXPECTED;
+        GXUNEXPECTED;
     }
     for (core::Count i = 0; i < text_size; ++i) {
         const char c = text[i];

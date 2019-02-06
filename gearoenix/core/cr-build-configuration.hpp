@@ -1,80 +1,86 @@
 #ifndef GEAROENIX_CORE_BUILD_CONFIGURATION_HPP
 #define GEAROENIX_CORE_BUILD_CONFIGURATION_HPP
-/// Platform definition
-/// --------------------------------------------------------------------------
+// Platform definition
 #ifdef ANDROID
-#define IN_ANDROID
-//#define USE_VULKAN
-//#define USE_OPENGL_ES3
-#define USE_OPENGL_ES2
+#define GX_IN_ANDROID
+//#define GX_USE_VULKAN
+//#define GX_USE_OPENGL_ES3
+#define GX_USE_OPENGL_ES2
 #elif defined(__EMSCRIPTEN__)
-#define IN_WEB
-//#define USE_OPENGL_ES3
-#define USE_OPENGL_ES2
-#define USE_SDL
+#define GX_IN_WEB
+//#define GX_USE_OPENGL_ES3
+#define GX_USE_OPENGL_ES2
+#define GX_USE_SDL
 #elif defined(__unix__)
-#define IN_LINUX
-//#define USE_VULKAN
-//#define USE_OPENGL_43
-//#define USE_OPENGL_33
-//#define USE_OPENGL_ES3
-#define USE_OPENGL_ES2
-#define IN_DESKTOP
-#define USE_SDL
-//#define USE_GLFW
+#define GX_IN_LINUX
+//#define GX_USE_VULKAN
+//#define GX_USE_OPENGL_43
+//#define GX_USE_OPENGL_33
+//#define GX_USE_OPENGL_ES3
+#define GX_USE_OPENGL_ES2
+#define GX_IN_DESKTOP
+#define GX_USE_SDL
+//#define GX_USE_GLFW
 #elif defined(WIN32) || defined(WIN64) || defined(_WIN32) || defined(_WIN64)
-#define IN_WINDOWS
-//#define USE_VULKAN
-//#define USE_DIRECTX12
-#define USE_DIRECTX11
-//#define USE_OPENGL_43
-//#define USE_OPENGL_33
-#define IN_DESKTOP
-//#define USE_SDL
-//#define USE_GLFW
-#define USE_WINAPI
+#define GX_IN_WINDOWS
+//#define GX_USE_VULKAN
+//#define GX_USE_DIRECTX12
+//#define GX_USE_DIRECTX11
+//#define GX_USE_OPENGL_43
+//#define GX_USE_OPENGL_33
+//#define GX_USE_OPENGL_ES3
+#define GX_USE_OPENGL_ES2
+#define GX_IN_DESKTOP
+#define GX_USE_SDL
+//#define GX_USE_GLFW
+//#define GX_USE_WINAPI
 #elif defined(__APPLE__)
 #include "TargetConditionals.h"
 #if TARGET_OS_IPHONE
-#define IN_IOS
-//#define USE_METAL
-//#define USE_VULKAN
-//#define USE_OPENGL_ES3
-#define USE_OPENGL_ES2
-#define USE_SDL
+#define GX_IN_IOS
+//#define GX_USE_METAL
+//#define GX_USE_VULKAN
+//#define GX_USE_OPENGL_ES3
+#define GX_USE_OPENGL_ES2
+#define GX_USE_SDL
 #elif TARGET_OS_MAC
-#define IN_MAC
-//#define USE_METAL
-//#define USE_VULKAN
-//#define USE_OPENGL_43
-#define USE_OPENGL_33
-#define USE_OPENGL_ES3
-#define IN_DESKTOP
-#define USE_SDL
-//#define USE_GLFW
+#define GX_IN_MAC
+//#define GX_USE_METAL
+//#define GX_USE_VULKAN
+//#define GX_USE_OPENGL_43
+#define GX_USE_OPENGL_33
+#define GX_USE_OPENGL_ES3
+#define GX_IN_DESKTOP
+#define GX_USE_SDL
+//#define GX_USE_GLFW
 #else
 #error "Unknown Apple platform"
 #endif // IOS MAC
 #else
 #error "Not implemetned yet."
 #endif
-/// Application constant definitions
-/// -------------------------------------------------------------
-#define APPLICATION_NAME "Gearoenix Demo App"
-/// Application compilation mode
-/// -----------------------------------------------------------------
-#define DEBUG_MODE
+// Application constant definitions
+#define GX_APP_NAME "Gearoenix Demo App"
+// Application compilation mode
+#define GX_DEBUG_MODE
 //#define TEST_MODE
-#define GAME_MODE
-/// Application features
-/// -------------------------------------------------------------------------
-#ifdef DEBUG_MODE
-#define LOG_ENABLED
-#define GEAROENIX_DEFAULT_WINDOW_WIDTH 1020
-#define GEAROENIX_DEFAULT_WINDOW_HEIGHT 600
-#else
-#define GEAROENIX_FULLSCREEN
+#define GX_GAME_MODE
+// Application features
+
+#define GX_LOG_ENABLED
+
+#ifdef GX_LOG_ENABLED
+#define GX_LOG_ERROR_ENABLED
+#define GX_LOG_WARN_ENABLED
+#define GX_LOG_INFO_ENABLED
 #endif
-//#define GEAROENIX_FULLSCREEN // For frocing fullscreen mode
-#define PROFILING_MODE
+
+// You can comment this for windowd apps
+#define GX_FULLSCREEN
+// Window aspect in debug mode
+#ifndef GX_FULLSCREEN
+#define GX_DEFAULT_WINDOW_WIDTH 1000
+#define GX_DEFAULT_WINDOW_HEIGHT 700
+#endif
+#define GX_PROFILING_MODE
 #endif

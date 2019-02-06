@@ -13,7 +13,7 @@ gearoenix::render::light::Sun::Sun(core::Id my_id, system::stream::Stream* f, En
 {
     color.read(f);
     db = math::Mat4x4(
-#ifdef IN_WINDOWS
+#ifdef GX_IN_WINDOWS
              0.5, 0.0, 0.0, 0.0,
              0.0, -0.5, 0.0, 0.0,
              0.0, 0.0, 1.0, 0.0,

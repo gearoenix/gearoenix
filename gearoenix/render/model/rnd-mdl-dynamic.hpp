@@ -12,7 +12,7 @@ namespace render {
                 math::Vec3 x;
                 math::Vec3 y;
                 math::Vec3 z;
-                // TODO it is based on the future needs
+                // GXTODO it is based on the future needs
             };
             std::vector<State> states;
 

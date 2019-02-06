@@ -18,9 +18,9 @@ gearoenix::core::event::movement::Movement::MovementType gearoenix::core::event:
 
 const gearoenix::core::event::movement::Mouse& gearoenix::core::event::movement::Movement::to_mouse() const
 {
-#ifdef DEBUG_MODE
+#ifdef GX_DEBUG_MODE
     if (movement_type != MovementType::MOUSE)
-        UNEXPECTED;
+        GXUNEXPECTED;
 #endif
     return *static_cast<const Mouse*>(this);
 }

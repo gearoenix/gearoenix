@@ -1,7 +1,7 @@
 #ifndef GEAROENIX_GLES2_BUFFER_MESH_HPP
 #define GEAROENIX_GLES2_BUFFER_MESH_HPP
 #include "../../core/cr-build-configuration.hpp"
-#ifdef USE_OPENGL_ES2
+#ifdef GX_USE_OPENGL_ES2
 #include "../../core/sync/cr-sync-end-caller.hpp"
 #include "../../render/buffer/rnd-buf-mesh.hpp"
 #include "../gles2.hpp"

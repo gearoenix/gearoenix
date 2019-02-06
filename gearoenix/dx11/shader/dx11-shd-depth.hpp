@@ -1,7 +1,7 @@
 #ifndef GEAROENIX_DX11_SHADER_DEPTH_POSITION_HPP
 #define GEAROENIX_DX11_SHADER_DEPTH_POSITION_HPP
 #include "../../core/cr-build-configuration.hpp"
-#ifdef USE_DIRECTX11
+#ifdef GX_USE_DIRECTX11
 #include "../../render/material/rnd-mat-depth.hpp"
 #include "dx11-shader.hpp"
 namespace gearoenix {

@@ -110,7 +110,7 @@ gearoenix::render::scene::Scene* gearoenix::render::scene::Scene::read(
     case SceneType::UI:
         return new Ui(my_id, f, e, c);
     default:
-        UNEXPECTED;
+        GXUNEXPECTED;
     }
 }
 
@@ -191,9 +191,9 @@ const std::shared_ptr<gearoenix::render::camera::Camera>& gearoenix::render::sce
 {
     //    return const_cast<camera::Camera*>(static_cast<const camera::Camera*>(static_cast<light::Sun*>(lights[0].get())->get_camera()));
     auto search = cameras.find(cam_id);
-#ifdef DEBUG_MODE
+#ifdef GX_DEBUG_MODE
     if (search == cameras.end())
-        UNEXPECTED;
+        GXUNEXPECTED;
 #endif
     return search->second;
 }
@@ -212,7 +212,7 @@ const gearoenix::render::light::Sun* gearoenix::render::scene::Scene::get_sun() 
 {
     const std::map<core::Id, std::shared_ptr<light::Light>>::const_iterator c = lights.find(sun_id);
     if (c == lights.end())
-        UNEXPECTED;
+        GXUNEXPECTED;
     std::shared_ptr<light::Sun> sun = std::static_pointer_cast<light::Sun>(c->second);
     return sun.get();
 }
@@ -270,9 +270,9 @@ void gearoenix::render::scene::Scene::add_model(core::Id model_id, core::sync::E
         model_id,
         core::sync::EndCaller<model::Model>(
             [c, model_id, this](std::shared_ptr<model::Model> mdl) -> void {
-#ifdef DEBUG_MODE
+#ifdef GX_DEBUG_MODE
                 if (root_models.find(model_id) != root_models.end())
-                    UNEXPECTED;
+                    GXUNEXPECTED;
 #endif
                 root_models[model_id] = mdl;
                 add_model(mdl);
@@ -289,10 +289,10 @@ std::weak_ptr<gearoenix::render::model::Model> gearoenix::render::scene::Scene::
 
 void gearoenix::render::scene::Scene::add_constraint(const std::shared_ptr<physics::constraint::Constraint>& cns)
 {
-#ifdef DEBUG_MODE
+#ifdef GX_DEBUG_MODE
     std::map<core::Id, std::shared_ptr<physics::constraint::Constraint>>::iterator search = root_constraints.find(cns->get_asset_id());
     if (root_constraints.end() != search)
-        UNEXPECTED;
+        GXUNEXPECTED;
 #endif
     root_constraints[cns->get_asset_id()] = cns;
     const std::vector<std::pair<core::Id, std::shared_ptr<model::Dynamic>>> models = cns->get_all_models();
@@ -307,10 +307,10 @@ void gearoenix::render::scene::Scene::add_constraint(const std::shared_ptr<physi
 
 void gearoenix::render::scene::Scene::add_body(const std::shared_ptr<physics::body::Body>& b)
 {
-#ifdef DEBUG_MODE
+#ifdef GX_DEBUG_MODE
     std::map<core::Id, std::shared_ptr<physics::body::Body>>::iterator search = root_bodies.find(b->get_asset_id());
     if (root_bodies.end() != search)
-        UNEXPECTED;
+        GXUNEXPECTED;
 #endif
     root_bodies[b->get_asset_id()] = b;
 }
