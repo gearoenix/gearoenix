@@ -3,22 +3,29 @@
 #include <string>
 #include <memory>
 #include <set>
+#include <vector>
+#include <map>
+#include "../cr-types.hpp"
 namespace gearoenix {
 	namespace core {
 		namespace graph {
 			class Node {
+			private:
+				
 			protected:
 				std::map<std::string, unsigned int> input_links_string_index;
 				std::map<std::string, unsigned int> output_links_string_index;
 				std::vector<std::shared_ptr<Node> > providers;
-				std::vector<std::set<std::weak_ptr<Node> > > consumers;
-			public:
+				std::vector<std::set<std::weak_ptr<Node>, weak_less<std::weak_ptr<Node>> > > consumers;
 				Node();
+			public:
 				virtual ~Node();
 				virtual void set_provider(unsigned int input_link_index, const std::shared_ptr<Node>& o);
 				virtual void set_consumer(unsigned int output_link_index, const std::weak_ptr<Node>& o);
-				unsigned int get_input_link_index(const std::string &name);
-				unsigned int get_output_link_index(const std::string &name);
+				unsigned int get_input_link_index(const std::string &name, bool &exist) const;
+				unsigned int get_output_link_index(const std::string &name, bool &exist) const;
+				const std::vector<std::string> get_input_links_names() const;
+				const std::vector<std::string> get_output_links_names() const;
 			};
 		}
 	}

@@ -1,8 +1,9 @@
 #ifndef GEAROENIX_VULKAN_ENGINE_HPP
 #define GEAROENIX_VULKAN_ENGINE_HPP
 #include "../core/cr-build-configuration.hpp"
-#ifdef USE_VULKAN
+#ifdef GX_USE_VULKAN
 #include "../core/cr-types.hpp"
+#include "../render/rnd-engine.hpp"
 #include <functional>
 #include <memory>
 #include <mutex>
@@ -15,7 +16,7 @@ namespace system {
     class Application;
     class File;
 }
-namespace render {
+namespace vulkan {
     namespace buffer {
         class Manager;
     }
@@ -52,7 +53,7 @@ namespace render {
     class RenderPass;
     class Surface;
     class Swapchain;
-    class Engine {
+    class Engine : public render::Engine {
     private:
         system::Application* sys_app;
         Linker* linker;
@@ -88,6 +89,7 @@ namespace render {
     public:
         Engine(system::Application* sys_app);
         ~Engine();
+		static bool is_supported();
         void window_changed();
         void update();
         void terminate();

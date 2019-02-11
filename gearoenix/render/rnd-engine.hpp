@@ -50,20 +50,23 @@ namespace render {
     }
     class Engine {
     public:
-        typedef enum : core::Id {
-            VULKAN,
-            OPENGL_43,
-            OPENGL_33,
-            OPENGL_ES3,
-            OPENGL_ES2,
-            DIRECTX_11,
-            DIRECTX_12,
-            METAL,
-        } EngineType;
+		class EngineType {
+		public:
+			typedef enum : core::Id {
+				VULKAN = 1,
+				OPENGL_43 = 2,
+				OPENGL_33 = 3,
+				OPENGL_ES3 = 4,
+				OPENGL_ES2 = 5,
+				DIRECTX_11 = 6,
+				DIRECTX_12 = 7,
+				METAL = 8,
+			} Type;
+		};
 
     private:
     protected:
-        EngineType engine_type = (EngineType)0xFFFFFFFFFFFFFFFF;
+        EngineType::Type engine_type = (EngineType::Type)0xFFFFFFFFFFFFFFFF;
         system::Application* sysapp;
         pipeline::Manager* pipmgr;
         core::sync::Semaphore* load_functions_mutex;

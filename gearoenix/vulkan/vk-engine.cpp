@@ -1,5 +1,5 @@
 #include "vk-engine.hpp"
-#ifdef USE_VULKAN
+#ifdef GX_USE_VULKAN
 #include "../core/asset/cr-asset-manager.hpp"
 #include "../core/cr-application.hpp"
 #include "../core/cr-static.hpp"

@@ -23,8 +23,8 @@ namespace system {
 #ifdef GX_IN_WEB
         static Application* app;
 #endif
-        const static core::Real rotate_epsilon;
-        const static core::Real zoom_epsilon;
+        const static core::Real ROTATION_EPSILON;
+        const static core::Real ZOOM_EPSILON;
         unsigned int win_width, win_height;
         core::Real screen_ratio, half_height_inversed, pre_x, pre_y;
         core::Application* core_app = nullptr;
@@ -33,7 +33,7 @@ namespace system {
         SDL_Window* window = nullptr;
         SDL_GLContext gl_context;
         bool running = true;
-        core::Id supported_engine;
+        core::Id supported_engine = 0;
         void create_window();
         void create_context();
         static int SDLCALL event_receiver(void* user_data, SDL_Event* event);
@@ -42,6 +42,7 @@ namespace system {
         Application();
         ~Application();
         void execute(core::Application* app);
+
 #ifdef GX_IN_WEB
         static void loop();
         void main_loop();
