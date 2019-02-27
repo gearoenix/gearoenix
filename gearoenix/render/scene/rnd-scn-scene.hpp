@@ -1,5 +1,6 @@
 #ifndef GEAROEMIX_RENDER_SCENE_SCENE_HPP
 #define GEAROEMIX_RENDER_SCENE_SCENE_HPP
+#include "../../core/cr-build-configuration.hpp"
 #include "../../core/asset/cr-asset.hpp"
 #include "../../core/sync/cr-sync-end-caller.hpp"
 #include "../../math/math-vector.hpp"
@@ -60,13 +61,28 @@ namespace render {
             friend class physics::Kernel;
 
         public:
-            typedef enum : core::Id {
-                GAME = 1,
-                UI = 2,
-            } SceneType;
+			struct Uniform {
+				math::Vec4 ambient_light = math::Vec4(0.3, 0.3, 0.3, 1.0);
+				math::Vec4 directional_lights_color[GX_MAX_DIRECTIONAL_LIGHTS];
+				math::Vec4 directional_lights_direction[GX_MAX_DIRECTIONAL_LIGHTS];
+				math::Vec4 point_lights_color_min_radius[GX_MAX_POINT_LIGHTS];
+				math::Vec4 point_lights_position_max_radius[GX_MAX_POINT_LIGHTS];
+				/// directional, point, cone, reserved
+				math::Vec4 lights_count;
+				/// samples-count, radius, z-tolerance, reserved
+				math::Vec4 ssao_config;
+			};
+
+			class Type {
+			public:
+				typedef enum : core::Id {
+					GAME = 1,
+					UI = 2,
+				} Id;
+			};
 
         protected:
-            const SceneType scene_type;
+            const Type::Id type_id;
             std::map<core::Id, std::shared_ptr<camera::Camera>> cameras;
             std::map<core::Id, std::shared_ptr<audio::Audio>> audios;
             std::map<core::Id, std::shared_ptr<light::Light>> lights;
@@ -89,7 +105,7 @@ namespace render {
             bool ambient_light_changed = true;
             math::Vec3 ambient_light = math::Vec3(0.2f, 0.2f, 0.2f);
             Engine* const render_engine;
-            Scene(core::Id my_id, SceneType t, system::stream::Stream* f, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> c);
+            Scene(core::Id my_id, Type::Id t, system::stream::Stream* f, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> c);
 
         public:
             void cast_shadow();

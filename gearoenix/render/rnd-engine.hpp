@@ -29,6 +29,10 @@ namespace system {
     }
 }
 namespace render {
+	namespace command {
+		class Buffer;
+		class Manager;
+	}
     namespace buffer {
         class Mesh;
         class Uniform;
@@ -37,6 +41,9 @@ namespace render {
         class Manager;
         class Pipeline;
     }
+	namespace sampler {
+		class Manager;
+	}
     namespace scene {
         class Scene;
     }
@@ -68,7 +75,11 @@ namespace render {
     protected:
         EngineType::Type engine_type = (EngineType::Type)0xFFFFFFFFFFFFFFFF;
         system::Application* sysapp;
-        pipeline::Manager* pipmgr;
+		// managers
+        pipeline::Manager* pipeline_manager = nullptr;
+		command::Manager* command_manager = nullptr;
+		sampler::Manager* sampler_manager = nullptr;
+		// end of managers
         core::sync::Semaphore* load_functions_mutex;
         core::sync::Semaphore* loaded_scenes_mutex;
         core::sync::Semaphore* scene_loader_mutex;
@@ -97,16 +108,21 @@ namespace render {
         virtual shader::Resources* create_shader_resources(core::Id sid, pipeline::Pipeline* p, buffer::Uniform* ub, core::sync::EndCaller<core::sync::EndCallerIgnore> c) = 0;
         virtual pipeline::Pipeline* create_pipeline(core::Id sid, core::sync::EndCaller<core::sync::EndCallerIgnore> c) = 0;
         virtual void on_event(core::event::Event& e);
+		// getters
         const pipeline::Manager* get_pipeline_manager() const;
         pipeline::Manager* get_pipeline_manager();
+		const command::Manager *get_command_manager() const;
+		command::Manager *get_command_manager();
+		const system::Application* get_system_application() const;
+		system::Application* get_system_application();
+		const physics::Engine* get_physics_engine() const;
+		physics::Engine* get_physics_engine();
+		// end of getters
         void add_load_function(std::function<void()> fun);
-        const system::Application* get_system_application() const;
-        system::Application* get_system_application();
         const std::shared_ptr<scene::Scene>& get_scene(core::Id scene_id) const;
         const std::map<core::Id, std::shared_ptr<scene::Scene>>& get_all_scenes() const;
         void load_scene(core::Id scene_id, std::function<void()> on_load);
         void delete_scene(core::Id scene_id);
-        physics::Engine* get_physics_engine();
     };
 }
 }
