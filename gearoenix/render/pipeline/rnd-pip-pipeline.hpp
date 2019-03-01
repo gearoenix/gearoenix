@@ -11,16 +11,37 @@ namespace render {
         class Shader;
     }
     namespace pipeline {
+		class PipelineType {
+		public:
+			typedef enum : core::Id {
+				DeferredPbr = 1,
+				GBufferFiller = 2,
+				ForwardPbr = 3,
+				/// it has directional light shadow map (no cascaded)
+				ForwardPbrDirectionalShadow = 4,
+				/// it has point light shadow map
+				ForwardPbrPointShadow = 5,
+				/// it has cone light shadow map
+				ForwardPbrConeShadow = 6,
+				ShadowAccumulatorDirectional = 7,
+				ShadowAccumulatorPoint = 8,
+				ShadowAccumulatorCone = 9,
+				ShadowMapper = 10,
+				LightBlooming = 11,
+				SSAO = 12,
+				SSR = 13,
+				Unlit = 14,
+			} Id;
+		};
         class Pipeline : public core::cache::Cached {
         protected:
             Engine* eng;
-            std::shared_ptr<shader::Shader> shd;
+			const PipelineType::Id pipeline_type;
 
         public:
-            Pipeline(core::Id sid, Engine* eng, core::sync::EndCaller<core::sync::EndCallerIgnore> call);
+            Pipeline(PipelineType::Id pipeline_type, Engine* eng, core::sync::EndCaller<core::sync::EndCallerIgnore> call);
             virtual ~Pipeline();
-            virtual void bind() = 0;
-            shader::Shader* get_shader();
+			PipelineType::Id get_pipeline_type_id() const;
         };
     }
 }

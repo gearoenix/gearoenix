@@ -1,8 +1,7 @@
 #ifndef GEAROENIX_RENDER_PIPELINE_MANAGER_HPP
 #define GEAROENIX_RENDER_PIPELINE_MANAGER_HPP
-#include "../../core/cr-types.hpp"
+#include "rnd-pip-pipeline.hpp"
 #include "../../core/sync/cr-sync-end-caller.hpp"
-#include <memory>
 namespace gearoenix {
 namespace core {
     namespace cache {
@@ -16,13 +15,11 @@ namespace render {
         class Manager {
         private:
             Engine* eng;
-            core::cache::Cacher* csh;
 
         public:
             Manager(Engine* engine);
             ~Manager();
-            std::shared_ptr<Pipeline> get_pipeline(core::Id sid, core::sync::EndCaller<core::sync::EndCallerIgnore> end);
-            std::shared_ptr<Pipeline> get_cached_pipeline(core::Id sid) const;
+            std::shared_ptr<Pipeline> get(PipelineType::Id pipeline_type, core::sync::EndCaller<core::sync::EndCallerIgnore> end);
         };
     }
 }

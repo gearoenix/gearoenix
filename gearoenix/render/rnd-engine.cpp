@@ -102,6 +102,16 @@ void gearoenix::render::Engine::on_event(core::event::Event& e)
     }
 }
 
+const command::Manager * gearoenix::render::Engine::get_command_manager() const
+{
+	return command_manager;
+}
+
+command::Manager * gearoenix::render::Engine::get_command_manager()
+{
+	return command_manager;
+}
+
 const gearoenix::system::Application* gearoenix::render::Engine::get_system_application() const
 {
     return sysapp;

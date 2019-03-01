@@ -11,6 +11,11 @@ gearoenix::render::pipeline::Pipeline::Pipeline(core::Id sid, Engine* eng, core:
 {
 }
 
+gearoenix::render::pipeline::PipelineType::Id gearoenix::render::pipeline::Pipeline::get_pipeline_type_id() const
+{
+	return pipeline_type;
+}
+
 gearoenix::render::pipeline::Pipeline::~Pipeline()
 {
 }

@@ -1,6 +1,9 @@
 #ifndef GEAROEMIX_RENDER_GRAPH_NODE_NODE_HPP
 #define GEAROEMIX_RENDER_GRAPH_NODE_NODE_HPP
 #include "../../../core/graph/cr-gr-node.hpp"
+#include "../../pipeline/rnd-pip-pipeline.hpp"
+#include <memory>
+#include <vector>
 
 /// Node is reponsible to record command buffers.
 /// It gathers all the needed data like pipeline, descriptor-sets, ... .
@@ -21,14 +24,29 @@
 namespace gearoenix {
 	namespace render {
 		class Engine;
+		namespace texture {
+			class Texture;
+		}
 		namespace graph {
 			namespace node {
 				class Node : public core::graph::Node {
 				protected:
-					Node(Engine* e);
+					Engine *e = nullptr;
+					std::vector<std::shared_ptr<texture::Texture> > input_textures;
+					std::vector<std::shared_ptr<texture::Texture> > output_textures;
+					std::shared_ptr<pipeline::Pipeline> render_pipeline = nullptr;
+					Node(
+						Engine* e,
+						const pipeline::PipelineType::Id pipeline_type_id,
+						const unsigned int input_textures_count,
+						const unsigned int output_textures_count,
+						const std::vector<std::string> &input_links,
+						const std::vector<std::string> &output_links,
+						const core::sync::EndCaller<core::sync::EndCallerIgnore> call);
 
 				public:
 					virtual ~Node();
+					virtual void set_input_texture(const std::shared_ptr<texture::Texture>& t, const unsigned int index);
 				};
 			}
 		}
