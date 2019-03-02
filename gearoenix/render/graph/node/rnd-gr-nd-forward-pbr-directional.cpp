@@ -9,9 +9,11 @@
 #include "../../texture/rnd-txt-texture-2d.hpp"
 #include "../../texture/rnd-txt-texture-cube.hpp"
 #include "../../mesh/rnd-msh-mesh.hpp"
+#include "../../model/rnd-mdl-model.hpp"
 #include <thread>
 
-gearoenix::render::graph::node::ForwardPbrDirectional::ForwardPbrDirectional(Engine * e, core::sync::EndCaller<core::sync::EndCallerIgnore> call) :
+gearoenix::render::graph::node::ForwardPbrDirectional::ForwardPbrDirectional(
+	Engine * e, core::sync::EndCaller<core::sync::EndCallerIgnore> call) :
 	Node(
 		e,
 		pipeline::PipelineType::ForwardPbrDirectionalShadow,
@@ -65,10 +67,11 @@ void gearoenix::render::graph::node::ForwardPbrDirectional::set_brdflut(const st
 	set_input_texture(t, 4);
 }
 
-void gearoenix::render::graph::node::ForwardPbrDirectional::set_input_texture(const std::shared_ptr<texture::Texture> &t, const unsigned int index)
+void gearoenix::render::graph::node::ForwardPbrDirectional::set_input_texture(
+	const std::shared_ptr<texture::Texture> &t, const unsigned int index)
 {
 	Node::set_input_texture(t, index);
-	for (ForwardPbrDirectionalFrame &f: frames) {
+	for (ForwardPbrDirectionalFrame &f : frames) {
 		f.input_texture_changed = true;
 	}
 }
@@ -88,7 +91,12 @@ void gearoenix::render::graph::node::ForwardPbrDirectional::update()
 	}
 }
 
-void gearoenix::render::graph::node::ForwardPbrDirectional::record(const scene::Scene & s, const camera::Camera & c, const light::Directional& l, const model::Model & m, const unsigned int kernel_index)
+void gearoenix::render::graph::node::ForwardPbrDirectional::record(
+	const std::shared_ptr<scene::Scene> &s,
+	const std::shared_ptr<camera::Camera> & c,
+	const std::shared_ptr<light::Directional> & l,
+	const std::shared_ptr<model::Model> & m,
+	const unsigned int kernel_index)
 {
 	const unsigned int frame_number = e->get_frame_number();
 	ForwardPbrDirectionalFrame &frame = frames[frame_number];
@@ -99,10 +107,11 @@ void gearoenix::render::graph::node::ForwardPbrDirectional::record(const scene::
 		const material::Material &mat = std::get<1>(id_mesh_material.second);
 		if (kernel.latest_render_data_pool >= kernel.render_data_pool.size()) {
 			kernel.render_data_pool.push_back(std::make_tuple(
-				std::shared_ptr<buffer::Uniform>(e->get_buffer_manager()->create_uniform(sizeof(ForwardPbrDirectionalUniform))), 
+				std::shared_ptr<buffer::Uniform>(e->get_buffer_manager()->create_uniform(sizeof(ForwardPbrDirectionalUniform))),
 				std::shared_ptr<pipeline::ForwardPbrDirectionalShadowResourceSet>(render_pipeline->create_resource_set())));
 		}
-		std::tuple<std::shared_ptr<buffer::Uniform>, std::shared_ptr<pipeline::ForwardPbrDirectionalShadowResourceSet> > &pool = kernel.render_data_pool[kernel.latest_render_data_pool];
+		std::tuple<std::shared_ptr<buffer::Uniform>, std::shared_ptr<pipeline::ForwardPbrDirectionalShadowResourceSet> > &pool = 
+			kernel.render_data_pool[kernel.latest_render_data_pool];
 		std::shared_ptr<buffer::Uniform> &ub = std::get<0>(pool);
 		std::shared_ptr <pipeline::ForwardPbrDirectionalShadowResourceSet> &prs = std::get<1>(pool);
 		ForwardPbrDirectionalUniform us;

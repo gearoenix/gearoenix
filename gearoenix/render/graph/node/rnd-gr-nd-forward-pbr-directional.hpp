@@ -101,7 +101,12 @@ namespace gearoenix {
 					void set_input_texture(const std::shared_ptr<texture::Texture>& t, const unsigned int index) override;
 					/// This will be called at the start of each frame
 					void update();
-					void record(const scene::Scene& s, const camera::Camera& c, const light::Directional& l, const model::Model& m, const unsigned int kernel_index);
+					void record(
+						const std::shared_ptr<scene::Scene> &s, 
+						const std::shared_ptr<camera::Camera> &c, 
+						const std::shared_ptr<light::Directional> &l, 
+						const std::shared_ptr<model::Model> &m, 
+						const unsigned int kernel_index);
 					/// This will be called at the end of each frame for pushing jobs to GPU
 					void submit();
 				};
