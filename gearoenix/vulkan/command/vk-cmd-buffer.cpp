@@ -10,6 +10,7 @@
 #include "../vk-check.hpp"
 #include "../vk-instance.hpp"
 #include "vk-cmd-pool.hpp"
+#include "..\..\render\command\rnd-cmd-buffer.hpp"
 
 gearoenix::render::command::Buffer::Buffer(Pool* pool)
     : pool(pool)
@@ -43,6 +44,10 @@ void gearoenix::render::command::Buffer::begin()
     setz(cmd_buf_info);
     cmd_buf_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
     VKC(linker->vkBeginCommandBuffer(vulkan_data, &cmd_buf_info));
+}
+
+void gearoenix::render::command::Buffer::record(const std::shared_ptr<Buffer>& o)
+{
 }
 
 void gearoenix::render::command::Buffer::copy_buffer(

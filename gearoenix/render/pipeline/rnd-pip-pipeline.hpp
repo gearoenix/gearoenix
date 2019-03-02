@@ -11,6 +11,8 @@ namespace render {
         class Shader;
     }
     namespace pipeline {
+		class Resource;
+		class ResourceSet;
 		class PipelineType {
 		public:
 			typedef enum : core::Id {
@@ -42,6 +44,7 @@ namespace render {
             Pipeline(PipelineType::Id pipeline_type, Engine* eng, core::sync::EndCaller<core::sync::EndCallerIgnore> call);
             virtual ~Pipeline();
 			PipelineType::Id get_pipeline_type_id() const;
+			virtual ResourceSet *create_resource_set() const = 0;
         };
     }
 }

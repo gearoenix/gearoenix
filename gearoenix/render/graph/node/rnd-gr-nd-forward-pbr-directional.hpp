@@ -29,6 +29,9 @@ namespace gearoenix {
 			class Resource;
 			class ResourceSet;
 			class Pipeline;
+			class ForwardPbrDirectionalShadow;
+			class ForwardPbrDirectionalShadowResource;
+			class ForwardPbrDirectionalShadowResourceSet;
 		}
 		namespace scene {
 			class Scene;
@@ -44,30 +47,32 @@ namespace gearoenix {
 		namespace graph {
 			namespace node {
 				struct ForwardPbrDirectionalKernel {
-					command::Buffer *secondary_cmd = nullptr;
+					std::shared_ptr <command::Buffer> secondary_cmd = nullptr;
 					unsigned int latest_render_data_pool = 0;
-					std::vector<std::tuple<buffer::Uniform *, pipeline::ResourceSet *> > render_data_pool;
+					std::vector<
+						std::tuple<
+							std::shared_ptr<buffer::Uniform>, 
+							std::shared_ptr<pipeline::ForwardPbrDirectionalShadowResourceSet> 
+						> 
+					> render_data_pool;
 
 					ForwardPbrDirectionalKernel(Engine* e, const unsigned int kernel_index);
-					~ForwardPbrDirectionalKernel();
 				};
 
 				struct ForwardPbrDirectionalFrame {
-					command::Buffer *primary_cmd = nullptr;
-					sync::Semaphore *semaphore = nullptr;
-					pipeline::Resource *pipeline_resource = nullptr;
-					bool input_texture_changed = false;
+					std::shared_ptr<command::Buffer> primary_cmd = nullptr;
+					std::shared_ptr<sync::Semaphore> semaphore = nullptr;
+					std::shared_ptr<pipeline::ForwardPbrDirectionalShadowResource> pipeline_resource = nullptr;
+					bool input_texture_changed = true;
 					std::vector<ForwardPbrDirectionalKernel> kernels;
 
 					ForwardPbrDirectionalFrame(Engine* e);
-					~ForwardPbrDirectionalFrame();
 				};
 
 				struct ForwardPbrDirectionalUniform {
 					math::Mat4x4 mvp = math::Mat4x4();
-					math::Mat4x4 directional_light_view_projection_biases;
-					math::Vec4 direction_light_color;
-					math::Vec4 direction_light_direction_count;
+					math::Mat4x4 light_view_projection_biases;
+					math::Vec4 light_color;
 				};
 
 				/// This renders only one directional light with one shadow map.

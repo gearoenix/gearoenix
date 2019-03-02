@@ -26,6 +26,7 @@ namespace gearoenix {
 		class Engine;
 		namespace texture {
 			class Texture;
+			class Target;
 		}
 		namespace graph {
 			namespace node {
@@ -34,6 +35,7 @@ namespace gearoenix {
 					Engine *e = nullptr;
 					std::vector<std::shared_ptr<texture::Texture> > input_textures;
 					std::vector<std::shared_ptr<texture::Texture> > output_textures;
+					std::vector<std::shared_ptr<texture::Target> > render_targets;
 					std::shared_ptr<pipeline::Pipeline> render_pipeline = nullptr;
 					Node(
 						Engine* e,

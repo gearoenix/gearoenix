@@ -2,6 +2,8 @@
 #define GEAROENIX_RENDER_PIPELINE_MANAGER_HPP
 #include "rnd-pip-pipeline.hpp"
 #include "../../core/sync/cr-sync-end-caller.hpp"
+#include <vector>
+
 namespace gearoenix {
 namespace core {
     namespace cache {
@@ -10,8 +12,12 @@ namespace core {
 }
 namespace render {
     class Engine;
+	namespace texture {
+		class Texture;
+	}
     namespace pipeline {
         class Pipeline;
+		class Resource;
         class Manager {
         private:
             Engine* eng;
@@ -20,6 +26,7 @@ namespace render {
             Manager(Engine* engine);
             ~Manager();
             std::shared_ptr<Pipeline> get(PipelineType::Id pipeline_type, core::sync::EndCaller<core::sync::EndCallerIgnore> end);
+			virtual std::shared_ptr<Resource> create_resource(const std::vector<std::shared_ptr<texture::Texture> > &ts) = 0;
         };
     }
 }

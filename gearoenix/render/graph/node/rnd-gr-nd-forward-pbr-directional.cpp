@@ -1,10 +1,14 @@
 #include "rnd-gr-nd-forward-pbr-directional.hpp"
 #include "../../rnd-engine.hpp"
+#include "../../buffer/rnd-buf-uniform.hpp"
 #include "../../command/rnd-cmd-manager.hpp"
+#include "../../command/rnd-cmd-buffer.hpp"
+#include "../../material/rnd-mat-material.hpp"
 #include "../../pipeline/rnd-pip-pipeline.hpp"
 #include "../../pipeline/rnd-pip-manager.hpp"
 #include "../../texture/rnd-txt-texture-2d.hpp"
 #include "../../texture/rnd-txt-texture-cube.hpp"
+#include "../../mesh/rnd-msh-mesh.hpp"
 #include <thread>
 
 gearoenix::render::graph::node::ForwardPbrDirectional::ForwardPbrDirectional(Engine * e, core::sync::EndCaller<core::sync::EndCallerIgnore> call) :
@@ -12,7 +16,7 @@ gearoenix::render::graph::node::ForwardPbrDirectional::ForwardPbrDirectional(Eng
 		e,
 		pipeline::PipelineType::ForwardPbrDirectionalShadow,
 		5,
-		0,
+		1,
 		{
 			"diffuse environment"
 			"specular environment"
@@ -75,7 +79,7 @@ void gearoenix::render::graph::node::ForwardPbrDirectional::update()
 	ForwardPbrDirectionalFrame &frame = frames[frame_number];
 	if (frame.input_texture_changed) {
 		frame.input_texture_changed = false;
-		frame.pipeline_resource = render_pipeline->create_resource(input_textures);
+		frame.pipeline_resource = e->get_pipeline_manager()->create_resource(input_textures);
 	}
 	frame.primary_cmd->begin();
 	for (ForwardPbrDirectionalKernel &kernel : frame.kernels) {
@@ -89,24 +93,55 @@ void gearoenix::render::graph::node::ForwardPbrDirectional::record(const scene::
 	const unsigned int frame_number = e->get_frame_number();
 	ForwardPbrDirectionalFrame &frame = frames[frame_number];
 	ForwardPbrDirectionalKernel &kernel = frame.kernels[kernel_index];
-	for (std::pair<core::Id, std::tuple<std::shared_ptr<mesh::Mesh>, material::Matrial> > &id_mesh_material : m.get_meshes()) {
+	const std::map<core::Id, std::tuple<std::shared_ptr<mesh::Mesh>, material::Material> > &meshes = m.get_meshes();
+	for (const std::pair<core::Id, std::tuple<std::shared_ptr<mesh::Mesh>, material::Material> > &id_mesh_material : meshes) {
+		const std::shared_ptr<mesh::Mesh> &msh = std::get<0>(id_mesh_material.second);
+		const material::Material &mat = std::get<1>(id_mesh_material.second);
 		if (kernel.latest_render_data_pool >= kernel.render_data_pool.size()) {
-			buffer::Uniform *u = e->get_buffer_manager()->create_uniform(sizeof(ForwardPbrDirectionalUniform));
-			pipeline::ResourceSet *prs = render_pipeline->create_resource_set();
-			kernel.render_data_pool.push_back(std::make_tuple(u, prs));
+			kernel.render_data_pool.push_back(std::make_tuple(
+				std::shared_ptr<buffer::Uniform>(e->get_buffer_manager()->create_uniform(sizeof(ForwardPbrDirectionalUniform))), 
+				std::shared_ptr<pipeline::ForwardPbrDirectionalShadowResourceSet>(render_pipeline->create_resource_set())));
 		}
+		std::tuple<std::shared_ptr<buffer::Uniform>, std::shared_ptr<pipeline::ForwardPbrDirectionalShadowResourceSet> > &pool = kernel.render_data_pool[kernel.latest_render_data_pool];
+		std::shared_ptr<buffer::Uniform> &ub = std::get<0>(pool);
+		std::shared_ptr <pipeline::ForwardPbrDirectionalShadowResourceSet> &prs = std::get<1>(pool);
 		ForwardPbrDirectionalUniform us;
-		/// todo
-		/// fill the uniform buffer
-		/// pass it to render pool data
-		/// pass all pipeline resources to pipeline resource set
-		/// record the command buffer
+		us.mvp = c.get_view_projection_matrix() * m.get_model_matrix();
+		us.light_view_projection_biases = l.get_view_projection_biases();
+		us.light_color = l.get_color().extend(1.0);
+		ub->update(&us);
+		prs->set_scene(s);
+		prs->set_camera(c);
+		prs->set_light(l);
+		prs->set_model(m);
+		prs->set_mesh(msh);
+		prs->set_material(mat);
+		prs->set_effect(ub, prs);
+		prs->record(kernel.secondary_cmd);
 		++kernel.latest_render_data_pool;
 	}
 }
 
 void gearoenix::render::graph::node::ForwardPbrDirectional::submit()
 {
+	const unsigned int frame_number = e->get_frame_number();
+	ForwardPbrDirectionalFrame &frame = frames[frame_number];
+	std::shared_ptr<command::Buffer> &cmd = frame.primary_cmd;
+	render_pipeline->bind(cmd);
+	render_target->bind(cmd);
+	for (const ForwardPbrDirectionalKernel k : frame.kernels) {
+		cmd->record(k.secondary_cmd);
+	}
+	std::vector<std::shared_ptr<sync::Semaphore> > pss(providers.size());
+	for (const std::shared_ptr<core::graph::Node> &p : providers) {
+		if (p == nullptr) continue;
+		const std::shared_ptr<Node> &rp = std::static_pointer_cast<Node>(p);
+		if (rp == nullptr) continue;
+		const std::shared_ptr<sync::Semaphore> &ps = rp->get_semaphore(frame_number);
+		if (ps == nullptr) continue;
+		pss.push_back(ps);
+	}
+	e->submit(pss, cmd, frame.semaphore);
 }
 
 gearoenix::render::graph::node::ForwardPbrDirectionalFrame::ForwardPbrDirectionalFrame(Engine *e) :
@@ -120,25 +155,7 @@ gearoenix::render::graph::node::ForwardPbrDirectionalFrame::ForwardPbrDirectiona
 	}
 }
 
-gearoenix::render::graph::node::ForwardPbrDirectionalFrame::~ForwardPbrDirectionalFrame()
-{
-	delete primary_cmd;
-	primary_cmd = nullptr;
-	delete semaphore;
-	semaphore = nullptr;
-}
-
 gearoenix::render::graph::node::ForwardPbrDirectionalKernel::ForwardPbrDirectionalKernel(Engine *e, const unsigned int kernel_index) :
 	secondary_cmd(e->get_command_manager()->create_secondary_command_buffer(kernel_index))
 {
-}
-
-gearoenix::render::graph::node::ForwardPbrDirectionalKernel::~ForwardPbrDirectionalKernel()
-{
-	delete secondary_cmd;
-	secondary_cmd = nullptr;
-	for (std::tuple<buffer::Uniform *, pipeline::ResourceSet *> &data : render_data_pool) {
-		delete std::get<0>(data);
-		delete std::get<1>(data);
-	}
 }
