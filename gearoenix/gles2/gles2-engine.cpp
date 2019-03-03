@@ -76,7 +76,7 @@ void gearoenix::gles2::Engine::initialize()
     glEnable(GL_STENCIL_TEST);
     glViewport(0, 0, (GLsizei)win_width, (GLsizei)win_height);
     glScissor(0, 0, (GLsizei)win_width, (GLsizei)win_height);
-    pipmgr = new render::pipeline::Manager(this);
+    pipeline_manager = new render::pipeline::Manager(this);
 #ifdef GLES2_PROFILING
     prof_last_time_draw = std::chrono::high_resolution_clock::now();
 #endif

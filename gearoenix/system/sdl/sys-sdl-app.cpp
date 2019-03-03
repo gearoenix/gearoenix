@@ -34,14 +34,14 @@ void gearoenix::system::Application::create_window()
 	std::uint32_t flags = SDL_WINDOW_SHOWN;
 
 #ifdef GX_USE_VULKAN
-	if (render::Engine::EngineType::VULKAN == supported_engine)
+	if (render::EngineType::VULKAN == supported_engine)
 	{
 		flags |= SDL_WINDOW_VULKAN;
 	}
 #endif
 
 #if defined(GX_USE_OPENGL_43) || defined(GX_USE_OPENGL_33) || defined(GX_USE_OPENGL_ES3) || defined(GX_USE_OPENGL_ES2)
-	if (render::Engine::EngineType::VULKAN != supported_engine) {
+	if (render::EngineType::VULKAN != supported_engine) {
 		SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
 		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 		SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
@@ -110,7 +110,7 @@ void gearoenix::system::Application::create_window()
 void gearoenix::system::Application::create_context()
 {
 #ifdef GX_USE_VULKAN
-	if (render::Engine::EngineType::VULKAN == supported_engine) {
+	if (render::EngineType::VULKAN == supported_engine) {
 		return;
 	}
 #endif
@@ -124,7 +124,7 @@ void gearoenix::system::Application::create_context()
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 	gl_context = SDL_GL_CreateContext(window);
 	if (gl_context != nullptr) {
-		supported_engine = render::Engine::EngineType::OPENGL_43;
+		supported_engine = render::EngineType::OPENGL_43;
 		glEnable(GL_MULTISAMPLE);
 		GXLOGD("Machine is capable if OpenGL 4.3");
 		return;
@@ -139,7 +139,7 @@ void gearoenix::system::Application::create_context()
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	gl_context = SDL_GL_CreateContext(window);
 	if (gl_context != nullptr) {
-		supported_engine = render::Engine::EngineType::OPENGL_33;
+		supported_engine = render::EngineType::OPENGL_33;
 		glEnable(GL_MULTISAMPLE);
 		GXLOGD("Machine is capable if OpenGL 3.3");
 		return;
@@ -154,7 +154,7 @@ void gearoenix::system::Application::create_context()
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
 	gl_context = SDL_GL_CreateContext(window);
 	if (gl_context != nullptr) {
-		supported_engine = render::Engine::EngineType::OPENGL_ES3;
+		supported_engine = render::EngineType::OPENGL_ES3;
 		glEnable(GL_MULTISAMPLE);
 		GXLOGD("Machine is capable if OpenGL ES 3.0");
 		return;
@@ -167,7 +167,7 @@ void gearoenix::system::Application::create_context()
 	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 	gl_context = SDL_GL_CreateContext(window);
 	if (gl_context != nullptr) {
-		supported_engine = render::Engine::EngineType::OPENGL_ES2;
+		supported_engine = render::EngineType::OPENGL_ES2;
 		GXLOGD("Machine is capable if OpenGL ES 2.0");
 		return;
 	}
@@ -175,7 +175,7 @@ void gearoenix::system::Application::create_context()
 	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
 	gl_context = SDL_GL_CreateContext(window);
 	if (gl_context != nullptr) {
-		supported_engine = render::Engine::EngineType::OPENGL_ES2;
+		supported_engine = render::EngineType::OPENGL_ES2;
 		GXLOGD("Machine is capable if weak OpenGL ES 2.0");
 		return;
 	}
@@ -328,7 +328,7 @@ gearoenix::system::Application::Application()
 #ifdef GX_USE_VULKAN
 	if (vulkan::Engine::is_supported())
 	{
-		supported_engine = render::Engine::EngineType::VULKAN;
+		supported_engine = render::EngineType::VULKAN;
 	}
 #endif
 
@@ -347,10 +347,10 @@ gearoenix::system::Application::Application()
 
 	SDL_AddEventWatch(event_receiver, this);
 
-	if (supported_engine == render::Engine::EngineType::OPENGL_43 ||
-		supported_engine == render::Engine::EngineType::OPENGL_33 ||
-		supported_engine == render::Engine::EngineType::OPENGL_ES3 ||
-		supported_engine == render::Engine::EngineType::OPENGL_ES3) {
+	if (supported_engine == render::EngineType::OPENGL_43 ||
+		supported_engine == render::EngineType::OPENGL_33 ||
+		supported_engine == render::EngineType::OPENGL_ES3 ||
+		supported_engine == render::EngineType::OPENGL_ES3) {
 
 #if defined(GX_IN_DESKTOP) && (defined(GX_USE_OPENGL_ES2) || defined(GX_USE_OPENGL_ES3) || defined(GX_USE_OPENGL_33) || defined(GX_USE_OPENGL_43))
 		const GLenum glew_error = glewInit();
@@ -375,7 +375,7 @@ gearoenix::system::Application::Application()
 	astmgr->initialize();
 
 #ifdef GX_USE_VULKAN
-	if (nullptr == render_engine && supported_engine == render::Engine::EngineType::VULKAN)
+	if (nullptr == render_engine && supported_engine == render::EngineType::VULKAN)
 	{
 		render_engine = new vulkan::Engine(this);
 	}
@@ -403,7 +403,7 @@ gearoenix::system::Application::Application()
 #endif
 
 #ifdef GX_USE_OPENGL_ES2
-	if (nullptr == render_engine && supported_engine == render::Engine::EngineType::OPENGL_ES2)
+	if (nullptr == render_engine && supported_engine == render::EngineType::OPENGL_ES2)
 	{
 		render_engine = new gles2::Engine(this);
 	}
@@ -450,10 +450,10 @@ void gearoenix::system::Application::main_loop()
 		// SDL_GL_MakeCurrent(window, gl_context);
 		render_engine->update();
 
-		if (supported_engine == render::Engine::EngineType::OPENGL_43 ||
-			supported_engine == render::Engine::EngineType::OPENGL_33 ||
-			supported_engine == render::Engine::EngineType::OPENGL_ES3 ||
-			supported_engine == render::Engine::EngineType::OPENGL_ES3) {
+		if (supported_engine == render::EngineType::OPENGL_43 ||
+			supported_engine == render::EngineType::OPENGL_33 ||
+			supported_engine == render::EngineType::OPENGL_ES3 ||
+			supported_engine == render::EngineType::OPENGL_ES3) {
 			SDL_GL_SwapWindow(window);
 		}
 #ifndef GX_IN_WEB

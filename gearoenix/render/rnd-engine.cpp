@@ -45,7 +45,7 @@ gearoenix::render::Engine::~Engine()
 
 void gearoenix::render::Engine::clear()
 {
-    if (pipmgr != nullptr) {
+    if (pipeline_manager != nullptr) {
         delete physics_engine;
         physics_engine = nullptr;
         loaded_scenes.clear();

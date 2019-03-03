@@ -1,11 +1,10 @@
 #ifndef GEAROENIX_CORE_ASSET_ASSET_HPP
 #define GEAROENIX_CORE_ASSET_ASSET_HPP
-#include "../cache/cr-cache-cached.hpp"
 #include "../cr-types.hpp"
 namespace gearoenix {
 namespace core {
     namespace asset {
-        class Asset : public cache::Cached {
+        class Asset {
         public:
             class AssetType {
             public:

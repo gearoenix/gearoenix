@@ -3,6 +3,7 @@
 #include "rnd-pip-pipeline.hpp"
 #include "../../core/sync/cr-sync-end-caller.hpp"
 #include <vector>
+#include <map>
 
 namespace gearoenix {
 namespace core {
@@ -21,6 +22,7 @@ namespace render {
         class Manager {
         private:
             Engine* eng;
+			std::map<PipelineType::Id, std::weak_ptr<Pipeline> > pipelines;
 
         public:
             Manager(Engine* engine);

@@ -161,7 +161,7 @@ void gearoenix::render::camera::Camera::global_rotate(const math::Mat4x4& rm)
     transformed = true;
 }
 
-const gearoenix::math::Mat4x4& gearoenix::render::camera::Camera::get_view_projection() const
+const gearoenix::math::Mat4x4& gearoenix::render::camera::Camera::get_view_projection_matrix() const
 {
     return vp;
 }

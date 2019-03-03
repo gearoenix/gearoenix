@@ -80,10 +80,10 @@ namespace render {
         EngineType::Id engine_type_id = EngineType::UNKNOWN;
         system::Application* sysapp;
 		/// managers pointers are own only by this class 
-        pipeline::Manager* pipeline_manager = nullptr;
-		command::Manager* command_manager = nullptr;
-		sampler::Manager* sampler_manager = nullptr;
-		buffer::Manager* buffer_manager = nullptr;
+        std::shared_ptr<pipeline::Manager> pipeline_manager = nullptr;
+		std::shared_ptr<command::Manager> command_manager = nullptr;
+		std::shared_ptr<sampler::Manager> sampler_manager = nullptr;
+		std::shared_ptr<buffer::Manager> buffer_manager = nullptr;
 		// end of managers
         core::sync::Semaphore* load_functions_mutex;
         core::sync::Semaphore* loaded_scenes_mutex;
