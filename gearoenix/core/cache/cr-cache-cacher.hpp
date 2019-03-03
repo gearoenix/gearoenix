@@ -14,7 +14,7 @@ namespace core {
             std::map<Id, std::weak_ptr<T>> cacheds;
 
         public:
-            std::shared_ptr<T> get(Id id, std::function<std::shared_ptr<T>()>)
+            std::shared_ptr<T> get(Id id, std::function<std::shared_ptr<T>()> new_fun)
 			{
 				auto search = cacheds.find(id);
 				if (search == cacheds.end()) {

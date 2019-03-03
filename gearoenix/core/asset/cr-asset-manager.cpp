@@ -14,8 +14,7 @@
 #include "../../system/stream/sys-stm-asset.hpp"
 #include "../../system/sys-app.hpp"
 #include "../cache/cr-cache-cacher.hpp"
-#include "../cache/file/cr-cache-file-sparse.hpp"
-#include "../cache/file/cr-cache-file.hpp"
+#include "../cache/cr-cache-file.hpp"
 #include "../cr-static.hpp"
 
 gearoenix::core::asset::Manager::Manager(system::Application* sys_app, const std::string& name)
