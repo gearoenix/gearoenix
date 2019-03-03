@@ -73,8 +73,7 @@ namespace render {
             // mesh_id -> (mesh, material, shadow_caster_material)
             std::map<core::Id,
                 std::tuple<std::shared_ptr<mesh::Mesh>,
-                    std::shared_ptr<material::Material>,
-                    std::shared_ptr<material::Depth>>>
+                    std::shared_ptr<material::Material>>>
                 meshes;
             // model_id -> model
             std::map<core::Id, std::shared_ptr<Model>> children;
@@ -92,7 +91,7 @@ namespace render {
             void draw(core::Id mesh_id, texture::Texture2D* shadow_texture);
             void cast_shadow(core::Id mesh_id);
             const std::map<core::Id, std::shared_ptr<Model>>& get_children() const;
-            const std::map<core::Id, std::tuple<std::shared_ptr<mesh::Mesh>, std::shared_ptr<material::Material>, std::shared_ptr<material::Depth>>>& get_meshes() const;
+            const std::map<core::Id, std::tuple<std::shared_ptr<mesh::Mesh>, std::shared_ptr<material::Material>>>& get_meshes() const;
             const math::Mat4x4& get_m() const;
             const math::Mat4x4& get_mvp() const;
             const math::Mat4x4& get_sun_mvp() const;

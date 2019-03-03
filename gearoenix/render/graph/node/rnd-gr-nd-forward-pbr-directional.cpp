@@ -101,10 +101,10 @@ void gearoenix::render::graph::node::ForwardPbrDirectional::record(
 	const unsigned int frame_number = e->get_frame_number();
 	ForwardPbrDirectionalFrame &frame = frames[frame_number];
 	ForwardPbrDirectionalKernel &kernel = frame.kernels[kernel_index];
-	const std::map<core::Id, std::tuple<std::shared_ptr<mesh::Mesh>, material::Material> > &meshes = m.get_meshes();
-	for (const std::pair<core::Id, std::tuple<std::shared_ptr<mesh::Mesh>, material::Material> > &id_mesh_material : meshes) {
+	const std::map<core::Id, std::tuple<std::shared_ptr<mesh::Mesh>, std::shared_ptr<material::Material> > > &meshes = m->get_meshes();
+	for (const std::pair<core::Id, std::tuple<std::shared_ptr<mesh::Mesh>, std::shared_ptr<material::Material> > > &id_mesh_material : meshes) {
 		const std::shared_ptr<mesh::Mesh> &msh = std::get<0>(id_mesh_material.second);
-		const material::Material &mat = std::get<1>(id_mesh_material.second);
+		const std::shared_ptr < material::Material> &mat = std::get<1>(id_mesh_material.second);
 		if (kernel.latest_render_data_pool >= kernel.render_data_pool.size()) {
 			kernel.render_data_pool.push_back(std::make_tuple(
 				std::shared_ptr<buffer::Uniform>(e->get_buffer_manager()->create_uniform(sizeof(ForwardPbrDirectionalUniform))),
