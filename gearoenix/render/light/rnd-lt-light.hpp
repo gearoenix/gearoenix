@@ -1,6 +1,7 @@
 #ifndef GEAROEMIX_RENDER_LIGHT_LIGHT_HPP
 #define GEAROEMIX_RENDER_LIGHT_LIGHT_HPP
 #include "../../core/asset/cr-asset.hpp"
+#include "../../math/math-vector.hpp"
 namespace gearoenix {
 namespace system {
     namespace stream {
@@ -17,6 +18,7 @@ namespace render {
         public:
             virtual ~Light();
             static Light* read(core::Id my_id, system::stream::Stream* f, Engine* e);
+			const math::Vec3& get_color() const;
         };
     }
 }

@@ -99,6 +99,7 @@ namespace render {
             bool hit(const math::Ray3& r, core::Real& distance_from_origin);
             bool get_is_in_camera() const;
             core::Real get_distance_from_camera() const;
+			const math::Mat4x4& get_model_matrix();
         };
     }
 }

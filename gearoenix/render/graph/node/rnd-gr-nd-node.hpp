@@ -24,6 +24,9 @@
 namespace gearoenix {
 	namespace render {
 		class Engine;
+		namespace sync {
+			class Semaphore;
+		}
 		namespace texture {
 			class Texture;
 			class Target;
@@ -35,7 +38,7 @@ namespace gearoenix {
 					Engine *e = nullptr;
 					std::vector<std::shared_ptr<texture::Texture> > input_textures;
 					std::vector<std::shared_ptr<texture::Texture> > output_textures;
-					std::vector<std::shared_ptr<texture::Target> > render_targets;
+					std::shared_ptr<texture::Target> render_target = nullptr;
 					std::shared_ptr<pipeline::Pipeline> render_pipeline = nullptr;
 					Node(
 						Engine* e,
@@ -49,6 +52,7 @@ namespace gearoenix {
 				public:
 					virtual ~Node();
 					virtual void set_input_texture(const std::shared_ptr<texture::Texture>& t, const unsigned int index);
+					virtual const std::shared_ptr<sync::Semaphore> &get_semaphore(const unsigned int frame_number) = 0;
 				};
 			}
 		}

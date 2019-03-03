@@ -106,6 +106,7 @@ namespace render {
         virtual void update() = 0;
         virtual void terminate() = 0;
 		virtual sync::Semaphore * create_semaphore() = 0;
+		virtual void submit(const std::vector<std::shared_ptr<sync::Semaphore> >& p, const std::shared_ptr<command::Buffer>& c, const std::shared_ptr<sync::Semaphore> &n);
 		// getters
         const pipeline::Manager* get_pipeline_manager() const;
         pipeline::Manager* get_pipeline_manager();

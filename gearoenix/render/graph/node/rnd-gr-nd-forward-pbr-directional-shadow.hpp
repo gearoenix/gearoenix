@@ -1,5 +1,5 @@
-#ifndef GEAROEMIX_RENDER_GRAPH_NODE_FORWARD_PBR_HPP
-#define GEAROEMIX_RENDER_GRAPH_NODE_FORWARD_PBR_HPP
+#ifndef GEAROEMIX_RENDER_GRAPH_NODE_FORWARD_PBR_DIRECTIONAL_SHADOW_HPP
+#define GEAROEMIX_RENDER_GRAPH_NODE_FORWARD_PBR_DIRECTIONAL_SHADOW_HPP
 #include "rnd-gr-nd-node.hpp"
 #include "../../../math/math-matrix.hpp"
 #include "../../../math/math-vector.hpp"
@@ -46,7 +46,7 @@ namespace gearoenix {
 		}
 		namespace graph {
 			namespace node {
-				struct ForwardPbrDirectionalKernel {
+				struct ForwardPbrDirectionalShadowKernel {
 					std::shared_ptr <command::Buffer> secondary_cmd = nullptr;
 					unsigned int latest_render_data_pool = 0;
 					std::vector<
@@ -56,20 +56,20 @@ namespace gearoenix {
 						> 
 					> render_data_pool;
 
-					ForwardPbrDirectionalKernel(Engine* e, const unsigned int kernel_index);
+					ForwardPbrDirectionalShadowKernel(Engine* e, const unsigned int kernel_index);
 				};
 
-				struct ForwardPbrDirectionalFrame {
+				struct ForwardPbrDirectionalShadowFrame {
 					std::shared_ptr<command::Buffer> primary_cmd = nullptr;
 					std::shared_ptr<sync::Semaphore> semaphore = nullptr;
 					std::shared_ptr<pipeline::ForwardPbrDirectionalShadowResource> pipeline_resource = nullptr;
 					bool input_texture_changed = true;
-					std::vector<ForwardPbrDirectionalKernel> kernels;
+					std::vector<ForwardPbrDirectionalShadowKernel> kernels;
 
-					ForwardPbrDirectionalFrame(Engine* e);
+					ForwardPbrDirectionalShadowFrame(Engine* e);
 				};
 
-				struct ForwardPbrDirectionalUniform {
+				struct ForwardPbrDirectionalShadowUniform {
 					math::Mat4x4 mvp = math::Mat4x4();
 					math::Mat4x4 light_view_projection_biases;
 					math::Vec4 light_color;
@@ -84,13 +84,13 @@ namespace gearoenix {
 				///     4 - brdflut
 				/// In here I do not care for race issues (for performance reason).
 				/// The user of this class must use its functionalities in their correct contextes.
-				class ForwardPbrDirectional : public Node {
+				class ForwardPbrDirectionalShadow : public Node {
 				private:
-					std::vector<ForwardPbrDirectionalFrame> frames;
+					std::vector<ForwardPbrDirectionalShadowFrame> frames;
 
 				public:
-					ForwardPbrDirectional(Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> call);
-					~ForwardPbrDirectional();
+					ForwardPbrDirectionalShadow(Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> call);
+					~ForwardPbrDirectionalShadow();
 
 					void set_diffuse_environment(const std::shared_ptr<texture::Cube>& t);
 					void set_specular_environment(const std::shared_ptr<texture::Cube>& t);
