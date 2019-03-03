@@ -11,15 +11,20 @@ namespace system {
         class Stream {
         private:
         protected:
+            bool is_endian_compatible = true;
+
             Stream();
-            virtual void built_in_type_read(void* data, core::Count length);
+            void built_in_type_read(void* data, core::Count length);
 
         public:
             virtual ~Stream();
+            
             virtual core::Count read(void* data, core::Count length) = 0;
             virtual core::Count write(const void* data, core::Count length) = 0;
             virtual void seek(core::Count offset) = 0;
             virtual core::Count tell() = 0;
+
+            bool get_endian_compatibility() const;
 
             std::string read_string();
             bool read_bool();

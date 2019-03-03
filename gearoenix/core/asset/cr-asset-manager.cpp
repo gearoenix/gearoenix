@@ -19,8 +19,7 @@
 
 gearoenix::core::asset::Manager::Manager(system::Application* sys_app, const std::string& name)
     : sys_app(sys_app)
-    , file(new system::stream::Asset(sys_app, name))
-    , shaders(new cache::Cacher())
+    , file(std::shared_ptr<system::stream::File>(new system::stream::File(sys_app, name)))
     , cameras(new cache::file::File(file))
     , audios(new cache::file::File(file))
     , lights(new cache::file::File(file))
@@ -36,19 +35,6 @@ gearoenix::core::asset::Manager::Manager(system::Application* sys_app, const std
 
 gearoenix::core::asset::Manager::~Manager()
 {
-    delete file;
-    delete shaders;
-    delete cameras;
-    delete audios;
-    delete lights;
-    delete fonts;
-    delete textures;
-    delete meshes;
-    delete models;
-    delete skyboxes;
-    delete constraints;
-    delete scenes;
-
     file = nullptr;
     shaders = nullptr;
     cameras = nullptr;

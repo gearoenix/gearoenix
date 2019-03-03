@@ -1,25 +1,12 @@
 #include "sys-stm-asset.hpp"
 #include "../sys-app.hpp"
 #include "../sys-log.hpp"
-#ifdef IN_IOS
+#ifdef GX_IN_IOS
 #import <Foundation/Foundation.h>
 //#import "../apple/sys-apl.mm"
-#elif defined(IN_ANDROID)
+#elif defined(GX_IN_ANDROID)
 #include <android_native_app_glue.h>
 #endif
-
-void gearoenix::system::stream::Asset::built_in_type_read(void* data, core::Count length)
-{
-    read(data, length);
-    if (is_endian_compatible)
-        return;
-    std::uint8_t* c_data = static_cast<std::uint8_t*>(data);
-    for (core::Count i = 0, j = length - 1; i < j; ++i, --j) {
-        std::uint8_t tmp = c_data[i];
-        c_data[i] = c_data[j];
-        c_data[j] = tmp;
-    }
-}
 
 void gearoenix::system::stream::Asset::check_endian_compatibility()
 {
@@ -63,11 +50,6 @@ gearoenix::system::stream::Asset::Asset
 gearoenix::system::stream::Asset::~Asset()
 {
     GXTODO; //android asset free check
-}
-
-bool gearoenix::system::stream::Asset::get_endian_compatibility() const
-{
-    return is_endian_compatible;
 }
 
 gearoenix::core::Count gearoenix::system::stream::Asset::read(void* data, core::Count length)

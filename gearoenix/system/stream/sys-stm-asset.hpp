@@ -14,7 +14,7 @@
 #elif defined(GX_IN_ANDROID)
 #include <android/asset_manager.h>
 #else
-#error "Not implemented yet!"
+#error "Unknown file implementation!"
 #endif
 namespace gearoenix {
 namespace system {
@@ -30,14 +30,12 @@ namespace system {
 #else
 #error "File usage is not specified!"
 #endif
-            bool is_endian_compatible = true;
             void check_endian_compatibility();
-            void built_in_type_read(void* data, core::Count length);
 
         public:
             Asset(system::Application* sys_app, const std::string& name);
             ~Asset();
-            bool get_endian_compatibility() const;
+
             core::Count read(void* data, core::Count length);
             core::Count write(const void* data, core::Count length);
             void seek(core::Count offset);

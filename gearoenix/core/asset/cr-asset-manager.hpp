@@ -7,74 +7,66 @@
 #include <string>
 namespace gearoenix {
 namespace audio {
-    class Audio;
+    class Manager;
 }
 namespace physics {
     namespace constraint {
-        class Constraint;
+        class Manager;
     }
 }
 namespace render {
     class Engine;
     namespace camera {
-        class Camera;
+        class Manager;
     }
     namespace font {
-        class Font;
+        class Manager;
     }
     namespace light {
-        class Light;
+        class Manager;
     }
     namespace mesh {
-        class Mesh;
+        class Manager;
     }
     namespace model {
-        class Model;
+        class Manager;
     }
     namespace skybox {
-        class Skybox;
+        class Manager;
     }
     namespace scene {
-        class Scene;
-    }
-    namespace shader {
-        class Shader;
+        class Manager;
     }
     namespace texture {
-        class Texture;
+        class Manager;
     }
 }
 namespace system {
     class Application;
     namespace stream {
-        class Asset;
+        class File;
     }
 }
 namespace core {
     namespace cache {
-        class Cacher;
-        namespace file {
-            class File;
-            class Sparse;
-        }
+        template<class T> class File;
     }
     namespace asset {
         class Manager {
         private:
             system::Application* sys_app = nullptr;
             render::Engine* render_engine = nullptr;
-            system::stream::Asset* file = nullptr;
-            cache::Cacher* shaders = nullptr;
-            cache::file::File* cameras = nullptr;
-            cache::file::File* audios = nullptr;
-            cache::file::File* lights = nullptr;
-            cache::file::File* textures = nullptr;
-            cache::file::File* fonts = nullptr;
-            cache::file::File* meshes = nullptr;
-            cache::file::File* models = nullptr;
-            cache::file::File* skyboxes = nullptr;
-            cache::file::File* constraints = nullptr;
-            cache::file::File* scenes = nullptr;
+            std::shared_ptr<system::stream::Asset> file = nullptr;
+            std::shared_ptr<render::camera::Manager> camera_manager = nullptr;
+            std::shared_ptr<audio::Manager> audio_manager = nullptr;
+            std::shared_ptr<render::light::Manager> light_manager = nullptr;
+            std::shared_ptr<render::texture::Manager> texture_manager = nullptr;
+            std::shared_ptr<render::font::Manager> font_manager = nullptr;
+            std::shared_ptr<render::mesh::Manager> mesh_manager = nullptr;
+            std::shared_ptr<render::model::Manager> model_manager = nullptr;
+            std::shared_ptr<render::skybox::Manager> skybox_manager = nullptr;
+            std::shared_ptr<physics::constraint::Manager> constraint_manager = nullptr;
+            std::shared_ptr<render::scene::Manager> scene_manager = nullptr;
             std::atomic<Id> last_id;
 
         public:
@@ -82,29 +74,17 @@ namespace core {
             ~Manager();
             void initialize();
             void set_render_engine(render::Engine* rndeng);
-            system::stream::Asset* get_file();
-            std::shared_ptr<render::shader::Shader> get_shader(Id id, sync::EndCaller<render::shader::Shader> end);
-            std::shared_ptr<render::shader::Shader> get_cached_shader(Id id) const;
-            std::shared_ptr<render::camera::Camera> get_camera(Id id);
-            std::shared_ptr<render::camera::Camera> get_cached_camera(Id id) const;
-            std::shared_ptr<audio::Audio> get_audio(Id id);
-            std::shared_ptr<audio::Audio> get_cached_audio(Id id);
-            std::shared_ptr<render::light::Light> get_light(Id id);
-            std::shared_ptr<render::light::Light> get_cached_light(Id id) const;
-            std::shared_ptr<render::texture::Texture> get_texture(Id id, sync::EndCaller<render::texture::Texture> end);
-            std::shared_ptr<render::texture::Texture> get_cached_texture(Id id) const;
-            std::shared_ptr<render::font::Font> get_font(Id id, sync::EndCaller<render::font::Font> end);
-            std::shared_ptr<render::font::Font> get_cached_font(Id id) const;
-            std::shared_ptr<render::mesh::Mesh> get_mesh(Id id, sync::EndCaller<render::mesh::Mesh> e);
-            std::shared_ptr<render::mesh::Mesh> get_cached_mesh(Id id) const;
-            std::shared_ptr<render::model::Model> get_model(Id id, sync::EndCaller<render::model::Model> e);
-            std::shared_ptr<render::model::Model> get_cached_model(Id id) const;
-            std::shared_ptr<render::skybox::Skybox> get_skybox(Id id, sync::EndCaller<render::skybox::Skybox> e);
-            std::shared_ptr<render::skybox::Skybox> get_cached_skybox(Id id) const;
-            std::shared_ptr<physics::constraint::Constraint> get_constriants(Id id, sync::EndCaller<physics::constraint::Constraint> e);
-            std::shared_ptr<physics::constraint::Constraint> get_cached_constraints(Id id) const;
-            std::shared_ptr<render::scene::Scene> get_scene(Id id, sync::EndCaller<render::scene::Scene> e);
-            std::shared_ptr<render::scene::Scene> get_cached_scene(Id id) const;
+            const std::shared_ptr<system::stream::File> &get_file() const;
+            const std::shared_ptr<render::camera::Manager> &camera_manager() const;
+            const std::shared_ptr<audio::Manager> &audio_manager() const;
+            const std::shared_ptr<render::light::Manager> &light_manager() const;
+            const std::shared_ptr<render::texture::Manager> &texture_manager() const;
+            const std::shared_ptr<render::font::Manager> &font_manager() const;
+            const std::shared_ptr<render::mesh::Manager> &mesh_manager() const;
+            const std::shared_ptr<render::model::Manager> &model_manager() const;
+            const std::shared_ptr<render::skybox::Manager> &skybox_manager() const;
+            const std::shared_ptr<physics::constraint::Manager> &constraint_manager() const;
+            const std::shared_ptr<render::scene::Manager> &scene_manager() const;
             Id create_id();
         };
     } // namespace asset
