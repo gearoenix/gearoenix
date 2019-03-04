@@ -21,7 +21,7 @@
 #include "../sys-log.hpp"
 #include <iostream>
 
-#ifdef IN_WEB
+#ifdef GX_IN_WEB
 gearoenix::system::Application* gearoenix::system::Application::app = nullptr;
 #endif
 
@@ -72,8 +72,8 @@ void gearoenix::system::Application::create_window()
 		GX_APP_NAME,
 		SDL_WINDOWPOS_CENTERED,
 		SDL_WINDOWPOS_CENTERED,
-		win_width,
-		win_height,
+        static_cast<int>(win_width),
+        static_cast<int>(win_height),
 		flags);
 	if (nullptr != window) {
 		GXLOGI("Best window created.");
@@ -85,8 +85,8 @@ void gearoenix::system::Application::create_window()
 		GX_APP_NAME,
 		SDL_WINDOWPOS_CENTERED,
 		SDL_WINDOWPOS_CENTERED,
-		win_width,
-		win_height,
+        static_cast<int>(win_width),
+        static_cast<int>(win_height),
 		flags);
 	if (nullptr != window) {
 		GXLOGI("Window with disabled multisamples created.");
@@ -97,8 +97,8 @@ void gearoenix::system::Application::create_window()
 		GX_APP_NAME,
 		SDL_WINDOWPOS_CENTERED,
 		SDL_WINDOWPOS_CENTERED,
-		win_width,
-		win_height,
+        static_cast<int>(win_width),
+        static_cast<int>(win_height),
 		flags);
 	if (nullptr != window) {
 		GXLOGI("Window with minimum rquirement created.");
@@ -293,14 +293,14 @@ int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_
 		switch (e->window.event) {
 		case SDL_WINDOWEVENT_RESIZED:
 			event = new core::event::WindowResize(
-				(core::Real) o->win_width,
-				(core::Real) o->win_height,
-				(core::Real) e->window.data1,
-				(core::Real) e->window.data2);
-			o->win_width = e->window.data1;
-			o->win_height = e->window.data2;
-			o->screen_ratio = (core::Real)o->win_width / (core::Real)o->win_height;
-			o->half_height_inversed = 2.0f / (core::Real)o->win_height;
+                static_cast<core::Real>(o->win_width),
+                static_cast<core::Real>(o->win_height),
+                static_cast<core::Real>(e->window.data1),
+                static_cast<core::Real>(e->window.data2));
+            o->win_width = static_cast<unsigned int>(e->window.data1);
+            o->win_height = static_cast<unsigned int>(e->window.data2);
+            o->screen_ratio = static_cast<core::Real>(o->win_width) / static_cast<core::Real>(o->win_height);
+            o->half_height_inversed = 2.0f / static_cast<core::Real>(o->win_height);
 			break;
 		default:
 			GXTODO;
@@ -312,7 +312,9 @@ int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_
 		break;
 	}
 	if (event != nullptr) {
-		o->render_engine->on_event(*event);
+        // TODO: new event system must be implemented
+        GXTODO;
+        // o->render_engine->on_event(*event);
 		o->core_app->on_event(*event);
 		delete event;
 	}
@@ -335,8 +337,8 @@ gearoenix::system::Application::Application()
 #ifdef GX_FULLSCREEN
 	SDL_DisplayMode display_mode;
 	SDL_GetCurrentDisplayMode(0, &display_mode);
-	win_width = display_mode.w;
-	win_height = display_mode.h;
+    win_width = static_cast<unsigned int>(display_mode.w);
+    win_height = static_cast<unsigned int>(display_mode.h);
 #else
 	win_width = GEAROENIX_DEFAULT_WINDOW_WIDTH;
 	win_height = GEAROENIX_DEFAULT_WINDOW_HEIGHT;
@@ -362,11 +364,11 @@ gearoenix::system::Application::Application()
 		SDL_GL_MakeCurrent(window, gl_context);
 		int w, h;
 		SDL_GL_GetDrawableSize(window, &w, &h);
-		win_width = (unsigned int)w;
-		win_height = (unsigned int)h;
+        win_width = static_cast<unsigned int>(w);
+        win_height = static_cast<unsigned int>(h);
 	}
-	screen_ratio = (core::Real)win_width / (core::Real)win_height;
-	half_height_inversed = 2.0f / (core::Real)win_height;
+    screen_ratio = static_cast<core::Real>(win_width) / static_cast<core::Real>(win_height);
+    half_height_inversed = 2.0f / static_cast<core::Real>(win_height);
 	int mx, my;
 	SDL_GetMouseState(&mx, &my);
 	pre_x = convert_x_to_ratio(mx);
@@ -518,12 +520,12 @@ gearoenix::core::Id gearoenix::system::Application::get_supported_engine() const
 
 gearoenix::core::Real gearoenix::system::Application::convert_x_to_ratio(int x) const
 {
-	return (((core::Real)x) * half_height_inversed) - screen_ratio;
+    return (static_cast<core::Real>(x) * half_height_inversed) - screen_ratio;
 }
 
 gearoenix::core::Real gearoenix::system::Application::convert_y_to_ratio(int y) const
 {
-	return 1.0f - (((core::Real)y) * half_height_inversed);
+    return 1.0f - (static_cast<core::Real>(y) * half_height_inversed);
 }
 
 #endif
