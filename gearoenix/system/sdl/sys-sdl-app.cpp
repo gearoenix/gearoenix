@@ -370,9 +370,7 @@ gearoenix::system::Application::Application()
 	int mx, my;
 	SDL_GetMouseState(&mx, &my);
 	pre_x = convert_x_to_ratio(mx);
-	pre_y = convert_y_to_ratio(my);
-	astmgr = new core::asset::Manager(this, "data.gx3d");
-	astmgr->initialize();
+    pre_y = convert_y_to_ratio(my);
 
 #ifdef GX_USE_VULKAN
 	if (nullptr == render_engine && supported_engine == render::EngineType::VULKAN)
@@ -412,8 +410,9 @@ gearoenix::system::Application::Application()
 	if (render_engine == nullptr)
 	{
 		GXLOGF("No suitable render engine found.");
-	}
-	astmgr->set_render_engine(render_engine);
+    }
+
+    astmgr = new core::asset::Manager(this, "data.gx3d");
 }
 
 gearoenix::system::Application::~Application()

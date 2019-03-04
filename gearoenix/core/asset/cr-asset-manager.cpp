@@ -1,6 +1,6 @@
 #include "cr-asset-manager.hpp"
-#include "../../audio/au-audio.hpp"
-#include "../../physics/constraint/phs-cns-placer.hpp"
+#include "../../audio/au-manager.hpp"
+#include "../../physics/constraint/phs-cns-manager.hpp"
 #include "../../render/camera/rnd-cmr-manager.hpp"
 #include "../../render/font/rnd-fnt-manager.hpp"
 #include "../../render/light/rnd-lt-manager.hpp"
@@ -22,12 +22,13 @@ gearoenix::core::asset::Manager::Manager(system::Application* sys_app, const std
     std::shared_ptr<system::stream::Stream> s = std::static_pointer_cast<system::stream::Stream>(file);
     last_id.store(s->read<Id>());
     core::Count off;
+    render::Engine *e = sys_app->get_render_engine();
 
 #define GXHELPER(a, n) \  
     off = s->tell(); \
     s = std::shared_ptr<system::stream::Stream>(new system::stream::Asset(sys_app, name)); \
     s->seek(off); \
-    a ## _manager = std::make_shared<n::Manager>(s);
+    a ## _manager = std::make_shared<n::Manager>(s, e);
 
     GXHELPER(camera, render::camera);
     GXHELPER(audio, audio);

@@ -115,9 +115,9 @@ namespace render {
 		const system::Application* get_system_application() const;
 		system::Application* get_system_application();
 		const physics::Engine* get_physics_engine() const;
-		physics::Engine* get_physics_engine();
-		const buffer::Manager *get_buffer_manager() const;
-		buffer::Manager *get_buffer_manager();
+        physics::Engine* get_physics_engine();
+        const buffer::Manager *get_buffer_manager() const;
+        buffer::Manager *get_buffer_manager();
 		// end of getters
         void add_load_function(std::function<void()> fun);
         const std::shared_ptr<scene::Scene>& get_scene(core::Id scene_id) const;

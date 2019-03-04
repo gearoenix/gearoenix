@@ -31,15 +31,10 @@ namespace core {
             std::shared_ptr<Caller> caller;
 
         public:
-            EndCaller(std::function<void(std::shared_ptr<T>)> f)
-                : caller(new Caller(f))
-            {
-            }
-            EndCaller(const EndCaller& o)
-                : caller(o.caller)
-            {
-            }
-            void set_data(std::shared_ptr<T> data)
+            EndCaller(std::function<void(std::shared_ptr<T>)> f): caller(new Caller(f)) {}
+            template <typename V> EndCaller(V v): caller(new Caller([v](std::shared_ptr<T>) -> void {})) {}
+            EndCaller(const EndCaller& o): caller(o.caller) {}
+            void set_data(const std::shared_ptr<T> &data)
             {
                 caller->data = data;
             }

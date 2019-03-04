@@ -4,7 +4,7 @@
 #include "phs-cns-placer.hpp"
 
 gearoenix::physics::constraint::Constraint::Constraint(core::Id my_id, Type t)
-    : core::asset::Asset(my_id, core::asset::Asset::AssetType::CONSTRAINT)
+    : core::asset::Asset(my_id, core::asset::Type::CONSTRAINT)
     , t(t)
 {
 }

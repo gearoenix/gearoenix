@@ -12,7 +12,7 @@ namespace render {
     class Engine;
     namespace texture {
         class Manager {
-        private:
+        protected:
             Engine *e;
             const std::shared_ptr<system::stream::Stream> s;
         public:

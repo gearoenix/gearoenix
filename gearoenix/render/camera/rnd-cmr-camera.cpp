@@ -8,7 +8,7 @@
 #include "rnd-cmr-perspective.hpp"
 
 gearoenix::render::camera::Camera::Camera(core::Id my_id, system::stream::Stream* f, system::Application* sysapp)
-    : core::asset::Asset(my_id, core::asset::Asset::AssetType::CAMERA)
+    : core::asset::Asset(my_id, core::asset::Type::CAMERA)
     , screen_ratio(nullptr == sysapp ? 1.0f : sysapp->get_window_ratio())
     , vwl(math::Mat4x4::look_at(
           math::Vec3(0.0f, 0.0f, 0.0f),

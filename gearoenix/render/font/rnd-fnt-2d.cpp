@@ -5,6 +5,7 @@
 #include "../../system/sys-app.hpp"
 #include "../rnd-engine.hpp"
 #include "../texture/rnd-txt-texture-2d.hpp"
+#include "../texture/rnd-txt-manager.hpp"
 #include <cmath>
 #include <string>
 
@@ -19,10 +20,7 @@ gearoenix::render::font::Font2D::Font2D(core::Id my_id, system::stream::Stream* 
 {
     f->read<core::Count>();
     f->read(&(letters_properties[0]), letters_properties.size() * sizeof(LetterProperties));
-    baked_texture = std::shared_ptr<texture::Texture2D>(
-        e->create_texture_2d(
-            e->get_system_application()->get_asset_manager()->create_id(),
-            f, core::sync::EndCaller<core::sync::EndCallerIgnore>([c](std::shared_ptr<core::sync::EndCallerIgnore>) -> void {})));
+    baked_texture = e->get_system_application()->get_asset_manager()->get_texture_manager()->create<texture::Texture2D>(c);
 }
 
 gearoenix::render::font::Font2D::~Font2D()

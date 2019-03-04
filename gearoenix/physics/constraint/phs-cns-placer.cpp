@@ -2,6 +2,7 @@
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../core/event/cr-ev-event.hpp"
 #include "../../core/event/cr-ev-window-resize.hpp"
+#include "../../render/model/rnd-mdl-manager.hpp"
 #include "../../render/model/rnd-mdl-dynamic.hpp"
 #include "../../render/rnd-engine.hpp"
 #include "../../system/stream/sys-stm-stream.hpp"
@@ -46,7 +47,7 @@ gearoenix::physics::constraint::Placer::Placer(core::Id my_id, system::stream::S
     f->read(model_ids);
     core::asset::Manager* asmgr = render_engine->get_system_application()->get_asset_manager();
     for (const core::Id model_id : model_ids) {
-        std::shared_ptr<render::model::Model> mdl = asmgr->get_model(model_id, core::sync::EndCaller<render::model::Model>([c](std::shared_ptr<render::model::Model>) -> void {}));
+        std::shared_ptr<render::model::Model> mdl = asmgr->get_model_manager()->get(model_id, core::sync::EndCaller<render::model::Model>(c));
         if (render::model::Model::RenderModel::STATIC == mdl->get_render_model_type())
             GXUNEXPECTED;
         models[model_id] = std::static_pointer_cast<render::model::Dynamic>(mdl);
