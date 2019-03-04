@@ -6,7 +6,7 @@ namespace audio {
     class Speaker : public Audio {
     private:
     public:
-        Speaker(core::Id my_id, system::stream::Stream* f);
+        Speaker(core::Id my_id, const std::shared_ptr<system::stream::Stream> &f);
     };
 } // namespace audio
 } // namespace gearoenix

@@ -12,7 +12,7 @@ namespace system {
 namespace render {
     class Engine;
     namespace font {
-        class Font : public core::asset::Asset {
+        class Font {
         public:
             class Shape {
             public:

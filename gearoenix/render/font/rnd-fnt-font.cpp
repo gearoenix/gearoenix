@@ -3,8 +3,7 @@
 #include "rnd-fnt-2d.hpp"
 
 gearoenix::render::font::Font::Font(core::Id my_id, Shape::Type t)
-    : core::asset::Asset(my_id, core::asset::Asset::AssetType::FONT)
-    , font_type(t)
+    : font_type(t)
 {
 }
 

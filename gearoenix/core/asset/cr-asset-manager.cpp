@@ -12,7 +12,6 @@
 #include "../../render/texture/rnd-txt-manager.hpp"
 #include "../../system/stream/sys-stm-asset.hpp"
 #include "../../system/sys-app.hpp"
-#include "../cache/cr-cache-cacher.hpp"
 #include "../cache/cr-cache-file.hpp"
 #include "../cr-static.hpp"
 
