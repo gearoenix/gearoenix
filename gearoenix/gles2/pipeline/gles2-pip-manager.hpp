@@ -7,16 +7,11 @@
 namespace gearoenix {
 namespace gles2 {
     class Engine;
-    namespace shader {
-        class Shader;
-    }
     namespace pipeline {
         class Manager : public render::pipeline::Manager {
         private:
         public:
-            Pipeline(core::Id sid, Engine* eng, core::sync::EndCaller<core::sync::EndCallerIgnore> call);
-            ~Pipeline();
-            void bind();
+            std::shared_ptr<render::pipeline::Resource> create_resource(const std::vector<std::shared_ptr<render::texture::Texture> > &ts) = 0;
         };
     }
 }

@@ -1,6 +1,5 @@
 #ifndef GEAROENIX_RENDER_PIPELINE_PIPELINE_HPP
 #define GEAROENIX_RENDER_PIPELINE_PIPELINE_HPP
-#include "../../core/cache/cr-cache-cached.hpp"
 #include "../../core/cr-types.hpp"
 #include "../../core/sync/cr-sync-end-caller.hpp"
 #include <memory>
@@ -35,7 +34,7 @@ namespace render {
 				Unlit = 14,
 			} Id;
 		};
-        class Pipeline : public core::cache::Cached {
+        class Pipeline {
         protected:
             Engine* eng;
 			const PipelineType::Id pipeline_type;

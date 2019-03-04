@@ -22,13 +22,13 @@ namespace render {
         class Manager {
         private:
             Engine* eng;
-			std::map<PipelineType::Id, std::weak_ptr<Pipeline> > pipelines;
+            std::map<PipelineType::Id, std::weak_ptr<Pipeline> > pipelines;
 
         public:
             Manager(Engine* engine);
-            ~Manager();
+            virtual ~Manager();
             std::shared_ptr<Pipeline> get(PipelineType::Id pipeline_type, core::sync::EndCaller<core::sync::EndCallerIgnore> end);
-			virtual std::shared_ptr<Resource> create_resource(const std::vector<std::shared_ptr<texture::Texture> > &ts) = 0;
+            virtual std::shared_ptr<Resource> create_resource(const std::vector<std::shared_ptr<texture::Texture> > &ts) = 0;
         };
     }
 }

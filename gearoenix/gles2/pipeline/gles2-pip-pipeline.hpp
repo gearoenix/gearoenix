@@ -14,7 +14,7 @@ namespace gles2 {
         class Pipeline : public render::pipeline::Pipeline {
         private:
         public:
-            Pipeline(core::Id sid, Engine* eng, core::sync::EndCaller<core::sync::EndCallerIgnore> call);
+            Pipeline(render::pipeline::PipelineType::Id pid, Engine* eng, core::sync::EndCaller<core::sync::EndCallerIgnore> call);
             ~Pipeline();
             void bind();
         };

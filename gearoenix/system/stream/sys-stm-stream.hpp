@@ -13,21 +13,46 @@ namespace system {
         protected:
             bool is_endian_compatible = true;
 
-            Stream();
-            void built_in_type_read(void* data, core::Count length);
+            Stream() {}
+ 
+            void built_in_type_read(void* data, core::Count length){
+                read(data, length);
+                if (is_endian_compatible)
+                    return;
+                std::uint8_t* c_data = static_cast<std::uint8_t*>(data);
+                for (core::Count i = 0, j = length - 1; i < j; ++i, --j) {
+                    std::uint8_t tmp = c_data[i];
+                    c_data[i] = c_data[j];
+                    c_data[j] = tmp;
+                }
+            }
 
         public:
-            virtual ~Stream();
+            virtual ~Stream() {}
             
             virtual core::Count read(void* data, core::Count length) = 0;
             virtual core::Count write(const void* data, core::Count length) = 0;
             virtual void seek(core::Count offset) = 0;
             virtual core::Count tell() = 0;
 
-            bool get_endian_compatibility() const;
+            bool get_endian_compatibility() const {
+                return is_endian_compatible;
+            }
 
-            std::string read_string();
-            bool read_bool();
+            std::string read_string() {
+                core::Count c;
+                read(c);
+                std::string s;
+                s.resize(c);
+                read(&(s[0]), c);
+                return s;
+            }
+
+            bool read_bool() {
+                std::uint8_t data;
+                read(&data, 1);
+                return data != 0;
+            }
 
             template <typename T>
             void read(std::vector<T>& data)

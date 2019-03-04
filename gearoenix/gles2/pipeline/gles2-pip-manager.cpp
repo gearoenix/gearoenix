@@ -6,19 +6,5 @@
 #include "../gles2-engine.hpp"
 #include "../shader/gles2-shader.hpp"
 
-gearoenix::gles2::pipeline::Pipeline::Pipeline(core::Id sid, Engine* eng, core::sync::EndCaller<core::sync::EndCallerIgnore> call)
-    : render::pipeline::Pipeline(sid, eng, call)
-{
-}
-
-gearoenix::gles2::pipeline::Pipeline::~Pipeline()
-{
-}
-
-void gearoenix::gles2::pipeline::Pipeline::bind()
-{
-    shd->use();
-    GXLOGE("It can be better.");
-}
 
 #endif

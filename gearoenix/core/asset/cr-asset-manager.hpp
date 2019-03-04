@@ -44,7 +44,7 @@ namespace render {
 namespace system {
     class Application;
     namespace stream {
-        class File;
+        class Asset;
     }
 }
 namespace core {
@@ -74,17 +74,17 @@ namespace core {
             ~Manager();
             void initialize();
             void set_render_engine(render::Engine* rndeng);
-            const std::shared_ptr<system::stream::File> &get_file() const;
-            const std::shared_ptr<render::camera::Manager> &camera_manager() const;
-            const std::shared_ptr<audio::Manager> &audio_manager() const;
-            const std::shared_ptr<render::light::Manager> &light_manager() const;
-            const std::shared_ptr<render::texture::Manager> &texture_manager() const;
-            const std::shared_ptr<render::font::Manager> &font_manager() const;
-            const std::shared_ptr<render::mesh::Manager> &mesh_manager() const;
-            const std::shared_ptr<render::model::Manager> &model_manager() const;
-            const std::shared_ptr<render::skybox::Manager> &skybox_manager() const;
-            const std::shared_ptr<physics::constraint::Manager> &constraint_manager() const;
-            const std::shared_ptr<render::scene::Manager> &scene_manager() const;
+            const std::shared_ptr<system::stream::Asset> &get_file() const;
+            const std::shared_ptr<render::camera::Manager> &get_camera_manager() const;
+            const std::shared_ptr<audio::Manager> &get_audio_manager() const;
+            const std::shared_ptr<render::light::Manager> &get_light_manager() const;
+            const std::shared_ptr<render::texture::Manager> &get_texture_manager() const;
+            const std::shared_ptr<render::font::Manager> &get_font_manager() const;
+            const std::shared_ptr<render::mesh::Manager> &get_mesh_manager() const;
+            const std::shared_ptr<render::model::Manager> &get_model_manager() const;
+            const std::shared_ptr<render::skybox::Manager> &get_skybox_manager() const;
+            const std::shared_ptr<physics::constraint::Manager> &get_constraint_manager() const;
+            const std::shared_ptr<render::scene::Manager> &get_scene_manager() const;
             Id create_id();
         };
     } // namespace asset

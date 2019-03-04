@@ -12,14 +12,10 @@ namespace core {
             private:
                 Cacher<T> cacher;
                 std::map<Id, Offset> offsets;
-                std::shared_ptr<system::stream::Stream> file;
+                std::shared_ptr<system::stream::Stream> file = nullptr;
 
             public:
-                File(const std::string &) {
-                    GXUNIMPLEMENTED;
-                }
-
-                void read_offsets() {
+                File(const std::shared_ptr<system::stream::Stream> &file): file(file) {
                     Count c;
                     file->read(c);
                     for (Count i = 0; i < c; ++i) {

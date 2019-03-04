@@ -52,6 +52,13 @@
 !CMakeLists.txt
 
 output/
+/output/
+
 assets/
+/assets/
 
 sdks/
+/sdks/
+
+.vscode/
+/.vscode/

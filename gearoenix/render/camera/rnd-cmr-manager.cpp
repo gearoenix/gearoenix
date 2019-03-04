@@ -1,0 +1,1 @@
+#include "rnd-cmr-manager.hpp"
