@@ -9,15 +9,17 @@ namespace system {
     }
 }
 namespace render {
-    class Engine;
+	namespace engine {
+		class Engine;
+	}
     namespace mesh {
         class Manager {
         private:
-            Engine* e;
+			const std::shared_ptr<engine::Engine> e;
             const std::shared_ptr<system::stream::Stream> s;
 
         public:
-            Manager(const std::shared_ptr<system::stream::Stream>& s, Engine* e);
+            Manager(const std::shared_ptr<system::stream::Stream>& s, const std::shared_ptr<engine::Engine> &e);
             ~Manager();
         };
     }
