@@ -18,7 +18,7 @@ void gearoenix::system::stream::Asset::check_endian_compatibility()
 
 gearoenix::system::stream::Asset::Asset
 #ifdef GX_USE_STD_FILE
-    (system::Application*, const std::string& name)
+    (const std::shared_ptr<system::Application>&, const std::string& name)
 {
     std::string file_path = name;
 #ifdef GX_IN_IOS
@@ -33,7 +33,7 @@ gearoenix::system::stream::Asset::Asset
         GXLOGF("Error in opening assets file.");
     }
 #elif defined(GX_IN_ANDROID)
-    (system::Application* sys_app, const std::string& name)
+    (const std::shared_ptr<system::Application>& sys_app, const std::string& name)
 //: sys_app(sys_app)
 {
     file = AAssetManager_open(sys_app->get_android_app()->activity->assetManager,

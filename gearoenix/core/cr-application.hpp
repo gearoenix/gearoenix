@@ -48,14 +48,14 @@ namespace core {
         delete app;                                                                      \
     }
 #elif defined(GX_IN_WINDOWS)
-#define GEAROENIX_START(CoreApp)                                                    \
-    int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)                            \
-    {                                                                               \
-        gearoenix::system::Application* app = new gearoenix::system::Application(); \
-        CoreApp* core_app = new CoreApp(app);                                       \
-        app->execute(core_app);                                                     \
-        delete app;                                                                 \
-        return 0;                                                                   \
+#define GEAROENIX_START(CoreApp)                                    \
+    int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)            \
+    {                                                               \
+        const std::shared_ptr<gearoenix::system::Application> app = \
+			gearoenix::system::Application::construct();            \
+        const std::shared_ptr<CoreApp> core_app(new CoreApp(app));  \
+        app->execute(core_app);                                     \
+        return 0;                                                   \
     }
 #elif defined(GX_IN_LINUX) || defined(GX_IN_MAC) || defined(GX_IN_IOS)
 #define GEAROENIX_START(CoreApp)                                                    \

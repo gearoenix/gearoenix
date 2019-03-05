@@ -17,7 +17,11 @@ namespace gles2 {
             GLuint texture_object;
 
         public:
-            Cube(core::Id my_id, system::stream::Stream* file, Engine* engine, core::sync::EndCaller<core::sync::EndCallerIgnore> end);
+            Cube(
+				const core::Id my_id, 
+				const std::shared_ptr<system::stream::Stream> &file, 
+				const std::shared_ptr<engine::Engine> &engine, 
+				core::sync::EndCaller<core::sync::EndCallerIgnore> end);
             ~Cube();
             void bind(GLenum texture_unit);
         };

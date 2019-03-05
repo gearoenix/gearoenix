@@ -3,7 +3,9 @@
 #include "../../core/cr-build-configuration.hpp"
 #ifdef GX_USE_SDL
 #include "../../core/cr-types.hpp"
+#include "../../render/engine/rnd-eng-type.hpp"
 #include <SDL.h>
+#include <memory>
 #ifdef GX_IN_WEB
 #include <emscripten.h>
 #endif
@@ -15,50 +17,69 @@ namespace core {
     class Application;
 }
 namespace render {
-    class Engine;
+	namespace engine {
+		class Engine;
+	}
 }
 namespace system {
     class Application {
     private:
+
 #ifdef GX_IN_WEB
         static Application* app;
 #endif
         const static core::Real ROTATION_EPSILON;
         const static core::Real ZOOM_EPSILON;
-        unsigned int win_width, win_height;
-        core::Real screen_ratio, half_height_inversed, pre_x, pre_y;
-        core::Application* core_app = nullptr;
-        render::Engine* render_engine = nullptr;
-        core::asset::Manager* astmgr = nullptr;
-        SDL_Window* window = nullptr;
-        SDL_GLContext gl_context;
-        bool running = true;
-        core::Id supported_engine = 0;
-        void create_window();
-        void create_context();
-        static int SDLCALL event_receiver(void* user_data, SDL_Event* event);
+
+        std::shared_ptr<render::engine::Engine> render_engine = nullptr;
+        std::shared_ptr<core::Application> core_app = nullptr;
+        std::shared_ptr<core::asset::Manager> astmgr = nullptr;
+
+		unsigned int win_width = 0;
+		unsigned int win_height = 0;
+
+		core::Real screen_ratio = 0.0f;
+		core::Real half_height_inversed = 0.0f;
+		core::Real pre_x = 0.0f;
+		core::Real pre_y = 0.0f;
+        
+		SDL_Window* window = nullptr;
+
+#ifdef GX_USE_OPENGL
+        SDL_GLContext gl_context = nullptr;
+#endif
+
+		bool running = true;
+        render::engine::Type::Id supported_engine = render::engine::Type::UNKNOWN;
+
+        void create_window() noexcept;
+        void create_context() noexcept;
+        static int SDLCALL event_receiver(void* user_data, SDL_Event* event) noexcept;
+
+        Application() noexcept;
 
     public:
-        Application();
+
+		static const std::shared_ptr<Application> construct() noexcept;
         ~Application();
-        void execute(core::Application* app);
+        void execute(const std::shared_ptr<core::Application> &app) noexcept;
 
 #ifdef GX_IN_WEB
-        static void loop();
-        void main_loop();
+        static void loop() noexcept;
+        void main_loop() noexcept;
 #endif
-        const core::Application* get_core_app() const;
-        core::Application* get_core_app();
-        const render::Engine* get_render_engine() const;
-        render::Engine* get_render_engine();
-        const core::asset::Manager* get_asset_manager() const;
-        core::asset::Manager* get_asset_manager();
-        core::Real get_window_ratio() const;
-        unsigned int get_width() const;
-        unsigned int get_height() const;
-        core::Real convert_x_to_ratio(int x) const;
-        core::Real convert_y_to_ratio(int y) const;
-        core::Id get_supported_engine() const;
+
+        const std::shared_ptr<core::Application> &get_core_app() const noexcept;
+		std::shared_ptr<core::Application> &get_core_app() noexcept;
+        const std::shared_ptr<render::engine::Engine> &get_render_engine() const noexcept;
+		std::shared_ptr<render::engine::Engine> &get_render_engine() noexcept;
+        const std::shared_ptr<core::asset::Manager> &get_asset_manager() const noexcept;
+		std::shared_ptr<core::asset::Manager> &get_asset_manager() noexcept;
+        core::Real get_window_ratio() const noexcept;
+        unsigned int get_width() const noexcept;
+        unsigned int get_height() const noexcept;
+        core::Real convert_x_to_ratio(int x) const noexcept;
+        core::Real convert_y_to_ratio(int y) const noexcept;
     };
 }
 }

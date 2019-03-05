@@ -14,7 +14,9 @@ namespace core {
     }
 }
 namespace render {
-    class Engine;
+	namespace engine {
+		class Engine;
+	}
 }
 namespace physics {
     class Kernel;
@@ -25,7 +27,7 @@ namespace physics {
         friend class Kernel;
 
     private:
-        render::Engine* render_engine;
+        const std::shared_ptr<render::engine::Engine> render_engine;
         // owner
         // if animation return true on its apply its gonna be deleted
         std::map<core::Id, std::shared_ptr<animation::Animation>> animations;
@@ -41,7 +43,7 @@ namespace physics {
 
     protected:
     public:
-        Engine(render::Engine* rndeng);
+        Engine(const std::shared_ptr<render::engine::Engine> &render_engine);
         ~Engine();
         // engine gonna remove it from its active animations, caller must take care of its deleteing
         void add_animation(std::shared_ptr<animation::Animation> a);

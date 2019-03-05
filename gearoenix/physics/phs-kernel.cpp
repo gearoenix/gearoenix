@@ -5,7 +5,7 @@
 #include "../render/camera/rnd-cmr-orthographic.hpp"
 #include "../render/light/rnd-lt-sun.hpp"
 #include "../render/model/rnd-mdl-model.hpp"
-#include "../render/rnd-engine.hpp"
+#include "../render/engine/rnd-eng-engine.hpp"
 #include "../render/scene/rnd-scn-scene.hpp"
 #include "animation/phs-anm-animation.hpp"
 #include "body/phs-bd-body.hpp"

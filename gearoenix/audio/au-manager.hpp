@@ -3,10 +3,11 @@
 #include "../core/cr-types.hpp"
 #include "../core/sync/cr-sync-end-caller.hpp"
 #include <memory>
-
 namespace gearoenix {
 namespace render {
-    class Engine;
+	namespace engine {
+		class Engine;
+	}
 }
 namespace system {
     namespace stream {
@@ -17,11 +18,10 @@ namespace audio {
     class Audio;
     class Manager {
     protected:
-        render::Engine* e;
+		const std::shared_ptr<render::engine::Engine> e;
         const std::shared_ptr<system::stream::Stream> s;
-
     public:
-        Manager(const std::shared_ptr<system::stream::Stream>& s, render::Engine* e);
+        Manager(const std::shared_ptr<system::stream::Stream>& s, const std::shared_ptr<render::engine::Engine> &e);
         ~Manager();
         std::shared_ptr<Audio> get(core::Id mid, core::sync::EndCaller<Audio> c);
     };

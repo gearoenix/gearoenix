@@ -4,6 +4,7 @@
 #include "sys-stm-stream.hpp"
 #include <string>
 #include <vector>
+#include <memory>
 
 #if defined(GX_IN_DESKTOP) || defined(GX_IN_IOS) || defined(GX_IN_WEB)
 #define GX_USE_STD_FILE
@@ -33,7 +34,7 @@ namespace system {
             void check_endian_compatibility();
 
         public:
-            Asset(system::Application* sys_app, const std::string& name);
+            Asset(const std::shared_ptr<system::Application> &sys_app, const std::string& name);
             ~Asset();
 
             core::Count read(void* data, core::Count length);

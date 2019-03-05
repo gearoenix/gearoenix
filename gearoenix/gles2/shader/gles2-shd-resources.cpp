@@ -3,7 +3,7 @@
 #include "../../system/sys-log.hpp"
 
 #include "../buffer/gles2-buf-uniform.hpp"
-#include "../gles2-engine.hpp"
+#include "../engine/gles2-eng-engine.hpp"
 #include "../pipeline/gles2-pip-pipeline.hpp"
 
 gearoenix::gles2::shader::Resources::Resources(Engine* e, pipeline::Pipeline* p, buffer::Uniform* u)

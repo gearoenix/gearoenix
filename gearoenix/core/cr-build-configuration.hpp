@@ -61,25 +61,24 @@
 #endif
 // Application constant definitions
 #define GX_APP_NAME "Gearoenix Demo App"
+#define GX_APP_DATA_NAME "data.gx3d"
 // Application compilation mode
 #define GX_DEBUG_MODE
 //#define TEST_MODE
 #define GX_GAME_MODE
 // Application features
-
 #define GX_LOG_ENABLED
-
 #ifdef GX_LOG_ENABLED
 #define GX_LOG_ERROR_ENABLED
 #define GX_LOG_WARN_ENABLED
 #define GX_LOG_INFO_ENABLED
 #endif
-
-// You can comment this for windowd apps
+/// You can comment this for windowed apps
 #define GX_FULLSCREEN
-// Window aspect in debug mode
 #ifndef GX_FULLSCREEN
+/// Window width in windowed mode
 #define GX_DEFAULT_WINDOW_WIDTH 1000
+/// Window height in windowed mode
 #define GX_DEFAULT_WINDOW_HEIGHT 700
 #endif
 #define GX_PROFILING_MODE
@@ -88,4 +87,7 @@
 #define GX_MAX_CONE_LIGHTS 8
 #define GX_MAX_SHADOW_MAPS 6
 #define GX_FRAMES_COUNT 2
+#if defined(GX_USE_OPENGL_ES2) || defined(GX_USE_OPENGL_ES3) || defined(GX_USE_OPENGL_33) || defined(GX_USE_OPENGL_43)
+#define GX_USE_OPENGL
+#endif
 #endif

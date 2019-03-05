@@ -3,12 +3,16 @@
 #include "../../render/texture/rnd-txt-png.hpp"
 #include "../../system/stream/sys-stm-stream.hpp"
 #include "../../system/sys-log.hpp"
-#include "../gles2-engine.hpp"
+#include "../engine/gles2-eng-engine.hpp"
 
 #define GX_FACES_COUNT 6
 
-gearoenix::gles2::texture::Cube::Cube(core::Id my_id, system::stream::Stream* file, Engine* eng, core::sync::EndCaller<core::sync::EndCallerIgnore> end)
-    : render::texture::Cube(my_id, eng)
+gearoenix::gles2::texture::Cube::Cube(
+	const core::Id my_id,
+	const std::shared_ptr<system::stream::Stream> &file,
+	const std::shared_ptr<engine::Engine> &engine,
+	core::sync::EndCaller<core::sync::EndCallerIgnore> end)
+    : render::texture::Cube(my_id, engine)
 {
     std::vector<std::vector<unsigned char>> img_data(GX_FACES_COUNT);
     unsigned int imgw, imgh;
@@ -43,7 +47,7 @@ gearoenix::gles2::texture::Cube::Cube(core::Id my_id, system::stream::Stream* fi
         //GX_CHECK_FOR_GRAPHIC_API_ERROR
         (void)end;
     };
-    eng->add_load_function(loadf);
+    engine->add_load_function(loadf);
 }
 
 gearoenix::gles2::texture::Cube::~Cube()

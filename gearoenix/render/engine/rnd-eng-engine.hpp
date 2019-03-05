@@ -3,6 +3,7 @@
 #include "../../core/cr-build-configuration.hpp"
 #include "../../core/cr-types.hpp"
 #include "../../core/sync/cr-sync-end-caller.hpp"
+#include "rnd-eng-type.hpp"
 #include <chrono>
 #include <functional>
 #include <map>
@@ -63,7 +64,7 @@ namespace render {
         class Engine {
         protected:
             unsigned int frame_number = 0;
-            Type::Id engine_type_id = EngineType::UNKNOWN;
+            const Type::Id engine_type_id;
             system::Application* sysapp;
             /// managers pointers are own only by this class
             std::shared_ptr<pipeline::Manager> pipeline_manager = nullptr;
@@ -84,7 +85,7 @@ namespace render {
             physics::Engine* physics_engine = nullptr;
             void do_load_functions();
             void clear();
-            Engine(system::Application* system_application);
+            Engine(const std::shared_ptr<system::Application> &system_application, const Type::Id engine_type_id);
 
         public:
             virtual ~Engine();
@@ -110,7 +111,7 @@ namespace render {
             const std::map<core::Id, std::shared_ptr<scene::Scene>>& get_all_scenes() const;
             void load_scene(core::Id scene_id, std::function<void()> on_load);
             void delete_scene(core::Id scene_id);
-            EngineType::Id get_engine_type_id() const;
+            Type::Id get_engine_type_id() const;
             unsigned int get_frame_number() const;
         };
     }

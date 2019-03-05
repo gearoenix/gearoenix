@@ -5,8 +5,8 @@
 #include "animation/phs-anm-animation.hpp"
 #include "phs-kernel.hpp"
 
-gearoenix::physics::Engine::Engine(render::Engine* rndeng)
-    : render_engine(rndeng)
+gearoenix::physics::Engine::Engine(const std::shared_ptr<render::engine::Engine> &render_engine)
+    : render_engine(render_engine)
     , signaller(new core::sync::Semaphore())
 {
     // because of some compiler &/| std problems it is here instead of initializer list

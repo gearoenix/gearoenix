@@ -4,7 +4,7 @@
 #include "rnd-lt-sun.hpp"
 
 gearoenix::render::light::Light::Light(core::Id my_id, system::stream::Stream*, Engine*)
-    : core::asset::Asset(my_id, core::asset::Asset::AssetType::LIGHT)
+    : core::asset::Asset(my_id, core::asset::Type::LIGHT)
 {
 }
 

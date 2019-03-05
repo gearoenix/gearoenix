@@ -1,7 +1,7 @@
 #include "sys-sdl-app.hpp"
 #ifdef GX_USE_SDL
 
-#if !defined(GX_USE_VULKAN) && !defined(GX_USE_OPENGL_43) && !defined(GX_USE_OPENGL_33) && !defined(GX_USE_OPENGL_ES3) && !defined(GX_USE_OPENGL_ES2)
+#if !defined(GX_USE_VULKAN) && !defined(GX_USE_OPENGL)
 #error "Only Vulkan or OpenGL APIs can be used along side of SDL2 application."
 #endif
 
@@ -13,11 +13,17 @@
 #include "../../core/event/cr-ev-event.hpp"
 #include "../../core/event/cr-ev-mv-mouse.hpp"
 #include "../../core/event/cr-ev-window-resize.hpp"
-#include "../../gles2/gles2-engine.hpp"
+#if defined(GX_USE_OPENGL_ES2)
+#include "../../gles2/engine/gles2-eng-engine.hpp"
 #include "../../gles2/gles2.hpp"
-#include "../../gles3/gles3-engine.hpp"
+#endif
+#if defined(GX_USE_OPENGL_ES3)
+#include "../../gles3/engine/gles3-eng-engine.hpp"
 #include "../../gles3/gles3.hpp"
-#include "../../vulkan/vk-engine.hpp"
+#endif
+#if defined(GX_USE_VULKAN)
+#include "../../vulkan/engine/vk-eng-engine.hpp"
+#endif
 #include "../sys-log.hpp"
 #include <iostream>
 
@@ -28,19 +34,19 @@ gearoenix::system::Application* gearoenix::system::Application::app = nullptr;
 const gearoenix::core::Real gearoenix::system::Application::ROTATION_EPSILON = 3.14f / 180.0f;
 const gearoenix::core::Real gearoenix::system::Application::ZOOM_EPSILON = 0.00001f;
 
-void gearoenix::system::Application::create_window()
+void gearoenix::system::Application::create_window() noexcept
 {
     SDL_SetHint(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandescapeRight");
     std::uint32_t flags = SDL_WINDOW_SHOWN;
 
 #ifdef GX_USE_VULKAN
-    if (render::EngineType::VULKAN == supported_engine) {
+    if (render::engine::Type::VULKAN == supported_engine) {
         flags |= SDL_WINDOW_VULKAN;
     }
 #endif
 
-#if defined(GX_USE_OPENGL_43) || defined(GX_USE_OPENGL_33) || defined(GX_USE_OPENGL_ES3) || defined(GX_USE_OPENGL_ES2)
-    if (render::EngineType::VULKAN != supported_engine) {
+#if defined(GX_USE_OPENGL)
+    if (render::engine::Type::VULKAN != supported_engine) {
         SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
         SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
         SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
@@ -106,10 +112,10 @@ void gearoenix::system::Application::create_window()
     GXLOGF("Can not create window with minimum requirements");
 }
 
-void gearoenix::system::Application::create_context()
+void gearoenix::system::Application::create_context() noexcept
 {
 #ifdef GX_USE_VULKAN
-    if (render::EngineType::VULKAN == supported_engine) {
+    if (render::engine::Type::VULKAN == supported_engine) {
         return;
     }
 #endif
@@ -123,7 +129,7 @@ void gearoenix::system::Application::create_context()
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     gl_context = SDL_GL_CreateContext(window);
     if (gl_context != nullptr) {
-        supported_engine = render::EngineType::OPENGL_43;
+        supported_engine = render::engine::Type::OPENGL_43;
         glEnable(GL_MULTISAMPLE);
         GXLOGD("Machine is capable if OpenGL 4.3");
         return;
@@ -138,7 +144,7 @@ void gearoenix::system::Application::create_context()
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     gl_context = SDL_GL_CreateContext(window);
     if (gl_context != nullptr) {
-        supported_engine = render::EngineType::OPENGL_33;
+        supported_engine = render::engine::Type::OPENGL_33;
         glEnable(GL_MULTISAMPLE);
         GXLOGD("Machine is capable if OpenGL 3.3");
         return;
@@ -153,20 +159,20 @@ void gearoenix::system::Application::create_context()
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
     gl_context = SDL_GL_CreateContext(window);
     if (gl_context != nullptr) {
-        supported_engine = render::EngineType::OPENGL_ES3;
+        supported_engine = render::engine::Type::OPENGL_ES3;
         glEnable(GL_MULTISAMPLE);
         GXLOGD("Machine is capable if OpenGL ES 3.0");
         return;
     }
 #endif
-
+#ifdef GX_USE_OPENGL_ES2
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
     gl_context = SDL_GL_CreateContext(window);
     if (gl_context != nullptr) {
-        supported_engine = render::EngineType::OPENGL_ES2;
+        supported_engine = render::engine::Type::OPENGL_ES2;
         GXLOGD("Machine is capable if OpenGL ES 2.0");
         return;
     }
@@ -174,14 +180,15 @@ void gearoenix::system::Application::create_context()
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
     gl_context = SDL_GL_CreateContext(window);
     if (gl_context != nullptr) {
-        supported_engine = render::EngineType::OPENGL_ES2;
+        supported_engine = render::engine::Type::OPENGL_ES2;
         GXLOGD("Machine is capable if weak OpenGL ES 2.0");
         return;
     }
+#endif
     GXLOGF("No usable API find in the host machine.");
 }
 
-int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_Event* e)
+int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_Event* e) noexcept
 {
     // It's gonna implement whenever needed and as much as needed.
     Application* o = static_cast<Application*>(user_data);
@@ -319,100 +326,110 @@ int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_
     return 1;
 }
 
-gearoenix::system::Application::Application()
+gearoenix::system::Application::Application() noexcept
 {
+}
+
+const std::shared_ptr<gearoenix::system::Application> gearoenix::system::Application::construct() noexcept {
+	const std::shared_ptr<Application> result(new Application());
+
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS) != 0) {
         GXLOGF("Failed to initialize SDL: " << SDL_GetError());
     }
 
 #ifdef GX_USE_VULKAN
     if (vulkan::Engine::is_supported()) {
-        supported_engine = render::EngineType::VULKAN;
+        supported_engine = render::engine::Type::VULKAN;
     }
 #endif
 
 #ifdef GX_FULLSCREEN
     SDL_DisplayMode display_mode;
     SDL_GetCurrentDisplayMode(0, &display_mode);
-    win_width = static_cast<unsigned int>(display_mode.w);
-    win_height = static_cast<unsigned int>(display_mode.h);
+    result->win_width = static_cast<unsigned int>(display_mode.w);
+    result->win_height = static_cast<unsigned int>(display_mode.h);
 #else
-    win_width = GEAROENIX_DEFAULT_WINDOW_WIDTH;
-    win_height = GEAROENIX_DEFAULT_WINDOW_HEIGHT;
+    result->win_width = GEAROENIX_DEFAULT_WINDOW_WIDTH;
+    result->win_height = GEAROENIX_DEFAULT_WINDOW_HEIGHT;
 #endif
 
-    create_window();
-    create_context();
+	result->create_window();
+	result->create_context();
 
-    SDL_AddEventWatch(event_receiver, this);
+    SDL_AddEventWatch(event_receiver, result.get());
 
-    if (supported_engine == render::EngineType::OPENGL_43 || supported_engine == render::EngineType::OPENGL_33 || supported_engine == render::EngineType::OPENGL_ES3 || supported_engine == render::EngineType::OPENGL_ES3) {
+    if (
+		result->supported_engine == render::engine::Type::OPENGL_43 || 
+		result->supported_engine == render::engine::Type::OPENGL_33 || 
+		result->supported_engine == render::engine::Type::OPENGL_ES3 || 
+		result->supported_engine == render::engine::Type::OPENGL_ES3) {
 
-#if defined(GX_IN_DESKTOP) && (defined(GX_USE_OPENGL_ES2) || defined(GX_USE_OPENGL_ES3) || defined(GX_USE_OPENGL_33) || defined(GX_USE_OPENGL_43))
+#if defined(GX_IN_DESKTOP) && defined(GX_USE_OPENGL)
         const GLenum glew_error = glewInit();
         if (glew_error != GLEW_OK) {
             GXLOGF("Error initializing GLEW! " << glewGetErrorString(glew_error));
         }
 #endif
-
-        SDL_GL_MakeCurrent(window, gl_context);
+#ifdef GX_USE_OPENGL
+        SDL_GL_MakeCurrent(result->window, result->gl_context);
+#endif
         int w, h;
-        SDL_GL_GetDrawableSize(window, &w, &h);
-        win_width = static_cast<unsigned int>(w);
-        win_height = static_cast<unsigned int>(h);
+        SDL_GL_GetDrawableSize(result->window, &w, &h);
+		result->win_width = static_cast<unsigned int>(w);
+		result->win_height = static_cast<unsigned int>(h);
     }
-    screen_ratio = static_cast<core::Real>(win_width) / static_cast<core::Real>(win_height);
-    half_height_inversed = 2.0f / static_cast<core::Real>(win_height);
+	result->screen_ratio = static_cast<core::Real>(result->win_width) / static_cast<core::Real>(result->win_height);
+	result->half_height_inversed = 2.0f / static_cast<core::Real>(result->win_height);
     int mx, my;
     SDL_GetMouseState(&mx, &my);
-    pre_x = convert_x_to_ratio(mx);
-    pre_y = convert_y_to_ratio(my);
+	result->pre_x = result->convert_x_to_ratio(mx);
+	result->pre_y = result->convert_y_to_ratio(my);
 
 #ifdef GX_USE_VULKAN
-    if (nullptr == render_engine && supported_engine == render::EngineType::VULKAN) {
-        render_engine = new vulkan::Engine(this);
+    if (nullptr == result->render_engine && result->supported_engine == render::engine::Type::VULKAN) {
+		result->render_engine = new vulkan::Engine(this);
     }
 #endif
 
 #ifdef GX_USE_OPENGL_43
-    if (nullptr == render_engine && supported_engine == render::Engine::OPENGL_43) {
-        render_engine = new gl43::Engine(this);
+    if (nullptr == result->render_engine && result->supported_engine == render::engine::Type::OPENGL_43) {
+		result->render_engine = new gl43::engine::Engine(this);
     }
 #endif
 
 #ifdef GX_USE_OPENGL_33
-    if (nullptr == render_engine && supported_engine == render::Engine::OPENGL_33) {
-        render_engine = new gl33::Engine(this);
+    if (nullptr == result->render_engine && result->supported_engine == render::engine::Type::OPENGL_33) {
+		result->render_engine = new gl33::engine::Engine(this);
     }
 #endif
 
 #ifdef GX_USE_OPENGL_ES3
-    if (nullptr == render_engine && supported_engine == render::Engine::OPENGL_ES3) {
-        render_engine = new gles3::Engine(this);
+    if (nullptr == result->render_engine && result->supported_engine == render::engine::Type::OPENGL_ES3) {
+		result->render_engine = new gles3::engine::Engine(this);
     }
 #endif
 
 #ifdef GX_USE_OPENGL_ES2
-    if (nullptr == render_engine && supported_engine == render::EngineType::OPENGL_ES2) {
-        render_engine = new gles2::Engine(this);
+    if (nullptr == result->render_engine && result->supported_engine == render::engine::Type::OPENGL_ES2) {
+		result->render_engine = new gles2::engine::Engine(result);
     }
 #endif
 
-    if (render_engine == nullptr) {
+    if (result->render_engine == nullptr) {
         GXLOGF("No suitable render engine found.");
     }
 
-    astmgr = new core::asset::Manager(this, "data.gx3d");
+	result->astmgr = std::make_shared<core::asset::Manager>(result, GX_APP_DATA_NAME);
 }
 
-gearoenix::system::Application::~Application()
+gearoenix::system::Application::~Application() noexcept
 {
-    delete core_app;
-    delete astmgr;
-    delete render_engine;
+    core_app = nullptr;
+    astmgr = nullptr;
+    render_engine = nullptr;
 }
 
-void gearoenix::system::Application::execute(core::Application* app)
+void gearoenix::system::Application::execute(const std::shared_ptr<core::Application> &app) noexcept
 {
     core_app = app;
 #ifdef GX_IN_WEB
@@ -439,76 +456,75 @@ void gearoenix::system::Application::main_loop()
     // SDL_GL_MakeCurrent(window, gl_context);
     render_engine->update();
 
-    if (supported_engine == render::EngineType::OPENGL_43 || supported_engine == render::EngineType::OPENGL_33 || supported_engine == render::EngineType::OPENGL_ES3 || supported_engine == render::EngineType::OPENGL_ES3) {
+    if (supported_engine == render::engine::Type::OPENGL_43 || supported_engine == render::engine::Type::OPENGL_33 || supported_engine == render::engine::Type::OPENGL_ES3 || supported_engine == render::engine::Type::OPENGL_ES3) {
         SDL_GL_SwapWindow(window);
     }
 #ifndef GX_IN_WEB
 }
 core_app->terminate();
+core_app = nullptr;
 render_engine->terminate();
+render_engine = nullptr;
 SDL_DelEventWatch(event_receiver, this);
+#ifdef GX_USE_OPENGL
 SDL_GL_DeleteContext(gl_context);
+#endif
 SDL_DestroyWindow(window);
 SDL_Quit();
 #endif
 }
 
-const gearoenix::core::Application* gearoenix::system::Application::get_core_app() const
+const std::shared_ptr<gearoenix::core::Application> &gearoenix::system::Application::get_core_app() const noexcept
 {
     return core_app;
 }
 
-gearoenix::core::Application* gearoenix::system::Application::get_core_app()
+std::shared_ptr<gearoenix::core::Application> &gearoenix::system::Application::get_core_app() noexcept
 {
     return core_app;
 }
 
-const gearoenix::render::Engine* gearoenix::system::Application::get_render_engine() const
+const std::shared_ptr<gearoenix::render::engine::Engine> &gearoenix::system::Application::get_render_engine() const noexcept
 {
     return render_engine;
 }
 
-gearoenix::render::Engine* gearoenix::system::Application::get_render_engine()
+std::shared_ptr<gearoenix::render::engine::Engine> &gearoenix::system::Application::get_render_engine() noexcept
 {
     return render_engine;
 }
 
-gearoenix::core::asset::Manager* gearoenix::system::Application::get_asset_manager()
+const std::shared_ptr<gearoenix::core::asset::Manager> &gearoenix::system::Application::get_asset_manager() const noexcept
 {
     return astmgr;
 }
 
-const gearoenix::core::asset::Manager* gearoenix::system::Application::get_asset_manager() const
+std::shared_ptr<gearoenix::core::asset::Manager> &gearoenix::system::Application::get_asset_manager() noexcept
 {
     return astmgr;
 }
 
-gearoenix::core::Real gearoenix::system::Application::get_window_ratio() const
+gearoenix::core::Real gearoenix::system::Application::get_window_ratio() const noexcept
 {
     return screen_ratio;
 }
 
-unsigned int gearoenix::system::Application::get_width() const
+unsigned int gearoenix::system::Application::get_width() const noexcept
 {
     return win_width;
 }
 
-unsigned int gearoenix::system::Application::get_height() const
+unsigned int gearoenix::system::Application::get_height() const noexcept
 {
     return win_height;
 }
 
-gearoenix::core::Id gearoenix::system::Application::get_supported_engine() const
-{
-    return supported_engine;
-}
-
-gearoenix::core::Real gearoenix::system::Application::convert_x_to_ratio(int x) const
+gearoenix::core::Real gearoenix::system::Application::convert_x_to_ratio(int x) const noexcept
 {
     return (static_cast<core::Real>(x) * half_height_inversed) - screen_ratio;
 }
 
-gearoenix::core::Real gearoenix::system::Application::convert_y_to_ratio(int y) const
+gearoenix::core::Real gearoenix::system::Application::convert_y_to_ratio(int y) const noexcept
 {
     return 1.0f - (static_cast<core::Real>(y) * half_height_inversed);
 }
