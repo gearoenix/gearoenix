@@ -22,40 +22,40 @@
 /// This system can be used to push independant commands on separate queue
 
 namespace gearoenix {
-	namespace render {
-		class Engine;
-		namespace sync {
-			class Semaphore;
-		}
-		namespace texture {
-			class Texture;
-			class Target;
-		}
-		namespace graph {
-			namespace node {
-				class Node : public core::graph::Node {
-				protected:
-					Engine *e = nullptr;
-					std::vector<std::shared_ptr<texture::Texture> > input_textures;
-					std::vector<std::shared_ptr<texture::Texture> > output_textures;
-					std::shared_ptr<texture::Target> render_target = nullptr;
-					std::shared_ptr<pipeline::Pipeline> render_pipeline = nullptr;
-					Node(
-						Engine* e,
-						const pipeline::PipelineType::Id pipeline_type_id,
-						const unsigned int input_textures_count,
-						const unsigned int output_textures_count,
-						const std::vector<std::string> &input_links,
-						const std::vector<std::string> &output_links,
-						const core::sync::EndCaller<core::sync::EndCallerIgnore> call);
+namespace render {
+    class Engine;
+    namespace sync {
+        class Semaphore;
+    }
+    namespace texture {
+        class Texture;
+        class Target;
+    }
+    namespace graph {
+        namespace node {
+            class Node : public core::graph::Node {
+            protected:
+                Engine* e = nullptr;
+                std::vector<std::shared_ptr<texture::Texture>> input_textures;
+                std::vector<std::shared_ptr<texture::Texture>> output_textures;
+                std::shared_ptr<texture::Target> render_target = nullptr;
+                std::shared_ptr<pipeline::Pipeline> render_pipeline = nullptr;
+                Node(
+                    Engine* e,
+                    const pipeline::PipelineType::Id pipeline_type_id,
+                    const unsigned int input_textures_count,
+                    const unsigned int output_textures_count,
+                    const std::vector<std::string>& input_links,
+                    const std::vector<std::string>& output_links,
+                    const core::sync::EndCaller<core::sync::EndCallerIgnore> call);
 
-				public:
-					virtual ~Node();
-					virtual void set_input_texture(const std::shared_ptr<texture::Texture>& t, const unsigned int index);
-					virtual const std::shared_ptr<sync::Semaphore> &get_semaphore(const unsigned int frame_number) = 0;
-				};
-			}
-		}
-	}
+            public:
+                virtual ~Node();
+                virtual void set_input_texture(const std::shared_ptr<texture::Texture>& t, const unsigned int index);
+                virtual const std::shared_ptr<sync::Semaphore>& get_semaphore(const unsigned int frame_number) = 0;
+            };
+        }
+    }
+}
 }
 #endif

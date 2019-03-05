@@ -14,8 +14,9 @@ namespace system {
             bool is_endian_compatible = true;
 
             Stream() {}
- 
-            void built_in_type_read(void* data, core::Count length){
+
+            void built_in_type_read(void* data, core::Count length)
+            {
                 read(data, length);
                 if (is_endian_compatible)
                     return;
@@ -29,17 +30,19 @@ namespace system {
 
         public:
             virtual ~Stream() {}
-            
+
             virtual core::Count read(void* data, core::Count length) = 0;
             virtual core::Count write(const void* data, core::Count length) = 0;
             virtual void seek(core::Count offset) = 0;
             virtual core::Count tell() = 0;
 
-            bool get_endian_compatibility() const {
+            bool get_endian_compatibility() const
+            {
                 return is_endian_compatible;
             }
 
-            std::string read_string() {
+            std::string read_string()
+            {
                 core::Count c;
                 read(c);
                 std::string s;
@@ -48,7 +51,8 @@ namespace system {
                 return s;
             }
 
-            bool read_bool() {
+            bool read_bool()
+            {
                 std::uint8_t data;
                 read(&data, 1);
                 return data != 0;

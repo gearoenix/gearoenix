@@ -3,7 +3,7 @@
 
 // Declaring gl data
 #if defined(GX_IN_DESKTOP)
-#define GLEW_STATIC 
+#define GLEW_STATIC
 #include <GL/glew.h>
 #include <SDL_opengl.h>
 #elif defined(GX_IN_IOS) || defined(GX_IN_WEB) || defined(GX_IN_ANDROID)

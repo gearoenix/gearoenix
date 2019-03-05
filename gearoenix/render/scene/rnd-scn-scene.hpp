@@ -1,7 +1,7 @@
 #ifndef GEAROEMIX_RENDER_SCENE_SCENE_HPP
 #define GEAROEMIX_RENDER_SCENE_SCENE_HPP
-#include "../../core/cr-build-configuration.hpp"
 #include "../../core/asset/cr-asset.hpp"
+#include "../../core/cr-build-configuration.hpp"
 #include "../../core/sync/cr-sync-end-caller.hpp"
 #include "../../math/math-vector.hpp"
 #include <map>
@@ -61,25 +61,25 @@ namespace render {
             friend class physics::Kernel;
 
         public:
-			struct Uniform {
-				math::Vec4 ambient_light = math::Vec4(0.3f, 0.3f, 0.3f, 1.0f);
-				math::Vec4 directional_lights_color[GX_MAX_DIRECTIONAL_LIGHTS];
-				math::Vec4 directional_lights_direction[GX_MAX_DIRECTIONAL_LIGHTS];
-				math::Vec4 point_lights_color_min_radius[GX_MAX_POINT_LIGHTS];
-				math::Vec4 point_lights_position_max_radius[GX_MAX_POINT_LIGHTS];
-				/// directional, point, cone, reserved
-				math::Vec4 lights_count;
-				/// samples-count, radius, z-tolerance, reserved
-				math::Vec4 ssao_config;
-			};
+            struct Uniform {
+                math::Vec4 ambient_light = math::Vec4(0.3f, 0.3f, 0.3f, 1.0f);
+                math::Vec4 directional_lights_color[GX_MAX_DIRECTIONAL_LIGHTS];
+                math::Vec4 directional_lights_direction[GX_MAX_DIRECTIONAL_LIGHTS];
+                math::Vec4 point_lights_color_min_radius[GX_MAX_POINT_LIGHTS];
+                math::Vec4 point_lights_position_max_radius[GX_MAX_POINT_LIGHTS];
+                /// directional, point, cone, reserved
+                math::Vec4 lights_count;
+                /// samples-count, radius, z-tolerance, reserved
+                math::Vec4 ssao_config;
+            };
 
-			class Type {
-			public:
-				typedef enum : core::Id {
-					GAME = 1,
-					UI = 2,
-				} Id;
-			};
+            class Type {
+            public:
+                typedef enum : core::Id {
+                    GAME = 1,
+                    UI = 2,
+                } Id;
+            };
 
         protected:
             const Type::Id type_id;

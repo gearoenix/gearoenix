@@ -1,4 +1,3 @@
-#include "rnd-engine.hpp"
 #include "../core/asset/cr-asset-manager.hpp"
 #include "../core/event/cr-ev-event.hpp"
 #include "../core/event/cr-ev-sys-system.hpp"
@@ -8,6 +7,7 @@
 #include "../system/sys-app.hpp"
 #include "../system/sys-log.hpp"
 #include "pipeline/rnd-pip-manager.hpp"
+#include "rnd-engine.hpp"
 #include "scene/rnd-scn-scene.hpp"
 #include <functional>
 #include <thread>
@@ -102,14 +102,14 @@ void gearoenix::render::Engine::on_event(core::event::Event& e)
     }
 }
 
-const command::Manager * gearoenix::render::Engine::get_command_manager() const
+const command::Manager* gearoenix::render::Engine::get_command_manager() const
 {
-	return command_manager;
+    return command_manager;
 }
 
-command::Manager * gearoenix::render::Engine::get_command_manager()
+command::Manager* gearoenix::render::Engine::get_command_manager()
 {
-	return command_manager;
+    return command_manager;
 }
 
 const gearoenix::system::Application* gearoenix::render::Engine::get_system_application() const

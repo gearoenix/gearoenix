@@ -11,9 +11,8 @@ namespace render {
     namespace light {
         class Directional : public Light {
         private:
-
         public:
-			const math::Mat4x4& get_view_projection_biases() const;
+            const math::Mat4x4& get_view_projection_biases() const;
         };
     }
 }

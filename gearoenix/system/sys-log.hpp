@@ -33,17 +33,17 @@ namespace system {
 }
 #define GXLOGI(s)                                                                 \
     {                                                                             \
-        gearoenix::system::Log::info << GX_APP_NAME << " " << s << " "       \
+        gearoenix::system::Log::info << GX_APP_NAME << " " << s << " "            \
                                      << __FILE__ << " " << __LINE__ << std::endl; \
     }
 #define GXLOGD(s)                                                                  \
     {                                                                              \
-        gearoenix::system::Log::debug << GX_APP_NAME << " " << s << " "       \
+        gearoenix::system::Log::debug << GX_APP_NAME << " " << s << " "            \
                                       << __FILE__ << " " << __LINE__ << std::endl; \
     }
 #define GXLOGE(s)                                                                  \
     {                                                                              \
-        gearoenix::system::Log::error << GX_APP_NAME << " " << s << " "       \
+        gearoenix::system::Log::error << GX_APP_NAME << " " << s << " "            \
                                       << __FILE__ << " " << __LINE__ << std::endl; \
     }
 #define GXLOGF(s)         \

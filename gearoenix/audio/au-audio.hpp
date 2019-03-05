@@ -12,10 +12,11 @@ namespace audio {
     class Audio : public core::asset::Asset {
     private:
     protected:
-        Audio(const core::Id my_id, const std::shared_ptr<system::stream::Stream> &f);
+        Audio(const core::Id my_id, const std::shared_ptr<system::stream::Stream>& f);
+
     public:
         virtual ~Audio();
-        static Audio* read(const core::Id my_id, const std::shared_ptr<system::stream::Stream> &f);
+        static Audio* read(const core::Id my_id, const std::shared_ptr<system::stream::Stream>& f);
     };
 } // namespace audio
 } // namespace gearoenix

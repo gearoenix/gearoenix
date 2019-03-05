@@ -13,10 +13,11 @@ namespace render {
     namespace mesh {
         class Manager {
         private:
-            Engine *e;
+            Engine* e;
             const std::shared_ptr<system::stream::Stream> s;
+
         public:
-        Manager(const std::shared_ptr<system::stream::Stream>& s, Engine* e);
+            Manager(const std::shared_ptr<system::stream::Stream>& s, Engine* e);
             ~Manager();
         };
     }

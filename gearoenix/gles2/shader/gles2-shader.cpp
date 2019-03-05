@@ -75,7 +75,7 @@ GLuint gearoenix::gles2::shader::Shader::get_uniform_location(const std::string&
 {
     GLuint result = glGetUniformLocation(shader_program, &(uname[0]));
     if (result == 0xFFFFFFFF) {
-		GXUNEXPECTED;
+        GXUNEXPECTED;
     }
     return result;
 }

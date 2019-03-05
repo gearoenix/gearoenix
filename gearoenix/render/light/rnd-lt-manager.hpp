@@ -1,8 +1,8 @@
 #ifndef GEAROEMIX_RENDER_LIGHT_MANAGER_HPP
 #define GEAROEMIX_RENDER_LIGHT_MANAGER_HPP
-#include <memory>
 #include "../../core/cr-types.hpp"
 #include "../../core/sync/cr-sync-end-caller.hpp"
+#include <memory>
 
 namespace gearoenix {
 namespace system {
@@ -13,11 +13,12 @@ namespace system {
 namespace render {
     class Engine;
     namespace light {
-    class Light;
+        class Light;
         class Manager {
         protected:
-            Engine *e = nullptr;
+            Engine* e = nullptr;
             const std::shared_ptr<system::stream::Stream> s;
+
         public:
             Manager(const std::shared_ptr<system::stream::Stream>& s, Engine* e);
             ~Manager();

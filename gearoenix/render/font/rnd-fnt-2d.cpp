@@ -4,8 +4,8 @@
 #include "../../system/stream/sys-stm-memory.hpp"
 #include "../../system/sys-app.hpp"
 #include "../rnd-engine.hpp"
-#include "../texture/rnd-txt-texture-2d.hpp"
 #include "../texture/rnd-txt-manager.hpp"
+#include "../texture/rnd-txt-texture-2d.hpp"
 #include <cmath>
 #include <string>
 

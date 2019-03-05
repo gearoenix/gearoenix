@@ -12,10 +12,12 @@ namespace render {
         public:
             Uniform(Engine*);
             virtual ~Uniform();
-			template<typename T> void update(const T& s) {
-				/// todo in debug mode check for the size of uniform buffer
-				update(s, sizeof(T));
-			}
+            template <typename T>
+            void update(const T& s)
+            {
+                /// todo in debug mode check for the size of uniform buffer
+                update(s, sizeof(T));
+            }
             virtual void update(const void*, unsigned int) = 0;
             virtual void* get_data() = 0;
         };

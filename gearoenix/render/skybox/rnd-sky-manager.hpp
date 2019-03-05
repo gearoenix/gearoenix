@@ -13,8 +13,9 @@ namespace render {
     namespace skybox {
         class Manager {
         private:
-            Engine *e;
+            Engine* e;
             const std::shared_ptr<system::stream::Stream> s;
+
         public:
             Manager(const std::shared_ptr<system::stream::Stream>& s, Engine* e);
             ~Manager();

@@ -9,8 +9,8 @@
 #include "../sync/vk-sync-fence.hpp"
 #include "../vk-check.hpp"
 #include "../vk-instance.hpp"
-#include "vk-cmd-pool.hpp"
 #include "..\..\render\command\rnd-cmd-buffer.hpp"
+#include "vk-cmd-pool.hpp"
 
 gearoenix::render::command::Buffer::Buffer(Pool* pool)
     : pool(pool)

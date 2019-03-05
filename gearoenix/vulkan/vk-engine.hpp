@@ -89,7 +89,7 @@ namespace vulkan {
     public:
         Engine(system::Application* sys_app);
         ~Engine();
-		static bool is_supported();
+        static bool is_supported();
         void window_changed();
         void update();
         void terminate();

@@ -18,7 +18,7 @@ namespace render {
         public:
             virtual ~Light();
             static Light* read(core::Id my_id, system::stream::Stream* f, Engine* e);
-			const math::Vec3& get_color() const;
+            const math::Vec3& get_color() const;
         };
     }
 }

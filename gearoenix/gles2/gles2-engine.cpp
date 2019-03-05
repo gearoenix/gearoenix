@@ -13,7 +13,7 @@
 #include "../system/sys-log.hpp"
 #include "buffer/gles2-buf-mesh.hpp"
 #include "buffer/gles2-buf-uniform.hpp"
-#include "pipeline/gles2-pip-pipeline.hpp"
+#include "pipeline/gles2-pip-manager.hpp"
 #include "shader/gles2-shd-depth.hpp"
 #include "shader/gles2-shd-directional-colored-matte-nonreflective-shadowless-opaque.hpp"
 #include "shader/gles2-shd-directional-colored-speculated-baked-full-opaque.hpp"
@@ -52,7 +52,7 @@ void gearoenix::gles2::Engine::initialize()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, shadow_map_color, 0);
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-		GXUNEXPECTED;
+        GXUNEXPECTED;
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
     glEnable(GL_BLEND);

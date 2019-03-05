@@ -13,8 +13,9 @@ namespace render {
     namespace texture {
         class Manager {
         protected:
-            Engine *e;
+            Engine* e;
             const std::shared_ptr<system::stream::Stream> s;
+
         public:
             Manager(const std::shared_ptr<system::stream::Stream>& s, Engine* e);
             ~Manager();

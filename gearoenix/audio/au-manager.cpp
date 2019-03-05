@@ -1,12 +1,5 @@
 #include "au-manager.hpp"
 
-namespace gearoenix {
-namespace audio {
-
-Manager::Manager()
+gearoenix::audio::Manager::Manager(const std::shared_ptr<system::stream::Stream>& s, render::Engine* e)
 {
-
 }
-
-} // namespace audio
-} // namespace gearoenix

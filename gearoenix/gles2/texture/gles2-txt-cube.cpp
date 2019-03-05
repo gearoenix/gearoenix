@@ -17,7 +17,7 @@ gearoenix::gles2::texture::Cube::Cube(core::Id my_id, system::stream::Stream* fi
         unsigned int iimgw, iimgh;
         render::texture::PNG::decode(file, img_data[i], iimgw, iimgh);
         if (iimgw != imgw || iimgh != imgh)
-			GXUNEXPECTED;
+            GXUNEXPECTED;
     }
     static const GLenum faces[] = {
         GL_TEXTURE_CUBE_MAP_POSITIVE_Z,

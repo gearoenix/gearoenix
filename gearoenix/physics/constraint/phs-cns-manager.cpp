@@ -2,13 +2,12 @@
 
 namespace gearoenix {
 namespace physics {
-namespace constraint {
+    namespace constraint {
 
-Manager::Manager()
-{
+        Manager::Manager()
+        {
+        }
 
-}
-
-} // namespace constraint
+    } // namespace constraint
 } // namespace physics
 } // namespace gearoenix

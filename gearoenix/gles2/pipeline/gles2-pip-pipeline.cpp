@@ -6,7 +6,7 @@
 #include "../gles2-engine.hpp"
 #include "../shader/gles2-shader.hpp"
 
-gearoenix::gles2::pipeline::Pipeline::Pipeline(render::pipeline::PipelineType::Id pid, Engine* eng, core::sync::EndCaller<core::sync::EndCallerIgnore> call)
+gearoenix::gles2::pipeline::Pipeline::Pipeline(render::pipeline::Type::Id pid, Engine* eng, core::sync::EndCaller<core::sync::EndCallerIgnore> call)
     : render::pipeline::Pipeline(pid, eng, call)
 {
 }
