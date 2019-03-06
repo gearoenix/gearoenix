@@ -7,17 +7,23 @@
 #include <memory>
 namespace gearoenix {
 namespace gles2 {
-    class Engine;
+	namespace engine {
+		class Engine;
+	}
     namespace texture {
         class Texture2D : public render::texture::Texture2D {
         private:
             GLuint texture_object;
 
         public:
-            Texture2D(core::Id my_id, system::stream::Stream* file, Engine* engine, core::sync::EndCaller<core::sync::EndCallerIgnore> end);
-            Texture2D(core::Id my_id, GLuint txtobj, Engine* eng);
+            Texture2D(
+				const core::Id my_id, 
+				const std::shared_ptr<system::stream::Stream> &file,
+				const std::shared_ptr<engine::Engine> &e, 
+				const core::sync::EndCaller<core::sync::EndCallerIgnore> end);
+            Texture2D(const core::Id my_id, const GLuint txtobj, const std::shared_ptr<engine::Engine> &e);
             ~Texture2D();
-            void bind(GLenum texture_unit);
+            void bind(const GLenum texture_unit);
         };
     }
 }

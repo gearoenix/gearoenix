@@ -5,6 +5,9 @@
 #include <vector>
 namespace gearoenix {
 namespace render {
+	namespace engine {
+		class Engine;
+	}
     namespace texture {
         class Texture2D;
     }
@@ -25,7 +28,11 @@ namespace render {
             std::shared_ptr<texture::Texture2D> baked_texture;
 
         public:
-            Font2D(core::Id my_id, system::stream::Stream* f, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> c);
+            Font2D(
+				const core::Id my_id, 
+				const std::shared_ptr<system::stream::Stream> &f, 
+				const std::shared_ptr<engine::Engine> &e, 
+				const core::sync::EndCaller<core::sync::EndCallerIgnore> &c);
             ~Font2D();
             const LetterProperties& get_letter_properties(char c) const;
             const std::shared_ptr<texture::Texture2D> get_baked_texture() const;

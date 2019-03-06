@@ -7,12 +7,12 @@
 #include "../../physics/phs-engine.hpp"
 #include "../camera/rnd-cmr-camera.hpp"
 #include "../model/rnd-mdl-model.hpp"
-#include "../rnd-engine.hpp"
+#include "../engine/rnd-eng-engine.hpp"
 #include "../widget/rnd-wdg-widget.hpp"
 #include <limits>
 
 gearoenix::render::scene::Ui::Ui(core::Id my_id, system::stream::Stream* f, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> c)
-    : Scene(my_id, Scene::SceneType::UI, f, e, c)
+    : Scene(my_id, Type::UI, f, e, c)
 {
 }
 

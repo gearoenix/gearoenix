@@ -1,7 +1,7 @@
 #ifndef GEAROENIX_GLES3_ENGINE_HPP
 #define GEAROENIX_GLES3_ENGINE_HPP
-#include "../core/cr-build-configuration.hpp"
-#ifdef USE_OPENGL_ES3
+#include "../../core/cr-build-configuration.hpp"
+#ifdef GX_USE_OPENGL_ES3
 #include "../render/rnd-engine.hpp"
 #include "gles3.hpp"
 #include <memory>

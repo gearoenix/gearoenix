@@ -13,17 +13,17 @@
 #include "../../pipeline/rnd-pip-pipeline.hpp"
 #include "../../pipeline/rnd-pip-resource-set.hpp"
 #include "../../pipeline/rnd-pip-resource.hpp"
-#include "../../rnd-engine.hpp"
+#include "../../engine/rnd-eng-engine.hpp"
 #include "../../texture/rnd-txt-target.hpp"
 #include "../../texture/rnd-txt-texture-2d.hpp"
 #include "../../texture/rnd-txt-texture-cube.hpp"
 #include <thread>
 
 gearoenix::render::graph::node::ForwardPbrDirectionalShadow::ForwardPbrDirectionalShadow(
-    Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> call)
+	const std::shared_ptr<engine::Engine> &e, const core::sync::EndCaller<core::sync::EndCallerIgnore> &call)
     : Node(
           e,
-          pipeline::PipelineType::ForwardPbrDirectionalShadow,
+          pipeline::Type::ForwardPbrDirectionalShadow,
           5,
           1,
           { "diffuse environment"
@@ -155,7 +155,7 @@ void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::submit()
     e->submit(pss, cmd, frame.semaphore);
 }
 
-gearoenix::render::graph::node::ForwardPbrDirectionalShadowFrame::ForwardPbrDirectionalShadowFrame(Engine* e)
+gearoenix::render::graph::node::ForwardPbrDirectionalShadowFrame::ForwardPbrDirectionalShadowFrame(const std::shared_ptr<engine::Engine> &e)
     : primary_cmd(e->get_command_manager()->create_primary_command_buffer())
     , semaphore(e->create_semaphore())
 {
@@ -166,7 +166,7 @@ gearoenix::render::graph::node::ForwardPbrDirectionalShadowFrame::ForwardPbrDire
     }
 }
 
-gearoenix::render::graph::node::ForwardPbrDirectionalShadowKernel::ForwardPbrDirectionalShadowKernel(Engine* e, const unsigned int kernel_index)
+gearoenix::render::graph::node::ForwardPbrDirectionalShadowKernel::ForwardPbrDirectionalShadowKernel(const std::shared_ptr<engine::Engine> &e, const unsigned int kernel_index)
     : secondary_cmd(e->get_command_manager()->create_secondary_command_buffer(kernel_index))
 {
 }

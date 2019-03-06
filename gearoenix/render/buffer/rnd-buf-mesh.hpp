@@ -8,14 +8,15 @@ namespace system {
     }
 }
 namespace render {
-    class Engine;
+	namespace engine {
+		class Engine;
+	}
     namespace buffer {
         class Mesh {
         protected:
-            Engine* engine;
-
+			const std::shared_ptr<engine::Engine> e;
         public:
-            Mesh(Engine* engine);
+            Mesh(const std::shared_ptr<engine::Engine> &e);
             virtual ~Mesh();
             virtual void bind() = 0;
             virtual void draw() = 0;

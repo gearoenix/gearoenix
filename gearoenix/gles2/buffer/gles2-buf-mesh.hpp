@@ -7,7 +7,9 @@
 #include "../gles2.hpp"
 namespace gearoenix {
 namespace gles2 {
-    class Engine;
+	namespace engine {
+		class Engine;
+	}
     namespace buffer {
         class Mesh : public render::buffer::Mesh {
         public:
@@ -16,7 +18,10 @@ namespace gles2 {
             GLsizei ic;
 
         public:
-            Mesh(unsigned int vertex_elements_count, system::stream::Stream* f, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> c);
+            Mesh(
+				const std::shared_ptr<system::stream::Stream> &f, 
+				const std::shared_ptr<engine::Engine> &e, 
+				const core::sync::EndCaller<core::sync::EndCallerIgnore> c);
             ~Mesh();
             void bind();
             void draw();

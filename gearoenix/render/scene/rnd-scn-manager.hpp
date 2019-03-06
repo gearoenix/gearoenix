@@ -9,16 +9,19 @@ namespace system {
     }
 }
 namespace render {
-    class Engine;
+	namespace engine {
+		class Engine;
+	}
     namespace scene {
+		class Scene;
         class Manager {
-        private:
-            Engine* e;
-            const std::shared_ptr<system::stream::Stream> s;
-
-        public:
-            Manager(const std::shared_ptr<system::stream::Stream>& s, Engine* e);
-            ~Manager();
+		protected:
+			const std::shared_ptr<engine::Engine> e;
+			const std::shared_ptr<system::stream::Stream> s;
+		public:
+			Manager(const std::shared_ptr<system::stream::Stream>& s, const std::shared_ptr<engine::Engine> &e);
+			~Manager();
+			std::shared_ptr<Scene> get(const core::Id mid, const core::sync::EndCaller<Scene> c);
         };
     }
 }

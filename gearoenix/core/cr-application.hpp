@@ -2,6 +2,7 @@
 #define GEAROENIX_CORE_APPLICATION_HPP
 #include "cr-build-configuration.hpp"
 #include "cr-types.hpp"
+#include <memory>
 #ifdef GX_IN_ANDROID
 #include <android_native_app_glue.h>
 #elif defined(GX_IN_WINDOWS)
@@ -18,10 +19,10 @@ namespace core {
     class Application {
     public:
     protected:
-        system::Application* sys_app;
+		const std::shared_ptr<system::Application> sys_app;
 
     public:
-        Application(system::Application* sys_app);
+        Application(const std::shared_ptr<system::Application> &sys_app);
         virtual ~Application();
         virtual void update() = 0;
         virtual void terminate() = 0;

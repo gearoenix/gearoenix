@@ -2,6 +2,7 @@
 #define GEAROEMIX_RENDER_LIGHT_LIGHT_HPP
 #include "../../core/asset/cr-asset.hpp"
 #include "../../math/math-vector.hpp"
+#include <memory>
 namespace gearoenix {
 namespace system {
     namespace stream {
@@ -9,15 +10,23 @@ namespace system {
     }
 }
 namespace render {
-    class Engine;
+	namespace engine {
+		class Engine;
+	}
     namespace light {
         class Light : public core::asset::Asset {
         protected:
-            Light(core::Id my_id, system::stream::Stream* f, Engine* e);
+            Light(
+				const core::Id my_id,
+				const std::shared_ptr<system::stream::Stream> &f,
+				const std::shared_ptr<engine::Engine> &e);
 
         public:
             virtual ~Light();
-            static Light* read(core::Id my_id, system::stream::Stream* f, Engine* e);
+            static Light* read(
+				const core::Id my_id,
+				const std::shared_ptr<system::stream::Stream> &f,
+				const std::shared_ptr<engine::Engine> &e);
             const math::Vec3& get_color() const;
         };
     }

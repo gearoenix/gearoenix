@@ -1,15 +1,15 @@
 #include "rnd-gr-nd-node.hpp"
 #include "../../pipeline/rnd-pip-manager.hpp"
-#include "../../rnd-engine.hpp"
+#include "../../engine/rnd-eng-engine.hpp"
 
 gearoenix::render::graph::node::Node::Node(
-    Engine* e,
-    const pipeline::PipelineType::Id pipeline_type_id,
-    const unsigned int input_textures_count,
-    const unsigned int output_textures_count,
-    const std::vector<std::string>& input_links,
-    const std::vector<std::string>& output_links,
-    const core::sync::EndCaller<core::sync::EndCallerIgnore> call)
+	const std::shared_ptr<engine::Engine> &e,
+	const pipeline::Type::Id pipeline_type_id,
+	const unsigned int input_textures_count,
+	const unsigned int output_textures_count,
+	const std::vector<std::string>& input_links,
+	const std::vector<std::string>& output_links,
+	const core::sync::EndCaller<core::sync::EndCallerIgnore> &call)
     : core::graph::Node(input_links, output_links)
     , e(e)
     , render_pipeline(e->get_pipeline_manager()->get(pipeline_type_id, call))

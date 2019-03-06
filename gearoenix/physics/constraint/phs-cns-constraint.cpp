@@ -3,7 +3,7 @@
 #include "../../system/sys-log.hpp"
 #include "phs-cns-placer.hpp"
 
-gearoenix::physics::constraint::Constraint::Constraint(core::Id my_id, Type t)
+gearoenix::physics::constraint::Constraint::Constraint(const core::Id my_id, const Type::Id t)
     : core::asset::Asset(my_id, core::asset::Type::CONSTRAINT)
     , t(t)
 {
@@ -23,33 +23,23 @@ bool gearoenix::physics::constraint::Constraint::is_alive() const
     return alive;
 }
 
-void gearoenix::physics::constraint::Constraint::apply(core::Real)
+void gearoenix::physics::constraint::Constraint::apply(const core::Real)
 {
     applied = true;
 }
 
-gearoenix::physics::constraint::Constraint* gearoenix::physics::constraint::Constraint::read(core::Id my_id, system::stream::Stream* f, render::Engine* render_engine, core::sync::EndCaller<core::sync::EndCallerIgnore> c)
+gearoenix::physics::constraint::Constraint* gearoenix::physics::constraint::Constraint::read(
+	const core::Id my_id,
+	const std::shared_ptr<system::stream::Stream> &f,
+	const std::shared_ptr<render::engine::Engine> &e,
+	const core::sync::EndCaller<core::sync::EndCallerIgnore> c)
 {
-    Type t;
-    f->read(t);
+    const Type::Id t = f->read<Type::Id>();
     switch (t) {
-    case PLACER:
-        return new Placer(my_id, f, render_engine, c);
+	case Type::PLACER:
+		GXUNEXPECTED;
+        //return new Placer(t, my_id, f, e, c);
     default:
         GXUNEXPECTED;
     }
-}
-
-gearoenix::physics::constraint::Placer* gearoenix::physics::constraint::Constraint::to_placer()
-{
-    if (t == PLACER)
-        return static_cast<Placer*>(this);
-    return nullptr;
-}
-
-const gearoenix::physics::constraint::Placer* gearoenix::physics::constraint::Constraint::to_placer() const
-{
-    if (t == PLACER)
-        return static_cast<const Placer*>(this);
-    return nullptr;
 }

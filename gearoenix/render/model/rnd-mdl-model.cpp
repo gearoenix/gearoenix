@@ -11,7 +11,7 @@
 #include "../material/rnd-mat-depth.hpp"
 #include "../material/rnd-mat-material.hpp"
 #include "../mesh/rnd-msh-mesh.hpp"
-#include "../rnd-engine.hpp"
+#include "../engine/rnd-eng-engine.hpp"
 #include "../scene/rnd-scn-scene.hpp"
 #include "../widget/rnd-wdg-widget.hpp"
 #include "rnd-mdl-dynamic.hpp"
@@ -19,7 +19,7 @@
 #include <iostream>
 
 gearoenix::render::model::Model::Model(core::Id my_id, RenderModel::Type t, system::stream::Stream* f, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> c)
-    : core::asset::Asset(my_id, core::asset::Asset::AssetType::MODEL)
+    : core::asset::Asset(my_id, core::asset::Type::MODEL)
     , render_model_type(t)
     , render_engine(e)
 {

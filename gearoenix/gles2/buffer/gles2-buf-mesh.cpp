@@ -2,15 +2,18 @@
 #ifdef GX_USE_OPENGL_ES2
 #include "../../system/stream/sys-stm-stream.hpp"
 #include "../../system/sys-log.hpp"
-#include "../gles2-engine.hpp"
+#include "../engine/gles2-eng-engine.hpp"
 #include "../gles2.hpp"
 
-gearoenix::gles2::buffer::Mesh::Mesh(unsigned int vec, system::stream::Stream* f, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> c)
+gearoenix::gles2::buffer::Mesh::Mesh(
+	const std::shared_ptr<system::stream::Stream> &f,
+	const std::shared_ptr<engine::Engine> &e,
+	const core::sync::EndCaller<core::sync::EndCallerIgnore> c)
     : render::buffer::Mesh(e)
 {
     core::Count cnt;
     f->read(cnt);
-    core::Count vsec = cnt * vec;
+    core::Count vsec = cnt * 12;
     std::vector<core::Real> vd((size_t)vsec);
     unsigned int vs = (unsigned int)(vsec * sizeof(core::Real));
     for (core::Count i = 0; i < vsec; ++i) {
@@ -39,7 +42,7 @@ gearoenix::gles2::buffer::Mesh::~Mesh()
         return;
     const GLuint cvbo = vbo;
     const GLuint cibo = ibo;
-    engine->add_load_function([cvbo, cibo]() -> void {
+    e->add_load_function([cvbo, cibo]() -> void {
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glDeleteBuffers(1, &cvbo);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);

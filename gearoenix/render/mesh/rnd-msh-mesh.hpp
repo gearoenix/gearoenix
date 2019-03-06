@@ -3,6 +3,7 @@
 #include "../../core/asset/cr-asset.hpp"
 #include "../../core/cr-types.hpp"
 #include "../../core/sync/cr-sync-end-caller.hpp"
+#include "rnd-msh-type.hpp"
 #include <memory>
 namespace gearoenix {
 namespace system {
@@ -11,7 +12,9 @@ namespace system {
     }
 }
 namespace render {
-    class Engine;
+	namespace engine {
+		class Engine;
+	}
     namespace buffer {
         class Mesh;
     }
@@ -29,20 +32,22 @@ namespace render {
     }
     namespace mesh {
         class Mesh : public core::asset::Asset {
-        public:
-            class Geo {
-            public:
-                typedef enum : core::Id {
-                    BASIC = 1,
-                } Type;
-            };
+        protected:
+            std::shared_ptr<buffer::Mesh> buf;
+			const Type::Id t;
+			Mesh(
+				const Type::Id t,
+				const core::Id my_id,
+				const std::shared_ptr<system::stream::Stream> &f,
+				const std::shared_ptr<engine::Engine> &e,
+				const core::sync::EndCaller<core::sync::EndCallerIgnore> c);
 
-        private:
-            buffer::Mesh* buf;
-
         public:
-            Mesh(core::Id my_id, system::stream::Stream* f, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> c);
-            static Mesh* read(core::Id my_id, system::stream::Stream* f, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> c);
+            static Mesh* read(
+				const core::Id my_id,
+				const std::shared_ptr<system::stream::Stream> &f,
+				const std::shared_ptr<engine::Engine> &e,
+				const core::sync::EndCaller<core::sync::EndCallerIgnore> c);
             ~Mesh();
             void bind();
             void draw();

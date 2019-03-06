@@ -2,12 +2,19 @@
 #define GEAROENIX_GLES2_ENGINE_HPP
 #include "../../core/cr-build-configuration.hpp"
 #ifdef GX_USE_OPENGL_ES2
+
+#ifdef GX_PROFILING_MODE
+#define GX_GLES2_ENGINE_PROFILING
+#endif
+
 #include "../../render/engine/rnd-eng-engine.hpp"
 //#include "gles2.hpp"
+
 #include <memory>
-#ifdef GX_GLES2_PROFILING
+#ifdef GX_GLES2_ENGINE_PROFILING
 #include <chrono>
 #endif
+
 namespace gearoenix {
 namespace gles2 {
     namespace texture {
@@ -26,7 +33,7 @@ namespace gles2 {
 			//        GLfloat win_width;
 			//        GLfloat win_height;
 			void initialize();
-#ifdef GX_GLES2_PROFILING
+#ifdef GX_GLES2_ENGINE_PROFILING
 			unsigned int prof_frames_count = 0;
 			std::chrono::high_resolution_clock::time_point prof_last_time_draw;
 			double prof_frames_time = 0.0;

@@ -11,13 +11,15 @@ namespace render {
     namespace light {
         class Sun : public Light {
         private:
-            camera::Orthographic* cam = nullptr;
             bool color_changed = true;
             math::Vec3 color;
             math::Mat4x4 db;
 
         public:
-            Sun(core::Id my_id, system::stream::Stream* f, Engine* e);
+            Sun(
+				const core::Id my_id, 
+				const std::shared_ptr<system::stream::Stream> &f,
+				const std::shared_ptr<engine::Engine> &e);
             ~Sun();
             const math::Vec3& get_direction() const;
             const math::Vec3& get_color() const;

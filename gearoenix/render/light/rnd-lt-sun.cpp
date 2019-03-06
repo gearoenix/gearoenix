@@ -3,41 +3,44 @@
 #include "../../core/cr-build-configuration.hpp"
 #include "../../system/sys-app.hpp"
 #include "../camera/rnd-cmr-orthographic.hpp"
-#include "../rnd-engine.hpp"
+#include "../engine/rnd-eng-engine.hpp"
 
-gearoenix::render::light::Sun::Sun(core::Id my_id, system::stream::Stream* f, Engine* e)
+gearoenix::render::light::Sun::Sun(
+	const core::Id my_id,
+	const std::shared_ptr<system::stream::Stream> &f,
+	const std::shared_ptr<engine::Engine> &e)
     : Light(my_id, f, e)
-    , cam(new camera::Orthographic(
-          e->get_system_application()->get_asset_manager()->create_id(),
-          f, nullptr))
+    //, cam(new camera::Orthographic(
+    //      e->get_system_application()->get_asset_manager()->create_id(),
+    //      f, nullptr))
 {
-    color.read(f);
-    db = math::Mat4x4(
-#ifdef GX_IN_WINDOWS
-             0.5, 0.0, 0.0, 0.0,
-             0.0, -0.5, 0.0, 0.0,
-             0.0, 0.0, 1.0, 0.0,
-             0.5, 0.5, 0.0, 1.0)
-#else
-             0.5, 0.0, 0.0, 0.0,
-             0.0, 0.5, 0.0, 0.0,
-             0.0, 0.0, 0.5, 0.0,
-             0.5, 0.5, 0.5, 1.0)
-#endif
-        * cam->get_view_projection();
+    //color.read(f);
+//    db = math::Mat4x4(
+//#ifdef GX_IN_WINDOWS
+//             0.5, 0.0, 0.0, 0.0,
+//             0.0, -0.5, 0.0, 0.0,
+//             0.0, 0.0, 1.0, 0.0,
+//             0.5, 0.5, 0.0, 1.0)
+//#else
+//             0.5, 0.0, 0.0, 0.0,
+//             0.0, 0.5, 0.0, 0.0,
+//             0.0, 0.0, 0.5, 0.0,
+//             0.5, 0.5, 0.5, 1.0)
+//#endif
+//        * cam->get_view_projection_matrix();
 }
 
 gearoenix::render::light::Sun::~Sun()
 {
-    if (nullptr != cam) {
-        delete cam;
-        cam = nullptr;
-    }
+    //if (nullptr != cam) {
+    //    delete cam;
+    //    cam = nullptr;
+    //}
 }
 
 const gearoenix::math::Vec3& gearoenix::render::light::Sun::get_direction() const
 {
-    return cam->get_z_axis();
+    /*return cam->get_z_axis();*/
 }
 
 const gearoenix::math::Vec3& gearoenix::render::light::Sun::get_color() const
@@ -57,5 +60,6 @@ const gearoenix::math::Mat4x4& gearoenix::render::light::Sun::get_bias() const
 
 const gearoenix::render::camera::Orthographic* gearoenix::render::light::Sun::get_camera() const
 {
-    return cam;
+	return nullptr;
+    //return cam;
 }

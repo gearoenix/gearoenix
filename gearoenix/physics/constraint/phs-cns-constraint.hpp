@@ -3,6 +3,7 @@
 #include "../../core/asset/cr-asset.hpp"
 #include "../../core/cr-types.hpp"
 #include "../../core/sync/cr-sync-end-caller.hpp"
+#include "phs-cns-type.hpp"
 #include <memory>
 #include <vector>
 namespace gearoenix {
@@ -12,7 +13,9 @@ namespace core {
     }
 }
 namespace render {
-    class Engine;
+	namespace engine {
+		class Engine;
+	}
     namespace model {
         class Dynamic;
     }
@@ -27,31 +30,28 @@ namespace physics {
         class Body;
     }
     namespace constraint {
-        class Placer;
         class Constraint : public core::asset::Asset {
-        public:
-            typedef enum : core::Id {
-                PLACER = 1,
-                TRACKER_SPRING_JOINT_SPRING = 2,
-                LOOKER = 3,
-            } Type;
-
         protected:
             bool applied = false;
             bool alive = true;
-            const Type t;
-            Constraint(core::Id my_id, Type t);
+            const Type::Id t;
+
+            Constraint(const core::Id my_id, const Type::Id t);
 
         public:
             virtual ~Constraint();
             virtual void on_event(const core::event::Event& e) = 0;
             virtual const std::vector<std::pair<core::Id, std::shared_ptr<render::model::Dynamic>>> get_all_models() const = 0;
             virtual const std::vector<std::shared_ptr<body::Body>> get_all_bodies() const;
-            virtual void apply(core::Real delta_time);
-            static Constraint* read(core::Id my_id, system::stream::Stream* f, render::Engine* render_engine, core::sync::EndCaller<core::sync::EndCallerIgnore> c);
+            virtual void apply(const core::Real delta_time);
+
+            static Constraint* read(
+				const core::Id my_id, 
+				const std::shared_ptr<system::stream::Stream> &f, 
+				const std::shared_ptr<render::engine::Engine> &e, 
+				const core::sync::EndCaller<core::sync::EndCallerIgnore> c);
+
             bool is_alive() const;
-            Placer* to_placer();
-            const Placer* to_placer() const;
         };
     }
 }

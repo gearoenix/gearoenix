@@ -2,8 +2,8 @@
 #include "../../system/stream/sys-stm-stream.hpp"
 #include "rnd-fnt-2d.hpp"
 
-gearoenix::render::font::Font::Font(core::Id my_id, Shape::Type t)
-    : font_type(t)
+gearoenix::render::font::Font::Font(const core::Id my_id, const Type::Id t)
+    : font_type_id(t)
 {
 }
 
@@ -11,15 +11,18 @@ gearoenix::render::font::Font::~Font()
 {
 }
 
-gearoenix::render::font::Font* gearoenix::render::font::Font::read(core::Id font_id, system::stream::Stream* f, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> c)
+gearoenix::render::font::Font* gearoenix::render::font::Font::read(
+	const core::Id font_id,
+	const std::shared_ptr<system::stream::Stream> &f,
+	const std::shared_ptr<engine::Engine> &e,
+	const core::sync::EndCaller<core::sync::EndCallerIgnore> &c)
 {
-    Shape::Type font_type;
-    f->read(font_type);
+    const Type::Id font_type = f->read<Type::Id>();
     switch (font_type) {
-    case Shape::D2:
+    case Type::D2:
         return new Font2D(font_id, f, e, c);
         break;
-    case Shape::D3:
+    case Type::D3:
         GXUNIMPLEMENTED;
         break;
     default:

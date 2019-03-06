@@ -3,23 +3,25 @@
 #include <memory>
 namespace gearoenix {
 namespace render {
-    class Engine;
+	namespace engine {
+		class Engine;
+	}
     namespace buffer {
         class Uniform {
         protected:
-            Engine* engine;
-
+            const std::shared_ptr<engine::Engine> e;
         public:
-            Uniform(Engine*);
+            Uniform(const std::shared_ptr<engine::Engine> &e);
             virtual ~Uniform();
-            template <typename T>
+            virtual void update(const void*, unsigned int) = 0;
+            virtual void* get_data() = 0;
+            
+			template <typename T>
             void update(const T& s)
             {
                 /// todo in debug mode check for the size of uniform buffer
                 update(s, sizeof(T));
             }
-            virtual void update(const void*, unsigned int) = 0;
-            virtual void* get_data() = 0;
         };
     } // namespace buffer
 } // namespace render

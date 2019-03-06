@@ -5,7 +5,9 @@
 
 namespace gearoenix {
 namespace render {
-    class Engine;
+	namespace engine {
+		class Engine;
+	}
     namespace camera {
         class Camera;
     }
@@ -17,7 +19,7 @@ namespace render {
 
 class GameApp : public gearoenix::core::Application {
 private:
-    gearoenix::render::Engine* rndeng;
+    const std::shared_ptr<gearoenix::render::engine::Engine> rndeng;
     std::shared_ptr<gearoenix::render::camera::Camera> cam;
     std::shared_ptr<gearoenix::render::model::Dynamic> mdl;
     bool left_mouse_down = false;
@@ -31,7 +33,7 @@ private:
     State::Type state = State::GARAGE;
 
 public:
-    GameApp(gearoenix::system::Application* sys_app);
+    GameApp(const std::shared_ptr<gearoenix::system::Application> &sys_app);
     ~GameApp();
     void update();
     void terminate();

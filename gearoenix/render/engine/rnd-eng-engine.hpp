@@ -65,7 +65,7 @@ namespace render {
         protected:
             unsigned int frame_number = 0;
             const Type::Id engine_type_id;
-            system::Application* sysapp;
+			const std::shared_ptr<system::Application> sysapp;
             /// managers pointers are own only by this class
             std::shared_ptr<pipeline::Manager> pipeline_manager = nullptr;
             std::shared_ptr<command::Manager> command_manager = nullptr;

@@ -1,5 +1,5 @@
-#include "gles3-engine.hpp"
-#ifdef USE_OPENGL_ES3
+#include "gles3-eng-engine.hpp"
+#ifdef GX_USE_OPENGL_ES3
 #include "../core/asset/cr-asset-manager.hpp"
 #include "../core/event/cr-ev-event.hpp"
 #include "../core/event/cr-ev-window-resize.hpp"

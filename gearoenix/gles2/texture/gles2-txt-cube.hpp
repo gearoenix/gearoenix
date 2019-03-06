@@ -10,7 +10,9 @@ namespace system {
     class File;
 }
 namespace gles2 {
-    class Engine;
+	namespace engine {
+		class Engine;
+	}
     namespace texture {
         class Cube : public render::texture::Cube {
         private:

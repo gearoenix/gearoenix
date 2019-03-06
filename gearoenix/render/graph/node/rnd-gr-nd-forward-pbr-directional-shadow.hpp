@@ -55,7 +55,7 @@ namespace render {
                         std::shared_ptr<pipeline::ForwardPbrDirectionalShadowResourceSet>>>
                     render_data_pool;
 
-                ForwardPbrDirectionalShadowKernel(Engine* e, const unsigned int kernel_index);
+                ForwardPbrDirectionalShadowKernel(const std::shared_ptr<engine::Engine> &e, const unsigned int kernel_index);
             };
 
             struct ForwardPbrDirectionalShadowFrame {
@@ -65,7 +65,7 @@ namespace render {
                 bool input_texture_changed = true;
                 std::vector<ForwardPbrDirectionalShadowKernel> kernels;
 
-                ForwardPbrDirectionalShadowFrame(Engine* e);
+                ForwardPbrDirectionalShadowFrame(const std::shared_ptr<engine::Engine> &e);
             };
 
             struct ForwardPbrDirectionalShadowUniform {
@@ -88,7 +88,7 @@ namespace render {
                 std::vector<ForwardPbrDirectionalShadowFrame> frames;
 
             public:
-                ForwardPbrDirectionalShadow(Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> call);
+                ForwardPbrDirectionalShadow(const std::shared_ptr<engine::Engine> &e, const core::sync::EndCaller<core::sync::EndCallerIgnore> &call);
                 ~ForwardPbrDirectionalShadow();
 
                 void set_diffuse_environment(const std::shared_ptr<texture::Cube>& t);

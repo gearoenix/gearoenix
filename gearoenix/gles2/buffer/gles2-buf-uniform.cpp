@@ -1,11 +1,11 @@
 #include "gles2-buf-uniform.hpp"
 #ifdef GX_USE_OPENGL_ES2
 #include "../../system/sys-log.hpp"
-#include "../gles2-engine.hpp"
+#include "../engine/gles2-eng-engine.hpp"
 #include <cstring>
 
-gearoenix::gles2::buffer::Uniform::Uniform(unsigned int s, Engine* eng)
-    : render::buffer::Uniform(eng)
+gearoenix::gles2::buffer::Uniform::Uniform(unsigned int s, const std::shared_ptr<engine::Engine> &e)
+    : render::buffer::Uniform(e)
     , data(new unsigned char[s])
 {
 }

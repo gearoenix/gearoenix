@@ -1,13 +1,15 @@
 #include "phs-cns-manager.hpp"
 
-namespace gearoenix {
-namespace physics {
-    namespace constraint {
+gearoenix::physics::constraint::Manager::Manager(
+	const std::shared_ptr<system::stream::Stream>& s, 
+	const std::shared_ptr<render::engine::Engine> &e):
+	e(e), s(s)
+{
+	GXUNIMPLEMENTED;
+}
 
-        Manager::Manager()
-        {
-        }
+gearoenix::physics::constraint::Manager::~Manager() {}
 
-    } // namespace constraint
-} // namespace physics
-} // namespace gearoenix
+std::shared_ptr<gearoenix::physics::constraint::Constraint> gearoenix::physics::constraint::Manager::get(const core::Id mid, const core::sync::EndCaller<Constraint> c) {
+	GXUNIMPLEMENTED;
+}

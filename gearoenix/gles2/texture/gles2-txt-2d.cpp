@@ -2,10 +2,15 @@
 #ifdef GX_USE_OPENGL_ES2
 #include "../../render/texture/rnd-txt-png.hpp"
 #include "../../system/sys-log.hpp"
-#include "../gles2-engine.hpp"
+#include "../engine/gles2-eng-engine.hpp"
+#include "../../system/stream/sys-stm-stream.hpp"
 
-gearoenix::gles2::texture::Texture2D::Texture2D(core::Id my_id, system::stream::Stream* file, Engine* eng, core::sync::EndCaller<core::sync::EndCallerIgnore> end)
-    : render::texture::Texture2D(my_id, eng)
+gearoenix::gles2::texture::Texture2D::Texture2D(
+	const core::Id my_id,
+	const std::shared_ptr<system::stream::Stream> &file,
+	const std::shared_ptr<engine::Engine> &e,
+	const core::sync::EndCaller<core::sync::EndCallerIgnore> end)
+    : render::texture::Texture2D(my_id, e)
 {
     std::vector<unsigned char> img_data;
     unsigned int imgw, imgh;
@@ -21,11 +26,11 @@ gearoenix::gles2::texture::Texture2D::Texture2D(core::Id my_id, system::stream::
         glGenerateMipmap(GL_TEXTURE_2D);
         (void)end;
     };
-    eng->add_load_function(loadf);
+    e->add_load_function(loadf);
 }
 
-gearoenix::gles2::texture::Texture2D::Texture2D(core::Id my_id, GLuint txtobj, Engine* eng)
-    : render::texture::Texture2D(my_id, eng)
+gearoenix::gles2::texture::Texture2D::Texture2D(const core::Id my_id, const GLuint txtobj, const std::shared_ptr<engine::Engine> &e)
+    : render::texture::Texture2D(my_id, e)
     , texture_object(txtobj)
 {
 }
