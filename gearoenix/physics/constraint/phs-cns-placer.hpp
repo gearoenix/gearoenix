@@ -28,9 +28,9 @@
 //
 //        public:
 //            Placer(
-//				const core::Id my_id, 
+//				const core::Id my_id,
 //				const std::shared_ptr<system::stream::Stream> &f,
-//				const std::shared_ptr<render::engine::Engine> &e, 
+//				const std::shared_ptr<render::engine::Engine> &e,
 //				const core::sync::EndCaller<core::sync::EndCallerIgnore> c);
 //            virtual ~Placer();
 //            virtual void apply(core::Real delta_time);

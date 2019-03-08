@@ -21,16 +21,17 @@ namespace physics {
             math::Vec3 angle;
             core::Real joint_k;
             core::Real length;
+
         public:
             TrackerSpringJointSpring(
-				const core::Id my_id, 
-				const std::shared_ptr<system::stream::Stream> &f, 
-				const std::shared_ptr<render::engine::Engine> &e, 
-				const core::sync::EndCaller<core::sync::EndCallerIgnore> c);
+                const core::Id my_id,
+                const std::shared_ptr<system::stream::Stream>& f,
+                const std::shared_ptr<render::engine::Engine>& e,
+                const core::sync::EndCaller<core::sync::EndCallerIgnore> c);
             TrackerSpringJointSpring(
                 const core::Id my_id,
-                const std::shared_ptr<body::Rigid> &active,
-                const std::shared_ptr<body::Rigid> &passive,
+                const std::shared_ptr<body::Rigid>& active,
+                const std::shared_ptr<body::Rigid>& passive,
                 const core::Real k,
                 const math::Vec3& angle,
                 const core::Real joint_k,

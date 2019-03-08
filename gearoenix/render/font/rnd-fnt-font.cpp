@@ -12,10 +12,10 @@ gearoenix::render::font::Font::~Font()
 }
 
 gearoenix::render::font::Font* gearoenix::render::font::Font::read(
-	const core::Id font_id,
-	const std::shared_ptr<system::stream::Stream> &f,
-	const std::shared_ptr<engine::Engine> &e,
-	const core::sync::EndCaller<core::sync::EndCallerIgnore> &c)
+    const core::Id font_id,
+    const std::shared_ptr<system::stream::Stream>& f,
+    const std::shared_ptr<engine::Engine>& e,
+    const core::sync::EndCaller<core::sync::EndCallerIgnore>& c)
 {
     const Type::Id font_type = f->read<Type::Id>();
     switch (font_type) {

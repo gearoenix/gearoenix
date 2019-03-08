@@ -10,21 +10,22 @@ namespace system {
     }
 }
 namespace render {
-	namespace engine {
-		class Engine;
-	}
+    namespace engine {
+        class Engine;
+    }
     namespace texture {
         class Texture : public core::asset::Asset {
         protected:
             const std::shared_ptr<engine::Engine> render_engine;
-            Texture(const core::Id my_id, const std::shared_ptr<engine::Engine> &e);
+            Texture(const core::Id my_id, const std::shared_ptr<engine::Engine>& e);
+
         public:
             virtual ~Texture();
             static Texture* read(
-				const core::Id my_id, 
-				const std::shared_ptr<system::stream::Stream> &f, 
-				const std::shared_ptr<engine::Engine> &e, 
-				core::sync::EndCaller<core::sync::EndCallerIgnore> c);
+                const core::Id my_id,
+                const std::shared_ptr<system::stream::Stream>& f,
+                const std::shared_ptr<engine::Engine>& e,
+                core::sync::EndCaller<core::sync::EndCallerIgnore> c);
         };
     }
 }

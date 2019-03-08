@@ -7,9 +7,9 @@
 
 namespace gearoenix {
 namespace render {
-	namespace engine {
-		class Engine;
-	}
+    namespace engine {
+        class Engine;
+    }
     namespace texture {
         class Texture;
     }
@@ -21,7 +21,7 @@ namespace render {
             const std::shared_ptr<engine::Engine> e;
             core::cache::Cacher<Pipeline> pipelines;
 
-            Manager(const std::shared_ptr<engine::Engine> &e);
+            Manager(const std::shared_ptr<engine::Engine>& e);
 
         public:
             virtual ~Manager();

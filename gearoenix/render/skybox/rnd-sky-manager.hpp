@@ -9,19 +9,20 @@ namespace system {
     }
 }
 namespace render {
-	namespace engine {
-		class Engine;
-	}
+    namespace engine {
+        class Engine;
+    }
     namespace skybox {
-		class Skybox;
+        class Skybox;
         class Manager {
-		protected:
-			const std::shared_ptr<engine::Engine> e;
-			const std::shared_ptr<system::stream::Stream> s;
-		public:
-			Manager(const std::shared_ptr<system::stream::Stream>& s, const std::shared_ptr<engine::Engine> &e);
-			~Manager();
-			std::shared_ptr<Skybox> get(const core::Id mid, const core::sync::EndCaller<Skybox> c);
+        protected:
+            const std::shared_ptr<engine::Engine> e;
+            const std::shared_ptr<system::stream::Stream> s;
+
+        public:
+            Manager(const std::shared_ptr<system::stream::Stream>& s, const std::shared_ptr<engine::Engine>& e);
+            ~Manager();
+            std::shared_ptr<Skybox> get(const core::Id mid, const core::sync::EndCaller<Skybox> c);
         };
     }
 }

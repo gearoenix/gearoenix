@@ -82,7 +82,7 @@ void gearoenix::gles2::engine::Engine::initialize()
 #endif
 }
 
-gearoenix::gles2::engine::Engine::Engine(const std::shared_ptr<system::Application> &sys_app)
+gearoenix::gles2::engine::Engine::Engine(const std::shared_ptr<system::Application>& sys_app)
     : render::engine::Engine(sys_app, render::engine::Type::OPENGL_ES2)
 {
     initialize();

@@ -6,9 +6,9 @@
 #include "../gles2.hpp"
 
 gearoenix::gles2::buffer::Mesh::Mesh(
-	const std::shared_ptr<system::stream::Stream> &f,
-	const std::shared_ptr<engine::Engine> &e,
-	const core::sync::EndCaller<core::sync::EndCallerIgnore> c)
+    const std::shared_ptr<system::stream::Stream>& f,
+    const std::shared_ptr<engine::Engine>& e,
+    const core::sync::EndCaller<core::sync::EndCallerIgnore> c)
     : render::buffer::Mesh(e)
 {
     core::Count cnt;

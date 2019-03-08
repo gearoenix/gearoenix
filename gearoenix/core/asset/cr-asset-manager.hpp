@@ -18,9 +18,9 @@ namespace render {
     namespace camera {
         class Manager;
     }
-	namespace engine {
-		class Engine;
-	}
+    namespace engine {
+        class Engine;
+    }
     namespace font {
         class Manager;
     }
@@ -57,8 +57,8 @@ namespace core {
     namespace asset {
         class Manager {
         private:
-			const std::shared_ptr<system::Application> sys_app;
-			const std::shared_ptr<render::engine::Engine> render_engine;
+            const std::shared_ptr<system::Application> sys_app;
+            const std::shared_ptr<render::engine::Engine> render_engine;
             const std::shared_ptr<system::stream::Asset> file;
             std::shared_ptr<render::camera::Manager> camera_manager = nullptr;
             std::shared_ptr<audio::Manager> audio_manager = nullptr;
@@ -73,7 +73,7 @@ namespace core {
             std::atomic<Id> last_id;
 
         public:
-            Manager(const std::shared_ptr<system::Application> &sys_app, const std::string& file);
+            Manager(const std::shared_ptr<system::Application>& sys_app, const std::string& file);
             const std::shared_ptr<system::stream::Asset>& get_file() const;
             const std::shared_ptr<render::camera::Manager>& get_camera_manager() const;
             const std::shared_ptr<audio::Manager>& get_audio_manager() const;

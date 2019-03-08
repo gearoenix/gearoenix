@@ -8,13 +8,13 @@
 #include "../../physics/body/phs-bd-rigid.hpp"
 #include "../../physics/constraint/phs-cns-tracker-spring-joint-spring.hpp"
 #include "../../render/camera/rnd-cmr-camera.hpp"
-#include "../../render/model/rnd-mdl-dynamic.hpp"
 #include "../../render/engine/rnd-eng-engine.hpp"
+#include "../../render/model/rnd-mdl-dynamic.hpp"
 #include "../../render/scene/rnd-scn-scene.hpp"
 #include "../../system/sys-app.hpp"
 #include "../../system/sys-log.hpp"
 
-GameApp::GameApp(const std::shared_ptr<gearoenix::system::Application> &sys_app)
+GameApp::GameApp(const std::shared_ptr<gearoenix::system::Application>& sys_app)
     : gearoenix::core::Application::Application(sys_app)
     , rndeng(sys_app->get_render_engine())
 {
@@ -119,7 +119,7 @@ void GameApp::on_event(const gearoenix::core::event::Event& e)
                     scene->add_model(1);
                     rndeng->delete_scene(1);
                     rndeng->delete_scene(2);
-                    const std::shared_ptr<gearoenix::core::asset::Manager> &astmgr = rndeng->get_system_application()->get_asset_manager();
+                    const std::shared_ptr<gearoenix::core::asset::Manager>& astmgr = rndeng->get_system_application()->get_asset_manager();
                     scene->add_constraint(
                         std::shared_ptr<gearoenix::physics::constraint::TrackerSpringJointSpring>(
                             new gearoenix::physics::constraint::TrackerSpringJointSpring(

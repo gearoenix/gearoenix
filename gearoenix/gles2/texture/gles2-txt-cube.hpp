@@ -10,9 +10,9 @@ namespace system {
     class File;
 }
 namespace gles2 {
-	namespace engine {
-		class Engine;
-	}
+    namespace engine {
+        class Engine;
+    }
     namespace texture {
         class Cube : public render::texture::Cube {
         private:
@@ -20,10 +20,10 @@ namespace gles2 {
 
         public:
             Cube(
-				const core::Id my_id, 
-				const std::shared_ptr<system::stream::Stream> &file, 
-				const std::shared_ptr<engine::Engine> &engine, 
-				core::sync::EndCaller<core::sync::EndCallerIgnore> end);
+                const core::Id my_id,
+                const std::shared_ptr<system::stream::Stream>& file,
+                const std::shared_ptr<engine::Engine>& engine,
+                core::sync::EndCaller<core::sync::EndCallerIgnore> end);
             ~Cube();
             void bind(GLenum texture_unit);
         };

@@ -7,9 +7,9 @@
 #include <memory>
 namespace gearoenix {
 namespace gles2 {
-	namespace engine {
-		class Engine;
-	}
+    namespace engine {
+        class Engine;
+    }
     namespace texture {
         class Texture2D : public render::texture::Texture2D {
         private:
@@ -17,11 +17,11 @@ namespace gles2 {
 
         public:
             Texture2D(
-				const core::Id my_id, 
-				const std::shared_ptr<system::stream::Stream> &file,
-				const std::shared_ptr<engine::Engine> &e, 
-				const core::sync::EndCaller<core::sync::EndCallerIgnore> end);
-            Texture2D(const core::Id my_id, const GLuint txtobj, const std::shared_ptr<engine::Engine> &e);
+                const core::Id my_id,
+                const std::shared_ptr<system::stream::Stream>& file,
+                const std::shared_ptr<engine::Engine>& e,
+                const core::sync::EndCaller<core::sync::EndCallerIgnore> end);
+            Texture2D(const core::Id my_id, const GLuint txtobj, const std::shared_ptr<engine::Engine>& e);
             ~Texture2D();
             void bind(const GLenum texture_unit);
         };

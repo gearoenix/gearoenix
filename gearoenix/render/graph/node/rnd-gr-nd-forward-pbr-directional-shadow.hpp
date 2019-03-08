@@ -55,7 +55,7 @@ namespace render {
                         std::shared_ptr<pipeline::ForwardPbrDirectionalShadowResourceSet>>>
                     render_data_pool;
 
-                ForwardPbrDirectionalShadowKernel(const std::shared_ptr<engine::Engine> &e, const unsigned int kernel_index);
+                ForwardPbrDirectionalShadowKernel(const std::shared_ptr<engine::Engine>& e, const unsigned int kernel_index);
             };
 
             struct ForwardPbrDirectionalShadowFrame {
@@ -63,9 +63,9 @@ namespace render {
                 std::shared_ptr<sync::Semaphore> semaphore = nullptr;
                 std::shared_ptr<pipeline::ForwardPbrDirectionalShadowResource> pipeline_resource = nullptr;
                 bool input_texture_changed = true;
-                std::vector<ForwardPbrDirectionalShadowKernel> kernels;
+                std::vector<std::shared_ptr<ForwardPbrDirectionalShadowKernel>> kernels;
 
-                ForwardPbrDirectionalShadowFrame(const std::shared_ptr<engine::Engine> &e);
+                ForwardPbrDirectionalShadowFrame(const std::shared_ptr<engine::Engine>& e);
             };
 
             struct ForwardPbrDirectionalShadowUniform {
@@ -85,10 +85,10 @@ namespace render {
             /// The user of this class must use its functionalities in their correct contextes.
             class ForwardPbrDirectionalShadow : public Node {
             private:
-                std::vector<ForwardPbrDirectionalShadowFrame> frames;
+                std::vector<std::shared_ptr<ForwardPbrDirectionalShadowFrame>> frames;
 
             public:
-                ForwardPbrDirectionalShadow(const std::shared_ptr<engine::Engine> &e, const core::sync::EndCaller<core::sync::EndCallerIgnore> &call);
+                ForwardPbrDirectionalShadow(const std::shared_ptr<engine::Engine>& e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call);
                 ~ForwardPbrDirectionalShadow();
 
                 void set_diffuse_environment(const std::shared_ptr<texture::Cube>& t);

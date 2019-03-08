@@ -1,3 +1,4 @@
+#include "rnd-eng-engine.hpp"
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../core/event/cr-ev-event.hpp"
 #include "../../core/event/cr-ev-sys-system.hpp"
@@ -7,9 +8,8 @@
 #include "../../system/sys-app.hpp"
 #include "../../system/sys-log.hpp"
 #include "../pipeline/rnd-pip-manager.hpp"
-#include "../scene/rnd-scn-scene.hpp"
 #include "../scene/rnd-scn-manager.hpp"
-#include "rnd-eng-engine.hpp"
+#include "../scene/rnd-scn-scene.hpp"
 #include <functional>
 #include <thread>
 
@@ -28,9 +28,9 @@ void gearoenix::render::engine::Engine::scene_loader_function()
     }
 }
 
-gearoenix::render::engine::Engine::Engine(const std::shared_ptr<system::Application> &system_application, const Type::Id engine_type_id)
+gearoenix::render::engine::Engine::Engine(const std::shared_ptr<system::Application>& system_application, const Type::Id engine_type_id)
     : sysapp(system_application)
-	, engine_type_id(engine_type_id)
+    , engine_type_id(engine_type_id)
 {
     load_functions_mutex = new core::sync::Semaphore(1);
     loaded_scenes_mutex = new core::sync::Semaphore(1);

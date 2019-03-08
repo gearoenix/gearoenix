@@ -2,7 +2,7 @@
 #ifdef GX_USE_OPENGL_ES2
 #include "../engine/gles2-eng-engine.hpp"
 
-gearoenix::gles2::pipeline::Manager::Manager(const std::shared_ptr<engine::Engine> &engine)
+gearoenix::gles2::pipeline::Manager::Manager(const std::shared_ptr<engine::Engine>& engine)
     : render::pipeline::Manager(engine)
 {
 }

@@ -29,15 +29,15 @@ void gearoenix::physics::constraint::Constraint::apply(const core::Real)
 }
 
 gearoenix::physics::constraint::Constraint* gearoenix::physics::constraint::Constraint::read(
-	const core::Id my_id,
-	const std::shared_ptr<system::stream::Stream> &f,
-	const std::shared_ptr<render::engine::Engine> &e,
-	const core::sync::EndCaller<core::sync::EndCallerIgnore> c)
+    const core::Id my_id,
+    const std::shared_ptr<system::stream::Stream>& f,
+    const std::shared_ptr<render::engine::Engine>& e,
+    const core::sync::EndCaller<core::sync::EndCallerIgnore> c)
 {
     const Type::Id t = f->read<Type::Id>();
     switch (t) {
-	case Type::PLACER:
-		GXUNEXPECTED;
+    case Type::PLACER:
+        GXUNEXPECTED;
         //return new Placer(t, my_id, f, e, c);
     default:
         GXUNEXPECTED;

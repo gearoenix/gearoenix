@@ -11,18 +11,18 @@ namespace system {
     }
 }
 namespace render {
-	namespace engine {
-		class Engine;
-	}
+    namespace engine {
+        class Engine;
+    }
     namespace model {
         class Model;
         class Manager {
         protected:
-			const std::shared_ptr<engine::Engine> e;
+            const std::shared_ptr<engine::Engine> e;
             const std::shared_ptr<system::stream::Stream> s;
 
         public:
-            Manager(const std::shared_ptr<system::stream::Stream>& s, const std::shared_ptr<engine::Engine> &e);
+            Manager(const std::shared_ptr<system::stream::Stream>& s, const std::shared_ptr<engine::Engine>& e);
             ~Manager();
             std::shared_ptr<Model> get(core::Id mid, core::sync::EndCaller<Model> c);
         };

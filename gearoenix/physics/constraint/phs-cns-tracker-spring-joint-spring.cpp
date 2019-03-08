@@ -3,31 +3,31 @@
 #include "../../core/cr-static.hpp"
 #include "../../core/event/cr-ev-event.hpp"
 #include "../../core/event/cr-ev-window-resize.hpp"
-#include "../../render/model/rnd-mdl-dynamic.hpp"
 #include "../../render/engine/rnd-eng-engine.hpp"
+#include "../../render/model/rnd-mdl-dynamic.hpp"
 #include "../../system/stream/sys-stm-stream.hpp"
 #include "../../system/sys-app.hpp"
 #include "../../system/sys-log.hpp"
 #include "../body/phs-bd-rigid.hpp"
 
 gearoenix::physics::constraint::TrackerSpringJointSpring::TrackerSpringJointSpring(
-	const core::Id my_id,
-	const std::shared_ptr<system::stream::Stream> &f,
-	const std::shared_ptr<render::engine::Engine> &e,
-	const core::sync::EndCaller<core::sync::EndCallerIgnore> c)
+    const core::Id my_id,
+    const std::shared_ptr<system::stream::Stream>& f,
+    const std::shared_ptr<render::engine::Engine>& e,
+    const core::sync::EndCaller<core::sync::EndCallerIgnore> c)
     : Constraint(my_id, Type::TRACKER_SPRING_JOINT_SPRING)
 {
     GXUNIMPLEMENTED;
 }
 
 gearoenix::physics::constraint::TrackerSpringJointSpring::TrackerSpringJointSpring(
-	const core::Id my_id, 
-	const std::shared_ptr<body::Rigid> &active, 
-	const std::shared_ptr<body::Rigid> &passive, 
-	const core::Real k, 
-	const math::Vec3& angle, 
-	const core::Real joint_k, 
-	const core::Real length)
+    const core::Id my_id,
+    const std::shared_ptr<body::Rigid>& active,
+    const std::shared_ptr<body::Rigid>& passive,
+    const core::Real k,
+    const math::Vec3& angle,
+    const core::Real joint_k,
+    const core::Real length)
     : Constraint(my_id, Type::TRACKER_SPRING_JOINT_SPRING)
     , active(active)
     , passive(passive)

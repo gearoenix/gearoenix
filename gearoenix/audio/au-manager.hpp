@@ -5,9 +5,9 @@
 #include <memory>
 namespace gearoenix {
 namespace render {
-	namespace engine {
-		class Engine;
-	}
+    namespace engine {
+        class Engine;
+    }
 }
 namespace system {
     namespace stream {
@@ -18,10 +18,11 @@ namespace audio {
     class Audio;
     class Manager {
     protected:
-		const std::shared_ptr<render::engine::Engine> e;
+        const std::shared_ptr<render::engine::Engine> e;
         const std::shared_ptr<system::stream::Stream> s;
+
     public:
-        Manager(const std::shared_ptr<system::stream::Stream>& s, const std::shared_ptr<render::engine::Engine> &e);
+        Manager(const std::shared_ptr<system::stream::Stream>& s, const std::shared_ptr<render::engine::Engine>& e);
         ~Manager();
         std::shared_ptr<Audio> get(core::Id mid, core::sync::EndCaller<Audio> c);
     };

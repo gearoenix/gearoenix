@@ -15,10 +15,10 @@ const int gearoenix::render::font::Font2D::last_character = 126;
 const int gearoenix::render::font::Font2D::characters_count = (gearoenix::render::font::Font2D::last_character - gearoenix::render::font::Font2D::first_character) + 1;
 
 gearoenix::render::font::Font2D::Font2D(
-	const core::Id my_id,
-	const std::shared_ptr<system::stream::Stream> &f,
-	const std::shared_ptr<engine::Engine> &e,
-	const core::sync::EndCaller<core::sync::EndCallerIgnore> &c)
+    const core::Id my_id,
+    const std::shared_ptr<system::stream::Stream>& f,
+    const std::shared_ptr<engine::Engine>& e,
+    const core::sync::EndCaller<core::sync::EndCallerIgnore>& c)
     : Font(my_id, Type::D2)
     , letters_properties(characters_count)
 {

@@ -3,13 +3,13 @@
 #include "rnd-txt-texture.hpp"
 namespace gearoenix {
 namespace render {
-	namespace engine {
-		class Engine;
-	}
+    namespace engine {
+        class Engine;
+    }
     namespace texture {
         class Texture2D : public Texture {
         protected:
-            Texture2D(const core::Id my_id, const std::shared_ptr<engine::Engine> &e);
+            Texture2D(const core::Id my_id, const std::shared_ptr<engine::Engine>& e);
 
         public:
             virtual ~Texture2D();

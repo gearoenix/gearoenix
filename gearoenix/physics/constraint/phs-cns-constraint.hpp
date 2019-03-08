@@ -13,9 +13,9 @@ namespace core {
     }
 }
 namespace render {
-	namespace engine {
-		class Engine;
-	}
+    namespace engine {
+        class Engine;
+    }
     namespace model {
         class Dynamic;
     }
@@ -46,10 +46,10 @@ namespace physics {
             virtual void apply(const core::Real delta_time);
 
             static Constraint* read(
-				const core::Id my_id, 
-				const std::shared_ptr<system::stream::Stream> &f, 
-				const std::shared_ptr<render::engine::Engine> &e, 
-				const core::sync::EndCaller<core::sync::EndCallerIgnore> c);
+                const core::Id my_id,
+                const std::shared_ptr<system::stream::Stream>& f,
+                const std::shared_ptr<render::engine::Engine>& e,
+                const core::sync::EndCaller<core::sync::EndCallerIgnore> c);
 
             bool is_alive() const;
         };

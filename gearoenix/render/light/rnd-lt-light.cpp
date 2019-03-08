@@ -5,9 +5,9 @@
 #include "rnd-lt-sun.hpp"
 
 gearoenix::render::light::Light::Light(
-	const core::Id my_id,
-	const std::shared_ptr<system::stream::Stream> &f,
-	const std::shared_ptr<engine::Engine> &e)
+    const core::Id my_id,
+    const std::shared_ptr<system::stream::Stream>& f,
+    const std::shared_ptr<engine::Engine>& e)
     : core::asset::Asset(my_id, core::asset::Type::LIGHT)
 {
 }
@@ -15,9 +15,9 @@ gearoenix::render::light::Light::Light(
 gearoenix::render::light::Light::~Light() {}
 
 gearoenix::render::light::Light* gearoenix::render::light::Light::read(
-	const core::Id my_id,
-	const std::shared_ptr<system::stream::Stream> &f,
-	const std::shared_ptr<engine::Engine> &e)
+    const core::Id my_id,
+    const std::shared_ptr<system::stream::Stream>& f,
+    const std::shared_ptr<engine::Engine>& e)
 {
     core::Id light_type;
     f->read(light_type);

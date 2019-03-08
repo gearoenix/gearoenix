@@ -6,9 +6,9 @@
 #include <memory>
 namespace gearoenix {
 namespace gles2 {
-	namespace engine {
-		class Engine;
-	}
+    namespace engine {
+        class Engine;
+    }
     namespace shader {
         class Shader;
     }
@@ -17,9 +17,9 @@ namespace gles2 {
         private:
         public:
             Pipeline(
-				const render::pipeline::Type::Id pid, 
-				const std::shared_ptr<engine::Engine> &e, 
-				const core::sync::EndCaller<core::sync::EndCallerIgnore> call);
+                const render::pipeline::Type::Id pid,
+                const std::shared_ptr<engine::Engine>& e,
+                const core::sync::EndCaller<core::sync::EndCallerIgnore> call);
             ~Pipeline();
             void bind();
         };

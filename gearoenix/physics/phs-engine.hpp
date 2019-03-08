@@ -14,9 +14,9 @@ namespace core {
     }
 }
 namespace render {
-	namespace engine {
-		class Engine;
-	}
+    namespace engine {
+        class Engine;
+    }
 }
 namespace physics {
     class Kernel;
@@ -43,7 +43,7 @@ namespace physics {
 
     protected:
     public:
-        Engine(const std::shared_ptr<render::engine::Engine> &render_engine);
+        Engine(const std::shared_ptr<render::engine::Engine>& render_engine);
         ~Engine();
         // engine gonna remove it from its active animations, caller must take care of its deleteing
         void add_animation(std::shared_ptr<animation::Animation> a);

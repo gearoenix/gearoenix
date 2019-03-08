@@ -4,6 +4,7 @@
 #include "../../camera/rnd-cmr-camera.hpp"
 #include "../../command/rnd-cmd-buffer.hpp"
 #include "../../command/rnd-cmd-manager.hpp"
+#include "../../engine/rnd-eng-engine.hpp"
 #include "../../light/rnd-lt-directional.hpp"
 #include "../../material/rnd-mat-material.hpp"
 #include "../../mesh/rnd-msh-mesh.hpp"
@@ -13,14 +14,14 @@
 #include "../../pipeline/rnd-pip-pipeline.hpp"
 #include "../../pipeline/rnd-pip-resource-set.hpp"
 #include "../../pipeline/rnd-pip-resource.hpp"
-#include "../../engine/rnd-eng-engine.hpp"
+#include "../../sync/rnd-sy-semaphore.hpp"
 #include "../../texture/rnd-txt-target.hpp"
 #include "../../texture/rnd-txt-texture-2d.hpp"
 #include "../../texture/rnd-txt-texture-cube.hpp"
 #include <thread>
 
 gearoenix::render::graph::node::ForwardPbrDirectionalShadow::ForwardPbrDirectionalShadow(
-	const std::shared_ptr<engine::Engine> &e, const core::sync::EndCaller<core::sync::EndCallerIgnore> &call)
+    const std::shared_ptr<engine::Engine>& e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call)
     : Node(
           e,
           pipeline::Type::ForwardPbrDirectionalShadow,
@@ -35,7 +36,7 @@ gearoenix::render::graph::node::ForwardPbrDirectionalShadow::ForwardPbrDirection
 {
     frames.resize(GX_FRAMES_COUNT);
     for (unsigned int i = 0; i < GX_FRAMES_COUNT; ++i) {
-        frames.push_back(ForwardPbrDirectionalShadowFrame(e));
+        frames.push_back(std::make_shared<ForwardPbrDirectionalShadowFrame>(e));
     }
 }
 
@@ -72,23 +73,23 @@ void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::set_input_text
     const std::shared_ptr<texture::Texture>& t, const unsigned int index)
 {
     Node::set_input_texture(t, index);
-    for (ForwardPbrDirectionalShadowFrame& f : frames) {
-        f.input_texture_changed = true;
+    for (const std::shared_ptr<ForwardPbrDirectionalShadowFrame>& f : frames) {
+        f->input_texture_changed = true;
     }
 }
 
 void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::update()
 {
     const unsigned int frame_number = e->get_frame_number();
-    ForwardPbrDirectionalShadowFrame& frame = frames[frame_number];
-    if (frame.input_texture_changed) {
-        frame.input_texture_changed = false;
-        frame.pipeline_resource = e->get_pipeline_manager()->create_resource(input_textures);
+    const std::shared_ptr<ForwardPbrDirectionalShadowFrame>& frame = frames[frame_number];
+    if (frame->input_texture_changed) {
+        frame->input_texture_changed = false;
+        frame->pipeline_resource = std::static_pointer_cast<pipeline::ForwardPbrDirectionalShadowResource>(e->get_pipeline_manager()->create_resource(input_textures));
     }
-    frame.primary_cmd->begin();
-    for (ForwardPbrDirectionalShadowKernel& kernel : frame.kernels) {
-        kernel.latest_render_data_pool = 0;
-        kernel.secondary_cmd->begin();
+    frame->primary_cmd->begin();
+    for (const std::shared_ptr<ForwardPbrDirectionalShadowKernel>& kernel : frame->kernels) {
+        kernel->latest_render_data_pool = 0;
+        kernel->secondary_cmd->begin();
     }
 }
 
@@ -100,18 +101,18 @@ void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::record(
     const unsigned int kernel_index)
 {
     const unsigned int frame_number = e->get_frame_number();
-    ForwardPbrDirectionalShadowFrame& frame = frames[frame_number];
-    ForwardPbrDirectionalShadowKernel& kernel = frame.kernels[kernel_index];
+    const std::shared_ptr<ForwardPbrDirectionalShadowFrame>& frame = frames[frame_number];
+    const std::shared_ptr<ForwardPbrDirectionalShadowKernel>& kernel = frame->kernels[kernel_index];
     const std::map<core::Id, std::tuple<std::shared_ptr<mesh::Mesh>, std::shared_ptr<material::Material>>>& meshes = m->get_meshes();
     for (const std::pair<core::Id, std::tuple<std::shared_ptr<mesh::Mesh>, std::shared_ptr<material::Material>>>& id_mesh_material : meshes) {
         const std::shared_ptr<mesh::Mesh>& msh = std::get<0>(id_mesh_material.second);
         const std::shared_ptr<material::Material>& mat = std::get<1>(id_mesh_material.second);
-        if (kernel.latest_render_data_pool >= kernel.render_data_pool.size()) {
-            kernel.render_data_pool.push_back(std::make_tuple(
+        if (kernel->latest_render_data_pool >= kernel->render_data_pool.size()) {
+            kernel->render_data_pool.push_back(std::make_tuple(
                 std::shared_ptr<buffer::Uniform>(e->get_buffer_manager()->create_uniform(sizeof(ForwardPbrDirectionalShadowUniform))),
                 std::shared_ptr<pipeline::ForwardPbrDirectionalShadowResourceSet>(static_cast<pipeline::ForwardPbrDirectionalShadowResourceSet*>(render_pipeline->create_resource_set()))));
         }
-        std::tuple<std::shared_ptr<buffer::Uniform>, std::shared_ptr<pipeline::ForwardPbrDirectionalShadowResourceSet>>& pool = kernel.render_data_pool[kernel.latest_render_data_pool];
+        std::tuple<std::shared_ptr<buffer::Uniform>, std::shared_ptr<pipeline::ForwardPbrDirectionalShadowResourceSet>>& pool = kernel->render_data_pool[kernel->latest_render_data_pool];
         std::shared_ptr<buffer::Uniform>& ub = std::get<0>(pool);
         std::shared_ptr<pipeline::ForwardPbrDirectionalShadowResourceSet>& prs = std::get<1>(pool);
         ForwardPbrDirectionalShadowUniform us;
@@ -125,20 +126,20 @@ void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::record(
         prs->set_model(m);
         prs->set_mesh(msh);
         prs->set_material(mat);
-        prs->set_effect(ub, frame.pipeline_resource);
-        prs->record(kernel.secondary_cmd);
-        ++kernel.latest_render_data_pool;
+        prs->set_effect(ub, frame->pipeline_resource);
+        prs->record(kernel->secondary_cmd);
+        ++kernel->latest_render_data_pool;
     }
 }
 
 void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::submit()
 {
     const unsigned int frame_number = e->get_frame_number();
-    ForwardPbrDirectionalShadowFrame& frame = frames[frame_number];
-    std::shared_ptr<command::Buffer>& cmd = frame.primary_cmd;
+    const std::shared_ptr<ForwardPbrDirectionalShadowFrame>& frame = frames[frame_number];
+    std::shared_ptr<command::Buffer>& cmd = frame->primary_cmd;
     render_target->bind(cmd);
-    for (const ForwardPbrDirectionalShadowKernel k : frame.kernels) {
-        cmd->record(k.secondary_cmd);
+    for (const std::shared_ptr<ForwardPbrDirectionalShadowKernel>& k : frame->kernels) {
+        cmd->record(k->secondary_cmd);
     }
     std::vector<std::shared_ptr<sync::Semaphore>> pss(providers.size());
     for (const std::shared_ptr<core::graph::Node>& p : providers) {
@@ -152,21 +153,21 @@ void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::submit()
             continue;
         pss.push_back(ps);
     }
-    e->submit(pss, cmd, frame.semaphore);
+    e->submit(pss, cmd, frame->semaphore);
 }
 
-gearoenix::render::graph::node::ForwardPbrDirectionalShadowFrame::ForwardPbrDirectionalShadowFrame(const std::shared_ptr<engine::Engine> &e)
+gearoenix::render::graph::node::ForwardPbrDirectionalShadowFrame::ForwardPbrDirectionalShadowFrame(const std::shared_ptr<engine::Engine>& e)
     : primary_cmd(e->get_command_manager()->create_primary_command_buffer())
     , semaphore(e->create_semaphore())
 {
     const unsigned int kernels_count = std::thread::hardware_concurrency();
     kernels.resize(kernels_count);
     for (unsigned int i = 0; i < kernels_count; ++i) {
-        kernels.push_back(ForwardPbrDirectionalShadowKernel(e, i));
+        kernels.push_back(std::make_shared<ForwardPbrDirectionalShadowKernel>(e, i));
     }
 }
 
-gearoenix::render::graph::node::ForwardPbrDirectionalShadowKernel::ForwardPbrDirectionalShadowKernel(const std::shared_ptr<engine::Engine> &e, const unsigned int kernel_index)
+gearoenix::render::graph::node::ForwardPbrDirectionalShadowKernel::ForwardPbrDirectionalShadowKernel(const std::shared_ptr<engine::Engine>& e, const unsigned int kernel_index)
     : secondary_cmd(e->get_command_manager()->create_secondary_command_buffer(kernel_index))
 {
 }

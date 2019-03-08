@@ -9,17 +9,17 @@ namespace system {
     }
 }
 namespace render {
-	namespace engine {
-		class Engine;
-	}
+    namespace engine {
+        class Engine;
+    }
     namespace camera {
         class Manager {
         protected:
-			const std::shared_ptr<engine::Engine> e;
+            const std::shared_ptr<engine::Engine> e;
             const std::shared_ptr<system::stream::Stream> s;
 
         public:
-            Manager(const std::shared_ptr<system::stream::Stream>& s, const std::shared_ptr<engine::Engine> &e);
+            Manager(const std::shared_ptr<system::stream::Stream>& s, const std::shared_ptr<engine::Engine>& e);
             ~Manager();
         };
     }

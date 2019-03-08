@@ -3,15 +3,15 @@
 #include "../../core/cr-types.hpp"
 namespace gearoenix {
 namespace render {
-	namespace mesh {
-		class Type {
-			public:
-			typedef enum : core::Id {
-				BASIC = 1,
-			} Id;
-		};
+    namespace mesh {
+        class Type {
+        public:
+            typedef enum : core::Id {
+                BASIC = 1,
+            } Id;
+        };
 
-	}
+    }
 }
 }
 #endif

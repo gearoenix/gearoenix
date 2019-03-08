@@ -330,8 +330,9 @@ gearoenix::system::Application::Application() noexcept
 {
 }
 
-const std::shared_ptr<gearoenix::system::Application> gearoenix::system::Application::construct() noexcept {
-	const std::shared_ptr<Application> result(new Application());
+const std::shared_ptr<gearoenix::system::Application> gearoenix::system::Application::construct() noexcept
+{
+    const std::shared_ptr<Application> result(new Application());
 
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS) != 0) {
         GXLOGF("Failed to initialize SDL: " << SDL_GetError());
@@ -353,16 +354,13 @@ const std::shared_ptr<gearoenix::system::Application> gearoenix::system::Applica
     result->win_height = GEAROENIX_DEFAULT_WINDOW_HEIGHT;
 #endif
 
-	result->create_window();
-	result->create_context();
+    result->create_window();
+    result->create_context();
 
     SDL_AddEventWatch(event_receiver, result.get());
 
     if (
-		result->supported_engine == render::engine::Type::OPENGL_43 || 
-		result->supported_engine == render::engine::Type::OPENGL_33 || 
-		result->supported_engine == render::engine::Type::OPENGL_ES3 || 
-		result->supported_engine == render::engine::Type::OPENGL_ES3) {
+        result->supported_engine == render::engine::Type::OPENGL_43 || result->supported_engine == render::engine::Type::OPENGL_33 || result->supported_engine == render::engine::Type::OPENGL_ES3 || result->supported_engine == render::engine::Type::OPENGL_ES3) {
 
 #if defined(GX_IN_DESKTOP) && defined(GX_USE_OPENGL)
         const GLenum glew_error = glewInit();
@@ -375,43 +373,43 @@ const std::shared_ptr<gearoenix::system::Application> gearoenix::system::Applica
 #endif
         int w, h;
         SDL_GL_GetDrawableSize(result->window, &w, &h);
-		result->win_width = static_cast<unsigned int>(w);
-		result->win_height = static_cast<unsigned int>(h);
+        result->win_width = static_cast<unsigned int>(w);
+        result->win_height = static_cast<unsigned int>(h);
     }
-	result->screen_ratio = static_cast<core::Real>(result->win_width) / static_cast<core::Real>(result->win_height);
-	result->half_height_inversed = 2.0f / static_cast<core::Real>(result->win_height);
+    result->screen_ratio = static_cast<core::Real>(result->win_width) / static_cast<core::Real>(result->win_height);
+    result->half_height_inversed = 2.0f / static_cast<core::Real>(result->win_height);
     int mx, my;
     SDL_GetMouseState(&mx, &my);
-	result->pre_x = result->convert_x_to_ratio(mx);
-	result->pre_y = result->convert_y_to_ratio(my);
+    result->pre_x = result->convert_x_to_ratio(mx);
+    result->pre_y = result->convert_y_to_ratio(my);
 
 #ifdef GX_USE_VULKAN
     if (nullptr == result->render_engine && result->supported_engine == render::engine::Type::VULKAN) {
-		result->render_engine = new vulkan::Engine(this);
+        result->render_engine = new vulkan::Engine(this);
     }
 #endif
 
 #ifdef GX_USE_OPENGL_43
     if (nullptr == result->render_engine && result->supported_engine == render::engine::Type::OPENGL_43) {
-		result->render_engine = new gl43::engine::Engine(this);
+        result->render_engine = new gl43::engine::Engine(this);
     }
 #endif
 
 #ifdef GX_USE_OPENGL_33
     if (nullptr == result->render_engine && result->supported_engine == render::engine::Type::OPENGL_33) {
-		result->render_engine = new gl33::engine::Engine(this);
+        result->render_engine = new gl33::engine::Engine(this);
     }
 #endif
 
 #ifdef GX_USE_OPENGL_ES3
     if (nullptr == result->render_engine && result->supported_engine == render::engine::Type::OPENGL_ES3) {
-		result->render_engine = new gles3::engine::Engine(this);
+        result->render_engine = new gles3::engine::Engine(this);
     }
 #endif
 
 #ifdef GX_USE_OPENGL_ES2
     if (nullptr == result->render_engine && result->supported_engine == render::engine::Type::OPENGL_ES2) {
-		result->render_engine = new gles2::engine::Engine(result);
+        result->render_engine = new gles2::engine::Engine(result);
     }
 #endif
 
@@ -419,7 +417,7 @@ const std::shared_ptr<gearoenix::system::Application> gearoenix::system::Applica
         GXLOGF("No suitable render engine found.");
     }
 
-	result->astmgr = std::make_shared<core::asset::Manager>(result, GX_APP_DATA_NAME);
+    result->astmgr = std::make_shared<core::asset::Manager>(result, GX_APP_DATA_NAME);
 }
 
 gearoenix::system::Application::~Application() noexcept
@@ -429,7 +427,7 @@ gearoenix::system::Application::~Application() noexcept
     render_engine = nullptr;
 }
 
-void gearoenix::system::Application::execute(const std::shared_ptr<core::Application> &app) noexcept
+void gearoenix::system::Application::execute(const std::shared_ptr<core::Application>& app) noexcept
 {
     core_app = app;
 #ifdef GX_IN_WEB
@@ -474,32 +472,32 @@ SDL_Quit();
 #endif
 }
 
-const std::shared_ptr<gearoenix::core::Application> &gearoenix::system::Application::get_core_app() const noexcept
+const std::shared_ptr<gearoenix::core::Application>& gearoenix::system::Application::get_core_app() const noexcept
 {
     return core_app;
 }
 
-std::shared_ptr<gearoenix::core::Application> &gearoenix::system::Application::get_core_app() noexcept
+std::shared_ptr<gearoenix::core::Application>& gearoenix::system::Application::get_core_app() noexcept
 {
     return core_app;
 }
 
-const std::shared_ptr<gearoenix::render::engine::Engine> &gearoenix::system::Application::get_render_engine() const noexcept
+const std::shared_ptr<gearoenix::render::engine::Engine>& gearoenix::system::Application::get_render_engine() const noexcept
 {
     return render_engine;
 }
 
-std::shared_ptr<gearoenix::render::engine::Engine> &gearoenix::system::Application::get_render_engine() noexcept
+std::shared_ptr<gearoenix::render::engine::Engine>& gearoenix::system::Application::get_render_engine() noexcept
 {
     return render_engine;
 }
 
-const std::shared_ptr<gearoenix::core::asset::Manager> &gearoenix::system::Application::get_asset_manager() const noexcept
+const std::shared_ptr<gearoenix::core::asset::Manager>& gearoenix::system::Application::get_asset_manager() const noexcept
 {
     return astmgr;
 }
 
-std::shared_ptr<gearoenix::core::asset::Manager> &gearoenix::system::Application::get_asset_manager() noexcept
+std::shared_ptr<gearoenix::core::asset::Manager>& gearoenix::system::Application::get_asset_manager() noexcept
 {
     return astmgr;
 }

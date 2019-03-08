@@ -11,9 +11,9 @@ namespace system {
     }
 }
 namespace render {
-	namespace engine {
-		class Engine;
-	}
+    namespace engine {
+        class Engine;
+    }
     namespace light {
         class Light;
         class Manager {
@@ -22,7 +22,7 @@ namespace render {
             const std::shared_ptr<system::stream::Stream> s;
 
         public:
-            Manager(const std::shared_ptr<system::stream::Stream>& s, const std::shared_ptr<engine::Engine> &e);
+            Manager(const std::shared_ptr<system::stream::Stream>& s, const std::shared_ptr<engine::Engine>& e);
             ~Manager();
             std::shared_ptr<Light> get(core::Id mid, core::sync::EndCaller<Light> c);
         };

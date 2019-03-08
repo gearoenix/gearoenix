@@ -5,9 +5,9 @@
 
 namespace gearoenix {
 namespace render {
-	namespace engine {
-		class Engine;
-	}
+    namespace engine {
+        class Engine;
+    }
     namespace camera {
         class Camera;
     }
@@ -33,7 +33,7 @@ private:
     State::Type state = State::GARAGE;
 
 public:
-    GameApp(const std::shared_ptr<gearoenix::system::Application> &sys_app);
+    GameApp(const std::shared_ptr<gearoenix::system::Application>& sys_app);
     ~GameApp();
     void update();
     void terminate();

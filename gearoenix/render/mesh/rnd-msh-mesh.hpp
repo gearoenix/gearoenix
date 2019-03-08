@@ -12,9 +12,9 @@ namespace system {
     }
 }
 namespace render {
-	namespace engine {
-		class Engine;
-	}
+    namespace engine {
+        class Engine;
+    }
     namespace buffer {
         class Mesh;
     }
@@ -34,20 +34,20 @@ namespace render {
         class Mesh : public core::asset::Asset {
         protected:
             std::shared_ptr<buffer::Mesh> buf;
-			const Type::Id t;
-			Mesh(
-				const Type::Id t,
-				const core::Id my_id,
-				const std::shared_ptr<system::stream::Stream> &f,
-				const std::shared_ptr<engine::Engine> &e,
-				const core::sync::EndCaller<core::sync::EndCallerIgnore> c);
+            const Type::Id t;
+            Mesh(
+                const Type::Id t,
+                const core::Id my_id,
+                const std::shared_ptr<system::stream::Stream>& f,
+                const std::shared_ptr<engine::Engine>& e,
+                const core::sync::EndCaller<core::sync::EndCallerIgnore> c);
 
         public:
             static Mesh* read(
-				const core::Id my_id,
-				const std::shared_ptr<system::stream::Stream> &f,
-				const std::shared_ptr<engine::Engine> &e,
-				const core::sync::EndCaller<core::sync::EndCallerIgnore> c);
+                const core::Id my_id,
+                const std::shared_ptr<system::stream::Stream>& f,
+                const std::shared_ptr<engine::Engine>& e,
+                const core::sync::EndCaller<core::sync::EndCallerIgnore> c);
             ~Mesh();
             void bind();
             void draw();

@@ -8,10 +8,10 @@
 #define GX_FACES_COUNT 6
 
 gearoenix::gles2::texture::Cube::Cube(
-	const core::Id my_id,
-	const std::shared_ptr<system::stream::Stream> &file,
-	const std::shared_ptr<engine::Engine> &engine,
-	core::sync::EndCaller<core::sync::EndCallerIgnore> end)
+    const core::Id my_id,
+    const std::shared_ptr<system::stream::Stream>& file,
+    const std::shared_ptr<engine::Engine>& engine,
+    core::sync::EndCaller<core::sync::EndCallerIgnore> end)
     : render::texture::Cube(my_id, engine)
 {
     std::vector<std::vector<unsigned char>> img_data(GX_FACES_COUNT);

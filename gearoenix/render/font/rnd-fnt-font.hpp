@@ -11,9 +11,9 @@ namespace system {
     }
 }
 namespace render {
-	namespace engine {
-		class Engine;
-	}
+    namespace engine {
+        class Engine;
+    }
     namespace font {
         class Font {
         protected:
@@ -23,10 +23,10 @@ namespace render {
         public:
             virtual ~Font();
             static Font* read(
-				const core::Id font_id,
-				const std::shared_ptr<system::stream::Stream> &f, 
-				const std::shared_ptr<engine::Engine> &e, 
-				const core::sync::EndCaller<core::sync::EndCallerIgnore> &c);
+                const core::Id font_id,
+                const std::shared_ptr<system::stream::Stream>& f,
+                const std::shared_ptr<engine::Engine>& e,
+                const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
         };
     }
 }

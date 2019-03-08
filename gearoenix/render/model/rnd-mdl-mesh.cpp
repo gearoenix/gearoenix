@@ -1,4 +1,3 @@
-#include "rnd-mdl-model.hpp"
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../core/cr-static.hpp"
 #include "../../physics/collider/phs-collider.hpp"
@@ -14,6 +13,7 @@
 #include "../scene/rnd-scn-scene.hpp"
 #include "../widget/rnd-wdg-widget.hpp"
 #include "rnd-mdl-dynamic.hpp"
+#include "rnd-mdl-model.hpp"
 #include "rnd-mdl-static.hpp"
 #include <iostream>
 

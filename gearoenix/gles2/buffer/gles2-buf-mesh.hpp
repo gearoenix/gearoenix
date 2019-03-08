@@ -7,9 +7,9 @@
 #include "../gles2.hpp"
 namespace gearoenix {
 namespace gles2 {
-	namespace engine {
-		class Engine;
-	}
+    namespace engine {
+        class Engine;
+    }
     namespace buffer {
         class Mesh : public render::buffer::Mesh {
         public:
@@ -19,9 +19,9 @@ namespace gles2 {
 
         public:
             Mesh(
-				const std::shared_ptr<system::stream::Stream> &f, 
-				const std::shared_ptr<engine::Engine> &e, 
-				const core::sync::EndCaller<core::sync::EndCallerIgnore> c);
+                const std::shared_ptr<system::stream::Stream>& f,
+                const std::shared_ptr<engine::Engine>& e,
+                const core::sync::EndCaller<core::sync::EndCallerIgnore> c);
             ~Mesh();
             void bind();
             void draw();

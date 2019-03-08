@@ -65,7 +65,7 @@ namespace render {
         protected:
             unsigned int frame_number = 0;
             const Type::Id engine_type_id;
-			const std::shared_ptr<system::Application> sysapp;
+            const std::shared_ptr<system::Application> sysapp;
             /// managers pointers are own only by this class
             std::shared_ptr<pipeline::Manager> pipeline_manager = nullptr;
             std::shared_ptr<command::Manager> command_manager = nullptr;
@@ -85,7 +85,7 @@ namespace render {
             physics::Engine* physics_engine = nullptr;
             void do_load_functions();
             void clear();
-            Engine(const std::shared_ptr<system::Application> &system_application, const Type::Id engine_type_id);
+            Engine(const std::shared_ptr<system::Application>& system_application, const Type::Id engine_type_id);
 
         public:
             virtual ~Engine();

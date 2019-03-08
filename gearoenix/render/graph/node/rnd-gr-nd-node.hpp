@@ -1,8 +1,8 @@
 #ifndef GEAROEMIX_RENDER_GRAPH_NODE_NODE_HPP
 #define GEAROEMIX_RENDER_GRAPH_NODE_NODE_HPP
 #include "../../../core/graph/cr-gr-node.hpp"
-#include "../../pipeline/rnd-pip-type.hpp"
 #include "../../../core/sync/cr-sync-end-caller.hpp"
+#include "../../pipeline/rnd-pip-type.hpp"
 #include <memory>
 #include <vector>
 
@@ -24,12 +24,12 @@
 
 namespace gearoenix {
 namespace render {
-	namespace engine {
-		class Engine;
-	}
-	namespace pipeline {
-		class Pipeline;
-	}
+    namespace engine {
+        class Engine;
+    }
+    namespace pipeline {
+        class Pipeline;
+    }
     namespace sync {
         class Semaphore;
     }
@@ -47,13 +47,13 @@ namespace render {
                 std::shared_ptr<texture::Target> render_target = nullptr;
                 std::shared_ptr<pipeline::Pipeline> render_pipeline = nullptr;
                 Node(
-					const std::shared_ptr<engine::Engine> &e,
+                    const std::shared_ptr<engine::Engine>& e,
                     const pipeline::Type::Id pipeline_type_id,
                     const unsigned int input_textures_count,
                     const unsigned int output_textures_count,
                     const std::vector<std::string>& input_links,
                     const std::vector<std::string>& output_links,
-                    const core::sync::EndCaller<core::sync::EndCallerIgnore> &call);
+                    const core::sync::EndCaller<core::sync::EndCallerIgnore>& call);
 
             public:
                 virtual ~Node();
