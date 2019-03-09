@@ -10,7 +10,7 @@ namespace render {
     namespace texture {
         class Target : public Texture2D {
         protected:
-            Target(core::Id my_id, Engine* e);
+            Target(const core::Id my_id, std::shared_ptr<engine::Engine>& e);
 
         public:
             virtual ~Target();

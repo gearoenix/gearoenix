@@ -26,7 +26,6 @@ namespace core {
         virtual ~Application();
         virtual void update() = 0;
         virtual void terminate() = 0;
-        virtual void on_event(const event::Event& e) = 0;
     };
 }
 }

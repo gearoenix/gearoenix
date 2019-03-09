@@ -3,11 +3,9 @@
 #include "../../system/stream/sys-stm-memory.hpp"
 #include "../../system/sys-app.hpp"
 #include "../font/rnd-fnt-2d.hpp"
-#include "../material/rnd-mat-depth.hpp"
-#include "../material/rnd-mat-font-colored.hpp"
 #include "../material/rnd-mat-material.hpp"
 #include "../mesh/rnd-msh-mesh.hpp"
-#include "../rnd-engine.hpp"
+#include "../engine/rnd-eng-engine.hpp"
 #include "../shader/rnd-shd-shader.hpp"
 
 void gearoenix::render::widget::Text::create_text_mesh(core::sync::EndCaller<core::sync::EndCallerIgnore> c)
@@ -15,7 +13,7 @@ void gearoenix::render::widget::Text::create_text_mesh(core::sync::EndCaller<cor
     system::stream::Memory ms;
     system::stream::Stream& s = ms;
     const core::Count text_size = (core::Count)text.size();
-    s.write(mesh::Mesh::Geo::BASIC);
+    s.write(mesh::Type::BASIC);
     s.write<core::Count>(5);
     s.write(text_size * 4);
     struct Vertex {
@@ -111,43 +109,47 @@ void gearoenix::render::widget::Text::create_text_mesh(core::sync::EndCaller<cor
         s.write(index + 3);
     }
     s.seek(0);
-    mesh_id = render_engine->get_system_application()->get_asset_manager()->create_id();
-    msh = std::shared_ptr<mesh::Mesh>(mesh::Mesh::read(mesh_id, &s, render_engine, c));
+    mesh_id = e->get_system_application()->get_asset_manager()->create_id();
+    //msh = std::shared_ptr<mesh::Mesh>(mesh::Mesh::read(mesh_id, s, e, c));
 }
 
-gearoenix::render::widget::Text::Text(core::Id my_id, system::stream::Stream* s, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> c)
-    : Widget(my_id, s, e, c)
-    , text(s->read_string())
-    , align(s->read<Alignment::Type>())
-    , space_character(s->read<core::Real>())
-    , space_word(s->read<core::Real>())
-    , space_line(s->read<core::Real>())
+gearoenix::render::widget::Text::Text(
+	const core::Id my_id,
+	const std::shared_ptr<system::stream::Stream> &f,
+	const std::shared_ptr<engine::Engine>& e,
+	const core::sync::EndCaller<core::sync::EndCallerIgnore> &c)
+    : Widget(my_id, e, c)
+    , text(f->read_string())
+    , align(f->read<Alignment::Type>())
+    , space_character(f->read<core::Real>())
+    , space_word(f->read<core::Real>())
+    , space_line(f->read<core::Real>())
 {
     core::Id font_id;
-    s->read(font_id);
-    s->read<core::Id>();
+    f->read(font_id);
+    f->read<core::Id>();
     math::Vec4 color;
-    color.read(s);
-    fnt = std::static_pointer_cast<font::Font2D>(
-        e->get_system_application()->get_asset_manager()->get_font(
-            font_id, core::sync::EndCaller<font::Font>([c](std::shared_ptr<font::Font>) -> void {
-            })));
-    create_text_mesh(c);
-    material::FontColored* font_mat = new material::FontColored(shader::FONT_COLORED, fnt->get_baked_texture(), e, c);
-    font_mat->set_color(color);
-    std::shared_ptr<material::Material> mat(font_mat);
-    std::shared_ptr<material::Depth> dp = nullptr;
-    if (shader::Shader::is_shadow_caster(mat->get_shader_id())) {
-        dp = std::shared_ptr<material::Depth>(
-            new material::Depth(
-                shader::Shader::get_shadow_caster_shader_id(mat->get_shader_id()),
-                e, c));
-        has_shadow_caster = true;
-    }
-    has_transparent |= shader::Shader::is_transparent(mat->get_shader_id());
-    needs_mvp |= mat->needs_mvp();
-    needs_dbm |= mat->needs_dbm();
-    meshes[mesh_id] = std::make_tuple(msh, mat, dp);
+    //color.read(f);
+    //fnt = std::static_pointer_cast<font::Font2D>(
+    //    e->get_system_application()->get_asset_manager()->get_font_manager()->get(
+    //        font_id, core::sync::EndCaller<font::Font>([c](std::shared_ptr<font::Font>) -> void {
+    //        })));
+    //create_text_mesh(c);
+    //material::FontColored* font_mat = new material::FontColored(shader::FONT_COLORED, fnt->get_baked_texture(), e, c);
+    //font_mat->set_color(color);
+    //std::shared_ptr<material::Material> mat(font_mat);
+    //std::shared_ptr<material::Depth> dp = nullptr;
+    //if (shader::Shader::is_shadow_caster(mat->get_shader_id())) {
+    //    dp = std::shared_ptr<material::Depth>(
+    //        new material::Depth(
+    //            shader::Shader::get_shadow_caster_shader_id(mat->get_shader_id()),
+    //            e, c));
+    //    has_shadow_caster = true;
+    //}
+    //has_transparent |= shader::Shader::is_transparent(mat->get_shader_id());
+    //needs_mvp |= mat->needs_mvp();
+    //needs_dbm |= mat->needs_dbm();
+    //meshes[mesh_id] = std::make_tuple(msh, mat, dp);
 }
 
 gearoenix::render::widget::Text::~Text() {}

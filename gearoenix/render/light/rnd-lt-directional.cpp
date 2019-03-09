@@ -1,6 +1,6 @@
-#include "../../core/asset/cr-asset-manager.hpp"
-#include "../../core/cr-build-configuration.hpp"
-#include "../../system/sys-app.hpp"
-#include "../camera/rnd-cmr-orthographic.hpp"
-#include "../engine/rnd-eng-engine.hpp"
-#include "rnd-lt-sun.hpp"
+#include "rnd-lt-directional.hpp"
+
+const gearoenix::math::Mat4x4 & gearoenix::render::light::Directional::get_view_projection_biases() const
+{
+	return view_projection_biases;
+}

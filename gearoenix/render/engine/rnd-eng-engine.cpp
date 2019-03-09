@@ -45,6 +45,11 @@ gearoenix::render::engine::Engine::~Engine()
     clear();
 }
 
+void gearoenix::render::engine::Engine::update() {
+	++frame_number;
+	frame_number %= GX_FRAMES_COUNT;
+}
+
 void gearoenix::render::engine::Engine::clear()
 {
     if (pipeline_manager != nullptr) {
@@ -145,6 +150,31 @@ void gearoenix::render::engine::Engine::do_load_functions()
         f();
     }
 }
+
+const std::shared_ptr<gearoenix::system::Application>& gearoenix::render::engine::Engine::get_system_application() const
+{
+	return sysapp;
+}
+
+const std::shared_ptr<gearoenix::physics::Engine>& gearoenix::render::engine::Engine::get_physics_engine() const
+{
+	GXUNIMPLEMENTED;
+	return nullptr;
+}
+
+const std::shared_ptr<gearoenix::render::pipeline::Manager> &gearoenix::render::engine::Engine::get_pipeline_manager() const {
+	return pipeline_manager;
+}
+
+const std::shared_ptr<gearoenix::render::command::Manager> &gearoenix::render::engine::Engine::get_command_manager() const {
+	return command_manager;
+}
+
+const std::shared_ptr<gearoenix::render::buffer::Manager>& gearoenix::render::engine::Engine::get_buffer_manager() const
+{
+	return buffer_manager;
+}
+
 void gearoenix::render::engine::Engine::add_load_function(std::function<void()> fun)
 {
     load_functions_mutex->lock();
@@ -152,57 +182,12 @@ void gearoenix::render::engine::Engine::add_load_function(std::function<void()> 
     load_functions_mutex->release();
 }
 
-const std::shared_ptr<gearoenix::render::scene::Scene>& gearoenix::render::engine::Engine::get_scene(core::Id scene_id) const
+gearoenix::render::engine::Type::Id gearoenix::render::engine::Engine::get_engine_type_id() const
 {
-#ifdef GX_DEBUG_MODE
-    std::map<core::Id, std::shared_ptr<gearoenix::render::scene::Scene>>::const_iterator f = loaded_scenes.find(scene_id);
-    if (f == loaded_scenes.end())
-        GXUNEXPECTED;
-    return f->second;
-#else
-    return loaded_scenes[scene_id];
-#endif
+	return engine_type_id;
 }
 
-const std::map<gearoenix::core::Id, std::shared_ptr<gearoenix::render::scene::Scene>>& gearoenix::render::engine::Engine::get_all_scenes() const
+unsigned int gearoenix::render::engine::Engine::get_frame_number() const
 {
-    return loaded_scenes;
-}
-
-void gearoenix::render::engine::Engine::load_scene(core::Id scene_id, std::function<void()> on_load)
-{
-    scene_loader_mutex->lock();
-    scene_loader_functions.push_back([this, scene_id, on_load] {
-        loaded_scenes_mutex->lock();
-#ifdef GX_DEBUG_MODE
-        if (loaded_scenes.find(scene_id) != loaded_scenes.end())
-            GXUNEXPECTED;
-#endif
-        sysapp->get_asset_manager()->get_scene_manager()->get(
-            scene_id, core::sync::EndCaller<scene::Scene>([this, on_load, scene_id](std::shared_ptr<scene::Scene> asset) -> void {
-                loaded_scenes[scene_id] = asset;
-                asset->set_renderable(true);
-                on_load();
-            }));
-        loaded_scenes_mutex->release();
-    });
-    scene_loader_mutex->release();
-    scene_loader_signaler->release();
-}
-
-void gearoenix::render::engine::Engine::delete_scene(core::Id scene_id)
-{
-    loaded_scenes_mutex->lock();
-    auto search = loaded_scenes.find(scene_id);
-#ifdef GX_DEBUG_MODE
-    if (loaded_scenes.end() == search)
-        GXUNEXPECTED;
-#endif
-    loaded_scenes.erase(search);
-    loaded_scenes_mutex->release();
-}
-
-gearoenix::physics::Engine* gearoenix::render::engine::Engine::get_physics_engine()
-{
-    return physics_engine;
+	return frame_number;
 }

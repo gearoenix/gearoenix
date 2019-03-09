@@ -1,5 +1,7 @@
 #ifndef GEAROEMIX_RENDER_SKYBOX_MANAGER_HPP
 #define GEAROEMIX_RENDER_SKYBOX_MANAGER_HPP
+#include "../../core/cr-types.hpp"
+#include "../../core/sync/cr-sync-end-caller.hpp"
 #include <memory>
 
 namespace gearoenix {

@@ -25,16 +25,16 @@ namespace render {
     namespace skybox {
         class Skybox : public core::asset::Asset {
         private:
-            std::shared_ptr<mesh::Mesh> msh = nullptr;
+            //std::shared_ptr<mesh::Mesh> msh = nullptr;
             core::Id mesh_id;
-            material::SkyboxBasic* mat = nullptr;
+            //material::SkyboxBasic* mat = nullptr;
 
         public:
-            Skybox(core::Id my_id, system::stream::Stream* s, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> c);
-            ~Skybox();
-            static Skybox* read(core::Id my_id, system::stream::Stream* s, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> c);
-            void draw();
-            void update(const scene::Scene* s);
+            //Skybox(core::Id my_id, system::stream::Stream* s, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> c);
+            //~Skybox();
+            //static Skybox* read(core::Id my_id, system::stream::Stream* s, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> c);
+            //void draw();
+            //void update(const scene::Scene* s);
         };
     }
 }

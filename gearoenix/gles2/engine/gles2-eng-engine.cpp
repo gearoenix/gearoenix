@@ -93,11 +93,6 @@ gearoenix::gles2::engine::Engine::~Engine()
     terminate();
 }
 
-void gearoenix::gles2::engine::Engine::window_changed()
-{
-    GXTODO;
-}
-
 void gearoenix::gles2::engine::Engine::update()
 {
     //GX_CHECK_FOR_GRAPHIC_API_ERROR;
@@ -149,6 +144,17 @@ void gearoenix::gles2::engine::Engine::terminate()
     //    delete shadow_map_texture;
     //    shadow_map_texture = nullptr;
     //}
+}
+
+gearoenix::render::sync::Semaphore * gearoenix::gles2::engine::Engine::create_semaphore()
+{
+	GXUNIMPLEMENTED;
+	return nullptr;
+}
+
+void gearoenix::gles2::engine::Engine::submit(const std::vector<std::shared_ptr<render::sync::Semaphore>>& p, const std::shared_ptr<render::command::Buffer>& c, const std::shared_ptr<render::sync::Semaphore>& n)
+{
+	GXUNIMPLEMENTED;
 }
 
 //gearoenix::render::texture::Texture2D* gearoenix::gles2::engine::Engine::create_texture_2d(core::Id id, system::stream::Stream* file, core::sync::EndCaller<core::sync::EndCallerIgnore> c)

@@ -10,7 +10,6 @@ namespace render {
     }
     namespace widget {
         class Text : public Widget {
-            friend class physics::Kernel;
 
         public:
             class Alignment {
@@ -33,12 +32,16 @@ namespace render {
             Alignment::Type align;
             core::Real space_character, space_word, space_line;
             std::shared_ptr<font::Font2D> fnt;
-            std::shared_ptr<mesh::Mesh> msh;
+            //std::shared_ptr<mesh::Mesh> msh;
             core::Id mesh_id;
             void create_text_mesh(core::sync::EndCaller<core::sync::EndCallerIgnore> c);
 
         public:
-            Text(core::Id my_id, system::stream::Stream* s, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> c);
+            Text(
+				const core::Id my_id,
+				const std::shared_ptr<system::stream::Stream> &f,
+				const std::shared_ptr<engine::Engine>& e,
+				const core::sync::EndCaller<core::sync::EndCallerIgnore> &c);
             ~Text();
         };
     }

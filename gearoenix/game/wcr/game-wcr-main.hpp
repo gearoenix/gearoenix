@@ -35,8 +35,7 @@ private:
 public:
     GameApp(const std::shared_ptr<gearoenix::system::Application>& sys_app);
     ~GameApp();
-    void update();
-    void terminate();
-    void on_event(const gearoenix::core::event::Event& e);
+    void update() override final;
+    void terminate() override final;
 };
 #endif

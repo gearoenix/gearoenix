@@ -48,6 +48,11 @@ const std::shared_ptr<gearoenix::system::stream::Asset>& gearoenix::core::asset:
     return file;
 }
 
+const std::shared_ptr<gearoenix::render::scene::Manager>& gearoenix::core::asset::Manager::get_scene_manager() const
+{
+	return scene_manager;
+}
+
 gearoenix::core::Id gearoenix::core::asset::Manager::create_id()
 {
     return last_id.fetch_add(1);

@@ -89,28 +89,19 @@ namespace render {
 
         public:
             virtual ~Engine();
-            virtual void window_changed() = 0;
-            virtual void update() = 0;
+            virtual void update();
             virtual void terminate() = 0;
             virtual sync::Semaphore* create_semaphore() = 0;
             virtual void submit(const std::vector<std::shared_ptr<sync::Semaphore>>& p, const std::shared_ptr<command::Buffer>& c, const std::shared_ptr<sync::Semaphore>& n) = 0;
             // getters
-            const pipeline::Manager* get_pipeline_manager() const;
-            pipeline::Manager* get_pipeline_manager();
-            const command::Manager* get_command_manager() const;
-            command::Manager* get_command_manager();
-            const system::Application* get_system_application() const;
-            system::Application* get_system_application();
-            const physics::Engine* get_physics_engine() const;
-            physics::Engine* get_physics_engine();
-            const buffer::Manager* get_buffer_manager() const;
-            buffer::Manager* get_buffer_manager();
+            const std::shared_ptr<pipeline::Manager> &get_pipeline_manager() const;
+            const std::shared_ptr<command::Manager> &get_command_manager() const;
+            const std::shared_ptr<system::Application> &get_system_application() const;
+            const std::shared_ptr<physics::Engine> &get_physics_engine() const;
+            const std::shared_ptr<buffer::Manager> &get_buffer_manager() const;
             // end of getters
             void add_load_function(std::function<void()> fun);
-            const std::shared_ptr<scene::Scene>& get_scene(core::Id scene_id) const;
-            const std::map<core::Id, std::shared_ptr<scene::Scene>>& get_all_scenes() const;
-            void load_scene(core::Id scene_id, std::function<void()> on_load);
-            void delete_scene(core::Id scene_id);
+
             Type::Id get_engine_type_id() const;
             unsigned int get_frame_number() const;
         };

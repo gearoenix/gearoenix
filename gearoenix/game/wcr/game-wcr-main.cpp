@@ -13,25 +13,25 @@
 #include "../../render/scene/rnd-scn-scene.hpp"
 #include "../../system/sys-app.hpp"
 #include "../../system/sys-log.hpp"
-//
-//GameApp::GameApp(const std::shared_ptr<gearoenix::system::Application>& sys_app)
-//    : gearoenix::core::Application::Application(sys_app)
-//    , rndeng(sys_app->get_render_engine())
-//{
-//    rndeng->load_scene(1, [this]() -> void {
-//        const auto& scene = rndeng->get_scene(1);
-//        cam = scene->get_current_camera();
-//        mdl = std::static_pointer_cast<gearoenix::render::model::Dynamic>(scene->get_model(1).lock());
-//    });
-//    rndeng->load_scene(2, [this]() -> void {});
-//}
-//
-//GameApp::~GameApp() {}
-//
-//void GameApp::update() {}
-//
-//void GameApp::terminate() {}
-//
+
+GameApp::GameApp(const std::shared_ptr<gearoenix::system::Application>& sys_app)
+    : gearoenix::core::Application::Application(sys_app)
+    , rndeng(sys_app->get_render_engine())
+{
+    /*rndeng->load_scene(1, [this]() -> void {
+        const auto& scene = rndeng->get_scene(1);
+        cam = scene->get_current_camera();
+        mdl = std::static_pointer_cast<gearoenix::render::model::Dynamic>(scene->get_model(1).lock());
+    });
+    rndeng->load_scene(2, [this]() -> void {});*/
+}
+
+GameApp::~GameApp() {}
+
+void GameApp::update() {}
+
+void GameApp::terminate() {}
+
 //void GameApp::on_event(const gearoenix::core::event::Event& e)
 //{
 //    switch (e.get_type()) {

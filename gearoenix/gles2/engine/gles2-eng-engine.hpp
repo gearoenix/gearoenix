@@ -34,6 +34,7 @@ namespace gles2 {
             //        GLfloat win_height;
             void initialize();
 #ifdef GX_GLES2_ENGINE_PROFILING
+			/// todo: create a class for profilling
             unsigned int prof_frames_count = 0;
             std::chrono::high_resolution_clock::time_point prof_last_time_draw;
             double prof_frames_time = 0.0;
@@ -41,9 +42,13 @@ namespace gles2 {
         public:
             Engine(const std::shared_ptr<system::Application>& sys_app);
             ~Engine();
-            void window_changed();
-            void update();
-            void terminate();
+			void update() override final;
+			void terminate() override final;
+			render::sync::Semaphore* create_semaphore() override final;
+			void submit(
+				const std::vector<std::shared_ptr<render::sync::Semaphore>>& p, 
+				const std::shared_ptr<render::command::Buffer>& c, 
+				const std::shared_ptr<render::sync::Semaphore>& n) override final;
             //        render::texture::Texture2D* create_texture_2d(core::Id id, system::stream::Stream* file, core::sync::EndCaller<core::sync::EndCallerIgnore> c);
             //        render::texture::Cube* create_texture_cube(core::Id id, system::stream::Stream* file, core::sync::EndCaller<core::sync::EndCallerIgnore> c);
             //        render::buffer::Mesh* create_mesh(unsigned int vec, system::stream::Stream* file, core::sync::EndCaller<core::sync::EndCallerIgnore> c);

@@ -15,17 +15,14 @@ namespace render {
     }
     namespace scene {
         class Ui : public Scene {
-            friend class physics::Kernel;
-            friend class Scene;
 
         protected:
-            core::Id pressed = (core::Id)-1;
-            core::Id mouse_overed = (core::Id)-1;
-            Ui(core::Id my_id, system::stream::Stream* f, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> c);
+            core::Id pressed = 0;
+            core::Id mouse_overed = 0;
 
         public:
-            virtual void on_event(core::event::Event& e);
-            core::Id find_widget_under_cursor(core::Real x, core::Real y);
+            // virtual void on_event(core::event::Event& e);
+            // core::Id find_widget_under_cursor(core::Real x, core::Real y);
         };
     }
 }

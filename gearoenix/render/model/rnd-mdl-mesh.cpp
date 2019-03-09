@@ -14,3 +14,19 @@
 #include "../widget/rnd-wdg-widget.hpp"
 #include "rnd-mdl-model.hpp"
 #include <iostream>
+#include "rnd-mdl-mesh.hpp"
+
+const std::shared_ptr<gearoenix::render::mesh::Mesh>& gearoenix::render::model::Mesh::get_mesh() const
+{
+	return msh;
+}
+
+const std::shared_ptr<gearoenix::render::material::Material>& gearoenix::render::model::Mesh::get_material() const
+{
+	return mat;
+}
+
+gearoenix::core::Real gearoenix::render::model::Mesh::get_radius() const
+{
+	return radius;
+}

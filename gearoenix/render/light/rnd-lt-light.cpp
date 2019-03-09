@@ -29,3 +29,13 @@ gearoenix::render::light::Light* gearoenix::render::light::Light::read(
     }
     return nullptr;
 }
+
+const gearoenix::math::Vec3 & gearoenix::render::light::Light::get_color() const
+{
+	return color;
+}
+
+bool gearoenix::render::light::Light::is_shadower() const
+{
+	return has_shadow;
+}

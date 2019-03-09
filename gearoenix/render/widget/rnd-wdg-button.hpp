@@ -11,7 +11,6 @@ namespace physics {
 namespace render {
     namespace widget {
         class Button : public Widget {
-            friend class physics::Kernel;
 
         private:
             const static core::Real press_animation_time;
@@ -40,7 +39,11 @@ namespace render {
             void cancel_effect();
 
         public:
-            Button(core::Id my_id, system::stream::Stream* f, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> c);
+            Button(
+				const core::Id my_id, 
+				const std::shared_ptr<system::stream::Stream> &f, 
+				const std::shared_ptr<engine::Engine>& e, 
+				const core::sync::EndCaller<core::sync::EndCallerIgnore> &c);
             virtual ~Button();
         };
     }

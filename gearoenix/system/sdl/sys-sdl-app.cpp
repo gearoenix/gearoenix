@@ -320,7 +320,7 @@ int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_
         // TODO: new event system must be implemented
         GXTODO;
         // o->render_engine->on_event(*event);
-        o->core_app->on_event(*event);
+        //o->core_app->on_event(*event);
         delete event;
     }
     return 1;
@@ -409,7 +409,7 @@ const std::shared_ptr<gearoenix::system::Application> gearoenix::system::Applica
 
 #ifdef GX_USE_OPENGL_ES2
     if (nullptr == result->render_engine && result->supported_engine == render::engine::Type::OPENGL_ES2) {
-        result->render_engine = new gles2::engine::Engine(result);
+        result->render_engine = std::shared_ptr<render::engine::Engine>(new gles2::engine::Engine(result));
     }
 #endif
 

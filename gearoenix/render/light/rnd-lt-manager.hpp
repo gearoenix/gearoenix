@@ -24,7 +24,7 @@ namespace render {
         public:
             Manager(const std::shared_ptr<system::stream::Stream>& s, const std::shared_ptr<engine::Engine>& e);
             ~Manager();
-            std::shared_ptr<Light> get(core::Id mid, core::sync::EndCaller<Light> c);
+            std::shared_ptr<Light> get(const core::Id mid, const core::sync::EndCaller<Light> &c);
         };
     }
 }

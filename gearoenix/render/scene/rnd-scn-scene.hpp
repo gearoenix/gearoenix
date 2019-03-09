@@ -3,11 +3,10 @@
 #include "../../core/asset/cr-asset.hpp"
 #include "../../core/cr-build-configuration.hpp"
 #include "../../core/sync/cr-sync-end-caller.hpp"
-#include "../../math/math-vector.hpp"
+#include "rnd-scn-type.hpp"
+#include "rnd-scn-uniform.hpp"
 #include <map>
 #include <memory>
-#include <set>
-#include <tuple>
 #include <vector>
 
 namespace gearoenix {
@@ -33,10 +32,15 @@ namespace system {
     class File;
 }
 namespace render {
-    class Engine;
+	namespace buffer {
+		class Uniform;
+	}
     namespace camera {
         class Camera;
     }
+	namespace engine {
+		class Engine;
+	}
     namespace light {
         class Light;
         class Sun;
@@ -50,6 +54,9 @@ namespace render {
     namespace model {
         class Model;
     }
+	namespace pipeline {
+		class Resource;
+	}
     namespace skybox {
         class Skybox;
     }
@@ -58,78 +65,49 @@ namespace render {
     }
     namespace scene {
         class Scene : public core::asset::Asset {
-            friend class physics::Kernel;
-
-        public:
-            struct Uniform {
-                math::Vec4 ambient_light = math::Vec4(0.3f, 0.3f, 0.3f, 1.0f);
-                math::Vec4 directional_lights_color[GX_MAX_DIRECTIONAL_LIGHTS];
-                math::Vec4 directional_lights_direction[GX_MAX_DIRECTIONAL_LIGHTS];
-                math::Vec4 point_lights_color_min_radius[GX_MAX_POINT_LIGHTS];
-                math::Vec4 point_lights_position_max_radius[GX_MAX_POINT_LIGHTS];
-                /// directional, point, cone, reserved
-                math::Vec4 lights_count;
-                /// samples-count, radius, z-tolerance, reserved
-                math::Vec4 ssao_config;
-            };
-
-            class Type {
-            public:
-                typedef enum : core::Id {
-                    GAME = 1,
-                    UI = 2,
-                } Id;
-            };
-
         protected:
-            const Type::Id type_id;
+			const std::shared_ptr<engine::Engine> &e;
+            const Type::Id scene_type_id;
+			const std::shared_ptr<pipeline::Resource> pipeline_resource;
+
+			bool renderable = false;
+			
+			Uniform uniform;
+			std::shared_ptr<buffer::Uniform> uniform_buffers[GX_FRAMES_COUNT];
+
             std::map<core::Id, std::shared_ptr<camera::Camera>> cameras;
             std::map<core::Id, std::shared_ptr<audio::Audio>> audios;
             std::map<core::Id, std::shared_ptr<light::Light>> lights;
-            std::map<core::Id, std::shared_ptr<model::Model>> root_models;
-            std::map<core::Id, std::shared_ptr<physics::body::Body>> root_bodies;
+            std::map<core::Id, std::shared_ptr<model::Model>> models;
+            std::map<core::Id, std::shared_ptr<physics::constraint::Constraint>> constraints;
             std::shared_ptr<skybox::Skybox> skybox;
-            std::map<core::Id, std::shared_ptr<physics::constraint::Constraint>> root_constraints;
-            bool all_models_needs_cleaning = false;
-            std::map<core::Id, std::weak_ptr<model::Model>> all_models;
-            std::map<core::Id, std::weak_ptr<physics::body::Body>> all_bodies;
-            // shadow_caster_shader_id -> model_id -> mesh_id
-            std::map<core::Id, std::map<core::Id, std::set<core::Id>>> shadow_caster_models;
-            // shader_id -> model_id -> mesh_id
-            std::map<core::Id, std::map<core::Id, std::set<core::Id>>> opaque_models;
-            // model_id -> mesh_id
-            std::map<core::Id, std::set<core::Id>> transparent_models;
-            core::Id cam_id = 0;
-            core::Id sun_id = 0;
-            bool renderable = false;
-            bool ambient_light_changed = true;
-            math::Vec3 ambient_light = math::Vec3(0.2f, 0.2f, 0.2f);
-            Engine* const render_engine;
-            Scene(core::Id my_id, Type::Id t, system::stream::Stream* f, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> c);
 
         public:
-            void cast_shadow();
-            void draw_sky();
-            void draw(texture::Texture2D* shadow_texture);
+			Scene(
+				const core::Id my_id,
+				const std::shared_ptr<engine::Engine> &e,
+				const core::sync::EndCaller<core::sync::EndCallerIgnore> &c);
+			Scene(
+				const std::shared_ptr<engine::Engine> &e,
+				const core::sync::EndCaller<core::sync::EndCallerIgnore> &c);
             virtual ~Scene();
-            static Scene* read(core::Id my_id, system::stream::Stream* f, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> c);
-            const std::map<core::Id, std::weak_ptr<model::Model>>& get_all_models() const;
-            const std::map<core::Id, std::weak_ptr<physics::body::Body>>& get_all_bodies() const;
-            const std::map<core::Id, std::shared_ptr<physics::constraint::Constraint>>& get_all_root_constraints() const;
-            const std::shared_ptr<camera::Camera>& get_current_camera() const;
-            const math::Vec3& get_ambient_light() const;
-            bool get_ambient_light_changed() const;
-            const light::Sun* get_sun() const;
-            void set_renderable(bool);
-            void clean();
-            virtual void on_event(core::event::Event& e);
+
+			static Scene* read_gx3d(
+				const core::Id my_id,
+				const std::shared_ptr<system::stream::Stream>& f,
+				const std::shared_ptr<engine::Engine> &e,
+				const core::sync::EndCaller<core::sync::EndCallerIgnore> &c);
+            
+			void enable_rendering();
+			void disable_rendering();
             bool is_renderable() const;
-            void add_mesh(core::Id mesh_id, core::Id model_id, std::shared_ptr<material::Material> mat, std::shared_ptr<material::Material> dp);
-            void add_model(core::Id model_id, core::sync::EndCaller<core::sync::EndCallerIgnore> c = core::sync::EndCaller<core::sync::EndCallerIgnore>([](std::shared_ptr<core::sync::EndCallerIgnore>) -> void {}));
+
             void add_model(const std::shared_ptr<model::Model>& m);
-            std::weak_ptr<model::Model> get_model(core::Id model_id);
-            void add_constraint(const std::shared_ptr<physics::constraint::Constraint>& cns);
-            void add_body(const std::shared_ptr<physics::body::Body>& b);
+			const std::shared_ptr<model::Model> &get_model(const core::Id model_id) const;
+            const std::map<core::Id, std::shared_ptr<model::Model>>& get_models() const;
+
+			void add_constraint(const std::shared_ptr<physics::constraint::Constraint>& cns);
+			const std::shared_ptr<physics::constraint::Constraint> &get_constraint(const core::Id constraint_id) const;
         };
     }
 }
