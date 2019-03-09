@@ -5,34 +5,39 @@
 #include <functional>
 #include <map>
 #include <memory>
+#include <type_traits>
 namespace gearoenix {
 namespace core {
     namespace cache {
-        template <class T>
+        template <class Base>
         class Cacher {
         private:
-            std::map<Id, std::weak_ptr<T>> cacheds;
+            std::map<Id, std::weak_ptr<Base>> cacheds;
 
         public:
-            std::shared_ptr<T> get(Id id, std::function<std::shared_ptr<T>()> new_fun)
+            template <class Derived>
+            class std::enable_if<std::is_base_of<Base, Derived>::value, std::shared_ptr<Derived>>::type
+            get(const Id id, std::function<std::shared_ptr<Derived>()> new_fun)
             {
                 auto search = cacheds.find(id);
                 if (search == cacheds.end()) {
-                    std::shared_ptr<T> new_item = new_fun();
+                    std::shared_ptr<Derived> new_item = new_fun();
                     cacheds[id] = new_item;
                     return new_item;
                 }
                 auto& found = search->second;
                 if (auto cached = found.lock()) {
-                    return std::static_pointer_cast<T>(cached);
+                    return std::static_pointer_cast<Derived>(cached);
                 } else {
-                    std::shared_ptr<T> new_item = new_fun();
+                    std::shared_ptr<Derived> new_item = new_fun();
                     found = new_item;
                     return new_item;
                 }
             }
 
-            std::shared_ptr<T> get(Id id) const
+            template <class Derived>
+            class std::enable_if<std::is_base_of<Base, Derived>::value, std::shared_ptr<Derived>>::type
+            get(const Id id) const
             {
                 auto search = cacheds.find(id);
                 if (search == cacheds.end()) {
@@ -41,7 +46,7 @@ namespace core {
                 }
                 auto& found = search->second;
                 if (auto cached = found.lock()) {
-                    return std::static_pointer_cast<T>(cached);
+                    return std::static_pointer_cast<Derived>(cached);
                 } else {
                     GXLOGF("Object with id: " << id << ", cached but it has been expired.");
                     return nullptr;

@@ -2,9 +2,8 @@
 
 gearoenix::audio::Manager::Manager(const std::shared_ptr<system::stream::Stream>& s, const std::shared_ptr<render::engine::Engine>& e)
     : e(e)
-    , s(s)
+    , cache(s)
 {
-    GXUNIMPLEMENTED;
 }
 
 gearoenix::audio::Manager::~Manager() {}

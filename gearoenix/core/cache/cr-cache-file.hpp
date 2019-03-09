@@ -12,26 +12,22 @@ namespace core {
         private:
             Cacher<T> cacher;
             std::map<Id, Offset> offsets;
-            std::shared_ptr<system::stream::Stream> file = nullptr;
+            const std::shared_ptr<system::stream::Stream> file;
 
         public:
             File(const std::shared_ptr<system::stream::Stream>& file)
                 : file(file)
             {
-                Count c;
-                file->read(c);
+                const Count c = file->read<Count>();
                 for (Count i = 0; i < c; ++i) {
-                    Id id;
-                    Offset o;
-                    file->read(id);
-                    file->read(o);
-                    offsets[id] = o;
+                    offsets[file->read<Id>()] = file->read<Offset>();
                 }
             }
 
-            std::shared_ptr<T> get(Id id, std::function<std::shared_ptr<T>()> new_fun)
+            template <class CT>
+            std::shared_ptr<CT> get(const Id id, std::function<std::shared_ptr<CT>()> new_fun)
             {
-                std::function<std::shared_ptr<T>()> fn_new = [new_fun, this, id] {
+                std::function<std::shared_ptr<CT>()> fn_new = [new_fun, this, id] {
 #ifdef GX_DEBUG_MODE
                     auto search = offsets.find(id);
                     if (search == offsets.end()) {
@@ -46,7 +42,8 @@ namespace core {
                 return cacher.get(id, fn_new);
             }
 
-            std::shared_ptr<T> get(Id id) const
+            template <class CT>
+            std::shared_ptr<CT> get(const Id id) const
             {
                 return cacher.get(id);
             }
