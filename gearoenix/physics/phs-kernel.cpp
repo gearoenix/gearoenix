@@ -106,7 +106,6 @@ void gearoenix::physics::Kernel::apply_models()
                 scene->all_models_needs_cleaning = true;
                 continue;
             }
-            model->commit(scene.get());
         }
     }
 }

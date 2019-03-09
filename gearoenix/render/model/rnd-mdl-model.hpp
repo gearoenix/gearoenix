@@ -26,9 +26,9 @@ namespace render {
     namespace pipeline {
         class Resource;
     }
-    class Mesh;
     namespace model {
-        class Model : public core::asset::Asset {
+		class Mesh;
+        class Model : public core::asset::Asset, public physics::Transferable {
         protected:
             const std::shared_ptr<engine::Engine> e;
 
@@ -36,7 +36,7 @@ namespace render {
             bool has_transparent = false;
 
             Uniform uniform;
-            const std::shared_ptr<buffer::Uniform> uniform_buffers[GX_FRAMES_COUNT];
+			std::shared_ptr<buffer::Uniform> uniform_buffers[GX_FRAMES_COUNT];
 
             const std::shared_ptr<pipeline::Resource> pipeline_resource;
 
@@ -44,22 +44,32 @@ namespace render {
             std::map<core::Id, std::shared_ptr<Model>> children;
             std::shared_ptr<physics::collider::Collider> collider = nullptr;
 
+			void read_gx3d(
+			    const std::shared_ptr<system::stream::Stream>& f,
+			    const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
+
         public:
-            Model(
-                const std::shared_ptr<engine::Engine>& e,
-                const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
-
-            static Model* read_gx3d(
-                const core::Id my_id,
-                const std::shared_ptr<system::stream::Stream>& f,
-                const std::shared_ptr<engine::Engine>& e,
-                const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
-
+			Model(
+				const core::Id my_id,
+				const std::shared_ptr<engine::Engine>& e,
+				const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
+			/// It will create an automatic Id for itself
+			Model(
+				const std::shared_ptr<engine::Engine>& e,
+				const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
             virtual ~Model();
+            
+			static Model *read_gx3d(
+				const core::Id my_id,
+				const std::shared_ptr<engine::Engine>& e,
+                const std::shared_ptr<system::stream::Stream>& f,
+                const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
+
             const std::map<core::Id, std::shared_ptr<Model>>& get_children() const;
             const std::map<core::Id, std::shared_ptr<Mesh>>& get_meshes() const;
             const std::shared_ptr<physics::collider::Collider>& get_collider() const;
-            const math::Mat4x4& get_model_matrix();
+            
+			const math::Mat4x4& get_model_matrix() const;
         };
     }
 }

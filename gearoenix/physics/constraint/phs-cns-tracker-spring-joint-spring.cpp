@@ -4,7 +4,7 @@
 #include "../../core/event/cr-ev-event.hpp"
 #include "../../core/event/cr-ev-window-resize.hpp"
 #include "../../render/engine/rnd-eng-engine.hpp"
-#include "../../render/model/rnd-mdl-dynamic.hpp"
+#include "../../render/model/rnd-mdl-model.hpp"
 #include "../../system/stream/sys-stm-stream.hpp"
 #include "../../system/sys-app.hpp"
 #include "../../system/sys-log.hpp"

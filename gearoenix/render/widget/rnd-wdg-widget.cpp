@@ -3,12 +3,16 @@
 #include "../../core/event/cr-ev-ui-ui.hpp"
 #include "../../system/stream/sys-stm-stream.hpp"
 #include "../../system/sys-app.hpp"
-#include "../rnd-engine.hpp"
+#include "../engine/rnd-eng-engine.hpp"
 #include "rnd-wdg-button.hpp"
 #include "rnd-wdg-text.hpp"
 
-gearoenix::render::widget::Widget::Widget(core::Id my_id, system::stream::Stream* f, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> c)
-    : model::Dynamic(my_id, f, e, c, RenderModel::WIDGET)
+gearoenix::render::widget::Widget::Widget(
+	const core::Id my_id,
+	const std::shared_ptr<system::stream::Stream>& f,
+	const std::shared_ptr<engine::Engine>& e,
+	const core::sync::EndCaller<core::sync::EndCallerIgnore> &c)
+    : model::Model(my_id, f, e, c)
 {
 }
 
@@ -24,7 +28,11 @@ void gearoenix::render::widget::Widget::cancel_effect()
 {
 }
 
-gearoenix::render::widget::Widget* gearoenix::render::widget::Widget::read(core::Id my_id, system::stream::Stream* f, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> c)
+gearoenix::render::widget::Widget* gearoenix::render::widget::Widget::read(
+	const core::Id my_id,
+	const std::shared_ptr<system::stream::Stream>& f,
+	const std::shared_ptr<engine::Engine>& e,
+	const core::sync::EndCaller<core::sync::EndCallerIgnore> &c)
 {
     core::Id t;
     f->read(t);

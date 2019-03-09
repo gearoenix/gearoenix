@@ -10,12 +10,10 @@
 #include "../camera/rnd-cmr-orthographic.hpp"
 #include "../light/rnd-lt-light.hpp"
 #include "../light/rnd-lt-sun.hpp"
-#include "../material/rnd-mat-depth.hpp"
 #include "../material/rnd-mat-material.hpp"
 #include "../mesh/rnd-msh-mesh.hpp"
-#include "../model/rnd-mdl-dynamic.hpp"
 #include "../model/rnd-mdl-model.hpp"
-#include "../rnd-engine.hpp"
+#include "../engine/rnd-eng-engine.hpp"
 #include "../shader/rnd-shd-shader.hpp"
 #include "../skybox/rnd-sky-skybox.hpp"
 #include "rnd-scn-ui.hpp"
@@ -27,21 +25,21 @@ void gearoenix::render::scene::Scene::add_model(const std::shared_ptr<model::Mod
     for (const std::pair<core::Id, std::shared_ptr<model::Model>>& child : children) {
         add_model(child.second);
     }
-    const std::map<core::Id, std::tuple<std::shared_ptr<mesh::Mesh>, std::shared_ptr<material::Material>, std::shared_ptr<material::Depth>>>& meshes = m->get_meshes();
-    for (const std::pair<core::Id, std::tuple<std::shared_ptr<mesh::Mesh>, std::shared_ptr<material::Material>, std::shared_ptr<material::Depth>>>& mp : meshes) {
-        core::Id msh = mp.first;
-        const std::shared_ptr<material::Material>& mtr = std::get<1>(mp.second);
-        core::Id shdid = mtr->get_shader_id();
-        if (shader::Shader::is_shadow_caster(shdid)) {
-            core::Id shdcstid = shader::Shader::get_shadow_caster_shader_id(shdid);
-            shadow_caster_models[shdcstid][m->get_asset_id()].insert(msh);
-        }
-        if (shader::Shader::is_transparent(shdid)) {
-            transparent_models[m->get_asset_id()].insert(msh);
-        } else {
-            opaque_models[shdid][m->get_asset_id()].insert(msh);
-        }
-    }
+    //const std::map<core::Id, std::tuple<std::shared_ptr<mesh::Mesh>, std::shared_ptr<material::Material>, std::shared_ptr<material::Depth>>>& meshes = m->get_meshes();
+    //for (const std::pair<core::Id, std::tuple<std::shared_ptr<mesh::Mesh>, std::shared_ptr<material::Material>, std::shared_ptr<material::Depth>>>& mp : meshes) {
+    //    core::Id msh = mp.first;
+    //    const std::shared_ptr<material::Material>& mtr = std::get<1>(mp.second);
+    //    core::Id shdid = mtr->get_shader_id();
+    //    if (shader::Shader::is_shadow_caster(shdid)) {
+    //        core::Id shdcstid = shader::Shader::get_shadow_caster_shader_id(shdid);
+    //        shadow_caster_models[shdcstid][m->get_asset_id()].insert(msh);
+    //    }
+    //    if (shader::Shader::is_transparent(shdid)) {
+    //        transparent_models[m->get_asset_id()].insert(msh);
+    //    } else {
+    //        opaque_models[shdid][m->get_asset_id()].insert(msh);
+    //    }
+    //}
 }
 
 gearoenix::render::scene::Scene::Scene(core::Id my_id, SceneType t, system::stream::Stream* f, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> c)

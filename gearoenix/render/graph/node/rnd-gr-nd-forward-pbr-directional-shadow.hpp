@@ -24,6 +24,7 @@ namespace render {
     }
     namespace model {
         class Model;
+		class Mesh;
     }
     namespace pipeline {
         class Resource;

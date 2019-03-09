@@ -3,24 +3,19 @@
 #include "../../core/sync/cr-sync-end-caller.hpp"
 #include "../../system/sys-app.hpp"
 #include "../../system/sys-log.hpp"
-#include "../rnd-engine.hpp"
+#include "../engine/rnd-eng-engine.hpp"
 
-gearoenix::render::pipeline::Pipeline::Pipeline(core::Id sid, Engine* eng, core::sync::EndCaller<core::sync::EndCallerIgnore> call)
-    : eng(eng)
-    , shd(eng->get_system_application()->get_asset_manager()->get_shader(sid, core::sync::EndCaller<shader::Shader>([call](std::shared_ptr<shader::Shader>) -> void {})))
+gearoenix::render::pipeline::Pipeline::Pipeline(const Type::Id pipeline_type, const std::shared_ptr<engine::Engine> e, const core::sync::EndCaller<core::sync::EndCallerIgnore> &call)
+    : e(e)
+	, pipeline_type(pipeline_type)
 {
 }
 
-gearoenix::render::pipeline::PipelineType::Id gearoenix::render::pipeline::Pipeline::get_pipeline_type_id() const
+gearoenix::render::pipeline::Type::Id gearoenix::render::pipeline::Pipeline::get_pipeline_type_id() const
 {
     return pipeline_type;
 }
 
 gearoenix::render::pipeline::Pipeline::~Pipeline()
 {
-}
-
-gearoenix::render::shader::Shader* gearoenix::render::pipeline::Pipeline::get_shader()
-{
-    return shd.get();
 }

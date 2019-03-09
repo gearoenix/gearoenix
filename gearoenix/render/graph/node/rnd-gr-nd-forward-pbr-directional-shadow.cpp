@@ -8,6 +8,7 @@
 #include "../../light/rnd-lt-directional.hpp"
 #include "../../material/rnd-mat-material.hpp"
 #include "../../mesh/rnd-msh-mesh.hpp"
+#include "../../model/rnd-mdl-mesh.hpp"
 #include "../../model/rnd-mdl-model.hpp"
 #include "../../pipeline/rnd-pip-forward-pbr-directional-shadow.hpp"
 #include "../../pipeline/rnd-pip-manager.hpp"
@@ -103,10 +104,10 @@ void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::record(
     const unsigned int frame_number = e->get_frame_number();
     const std::shared_ptr<ForwardPbrDirectionalShadowFrame>& frame = frames[frame_number];
     const std::shared_ptr<ForwardPbrDirectionalShadowKernel>& kernel = frame->kernels[kernel_index];
-    const std::map<core::Id, std::tuple<std::shared_ptr<mesh::Mesh>, std::shared_ptr<material::Material>>>& meshes = m->get_meshes();
-    for (const std::pair<core::Id, std::tuple<std::shared_ptr<mesh::Mesh>, std::shared_ptr<material::Material>>>& id_mesh_material : meshes) {
-        const std::shared_ptr<mesh::Mesh>& msh = std::get<0>(id_mesh_material.second);
-        const std::shared_ptr<material::Material>& mat = std::get<1>(id_mesh_material.second);
+    const std::map<core::Id, std::shared_ptr<model::Mesh>>& meshes = m->get_meshes();
+    for (const std::pair<core::Id, std::shared_ptr<model::Mesh>>& id_mesh : meshes) {
+        const std::shared_ptr<mesh::Mesh>& msh = id_mesh.second->get_mesh();
+        const std::shared_ptr<material::Material>& mat = id_mesh.second->get_material();
         if (kernel->latest_render_data_pool >= kernel->render_data_pool.size()) {
             kernel->render_data_pool.push_back(std::make_tuple(
                 std::shared_ptr<buffer::Uniform>(e->get_buffer_manager()->create_uniform(sizeof(ForwardPbrDirectionalShadowUniform))),

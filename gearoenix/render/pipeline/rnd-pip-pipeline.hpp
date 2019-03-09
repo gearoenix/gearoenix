@@ -6,7 +6,9 @@
 #include <memory>
 namespace gearoenix {
 namespace render {
-    class Engine;
+	namespace engine {
+		class Engine;
+	}
     namespace shader {
         class Shader;
     }
@@ -15,11 +17,11 @@ namespace render {
         class ResourceSet;
         class Pipeline {
         protected:
-            Engine* eng;
+            const std::shared_ptr<engine::Engine> e;
             const Type::Id pipeline_type;
 
         public:
-            Pipeline(Type::Id pipeline_type, Engine* eng, core::sync::EndCaller<core::sync::EndCallerIgnore> call);
+            Pipeline(const Type::Id pipeline_type, const std::shared_ptr<engine::Engine> e, const core::sync::EndCaller<core::sync::EndCallerIgnore> &call);
             virtual ~Pipeline();
             Type::Id get_pipeline_type_id() const;
             virtual ResourceSet* create_resource_set() const = 0;

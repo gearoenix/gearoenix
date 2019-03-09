@@ -1,53 +1,47 @@
-#ifndef GEAROEMIX_RENDER_MODEL_MODEL_HPP
-#define GEAROEMIX_RENDER_MODEL_MODEL_HPP
-#include "../../core/asset/cr-asset.hpp"
+#ifndef GEAROEMIX_RENDER_MODEL_MESH_HPP
+#define GEAROEMIX_RENDER_MODEL_MESH_HPP
 #include "../../core/cr-types.hpp"
 #include "../../core/sync/cr-sync-end-caller.hpp"
-#include "../../math/math-matrix.hpp"
-#include "../../math/math-vector.hpp"
-#include "../../physics/phs-transformable.hpp"
-#include <map>
 #include <memory>
+
 namespace gearoenix {
-namespace physics {
-    namespace collider {
-        class Collider;
+namespace system {
+    namespace stream {
+        class Stream;
     }
 }
 namespace render {
     namespace engine {
         class Engine;
     }
-    class Mesh;
+	namespace material {
+		class Material;
+	}
+	namespace mesh {
+		class Mesh;
+	}
     namespace model {
-        class Model : public core::asset::Asset {
+        class Mesh {
         protected:
             const std::shared_ptr<engine::Engine> e;
-
-            bool has_shadow_caster = false;
-            bool has_transparent = false;
-            math::Mat4x4 m;
             core::Real radius = 0.0;
-            std::map<core::Id, std::shared_ptr<Mesh>> meshes;
-            std::map<core::Id, std::shared_ptr<Model>> children;
-            std::shared_ptr<physics::collider::Collider> collider = nullptr;
-            Model(
-                const core::Id my_id,
-                const std::shared_ptr<system::stream::Stream>& f,
-                const std::shared_ptr<engine::Engine>& e,
-                const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
+			std::shared_ptr<material::Material> mat;
+			std::shared_ptr<mesh::Mesh> msh;
+
+            Mesh();
 
         public:
-            static Model* read_gx3d(
-                const core::Id my_id,
+            static Mesh* read_gx3d(
+                const core::Id mesh_id,
                 const std::shared_ptr<system::stream::Stream>& f,
                 const std::shared_ptr<engine::Engine>& e,
                 const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
-            virtual ~Model();
-            const std::map<core::Id, std::shared_ptr<Model>>& get_children() const;
-            const std::map<core::Id, std::shared_ptr<Mesh>>& get_meshes() const;
-            const std::shared_ptr<physics::collider::Collider>& get_collider() const;
-            const math::Mat4x4& get_model_matrix();
+
+            virtual ~Mesh();
+
+            const std::shared_ptr<mesh::Mesh>& get_mesh() const;
+            const std::shared_ptr<material::Material>& get_material() const;
+            core::Real get_radius() const;
         };
     }
 }

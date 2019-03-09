@@ -7,12 +7,12 @@ namespace render {
     namespace material {
 
         struct Uniform {
-            core::Real alpha = 1.0;
-            core::Real alpha_cutoff = 0.001;
-            core::Real metallic_factor = 1.0;
-            core::Real normal_scale = 1.0;
-            core::Real occlusion_strength = 1.0;
-            core::Real roughness_factor = 1.0;
+            core::Real alpha = 1.0f;
+            core::Real alpha_cutoff = 0.001f;
+            core::Real metallic_factor = 1.0f;
+            core::Real normal_scale = 1.0f;
+            core::Real occlusion_strength = 1.0f;
+            core::Real roughness_factor = 1.0f;
         };
 
     } // namespace material

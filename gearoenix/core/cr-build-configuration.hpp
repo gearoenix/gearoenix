@@ -64,7 +64,7 @@
 #define GX_APP_DATA_NAME "data.gx3d"
 // Application compilation mode
 #define GX_DEBUG_MODE
-//#define TEST_MODE
+//#define GX_TEST_MODE
 #define GX_GAME_MODE
 // Application features
 #define GX_LOG_ENABLED

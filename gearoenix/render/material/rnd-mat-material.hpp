@@ -2,7 +2,7 @@
 #define GEAROEMIX_RENDER_MATERIAL_MATERIAL_HPP
 #include "../../core/cr-build-configuration.hpp"
 #include "../../core/sync/cr-sync-end-caller.hpp"
-#include "rnd-mat-frame.hpp" -
+#include "rnd-mat-frame.hpp"
 #include "rnd-mat-translucency-mode.hpp"
 #include "rnd-mat-uniform.hpp"
 namespace gearoenix {
