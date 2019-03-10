@@ -1,17 +1,21 @@
 #include "rnd-scn-scene.hpp"
 #include "../../audio/au-audio.hpp"
+#include "../../audio/au-manager.hpp"
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../core/sync/cr-sync-end-caller.hpp"
 #include "../../physics/body/phs-bd-body.hpp"
 #include "../../physics/constraint/phs-cns-constraint.hpp"
+#include "../../physics/constraint/phs-cns-manager.hpp"
 #include "../../system/stream/sys-stm-stream.hpp"
 #include "../../system/sys-app.hpp"
 #include "../buffer/rnd-buf-manager.hpp"
 #include "../buffer/rnd-buf-uniform.hpp"
 #include "../camera/rnd-cmr-camera.hpp"
+#include "../camera/rnd-cmr-manager.hpp"
 #include "../camera/rnd-cmr-orthographic.hpp"
 #include "../light/rnd-lt-light.hpp"
 #include "../light/rnd-lt-sun.hpp"
+#include "../light/rnd-lt-manager.hpp"
 #include "../material/rnd-mat-material.hpp"
 #include "../mesh/rnd-msh-mesh.hpp"
 #include "../model/rnd-mdl-model.hpp"
@@ -43,16 +47,21 @@ gearoenix::render::scene::Scene::Scene(
 		const core::sync::EndCaller<x::y> call(c);                            \
 		std::vector<core::Id> ids;                                            \
 		f->read(ids);                                                         \
-		for (const core::Id id : ids) add_##x(mgr->get(id, call));            \
+		for (const core::Id id : ids) add_##x(mgr->get_gx3d(id, call));            \
 	}
 	GXHELPER(camera, Camera);
 	GXHELPER(audio, Audio);
 	GXHELPER(light, Light);
 	GXHELPER(model, Model);
-	core::Id skybox_id = 0;
-	f->read(skybox_id);
+	if (f->read_bool()) {
+		core::Id skybox_id = 0;
+		f->read(skybox_id);
+	}
 	GXHELPER(constraint, Constraint);
 #undef GXHELPER
+	if (f->read_bool()) {
+		GXUNIMPLEMENTED;
+	}
 }
 
 gearoenix::render::scene::Scene::Scene(

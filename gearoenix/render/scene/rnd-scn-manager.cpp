@@ -16,6 +16,7 @@ gearoenix::render::scene::Manager::~Manager() {}
 void gearoenix::render::scene::Manager::read_gx3d(const core::Id mid, core::sync::EndCaller<Scene> c) {
 	io_worker->push([mid, c, this] () mutable noexcept -> void {
 		c.set_data(cache.get<Scene>(mid, [mid, c, this] () noexcept -> std::shared_ptr<Scene> {
+			GXLOGD("Id of scene is " << mid);
 			const std::shared_ptr<system::stream::Stream> &file = cache.get_file();
 			const core::sync::EndCaller<core::sync::EndCallerIgnore> call(c);
 			const Type::Id t = file->read<Type::Id>();
@@ -25,6 +26,7 @@ void gearoenix::render::scene::Manager::read_gx3d(const core::Id mid, core::sync
 				GXLOGD("Type of scene is game.");
 				s = std::make_shared<Scene>(mid, file, e, call);
 			case Type::UI:
+				GXLOGD("Type of scene is ui.");
 				GXUNIMPLEMENTED;
 			default:
 				GXUNEXPECTED;
