@@ -74,7 +74,7 @@
 #define GX_LOG_INFO_ENABLED
 #endif
 /// You can comment this for windowed apps
-#define GX_FULLSCREEN
+//#define GX_FULLSCREEN
 #ifndef GX_FULLSCREEN
 /// Window width in windowed mode
 #define GX_DEFAULT_WINDOW_WIDTH 1000

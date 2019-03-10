@@ -350,8 +350,8 @@ const std::shared_ptr<gearoenix::system::Application> gearoenix::system::Applica
     result->win_width = static_cast<unsigned int>(display_mode.w);
     result->win_height = static_cast<unsigned int>(display_mode.h);
 #else
-    result->win_width = GEAROENIX_DEFAULT_WINDOW_WIDTH;
-    result->win_height = GEAROENIX_DEFAULT_WINDOW_HEIGHT;
+    result->win_width = GX_DEFAULT_WINDOW_WIDTH;
+    result->win_height = GX_DEFAULT_WINDOW_HEIGHT;
 #endif
 
     result->create_window();
@@ -418,6 +418,7 @@ const std::shared_ptr<gearoenix::system::Application> gearoenix::system::Applica
     }
 
     result->astmgr = std::make_shared<core::asset::Manager>(result, GX_APP_DATA_NAME);
+    return result;
 }
 
 gearoenix::system::Application::~Application() noexcept
@@ -453,10 +454,11 @@ void gearoenix::system::Application::main_loop()
     }
     // SDL_GL_MakeCurrent(window, gl_context);
     render_engine->update();
-
+#ifdef GX_USE_OPENGL
     if (supported_engine == render::engine::Type::OPENGL_43 || supported_engine == render::engine::Type::OPENGL_33 || supported_engine == render::engine::Type::OPENGL_ES3 || supported_engine == render::engine::Type::OPENGL_ES3) {
         SDL_GL_SwapWindow(window);
     }
+#endif
 #ifndef GX_IN_WEB
 }
 core_app->terminate();
