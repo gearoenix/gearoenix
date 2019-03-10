@@ -49,15 +49,15 @@ gearoenix::render::scene::Scene::Scene(
 		f->read(ids);                                                         \
 		for (const core::Id id : ids) add_##x(mgr->get_gx3d(id, call));            \
 	}
-	GXHELPER(camera, Camera);
-	GXHELPER(audio, Audio);
-	GXHELPER(light, Light);
-	GXHELPER(model, Model);
+//	GXHELPER(camera, Camera);
+//	GXHELPER(audio, Audio);
+//	GXHELPER(light, Light);
+//	GXHELPER(model, Model);
 	if (f->read_bool()) {
 		core::Id skybox_id = 0;
 		f->read(skybox_id);
 	}
-	GXHELPER(constraint, Constraint);
+//	GXHELPER(constraint, Constraint);
 #undef GXHELPER
 	if (f->read_bool()) {
 		GXUNIMPLEMENTED;
@@ -79,23 +79,6 @@ gearoenix::render::scene::Scene::Scene(
 
 gearoenix::render::scene::Scene::~Scene()
 {}
-
-gearoenix::render::scene::Scene* gearoenix::render::scene::Scene::read_gx3d(
-	const core::Id my_id,
-	const std::shared_ptr<system::stream::Stream>& f,
-	const std::shared_ptr<engine::Engine> &e,
-	const core::sync::EndCaller<core::sync::EndCallerIgnore> &c)
-{
-    const Type::Id t = f->read<Type::Id>();
-    switch (t) {
-    case Type::GAME:
-		GXUNIMPLEMENTED;
-    case Type::UI:
-		GXUNIMPLEMENTED;
-    default:
-        GXUNEXPECTED;
-    }
-}
 
 void gearoenix::render::scene::Scene::enable_rendering() {
 	renderable = true;

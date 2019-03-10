@@ -6,40 +6,44 @@
 
 void gearoenix::render::camera::Perspective::on_ratio_change()
 {
-    c_height = c_width / screen_ratio;
-    tanvang = c_height / start;
-    one_cosvang = 1.0f / std::cos(std::atan(tanhang));
-    p = math::Mat4x4::perspective(c_width * 2.0f, c_height * 2.0f, start, end);
-    vp = p * v;
+//    c_height = c_width / screen_ratio;
+//    tanvang = c_height / start;
+//    one_cosvang = 1.0f / std::cos(std::atan(tanhang));
+//    p = math::Mat4x4::perspective(c_width * 2.0f, c_height * 2.0f, start, end);
+//    vp = p * v;
 }
 
-gearoenix::render::camera::Perspective::Perspective(core::Id my_id, system::stream::Stream* f, system::Application* app)
-    : Camera(my_id, f, app)
+gearoenix::render::camera::Perspective::Perspective(
+        const core::Id my_id,
+        const std::shared_ptr<system::stream::Stream> &f,
+        const std::shared_ptr<engine::Engine> &e,
+        const core::sync::EndCaller<core::sync::EndCallerIgnore> &c)
+    : Camera(my_id, f, e, c)
 {
-    f->read(h_angle);
-    tanhang = std::tan(h_angle);
-    one_coshang = 1.0f / std::cos(h_angle);
-    c_width = tanhang * start;
-    on_ratio_change();
+//    f->read(h_angle);
+//    tanhang = std::tan(h_angle);
+//    one_coshang = 1.0f / std::cos(h_angle);
+//    c_width = tanhang * start;
+//    on_ratio_change();
 }
 
 bool gearoenix::render::camera::Perspective::in_sight(const math::Vec3& location, const core::Real radius) const
 {
-    math::Vec3 eye = location - l;
-    core::Real eye_z = -(z_axis.dot(eye));
-    if (eye_z < 0.0f)
-        return eye.square_length() < (radius * radius);
-    if (eye_z - radius > end)
-        return false;
-    math::Vec3 eye_on_z_plane = eye - (z_axis * (-eye_z));
-    core::Real eye_on_x = std::abs(eye_on_z_plane.dot(x_axis));
-    if (eye_on_x - (radius * one_coshang) > tanhang * eye_z)
-        return false;
-    core::Real eye_on_y = std::abs(eye_on_z_plane.dot(y_axis));
-    if (eye_on_y - (radius * one_cosvang) > tanvang * eye_z)
-        return false;
+//    math::Vec3 eye = location - l;
+//    core::Real eye_z = -(z_axis.dot(eye));
+//    if (eye_z < 0.0f)
+//        return eye.square_length() < (radius * radius);
+//    if (eye_z - radius > end)
+//        return false;
+//    math::Vec3 eye_on_z_plane = eye - (z_axis * (-eye_z));
+//    core::Real eye_on_x = std::abs(eye_on_z_plane.dot(x_axis));
+//    if (eye_on_x - (radius * one_coshang) > tanhang * eye_z)
+//        return false;
+//    core::Real eye_on_y = std::abs(eye_on_z_plane.dot(y_axis));
+//    if (eye_on_y - (radius * one_cosvang) > tanvang * eye_z)
+//        return false;
 
-    return true;
+//    return true;
 }
 
 void gearoenix::render::camera::Perspective::on_event(const core::event::Event& e)
@@ -51,13 +55,13 @@ void gearoenix::render::camera::Perspective::on_event(const core::event::Event& 
 
 gearoenix::math::Ray3 gearoenix::render::camera::Perspective::create_ray3(const core::Real x, const core::Real y) const
 {
-    math::Vec3 dir = (x_axis * x) + (y_axis * y) - (z_axis * start);
-    math::Vec3 origin = dir + l;
-    dir.normalize();
-    return math::Ray3(origin, dir);
+//    math::Vec3 dir = (x_axis * x) + (y_axis * y) - (z_axis * start);
+//    math::Vec3 origin = dir + l;
+//    dir.normalize();
+//    return math::Ray3(origin, dir);
 }
 
 gearoenix::core::Real gearoenix::render::camera::Perspective::get_distance(const math::Vec3 model_location) const
 {
-    return (model_location - l).square_length();
+//    return (model_location - l).square_length();
 }

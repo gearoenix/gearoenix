@@ -5,6 +5,8 @@
 #include "../../math/math-ray.hpp"
 #include "../../math/math-vector.hpp"
 #include "../../physics/phs-transformable.hpp"
+#include "../../core/sync/cr-sync-end-caller.hpp"
+#include "rnd-cmr-uniform.hpp"
 
 namespace gearoenix {
 namespace core {
@@ -20,26 +22,24 @@ namespace system {
     class File;
 }
 namespace render {
+namespace engine {
+class Engine;
+}
     namespace camera {
         class Camera : public core::asset::Asset, public physics::Transferable {
             friend class physics::Kernel;
 
         protected:
-            core::Real start;
-            core::Real end;
-            core::Real screen_ratio;
-            core::Real c_width;
-            core::Real c_height;
-            math::Vec3 l;
-            math::Mat4x4 vwl;
-            math::Mat4x4 v;
-            math::Mat4x4 p;
-            math::Mat4x4 vp;
-            Camera(core::Id my_id, system::stream::Stream* f, system::Application* sysapp);
+            Uniform uniform;
+
+            Camera(
+                    const core::Id my_id,
+                    const std::shared_ptr<system::stream::Stream> &f,
+                    const std::shared_ptr<engine::Engine> &e,
+                    const core::sync::EndCaller<core::sync::EndCallerIgnore> &c);
 
         public:
             virtual ~Camera();
-            static Camera* read(core::Id my_id, system::stream::Stream* f, system::Application* sysapp);
             void look_at(const math::Vec3& target, const math::Vec3& up);
             void look_at(const math::Vec3& origin, const math::Vec3& target, const math::Vec3& up);
             const math::Mat4x4& get_view_projection_matrix() const;
