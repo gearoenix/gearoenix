@@ -15,6 +15,7 @@
 #include "../material/rnd-mat-material.hpp"
 #include "../mesh/rnd-msh-mesh.hpp"
 #include "../model/rnd-mdl-model.hpp"
+#include "../model/rnd-mdl-manager.hpp"
 #include "../pipeline/rnd-pip-manager.hpp"
 #include "../pipeline/rnd-pip-resource.hpp"
 #include "../engine/rnd-eng-engine.hpp"
@@ -24,6 +25,7 @@
 
 gearoenix::render::scene::Scene::Scene(
 	const core::Id my_id,
+	const std::shared_ptr<system::stream::Stream>& f,
 	const std::shared_ptr<engine::Engine> &e,
 	const core::sync::EndCaller<core::sync::EndCallerIgnore> &c)
 	: core::asset::Asset(my_id, core::asset::Type::SCENE)
@@ -34,6 +36,23 @@ gearoenix::render::scene::Scene::Scene(
 	for (unsigned int i = 0; i < GX_FRAMES_COUNT; ++i) {
 		uniform_buffers[i] = std::shared_ptr<buffer::Uniform>(e->get_buffer_manager()->create_uniform(sizeof(Uniform)));
 	}
+	const std::shared_ptr<core::asset::Manager> &astmgr = e->get_system_application()->get_asset_manager();
+#define GXHELPER(x, y)                                                        \
+	{                                                                         \
+		const std::shared_ptr<x::Manager> &mgr = astmgr->get_##x##_manager(); \
+		const core::sync::EndCaller<x::y> call(c);                            \
+		std::vector<core::Id> ids;                                            \
+		f->read(ids);                                                         \
+		for (const core::Id id : ids) add_##x(mgr->get(id, call));            \
+	}
+	GXHELPER(camera, Camera);
+	GXHELPER(audio, Audio);
+	GXHELPER(light, Light);
+	GXHELPER(model, Model);
+	core::Id skybox_id = 0;
+	f->read(skybox_id);
+	GXHELPER(constraint, Constraint);
+#undef GXHELPER
 }
 
 gearoenix::render::scene::Scene::Scene(

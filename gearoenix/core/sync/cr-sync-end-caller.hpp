@@ -75,6 +75,11 @@ namespace core {
                 : caller(new Caller(f))
             {
             }
+			template <typename V>
+			EndCaller(V v)
+				: caller(new Caller([v](std::shared_ptr<T>) -> void {}))
+			{
+			}
             void set_data(std::shared_ptr<EndCallerIgnore> data)
             {
                 caller->data = data;

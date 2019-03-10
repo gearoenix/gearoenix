@@ -83,20 +83,18 @@ namespace render {
             std::shared_ptr<skybox::Skybox> skybox;
 
         public:
+			/// It's going read itself from gx3d stream.
 			Scene(
-				const core::Id my_id,
-				const std::shared_ptr<engine::Engine> &e,
-				const core::sync::EndCaller<core::sync::EndCallerIgnore> &c);
-			Scene(
-				const std::shared_ptr<engine::Engine> &e,
-				const core::sync::EndCaller<core::sync::EndCallerIgnore> &c);
-            virtual ~Scene();
-
-			static Scene* read_gx3d(
 				const core::Id my_id,
 				const std::shared_ptr<system::stream::Stream>& f,
 				const std::shared_ptr<engine::Engine> &e,
 				const core::sync::EndCaller<core::sync::EndCallerIgnore> &c);
+
+			Scene(
+				const std::shared_ptr<engine::Engine> &e,
+				const core::sync::EndCaller<core::sync::EndCallerIgnore> &c);
+
+            virtual ~Scene();
             
 			void enable_rendering();
 			void disable_rendering();

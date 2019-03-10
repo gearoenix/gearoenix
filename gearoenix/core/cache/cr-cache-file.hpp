@@ -18,6 +18,7 @@ namespace gearoenix {
 				File(const std::shared_ptr<system::stream::Stream>& file);
 				template <class C> std::shared_ptr<C> get(const Id id, std::function<std::shared_ptr<C>()> new_fun);
 				template <class C> std::shared_ptr<C> get(const Id id) const;
+				const std::shared_ptr<system::stream::Stream> &get_file() const;
 			};
 		}
 	}
@@ -60,4 +61,9 @@ std::shared_ptr<C> gearoenix::core::cache::File<T>::get(const Id id) const
 	return cacher.get(id);
 }
 
+template <class T>
+const std::shared_ptr<gearoenix::system::stream::Stream> &gearoenix::core::cache::File<T>::get_file() const
+{
+	return file;
+}
 #endif
