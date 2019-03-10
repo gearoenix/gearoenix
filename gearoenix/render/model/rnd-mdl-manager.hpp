@@ -2,6 +2,7 @@
 #define GEAROEMIX_RENDER_MODEL_MANAGER_HPP
 #include "../../core/cr-types.hpp"
 #include "../../core/sync/cr-sync-end-caller.hpp"
+#include "../../core/cache/cr-cache-file.hpp"
 #include <memory>
 
 namespace gearoenix {
@@ -19,7 +20,7 @@ namespace render {
         class Manager {
         protected:
             const std::shared_ptr<engine::Engine> e;
-            const std::shared_ptr<system::stream::Stream> s;
+			core::cache::File<Model> cache;
 
         public:
             Manager(const std::shared_ptr<system::stream::Stream>& s, const std::shared_ptr<engine::Engine>& e);

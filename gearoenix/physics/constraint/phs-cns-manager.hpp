@@ -2,6 +2,7 @@
 #define GEAROENIX_PHYSICS_CONSTRAINT_MANAGER_HPP
 #include "../../core/cr-types.hpp"
 #include "../../core/sync/cr-sync-end-caller.hpp"
+#include "../../core/cache/cr-cache-file.hpp"
 #include <memory>
 
 namespace gearoenix {
@@ -21,12 +22,12 @@ namespace physics {
         class Manager {
         protected:
             const std::shared_ptr<render::engine::Engine> e;
-            const std::shared_ptr<system::stream::Stream> s;
+            core::cache::File<Constraint> cache;
 
         public:
             Manager(const std::shared_ptr<system::stream::Stream>& s, const std::shared_ptr<render::engine::Engine>& e);
             ~Manager();
-            std::shared_ptr<Constraint> get(const core::Id mid, const core::sync::EndCaller<Constraint> c);
+            std::shared_ptr<Constraint> get(const core::Id mid, const core::sync::EndCaller<Constraint> &c);
         };
     } // namespace constraint
 } // namespace physics

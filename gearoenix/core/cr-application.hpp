@@ -9,6 +9,11 @@
 #include <Windows.h>
 #endif
 namespace gearoenix {
+namespace render {
+	namespace engine {
+		class Engine;
+	}
+}
 namespace system {
     class Application;
 }
@@ -19,7 +24,8 @@ namespace core {
     class Application {
     public:
     protected:
-        const std::shared_ptr<system::Application> sys_app;
+		const std::shared_ptr<system::Application> sys_app;
+		const std::shared_ptr<render::engine::Engine> rnd_eng;
 
     public:
         Application(const std::shared_ptr<system::Application>& sys_app);

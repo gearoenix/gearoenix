@@ -40,7 +40,7 @@ gearoenix::render::light::Sun::~Sun()
 
 const gearoenix::math::Vec3& gearoenix::render::light::Sun::get_direction() const
 {
-    /*return cam->get_z_axis();*/
+	return color;
 }
 
 const gearoenix::math::Vec3& gearoenix::render::light::Sun::get_color() const

@@ -36,6 +36,7 @@ namespace system {
         gearoenix::system::Log::info << GX_APP_NAME << " " << s << " "            \
                                      << __FILE__ << " " << __LINE__ << std::endl; \
     }
+/// This is gonna be ignored in release mode compilation
 #define GXLOGD(s)                                                                  \
     {                                                                              \
         gearoenix::system::Log::debug << GX_APP_NAME << " " << s << " "            \

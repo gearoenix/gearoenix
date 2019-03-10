@@ -30,7 +30,7 @@ gearoenix::system::stream::Asset::Asset
 #endif
     file.open(file_path, std::ios::binary | std::ios::in);
     if (!file.is_open()) {
-        GXLOGF("Error in opening assets file.");
+        GXLOGF("Error in opening assets file: " << name);
     }
 #elif defined(GX_IN_ANDROID)
     (const std::shared_ptr<system::Application>& sys_app, const std::string& name)

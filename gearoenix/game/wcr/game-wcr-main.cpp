@@ -16,7 +16,6 @@
 
 GameApp::GameApp(const std::shared_ptr<gearoenix::system::Application>& sys_app)
     : gearoenix::core::Application::Application(sys_app)
-    , rndeng(sys_app->get_render_engine())
 {
     /*rndeng->load_scene(1, [this]() -> void {
         const auto& scene = rndeng->get_scene(1);
@@ -30,7 +29,10 @@ GameApp::~GameApp() {}
 
 void GameApp::update() {}
 
-void GameApp::terminate() {}
+void GameApp::terminate() {
+	cam = nullptr;
+	mdl = nullptr;
+}
 
 //void GameApp::on_event(const gearoenix::core::event::Event& e)
 //{
