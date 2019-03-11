@@ -29,7 +29,7 @@ namespace math {
         core::Real mat[16];
 
     public:
-        Mat4x4(core::Real e);
+        Mat4x4(const core::Real e);
         Mat4x4();
         Mat4x4(
             core::Real e0, core::Real e1, core::Real e2, core::Real e3,
@@ -60,10 +60,10 @@ namespace math {
         Mat4x4 transposed() const;
         const core::Real* data() const;
         static Mat4x4 look_at(const Vec3& position, const Vec3& target, const Vec3& up);
-        static Mat4x4 rotation(const Vec3& v, core::Real degree);
+        static Mat4x4 rotation(const Vec3& v, const core::Real degree);
         static Mat4x4 translator(const Vec3& v);
-        static Mat4x4 orthographic(core::Real width, core::Real height, core::Real near, core::Real far);
-        static Mat4x4 perspective(core::Real width, core::Real height, core::Real near, core::Real far);
+        static Mat4x4 orthographic(const core::Real width, const core::Real height, const core::Real near, const core::Real far);
+        static Mat4x4 perspective(const core::Real width, const core::Real height, const core::Real near, const core::Real far);
     };
 }
 }

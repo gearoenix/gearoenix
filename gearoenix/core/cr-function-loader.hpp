@@ -15,8 +15,7 @@ namespace core {
         FunctionLoader();
         ~FunctionLoader();
         void load(std::function<void()> fun);
-        void unload_one();
-        void unload_all();
+        void unload();
         unsigned int get_loadeds_count() const;
     };
 

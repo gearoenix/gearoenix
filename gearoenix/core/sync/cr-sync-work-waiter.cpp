@@ -6,7 +6,7 @@ void gearoenix::core::sync::WorkWaiter::wait_loop()
 {
 	while (running) {
 		semaphore->lock();
-		function_loader->unload_all();
+        function_loader->unload();
 	}
 	running = true;
 }

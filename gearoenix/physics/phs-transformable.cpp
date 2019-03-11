@@ -47,8 +47,9 @@ void gearoenix::physics::Transferable::initialize_axis(const math::Mat4x4& t)
     transformed = true;
 }
 
-gearoenix::physics::Transferable::Transferable()
-    : x_axis(1.0f, 0.0f, 0.0f)
+gearoenix::physics::Transferable::Transferable(const std::shared_ptr<Transferable> &transformation)
+    : transformation(transformation)
+    , x_axis(1.0f, 0.0f, 0.0f)
     , y_axis(0.0f, 1.0f, 0.0f)
     , z_axis(0.0f, 0.0f, 1.0f)
 {
@@ -115,4 +116,14 @@ void gearoenix::physics::Transferable::global_rotate(const math::Mat4x4& rm)
     y_axis = rm * y_axis;
     z_axis = rm * z_axis;
     transformed = true;
+}
+
+void gearoenix::physics::Transferable::set_orientation(const math::Quat &q)
+{
+    transformation->set_orientation(q);
+}
+
+const std::shared_ptr<gearoenix::physics::Transferable> &gearoenix::physics::Transferable::get_transformation() const
+{
+    return transformation;
 }

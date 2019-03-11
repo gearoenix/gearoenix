@@ -4,8 +4,28 @@
 #include "../../system/stream/sys-stm-stream.hpp"
 #include "../../system/sys-app.hpp"
 #include "../../system/sys-log.hpp"
+#include "../engine/rnd-eng-engine.hpp"
+#include "../../math/math-quaternion.hpp"
 #include "rnd-cmr-orthographic.hpp"
 #include "rnd-cmr-perspective.hpp"
+
+void gearoenix::render::camera::Camera::update_location()
+{
+    math::Mat4x4 translate = math::Mat4x4::translator(-uniform.position_far.xyz());
+    uniform.view = uniform.inversed_rotation * translate;
+    update_view_projection();
+}
+
+void gearoenix::render::camera::Camera::update_view_projection()
+{
+    uniform.view_projection = uniform.projection * uniform.view;
+    uniform.uniform_view_projection = math::Mat4x4(
+                0.5f, 0.0f, 0.0f, 0.0f,
+                0.0f, 0.5f, 0.0f, 0.0f,
+                0.0f, 0.0f, 1.0f, 0.0f,
+                0.5f, 0.5f, 0.0f, 1.0f)
+            * uniform.view_projection;
+}
 
 gearoenix::render::camera::Camera::Camera(
         const core::Id my_id,
@@ -13,8 +33,24 @@ gearoenix::render::camera::Camera::Camera(
         const std::shared_ptr<engine::Engine> &e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore> &c)
     : core::asset::Asset(my_id, core::asset::Type::CAMERA)
-//    , screen_ratio(nullptr == e ? 1.0f : e->get_system_get_window_ratio())
 {
+    uniform.near_aspect_ratio_reserved[1] = e->get_system_application()->get_window_ratio();
+    f->read(uniform.position_far[0]);
+    f->read(uniform.position_far[1]);
+    f->read(uniform.position_far[2]);
+    math::Quat q;
+    f->read(q.w);
+    f->read(q.x);
+    f->read(q.y);
+    f->read(q.z);
+    uniform.near_aspect_ratio_reserved[0]= -f->read<core::Real>();
+    uniform.position_far[3]= -f->read<core::Real>();
+    const math::Mat4x4 r = q.to_mat();
+    uniform.x_reserved.xyz((r * math::Vec4(uniform.x_reserved.xyz(), 0.0f)).xyz());
+    uniform.y_reserved.xyz((r * math::Vec4(uniform.y_reserved.xyz(), 0.0f)).xyz());
+    uniform.z_reserved.xyz((r * math::Vec4(uniform.z_reserved.xyz(), 0.0f)).xyz());
+    uniform.inversed_rotation = math::Quat(q.x, q.y, q.z, -q.w).to_mat();
+    update_location();
 }
 
 gearoenix::render::camera::Camera::~Camera()
@@ -186,4 +222,14 @@ void gearoenix::render::camera::Camera::global_scale(const core::Real)
 void gearoenix::render::camera::Camera::local_scale(const core::Real)
 {
     GXUNEXPECTED;
+}
+
+void gearoenix::render::camera::Camera::set_orientation(const math::Quat &q)
+{
+    const math::Mat4x4 r = q.to_mat();
+    uniform.x_reserved.xyz((r * math::Vec4(uniform.x_reserved.xyz(), 0.0f)).xyz());
+    uniform.y_reserved.xyz((r * math::Vec4(uniform.y_reserved.xyz(), 0.0f)).xyz());
+    uniform.z_reserved.xyz((r * math::Vec4(uniform.z_reserved.xyz(), 0.0f)).xyz());
+    uniform.inversed_rotation = math::Quat(q.x, q.y, q.z, -q.w).to_mat();
+    update_location();
 }

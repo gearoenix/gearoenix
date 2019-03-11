@@ -102,6 +102,24 @@ gearoenix::core::Real& gearoenix::math::Vec2::operator[](const unsigned int i)
     return vec[i];
 }
 
+const gearoenix::core::Real& gearoenix::math::Vec2::operator[](const int i) const
+{
+#ifdef GX_DEBUG_MODE
+    if (i > 1)
+        GXLOGF("Out of range access");
+#endif
+    return vec[i];
+}
+
+gearoenix::core::Real& gearoenix::math::Vec2::operator[](const int i)
+{
+#ifdef GX_DEBUG_MODE
+    if (i > 1)
+        GXLOGF("Out of range access");
+#endif
+    return vec[i];
+}
+
 gearoenix::core::Real gearoenix::math::Vec2::dot(const Vec2& o) const
 {
     return (vec[0] * o.vec[0]) + (vec[1] * o.vec[1]);
@@ -119,7 +137,7 @@ gearoenix::math::Vec2 gearoenix::math::Vec2::operator-() const
 
 gearoenix::core::Real gearoenix::math::Vec2::length() const
 {
-    return core::Real(sqrt(vec[0] * vec[0] + vec[1] * vec[1]));
+    return core::Real(sqrt(static_cast<double>(vec[0] * vec[0] + vec[1] * vec[1])));
 }
 
 gearoenix::core::Real gearoenix::math::Vec2::square_length() const
@@ -150,13 +168,13 @@ gearoenix::core::Real gearoenix::math::Vec2::square_distance(const Vec2& a) cons
 
 gearoenix::math::Vec2 gearoenix::math::Vec2::normalized() const
 {
-    core::Real l(sqrt(vec[0] * vec[0] + vec[1] * vec[1]));
+    core::Real l(static_cast<float>(sqrt(static_cast<double>(vec[0] * vec[0] + vec[1] * vec[1]))));
     return Vec2(vec[0] / l, vec[1] / l);
 }
 
 void gearoenix::math::Vec2::normalize()
 {
-    core::Real l(sqrt(vec[0] * vec[0] + vec[1] * vec[1]));
+    core::Real l(static_cast<float>(sqrt(static_cast<double>(vec[0] * vec[0] + vec[1] * vec[1]))));
     l = 1.0f / l;
     vec[0] *= l;
     vec[1] *= l;
@@ -232,31 +250,23 @@ const gearoenix::math::Vec3 gearoenix::math::Vec3::Y(0.0f, 1.0f, 0.0f);
 const gearoenix::math::Vec3 gearoenix::math::Vec3::Z(0.0f, 0.0f, 1.0f);
 
 gearoenix::math::Vec3::Vec3()
+    : vec {0.0f, 0.0f, 0.0f}
 {
-    vec[0] = 0;
-    vec[1] = 0;
-    vec[2] = 0;
 }
 
-gearoenix::math::Vec3::Vec3(core::Real x, core::Real y, core::Real z)
+gearoenix::math::Vec3::Vec3(const core::Real e)
+    : vec {e, e, e}
 {
-    vec[0] = x;
-    vec[1] = y;
-    vec[2] = z;
 }
 
-gearoenix::math::Vec3::Vec3(core::Real e)
+gearoenix::math::Vec3::Vec3(const core::Real x, const core::Real y, const core::Real z)
+    : vec {x, y, z}
 {
-    vec[0] = e;
-    vec[1] = e;
-    vec[2] = e;
 }
 
-gearoenix::math::Vec3::Vec3(const math::Vec2& o, core::Real e)
+gearoenix::math::Vec3::Vec3(const math::Vec2& o, const core::Real e)
+    : vec {o[0], o[1], e}
 {
-    vec[0] = o[0];
-    vec[1] = o[1];
-    vec[2] = e;
 }
 
 gearoenix::math::Vec3::Vec3(const Vec3& v)
@@ -360,6 +370,26 @@ gearoenix::core::Real& gearoenix::math::Vec3::operator[](const unsigned int i)
     return vec[i];
 }
 
+const gearoenix::core::Real& gearoenix::math::Vec3::operator[](const int i) const
+{
+#ifdef GX_DEBUG_MODE
+    if (i > 2) {
+        GXLOGF("Out of range access");
+    }
+#endif
+    return vec[i];
+}
+
+gearoenix::core::Real& gearoenix::math::Vec3::operator[](const int i)
+{
+#ifdef GX_DEBUG_MODE
+    if (i > 2) {
+        GXLOGF("Out of range access");
+    }
+#endif
+    return vec[i];
+}
+
 gearoenix::math::Vec2 gearoenix::math::Vec3::xy() const
 {
     return Vec2(vec[0], vec[1]);
@@ -377,7 +407,7 @@ gearoenix::math::Vec3 gearoenix::math::Vec3::operator-() const
 
 gearoenix::core::Real gearoenix::math::Vec3::length() const
 {
-    return core::Real(sqrt(vec[0] * vec[0] + vec[1] * vec[1] + vec[2] * vec[2]));
+    return core::Real(sqrt(static_cast<double>(vec[0] * vec[0] + vec[1] * vec[1] + vec[2] * vec[2])));
 }
 
 gearoenix::core::Real gearoenix::math::Vec3::square_length() const
@@ -424,7 +454,7 @@ gearoenix::math::Vec3 gearoenix::math::Vec3::normalized() const
 
 void gearoenix::math::Vec3::normalize()
 {
-    core::Real l(sqrt(vec[0] * vec[0] + vec[1] * vec[1] + vec[2] * vec[2]));
+    core::Real l(static_cast<core::Real>(sqrt(static_cast<double>(vec[0] * vec[0] + vec[1] * vec[1] + vec[2] * vec[2]))));
     l = 1.0f / l;
     vec[0] *= l;
     vec[1] *= l;
@@ -484,7 +514,6 @@ void gearoenix::math::Vec4::xyz(const Vec3& v)
     vec[0] = v[0];
     vec[1] = v[1];
     vec[2] = v[2];
-    ;
 }
 
 gearoenix::core::Real gearoenix::math::Vec4::w() const
@@ -515,6 +544,24 @@ gearoenix::core::Real& gearoenix::math::Vec4::operator[](const unsigned int i)
     return vec[i];
 }
 
+const gearoenix::core::Real& gearoenix::math::Vec4::operator[](const int i) const
+{
+#ifdef GX_DEBUG_MODE
+    if (i > 3)
+        GXLOGF("Out of range access");
+#endif
+    return vec[i];
+}
+
+gearoenix::core::Real& gearoenix::math::Vec4::operator[](const int i)
+{
+#ifdef GX_DEBUG_MODE
+    if (i > 3)
+        GXLOGF("Out of range access");
+#endif
+    return vec[i];
+}
+
 gearoenix::core::Real gearoenix::math::Vec4::dot(const Vec4& o) const
 {
     return (vec[0] * o.vec[0]) + (vec[1] * o.vec[1]) + (vec[2] * o.vec[2]) + (vec[3] * o.vec[3]);
@@ -530,8 +577,8 @@ gearoenix::math::Vec4 gearoenix::math::Vec4::cross(const Vec4& o) const
 
 gearoenix::math::Vec4 gearoenix::math::Vec4::normalized() const
 {
-    core::Real len = (core::Real)sqrt((double)(vec[0] * vec[0] + vec[1] * vec[1] + vec[2] * vec[2] + vec[3] * vec[3]));
-    Vec4 r(vec[0] / len, vec[1] / len, vec[2] / len, vec[3] / len);
+    const core::Real len = static_cast<core::Real>(sqrt(static_cast<double>(vec[0] * vec[0] + vec[1] * vec[1] + vec[2] * vec[2] + vec[3] * vec[3])));
+    const Vec4 r(vec[0] / len, vec[1] / len, vec[2] / len, vec[3] / len);
     return r;
 }
 

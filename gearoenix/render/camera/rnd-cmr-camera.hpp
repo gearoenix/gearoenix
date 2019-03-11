@@ -31,13 +31,13 @@ class Engine;
 
         protected:
             Uniform uniform;
-
+            void update_location();
+            void update_view_projection();
             Camera(
                     const core::Id my_id,
                     const std::shared_ptr<system::stream::Stream> &f,
                     const std::shared_ptr<engine::Engine> &e,
                     const core::sync::EndCaller<core::sync::EndCallerIgnore> &c);
-
         public:
             virtual ~Camera();
             void look_at(const math::Vec3& target, const math::Vec3& up);
@@ -49,18 +49,19 @@ class Engine;
             virtual math::Ray3 create_ray3(const core::Real x, const core::Real y) const = 0;
             virtual core::Real get_distance(const math::Vec3 model_location) const = 0;
             // Transformable---------------------------------------------------------------
-            void get_location(math::Vec3& l) const;
-            void set_location(const math::Vec3& l);
-            void translate(const math::Vec3& t);
-            void global_rotate(const core::Real d, const math::Vec3& axis, const math::Vec3& location);
-            void global_rotate(const core::Real d, const math::Vec3& axis);
-            void global_rotate(const math::Mat4x4& rm);
-            void local_rotate(const core::Real d, const math::Vec3& axis);
-            void local_x_rotate(const core::Real d);
-            void local_y_rotate(const core::Real d);
-            void local_z_rotate(const core::Real d);
-            void global_scale(const core::Real s);
-            void local_scale(const core::Real s);
+            void get_location(math::Vec3& l) const override final;
+            void set_location(const math::Vec3& l) override final;
+            void translate(const math::Vec3& t) override final;
+            void global_rotate(const core::Real d, const math::Vec3& axis, const math::Vec3& location) override final;
+            void global_rotate(const core::Real d, const math::Vec3& axis) override final;
+            void global_rotate(const math::Mat4x4& rm) override final;
+            void local_rotate(const core::Real d, const math::Vec3& axis) override final;
+            void local_x_rotate(const core::Real d) override final;
+            void local_y_rotate(const core::Real d) override final;
+            void local_z_rotate(const core::Real d) override final;
+            void global_scale(const core::Real s) override final;
+            void local_scale(const core::Real s) override final;
+            void set_orientation(const math::Quat &q) override final;
         };
     }
 }

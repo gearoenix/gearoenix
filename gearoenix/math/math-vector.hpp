@@ -32,6 +32,8 @@ namespace math {
         void operator/=(const Vec2& a);
         const core::Real& operator[](const unsigned int i) const;
         core::Real& operator[](const unsigned int i);
+        const core::Real& operator[](const int i) const;
+        core::Real& operator[](const int i);
         core::Real dot(const Vec2& o) const;
         core::Real cross(const Vec2& o) const;
         core::Real length() const;
@@ -54,9 +56,9 @@ namespace math {
         static const Vec3 Y;
         static const Vec3 Z;
         Vec3();
-        Vec3(core::Real e);
-        Vec3(const math::Vec2& o, core::Real e);
-        Vec3(core::Real x, core::Real y, core::Real z);
+        Vec3(const core::Real e);
+        Vec3(const math::Vec2& o, const core::Real e);
+        Vec3(const core::Real x, const core::Real y, const core::Real z);
         Vec3(const Vec3& v);
         Vec3 operator-() const;
         Vec3 operator+(const Vec3& a) const;
@@ -73,6 +75,8 @@ namespace math {
         void operator/=(const core::Real a);
         const core::Real& operator[](const unsigned int i) const;
         core::Real& operator[](const unsigned int i);
+        const core::Real& operator[](const int i) const;
+        core::Real& operator[](const int i);
         Vec2 xy() const;
         core::Real* data();
         core::Real length() const;
@@ -102,6 +106,8 @@ namespace math {
         void w(core::Real);
         const core::Real& operator[](const unsigned int i) const;
         core::Real& operator[](const unsigned int i);
+        const core::Real& operator[](const int i) const;
+        core::Real& operator[](const int i);
         core::Real dot(const Vec4& o) const;
         Vec4 cross(const Vec4& o) const;
         Vec4 normalized() const;

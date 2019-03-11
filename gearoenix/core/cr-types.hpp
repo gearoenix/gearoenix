@@ -2,7 +2,7 @@
 #define GEAROENIX_CORE_TYPES_HPP
 #include <cstdint>
 
-#define GXPOSEPSILON 0.0001
+#define GXPOSEPSILON 0.0001f
 #define GXNEGEPSILON -GXPOSEPSILON
 
 namespace gearoenix {

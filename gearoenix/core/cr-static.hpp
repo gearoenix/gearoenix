@@ -5,6 +5,7 @@
 #endif
 #include "cr-types.hpp"
 #define GXISZERO(x) (((x) < (GXPOSEPSILON)) && ((x) > (GXNEGEPSILON)))
+#define GXISNOTZERO(x) (((x) > (GXPOSEPSILON)) || ((x) < (GXNEGEPSILON)))
 #ifndef GXMAX
 #define GXMAX(x, y) (((x) > (y)) ? (x) : (y))
 #endif

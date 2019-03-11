@@ -36,16 +36,16 @@ bool gearoenix::math::Mat2x2::invert()
     const core::Real det = mat[0] * mat[3] - mat[1] * mat[2];
     if (det < GXPOSEPSILON && det > GXNEGEPSILON)
         return false;
-    core::Real tmp = mat[0];
+    const core::Real tmp = mat[0];
     mat[0] = mat[3];
     mat[3] = tmp;
     mat[1] = -mat[1];
     mat[2] = -mat[2];
-    tmp = 1.0f / det;
-    mat[0] *= tmp;
-    mat[1] *= tmp;
-    mat[2] *= tmp;
-    mat[3] *= tmp;
+    const core::Real tmp1 = 1.0f / det;
+    mat[0] *= tmp1;
+    mat[1] *= tmp1;
+    mat[2] *= tmp1;
+    mat[3] *= tmp1;
     return true;
 }
 
@@ -54,44 +54,46 @@ gearoenix::math::Vec2 gearoenix::math::Mat2x2::operator*(const Vec2& v) const
     return Vec2(mat[0] * v[0] + mat[1] * v[1], mat[2] * v[0] + mat[3] * v[1]);
 }
 
-gearoenix::math::Mat4x4::Mat4x4(core::Real e)
+gearoenix::math::Mat4x4::Mat4x4(const core::Real e)
+    : mat{e,
+     core::Real(0),
+     core::Real(0),
+     core::Real(0),
+     core::Real(0),
+     e,
+     core::Real(0),
+     core::Real(0),
+     core::Real(0),
+     core::Real(0),
+     e,
+     core::Real(0),
+     core::Real(0),
+     core::Real(0),
+     core::Real(0),
+     e}
 {
-    mat[0] = e;
-    mat[1] = core::Real(0);
-    mat[2] = core::Real(0);
-    mat[3] = core::Real(0);
-    mat[4] = core::Real(0);
-    mat[5] = e;
-    mat[6] = core::Real(0);
-    mat[7] = core::Real(0);
-    mat[8] = core::Real(0);
-    mat[9] = core::Real(0);
-    mat[10] = e;
-    mat[11] = core::Real(0);
-    mat[12] = core::Real(0);
-    mat[13] = core::Real(0);
-    mat[14] = core::Real(0);
-    mat[15] = e;
 }
 
 gearoenix::math::Mat4x4::Mat4x4()
+    :mat{
+    core::Real(1),
+    core::Real(0),
+    core::Real(0),
+    core::Real(0),
+    core::Real(0),
+    core::Real(1),
+    core::Real(0),
+    core::Real(0),
+    core::Real(0),
+    core::Real(0),
+    core::Real(1),
+    core::Real(0),
+    core::Real(0),
+    core::Real(0),
+    core::Real(0),
+    core::Real(1)
+         }
 {
-    mat[0] = core::Real(1);
-    mat[1] = core::Real(0);
-    mat[2] = core::Real(0);
-    mat[3] = core::Real(0);
-    mat[4] = core::Real(0);
-    mat[5] = core::Real(1);
-    mat[6] = core::Real(0);
-    mat[7] = core::Real(0);
-    mat[8] = core::Real(0);
-    mat[9] = core::Real(0);
-    mat[10] = core::Real(1);
-    mat[11] = core::Real(0);
-    mat[12] = core::Real(0);
-    mat[13] = core::Real(0);
-    mat[14] = core::Real(0);
-    mat[15] = core::Real(1);
 }
 
 gearoenix::math::Mat4x4::Mat4x4(
@@ -99,23 +101,25 @@ gearoenix::math::Mat4x4::Mat4x4(
     core::Real e4, core::Real e5, core::Real e6, core::Real e7,
     core::Real e8, core::Real e9, core::Real e10, core::Real e11,
     core::Real e12, core::Real e13, core::Real e14, core::Real e15)
+    :mat {
+    e0,
+    e1,
+    e2,
+    e3,
+    e4,
+    e5,
+    e6,
+    e7,
+    e8,
+    e9,
+    e10,
+    e11,
+    e12,
+    e13,
+    e14,
+    e15
+    }
 {
-    mat[0] = e0;
-    mat[1] = e1;
-    mat[2] = e2;
-    mat[3] = e3;
-    mat[4] = e4;
-    mat[5] = e5;
-    mat[6] = e6;
-    mat[7] = e7;
-    mat[8] = e8;
-    mat[9] = e9;
-    mat[10] = e10;
-    mat[11] = e11;
-    mat[12] = e12;
-    mat[13] = e13;
-    mat[14] = e14;
-    mat[15] = e15;
 }
 
 gearoenix::math::Mat4x4::Mat4x4(system::stream::Stream* f)
@@ -329,24 +333,24 @@ gearoenix::math::Mat4x4 gearoenix::math::Mat4x4::look_at(const Vec3& position, c
     return m;
 }
 
-gearoenix::math::Mat4x4 gearoenix::math::Mat4x4::rotation(const Vec3& v, core::Real degree)
+gearoenix::math::Mat4x4 gearoenix::math::Mat4x4::rotation(const Vec3& v, const core::Real degree)
 {
-    core::Real sinus = core::Real(sin(degree));
-    core::Real cosinus = core::Real(cos(degree));
-    core::Real oneminuscos = core::Real(1.0 - cosinus);
-    Vec3 w = v.normalized();
-    core::Real wx2 = w[0] * w[0];
-    core::Real wxy = w[0] * w[1];
-    core::Real wxz = w[0] * w[2];
-    core::Real wy2 = w[1] * w[1];
-    core::Real wyz = w[1] * w[2];
-    core::Real wz2 = w[2] * w[2];
-    core::Real wxyonemincos = wxy * oneminuscos;
-    core::Real wxzonemincos = wxz * oneminuscos;
-    core::Real wyzonemincos = wyz * oneminuscos;
-    core::Real wxsin = w[0] * sinus;
-    core::Real wysin = w[1] * sinus;
-    core::Real wzsin = w[2] * sinus;
+    const core::Real sinus = static_cast<core::Real>(sin(static_cast<double>(degree)));
+    const core::Real cosinus = static_cast<core::Real>(cos(static_cast<double>(degree)));
+    const core::Real oneminuscos = 1.0f - cosinus;
+    const Vec3 w = v.normalized();
+    const core::Real wx2 = w[0] * w[0];
+    const core::Real wxy = w[0] * w[1];
+    const core::Real wxz = w[0] * w[2];
+    const core::Real wy2 = w[1] * w[1];
+    const core::Real wyz = w[1] * w[2];
+    const core::Real wz2 = w[2] * w[2];
+    const core::Real wxyonemincos = wxy * oneminuscos;
+    const core::Real wxzonemincos = wxz * oneminuscos;
+    const core::Real wyzonemincos = wyz * oneminuscos;
+    const core::Real wxsin = w[0] * sinus;
+    const core::Real wysin = w[1] * sinus;
+    const core::Real wzsin = w[2] * sinus;
     Mat4x4 m;
     m.mat[0] = cosinus + (wx2 * oneminuscos);
     m.mat[1] = wzsin + wxyonemincos;
@@ -389,7 +393,7 @@ gearoenix::math::Mat4x4 gearoenix::math::Mat4x4::translator(const Vec3& v)
     return r;
 }
 
-gearoenix::math::Mat4x4 gearoenix::math::Mat4x4::orthographic(core::Real width, core::Real height, core::Real near, core::Real far)
+gearoenix::math::Mat4x4 gearoenix::math::Mat4x4::orthographic(const core::Real width, const core::Real height, const core::Real near, const core::Real far)
 {
 #ifdef GX_IN_WINDOWS
     Mat4x4 r;
@@ -412,17 +416,17 @@ gearoenix::math::Mat4x4 gearoenix::math::Mat4x4::orthographic(core::Real width, 
     return r;
 #else
     Mat4x4 r;
-    r.mat[0] = core::Real(2.0 / width);
+    r.mat[0] = core::Real(2.0f / width);
     r.mat[1] = core::Real(0.0);
     r.mat[2] = core::Real(0.0);
     r.mat[3] = core::Real(0.0);
     r.mat[4] = core::Real(0.0);
-    r.mat[5] = core::Real(2.0 / height);
+    r.mat[5] = core::Real(2.0f / height);
     r.mat[6] = core::Real(0.0);
     r.mat[7] = core::Real(0.0);
     r.mat[8] = core::Real(0.0);
     r.mat[9] = core::Real(0.0);
-    r.mat[10] = core::Real(2.0 / (near - far));
+    r.mat[10] = core::Real(2.0f / (near - far));
     r.mat[11] = core::Real(0.0);
     r.mat[12] = core::Real(0.0);
     r.mat[13] = core::Real(0.0);
@@ -432,7 +436,7 @@ gearoenix::math::Mat4x4 gearoenix::math::Mat4x4::orthographic(core::Real width, 
 #endif
 }
 
-gearoenix::math::Mat4x4 gearoenix::math::Mat4x4::perspective(core::Real width, core::Real height, core::Real near, core::Real far)
+gearoenix::math::Mat4x4 gearoenix::math::Mat4x4::perspective(const core::Real width, const core::Real height, const core::Real near, const core::Real far)
 {
 #ifdef GX_IN_WINDOWS
     Mat4x4 r;
@@ -455,12 +459,12 @@ gearoenix::math::Mat4x4 gearoenix::math::Mat4x4::perspective(core::Real width, c
     return r;
 #else
     Mat4x4 r;
-    r.mat[0] = core::Real((2.0 * near) / width);
+    r.mat[0] = core::Real((2.0f * near) / width);
     r.mat[1] = core::Real(0.0);
     r.mat[2] = core::Real(0.0);
     r.mat[3] = core::Real(0.0);
     r.mat[4] = core::Real(0.0);
-    r.mat[5] = core::Real((2.0 * near) / height);
+    r.mat[5] = core::Real((2.0f * near) / height);
     r.mat[6] = core::Real(0.0);
     r.mat[7] = core::Real(0.0);
     r.mat[8] = core::Real(0.0);
@@ -469,7 +473,7 @@ gearoenix::math::Mat4x4 gearoenix::math::Mat4x4::perspective(core::Real width, c
     r.mat[11] = core::Real(-1.0);
     r.mat[12] = core::Real(0.0);
     r.mat[13] = core::Real(0.0);
-    r.mat[14] = core::Real((2.0 * far * near) / (near - far));
+    r.mat[14] = core::Real((2.0f * far * near) / (near - far));
     r.mat[15] = core::Real(0.0);
     return r;
 #endif

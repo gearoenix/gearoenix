@@ -19,13 +19,12 @@ std::shared_ptr<gearoenix::render::camera::Camera> gearoenix::render::camera::Ma
 		const core::Id t = file->read<core::Id>();
 		switch (t) {
 		case 1:
-//			return std::make_shared<Perspective>(id, file, e);
-			break;
+            return std::make_shared<Perspective>(id, file, e, call);
 		case 2:
-//			return std::make_shared<Orthographic>(id, file, e);
+            // return std::make_shared<Orthographic>(id, file, e);
+            GXUNIMPLEMENTED;
 		default:
 			GXUNEXPECTED;
-			break;
 		}
 	});
 	call.set_data(data);

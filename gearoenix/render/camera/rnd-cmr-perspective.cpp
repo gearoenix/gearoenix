@@ -20,11 +20,9 @@ gearoenix::render::camera::Perspective::Perspective(
         const core::sync::EndCaller<core::sync::EndCallerIgnore> &c)
     : Camera(my_id, f, e, c)
 {
-//    f->read(h_angle);
-//    tanhang = std::tan(h_angle);
-//    one_coshang = 1.0f / std::cos(h_angle);
-//    c_width = tanhang * start;
-//    on_ratio_change();
+    const core::Real rad = f->read<core::Real>();
+    GXLOGD("Radiant is: " << rad << ", in perspective camera with id: " << my_id);
+    set_vertical_field_of_view(rad);
 }
 
 bool gearoenix::render::camera::Perspective::in_sight(const math::Vec3& location, const core::Real radius) const
@@ -64,4 +62,26 @@ gearoenix::math::Ray3 gearoenix::render::camera::Perspective::create_ray3(const 
 gearoenix::core::Real gearoenix::render::camera::Perspective::get_distance(const math::Vec3 model_location) const
 {
 //    return (model_location - l).square_length();
+}
+
+void gearoenix::render::camera::Perspective::set_vertical_field_of_view(const core::Real radian) {
+    fovy = radian;
+    tany = static_cast<core::Real>(std::tan(static_cast<double>(radian)));
+    tanx = tany * uniform.near_aspect_ratio_reserved[1];
+    fovx = static_cast<core::Real>(std::atan(static_cast<double>(tanx)));
+    uniform.projection = math::Mat4x4::perspective(
+                tanx * uniform.near_aspect_ratio_reserved[0],
+            tany * uniform.near_aspect_ratio_reserved[0],
+            uniform.near_aspect_ratio_reserved[0],
+            uniform.position_far[3]);
+    uniform.uniform_projection = math::Mat4x4(
+                0.5f, 0.0f, 0.0f, 0.0f,
+                0.0f, 0.5f, 0.0f, 0.0f,
+                0.0f, 0.0f, 1.0f, 0.0f,
+                0.5f, 0.5f, 0.0f, 1.0f) * uniform.projection;
+
+    lambda = static_cast<core::Real>(
+                std::sin(static_cast<double>(fovx * 0.5f)) +
+                std::sin(static_cast<double>(fovy * 0.5f))) * 0.5f;
+    update_view_projection();
 }
