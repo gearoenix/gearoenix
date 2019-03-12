@@ -4,7 +4,7 @@
 #include "../engine/gles2-eng-engine.hpp"
 #include <cstring>
 
-gearoenix::gles2::buffer::Uniform::Uniform(unsigned int s, const std::shared_ptr<engine::Engine>& e)
+gearoenix::gles2::buffer::Uniform::Uniform(const unsigned int s, const std::shared_ptr<engine::Engine>& e)
     : render::buffer::Uniform(e)
     , data(new unsigned char[s])
 {

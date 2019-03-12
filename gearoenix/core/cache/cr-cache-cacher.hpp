@@ -16,8 +16,8 @@ namespace gearoenix {
 				std::map<Key, std::weak_ptr<T>, Compare> cacheds;
 
 			public:
-				template <class C> std::shared_ptr<C> get(const Key id, std::function<std::shared_ptr<C>()> new_fun);
-				template <class C> std::shared_ptr<C> get(const Key id) const;
+				template <class C> std::shared_ptr<C> get(const Key &id, const std::function<std::shared_ptr<C>()> &new_fun);
+				template <class C> std::shared_ptr<C> get(const Key &id) const;
 			};
 		}
 	}
@@ -25,7 +25,7 @@ namespace gearoenix {
 
 template <class  T, class Key, class Compare>
 template <class  C>
-std::shared_ptr<C> gearoenix::core::cache::Cacher<T, Key, Compare>::get(const Key id, std::function<std::shared_ptr<C>()> new_fun)
+std::shared_ptr<C> gearoenix::core::cache::Cacher<T, Key, Compare>::get(const Key &id, const std::function<std::shared_ptr<C>()> &new_fun)
 {
 	auto search = cacheds.find(id);
 	if (search == cacheds.end()) {
@@ -46,7 +46,7 @@ std::shared_ptr<C> gearoenix::core::cache::Cacher<T, Key, Compare>::get(const Ke
 
 template <class  T, class Key, class Compare>
 template <class  C>
-std::shared_ptr<C> gearoenix::core::cache::Cacher<T, Key, Compare>::get(const Key id) const
+std::shared_ptr<C> gearoenix::core::cache::Cacher<T, Key, Compare>::get(const Key &id) const
 {
 	auto search = cacheds.find(id);
 	if (search == cacheds.end()) {

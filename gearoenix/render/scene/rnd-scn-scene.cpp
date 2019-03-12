@@ -44,10 +44,12 @@ gearoenix::render::scene::Scene::Scene(
 #define GXHELPER(x, n, cls)                                                   \
 	{                                                                         \
         const std::shared_ptr<n::Manager> &mgr = astmgr->get_##x##_manager(); \
-        core::sync::EndCaller<n::cls> call(c);                                \
 		std::vector<core::Id> ids;                                            \
 		f->read(ids);                                                         \
-        for (const core::Id id : ids) add_##x(mgr->get_gx3d(id, call));       \
+		if(ids.size() > 0) {                                                  \
+			core::sync::EndCaller<n::cls> call(c);                            \
+			for (const core::Id id : ids) add_##x(mgr->get_gx3d(id, call));   \
+		}                                                                     \
 	}
 
     GXHELPER(camera, camera, Camera);

@@ -13,6 +13,7 @@
 #include "../../system/sys-log.hpp"
 #include "../buffer/gles2-buf-mesh.hpp"
 #include "../buffer/gles2-buf-uniform.hpp"
+#include "../buffer/gles2-buf-manager.hpp"
 #include "../pipeline/gles2-pip-manager.hpp"
 #include "../shader/gles2-shd-depth.hpp"
 #include "../shader/gles2-shd-directional-colored-matte-nonreflective-shadowless-opaque.hpp"
@@ -92,6 +93,7 @@ std::shared_ptr<gearoenix::gles2::engine::Engine> gearoenix::gles2::engine::Engi
 {
 	std::shared_ptr<Engine> e(new Engine(sys_app));
 	e->pipeline_manager = std::make_shared<pipeline::Manager>(e);
+	e->buffer_manager = std::make_shared<buffer::Manager>(e);
 	return e;
 }
 

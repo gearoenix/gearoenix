@@ -14,7 +14,7 @@ namespace gles2 {
             unsigned char* data = nullptr;
 
         public:
-            Uniform(unsigned int s, const std::shared_ptr<engine::Engine>& e);
+            Uniform(const unsigned int s, const std::shared_ptr<engine::Engine>& e);
             ~Uniform();
             void update(const void* src, unsigned int data_size);
             void* get_data();

@@ -409,7 +409,7 @@ const std::shared_ptr<gearoenix::system::Application> gearoenix::system::Applica
 
 #ifdef GX_USE_OPENGL_ES2
     if (nullptr == result->render_engine && result->supported_engine == render::engine::Type::OPENGL_ES2) {
-        result->render_engine = std::shared_ptr<render::engine::Engine>(new gles2::engine::Engine(result));
+        result->render_engine = gles2::engine::Engine::construct(result);
     }
 #endif
 
