@@ -26,7 +26,7 @@ gearoenix::gles2::texture::Texture2D::Texture2D(
         glGenerateMipmap(GL_TEXTURE_2D);
         (void)end;
     };
-    e->add_load_function(loadf);
+//    e->add_load_function(loadf);
 }
 
 gearoenix::gles2::texture::Texture2D::Texture2D(const core::Id my_id, const GLuint txtobj, const std::shared_ptr<engine::Engine>& e)
@@ -40,10 +40,10 @@ gearoenix::gles2::texture::Texture2D::~Texture2D()
     if (texture_object == 0)
         return;
     const GLuint c_texture_object = texture_object;
-    render_engine->add_load_function([c_texture_object] {
-        glBindTexture(GL_TEXTURE_2D, 0);
-        glDeleteTextures(1, &c_texture_object);
-    });
+//    render_engine->add_load_function([c_texture_object] {
+//        glBindTexture(GL_TEXTURE_2D, 0);
+//        glDeleteTextures(1, &c_texture_object);
+//    });
     texture_object = 0;
 }
 

@@ -47,7 +47,7 @@ gearoenix::gles2::texture::Cube::Cube(
         //GX_CHECK_FOR_GRAPHIC_API_ERROR
         (void)end;
     };
-    engine->add_load_function(loadf);
+//    engine->add_load_function(loadf);
 }
 
 gearoenix::gles2::texture::Cube::~Cube()
@@ -55,10 +55,10 @@ gearoenix::gles2::texture::Cube::~Cube()
     if (texture_object == 0)
         return;
     const GLuint c_texture_object = texture_object;
-    render_engine->add_load_function([c_texture_object] {
-        glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
-        glDeleteTextures(1, &c_texture_object);
-    });
+//    render_engine->add_load_function([c_texture_object] {
+//        glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+//        glDeleteTextures(1, &c_texture_object);
+//    });
     texture_object = 0;
 }
 

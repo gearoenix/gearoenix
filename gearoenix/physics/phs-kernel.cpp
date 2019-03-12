@@ -1,5 +1,5 @@
 #include "phs-kernel.hpp"
-#include "../core/sync/cr-sync-semaphore.hpp"
+#include "../core/sync/cr-sync-queued-semaphore.hpp"
 #include "../core/sync/cr-sync-stop-point.hpp"
 #include "../render/camera/rnd-cmr-camera.hpp"
 #include "../render/camera/rnd-cmr-orthographic.hpp"
@@ -114,7 +114,7 @@ gearoenix::physics::Kernel::Kernel(const unsigned int thread_index, Engine* engi
     : engine(engine)
     , thread_index(thread_index)
 {
-    signaller = new core::sync::Semaphore(1);
+    signaller = new core::sync::QueuedSemaphore(1);
     thread = std::thread(std::bind(&Kernel::run, this));
 }
 

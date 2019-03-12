@@ -33,7 +33,7 @@ gearoenix::gles2::buffer::Mesh::Mesh(
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, is, idata.data(), GL_STATIC_DRAW);
     };
-    e->add_load_function(todo);
+//    e->add_load_function(todo);
 }
 
 gearoenix::gles2::buffer::Mesh::~Mesh()
@@ -42,12 +42,12 @@ gearoenix::gles2::buffer::Mesh::~Mesh()
         return;
     const GLuint cvbo = vbo;
     const GLuint cibo = ibo;
-    e->add_load_function([cvbo, cibo]() -> void {
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glDeleteBuffers(1, &cvbo);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-        glDeleteBuffers(1, &cibo);
-    });
+//    e->add_load_function([cvbo, cibo]() -> void {
+//        glBindBuffer(GL_ARRAY_BUFFER, 0);
+//        glDeleteBuffers(1, &cvbo);
+//        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+//        glDeleteBuffers(1, &cibo);
+//    });
     vbo = 0;
     ibo = 0;
 }

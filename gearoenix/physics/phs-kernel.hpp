@@ -7,7 +7,7 @@
 namespace gearoenix {
 namespace core {
     namespace sync {
-        class Semaphore;
+        class QueuedSemaphore;
     }
 }
 namespace physics {
@@ -19,7 +19,7 @@ namespace physics {
         std::chrono::system_clock::time_point now;
         core::Real delta_time;
         const unsigned int thread_index;
-        core::sync::Semaphore* signaller;
+        core::sync::QueuedSemaphore* signaller;
         std::thread thread;
         volatile bool alive = true;
         void run();

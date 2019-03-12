@@ -17,7 +17,7 @@ namespace core {
         class Event;
     }
     namespace sync {
-        class Semaphore;
+        class QueuedSemaphore;
     }
 }
 namespace physics {
@@ -72,19 +72,7 @@ namespace render {
             std::shared_ptr<sampler::Manager> sampler_manager = nullptr;
             std::shared_ptr<buffer::Manager> buffer_manager = nullptr;
             // end of managers
-            core::sync::Semaphore* load_functions_mutex;
-            core::sync::Semaphore* loaded_scenes_mutex;
-            core::sync::Semaphore* scene_loader_mutex;
-            core::sync::Semaphore* scene_loader_signaler;
-            std::thread scene_loader;
-            volatile bool scene_loader_continue = true;
-            void scene_loader_function();
-            std::vector<std::function<void()>> scene_loader_functions;
-            std::vector<std::function<void()>> load_functions;
-            std::map<core::Id, std::shared_ptr<scene::Scene>> loaded_scenes;
             physics::Engine* physics_engine = nullptr;
-            void do_load_functions();
-            void clear();
             Engine(const std::shared_ptr<system::Application>& system_application, const Type::Id engine_type_id);
 
         public:
@@ -100,8 +88,6 @@ namespace render {
             const std::shared_ptr<physics::Engine> &get_physics_engine() const;
             const std::shared_ptr<buffer::Manager> &get_buffer_manager() const;
             // end of getters
-            void add_load_function(std::function<void()> fun);
-
             Type::Id get_engine_type_id() const;
             unsigned int get_frame_number() const;
         };

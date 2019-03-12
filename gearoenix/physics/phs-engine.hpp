@@ -9,7 +9,7 @@
 namespace gearoenix {
 namespace core {
     namespace sync {
-        class Semaphore;
+        class QueuedSemaphore;
         class StopPoint;
     }
 }
@@ -35,7 +35,7 @@ namespace physics {
         std::vector<std::shared_ptr<animation::Animation>> pending_animations;
         bool animations_need_cleaning = false;
         const unsigned int threads_count = 4;
-        core::sync::Semaphore* signaller;
+        core::sync::QueuedSemaphore* signaller;
         Kernel** kernels;
         core::sync::StopPoint* kernels_piont_animations = nullptr;
         core::sync::StopPoint* kernels_piont_constraints = nullptr;

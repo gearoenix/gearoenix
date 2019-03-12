@@ -14,6 +14,7 @@ gearoenix::render::scene::Manager::Manager(const std::shared_ptr<system::stream:
 gearoenix::render::scene::Manager::~Manager() {}
 
 void gearoenix::render::scene::Manager::get_gx3d(const core::Id mid, core::sync::EndCaller<Scene> c) {
+    GXLOGD("Goint to load scene with id: " << mid);
 	io_worker->push([mid, c, this] () mutable noexcept -> void {
 		c.set_data(cache.get<Scene>(mid, [mid, c, this] () noexcept -> std::shared_ptr<Scene> {
 			GXLOGD("Id of scene is " << mid);

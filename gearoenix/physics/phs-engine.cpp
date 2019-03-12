@@ -1,5 +1,5 @@
 #include "phs-engine.hpp"
-#include "../core/sync/cr-sync-semaphore.hpp"
+#include "../core/sync/cr-sync-queued-semaphore.hpp"
 #include "../core/sync/cr-sync-stop-point.hpp"
 #include "../system/sys-log.hpp"
 #include "animation/phs-anm-animation.hpp"
@@ -7,7 +7,7 @@
 
 gearoenix::physics::Engine::Engine(const std::shared_ptr<render::engine::Engine>& render_engine)
     : render_engine(render_engine)
-    , signaller(new core::sync::Semaphore())
+    , signaller(new core::sync::QueuedSemaphore())
 {
     // because of some compiler &/| std problems it is here instead of initializer list
     const_cast<unsigned int&>(threads_count) = std::thread::hardware_concurrency() > 4 ? std::thread::hardware_concurrency() : 4;
