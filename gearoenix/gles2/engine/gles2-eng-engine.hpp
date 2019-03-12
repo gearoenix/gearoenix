@@ -39,8 +39,9 @@ namespace gles2 {
             std::chrono::high_resolution_clock::time_point prof_last_time_draw;
             double prof_frames_time = 0.0;
 #endif
-        public:
             Engine(const std::shared_ptr<system::Application>& sys_app);
+        public:
+			static std::shared_ptr<Engine> construct(const std::shared_ptr<system::Application>& sys_app);
             ~Engine();
 			void update() override final;
 			void terminate() override final;

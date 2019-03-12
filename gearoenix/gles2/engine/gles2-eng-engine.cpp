@@ -88,6 +88,13 @@ gearoenix::gles2::engine::Engine::Engine(const std::shared_ptr<system::Applicati
     initialize();
 }
 
+std::shared_ptr<gearoenix::gles2::engine::Engine> gearoenix::gles2::engine::Engine::construct(const std::shared_ptr<system::Application>& sys_app)
+{
+	std::shared_ptr<Engine> e(new Engine(sys_app));
+	e->pipeline_manager = std::make_shared<pipeline::Manager>(e);
+	return e;
+}
+
 gearoenix::gles2::engine::Engine::~Engine()
 {
     terminate();

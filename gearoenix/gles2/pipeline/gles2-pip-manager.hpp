@@ -17,4 +17,4 @@ namespace gles2 {
     }
 }
 }
-#endif // GEAROENIX_RENDER_PIPELINE_MANAGER_HPP
+#endif

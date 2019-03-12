@@ -168,12 +168,12 @@ void gearoenix::render::camera::Camera::global_rotate(const math::Mat4x4& rm)
 
 const gearoenix::math::Mat4x4& gearoenix::render::camera::Camera::get_view_projection_matrix() const
 {
-//    return vp;
+    return uniform.view_projection;
 }
 
 const gearoenix::math::Mat4x4& gearoenix::render::camera::Camera::get_zero_located_view() const
 {
-//    return vwl;
+    return uniform.inversed_rotation;
 }
 
 void gearoenix::render::camera::Camera::get_location(math::Vec3& location) const

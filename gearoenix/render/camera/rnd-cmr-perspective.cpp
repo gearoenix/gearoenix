@@ -40,8 +40,7 @@ bool gearoenix::render::camera::Perspective::in_sight(const math::Vec3& location
 //    core::Real eye_on_y = std::abs(eye_on_z_plane.dot(y_axis));
 //    if (eye_on_y - (radius * one_cosvang) > tanvang * eye_z)
 //        return false;
-
-//    return true;
+    return true;
 }
 
 void gearoenix::render::camera::Perspective::on_event(const core::event::Event& e)
@@ -53,15 +52,15 @@ void gearoenix::render::camera::Perspective::on_event(const core::event::Event& 
 
 gearoenix::math::Ray3 gearoenix::render::camera::Perspective::create_ray3(const core::Real x, const core::Real y) const
 {
-//    math::Vec3 dir = (x_axis * x) + (y_axis * y) - (z_axis * start);
-//    math::Vec3 origin = dir + l;
-//    dir.normalize();
-//    return math::Ray3(origin, dir);
+    math::Vec3 dir = (uniform.x_reserved.xyz() * x) + (uniform.y_reserved.xyz() * y) + (uniform.z_reserved.xyz() * uniform.near_aspect_ratio_reserved[0]);
+    const math::Vec3 origin = dir + uniform.position_far.xyz();
+    dir.normalize();
+    return math::Ray3(origin, dir);
 }
 
 gearoenix::core::Real gearoenix::render::camera::Perspective::get_distance(const math::Vec3 model_location) const
 {
-//    return (model_location - l).square_length();
+    return (model_location - uniform.position_far.xyz()).square_length();
 }
 
 void gearoenix::render::camera::Perspective::set_vertical_field_of_view(const core::Real radian) {

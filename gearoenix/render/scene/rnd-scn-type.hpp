@@ -7,7 +7,7 @@ namespace gearoenix {
 		namespace scene {
 			class Type {
 			public:
-				typedef enum : core::Id {
+				typedef enum : core::TypeId {
 					GAME = 1,
 					UI = 2,
 				} Id;

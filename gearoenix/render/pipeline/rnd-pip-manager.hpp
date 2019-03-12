@@ -20,6 +20,7 @@ namespace render {
         protected:
             const std::shared_ptr<engine::Engine> e;
             core::cache::Cacher<Pipeline> pipelines;
+			core::cache::Cacher<Resource, std::vector<std::shared_ptr<texture::Texture>>> resources;
 
             Manager(const std::shared_ptr<engine::Engine>& e);
 

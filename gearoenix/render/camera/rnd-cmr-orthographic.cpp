@@ -37,7 +37,7 @@ bool gearoenix::render::camera::Orthographic::in_sight(const math::Vec3& locatio
 //    core::Real eye_on_y = std::abs(eye_on_z_plane.dot(y_axis));
 //    if (eye_on_y - radius > c_height)
 //        return false;
-//    return true;
+    return true;
 }
 
 void gearoenix::render::camera::Orthographic::on_event(const core::event::Event& e)
@@ -49,12 +49,16 @@ void gearoenix::render::camera::Orthographic::on_event(const core::event::Event&
 
 gearoenix::math::Ray3 gearoenix::render::camera::Orthographic::create_ray3(const core::Real x, const core::Real y) const
 {
-//    math::Vec3 dir = -z_axis;
-//    math::Vec3 origin = (x_axis * x) + (y_axis * y) + (dir * start) + l;
-//    return math::Ray3(origin, dir);
+    const math::Vec3 dir = -uniform.z_reserved.xyz();
+    const math::Vec3 origin = 
+		(uniform.x_reserved.xyz() * x) + 
+		(uniform.y_reserved.xyz() * y) + 
+		(dir * uniform.near_aspect_ratio_reserved[0]) + 
+		uniform.position_far.xyz();
+    return math::Ray3(origin, dir);
 }
 
 gearoenix::core::Real gearoenix::render::camera::Orthographic::get_distance(const math::Vec3 &model_location) const
 {
-//    return -((model_location - l).dot(z_axis));
+    return ((uniform.position_far.xyz() - model_location).dot(uniform.z_reserved.xyz()));
 }
