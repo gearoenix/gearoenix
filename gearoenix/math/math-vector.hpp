@@ -1,6 +1,8 @@
 #ifndef GEAROEMIX_MATH_VECTOR_HPP
 #define GEAROEMIX_MATH_VECTOR_HPP
 #include "../core/cr-types.hpp"
+#include <ostream>
+
 namespace gearoenix {
 namespace system {
     namespace stream {
@@ -114,6 +116,12 @@ namespace math {
         void normalize();
         void read(system::stream::Stream* f);
         const core::Real* data() const;
+
+        friend std::ostream& operator << (std::ostream &os, const Vec4 &v)
+        {
+                os << "Vec4 {" << v[0] << ", " << v[1] << ", " << v[2] << ", " << v[3] << "}";
+                return os;
+        }
     };
 }
 }

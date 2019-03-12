@@ -14,6 +14,7 @@ namespace core {
                 std::mutex m;
                 std::condition_variable c;
                 volatile bool locked = true;
+                volatile bool unlocked = false;
             };
             typedef std::shared_ptr<LockData> Lock;
             std::mutex m_count;

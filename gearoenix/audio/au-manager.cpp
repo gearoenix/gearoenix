@@ -8,7 +8,7 @@ gearoenix::audio::Manager::Manager(const std::shared_ptr<system::stream::Stream>
 
 gearoenix::audio::Manager::~Manager() {}
 
-std::shared_ptr<gearoenix::audio::Audio> gearoenix::audio::Manager::get(core::Id, core::sync::EndCaller<Audio>)
+std::shared_ptr<gearoenix::audio::Audio> gearoenix::audio::Manager::get_gx3d(const core::Id, core::sync::EndCaller<Audio> &)
 {
     GXUNIMPLEMENTED;
 }

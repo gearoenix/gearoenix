@@ -83,7 +83,7 @@ namespace render {
             std::shared_ptr<skybox::Skybox> skybox;
 
         public:
-			/// It's going read itself from gx3d stream.
+            /// It's going to read itself from gx3d stream.
 			Scene(
 				const core::Id my_id,
 				const std::shared_ptr<system::stream::Stream>& f,
@@ -100,12 +100,21 @@ namespace render {
 			void disable_rendering();
             bool is_renderable() const;
 
-            void add_model(const std::shared_ptr<model::Model>& m);
-			const std::shared_ptr<model::Model> &get_model(const core::Id model_id) const;
-            const std::map<core::Id, std::shared_ptr<model::Model>>& get_models() const;
+#define GXHELPER(x, c)                                                        \
+            void add_##x(const std::shared_ptr<c>& m);                        \
+            const std::shared_ptr<c> &get_##x(const core::Id x##_id) const;   \
+            const std::map<core::Id, std::shared_ptr<c>>& get_##x##s() const
 
-			void add_constraint(const std::shared_ptr<physics::constraint::Constraint>& cns);
-			const std::shared_ptr<physics::constraint::Constraint> &get_constraint(const core::Id constraint_id) const;
+            GXHELPER(camera, camera::Camera);
+            GXHELPER(audio, audio::Audio);
+            GXHELPER(light, light::Light);
+            GXHELPER(model, model::Model);
+            GXHELPER(constraint, physics::constraint::Constraint);
+
+#undef GXHELPER
+
+            void set_skybox(const std::shared_ptr<skybox::Skybox>& s);
+            const std::shared_ptr<model::Model> &get_skybox(const core::Id skybox_id) const;
         };
     }
 }

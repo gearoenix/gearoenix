@@ -32,7 +32,7 @@ namespace render {
             Manager(const std::shared_ptr<system::stream::Stream>& s, const std::shared_ptr<engine::Engine>& e);
             ~Manager();
 			/// It is gonna load the scene (if exists) in another thread.
-			void read_gx3d(const core::Id mid, core::sync::EndCaller<Scene> c);
+            void get_gx3d(const core::Id mid, core::sync::EndCaller<Scene> c);
         };
     }
 }

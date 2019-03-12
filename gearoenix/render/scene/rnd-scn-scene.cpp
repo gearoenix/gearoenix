@@ -41,24 +41,27 @@ gearoenix::render::scene::Scene::Scene(
 		uniform_buffers[i] = std::shared_ptr<buffer::Uniform>(e->get_buffer_manager()->create_uniform(sizeof(Uniform)));
 	}
 	const std::shared_ptr<core::asset::Manager> &astmgr = e->get_system_application()->get_asset_manager();
-#define GXHELPER(x, y)                                                        \
+#define GXHELPER(x, n, cls)                                                   \
 	{                                                                         \
-		const std::shared_ptr<x::Manager> &mgr = astmgr->get_##x##_manager(); \
-		const core::sync::EndCaller<x::y> call(c);                            \
+        const std::shared_ptr<n::Manager> &mgr = astmgr->get_##x##_manager(); \
+        core::sync::EndCaller<n::cls> call(c);                                \
 		std::vector<core::Id> ids;                                            \
 		f->read(ids);                                                         \
-		for (const core::Id id : ids) add_##x(mgr->get_gx3d(id, call));            \
+        for (const core::Id id : ids) add_##x(mgr->get_gx3d(id, call));       \
 	}
-//	GXHELPER(camera, Camera);
-//	GXHELPER(audio, Audio);
-//	GXHELPER(light, Light);
-//	GXHELPER(model, Model);
+
+    GXHELPER(camera, camera, Camera);
+    GXHELPER(audio, audio, Audio);
+    GXHELPER(light, light, Light);
+    GXHELPER(model, model, Model);
 	if (f->read_bool()) {
 		core::Id skybox_id = 0;
 		f->read(skybox_id);
 	}
-//	GXHELPER(constraint, Constraint);
+    GXHELPER(constraint, physics::constraint, Constraint);
+
 #undef GXHELPER
+
 	if (f->read_bool()) {
 		GXUNIMPLEMENTED;
 	}
@@ -92,15 +95,48 @@ bool gearoenix::render::scene::Scene::is_renderable() const {
 	return renderable;
 }
 
+void gearoenix::render::scene::Scene::add_camera(const std::shared_ptr<camera::Camera>& o)
+{
+    const core::Id oid = o->get_asset_id();
+#ifdef GX_DEBUG_MODE
+    if (cameras.find(oid) != cameras.end()) {
+        GXLOGE("Error overriding of a camera with same Id: " << oid);
+    }
+#endif
+    cameras[oid] = o;
+}
+
+void gearoenix::render::scene::Scene::add_audio(const std::shared_ptr<audio::Audio>& o)
+{
+    const core::Id oid = o->get_asset_id();
+#ifdef GX_DEBUG_MODE
+    if (audios.find(oid) != audios.end()) {
+        GXLOGE("Error overriding of a audio with same Id: " << oid);
+    }
+#endif
+    audios[oid] = o;
+}
+
+void gearoenix::render::scene::Scene::add_light(const std::shared_ptr<light::Light>& o)
+{
+    const core::Id oid = o->get_asset_id();
+#ifdef GX_DEBUG_MODE
+    if (lights.find(oid) != lights.end()) {
+        GXLOGE("Error overriding of a light with same Id: " << oid);
+    }
+#endif
+    lights[oid] = o;
+}
+
 void gearoenix::render::scene::Scene::add_model(const std::shared_ptr<model::Model>& m)
 {
-	const core::Id mid = m->get_asset_id();
+    const core::Id mid = m->get_asset_id();
 #ifdef GX_DEBUG_MODE
-	if (models.find(mid) != models.end()) {
-		GXLOGE("Error overriding of a model with same Id: " << mid);
-	}
+    if (models.find(mid) != models.end()) {
+        GXLOGE("Error overriding of a model with same Id: " << mid);
+    }
 #endif // GX_DEBUG_MODE
-	models[mid] = m;
+    models[mid] = m;
 }
 
 const std::shared_ptr<gearoenix::render::model::Model> &gearoenix::render::scene::Scene::get_model(const core::Id model_id) const {

@@ -8,8 +8,10 @@
 #include "../../physics/body/phs-bd-rigid.hpp"
 #include "../../physics/constraint/phs-cns-tracker-spring-joint-spring.hpp"
 #include "../../render/camera/rnd-cmr-camera.hpp"
+#include "../../render/camera/rnd-cmr-manager.hpp"
 #include "../../render/engine/rnd-eng-engine.hpp"
 #include "../../render/model/rnd-mdl-model.hpp"
+#include "../../render/scene/rnd-scn-manager.hpp"
 #include "../../render/scene/rnd-scn-scene.hpp"
 #include "../../system/sys-app.hpp"
 #include "../../system/sys-log.hpp"
@@ -17,6 +19,9 @@
 GameApp::GameApp(const std::shared_ptr<gearoenix::system::Application>& sys_app)
     : gearoenix::core::Application::Application(sys_app)
 {
+    sys_app->get_asset_manager()->get_scene_manager()->get_gx3d(1024, [](std::shared_ptr<gearoenix::render::scene::Scene>) {
+        GXLOGF("Reached");
+    });
     /*rndeng->load_scene(1, [this]() -> void {
         const auto& scene = rndeng->get_scene(1);
         cam = scene->get_current_camera();

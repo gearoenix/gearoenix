@@ -6,3 +6,8 @@ gearoenix::render::model::Manager::Manager(const std::shared_ptr<system::stream:
 {}
 
 gearoenix::render::model::Manager::~Manager() {}
+
+std::shared_ptr<gearoenix::render::model::Model> gearoenix::render::model::Manager::get_gx3d(const core::Id, core::sync::EndCaller<Model> &)
+{
+   GXUNIMPLEMENTED;
+}

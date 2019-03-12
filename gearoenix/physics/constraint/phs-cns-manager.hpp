@@ -27,7 +27,7 @@ namespace physics {
         public:
             Manager(const std::shared_ptr<system::stream::Stream>& s, const std::shared_ptr<render::engine::Engine>& e);
             ~Manager();
-            std::shared_ptr<Constraint> get(const core::Id mid, const core::sync::EndCaller<Constraint> &c);
+            std::shared_ptr<Constraint> get_gx3d(const core::Id mid, core::sync::EndCaller<Constraint> &c);
         };
     } // namespace constraint
 } // namespace physics

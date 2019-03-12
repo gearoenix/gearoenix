@@ -30,8 +30,10 @@ gearoenix::core::cache::File<T>::File(const std::shared_ptr<system::stream::Stre
 {
 	const Count c = file->read<Count>();
 	GXLOGD("Number of entries is " << c);
-	for (Count i = 0; i < c; ++i) {
-		offsets[file->read<Id>()] = file->read<Offset>();
+    for (Count i = 0; i < c; ++i) {
+        const Id id = file->read<Id>();
+        const Offset off = file->read<Offset>();
+        offsets[id] = off;
 	}
 }
 

@@ -25,7 +25,7 @@ namespace render {
         public:
             Manager(const std::shared_ptr<system::stream::Stream>& s, const std::shared_ptr<engine::Engine>& e);
             ~Manager();
-            std::shared_ptr<Model> get(core::Id mid, core::sync::EndCaller<Model> c);
+            std::shared_ptr<Model> get_gx3d(const core::Id mid, core::sync::EndCaller<Model> &c);
         };
     }
 }

@@ -1,11 +1,12 @@
 #include "cr-sync-work-waiter.hpp"
 #include "cr-sync-semaphore.hpp"
 #include "../cr-function-loader.hpp"
+#include "../../system/sys-log.hpp"
 
 void gearoenix::core::sync::WorkWaiter::wait_loop()
 {
 	while (running) {
-		semaphore->lock();
+        semaphore->lock();
         function_loader->unload();
 	}
 	running = true;
@@ -29,6 +30,6 @@ gearoenix::core::sync::WorkWaiter::~WorkWaiter()
 
 void gearoenix::core::sync::WorkWaiter::push(std::function<void()> f)
 {
-	function_loader->load(f);
-	semaphore->release();
+    function_loader->load(f);
+    semaphore->release();
 }

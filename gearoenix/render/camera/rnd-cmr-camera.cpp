@@ -50,6 +50,9 @@ gearoenix::render::camera::Camera::Camera(
     uniform.y_reserved.xyz((r * math::Vec4(uniform.y_reserved.xyz(), 0.0f)).xyz());
     uniform.z_reserved.xyz((r * math::Vec4(uniform.z_reserved.xyz(), 0.0f)).xyz());
     uniform.inversed_rotation = math::Quat(q.x, q.y, q.z, -q.w).to_mat();
+    GXLOGD("Position and far: " << uniform.position_far);
+    GXLOGD("Quaternion: " << q);
+    GXLOGD("Near aspect ratio: " << uniform.near_aspect_ratio_reserved);
     update_location();
 }
 

@@ -48,6 +48,52 @@ const std::shared_ptr<gearoenix::system::stream::Asset>& gearoenix::core::asset:
     return file;
 }
 
+const std::shared_ptr<gearoenix::render::camera::Manager>& gearoenix::core::asset::Manager::get_camera_manager() const
+{
+    return camera_manager;
+}
+
+const std::shared_ptr<gearoenix::audio::Manager>& gearoenix::core::asset::Manager::get_audio_manager() const
+{
+    return audio_manager;
+}
+
+const std::shared_ptr<gearoenix::render::light::Manager>& gearoenix::core::asset::Manager::get_light_manager() const
+{
+    return light_manager;
+}
+
+const std::shared_ptr<gearoenix::render::texture::Manager>& gearoenix::core::asset::Manager::get_texture_manager() const
+{
+    return texture_manager;
+}
+
+const std::shared_ptr<gearoenix::render::font::Manager>& gearoenix::core::asset::Manager::get_font_manager() const
+{
+    return font_manager;
+}
+
+const std::shared_ptr<gearoenix::render::mesh::Manager>& gearoenix::core::asset::Manager::get_mesh_manager() const
+{
+    return mesh_manager;
+}
+
+const std::shared_ptr<gearoenix::render::model::Manager>& gearoenix::core::asset::Manager::get_model_manager() const
+{
+    return model_manager;
+}
+
+const std::shared_ptr<gearoenix::render::skybox::Manager>& gearoenix::core::asset::Manager::get_skybox_manager() const
+{
+    return skybox_manager;
+}
+
+const std::shared_ptr<gearoenix::physics::constraint::Manager>& gearoenix::core::asset::Manager::get_constraint_manager() const
+{
+    return constraint_manager;
+}
+
+
 const std::shared_ptr<gearoenix::render::scene::Manager>& gearoenix::core::asset::Manager::get_scene_manager() const
 {
 	return scene_manager;

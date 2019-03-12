@@ -10,7 +10,7 @@ gearoenix::physics::constraint::Manager::Manager(
 
 gearoenix::physics::constraint::Manager::~Manager() {}
 
-std::shared_ptr<gearoenix::physics::constraint::Constraint> gearoenix::physics::constraint::Manager::get(const core::Id mid, const core::sync::EndCaller<Constraint> &c)
+std::shared_ptr<gearoenix::physics::constraint::Constraint> gearoenix::physics::constraint::Manager::get_gx3d(const core::Id, core::sync::EndCaller<Constraint> &)
 {
     GXUNIMPLEMENTED;
 	return nullptr;
