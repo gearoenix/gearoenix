@@ -2,6 +2,7 @@
 #define GEAROEMIX_MATH_VECTOR_HPP
 #include "../core/cr-types.hpp"
 #include <ostream>
+#include <memory>
 
 namespace gearoenix {
 namespace system {
@@ -44,7 +45,7 @@ namespace math {
         core::Real square_distance(const Vec2& a) const;
         Vec2 normalized() const;
         void normalize();
-        void read(system::stream::Stream* f);
+        void read(const std::shared_ptr<system::stream::Stream> &f);
         void print() const;
         static bool intersect(const Vec2& s11, const Vec2& s12, const Vec2& s21, const Vec2& s22, Vec2& i);
     };
@@ -89,7 +90,7 @@ namespace math {
         Vec3 cross(const Vec3& o) const;
         Vec3 normalized() const;
         void normalize();
-        void read(system::stream::Stream* f);
+        void read(const std::shared_ptr<system::stream::Stream> &f);
         void print() const;
     };
 
@@ -114,7 +115,7 @@ namespace math {
         Vec4 cross(const Vec4& o) const;
         Vec4 normalized() const;
         void normalize();
-        void read(system::stream::Stream* f);
+        void read(const std::shared_ptr<system::stream::Stream> &f);
         const core::Real* data() const;
 
         friend std::ostream& operator << (std::ostream &os, const Vec4 &v)

@@ -32,6 +32,7 @@ namespace render {
         protected:
             const std::shared_ptr<engine::Engine> e;
 
+			bool is_dynamic = true;
             bool has_shadow_caster = false;
             bool has_transparent = false;
 
@@ -44,26 +45,18 @@ namespace render {
             std::map<core::Id, std::shared_ptr<Model>> children;
             std::shared_ptr<physics::collider::Collider> collider = nullptr;
 
-			void read_gx3d(
-			    const std::shared_ptr<system::stream::Stream>& f,
-			    const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
-
         public:
 			Model(
 				const core::Id my_id,
+				const std::shared_ptr<system::stream::Stream>& f,
 				const std::shared_ptr<engine::Engine>& e,
-				const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
+				const core::sync::EndCaller<core::sync::EndCallerIgnore>& c,
+				const bool is_dynamic = true);
 			/// It will create an automatic Id for itself
 			Model(
 				const std::shared_ptr<engine::Engine>& e,
 				const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
             virtual ~Model();
-            
-			static Model *read_gx3d(
-				const core::Id my_id,
-				const std::shared_ptr<engine::Engine>& e,
-                const std::shared_ptr<system::stream::Stream>& f,
-                const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
 
             const std::map<core::Id, std::shared_ptr<Model>>& get_children() const;
             const std::map<core::Id, std::shared_ptr<Mesh>>& get_meshes() const;

@@ -16,6 +16,12 @@
 #include <iostream>
 #include "rnd-mdl-mesh.hpp"
 
+gearoenix::render::model::Mesh::Mesh(const std::shared_ptr<system::stream::Stream>& f, const std::shared_ptr<engine::Engine>& e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c)
+	: msh(e->get_system_application()->get_asset_manager()->get_gx3d(f->read<core::Id>(), [](std::shared_ptr<mesh::Mesh>) {}))
+	, mat(new material::Material(f, e))
+{
+}
+
 const std::shared_ptr<gearoenix::render::mesh::Mesh>& gearoenix::render::model::Mesh::get_mesh() const
 {
 	return msh;
@@ -24,9 +30,4 @@ const std::shared_ptr<gearoenix::render::mesh::Mesh>& gearoenix::render::model::
 const std::shared_ptr<gearoenix::render::material::Material>& gearoenix::render::model::Mesh::get_material() const
 {
 	return mat;
-}
-
-gearoenix::core::Real gearoenix::render::model::Mesh::get_radius() const
-{
-	return radius;
 }

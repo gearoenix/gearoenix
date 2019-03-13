@@ -1,5 +1,5 @@
-#ifndef GEAROENIX_AUDIO_AUDIO_HPP
-#define GEAROENIX_AUDIO_AUDIO_HPP
+#ifndef GEAROENIX_AUDIO_TYPE_HPP
+#define GEAROENIX_AUDIO_TYPE_HPP
 #include "../core/cr-types.hpp"
 
 namespace gearoenix {

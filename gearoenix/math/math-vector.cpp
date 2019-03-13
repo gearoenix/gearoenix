@@ -180,7 +180,7 @@ void gearoenix::math::Vec2::normalize()
     vec[1] *= l;
 }
 
-void gearoenix::math::Vec2::read(system::stream::Stream* f)
+void gearoenix::math::Vec2::read(const std::shared_ptr<system::stream::Stream> &f)
 {
     f->read(vec[0]);
     f->read(vec[1]);
@@ -461,7 +461,7 @@ void gearoenix::math::Vec3::normalize()
     vec[2] *= l;
 }
 
-void gearoenix::math::Vec3::read(system::stream::Stream* f)
+void gearoenix::math::Vec3::read(const std::shared_ptr<system::stream::Stream> &f)
 {
     f->read(vec[0]);
     f->read(vec[1]);
@@ -582,7 +582,7 @@ gearoenix::math::Vec4 gearoenix::math::Vec4::normalized() const
     return r;
 }
 
-void gearoenix::math::Vec4::read(system::stream::Stream* f)
+void gearoenix::math::Vec4::read(const std::shared_ptr<system::stream::Stream> &f)
 {
     f->read(vec[0]);
     f->read(vec[1]);

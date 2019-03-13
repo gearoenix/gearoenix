@@ -118,7 +118,8 @@ void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::record(
         std::shared_ptr<pipeline::ForwardPbrDirectionalShadowResourceSet>& prs = std::get<1>(pool);
         ForwardPbrDirectionalShadowUniform us;
         us.mvp = c->get_view_projection_matrix() * m->get_model_matrix();
-        us.light_view_projection_biases = l->get_view_projection_biases();
+		GXTODO;
+        //us.light_view_projection_biases = l->get_view_projection_biases();
         us.light_color = math::Vec4(l->get_color(), 1.0);
         ub->update(&us);
         prs->set_scene(s);

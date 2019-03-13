@@ -10,15 +10,15 @@ gearoenix::physics::collider::Collider::Collider(Type t)
 
 gearoenix::physics::collider::Collider::~Collider() {}
 
-gearoenix::physics::collider::Collider* gearoenix::physics::collider::Collider::read(system::stream::Stream* in)
+gearoenix::physics::collider::Collider* gearoenix::physics::collider::Collider::read(const std::shared_ptr<system::stream::Stream> &f)
 {
     core::Id collider_type_id;
-    in->read(collider_type_id);
+    f->read(collider_type_id);
     switch (collider_type_id) {
     case Type::GHOST:
         return nullptr;
     case Type::MESH:
-        return new Mesh(in);
+        return new Mesh(f);
     default:
         GXUNEXPECTED;
     }

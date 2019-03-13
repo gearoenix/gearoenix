@@ -18,7 +18,7 @@ namespace render {
         protected:
 			bool enabled = true;
 			bool has_shadow = false;
-			math::Vec3 color = math::Vec3(0.7f, 0.7f, 0.7f);
+			math::Vec4 color_strength = math::Vec4(1.0f, 1.0f, 1.0f, 0.7f);
 
             Light(
                 const core::Id my_id,
@@ -27,17 +27,14 @@ namespace render {
 
         public:
             virtual ~Light();
-            
-			static Light* read(
-                const core::Id my_id,
-                const std::shared_ptr<system::stream::Stream>& f,
-                const std::shared_ptr<engine::Engine>& e);
 
-            const math::Vec3& get_color() const;
+			const math::Vec3& get_color() const;
+			const math::Vec4& get_color_strength() const;
+			const core::Real strength() const;
 
 			bool is_shadower() const;
-			void enable_shadowing() const;
-			void disable_shadowing() const;
+			void enable_shadowing();
+			void disable_shadowing();
 
 			bool is_enabled() const;
 			void enable();

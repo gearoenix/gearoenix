@@ -12,24 +12,52 @@
 #include "../engine/rnd-eng-engine.hpp"
 #include "../light/rnd-lt-sun.hpp"
 #include "../material/rnd-mat-material.hpp"
+#include "../mesh/rnd-msh-manager.hpp"
 #include "../mesh/rnd-msh-mesh.hpp"
 #include "../pipeline/rnd-pip-manager.hpp"
 #include "../pipeline/rnd-pip-resource.hpp"
 #include "../scene/rnd-scn-scene.hpp"
 #include "../widget/rnd-wdg-widget.hpp"
+#include "rnd-mdl-manager.hpp"
 #include "rnd-mdl-mesh.hpp"
 #include <iostream>
 
 gearoenix::render::model::Model::Model(
 	const core::Id my_id,
+	const std::shared_ptr<system::stream::Stream>& f,
 	const std::shared_ptr<engine::Engine>& e,
-	const core::sync::EndCaller<core::sync::EndCallerIgnore>& c)
+	const core::sync::EndCaller<core::sync::EndCallerIgnore>& c,
+	const bool is_dynamic)
 	: core::asset::Asset(my_id, core::asset::Type::MODEL)
 	, e(e)
 	, pipeline_resource(e->get_pipeline_manager()->create_resource({}))
 {
 	for (unsigned int i = 0; i < GX_FRAMES_COUNT; ++i) {
 		uniform_buffers[i] = std::shared_ptr<buffer::Uniform>(e->get_buffer_manager()->create_uniform(sizeof(Uniform)));
+	}
+	uniform.m.read(f);
+	f->read(uniform.radius);
+	const core::Count meshes_count = f->read<core::Count>();
+	const std::shared_ptr<core::asset::Manager> &astmgr = e->get_system_application()->get_asset_manager();
+	if (meshes.size() > 0)
+	{
+		const core::sync::EndCaller<mesh::Mesh> call([](const std::shared_ptr<mesh::Mesh>) {});
+		const std::shared_ptr<mesh::Manager> &mshmgr = astmgr->get_mesh_manager();
+		for (core::Count i; i < meshes_count; ++i)
+		{
+			add_mesh(new Mesh(f, e));
+		}
+	}
+	std::vector<core::Id> children_ids;
+	if (children_ids.size() > 0)
+	{
+		const core::sync::EndCaller<Model> call([](const std::shared_ptr<Model>) {});
+		const std::shared_ptr<Manager> &mdlmgr = astmgr->get_model_manager();
+		f->read(children_ids);
+		for (const core::Id mdlid : children_ids)
+		{
+			add_child(mdlmgr->get_gx3d(mdlid, call));
+		}
 	}
 }
 
