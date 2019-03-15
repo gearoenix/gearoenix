@@ -5,7 +5,6 @@
 #include <vector>
 namespace gearoenix {
 namespace core {
-
     class FunctionLoader {
     private:
         std::mutex locker;
@@ -18,8 +17,6 @@ namespace core {
         void unload();
         unsigned int get_loadeds_count() const;
     };
-
-} // namespace core
-} // namespace gearoenix
-
-#endif // CRFUNCTIONLOADER_HPP
+}
+}
+#endif

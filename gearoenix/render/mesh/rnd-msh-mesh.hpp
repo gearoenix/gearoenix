@@ -16,7 +16,7 @@ namespace render {
         class Engine;
     }
     namespace buffer {
-        class Mesh;
+        class Buffer;
     }
     namespace material {
         class Material;
@@ -33,24 +33,24 @@ namespace render {
     namespace mesh {
         class Mesh : public core::asset::Asset {
         protected:
-            std::shared_ptr<buffer::Mesh> buf;
-            const Type::Id t;
-            Mesh(
-                const Type::Id t,
-                const core::Id my_id,
-                const std::shared_ptr<system::stream::Stream>& f,
-                const std::shared_ptr<engine::Engine>& e,
-                const core::sync::EndCaller<core::sync::EndCallerIgnore> c);
+            const Type::Id mesh_type_id;
+
+			core::Real radius = 0.0f;
+			std::shared_ptr<buffer::Buffer> vertex_buffer = nullptr;
+			std::shared_ptr<buffer::Buffer> index_buffer = nullptr;
+
+			Mesh(const core::Id my_id, const Type::Id mesh_type_id);
 
         public:
-            static Mesh* read(
+            Mesh(
                 const core::Id my_id,
                 const std::shared_ptr<system::stream::Stream>& f,
                 const std::shared_ptr<engine::Engine>& e,
-                const core::sync::EndCaller<core::sync::EndCallerIgnore> c);
+                const core::sync::EndCaller<core::sync::EndCallerIgnore> &c);
             ~Mesh();
-            void bind();
             void draw();
+			core::Real get_radius() const;
+			Type::Id get_mesh_type_id() const;
         };
     }
 }

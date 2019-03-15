@@ -1,4 +1,4 @@
-#include "gles2-buf-mesh.hpp"
+#include "gles2-buf-index.hpp"
 #ifdef GX_USE_OPENGL_ES2
 #include "../../system/stream/sys-stm-stream.hpp"
 #include "../../system/sys-log.hpp"

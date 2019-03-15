@@ -14,9 +14,19 @@ gearoenix::gles2::buffer::Manager::~Manager()
 {
 }
 
-gearoenix::render::buffer::Uniform * gearoenix::gles2::buffer::Manager::create_uniform(const unsigned int size)
+std::shared_ptr<gearoenix::render::buffer::Uniform> gearoenix::gles2::buffer::Manager::create_uniform(const unsigned int size, const core::sync::EndCaller<core::sync::EndCallerIgnore>& )
 {
-	return new Uniform(size, std::static_pointer_cast<engine::Engine>(e));
+	return std::shared_ptr<render::buffer::Uniform>(new Uniform(size, std::static_pointer_cast<engine::Engine>(e)));
+}
+
+std::shared_ptr<gearoenix::render::buffer::Static> gearoenix::gles2::buffer::Manager::create_static(const std::vector<math::BasicVertex> vertices, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c)
+{
+
+}
+
+std::shared_ptr<gearoenix::render::buffer::Static> gearoenix::gles2::buffer::Manager::create_static(const std::vector<std::uint32_t> indices, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c)
+{
+
 }
 
 #endif

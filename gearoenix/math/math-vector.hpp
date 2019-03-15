@@ -48,6 +48,12 @@ namespace math {
         void read(const std::shared_ptr<system::stream::Stream> &f);
         void print() const;
         static bool intersect(const Vec2& s11, const Vec2& s12, const Vec2& s21, const Vec2& s22, Vec2& i);
+
+		friend std::ostream& operator << (std::ostream &os, const Vec2 &v)
+		{
+			os << "Vec2 {" << v[0] << ", " << v[1] << "}";
+			return os;
+		}
     };
 
     struct Vec3 {
@@ -92,6 +98,12 @@ namespace math {
         void normalize();
         void read(const std::shared_ptr<system::stream::Stream> &f);
         void print() const;
+
+		friend std::ostream& operator << (std::ostream &os, const Vec3 &v)
+		{
+			os << "Vec3 {" << v[0] << ", " << v[1] << ", " << v[2] << "}";
+			return os;
+		}
     };
 
     struct Vec4 {

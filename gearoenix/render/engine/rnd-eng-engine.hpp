@@ -13,6 +13,7 @@
 #include <vector>
 namespace gearoenix {
 namespace core {
+	class FunctionLoader;
     namespace event {
         class Event;
     }
@@ -66,6 +67,7 @@ namespace render {
             unsigned int frame_number = 0;
             const Type::Id engine_type_id;
             const std::shared_ptr<system::Application> sysapp;
+			const std::shared_ptr<core::FunctionLoader> fun_loader;
             /// managers pointers are own only by this class
             std::shared_ptr<pipeline::Manager> pipeline_manager = nullptr;
             std::shared_ptr<command::Manager> command_manager = nullptr;
@@ -81,13 +83,13 @@ namespace render {
             virtual void terminate() = 0;
             virtual sync::Semaphore* create_semaphore() = 0;
             virtual void submit(const std::vector<std::shared_ptr<sync::Semaphore>>& p, const std::shared_ptr<command::Buffer>& c, const std::shared_ptr<sync::Semaphore>& n) = 0;
-            // getters
+            
             const std::shared_ptr<pipeline::Manager> &get_pipeline_manager() const;
             const std::shared_ptr<command::Manager> &get_command_manager() const;
             const std::shared_ptr<system::Application> &get_system_application() const;
             const std::shared_ptr<physics::Engine> &get_physics_engine() const;
-            const std::shared_ptr<buffer::Manager> &get_buffer_manager() const;
-            // end of getters
+			const std::shared_ptr<buffer::Manager> &get_buffer_manager() const;
+			const std::shared_ptr<core::FunctionLoader> &get_function_loader() const;
             Type::Id get_engine_type_id() const;
             unsigned int get_frame_number() const;
         };

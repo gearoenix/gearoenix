@@ -1,4 +1,5 @@
 #include "rnd-eng-engine.hpp"
+#include "../../core/cr-function-loader.hpp"
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../core/event/cr-ev-event.hpp"
 #include "../../core/event/cr-ev-sys-system.hpp"
@@ -16,6 +17,7 @@
 gearoenix::render::engine::Engine::Engine(const std::shared_ptr<system::Application>& system_application, const Type::Id engine_type_id)
     : engine_type_id(engine_type_id)
     , sysapp(system_application)
+	, fun_loader(new core::FunctionLoader())
 {
     //physics_engine = new physics::Engine(this);
 }
@@ -118,6 +120,11 @@ const std::shared_ptr<gearoenix::render::command::Manager> &gearoenix::render::e
 const std::shared_ptr<gearoenix::render::buffer::Manager>& gearoenix::render::engine::Engine::get_buffer_manager() const
 {
 	return buffer_manager;
+}
+
+const std::shared_ptr<gearoenix::core::FunctionLoader>& gearoenix::render::engine::Engine::get_function_loader() const
+{
+	return fun_loader;
 }
 
 gearoenix::render::engine::Type::Id gearoenix::render::engine::Engine::get_engine_type_id() const
