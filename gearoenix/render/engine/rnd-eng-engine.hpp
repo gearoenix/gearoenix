@@ -3,6 +3,8 @@
 #include "../../core/cr-build-configuration.hpp"
 #include "../../core/cr-types.hpp"
 #include "../../core/sync/cr-sync-end-caller.hpp"
+#include "../texture/rnd-txt-format.hpp"
+#include "../texture/rnd-txt-sample.hpp"
 #include "rnd-eng-type.hpp"
 #include <chrono>
 #include <functional>
@@ -73,7 +75,6 @@ namespace render {
             std::shared_ptr<command::Manager> command_manager = nullptr;
             std::shared_ptr<sampler::Manager> sampler_manager = nullptr;
             std::shared_ptr<buffer::Manager> buffer_manager = nullptr;
-            // end of managers
             physics::Engine* physics_engine = nullptr;
             Engine(const std::shared_ptr<system::Application>& system_application, const Type::Id engine_type_id);
 
@@ -82,6 +83,15 @@ namespace render {
             virtual void update();
             virtual void terminate() = 0;
             virtual sync::Semaphore* create_semaphore() = 0;
+			/// Caller of this function must maintain the pointer to data untill call of EndCaller.
+			virtual texture::Texture2D* create_texture_2d(
+				const core::Id id,
+				const void *data,
+				const texture::Format::Id f,
+				const texture::Sample::Id s,
+				const unsigned int width,
+				const unsigned int heigt,
+				const core::sync::EndCaller<core::sync::EndCallerIgnore> &call) = 0;
             virtual void submit(const std::vector<std::shared_ptr<sync::Semaphore>>& p, const std::shared_ptr<command::Buffer>& c, const std::shared_ptr<sync::Semaphore>& n) = 0;
             
             const std::shared_ptr<pipeline::Manager> &get_pipeline_manager() const;

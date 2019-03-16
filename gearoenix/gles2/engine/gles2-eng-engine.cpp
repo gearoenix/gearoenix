@@ -160,6 +160,18 @@ gearoenix::render::sync::Semaphore * gearoenix::gles2::engine::Engine::create_se
 	return nullptr;
 }
 
+gearoenix::render::texture::Texture2D * gearoenix::gles2::engine::Engine::create_texture_2d(
+	const core::Id id, 
+	const void * data, 
+	const render::texture::Format::Id f, 
+	const render::texture::Sample::Id s, 
+	const unsigned int width, 
+	const unsigned int heigt, 
+	const core::sync::EndCaller<core::sync::EndCallerIgnore>& call)
+{
+	GXUNIMPLEMENTED;
+}
+
 void gearoenix::gles2::engine::Engine::submit(const std::vector<std::shared_ptr<render::sync::Semaphore>>& p, const std::shared_ptr<render::command::Buffer>& c, const std::shared_ptr<render::sync::Semaphore>& n)
 {
 	GXUNIMPLEMENTED;

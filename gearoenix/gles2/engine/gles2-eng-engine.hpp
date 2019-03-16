@@ -46,6 +46,14 @@ namespace gles2 {
 			void update() override final;
 			void terminate() override final;
 			render::sync::Semaphore* create_semaphore() override final;
+			render::texture::Texture2D* create_texture_2d(
+				const core::Id id,
+				const void *data,
+				const render::texture::Format::Id f,
+				const render::texture::Sample::Id s,
+				const unsigned int width,
+				const unsigned int heigt,
+				const core::sync::EndCaller<core::sync::EndCallerIgnore> &call) override final;
 			void submit(
 				const std::vector<std::shared_ptr<render::sync::Semaphore>>& p, 
 				const std::shared_ptr<render::command::Buffer>& c, 

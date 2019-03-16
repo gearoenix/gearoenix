@@ -62,5 +62,4 @@ std::shared_ptr<C> gearoenix::core::cache::Cacher<T, Key, Compare>::get(const Ke
 		return nullptr;
 	}
 }
-
 #endif

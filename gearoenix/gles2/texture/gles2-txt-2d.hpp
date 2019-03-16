@@ -18,9 +18,13 @@ namespace gles2 {
         public:
             Texture2D(
                 const core::Id my_id,
-                const std::shared_ptr<system::stream::Stream>& file,
                 const std::shared_ptr<engine::Engine>& e,
-                const core::sync::EndCaller<core::sync::EndCallerIgnore> end);
+				const void * data,
+				const render::texture::Format::Id f,
+				const render::texture::Sample::Id s,
+				const unsigned int width,
+				const unsigned int heigt,
+				const core::sync::EndCaller<core::sync::EndCallerIgnore>& call);
             Texture2D(const core::Id my_id, const GLuint txtobj, const std::shared_ptr<engine::Engine>& e);
             ~Texture2D();
             void bind(const GLenum texture_unit);

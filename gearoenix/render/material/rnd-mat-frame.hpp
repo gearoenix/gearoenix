@@ -15,7 +15,7 @@ namespace render {
             std::shared_ptr<buffer::Uniform> uniform_buffer = nullptr;
             std::shared_ptr<pipeline::Resource> pipeline_resouce = nullptr;
         };
-    } // namespace material
-} // namespace render
-} // namespace gearoenix
+    }
+}
+}
 #endif

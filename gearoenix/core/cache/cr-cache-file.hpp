@@ -19,6 +19,8 @@ namespace gearoenix {
 				template <class C> std::shared_ptr<C> get(const Id id, std::function<std::shared_ptr<C>()> new_fun);
 				template <class C> std::shared_ptr<C> get(const Id id) const;
 				const std::shared_ptr<system::stream::Stream> &get_file() const;
+				const Cacher<T> &get_cacher() const;
+				Cacher<T> &get_cacher();
 			};
 		}
 	}
@@ -58,14 +60,26 @@ std::shared_ptr<C> gearoenix::core::cache::File<T>::get(const Id id, std::functi
 
 template <class T>
 template <class C>
-std::shared_ptr<C> gearoenix::core::cache::File<T>::get(const Id id) const
+inline std::shared_ptr<C> gearoenix::core::cache::File<T>::get(const Id id) const
 {
 	return cacher.get<C>(id);
 }
 
 template <class T>
-const std::shared_ptr<gearoenix::system::stream::Stream> &gearoenix::core::cache::File<T>::get_file() const
+inline const std::shared_ptr<gearoenix::system::stream::Stream> &gearoenix::core::cache::File<T>::get_file() const
 {
 	return file;
+}
+
+template<class T>
+inline const gearoenix::core::cache::Cacher<T>& gearoenix::core::cache::File<T>::get_cacher() const
+{
+	return cacher;
+}
+
+template<class T>
+inline gearoenix::core::cache::Cacher<T>& gearoenix::core::cache::File<T>::get_cacher()
+{
+	return cacher;
 }
 #endif
