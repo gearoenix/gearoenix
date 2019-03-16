@@ -87,8 +87,8 @@ namespace render {
 			virtual texture::Texture2D* create_texture_2d(
 				const core::Id id,
 				const void *data,
-				const texture::Format::Id f,
-				const texture::Sample::Id s,
+				const texture::TextureFormat::Id f,
+				const texture::SampleInfo s,
 				const unsigned int width,
 				const unsigned int heigt,
 				const core::sync::EndCaller<core::sync::EndCallerIgnore> &call) = 0;

@@ -5,57 +5,35 @@
 #include "../../system/sys-log.hpp"
 #include "../engine/gles2-eng-engine.hpp"
 #include "../../core/cr-function-loader.hpp"
+#include "gles2-txt-sample.hpp"
 
 gearoenix::gles2::texture::Texture2D::Texture2D(
 	const core::Id my_id,
 	const std::shared_ptr<engine::Engine>& e,
 	const void * data,
-	const render::texture::Format::Id f,
-	const render::texture::Sample::Id s,
+	const render::texture::TextureFormat::Id f,
+	const render::texture::SampleInfo s,
 	const unsigned int img_width,
 	const unsigned int img_heigt,
 	const core::sync::EndCaller<core::sync::EndCallerIgnore>& call)
     : render::texture::Texture2D(my_id, e)
 {
-	GLfloat min_filter;
-	GLfloat mag_filter;
-	switch (s)
+#ifdef GX_DEBUG_GLES2
+	if (render::texture::TextureFormat::RGBA_UINT8 != f)
 	{
-	case render::texture::Sample::NEAREST:
-		min_filter = GL_NEAREST;
-		mag_filter = GL_NEAREST;
-		break;
-	case render::texture::Sample::LINEAR:
-		min_filter = GL_LINEAR_MIPMAP_LINEAR;
-		mag_filter = GL_LINEAR;
-		break;
-	default:
-		GXUNEXPECTED;
-		break;
+		GXLOGF("Only RGBA_UINT8 format is supported in gles2, in texture: " << my_id);
 	}
-	GLint internal_format;
-	GLenum format;
-	GLenum pixel_type;
-	switch (f)
-	{
-	case render::texture::Format::RGBA_UINT8:
-		internal_format = GL_RGBA;
-		format = GL_RGBA;
-		pixel_type = GL_UNSIGNED_BYTE;
-		break;
-	default:
-		GXUNEXPECTED;
-		break;
-	}
-	e->get_function_loader()->load([this, data, f, s, img_width, img_heigt, min_filter, mag_filter, internal_format, format, pixel_type, call]
+#endif
+	const SampleInfo sample_info = SampleInfo(s);
+	e->get_function_loader()->load([this, data, f, s, img_width, img_heigt, sample_info, call]
 	{
         glGenTextures(1, &texture_object);
         glBindTexture(GL_TEXTURE_2D, texture_object);
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, min_filter);
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mag_filter);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexImage2D(GL_TEXTURE_2D, 0, internal_format, img_width, img_heigt, 0, format, pixel_type, data);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, sample_info.min_filter);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, sample_info.mag_filter);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, sample_info.wrap_s);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, sample_info.wrap_t);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img_width, img_heigt, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
     });
 }

@@ -4,7 +4,7 @@
 namespace gearoenix {
 namespace render {
     namespace texture {
-        class Format {
+        class TextureFormat {
         public:
 			typedef enum : core::TypeId 
 			{

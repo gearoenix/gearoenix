@@ -163,8 +163,8 @@ gearoenix::render::sync::Semaphore * gearoenix::gles2::engine::Engine::create_se
 gearoenix::render::texture::Texture2D * gearoenix::gles2::engine::Engine::create_texture_2d(
 	const core::Id id, 
 	const void * data, 
-	const render::texture::Format::Id f, 
-	const render::texture::Sample::Id s, 
+	const render::texture::TextureFormat::Id f, 
+	const render::texture::SampleInfo s, 
 	const unsigned int width, 
 	const unsigned int heigt, 
 	const core::sync::EndCaller<core::sync::EndCallerIgnore>& call)

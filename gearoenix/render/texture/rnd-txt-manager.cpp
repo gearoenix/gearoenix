@@ -22,9 +22,15 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
 		cc[1] = static_cast<std::uint8_t>(color[1] * 255.001f);
 		cc[2] = static_cast<std::uint8_t>(color[2] * 255.001f);
 		cc[3] = static_cast<std::uint8_t>(color[3] * 255.001f);
+		SampleInfo sample_info;
+		sample_info.mag_filter = Filter::NEAREST;
+		sample_info.min_filter = Filter::NEAREST;
+		sample_info.wrap_s = Wrap::REPEAT;
+		sample_info.wrap_t = Wrap::REPEAT;
+		sample_info.wrap_r = Wrap::REPEAT;
 		const std::shared_ptr<Texture2D> t(e->create_texture_2d(
-			*id_ptr, static_cast<void *>(cc), 
-			Format::RGBA_UINT8, Sample::NEAREST, 1, 1, 
+			*id_ptr, static_cast<const void *>(cc), 
+			TextureFormat::RGBA_UINT8, sample_info, 1, 1, 
 			core::sync::EndCaller<core::sync::EndCallerIgnore>(c)));
 		color_id[color] = *id_ptr;
 		return t;

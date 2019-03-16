@@ -1,17 +1,16 @@
 #ifndef GEAROEMIX_RENDER_TEXTURE_SAMPLE_HPP
 #define GEAROEMIX_RENDER_TEXTURE_SAMPLE_HPP
-#include "../../core/cr-types.hpp"
+#include "rnd-txt-filter.hpp"
+#include "rnd-txt-wrap.hpp"
 namespace gearoenix {
 namespace render {
     namespace texture {
-        class Sample {
-        public:
-			typedef enum : core::TypeId 
-			{
-				CUBIC = 1,
-				LINEAR = 2,
-				NEAREST = 3,
-			} Id;
+        struct SampleInfo {
+			Filter::Id min_filter = Filter::LINEAR;
+			Filter::Id mag_filter = Filter::LINEAR;
+			Wrap::Id wrap_s = Wrap::REPEAT;
+			Wrap::Id wrap_t = Wrap::REPEAT;
+			Wrap::Id wrap_r = Wrap::REPEAT;
         };
     }
 }

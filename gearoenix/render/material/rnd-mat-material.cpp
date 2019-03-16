@@ -9,5 +9,5 @@ gearoenix::render::material::Material::Material(const std::shared_ptr<engine::En
 	: e(e)
 {
 	const std::shared_ptr<texture::Manager> &txtmgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
-	color = txtmgr->
+	GXUNIMPLEMENTED;
 }

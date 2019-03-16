@@ -49,8 +49,8 @@ namespace gles2 {
 			render::texture::Texture2D* create_texture_2d(
 				const core::Id id,
 				const void *data,
-				const render::texture::Format::Id f,
-				const render::texture::Sample::Id s,
+				const render::texture::TextureFormat::Id f,
+				const render::texture::SampleInfo s,
 				const unsigned int width,
 				const unsigned int heigt,
 				const core::sync::EndCaller<core::sync::EndCallerIgnore> &call) override final;
