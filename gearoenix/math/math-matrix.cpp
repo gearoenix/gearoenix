@@ -201,46 +201,133 @@ gearoenix::core::Real& gearoenix::math::Mat4x4::operator[](const unsigned int i)
     return mat[i];
 }
 
-void gearoenix::math::Mat4x4::scale3x3(const core::Real& s)
+void gearoenix::math::Mat4x4::local_scale(const core::Real& s)
 {
     mat[0] *= s;
     mat[1] *= s;
-    mat[2] *= s;
+	mat[2] *= s;
+	mat[3] *= s;
     mat[4] *= s;
     mat[5] *= s;
-    mat[6] *= s;
+	mat[6] *= s;
+	mat[7] *= s;
     mat[8] *= s;
     mat[9] *= s;
-    mat[10] *= s;
+	mat[10] *= s;
+	mat[11] *= s;
 }
 
-void gearoenix::math::Mat4x4::scale3x3(const core::Real& a, const core::Real& b, const core::Real& c)
+void gearoenix::math::Mat4x4::local_scale(const core::Real & a, const core::Real & b, const core::Real & c)
+{
+	mat[0] *= a;
+	mat[1] *= a;
+	mat[2] *= a;
+	mat[3] *= a;
+	mat[4] *= b;
+	mat[5] *= b;
+	mat[6] *= b;
+	mat[7] *= b;
+	mat[8] *= c;
+	mat[9] *= c;
+	mat[10] *= c;
+	mat[11] *= c;
+}
+
+void gearoenix::math::Mat4x4::local_scale(const core::Real& a, const core::Real& b, const core::Real& c, const core::Real& d)
 {
     mat[0] *= a;
     mat[1] *= a;
-    mat[2] *= a;
+	mat[2] *= a;
+	mat[3] *= a;
     mat[4] *= b;
     mat[5] *= b;
-    mat[6] *= b;
+	mat[6] *= b;
+	mat[7] *= b;
     mat[8] *= c;
     mat[9] *= c;
-    mat[10] *= c;
+	mat[10] *= c;
+	mat[11] *= c;
+	mat[12] *= d;
+	mat[13] *= d;
+	mat[14] *= d;
+	mat[15] *= d;
 }
 
-void gearoenix::math::Mat4x4::scale4x3(const core::Real& s)
+void gearoenix::math::Mat4x4::local_scale(const Vec3 & s)
 {
-    mat[0] *= s;
-    mat[1] *= s;
-    mat[2] *= s;
-    mat[4] *= s;
-    mat[5] *= s;
-    mat[6] *= s;
-    mat[8] *= s;
-    mat[9] *= s;
-    mat[10] *= s;
-    mat[12] *= s;
-    mat[13] *= s;
-    mat[14] *= s;
+	local_scale(s[0], s[1], s[2]);
+}
+
+void gearoenix::math::Mat4x4::local_scale(const Vec4 & s)
+{
+	local_scale(s[0], s[1], s[2], s[3]);
+}
+
+void gearoenix::math::Mat4x4::global_scale(const core::Real & s)
+{
+	mat[0] *= s;
+	mat[1] *= s;
+	mat[2] *= s;
+	mat[4] *= s;
+	mat[5] *= s;
+	mat[6] *= s;
+	mat[8] *= s;
+	mat[9] *= s;
+	mat[10] *= s;
+	mat[12] *= s;
+	mat[13] *= s;
+	mat[14] *= s;
+}
+
+void gearoenix::math::Mat4x4::global_scale(const core::Real & a, const core::Real & b, const core::Real & c)
+{
+	mat[0] *= a;
+	mat[4] *= a;
+	mat[8] *= a;
+	mat[12] *= a;
+
+	mat[1] *= b;
+	mat[5] *= b;
+	mat[9] *= b;
+	mat[13] *= b;
+
+	mat[2] *= c;
+	mat[6] *= c;
+	mat[10] *= c;
+	mat[14] *= c;
+}
+
+void gearoenix::math::Mat4x4::global_scale(const core::Real & a, const core::Real & b, const core::Real & c, const core::Real & d)
+{
+	mat[0] *= a;
+	mat[4] *= a;
+	mat[8] *= a;
+	mat[12] *= a;
+
+	mat[1] *= b;
+	mat[5] *= b;
+	mat[9] *= b;
+	mat[13] *= b;
+
+	mat[2] *= c;
+	mat[6] *= c;
+	mat[10] *= c;
+	mat[14] *= c;
+
+	mat[3] *= d;
+	mat[7] *= d;
+	mat[11] *= d;
+	mat[15] *= d;
+}
+
+void gearoenix::math::Mat4x4::global_scale(const Vec3 & s)
+{
+	global_scale(s[0], s[1], s[2]);
+}
+
+void gearoenix::math::Mat4x4::global_scale(const Vec4 & s)
+{
+	global_scale(s[0], s[1], s[2], s[4]);
 }
 
 void gearoenix::math::Mat4x4::translate(const Vec3& v)

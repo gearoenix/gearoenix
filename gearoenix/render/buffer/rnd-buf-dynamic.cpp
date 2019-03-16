@@ -1,10 +1,8 @@
-#include "rnd-buf-mesh.hpp"
+#include "rnd-buf-dynamic.hpp"
 
-gearoenix::render::buffer::Mesh::Mesh(const std::shared_ptr<engine::Engine>& e)
-    : e(e)
+gearoenix::render::buffer::Dynamic::Dynamic(const unsigned int s, const std::shared_ptr<engine::Engine>& e) : Buffer(s, e) {}
+
+gearoenix::render::buffer::Dynamic::~Dynamic()
 {
 }
 
-gearoenix::render::buffer::Mesh::~Mesh()
-{
-}

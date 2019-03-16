@@ -6,7 +6,6 @@
 #include "../../core/sync/cr-sync-end-caller.hpp"
 #include "../../math/math-matrix.hpp"
 #include "../../math/math-vector.hpp"
-#include "../../physics/phs-transformable.hpp"
 #include "rnd-mdl-uniform.hpp"
 #include <map>
 #include <memory>
@@ -28,7 +27,7 @@ namespace render {
     }
     namespace model {
 		class Mesh;
-        class Model : public core::asset::Asset, public physics::Transferable {
+        class Model : public core::asset::Asset {
         protected:
             const std::shared_ptr<engine::Engine> e;
 
@@ -57,6 +56,8 @@ namespace render {
 				const std::shared_ptr<engine::Engine>& e,
 				const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
             virtual ~Model();
+			void add_mesh(const std::shared_ptr<Mesh> &m);
+			void add_child(const std::shared_ptr<Model> &c);
 
             const std::map<core::Id, std::shared_ptr<Model>>& get_children() const;
             const std::map<core::Id, std::shared_ptr<Mesh>>& get_meshes() const;

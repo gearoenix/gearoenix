@@ -11,7 +11,6 @@
 #include "../../render/scene/rnd-scn-scene.hpp"
 #include "../../system/sys-app.hpp"
 #include "../../system/sys-log.hpp"
-#include "../buffer/gles2-buf-mesh.hpp"
 #include "../buffer/gles2-buf-uniform.hpp"
 #include "../buffer/gles2-buf-manager.hpp"
 #include "../pipeline/gles2-pip-manager.hpp"

@@ -4,7 +4,6 @@
 #include "../../math/math-matrix.hpp"
 #include "../../math/math-ray.hpp"
 #include "../../math/math-vector.hpp"
-#include "../../physics/phs-transformable.hpp"
 #include "../../core/sync/cr-sync-end-caller.hpp"
 #include "rnd-cmr-uniform.hpp"
 
@@ -13,6 +12,9 @@ namespace core {
     namespace event {
         class Event;
     }
+}
+namespace math {
+	struct Quat;
 }
 namespace physics {
     class Kernel;
@@ -26,7 +28,7 @@ namespace engine {
 class Engine;
 }
     namespace camera {
-        class Camera : public core::asset::Asset, public physics::Transferable {
+        class Camera : public core::asset::Asset {
             friend class physics::Kernel;
 
         protected:
@@ -49,19 +51,19 @@ class Engine;
             virtual math::Ray3 create_ray3(const core::Real x, const core::Real y) const = 0;
             virtual core::Real get_distance(const math::Vec3 model_location) const = 0;
             // Transformable---------------------------------------------------------------
-            void get_location(math::Vec3& l) const override final;
-            void set_location(const math::Vec3& l) override final;
-            void translate(const math::Vec3& t) override final;
-            void global_rotate(const core::Real d, const math::Vec3& axis, const math::Vec3& location) override final;
-            void global_rotate(const core::Real d, const math::Vec3& axis) override final;
-            void global_rotate(const math::Mat4x4& rm) override final;
-            void local_rotate(const core::Real d, const math::Vec3& axis) override final;
-            void local_x_rotate(const core::Real d) override final;
-            void local_y_rotate(const core::Real d) override final;
-            void local_z_rotate(const core::Real d) override final;
-            void global_scale(const core::Real s) override final;
-            void local_scale(const core::Real s) override final;
-            void set_orientation(const math::Quat &q) override final;
+            void get_location(math::Vec3& l) const;
+            void set_location(const math::Vec3& l);
+            void translate(const math::Vec3& t);
+            void global_rotate(const core::Real d, const math::Vec3& axis, const math::Vec3& location);
+            void global_rotate(const core::Real d, const math::Vec3& axis);
+            void global_rotate(const math::Mat4x4& rm);
+            void local_rotate(const core::Real d, const math::Vec3& axis);
+            void local_x_rotate(const core::Real d);
+            void local_y_rotate(const core::Real d);
+            void local_z_rotate(const core::Real d);
+            void global_scale(const core::Real s);
+            void local_scale(const core::Real s);
+            void set_orientation(const math::Quat &q);
         };
     }
 }

@@ -96,8 +96,8 @@ void gearoenix::render::widget::Widget::cancel_effect()
 {
 }
 
-gearoenix::render::widget::Widget::Widget(const core::Id my_id, const std::shared_ptr<engine::Engine>& e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c):
-	model::Model(my_id, e, c)
+gearoenix::render::widget::Widget::Widget(const core::Id my_id, const std::shared_ptr<system::stream::Stream>& s, const std::shared_ptr<engine::Engine>& e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c)
+	: model::Model(my_id, s, e, c)
 {
 }
 

@@ -63,8 +63,8 @@ const std::vector<std::shared_ptr<gearoenix::physics::body::Body>> gearoenix::ph
 void gearoenix::physics::constraint::TrackerSpringJointSpring::apply(core::Real)
 {
     math::Vec3 actpos, paspos;
-    active->get_body_obj()->get_location(actpos);
-    passive->get_body_obj()->get_location(paspos);
+    //active->get_body_obj()->get_location(actpos);
+    //passive->get_body_obj()->get_location(paspos);
     math::Vec3 direction = actpos - paspos;
     const core::Real distance = direction.length();
     direction /= distance;

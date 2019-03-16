@@ -47,9 +47,26 @@ namespace math {
         void operator*=(const Mat4x4& m);
         const core::Real& operator[](const unsigned int i) const;
         core::Real& operator[](const unsigned int i);
-        void scale3x3(const core::Real& s);
-        void scale3x3(const core::Real& a, const core::Real& b, const core::Real& c);
-        void scale4x3(const core::Real& s);
+		/// It does not change location
+        void local_scale(const core::Real& s);
+		/// It does not change location
+		void local_scale(const core::Real& a, const core::Real& b, const core::Real& c);
+		/// It changes location
+		void local_scale(const core::Real& a, const core::Real& b, const core::Real& c, const core::Real& d);
+		/// It does not change location
+		void local_scale(const Vec3 &s);
+		/// It changes location
+		void local_scale(const Vec4 &s);
+		/// It does not change location
+		void global_scale(const core::Real& s);
+		/// It does not change location
+		void global_scale(const core::Real& a, const core::Real& b, const core::Real& c);
+		/// It changes location
+		void global_scale(const core::Real& a, const core::Real& b, const core::Real& c, const core::Real& d);
+		/// It does not change location
+		void global_scale(const Vec3 &s);
+		/// It changes location
+		void global_scale(const Vec4 &s);
         void translate(const Vec3& v);
         void set_location_zero();
         void set_location(const Vec3& location);

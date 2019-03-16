@@ -118,7 +118,7 @@ gearoenix::render::widget::Text::Text(
 	const std::shared_ptr<system::stream::Stream> &f,
 	const std::shared_ptr<engine::Engine>& e,
 	const core::sync::EndCaller<core::sync::EndCallerIgnore> &c)
-    : Widget(my_id, e, c)
+    : Widget(my_id, f, e, c)
     , text(f->read_string())
     , align(f->read<Alignment::Type>())
     , space_character(f->read<core::Real>())

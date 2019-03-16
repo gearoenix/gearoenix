@@ -10,6 +10,7 @@ namespace math {
 		Vec3 tangent;
 		Vec2 uv;
 
+		BasicVertex();
 		BasicVertex(const std::shared_ptr<system::stream::Stream> &f);
         void read(const std::shared_ptr<system::stream::Stream> &f);
 

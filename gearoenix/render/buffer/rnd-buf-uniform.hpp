@@ -1,18 +1,13 @@
 #ifndef GEAROENIX_RENDER_BUFFER_UNIFORM_HPP
 #define GEAROENIX_RENDER_BUFFER_UNIFORM_HPP
-#include <memory>
+#include "rnd-buf-buffer.hpp"
 namespace gearoenix {
 namespace render {
-    namespace engine {
-        class Engine;
-    }
     namespace buffer {
-        class Uniform {
+        class Uniform : public Buffer {
         protected:
-            const std::shared_ptr<engine::Engine> e;
-
+            Uniform(const unsigned int s, const std::shared_ptr<engine::Engine>& e);
         public:
-            Uniform(const std::shared_ptr<engine::Engine>& e);
             virtual ~Uniform();
             virtual void update(const void*, unsigned int) = 0;
             virtual void* get_data() = 0;
@@ -24,7 +19,7 @@ namespace render {
                 update(s, sizeof(T));
             }
         };
-    } // namespace buffer
-} // namespace render
-} // namespace gearoenix
-#endif // GEAROENIX_RENDER_BUFFER_UNIFORM_HPP
+    }
+}
+}
+#endif

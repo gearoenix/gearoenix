@@ -9,6 +9,7 @@
 #include "../engine/rnd-eng-engine.hpp"
 #include "../light/rnd-lt-sun.hpp"
 #include "../material/rnd-mat-material.hpp"
+#include "../mesh/rnd-msh-manager.hpp"
 #include "../mesh/rnd-msh-mesh.hpp"
 #include "../scene/rnd-scn-scene.hpp"
 #include "../widget/rnd-wdg-widget.hpp"
@@ -17,9 +18,10 @@
 #include "rnd-mdl-mesh.hpp"
 
 gearoenix::render::model::Mesh::Mesh(const std::shared_ptr<system::stream::Stream>& f, const std::shared_ptr<engine::Engine>& e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c)
-	: msh(e->get_system_application()->get_asset_manager()->get_gx3d(f->read<core::Id>(), [](std::shared_ptr<mesh::Mesh>) {}))
-	, mat(new material::Material(f, e))
 {
+	core::sync::EndCaller<mesh::Mesh> call([c](std::shared_ptr<mesh::Mesh>) {});
+	msh = e->get_system_application()->get_asset_manager()->get_mesh_manager()->get_gx3d(f->read<core::Id>(), call);
+	mat = std::make_shared<material::Material>(e, f);
 }
 
 const std::shared_ptr<gearoenix::render::mesh::Mesh>& gearoenix::render::model::Mesh::get_mesh() const

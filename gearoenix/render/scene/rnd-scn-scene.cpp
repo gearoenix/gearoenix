@@ -38,7 +38,7 @@ gearoenix::render::scene::Scene::Scene(
 	, pipeline_resource(e->get_pipeline_manager()->create_resource({}))
 {
 	for (unsigned int i = 0; i < GX_FRAMES_COUNT; ++i) {
-		uniform_buffers[i] = std::shared_ptr<buffer::Uniform>(e->get_buffer_manager()->create_uniform(sizeof(Uniform)));
+		uniform_buffers[i] = std::shared_ptr<buffer::Uniform>(e->get_buffer_manager()->create_uniform(sizeof(Uniform), e));
 	}
 	const std::shared_ptr<core::asset::Manager> &astmgr = e->get_system_application()->get_asset_manager();
 #define GXHELPER(x, n, cls)                                                   \
@@ -78,7 +78,7 @@ gearoenix::render::scene::Scene::Scene(
 	, pipeline_resource(e->get_pipeline_manager()->create_resource({}))
 {
 	for (unsigned int i = 0; i < GX_FRAMES_COUNT; ++i) {
-		uniform_buffers[i] = std::shared_ptr<buffer::Uniform>(e->get_buffer_manager()->create_uniform(sizeof(Uniform)));
+		uniform_buffers[i] = std::shared_ptr<buffer::Uniform>(e->get_buffer_manager()->create_uniform(sizeof(Uniform), e));
 	}
 }
 

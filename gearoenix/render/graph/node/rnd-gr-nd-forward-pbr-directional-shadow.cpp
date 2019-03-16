@@ -37,7 +37,7 @@ gearoenix::render::graph::node::ForwardPbrDirectionalShadow::ForwardPbrDirection
 {
     frames.resize(GX_FRAMES_COUNT);
     for (unsigned int i = 0; i < GX_FRAMES_COUNT; ++i) {
-        frames.push_back(std::make_shared<ForwardPbrDirectionalShadowFrame>(e));
+        frames[i] = std::make_shared<ForwardPbrDirectionalShadowFrame>(e);
     }
 }
 
@@ -110,7 +110,7 @@ void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::record(
         const std::shared_ptr<material::Material>& mat = id_mesh.second->get_material();
         if (kernel->latest_render_data_pool >= kernel->render_data_pool.size()) {
             kernel->render_data_pool.push_back(std::make_tuple(
-                std::shared_ptr<buffer::Uniform>(e->get_buffer_manager()->create_uniform(sizeof(ForwardPbrDirectionalShadowUniform))),
+                std::shared_ptr<buffer::Uniform>(e->get_buffer_manager()->create_uniform(sizeof(ForwardPbrDirectionalShadowUniform), e)),
                 std::shared_ptr<pipeline::ForwardPbrDirectionalShadowResourceSet>(static_cast<pipeline::ForwardPbrDirectionalShadowResourceSet*>(render_pipeline->create_resource_set()))));
         }
         std::tuple<std::shared_ptr<buffer::Uniform>, std::shared_ptr<pipeline::ForwardPbrDirectionalShadowResourceSet>>& pool = kernel->render_data_pool[kernel->latest_render_data_pool];
@@ -165,7 +165,7 @@ gearoenix::render::graph::node::ForwardPbrDirectionalShadowFrame::ForwardPbrDire
     const unsigned int kernels_count = std::thread::hardware_concurrency();
     kernels.resize(kernels_count);
     for (unsigned int i = 0; i < kernels_count; ++i) {
-        kernels.push_back(std::make_shared<ForwardPbrDirectionalShadowKernel>(e, i));
+        kernels[i] = std::make_shared<ForwardPbrDirectionalShadowKernel>(e, i);
     }
 }
 

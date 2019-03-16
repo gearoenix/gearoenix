@@ -33,32 +33,31 @@ gearoenix::render::model::Model::Model(
 	, pipeline_resource(e->get_pipeline_manager()->create_resource({}))
 {
 	for (unsigned int i = 0; i < GX_FRAMES_COUNT; ++i) {
-		uniform_buffers[i] = std::shared_ptr<buffer::Uniform>(e->get_buffer_manager()->create_uniform(sizeof(Uniform)));
+		uniform_buffers[i] = std::shared_ptr<buffer::Uniform>(e->get_buffer_manager()->create_uniform(sizeof(Uniform), e));
 	}
 	uniform.m.read(f);
-	f->read(uniform.radius);
 	const core::Count meshes_count = f->read<core::Count>();
 	const std::shared_ptr<core::asset::Manager> &astmgr = e->get_system_application()->get_asset_manager();
-	if (meshes.size() > 0)
+	if (meshes_count > 0)
 	{
 		const core::sync::EndCaller<mesh::Mesh> call([](const std::shared_ptr<mesh::Mesh>) {});
 		const std::shared_ptr<mesh::Manager> &mshmgr = astmgr->get_mesh_manager();
-		for (core::Count i; i < meshes_count; ++i)
+		for (core::Count i = 0; i < meshes_count; ++i)
 		{
-			add_mesh(new Mesh(f, e));
+			add_mesh(std::make_shared<Mesh>(f, e, c));
 		}
 	}
-	std::vector<core::Id> children_ids;
+	/*std::vector<core::Id> children_ids;
 	if (children_ids.size() > 0)
 	{
-		const core::sync::EndCaller<Model> call([](const std::shared_ptr<Model>) {});
+		core::sync::EndCaller<Model> call([](const std::shared_ptr<Model>) {});
 		const std::shared_ptr<Manager> &mdlmgr = astmgr->get_model_manager();
 		f->read(children_ids);
 		for (const core::Id mdlid : children_ids)
 		{
 			add_child(mdlmgr->get_gx3d(mdlid, call));
 		}
-	}
+	}*/
 }
 
 gearoenix::render::model::Model::Model(
@@ -69,12 +68,22 @@ gearoenix::render::model::Model::Model(
 	, pipeline_resource(e->get_pipeline_manager()->create_resource({}))
 {
 	for (unsigned int i = 0; i < GX_FRAMES_COUNT; ++i) {
-		uniform_buffers[i] = std::shared_ptr<buffer::Uniform>(e->get_buffer_manager()->create_uniform(sizeof(Uniform)));
+		uniform_buffers[i] = std::shared_ptr<buffer::Uniform>(e->get_buffer_manager()->create_uniform(sizeof(Uniform), e));
 	}
 }
 
 gearoenix::render::model::Model::~Model()
 {
+}
+
+void gearoenix::render::model::Model::add_mesh(const std::shared_ptr<Mesh>& m)
+{
+	meshes[m->get_mesh()->get_asset_id()] = m;
+}
+
+void gearoenix::render::model::Model::add_child(const std::shared_ptr<Model>& c)
+{
+
 }
 
 //    //std::lock_guard<std::mutex> lg(locker);

@@ -3,9 +3,10 @@
 #include "../../system/stream/sys-stm-stream.hpp"
 #include "../../math/math-vertex.hpp"
 #include "../buffer/rnd-buf-manager.hpp"
-#include "../buffer/rnd-buf-mesh.hpp"
+#include "../buffer/rnd-buf-static.hpp"
 #include "../engine/rnd-eng-engine.hpp"
 #include "../material/rnd-mat-material.hpp"
+#include <vector>
 
 gearoenix::render::mesh::Mesh::Mesh(const core::Id my_id, const Type::Id mesh_type_id)
 	: core::asset::Asset(my_id, core::asset::Type::MESH)

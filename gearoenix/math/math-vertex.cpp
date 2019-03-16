@@ -1,5 +1,9 @@
 #include "math-vertex.hpp"
 
+gearoenix::math::BasicVertex::BasicVertex()
+{
+}
+
 gearoenix::math::BasicVertex::BasicVertex(const std::shared_ptr<system::stream::Stream>& f)
 {
 	read(f);

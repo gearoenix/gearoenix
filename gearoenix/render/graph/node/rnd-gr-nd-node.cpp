@@ -16,11 +16,11 @@ gearoenix::render::graph::node::Node::Node(
 {
     input_textures.resize(input_textures_count);
     for (unsigned int i = 0; i < input_textures_count; ++i) {
-        input_textures.push_back(nullptr);
+        input_textures[i] = nullptr;
     }
     output_textures.resize(output_textures_count);
     for (unsigned int i = 0; i < output_textures_count; ++i) {
-        output_textures.push_back(nullptr);
+        output_textures[i] = nullptr;
     }
 }
 

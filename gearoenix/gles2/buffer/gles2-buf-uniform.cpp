@@ -5,7 +5,7 @@
 #include <cstring>
 
 gearoenix::gles2::buffer::Uniform::Uniform(const unsigned int s, const std::shared_ptr<engine::Engine>& e)
-    : render::buffer::Uniform(e)
+    : render::buffer::Uniform(s, e)
     , data(new unsigned char[s])
 {
 }
