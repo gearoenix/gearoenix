@@ -4,6 +4,7 @@
 #include "../../core/sync/cr-sync-end-caller.hpp"
 #include "rnd-mat-frame.hpp"
 #include "rnd-mat-translucency-mode.hpp"
+#include "rnd-mat-uniform.hpp"
 namespace gearoenix {
 namespace system {
     namespace stream {
@@ -27,6 +28,9 @@ namespace render {
             std::shared_ptr<texture::Texture2D> emissive = nullptr;
             TranslucencyMode::Id translucency = TranslucencyMode::Opaque;
             Frame frames[GX_FRAMES_COUNT];
+			Uniform uniform;
+
+			void initialize();
 
         public:
 			Material(const std::shared_ptr<engine::Engine>& e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end);

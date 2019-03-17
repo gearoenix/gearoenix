@@ -29,8 +29,10 @@ namespace render {
             Manager(const std::shared_ptr<system::stream::Stream>& s, const std::shared_ptr<engine::Engine>& e);
             ~Manager();
 
-			std::shared_ptr<Texture2D> get(const math::Vec4 &color, core::sync::EndCaller<Texture2D> &c);
-			std::shared_ptr<Texture> get_gx3d(const core::Id id, const core::sync::EndCaller<Texture> &c);
+			std::shared_ptr<Texture2D> get(const math::Vec4 &color, core::sync::EndCaller<Texture2D> &c, const unsigned int color_count = 4);
+			std::shared_ptr<Texture2D> get(const math::Vec3 &color, core::sync::EndCaller<Texture2D> &c);
+			std::shared_ptr<Texture2D> get(const math::Vec2 &color, core::sync::EndCaller<Texture2D> &c);
+			std::shared_ptr<Texture> get_gx3d(const core::Id id, core::sync::EndCaller<Texture> &c);
         };
     }
 }

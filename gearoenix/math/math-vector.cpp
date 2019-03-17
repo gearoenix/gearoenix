@@ -488,6 +488,14 @@ gearoenix::math::Vec4::Vec4(core::Real x, core::Real y, core::Real z, core::Real
     vec[3] = w;
 }
 
+gearoenix::math::Vec4::Vec4(const Vec2 & v, core::Real z, core::Real w)
+{
+	vec[0] = v[0];
+	vec[1] = v[1];
+	vec[2] = z;
+	vec[3] = w;
+}
+
 gearoenix::math::Vec4::Vec4(core::Real e)
 {
     vec[0] = e;

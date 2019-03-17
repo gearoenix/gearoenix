@@ -114,7 +114,8 @@ namespace math {
         Vec4();
         Vec4(core::Real e);
         Vec4(core::Real x, core::Real y, core::Real z, core::Real w);
-        Vec4(const Vec3& v, core::Real w);
+		Vec4(const Vec2& v, core::Real z, core::Real w);
+		Vec4(const Vec3& v, core::Real w);
         Vec3 xyz() const;
         void xyz(const Vec3& v);
         core::Real w() const;

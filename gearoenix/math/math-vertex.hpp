@@ -7,7 +7,7 @@ namespace math {
     struct BasicVertex {
 		Vec3 position;
 		Vec3 normal;
-		Vec3 tangent;
+		Vec4 tangent;
 		Vec2 uv;
 
 		BasicVertex();

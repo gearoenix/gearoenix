@@ -18,14 +18,9 @@ gearoenix::gles2::texture::Texture2D::Texture2D(
 	const core::sync::EndCaller<core::sync::EndCallerIgnore>& call)
     : render::texture::Texture2D(my_id, e)
 {
-#ifdef GX_DEBUG_GLES2
-	if (render::texture::TextureFormat::RGBA_UINT8 != f)
-	{
-		GXLOGF("Only RGBA_UINT8 format is supported in gles2, in texture: " << my_id);
-	}
-#endif
 	const SampleInfo sample_info = SampleInfo(s);
-	e->get_function_loader()->load([this, data, f, s, img_width, img_heigt, sample_info, call]
+	const GLuint cf = convert_format(f);
+	e->get_function_loader()->load([this, data, cf, s, img_width, img_heigt, sample_info, call]
 	{
         glGenTextures(1, &texture_object);
         glBindTexture(GL_TEXTURE_2D, texture_object);
@@ -33,8 +28,9 @@ gearoenix::gles2::texture::Texture2D::Texture2D(
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, sample_info.mag_filter);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, sample_info.wrap_s);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, sample_info.wrap_t);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img_width, img_heigt, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        glTexImage2D(GL_TEXTURE_2D, 0, static_cast<const GLint>(cf), img_width, img_heigt, 0, static_cast<const GLenum>(cf), GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
+		GX_CHECK_FOR_GRAPHIC_API_ERROR;
     });
 }
 
@@ -61,6 +57,24 @@ void gearoenix::gles2::texture::Texture2D::bind(GLenum texture_unit)
 {
     glActiveTexture(texture_unit);
     glBindTexture(GL_TEXTURE_2D, texture_object);
+}
+
+GLuint gearoenix::gles2::texture::Texture2D::convert_format(const render::texture::TextureFormat::Id f)
+{
+	switch (f)
+	{
+	case render::texture::TextureFormat::RGBA_UINT8:
+		return GL_RGBA;
+	case render::texture::TextureFormat::RGB_UINT8:
+		return GL_RGB;
+	case render::texture::TextureFormat::RG_UINT8:
+		return GL_RG;
+	case render::texture::TextureFormat::R_UINT8:
+		return GL_R;
+	default:
+		GXLOGF("Unsupported texture format in gles2.");
+		break;
+	}
 }
 
 #endif

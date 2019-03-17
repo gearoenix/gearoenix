@@ -165,11 +165,11 @@ gearoenix::render::texture::Texture2D * gearoenix::gles2::engine::Engine::create
 	const void * data, 
 	const render::texture::TextureFormat::Id f, 
 	const render::texture::SampleInfo s, 
-	const unsigned int width, 
-	const unsigned int heigt, 
+	const unsigned int img_width, 
+	const unsigned int img_height, 
 	const core::sync::EndCaller<core::sync::EndCallerIgnore>& call)
 {
-	GXUNIMPLEMENTED;
+	return new texture::Texture2D(id, std::static_pointer_cast<Engine>(sysapp->get_render_engine()), data, f, s, img_width, img_height, call);
 }
 
 void gearoenix::gles2::engine::Engine::submit(const std::vector<std::shared_ptr<render::sync::Semaphore>>& p, const std::shared_ptr<render::command::Buffer>& c, const std::shared_ptr<render::sync::Semaphore>& n)

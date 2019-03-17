@@ -30,6 +30,7 @@ namespace gearoenix {
 				Texture2D(const core::Id my_id, const GLuint txtobj, const std::shared_ptr<engine::Engine>& e);
 				~Texture2D();
 				void bind(const GLenum texture_unit);
+				static GLuint convert_format(const render::texture::TextureFormat::Id f);
 			};
 		}
 	}

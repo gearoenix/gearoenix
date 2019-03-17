@@ -24,6 +24,8 @@ gearoenix::render::model::Mesh::Mesh(const std::shared_ptr<system::stream::Strea
 	mat = std::make_shared<material::Material>(e, f);
 }
 
+gearoenix::render::model::Mesh::~Mesh() {}
+
 const std::shared_ptr<gearoenix::render::mesh::Mesh>& gearoenix::render::model::Mesh::get_mesh() const
 {
 	return msh;

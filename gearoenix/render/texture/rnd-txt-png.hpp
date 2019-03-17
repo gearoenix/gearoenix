@@ -1,5 +1,6 @@
 #ifndef GEAROEMIX_RENDER_TEXTURE_PNG_HPP
 #define GEAROEMIX_RENDER_TEXTURE_PNG_HPP
+#include "rnd-txt-format.hpp"
 #include <memory>
 #include <vector>
 namespace gearoenix {
