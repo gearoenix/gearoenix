@@ -21,18 +21,16 @@ void gearoenix::render::scene::Manager::get_gx3d(const core::Id mid, core::sync:
 			const std::shared_ptr<system::stream::Stream> &file = cache.get_file();
 			const core::sync::EndCaller<core::sync::EndCallerIgnore> call(c);
 			const Type::Id t = file->read<Type::Id>();
-			std::shared_ptr<Scene> s;
 			switch (t) {
 			case Type::GAME:
 				GXLOGD("Type of scene is game.");
-                s = std::shared_ptr<Scene>(new Scene(mid, file, e, call));
+                return std::make_shared<Scene>(mid, file, e, call);
 			case Type::UI:
 				GXLOGD("Type of scene is ui.");
 				GXUNIMPLEMENTED;
 			default:
 				GXUNEXPECTED;
-			}
-			return s;
+            }
 		}));
 	});
 }

@@ -38,15 +38,10 @@ gearoenix::render::model::Model::Model(
 	uniform.m.read(f);
 	const core::Count meshes_count = f->read<core::Count>();
 	const std::shared_ptr<core::asset::Manager> &astmgr = e->get_system_application()->get_asset_manager();
-	if (meshes_count > 0)
-	{
-		const core::sync::EndCaller<mesh::Mesh> call([](const std::shared_ptr<mesh::Mesh>) {});
-		const std::shared_ptr<mesh::Manager> &mshmgr = astmgr->get_mesh_manager();
-		for (core::Count i = 0; i < meshes_count; ++i)
-		{
-			add_mesh(std::make_shared<Mesh>(f, e, c));
-		}
-	}
+    for (core::Count i = 0; i < meshes_count; ++i)
+    {
+        add_mesh(std::make_shared<Mesh>(f, e, c));
+    }
 	/*std::vector<core::Id> children_ids;
 	if (children_ids.size() > 0)
 	{

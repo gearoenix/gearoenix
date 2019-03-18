@@ -62,7 +62,7 @@ template <class T>
 template <class C>
 inline std::shared_ptr<C> gearoenix::core::cache::File<T>::get(const Id id) const
 {
-	return cacher.get<C>(id);
+    return cacher.template get<C>(id);
 }
 
 template <class T>
