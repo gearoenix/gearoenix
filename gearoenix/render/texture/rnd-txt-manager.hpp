@@ -23,7 +23,7 @@ namespace render {
         protected:
             const std::shared_ptr<engine::Engine> e;
 			core::cache::File<Texture> cache;
-			std::map<math::Vec4, core::Id, math::Vec4::less> color_id;
+			std::map<math::Vec4, core::Id> color_id;
 
         public:
             Manager(const std::shared_ptr<system::stream::Stream>& s, const std::shared_ptr<engine::Engine>& e);

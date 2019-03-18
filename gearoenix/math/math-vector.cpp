@@ -570,6 +570,57 @@ gearoenix::core::Real& gearoenix::math::Vec4::operator[](const int i)
     return vec[i];
 }
 
+bool gearoenix::math::Vec4::operator<(const Vec4 & o) const
+{
+	if (vec[0] < o.vec[0]) {
+		return true;
+	}
+	if (vec[0] != o.vec[0]) {
+		return false;
+	}
+	if (vec[1] < o.vec[1]) {
+		return true;
+	}
+	if (vec[1] != o.vec[1]) {
+		return false;
+	}
+	if (vec[2] < o.vec[2]) {
+		return true;
+	}
+	if (vec[2] != o.vec[2]) {
+		return false;
+	}
+	return vec[3] < o.vec[3];
+}
+
+bool gearoenix::math::Vec4::operator==(const Vec4 & o) const
+{
+	return vec[0] == o.vec[0] && vec[1] == o.vec[1] && vec[2] == o.vec[2]  && vec[3] == o.vec[3];
+}
+
+bool gearoenix::math::Vec4::operator>(const Vec4 & o) const
+{
+	if (vec[0] > o.vec[0]) {
+		return true;
+	}
+	if (vec[0] != o.vec[0]) {
+		return false;
+	}
+	if (vec[1] > o.vec[1]) {
+		return true;
+	}
+	if (vec[1] != o.vec[1]) {
+		return false;
+	}
+	if (vec[2] > o.vec[2]) {
+		return true;
+	}
+	if (vec[2] != o.vec[2]) {
+		return false;
+	}
+	return vec[3] > o.vec[3];
+}
+
 gearoenix::core::Real gearoenix::math::Vec4::dot(const Vec4& o) const
 {
     return (vec[0] * o.vec[0]) + (vec[1] * o.vec[1]) + (vec[2] * o.vec[2]) + (vec[3] * o.vec[3]);
