@@ -9,7 +9,7 @@
 gearoenix::gles2::pipeline::Pipeline::Pipeline(
     const render::pipeline::Type::Id pid,
     const std::shared_ptr<engine::Engine>& e,
-    const core::sync::EndCaller<core::sync::EndCallerIgnore> call)
+    const core::sync::EndCaller<core::sync::EndCallerIgnore> &call)
     : render::pipeline::Pipeline(pid, e, call)
 {
 }

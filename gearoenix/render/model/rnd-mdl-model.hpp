@@ -38,7 +38,7 @@ namespace render {
             Uniform uniform;
 			std::shared_ptr<buffer::Uniform> uniform_buffers[GX_FRAMES_COUNT];
 
-            const std::shared_ptr<pipeline::Resource> pipeline_resource;
+            std::shared_ptr<pipeline::Resource> pipeline_resource;
 
             std::map<core::Id, std::shared_ptr<Mesh>> meshes;
             std::map<core::Id, std::shared_ptr<Model>> children;

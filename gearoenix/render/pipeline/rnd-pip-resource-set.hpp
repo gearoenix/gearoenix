@@ -33,6 +33,7 @@ namespace render {
         class Resource;
         class ResourceSet {
         public:
+            virtual ~ResourceSet();
             virtual void set_scene(const std::shared_ptr<scene::Scene>& s) = 0;
             virtual void set_camera(const std::shared_ptr<camera::Camera>& c) = 0;
             virtual void set_light(const std::shared_ptr<light::Light>& l) = 0;

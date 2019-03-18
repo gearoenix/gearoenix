@@ -68,12 +68,12 @@ namespace render {
         protected:
 			const std::shared_ptr<engine::Engine> &e;
             const Type::Id scene_type_id;
-			const std::shared_ptr<pipeline::Resource> pipeline_resource;
 
 			bool renderable = false;
 			
 			Uniform uniform;
 			std::shared_ptr<buffer::Uniform> uniform_buffers[GX_FRAMES_COUNT];
+            std::shared_ptr<pipeline::Resource> pipeline_resource;
 
             std::map<core::Id, std::shared_ptr<camera::Camera>> cameras;
             std::map<core::Id, std::shared_ptr<audio::Audio>> audios;

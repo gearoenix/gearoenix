@@ -31,6 +31,7 @@ namespace render {
         class ForwardPbrDirectionalShadowResource : public Resource {
         };
         class ForwardPbrDirectionalShadowResourceSet : public ResourceSet {
+
         };
         class ForwardPbrDirectionalShadow : public Pipeline {
         };

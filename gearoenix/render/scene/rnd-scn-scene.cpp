@@ -34,12 +34,12 @@ gearoenix::render::scene::Scene::Scene(
 	const core::sync::EndCaller<core::sync::EndCallerIgnore> &c)
 	: core::asset::Asset(my_id, core::asset::Type::SCENE)
 	, e(e)
-	, scene_type_id(Type::GAME)
-	, pipeline_resource(e->get_pipeline_manager()->create_resource({}))
+    , scene_type_id(Type::GAME)
 {
 	for (unsigned int i = 0; i < GX_FRAMES_COUNT; ++i) {
 		uniform_buffers[i] = std::shared_ptr<buffer::Uniform>(e->get_buffer_manager()->create_uniform(sizeof(Uniform), e));
-	}
+    }
+    pipeline_resource = e->get_pipeline_manager()->create_resource(uniform_buffers[GX_FRAMES_COUNT - 1], {});
 	const std::shared_ptr<core::asset::Manager> &astmgr = e->get_system_application()->get_asset_manager();
 #define GXHELPER(x, n, cls)                                                   \
 	{                                                                         \
@@ -74,12 +74,12 @@ gearoenix::render::scene::Scene::Scene(
 	const core::sync::EndCaller<core::sync::EndCallerIgnore> &c)
 	: core::asset::Asset(e->get_system_application()->get_asset_manager()->create_id(), core::asset::Type::SCENE)
 	, e(e)
-	, scene_type_id(Type::GAME)
-	, pipeline_resource(e->get_pipeline_manager()->create_resource({}))
+    , scene_type_id(Type::GAME)
 {
 	for (unsigned int i = 0; i < GX_FRAMES_COUNT; ++i) {
 		uniform_buffers[i] = std::shared_ptr<buffer::Uniform>(e->get_buffer_manager()->create_uniform(sizeof(Uniform), e));
 	}
+    pipeline_resource = e->get_pipeline_manager()->create_resource(uniform_buffers[GX_FRAMES_COUNT - 1], {});
 }
 
 gearoenix::render::scene::Scene::~Scene()

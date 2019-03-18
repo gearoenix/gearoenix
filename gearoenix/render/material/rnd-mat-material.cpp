@@ -19,7 +19,7 @@ void gearoenix::render::material::Material::initialize()
 	{
 		frame.textures_changes = false;
 		frame.uniform_buffer = std::shared_ptr<buffer::Uniform>(bufmgr->create_uniform(sizeof(Uniform), e));
-		frame.pipeline_resouce = pipmgr->create_resource({ color, metallic_roughness, normal, emissive });
+        frame.pipeline_resouce = pipmgr->create_resource(frame.uniform_buffer, { color, metallic_roughness, normal, emissive });
 	}
 }
 

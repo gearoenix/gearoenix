@@ -13,7 +13,7 @@ gearoenix::gles2::buffer::Index::Index(
 	std::vector<GLushort> idata(indices.size());
 	for (size_t i = 0; i < indices.size(); ++i) 
 	{
-		idata[i] = indices[i];
+        idata[i] = static_cast<GLushort>(indices[i]);
 	}
 	count = static_cast<GLsizei>(indices.size());
 	e->get_function_loader()->load([this, idata, c] {

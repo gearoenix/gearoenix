@@ -13,6 +13,7 @@ gearoenix::gles2::buffer::Uniform::Uniform(const unsigned int s, const std::shar
 gearoenix::gles2::buffer::Uniform::~Uniform()
 {
     delete[] data;
+    data = nullptr;
 }
 
 void gearoenix::gles2::buffer::Uniform::update(const void* src, unsigned int size)

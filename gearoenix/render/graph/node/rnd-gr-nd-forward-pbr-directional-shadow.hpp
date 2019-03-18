@@ -90,7 +90,7 @@ namespace render {
 
             public:
                 ForwardPbrDirectionalShadow(const std::shared_ptr<engine::Engine>& e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call);
-                ~ForwardPbrDirectionalShadow();
+                ~ForwardPbrDirectionalShadow() override final;
 
                 void set_diffuse_environment(const std::shared_ptr<texture::Cube>& t);
                 void set_specular_environment(const std::shared_ptr<texture::Cube>& t);
@@ -98,7 +98,7 @@ namespace render {
                 void set_shadow_mapper(const std::shared_ptr<texture::Texture2D>& t);
                 void set_brdflut(const std::shared_ptr<texture::Texture2D>& t);
 
-                void set_input_texture(const std::shared_ptr<texture::Texture>& t, const unsigned int index) override;
+                void set_input_texture(const std::shared_ptr<texture::Texture>& t, const unsigned int index) override final;
                 /// This will be called at the start of each frame
                 void update();
                 void record(

@@ -85,7 +85,7 @@ void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::update()
     const std::shared_ptr<ForwardPbrDirectionalShadowFrame>& frame = frames[frame_number];
     if (frame->input_texture_changed) {
         frame->input_texture_changed = false;
-        frame->pipeline_resource = std::static_pointer_cast<pipeline::ForwardPbrDirectionalShadowResource>(e->get_pipeline_manager()->create_resource(input_textures));
+        frame->pipeline_resource = std::static_pointer_cast<pipeline::ForwardPbrDirectionalShadowResource>(e->get_pipeline_manager()->create_resource(e->get_buffer_manager()->create_uniform(sizeof(ForwardPbrDirectionalShadowUniform), core::sync::EndCaller<core::sync::EndCallerIgnore>(0)), input_textures));
     }
     frame->primary_cmd->begin();
     for (const std::shared_ptr<ForwardPbrDirectionalShadowKernel>& kernel : frame->kernels) {

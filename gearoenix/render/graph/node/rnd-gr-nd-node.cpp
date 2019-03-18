@@ -12,8 +12,9 @@ gearoenix::render::graph::node::Node::Node(
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call)
     : core::graph::Node(input_links, output_links)
     , e(e)
-    , render_pipeline(e->get_pipeline_manager()->get(pipeline_type_id, call))
 {
+    core::sync::EndCaller<pipeline::Pipeline> pipcall(call);
+    render_pipeline = e->get_pipeline_manager()->get(pipeline_type_id, pipcall);
     input_textures.resize(input_textures_count);
     for (unsigned int i = 0; i < input_textures_count; ++i) {
         input_textures[i] = nullptr;

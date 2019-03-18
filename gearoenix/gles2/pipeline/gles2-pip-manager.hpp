@@ -11,8 +11,8 @@ namespace gles2 {
         public:
             Manager(const std::shared_ptr<engine::Engine>& engine);
             ~Manager() override final;
-            std::shared_ptr<render::pipeline::Pipeline> get(const render::pipeline::Type::Id pipeline_type_id, core::sync::EndCaller<core::sync::EndCallerIgnore> end) override final;
-            std::shared_ptr<render::pipeline::Resource> create_resource(const std::vector<std::shared_ptr<render::texture::Texture>>& ts) override final;
+            std::shared_ptr<render::pipeline::Pipeline> get(const render::pipeline::Type::Id pipeline_type_id, core::sync::EndCaller<render::pipeline::Pipeline> &end) override final;
+            std::shared_ptr<render::pipeline::Resource> create_resource(const std::shared_ptr<render::buffer::Uniform> &u, const std::vector<std::shared_ptr<render::texture::Texture>>& ts) override final;
         };
     }
 }
