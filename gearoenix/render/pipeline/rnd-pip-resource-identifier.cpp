@@ -22,13 +22,14 @@ std::vector<gearoenix::core::Id> gearoenix::render::pipeline::ResourceIdentifier
 
 bool gearoenix::render::pipeline::ResourceIdentifier::operator<(const ResourceIdentifier &o) const
 {
-    if (buffer_size < o.buffer_size) return true;
+	if (buffer_size < o.buffer_size) return true;
+	if (buffer_size != o.buffer_size) return false;
     const size_t textures_ids_size = textures_ids.size();
     const size_t o_textures_ids_size = o.textures_ids.size();
     if (textures_ids_size < o_textures_ids_size) return true;
-    if (textures_ids_size > o_textures_ids_size) return false;
+    if (textures_ids_size != o_textures_ids_size) return false;
     for(size_t i = 0; i < textures_ids_size; ++i)
         if(textures_ids[i] < o.textures_ids[i]) return true;
-        else if(textures_ids[i] > o.textures_ids[i]) return false;
+        else if(textures_ids[i] != o.textures_ids[i]) return false;
     return false;
 }

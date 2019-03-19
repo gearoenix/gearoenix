@@ -124,6 +124,9 @@ namespace math {
         core::Real& operator[](const unsigned int i);
         const core::Real& operator[](const int i) const;
         core::Real& operator[](const int i);
+		bool operator<(const Vec4 &o) const;
+		bool operator>(const Vec4 &o) const;
+		bool operator==(const Vec4 &o) const;
         core::Real dot(const Vec4& o) const;
         Vec4 cross(const Vec4& o) const;
         Vec4 normalized() const;
@@ -136,22 +139,6 @@ namespace math {
                 os << "Vec4 {" << v[0] << ", " << v[1] << ", " << v[2] << ", " << v[3] << "}";
                 return os;
         }
-
-		struct less {
-			constexpr bool operator()(const Vec4 & lhs, const Vec4 & rhs) const
-			{
-				if (lhs.vec[0] < rhs.vec[0]) {
-					return true;
-				}
-				if (lhs.vec[1] < rhs.vec[1]) {
-					return true;
-				}
-				if (lhs.vec[2] < rhs.vec[2]) {
-					return true;
-				}
-				return lhs.vec[0] < rhs.vec[0];
-			}
-		};
     };
 }
 }

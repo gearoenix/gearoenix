@@ -570,6 +570,57 @@ gearoenix::core::Real& gearoenix::math::Vec4::operator[](const int i)
     return vec[i];
 }
 
+bool gearoenix::math::Vec4::operator<(const Vec4 & o) const
+{
+	if (vec[0] < o.vec[0]) {
+		return true;
+	}
+	if (vec[0] != o.vec[0]) {
+		return false;
+	}
+	if (vec[1] < o.vec[1]) {
+		return true;
+	}
+	if (vec[1] != o.vec[1]) {
+		return false;
+	}
+	if (vec[2] < o.vec[2]) {
+		return true;
+	}
+	if (vec[2] != o.vec[2]) {
+		return false;
+	}
+	return vec[3] < o.vec[3];
+}
+
+bool gearoenix::math::Vec4::operator>(const Vec4 & o) const
+{
+	if (vec[0] > o.vec[0]) {
+		return true;
+	}
+	if (vec[0] != o.vec[0]) {
+		return false;
+	}
+	if (vec[1] > o.vec[1]) {
+		return true;
+	}
+	if (vec[1] != o.vec[1]) {
+		return false;
+	}
+	if (vec[2] > o.vec[2]) {
+		return true;
+	}
+	if (vec[2] != o.vec[2]) {
+		return false;
+	}
+	return vec[3] > o.vec[3];
+}
+
+bool gearoenix::math::Vec4::operator==(const Vec4 & o) const
+{
+	return vec[0] == o.vec[0] && vec[1] == o.vec[1] && vec[2] == o.vec[2] && vec[3] == o.vec[3];
+}
+
 gearoenix::core::Real gearoenix::math::Vec4::dot(const Vec4& o) const
 {
     return (vec[0] * o.vec[0]) + (vec[1] * o.vec[1]) + (vec[2] * o.vec[2]) + (vec[3] * o.vec[3]);
@@ -588,6 +639,15 @@ gearoenix::math::Vec4 gearoenix::math::Vec4::normalized() const
     const core::Real len = static_cast<core::Real>(sqrt(static_cast<double>(vec[0] * vec[0] + vec[1] * vec[1] + vec[2] * vec[2] + vec[3] * vec[3])));
     const Vec4 r(vec[0] / len, vec[1] / len, vec[2] / len, vec[3] / len);
     return r;
+}
+
+void gearoenix::math::Vec4::normalize()
+{
+	const core::Real ilen = 1.0f / static_cast<core::Real>(sqrt(static_cast<double>(vec[0] * vec[0] + vec[1] * vec[1] + vec[2] * vec[2] + vec[3] * vec[3])));
+	vec[0] *= ilen;
+	vec[1] *= ilen;
+	vec[2] *= ilen;
+	vec[3] *= ilen;
 }
 
 void gearoenix::math::Vec4::read(const std::shared_ptr<system::stream::Stream> &f)

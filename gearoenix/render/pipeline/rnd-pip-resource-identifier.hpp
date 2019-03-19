@@ -25,7 +25,7 @@ struct ResourceIdentifier
 
     static std::vector<core::Id> get_textures_ids(const std::vector<std::shared_ptr<texture::Texture>> &ts);
 
-    bool operator < ( const ResourceIdentifier &o ) const;
+	bool operator < (const ResourceIdentifier &o) const;
 };
 }
 }

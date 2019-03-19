@@ -83,6 +83,12 @@ namespace render {
             std::shared_ptr<skybox::Skybox> skybox;
 
         public:
+			const static std::shared_ptr<camera::Camera> null_camera;
+			const static std::shared_ptr<audio::Audio> null_audio;
+			const static std::shared_ptr<light::Light> null_light;
+			const static std::shared_ptr<model::Model> null_model;
+			const static std::shared_ptr<physics::constraint::Constraint> null_constraint;
+
             /// It's going to read itself from gx3d stream.
 			Scene(
 				const core::Id my_id,
