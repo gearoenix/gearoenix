@@ -1,19 +1,23 @@
-#ifndef GEAROENIX_CORE_SYNC_SEMAPHORE_HPP
-#define GEAROENIX_CORE_SYNC_SEMAPHORE_HPP
+#ifndef GEAROENIX_CORE_SYNC_SIGNALER_HPP
+#define GEAROENIX_CORE_SYNC_SIGNALER_HPP
 #include <mutex>
 #include <condition_variable>
 
 namespace gearoenix {
 namespace core {
 namespace sync {
-class Semaphore
+	/// It should be used within two threads
+	/// One thread must only wait on it and another one must signal it
+	/// Wait must happen before signal otherwise ther is no guarantee of expected execution order
+	/// Other uses may cause starvation and unordered signalling
+class Signaler
 {
 private:
     std::mutex m;
     std::condition_variable cv;
-    unsigned int c = 0;
+	volatile bool locked = true;
+	volatile bool unlocked = false;
 public:
-    Semaphore(unsigned int c = 0);
     void signal();
     void wait();
 };

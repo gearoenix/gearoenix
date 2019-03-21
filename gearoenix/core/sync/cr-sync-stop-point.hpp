@@ -1,6 +1,7 @@
 #ifndef GEAROENIX_CORE_SYNC_STOP_POINT_HPP
 #define GEAROENIX_CORE_SYNC_STOP_POINT_HPP
 #include <mutex>
+#include <memory>
 
 namespace gearoenix {
 namespace core {
@@ -8,14 +9,13 @@ namespace core {
         class QueuedSemaphore;
         class StopPoint {
         private:
-            QueuedSemaphore* sem = nullptr;
+            const std::shared_ptr<QueuedSemaphore> sem;
             const int stoper;
             volatile int counter = 0;
             std::mutex counter_lock;
 
         public:
             StopPoint(int walkers_count);
-            ~StopPoint();
             void all_reach();
         };
     }

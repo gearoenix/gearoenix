@@ -641,6 +641,15 @@ gearoenix::math::Vec4 gearoenix::math::Vec4::normalized() const
     return r;
 }
 
+void gearoenix::math::Vec4::normalize()
+{
+	const core::Real ilen = 1.0f / static_cast<core::Real>(sqrt(static_cast<double>(vec[0] * vec[0] + vec[1] * vec[1] + vec[2] * vec[2] + vec[3] * vec[3])));
+	vec[0] *= ilen;
+	vec[1] *= ilen;
+	vec[2] *= ilen;
+	vec[3] *= ilen;
+}
+
 void gearoenix::math::Vec4::read(const std::shared_ptr<system::stream::Stream> &f)
 {
     f->read(vec[0]);

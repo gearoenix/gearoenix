@@ -7,11 +7,6 @@ gearoenix::core::sync::StopPoint::StopPoint(int walkers_count)
 {
 }
 
-gearoenix::core::sync::StopPoint::~StopPoint()
-{
-    delete sem;
-}
-
 void gearoenix::core::sync::StopPoint::all_reach()
 {
     counter_lock.lock();

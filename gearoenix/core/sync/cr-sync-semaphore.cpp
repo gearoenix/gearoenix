@@ -1,19 +1,23 @@
+#include "../cr-build-configuration.hpp"
 #include "cr-sync-semaphore.hpp"
+#include "../../system/sys-log.hpp"
+#include <thread>
 
-gearoenix::core::sync::Semaphore::Semaphore(unsigned int c)
-    : c(c)
-{}
-
-void gearoenix::core::sync::Semaphore::signal()
+void gearoenix::core::sync::Signaler::signal()
 {
-    std::unique_lock<std::mutex> lock(m);
-    ++c;
-    cv.notify_one();
+	do {
+		unlocked = true;
+		cv.notify_one();
+		std::this_thread::yield();
+	} while (locked);
 }
 
-void gearoenix::core::sync::Semaphore::wait()
+void gearoenix::core::sync::Signaler::wait()
 {
+	locked = true;
+	unlocked = false;
     std::unique_lock<std::mutex> lock(m);
-    cv.wait(lock, [&]{ return c > 0; });
-    --c;
+    cv.wait(lock, [&]{ return unlocked; });
+	locked = false;
+	unlocked = true;
 }
