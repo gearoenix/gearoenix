@@ -99,6 +99,7 @@ namespace render {
                 void set_brdflut(const std::shared_ptr<texture::Texture2D>& t);
 
                 void set_input_texture(const std::shared_ptr<texture::Texture>& t, const unsigned int index) override final;
+				const std::shared_ptr<sync::Semaphore>& get_semaphore(const unsigned int frame_number);
                 /// This will be called at the start of each frame
                 void update();
                 void record(

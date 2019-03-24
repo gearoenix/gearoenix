@@ -35,8 +35,8 @@ gearoenix::render::graph::node::ForwardPbrDirectionalShadow::ForwardPbrDirection
 		{ "color" },
 		call)
 {
-	frames.resize(GX_FRAMES_COUNT);
-	for (unsigned int i = 0; i < GX_FRAMES_COUNT; ++i) {
+	frames.resize(e->get_frames_count());
+	for (unsigned int i = 0; i < e->get_frames_count(); ++i) {
 		frames[i] = std::make_shared<ForwardPbrDirectionalShadowFrame>(e);
 	}
 }
@@ -77,6 +77,11 @@ void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::set_input_text
 	for (const std::shared_ptr<ForwardPbrDirectionalShadowFrame>& f : frames) {
 		f->input_texture_changed = true;
 	}
+}
+
+const std::shared_ptr<gearoenix::render::sync::Semaphore>& gearoenix::render::graph::node::ForwardPbrDirectionalShadow::get_semaphore(const unsigned int frame_number)
+{
+	GXUNEXPECTED;
 }
 
 void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::update()

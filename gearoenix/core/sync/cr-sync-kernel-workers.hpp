@@ -4,27 +4,33 @@
 #include <vector>
 #include <thread> 
 #include <functional>
+#include <mutex>
 
 namespace gearoenix {
 	namespace core {
 		namespace sync {
-			class QueuedSemaphore;
+			class Signaler;
 			class KernelWorker {
 			private:
 				struct Worker {
-					const std::function<void(unsigned int)> worker;
+					const std::vector<std::shared_ptr<Signaler>> waits;
+					const std::function<void(const unsigned int)> worker;
 					const std::function<void()> boss;
-					const std::vector<std::shared_ptr<QueuedSemaphore>> semaphores;
+					const std::vector<std::shared_ptr<Signaler>> signals;
 				};
-				std::vector<std::thread> thread;
-				std::vector<std::>
+				std::vector<std::shared_ptr<Signaler>> signals;
+				std::vector<std::thread> threads;
 				std::vector<Worker> workers;
+				std::mutex workers_syncer;
 				volatile bool running = true;
+				volatile bool terminated = false;
 
-				void loop();
+				void thread_loop(const unsigned int);
 
 			public:
-				void add_step(std::function<void(unsigned int)> worker, std::function<void()> boss = [] {});
+				KernelWorker();
+				~KernelWorker();
+				void add_step(std::function<void(const unsigned int)> worker, std::function<void()> boss = [] {});
 				void do_steps();
 			};
 		}

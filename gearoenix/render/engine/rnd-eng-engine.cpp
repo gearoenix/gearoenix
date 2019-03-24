@@ -3,7 +3,7 @@
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../core/event/cr-ev-event.hpp"
 #include "../../core/event/cr-ev-sys-system.hpp"
-#include "../../core/sync/cr-sync-end-caller.hpp"
+#include "../../core/sync/cr-sync-kernel-workers.hpp"
 #include "../../core/sync/cr-sync-queued-semaphore.hpp"
 #include "../../physics/phs-engine.hpp"
 #include "../../system/sys-app.hpp"
@@ -11,7 +11,6 @@
 #include "../pipeline/rnd-pip-manager.hpp"
 #include "../scene/rnd-scn-manager.hpp"
 #include "../scene/rnd-scn-scene.hpp"
-#include <functional>
 #include <thread>
 
 gearoenix::render::engine::Engine::Engine(const std::shared_ptr<system::Application>& system_application, const Type::Id engine_type_id)
@@ -19,16 +18,27 @@ gearoenix::render::engine::Engine::Engine(const std::shared_ptr<system::Applicat
     , sysapp(system_application)
 	, fun_loader(new core::FunctionLoader())
     , physics_engine(nullptr)
+	, kernels(new core::sync::KernelWorker())
 {
+
 }
 
 gearoenix::render::engine::Engine::~Engine()
 {
+	sysapp = nullptr;
+	fun_loader = nullptr;
+	physics_engine = nullptr;
+	kernels = nullptr;
+	pipeline_manager = nullptr;
+	command_manager = nullptr;
+	sampler_manager = nullptr;
+	buffer_manager = nullptr;
 }
 
 void gearoenix::render::engine::Engine::update() {
 	++frame_number;
-	frame_number %= GX_FRAMES_COUNT;
+	frame_number %= frames_count;
+	kernels->do_steps();
 }
 
 const std::shared_ptr<gearoenix::system::Application>& gearoenix::render::engine::Engine::get_system_application() const
@@ -67,4 +77,9 @@ gearoenix::render::engine::Type::Id gearoenix::render::engine::Engine::get_engin
 unsigned int gearoenix::render::engine::Engine::get_frame_number() const
 {
 	return frame_number;
+}
+
+unsigned int gearoenix::render::engine::Engine::get_frames_count() const
+{
+	return frames_count;
 }

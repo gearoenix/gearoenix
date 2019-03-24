@@ -31,10 +31,11 @@ gearoenix::render::model::Model::Model(
 	: core::asset::Asset(my_id, core::asset::Type::MODEL)
 	, e(e)
 {
-	for (unsigned int i = 0; i < GX_FRAMES_COUNT; ++i) {
+	uniform_buffers.resize(e->get_frames_count());
+	for (unsigned int i = 0; i < e->get_frames_count(); ++i) {
 		uniform_buffers[i] = std::shared_ptr<buffer::Uniform>(e->get_buffer_manager()->create_uniform(sizeof(Uniform), e));
 	}
-    pipeline_resource = e->get_pipeline_manager()->create_resource(uniform_buffers[GX_FRAMES_COUNT - 1], {});
+    pipeline_resource = e->get_pipeline_manager()->create_resource(uniform_buffers[e->get_frames_count() - 1], {});
 	uniform.m.read(f);
 	const core::Count meshes_count = f->read<core::Count>();
 	const std::shared_ptr<core::asset::Manager> &astmgr = e->get_system_application()->get_asset_manager();
@@ -61,10 +62,10 @@ gearoenix::render::model::Model::Model(
 	: core::asset::Asset(e->get_system_application()->get_asset_manager()->create_id(), core::asset::Type::MODEL)
 	, e(e)
 {
-	for (unsigned int i = 0; i < GX_FRAMES_COUNT; ++i) {
+	for (unsigned int i = 0; i < e->get_frames_count(); ++i) {
 		uniform_buffers[i] = std::shared_ptr<buffer::Uniform>(e->get_buffer_manager()->create_uniform(sizeof(Uniform), e));
 	}
-    pipeline_resource = e->get_pipeline_manager()->create_resource(uniform_buffers[GX_FRAMES_COUNT - 1], {});
+    pipeline_resource = e->get_pipeline_manager()->create_resource(uniform_buffers[e->get_frames_count() - 1], {});
 }
 
 gearoenix::render::model::Model::~Model()

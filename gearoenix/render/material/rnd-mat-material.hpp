@@ -5,6 +5,7 @@
 #include "rnd-mat-frame.hpp"
 #include "rnd-mat-translucency-mode.hpp"
 #include "rnd-mat-uniform.hpp"
+#include <vector>
 namespace gearoenix {
 namespace system {
     namespace stream {
@@ -27,7 +28,7 @@ namespace render {
             std::shared_ptr<texture::Texture2D> normal = nullptr;
             std::shared_ptr<texture::Texture2D> emissive = nullptr;
             TranslucencyMode::Id translucency = TranslucencyMode::Opaque;
-            Frame frames[GX_FRAMES_COUNT];
+            std::vector<Frame> frames;
 			Uniform uniform;
 
 			void initialize();

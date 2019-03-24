@@ -6,12 +6,7 @@
 #include "../texture/rnd-txt-format.hpp"
 #include "../texture/rnd-txt-sample.hpp"
 #include "rnd-eng-type.hpp"
-#include <chrono>
-#include <functional>
-#include <map>
 #include <memory>
-#include <set>
-#include <thread>
 #include <vector>
 namespace gearoenix {
 	namespace core {
@@ -21,6 +16,7 @@ namespace gearoenix {
 		}
 		namespace sync {
 			class QueuedSemaphore;
+			class KernelWorker;
 		}
 	}
 	namespace physics {
@@ -66,11 +62,13 @@ namespace gearoenix {
 		namespace engine {
 			class Engine {
 			protected:
+				unsigned int frames_count = 2;
 				unsigned int frame_number = 0;
 				const Type::Id engine_type_id;
-				const std::shared_ptr<system::Application> sysapp;
-				const std::shared_ptr<core::FunctionLoader> fun_loader;
-				const std::shared_ptr<physics::Engine> physics_engine;
+				std::shared_ptr<system::Application> sysapp = nullptr;
+				std::shared_ptr<core::FunctionLoader> fun_loader = nullptr;
+				std::shared_ptr<physics::Engine> physics_engine = nullptr;
+				std::shared_ptr<core::sync::KernelWorker> kernels = nullptr;
 				/// managers pointers are own only by this class
 				std::shared_ptr<pipeline::Manager> pipeline_manager = nullptr;
 				std::shared_ptr<command::Manager> command_manager = nullptr;
@@ -102,6 +100,7 @@ namespace gearoenix {
 				const std::shared_ptr<buffer::Manager> &get_buffer_manager() const;
 				Type::Id get_engine_type_id() const;
 				unsigned int get_frame_number() const;
+				unsigned int get_frames_count() const;
 			};
 		}
 	}

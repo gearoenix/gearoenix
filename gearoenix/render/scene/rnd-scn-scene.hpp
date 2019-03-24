@@ -72,7 +72,7 @@ namespace render {
 			bool renderable = false;
 			
 			Uniform uniform;
-			std::shared_ptr<buffer::Uniform> uniform_buffers[GX_FRAMES_COUNT];
+			std::vector<std::shared_ptr<buffer::Uniform>> uniform_buffers;
             std::shared_ptr<pipeline::Resource> pipeline_resource;
 
             std::map<core::Id, std::shared_ptr<camera::Camera>> cameras;

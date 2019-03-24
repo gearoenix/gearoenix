@@ -9,6 +9,7 @@
 #include "rnd-mdl-uniform.hpp"
 #include <map>
 #include <memory>
+#include <vector>
 namespace gearoenix {
 namespace physics {
     namespace collider {
@@ -36,7 +37,7 @@ namespace render {
             bool has_transparent = false;
 
             Uniform uniform;
-			std::shared_ptr<buffer::Uniform> uniform_buffers[GX_FRAMES_COUNT];
+			std::vector<std::shared_ptr<buffer::Uniform>> uniform_buffers;
 
             std::shared_ptr<pipeline::Resource> pipeline_resource;
 

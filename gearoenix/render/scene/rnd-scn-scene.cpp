@@ -42,10 +42,11 @@ gearoenix::render::scene::Scene::Scene(
 	, e(e)
 	, scene_type_id(Type::GAME)
 {
-	for (unsigned int i = 0; i < GX_FRAMES_COUNT; ++i) {
-		uniform_buffers[i] = std::shared_ptr<buffer::Uniform>(e->get_buffer_manager()->create_uniform(sizeof(Uniform), e));
+	uniform_buffers.reserve(e->get_frames_count());
+	for (unsigned int i = 0; i < e->get_frames_count(); ++i) {
+		uniform_buffers.push_back(std::shared_ptr<buffer::Uniform>(e->get_buffer_manager()->create_uniform(sizeof(Uniform), e)));
 	}
-	pipeline_resource = e->get_pipeline_manager()->create_resource(uniform_buffers[GX_FRAMES_COUNT - 1], {});
+	pipeline_resource = e->get_pipeline_manager()->create_resource(uniform_buffers[e->get_frames_count() - 1], {});
 	const std::shared_ptr<core::asset::Manager> &astmgr = e->get_system_application()->get_asset_manager();
 #define GXHELPER(x, n, cls)                                                   \
 	{                                                                         \
@@ -82,10 +83,10 @@ gearoenix::render::scene::Scene::Scene(
 	, e(e)
 	, scene_type_id(Type::GAME)
 {
-	for (unsigned int i = 0; i < GX_FRAMES_COUNT; ++i) {
+	for (unsigned int i = 0; i < e->get_frames_count(); ++i) {
 		uniform_buffers[i] = std::shared_ptr<buffer::Uniform>(e->get_buffer_manager()->create_uniform(sizeof(Uniform), e));
 	}
-	pipeline_resource = e->get_pipeline_manager()->create_resource(uniform_buffers[GX_FRAMES_COUNT - 1], {});
+	pipeline_resource = e->get_pipeline_manager()->create_resource(uniform_buffers[e->get_frames_count() - 1], {});
 }
 
 gearoenix::render::scene::Scene::~Scene()

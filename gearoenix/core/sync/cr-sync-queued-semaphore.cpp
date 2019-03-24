@@ -24,11 +24,9 @@ void gearoenix::core::sync::QueuedSemaphore::lock()
     std::unique_lock<std::mutex> lock(l->m);
     m_count.unlock();
     l->c.wait(lock, [&] {
-		GXLOGD("-------------------");
         return l->unlocked;
     });
     l->locked = false;
-	GXLOGD("++++++++++++++++++++++");
     lock.unlock();
 }
 

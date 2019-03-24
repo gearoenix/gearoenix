@@ -1,10 +1,11 @@
 #include "../cr-build-configuration.hpp"
-#include "cr-sync-semaphore.hpp"
+#include "cr-sync-signaler.hpp"
 #include "../../system/sys-log.hpp"
 #include <thread>
 
 void gearoenix::core::sync::Signaler::signal()
 {
+	locked = true;
 	do {
 		unlocked = true;
 		cv.notify_one();
