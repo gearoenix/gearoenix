@@ -26,6 +26,7 @@ namespace gearoenix {
 					Pbr(
 						const std::shared_ptr<engine::Engine>& e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call);
 					~Pbr() override final;
+					void update() override final;
 					void record(const unsigned int kernel_index) override final;
 					void submit() override final;
 				};

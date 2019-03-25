@@ -115,6 +115,11 @@ void gearoenix::render::scene::Scene::add_camera(const std::shared_ptr<camera::C
 	cameras[oid] = o;
 }
 
+const std::map<gearoenix::core::Id, std::shared_ptr<gearoenix::render::camera::Camera>>& gearoenix::render::scene::Scene::get_cameras() const
+{
+	return cameras;
+}
+
 void gearoenix::render::scene::Scene::add_audio(const std::shared_ptr<audio::Audio>& o)
 {
 	const core::Id oid = o->get_asset_id();
@@ -135,6 +140,11 @@ void gearoenix::render::scene::Scene::add_light(const std::shared_ptr<light::Lig
 	}
 #endif
 	lights[oid] = o;
+}
+
+const std::map<gearoenix::core::Id, std::shared_ptr<gearoenix::render::light::Light>>& gearoenix::render::scene::Scene::get_lights() const
+{
+	return lights;
 }
 
 void gearoenix::render::scene::Scene::add_model(const std::shared_ptr<model::Model>& m)

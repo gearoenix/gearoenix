@@ -8,10 +8,16 @@
 #include "../../physics/phs-engine.hpp"
 #include "../../system/sys-app.hpp"
 #include "../../system/sys-log.hpp"
+#include "../graph/tree/rnd-gr-tr-pbr.hpp"
 #include "../pipeline/rnd-pip-manager.hpp"
 #include "../scene/rnd-scn-manager.hpp"
 #include "../scene/rnd-scn-scene.hpp"
 #include <thread>
+
+void gearoenix::render::engine::Engine::record(const unsigned int kernel_index)
+{
+	render_tree->record(kernel_index);
+}
 
 gearoenix::render::engine::Engine::Engine(const std::shared_ptr<system::Application>& system_application, const Type::Id engine_type_id)
     : engine_type_id(engine_type_id)
@@ -20,7 +26,7 @@ gearoenix::render::engine::Engine::Engine(const std::shared_ptr<system::Applicat
     , physics_engine(nullptr)
 	, kernels(new core::sync::KernelWorker())
 {
-
+	kernels->add_step(std::bind(&Engine::record, this, std::placeholders::_1));
 }
 
 gearoenix::render::engine::Engine::~Engine()

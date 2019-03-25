@@ -15,6 +15,8 @@ namespace gearoenix {
 						const std::shared_ptr<engine::Engine>& e);
 				public:
 					virtual ~Tree();
+					/// It is called from graphic thread
+					virtual void update() = 0;
 					/// Multithreaded rendering happens in here
 					virtual void record(const unsigned int kernel_index) = 0;
 					/// Submit is called from graphic thread

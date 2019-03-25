@@ -32,9 +32,9 @@
 
 void gearoenix::gles2::engine::Engine::initialize()
 {
-    //glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-    //win_width = (GLfloat)sysapp->get_width();
-    //win_height = (GLfloat)sysapp->get_height();
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	GLfloat win_width = (GLfloat)sysapp->get_width();
+	GLfloat win_height = (GLfloat)sysapp->get_height();
     //glGetIntegerv(GL_FRAMEBUFFER_BINDING, (GLint*)&render_framebuffer);
     //glGetIntegerv(GL_RENDERBUFFER_BINDING, (GLint*)&render_depth);
     //glGenFramebuffers(1, &shadow_map_framebuffer);
@@ -67,15 +67,15 @@ void gearoenix::gles2::engine::Engine::initialize()
     //if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
     //    GXUNEXPECTED;
     //shadow_map_texture = new texture::Texture2D(sysapp->get_asset_manager()->create_id(), shadow_map_color, this);
-    //glEnable(GL_CULL_FACE);
-    //glCullFace(GL_BACK);
-    //glEnable(GL_BLEND);
-    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    //glEnable(GL_DEPTH_TEST);
-    //glEnable(GL_SCISSOR_TEST);
-    //glEnable(GL_STENCIL_TEST);
-    //glViewport(0, 0, (GLsizei)win_width, (GLsizei)win_height);
-    //glScissor(0, 0, (GLsizei)win_width, (GLsizei)win_height);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_SCISSOR_TEST);
+    glEnable(GL_STENCIL_TEST);
+    glViewport(0, 0, (GLsizei)win_width, (GLsizei)win_height);
+    glScissor(0, 0, (GLsizei)win_width, (GLsizei)win_height);
     //pipeline_manager = new render::pipeline::Manager(this);
 #ifdef GX_GLES2_ENGINE_PROFILING
     prof_last_time_draw = std::chrono::high_resolution_clock::now();
@@ -103,8 +103,8 @@ gearoenix::gles2::engine::Engine::~Engine()
 
 void gearoenix::gles2::engine::Engine::update()
 {
-    //GX_CHECK_FOR_GRAPHIC_API_ERROR;
-    //glClear(GL_COLOR_BUFFER_BIT);
+	render::engine::Engine::update();
+    glClear(GL_COLOR_BUFFER_BIT);
     //do_load_functions();
     //physics_engine->wait();
     //for (std::pair<const core::Id, std::shared_ptr<render::scene::Scene>>& scene : loaded_scenes) {
@@ -127,6 +127,7 @@ void gearoenix::gles2::engine::Engine::update()
     //    scene.second->draw(shadow_map_texture);
     //}
     //physics_engine->update();
+	GX_CHECK_FOR_GRAPHIC_API_ERROR;
 #ifdef GX_GLES2_ENGINE_PROFILING
     auto now = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>(now - prof_last_time_draw);
@@ -175,6 +176,11 @@ gearoenix::render::texture::Texture2D * gearoenix::gles2::engine::Engine::create
 void gearoenix::gles2::engine::Engine::submit(const std::vector<std::shared_ptr<render::sync::Semaphore>>& p, const std::shared_ptr<render::command::Buffer>& c, const std::shared_ptr<render::sync::Semaphore>& n)
 {
 	GXUNIMPLEMENTED;
+}
+
+void gearoenix::render::engine::Engine::set_render_tree(const std::shared_ptr<graph::tree::Tree>& tree)
+{
+	render_tree = tree;
 }
 
 //gearoenix::render::texture::Texture2D* gearoenix::gles2::engine::Engine::create_texture_2d(core::Id id, system::stream::Stream* file, core::sync::EndCaller<core::sync::EndCallerIgnore> c)

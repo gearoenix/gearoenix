@@ -34,3 +34,8 @@ void gearoenix::render::scene::Manager::get_gx3d(const core::Id mid, core::sync:
 		}));
 	});
 }
+
+const std::map<gearoenix::core::Id, std::weak_ptr<gearoenix::render::scene::Scene>>& gearoenix::render::scene::Manager::get_scenes() const
+{
+	return cache.get_cacher().get_cacheds();
+}

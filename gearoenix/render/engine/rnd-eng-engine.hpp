@@ -38,6 +38,11 @@ namespace gearoenix {
 			class Uniform;
 			class Manager;
 		}
+		namespace graph {
+			namespace tree {
+				class Tree;
+			}
+		}
 		namespace pipeline {
 			class Manager;
 			class Pipeline;
@@ -69,13 +74,14 @@ namespace gearoenix {
 				std::shared_ptr<core::FunctionLoader> fun_loader = nullptr;
 				std::shared_ptr<physics::Engine> physics_engine = nullptr;
 				std::shared_ptr<core::sync::KernelWorker> kernels = nullptr;
+				std::shared_ptr<graph::tree::Tree> render_tree = nullptr;
 				/// managers pointers are own only by this class
 				std::shared_ptr<pipeline::Manager> pipeline_manager = nullptr;
 				std::shared_ptr<command::Manager> command_manager = nullptr;
 				std::shared_ptr<sampler::Manager> sampler_manager = nullptr;
 				std::shared_ptr<buffer::Manager> buffer_manager = nullptr;
+				void record(const unsigned int kernel_index);
 				Engine(const std::shared_ptr<system::Application>& system_application, const Type::Id engine_type_id);
-
 			public:
 				virtual ~Engine();
 				virtual void update();
@@ -91,6 +97,7 @@ namespace gearoenix {
 					const unsigned int heigt,
 					const core::sync::EndCaller<core::sync::EndCallerIgnore> &call) = 0;
 				virtual void submit(const std::vector<std::shared_ptr<sync::Semaphore>>& p, const std::shared_ptr<command::Buffer>& c, const std::shared_ptr<sync::Semaphore>& n) = 0;
+				virtual void set_render_tree(const std::shared_ptr<graph::tree::Tree> &tree);
 
 				const std::shared_ptr<system::Application> &get_system_application() const;
 				const std::shared_ptr<core::FunctionLoader> &get_function_loader() const;

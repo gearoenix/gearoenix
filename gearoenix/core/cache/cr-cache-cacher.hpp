@@ -18,6 +18,7 @@ namespace gearoenix {
 			public:
 				template <class C> std::shared_ptr<C> get(const Key &id, const std::function<std::shared_ptr<C>()> &new_fun);
 				template <class C> std::shared_ptr<C> get(const Key &id) const;
+				const std::map<Key, std::weak_ptr<T>, Compare> &get_cacheds() const;
 			};
 		}
 	}
@@ -61,5 +62,11 @@ std::shared_ptr<C> gearoenix::core::cache::Cacher<T, Key, Compare>::get(const Ke
 		GXLOGF("Object with id: " << id << ", cached but it has been expired.");
 		return nullptr;
 	}
+}
+
+template <class  T, class Key, class Compare>
+const std::map<Key, std::weak_ptr<T>, Compare> &gearoenix::core::cache::Cacher<T, Key, Compare>::get_cacheds() const
+{
+	return cacheds;
 }
 #endif

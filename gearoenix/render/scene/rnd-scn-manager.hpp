@@ -33,6 +33,7 @@ namespace render {
             ~Manager();
 			/// It is gonna load the scene (if exists) in another thread.
             void get_gx3d(const core::Id mid, core::sync::EndCaller<Scene> c);
+			const std::map<core::Id, std::weak_ptr<scene::Scene>> &get_scenes() const;
         };
     }
 }
