@@ -1,5 +1,6 @@
 #ifndef GEAROENIX_GLES2_PIPELINE_MANAGER_HPP
 #define GEAROENIX_GLES2_PIPELINE_MANAGER_HPP
+#include "../../core/cache/cr-cache-cacher.hpp"
 #include "../../render/pipeline/rnd-pip-manager.hpp"
 namespace gearoenix {
 namespace gles2 {
@@ -7,7 +8,10 @@ namespace gles2 {
         class Engine;
     }
     namespace pipeline {
+		class Pipeline;
         class Manager : public render::pipeline::Manager {
+		private:
+			core::cache::Cacher<Pipeline> cacheds;
         public:
             Manager(const std::shared_ptr<engine::Engine>& engine);
             ~Manager() override final;
