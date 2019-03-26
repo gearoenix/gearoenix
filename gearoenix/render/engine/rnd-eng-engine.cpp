@@ -70,6 +70,11 @@ const std::shared_ptr<gearoenix::render::buffer::Manager>& gearoenix::render::en
 	return buffer_manager;
 }
 
+const std::shared_ptr<gearoenix::core::sync::KernelWorker>& gearoenix::render::engine::Engine::get_kernels() const
+{
+	return kernels;
+}
+
 const std::shared_ptr<gearoenix::core::FunctionLoader>& gearoenix::render::engine::Engine::get_function_loader() const
 {
 	return fun_loader;

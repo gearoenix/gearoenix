@@ -76,3 +76,8 @@ void gearoenix::core::sync::KernelWorker::do_steps()
 		worker.boss();
 	}
 }
+
+unsigned int gearoenix::core::sync::KernelWorker::get_threads_count() const
+{
+	return static_cast<unsigned int>(threads.size());
+}

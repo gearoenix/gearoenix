@@ -105,6 +105,7 @@ namespace gearoenix {
 				const std::shared_ptr<pipeline::Manager> &get_pipeline_manager() const;
 				const std::shared_ptr<command::Manager> &get_command_manager() const;
 				const std::shared_ptr<buffer::Manager> &get_buffer_manager() const;
+				const std::shared_ptr<core::sync::KernelWorker> &get_kernels() const;
 				Type::Id get_engine_type_id() const;
 				unsigned int get_frame_number() const;
 				unsigned int get_frames_count() const;
