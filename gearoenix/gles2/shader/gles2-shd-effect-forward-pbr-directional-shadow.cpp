@@ -1,101 +1,324 @@
-//#include "gles2-shader.hpp"
-//#ifdef GX_USE_OPENGL_ES2
-//#include "../../system/sys-log.hpp"
-//
-//void gearoenix::gles2::shader::Shader::create_program()
-//{
-//    shader_program = glCreateProgram();
-//    if (shader_program == 0) {
-//        GXLOGF("Error creating shader program.");
-//    }
-//}
-//
-//GLuint gearoenix::gles2::shader::Shader::add_shader_to_program(const std::string& shd, const GLenum& shader_type)
-//{
-//    GLuint shader_obj = glCreateShader(shader_type);
-//    if (shader_obj == 0) {
-//        GXLOGF("Error creating shader type.");
-//    }
-//    const char* chtemp = shd.c_str();
-//    const GLint uintemp = (GLint)shd.length();
-//    glShaderSource(shader_obj, 1, &(chtemp), &(uintemp));
-//    glCompileShader(shader_obj);
-//    GLint success;
-//    glGetShaderiv(shader_obj, GL_COMPILE_STATUS, &success);
-//    if (!success) {
-//        GLint sts_size;
-//        glGetShaderiv(shader_obj, GL_INFO_LOG_LENGTH, &sts_size);
-//        std::vector<GLchar> info_log;
-//        info_log.resize(sts_size);
-//        glGetShaderInfoLog(shader_obj, sts_size, NULL, &(info_log[0]));
-//        GXLOGF("Error compiling shader type. Info: " << &(info_log[0]));
-//    }
-//    glAttachShader(shader_program, shader_obj);
-//    return shader_obj;
-//}
-//
-//void gearoenix::gles2::shader::Shader::link()
-//{
-//    GLint is_success = 0;
-//    glLinkProgram(shader_program);
-//    glGetProgramiv(shader_program, GL_LINK_STATUS, &is_success);
-//    if (is_success == 0) {
-//        GLint max_length = 0;
-//        glGetProgramiv(shader_program, GL_INFO_LOG_LENGTH, &max_length);
-//        std::vector<GLchar> info_log;
-//        info_log.resize(max_length);
-//        glGetProgramInfoLog(shader_program, max_length, NULL, &(info_log[0]));
-//        GXLOGF("Error linking shader program: " << &(info_log[0]));
-//    }
-//}
-//
-//void gearoenix::gles2::shader::Shader::validate()
-//{
-//    glValidateProgram(shader_program);
-//    GLint is_success = 0;
-//    glGetProgramiv(shader_program, GL_VALIDATE_STATUS, &is_success);
-//    if (!is_success) {
-//        GLint max_length = 0;
-//        glGetProgramiv(shader_program, GL_INFO_LOG_LENGTH, &max_length);
-//        std::string info_log;
-//        info_log.resize(max_length);
-//        glGetProgramInfoLog(shader_program, max_length, NULL, &(info_log[0]));
-//        GXLOGF("Invalid shader program: " << info_log);
-//    }
-//    glUseProgram(shader_program);
-//}
-//
-//void gearoenix::gles2::shader::Shader::run()
-//{
-//    link();
-//    glUseProgram(shader_program);
-//}
-//
-//GLuint gearoenix::gles2::shader::Shader::get_uniform_location(const std::string& uname)
-//{
-//    GLuint result = glGetUniformLocation(shader_program, &(uname[0]));
-//    if (result == 0xFFFFFFFF) {
-//        GXUNEXPECTED;
-//    }
-//    return result;
-//}
-//
-//void gearoenix::gles2::shader::Shader::end_program(const GLuint shader_program)
-//{
-//    glDeleteProgram(shader_program);
-//}
-//
-//void gearoenix::gles2::shader::Shader::end_object(const GLuint shader_object)
-//{
-//    glDeleteShader(shader_object);
-//}
-//
-//gearoenix::gles2::shader::Shader::Shader(core::Id my_id, Engine* eng, core::sync::EndCaller<core::sync::EndCallerIgnore>)
-//    : render::shader::Shader(my_id)
-//    , eng(eng)
-//{
-//}
-//
-//gearoenix::gles2::shader::Shader::~Shader() {}
-//
-//#endif
+#include "gles2-shd-effect-forward-pbr-directional-shadow.hpp"
+#ifdef GX_USE_OPENGL_ES2
+#include "../../system/sys-log.hpp"
+
+const static std::string vertex_shader_code =
+	"precision highp float;\n"
+	"attribute vec3 position;\n"
+	"attribute vec4 normal;\n"
+	"attribute vec4 tangent;\n"
+	"attribute vec2 uv;\n"
+	"uniform mat4 mvp;\n"
+	"uniform mat4 m;\n"
+	"varying vec3 out_pos;\n"
+	"varying vec2 out_uv;\n"
+	"varying mat3 out_tbn;\n"
+	"void main()\n"
+	"{\n"
+	"    const vec4 pos = m * vec4(position, 1.0);\n"
+	"    const vec3 nrm = normalize((m * vec4(normal, 0.0)).xyz);\n"
+	"    const vec3 tng = normalize((m * vec4(tangent.xyz, 0.0)).xyz);\n"
+	"    const vec3 btg = cross(nrm, tng) * tangent.w;\n"
+	"    out_pos = pos.xyz;\n"
+	"    out_uv = uv;\n"
+	"    out_tbn = mat3(tng, btg, nrm);\n"
+	"    gl_Position = mvp * pos;\n"
+	"}";
+
+const static std::string fragment_shader_code = 
+"precision highp float;\n"
+"uniform vec3 u_LightDirection;\n"
+"uniform vec3 u_LightColor;\n"
+"uniform samplerCube u_DiffuseEnvSampler;\n"
+"uniform samplerCube u_SpecularEnvSampler;\n"
+"uniform sampler2D u_brdfLUT;\n"
+"uniform sampler2D u_BaseColorSampler;\n"
+"uniform sampler2D u_NormalSampler;\n"
+"uniform float u_NormalScale;\n"
+"uniform sampler2D u_EmissiveSampler;\n"
+"uniform vec3 u_EmissiveFactor;\n"
+"uniform sampler2D u_MetallicRoughnessSampler;\n"
+"uniform sampler2D u_OcclusionSampler;\n"
+"uniform float u_OcclusionStrength;\n"
+"uniform vec2 u_MetallicRoughnessValues;\n"
+"uniform vec4 u_BaseColorFactor;\n"
+"uniform vec3 u_Camera;\n"
+"// debugging flags used for shader output of intermediate PBR variables\n"
+"uniform vec4 u_ScaleDiffBaseMR;\n"
+"uniform vec4 u_ScaleFGDSpec;\n"
+"uniform vec4 u_ScaleIBLAmbient;\n"
+"\n"
+"varying vec3 v_Position;\n"
+"\n"
+"varying vec2 v_UV;\n"
+"\n"
+"#ifdef HAS_NORMALS\n"
+"#ifdef HAS_TANGENTS\n"
+"varying mat3 v_TBN;\n"
+"#else\n"
+"varying vec3 v_Normal;\n"
+"#endif\n"
+"#endif\n"
+"\n"
+"// Encapsulate the various inputs used by the various functions in the shading equation\n"
+"// We store values in this struct to simplify the integration of alternative implementations\n"
+"// of the shading terms, outlined in the Readme.MD Appendix.\n"
+"struct PBRInfo\n"
+"{\n"
+"	float NdotL;                  // cos angle between normal and light direction\n"
+"	float NdotV;                  // cos angle between normal and view direction\n"
+"	float NdotH;                  // cos angle between normal and half vector\n"
+"	float LdotH;                  // cos angle between light direction and half vector\n"
+"	float VdotH;                  // cos angle between view direction and half vector\n"
+"	float perceptualRoughness;    // roughness value, as authored by the model creator (input to shader)\n"
+"	float metalness;              // metallic value at the surface\n"
+"	vec3 reflectance0;            // full reflectance color (normal incidence angle)\n"
+"	vec3 reflectance90;           // reflectance color at grazing angle\n"
+"	float alphaRoughness;         // roughness mapped to a more linear change in the roughness (proposed by [2])\n"
+"	vec3 diffuseColor;            // color contribution from diffuse lighting\n"
+"	vec3 specularColor;           // color contribution from specular lighting\n"
+"};\n"
+"\n"
+"const float M_PI = 3.141592653589793;\n"
+"const float c_MinRoughness = 0.04;\n"
+"\n"
+"vec4 SRGBtoLINEAR(vec4 srgbIn)\n"
+"{\n"
+"#ifdef MANUAL_SRGB\n"
+"#ifdef SRGB_FAST_APPROXIMATION\n"
+"	vec3 linOut = pow(srgbIn.xyz, vec3(2.2));\n"
+"#else //SRGB_FAST_APPROXIMATION\n"
+"	vec3 bLess = step(vec3(0.04045), srgbIn.xyz);\n"
+"	vec3 linOut = mix(srgbIn.xyz / vec3(12.92), pow((srgbIn.xyz + vec3(0.055)) / vec3(1.055), vec3(2.4)), bLess);\n"
+"#endif //SRGB_FAST_APPROXIMATION\n"
+"	return vec4(linOut, srgbIn.w);;\n"
+"#else //MANUAL_SRGB\n"
+"	return srgbIn;\n"
+"#endif //MANUAL_SRGB\n"
+"}\n"
+"\n"
+"// Find the normal for this fragment, pulling either from a predefined normal map\n"
+"// or from the interpolated mesh normal and tangent attributes.\n"
+"vec3 getNormal()\n"
+"{\n"
+"	// Retrieve the tangent space matrix\n"
+"#ifndef HAS_TANGENTS\n"
+"	vec3 pos_dx = dFdx(v_Position);\n"
+"	vec3 pos_dy = dFdy(v_Position);\n"
+"	vec3 tex_dx = dFdx(vec3(v_UV, 0.0));\n"
+"	vec3 tex_dy = dFdy(vec3(v_UV, 0.0));\n"
+"	vec3 t = (tex_dy.t * pos_dx - tex_dx.t * pos_dy) / (tex_dx.s * tex_dy.t - tex_dy.s * tex_dx.t);\n"
+"\n"
+"#ifdef HAS_NORMALS\n"
+"	vec3 ng = normalize(v_Normal);\n"
+"#else\n"
+"	vec3 ng = cross(pos_dx, pos_dy);\n"
+"#endif\n"
+"\n"
+"	t = normalize(t - ng * dot(ng, t));\n"
+"	vec3 b = normalize(cross(ng, t));\n"
+"	mat3 tbn = mat3(t, b, ng);\n"
+"#else // HAS_TANGENTS\n"
+"	mat3 tbn = v_TBN;\n"
+"#endif\n"
+"\n"
+"#ifdef HAS_NORMALMAP\n"
+"	vec3 n = texture2D(u_NormalSampler, v_UV).rgb;\n"
+"	n = normalize(tbn * ((2.0 * n - 1.0) * vec3(u_NormalScale, u_NormalScale, 1.0)));\n"
+"#else\n"
+"	// The tbn matrix is linearly interpolated, so we need to re-normalize\n"
+"	vec3 n = normalize(tbn[2].xyz);\n"
+"#endif\n"
+"\n"
+"	return n;\n"
+"}\n"
+"\n"
+"// Calculation of the lighting contribution from an optional Image Based Light source.\n"
+"// Precomputed Environment Maps are required uniform inputs and are computed as outlined in [1].\n"
+"// See our README.md on Environment Maps [3] for additional discussion.\n"
+"#ifdef USE_IBL\n"
+"vec3 getIBLContribution(PBRInfo pbrInputs, vec3 n, vec3 reflection)\n"
+"{\n"
+"	float mipCount = 9.0; // resolution of 512x512\n"
+"	float lod = (pbrInputs.perceptualRoughness * mipCount);\n"
+"	// retrieve a scale and bias to F0. See [1], Figure 3\n"
+"	vec3 brdf = SRGBtoLINEAR(texture2D(u_brdfLUT, vec2(pbrInputs.NdotV, 1.0 - pbrInputs.perceptualRoughness))).rgb;\n"
+"	vec3 diffuseLight = SRGBtoLINEAR(textureCube(u_DiffuseEnvSampler, n)).rgb;\n"
+"\n"
+"#ifdef USE_TEX_LOD\n"
+"	vec3 specularLight = SRGBtoLINEAR(textureCubeLodEXT(u_SpecularEnvSampler, reflection, lod)).rgb;\n"
+"#else\n"
+"	vec3 specularLight = SRGBtoLINEAR(textureCube(u_SpecularEnvSampler, reflection)).rgb;\n"
+"#endif\n"
+"\n"
+"	vec3 diffuse = diffuseLight * pbrInputs.diffuseColor;\n"
+"	vec3 specular = specularLight * (pbrInputs.specularColor * brdf.x + brdf.y);\n"
+"\n"
+"	// For presentation, this allows us to disable IBL terms\n"
+"	diffuse *= u_ScaleIBLAmbient.x;\n"
+"	specular *= u_ScaleIBLAmbient.y;\n"
+"\n"
+"	return diffuse + specular;\n"
+"}\n"
+"#endif\n"
+"\n"
+"// Basic Lambertian diffuse\n"
+"// Implementation from Lambert's Photometria https://archive.org/details/lambertsphotome00lambgoog\n"
+"// See also [1], Equation 1\n"
+"vec3 diffuse(PBRInfo pbrInputs)\n"
+"{\n"
+"	return pbrInputs.diffuseColor / M_PI;\n"
+"}\n"
+"\n"
+"// The following equation models the Fresnel reflectance term of the spec equation (aka F())\n"
+"// Implementation of fresnel from [4], Equation 15\n"
+"vec3 specularReflection(PBRInfo pbrInputs)\n"
+"{\n"
+"	return pbrInputs.reflectance0 + (pbrInputs.reflectance90 - pbrInputs.reflectance0) * pow(clamp(1.0 - pbrInputs.VdotH, 0.0, 1.0), 5.0);\n"
+"}\n"
+"\n"
+"// This calculates the specular geometric attenuation (aka G()),\n"
+"// where rougher material will reflect less light back to the viewer.\n"
+"// This implementation is based on [1] Equation 4, and we adopt their modifications to\n"
+"// alphaRoughness as input as originally proposed in [2].\n"
+"float geometricOcclusion(PBRInfo pbrInputs)\n"
+"{\n"
+"	float NdotL = pbrInputs.NdotL;\n"
+"	float NdotV = pbrInputs.NdotV;\n"
+"	float r = pbrInputs.alphaRoughness;\n"
+"\n"
+"	float attenuationL = 2.0 * NdotL / (NdotL + sqrt(r * r + (1.0 - r * r) * (NdotL * NdotL)));\n"
+"	float attenuationV = 2.0 * NdotV / (NdotV + sqrt(r * r + (1.0 - r * r) * (NdotV * NdotV)));\n"
+"	return attenuationL * attenuationV;\n"
+"}\n"
+"\n"
+"// The following equation(s) model the distribution of microfacet normals across the area being drawn (aka D())\n"
+"// Implementation from "Average Irregularity Representation of a Roughened Surface for Ray Reflection" by T. S. Trowbridge, and K. P. Reitz\n"
+"// Follows the distribution function recommended in the SIGGRAPH 2013 course notes from EPIC Games [1], Equation 3.\n"
+"float microfacetDistribution(PBRInfo pbrInputs)\n"
+"{\n"
+"	float roughnessSq = pbrInputs.alphaRoughness * pbrInputs.alphaRoughness;\n"
+"	float f = (pbrInputs.NdotH * roughnessSq - pbrInputs.NdotH) * pbrInputs.NdotH + 1.0;\n"
+"	return roughnessSq / (M_PI * f * f);\n"
+"}\n"
+"\n"
+"void main()\n"
+"{\n"
+"	// Metallic and Roughness material properties are packed together\n"
+"	// In glTF, these factors can be specified by fixed scalar values\n"
+"	// or from a metallic-roughness map\n"
+"	float perceptualRoughness = u_MetallicRoughnessValues.y;\n"
+"	float metallic = u_MetallicRoughnessValues.x;\n"
+"#ifdef HAS_METALROUGHNESSMAP\n"
+"	// Roughness is stored in the 'g' channel, metallic is stored in the 'b' channel.\n"
+"	// This layout intentionally reserves the 'r' channel for (optional) occlusion map data\n"
+"	vec4 mrSample = texture2D(u_MetallicRoughnessSampler, v_UV);\n"
+"	perceptualRoughness = mrSample.g * perceptualRoughness;\n"
+"	metallic = mrSample.b * metallic;\n"
+"#endif\n"
+"	perceptualRoughness = clamp(perceptualRoughness, c_MinRoughness, 1.0);\n"
+"	metallic = clamp(metallic, 0.0, 1.0);\n"
+"	// Roughness is authored as perceptual roughness; as is convention,\n"
+"	// convert to material roughness by squaring the perceptual roughness [2].\n"
+"	float alphaRoughness = perceptualRoughness * perceptualRoughness;\n"
+"\n"
+"	// The albedo may be defined from a base texture or a flat color\n"
+"#ifdef HAS_BASECOLORMAP\n"
+"	vec4 baseColor = SRGBtoLINEAR(texture2D(u_BaseColorSampler, v_UV)) * u_BaseColorFactor;\n"
+"#else\n"
+"	vec4 baseColor = u_BaseColorFactor;\n"
+"#endif\n"
+"\n"
+"	vec3 f0 = vec3(0.04);\n"
+"	vec3 diffuseColor = baseColor.rgb * (vec3(1.0) - f0);\n"
+"	diffuseColor *= 1.0 - metallic;\n"
+"	vec3 specularColor = mix(f0, baseColor.rgb, metallic);\n"
+"\n"
+"	// Compute reflectance.\n"
+"	float reflectance = max(max(specularColor.r, specularColor.g), specularColor.b);\n"
+"\n"
+"	// For typical incident reflectance range (between 4% to 100%) set the grazing reflectance to 100% for typical fresnel effect.\n"
+"	// For very low reflectance range on highly diffuse objects (below 4%), incrementally reduce grazing reflecance to 0%.\n"
+"	float reflectance90 = clamp(reflectance * 25.0, 0.0, 1.0);\n"
+"	vec3 specularEnvironmentR0 = specularColor.rgb;\n"
+"	vec3 specularEnvironmentR90 = vec3(1.0, 1.0, 1.0) * reflectance90;\n"
+"\n"
+"	vec3 n = getNormal();                             // normal at surface point\n"
+"	vec3 v = normalize(u_Camera - v_Position);        // Vector from surface point to camera\n"
+"	vec3 l = normalize(u_LightDirection);             // Vector from surface point to light\n"
+"	vec3 h = normalize(l + v);                          // Half vector between both l and v\n"
+"	vec3 reflection = -normalize(reflect(v, n));\n"
+"\n"
+"	float NdotL = clamp(dot(n, l), 0.001, 1.0);\n"
+"	float NdotV = clamp(abs(dot(n, v)), 0.001, 1.0);\n"
+"	float NdotH = clamp(dot(n, h), 0.0, 1.0);\n"
+"	float LdotH = clamp(dot(l, h), 0.0, 1.0);\n"
+"	float VdotH = clamp(dot(v, h), 0.0, 1.0);\n"
+"\n"
+"	PBRInfo pbrInputs = PBRInfo(\n"
+"		NdotL,\n"
+"		NdotV,\n"
+"		NdotH,\n"
+"		LdotH,\n"
+"		VdotH,\n"
+"		perceptualRoughness,\n"
+"		metallic,\n"
+"		specularEnvironmentR0,\n"
+"		specularEnvironmentR90,\n"
+"		alphaRoughness,\n"
+"		diffuseColor,\n"
+"		specularColor\n"
+"	);\n"
+"\n"
+"	// Calculate the shading terms for the microfacet specular shading model\n"
+"	vec3 F = specularReflection(pbrInputs);\n"
+"	float G = geometricOcclusion(pbrInputs);\n"
+"	float D = microfacetDistribution(pbrInputs);\n"
+"\n"
+"	// Calculation of analytical lighting contribution\n"
+"	vec3 diffuseContrib = (1.0 - F) * diffuse(pbrInputs);\n"
+"	vec3 specContrib = F * G * D / (4.0 * NdotL * NdotV);\n"
+"	// Obtain final intensity as reflectance (BRDF) scaled by the energy of the light (cosine law)\n"
+"	vec3 color = NdotL * u_LightColor * (diffuseContrib + specContrib);\n"
+"\n"
+"	// Calculate lighting contribution from image based lighting source (IBL)\n"
+"#ifdef USE_IBL\n"
+"	color += getIBLContribution(pbrInputs, n, reflection);\n"
+"#endif\n"
+"\n"
+"	// Apply optional PBR terms for additional (optional) shading\n"
+"#ifdef HAS_OCCLUSIONMAP\n"
+"	float ao = texture2D(u_OcclusionSampler, v_UV).r;\n"
+"	color = mix(color, color * ao, u_OcclusionStrength);\n"
+"#endif\n"
+"\n"
+"#ifdef HAS_EMISSIVEMAP\n"
+"	vec3 emissive = SRGBtoLINEAR(texture2D(u_EmissiveSampler, v_UV)).rgb * u_EmissiveFactor;\n"
+"	color += emissive;\n"
+"#endif\n"
+"\n"
+"	// This section uses mix to override final color for reference app visualization\n"
+"	// of various parameters in the lighting equation.\n"
+"	color = mix(color, F, u_ScaleFGDSpec.x);\n"
+"	color = mix(color, vec3(G), u_ScaleFGDSpec.y);\n"
+"	color = mix(color, vec3(D), u_ScaleFGDSpec.z);\n"
+"	color = mix(color, specContrib, u_ScaleFGDSpec.w);\n"
+"\n"
+"	color = mix(color, diffuseContrib, u_ScaleDiffBaseMR.x);\n"
+"	color = mix(color, baseColor.rgb, u_ScaleDiffBaseMR.y);\n"
+"	color = mix(color, vec3(metallic), u_ScaleDiffBaseMR.z);\n"
+"	color = mix(color, vec3(perceptualRoughness), u_ScaleDiffBaseMR.w);\n"
+"\n"
+"	gl_FragColor = vec4(pow(color, vec3(1.0 / 2.2)), baseColor.a);\n"
+"}";
+
+gearoenix::gles2::shader::ForwardPbrDirectionalShadow::ForwardPbrDirectionalShadow(const std::shared_ptr<engine::Engine> &e, const core::sync::EndCaller<core::sync::EndCallerIgnore> &c)
+	: Shader(e, c)
+{
+}
+
+gearoenix::gles2::shader::ForwardPbrDirectionalShadow::~ForwardPbrDirectionalShadow()
+{
+}
+
+#endif

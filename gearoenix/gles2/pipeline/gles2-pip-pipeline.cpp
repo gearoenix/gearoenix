@@ -4,7 +4,7 @@
 #include "../../system/sys-app.hpp"
 #include "../../system/sys-log.hpp"
 #include "../engine/gles2-eng-engine.hpp"
-#include "../shader/gles2-shader.hpp"
+#include "../shader/gles2-shd-shader.hpp"
 
 gearoenix::gles2::pipeline::Pipeline::Pipeline(
     const render::pipeline::Type::Id pid,
