@@ -1,44 +1,46 @@
 #include "gles2-shd-effect-forward-pbr-directional-shadow.hpp"
 #ifdef GX_USE_OPENGL_ES2
+#include "../../core/cr-function-loader.hpp"
 #include "../../system/sys-log.hpp"
+#include "../engine/gles2-eng-engine.hpp"
 
 const static std::string vertex_shader_code =
-	// precision(s)
-	"precision highp float;\n"
-	"precision highp sampler2D;\n"
-	"precision highp samplerCube;\n"
-	// attribute(s)
-	"attribute vec3 position;\n"
-	"attribute vec3 normal;\n"
-	"attribute vec4 tangent;\n"
-	"attribute vec2 uv;\n"
-	// effect uniform(s)
-	"uniform mat4 effect_mvp;\n"
-	// light uniform(s)
-	"uniform mat4 light_vp_bias;\n"
-	// model uniform(s)
-	"uniform mat4 model_m;\n"
-	// output(s)
-	"varying vec3 out_pos;\n"
-	"varying mat3 out_nrm;\n"
-	"varying mat3 out_tng;\n"
-	"varying mat3 out_tbn;\n"
-	"varying vec2 out_uv;\n"
-	"varying vec3 out_light_pos;\n"
-	"void main()\n"
-	"{\n"
-	"    const vec4 pos = m * vec4(position, 1.0);\n"
-	"    out_pos = pos.xyz;\n"
-	"    out_nrm = normalize((m * vec4(normal, 0.0)).xyz);\n"
-	"    out_tng = normalize((m * vec4(tangent.xyz, 0.0)).xyz);\n"
-	"    out_btg = cross(nrm, tng) * tangent.w;\n"
-	"    out_uv = uv;\n"
-	"    const vec4 light_pos = light_vp_bias * pos;\n"
-	"    out_light_pos = light_pos.xyz / light_pos.w;\n"
-	"    gl_Position = mvp * pos;\n"
-	"}";
+// precision(s)
+"precision highp float;\n"
+"precision highp sampler2D;\n"
+"precision highp samplerCube;\n"
+// attribute(s)
+"attribute vec3 position;\n"
+"attribute vec3 normal;\n"
+"attribute vec4 tangent;\n"
+"attribute vec2 uv;\n"
+// effect uniform(s)
+"uniform mat4 camera_vp;\n"
+// light uniform(s)
+"uniform mat4 light_vp_bias;\n"
+// model uniform(s)
+"uniform mat4 model_m;\n"
+// output(s)
+"varying vec3 out_pos;\n"
+"varying mat3 out_nrm;\n"
+"varying mat3 out_tng;\n"
+"varying mat3 out_tbn;\n"
+"varying vec2 out_uv;\n"
+"varying vec3 out_light_pos;\n"
+"void main()\n"
+"{\n"
+"    const vec4 pos = m * vec4(position, 1.0);\n"
+"    out_pos = pos.xyz;\n"
+"    out_nrm = normalize((m * vec4(normal, 0.0)).xyz);\n"
+"    out_tng = normalize((m * vec4(tangent.xyz, 0.0)).xyz);\n"
+"    out_btg = cross(nrm, tng) * tangent.w;\n"
+"    out_uv = uv;\n"
+"    const vec4 light_pos = light_vp_bias * pos;\n"
+"    out_light_pos = light_pos.xyz / light_pos.w;\n"
+"    gl_Position = mvp * pos;\n"
+"}";
 
-const static std::string fragment_shader_code = 
+const static std::string fragment_shader_code =
 // precisions
 "precision highp   float;\n"
 "precision highp   sampler2D;\n"
@@ -182,37 +184,36 @@ const static std::string fragment_shader_code =
 "        lo += (kd * albedo / GXPI + specular) * radiance * nl;\n"
 "    }\n"
 //   ambient lighting (we now use IBL as the ambient term)
-	vec3 F = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
-
-	vec3 kS = F;
-	vec3 kD = 1.0 - kS;
-	kD *= 1.0 - metallic;
-
-	vec3 irradiance = texture(irradianceMap, N).rgb;
-	vec3 diffuse = irradiance * albedo;
-
-	// sample both the pre-filter map and the BRDF lut and combine them together as per the Split-Sum approximation to get the IBL specular part.
-	const float MAX_REFLECTION_LOD = 4.0;
-	vec3 prefilteredColor = textureLod(prefilterMap, R, roughness * MAX_REFLECTION_LOD).rgb;
-	vec2 brdf = texture(brdfLUT, vec2(max(dot(N, V), 0.0), roughness)).rg;
-	vec3 specular = prefilteredColor * (F * brdf.x + brdf.y);
-
-	vec3 ambient = (kD * diffuse + specular) * ao;
-
-	vec3 color = ambient + Lo;
-
-	// HDR tonemapping
-	color = color / (color + vec3(1.0));
-	// gamma correct
-	color = pow(color, vec3(1.0 / 2.2));
-	// TODO don't forget gamma correction it can be part of scene uniform data
-	FragColor = vec4(color, 1.0);
-}"
-;
+"    const vec3 frsn = fresnel_schlick_roughness(max(dot(normal, view), 0.0), f0, roughness);\n"
+"    const vec3 ks = frsn;\n"
+"    const vec3 kd = (1.0 - ks) * (1.0 - metallic);\n"
+"    const vec3 irradiance = textureCube(effect_diffuse_environment, normal).rgb;\n"
+"    const vec3 diffuse = irradiance * albedo;\n"
+//   sample both the pre-filter map and the BRDF lut and combine them together as per 
+//   the Split-Sum approximation to get the IBL specular part.
+"    const float MAX_REFLECTION_LOD = 4.0;\n"
+"    const vec3 prefiltered_color = textureCube(effect_specular_environment, reflection, roughness * MAX_REFLECTION_LOD).rgb;\n"
+"    const vec2 brdf = texture2D(effect_brdflut, vec2(max(dot(normal, view), 0.0), roughness)).rg;\n"
+"    const vec3 specular = prefiltered_color * (frsn * brdf.x + brdf.y);\n"
+//   TODO: add ambient occlusion (* ao);
+"    const vec3 ambient = kd * diffuse + specular;\n"
+"    tmpv4.xyz = ambient + lo;\n"
+//   HDR tonemapping
+"    tmpv4.xyz = tmpv4.xyz / (tmpv4.xyz + vec3(1.0));\n"
+//   gamma correct
+"    color = pow(color, vec3(1.0 / 2.2));\n"
+//   TODO don't forget gamma correction it can be part of scene uniform data
+"    gl_FragColor = vec4(color, 1.0);\n"
+"}";
 
 gearoenix::gles2::shader::ForwardPbrDirectionalShadow::ForwardPbrDirectionalShadow(const std::shared_ptr<engine::Engine> &e, const core::sync::EndCaller<core::sync::EndCallerIgnore> &c)
 	: Shader(e, c)
 {
+	e->get_function_loader()->load([this] {
+		set_vertex_shader(vertex_shader_code);
+		set_fragment_shader(fragment_shader_code);
+		link();
+	});
 }
 
 gearoenix::gles2::shader::ForwardPbrDirectionalShadow::~ForwardPbrDirectionalShadow()

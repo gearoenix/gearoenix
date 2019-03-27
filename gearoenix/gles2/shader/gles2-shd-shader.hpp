@@ -18,6 +18,10 @@ namespace gles2 {
 			GLuint shader_program = 0;
 			GLuint vertex_object = 0;
 			GLuint fragment_object = 0;
+			GLint position_attribute_location = -1;
+			GLint normal_attribute_location = -1;
+			GLint tangent_attribute_location = -1;
+			GLint uv_attribute_location = -1;
             void create_program();
             void run();
             void link();

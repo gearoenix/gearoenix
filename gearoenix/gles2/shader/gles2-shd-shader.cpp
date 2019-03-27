@@ -32,6 +32,11 @@ void gearoenix::gles2::shader::Shader::link()
 		glGetProgramInfoLog(shader_program, max_length, NULL, &(info_log[0]));
 		GXLOGF("Error linking shader program: " << &(info_log[0]));
 	}
+	glUseProgram(shader_program);
+	position_attribute_location = glGetAttribLocation(shader_program, "position");
+	normal_attribute_location = glGetAttribLocation(shader_program, "normal");
+	tangent_attribute_location = glGetAttribLocation(shader_program, "tangent");
+	uv_attribute_location = glGetAttribLocation(shader_program, "uv");
 }
 
 void gearoenix::gles2::shader::Shader::validate()
