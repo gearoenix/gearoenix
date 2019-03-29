@@ -13,7 +13,6 @@ namespace render {
         class Shader;
     }
     namespace pipeline {
-        class Resource;
         class ResourceSet;
         class Pipeline {
         protected:
@@ -29,4 +28,4 @@ namespace render {
     }
 }
 }
-#endif // GEAROENIX_RENDER_PIPELINE_PIPELINE_HPP
+#endif

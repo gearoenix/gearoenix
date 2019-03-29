@@ -27,11 +27,7 @@ namespace render {
 		class Mesh;
     }
     namespace pipeline {
-        class Resource;
-        class ResourceSet;
-        class Pipeline;
         class ForwardPbrDirectionalShadow;
-        class ForwardPbrDirectionalShadowResource;
         class ForwardPbrDirectionalShadowResourceSet;
     }
     namespace scene {
@@ -62,8 +58,6 @@ namespace render {
             struct ForwardPbrDirectionalShadowFrame {
                 std::shared_ptr<command::Buffer> primary_cmd = nullptr;
                 std::shared_ptr<sync::Semaphore> semaphore = nullptr;
-                std::shared_ptr<pipeline::ForwardPbrDirectionalShadowResource> pipeline_resource = nullptr;
-                bool input_texture_changed = true;
                 std::vector<std::shared_ptr<ForwardPbrDirectionalShadowKernel>> kernels;
 
                 ForwardPbrDirectionalShadowFrame(const std::shared_ptr<engine::Engine>& e);
@@ -98,7 +92,6 @@ namespace render {
                 void set_shadow_mapper(const std::shared_ptr<texture::Texture2D>& t);
                 void set_brdflut(const std::shared_ptr<texture::Texture2D>& t);
 
-                void set_input_texture(const std::shared_ptr<texture::Texture>& t, const unsigned int index) override final;
 				const std::shared_ptr<sync::Semaphore>& get_semaphore(const unsigned int frame_number);
                 /// This will be called at the start of each frame
                 void update();

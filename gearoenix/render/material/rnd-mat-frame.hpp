@@ -11,9 +11,8 @@ namespace render {
     }
     namespace material {
         struct Frame {
-            bool textures_changes = true;
+			// TODO It can become a separat structure as framed uniform buffer
             std::shared_ptr<buffer::Uniform> uniform_buffer = nullptr;
-            std::shared_ptr<pipeline::Resource> pipeline_resouce = nullptr;
         };
     }
 }

@@ -14,7 +14,6 @@
 #include "../../pipeline/rnd-pip-manager.hpp"
 #include "../../pipeline/rnd-pip-pipeline.hpp"
 #include "../../pipeline/rnd-pip-resource-set.hpp"
-#include "../../pipeline/rnd-pip-resource.hpp"
 #include "../../sync/rnd-sy-semaphore.hpp"
 #include "../../texture/rnd-txt-target.hpp"
 #include "../../texture/rnd-txt-texture-2d.hpp"
@@ -70,15 +69,6 @@ void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::set_brdflut(co
 	set_input_texture(t, 4);
 }
 
-void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::set_input_texture(
-	const std::shared_ptr<texture::Texture>& t, const unsigned int index)
-{
-	Node::set_input_texture(t, index);
-	for (const std::shared_ptr<ForwardPbrDirectionalShadowFrame>& f : frames) {
-		f->input_texture_changed = true;
-	}
-}
-
 const std::shared_ptr<gearoenix::render::sync::Semaphore>& gearoenix::render::graph::node::ForwardPbrDirectionalShadow::get_semaphore(const unsigned int frame_number)
 {
 	GXUNEXPECTED;
@@ -88,10 +78,6 @@ void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::update()
 {
 	const unsigned int frame_number = e->get_frame_number();
 	const std::shared_ptr<ForwardPbrDirectionalShadowFrame>& frame = frames[frame_number];
-	if (frame->input_texture_changed) {
-		frame->input_texture_changed = false;
-		frame->pipeline_resource = std::static_pointer_cast<pipeline::ForwardPbrDirectionalShadowResource>(e->get_pipeline_manager()->create_resource(e->get_buffer_manager()->create_uniform(sizeof(ForwardPbrDirectionalShadowUniform), core::sync::EndCaller<core::sync::EndCallerIgnore>(0)), input_textures));
-	}
 	frame->primary_cmd->begin();
 	for (const std::shared_ptr<ForwardPbrDirectionalShadowKernel>& kernel : frame->kernels) {
 		kernel->latest_render_data_pool = 0;
@@ -133,7 +119,8 @@ void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::record(
 		prs->set_model(m);
 		prs->set_mesh(msh);
 		prs->set_material(mat);
-		prs->set_effect(ub, frame->pipeline_resource);
+		// TODO: 
+		// prs->set_effect(ub, frame->pipeline_resource);
 		prs->record(kernel->secondary_cmd);
 		++kernel->latest_render_data_pool;
 	}
