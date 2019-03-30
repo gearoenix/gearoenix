@@ -8,8 +8,7 @@
 #include "../../physics/constraint/phs-cns-manager.hpp"
 #include "../../system/stream/sys-stm-stream.hpp"
 #include "../../system/sys-app.hpp"
-#include "../buffer/rnd-buf-manager.hpp"
-#include "../buffer/rnd-buf-uniform.hpp"
+#include "../buffer/rnd-buf-framed-uniform.hpp"
 #include "../camera/rnd-cmr-camera.hpp"
 #include "../camera/rnd-cmr-manager.hpp"
 #include "../camera/rnd-cmr-orthographic.hpp"
@@ -21,7 +20,6 @@
 #include "../model/rnd-mdl-model.hpp"
 #include "../model/rnd-mdl-manager.hpp"
 #include "../pipeline/rnd-pip-manager.hpp"
-#include "../pipeline/rnd-pip-resource.hpp"
 #include "../engine/rnd-eng-engine.hpp"
 #include "../shader/rnd-shd-shader.hpp"
 #include "../skybox/rnd-sky-skybox.hpp"
@@ -41,12 +39,8 @@ gearoenix::render::scene::Scene::Scene(
 	: core::asset::Asset(my_id, core::asset::Type::SCENE)
 	, e(e)
 	, scene_type_id(Type::GAME)
+	, uniform_buffers(std::shared_ptr<buffer::FramedUniform>(new buffer::FramedUniform(sizeof(Uniform), e, c)))
 {
-	uniform_buffers.reserve(e->get_frames_count());
-	for (unsigned int i = 0; i < e->get_frames_count(); ++i) {
-		uniform_buffers.push_back(std::shared_ptr<buffer::Uniform>(e->get_buffer_manager()->create_uniform(sizeof(Uniform), e)));
-	}
-	pipeline_resource = e->get_pipeline_manager()->create_resource(uniform_buffers[e->get_frames_count() - 1], {});
 	const std::shared_ptr<core::asset::Manager> &astmgr = e->get_system_application()->get_asset_manager();
 #define GXHELPER(x, n, cls)                                                   \
 	{                                                                         \
@@ -82,12 +76,8 @@ gearoenix::render::scene::Scene::Scene(
 	: core::asset::Asset(e->get_system_application()->get_asset_manager()->create_id(), core::asset::Type::SCENE)
 	, e(e)
 	, scene_type_id(Type::GAME)
-{
-	for (unsigned int i = 0; i < e->get_frames_count(); ++i) {
-		uniform_buffers[i] = std::shared_ptr<buffer::Uniform>(e->get_buffer_manager()->create_uniform(sizeof(Uniform), e));
-	}
-	pipeline_resource = e->get_pipeline_manager()->create_resource(uniform_buffers[e->get_frames_count() - 1], {});
-}
+	, uniform_buffers(std::shared_ptr<buffer::FramedUniform>(new buffer::FramedUniform(sizeof(Uniform), e, c)))
+{}
 
 gearoenix::render::scene::Scene::~Scene()
 {}

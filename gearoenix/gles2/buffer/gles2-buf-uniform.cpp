@@ -16,7 +16,7 @@ gearoenix::gles2::buffer::Uniform::~Uniform()
     data = nullptr;
 }
 
-void gearoenix::gles2::buffer::Uniform::update(const void* src, unsigned int size)
+void gearoenix::gles2::buffer::Uniform::update(const void* src)
 {
     std::memcpy(data, src, size);
 }

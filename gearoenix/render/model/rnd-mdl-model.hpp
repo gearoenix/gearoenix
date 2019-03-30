@@ -18,28 +18,23 @@ namespace physics {
 }
 namespace render {
     namespace buffer {
-        class Uniform;
+        class FramedUniform;
     }
     namespace engine {
         class Engine;
-    }
-    namespace pipeline {
-        class Resource;
     }
     namespace model {
 		class Mesh;
         class Model : public core::asset::Asset {
         protected:
             const std::shared_ptr<engine::Engine> e;
+			const std::shared_ptr<buffer::FramedUniform> uniform_buffers;
 
 			bool is_dynamic = true;
             bool has_shadow_caster = false;
             bool has_transparent = false;
 
             Uniform uniform;
-			std::vector<std::shared_ptr<buffer::Uniform>> uniform_buffers;
-
-            std::shared_ptr<pipeline::Resource> pipeline_resource;
 
             std::map<core::Id, std::shared_ptr<Mesh>> meshes;
             std::map<core::Id, std::shared_ptr<Model>> children;

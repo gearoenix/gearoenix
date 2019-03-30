@@ -33,7 +33,7 @@ namespace system {
 }
 namespace render {
 	namespace buffer {
-		class Uniform;
+		class FramedUniform;
 	}
     namespace camera {
         class Camera;
@@ -54,9 +54,6 @@ namespace render {
     namespace model {
         class Model;
     }
-	namespace pipeline {
-		class Resource;
-	}
     namespace skybox {
         class Skybox;
     }
@@ -68,12 +65,11 @@ namespace render {
         protected:
 			const std::shared_ptr<engine::Engine> &e;
             const Type::Id scene_type_id;
+			const std::shared_ptr<buffer::FramedUniform> uniform_buffers;
 
 			bool renderable = false;
 			
 			Uniform uniform;
-			std::vector<std::shared_ptr<buffer::Uniform>> uniform_buffers;
-            std::shared_ptr<pipeline::Resource> pipeline_resource;
 
             std::map<core::Id, std::shared_ptr<camera::Camera>> cameras;
             std::map<core::Id, std::shared_ptr<audio::Audio>> audios;

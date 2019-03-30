@@ -4,27 +4,15 @@
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../texture/rnd-txt-manager.hpp"
 #include "../texture/rnd-txt-texture-2d.hpp"
-#include "../buffer/rnd-buf-manager.hpp"
+#include "../buffer/rnd-buf-framed-uniform.hpp"
 #include "../pipeline/rnd-pip-manager.hpp"
 
 #ifdef GX_DEBUG_MODE
 #define GX_DEBUG_MATERIAL_IMPORT
 #endif
 
-void gearoenix::render::material::Material::initialize()
-{
-	const std::shared_ptr<pipeline::Manager> &pipmgr = e->get_pipeline_manager();
-	const std::shared_ptr<buffer::Manager> &bufmgr = e->get_buffer_manager();
-	for (Frame &frame : frames)
-	{
-		frame.textures_changes = false;
-		frame.uniform_buffer = std::shared_ptr<buffer::Uniform>(bufmgr->create_uniform(sizeof(Uniform), e));
-        frame.pipeline_resouce = pipmgr->create_resource(frame.uniform_buffer, { color, metallic_roughness, normal, emissive });
-	}
-}
-
 gearoenix::render::material::Material::Material(const std::shared_ptr<engine::Engine>& e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end)
-	: e(e)
+	: e(e), uniform_buffers(std::shared_ptr<buffer::FramedUniform>(new buffer::FramedUniform(sizeof(Uniform), e, end)))
 {
 	core::sync::EndCaller<texture::Texture2D> calltxt2d(end);
 	const std::shared_ptr<texture::Manager> &txtmgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
@@ -32,10 +20,10 @@ gearoenix::render::material::Material::Material(const std::shared_ptr<engine::En
 	metallic_roughness = txtmgr->get(math::Vec2(0.5f, 0.5f), calltxt2d);
 	normal = txtmgr->get(math::Vec3(0.5f, 0.5f, 1.0f), calltxt2d);
 	emissive = txtmgr->get(math::Vec3(0.0f, 0.0f, 0.0f), calltxt2d);
-	initialize();
 }
 
 gearoenix::render::material::Material::Material(const std::shared_ptr<system::stream::Stream>& f, const std::shared_ptr<engine::Engine>& e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end)
+	: e(e), uniform_buffers(std::shared_ptr<buffer::FramedUniform>(new buffer::FramedUniform(sizeof(Uniform), e, end)))
 {
 #ifdef GX_DEBUG_MATERIAL_IMPORT
 	bool alpha_init = false;
@@ -204,7 +192,6 @@ gearoenix::render::material::Material::Material(const std::shared_ptr<system::st
 		GXLOGF("Roughness factor is missing.");
 	}
 #endif
-	initialize();
 }
 
 gearoenix::render::material::Material::~Material()

@@ -9,15 +9,8 @@ namespace render {
             Uniform(const unsigned int s, const std::shared_ptr<engine::Engine>& e);
         public:
             virtual ~Uniform();
-            virtual void update(const void*, unsigned int) = 0;
+            virtual void update(const void*) = 0;
             virtual void* get_data() = 0;
-
-            template <typename T>
-            void update(const T& s)
-            {
-                /// todo in debug mode check for the size of uniform buffer
-                update(s, sizeof(T));
-            }
         };
     }
 }

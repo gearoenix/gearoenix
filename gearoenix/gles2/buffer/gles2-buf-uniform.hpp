@@ -16,7 +16,7 @@ namespace gles2 {
         public:
             Uniform(const unsigned int s, const std::shared_ptr<engine::Engine>& e);
             ~Uniform();
-            void update(const void* src, unsigned int data_size);
+            void update(const void* src);
             void* get_data();
         };
     } // namespace buffer

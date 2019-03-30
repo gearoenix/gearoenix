@@ -5,8 +5,7 @@
 #include "../../system/stream/sys-stm-asset.hpp"
 #include "../../system/stream/sys-stm-stream.hpp"
 #include "../../system/sys-app.hpp"
-#include "../buffer/rnd-buf-manager.hpp"
-#include "../buffer/rnd-buf-uniform.hpp"
+#include "../buffer/rnd-buf-framed-uniform.hpp"
 #include "../camera/rnd-cmr-camera.hpp"
 #include "../camera/rnd-cmr-orthographic.hpp"
 #include "../engine/rnd-eng-engine.hpp"
@@ -15,7 +14,6 @@
 #include "../mesh/rnd-msh-manager.hpp"
 #include "../mesh/rnd-msh-mesh.hpp"
 #include "../pipeline/rnd-pip-manager.hpp"
-#include "../pipeline/rnd-pip-resource.hpp"
 #include "../scene/rnd-scn-scene.hpp"
 #include "../widget/rnd-wdg-widget.hpp"
 #include "rnd-mdl-manager.hpp"
@@ -30,12 +28,8 @@ gearoenix::render::model::Model::Model(
 	const bool is_dynamic)
 	: core::asset::Asset(my_id, core::asset::Type::MODEL)
 	, e(e)
+	, uniform_buffers(std::shared_ptr<buffer::FramedUniform>(new buffer::FramedUniform(sizeof(Uniform), e, c)))
 {
-	uniform_buffers.resize(e->get_frames_count());
-	for (unsigned int i = 0; i < e->get_frames_count(); ++i) {
-		uniform_buffers[i] = std::shared_ptr<buffer::Uniform>(e->get_buffer_manager()->create_uniform(sizeof(Uniform), e));
-	}
-    pipeline_resource = e->get_pipeline_manager()->create_resource(uniform_buffers[e->get_frames_count() - 1], {});
 	uniform.m.read(f);
 	const core::Count meshes_count = f->read<core::Count>();
 	const std::shared_ptr<core::asset::Manager> &astmgr = e->get_system_application()->get_asset_manager();
@@ -61,11 +55,8 @@ gearoenix::render::model::Model::Model(
 	const core::sync::EndCaller<core::sync::EndCallerIgnore>& c)
 	: core::asset::Asset(e->get_system_application()->get_asset_manager()->create_id(), core::asset::Type::MODEL)
 	, e(e)
+	, uniform_buffers(std::shared_ptr<buffer::FramedUniform>(new buffer::FramedUniform(sizeof(Uniform), e, c)))
 {
-	for (unsigned int i = 0; i < e->get_frames_count(); ++i) {
-		uniform_buffers[i] = std::shared_ptr<buffer::Uniform>(e->get_buffer_manager()->create_uniform(sizeof(Uniform), e));
-	}
-    pipeline_resource = e->get_pipeline_manager()->create_resource(uniform_buffers[e->get_frames_count() - 1], {});
 }
 
 gearoenix::render::model::Model::~Model()
