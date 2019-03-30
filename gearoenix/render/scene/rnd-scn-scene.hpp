@@ -117,6 +117,8 @@ namespace render {
 
             void set_skybox(const std::shared_ptr<skybox::Skybox>& s);
             const std::shared_ptr<model::Model> &get_skybox(const core::Id skybox_id) const;
+
+			const std::shared_ptr<buffer::FramedUniform>& get_uniform_buffers() const;
         };
     }
 }

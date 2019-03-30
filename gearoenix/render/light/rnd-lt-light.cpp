@@ -60,3 +60,8 @@ void gearoenix::render::light::Light::disable()
 {
 	enabled = false;
 }
+
+const std::shared_ptr<gearoenix::render::buffer::FramedUniform>& gearoenix::render::light::Light::get_uniform_buffers() const
+{
+	return nullptr;
+}

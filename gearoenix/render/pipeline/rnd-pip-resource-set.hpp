@@ -14,6 +14,11 @@ namespace render {
     namespace command {
         class Buffer;
     }
+	namespace graph {
+		namespace node {
+			class Node;
+		}
+	}
     namespace light {
         class Light;
     }
@@ -29,19 +34,36 @@ namespace render {
     namespace scene {
         class Scene;
     }
+	namespace texture {
+		class Texture2D;
+	}
     namespace pipeline {
-        class Resource;
         class ResourceSet {
+		protected:
+			std::shared_ptr<buffer::Uniform> scene_uniform_buffer = nullptr;
+			std::shared_ptr<buffer::Uniform> camera_uniform_buffer = nullptr;
+			std::shared_ptr<buffer::Uniform> light_uniform_buffer = nullptr;
+			std::shared_ptr<buffer::Uniform> model_uniform_buffer = nullptr;
+			std::shared_ptr<buffer::Uniform> mesh_uniform_buffer = nullptr;
+			std::shared_ptr<buffer::Uniform> material_uniform_buffer = nullptr;
+			std::shared_ptr<buffer::Uniform> node_uniform_buffer = nullptr;
+
+			std::shared_ptr<texture::Texture2D> color = nullptr;
+			std::shared_ptr<texture::Texture2D> metallic_roughness = nullptr;
+			std::shared_ptr<texture::Texture2D> normal = nullptr;
+			std::shared_ptr<texture::Texture2D> emissive = nullptr;
         public:
             virtual ~ResourceSet();
-            virtual void set_scene(const std::shared_ptr<scene::Scene>& s) = 0;
-            virtual void set_camera(const std::shared_ptr<camera::Camera>& c) = 0;
-            virtual void set_light(const std::shared_ptr<light::Light>& l) = 0;
-            virtual void set_model(const std::shared_ptr<model::Model>& m) = 0;
-            virtual void set_mesh(const std::shared_ptr<mesh::Mesh>& m) = 0;
-            virtual void set_material(const std::shared_ptr<material::Material>& m) = 0;
-            virtual void set_effect(const std::shared_ptr<buffer::Uniform>& u, const std::shared_ptr<Resource>& r) = 0;
-            virtual void record(const std::shared_ptr<command::Buffer>& c) = 0;
+#define GXHELPER(c, cc) virtual void set_##c(const std::shared_ptr<c::cc>& o)
+			GXHELPER(scene, Scene);
+            GXHELPER(camera, Camera);
+            GXHELPER(light, Light);
+            GXHELPER(model, Model);
+            GXHELPER(mesh, Mesh);
+            GXHELPER(material, Material);
+#undef GXHELPER
+            virtual void set_node(const graph::node::Node *const node);
+            virtual void clean();
         };
     }
 }

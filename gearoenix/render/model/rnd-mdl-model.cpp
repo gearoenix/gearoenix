@@ -146,6 +146,11 @@ const std::shared_ptr<gearoenix::physics::collider::Collider>& gearoenix::render
 	return collider;
 }
 
+const std::shared_ptr<gearoenix::render::buffer::FramedUniform>& gearoenix::render::model::Model::get_uniform_buffers() const
+{
+	return uniform_buffers;
+}
+
 const gearoenix::math::Mat4x4& gearoenix::render::model::Model::get_model_matrix() const
 {
 	return uniform.m;

@@ -24,6 +24,9 @@ namespace system {
     class File;
 }
 namespace render {
+	namespace buffer {
+		class FramedUniform;
+	}
 namespace engine {
 class Engine;
 }
@@ -33,6 +36,7 @@ class Engine;
 
         protected:
             Uniform uniform;
+			const std::shared_ptr<buffer::FramedUniform> uniform_buffers;
             void update_location();
             void update_view_projection();
             Camera(
@@ -46,6 +50,7 @@ class Engine;
             void look_at(const math::Vec3& origin, const math::Vec3& target, const math::Vec3& up);
             const math::Mat4x4& get_view_projection_matrix() const;
             const math::Mat4x4& get_zero_located_view() const;
+			const std::shared_ptr<buffer::FramedUniform> &get_uniform_buffers() const;
             virtual void on_event(const core::event::Event& e);
             virtual bool in_sight(const math::Vec3& location, const core::Real radius) const = 0;
             virtual math::Ray3 create_ray3(const core::Real x, const core::Real y) const = 0;

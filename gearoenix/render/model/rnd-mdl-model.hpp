@@ -58,6 +58,7 @@ namespace render {
             const std::map<core::Id, std::shared_ptr<Model>>& get_children() const;
             const std::map<core::Id, std::shared_ptr<Mesh>>& get_meshes() const;
             const std::shared_ptr<physics::collider::Collider>& get_collider() const;
+			const std::shared_ptr<buffer::FramedUniform> &get_uniform_buffers() const;
             
 			const math::Mat4x4& get_model_matrix() const;
         };

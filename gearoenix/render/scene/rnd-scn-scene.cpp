@@ -180,3 +180,8 @@ const std::shared_ptr<gearoenix::physics::constraint::Constraint>& gearoenix::re
 	}
 	return find->second;
 }
+
+const std::shared_ptr<gearoenix::render::buffer::FramedUniform>& gearoenix::render::scene::Scene::get_uniform_buffers() const
+{
+	return uniform_buffers;
+}

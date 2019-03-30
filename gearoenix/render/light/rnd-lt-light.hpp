@@ -10,6 +10,9 @@ namespace system {
     }
 }
 namespace render {
+	namespace buffer {
+		class FramedUniform;
+	}
     namespace engine {
         class Engine;
     }
@@ -39,6 +42,10 @@ namespace render {
 			bool is_enabled() const;
 			void enable();
 			void disable();
+
+			/// Only a shadow caster should have implement this (or in a very rare conditions)
+			/// Otherwise the default implementation will return nullptr
+			virtual const std::shared_ptr<buffer::FramedUniform> &get_uniform_buffers() const;
         };
     }
 }

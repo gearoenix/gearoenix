@@ -6,6 +6,7 @@
 #include "../../system/sys-log.hpp"
 #include "../engine/rnd-eng-engine.hpp"
 #include "../../math/math-quaternion.hpp"
+#include "../buffer/rnd-buf-framed-uniform.hpp"
 #include "rnd-cmr-orthographic.hpp"
 #include "rnd-cmr-perspective.hpp"
 
@@ -33,6 +34,7 @@ gearoenix::render::camera::Camera::Camera(
         const std::shared_ptr<engine::Engine> &e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore> &c)
     : core::asset::Asset(my_id, core::asset::Type::CAMERA)
+	, uniform_buffers(std::make_shared<buffer::FramedUniform>(sizeof(uniform), e, c))
 {
     uniform.near_aspect_ratio_reserved[1] = e->get_system_application()->get_window_ratio();
     f->read(uniform.position_far[0]);
@@ -174,6 +176,11 @@ const gearoenix::math::Mat4x4& gearoenix::render::camera::Camera::get_view_proje
 const gearoenix::math::Mat4x4& gearoenix::render::camera::Camera::get_zero_located_view() const
 {
     return uniform.inversed_rotation;
+}
+
+const std::shared_ptr<gearoenix::render::buffer::FramedUniform>& gearoenix::render::camera::Camera::get_uniform_buffers() const
+{
+	return uniform_buffers;
 }
 
 void gearoenix::render::camera::Camera::get_location(math::Vec3& location) const
