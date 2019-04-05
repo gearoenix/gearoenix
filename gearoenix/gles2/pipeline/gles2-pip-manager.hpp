@@ -10,8 +10,6 @@ namespace gles2 {
     namespace pipeline {
 		class Pipeline;
         class Manager : public render::pipeline::Manager {
-		private:
-			core::cache::Cacher<Pipeline> cacheds;
         public:
             Manager(const std::shared_ptr<engine::Engine>& engine);
             ~Manager() override final;

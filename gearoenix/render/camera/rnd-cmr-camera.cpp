@@ -34,7 +34,7 @@ gearoenix::render::camera::Camera::Camera(
         const std::shared_ptr<engine::Engine> &e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore> &c)
     : core::asset::Asset(my_id, core::asset::Type::CAMERA)
-	, uniform_buffers(std::make_shared<buffer::FramedUniform>(sizeof(uniform), e, c))
+	, uniform_buffers(new buffer::FramedUniform(sizeof(Uniform), e, c))
 {
     uniform.near_aspect_ratio_reserved[1] = e->get_system_application()->get_window_ratio();
     f->read(uniform.position_far[0]);

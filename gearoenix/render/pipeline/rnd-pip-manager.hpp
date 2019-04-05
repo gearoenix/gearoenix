@@ -21,7 +21,7 @@ class Uniform;
         class Manager {
         protected:
             const std::shared_ptr<engine::Engine> e;
-            core::cache::Cacher<Pipeline> pipelines;
+            core::cache::Cacher<Pipeline, Type::Id> pipelines;
             Manager(const std::shared_ptr<engine::Engine>& e);
         public:
             virtual ~Manager();

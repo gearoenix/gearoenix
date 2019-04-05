@@ -197,3 +197,8 @@ gearoenix::render::material::Material::Material(const std::shared_ptr<system::st
 gearoenix::render::material::Material::~Material()
 {
 }
+
+const std::shared_ptr<gearoenix::render::buffer::FramedUniform>& gearoenix::render::material::Material::get_uniform_buffers() const
+{
+	return uniform_buffers;
+}

@@ -1,5 +1,5 @@
 #include "vk-cmd-buffer.hpp"
-#ifdef USE_VULKAN
+#ifdef GX_USE_VULKAN
 #ifdef DEBUG_MODE
 #define VK_CMD_BUFF_DEBUG
 #endif
@@ -98,6 +98,10 @@ void gearoenix::render::command::Buffer::set_scissor(const VkRect2D& scissor)
 void gearoenix::render::command::Buffer::end()
 {
     VKC(linker->vkEndCommandBuffer(vulkan_data));
+}
+
+void gearoenix::render::command::Buffer::bind(const std::shared_ptr<pipeline::ResourceSet>& r)
+{
 }
 
 void gearoenix::render::command::Buffer::end_render_pass()

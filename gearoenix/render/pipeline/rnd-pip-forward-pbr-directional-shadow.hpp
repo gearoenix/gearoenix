@@ -27,9 +27,6 @@ namespace render {
         class Model;
     }
     namespace pipeline {
-        class ForwardPbrDirectionalShadowResourceSet : public ResourceSet {
-
-        };
         class ForwardPbrDirectionalShadow : public Pipeline {
         };
     }

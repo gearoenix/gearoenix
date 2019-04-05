@@ -11,6 +11,7 @@
 #include "../../model/rnd-mdl-mesh.hpp"
 #include "../../model/rnd-mdl-model.hpp"
 #include "../../pipeline/rnd-pip-forward-pbr-directional-shadow.hpp"
+#include "../../pipeline/rnd-pip-forward-pbr-directional-shadow-resource-set.hpp"
 #include "../../pipeline/rnd-pip-manager.hpp"
 #include "../../pipeline/rnd-pip-pipeline.hpp"
 #include "../../pipeline/rnd-pip-resource-set.hpp"
@@ -120,8 +121,13 @@ void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::record(
 		prs->set_mesh(msh);
 		prs->set_material(mat);
 		// TODO: 
-		// prs->set_effect(ub, frame->pipeline_resource);
-		prs->record(kernel->secondary_cmd);
+		prs->set_node_uniform_buffer(ub);
+		prs->set_diffuse_environment(std::static_pointer_cast<texture::Cube>(input_textures[0]));
+		prs->set_specular_environment(std::static_pointer_cast<texture::Cube>(input_textures[1]));
+		prs->set_ambient_occlusion(std::static_pointer_cast<texture::Texture2D>(input_textures[2]));
+		prs->set_shadow_mapper(std::static_pointer_cast<texture::Texture2D>(input_textures[3]));
+		prs->set_brdflut(std::static_pointer_cast<texture::Texture2D>(input_textures[4]));
+		kernel->secondary_cmd->bind(prs);
 		++kernel->latest_render_data_pool;
 	}
 }

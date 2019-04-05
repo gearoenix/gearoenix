@@ -13,9 +13,11 @@
 #include "../../system/sys-log.hpp"
 #include "../buffer/gles2-buf-uniform.hpp"
 #include "../buffer/gles2-buf-manager.hpp"
+#include "../command/gles2-cmd-manager.hpp"
 #include "../pipeline/gles2-pip-manager.hpp"
 #include "../texture/gles2-txt-2d.hpp"
 #include "../texture/gles2-txt-cube.hpp"
+#include "../sync/gles2-sy-semaphore.hpp"
 
 void gearoenix::gles2::engine::Engine::initialize()
 {
@@ -80,6 +82,7 @@ std::shared_ptr<gearoenix::gles2::engine::Engine> gearoenix::gles2::engine::Engi
 	std::shared_ptr<Engine> e(new Engine(sys_app));
 	e->pipeline_manager = std::make_shared<pipeline::Manager>(e);
 	e->buffer_manager = std::make_shared<buffer::Manager>(e);
+	e->command_manager = std::make_shared<command::Manager>();
 	return e;
 }
 
@@ -144,8 +147,7 @@ void gearoenix::gles2::engine::Engine::terminate()
 
 gearoenix::render::sync::Semaphore * gearoenix::gles2::engine::Engine::create_semaphore()
 {
-	GXUNIMPLEMENTED;
-	return nullptr;
+	return new sync::Semaphore();
 }
 
 gearoenix::render::texture::Texture2D * gearoenix::gles2::engine::Engine::create_texture_2d(

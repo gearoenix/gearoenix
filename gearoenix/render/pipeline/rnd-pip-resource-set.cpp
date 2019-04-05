@@ -2,6 +2,7 @@
 #include "../scene/rnd-scn-scene.hpp"
 #include "../buffer/rnd-buf-framed-uniform.hpp"
 #include "../camera/rnd-cmr-camera.hpp"
+#include "../graph/node/rnd-gr-nd-forward-pbr-directional-shadow.hpp"
 #include "../light/rnd-lt-light.hpp"
 #include "../model/rnd-mdl-model.hpp"
 #include "../mesh/rnd-msh-mesh.hpp"
@@ -21,3 +22,18 @@ void gearoenix::render::pipeline::ResourceSet::set_mesh(const std::shared_ptr<me
 GXHELPER(material, Material)
 
 #undef GXHELPER
+
+void gearoenix::render::pipeline::ResourceSet::clean()
+{
+	scene_uniform_buffer = nullptr;
+	camera_uniform_buffer = nullptr;
+	light_uniform_buffer = nullptr;
+	model_uniform_buffer = nullptr;
+	mesh_uniform_buffer = nullptr;
+	material_uniform_buffer = nullptr;
+	node_uniform_buffer = nullptr;
+	color = nullptr;
+	metallic_roughness = nullptr;
+	normal = nullptr;
+	emissive = nullptr;
+}

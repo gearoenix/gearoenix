@@ -62,7 +62,6 @@ namespace render {
             GXHELPER(mesh, Mesh);
             GXHELPER(material, Material);
 #undef GXHELPER
-            virtual void set_node(const graph::node::Node *const node);
             virtual void clean();
         };
     }

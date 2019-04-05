@@ -7,7 +7,7 @@ void gearoenix::core::sync::KernelWorker::thread_loop(const unsigned int kernel_
 	while (running) {
 		signals[kernel_index]->wait();
 		GXHELPER;
-		std::lock_guard<std::mutex> _lock(workers_syncer);
+		std::lock_guard<std::mutex> _lock(*workers_syncers[kernel_index]);
 		for (const Worker &worker : workers)
 		{
 			GXHELPER;
@@ -26,10 +26,12 @@ gearoenix::core::sync::KernelWorker::KernelWorker()
 	const unsigned int kernels_count = std::thread::hardware_concurrency();
 	signals.reserve(kernels_count);
 	threads.reserve(kernels_count);
+	workers_syncers.reserve(kernels_count);
 	for (unsigned int ki = 0; ki < kernels_count; ++ki)
 	{
 		signals.push_back(std::make_shared<Signaler>());
 		threads.push_back(std::thread(std::bind(&KernelWorker::thread_loop, this, ki)));
+		workers_syncers.push_back(std::make_shared<std::mutex>());
 	}
 }
 
@@ -55,12 +57,13 @@ void gearoenix::core::sync::KernelWorker::add_step(std::function<void(const unsi
 		waits.push_back(std::make_shared<Signaler>());
 		signals.push_back(std::make_shared<Signaler>());
 	}
-	std::lock_guard<std::mutex> _lock(workers_syncer);
+	for (std::shared_ptr<std::mutex> &m : workers_syncers) m->lock();
 	workers.push_back({
 		waits,
 		worker,
 		boss,
 		signals});
+	for (std::shared_ptr<std::mutex> &m : workers_syncers) m->unlock();
 }
 
 void gearoenix::core::sync::KernelWorker::do_steps()
@@ -72,7 +75,7 @@ void gearoenix::core::sync::KernelWorker::do_steps()
 		for (const std::shared_ptr<Signaler> &wait : worker.waits)
 			wait->signal();
 		for (const std::shared_ptr<Signaler> &signal : worker.signals)
-			signal->signal();
+			signal->wait();
 		worker.boss();
 	}
 }

@@ -13,11 +13,12 @@ gearoenix::gles2::pipeline::Manager::~Manager() {}
 
 std::shared_ptr<gearoenix::render::pipeline::Pipeline> gearoenix::gles2::pipeline::Manager::get(const render::pipeline::Type::Id pipeline_type_id, core::sync::EndCaller<render::pipeline::Pipeline> &end)
 {
-	const std::shared_ptr<render::pipeline::Pipeline> p = cacheds.get(pipeline_type_id, [this, pipeline_type_id, end] {
+	const std::shared_ptr<render::pipeline::Pipeline> p = pipelines.get<render::pipeline::Pipeline>(pipeline_type_id, [this, pipeline_type_id, end] {
+		const std::shared_ptr<engine::Engine> gles2eng = std::static_pointer_cast<engine::Engine>(e);
 		switch (pipeline_type_id)
 		{
 		case render::pipeline::Type::ForwardPbrDirectionalShadow:
-			return std::shared_ptr<render::pipeline::Pipeline>(new ForwardPbrDirectionalShadow(e, end));
+			return std::shared_ptr<render::pipeline::Pipeline>(new ForwardPbrDirectionalShadow(gles2eng, end));
 		default:
 			GXLOGF("Unexpected pipeline type: " << pipeline_type_id);
 			break;

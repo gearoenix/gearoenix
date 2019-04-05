@@ -21,7 +21,8 @@ namespace gearoenix {
 				std::vector<std::shared_ptr<Signaler>> signals;
 				std::vector<std::thread> threads;
 				std::vector<Worker> workers;
-				std::mutex workers_syncer;
+				// For each thread there is a separate mutex to donot lock all threads by one mutex
+				std::vector<std::shared_ptr<std::mutex>> workers_syncers;
 				volatile bool running = true;
 				volatile bool terminated = false;
 
