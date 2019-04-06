@@ -22,22 +22,23 @@ const static std::string vertex_shader_code =
 	"uniform mat4 model_m;\n"
 	// output(s)
 	"varying vec3 out_pos;\n"
-	"varying mat3 out_nrm;\n"
-	"varying mat3 out_tng;\n"
-	"varying mat3 out_tbn;\n"
+    "varying vec3 out_nrm;\n"
+    "varying vec3 out_tng;\n"
+    "varying vec3 out_btg;\n"
 	"varying vec2 out_uv;\n"
 	"varying vec3 out_light_pos;\n"
+    // Main function
 	"void main()\n"
 	"{\n"
-	"    const vec4 pos = m * vec4(position, 1.0);\n"
+    "    vec4 pos = model_m * vec4(position, 1.0);\n"
 	"    out_pos = pos.xyz;\n"
-	"    out_nrm = normalize((m * vec4(normal, 0.0)).xyz);\n"
-	"    out_tng = normalize((m * vec4(tangent.xyz, 0.0)).xyz);\n"
-	"    out_btg = cross(nrm, tng) * tangent.w;\n"
+    "    out_nrm = normalize((model_m * vec4(normal, 0.0)).xyz);\n"
+    "    out_tng = normalize((model_m * vec4(tangent.xyz, 0.0)).xyz);\n"
+    "    out_btg = cross(out_nrm, out_tng) * tangent.w;\n"
 	"    out_uv = uv;\n"
-	"    const vec4 light_pos = light_vp_bias * pos;\n"
+    "    vec4 light_pos = light_vp_bias * pos;\n"
 	"    out_light_pos = light_pos.xyz / light_pos.w;\n"
-	"    gl_Position = mvp * pos;\n"
+    "    gl_Position = camera_vp * pos;\n"
 	"}";
 
 const static std::string fragment_shader_code =
@@ -81,9 +82,9 @@ const static std::string fragment_shader_code =
 	"uniform vec3      camera_position;\n"
 	// output(s) of vertex shader
 	"varying vec3 out_pos;\n"
-	"varying mat3 out_nrm;\n"
-	"varying mat3 out_tng;\n"
-	"varying mat3 out_tbn;\n"
+    "varying vec3 out_nrm;\n"
+    "varying vec3 out_tng;\n"
+    "varying vec3 out_btg;\n"
 	"varying vec2 out_uv;\n"
 	"varying vec3 out_light_pos;\n"
 	// Normal Distribution Function Trowbridge-Reitz GGX

@@ -52,7 +52,7 @@ void gearoenix::core::sync::KernelWorker::add_step(std::function<void(const unsi
 	std::vector<std::shared_ptr<Signaler>> signals;
 	waits.reserve(kernels_count);
 	signals.reserve(kernels_count);
-	for (rsize_t ki = 0; ki < kernels_count; ++ki)
+    for (size_t ki = 0; ki < kernels_count; ++ki)
 	{
 		waits.push_back(std::make_shared<Signaler>());
 		signals.push_back(std::make_shared<Signaler>());
