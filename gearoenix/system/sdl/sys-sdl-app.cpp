@@ -360,7 +360,7 @@ const std::shared_ptr<gearoenix::system::Application> gearoenix::system::Applica
     SDL_AddEventWatch(event_receiver, result.get());
 
     if (
-        result->supported_engine == render::engine::Type::OPENGL_43 || result->supported_engine == render::engine::Type::OPENGL_33 || result->supported_engine == render::engine::Type::OPENGL_ES3 || result->supported_engine == render::engine::Type::OPENGL_ES3) {
+        result->supported_engine == render::engine::Type::OPENGL_43 || result->supported_engine == render::engine::Type::OPENGL_33 || result->supported_engine == render::engine::Type::OPENGL_ES3 || result->supported_engine == render::engine::Type::OPENGL_ES2) {
 
 #if defined(GX_IN_DESKTOP) && defined(GX_USE_OPENGL)
         const GLenum glew_error = glewInit();

@@ -9,10 +9,8 @@ void gearoenix::core::sync::WorkWaiter::wait_loop()
 {
 	while (running) {
         GXLOGD("Going to wait.");
-        std::cout << "Going to wait." << std::endl;
         semaphore->lock();
         GXLOGD("Going to unload.");
-        std::cout << "Going to unload." << std::endl;
         function_loader->unload();
 	}
 	running = true;

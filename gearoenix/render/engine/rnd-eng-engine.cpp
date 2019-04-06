@@ -44,6 +44,7 @@ gearoenix::render::engine::Engine::~Engine()
 void gearoenix::render::engine::Engine::update() {
 	++frame_number;
 	frame_number %= frames_count;
+	fun_loader->unload();
 	kernels->do_steps();
 }
 
