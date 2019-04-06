@@ -3,8 +3,8 @@
 #include "../../core/cr-build-configuration.hpp"
 #ifdef GX_USE_OPENGL_ES2
 #include "../../core/sync/cr-sync-end-caller.hpp"
+#include "../../gl/gl-types.hpp"
 #include "../../render/buffer/rnd-buf-static.hpp"
-#include "../gles2.hpp"
 #include <vector>
 namespace gearoenix {
 	namespace gles2 {
@@ -15,8 +15,8 @@ namespace gearoenix {
 			class Index : public render::buffer::Static {
 			public:
 			private:
-				GLuint bo = 0;
-				GLsizei count = 0;
+				gl::uint bo = 0;
+				gl::sizei count = 0;
 
 			public:
 				Index(

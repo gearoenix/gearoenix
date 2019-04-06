@@ -93,4 +93,7 @@
 #if defined(GX_USE_OPENGL_ES2) || defined(GX_USE_OPENGL_ES3) || defined(GX_USE_OPENGL_33) || defined(GX_USE_OPENGL_43)
 #define GX_USE_OPENGL
 #endif
+#if defined(GX_USE_OPENGL) && defined(GX_IN_DESKTOP)
+#define GX_USE_GLEW
+#endif
 #endif

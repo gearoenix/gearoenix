@@ -4,6 +4,7 @@
 #ifdef GX_USE_SDL
 #include "../../core/cr-types.hpp"
 #include "../../render/engine/rnd-eng-type.hpp"
+#define NO_SDL_GLEXT
 #include <SDL.h>
 #include <memory>
 #ifdef GX_IN_WEB

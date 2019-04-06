@@ -5,6 +5,8 @@
 #include "../../core/event/cr-ev-sys-system.hpp"
 #include "../../core/event/cr-ev-window-resize.hpp"
 #include "../../core/sync/cr-sync-end-caller.hpp"
+#include "../../gl/gl-loader.hpp"
+#include "../../gl/gl-constants.hpp"
 #include "../../physics/phs-engine.hpp"
 #include "../../render/camera/rnd-cmr-camera.hpp"
 #include "../../render/pipeline/rnd-pip-manager.hpp"
@@ -21,9 +23,9 @@
 
 void gearoenix::gles2::engine::Engine::initialize()
 {
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-	GLfloat win_width = (GLfloat)sysapp->get_width();
-	GLfloat win_height = (GLfloat)sysapp->get_height();
+    gl::clear_color(0.0f, 0.0f, 0.0f, 0.0f);
+	float win_width = static_cast<float>(sysapp->get_width());
+	float win_height = static_cast<float>(sysapp->get_height());
     //glGetIntegerv(GL_FRAMEBUFFER_BINDING, (GLint*)&render_framebuffer);
     //glGetIntegerv(GL_RENDERBUFFER_BINDING, (GLint*)&render_depth);
     //glGenFramebuffers(1, &shadow_map_framebuffer);
@@ -56,15 +58,15 @@ void gearoenix::gles2::engine::Engine::initialize()
     //if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
     //    GXUNEXPECTED;
     //shadow_map_texture = new texture::Texture2D(sysapp->get_asset_manager()->create_id(), shadow_map_color, this);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_SCISSOR_TEST);
-    glEnable(GL_STENCIL_TEST);
-    glViewport(0, 0, (GLsizei)win_width, (GLsizei)win_height);
-    glScissor(0, 0, (GLsizei)win_width, (GLsizei)win_height);
+    gl::enable(GL_CULL_FACE);
+    gl::cull_face(GL_BACK);
+    gl::enable(GL_BLEND);
+    gl::blend_func(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    gl::enable(GL_DEPTH_TEST);
+    gl::enable(GL_SCISSOR_TEST);
+    gl::enable(GL_STENCIL_TEST);
+    gl::viewport(0, 0, static_cast<gl::sizei>(win_width), static_cast<gl::sizei>(win_height));
+    gl::scissor(0, 0, static_cast<gl::sizei>(win_width), static_cast<gl::sizei>(win_height));
     //pipeline_manager = new render::pipeline::Manager(this);
 #ifdef GX_GLES2_ENGINE_PROFILING
     prof_last_time_draw = std::chrono::high_resolution_clock::now();
@@ -94,7 +96,7 @@ gearoenix::gles2::engine::Engine::~Engine()
 void gearoenix::gles2::engine::Engine::update()
 {
 	render::engine::Engine::update();
-    glClear(GL_COLOR_BUFFER_BIT);
+    gl::clear(GL_COLOR_BUFFER_BIT);
     //do_load_functions();
     //physics_engine->wait();
     //for (std::pair<const core::Id, std::shared_ptr<render::scene::Scene>>& scene : loaded_scenes) {
@@ -117,7 +119,7 @@ void gearoenix::gles2::engine::Engine::update()
     //    scene.second->draw(shadow_map_texture);
     //}
     //physics_engine->update();
-	GX_CHECK_FOR_GRAPHIC_API_ERROR;
+	gl::check_for_error();
 #ifdef GX_GLES2_ENGINE_PROFILING
     auto now = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>(now - prof_last_time_draw);

@@ -13,6 +13,7 @@
 #include "../../core/event/cr-ev-event.hpp"
 #include "../../core/event/cr-ev-mv-mouse.hpp"
 #include "../../core/event/cr-ev-window-resize.hpp"
+#include "../../gl/gl-loader.hpp"
 #if defined(GX_USE_OPENGL_ES2)
 #include "../../gles2/engine/gles2-eng-engine.hpp"
 #include "../../gles2/gles2.hpp"
@@ -358,24 +359,17 @@ const std::shared_ptr<gearoenix::system::Application> gearoenix::system::Applica
     result->create_context();
 
     SDL_AddEventWatch(event_receiver, result.get());
-
+#ifdef GX_USE_OPENGL
     if (
         result->supported_engine == render::engine::Type::OPENGL_43 || result->supported_engine == render::engine::Type::OPENGL_33 || result->supported_engine == render::engine::Type::OPENGL_ES3 || result->supported_engine == render::engine::Type::OPENGL_ES2) {
-
-#if defined(GX_IN_DESKTOP) && defined(GX_USE_OPENGL)
-        const GLenum glew_error = glewInit();
-        if (glew_error != GLEW_OK) {
-            GXLOGF("Error initializing GLEW! " << glewGetErrorString(glew_error));
-        }
-#endif
-#ifdef GX_USE_OPENGL
-        SDL_GL_MakeCurrent(result->window, result->gl_context);
-#endif
+		SDL_GL_MakeCurrent(result->window, result->gl_context);
+		gl::load_functions();
         int w, h;
         SDL_GL_GetDrawableSize(result->window, &w, &h);
         result->win_width = static_cast<unsigned int>(w);
         result->win_height = static_cast<unsigned int>(h);
     }
+#endif
     result->screen_ratio = static_cast<core::Real>(result->win_width) / static_cast<core::Real>(result->win_height);
     result->half_height_inversed = 2.0f / static_cast<core::Real>(result->win_height);
     int mx, my;

@@ -1,5 +1,6 @@
 #include "gles2-shd-shader.hpp"
 #ifdef GX_USE_OPENGL_ES2
+#include "../gles2.hpp"
 #include "../../core/cr-function-loader.hpp"
 #include "../../system/sys-log.hpp"
 #include "../engine/gles2-eng-engine.hpp"
