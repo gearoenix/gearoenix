@@ -335,4 +335,21 @@
 #define GL_DOT3_RGB                       0x86AE
 #define GL_DOT3_RGBA                      0x86AF
 #define GL_INVALID_FRAMEBUFFER_OPERATION  0x0506
+#define GL_RG                             0x8227
+#define GL_R                              0x2002
+#define GL_MIRRORED_REPEAT                0x8370
+#define GL_TEXTURE_CUBE_MAP_POSITIVE_X    0x8515
+#define GL_TEXTURE_CUBE_MAP_NEGATIVE_X    0x8516
+#define GL_TEXTURE_CUBE_MAP_POSITIVE_Y    0x8517
+#define GL_TEXTURE_CUBE_MAP_NEGATIVE_Y    0x8518
+#define GL_TEXTURE_CUBE_MAP_POSITIVE_Z    0x8519
+#define GL_TEXTURE_CUBE_MAP_NEGATIVE_Z    0x851A
+#define GL_TEXTURE_CUBE_MAP               0x8513
+#define GL_LINK_STATUS                    0x8B82
+#define GL_COMPILE_STATUS                 0x8B81
+#define GL_INFO_LOG_LENGTH                0x8B84
+#define GL_SHADER_SOURCE_LENGTH           0x8B88
+#define GL_SHADER_COMPILER                0x8DFA
+#define GL_SHADER_BINARY_FORMATS          0x8DF8
+#define GL_VALIDATE_STATUS                0x8B83
 #endif

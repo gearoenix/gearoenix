@@ -3,6 +3,7 @@
 #include "../../core/cr-build-configuration.hpp"
 #ifdef GX_USE_OPENGL_ES2
 #include "../../core/sync/cr-sync-end-caller.hpp"
+#include "../../gl/gl-types.hpp"
 #include "../../math/math-vertex.hpp"
 #include "../../render/buffer/rnd-buf-static.hpp"
 #include "../gles2.hpp"
@@ -16,7 +17,7 @@ namespace gles2 {
         class Vertex : public render::buffer::Static {
         public:
         private:
-            GLuint bo = 0;
+            gl::uint bo = 0;
 
         public:
             Vertex(

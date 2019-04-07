@@ -2,6 +2,7 @@
 #define GEAROENIX_GLES2_TEXTURE_2D_HPP
 #include "../../core/cr-build-configuration.hpp"
 #ifdef GX_USE_OPENGL_ES2
+#include "../../gl/gl-types.hpp"
 #include "../../render/texture/rnd-txt-texture-2d.hpp"
 #include "../../render/texture/rnd-txt-format.hpp"
 #include "../../render/texture/rnd-txt-sample.hpp"
@@ -15,7 +16,7 @@ namespace gearoenix {
 		namespace texture {
 			class Texture2D : public render::texture::Texture2D {
 			private:
-				GLuint texture_object = 0;
+				gl::uint texture_object = 0;
 
 			public:
 				Texture2D(
@@ -27,10 +28,10 @@ namespace gearoenix {
 					const unsigned int width,
 					const unsigned int heigt,
 					const core::sync::EndCaller<core::sync::EndCallerIgnore>& call);
-				Texture2D(const core::Id my_id, const GLuint txtobj, const std::shared_ptr<engine::Engine>& e);
+				Texture2D(const core::Id my_id, const gl::uint txtobj, const std::shared_ptr<engine::Engine>& e);
 				~Texture2D();
-				void bind(const GLenum texture_unit);
-				static GLuint convert_format(const render::texture::TextureFormat::Id f);
+				void bind(const gl::enumerated texture_unit);
+				static gl::uint convert_format(const render::texture::TextureFormat::Id f);
 			};
 		}
 	}

@@ -1,5 +1,7 @@
 #include "gles2-txt-cube.hpp"
 #ifdef GX_USE_OPENGL_ES2
+#include "../../gl/gl-constants.hpp"
+#include "../../gl/gl-loader.hpp"
 #include "../../render/texture/rnd-txt-png.hpp"
 #include "../../system/stream/sys-stm-stream.hpp"
 #include "../../system/sys-log.hpp"
@@ -23,7 +25,7 @@ gearoenix::gles2::texture::Cube::Cube(
         if (iimgw != imgw || iimgh != imgh)
             GXUNEXPECTED;
     }
-    static const GLenum faces[] = {
+    static const gl::enumerated faces[] = {
         GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
         GL_TEXTURE_CUBE_MAP_NEGATIVE_Z,
         GL_TEXTURE_CUBE_MAP_POSITIVE_X,
@@ -32,18 +34,17 @@ gearoenix::gles2::texture::Cube::Cube(
         GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
     };
     std::function<void()> loadf = [&, imgw, imgh, img_data, end]() -> void {
-        glGenTextures(1, &texture_object);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, texture_object);
-        glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        //GX_CHECK_FOR_GRAPHIC_API_ERROR
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); //GL_MllIRRORED_REPEAT
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        gl::gen_textures(1, &texture_object);
+        gl::bind_texture(GL_TEXTURE_CUBE_MAP, texture_object);
+        gl::tex_parameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        gl::tex_parameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        gl::tex_parameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); //GL_MllIRRORED_REPEAT
+        gl::tex_parameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         for (int i = 0; i < GX_FACES_COUNT; ++i) {
-            glTexImage2D(faces[i], 0, GL_RGBA, imgw, imgh, 0, GL_RGBA, GL_UNSIGNED_BYTE, (void*)img_data[i].data());
+            gl::tex_image_2d(faces[i], 0, GL_RGBA, imgw, imgh, 0, GL_RGBA, GL_UNSIGNED_BYTE, (void*)img_data[i].data());
         }
-        glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
-        glGetError();
+        gl::generate_mipmap(GL_TEXTURE_CUBE_MAP);
+        gl::get_error();
         //GX_CHECK_FOR_GRAPHIC_API_ERROR
         (void)end;
     };
@@ -54,7 +55,7 @@ gearoenix::gles2::texture::Cube::~Cube()
 {
     if (texture_object == 0)
         return;
-    const GLuint c_texture_object = texture_object;
+    const gl::uint c_texture_object = texture_object;
 //    render_engine->add_load_function([c_texture_object] {
 //        glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 //        glDeleteTextures(1, &c_texture_object);
@@ -62,10 +63,10 @@ gearoenix::gles2::texture::Cube::~Cube()
     texture_object = 0;
 }
 
-void gearoenix::gles2::texture::Cube::bind(GLenum texture_unit)
+void gearoenix::gles2::texture::Cube::bind(gl::enumerated texture_unit)
 {
-    glActiveTexture(texture_unit);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, texture_object);
+    gl::active_texture(texture_unit);
+    gl::bind_texture(GL_TEXTURE_CUBE_MAP, texture_object);
 }
 
 #endif
