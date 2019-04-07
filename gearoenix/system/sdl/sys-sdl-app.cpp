@@ -57,6 +57,9 @@ void gearoenix::system::Application::create_window() noexcept
         SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
         SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 16);
         SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 32);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
 
         flags |= SDL_WINDOW_OPENGL;
     }
@@ -73,7 +76,7 @@ void gearoenix::system::Application::create_window() noexcept
 #if defined(GX_IN_MAC) || defined(GX_IN_IOS)
     flags |= SDL_WINDOW_ALLOW_HIGHDPI;
 #endif
-
+	supported_engine = render::engine::Type::OPENGL_ES2;
     window = SDL_CreateWindow(
         GX_APP_NAME,
         SDL_WINDOWPOS_CENTERED,
@@ -85,31 +88,7 @@ void gearoenix::system::Application::create_window() noexcept
         GXLOGI("Best window created.");
         return;
     }
-    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
-    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
-    window = SDL_CreateWindow(
-        GX_APP_NAME,
-        SDL_WINDOWPOS_CENTERED,
-        SDL_WINDOWPOS_CENTERED,
-        static_cast<int>(win_width),
-        static_cast<int>(win_height),
-        flags);
-    if (nullptr != window) {
-        GXLOGI("Window with disabled multisamples created.");
-        return;
-    }
-    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-    window = SDL_CreateWindow(
-        GX_APP_NAME,
-        SDL_WINDOWPOS_CENTERED,
-        SDL_WINDOWPOS_CENTERED,
-        static_cast<int>(win_width),
-        static_cast<int>(win_height),
-        flags);
-    if (nullptr != window) {
-        GXLOGI("Window with minimum rquirement created.");
-        return;
-    }
+	GXTODO; // support other opengl versions
     GXLOGF("Can not create window with minimum requirements");
 }
 
@@ -120,73 +99,10 @@ void gearoenix::system::Application::create_context() noexcept
         return;
     }
 #endif
-
-#ifdef GX_USE_OPENGL_43
-    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
-    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 16);
-    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 32);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+#ifdef GX_USE_OPENGL
     gl_context = SDL_GL_CreateContext(window);
-    if (gl_context != nullptr) {
-        supported_engine = render::engine::Type::OPENGL_43;
-        glEnable(GL_MULTISAMPLE);
-        GXLOGD("Machine is capable if OpenGL 4.3");
-        return;
-    }
+    if (gl_context == nullptr) GXUNEXPECTED;
 #endif
-
-#ifdef GX_USE_OPENGL_33
-    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
-    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 16);
-    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 32);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    gl_context = SDL_GL_CreateContext(window);
-    if (gl_context != nullptr) {
-        supported_engine = render::engine::Type::OPENGL_33;
-        glEnable(GL_MULTISAMPLE);
-        GXLOGD("Machine is capable if OpenGL 3.3");
-        return;
-    }
-#endif
-
-#ifdef GX_USE_OPENGL_ES3
-    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
-    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 16);
-    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 32);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
-    gl_context = SDL_GL_CreateContext(window);
-    if (gl_context != nullptr) {
-        supported_engine = render::engine::Type::OPENGL_ES3;
-        glEnable(GL_MULTISAMPLE);
-        GXLOGD("Machine is capable if OpenGL ES 3.0");
-        return;
-    }
-#endif
-#ifdef GX_USE_OPENGL_ES2
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
-    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-    gl_context = SDL_GL_CreateContext(window);
-    if (gl_context != nullptr) {
-        supported_engine = render::engine::Type::OPENGL_ES2;
-        GXLOGD("Machine is capable if OpenGL ES 2.0");
-        return;
-    }
-    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
-    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
-    gl_context = SDL_GL_CreateContext(window);
-    if (gl_context != nullptr) {
-        supported_engine = render::engine::Type::OPENGL_ES2;
-        GXLOGD("Machine is capable if weak OpenGL ES 2.0");
-        return;
-    }
-#endif
-    GXLOGF("No usable API find in the host machine.");
 }
 
 int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_Event* e) noexcept
@@ -335,9 +251,12 @@ const std::shared_ptr<gearoenix::system::Application> gearoenix::system::Applica
 {
     const std::shared_ptr<Application> result(new Application());
 
-    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS) != 0) {
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_AUDIO) != 0) {
         GXLOGF("Failed to initialize SDL: " << SDL_GetError());
     }
+#ifdef GX_USE_OPENGL
+	gl::Loader::load_library();
+#endif
 
 #ifdef GX_USE_VULKAN
     if (vulkan::Engine::is_supported()) {
@@ -363,7 +282,7 @@ const std::shared_ptr<gearoenix::system::Application> gearoenix::system::Applica
     if (
         result->supported_engine == render::engine::Type::OPENGL_43 || result->supported_engine == render::engine::Type::OPENGL_33 || result->supported_engine == render::engine::Type::OPENGL_ES3 || result->supported_engine == render::engine::Type::OPENGL_ES2) {
 		SDL_GL_MakeCurrent(result->window, result->gl_context);
-		gl::load_functions();
+		gl::Loader::load_functions();
         int w, h;
         SDL_GL_GetDrawableSize(result->window, &w, &h);
         result->win_width = static_cast<unsigned int>(w);

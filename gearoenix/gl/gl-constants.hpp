@@ -352,4 +352,6 @@
 #define GL_SHADER_COMPILER                0x8DFA
 #define GL_SHADER_BINARY_FORMATS          0x8DF8
 #define GL_VALIDATE_STATUS                0x8B83
+#define GL_FRAGMENT_SHADER                0x8B30
+#define GL_VERTEX_SHADER                  0x8B31
 #endif

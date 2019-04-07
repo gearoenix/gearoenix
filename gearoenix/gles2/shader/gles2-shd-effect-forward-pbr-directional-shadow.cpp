@@ -243,7 +243,7 @@ gearoenix::gles2::shader::ForwardPbrDirectionalShadow::ForwardPbrDirectionalShad
 		GX_GLES2_THIS_GET_UNIFORM_F(scene_point_lights_position_max_radius);
 		GX_GLES2_THIS_GET_UNIFORM_F(scene_ssao_config);
 	});
-	GLint texture_index = 0;
+	gl::sint texture_index = 0;
 	material_base_color_index = texture_index;
 	++texture_index;
 	material_metallic_roughness_index = texture_index;

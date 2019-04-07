@@ -24,15 +24,15 @@ gearoenix::gles2::texture::Texture2D::Texture2D(
 	const gl::uint cf = convert_format(f);
 	e->get_function_loader()->load([this, data, cf, s, img_width, img_heigt, sample_info, call]
 	{
-        gl::gen_textures(1, &texture_object);
-        gl::bind_texture(GL_TEXTURE_2D, texture_object);
-        gl::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, sample_info.min_filter);
-        gl::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, sample_info.mag_filter);
-        gl::tex_parameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, sample_info.wrap_s);
-        gl::tex_parameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, sample_info.wrap_t);
-        gl::tex_image_2d(GL_TEXTURE_2D, 0, static_cast<const gl::sint>(cf), img_width, img_heigt, 0, static_cast<const gl::enumerated>(cf), GL_UNSIGNED_BYTE, data);
-        gl::generate_mipmap(GL_TEXTURE_2D);
-		gl::check_for_error();
+        gl::Loader::gen_textures(1, &texture_object);
+        gl::Loader::bind_texture(GL_TEXTURE_2D, texture_object);
+        gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, sample_info.min_filter);
+        gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, sample_info.mag_filter);
+        gl::Loader::tex_parameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, sample_info.wrap_s);
+        gl::Loader::tex_parameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, sample_info.wrap_t);
+        gl::Loader::tex_image_2d(GL_TEXTURE_2D, 0, static_cast<const gl::sint>(cf), img_width, img_heigt, 0, static_cast<const gl::enumerated>(cf), GL_UNSIGNED_BYTE, data);
+        gl::Loader::generate_mipmap(GL_TEXTURE_2D);
+		gl::Loader::check_for_error();
     });
 }
 
@@ -57,8 +57,8 @@ gearoenix::gles2::texture::Texture2D::~Texture2D()
 
 void gearoenix::gles2::texture::Texture2D::bind(gl::enumerated texture_unit)
 {
-    gl::active_texture(texture_unit);
-    gl::bind_texture(GL_TEXTURE_2D, texture_object);
+    gl::Loader::active_texture(texture_unit);
+    gl::Loader::bind_texture(GL_TEXTURE_2D, texture_object);
 }
 
 gearoenix::gl::uint gearoenix::gles2::texture::Texture2D::convert_format(const render::texture::TextureFormat::Id f)

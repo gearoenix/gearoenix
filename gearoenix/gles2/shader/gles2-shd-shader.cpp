@@ -10,7 +10,7 @@
 
 void gearoenix::gles2::shader::Shader::create_program()
 {
-	shader_program = gl::create_program();
+	shader_program = gl::Loader::create_program();
 	if (shader_program == 0) {
 		GXLOGF("Error creating shader program.");
 	}
@@ -19,66 +19,66 @@ void gearoenix::gles2::shader::Shader::create_program()
 void gearoenix::gles2::shader::Shader::run()
 {
 	link();
-	gl::use_program(shader_program);
+	gl::Loader::use_program(shader_program);
 }
 
 void gearoenix::gles2::shader::Shader::link()
 {
 	gl::sint is_success = 0;
-	gl::link_program(shader_program);
-	gl::get_programiv(shader_program, GL_LINK_STATUS, &is_success);
+	gl::Loader::link_program(shader_program);
+	gl::Loader::get_programiv(shader_program, GL_LINK_STATUS, &is_success);
 	if (is_success == 0) {
 		gl::sint max_length = 0;
-		gl::get_programiv(shader_program, GL_INFO_LOG_LENGTH, &max_length);
+		gl::Loader::get_programiv(shader_program, GL_INFO_LOG_LENGTH, &max_length);
 		std::vector<char> info_log;
 		info_log.resize(max_length);
-		gl::get_program_info_log(shader_program, max_length, NULL, &(info_log[0]));
+		gl::Loader::get_program_info_log(shader_program, max_length, NULL, &(info_log[0]));
 		GXLOGF("Error linking shader program: " << &(info_log[0]));
 	}
-	gl::use_program(shader_program);
-	position_attribute_location = gl::get_attrib_location(shader_program, "position");
-	normal_attribute_location = gl::get_attrib_location(shader_program, "normal");
-	tangent_attribute_location = gl::get_attrib_location(shader_program, "tangent");
-	uv_attribute_location = gl::get_attrib_location(shader_program, "uv");
+	gl::Loader::use_program(shader_program);
+	position_attribute_location = gl::Loader::get_attrib_location(shader_program, "position");
+	normal_attribute_location = gl::Loader::get_attrib_location(shader_program, "normal");
+	tangent_attribute_location = gl::Loader::get_attrib_location(shader_program, "tangent");
+	uv_attribute_location = gl::Loader::get_attrib_location(shader_program, "uv");
 }
 
 void gearoenix::gles2::shader::Shader::validate()
 {
-	gl::validate_program(shader_program);
+	gl::Loader::validate_program(shader_program);
 	gl::sint is_success = 0;
-	gl::get_programiv(shader_program, GL_VALIDATE_STATUS, &is_success);
+	gl::Loader::get_programiv(shader_program, GL_VALIDATE_STATUS, &is_success);
 	if (!is_success) {
 		gl::sint max_length = 0;
-		gl::get_programiv(shader_program, GL_INFO_LOG_LENGTH, &max_length);
+		gl::Loader::get_programiv(shader_program, GL_INFO_LOG_LENGTH, &max_length);
 		std::string info_log;
 		info_log.resize(max_length);
-		gl::get_program_info_log(shader_program, max_length, NULL, &(info_log[0]));
+		gl::Loader::get_program_info_log(shader_program, max_length, NULL, &(info_log[0]));
 		GXLOGF("Invalid shader program: " << info_log);
 	}
-	gl::use_program(shader_program);
+	gl::Loader::use_program(shader_program);
 }
 
 gearoenix::gl::uint gearoenix::gles2::shader::Shader::add_shader_to_program(const std::string& shd, const gl::enumerated shader_type)
 {
-	gl::uint shader_obj = gl::create_shader(shader_type);
+	gl::uint shader_obj = gl::Loader::create_shader(shader_type);
 	if (shader_obj == 0) {
 		GXLOGF("Error creating shader type.");
 	}
 	const char* chtemp = shd.c_str();
 	const gl::sint uintemp = static_cast<gl::sint>(shd.length());
-	glShaderSource(shader_obj, 1, &(chtemp), &(uintemp));
-	glCompileShader(shader_obj);
+	gl::Loader::shader_source(shader_obj, 1, &(chtemp), &(uintemp));
+	gl::Loader::compile_shader(shader_obj);
 	gl::sint success;
-	glGetShaderiv(shader_obj, GL_COMPILE_STATUS, &success);
+	gl::Loader::get_shaderiv(shader_obj, GL_COMPILE_STATUS, &success);
 	if (!success) {
 		gl::sint sts_size;
-		glGetShaderiv(shader_obj, GL_INFO_LOG_LENGTH, &sts_size);
+		gl::Loader::get_shaderiv(shader_obj, GL_INFO_LOG_LENGTH, &sts_size);
 		std::vector<char> info_log;
 		info_log.resize(sts_size);
-		glGetShaderInfoLog(shader_obj, sts_size, NULL, &(info_log[0]));
+		gl::Loader::get_shader_info_log(shader_obj, sts_size, NULL, &(info_log[0]));
 		GXLOGF("Error compiling shader type. Info: " << &(info_log[0]));
 	}
-	glAttachShader(shader_program, shader_obj);
+	gl::Loader::attach_shader(shader_program, shader_obj);
 	return shader_obj;
 }
 
@@ -94,12 +94,12 @@ gearoenix::gl::uint gearoenix::gles2::shader::Shader::set_fragment_shader(const 
 
 void gearoenix::gles2::shader::Shader::end_program(const gl::uint shader_program)
 {
-	glDeleteProgram(shader_program);
+	gl::Loader::delete_program(shader_program);
 }
 
 void gearoenix::gles2::shader::Shader::end_object(const gl::uint shader_object)
 {
-	glDeleteShader(shader_object);
+	gl::Loader::delete_shader(shader_object);
 }
 
 gearoenix::gles2::shader::Shader::Shader(const std::shared_ptr<engine::Engine>& e, const core::sync::EndCaller<core::sync::EndCallerIgnore> &c)
@@ -126,6 +126,6 @@ gearoenix::gles2::shader::Shader::~Shader() {
 
 gearoenix::gl::uint gearoenix::gles2::shader::Shader::get_uniform_location(const std::string& uname) const
 {
-	return glGetUniformLocation(shader_program, &(uname[0]));
+	return gl::Loader::get_uniform_location(shader_program, &(uname[0]));
 }
 #endif

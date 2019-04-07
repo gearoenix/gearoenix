@@ -34,17 +34,17 @@ gearoenix::gles2::texture::Cube::Cube(
         GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
     };
     std::function<void()> loadf = [&, imgw, imgh, img_data, end]() -> void {
-        gl::gen_textures(1, &texture_object);
-        gl::bind_texture(GL_TEXTURE_CUBE_MAP, texture_object);
-        gl::tex_parameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        gl::tex_parameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        gl::tex_parameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); //GL_MllIRRORED_REPEAT
-        gl::tex_parameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        gl::Loader::gen_textures(1, &texture_object);
+        gl::Loader::bind_texture(GL_TEXTURE_CUBE_MAP, texture_object);
+        gl::Loader::tex_parameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        gl::Loader::tex_parameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        gl::Loader::tex_parameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); //GL_MllIRRORED_REPEAT
+        gl::Loader::tex_parameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         for (int i = 0; i < GX_FACES_COUNT; ++i) {
-            gl::tex_image_2d(faces[i], 0, GL_RGBA, imgw, imgh, 0, GL_RGBA, GL_UNSIGNED_BYTE, (void*)img_data[i].data());
+            gl::Loader::tex_image_2d(faces[i], 0, GL_RGBA, imgw, imgh, 0, GL_RGBA, GL_UNSIGNED_BYTE, (void*)img_data[i].data());
         }
-        gl::generate_mipmap(GL_TEXTURE_CUBE_MAP);
-        gl::get_error();
+        gl::Loader::generate_mipmap(GL_TEXTURE_CUBE_MAP);
+        gl::Loader::get_error();
         //GX_CHECK_FOR_GRAPHIC_API_ERROR
         (void)end;
     };
@@ -65,8 +65,8 @@ gearoenix::gles2::texture::Cube::~Cube()
 
 void gearoenix::gles2::texture::Cube::bind(gl::enumerated texture_unit)
 {
-    gl::active_texture(texture_unit);
-    gl::bind_texture(GL_TEXTURE_CUBE_MAP, texture_object);
+    gl::Loader::active_texture(texture_unit);
+    gl::Loader::bind_texture(GL_TEXTURE_CUBE_MAP, texture_object);
 }
 
 #endif

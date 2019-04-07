@@ -13,9 +13,9 @@ gearoenix::gles2::buffer::Vertex::Vertex(
     : render::buffer::Static(static_cast<unsigned int>(vertices.size() * sizeof(math::BasicVertex)), e)
 {
     e->get_function_loader()->load([this, vertices, c] {
-		gl::gen_buffers(1, &bo);
-		gl::bind_buffer(GL_ARRAY_BUFFER, bo);
-		gl::buffer_data(GL_ARRAY_BUFFER, size, vertices.data(), GL_STATIC_DRAW);
+		gl::Loader::gen_buffers(1, &bo);
+		gl::Loader::bind_buffer(GL_ARRAY_BUFFER, bo);
+		gl::Loader::buffer_data(GL_ARRAY_BUFFER, size, vertices.data(), GL_STATIC_DRAW);
 	});
 }
 
@@ -25,8 +25,8 @@ gearoenix::gles2::buffer::Vertex::~Vertex()
         return;
 	const gl::uint cbo = bo;
     e->get_function_loader()->load([cbo] {
-        gl::bind_buffer(GL_ARRAY_BUFFER, 0);
-        gl::delete_buffers(1, &cbo);
+        gl::Loader::bind_buffer(GL_ARRAY_BUFFER, 0);
+        gl::Loader::delete_buffers(1, &cbo);
     });
     bo = 0;
 }
