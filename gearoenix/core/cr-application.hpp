@@ -5,8 +5,10 @@
 #include <memory>
 #ifdef GX_IN_ANDROID
 #include <android_native_app_glue.h>
-#elif defined(GX_IN_WINDOWS)
+#elif defined(GX_USE_WINAPI)
 #include <Windows.h>
+#elif defined(GX_USE_SDL)
+#include <SDL.h>
 #endif
 namespace gearoenix {
 namespace render {
@@ -53,7 +55,7 @@ namespace core {
         app->execute(core_app);                                                          \
         delete app;                                                                      \
     }
-#elif defined(GX_IN_WINDOWS)
+#elif defined(GX_USE_WINAPI)
 #define GEAROENIX_START(CoreApp)                                                                                 \
     int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)                                                         \
     {                                                                                                            \
@@ -62,7 +64,7 @@ namespace core {
         app->execute(core_app);                                                                                  \
         return 0;                                                                                                \
     }
-#elif defined(GX_IN_LINUX) || defined(GX_IN_MAC) || defined(GX_IN_IOS)
+#elif defined(GX_IN_LINUX) || defined(GX_IN_MAC) || defined(GX_IN_IOS) || defined(GX_USE_SDL)
 #define GEAROENIX_START(CoreApp)                                                                                 \
     int main(int, char**)                                                                                        \
     {                                                                                                            \

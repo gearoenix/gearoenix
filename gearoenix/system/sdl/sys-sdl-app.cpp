@@ -55,11 +55,12 @@ void gearoenix::system::Application::create_window() noexcept
         SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
         SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
         SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
-        SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 16);
-        SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 32);
+        SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
+        SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+		SDL_GL_SetSwapInterval(0);
 
         flags |= SDL_WINDOW_OPENGL;
     }
@@ -250,7 +251,6 @@ gearoenix::system::Application::Application() noexcept
 const std::shared_ptr<gearoenix::system::Application> gearoenix::system::Application::construct() noexcept
 {
     const std::shared_ptr<Application> result(new Application());
-
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_AUDIO) != 0) {
         GXLOGF("Failed to initialize SDL: " << SDL_GetError());
     }
@@ -279,9 +279,10 @@ const std::shared_ptr<gearoenix::system::Application> gearoenix::system::Applica
 
     SDL_AddEventWatch(event_receiver, result.get());
 #ifdef GX_USE_OPENGL
-    if (
-        result->supported_engine == render::engine::Type::OPENGL_43 || result->supported_engine == render::engine::Type::OPENGL_33 || result->supported_engine == render::engine::Type::OPENGL_ES3 || result->supported_engine == render::engine::Type::OPENGL_ES2) {
-		SDL_GL_MakeCurrent(result->window, result->gl_context);
+    if (result->supported_engine == render::engine::Type::OPENGL_43 || 
+		result->supported_engine == render::engine::Type::OPENGL_33 || 
+		result->supported_engine == render::engine::Type::OPENGL_ES3 || 
+		result->supported_engine == render::engine::Type::OPENGL_ES2) {
 		gl::Loader::load_functions();
         int w, h;
         SDL_GL_GetDrawableSize(result->window, &w, &h);

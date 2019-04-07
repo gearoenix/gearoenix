@@ -82,7 +82,7 @@ void gearoenix::gl::Loader::load_functions()
 	GXFUNLDF(glDeleteShader, delete_shader);
 	GXFUNLDF(glDeleteTextures, delete_textures);
 	GXFUNLDF(glEnable, enable);
-	GXFUNLDF(glGenBufers, gen_buffers);
+	GXFUNLDF(glGenBuffers, gen_buffers);
 	GXFUNLDF(glGenTextures, gen_textures);
 	GXFUNLDF(glGenerateMipmap, generate_mipmap);
 	GXFUNLDF(glGetAttribLocation, get_attrib_location);
