@@ -20,17 +20,8 @@
 GameApp::GameApp(const std::shared_ptr<gearoenix::system::Application>& sys_app)
     : gearoenix::core::Application::Application(sys_app)
 {
-	gearoenix::core::sync::EndCaller<gearoenix::render::scene::Scene> call([](std::shared_ptr<gearoenix::render::scene::Scene>) {
-		GXLOGF("Reached");
-	});
-	rnd_eng->set_render_tree(std::shared_ptr<gearoenix::render::graph::tree::Tree>(new gearoenix::render::graph::tree::Pbr(rnd_eng, call)));
-    sys_app->get_asset_manager()->get_scene_manager()->get_gx3d(1024, call);
-    /*rndeng->load_scene(1, [this]() -> void {
-        const auto& scene = rndeng->get_scene(1);
-        cam = scene->get_current_camera();
-        mdl = std::static_pointer_cast<gearoenix::render::model::Dynamic>(scene->get_model(1).lock());
-    });
-    rndeng->load_scene(2, [this]() -> void {});*/
+	rnd_eng->set_render_tree(std::shared_ptr<gearoenix::render::graph::tree::Tree>(new gearoenix::render::graph::tree::Pbr(rnd_eng, gearoenix::core::sync::EndCaller<gearoenix::core::sync::EndCallerIgnore>([] {}))));
+    sys_app->get_asset_manager()->get_scene_manager()->get_gx3d(1024, gearoenix::core::sync::EndCaller<gearoenix::render::scene::Scene>([](std::shared_ptr<gearoenix::render::scene::Scene>) { }));
 }
 
 GameApp::~GameApp() {}

@@ -15,7 +15,7 @@ std::shared_ptr<gearoenix::render::model::Model> gearoenix::render::model::Manag
 	std::shared_ptr<Model> m = cache.get<Model>(id, [id, c, this] {
 		const std::shared_ptr<system::stream::Stream> &f = cache.get_file();
 		const Type::Id t = f->read<Type::Id>();
-		const core::sync::EndCaller<core::sync::EndCallerIgnore> call(c);
+		const core::sync::EndCaller<core::sync::EndCallerIgnore> call([c] {});
 		switch (t)
 		{
 		case Type::DYNAMIC:

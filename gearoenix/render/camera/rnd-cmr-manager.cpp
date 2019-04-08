@@ -19,7 +19,7 @@ std::shared_ptr<gearoenix::render::camera::Camera> gearoenix::render::camera::Ma
         const core::TypeId t = file->read<core::TypeId>();
 		switch (t) {
 		case 1:
-            return std::shared_ptr<Perspective>(new Perspective(id, file, e, call));
+            return std::shared_ptr<Perspective>(new Perspective(id, file, e));
 		case 2:
             // return std::make_shared<Orthographic>(id, file, e);
             GXUNIMPLEMENTED;

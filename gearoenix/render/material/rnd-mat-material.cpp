@@ -12,9 +12,9 @@
 #endif
 
 gearoenix::render::material::Material::Material(const std::shared_ptr<engine::Engine>& e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end)
-	: e(e), uniform_buffers(std::shared_ptr<buffer::FramedUniform>(new buffer::FramedUniform(sizeof(Uniform), e, end)))
+	: e(e), uniform_buffers(std::shared_ptr<buffer::FramedUniform>(new buffer::FramedUniform(sizeof(Uniform), e)))
 {
-	core::sync::EndCaller<texture::Texture2D> calltxt2d(end);
+	core::sync::EndCaller<texture::Texture2D> calltxt2d([end](std::shared_ptr<texture::Texture2D>) {});
 	const std::shared_ptr<texture::Manager> &txtmgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
 	color = txtmgr->get(math::Vec3(0.9f, 0.1f, 0.3f), calltxt2d);
 	metallic_roughness = txtmgr->get(math::Vec2(0.5f, 0.5f), calltxt2d);
@@ -23,7 +23,7 @@ gearoenix::render::material::Material::Material(const std::shared_ptr<engine::En
 }
 
 gearoenix::render::material::Material::Material(const std::shared_ptr<system::stream::Stream>& f, const std::shared_ptr<engine::Engine>& e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end)
-	: e(e), uniform_buffers(std::shared_ptr<buffer::FramedUniform>(new buffer::FramedUniform(sizeof(Uniform), e, end)))
+	: e(e), uniform_buffers(std::shared_ptr<buffer::FramedUniform>(new buffer::FramedUniform(sizeof(Uniform), e)))
 {
 #ifdef GX_DEBUG_MATERIAL_IMPORT
 	bool alpha_init = false;
@@ -47,14 +47,14 @@ gearoenix::render::material::Material::Material(const std::shared_ptr<system::st
 		{
 		case Field::Vector:
 		{
-			core::sync::EndCaller<texture::Texture2D> calltxt2d(end);
+			core::sync::EndCaller<texture::Texture2D> calltxt2d([end](std::shared_ptr<texture::Texture2D>) {});
 			math::Vec4 color_value;
 			color_value.read(f);
 			return txtmgr->get(color_value, calltxt2d);
 		}
 		case Field::Texture:
 		{
-			core::sync::EndCaller<texture::Texture> calltxt(end);
+			core::sync::EndCaller<texture::Texture> calltxt([end](std::shared_ptr<texture::Texture>) {});
 			return std::static_pointer_cast<texture::Texture2D>(txtmgr->get_gx3d(f->read<core::Id>(), calltxt));
 		}
 		default:

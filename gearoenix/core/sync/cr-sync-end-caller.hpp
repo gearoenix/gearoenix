@@ -4,6 +4,7 @@
 #include "../cr-build-configuration.hpp"
 #include <functional>
 #include <memory>
+#include <type_traits>
 
 namespace gearoenix {
 namespace core {
@@ -35,11 +36,6 @@ namespace core {
                 : caller(new Caller(f))
             {
             }
-            template <typename V>
-            EndCaller(V v)
-                : caller(new Caller([v](std::shared_ptr<T>) -> void {}))
-            {
-            }
             EndCaller(const EndCaller& o)
                 : caller(o.caller)
             {
@@ -57,33 +53,28 @@ namespace core {
         private:
             class Caller {
             public:
-                std::function<void(std::shared_ptr<EndCallerIgnore>)> f;
-                std::shared_ptr<EndCallerIgnore> data = nullptr;
-                Caller(std::function<void(std::shared_ptr<EndCallerIgnore>)> f)
+                std::function<void()> f;
+                Caller(std::function<void()> f)
                     : f(f)
                 {
                 }
                 ~Caller()
                 {
-                    f(data);
+                    f();
                 }
             };
             std::shared_ptr<Caller> caller;
 
         public:
-            EndCaller(std::function<void(std::shared_ptr<EndCallerIgnore>)> f)
-                : caller(new Caller(f))
-            {
-            }
-			template <typename V>
-			EndCaller(V v)
-                : caller(new Caller([v](std::shared_ptr<EndCallerIgnore>) -> void {}))
+			EndCaller(std::function<void()> f)
+				: caller(new Caller(f))
 			{
 			}
-            void set_data(std::shared_ptr<EndCallerIgnore> data)
-            {
-                caller->data = data;
-            }
+
+			EndCaller(const EndCaller& o)
+				: caller(o.caller)
+			{
+			}
         };
 #endif
     }

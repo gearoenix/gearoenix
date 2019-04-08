@@ -44,14 +44,13 @@ gearoenix::gles2::texture::Texture2D::Texture2D(const core::Id my_id, const gl::
 
 gearoenix::gles2::texture::Texture2D::~Texture2D()
 {
-	GXUNIMPLEMENTED;
     if (texture_object == 0)
         return;
     const gl::uint c_texture_object = texture_object;
-//    render_engine->add_load_function([c_texture_object] {
-//        glBindTexture(GL_TEXTURE_2D, 0);
-//        glDeleteTextures(1, &c_texture_object);
-//    });
+    render_engine->get_function_loader()->load([c_texture_object] {
+        gl::Loader::bind_texture(GL_TEXTURE_2D, 0);
+		gl::Loader::delete_textures(1, &c_texture_object);
+    });
     texture_object = 0;
 }
 

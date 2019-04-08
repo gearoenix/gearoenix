@@ -31,10 +31,9 @@ void gearoenix::render::camera::Camera::update_view_projection()
 gearoenix::render::camera::Camera::Camera(
         const core::Id my_id,
         const std::shared_ptr<system::stream::Stream> &f,
-        const std::shared_ptr<engine::Engine> &e,
-        const core::sync::EndCaller<core::sync::EndCallerIgnore> &c)
+        const std::shared_ptr<engine::Engine> &e)
     : core::asset::Asset(my_id, core::asset::Type::CAMERA)
-	, uniform_buffers(new buffer::FramedUniform(sizeof(Uniform), e, c))
+	, uniform_buffers(new buffer::FramedUniform(sizeof(Uniform), e))
 {
     uniform.near_aspect_ratio_reserved[1] = e->get_system_application()->get_window_ratio();
     f->read(uniform.position_far[0]);

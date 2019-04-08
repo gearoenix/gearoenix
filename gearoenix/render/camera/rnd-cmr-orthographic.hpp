@@ -1,9 +1,6 @@
 #ifndef GEAROEMIX_RENDER_CAMERA_ORTHOGRAPHIC_HPP
 #define GEAROEMIX_RENDER_CAMERA_ORTHOGRAPHIC_HPP
 #include "rnd-cmr-camera.hpp"
-#include "../../core/sync/cr-sync-end-caller.hpp"
-#include <memory>
-
 namespace gearoenix {
 namespace render {
     namespace camera {
@@ -17,8 +14,7 @@ namespace render {
             Orthographic(
                     const core::Id my_id,
                     const std::shared_ptr<system::stream::Stream> &f,
-                    const std::shared_ptr<engine::Engine> &e,
-                    const core::sync::EndCaller<core::sync::EndCallerIgnore> &c);
+                    const std::shared_ptr<engine::Engine> &e);
             bool in_sight(const math::Vec3& location, const core::Real radius) const;
             void on_event(const core::event::Event& e);
             math::Ray3 create_ray3(const core::Real x, const core::Real y) const;

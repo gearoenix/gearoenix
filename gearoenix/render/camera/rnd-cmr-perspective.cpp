@@ -2,6 +2,7 @@
 #include "../../core/event/cr-ev-event.hpp"
 #include "../../core/event/cr-ev-window-resize.hpp"
 #include "../../system/stream/sys-stm-stream.hpp"
+#include "../../system/sys-log.hpp"
 #include <cmath>
 
 void gearoenix::render::camera::Perspective::on_ratio_change()
@@ -16,9 +17,8 @@ void gearoenix::render::camera::Perspective::on_ratio_change()
 gearoenix::render::camera::Perspective::Perspective(
         const core::Id my_id,
         const std::shared_ptr<system::stream::Stream> &f,
-        const std::shared_ptr<engine::Engine> &e,
-        const core::sync::EndCaller<core::sync::EndCallerIgnore> &c)
-    : Camera(my_id, f, e, c)
+        const std::shared_ptr<engine::Engine> &e)
+    : Camera(my_id, f, e)
 {
     const core::Real rad = f->read<core::Real>();
     GXLOGD("Radiant is: " << rad << ", in perspective camera with id: " << my_id);

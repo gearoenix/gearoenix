@@ -39,9 +39,9 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
 		sample_info.wrap_t = Wrap::REPEAT;
 		sample_info.wrap_r = Wrap::REPEAT;
 		const std::shared_ptr<Texture2D> t(e->create_texture_2d(
-			*id_ptr, static_cast<const void *>(cc), 
-			tex_format, sample_info, 1, 1, 
-			core::sync::EndCaller<core::sync::EndCallerIgnore>(c)));
+			*id_ptr, static_cast<const void *>(cc),
+			tex_format, sample_info, 1, 1,
+			core::sync::EndCaller<core::sync::EndCallerIgnore>([c] {})));
 		color_id[color] = *id_ptr;
 		return t;
 	};
@@ -49,11 +49,15 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
 	if (color_id.end() != i1)
 	{
 		*id_ptr = i1->second;
-		return std::static_pointer_cast<Texture2D>(cache.get_cacher().get(i1->second, fun));
+		std::shared_ptr<Texture2D> data = std::static_pointer_cast<Texture2D>(cache.get_cacher().get(i1->second, fun));
+		c.set_data(data);
+		return data;
 	}
 	const core::Id id = e->get_system_application()->get_asset_manager()->create_id();
 	*id_ptr = id;
-	return std::static_pointer_cast<Texture2D>(cache.get_cacher().get(id, fun));
+	std::shared_ptr<Texture2D> data = std::static_pointer_cast<Texture2D>(cache.get_cacher().get(id, fun));
+	c.set_data(data);
+	return data;
 }
 
 std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::get(const math::Vec3 & color, core::sync::EndCaller<Texture2D>& c)
@@ -78,7 +82,7 @@ std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::render::texture:
 			unsigned int img_width;
 			unsigned int img_height;
 			PNG::decode(f, *data, img_width, img_height);
-			core::sync::EndCaller<core::sync::EndCallerIgnore> call(std::make_tuple(c, data));
+			core::sync::EndCaller<core::sync::EndCallerIgnore> call([c, data] {});
 			SampleInfo sinfo;
 			return std::shared_ptr<Texture>(e->create_texture_2d(
 				id, static_cast<const void *>(data->data()), TextureFormat::RGBA_UINT8, sinfo, img_width, img_height, call));

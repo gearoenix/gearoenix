@@ -4,7 +4,6 @@
 #include "../../math/math-matrix.hpp"
 #include "../../math/math-ray.hpp"
 #include "../../math/math-vector.hpp"
-#include "../../core/sync/cr-sync-end-caller.hpp"
 #include "rnd-cmr-uniform.hpp"
 
 namespace gearoenix {
@@ -42,8 +41,7 @@ class Engine;
             Camera(
                     const core::Id my_id,
                     const std::shared_ptr<system::stream::Stream> &f,
-                    const std::shared_ptr<engine::Engine> &e,
-                    const core::sync::EndCaller<core::sync::EndCallerIgnore> &c);
+                    const std::shared_ptr<engine::Engine> &e);
         public:
             virtual ~Camera();
             void look_at(const math::Vec3& target, const math::Vec3& up);

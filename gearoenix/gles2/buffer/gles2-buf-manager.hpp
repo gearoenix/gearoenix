@@ -13,7 +13,7 @@ namespace gles2 {
         public:
             Manager(const std::shared_ptr<engine::Engine>& e);
             ~Manager();
-			std::shared_ptr<render::buffer::Uniform> create_uniform(const unsigned int size, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) override final;
+			std::shared_ptr<render::buffer::Uniform> create_uniform(const unsigned int size) override final;
 			std::shared_ptr<render::buffer::Static> create_static(const std::vector<math::BasicVertex> vertices, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) override final;
 			std::shared_ptr<render::buffer::Static> create_static(const std::vector<std::uint32_t> indices, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) override final;
         };

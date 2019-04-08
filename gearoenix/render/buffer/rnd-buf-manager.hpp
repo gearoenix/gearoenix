@@ -20,7 +20,7 @@ namespace render {
 			Manager(const std::shared_ptr<engine::Engine> &e);
         public:
 			virtual ~Manager();
-			virtual std::shared_ptr<Uniform> create_uniform(const unsigned int size, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) = 0;
+			virtual std::shared_ptr<Uniform> create_uniform(const unsigned int size) = 0;
 			virtual std::shared_ptr<Static> create_static(const std::vector<math::BasicVertex> vertices, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) = 0;
 			virtual std::shared_ptr<Static> create_static(const std::vector<std::uint32_t> indices, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) = 0;
         };

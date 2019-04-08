@@ -21,7 +21,7 @@ gearoenix::render::model::Mesh::Mesh(const std::shared_ptr<system::stream::Strea
 {
 	core::sync::EndCaller<mesh::Mesh> call([c](std::shared_ptr<mesh::Mesh>) {});
 	msh = e->get_system_application()->get_asset_manager()->get_mesh_manager()->get_gx3d(f->read<core::Id>(), call);
-	mat = std::make_shared<material::Material>(e, f);
+	mat = std::make_shared<material::Material>(f, e, core::sync::EndCaller<core::sync::EndCallerIgnore>([c] {}));
 }
 
 gearoenix::render::model::Mesh::~Mesh() {}

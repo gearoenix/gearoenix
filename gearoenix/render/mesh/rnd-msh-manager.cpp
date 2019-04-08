@@ -16,7 +16,7 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager:
 		switch(f->read<core::TypeId>())
 		{
 		case Type::BASIC:
-			return std::make_shared<Mesh>(id, f, e, c);
+			return std::make_shared<Mesh>(id, f, e, core::sync::EndCaller<core::sync::EndCallerIgnore>([c] {}));
 		default:
 			GXUNEXPECTED;
 		}

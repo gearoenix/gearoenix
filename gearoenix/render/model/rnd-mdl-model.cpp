@@ -28,7 +28,7 @@ gearoenix::render::model::Model::Model(
 	const bool is_dynamic)
 	: core::asset::Asset(my_id, core::asset::Type::MODEL)
 	, e(e)
-	, uniform_buffers(std::shared_ptr<buffer::FramedUniform>(new buffer::FramedUniform(sizeof(Uniform), e, c)))
+	, uniform_buffers(std::make_shared<buffer::FramedUniform>(sizeof(Uniform), e))
 {
 	uniform.m.read(f);
 	const core::Count meshes_count = f->read<core::Count>();
@@ -55,7 +55,7 @@ gearoenix::render::model::Model::Model(
 	const core::sync::EndCaller<core::sync::EndCallerIgnore>& c)
 	: core::asset::Asset(e->get_system_application()->get_asset_manager()->create_id(), core::asset::Type::MODEL)
 	, e(e)
-	, uniform_buffers(std::shared_ptr<buffer::FramedUniform>(new buffer::FramedUniform(sizeof(Uniform), e, c)))
+	, uniform_buffers(std::make_shared<buffer::FramedUniform>(sizeof(Uniform), e))
 {
 }
 

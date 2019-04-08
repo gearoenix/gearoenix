@@ -39,7 +39,7 @@ gearoenix::render::scene::Scene::Scene(
 	: core::asset::Asset(my_id, core::asset::Type::SCENE)
 	, e(e)
 	, scene_type_id(Type::GAME)
-	, uniform_buffers(std::shared_ptr<buffer::FramedUniform>(new buffer::FramedUniform(sizeof(Uniform), e, c)))
+	, uniform_buffers(std::make_shared<buffer::FramedUniform>(sizeof(Uniform), e))
 {
 	const std::shared_ptr<core::asset::Manager> &astmgr = e->get_system_application()->get_asset_manager();
 #define GXHELPER(x, n, cls)                                                   \
@@ -48,7 +48,7 @@ gearoenix::render::scene::Scene::Scene(
 		std::vector<core::Id> ids;                                            \
 		f->read(ids);                                                         \
 		if(ids.size() > 0) {                                                  \
-			core::sync::EndCaller<n::cls> call(c);                            \
+			core::sync::EndCaller<n::cls> call([c](std::shared_ptr<n::cls>){});                            \
 			for (const core::Id id : ids) add_##x(mgr->get_gx3d(id, call));   \
 		}                                                                     \
 	}
@@ -76,7 +76,7 @@ gearoenix::render::scene::Scene::Scene(
 	: core::asset::Asset(e->get_system_application()->get_asset_manager()->create_id(), core::asset::Type::SCENE)
 	, e(e)
 	, scene_type_id(Type::GAME)
-	, uniform_buffers(std::shared_ptr<buffer::FramedUniform>(new buffer::FramedUniform(sizeof(Uniform), e, c)))
+	, uniform_buffers(std::make_shared<buffer::FramedUniform>(sizeof(Uniform), e))
 {}
 
 gearoenix::render::scene::Scene::~Scene()

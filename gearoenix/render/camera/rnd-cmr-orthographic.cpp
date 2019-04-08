@@ -13,9 +13,8 @@ void gearoenix::render::camera::Orthographic::on_ratio_change()
 gearoenix::render::camera::Orthographic::Orthographic(
         const core::Id my_id,
         const std::shared_ptr<system::stream::Stream> &f,
-        const std::shared_ptr<engine::Engine> &e,
-        const core::sync::EndCaller<core::sync::EndCallerIgnore> &c)
-    : Camera(my_id, f, e, c)
+        const std::shared_ptr<engine::Engine> &e)
+    : Camera(my_id, f, e)
 {
 //    f->read(aspects_size);
 //    c_height = aspects_size;
