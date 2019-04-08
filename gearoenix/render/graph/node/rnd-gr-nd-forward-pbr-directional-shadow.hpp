@@ -46,12 +46,7 @@ namespace render {
             struct ForwardPbrDirectionalShadowKernel {
                 std::shared_ptr<command::Buffer> secondary_cmd = nullptr;
                 unsigned int latest_render_data_pool = 0;
-                std::vector<
-                    std::tuple<
-                        std::shared_ptr<buffer::Uniform>,
-                        std::shared_ptr<pipeline::ForwardPbrDirectionalShadowResourceSet>>>
-                    render_data_pool;
-
+                std::vector<std::shared_ptr<pipeline::ForwardPbrDirectionalShadowResourceSet>> render_data_pool;
                 ForwardPbrDirectionalShadowKernel(const std::shared_ptr<engine::Engine>& e, const unsigned int kernel_index);
             };
 
@@ -59,14 +54,7 @@ namespace render {
                 std::shared_ptr<command::Buffer> primary_cmd = nullptr;
                 std::shared_ptr<sync::Semaphore> semaphore = nullptr;
                 std::vector<std::shared_ptr<ForwardPbrDirectionalShadowKernel>> kernels;
-
                 ForwardPbrDirectionalShadowFrame(const std::shared_ptr<engine::Engine>& e);
-            };
-
-            struct ForwardPbrDirectionalShadowUniform {
-                math::Mat4x4 mvp = math::Mat4x4();
-                math::Mat4x4 light_view_projection_biases;
-                math::Vec4 light_color;
             };
 
             /// This renders only one directional light with one shadow map.

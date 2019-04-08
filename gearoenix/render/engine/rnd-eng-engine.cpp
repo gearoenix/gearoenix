@@ -14,11 +14,6 @@
 #include "../scene/rnd-scn-scene.hpp"
 #include <thread>
 
-void gearoenix::render::engine::Engine::record(const unsigned int kernel_index)
-{
-	render_tree->record(kernel_index);
-}
-
 gearoenix::render::engine::Engine::Engine(const std::shared_ptr<system::Application>& system_application, const Type::Id engine_type_id)
     : engine_type_id(engine_type_id)
     , sysapp(system_application)
@@ -26,7 +21,11 @@ gearoenix::render::engine::Engine::Engine(const std::shared_ptr<system::Applicat
     , physics_engine(nullptr)
 	, kernels(new core::sync::KernelWorker())
 {
-	kernels->add_step(std::bind(&Engine::record, this, std::placeholders::_1));
+	kernels->add_step([this](const unsigned int kernel_index) {
+		render_tree->record(kernel_index);
+	}, [this] {
+		render_tree->submit();
+	});
 }
 
 gearoenix::render::engine::Engine::~Engine()
@@ -45,7 +44,13 @@ void gearoenix::render::engine::Engine::update() {
 	++frame_number;
 	frame_number %= frames_count;
 	fun_loader->unload();
+	render_tree->update();
 	kernels->do_steps();
+}
+
+void gearoenix::render::engine::Engine::set_render_tree(const std::shared_ptr<graph::tree::Tree>& tree)
+{
+	render_tree = tree;
 }
 
 const std::shared_ptr<gearoenix::system::Application>& gearoenix::render::engine::Engine::get_system_application() const
@@ -84,6 +89,11 @@ const std::shared_ptr<gearoenix::core::FunctionLoader>& gearoenix::render::engin
 gearoenix::render::engine::Type::Id gearoenix::render::engine::Engine::get_engine_type_id() const
 {
 	return engine_type_id;
+}
+
+const std::shared_ptr<gearoenix::render::texture::Target> &gearoenix::render::engine::Engine::get_main_render_target() const
+{
+	return main_render_target;
 }
 
 unsigned int gearoenix::render::engine::Engine::get_frame_number() const

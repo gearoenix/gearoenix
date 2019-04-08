@@ -14,7 +14,6 @@ namespace render {
 
         public:
             virtual ~Target();
-            virtual void bind(const std::shared_ptr<command::Buffer>& c) = 0;
         };
     }
 }

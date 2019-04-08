@@ -101,33 +101,24 @@ void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::record(
 		const std::shared_ptr<mesh::Mesh>& msh = id_mesh.second->get_mesh();
 		const std::shared_ptr<material::Material>& mat = id_mesh.second->get_material();
 		if (kernel->latest_render_data_pool >= kernel->render_data_pool.size()) {
-			kernel->render_data_pool.push_back(std::make_tuple(
-				std::shared_ptr<buffer::Uniform>(e->get_buffer_manager()->create_uniform(sizeof(ForwardPbrDirectionalShadowUniform))),
-				std::shared_ptr<pipeline::ForwardPbrDirectionalShadowResourceSet>(static_cast<pipeline::ForwardPbrDirectionalShadowResourceSet*>(render_pipeline->create_resource_set()))));
+			kernel->render_data_pool.push_back(
+				std::shared_ptr<pipeline::ForwardPbrDirectionalShadowResourceSet>(
+					static_cast<pipeline::ForwardPbrDirectionalShadowResourceSet*>(render_pipeline->create_resource_set())));
 		}
-		std::tuple<std::shared_ptr<buffer::Uniform>, std::shared_ptr<pipeline::ForwardPbrDirectionalShadowResourceSet>>& pool = kernel->render_data_pool[kernel->latest_render_data_pool];
-		std::shared_ptr<buffer::Uniform>& ub = std::get<0>(pool);
-		std::shared_ptr<pipeline::ForwardPbrDirectionalShadowResourceSet>& prs = std::get<1>(pool);
-		ForwardPbrDirectionalShadowUniform us;
-		us.mvp = c->get_view_projection_matrix() * m->get_model_matrix();
-		GXTODO;
-		//us.light_view_projection_biases = l->get_view_projection_biases();
-		us.light_color = math::Vec4(l->get_color(), 1.0);
-		ub->update(&us);
+		const std::shared_ptr<pipeline::ForwardPbrDirectionalShadowResourceSet>& prs = kernel->render_data_pool[kernel->latest_render_data_pool];
 		prs->set_scene(s);
 		prs->set_camera(c);
 		prs->set_light(l);
 		prs->set_model(m);
 		prs->set_mesh(msh);
 		prs->set_material(mat);
-		// TODO: 
-		prs->set_node_uniform_buffer(ub);
 		prs->set_diffuse_environment(std::static_pointer_cast<texture::Cube>(input_textures[0]));
 		prs->set_specular_environment(std::static_pointer_cast<texture::Cube>(input_textures[1]));
 		prs->set_ambient_occlusion(std::static_pointer_cast<texture::Texture2D>(input_textures[2]));
 		prs->set_shadow_mapper(std::static_pointer_cast<texture::Texture2D>(input_textures[3]));
 		prs->set_brdflut(std::static_pointer_cast<texture::Texture2D>(input_textures[4]));
-		kernel->secondary_cmd->bind(prs);
+		const std::shared_ptr<command::Buffer> &cmd = kernel->secondary_cmd;
+		cmd->bind(prs);
 		++kernel->latest_render_data_pool;
 	}
 }
@@ -137,7 +128,7 @@ void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::submit()
 	const unsigned int frame_number = e->get_frame_number();
 	const std::shared_ptr<ForwardPbrDirectionalShadowFrame>& frame = frames[frame_number];
 	std::shared_ptr<command::Buffer>& cmd = frame->primary_cmd;
-	render_target->bind(cmd);
+	cmd->bind(render_target);
 	for (const std::shared_ptr<ForwardPbrDirectionalShadowKernel>& k : frame->kernels) {
 		cmd->record(k->secondary_cmd);
 	}
@@ -154,6 +145,10 @@ void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::submit()
 		pss.push_back(ps);
 	}
 	e->submit(pss, cmd, frame->semaphore);
+	for (const std::shared_ptr<ForwardPbrDirectionalShadowKernel>& k : frame->kernels) {
+		for (unsigned int i = k->latest_render_data_pool; i < k->render_data_pool.size(); ++i)
+			k->render_data_pool[i]->clean();
+	}
 }
 
 gearoenix::render::graph::node::ForwardPbrDirectionalShadowFrame::ForwardPbrDirectionalShadowFrame(const std::shared_ptr<engine::Engine>& e)

@@ -20,7 +20,7 @@ namespace gearoenix {
 					// std::shared_ptr<node::SahdowAccumulatorCone> shdacmcone = nullptr;
 					// std::shared_ptr<node::SahdowAccumulatorDirectional> shdacmdir = nullptr;
 					// std::shared_ptr<node::SahdowAccumulatorPoint> shdacmpnt = nullptr;
-					/// In future, this should become several for each light frustum
+					/// TODO: In future, this should become several for each light frustum
 					//std::shared_ptr<node::ShadowMapper> shdmap = nullptr;
 				public:
 					Pbr(

@@ -8,6 +8,9 @@ namespace render {
 	namespace pipeline {
 		class ResourceSet;
 	}
+	namespace texture {
+		class Target;
+	}
     namespace command {
         class Buffer {
         protected:
@@ -20,6 +23,7 @@ namespace render {
 			virtual void end();
             virtual void record(const std::shared_ptr<Buffer>& o);
 			virtual void bind(const std::shared_ptr<pipeline::ResourceSet> &r);
+			virtual void bind(const std::shared_ptr<texture::Target> &t) = 0;
         };
     }
 }

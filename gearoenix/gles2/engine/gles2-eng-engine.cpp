@@ -95,8 +95,8 @@ gearoenix::gles2::engine::Engine::~Engine()
 
 void gearoenix::gles2::engine::Engine::update()
 {
+    gl::Loader::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	render::engine::Engine::update();
-    gl::Loader::clear(GL_COLOR_BUFFER_BIT);
     //do_load_functions();
     //physics_engine->wait();
     //for (std::pair<const core::Id, std::shared_ptr<render::scene::Scene>>& scene : loaded_scenes) {
@@ -167,11 +167,6 @@ gearoenix::render::texture::Texture2D * gearoenix::gles2::engine::Engine::create
 void gearoenix::gles2::engine::Engine::submit(const std::vector<std::shared_ptr<render::sync::Semaphore>>& p, const std::shared_ptr<render::command::Buffer>& c, const std::shared_ptr<render::sync::Semaphore>& n)
 {
 	GXUNIMPLEMENTED;
-}
-
-void gearoenix::render::engine::Engine::set_render_tree(const std::shared_ptr<graph::tree::Tree>& tree)
-{
-	render_tree = tree;
 }
 
 //gearoenix::render::texture::Texture2D* gearoenix::gles2::engine::Engine::create_texture_2d(core::Id id, system::stream::Stream* file, core::sync::EndCaller<core::sync::EndCallerIgnore> c)

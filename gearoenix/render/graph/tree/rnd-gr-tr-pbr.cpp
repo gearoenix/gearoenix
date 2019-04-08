@@ -61,4 +61,5 @@ void gearoenix::render::graph::tree::Pbr::record(const unsigned int kernel_index
 
 void gearoenix::render::graph::tree::Pbr::submit()
 {
+	fwddirshd->submit();
 }

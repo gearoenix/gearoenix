@@ -61,8 +61,9 @@ namespace gearoenix {
 			class Semaphore;
 		}
 		namespace texture {
-			class Texture2D;
 			class Cube;
+			class Target;
+			class Texture2D;
 		}
 		namespace engine {
 			class Engine {
@@ -75,12 +76,12 @@ namespace gearoenix {
 				std::shared_ptr<physics::Engine> physics_engine = nullptr;
 				std::shared_ptr<core::sync::KernelWorker> kernels = nullptr;
 				std::shared_ptr<graph::tree::Tree> render_tree = nullptr;
+				std::shared_ptr<texture::Target> main_render_target = nullptr;
 				/// managers pointers are own only by this class
 				std::shared_ptr<pipeline::Manager> pipeline_manager = nullptr;
 				std::shared_ptr<command::Manager> command_manager = nullptr;
 				std::shared_ptr<sampler::Manager> sampler_manager = nullptr;
 				std::shared_ptr<buffer::Manager> buffer_manager = nullptr;
-				void record(const unsigned int kernel_index);
 				Engine(const std::shared_ptr<system::Application>& system_application, const Type::Id engine_type_id);
 			public:
 				virtual ~Engine();
@@ -97,6 +98,15 @@ namespace gearoenix {
 					const unsigned int heigt,
 					const core::sync::EndCaller<core::sync::EndCallerIgnore> &call) = 0;
 				virtual void submit(const std::vector<std::shared_ptr<sync::Semaphore>>& p, const std::shared_ptr<command::Buffer>& c, const std::shared_ptr<sync::Semaphore>& n) = 0;
+				/// TODO: This is (design/mechanism) going to change in far future
+				/// game developer must keep all the render-trees by himself/herself
+				/// Then every thing based on the following must be choosed by render-trees:
+				///   - Type of object/scene (e.g. UI, GAME, MODEL, Widget, etc)
+				///   - Tagging the objects or meshes that must be rendered by which render-tree
+				/// This is going to add a great flexibility in rendering of engine
+				///
+				/// The other way of accomplishing of this functionallity is to create a render-tree 
+				/// that is composed with several other render-trees
 				virtual void set_render_tree(const std::shared_ptr<graph::tree::Tree> &tree);
 
 				const std::shared_ptr<system::Application> &get_system_application() const;
@@ -106,6 +116,7 @@ namespace gearoenix {
 				const std::shared_ptr<command::Manager> &get_command_manager() const;
 				const std::shared_ptr<buffer::Manager> &get_buffer_manager() const;
 				const std::shared_ptr<core::sync::KernelWorker> &get_kernels() const;
+				const std::shared_ptr<texture::Target> &get_main_render_target() const;
 				Type::Id get_engine_type_id() const;
 				unsigned int get_frame_number() const;
 				unsigned int get_frames_count() const;
