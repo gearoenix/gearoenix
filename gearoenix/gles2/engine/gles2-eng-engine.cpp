@@ -19,15 +19,11 @@
 #include "../pipeline/gles2-pip-manager.hpp"
 #include "../texture/gles2-txt-2d.hpp"
 #include "../texture/gles2-txt-cube.hpp"
+#include "../texture/gles2-txt-target.hpp"
 #include "../sync/gles2-sy-semaphore.hpp"
 
 void gearoenix::gles2::engine::Engine::initialize()
 {
-    gl::Loader::clear_color(0.0f, 0.0f, 0.0f, 0.0f);
-	float win_width = static_cast<float>(sysapp->get_width());
-	float win_height = static_cast<float>(sysapp->get_height());
-    //glGetIntegerv(GL_FRAMEBUFFER_BINDING, (GLint*)&render_framebuffer);
-    //glGetIntegerv(GL_RENDERBUFFER_BINDING, (GLint*)&render_depth);
     //glGenFramebuffers(1, &shadow_map_framebuffer);
     //glGenRenderbuffers(1, &shadow_map_depth);
     //glBindRenderbuffer(GL_RENDERBUFFER, shadow_map_depth);
@@ -58,15 +54,6 @@ void gearoenix::gles2::engine::Engine::initialize()
     //if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
     //    GXUNEXPECTED;
     //shadow_map_texture = new texture::Texture2D(sysapp->get_asset_manager()->create_id(), shadow_map_color, this);
-    gl::Loader::enable(GL_CULL_FACE);
-    gl::Loader::cull_face(GL_BACK);
-    gl::Loader::enable(GL_BLEND);
-    gl::Loader::blend_func(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    gl::Loader::enable(GL_DEPTH_TEST);
-    gl::Loader::enable(GL_SCISSOR_TEST);
-    gl::Loader::enable(GL_STENCIL_TEST);
-    gl::Loader::viewport(0, 0, static_cast<gl::sizei>(win_width), static_cast<gl::sizei>(win_height));
-    gl::Loader::scissor(0, 0, static_cast<gl::sizei>(win_width), static_cast<gl::sizei>(win_height));
     //pipeline_manager = new render::pipeline::Manager(this);
 #ifdef GX_GLES2_ENGINE_PROFILING
     prof_last_time_draw = std::chrono::high_resolution_clock::now();
@@ -85,6 +72,7 @@ std::shared_ptr<gearoenix::gles2::engine::Engine> gearoenix::gles2::engine::Engi
 	e->pipeline_manager = std::make_shared<pipeline::Manager>(e);
 	e->buffer_manager = std::make_shared<buffer::Manager>(e);
 	e->command_manager = std::make_shared<command::Manager>();
+	e->main_render_target = std::shared_ptr<render::texture::Target>(new texture::Target(e));
 	return e;
 }
 
@@ -119,7 +107,9 @@ void gearoenix::gles2::engine::Engine::update()
     //    scene.second->draw(shadow_map_texture);
     //}
     //physics_engine->update();
+#ifdef GX_DEBUG_GLES2
 	gl::Loader::check_for_error();
+#endif
 #ifdef GX_GLES2_ENGINE_PROFILING
     auto now = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>(now - prof_last_time_draw);
@@ -137,6 +127,7 @@ void gearoenix::gles2::engine::Engine::update()
 
 void gearoenix::gles2::engine::Engine::terminate()
 {
+	render::engine::Engine::terminate();
     //if (shadow_map_texture != nullptr) {
     //    glDeleteFramebuffers(1, &shadow_map_framebuffer);
     //    shadow_map_framebuffer = 0;

@@ -44,6 +44,7 @@ namespace gearoenix {
 		typedef GXGL_APICALL void(GXGL_APIENTRY generate_mipmap_fnp)(enumerated target);
 		typedef GXGL_APICALL sint(GXGL_APIENTRY get_attrib_location_fnp)(uint program, const char * name);
 		typedef GXGL_APICALL enumerated(GXGL_APIENTRY get_error_fnp)();
+		typedef GXGL_APICALL void(GXGL_APIENTRY get_integerv_fnp)(enumerated pname, sint *data);
 		typedef GXGL_APICALL void(GXGL_APIENTRY get_programiv_fnp)(uint program, enumerated pname, sint * params);
 		typedef GXGL_APICALL void(GXGL_APIENTRY get_program_info_log_fnp)(uint program, sizei buf_size, sizei *length, char * info);
 		typedef GXGL_APICALL void(GXGL_APIENTRY get_shaderiv_fnp)(uint shader, enumerated pname, sint *params);
@@ -93,6 +94,7 @@ namespace gearoenix {
 			static generate_mipmap_fnp generate_mipmap;
 			static get_attrib_location_fnp get_attrib_location;
 			static get_error_fnp get_error;
+			static get_integerv_fnp get_integerv;
 			static get_programiv_fnp get_programiv;
 			static get_program_info_log_fnp get_program_info_log;
 			static get_shaderiv_fnp get_shaderiv;

@@ -31,6 +31,7 @@ gearoenix::gl::gen_textures_fnp gearoenix::gl::Loader::gen_textures;
 gearoenix::gl::generate_mipmap_fnp gearoenix::gl::Loader::generate_mipmap;
 gearoenix::gl::get_attrib_location_fnp gearoenix::gl::Loader::get_attrib_location;
 gearoenix::gl::get_error_fnp gearoenix::gl::Loader::get_error;
+gearoenix::gl::get_integerv_fnp gearoenix::gl::Loader::get_integerv;
 gearoenix::gl::get_programiv_fnp gearoenix::gl::Loader::get_programiv;
 gearoenix::gl::get_program_info_log_fnp gearoenix::gl::Loader::get_program_info_log;
 gearoenix::gl::get_shaderiv_fnp gearoenix::gl::Loader::get_shaderiv;
@@ -87,6 +88,7 @@ void gearoenix::gl::Loader::load_functions()
 	GXFUNLDF(glGenerateMipmap, generate_mipmap);
 	GXFUNLDF(glGetAttribLocation, get_attrib_location);
 	GXFUNLDF(glGetError, get_error);
+	GXFUNLDF(glGetIntegerv, get_integerv);
 	GXFUNLDF(glGetProgramiv, get_programiv);
 	GXFUNLDF(glGetProgramInfoLog, get_program_info_log);
 	GXFUNLDF(glGetShaderiv, get_shaderiv);

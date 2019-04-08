@@ -12,6 +12,7 @@ namespace gles2 {
 			void end() override final;
             void record(const std::shared_ptr<render::command::Buffer>& o) override final;
 			void bind(const std::shared_ptr<render::pipeline::ResourceSet> &r) override final;
+			void bind(const std::shared_ptr<render::texture::Target> &t) override final;
         };
     }
 }

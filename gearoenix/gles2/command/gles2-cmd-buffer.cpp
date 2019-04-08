@@ -1,4 +1,5 @@
 #include "gles2-cmd-buffer.hpp"
+#include "../../system/sys-log.hpp"
 
 gearoenix::gles2::command::Buffer::~Buffer() {}
 
@@ -20,4 +21,9 @@ void gearoenix::gles2::command::Buffer::record(const std::shared_ptr<render::com
 void gearoenix::gles2::command::Buffer::bind(const std::shared_ptr<render::pipeline::ResourceSet> &r)
 {
 	render::command::Buffer::bind(r);
+}
+
+void gearoenix::gles2::command::Buffer::bind(const std::shared_ptr<render::texture::Target> &)
+{
+	GXUNIMPLEMENTED;
 }

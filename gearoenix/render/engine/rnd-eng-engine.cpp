@@ -30,14 +30,7 @@ gearoenix::render::engine::Engine::Engine(const std::shared_ptr<system::Applicat
 
 gearoenix::render::engine::Engine::~Engine()
 {
-	sysapp = nullptr;
-	fun_loader = nullptr;
-	physics_engine = nullptr;
-	kernels = nullptr;
-	pipeline_manager = nullptr;
-	command_manager = nullptr;
-	sampler_manager = nullptr;
-	buffer_manager = nullptr;
+	terminate();
 }
 
 void gearoenix::render::engine::Engine::update() {
@@ -46,6 +39,20 @@ void gearoenix::render::engine::Engine::update() {
 	fun_loader->unload();
 	render_tree->update();
 	kernels->do_steps();
+}
+
+void gearoenix::render::engine::Engine::terminate()
+{
+	sysapp = nullptr;
+	fun_loader = nullptr;
+	physics_engine = nullptr;
+	kernels = nullptr;
+	render_tree = nullptr;
+	main_render_target = nullptr;
+	pipeline_manager = nullptr;
+	command_manager = nullptr;
+	sampler_manager = nullptr;
+	buffer_manager = nullptr;
 }
 
 void gearoenix::render::engine::Engine::set_render_tree(const std::shared_ptr<graph::tree::Tree>& tree)

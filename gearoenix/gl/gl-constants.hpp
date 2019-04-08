@@ -354,4 +354,6 @@
 #define GL_VALIDATE_STATUS                0x8B83
 #define GL_FRAGMENT_SHADER                0x8B30
 #define GL_VERTEX_SHADER                  0x8B31
+#define GL_FRAMEBUFFER_BINDING            0x8CA6
+#define GL_RENDERBUFFER_BINDING           0x8CA7
 #endif

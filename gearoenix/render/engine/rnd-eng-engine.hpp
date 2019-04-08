@@ -86,7 +86,7 @@ namespace gearoenix {
 			public:
 				virtual ~Engine();
 				virtual void update();
-				virtual void terminate() = 0;
+				virtual void terminate();
 				virtual sync::Semaphore* create_semaphore() = 0;
 				/// Caller of this function must maintain the pointer to data untill call of EndCaller.
 				virtual texture::Texture2D* create_texture_2d(
