@@ -5,3 +5,9 @@ gearoenix::gles2::pipeline::ForwardPbrDirectionalShadowResourceSet::ForwardPbrDi
 	: ResourceSet(shd)
 {
 }
+
+void gearoenix::gles2::pipeline::ForwardPbrDirectionalShadowResourceSet::bind(gl::uint &bound_shader_program) const
+{
+	ResourceSet::bind(bound_shader_program);
+	GXUNIMPLEMENTED;
+}

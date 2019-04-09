@@ -60,6 +60,7 @@ namespace gearoenix
 			public:
 				ForwardPbrDirectionalShadow(const std::shared_ptr<engine::Engine> &e, const core::sync::EndCaller<core::sync::EndCallerIgnore> &c);
 				~ForwardPbrDirectionalShadow() override final;
+				void bind() const override final;
 			};
 		} // namespace shader
 	} // namespace gles2

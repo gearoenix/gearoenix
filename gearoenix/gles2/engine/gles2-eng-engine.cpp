@@ -15,6 +15,7 @@
 #include "../../system/sys-log.hpp"
 #include "../buffer/gles2-buf-uniform.hpp"
 #include "../buffer/gles2-buf-manager.hpp"
+#include "../command/gles2-cmd-buffer.hpp"
 #include "../command/gles2-cmd-manager.hpp"
 #include "../pipeline/gles2-pip-manager.hpp"
 #include "../texture/gles2-txt-2d.hpp"
@@ -155,9 +156,9 @@ gearoenix::render::texture::Texture2D * gearoenix::gles2::engine::Engine::create
 	return new texture::Texture2D(id, std::static_pointer_cast<Engine>(sysapp->get_render_engine()), data, f, s, img_width, img_height, call);
 }
 
-void gearoenix::gles2::engine::Engine::submit(const std::vector<std::shared_ptr<render::sync::Semaphore>>& p, const std::shared_ptr<render::command::Buffer>& c, const std::shared_ptr<render::sync::Semaphore>& n)
+void gearoenix::gles2::engine::Engine::submit(const std::vector<std::shared_ptr<render::sync::Semaphore>>&, const std::shared_ptr<render::command::Buffer>& c, const std::shared_ptr<render::sync::Semaphore>&)
 {
-	GXUNIMPLEMENTED;
+	static_cast<const command::Buffer *>(c.get())->play();
 }
 
 //gearoenix::render::texture::Texture2D* gearoenix::gles2::engine::Engine::create_texture_2d(core::Id id, system::stream::Stream* file, core::sync::EndCaller<core::sync::EndCallerIgnore> c)

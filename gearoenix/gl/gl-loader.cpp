@@ -10,7 +10,10 @@
 
 gearoenix::gl::active_texture_fnp gearoenix::gl::Loader::active_texture;
 gearoenix::gl::attach_shader_fnp gearoenix::gl::Loader::attach_shader;
+gearoenix::gl::bind_attrib_location_fnp gearoenix::gl::Loader::bind_attrib_location;
 gearoenix::gl::bind_buffer_fnp gearoenix::gl::Loader::bind_buffer;
+gearoenix::gl::bind_framebuffer_fnp gearoenix::gl::Loader::bind_framebuffer;
+gearoenix::gl::bind_renderbuffer_fnp gearoenix::gl::Loader::bind_renderbuffer;
 gearoenix::gl::bind_texture_fnp gearoenix::gl::Loader::bind_texture;
 gearoenix::gl::blend_func_fnp gearoenix::gl::Loader::blend_func;
 gearoenix::gl::buffer_data_fnp gearoenix::gl::Loader::buffer_data;
@@ -25,7 +28,10 @@ gearoenix::gl::delete_program_fnp gearoenix::gl::Loader::delete_program;
 gearoenix::gl::delete_renderbuffers_fnp gearoenix::gl::Loader::delete_renderbuffers;
 gearoenix::gl::delete_shader_fnp gearoenix::gl::Loader::delete_shader;
 gearoenix::gl::delete_textures_fnp gearoenix::gl::Loader::delete_textures;
+gearoenix::gl::depth_mask_fnp gearoenix::gl::Loader::depth_mask;
+gearoenix::gl::draw_elements_fnp gearoenix::gl::Loader::draw_elements;
 gearoenix::gl::enable_fnp gearoenix::gl::Loader::enable;
+gearoenix::gl::enable_vertex_attrib_array_fnp gearoenix::gl::Loader::enable_vertex_attrib_array;
 gearoenix::gl::gen_buffers_fnp gearoenix::gl::Loader::gen_buffers;
 gearoenix::gl::gen_textures_fnp gearoenix::gl::Loader::gen_textures;
 gearoenix::gl::generate_mipmap_fnp gearoenix::gl::Loader::generate_mipmap;
@@ -45,8 +51,10 @@ gearoenix::gl::tex_parameteri_fnp gearoenix::gl::Loader::tex_parameteri;
 gearoenix::gl::tex_parameteriv_fnp gearoenix::gl::Loader::tex_parameteriv;
 gearoenix::gl::scissor_fnp gearoenix::gl::Loader::scissor;
 gearoenix::gl::shader_source_fnp gearoenix::gl::Loader::shader_source;
+gearoenix::gl::uniform1i_fnp gearoenix::gl::Loader::uniform1i;
 gearoenix::gl::use_program_fnp gearoenix::gl::Loader::use_program;
 gearoenix::gl::validate_program_fnp gearoenix::gl::Loader::validate_program;
+gearoenix::gl::vertex_attrib_pointer_fnp gearoenix::gl::Loader::vertex_attrib_pointer;
 gearoenix::gl::viewport_fnp gearoenix::gl::Loader::viewport;
 
 void gearoenix::gl::Loader::load_library()
@@ -67,7 +75,10 @@ void gearoenix::gl::Loader::load_functions()
 #endif
 	GXFUNLDF(glActiveTexture, active_texture);
 	GXFUNLDF(glAttachShader, attach_shader);
+	GXFUNLDF(glBindAttribLocation, bind_attrib_location);
 	GXFUNLDF(glBindBuffer, bind_buffer);
+	GXFUNLDF(glBindFramebuffer, bind_framebuffer);
+	GXFUNLDF(glBindRenderbuffer, bind_renderbuffer);
 	GXFUNLDF(glBindTexture, bind_texture);
 	GXFUNLDF(glBlendFunc, blend_func);
 	GXFUNLDF(glBufferData, buffer_data);
@@ -82,7 +93,10 @@ void gearoenix::gl::Loader::load_functions()
 	GXFUNLDF(glDeleteRenderbuffers, delete_renderbuffers);
 	GXFUNLDF(glDeleteShader, delete_shader);
 	GXFUNLDF(glDeleteTextures, delete_textures);
+	GXFUNLDF(glDepthMask, depth_mask);
+	GXFUNLDF(glDrawElements, draw_elements);
 	GXFUNLDF(glEnable, enable);
+	GXFUNLDF(glEnableVertexAttribArray, enable_vertex_attrib_array);
 	GXFUNLDF(glGenBuffers, gen_buffers);
 	GXFUNLDF(glGenTextures, gen_textures);
 	GXFUNLDF(glGenerateMipmap, generate_mipmap);
@@ -102,8 +116,10 @@ void gearoenix::gl::Loader::load_functions()
 	GXFUNLDF(glTexParameteriv, tex_parameteriv);
 	GXFUNLDF(glScissor, scissor);
 	GXFUNLDF(glShaderSource, shader_source);
+	GXFUNLDF(glUniform1i, uniform1i);
 	GXFUNLDF(glUseProgram, use_program);
 	GXFUNLDF(glValidateProgram, validate_program);
+	GXFUNLDF(glVertexAttribPointer, vertex_attrib_pointer);
 	GXFUNLDF(glViewport, viewport);
 }
 

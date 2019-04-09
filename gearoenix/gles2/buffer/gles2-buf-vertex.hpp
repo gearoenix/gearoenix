@@ -25,6 +25,7 @@ namespace gles2 {
                 const std::shared_ptr<engine::Engine>& e,
                 const core::sync::EndCaller<core::sync::EndCallerIgnore> &c);
             ~Vertex();
+			void bind() const;
         };
     }
 }

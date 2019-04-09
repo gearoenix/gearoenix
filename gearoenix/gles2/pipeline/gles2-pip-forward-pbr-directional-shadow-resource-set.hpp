@@ -11,6 +11,7 @@ namespace gearoenix {
         class ForwardPbrDirectionalShadowResourceSet : public ResourceSet {
 		public:
 			ForwardPbrDirectionalShadowResourceSet(const std::shared_ptr<shader::ForwardPbrDirectionalShadow> &shd);
+			void bind(gl::uint &bound_shader_program) const override final;
 			//void set_scene(const std::shared_ptr<render::scene::Scene>& s) override final;
 			//void set_camera(const std::shared_ptr<render::camera::Camera>& c) override final;
 			//void set_light(const std::shared_ptr<render::light::Light>& l) override final;

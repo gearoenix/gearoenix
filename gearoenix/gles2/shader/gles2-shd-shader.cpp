@@ -128,4 +128,25 @@ gearoenix::gl::uint gearoenix::gles2::shader::Shader::get_uniform_location(const
 {
 	return gl::Loader::get_uniform_location(shader_program, &(uname[0]));
 }
+
+gearoenix::gl::uint gearoenix::gles2::shader::Shader::get_shader_program() const
+{
+	return shader_program;
+}
+
+void gearoenix::gles2::shader::Shader::bind() const
+{
+
+	gl::Loader::use_program(shader_program);
+	if (position_attribute_location != -1) gl::Loader::enable_vertex_attrib_array(position_attribute_location);
+	if (normal_attribute_location != -1) gl::Loader::enable_vertex_attrib_array(normal_attribute_location);
+	if (tangent_attribute_location != -1) gl::Loader::enable_vertex_attrib_array(tangent_attribute_location);
+	if (uv_attribute_location != -1) gl::Loader::enable_vertex_attrib_array(uv_attribute_location);
+
+	if (position_attribute_location != -1) gl::Loader::vertex_attrib_pointer(position_attribute_location, 3, GL_FLOAT, GL_FALSE, 12 * sizeof(float), reinterpret_cast<void*>(0));
+	if (normal_attribute_location != -1) gl::Loader::vertex_attrib_pointer(normal_attribute_location, 3, GL_FLOAT, GL_FALSE, 12 * sizeof(float), reinterpret_cast<void*>(3 * sizeof(float)));
+	if (tangent_attribute_location != -1) gl::Loader::vertex_attrib_pointer(tangent_attribute_location, 4, GL_FLOAT, GL_FALSE, 12 * sizeof(float), reinterpret_cast<void*>(6 * sizeof(float)));
+	if (uv_attribute_location != -1) gl::Loader::vertex_attrib_pointer(uv_attribute_location, 2, GL_FLOAT, GL_FALSE, 12 * sizeof(float), reinterpret_cast<void*>(10 * sizeof(float)));
+}
+
 #endif

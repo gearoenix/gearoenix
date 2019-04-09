@@ -24,6 +24,8 @@ namespace gearoenix {
 					const std::shared_ptr<engine::Engine>& e,
 					const core::sync::EndCaller<core::sync::EndCallerIgnore> &c);
 				~Index();
+				void bind() const;
+				void draw() const;
 			};
 		}
 	}

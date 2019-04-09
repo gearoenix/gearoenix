@@ -17,7 +17,9 @@ GXHELPER(camera, Camera)
 GXHELPER(light, Light)
 GXHELPER(model, Model)
 
-void gearoenix::render::pipeline::ResourceSet::set_mesh(const std::shared_ptr<mesh::Mesh>&) { }
+void gearoenix::render::pipeline::ResourceSet::set_mesh(const std::shared_ptr<mesh::Mesh>& m) {
+	msh = m;
+}
 
 GXHELPER(material, Material)
 
@@ -29,9 +31,9 @@ void gearoenix::render::pipeline::ResourceSet::clean()
 	camera_uniform_buffer = nullptr;
 	light_uniform_buffer = nullptr;
 	model_uniform_buffer = nullptr;
-	mesh_uniform_buffer = nullptr;
 	material_uniform_buffer = nullptr;
 	node_uniform_buffer = nullptr;
+	msh = nullptr;
 	color = nullptr;
 	metallic_roughness = nullptr;
 	normal = nullptr;

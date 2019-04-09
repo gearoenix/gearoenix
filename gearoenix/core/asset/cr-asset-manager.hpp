@@ -70,7 +70,7 @@ namespace core {
             std::shared_ptr<render::skybox::Manager> skybox_manager = nullptr;
             std::shared_ptr<physics::constraint::Manager> constraint_manager = nullptr;
             std::shared_ptr<render::scene::Manager> scene_manager = nullptr;
-            std::atomic<Id> last_id;
+            static std::atomic<Id> last_id;
 
         public:
             Manager(const std::shared_ptr<system::Application>& sys_app, const std::string& file);
@@ -85,7 +85,7 @@ namespace core {
             const std::shared_ptr<render::skybox::Manager>& get_skybox_manager() const;
             const std::shared_ptr<physics::constraint::Manager>& get_constraint_manager() const;
             const std::shared_ptr<render::scene::Manager>& get_scene_manager() const;
-            Id create_id();
+            static Id create_id();
         };
     } // namespace asset
 } // namespace core

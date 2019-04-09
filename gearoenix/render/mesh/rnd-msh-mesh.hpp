@@ -51,6 +51,8 @@ namespace render {
             void draw();
 			core::Real get_radius() const;
 			Type::Id get_mesh_type_id() const;
+			const std::shared_ptr<buffer::Buffer> &get_vertex_buffer() const;
+			const std::shared_ptr<buffer::Buffer> &get_index_buffer() const;
         };
     }
 }

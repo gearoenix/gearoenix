@@ -23,7 +23,10 @@ namespace gearoenix {
 	namespace gl {
 		typedef GXGL_APICALL void(GXGL_APIENTRY active_texture_fnp)(enumerated texture);
 		typedef GXGL_APICALL void(GXGL_APIENTRY attach_shader_fnp)(uint program, uint shader);
+		typedef GXGL_APICALL void(GXGL_APIENTRY bind_attrib_location_fnp)(uint program, uint index, const char *name);
 		typedef GXGL_APICALL void(GXGL_APIENTRY bind_buffer_fnp)(enumerated, uint);
+		typedef GXGL_APICALL void(GXGL_APIENTRY bind_framebuffer_fnp)(enumerated target, uint framebuffer);
+		typedef GXGL_APICALL void(GXGL_APIENTRY bind_renderbuffer_fnp)(enumerated target, uint renderbuffer);
 		typedef GXGL_APICALL void(GXGL_APIENTRY bind_texture_fnp)(enumerated, uint);
 		typedef GXGL_APICALL void(GXGL_APIENTRY blend_func_fnp)(enumerated, enumerated);
 		typedef GXGL_APICALL void(GXGL_APIENTRY buffer_data_fnp)(enumerated, sizeiptr, const void *, enumerated);
@@ -38,7 +41,10 @@ namespace gearoenix {
 		typedef GXGL_APICALL void(GXGL_APIENTRY delete_renderbuffers_fnp)(sizei n, const uint *renderbuffers);
 		typedef GXGL_APICALL void(GXGL_APIENTRY delete_shader_fnp)(uint shader);
 		typedef GXGL_APICALL void(GXGL_APIENTRY delete_textures_fnp)(sizei n, const uint *textures);
+		typedef GXGL_APICALL void(GXGL_APIENTRY depth_mask_fnp)(boolean flag);
+		typedef GXGL_APICALL void(GXGL_APIENTRY draw_elements_fnp)(enumerated mode, sizei count, enumerated type, const void *indices);
 		typedef GXGL_APICALL void(GXGL_APIENTRY enable_fnp)(enumerated);
+		typedef GXGL_APICALL void(GXGL_APIENTRY enable_vertex_attrib_array_fnp)(uint index);
 		typedef GXGL_APICALL void(GXGL_APIENTRY gen_buffers_fnp)(sizei, uint *);
 		typedef GXGL_APICALL void(GXGL_APIENTRY gen_textures_fnp)(sizei, uint *);
 		typedef GXGL_APICALL void(GXGL_APIENTRY generate_mipmap_fnp)(enumerated target);
@@ -58,8 +64,10 @@ namespace gearoenix {
 		typedef GXGL_APICALL void(GXGL_APIENTRY tex_parameteriv_fnp)(enumerated, enumerated, const sint *);
 		typedef GXGL_APICALL void(GXGL_APIENTRY scissor_fnp)(sint, sint, sizei, sizei);
 		typedef GXGL_APICALL void(GXGL_APIENTRY shader_source_fnp)(uint shader, sizei count, const char *const* code, const sint *length);
+		typedef GXGL_APICALL void(GXGL_APIENTRY uniform1i_fnp)(sint location, sint v0);
 		typedef GXGL_APICALL void(GXGL_APIENTRY use_program_fnp)(uint program);
 		typedef GXGL_APICALL void(GXGL_APIENTRY validate_program_fnp)(uint program);
+		typedef GXGL_APICALL void(GXGL_APIENTRY vertex_attrib_pointer_fnp)(uint index, sint size, enumerated type, boolean normalized, sizei stride, const void *pointer);
 		typedef GXGL_APICALL void(GXGL_APIENTRY viewport_fnp)(sint, sint, sizei, sizei);
 
 		class Loader {
@@ -73,7 +81,10 @@ namespace gearoenix {
 
 			static active_texture_fnp active_texture;
 			static attach_shader_fnp attach_shader;
+			static bind_attrib_location_fnp bind_attrib_location;
 			static bind_buffer_fnp bind_buffer;
+			static bind_framebuffer_fnp bind_framebuffer;
+			static bind_renderbuffer_fnp bind_renderbuffer;
 			static bind_texture_fnp bind_texture;
 			static blend_func_fnp blend_func;
 			static buffer_data_fnp buffer_data;
@@ -88,7 +99,10 @@ namespace gearoenix {
 			static delete_renderbuffers_fnp delete_renderbuffers;
 			static delete_shader_fnp delete_shader;
 			static delete_textures_fnp delete_textures;
+			static depth_mask_fnp depth_mask;
+			static draw_elements_fnp draw_elements;
 			static enable_fnp enable;
+			static enable_vertex_attrib_array_fnp enable_vertex_attrib_array;
 			static gen_buffers_fnp gen_buffers;
 			static gen_textures_fnp gen_textures;
 			static generate_mipmap_fnp generate_mipmap;
@@ -108,8 +122,10 @@ namespace gearoenix {
 			static tex_parameteriv_fnp tex_parameteriv;
 			static scissor_fnp scissor;
 			static shader_source_fnp shader_source;
+			static uniform1i_fnp uniform1i;
 			static use_program_fnp use_program;
 			static validate_program_fnp validate_program;
+			static vertex_attrib_pointer_fnp vertex_attrib_pointer;
 			static viewport_fnp viewport;
 		};
 	}

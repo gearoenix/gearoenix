@@ -37,4 +37,14 @@ gearoenix::gles2::buffer::Index::~Index()
 	bo = 0;
 }
 
+void gearoenix::gles2::buffer::Index::bind() const
+{
+	gl::Loader::bind_buffer(GL_ELEMENT_ARRAY_BUFFER, bo);
+}
+
+void gearoenix::gles2::buffer::Index::draw() const
+{
+	gl::Loader::draw_elements(GL_TRIANGLES, count, GL_UNSIGNED_SHORT, 0);
+}
+
 #endif

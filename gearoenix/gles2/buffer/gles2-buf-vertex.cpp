@@ -31,4 +31,9 @@ gearoenix::gles2::buffer::Vertex::~Vertex()
     bo = 0;
 }
 
+void gearoenix::gles2::buffer::Vertex::bind() const
+{
+	gl::Loader::bind_buffer(GL_ARRAY_BUFFER, bo);
+}
+
 #endif

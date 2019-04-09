@@ -16,6 +16,7 @@ namespace render {
         protected:
 			std::vector<std::shared_ptr<Buffer>> recored_secondaries;
 			std::vector<std::shared_ptr<pipeline::ResourceSet>> bound_resource_sets;
+			std::shared_ptr<texture::Target> render_target = nullptr;
 
         public:
 			virtual ~Buffer();
@@ -23,7 +24,7 @@ namespace render {
 			virtual void end();
             virtual void record(const std::shared_ptr<Buffer>& o);
 			virtual void bind(const std::shared_ptr<pipeline::ResourceSet> &r);
-			virtual void bind(const std::shared_ptr<texture::Target> &t) = 0;
+			virtual void bind(const std::shared_ptr<texture::Target> &t);
         };
     }
 }

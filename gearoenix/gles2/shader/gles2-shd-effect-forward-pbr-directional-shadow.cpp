@@ -1,6 +1,7 @@
 #include "gles2-shd-effect-forward-pbr-directional-shadow.hpp"
 #ifdef GX_USE_OPENGL_ES2
 #include "../../core/cr-function-loader.hpp"
+#include "../../gl/gl-loader.hpp"
 #include "../../system/sys-log.hpp"
 #include "../engine/gles2-eng-engine.hpp"
 
@@ -267,6 +268,19 @@ gearoenix::gles2::shader::ForwardPbrDirectionalShadow::ForwardPbrDirectionalShad
 
 gearoenix::gles2::shader::ForwardPbrDirectionalShadow::~ForwardPbrDirectionalShadow()
 {
+}
+
+void gearoenix::gles2::shader::ForwardPbrDirectionalShadow::bind() const
+{
+	gl::Loader::uniform1i(material_base_color, material_base_color_index);
+	gl::Loader::uniform1i(material_metallic_roughness, material_metallic_roughness_index);
+	gl::Loader::uniform1i(material_normal, material_normal_index);
+	gl::Loader::uniform1i(material_emissive, material_emissive_index);
+	gl::Loader::uniform1i(effect_diffuse_environment, effect_diffuse_environment_index);
+	gl::Loader::uniform1i(effect_specular_environment, effect_specular_environment_index);
+	gl::Loader::uniform1i(effect_ambient_occlusion, effect_ambient_occlusion_index);
+	gl::Loader::uniform1i(effect_shadow_map, effect_shadow_map_index);
+	gl::Loader::uniform1i(effect_brdflut, effect_brdflut_index);
 }
 
 #endif

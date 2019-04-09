@@ -22,6 +22,7 @@ namespace gearoenix {
 			public:
 				Target(const std::shared_ptr<engine::Engine>& e);
 				~Target() override final;
+				void bind() const;
 			};
 		}
 	}

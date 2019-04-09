@@ -356,4 +356,6 @@
 #define GL_VERTEX_SHADER                  0x8B31
 #define GL_FRAMEBUFFER_BINDING            0x8CA6
 #define GL_RENDERBUFFER_BINDING           0x8CA7
+#define GL_FRAMEBUFFER                    0x8D40
+#define GL_RENDERBUFFER                   0x8D41
 #endif

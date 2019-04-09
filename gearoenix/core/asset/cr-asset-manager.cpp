@@ -15,6 +15,8 @@
 #include "../cache/cr-cache-file.hpp"
 #include "../cr-static.hpp"
 
+std::atomic<gearoenix::core::Id> gearoenix::core::asset::Manager::last_id(0);
+
 gearoenix::core::asset::Manager::Manager(const std::shared_ptr<system::Application>& sys_app, const std::string& name)
     : sys_app(sys_app)
     , render_engine(sys_app->get_render_engine())

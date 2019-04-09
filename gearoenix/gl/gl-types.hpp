@@ -3,6 +3,7 @@
 #include <cstdint>
 namespace gearoenix {
 	namespace gl {
+		typedef std::uint8_t boolean;
 		typedef std::uint32_t bitfield;
 		typedef std::uint32_t enumerated;
 		typedef std::int32_t sint;

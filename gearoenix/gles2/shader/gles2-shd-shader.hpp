@@ -55,6 +55,8 @@ namespace gearoenix {
 				virtual ~Shader();
 				/// On not found returns GX_SHADER_UNIFORM_FAILED
 				gl::uint get_uniform_location(const std::string& name) const;
+				gl::uint get_shader_program() const;
+				virtual void bind() const;
 			};
 		}
 	}
