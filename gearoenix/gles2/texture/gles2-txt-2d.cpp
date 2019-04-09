@@ -54,7 +54,7 @@ gearoenix::gles2::texture::Texture2D::~Texture2D()
     texture_object = 0;
 }
 
-void gearoenix::gles2::texture::Texture2D::bind(gl::enumerated texture_unit)
+void gearoenix::gles2::texture::Texture2D::bind(gl::enumerated texture_unit) const
 {
     gl::Loader::active_texture(texture_unit);
     gl::Loader::bind_texture(GL_TEXTURE_2D, texture_object);

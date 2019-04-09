@@ -25,7 +25,7 @@ namespace gles2 {
                 const std::shared_ptr<engine::Engine>& engine,
                 core::sync::EndCaller<core::sync::EndCallerIgnore> end);
             ~Cube();
-            void bind(gl::enumerated texture_unit);
+            void bind(gl::enumerated texture_unit) const;
         };
     }
 }

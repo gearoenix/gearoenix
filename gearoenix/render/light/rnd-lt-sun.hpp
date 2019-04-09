@@ -6,14 +6,10 @@
 #include "rnd-lt-light.hpp"
 namespace gearoenix {
 namespace render {
-    namespace camera {
-        class Orthographic;
-    }
     namespace light {
         class Sun : public Light {
         private:
             bool color_changed = true;
-            math::Vec3 color;
             math::Mat4x4 db;
 
         public:
@@ -23,11 +19,7 @@ namespace render {
                 const std::shared_ptr<engine::Engine>& e,
 				const core::sync::EndCaller<core::sync::EndCallerIgnore> &c);
             ~Sun();
-            const math::Vec3& get_direction() const;
-            const math::Vec3& get_color() const;
-            bool get_color_changed() const;
             const math::Mat4x4& get_bias() const;
-            const camera::Orthographic* get_camera() const;
         };
     }
 }

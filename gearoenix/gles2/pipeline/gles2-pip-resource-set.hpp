@@ -10,7 +10,7 @@ namespace gearoenix {
 		}
     namespace pipeline {
         class ResourceSet : public render::pipeline::ResourceSet {
-		private:
+		protected:
 			const std::shared_ptr<shader::Shader> shd;
 		public:
 			ResourceSet(const std::shared_ptr<shader::Shader> &shd);

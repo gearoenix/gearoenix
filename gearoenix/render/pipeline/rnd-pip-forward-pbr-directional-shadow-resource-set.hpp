@@ -35,7 +35,7 @@ namespace render {
 			std::shared_ptr<texture::Cube> diffuse_environment = nullptr;
 			std::shared_ptr<texture::Cube> specular_environment = nullptr;
 			std::shared_ptr<texture::Texture2D> ambient_occlusion = nullptr;
-			std::shared_ptr<texture::Texture2D> shadow_mapper = nullptr;
+			std::shared_ptr<texture::Texture2D> shadow_map = nullptr;
 			std::shared_ptr<texture::Texture2D> brdflut = nullptr;
 		public:
 			virtual void set_node_uniform_buffer(const std::shared_ptr<buffer::Uniform> &uniform_buffer);

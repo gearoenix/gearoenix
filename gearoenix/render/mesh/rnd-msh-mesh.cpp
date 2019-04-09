@@ -54,3 +54,13 @@ gearoenix::render::mesh::Type::Id gearoenix::render::mesh::Mesh::get_mesh_type_i
 {
 	return mesh_type_id;
 }
+
+const std::shared_ptr<gearoenix::render::buffer::Buffer>& gearoenix::render::mesh::Mesh::get_vertex_buffer() const
+{
+	return vertex_buffer;
+}
+
+const std::shared_ptr<gearoenix::render::buffer::Buffer>& gearoenix::render::mesh::Mesh::get_index_buffer() const
+{
+	return index_buffer;
+}

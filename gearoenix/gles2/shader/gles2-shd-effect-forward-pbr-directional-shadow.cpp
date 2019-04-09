@@ -1,6 +1,7 @@
 #include "gles2-shd-effect-forward-pbr-directional-shadow.hpp"
 #ifdef GX_USE_OPENGL_ES2
 #include "../../core/cr-function-loader.hpp"
+#include "../../gl/gl-constants.hpp"
 #include "../../gl/gl-loader.hpp"
 #include "../../system/sys-log.hpp"
 #include "../engine/gles2-eng-engine.hpp"
@@ -282,5 +283,47 @@ void gearoenix::gles2::shader::ForwardPbrDirectionalShadow::bind() const
 	gl::Loader::uniform1i(effect_shadow_map, effect_shadow_map_index);
 	gl::Loader::uniform1i(effect_brdflut, effect_brdflut_index);
 }
+
+#define GXHELPERV(x, t, n)                                                                           \
+void gearoenix::gles2::shader::ForwardPbrDirectionalShadow::set_##x##_data(const float *data) const  \
+{                                                                                                    \
+	gl::Loader::uniform##t##fv(x, n, data);                                                          \
+}
+
+#define GXHELPERF(x)                                                                                 \
+void gearoenix::gles2::shader::ForwardPbrDirectionalShadow::set_##x##_data(const float *data) const  \
+{                                                                                                    \
+	gl::Loader::uniform1f(x, *data);                                                                 \
+}
+
+#define GXHELPERM(x, t, n)                                                                           \
+void gearoenix::gles2::shader::ForwardPbrDirectionalShadow::set_##x##_data(const float *data) const  \
+{                                                                                                    \
+	gl::Loader::uniform_matrix##t##fv(x, n, GL_FALSE, data);                                         \
+}
+
+GXHELPERV(camera_position, 3, 1);
+GXHELPERM(camera_vp, 4, 1);
+GXHELPERV(light_color, 3, 1);
+GXHELPERV(light_direction, 3, 1);
+GXHELPERM(light_vp_bias, 4, 1);
+GXHELPERF(material_alpha);
+GXHELPERF(material_alpha_cutoff);
+GXHELPERF(material_metallic_factor);
+GXHELPERF(material_normal_scale);
+GXHELPERF(material_occlusion_strength);
+GXHELPERF(material_roughness_factor);
+GXHELPERM(model_m, 4, 1);
+GXHELPERV(scene_ambient_light, 3, 1);
+GXHELPERV(scene_directional_lights_color, 4, GX_MAX_DIRECTIONAL_LIGHTS);
+GXHELPERV(scene_directional_lights_direction, 4, GX_MAX_DIRECTIONAL_LIGHTS);
+GXHELPERV(scene_lights_count, 2, 1);
+GXHELPERV(scene_point_lights_color_min_radius, 4, GX_MAX_POINT_LIGHTS);
+GXHELPERV(scene_point_lights_position_max_radius, 4, GX_MAX_POINT_LIGHTS);
+GXHELPERV(scene_ssao_config, 3, 1);
+
+#undef GXHELPERF
+#undef GXHELPERM
+#undef GXHELPERV
 
 #endif

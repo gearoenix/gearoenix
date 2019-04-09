@@ -63,7 +63,7 @@ gearoenix::gles2::texture::Cube::~Cube()
     texture_object = 0;
 }
 
-void gearoenix::gles2::texture::Cube::bind(gl::enumerated texture_unit)
+void gearoenix::gles2::texture::Cube::bind(gl::enumerated texture_unit) const
 {
     gl::Loader::active_texture(texture_unit);
     gl::Loader::bind_texture(GL_TEXTURE_CUBE_MAP, texture_object);
