@@ -13,13 +13,6 @@ namespace gearoenix {
 		public:
 			ForwardPbrDirectionalShadowResourceSet(const std::shared_ptr<shader::ForwardPbrDirectionalShadow> &shd);
 			void bind(gl::uint &bound_shader_program) const override final;
-			//void set_scene(const std::shared_ptr<render::scene::Scene>& s) override final;
-			//void set_camera(const std::shared_ptr<render::camera::Camera>& c) override final;
-			//void set_light(const std::shared_ptr<render::light::Light>& l) override final;
-			//void set_model(const std::shared_ptr<render::model::Model>& m) override final;
-			//void set_mesh(const std::shared_ptr<render::mesh::Mesh>& m) override final;
-			//void set_material(const std::shared_ptr<render::material::Material>& m) override final;
-			//void set_node(const render::graph::node::Node *const node) override final;
         };
     }
 }

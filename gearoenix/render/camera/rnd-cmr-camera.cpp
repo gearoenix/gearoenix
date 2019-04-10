@@ -223,6 +223,11 @@ void gearoenix::render::camera::Camera::on_event(const core::event::Event& e)
 //    }
 }
 
+void gearoenix::render::camera::Camera::update_uniform()
+{
+	uniform_buffers->update(&uniform);
+}
+
 void gearoenix::render::camera::Camera::global_scale(const core::Real)
 {
     GXUNEXPECTED;

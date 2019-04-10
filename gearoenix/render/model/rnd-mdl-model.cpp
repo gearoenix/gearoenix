@@ -9,7 +9,6 @@
 #include "../camera/rnd-cmr-camera.hpp"
 #include "../camera/rnd-cmr-orthographic.hpp"
 #include "../engine/rnd-eng-engine.hpp"
-#include "../light/rnd-lt-sun.hpp"
 #include "../material/rnd-mat-material.hpp"
 #include "../mesh/rnd-msh-manager.hpp"
 #include "../mesh/rnd-msh-mesh.hpp"
@@ -61,6 +60,11 @@ gearoenix::render::model::Model::Model(
 
 gearoenix::render::model::Model::~Model()
 {
+}
+
+void gearoenix::render::model::Model::update_uniform()
+{
+	uniform_buffers->update(&uniform);
 }
 
 void gearoenix::render::model::Model::add_mesh(const std::shared_ptr<Mesh>& m)

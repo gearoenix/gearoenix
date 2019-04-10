@@ -50,6 +50,7 @@ class Engine;
             const math::Mat4x4& get_zero_located_view() const;
 			const std::shared_ptr<buffer::FramedUniform> &get_uniform_buffers() const;
             virtual void on_event(const core::event::Event& e);
+			virtual void update_uniform();
             virtual bool in_sight(const math::Vec3& location, const core::Real radius) const = 0;
             virtual math::Ray3 create_ray3(const core::Real x, const core::Real y) const = 0;
             virtual core::Real get_distance(const math::Vec3 model_location) const = 0;

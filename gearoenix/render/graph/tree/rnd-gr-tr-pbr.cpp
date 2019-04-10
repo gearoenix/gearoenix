@@ -34,11 +34,11 @@ void gearoenix::render::graph::tree::Pbr::record(const unsigned int kernel_index
 	const std::map<core::Id, std::weak_ptr<scene::Scene>> &scenes = scnmgr->get_scenes();
 	unsigned int scene_number = 0;
 #define GXDOTASK(expr) if(task_number == kernel_index) expr; task_number = (task_number + 1) % kernels_count
-	for (const std::pair<core::Id, std::weak_ptr<scene::Scene>> &id_scene : scenes) {
+	for (const std::pair<core::Id, std::weak_ptr<scene::Scene>> id_scene : scenes) {
 		if (const std::shared_ptr<scene::Scene> scn = id_scene.second.lock()) {
-			const std::map<core::Id, std::shared_ptr<camera::Camera>> &cameras = scn->get_cameras();
-			const std::map<core::Id, std::shared_ptr<light::Light>> &lights = scn->get_lights();
-			const std::map<core::Id, std::shared_ptr<model::Model>> &models = scn->get_models();
+			const std::map<core::Id, std::shared_ptr<camera::Camera>> cameras = scn->get_cameras();
+			const std::map<core::Id, std::shared_ptr<light::Light>> lights = scn->get_lights();
+			const std::map<core::Id, std::shared_ptr<model::Model>> models = scn->get_models();
 			for (const std::pair<core::Id, std::shared_ptr<camera::Camera>> &id_camera : cameras) {
 				for (const std::pair<core::Id, std::shared_ptr<light::Light>> &id_light : lights) {
 					if (!id_light.second->is_shadower()) continue;

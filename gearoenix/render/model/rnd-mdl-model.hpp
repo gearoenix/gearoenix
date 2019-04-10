@@ -52,6 +52,7 @@ namespace render {
 				const std::shared_ptr<engine::Engine>& e,
 				const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
             virtual ~Model();
+			virtual void update_uniform();
 			void add_mesh(const std::shared_ptr<Mesh> &m);
 			void add_child(const std::shared_ptr<Model> &c);
 

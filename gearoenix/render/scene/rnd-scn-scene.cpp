@@ -12,15 +12,16 @@
 #include "../camera/rnd-cmr-camera.hpp"
 #include "../camera/rnd-cmr-manager.hpp"
 #include "../camera/rnd-cmr-orthographic.hpp"
+#include "../engine/rnd-eng-engine.hpp"
+#include "../light/rnd-lt-directional.hpp"
 #include "../light/rnd-lt-light.hpp"
-#include "../light/rnd-lt-sun.hpp"
 #include "../light/rnd-lt-manager.hpp"
+#include "../light/rnd-lt-point.hpp"
 #include "../material/rnd-mat-material.hpp"
 #include "../mesh/rnd-msh-mesh.hpp"
 #include "../model/rnd-mdl-model.hpp"
 #include "../model/rnd-mdl-manager.hpp"
 #include "../pipeline/rnd-pip-manager.hpp"
-#include "../engine/rnd-eng-engine.hpp"
 #include "../shader/rnd-shd-shader.hpp"
 #include "../skybox/rnd-sky-skybox.hpp"
 #include "rnd-scn-ui.hpp"
@@ -39,7 +40,7 @@ gearoenix::render::scene::Scene::Scene(
 	: core::asset::Asset(my_id, core::asset::Type::SCENE)
 	, e(e)
 	, scene_type_id(Type::GAME)
-	, uniform_buffers(std::make_shared<buffer::FramedUniform>(sizeof(Uniform), e))
+	, uniform_buffers(std::make_shared<buffer::FramedUniform>(static_cast<const unsigned int>(sizeof(Uniform)), e))
 {
 	const std::shared_ptr<core::asset::Manager> &astmgr = e->get_system_application()->get_asset_manager();
 #define GXHELPER(x, n, cls)                                                   \
@@ -76,7 +77,7 @@ gearoenix::render::scene::Scene::Scene(
 	: core::asset::Asset(e->get_system_application()->get_asset_manager()->create_id(), core::asset::Type::SCENE)
 	, e(e)
 	, scene_type_id(Type::GAME)
-	, uniform_buffers(std::make_shared<buffer::FramedUniform>(sizeof(Uniform), e))
+	, uniform_buffers(std::make_shared<buffer::FramedUniform>(static_cast<const unsigned int>(sizeof(Uniform)), e))
 {}
 
 gearoenix::render::scene::Scene::~Scene()
@@ -184,4 +185,37 @@ const std::shared_ptr<gearoenix::physics::constraint::Constraint>& gearoenix::re
 const std::shared_ptr<gearoenix::render::buffer::FramedUniform>& gearoenix::render::scene::Scene::get_uniform_buffers() const
 {
 	return uniform_buffers;
+}
+
+void gearoenix::render::scene::Scene::update_uniform()
+{
+	unsigned int dirc = 0;
+	unsigned int pntc = 0;
+	for (const std::pair<core::Id, std::shared_ptr<light::Light>> il : lights)
+	{
+		const light::Light * const l = il.second.get();
+		{
+			const light::Directional * const dl = dynamic_cast<const light::Directional *>(l);
+			if (dl != nullptr && dirc < GX_MAX_DIRECTIONAL_LIGHTS)
+			{
+				uniform.directional_lights_color[dirc] = dl->get_color_strength();
+				uniform.directional_lights_direction[dirc] = dl->get_direction();
+				++dirc;
+				continue;
+			}
+		}
+		{
+			const light::Point * const pl = dynamic_cast<const light::Point *>(l);
+			if (pl != nullptr && pntc < GX_MAX_POINT_LIGHTS)
+			{
+				uniform.point_lights_color_min_radius[dirc] = pl->get_color_strength();
+				uniform.point_lights_position_max_radius[dirc] = pl->get_position_radius();
+				++pntc;
+				continue;
+			}
+		}
+	}
+	uniform.lights_count[0] = static_cast<core::Real>(dirc);
+	uniform.lights_count[1] = static_cast<core::Real>(pntc);
+	uniform_buffers->update(&uniform);
 }

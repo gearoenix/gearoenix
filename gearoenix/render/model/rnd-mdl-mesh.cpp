@@ -7,7 +7,6 @@
 #include "../camera/rnd-cmr-camera.hpp"
 #include "../camera/rnd-cmr-orthographic.hpp"
 #include "../engine/rnd-eng-engine.hpp"
-#include "../light/rnd-lt-sun.hpp"
 #include "../material/rnd-mat-material.hpp"
 #include "../mesh/rnd-msh-manager.hpp"
 #include "../mesh/rnd-msh-mesh.hpp"

@@ -39,6 +39,7 @@ namespace render {
 			Material(const std::shared_ptr<engine::Engine>& e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end);
 			Material(const std::shared_ptr<system::stream::Stream>& f, const std::shared_ptr<engine::Engine>& e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end);
             ~Material();
+			void update_uniform();
 			const std::shared_ptr<buffer::FramedUniform> &get_uniform_buffers() const;
         };
     }

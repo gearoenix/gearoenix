@@ -2,7 +2,6 @@
 #include "../../system/stream/sys-stm-stream.hpp"
 #include "../../system/sys-log.hpp"
 #include "../engine/rnd-eng-engine.hpp"
-#include "rnd-lt-sun.hpp"
 
 gearoenix::render::light::Light::Light(
     const core::Id my_id,
@@ -59,6 +58,10 @@ void gearoenix::render::light::Light::enable()
 void gearoenix::render::light::Light::disable()
 {
 	enabled = false;
+}
+
+void gearoenix::render::light::Light::update_uniform()
+{
 }
 
 const std::shared_ptr<gearoenix::render::buffer::FramedUniform>& gearoenix::render::light::Light::get_uniform_buffers() const

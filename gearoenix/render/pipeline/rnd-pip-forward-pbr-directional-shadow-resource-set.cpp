@@ -22,7 +22,7 @@ void gearoenix::render::pipeline::ForwardPbrDirectionalShadowResourceSet::set_am
 
 void gearoenix::render::pipeline::ForwardPbrDirectionalShadowResourceSet::set_shadow_mapper(const std::shared_ptr<texture::Texture2D>& t)
 {
-	shadow_mapper = t;
+	shadow_map = t;
 }
 
 void gearoenix::render::pipeline::ForwardPbrDirectionalShadowResourceSet::set_brdflut(const std::shared_ptr<texture::Texture2D>& t)
@@ -36,6 +36,6 @@ void gearoenix::render::pipeline::ForwardPbrDirectionalShadowResourceSet::clean(
 	diffuse_environment = nullptr;
 	specular_environment = nullptr;
 	ambient_occlusion = nullptr;
-	shadow_mapper = nullptr;
+	shadow_map = nullptr;
 	brdflut = nullptr;
 }

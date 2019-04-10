@@ -1,81 +1,61 @@
 #include "phs-engine.hpp"
+#include "../core/asset/cr-asset-manager.hpp"
+#include "../core/sync/cr-sync-kernel-workers.hpp"
 #include "../core/sync/cr-sync-queued-semaphore.hpp"
 #include "../core/sync/cr-sync-stop-point.hpp"
+#include "../render/engine/rnd-eng-engine.hpp"
+#include "../render/scene/rnd-scn-manager.hpp"
+#include "../system/sys-app.hpp"
 #include "../system/sys-log.hpp"
 #include "animation/phs-anm-animation.hpp"
-#include "phs-kernel.hpp"
+#include <functional>
 
-gearoenix::physics::Engine::Engine(const std::shared_ptr<render::engine::Engine>& render_engine)
-    : render_engine(render_engine)
-    , signaller(new core::sync::QueuedSemaphore())
+void gearoenix::physics::Engine::update_uniform_buffers_kernel(const unsigned int kernel_index)
 {
-    // because of some compiler &/| std problems it is here instead of initializer list
-    const_cast<unsigned int&>(threads_count) = std::thread::hardware_concurrency() > 4 ? std::thread::hardware_concurrency() : 4;
-    kernels_piont_animations = new core::sync::StopPoint(threads_count);
-    kernels_piont_constraints = new core::sync::StopPoint(threads_count);
-    kernels_piont_bodies = new core::sync::StopPoint(threads_count);
-    kernels = new Kernel*[threads_count];
-    for (unsigned int i = 0; i < threads_count; ++i) {
-        kernels[i] = new Kernel(i, this);
-    }
-    std::this_thread::yield();
+
+}
+
+void gearoenix::physics::Engine::update_uniform_buffers()
+{
+}
+
+gearoenix::physics::Engine::Engine(const std::shared_ptr<render::engine::Engine>& e)
+    : e(e)
+	, kernels(new core::sync::KernelWorker())
+{
+	kernels->add_step(std::bind(&Engine::update_uniform_buffers_kernel, this, std::placeholders::_1), std::bind(&Engine::update_uniform_buffers, this));
 }
 
 gearoenix::physics::Engine::~Engine()
 {
-    for (unsigned int i = 0; i < threads_count; ++i) {
-        delete kernels[i];
-    }
-    delete[] kernels;
-    delete signaller;
-    delete kernels_piont_animations;
-    delete kernels_piont_constraints;
-    delete kernels_piont_bodies;
 }
 
-void gearoenix::physics::Engine::add_animation(std::shared_ptr<animation::Animation> a)
+void gearoenix::physics::Engine::add_animation(const std::shared_ptr<animation::Animation> &a)
 {
-    std::lock_guard<std::mutex> lg(pending_animations_locker);
+    std::lock_guard<std::mutex> _lg(added_animations_locker);
 #ifdef GX_DEBUG_MODE
     if (animations.find(a->get_id()) != animations.end())
         GXUNEXPECTED;
 #endif
-    pending_animations.push_back(a);
+    added_animations.push_back(a);
+}
+
+void gearoenix::physics::Engine::remove_animation(const std::shared_ptr<animation::Animation>& a)
+{
+	remove_animation(a->get_id());
+}
+
+void gearoenix::physics::Engine::remove_animation(core::Id a)
+{
+	std::lock_guard<std::mutex> _lg(removed_animations_locker);
+#ifdef GX_DEBUG_MODE
+	if (animations.find(a) == animations.end())
+		GXUNEXPECTED;
+#endif
+	removed_animations.push_back(a);
 }
 
 void gearoenix::physics::Engine::update()
 {
-    for (unsigned int i = 0; i < threads_count; ++i) {
-        kernels[i]->signal();
-    }
-}
 
-void gearoenix::physics::Engine::wait()
-{
-    for (unsigned int i = 0; i < threads_count; ++i) {
-        signaller->lock();
-    }
-    if (animations_need_cleaning) {
-        animations_need_cleaning = false;
-        for (std::map<core::Id, std::shared_ptr<animation::Animation>>::iterator iter = animations.begin(); iter != animations.end();) {
-            if (iter->second->is_ended()) {
-                iter = animations.erase(iter);
-            } else {
-                ++iter;
-            }
-        }
-    }
-    {
-        std::lock_guard<std::mutex> lg(pending_animations_locker);
-        for (const std::shared_ptr<animation::Animation>& an : pending_animations) {
-            {
-                const std::map<core::Id, std::shared_ptr<animation::Animation>>::iterator iter = animations.find(an->get_id());
-                if (iter != animations.end())
-                    if (iter->second->get_id() == an->get_id())
-                        GXUNEXPECTED;
-            }
-            animations[an->get_id()] = an;
-        }
-        pending_animations.clear();
-    }
 }

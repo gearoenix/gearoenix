@@ -36,7 +36,7 @@ void gearoenix::gles2::command::Buffer::play() const
 	gl::uint bound_shader_program = static_cast<gl::uint>(-1);
 	for (const std::shared_ptr<render::pipeline::ResourceSet> &prs : bound_resource_sets)
 	{
-		static_cast<const pipeline::ResourceSet *>(prs.get())->bind(bound_shader_program);
+		reinterpret_cast<const pipeline::ResourceSet *>(prs.get())->bind(bound_shader_program);
 	}
 	GXUNIMPLEMENTED;
 }

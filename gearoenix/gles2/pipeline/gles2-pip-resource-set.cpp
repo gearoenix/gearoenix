@@ -12,8 +12,6 @@ gearoenix::gles2::pipeline::ResourceSet::ResourceSet(const std::shared_ptr<shade
 
 void gearoenix::gles2::pipeline::ResourceSet::bind(gl::uint & bound_shader_program) const
 {
-	static_cast<buffer::Index *>(msh->get_index_buffer().get())->bind();
-	static_cast<buffer::Vertex *>(msh->get_vertex_buffer().get())->bind();
 	if (shd->get_shader_program() != bound_shader_program)
 	{
 		bound_shader_program = shd->get_shader_program();

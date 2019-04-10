@@ -21,7 +21,7 @@ namespace render {
         protected:
 			bool enabled = true;
 			bool has_shadow = false;
-			math::Vec4 color_strength = math::Vec4(1.0f, 1.0f, 1.0f, 0.7f);
+			math::Vec4 color = math::Vec4(1.0f, 1.0f, 1.0f, 0.7f);
 
             Light(
                 const core::Id my_id,
@@ -31,9 +31,7 @@ namespace render {
         public:
             virtual ~Light();
 
-			const math::Vec3& get_color() const;
-			const math::Vec4& get_color_strength() const;
-			const core::Real strength() const;
+			const math::Vec4& get_color() const;
 
 			bool is_shadower() const;
 			void enable_shadowing();
@@ -42,6 +40,8 @@ namespace render {
 			bool is_enabled() const;
 			void enable();
 			void disable();
+
+			virtual void update_uniform();
 
 			/// Only a shadow caster should have implement this (or in a very rare conditions)
 			/// Otherwise the default implementation will return nullptr
