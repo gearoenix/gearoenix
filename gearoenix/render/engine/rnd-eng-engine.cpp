@@ -18,7 +18,7 @@ gearoenix::render::engine::Engine::Engine(const std::shared_ptr<system::Applicat
     : engine_type_id(engine_type_id)
     , sysapp(system_application)
 	, fun_loader(new core::FunctionLoader())
-    , physics_engine(nullptr)
+    , physics_engine(new physics::Engine(system_application))
 	, kernels(new core::sync::KernelWorker())
 {
 	kernels->add_step([this](const unsigned int kernel_index) {
@@ -36,6 +36,7 @@ gearoenix::render::engine::Engine::~Engine()
 void gearoenix::render::engine::Engine::update() {
 	++frame_number;
 	frame_number %= frames_count;
+	physics_engine->update();
 	fun_loader->unload();
 	render_tree->update();
 	kernels->do_steps();

@@ -191,14 +191,14 @@ void gearoenix::render::scene::Scene::update_uniform()
 {
 	unsigned int dirc = 0;
 	unsigned int pntc = 0;
-	for (const std::pair<core::Id, std::shared_ptr<light::Light>> il : lights)
+	for (const std::pair<core::Id, std::shared_ptr<light::Light>> &il : lights)
 	{
 		const light::Light * const l = il.second.get();
 		{
 			const light::Directional * const dl = dynamic_cast<const light::Directional *>(l);
 			if (dl != nullptr && dirc < GX_MAX_DIRECTIONAL_LIGHTS)
 			{
-				uniform.directional_lights_color[dirc] = dl->get_color_strength();
+				uniform.directional_lights_color[dirc] = dl->get_color();
 				uniform.directional_lights_direction[dirc] = dl->get_direction();
 				++dirc;
 				continue;
@@ -208,7 +208,7 @@ void gearoenix::render::scene::Scene::update_uniform()
 			const light::Point * const pl = dynamic_cast<const light::Point *>(l);
 			if (pl != nullptr && pntc < GX_MAX_POINT_LIGHTS)
 			{
-				uniform.point_lights_color_min_radius[dirc] = pl->get_color_strength();
+				uniform.point_lights_color_min_radius[dirc] = pl->get_color();
 				uniform.point_lights_position_max_radius[dirc] = pl->get_position_radius();
 				++pntc;
 				continue;

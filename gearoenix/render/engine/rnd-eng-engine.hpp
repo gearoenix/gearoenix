@@ -97,7 +97,10 @@ namespace gearoenix {
 					const unsigned int width,
 					const unsigned int heigt,
 					const core::sync::EndCaller<core::sync::EndCallerIgnore> &call) = 0;
-				virtual void submit(const std::vector<std::shared_ptr<sync::Semaphore>>& p, const std::shared_ptr<command::Buffer>& c, const std::shared_ptr<sync::Semaphore>& n) = 0;
+				virtual void submit(
+					const std::vector<std::shared_ptr<sync::Semaphore>>& p, 
+					const std::shared_ptr<command::Buffer>& c, 
+					const std::shared_ptr<sync::Semaphore>& n) = 0;
 				/// TODO: This is (design/mechanism) going to change in far future
 				/// game developer must keep all the render-trees by himself/herself
 				/// Then every thing based on the following must be choosed by render-trees:

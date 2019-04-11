@@ -11,19 +11,17 @@ namespace core {
 		class KernelWorker;
 	}
 }
-namespace render {
-    namespace engine {
-        class Engine;
-    }
+namespace system 
+{
+	class Application;
 }
 namespace physics {
-    class Kernel;
     namespace animation {
         class Animation;
     }
     class Engine {
     private:
-        const std::shared_ptr<render::engine::Engine> e;
+        const std::shared_ptr<system::Application> sysapp;
 		const std::shared_ptr<core::sync::KernelWorker> kernels;
         // if animation return true on its apply its gonna be deleted
         std::map<core::Id, std::shared_ptr<animation::Animation>> animations;
@@ -36,7 +34,7 @@ namespace physics {
 		void update_uniform_buffers();
 
     public:
-        Engine(const std::shared_ptr<render::engine::Engine>& e);
+        Engine(const std::shared_ptr<system::Application>& sysapp);
         ~Engine();
         void add_animation(const std::shared_ptr<animation::Animation> &a);
 		void remove_animation(const std::shared_ptr<animation::Animation> &a);

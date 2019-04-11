@@ -30,13 +30,16 @@ void gearoenix::gles2::command::Buffer::bind(const std::shared_ptr<render::textu
 	render::command::Buffer::bind(t);
 }
 
-void gearoenix::gles2::command::Buffer::play() const
+gearoenix::gl::uint gearoenix::gles2::command::Buffer::play(gl::uint bound_shader_program) const
 {
-	static_cast<const texture::Target *>(render_target.get())->bind();
-	gl::uint bound_shader_program = static_cast<gl::uint>(-1);
+	if(render_target != nullptr) static_cast<const texture::Target *>(render_target.get())->bind();
 	for (const std::shared_ptr<render::pipeline::ResourceSet> &prs : bound_resource_sets)
 	{
 		reinterpret_cast<const pipeline::ResourceSet *>(prs.get())->bind(bound_shader_program);
 	}
-	GXUNIMPLEMENTED;
+	for (const std::shared_ptr<render::command::Buffer> &c : recored_secondaries)
+	{
+		static_cast<const Buffer *>(c.get())->play();
+	}
+	return bound_shader_program;
 }

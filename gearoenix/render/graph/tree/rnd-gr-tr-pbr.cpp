@@ -13,6 +13,7 @@ gearoenix::render::graph::tree::Pbr::Pbr(const std::shared_ptr<engine::Engine>& 
 	, in_weak_hardware(engine::Type::OPENGL_ES2 == e->get_engine_type_id())
 {
 	fwddirshd = std::shared_ptr<node::ForwardPbrDirectionalShadow>(new node::ForwardPbrDirectionalShadow(e, call));
+	fwddirshd->set_render_target(e->get_main_render_target());
 }
 
 gearoenix::render::graph::tree::Pbr::~Pbr()

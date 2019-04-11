@@ -33,3 +33,8 @@ void gearoenix::render::graph::node::Node::set_input_texture(const std::shared_p
 {
     input_textures[index] = t;
 }
+
+void gearoenix::render::graph::node::Node::set_render_target(const std::shared_ptr<texture::Target>& t)
+{
+	render_target = t;
+}

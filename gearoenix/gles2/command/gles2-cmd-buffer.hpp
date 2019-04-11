@@ -1,5 +1,6 @@
 #ifndef GEAROEMIX_GLES2_COMMAND_BUFFER_HPP
 #define GEAROEMIX_GLES2_COMMAND_BUFFER_HPP
+#include "../../gl/gl-types.hpp"
 #include "../../render/command/rnd-cmd-buffer.hpp"
 
 namespace gearoenix {
@@ -13,7 +14,7 @@ namespace gles2 {
             void record(const std::shared_ptr<render::command::Buffer>& o) override final;
 			void bind(const std::shared_ptr<render::pipeline::ResourceSet> &r) override final;
 			void bind(const std::shared_ptr<render::texture::Target> &t) override final;
-			void play() const;
+			gl::uint play(gl::uint bound_shader_program = static_cast<gl::uint>(-1)) const;
         };
     }
 }

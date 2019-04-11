@@ -200,7 +200,7 @@ gearoenix::render::material::Material::~Material()
 
 void gearoenix::render::material::Material::update_uniform()
 {
-	uniform_buffers->update(uniform);
+	uniform_buffers->update(&uniform);
 }
 
 const std::shared_ptr<gearoenix::render::buffer::FramedUniform>& gearoenix::render::material::Material::get_uniform_buffers() const

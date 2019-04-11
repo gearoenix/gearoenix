@@ -8,6 +8,7 @@ void gearoenix::render::command::Buffer::begin()
 {
 	recored_secondaries.clear();
 	bound_resource_sets.clear();
+	render_target = nullptr;
 }
 
 void gearoenix::render::command::Buffer::end()

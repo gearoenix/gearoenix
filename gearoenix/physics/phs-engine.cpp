@@ -3,8 +3,11 @@
 #include "../core/sync/cr-sync-kernel-workers.hpp"
 #include "../core/sync/cr-sync-queued-semaphore.hpp"
 #include "../core/sync/cr-sync-stop-point.hpp"
+#include "../render/camera/rnd-cmr-camera.hpp"
 #include "../render/engine/rnd-eng-engine.hpp"
+#include "../render/model/rnd-mdl-model.hpp"
 #include "../render/scene/rnd-scn-manager.hpp"
+#include "../render/scene/rnd-scn-scene.hpp"
 #include "../system/sys-app.hpp"
 #include "../system/sys-log.hpp"
 #include "animation/phs-anm-animation.hpp"
@@ -12,15 +15,35 @@
 
 void gearoenix::physics::Engine::update_uniform_buffers_kernel(const unsigned int kernel_index)
 {
-
+	unsigned int task_number = 0;
+	const unsigned int kernels_count = kernels->get_threads_count();
+#define GXDOTASK(expr) if(task_number == kernel_index) expr; task_number = (task_number + 1) % kernels_count
+	const std::map<core::Id, std::weak_ptr<render::scene::Scene>>& scenes = sysapp->get_asset_manager()->get_scene_manager()->get_scenes();
+	for (const std::pair<core::Id, std::weak_ptr<render::scene::Scene>> &is : scenes)
+	{
+		if (const std::shared_ptr<render::scene::Scene> scene = is.second.lock())
+		{
+			GXDOTASK(scene->update_uniform());
+			const std::map<core::Id, std::shared_ptr<render::camera::Camera>> &cameras = scene->get_cameras();
+			for (const std::pair<core::Id, std::shared_ptr<render::camera::Camera>> &id_camera : cameras)
+			{
+				GXDOTASK(id_camera.second->update_uniform());
+			}
+			const std::map<core::Id, std::shared_ptr<render::model::Model>> &models = scene->get_models();
+			for (const std::pair<core::Id, std::shared_ptr<render::model::Model>> &id_model : models)
+			{
+				GXDOTASK(id_model.second->update_uniform());
+			}
+		}
+	}
 }
 
 void gearoenix::physics::Engine::update_uniform_buffers()
 {
 }
 
-gearoenix::physics::Engine::Engine(const std::shared_ptr<render::engine::Engine>& e)
-    : e(e)
+gearoenix::physics::Engine::Engine(const std::shared_ptr<system::Application>& sysapp)
+    : sysapp(sysapp)
 	, kernels(new core::sync::KernelWorker())
 {
 	kernels->add_step(std::bind(&Engine::update_uniform_buffers_kernel, this, std::placeholders::_1), std::bind(&Engine::update_uniform_buffers, this));
@@ -57,5 +80,5 @@ void gearoenix::physics::Engine::remove_animation(core::Id a)
 
 void gearoenix::physics::Engine::update()
 {
-
+	kernels->do_steps();
 }

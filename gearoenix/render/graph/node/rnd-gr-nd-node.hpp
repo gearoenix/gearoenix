@@ -58,6 +58,7 @@ namespace render {
             public:
                 virtual ~Node();
                 virtual void set_input_texture(const std::shared_ptr<texture::Texture>& t, const unsigned int index);
+				virtual void set_render_target(const std::shared_ptr<texture::Target>& t);
                 virtual const std::shared_ptr<sync::Semaphore>& get_semaphore(const unsigned int frame_number) = 0;
             };
         }

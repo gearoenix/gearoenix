@@ -3,31 +3,23 @@
 #include "../../system/sys-log.hpp"
 #include "../engine/rnd-eng-engine.hpp"
 
+static std::shared_ptr<gearoenix::render::buffer::FramedUniform> null_uniforms;
+
 gearoenix::render::light::Light::Light(
     const core::Id my_id,
     const std::shared_ptr<system::stream::Stream>& f,
     const std::shared_ptr<engine::Engine>& e)
     : core::asset::Asset(my_id, core::asset::Type::LIGHT)
 {
-	color_strength.read(f);
+	color.read(f);
 	has_shadow = f->read_bool();
 }
 
 gearoenix::render::light::Light::~Light() {}
 
-const gearoenix::math::Vec3 & gearoenix::render::light::Light::get_color() const
+const gearoenix::math::Vec4 & gearoenix::render::light::Light::get_color() const
 {
-	return *reinterpret_cast<const math::Vec3 *>(&color_strength);
-}
-
-const gearoenix::math::Vec4 & gearoenix::render::light::Light::get_color_strength() const
-{
-	return color_strength;
-}
-
-const gearoenix::core::Real gearoenix::render::light::Light::strength() const
-{
-	return color_strength[3];
+	return color;
 }
 
 bool gearoenix::render::light::Light::is_shadower() const
@@ -66,5 +58,5 @@ void gearoenix::render::light::Light::update_uniform()
 
 const std::shared_ptr<gearoenix::render::buffer::FramedUniform>& gearoenix::render::light::Light::get_uniform_buffers() const
 {
-	return nullptr;
+	return null_uniforms;
 }
