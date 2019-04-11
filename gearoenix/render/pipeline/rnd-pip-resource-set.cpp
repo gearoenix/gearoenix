@@ -14,7 +14,13 @@ gearoenix::render::pipeline::ResourceSet::~ResourceSet() {}
 
 GXHELPER(scene, Scene)
 GXHELPER(camera, Camera)
-GXHELPER(light, Light)
+
+void gearoenix::render::pipeline::ResourceSet::set_light(const std::shared_ptr<light::Light>& l) {
+	const std::shared_ptr<buffer::FramedUniform> &fub = l->get_uniform_buffers();
+	if (fub == nullptr) light_uniform_buffer = nullptr;
+	else light_uniform_buffer = fub->get_buffer();
+}
+
 GXHELPER(model, Model)
 
 void gearoenix::render::pipeline::ResourceSet::set_mesh(const std::shared_ptr<mesh::Mesh>& m) {

@@ -133,6 +133,15 @@ void gearoenix::render::scene::Scene::add_light(const std::shared_ptr<light::Lig
 	lights[oid] = o;
 }
 
+const std::shared_ptr<gearoenix::render::light::Light>& gearoenix::render::scene::Scene::get_light(const core::Id id) const
+{
+	const auto &find = lights.find(id);
+	if (lights.end() == find) {
+		return null_light;
+	}
+	return find->second;
+}
+
 const std::map<gearoenix::core::Id, std::shared_ptr<gearoenix::render::light::Light>>& gearoenix::render::scene::Scene::get_lights() const
 {
 	return lights;

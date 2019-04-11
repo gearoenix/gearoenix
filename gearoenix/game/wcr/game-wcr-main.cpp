@@ -11,6 +11,7 @@
 #include "../../render/camera/rnd-cmr-manager.hpp"
 #include "../../render/engine/rnd-eng-engine.hpp"
 #include "../../render/graph/tree/rnd-gr-tr-pbr.hpp"
+#include "../../render/light/rnd-lt-light.hpp"
 #include "../../render/model/rnd-mdl-model.hpp"
 #include "../../render/scene/rnd-scn-manager.hpp"
 #include "../../render/scene/rnd-scn-scene.hpp"
@@ -21,7 +22,10 @@ GameApp::GameApp(const std::shared_ptr<gearoenix::system::Application>& sys_app)
     : gearoenix::core::Application::Application(sys_app)
 {
 	rnd_eng->set_render_tree(std::shared_ptr<gearoenix::render::graph::tree::Tree>(new gearoenix::render::graph::tree::Pbr(rnd_eng, gearoenix::core::sync::EndCaller<gearoenix::core::sync::EndCallerIgnore>([] {}))));
-    sys_app->get_asset_manager()->get_scene_manager()->get_gx3d(1024, gearoenix::core::sync::EndCaller<gearoenix::render::scene::Scene>([this](std::shared_ptr<gearoenix::render::scene::Scene> s) { scn = s; }));
+    sys_app->get_asset_manager()->get_scene_manager()->get_gx3d(1024, gearoenix::core::sync::EndCaller<gearoenix::render::scene::Scene>([this](std::shared_ptr<gearoenix::render::scene::Scene> s) { 
+		scn = s;
+		s->get_light(1027)->enable_shadowing();
+	}));
 }
 
 GameApp::~GameApp() {}

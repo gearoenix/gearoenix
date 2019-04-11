@@ -1,6 +1,7 @@
 #ifndef GL_TYPES_HPP
 #define GL_TYPES_HPP
 #include <cstdint>
+#include <cstddef>
 namespace gearoenix {
 	namespace gl {
 		typedef std::uint8_t boolean;
