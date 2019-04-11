@@ -76,7 +76,7 @@ void gearoenix::gl::Loader::load_library()
 void gearoenix::gl::Loader::load_functions()
 {
 #ifdef GX_USE_SDL
-#define GXFUNLDF(name, fun) fun = static_cast<fun##_fnp>(SDL_GL_GetProcAddress(#name)); if(fun == nullptr) GXLOGF("Failed to load " << #name)
+#define GXFUNLDF(name, fun) fun = reinterpret_cast<fun##_fnp>(SDL_GL_GetProcAddress(#name)); if(fun == nullptr) GXLOGF("Failed to load " << #name)
 #else
 #error "Not implemented for this platform."
 #endif

@@ -14,11 +14,15 @@ namespace render {
     namespace model {
         class Model;
     }
+    namespace scene {
+    class Scene;
+    }
 }
 }
 
 class GameApp : public gearoenix::core::Application {
 private:
+    std::shared_ptr<gearoenix::render::scene::Scene> scn;
     std::shared_ptr<gearoenix::render::camera::Camera> cam;
     std::shared_ptr<gearoenix::render::model::Model> mdl;
     bool left_mouse_down = false;

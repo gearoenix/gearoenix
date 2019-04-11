@@ -184,14 +184,14 @@ const static std::string fragment_shader_code =
 	"        float nl = max(dot(normal, light_direction), 0.0);\n" // 106
 	//       add to outgoing radiance Lo
 	//       note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
-	"        lo += (kd * albedo / GXPI + specular) * radiance * nl;\n" // 107
+    "        lo += (kd * albedo.xyz / GXPI + specular) * radiance * nl;\n" // 107
 	"    }\n" // 108
 	//   ambient lighting (we now use IBL as the ambient term)
 	"    vec3 frsn = fresnel_schlick_roughness(max(dot(normal, view), 0.0), f0, roughness);\n" // 109
 	"    vec3 ks = frsn;\n" // 110
 	"    vec3 kd = (1.0 - ks) * (1.0 - metallic);\n" // 111
 	"    vec3 irradiance = textureCube(effect_diffuse_environment, normal).rgb;\n" // 112
-	"    vec3 diffuse = irradiance * albedo;\n" // 113
+    "    vec3 diffuse = irradiance * albedo.xyz;\n" // 113
 	//   sample both the pre-filter map and the BRDF lut and combine them together as per
 	//   the Split-Sum approximation to get the IBL specular part.
 	"    float MAX_REFLECTION_LOD = 4.0;\n" // 114
