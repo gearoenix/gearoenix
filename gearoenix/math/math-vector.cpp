@@ -120,6 +120,33 @@ gearoenix::core::Real& gearoenix::math::Vec2::operator[](const int i)
     return vec[i];
 }
 
+bool gearoenix::math::Vec2::operator<(const Vec2 & o) const
+{
+	if (vec[0] < o.vec[0]) {
+		return true;
+	}
+	if (vec[0] != o.vec[0]) {
+		return false;
+	}
+	return vec[1] < o.vec[1];
+}
+
+bool gearoenix::math::Vec2::operator==(const Vec2 & o) const
+{
+	return vec[0] == o.vec[0] && vec[1] == o.vec[1];
+}
+
+bool gearoenix::math::Vec2::operator>(const Vec2 & o) const
+{
+	if (vec[0] > o.vec[0]) {
+		return true;
+	}
+	if (vec[0] != o.vec[0]) {
+		return false;
+	}
+	return vec[1] > o.vec[1];
+}
+
 gearoenix::core::Real gearoenix::math::Vec2::dot(const Vec2& o) const
 {
     return (vec[0] * o.vec[0]) + (vec[1] * o.vec[1]);
@@ -388,6 +415,45 @@ gearoenix::core::Real& gearoenix::math::Vec3::operator[](const int i)
     }
 #endif
     return vec[i];
+}
+
+bool gearoenix::math::Vec3::operator<(const Vec3 & o) const
+{
+	if (vec[0] < o.vec[0]) {
+		return true;
+	}
+	if (vec[0] != o.vec[0]) {
+		return false;
+	}
+	if (vec[1] < o.vec[1]) {
+		return true;
+	}
+	if (vec[1] != o.vec[1]) {
+		return false;
+	}
+	return vec[2] < o.vec[2];
+}
+
+bool gearoenix::math::Vec3::operator==(const Vec3 & o) const
+{
+	return vec[0] == o.vec[0] && vec[1] == o.vec[1] && vec[2] == o.vec[2];
+}
+
+bool gearoenix::math::Vec3::operator>(const Vec3 & o) const
+{
+	if (vec[0] > o.vec[0]) {
+		return true;
+	}
+	if (vec[0] != o.vec[0]) {
+		return false;
+	}
+	if (vec[1] > o.vec[1]) {
+		return true;
+	}
+	if (vec[1] != o.vec[1]) {
+		return false;
+	}
+	return vec[2] > o.vec[2];
 }
 
 gearoenix::math::Vec2 gearoenix::math::Vec3::xy() const

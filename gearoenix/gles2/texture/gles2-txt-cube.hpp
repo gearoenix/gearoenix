@@ -4,6 +4,8 @@
 #ifdef GX_USE_OPENGL_ES2
 #include "../../gl/gl-types.hpp"
 #include "../../render/texture/rnd-txt-texture-cube.hpp"
+#include "../../render/texture/rnd-txt-format.hpp"
+#include "../../render/texture/rnd-txt-sample.hpp"
 #include <memory>
 namespace gearoenix {
 namespace system {
@@ -21,9 +23,12 @@ namespace gles2 {
         public:
             Cube(
                 const core::Id my_id,
-                const std::shared_ptr<system::stream::Stream>& file,
                 const std::shared_ptr<engine::Engine>& engine,
-                core::sync::EndCaller<core::sync::EndCallerIgnore> end);
+				const void *data,
+				const render::texture::TextureFormat::Id f,
+				const render::texture::SampleInfo s,
+				const unsigned int aspect,
+				const core::sync::EndCaller<core::sync::EndCallerIgnore>& call);
             ~Cube();
             void bind(gl::enumerated texture_unit) const;
         };

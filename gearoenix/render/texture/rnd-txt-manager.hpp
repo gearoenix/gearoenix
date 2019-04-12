@@ -17,21 +17,30 @@ namespace render {
         class Engine;
     }
     namespace texture {
+		class Cube;
 		class Texture;
 		class Texture2D;
         class Manager {
         protected:
             const std::shared_ptr<engine::Engine> e;
 			core::cache::File<Texture> cache;
-			std::map<math::Vec4, core::Id> color_id;
+			std::map<math::Vec4, core::Id> color_4d_id_t2d;
+			std::map<math::Vec3, core::Id> color_3d_id_t2d;
+			std::map<math::Vec2, core::Id> color_2d_id_t2d;
+			std::map<math::Vec4, core::Id> color_4d_id_cube;
+			std::map<math::Vec3, core::Id> color_3d_id_cube;
+			std::map<math::Vec2, core::Id> color_2d_id_cube;
 
         public:
             Manager(const std::shared_ptr<system::stream::Stream>& s, const std::shared_ptr<engine::Engine>& e);
             ~Manager();
 
-			std::shared_ptr<Texture2D> get(const math::Vec4 &color, core::sync::EndCaller<Texture2D> &c, const unsigned int color_count = 4);
-			std::shared_ptr<Texture2D> get(const math::Vec3 &color, core::sync::EndCaller<Texture2D> &c);
-			std::shared_ptr<Texture2D> get(const math::Vec2 &color, core::sync::EndCaller<Texture2D> &c);
+			std::shared_ptr<Texture2D> get_2d(const math::Vec4 &color, core::sync::EndCaller<Texture2D> &c);
+			std::shared_ptr<Texture2D> get_2d(const math::Vec3 &color, core::sync::EndCaller<Texture2D> &c);
+			std::shared_ptr<Texture2D> get_2d(const math::Vec2 &color, core::sync::EndCaller<Texture2D> &c);
+			std::shared_ptr<Cube> get_cube(const math::Vec4 &color, core::sync::EndCaller<Cube> &c);
+			std::shared_ptr<Cube> get_cube(const math::Vec3 &color, core::sync::EndCaller<Cube> &c);
+			std::shared_ptr<Cube> get_cube(const math::Vec2 &color, core::sync::EndCaller<Cube> &c);
 			std::shared_ptr<Texture> get_gx3d(const core::Id id, core::sync::EndCaller<Texture> &c);
         };
     }

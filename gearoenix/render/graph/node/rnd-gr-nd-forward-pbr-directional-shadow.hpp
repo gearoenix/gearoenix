@@ -58,12 +58,6 @@ namespace render {
             };
 
             /// This renders only one directional light with one shadow map.
-            /// It needs following textures:
-            ///     0 - diffuse environment
-            ///     1 - specular environment
-            ///     2 - ambient occlusion
-            ///     3 - shadow map
-            ///     4 - brdflut
             /// In here I do not care for race issues (for performance reason).
             /// The user of this class must use its functionalities in their correct contextes.
             class ForwardPbrDirectionalShadow : public Node {
@@ -71,6 +65,12 @@ namespace render {
                 std::vector<std::shared_ptr<ForwardPbrDirectionalShadowFrame>> frames;
 
             public:
+				const static unsigned int diffuse_environment_index;
+				const static unsigned int specular_environment_index;
+				const static unsigned int ambient_occlusion_index;
+				const static unsigned int shadow_map_index;
+				const static unsigned int brdflut_index;
+
                 ForwardPbrDirectionalShadow(const std::shared_ptr<engine::Engine>& e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call);
                 ~ForwardPbrDirectionalShadow() override final;
 
@@ -83,6 +83,7 @@ namespace render {
 				const std::shared_ptr<sync::Semaphore>& get_semaphore(const unsigned int frame_number);
                 /// This will be called at the start of each frame
                 void update();
+				/// Multithreaded rendering happens in here
                 void record(
                     const std::shared_ptr<scene::Scene>& s,
                     const std::shared_ptr<camera::Camera>& c,

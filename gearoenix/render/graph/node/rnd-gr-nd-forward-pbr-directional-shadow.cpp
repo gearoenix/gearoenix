@@ -1,4 +1,6 @@
 #include "rnd-gr-nd-forward-pbr-directional-shadow.hpp"
+#include "../../../core/asset/cr-asset-manager.hpp"
+#include "../../../system/sys-app.hpp"
 #include "../../buffer/rnd-buf-manager.hpp"
 #include "../../buffer/rnd-buf-uniform.hpp"
 #include "../../camera/rnd-cmr-camera.hpp"
@@ -16,10 +18,17 @@
 #include "../../pipeline/rnd-pip-pipeline.hpp"
 #include "../../pipeline/rnd-pip-resource-set.hpp"
 #include "../../sync/rnd-sy-semaphore.hpp"
+#include "../../texture/rnd-txt-manager.hpp"
 #include "../../texture/rnd-txt-target.hpp"
 #include "../../texture/rnd-txt-texture-2d.hpp"
 #include "../../texture/rnd-txt-texture-cube.hpp"
 #include <thread>
+
+const unsigned int gearoenix::render::graph::node::ForwardPbrDirectionalShadow::diffuse_environment_index = 0;
+const unsigned int gearoenix::render::graph::node::ForwardPbrDirectionalShadow::specular_environment_index = 1;
+const unsigned int gearoenix::render::graph::node::ForwardPbrDirectionalShadow::ambient_occlusion_index = 2;
+const unsigned int gearoenix::render::graph::node::ForwardPbrDirectionalShadow::shadow_map_index = 3;
+const unsigned int gearoenix::render::graph::node::ForwardPbrDirectionalShadow::brdflut_index = 4;
 
 gearoenix::render::graph::node::ForwardPbrDirectionalShadow::ForwardPbrDirectionalShadow(
 	const std::shared_ptr<engine::Engine>& e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call)
@@ -39,6 +48,14 @@ gearoenix::render::graph::node::ForwardPbrDirectionalShadow::ForwardPbrDirection
 	for (unsigned int i = 0; i < e->get_frames_count(); ++i) {
 		frames[i] = std::make_shared<ForwardPbrDirectionalShadowFrame>(e);
 	}
+	const std::shared_ptr<texture::Manager> &txtmgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
+	core::sync::EndCaller<texture::Cube> txtcubecall([call](std::shared_ptr<texture::Cube>) {});
+	core::sync::EndCaller<texture::Texture2D> txt2dcall([call](std::shared_ptr<texture::Texture2D>) {});
+	input_textures[diffuse_environment_index] = txtmgr->get_cube(math::Vec3(1.0f, 1.0f, 1.0f), txtcubecall);
+	input_textures[specular_environment_index] = txtmgr->get_cube(math::Vec3(1.0f, 1.0f, 1.0f), txtcubecall);
+	input_textures[ambient_occlusion_index] = txtmgr->get_2d(1.0f, txt2dcall);
+	input_textures[shadow_map_index] = txtmgr->get_2d(math::Vec2(1.0, 1.0), txt2dcall);
+	input_textures[brdflut_index] = txtmgr->get_2d(math::Vec2(1.0, 1.0), txt2dcall);
 }
 
 gearoenix::render::graph::node::ForwardPbrDirectionalShadow::~ForwardPbrDirectionalShadow()

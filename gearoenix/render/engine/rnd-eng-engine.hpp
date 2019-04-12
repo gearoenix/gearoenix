@@ -97,6 +97,14 @@ namespace gearoenix {
 					const unsigned int width,
 					const unsigned int heigt,
 					const core::sync::EndCaller<core::sync::EndCallerIgnore> &call) = 0;
+				/// Caller of this function must maintain the pointer to data untill call of EndCaller.
+				virtual texture::Cube* create_texture_cube(
+					const core::Id id,
+					const void *data,
+					const texture::TextureFormat::Id f,
+					const texture::SampleInfo s,
+					const unsigned int aspect,
+					const core::sync::EndCaller<core::sync::EndCallerIgnore> &call) = 0;
 				virtual void submit(
 					const std::vector<std::shared_ptr<sync::Semaphore>>& p, 
 					const std::shared_ptr<command::Buffer>& c, 

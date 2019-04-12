@@ -37,6 +37,9 @@ namespace math {
         core::Real& operator[](const unsigned int i);
         const core::Real& operator[](const int i) const;
         core::Real& operator[](const int i);
+		bool operator < (const Vec2 &o) const;
+		bool operator ==(const Vec2 &o) const;
+		bool operator > (const Vec2 &o) const;
         core::Real dot(const Vec2& o) const;
         core::Real cross(const Vec2& o) const;
         core::Real length() const;
@@ -86,6 +89,9 @@ namespace math {
         core::Real& operator[](const unsigned int i);
         const core::Real& operator[](const int i) const;
         core::Real& operator[](const int i);
+		bool operator < (const Vec3 &o) const;
+		bool operator ==(const Vec3 &o) const;
+		bool operator > (const Vec3 &o) const;
         Vec2 xy() const;
         core::Real* data();
         core::Real length() const;

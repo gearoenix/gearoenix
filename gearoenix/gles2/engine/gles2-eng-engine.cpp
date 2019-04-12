@@ -156,6 +156,17 @@ gearoenix::render::texture::Texture2D * gearoenix::gles2::engine::Engine::create
 	return new texture::Texture2D(id, std::static_pointer_cast<Engine>(sysapp->get_render_engine()), data, f, s, img_width, img_height, call);
 }
 
+gearoenix::render::texture::Cube * gearoenix::gles2::engine::Engine::create_texture_cube(
+	const core::Id id, 
+	const void * data, 
+	const render::texture::TextureFormat::Id f, 
+	const render::texture::SampleInfo s, 
+	const unsigned int aspect, 
+	const core::sync::EndCaller<core::sync::EndCallerIgnore>& call)
+{
+	return new texture::Cube(id, std::static_pointer_cast<Engine>(sysapp->get_render_engine()), data, f, s, aspect, call);
+}
+
 void gearoenix::gles2::engine::Engine::submit(const std::vector<std::shared_ptr<render::sync::Semaphore>>&, const std::shared_ptr<render::command::Buffer>& c, const std::shared_ptr<render::sync::Semaphore>&)
 {
 	static_cast<const command::Buffer *>(c.get())->play();
