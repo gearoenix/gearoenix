@@ -26,11 +26,11 @@
 #include "../skybox/rnd-sky-skybox.hpp"
 #include "rnd-scn-ui.hpp"
 
-const std::shared_ptr<gearoenix::render::camera::Camera>          gearoenix::render::scene::Scene::null_camera = nullptr;
-const std::shared_ptr<gearoenix::audio::Audio>                    gearoenix::render::scene::Scene::null_audio = nullptr;
-const std::shared_ptr<gearoenix::render::light::Light>            gearoenix::render::scene::Scene::null_light = nullptr;
-const std::shared_ptr<gearoenix::render::model::Model>            gearoenix::render::scene::Scene::null_model = nullptr;
-const std::shared_ptr<gearoenix::physics::constraint::Constraint> gearoenix::render::scene::Scene::null_constraint = nullptr;
+static const std::shared_ptr<gearoenix::render::camera::Camera>          null_camera = nullptr;
+static const std::shared_ptr<gearoenix::audio::Audio>                    null_audio = nullptr;
+static const std::shared_ptr<gearoenix::render::light::Light>            null_light = nullptr;
+static const std::shared_ptr<gearoenix::render::model::Model>            null_model = nullptr;
+static const std::shared_ptr<gearoenix::physics::constraint::Constraint> null_constraint = nullptr;
 
 gearoenix::render::scene::Scene::Scene(
 	const core::Id my_id,
@@ -68,7 +68,11 @@ gearoenix::render::scene::Scene::Scene(
 
 	if (f->read_bool()) {
 		GXUNIMPLEMENTED;
-	}
+    }
+
+    GXLOGD("Number of models is: " << models.size());
+    GXLOGD("Number of lights is: " << lights.size());
+    GXLOGD("Number of cameras is: " << cameras.size());
 }
 
 gearoenix::render::scene::Scene::Scene(
