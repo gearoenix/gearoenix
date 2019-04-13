@@ -221,8 +221,8 @@ void gearoenix::render::scene::Scene::update_uniform()
 			const light::Point * const pl = dynamic_cast<const light::Point *>(l);
 			if (pl != nullptr && pntc < GX_MAX_POINT_LIGHTS)
 			{
-				uniform.point_lights_color_min_radius[dirc] = pl->get_color();
-				uniform.point_lights_position_max_radius[dirc] = pl->get_position_radius();
+                uniform.point_lights_color_min_radius[pntc] = pl->get_color();
+                uniform.point_lights_position_max_radius[pntc] = pl->get_position_radius();
 				++pntc;
 				continue;
 			}
