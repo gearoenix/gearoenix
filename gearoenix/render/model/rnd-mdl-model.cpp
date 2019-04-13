@@ -65,6 +65,10 @@ gearoenix::render::model::Model::~Model()
 void gearoenix::render::model::Model::update_uniform()
 {
 	uniform_buffers->update(&uniform);
+	for (const std::pair<core::Id, std::shared_ptr<Mesh>> &msh : meshes)
+		msh.second->update_uniform();
+	for (const std::pair<core::Id, std::shared_ptr<Model>> &ch : children)
+		ch.second->update_uniform();
 }
 
 void gearoenix::render::model::Model::add_mesh(const std::shared_ptr<Mesh>& m)

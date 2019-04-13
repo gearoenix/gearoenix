@@ -34,3 +34,8 @@ const std::shared_ptr<gearoenix::render::material::Material>& gearoenix::render:
 {
 	return mat;
 }
+
+void gearoenix::render::model::Mesh::update_uniform()
+{
+	mat->update_uniform();
+}

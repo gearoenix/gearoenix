@@ -35,6 +35,7 @@ namespace render {
 
             const std::shared_ptr<mesh::Mesh>& get_mesh() const;
             const std::shared_ptr<material::Material>& get_material() const;
+			void update_uniform();
         };
     }
 }
