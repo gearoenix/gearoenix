@@ -273,14 +273,15 @@ gearoenix::gles2::shader::ForwardPbrDirectionalShadow::~ForwardPbrDirectionalSha
 
 void gearoenix::gles2::shader::ForwardPbrDirectionalShadow::bind() const
 {
+    Shader::bind();
 	gl::Loader::uniform1i(material_base_color, material_base_color_index);
 	gl::Loader::uniform1i(material_metallic_roughness, material_metallic_roughness_index);
 	gl::Loader::uniform1i(material_normal, material_normal_index);
-	gl::Loader::uniform1i(material_emissive, material_emissive_index);
+    //gl::Loader::uniform1i(material_emissive, material_emissive_index);
 	gl::Loader::uniform1i(effect_diffuse_environment, effect_diffuse_environment_index);
 	gl::Loader::uniform1i(effect_specular_environment, effect_specular_environment_index);
-	gl::Loader::uniform1i(effect_ambient_occlusion, effect_ambient_occlusion_index);
-	gl::Loader::uniform1i(effect_shadow_map, effect_shadow_map_index);
+    //gl::Loader::uniform1i(effect_ambient_occlusion, effect_ambient_occlusion_index);
+    //gl::Loader::uniform1i(effect_shadow_map, effect_shadow_map_index);
 	gl::Loader::uniform1i(effect_brdflut, effect_brdflut_index);
 }
 
