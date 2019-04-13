@@ -207,3 +207,23 @@ const std::shared_ptr<gearoenix::render::buffer::FramedUniform>& gearoenix::rend
 {
 	return uniform_buffers;
 }
+
+const std::shared_ptr<gearoenix::render::texture::Texture2D>& gearoenix::render::material::Material::get_color() const
+{
+	return color;
+}
+
+const std::shared_ptr<gearoenix::render::texture::Texture2D>& gearoenix::render::material::Material::get_metallic_roughness() const
+{
+	return metallic_roughness;
+}
+
+const std::shared_ptr<gearoenix::render::texture::Texture2D>& gearoenix::render::material::Material::get_normal() const
+{
+	return normal;
+}
+
+const std::shared_ptr<gearoenix::render::texture::Texture2D>& gearoenix::render::material::Material::get_emissive() const
+{
+	return emissive;
+}

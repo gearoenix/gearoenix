@@ -27,6 +27,7 @@ namespace render {
 			std::map<math::Vec4, core::Id> color_4d_id_t2d;
 			std::map<math::Vec3, core::Id> color_3d_id_t2d;
 			std::map<math::Vec2, core::Id> color_2d_id_t2d;
+			std::map<core::Real, core::Id> color_1d_id_t2d;
 			std::map<math::Vec4, core::Id> color_4d_id_cube;
 			std::map<math::Vec3, core::Id> color_3d_id_cube;
 			std::map<math::Vec2, core::Id> color_2d_id_cube;
@@ -38,6 +39,7 @@ namespace render {
 			std::shared_ptr<Texture2D> get_2d(const math::Vec4 &color, core::sync::EndCaller<Texture2D> &c);
 			std::shared_ptr<Texture2D> get_2d(const math::Vec3 &color, core::sync::EndCaller<Texture2D> &c);
 			std::shared_ptr<Texture2D> get_2d(const math::Vec2 &color, core::sync::EndCaller<Texture2D> &c);
+			std::shared_ptr<Texture2D> get_2d(const core::Real value, core::sync::EndCaller<Texture2D> &c);
 			std::shared_ptr<Cube> get_cube(const math::Vec4 &color, core::sync::EndCaller<Cube> &c);
 			std::shared_ptr<Cube> get_cube(const math::Vec3 &color, core::sync::EndCaller<Cube> &c);
 			std::shared_ptr<Cube> get_cube(const math::Vec2 &color, core::sync::EndCaller<Cube> &c);

@@ -31,7 +31,6 @@ namespace gearoenix {
 				Texture2D(const core::Id my_id, const gl::uint txtobj, const std::shared_ptr<engine::Engine>& e);
 				~Texture2D();
 				void bind(const gl::enumerated texture_unit) const;
-				static gl::uint convert_format(const render::texture::TextureFormat::Id f);
 			};
 		}
 	}

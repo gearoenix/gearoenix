@@ -41,6 +41,10 @@ namespace render {
             ~Material();
 			void update_uniform();
 			const std::shared_ptr<buffer::FramedUniform> &get_uniform_buffers() const;
+			const std::shared_ptr<texture::Texture2D> &get_color() const;
+			const std::shared_ptr<texture::Texture2D> &get_metallic_roughness() const;
+			const std::shared_ptr<texture::Texture2D> &get_normal() const;
+			const std::shared_ptr<texture::Texture2D> &get_emissive() const;
         };
     }
 }

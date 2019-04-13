@@ -51,6 +51,7 @@ gearoenix::render::graph::node::ForwardPbrDirectionalShadow::ForwardPbrDirection
 	const std::shared_ptr<texture::Manager> &txtmgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
 	core::sync::EndCaller<texture::Cube> txtcubecall([call](std::shared_ptr<texture::Cube>) {});
 	core::sync::EndCaller<texture::Texture2D> txt2dcall([call](std::shared_ptr<texture::Texture2D>) {});
+
 	input_textures[diffuse_environment_index] = txtmgr->get_cube(math::Vec3(1.0f, 1.0f, 1.0f), txtcubecall);
 	input_textures[specular_environment_index] = txtmgr->get_cube(math::Vec3(1.0f, 1.0f, 1.0f), txtcubecall);
 	input_textures[ambient_occlusion_index] = txtmgr->get_2d(1.0f, txt2dcall);
@@ -64,27 +65,27 @@ gearoenix::render::graph::node::ForwardPbrDirectionalShadow::~ForwardPbrDirectio
 
 void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::set_diffuse_environment(const std::shared_ptr<texture::Cube>& t)
 {
-	set_input_texture(std::static_pointer_cast<texture::Texture>(t), 0);
+	set_input_texture(t, diffuse_environment_index);
 }
 
 void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::set_specular_environment(const std::shared_ptr<texture::Cube>& t)
 {
-	set_input_texture(std::static_pointer_cast<texture::Texture>(t), 1);
+	set_input_texture(t, specular_environment_index);
 }
 
 void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::set_ambient_occlusion(const std::shared_ptr<texture::Texture2D>& t)
 {
-	set_input_texture(t, 2);
+	set_input_texture(t, ambient_occlusion_index);
 }
 
 void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::set_shadow_mapper(const std::shared_ptr<texture::Texture2D>& t)
 {
-	set_input_texture(t, 3);
+	set_input_texture(t, shadow_map_index);
 }
 
 void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::set_brdflut(const std::shared_ptr<texture::Texture2D>& t)
 {
-	set_input_texture(t, 4);
+	set_input_texture(t, brdflut_index);
 }
 
 const std::shared_ptr<gearoenix::render::sync::Semaphore>& gearoenix::render::graph::node::ForwardPbrDirectionalShadow::get_semaphore(const unsigned int frame_number)

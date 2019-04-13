@@ -27,7 +27,13 @@ void gearoenix::render::pipeline::ResourceSet::set_mesh(const std::shared_ptr<me
 	msh = m;
 }
 
-GXHELPER(material, Material)
+void gearoenix::render::pipeline::ResourceSet::set_material(const std::shared_ptr<material::Material>& m) {
+	material_uniform_buffer = m->get_uniform_buffers()->get_buffer();
+	color = m->get_color();
+	metallic_roughness = m->get_metallic_roughness();
+	normal = m->get_normal();
+	emissive = m->get_emissive();
+}
 
 #undef GXHELPER
 

@@ -1,8 +1,6 @@
 #ifndef GEAROEMIX_CORE_STATIC_HPP
 #define GEAROEMIX_CORE_STATIC_HPP
-#ifndef countof
-#define countof(x) (sizeof(x) / sizeof(x[0]))
-#endif
+#define GXCOUNTOF(x) (sizeof(x) / sizeof(x[0]))
 #include "cr-types.hpp"
 #define GXISZERO(x) (((x) < (GXPOSEPSILON)) && ((x) > (GXNEGEPSILON)))
 #define GXISNOTZERO(x) (((x) > (GXPOSEPSILON)) || ((x) < (GXNEGEPSILON)))
