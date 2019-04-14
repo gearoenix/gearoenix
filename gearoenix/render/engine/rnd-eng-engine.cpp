@@ -51,7 +51,8 @@ void gearoenix::render::engine::Engine::terminate()
     sampler_manager = nullptr;
     buffer_manager = nullptr;
 
-	if(fun_loader != nullptr) fun_loader->unload();
+    if (fun_loader != nullptr)
+        fun_loader->unload();
     fun_loader = nullptr;
 }
 

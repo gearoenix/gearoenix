@@ -36,8 +36,8 @@ void GameApp::update()
 
 void GameApp::terminate()
 {
-	gearoenix::core::Application::terminate();
-	scn = nullptr;
+    gearoenix::core::Application::terminate();
+    scn = nullptr;
     cam = nullptr;
     mdl = nullptr;
 }

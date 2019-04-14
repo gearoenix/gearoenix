@@ -12,6 +12,6 @@ gearoenix::core::Application::~Application() {}
 
 void gearoenix::core::Application::terminate()
 {
-	sys_app = nullptr;
-	rnd_eng = nullptr;
+    sys_app = nullptr;
+    rnd_eng = nullptr;
 }
