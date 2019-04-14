@@ -22,7 +22,7 @@ gearoenix::render::camera::Perspective::Perspective(
 {
     const core::Real rad = f->read<core::Real>();
     GXLOGD("Radiant is: " << rad << ", in perspective camera with id: " << my_id);
-    set_vertical_field_of_view(rad);
+    set_field_of_view(rad);
 }
 
 bool gearoenix::render::camera::Perspective::in_sight(const math::Vec3& location, const core::Real radius) const
@@ -63,22 +63,21 @@ gearoenix::core::Real gearoenix::render::camera::Perspective::get_distance(const
     return (model_location - uniform.position_far.xyz()).square_length();
 }
 
-void gearoenix::render::camera::Perspective::set_vertical_field_of_view(const core::Real radian) {
-    fovy = radian;
-    tany = static_cast<core::Real>(std::tan(static_cast<double>(radian)));
-    tanx = tany * uniform.near_aspect_ratio_reserved[1];
-    fovx = static_cast<core::Real>(std::atan(static_cast<double>(tanx)));
+void gearoenix::render::camera::Perspective::set_field_of_view(const core::Real radian) {
+    fovx = radian;
+    tanx = static_cast<core::Real>(std::tan(static_cast<double>(radian * 0.5f)));
+    tany = tanx / uniform.near_aspect_ratio_reserved[1];
+    fovy = static_cast<core::Real>(std::atan(static_cast<double>(tany))) * 2.0f;
     uniform.projection = math::Mat4x4::perspective(
-                tanx * uniform.near_aspect_ratio_reserved[0],
-            tany * uniform.near_aspect_ratio_reserved[0],
-            uniform.near_aspect_ratio_reserved[0],
-            uniform.position_far[3]);
+                tanx * -uniform.near_aspect_ratio_reserved[0],
+            tany * -uniform.near_aspect_ratio_reserved[0],
+            -uniform.near_aspect_ratio_reserved[0],
+            -uniform.position_far[3]);
     uniform.uniform_projection = math::Mat4x4(
                 0.5f, 0.0f, 0.0f, 0.0f,
                 0.0f, 0.5f, 0.0f, 0.0f,
                 0.0f, 0.0f, 1.0f, 0.0f,
                 0.5f, 0.5f, 0.0f, 1.0f) * uniform.projection;
-
     lambda = static_cast<core::Real>(
                 std::sin(static_cast<double>(fovx * 0.5f)) +
                 std::sin(static_cast<double>(fovy * 0.5f))) * 0.5f;

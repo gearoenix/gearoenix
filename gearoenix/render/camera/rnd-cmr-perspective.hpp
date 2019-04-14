@@ -30,7 +30,7 @@ namespace render {
             void on_event(const core::event::Event& e);
             math::Ray3 create_ray3(const core::Real x, const core::Real y) const;
             core::Real get_distance(const math::Vec3 model_location) const;
-            void set_vertical_field_of_view(const core::Real radian);
+            void set_field_of_view(const core::Real radian);
         };
     }
 }
