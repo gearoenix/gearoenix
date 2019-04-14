@@ -95,7 +95,7 @@ const static std::string fragment_shader_code =
     "    float nh = max(dot(normal, halfway), 0.0);\n" // 39
     "    float nh2 = nh * nh;\n" // 40
     "    float nom = roughness2;\n" // 41
-    "    float tmpdenom = (nh2 * (roughness2 - 1.0) + 1.0);\n" // 42
+    "    float tmpdenom = nh2 * (roughness2 - 1.0) + 1.0;\n" // 42
     "    float denom = GXPI * tmpdenom * tmpdenom;\n" // 43
     "    return nom / denom;\n" // 44
     "}\n" // 45
@@ -103,7 +103,7 @@ const static std::string fragment_shader_code =
     "    float r = roughness + 1.0;\n" // 47
     "    float k = (r * r) * (1.0 / 8.0);\n" // 48
     "    float nom = nd;\n" // 49
-    "    float denom = (nd * (1.0 - k)) + k;\n" // 50
+    "    float denom = nd * (1.0 - k) + k;\n" // 50
     "    return nom / denom;\n" // 51
     "}\n" // 52
     "float geometry_smith(const vec3 normal, const vec3 view, const vec3 light, const float roughness) {\n" // 53

@@ -482,26 +482,6 @@ gearoenix::math::Mat4x4 gearoenix::math::Mat4x4::translator(const Vec3& v)
 
 gearoenix::math::Mat4x4 gearoenix::math::Mat4x4::orthographic(const core::Real width, const core::Real height, const core::Real near, const core::Real far)
 {
-#ifdef GX_IN_WINDOWS
-    Mat4x4 r;
-    r.mat[0] = core::Real(2.0 / width);
-    r.mat[1] = core::Real(0.0);
-    r.mat[2] = core::Real(0.0);
-    r.mat[3] = core::Real(0.0);
-    r.mat[4] = core::Real(0.0);
-    r.mat[5] = core::Real(2.0 / height);
-    r.mat[6] = core::Real(0.0);
-    r.mat[7] = core::Real(0.0);
-    r.mat[8] = core::Real(0.0);
-    r.mat[9] = core::Real(0.0);
-    r.mat[10] = core::Real(1.0 / (near - far));
-    r.mat[11] = core::Real(0.0);
-    r.mat[12] = core::Real(0.0);
-    r.mat[13] = core::Real(0.0);
-    r.mat[14] = ((far + near) * 0.5f) / (near - far) + 0.5f;
-    r.mat[15] = core::Real(1.0);
-    return r;
-#else
     Mat4x4 r;
     r.mat[0] = core::Real(2.0f / width);
     r.mat[1] = core::Real(0.0);
@@ -520,31 +500,10 @@ gearoenix::math::Mat4x4 gearoenix::math::Mat4x4::orthographic(const core::Real w
     r.mat[14] = core::Real((far + near) / (near - far));
     r.mat[15] = core::Real(1.0);
     return r;
-#endif
 }
 
 gearoenix::math::Mat4x4 gearoenix::math::Mat4x4::perspective(const core::Real width, const core::Real height, const core::Real near, const core::Real far)
 {
-#ifdef GX_IN_WINDOWS
-    Mat4x4 r;
-    r.mat[0] = core::Real((2.0 * near) / width);
-    r.mat[1] = core::Real(0.0);
-    r.mat[2] = core::Real(0.0);
-    r.mat[3] = core::Real(0.0);
-    r.mat[4] = core::Real(0.0);
-    r.mat[5] = core::Real((2.0 * near) / height);
-    r.mat[6] = core::Real(0.0);
-    r.mat[7] = core::Real(0.0);
-    r.mat[8] = core::Real(0.0);
-    r.mat[9] = core::Real(0.0);
-    r.mat[10] = core::Real((((far + near) * 0.5f) / (near - far)) - 0.5f);
-    r.mat[11] = core::Real(-1.0);
-    r.mat[12] = core::Real(0.0);
-    r.mat[13] = core::Real(0.0);
-    r.mat[14] = core::Real((far * near) / (near - far));
-    r.mat[15] = core::Real(0.0);
-    return r;
-#else
     Mat4x4 r;
     r.mat[0] = core::Real((2.0f * near) / width);
     r.mat[1] = core::Real(0.0);
@@ -563,7 +522,6 @@ gearoenix::math::Mat4x4 gearoenix::math::Mat4x4::perspective(const core::Real wi
     r.mat[14] = core::Real((2.0f * far * near) / (near - far));
     r.mat[15] = core::Real(0.0);
     return r;
-#endif
 }
 
 gearoenix::math::Mat4x4 gearoenix::math::Mat4x4::transposed() const
