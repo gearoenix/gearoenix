@@ -67,7 +67,8 @@ gearoenix::gl::viewport_fnp gearoenix::gl::Loader::viewport;
 void gearoenix::gl::Loader::load_library()
 {
 #ifdef GX_USE_SDL
-	if (SDL_GL_LoadLibrary(nullptr) != 0) GXLOGF("Failed to load OpenGL shared library through SDL2 library loader");
+    if (SDL_GL_LoadLibrary(nullptr) != 0)
+        GXLOGF("Failed to load OpenGL shared library through SDL2 library loader");
 #else
 #error "Not implemented for this platform."
 #endif
@@ -76,83 +77,86 @@ void gearoenix::gl::Loader::load_library()
 void gearoenix::gl::Loader::load_functions()
 {
 #ifdef GX_USE_SDL
-#define GXFUNLDF(name, fun) fun = reinterpret_cast<fun##_fnp>(SDL_GL_GetProcAddress(#name)); if(fun == nullptr) GXLOGF("Failed to load " << #name)
+#define GXFUNLDF(name, fun)                                          \
+    fun = reinterpret_cast<fun##_fnp>(SDL_GL_GetProcAddress(#name)); \
+    if (fun == nullptr)                                              \
+    GXLOGF("Failed to load " << #name)
 #else
 #error "Not implemented for this platform."
 #endif
-	GXFUNLDF(glActiveTexture, active_texture);
-	GXFUNLDF(glAttachShader, attach_shader);
-	GXFUNLDF(glBindAttribLocation, bind_attrib_location);
-	GXFUNLDF(glBindBuffer, bind_buffer);
-	GXFUNLDF(glBindFramebuffer, bind_framebuffer);
-	GXFUNLDF(glBindRenderbuffer, bind_renderbuffer);
-	GXFUNLDF(glBindTexture, bind_texture);
-	GXFUNLDF(glBlendFunc, blend_func);
-	GXFUNLDF(glBufferData, buffer_data);
-	GXFUNLDF(glClearColor, clear_color);
-	GXFUNLDF(glClear, clear);
-	GXFUNLDF(glCompileShader, compile_shader);
-	GXFUNLDF(glCreateProgram, create_program);
-	GXFUNLDF(glCreateShader, create_shader);
-	GXFUNLDF(glCullFace, cull_face);
-	GXFUNLDF(glDeleteBuffers, delete_buffers);
-	GXFUNLDF(glDeleteProgram, delete_program);
-	GXFUNLDF(glDeleteRenderbuffers, delete_renderbuffers);
-	GXFUNLDF(glDeleteShader, delete_shader);
-	GXFUNLDF(glDeleteTextures, delete_textures);
-	GXFUNLDF(glDepthMask, depth_mask);
-	GXFUNLDF(glDrawElements, draw_elements);
-	GXFUNLDF(glEnable, enable);
-	GXFUNLDF(glEnableVertexAttribArray, enable_vertex_attrib_array);
-	GXFUNLDF(glGenBuffers, gen_buffers);
-	GXFUNLDF(glGenTextures, gen_textures);
-	GXFUNLDF(glGenerateMipmap, generate_mipmap);
-	GXFUNLDF(glGetAttribLocation, get_attrib_location);
-	GXFUNLDF(glGetError, get_error);
-	GXFUNLDF(glGetIntegerv, get_integerv);
-	GXFUNLDF(glGetProgramiv, get_programiv);
-	GXFUNLDF(glGetProgramInfoLog, get_program_info_log);
-	GXFUNLDF(glGetShaderiv, get_shaderiv);
-	GXFUNLDF(glGetShaderInfoLog, get_shader_info_log);
-	GXFUNLDF(glGetUniformLocation, get_uniform_location);
-	GXFUNLDF(glLinkProgram, link_program);
-	GXFUNLDF(glTexImage2D, tex_image_2d);
-	GXFUNLDF(glTexParameterf, tex_parameterf);
-	GXFUNLDF(glTexParameterfv, tex_parameterfv);
-	GXFUNLDF(glTexParameteri, tex_parameteri);
-	GXFUNLDF(glTexParameteriv, tex_parameteriv);
-	GXFUNLDF(glScissor, scissor);
-	GXFUNLDF(glShaderSource, shader_source);
-	GXFUNLDF(glUniform1f, uniform1f);
-	GXFUNLDF(glUniform1i, uniform1i);
-	GXFUNLDF(glUniform2fv, uniform2fv);
-	GXFUNLDF(glUniform3fv, uniform3fv);
-	GXFUNLDF(glUniform4fv, uniform4fv);
-	GXFUNLDF(glUniformMatrix2fv, uniform_matrix2fv);
-	GXFUNLDF(glUniformMatrix3fv, uniform_matrix3fv);
-	GXFUNLDF(glUniformMatrix4fv, uniform_matrix4fv);
-	GXFUNLDF(glUseProgram, use_program);
-	GXFUNLDF(glValidateProgram, validate_program);
-	GXFUNLDF(glVertexAttribPointer, vertex_attrib_pointer);
-	GXFUNLDF(glViewport, viewport);
+    GXFUNLDF(glActiveTexture, active_texture);
+    GXFUNLDF(glAttachShader, attach_shader);
+    GXFUNLDF(glBindAttribLocation, bind_attrib_location);
+    GXFUNLDF(glBindBuffer, bind_buffer);
+    GXFUNLDF(glBindFramebuffer, bind_framebuffer);
+    GXFUNLDF(glBindRenderbuffer, bind_renderbuffer);
+    GXFUNLDF(glBindTexture, bind_texture);
+    GXFUNLDF(glBlendFunc, blend_func);
+    GXFUNLDF(glBufferData, buffer_data);
+    GXFUNLDF(glClearColor, clear_color);
+    GXFUNLDF(glClear, clear);
+    GXFUNLDF(glCompileShader, compile_shader);
+    GXFUNLDF(glCreateProgram, create_program);
+    GXFUNLDF(glCreateShader, create_shader);
+    GXFUNLDF(glCullFace, cull_face);
+    GXFUNLDF(glDeleteBuffers, delete_buffers);
+    GXFUNLDF(glDeleteProgram, delete_program);
+    GXFUNLDF(glDeleteRenderbuffers, delete_renderbuffers);
+    GXFUNLDF(glDeleteShader, delete_shader);
+    GXFUNLDF(glDeleteTextures, delete_textures);
+    GXFUNLDF(glDepthMask, depth_mask);
+    GXFUNLDF(glDrawElements, draw_elements);
+    GXFUNLDF(glEnable, enable);
+    GXFUNLDF(glEnableVertexAttribArray, enable_vertex_attrib_array);
+    GXFUNLDF(glGenBuffers, gen_buffers);
+    GXFUNLDF(glGenTextures, gen_textures);
+    GXFUNLDF(glGenerateMipmap, generate_mipmap);
+    GXFUNLDF(glGetAttribLocation, get_attrib_location);
+    GXFUNLDF(glGetError, get_error);
+    GXFUNLDF(glGetIntegerv, get_integerv);
+    GXFUNLDF(glGetProgramiv, get_programiv);
+    GXFUNLDF(glGetProgramInfoLog, get_program_info_log);
+    GXFUNLDF(glGetShaderiv, get_shaderiv);
+    GXFUNLDF(glGetShaderInfoLog, get_shader_info_log);
+    GXFUNLDF(glGetUniformLocation, get_uniform_location);
+    GXFUNLDF(glLinkProgram, link_program);
+    GXFUNLDF(glTexImage2D, tex_image_2d);
+    GXFUNLDF(glTexParameterf, tex_parameterf);
+    GXFUNLDF(glTexParameterfv, tex_parameterfv);
+    GXFUNLDF(glTexParameteri, tex_parameteri);
+    GXFUNLDF(glTexParameteriv, tex_parameteriv);
+    GXFUNLDF(glScissor, scissor);
+    GXFUNLDF(glShaderSource, shader_source);
+    GXFUNLDF(glUniform1f, uniform1f);
+    GXFUNLDF(glUniform1i, uniform1i);
+    GXFUNLDF(glUniform2fv, uniform2fv);
+    GXFUNLDF(glUniform3fv, uniform3fv);
+    GXFUNLDF(glUniform4fv, uniform4fv);
+    GXFUNLDF(glUniformMatrix2fv, uniform_matrix2fv);
+    GXFUNLDF(glUniformMatrix3fv, uniform_matrix3fv);
+    GXFUNLDF(glUniformMatrix4fv, uniform_matrix4fv);
+    GXFUNLDF(glUseProgram, use_program);
+    GXFUNLDF(glValidateProgram, validate_program);
+    GXFUNLDF(glVertexAttribPointer, vertex_attrib_pointer);
+    GXFUNLDF(glViewport, viewport);
 }
 
 void gearoenix::gl::Loader::check_for_error()
 {
-	switch (get_error()) {
-	case GL_NO_ERROR:
-		break;
-	case GL_INVALID_ENUM:
-		GXLOGF("Invalid enum");
-	case GL_INVALID_VALUE:
-		GXLOGF("Invalid value");
-	case GL_INVALID_OPERATION:
-		GXLOGF("Invalid operation");
-	case GL_INVALID_FRAMEBUFFER_OPERATION:
-		GXLOGF("Invalid framebuffer operation error.");
-	case GL_OUT_OF_MEMORY:
-		GXLOGF("Out of memory error.");
-	default:
-		GXLOGF("Unknown error.");
-	}
+    switch (get_error()) {
+    case GL_NO_ERROR:
+        break;
+    case GL_INVALID_ENUM:
+        GXLOGF("Invalid enum");
+    case GL_INVALID_VALUE:
+        GXLOGF("Invalid value");
+    case GL_INVALID_OPERATION:
+        GXLOGF("Invalid operation");
+    case GL_INVALID_FRAMEBUFFER_OPERATION:
+        GXLOGF("Invalid framebuffer operation error.");
+    case GL_OUT_OF_MEMORY:
+        GXLOGF("Out of memory error.");
+    default:
+        GXLOGF("Unknown error.");
+    }
 }

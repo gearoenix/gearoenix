@@ -4,9 +4,10 @@
 namespace gearoenix {
 namespace render {
     namespace buffer {
-        class Dynamic: public Buffer {
+        class Dynamic : public Buffer {
         protected:
             Dynamic(const unsigned int s, const std::shared_ptr<engine::Engine>& e);
+
         public:
             virtual ~Dynamic();
         };

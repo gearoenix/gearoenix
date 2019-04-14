@@ -1,26 +1,26 @@
 #include "test-config.hpp"
 #ifdef GX_TEST003
+#include "../core/cr-static.hpp"
 #include "../math/math-aabb.hpp"
 #include "../math/math-matrix.hpp"
+#include "../math/math-quaternion.hpp"
 #include "../math/math-ray.hpp"
 #include "../math/math-triangle.hpp"
 #include "../math/math-vector.hpp"
 #include "../system/sys-log.hpp"
-#include "../math/math-quaternion.hpp"
-#include "../core/cr-static.hpp"
 #include <chrono>
 #define GLM_FORCE_CXX14
 #define GLM_FORCE_SIMD_SSE42
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/quaternion.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/quaternion.hpp>
 #include <glm/mat4x4.hpp>
 #include <glm/trigonometric.hpp>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
-#include <glm/gtc/quaternion.hpp>
-#include <glm/gtx/quaternion.hpp>
 #include <random>
 
 static std::random_device rd;
@@ -69,9 +69,12 @@ void check_eq(const gearoenix::core::Real f1, const gearoenix::core::Real f2)
 {
     const float v1 = std::abs(f1 - f2);
     const float v2 = std::abs(f1 + f2);
-    if(GXISZERO(v1) && GXISZERO(v2)) return;
-    if(GXISZERO(v2) && GXISNOTZERO(v1)) GXUNEXPECTED;
-    if (f1 / f2 > 0.01f) GXUNEXPECTED;
+    if (GXISZERO(v1) && GXISZERO(v2))
+        return;
+    if (GXISZERO(v2) && GXISNOTZERO(v1))
+        GXUNEXPECTED;
+    if (f1 / f2 > 0.01f)
+        GXUNEXPECTED;
 }
 
 void check(glm::mat4& m1, gearoenix::math::Mat4x4& m2)

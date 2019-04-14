@@ -14,7 +14,7 @@ namespace render {
         class Engine;
     }
     namespace camera {
-    class Camera;
+        class Camera;
         class Manager {
         protected:
             const std::shared_ptr<engine::Engine> e;
@@ -23,7 +23,7 @@ namespace render {
         public:
             Manager(const std::shared_ptr<system::stream::Stream>& s, const std::shared_ptr<engine::Engine>& e);
             ~Manager();
-			std::shared_ptr<Camera> get_gx3d(const core::Id cid, core::sync::EndCaller<Camera> &call);
+            std::shared_ptr<Camera> get_gx3d(const core::Id cid, core::sync::EndCaller<Camera>& call);
         };
     }
 }

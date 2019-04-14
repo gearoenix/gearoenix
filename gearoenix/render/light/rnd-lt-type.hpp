@@ -7,11 +7,11 @@ namespace render {
     namespace light {
         class Type {
         public:
-			typedef enum : core::TypeId {
-				CONE = 1,
-				DIRECTIONAL = 2,
-				POINT = 3,
-			} Id;
+            typedef enum : core::TypeId {
+                CONE = 1,
+                DIRECTIONAL = 2,
+                POINT = 3,
+            } Id;
         };
     }
 }

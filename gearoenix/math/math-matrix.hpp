@@ -38,7 +38,7 @@ namespace math {
             core::Real e4, core::Real e5, core::Real e6, core::Real e7,
             core::Real e8, core::Real e9, core::Real e10, core::Real e11,
             core::Real e12, core::Real e13, core::Real e14, core::Real e15);
-        Mat4x4(const std::shared_ptr<system::stream::Stream> &f);
+        Mat4x4(const std::shared_ptr<system::stream::Stream>& f);
         Mat4x4(const Mat4x4& m);
         Vec3 operator*(const Vec3& v) const;
         Vec4 operator*(const Vec4& v) const;
@@ -47,33 +47,33 @@ namespace math {
         void operator*=(const Mat4x4& m);
         const core::Real& operator[](const unsigned int i) const;
         core::Real& operator[](const unsigned int i);
-		/// It does not change location
+        /// It does not change location
         void local_scale(const core::Real& s);
-		/// It does not change location
-		void local_scale(const core::Real& a, const core::Real& b, const core::Real& c);
-		/// It changes location
-		void local_scale(const core::Real& a, const core::Real& b, const core::Real& c, const core::Real& d);
-		/// It does not change location
-		void local_scale(const Vec3 &s);
-		/// It changes location
-		void local_scale(const Vec4 &s);
-		/// It does not change location
-		void global_scale(const core::Real& s);
-		/// It does not change location
-		void global_scale(const core::Real& a, const core::Real& b, const core::Real& c);
-		/// It changes location
-		void global_scale(const core::Real& a, const core::Real& b, const core::Real& c, const core::Real& d);
-		/// It does not change location
-		void global_scale(const Vec3 &s);
-		/// It changes location
-		void global_scale(const Vec4 &s);
+        /// It does not change location
+        void local_scale(const core::Real& a, const core::Real& b, const core::Real& c);
+        /// It changes location
+        void local_scale(const core::Real& a, const core::Real& b, const core::Real& c, const core::Real& d);
+        /// It does not change location
+        void local_scale(const Vec3& s);
+        /// It changes location
+        void local_scale(const Vec4& s);
+        /// It does not change location
+        void global_scale(const core::Real& s);
+        /// It does not change location
+        void global_scale(const core::Real& a, const core::Real& b, const core::Real& c);
+        /// It changes location
+        void global_scale(const core::Real& a, const core::Real& b, const core::Real& c, const core::Real& d);
+        /// It does not change location
+        void global_scale(const Vec3& s);
+        /// It changes location
+        void global_scale(const Vec4& s);
         void translate(const Vec3& v);
         void set_location_zero();
         void set_location(const Vec3& location);
         void get_location(Vec3& location) const;
         void inverse();
         void transpose();
-        void read(const std::shared_ptr<system::stream::Stream> &f);
+        void read(const std::shared_ptr<system::stream::Stream>& f);
         core::Real determinant() const;
         Mat4x4 inversed() const;
         Mat4x4 transposed() const;

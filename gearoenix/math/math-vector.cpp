@@ -120,31 +120,31 @@ gearoenix::core::Real& gearoenix::math::Vec2::operator[](const int i)
     return vec[i];
 }
 
-bool gearoenix::math::Vec2::operator<(const Vec2 & o) const
+bool gearoenix::math::Vec2::operator<(const Vec2& o) const
 {
-	if (vec[0] < o.vec[0]) {
-		return true;
-	}
-	if (vec[0] != o.vec[0]) {
-		return false;
-	}
-	return vec[1] < o.vec[1];
+    if (vec[0] < o.vec[0]) {
+        return true;
+    }
+    if (vec[0] != o.vec[0]) {
+        return false;
+    }
+    return vec[1] < o.vec[1];
 }
 
-bool gearoenix::math::Vec2::operator==(const Vec2 & o) const
+bool gearoenix::math::Vec2::operator==(const Vec2& o) const
 {
-	return vec[0] == o.vec[0] && vec[1] == o.vec[1];
+    return vec[0] == o.vec[0] && vec[1] == o.vec[1];
 }
 
-bool gearoenix::math::Vec2::operator>(const Vec2 & o) const
+bool gearoenix::math::Vec2::operator>(const Vec2& o) const
 {
-	if (vec[0] > o.vec[0]) {
-		return true;
-	}
-	if (vec[0] != o.vec[0]) {
-		return false;
-	}
-	return vec[1] > o.vec[1];
+    if (vec[0] > o.vec[0]) {
+        return true;
+    }
+    if (vec[0] != o.vec[0]) {
+        return false;
+    }
+    return vec[1] > o.vec[1];
 }
 
 gearoenix::core::Real gearoenix::math::Vec2::dot(const Vec2& o) const
@@ -207,7 +207,7 @@ void gearoenix::math::Vec2::normalize()
     vec[1] *= l;
 }
 
-void gearoenix::math::Vec2::read(const std::shared_ptr<system::stream::Stream> &f)
+void gearoenix::math::Vec2::read(const std::shared_ptr<system::stream::Stream>& f)
 {
     f->read(vec[0]);
     f->read(vec[1]);
@@ -277,22 +277,22 @@ const gearoenix::math::Vec3 gearoenix::math::Vec3::Y(0.0f, 1.0f, 0.0f);
 const gearoenix::math::Vec3 gearoenix::math::Vec3::Z(0.0f, 0.0f, 1.0f);
 
 gearoenix::math::Vec3::Vec3()
-    : vec {0.0f, 0.0f, 0.0f}
+    : vec { 0.0f, 0.0f, 0.0f }
 {
 }
 
 gearoenix::math::Vec3::Vec3(const core::Real e)
-    : vec {e, e, e}
+    : vec { e, e, e }
 {
 }
 
 gearoenix::math::Vec3::Vec3(const core::Real x, const core::Real y, const core::Real z)
-    : vec {x, y, z}
+    : vec { x, y, z }
 {
 }
 
 gearoenix::math::Vec3::Vec3(const math::Vec2& o, const core::Real e)
-    : vec {o[0], o[1], e}
+    : vec { o[0], o[1], e }
 {
 }
 
@@ -417,43 +417,43 @@ gearoenix::core::Real& gearoenix::math::Vec3::operator[](const int i)
     return vec[i];
 }
 
-bool gearoenix::math::Vec3::operator<(const Vec3 & o) const
+bool gearoenix::math::Vec3::operator<(const Vec3& o) const
 {
-	if (vec[0] < o.vec[0]) {
-		return true;
-	}
-	if (vec[0] != o.vec[0]) {
-		return false;
-	}
-	if (vec[1] < o.vec[1]) {
-		return true;
-	}
-	if (vec[1] != o.vec[1]) {
-		return false;
-	}
-	return vec[2] < o.vec[2];
+    if (vec[0] < o.vec[0]) {
+        return true;
+    }
+    if (vec[0] != o.vec[0]) {
+        return false;
+    }
+    if (vec[1] < o.vec[1]) {
+        return true;
+    }
+    if (vec[1] != o.vec[1]) {
+        return false;
+    }
+    return vec[2] < o.vec[2];
 }
 
-bool gearoenix::math::Vec3::operator==(const Vec3 & o) const
+bool gearoenix::math::Vec3::operator==(const Vec3& o) const
 {
-	return vec[0] == o.vec[0] && vec[1] == o.vec[1] && vec[2] == o.vec[2];
+    return vec[0] == o.vec[0] && vec[1] == o.vec[1] && vec[2] == o.vec[2];
 }
 
-bool gearoenix::math::Vec3::operator>(const Vec3 & o) const
+bool gearoenix::math::Vec3::operator>(const Vec3& o) const
 {
-	if (vec[0] > o.vec[0]) {
-		return true;
-	}
-	if (vec[0] != o.vec[0]) {
-		return false;
-	}
-	if (vec[1] > o.vec[1]) {
-		return true;
-	}
-	if (vec[1] != o.vec[1]) {
-		return false;
-	}
-	return vec[2] > o.vec[2];
+    if (vec[0] > o.vec[0]) {
+        return true;
+    }
+    if (vec[0] != o.vec[0]) {
+        return false;
+    }
+    if (vec[1] > o.vec[1]) {
+        return true;
+    }
+    if (vec[1] != o.vec[1]) {
+        return false;
+    }
+    return vec[2] > o.vec[2];
 }
 
 gearoenix::math::Vec2 gearoenix::math::Vec3::xy() const
@@ -527,7 +527,7 @@ void gearoenix::math::Vec3::normalize()
     vec[2] *= l;
 }
 
-void gearoenix::math::Vec3::read(const std::shared_ptr<system::stream::Stream> &f)
+void gearoenix::math::Vec3::read(const std::shared_ptr<system::stream::Stream>& f)
 {
     f->read(vec[0]);
     f->read(vec[1]);
@@ -554,12 +554,12 @@ gearoenix::math::Vec4::Vec4(core::Real x, core::Real y, core::Real z, core::Real
     vec[3] = w;
 }
 
-gearoenix::math::Vec4::Vec4(const Vec2 & v, core::Real z, core::Real w)
+gearoenix::math::Vec4::Vec4(const Vec2& v, core::Real z, core::Real w)
 {
-	vec[0] = v[0];
-	vec[1] = v[1];
-	vec[2] = z;
-	vec[3] = w;
+    vec[0] = v[0];
+    vec[1] = v[1];
+    vec[2] = z;
+    vec[3] = w;
 }
 
 gearoenix::math::Vec4::Vec4(core::Real e)
@@ -636,55 +636,55 @@ gearoenix::core::Real& gearoenix::math::Vec4::operator[](const int i)
     return vec[i];
 }
 
-bool gearoenix::math::Vec4::operator<(const Vec4 & o) const
+bool gearoenix::math::Vec4::operator<(const Vec4& o) const
 {
-	if (vec[0] < o.vec[0]) {
-		return true;
-	}
-	if (vec[0] != o.vec[0]) {
-		return false;
-	}
-	if (vec[1] < o.vec[1]) {
-		return true;
-	}
-	if (vec[1] != o.vec[1]) {
-		return false;
-	}
-	if (vec[2] < o.vec[2]) {
-		return true;
-	}
-	if (vec[2] != o.vec[2]) {
-		return false;
-	}
-	return vec[3] < o.vec[3];
+    if (vec[0] < o.vec[0]) {
+        return true;
+    }
+    if (vec[0] != o.vec[0]) {
+        return false;
+    }
+    if (vec[1] < o.vec[1]) {
+        return true;
+    }
+    if (vec[1] != o.vec[1]) {
+        return false;
+    }
+    if (vec[2] < o.vec[2]) {
+        return true;
+    }
+    if (vec[2] != o.vec[2]) {
+        return false;
+    }
+    return vec[3] < o.vec[3];
 }
 
-bool gearoenix::math::Vec4::operator==(const Vec4 & o) const
+bool gearoenix::math::Vec4::operator==(const Vec4& o) const
 {
-	return vec[0] == o.vec[0] && vec[1] == o.vec[1] && vec[2] == o.vec[2]  && vec[3] == o.vec[3];
+    return vec[0] == o.vec[0] && vec[1] == o.vec[1] && vec[2] == o.vec[2] && vec[3] == o.vec[3];
 }
 
-bool gearoenix::math::Vec4::operator>(const Vec4 & o) const
+bool gearoenix::math::Vec4::operator>(const Vec4& o) const
 {
-	if (vec[0] > o.vec[0]) {
-		return true;
-	}
-	if (vec[0] != o.vec[0]) {
-		return false;
-	}
-	if (vec[1] > o.vec[1]) {
-		return true;
-	}
-	if (vec[1] != o.vec[1]) {
-		return false;
-	}
-	if (vec[2] > o.vec[2]) {
-		return true;
-	}
-	if (vec[2] != o.vec[2]) {
-		return false;
-	}
-	return vec[3] > o.vec[3];
+    if (vec[0] > o.vec[0]) {
+        return true;
+    }
+    if (vec[0] != o.vec[0]) {
+        return false;
+    }
+    if (vec[1] > o.vec[1]) {
+        return true;
+    }
+    if (vec[1] != o.vec[1]) {
+        return false;
+    }
+    if (vec[2] > o.vec[2]) {
+        return true;
+    }
+    if (vec[2] != o.vec[2]) {
+        return false;
+    }
+    return vec[3] > o.vec[3];
 }
 
 gearoenix::core::Real gearoenix::math::Vec4::dot(const Vec4& o) const
@@ -709,14 +709,14 @@ gearoenix::math::Vec4 gearoenix::math::Vec4::normalized() const
 
 void gearoenix::math::Vec4::normalize()
 {
-	const core::Real ilen = 1.0f / static_cast<core::Real>(sqrt(static_cast<double>(vec[0] * vec[0] + vec[1] * vec[1] + vec[2] * vec[2] + vec[3] * vec[3])));
-	vec[0] *= ilen;
-	vec[1] *= ilen;
-	vec[2] *= ilen;
-	vec[3] *= ilen;
+    const core::Real ilen = 1.0f / static_cast<core::Real>(sqrt(static_cast<double>(vec[0] * vec[0] + vec[1] * vec[1] + vec[2] * vec[2] + vec[3] * vec[3])));
+    vec[0] *= ilen;
+    vec[1] *= ilen;
+    vec[2] *= ilen;
+    vec[3] *= ilen;
 }
 
-void gearoenix::math::Vec4::read(const std::shared_ptr<system::stream::Stream> &f)
+void gearoenix::math::Vec4::read(const std::shared_ptr<system::stream::Stream>& f)
 {
     f->read(vec[0]);
     f->read(vec[1]);

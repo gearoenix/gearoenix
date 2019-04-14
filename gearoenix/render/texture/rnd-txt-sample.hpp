@@ -6,11 +6,11 @@ namespace gearoenix {
 namespace render {
     namespace texture {
         struct SampleInfo {
-			Filter::Id min_filter = Filter::LINEAR;
-			Filter::Id mag_filter = Filter::LINEAR;
-			Wrap::Id wrap_s = Wrap::REPEAT;
-			Wrap::Id wrap_t = Wrap::REPEAT;
-			Wrap::Id wrap_r = Wrap::REPEAT;
+            Filter::Id min_filter = Filter::LINEAR;
+            Filter::Id mag_filter = Filter::LINEAR;
+            Wrap::Id wrap_s = Wrap::REPEAT;
+            Wrap::Id wrap_t = Wrap::REPEAT;
+            Wrap::Id wrap_r = Wrap::REPEAT;
         };
     }
 }

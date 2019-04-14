@@ -3,17 +3,18 @@
 #include "../../gl/gl-types.hpp"
 #include <memory>
 namespace gearoenix {
-	namespace gles2 {
-		namespace shader {
-			class Shader;
-		}
+namespace gles2 {
+    namespace shader {
+        class Shader;
+    }
     namespace pipeline {
         class ResourceSet {
-		protected:
-			const std::shared_ptr<shader::Shader> shd;
-		public:
-			ResourceSet(const std::shared_ptr<shader::Shader> &shd);
-			virtual void bind(gl::uint &bound_shader_program) const;
+        protected:
+            const std::shared_ptr<shader::Shader> shd;
+
+        public:
+            ResourceSet(const std::shared_ptr<shader::Shader>& shd);
+            virtual void bind(gl::uint& bound_shader_program) const;
         };
     }
 }

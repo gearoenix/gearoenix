@@ -24,7 +24,7 @@ namespace render {
     }
     namespace model {
         class Model;
-		class Mesh;
+        class Mesh;
     }
     namespace pipeline {
         class ForwardPbrDirectionalShadow;
@@ -65,11 +65,11 @@ namespace render {
                 std::vector<std::shared_ptr<ForwardPbrDirectionalShadowFrame>> frames;
 
             public:
-				const static unsigned int diffuse_environment_index;
-				const static unsigned int specular_environment_index;
-				const static unsigned int ambient_occlusion_index;
-				const static unsigned int shadow_map_index;
-				const static unsigned int brdflut_index;
+                const static unsigned int diffuse_environment_index;
+                const static unsigned int specular_environment_index;
+                const static unsigned int ambient_occlusion_index;
+                const static unsigned int shadow_map_index;
+                const static unsigned int brdflut_index;
 
                 ForwardPbrDirectionalShadow(const std::shared_ptr<engine::Engine>& e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call);
                 ~ForwardPbrDirectionalShadow() override final;
@@ -80,10 +80,10 @@ namespace render {
                 void set_shadow_mapper(const std::shared_ptr<texture::Texture2D>& t);
                 void set_brdflut(const std::shared_ptr<texture::Texture2D>& t);
 
-				const std::shared_ptr<sync::Semaphore>& get_semaphore(const unsigned int frame_number);
+                const std::shared_ptr<sync::Semaphore>& get_semaphore(const unsigned int frame_number);
                 /// This will be called at the start of each frame
                 void update();
-				/// Multithreaded rendering happens in here
+                /// Multithreaded rendering happens in here
                 void record(
                     const std::shared_ptr<scene::Scene>& s,
                     const std::shared_ptr<camera::Camera>& c,

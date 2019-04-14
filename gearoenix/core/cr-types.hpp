@@ -7,8 +7,8 @@
 
 namespace gearoenix {
 namespace core {
-typedef std::uint64_t Id;
-typedef std::uint8_t TypeId;
+    typedef std::uint64_t Id;
+    typedef std::uint8_t TypeId;
     typedef std::uint64_t Count;
     typedef std::int64_t Offset;
     typedef float Real;

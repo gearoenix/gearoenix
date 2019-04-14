@@ -11,45 +11,45 @@ gearoenix::render::light::Light::Light(
     const std::shared_ptr<engine::Engine>& e)
     : core::asset::Asset(my_id, core::asset::Type::LIGHT)
 {
-	color.read(f);
-	has_shadow = f->read_bool();
+    color.read(f);
+    has_shadow = f->read_bool();
 }
 
 gearoenix::render::light::Light::~Light() {}
 
-const gearoenix::math::Vec4 & gearoenix::render::light::Light::get_color() const
+const gearoenix::math::Vec4& gearoenix::render::light::Light::get_color() const
 {
-	return color;
+    return color;
 }
 
 bool gearoenix::render::light::Light::is_shadower() const
 {
-	return has_shadow;
+    return has_shadow;
 }
 
 void gearoenix::render::light::Light::enable_shadowing()
 {
-	has_shadow = true;
+    has_shadow = true;
 }
 
 void gearoenix::render::light::Light::disable_shadowing()
 {
-	has_shadow = false;
+    has_shadow = false;
 }
 
 bool gearoenix::render::light::Light::is_enabled() const
 {
-	return enabled;
+    return enabled;
 }
 
 void gearoenix::render::light::Light::enable()
 {
-	enabled = true;
+    enabled = true;
 }
 
 void gearoenix::render::light::Light::disable()
 {
-	enabled = false;
+    enabled = false;
 }
 
 void gearoenix::render::light::Light::update_uniform()
@@ -58,5 +58,5 @@ void gearoenix::render::light::Light::update_uniform()
 
 const std::shared_ptr<gearoenix::render::buffer::FramedUniform>& gearoenix::render::light::Light::get_uniform_buffers() const
 {
-	return null_uniforms;
+    return null_uniforms;
 }

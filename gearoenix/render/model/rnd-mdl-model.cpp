@@ -20,23 +20,22 @@
 #include <iostream>
 
 gearoenix::render::model::Model::Model(
-	const core::Id my_id,
-	const std::shared_ptr<system::stream::Stream>& f,
-	const std::shared_ptr<engine::Engine>& e,
-	const core::sync::EndCaller<core::sync::EndCallerIgnore>& c,
-	const bool is_dynamic)
-	: core::asset::Asset(my_id, core::asset::Type::MODEL)
-	, e(e)
-	, uniform_buffers(std::make_shared<buffer::FramedUniform>(static_cast<const unsigned int>(sizeof(Uniform)), e))
+    const core::Id my_id,
+    const std::shared_ptr<system::stream::Stream>& f,
+    const std::shared_ptr<engine::Engine>& e,
+    const core::sync::EndCaller<core::sync::EndCallerIgnore>& c,
+    const bool is_dynamic)
+    : core::asset::Asset(my_id, core::asset::Type::MODEL)
+    , e(e)
+    , uniform_buffers(std::make_shared<buffer::FramedUniform>(static_cast<const unsigned int>(sizeof(Uniform)), e))
 {
-	uniform.m.read(f);
-	const core::Count meshes_count = f->read<core::Count>();
-	const std::shared_ptr<core::asset::Manager> &astmgr = e->get_system_application()->get_asset_manager();
-    for (core::Count i = 0; i < meshes_count; ++i)
-    {
+    uniform.m.read(f);
+    const core::Count meshes_count = f->read<core::Count>();
+    const std::shared_ptr<core::asset::Manager>& astmgr = e->get_system_application()->get_asset_manager();
+    for (core::Count i = 0; i < meshes_count; ++i) {
         add_mesh(std::make_shared<Mesh>(f, e, c));
     }
-	/*std::vector<core::Id> children_ids;
+    /*std::vector<core::Id> children_ids;
 	if (children_ids.size() > 0)
 	{
 		core::sync::EndCaller<Model> call([](const std::shared_ptr<Model>) {});
@@ -50,11 +49,11 @@ gearoenix::render::model::Model::Model(
 }
 
 gearoenix::render::model::Model::Model(
-	const std::shared_ptr<engine::Engine>& e,
-	const core::sync::EndCaller<core::sync::EndCallerIgnore>& c)
-	: core::asset::Asset(e->get_system_application()->get_asset_manager()->create_id(), core::asset::Type::MODEL)
-	, e(e)
-	, uniform_buffers(std::make_shared<buffer::FramedUniform>(static_cast<const unsigned int>(sizeof(Uniform)), e))
+    const std::shared_ptr<engine::Engine>& e,
+    const core::sync::EndCaller<core::sync::EndCallerIgnore>& c)
+    : core::asset::Asset(e->get_system_application()->get_asset_manager()->create_id(), core::asset::Type::MODEL)
+    , e(e)
+    , uniform_buffers(std::make_shared<buffer::FramedUniform>(static_cast<const unsigned int>(sizeof(Uniform)), e))
 {
 }
 
@@ -64,21 +63,20 @@ gearoenix::render::model::Model::~Model()
 
 void gearoenix::render::model::Model::update_uniform()
 {
-	uniform_buffers->update(&uniform);
-	for (const std::pair<core::Id, std::shared_ptr<Mesh>> &msh : meshes)
-		msh.second->update_uniform();
-	for (const std::pair<core::Id, std::shared_ptr<Model>> &ch : children)
-		ch.second->update_uniform();
+    uniform_buffers->update(&uniform);
+    for (const std::pair<core::Id, std::shared_ptr<Mesh>>& msh : meshes)
+        msh.second->update_uniform();
+    for (const std::pair<core::Id, std::shared_ptr<Model>>& ch : children)
+        ch.second->update_uniform();
 }
 
 void gearoenix::render::model::Model::add_mesh(const std::shared_ptr<Mesh>& m)
 {
-	meshes[m->get_mesh()->get_asset_id()] = m;
+    meshes[m->get_mesh()->get_asset_id()] = m;
 }
 
 void gearoenix::render::model::Model::add_child(const std::shared_ptr<Model>& c)
 {
-
 }
 
 //    //std::lock_guard<std::mutex> lg(locker);
@@ -141,25 +139,25 @@ void gearoenix::render::model::Model::add_child(const std::shared_ptr<Model>& c)
 
 const std::map<gearoenix::core::Id, std::shared_ptr<gearoenix::render::model::Model>>& gearoenix::render::model::Model::get_children() const
 {
-	return children;
+    return children;
 }
 
 const std::map<gearoenix::core::Id, std::shared_ptr<gearoenix::render::model::Mesh>>& gearoenix::render::model::Model::get_meshes() const
 {
-	return meshes;
+    return meshes;
 }
 
 const std::shared_ptr<gearoenix::physics::collider::Collider>& gearoenix::render::model::Model::get_collider() const
 {
-	return collider;
+    return collider;
 }
 
 const std::shared_ptr<gearoenix::render::buffer::FramedUniform>& gearoenix::render::model::Model::get_uniform_buffers() const
 {
-	return uniform_buffers;
+    return uniform_buffers;
 }
 
 const gearoenix::math::Mat4x4& gearoenix::render::model::Model::get_model_matrix() const
 {
-	return uniform.m;
+    return uniform.m;
 }

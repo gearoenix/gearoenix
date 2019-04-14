@@ -1,6 +1,6 @@
 #include "rnd-eng-engine.hpp"
-#include "../../core/cr-function-loader.hpp"
 #include "../../core/asset/cr-asset-manager.hpp"
+#include "../../core/cr-function-loader.hpp"
 #include "../../core/event/cr-ev-event.hpp"
 #include "../../core/event/cr-ev-sys-system.hpp"
 #include "../../core/sync/cr-sync-kernel-workers.hpp"
@@ -17,53 +17,50 @@
 gearoenix::render::engine::Engine::Engine(const std::shared_ptr<system::Application>& system_application, const Type::Id engine_type_id)
     : engine_type_id(engine_type_id)
     , sysapp(system_application)
-	, fun_loader(new core::FunctionLoader())
+    , fun_loader(new core::FunctionLoader())
     , physics_engine(new physics::Engine(system_application))
-	, kernels(new core::sync::KernelWorker())
+    , kernels(new core::sync::KernelWorker())
 {
-	kernels->add_step([this](const unsigned int kernel_index) {
-		render_tree->record(kernel_index);
-	}, [this] {
-		render_tree->submit();
-	});
+    kernels->add_step([this](const unsigned int kernel_index) { render_tree->record(kernel_index); }, [this] { render_tree->submit(); });
 }
 
 gearoenix::render::engine::Engine::~Engine()
 {
-	terminate();
+    terminate();
 }
 
-void gearoenix::render::engine::Engine::update() {
-	++frame_number;
-	frame_number %= frames_count;
-	physics_engine->update();
-	fun_loader->unload();
-	render_tree->update();
-	kernels->do_steps();
+void gearoenix::render::engine::Engine::update()
+{
+    ++frame_number;
+    frame_number %= frames_count;
+    physics_engine->update();
+    fun_loader->unload();
+    render_tree->update();
+    kernels->do_steps();
 }
 
 void gearoenix::render::engine::Engine::terminate()
 {
-	sysapp = nullptr;
-	fun_loader = nullptr;
-	physics_engine = nullptr;
-	kernels = nullptr;
-	render_tree = nullptr;
-	main_render_target = nullptr;
-	pipeline_manager = nullptr;
-	command_manager = nullptr;
-	sampler_manager = nullptr;
-	buffer_manager = nullptr;
+    sysapp = nullptr;
+    fun_loader = nullptr;
+    physics_engine = nullptr;
+    kernels = nullptr;
+    render_tree = nullptr;
+    main_render_target = nullptr;
+    pipeline_manager = nullptr;
+    command_manager = nullptr;
+    sampler_manager = nullptr;
+    buffer_manager = nullptr;
 }
 
 void gearoenix::render::engine::Engine::set_render_tree(const std::shared_ptr<graph::tree::Tree>& tree)
 {
-	render_tree = tree;
+    render_tree = tree;
 }
 
 const std::shared_ptr<gearoenix::system::Application>& gearoenix::render::engine::Engine::get_system_application() const
 {
-	return sysapp;
+    return sysapp;
 }
 
 const std::shared_ptr<gearoenix::physics::Engine>& gearoenix::render::engine::Engine::get_physics_engine() const
@@ -71,45 +68,47 @@ const std::shared_ptr<gearoenix::physics::Engine>& gearoenix::render::engine::En
     return physics_engine;
 }
 
-const std::shared_ptr<gearoenix::render::pipeline::Manager> &gearoenix::render::engine::Engine::get_pipeline_manager() const {
-	return pipeline_manager;
+const std::shared_ptr<gearoenix::render::pipeline::Manager>& gearoenix::render::engine::Engine::get_pipeline_manager() const
+{
+    return pipeline_manager;
 }
 
-const std::shared_ptr<gearoenix::render::command::Manager> &gearoenix::render::engine::Engine::get_command_manager() const {
-	return command_manager;
+const std::shared_ptr<gearoenix::render::command::Manager>& gearoenix::render::engine::Engine::get_command_manager() const
+{
+    return command_manager;
 }
 
 const std::shared_ptr<gearoenix::render::buffer::Manager>& gearoenix::render::engine::Engine::get_buffer_manager() const
 {
-	return buffer_manager;
+    return buffer_manager;
 }
 
 const std::shared_ptr<gearoenix::core::sync::KernelWorker>& gearoenix::render::engine::Engine::get_kernels() const
 {
-	return kernels;
+    return kernels;
 }
 
 const std::shared_ptr<gearoenix::core::FunctionLoader>& gearoenix::render::engine::Engine::get_function_loader() const
 {
-	return fun_loader;
+    return fun_loader;
 }
 
 gearoenix::render::engine::Type::Id gearoenix::render::engine::Engine::get_engine_type_id() const
 {
-	return engine_type_id;
+    return engine_type_id;
 }
 
-const std::shared_ptr<gearoenix::render::texture::Target> &gearoenix::render::engine::Engine::get_main_render_target() const
+const std::shared_ptr<gearoenix::render::texture::Target>& gearoenix::render::engine::Engine::get_main_render_target() const
 {
-	return main_render_target;
+    return main_render_target;
 }
 
 unsigned int gearoenix::render::engine::Engine::get_frame_number() const
 {
-	return frame_number;
+    return frame_number;
 }
 
 unsigned int gearoenix::render::engine::Engine::get_frames_count() const
 {
-	return frames_count;
+    return frames_count;
 }

@@ -1,6 +1,6 @@
 #include "cr-sync-queued-semaphore.hpp"
-#include <thread>
 #include "../../system/sys-log.hpp"
+#include <thread>
 
 gearoenix::core::sync::QueuedSemaphore::QueuedSemaphore(int count)
     : count(count)
@@ -40,9 +40,9 @@ void gearoenix::core::sync::QueuedSemaphore::release()
     }
     Lock l = q.front();
     q.pop();
-	m_count.unlock();
+    m_count.unlock();
     do {
-		GXLOGD("waiting");
+        GXLOGD("waiting");
         l->unlocked = true;
         l->c.notify_all();
         std::this_thread::yield();

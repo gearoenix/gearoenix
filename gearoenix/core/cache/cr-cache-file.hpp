@@ -6,56 +6,59 @@
 #include "cr-cache-cacher.hpp"
 
 namespace gearoenix {
-	namespace core {
-		namespace cache {
-			template <class T>
-			class File {
-			private:
-				Cacher<T> cacher;
-				std::map<Id, Offset> offsets;
-				const std::shared_ptr<system::stream::Stream> file;
-			public:
-				File(const std::shared_ptr<system::stream::Stream>& file);
-				template <class C> std::shared_ptr<C> get(const Id id, std::function<std::shared_ptr<C>()> new_fun);
-				template <class C> std::shared_ptr<C> get(const Id id) const;
-				const std::shared_ptr<system::stream::Stream> &get_file() const;
-				const Cacher<T> &get_cacher() const;
-				Cacher<T> &get_cacher();
-			};
-		}
-	}
+namespace core {
+    namespace cache {
+        template <class T>
+        class File {
+        private:
+            Cacher<T> cacher;
+            std::map<Id, Offset> offsets;
+            const std::shared_ptr<system::stream::Stream> file;
+
+        public:
+            File(const std::shared_ptr<system::stream::Stream>& file);
+            template <class C>
+            std::shared_ptr<C> get(const Id id, std::function<std::shared_ptr<C>()> new_fun);
+            template <class C>
+            std::shared_ptr<C> get(const Id id) const;
+            const std::shared_ptr<system::stream::Stream>& get_file() const;
+            const Cacher<T>& get_cacher() const;
+            Cacher<T>& get_cacher();
+        };
+    }
+}
 }
 
 template <class T>
 gearoenix::core::cache::File<T>::File(const std::shared_ptr<system::stream::Stream>& file)
-	: file(file)
+    : file(file)
 {
-	const Count c = file->read<Count>();
-	GXLOGD("Number of entries is " << c);
+    const Count c = file->read<Count>();
+    GXLOGD("Number of entries is " << c);
     for (Count i = 0; i < c; ++i) {
         const Id id = file->read<Id>();
         const Offset off = file->read<Offset>();
         offsets[id] = off;
-	}
+    }
 }
 
 template <class T>
 template <class C>
 std::shared_ptr<C> gearoenix::core::cache::File<T>::get(const Id id, std::function<std::shared_ptr<C>()> new_fun)
 {
-	std::function<std::shared_ptr<C>()> fn_new = [new_fun, this, id] {
+    std::function<std::shared_ptr<C>()> fn_new = [new_fun, this, id] {
 #ifdef GX_DEBUG_MODE
-		auto search = offsets.find(id);
-		if (search == offsets.end()) {
-			GXLOGF("object with id: " << id << ", not found in table of offsets.");
-		}
-		file->seek(static_cast<unsigned int>(search->second));
+        auto search = offsets.find(id);
+        if (search == offsets.end()) {
+            GXLOGF("object with id: " << id << ", not found in table of offsets.");
+        }
+        file->seek(static_cast<unsigned int>(search->second));
 #else
-		file->seek(offsets[id]);
+        file->seek(offsets[id]);
 #endif
-		return new_fun();
-	};
-	return cacher.get(id, fn_new);
+        return new_fun();
+    };
+    return cacher.get(id, fn_new);
 }
 
 template <class T>
@@ -66,20 +69,20 @@ inline std::shared_ptr<C> gearoenix::core::cache::File<T>::get(const Id id) cons
 }
 
 template <class T>
-inline const std::shared_ptr<gearoenix::system::stream::Stream> &gearoenix::core::cache::File<T>::get_file() const
+inline const std::shared_ptr<gearoenix::system::stream::Stream>& gearoenix::core::cache::File<T>::get_file() const
 {
-	return file;
+    return file;
 }
 
-template<class T>
+template <class T>
 inline const gearoenix::core::cache::Cacher<T>& gearoenix::core::cache::File<T>::get_cacher() const
 {
-	return cacher;
+    return cacher;
 }
 
-template<class T>
+template <class T>
 inline gearoenix::core::cache::Cacher<T>& gearoenix::core::cache::File<T>::get_cacher()
 {
-	return cacher;
+    return cacher;
 }
 #endif

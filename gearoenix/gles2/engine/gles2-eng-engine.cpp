@@ -5,23 +5,23 @@
 #include "../../core/event/cr-ev-sys-system.hpp"
 #include "../../core/event/cr-ev-window-resize.hpp"
 #include "../../core/sync/cr-sync-end-caller.hpp"
-#include "../../gl/gl-loader.hpp"
 #include "../../gl/gl-constants.hpp"
+#include "../../gl/gl-loader.hpp"
 #include "../../physics/phs-engine.hpp"
 #include "../../render/camera/rnd-cmr-camera.hpp"
 #include "../../render/pipeline/rnd-pip-manager.hpp"
 #include "../../render/scene/rnd-scn-scene.hpp"
 #include "../../system/sys-app.hpp"
 #include "../../system/sys-log.hpp"
-#include "../buffer/gles2-buf-uniform.hpp"
 #include "../buffer/gles2-buf-manager.hpp"
+#include "../buffer/gles2-buf-uniform.hpp"
 #include "../command/gles2-cmd-buffer.hpp"
 #include "../command/gles2-cmd-manager.hpp"
 #include "../pipeline/gles2-pip-manager.hpp"
+#include "../sync/gles2-sy-semaphore.hpp"
 #include "../texture/gles2-txt-2d.hpp"
 #include "../texture/gles2-txt-cube.hpp"
 #include "../texture/gles2-txt-target.hpp"
-#include "../sync/gles2-sy-semaphore.hpp"
 
 void gearoenix::gles2::engine::Engine::initialize()
 {
@@ -69,12 +69,12 @@ gearoenix::gles2::engine::Engine::Engine(const std::shared_ptr<system::Applicati
 
 std::shared_ptr<gearoenix::gles2::engine::Engine> gearoenix::gles2::engine::Engine::construct(const std::shared_ptr<system::Application>& sys_app)
 {
-	std::shared_ptr<Engine> e(new Engine(sys_app));
-	e->pipeline_manager = std::make_shared<pipeline::Manager>(e);
-	e->buffer_manager = std::make_shared<buffer::Manager>(e);
-	e->command_manager = std::make_shared<command::Manager>();
-	e->main_render_target = std::shared_ptr<render::texture::Target>(new texture::Target(e));
-	return e;
+    std::shared_ptr<Engine> e(new Engine(sys_app));
+    e->pipeline_manager = std::make_shared<pipeline::Manager>(e);
+    e->buffer_manager = std::make_shared<buffer::Manager>(e);
+    e->command_manager = std::make_shared<command::Manager>();
+    e->main_render_target = std::shared_ptr<render::texture::Target>(new texture::Target(e));
+    return e;
 }
 
 gearoenix::gles2::engine::Engine::~Engine()
@@ -85,7 +85,7 @@ gearoenix::gles2::engine::Engine::~Engine()
 void gearoenix::gles2::engine::Engine::update()
 {
     gl::Loader::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	render::engine::Engine::update();
+    render::engine::Engine::update();
     //do_load_functions();
     //physics_engine->wait();
     //for (std::pair<const core::Id, std::shared_ptr<render::scene::Scene>>& scene : loaded_scenes) {
@@ -109,7 +109,7 @@ void gearoenix::gles2::engine::Engine::update()
     //}
     //physics_engine->update();
 #ifdef GX_DEBUG_GLES2
-	gl::Loader::check_for_error();
+    gl::Loader::check_for_error();
 #endif
 #ifdef GX_GLES2_ENGINE_PROFILING
     auto now = std::chrono::high_resolution_clock::now();
@@ -128,7 +128,7 @@ void gearoenix::gles2::engine::Engine::update()
 
 void gearoenix::gles2::engine::Engine::terminate()
 {
-	render::engine::Engine::terminate();
+    render::engine::Engine::terminate();
     //if (shadow_map_texture != nullptr) {
     //    glDeleteFramebuffers(1, &shadow_map_framebuffer);
     //    shadow_map_framebuffer = 0;
@@ -139,37 +139,37 @@ void gearoenix::gles2::engine::Engine::terminate()
     //}
 }
 
-gearoenix::render::sync::Semaphore * gearoenix::gles2::engine::Engine::create_semaphore()
+gearoenix::render::sync::Semaphore* gearoenix::gles2::engine::Engine::create_semaphore()
 {
-	return new sync::Semaphore();
+    return new sync::Semaphore();
 }
 
-gearoenix::render::texture::Texture2D * gearoenix::gles2::engine::Engine::create_texture_2d(
-	const core::Id id, 
-	const void * data, 
-	const render::texture::TextureFormat::Id f, 
-	const render::texture::SampleInfo s, 
-	const unsigned int img_width, 
-	const unsigned int img_height, 
-	const core::sync::EndCaller<core::sync::EndCallerIgnore>& call)
+gearoenix::render::texture::Texture2D* gearoenix::gles2::engine::Engine::create_texture_2d(
+    const core::Id id,
+    const void* data,
+    const render::texture::TextureFormat::Id f,
+    const render::texture::SampleInfo s,
+    const unsigned int img_width,
+    const unsigned int img_height,
+    const core::sync::EndCaller<core::sync::EndCallerIgnore>& call)
 {
-	return new texture::Texture2D(id, std::static_pointer_cast<Engine>(sysapp->get_render_engine()), data, f, s, img_width, img_height, call);
+    return new texture::Texture2D(id, std::static_pointer_cast<Engine>(sysapp->get_render_engine()), data, f, s, img_width, img_height, call);
 }
 
-gearoenix::render::texture::Cube * gearoenix::gles2::engine::Engine::create_texture_cube(
-	const core::Id id, 
-	const void * data, 
-	const render::texture::TextureFormat::Id f, 
-	const render::texture::SampleInfo s, 
-	const unsigned int aspect, 
-	const core::sync::EndCaller<core::sync::EndCallerIgnore>& call)
+gearoenix::render::texture::Cube* gearoenix::gles2::engine::Engine::create_texture_cube(
+    const core::Id id,
+    const void* data,
+    const render::texture::TextureFormat::Id f,
+    const render::texture::SampleInfo s,
+    const unsigned int aspect,
+    const core::sync::EndCaller<core::sync::EndCallerIgnore>& call)
 {
-	return new texture::Cube(id, std::static_pointer_cast<Engine>(sysapp->get_render_engine()), data, f, s, aspect, call);
+    return new texture::Cube(id, std::static_pointer_cast<Engine>(sysapp->get_render_engine()), data, f, s, aspect, call);
 }
 
 void gearoenix::gles2::engine::Engine::submit(const std::vector<std::shared_ptr<render::sync::Semaphore>>&, const std::shared_ptr<render::command::Buffer>& c, const std::shared_ptr<render::sync::Semaphore>&)
 {
-	static_cast<const command::Buffer *>(c.get())->play();
+    static_cast<const command::Buffer*>(c.get())->play();
 }
 
 //gearoenix::render::texture::Texture2D* gearoenix::gles2::engine::Engine::create_texture_2d(core::Id id, system::stream::Stream* file, core::sync::EndCaller<core::sync::EndCallerIgnore> c)

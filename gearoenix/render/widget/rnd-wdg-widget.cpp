@@ -8,8 +8,6 @@
 //#include "rnd-wdg-text.hpp"
 //
 
-
-
 //
 //void gearoenix::render::widget::Widget::press_effect()
 //{
@@ -97,12 +95,12 @@ void gearoenix::render::widget::Widget::cancel_effect()
 }
 
 gearoenix::render::widget::Widget::Widget(const core::Id my_id, const std::shared_ptr<system::stream::Stream>& s, const std::shared_ptr<engine::Engine>& e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c)
-	: model::Model(my_id, s, e, c)
+    : model::Model(my_id, s, e, c)
 {
 }
 
-gearoenix::render::widget::Widget::Widget(const std::shared_ptr<engine::Engine>& e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c):
-	model::Model(e, c)
+gearoenix::render::widget::Widget::Widget(const std::shared_ptr<engine::Engine>& e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c)
+    : model::Model(e, c)
 {
 }
 
@@ -112,7 +110,7 @@ gearoenix::render::widget::Widget::~Widget()
 
 void gearoenix::render::widget::Widget::read_gx3d(const std::shared_ptr<system::stream::Stream>& f, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c)
 {
-	GXUNIMPLEMENTED;
+    GXUNIMPLEMENTED;
 }
 
 void gearoenix::render::widget::Widget::state_change(EventType e)

@@ -1,7 +1,7 @@
 #ifndef GEAROENIX_CORE_SYNC_STOP_POINT_HPP
 #define GEAROENIX_CORE_SYNC_STOP_POINT_HPP
-#include <mutex>
 #include <memory>
+#include <mutex>
 
 namespace gearoenix {
 namespace core {

@@ -54,13 +54,13 @@ void gearoenix::system::Application::create_window() noexcept
         SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
         SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
         SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
-//        SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
-//        SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
+        //        SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+        //        SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
         SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
-		SDL_GL_SetSwapInterval(0);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+        SDL_GL_SetSwapInterval(0);
 
         flags |= SDL_WINDOW_OPENGL;
     }
@@ -77,7 +77,7 @@ void gearoenix::system::Application::create_window() noexcept
 #if defined(GX_IN_MAC) || defined(GX_IN_IOS)
     flags |= SDL_WINDOW_ALLOW_HIGHDPI;
 #endif
-	supported_engine = render::engine::Type::OPENGL_ES2;
+    supported_engine = render::engine::Type::OPENGL_ES2;
     window = SDL_CreateWindow(
         GX_APP_NAME,
         SDL_WINDOWPOS_CENTERED,
@@ -89,7 +89,7 @@ void gearoenix::system::Application::create_window() noexcept
         GXLOGI("Best window created.");
         return;
     }
-	GXTODO; // support other opengl versions
+    GXTODO; // support other opengl versions
     GXLOGF("Can not create window with minimum requirements");
 }
 
@@ -102,7 +102,8 @@ void gearoenix::system::Application::create_context() noexcept
 #endif
 #ifdef GX_USE_OPENGL
     gl_context = SDL_GL_CreateContext(window);
-    if (gl_context == nullptr) GXUNEXPECTED;
+    if (gl_context == nullptr)
+        GXUNEXPECTED;
 #endif
 }
 
@@ -255,7 +256,7 @@ const std::shared_ptr<gearoenix::system::Application> gearoenix::system::Applica
         GXLOGF("Failed to initialize SDL: " << SDL_GetError());
     }
 #ifdef GX_USE_OPENGL
-	gl::Loader::load_library();
+    gl::Loader::load_library();
 #endif
 
 #ifdef GX_USE_VULKAN
@@ -279,11 +280,8 @@ const std::shared_ptr<gearoenix::system::Application> gearoenix::system::Applica
 
     SDL_AddEventWatch(event_receiver, result.get());
 #ifdef GX_USE_OPENGL
-    if (result->supported_engine == render::engine::Type::OPENGL_43 || 
-		result->supported_engine == render::engine::Type::OPENGL_33 || 
-		result->supported_engine == render::engine::Type::OPENGL_ES3 || 
-		result->supported_engine == render::engine::Type::OPENGL_ES2) {
-		gl::Loader::load_functions();
+    if (result->supported_engine == render::engine::Type::OPENGL_43 || result->supported_engine == render::engine::Type::OPENGL_33 || result->supported_engine == render::engine::Type::OPENGL_ES3 || result->supported_engine == render::engine::Type::OPENGL_ES2) {
+        gl::Loader::load_functions();
         int w, h;
         SDL_GL_GetDrawableSize(result->window, &w, &h);
         result->win_width = static_cast<unsigned int>(w);

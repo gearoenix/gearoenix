@@ -10,7 +10,7 @@ namespace core {
         protected:
             const Id asset_id;
             const Type::Id asset_type;
-			Asset(const Id asset_id, const Type::Id asset_type);
+            Asset(const Id asset_id, const Type::Id asset_type);
 
         public:
             virtual ~Asset();

@@ -24,13 +24,13 @@ namespace render {
         class Engine;
     }
     namespace model {
-		class Mesh;
+        class Mesh;
         class Model : public core::asset::Asset {
         protected:
             const std::shared_ptr<engine::Engine> e;
-			const std::shared_ptr<buffer::FramedUniform> uniform_buffers;
+            const std::shared_ptr<buffer::FramedUniform> uniform_buffers;
 
-			bool is_dynamic = true;
+            bool is_dynamic = true;
             bool has_shadow_caster = false;
             bool has_transparent = false;
 
@@ -41,27 +41,27 @@ namespace render {
             std::shared_ptr<physics::collider::Collider> collider = nullptr;
 
         public:
-			Model(
-				const core::Id my_id,
-				const std::shared_ptr<system::stream::Stream>& f,
-				const std::shared_ptr<engine::Engine>& e,
-				const core::sync::EndCaller<core::sync::EndCallerIgnore>& c,
-				const bool is_dynamic = true);
-			/// It will create an automatic Id for itself
-			Model(
-				const std::shared_ptr<engine::Engine>& e,
-				const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
+            Model(
+                const core::Id my_id,
+                const std::shared_ptr<system::stream::Stream>& f,
+                const std::shared_ptr<engine::Engine>& e,
+                const core::sync::EndCaller<core::sync::EndCallerIgnore>& c,
+                const bool is_dynamic = true);
+            /// It will create an automatic Id for itself
+            Model(
+                const std::shared_ptr<engine::Engine>& e,
+                const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
             virtual ~Model();
-			virtual void update_uniform();
-			void add_mesh(const std::shared_ptr<Mesh> &m);
-			void add_child(const std::shared_ptr<Model> &c);
+            virtual void update_uniform();
+            void add_mesh(const std::shared_ptr<Mesh>& m);
+            void add_child(const std::shared_ptr<Model>& c);
 
             const std::map<core::Id, std::shared_ptr<Model>>& get_children() const;
             const std::map<core::Id, std::shared_ptr<Mesh>>& get_meshes() const;
             const std::shared_ptr<physics::collider::Collider>& get_collider() const;
-			const std::shared_ptr<buffer::FramedUniform> &get_uniform_buffers() const;
-            
-			const math::Mat4x4& get_model_matrix() const;
+            const std::shared_ptr<buffer::FramedUniform>& get_uniform_buffers() const;
+
+            const math::Mat4x4& get_model_matrix() const;
         };
     }
 }

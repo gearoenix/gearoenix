@@ -66,15 +66,15 @@ namespace core {
             std::shared_ptr<Caller> caller;
 
         public:
-			EndCaller(std::function<void()> f)
-				: caller(new Caller(f))
-			{
-			}
+            EndCaller(std::function<void()> f)
+                : caller(new Caller(f))
+            {
+            }
 
-			EndCaller(const EndCaller& o)
-				: caller(o.caller)
-			{
-			}
+            EndCaller(const EndCaller& o)
+                : caller(o.caller)
+            {
+            }
         };
 #endif
     }

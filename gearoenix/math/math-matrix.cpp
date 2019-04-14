@@ -55,44 +55,44 @@ gearoenix::math::Vec2 gearoenix::math::Mat2x2::operator*(const Vec2& v) const
 }
 
 gearoenix::math::Mat4x4::Mat4x4(const core::Real e)
-    : mat{e,
-     core::Real(0),
-     core::Real(0),
-     core::Real(0),
-     core::Real(0),
-     e,
-     core::Real(0),
-     core::Real(0),
-     core::Real(0),
-     core::Real(0),
-     e,
-     core::Real(0),
-     core::Real(0),
-     core::Real(0),
-     core::Real(0),
-     e}
+    : mat { e,
+        core::Real(0),
+        core::Real(0),
+        core::Real(0),
+        core::Real(0),
+        e,
+        core::Real(0),
+        core::Real(0),
+        core::Real(0),
+        core::Real(0),
+        e,
+        core::Real(0),
+        core::Real(0),
+        core::Real(0),
+        core::Real(0),
+        e }
 {
 }
 
 gearoenix::math::Mat4x4::Mat4x4()
-    :mat{
-    core::Real(1),
-    core::Real(0),
-    core::Real(0),
-    core::Real(0),
-    core::Real(0),
-    core::Real(1),
-    core::Real(0),
-    core::Real(0),
-    core::Real(0),
-    core::Real(0),
-    core::Real(1),
-    core::Real(0),
-    core::Real(0),
-    core::Real(0),
-    core::Real(0),
-    core::Real(1)
-         }
+    : mat {
+        core::Real(1),
+        core::Real(0),
+        core::Real(0),
+        core::Real(0),
+        core::Real(0),
+        core::Real(1),
+        core::Real(0),
+        core::Real(0),
+        core::Real(0),
+        core::Real(0),
+        core::Real(1),
+        core::Real(0),
+        core::Real(0),
+        core::Real(0),
+        core::Real(0),
+        core::Real(1)
+    }
 {
 }
 
@@ -101,28 +101,28 @@ gearoenix::math::Mat4x4::Mat4x4(
     core::Real e4, core::Real e5, core::Real e6, core::Real e7,
     core::Real e8, core::Real e9, core::Real e10, core::Real e11,
     core::Real e12, core::Real e13, core::Real e14, core::Real e15)
-    :mat {
-    e0,
-    e1,
-    e2,
-    e3,
-    e4,
-    e5,
-    e6,
-    e7,
-    e8,
-    e9,
-    e10,
-    e11,
-    e12,
-    e13,
-    e14,
-    e15
+    : mat {
+        e0,
+        e1,
+        e2,
+        e3,
+        e4,
+        e5,
+        e6,
+        e7,
+        e8,
+        e9,
+        e10,
+        e11,
+        e12,
+        e13,
+        e14,
+        e15
     }
 {
 }
 
-gearoenix::math::Mat4x4::Mat4x4(const std::shared_ptr<system::stream::Stream> &f)
+gearoenix::math::Mat4x4::Mat4x4(const std::shared_ptr<system::stream::Stream>& f)
 {
     read(f);
 }
@@ -205,129 +205,129 @@ void gearoenix::math::Mat4x4::local_scale(const core::Real& s)
 {
     mat[0] *= s;
     mat[1] *= s;
-	mat[2] *= s;
-	mat[3] *= s;
+    mat[2] *= s;
+    mat[3] *= s;
     mat[4] *= s;
     mat[5] *= s;
-	mat[6] *= s;
-	mat[7] *= s;
+    mat[6] *= s;
+    mat[7] *= s;
     mat[8] *= s;
     mat[9] *= s;
-	mat[10] *= s;
-	mat[11] *= s;
+    mat[10] *= s;
+    mat[11] *= s;
 }
 
-void gearoenix::math::Mat4x4::local_scale(const core::Real & a, const core::Real & b, const core::Real & c)
+void gearoenix::math::Mat4x4::local_scale(const core::Real& a, const core::Real& b, const core::Real& c)
 {
-	mat[0] *= a;
-	mat[1] *= a;
-	mat[2] *= a;
-	mat[3] *= a;
-	mat[4] *= b;
-	mat[5] *= b;
-	mat[6] *= b;
-	mat[7] *= b;
-	mat[8] *= c;
-	mat[9] *= c;
-	mat[10] *= c;
-	mat[11] *= c;
+    mat[0] *= a;
+    mat[1] *= a;
+    mat[2] *= a;
+    mat[3] *= a;
+    mat[4] *= b;
+    mat[5] *= b;
+    mat[6] *= b;
+    mat[7] *= b;
+    mat[8] *= c;
+    mat[9] *= c;
+    mat[10] *= c;
+    mat[11] *= c;
 }
 
 void gearoenix::math::Mat4x4::local_scale(const core::Real& a, const core::Real& b, const core::Real& c, const core::Real& d)
 {
     mat[0] *= a;
     mat[1] *= a;
-	mat[2] *= a;
-	mat[3] *= a;
+    mat[2] *= a;
+    mat[3] *= a;
     mat[4] *= b;
     mat[5] *= b;
-	mat[6] *= b;
-	mat[7] *= b;
+    mat[6] *= b;
+    mat[7] *= b;
     mat[8] *= c;
     mat[9] *= c;
-	mat[10] *= c;
-	mat[11] *= c;
-	mat[12] *= d;
-	mat[13] *= d;
-	mat[14] *= d;
-	mat[15] *= d;
+    mat[10] *= c;
+    mat[11] *= c;
+    mat[12] *= d;
+    mat[13] *= d;
+    mat[14] *= d;
+    mat[15] *= d;
 }
 
-void gearoenix::math::Mat4x4::local_scale(const Vec3 & s)
+void gearoenix::math::Mat4x4::local_scale(const Vec3& s)
 {
-	local_scale(s[0], s[1], s[2]);
+    local_scale(s[0], s[1], s[2]);
 }
 
-void gearoenix::math::Mat4x4::local_scale(const Vec4 & s)
+void gearoenix::math::Mat4x4::local_scale(const Vec4& s)
 {
-	local_scale(s[0], s[1], s[2], s[3]);
+    local_scale(s[0], s[1], s[2], s[3]);
 }
 
-void gearoenix::math::Mat4x4::global_scale(const core::Real & s)
+void gearoenix::math::Mat4x4::global_scale(const core::Real& s)
 {
-	mat[0] *= s;
-	mat[1] *= s;
-	mat[2] *= s;
-	mat[4] *= s;
-	mat[5] *= s;
-	mat[6] *= s;
-	mat[8] *= s;
-	mat[9] *= s;
-	mat[10] *= s;
-	mat[12] *= s;
-	mat[13] *= s;
-	mat[14] *= s;
+    mat[0] *= s;
+    mat[1] *= s;
+    mat[2] *= s;
+    mat[4] *= s;
+    mat[5] *= s;
+    mat[6] *= s;
+    mat[8] *= s;
+    mat[9] *= s;
+    mat[10] *= s;
+    mat[12] *= s;
+    mat[13] *= s;
+    mat[14] *= s;
 }
 
-void gearoenix::math::Mat4x4::global_scale(const core::Real & a, const core::Real & b, const core::Real & c)
+void gearoenix::math::Mat4x4::global_scale(const core::Real& a, const core::Real& b, const core::Real& c)
 {
-	mat[0] *= a;
-	mat[4] *= a;
-	mat[8] *= a;
-	mat[12] *= a;
+    mat[0] *= a;
+    mat[4] *= a;
+    mat[8] *= a;
+    mat[12] *= a;
 
-	mat[1] *= b;
-	mat[5] *= b;
-	mat[9] *= b;
-	mat[13] *= b;
+    mat[1] *= b;
+    mat[5] *= b;
+    mat[9] *= b;
+    mat[13] *= b;
 
-	mat[2] *= c;
-	mat[6] *= c;
-	mat[10] *= c;
-	mat[14] *= c;
+    mat[2] *= c;
+    mat[6] *= c;
+    mat[10] *= c;
+    mat[14] *= c;
 }
 
-void gearoenix::math::Mat4x4::global_scale(const core::Real & a, const core::Real & b, const core::Real & c, const core::Real & d)
+void gearoenix::math::Mat4x4::global_scale(const core::Real& a, const core::Real& b, const core::Real& c, const core::Real& d)
 {
-	mat[0] *= a;
-	mat[4] *= a;
-	mat[8] *= a;
-	mat[12] *= a;
+    mat[0] *= a;
+    mat[4] *= a;
+    mat[8] *= a;
+    mat[12] *= a;
 
-	mat[1] *= b;
-	mat[5] *= b;
-	mat[9] *= b;
-	mat[13] *= b;
+    mat[1] *= b;
+    mat[5] *= b;
+    mat[9] *= b;
+    mat[13] *= b;
 
-	mat[2] *= c;
-	mat[6] *= c;
-	mat[10] *= c;
-	mat[14] *= c;
+    mat[2] *= c;
+    mat[6] *= c;
+    mat[10] *= c;
+    mat[14] *= c;
 
-	mat[3] *= d;
-	mat[7] *= d;
-	mat[11] *= d;
-	mat[15] *= d;
+    mat[3] *= d;
+    mat[7] *= d;
+    mat[11] *= d;
+    mat[15] *= d;
 }
 
-void gearoenix::math::Mat4x4::global_scale(const Vec3 & s)
+void gearoenix::math::Mat4x4::global_scale(const Vec3& s)
 {
-	global_scale(s[0], s[1], s[2]);
+    global_scale(s[0], s[1], s[2]);
 }
 
-void gearoenix::math::Mat4x4::global_scale(const Vec4 & s)
+void gearoenix::math::Mat4x4::global_scale(const Vec4& s)
 {
-	global_scale(s[0], s[1], s[2], s[4]);
+    global_scale(s[0], s[1], s[2], s[4]);
 }
 
 void gearoenix::math::Mat4x4::translate(const Vec3& v)
@@ -366,7 +366,7 @@ void gearoenix::math::Mat4x4::get_location(Vec3& location) const
     location[2] = mat[14];
 }
 
-void gearoenix::math::Mat4x4::read(const std::shared_ptr<system::stream::Stream> &f)
+void gearoenix::math::Mat4x4::read(const std::shared_ptr<system::stream::Stream>& f)
 {
     for (int i = 0; i < 16; ++i)
         f->read(mat[i]);

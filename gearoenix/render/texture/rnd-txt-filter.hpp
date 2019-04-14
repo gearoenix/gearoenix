@@ -6,12 +6,11 @@ namespace render {
     namespace texture {
         class Filter {
         public:
-			typedef enum : core::TypeId 
-			{
-				CUBIC = 1,
-				LINEAR = 2,
-				NEAREST = 3,
-			} Id;
+            typedef enum : core::TypeId {
+                CUBIC = 1,
+                LINEAR = 2,
+                NEAREST = 3,
+            } Id;
         };
     }
 }

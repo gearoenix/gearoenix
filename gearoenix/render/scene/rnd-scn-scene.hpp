@@ -32,15 +32,15 @@ namespace system {
     class File;
 }
 namespace render {
-	namespace buffer {
-		class FramedUniform;
-	}
+    namespace buffer {
+        class FramedUniform;
+    }
     namespace camera {
         class Camera;
     }
-	namespace engine {
-		class Engine;
-	}
+    namespace engine {
+        class Engine;
+    }
     namespace light {
         class Light;
         class Sun;
@@ -63,13 +63,13 @@ namespace render {
     namespace scene {
         class Scene : public core::asset::Asset {
         protected:
-			const std::shared_ptr<engine::Engine> &e;
+            const std::shared_ptr<engine::Engine>& e;
             const Type::Id scene_type_id;
-			const std::shared_ptr<buffer::FramedUniform> uniform_buffers;
+            const std::shared_ptr<buffer::FramedUniform> uniform_buffers;
 
-			bool renderable = false;
-			
-			Uniform uniform;
+            bool renderable = false;
+
+            Uniform uniform;
 
             std::map<core::Id, std::shared_ptr<camera::Camera>> cameras;
             std::map<core::Id, std::shared_ptr<audio::Audio>> audios;
@@ -80,26 +80,26 @@ namespace render {
 
         public:
             /// It's going to read itself from gx3d stream.
-			Scene(
-				const core::Id my_id,
-				const std::shared_ptr<system::stream::Stream>& f,
-				const std::shared_ptr<engine::Engine> &e,
-				const core::sync::EndCaller<core::sync::EndCallerIgnore> &c);
+            Scene(
+                const core::Id my_id,
+                const std::shared_ptr<system::stream::Stream>& f,
+                const std::shared_ptr<engine::Engine>& e,
+                const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
 
-			Scene(
-				const std::shared_ptr<engine::Engine> &e,
-				const core::sync::EndCaller<core::sync::EndCallerIgnore> &c);
+            Scene(
+                const std::shared_ptr<engine::Engine>& e,
+                const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
 
             virtual ~Scene();
-            
-			void enable_rendering();
-			void disable_rendering();
+
+            void enable_rendering();
+            void disable_rendering();
             bool is_renderable() const;
 
-#define GXHELPER(x, c)                                                        \
-            void add_##x(const std::shared_ptr<c>& m);                        \
-            const std::shared_ptr<c> &get_##x(const core::Id x##_id) const;   \
-            const std::map<core::Id, std::shared_ptr<c>>& get_##x##s() const
+#define GXHELPER(x, c)                                              \
+    void add_##x(const std::shared_ptr<c>& m);                      \
+    const std::shared_ptr<c>& get_##x(const core::Id x##_id) const; \
+    const std::map<core::Id, std::shared_ptr<c>>& get_##x##s() const
 
             GXHELPER(camera, camera::Camera);
             GXHELPER(audio, audio::Audio);
@@ -110,11 +110,11 @@ namespace render {
 #undef GXHELPER
 
             void set_skybox(const std::shared_ptr<skybox::Skybox>& s);
-            const std::shared_ptr<model::Model> &get_skybox(const core::Id skybox_id) const;
+            const std::shared_ptr<model::Model>& get_skybox(const core::Id skybox_id) const;
 
-			const std::shared_ptr<buffer::FramedUniform>& get_uniform_buffers() const;
+            const std::shared_ptr<buffer::FramedUniform>& get_uniform_buffers() const;
 
-			void update_uniform();
+            void update_uniform();
         };
     }
 }

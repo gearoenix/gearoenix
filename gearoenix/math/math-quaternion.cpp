@@ -1,13 +1,14 @@
 #include "math-quaternion.hpp"
 
-gearoenix::math::Quat::Quat(){}
+gearoenix::math::Quat::Quat() {}
 
 gearoenix::math::Quat::Quat(const core::Real x, const core::Real y, const core::Real z, const core::Real w)
     : x(x)
     , y(y)
     , z(z)
     , w(w)
-{}
+{
+}
 
 gearoenix::math::Mat4x4 gearoenix::math::Quat::to_mat() const
 {
@@ -21,14 +22,14 @@ gearoenix::math::Mat4x4 gearoenix::math::Quat::to_mat() const
     const core::Real zz = z * z;
     const core::Real zw = z * w;
     Mat4x4 m;
-    m[0] = 1.0f - 2.0f * ( yy + zz );
-    m[1] = 2.0f * ( xy + zw );
-    m[2] = 2.0f * ( xz - yw );
-    m[4] = 2.0f * ( xy - zw );
-    m[5] = 1.0f - 2.0f * ( xx + zz );
-    m[6] = 2.0f * ( yz + xw );
-    m[8] = 2.0f * ( xz + yw );
-    m[9] = 2.0f * ( yz - xw );
-    m[10] = 1.0f - 2.0f * ( xx + yy );
+    m[0] = 1.0f - 2.0f * (yy + zz);
+    m[1] = 2.0f * (xy + zw);
+    m[2] = 2.0f * (xz - yw);
+    m[4] = 2.0f * (xy - zw);
+    m[5] = 1.0f - 2.0f * (xx + zz);
+    m[6] = 2.0f * (yz + xw);
+    m[8] = 2.0f * (xz + yw);
+    m[9] = 2.0f * (yz - xw);
+    m[10] = 1.0f - 2.0f * (xx + yy);
     return m;
 }

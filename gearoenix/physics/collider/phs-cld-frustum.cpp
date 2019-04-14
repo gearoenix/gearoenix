@@ -2,5 +2,4 @@
 
 gearoenix::physics::collider::Frustum::Frustum()
 {
-
 }

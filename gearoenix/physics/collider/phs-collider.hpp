@@ -29,7 +29,7 @@ namespace physics {
 
         public:
             virtual ~Collider();
-            static Collider* read(const std::shared_ptr<system::stream::Stream> &f);
+            static Collider* read(const std::shared_ptr<system::stream::Stream>& f);
             virtual void update(const math::Mat4x4& m) = 0;
             virtual bool hit(const math::Ray3& r, core::Real& distance_from_origin) const = 0;
             virtual void print() const = 0;

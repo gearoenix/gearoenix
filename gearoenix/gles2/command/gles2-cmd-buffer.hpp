@@ -6,15 +6,15 @@
 namespace gearoenix {
 namespace gles2 {
     namespace command {
-        class Buffer: public render::command::Buffer {
+        class Buffer : public render::command::Buffer {
         public:
-			~Buffer() override final;
-			void begin() override final;
-			void end() override final;
+            ~Buffer() override final;
+            void begin() override final;
+            void end() override final;
             void record(const std::shared_ptr<render::command::Buffer>& o) override final;
-			void bind(const std::shared_ptr<render::pipeline::ResourceSet> &r) override final;
-			void bind(const std::shared_ptr<render::texture::Target> &t) override final;
-			gl::uint play(gl::uint bound_shader_program = static_cast<gl::uint>(-1)) const;
+            void bind(const std::shared_ptr<render::pipeline::ResourceSet>& r) override final;
+            void bind(const std::shared_ptr<render::texture::Target>& t) override final;
+            gl::uint play(gl::uint bound_shader_program = static_cast<gl::uint>(-1)) const;
         };
     }
 }

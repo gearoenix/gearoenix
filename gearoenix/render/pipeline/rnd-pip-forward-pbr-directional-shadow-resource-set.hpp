@@ -26,25 +26,26 @@ namespace render {
     namespace model {
         class Model;
     }
-	namespace texture {
-		class Cube;
-	}
+    namespace texture {
+        class Cube;
+    }
     namespace pipeline {
         class ForwardPbrDirectionalShadowResourceSet : public ResourceSet {
-		protected:
-			std::shared_ptr<texture::Cube> diffuse_environment = nullptr;
-			std::shared_ptr<texture::Cube> specular_environment = nullptr;
-			std::shared_ptr<texture::Texture2D> ambient_occlusion = nullptr;
-			std::shared_ptr<texture::Texture2D> shadow_map = nullptr;
-			std::shared_ptr<texture::Texture2D> brdflut = nullptr;
-		public:
-			virtual void set_node_uniform_buffer(const std::shared_ptr<buffer::Uniform> &uniform_buffer);
-			virtual void set_diffuse_environment(const std::shared_ptr<texture::Cube>& t);
-			virtual void set_specular_environment(const std::shared_ptr<texture::Cube>& t);
-			virtual void set_ambient_occlusion(const std::shared_ptr<texture::Texture2D>& t);
-			virtual void set_shadow_mapper(const std::shared_ptr<texture::Texture2D>& t);
-			virtual void set_brdflut(const std::shared_ptr<texture::Texture2D>& t);
-			virtual void clean();
+        protected:
+            std::shared_ptr<texture::Cube> diffuse_environment = nullptr;
+            std::shared_ptr<texture::Cube> specular_environment = nullptr;
+            std::shared_ptr<texture::Texture2D> ambient_occlusion = nullptr;
+            std::shared_ptr<texture::Texture2D> shadow_map = nullptr;
+            std::shared_ptr<texture::Texture2D> brdflut = nullptr;
+
+        public:
+            virtual void set_node_uniform_buffer(const std::shared_ptr<buffer::Uniform>& uniform_buffer);
+            virtual void set_diffuse_environment(const std::shared_ptr<texture::Cube>& t);
+            virtual void set_specular_environment(const std::shared_ptr<texture::Cube>& t);
+            virtual void set_ambient_occlusion(const std::shared_ptr<texture::Texture2D>& t);
+            virtual void set_shadow_mapper(const std::shared_ptr<texture::Texture2D>& t);
+            virtual void set_brdflut(const std::shared_ptr<texture::Texture2D>& t);
+            virtual void clean();
         };
     }
 }

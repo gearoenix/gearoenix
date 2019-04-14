@@ -6,12 +6,11 @@ namespace render {
     namespace texture {
         class Type {
         public:
-			typedef enum : core::TypeId 
-			{
-				TEXTURE_2D = 1,
-				TEXTURE_3D = 2,
-				CUBE = 3,
-			} Id;
+            typedef enum : core::TypeId {
+                TEXTURE_2D = 1,
+                TEXTURE_3D = 2,
+                CUBE = 3,
+            } Id;
         };
     }
 }

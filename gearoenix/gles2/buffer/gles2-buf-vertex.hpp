@@ -21,11 +21,11 @@ namespace gles2 {
 
         public:
             Vertex(
-				const std::vector<math::BasicVertex> vertices,
+                const std::vector<math::BasicVertex> vertices,
                 const std::shared_ptr<engine::Engine>& e,
-                const core::sync::EndCaller<core::sync::EndCallerIgnore> &c);
+                const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
             ~Vertex();
-			void bind() const;
+            void bind() const;
         };
     }
 }

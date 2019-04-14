@@ -7,9 +7,9 @@
 
 namespace gearoenix {
 namespace render {
-namespace buffer {
-class Uniform;
-}
+    namespace buffer {
+        class Uniform;
+    }
     namespace engine {
         class Engine;
     }
@@ -23,9 +23,10 @@ class Uniform;
             const std::shared_ptr<engine::Engine> e;
             core::cache::Cacher<Pipeline, Type::Id> pipelines;
             Manager(const std::shared_ptr<engine::Engine>& e);
+
         public:
             virtual ~Manager();
-            virtual std::shared_ptr<Pipeline> get(const Type::Id pipeline_type, core::sync::EndCaller<Pipeline> &end) = 0;
+            virtual std::shared_ptr<Pipeline> get(const Type::Id pipeline_type, core::sync::EndCaller<Pipeline>& end) = 0;
         };
     }
 }

@@ -39,46 +39,46 @@ void gearoenix::render::widget::Button::press_effect()
         //if (this_mdl == nullptr)
         //    GXUNEXPECTED;
         //const std::shared_ptr<Button> shared_this = std::static_pointer_cast<Button>(this_mdl);
-//        anim = std::shared_ptr<physics::animation::Animation>(
-//            new physics::animation::Once(
-//                [shared_this](core::Real st, core::Real) -> void {
-//                    //std::lock_guard<std::mutex> lg(effect_locker);
-//                    const core::Real cursz = 1.0f - (st * press_animation_time_inversed) * max_scale_inversed_reduction;
-//                    const core::Real scl = cursz / shared_this->current_size;
-//                    shared_this->current_size = cursz;
-//#ifdef DEBUG_EFFECT
-//                    if (st < 0.0f || st > press_animation_time || shared_this->current_size > max_scale || max_scale_inversed > shared_this->current_size)
-//                        GXUNEXPECTED;
-//#endif
-//                    shared_this->local_scale(scl);
-//                },
-//                std::chrono::duration_cast<std::chrono::milliseconds>(press_animation_time_duration)));
-//        anim->set_on_delete(
-//            [shared_this]() -> void {
-//                physics::Engine* phseng = shared_this->e->get_physics_engine();
-//                std::shared_ptr<physics::animation::Animation> anim2(
-//                    new physics::animation::Once(
-//                        [shared_this](core::Real st, core::Real) -> void {
-//                            //std::lock_guard<std::mutex> lg(effect_locker);
-//                            const core::Real cursz = max_scale_inversed + (st * press_animation_time_inversed) * max_scale_inversed_reduction;
-//                            const core::Real scl = cursz / shared_this->current_size;
-//                            shared_this->current_size = cursz;
-//#ifdef DEBUG_EFFECT
-//                            if (st < 0.0f || st > press_animation_time || shared_this->current_size > max_scale || max_scale_inversed > shared_this->current_size)
-//                                GXUNEXPECTED;
-//#endif
-//                            shared_this->local_scale(scl);
-//                        },
-//                        std::chrono::duration_cast<std::chrono::milliseconds>(press_animation_time_duration),
-//                        [shared_this]() -> void {
-//                            //std::lock_guard<std::mutex> lg(effect_locker);
-//                            //pop_state();
-//                            shared_this->effect_state = EffectState::NO_ANIM;
-//                        }));
-//                phseng->add_animation(anim2);
-//                shared_this->latest_anim = anim2;
-//            });
-        const std::shared_ptr<physics::Engine> &phseng = e->get_physics_engine();
+        //        anim = std::shared_ptr<physics::animation::Animation>(
+        //            new physics::animation::Once(
+        //                [shared_this](core::Real st, core::Real) -> void {
+        //                    //std::lock_guard<std::mutex> lg(effect_locker);
+        //                    const core::Real cursz = 1.0f - (st * press_animation_time_inversed) * max_scale_inversed_reduction;
+        //                    const core::Real scl = cursz / shared_this->current_size;
+        //                    shared_this->current_size = cursz;
+        //#ifdef DEBUG_EFFECT
+        //                    if (st < 0.0f || st > press_animation_time || shared_this->current_size > max_scale || max_scale_inversed > shared_this->current_size)
+        //                        GXUNEXPECTED;
+        //#endif
+        //                    shared_this->local_scale(scl);
+        //                },
+        //                std::chrono::duration_cast<std::chrono::milliseconds>(press_animation_time_duration)));
+        //        anim->set_on_delete(
+        //            [shared_this]() -> void {
+        //                physics::Engine* phseng = shared_this->e->get_physics_engine();
+        //                std::shared_ptr<physics::animation::Animation> anim2(
+        //                    new physics::animation::Once(
+        //                        [shared_this](core::Real st, core::Real) -> void {
+        //                            //std::lock_guard<std::mutex> lg(effect_locker);
+        //                            const core::Real cursz = max_scale_inversed + (st * press_animation_time_inversed) * max_scale_inversed_reduction;
+        //                            const core::Real scl = cursz / shared_this->current_size;
+        //                            shared_this->current_size = cursz;
+        //#ifdef DEBUG_EFFECT
+        //                            if (st < 0.0f || st > press_animation_time || shared_this->current_size > max_scale || max_scale_inversed > shared_this->current_size)
+        //                                GXUNEXPECTED;
+        //#endif
+        //                            shared_this->local_scale(scl);
+        //                        },
+        //                        std::chrono::duration_cast<std::chrono::milliseconds>(press_animation_time_duration),
+        //                        [shared_this]() -> void {
+        //                            //std::lock_guard<std::mutex> lg(effect_locker);
+        //                            //pop_state();
+        //                            shared_this->effect_state = EffectState::NO_ANIM;
+        //                        }));
+        //                phseng->add_animation(anim2);
+        //                shared_this->latest_anim = anim2;
+        //            });
+        const std::shared_ptr<physics::Engine>& phseng = e->get_physics_engine();
         phseng->add_animation(anim);
         break;
     }
@@ -130,10 +130,10 @@ void gearoenix::render::widget::Button::cancel_effect()
 }
 
 gearoenix::render::widget::Button::Button(
-	const core::Id my_id,
-	const std::shared_ptr<system::stream::Stream> &f,
-	const std::shared_ptr<engine::Engine>& e,
-	const core::sync::EndCaller<core::sync::EndCallerIgnore> &c)
+    const core::Id my_id,
+    const std::shared_ptr<system::stream::Stream>& f,
+    const std::shared_ptr<engine::Engine>& e,
+    const core::sync::EndCaller<core::sync::EndCallerIgnore>& c)
     : Widget(my_id, f, e, c)
 {
 }

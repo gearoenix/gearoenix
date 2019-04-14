@@ -5,9 +5,10 @@
 namespace gearoenix {
 namespace render {
     namespace buffer {
-        class Static: public Buffer {
+        class Static : public Buffer {
         protected:
             Static(const unsigned int size, const std::shared_ptr<engine::Engine>& e);
+
         public:
             virtual ~Static();
         };

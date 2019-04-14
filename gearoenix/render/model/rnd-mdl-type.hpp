@@ -6,11 +6,11 @@ namespace render {
     namespace model {
         class Type {
         public:
-			typedef enum : core::TypeId {
-				DYNAMIC = 1,
-				STATIC = 2,
-				WIDGET = 3,
-			} Id;
+            typedef enum : core::TypeId {
+                DYNAMIC = 1,
+                STATIC = 2,
+                WIDGET = 3,
+            } Id;
         };
     }
 }

@@ -2,10 +2,10 @@
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../system/stream/sys-stm-memory.hpp"
 #include "../../system/sys-app.hpp"
+#include "../engine/rnd-eng-engine.hpp"
 #include "../font/rnd-fnt-2d.hpp"
 #include "../material/rnd-mat-material.hpp"
 #include "../mesh/rnd-msh-mesh.hpp"
-#include "../engine/rnd-eng-engine.hpp"
 #include "../shader/rnd-shd-shader.hpp"
 
 void gearoenix::render::widget::Text::create_text_mesh(core::sync::EndCaller<core::sync::EndCallerIgnore> c)
@@ -114,10 +114,10 @@ void gearoenix::render::widget::Text::create_text_mesh(core::sync::EndCaller<cor
 }
 
 gearoenix::render::widget::Text::Text(
-	const core::Id my_id,
-	const std::shared_ptr<system::stream::Stream> &f,
-	const std::shared_ptr<engine::Engine>& e,
-	const core::sync::EndCaller<core::sync::EndCallerIgnore> &c)
+    const core::Id my_id,
+    const std::shared_ptr<system::stream::Stream>& f,
+    const std::shared_ptr<engine::Engine>& e,
+    const core::sync::EndCaller<core::sync::EndCallerIgnore>& c)
     : Widget(my_id, f, e, c)
     , text(f->read_string())
     , align(f->read<Alignment::Type>())

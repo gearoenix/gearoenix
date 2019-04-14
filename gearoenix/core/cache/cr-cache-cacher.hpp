@@ -8,65 +8,65 @@
 #include <type_traits>
 
 namespace gearoenix {
-	namespace core {
-		namespace cache {
-			template <class  T, class Key = Id, class Compare = std::less<Key>>
-			class Cacher {
-			private:
-				std::map<Key, std::weak_ptr<T>, Compare> cacheds;
+namespace core {
+    namespace cache {
+        template <class T, class Key = Id, class Compare = std::less<Key>>
+        class Cacher {
+        private:
+            std::map<Key, std::weak_ptr<T>, Compare> cacheds;
 
-			public:
-				template <class C> std::shared_ptr<C> get(const Key &id, const std::function<std::shared_ptr<C>()> &new_fun);
-				template <class C> std::shared_ptr<C> get(const Key &id) const;
-				const std::map<Key, std::weak_ptr<T>, Compare> &get_cacheds() const;
-			};
-		}
-	}
+        public:
+            template <class C>
+            std::shared_ptr<C> get(const Key& id, const std::function<std::shared_ptr<C>()>& new_fun);
+            template <class C>
+            std::shared_ptr<C> get(const Key& id) const;
+            const std::map<Key, std::weak_ptr<T>, Compare>& get_cacheds() const;
+        };
+    }
+}
 }
 
-template <class  T, class Key, class Compare>
-template <class  C>
-std::shared_ptr<C> gearoenix::core::cache::Cacher<T, Key, Compare>::get(const Key &id, const std::function<std::shared_ptr<C>()> &new_fun)
+template <class T, class Key, class Compare>
+template <class C>
+std::shared_ptr<C> gearoenix::core::cache::Cacher<T, Key, Compare>::get(const Key& id, const std::function<std::shared_ptr<C>()>& new_fun)
 {
-	auto search = cacheds.find(id);
-	if (search == cacheds.end()) {
-		std::shared_ptr<C> new_item = new_fun();
-		cacheds[id] = new_item;
-		return new_item;
-	}
-	auto& found = search->second;
-	if (auto cached = found.lock()) {
-		return std::static_pointer_cast<C>(cached);
-	}
-	else {
-		std::shared_ptr<C> new_item = new_fun();
-		found = new_item;
-		return new_item;
-	}
+    auto search = cacheds.find(id);
+    if (search == cacheds.end()) {
+        std::shared_ptr<C> new_item = new_fun();
+        cacheds[id] = new_item;
+        return new_item;
+    }
+    auto& found = search->second;
+    if (auto cached = found.lock()) {
+        return std::static_pointer_cast<C>(cached);
+    } else {
+        std::shared_ptr<C> new_item = new_fun();
+        found = new_item;
+        return new_item;
+    }
 }
 
-template <class  T, class Key, class Compare>
-template <class  C>
-std::shared_ptr<C> gearoenix::core::cache::Cacher<T, Key, Compare>::get(const Key &id) const
+template <class T, class Key, class Compare>
+template <class C>
+std::shared_ptr<C> gearoenix::core::cache::Cacher<T, Key, Compare>::get(const Key& id) const
 {
-	auto search = cacheds.find(id);
-	if (search == cacheds.end()) {
-		GXLOGF("Object with id: " << id << ", has not been cached.");
-		return nullptr;
-	}
-	auto& found = search->second;
-	if (auto cached = found.lock()) {
-		return std::static_pointer_cast<C>(cached);
-	}
-	else {
-		GXLOGF("Object with id: " << id << ", cached but it has been expired.");
-		return nullptr;
-	}
+    auto search = cacheds.find(id);
+    if (search == cacheds.end()) {
+        GXLOGF("Object with id: " << id << ", has not been cached.");
+        return nullptr;
+    }
+    auto& found = search->second;
+    if (auto cached = found.lock()) {
+        return std::static_pointer_cast<C>(cached);
+    } else {
+        GXLOGF("Object with id: " << id << ", cached but it has been expired.");
+        return nullptr;
+    }
 }
 
-template <class  T, class Key, class Compare>
-const std::map<Key, std::weak_ptr<T>, Compare> &gearoenix::core::cache::Cacher<T, Key, Compare>::get_cacheds() const
+template <class T, class Key, class Compare>
+const std::map<Key, std::weak_ptr<T>, Compare>& gearoenix::core::cache::Cacher<T, Key, Compare>::get_cacheds() const
 {
-	return cacheds;
+    return cacheds;
 }
 #endif

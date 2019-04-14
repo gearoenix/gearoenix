@@ -9,8 +9,8 @@ namespace render {
     namespace texture {
         class Texture2D : public Texture {
         protected:
-			unsigned int img_width = 0;
-			unsigned int img_height = 0;
+            unsigned int img_width = 0;
+            unsigned int img_height = 0;
             Texture2D(const core::Id my_id, const std::shared_ptr<engine::Engine>& e);
 
         public:

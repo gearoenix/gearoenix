@@ -13,7 +13,7 @@ gearoenix::render::graph::node::Node::Node(
     : core::graph::Node(input_links, output_links)
     , e(e)
 {
-	core::sync::EndCaller<pipeline::Pipeline> pipcall([call](std::shared_ptr<pipeline::Pipeline>) {});
+    core::sync::EndCaller<pipeline::Pipeline> pipcall([call](std::shared_ptr<pipeline::Pipeline>) {});
     render_pipeline = e->get_pipeline_manager()->get(pipeline_type_id, pipcall);
     input_textures.resize(input_textures_count);
     for (unsigned int i = 0; i < input_textures_count; ++i) {
@@ -36,5 +36,5 @@ void gearoenix::render::graph::node::Node::set_input_texture(const std::shared_p
 
 void gearoenix::render::graph::node::Node::set_render_target(const std::shared_ptr<texture::Target>& t)
 {
-	render_target = t;
+    render_target = t;
 }

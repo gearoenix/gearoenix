@@ -4,7 +4,7 @@
 #include "../../system/stream/sys-stm-stream.hpp"
 #include "../../system/sys-log.hpp"
 
-gearoenix::physics::collider::Mesh::Mesh(const std::shared_ptr<system::stream::Stream> &f)
+gearoenix::physics::collider::Mesh::Mesh(const std::shared_ptr<system::stream::Stream>& f)
     : Collider(Type::MESH)
 {
     const core::Count cnt = f->read<core::Count>();

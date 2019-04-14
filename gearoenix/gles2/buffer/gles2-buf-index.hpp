@@ -7,28 +7,28 @@
 #include "../../render/buffer/rnd-buf-static.hpp"
 #include <vector>
 namespace gearoenix {
-	namespace gles2 {
-		namespace engine {
-			class Engine;
-		}
-		namespace buffer {
-			class Index : public render::buffer::Static {
-			public:
-			private:
-				gl::uint bo = 0;
-				gl::sizei count = 0;
+namespace gles2 {
+    namespace engine {
+        class Engine;
+    }
+    namespace buffer {
+        class Index : public render::buffer::Static {
+        public:
+        private:
+            gl::uint bo = 0;
+            gl::sizei count = 0;
 
-			public:
-				Index(
-					const std::vector<std::uint32_t> indices,
-					const std::shared_ptr<engine::Engine>& e,
-					const core::sync::EndCaller<core::sync::EndCallerIgnore> &c);
-				~Index();
-				void bind() const;
-				void draw() const;
-			};
-		}
-	}
+        public:
+            Index(
+                const std::vector<std::uint32_t> indices,
+                const std::shared_ptr<engine::Engine>& e,
+                const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
+            ~Index();
+            void bind() const;
+            void draw() const;
+        };
+    }
+}
 }
 #endif
 #endif

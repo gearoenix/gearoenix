@@ -38,10 +38,10 @@ namespace render {
 
         public:
             Text(
-				const core::Id my_id,
-				const std::shared_ptr<system::stream::Stream> &f,
-				const std::shared_ptr<engine::Engine>& e,
-				const core::sync::EndCaller<core::sync::EndCallerIgnore> &c);
+                const core::Id my_id,
+                const std::shared_ptr<system::stream::Stream>& f,
+                const std::shared_ptr<engine::Engine>& e,
+                const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
             ~Text();
         };
     }

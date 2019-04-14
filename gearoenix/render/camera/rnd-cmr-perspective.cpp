@@ -7,17 +7,17 @@
 
 void gearoenix::render::camera::Perspective::on_ratio_change()
 {
-//    c_height = c_width / screen_ratio;
-//    tanvang = c_height / start;
-//    one_cosvang = 1.0f / std::cos(std::atan(tanhang));
-//    p = math::Mat4x4::perspective(c_width * 2.0f, c_height * 2.0f, start, end);
-//    vp = p * v;
+    //    c_height = c_width / screen_ratio;
+    //    tanvang = c_height / start;
+    //    one_cosvang = 1.0f / std::cos(std::atan(tanhang));
+    //    p = math::Mat4x4::perspective(c_width * 2.0f, c_height * 2.0f, start, end);
+    //    vp = p * v;
 }
 
 gearoenix::render::camera::Perspective::Perspective(
-        const core::Id my_id,
-        const std::shared_ptr<system::stream::Stream> &f,
-        const std::shared_ptr<engine::Engine> &e)
+    const core::Id my_id,
+    const std::shared_ptr<system::stream::Stream>& f,
+    const std::shared_ptr<engine::Engine>& e)
     : Camera(my_id, f, e)
 {
     const core::Real rad = f->read<core::Real>();
@@ -27,19 +27,19 @@ gearoenix::render::camera::Perspective::Perspective(
 
 bool gearoenix::render::camera::Perspective::in_sight(const math::Vec3& location, const core::Real radius) const
 {
-//    math::Vec3 eye = location - l;
-//    core::Real eye_z = -(z_axis.dot(eye));
-//    if (eye_z < 0.0f)
-//        return eye.square_length() < (radius * radius);
-//    if (eye_z - radius > end)
-//        return false;
-//    math::Vec3 eye_on_z_plane = eye - (z_axis * (-eye_z));
-//    core::Real eye_on_x = std::abs(eye_on_z_plane.dot(x_axis));
-//    if (eye_on_x - (radius * one_coshang) > tanhang * eye_z)
-//        return false;
-//    core::Real eye_on_y = std::abs(eye_on_z_plane.dot(y_axis));
-//    if (eye_on_y - (radius * one_cosvang) > tanvang * eye_z)
-//        return false;
+    //    math::Vec3 eye = location - l;
+    //    core::Real eye_z = -(z_axis.dot(eye));
+    //    if (eye_z < 0.0f)
+    //        return eye.square_length() < (radius * radius);
+    //    if (eye_z - radius > end)
+    //        return false;
+    //    math::Vec3 eye_on_z_plane = eye - (z_axis * (-eye_z));
+    //    core::Real eye_on_x = std::abs(eye_on_z_plane.dot(x_axis));
+    //    if (eye_on_x - (radius * one_coshang) > tanhang * eye_z)
+    //        return false;
+    //    core::Real eye_on_y = std::abs(eye_on_z_plane.dot(y_axis));
+    //    if (eye_on_y - (radius * one_cosvang) > tanvang * eye_z)
+    //        return false;
     return true;
 }
 
@@ -63,23 +63,25 @@ gearoenix::core::Real gearoenix::render::camera::Perspective::get_distance(const
     return (model_location - uniform.position_far.xyz()).square_length();
 }
 
-void gearoenix::render::camera::Perspective::set_field_of_view(const core::Real radian) {
+void gearoenix::render::camera::Perspective::set_field_of_view(const core::Real radian)
+{
     fovx = radian;
     tanx = static_cast<core::Real>(std::tan(static_cast<double>(radian * 0.5f)));
     tany = tanx / uniform.near_aspect_ratio_reserved[1];
     fovy = static_cast<core::Real>(std::atan(static_cast<double>(tany))) * 2.0f;
     uniform.projection = math::Mat4x4::perspective(
-                tanx * -uniform.near_aspect_ratio_reserved[0],
-            tany * -uniform.near_aspect_ratio_reserved[0],
-            -uniform.near_aspect_ratio_reserved[0],
-            -uniform.position_far[3]);
+        tanx * -uniform.near_aspect_ratio_reserved[0],
+        tany * -uniform.near_aspect_ratio_reserved[0],
+        -uniform.near_aspect_ratio_reserved[0],
+        -uniform.position_far[3]);
     uniform.uniform_projection = math::Mat4x4(
-                0.5f, 0.0f, 0.0f, 0.0f,
-                0.0f, 0.5f, 0.0f, 0.0f,
-                0.0f, 0.0f, 1.0f, 0.0f,
-                0.5f, 0.5f, 0.0f, 1.0f) * uniform.projection;
+                                     0.5f, 0.0f, 0.0f, 0.0f,
+                                     0.0f, 0.5f, 0.0f, 0.0f,
+                                     0.0f, 0.0f, 1.0f, 0.0f,
+                                     0.5f, 0.5f, 0.0f, 1.0f)
+        * uniform.projection;
     lambda = static_cast<core::Real>(
-                std::sin(static_cast<double>(fovx * 0.5f)) +
-                std::sin(static_cast<double>(fovy * 0.5f))) * 0.5f;
+                 std::sin(static_cast<double>(fovx * 0.5f)) + std::sin(static_cast<double>(fovy * 0.5f)))
+        * 0.5f;
     update_view_projection();
 }

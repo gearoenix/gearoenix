@@ -15,7 +15,7 @@ namespace render {
         class Model;
     }
     namespace scene {
-    class Scene;
+        class Scene;
     }
 }
 }

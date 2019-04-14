@@ -5,8 +5,8 @@
 #include "../../math/math-triangle.hpp"
 #include "../../math/math-vector.hpp"
 #include "phs-collider.hpp"
-#include <vector>
 #include <memory>
+#include <vector>
 namespace gearoenix {
 namespace system {
     class File;
@@ -21,7 +21,7 @@ namespace physics {
             math::Aabb3 box;
 
         public:
-            Mesh(const std::shared_ptr<system::stream::Stream> &f);
+            Mesh(const std::shared_ptr<system::stream::Stream>& f);
             ~Mesh();
             void update(const math::Mat4x4& m);
             bool hit(const math::Ray3& r, core::Real& distance_from_origin) const;

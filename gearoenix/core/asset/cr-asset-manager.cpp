@@ -95,10 +95,9 @@ const std::shared_ptr<gearoenix::physics::constraint::Manager>& gearoenix::core:
     return constraint_manager;
 }
 
-
 const std::shared_ptr<gearoenix::render::scene::Manager>& gearoenix::core::asset::Manager::get_scene_manager() const
 {
-	return scene_manager;
+    return scene_manager;
 }
 
 gearoenix::core::Id gearoenix::core::asset::Manager::create_id()

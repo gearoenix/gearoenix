@@ -7,6 +7,7 @@ namespace render {
         class Uniform : public Buffer {
         protected:
             Uniform(const unsigned int s, const std::shared_ptr<engine::Engine>& e);
+
         public:
             virtual ~Uniform();
             virtual void update(const void*) = 0;

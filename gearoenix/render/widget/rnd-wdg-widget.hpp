@@ -19,11 +19,11 @@ namespace render {
             } StateType;
 
             // This is something internal, it's gonna be used between ui-scene & widget
-			typedef enum : core::Id {
-				PRESS,
-				RELEASE,
-				MOVE_OUT,
-			} EventType;
+            typedef enum : core::Id {
+                PRESS,
+                RELEASE,
+                MOVE_OUT,
+            } EventType;
 
         protected:
             StateType state_type = StateType::NORMAL;
@@ -33,18 +33,18 @@ namespace render {
             virtual void cancel_effect();
 
         public:
-			Widget(
-				const core::Id my_id,
-				const std::shared_ptr<system::stream::Stream> &s,
-				const std::shared_ptr<engine::Engine>& e,
-				const core::sync::EndCaller<core::sync::EndCallerIgnore> &c);
-			Widget(
-				const std::shared_ptr<engine::Engine>& e,
-				const core::sync::EndCaller<core::sync::EndCallerIgnore> &c);
+            Widget(
+                const core::Id my_id,
+                const std::shared_ptr<system::stream::Stream>& s,
+                const std::shared_ptr<engine::Engine>& e,
+                const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
+            Widget(
+                const std::shared_ptr<engine::Engine>& e,
+                const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
             virtual ~Widget();
-			void read_gx3d(
-				const std::shared_ptr<system::stream::Stream>& f,
-				const core::sync::EndCaller<core::sync::EndCallerIgnore> &c);
+            void read_gx3d(
+                const std::shared_ptr<system::stream::Stream>& f,
+                const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
             void state_change(EventType e);
         };
     }

@@ -10,7 +10,7 @@ gearoenix::physics::collider::Collider::Collider(Type t)
 
 gearoenix::physics::collider::Collider::~Collider() {}
 
-gearoenix::physics::collider::Collider* gearoenix::physics::collider::Collider::read(const std::shared_ptr<system::stream::Stream> &f)
+gearoenix::physics::collider::Collider* gearoenix::physics::collider::Collider::read(const std::shared_ptr<system::stream::Stream>& f)
 {
     core::Id collider_type_id;
     f->read(collider_type_id);

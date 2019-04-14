@@ -35,24 +35,24 @@ namespace render {
         protected:
             const Type::Id mesh_type_id;
 
-			core::Real radius = 0.0f;
-			std::shared_ptr<buffer::Buffer> vertex_buffer = nullptr;
-			std::shared_ptr<buffer::Buffer> index_buffer = nullptr;
+            core::Real radius = 0.0f;
+            std::shared_ptr<buffer::Buffer> vertex_buffer = nullptr;
+            std::shared_ptr<buffer::Buffer> index_buffer = nullptr;
 
-			Mesh(const core::Id my_id, const Type::Id mesh_type_id);
+            Mesh(const core::Id my_id, const Type::Id mesh_type_id);
 
         public:
             Mesh(
                 const core::Id my_id,
                 const std::shared_ptr<system::stream::Stream>& f,
                 const std::shared_ptr<engine::Engine>& e,
-                const core::sync::EndCaller<core::sync::EndCallerIgnore> &c);
+                const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
             ~Mesh();
             void draw();
-			core::Real get_radius() const;
-			Type::Id get_mesh_type_id() const;
-			const std::shared_ptr<buffer::Buffer> &get_vertex_buffer() const;
-			const std::shared_ptr<buffer::Buffer> &get_index_buffer() const;
+            core::Real get_radius() const;
+            Type::Id get_mesh_type_id() const;
+            const std::shared_ptr<buffer::Buffer>& get_vertex_buffer() const;
+            const std::shared_ptr<buffer::Buffer>& get_index_buffer() const;
         };
     }
 }

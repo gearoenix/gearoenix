@@ -7,13 +7,12 @@
 #include <vector>
 namespace gearoenix {
 namespace core {
-	namespace sync {
-		class KernelWorker;
-	}
+    namespace sync {
+        class KernelWorker;
+    }
 }
-namespace system 
-{
-	class Application;
+namespace system {
+    class Application;
 }
 namespace physics {
     namespace animation {
@@ -22,23 +21,23 @@ namespace physics {
     class Engine {
     private:
         const std::shared_ptr<system::Application> sysapp;
-		const std::shared_ptr<core::sync::KernelWorker> kernels;
+        const std::shared_ptr<core::sync::KernelWorker> kernels;
         // if animation return true on its apply its gonna be deleted
         std::map<core::Id, std::shared_ptr<animation::Animation>> animations;
         std::mutex added_animations_locker;
         std::vector<std::shared_ptr<animation::Animation>> added_animations;
-		std::mutex removed_animations_locker;
-		std::vector<core::Id> removed_animations;
+        std::mutex removed_animations_locker;
+        std::vector<core::Id> removed_animations;
 
-		void update_uniform_buffers_kernel(const unsigned int kernel_index);
-		void update_uniform_buffers();
+        void update_uniform_buffers_kernel(const unsigned int kernel_index);
+        void update_uniform_buffers();
 
     public:
         Engine(const std::shared_ptr<system::Application>& sysapp);
         ~Engine();
-        void add_animation(const std::shared_ptr<animation::Animation> &a);
-		void remove_animation(const std::shared_ptr<animation::Animation> &a);
-		void remove_animation(core::Id a);
+        void add_animation(const std::shared_ptr<animation::Animation>& a);
+        void remove_animation(const std::shared_ptr<animation::Animation>& a);
+        void remove_animation(core::Id a);
         void update();
     };
 }
