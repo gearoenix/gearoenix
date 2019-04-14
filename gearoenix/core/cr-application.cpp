@@ -9,3 +9,9 @@ gearoenix::core::Application::Application(const std::shared_ptr<system::Applicat
 }
 
 gearoenix::core::Application::~Application() {}
+
+void gearoenix::core::Application::terminate()
+{
+	sys_app = nullptr;
+	rnd_eng = nullptr;
+}

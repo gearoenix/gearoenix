@@ -42,7 +42,6 @@ void gearoenix::render::engine::Engine::update()
 void gearoenix::render::engine::Engine::terminate()
 {
     sysapp = nullptr;
-    fun_loader = nullptr;
     physics_engine = nullptr;
     kernels = nullptr;
     render_tree = nullptr;
@@ -51,6 +50,9 @@ void gearoenix::render::engine::Engine::terminate()
     command_manager = nullptr;
     sampler_manager = nullptr;
     buffer_manager = nullptr;
+
+	if(fun_loader != nullptr) fun_loader->unload();
+    fun_loader = nullptr;
 }
 
 void gearoenix::render::engine::Engine::set_render_tree(const std::shared_ptr<graph::tree::Tree>& tree)

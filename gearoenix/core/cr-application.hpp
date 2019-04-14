@@ -26,14 +26,14 @@ namespace core {
     class Application {
     public:
     protected:
-        const std::shared_ptr<system::Application> sys_app;
-        const std::shared_ptr<render::engine::Engine> rnd_eng;
+        std::shared_ptr<system::Application> sys_app;
+        std::shared_ptr<render::engine::Engine> rnd_eng;
 
     public:
         Application(const std::shared_ptr<system::Application>& sys_app);
         virtual ~Application();
         virtual void update() = 0;
-        virtual void terminate() = 0;
+        virtual void terminate();
     };
 }
 }
