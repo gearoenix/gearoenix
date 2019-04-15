@@ -34,7 +34,7 @@ void gearoenix::render::graph::tree::Pbr::record(const unsigned int kernel_index
     const std::shared_ptr<scene::Manager>& scnmgr = astmgr->get_scene_manager();
     const std::map<core::Id, std::weak_ptr<scene::Scene>>& scenes = scnmgr->get_scenes();
     unsigned int scene_number = 0;
-#define GXDOTASK(expr) if (task_number == kernel_index) expr; task_number = (task_number + 1) % kernels_count
+#define GXDOTASK(expr) if (task_number == kernel_index) { expr; } task_number = (task_number + 1) % kernels_count
     for (const std::pair<core::Id, std::weak_ptr<scene::Scene>> id_scene : scenes) {
         if (const std::shared_ptr<scene::Scene> scn = id_scene.second.lock()) {
 			if (!scn->is_renderable()) continue;

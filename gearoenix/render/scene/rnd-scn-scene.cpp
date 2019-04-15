@@ -50,8 +50,7 @@ gearoenix::render::scene::Scene::Scene(
         f->read(ids);                                                            \
         if (ids.size() > 0) {                                                    \
             core::sync::EndCaller<n::cls> call([c](std::shared_ptr<n::cls>) {}); \
-            for (const core::Id id : ids)                                        \
-                add_##x(mgr->get_gx3d(id, call));                                \
+            for (const core::Id id : ids) add_##x(mgr->get_gx3d(id, call));      \
         }                                                                        \
     }
 

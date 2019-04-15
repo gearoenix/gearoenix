@@ -35,7 +35,9 @@ const gearoenix::core::Real gearoenix::system::Application::ZOOM_EPSILON = 0.000
 
 void gearoenix::system::Application::create_window() noexcept
 {
-    //SDL_SetHint(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandescapeRight");
+#ifndef GX_IN_DESKTOP
+    SDL_SetHint(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandescapeRight");
+#endif
     std::uint32_t flags = SDL_WINDOW_SHOWN;
 
 #ifdef GX_USE_VULKAN

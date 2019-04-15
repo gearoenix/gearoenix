@@ -70,8 +70,8 @@ void gearoenix::render::camera::Perspective::set_field_of_view(const core::Real 
     tany = tanx / uniform.near_aspect_ratio_reserved[1];
     fovy = static_cast<core::Real>(std::atan(static_cast<double>(tany))) * 2.0f;
     uniform.projection = math::Mat4x4::perspective(
-        tanx * -uniform.near_aspect_ratio_reserved[0],
-        tany * -uniform.near_aspect_ratio_reserved[0],
+        tanx * -uniform.near_aspect_ratio_reserved[0] * 2.0f,
+        tany * -uniform.near_aspect_ratio_reserved[0] * 2.0f,
         -uniform.near_aspect_ratio_reserved[0],
         -uniform.position_far[3]);
     uniform.uniform_projection = math::Mat4x4(
