@@ -30,7 +30,7 @@ gearoenix::render::Surface::Surface(Instance* instance,
     create_info.window = sys_app->get_window();
     VKC(instance->get_linker()->vkCreateXcbSurfaceKHR(
         instance->get_vulkan_data(), &create_info, 0, &vulkan_data));
-#elif defined(IN_WINDOWS)
+#elif defined(GX_IN_WINDOWS)
     VkWin32SurfaceCreateInfoKHR create_info;
     setz(create_info);
     create_info.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;

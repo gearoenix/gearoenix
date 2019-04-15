@@ -5,7 +5,7 @@
 #include <chrono>
 #include <thread>
 
-#ifndef IN_WINDOWS
+#ifndef GX_IN_WINDOWS
 int main()
 #else
 #include <Windows.h>

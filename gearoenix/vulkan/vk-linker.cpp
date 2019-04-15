@@ -4,13 +4,13 @@
 #include <string>
 #if defined(IN_LINUX) || defined(IN_ANDROID)
 #include <dlfcn.h>
-#elif defined(IN_WINDOWS)
+#elif defined(GX_IN_WINDOWS)
 #include <Windows.h>
 #endif
 
 gearoenix::render::Linker::Linker()
 {
-#ifdef IN_WINDOWS
+#ifdef GX_IN_WINDOWS
     auto libvulkan = LoadLibrary("vulkan-1.dll");
 #else
     void* libvulkan = dlopen("libvulkan.so", RTLD_NOW | RTLD_LOCAL);
@@ -18,7 +18,7 @@ gearoenix::render::Linker::Linker()
     if (!libvulkan) {
         LOGF(std::string("Error no Vulkan is available."));
     }
-#ifdef IN_WINDOWS
+#ifdef GX_IN_WINDOWS
 #define VKL(x) x = static_cast<PFN_##x>(GetProcAddress(libvulkan, #x))
 #else
 #define VKL(x) x = static_cast<PFN_##x>(dlsym(libvulkan, #x))

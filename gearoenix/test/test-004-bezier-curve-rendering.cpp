@@ -5,7 +5,7 @@
 #include "../render/texture/rnd-txt-lodepng.hpp"
 #include "../system/sys-log.hpp"
 
-#ifndef IN_WINDOWS
+#ifndef GX_IN_WINDOWS
 int main()
 #else
 #include <Windows.h>

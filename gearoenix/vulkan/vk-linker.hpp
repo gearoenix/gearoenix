@@ -6,7 +6,7 @@
 #define VK_USE_PLATFORM_ANDROID_KHR
 #elif defined(IN_LINUX)
 #define VK_USE_PLATFORM_XCB_KHR
-#elif defined(IN_WINDOWS)
+#elif defined(GX_IN_WINDOWS)
 #define VK_USE_PLATFORM_WIN32_KHR
 #else
 #error "It is not implemented yet!"

@@ -16,11 +16,9 @@
 #include "../../gl/gl-loader.hpp"
 #if defined(GX_USE_OPENGL_ES2)
 #include "../../gles2/engine/gles2-eng-engine.hpp"
-#include "../../gles2/gles2.hpp"
 #endif
 #if defined(GX_USE_OPENGL_ES3)
 #include "../../gles3/engine/gles3-eng-engine.hpp"
-#include "../../gles3/gles3.hpp"
 #endif
 #if defined(GX_USE_VULKAN)
 #include "../../vulkan/engine/vk-eng-engine.hpp"
@@ -37,7 +35,7 @@ const gearoenix::core::Real gearoenix::system::Application::ZOOM_EPSILON = 0.000
 
 void gearoenix::system::Application::create_window() noexcept
 {
-    SDL_SetHint(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandescapeRight");
+    //SDL_SetHint(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandescapeRight");
     std::uint32_t flags = SDL_WINDOW_SHOWN;
 
 #ifdef GX_USE_VULKAN
@@ -54,8 +52,8 @@ void gearoenix::system::Application::create_window() noexcept
         SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
         SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
         SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
-        //        SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
-        //        SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
+        // SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+        // SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
         SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);

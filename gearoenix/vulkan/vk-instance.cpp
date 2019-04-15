@@ -160,7 +160,7 @@ gearoenix::render::Instance::Instance(Linker* l)
         VK_KHR_ANDROID_SURFACE_EXTENSION_NAME,
 #elif defined(IN_LINUX)
         VK_KHR_XCB_SURFACE_EXTENSION_NAME,
-#elif defined(IN_WINDOWS)
+#elif defined(GX_IN_WINDOWS)
         VK_KHR_WIN32_SURFACE_EXTENSION_NAME,
 #else
 #error "Not implemented yet!"
