@@ -11,7 +11,7 @@ gearoenix::render::light::Light::Light(
     const std::shared_ptr<engine::Engine>& e)
     : core::asset::Asset(my_id, core::asset::Type::LIGHT)
 {
-    color.read(f);
+    color = math::Vec4(f->read<core::Real>(), f->read<core::Real>(), f->read<core::Real>(), 1.0f);
     has_shadow = f->read_bool();
 }
 
