@@ -99,18 +99,17 @@ const static std::string fragment_shader_code =
     "    float denom = GXPI * tmpdenom * tmpdenom;\n" // 43
     "    return nom / denom;\n" // 44
     "}\n" // 45
-    "float geometry_schlick_ggx(const float nd, const float roughness) {\n" // 46
-    "    float r = roughness + 1.0;\n" // 47
-    "    float k = (r * r) * (1.0 / 8.0);\n" // 48
+    "float geometry_schlick_ggx(const float nd, const float roughness, const float k, const float k_inv) {\n" // 46
     "    float nom = nd;\n" // 49
-    "    float denom = nd * (1.0 - k) + k;\n" // 50
+    "    float denom = nd * k_inv + k;\n" // 50
     "    return nom / denom;\n" // 51
     "}\n" // 52
-    "float geometry_smith(const vec3 normal, const vec3 view, const vec3 light, const float roughness) {\n" // 53
-    "    float nv = max(dot(normal, view), 0.0);\n" // 54
-    "    float nl = max(dot(normal, light), 0.0);\n" // 55
-    "    float ggx2 = geometry_schlick_ggx(nv, roughness);\n" // 56
-    "    float ggx1 = geometry_schlick_ggx(nl, roughness);\n" // 57
+    "float geometry_smith(const float normal_dot_light, const float normal_dot_view, const float roughness) {\n" // 53
+	"    float k = roughness + 1.0;\n" // 47
+	"    k = (k * k) * (1.0 / 8.0);\n" // 48
+	"    float k_inv = 1.0 - k;\n" //
+    "    float ggx2 = geometry_schlick_ggx(normal_dot_view, roughness, k, k_inv);\n" // 56
+    "    float ggx1 = geometry_schlick_ggx(normal_dot_light, roughness, k, k_inv);\n" // 57
     "    return ggx1 * ggx2;\n" // 58
     "}\n" // 59
     "vec3 fresnel_schlick(const float nv, const vec3 f0) {\n" // 60
@@ -145,14 +144,15 @@ const static std::string fragment_shader_code =
     "    vec3 normal = mat3(out_tng, out_btg, out_nrm) * ((texture2D(material_normal, out_uv).xyz - 0.5) * 2.0 * material_normal_scale);\n" // 84
     "    vec3 view = normalize(camera_position - out_pos);\n" // 85
     "    vec3 reflection = reflect(-view, normal);\n" // 86
+	"    float normal_dot_view = max(dot(normal, view), 0.0);\n" // 87
     //   calculate reflectance at normal incidence; if dia-electric (like plastic) use F0
     //   of 0.04 and if it's a metal, use the albedo color as F0 (metallic workflow)
     //   TODO: in future I must bring builder fresnel factor 0 (the hard coded 0.4) from matrial uniform data
-    "    vec3 f0 = mix(vec3(0.04), albedo.xyz, metallic);\n" // 87
+    "    vec3 f0 = mix(vec3(0.04), albedo.xyz, metallic);\n" // 88
     //   reflectance equation
-    "    vec3 lo = vec3(0.0);\n" // 88
+    "    vec3 lo = vec3(0.0);\n" // 89
     //   computing point lights
-    "    for (int i = 0; i < " GX_MAX_POINT_LIGHTS_STR "; ++i)\n" // 89
+    "    for (int i = 0; i < " GX_MAX_POINT_LIGHTS_STR "; ++i)\n" // 90
     "    {\n" // 90
     //       calculate per-light radiance
     "        vec3 light_vec = scene_point_lights_position_max_radius[i].xyz - out_pos;\n" // 91
@@ -160,16 +160,17 @@ const static std::string fragment_shader_code =
     "        float distance = length(light_vec);\n" // 92
     "        float distance_inv = 1.0 / distance;\n" // 93
     "        vec3 light_direction = light_vec * distance_inv;\n" // 94
+	"        float normal_dot_light = max(dot(normal, light_direction), 0.0);\n" //
     "        vec3 half_vec = normalize(view + light_direction);\n" // 95
     "        float attenuation = distance_inv * distance_inv;\n" // 96
     "        vec3 radiance = scene_point_lights_color_min_radius[i].xyz * attenuation;\n" // 97
     //       Cook-Torrance BRDF
     "        float ndf = distribution_ggx(normal, half_vec, roughness);\n" // 98
-    "        float geo = geometry_smith(normal, view, light_direction, roughness);\n" // 99
+    "        float geo = geometry_smith(normal_dot_light, normal_dot_view, roughness);\n" // 99
     "        vec3 frsn = fresnel_schlick(max(dot(half_vec, view), 0.0), f0);\n" // 100
     "        vec3 nominator = ndf * geo * frsn;\n" // 101
     //       0.001 to prevent divide by zero.
-    "        float denominator = 4.0 * max(dot(normal, view), 0.0) * max(dot(normal, light_direction), 0.0) + 0.001;\n" // 102
+    "        float denominator = 4.0 * normal_dot_view * normal_dot_light + 0.001;\n" // 102
     "        vec3 specular = nominator / denominator;\n" // 103
     //       kS is equal to Fresnel
     "        vec3 ks = frsn;\n" // 104
@@ -181,13 +182,12 @@ const static std::string fragment_shader_code =
     //       have no diffuse light).
     "        vec3 kd = (vec3(1.0) - ks) * (1.0 - metallic);\n" // 105
     //       scale light by NdotL
-    "        float nl = max(dot(normal, light_direction), 0.0);\n" // 106
     //       add to outgoing radiance Lo
     //       note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
-    "        lo += (kd * albedo.xyz / GXPI + specular) * radiance * nl;\n" // 107
+    "        lo += (kd * albedo.xyz / GXPI + specular) * radiance * normal_dot_light;\n" // 107
     "    }\n" // 108
     //   ambient lighting (we now use IBL as the ambient term)
-    "    vec3 frsn = fresnel_schlick_roughness(max(dot(normal, view), 0.0), f0, roughness);\n" // 109
+    "    vec3 frsn = fresnel_schlick_roughness(normal_dot_view, f0, roughness);\n" // 109
     "    vec3 ks = frsn;\n" // 110
     "    vec3 kd = (1.0 - ks) * (1.0 - metallic);\n" // 111
     "    vec3 irradiance = textureCube(effect_diffuse_environment, normal).rgb;\n" // 112
@@ -196,7 +196,7 @@ const static std::string fragment_shader_code =
     //   the Split-Sum approximation to get the IBL specular part.
     "    float MAX_REFLECTION_LOD = 4.0;\n" // 114
     "    vec3 prefiltered_color = textureCube(effect_specular_environment, reflection, roughness * MAX_REFLECTION_LOD).rgb;\n" // 115
-    "    vec2 brdf = texture2D(effect_brdflut, vec2(max(dot(normal, view), 0.0), roughness)).rg;\n" // 116
+    "    vec2 brdf = texture2D(effect_brdflut, vec2(normal_dot_view, roughness)).rg;\n" // 116
     "    vec3 specular = prefiltered_color * (frsn * brdf.x + brdf.y);\n" // 117
     //   TODO: add ambient occlusion (* ao);
     "    vec3 ambient = kd * diffuse + specular;\n" // 118
