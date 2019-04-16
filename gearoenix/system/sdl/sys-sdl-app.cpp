@@ -377,9 +377,11 @@ core_app->terminate();
 core_app = nullptr;
 render_engine->terminate();
 render_engine = nullptr;
+astmgr = nullptr;
 SDL_DelEventWatch(event_receiver, this);
 #ifdef GX_USE_OPENGL
 SDL_GL_DeleteContext(gl_context);
+gl::Loader::unload_library();
 #endif
 SDL_DestroyWindow(window);
 SDL_Quit();

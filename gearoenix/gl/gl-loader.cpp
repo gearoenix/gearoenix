@@ -74,6 +74,15 @@ void gearoenix::gl::Loader::load_library()
 #endif
 }
 
+void gearoenix::gl::Loader::unload_library()
+{
+#ifdef GX_USE_SDL
+    SDL_GL_UnloadLibrary();
+#else
+#error "Not implemented for this platform."
+#endif
+}
+
 void gearoenix::gl::Loader::load_functions()
 {
 #ifdef GX_USE_SDL

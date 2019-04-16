@@ -84,6 +84,7 @@ namespace gl {
 
     public:
         static void load_library();
+        static void unload_library();
         static void load_functions();
         static void check_for_error();
 
