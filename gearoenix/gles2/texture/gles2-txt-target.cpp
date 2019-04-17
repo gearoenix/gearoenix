@@ -20,7 +20,6 @@ gearoenix::gles2::texture::Target::Target(const std::shared_ptr<engine::Engine>&
 {
     img_width = e->get_system_application()->get_width();
     img_height = e->get_system_application()->get_height();
-    const std::shared_ptr<system::Application>& sysapp = e->get_system_application();
     gl::Loader::get_integerv(GL_FRAMEBUFFER_BINDING, &framebuffer);
     gl::Loader::get_integerv(GL_RENDERBUFFER_BINDING, &depth_buffer);
     gl::Loader::clear_color(0.0f, 0.0f, 0.0f, 0.0f);

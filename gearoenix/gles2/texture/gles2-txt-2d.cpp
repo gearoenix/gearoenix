@@ -45,14 +45,14 @@ gearoenix::gles2::texture::Texture2D::Texture2D(
                 pixels[i] = pixels[j];
     } else
         GXLOGF("Unsupported/Unimplemented setting for texture with id " << my_id);
-    e->get_function_loader()->load([this, pixels, cf, s, gimg_width, gimg_height, sample_info, call] {
+    e->get_function_loader()->load([this, pixels, cf, gimg_width, gimg_height, sample_info, call] {
         gl::Loader::gen_textures(1, &texture_object);
         gl::Loader::bind_texture(GL_TEXTURE_2D, texture_object);
         gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, sample_info.min_filter);
         gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, sample_info.mag_filter);
         gl::Loader::tex_parameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, sample_info.wrap_s);
         gl::Loader::tex_parameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, sample_info.wrap_t);
-        gl::Loader::tex_image_2d(GL_TEXTURE_2D, 0, static_cast<const gl::sint>(cf), gimg_width, gimg_height, 0, static_cast<const gl::enumerated>(cf), GL_UNSIGNED_BYTE, pixels);
+        gl::Loader::tex_image_2d(GL_TEXTURE_2D, 0, static_cast<gl::sint>(cf), gimg_width, gimg_height, 0, static_cast<gl::enumerated>(cf), GL_UNSIGNED_BYTE, pixels);
         gl::Loader::generate_mipmap(GL_TEXTURE_2D);
         gl::Loader::check_for_error();
         delete[] pixels;

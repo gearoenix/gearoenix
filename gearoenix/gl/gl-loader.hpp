@@ -57,7 +57,7 @@ namespace gl {
     typedef GXGL_APICALL void(GXGL_APIENTRY get_shader_info_log_fnp)(uint shader, sizei bufSize, sizei* length, char* info);
     typedef GXGL_APICALL sint(GXGL_APIENTRY get_uniform_location_fnp)(uint program, const char* name);
     typedef GXGL_APICALL void(GXGL_APIENTRY link_program_fnp)(uint program);
-    typedef GXGL_APICALL void(GXGL_APIENTRY tex_image_2d_fnp)(enumerated target, sint level, sint internal_format, sizei image_width, sint image_height, sint border, enumerated format, enumerated data_type, const void* pixels);
+    typedef GXGL_APICALL void(GXGL_APIENTRY tex_image_2d_fnp)(enumerated target, sint level, sint internal_format, sizei image_width, sizei image_height, sint border, enumerated format, enumerated data_type, const void* pixels);
     typedef GXGL_APICALL void(GXGL_APIENTRY tex_parameterf_fnp)(enumerated, enumerated, float);
     typedef GXGL_APICALL void(GXGL_APIENTRY tex_parameterfv_fnp)(enumerated, enumerated, const float*);
     typedef GXGL_APICALL void(GXGL_APIENTRY tex_parameteri_fnp)(enumerated, enumerated, sint);

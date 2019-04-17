@@ -20,11 +20,9 @@ std::shared_ptr<gearoenix::render::model::Model> gearoenix::render::model::Manag
         switch (t) {
         case Type::DYNAMIC:
         case Type::STATIC:
-            return std::make_shared<Model>(id, f, e, call, Type::DYNAMIC == t);
+            return std::make_shared<Model>(id, f, e, call);
         case Type::WIDGET:
             GXUNIMPLEMENTED;
-        default:
-            GXUNEXPECTED;
         }
     });
     c.set_data(m);

@@ -8,7 +8,7 @@ static std::shared_ptr<gearoenix::render::buffer::FramedUniform> null_uniforms;
 gearoenix::render::light::Light::Light(
     const core::Id my_id,
     const std::shared_ptr<system::stream::Stream>& f,
-    const std::shared_ptr<engine::Engine>& e)
+    const std::shared_ptr<engine::Engine>&)
     : core::asset::Asset(my_id, core::asset::Type::LIGHT)
 {
 	f->read(color[0]);

@@ -88,7 +88,7 @@ void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::set_brdflut(co
     set_input_texture(t, brdflut_index);
 }
 
-const std::shared_ptr<gearoenix::render::sync::Semaphore>& gearoenix::render::graph::node::ForwardPbrDirectionalShadow::get_semaphore(const unsigned int frame_number)
+const std::shared_ptr<gearoenix::render::sync::Semaphore>& gearoenix::render::graph::node::ForwardPbrDirectionalShadow::get_semaphore(const unsigned int)
 {
     GXUNEXPECTED;
 }

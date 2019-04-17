@@ -13,13 +13,13 @@ namespace core {
             struct LockData {
                 std::mutex m;
                 std::condition_variable c;
-                bool locked = true;
-                bool unlocked = false;
+                volatile bool locked = true;
+                volatile bool unlocked = false;
             };
             typedef std::shared_ptr<LockData> Lock;
             std::mutex m_count;
             std::queue<Lock> q;
-            int count = 0;
+            volatile int count = 0;
 
         public:
             QueuedSemaphore(int count = 0);
