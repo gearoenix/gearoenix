@@ -40,7 +40,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
         return std::shared_ptr<Texture>(e->create_texture_2d(
             id, static_cast<const void*>(cc.get()),
             TextureFormat::RGBA_FLOAT32, sample_info, 1, 1,
-            core::sync::EndCaller<core::sync::EndCallerIgnore>([c, cc] { })));
+            core::sync::EndCaller<core::sync::EndCallerIgnore>([c, cc] {})));
     };
     std::shared_ptr<Texture2D> data = std::static_pointer_cast<Texture2D>(cache.get_cacher().get(id, fun));
     c.set_data(data);

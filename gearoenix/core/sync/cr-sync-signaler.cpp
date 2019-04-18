@@ -18,7 +18,7 @@ void gearoenix::core::sync::Signaler::wait()
     locked = true;
     unlocked = false;
     std::unique_lock<std::mutex> lock(m);
-    cv.wait(lock, [&] { return unlocked; });
+    cv.wait(lock, [this] { return unlocked; });
     locked = false;
     unlocked = true;
 }

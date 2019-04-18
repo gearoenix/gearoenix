@@ -111,7 +111,8 @@ namespace vulkan {
         unsigned int get_frames_count() const;
         unsigned int get_current_frame_index() const;
         command::Buffer* get_current_command_buffer();
-        unsigned int load_scene(core::Id scene_id, std::function<void(unsigned int)> on_load = [](unsigned int) {});
+        unsigned int load_scene(
+            core::Id scene_id, std::function<void(unsigned int)> on_load = [](unsigned int) {});
         void push_todo(std::function<std::function<void()>(command::Buffer*)> fun);
     };
 }

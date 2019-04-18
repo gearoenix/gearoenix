@@ -1,23 +1,24 @@
 #include "cr-sync-work-waiter.hpp"
 #include "../../system/sys-log.hpp"
 #include "../cr-function-loader.hpp"
-#include "cr-sync-queued-semaphore.hpp"
+#include "cr-sync-semaphore.hpp"
 
 #include <iostream>
 
 void gearoenix::core::sync::WorkWaiter::wait_loop()
 {
-    while (running) {
+
+    while (state == WORKING) {
         GXLOGD("Going to wait.");
         semaphore->lock();
         GXLOGD("Going to unload.");
         function_loader->unload();
     }
-    running = true;
+    state = TERMINATED;
 }
 
 gearoenix::core::sync::WorkWaiter::WorkWaiter()
-    : semaphore(new QueuedSemaphore())
+    : semaphore(new Semaphore())
     , function_loader(new FunctionLoader())
     , thread(std::bind(&WorkWaiter::wait_loop, this))
 {
@@ -25,8 +26,12 @@ gearoenix::core::sync::WorkWaiter::WorkWaiter()
 
 gearoenix::core::sync::WorkWaiter::~WorkWaiter()
 {
-    running = false;
-    while (!running) {
+#ifdef GX_DEBUG_MODE
+    if (state == TERMINATED)
+        GXLOGF("Error terminated sooner than expected.");
+#endif
+    state = FINISHED;
+    while (state != TERMINATED) {
         semaphore->release();
     }
     thread.join();

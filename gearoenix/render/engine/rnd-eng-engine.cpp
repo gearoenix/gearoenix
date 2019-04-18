@@ -4,7 +4,7 @@
 #include "../../core/event/cr-ev-event.hpp"
 #include "../../core/event/cr-ev-sys-system.hpp"
 #include "../../core/sync/cr-sync-kernel-workers.hpp"
-#include "../../core/sync/cr-sync-queued-semaphore.hpp"
+#include "../../core/sync/cr-sync-semaphore.hpp"
 #include "../../physics/phs-engine.hpp"
 #include "../../system/sys-app.hpp"
 #include "../../system/sys-log.hpp"

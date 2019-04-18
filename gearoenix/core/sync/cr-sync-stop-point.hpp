@@ -6,10 +6,10 @@
 namespace gearoenix {
 namespace core {
     namespace sync {
-        class QueuedSemaphore;
+        class Semaphore;
         class StopPoint {
         private:
-            const std::shared_ptr<QueuedSemaphore> sem;
+            const std::shared_ptr<Semaphore> sem;
             const int stoper;
             volatile int counter = 0;
             std::mutex counter_lock;

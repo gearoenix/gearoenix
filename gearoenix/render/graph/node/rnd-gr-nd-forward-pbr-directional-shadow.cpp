@@ -33,16 +33,16 @@ const unsigned int gearoenix::render::graph::node::ForwardPbrDirectionalShadow::
 gearoenix::render::graph::node::ForwardPbrDirectionalShadow::ForwardPbrDirectionalShadow(
     const std::shared_ptr<engine::Engine>& e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call)
     : Node(
-          e,
-          pipeline::Type::ForwardPbrDirectionalShadow,
-          5,
-          1,
-          { "diffuse environment"
-            "specular environment"
-            "ambient occlusion"
-            "shadow map" },
-          { "color" },
-          call)
+        e,
+        pipeline::Type::ForwardPbrDirectionalShadow,
+        5,
+        1,
+        { "diffuse environment"
+          "specular environment"
+          "ambient occlusion"
+          "shadow map" },
+        { "color" },
+        call)
 {
     frames.resize(e->get_frames_count());
     for (unsigned int i = 0; i < e->get_frames_count(); ++i) {

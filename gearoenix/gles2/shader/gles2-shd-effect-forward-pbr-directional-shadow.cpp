@@ -105,9 +105,9 @@ const static std::string fragment_shader_code =
     "    return nom / denom;\n" // 51
     "}\n" // 52
     "float geometry_smith(const float normal_dot_light, const float normal_dot_view, const float roughness) {\n" // 53
-	"    float k = roughness + 1.0;\n" // 47
-	"    k = (k * k) * (1.0 / 8.0);\n" // 48
-	"    float k_inv = 1.0 - k;\n" //
+    "    float k = roughness + 1.0;\n" // 47
+    "    k = (k * k) * (1.0 / 8.0);\n" // 48
+    "    float k_inv = 1.0 - k;\n" //
     "    float ggx2 = geometry_schlick_ggx(normal_dot_view, roughness, k, k_inv);\n" // 56
     "    float ggx1 = geometry_schlick_ggx(normal_dot_light, roughness, k, k_inv);\n" // 57
     "    return ggx1 * ggx2;\n" // 58
@@ -144,7 +144,7 @@ const static std::string fragment_shader_code =
     "    vec3 normal = mat3(out_tng, out_btg, out_nrm) * ((texture2D(material_normal, out_uv).xyz - 0.5) * 2.0 * material_normal_scale);\n" // 84
     "    vec3 view = normalize(camera_position - out_pos);\n" // 85
     "    vec3 reflection = reflect(-view, normal);\n" // 86
-	"    float normal_dot_view = max(dot(normal, view), 0.0);\n" // 87
+    "    float normal_dot_view = max(dot(normal, view), 0.0);\n" // 87
     //   calculate reflectance at normal incidence; if dia-electric (like plastic) use F0
     //   of 0.04 and if it's a metal, use the albedo color as F0 (metallic workflow)
     //   TODO: in future I must bring builder fresnel factor 0 (the hard coded 0.4) from matrial uniform data
@@ -160,7 +160,7 @@ const static std::string fragment_shader_code =
     "        float distance = length(light_vec);\n" // 92
     "        float distance_inv = 1.0 / distance;\n" // 93
     "        vec3 light_direction = light_vec * distance_inv;\n" // 94
-	"        float normal_dot_light = max(dot(normal, light_direction), 0.0);\n" //
+    "        float normal_dot_light = max(dot(normal, light_direction), 0.0);\n" //
     "        vec3 half_vec = normalize(view + light_direction);\n" // 95
     "        float attenuation = distance_inv * distance_inv;\n" // 96
     "        vec3 radiance = scene_point_lights_color_min_radius[i].xyz * attenuation;\n" // 97

@@ -1,8 +1,8 @@
 #include "cr-sync-stop-point.hpp"
-#include "cr-sync-queued-semaphore.hpp"
+#include "cr-sync-semaphore.hpp"
 
 gearoenix::core::sync::StopPoint::StopPoint(int walkers_count)
-    : sem(new QueuedSemaphore())
+    : sem(new Semaphore())
     , stoper(walkers_count)
 {
 }

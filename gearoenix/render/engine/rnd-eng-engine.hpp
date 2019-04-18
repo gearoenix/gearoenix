@@ -15,7 +15,6 @@ namespace core {
         class Event;
     }
     namespace sync {
-        class QueuedSemaphore;
         class KernelWorker;
     }
 }

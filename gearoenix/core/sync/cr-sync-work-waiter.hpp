@@ -8,13 +8,19 @@ namespace gearoenix {
 namespace core {
     class FunctionLoader;
     namespace sync {
-        class QueuedSemaphore;
+        class Semaphore;
         class WorkWaiter {
         private:
-            const std::shared_ptr<QueuedSemaphore> semaphore;
+            typedef enum {
+                WORKING,
+                FINISHED,
+                TERMINATED,
+            } work_state;
+
+            const std::shared_ptr<Semaphore> semaphore;
             const std::shared_ptr<FunctionLoader> function_loader;
             std::thread thread;
-            volatile bool running = true;
+            work_state state = WORKING;
 
             void wait_loop();
 

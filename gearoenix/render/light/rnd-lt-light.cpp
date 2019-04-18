@@ -11,9 +11,9 @@ gearoenix::render::light::Light::Light(
     const std::shared_ptr<engine::Engine>&)
     : core::asset::Asset(my_id, core::asset::Type::LIGHT)
 {
-	f->read(color[0]);
-	f->read(color[1]);
-	f->read(color[2]);
+    f->read(color[0]);
+    f->read(color[1]);
+    f->read(color[2]);
     has_shadow = f->read_bool();
 }
 

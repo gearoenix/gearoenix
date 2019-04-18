@@ -1,7 +1,7 @@
 #include "phs-engine.hpp"
 #include "../core/asset/cr-asset-manager.hpp"
 #include "../core/sync/cr-sync-kernel-workers.hpp"
-#include "../core/sync/cr-sync-queued-semaphore.hpp"
+#include "../core/sync/cr-sync-semaphore.hpp"
 #include "../core/sync/cr-sync-stop-point.hpp"
 #include "../render/camera/rnd-cmr-camera.hpp"
 #include "../render/engine/rnd-eng-engine.hpp"
@@ -17,7 +17,11 @@ void gearoenix::physics::Engine::update_uniform_buffers_kernel(const unsigned in
 {
     unsigned int task_number = 0;
     const unsigned int kernels_count = kernels->get_threads_count();
-#define GXDOTASK(expr) if (task_number == kernel_index) { expr; } task_number = (task_number + 1) % kernels_count
+#define GXDOTASK(expr)                 \
+    if (task_number == kernel_index) { \
+        expr;                          \
+    }                                  \
+    task_number = (task_number + 1) % kernels_count
     const std::map<core::Id, std::weak_ptr<render::scene::Scene>>& scenes = sysapp->get_asset_manager()->get_scene_manager()->get_scenes();
     for (const std::pair<core::Id, std::weak_ptr<render::scene::Scene>>& is : scenes) {
         if (const std::shared_ptr<render::scene::Scene> scene = is.second.lock()) {

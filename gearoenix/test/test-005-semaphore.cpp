@@ -1,36 +1,58 @@
 #include "test-005-semaphore.hpp"
 #ifdef GX_TEST005
-#include "../core/sync/cr-sync-queued-semaphore.hpp"
+#include "../core/sync/cr-sync-semaphore.hpp"
 #include "../system/sys-log.hpp"
 #include <chrono>
 #include <thread>
 
-#ifndef GX_IN_WINDOWS
 int main()
-#else
-#include <Windows.h>
-int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
-#endif
 {
-    gearoenix::core::sync::QueuedSemaphore sem;
+    gearoenix::core::sync::Semaphore sem;
+    constexpr auto loop_count = 10000000;
+    std::thread t0([&] {
+        for (int i = 0; i < loop_count; ++i)
+            sem.lock();
+    });
     std::thread t1([&] {
-        for (int i = 0; i < 100000; ++i) sem.release();
+        for (int i = 0; i < loop_count; ++i)
+            sem.release();
     });
     std::thread t2([&] {
-        for (int i = 0; i < 100000; ++i) sem.lock();
+        for (int i = 0; i < loop_count; ++i)
+            sem.lock();
     });
     std::thread t3([&] {
-        for (int i = 0; i < 100000; ++i) sem.release();
+        for (int i = 0; i < loop_count; ++i)
+            sem.release();
     });
     std::thread t4([&] {
-        for (int i = 0; i < 100000; ++i) sem.lock();
+        for (int i = 0; i < loop_count; ++i)
+            sem.lock();
     });
+    std::thread t5([&] {
+        for (int i = 0; i < loop_count; ++i)
+            sem.release();
+    });
+    std::thread t6([&] {
+        for (int i = 0; i < loop_count; ++i)
+            sem.lock();
+    });
+    std::thread t7([&] {
+        for (int i = 0; i < loop_count; ++i)
+            sem.release();
+    });
+    t0.join();
     t1.join();
     t2.join();
     t3.join();
     t4.join();
-    for (int i = 0; i < 100; ++i) sem.release();
-    for (int i = 0; i < 100; ++i) sem.lock();
+    t5.join();
+    t6.join();
+    t7.join();
+    for (int i = 0; i < loop_count; ++i)
+        sem.release();
+    for (int i = 0; i < loop_count; ++i)
+        sem.lock();
     return 0;
 }
 

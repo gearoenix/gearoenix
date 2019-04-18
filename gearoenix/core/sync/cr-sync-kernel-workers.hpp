@@ -31,7 +31,8 @@ namespace core {
         public:
             KernelWorker();
             ~KernelWorker();
-            void add_step(std::function<void(const unsigned int)> worker, std::function<void()> boss = [] {});
+            void add_step(
+                std::function<void(const unsigned int)> worker, std::function<void()> boss = [] {});
             void do_steps();
             unsigned int get_threads_count() const;
         };

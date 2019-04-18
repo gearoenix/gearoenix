@@ -41,7 +41,7 @@ gearoenix::core::sync::KernelWorker::~KernelWorker()
 {
     running = false;
     while (!terminated)
-        for (const auto &s : signals)
+        for (const auto& s : signals)
             s->signal();
     for (std::thread& t : threads)
         t.join();
