@@ -23,7 +23,6 @@ GameApp::GameApp(const std::shared_ptr<gearoenix::system::Application>& sys_app)
 {
     rnd_eng->set_render_tree(std::shared_ptr<gearoenix::render::graph::tree::Tree>(new gearoenix::render::graph::tree::Pbr(rnd_eng, gearoenix::core::sync::EndCaller<gearoenix::core::sync::EndCallerIgnore>([] {}))));
     sys_app->get_asset_manager()->get_scene_manager()->get_gx3d(1024, gearoenix::core::sync::EndCaller<gearoenix::render::scene::Scene>([this](std::shared_ptr<gearoenix::render::scene::Scene> s) {
-        //GXLOGF("REACHED");
         scn = s;
         s->get_light(1027)->enable_shadowing();
     }));

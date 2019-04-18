@@ -31,8 +31,8 @@ void gearoenix::gles2::shader::Shader::link()
         gl::sint max_length = 0;
         gl::Loader::get_programiv(shader_program, GL_INFO_LOG_LENGTH, &max_length);
         std::vector<char> info_log;
-        info_log.resize(max_length);
-        gl::Loader::get_program_info_log(shader_program, max_length, NULL, &(info_log[0]));
+        info_log.resize(static_cast<std::size_t>(max_length));
+        gl::Loader::get_program_info_log(shader_program, static_cast<gl::sizei>(max_length), nullptr, &(info_log[0]));
         GXLOGF("Error linking shader program: " << &(info_log[0]));
     }
     gl::Loader::use_program(shader_program);
@@ -51,8 +51,8 @@ void gearoenix::gles2::shader::Shader::validate()
         gl::sint max_length = 0;
         gl::Loader::get_programiv(shader_program, GL_INFO_LOG_LENGTH, &max_length);
         std::string info_log;
-        info_log.resize(max_length);
-        gl::Loader::get_program_info_log(shader_program, max_length, NULL, &(info_log[0]));
+        info_log.resize(static_cast<std::size_t>(max_length));
+        gl::Loader::get_program_info_log(shader_program, static_cast<gl::sizei>(max_length), nullptr, &(info_log[0]));
         GXLOGF("Invalid shader program: " << info_log);
     }
     gl::Loader::use_program(shader_program);
@@ -74,8 +74,8 @@ gearoenix::gl::uint gearoenix::gles2::shader::Shader::add_shader_to_program(cons
         gl::sint sts_size;
         gl::Loader::get_shaderiv(shader_obj, GL_INFO_LOG_LENGTH, &sts_size);
         std::vector<char> info_log;
-        info_log.resize(sts_size);
-        gl::Loader::get_shader_info_log(shader_obj, sts_size, NULL, &(info_log[0]));
+        info_log.resize(static_cast<std::size_t>(sts_size));
+        gl::Loader::get_shader_info_log(shader_obj, static_cast<gl::sizei>(sts_size), nullptr, &(info_log[0]));
         GXLOGF("Error compiling shader type. Info: " << &(info_log[0]));
     }
     gl::Loader::attach_shader(shader_program, shader_obj);
@@ -128,7 +128,7 @@ gearoenix::gles2::shader::Shader::~Shader()
     fragment_object = 0;
 }
 
-gearoenix::gl::uint gearoenix::gles2::shader::Shader::get_uniform_location(const std::string& uname) const
+gearoenix::gl::sint gearoenix::gles2::shader::Shader::get_uniform_location(const std::string& uname) const
 {
     return gl::Loader::get_uniform_location(shader_program, &(uname[0]));
 }
@@ -143,22 +143,22 @@ void gearoenix::gles2::shader::Shader::bind() const
 
     gl::Loader::use_program(shader_program);
     if (position_attribute_location != -1)
-        gl::Loader::enable_vertex_attrib_array(position_attribute_location);
+        gl::Loader::enable_vertex_attrib_array(static_cast<gl::uint>(position_attribute_location));
     if (normal_attribute_location != -1)
-        gl::Loader::enable_vertex_attrib_array(normal_attribute_location);
+        gl::Loader::enable_vertex_attrib_array(static_cast<gl::uint>(normal_attribute_location));
     if (tangent_attribute_location != -1)
-        gl::Loader::enable_vertex_attrib_array(tangent_attribute_location);
+        gl::Loader::enable_vertex_attrib_array(static_cast<gl::uint>(tangent_attribute_location));
     if (uv_attribute_location != -1)
-        gl::Loader::enable_vertex_attrib_array(uv_attribute_location);
+        gl::Loader::enable_vertex_attrib_array(static_cast<gl::uint>(uv_attribute_location));
 
     if (position_attribute_location != -1)
-        gl::Loader::vertex_attrib_pointer(position_attribute_location, 3, GL_FLOAT, GL_FALSE, 12 * sizeof(float), reinterpret_cast<void*>(0));
+        gl::Loader::vertex_attrib_pointer(static_cast<gl::uint>(position_attribute_location), 3, GL_FLOAT, GL_FALSE, 12 * sizeof(float), reinterpret_cast<void*>(0));
     if (normal_attribute_location != -1)
-        gl::Loader::vertex_attrib_pointer(normal_attribute_location, 3, GL_FLOAT, GL_FALSE, 12 * sizeof(float), reinterpret_cast<void*>(3 * sizeof(float)));
+        gl::Loader::vertex_attrib_pointer(static_cast<gl::uint>(normal_attribute_location), 3, GL_FLOAT, GL_FALSE, 12 * sizeof(float), reinterpret_cast<void*>(3 * sizeof(float)));
     if (tangent_attribute_location != -1)
-        gl::Loader::vertex_attrib_pointer(tangent_attribute_location, 4, GL_FLOAT, GL_FALSE, 12 * sizeof(float), reinterpret_cast<void*>(6 * sizeof(float)));
+        gl::Loader::vertex_attrib_pointer(static_cast<gl::uint>(tangent_attribute_location), 4, GL_FLOAT, GL_FALSE, 12 * sizeof(float), reinterpret_cast<void*>(6 * sizeof(float)));
     if (uv_attribute_location != -1)
-        gl::Loader::vertex_attrib_pointer(uv_attribute_location, 2, GL_FLOAT, GL_FALSE, 12 * sizeof(float), reinterpret_cast<void*>(10 * sizeof(float)));
+        gl::Loader::vertex_attrib_pointer(static_cast<gl::uint>(uv_attribute_location), 2, GL_FLOAT, GL_FALSE, 12 * sizeof(float), reinterpret_cast<void*>(10 * sizeof(float)));
 }
 
 #endif

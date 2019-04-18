@@ -8,7 +8,7 @@
 #include "../gles2.hpp"
 #include <string>
 
-#define GX_SHADER_UNIFORM_FAILED 0xFFFFFFFF
+#define GX_SHADER_UNIFORM_FAILED -1
 
 #ifdef GX_DEBUG_GLES2
 #define GX_DEBUG_GLES2_GLSL
@@ -54,7 +54,7 @@ namespace gles2 {
             Shader(const std::shared_ptr<engine::Engine>& e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
             virtual ~Shader();
             /// On not found returns GX_SHADER_UNIFORM_FAILED
-            gl::uint get_uniform_location(const std::string& name) const;
+            gl::sint get_uniform_location(const std::string& name) const;
             gl::uint get_shader_program() const;
             virtual void bind() const;
         };
