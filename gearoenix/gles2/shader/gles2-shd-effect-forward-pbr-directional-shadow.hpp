@@ -15,6 +15,7 @@ namespace gles2 {
     namespace shader {
         class ForwardPbrDirectionalShadow : public Shader {
         private:
+            GX_GLES2_SHADER_MATERIAL_UNIFORMS_LOCATIONS
             gl::sint camera_position = GX_SHADER_UNIFORM_FAILED;
             gl::sint camera_vp = GX_SHADER_UNIFORM_FAILED;
             gl::sint effect_ambient_occlusion = GX_SHADER_UNIFORM_FAILED;
@@ -25,16 +26,6 @@ namespace gles2 {
             gl::sint light_color = GX_SHADER_UNIFORM_FAILED;
             gl::sint light_direction = GX_SHADER_UNIFORM_FAILED;
             gl::sint light_vp_bias = GX_SHADER_UNIFORM_FAILED;
-            gl::sint material_alpha = GX_SHADER_UNIFORM_FAILED;
-            gl::sint material_alpha_cutoff = GX_SHADER_UNIFORM_FAILED;
-            gl::sint material_base_color = GX_SHADER_UNIFORM_FAILED;
-            gl::sint material_emissive = GX_SHADER_UNIFORM_FAILED;
-            gl::sint material_metallic_factor = GX_SHADER_UNIFORM_FAILED;
-            gl::sint material_metallic_roughness = GX_SHADER_UNIFORM_FAILED;
-            gl::sint material_normal = GX_SHADER_UNIFORM_FAILED;
-            gl::sint material_normal_scale = GX_SHADER_UNIFORM_FAILED;
-            gl::sint material_occlusion_strength = GX_SHADER_UNIFORM_FAILED;
-            gl::sint material_roughness_factor = GX_SHADER_UNIFORM_FAILED;
             gl::sint model_m = GX_SHADER_UNIFORM_FAILED;
             gl::sint scene_ambient_light = GX_SHADER_UNIFORM_FAILED;
             gl::sint scene_directional_lights_color = GX_SHADER_UNIFORM_FAILED;
@@ -43,11 +34,6 @@ namespace gles2 {
             gl::sint scene_point_lights_color_min_radius = GX_SHADER_UNIFORM_FAILED;
             gl::sint scene_point_lights_position_max_radius = GX_SHADER_UNIFORM_FAILED;
             gl::sint scene_ssao_config = GX_SHADER_UNIFORM_FAILED;
-            // Textures indices
-            gl::sint material_base_color_index = -1;
-            gl::sint material_metallic_roughness_index = -1;
-            gl::sint material_normal_index = -1;
-            gl::sint material_emissive_index = -1;
             gl::sint effect_diffuse_environment_index = -1;
             gl::sint effect_specular_environment_index = -1;
             gl::sint effect_ambient_occlusion_index = -1;
@@ -58,6 +44,7 @@ namespace gles2 {
             ForwardPbrDirectionalShadow(const std::shared_ptr<engine::Engine>& e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
             ~ForwardPbrDirectionalShadow() override final;
             void bind() const override final;
+            GX_GLES2_SHADER_MATERIAL_FUNCTION_DECLARATIONS
             GX_GETTER_BUILDER(camera_position)
             GX_GETTER_BUILDER(camera_vp)
             GX_GETTER_BUILDER(effect_ambient_occlusion)
@@ -68,16 +55,6 @@ namespace gles2 {
             GX_GETTER_BUILDER(light_color)
             GX_GETTER_BUILDER(light_direction)
             GX_GETTER_BUILDER(light_vp_bias)
-            GX_GETTER_BUILDER(material_alpha)
-            GX_GETTER_BUILDER(material_alpha_cutoff)
-            GX_GETTER_BUILDER(material_base_color)
-            GX_GETTER_BUILDER(material_emissive)
-            GX_GETTER_BUILDER(material_metallic_factor)
-            GX_GETTER_BUILDER(material_metallic_roughness)
-            GX_GETTER_BUILDER(material_normal)
-            GX_GETTER_BUILDER(material_normal_scale)
-            GX_GETTER_BUILDER(material_occlusion_strength)
-            GX_GETTER_BUILDER(material_roughness_factor)
             GX_GETTER_BUILDER(model_m)
             GX_GETTER_BUILDER(scene_ambient_light)
             GX_GETTER_BUILDER(scene_directional_lights_color)
@@ -86,10 +63,6 @@ namespace gles2 {
             GX_GETTER_BUILDER(scene_point_lights_color_min_radius)
             GX_GETTER_BUILDER(scene_point_lights_position_max_radius)
             GX_GETTER_BUILDER(scene_ssao_config)
-            GX_GETTER_BUILDER(material_base_color_index)
-            GX_GETTER_BUILDER(material_metallic_roughness_index)
-            GX_GETTER_BUILDER(material_normal_index)
-            GX_GETTER_BUILDER(material_emissive_index)
             GX_GETTER_BUILDER(effect_diffuse_environment_index)
             GX_GETTER_BUILDER(effect_specular_environment_index)
             GX_GETTER_BUILDER(effect_ambient_occlusion_index)
@@ -106,16 +79,6 @@ namespace gles2 {
             GXHELPER(light_color)
             GXHELPER(light_direction)
             GXHELPER(light_vp_bias)
-            GXHELPER(material_alpha)
-            GXHELPER(material_alpha_cutoff)
-            GXHELPER(material_base_color)
-            GXHELPER(material_emissive)
-            GXHELPER(material_metallic_factor)
-            GXHELPER(material_metallic_roughness)
-            GXHELPER(material_normal)
-            GXHELPER(material_normal_scale)
-            GXHELPER(material_occlusion_strength)
-            GXHELPER(material_roughness_factor)
             GXHELPER(model_m)
             GXHELPER(scene_ambient_light)
             GXHELPER(scene_directional_lights_color)
@@ -124,10 +87,6 @@ namespace gles2 {
             GXHELPER(scene_point_lights_color_min_radius)
             GXHELPER(scene_point_lights_position_max_radius)
             GXHELPER(scene_ssao_config)
-            GXHELPER(material_base_color_index)
-            GXHELPER(material_metallic_roughness_index)
-            GXHELPER(material_normal_index)
-            GXHELPER(material_emissive_index)
             GXHELPER(effect_diffuse_environment_index)
             GXHELPER(effect_specular_environment_index)
             GXHELPER(effect_ambient_occlusion_index)

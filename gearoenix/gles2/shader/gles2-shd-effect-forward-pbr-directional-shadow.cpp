@@ -6,16 +6,7 @@
 #include "../../system/sys-log.hpp"
 #include "../engine/gles2-eng-engine.hpp"
 
-const static std::string vertex_shader_code =
-    // precision(s)
-    "precision highp float;\n"
-    "precision highp sampler2D;\n"
-    "precision highp samplerCube;\n"
-    // attribute(s)
-    "attribute vec3 position;\n"
-    "attribute vec3 normal;\n"
-    "attribute vec4 tangent;\n"
-    "attribute vec2 uv;\n"
+const static std::string vertex_shader_code = GX_GLES2_SHADER_SRC_DEFAULT_VERTEX_STARTING
     // effect uniform(s)
     "uniform mat4 camera_vp;\n"
     // light uniform(s)
@@ -43,24 +34,8 @@ const static std::string vertex_shader_code =
     "    gl_Position = camera_vp * pos;\n"
     "}";
 
-const static std::string fragment_shader_code =
-    // precisions
-    "precision highp   float;\n" // 1
-    "precision highp   sampler2D;\n" // 2
-    "precision highp   samplerCube;\n" // 3
-    // constant(s)
-    "#define GXPI      3.14159265359\n" // 4
-    // material uniform(s)
-    "uniform float     material_alpha;\n" // 5
-    "uniform float     material_alpha_cutoff;\n" // 6
-    "uniform float     material_metallic_factor;\n" // 7
-    "uniform float     material_normal_scale;\n" // 8
-    "uniform float     material_occlusion_strength;\n" // 9
-    "uniform float     material_roughness_factor;\n" // 10
-    "uniform sampler2D material_base_color;\n" // 11
-    "uniform sampler2D material_metallic_roughness;\n" // 12
-    "uniform sampler2D material_normal;\n" // 13
-    "uniform sampler2D material_emissive;\n" // 14
+const static std::string fragment_shader_code = GX_GLES2_SHADER_SRC_DEFAULT_FRAGMENT_STARTING
+    GX_GLES2_SHADER_SRC_MATERIAL_RESOURCES
     // scenes uniform(s)
     "uniform vec3      scene_ambient_light;\n" // 15
     "uniform vec4      scene_directional_lights_color[" GX_MAX_DIRECTIONAL_LIGHTS_STR "];\n" // 16
@@ -247,6 +222,7 @@ gearoenix::gles2::shader::ForwardPbrDirectionalShadow::ForwardPbrDirectionalShad
         set_vertex_shader(vertex_shader_code);
         set_fragment_shader(fragment_shader_code);
         link();
+        GX_GLES2_SHADER_MATERIAL_GET_UNIFORM_LOCATIONS
         GX_GLES2_THIS_GET_UNIFORM_F(camera_position);
         GX_GLES2_THIS_GET_UNIFORM_F(camera_vp);
         // TODO
@@ -258,17 +234,7 @@ gearoenix::gles2::shader::ForwardPbrDirectionalShadow::ForwardPbrDirectionalShad
         GX_GLES2_THIS_GET_UNIFORM_F(effect_specular_environment);
         /*GX_GLES2_THIS_GET_UNIFORM_F(light_color);
 		GX_GLES2_THIS_GET_UNIFORM_F(light_direction);
-		GX_GLES2_THIS_GET_UNIFORM_F(light_vp_bias);*/
-        GX_GLES2_THIS_GET_UNIFORM_F(material_alpha);
-        GX_GLES2_THIS_GET_UNIFORM_F(material_alpha_cutoff);
-        GX_GLES2_THIS_GET_UNIFORM_F(material_base_color);
-        //GX_GLES2_THIS_GET_UNIFORM_F(material_emissive);
-        GX_GLES2_THIS_GET_UNIFORM_F(material_metallic_factor);
-        GX_GLES2_THIS_GET_UNIFORM_F(material_metallic_roughness);
-        GX_GLES2_THIS_GET_UNIFORM_F(material_normal);
-        GX_GLES2_THIS_GET_UNIFORM_F(material_normal_scale);
-        //GX_GLES2_THIS_GET_UNIFORM_F(material_occlusion_strength);
-        GX_GLES2_THIS_GET_UNIFORM_F(material_roughness_factor);
+        GX_GLES2_THIS_GET_UNIFORM_F(light_vp_bias);*/
         GX_GLES2_THIS_GET_UNIFORM_F(model_m);
         // GX_GLES2_THIS_GET_UNIFORM_F(scene_ambient_light);
         GX_GLES2_THIS_GET_UNIFORM_F(scene_directional_lights_color);
@@ -278,15 +244,8 @@ gearoenix::gles2::shader::ForwardPbrDirectionalShadow::ForwardPbrDirectionalShad
         GX_GLES2_THIS_GET_UNIFORM_F(scene_point_lights_position_max_radius);
         // GX_GLES2_THIS_GET_UNIFORM_F(scene_ssao_config);
     });
-    gl::sint texture_index = 0;
-    material_base_color_index = texture_index;
-    ++texture_index;
-    material_metallic_roughness_index = texture_index;
-    ++texture_index;
-    material_normal_index = texture_index;
-    ++texture_index;
-    material_emissive_index = texture_index;
-    ++texture_index;
+    GX_GLES2_SHADER_SET_TEXTURE_INDEX_STARTING
+    GX_GLES2_SHADER_MATERIAL_SET_TEXTURE_INDEX
     effect_diffuse_environment_index = texture_index;
     ++texture_index;
     effect_specular_environment_index = texture_index;
@@ -305,10 +264,7 @@ gearoenix::gles2::shader::ForwardPbrDirectionalShadow::~ForwardPbrDirectionalSha
 void gearoenix::gles2::shader::ForwardPbrDirectionalShadow::bind() const
 {
     Shader::bind();
-    gl::Loader::uniform1i(material_base_color, material_base_color_index);
-    gl::Loader::uniform1i(material_metallic_roughness, material_metallic_roughness_index);
-    gl::Loader::uniform1i(material_normal, material_normal_index);
-    //gl::Loader::uniform1i(material_emissive, material_emissive_index);
+    GX_GLES2_SHADER_MATERIAL_SET_TEXTURE_INDEX_UNIFORM
     gl::Loader::uniform1i(effect_diffuse_environment, effect_diffuse_environment_index);
     gl::Loader::uniform1i(effect_specular_environment, effect_specular_environment_index);
     //gl::Loader::uniform1i(effect_ambient_occlusion, effect_ambient_occlusion_index);
@@ -339,12 +295,6 @@ GXHELPERM(camera_vp, 4, 1);
 GXHELPERV(light_color, 3, 1);
 GXHELPERV(light_direction, 3, 1);
 GXHELPERM(light_vp_bias, 4, 1);
-GXHELPERF(material_alpha);
-GXHELPERF(material_alpha_cutoff);
-GXHELPERF(material_metallic_factor);
-GXHELPERF(material_normal_scale);
-GXHELPERF(material_occlusion_strength);
-GXHELPERF(material_roughness_factor);
 GXHELPERM(model_m, 4, 1);
 GXHELPERV(scene_ambient_light, 3, 1);
 GXHELPERV(scene_directional_lights_color, 4, GX_MAX_DIRECTIONAL_LIGHTS);
