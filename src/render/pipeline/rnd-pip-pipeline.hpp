@@ -18,9 +18,9 @@ namespace render {
         protected:
             const std::shared_ptr<engine::Engine> e;
             const Type::Id pipeline_type;
+            Pipeline(const Type::Id pipeline_type, const std::shared_ptr<engine::Engine> e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call);
 
         public:
-            Pipeline(const Type::Id pipeline_type, const std::shared_ptr<engine::Engine> e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call);
             virtual ~Pipeline();
             Type::Id get_pipeline_type_id() const;
             virtual ResourceSet* create_resource_set() const = 0;

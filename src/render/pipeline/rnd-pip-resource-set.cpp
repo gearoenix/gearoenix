@@ -43,6 +43,11 @@ void gearoenix::render::pipeline::ResourceSet::set_material(const std::shared_pt
 
 #undef GXHELPER
 
+void gearoenix::render::pipeline::ResourceSet::set_node_uniform_buffer(const std::shared_ptr<buffer::Uniform>& b)
+{
+    node_uniform_buffer = b;
+}
+
 void gearoenix::render::pipeline::ResourceSet::clean()
 {
     scene_uniform_buffer = nullptr;

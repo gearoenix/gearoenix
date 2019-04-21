@@ -1,34 +1,8 @@
 #ifndef GEAROEMIX_RENDER_PIPELINE_FORWARD_PBR_DIRECTIONAL_SHADOW_RESOURCE_SET_HPP
 #define GEAROEMIX_RENDER_PIPELINE_FORWARD_PBR_DIRECTIONAL_SHADOW_RESOURCE_SET_HPP
-#include "rnd-pip-pipeline.hpp"
 #include "rnd-pip-resource-set.hpp"
-//#include "../../math/math-matrix.hpp"
-//#include "../../math/math-vector.hpp"
-//#include "../../core/sync/cr-sync-end-caller.hpp"
-//#include <vector>
-#include <memory>
-
 namespace gearoenix {
 namespace render {
-    namespace buffer {
-        class Uniform;
-        class Manager;
-    }
-    namespace camera {
-        class Camera;
-    }
-    namespace command {
-        class Buffer;
-    }
-    namespace light {
-        class Directional;
-    }
-    namespace model {
-        class Model;
-    }
-    namespace texture {
-        class Cube;
-    }
     namespace pipeline {
         class ForwardPbrDirectionalShadowResourceSet : public ResourceSet {
         protected:

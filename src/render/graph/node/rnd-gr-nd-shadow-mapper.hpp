@@ -43,6 +43,10 @@ namespace render {
     }
     namespace graph {
         namespace node {
+            struct ShadowMapperUniform {
+                math::Mat4x4 mvp;
+            };
+
             struct ShadowMapperKernel {
                 std::shared_ptr<command::Buffer> secondary_cmd = nullptr;
                 unsigned int latest_render_data_pool = 0;

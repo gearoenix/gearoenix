@@ -16,24 +16,24 @@ namespace gles2 {
         class ForwardPbrDirectionalShadow : public Shader {
         private:
             GX_GLES2_SHADER_MATERIAL_UNIFORMS_LOCATIONS
-            gl::sint camera_position = GX_SHADER_UNIFORM_FAILED;
-            gl::sint camera_vp = GX_SHADER_UNIFORM_FAILED;
-            gl::sint effect_ambient_occlusion = GX_SHADER_UNIFORM_FAILED;
-            gl::sint effect_brdflut = GX_SHADER_UNIFORM_FAILED;
-            gl::sint effect_diffuse_environment = GX_SHADER_UNIFORM_FAILED;
-            gl::sint effect_shadow_map = GX_SHADER_UNIFORM_FAILED;
-            gl::sint effect_specular_environment = GX_SHADER_UNIFORM_FAILED;
-            gl::sint light_color = GX_SHADER_UNIFORM_FAILED;
-            gl::sint light_direction = GX_SHADER_UNIFORM_FAILED;
-            gl::sint light_vp_bias = GX_SHADER_UNIFORM_FAILED;
-            gl::sint model_m = GX_SHADER_UNIFORM_FAILED;
-            gl::sint scene_ambient_light = GX_SHADER_UNIFORM_FAILED;
-            gl::sint scene_directional_lights_color = GX_SHADER_UNIFORM_FAILED;
-            gl::sint scene_directional_lights_direction = GX_SHADER_UNIFORM_FAILED;
-            gl::sint scene_lights_count = GX_SHADER_UNIFORM_FAILED;
-            gl::sint scene_point_lights_color_min_radius = GX_SHADER_UNIFORM_FAILED;
-            gl::sint scene_point_lights_position_max_radius = GX_SHADER_UNIFORM_FAILED;
-            gl::sint scene_ssao_config = GX_SHADER_UNIFORM_FAILED;
+            gl::sint camera_position = GX_GLES2_UNIFORM_FAILED;
+            gl::sint camera_vp = GX_GLES2_UNIFORM_FAILED;
+            gl::sint effect_ambient_occlusion = GX_GLES2_UNIFORM_FAILED;
+            gl::sint effect_brdflut = GX_GLES2_UNIFORM_FAILED;
+            gl::sint effect_diffuse_environment = GX_GLES2_UNIFORM_FAILED;
+            gl::sint effect_shadow_map = GX_GLES2_UNIFORM_FAILED;
+            gl::sint effect_specular_environment = GX_GLES2_UNIFORM_FAILED;
+            gl::sint light_color = GX_GLES2_UNIFORM_FAILED;
+            gl::sint light_direction = GX_GLES2_UNIFORM_FAILED;
+            gl::sint light_vp_bias = GX_GLES2_UNIFORM_FAILED;
+            gl::sint model_m = GX_GLES2_UNIFORM_FAILED;
+            gl::sint scene_ambient_light = GX_GLES2_UNIFORM_FAILED;
+            gl::sint scene_directional_lights_color = GX_GLES2_UNIFORM_FAILED;
+            gl::sint scene_directional_lights_direction = GX_GLES2_UNIFORM_FAILED;
+            gl::sint scene_lights_count = GX_GLES2_UNIFORM_FAILED;
+            gl::sint scene_point_lights_color_min_radius = GX_GLES2_UNIFORM_FAILED;
+            gl::sint scene_point_lights_position_max_radius = GX_GLES2_UNIFORM_FAILED;
+            gl::sint scene_ssao_config = GX_GLES2_UNIFORM_FAILED;
             gl::sint effect_diffuse_environment_index = -1;
             gl::sint effect_specular_environment_index = -1;
             gl::sint effect_ambient_occlusion_index = -1;

@@ -1,14 +1,16 @@
 #ifndef GEAROEMIX_GLES2_PIPELINE_FORWARD_PBR_DIRECTIONAL_SHADOW_HPP
 #define GEAROEMIX_GLES2_PIPELINE_FORWARD_PBR_DIRECTIONAL_SHADOW_HPP
-#include "../../core/sync/cr-sync-end-caller.hpp"
-#include "gles2-pip-pipeline.hpp"
+#include "../../render/pipeline/rnd-pip-forward-pbr-directional-shadow.hpp"
 namespace gearoenix {
 namespace gles2 {
+    namespace engine {
+        class Engine;
+    }
     namespace shader {
         class ForwardPbrDirectionalShadow;
     }
     namespace pipeline {
-        class ForwardPbrDirectionalShadow : public Pipeline {
+        class ForwardPbrDirectionalShadow : public render::pipeline::ForwardPbrDirectionalShadow {
         private:
             const std::shared_ptr<shader::ForwardPbrDirectionalShadow> shd;
 

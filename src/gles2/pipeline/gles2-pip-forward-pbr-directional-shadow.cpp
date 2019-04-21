@@ -1,9 +1,10 @@
 #include "gles2-pip-forward-pbr-directional-shadow.hpp"
+#include "../engine/gles2-eng-engine.hpp"
 #include "../shader/gles2-shd-effect-forward-pbr-directional-shadow.hpp"
 #include "gles2-pip-forward-pbr-directional-shadow-resource-set.hpp"
 
 gearoenix::gles2::pipeline::ForwardPbrDirectionalShadow::ForwardPbrDirectionalShadow(const std::shared_ptr<engine::Engine>& e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c)
-    : Pipeline(render::pipeline::Type::ForwardPbrDirectionalShadow, e, c)
+    : render::pipeline::ForwardPbrDirectionalShadow(e, c)
     , shd(new shader::ForwardPbrDirectionalShadow(e, c))
 {
 }

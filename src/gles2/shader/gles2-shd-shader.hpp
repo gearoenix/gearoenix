@@ -11,7 +11,7 @@
 #include "../gles2.hpp"
 #include <string>
 
-#define GX_SHADER_UNIFORM_FAILED -1
+#define GX_GLES2_UNIFORM_FAILED -1
 
 #ifdef GX_DEBUG_GLES2
 #define GX_DEBUG_GLES2_GLSL
@@ -21,7 +21,7 @@
 
 #define GX_GLES2_GET_UNIFORM_F(shd, uniform)                 \
     GX_GLES2_GET_UNIFORM(shd, uniform);                      \
-    if (GX_SHADER_UNIFORM_FAILED == uniform) {               \
+    if (GX_GLES2_UNIFORM_FAILED == uniform) {                \
         GXLOGF("Failed to locate the uniform " << #uniform); \
     }
 
@@ -57,7 +57,7 @@
     ++texture_index;
 
 #define GX_GLES2_SHADER_SET_TEXTURE_INDEX_UNIFORM(x) \
-    if (x != GX_SHADER_UNIFORM_FAILED)               \
+    if (x != GX_GLES2_UNIFORM_FAILED)                \
         gl::Loader::uniform1i(x, x##_index);
 
 #define GX_GLES2_SHADER_SRC_DEFAULT_PERCISION \
@@ -92,21 +92,21 @@
 
 #define GX_GLES2_SHADER_SRC_MATERIAL_RESOURCES GX_GLES2_SHADER_SRC_MATERIAL_UNIFORMS GX_GLES2_SHADER_SRC_MATERIAL_TEXTURES
 
-#define GX_GLES2_SHADER_MATERIAL_UNIFORMS_LOCATIONS                        \
-    gl::sint material_alpha = GX_SHADER_UNIFORM_FAILED;                    \
-    gl::sint material_alpha_cutoff = GX_SHADER_UNIFORM_FAILED;             \
-    gl::sint material_base_color = GX_SHADER_UNIFORM_FAILED;               \
-    gl::sint material_emissive = GX_SHADER_UNIFORM_FAILED;                 \
-    gl::sint material_metallic_factor = GX_SHADER_UNIFORM_FAILED;          \
-    gl::sint material_metallic_roughness = GX_SHADER_UNIFORM_FAILED;       \
-    gl::sint material_normal = GX_SHADER_UNIFORM_FAILED;                   \
-    gl::sint material_normal_scale = GX_SHADER_UNIFORM_FAILED;             \
-    gl::sint material_occlusion_strength = GX_SHADER_UNIFORM_FAILED;       \
-    gl::sint material_roughness_factor = GX_SHADER_UNIFORM_FAILED;         \
-    gl::sint material_base_color_index = GX_SHADER_UNIFORM_FAILED;         \
-    gl::sint material_metallic_roughness_index = GX_SHADER_UNIFORM_FAILED; \
-    gl::sint material_normal_index = GX_SHADER_UNIFORM_FAILED;             \
-    gl::sint material_emissive_index = GX_SHADER_UNIFORM_FAILED;
+#define GX_GLES2_SHADER_MATERIAL_UNIFORMS_LOCATIONS                       \
+    gl::sint material_alpha = GX_GLES2_UNIFORM_FAILED;                    \
+    gl::sint material_alpha_cutoff = GX_GLES2_UNIFORM_FAILED;             \
+    gl::sint material_base_color = GX_GLES2_UNIFORM_FAILED;               \
+    gl::sint material_emissive = GX_GLES2_UNIFORM_FAILED;                 \
+    gl::sint material_metallic_factor = GX_GLES2_UNIFORM_FAILED;          \
+    gl::sint material_metallic_roughness = GX_GLES2_UNIFORM_FAILED;       \
+    gl::sint material_normal = GX_GLES2_UNIFORM_FAILED;                   \
+    gl::sint material_normal_scale = GX_GLES2_UNIFORM_FAILED;             \
+    gl::sint material_occlusion_strength = GX_GLES2_UNIFORM_FAILED;       \
+    gl::sint material_roughness_factor = GX_GLES2_UNIFORM_FAILED;         \
+    gl::sint material_base_color_index = GX_GLES2_UNIFORM_FAILED;         \
+    gl::sint material_metallic_roughness_index = GX_GLES2_UNIFORM_FAILED; \
+    gl::sint material_normal_index = GX_GLES2_UNIFORM_FAILED;             \
+    gl::sint material_emissive_index = GX_GLES2_UNIFORM_FAILED;
 
 #define GX_GLES2_SHADER_MATERIAL_FUNCTION_DECLARATIONS               \
     GX_GETTER_BUILDER(material_base_color)                           \

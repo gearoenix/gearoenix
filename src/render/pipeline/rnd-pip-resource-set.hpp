@@ -36,6 +36,7 @@ namespace render {
     }
     namespace texture {
         class Texture2D;
+        class Cube;
     }
     namespace pipeline {
         class ResourceSet {
@@ -64,6 +65,7 @@ namespace render {
             GXHELPER(mesh, Mesh);
             GXHELPER(material, Material);
 #undef GXHELPER
+            void set_node_uniform_buffer(const std::shared_ptr<buffer::Uniform>& node_uniform_buffer);
             virtual void clean();
         };
     }
