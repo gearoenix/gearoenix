@@ -9,7 +9,7 @@ set(APP_GLUE "${ANDROID_NDK}/sources/android/native_app_glue")
 add_library(
     native-app-glue
     STATIC
-    ${APP_GLUE}/android_native_app_glue.c )
+    ${APP_GLUE}/android_native_app_glue.c)
 
 add_library(
     ndk-helper

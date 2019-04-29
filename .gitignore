@@ -48,8 +48,6 @@
 # assets
 *.png
 *.ttf
-*.txt
-!CMakeLists.txt
 
 output/
 /output/
@@ -59,6 +57,9 @@ assets/
 
 sdks/
 /sdks/
+
+sdk/
+/sdk/
 
 .vscode/
 /.vscode/
