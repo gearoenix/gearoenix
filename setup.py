@@ -17,12 +17,12 @@ os.chdir(SRC_PATH)
 
 print("Updaating the git sub modules ...")
 subprocess.run([
-    'git', 
-    'submodule', 
+    'git',
+    'submodule',
     'update',
     '--init',
-    '--recursive', 
-    '--remote'
+    '--recursive',
+    '--remote',
 ])
 
 SDK_PATH = os.path.join(SRC_PATH, 'sdk')
@@ -115,3 +115,11 @@ elif 'Linux' in PLATFORM:
         'make',
         '-j' + str(multiprocessing.cpu_count())
     ])
+    SDL2_STATIC = 'libSDL2.a'
+    SDL2_MAIN = 'libSDL2main.a'
+    shutil.move(
+        os.path.join(SDL2_BUILD_DIR_PATH, SDL2_STATIC),
+        os.path.join(LIBS_PATH, SDL2_STATIC))
+    shutil.move(
+        os.path.join(SDL2_BUILD_DIR_PATH, SDL2_MAIN),
+        os.path.join(LIBS_PATH, SDL2_MAIN))
