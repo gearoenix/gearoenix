@@ -54,14 +54,19 @@ def download_lib(lib_name, lib_pack_path, lib_url):
               'and re-run this script.')
 
 
-SDL2_DIR_NAME = 'SDL2-2.0.9'
+SDL2_DIR_NAME = 'SDL2'
 SDL2_DIR_PATH = os.path.join(SDK_PATH, SDL2_DIR_NAME)
+SDL2_VERSION = '2.0.9'
+SDL2_DIR_NAME_VER = SDL2_DIR_NAME + '-' + SDL2_VERSION
+SDL2_DIR_PATH_VER = os.path.join(SDK_PATH, SDL2_DIR_NAME_VER)
 SDL2_BUILD_DIR_PATH = os.path.join(SDK_PATH, 'sdl2-build')
-SDL2_PACK_NAME = SDL2_DIR_NAME + '.zip'
+SDL2_PACK_NAME = SDL2_DIR_NAME_VER + '.zip'
 SDL2_PACK_URL = 'https://www.libsdl.org/release/' + SDL2_PACK_NAME
 SDL2_PACK_PATH = os.path.join(SDK_PATH, SDL2_PACK_NAME)
 SDL2_BUILD_TYPE = 'MinSizeRel'
 download_lib(SDL2_DIR_NAME, SDL2_PACK_PATH, SDL2_PACK_URL)
+if not os.path.exists(SDL2_DIR_PATH):
+    shutil.move(SDL2_DIR_PATH_VER, SDL2_DIR_PATH)
 
 GLM_VERSION = '0.9.9.5'
 GLM_DIR_NAME = 'glm-' + GLM_VERSION

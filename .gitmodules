@@ -1,6 +1,0 @@
-[submodule "external/stb"]
-	path = external/stb
-	url = https://github.com/nothings/stb.git
-[submodule "external/glm"]
-	path = external/glm
-	url = https://github.com/g-truc/glm
