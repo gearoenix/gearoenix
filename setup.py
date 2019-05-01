@@ -15,27 +15,9 @@ print("Building in platform:", PLATFORM)
 SRC_PATH = os.path.dirname(os.path.abspath(__file__))
 os.chdir(SRC_PATH)
 
-print("Updaating the git sub modules ...")
-subprocess.run([
-    'git',
-    'submodule',
-    'update',
-    '--init',
-    '--recursive',
-    '--remote',
-])
-
 SDK_PATH = os.path.join(SRC_PATH, 'sdk')
 if not os.path.exists(SDK_PATH):
     os.makedirs(SDK_PATH)
-
-SDL2_DIR_NAME = 'SDL2-2.0.9'
-SDL2_DIR_PATH = os.path.join(SDK_PATH, SDL2_DIR_NAME)
-SDL2_BUILD_DIR_PATH = os.path.join(SDK_PATH, 'sdl2-build')
-SDL2_PACK_NAME = SDL2_DIR_NAME + '.zip'
-SDL2_PACK_URL = 'https://www.libsdl.org/release/' + SDL2_PACK_NAME
-SDL2_PACK_PATH = os.path.join(SDK_PATH, SDL2_PACK_NAME)
-SDL2_BUILD_TYPE = 'MinSizeRel'
 
 
 def report_hook(blocknum, blocksize, totalsize):
@@ -54,17 +36,62 @@ def report_hook(blocknum, blocksize, totalsize):
         sys.stderr.write("read %d\n" % (bytesread,))
 
 
-if not os.path.isfile(SDL2_PACK_PATH):
-    print("Downloading SDL2 from", SDL2_PACK_URL, "...")
-    urlretrieve(SDL2_PACK_URL, SDL2_PACK_PATH, report_hook)
-    print("Download SDL2 finished.")
-    print("Extracting SDL2 ...")
-    zip = ZipFile(SDL2_PACK_PATH, 'r')
-    zip.extractall(SDK_PATH)
-    zip.close()
-else:
-    print("SDL2 pack has been already downloaded.")
-    print("If SDL2 library is not very OK you can delete it and re-run this script.")
+def download_lib(lib_name, lib_pack_path, lib_url):
+    if not os.path.isfile(lib_pack_path):
+        print('Downloading', lib_name, 'from', lib_url, '...')
+        urlretrieve(lib_url, lib_pack_path, report_hook)
+        print('Download', lib_name, 'finished.')
+        print('Extracting', lib_name, '...')
+        zip = ZipFile(lib_pack_path, 'r')
+        zip.extractall(SDK_PATH)
+        zip.close()
+    else:
+        print(lib_name, 'pack has been already downloaded.')
+        print('If', lib_name,
+              'library is not very OK,',
+              'you can delete',
+              lib_pack_path,
+              'and re-run this script.')
+
+
+SDL2_DIR_NAME = 'SDL2-2.0.9'
+SDL2_DIR_PATH = os.path.join(SDK_PATH, SDL2_DIR_NAME)
+SDL2_BUILD_DIR_PATH = os.path.join(SDK_PATH, 'sdl2-build')
+SDL2_PACK_NAME = SDL2_DIR_NAME + '.zip'
+SDL2_PACK_URL = 'https://www.libsdl.org/release/' + SDL2_PACK_NAME
+SDL2_PACK_PATH = os.path.join(SDK_PATH, SDL2_PACK_NAME)
+SDL2_BUILD_TYPE = 'MinSizeRel'
+download_lib(SDL2_DIR_NAME, SDL2_PACK_PATH, SDL2_PACK_URL)
+
+GLM_VERSION = '0.9.9.5'
+GLM_DIR_NAME = 'glm-' + GLM_VERSION
+GLM_DIR_PATH = os.path.join(SDK_PATH, GLM_DIR_NAME)
+GLM_PACK_NAME = GLM_DIR_NAME + '.zip'
+GLM_PACK_URL = 'https://github.com/g-truc/glm/releases/download/' + \
+    GLM_VERSION + '/' + GLM_PACK_NAME
+GLM_PACK_PATH = os.path.join(SDK_PATH, GLM_PACK_NAME)
+download_lib(GLM_DIR_NAME, GLM_PACK_PATH, GLM_PACK_URL)
+
+STB_DIR_NAME = 'stb'
+STB_DIR_PATH = os.path.join(SDK_PATH, STB_DIR_NAME)
+STB_PACK_NAME = STB_DIR_NAME + '.zip'
+STB_PACK_URL = 'https://github.com/nothings/stb/archive/master.zip'
+STB_PACK_PATH = os.path.join(SDK_PATH, STB_PACK_NAME)
+download_lib(STB_DIR_NAME, STB_PACK_PATH, STB_PACK_URL)
+if not os.path.exists(STB_DIR_PATH):
+    shutil.move(os.path.join(SDK_PATH, 'stb-master'), STB_DIR_PATH)
+
+BOOST_VERSION = '1_70_0'
+BOOST_URL_VERSION = BOOST_VERSION.replace('_', '.')
+BOOST_DIR_VERSION = '_' + BOOST_VERSION
+BOOST_DIR_NAME = 'boost'
+BOOST_DIR_PATH = os.path.join(SDK_PATH, BOOST_DIR_NAME)
+BOOST_PACK_NAME = BOOST_DIR_NAME + BOOST_DIR_VERSION + '.zip'
+BOOST_PACK_URL = 'https://dl.bintray.com/boostorg/release/1.70.0/source/' + BOOST_PACK_NAME
+BOOST_PACK_PATH = os.path.join(SDK_PATH, BOOST_PACK_NAME)
+download_lib(BOOST_DIR_NAME, BOOST_PACK_PATH, BOOST_PACK_URL)
+if not os.path.exists(BOOST_DIR_PATH):
+    shutil.move(BOOST_DIR_PATH + BOOST_DIR_VERSION, BOOST_DIR_PATH)
 
 if os.path.exists(SDL2_BUILD_DIR_PATH):
     shutil.rmtree(SDL2_BUILD_DIR_PATH)

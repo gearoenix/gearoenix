@@ -26,13 +26,14 @@ static std::default_random_engine gen(rd());
 static std::uniform_real_distribution<> dis(0.0, 1.0);
 static long double glmt = 0.0L, gt = 0.0L;
 
-#define PROF(x, t)                                                                                                                  \
-    {                                                                                                                               \
-        auto now1 = std::chrono::high_resolution_clock::now();                                                                      \
-        x;                                                                                                                          \
-        auto now2 = std::chrono::high_resolution_clock::now();                                                                      \
-        std::chrono::duration<long double> time_span = std::chrono::duration_cast<std::chrono::duration<long double>>(now2 - now1); \
-        t += time_span.count();                                                                                                     \
+#define PROF(x, t) \
+    { \
+        auto now1 = std::chrono::high_resolution_clock::now(); \
+        x; \
+        auto now2 = std::chrono::high_resolution_clock::now(); \
+        std::chrono::duration<long double> time_span = \
+            std::chrono::duration_cast<std::chrono::duration<long double>>(now2 - now1); \
+        t += time_span.count(); \
     }
 
 void rm(glm::mat4& m1, gearoenix::math::Mat4x4& m2)
@@ -184,4 +185,3 @@ int main()
         }
     }
 }
-#endif
