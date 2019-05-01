@@ -75,8 +75,8 @@ namespace render {
                 const static unsigned int shadow_map_index;
                 const static unsigned int brdflut_index;
 
-                ForwardPbrDirectionalShadow(const std::shared_ptr<engine::Engine>& e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call);
-                ~ForwardPbrDirectionalShadow() override final;
+				ShadowMapper(const std::shared_ptr<engine::Engine>& e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call);
+                ~ShadowMapper() override final;
 
                 void set_diffuse_environment(const std::shared_ptr<texture::Cube>& t);
                 void set_specular_environment(const std::shared_ptr<texture::Cube>& t);

@@ -1,7 +1,7 @@
 SET(GX_LIBS )
 
 IF (GX_USE_SDL2)
-    SET (GX_SDL2_PATH "${GX_SDK_PATH}/SDL2-2.0.9")
+    SET (GX_SDL2_PATH "${GX_SDK_PATH}/SDL2")
     SET (GX_SDL2_STATIC_LIB "SDL2")
     SET (GX_SDL2_MAIN_LIB "SDL2main")
     IF (MSVC)
@@ -10,10 +10,13 @@ IF (GX_USE_SDL2)
     GX_MAKE_LIB (GX_SDL2_STATIC_LIB ${GX_SDL2_STATIC_LIB})
     GX_MAKE_LIB (GX_SDL2_MAIN_LIB ${GX_SDL2_MAIN_LIB})
     MESSAGE (STATUS "SDL2 libraries are ${GX_SDL2_STATIC_LIB} and ${GX_SDL2_MAIN_LIB}.")
-    SET (GX_LIBS ${GX_LIBS} ${GX_SDL2_STATIC_LIB} ${GX_SDL2_MAIN_LIB})
+    SET (GX_LIBS 
+        ${GX_LIBS} 
+        "${GX_SDK_LIB_PATH}${GX_SDL2_STATIC_LIB}" 
+        "${GX_SDK_LIB_PATH}${GX_SDL2_MAIN_LIB}")
 ENDIF (GX_USE_SDL2)
 
-SET(GX_ENGINE_SRC_DIR "${CMAKE_SOURCE_DIR}/src/")
+SET(GX_ENGINE_SRC_DIR "${CMAKE_SOURCE_DIR}/gearoenix/")
 MESSAGE (STATUS "Source directory is '${GX_ENGINE_SRC_DIR}'.")
 
 MESSAGE (STATUS "Source libraries are ${GX_LIBS}.")
@@ -141,9 +144,6 @@ SET (GX_ENGINE_SRC
     "${GX_ENGINE_SRC_DIR}dx11/texture/dx11-txt-sampler.cpp"
     "${GX_ENGINE_SRC_DIR}dx11/texture/dx11-txt-sampler.hpp"
     "${GX_ENGINE_SRC_DIR}dx12/dx12-engine.cpp"
-    "${GX_ENGINE_SRC_DIR}game/game-config.hpp"
-    "${GX_ENGINE_SRC_DIR}game/wcr/game-wcr-main.cpp"
-    "${GX_ENGINE_SRC_DIR}game/wcr/game-wcr-main.hpp"
     "${GX_ENGINE_SRC_DIR}gl/gl-constants.cpp"
     "${GX_ENGINE_SRC_DIR}gl/gl-constants.hpp"
     "${GX_ENGINE_SRC_DIR}gl/gl-loader.cpp"
@@ -458,19 +458,6 @@ SET (GX_ENGINE_SRC
     "${GX_ENGINE_SRC_DIR}system/sys-log.hpp"
     "${GX_ENGINE_SRC_DIR}system/win/sys-win-app.cpp"
     "${GX_ENGINE_SRC_DIR}system/win/sys-win-app.hpp"
-    "${GX_ENGINE_SRC_DIR}test/test-001-scene-free-camera.cpp"
-    "${GX_ENGINE_SRC_DIR}test/test-001-scene-free-camera.hpp"
-    "${GX_ENGINE_SRC_DIR}test/test-002-memory-test.cpp"
-    "${GX_ENGINE_SRC_DIR}test/test-002-memory-test.hpp"
-    "${GX_ENGINE_SRC_DIR}test/test-003-math.cpp"
-    "${GX_ENGINE_SRC_DIR}test/test-003-math.hpp"
-    "${GX_ENGINE_SRC_DIR}test/test-004-bezier-curve-rendering.cpp"
-    "${GX_ENGINE_SRC_DIR}test/test-004-bezier-curve-rendering.hpp"
-    "${GX_ENGINE_SRC_DIR}test/test-005-semaphore.cpp"
-    "${GX_ENGINE_SRC_DIR}test/test-005-semaphore.hpp"
-    "${GX_ENGINE_SRC_DIR}test/test-006-stop-point.cpp"
-    "${GX_ENGINE_SRC_DIR}test/test-006-stop-point.hpp"
-    "${GX_ENGINE_SRC_DIR}test/test-config.hpp"
     "${GX_ENGINE_SRC_DIR}vulkan/buffer/vk-buf-buffer.cpp"
     "${GX_ENGINE_SRC_DIR}vulkan/buffer/vk-buf-buffer.hpp"
     "${GX_ENGINE_SRC_DIR}vulkan/buffer/vk-buf-dynamic.cpp"
@@ -547,6 +534,8 @@ SET (GX_ENGINE_SRC
     "${GX_ENGINE_SRC_DIR}vulkan/vk-surface.hpp"
     "${GX_ENGINE_SRC_DIR}vulkan/vk-swapchain.cpp"
     "${GX_ENGINE_SRC_DIR}vulkan/vk-swapchain.hpp")
+
+INCLUDE_DIRECTORIES (${SDL2_INCLUDE_DIRS} ${STB_INCLUDE_DIRS})
 
 ADD_LIBRARY (GX_ENGINE_LIB STATIC ${GX_ENGINE_SRC})
 SET (GX_LIBS ${GX_ENGINE_LIB} ${GX_LIBS})

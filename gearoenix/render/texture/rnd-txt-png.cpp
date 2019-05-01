@@ -5,7 +5,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #define STBI_NO_STDIO
 #define STBI_ONLY_PNG
-#include "../../../external/stb/stb_image.h"
+#include <stb_image.h>
 #include <cstring>
 
 #define GEAROENIX_PNG_SIGNATURE_SIZE 8
