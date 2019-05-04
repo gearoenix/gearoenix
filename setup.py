@@ -144,7 +144,12 @@ if 'Windows' in PLATFORM:
 
 elif 'Linux' in PLATFORM:
     subprocess.run([
-        'make',
+        'cmake',
+        '--build',
+        '.',
+        '--config',
+        SDL2_BUILD_TYPE,
+        '--',
         '-j' + str(multiprocessing.cpu_count())
     ])
     SDL2_STATIC = 'libSDL2.a'

@@ -1,7 +1,7 @@
 version: 2
 
 orbs:
-  codecov: codecov/codecov
+  codecov: codecov/codecov@1.0.2
 
 jobs:
   build:
@@ -11,16 +11,17 @@ jobs:
       - checkout
       - run:
           name: Updating OS
-          command: 'apt update && apt dist-upgrade -y'
+          command: 'apt update && apt dist-upgrade -y && apt install lcov gcovr -y'
       - run:
           name: Setup dependancies
           command: 'python3 ./setup.py'
       - run:
           name: Cmake run
-          command: 'cmake .'
+          command: 'cmake -DCMAKE_BUILD_TYPE=Debug .'
       - run:
-          name: Make run
-          command: 'make'
-      - run:
-          name: CTest run
-          command: 'ctest'
+          name: Build and tests run
+          command: 'cmake --build . --config Debug --target GX_COVERAGE -- -j4'
+      - codecov/upload:
+          token: '453e58a5-4001-4af6-8fea-f2eded87541e'
+          file: 'GX_COVERAGE.info'
+          config: '.circleci/codecov.yml'

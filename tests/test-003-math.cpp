@@ -135,70 +135,71 @@ int main()
     }
     GXLOGI("glmt " << glmt << ", gt " << gt);
     /////////////////////////////////////////////////////////////
-    for (int i = 0; i < 1000; ++i)
-    {
-        const gearoenix::math::Vec3 rayo(
-            static_cast<float>((dis(gen) > 0.5 ? -1.0 : 1.0) * (dis(gen) * 100.0 + 1.1)),
-            static_cast<float>((dis(gen) > 0.5 ? -1.0 : 1.0) * (dis(gen) * 100.0 + 1.1)),
-            static_cast<float>((dis(gen) > 0.5 ? -1.0 : 1.0) * (dis(gen) * 100.0 + 1.1)));
-        gearoenix::math::Ray3 ray(rayo, (-rayo).normalized());
-        gearoenix::math::Aabb3 aabb(gearoenix::math::Vec3(0.0f, 1.0f, 1.0f), gearoenix::math::Vec3(0.0f, -1.0f, -1.0f));
-        gearoenix::core::Real tmin;
-        bool hit = aabb.test(ray, tmin);
-        if (!hit)
-        {
-            GXLOGF("hit: " << hit << ", tmin: " << tmin);
-        }
-    }
-    for (int i = 0; i < 1000; ++i)
-    {
-        const gearoenix::math::Vec3 rayo(
-            static_cast<float>((dis(gen) > 0.5 ? -1.0 : 1.0) * (dis(gen) * 100.0 + 1.1)),
-            static_cast<float>((dis(gen) > 0.5 ? -1.0 : 1.0) * (dis(gen) * 100.0 + 1.1)),
-            static_cast<float>((dis(gen) > 0.5 ? -1.0 : 1.0) * (dis(gen) * 100.0 + 1.1)));
-        gearoenix::math::Ray3 ray(rayo, (-rayo).normalized());
-        gearoenix::math::Aabb3 aabb(gearoenix::math::Vec3(1.0f, 1.0f, 1001.0f), gearoenix::math::Vec3(-1.0f, -1.0f, 1000.0f));
-        gearoenix::core::Real tmin;
-        bool hit = aabb.test(ray, tmin);
-        if (hit)
-        {
-            GXLOGF("hit: " << hit << ", tmin: " << tmin);
-        }
-    }
-    for (int i = 0; i < 1000; ++i)
-    {
-        const gearoenix::math::Vec3 rayo(
-            static_cast<float>((dis(gen) > 0.5 ? -1.0 : 1.0) * (dis(gen) * 100.0 + 1.1)),
-            static_cast<float>((dis(gen) > 0.5 ? -1.0 : 1.0) * (dis(gen) * 100.0 + 1.1)),
-            static_cast<float>((dis(gen) > 0.5 ? -1.0 : 1.0) * (dis(gen) * 100.0 + 1.1)));
-        gearoenix::math::Ray3 ray(rayo, (-rayo).normalized());
-        gearoenix::math::Triangle3 tri(
-            gearoenix::math::Vec3(0.0f, 1.0f, -1.0f),
-            gearoenix::math::Vec3(0.0f, -1.0f, -1.0f),
-            gearoenix::math::Vec3(0.0f, 0.0f, 1.0f));
-        gearoenix::math::Vec3 fc;
-        bool hit = tri.intersect(ray, std::numeric_limits<gearoenix::core::Real>::max(), fc);
-        if (!hit)
-        {
-            GXLOGF("hit: " << hit);
-        }
-    }
-    for (int i = 0; i < 1000; ++i)
-    {
-        const gearoenix::math::Vec3 rayo(
-            static_cast<float>((dis(gen) > 0.5 ? -1.0 : 1.0) * (dis(gen) * 100.0 + 1.1)),
-            static_cast<float>((dis(gen) > 0.5 ? -1.0 : 1.0) * (dis(gen) * 100.0 + 1.1)),
-            static_cast<float>((dis(gen) > 0.5 ? -1.0 : 1.0) * (dis(gen) * 100.0 + 1.1)));
-        gearoenix::math::Ray3 ray(rayo, (-rayo).normalized());
-        gearoenix::math::Triangle3 tri(
-            gearoenix::math::Vec3(1000.0f, 1.0f, -1.0f),
-            gearoenix::math::Vec3(1000.0f, -1.0f, -1.0f),
-            gearoenix::math::Vec3(1000.0f, 0.0f, 1.0f));
-        gearoenix::math::Vec3 fc;
-        bool hit = tri.intersect(ray, std::numeric_limits<gearoenix::core::Real>::max(), fc);
-        if (hit)
-        {
-            GXLOGF("hit: " << hit);
-        }
-    }
+    // for (int i = 0; i < 1000; ++i)
+    // {
+    //     const gearoenix::math::Vec3 rayo(
+    //         static_cast<float>((dis(gen) > 0.5 ? -1.0 : 1.0) * (dis(gen) * 100.0 + 1.1)),
+    //         static_cast<float>((dis(gen) > 0.5 ? -1.0 : 1.0) * (dis(gen) * 100.0 + 1.1)),
+    //         static_cast<float>((dis(gen) > 0.5 ? -1.0 : 1.0) * (dis(gen) * 100.0 + 1.1)));
+    //     gearoenix::math::Ray3 ray(rayo, (-rayo).normalized());
+    //     gearoenix::math::Aabb3 aabb(gearoenix::math::Vec3(0.0f, 1.0f, 1.0f), gearoenix::math::Vec3(0.0f, -1.0f, -1.0f));
+    //     gearoenix::core::Real tmin;
+    //     bool hit = aabb.test(ray, tmin);
+    //     if (!hit)
+    //     {
+    //         GXLOGF("hit: " << hit << ", tmin: " << tmin);
+    //     }
+    // }
+    // for (int i = 0; i < 1000; ++i)
+    // {
+    //     const gearoenix::math::Vec3 rayo(
+    //         static_cast<float>((dis(gen) > 0.5 ? -1.0 : 1.0) * (dis(gen) * 100.0 + 1.1)),
+    //         static_cast<float>((dis(gen) > 0.5 ? -1.0 : 1.0) * (dis(gen) * 100.0 + 1.1)),
+    //         static_cast<float>((dis(gen) > 0.5 ? -1.0 : 1.0) * (dis(gen) * 100.0 + 1.1)));
+    //     gearoenix::math::Ray3 ray(rayo, (-rayo).normalized());
+    //     gearoenix::math::Aabb3 aabb(gearoenix::math::Vec3(1.0f, 1.0f, 1001.0f), gearoenix::math::Vec3(-1.0f, -1.0f, 1000.0f));
+    //     gearoenix::core::Real tmin;
+    //     bool hit = aabb.test(ray, tmin);
+    //     if (hit)
+    //     {
+    //         GXLOGF("hit: " << hit << ", tmin: " << tmin);
+    //     }
+    // }
+    // for (int i = 0; i < 1000; ++i)
+    // {
+    //     const gearoenix::math::Vec3 rayo(
+    //         static_cast<float>((dis(gen) > 0.5 ? -1.0 : 1.0) * (dis(gen) * 100.0 + 1.1)),
+    //         static_cast<float>((dis(gen) > 0.5 ? -1.0 : 1.0) * (dis(gen) * 100.0 + 1.1)),
+    //         static_cast<float>((dis(gen) > 0.5 ? -1.0 : 1.0) * (dis(gen) * 100.0 + 1.1)));
+    //     gearoenix::math::Ray3 ray(rayo, (-rayo).normalized());
+    //     gearoenix::math::Triangle3 tri(
+    //         gearoenix::math::Vec3(0.0f, 1.0f, -1.0f),
+    //         gearoenix::math::Vec3(0.0f, -1.0f, -1.0f),
+    //         gearoenix::math::Vec3(0.0f, 0.0f, 1.0f));
+    //     gearoenix::math::Vec3 fc;
+    //     bool hit = tri.intersect(ray, std::numeric_limits<gearoenix::core::Real>::max(), fc);
+    //     if (!hit)
+    //     {
+    //         GXLOGF("hit: " << hit);
+    //     }
+    // }
+    // for (int i = 0; i < 1000; ++i)
+    // {
+    //     const gearoenix::math::Vec3 rayo(
+    //         static_cast<float>((dis(gen) > 0.5 ? -1.0 : 1.0) * (dis(gen) * 100.0 + 1.1)),
+    //         static_cast<float>((dis(gen) > 0.5 ? -1.0 : 1.0) * (dis(gen) * 100.0 + 1.1)),
+    //         static_cast<float>((dis(gen) > 0.5 ? -1.0 : 1.0) * (dis(gen) * 100.0 + 1.1)));
+    //     gearoenix::math::Ray3 ray(rayo, (-rayo).normalized());
+    //     gearoenix::math::Triangle3 tri(
+    //         gearoenix::math::Vec3(1000.0f, 1.0f, -1.0f),
+    //         gearoenix::math::Vec3(1000.0f, -1.0f, -1.0f),
+    //         gearoenix::math::Vec3(1000.0f, 0.0f, 1.0f));
+    //     gearoenix::math::Vec3 fc;
+    //     bool hit = tri.intersect(ray, std::numeric_limits<gearoenix::core::Real>::max(), fc);
+    //     if (hit)
+    //     {
+    //         GXLOGF("hit: " << hit);
+    //     }
+    // }
+    return 0;
 }
