@@ -1,5 +1,8 @@
 # Gearoenix Game Engine
-An in-house game engine that tries to be applicable for other use-cases.
+A cross-platform c++ 3d game engine.
+
+[![codecov](https://codecov.io/gh/Hossein-Noroozpour/gearoenix/branch/master/graph/badge.svg)](https://codecov.io/gh/Hossein-Noroozpour/gearoenix)
+[![CircleCI](https://circleci.com/gh/Hossein-Noroozpour/gearoenix.svg?style=svg)](https://circleci.com/gh/Hossein-Noroozpour/gearoenix)
 
 ## Features
 - It is cross-platform (already tested on Linux(Ubuntu, Fedora), MacOS,
