@@ -1,5 +1,8 @@
 version: 2
 
+orbs:
+  codecov: codecov/codecov
+
 jobs:
   build:
     docker:
