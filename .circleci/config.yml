@@ -23,6 +23,5 @@ jobs:
           command: 'cmake --build . --config Debug --target GX_COVERAGE -- -j4'
       - codecov/upload:
           flags: unittest
-          token: '453e58a5-4001-4af6-8fea-f2eded87541e'
           file: 'GX_COVERAGE.info'
           config: '.circleci/codecov.yml'
