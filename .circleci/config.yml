@@ -3,12 +3,12 @@ version: 2
 jobs:
   build:
     docker:
-      - image: 'circleci/cci-demo-docker-primary:0.0.2'
+      - image: 'noroozpour/gearoenix:0.0.1'
     steps:
       - checkout
       - run:
           name: Updating OS
-          command: 'apt-get update && apt-get dist-upgrade -y'
+          command: 'apt update && apt dist-upgrade -y'
       - run:
           name: Setup dependancies
           command: 'python3 ./setup.py'
