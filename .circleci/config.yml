@@ -24,4 +24,4 @@ jobs:
       - codecov/upload:
           flags: unittest
           file: 'GX_COVERAGE.info'
-          config: '.circleci/codecov.yml'
+          conf: '.circleci/codecov.yml'
