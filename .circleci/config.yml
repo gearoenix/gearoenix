@@ -11,7 +11,7 @@ jobs:
       - checkout
       - run:
           name: Updating OS
-          command: 'apt update && apt dist-upgrade -y && apt install lcov gcovr -y'
+          command: 'apt update && apt dist-upgrade -y && apt install lcov gcovr curl -y'
       - run:
           name: Setup dependancies
           command: 'python3 ./setup.py'
