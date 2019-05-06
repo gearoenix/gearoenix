@@ -21,6 +21,8 @@
 #include <random>
 #include <chrono>
 #include <algorithm>
+#define BOOST_TEST_MODULE Tests for math library of Gearoenix
+#include <boost/test/included/unit_test.hpp>
 
 static std::random_device rd;
 static std::default_random_engine gen(rd());
@@ -74,9 +76,9 @@ void check_eq(const gearoenix::core::Real f1, const gearoenix::core::Real f2)
     if (GXISZERO(v1) && GXISZERO(v2))
         return;
     if (GXISZERO(v2) && GXISNOTZERO(v1))
-        GXUNEXPECTED;
+		BOOST_TEST(false);
     if (f1 / f2 > 0.01f)
-        GXUNEXPECTED;
+        BOOST_TEST(false);
 }
 
 void check(glm::mat4 &m1, gearoenix::math::Mat4x4 &m2)
@@ -89,20 +91,21 @@ void check(glm::mat4 &m1, gearoenix::math::Mat4x4 &m2)
         if (f1 / f2 > 0.01f)
         {
             for (unsigned int j = 0; j < 16; ++j)
-                GXLOGE(glm::value_ptr(m1)[j] << ", " << m2[j]);
-            GXUNEXPECTED;
+                BOOST_TEST_MESSAGE("Error-" << glm::value_ptr(m1)[j] << ", " << m2[j]);
+            BOOST_TEST(false);
         }
     }
 }
 
-int main()
+
+BOOST_AUTO_TEST_CASE(math_test)
 {
     glm::mat4 m1;
     gearoenix::math::Mat4x4 m2;
     glm::vec3 v1;
     gearoenix::math::Vec3 v2;
     float f;
-    GXLOGI("Rotation test");
+    BOOST_TEST_MESSAGE("Rotation test");
     for (int i = 0; i < 1000; ++i)
     {
         f = static_cast<float>(dis(gen));
@@ -112,8 +115,8 @@ int main()
         PROF(m2 = gearoenix::math::Mat4x4::rotation(v2, f), gt);
         check(m1, m2);
     }
-    GXLOGI("Inversion test");
-    GXLOGI("glmt " << glmt << ", gt " << gt);
+    BOOST_TEST_MESSAGE("Inversion test");
+    BOOST_TEST_MESSAGE("glmt " << glmt << ", gt " << gt);
     for (int i = 0; i < 1000; ++i)
     {
         f = static_cast<float>(dis(gen));
@@ -122,8 +125,8 @@ int main()
         PROF(m2 = m2.inversed(), gt);
         check(m1, m2);
     }
-    GXLOGI("glmt " << glmt << ", gt " << gt);
-    GXLOGI("Quaternion tests");
+    BOOST_TEST_MESSAGE("glmt " << glmt << ", gt " << gt);
+    BOOST_TEST_MESSAGE("Quaternion tests");
     glm::quat q1;
     gearoenix::math::Quat q2;
     for (int i = 0; i < 1000; ++i)
@@ -133,7 +136,7 @@ int main()
         PROF(m2 = q2.to_mat(), gt);
         check(m1, m2);
     }
-    GXLOGI("glmt " << glmt << ", gt " << gt);
+    BOOST_TEST_MESSAGE("glmt " << glmt << ", gt " << gt);
     /////////////////////////////////////////////////////////////
     // for (int i = 0; i < 1000; ++i)
     // {
@@ -201,5 +204,4 @@ int main()
     //         GXLOGF("hit: " << hit);
     //     }
     // }
-    return 0;
 }

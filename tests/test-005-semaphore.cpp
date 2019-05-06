@@ -1,4 +1,3 @@
-#include "test-005-semaphore.hpp"
 #ifdef GX_TEST005
 #include "../core/sync/cr-sync-semaphore.hpp"
 #include "../system/sys-log.hpp"

@@ -1,4 +1,3 @@
-#include "test-006-stop-point.hpp"
 #ifdef GX_TEST006
 #include "../core/sync/cr-sync-stop-point.hpp"
 #include "../system/sys-log.hpp"
