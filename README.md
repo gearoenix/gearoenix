@@ -1,14 +1,15 @@
 # Gearoenix Game Engine
+
 Yet another cross-platform C++ 3D game engine.
 
 [![codecov](https://codecov.io/gh/Hossein-Noroozpour/gearoenix/branch/master/graph/badge.svg)](https://codecov.io/gh/Hossein-Noroozpour/gearoenix)
 [![CircleCI](https://circleci.com/gh/Hossein-Noroozpour/gearoenix.svg?style=svg)](https://circleci.com/gh/Hossein-Noroozpour/gearoenix)
 
-
 ## Features
+
 - It is cross-platform.
 - It is Lightweight.
-- It has a runtime abtraction over Graphic APIs (e.g. `OpenGL ES2`, `OpenGL ES3(WIP)`, 
+- It has a runtime abtraction over Graphic APIs (e.g. `OpenGL ES2`, `OpenGL ES3(WIP)`,
   `Directx11(WIP)` and `Vulkan(WIP)`).
 - It has its own file format for importing scenes data in to game. This file
   format help the engine to have better performance in loading a scene and
@@ -38,17 +39,18 @@ Yet another cross-platform C++ 3D game engine.
 - Pbr Material.
 - Ability to create customized and or special materials/effects with special behaviors.
 
-
 ## Demos
+
 I'm developing gearoenix and a game with it, and I'm little on the urge, do not
 expect a full functioning AAA game as a demo from me :D. These are mostly in
 debug mode of code, but still have great performance.
+
 - [This is WebAssembly demo](https://hossein-noroozpour.github.io/gearoenix-static-files/web-demo/index.html)
 - [This is Android demo](https://hossein-noroozpour.github.io/gearoenix-static-files/android/android.7z)
 - [This is Linux demo](https://hossein-noroozpour.github.io/gearoenix-static-files/linux/linux.7z)
 
+## How to Build
 
-## How to Build?
 - Star this project (:D)
 - Download zip of master branch.
 - Execute the setup.py with your python3 compiler. (This script provide a simple way of gathering
@@ -56,12 +58,12 @@ debug mode of code, but still have great performance.
 - Create a build directory and cd it. (e.g. 'build')
 - Do camke on it. (like: ```cmake -DCMAKE_BUILD_TYPE=Release .```)
 - Build it. (like: ```cmake --build . --config Release```)
-- If you have a problem to initialize the environment, 
+- If you have a problem to initialize the environment,
   you either can use the provided docker images in docker hub or
   look at the provided **Dockerfile** file in project ci part.
 
-
 ## Development Process
+
 Design and decision making in development process of this project is dependent
 on games that I'm developing. I design and develop a new feature whenever my
 games need it, sometimes in the
@@ -71,8 +73,9 @@ its development. Test coverage is very low, I will improve it and any contributi
 is highly regarded.
 
 ## License
+
 You can do whatever you want to do with it as long as you take responsibility
 of all of
 its consequences, **But** If you used it and it was useful for you, please make
-an acknowledgment and promotion for this project and me, I'm currently seeking 
+an acknowledgment and promotion for this project and me, I'm currently seeking
 for a job in the graphic and game-engine fields.
