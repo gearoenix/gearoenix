@@ -10,28 +10,11 @@ gearoenix::math::Frustum::Frustum(const Plane (&planes)[6]) noexcept
 
 gearoenix::math::IntersectionStatus::Type gearoenix::math::Frustum::check_intersection(const Sphere& s) const noexcept
 {
-	IntersectionStatus::Type state = IntersectionStatus::Out;
+	IntersectionStatus::Type state = IntersectionStatus::In;
 	for (const Plane& p : planes) {
-		const IntersectionStatus::Type c = p.check_intersection(s);
-		if (c == IntersectionStatus::Above) return IntersectionStatus::Out;
-		switch (state) {
-		case IntersectionStatus::Tangent:
-			continue;
-		case IntersectionStatus::Cut:
-			if (c == IntersectionStatus::AboveTangent) state = IntersectionStatus::Tangent;
-			break;
-		case IntersectionStatus::In:
-			if (c == IntersectionStatus::AboveTangent) state = IntersectionStatus::Tangent;
-			else if (c == IntersectionStatus::Cut) state = IntersectionStatus::Cut;
-			break;
-		case IntersectionStatus::Out:
-			if (c == IntersectionStatus::AboveTangent) state = IntersectionStatus::Tangent;
-			else if (c == IntersectionStatus::Cut) state = IntersectionStatus::Cut;
-			else if (c == IntersectionStatus::Under) state = IntersectionStatus::In;
-			break;
-		default:
-			GXUNEXPECTED;
-		}
+		const core::Real sd = s.position.dot(p.normal) + p.d;
+		if(s.radius <= -sd) return IntersectionStatus::Out;
+		if (s.radius > sd) state = IntersectionStatus::Cut;
 	}
 	return state;
 }

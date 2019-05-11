@@ -9,8 +9,9 @@ namespace gearoenix
 			Plane planes[6];
 			
 			Frustum() = delete;
+			/// These planes must face inward the frustum
 			explicit Frustum(const Plane (&planes)[6]) noexcept;
-
+			/// This is not exact but rather fast, necessarily informative and conservatively includes objects
 			IntersectionStatus::Type check_intersection(const Sphere& s) const noexcept;
 		};
 	}

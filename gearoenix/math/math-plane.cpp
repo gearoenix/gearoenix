@@ -12,8 +12,7 @@ gearoenix::math::IntersectionStatus::Type gearoenix::math::Plane::check_intersec
 {
 	const core::Real sd = s.position.dot(normal) + d;
 	if (sd > s.radius) return IntersectionStatus::Above;
-	if (sd == s.radius) return IntersectionStatus::AboveTangent;
-	if (sd < -s.radius) return IntersectionStatus::Under;
-	if (sd == -s.radius) return IntersectionStatus::UnderTangent;
+	if (sd == s.radius) return IntersectionStatus::Tangent;
+	if (sd <= -s.radius) return IntersectionStatus::Under;
 	return IntersectionStatus::Cut;
 }

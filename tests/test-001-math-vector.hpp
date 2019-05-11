@@ -96,7 +96,7 @@ void check(glm::mat4 &m1, gearoenix::math::Mat4x4 &m2)
     }
 }
 
-BOOST_AUTO_TEST_CASE(math_test)
+BOOST_AUTO_TEST_CASE(math_vector_test)
 {
     glm::mat4 m1;
     gearoenix::math::Mat4x4 m2;
