@@ -1,31 +1,49 @@
 #include "math-aabb.hpp"
 #include "../core/cr-static.hpp"
 #include "math-ray.hpp"
+#include "../core/cr-build-configuration.hpp"
 #include <limits>
 
-gearoenix::math::Aabb3::Aabb3() {}
-
-gearoenix::math::Aabb3::Aabb3(const Vec3& max, const Vec3& min)
-    : a(max)
-    , b(min)
+gearoenix::math::Aabb3::Aabb3() noexcept
+	: mx(Vec3(-std::numeric_limits<core::Real>::max(), -std::numeric_limits<core::Real>::max(), -std::numeric_limits<core::Real>::max()))
+	, mn(Vec3(std::numeric_limits<core::Real>::max(), std::numeric_limits<core::Real>::max(), std::numeric_limits<core::Real>::max()))
 {
+}
+
+gearoenix::math::Aabb3::Aabb3(const Vec3& mx, const Vec3& mn) noexcept
+    : mx(mx)
+    , mn(mn)
+{
+#ifdef GX_DEBUG_MODE
+	//if()
+#endif
+}
+
+void gearoenix::math::Aabb3::reset() 
+{
+	mx = Vec3(-std::numeric_limits<core::Real>::max(), -std::numeric_limits<core::Real>::max(), -std::numeric_limits<core::Real>::max());
+	mn = Vec3(std::numeric_limits<core::Real>::max(), std::numeric_limits<core::Real>::max(), std::numeric_limits<core::Real>::max());
 }
 
 void gearoenix::math::Aabb3::reset(const Vec3& p)
 {
-    for (int i = 0; i < 3; ++i) {
-        a[i] = p[i];
-        b[i] = p[i];
-    }
+	mx = p;
+    mn = p;
 }
 
 void gearoenix::math::Aabb3::put(const Vec3& p)
 {
-    for (int i = 0; i < 3; ++i)
-        if (p[i] > a[i])
-            a[i] = p[i];
-        else if (p[i] < b[i])
-            b[i] = p[i];
+	for (int i = 0; i < 3; ++i)
+	{
+		if (p[i] > mx[i])
+		{
+			mx[i] = p[i];
+		}
+		else if (p[i] < mn[i])
+		{
+			mn[i] = p[i];
+		}
+	}
 }
 
 bool gearoenix::math::Aabb3::test(const Ray3& ray, core::Real& tmin_result) const
@@ -37,8 +55,8 @@ bool gearoenix::math::Aabb3::test(const Ray3& ray, core::Real& tmin_result) cons
     for (int i = 0; i < 3; ++i) {
         if (GXISZERO(rd[i]))
             continue;
-        const core::Real oor = a[i] - ro[i];
-        const core::Real oomr = b[i] - ro[i];
+        const core::Real oor = mx[i] - ro[i];
+        const core::Real oomr = mn[i] - ro[i];
         const core::Real rrd = 1.0f / rd[i];
         const core::Real f1 = oor * rrd;
         const core::Real f2 = oomr * rrd;
@@ -61,14 +79,14 @@ bool gearoenix::math::Aabb3::test(const Aabb3& o, Aabb3& intersection) const
 {
     int equals = 0;
     for (int i = 0; i < 3; ++i) {
-        const core::Real eb = b[i];
-        const core::Real oeb = o.b[i];
+        const core::Real eb = mn[i];
+        const core::Real oeb = o.mn[i];
         const core::Real ieb = GXMAX(eb, oeb);
-        const core::Real ea = a[i];
-        const core::Real oea = o.a[i];
+        const core::Real ea = mx[i];
+        const core::Real oea = o.mx[i];
         const core::Real iea = GXMIN(ea, oea);
-        intersection.a[i] = iea;
-        intersection.b[i] = ieb;
+        intersection.mx[i] = iea;
+        intersection.mn[i] = ieb;
         if (ieb == iea) {
             ++equals;
         } else if (ieb > iea) {

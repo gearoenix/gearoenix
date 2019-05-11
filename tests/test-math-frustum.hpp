@@ -13,7 +13,6 @@ BOOST_AUTO_TEST_CASE(math_frustum_test)
 		gxm::Plane(gxm::Vec3(1.0f, 1.0f, 1.0f), gxm::Vec3(0.0f, 0.0f, -1.0f)),
 	};
 	const gxm::Frustum f(planes);
-	const gxm::Sphere s(gxm::Vec3(1.0f, 1.0f, 1.0f), 1.0f);
 
 	BOOST_CHECK_EQUAL(f.check_intersection(gxm::Sphere(gxm::Vec3(0.0f, 0.0f, 0.0f), 0.9999f)), gxm::IntersectionStatus::In);
 	BOOST_CHECK_EQUAL(f.check_intersection(gxm::Sphere(gxm::Vec3(1.0f, 1.0f, 1.0f), 1.0f)), gxm::IntersectionStatus::Cut);

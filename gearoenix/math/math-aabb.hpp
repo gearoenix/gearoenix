@@ -5,13 +5,12 @@ namespace gearoenix {
 namespace math {
     struct Ray3;
     struct Aabb3 {
-    private:
-        Vec3 a; // max
-        Vec3 b; // min
-    public:
-        Aabb3();
-        Aabb3(const Vec3& max, const Vec3& min);
-        void reset(const Vec3& p);
+        Vec3 mx;
+        Vec3 mn;
+        explicit Aabb3() noexcept;
+		explicit Aabb3(const Vec3& mx, const Vec3& mn) noexcept;
+		void reset();
+		void reset(const Vec3& p);
         void put(const Vec3& p);
         bool test(const Ray3& r, core::Real& tmin) const;
         bool test(const Aabb3& o, Aabb3& intersection) const;
