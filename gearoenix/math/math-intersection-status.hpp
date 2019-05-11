@@ -9,11 +9,13 @@ namespace gearoenix
 		public:
 			typedef enum {
 				Above,
+				AboveTangent,
 				Cut,
 				In,
 				Out,
 				Tangent,
 				Under,
+				UnderTangent,
 			} Type;
 		};
 	}

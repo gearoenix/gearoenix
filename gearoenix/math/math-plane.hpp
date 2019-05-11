@@ -14,7 +14,7 @@ namespace gearoenix
 			Vec3 point;
 
 			Plane() = delete;
-			Plane(const Vec3& point, const Vec3& normal) noexcept;
+			explicit Plane(const Vec3& point, const Vec3& normal) noexcept;
 
 			IntersectionStatus::Type check_intersection(const Sphere& s) const noexcept;
 		};

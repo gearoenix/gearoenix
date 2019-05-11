@@ -21,8 +21,6 @@
 #include <random>
 #include <chrono>
 #include <algorithm>
-#define BOOST_TEST_MODULE Tests for math library of Gearoenix
-#include <boost/test/included/unit_test.hpp>
 
 static std::random_device rd;
 static std::default_random_engine gen(rd());
@@ -76,7 +74,7 @@ void check_eq(const gearoenix::core::Real f1, const gearoenix::core::Real f2)
     if (GXISZERO(v1) && GXISZERO(v2))
         return;
     if (GXISZERO(v2) && GXISNOTZERO(v1))
-		BOOST_TEST(false);
+        BOOST_TEST(false);
     if (f1 / f2 > 0.01f)
         BOOST_TEST(false);
 }
@@ -87,7 +85,8 @@ void check(glm::mat4 &m1, gearoenix::math::Mat4x4 &m2)
     {
         float f1 = std::abs(glm::value_ptr(m1)[i] - m2[i]);
         float f2 = std::abs(glm::value_ptr(m1)[i] + m2[i]);
-		if (f1 > f2) std::swap(f1, f2);
+        if (f1 > f2)
+            std::swap(f1, f2);
         if (f1 / f2 > 0.01f)
         {
             for (unsigned int j = 0; j < 16; ++j)
@@ -96,7 +95,6 @@ void check(glm::mat4 &m1, gearoenix::math::Mat4x4 &m2)
         }
     }
 }
-
 
 BOOST_AUTO_TEST_CASE(math_test)
 {

@@ -45,7 +45,7 @@ I'm developing gearoenix and a game with it, and I'm little on the urge, do not
 expect a full functioning AAA game as a demo from me :D. These are mostly in
 debug mode of code, but still have great performance.
 
-- [This is WebAssembly demo](https://hossein-noroozpour.github.io/gearoenix-static-files/web-demo/index.html)
+- [This is WebAssembly demo (Firefox shows better)](https://hossein-noroozpour.github.io/gearoenix-static-files/web-demo/index.html)
 - [This is Android demo](https://hossein-noroozpour.github.io/gearoenix-static-files/android/android.7z)
 - [This is Linux demo](https://hossein-noroozpour.github.io/gearoenix-static-files/linux/linux.7z)
 
