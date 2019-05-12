@@ -143,7 +143,6 @@ SET (GX_ENGINE_SRC
     "${GX_ENGINE_SRC_DIR}dx11/texture/dx11-txt-cube.hpp"
     "${GX_ENGINE_SRC_DIR}dx11/texture/dx11-txt-sampler.cpp"
     "${GX_ENGINE_SRC_DIR}dx11/texture/dx11-txt-sampler.hpp"
-    "${GX_ENGINE_SRC_DIR}dx12/dx12-engine.cpp"
     "${GX_ENGINE_SRC_DIR}gl/gl-constants.cpp"
     "${GX_ENGINE_SRC_DIR}gl/gl-constants.hpp"
     "${GX_ENGINE_SRC_DIR}gl/gl-loader.cpp"
