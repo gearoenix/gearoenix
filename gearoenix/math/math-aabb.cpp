@@ -19,19 +19,19 @@ gearoenix::math::Aabb3::Aabb3(const Vec3& mx, const Vec3& mn) noexcept
 #endif
 }
 
-void gearoenix::math::Aabb3::reset() 
+void gearoenix::math::Aabb3::reset() noexcept
 {
 	mx = Vec3(-std::numeric_limits<core::Real>::max(), -std::numeric_limits<core::Real>::max(), -std::numeric_limits<core::Real>::max());
 	mn = Vec3(std::numeric_limits<core::Real>::max(), std::numeric_limits<core::Real>::max(), std::numeric_limits<core::Real>::max());
 }
 
-void gearoenix::math::Aabb3::reset(const Vec3& p)
+void gearoenix::math::Aabb3::reset(const Vec3& p)noexcept
 {
 	mx = p;
     mn = p;
 }
 
-void gearoenix::math::Aabb3::put(const Vec3& p)
+void gearoenix::math::Aabb3::put(const Vec3& p)noexcept
 {
 	for (int i = 0; i < 3; ++i)
 	{
@@ -46,7 +46,7 @@ void gearoenix::math::Aabb3::put(const Vec3& p)
 	}
 }
 
-bool gearoenix::math::Aabb3::test(const Ray3& ray, core::Real& tmin_result) const
+bool gearoenix::math::Aabb3::test(const Ray3& ray, core::Real& tmin_result) const noexcept
 {
     const math::Vec3& ro = ray.get_origin();
     const math::Vec3& rd = ray.get_direction();
@@ -75,23 +75,51 @@ bool gearoenix::math::Aabb3::test(const Ray3& ray, core::Real& tmin_result) cons
     return false;
 }
 
-bool gearoenix::math::Aabb3::test(const Aabb3& o, Aabb3& intersection) const
+bool gearoenix::math::Aabb3::test(const Aabb3& o, Aabb3& intersection) const noexcept
 {
-    int equals = 0;
-    for (int i = 0; i < 3; ++i) {
-        const core::Real eb = mn[i];
-        const core::Real oeb = o.mn[i];
-        const core::Real ieb = GXMAX(eb, oeb);
-        const core::Real ea = mx[i];
-        const core::Real oea = o.mx[i];
-        const core::Real iea = GXMIN(ea, oea);
-        intersection.mx[i] = iea;
-        intersection.mn[i] = ieb;
-        if (ieb == iea) {
-            ++equals;
-        } else if (ieb > iea) {
-            return false;
-        }
-    }
-    return equals < 3;
+	int equals = 0;
+	for (int i = 0; i < 3; ++i) {
+		const core::Real eb = mn[i];
+		const core::Real oeb = o.mn[i];
+		const core::Real ieb = GXMAX(eb, oeb);
+		const core::Real ea = mx[i];
+		const core::Real oea = o.mx[i];
+		const core::Real iea = GXMIN(ea, oea);
+		intersection.mx[i] = iea;
+		intersection.mn[i] = ieb;
+		if (ieb == iea) {
+			++equals;
+		}
+		else if (ieb > iea) {
+			return false;
+		}
+	}
+	return equals < 3;
+}
+
+bool gearoenix::math::Aabb3::test(const Aabb3& o) const noexcept
+{
+	return mn[0] < o.mx[0]
+		&& mx[0] > o.mn[0]
+		&& mn[1] < o.mx[1]
+		&& mx[1] > o.mn[1]
+		&& mn[2] < o.mx[2]
+		&& mx[2] > o.mn[2];
+}
+
+gearoenix::math::IntersectionStatus::Type gearoenix::math::Aabb3::check_intersection(const Aabb3& o) const noexcept
+{
+	if (mx[0] > o.mx[0]
+		&& mx[1] > o.mx[1]
+		&& mx[2] > o.mx[2]
+		&& mn[0] < o.mn[0]
+		&& mn[1] < o.mn[1]
+		&& mn[2] < o.mn[2]) return gearoenix::math::IntersectionStatus::In;
+	if (mn[0] < o.mx[0]
+		&& mx[0] > o.mn[0]
+		&& mn[1] < o.mx[1]
+		&& mx[1] > o.mn[1]
+		&& mn[2] < o.mx[2]
+		&& mx[2] > o.mn[2]) return gearoenix::math::IntersectionStatus::Cut;
+	return gearoenix::math::IntersectionStatus::Out;
 }

@@ -34,11 +34,16 @@ gearoenix::math::IntersectionStatus::Type gearoenix::math::ProjectorFrustum::che
 		c + Vec3(-r[0], r[1], -r[2]),
 		c + Vec3(r[0], -r[1], -r[2]),
 		aabb.mn,
-		});
+	});
 }
 
 gearoenix::math::IntersectionStatus::Type gearoenix::math::ProjectorFrustum::check_intersection(const Vec3(&points)[8]) const noexcept
 {
-
-	return IntersectionStatus::Out;
+	Aabb3 aabb;
+	for (const Vec3& p : points) {
+		const Vec4 pp = view_projection * Vec4(p, 1.0f);
+		aabb.put(pp.xyz() / pp[3]);
+	}
+	static const Aabb3 u(Vec3(1.0f, 1.0f, 1.0f), Vec3(-1.0f, -1.0f, -1.0f));
+	return u.check_intersection(aabb);
 }
