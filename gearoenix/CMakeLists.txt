@@ -251,6 +251,8 @@ SET (GX_ENGINE_SRC
     "${GX_ENGINE_SRC_DIR}math/math-plane.hpp"
     "${GX_ENGINE_SRC_DIR}math/math-plotter.cpp"
     "${GX_ENGINE_SRC_DIR}math/math-plotter.hpp"
+    "${GX_ENGINE_SRC_DIR}math/math-projector-frustum.cpp"
+    "${GX_ENGINE_SRC_DIR}math/math-projector-frustum.hpp"
     "${GX_ENGINE_SRC_DIR}math/math-quaternion.cpp"
     "${GX_ENGINE_SRC_DIR}math/math-quaternion.hpp"
     "${GX_ENGINE_SRC_DIR}math/math-ray.cpp"
