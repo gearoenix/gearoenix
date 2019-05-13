@@ -1,31 +1,37 @@
-#include "game-wcr-main.hpp"
-#ifdef GX_GAME_WCR
-#include "../../core/asset/cr-asset-manager.hpp"
-#include "../../core/event/cr-ev-bt-mouse.hpp"
-#include "../../core/event/cr-ev-mv-mouse.hpp"
-#include "../../core/event/cr-ev-sys-system.hpp"
-#include "../../core/event/cr-ev-ui-ui.hpp"
-#include "../../physics/body/phs-bd-rigid.hpp"
-#include "../../physics/constraint/phs-cns-tracker-spring-joint-spring.hpp"
-#include "../../render/camera/rnd-cmr-camera.hpp"
-#include "../../render/camera/rnd-cmr-manager.hpp"
-#include "../../render/engine/rnd-eng-engine.hpp"
-#include "../../render/graph/tree/rnd-gr-tr-pbr.hpp"
-#include "../../render/light/rnd-lt-light.hpp"
-#include "../../render/model/rnd-mdl-model.hpp"
-#include "../../render/scene/rnd-scn-manager.hpp"
-#include "../../render/scene/rnd-scn-scene.hpp"
-#include "../../system/sys-app.hpp"
-#include "../../system/sys-log.hpp"
+#include "exm-hello-world.hpp"
+#include <gearoenix/core/asset/cr-asset-manager.hpp>
+#include <gearoenix/core/event/cr-ev-bt-mouse.hpp>
+#include <gearoenix/core/event/cr-ev-mv-mouse.hpp>
+#include <gearoenix/core/event/cr-ev-sys-system.hpp>
+#include <gearoenix/core/event/cr-ev-ui-ui.hpp>
+#include <gearoenix/physics/body/phs-bd-rigid.hpp>
+#include <gearoenix/physics/constraint/phs-cns-tracker-spring-joint-spring.hpp>
+#include <gearoenix/render/camera/rnd-cmr-camera.hpp>
+#include <gearoenix/render/camera/rnd-cmr-manager.hpp>
+#include <gearoenix/render/engine/rnd-eng-engine.hpp>
+#include <gearoenix/render/graph/tree/rnd-gr-tr-pbr.hpp>
+#include <gearoenix/render/light/rnd-lt-light.hpp>
+#include <gearoenix/render/model/rnd-mdl-model.hpp>
+#include <gearoenix/render/scene/rnd-scn-manager.hpp>
+#include <gearoenix/render/scene/rnd-scn-scene.hpp>
+#include <gearoenix/system/sys-app.hpp>
+#include <gearoenix/system/sys-log.hpp>
 
 GameApp::GameApp(const std::shared_ptr<gearoenix::system::Application>& sys_app)
     : gearoenix::core::Application::Application(sys_app)
 {
-    rnd_eng->set_render_tree(std::shared_ptr<gearoenix::render::graph::tree::Tree>(new gearoenix::render::graph::tree::Pbr(rnd_eng, gearoenix::core::sync::EndCaller<gearoenix::core::sync::EndCallerIgnore>([] {}))));
-    sys_app->get_asset_manager()->get_scene_manager()->get_gx3d(1024, gearoenix::core::sync::EndCaller<gearoenix::render::scene::Scene>([this](std::shared_ptr<gearoenix::render::scene::Scene> s) {
-        scn = s;
-        s->get_light(1027)->enable_shadowing();
-    }));
+    rnd_eng->set_render_tree(
+		std::shared_ptr<gearoenix::render::graph::tree::Tree>(
+			new gearoenix::render::graph::tree::Pbr(
+				rnd_eng, 
+				gearoenix::core::sync::EndCaller<gearoenix::core::sync::EndCallerIgnore>([] {}))));
+    sys_app->get_asset_manager()->get_scene_manager()->get_gx3d(
+		1024, 
+		gearoenix::core::sync::EndCaller<gearoenix::render::scene::Scene>(
+			[this](std::shared_ptr<gearoenix::render::scene::Scene> s) {
+				scn = s;
+				s->get_light(1027)->enable_shadowing();
+			}));
 }
 
 GameApp::~GameApp() {}
@@ -152,4 +158,3 @@ void GameApp::terminate()
 //}
 //
 GEAROENIX_START(GameApp)
-#endif

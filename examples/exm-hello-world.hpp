@@ -27,9 +27,12 @@ private:
     std::shared_ptr<gearoenix::render::model::Model> mdl;
 
 public:
+	/// This function must be like this
     GameApp(const std::shared_ptr<gearoenix::system::Application>& sys_app);
     ~GameApp() override final;
+	/// On every screen refresh this function is going to be called
     void update() override final;
+	/// Before terminationg everything in engine this function is going to be called
     void terminate() override final;
 };
 #endif
