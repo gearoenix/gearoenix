@@ -20,7 +20,7 @@ namespace render {
         class Manager {
         protected:
             const std::shared_ptr<engine::Engine> e;
-            core::cache::File<Light> cache;
+			core::cache::File<Light> cache;
 
         public:
             Manager(const std::shared_ptr<system::stream::Stream>& s, const std::shared_ptr<engine::Engine>& e);

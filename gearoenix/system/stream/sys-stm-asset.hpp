@@ -33,10 +33,11 @@ namespace system {
 #endif
             void check_endian_compatibility();
 
+            Asset();
         public:
-            Asset(const std::shared_ptr<system::Application>& sys_app, const std::string& name);
             ~Asset();
-
+			/// It will return null it file does not exist
+			static std::shared_ptr<Asset> construct(const std::shared_ptr<system::Application>& sys_app, const std::string& name) noexcept;
             core::Count read(void* data, core::Count length);
             core::Count write(const void* data, core::Count length);
             void seek(core::Count offset);

@@ -18,9 +18,9 @@ gearoenix::render::engine::Engine::Engine(const std::shared_ptr<system::Applicat
     : engine_type_id(engine_type_id)
     , sysapp(system_application)
     , fun_loader(new core::FunctionLoader())
-    , kernels(new core::sync::KernelWorker())
-    , physics_engine(new physics::Engine(system_application, kernels))
+    , kernels(new core::sync::KernelWorker()) 
 {
+	physics_engine = std::make_shared<physics::Engine>(system_application, kernels);
     kernels->add_step([this](const unsigned int kernel_index) { render_tree->record(kernel_index); }, [this] { render_tree->submit(); });
 }
 

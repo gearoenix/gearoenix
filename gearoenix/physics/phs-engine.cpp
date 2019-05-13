@@ -80,5 +80,4 @@ void gearoenix::physics::Engine::remove_animation(core::Id a)
 
 void gearoenix::physics::Engine::update()
 {
-    kernels->do_steps();
 }

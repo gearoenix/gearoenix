@@ -8,26 +8,36 @@
 #include <gearoenix/physics/constraint/phs-cns-tracker-spring-joint-spring.hpp>
 #include <gearoenix/render/camera/rnd-cmr-camera.hpp>
 #include <gearoenix/render/camera/rnd-cmr-manager.hpp>
+#include <gearoenix/render/camera/rnd-cmr-perspective.hpp>
 #include <gearoenix/render/engine/rnd-eng-engine.hpp>
 #include <gearoenix/render/graph/tree/rnd-gr-tr-pbr.hpp>
 #include <gearoenix/render/light/rnd-lt-light.hpp>
+#include <gearoenix/render/mesh/rnd-msh-manager.hpp>
+#include <gearoenix/render/mesh/rnd-msh-mesh.hpp>
 #include <gearoenix/render/model/rnd-mdl-model.hpp>
 #include <gearoenix/render/scene/rnd-scn-manager.hpp>
 #include <gearoenix/render/scene/rnd-scn-scene.hpp>
 #include <gearoenix/system/sys-app.hpp>
 #include <gearoenix/system/sys-log.hpp>
 
+template<class T>
+using GxEndCaller = gearoenix::core::sync::EndCaller<T>;
+
+using GxEndCallerIgnore = gearoenix::core::sync::EndCallerIgnore;
+using GxGrTree = gearoenix::render::graph::tree::Tree;
+using GxGrPbr = gearoenix::render::graph::tree::Pbr;
+using GxMesh = gearoenix::render::mesh::Mesh;
+using GxModelManager = gearoenix::render::model::Manager;
+
 GameApp::GameApp(const std::shared_ptr<gearoenix::system::Application>& sys_app)
     : gearoenix::core::Application::Application(sys_app)
 {
-    rnd_eng->set_render_tree(
-		std::shared_ptr<gearoenix::render::graph::tree::Tree>(
-			new gearoenix::render::graph::tree::Pbr(
-				rnd_eng, 
-				gearoenix::core::sync::EndCaller<gearoenix::core::sync::EndCallerIgnore>([] {}))));
-	
+    rnd_eng->set_render_tree(std::shared_ptr<GxGrTree>(new GxGrPbr(rnd_eng, GxEndCaller<GxEndCallerIgnore>([] {}))));
 	const std::shared_ptr<gearoenix::core::asset::Manager>& astmgr = sys_app->get_asset_manager();
-	scn = astmgr->get_scene_manager()->create<GxScene>(gearoenix::core::sync::EndCaller<GxScene>([](std::shared_ptr<GxScene>) {}));
+	scn = astmgr->get_scene_manager()->create<GxScene>(GxEndCaller<GxScene>([](std::shared_ptr<GxScene>) {}));
+	cam = astmgr->get_camera_manager()->create<GxPersCam>();
+	const std::shared_ptr<GxMesh> msh = astmgr->get_mesh_manager()->create_icosphere(GxEndCaller<GxMesh>([](std::shared_ptr<GxMesh>) {}));
+	const std::shared_ptr<GxModelManager> &mdlmgr = astmgr->get_model_manager();
 }
 
 GameApp::~GameApp() {}

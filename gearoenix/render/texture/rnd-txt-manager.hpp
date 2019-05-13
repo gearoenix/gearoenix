@@ -23,7 +23,7 @@ namespace render {
         class Manager {
         protected:
             const std::shared_ptr<engine::Engine> e;
-            core::cache::File<Texture> cache;
+			core::cache::File<Texture> cache;
             std::map<math::Vec4, core::Id> color_4d_id_t2d;
             std::map<math::Vec3, core::Id> color_3d_id_t2d;
             std::map<math::Vec2, core::Id> color_2d_id_t2d;

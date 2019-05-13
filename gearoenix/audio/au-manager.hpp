@@ -20,7 +20,7 @@ namespace audio {
     class Manager {
     protected:
         const std::shared_ptr<render::engine::Engine> e;
-        core::cache::File<Audio> cache;
+		core::cache::File<Audio> cache;
 
     public:
         Manager(const std::shared_ptr<system::stream::Stream>& s, const std::shared_ptr<render::engine::Engine>& e);
