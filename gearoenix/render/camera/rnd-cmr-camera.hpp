@@ -38,10 +38,13 @@ namespace render {
             const std::shared_ptr<buffer::FramedUniform> uniform_buffers;
             void update_location();
             void update_view_projection();
-            Camera(
-                const core::Id my_id,
-                const std::shared_ptr<system::stream::Stream>& f,
-                const std::shared_ptr<engine::Engine>& e);
+			Camera(
+				const core::Id my_id,
+				const std::shared_ptr<engine::Engine>& e) noexcept;
+			Camera(
+				const core::Id my_id,
+				const std::shared_ptr<system::stream::Stream>& f,
+				const std::shared_ptr<engine::Engine>& e);
 
         public:
             virtual ~Camera();

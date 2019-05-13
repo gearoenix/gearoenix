@@ -99,10 +99,10 @@ gearoenix::render::widget::Widget::Widget(const core::Id my_id, const std::share
 {
 }
 
-gearoenix::render::widget::Widget::Widget(const std::shared_ptr<engine::Engine>& e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c)
-    : model::Model(e, c)
-{
-}
+//gearoenix::render::widget::Widget::Widget(const std::shared_ptr<engine::Engine>& e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c)
+//    : model::Model(e, c)
+//{
+//}
 
 gearoenix::render::widget::Widget::~Widget()
 {

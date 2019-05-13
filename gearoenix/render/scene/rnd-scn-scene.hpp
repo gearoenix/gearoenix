@@ -87,6 +87,7 @@ namespace render {
                 const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
 
             Scene(
+				const core::Id my_id,
                 const std::shared_ptr<engine::Engine>& e,
                 const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
 

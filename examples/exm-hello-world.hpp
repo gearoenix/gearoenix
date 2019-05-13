@@ -9,7 +9,7 @@ namespace render {
         class Engine;
     }
     namespace camera {
-        class Camera;
+        class Perspective;
     }
     namespace model {
         class Model;
@@ -22,9 +22,13 @@ namespace render {
 
 class GameApp : public gearoenix::core::Application {
 private:
-    std::shared_ptr<gearoenix::render::scene::Scene> scn;
-    std::shared_ptr<gearoenix::render::camera::Camera> cam;
-    std::shared_ptr<gearoenix::render::model::Model> mdl;
+	using GxScene = gearoenix::render::scene::Scene;
+	using GxPersCam = gearoenix::render::camera::Perspective;
+	using GxModel = gearoenix::render::model::Model;
+
+    std::shared_ptr<GxScene> scn;
+    std::shared_ptr<GxPersCam> cam;
+    std::shared_ptr<GxModel> mdl;
 
 public:
 	/// This function must be like this

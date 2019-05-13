@@ -47,9 +47,10 @@ gearoenix::render::model::Model::Model(
 }
 
 gearoenix::render::model::Model::Model(
+	const core::Id my_id,
     const std::shared_ptr<engine::Engine>& e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>&)
-    : core::asset::Asset(e->get_system_application()->get_asset_manager()->create_id(), core::asset::Type::MODEL)
+    : core::asset::Asset(my_id, core::asset::Type::MODEL)
     , e(e)
     , uniform_buffers(std::make_shared<buffer::FramedUniform>(static_cast<unsigned int>(sizeof(Uniform)), e))
 {

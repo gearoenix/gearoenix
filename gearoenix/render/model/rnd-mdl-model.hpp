@@ -41,12 +41,14 @@ namespace render {
             std::shared_ptr<physics::collider::Collider> collider = nullptr;
 
         public:
-            Model(const core::Id my_id,
+            Model(
+				const core::Id my_id,
                 const std::shared_ptr<system::stream::Stream>& f,
                 const std::shared_ptr<engine::Engine>& e,
                 const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
             /// It will create an automatic Id for itself
             Model(
+				const core::Id my_id,
                 const std::shared_ptr<engine::Engine>& e,
                 const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
             virtual ~Model();

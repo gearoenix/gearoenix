@@ -65,15 +65,26 @@ for vertex, index_list in vertices.items():
         indices[i] = last_index
     last_index += 1
 
-s = 'static const core::Real * const vertices = {\n'
+s = 'static const std::vector<math::BasicVertex> vertices = {\n'
 for v in mesh_vertices:
-    s += '    '
-    for e in v:
-        s += str(e) + 'f, '
-    s += '\n'
+    s += '    math::BasicVertex { '
+    s += 'math::Vec3(' + str(v[0]) + 'f, ' + \
+        str(v[1]) + 'f, ' + str(v[2]) + 'f), '
+    i = 3
+    if NEEDS_NORMAL:
+        s += 'math::Vec3(' + str(v[i]) + 'f, ' + \
+            str(v[i + 1]) + 'f, ' + str(v[i + 2]) + 'f), '
+        i += 3
+    if NEEDS_TANGENT:
+        s += 'math::Vec4(' + str(v[i]) + 'f, ' + str(v[i + 1]) + \
+            'f, ' + str(v[i + 2]) + 'f, ' + str(v[i + 3]) + 'f), '
+        i += 4
+    if NEEDS_UV:
+        s += 'math::Vec2(' + str(v[i]) + 'f, ' + str(v[i + 1]) + 'f), '
+    s += '},\n'
 s += '};\n\n'
 
-s += 'static const std::uint32 * const indices = {\n'
+s += 'static const std::vector<std::uint32> indices = {\n'
 last_index = 0
 while last_index < len(indices):
     i = 0
@@ -84,5 +95,7 @@ while last_index < len(indices):
         i += 1
     s += '\n'
 s += '};\n\n'
+s += 'const static core::Real occlusion_radius = ' + \
+    str(occlusion_radius) + 'f;\n\n'
 
 open('C:\\Users\\hossein\\Desktop\\1.txt', 'w').write(s)

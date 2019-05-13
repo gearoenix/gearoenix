@@ -25,13 +25,9 @@ GameApp::GameApp(const std::shared_ptr<gearoenix::system::Application>& sys_app)
 			new gearoenix::render::graph::tree::Pbr(
 				rnd_eng, 
 				gearoenix::core::sync::EndCaller<gearoenix::core::sync::EndCallerIgnore>([] {}))));
-    sys_app->get_asset_manager()->get_scene_manager()->get_gx3d(
-		1024, 
-		gearoenix::core::sync::EndCaller<gearoenix::render::scene::Scene>(
-			[this](std::shared_ptr<gearoenix::render::scene::Scene> s) {
-				scn = s;
-				s->get_light(1027)->enable_shadowing();
-			}));
+	
+	const std::shared_ptr<gearoenix::core::asset::Manager>& astmgr = sys_app->get_asset_manager();
+	scn = astmgr->get_scene_manager()->create<GxScene>(gearoenix::core::sync::EndCaller<GxScene>([](std::shared_ptr<GxScene>) {}));
 }
 
 GameApp::~GameApp() {}

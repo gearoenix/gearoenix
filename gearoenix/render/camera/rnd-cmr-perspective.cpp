@@ -25,6 +25,14 @@ gearoenix::render::camera::Perspective::Perspective(
     set_field_of_view(rad);
 }
 
+gearoenix::render::camera::Perspective::Perspective(
+	const core::Id my_id, 
+	const std::shared_ptr<engine::Engine>& e)
+	: Camera(my_id, e)
+{
+	set_field_of_view(1.571f);
+}
+
 bool gearoenix::render::camera::Perspective::in_sight(const math::Vec3& location, const core::Real radius) const
 {
     //    math::Vec3 eye = location - l;

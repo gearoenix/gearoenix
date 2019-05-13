@@ -21,10 +21,13 @@ namespace render {
             void on_ratio_change();
 
         public:
-            Perspective(
-                const core::Id my_id,
-                const std::shared_ptr<system::stream::Stream>& f,
-                const std::shared_ptr<engine::Engine>& e);
+			Perspective(
+				const core::Id my_id,
+				const std::shared_ptr<system::stream::Stream>& f,
+				const std::shared_ptr<engine::Engine>& e);
+			Perspective(
+				const core::Id my_id,
+				const std::shared_ptr<engine::Engine>& e);
             bool in_sight(const math::Vec3& location, const core::Real radius) const;
             void on_event(const core::event::Event& e);
             math::Ray3 create_ray3(const core::Real x, const core::Real y) const;

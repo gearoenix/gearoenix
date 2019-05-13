@@ -2,6 +2,7 @@
 #define GEAROEMIX_RENDER_CAMERA_MANAGER_HPP
 #include "../../core/cache/cr-cache-file.hpp"
 #include "../../core/sync/cr-sync-end-caller.hpp"
+#include "rnd-cmr-camera.hpp"
 
 namespace gearoenix {
 namespace system {
@@ -14,7 +15,6 @@ namespace render {
         class Engine;
     }
     namespace camera {
-        class Camera;
         class Manager {
         protected:
             const std::shared_ptr<engine::Engine> e;
@@ -24,8 +24,24 @@ namespace render {
             Manager(const std::shared_ptr<system::stream::Stream>& s, const std::shared_ptr<engine::Engine>& e);
             ~Manager();
             std::shared_ptr<Camera> get_gx3d(const core::Id cid, core::sync::EndCaller<Camera>& call);
+			template <typename T>
+			typename std::enable_if<std::is_base_of<Camera, T>::value, std::shared_ptr<T>>::type
+				create(core::sync::EndCaller<T>& c);
         };
     }
 }
+}
+
+template <typename T>
+typename std::enable_if<std::is_base_of<gearoenix::render::camera::Camera, T>::value, std::shared_ptr<T>>::type
+gearoenix::render::camera::Manager::create(core::sync::EndCaller<T>& c)
+{
+	const core::Id id = core::asset::Manager::create_id();
+	const core::sync::EndCaller<core::sync::EndCallerIgnore> call([c] {});
+	const std::shared_ptr<T> result(new T(id, e, call));
+	c.set_data(result);
+	const std::weak_ptr<Scene> w = result;
+	cache.get_cacher().get_cacheds()[id] = w;
+	return result;
 }
 #endif

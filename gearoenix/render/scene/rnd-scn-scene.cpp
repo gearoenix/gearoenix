@@ -77,9 +77,10 @@ gearoenix::render::scene::Scene::Scene(
 }
 
 gearoenix::render::scene::Scene::Scene(
+	const core::Id my_id,
     const std::shared_ptr<engine::Engine>& e,
-    const core::sync::EndCaller<core::sync::EndCallerIgnore>& c)
-    : core::asset::Asset(e->get_system_application()->get_asset_manager()->create_id(), core::asset::Type::SCENE)
+    const core::sync::EndCaller<core::sync::EndCallerIgnore>&)
+    : core::asset::Asset(my_id, core::asset::Type::SCENE)
     , e(e)
     , scene_type_id(Type::GAME)
     , uniform_buffers(std::make_shared<buffer::FramedUniform>(static_cast<const unsigned int>(sizeof(Uniform)), e))
