@@ -1,9 +1,9 @@
 #ifndef GEAROEMIX_RENDER_MODEL_MANAGER_HPP
 #define GEAROEMIX_RENDER_MODEL_MANAGER_HPP
+#include "../../core/asset/cr-asset-manager.hpp"
 #include "../../core/cache/cr-cache-file.hpp"
 #include "../../core/cr-types.hpp"
 #include "../../core/sync/cr-sync-end-caller.hpp"
-#include "../../core/asset/cr-asset-manager.hpp"
 #include "rnd-mdl-model.hpp"
 #include <memory>
 

@@ -1,5 +1,6 @@
 #ifndef GEAROEMIX_RENDER_CAMERA_MANAGER_HPP
 #define GEAROEMIX_RENDER_CAMERA_MANAGER_HPP
+#include "../../core/asset/cr-asset-manager.hpp"
 #include "../../core/cache/cr-cache-file.hpp"
 #include "../../core/sync/cr-sync-end-caller.hpp"
 #include "rnd-cmr-camera.hpp"
