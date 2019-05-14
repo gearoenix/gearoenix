@@ -23,6 +23,12 @@ gearoenix::render::model::Mesh::Mesh(const std::shared_ptr<system::stream::Strea
     mat = std::make_shared<material::Material>(f, e, core::sync::EndCaller<core::sync::EndCallerIgnore>([c] {}));
 }
 
+gearoenix::render::model::Mesh::Mesh(const std::shared_ptr<mesh::Mesh>& msh, const std::shared_ptr<material::Material>& mat) noexcept
+	: msh(msh)
+	, mat(mat)
+{
+}
+
 gearoenix::render::model::Mesh::~Mesh() {}
 
 const std::shared_ptr<gearoenix::render::mesh::Mesh>& gearoenix::render::model::Mesh::get_mesh() const

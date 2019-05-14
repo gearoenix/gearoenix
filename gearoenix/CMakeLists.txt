@@ -300,6 +300,8 @@ SET (GX_ENGINE_SRC
     "${GX_ENGINE_SRC_DIR}render/camera/rnd-cmr-orthographic.hpp"
     "${GX_ENGINE_SRC_DIR}render/camera/rnd-cmr-perspective.cpp"
     "${GX_ENGINE_SRC_DIR}render/camera/rnd-cmr-perspective.hpp"
+    "${GX_ENGINE_SRC_DIR}render/camera/rnd-cmr-transformation.cpp"
+    "${GX_ENGINE_SRC_DIR}render/camera/rnd-cmr-transformation.hpp"
     "${GX_ENGINE_SRC_DIR}render/camera/rnd-cmr-uniform.cpp"
     "${GX_ENGINE_SRC_DIR}render/camera/rnd-cmr-uniform.hpp"
     "${GX_ENGINE_SRC_DIR}render/command/rnd-cmd-buffer.cpp"

@@ -31,6 +31,10 @@ namespace render {
                 const std::shared_ptr<engine::Engine>& e,
                 const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
 
+			Mesh(
+				const std::shared_ptr<mesh::Mesh>& msh,
+				const std::shared_ptr<material::Material> &mat) noexcept;
+
             ~Mesh();
 
             const std::shared_ptr<mesh::Mesh>& get_mesh() const;

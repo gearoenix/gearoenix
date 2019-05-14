@@ -1,10 +1,8 @@
 #include "phs-transformation.hpp"
 #include "../math/math-quaternion.hpp"
+#include "../system/sys-log.hpp"
 
 gearoenix::physics::Transformation::Transformation()
-    : x_axis(1.0f, 0.0f, 0.0f)
-    , y_axis(0.0f, 1.0f, 0.0f)
-    , z_axis(0.0f, 0.0f, 1.0f)
 {
 }
 
@@ -12,126 +10,97 @@ gearoenix::physics::Transformation::~Transformation()
 {
 }
 
-const gearoenix::math::Vec3& gearoenix::physics::Transformation::get_x_axis() const
+const gearoenix::math::Vec3& gearoenix::physics::Transformation::get_x_axis() const noexcept
 {
-    return x_axis;
+	GXUNIMPLEMENTED;
 }
 
-const gearoenix::math::Vec3& gearoenix::physics::Transformation::get_y_axis() const
+const gearoenix::math::Vec3& gearoenix::physics::Transformation::get_y_axis() const noexcept
 {
-    return y_axis;
+	GXUNIMPLEMENTED;
 }
 
-const gearoenix::math::Vec3& gearoenix::physics::Transformation::get_z_axis() const
+const gearoenix::math::Vec3& gearoenix::physics::Transformation::get_z_axis() const noexcept
 {
-    return z_axis;
+	GXUNIMPLEMENTED;
 }
 
-const gearoenix::math::Mat4x4& gearoenix::physics::Transformation::get_transformation() const
+const gearoenix::math::Mat4x4& gearoenix::physics::Transformation::get_transformation() const noexcept
 {
-    return transformation;
+	GXUNIMPLEMENTED;
 }
 
-void gearoenix::physics::Transformation::get_location(math::Vec3& l) const
+void gearoenix::physics::Transformation::get_location(math::Vec3& l) const noexcept
 {
-    transformation.get_location(l);
+	GXUNIMPLEMENTED;
 }
 
-const gearoenix::math::Vec3 gearoenix::physics::Transformation::get_location() const
+const gearoenix::math::Vec3 gearoenix::physics::Transformation::get_location() const noexcept
 {
-    math::Vec3 l;
-    get_location(l);
-    return l;
+	GXUNIMPLEMENTED;
 }
 
-void gearoenix::physics::Transformation::set_location(const math::Vec3& l)
+void gearoenix::physics::Transformation::set_location(const math::Vec3& l) noexcept
 {
-    transformation.set_location(l);
+	GXUNIMPLEMENTED;
 }
 
-void gearoenix::physics::Transformation::translate(const math::Vec3& t)
+void gearoenix::physics::Transformation::translate(const math::Vec3& t) noexcept
 {
-    transformation.translate(t);
+	GXUNIMPLEMENTED;
 }
 
-void gearoenix::physics::Transformation::local_x_translate(const core::Real t)
+void gearoenix::physics::Transformation::local_x_translate(const core::Real t) noexcept
 {
-    translate(x_axis * t);
+	GXUNIMPLEMENTED;
 }
 
-void gearoenix::physics::Transformation::local_y_translate(const core::Real t)
+void gearoenix::physics::Transformation::local_y_translate(const core::Real t) noexcept
 {
-    translate(y_axis * t);
+	GXUNIMPLEMENTED;
 }
 
-void gearoenix::physics::Transformation::local_z_translate(const core::Real t)
+void gearoenix::physics::Transformation::local_z_translate(const core::Real t) noexcept
 {
-    translate(z_axis * t);
+	GXUNIMPLEMENTED;
 }
 
-void gearoenix::physics::Transformation::global_rotate(const core::Real d, const math::Vec3& axis, const math::Vec3& location)
+void gearoenix::physics::Transformation::global_rotate(const core::Real d, const math::Vec3& axis, const math::Vec3& location) noexcept
 {
-    translate(-location);
-    global_rotate(d, axis);
-    translate(location);
+	GXUNIMPLEMENTED;
 }
 
-void gearoenix::physics::Transformation::global_rotate(const core::Real d, const math::Vec3& axis)
+void gearoenix::physics::Transformation::global_rotate(const core::Real d, const math::Vec3& axis) noexcept
 {
-    const math::Mat4x4 r = math::Mat4x4::rotation(axis, d);
-    x_axis = r * x_axis;
-    y_axis = r * y_axis;
-    z_axis = r * z_axis;
-    transformation = r * transformation;
+	GXUNIMPLEMENTED;
 }
 
-void gearoenix::physics::Transformation::local_rotate(const core::Real d, const math::Vec3& axis)
+void gearoenix::physics::Transformation::local_rotate(const core::Real d, const math::Vec3& axis) noexcept
 {
-    math::Vec3 l;
-    transformation.get_location(l);
-    transformation.set_location_zero();
-    const math::Mat4x4 r = math::Mat4x4::rotation(axis, d);
-    x_axis = r * x_axis;
-    y_axis = r * y_axis;
-    z_axis = r * z_axis;
-    transformation = r * transformation;
-    transformation.set_location(l);
+	GXUNIMPLEMENTED;
 }
 
-void gearoenix::physics::Transformation::local_x_rotate(const core::Real d)
+void gearoenix::physics::Transformation::local_x_rotate(const core::Real d) noexcept
 {
-    local_rotate(d, x_axis);
+	GXUNIMPLEMENTED;
 }
 
-void gearoenix::physics::Transformation::local_y_rotate(const core::Real d)
+void gearoenix::physics::Transformation::local_y_rotate(const core::Real d) noexcept
 {
-    local_rotate(d, y_axis);
+	GXUNIMPLEMENTED;
 }
 
-void gearoenix::physics::Transformation::local_z_rotate(const core::Real d)
+void gearoenix::physics::Transformation::local_z_rotate(const core::Real d) noexcept
 {
-    local_rotate(d, z_axis);
+	GXUNIMPLEMENTED;
 }
 
-void gearoenix::physics::Transformation::global_scale(const core::Real s)
+void gearoenix::physics::Transformation::scale(const core::Real s) noexcept
 {
-    transformation.global_scale(s, s, s, s);
+	GXUNIMPLEMENTED;
 }
 
-void gearoenix::physics::Transformation::local_scale(const core::Real s)
+void gearoenix::physics::Transformation::set_orientation(const math::Quat& q) noexcept
 {
-    transformation.local_scale(s);
-}
-
-void gearoenix::physics::Transformation::set_orientation(const math::Quat& q)
-{
-    math::Vec3 l;
-    transformation.get_location(l);
-    transformation.set_location_zero();
-    const math::Mat4x4 r = q.to_mat();
-    transformation = r;
-    x_axis = l * x_axis;
-    y_axis = l * y_axis;
-    z_axis = l * z_axis;
-    transformation.set_location(l);
+	GXUNIMPLEMENTED;
 }
