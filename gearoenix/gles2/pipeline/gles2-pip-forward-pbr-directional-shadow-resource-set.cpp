@@ -25,7 +25,7 @@ void gearoenix::gles2::pipeline::ForwardPbrDirectionalShadowResourceSet::bind(gl
     gles2::pipeline::ResourceSet::bind(bound_shader_program);
     const shader::ForwardPbrDirectionalShadow* shdr = static_cast<const shader::ForwardPbrDirectionalShadow*>(shd.get());
     const render::camera::Uniform* camera = reinterpret_cast<const render::camera::Uniform*>(camera_uniform_buffer->get_data());
-    shdr->set_camera_position_data(camera->position_far.data());
+    shdr->set_camera_position_data(camera->position.data());
     shdr->set_camera_vp_data(camera->view_projection.data());
     //static_cast<const texture::Texture2D *>(ambient_occlusion.get())->bind(shdr->get_effect_ambient_occlusion_index());
     static_cast<const texture::Texture2D*>(brdflut.get())->bind(static_cast<gl::enumerated>(shdr->get_effect_brdflut_index()));

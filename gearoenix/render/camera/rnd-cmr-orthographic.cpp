@@ -1,6 +1,7 @@
 #include "rnd-cmr-orthographic.hpp"
 #include "../../core/event/cr-ev-event.hpp"
 #include "../../system/stream/sys-stm-stream.hpp"
+#include "rnd-cmr-uniform.hpp"
 #include <cmath>
 
 void gearoenix::render::camera::Orthographic::on_ratio_change()
@@ -39,21 +40,14 @@ bool gearoenix::render::camera::Orthographic::in_sight(const math::Vec3& locatio
     return true;
 }
 
-void gearoenix::render::camera::Orthographic::on_event(const core::event::Event& e)
-{
-    Camera::on_event(e);
-    if (e.get_type() == core::event::Event::From::WINDOW_RESIZE)
-        on_ratio_change();
-}
-
 gearoenix::math::Ray3 gearoenix::render::camera::Orthographic::create_ray3(const core::Real x, const core::Real y) const
 {
-    const math::Vec3 dir = -uniform.z_reserved.xyz();
-    const math::Vec3 origin = (uniform.x_reserved.xyz() * x) + (uniform.y_reserved.xyz() * y) + (dir * uniform.near_aspect_ratio_reserved[0]) + uniform.position_far.xyz();
+    const math::Vec3 dir = -uniform->z;
+    const math::Vec3 origin = (uniform->x * x) + (uniform->y * y) + (dir * uniform->near) + uniform->position;
     return math::Ray3(origin, dir);
 }
 
 gearoenix::core::Real gearoenix::render::camera::Orthographic::get_distance(const math::Vec3& model_location) const
 {
-    return ((uniform.position_far.xyz() - model_location).dot(uniform.z_reserved.xyz()));
+    return (uniform->position - model_location).dot(uniform->z);
 }

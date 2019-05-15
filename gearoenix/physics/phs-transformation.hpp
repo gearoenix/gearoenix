@@ -7,14 +7,13 @@ namespace gearoenix {
 namespace physics {
     class Transformation {
 	protected:
-        Transformation();
+        Transformation() noexcept;
     public:
-        virtual ~Transformation();
+        virtual ~Transformation() noexcept;
 		virtual const math::Vec3& get_x_axis() const noexcept;
 		virtual const math::Vec3& get_y_axis() const noexcept;
 		virtual const math::Vec3& get_z_axis() const noexcept;
-		virtual const math::Mat4x4& get_transformation() const noexcept;
-        virtual const math::Vec3 get_location() const noexcept;
+        virtual const math::Vec3& get_location() const noexcept;
 		virtual void get_location(math::Vec3& l) const noexcept;
         virtual void set_location(const math::Vec3& l) noexcept;
 		virtual void translate(const math::Vec3& t) noexcept;

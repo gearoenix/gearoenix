@@ -3,6 +3,8 @@
 #include "../../core/event/cr-ev-window-resize.hpp"
 #include "../../system/stream/sys-stm-stream.hpp"
 #include "../../system/sys-log.hpp"
+#include "rnd-cmr-uniform.hpp"
+#include "rnd-cmr-transformation.hpp"
 #include <cmath>
 
 void gearoenix::render::camera::Perspective::on_ratio_change()
@@ -51,45 +53,38 @@ bool gearoenix::render::camera::Perspective::in_sight(const math::Vec3& location
     return true;
 }
 
-void gearoenix::render::camera::Perspective::on_event(const core::event::Event& e)
-{
-    Camera::on_event(e);
-    if (e.get_type() == core::event::Event::From::WINDOW_RESIZE)
-        on_ratio_change();
-}
-
 gearoenix::math::Ray3 gearoenix::render::camera::Perspective::create_ray3(const core::Real x, const core::Real y) const
 {
-    math::Vec3 dir = (uniform.x_reserved.xyz() * x) + (uniform.y_reserved.xyz() * y) + (uniform.z_reserved.xyz() * uniform.near_aspect_ratio_reserved[0]);
-    const math::Vec3 origin = dir + uniform.position_far.xyz();
+    math::Vec3 dir = (uniform->x * x) + (uniform->y * y) + (uniform->z * uniform->near);
+    const math::Vec3 origin = dir + uniform->position;
     dir.normalize();
     return math::Ray3(origin, dir);
 }
 
-gearoenix::core::Real gearoenix::render::camera::Perspective::get_distance(const math::Vec3 model_location) const
+gearoenix::core::Real gearoenix::render::camera::Perspective::get_distance(const math::Vec3 &model_location) const
 {
-    return (model_location - uniform.position_far.xyz()).square_length();
+    return (model_location - uniform->position).square_length();
 }
 
 void gearoenix::render::camera::Perspective::set_field_of_view(const core::Real radian)
 {
     fovx = radian;
-    tanx = static_cast<core::Real>(std::tan(static_cast<double>(radian * 0.5f)));
-    tany = tanx / uniform.near_aspect_ratio_reserved[1];
+    tanx = static_cast<core::Real>(std::tan(static_cast<double>(radian) * 0.5));
+    tany = tanx / uniform->aspect_ratio;
     fovy = static_cast<core::Real>(std::atan(static_cast<double>(tany))) * 2.0f;
-    uniform.projection = math::Mat4x4::perspective(
-        tanx * -uniform.near_aspect_ratio_reserved[0] * 2.0f,
-        tany * -uniform.near_aspect_ratio_reserved[0] * 2.0f,
-        -uniform.near_aspect_ratio_reserved[0],
-        -uniform.position_far[3]);
-    uniform.uniform_projection = math::Mat4x4(
+    uniform->projection = math::Mat4x4::perspective(
+        tanx * -uniform->near * 2.0f,
+        tany * -uniform->near * 2.0f,
+        -uniform->near,
+        -uniform->far);
+    uniform->uniform_projection = math::Mat4x4(
                                      0.5f, 0.0f, 0.0f, 0.0f,
                                      0.0f, 0.5f, 0.0f, 0.0f,
                                      0.0f, 0.0f, 1.0f, 0.0f,
                                      0.5f, 0.5f, 0.0f, 1.0f)
-        * uniform.projection;
+        * uniform->projection;
     lambda = static_cast<core::Real>(
-                 std::sin(static_cast<double>(fovx * 0.5f)) + std::sin(static_cast<double>(fovy * 0.5f)))
+                 std::sin(static_cast<double>(fovx) * 0.5) + std::sin(static_cast<double>(fovy) * 0.5))
         * 0.5f;
-    update_view_projection();
+    transformation->update_view_projection();
 }

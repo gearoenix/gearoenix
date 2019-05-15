@@ -93,7 +93,7 @@ namespace math {
         bool operator==(const Vec3& o) const;
         bool operator>(const Vec3& o) const;
         Vec2 xy() const;
-        core::Real* data();
+        const core::Real* data() const noexcept;
         core::Real length() const;
         core::Real square_length() const;
         core::Real square_distance(const Vec3& a) const;
