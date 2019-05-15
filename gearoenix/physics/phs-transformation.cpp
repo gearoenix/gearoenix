@@ -1,7 +1,5 @@
 #include "phs-transformation.hpp"
-#include "../math/math-quaternion.hpp"
 #include "../system/sys-log.hpp"
-#include "..\render\camera\rnd-cmr-transformation.hpp"
 
 gearoenix::physics::Transformation::Transformation() noexcept
 {
