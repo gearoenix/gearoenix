@@ -16,3 +16,4 @@ RUN apt install -y curl
 RUN apt install -y lcov 
 RUN apt install -y gcovr 
 RUN apt install -y wget
+RUN apt install -y libsndio-dev
