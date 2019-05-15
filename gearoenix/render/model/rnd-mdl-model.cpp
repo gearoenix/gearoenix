@@ -17,6 +17,7 @@
 #include "../widget/rnd-wdg-widget.hpp"
 #include "rnd-mdl-manager.hpp"
 #include "rnd-mdl-mesh.hpp"
+#include "rnd-mdl-transformation.hpp"
 #include <iostream>
 
 gearoenix::render::model::Model::Model(
@@ -27,12 +28,14 @@ gearoenix::render::model::Model::Model(
     : core::asset::Asset(my_id, core::asset::Type::MODEL)
     , e(e)
     , uniform_buffers(std::make_shared<buffer::FramedUniform>(static_cast<unsigned int>(sizeof(Uniform)), e))
+	, transformation(new Transformation(&uniform))
 {
     uniform.m.read(f);
     const core::Count meshes_count = f->read<core::Count>();
     for (core::Count i = 0; i < meshes_count; ++i) {
         add_mesh(std::make_shared<Mesh>(f, e, c));
     }
+	// TODO child 
     /*std::vector<core::Id> children_ids;
 	if (children_ids.size() > 0)
 	{
@@ -53,6 +56,7 @@ gearoenix::render::model::Model::Model(
     : core::asset::Asset(my_id, core::asset::Type::MODEL)
     , e(e)
     , uniform_buffers(std::make_shared<buffer::FramedUniform>(static_cast<unsigned int>(sizeof(Uniform)), e))
+	, transformation(new Transformation(&uniform))
 {
 }
 
@@ -154,6 +158,11 @@ const std::shared_ptr<gearoenix::physics::collider::Collider>& gearoenix::render
 const std::shared_ptr<gearoenix::render::buffer::FramedUniform>& gearoenix::render::model::Model::get_uniform_buffers() const
 {
     return uniform_buffers;
+}
+
+const std::shared_ptr<gearoenix::render::model::Transformation>& gearoenix::render::model::Model::get_transformation() const noexcept
+{
+	return transformation;
 }
 
 const gearoenix::math::Mat4x4& gearoenix::render::model::Model::get_model_matrix() const

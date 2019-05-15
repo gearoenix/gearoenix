@@ -25,10 +25,12 @@ namespace render {
     }
     namespace model {
         class Mesh;
+		class Transformation;
         class Model : public core::asset::Asset {
         protected:
             const std::shared_ptr<engine::Engine> e;
-            const std::shared_ptr<buffer::FramedUniform> uniform_buffers;
+			const std::shared_ptr<buffer::FramedUniform> uniform_buffers;
+			const std::shared_ptr<Transformation> transformation;
 
             bool is_dynamic = true;
             bool has_shadow_caster = false;
@@ -60,6 +62,7 @@ namespace render {
             const std::map<core::Id, std::shared_ptr<Mesh>>& get_meshes() const;
             const std::shared_ptr<physics::collider::Collider>& get_collider() const;
             const std::shared_ptr<buffer::FramedUniform>& get_uniform_buffers() const;
+			const std::shared_ptr<Transformation>& get_transformation() const noexcept;
 
             const math::Mat4x4& get_model_matrix() const;
         };

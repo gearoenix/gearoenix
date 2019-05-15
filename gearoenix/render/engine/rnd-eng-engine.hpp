@@ -8,6 +8,7 @@
 #include "rnd-eng-type.hpp"
 #include <memory>
 #include <vector>
+#include <chrono>
 namespace gearoenix {
 namespace core {
     class FunctionLoader;
@@ -70,6 +71,9 @@ namespace render {
             unsigned int frames_count = 2;
             unsigned int frame_number = 0;
             const Type::Id engine_type_id;
+			core::Real delta_time = 0.0f;
+			std::chrono::time_point<std::chrono::high_resolution_clock> last_frame_time = std::chrono::high_resolution_clock::now();
+
             std::shared_ptr<system::Application> sysapp = nullptr;
             std::shared_ptr<core::FunctionLoader> fun_loader = nullptr;
             std::shared_ptr<physics::Engine> physics_engine = nullptr;
@@ -134,6 +138,7 @@ namespace render {
             Type::Id get_engine_type_id() const;
             unsigned int get_frame_number() const;
             unsigned int get_frames_count() const;
+			core::Real get_delta_time() const noexcept;
         };
     }
 }

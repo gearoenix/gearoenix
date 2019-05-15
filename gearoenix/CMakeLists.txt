@@ -368,6 +368,8 @@ SET (GX_ENGINE_SRC
     "${GX_ENGINE_SRC_DIR}render/model/rnd-mdl-mesh.hpp"
     "${GX_ENGINE_SRC_DIR}render/model/rnd-mdl-model.cpp"
     "${GX_ENGINE_SRC_DIR}render/model/rnd-mdl-model.hpp"
+    "${GX_ENGINE_SRC_DIR}render/model/rnd-mdl-transformation.cpp"
+    "${GX_ENGINE_SRC_DIR}render/model/rnd-mdl-transformation.hpp"
     "${GX_ENGINE_SRC_DIR}render/model/rnd-mdl-type.hpp"
     "${GX_ENGINE_SRC_DIR}render/model/rnd-mdl-uniform.cpp"
     "${GX_ENGINE_SRC_DIR}render/model/rnd-mdl-uniform.hpp"

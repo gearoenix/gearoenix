@@ -17,7 +17,7 @@ gearoenix::render::material::Material::Material(const std::shared_ptr<engine::En
 {
     core::sync::EndCaller<texture::Texture2D> calltxt2d([end](std::shared_ptr<texture::Texture2D>) {});
     const std::shared_ptr<texture::Manager>& txtmgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
-    color = txtmgr->get_2d(math::Vec3(0.9f, 0.1f, 0.3f), calltxt2d);
+    color = txtmgr->get_2d(math::Vec3(1.0f, 0.0f, 0.0f), calltxt2d);
     metallic_roughness = txtmgr->get_2d(math::Vec2(0.5f, 0.5f), calltxt2d);
     normal = txtmgr->get_2d(math::Vec3(0.5f, 0.5f, 1.0f), calltxt2d);
     emissive = txtmgr->get_2d(math::Vec3(0.0f, 0.0f, 0.0f), calltxt2d);
@@ -222,4 +222,15 @@ const std::shared_ptr<gearoenix::render::texture::Texture2D>& gearoenix::render:
 const std::shared_ptr<gearoenix::render::texture::Texture2D>& gearoenix::render::material::Material::get_emissive() const
 {
     return emissive;
+}
+
+
+void gearoenix::render::material::Material::set_metallic_factor(const core::Real f) noexcept
+{
+	uniform.metallic_factor = f;
+}
+
+void gearoenix::render::material::Material::set_roughness_factor(const core::Real f) noexcept
+{
+	uniform.roughness_factor = f;
 }

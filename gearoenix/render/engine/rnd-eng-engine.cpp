@@ -31,6 +31,11 @@ gearoenix::render::engine::Engine::~Engine()
 
 void gearoenix::render::engine::Engine::update()
 {
+	const std::chrono::time_point<std::chrono::high_resolution_clock> now = std::chrono::high_resolution_clock::now();
+	const std::chrono::duration<core::Real> delta_time_duration = now - last_frame_time;
+	delta_time = delta_time_duration.count();
+	last_frame_time = now;
+
     ++frame_number;
     frame_number %= frames_count;
     physics_engine->update();
@@ -114,4 +119,9 @@ unsigned int gearoenix::render::engine::Engine::get_frame_number() const
 unsigned int gearoenix::render::engine::Engine::get_frames_count() const
 {
     return frames_count;
+}
+
+gearoenix::core::Real gearoenix::render::engine::Engine::get_delta_time() const noexcept
+{
+	return delta_time;
 }

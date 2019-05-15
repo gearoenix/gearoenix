@@ -16,23 +16,28 @@ namespace render {
     }
     namespace light {
         struct DirectionalUniform {
-            math::Vec4 color_strength;
-            math::Vec4 direction;
+            math::Vec3 color = math::Vec3(1.0f, 1.0f, 1.0f);
+			core::Real strength = 1.0f;
+            math::Vec3 direction = math::Vec3(0.0f, 0.0f, -1.0f);
+			core::Real reserved_1 = 0.0f;
             math::Vec4 vps[GX_SHADOW_CASCADES_COUNT];
             math::Vec4 vpbs[GX_SHADOW_CASCADES_COUNT];
         };
 
         class Directional : public Light {
         protected:
-            math::Vec4 direction;
+            math::Vec3 direction = math::Vec3(0.0f, 0.0f, -1.0f);
 
         public:
-            Directional(
-                const core::Id my_id,
-                const std::shared_ptr<system::stream::Stream>& f,
-                const std::shared_ptr<engine::Engine>& e);
-            const math::Vec4& get_direction() const;
-            math::Vec4& get_direction();
+			Directional(
+				const core::Id my_id,
+				const std::shared_ptr<system::stream::Stream>& f,
+				const std::shared_ptr<engine::Engine>& e) noexcept;
+			Directional(
+				const core::Id my_id,
+				const std::shared_ptr<engine::Engine>& e) noexcept;
+            const math::Vec3& get_direction() const noexcept;
+            void set_direction(const math::Vec3& dir) noexcept;
         };
     }
 }

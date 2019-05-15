@@ -1,18 +1,28 @@
 #include "rnd-lt-directional.hpp"
 #include "../../system/stream/sys-stm-stream.hpp"
 
-gearoenix::render::light::Directional::Directional(const core::Id my_id, const std::shared_ptr<system::stream::Stream>& f, const std::shared_ptr<engine::Engine>& e)
-    : Light(my_id, f, e)
-    , direction(f->read<core::Real>(), f->read<core::Real>(), f->read<core::Real>(), 0.0f)
+gearoenix::render::light::Directional::Directional(
+	const core::Id my_id, 
+	const std::shared_ptr<system::stream::Stream>& f, 
+	const std::shared_ptr<engine::Engine>& e) noexcept
+	: Light(my_id, f, e)
+	, direction(f->read<core::Real>(), f->read<core::Real>(), f->read<core::Real>())
 {
 }
 
-const gearoenix::math::Vec4& gearoenix::render::light::Directional::get_direction() const
+gearoenix::render::light::Directional::Directional(
+	const core::Id my_id, 
+	const std::shared_ptr<engine::Engine>& e) noexcept
+	: Light(my_id, e)
+{
+}
+
+const gearoenix::math::Vec3& gearoenix::render::light::Directional::get_direction() const noexcept
 {
     return direction;
 }
 
-gearoenix::math::Vec4& gearoenix::render::light::Directional::get_direction()
+void gearoenix::render::light::Directional::set_direction(const gearoenix::math::Vec3& dir) noexcept
 {
-    return direction;
+	direction = dir;
 }

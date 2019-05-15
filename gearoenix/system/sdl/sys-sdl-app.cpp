@@ -365,6 +365,7 @@ void gearoenix::system::Application::main_loop()
         }
     }
     // SDL_GL_MakeCurrent(window, gl_context);
+	core_app->update();
     render_engine->update();
 #ifdef GX_USE_OPENGL
     if (supported_engine == render::engine::Type::OPENGL_43 || supported_engine == render::engine::Type::OPENGL_33 || supported_engine == render::engine::Type::OPENGL_ES3 || supported_engine == render::engine::Type::OPENGL_ES2) {

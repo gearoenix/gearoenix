@@ -217,8 +217,8 @@ void gearoenix::render::scene::Scene::update_uniform()
         {
             const light::Directional* const dl = dynamic_cast<const light::Directional*>(l);
             if (dl != nullptr && dirc < GX_MAX_DIRECTIONAL_LIGHTS) {
-                uniform.directional_lights_color[dirc] = dl->get_color();
-                uniform.directional_lights_direction[dirc] = dl->get_direction();
+                uniform.directional_lights_color[dirc] = math::Vec4(dl->get_color(), 0.0f);
+                uniform.directional_lights_direction[dirc] = math::Vec4(dl->get_direction(), 0.0f);
                 ++dirc;
                 continue;
             }
@@ -226,7 +226,8 @@ void gearoenix::render::scene::Scene::update_uniform()
         {
             const light::Point* const pl = dynamic_cast<const light::Point*>(l);
             if (pl != nullptr && pntc < GX_MAX_POINT_LIGHTS) {
-                uniform.point_lights_color_min_radius[pntc] = pl->get_color();
+				// TODO: min radius, remove it or complete it
+                uniform.point_lights_color_min_radius[pntc] = math::Vec4(pl->get_color(), 0.0f);
                 uniform.point_lights_position_max_radius[pntc] = pl->get_position_radius();
                 ++pntc;
                 continue;

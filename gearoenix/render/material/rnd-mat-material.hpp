@@ -45,6 +45,8 @@ namespace render {
             const std::shared_ptr<texture::Texture2D>& get_metallic_roughness() const;
             const std::shared_ptr<texture::Texture2D>& get_normal() const;
             const std::shared_ptr<texture::Texture2D>& get_emissive() const;
+			void set_metallic_factor(const core::Real f) noexcept;
+			void set_roughness_factor(const core::Real f) noexcept;
         };
     }
 }

@@ -32,10 +32,11 @@ void gearoenix::render::camera::Transformation::look_at(const math::Vec3& target
 void gearoenix::render::camera::Transformation::look_at(const math::Vec3 & origin, const math::Vec3 & target, const math::Vec3 & up) noexcept
 {
 	uniform->position = origin;
-	uniform->z = (target - origin).normalized();
+	uniform->z = (origin - target).normalized();
+	uniform->x = up.cross(uniform->z);
 	uniform->y = uniform->z.cross(uniform->x);
 	uniform->view = math::Mat4x4::look_at(uniform->position, target, uniform->y);
-	uniform->inversed_rotation = uniform->view * math::Mat4x4::translator(-(uniform->position));
+	uniform->inversed_rotation = uniform->view * math::Mat4x4::translator(uniform->position);
 	update_view_projection();
 }
 

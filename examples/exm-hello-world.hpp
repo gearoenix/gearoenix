@@ -4,12 +4,16 @@
 #include <memory>
 
 namespace gearoenix {
+	namespace physics {
+		class Transformation;
+	}
 namespace render {
     namespace engine {
         class Engine;
     }
     namespace camera {
         class Perspective;
+		class Transformation;
     }
     namespace model {
         class Model;
@@ -23,12 +27,10 @@ namespace render {
 class GameApp : public gearoenix::core::Application {
 private:
 	using GxScene = gearoenix::render::scene::Scene;
-	using GxPersCam = gearoenix::render::camera::Perspective;
-	using GxModel = gearoenix::render::model::Model;
+	using GxCamTran = gearoenix::render::camera::Transformation;
 
     std::shared_ptr<GxScene> scn;
-    std::shared_ptr<GxPersCam> cam;
-    std::shared_ptr<GxModel> mdl;
+	std::shared_ptr<GxCamTran> camtrn;
 
 public:
 	/// This function must be like this

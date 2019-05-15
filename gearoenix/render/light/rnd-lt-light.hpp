@@ -21,31 +21,35 @@ namespace render {
         protected:
             bool enabled = true;
             bool has_shadow = false;
-            math::Vec4 color = math::Vec4(1.0f, 1.0f, 1.0f, 0.7f);
+            math::Vec3 color = math::Vec3(1.0f, 1.0f, 1.0f);
 
-            Light(
-                const core::Id my_id,
-                const std::shared_ptr<system::stream::Stream>& f,
-                const std::shared_ptr<engine::Engine>& e);
+			Light(
+				const core::Id my_id,
+				const std::shared_ptr<system::stream::Stream>& f,
+				const std::shared_ptr<engine::Engine>& e) noexcept;
+			Light(
+				const core::Id my_id,
+				const std::shared_ptr<engine::Engine>& e) noexcept;
 
         public:
-            virtual ~Light();
+            virtual ~Light() noexcept;
 
-            const math::Vec4& get_color() const;
+			const math::Vec3& get_color() const noexcept;
+			void set_color(const math::Vec3& color) noexcept;
 
-            bool is_shadower() const;
-            void enable_shadowing();
-            void disable_shadowing();
+            bool is_shadower() const noexcept;
+            void enable_shadowing() noexcept;
+            void disable_shadowing() noexcept;
 
-            bool is_enabled() const;
-            void enable();
-            void disable();
+            bool is_enabled() const noexcept;
+            void enable() noexcept;
+            void disable() noexcept;
 
-            virtual void update_uniform();
+            virtual void update_uniform() noexcept;
 
             /// Only a shadow caster should have implement this (or in a very rare conditions)
             /// Otherwise the default implementation will return nullptr
-            virtual const std::shared_ptr<buffer::FramedUniform>& get_uniform_buffers() const;
+            virtual const std::shared_ptr<buffer::FramedUniform>& get_uniform_buffers() const noexcept;
         };
     }
 }

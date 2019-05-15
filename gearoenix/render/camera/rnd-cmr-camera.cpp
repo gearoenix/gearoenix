@@ -55,7 +55,7 @@ gearoenix::render::camera::Camera::~Camera()
 
 void gearoenix::render::camera::Camera::update_uniform()
 {
-	uniform_buffers->update(&uniform);
+	uniform_buffers->update(uniform.get());
 }
 
 const std::shared_ptr<gearoenix::render::buffer::FramedUniform>& gearoenix::render::camera::Camera::get_uniform_buffers() const
@@ -63,7 +63,7 @@ const std::shared_ptr<gearoenix::render::buffer::FramedUniform>& gearoenix::rend
     return uniform_buffers;
 }
 
-const std::shared_ptr<gearoenix::physics::Transformation>& gearoenix::render::camera::Camera::get_transformation() const noexcept
+const std::shared_ptr<gearoenix::physics::Transformation> gearoenix::render::camera::Camera::get_transformation() const noexcept
 {
 	return transformation;
 }

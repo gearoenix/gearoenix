@@ -166,7 +166,7 @@ const static std::string fragment_shader_code = GX_GLES2_SHADER_SRC_DEFAULT_FRAG
     "    for (float i = 0.001; i < scene_lights_count.x; ++i)\n" // 110
     "    {\n" // 111
     "        int ii = int(i);\n" // 112
-    "        vec3 light_direction = scene_directional_lights_direction[ii].xyz;\n" // 113
+    "        vec3 light_direction = -scene_directional_lights_direction[ii].xyz;\n" // 113
     "        float normal_dot_light = max(dot(normal, light_direction), 0.0);\n" // 114
     "        vec3 half_vec = normalize(view + light_direction);\n" // 115
     "        vec3 radiance = scene_directional_lights_color[ii].xyz;\n" // 116
