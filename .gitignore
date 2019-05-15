@@ -66,3 +66,5 @@ sdk/
 
 build/
 /build/
+
+CMakeLists.txt.user

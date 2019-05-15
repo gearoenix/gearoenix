@@ -47,9 +47,13 @@ GameApp::GameApp(const std::shared_ptr<gearoenix::system::Application>& sys_app)
     : gearoenix::core::Application::Application(sys_app)
 {
 	const GxEndCallerIgnored endcall([this] { scn->enable_rendering(); });
+	GxEndCaller<GxScene> scncall([endcall](std::shared_ptr<GxScene>) {});
+	GxEndCaller<GxMesh> mshcall([endcall](std::shared_ptr<GxMesh>) {});
+	GxEndCaller<GxModel> mdlcall([endcall](std::shared_ptr<GxModel>) {});
+
     rnd_eng->set_render_tree(std::shared_ptr<GxGrTree>(new GxGrPbr(rnd_eng, endcall)));
 	const std::shared_ptr<gearoenix::core::asset::Manager>& astmgr = sys_app->get_asset_manager();
-	scn = astmgr->get_scene_manager()->create<GxScene>(GxEndCaller<GxScene>([endcall](std::shared_ptr<GxScene>) {}));
+	scn = astmgr->get_scene_manager()->create<GxScene>(scncall);
 
 	std::shared_ptr<GxPersCam> cam = astmgr->get_camera_manager()->create<GxPersCam>();
 	camtrn = std::static_pointer_cast<GxCamTran>(cam->get_transformation());
@@ -76,14 +80,14 @@ GameApp::GameApp(const std::shared_ptr<gearoenix::system::Application>& sys_app)
 	light4->set_color(GxVec3(0.5f, 0.5f, 0.5f));
 	scn->add_light(light4);
 	
-	const std::shared_ptr<GxMesh> msh = astmgr->get_mesh_manager()->create_icosphere(GxEndCaller<GxMesh>([endcall](std::shared_ptr<GxMesh>) {}));
+	const std::shared_ptr<GxMesh> msh = astmgr->get_mesh_manager()->create_icosphere(mshcall);
 	const std::shared_ptr<GxMdManager> &mdlmgr = astmgr->get_model_manager();
 	for (gearoenix::core::Real y = -10.0f, roughness = 0.1f; y < 10.1f; y += 2.5f, roughness += 0.1f) {
 		for (gearoenix::core::Real x = -10.0f, metallic = 0.1f; x < 10.1f; x += 2.5f, metallic += 0.1f) {
 			const std::shared_ptr<GxMaterial> mat(new GxMaterial(rnd_eng, endcall));
 			mat->set_roughness_factor(roughness);
 			mat->set_metallic_factor(metallic);
-			const std::shared_ptr<GxModel> mdl = mdlmgr->create<GxModel>(GxEndCaller<GxModel>([endcall](std::shared_ptr<GxModel>) {}));
+			const std::shared_ptr<GxModel> mdl = mdlmgr->create<GxModel>(mdlcall);
 			mdl->add_mesh(std::make_shared<GxMdMesh>(msh, mat));
 			mdl->get_transformation()->set_location(GxVec3(x, y, 0.0f));
 			scn->add_model(mdl);

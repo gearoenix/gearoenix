@@ -93,6 +93,11 @@ IF (GX_USE_SDL2)
             oleaut32
             imm32)
     ELSE ()
+        SET (GX_LIBS 
+            ${GX_LIBS}
+            pthread
+            dl
+            sndio)
     ENDIF (MSVC)
 ENDIF (GX_USE_SDL2)
 
