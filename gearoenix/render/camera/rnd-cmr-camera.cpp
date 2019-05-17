@@ -62,6 +62,11 @@ const std::shared_ptr<gearoenix::physics::Transformation> gearoenix::render::cam
     return transformation;
 }
 
+bool gearoenix::render::camera::Camera::in_sight(const gearoenix::math::Vec3& location, const core::Real radius) const noexcept
+{
+    return frustum->check_intersection(location, radius);
+}
+
 void gearoenix::render::camera::Camera::update_uniform()
 {
     uniform_buffers->update(uniform.get());

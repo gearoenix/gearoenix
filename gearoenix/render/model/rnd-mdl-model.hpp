@@ -5,16 +5,15 @@
 #include "../../core/cr-types.hpp"
 #include "../../core/sync/cr-sync-end-caller.hpp"
 #include "../../math/math-matrix.hpp"
+#include "../../math/math-sphere.hpp"
 #include "../../math/math-vector.hpp"
 #include "rnd-mdl-uniform.hpp"
 #include <map>
 #include <memory>
 #include <vector>
 namespace gearoenix {
-namespace physics {
-    namespace collider {
-        class Collider;
-    }
+namespace physics::collider {
+    class Collider;
 }
 namespace render {
     namespace buffer {
@@ -37,6 +36,7 @@ namespace render {
             bool has_transparent = false;
 
             Uniform uniform;
+            math::Sphere occlusion_sphere = math::Sphere(math::Vec3(0.0f), 1.0f);
 
             std::map<core::Id, std::shared_ptr<Mesh>> meshes;
             std::map<core::Id, std::shared_ptr<Model>> children;
@@ -44,16 +44,15 @@ namespace render {
 
         public:
             Model(
-                const core::Id my_id,
+                core::Id my_id,
                 const std::shared_ptr<system::stream::Stream>& f,
                 const std::shared_ptr<engine::Engine>& e,
                 const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
             /// It will create an automatic Id for itself
             Model(
-                const core::Id my_id,
+                core::Id my_id,
                 const std::shared_ptr<engine::Engine>& e,
                 const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
-            virtual ~Model();
             virtual void update_uniform();
             void add_mesh(const std::shared_ptr<Mesh>& m);
             void add_child(const std::shared_ptr<Model>& c);
@@ -63,6 +62,7 @@ namespace render {
             const std::shared_ptr<physics::collider::Collider>& get_collider() const;
             const std::shared_ptr<buffer::FramedUniform>& get_uniform_buffers() const;
             const std::shared_ptr<Transformation>& get_transformation() const noexcept;
+            const math::Sphere& get_occlusion_sphere() const noexcept;
 
             const math::Mat4x4& get_model_matrix() const;
         };

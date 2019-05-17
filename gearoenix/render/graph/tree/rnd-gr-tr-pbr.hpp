@@ -23,12 +23,10 @@ namespace render {
                 /// TODO: In future, this should become several for each light frustum
                 //std::shared_ptr<node::ShadowMapper> shdmap = nullptr;
             public:
-                Pbr(
-                    const std::shared_ptr<engine::Engine>& e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call);
-                ~Pbr() override final;
-                void update() override final;
-                void record(const unsigned int kernel_index) override final;
-                void submit() override final;
+                Pbr(const std::shared_ptr<engine::Engine>& e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
+                void update() noexcept final;
+                void record(unsigned int kernel_index) noexcept final;
+                void submit() noexcept final;
             };
         }
     }

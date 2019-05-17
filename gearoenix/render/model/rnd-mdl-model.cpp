@@ -28,10 +28,10 @@ gearoenix::render::model::Model::Model(
     : core::asset::Asset(my_id, core::asset::Type::MODEL)
     , e(e)
     , uniform_buffers(std::make_shared<buffer::FramedUniform>(static_cast<unsigned int>(sizeof(Uniform)), e))
-    , transformation(new Transformation(&uniform))
+    , transformation(new Transformation(&uniform, &occlusion_sphere))
 {
     uniform.m.read(f);
-    const core::Count meshes_count = f->read<core::Count>();
+    const auto meshes_count = f->read<core::Count>();
     for (core::Count i = 0; i < meshes_count; ++i) {
         add_mesh(std::make_shared<Mesh>(f, e, c));
     }
@@ -56,11 +56,7 @@ gearoenix::render::model::Model::Model(
     : core::asset::Asset(my_id, core::asset::Type::MODEL)
     , e(e)
     , uniform_buffers(std::make_shared<buffer::FramedUniform>(static_cast<unsigned int>(sizeof(Uniform)), e))
-    , transformation(new Transformation(&uniform))
-{
-}
-
-gearoenix::render::model::Model::~Model()
+    , transformation(new Transformation(&uniform, &occlusion_sphere))
 {
 }
 
@@ -76,6 +72,7 @@ void gearoenix::render::model::Model::update_uniform()
 void gearoenix::render::model::Model::add_mesh(const std::shared_ptr<Mesh>& m)
 {
     meshes[m->get_mesh()->get_asset_id()] = m;
+    occlusion_sphere.insert(m->get_mesh()->get_radius());
 }
 
 void gearoenix::render::model::Model::add_child(const std::shared_ptr<Model>&)
@@ -163,6 +160,11 @@ const std::shared_ptr<gearoenix::render::buffer::FramedUniform>& gearoenix::rend
 const std::shared_ptr<gearoenix::render::model::Transformation>& gearoenix::render::model::Model::get_transformation() const noexcept
 {
     return transformation;
+}
+
+const gearoenix::math::Sphere& gearoenix::render::model::Model::get_occlusion_sphere() const noexcept
+{
+    return occlusion_sphere;
 }
 
 const gearoenix::math::Mat4x4& gearoenix::render::model::Model::get_model_matrix() const

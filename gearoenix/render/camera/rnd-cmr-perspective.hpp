@@ -25,9 +25,8 @@ namespace render::camera {
         Perspective(
             core::Id my_id,
             const std::shared_ptr<engine::Engine>& e);
-        void set_aspect_ratio(core::Real ratio);
+        void set_aspect_ratio(core::Real ratio) final;
         void set_field_of_view(core::Real radian);
-        bool in_sight(const math::Vec3& location, core::Real radius) const final;
         math::Ray3 create_ray3(core::Real x, core::Real y) const final;
         core::Real get_distance(const math::Vec3& model_location) const final;
         std::vector<math::Vec3[4]> get_cascaded_shadow_frustum_partitions() const final;
