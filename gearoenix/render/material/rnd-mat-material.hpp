@@ -1,5 +1,5 @@
-#ifndef GEAROEMIX_RENDER_MATERIAL_MATERIAL_HPP
-#define GEAROEMIX_RENDER_MATERIAL_MATERIAL_HPP
+#ifndef GEAROENIX_RENDER_MATERIAL_MATERIAL_HPP
+#define GEAROENIX_RENDER_MATERIAL_MATERIAL_HPP
 #include "../../core/cr-build-configuration.hpp"
 #include "../../core/sync/cr-sync-end-caller.hpp"
 #include "rnd-mat-translucency-mode.hpp"
@@ -45,8 +45,8 @@ namespace render {
             const std::shared_ptr<texture::Texture2D>& get_metallic_roughness() const;
             const std::shared_ptr<texture::Texture2D>& get_normal() const;
             const std::shared_ptr<texture::Texture2D>& get_emissive() const;
-			void set_metallic_factor(const core::Real f) noexcept;
-			void set_roughness_factor(const core::Real f) noexcept;
+            void set_metallic_factor(const core::Real f) noexcept;
+            void set_roughness_factor(const core::Real f) noexcept;
         };
     }
 }

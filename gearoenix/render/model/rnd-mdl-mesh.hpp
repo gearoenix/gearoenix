@@ -1,5 +1,5 @@
-#ifndef GEAROEMIX_RENDER_MODEL_MESH_HPP
-#define GEAROEMIX_RENDER_MODEL_MESH_HPP
+#ifndef GEAROENIX_RENDER_MODEL_MESH_HPP
+#define GEAROENIX_RENDER_MODEL_MESH_HPP
 #include "../../core/sync/cr-sync-end-caller.hpp"
 #include <memory>
 
@@ -31,9 +31,9 @@ namespace render {
                 const std::shared_ptr<engine::Engine>& e,
                 const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
 
-			Mesh(
-				const std::shared_ptr<mesh::Mesh>& msh,
-				const std::shared_ptr<material::Material> &mat) noexcept;
+            Mesh(
+                const std::shared_ptr<mesh::Mesh>& msh,
+                const std::shared_ptr<material::Material>& mat) noexcept;
 
             ~Mesh();
 

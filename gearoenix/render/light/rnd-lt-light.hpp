@@ -1,13 +1,12 @@
-#ifndef GEAROEMIX_RENDER_LIGHT_LIGHT_HPP
-#define GEAROEMIX_RENDER_LIGHT_LIGHT_HPP
+#ifndef GEAROENIX_RENDER_LIGHT_LIGHT_HPP
+#define GEAROENIX_RENDER_LIGHT_LIGHT_HPP
 #include "../../core/asset/cr-asset.hpp"
+#include "../../math/math-aabb.hpp"
 #include "../../math/math-vector.hpp"
 #include <memory>
 namespace gearoenix {
-namespace system {
-    namespace stream {
-        class Stream;
-    }
+namespace system::stream {
+    class Stream;
 }
 namespace render {
     namespace buffer {
@@ -22,20 +21,19 @@ namespace render {
             bool enabled = true;
             bool has_shadow = false;
             math::Vec3 color = math::Vec3(1.0f, 1.0f, 1.0f);
+            math::Aabb3 influence;
 
-			Light(
-				const core::Id my_id,
-				const std::shared_ptr<system::stream::Stream>& f,
-				const std::shared_ptr<engine::Engine>& e) noexcept;
-			Light(
-				const core::Id my_id,
-				const std::shared_ptr<engine::Engine>& e) noexcept;
+            Light(
+                core::Id my_id,
+                const std::shared_ptr<system::stream::Stream>& f,
+                const std::shared_ptr<engine::Engine>& e) noexcept;
+            Light(
+                core::Id my_id,
+                const std::shared_ptr<engine::Engine>& e) noexcept;
 
         public:
-            virtual ~Light() noexcept;
-
-			const math::Vec3& get_color() const noexcept;
-			void set_color(const math::Vec3& color) noexcept;
+            const math::Vec3& get_color() const noexcept;
+            void set_color(const math::Vec3& color) noexcept;
 
             bool is_shadower() const noexcept;
             void enable_shadowing() noexcept;
@@ -44,6 +42,9 @@ namespace render {
             bool is_enabled() const noexcept;
             void enable() noexcept;
             void disable() noexcept;
+
+            const math::Aabb3& get_influence_area() const noexcept;
+            void set_influence_area(const math::Aabb3& a) noexcept;
 
             virtual void update_uniform() noexcept;
 

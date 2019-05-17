@@ -18,20 +18,18 @@ gearoenix::render::light::Light::Light(
 }
 
 gearoenix::render::light::Light::Light(const core::Id my_id, const std::shared_ptr<engine::Engine>& e) noexcept
-	: core::asset::Asset(my_id, core::asset::Type::LIGHT) 
+    : core::asset::Asset(my_id, core::asset::Type::LIGHT)
 {
 }
 
-gearoenix::render::light::Light::~Light() noexcept {}
-
 const gearoenix::math::Vec3& gearoenix::render::light::Light::get_color() const noexcept
 {
-	return color;
+    return color;
 }
 
 void gearoenix::render::light::Light::set_color(const gearoenix::math::Vec3& c) noexcept
 {
-	color = c;
+    color = c;
 }
 
 bool gearoenix::render::light::Light::is_shadower() const noexcept
@@ -62,6 +60,16 @@ void gearoenix::render::light::Light::enable() noexcept
 void gearoenix::render::light::Light::disable() noexcept
 {
     enabled = false;
+}
+
+const gearoenix::math::Aabb3& gearoenix::render::light::Light::get_influence_area() const noexcept
+{
+    return influence;
+}
+
+void gearoenix::render::light::Light::set_influence_area(const gearoenix::math::Aabb3& a) noexcept
+{
+    influence = a;
 }
 
 void gearoenix::render::light::Light::update_uniform() noexcept

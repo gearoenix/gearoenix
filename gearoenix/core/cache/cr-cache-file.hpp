@@ -33,15 +33,15 @@ template <class T>
 gearoenix::core::cache::File<T>::File(const std::shared_ptr<system::stream::Stream>& file)
     : file(file)
 {
-	if (file != nullptr) {
-		const Count c = file->read<Count>();
-		GXLOGD("Number of entries is " << c);
-		for (Count i = 0; i < c; ++i) {
-			const Id id = file->read<Id>();
-			const Offset off = file->read<Offset>();
-			offsets[id] = off;
-		}
-	}
+    if (file != nullptr) {
+        const Count c = file->read<Count>();
+        GXLOGD("Number of entries is " << c);
+        for (Count i = 0; i < c; ++i) {
+            const Id id = file->read<Id>();
+            const Offset off = file->read<Offset>();
+            offsets[id] = off;
+        }
+    }
 }
 
 template <class T>

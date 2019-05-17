@@ -1,5 +1,5 @@
-#ifndef GEAROEMIX_RENDER_TEXTURE_FILTER_HPP
-#define GEAROEMIX_RENDER_TEXTURE_FILTER_HPP
+#ifndef GEAROENIX_RENDER_TEXTURE_FILTER_HPP
+#define GEAROENIX_RENDER_TEXTURE_FILTER_HPP
 #include "../../core/cr-types.hpp"
 namespace gearoenix {
 namespace render {

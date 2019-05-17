@@ -7,17 +7,17 @@
 #include "../../system/sys-log.hpp"
 #include "../buffer/rnd-buf-framed-uniform.hpp"
 #include "../engine/rnd-eng-engine.hpp"
-#include "rnd-cmr-uniform.hpp"
 #include "rnd-cmr-transformation.hpp"
+#include "rnd-cmr-uniform.hpp"
 
 gearoenix::render::camera::Camera::Camera(
-	const core::Id my_id, const std::shared_ptr<engine::Engine>& e) noexcept
-	: core::asset::Asset(my_id, core::asset::Type::CAMERA)
-	, uniform(new Uniform)
-	, uniform_buffers(new buffer::FramedUniform(sizeof(Uniform), e))
+    const core::Id my_id, const std::shared_ptr<engine::Engine>& e) noexcept
+    : core::asset::Asset(my_id, core::asset::Type::CAMERA)
+    , uniform(new Uniform)
+    , uniform_buffers(new buffer::FramedUniform(sizeof(Uniform), e))
 {
-	transformation = std::make_shared<Transformation>(uniform);
-	uniform->aspect_ratio = e->get_system_application()->get_window_ratio();
+    transformation = std::make_shared<Transformation>(uniform);
+    uniform->aspect_ratio = e->get_system_application()->get_window_ratio();
 }
 
 gearoenix::render::camera::Camera::Camera(
@@ -25,11 +25,11 @@ gearoenix::render::camera::Camera::Camera(
     const std::shared_ptr<system::stream::Stream>& f,
     const std::shared_ptr<engine::Engine>& e)
     : core::asset::Asset(my_id, core::asset::Type::CAMERA)
-	, uniform(new Uniform)
+    , uniform(new Uniform)
     , uniform_buffers(new buffer::FramedUniform(sizeof(Uniform), e))
 {
-	transformation = std::make_shared<Transformation>(uniform);
-	uniform->aspect_ratio = e->get_system_application()->get_window_ratio();
+    transformation = std::make_shared<Transformation>(uniform);
+    uniform->aspect_ratio = e->get_system_application()->get_window_ratio();
     uniform->position.read(f);
     math::Quat q;
     f->read(q.w);
@@ -55,7 +55,7 @@ gearoenix::render::camera::Camera::~Camera()
 
 void gearoenix::render::camera::Camera::update_uniform()
 {
-	uniform_buffers->update(uniform.get());
+    uniform_buffers->update(uniform.get());
 }
 
 const std::shared_ptr<gearoenix::render::buffer::FramedUniform>& gearoenix::render::camera::Camera::get_uniform_buffers() const
@@ -65,5 +65,5 @@ const std::shared_ptr<gearoenix::render::buffer::FramedUniform>& gearoenix::rend
 
 const std::shared_ptr<gearoenix::physics::Transformation> gearoenix::render::camera::Camera::get_transformation() const noexcept
 {
-	return transformation;
+    return transformation;
 }

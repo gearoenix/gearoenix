@@ -1,5 +1,5 @@
-#ifndef GEAROEMIX_GLES2_SYNC_SEMAPHORE_HPP
-#define GEAROEMIX_GLES2_SYNC_SEMAPHORE_HPP
+#ifndef GEAROENIX_GLES2_SYNC_SEMAPHORE_HPP
+#define GEAROENIX_GLES2_SYNC_SEMAPHORE_HPP
 #include "../../render/sync/rnd-sy-semaphore.hpp"
 namespace gearoenix {
 namespace gles2 {

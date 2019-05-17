@@ -1,5 +1,5 @@
-#ifndef GEAROEMIX_RENDER_FONT_2D_HPP
-#define GEAROEMIX_RENDER_FONT_2D_HPP
+#ifndef GEAROENIX_RENDER_FONT_2D_HPP
+#define GEAROENIX_RENDER_FONT_2D_HPP
 #include "../../math/math-vector.hpp"
 #include "rnd-fnt-font.hpp"
 #include <vector>

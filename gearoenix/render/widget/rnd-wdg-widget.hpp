@@ -1,5 +1,5 @@
-#ifndef GEAROEMIX_RENDER_WIDGET_WIDGET_HPP
-#define GEAROEMIX_RENDER_WIDGET_WIDGET_HPP
+#ifndef GEAROENIX_RENDER_WIDGET_WIDGET_HPP
+#define GEAROENIX_RENDER_WIDGET_WIDGET_HPP
 #include "../model/rnd-mdl-model.hpp"
 
 namespace gearoenix {

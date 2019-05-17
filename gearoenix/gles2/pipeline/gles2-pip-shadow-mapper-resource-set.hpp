@@ -1,5 +1,5 @@
-#ifndef GEAROEMIX_GLES2_PIPELINE_SHADOW_MAPPER_RESOURCE_SET_HPP
-#define GEAROEMIX_GLES2_PIPELINE_SHADOW_MAPPER_RESOURCE_SET_HPP
+#ifndef GEAROENIX_GLES2_PIPELINE_SHADOW_MAPPER_RESOURCE_SET_HPP
+#define GEAROENIX_GLES2_PIPELINE_SHADOW_MAPPER_RESOURCE_SET_HPP
 #include "../../render/pipeline/rnd-pip-shadow-mapper-resource-set.hpp"
 #include "gles2-pip-resource-set.hpp"
 namespace gearoenix {

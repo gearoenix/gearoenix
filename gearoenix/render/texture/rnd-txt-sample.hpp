@@ -1,5 +1,5 @@
-#ifndef GEAROEMIX_RENDER_TEXTURE_SAMPLE_HPP
-#define GEAROEMIX_RENDER_TEXTURE_SAMPLE_HPP
+#ifndef GEAROENIX_RENDER_TEXTURE_SAMPLE_HPP
+#define GEAROENIX_RENDER_TEXTURE_SAMPLE_HPP
 #include "rnd-txt-filter.hpp"
 #include "rnd-txt-wrap.hpp"
 namespace gearoenix {

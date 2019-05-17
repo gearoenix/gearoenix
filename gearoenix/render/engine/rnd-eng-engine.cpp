@@ -18,9 +18,9 @@ gearoenix::render::engine::Engine::Engine(const std::shared_ptr<system::Applicat
     : engine_type_id(engine_type_id)
     , sysapp(system_application)
     , fun_loader(new core::FunctionLoader())
-    , kernels(new core::sync::KernelWorker()) 
+    , kernels(new core::sync::KernelWorker())
 {
-	physics_engine = std::make_shared<physics::Engine>(system_application, kernels);
+    physics_engine = std::make_shared<physics::Engine>(system_application, kernels);
     kernels->add_step([this](const unsigned int kernel_index) { render_tree->record(kernel_index); }, [this] { render_tree->submit(); });
 }
 
@@ -31,10 +31,10 @@ gearoenix::render::engine::Engine::~Engine()
 
 void gearoenix::render::engine::Engine::update()
 {
-	const std::chrono::time_point<std::chrono::high_resolution_clock> now = std::chrono::high_resolution_clock::now();
-	const std::chrono::duration<core::Real> delta_time_duration = now - last_frame_time;
-	delta_time = delta_time_duration.count();
-	last_frame_time = now;
+    const std::chrono::time_point<std::chrono::high_resolution_clock> now = std::chrono::high_resolution_clock::now();
+    const std::chrono::duration<core::Real> delta_time_duration = now - last_frame_time;
+    delta_time = delta_time_duration.count();
+    last_frame_time = now;
 
     ++frame_number;
     frame_number %= frames_count;
@@ -123,5 +123,5 @@ unsigned int gearoenix::render::engine::Engine::get_frames_count() const
 
 gearoenix::core::Real gearoenix::render::engine::Engine::get_delta_time() const noexcept
 {
-	return delta_time;
+    return delta_time;
 }

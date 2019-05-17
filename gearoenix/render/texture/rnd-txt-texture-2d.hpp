@@ -1,5 +1,5 @@
-#ifndef GEAROEMIX_RENDER_TEXTURE_TEXTURE_2D_HPP
-#define GEAROEMIX_RENDER_TEXTURE_TEXTURE_2D_HPP
+#ifndef GEAROENIX_RENDER_TEXTURE_TEXTURE_2D_HPP
+#define GEAROENIX_RENDER_TEXTURE_TEXTURE_2D_HPP
 #include "rnd-txt-texture.hpp"
 namespace gearoenix {
 namespace render {

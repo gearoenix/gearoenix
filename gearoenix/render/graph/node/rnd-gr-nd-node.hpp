@@ -1,5 +1,5 @@
-#ifndef GEAROEMIX_RENDER_GRAPH_NODE_NODE_HPP
-#define GEAROEMIX_RENDER_GRAPH_NODE_NODE_HPP
+#ifndef GEAROENIX_RENDER_GRAPH_NODE_NODE_HPP
+#define GEAROENIX_RENDER_GRAPH_NODE_NODE_HPP
 #include "../../../core/graph/cr-gr-node.hpp"
 #include "../../../core/sync/cr-sync-end-caller.hpp"
 #include "../../pipeline/rnd-pip-type.hpp"

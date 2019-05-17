@@ -33,7 +33,7 @@ namespace physics {
         void update_uniform_buffers();
 
     public:
-        Engine(const std::shared_ptr<system::Application>& sysapp, const std::shared_ptr<core::sync::KernelWorker> &kernels);
+        Engine(const std::shared_ptr<system::Application>& sysapp, const std::shared_ptr<core::sync::KernelWorker>& kernels);
         ~Engine();
         void add_animation(const std::shared_ptr<animation::Animation>& a);
         void remove_animation(const std::shared_ptr<animation::Animation>& a);

@@ -1,5 +1,5 @@
-#ifndef GEAROEMIX_MATH_TRIANGLE_HPP
-#define GEAROEMIX_MATH_TRIANGLE_HPP
+#ifndef GEAROENIX_MATH_TRIANGLE_HPP
+#define GEAROENIX_MATH_TRIANGLE_HPP
 #include "math-vector.hpp"
 namespace gearoenix {
 namespace system {

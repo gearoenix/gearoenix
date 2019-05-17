@@ -22,43 +22,43 @@ gearoenix::core::asset::Manager::Manager(const std::shared_ptr<system::Applicati
     , render_engine(sys_app->get_render_engine())
     , file(system::stream::Asset::construct(sys_app, name))
 {
-	if (file == nullptr) {
+    if (file == nullptr) {
 #define GXHELPER(a, n) a##_manager = std::make_shared<n::Manager>(nullptr, render_engine);
 
-		GXHELPER(camera, render::camera);
-		GXHELPER(audio, audio);
-		GXHELPER(light, render::light);
-		GXHELPER(texture, render::texture);
-		GXHELPER(font, render::font);
-		GXHELPER(mesh, render::mesh);
-		GXHELPER(model, render::model);
-		GXHELPER(skybox, render::skybox);
-		GXHELPER(constraint, physics::constraint);
-		GXHELPER(scene, render::scene);
+        GXHELPER(camera, render::camera);
+        GXHELPER(audio, audio);
+        GXHELPER(light, render::light);
+        GXHELPER(texture, render::texture);
+        GXHELPER(font, render::font);
+        GXHELPER(mesh, render::mesh);
+        GXHELPER(model, render::model);
+        GXHELPER(skybox, render::skybox);
+        GXHELPER(constraint, physics::constraint);
+        GXHELPER(scene, render::scene);
 #undef GXHELPER
-	} else {
-		std::shared_ptr<system::stream::Stream> s = std::static_pointer_cast<system::stream::Stream>(file);
-		last_id.store(s->read<Id>());
-		core::Count off;
+    } else {
+        std::shared_ptr<system::stream::Stream> s = std::static_pointer_cast<system::stream::Stream>(file);
+        last_id.store(s->read<Id>());
+        core::Count off;
 
-#define GXHELPER(a, n)                                       \
-		off = s->tell();                                     \
-		s = system::stream::Asset::construct(sys_app, name); \
-		s->seek(off);                                        \
-		a##_manager = std::make_shared<n::Manager>(s, render_engine);
+#define GXHELPER(a, n)                                   \
+    off = s->tell();                                     \
+    s = system::stream::Asset::construct(sys_app, name); \
+    s->seek(off);                                        \
+    a##_manager = std::make_shared<n::Manager>(s, render_engine);
 
-		GXHELPER(camera, render::camera);
-		GXHELPER(audio, audio);
-		GXHELPER(light, render::light);
-		GXHELPER(texture, render::texture);
-		GXHELPER(font, render::font);
-		GXHELPER(mesh, render::mesh);
-		GXHELPER(model, render::model);
-		GXHELPER(skybox, render::skybox);
-		GXHELPER(constraint, physics::constraint);
-		GXHELPER(scene, render::scene);
+        GXHELPER(camera, render::camera);
+        GXHELPER(audio, audio);
+        GXHELPER(light, render::light);
+        GXHELPER(texture, render::texture);
+        GXHELPER(font, render::font);
+        GXHELPER(mesh, render::mesh);
+        GXHELPER(model, render::model);
+        GXHELPER(skybox, render::skybox);
+        GXHELPER(constraint, physics::constraint);
+        GXHELPER(scene, render::scene);
 #undef GXHELPER
-	}
+    }
 }
 
 const std::shared_ptr<gearoenix::system::stream::Asset>& gearoenix::core::asset::Manager::get_file() const

@@ -1,5 +1,5 @@
-#ifndef GEAROEMIX_RENDER_SCENE_UI_HPP
-#define GEAROEMIX_RENDER_SCENE_UI_HPP
+#ifndef GEAROENIX_RENDER_SCENE_UI_HPP
+#define GEAROENIX_RENDER_SCENE_UI_HPP
 #include "rnd-scn-scene.hpp"
 #include <chrono>
 

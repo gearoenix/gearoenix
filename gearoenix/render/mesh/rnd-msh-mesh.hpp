@@ -43,26 +43,26 @@ namespace render {
             Mesh(const core::Id my_id, const Type::Id mesh_type_id);
 
         public:
-			Mesh(
-				const core::Id my_id,
-				const std::shared_ptr<system::stream::Stream>& f,
-				const std::shared_ptr<engine::Engine>& e,
-				const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
-			Mesh(
-				const core::Id my_id,
-				const std::vector<math::BasicVertex>& vertices,
-				const std::vector<std::uint32_t>& indices,
-				const core::Real radius,
-				const std::shared_ptr<engine::Engine>& e,
-				const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+            Mesh(
+                const core::Id my_id,
+                const std::shared_ptr<system::stream::Stream>& f,
+                const std::shared_ptr<engine::Engine>& e,
+                const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
+            Mesh(
+                const core::Id my_id,
+                const std::vector<math::BasicVertex>& vertices,
+                const std::vector<std::uint32_t>& indices,
+                const core::Real radius,
+                const std::shared_ptr<engine::Engine>& e,
+                const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
             ~Mesh();
             void draw();
-			void set_vertices(
-				const std::shared_ptr<engine::Engine>& e,
-				const std::vector<math::BasicVertex>& vertices,
-				const std::vector<std::uint32_t>& indices,
-				const core::Real radius,
-				const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+            void set_vertices(
+                const std::shared_ptr<engine::Engine>& e,
+                const std::vector<math::BasicVertex>& vertices,
+                const std::vector<std::uint32_t>& indices,
+                const core::Real radius,
+                const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
             core::Real get_radius() const;
             Type::Id get_mesh_type_id() const;
             const std::shared_ptr<buffer::Buffer>& get_vertex_buffer() const;

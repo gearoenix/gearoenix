@@ -1,5 +1,5 @@
-#ifndef GEAROEMIX_RENDER_GRAPH_NODE_FORWARD_PBR_DIRECTIONAL_SHADOW_HPP
-#define GEAROEMIX_RENDER_GRAPH_NODE_FORWARD_PBR_DIRECTIONAL_SHADOW_HPP
+#ifndef GEAROENIX_RENDER_GRAPH_NODE_FORWARD_PBR_DIRECTIONAL_SHADOW_HPP
+#define GEAROENIX_RENDER_GRAPH_NODE_FORWARD_PBR_DIRECTIONAL_SHADOW_HPP
 #include "../../../core/sync/cr-sync-end-caller.hpp"
 #include "../../../math/math-matrix.hpp"
 #include "../../../math/math-vector.hpp"
@@ -75,7 +75,7 @@ namespace render {
                 const static unsigned int shadow_map_index;
                 const static unsigned int brdflut_index;
 
-				ShadowMapper(const std::shared_ptr<engine::Engine>& e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call);
+                ShadowMapper(const std::shared_ptr<engine::Engine>& e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call);
                 ~ShadowMapper() override final;
 
                 void set_diffuse_environment(const std::shared_ptr<texture::Cube>& t);

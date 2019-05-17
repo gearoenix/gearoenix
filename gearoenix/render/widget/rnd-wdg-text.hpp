@@ -1,5 +1,5 @@
-#ifndef GEAROEMIX_RENDER_WIDGET_TEXT_HPP
-#define GEAROEMIX_RENDER_WIDGET_TEXT_HPP
+#ifndef GEAROENIX_RENDER_WIDGET_TEXT_HPP
+#define GEAROENIX_RENDER_WIDGET_TEXT_HPP
 #include "rnd-wdg-widget.hpp"
 #include <cstdint>
 namespace gearoenix {

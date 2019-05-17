@@ -1,5 +1,5 @@
-#ifndef GEAROEMIX_MATH_BEZIER_CURVE_HPP
-#define GEAROEMIX_MATH_BEZIER_CURVE_HPP
+#ifndef GEAROENIX_MATH_BEZIER_CURVE_HPP
+#define GEAROENIX_MATH_BEZIER_CURVE_HPP
 #include "math-vector.hpp"
 #include <vector>
 namespace gearoenix {

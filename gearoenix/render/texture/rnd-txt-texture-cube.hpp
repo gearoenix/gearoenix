@@ -1,5 +1,5 @@
-#ifndef GEAROEMIX_RENDER_TEXTURE_CUBE_HPP
-#define GEAROEMIX_RENDER_TEXTURE_CUBE_HPP
+#ifndef GEAROENIX_RENDER_TEXTURE_CUBE_HPP
+#define GEAROENIX_RENDER_TEXTURE_CUBE_HPP
 #include "rnd-txt-texture.hpp"
 namespace gearoenix {
 namespace render {

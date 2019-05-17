@@ -77,7 +77,7 @@ gearoenix::render::scene::Scene::Scene(
 }
 
 gearoenix::render::scene::Scene::Scene(
-	const core::Id my_id,
+    const core::Id my_id,
     const std::shared_ptr<engine::Engine>& e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>&)
     : core::asset::Asset(my_id, core::asset::Type::SCENE)
@@ -226,7 +226,7 @@ void gearoenix::render::scene::Scene::update_uniform()
         {
             const light::Point* const pl = dynamic_cast<const light::Point*>(l);
             if (pl != nullptr && pntc < GX_MAX_POINT_LIGHTS) {
-				// TODO: min radius, remove it or complete it
+                // TODO: min radius, remove it or complete it
                 uniform.point_lights_color_min_radius[pntc] = math::Vec4(pl->get_color(), 0.0f);
                 uniform.point_lights_position_max_radius[pntc] = pl->get_position_radius();
                 ++pntc;

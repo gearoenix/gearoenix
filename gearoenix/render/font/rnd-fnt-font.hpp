@@ -1,5 +1,5 @@
-#ifndef GEAROEMIX_RENDER_FONT_FONT_HPP
-#define GEAROEMIX_RENDER_FONT_FONT_HPP
+#ifndef GEAROENIX_RENDER_FONT_FONT_HPP
+#define GEAROENIX_RENDER_FONT_FONT_HPP
 #include "../../core/asset/cr-asset.hpp"
 #include "../../core/cr-types.hpp"
 #include "../../core/sync/cr-sync-end-caller.hpp"

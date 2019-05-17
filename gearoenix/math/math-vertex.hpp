@@ -1,5 +1,5 @@
-#ifndef GEAROEMIX_MATH_VERTEX_HPP
-#define GEAROEMIX_MATH_VERTEX_HPP
+#ifndef GEAROENIX_MATH_VERTEX_HPP
+#define GEAROENIX_MATH_VERTEX_HPP
 #include "math-vector.hpp"
 
 namespace gearoenix {
@@ -11,7 +11,7 @@ namespace math {
         Vec2 uv;
 
         BasicVertex();
-		BasicVertex(const Vec3& position, const Vec3& normal, const Vec4& tangent, const Vec2& uv);
+        BasicVertex(const Vec3& position, const Vec3& normal, const Vec4& tangent, const Vec2& uv);
         BasicVertex(const std::shared_ptr<system::stream::Stream>& f);
         void read(const std::shared_ptr<system::stream::Stream>& f);
 

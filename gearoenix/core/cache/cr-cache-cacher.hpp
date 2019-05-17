@@ -20,8 +20,8 @@ namespace core {
             std::shared_ptr<C> get(const Key& id, const std::function<std::shared_ptr<C>()>& new_fun);
             template <class C>
             std::shared_ptr<C> get(const Key& id) const;
-			const std::map<Key, std::weak_ptr<T>, Compare>& get_cacheds() const;
-			std::map<Key, std::weak_ptr<T>, Compare>& get_cacheds() noexcept;
+            const std::map<Key, std::weak_ptr<T>, Compare>& get_cacheds() const;
+            std::map<Key, std::weak_ptr<T>, Compare>& get_cacheds() noexcept;
         };
     }
 }
@@ -68,13 +68,13 @@ std::shared_ptr<C> gearoenix::core::cache::Cacher<T, Key, Compare>::get(const Ke
 template <class T, class Key, class Compare>
 const std::map<Key, std::weak_ptr<T>, Compare>& gearoenix::core::cache::Cacher<T, Key, Compare>::get_cacheds() const
 {
-	return cacheds;
+    return cacheds;
 }
 
 template <class T, class Key, class Compare>
 std::map<Key, std::weak_ptr<T>, Compare>& gearoenix::core::cache::Cacher<T, Key, Compare>::get_cacheds() noexcept
 {
-	return cacheds;
+    return cacheds;
 }
 
 #endif

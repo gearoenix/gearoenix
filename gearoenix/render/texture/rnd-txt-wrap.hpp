@@ -1,5 +1,5 @@
-#ifndef GEAROEMIX_RENDER_TEXTURE_WRAP_HPP
-#define GEAROEMIX_RENDER_TEXTURE_WRAP_HPP
+#ifndef GEAROENIX_RENDER_TEXTURE_WRAP_HPP
+#define GEAROENIX_RENDER_TEXTURE_WRAP_HPP
 #include "../../core/cr-types.hpp"
 namespace gearoenix {
 namespace render {

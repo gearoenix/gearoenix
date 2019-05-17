@@ -1,5 +1,5 @@
-#ifndef GEAROEMIX_GLES2_COMMAND_BUFFER_HPP
-#define GEAROEMIX_GLES2_COMMAND_BUFFER_HPP
+#ifndef GEAROENIX_GLES2_COMMAND_BUFFER_HPP
+#define GEAROENIX_GLES2_COMMAND_BUFFER_HPP
 #include "../../gl/gl-types.hpp"
 #include "../../render/command/rnd-cmd-buffer.hpp"
 

@@ -1,5 +1,5 @@
-#ifndef GEAROEMIX_RENDER_SCENE_SCENE_HPP
-#define GEAROEMIX_RENDER_SCENE_SCENE_HPP
+#ifndef GEAROENIX_RENDER_SCENE_SCENE_HPP
+#define GEAROENIX_RENDER_SCENE_SCENE_HPP
 #include "../../core/asset/cr-asset.hpp"
 #include "../../core/cr-build-configuration.hpp"
 #include "../../core/sync/cr-sync-end-caller.hpp"
@@ -87,7 +87,7 @@ namespace render {
                 const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
 
             Scene(
-				const core::Id my_id,
+                const core::Id my_id,
                 const std::shared_ptr<engine::Engine>& e,
                 const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
 

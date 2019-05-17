@@ -1,5 +1,5 @@
-#ifndef GEAROEMIX_RENDER_MODEL_TYPE_HPP
-#define GEAROEMIX_RENDER_MODEL_TYPE_HPP
+#ifndef GEAROENIX_RENDER_MODEL_TYPE_HPP
+#define GEAROENIX_RENDER_MODEL_TYPE_HPP
 #include "../../core/cr-types.hpp"
 namespace gearoenix {
 namespace render {

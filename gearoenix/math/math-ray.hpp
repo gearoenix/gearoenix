@@ -1,5 +1,5 @@
-#ifndef GEAROEMIX_MATH_RAY_HPP
-#define GEAROEMIX_MATH_RAY_HPP
+#ifndef GEAROENIX_MATH_RAY_HPP
+#define GEAROENIX_MATH_RAY_HPP
 #include "math-vector.hpp"
 namespace gearoenix {
 namespace math {

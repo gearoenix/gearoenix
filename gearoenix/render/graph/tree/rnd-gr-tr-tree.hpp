@@ -1,5 +1,5 @@
-#ifndef GEAROEMIX_RENDER_GRAPH_TREE_TREE_HPP
-#define GEAROEMIX_RENDER_GRAPH_TREE_TREE_HPP
+#ifndef GEAROENIX_RENDER_GRAPH_TREE_TREE_HPP
+#define GEAROENIX_RENDER_GRAPH_TREE_TREE_HPP
 #include <memory>
 namespace gearoenix {
 namespace render {

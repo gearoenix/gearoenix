@@ -1,5 +1,5 @@
-#ifndef GEAROEMIX_MATH_PLOTTER_HPP
-#define GEAROEMIX_MATH_PLOTTER_HPP
+#ifndef GEAROENIX_MATH_PLOTTER_HPP
+#define GEAROENIX_MATH_PLOTTER_HPP
 #include "math-vector.hpp"
 #include <cstdint>
 #include <tuple>

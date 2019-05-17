@@ -1,5 +1,5 @@
-#ifndef GEAROEMIX_GLES2_COMMAND_MANAGER_HPP
-#define GEAROEMIX_GLES2_COMMAND_MANAGER_HPP
+#ifndef GEAROENIX_GLES2_COMMAND_MANAGER_HPP
+#define GEAROENIX_GLES2_COMMAND_MANAGER_HPP
 #include "../../render/command/rnd-cmd-manager.hpp"
 namespace gearoenix {
 namespace gles2 {

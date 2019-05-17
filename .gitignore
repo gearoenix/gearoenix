@@ -67,4 +67,10 @@ sdk/
 build/
 /build/
 
+.idea/
+/.idea/
+
+cmake-build*/
+/cmake-build*/
+
 CMakeLists.txt.user

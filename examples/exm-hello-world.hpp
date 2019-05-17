@@ -4,16 +4,16 @@
 #include <memory>
 
 namespace gearoenix {
-	namespace physics {
-		class Transformation;
-	}
+namespace physics {
+    class Transformation;
+}
 namespace render {
     namespace engine {
         class Engine;
     }
     namespace camera {
         class Perspective;
-		class Transformation;
+        class Transformation;
     }
     namespace model {
         class Model;
@@ -26,19 +26,19 @@ namespace render {
 
 class GameApp : public gearoenix::core::Application {
 private:
-	using GxScene = gearoenix::render::scene::Scene;
-	using GxCamTran = gearoenix::render::camera::Transformation;
+    using GxScene = gearoenix::render::scene::Scene;
+    using GxCamTran = gearoenix::render::camera::Transformation;
 
     std::shared_ptr<GxScene> scn;
-	std::shared_ptr<GxCamTran> camtrn;
+    std::shared_ptr<GxCamTran> camtrn;
 
 public:
-	/// This function must be like this
+    /// This function must be like this
     GameApp(const std::shared_ptr<gearoenix::system::Application>& sys_app);
     ~GameApp() override final;
-	/// On every screen refresh this function is going to be called
+    /// On every screen refresh this function is going to be called
     void update() override final;
-	/// Before terminationg everything in engine this function is going to be called
+    /// Before terminationg everything in engine this function is going to be called
     void terminate() override final;
 };
 #endif

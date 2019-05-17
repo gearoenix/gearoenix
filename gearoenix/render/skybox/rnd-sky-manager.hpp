@@ -1,5 +1,5 @@
-#ifndef GEAROEMIX_RENDER_SKYBOX_MANAGER_HPP
-#define GEAROEMIX_RENDER_SKYBOX_MANAGER_HPP
+#ifndef GEAROENIX_RENDER_SKYBOX_MANAGER_HPP
+#define GEAROENIX_RENDER_SKYBOX_MANAGER_HPP
 #include "../../core/cache/cr-cache-file.hpp"
 #include "../../core/cr-types.hpp"
 #include "../../core/sync/cr-sync-end-caller.hpp"

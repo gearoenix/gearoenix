@@ -1,5 +1,5 @@
-#ifndef GEAROEMIX_RENDER_SCENE_UNIFORM_HPP
-#define GEAROEMIX_RENDER_SCENE_UNIFORM_HPP
+#ifndef GEAROENIX_RENDER_SCENE_UNIFORM_HPP
+#define GEAROENIX_RENDER_SCENE_UNIFORM_HPP
 #include "../../core/cr-build-configuration.hpp"
 #include "../../math/math-vector.hpp"
 

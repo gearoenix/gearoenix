@@ -5,10 +5,10 @@ gearoenix::math::BasicVertex::BasicVertex()
 }
 
 gearoenix::math::BasicVertex::BasicVertex(const Vec3& position, const Vec3& normal, const Vec4& tangent, const Vec2& uv)
-	: position(position)
-	, normal(normal)
-	, tangent(tangent)
-	, uv(uv)
+    : position(position)
+    , normal(normal)
+    , tangent(tangent)
+    , uv(uv)
 {
 }
 

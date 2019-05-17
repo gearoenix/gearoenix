@@ -1,5 +1,5 @@
-#ifndef GEAROEMIX_RENDER_GRAPH_TREE_PBR_HPP
-#define GEAROEMIX_RENDER_GRAPH_TREE_PBR_HPP
+#ifndef GEAROENIX_RENDER_GRAPH_TREE_PBR_HPP
+#define GEAROENIX_RENDER_GRAPH_TREE_PBR_HPP
 #include "../../../core/sync/cr-sync-end-caller.hpp"
 #include "rnd-gr-tr-tree.hpp"
 namespace gearoenix {

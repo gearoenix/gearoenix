@@ -1,5 +1,5 @@
-#ifndef GEAROEMIX_MATH_VECTOR_HPP
-#define GEAROEMIX_MATH_VECTOR_HPP
+#ifndef GEAROENIX_MATH_VECTOR_HPP
+#define GEAROENIX_MATH_VECTOR_HPP
 #include "../core/cr-types.hpp"
 #include <memory>
 #include <ostream>

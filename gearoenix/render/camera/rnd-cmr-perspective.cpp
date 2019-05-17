@@ -3,8 +3,8 @@
 #include "../../core/event/cr-ev-window-resize.hpp"
 #include "../../system/stream/sys-stm-stream.hpp"
 #include "../../system/sys-log.hpp"
-#include "rnd-cmr-uniform.hpp"
 #include "rnd-cmr-transformation.hpp"
+#include "rnd-cmr-uniform.hpp"
 #include <cmath>
 
 void gearoenix::render::camera::Perspective::on_ratio_change()
@@ -28,11 +28,11 @@ gearoenix::render::camera::Perspective::Perspective(
 }
 
 gearoenix::render::camera::Perspective::Perspective(
-	const core::Id my_id, 
-	const std::shared_ptr<engine::Engine>& e)
-	: Camera(my_id, e)
+    const core::Id my_id,
+    const std::shared_ptr<engine::Engine>& e)
+    : Camera(my_id, e)
 {
-	set_field_of_view(1.571f);
+    set_field_of_view(1.571f);
 }
 
 bool gearoenix::render::camera::Perspective::in_sight(const math::Vec3& location, const core::Real radius) const
@@ -61,7 +61,7 @@ gearoenix::math::Ray3 gearoenix::render::camera::Perspective::create_ray3(const 
     return math::Ray3(origin, dir);
 }
 
-gearoenix::core::Real gearoenix::render::camera::Perspective::get_distance(const math::Vec3 &model_location) const
+gearoenix::core::Real gearoenix::render::camera::Perspective::get_distance(const math::Vec3& model_location) const
 {
     return (model_location - uniform->position).square_length();
 }
@@ -78,10 +78,10 @@ void gearoenix::render::camera::Perspective::set_field_of_view(const core::Real 
         -uniform->near,
         -uniform->far);
     uniform->uniform_projection = math::Mat4x4(
-                                     0.5f, 0.0f, 0.0f, 0.0f,
-                                     0.0f, 0.5f, 0.0f, 0.0f,
-                                     0.0f, 0.0f, 1.0f, 0.0f,
-                                     0.5f, 0.5f, 0.0f, 1.0f)
+                                      0.5f, 0.0f, 0.0f, 0.0f,
+                                      0.0f, 0.5f, 0.0f, 0.0f,
+                                      0.0f, 0.0f, 1.0f, 0.0f,
+                                      0.5f, 0.5f, 0.0f, 1.0f)
         * uniform->projection;
     lambda = static_cast<core::Real>(
                  std::sin(static_cast<double>(fovx) * 0.5) + std::sin(static_cast<double>(fovy) * 0.5))

@@ -224,13 +224,12 @@ const std::shared_ptr<gearoenix::render::texture::Texture2D>& gearoenix::render:
     return emissive;
 }
 
-
 void gearoenix::render::material::Material::set_metallic_factor(const core::Real f) noexcept
 {
-	uniform.metallic_factor = f;
+    uniform.metallic_factor = f;
 }
 
 void gearoenix::render::material::Material::set_roughness_factor(const core::Real f) noexcept
 {
-	uniform.roughness_factor = f;
+    uniform.roughness_factor = f;
 }

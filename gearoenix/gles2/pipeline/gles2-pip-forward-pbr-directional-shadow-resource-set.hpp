@@ -1,5 +1,5 @@
-#ifndef GEAROEMIX_GLES2_PIPELINE_FORWARD_PBR_DIRECTIONAL_SHADOW_RESOURCE_SET_HPP
-#define GEAROEMIX_GLES2_PIPELINE_FORWARD_PBR_DIRECTIONAL_SHADOW_RESOURCE_SET_HPP
+#ifndef GEAROENIX_GLES2_PIPELINE_FORWARD_PBR_DIRECTIONAL_SHADOW_RESOURCE_SET_HPP
+#define GEAROENIX_GLES2_PIPELINE_FORWARD_PBR_DIRECTIONAL_SHADOW_RESOURCE_SET_HPP
 #include "../../core/sync/cr-sync-end-caller.hpp"
 #include "../../render/pipeline/rnd-pip-forward-pbr-directional-shadow-resource-set.hpp"
 #include "gles2-pip-resource-set.hpp"

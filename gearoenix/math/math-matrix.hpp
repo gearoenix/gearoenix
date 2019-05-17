@@ -1,5 +1,5 @@
-#ifndef GEAROEMIX_MATH_MATRIX_HPP
-#define GEAROEMIX_MATH_MATRIX_HPP
+#ifndef GEAROENIX_MATH_MATRIX_HPP
+#define GEAROENIX_MATH_MATRIX_HPP
 #include "../core/cr-types.hpp"
 #include <memory>
 

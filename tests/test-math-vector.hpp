@@ -9,6 +9,8 @@
 #define GLM_FORCE_CXX14
 #define GLM_FORCE_SIMD_SSE42
 #define GLM_ENABLE_EXPERIMENTAL
+#include <algorithm>
+#include <chrono>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
@@ -19,43 +21,38 @@
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 #include <random>
-#include <chrono>
-#include <algorithm>
 
 static std::random_device rd;
 static std::default_random_engine gen(rd());
 static std::uniform_real_distribution<> dis(0.0, 1.0);
 static long double glmt = 0.0L, gt = 0.0L;
 
-#define PROF(x, t)                                                                       \
-    {                                                                                    \
-        auto now1 = std::chrono::high_resolution_clock::now();                           \
-        x;                                                                               \
-        auto now2 = std::chrono::high_resolution_clock::now();                           \
-        std::chrono::duration<long double> time_span =                                   \
-            std::chrono::duration_cast<std::chrono::duration<long double>>(now2 - now1); \
-        t += time_span.count();                                                          \
+#define PROF(x, t)                                                                                                                  \
+    {                                                                                                                               \
+        auto now1 = std::chrono::high_resolution_clock::now();                                                                      \
+        x;                                                                                                                          \
+        auto now2 = std::chrono::high_resolution_clock::now();                                                                      \
+        std::chrono::duration<long double> time_span = std::chrono::duration_cast<std::chrono::duration<long double>>(now2 - now1); \
+        t += time_span.count();                                                                                                     \
     }
 
-void rm(glm::mat4 &m1, gearoenix::math::Mat4x4 &m2)
+void rm(glm::mat4& m1, gearoenix::math::Mat4x4& m2)
 {
-    for (unsigned int i = 0; i < 16; ++i)
-    {
+    for (unsigned int i = 0; i < 16; ++i) {
         glm::value_ptr(m1)[i] = static_cast<gearoenix::core::Real>(dis(gen));
         m2[i] = glm::value_ptr(m1)[i];
     }
 }
 
-void rv(glm::vec3 &v1, gearoenix::math::Vec3 &v2)
+void rv(glm::vec3& v1, gearoenix::math::Vec3& v2)
 {
-    for (int i = 0; i < 3; ++i)
-    {
+    for (int i = 0; i < 3; ++i) {
         v1[i] = static_cast<gearoenix::core::Real>(dis(gen));
         v2[i] = v1[i];
     }
 }
 
-void rq(glm::quat &q1, gearoenix::math::Quat &q2)
+void rq(glm::quat& q1, gearoenix::math::Quat& q2)
 {
     q1.x = static_cast<gearoenix::core::Real>(dis(gen));
     q2.x = q1.x;
@@ -79,16 +76,14 @@ void check_eq(const gearoenix::core::Real f1, const gearoenix::core::Real f2)
         BOOST_TEST(false);
 }
 
-void check(glm::mat4 &m1, gearoenix::math::Mat4x4 &m2)
+void check(glm::mat4& m1, gearoenix::math::Mat4x4& m2)
 {
-    for (unsigned int i = 0; i < 16; ++i)
-    {
+    for (unsigned int i = 0; i < 16; ++i) {
         float f1 = std::abs(glm::value_ptr(m1)[i] - m2[i]);
         float f2 = std::abs(glm::value_ptr(m1)[i] + m2[i]);
         if (f1 > f2)
             std::swap(f1, f2);
-        if (f1 / f2 > 0.01f)
-        {
+        if (f1 / f2 > 0.01f) {
             for (unsigned int j = 0; j < 16; ++j)
                 BOOST_TEST_MESSAGE("Error-" << glm::value_ptr(m1)[j] << ", " << m2[j]);
             BOOST_TEST(false);
@@ -104,8 +99,7 @@ BOOST_AUTO_TEST_CASE(math_vector_test)
     gearoenix::math::Vec3 v2;
     float f;
     BOOST_TEST_MESSAGE("Rotation test");
-    for (int i = 0; i < 1000; ++i)
-    {
+    for (int i = 0; i < 1000; ++i) {
         f = static_cast<float>(dis(gen));
         rv(v1, v2);
         v1 = glm::normalize(v1);
@@ -115,8 +109,7 @@ BOOST_AUTO_TEST_CASE(math_vector_test)
     }
     BOOST_TEST_MESSAGE("Inversion test");
     BOOST_TEST_MESSAGE("glmt " << glmt << ", gt " << gt);
-    for (int i = 0; i < 1000; ++i)
-    {
+    for (int i = 0; i < 1000; ++i) {
         f = static_cast<float>(dis(gen));
         rm(m1, m2);
         PROF(m1 = glm::inverse(m1), glmt);
@@ -127,8 +120,7 @@ BOOST_AUTO_TEST_CASE(math_vector_test)
     BOOST_TEST_MESSAGE("Quaternion tests");
     glm::quat q1;
     gearoenix::math::Quat q2;
-    for (int i = 0; i < 1000; ++i)
-    {
+    for (int i = 0; i < 1000; ++i) {
         rq(q1, q2);
         PROF(m1 = glm::toMat4(q1), glmt);
         PROF(m2 = q2.to_mat(), gt);

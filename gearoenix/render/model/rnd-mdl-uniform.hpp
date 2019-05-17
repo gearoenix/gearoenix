@@ -1,5 +1,5 @@
-#ifndef GEAROEMIX_RENDER_MODEL_UNIFORM_HPP
-#define GEAROEMIX_RENDER_MODEL_UNIFORM_HPP
+#ifndef GEAROENIX_RENDER_MODEL_UNIFORM_HPP
+#define GEAROENIX_RENDER_MODEL_UNIFORM_HPP
 #include "../../math/math-matrix.hpp"
 namespace gearoenix {
 namespace render {

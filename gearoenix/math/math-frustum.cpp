@@ -1,31 +1,28 @@
 #include "math-frustum.hpp"
-#include "math-sphere.hpp"
 #include "../system/sys-log.hpp"
+#include "math-sphere.hpp"
 
 gearoenix::math::Frustum::Frustum(const Plane (&planes)[6]) noexcept
-	: planes { planes[0], planes[1], planes[2], planes[3], planes[4], planes[5] }
+    : planes { planes[0], planes[1], planes[2], planes[3], planes[4], planes[5] }
 {
-
 }
 
 gearoenix::math::IntersectionStatus::Type gearoenix::math::Frustum::check_intersection(const Sphere& s) const noexcept
 {
-	IntersectionStatus::Type state = IntersectionStatus::In;
-	for (const Plane& p : planes) {
-		switch (p.check_intersection(s))
-		{
-		case IntersectionStatus::Under:
-			return IntersectionStatus::Out;
-		case IntersectionStatus::Cut:
-			state = IntersectionStatus::Cut;
-			break;
-		default:
-			break;
-		}
-	}
-	return state;
+    IntersectionStatus::Type state = IntersectionStatus::In;
+    for (const Plane& p : planes) {
+        switch (p.check_intersection(s)) {
+        case IntersectionStatus::Under:
+            return IntersectionStatus::Out;
+        case IntersectionStatus::Cut:
+            state = IntersectionStatus::Cut;
+            break;
+        default:
+            break;
+        }
+    }
+    return state;
 }
-
 
 //for (int i = 0; i < 6; i++)
 //{

@@ -34,16 +34,16 @@ gearoenix::render::mesh::Mesh::Mesh(
 }
 
 gearoenix::render::mesh::Mesh::Mesh(
-	const core::Id my_id,
-	const std::vector<math::BasicVertex>& vertices,
-	const std::vector<std::uint32_t>& indices,
-	const core::Real radius,
-	const std::shared_ptr<engine::Engine>& e, 
-	const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
-	: core::asset::Asset(my_id, core::asset::Type::MESH)
-	, mesh_type_id(Type::BASIC)
+    const core::Id my_id,
+    const std::vector<math::BasicVertex>& vertices,
+    const std::vector<std::uint32_t>& indices,
+    const core::Real radius,
+    const std::shared_ptr<engine::Engine>& e,
+    const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
+    : core::asset::Asset(my_id, core::asset::Type::MESH)
+    , mesh_type_id(Type::BASIC)
 {
-	set_vertices(e, vertices, indices, radius, c);
+    set_vertices(e, vertices, indices, radius, c);
 }
 
 gearoenix::render::mesh::Mesh::~Mesh()
@@ -56,16 +56,16 @@ void gearoenix::render::mesh::Mesh::draw()
 }
 
 void gearoenix::render::mesh::Mesh::set_vertices(
-	const std::shared_ptr<engine::Engine>& e,
-	const std::vector<math::BasicVertex>& vertices, 
-	const std::vector<std::uint32_t>& indices, 
-	const core::Real r,
-	const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
+    const std::shared_ptr<engine::Engine>& e,
+    const std::vector<math::BasicVertex>& vertices,
+    const std::vector<std::uint32_t>& indices,
+    const core::Real r,
+    const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
 {
-	const std::shared_ptr<buffer::Manager>& bufmgr = e->get_buffer_manager();
-	vertex_buffer = bufmgr->create_static(vertices, c);
-	index_buffer = bufmgr->create_static(indices, c);
-	radius = r;
+    const std::shared_ptr<buffer::Manager>& bufmgr = e->get_buffer_manager();
+    vertex_buffer = bufmgr->create_static(vertices, c);
+    index_buffer = bufmgr->create_static(indices, c);
+    radius = r;
 }
 
 gearoenix::core::Real gearoenix::render::mesh::Mesh::get_radius() const

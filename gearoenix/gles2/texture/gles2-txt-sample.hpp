@@ -1,5 +1,5 @@
-#ifndef GEAROEMIX_GLES2_TEXTURE_SAMPLE_HPP
-#define GEAROEMIX_GLES2_TEXTURE_SAMPLE_HPP
+#ifndef GEAROENIX_GLES2_TEXTURE_SAMPLE_HPP
+#define GEAROENIX_GLES2_TEXTURE_SAMPLE_HPP
 #include "../../core/cr-build-configuration.hpp"
 #ifdef GX_USE_OPENGL_ES2
 #include "../../gl/gl-constants.hpp"

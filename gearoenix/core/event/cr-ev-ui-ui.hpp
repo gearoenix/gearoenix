@@ -1,5 +1,5 @@
-#ifndef GEAROEMIX_CORE_UI_UI_HPP
-#define GEAROEMIX_CORE_UI_UI_HPP
+#ifndef GEAROENIX_CORE_UI_UI_HPP
+#define GEAROENIX_CORE_UI_UI_HPP
 
 #include "cr-ev-event.hpp"
 

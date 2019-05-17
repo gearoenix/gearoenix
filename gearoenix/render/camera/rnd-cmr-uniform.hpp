@@ -8,19 +8,19 @@ namespace render {
     namespace camera {
         struct Uniform {
             math::Vec3 x = math::Vec3(1.0f, 0.0f, 0.0f);
-			core::Real reserved_1 = 0.0f;
+            core::Real reserved_1 = 0.0f;
             math::Vec3 y = math::Vec3(0.0f, 1.0f, 0.0f);
-			core::Real reserved_2 = 0.0f;
+            core::Real reserved_2 = 0.0f;
             math::Vec3 z = math::Vec3(0.0f, 0.0f, 1.0f);
-			core::Real reserved_3 = 0.0f;
+            core::Real reserved_3 = 0.0f;
             math::Vec3 position = math::Vec3(0.0f, 0.0f, 0.0f);
             /// far is negative
-			core::Real far = -100.0f;
+            core::Real far = -100.0f;
             /// near is negative
-			core::Real near = -1.0f;
-			core::Real aspect_ratio = 1.7f;
-			core::Real reserved_4 = 0.0f;
-			core::Real reserved_5 = 0.0f;
+            core::Real near = -1.0f;
+            core::Real aspect_ratio = 1.7f;
+            core::Real reserved_4 = 0.0f;
+            core::Real reserved_5 = 0.0f;
             math::Mat4x4 inversed_rotation;
             math::Mat4x4 view;
             math::Mat4x4 projection;

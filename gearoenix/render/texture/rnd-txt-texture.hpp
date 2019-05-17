@@ -1,5 +1,5 @@
-#ifndef GEAROEMIX_RENDER_TEXTURE_TEXTURE_HPP
-#define GEAROEMIX_RENDER_TEXTURE_TEXTURE_HPP
+#ifndef GEAROENIX_RENDER_TEXTURE_TEXTURE_HPP
+#define GEAROENIX_RENDER_TEXTURE_TEXTURE_HPP
 #include "../../core/asset/cr-asset.hpp"
 #include "../../core/sync/cr-sync-end-caller.hpp"
 #include <memory>

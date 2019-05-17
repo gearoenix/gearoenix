@@ -25,33 +25,34 @@ gearoenix::system::stream::Asset::~Asset()
 
 std::shared_ptr<gearoenix::system::stream::Asset> gearoenix::system::stream::Asset::construct(const std::shared_ptr<system::Application>& sys_app, const std::string& name) noexcept
 {
-	std::shared_ptr<Asset> asset(new Asset());
+    std::shared_ptr<Asset> asset(new Asset());
 #ifdef GX_USE_STD_FILE
-	std::string file_path = name;
+    std::string file_path = name;
 #ifdef GX_IN_IOS
-	@autoreleasepool {
-		// NSString *f_name = [NSString stringWithCString:name.c_str() encoding:[NSString defaultCStringEncoding]];
-		NSString* path = [[NSBundle mainBundle]pathForResource:@"data" ofType : @"gx3d"];
-		file_path = std::string([path fileSystemRepresentation]);
-	}
+    @autoreleasepool {
+        // NSString *f_name = [NSString stringWithCString:name.c_str() encoding:[NSString defaultCStringEncoding]];
+        NSString* path = [[NSBundle mainBundle] pathForResource:@"data" ofType:@"gx3d"];
+        file_path = std::string([path fileSystemRepresentation]);
+    }
 #endif
-	asset->file.open(file_path, std::ios::binary | std::ios::in);
-	if (!asset->file.is_open()) {
-		GXLOGD("Error in opening assets file: " << name);
-		return nullptr;
-	}
+    asset->file.open(file_path, std::ios::binary | std::ios::in);
+    if (!asset->file.is_open()) {
+        GXLOGD("Error in opening assets file: " << name);
+        return nullptr;
+    }
 #elif defined(GX_IN_ANDROID)
-	asset->sys_app = sys_app
-	asset->file = AAssetManager_open(sys_app->get_android_app()->activity->assetManager,
-		name.c_str(), AASSET_MODE_BUFFER);
-	if (asset->file == nullptr) {
-		GXLOGF("Asset not found! " << name);
-	}
+    asset->sys_app = sys_app
+                         asset->file
+        = AAssetManager_open(sys_app->get_android_app()->activity->assetManager,
+            name.c_str(), AASSET_MODE_BUFFER);
+    if (asset->file == nullptr) {
+        GXLOGF("Asset not found! " << name);
+    }
 #else
 #error "Unexpected file interface!"
 #endif
-	asset->check_endian_compatibility();
-	return asset;
+    asset->check_endian_compatibility();
+    return asset;
 }
 
 gearoenix::core::Count gearoenix::system::stream::Asset::read(void* data, core::Count length)

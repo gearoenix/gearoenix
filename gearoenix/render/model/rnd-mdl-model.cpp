@@ -28,14 +28,14 @@ gearoenix::render::model::Model::Model(
     : core::asset::Asset(my_id, core::asset::Type::MODEL)
     , e(e)
     , uniform_buffers(std::make_shared<buffer::FramedUniform>(static_cast<unsigned int>(sizeof(Uniform)), e))
-	, transformation(new Transformation(&uniform))
+    , transformation(new Transformation(&uniform))
 {
     uniform.m.read(f);
     const core::Count meshes_count = f->read<core::Count>();
     for (core::Count i = 0; i < meshes_count; ++i) {
         add_mesh(std::make_shared<Mesh>(f, e, c));
     }
-	// TODO child 
+    // TODO child
     /*std::vector<core::Id> children_ids;
 	if (children_ids.size() > 0)
 	{
@@ -50,13 +50,13 @@ gearoenix::render::model::Model::Model(
 }
 
 gearoenix::render::model::Model::Model(
-	const core::Id my_id,
+    const core::Id my_id,
     const std::shared_ptr<engine::Engine>& e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>&)
     : core::asset::Asset(my_id, core::asset::Type::MODEL)
     , e(e)
     , uniform_buffers(std::make_shared<buffer::FramedUniform>(static_cast<unsigned int>(sizeof(Uniform)), e))
-	, transformation(new Transformation(&uniform))
+    , transformation(new Transformation(&uniform))
 {
 }
 
@@ -162,7 +162,7 @@ const std::shared_ptr<gearoenix::render::buffer::FramedUniform>& gearoenix::rend
 
 const std::shared_ptr<gearoenix::render::model::Transformation>& gearoenix::render::model::Model::get_transformation() const noexcept
 {
-	return transformation;
+    return transformation;
 }
 
 const gearoenix::math::Mat4x4& gearoenix::render::model::Model::get_model_matrix() const

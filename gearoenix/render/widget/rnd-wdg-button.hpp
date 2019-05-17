@@ -1,5 +1,5 @@
-#ifndef GEAROEMIX_RENDER_WIDGET_BUTTON_HPP
-#define GEAROEMIX_RENDER_WIDGET_BUTTON_HPP
+#ifndef GEAROENIX_RENDER_WIDGET_BUTTON_HPP
+#define GEAROENIX_RENDER_WIDGET_BUTTON_HPP
 #include "rnd-wdg-widget.hpp"
 #include <chrono>
 namespace gearoenix {

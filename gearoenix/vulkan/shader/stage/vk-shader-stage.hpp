@@ -1,5 +1,5 @@
-#ifndef GEAROEMIX_VULKAN_SHADER_STAGE_STAGE_HPP
-#define GEAROEMIX_VULKAN_SHADER_STAGE_STAGE_HPP
+#ifndef GEAROENIX_VULKAN_SHADER_STAGE_STAGE_HPP
+#define GEAROENIX_VULKAN_SHADER_STAGE_STAGE_HPP
 #include "../../../core/cr-build-configuration.hpp"
 #ifdef USE_VULKAN
 #include "../../vk-linker.hpp"

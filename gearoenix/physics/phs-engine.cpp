@@ -42,7 +42,7 @@ void gearoenix::physics::Engine::update_uniform_buffers()
 {
 }
 
-gearoenix::physics::Engine::Engine(const std::shared_ptr<system::Application>& sysapp, const std::shared_ptr<core::sync::KernelWorker> &kernels)
+gearoenix::physics::Engine::Engine(const std::shared_ptr<system::Application>& sysapp, const std::shared_ptr<core::sync::KernelWorker>& kernels)
     : sysapp(sysapp)
     , kernels(kernels)
 {

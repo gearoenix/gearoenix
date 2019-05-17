@@ -24,8 +24,8 @@ gearoenix::render::model::Mesh::Mesh(const std::shared_ptr<system::stream::Strea
 }
 
 gearoenix::render::model::Mesh::Mesh(const std::shared_ptr<mesh::Mesh>& msh, const std::shared_ptr<material::Material>& mat) noexcept
-	: msh(msh)
-	, mat(mat)
+    : msh(msh)
+    , mat(mat)
 {
 }
 
