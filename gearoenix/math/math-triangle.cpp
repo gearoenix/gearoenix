@@ -3,8 +3,6 @@
 #include "../system/sys-log.hpp"
 #include "math-ray.hpp"
 
-gearoenix::math::Triangle3::Triangle3() {}
-
 gearoenix::math::Triangle3::Triangle3(const Vec3& p1, const Vec3& p2, const Vec3& p3)
     : head(p1)
 {
@@ -40,14 +38,4 @@ bool gearoenix::math::Triangle3::intersect(const Ray3& r, const core::Real tmin,
         }
     }
     return false;
-}
-
-void gearoenix::math::Triangle3::print() const
-{
-    GXLOGI("head:");
-    head.print();
-    GXLOGI("edge[0]:");
-    edge[0].print();
-    GXLOGI("edge[1]:");
-    edge[1].print();
 }

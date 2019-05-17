@@ -1,6 +1,7 @@
 #include "rnd-cmr-camera.hpp"
 #include "../../core/event/cr-ev-event.hpp"
 #include "../../core/event/cr-ev-window-resize.hpp"
+#include "../../math/math-projector-frustum.hpp"
 #include "../../math/math-quaternion.hpp"
 #include "../../system/stream/sys-stm-stream.hpp"
 #include "../../system/sys-app.hpp"
@@ -14,9 +15,10 @@ gearoenix::render::camera::Camera::Camera(
     const core::Id my_id, const std::shared_ptr<engine::Engine>& e) noexcept
     : core::asset::Asset(my_id, core::asset::Type::CAMERA)
     , uniform(new Uniform)
+    , frustum(new math::ProjectorFrustum(math::Mat4x4()))
     , uniform_buffers(new buffer::FramedUniform(sizeof(Uniform), e))
 {
-    transformation = std::make_shared<Transformation>(uniform);
+    transformation = std::make_shared<Transformation>(uniform, frustum);
     uniform->aspect_ratio = e->get_system_application()->get_window_ratio();
 }
 
@@ -26,9 +28,10 @@ gearoenix::render::camera::Camera::Camera(
     const std::shared_ptr<engine::Engine>& e)
     : core::asset::Asset(my_id, core::asset::Type::CAMERA)
     , uniform(new Uniform)
+    , frustum(new math::ProjectorFrustum(math::Mat4x4()))
     , uniform_buffers(new buffer::FramedUniform(sizeof(Uniform), e))
 {
-    transformation = std::make_shared<Transformation>(uniform);
+    transformation = std::make_shared<Transformation>(uniform, frustum);
     uniform->aspect_ratio = e->get_system_application()->get_window_ratio();
     uniform->position.read(f);
     math::Quat q;
@@ -43,19 +46,10 @@ gearoenix::render::camera::Camera::Camera(
     uniform->y = r * uniform->y;
     uniform->z = r * uniform->z;
     uniform->inversed_rotation = math::Quat(q.x, q.y, q.z, -q.w).to_mat();
-    GXLOGD("Position: " << uniform->position);
-    GXLOGD("Quaternion: " << q);
-    GXLOGD("Near: " << uniform->near);
+    GXLOGD("Position: " << uniform->position)
+    GXLOGD("Quaternion: " << q)
+    GXLOGD("Near: " << uniform->near)
     transformation->update_location();
-}
-
-gearoenix::render::camera::Camera::~Camera()
-{
-}
-
-void gearoenix::render::camera::Camera::update_uniform()
-{
-    uniform_buffers->update(uniform.get());
 }
 
 const std::shared_ptr<gearoenix::render::buffer::FramedUniform>& gearoenix::render::camera::Camera::get_uniform_buffers() const
@@ -66,4 +60,14 @@ const std::shared_ptr<gearoenix::render::buffer::FramedUniform>& gearoenix::rend
 const std::shared_ptr<gearoenix::physics::Transformation> gearoenix::render::camera::Camera::get_transformation() const noexcept
 {
     return transformation;
+}
+
+void gearoenix::render::camera::Camera::update_uniform()
+{
+    uniform_buffers->update(uniform.get());
+}
+
+void gearoenix::render::camera::Camera::set_aspect_ratio(const gearoenix::core::Real ratio)
+{
+    uniform->aspect_ratio = ratio;
 }

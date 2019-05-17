@@ -7,13 +7,24 @@
 #include "rnd-cmr-uniform.hpp"
 #include <cmath>
 
-void gearoenix::render::camera::Perspective::on_ratio_change()
+void gearoenix::render::camera::Perspective::update_fovy()
 {
-    //    c_height = c_width / screen_ratio;
-    //    tanvang = c_height / start;
-    //    one_cosvang = 1.0f / std::cos(std::atan(tanhang));
-    //    p = math::Mat4x4::perspective(c_width * 2.0f, c_height * 2.0f, start, end);
-    //    vp = p * v;
+    fovy = static_cast<core::Real>(std::atan(static_cast<double>(tany))) * 2.0f;
+    uniform->projection = math::Mat4x4::perspective(
+        tanx * -uniform->near * 2.0f,
+        tany * -uniform->near * 2.0f,
+        -uniform->near,
+        -uniform->far);
+    uniform->uniform_projection = math::Mat4x4(
+                                      0.5f, 0.0f, 0.0f, 0.0f,
+                                      0.0f, 0.5f, 0.0f, 0.0f,
+                                      0.0f, 0.0f, 1.0f, 0.0f,
+                                      0.5f, 0.5f, 0.0f, 1.0f)
+        * uniform->projection;
+    lambda = static_cast<core::Real>(
+                 std::sin(static_cast<double>(fovx) * 0.5) + std::sin(static_cast<double>(fovy) * 0.5))
+        * 0.5f;
+    transformation->update_view_projection();
 }
 
 gearoenix::render::camera::Perspective::Perspective(
@@ -22,7 +33,7 @@ gearoenix::render::camera::Perspective::Perspective(
     const std::shared_ptr<engine::Engine>& e)
     : Camera(my_id, f, e)
 {
-    const core::Real rad = f->read<core::Real>();
+    const auto rad = f->read<core::Real>();
     GXLOGD("Radiant is: " << rad << ", in perspective camera with id: " << my_id);
     set_field_of_view(rad);
 }
@@ -33,6 +44,21 @@ gearoenix::render::camera::Perspective::Perspective(
     : Camera(my_id, e)
 {
     set_field_of_view(1.571f);
+}
+
+void gearoenix::render::camera::Perspective::set_aspect_ratio(const gearoenix::core::Real ratio)
+{
+    Camera::set_aspect_ratio(ratio);
+    tany = tanx / ratio;
+    update_fovy();
+}
+
+void gearoenix::render::camera::Perspective::set_field_of_view(const core::Real radian)
+{
+    fovx = radian;
+    tanx = static_cast<core::Real>(std::tan(static_cast<double>(radian) * 0.5));
+    tany = tanx / uniform->aspect_ratio;
+    update_fovy();
 }
 
 bool gearoenix::render::camera::Perspective::in_sight(const math::Vec3& location, const core::Real radius) const
@@ -66,25 +92,6 @@ gearoenix::core::Real gearoenix::render::camera::Perspective::get_distance(const
     return (model_location - uniform->position).square_length();
 }
 
-void gearoenix::render::camera::Perspective::set_field_of_view(const core::Real radian)
+std::vector<gearoenix::math::Vec3[4]> gearoenix::render::camera::Perspective::get_cascaded_shadow_frustum_partitions() const
 {
-    fovx = radian;
-    tanx = static_cast<core::Real>(std::tan(static_cast<double>(radian) * 0.5));
-    tany = tanx / uniform->aspect_ratio;
-    fovy = static_cast<core::Real>(std::atan(static_cast<double>(tany))) * 2.0f;
-    uniform->projection = math::Mat4x4::perspective(
-        tanx * -uniform->near * 2.0f,
-        tany * -uniform->near * 2.0f,
-        -uniform->near,
-        -uniform->far);
-    uniform->uniform_projection = math::Mat4x4(
-                                      0.5f, 0.0f, 0.0f, 0.0f,
-                                      0.0f, 0.5f, 0.0f, 0.0f,
-                                      0.0f, 0.0f, 1.0f, 0.0f,
-                                      0.5f, 0.5f, 0.0f, 1.0f)
-        * uniform->projection;
-    lambda = static_cast<core::Real>(
-                 std::sin(static_cast<double>(fovx) * 0.5) + std::sin(static_cast<double>(fovy) * 0.5))
-        * 0.5f;
-    transformation->update_view_projection();
 }

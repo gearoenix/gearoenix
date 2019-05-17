@@ -7,16 +7,12 @@
 gearoenix::physics::collider::Mesh::Mesh(const std::shared_ptr<system::stream::Stream>& f)
     : Collider(Type::MESH)
 {
-    const core::Count cnt = f->read<core::Count>();
+    const auto cnt = f->read<core::Count>();
     vertices.resize(cnt);
     for (core::Count i = 0; i < cnt; ++i)
         vertices[i].read(f);
     f->read(indices);
     ts.resize(indices.size());
-}
-
-gearoenix::physics::collider::Mesh::~Mesh()
-{
 }
 
 void gearoenix::physics::collider::Mesh::update(const math::Mat4x4& m)
@@ -63,13 +59,4 @@ bool gearoenix::physics::collider::Mesh::hit(const math::Ray3& r, core::Real& d,
         return result;
     }
     return false;
-}
-
-void gearoenix::physics::collider::Mesh::print() const
-{
-    GXLOGI("Begin of collider print:");
-    for (const math::Triangle3& t : ts) {
-        t.print();
-    }
-    GXLOGI("End of collider print.");
 }

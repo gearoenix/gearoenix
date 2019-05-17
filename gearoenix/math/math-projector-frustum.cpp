@@ -7,17 +7,27 @@ gearoenix::math::ProjectorFrustum::ProjectorFrustum(const Mat4x4& view_projectio
 {
 }
 
+void gearoenix::math::ProjectorFrustum::set_view_projection(const gearoenix::math::Mat4x4& v) noexcept
+{
+    view_projection = v;
+}
+
 gearoenix::math::IntersectionStatus::Type gearoenix::math::ProjectorFrustum::check_intersection(const Sphere& s) const noexcept
 {
+    return check_intersection(s.position, s.radius);
+}
+
+gearoenix::math::IntersectionStatus::Type gearoenix::math::ProjectorFrustum::check_intersection(const gearoenix::math::Vec3& position, const core::Real radius) const noexcept
+{
     return check_intersection({
-        s.position + Vec3(s.radius, s.radius, s.radius),
-        s.position + Vec3(-s.radius, s.radius, s.radius),
-        s.position + Vec3(s.radius, -s.radius, s.radius),
-        s.position + Vec3(-s.radius, -s.radius, s.radius),
-        s.position + Vec3(s.radius, s.radius, -s.radius),
-        s.position + Vec3(-s.radius, s.radius, -s.radius),
-        s.position + Vec3(s.radius, -s.radius, -s.radius),
-        s.position + Vec3(-s.radius, -s.radius, -s.radius),
+        position + Vec3(radius, radius, radius),
+        position + Vec3(-radius, radius, radius),
+        position + Vec3(radius, -radius, radius),
+        position + Vec3(-radius, -radius, radius),
+        position + Vec3(radius, radius, -radius),
+        position + Vec3(-radius, radius, -radius),
+        position + Vec3(radius, -radius, -radius),
+        position + Vec3(-radius, -radius, -radius),
     });
 }
 

@@ -1,12 +1,13 @@
 #include "rnd-cmr-transformation.hpp"
+#include "../../math/math-projector-frustum.hpp"
 #include "rnd-cmr-uniform.hpp"
+#include <utility>
 
-gearoenix::render::camera::Transformation::Transformation(const std::shared_ptr<Uniform>& uniform) noexcept
-    : uniform(uniform)
+gearoenix::render::camera::Transformation::Transformation(std::shared_ptr<Uniform> uniform, std::shared_ptr<math::ProjectorFrustum> frustum) noexcept
+    : uniform(std::move(uniform))
+    , frustum(std::move(frustum))
 {
 }
-
-gearoenix::render::camera::Transformation::~Transformation() noexcept {}
 
 void gearoenix::render::camera::Transformation::update_location() noexcept
 {
@@ -24,6 +25,7 @@ void gearoenix::render::camera::Transformation::update_view_projection() noexcep
                                            0.0f, 0.0f, 1.0f, 0.0f,
                                            0.5f, 0.5f, 0.0f, 1.0f)
         * uniform->view_projection;
+    frustum->set_view_projection(uniform->view_projection);
 }
 
 void gearoenix::render::camera::Transformation::look_at(const math::Vec3& target, const math::Vec3& up) noexcept
