@@ -3,7 +3,10 @@
 #include "../../core/event/cr-ev-window-resize.hpp"
 #include "../../system/stream/sys-stm-stream.hpp"
 #include "../../system/sys-log.hpp"
+#include "../../system/sys-app.hpp"
+#include "../../system/sys-configuration.hpp"
 #include "../engine/rnd-eng-engine.hpp"
+#include "../engine/rnd-eng-configuration.hpp"
 #include "rnd-cmr-transformation.hpp"
 #include "rnd-cmr-uniform.hpp"
 #include <cmath>
@@ -75,8 +78,71 @@ gearoenix::core::Real gearoenix::render::camera::Perspective::get_distance(const
     return (model_location - uniform->position).square_length();
 }
 
-std::vector<gearoenix::math::Vec3[4]> gearoenix::render::camera::Perspective::get_cascaded_shadow_frustum_partitions() const
+std::vector<gearoenix::math::Vec3[4]> gearoenix::render::camera::Perspective::get_cascaded_shadow_frustum_partitions() const noexcept
 {
-	//e->get
-	return std::vector<gearoenix::math::Vec3[4]>();
+	const system::Configuration &sys_conf = e->get_system_application()->get_configuration();
+	const engine::Configuration& eng_conf = sys_conf.render_config;
+	const std::size_t sections_count = eng_conf.shadow_cascades_count;
+	std::vector<math::Vec3[4]> partitions(sections_count + 1);
+
+	const math::Vec3 xtanx = uniform->x * tanx;
+	const math::Vec3 ytany = uniform->y * tany;
+
+	math::Vec3 x = xtanx * -uniform->near;
+	math::Vec3 y = ytany * -uniform->near;
+	math::Vec3 z = uniform->position + (uniform->z * uniform->near);
+
+	math::Vec3 zmx;
+	math::Vec3 zpx;
+
+#define GXHELPER(index)             \
+	zmx = z - x;                    \
+	zpx = z + x;                    \
+	partitions[index][0] = zmx - y; \
+	partitions[index][1] = zpx - y; \
+	partitions[index][2] = zpx + y; \
+	partitions[index][3] = zmx + y; \
+
+	GXHELPER(0)
+
+	x = xtanx * -uniform->far;
+	y = ytany * -uniform->far;
+	z = uniform->position + (uniform->z * uniform->far);
+
+	GXHELPER(sections_count)
+
+	if (sections_count < 2) {
+		// it provides a little performance gain for poor hardwares
+		return partitions;
+	}
+
+	// Zi = yn(f/n)^(i/N) + (1-y)(n+(i/N)(f-n))
+	// Zi = yn((f/n)^(1/N))^i + (1-y)n + (1-y)((f-n)/N)i
+	const core::Real oneminlambda = 1.0f - lambda;
+	const core::Real onedivcn = 1.0f / static_cast<core::Real>(sections_count);
+	// uniform increament
+	const core::Real unisecinc = oneminlambda * onedivcn * (uniform->far - uniform->near);
+	const core::Real fdivn = uniform->far / uniform->near;
+	// logarithmic multiplication
+	const core::Real logsecmul = std::pow(fdivn, onedivcn);
+	// uniform sector
+	core::Real unisec = oneminlambda * uniform->near;
+	// logarithmic sector
+	core::Real logsec = lambda * uniform->near;
+
+	for(std::size_t i = 1; i < sections_count; ++i) {
+		logsec *= logsecmul;
+		unisec += unisecinc;
+
+		const core::Real l = logsec + unisec;
+		x = xtanx * l;
+		y = ytany * l;
+		z = uniform->position + (uniform->z * l);
+
+		GXHELPER(i)
+	}
+
+#undef GXHELPER
+
+	return partitions;
 }
