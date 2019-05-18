@@ -18,16 +18,16 @@ namespace physics {
         virtual void get_location(math::Vec3& l) const noexcept;
         virtual void set_location(const math::Vec3& l) noexcept;
         virtual void translate(const math::Vec3& t) noexcept;
-        virtual void local_x_translate(const core::Real t) noexcept;
-        virtual void local_y_translate(const core::Real t) noexcept;
-        virtual void local_z_translate(const core::Real t) noexcept;
-        virtual void global_rotate(const core::Real d, const math::Vec3& axis, const math::Vec3& location) noexcept;
-        virtual void global_rotate(const core::Real d, const math::Vec3& axis) noexcept;
-        virtual void local_rotate(const core::Real d, const math::Vec3& axis) noexcept;
-        virtual void local_x_rotate(const core::Real d) noexcept;
-        virtual void local_y_rotate(const core::Real d) noexcept;
-        virtual void local_z_rotate(const core::Real d) noexcept;
-        virtual void scale(const core::Real s) noexcept;
+        virtual void local_x_translate(core::Real t) noexcept;
+        virtual void local_y_translate(core::Real t) noexcept;
+        virtual void local_z_translate(core::Real t) noexcept;
+        virtual void global_rotate(core::Real d, const math::Vec3& axis, const math::Vec3& location) noexcept;
+        virtual void global_rotate(core::Real d, const math::Vec3& axis) noexcept;
+        virtual void local_rotate(core::Real d, const math::Vec3& axis) noexcept;
+        virtual void local_x_rotate(core::Real d) noexcept;
+        virtual void local_y_rotate(core::Real d) noexcept;
+        virtual void local_z_rotate(core::Real d) noexcept;
+        virtual void scale(core::Real s) noexcept;
         virtual void set_orientation(const math::Quat& q) noexcept;
     };
 }

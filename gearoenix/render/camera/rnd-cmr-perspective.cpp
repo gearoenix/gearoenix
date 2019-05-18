@@ -76,4 +76,5 @@ gearoenix::core::Real gearoenix::render::camera::Perspective::get_distance(const
 
 std::vector<gearoenix::math::Vec3[4]> gearoenix::render::camera::Perspective::get_cascaded_shadow_frustum_partitions() const
 {
+	return std::vector<gearoenix::math::Vec3[4]>();
 }
