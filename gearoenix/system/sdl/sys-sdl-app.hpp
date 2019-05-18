@@ -23,6 +23,7 @@ namespace render {
     }
 }
 namespace system {
+	struct Configuration;
     class Application {
     private:
 #ifdef GX_IN_WEB
@@ -31,6 +32,7 @@ namespace system {
         const static core::Real ROTATION_EPSILON;
         const static core::Real ZOOM_EPSILON;
 
+		std::shared_ptr<Configuration> config = nullptr;
         std::shared_ptr<render::engine::Engine> render_engine = nullptr;
         std::shared_ptr<core::Application> core_app = nullptr;
         std::shared_ptr<core::asset::Manager> astmgr = nullptr;
@@ -72,8 +74,10 @@ namespace system {
         std::shared_ptr<core::Application>& get_core_app() noexcept;
         const std::shared_ptr<render::engine::Engine>& get_render_engine() const noexcept;
         std::shared_ptr<render::engine::Engine>& get_render_engine() noexcept;
-        const std::shared_ptr<core::asset::Manager>& get_asset_manager() const noexcept;
-        std::shared_ptr<core::asset::Manager>& get_asset_manager() noexcept;
+		const std::shared_ptr<core::asset::Manager>& get_asset_manager() const noexcept;
+		std::shared_ptr<core::asset::Manager>& get_asset_manager() noexcept;
+		const Configuration& get_configuration() const noexcept;
+		Configuration& get_configuration() noexcept;
         core::Real get_window_ratio() const noexcept;
         unsigned int get_width() const noexcept;
         unsigned int get_height() const noexcept;

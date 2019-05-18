@@ -5,8 +5,7 @@
 #define GXPOSEPSILON 0.0001f
 #define GXNEGEPSILON -GXPOSEPSILON
 
-namespace gearoenix {
-namespace core {
+namespace gearoenix::core {
     typedef std::uint64_t Id;
     typedef std::uint8_t TypeId;
     typedef std::uint64_t Count;
@@ -28,6 +27,5 @@ namespace core {
             return false;
         }
     };
-}
 }
 #endif

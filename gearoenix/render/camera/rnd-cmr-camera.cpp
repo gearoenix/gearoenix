@@ -14,6 +14,7 @@
 gearoenix::render::camera::Camera::Camera(
     const core::Id my_id, const std::shared_ptr<engine::Engine>& e) noexcept
     : core::asset::Asset(my_id, core::asset::Type::CAMERA)
+	, e(e)
     , uniform(new Uniform)
     , frustum(new math::ProjectorFrustum(math::Mat4x4()))
     , uniform_buffers(new buffer::FramedUniform(sizeof(Uniform), e))
@@ -27,6 +28,7 @@ gearoenix::render::camera::Camera::Camera(
     const std::shared_ptr<system::stream::Stream>& f,
     const std::shared_ptr<engine::Engine>& e)
     : core::asset::Asset(my_id, core::asset::Type::CAMERA)
+	, e(e)
     , uniform(new Uniform)
     , frustum(new math::ProjectorFrustum(math::Mat4x4()))
     , uniform_buffers(new buffer::FramedUniform(sizeof(Uniform), e))

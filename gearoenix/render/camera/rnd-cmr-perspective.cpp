@@ -3,6 +3,7 @@
 #include "../../core/event/cr-ev-window-resize.hpp"
 #include "../../system/stream/sys-stm-stream.hpp"
 #include "../../system/sys-log.hpp"
+#include "../engine/rnd-eng-engine.hpp"
 #include "rnd-cmr-transformation.hpp"
 #include "rnd-cmr-uniform.hpp"
 #include <cmath>
@@ -76,5 +77,6 @@ gearoenix::core::Real gearoenix::render::camera::Perspective::get_distance(const
 
 std::vector<gearoenix::math::Vec3[4]> gearoenix::render::camera::Perspective::get_cascaded_shadow_frustum_partitions() const
 {
+	//e->get
 	return std::vector<gearoenix::math::Vec3[4]>();
 }

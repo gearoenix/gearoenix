@@ -419,6 +419,16 @@ std::shared_ptr<gearoenix::core::asset::Manager>& gearoenix::system::Application
     return astmgr;
 }
 
+const gearoenix::system::Configuration& gearoenix::system::Application::get_configuration() const noexcept
+{
+	return *config;
+}
+
+gearoenix::system::Configuration& gearoenix::system::Application::get_configuration() noexcept
+{
+	return *config;
+}
+
 gearoenix::core::Real gearoenix::system::Application::get_window_ratio() const noexcept
 {
     return screen_ratio;

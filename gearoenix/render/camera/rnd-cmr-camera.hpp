@@ -31,6 +31,7 @@ namespace render {
         struct Uniform;
         class Camera : public core::asset::Asset {
         protected:
+			const std::shared_ptr<engine::Engine> e;
             std::shared_ptr<Uniform> uniform;
             std::shared_ptr<math::ProjectorFrustum> frustum;
             std::shared_ptr<Transformation> transformation;
