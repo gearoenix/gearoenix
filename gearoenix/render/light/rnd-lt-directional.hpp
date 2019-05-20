@@ -19,10 +19,11 @@ namespace light {
         core::Real strength = 1.0f;
         math::Vec3 direction = math::Vec3(0.0f, 0.0f, -1.0f);
         core::Real reserved_1 = 0.0f;
-        math::Vec4 vps[GX_SHADOW_CASCADES_COUNT];
-        math::Vec4 vpbs[GX_SHADOW_CASCADES_COUNT];
+        math::Vec4 vps[GX_SHADOW_MAX_CASCADES_COUNT];
+        math::Vec4 vpbs[GX_SHADOW_MAX_CASCADES_COUNT];
     };
 
+	class CascadeInfo;
     class Directional : public Light {
     protected:
         math::Vec3 direction = math::Vec3(0.0f, 0.0f, -1.0f);
@@ -37,6 +38,7 @@ namespace light {
             const std::shared_ptr<engine::Engine>& e) noexcept;
         const math::Vec3& get_direction() const noexcept;
         void set_direction(const math::Vec3& dir) noexcept;
+		std::shared_ptr<CascadeInfo> create_cascades_info(const std::vector<math::Vec3[4]>& partitions) const noexcept;
     };
 }
 }

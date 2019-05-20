@@ -8,8 +8,9 @@ static std::shared_ptr<gearoenix::render::buffer::FramedUniform> null_uniforms;
 gearoenix::render::light::Light::Light(
     const core::Id my_id,
     const std::shared_ptr<system::stream::Stream>& f,
-    const std::shared_ptr<engine::Engine>&) noexcept
+    const std::shared_ptr<engine::Engine>& e) noexcept
     : core::asset::Asset(my_id, core::asset::Type::LIGHT)
+	, e(e)
 {
     f->read(color[0]);
     f->read(color[1]);
@@ -19,6 +20,7 @@ gearoenix::render::light::Light::Light(
 
 gearoenix::render::light::Light::Light(const core::Id my_id, const std::shared_ptr<engine::Engine>& e) noexcept
     : core::asset::Asset(my_id, core::asset::Type::LIGHT)
+	, e(e)
 {
 }
 

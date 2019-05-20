@@ -18,6 +18,7 @@ namespace render {
     namespace light {
         class Light : public core::asset::Asset {
         protected:
+			const std::shared_ptr<engine::Engine> e;
             bool enabled = true;
             bool has_shadow = false;
             math::Vec3 color = math::Vec3(1.0f, 1.0f, 1.0f);

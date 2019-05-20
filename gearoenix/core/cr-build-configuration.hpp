@@ -89,7 +89,7 @@
 #define GX_MAX_CONE_LIGHTS 8
 #define GX_MAX_CONE_LIGHTS_STR "8"
 #define GX_MAX_SHADOW_MAPS 6
-#define GX_SHADOW_CASCADES_COUNT 1
+#define GX_SHADOW_MAX_CASCADES_COUNT 1
 #if defined(GX_USE_OPENGL_ES2) || defined(GX_USE_OPENGL_ES3) || defined(GX_USE_OPENGL_33) || defined(GX_USE_OPENGL_43)
 #define GX_USE_OPENGL
 #endif

@@ -343,6 +343,8 @@ SET (GX_ENGINE_SRC
     "${GX_ENGINE_SRC_DIR}render/graph/tree/rnd-gr-tr-pbr.hpp"
     "${GX_ENGINE_SRC_DIR}render/graph/tree/rnd-gr-tr-tree.cpp"
     "${GX_ENGINE_SRC_DIR}render/graph/tree/rnd-gr-tr-tree.hpp"
+    "${GX_ENGINE_SRC_DIR}render/light/rnd-lt-cascade-info.hpp"
+    "${GX_ENGINE_SRC_DIR}render/light/rnd-lt-cascade-info.cpp"
     "${GX_ENGINE_SRC_DIR}render/light/rnd-lt-directional.cpp"
     "${GX_ENGINE_SRC_DIR}render/light/rnd-lt-directional.hpp"
     "${GX_ENGINE_SRC_DIR}render/light/rnd-lt-light.cpp"

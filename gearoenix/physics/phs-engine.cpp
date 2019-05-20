@@ -99,14 +99,7 @@ void gearoenix::physics::Engine::update_002_kernel(const unsigned int kernel_ind
                 if (!light.second->is_shadower()) continue;
                 const auto dir_light = std::dynamic_pointer_cast<render::light::Directional>(light.second);
                 if (dir_light == nullptr) continue;
-				GXDOTASK(
-					std::shared_ptr<render::light::CascadeInfo> & light_info = camera_light_info[dir_light];
-                    if (light_info == nullptr) {
-						//light_info = dir_light->create_cascades_info(camera.second);
-                    } else {
-                        //dir_light->update_cascades_info(light_info, camera.second);
-                    }
-                );
+				GXDOTASK(camera_light_info[dir_light] = dir_light->create_cascades_info(camera.second));
             }
         }
     }

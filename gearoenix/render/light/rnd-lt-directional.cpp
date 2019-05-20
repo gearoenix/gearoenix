@@ -26,3 +26,8 @@ void gearoenix::render::light::Directional::set_direction(const gearoenix::math:
 {
     direction = dir;
 }
+
+std::shared_ptr<gearoenix::render::light::CascadeInfo> gearoenix::render::light::Directional::create_cascades_info(const std::vector<math::Vec3[4]>& partitions) const noexcept
+{
+	return std::shared_ptr<CascadeInfo>();
+}
