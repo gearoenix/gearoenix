@@ -17,15 +17,15 @@ namespace math {
 
     private:
         std::vector<Point> points;
-        void create_smooth_nonoverlaping_blunt_closed();
+        void create_smooth_non_overlapping_blunt_closed();
 
     public:
         CubicBezierCurve2D();
-        CubicBezierCurve2D(const int points_count);
-        CubicBezierCurve2D(const int points_count, const bool smooth, const bool overlapable, const bool fast_curvable, const bool closed);
-        void normalize(const core::Real scale = 1.0f);
-        void set_point(const int index, const Point& p);
-        void render(std::uint32_t* pixels, const int img_width, const int img_height, const std::uint32_t color = 0XFFFFFFFF);
+        explicit CubicBezierCurve2D(int points_count);
+        CubicBezierCurve2D(int points_count, bool smooth, bool overlapable, bool fast_curvable, bool closed);
+        void normalize(core::Real scale = 1.0f);
+        void set_point(int index, const Point& p);
+        void render(std::uint32_t* pixels, int img_width, int img_height, std::uint32_t color = 0XFFFFFFFF);
     };
 }
 }

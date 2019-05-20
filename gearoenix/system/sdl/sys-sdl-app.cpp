@@ -24,6 +24,7 @@
 #include "../../vulkan/engine/vk-eng-engine.hpp"
 #endif
 #include "../sys-log.hpp"
+#include "../sys-configuration.hpp"
 #include <iostream>
 
 #ifdef GX_IN_WEB
@@ -86,11 +87,11 @@ void gearoenix::system::Application::create_window() noexcept
         static_cast<int>(win_height),
         flags);
     if (nullptr != window) {
-        GXLOGI("Best window created.");
+        GXLOGI("Best window created.")
         return;
     }
-    GXTODO; // support other opengl versions
-    GXLOGF("Can not create window with minimum requirements");
+    GXTODO // support other opengl versions
+    GXLOGF("Can not create window with minimum requirements")
 }
 
 void gearoenix::system::Application::create_context() noexcept
@@ -103,14 +104,14 @@ void gearoenix::system::Application::create_context() noexcept
 #ifdef GX_USE_OPENGL
     gl_context = SDL_GL_CreateContext(window);
     if (gl_context == nullptr)
-        GXUNEXPECTED;
+        GXUNEXPECTED
 #endif
 }
 
 int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_Event* e) noexcept
 {
     // It's gonna implement whenever needed and as much as needed.
-    Application* o = static_cast<Application*>(user_data);
+    auto* o = static_cast<Application*>(user_data);
     core::event::Event* event = nullptr;
     switch (e->type) {
     case SDL_APP_WILLENTERBACKGROUND:
@@ -227,17 +228,17 @@ int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_
             o->half_height_inversed = 2.0f / static_cast<core::Real>(o->win_height);
             break;
         default:
-            GXTODO;
+            GXTODO
             break;
         }
         break;
     default:
-        GXLOGE("Unhandled event " << e->type);
+        GXLOGE("Unhandled event " << e->type)
         break;
     }
     if (event != nullptr) {
         // TODO: new event system must be implemented
-        GXTODO;
+        GXTODO
         // o->render_engine->on_event(*event);
         //o->core_app->on_event(*event);
         delete event;
@@ -245,15 +246,11 @@ int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_
     return 1;
 }
 
-gearoenix::system::Application::Application() noexcept
-{
-}
-
 const std::shared_ptr<gearoenix::system::Application> gearoenix::system::Application::construct() noexcept
 {
     const std::shared_ptr<Application> result(new Application());
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_AUDIO) != 0) {
-        GXLOGF("Failed to initialize SDL: " << SDL_GetError());
+        GXLOGF("Failed to initialize SDL: " << SDL_GetError())
     }
 #ifdef GX_USE_OPENGL
     gl::Loader::load_library();
@@ -295,6 +292,7 @@ const std::shared_ptr<gearoenix::system::Application> gearoenix::system::Applica
     result->pre_x = result->convert_x_to_ratio(mx);
     result->pre_y = result->convert_y_to_ratio(my);
 
+    result->config = std::make_shared<Configuration>();
 #ifdef GX_USE_VULKAN
     if (nullptr == result->render_engine && result->supported_engine == render::engine::Type::VULKAN) {
         result->render_engine = new vulkan::Engine(this);
@@ -326,7 +324,7 @@ const std::shared_ptr<gearoenix::system::Application> gearoenix::system::Applica
 #endif
 
     if (result->render_engine == nullptr) {
-        GXLOGF("No suitable render engine found.");
+        GXLOGF("No suitable render engine found.")
     }
 
     result->astmgr = std::make_shared<core::asset::Manager>(result, GX_APP_DATA_NAME);

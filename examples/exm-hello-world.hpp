@@ -3,11 +3,7 @@
 #include <gearoenix/core/cr-application.hpp>
 #include <memory>
 
-namespace gearoenix {
-namespace physics {
-    class Transformation;
-}
-namespace render {
+namespace gearoenix::render {
     namespace engine {
         class Engine;
     }
@@ -22,7 +18,6 @@ namespace render {
         class Scene;
     }
 }
-}
 
 class GameApp : public gearoenix::core::Application {
 private:
@@ -35,10 +30,10 @@ private:
 public:
     /// This function must be like this
     GameApp(const std::shared_ptr<gearoenix::system::Application>& sys_app);
-    ~GameApp() override final;
+    ~GameApp() final;
     /// On every screen refresh this function is going to be called
-    void update() override final;
+    void update() final;
     /// Before terminationg everything in engine this function is going to be called
-    void terminate() override final;
+    void terminate() final;
 };
 #endif

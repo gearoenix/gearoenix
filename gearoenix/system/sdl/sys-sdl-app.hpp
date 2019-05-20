@@ -17,11 +17,9 @@ namespace core {
     }
     class Application;
 }
-namespace render {
-    namespace engine {
+namespace render::engine {
         class Engine;
     }
-}
 namespace system {
 	struct Configuration;
     class Application {
@@ -58,11 +56,11 @@ namespace system {
         void create_context() noexcept;
         static int SDLCALL event_receiver(void* user_data, SDL_Event* event) noexcept;
 
-        Application() noexcept;
+        Application() noexcept = default;
 
     public:
         static const std::shared_ptr<Application> construct() noexcept;
-        ~Application();
+        ~Application()noexcept;
         void execute(const std::shared_ptr<core::Application>& app) noexcept;
 
 #ifdef GX_IN_WEB
