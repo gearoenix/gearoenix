@@ -67,7 +67,7 @@ namespace render {
             const Type::Id scene_type_id;
             const std::shared_ptr<buffer::FramedUniform> uniform_buffers;
 
-            bool renderable = false;
+            bool enabled = false;
 
             Uniform uniform;
 
@@ -93,9 +93,9 @@ namespace render {
 
             virtual ~Scene();
 
-            void enable_rendering();
-            void disable_rendering();
-            bool is_renderable() const;
+            void enable();
+            void disable();
+            bool is_enabled() const;
 
 #define GXHELPER(x, c)                                              \
     void add_##x(const std::shared_ptr<c>& m);                      \

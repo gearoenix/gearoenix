@@ -41,7 +41,7 @@ void gearoenix::render::graph::tree::Pbr::record(const unsigned int kernel_index
     task_number = (task_number + 1) % kernels_count
     for (const std::pair<const core::Id, std::weak_ptr<scene::Scene>>& id_scene : scenes) {
         if (const std::shared_ptr<scene::Scene> scn = id_scene.second.lock()) {
-            if (!scn->is_renderable())
+            if (!scn->is_enabled())
                 continue;
             const std::map<core::Id, std::shared_ptr<camera::Camera>> cameras = scn->get_cameras();
             const std::map<core::Id, std::shared_ptr<light::Light>> lights = scn->get_lights();

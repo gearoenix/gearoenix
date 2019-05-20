@@ -24,7 +24,7 @@ void gearoenix::render::scene::Manager::get_gx3d(const core::Id mid, core::sync:
             const std::shared_ptr<system::stream::Stream>& file = cache.get_file();
             Scene** scnptr = new Scene*;
             const core::sync::EndCaller<core::sync::EndCallerIgnore> call([c, scnptr] {
-                (*scnptr)->enable_rendering();
+                (*scnptr)->enable();
                 delete scnptr;
             });
             const Type::Id t = file->read<Type::Id>();

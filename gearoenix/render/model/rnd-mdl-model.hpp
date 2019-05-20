@@ -34,6 +34,7 @@ namespace render {
             bool is_dynamic = true;
             bool has_shadow_caster = false;
             bool has_transparent = false;
+			bool enabled = true;
 
             Uniform uniform;
             math::Sphere occlusion_sphere = math::Sphere(math::Vec3(0.0f), 1.0f);
@@ -56,6 +57,9 @@ namespace render {
             virtual void update_uniform();
             void add_mesh(const std::shared_ptr<Mesh>& m);
             void add_child(const std::shared_ptr<Model>& c);
+			bool is_enabled() const noexcept;
+			void enable() noexcept;
+			void disable() noexcept;
 
             const std::map<core::Id, std::shared_ptr<Model>>& get_children() const;
             const std::map<core::Id, std::shared_ptr<Mesh>>& get_meshes() const;

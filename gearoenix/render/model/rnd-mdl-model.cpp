@@ -79,6 +79,21 @@ void gearoenix::render::model::Model::add_child(const std::shared_ptr<Model>&)
 {
 }
 
+bool gearoenix::render::model::Model::is_enabled() const noexcept
+{
+	return enabled;
+}
+
+void gearoenix::render::model::Model::enable() noexcept
+{
+	enabled = true;
+}
+
+void gearoenix::render::model::Model::disable() noexcept
+{
+	enabled = false;
+}
+
 //    //std::lock_guard<std::mutex> lg(locker);
 //    m.read(f);
 //    occrdss.read(f);

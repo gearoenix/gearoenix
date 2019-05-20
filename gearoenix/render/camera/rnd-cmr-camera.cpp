@@ -64,6 +64,21 @@ const std::shared_ptr<gearoenix::physics::Transformation> gearoenix::render::cam
     return transformation;
 }
 
+bool gearoenix::render::camera::Camera::is_enabled() const noexcept
+{
+	return enabled;
+}
+
+void gearoenix::render::camera::Camera::enable() noexcept
+{
+	enabled = true;
+}
+
+void gearoenix::render::camera::Camera::disable() noexcept
+{
+	enabled = false;
+}
+
 bool gearoenix::render::camera::Camera::in_sight(const gearoenix::math::Vec3& location, const core::Real radius) const noexcept
 {
     return frustum->check_intersection(location, radius);

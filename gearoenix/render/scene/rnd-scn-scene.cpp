@@ -91,19 +91,19 @@ gearoenix::render::scene::Scene::~Scene()
 {
 }
 
-void gearoenix::render::scene::Scene::enable_rendering()
+void gearoenix::render::scene::Scene::enable()
 {
-    renderable = true;
+    enabled = true;
 }
 
-void gearoenix::render::scene::Scene::disable_rendering()
+void gearoenix::render::scene::Scene::disable()
 {
-    renderable = false;
+    enabled = false;
 }
 
-bool gearoenix::render::scene::Scene::is_renderable() const
+bool gearoenix::render::scene::Scene::is_enabled() const
 {
-    return renderable;
+    return enabled;
 }
 
 void gearoenix::render::scene::Scene::add_camera(const std::shared_ptr<camera::Camera>& o)

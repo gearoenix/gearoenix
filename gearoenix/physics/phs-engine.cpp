@@ -26,30 +26,36 @@ void gearoenix::physics::Engine::update_001_kernel(const unsigned int kernel_ind
     }                                  \
     task_number = (task_number + 1) % kernels_count
     const std::map<core::Id, std::weak_ptr<render::scene::Scene>>& scenes = sysapp->get_asset_manager()->get_scene_manager()->get_scenes();
+	SceneCameraPartitions& cascaded_shadows_partitions = kernels_cascaded_shadows_partitions[kernel_index];
+	SceneCameraModelSet& kernel_visible_models = kernels_visible_models[kernel_index];
     for (const std::pair<const core::Id, std::weak_ptr<render::scene::Scene>>& is : scenes) {
         if (const std::shared_ptr<render::scene::Scene> scene = is.second.lock()) {
-            if(!scene->is_renderable()) continue;
+            if(!scene->is_enabled()) continue;
+			CameraPartitions& scene_cascaded_shadows_partitions = cascaded_shadows_partitions[scene];
+			CameraModelSet& scene_visible_models = kernel_visible_models[scene];
             GXDOTASK(scene->update_uniform());
             const std::map<core::Id, std::shared_ptr<render::camera::Camera>>& cameras = scene->get_cameras();
             const std::map<core::Id, std::shared_ptr<render::model::Model>>& models = scene->get_models();
             for (const std::pair<const core::Id, std::shared_ptr<render::camera::Camera>>& id_camera : cameras) {
                 const std::shared_ptr<render::camera::Camera>& camera = id_camera.second;
-                // TODO: renderable check for camera
+				if (!camera->is_enabled()) continue;
+				ModelSet& camera_visible_models = scene_visible_models[camera];
                 GXDOTASK(camera->update_uniform());
-                GXDOTASK(kernels_cascaded_shadows_partitions[kernel_index][scene][camera] = camera->get_cascaded_shadow_frustum_partitions());
+                GXDOTASK(scene_cascaded_shadows_partitions[camera] = camera->get_cascaded_shadow_frustum_partitions());
                 for (const std::pair<const core::Id, std::shared_ptr<render::model::Model>>& id_model : models) {
                     const std::shared_ptr<render::model::Model>& model = id_model.second;
-                    // TODO: renderable check model
+					if (!model->is_enabled()) continue;
                     GXDOTASK(
                         const math::Sphere& sphere = model->get_occlusion_sphere();
                         if (camera->in_sight(sphere.position, sphere.radius)) {
-                            kernels_visible_models[kernel_index][scene][camera].insert(model);
+                            camera_visible_models.insert(model);
                         });
                 }
             }
             for (const std::pair<const core::Id, std::shared_ptr<render::model::Model>>& id_model : models) {
-                // TODO: renderable check model
-                GXDOTASK(id_model.second->update_uniform());
+				const std::shared_ptr<render::model::Model>& model = id_model.second;
+				if (!model->is_enabled()) continue;
+                GXDOTASK(model->update_uniform());
             }
         }
     }
@@ -82,34 +88,24 @@ void gearoenix::physics::Engine::update_002_kernel(const unsigned int kernel_ind
     SceneCameraLightCascadeInfo &kernel_camera_light_info = kernels_cascaded_shadow_caster_data[kernel_index];
     for (const std::pair<const std::shared_ptr<render::scene::Scene>, CameraPartitions>& scene_partitions : cascaded_shadows_partitions) {
         const std::shared_ptr<render::scene::Scene> &scene = scene_partitions.first;
-        if (!scene->is_renderable()) continue;
+        if (!scene->is_enabled()) continue;
         const CameraPartitions &cameras = scene_partitions.second;
+		CameraLightCascadeInfo& scene_camera_light_info = kernel_camera_light_info[scene];
         for (const std::pair<const std::shared_ptr<render::camera::Camera>, Partitions> &camera: cameras) {
             const std::map<core::Id, std::shared_ptr<render::light::Light>> &lights = scene->get_lights();
+			LightCascadeInfo& camera_light_info = scene_camera_light_info[camera.first];
             for (const std::pair<const core::Id, std::shared_ptr<render::light::Light>> &light: lights) {
                 if (!light.second->is_enabled()) continue;
                 if (!light.second->is_shadower()) continue;
                 const auto dir_light = std::dynamic_pointer_cast<render::light::Directional>(light.second);
                 if (dir_light == nullptr) continue;
-                GXDOTASK(
-                        /// Following searches are for using less allocation, and std::shared_ptr constructor
-                        // TODO: improve
-                        const SceneCameraLightCascadeInfo::iterator &search1 = kernel_camera_light_info.find(scene);
-                        if(search1 == kernel_camera_light_info.end()) {
-                            // kernel_camera_light_info[scene][camera.first][dir_light] = dir_light->create_cascades_info(camera.second);
-                        } else {
-                            const CameraLightCascadeInfo::iterator &search2 = search1->second.find(camera.first);
-                            if (search2 == search1->second.end()) {
-                                // search1->second[camera.first][dir_light] = dir_light->create_cascades_info(camera.second);
-                            } else {
-                                const LightCascadeInfo::iterator &search3 = search2->second.find(dir_light);
-                                if (search3 == search2->second.end()) {
-                                    // search2->second[dir_light] = dir_light->create_cascades_info(camera.second);
-                                } else {
-                                    // dir_light->update_cascades_info(search3->second, camera.second);
-                                }
-                            }
-                        }
+				GXDOTASK(
+					std::shared_ptr<render::light::CascadeInfo> & light_info = camera_light_info[dir_light];
+                    if (light_info == nullptr) {
+						//light_info = dir_light->create_cascades_info(camera.second);
+                    } else {
+                        //dir_light->update_cascades_info(light_info, camera.second);
+                    }
                 );
             }
         }
