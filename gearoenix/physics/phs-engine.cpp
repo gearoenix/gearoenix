@@ -26,13 +26,13 @@ void gearoenix::physics::Engine::update_001_kernel(const unsigned int kernel_ind
     }                                  \
     task_number = (task_number + 1) % kernels_count
     const std::map<core::Id, std::weak_ptr<render::scene::Scene>>& scenes = sysapp->get_asset_manager()->get_scene_manager()->get_scenes();
-    SceneCameraPartitions& cascaded_shadows_partitions = kernels_cascaded_shadows_partitions[kernel_index];
+    SceneCameraPartitions& kernel_cascaded_shadows_partitions = kernels_cascaded_shadows_partitions[kernel_index];
     SceneCameraModelSet& kernel_visible_models = kernels_visible_models[kernel_index];
     for (const std::pair<const core::Id, std::weak_ptr<render::scene::Scene>>& is : scenes) {
         if (const std::shared_ptr<render::scene::Scene> scene = is.second.lock()) {
             if (!scene->is_enabled())
                 continue;
-            CameraPartitions& scene_cascaded_shadows_partitions = cascaded_shadows_partitions[scene];
+            CameraPartitions& scene_cascaded_shadows_partitions = kernel_cascaded_shadows_partitions[scene];
             CameraModelSet& scene_visible_models = kernel_visible_models[scene];
             GXDOTASK(scene->update_uniform());
             const std::map<core::Id, std::shared_ptr<render::camera::Camera>>& cameras = scene->get_cameras();
