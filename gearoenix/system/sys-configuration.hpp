@@ -4,8 +4,8 @@
 #include "../render/engine/rnd-eng-configuration.hpp"
 #include <string>
 namespace gearoenix::system {
-	struct Configuration {
-		render::engine::Configuration render_config;
-	};
+struct Configuration {
+    render::engine::Configuration render_config;
+};
 }
 #endif

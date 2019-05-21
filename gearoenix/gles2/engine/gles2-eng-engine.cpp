@@ -61,7 +61,7 @@ void gearoenix::gles2::engine::Engine::initialize() noexcept
 #endif
 }
 
-gearoenix::gles2::engine::Engine::Engine(system::Application *const sys_app) noexcept
+gearoenix::gles2::engine::Engine::Engine(system::Application* const sys_app) noexcept
     : render::engine::Engine(sys_app, render::engine::Type::OPENGL_ES2)
 {
     initialize();
@@ -77,12 +77,12 @@ std::shared_ptr<gearoenix::gles2::engine::Engine> gearoenix::gles2::engine::Engi
     return e;
 }
 
-gearoenix::gles2::engine::Engine::~Engine()noexcept
+gearoenix::gles2::engine::Engine::~Engine() noexcept
 {
     terminate();
 }
 
-void gearoenix::gles2::engine::Engine::update()noexcept
+void gearoenix::gles2::engine::Engine::update() noexcept
 {
     gl::Loader::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     render::engine::Engine::update();
@@ -126,7 +126,7 @@ void gearoenix::gles2::engine::Engine::update()noexcept
 #endif
 }
 
-void gearoenix::gles2::engine::Engine::terminate()noexcept
+void gearoenix::gles2::engine::Engine::terminate() noexcept
 {
     render::engine::Engine::terminate();
     //if (shadow_map_texture != nullptr) {
@@ -162,21 +162,21 @@ gearoenix::render::texture::Cube* gearoenix::gles2::engine::Engine::create_textu
     const render::texture::TextureFormat::Id f,
     const render::texture::SampleInfo s,
     const unsigned int aspect,
-    const core::sync::EndCaller<core::sync::EndCallerIgnore>& call)noexcept
+    const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
 {
     return new texture::Cube(id, std::static_pointer_cast<Engine>(sysapp->get_render_engine()), data, f, s, aspect, call);
 }
 
 void gearoenix::gles2::engine::Engine::submit(
-	const std::size_t,
-	const render::sync::Semaphore*const*const,
-	const std::size_t cmds_count,
-	const render::command::Buffer*const*const cmds,
-	const std::size_t,
-	const render::sync::Semaphore*const*const)noexcept
+    const std::size_t,
+    const render::sync::Semaphore* const* const,
+    const std::size_t cmds_count,
+    const render::command::Buffer* const* const cmds,
+    const std::size_t,
+    const render::sync::Semaphore* const* const) noexcept
 {
-	for (std::size_t i = 0; i < cmds_count; ++i)
-		static_cast<const command::Buffer*>(cmds[i])->play();
+    for (std::size_t i = 0; i < cmds_count; ++i)
+        static_cast<const command::Buffer*>(cmds[i])->play();
 }
 
 //gearoenix::render::texture::Texture2D* gearoenix::gles2::engine::Engine::create_texture_2d(core::Id id, system::stream::Stream* file, core::sync::EndCaller<core::sync::EndCallerIgnore> c)

@@ -4,19 +4,19 @@
 #include <memory>
 
 namespace gearoenix::render {
-    namespace engine {
-        class Engine;
-    }
-    namespace camera {
-        class Perspective;
-        class Transformation;
-    }
-    namespace model {
-        class Model;
-    }
-    namespace scene {
-        class Scene;
-    }
+namespace engine {
+    class Engine;
+}
+namespace camera {
+    class Perspective;
+    class Transformation;
+}
+namespace model {
+    class Model;
+}
+namespace scene {
+    class Scene;
+}
 }
 
 class GameApp : public gearoenix::core::Application {

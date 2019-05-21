@@ -48,7 +48,7 @@ namespace render {
             std::shared_ptr<buffer::Uniform> material_uniform_buffer = nullptr;
             std::shared_ptr<buffer::Uniform> node_uniform_buffer = nullptr;
 
-            std::shared_ptr<mesh::Mesh> msh = nullptr;
+            const mesh::Mesh* msh = nullptr;
 
             std::shared_ptr<texture::Texture2D> color = nullptr;
             std::shared_ptr<texture::Texture2D> metallic_roughness = nullptr;
@@ -56,8 +56,8 @@ namespace render {
             std::shared_ptr<texture::Texture2D> emissive = nullptr;
 
         public:
-            virtual ~ResourceSet();
-#define GXHELPER(c, cc) virtual void set_##c(const std::shared_ptr<c::cc>& o)
+            virtual ~ResourceSet() = default;
+#define GXHELPER(c, cc) virtual void set_##c(const c::cc* o) noexcept
             GXHELPER(scene, Scene);
             GXHELPER(camera, Camera);
             GXHELPER(light, Light);

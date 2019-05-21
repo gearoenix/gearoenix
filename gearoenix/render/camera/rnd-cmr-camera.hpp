@@ -31,8 +31,8 @@ namespace render {
         struct Uniform;
         class Camera : public core::asset::Asset {
         protected:
-			bool enabled = true;
-			const std::shared_ptr<engine::Engine> e;
+            bool enabled = true;
+            const std::shared_ptr<engine::Engine> e;
             std::shared_ptr<Uniform> uniform;
             std::shared_ptr<math::ProjectorFrustum> frustum;
             std::shared_ptr<Transformation> transformation;
@@ -49,9 +49,9 @@ namespace render {
         public:
             const std::shared_ptr<buffer::FramedUniform>& get_uniform_buffers() const;
             const std::shared_ptr<physics::Transformation> get_transformation() const noexcept;
-			bool is_enabled() const noexcept;
-			void enable() noexcept;
-			void disable() noexcept;
+            bool is_enabled() const noexcept;
+            void enable() noexcept;
+            void disable() noexcept;
             bool in_sight(const math::Vec3& location, core::Real radius) const noexcept;
             virtual void update_uniform();
             virtual void set_aspect_ratio(core::Real ratio);

@@ -10,7 +10,7 @@ gearoenix::render::light::Light::Light(
     const std::shared_ptr<system::stream::Stream>& f,
     const std::shared_ptr<engine::Engine>& e) noexcept
     : core::asset::Asset(my_id, core::asset::Type::LIGHT)
-	, e(e)
+    , e(e)
 {
     f->read(color[0]);
     f->read(color[1]);
@@ -20,7 +20,7 @@ gearoenix::render::light::Light::Light(
 
 gearoenix::render::light::Light::Light(const core::Id my_id, const std::shared_ptr<engine::Engine>& e) noexcept
     : core::asset::Asset(my_id, core::asset::Type::LIGHT)
-	, e(e)
+    , e(e)
 {
 }
 

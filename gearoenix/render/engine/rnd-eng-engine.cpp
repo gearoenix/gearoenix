@@ -15,7 +15,7 @@
 #include "../scene/rnd-scn-scene.hpp"
 #include <thread>
 
-gearoenix::render::engine::Engine::Engine(system::Application *const system_application, const Type::Id engine_type_id) noexcept
+gearoenix::render::engine::Engine::Engine(system::Application* const system_application, const Type::Id engine_type_id) noexcept
     : engine_type_id(engine_type_id)
     , sysapp(system_application)
     , fun_loader(new core::FunctionLoader())
@@ -45,7 +45,7 @@ void gearoenix::render::engine::Engine::update() noexcept
     kernels->do_steps();
 }
 
-void gearoenix::render::engine::Engine::terminate()noexcept
+void gearoenix::render::engine::Engine::terminate() noexcept
 {
     GXDELETE(physics_engine)
     GXDELETE(kernels)
@@ -55,26 +55,26 @@ void gearoenix::render::engine::Engine::terminate()noexcept
     GXDELETE(command_manager)
     GXDELETE(sampler_manager)
     GXDELETE(buffer_manager)
-	if (fun_loader != nullptr) {
-		fun_loader->unload();
-		delete fun_loader;
-		fun_loader = nullptr;
-	}
+    if (fun_loader != nullptr) {
+        fun_loader->unload();
+        delete fun_loader;
+        fun_loader = nullptr;
+    }
 }
 
-void gearoenix::render::engine::Engine::set_render_tree(graph::tree::Tree * const tree) noexcept
+void gearoenix::render::engine::Engine::set_render_tree(graph::tree::Tree* const tree) noexcept
 {
     render_tree = tree;
 }
 
 const gearoenix::system::Application* gearoenix::render::engine::Engine::get_system_application() const noexcept
 {
-	return sysapp;
+    return sysapp;
 }
 
 gearoenix::system::Application* gearoenix::render::engine::Engine::get_system_application() noexcept
 {
-	return sysapp;
+    return sysapp;
 }
 
 const gearoenix::physics::Engine* gearoenix::render::engine::Engine::get_physics_engine() const noexcept
@@ -84,17 +84,17 @@ const gearoenix::physics::Engine* gearoenix::render::engine::Engine::get_physics
 
 gearoenix::physics::Engine* gearoenix::render::engine::Engine::get_physics_engine() noexcept
 {
-	return physics_engine;
+    return physics_engine;
 }
 
 const gearoenix::render::pipeline::Manager* gearoenix::render::engine::Engine::get_pipeline_manager() const noexcept
 {
-	return pipeline_manager;
+    return pipeline_manager;
 }
 
 gearoenix::render::pipeline::Manager* gearoenix::render::engine::Engine::get_pipeline_manager() noexcept
 {
-	return pipeline_manager;
+    return pipeline_manager;
 }
 
 const gearoenix::render::command::Manager* gearoenix::render::engine::Engine::get_command_manager() const noexcept
@@ -104,7 +104,7 @@ const gearoenix::render::command::Manager* gearoenix::render::engine::Engine::ge
 
 gearoenix::render::command::Manager* gearoenix::render::engine::Engine::get_command_manager() noexcept
 {
-	return command_manager;
+    return command_manager;
 }
 
 const gearoenix::render::buffer::Manager* gearoenix::render::engine::Engine::get_buffer_manager() const noexcept
@@ -114,7 +114,7 @@ const gearoenix::render::buffer::Manager* gearoenix::render::engine::Engine::get
 
 gearoenix::render::buffer::Manager* gearoenix::render::engine::Engine::get_buffer_manager() noexcept
 {
-	return buffer_manager;
+    return buffer_manager;
 }
 
 const gearoenix::core::sync::KernelWorker* gearoenix::render::engine::Engine::get_kernels() const noexcept
@@ -124,7 +124,7 @@ const gearoenix::core::sync::KernelWorker* gearoenix::render::engine::Engine::ge
 
 gearoenix::core::sync::KernelWorker* gearoenix::render::engine::Engine::get_kernels() noexcept
 {
-	return kernels;
+    return kernels;
 }
 
 const gearoenix::core::FunctionLoader* gearoenix::render::engine::Engine::get_function_loader() const noexcept
@@ -134,7 +134,7 @@ const gearoenix::core::FunctionLoader* gearoenix::render::engine::Engine::get_fu
 
 gearoenix::core::FunctionLoader* gearoenix::render::engine::Engine::get_function_loader() noexcept
 {
-	return fun_loader;
+    return fun_loader;
 }
 
 gearoenix::render::engine::Type::Id gearoenix::render::engine::Engine::get_engine_type_id() const noexcept
@@ -149,7 +149,7 @@ const gearoenix::render::texture::Target* gearoenix::render::engine::Engine::get
 
 gearoenix::render::texture::Target* gearoenix::render::engine::Engine::get_main_render_target() noexcept
 {
-	return main_render_target;
+    return main_render_target;
 }
 
 unsigned int gearoenix::render::engine::Engine::get_frame_number() const noexcept

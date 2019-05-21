@@ -26,7 +26,7 @@ void gearoenix::gles2::command::Buffer::bind(const std::shared_ptr<render::pipel
     render::command::Buffer::bind(r);
 }
 
-void gearoenix::gles2::command::Buffer::bind(render::texture::Target*const t)
+void gearoenix::gles2::command::Buffer::bind(render::texture::Target* const t)
 {
     render::command::Buffer::bind(t);
 }

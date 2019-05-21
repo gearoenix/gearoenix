@@ -81,17 +81,17 @@ void gearoenix::render::model::Model::add_child(const std::shared_ptr<Model>&)
 
 bool gearoenix::render::model::Model::is_enabled() const noexcept
 {
-	return enabled;
+    return enabled;
 }
 
 void gearoenix::render::model::Model::enable() noexcept
 {
-	enabled = true;
+    enabled = true;
 }
 
 void gearoenix::render::model::Model::disable() noexcept
 {
-	enabled = false;
+    enabled = false;
 }
 
 //    //std::lock_guard<std::mutex> lg(locker);

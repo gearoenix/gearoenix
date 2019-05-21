@@ -45,9 +45,10 @@ namespace physics {
         using LightCascadeInfo = std::map<render::light::Directional*, render::light::CascadeInfo*>;
         using CameraLightCascadeInfo = std::map<render::camera::Camera*, LightCascadeInfo>;
         using SceneCameraLightCascadeInfo = std::map<std::shared_ptr<render::scene::Scene>, CameraLightCascadeInfo>;
+
     private:
-        system::Application *const sysapp;
-        core::sync::KernelWorker *const kernels;
+        system::Application* const sysapp;
+        core::sync::KernelWorker* const kernels;
         // if animation return true on its apply its gonna be deleted
         std::map<core::Id, std::shared_ptr<animation::Animation>> animations;
         std::vector<SceneCameraModelSet> kernels_visible_models;
@@ -77,7 +78,7 @@ namespace physics {
         void update_002_receiver() noexcept;
 
     public:
-        Engine(system::Application* sysapp, core::sync::KernelWorker * kernels) noexcept;
+        Engine(system::Application* sysapp, core::sync::KernelWorker* kernels) noexcept;
         void add_animation(const std::shared_ptr<animation::Animation>& a) noexcept;
         void remove_animation(const std::shared_ptr<animation::Animation>& a) noexcept;
         void remove_animation(core::Id a) noexcept;

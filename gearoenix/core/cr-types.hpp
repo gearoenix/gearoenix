@@ -6,26 +6,26 @@
 #define GXNEGEPSILON -GXPOSEPSILON
 
 namespace gearoenix::core {
-    typedef std::uint64_t Id;
-    typedef std::uint8_t TypeId;
-    typedef std::uint64_t Count;
-    typedef std::int64_t Offset;
-    typedef float Real;
+typedef std::uint64_t Id;
+typedef std::uint8_t TypeId;
+typedef std::uint64_t Count;
+typedef std::int64_t Offset;
+typedef float Real;
 
-    template <class T>
-    struct weak_less {
-        constexpr bool operator()(const T& lhs, const T& rhs) const
-        {
-            if (auto lhs_l = lhs.lock()) {
-                if (auto rhs_l = rhs.lock()) {
-                    return lhs_l.get() < rhs_l.get();
-                }
-                return false;
-            } else if (auto rhs_l = rhs.lock()) {
-                return true;
+template <class T>
+struct weak_less {
+    constexpr bool operator()(const T& lhs, const T& rhs) const
+    {
+        if (auto lhs_l = lhs.lock()) {
+            if (auto rhs_l = rhs.lock()) {
+                return lhs_l.get() < rhs_l.get();
             }
             return false;
+        } else if (auto rhs_l = rhs.lock()) {
+            return true;
         }
-    };
+        return false;
+    }
+};
 }
 #endif

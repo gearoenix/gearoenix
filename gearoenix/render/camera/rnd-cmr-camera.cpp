@@ -14,7 +14,7 @@
 gearoenix::render::camera::Camera::Camera(
     const core::Id my_id, const std::shared_ptr<engine::Engine>& e) noexcept
     : core::asset::Asset(my_id, core::asset::Type::CAMERA)
-	, e(e)
+    , e(e)
     , uniform(new Uniform)
     , frustum(new math::ProjectorFrustum(math::Mat4x4()))
     , uniform_buffers(new buffer::FramedUniform(sizeof(Uniform), e))
@@ -28,7 +28,7 @@ gearoenix::render::camera::Camera::Camera(
     const std::shared_ptr<system::stream::Stream>& f,
     const std::shared_ptr<engine::Engine>& e)
     : core::asset::Asset(my_id, core::asset::Type::CAMERA)
-	, e(e)
+    , e(e)
     , uniform(new Uniform)
     , frustum(new math::ProjectorFrustum(math::Mat4x4()))
     , uniform_buffers(new buffer::FramedUniform(sizeof(Uniform), e))
@@ -66,17 +66,17 @@ const std::shared_ptr<gearoenix::physics::Transformation> gearoenix::render::cam
 
 bool gearoenix::render::camera::Camera::is_enabled() const noexcept
 {
-	return enabled;
+    return enabled;
 }
 
 void gearoenix::render::camera::Camera::enable() noexcept
 {
-	enabled = true;
+    enabled = true;
 }
 
 void gearoenix::render::camera::Camera::disable() noexcept
 {
-	enabled = false;
+    enabled = false;
 }
 
 bool gearoenix::render::camera::Camera::in_sight(const gearoenix::math::Vec3& location, const core::Real radius) const noexcept

@@ -23,8 +23,8 @@
 #if defined(GX_USE_VULKAN)
 #include "../../vulkan/engine/vk-eng-engine.hpp"
 #endif
-#include "../sys-log.hpp"
 #include "../sys-configuration.hpp"
+#include "../sys-log.hpp"
 #include <iostream>
 
 #ifdef GX_IN_WEB
@@ -91,7 +91,7 @@ void gearoenix::system::Application::create_window() noexcept
         return;
     }
     GXTODO // support other opengl versions
-    GXLOGF("Can not create window with minimum requirements")
+        GXLOGF("Can not create window with minimum requirements")
 }
 
 void gearoenix::system::Application::create_context() noexcept
@@ -418,12 +418,12 @@ std::shared_ptr<gearoenix::core::asset::Manager>& gearoenix::system::Application
 
 const gearoenix::system::Configuration& gearoenix::system::Application::get_configuration() const noexcept
 {
-	return *config;
+    return *config;
 }
 
 gearoenix::system::Configuration& gearoenix::system::Application::get_configuration() noexcept
 {
-	return *config;
+    return *config;
 }
 
 gearoenix::core::Real gearoenix::system::Application::get_window_ratio() const noexcept

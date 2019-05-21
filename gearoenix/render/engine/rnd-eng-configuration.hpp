@@ -4,8 +4,8 @@
 #include <cstdint>
 
 namespace gearoenix::render::engine {
-    struct Configuration {
-        std::int8_t shadow_cascades_count = GX_SHADOW_MAX_CASCADES_COUNT;
-    };
+struct Configuration {
+    std::int8_t shadow_cascades_count = GX_SHADOW_MAX_CASCADES_COUNT;
+};
 }
 #endif
