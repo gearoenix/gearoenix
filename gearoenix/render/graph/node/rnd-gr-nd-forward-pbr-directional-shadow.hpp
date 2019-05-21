@@ -82,14 +82,14 @@ namespace render {
 
                 const std::shared_ptr<sync::Semaphore>& get_semaphore(const unsigned int frame_number) override final;
                 /// This will be called at the start of each frame
-                void update();
+                void update() noexcept;
                 /// Multithreaded rendering happens in here
                 void record(
-                    const std::shared_ptr<scene::Scene>& s,
-                    const std::shared_ptr<camera::Camera>& c,
-                    const std::shared_ptr<light::Directional>& l,
-                    const std::shared_ptr<model::Model>& m,
-                    const unsigned int kernel_index);
+					const scene::Scene* s,
+					const camera::Camera* c,
+					const light::Directional* l,
+					const model::Model* m,
+					unsigned int kernel_index) noexcept;
                 /// This will be called at the end of each frame for pushing jobs to GPU
                 void submit();
             };

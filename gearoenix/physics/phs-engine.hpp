@@ -35,19 +35,19 @@ namespace physics {
     }
     class Engine {
     public:
-        using ModelSet = std::set<std::shared_ptr<render::model::Model>>;
-        using CameraModelSet = std::map<std::shared_ptr<render::camera::Camera>, ModelSet>;
+        using ModelSet = std::set<render::model::Model*>;
+        using CameraModelSet = std::map<render::camera::Camera*, ModelSet>;
         using SceneCameraModelSet = std::map<std::shared_ptr<render::scene::Scene>, CameraModelSet>;
         using Partition = math::Vec3[4];
         using Partitions = std::vector<Partition>;
-        using CameraPartitions = std::map<std::shared_ptr<render::camera::Camera>, Partitions>;
+        using CameraPartitions = std::map<render::camera::Camera*, Partitions>;
         using SceneCameraPartitions = std::map<std::shared_ptr<render::scene::Scene>, CameraPartitions>;
-        using LightCascadeInfo = std::map<std::shared_ptr<render::light::Directional>, std::shared_ptr<render::light::CascadeInfo>>;
-        using CameraLightCascadeInfo = std::map<std::shared_ptr<render::camera::Camera>, LightCascadeInfo>;
+        using LightCascadeInfo = std::map<render::light::Directional*, render::light::CascadeInfo*>;
+        using CameraLightCascadeInfo = std::map<render::camera::Camera*, LightCascadeInfo>;
         using SceneCameraLightCascadeInfo = std::map<std::shared_ptr<render::scene::Scene>, CameraLightCascadeInfo>;
     private:
-        const std::shared_ptr<system::Application> sysapp;
-        const std::shared_ptr<core::sync::KernelWorker> kernels;
+        system::Application *const sysapp;
+        core::sync::KernelWorker *const kernels;
         // if animation return true on its apply its gonna be deleted
         std::map<core::Id, std::shared_ptr<animation::Animation>> animations;
         std::vector<SceneCameraModelSet> kernels_visible_models;
@@ -77,7 +77,7 @@ namespace physics {
         void update_002_receiver() noexcept;
 
     public:
-        Engine(std::shared_ptr<system::Application> sysapp, std::shared_ptr<core::sync::KernelWorker> kernels) noexcept;
+        Engine(system::Application* sysapp, core::sync::KernelWorker * kernels) noexcept;
         void add_animation(const std::shared_ptr<animation::Animation>& a) noexcept;
         void remove_animation(const std::shared_ptr<animation::Animation>& a) noexcept;
         void remove_animation(core::Id a) noexcept;

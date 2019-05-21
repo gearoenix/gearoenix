@@ -18,4 +18,5 @@
 #define GXSETARRZ(x) std::memset((x), 0, sizeof((x)))
 #define GX_GETTER_BUILDER(x) \
     decltype(x) get_##x() const { return x; }
+#define GXDELETE(x) if((x) != nullptr) { delete (x); (x) = nullptr; }
 #endif

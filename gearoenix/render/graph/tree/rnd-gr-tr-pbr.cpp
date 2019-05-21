@@ -28,43 +28,38 @@ void gearoenix::render::graph::tree::Pbr::record(const unsigned int kernel_index
 {
     const unsigned int kernels_count = e->get_kernels()->get_threads_count();
     unsigned int task_number = 0;
-    const std::shared_ptr<system::Application>& sysapp = e->get_system_application();
+    const system::Application* sysapp = e->get_system_application();
     const std::shared_ptr<core::asset::Manager>& astmgr = sysapp->get_asset_manager();
     const std::shared_ptr<scene::Manager>& scnmgr = astmgr->get_scene_manager();
-    const std::map<core::Id, std::weak_ptr<scene::Scene>>& scenes = scnmgr->get_scenes();
-    std::map<std::shared_ptr<scene::Scene>, std::map<std::shared_ptr<camera::Camera>, std::set<std::shared_ptr<model::Model>>>>& visible_models = e->get_physics_engine()->get_visible_models();
+    const physics::Engine::SceneCameraModelSet& visible_models = e->get_physics_engine()->get_visible_models();
     unsigned int scene_number = 0;
 #define GXDOTASK(expr)                 \
     if (task_number == kernel_index) { \
         expr;                          \
     }                                  \
     task_number = (task_number + 1) % kernels_count
-    for (const std::pair<const core::Id, std::weak_ptr<scene::Scene>>& id_scene : scenes) {
-        if (const std::shared_ptr<scene::Scene> scn = id_scene.second.lock()) {
-            if (!scn->is_enabled())
-                continue;
-            const std::map<core::Id, std::shared_ptr<camera::Camera>> cameras = scn->get_cameras();
-            const std::map<core::Id, std::shared_ptr<light::Light>> lights = scn->get_lights();
-            for (const std::pair<const core::Id, std::shared_ptr<camera::Camera>>& id_camera : cameras) {
-                const std::shared_ptr<camera::Camera>& cam = id_camera.second;
-                const std::set<std::shared_ptr<model::Model>>& models = visible_models[scn][cam];
-                for (const std::pair<const core::Id, std::shared_ptr<light::Light>>& id_light : lights) {
-                    if (!id_light.second->is_shadower())
-                        continue;
-                    const std::shared_ptr<light::Directional> dirlt = std::dynamic_pointer_cast<light::Directional>(id_light.second);
-                    if (dirlt != nullptr) {
-                        for (const std::shared_ptr<model::Model>& model : models) {
-                            GXDOTASK(fwddirshd->record(scn, cam, dirlt, model, kernel_index));
-                        }
-                        continue; /// This is for future
-                    }
-                    // const std::shared_ptr<light::Point> pntlt = std::dynamic_pointer_cast<light::Point>(id_light.second);
-                    /// like ...
-                }
-            }
-            ++scene_number;
-        }
-    }
+	for (const std::pair<std::shared_ptr<scene::Scene>, physics::Engine::CameraModelSet>& scene_camera : visible_models) {
+		const std::shared_ptr<scene::Scene> &scn = scene_camera.first;
+		const std::map<core::Id, std::shared_ptr<light::Light>> lights = scn->get_lights();
+		for (const std::pair<camera::Camera*const, physics::Engine::ModelSet>& camera_models : scene_camera.second) {
+			const camera::Camera* const cam = camera_models.first;
+			const std::set<model::Model*>& models = camera_models.second;
+			for (const std::pair<const core::Id, std::shared_ptr<light::Light>>& id_light : lights) {
+				if (!id_light.second->is_shadower())
+					continue;
+				const std::shared_ptr<light::Directional> dirlt = std::dynamic_pointer_cast<light::Directional>(id_light.second);
+				if (dirlt != nullptr) {
+					for (const model::Model*const model : models) {
+						GXDOTASK(fwddirshd->record(scn, cam, dirlt, model, kernel_index));
+					}
+					continue; /// This is for future
+				}
+				// const std::shared_ptr<light::Point> pntlt = std::dynamic_pointer_cast<light::Point>(id_light.second);
+				/// like ...
+			}
+		}
+		++scene_number;
+	}
 #undef GXDOTASK
 }
 

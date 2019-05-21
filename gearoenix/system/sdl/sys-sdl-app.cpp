@@ -319,7 +319,7 @@ const std::shared_ptr<gearoenix::system::Application> gearoenix::system::Applica
 
 #ifdef GX_USE_OPENGL_ES2
     if (nullptr == result->render_engine && result->supported_engine == render::engine::Type::OPENGL_ES2) {
-        result->render_engine = gles2::engine::Engine::construct(result);
+        result->render_engine = gles2::engine::Engine::construct(result.get());
     }
 #endif
 
@@ -374,7 +374,6 @@ void gearoenix::system::Application::main_loop()
 }
 core_app->terminate();
 core_app = nullptr;
-render_engine->terminate();
 render_engine = nullptr;
 astmgr = nullptr;
 SDL_DelEventWatch(event_receiver, this);

@@ -44,7 +44,7 @@ namespace render {
                 const std::shared_ptr<engine::Engine> e;
                 std::vector<std::shared_ptr<texture::Texture>> input_textures;
                 std::vector<std::shared_ptr<texture::Texture>> output_textures;
-                std::shared_ptr<texture::Target> render_target = nullptr;
+                texture::Target * render_target = nullptr;
                 std::shared_ptr<pipeline::Pipeline> render_pipeline = nullptr;
                 Node(
                     const std::shared_ptr<engine::Engine>& e,
@@ -58,7 +58,7 @@ namespace render {
             public:
                 virtual ~Node();
                 virtual void set_input_texture(const std::shared_ptr<texture::Texture>& t, const unsigned int index);
-                virtual void set_render_target(const std::shared_ptr<texture::Target>& t);
+                virtual void set_render_target(texture::Target * t);
                 virtual const std::shared_ptr<sync::Semaphore>& get_semaphore(const unsigned int frame_number) = 0;
             };
         }

@@ -50,8 +50,8 @@ GameApp::GameApp(const std::shared_ptr<gearoenix::system::Application>& sys_app)
     GxEndCaller<GxScene> scncall([endcall](std::shared_ptr<GxScene>) {});
     GxEndCaller<GxMesh> mshcall([endcall](std::shared_ptr<GxMesh>) {});
     GxEndCaller<GxModel> mdlcall([endcall](std::shared_ptr<GxModel>) {});
-
-    rnd_eng->set_render_tree(std::shared_ptr<GxGrTree>(new GxGrPbr(rnd_eng, endcall)));
+	/// TODO: keep the render tree pointer and delete it later
+    rnd_eng->set_render_tree(new GxGrPbr(rnd_eng, endcall));
     const std::shared_ptr<gearoenix::core::asset::Manager>& astmgr = sys_app->get_asset_manager();
     scn = astmgr->get_scene_manager()->create<GxScene>(scncall);
 

@@ -62,7 +62,7 @@ void gearoenix::render::mesh::Mesh::set_vertices(
     const core::Real r,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
 {
-    const std::shared_ptr<buffer::Manager>& bufmgr = e->get_buffer_manager();
+    buffer::Manager* bufmgr = e->get_buffer_manager();
     vertex_buffer = bufmgr->create_static(vertices, c);
     index_buffer = bufmgr->create_static(indices, c);
     radius = r;

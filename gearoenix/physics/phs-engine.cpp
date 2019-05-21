@@ -39,16 +39,16 @@ void gearoenix::physics::Engine::update_001_kernel(const unsigned int kernel_ind
             for (const std::pair<const core::Id, std::shared_ptr<render::camera::Camera>>& id_camera : cameras) {
                 const std::shared_ptr<render::camera::Camera>& camera = id_camera.second;
 				if (!camera->is_enabled()) continue;
-				ModelSet& camera_visible_models = scene_visible_models[camera];
+				ModelSet& camera_visible_models = scene_visible_models[camera.get()];
                 GXDOTASK(camera->update_uniform());
-                GXDOTASK(scene_cascaded_shadows_partitions[camera] = camera->get_cascaded_shadow_frustum_partitions());
+                GXDOTASK(scene_cascaded_shadows_partitions[camera.get()] = camera->get_cascaded_shadow_frustum_partitions());
                 for (const std::pair<const core::Id, std::shared_ptr<render::model::Model>>& id_model : models) {
                     const std::shared_ptr<render::model::Model>& model = id_model.second;
 					if (!model->is_enabled()) continue;
                     GXDOTASK(
                         const math::Sphere& sphere = model->get_occlusion_sphere();
                         if (camera->in_sight(sphere.position, sphere.radius)) {
-                            camera_visible_models.insert(model);
+                            camera_visible_models.insert(model.get());
                         });
                 }
             }
@@ -91,7 +91,7 @@ void gearoenix::physics::Engine::update_002_kernel(const unsigned int kernel_ind
         if (!scene->is_enabled()) continue;
         const CameraPartitions &cameras = scene_partitions.second;
 		CameraLightCascadeInfo& scene_camera_light_info = kernel_camera_light_info[scene];
-        for (const std::pair<const std::shared_ptr<render::camera::Camera>, Partitions> &camera: cameras) {
+        for (const std::pair<render::camera::Camera*const, Partitions> &camera: cameras) {
             const std::map<core::Id, std::shared_ptr<render::light::Light>> &lights = scene->get_lights();
 			LightCascadeInfo& camera_light_info = scene_camera_light_info[camera.first];
             for (const std::pair<const core::Id, std::shared_ptr<render::light::Light>> &light: lights) {
@@ -99,7 +99,7 @@ void gearoenix::physics::Engine::update_002_kernel(const unsigned int kernel_ind
                 if (!light.second->is_shadower()) continue;
                 const auto dir_light = std::dynamic_pointer_cast<render::light::Directional>(light.second);
                 if (dir_light == nullptr) continue;
-				GXDOTASK(camera_light_info[dir_light] = dir_light->create_cascades_info(camera.second));
+				//GXDOTASK(camera_light_info[dir_light.get()] = dir_light->create_cascades_info(camera.second));
             }
         }
     }
@@ -112,7 +112,7 @@ void gearoenix::physics::Engine::update_002_receiver()noexcept
     for (SceneCameraLightCascadeInfo& k : kernels_cascaded_shadow_caster_data) {
         for (std::pair<const std::shared_ptr<render::scene::Scene>, CameraLightCascadeInfo>& s : k) {
             CameraLightCascadeInfo &scene_info = cascaded_shadow_caster_data[s.first];
-            for (std::pair<const std::shared_ptr<render::camera::Camera>, LightCascadeInfo>& c : s.second) {
+            for (std::pair<render::camera::Camera* const, LightCascadeInfo>& c : s.second) {
                 scene_info[c.first].merge(c.second);
             }
         }
@@ -120,9 +120,9 @@ void gearoenix::physics::Engine::update_002_receiver()noexcept
     }
 }
 
-gearoenix::physics::Engine::Engine(std::shared_ptr<system::Application> sysapp, std::shared_ptr<core::sync::KernelWorker> kernels) noexcept
-    : sysapp(std::move(sysapp))
-    , kernels(std::move(kernels))
+gearoenix::physics::Engine::Engine(system::Application *const sysapp, core::sync::KernelWorker *const kernels) noexcept
+    : sysapp(sysapp)
+    , kernels(kernels)
         , kernels_visible_models(this->kernels->get_threads_count())
         , kernels_cascaded_shadows_partitions(this->kernels->get_threads_count())
         , kernels_cascaded_shadow_caster_data(this->kernels->get_threads_count())

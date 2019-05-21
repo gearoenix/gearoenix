@@ -93,7 +93,7 @@ const std::shared_ptr<gearoenix::render::sync::Semaphore>& gearoenix::render::gr
     GXUNEXPECTED;
 }
 
-void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::update()
+void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::update() noexcept
 {
     const unsigned int frame_number = e->get_frame_number();
     const std::shared_ptr<ForwardPbrDirectionalShadowFrame>& frame = frames[frame_number];
@@ -105,11 +105,11 @@ void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::update()
 }
 
 void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::record(
-    const std::shared_ptr<scene::Scene>& s,
-    const std::shared_ptr<camera::Camera>& c,
-    const std::shared_ptr<light::Directional>& l,
-    const std::shared_ptr<model::Model>& m,
-    const unsigned int kernel_index)
+    const scene::Scene* const s,
+    const camera::Camera* const c,
+    const light::Directional*const l,
+    const model::Model* const m,
+    const unsigned int kernel_index) noexcept
 {
     const unsigned int frame_number = e->get_frame_number();
     const std::shared_ptr<ForwardPbrDirectionalShadowFrame>& frame = frames[frame_number];
@@ -145,12 +145,12 @@ void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::submit()
 {
     const unsigned int frame_number = e->get_frame_number();
     const std::shared_ptr<ForwardPbrDirectionalShadowFrame>& frame = frames[frame_number];
-    std::shared_ptr<command::Buffer>& cmd = frame->primary_cmd;
+    command::Buffer* cmd = frame->primary_cmd.get();
     cmd->bind(render_target);
     for (const std::shared_ptr<ForwardPbrDirectionalShadowKernel>& k : frame->kernels) {
         cmd->record(k->secondary_cmd);
     }
-    std::vector<std::shared_ptr<sync::Semaphore>> pss(providers.size());
+    std::vector<sync::Semaphore *> pss(providers.size());
     for (const std::shared_ptr<core::graph::Node>& p : providers) {
         if (p == nullptr)
             continue;
@@ -160,9 +160,10 @@ void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::submit()
         const std::shared_ptr<sync::Semaphore>& ps = rp->get_semaphore(frame_number);
         if (ps == nullptr)
             continue;
-        pss.push_back(ps);
+        pss.push_back(ps.get());
     }
-    e->submit(pss, cmd, frame->semaphore);
+	sync::Semaphore* nxt = frame->semaphore.get();
+    e->submit(pss.size(), pss.data(), 1, &cmd, 1, &nxt);
     for (const std::shared_ptr<ForwardPbrDirectionalShadowKernel>& k : frame->kernels) {
         for (unsigned int i = k->latest_render_data_pool; i < k->render_data_pool.size(); ++i)
             k->render_data_pool[i]->clean();

@@ -26,7 +26,7 @@ void gearoenix::gles2::command::Buffer::bind(const std::shared_ptr<render::pipel
     render::command::Buffer::bind(r);
 }
 
-void gearoenix::gles2::command::Buffer::bind(const std::shared_ptr<render::texture::Target>& t)
+void gearoenix::gles2::command::Buffer::bind(render::texture::Target*const t)
 {
     render::command::Buffer::bind(t);
 }
@@ -34,7 +34,7 @@ void gearoenix::gles2::command::Buffer::bind(const std::shared_ptr<render::textu
 gearoenix::gl::uint gearoenix::gles2::command::Buffer::play(gl::uint bound_shader_program) const
 {
     if (render_target != nullptr)
-        static_cast<const texture::Target*>(render_target.get())->bind();
+        static_cast<const texture::Target*>(render_target)->bind();
     for (const std::shared_ptr<render::pipeline::ResourceSet>& prs : bound_resource_sets) {
         dynamic_cast<const pipeline::ResourceSet*>(prs.get())->bind(bound_shader_program);
     }

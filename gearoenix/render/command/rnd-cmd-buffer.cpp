@@ -25,7 +25,7 @@ void gearoenix::render::command::Buffer::bind(const std::shared_ptr<pipeline::Re
     bound_resource_sets.push_back(r);
 }
 
-void gearoenix::render::command::Buffer::bind(const std::shared_ptr<texture::Target>& t)
+void gearoenix::render::command::Buffer::bind(texture::Target* const t)
 {
 #ifdef GX_DEBUG_MODE
     if (render_target != nullptr)

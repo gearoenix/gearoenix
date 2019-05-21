@@ -23,7 +23,7 @@
 #include "../texture/gles2-txt-cube.hpp"
 #include "../texture/gles2-txt-target.hpp"
 
-void gearoenix::gles2::engine::Engine::initialize()
+void gearoenix::gles2::engine::Engine::initialize() noexcept
 {
     //glGenFramebuffers(1, &shadow_map_framebuffer);
     //glGenRenderbuffers(1, &shadow_map_depth);
@@ -61,28 +61,28 @@ void gearoenix::gles2::engine::Engine::initialize()
 #endif
 }
 
-gearoenix::gles2::engine::Engine::Engine(const std::shared_ptr<system::Application>& sys_app)
+gearoenix::gles2::engine::Engine::Engine(system::Application *const sys_app) noexcept
     : render::engine::Engine(sys_app, render::engine::Type::OPENGL_ES2)
 {
     initialize();
 }
 
-std::shared_ptr<gearoenix::gles2::engine::Engine> gearoenix::gles2::engine::Engine::construct(const std::shared_ptr<system::Application>& sys_app)
+std::shared_ptr<gearoenix::gles2::engine::Engine> gearoenix::gles2::engine::Engine::construct(system::Application* const sys_app) noexcept
 {
     std::shared_ptr<Engine> e(new Engine(sys_app));
-    e->pipeline_manager = std::make_shared<pipeline::Manager>(e);
-    e->buffer_manager = std::make_shared<buffer::Manager>(e);
-    e->command_manager = std::make_shared<command::Manager>();
-    e->main_render_target = std::shared_ptr<render::texture::Target>(new texture::Target(e));
+    e->pipeline_manager = new pipeline::Manager(e);
+    e->buffer_manager = new buffer::Manager(e);
+    e->command_manager = new command::Manager();
+    e->main_render_target = new texture::Target(e);
     return e;
 }
 
-gearoenix::gles2::engine::Engine::~Engine()
+gearoenix::gles2::engine::Engine::~Engine()noexcept
 {
     terminate();
 }
 
-void gearoenix::gles2::engine::Engine::update()
+void gearoenix::gles2::engine::Engine::update()noexcept
 {
     gl::Loader::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     render::engine::Engine::update();
@@ -126,7 +126,7 @@ void gearoenix::gles2::engine::Engine::update()
 #endif
 }
 
-void gearoenix::gles2::engine::Engine::terminate()
+void gearoenix::gles2::engine::Engine::terminate()noexcept
 {
     render::engine::Engine::terminate();
     //if (shadow_map_texture != nullptr) {
@@ -139,7 +139,7 @@ void gearoenix::gles2::engine::Engine::terminate()
     //}
 }
 
-gearoenix::render::sync::Semaphore* gearoenix::gles2::engine::Engine::create_semaphore()
+gearoenix::render::sync::Semaphore* gearoenix::gles2::engine::Engine::create_semaphore() const noexcept
 {
     return new sync::Semaphore();
 }
@@ -151,7 +151,7 @@ gearoenix::render::texture::Texture2D* gearoenix::gles2::engine::Engine::create_
     const render::texture::SampleInfo s,
     const unsigned int img_width,
     const unsigned int img_height,
-    const core::sync::EndCaller<core::sync::EndCallerIgnore>& call)
+    const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
 {
     return new texture::Texture2D(id, std::static_pointer_cast<Engine>(sysapp->get_render_engine()), data, f, s, img_width, img_height, call);
 }
@@ -162,14 +162,21 @@ gearoenix::render::texture::Cube* gearoenix::gles2::engine::Engine::create_textu
     const render::texture::TextureFormat::Id f,
     const render::texture::SampleInfo s,
     const unsigned int aspect,
-    const core::sync::EndCaller<core::sync::EndCallerIgnore>& call)
+    const core::sync::EndCaller<core::sync::EndCallerIgnore>& call)noexcept
 {
     return new texture::Cube(id, std::static_pointer_cast<Engine>(sysapp->get_render_engine()), data, f, s, aspect, call);
 }
 
-void gearoenix::gles2::engine::Engine::submit(const std::vector<std::shared_ptr<render::sync::Semaphore>>&, const std::shared_ptr<render::command::Buffer>& c, const std::shared_ptr<render::sync::Semaphore>&)
+void gearoenix::gles2::engine::Engine::submit(
+	const std::size_t,
+	const render::sync::Semaphore*const*const,
+	const std::size_t cmds_count,
+	const render::command::Buffer*const*const cmds,
+	const std::size_t,
+	const render::sync::Semaphore*const*const)noexcept
 {
-    static_cast<const command::Buffer*>(c.get())->play();
+	for (std::size_t i = 0; i < cmds_count; ++i)
+		static_cast<const command::Buffer*>(cmds[i])->play();
 }
 
 //gearoenix::render::texture::Texture2D* gearoenix::gles2::engine::Engine::create_texture_2d(core::Id id, system::stream::Stream* file, core::sync::EndCaller<core::sync::EndCallerIgnore> c)

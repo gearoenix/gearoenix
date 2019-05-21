@@ -78,7 +78,7 @@ void gearoenix::render::widget::Button::press_effect()
         //                phseng->add_animation(anim2);
         //                shared_this->latest_anim = anim2;
         //            });
-        const std::shared_ptr<physics::Engine>& phseng = e->get_physics_engine();
+        physics::Engine* phseng = e->get_physics_engine();
         phseng->add_animation(anim);
         break;
     }
