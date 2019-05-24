@@ -8,15 +8,11 @@
 #include <memory>
 
 namespace gearoenix {
-namespace core {
-    namespace sync {
-        class WorkWaiter;
-    }
+namespace core::sync {
+    class WorkWaiter;
 }
-namespace system {
-    namespace stream {
-        class Stream;
-    }
+namespace system::stream {
+    class Stream;
 }
 namespace render {
     namespace engine {
@@ -30,10 +26,10 @@ namespace render {
             const std::shared_ptr<core::sync::WorkWaiter> io_worker;
 
         public:
-            Manager(const std::shared_ptr<system::stream::Stream>& s, const std::shared_ptr<engine::Engine>& e);
-            ~Manager();
+            Manager(const std::shared_ptr<system::stream::Stream>& s, std::shared_ptr<engine::Engine> e);
+            ~Manager() = default;
             /// It is gonna load the scene (if exists) in another thread.
-            void get_gx3d(const core::Id mid, core::sync::EndCaller<Scene> c);
+            void get_gx3d(core::Id mid, core::sync::EndCaller<Scene> c);
             /// T must be derived from Scene and have the same constructor that Scene has.
             template <typename T>
             typename std::enable_if<std::is_base_of<Scene, T>::value, std::shared_ptr<T>>::type

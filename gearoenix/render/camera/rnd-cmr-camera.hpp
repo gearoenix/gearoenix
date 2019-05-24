@@ -37,6 +37,7 @@ namespace render {
             std::shared_ptr<math::ProjectorFrustum> frustum;
             std::shared_ptr<Transformation> transformation;
             std::shared_ptr<buffer::FramedUniform> uniform_buffers;
+            std::shared_ptr<std::vector<std::array<math::Vec3, 4>>> cascaded_shadow_frustum_partitions;
 
             Camera(
                 core::Id my_id,
@@ -57,7 +58,7 @@ namespace render {
             virtual void set_aspect_ratio(core::Real ratio);
             virtual math::Ray3 create_ray3(core::Real x, core::Real y) const = 0;
             virtual core::Real get_distance(const math::Vec3& model_location) const = 0;
-            virtual std::vector<math::Vec3[4]> get_cascaded_shadow_frustum_partitions() const noexcept = 0;
+            const std::vector<std::array<math::Vec3, 4>>& get_cascaded_shadow_frustum_partitions() noexcept;
         };
     }
 }

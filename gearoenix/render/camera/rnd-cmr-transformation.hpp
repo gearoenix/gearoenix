@@ -1,6 +1,8 @@
 #ifndef GEAROENIX_RENDER_CAMERA_TRANSFORMATON_HPP
 #define GEAROENIX_RENDER_CAMERA_TRANSFORMATON_HPP
 #include "../../physics/phs-transformation.hpp"
+#include <functional>
+#include <vector>
 
 namespace gearoenix {
 namespace math {
@@ -12,11 +14,17 @@ namespace render::camera {
     private:
         const std::shared_ptr<Uniform> uniform;
         const std::shared_ptr<math::ProjectorFrustum> frustum;
+        const std::shared_ptr<std::vector<std::array<math::Vec3, 4>>> cascaded_shadow_frustum_partitions;
+        std::function<void()> on_frustum_update = [] {};
 
     public:
-        Transformation(std::shared_ptr<Uniform> uniform, std::shared_ptr<math::ProjectorFrustum> frustum) noexcept;
+        Transformation(
+            std::shared_ptr<Uniform> uniform,
+            std::shared_ptr<math::ProjectorFrustum> frustum,
+            std::shared_ptr<std::vector<std::array<math::Vec3, 4>>> cascade) noexcept;
         void update_location() noexcept;
         void update_view_projection() noexcept;
+        void set_on_frustum_update(std::function<void()> f) noexcept;
         void look_at(const math::Vec3& target, const math::Vec3& up) noexcept;
         void look_at(const math::Vec3& origin, const math::Vec3& target, const math::Vec3& up) noexcept;
         // physics::Transformation----------------------------------------------------------------------------

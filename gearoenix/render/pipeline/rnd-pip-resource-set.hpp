@@ -57,14 +57,14 @@ namespace render {
 
         public:
             virtual ~ResourceSet() = default;
-#define GXHELPER(c, cc) virtual void set_##c(const c::cc* o) noexcept
-            GXHELPER(scene, Scene);
-            GXHELPER(camera, Camera);
-            GXHELPER(light, Light);
-            GXHELPER(model, Model);
-            GXHELPER(mesh, Mesh);
-            GXHELPER(material, Material);
-#undef GXHELPER
+#define GX_HELPER(c, cc) virtual void set_##c(const c::cc* o) noexcept
+            GX_HELPER(scene, Scene);
+            GX_HELPER(camera, Camera);
+            GX_HELPER(light, Light);
+            GX_HELPER(model, Model);
+            GX_HELPER(mesh, Mesh);
+            GX_HELPER(material, Material);
+#undef GX_HELPER
             void set_node_uniform_buffer(const std::shared_ptr<buffer::Uniform>& node_uniform_buffer);
             virtual void clean();
         };

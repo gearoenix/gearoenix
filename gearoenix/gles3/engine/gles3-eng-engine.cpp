@@ -29,12 +29,12 @@
 #include "texture/gles3-txt-2d.hpp"
 #include "texture/gles3-txt-cube.hpp"
 
-gearoenix::gles3::Engine::Engine(system::Application* sysapp)
-    : render::Engine(sysapp)
+gearoenix::gles3::Engine::Engine(system::Application* sys_app)
+    : render::Engine(sys_app)
 {
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-    win_width = (GLfloat)sysapp->get_width();
-    win_height = (GLfloat)sysapp->get_height();
+    win_width = (GLfloat)sys_app->get_width();
+    win_height = (GLfloat)sys_app->get_height();
     glGetIntegerv(GL_FRAMEBUFFER_BINDING, (GLint*)&render_framebuffer);
     glGetIntegerv(GL_RENDERBUFFER_BINDING, (GLint*)&render_depth);
     glGenFramebuffers(1, &shadow_map_framebuffer);
@@ -66,7 +66,7 @@ gearoenix::gles3::Engine::Engine(system::Application* sysapp)
     glBindFramebuffer(GL_FRAMEBUFFER, render_framebuffer);
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         UNEXPECTED;
-    shadow_map_texture = new texture::Texture2D(sysapp->get_asset_manager()->create_id(), shadow_map_color, this);
+    shadow_map_texture = new texture::Texture2D(sys_app->get_asset_manager()->create_id(), shadow_map_color, this);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
     glEnable(GL_BLEND);

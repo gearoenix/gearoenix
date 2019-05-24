@@ -16,6 +16,7 @@ namespace render::camera {
         const std::shared_ptr<physics::collider::Frustum> frustum;
 
         void update_fovy();
+        void update_cascades() noexcept;
 
     public:
         Perspective(
@@ -29,7 +30,6 @@ namespace render::camera {
         void set_field_of_view(core::Real radian);
         math::Ray3 create_ray3(core::Real x, core::Real y) const final;
         core::Real get_distance(const math::Vec3& model_location) const final;
-        std::vector<math::Vec3[4]> get_cascaded_shadow_frustum_partitions() const noexcept final;
     };
 }
 }

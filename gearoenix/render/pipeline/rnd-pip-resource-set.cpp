@@ -8,14 +8,14 @@
 #include "../model/rnd-mdl-model.hpp"
 #include "../scene/rnd-scn-scene.hpp"
 
-#define GXHELPER(c, cc)                                                                   \
+#define GX_HELPER(c, cc)                                                                  \
     void gearoenix::render::pipeline::ResourceSet::set_##c(const c::cc* const o) noexcept \
     {                                                                                     \
         c##_uniform_buffer = o->get_uniform_buffers()->get_buffer();                      \
     }
 
-GXHELPER(scene, Scene)
-GXHELPER(camera, Camera)
+GX_HELPER(scene, Scene)
+GX_HELPER(camera, Camera)
 
 void gearoenix::render::pipeline::ResourceSet::set_light(const light::Light* const l) noexcept
 {
@@ -26,7 +26,7 @@ void gearoenix::render::pipeline::ResourceSet::set_light(const light::Light* con
         light_uniform_buffer = fub->get_buffer();
 }
 
-GXHELPER(model, Model)
+GX_HELPER(model, Model)
 
 void gearoenix::render::pipeline::ResourceSet::set_mesh(const mesh::Mesh* const m) noexcept
 {
@@ -42,7 +42,7 @@ void gearoenix::render::pipeline::ResourceSet::set_material(const material::Mate
     emissive = m->get_emissive();
 }
 
-#undef GXHELPER
+#undef GX_HELPER
 
 void gearoenix::render::pipeline::ResourceSet::set_node_uniform_buffer(const std::shared_ptr<buffer::Uniform>& b)
 {

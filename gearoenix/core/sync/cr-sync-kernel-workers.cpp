@@ -3,25 +3,25 @@
 
 void gearoenix::core::sync::KernelWorker::thread_loop(const unsigned int kernel_index)
 {
-#define GXHELPER           \
+#define GX_HELPER          \
     if (!running) {        \
         terminated = true; \
         return;            \
     }
     while (running) {
         signals[kernel_index]->wait();
-        GXHELPER;
+        GX_HELPER;
         std::lock_guard<std::mutex> _lock(*workers_syncers[kernel_index]);
         for (const Worker& worker : workers) {
-            GXHELPER;
+            GX_HELPER;
             worker.waits[kernel_index]->wait();
-            GXHELPER;
+            GX_HELPER;
             worker.worker(kernel_index);
-            GXHELPER;
+            GX_HELPER;
             worker.signals[kernel_index]->signal();
         }
     }
-#undef GXHELPER
+#undef GX_HELPER
 }
 
 gearoenix::core::sync::KernelWorker::KernelWorker()

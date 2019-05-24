@@ -43,7 +43,7 @@ gearoenix::render::scene::Scene::Scene(
     , uniform_buffers(std::make_shared<buffer::FramedUniform>(static_cast<const unsigned int>(sizeof(Uniform)), e))
 {
     const std::shared_ptr<core::asset::Manager>& astmgr = e->get_system_application()->get_asset_manager();
-#define GXHELPER(x, n, cls)                                                      \
+#define GX_HELPER(x, n, cls)                                                     \
     {                                                                            \
         const std::shared_ptr<n::Manager>& mgr = astmgr->get_##x##_manager();    \
         std::vector<core::Id> ids;                                               \
@@ -55,17 +55,17 @@ gearoenix::render::scene::Scene::Scene(
         }                                                                        \
     }
 
-    GXHELPER(camera, camera, Camera);
-    GXHELPER(audio, audio, Audio);
-    GXHELPER(light, light, Light);
-    GXHELPER(model, model, Model);
+    GX_HELPER(camera, camera, Camera);
+    GX_HELPER(audio, audio, Audio);
+    GX_HELPER(light, light, Light);
+    GX_HELPER(model, model, Model);
     if (f->read_bool()) {
         core::Id skybox_id = 0;
         f->read(skybox_id);
     }
-    GXHELPER(constraint, physics::constraint, Constraint);
+    GX_HELPER(constraint, physics::constraint, Constraint);
 
-#undef GXHELPER
+#undef GX_HELPER
 
     if (f->read_bool()) {
         GXUNIMPLEMENTED;

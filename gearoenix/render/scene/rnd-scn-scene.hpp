@@ -97,18 +97,18 @@ namespace render {
             void disable();
             bool is_enabled() const;
 
-#define GXHELPER(x, c)                                              \
+#define GX_HELPER(x, c)                                             \
     void add_##x(const std::shared_ptr<c>& m);                      \
     const std::shared_ptr<c>& get_##x(const core::Id x##_id) const; \
     const std::map<core::Id, std::shared_ptr<c>>& get_##x##s() const
 
-            GXHELPER(camera, camera::Camera);
-            GXHELPER(audio, audio::Audio);
-            GXHELPER(light, light::Light);
-            GXHELPER(model, model::Model);
-            GXHELPER(constraint, physics::constraint::Constraint);
+            GX_HELPER(camera, camera::Camera);
+            GX_HELPER(audio, audio::Audio);
+            GX_HELPER(light, light::Light);
+            GX_HELPER(model, model::Model);
+            GX_HELPER(constraint, physics::constraint::Constraint);
 
-#undef GXHELPER
+#undef GX_HELPER
 
             void set_skybox(const std::shared_ptr<skybox::Skybox>& s);
             const std::shared_ptr<model::Model>& get_skybox(const core::Id skybox_id) const;

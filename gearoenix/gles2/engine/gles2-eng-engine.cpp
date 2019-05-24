@@ -54,7 +54,7 @@ void gearoenix::gles2::engine::Engine::initialize() noexcept
     //glBindFramebuffer(GL_FRAMEBUFFER, render_framebuffer);
     //if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
     //    GXUNEXPECTED;
-    //shadow_map_texture = new texture::Texture2D(sysapp->get_asset_manager()->create_id(), shadow_map_color, this);
+    //shadow_map_texture = new texture::Texture2D(sys_app->get_asset_manager()->create_id(), shadow_map_color, this);
     //pipeline_manager = new render::pipeline::Manager(this);
 #ifdef GX_GLES2_ENGINE_PROFILING
     prof_last_time_draw = std::chrono::high_resolution_clock::now();

@@ -3,9 +3,13 @@
 #include "rnd-cmr-uniform.hpp"
 #include <utility>
 
-gearoenix::render::camera::Transformation::Transformation(std::shared_ptr<Uniform> uniform, std::shared_ptr<math::ProjectorFrustum> frustum) noexcept
+gearoenix::render::camera::Transformation::Transformation(
+    std::shared_ptr<Uniform> uniform,
+    std::shared_ptr<math::ProjectorFrustum> frustum,
+    std::shared_ptr<std::vector<std::array<math::Vec3, 4>>> cascade) noexcept
     : uniform(std::move(uniform))
     , frustum(std::move(frustum))
+    , cascaded_shadow_frustum_partitions(std::move(cascade))
 {
 }
 
@@ -26,6 +30,11 @@ void gearoenix::render::camera::Transformation::update_view_projection() noexcep
                                            0.5f, 0.5f, 0.0f, 1.0f)
         * uniform->view_projection;
     frustum->set_view_projection(uniform->view_projection);
+}
+
+void gearoenix::render::camera::Transformation::set_on_frustum_update(std::function<void()> f) noexcept
+{
+    on_frustum_update = std::move(f);
 }
 
 void gearoenix::render::camera::Transformation::look_at(const math::Vec3& target, const math::Vec3& up) noexcept

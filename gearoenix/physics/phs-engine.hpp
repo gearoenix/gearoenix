@@ -60,29 +60,24 @@ namespace physics {
         using SceneCameraDirLightPairedPool = SceneCameraPairedPool<DirLightPairedPool<T>>;
         using ModelPtrs = std::vector<ModelPtr>;
         using VisibileModels = SceneCameraPairedPool<ModelPtrs>;
-        using Partition = math::Vec4[4];
+        using GatheredVisibileModels = std::map<ScenePtr, std::map<CameraPtr, ModelPtrs>>;
+        using GatheredCascadeInfos = std::map<ScenePtr, std::map<CameraPtr, std::map<DirLightPtr, CascadeInfoPtr>>>;
+        using Partition = std::array<math::Vec3, 4>;
         using Partitions = std::vector<Partition>;
         using SceneCameraPartitions = SceneCameraPairedPool<Partitions>;
         using SceneCameraDirLightCascadeInfo = SceneCameraDirLightPairedPool<CascadeInfoPtr>;
 
     private:
-        using RenderObjects = TupledPool<ScenePtr, std::vector<LightPtr>, std::vector<CameraPtr>, ModelPtrs>;
-
-        system::Application* const sysapp;
+        system::Application* const sys_app;
         core::sync::KernelWorker* const kernels;
         /// if animation return true on its apply its gonna be deleted
         std::map<core::Id, std::shared_ptr<animation::Animation>> animations;
-        /// This is the batched render objects for kernels
-        std::vector<RenderObjects> kernel_render_objects;
         /// visibility checker
         std::vector<VisibileModels> kernels_visible_models;
-        VisibileModels visible_models;
-        /// Camera partitions for cascaded shadowing directional lights
-        std::vector<SceneCameraPartitions> kernels_cascaded_shadows_partitions;
-        SceneCameraPartitions cascaded_shadows_partitions;
+        GatheredVisibileModels visible_models;
         /// Cascaded shadowing light data
         std::vector<SceneCameraDirLightCascadeInfo> kernels_cascaded_shadow_caster_data;
-        SceneCameraDirLightCascadeInfo cascaded_shadow_caster_data;
+        GatheredCascadeInfos cascaded_shadow_caster_data;
 
         std::mutex added_animations_locker;
         std::vector<std::shared_ptr<animation::Animation>> added_animations;
@@ -110,8 +105,8 @@ namespace physics {
         void remove_animation(const std::shared_ptr<animation::Animation>& a) noexcept;
         void remove_animation(core::Id a) noexcept;
         void update() noexcept;
-        const VisibileModels& get_visible_models() const noexcept;
-        VisibileModels& get_visible_models() noexcept;
+        const GatheredVisibileModels& get_visible_models() const noexcept;
+        GatheredVisibileModels& get_visible_models() noexcept;
     };
 }
 }

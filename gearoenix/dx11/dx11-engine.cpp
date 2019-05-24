@@ -43,8 +43,8 @@ void gearoenix::dx11::Engine::initial_screen()
     back_buffer_ptr = nullptr;
     D3D11_TEXTURE2D_DESC depth_buffer_desc;
     GXSETZ(depth_buffer_desc);
-    depth_buffer_desc.Width = sysapp->get_width();
-    depth_buffer_desc.Height = sysapp->get_height();
+    depth_buffer_desc.Width = sys_app->get_width();
+    depth_buffer_desc.Height = sys_app->get_height();
     depth_buffer_desc.MipLevels = 1;
     depth_buffer_desc.ArraySize = 1;
     depth_buffer_desc.Format = DXGI_FORMAT_D32_FLOAT;
@@ -61,8 +61,8 @@ void gearoenix::dx11::Engine::initial_screen()
     depth_stencil_view_desc.Texture2D.MipSlice = 0;
     GXHRCHK(device->CreateDepthStencilView(main_dsb, &depth_stencil_view_desc, &main_dsv));
     context->OMSetRenderTargets(1, &main_rtv, main_dsv);
-    main_viewport.Width = (float)sysapp->get_width();
-    main_viewport.Height = (float)sysapp->get_height();
+    main_viewport.Width = (float)sys_app->get_width();
+    main_viewport.Height = (float)sys_app->get_height();
 }
 
 void gearoenix::dx11::Engine::terminate_screen()
@@ -105,7 +105,7 @@ void gearoenix::dx11::Engine::initial_shadow()
     sdesc.Texture2D.MipLevels = 1;
     ID3D11ShaderResourceView* shadow_srv;
     GXHRCHK(device->CreateShaderResourceView(txt, &sdesc, &shadow_srv));
-    shadow_txt = new texture::Texture2D(sysapp->get_asset_manager()->create_id(), this, shadow_srv);
+    shadow_txt = new texture::Texture2D(sys_app->get_asset_manager()->create_id(), this, shadow_srv);
     GXSETZ(tdesc);
     tdesc.Width = SHADOW_WIDTH;
     tdesc.Height = SHADOW_WIDTH;
@@ -201,8 +201,8 @@ gearoenix::dx11::Engine::Engine(system::Application* sys_app)
                 continue;
             }
             for (UINT i = 0; i < num_modes; i++) {
-                if (display_mode_list[i].Width == sysapp->get_width()) {
-                    if (display_mode_list[i].Height == sysapp->get_height()) {
+                if (display_mode_list[i].Width == sys_app->get_width()) {
+                    if (display_mode_list[i].Height == sys_app->get_height()) {
                         numerator = display_mode_list[i].RefreshRate.Numerator;
                         denominator = display_mode_list[i].RefreshRate.Denominator;
                     }
@@ -221,13 +221,13 @@ adapter_found_label:
     DXGI_SWAP_CHAIN_DESC swap_chain_desc;
     GXSETZ(swap_chain_desc);
     swap_chain_desc.BufferCount = 1;
-    swap_chain_desc.BufferDesc.Width = sysapp->get_width();
-    swap_chain_desc.BufferDesc.Height = sysapp->get_height();
+    swap_chain_desc.BufferDesc.Width = sys_app->get_width();
+    swap_chain_desc.BufferDesc.Height = sys_app->get_height();
     swap_chain_desc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
     swap_chain_desc.BufferDesc.RefreshRate.Numerator = numerator;
     swap_chain_desc.BufferDesc.RefreshRate.Denominator = denominator;
     swap_chain_desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-    swap_chain_desc.OutputWindow = sysapp->get_window();
+    swap_chain_desc.OutputWindow = sys_app->get_window();
     swap_chain_desc.SampleDesc = sample;
 #ifdef GEAROENIX_FULLSCREEN
     swap_chain_desc.Windowed = false;

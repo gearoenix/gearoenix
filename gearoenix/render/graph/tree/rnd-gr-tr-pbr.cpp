@@ -26,38 +26,38 @@ void gearoenix::render::graph::tree::Pbr::update() noexcept
 
 void gearoenix::render::graph::tree::Pbr::record(const unsigned int kernel_index) noexcept
 {
-    //    const unsigned int kernels_count = e->get_kernels()->get_threads_count();
-    //    unsigned int task_number = 0;
-    //    const physics::Engine::VisibileModels & visible_models = e->get_physics_engine()->get_visible_models();
-    //    unsigned int scene_number = 0;
-    //#define GXDOTASK(expr)                 \
-//    if (task_number == kernel_index) { \
-//        expr;                          \
-//    }                                  \
-//    task_number = (task_number + 1) % kernels_count
-    //    for (const std::pair<const std::shared_ptr<scene::Scene>, physics::Engine::CameraModelSet>& scene_camera : visible_models) {
-    //        const std::shared_ptr<scene::Scene>& scn = scene_camera.first;
-    //        const std::map<core::Id, std::shared_ptr<light::Light>> lights = scn->get_lights();
-    //        for (const std::pair<camera::Camera* const, physics::Engine::ModelSet>& camera_models : scene_camera.second) {
-    //            const camera::Camera* const cam = camera_models.first;
-    //            const std::set<model::Model*>& models = camera_models.second;
-    //            for (const std::pair<const core::Id, std::shared_ptr<light::Light>>& id_light : lights) {
-    //                if (!id_light.second->is_shadower())
-    //                    continue;
-    //                const std::shared_ptr<light::Directional> dirlt = std::dynamic_pointer_cast<light::Directional>(id_light.second);
-    //                if (dirlt != nullptr) {
-    //                    for (const model::Model* const model : models) {
-    //                        GXDOTASK(fwddirshd->record(scn.get(), cam, dirlt.get(), model, kernel_index));
-    //                    }
-    //                    continue; /// This is for future
-    //                }
-    //                // const std::shared_ptr<light::Point> pntlt = std::dynamic_pointer_cast<light::Point>(id_light.second);
-    //                /// like ...
-    //            }
-    //        }
-    //        ++scene_number;
-    //    }
-    //#undef GXDOTASK
+    const unsigned int kernels_count = e->get_kernels()->get_threads_count();
+    unsigned int task_number = 0;
+    const physics::Engine::GatheredVisibileModels& visible_models = e->get_physics_engine()->get_visible_models();
+    unsigned int scene_number = 0;
+#define GX_DO_TASK(expr)               \
+    if (task_number == kernel_index) { \
+        expr;                          \
+    }                                  \
+    task_number = (task_number + 1) % kernels_count
+    for (const auto& scene_camera : visible_models) {
+        const scene::Scene* scn = scene_camera.first;
+        const std::map<core::Id, std::shared_ptr<light::Light>> lights = scn->get_lights();
+        for (const auto& camera_models : scene_camera.second) {
+            const camera::Camera* const cam = camera_models.first;
+            const auto& models = camera_models.second;
+            for (const std::pair<const core::Id, std::shared_ptr<light::Light>>& id_light : lights) {
+                if (!id_light.second->is_shadower())
+                    continue;
+                const std::shared_ptr<light::Directional> dirlt = std::dynamic_pointer_cast<light::Directional>(id_light.second);
+                if (dirlt != nullptr) {
+                    for (const model::Model* const model : models) {
+                        GX_DO_TASK(fwddirshd->record(scn, cam, dirlt.get(), model, kernel_index));
+                    }
+                    continue; /// This is for future
+                }
+                // const std::shared_ptr<light::Point> pntlt = std::dynamic_pointer_cast<light::Point>(id_light.second);
+                /// like ...
+            }
+        }
+        ++scene_number;
+    }
+#undef GX_DO_TASK
 }
 
 void gearoenix::render::graph::tree::Pbr::submit() noexcept
