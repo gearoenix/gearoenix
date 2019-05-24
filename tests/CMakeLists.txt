@@ -3,6 +3,7 @@ SET (GX_TEST_NEEDS ${GX_LIBS})
 INCLUDE_DIRECTORIES (${CMAKE_SOURCE_DIR} ${BOOST_INCLUDE_DIRS} ${GLM_INCLUDE_DIRS})
 
 ADD_EXECUTABLE (GX_TESTS 
+    test-core-pool.hpp
     test-math-vector.hpp
     test-math-frustum.hpp
     test-main.cpp)

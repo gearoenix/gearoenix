@@ -2,6 +2,8 @@
 #include "../../core/sync/cr-sync-kernel-workers.hpp"
 #include "../../system/sys-app.hpp"
 #include "../../system/sys-configuration.hpp"
+#include "../buffer/rnd-buf-uniform.hpp"
+#include "../command/rnd-cmd-buffer.hpp"
 #include "../command/rnd-cmd-manager.hpp"
 #include "../engine/rnd-eng-engine.hpp"
 #include "../sync/rnd-sy-semaphore.hpp"
@@ -78,7 +80,7 @@ gearoenix::render::light::FrameCascadeInfo::~FrameCascadeInfo() noexcept
 gearoenix::render::light::CascadeInfo::CascadeInfo(engine::Engine* const e) noexcept
     : e(e)
 {
-    const std::size_t frames_count = static_cast<std::size_t>(e->get_frames_count());
+    const auto frames_count = static_cast<std::size_t>(e->get_frames_count());
     frames.resize(frames_count);
     for (FrameCascadeInfo*& frame : frames)
         frame = new FrameCascadeInfo(e);

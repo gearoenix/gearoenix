@@ -31,7 +31,7 @@ namespace light {
         math::Mat4x4 zero_located_view;
         std::vector<CameraCascadeInfo> cameras;
 
-        MathCascadeInfo(engine::Engine* e) noexcept;
+        explicit MathCascadeInfo(engine::Engine* e) noexcept;
         void initialize(engine::Engine* e) noexcept;
     };
     class KernelCascadeInfo {
@@ -68,7 +68,7 @@ namespace light {
         sync::Semaphore* shadow_accumulator_semaphore = nullptr;
 
     public:
-        FrameCascadeInfo(engine::Engine* e) noexcept;
+        explicit FrameCascadeInfo(engine::Engine* e) noexcept;
         ~FrameCascadeInfo() noexcept;
     };
     class CascadeInfo {
@@ -78,7 +78,7 @@ namespace light {
         std::vector<FrameCascadeInfo*> frames;
 
     public:
-        CascadeInfo(engine::Engine* e) noexcept;
+        explicit CascadeInfo(engine::Engine* e) noexcept;
         ~CascadeInfo() noexcept;
         void set_zero_located_view(const math::Mat4x4& m) noexcept;
         void set_frustum_partitions(const std::vector<math::Vec3[4]>& p) noexcept;
