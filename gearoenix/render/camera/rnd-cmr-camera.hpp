@@ -3,6 +3,7 @@
 #include "../../core/asset/cr-asset.hpp"
 #include "../../math/math-ray.hpp"
 #include <vector>
+#include <array>
 
 namespace gearoenix {
 namespace core::event {

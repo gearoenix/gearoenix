@@ -79,9 +79,8 @@ gearoenix::render::light::FrameCascadeInfo::~FrameCascadeInfo() noexcept
 
 gearoenix::render::light::CascadeInfo::CascadeInfo(engine::Engine* const e) noexcept
     : e(e)
+	, frames(static_cast<std::size_t>(e->get_frames_count()))
 {
-    const auto frames_count = static_cast<std::size_t>(e->get_frames_count());
-    frames.resize(frames_count);
     for (FrameCascadeInfo*& frame : frames)
         frame = new FrameCascadeInfo(e);
 }

@@ -74,7 +74,7 @@ namespace light {
     class CascadeInfo {
     private:
         /// It is now owner of engine
-        engine::Engine* e = nullptr;
+        engine::Engine* const e;
         std::vector<FrameCascadeInfo*> frames;
 
     public:
