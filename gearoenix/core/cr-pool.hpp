@@ -2,6 +2,7 @@
 #define GEAROENIX_CORE_POOL_HPP
 
 #include "cr-build-configuration.hpp"
+#include "../system/sys-log.hpp"
 #include <functional>
 #include <vector>
 
