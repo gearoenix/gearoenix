@@ -1,6 +1,7 @@
 #ifndef GEAROENIX_CORE_POOL_HPP
 #define GEAROENIX_CORE_POOL_HPP
 
+#include "cr-build-configuration.hpp"
 #include <functional>
 #include <vector>
 
@@ -146,7 +147,7 @@ typename std::enable_if<std::is_integral<I>::value, const T&>::type
 gearoenix::core::OneLoopPool<T>::operator[](const I index) const noexcept
 {
 #ifdef GX_DEBUG_MODE
-	if (i < 0 || i >= current_index) GXLOGF("Out of range index {" << index << "}");
+	if (index < 0 || index >= current_index) GXLOGF("Out of range index {" << index << "}");
 #endif
 	return *objects[index];
 }
@@ -157,7 +158,7 @@ typename std::enable_if<std::is_integral<I>::value, T&>::type
 gearoenix::core::OneLoopPool<T>::operator[](const I index) noexcept
 {
 #ifdef GX_DEBUG_MODE
-	if (i < 0 || i >= current_index) GXLOGF("Out of range index {" << index << "}");
+	if (index < 0 || index >= current_index) GXLOGF("Out of range index {" << index << "}");
 #endif
 	return *objects[index];
 }
