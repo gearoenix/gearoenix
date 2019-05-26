@@ -36,6 +36,7 @@ struct KernelRenderCascadeInfo {
     {
         delete uniform;
         uniform = nullptr;
+		m = nullptr;
     }
 };
 

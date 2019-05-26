@@ -9,6 +9,7 @@ Yet another cross-platform C++ 3D game engine.
 
 - It is cross-platform.
 - It is Lightweight.
+- Highly multithreaded architecture.
 - It has a runtime abtraction over Graphic APIs (e.g. `OpenGL ES2`, `OpenGL ES3(WIP)`,
   `Directx11(WIP)` and `Vulkan(WIP)`).
 - It has its own file format for importing scenes data in to game. This file
@@ -38,6 +39,7 @@ Yet another cross-platform C++ 3D game engine.
 - Multithreaded mathematic works for increasing performance.
 - Pbr Material.
 - Ability to create customized and or special materials/effects with special behaviors.
+- Adaptive cascaded shadow mapping (WIP)
 
 ## Demos
 
