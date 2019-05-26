@@ -113,7 +113,7 @@ BOOST_AUTO_TEST_CASE(math_vector_test)
         f = static_cast<float>(dis(gen));
         rm(m1, m2);
         PROF(m1 = glm::inverse(m1), glmt);
-        PROF(m2 = m2.inversed(), gt);
+        PROF(m2 = m2.inverted(), gt);
         check(m1, m2);
     }
     BOOST_TEST_MESSAGE("glmt " << glmt << ", gt " << gt);

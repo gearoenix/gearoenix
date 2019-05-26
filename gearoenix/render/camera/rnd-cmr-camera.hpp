@@ -2,8 +2,8 @@
 #define GEAROENIX_RENDER_CAMERA_CAMERA_HPP
 #include "../../core/asset/cr-asset.hpp"
 #include "../../math/math-ray.hpp"
-#include <vector>
 #include <array>
+#include <vector>
 
 namespace gearoenix {
 namespace core::event {

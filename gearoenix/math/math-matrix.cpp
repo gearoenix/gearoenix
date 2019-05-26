@@ -161,11 +161,12 @@ gearoenix::math::Mat4x4 gearoenix::math::Mat4x4::operator*(const Mat4x4& m) cons
     return r;
 }
 
-void gearoenix::math::Mat4x4::operator=(const Mat4x4& m)
+gearoenix::math::Mat4x4& gearoenix::math::Mat4x4::operator=(const Mat4x4& m)
 {
     for (int i = 0; i < 16; i++) {
         mat[i] = m.mat[i];
     }
+    return *this;
 }
 
 void gearoenix::math::Mat4x4::operator*=(const Mat4x4& m)
@@ -368,11 +369,11 @@ void gearoenix::math::Mat4x4::get_location(Vec3& location) const
 
 void gearoenix::math::Mat4x4::read(const std::shared_ptr<system::stream::Stream>& f)
 {
-    for (int i = 0; i < 16; ++i)
-        f->read(mat[i]);
+    for (core::Real& i : mat)
+        f->read(i);
 }
 
-gearoenix::math::Mat4x4 gearoenix::math::Mat4x4::inversed() const
+gearoenix::math::Mat4x4 gearoenix::math::Mat4x4::inverted() const
 {
     core::Real id = 1.0f / determinant();
     Mat4x4 result;
@@ -422,8 +423,8 @@ gearoenix::math::Mat4x4 gearoenix::math::Mat4x4::look_at(const Vec3& position, c
 
 gearoenix::math::Mat4x4 gearoenix::math::Mat4x4::rotation(const Vec3& v, const core::Real degree)
 {
-    const core::Real sinus = static_cast<core::Real>(sin(static_cast<double>(degree)));
-    const core::Real cosinus = static_cast<core::Real>(cos(static_cast<double>(degree)));
+    const auto sinus = static_cast<core::Real>(sin(static_cast<double>(degree)));
+    const auto cosinus = static_cast<core::Real>(cos(static_cast<double>(degree)));
     const core::Real oneminuscos = 1.0f - cosinus;
     const Vec3 w = v.normalized();
     const core::Real wx2 = w[0] * w[0];
@@ -527,8 +528,8 @@ gearoenix::math::Mat4x4 gearoenix::math::Mat4x4::perspective(const core::Real wi
 gearoenix::math::Mat4x4 gearoenix::math::Mat4x4::transposed() const
 {
     Mat4x4 r;
-    for (int i = 0; i < 16; ++i) {
-        r.mat[((i & 3) << 2) + (i >> 2)] = mat[i];
+    for (unsigned int i = 0; i < 16; ++i) {
+        r.mat[((i & 3u) << 2) + (i >> 2)] = mat[i];
     }
     return r;
 }
