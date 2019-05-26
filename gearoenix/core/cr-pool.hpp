@@ -41,6 +41,10 @@ public:
     iterator end() noexcept;
     std::size_t capacity() const noexcept;
     std::size_t size() const noexcept;
+	template<typename I>
+	typename std::enable_if<std::is_integral<I>::value, const T&>::type operator[](I index) const noexcept;
+	template<typename I>
+	typename std::enable_if<std::is_integral<I>::value, T&>::type  operator[](I index) noexcept;
 };
 }
 
@@ -134,6 +138,28 @@ template <class T>
 std::size_t gearoenix::core::OneLoopPool<T>::size() const noexcept
 {
     return current_index;
+}
+
+template<class T>
+template<typename I>
+typename std::enable_if<std::is_integral<I>::value, const T&>::type
+gearoenix::core::OneLoopPool<T>::operator[](const I index) const noexcept
+{
+#ifdef GX_DEBUG_MODE
+	if (i < 0 || i >= current_index) GXLOGF("Out of range index {" << index << "}");
+#endif
+	return *objects[index];
+}
+
+template<class T>
+template<typename I>
+typename std::enable_if<std::is_integral<I>::value, T&>::type
+gearoenix::core::OneLoopPool<T>::operator[](const I index) noexcept
+{
+#ifdef GX_DEBUG_MODE
+	if (i < 0 || i >= current_index) GXLOGF("Out of range index {" << index << "}");
+#endif
+	return *objects[index];
 }
 
 #endif
