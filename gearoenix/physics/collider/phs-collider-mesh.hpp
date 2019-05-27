@@ -20,10 +20,10 @@ namespace physics::collider {
         math::Aabb3 box;
 
     public:
-        explicit Mesh(const std::shared_ptr<system::stream::Stream>& f);
-        void update(const math::Mat4x4& m) final;
-        bool hit(const math::Ray3& r, core::Real& distance_from_origin) const final;
-        bool hit(const math::Ray3& r, core::Real& distance_from_origin, math::Vec2& factors) const;
+        explicit Mesh(system::stream::Stream* f) noexcept;
+        void update(const math::Mat4x4& m) noexcept final;
+        bool hit(const math::Ray3& r, core::Real& distance_from_origin) const  noexcept final;
+        bool hit(const math::Ray3& r, core::Real& distance_from_origin, math::Vec2& factors) const noexcept;
 
         friend std::ostream& operator<<(std::ostream& os, const Mesh& m) noexcept
         {

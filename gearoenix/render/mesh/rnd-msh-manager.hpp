@@ -5,11 +5,9 @@
 #include <memory>
 
 namespace gearoenix {
-namespace system {
-    namespace stream {
+namespace system::stream {
         class Stream;
     }
-}
 namespace render {
     namespace engine {
         class Engine;
@@ -18,14 +16,14 @@ namespace render {
         class Mesh;
         class Manager {
         private:
-            const std::shared_ptr<engine::Engine> e;
+            engine::Engine*const e;
             core::cache::File<Mesh> cache;
             std::weak_ptr<Mesh> icosphere;
 
         public:
-            Manager(const std::shared_ptr<system::stream::Stream>& s, const std::shared_ptr<engine::Engine>& e);
-            ~Manager();
-            std::shared_ptr<Mesh> get_gx3d(const core::Id id, core::sync::EndCaller<Mesh>& c);
+            Manager(system::stream::Stream* s, engine::Engine* e) noexcept;
+            ~Manager() noexcept = default;
+            std::shared_ptr<Mesh> get_gx3d(core::Id id, core::sync::EndCaller<Mesh>& c) noexcept;
             std::shared_ptr<Mesh> create_icosphere(core::sync::EndCaller<Mesh>& c) noexcept;
         };
     }

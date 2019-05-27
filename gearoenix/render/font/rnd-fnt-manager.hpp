@@ -3,14 +3,11 @@
 #include "../../core/cache/cr-cache-file.hpp"
 #include "../../core/cr-types.hpp"
 #include "../../core/sync/cr-sync-end-caller.hpp"
-#include <memory>
 
 namespace gearoenix {
-namespace system {
-    namespace stream {
+namespace system::stream {
         class Stream;
     }
-}
 namespace render {
     namespace engine {
         class Engine;
@@ -19,13 +16,13 @@ namespace render {
         class Font;
         class Manager {
         protected:
-            const std::shared_ptr<engine::Engine> e;
+            engine::Engine*const e;
             core::cache::File<Font> cache;
 
         public:
-            Manager(const std::shared_ptr<system::stream::Stream>& s, const std::shared_ptr<engine::Engine>& e);
-            ~Manager();
-            std::shared_ptr<Font> get(const core::Id mid, const core::sync::EndCaller<Font> c);
+            Manager(system::stream::Stream* s, engine::Engine* e) noexcept;
+            ~Manager() noexcept = default;
+            std::shared_ptr<Font> get(core::Id mid, const core::sync::EndCaller<Font> c) noexcept;
         };
     }
 }

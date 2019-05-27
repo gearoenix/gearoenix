@@ -18,19 +18,14 @@ namespace render {
     namespace light {
         class Light : public core::asset::Asset {
         protected:
-            const std::shared_ptr<engine::Engine> e;
+            engine::Engine*const e;
             bool enabled = true;
             bool has_shadow = false;
             math::Vec3 color = math::Vec3(1.0f, 1.0f, 1.0f);
             math::Aabb3 influence;
 
-            Light(
-                core::Id my_id,
-                const std::shared_ptr<system::stream::Stream>& f,
-                const std::shared_ptr<engine::Engine>& e) noexcept;
-            Light(
-                core::Id my_id,
-                const std::shared_ptr<engine::Engine>& e) noexcept;
+            Light(core::Id my_id, system::stream::Stream* f, engine::Engine* e) noexcept;
+            Light(core::Id my_id, engine::Engine* e) noexcept;
 
         public:
             const math::Vec3& get_color() const noexcept;

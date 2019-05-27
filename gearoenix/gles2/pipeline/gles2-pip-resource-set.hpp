@@ -3,12 +3,12 @@
 #include "../../gl/gl-types.hpp"
 #include <memory>
 
-#define GX_GLES2_PIPRES_START_DRAWING_MESH                                \
-    static_cast<buffer::Index*>(msh->get_index_buffer().get())->bind();   \
-    static_cast<buffer::Vertex*>(msh->get_vertex_buffer().get())->bind(); \
+#define GX_GLES2_PIPRES_START_DRAWING_MESH                                     \
+    reinterpret_cast<const buffer::Index*>(msh->get_index_buffer())->bind();   \
+    reinterpret_cast<const buffer::Vertex*>(msh->get_vertex_buffer())->bind(); \
     gles2::pipeline::ResourceSet::bind(bound_shader_program)
 
-#define GX_GLES2_PIPRES_END_DRAWING_MESH static_cast<buffer::Index*>(msh->get_index_buffer().get())->draw()
+#define GX_GLES2_PIPRES_END_DRAWING_MESH reinterpret_cast<const buffer::Index*>(msh->get_index_buffer())->draw()
 
 #define GX_GLES2_PIPRES_START_SHADER(cls, shd) const shader::cls* shdr = static_cast<const shader::cls*>(shd.get())
 
@@ -39,8 +39,7 @@
         GX_GLES2_PIPRES_SET_UNIFORM(material_roughness_factor, material->roughness_factor);                                                  \
     }
 
-namespace gearoenix {
-namespace gles2 {
+namespace gearoenix::gles2 {
     namespace shader {
         class Shader;
     }
@@ -48,13 +47,12 @@ namespace gles2 {
         class ResourceSet {
         protected:
             const std::shared_ptr<shader::Shader> shd;
-            ResourceSet(const std::shared_ptr<shader::Shader>& shd);
+            explicit ResourceSet(const std::shared_ptr<shader::Shader>& shd);
 
         public:
             virtual ~ResourceSet();
             virtual void bind(gl::uint& bound_shader_program) const;
         };
     }
-}
 }
 #endif

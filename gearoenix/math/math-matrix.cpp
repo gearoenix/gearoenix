@@ -5,33 +5,23 @@
 #include "math-vector.hpp"
 #include <cmath>
 
-gearoenix::math::Mat2x2::Mat2x2()
-{
-    mat[0] = 1.0f;
-    mat[1] = 0.0f;
-    mat[2] = 0.0f;
-    mat[3] = 1.0f;
-}
+gearoenix::math::Mat2x2::Mat2x2() noexcept
+    : mat { 1.0f, 0.0f, 0.0f, 1.0f }
+{}
 
-gearoenix::math::Mat2x2::Mat2x2(const core::Real dia_e)
+gearoenix::math::Mat2x2::Mat2x2(const core::Real dia_e) noexcept
+    : mat { dia_e, 0.0f, 0.0f, dia_e }
 {
-    mat[0] = dia_e;
-    mat[1] = 0.0f;
-    mat[2] = 0.0f;
-    mat[3] = dia_e;
 }
 
 gearoenix::math::Mat2x2::Mat2x2(
     const core::Real e0, const core::Real e1,
-    const core::Real e2, const core::Real e3)
+    const core::Real e2, const core::Real e3) noexcept
+    : mat { e0,e1,e2, e3}
 {
-    mat[0] = e0;
-    mat[1] = e1;
-    mat[2] = e2;
-    mat[3] = e3;
 }
 
-bool gearoenix::math::Mat2x2::invert()
+bool gearoenix::math::Mat2x2::invert() noexcept
 {
     const core::Real det = mat[0] * mat[3] - mat[1] * mat[2];
     if (det < GXPOSEPSILON && det > GXNEGEPSILON)
@@ -49,12 +39,12 @@ bool gearoenix::math::Mat2x2::invert()
     return true;
 }
 
-gearoenix::math::Vec2 gearoenix::math::Mat2x2::operator*(const Vec2& v) const
+gearoenix::math::Vec2 gearoenix::math::Mat2x2::operator*(const Vec2& v) const noexcept
 {
     return Vec2(mat[0] * v[0] + mat[1] * v[1], mat[2] * v[0] + mat[3] * v[1]);
 }
 
-gearoenix::math::Mat4x4::Mat4x4(const core::Real e)
+gearoenix::math::Mat4x4::Mat4x4(const core::Real e) noexcept
     : mat { e,
         core::Real(0),
         core::Real(0),
@@ -74,7 +64,7 @@ gearoenix::math::Mat4x4::Mat4x4(const core::Real e)
 {
 }
 
-gearoenix::math::Mat4x4::Mat4x4()
+gearoenix::math::Mat4x4::Mat4x4() noexcept
     : mat {
         core::Real(1),
         core::Real(0),
@@ -100,7 +90,7 @@ gearoenix::math::Mat4x4::Mat4x4(
     core::Real e0, core::Real e1, core::Real e2, core::Real e3,
     core::Real e4, core::Real e5, core::Real e6, core::Real e7,
     core::Real e8, core::Real e9, core::Real e10, core::Real e11,
-    core::Real e12, core::Real e13, core::Real e14, core::Real e15)
+    core::Real e12, core::Real e13, core::Real e14, core::Real e15) noexcept
     : mat {
         e0,
         e1,
@@ -122,26 +112,27 @@ gearoenix::math::Mat4x4::Mat4x4(
 {
 }
 
-gearoenix::math::Mat4x4::Mat4x4(const std::shared_ptr<system::stream::Stream>& f)
+gearoenix::math::Mat4x4::Mat4x4(system::stream::Stream*const f) noexcept : mat {}
 {
     read(f);
 }
 
-gearoenix::math::Mat4x4::Mat4x4(const Mat4x4& m)
+gearoenix::math::Mat4x4::Mat4x4(const Mat4x4& m) noexcept
+        : mat {}
 {
     for (int i = 0; i < 16; i++) {
         mat[i] = m.mat[i];
     }
 }
 
-gearoenix::math::Vec3 gearoenix::math::Mat4x4::operator*(const Vec3& v) const
+gearoenix::math::Vec3 gearoenix::math::Mat4x4::operator*(const Vec3& v) const noexcept
 {
     return Vec3(mat[0] * v[0] + mat[4] * v[1] + mat[8] * v[2] + mat[12],
         mat[1] * v[0] + mat[5] * v[1] + mat[9] * v[2] + mat[13],
         mat[2] * v[0] + mat[6] * v[1] + mat[10] * v[2] + mat[14]);
 }
 
-gearoenix::math::Vec4 gearoenix::math::Mat4x4::operator*(const Vec4& v) const
+gearoenix::math::Vec4 gearoenix::math::Mat4x4::operator*(const Vec4& v) const noexcept
 {
     return Vec4(
         mat[0] * v[0] + mat[4] * v[1] + mat[8] * v[2] + mat[12] * v[3],
@@ -150,7 +141,7 @@ gearoenix::math::Vec4 gearoenix::math::Mat4x4::operator*(const Vec4& v) const
         mat[3] * v[0] + mat[7] * v[1] + mat[11] * v[2] + mat[15] * v[3]);
 }
 
-gearoenix::math::Mat4x4 gearoenix::math::Mat4x4::operator*(const Mat4x4& m) const
+gearoenix::math::Mat4x4 gearoenix::math::Mat4x4::operator*(const Mat4x4& m) const noexcept
 {
     Mat4x4 r;
     for (int i = 0, ri = 0; i < 16; i += 4) {
@@ -161,7 +152,7 @@ gearoenix::math::Mat4x4 gearoenix::math::Mat4x4::operator*(const Mat4x4& m) cons
     return r;
 }
 
-gearoenix::math::Mat4x4& gearoenix::math::Mat4x4::operator=(const Mat4x4& m)
+gearoenix::math::Mat4x4& gearoenix::math::Mat4x4::operator=(const Mat4x4& m) noexcept
 {
     for (int i = 0; i < 16; i++) {
         mat[i] = m.mat[i];
@@ -169,7 +160,7 @@ gearoenix::math::Mat4x4& gearoenix::math::Mat4x4::operator=(const Mat4x4& m)
     return *this;
 }
 
-void gearoenix::math::Mat4x4::operator*=(const Mat4x4& m)
+void gearoenix::math::Mat4x4::operator*=(const Mat4x4& m) noexcept
 {
     Mat4x4 r;
     for (int i = 0, ri = 0; i < 16; i += 4) {
@@ -182,7 +173,7 @@ void gearoenix::math::Mat4x4::operator*=(const Mat4x4& m)
     }
 }
 
-const gearoenix::core::Real& gearoenix::math::Mat4x4::operator[](const unsigned int i) const
+const gearoenix::core::Real& gearoenix::math::Mat4x4::operator[](const unsigned int i) const noexcept
 {
 #ifdef GX_DEBUG_MODE
     if (i > 15) {
@@ -192,7 +183,7 @@ const gearoenix::core::Real& gearoenix::math::Mat4x4::operator[](const unsigned 
     return mat[i];
 }
 
-gearoenix::core::Real& gearoenix::math::Mat4x4::operator[](const unsigned int i)
+gearoenix::core::Real& gearoenix::math::Mat4x4::operator[](const unsigned int i) noexcept
 {
 #ifdef GX_DEBUG_MODE
     if (i > 15) {
@@ -202,7 +193,7 @@ gearoenix::core::Real& gearoenix::math::Mat4x4::operator[](const unsigned int i)
     return mat[i];
 }
 
-void gearoenix::math::Mat4x4::local_scale(const core::Real& s)
+void gearoenix::math::Mat4x4::local_scale(const core::Real s) noexcept
 {
     mat[0] *= s;
     mat[1] *= s;
@@ -218,7 +209,7 @@ void gearoenix::math::Mat4x4::local_scale(const core::Real& s)
     mat[11] *= s;
 }
 
-void gearoenix::math::Mat4x4::local_scale(const core::Real& a, const core::Real& b, const core::Real& c)
+void gearoenix::math::Mat4x4::local_scale(const core::Real a, const core::Real b, const core::Real c) noexcept
 {
     mat[0] *= a;
     mat[1] *= a;
@@ -234,7 +225,7 @@ void gearoenix::math::Mat4x4::local_scale(const core::Real& a, const core::Real&
     mat[11] *= c;
 }
 
-void gearoenix::math::Mat4x4::local_scale(const core::Real& a, const core::Real& b, const core::Real& c, const core::Real& d)
+void gearoenix::math::Mat4x4::local_scale(const core::Real a, const core::Real b, const core::Real c, const core::Real d) noexcept
 {
     mat[0] *= a;
     mat[1] *= a;
@@ -254,17 +245,17 @@ void gearoenix::math::Mat4x4::local_scale(const core::Real& a, const core::Real&
     mat[15] *= d;
 }
 
-void gearoenix::math::Mat4x4::local_scale(const Vec3& s)
+void gearoenix::math::Mat4x4::local_scale(const Vec3& s) noexcept
 {
     local_scale(s[0], s[1], s[2]);
 }
 
-void gearoenix::math::Mat4x4::local_scale(const Vec4& s)
+void gearoenix::math::Mat4x4::local_scale(const Vec4& s) noexcept
 {
     local_scale(s[0], s[1], s[2], s[3]);
 }
 
-void gearoenix::math::Mat4x4::global_scale(const core::Real& s)
+void gearoenix::math::Mat4x4::global_scale(const core::Real s) noexcept
 {
     mat[0] *= s;
     mat[1] *= s;
@@ -280,7 +271,7 @@ void gearoenix::math::Mat4x4::global_scale(const core::Real& s)
     mat[14] *= s;
 }
 
-void gearoenix::math::Mat4x4::global_scale(const core::Real& a, const core::Real& b, const core::Real& c)
+void gearoenix::math::Mat4x4::global_scale(const core::Real a, const core::Real b, const core::Real c) noexcept
 {
     mat[0] *= a;
     mat[4] *= a;
@@ -298,7 +289,7 @@ void gearoenix::math::Mat4x4::global_scale(const core::Real& a, const core::Real
     mat[14] *= c;
 }
 
-void gearoenix::math::Mat4x4::global_scale(const core::Real& a, const core::Real& b, const core::Real& c, const core::Real& d)
+void gearoenix::math::Mat4x4::global_scale(const core::Real a, const core::Real b, const core::Real c, const core::Real d) noexcept
 {
     mat[0] *= a;
     mat[4] *= a;
@@ -321,24 +312,24 @@ void gearoenix::math::Mat4x4::global_scale(const core::Real& a, const core::Real
     mat[15] *= d;
 }
 
-void gearoenix::math::Mat4x4::global_scale(const Vec3& s)
+void gearoenix::math::Mat4x4::global_scale(const Vec3& s) noexcept
 {
     global_scale(s[0], s[1], s[2]);
 }
 
-void gearoenix::math::Mat4x4::global_scale(const Vec4& s)
+void gearoenix::math::Mat4x4::global_scale(const Vec4& s) noexcept
 {
     global_scale(s[0], s[1], s[2], s[4]);
 }
 
-void gearoenix::math::Mat4x4::translate(const Vec3& v)
+void gearoenix::math::Mat4x4::translate(const Vec3& v) noexcept
 {
     mat[12] += v[0];
     mat[13] += v[1];
     mat[14] += v[2];
 }
 
-gearoenix::core::Real gearoenix::math::Mat4x4::determinant() const
+gearoenix::core::Real gearoenix::math::Mat4x4::determinant() const noexcept
 {
     return (+mat[0] * (+mat[5] * (mat[10] * mat[15] - mat[11] * mat[14]) - mat[9] * (mat[6] * mat[15] - mat[7] * mat[14]) + mat[13] * (mat[6] * mat[11] - mat[7] * mat[10]))
         - mat[4] * (+mat[1] * (mat[10] * mat[15] - mat[11] * mat[14]) - mat[9] * (mat[2] * mat[15] - mat[3] * mat[14]) + mat[13] * (mat[2] * mat[11] - mat[3] * mat[10]))
@@ -346,34 +337,34 @@ gearoenix::core::Real gearoenix::math::Mat4x4::determinant() const
         - mat[12] * (+mat[1] * (mat[6] * mat[11] - mat[7] * mat[10]) - mat[5] * (mat[2] * mat[11] - mat[3] * mat[10]) + mat[9] * (mat[2] * mat[7] - mat[3] * mat[6])));
 }
 
-void gearoenix::math::Mat4x4::set_location_zero()
+void gearoenix::math::Mat4x4::set_location_zero() noexcept
 {
     mat[12] = core::Real(0);
     mat[13] = core::Real(0);
     mat[14] = core::Real(0);
 }
 
-void gearoenix::math::Mat4x4::set_location(const Vec3& location)
+void gearoenix::math::Mat4x4::set_location(const Vec3& location) noexcept
 {
     mat[12] = location[0];
     mat[13] = location[1];
     mat[14] = location[2];
 }
 
-void gearoenix::math::Mat4x4::get_location(Vec3& location) const
+void gearoenix::math::Mat4x4::get_location(Vec3& location) const noexcept
 {
     location[0] = mat[12];
     location[1] = mat[13];
     location[2] = mat[14];
 }
 
-void gearoenix::math::Mat4x4::read(const std::shared_ptr<system::stream::Stream>& f)
+void gearoenix::math::Mat4x4::read(system::stream::Stream*const f) noexcept
 {
     for (core::Real& i : mat)
         f->read(i);
 }
 
-gearoenix::math::Mat4x4 gearoenix::math::Mat4x4::inverted() const
+gearoenix::math::Mat4x4 gearoenix::math::Mat4x4::inverted() const noexcept
 {
     core::Real id = 1.0f / determinant();
     Mat4x4 result;
@@ -396,7 +387,7 @@ gearoenix::math::Mat4x4 gearoenix::math::Mat4x4::inverted() const
     return result;
 }
 
-gearoenix::math::Mat4x4 gearoenix::math::Mat4x4::look_at(const Vec3& position, const Vec3& target, const Vec3& up)
+gearoenix::math::Mat4x4 gearoenix::math::Mat4x4::look_at(const Vec3& position, const Vec3& target, const Vec3& up) noexcept
 {
     Vec3 z = (target - position).normalized();
     Vec3 x = up.cross(z).normalized();
@@ -421,7 +412,7 @@ gearoenix::math::Mat4x4 gearoenix::math::Mat4x4::look_at(const Vec3& position, c
     return m;
 }
 
-gearoenix::math::Mat4x4 gearoenix::math::Mat4x4::rotation(const Vec3& v, const core::Real degree)
+gearoenix::math::Mat4x4 gearoenix::math::Mat4x4::rotation(const Vec3& v, const core::Real degree) noexcept
 {
     const auto sinus = static_cast<core::Real>(sin(static_cast<double>(degree)));
     const auto cosinus = static_cast<core::Real>(cos(static_cast<double>(degree)));
@@ -459,7 +450,7 @@ gearoenix::math::Mat4x4 gearoenix::math::Mat4x4::rotation(const Vec3& v, const c
     return m;
 }
 
-gearoenix::math::Mat4x4 gearoenix::math::Mat4x4::translator(const Vec3& v)
+gearoenix::math::Mat4x4 gearoenix::math::Mat4x4::translator(const Vec3& v) noexcept
 {
     Mat4x4 r;
     r.mat[0] = core::Real(1);
@@ -481,7 +472,7 @@ gearoenix::math::Mat4x4 gearoenix::math::Mat4x4::translator(const Vec3& v)
     return r;
 }
 
-gearoenix::math::Mat4x4 gearoenix::math::Mat4x4::orthographic(const core::Real width, const core::Real height, const core::Real near, const core::Real far)
+gearoenix::math::Mat4x4 gearoenix::math::Mat4x4::orthographic(const core::Real width, const core::Real height, const core::Real near, const core::Real far) noexcept
 {
     Mat4x4 r;
     r.mat[0] = core::Real(2.0f / width);
@@ -503,7 +494,7 @@ gearoenix::math::Mat4x4 gearoenix::math::Mat4x4::orthographic(const core::Real w
     return r;
 }
 
-gearoenix::math::Mat4x4 gearoenix::math::Mat4x4::perspective(const core::Real width, const core::Real height, const core::Real near, const core::Real far)
+gearoenix::math::Mat4x4 gearoenix::math::Mat4x4::perspective(const core::Real width, const core::Real height, const core::Real near, const core::Real far) noexcept
 {
     Mat4x4 r;
     r.mat[0] = core::Real((2.0f * near) / width);
@@ -525,7 +516,7 @@ gearoenix::math::Mat4x4 gearoenix::math::Mat4x4::perspective(const core::Real wi
     return r;
 }
 
-gearoenix::math::Mat4x4 gearoenix::math::Mat4x4::transposed() const
+gearoenix::math::Mat4x4 gearoenix::math::Mat4x4::transposed() const noexcept
 {
     Mat4x4 r;
     for (unsigned int i = 0; i < 16; ++i) {
@@ -534,7 +525,7 @@ gearoenix::math::Mat4x4 gearoenix::math::Mat4x4::transposed() const
     return r;
 }
 
-const gearoenix::core::Real* gearoenix::math::Mat4x4::data() const
+const gearoenix::core::Real* gearoenix::math::Mat4x4::data() const noexcept
 {
     return mat;
 }

@@ -6,8 +6,7 @@
 #include "../../gl/gl-types.hpp"
 #include "../../render/buffer/rnd-buf-static.hpp"
 #include <vector>
-namespace gearoenix {
-namespace gles2 {
+namespace gearoenix::gles2 {
     namespace engine {
         class Engine;
     }
@@ -20,15 +19,14 @@ namespace gles2 {
 
         public:
             Index(
-                const std::vector<std::uint32_t> indices,
-                const std::shared_ptr<engine::Engine>& e,
-                const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
-            ~Index();
-            void bind() const;
-            void draw() const;
+                std::vector<std::uint32_t> indices,
+                engine::Engine* e,
+                const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept ;
+            ~Index() noexcept final;
+            void bind() const noexcept ;
+            void draw() const noexcept ;
         };
     }
-}
 }
 #endif
 #endif

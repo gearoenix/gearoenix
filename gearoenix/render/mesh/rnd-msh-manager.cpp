@@ -3,15 +3,13 @@
 #include "rnd-msh-mesh.hpp"
 #include "rnd-msh-type.hpp"
 
-gearoenix::render::mesh::Manager::Manager(const std::shared_ptr<system::stream::Stream>& s, const std::shared_ptr<engine::Engine>& e)
+gearoenix::render::mesh::Manager::Manager(system::stream::Stream*const s, engine::Engine*const e) noexcept
     : e(e)
     , cache(s)
 {
 }
 
-gearoenix::render::mesh::Manager::~Manager() {}
-
-std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager::get_gx3d(const core::Id id, core::sync::EndCaller<Mesh>& c)
+std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager::get_gx3d(const core::Id id, core::sync::EndCaller<Mesh>& c) noexcept
 {
     auto m = cache.get<Mesh>(id, [id, c, this] {
         const auto& f = cache.get_file();
@@ -19,7 +17,7 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager:
         case Type::BASIC:
             return std::make_shared<Mesh>(id, f, e, core::sync::EndCaller<core::sync::EndCallerIgnore>([c] {}));
         default:
-            GXUNEXPECTED;
+            GXUNEXPECTED
         }
     });
     c.set_data(m);

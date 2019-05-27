@@ -2,13 +2,13 @@
 #define GEAROENIX_CORE_STATIC_HPP
 #define GXCOUNTOF(x) (sizeof(x) / sizeof(x[0]))
 #include "cr-types.hpp"
-#define GXISZERO(x) (((x) < (GXPOSEPSILON)) && ((x) > (GXNEGEPSILON)))
+#define GX_IS_ZERO(x) (((x) < (GXPOSEPSILON)) && ((x) > (GXNEGEPSILON)))
 #define GXISNOTZERO(x) (((x) > (GXPOSEPSILON)) || ((x) < (GXNEGEPSILON)))
-#ifndef GXMAX
-#define GXMAX(x, y) (((x) > (y)) ? (x) : (y))
+#ifndef GX_MAX
+#define GX_MAX(x, y) (((x) > (y)) ? (x) : (y))
 #endif
-#ifndef GXMIN
-#define GXMIN(x, y) (((x) < (y)) ? (x) : (y))
+#ifndef GX_MIN
+#define GX_MIN(x, y) (((x) < (y)) ? (x) : (y))
 #endif
 #ifdef setz
 #error "setz already defined"

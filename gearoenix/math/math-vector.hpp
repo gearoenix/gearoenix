@@ -1,7 +1,6 @@
 #ifndef GEAROENIX_MATH_VECTOR_HPP
 #define GEAROENIX_MATH_VECTOR_HPP
 #include "../core/cr-types.hpp"
-#include <memory>
 #include <ostream>
 
 namespace gearoenix {
@@ -46,7 +45,7 @@ namespace math {
         core::Real square_distance(const Vec2& a) const noexcept;
         Vec2 normalized() const noexcept;
         void normalize() noexcept;
-        void read(const std::shared_ptr<system::stream::Stream>& f) noexcept;
+        void read(system::stream::Stream* f) noexcept;
         static bool intersect(const Vec2& s11, const Vec2& s12, const Vec2& s21, const Vec2& s22, Vec2& i) noexcept;
 
         friend std::ostream& operator<<(std::ostream& os, const Vec2& v) noexcept
@@ -73,6 +72,7 @@ namespace math {
         Vec3 operator+(const Vec3& a) const noexcept;
         Vec3 operator+(core::Real a) const noexcept;
         Vec3 operator-(const Vec3& a) const noexcept;
+        Vec3 operator-(core::Real a) const noexcept;
         Vec3 operator*(const Vec3& a) const noexcept;
         Vec3 operator*(core::Real a) const noexcept;
         Vec3 operator/(const Vec3& a) const noexcept;
@@ -100,7 +100,7 @@ namespace math {
         Vec3 cross(const Vec3& o) const noexcept;
         Vec3 normalized() const noexcept;
         void normalize() noexcept;
-        void read(const std::shared_ptr<system::stream::Stream>& f) noexcept;
+        void read(system::stream::Stream* f) noexcept;
 
         friend std::ostream& operator<<(std::ostream& os, const Vec3& v) noexcept
         {
@@ -134,7 +134,7 @@ namespace math {
         Vec4 cross(const Vec4& o) const noexcept;
         Vec4 normalized() const noexcept;
         void normalize() noexcept;
-        void read(const std::shared_ptr<system::stream::Stream>& f) noexcept;
+        void read(system::stream::Stream* f) noexcept;
         const core::Real* data() const noexcept;
 
         friend std::ostream& operator<<(std::ostream& os, const Vec4& v) noexcept

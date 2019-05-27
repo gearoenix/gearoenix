@@ -8,7 +8,6 @@
 namespace gearoenix::render {
 namespace camera {
     class Camera;
-    class Orthographic;
 }
 namespace model {
     class Model;
@@ -29,16 +28,10 @@ namespace light {
         math::Vec3 direction = math::Vec3(0.0f, 0.0f, -1.0f);
 
     public:
-        Directional(
-            core::Id my_id,
-            const std::shared_ptr<system::stream::Stream>& f,
-            const std::shared_ptr<engine::Engine>& e) noexcept;
-        Directional(
-            core::Id my_id,
-            const std::shared_ptr<engine::Engine>& e) noexcept;
+        Directional(core::Id my_id, system::stream::Stream* f, engine::Engine* e) noexcept;
+        Directional(core::Id my_id, engine::Engine* e) noexcept;
         const math::Vec3& get_direction() const noexcept;
         void set_direction(const math::Vec3& dir) noexcept;
-        std::shared_ptr<CascadeInfo> create_cascades_info(const std::vector<math::Vec3[4]>& partitions) const noexcept;
     };
 }
 }

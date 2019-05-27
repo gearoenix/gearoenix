@@ -5,13 +5,10 @@
 #include "../../core/sync/cr-sync-end-caller.hpp"
 #include "../../math/math-vertex.hpp"
 #include "rnd-msh-type.hpp"
-#include <memory>
 namespace gearoenix {
-namespace system {
-    namespace stream {
+namespace system::stream {
         class Stream;
     }
-}
 namespace render {
     namespace engine {
         class Engine;
@@ -37,36 +34,37 @@ namespace render {
             const Type::Id mesh_type_id;
 
             core::Real radius = 0.0f;
-            std::shared_ptr<buffer::Buffer> vertex_buffer = nullptr;
-            std::shared_ptr<buffer::Buffer> index_buffer = nullptr;
+            buffer::Buffer* vertex_buffer = nullptr;
+            buffer::Buffer* index_buffer = nullptr;
 
-            Mesh(const core::Id my_id, const Type::Id mesh_type_id);
+            Mesh(core::Id my_id, Type::Id mesh_type_id) noexcept;
 
         public:
             Mesh(
-                const core::Id my_id,
-                const std::shared_ptr<system::stream::Stream>& f,
-                const std::shared_ptr<engine::Engine>& e,
-                const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
+                core::Id my_id,
+                system::stream::Stream* f,
+                engine::Engine* e,
+                const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept ;
             Mesh(
-                const core::Id my_id,
-                const std::vector<math::BasicVertex>& vertices,
-                const std::vector<std::uint32_t>& indices,
-                const core::Real radius,
-                const std::shared_ptr<engine::Engine>& e,
+                core::Id my_id,
+                std::vector<math::BasicVertex> vertices,
+                std::vector<std::uint32_t> indices,
+                core::Real radius,
+                engine::Engine* e,
                 const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
-            ~Mesh();
-            void draw();
+            ~Mesh() noexcept final;
             void set_vertices(
-                const std::shared_ptr<engine::Engine>& e,
-                const std::vector<math::BasicVertex>& vertices,
-                const std::vector<std::uint32_t>& indices,
-                const core::Real radius,
+                engine::Engine* e,
+                std::vector<math::BasicVertex> vertices,
+                std::vector<std::uint32_t> indices,
+                core::Real radius,
                 const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
-            core::Real get_radius() const;
-            Type::Id get_mesh_type_id() const;
-            const std::shared_ptr<buffer::Buffer>& get_vertex_buffer() const;
-            const std::shared_ptr<buffer::Buffer>& get_index_buffer() const;
+            core::Real get_radius() const noexcept;
+            Type::Id get_mesh_type_id() const noexcept;
+            const buffer::Buffer* get_vertex_buffer() const noexcept;
+            buffer::Buffer* get_vertex_buffer() noexcept;
+            const buffer::Buffer* get_index_buffer() const noexcept;
+            buffer::Buffer* get_index_buffer() noexcept;
         };
     }
 }

@@ -6,10 +6,8 @@
 #include "../../gl/gl-types.hpp"
 #include "../../math/math-vertex.hpp"
 #include "../../render/buffer/rnd-buf-static.hpp"
-#include "../gles2.hpp"
 #include <vector>
-namespace gearoenix {
-namespace gles2 {
+namespace gearoenix::gles2 {
     namespace engine {
         class Engine;
     }
@@ -21,14 +19,13 @@ namespace gles2 {
 
         public:
             Vertex(
-                const std::vector<math::BasicVertex> vertices,
-                const std::shared_ptr<engine::Engine>& e,
-                const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
-            ~Vertex();
-            void bind() const;
+                std::vector<math::BasicVertex> vertices,
+                engine::Engine* e,
+                const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+            ~Vertex() noexcept final;
+            void bind() const noexcept ;
         };
     }
-}
 }
 #endif
 #endif

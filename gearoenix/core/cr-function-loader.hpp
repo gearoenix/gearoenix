@@ -1,10 +1,9 @@
-#ifndef GEAROENIX_CORE_FUNCTIONLOADER_HPP
-#define GEAROENIX_CORE_FUNCTIONLOADER_HPP
+#ifndef GEAROENIX_CORE_FUNCTION_LOADER_HPP
+#define GEAROENIX_CORE_FUNCTION_LOADER_HPP
 #include <functional>
 #include <mutex>
 #include <vector>
-namespace gearoenix {
-namespace core {
+namespace gearoenix::core {
     class FunctionLoader {
     private:
         std::mutex locker;
@@ -17,6 +16,5 @@ namespace core {
         void unload();
         unsigned int get_loadeds_count() const;
     };
-}
 }
 #endif

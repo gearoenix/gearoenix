@@ -7,24 +7,24 @@
 #include "../engine/gles2-eng-engine.hpp"
 
 gearoenix::gles2::buffer::Index::Index(
-    const std::vector<std::uint32_t> indices,
-    const std::shared_ptr<engine::Engine>& e,
-    const core::sync::EndCaller<core::sync::EndCallerIgnore>& c)
+    std::vector<std::uint32_t> indices,
+    engine::Engine*const e,
+    const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : render::buffer::Static(static_cast<unsigned int>(indices.size() * sizeof(gl::ushort)), e)
 {
-    std::vector<gl::ushort> idata(indices.size());
+    std::vector<gl::ushort> data(indices.size());
     for (size_t i = 0; i < indices.size(); ++i) {
-        idata[i] = static_cast<gl::ushort>(indices[i]);
+        data[i] = static_cast<gl::ushort>(indices[i]);
     }
     count = static_cast<gl::sizei>(indices.size());
-    e->get_function_loader()->load([this, idata, c] {
+    e->get_function_loader()->load([this, data { move(data) }, c] {
         gl::Loader::gen_buffers(1, &bo);
         gl::Loader::bind_buffer(GL_ELEMENT_ARRAY_BUFFER, bo);
-        gl::Loader::buffer_data(GL_ELEMENT_ARRAY_BUFFER, size, idata.data(), GL_STATIC_DRAW);
+        gl::Loader::buffer_data(GL_ELEMENT_ARRAY_BUFFER, size, data.data(), GL_STATIC_DRAW);
     });
 }
 
-gearoenix::gles2::buffer::Index::~Index()
+gearoenix::gles2::buffer::Index::~Index() noexcept
 {
     if (bo == 0)
         return;
@@ -36,14 +36,14 @@ gearoenix::gles2::buffer::Index::~Index()
     bo = 0;
 }
 
-void gearoenix::gles2::buffer::Index::bind() const
+void gearoenix::gles2::buffer::Index::bind() const noexcept
 {
     gl::Loader::bind_buffer(GL_ELEMENT_ARRAY_BUFFER, bo);
 }
 
-void gearoenix::gles2::buffer::Index::draw() const
+void gearoenix::gles2::buffer::Index::draw() const noexcept
 {
-    gl::Loader::draw_elements(GL_TRIANGLES, count, GL_UNSIGNED_SHORT, 0);
+    gl::Loader::draw_elements(GL_TRIANGLES, count, GL_UNSIGNED_SHORT, nullptr);
 }
 
 #endif

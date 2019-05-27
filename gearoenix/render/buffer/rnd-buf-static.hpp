@@ -1,18 +1,12 @@
 #ifndef GEAROENIX_RENDER_BUFFER_STATIC_HPP
 #define GEAROENIX_RENDER_BUFFER_STATIC_HPP
 #include "rnd-buf-buffer.hpp"
-
-namespace gearoenix {
-namespace render {
-    namespace buffer {
+namespace gearoenix::render::buffer {
         class Static : public Buffer {
         protected:
-            Static(const unsigned int size, const std::shared_ptr<engine::Engine>& e);
-
+            Static(const unsigned int size, engine::Engine*const e) noexcept : Buffer(size, e) {}
         public:
-            virtual ~Static();
+            virtual ~Static() noexcept = default;
         };
     }
-}
-}
 #endif

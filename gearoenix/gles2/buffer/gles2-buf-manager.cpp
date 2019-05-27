@@ -7,28 +7,24 @@
 #include "gles2-buf-vertex.hpp"
 #include <cstring>
 
-gearoenix::gles2::buffer::Manager::Manager(const std::shared_ptr<engine::Engine>& e)
+gearoenix::gles2::buffer::Manager::Manager(engine::Engine*const e) noexcept
     : render::buffer::Manager(e)
 {
 }
 
-gearoenix::gles2::buffer::Manager::~Manager()
+gearoenix::render::buffer::Uniform* gearoenix::gles2::buffer::Manager::create_uniform(const unsigned int size) noexcept
 {
+    return new Uniform(size, dynamic_cast<engine::Engine*>(e));
 }
 
-std::shared_ptr<gearoenix::render::buffer::Uniform> gearoenix::gles2::buffer::Manager::create_uniform(const unsigned int size)
+gearoenix::render::buffer::Static* gearoenix::gles2::buffer::Manager::create_static(std::vector<math::BasicVertex> vertices, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
 {
-    return std::shared_ptr<render::buffer::Uniform>(new Uniform(size, std::static_pointer_cast<engine::Engine>(e)));
+    return new Vertex(std::move(vertices), dynamic_cast<engine::Engine*>(e), c);
 }
 
-std::shared_ptr<gearoenix::render::buffer::Static> gearoenix::gles2::buffer::Manager::create_static(const std::vector<math::BasicVertex> vertices, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c)
+gearoenix::render::buffer::Static* gearoenix::gles2::buffer::Manager::create_static(std::vector<std::uint32_t> indices, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
 {
-    return std::make_shared<Vertex>(vertices, std::static_pointer_cast<engine::Engine>(e), c);
-}
-
-std::shared_ptr<gearoenix::render::buffer::Static> gearoenix::gles2::buffer::Manager::create_static(const std::vector<std::uint32_t> indices, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c)
-{
-    return std::make_shared<Index>(indices, std::static_pointer_cast<engine::Engine>(e), c);
+    return new Index(std::move(indices), dynamic_cast<engine::Engine*>(e), c);
 }
 
 #endif

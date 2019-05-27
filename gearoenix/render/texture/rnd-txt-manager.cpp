@@ -9,15 +9,13 @@
 #include "rnd-txt-texture-cube.hpp"
 #include "rnd-txt-type.hpp"
 
-gearoenix::render::texture::Manager::Manager(const std::shared_ptr<system::stream::Stream>& s, const std::shared_ptr<engine::Engine>& e)
+gearoenix::render::texture::Manager::Manager(system::stream::Stream*const s, engine::Engine*const e) noexcept
     : e(e)
     , cache(s)
 {
 }
 
-gearoenix::render::texture::Manager::~Manager() {}
-
-std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::get_2d(const math::Vec4& color, core::sync::EndCaller<Texture2D>& c)
+std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::get_2d(const math::Vec4& color, core::sync::EndCaller<Texture2D>& c) noexcept
 {
     static_assert(sizeof(core::Real) == 4, "Only float 32 bit are supported.");
     std::shared_ptr<core::Real[]> cc(new core::Real[4]);
@@ -47,7 +45,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     return data;
 }
 
-std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::get_2d(const math::Vec3& color, core::sync::EndCaller<Texture2D>& c)
+std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::get_2d(const math::Vec3& color, core::sync::EndCaller<Texture2D>& c) noexcept
 {
     const auto search = color_3d_id_t2d.find(color);
     const bool found = color_3d_id_t2d.end() != search;
@@ -57,7 +55,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     return get_2d(math::Vec4(color, 1.0f), c);
 }
 
-std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::get_2d(const math::Vec2& color, core::sync::EndCaller<Texture2D>& c)
+std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::get_2d(const math::Vec2& color, core::sync::EndCaller<Texture2D>& c) noexcept
 {
     const auto search = color_2d_id_t2d.find(color);
     const bool found = color_2d_id_t2d.end() != search;
@@ -67,7 +65,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     return get_2d(math::Vec4(color, 0.0f, 1.0f), c);
 }
 
-std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::get_2d(const core::Real value, core::sync::EndCaller<Texture2D>& c)
+std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::get_2d(const core::Real value, core::sync::EndCaller<Texture2D>& c) noexcept
 {
     const auto search = color_1d_id_t2d.find(value);
     const bool found = color_1d_id_t2d.end() != search;
@@ -77,7 +75,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     return get_2d(math::Vec4(value, 0.0f, 0.0f, 1.0f), c);
 }
 
-std::shared_ptr<gearoenix::render::texture::Cube> gearoenix::render::texture::Manager::get_cube(const math::Vec4& color, core::sync::EndCaller<Cube>& c)
+std::shared_ptr<gearoenix::render::texture::Cube> gearoenix::render::texture::Manager::get_cube(const math::Vec4& color, core::sync::EndCaller<Cube>& c) noexcept
 {
     static_assert(sizeof(core::Real) == 4, "Only float 32 bit are supported.");
     std::shared_ptr<core::Real[]> cc(new core::Real[4]);
@@ -107,7 +105,7 @@ std::shared_ptr<gearoenix::render::texture::Cube> gearoenix::render::texture::Ma
     return data;
 }
 
-std::shared_ptr<gearoenix::render::texture::Cube> gearoenix::render::texture::Manager::get_cube(const math::Vec3& color, core::sync::EndCaller<Cube>& c)
+std::shared_ptr<gearoenix::render::texture::Cube> gearoenix::render::texture::Manager::get_cube(const math::Vec3& color, core::sync::EndCaller<Cube>& c) noexcept
 {
     const auto search = color_3d_id_cube.find(color);
     const bool found = color_3d_id_cube.end() != search;
@@ -117,7 +115,7 @@ std::shared_ptr<gearoenix::render::texture::Cube> gearoenix::render::texture::Ma
     return get_cube(math::Vec4(color, 1.0f), c);
 }
 
-std::shared_ptr<gearoenix::render::texture::Cube> gearoenix::render::texture::Manager::get_cube(const math::Vec2& color, core::sync::EndCaller<Cube>& c)
+std::shared_ptr<gearoenix::render::texture::Cube> gearoenix::render::texture::Manager::get_cube(const math::Vec2& color, core::sync::EndCaller<Cube>& c) noexcept
 {
     const auto search = color_2d_id_cube.find(color);
     const bool found = color_2d_id_cube.end() != search;
@@ -127,10 +125,10 @@ std::shared_ptr<gearoenix::render::texture::Cube> gearoenix::render::texture::Ma
     return get_cube(math::Vec4(color, 0.0f, 1.0f), c);
 }
 
-std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::render::texture::Manager::get_gx3d(const core::Id id, core::sync::EndCaller<Texture>& c)
+std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::render::texture::Manager::get_gx3d(const core::Id id, core::sync::EndCaller<Texture>& c) noexcept
 {
     const std::shared_ptr<Texture> o = cache.get<Texture>(id, [this, id, c] {
-        const std::shared_ptr<system::stream::Stream>& f = cache.get_file();
+        system::stream::Stream*const f = cache.get_file();
         switch (f->read<Type::Id>()) {
         case Type::TEXTURE_2D: {
             std::shared_ptr<std::vector<unsigned char>> data(new std::vector<unsigned char>);
@@ -138,19 +136,16 @@ std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::render::texture:
             unsigned int img_height;
             PNG::decode(f, *(data.get()), img_width, img_height);
             core::sync::EndCaller<core::sync::EndCallerIgnore> call([c, data] {});
-            SampleInfo sinfo;
+            SampleInfo sinfo = SampleInfo();
             return std::shared_ptr<Texture>(e->create_texture_2d(
                 id, static_cast<const void*>(data->data()), TextureFormat::RGBA_UINT8, sinfo, img_width, img_height, call));
         }
         case Type::TEXTURE_3D:
-            GXUNIMPLEMENTED;
-            break;
+            GXUNIMPLEMENTED
         case Type::CUBE:
-            GXUNIMPLEMENTED;
-            break;
+            GXUNIMPLEMENTED
         default:
-            GXUNEXPECTED;
-            break;
+            GXUNEXPECTED
         }
     });
     c.set_data(o);

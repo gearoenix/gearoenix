@@ -29,6 +29,7 @@ namespace light {
         /// It is now owner of engine
         engine::Engine* const e;
         std::vector<FrameCascadeInfo*> frames;
+        FrameCascadeInfo* current_frame = nullptr;
 
     public:
         explicit CascadeInfo(engine::Engine* e) noexcept;

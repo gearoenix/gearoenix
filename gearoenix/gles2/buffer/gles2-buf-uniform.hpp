@@ -3,8 +3,7 @@
 #include "../../core/cr-build-configuration.hpp"
 #ifdef GX_USE_OPENGL_ES2
 #include "../../render/buffer/rnd-buf-uniform.hpp"
-namespace gearoenix {
-namespace gles2 {
+namespace gearoenix::gles2 {
     namespace engine {
         class Engine;
     }
@@ -14,13 +13,12 @@ namespace gles2 {
             unsigned char* data = nullptr;
 
         public:
-            Uniform(const unsigned int s, const std::shared_ptr<engine::Engine>& e);
-            ~Uniform();
-            void update(const void* src);
-            void* get_data();
+            Uniform(unsigned int s, engine::Engine* e) noexcept ;
+            ~Uniform() noexcept final;
+            void update(const void* src) noexcept final;
+            const void* get_data() noexcept final;
         };
     } // namespace buffer
-} // namespace gles2
 } // namespace gearoenix
 #endif
 #endif // GEAROENIX_GLES2_BUFFER_UNIFORM_HPP

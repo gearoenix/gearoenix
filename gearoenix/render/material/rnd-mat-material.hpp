@@ -6,11 +6,9 @@
 #include "rnd-mat-uniform.hpp"
 #include <vector>
 namespace gearoenix {
-namespace system {
-    namespace stream {
+namespace system::stream {
         class Stream;
     }
-}
 namespace render {
     namespace buffer {
         class FramedUniform;
@@ -36,17 +34,17 @@ namespace render {
             Uniform uniform;
 
         public:
-            Material(const std::shared_ptr<engine::Engine>& e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end);
-            Material(const std::shared_ptr<system::stream::Stream>& f, const std::shared_ptr<engine::Engine>& e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end);
-            ~Material();
-            void update_uniform();
-            const std::shared_ptr<buffer::FramedUniform>& get_uniform_buffers() const;
-            const std::shared_ptr<texture::Texture2D>& get_color() const;
-            const std::shared_ptr<texture::Texture2D>& get_metallic_roughness() const;
-            const std::shared_ptr<texture::Texture2D>& get_normal() const;
-            const std::shared_ptr<texture::Texture2D>& get_emissive() const;
-            void set_metallic_factor(const core::Real f) noexcept;
-            void set_roughness_factor(const core::Real f) noexcept;
+            Material(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept ;
+            Material(system::stream::Stream* f, engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept ;
+            ~Material() noexcept = default;
+            void update_uniform() noexcept ;
+            const std::shared_ptr<buffer::FramedUniform>& get_uniform_buffers() const noexcept ;
+            const std::shared_ptr<texture::Texture2D>& get_color() const noexcept ;
+            const std::shared_ptr<texture::Texture2D>& get_metallic_roughness() const noexcept ;
+            const std::shared_ptr<texture::Texture2D>& get_normal() const noexcept ;
+            const std::shared_ptr<texture::Texture2D>& get_emissive() const noexcept ;
+            void set_metallic_factor(core::Real f) noexcept;
+            void set_roughness_factor(core::Real f) noexcept ;
         };
     }
 }

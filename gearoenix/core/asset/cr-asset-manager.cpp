@@ -23,18 +23,18 @@ gearoenix::core::asset::Manager::Manager(const std::shared_ptr<system::Applicati
     , file(system::stream::Asset::construct(sys_app, name))
 {
     if (file == nullptr) {
-#define GX_HELPER(a, n) a##_manager = std::make_shared<n::Manager>(nullptr, render_engine);
+#define GX_HELPER(a, n) a##_manager = std::make_shared<n::Manager>(nullptr, render_engine.get());
 
-        GX_HELPER(camera, render::camera);
-        GX_HELPER(audio, audio);
-        GX_HELPER(light, render::light);
-        GX_HELPER(texture, render::texture);
-        GX_HELPER(font, render::font);
-        GX_HELPER(mesh, render::mesh);
-        GX_HELPER(model, render::model);
-        GX_HELPER(skybox, render::skybox);
-        GX_HELPER(constraint, physics::constraint);
-        GX_HELPER(scene, render::scene);
+        GX_HELPER(camera, render::camera)
+        GX_HELPER(audio, audio)
+        GX_HELPER(light, render::light)
+        GX_HELPER(texture, render::texture)
+        GX_HELPER(font, render::font)
+        GX_HELPER(mesh, render::mesh)
+        GX_HELPER(model, render::model)
+        GX_HELPER(skybox, render::skybox)
+        GX_HELPER(constraint, physics::constraint)
+        GX_HELPER(scene, render::scene)
 #undef GX_HELPER
     } else {
         std::shared_ptr<system::stream::Stream> s = std::static_pointer_cast<system::stream::Stream>(file);
@@ -45,18 +45,18 @@ gearoenix::core::asset::Manager::Manager(const std::shared_ptr<system::Applicati
     off = s->tell();                                     \
     s = system::stream::Asset::construct(sys_app, name); \
     s->seek(off);                                        \
-    a##_manager = std::make_shared<n::Manager>(s, render_engine);
+    a##_manager = std::make_shared<n::Manager>(s, render_engine.get());
 
-        GX_HELPER(camera, render::camera);
-        GX_HELPER(audio, audio);
-        GX_HELPER(light, render::light);
-        GX_HELPER(texture, render::texture);
-        GX_HELPER(font, render::font);
-        GX_HELPER(mesh, render::mesh);
-        GX_HELPER(model, render::model);
-        GX_HELPER(skybox, render::skybox);
-        GX_HELPER(constraint, physics::constraint);
-        GX_HELPER(scene, render::scene);
+        GX_HELPER(camera, render::camera)
+        GX_HELPER(audio, audio)
+        GX_HELPER(light, render::light)
+        GX_HELPER(texture, render::texture)
+        GX_HELPER(font, render::font)
+        GX_HELPER(mesh, render::mesh)
+        GX_HELPER(model, render::model)
+        GX_HELPER(skybox, render::skybox)
+        GX_HELPER(constraint, physics::constraint)
+        GX_HELPER(scene, render::scene)
 #undef GX_HELPER
     }
 }

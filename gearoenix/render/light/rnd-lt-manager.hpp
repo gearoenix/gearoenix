@@ -18,13 +18,13 @@ namespace render {
         class Light;
         class Manager {
         protected:
-            const std::shared_ptr<engine::Engine> e;
+            engine::Engine*const e;
             core::cache::File<Light> cache;
 
         public:
-            Manager(const std::shared_ptr<system::stream::Stream>& s, const std::shared_ptr<engine::Engine>& e);
-            ~Manager();
-            std::shared_ptr<Light> get_gx3d(core::Id mid, core::sync::EndCaller<Light>& c);
+            Manager(system::stream::Stream* s, engine::Engine* e) noexcept ;
+            ~Manager() noexcept  = default;
+            std::shared_ptr<Light> get_gx3d(core::Id mid, core::sync::EndCaller<Light>& c) noexcept ;
             template <typename T>
             typename std::enable_if<std::is_base_of<gearoenix::render::light::Light, T>::value, std::shared_ptr<T>>::type
             create() noexcept;

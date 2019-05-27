@@ -6,14 +6,14 @@
 #include "rnd-scn-type.hpp"
 #include <utility>
 
-gearoenix::render::scene::Manager::Manager(const std::shared_ptr<system::stream::Stream>& s, std::shared_ptr<engine::Engine> e)
-    : e(std::move(e))
+gearoenix::render::scene::Manager::Manager(system::stream::Stream*const s, engine::Engine*const e) noexcept
+        : e(e)
     , cache(s)
     , io_worker(new core::sync::WorkWaiter())
 {
 }
 
-void gearoenix::render::scene::Manager::get_gx3d(const core::Id mid, core::sync::EndCaller<Scene> c)
+void gearoenix::render::scene::Manager::get_gx3d(const core::Id mid, core::sync::EndCaller<Scene> c) noexcept
 {
     GXLOGD("Going to load scene with id: " << mid)
     io_worker->push([mid, c, this]() mutable {
@@ -43,7 +43,7 @@ void gearoenix::render::scene::Manager::get_gx3d(const core::Id mid, core::sync:
     });
 }
 
-const std::map<gearoenix::core::Id, std::weak_ptr<gearoenix::render::scene::Scene>>& gearoenix::render::scene::Manager::get_scenes() const
+const std::map<gearoenix::core::Id, std::weak_ptr<gearoenix::render::scene::Scene>>& gearoenix::render::scene::Manager::get_scenes() const noexcept
 {
     return cache.get_cacher().get_cacheds();
 }

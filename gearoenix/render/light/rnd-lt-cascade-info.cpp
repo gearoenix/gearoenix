@@ -3,13 +3,17 @@
 #include "../../core/sync/cr-sync-kernel-workers.hpp"
 #include "../../math/math-aabb.hpp"
 #include "../../math/math-matrix.hpp"
+#include "../../math/math-sphere.hpp"
 #include "../../system/sys-app.hpp"
 #include "../../system/sys-configuration.hpp"
 #include "../buffer/rnd-buf-uniform.hpp"
+#include "../buffer/rnd-buf-manager.hpp"
 #include "../command/rnd-cmd-buffer.hpp"
 #include "../command/rnd-cmd-manager.hpp"
 #include "../engine/rnd-eng-engine.hpp"
 #include "../sync/rnd-sy-semaphore.hpp"
+#include "../model/rnd-mdl-model.hpp"
+#include <limits>
 
 struct MathCascadeInfo {
     const gearoenix::math::Mat4x4* zero_located_view = nullptr;
@@ -19,9 +23,13 @@ struct MathCascadeInfo {
 
 struct KernelRenderCascadeInfo {
     gearoenix::render::buffer::Uniform* uniform = nullptr;
-    std::size_t cascade_index = 0;
+    std::size_t cascade_index = static_cast<std::size_t>(-1);
     /// It is not owner of model
     const gearoenix::render::model::Model* m = nullptr;
+
+
+    explicit KernelRenderCascadeInfo(gearoenix::render::engine::Engine* const e) noexcept
+        : uniform(e->get_buffer_manager()->create_uniform(sizeof(gearoenix::math::Mat4x4))) {}
 
     ~KernelRenderCascadeInfo() noexcept
     {
@@ -33,12 +41,31 @@ struct KernelRenderCascadeInfo {
 };
 
 struct KernelCascadeInfo {
+    gearoenix::render::engine::Engine* const e;
     const std::size_t kernel_index;
     MathCascadeInfo math_info;
 	gearoenix::core::OneLoopPool<gearoenix::render::command::Buffer> shadow_mapper_secondary_commands;
     gearoenix::core::OneLoopPool<KernelRenderCascadeInfo> render_data_pool;
 
-    KernelCascadeInfo(std::size_t kernel_index) noexcept : kernel_index(kernel_index) {}
+    explicit KernelCascadeInfo(gearoenix::render::engine::Engine* const e, std::size_t kernel_index) noexcept : e(e), kernel_index(kernel_index) {}
+
+    void shadow(const gearoenix::render::model::Model *m) noexcept {
+        const gearoenix::math::Sphere &ms = m->get_occlusion_sphere();
+        const gearoenix::math::Sphere s((*math_info.zero_located_view) * ms.position, ms.radius);
+        const auto &limit_boxes = *(math_info.limit_boxes);
+        auto &seen_boxes = math_info.seen_boxes;
+        const std::size_t cascades_count = limit_boxes.size();
+        for(std::size_t i = 0; i < cascades_count; ++i) {
+            if(limit_boxes[i].test(s)) {
+                seen_boxes[i].put(s);
+                auto *r = render_data_pool.get_next([this] {
+                    return new KernelRenderCascadeInfo(e);
+                });
+                r->cascade_index = i;
+                r->m = m;
+            }
+        }
+    }
 };
 
 struct FrameCascadeInfo {
@@ -63,7 +90,7 @@ struct FrameCascadeInfo {
         , shadow_accumulator_semaphore(e->create_semaphore())
     {
         for (std::size_t i = 0; i < kernels.size(); ++i) {
-            auto k = new KernelCascadeInfo(i);
+            auto k = new KernelCascadeInfo(e, i);
             kernels[i] = k;
             k->math_info.limit_boxes = &limit_boxes;
             k->math_info.zero_located_view = &zero_located_view;
@@ -129,14 +156,26 @@ struct FrameCascadeInfo {
         for (const auto& v : p[ss]) {
             limit_boxes[sss].put(m * v);
         }
+        for (auto &l: limit_boxes) {
+            auto v = l.mx;
+            v[2] = -std::numeric_limits<gearoenix::core::Real>::max();
+            l.put(v);
+        }
     }
 
 	void start() noexcept {
-		for (auto* k : kernels) for (auto& c : k->shadow_mapper_secondary_commands) c.begin();
-		for (auto& c : shadow_mapper_primary_commands) c.begin();
+		for (auto* k : kernels)
+		    for (gearoenix::render::command::Buffer& c : k->shadow_mapper_secondary_commands)
+		        c.begin();
+		for (gearoenix::render::command::Buffer& c : shadow_mapper_primary_commands)
+		    c.begin();
 		shadow_accumulator_secondary_command->begin();
 		shadow_accumulator_primary_command->begin();
 	}
+
+    void shadow(const gearoenix::render::model::Model *m, const std::size_t kernel_index) noexcept {
+        kernels[kernel_index]->shadow(m);
+    }
 };
 
 gearoenix::render::light::CascadeInfo::CascadeInfo(engine::Engine* const e) noexcept
@@ -156,12 +195,16 @@ gearoenix::render::light::CascadeInfo::~CascadeInfo() noexcept
 
 void gearoenix::render::light::CascadeInfo::update(const math::Mat4x4& m, const std::vector<std::array<math::Vec3, 4>>& p) noexcept
 {
-	FrameCascadeInfo* frame = frames[e->get_frame_number()];
-    frame->set_zero_located_view(m);
-    frame->set_frustum_partitions(p);
+    current_frame = frames[e->get_frame_number()];
+    current_frame->set_zero_located_view(m);
+    current_frame->set_frustum_partitions(p);
 }
 
 void gearoenix::render::light::CascadeInfo::start() noexcept
 {
-	frames[e->get_frame_number()]->start();
+    current_frame->start();
+}
+
+void gearoenix::render::light::CascadeInfo::shadow(const model::Model *m, const std::size_t kernel_index) noexcept {
+    current_frame->shadow(m, kernel_index);
 }

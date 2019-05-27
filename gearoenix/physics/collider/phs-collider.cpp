@@ -3,14 +3,12 @@
 #include "../../system/sys-log.hpp"
 #include "phs-collider-mesh.hpp"
 
-gearoenix::physics::collider::Collider::Collider(Type t)
+gearoenix::physics::collider::Collider::Collider(Type t) noexcept
     : t(t)
 {
 }
 
-gearoenix::physics::collider::Collider::~Collider() {}
-
-gearoenix::physics::collider::Collider* gearoenix::physics::collider::Collider::read(const std::shared_ptr<system::stream::Stream>& f)
+gearoenix::physics::collider::Collider* gearoenix::physics::collider::Collider::read(system::stream::Stream*const f) noexcept
 {
     core::Id collider_type_id;
     f->read(collider_type_id);
@@ -20,6 +18,6 @@ gearoenix::physics::collider::Collider* gearoenix::physics::collider::Collider::
     case Type::MESH:
         return new Mesh(f);
     default:
-        GXUNEXPECTED;
+        GXUNEXPECTED
     }
 }

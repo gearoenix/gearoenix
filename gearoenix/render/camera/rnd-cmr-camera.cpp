@@ -11,8 +11,7 @@
 #include "rnd-cmr-transformation.hpp"
 #include "rnd-cmr-uniform.hpp"
 
-gearoenix::render::camera::Camera::Camera(
-    const core::Id my_id, const std::shared_ptr<engine::Engine>& e) noexcept
+gearoenix::render::camera::Camera::Camera(const core::Id my_id, engine::Engine*const e) noexcept
     : core::asset::Asset(my_id, core::asset::Type::CAMERA)
     , e(e)
     , uniform(new Uniform)
@@ -26,8 +25,8 @@ gearoenix::render::camera::Camera::Camera(
 
 gearoenix::render::camera::Camera::Camera(
     const core::Id my_id,
-    const std::shared_ptr<system::stream::Stream>& f,
-    const std::shared_ptr<engine::Engine>& e)
+    system::stream::Stream*const f,
+    engine::Engine*const e) noexcept
     : core::asset::Asset(my_id, core::asset::Type::CAMERA)
     , e(e)
     , uniform(new Uniform)

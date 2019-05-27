@@ -15,7 +15,7 @@
 #endif
 
 void gearoenix::render::texture::PNG::decode(
-    const std::shared_ptr<system::stream::Stream>& file,
+    system::stream::Stream*const file,
     std::vector<unsigned char>& data,
     unsigned int& img_width,
     unsigned int& img_height)
@@ -25,7 +25,7 @@ void gearoenix::render::texture::PNG::decode(
     int iw, ih, channels;
     unsigned char* dd = stbi_load_from_memory(png.data(), (int)png.size(), &iw, &ih, &channels, 4);
     if (dd == nullptr) {
-        GXLOGF("PNG decoder error.");
+        GXLOGF("PNG decoder error.")
     }
     img_width = (unsigned int)iw;
     img_height = (unsigned int)ih;

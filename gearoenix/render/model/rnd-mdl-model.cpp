@@ -22,10 +22,10 @@
 
 gearoenix::render::model::Model::Model(
     const core::Id my_id,
-    const std::shared_ptr<system::stream::Stream>& f,
-    const std::shared_ptr<engine::Engine>& e,
-    const core::sync::EndCaller<core::sync::EndCallerIgnore>& c)
-    : core::asset::Asset(my_id, core::asset::Type::MODEL)
+    system::stream::Stream*const f,
+    engine::Engine*const e,
+    const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
+        : core::asset::Asset(my_id, core::asset::Type::MODEL)
     , e(e)
     , uniform_buffers(std::make_shared<buffer::FramedUniform>(static_cast<unsigned int>(sizeof(Uniform)), e))
     , transformation(new Transformation(&uniform, &occlusion_sphere))
@@ -51,16 +51,16 @@ gearoenix::render::model::Model::Model(
 
 gearoenix::render::model::Model::Model(
     const core::Id my_id,
-    const std::shared_ptr<engine::Engine>& e,
-    const core::sync::EndCaller<core::sync::EndCallerIgnore>&)
-    : core::asset::Asset(my_id, core::asset::Type::MODEL)
+    engine::Engine*const e,
+    const core::sync::EndCaller<core::sync::EndCallerIgnore>&) noexcept
+        : core::asset::Asset(my_id, core::asset::Type::MODEL)
     , e(e)
     , uniform_buffers(std::make_shared<buffer::FramedUniform>(static_cast<unsigned int>(sizeof(Uniform)), e))
     , transformation(new Transformation(&uniform, &occlusion_sphere))
 {
 }
 
-void gearoenix::render::model::Model::update_uniform()
+void gearoenix::render::model::Model::update_uniform() noexcept
 {
     uniform_buffers->update(&uniform);
     for (const auto& msh : meshes)
@@ -69,13 +69,13 @@ void gearoenix::render::model::Model::update_uniform()
         ch.second->update_uniform();
 }
 
-void gearoenix::render::model::Model::add_mesh(const std::shared_ptr<Mesh>& m)
+void gearoenix::render::model::Model::add_mesh(const std::shared_ptr<Mesh>& m) noexcept
 {
     meshes[m->get_mesh()->get_asset_id()] = m;
     occlusion_sphere.insert(m->get_mesh()->get_radius());
 }
 
-void gearoenix::render::model::Model::add_child(const std::shared_ptr<Model>&)
+void gearoenix::render::model::Model::add_child(const std::shared_ptr<Model>&) noexcept
 {
 }
 
@@ -103,8 +103,8 @@ void gearoenix::render::model::Model::disable() noexcept
 //    f->read(model_children);
 //    std::vector<core::Id> mesh_ids;
 //    f->read(mesh_ids);
-//    occrds = GXMAX(occrdss[0], occrdss[1]);
-//    occrds = GXMAX(occrds, occrdss[2]);
+//    occrds = GX_MAX(occrdss[0], occrdss[1]);
+//    occrds = GX_MAX(occrds, occrdss[2]);
 //    core::Count mesh_count = mesh_ids.size();
 //    std::map<core::Id, std::tuple<std::shared_ptr<material::Material>, std::shared_ptr<material::Depth>>> materials;
 //    for (core::Count i = 0; i < mesh_count; ++i) {
@@ -152,22 +152,22 @@ void gearoenix::render::model::Model::disable() noexcept
 //    return nullptr;
 //}
 
-const std::map<gearoenix::core::Id, std::shared_ptr<gearoenix::render::model::Model>>& gearoenix::render::model::Model::get_children() const
+const std::map<gearoenix::core::Id, std::shared_ptr<gearoenix::render::model::Model>>& gearoenix::render::model::Model::get_children() const noexcept
 {
     return children;
 }
 
-const std::map<gearoenix::core::Id, std::shared_ptr<gearoenix::render::model::Mesh>>& gearoenix::render::model::Model::get_meshes() const
+const std::map<gearoenix::core::Id, std::shared_ptr<gearoenix::render::model::Mesh>>& gearoenix::render::model::Model::get_meshes() const noexcept
 {
     return meshes;
 }
 
-const std::shared_ptr<gearoenix::physics::collider::Collider>& gearoenix::render::model::Model::get_collider() const
+const std::shared_ptr<gearoenix::physics::collider::Collider>& gearoenix::render::model::Model::get_collider() const noexcept
 {
     return collider;
 }
 
-const std::shared_ptr<gearoenix::render::buffer::FramedUniform>& gearoenix::render::model::Model::get_uniform_buffers() const
+const std::shared_ptr<gearoenix::render::buffer::FramedUniform>& gearoenix::render::model::Model::get_uniform_buffers() const noexcept
 {
     return uniform_buffers;
 }
@@ -182,7 +182,7 @@ const gearoenix::math::Sphere& gearoenix::render::model::Model::get_occlusion_sp
     return occlusion_sphere;
 }
 
-const gearoenix::math::Mat4x4& gearoenix::render::model::Model::get_model_matrix() const
+const gearoenix::math::Mat4x4& gearoenix::render::model::Model::get_model_matrix() const noexcept
 {
     return uniform.m;
 }

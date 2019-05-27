@@ -7,8 +7,8 @@ static std::shared_ptr<gearoenix::render::buffer::FramedUniform> null_uniforms;
 
 gearoenix::render::light::Light::Light(
     const core::Id my_id,
-    const std::shared_ptr<system::stream::Stream>& f,
-    const std::shared_ptr<engine::Engine>& e) noexcept
+    system::stream::Stream*const f,
+    engine::Engine*const e) noexcept
     : core::asset::Asset(my_id, core::asset::Type::LIGHT)
     , e(e)
 {
@@ -18,7 +18,7 @@ gearoenix::render::light::Light::Light(
     has_shadow = f->read_bool();
 }
 
-gearoenix::render::light::Light::Light(const core::Id my_id, const std::shared_ptr<engine::Engine>& e) noexcept
+gearoenix::render::light::Light::Light(const core::Id my_id, engine::Engine*const e) noexcept
     : core::asset::Asset(my_id, core::asset::Type::LIGHT)
     , e(e)
 {

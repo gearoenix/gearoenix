@@ -210,7 +210,7 @@ void gearoenix::math::Vec2::normalize() noexcept
     vec[1] *= l;
 }
 
-void gearoenix::math::Vec2::read(const std::shared_ptr<system::stream::Stream>& f) noexcept
+void gearoenix::math::Vec2::read(system::stream::Stream*const f) noexcept
 {
     f->read(vec[0]);
     f->read(vec[1]);
@@ -320,6 +320,11 @@ gearoenix::math::Vec3 gearoenix::math::Vec3::operator+(const core::Real a) const
 gearoenix::math::Vec3 gearoenix::math::Vec3::operator-(const Vec3& a) const noexcept
 {
     return Vec3(vec[0] - a.vec[0], vec[1] - a.vec[1], vec[2] - a.vec[2]);
+}
+
+
+gearoenix::math::Vec3 gearoenix::math::Vec3::operator-(const core::Real a) const noexcept {
+    return Vec3(vec[0] - a, vec[1] - a, vec[2] - a);
 }
 
 gearoenix::math::Vec3 gearoenix::math::Vec3::operator*(const Vec3& a) const noexcept
@@ -528,7 +533,7 @@ void gearoenix::math::Vec3::normalize() noexcept
     vec[2] *= l;
 }
 
-void gearoenix::math::Vec3::read(const std::shared_ptr<system::stream::Stream>& f) noexcept
+void gearoenix::math::Vec3::read(system::stream::Stream* const f) noexcept
 {
     f->read(vec[0]);
     f->read(vec[1]);
@@ -698,7 +703,7 @@ void gearoenix::math::Vec4::normalize() noexcept
     vec[3] *= ilen;
 }
 
-void gearoenix::math::Vec4::read(const std::shared_ptr<system::stream::Stream>& f) noexcept
+void gearoenix::math::Vec4::read(system::stream::Stream*const f) noexcept
 {
     f->read(vec[0]);
     f->read(vec[1]);

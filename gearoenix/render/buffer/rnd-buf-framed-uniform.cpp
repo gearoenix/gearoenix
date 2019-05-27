@@ -3,31 +3,35 @@
 #include "rnd-buf-manager.hpp"
 #include "rnd-buf-uniform.hpp"
 
-static std::vector<std::shared_ptr<gearoenix::render::buffer::Uniform>> create_uniforms(const unsigned int s, const std::shared_ptr<gearoenix::render::engine::Engine>& e)
-{
-    const unsigned int frames_count = e->get_frames_count();
-    std::vector<std::shared_ptr<gearoenix::render::buffer::Uniform>> uniforms(frames_count);
-    for (unsigned int i = 0; i < frames_count; ++i)
-        uniforms[i] = e->get_buffer_manager()->create_uniform(s);
-    return uniforms;
-}
-
-gearoenix::render::buffer::FramedUniform::FramedUniform(const unsigned int s, const std::shared_ptr<engine::Engine>& e)
+gearoenix::render::buffer::FramedUniform::FramedUniform(const unsigned int s, engine::Engine*const e) noexcept
     : e(e)
-    , uniforms(create_uniforms(s, e))
+    , uniforms(new Uniform*[e->get_frames_count()])
 {
+    auto *cmd_mgr = e->get_buffer_manager();
+    const unsigned int fc = e->get_frames_count();
+    for(unsigned int i = 0; i < fc; ++i)
+        uniforms[i] = cmd_mgr->create_uniform(s);
 }
 
-gearoenix::render::buffer::FramedUniform::~FramedUniform()
+gearoenix::render::buffer::FramedUniform::~FramedUniform() noexcept
 {
+    const unsigned int fc = e->get_frames_count();
+    for(unsigned int i = 0; i < fc; ++i)
+        delete uniforms[i];
+    delete [] uniforms;
 }
 
-void gearoenix::render::buffer::FramedUniform::update(const void* data)
+void gearoenix::render::buffer::FramedUniform::update(const void* data) noexcept
 {
     uniforms[e->get_frame_number()]->update(data);
 }
 
-const std::shared_ptr<gearoenix::render::buffer::Uniform>& gearoenix::render::buffer::FramedUniform::get_buffer() const
+const gearoenix::render::buffer::Uniform* gearoenix::render::buffer::FramedUniform::get_buffer() const noexcept
+{
+    return uniforms[e->get_frame_number()];
+}
+
+gearoenix::render::buffer::Uniform* gearoenix::render::buffer::FramedUniform::get_buffer() noexcept
 {
     return uniforms[e->get_frame_number()];
 }

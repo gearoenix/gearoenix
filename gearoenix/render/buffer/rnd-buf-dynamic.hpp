@@ -1,17 +1,13 @@
 #ifndef GEAROENIX_RENDER_BUFFER_DYNAMIC_HPP
 #define GEAROENIX_RENDER_BUFFER_DYNAMIC_HPP
 #include "rnd-buf-buffer.hpp"
-namespace gearoenix {
-namespace render {
-    namespace buffer {
+namespace gearoenix::render::buffer {
         class Dynamic : public Buffer {
         protected:
-            Dynamic(const unsigned int s, const std::shared_ptr<engine::Engine>& e);
+            Dynamic(const unsigned int s, engine::Engine* const e) noexcept : Buffer(s, e) {}
 
         public:
-            virtual ~Dynamic();
+            virtual ~Dynamic() noexcept = default;
         };
     }
-}
-}
 #endif

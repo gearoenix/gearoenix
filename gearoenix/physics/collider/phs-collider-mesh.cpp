@@ -4,7 +4,7 @@
 #include "../../system/stream/sys-stm-stream.hpp"
 #include "../../system/sys-log.hpp"
 
-gearoenix::physics::collider::Mesh::Mesh(const std::shared_ptr<system::stream::Stream>& f)
+gearoenix::physics::collider::Mesh::Mesh(system::stream::Stream*const f) noexcept
     : Collider(Type::MESH)
 {
     const auto cnt = f->read<core::Count>();
@@ -15,7 +15,7 @@ gearoenix::physics::collider::Mesh::Mesh(const std::shared_ptr<system::stream::S
     ts.resize(indices.size());
 }
 
-void gearoenix::physics::collider::Mesh::update(const math::Mat4x4& m)
+void gearoenix::physics::collider::Mesh::update(const math::Mat4x4& m) noexcept
 {
     const size_t vscnt = vertices.size();
     std::vector<math::Vec3> transformed_vertices(vscnt);
@@ -37,13 +37,13 @@ void gearoenix::physics::collider::Mesh::update(const math::Mat4x4& m)
     }
 }
 
-bool gearoenix::physics::collider::Mesh::hit(const math::Ray3& r, core::Real& d) const
+bool gearoenix::physics::collider::Mesh::hit(const math::Ray3& r, core::Real& d) const noexcept
 {
     math::Vec2 fs;
     return hit(r, d, fs);
 }
 
-bool gearoenix::physics::collider::Mesh::hit(const math::Ray3& r, core::Real& d, math::Vec2& fs) const
+bool gearoenix::physics::collider::Mesh::hit(const math::Ray3& r, core::Real& d, math::Vec2& fs) const noexcept
 {
     core::Real tmpd = d;
     if (box.test(r, tmpd)) {

@@ -4,6 +4,7 @@
 #include "../../math/math-ray.hpp"
 #include <array>
 #include <vector>
+#include <memory>
 
 namespace gearoenix {
 namespace core::event {
@@ -33,20 +34,15 @@ namespace render {
         class Camera : public core::asset::Asset {
         protected:
             bool enabled = true;
-            const std::shared_ptr<engine::Engine> e;
+            engine::Engine*const e;
             std::shared_ptr<Uniform> uniform;
             std::shared_ptr<math::ProjectorFrustum> frustum;
             std::shared_ptr<Transformation> transformation;
             std::shared_ptr<buffer::FramedUniform> uniform_buffers;
             std::shared_ptr<std::vector<std::array<math::Vec3, 4>>> cascaded_shadow_frustum_partitions;
 
-            Camera(
-                core::Id my_id,
-                const std::shared_ptr<engine::Engine>& e) noexcept;
-            Camera(
-                core::Id my_id,
-                const std::shared_ptr<system::stream::Stream>& f,
-                const std::shared_ptr<engine::Engine>& e);
+            Camera(core::Id my_id, engine::Engine* e) noexcept;
+            Camera(core::Id my_id, system::stream::Stream* f, engine::Engine* e) noexcept;
 
         public:
             const std::shared_ptr<buffer::FramedUniform>& get_uniform_buffers() const;

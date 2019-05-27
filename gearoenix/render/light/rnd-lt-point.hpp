@@ -3,9 +3,7 @@
 #include "../../core/sync/cr-sync-end-caller.hpp"
 #include "../../math/math-vector.hpp"
 #include "rnd-lt-light.hpp"
-namespace gearoenix {
-namespace render {
-    namespace light {
+namespace gearoenix::render::light {
         struct PointUniform {
             math::Vec4 color_min_radius;
             math::Vec4 position_max_radius;
@@ -17,13 +15,8 @@ namespace render {
             math::Vec4 position_radius = math::Vec4(1.0, 1.0, 1.0, 1.0);
 
         public:
-            Point(
-                core::Id my_id,
-                const std::shared_ptr<system::stream::Stream>& f,
-                const std::shared_ptr<engine::Engine>& e);
-            const math::Vec4& get_position_radius() const;
+            Point(core::Id my_id, system::stream::Stream* f, engine::Engine* e) noexcept ;
+            const math::Vec4& get_position_radius() const noexcept ;
         };
     }
-}
-}
 #endif

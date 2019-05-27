@@ -1,9 +1,7 @@
 #include "rnd-sky-manager.hpp"
 
-gearoenix::render::skybox::Manager::Manager(const std::shared_ptr<system::stream::Stream>& s, const std::shared_ptr<engine::Engine>& e)
+gearoenix::render::skybox::Manager::Manager(system::stream::Stream*const s, engine::Engine*const e) noexcept
     : e(e)
     , cache(s)
 {
 }
-
-gearoenix::render::skybox::Manager::~Manager() {}

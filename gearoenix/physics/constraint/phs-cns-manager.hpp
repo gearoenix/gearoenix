@@ -3,33 +3,26 @@
 #include "../../core/cache/cr-cache-file.hpp"
 #include "../../core/cr-types.hpp"
 #include "../../core/sync/cr-sync-end-caller.hpp"
-#include <memory>
 
 namespace gearoenix {
-namespace render {
-    namespace engine {
+namespace render::engine {
         class Engine;
     }
-}
-namespace system {
-    namespace stream {
+namespace system::stream {
         class Stream;
     }
-}
-namespace physics {
-    namespace constraint {
+namespace physics::constraint {
         class Constraint;
         class Manager {
         protected:
-            const std::shared_ptr<render::engine::Engine> e;
+            render::engine::Engine*const e;
             core::cache::File<Constraint> cache;
 
         public:
-            Manager(const std::shared_ptr<system::stream::Stream>& s, const std::shared_ptr<render::engine::Engine>& e);
-            ~Manager();
-            std::shared_ptr<Constraint> get_gx3d(const core::Id mid, core::sync::EndCaller<Constraint>& c);
+            Manager(system::stream::Stream* s, render::engine::Engine* e) noexcept ;
+            ~Manager() noexcept = default;
+            std::shared_ptr<Constraint> get_gx3d(core::Id mid, core::sync::EndCaller<Constraint>& c) noexcept ;
         };
-    } // namespace constraint
-} // namespace physics
+    } // namespace physics
 } // namespace gearoenix
 #endif

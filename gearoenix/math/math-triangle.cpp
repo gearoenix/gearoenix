@@ -14,7 +14,7 @@ bool gearoenix::math::Triangle3::intersect(const Ray3& r, const core::Real tmin,
 {
     const Vec3 pvec = r.d.cross(edge[1]);
     const core::Real det = edge[0].dot(pvec);
-    if (GXISZERO(det)) {
+    if (GX_IS_ZERO(det)) {
         return false;
     }
     const core::Real inv_det = 1.0f / det;

@@ -8,11 +8,9 @@
 #include <memory>
 
 namespace gearoenix {
-namespace system {
-    namespace stream {
+namespace system::stream {
         class Stream;
     }
-}
 namespace render {
     namespace engine {
         class Engine;
@@ -20,17 +18,17 @@ namespace render {
     namespace model {
         class Manager {
         protected:
-            const std::shared_ptr<engine::Engine> e;
+            engine::Engine*const e;
             core::cache::File<Model> cache;
 
         public:
-            Manager(const std::shared_ptr<system::stream::Stream>& s, const std::shared_ptr<engine::Engine>& e);
-            ~Manager();
-            std::shared_ptr<Model> get_gx3d(const core::Id mid, core::sync::EndCaller<Model>& c);
+            Manager(system::stream::Stream* s, engine::Engine* e) noexcept ;
+            ~Manager() noexcept = default;
+            std::shared_ptr<Model> get_gx3d(core::Id mid, core::sync::EndCaller<Model>& c) noexcept ;
             /// T must be derived from Model and have the same constructor that Model has.
             template <typename T>
             typename std::enable_if<std::is_base_of<Model, T>::value, std::shared_ptr<T>>::type
-            create(core::sync::EndCaller<T>& c);
+            create(core::sync::EndCaller<T>& c) noexcept ;
         };
     }
 }
@@ -38,7 +36,7 @@ namespace render {
 
 template <typename T>
 typename std::enable_if<std::is_base_of<gearoenix::render::model::Model, T>::value, std::shared_ptr<T>>::type
-gearoenix::render::model::Manager::create(core::sync::EndCaller<T>& c)
+gearoenix::render::model::Manager::create(core::sync::EndCaller<T>& c) noexcept
 {
     const core::Id id = core::asset::Manager::create_id();
     const core::sync::EndCaller<core::sync::EndCallerIgnore> call([c] {});

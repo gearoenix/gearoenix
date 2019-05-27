@@ -71,7 +71,7 @@ std::shared_ptr<gearoenix::gles2::engine::Engine> gearoenix::gles2::engine::Engi
 {
     std::shared_ptr<Engine> e(new Engine(sys_app));
     e->pipeline_manager = new pipeline::Manager(e);
-    e->buffer_manager = new buffer::Manager(e);
+    e->buffer_manager = new buffer::Manager(e.get());
     e->command_manager = new command::Manager();
     e->main_render_target = new texture::Target(e);
     return e;
@@ -118,7 +118,7 @@ void gearoenix::gles2::engine::Engine::update() noexcept
     prof_frames_count++;
     if (prof_frames_count > 1999) {
         prof_frames_time = 2000.0 / prof_frames_time;
-        GXLOGI("Average frame per second in 2000 loop is: " << prof_frames_time);
+        GXLOGI("Average frame per second in 2000 loop is: " << prof_frames_time)
         prof_frames_count = 0;
         prof_frames_time = 0.0f;
     }
@@ -176,7 +176,7 @@ void gearoenix::gles2::engine::Engine::submit(
     const render::sync::Semaphore* const* const) noexcept
 {
     for (std::size_t i = 0; i < cmds_count; ++i)
-        static_cast<const command::Buffer*>(cmds[i])->play();
+        dynamic_cast<const command::Buffer*>(cmds[i])->play();
 }
 
 //gearoenix::render::texture::Texture2D* gearoenix::gles2::engine::Engine::create_texture_2d(core::Id id, system::stream::Stream* file, core::sync::EndCaller<core::sync::EndCallerIgnore> c)

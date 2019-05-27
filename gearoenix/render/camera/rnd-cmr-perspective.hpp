@@ -15,21 +15,16 @@ namespace render::camera {
         core::Real lambda = 0.3f;
         const std::shared_ptr<physics::collider::Frustum> frustum;
 
-        void update_fovy();
+        void update_fovy() noexcept;
         void update_cascades() noexcept;
 
     public:
-        Perspective(
-            core::Id my_id,
-            const std::shared_ptr<system::stream::Stream>& f,
-            const std::shared_ptr<engine::Engine>& e);
-        Perspective(
-            core::Id my_id,
-            const std::shared_ptr<engine::Engine>& e);
-        void set_aspect_ratio(core::Real ratio) final;
-        void set_field_of_view(core::Real radian);
-        math::Ray3 create_ray3(core::Real x, core::Real y) const final;
-        core::Real get_distance(const math::Vec3& model_location) const final;
+        Perspective(core::Id my_id, system::stream::Stream* f, engine::Engine* e) noexcept;
+        Perspective(core::Id my_id, engine::Engine* e) noexcept;
+        void set_aspect_ratio(core::Real ratio) noexcept final;
+        void set_field_of_view(core::Real radian) noexcept;
+        math::Ray3 create_ray3(core::Real x, core::Real y) const noexcept final;
+        core::Real get_distance(const math::Vec3& model_location) const noexcept final;
     };
 }
 }
