@@ -33,10 +33,8 @@ static const std::shared_ptr<gearoenix::render::model::Model> null_model = nullp
 static const std::shared_ptr<gearoenix::physics::constraint::Constraint> null_constraint = nullptr;
 
 gearoenix::render::scene::Scene::Scene(
-    const core::Id my_id,
-    const std::shared_ptr<system::stream::Stream>& f,
-    const std::shared_ptr<engine::Engine>& e,
-    const core::sync::EndCaller<core::sync::EndCallerIgnore>& c)
+    const core::Id my_id, system::stream::Stream*const f, engine::Engine*const e,
+    const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : core::asset::Asset(my_id, core::asset::Type::SCENE)
     , e(e)
     , scene_type_id(Type::GAME)
@@ -78,8 +76,8 @@ gearoenix::render::scene::Scene::Scene(
 
 gearoenix::render::scene::Scene::Scene(
     const core::Id my_id,
-    const std::shared_ptr<engine::Engine>& e,
-    const core::sync::EndCaller<core::sync::EndCallerIgnore>&)
+	engine::Engine*const  e,
+    const core::sync::EndCaller<core::sync::EndCallerIgnore>&) noexcept
     : core::asset::Asset(my_id, core::asset::Type::SCENE)
     , e(e)
     , scene_type_id(Type::GAME)
@@ -87,26 +85,26 @@ gearoenix::render::scene::Scene::Scene(
 {
 }
 
-gearoenix::render::scene::Scene::~Scene()
+gearoenix::render::scene::Scene::~Scene() noexcept
 {
 }
 
-void gearoenix::render::scene::Scene::enable()
+void gearoenix::render::scene::Scene::enable() noexcept
 {
     enabled = true;
 }
 
-void gearoenix::render::scene::Scene::disable()
+void gearoenix::render::scene::Scene::disable() noexcept
 {
     enabled = false;
 }
 
-bool gearoenix::render::scene::Scene::is_enabled() const
+bool gearoenix::render::scene::Scene::is_enabled() const noexcept
 {
     return enabled;
 }
 
-void gearoenix::render::scene::Scene::add_camera(const std::shared_ptr<camera::Camera>& o)
+void gearoenix::render::scene::Scene::add_camera(const std::shared_ptr<camera::Camera>& o) noexcept
 {
     const core::Id oid = o->get_asset_id();
 #ifdef GX_DEBUG_MODE
@@ -117,12 +115,12 @@ void gearoenix::render::scene::Scene::add_camera(const std::shared_ptr<camera::C
     cameras[oid] = o;
 }
 
-const std::map<gearoenix::core::Id, std::shared_ptr<gearoenix::render::camera::Camera>>& gearoenix::render::scene::Scene::get_cameras() const
+const std::map<gearoenix::core::Id, std::shared_ptr<gearoenix::render::camera::Camera>>& gearoenix::render::scene::Scene::get_cameras() const noexcept
 {
     return cameras;
 }
 
-void gearoenix::render::scene::Scene::add_audio(const std::shared_ptr<audio::Audio>& o)
+void gearoenix::render::scene::Scene::add_audio(const std::shared_ptr<audio::Audio>& o) noexcept
 {
     const core::Id oid = o->get_asset_id();
 #ifdef GX_DEBUG_MODE
@@ -133,7 +131,7 @@ void gearoenix::render::scene::Scene::add_audio(const std::shared_ptr<audio::Aud
     audios[oid] = o;
 }
 
-void gearoenix::render::scene::Scene::add_light(const std::shared_ptr<light::Light>& o)
+void gearoenix::render::scene::Scene::add_light(const std::shared_ptr<light::Light>& o) noexcept
 {
     const core::Id oid = o->get_asset_id();
 #ifdef GX_DEBUG_MODE
@@ -144,7 +142,7 @@ void gearoenix::render::scene::Scene::add_light(const std::shared_ptr<light::Lig
     lights[oid] = o;
 }
 
-const std::shared_ptr<gearoenix::render::light::Light>& gearoenix::render::scene::Scene::get_light(const core::Id id) const
+const std::shared_ptr<gearoenix::render::light::Light>& gearoenix::render::scene::Scene::get_light(const core::Id id) const noexcept
 {
     const auto& find = lights.find(id);
     if (lights.end() == find) {
@@ -153,12 +151,12 @@ const std::shared_ptr<gearoenix::render::light::Light>& gearoenix::render::scene
     return find->second;
 }
 
-const std::map<gearoenix::core::Id, std::shared_ptr<gearoenix::render::light::Light>>& gearoenix::render::scene::Scene::get_lights() const
+const std::map<gearoenix::core::Id, std::shared_ptr<gearoenix::render::light::Light>>& gearoenix::render::scene::Scene::get_lights() const noexcept
 {
     return lights;
 }
 
-void gearoenix::render::scene::Scene::add_model(const std::shared_ptr<model::Model>& m)
+void gearoenix::render::scene::Scene::add_model(const std::shared_ptr<model::Model>& m) noexcept
 {
     const core::Id mid = m->get_asset_id();
 #ifdef GX_DEBUG_MODE
@@ -169,7 +167,7 @@ void gearoenix::render::scene::Scene::add_model(const std::shared_ptr<model::Mod
     models[mid] = m;
 }
 
-const std::shared_ptr<gearoenix::render::model::Model>& gearoenix::render::scene::Scene::get_model(const core::Id model_id) const
+const std::shared_ptr<gearoenix::render::model::Model>& gearoenix::render::scene::Scene::get_model(const core::Id model_id) const noexcept
 {
     const auto& find = models.find(model_id);
     if (models.end() == find) {
@@ -178,12 +176,12 @@ const std::shared_ptr<gearoenix::render::model::Model>& gearoenix::render::scene
     return find->second;
 }
 
-const std::map<gearoenix::core::Id, std::shared_ptr<gearoenix::render::model::Model>>& gearoenix::render::scene::Scene::get_models() const
+const std::map<gearoenix::core::Id, std::shared_ptr<gearoenix::render::model::Model>>& gearoenix::render::scene::Scene::get_models() const noexcept
 {
     return models;
 }
 
-void gearoenix::render::scene::Scene::add_constraint(const std::shared_ptr<physics::constraint::Constraint>& c)
+void gearoenix::render::scene::Scene::add_constraint(const std::shared_ptr<physics::constraint::Constraint>& c) noexcept
 {
     const core::Id cid = c->get_asset_id();
 #ifdef GX_DEBUG_MODE
@@ -194,7 +192,7 @@ void gearoenix::render::scene::Scene::add_constraint(const std::shared_ptr<physi
     constraints[cid] = c;
 }
 
-const std::shared_ptr<gearoenix::physics::constraint::Constraint>& gearoenix::render::scene::Scene::get_constraint(const core::Id constraint_id) const
+const std::shared_ptr<gearoenix::physics::constraint::Constraint>& gearoenix::render::scene::Scene::get_constraint(const core::Id constraint_id) const noexcept
 {
     const auto& find = constraints.find(constraint_id);
     if (constraints.end() == find) {
@@ -203,12 +201,12 @@ const std::shared_ptr<gearoenix::physics::constraint::Constraint>& gearoenix::re
     return find->second;
 }
 
-const std::shared_ptr<gearoenix::render::buffer::FramedUniform>& gearoenix::render::scene::Scene::get_uniform_buffers() const
+const std::shared_ptr<gearoenix::render::buffer::FramedUniform>& gearoenix::render::scene::Scene::get_uniform_buffers() const noexcept
 {
     return uniform_buffers;
 }
 
-void gearoenix::render::scene::Scene::update_uniform()
+void gearoenix::render::scene::Scene::update_uniform() noexcept
 {
     unsigned int dirc = 0;
     unsigned int pntc = 0;

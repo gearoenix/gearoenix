@@ -12,13 +12,13 @@ namespace system {
             std::fstream file;
 
         public:
-            Local(const std::string& name, bool writable = false);
-            ~Local();
-            core::Count read(void* data, core::Count length);
-            core::Count write(const void* data, core::Count length);
-            void seek(core::Count offset);
-            core::Count tell();
-            static bool exist(const std::string& name);
+            Local(const std::string& name, bool writable = false) noexcept;
+            ~Local() noexcept final;
+            core::Count read(void* data, core::Count length) noexcept;
+            core::Count write(const void* data, core::Count length) noexcept;
+            void seek(core::Count offset) noexcept;
+            core::Count tell() noexcept;
+            static bool exist(const std::string& name) noexcept;
         };
     }
 }

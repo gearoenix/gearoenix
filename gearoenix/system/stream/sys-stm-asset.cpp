@@ -8,7 +8,7 @@
 #include <android_native_app_glue.h>
 #endif
 
-void gearoenix::system::stream::Asset::check_endian_compatibility()
+void gearoenix::system::stream::Asset::check_endian_compatibility() noexcept
 {
     unsigned int system_endian = 1;
     uint8_t resource_endian;
@@ -16,16 +16,16 @@ void gearoenix::system::stream::Asset::check_endian_compatibility()
     is_endian_compatible = (resource_endian == ((uint8_t*)(&system_endian))[0]);
 }
 
-gearoenix::system::stream::Asset::Asset() {}
+gearoenix::system::stream::Asset::Asset() noexcept {}
 
-gearoenix::system::stream::Asset::~Asset()
+gearoenix::system::stream::Asset::~Asset() noexcept
 {
     GXTODO; //android asset free check
 }
 
-std::shared_ptr<gearoenix::system::stream::Asset> gearoenix::system::stream::Asset::construct(const std::shared_ptr<system::Application>& sys_app, const std::string& name) noexcept
+gearoenix::system::stream::Asset* gearoenix::system::stream::Asset::construct(system::Application*const sys_app, const std::string& name) noexcept
 {
-    std::shared_ptr<Asset> asset(new Asset());
+	Asset *asset = new Asset();
 #ifdef GX_USE_STD_FILE
     std::string file_path = name;
 #ifdef GX_IN_IOS
@@ -55,7 +55,7 @@ std::shared_ptr<gearoenix::system::stream::Asset> gearoenix::system::stream::Ass
     return asset;
 }
 
-gearoenix::core::Count gearoenix::system::stream::Asset::read(void* data, core::Count length)
+gearoenix::core::Count gearoenix::system::stream::Asset::read(void* data, core::Count length) noexcept
 {
 #ifdef GX_IN_ANDROID
     core::Count result = static_cast<core::Count>(AAsset_read(file, data, length));
@@ -72,12 +72,12 @@ gearoenix::core::Count gearoenix::system::stream::Asset::read(void* data, core::
     return result;
 }
 
-gearoenix::core::Count gearoenix::system::stream::Asset::write(const void*, core::Count)
+gearoenix::core::Count gearoenix::system::stream::Asset::write(const void*, core::Count) noexcept
 {
     GXUNEXPECTED;
 }
 
-void gearoenix::system::stream::Asset::seek(core::Count offset)
+void gearoenix::system::stream::Asset::seek(core::Count offset) noexcept
 {
 #if defined(GX_USE_STD_FILE)
     file.seekg(offset, std::ios::beg);
@@ -88,7 +88,7 @@ void gearoenix::system::stream::Asset::seek(core::Count offset)
 #endif
 }
 
-gearoenix::core::Count gearoenix::system::stream::Asset::tell()
+gearoenix::core::Count gearoenix::system::stream::Asset::tell() noexcept
 {
 #if defined(GX_USE_STD_FILE)
     return (core::Count)file.tellg();

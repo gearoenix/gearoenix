@@ -3,11 +3,11 @@
 #include "../sys-log.hpp"
 #include <cstring>
 
-gearoenix::system::stream::Memory::Memory() {}
+gearoenix::system::stream::Memory::Memory() noexcept {}
 
-gearoenix::system::stream::Memory::~Memory() {}
+gearoenix::system::stream::Memory::~Memory() noexcept {}
 
-gearoenix::core::Count gearoenix::system::stream::Memory::read(void* d, core::Count length)
+gearoenix::core::Count gearoenix::system::stream::Memory::read(void* d, core::Count length) noexcept
 {
     const core::Count sz = length + index;
     const core::Count result = sz > mem_data.size() ? mem_data.size() - index : length;
@@ -20,7 +20,7 @@ gearoenix::core::Count gearoenix::system::stream::Memory::read(void* d, core::Co
     return result;
 }
 
-gearoenix::core::Count gearoenix::system::stream::Memory::write(const void* d, core::Count length)
+gearoenix::core::Count gearoenix::system::stream::Memory::write(const void* d, core::Count length) noexcept
 {
     const core::Count sz = length + index;
     if (sz <= mem_data.size()) {
@@ -37,7 +37,7 @@ gearoenix::core::Count gearoenix::system::stream::Memory::write(const void* d, c
     return length;
 }
 
-void gearoenix::system::stream::Memory::seek(core::Count offset)
+void gearoenix::system::stream::Memory::seek(core::Count offset) noexcept
 {
 #ifdef GX_DEBUG_MODE
     if (offset > mem_data.size())
@@ -46,7 +46,7 @@ void gearoenix::system::stream::Memory::seek(core::Count offset)
     index = offset;
 }
 
-gearoenix::core::Count gearoenix::system::stream::Memory::tell()
+gearoenix::core::Count gearoenix::system::stream::Memory::tell() noexcept
 {
     return index;
 }

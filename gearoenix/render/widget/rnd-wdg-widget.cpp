@@ -82,37 +82,37 @@
 //    //(void)lg;
 //}
 
-void gearoenix::render::widget::Widget::press_effect()
+void gearoenix::render::widget::Widget::press_effect() noexcept
 {
 }
 
-void gearoenix::render::widget::Widget::release_effect()
+void gearoenix::render::widget::Widget::release_effect() noexcept
 {
 }
 
-void gearoenix::render::widget::Widget::cancel_effect()
+void gearoenix::render::widget::Widget::cancel_effect() noexcept
 {
 }
 
-gearoenix::render::widget::Widget::Widget(const core::Id my_id, const std::shared_ptr<system::stream::Stream>& s, const std::shared_ptr<engine::Engine>& e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c)
+gearoenix::render::widget::Widget::Widget(const core::Id my_id, system::stream::Stream*const s, engine::Engine*const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : model::Model(my_id, s, e, c)
 {
 }
 
-//gearoenix::render::widget::Widget::Widget(const std::shared_ptr<engine::Engine>& e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c)
+//gearoenix::render::widget::Widget::Widget(const std::shared_ptr<engine::Engine>& e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
 //    : model::Model(e, c)
 //{
 //}
 
-gearoenix::render::widget::Widget::~Widget()
+gearoenix::render::widget::Widget::~Widget() noexcept
 {
 }
 
-void gearoenix::render::widget::Widget::read_gx3d(const std::shared_ptr<system::stream::Stream>& f, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c)
+void gearoenix::render::widget::Widget::read_gx3d(const std::shared_ptr<system::stream::Stream>& f, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
 {
     GXUNIMPLEMENTED;
 }
 
-void gearoenix::render::widget::Widget::state_change(EventType e)
+void gearoenix::render::widget::Widget::state_change(EventType e) noexcept
 {
 }

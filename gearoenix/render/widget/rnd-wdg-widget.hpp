@@ -28,24 +28,24 @@ namespace render {
         protected:
             StateType state_type = StateType::NORMAL;
             // at the end it must send event
-            virtual void press_effect();
-            virtual void release_effect();
-            virtual void cancel_effect();
+            virtual void press_effect() noexcept;
+            virtual void release_effect() noexcept;
+            virtual void cancel_effect() noexcept;
 
         public:
             Widget(
-                const core::Id my_id,
-                const std::shared_ptr<system::stream::Stream>& s,
-                const std::shared_ptr<engine::Engine>& e,
-                const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
+				core::Id my_id,
+				system::stream::Stream* s,
+				engine::Engine* e,
+                const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
             Widget(
-                const std::shared_ptr<engine::Engine>& e,
-                const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
-            virtual ~Widget();
+				engine::Engine* e,
+                const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+            virtual ~Widget() noexcept;
             void read_gx3d(
                 const std::shared_ptr<system::stream::Stream>& f,
-                const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
-            void state_change(EventType e);
+                const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+            void state_change(EventType e) noexcept;
         };
     }
 }

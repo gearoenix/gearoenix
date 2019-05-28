@@ -34,15 +34,15 @@ namespace render {
             std::shared_ptr<font::Font2D> fnt;
             //std::shared_ptr<mesh::Mesh> msh;
             core::Id mesh_id;
-            void create_text_mesh(core::sync::EndCaller<core::sync::EndCallerIgnore> c);
+            void create_text_mesh(core::sync::EndCaller<core::sync::EndCallerIgnore> c) noexcept;
 
         public:
             Text(
                 const core::Id my_id,
-                const std::shared_ptr<system::stream::Stream>& f,
-                const std::shared_ptr<engine::Engine>& e,
-                const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
-            ~Text();
+                system::stream::Stream* f,
+                engine::Engine* e,
+                const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+            ~Text() noexcept final;
         };
     }
 }

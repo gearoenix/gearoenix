@@ -13,9 +13,9 @@ namespace system {
         protected:
             bool is_endian_compatible = true;
 
-            Stream() {}
+            Stream() noexcept {}
 
-            void built_in_type_read(void* data, core::Count length)
+            void built_in_type_read(void* data, core::Count length) noexcept
             {
                 read(data, length);
                 if (is_endian_compatible)
@@ -29,19 +29,19 @@ namespace system {
             }
 
         public:
-            virtual ~Stream() {}
+            virtual ~Stream() noexcept {}
 
-            virtual core::Count read(void* data, core::Count length) = 0;
-            virtual core::Count write(const void* data, core::Count length) = 0;
-            virtual void seek(core::Count offset) = 0;
-            virtual core::Count tell() = 0;
+            virtual core::Count read(void* data, core::Count length) noexcept = 0;
+            virtual core::Count write(const void* data, core::Count length) noexcept = 0;
+            virtual void seek(core::Count offset) noexcept = 0;
+            virtual core::Count tell() noexcept = 0;
 
-            bool get_endian_compatibility() const
+            bool get_endian_compatibility() const noexcept
             {
                 return is_endian_compatible;
             }
 
-            std::string read_string()
+            std::string read_string() noexcept
             {
                 core::Count c;
                 read(c);
@@ -51,7 +51,7 @@ namespace system {
                 return s;
             }
 
-            bool read_bool()
+            bool read_bool() noexcept
             {
                 std::uint8_t data;
                 read(&data, 1);
@@ -59,7 +59,7 @@ namespace system {
             }
 
             template <typename T>
-            void read(std::vector<T>& data)
+            void read(std::vector<T>& data) noexcept
             {
                 core::Count c;
                 read(c);
@@ -71,20 +71,20 @@ namespace system {
 
             template <typename T>
             typename std::enable_if<sizeof(T) == 1 && (std::is_integral<T>::value || std::is_enum<T>::value), void>::type
-            read(T& data)
+            read(T& data) noexcept
             {
                 read(&data, sizeof(T));
             }
 
             template <typename T>
             typename std::enable_if<(sizeof(T) > 1) && (sizeof(T) < 9) && (std::is_integral<T>::value || std::is_floating_point<T>::value || std::is_enum<T>::value), void>::type
-            read(T& data)
+            read(T& data) noexcept
             {
                 built_in_type_read(&data, sizeof(T));
             }
 
             template <typename T>
-            T read()
+            T read() noexcept
             {
                 T data;
                 read(data);
@@ -92,7 +92,7 @@ namespace system {
             }
 
             template <typename T>
-            void write(const T& d)
+            void write(const T& d) noexcept
             {
                 write(&d, sizeof(T));
             }

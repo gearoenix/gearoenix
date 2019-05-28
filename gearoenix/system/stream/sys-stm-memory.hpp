@@ -13,12 +13,12 @@ namespace system {
             core::Count index = 0;
 
         public:
-            Memory();
-            ~Memory();
-            core::Count read(void* d, core::Count length);
-            core::Count write(const void* d, core::Count length);
-            void seek(core::Count offset);
-            core::Count tell();
+            Memory() noexcept;
+            ~Memory() noexcept final;
+            core::Count read(void* d, core::Count length) noexcept;
+            core::Count write(const void* d, core::Count length) noexcept;
+            void seek(core::Count offset) noexcept;
+            core::Count tell() noexcept;
         };
     }
 }

@@ -34,17 +34,17 @@ namespace render {
             EffectState::Type effect_state = EffectState::NO_ANIM;
             std::shared_ptr<physics::animation::Animation> anim;
             std::weak_ptr<physics::animation::Animation> latest_anim;
-            void press_effect();
-            void release_effect();
-            void cancel_effect();
+            void press_effect() noexcept;
+            void release_effect() noexcept;
+            void cancel_effect() noexcept;
 
         public:
             Button(
-                const core::Id my_id,
-                const std::shared_ptr<system::stream::Stream>& f,
-                const std::shared_ptr<engine::Engine>& e,
-                const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
-            virtual ~Button();
+                core::Id my_id,
+				system::stream::Stream* f,
+				engine::Engine* e,
+                const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+            virtual ~Button() noexcept;
         };
     }
 }

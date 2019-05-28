@@ -27,9 +27,9 @@ namespace render {
 
         public:
             Mesh(
-                const std::shared_ptr<system::stream::Stream>& f,
-                const std::shared_ptr<engine::Engine>& e,
-                const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
+				system::stream::Stream* f,
+				engine::Engine* e,
+                const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
 
             Mesh(
                 const std::shared_ptr<mesh::Mesh>& msh,
@@ -37,9 +37,9 @@ namespace render {
 
             ~Mesh();
 
-            const std::shared_ptr<mesh::Mesh>& get_mesh() const;
-            const std::shared_ptr<material::Material>& get_material() const;
-            void update_uniform();
+            const std::shared_ptr<mesh::Mesh>& get_mesh() const noexcept;
+            const std::shared_ptr<material::Material>& get_material() const noexcept;
+            void update_uniform() noexcept;
         };
     }
 }

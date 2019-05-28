@@ -20,7 +20,7 @@ void gearoenix::render::scene::Manager::get_gx3d(const core::Id mid, core::sync:
         GXLOGD("In IO thread, loading scene with id: " << mid)
         c.set_data(cache.get<Scene>(mid, [mid, c, this] {
             GXLOGD("Scene with id: " << mid << " is not cached, going to import it.")
-            const std::shared_ptr<system::stream::Stream>& file = cache.get_file();
+            system::stream::Stream*const file = cache.get_file();
             auto scnptr = new Scene*;
             const core::sync::EndCaller<core::sync::EndCallerIgnore> call([c, scnptr] {
                 (*scnptr)->enable();

@@ -1,6 +1,6 @@
 #include "rnd-pip-forward-pbr-directional-shadow-resource-set.hpp"
 
-void gearoenix::render::pipeline::ForwardPbrDirectionalShadowResourceSet::set_node_uniform_buffer(const std::shared_ptr<buffer::Uniform>& uniform_buffer)
+void gearoenix::render::pipeline::ForwardPbrDirectionalShadowResourceSet::set_node_uniform_buffer(buffer::Uniform* uniform_buffer)
 {
     node_uniform_buffer = uniform_buffer;
 }

@@ -8,7 +8,7 @@
 #include "../mesh/rnd-msh-mesh.hpp"
 #include "../shader/rnd-shd-shader.hpp"
 
-void gearoenix::render::widget::Text::create_text_mesh(core::sync::EndCaller<core::sync::EndCallerIgnore> c)
+void gearoenix::render::widget::Text::create_text_mesh(core::sync::EndCaller<core::sync::EndCallerIgnore> c) noexcept
 {
     system::stream::Memory ms;
     system::stream::Stream& s = ms;
@@ -115,9 +115,9 @@ void gearoenix::render::widget::Text::create_text_mesh(core::sync::EndCaller<cor
 
 gearoenix::render::widget::Text::Text(
     const core::Id my_id,
-    const std::shared_ptr<system::stream::Stream>& f,
-    const std::shared_ptr<engine::Engine>& e,
-    const core::sync::EndCaller<core::sync::EndCallerIgnore>& c)
+    system::stream::Stream*const f,
+    engine::Engine*const e,
+    const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : Widget(my_id, f, e, c)
     , text(f->read_string())
     , align(f->read<Alignment::Type>())
@@ -152,4 +152,4 @@ gearoenix::render::widget::Text::Text(
     //meshes[mesh_id] = std::make_tuple(msh, mat, dp);
 }
 
-gearoenix::render::widget::Text::~Text() {}
+gearoenix::render::widget::Text::~Text() noexcept {}

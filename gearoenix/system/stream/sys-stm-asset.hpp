@@ -31,18 +31,18 @@ namespace system {
 #else
 #error "File usage is not specified!"
 #endif
-            void check_endian_compatibility();
+            void check_endian_compatibility() noexcept;
 
-            Asset();
+            Asset() noexcept;
 
         public:
-            ~Asset();
+            ~Asset() noexcept;
             /// It will return null it file does not exist
-            static std::shared_ptr<Asset> construct(const std::shared_ptr<system::Application>& sys_app, const std::string& name) noexcept;
-            core::Count read(void* data, core::Count length);
-            core::Count write(const void* data, core::Count length);
-            void seek(core::Count offset);
-            core::Count tell();
+            static Asset* construct(system::Application* sys_app, const std::string& name) noexcept;
+            core::Count read(void* data, core::Count length) noexcept;
+            core::Count write(const void* data, core::Count length) noexcept;
+            void seek(core::Count offset) noexcept;
+            core::Count tell() noexcept;
         };
     }
 }

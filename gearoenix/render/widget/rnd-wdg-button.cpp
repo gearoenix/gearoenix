@@ -17,7 +17,7 @@ const gearoenix::core::Real gearoenix::render::widget::Button::max_scale_reducti
 const gearoenix::core::Real gearoenix::render::widget::Button::max_scale_inversed = 1.0f / gearoenix::render::widget::Button::max_scale;
 const gearoenix::core::Real gearoenix::render::widget::Button::max_scale_inversed_reduction = 1.0f - gearoenix::render::widget::Button::max_scale_inversed;
 
-void gearoenix::render::widget::Button::press_effect()
+void gearoenix::render::widget::Button::press_effect() noexcept
 {
     //std::lock_guard<std::mutex> lg(effect_locker);
     switch (effect_state) {
@@ -93,7 +93,7 @@ void gearoenix::render::widget::Button::press_effect()
     }
 }
 
-void gearoenix::render::widget::Button::release_effect()
+void gearoenix::render::widget::Button::release_effect() noexcept
 {
     //std::lock_guard<std::mutex> lg(effect_locker);
     switch (effect_state) {
@@ -111,7 +111,7 @@ void gearoenix::render::widget::Button::release_effect()
     }
 }
 
-void gearoenix::render::widget::Button::cancel_effect()
+void gearoenix::render::widget::Button::cancel_effect() noexcept
 {
     //std::lock_guard<std::mutex> lg(effect_locker);
     switch (effect_state) {
@@ -131,14 +131,14 @@ void gearoenix::render::widget::Button::cancel_effect()
 
 gearoenix::render::widget::Button::Button(
     const core::Id my_id,
-    const std::shared_ptr<system::stream::Stream>& f,
-    const std::shared_ptr<engine::Engine>& e,
-    const core::sync::EndCaller<core::sync::EndCallerIgnore>& c)
+    system::stream::Stream*const f,
+    engine::Engine*const e,
+    const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : Widget(my_id, f, e, c)
 {
 }
 
-gearoenix::render::widget::Button::~Button()
+gearoenix::render::widget::Button::~Button() noexcept
 {
     if (anim != nullptr) {
         anim->terminate();

@@ -84,7 +84,7 @@ GameApp::GameApp(const std::shared_ptr<gearoenix::system::Application>& sys_app)
     const std::shared_ptr<GxMdManager>& mdlmgr = astmgr->get_model_manager();
     for (gearoenix::core::Real y = -10.0f, roughness = 0.1f; y < 10.1f; y += 2.5f, roughness += 0.1f) {
         for (gearoenix::core::Real x = -10.0f, metallic = 0.1f; x < 10.1f; x += 2.5f, metallic += 0.1f) {
-            const std::shared_ptr<GxMaterial> mat(new GxMaterial(rnd_eng, endcall));
+            const std::shared_ptr<GxMaterial> mat(new GxMaterial(rnd_eng.get(), endcall));
             mat->set_roughness_factor(roughness);
             mat->set_metallic_factor(metallic);
             const std::shared_ptr<GxModel> mdl = mdlmgr->create<GxModel>(mdlcall);

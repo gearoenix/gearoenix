@@ -13,7 +13,7 @@ namespace render {
             std::shared_ptr<texture::Texture2D> brdflut = nullptr;
 
         public:
-            virtual void set_node_uniform_buffer(const std::shared_ptr<buffer::Uniform>& uniform_buffer);
+            virtual void set_node_uniform_buffer(buffer::Uniform* uniform_buffer);
             virtual void set_diffuse_environment(const std::shared_ptr<texture::Cube>& t);
             virtual void set_specular_environment(const std::shared_ptr<texture::Cube>& t);
             virtual void set_ambient_occlusion(const std::shared_ptr<texture::Texture2D>& t);

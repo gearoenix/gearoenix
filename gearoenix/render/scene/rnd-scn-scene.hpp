@@ -63,7 +63,7 @@ namespace render {
     namespace scene {
         class Scene : public core::asset::Asset {
         protected:
-            const std::shared_ptr<engine::Engine>& e;
+			engine::Engine*const e;
             const Type::Id scene_type_id;
             const std::shared_ptr<buffer::FramedUniform> uniform_buffers;
 
@@ -81,26 +81,23 @@ namespace render {
         public:
             /// It's going to read itself from gx3d stream.
             Scene(
-                const core::Id my_id,
-                const std::shared_ptr<system::stream::Stream>& f,
-                const std::shared_ptr<engine::Engine>& e,
-                const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
+                const core::Id my_id, system::stream::Stream* f, engine::Engine* e,
+                const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
 
             Scene(
-                const core::Id my_id,
-                const std::shared_ptr<engine::Engine>& e,
-                const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
+                const core::Id my_id, engine::Engine* e,
+                const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
 
-            virtual ~Scene();
+            virtual ~Scene() noexcept;
 
-            void enable();
-            void disable();
-            bool is_enabled() const;
+            void enable() noexcept;
+            void disable() noexcept;
+            bool is_enabled() const noexcept;
 
-#define GX_HELPER(x, c)                                             \
-    void add_##x(const std::shared_ptr<c>& m);                      \
-    const std::shared_ptr<c>& get_##x(const core::Id x##_id) const; \
-    const std::map<core::Id, std::shared_ptr<c>>& get_##x##s() const
+#define GX_HELPER(x, c)                                                      \
+    void add_##x(const std::shared_ptr<c>& m) noexcept;                      \
+    const std::shared_ptr<c>& get_##x(const core::Id x##_id) const noexcept; \
+    const std::map<core::Id, std::shared_ptr<c>>& get_##x##s() const noexcept
 
             GX_HELPER(camera, camera::Camera);
             GX_HELPER(audio, audio::Audio);
@@ -110,12 +107,12 @@ namespace render {
 
 #undef GX_HELPER
 
-            void set_skybox(const std::shared_ptr<skybox::Skybox>& s);
-            const std::shared_ptr<model::Model>& get_skybox(const core::Id skybox_id) const;
+            void set_skybox(const std::shared_ptr<skybox::Skybox>& s) noexcept;
+            const std::shared_ptr<model::Model>& get_skybox(const core::Id skybox_id) const noexcept;
 
-            const std::shared_ptr<buffer::FramedUniform>& get_uniform_buffers() const;
+            const std::shared_ptr<buffer::FramedUniform>& get_uniform_buffers() const noexcept;
 
-            void update_uniform();
+            void update_uniform() noexcept;
         };
     }
 }

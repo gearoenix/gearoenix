@@ -44,7 +44,7 @@ void gearoenix::render::pipeline::ResourceSet::set_material(const material::Mate
 
 #undef GX_HELPER
 
-void gearoenix::render::pipeline::ResourceSet::set_node_uniform_buffer(const std::shared_ptr<buffer::Uniform>& b)
+void gearoenix::render::pipeline::ResourceSet::set_node_uniform_buffer(buffer::Uniform* b)
 {
     node_uniform_buffer = b;
 }

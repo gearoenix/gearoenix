@@ -41,12 +41,12 @@ namespace render {
     namespace pipeline {
         class ResourceSet {
         protected:
-            std::shared_ptr<buffer::Uniform> scene_uniform_buffer = nullptr;
-            std::shared_ptr<buffer::Uniform> camera_uniform_buffer = nullptr;
-            std::shared_ptr<buffer::Uniform> light_uniform_buffer = nullptr;
-            std::shared_ptr<buffer::Uniform> model_uniform_buffer = nullptr;
-            std::shared_ptr<buffer::Uniform> material_uniform_buffer = nullptr;
-            std::shared_ptr<buffer::Uniform> node_uniform_buffer = nullptr;
+            buffer::Uniform* scene_uniform_buffer = nullptr;
+            buffer::Uniform* camera_uniform_buffer = nullptr;
+            buffer::Uniform* light_uniform_buffer = nullptr;
+            buffer::Uniform* model_uniform_buffer = nullptr;
+            buffer::Uniform* material_uniform_buffer = nullptr;
+            buffer::Uniform* node_uniform_buffer = nullptr;
 
             const mesh::Mesh* msh = nullptr;
 
@@ -65,7 +65,7 @@ namespace render {
             GX_HELPER(mesh, Mesh);
             GX_HELPER(material, Material);
 #undef GX_HELPER
-            void set_node_uniform_buffer(const std::shared_ptr<buffer::Uniform>& node_uniform_buffer);
+            void set_node_uniform_buffer(buffer::Uniform* node_uniform_buffer);
             virtual void clean();
         };
     }

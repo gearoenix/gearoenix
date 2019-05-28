@@ -22,7 +22,7 @@ namespace render {
     namespace material {
         class Material {
         private:
-            const std::shared_ptr<engine::Engine> e;
+			engine::Engine*const e;
             const std::shared_ptr<buffer::FramedUniform> uniform_buffers;
 
             std::shared_ptr<texture::Texture2D> color = nullptr;
