@@ -6,8 +6,8 @@
 #include "rnd-scn-type.hpp"
 #include <utility>
 
-gearoenix::render::scene::Manager::Manager(system::stream::Stream*const s, engine::Engine*const e) noexcept
-        : e(e)
+gearoenix::render::scene::Manager::Manager(system::stream::Stream* const s, engine::Engine* const e) noexcept
+    : e(e)
     , cache(s)
     , io_worker(new core::sync::WorkWaiter())
 {
@@ -20,7 +20,7 @@ void gearoenix::render::scene::Manager::get_gx3d(const core::Id mid, core::sync:
         GXLOGD("In IO thread, loading scene with id: " << mid)
         c.set_data(cache.get<Scene>(mid, [mid, c, this] {
             GXLOGD("Scene with id: " << mid << " is not cached, going to import it.")
-            system::stream::Stream*const file = cache.get_file();
+            system::stream::Stream* const file = cache.get_file();
             auto scnptr = new Scene*;
             const core::sync::EndCaller<core::sync::EndCallerIgnore> call([c, scnptr] {
                 (*scnptr)->enable();

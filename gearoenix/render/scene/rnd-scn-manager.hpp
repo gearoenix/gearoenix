@@ -21,20 +21,20 @@ namespace render {
     namespace scene {
         class Manager {
         protected:
-            engine::Engine*const e;
+            engine::Engine* const e;
             core::cache::File<Scene> cache;
             const std::shared_ptr<core::sync::WorkWaiter> io_worker;
 
         public:
             Manager(system::stream::Stream* s, engine::Engine* e) noexcept;
-            ~Manager() noexcept  = default;
+            ~Manager() noexcept = default;
             /// It is gonna load the scene (if exists) in another thread.
-            void get_gx3d(core::Id mid, core::sync::EndCaller<Scene> c) noexcept ;
+            void get_gx3d(core::Id mid, core::sync::EndCaller<Scene> c) noexcept;
             /// T must be derived from Scene and have the same constructor that Scene has.
             template <typename T>
             typename std::enable_if<std::is_base_of<Scene, T>::value, std::shared_ptr<T>>::type
-            create(core::sync::EndCaller<T>& c) noexcept ;
-            const std::map<core::Id, std::weak_ptr<scene::Scene>>& get_scenes() const noexcept ;
+            create(core::sync::EndCaller<T>& c) noexcept;
+            const std::map<core::Id, std::weak_ptr<scene::Scene>>& get_scenes() const noexcept;
         };
     }
 }

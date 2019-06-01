@@ -6,29 +6,29 @@
 #include "cr-cache-cacher.hpp"
 
 namespace gearoenix::core::cache {
-        template <class T>
-        class File {
-        private:
-            Cacher<T> cacher;
-            std::map<Id, Offset> offsets;
-            system::stream::Stream*const file;
+template <class T>
+class File {
+private:
+    Cacher<T> cacher;
+    std::map<Id, Offset> offsets;
+    system::stream::Stream* const file;
 
-        public:
-            explicit File(system::stream::Stream* file) noexcept;
-            ~File() noexcept;
-            template <class C>
-            std::shared_ptr<C> get(Id id, std::function<std::shared_ptr<C>()> new_fun) noexcept;
-            template <class C>
-            std::shared_ptr<C> get(Id id) const noexcept;
-            const system::stream::Stream* get_file() const noexcept;
-            system::stream::Stream* get_file() noexcept;
-            const Cacher<T>& get_cacher() const noexcept;
-            Cacher<T>& get_cacher() noexcept;
-        };
-    }
+public:
+    explicit File(system::stream::Stream* file) noexcept;
+    ~File() noexcept;
+    template <class C>
+    std::shared_ptr<C> get(Id id, std::function<std::shared_ptr<C>()> new_fun) noexcept;
+    template <class C>
+    std::shared_ptr<C> get(Id id) const noexcept;
+    const system::stream::Stream* get_file() const noexcept;
+    system::stream::Stream* get_file() noexcept;
+    const Cacher<T>& get_cacher() const noexcept;
+    Cacher<T>& get_cacher() noexcept;
+};
+}
 
 template <class T>
-gearoenix::core::cache::File<T>::File(system::stream::Stream*const file) noexcept
+gearoenix::core::cache::File<T>::File(system::stream::Stream* const file) noexcept
     : file(file)
 {
     if (file != nullptr) {
@@ -42,8 +42,9 @@ gearoenix::core::cache::File<T>::File(system::stream::Stream*const file) noexcep
     }
 }
 
-template<class T>
-gearoenix::core::cache::File<T>::~File() noexcept {
+template <class T>
+gearoenix::core::cache::File<T>::~File() noexcept
+{
     delete file;
 }
 

@@ -7,8 +7,8 @@
 #include <vector>
 namespace gearoenix {
 namespace system::stream {
-        class Stream;
-    }
+    class Stream;
+}
 namespace render {
     namespace buffer {
         class FramedUniform;
@@ -22,7 +22,7 @@ namespace render {
     namespace material {
         class Material {
         private:
-			engine::Engine*const e;
+            engine::Engine* const e;
             const std::shared_ptr<buffer::FramedUniform> uniform_buffers;
 
             std::shared_ptr<texture::Texture2D> color = nullptr;
@@ -34,17 +34,17 @@ namespace render {
             Uniform uniform;
 
         public:
-            Material(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept ;
-            Material(system::stream::Stream* f, engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept ;
+            Material(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept;
+            Material(system::stream::Stream* f, engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept;
             ~Material() noexcept = default;
-            void update_uniform() noexcept ;
-            const std::shared_ptr<buffer::FramedUniform>& get_uniform_buffers() const noexcept ;
-            const std::shared_ptr<texture::Texture2D>& get_color() const noexcept ;
-            const std::shared_ptr<texture::Texture2D>& get_metallic_roughness() const noexcept ;
-            const std::shared_ptr<texture::Texture2D>& get_normal() const noexcept ;
-            const std::shared_ptr<texture::Texture2D>& get_emissive() const noexcept ;
+            void update_uniform() noexcept;
+            const std::shared_ptr<buffer::FramedUniform>& get_uniform_buffers() const noexcept;
+            const std::shared_ptr<texture::Texture2D>& get_color() const noexcept;
+            const std::shared_ptr<texture::Texture2D>& get_metallic_roughness() const noexcept;
+            const std::shared_ptr<texture::Texture2D>& get_normal() const noexcept;
+            const std::shared_ptr<texture::Texture2D>& get_emissive() const noexcept;
             void set_metallic_factor(core::Real f) noexcept;
-            void set_roughness_factor(core::Real f) noexcept ;
+            void set_roughness_factor(core::Real f) noexcept;
         };
     }
 }

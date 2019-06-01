@@ -7,7 +7,8 @@
 
 gearoenix::math::Mat2x2::Mat2x2() noexcept
     : mat { 1.0f, 0.0f, 0.0f, 1.0f }
-{}
+{
+}
 
 gearoenix::math::Mat2x2::Mat2x2(const core::Real dia_e) noexcept
     : mat { dia_e, 0.0f, 0.0f, dia_e }
@@ -17,7 +18,7 @@ gearoenix::math::Mat2x2::Mat2x2(const core::Real dia_e) noexcept
 gearoenix::math::Mat2x2::Mat2x2(
     const core::Real e0, const core::Real e1,
     const core::Real e2, const core::Real e3) noexcept
-    : mat { e0,e1,e2, e3}
+    : mat { e0, e1, e2, e3 }
 {
 }
 
@@ -112,13 +113,14 @@ gearoenix::math::Mat4x4::Mat4x4(
 {
 }
 
-gearoenix::math::Mat4x4::Mat4x4(system::stream::Stream*const f) noexcept : mat {}
+gearoenix::math::Mat4x4::Mat4x4(system::stream::Stream* const f) noexcept
+    : mat {}
 {
     read(f);
 }
 
 gearoenix::math::Mat4x4::Mat4x4(const Mat4x4& m) noexcept
-        : mat {}
+    : mat {}
 {
     for (int i = 0; i < 16; i++) {
         mat[i] = m.mat[i];
@@ -358,7 +360,7 @@ void gearoenix::math::Mat4x4::get_location(Vec3& location) const noexcept
     location[2] = mat[14];
 }
 
-void gearoenix::math::Mat4x4::read(system::stream::Stream*const f) noexcept
+void gearoenix::math::Mat4x4::read(system::stream::Stream* const f) noexcept
 {
     for (core::Real& i : mat)
         f->read(i);

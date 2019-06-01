@@ -40,19 +40,19 @@
     }
 
 namespace gearoenix::gles2 {
-    namespace shader {
-        class Shader;
-    }
-    namespace pipeline {
-        class ResourceSet {
-        protected:
-            const std::shared_ptr<shader::Shader> shd;
-            explicit ResourceSet(const std::shared_ptr<shader::Shader>& shd);
+namespace shader {
+    class Shader;
+}
+namespace pipeline {
+    class ResourceSet {
+    protected:
+        const std::shared_ptr<shader::Shader> shd;
+        explicit ResourceSet(const std::shared_ptr<shader::Shader>& shd);
 
-        public:
-            virtual ~ResourceSet();
-            virtual void bind(gl::uint& bound_shader_program) const;
-        };
-    }
+    public:
+        virtual ~ResourceSet();
+        virtual void bind(gl::uint& bound_shader_program) const;
+    };
+}
 }
 #endif

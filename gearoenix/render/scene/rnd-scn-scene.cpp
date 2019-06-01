@@ -33,7 +33,7 @@ static const std::shared_ptr<gearoenix::render::model::Model> null_model = nullp
 static const std::shared_ptr<gearoenix::physics::constraint::Constraint> null_constraint = nullptr;
 
 gearoenix::render::scene::Scene::Scene(
-    const core::Id my_id, system::stream::Stream*const f, engine::Engine*const e,
+    const core::Id my_id, system::stream::Stream* const f, engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : core::asset::Asset(my_id, core::asset::Type::SCENE)
     , e(e)
@@ -76,7 +76,7 @@ gearoenix::render::scene::Scene::Scene(
 
 gearoenix::render::scene::Scene::Scene(
     const core::Id my_id,
-	engine::Engine*const  e,
+    engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>&) noexcept
     : core::asset::Asset(my_id, core::asset::Type::SCENE)
     , e(e)

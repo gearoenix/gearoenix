@@ -5,16 +5,16 @@
 #include "../core/sync/cr-sync-end-caller.hpp"
 namespace gearoenix {
 namespace render::engine {
-        class Engine;
-    }
+    class Engine;
+}
 namespace system::stream {
-        class Stream;
-    }
+    class Stream;
+}
 namespace audio {
     class Audio;
     class Manager {
     protected:
-        render::engine::Engine*const e;
+        render::engine::Engine* const e;
         core::cache::File<Audio> cache;
 
     public:

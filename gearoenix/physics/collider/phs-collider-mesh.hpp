@@ -22,7 +22,7 @@ namespace physics::collider {
     public:
         explicit Mesh(system::stream::Stream* f) noexcept;
         void update(const math::Mat4x4& m) noexcept final;
-        bool hit(const math::Ray3& r, core::Real& distance_from_origin) const  noexcept final;
+        bool hit(const math::Ray3& r, core::Real& distance_from_origin) const noexcept final;
         bool hit(const math::Ray3& r, core::Real& distance_from_origin, math::Vec2& factors) const noexcept;
 
         friend std::ostream& operator<<(std::ostream& os, const Mesh& m) noexcept

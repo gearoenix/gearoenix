@@ -5,24 +5,27 @@
 #include <vector>
 
 namespace gearoenix::render {
-    namespace engine {
-        class Engine;
-    }
-    namespace buffer {
-        class Static;
-        class Uniform;
-        /// All of the functions must be internally synchronized
-        class Manager {
-        protected:
-            engine::Engine *const e;
-            explicit Manager(engine::Engine* e) noexcept: e(e) {}
+namespace engine {
+    class Engine;
+}
+namespace buffer {
+    class Static;
+    class Uniform;
+    /// All of the functions must be internally synchronized
+    class Manager {
+    protected:
+        engine::Engine* const e;
+        explicit Manager(engine::Engine* e) noexcept
+            : e(e)
+        {
+        }
 
-        public:
-            virtual ~Manager() noexcept = default;
-            virtual Uniform* create_uniform(unsigned int size) noexcept = 0;
-            virtual Static* create_static(std::vector<math::BasicVertex> vertices, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept = 0;
-            virtual Static* create_static(std::vector<std::uint32_t> indices, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept = 0;
-        };
-    }
+    public:
+        virtual ~Manager() noexcept = default;
+        virtual Uniform* create_uniform(unsigned int size) noexcept = 0;
+        virtual Static* create_static(std::vector<math::BasicVertex> vertices, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept = 0;
+        virtual Static* create_static(std::vector<std::uint32_t> indices, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept = 0;
+    };
+}
 }
 #endif

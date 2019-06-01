@@ -9,7 +9,7 @@
 #include "rnd-txt-texture-cube.hpp"
 #include "rnd-txt-type.hpp"
 
-gearoenix::render::texture::Manager::Manager(system::stream::Stream*const s, engine::Engine*const e) noexcept
+gearoenix::render::texture::Manager::Manager(system::stream::Stream* const s, engine::Engine* const e) noexcept
     : e(e)
     , cache(s)
 {
@@ -128,7 +128,7 @@ std::shared_ptr<gearoenix::render::texture::Cube> gearoenix::render::texture::Ma
 std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::render::texture::Manager::get_gx3d(const core::Id id, core::sync::EndCaller<Texture>& c) noexcept
 {
     const std::shared_ptr<Texture> o = cache.get<Texture>(id, [this, id, c] {
-        system::stream::Stream*const f = cache.get_file();
+        system::stream::Stream* const f = cache.get_file();
         switch (f->read<Type::Id>()) {
         case Type::TEXTURE_2D: {
             std::shared_ptr<std::vector<unsigned char>> data(new std::vector<unsigned char>);

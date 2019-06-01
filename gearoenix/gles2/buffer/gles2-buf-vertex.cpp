@@ -8,7 +8,7 @@
 
 gearoenix::gles2::buffer::Vertex::Vertex(
     std::vector<math::BasicVertex> vertices,
-    engine::Engine*const e,
+    engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : render::buffer::Static(static_cast<unsigned int>(vertices.size() * sizeof(math::BasicVertex)), e)
 {

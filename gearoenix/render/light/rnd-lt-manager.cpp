@@ -4,8 +4,8 @@
 #include "rnd-lt-type.hpp"
 #include <memory>
 
-gearoenix::render::light::Manager::Manager(system::stream::Stream*const s, engine::Engine*const e) noexcept
-        : e(e)
+gearoenix::render::light::Manager::Manager(system::stream::Stream* const s, engine::Engine* const e) noexcept
+    : e(e)
     , cache(s)
 {
 }

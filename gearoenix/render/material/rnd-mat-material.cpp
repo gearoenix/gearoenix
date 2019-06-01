@@ -11,7 +11,7 @@
 #define GX_DEBUG_MATERIAL_IMPORT
 #endif
 
-gearoenix::render::material::Material::Material(engine::Engine*const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept
+gearoenix::render::material::Material::Material(engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept
     : e(e)
     , uniform_buffers(std::make_shared<buffer::FramedUniform>(sizeof(Uniform), e))
 {
@@ -23,7 +23,7 @@ gearoenix::render::material::Material::Material(engine::Engine*const e, const co
     emissive = txtmgr->get_2d(math::Vec3(0.0f, 0.0f, 0.0f), calltxt2d);
 }
 
-gearoenix::render::material::Material::Material(system::stream::Stream*const f, engine::Engine*const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept
+gearoenix::render::material::Material::Material(system::stream::Stream* const f, engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept
     : e(e)
     , uniform_buffers(std::make_shared<buffer::FramedUniform>(sizeof(Uniform), e))
 {

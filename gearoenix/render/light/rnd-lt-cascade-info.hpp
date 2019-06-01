@@ -40,12 +40,12 @@ namespace light {
         void start() noexcept;
 
         void shadow(const model::Model*, std::size_t kernel_index) noexcept;
-        
-		void shrink() noexcept;
-        
-		void record(std::size_t kernel_index) noexcept;
-        
-		void submit() noexcept;
+
+        void shrink() noexcept;
+
+        void record(std::size_t kernel_index) noexcept;
+
+        void submit() noexcept;
     };
 }
 }

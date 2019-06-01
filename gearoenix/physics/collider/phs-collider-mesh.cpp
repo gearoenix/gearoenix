@@ -4,7 +4,7 @@
 #include "../../system/stream/sys-stm-stream.hpp"
 #include "../../system/sys-log.hpp"
 
-gearoenix::physics::collider::Mesh::Mesh(system::stream::Stream*const f) noexcept
+gearoenix::physics::collider::Mesh::Mesh(system::stream::Stream* const f) noexcept
     : Collider(Type::MESH)
 {
     const auto cnt = f->read<core::Count>();

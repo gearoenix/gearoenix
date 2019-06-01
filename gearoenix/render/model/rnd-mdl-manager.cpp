@@ -3,8 +3,8 @@
 #include "rnd-mdl-model.hpp"
 #include "rnd-mdl-type.hpp"
 
-gearoenix::render::model::Manager::Manager(system::stream::Stream*const s, engine::Engine*const e) noexcept
-        : e(e)
+gearoenix::render::model::Manager::Manager(system::stream::Stream* const s, engine::Engine* const e) noexcept
+    : e(e)
     , cache(s)
 {
 }

@@ -1,8 +1,8 @@
 #ifndef GEAROENIX_CORE_POOL_HPP
 #define GEAROENIX_CORE_POOL_HPP
 
-#include "cr-build-configuration.hpp"
 #include "../system/sys-log.hpp"
+#include "cr-build-configuration.hpp"
 #include <functional>
 #include <vector>
 
@@ -43,10 +43,10 @@ public:
     iterator end() noexcept;
     std::size_t capacity() const noexcept;
     std::size_t size() const noexcept;
-	template<typename I>
-	typename std::enable_if<std::is_integral<I>::value, const T&>::type operator[](I index) const noexcept;
-	template<typename I>
-	typename std::enable_if<std::is_integral<I>::value, T&>::type  operator[](I index) noexcept;
+    template <typename I>
+    typename std::enable_if<std::is_integral<I>::value, const T&>::type operator[](I index) const noexcept;
+    template <typename I>
+    typename std::enable_if<std::is_integral<I>::value, T&>::type operator[](I index) noexcept;
 };
 }
 
@@ -142,26 +142,28 @@ std::size_t gearoenix::core::OneLoopPool<T>::size() const noexcept
     return current_index;
 }
 
-template<class T>
-template<typename I>
+template <class T>
+template <typename I>
 typename std::enable_if<std::is_integral<I>::value, const T&>::type
-gearoenix::core::OneLoopPool<T>::operator[](const I index) const noexcept
+    gearoenix::core::OneLoopPool<T>::operator[](const I index) const noexcept
 {
 #ifdef GX_DEBUG_MODE
-	if (index < 0 || index >= current_index) GXLOGF("Out of range index {" << index << "}");
+    if (index < 0 || index >= current_index)
+        GXLOGF("Out of range index {" << index << "}");
 #endif
-	return *objects[index];
+    return *objects[index];
 }
 
-template<class T>
-template<typename I>
+template <class T>
+template <typename I>
 typename std::enable_if<std::is_integral<I>::value, T&>::type
-gearoenix::core::OneLoopPool<T>::operator[](const I index) noexcept
+    gearoenix::core::OneLoopPool<T>::operator[](const I index) noexcept
 {
 #ifdef GX_DEBUG_MODE
-	if (index < 0 || index >= current_index) GXLOGF("Out of range index {" << index << "}");
+    if (index < 0 || index >= current_index)
+        GXLOGF("Out of range index {" << index << "}");
 #endif
-	return *objects[index];
+    return *objects[index];
 }
 
 #endif

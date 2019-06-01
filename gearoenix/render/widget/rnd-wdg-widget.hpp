@@ -34,12 +34,12 @@ namespace render {
 
         public:
             Widget(
-				core::Id my_id,
-				system::stream::Stream* s,
-				engine::Engine* e,
+                core::Id my_id,
+                system::stream::Stream* s,
+                engine::Engine* e,
                 const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
             Widget(
-				engine::Engine* e,
+                engine::Engine* e,
                 const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
             virtual ~Widget() noexcept;
             void read_gx3d(

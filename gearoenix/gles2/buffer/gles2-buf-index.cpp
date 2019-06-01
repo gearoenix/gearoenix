@@ -8,7 +8,7 @@
 
 gearoenix::gles2::buffer::Index::Index(
     std::vector<std::uint32_t> indices,
-    engine::Engine*const e,
+    engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : render::buffer::Static(static_cast<unsigned int>(indices.size() * sizeof(gl::ushort)), e)
 {

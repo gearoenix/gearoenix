@@ -16,8 +16,8 @@ gearoenix::render::mesh::Mesh::Mesh(const core::Id my_id, const Type::Id mesh_ty
 
 gearoenix::render::mesh::Mesh::Mesh(
     const core::Id my_id,
-    system::stream::Stream*const f,
-    engine::Engine*const e,
+    system::stream::Stream* const f,
+    engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : core::asset::Asset(my_id, core::asset::Type::MESH)
     , mesh_type_id(Type::BASIC)
@@ -38,7 +38,7 @@ gearoenix::render::mesh::Mesh::Mesh(
     std::vector<math::BasicVertex> vertices,
     std::vector<std::uint32_t> indices,
     const core::Real radius,
-    engine::Engine*const e,
+    engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : core::asset::Asset(my_id, core::asset::Type::MESH)
     , mesh_type_id(Type::BASIC)
@@ -46,7 +46,7 @@ gearoenix::render::mesh::Mesh::Mesh(
     set_vertices(e, std::move(vertices), std::move(indices), radius, c);
 }
 
-gearoenix::render::mesh::Mesh::~Mesh()noexcept
+gearoenix::render::mesh::Mesh::~Mesh() noexcept
 {
     radius = -1.0f;
     delete vertex_buffer;
@@ -56,7 +56,7 @@ gearoenix::render::mesh::Mesh::~Mesh()noexcept
 }
 
 void gearoenix::render::mesh::Mesh::set_vertices(
-    engine::Engine*const e,
+    engine::Engine* const e,
     std::vector<math::BasicVertex> vertices,
     std::vector<std::uint32_t> indices,
     const core::Real r,

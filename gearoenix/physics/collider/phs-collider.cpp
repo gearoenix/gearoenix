@@ -8,7 +8,7 @@ gearoenix::physics::collider::Collider::Collider(Type t) noexcept
 {
 }
 
-gearoenix::physics::collider::Collider* gearoenix::physics::collider::Collider::read(system::stream::Stream*const f) noexcept
+gearoenix::physics::collider::Collider* gearoenix::physics::collider::Collider::read(system::stream::Stream* const f) noexcept
 {
     core::Id collider_type_id;
     f->read(collider_type_id);

@@ -7,8 +7,8 @@
 
 namespace gearoenix {
 namespace system::stream {
-        class Stream;
-    }
+    class Stream;
+}
 namespace render {
     namespace engine {
         class Engine;
@@ -17,13 +17,13 @@ namespace render {
         class Skybox;
         class Manager {
         protected:
-            engine::Engine*const e;
+            engine::Engine* const e;
             core::cache::File<Skybox> cache;
 
         public:
-            Manager(system::stream::Stream* s, engine::Engine* e) noexcept ;
+            Manager(system::stream::Stream* s, engine::Engine* e) noexcept;
             ~Manager() noexcept = default;
-            std::shared_ptr<Skybox> get(core::Id mid, const core::sync::EndCaller<Skybox> c) noexcept ;
+            std::shared_ptr<Skybox> get(core::Id mid, const core::sync::EndCaller<Skybox> c) noexcept;
         };
     }
 }

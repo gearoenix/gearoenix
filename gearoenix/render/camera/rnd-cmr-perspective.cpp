@@ -101,8 +101,8 @@ void gearoenix::render::camera::Perspective::update_cascades() noexcept
 
 gearoenix::render::camera::Perspective::Perspective(
     const core::Id my_id,
-    system::stream::Stream*const f,
-    engine::Engine*const e) noexcept
+    system::stream::Stream* const f,
+    engine::Engine* const e) noexcept
     : Camera(my_id, f, e)
 {
     transformation->set_on_frustum_update([this] { update_cascades(); });
@@ -113,7 +113,7 @@ gearoenix::render::camera::Perspective::Perspective(
 
 gearoenix::render::camera::Perspective::Perspective(
     const core::Id my_id,
-    engine::Engine*const e) noexcept
+    engine::Engine* const e) noexcept
     : Camera(my_id, e)
 {
     transformation->set_on_frustum_update([this] { update_cascades(); });

@@ -131,8 +131,8 @@ void gearoenix::render::widget::Button::cancel_effect() noexcept
 
 gearoenix::render::widget::Button::Button(
     const core::Id my_id,
-    system::stream::Stream*const f,
-    engine::Engine*const e,
+    system::stream::Stream* const f,
+    engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : Widget(my_id, f, e, c)
 {

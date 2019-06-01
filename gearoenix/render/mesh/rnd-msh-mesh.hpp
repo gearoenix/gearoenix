@@ -7,8 +7,8 @@
 #include "rnd-msh-type.hpp"
 namespace gearoenix {
 namespace system::stream {
-        class Stream;
-    }
+    class Stream;
+}
 namespace render {
     namespace engine {
         class Engine;
@@ -44,7 +44,7 @@ namespace render {
                 core::Id my_id,
                 system::stream::Stream* f,
                 engine::Engine* e,
-                const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept ;
+                const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
             Mesh(
                 core::Id my_id,
                 std::vector<math::BasicVertex> vertices,

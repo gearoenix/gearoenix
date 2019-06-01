@@ -15,7 +15,7 @@
 #endif
 
 void gearoenix::render::texture::PNG::decode(
-    system::stream::Stream*const file,
+    system::stream::Stream* const file,
     std::vector<unsigned char>& data,
     unsigned int& img_width,
     unsigned int& img_height)

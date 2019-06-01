@@ -2,7 +2,7 @@
 #include "au-audio.hpp"
 #include "au-type.hpp"
 
-gearoenix::audio::Manager::Manager(system::stream::Stream*const s, render::engine::Engine*const e) noexcept
+gearoenix::audio::Manager::Manager(system::stream::Stream* const s, render::engine::Engine* const e) noexcept
     : e(e)
     , cache(s)
 {

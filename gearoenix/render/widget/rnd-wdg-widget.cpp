@@ -94,7 +94,7 @@ void gearoenix::render::widget::Widget::cancel_effect() noexcept
 {
 }
 
-gearoenix::render::widget::Widget::Widget(const core::Id my_id, system::stream::Stream*const s, engine::Engine*const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
+gearoenix::render::widget::Widget::Widget(const core::Id my_id, system::stream::Stream* const s, engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : model::Model(my_id, s, e, c)
 {
 }

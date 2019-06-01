@@ -43,7 +43,8 @@ void gearoenix::math::Aabb3::put(const Vec3& p) noexcept
     }
 }
 
-void gearoenix::math::Aabb3::put(const Sphere &o) noexcept {
+void gearoenix::math::Aabb3::put(const Sphere& o) noexcept
+{
     put(o.position + o.radius);
     put(o.position - o.radius);
 }
@@ -108,7 +109,8 @@ bool gearoenix::math::Aabb3::test(const Aabb3& o) const noexcept
         && mx[2] > o.mn[2];
 }
 
-bool gearoenix::math::Aabb3::test(const gearoenix::math::Sphere &o) const noexcept {
+bool gearoenix::math::Aabb3::test(const gearoenix::math::Sphere& o) const noexcept
+{
     return test(Aabb3(o.position + o.radius, o.position - o.radius));
 }
 

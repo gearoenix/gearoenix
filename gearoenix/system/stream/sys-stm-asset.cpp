@@ -23,9 +23,9 @@ gearoenix::system::stream::Asset::~Asset() noexcept
     GXTODO; //android asset free check
 }
 
-gearoenix::system::stream::Asset* gearoenix::system::stream::Asset::construct(system::Application*const sys_app, const std::string& name) noexcept
+gearoenix::system::stream::Asset* gearoenix::system::stream::Asset::construct(system::Application* const sys_app, const std::string& name) noexcept
 {
-	Asset *asset = new Asset();
+    Asset* asset = new Asset();
 #ifdef GX_USE_STD_FILE
     std::string file_path = name;
 #ifdef GX_IN_IOS

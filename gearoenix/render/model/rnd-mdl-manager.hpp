@@ -9,8 +9,8 @@
 
 namespace gearoenix {
 namespace system::stream {
-        class Stream;
-    }
+    class Stream;
+}
 namespace render {
     namespace engine {
         class Engine;
@@ -18,17 +18,17 @@ namespace render {
     namespace model {
         class Manager {
         protected:
-            engine::Engine*const e;
+            engine::Engine* const e;
             core::cache::File<Model> cache;
 
         public:
-            Manager(system::stream::Stream* s, engine::Engine* e) noexcept ;
+            Manager(system::stream::Stream* s, engine::Engine* e) noexcept;
             ~Manager() noexcept = default;
-            std::shared_ptr<Model> get_gx3d(core::Id mid, core::sync::EndCaller<Model>& c) noexcept ;
+            std::shared_ptr<Model> get_gx3d(core::Id mid, core::sync::EndCaller<Model>& c) noexcept;
             /// T must be derived from Model and have the same constructor that Model has.
             template <typename T>
             typename std::enable_if<std::is_base_of<Model, T>::value, std::shared_ptr<T>>::type
-            create(core::sync::EndCaller<T>& c) noexcept ;
+            create(core::sync::EndCaller<T>& c) noexcept;
         };
     }
 }

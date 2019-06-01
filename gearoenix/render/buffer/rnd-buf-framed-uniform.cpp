@@ -3,22 +3,22 @@
 #include "rnd-buf-manager.hpp"
 #include "rnd-buf-uniform.hpp"
 
-gearoenix::render::buffer::FramedUniform::FramedUniform(const unsigned int s, engine::Engine*const e) noexcept
+gearoenix::render::buffer::FramedUniform::FramedUniform(const unsigned int s, engine::Engine* const e) noexcept
     : e(e)
     , uniforms(new Uniform*[e->get_frames_count()])
 {
-    auto *cmd_mgr = e->get_buffer_manager();
+    auto* cmd_mgr = e->get_buffer_manager();
     const unsigned int fc = e->get_frames_count();
-    for(unsigned int i = 0; i < fc; ++i)
+    for (unsigned int i = 0; i < fc; ++i)
         uniforms[i] = cmd_mgr->create_uniform(s);
 }
 
 gearoenix::render::buffer::FramedUniform::~FramedUniform() noexcept
 {
     const unsigned int fc = e->get_frames_count();
-    for(unsigned int i = 0; i < fc; ++i)
+    for (unsigned int i = 0; i < fc; ++i)
         delete uniforms[i];
-    delete [] uniforms;
+    delete[] uniforms;
 }
 
 void gearoenix::render::buffer::FramedUniform::update(const void* data) noexcept

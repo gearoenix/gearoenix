@@ -3,8 +3,8 @@
 #include "../../core/asset/cr-asset.hpp"
 #include "../../math/math-ray.hpp"
 #include <array>
-#include <vector>
 #include <memory>
+#include <vector>
 
 namespace gearoenix {
 namespace core::event {
@@ -34,7 +34,7 @@ namespace render {
         class Camera : public core::asset::Asset {
         protected:
             bool enabled = true;
-            engine::Engine*const e;
+            engine::Engine* const e;
             std::shared_ptr<Uniform> uniform;
             std::shared_ptr<math::ProjectorFrustum> frustum;
             std::shared_ptr<Transformation> transformation;

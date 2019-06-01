@@ -3,7 +3,7 @@
 #include "rnd-msh-mesh.hpp"
 #include "rnd-msh-type.hpp"
 
-gearoenix::render::mesh::Manager::Manager(system::stream::Stream*const s, engine::Engine*const e) noexcept
+gearoenix::render::mesh::Manager::Manager(system::stream::Stream* const s, engine::Engine* const e) noexcept
     : e(e)
     , cache(s)
 {

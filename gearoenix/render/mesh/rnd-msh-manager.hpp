@@ -6,8 +6,8 @@
 
 namespace gearoenix {
 namespace system::stream {
-        class Stream;
-    }
+    class Stream;
+}
 namespace render {
     namespace engine {
         class Engine;
@@ -16,7 +16,7 @@ namespace render {
         class Mesh;
         class Manager {
         private:
-            engine::Engine*const e;
+            engine::Engine* const e;
             core::cache::File<Mesh> cache;
             std::weak_ptr<Mesh> icosphere;
 

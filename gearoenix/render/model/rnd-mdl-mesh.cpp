@@ -16,7 +16,7 @@
 #include "rnd-mdl-model.hpp"
 #include <iostream>
 
-gearoenix::render::model::Mesh::Mesh(system::stream::Stream*const f, engine::Engine*const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
+gearoenix::render::model::Mesh::Mesh(system::stream::Stream* const f, engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
 {
     core::sync::EndCaller<mesh::Mesh> call([c](std::shared_ptr<mesh::Mesh>) {});
     msh = e->get_system_application()->get_asset_manager()->get_mesh_manager()->get_gx3d(f->read<core::Id>(), call);

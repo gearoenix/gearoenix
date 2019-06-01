@@ -22,10 +22,10 @@
 
 gearoenix::render::model::Model::Model(
     const core::Id my_id,
-    system::stream::Stream*const f,
-    engine::Engine*const e,
+    system::stream::Stream* const f,
+    engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
-        : core::asset::Asset(my_id, core::asset::Type::MODEL)
+    : core::asset::Asset(my_id, core::asset::Type::MODEL)
     , e(e)
     , uniform_buffers(std::make_shared<buffer::FramedUniform>(static_cast<unsigned int>(sizeof(Uniform)), e))
     , transformation(new Transformation(&uniform, &occlusion_sphere))
@@ -51,9 +51,9 @@ gearoenix::render::model::Model::Model(
 
 gearoenix::render::model::Model::Model(
     const core::Id my_id,
-    engine::Engine*const e,
+    engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>&) noexcept
-        : core::asset::Asset(my_id, core::asset::Type::MODEL)
+    : core::asset::Asset(my_id, core::asset::Type::MODEL)
     , e(e)
     , uniform_buffers(std::make_shared<buffer::FramedUniform>(static_cast<unsigned int>(sizeof(Uniform)), e))
     , transformation(new Transformation(&uniform, &occlusion_sphere))

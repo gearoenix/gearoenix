@@ -18,7 +18,7 @@ namespace render {
     namespace light {
         class Light : public core::asset::Asset {
         protected:
-            engine::Engine*const e;
+            engine::Engine* const e;
             bool enabled = true;
             bool has_shadow = false;
             math::Vec3 color = math::Vec3(1.0f, 1.0f, 1.0f);

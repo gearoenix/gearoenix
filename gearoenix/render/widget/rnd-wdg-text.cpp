@@ -115,8 +115,8 @@ void gearoenix::render::widget::Text::create_text_mesh(core::sync::EndCaller<cor
 
 gearoenix::render::widget::Text::Text(
     const core::Id my_id,
-    system::stream::Stream*const f,
-    engine::Engine*const e,
+    system::stream::Stream* const f,
+    engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : Widget(my_id, f, e, c)
     , text(f->read_string())

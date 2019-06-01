@@ -4,7 +4,7 @@
 #include "rnd-cmr-orthographic.hpp"
 #include "rnd-cmr-perspective.hpp"
 
-gearoenix::render::camera::Manager::Manager(system::stream::Stream*const s, engine::Engine*const e) noexcept
+gearoenix::render::camera::Manager::Manager(system::stream::Stream* const s, engine::Engine* const e) noexcept
     : e(e)
     , cache(s)
 {
@@ -14,7 +14,7 @@ std::shared_ptr<gearoenix::render::camera::Camera> gearoenix::render::camera::Ma
 {
     std::shared_ptr<Camera> data = cache.get<Camera>(
         id, [ this, id, call ]() noexcept->std::shared_ptr<Camera> {
-            system::stream::Stream*const file = cache.get_file();
+            system::stream::Stream* const file = cache.get_file();
             const auto t = file->read<core::TypeId>();
             switch (t) {
             case 1:

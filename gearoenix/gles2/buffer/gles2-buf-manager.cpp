@@ -7,7 +7,7 @@
 #include "gles2-buf-vertex.hpp"
 #include <cstring>
 
-gearoenix::gles2::buffer::Manager::Manager(engine::Engine*const e) noexcept
+gearoenix::gles2::buffer::Manager::Manager(engine::Engine* const e) noexcept
     : render::buffer::Manager(e)
 {
 }

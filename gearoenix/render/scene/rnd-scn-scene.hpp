@@ -63,7 +63,7 @@ namespace render {
     namespace scene {
         class Scene : public core::asset::Asset {
         protected:
-			engine::Engine*const e;
+            engine::Engine* const e;
             const Type::Id scene_type_id;
             const std::shared_ptr<buffer::FramedUniform> uniform_buffers;
 

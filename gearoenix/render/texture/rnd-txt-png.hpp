@@ -4,15 +4,15 @@
 #include <vector>
 namespace gearoenix {
 namespace system::stream {
-        class Stream;
-    }
+    class Stream;
+}
 namespace render {
     class Engine;
     namespace texture {
         class PNG {
         public:
             static void decode(
-                    system::stream::Stream*const file,
+                system::stream::Stream* const file,
                 std::vector<unsigned char>& decoded_data,
                 unsigned int& width,
                 unsigned int& height);

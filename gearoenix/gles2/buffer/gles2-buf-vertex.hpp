@@ -8,24 +8,24 @@
 #include "../../render/buffer/rnd-buf-static.hpp"
 #include <vector>
 namespace gearoenix::gles2 {
-    namespace engine {
-        class Engine;
-    }
-    namespace buffer {
-        class Vertex : public render::buffer::Static {
-        public:
-        private:
-            gl::uint bo = 0;
+namespace engine {
+    class Engine;
+}
+namespace buffer {
+    class Vertex : public render::buffer::Static {
+    public:
+    private:
+        gl::uint bo = 0;
 
-        public:
-            Vertex(
-                std::vector<math::BasicVertex> vertices,
-                engine::Engine* e,
-                const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
-            ~Vertex() noexcept final;
-            void bind() const noexcept ;
-        };
-    }
+    public:
+        Vertex(
+            std::vector<math::BasicVertex> vertices,
+            engine::Engine* e,
+            const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+        ~Vertex() noexcept final;
+        void bind() const noexcept;
+    };
+}
 }
 #endif
 #endif

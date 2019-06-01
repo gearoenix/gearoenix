@@ -27,7 +27,7 @@ namespace render {
         class Transformation;
         class Model : public core::asset::Asset {
         protected:
-            engine::Engine*const e;
+            engine::Engine* const e;
             const std::shared_ptr<buffer::FramedUniform> uniform_buffers;
             const std::shared_ptr<Transformation> transformation;
 
@@ -45,30 +45,30 @@ namespace render {
 
         public:
             Model(
-                    core::Id my_id,
-                    system::stream::Stream* f,
-                    engine::Engine* e,
-                const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept ;
+                core::Id my_id,
+                system::stream::Stream* f,
+                engine::Engine* e,
+                const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
             /// It will create an automatic Id for itself
             Model(
                 core::Id my_id,
                 engine::Engine* e,
-                const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept ;
-            virtual void update_uniform() noexcept ;
-            void add_mesh(const std::shared_ptr<Mesh>& m) noexcept ;
-            void add_child(const std::shared_ptr<Model>& c) noexcept ;
+                const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+            virtual void update_uniform() noexcept;
+            void add_mesh(const std::shared_ptr<Mesh>& m) noexcept;
+            void add_child(const std::shared_ptr<Model>& c) noexcept;
             bool is_enabled() const noexcept;
             void enable() noexcept;
             void disable() noexcept;
 
-            const std::map<core::Id, std::shared_ptr<Model>>& get_children() const noexcept ;
-            const std::map<core::Id, std::shared_ptr<Mesh>>& get_meshes() const noexcept ;
-            const std::shared_ptr<physics::collider::Collider>& get_collider() const noexcept ;
-            const std::shared_ptr<buffer::FramedUniform>& get_uniform_buffers() const noexcept ;
+            const std::map<core::Id, std::shared_ptr<Model>>& get_children() const noexcept;
+            const std::map<core::Id, std::shared_ptr<Mesh>>& get_meshes() const noexcept;
+            const std::shared_ptr<physics::collider::Collider>& get_collider() const noexcept;
+            const std::shared_ptr<buffer::FramedUniform>& get_uniform_buffers() const noexcept;
             const std::shared_ptr<Transformation>& get_transformation() const noexcept;
             const math::Sphere& get_occlusion_sphere() const noexcept;
 
-            const math::Mat4x4& get_model_matrix() const noexcept ;
+            const math::Mat4x4& get_model_matrix() const noexcept;
         };
     }
 }

@@ -24,9 +24,9 @@ namespace physics::collider {
     public:
         Collider() = delete;
         virtual ~Collider() noexcept = default;
-        static Collider* read(system::stream::Stream* f)  noexcept;
+        static Collider* read(system::stream::Stream* f) noexcept;
         virtual void update(const math::Mat4x4& m) noexcept = 0;
-        virtual bool hit(const math::Ray3& r, core::Real& distance_from_origin) const  noexcept = 0;
+        virtual bool hit(const math::Ray3& r, core::Real& distance_from_origin) const noexcept = 0;
     };
 }
 }

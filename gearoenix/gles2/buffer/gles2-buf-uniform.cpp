@@ -16,7 +16,7 @@ gearoenix::gles2::buffer::Uniform::~Uniform() noexcept
     data = nullptr;
 }
 
-void gearoenix::gles2::buffer::Uniform::update(const void*const src) noexcept
+void gearoenix::gles2::buffer::Uniform::update(const void* const src) noexcept
 {
     std::memcpy(data, src, size);
 }
