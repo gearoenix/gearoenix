@@ -18,6 +18,7 @@
 struct MathCascadeInfo {
     const gearoenix::math::Mat4x4* zero_located_view = nullptr;
     const gearoenix::core::OneLoopPool<gearoenix::math::Aabb3>* limit_boxes = nullptr;
+    const std::vector<gearoenix::math::Mat4x4>* vps = nullptr;
     gearoenix::core::OneLoopPool<gearoenix::math::Aabb3> seen_boxes;
 };
 
@@ -79,6 +80,7 @@ struct FrameCascadeInfo {
     std::vector<KernelCascadeInfo*> kernels;
     gearoenix::render::engine::Engine* const e;
     /// For each cascades
+    std::vector<gearoenix::math::Mat4x4> vps;
     gearoenix::core::OneLoopPool<gearoenix::math::Aabb3> limit_boxes;
     gearoenix::core::OneLoopPool<gearoenix::render::command::Buffer> shadow_mapper_primary_commands;
     gearoenix::render::sync::Semaphore* shadow_mappers_semaphore = nullptr;
@@ -98,8 +100,10 @@ struct FrameCascadeInfo {
         for (std::size_t i = 0; i < kernels.size(); ++i) {
             auto k = new KernelCascadeInfo(e, i);
             kernels[i] = k;
-            k->math_info.limit_boxes = &limit_boxes;
-            k->math_info.zero_located_view = &zero_located_view;
+            auto& math_info = k->math_info;
+            math_info.limit_boxes = &limit_boxes;
+            math_info.zero_located_view = &zero_located_view;
+            math_info.vps = &vps;
         }
     }
 
@@ -182,6 +186,39 @@ struct FrameCascadeInfo {
     {
         kernels[kernel_index]->shadow(m);
     }
+
+    void shrink() noexcept
+    {
+        const auto cc = limit_boxes.size();
+        auto mxs = new gearoenix::math::Aabb3[cc];
+        auto ins = new gearoenix::math::Aabb3[cc];
+        for (auto k : kernels) {
+            auto& seen = k->math_info.seen_boxes;
+            for (std::size_t i = 0; i < cc; ++i) {
+                mxs[i].put(seen[i]);
+            }
+        }
+        for (std::size_t i = 0; i < cc; ++i) {
+            mxs[i].test(limit_boxes[i], ins[i]);
+        }
+        vps.clear();
+        for (std::size_t i = 0; i < cc; ++i) {
+            const auto& mx = ins[i].mx;
+            const auto& mn = ins[i].mn;
+            const auto c = (mx + mn) * 0.5f;
+            const auto d = mx - mn;
+            const auto w = d[0] * 0.51f;
+            const auto h = d[1] * 0.51f;
+            const auto depth = d[2];
+            const auto n = depth * 0.01;
+            const auto f = depth * 1.03;
+            const auto p = gearoenix::math::Mat4x4::orthographic(w, h, n, f);
+            const auto t = gearoenix::math::Mat4x4::translator(-gearoenix::math::Vec3(c.xy(), mx[2] + (n * 2.0f)));
+            vps.push_back(p * t * zero_located_view);
+        }
+        delete[] ins;
+        delete[] mxs;
+    }
 };
 
 gearoenix::render::light::CascadeInfo::CascadeInfo(engine::Engine* const e) noexcept
@@ -214,4 +251,9 @@ void gearoenix::render::light::CascadeInfo::start() noexcept
 void gearoenix::render::light::CascadeInfo::shadow(const model::Model* m, const std::size_t kernel_index) noexcept
 {
     current_frame->shadow(m, kernel_index);
+}
+
+void gearoenix::render::light::CascadeInfo::shrink() noexcept
+{
+    current_frame->shrink();
 }

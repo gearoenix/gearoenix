@@ -150,16 +150,16 @@ void gearoenix::physics::Engine::update_002_kernel(const unsigned int kernel_ind
 
 void gearoenix::physics::Engine::update_002_receiver() noexcept
 {
-    //    cascaded_shadow_caster_data.clear();
-    //    for (SceneCameraLightCascadeInfo& k : kernels_cascaded_shadow_caster_data) {
-    //        for (std::pair<const std::shared_ptr<render::scene::Scene>, CameraLightCascadeInfo>& s : k) {
-    //            CameraLightCascadeInfo& scene_info = cascaded_shadow_caster_data[s.first];
-    //            for (std::pair<render::camera::Camera* const, LightCascadeInfo>& c : s.second) {
-    //                scene_info[c.first].merge(c.second);
-    //            }
-    //        }
-    //        k.clear();
-    //    }
+    for (auto& scene_camera_data : scenes_camera_data) {
+        auto& cameras_data = scene_camera_data.second;
+        for (auto& camera : cameras_data) {
+            auto& lights = camera.second.second;
+            for (auto& lc : lights) {
+                auto* cas = lc.second;
+                cas->shrink();
+            }
+        }
+    }
 }
 
 gearoenix::physics::Engine::Engine(system::Application* const sysapp, core::sync::KernelWorker* const kernels) noexcept

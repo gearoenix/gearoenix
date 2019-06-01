@@ -49,6 +49,16 @@ void gearoenix::math::Aabb3::put(const Sphere& o) noexcept
     put(o.position - o.radius);
 }
 
+void gearoenix::math::Aabb3::put(const gearoenix::math::Aabb3& o) noexcept
+{
+    mx[0] = GX_MAX(o.mx[0], mx[0]);
+    mx[1] = GX_MAX(o.mx[1], mx[1]);
+    mx[2] = GX_MAX(o.mx[2], mx[2]);
+    mn[0] = GX_MIN(o.mn[0], mn[0]);
+    mn[1] = GX_MIN(o.mn[1], mn[1]);
+    mn[2] = GX_MIN(o.mn[2], mn[2]);
+}
+
 bool gearoenix::math::Aabb3::test(const Ray3& ray, core::Real& t_min_result) const noexcept
 {
     const math::Vec3& ro = ray.get_origin();

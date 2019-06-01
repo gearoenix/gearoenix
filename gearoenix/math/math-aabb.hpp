@@ -14,6 +14,7 @@ struct Aabb3 {
     void reset(const Vec3& p) noexcept;
     void put(const Vec3& p) noexcept;
     void put(const Sphere& o) noexcept;
+    void put(const Aabb3& o) noexcept;
     bool test(const Ray3& r, core::Real& t_min_result) const noexcept;
     bool test(const Aabb3& o, Aabb3& intersection) const noexcept;
     bool test(const Aabb3& o) const noexcept;
