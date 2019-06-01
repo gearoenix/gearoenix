@@ -122,32 +122,30 @@ void gearoenix::physics::Engine::update_001_receiver() noexcept
             }
         }
     }
-    //    cascaded_shadows_partitions.clear();
-    //    for (auto& k : kernels_cascaded_shadows_partitions) {
-    //        for (auto& s : k) {
-    //            cascaded_shadows_partitions[s.first].merge(s.second);
-    //        }
-    //        k.clear();
-    //    }
 }
 
 void gearoenix::physics::Engine::update_002_kernel(const unsigned int kernel_index) noexcept
 {
-    //    unsigned int task_number = 0;
-    //    const unsigned int kernels_count = kernels->get_threads_count();
-    //    SceneCameraLightCascadeInfo& kernel_camera_light_info = kernels_cascaded_shadow_caster_data[kernel_index];
-    //    for (const std::pair<const std::shared_ptr<render::scene::Scene>, CameraPartitions>& scene_partitions : cascaded_shadows_partitions) {
-    //        const std::shared_ptr<render::scene::Scene>& scene = scene_partitions.first;
-    //        if (!scene->is_enabled())
-    //            continue;
-    //        const CameraPartitions& cameras = scene_partitions.second;
-    //        CameraLightCascadeInfo& scene_camera_light_info = kernel_camera_light_info[scene];
-    //        for (const std::pair<render::camera::Camera* const, Partitions>& camera : cameras) {
-    //            const std::map<core::Id, std::shared_ptr<render::light::Light>>& lights = scene->get_lights();
-    //            LightCascadeInfo& camera_light_info = scene_camera_light_info[camera.first];
-    //        }
-    //    }
-    //#undef GX_DO_TASK
+    unsigned int task_number = 0;
+    const unsigned int kernels_count = kernels->get_threads_count();
+    for (auto& scene_camera_data : scenes_camera_data) {
+        ScenePtr scene = scene_camera_data.first;
+        auto& cameras_data = scene_camera_data.second;
+        auto& models = scene->get_models();
+        for (auto& camera : cameras_data) {
+            auto& lights = camera.second.second;
+            for (auto& lc : lights) {
+                auto* cas = lc.second;
+                for (auto& im : models) {
+                    auto& m = im.second;
+                    if (!m->is_enabled())
+                        continue;
+                    GX_DO_TASK(cas->shadow(m.get(), task_number));
+                }
+            }
+        }
+    }
+#undef GX_DO_TASK
 }
 
 void gearoenix::physics::Engine::update_002_receiver() noexcept

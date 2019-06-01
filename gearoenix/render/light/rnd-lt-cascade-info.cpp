@@ -161,7 +161,7 @@ struct FrameCascadeInfo {
             limit_boxes[sss].put(m * v);
         }
         for (auto& l : limit_boxes) {
-            auto v = l.mx;
+            gearoenix::math::Vec3 v = l.mx;
             v[2] = -std::numeric_limits<gearoenix::core::Real>::max();
             l.put(v);
         }
