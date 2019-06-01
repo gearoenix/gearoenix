@@ -28,7 +28,7 @@ void gearoenix::render::graph::tree::Pbr::record(const unsigned int kernel_index
 {
     const unsigned int kernels_count = e->get_kernels()->get_threads_count();
     unsigned int task_number = 0;
-    const physics::Engine::GatheredVisibileModels& visible_models = e->get_physics_engine()->get_visible_models();
+    const physics::Engine::GatheredSceneCameraData& visible_models = e->get_physics_engine()->get_visible_models();
     unsigned int scene_number = 0;
 #define GX_DO_TASK(expr)               \
     if (task_number == kernel_index) { \
@@ -40,7 +40,7 @@ void gearoenix::render::graph::tree::Pbr::record(const unsigned int kernel_index
         const std::map<core::Id, std::shared_ptr<light::Light>> lights = scn->get_lights();
         for (const auto& camera_models : scene_camera.second) {
             const camera::Camera* const cam = camera_models.first;
-            const auto& models = camera_models.second;
+            const auto& models = camera_models.second.first;
             for (const std::pair<const core::Id, std::shared_ptr<light::Light>>& id_light : lights) {
                 if (!id_light.second->is_shadower())
                     continue;

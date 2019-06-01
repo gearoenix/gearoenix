@@ -52,15 +52,20 @@ namespace physics {
         using ScenePairedPool = PairedPool<ScenePtr, T>;
         template <class T>
         using CameraPairedPool = PairedPool<CameraPtr, T>;
+        template <class... Types>
+        using CameraTupledPool = TupledPool<CameraPtr, Types...>;
         template <class T>
         using DirLightPairedPool = PairedPool<DirLightPtr, T>;
         template <class T>
         using SceneCameraPairedPool = ScenePairedPool<CameraPairedPool<T>>;
+        template <class... Types>
+        using SceneCameraTupledPool = ScenePairedPool<CameraTupledPool<Types...>>;
         template <class T>
         using SceneCameraDirLightPairedPool = SceneCameraPairedPool<DirLightPairedPool<T>>;
         using ModelPtrs = std::vector<ModelPtr>;
-        using VisibileModels = SceneCameraPairedPool<ModelPtrs>;
-        using GatheredVisibileModels = std::map<ScenePtr, std::map<CameraPtr, ModelPtrs>>;
+        using DirLightCascadeInfos = std::vector<std::pair<DirLightPtr, CascadeInfoPtr>>;
+        using SceneCameraData = SceneCameraTupledPool<ModelPtrs, DirLightPairedPool<CascadeInfoPtr>>;
+        using GatheredSceneCameraData = std::map<ScenePtr, std::map<CameraPtr, std::pair<ModelPtrs, DirLightCascadeInfos>>>;
         using GatheredCascadeInfos = std::map<ScenePtr, std::map<CameraPtr, std::map<DirLightPtr, CascadeInfoPtr>>>;
         using Partition = std::array<math::Vec3, 4>;
         using Partitions = std::vector<Partition>;
@@ -73,11 +78,8 @@ namespace physics {
         /// if animation return true on its apply its gonna be deleted
         std::map<core::Id, std::shared_ptr<animation::Animation>> animations;
         /// visibility checker
-        std::vector<VisibileModels> kernels_visible_models;
-        GatheredVisibileModels visible_models;
-        /// Cascaded shadowing light data
-        std::vector<SceneCameraDirLightCascadeInfo> kernels_cascaded_shadow_caster_data;
-        GatheredCascadeInfos cascaded_shadow_caster_data;
+        std::vector<SceneCameraData> kernels_scene_camera_data;
+        GatheredSceneCameraData scenes_camera_data;
 
         std::mutex added_animations_locker;
         std::vector<std::shared_ptr<animation::Animation>> added_animations;
@@ -105,8 +107,8 @@ namespace physics {
         void remove_animation(const std::shared_ptr<animation::Animation>& a) noexcept;
         void remove_animation(core::Id a) noexcept;
         void update() noexcept;
-        const GatheredVisibileModels& get_visible_models() const noexcept;
-        GatheredVisibileModels& get_visible_models() noexcept;
+        const GatheredSceneCameraData& get_visible_models() const noexcept;
+        GatheredSceneCameraData& get_visible_models() noexcept;
     };
 }
 }
