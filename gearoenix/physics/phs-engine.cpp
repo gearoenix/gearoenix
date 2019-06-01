@@ -83,7 +83,7 @@ void gearoenix::physics::Engine::update_001_kernel(const unsigned int kernel_ind
                         const auto dot = std::abs(dir.dot(math::Vec3(0.0f, 1.0f, 0.0f))) - 1.0f;
                         const math::Vec3 up = GX_IS_ZERO(dot) ? math::Vec3::Z : math::Vec3::Y;
                         const auto view = math::Mat4x4::look_at(math::Vec3(), dir, up);
-                        cascade_data->update(view, cascade_partitions););
+                        cascade_data->update(view, cascade_partitions));
                 }
                 for (const std::pair<const core::Id, std::shared_ptr<render::model::Model>>& id_model : models) {
                     const std::shared_ptr<render::model::Model>& model = id_model.second;

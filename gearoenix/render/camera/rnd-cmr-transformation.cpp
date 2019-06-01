@@ -30,6 +30,7 @@ void gearoenix::render::camera::Transformation::update_view_projection() noexcep
                                            0.5f, 0.5f, 0.0f, 1.0f)
         * uniform->view_projection;
     frustum->set_view_projection(uniform->view_projection);
+    on_frustum_update();
 }
 
 void gearoenix::render::camera::Transformation::set_on_frustum_update(std::function<void()> f) noexcept
