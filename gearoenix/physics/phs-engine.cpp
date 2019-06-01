@@ -33,70 +33,70 @@ void gearoenix::physics::Engine::update_001_kernel(const unsigned int kernel_ind
     kernel_scene_camera_data.refresh();
     for (const std::pair<const core::Id, std::weak_ptr<render::scene::Scene>>& is : scenes) {
         const std::shared_ptr<render::scene::Scene> scene = is.second.lock();
-        if (scene == nullptr) continue;
+        if (scene == nullptr)
+            continue;
         if (!scene->is_enabled())
             continue;
         auto scene_camera_data = kernel_scene_camera_data.get_next([] { return new SceneCameraData::iterator::value_type; });
         scene_camera_data->first = scene.get();
-        auto &cameras_data = scene_camera_data->second;
+        auto& cameras_data = scene_camera_data->second;
         cameras_data.refresh();
         GX_DO_TASK(scene->update_uniform());
-        const std::map<core::Id, std::shared_ptr<render::camera::Camera>> &cameras = scene->get_cameras();
-        const std::map<core::Id, std::shared_ptr<render::model::Model>> &models = scene->get_models();
-        const std::map<core::Id, std::shared_ptr<render::light::Light>> &lights = scene->get_lights();
-        for (const std::pair<const core::Id, std::shared_ptr<render::camera::Camera>> &id_camera : cameras) {
-            const std::shared_ptr<render::camera::Camera> &camera = id_camera.second;
+        const std::map<core::Id, std::shared_ptr<render::camera::Camera>>& cameras = scene->get_cameras();
+        const std::map<core::Id, std::shared_ptr<render::model::Model>>& models = scene->get_models();
+        const std::map<core::Id, std::shared_ptr<render::light::Light>>& lights = scene->get_lights();
+        for (const std::pair<const core::Id, std::shared_ptr<render::camera::Camera>>& id_camera : cameras) {
+            const std::shared_ptr<render::camera::Camera>& camera = id_camera.second;
             if (!camera->is_enabled())
                 continue;
             auto camera_visible_models = cameras_data.get_next(
-                    [] { return new decltype(scene_camera_data->second)::iterator::value_type; });
+                [] { return new decltype(scene_camera_data->second)::iterator::value_type; });
             std::get<0>(*camera_visible_models) = camera.get();
-            auto &current_visible_models = std::get<1>(*camera_visible_models);
+            auto& current_visible_models = std::get<1>(*camera_visible_models);
             current_visible_models.clear();
-            auto &lights_cascade_info = std::get<2>(*camera_visible_models);
+            auto& lights_cascade_info = std::get<2>(*camera_visible_models);
             lights_cascade_info.refresh();
             GX_DO_TASK(camera->update_uniform());
-            const auto &cascade_partitions = camera->get_cascaded_shadow_frustum_partitions();
-            for (const std::pair<const core::Id, std::shared_ptr<render::light::Light>> &light : lights) {
+            const auto& cascade_partitions = camera->get_cascaded_shadow_frustum_partitions();
+            for (const std::pair<const core::Id, std::shared_ptr<render::light::Light>>& light : lights) {
                 if (!light.second->is_enabled())
                     continue;
                 if (!light.second->is_shadower())
                     continue;
-                auto dir_light = dynamic_cast<DirLightPtr >(light.second.get());
+                auto dir_light = dynamic_cast<DirLightPtr>(light.second.get());
                 if (dir_light == nullptr)
                     continue;
                 GX_DO_TASK(
-                        auto light_cascaded_shadow_caster_data = lights_cascade_info.get_next([this] {
-                            auto p = new DirLightPairedPool<CascadeInfoPtr>::iterator::value_type;
-                            p->second = new render::light::CascadeInfo(sys_app->get_render_engine().get());
-                            return p;
-                        });
-                        light_cascaded_shadow_caster_data->first = dir_light;
-                        auto *cascade_data = light_cascaded_shadow_caster_data->second;
-                        const auto &dir = dir_light->get_direction();
-                        const auto dot = std::abs(dir.dot(math::Vec3(0.0f, 1.0f, 0.0f))) - 1.0f;
-                        const math::Vec3 up = GX_IS_ZERO(dot) ? math::Vec3::Z : math::Vec3::Y;
-                        const auto view = math::Mat4x4::look_at(math::Vec3(), dir, up);
-                        cascade_data->update(view, cascade_partitions));
+                    auto light_cascaded_shadow_caster_data = lights_cascade_info.get_next([this] {
+                        auto p = new DirLightPairedPool<CascadeInfoPtr>::iterator::value_type;
+                        p->second = new render::light::CascadeInfo(sys_app->get_render_engine().get());
+                        return p;
+                    });
+                    light_cascaded_shadow_caster_data->first = dir_light;
+                    auto* cascade_data = light_cascaded_shadow_caster_data->second;
+                    const auto& dir = dir_light->get_direction();
+                    const auto dot = std::abs(dir.dot(math::Vec3(0.0f, 1.0f, 0.0f))) - 1.0f;
+                    const math::Vec3 up = GX_IS_ZERO(dot) ? math::Vec3::Z : math::Vec3::Y;
+                    const auto view = math::Mat4x4::look_at(math::Vec3(), dir, up);
+                    cascade_data->update(view, cascade_partitions));
             }
-            for (const std::pair<const core::Id, std::shared_ptr<render::model::Model>> &id_model : models) {
-                const std::shared_ptr<render::model::Model> &model = id_model.second;
+            for (const std::pair<const core::Id, std::shared_ptr<render::model::Model>>& id_model : models) {
+                const std::shared_ptr<render::model::Model>& model = id_model.second;
                 if (!model->is_enabled())
                     continue;
                 GX_DO_TASK(
-                        const math::Sphere &sphere = model->get_occlusion_sphere();
-                        if (camera->in_sight(sphere.position, sphere.radius)) {
-                            current_visible_models.push_back(model.get());
-                        });
+                    const math::Sphere& sphere = model->get_occlusion_sphere();
+                    if (camera->in_sight(sphere.position, sphere.radius)) {
+                        current_visible_models.push_back(model.get());
+                    });
             }
         }
-        for (const std::pair<const core::Id, std::shared_ptr<render::model::Model>> &id_model : models) {
-            const std::shared_ptr<render::model::Model> &model = id_model.second;
+        for (const std::pair<const core::Id, std::shared_ptr<render::model::Model>>& id_model : models) {
+            const std::shared_ptr<render::model::Model>& model = id_model.second;
             if (!model->is_enabled())
                 continue;
             GX_DO_TASK(model->update_uniform());
         }
-
     }
 }
 
@@ -113,13 +113,12 @@ void gearoenix::physics::Engine::update_001_receiver() noexcept
                 auto& cascades = camera_data.second;
                 auto& ms = std::get<1>(c);
                 auto& ls = std::get<2>(c);
-                for (auto& m: ms)
+                for (auto& m : ms)
                     models.push_back(m);
-                for (auto& l: ls) {
+                for (auto& l : ls) {
                     l.second->start();
                     cascades.push_back(l);
                 }
-
             }
         }
     }
