@@ -9,13 +9,14 @@
 #include "../../system/sys-app.hpp"
 #include "../../system/sys-log.hpp"
 #include "../engine/gles2-eng-engine.hpp"
+#include "../gles2.hpp"
 #include "gles2-txt-sample.hpp"
 
 #ifdef GX_DEBUG_GLES2
 #define GX_DEBUG_GLES2_TARGET
 #endif
 
-gearoenix::gles2::texture::Target::Target(const std::shared_ptr<engine::Engine>& e)
+gearoenix::gles2::texture::Target::Target(engine::Engine* const e) noexcept
     : render::texture::Target(core::asset::Manager::create_id(), e)
 {
     img_width = e->get_system_application()->get_width();
@@ -32,19 +33,19 @@ gearoenix::gles2::texture::Target::Target(const std::shared_ptr<engine::Engine>&
     gl::Loader::enable(GL_STENCIL_TEST);
     gl::Loader::viewport(0, 0, static_cast<gl::sizei>(img_width), static_cast<gl::sizei>(img_height));
     gl::Loader::scissor(0, 0, static_cast<gl::sizei>(img_width), static_cast<gl::sizei>(img_height));
-#ifdef GX_DEBUG_GLES2
+#ifdef GX_DEBUG_GLES2_TARGET
     gl::Loader::check_for_error();
 #endif
 }
 
-gearoenix::gles2::texture::Target::~Target()
+gearoenix::gles2::texture::Target::~Target() noexcept
 {
     if (texture_object == 0) // This is main render-target
         return;
-    GXUNIMPLEMENTED;
+    GXUNIMPLEMENTED
 }
 
-void gearoenix::gles2::texture::Target::bind() const
+void gearoenix::gles2::texture::Target::bind() const noexcept
 {
     gl::Loader::bind_renderbuffer(GL_RENDERBUFFER, depth_buffer);
     gl::Loader::bind_framebuffer(GL_FRAMEBUFFER, framebuffer);

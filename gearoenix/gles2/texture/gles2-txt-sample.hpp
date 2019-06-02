@@ -6,21 +6,17 @@
 #include "../../gl/gl-types.hpp"
 #include "../../render/texture/rnd-txt-sample.hpp"
 
-namespace gearoenix {
-namespace gles2 {
-    namespace texture {
-        struct SampleInfo {
-            float min_filter = GL_LINEAR_MIPMAP_LINEAR;
-            float mag_filter = GL_LINEAR;
-            gl::sint wrap_s = GL_REPEAT;
-            gl::sint wrap_t = GL_REPEAT;
-            gl::sint wrap_r = GL_REPEAT;
+namespace gearoenix::gles2::texture {
+struct SampleInfo {
+    float min_filter = GL_LINEAR_MIPMAP_LINEAR;
+    float mag_filter = GL_LINEAR;
+    gl::sint wrap_s = GL_REPEAT;
+    gl::sint wrap_t = GL_REPEAT;
+    gl::sint wrap_r = GL_REPEAT;
 
-            SampleInfo();
-            SampleInfo(const render::texture::SampleInfo& o);
-        };
-    }
-}
+    SampleInfo() noexcept = default;
+    explicit SampleInfo(const render::texture::SampleInfo& o) noexcept;
+};
 }
 #endif
 #endif

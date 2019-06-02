@@ -2,83 +2,73 @@
 #define GEAROENIX_GLES2_ENGINE_HPP
 #include "../../core/cr-build-configuration.hpp"
 #ifdef GX_USE_OPENGL_ES2
-
-#ifdef GX_PROFILING_MODE
+#include "../../render/engine/rnd-eng-engine.hpp"
+#include "../gles2.hpp"
+#ifdef GX_GLES2_PROFILING
 #define GX_GLES2_ENGINE_PROFILING
 #endif
-
-#include "../../render/engine/rnd-eng-engine.hpp"
-//#include "gles2.hpp"
-
 #ifdef GX_GLES2_ENGINE_PROFILING
 #include <chrono>
 #endif
 
-namespace gearoenix {
-namespace gles2 {
-    namespace texture {
-        class Texture2D;
-    }
-    namespace engine {
-        class Engine : public render::engine::Engine {
-        private:
-            // GLuint shadow_map_color = 0;
-            // GLuint shadow_map_depth = 0;
-            // GLuint shadow_map_framebuffer = 0;
-            // GLuint shadow_map_aspect = 1024;
-            // texture::Texture2D* shadow_map_texture = nullptr;
-            // GLuint render_depth = 0;
-            // GLuint render_framebuffer = 0;
-            // GLfloat win_width;
-            // GLfloat win_height;
-            void initialize() noexcept;
+namespace gearoenix::gles2::engine {
+class Engine : public render::engine::Engine {
+private:
+    // GLuint shadow_map_color = 0;
+    // GLuint shadow_map_depth = 0;
+    // GLuint shadow_map_framebuffer = 0;
+    // GLuint shadow_map_aspect = 1024;
+    // texture::Texture2D* shadow_map_texture = nullptr;
+    // GLuint render_depth = 0;
+    // GLuint render_framebuffer = 0;
+    // GLfloat win_width;
+    // GLfloat win_height;
+    void initialize() noexcept;
 #ifdef GX_GLES2_ENGINE_PROFILING
-            /// todo: create a class for profilling
-            unsigned int prof_frames_count = 0;
-            std::chrono::high_resolution_clock::time_point prof_last_time_draw;
-            double prof_frames_time = 0.0;
+    /// todo: create a class for profilling
+    unsigned int prof_frames_count = 0;
+    std::chrono::high_resolution_clock::time_point prof_last_time_draw;
+    double prof_frames_time = 0.0;
 #endif
-            Engine(system::Application* sys_app) noexcept;
+    explicit Engine(system::Application* sys_app) noexcept;
 
-        public:
-            static std::shared_ptr<Engine> construct(system::Application* sys_app) noexcept;
-            ~Engine() noexcept final;
-            void update() noexcept final;
-            void terminate() noexcept final;
-            render::sync::Semaphore* create_semaphore() const noexcept final;
-            render::texture::Texture2D* create_texture_2d(
-                const core::Id id,
-                const void* data,
-                const render::texture::TextureFormat::Id f,
-                const render::texture::SampleInfo s,
-                const unsigned int width,
-                const unsigned int heigt,
-                const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept final;
-            render::texture::Cube* create_texture_cube(
-                const core::Id id,
-                const void* data,
-                const render::texture::TextureFormat::Id f,
-                const render::texture::SampleInfo s,
-                const unsigned int aspect,
-                const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept final;
-            void submit(
-                const std::size_t pres_count,
-                const render::sync::Semaphore* const* const pres,
-                const std::size_t cmds_count,
-                const render::command::Buffer* const* const cmds,
-                const std::size_t nxts_count,
-                const render::sync::Semaphore* const* const nxts) noexcept final;
-            // render::texture::Texture2D* create_texture_2d(core::Id id, system::stream::Stream* file, core::sync::EndCaller<core::sync::EndCallerIgnore> c);
-            // render::texture::Cube* create_texture_cube(core::Id id, system::stream::Stream* file, core::sync::EndCaller<core::sync::EndCallerIgnore> c);
-            // render::buffer::Mesh* create_mesh(unsigned int vec, system::stream::Stream* file, core::sync::EndCaller<core::sync::EndCallerIgnore> c);
-            // render::buffer::Uniform* create_uniform(unsigned int s, core::sync::EndCaller<core::sync::EndCallerIgnore> c);
-            // render::shader::Shader* create_shader(core::Id sid, system::stream::Stream* file, core::sync::EndCaller<core::sync::EndCallerIgnore> c);
-            // render::shader::Resources* create_shader_resources(core::Id sid, render::pipeline::Pipeline* p, render::buffer::Uniform* ub, core::sync::EndCaller<core::sync::EndCallerIgnore> c);
-            // render::pipeline::Pipeline* create_pipeline(core::Id sid, core::sync::EndCaller<core::sync::EndCallerIgnore> c);
-            // void on_event(core::event::Event& e);
-        };
-    }
-}
+public:
+    static std::shared_ptr<Engine> construct(system::Application* sys_app) noexcept;
+    ~Engine() noexcept final;
+    void update() noexcept final;
+    void terminate() noexcept final;
+    render::sync::Semaphore* create_semaphore() const noexcept final;
+    render::texture::Texture2D* create_texture_2d(
+        core::Id id,
+        const void* data,
+        render::texture::TextureFormat::Id f,
+        render::texture::SampleInfo s,
+        unsigned int width,
+        unsigned int heigt,
+        const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept final;
+    render::texture::Cube* create_texture_cube(
+        core::Id id,
+        const void* data,
+        render::texture::TextureFormat::Id f,
+        render::texture::SampleInfo s,
+        unsigned int aspect,
+        const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept final;
+    void submit(
+        std::size_t pres_count,
+        const render::sync::Semaphore* const* pres,
+        std::size_t cmds_count,
+        const render::command::Buffer* const* cmds,
+        std::size_t nxts_count,
+        const render::sync::Semaphore* const* nxts) noexcept final;
+    // render::texture::Texture2D* create_texture_2d(core::Id id, system::stream::Stream* file, core::sync::EndCaller<core::sync::EndCallerIgnore> c);
+    // render::texture::Cube* create_texture_cube(core::Id id, system::stream::Stream* file, core::sync::EndCaller<core::sync::EndCallerIgnore> c);
+    // render::buffer::Mesh* create_mesh(unsigned int vec, system::stream::Stream* file, core::sync::EndCaller<core::sync::EndCallerIgnore> c);
+    // render::buffer::Uniform* create_uniform(unsigned int s, core::sync::EndCaller<core::sync::EndCallerIgnore> c);
+    // render::shader::Shader* create_shader(core::Id sid, system::stream::Stream* file, core::sync::EndCaller<core::sync::EndCallerIgnore> c);
+    // render::shader::Resources* create_shader_resources(core::Id sid, render::pipeline::Pipeline* p, render::buffer::Uniform* ub, core::sync::EndCaller<core::sync::EndCallerIgnore> c);
+    // render::pipeline::Pipeline* create_pipeline(core::Id sid, core::sync::EndCaller<core::sync::EndCallerIgnore> c);
+    // void on_event(core::event::Event& e);
+};
 }
 #endif
 #endif

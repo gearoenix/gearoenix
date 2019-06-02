@@ -73,7 +73,7 @@ std::shared_ptr<gearoenix::gles2::engine::Engine> gearoenix::gles2::engine::Engi
     e->pipeline_manager = new pipeline::Manager(e);
     e->buffer_manager = new buffer::Manager(e.get());
     e->command_manager = new command::Manager();
-    e->main_render_target = new texture::Target(e);
+    e->main_render_target = new texture::Target(e.get());
     return e;
 }
 
@@ -153,7 +153,7 @@ gearoenix::render::texture::Texture2D* gearoenix::gles2::engine::Engine::create_
     const unsigned int img_height,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
 {
-    return new texture::Texture2D(id, std::static_pointer_cast<Engine>(sysapp->get_render_engine()), data, f, s, img_width, img_height, call);
+    return new texture::Texture2D(id, this, data, f, s, img_width, img_height, call);
 }
 
 gearoenix::render::texture::Cube* gearoenix::gles2::engine::Engine::create_texture_cube(
@@ -164,7 +164,7 @@ gearoenix::render::texture::Cube* gearoenix::gles2::engine::Engine::create_textu
     const unsigned int aspect,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
 {
-    return new texture::Cube(id, std::static_pointer_cast<Engine>(sysapp->get_render_engine()), data, f, s, aspect, call);
+    return new texture::Cube(id, this, data, f, s, aspect, call);
 }
 
 void gearoenix::gles2::engine::Engine::submit(

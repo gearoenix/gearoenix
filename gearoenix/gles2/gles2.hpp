@@ -8,7 +8,9 @@
 #define GX_DEBUG_GLES2
 #endif
 
+#ifdef GX_PROFILING_MODE
 #define GX_GLES2_PROFILING
+#endif
 
 #endif
 #endif

@@ -3,8 +3,6 @@
 #include "../../core/cr-function-loader.hpp"
 #include "../../gl/gl-constants.hpp"
 #include "../../gl/gl-loader.hpp"
-#include "../../render/texture/rnd-txt-png.hpp"
-#include "../../system/stream/sys-stm-stream.hpp"
 #include "../../system/sys-log.hpp"
 #include "../engine/gles2-eng-engine.hpp"
 #include "gles2-txt-sample.hpp"
@@ -13,13 +11,13 @@ static constexpr auto GX_GLES2_MIN_TEX2D_ASPECT = 64;
 
 gearoenix::gles2::texture::Texture2D::Texture2D(
     const core::Id my_id,
-    const std::shared_ptr<engine::Engine>& e,
-    const void* data,
+    engine::Engine* const e,
+    const void* const data,
     const render::texture::TextureFormat::Id f,
     const render::texture::SampleInfo s,
     const unsigned int img_width,
     const unsigned int img_height,
-    const core::sync::EndCaller<core::sync::EndCallerIgnore>& call)
+    const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
     : render::texture::Texture2D(my_id, e)
 {
     const SampleInfo sample_info = SampleInfo(s);
@@ -28,13 +26,13 @@ gearoenix::gles2::texture::Texture2D::Texture2D(
     const gl::sizei gimg_height = GX_GLES2_MIN_TEX2D_ASPECT < img_height ? static_cast<gl::sizei>(img_height) : GX_GLES2_MIN_TEX2D_ASPECT;
 #ifdef GX_DEBUG_GLES2
     if ((img_width != 1 && img_width < GX_GLES2_MIN_TEX2D_ASPECT) || (img_height != 1 && img_height < GX_GLES2_MIN_TEX2D_ASPECT))
-        GXLOGF("Unsupported image aspect in GLES2 for texture id: " << my_id);
+        GXLOGF("Unsupported image aspect in GLES2 for texture id: " << my_id)
 #endif
     std::uint8_t* pixels = nullptr;
     if (f == render::texture::TextureFormat::RGBA_FLOAT32 && img_width == 1 && img_height == 1) {
         cf = GL_RGBA;
         const gl::sizei pixel_size = gimg_width * gimg_height * 4;
-        const core::Real* rdata = reinterpret_cast<const core::Real*>(data);
+        const auto rdata = reinterpret_cast<const core::Real*>(data);
         pixels = new std::uint8_t[pixel_size];
         pixels[0] = static_cast<std::uint8_t>(rdata[0] * 255.1f);
         pixels[1] = static_cast<std::uint8_t>(rdata[1] * 255.1f);
@@ -44,7 +42,7 @@ gearoenix::gles2::texture::Texture2D::Texture2D(
             for (int j = 0; j < 4; ++j, ++i)
                 pixels[i] = pixels[j];
     } else
-        GXLOGF("Unsupported/Unimplemented setting for texture with id " << my_id);
+        GXLOGF("Unsupported/Unimplemented setting for texture with id " << my_id)
     e->get_function_loader()->load([this, pixels, cf, gimg_width, gimg_height, sample_info, call] {
         gl::Loader::gen_textures(1, &texture_object);
         gl::Loader::bind_texture(GL_TEXTURE_2D, texture_object);
@@ -59,13 +57,13 @@ gearoenix::gles2::texture::Texture2D::Texture2D(
     });
 }
 
-gearoenix::gles2::texture::Texture2D::Texture2D(const core::Id my_id, const gl::uint txtobj, const std::shared_ptr<engine::Engine>& e)
+gearoenix::gles2::texture::Texture2D::Texture2D(const core::Id my_id, const gl::uint txtobj, engine::Engine* const e) noexcept
     : render::texture::Texture2D(my_id, e)
     , texture_object(txtobj)
 {
 }
 
-gearoenix::gles2::texture::Texture2D::~Texture2D()
+gearoenix::gles2::texture::Texture2D::~Texture2D() noexcept
 {
     if (texture_object == 0)
         return;
@@ -77,7 +75,7 @@ gearoenix::gles2::texture::Texture2D::~Texture2D()
     texture_object = 0;
 }
 
-void gearoenix::gles2::texture::Texture2D::bind(gl::enumerated texture_unit) const
+void gearoenix::gles2::texture::Texture2D::bind(gl::enumerated texture_unit) const noexcept
 {
     gl::Loader::active_texture(GL_TEXTURE0 + texture_unit);
     gl::Loader::bind_texture(GL_TEXTURE_2D, texture_object);

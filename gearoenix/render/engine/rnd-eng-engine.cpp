@@ -17,7 +17,7 @@
 
 gearoenix::render::engine::Engine::Engine(system::Application* const system_application, const Type::Id engine_type_id) noexcept
     : engine_type_id(engine_type_id)
-    , sysapp(system_application)
+    , sys_app(system_application)
     , fun_loader(new core::FunctionLoader())
     , kernels(new core::sync::KernelWorker())
 {
@@ -69,12 +69,12 @@ void gearoenix::render::engine::Engine::set_render_tree(graph::tree::Tree* const
 
 const gearoenix::system::Application* gearoenix::render::engine::Engine::get_system_application() const noexcept
 {
-    return sysapp;
+    return sys_app;
 }
 
 gearoenix::system::Application* gearoenix::render::engine::Engine::get_system_application() noexcept
 {
-    return sysapp;
+    return sys_app;
 }
 
 const gearoenix::physics::Engine* gearoenix::render::engine::Engine::get_physics_engine() const noexcept

@@ -24,12 +24,12 @@ static const gearoenix::gl::enumerated FACES[] = {
 
 gearoenix::gles2::texture::Cube::Cube(
     const core::Id my_id,
-    const std::shared_ptr<engine::Engine>& engine,
-    const void* data,
+    engine::Engine* const engine,
+    const void* const data,
     const render::texture::TextureFormat::Id f,
     const render::texture::SampleInfo s,
     const unsigned int aspect,
-    const core::sync::EndCaller<core::sync::EndCallerIgnore>& call)
+    const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
     : render::texture::Cube(my_id, engine)
 {
     const SampleInfo sample_info = SampleInfo(s);
@@ -43,7 +43,7 @@ gearoenix::gles2::texture::Cube::Cube(
     if (f == render::texture::TextureFormat::RGBA_FLOAT32 && aspect == 1) {
         cf = GL_RGBA;
         const gl::sizei pixel_size = gaspect * gaspect * 4;
-        const core::Real* rdata = reinterpret_cast<const core::Real*>(data);
+        const auto* const rdata = reinterpret_cast<const core::Real*>(data);
         pixels = new std::uint8_t*[GXCOUNTOF(FACES)];
         std::uint8_t p[4];
         p[0] = static_cast<std::uint8_t>(rdata[0] * 255.1f);
@@ -57,7 +57,7 @@ gearoenix::gles2::texture::Cube::Cube(
                     pixels[fi][i] = p[j];
         }
     } else
-        GXLOGF("Unsupported/Unimplemented setting for cube texture with id " << my_id);
+        GXLOGF("Unsupported/Unimplemented setting for cube texture with id " << my_id)
     engine->get_function_loader()->load([this, gaspect, pixels, cf, sample_info, call] {
         gl::Loader::gen_textures(1, &texture_object);
         gl::Loader::bind_texture(GL_TEXTURE_CUBE_MAP, texture_object);
@@ -79,7 +79,7 @@ gearoenix::gles2::texture::Cube::Cube(
     });
 }
 
-gearoenix::gles2::texture::Cube::~Cube()
+gearoenix::gles2::texture::Cube::~Cube() noexcept
 {
     if (texture_object == 0)
         return;
@@ -91,7 +91,7 @@ gearoenix::gles2::texture::Cube::~Cube()
     texture_object = 0;
 }
 
-void gearoenix::gles2::texture::Cube::bind(gl::enumerated texture_unit) const
+void gearoenix::gles2::texture::Cube::bind(gl::enumerated texture_unit) const noexcept
 {
     gl::Loader::active_texture(GL_TEXTURE0 + texture_unit);
     gl::Loader::bind_texture(GL_TEXTURE_CUBE_MAP, texture_object);

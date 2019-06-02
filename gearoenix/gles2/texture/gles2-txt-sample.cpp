@@ -1,11 +1,7 @@
 #include "gles2-txt-sample.hpp"
 #include "../../system/sys-log.hpp"
 
-gearoenix::gles2::texture::SampleInfo::SampleInfo()
-{
-}
-
-gearoenix::gles2::texture::SampleInfo::SampleInfo(const render::texture::SampleInfo& o)
+gearoenix::gles2::texture::SampleInfo::SampleInfo(const render::texture::SampleInfo& o) noexcept
 {
     switch (o.mag_filter) {
     case render::texture::Filter::NEAREST:
@@ -15,8 +11,7 @@ gearoenix::gles2::texture::SampleInfo::SampleInfo(const render::texture::SampleI
         mag_filter = GL_LINEAR;
         break;
     default:
-        GXUNEXPECTED;
-        break;
+        GXUNEXPECTED
     }
     switch (o.min_filter) {
     case render::texture::Filter::NEAREST:
@@ -26,8 +21,7 @@ gearoenix::gles2::texture::SampleInfo::SampleInfo(const render::texture::SampleI
         min_filter = GL_LINEAR_MIPMAP_LINEAR;
         break;
     default:
-        GXUNEXPECTED;
-        break;
+        GXUNEXPECTED
     }
     const auto fun = [](render::texture::Wrap::Id w) {
         switch (w) {
@@ -38,8 +32,7 @@ gearoenix::gles2::texture::SampleInfo::SampleInfo(const render::texture::SampleI
         case render::texture::Wrap::REPEAT:
             return GL_REPEAT;
         default:
-            GXUNEXPECTED;
-            break;
+            GXUNEXPECTED
         }
     };
     wrap_s = fun(o.wrap_s);

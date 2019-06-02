@@ -37,10 +37,8 @@ namespace render {
         class Uniform;
         class Manager;
     }
-    namespace graph {
-        namespace tree {
-            class Tree;
-        }
+    namespace graph::tree {
+        class Tree;
     }
     namespace pipeline {
         class Manager;
@@ -73,7 +71,7 @@ namespace render {
             core::Real delta_time = 0.0f;
             std::chrono::time_point<std::chrono::high_resolution_clock> last_frame_time = std::chrono::high_resolution_clock::now();
 
-            system::Application* sysapp = nullptr;
+            system::Application* sys_app = nullptr;
             core::FunctionLoader* fun_loader = nullptr;
             physics::Engine* physics_engine = nullptr;
             core::sync::KernelWorker* kernels = nullptr;
@@ -87,48 +85,48 @@ namespace render {
             /// In addition, this design is temporary and in next version of engine it is going to be changed.
             graph::tree::Tree* render_tree = nullptr;
 
-            Engine(system::Application* system_application, const Type::Id engine_type_id) noexcept;
+            Engine(system::Application* system_application, Type::Id engine_type_id) noexcept;
 
         public:
             virtual ~Engine() noexcept;
             virtual void update() noexcept;
             virtual void terminate() noexcept;
             virtual sync::Semaphore* create_semaphore() const noexcept = 0;
-            /// Caller of this function must maintain the pointer to data untill call of EndCaller.
+            /// Caller of this function must maintain the pointer to data until call of EndCaller.
             virtual texture::Texture2D* create_texture_2d(
-                const core::Id id,
+                core::Id id,
                 const void* data,
-                const texture::TextureFormat::Id f,
-                const texture::SampleInfo s,
-                const unsigned int width,
-                const unsigned int heigt,
+                texture::TextureFormat::Id f,
+                texture::SampleInfo s,
+                unsigned int width,
+                unsigned int heigt,
                 const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
                 = 0;
-            /// Caller of this function must maintain the pointer to data untill call of EndCaller.
+            /// Caller of this function must maintain the pointer to data until call of EndCaller.
             virtual texture::Cube* create_texture_cube(
-                const core::Id id,
+                core::Id id,
                 const void* data,
-                const texture::TextureFormat::Id f,
-                const texture::SampleInfo s,
-                const unsigned int aspect,
+                texture::TextureFormat::Id f,
+                texture::SampleInfo s,
+                unsigned int aspect,
                 const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
                 = 0;
             virtual void submit(
-                const std::size_t pres_count,
-                const sync::Semaphore* const* const pres,
-                const std::size_t cmds_count,
-                const command::Buffer* const* const cmds,
-                const std::size_t nxts_count,
-                const sync::Semaphore* const* const nxts) noexcept
+                std::size_t pres_count,
+                const sync::Semaphore* const* pres,
+                std::size_t cmds_count,
+                const command::Buffer* const* cmds,
+                std::size_t nxts_count,
+                const sync::Semaphore* const* nxts) noexcept
                 = 0;
             /// TODO: This is (design/mechanism) going to change in far future
             /// game developer must keep all the render-trees by himself/herself
-            /// Then every thing based on the following must be choosed by render-trees:
+            /// Then every thing based on the following must be chose by render-trees:
             ///   - Type of object/scene (e.g. UI, GAME, MODEL, Widget, etc)
             ///   - Tagging the objects or meshes that must be rendered by which render-tree
             /// This is going to add a great flexibility in rendering of engine
             ///
-            /// The other way of accomplishing of this functionallity is to create a render-tree
+            /// The other way of accomplishing of this functionality is to create a render-tree
             /// that is composed with several other render-trees
             virtual void set_render_tree(graph::tree::Tree* tree) noexcept;
 
