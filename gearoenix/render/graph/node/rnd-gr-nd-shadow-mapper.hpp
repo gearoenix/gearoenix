@@ -67,30 +67,17 @@ namespace graph::node {
         std::vector<std::shared_ptr<ShadowMapperFrame>> frames;
 
     public:
-        const static unsigned int diffuse_environment_index;
-        const static unsigned int specular_environment_index;
-        const static unsigned int ambient_occlusion_index;
-        const static unsigned int shadow_map_index;
-        const static unsigned int brdflut_index;
-
         ShadowMapper(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
         ~ShadowMapper() noexcept final;
-
-        void set_diffuse_environment(const std::shared_ptr<texture::Cube>& t) noexcept;
-        void set_specular_environment(const std::shared_ptr<texture::Cube>& t) noexcept;
-        void set_ambient_occlusion(const std::shared_ptr<texture::Texture2D>& t) noexcept;
-        void set_shadow_mapper(const std::shared_ptr<texture::Texture2D>& t) noexcept;
-        void set_brdflut(const std::shared_ptr<texture::Texture2D>& t) noexcept;
-
         const std::shared_ptr<sync::Semaphore>& get_semaphore(unsigned int frame_number) noexcept final;
         /// This will be called at the start of each frame
         void update() noexcept;
         /// Multithreaded rendering happens in here
         void record(
-            const std::shared_ptr<scene::Scene>& s,
-            const std::shared_ptr<camera::Camera>& c,
-            const std::shared_ptr<light::Directional>& l,
-            const std::shared_ptr<model::Model>& m,
+            scene::Scene* s,
+            camera::Camera* c,
+            light::Directional* l,
+            model::Model* m,
             const unsigned int kernel_index) noexcept;
         /// This will be called at the end of each frame for pushing jobs to GPU
         void submit() noexcept;

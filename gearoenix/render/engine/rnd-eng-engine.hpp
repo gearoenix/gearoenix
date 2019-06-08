@@ -61,6 +61,7 @@ namespace render {
         class Cube;
         class Target;
         class Texture2D;
+        class Target;
     }
     namespace engine {
         class Engine {
@@ -111,7 +112,7 @@ namespace render {
                 unsigned int aspect,
                 const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
                 = 0;
-            virtual texture::Texture2D* create_render_target(
+            virtual texture::Target* create_render_target(
                 core::Id id,
                 texture::TextureFormat::Id f,
                 texture::SampleInfo s,

@@ -106,7 +106,7 @@ gearoenix::render::texture::Cube* gearoenix::gles2::engine::Engine::create_textu
     return new texture::Cube(id, this, data, f, s, aspect, call);
 }
 
-gearoenix::render::texture::Texture2D* gearoenix::gles2::engine::Engine::create_render_target(
+gearoenix::render::texture::Target* gearoenix::gles2::engine::Engine::create_render_target(
     core::Id id,
     render::texture::TextureFormat::Id f,
     render::texture::SampleInfo s,

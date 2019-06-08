@@ -44,7 +44,7 @@ public:
         render::texture::SampleInfo s,
         unsigned int aspect,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept final;
-    render::texture::Texture2D* create_render_target(
+    render::texture::Target* create_render_target(
         core::Id id,
         render::texture::TextureFormat::Id f,
         render::texture::SampleInfo s,

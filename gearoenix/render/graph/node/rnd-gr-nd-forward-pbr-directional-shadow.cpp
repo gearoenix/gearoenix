@@ -1,5 +1,6 @@
 #include "rnd-gr-nd-forward-pbr-directional-shadow.hpp"
 #include "../../../core/asset/cr-asset-manager.hpp"
+#include "../../../core/sync/cr-sync-kernel-workers.hpp"
 #include "../../../system/sys-app.hpp"
 #include "../../buffer/rnd-buf-manager.hpp"
 #include "../../buffer/rnd-buf-uniform.hpp"
@@ -162,7 +163,7 @@ gearoenix::render::graph::node::ForwardPbrDirectionalShadowFrame::ForwardPbrDire
     : primary_cmd(e->get_command_manager()->create_primary_command_buffer())
     , semaphore(e->create_semaphore())
 {
-    const unsigned int kernels_count = std::thread::hardware_concurrency();
+    const unsigned int kernels_count = e->get_kernels()->get_threads_count();
     kernels.resize(kernels_count);
     for (unsigned int i = 0; i < kernels_count; ++i) {
         kernels[i] = std::make_shared<ForwardPbrDirectionalShadowKernel>(e, i);
