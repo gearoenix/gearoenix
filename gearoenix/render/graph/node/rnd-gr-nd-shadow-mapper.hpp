@@ -1,5 +1,6 @@
 #ifndef GEAROENIX_RENDER_GRAPH_NODE_FORWARD_PBR_DIRECTIONAL_SHADOW_HPP
 #define GEAROENIX_RENDER_GRAPH_NODE_FORWARD_PBR_DIRECTIONAL_SHADOW_HPP
+#include "../../../core/cr-pool.hpp"
 #include "../../../core/sync/cr-sync-end-caller.hpp"
 #include "../../../math/math-matrix.hpp"
 #include "../../../math/math-vector.hpp"
@@ -47,8 +48,7 @@ namespace graph::node {
 
     struct ShadowMapperKernel {
         std::shared_ptr<command::Buffer> secondary_cmd = nullptr;
-        unsigned int latest_render_data_pool = 0;
-        std::vector<std::shared_ptr<pipeline::ForwardPbrDirectionalShadowResourceSet>> render_data_pool;
+        core::OneLoopPool<pipeline::ForwardPbrDirectionalShadowResourceSet> render_data_pool;
         ShadowMapperKernel(engine::Engine* e, unsigned int kernel_index) noexcept;
     };
 

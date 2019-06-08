@@ -18,7 +18,7 @@
 
 #define GX_GLES2_PIPRES_SET_TXT(x, txt, cls)        \
     if (shdr->get_##x() != GX_GLES2_UNIFORM_FAILED) \
-        static_cast<const texture::cls*>(txt.get())->bind(static_cast<gl::enumerated>(shdr->get_##x##_index()));
+        static_cast<const texture::cls*>(txt)->bind(static_cast<gl::enumerated>(shdr->get_##x##_index()));
 
 #define GX_GLES2_PIPRES_SET_TXT2D(x, txt) GX_GLES2_PIPRES_SET_TXT(x, txt, Texture2D)
 

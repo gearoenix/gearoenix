@@ -10,7 +10,7 @@ namespace node {
 namespace tree {
     class Pbr : public Tree {
     private:
-        const bool in_weak_hardware;
+        bool in_weak_hardware = true;
         // std::shared_ptr<node::ForwardPbrConeShadow> fwdconshd = nullptr;
         std::shared_ptr<node::ForwardPbrDirectionalShadow> fwddirshd = nullptr;
         // std::shared_ptr<node::ForwardPbrPointShadow> fwdpointshd = nullptr;

@@ -36,20 +36,20 @@ void gearoenix::render::pipeline::ResourceSet::set_mesh(const mesh::Mesh* const 
 void gearoenix::render::pipeline::ResourceSet::set_material(const material::Material* m) noexcept
 {
     material_uniform_buffer = m->get_uniform_buffers()->get_buffer();
-    color = m->get_color();
-    metallic_roughness = m->get_metallic_roughness();
-    normal = m->get_normal();
-    emissive = m->get_emissive();
+    color = m->get_color().get();
+    metallic_roughness = m->get_metallic_roughness().get();
+    normal = m->get_normal().get();
+    emissive = m->get_emissive().get();
 }
 
 #undef GX_HELPER
 
-void gearoenix::render::pipeline::ResourceSet::set_node_uniform_buffer(buffer::Uniform* b)
+void gearoenix::render::pipeline::ResourceSet::set_node_uniform_buffer(buffer::Uniform* b) noexcept
 {
     node_uniform_buffer = b;
 }
 
-void gearoenix::render::pipeline::ResourceSet::clean()
+void gearoenix::render::pipeline::ResourceSet::clean() noexcept
 {
     scene_uniform_buffer = nullptr;
     camera_uniform_buffer = nullptr;

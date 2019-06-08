@@ -28,10 +28,10 @@ void gearoenix::gles2::pipeline::ForwardPbrDirectionalShadowResourceSet::bind(gl
     shdr->set_camera_position_data(camera->position.data());
     shdr->set_camera_vp_data(camera->view_projection.data());
     //static_cast<const texture::Texture2D *>(ambient_occlusion.get())->bind(shdr->get_effect_ambient_occlusion_index());
-    reinterpret_cast<const texture::Texture2D*>(brdflut.get())->bind(static_cast<gl::enumerated>(shdr->get_effect_brdflut_index()));
-    reinterpret_cast<const texture::Cube*>(diffuse_environment.get())->bind(static_cast<gl::enumerated>(shdr->get_effect_diffuse_environment_index()));
+    reinterpret_cast<const texture::Texture2D*>(brdflut)->bind(static_cast<gl::enumerated>(shdr->get_effect_brdflut_index()));
+    reinterpret_cast<const texture::Cube*>(diffuse_environment)->bind(static_cast<gl::enumerated>(shdr->get_effect_diffuse_environment_index()));
     //static_cast<const texture::Texture2D *>(shadow_map.get())->bind(shdr->get_effect_shadow_map_index());
-    reinterpret_cast<const texture::Cube*>(specular_environment.get())->bind(static_cast<gl::enumerated>(shdr->get_effect_specular_environment_index()));
+    reinterpret_cast<const texture::Cube*>(specular_environment)->bind(static_cast<gl::enumerated>(shdr->get_effect_specular_environment_index()));
     //const render::light::DirectionalUniform *light = reinterpret_cast<const render::light::DirectionalUniform *>(light_uniform_buffer->get_data());
     //shdr->set_light_color_data(light->color_strength.data());
     //shdr->set_light_direction_data(light->direction.data());
@@ -39,11 +39,11 @@ void gearoenix::gles2::pipeline::ForwardPbrDirectionalShadowResourceSet::bind(gl
     auto material = reinterpret_cast<const render::material::Uniform*>(material_uniform_buffer->get_data());
     shdr->set_material_alpha_data(&(material->alpha));
     shdr->set_material_alpha_cutoff_data(&(material->alpha_cutoff));
-    reinterpret_cast<const texture::Texture2D*>(color.get())->bind(static_cast<gl::enumerated>(shdr->get_material_base_color_index()));
+    reinterpret_cast<const texture::Texture2D*>(color)->bind(static_cast<gl::enumerated>(shdr->get_material_base_color_index()));
     //static_cast<const texture::Texture2D *>(emissive.get())->bind(shdr->get_material_emissive_index());
     shdr->set_material_metallic_factor_data(&(material->metallic_factor));
-    reinterpret_cast<const texture::Texture2D*>(metallic_roughness.get())->bind(static_cast<gl::enumerated>(shdr->get_material_metallic_roughness_index()));
-    reinterpret_cast<const texture::Texture2D*>(normal.get())->bind(static_cast<gl::enumerated>(shdr->get_material_normal_index()));
+    reinterpret_cast<const texture::Texture2D*>(metallic_roughness)->bind(static_cast<gl::enumerated>(shdr->get_material_metallic_roughness_index()));
+    reinterpret_cast<const texture::Texture2D*>(normal)->bind(static_cast<gl::enumerated>(shdr->get_material_normal_index()));
     shdr->set_material_normal_scale_data(&(material->normal_scale));
     //shdr->set_material_occlusion_strength_data(&(material->occlusion_strength));
     shdr->set_material_roughness_factor_data(&(material->roughness_factor));

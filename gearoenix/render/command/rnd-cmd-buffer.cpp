@@ -2,34 +2,32 @@
 #include "../../core/cr-build-configuration.hpp"
 #include "../../system/sys-log.hpp"
 
-gearoenix::render::command::Buffer::~Buffer() {}
-
-void gearoenix::render::command::Buffer::begin()
+void gearoenix::render::command::Buffer::begin() noexcept
 {
-    recored_secondaries.clear();
+    recorded_secondaries.clear();
     bound_resource_sets.clear();
     render_target = nullptr;
 }
 
-void gearoenix::render::command::Buffer::end()
+void gearoenix::render::command::Buffer::end() noexcept
 {
 }
 
-void gearoenix::render::command::Buffer::record(const std::shared_ptr<Buffer>& o)
+void gearoenix::render::command::Buffer::record(Buffer* const o) noexcept
 {
-    recored_secondaries.push_back(o);
+    recorded_secondaries.push_back(o);
 }
 
-void gearoenix::render::command::Buffer::bind(const std::shared_ptr<pipeline::ResourceSet>& r)
+void gearoenix::render::command::Buffer::bind(pipeline::ResourceSet* const r) noexcept
 {
     bound_resource_sets.push_back(r);
 }
 
-void gearoenix::render::command::Buffer::bind(texture::Target* const t)
+void gearoenix::render::command::Buffer::bind(texture::Target* const t) noexcept
 {
 #ifdef GX_DEBUG_MODE
     if (render_target != nullptr)
-        GXLOGF("Only one render target must be bound.");
+        GXLOGF("Only one render target must be bound.")
 #endif
     render_target = t;
 }

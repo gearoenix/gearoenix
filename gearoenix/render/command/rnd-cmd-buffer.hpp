@@ -3,30 +3,28 @@
 #include <memory>
 #include <vector>
 
-namespace gearoenix {
-namespace render {
-    namespace pipeline {
-        class ResourceSet;
-    }
-    namespace texture {
-        class Target;
-    }
-    namespace command {
-        class Buffer {
-        protected:
-            std::vector<std::shared_ptr<Buffer>> recored_secondaries;
-            std::vector<std::shared_ptr<pipeline::ResourceSet>> bound_resource_sets;
-            texture::Target* render_target = nullptr;
+namespace gearoenix::render {
+namespace pipeline {
+    class ResourceSet;
+}
+namespace texture {
+    class Target;
+}
+namespace command {
+    class Buffer {
+    protected:
+        std::vector<Buffer*> recorded_secondaries;
+        std::vector<pipeline::ResourceSet*> bound_resource_sets;
+        texture::Target* render_target = nullptr;
 
-        public:
-            virtual ~Buffer();
-            virtual void begin();
-            virtual void end();
-            virtual void record(const std::shared_ptr<Buffer>& o);
-            virtual void bind(const std::shared_ptr<pipeline::ResourceSet>& r);
-            virtual void bind(texture::Target* t);
-        };
-    }
+    public:
+        virtual ~Buffer() noexcept = default;
+        virtual void begin() noexcept;
+        virtual void end() noexcept;
+        virtual void record(Buffer* o) noexcept;
+        virtual void bind(pipeline::ResourceSet* r) noexcept;
+        virtual void bind(texture::Target* t) noexcept;
+    };
 }
 }
 
