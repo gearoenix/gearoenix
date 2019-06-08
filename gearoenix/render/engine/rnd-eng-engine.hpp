@@ -99,7 +99,7 @@ namespace render {
                 texture::TextureFormat::Id f,
                 texture::SampleInfo s,
                 unsigned int width,
-                unsigned int heigt,
+                unsigned int height,
                 const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
                 = 0;
             /// Caller of this function must maintain the pointer to data until call of EndCaller.
@@ -109,6 +109,14 @@ namespace render {
                 texture::TextureFormat::Id f,
                 texture::SampleInfo s,
                 unsigned int aspect,
+                const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
+                = 0;
+            virtual texture::Texture2D* create_render_target(
+                core::Id id,
+                texture::TextureFormat::Id f,
+                texture::SampleInfo s,
+                unsigned int width,
+                unsigned int height,
                 const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
                 = 0;
             virtual void submit(

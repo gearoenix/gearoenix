@@ -14,18 +14,9 @@
 namespace gearoenix::gles2::engine {
 class Engine : public render::engine::Engine {
 private:
-    // GLuint shadow_map_color = 0;
-    // GLuint shadow_map_depth = 0;
-    // GLuint shadow_map_framebuffer = 0;
-    // GLuint shadow_map_aspect = 1024;
-    // texture::Texture2D* shadow_map_texture = nullptr;
-    // GLuint render_depth = 0;
-    // GLuint render_framebuffer = 0;
-    // GLfloat win_width;
-    // GLfloat win_height;
     void initialize() noexcept;
 #ifdef GX_GLES2_ENGINE_PROFILING
-    /// todo: create a class for profilling
+    /// todo: create a class for profiling
     unsigned int prof_frames_count = 0;
     std::chrono::high_resolution_clock::time_point prof_last_time_draw;
     double prof_frames_time = 0.0;
@@ -53,6 +44,13 @@ public:
         render::texture::SampleInfo s,
         unsigned int aspect,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept final;
+    render::texture::Texture2D* create_render_target(
+        core::Id id,
+        render::texture::TextureFormat::Id f,
+        render::texture::SampleInfo s,
+        unsigned int width,
+        unsigned int height,
+        const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept final;
     void submit(
         std::size_t pres_count,
         const render::sync::Semaphore* const* pres,
@@ -60,14 +58,6 @@ public:
         const render::command::Buffer* const* cmds,
         std::size_t nxts_count,
         const render::sync::Semaphore* const* nxts) noexcept final;
-    // render::texture::Texture2D* create_texture_2d(core::Id id, system::stream::Stream* file, core::sync::EndCaller<core::sync::EndCallerIgnore> c);
-    // render::texture::Cube* create_texture_cube(core::Id id, system::stream::Stream* file, core::sync::EndCaller<core::sync::EndCallerIgnore> c);
-    // render::buffer::Mesh* create_mesh(unsigned int vec, system::stream::Stream* file, core::sync::EndCaller<core::sync::EndCallerIgnore> c);
-    // render::buffer::Uniform* create_uniform(unsigned int s, core::sync::EndCaller<core::sync::EndCallerIgnore> c);
-    // render::shader::Shader* create_shader(core::Id sid, system::stream::Stream* file, core::sync::EndCaller<core::sync::EndCallerIgnore> c);
-    // render::shader::Resources* create_shader_resources(core::Id sid, render::pipeline::Pipeline* p, render::buffer::Uniform* ub, core::sync::EndCaller<core::sync::EndCallerIgnore> c);
-    // render::pipeline::Pipeline* create_pipeline(core::Id sid, core::sync::EndCaller<core::sync::EndCallerIgnore> c);
-    // void on_event(core::event::Event& e);
 };
 }
 #endif
