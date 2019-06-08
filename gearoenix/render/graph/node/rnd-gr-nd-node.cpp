@@ -3,13 +3,13 @@
 #include "../../pipeline/rnd-pip-manager.hpp"
 
 gearoenix::render::graph::node::Node::Node(
-    const std::shared_ptr<engine::Engine>& e,
+    engine::Engine* const e,
     const pipeline::Type::Id pipeline_type_id,
     const unsigned int input_textures_count,
     const unsigned int output_textures_count,
     const std::vector<std::string>& input_links,
     const std::vector<std::string>& output_links,
-    const core::sync::EndCaller<core::sync::EndCallerIgnore>& call)
+    const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
     : core::graph::Node(input_links, output_links)
     , e(e)
 {
@@ -25,16 +25,12 @@ gearoenix::render::graph::node::Node::Node(
     }
 }
 
-gearoenix::render::graph::node::Node::~Node()
-{
-}
-
-void gearoenix::render::graph::node::Node::set_input_texture(const std::shared_ptr<texture::Texture>& t, const unsigned int index)
+void gearoenix::render::graph::node::Node::set_input_texture(const std::shared_ptr<texture::Texture>& t, const unsigned int index) noexcept
 {
     input_textures[index] = t;
 }
 
-void gearoenix::render::graph::node::Node::set_render_target(texture::Target* const t)
+void gearoenix::render::graph::node::Node::set_render_target(texture::Target* const t) noexcept
 {
     render_target = t;
 }

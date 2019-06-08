@@ -29,11 +29,11 @@ private:
 
 public:
     /// This function must be like this
-    GameApp(const std::shared_ptr<gearoenix::system::Application>& sys_app);
-    ~GameApp() final;
+    GameApp(const std::shared_ptr<gearoenix::system::Application>& sys_app) noexcept;
+    ~GameApp() noexcept final = default;
     /// On every screen refresh this function is going to be called
-    void update() final;
+    void update() noexcept final;
     /// Before terminationg everything in engine this function is going to be called
-    void terminate() final;
+    void terminate() noexcept final;
 };
 #endif

@@ -8,8 +8,11 @@ namespace engine {
 namespace graph::tree {
     class Tree {
     protected:
-        const std::shared_ptr<engine::Engine> e;
-        explicit Tree(std::shared_ptr<engine::Engine> e) noexcept;
+        engine::Engine* e = nullptr;
+        explicit Tree(engine::Engine* const e) noexcept
+            : e(e)
+        {
+        }
 
     public:
         virtual ~Tree() noexcept = default;

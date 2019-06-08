@@ -31,7 +31,7 @@ const unsigned int gearoenix::render::graph::node::ForwardPbrDirectionalShadow::
 const unsigned int gearoenix::render::graph::node::ForwardPbrDirectionalShadow::brdflut_index = 4;
 
 gearoenix::render::graph::node::ForwardPbrDirectionalShadow::ForwardPbrDirectionalShadow(
-    const std::shared_ptr<engine::Engine>& e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call)
+    engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
     : Node(
         e,
         pipeline::Type::ForwardPbrDirectionalShadow,
@@ -59,32 +59,32 @@ gearoenix::render::graph::node::ForwardPbrDirectionalShadow::ForwardPbrDirection
     input_textures[brdflut_index] = txtmgr->get_2d(math::Vec2(1.0, 1.0), txt2dcall);
 }
 
-void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::set_diffuse_environment(const std::shared_ptr<texture::Cube>& t)
+void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::set_diffuse_environment(const std::shared_ptr<texture::Cube>& t) noexcept
 {
     set_input_texture(t, diffuse_environment_index);
 }
 
-void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::set_specular_environment(const std::shared_ptr<texture::Cube>& t)
+void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::set_specular_environment(const std::shared_ptr<texture::Cube>& t) noexcept
 {
     set_input_texture(t, specular_environment_index);
 }
 
-void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::set_ambient_occlusion(const std::shared_ptr<texture::Texture2D>& t)
+void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::set_ambient_occlusion(const std::shared_ptr<texture::Texture2D>& t) noexcept
 {
     set_input_texture(t, ambient_occlusion_index);
 }
 
-void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::set_shadow_mapper(const std::shared_ptr<texture::Texture2D>& t)
+void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::set_shadow_mapper(const std::shared_ptr<texture::Texture2D>& t) noexcept
 {
     set_input_texture(t, shadow_map_index);
 }
 
-void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::set_brdflut(const std::shared_ptr<texture::Texture2D>& t)
+void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::set_brdflut(const std::shared_ptr<texture::Texture2D>& t) noexcept
 {
     set_input_texture(t, brdflut_index);
 }
 
-const std::shared_ptr<gearoenix::render::sync::Semaphore>& gearoenix::render::graph::node::ForwardPbrDirectionalShadow::get_semaphore(const unsigned int)
+const std::shared_ptr<gearoenix::render::sync::Semaphore>& gearoenix::render::graph::node::ForwardPbrDirectionalShadow::get_semaphore(const unsigned int) noexcept
 {
     GXUNEXPECTED;
 }
@@ -137,7 +137,7 @@ void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::record(
     }
 }
 
-void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::submit()
+void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::submit() noexcept
 {
     const unsigned int frame_number = e->get_frame_number();
     const std::shared_ptr<ForwardPbrDirectionalShadowFrame>& frame = frames[frame_number];
@@ -166,7 +166,7 @@ void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::submit()
     }
 }
 
-gearoenix::render::graph::node::ForwardPbrDirectionalShadowFrame::ForwardPbrDirectionalShadowFrame(const std::shared_ptr<engine::Engine>& e)
+gearoenix::render::graph::node::ForwardPbrDirectionalShadowFrame::ForwardPbrDirectionalShadowFrame(engine::Engine* e) noexcept
     : primary_cmd(e->get_command_manager()->create_primary_command_buffer())
     , semaphore(e->create_semaphore())
 {
@@ -177,7 +177,7 @@ gearoenix::render::graph::node::ForwardPbrDirectionalShadowFrame::ForwardPbrDire
     }
 }
 
-gearoenix::render::graph::node::ForwardPbrDirectionalShadowKernel::ForwardPbrDirectionalShadowKernel(const std::shared_ptr<engine::Engine>& e, const unsigned int kernel_index)
+gearoenix::render::graph::node::ForwardPbrDirectionalShadowKernel::ForwardPbrDirectionalShadowKernel(engine::Engine* e, const unsigned int kernel_index) noexcept
     : secondary_cmd(e->get_command_manager()->create_secondary_command_buffer(kernel_index))
 {
 }

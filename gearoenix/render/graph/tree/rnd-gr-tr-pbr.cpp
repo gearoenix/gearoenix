@@ -1,5 +1,4 @@
-#include <memory>
-
+#include "rnd-gr-tr-pbr.hpp"
 #include "../../../core/asset/cr-asset-manager.hpp"
 #include "../../../core/sync/cr-sync-kernel-workers.hpp"
 #include "../../../physics/phs-engine.hpp"
@@ -9,9 +8,9 @@
 #include "../../scene/rnd-scn-manager.hpp"
 #include "../../scene/rnd-scn-scene.hpp"
 #include "../node/rnd-gr-nd-forward-pbr-directional-shadow.hpp"
-#include "rnd-gr-tr-pbr.hpp"
+#include <memory>
 
-gearoenix::render::graph::tree::Pbr::Pbr(const std::shared_ptr<engine::Engine>& e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
+gearoenix::render::graph::tree::Pbr::Pbr(engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
     : Tree(e)
     , in_weak_hardware(engine::Type::OPENGL_ES2 == e->get_engine_type_id())
 {

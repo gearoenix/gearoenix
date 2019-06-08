@@ -45,14 +45,14 @@ namespace graph::node {
         std::shared_ptr<command::Buffer> secondary_cmd = nullptr;
         unsigned int latest_render_data_pool = 0;
         std::vector<std::shared_ptr<pipeline::ForwardPbrDirectionalShadowResourceSet>> render_data_pool;
-        ForwardPbrDirectionalShadowKernel(const std::shared_ptr<engine::Engine>& e, unsigned int kernel_index);
+        ForwardPbrDirectionalShadowKernel(engine::Engine* e, unsigned int kernel_index) noexcept;
     };
 
     struct ForwardPbrDirectionalShadowFrame {
         std::shared_ptr<command::Buffer> primary_cmd = nullptr;
         std::shared_ptr<sync::Semaphore> semaphore = nullptr;
         std::vector<std::shared_ptr<ForwardPbrDirectionalShadowKernel>> kernels;
-        ForwardPbrDirectionalShadowFrame(const std::shared_ptr<engine::Engine>& e);
+        explicit ForwardPbrDirectionalShadowFrame(engine::Engine* e) noexcept;
     };
 
     /// This renders only one directional light with one shadow map.
@@ -69,16 +69,16 @@ namespace graph::node {
         const static unsigned int shadow_map_index;
         const static unsigned int brdflut_index;
 
-        ForwardPbrDirectionalShadow(const std::shared_ptr<engine::Engine>& e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call);
-        ~ForwardPbrDirectionalShadow() final = default;
+        ForwardPbrDirectionalShadow(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
+        ~ForwardPbrDirectionalShadow() noexcept final = default;
 
-        void set_diffuse_environment(const std::shared_ptr<texture::Cube>& t);
-        void set_specular_environment(const std::shared_ptr<texture::Cube>& t);
-        void set_ambient_occlusion(const std::shared_ptr<texture::Texture2D>& t);
-        void set_shadow_mapper(const std::shared_ptr<texture::Texture2D>& t);
-        void set_brdflut(const std::shared_ptr<texture::Texture2D>& t);
+        void set_diffuse_environment(const std::shared_ptr<texture::Cube>& t) noexcept;
+        void set_specular_environment(const std::shared_ptr<texture::Cube>& t) noexcept;
+        void set_ambient_occlusion(const std::shared_ptr<texture::Texture2D>& t) noexcept;
+        void set_shadow_mapper(const std::shared_ptr<texture::Texture2D>& t) noexcept;
+        void set_brdflut(const std::shared_ptr<texture::Texture2D>& t) noexcept;
 
-        const std::shared_ptr<sync::Semaphore>& get_semaphore(unsigned int frame_number) final;
+        const std::shared_ptr<sync::Semaphore>& get_semaphore(unsigned int frame_number) noexcept final;
         /// This will be called at the start of each frame
         void update() noexcept;
         /// Multithreaded rendering happens in here
@@ -89,7 +89,7 @@ namespace graph::node {
             const model::Model* m,
             unsigned int kernel_index) noexcept;
         /// This will be called at the end of each frame for pushing jobs to GPU
-        void submit();
+        void submit() noexcept;
     };
 }
 }
