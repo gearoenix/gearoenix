@@ -61,6 +61,7 @@ namespace graph::node {
     class ForwardPbrDirectionalShadow : public Node {
     private:
         std::vector<std::shared_ptr<ForwardPbrDirectionalShadowFrame>> frames;
+        ForwardPbrDirectionalShadowFrame* frame = nullptr;
 
     public:
         const static unsigned int diffuse_environment_index;

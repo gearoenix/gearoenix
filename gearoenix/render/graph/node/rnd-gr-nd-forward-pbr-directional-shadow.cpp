@@ -87,13 +87,13 @@ void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::set_brdflut(co
 
 const std::shared_ptr<gearoenix::render::sync::Semaphore>& gearoenix::render::graph::node::ForwardPbrDirectionalShadow::get_semaphore(const unsigned int) noexcept
 {
-    GXUNEXPECTED;
+    GXUNEXPECTED
 }
 
 void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::update() noexcept
 {
     const unsigned int frame_number = e->get_frame_number();
-    const std::shared_ptr<ForwardPbrDirectionalShadowFrame>& frame = frames[frame_number];
+    frame = frames[frame_number].get();
     frame->primary_cmd->begin();
     for (const std::shared_ptr<ForwardPbrDirectionalShadowKernel>& kernel : frame->kernels) {
         kernel->render_data_pool.refresh();
@@ -108,8 +108,6 @@ void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::record(
     const model::Model* const m,
     const unsigned int kernel_index) noexcept
 {
-    const unsigned int frame_number = e->get_frame_number();
-    const std::shared_ptr<ForwardPbrDirectionalShadowFrame>& frame = frames[frame_number];
     const std::shared_ptr<ForwardPbrDirectionalShadowKernel>& kernel = frame->kernels[kernel_index];
     const std::map<core::Id, std::shared_ptr<model::Mesh>>& meshes = m->get_meshes();
     for (const std::pair<const core::Id, std::shared_ptr<model::Mesh>>& id_mesh : meshes) {
@@ -137,13 +135,12 @@ void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::record(
 void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::submit() noexcept
 {
     const unsigned int frame_number = e->get_frame_number();
-    const std::shared_ptr<ForwardPbrDirectionalShadowFrame>& frame = frames[frame_number];
     command::Buffer* cmd = frame->primary_cmd.get();
     cmd->bind(render_target);
     for (const std::shared_ptr<ForwardPbrDirectionalShadowKernel>& k : frame->kernels) {
         cmd->record(k->secondary_cmd.get());
     }
-    std::vector<sync::Semaphore*> pss(providers.size());
+    std::vector<sync::Semaphore*> pss;
     for (const std::shared_ptr<core::graph::Node>& p : providers) {
         if (p == nullptr)
             continue;

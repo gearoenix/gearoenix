@@ -27,8 +27,8 @@ namespace model {
     class Mesh;
 }
 namespace pipeline {
-    class ForwardPbrDirectionalShadow;
-    class ForwardPbrDirectionalShadowResourceSet;
+    class ShadowMapper;
+    class ShadowMapperResourceSet;
 }
 namespace scene {
     class Scene;
@@ -46,9 +46,16 @@ namespace graph::node {
         math::Mat4x4 mvp;
     };
 
+    struct ShadowMapperRenderData {
+        pipeline::ShadowMapperResourceSet* r = nullptr;
+        buffer::Uniform* u = nullptr;
+        ShadowMapperRenderData(engine::Engine* e, pipeline::Pipeline* pip) noexcept;
+        ~ShadowMapperRenderData() noexcept;
+    };
+
     struct ShadowMapperKernel {
         std::shared_ptr<command::Buffer> secondary_cmd = nullptr;
-        core::OneLoopPool<pipeline::ForwardPbrDirectionalShadowResourceSet> render_data_pool;
+        core::OneLoopPool<ShadowMapperRenderData> render_data_pool;
         ShadowMapperKernel(engine::Engine* e, unsigned int kernel_index) noexcept;
     };
 
@@ -65,20 +72,16 @@ namespace graph::node {
     class ShadowMapper : public Node {
     private:
         std::vector<std::shared_ptr<ShadowMapperFrame>> frames;
+        ShadowMapperFrame* frame = nullptr;
 
     public:
         ShadowMapper(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
-        ~ShadowMapper() noexcept final;
+        ~ShadowMapper() noexcept final = default;
         const std::shared_ptr<sync::Semaphore>& get_semaphore(unsigned int frame_number) noexcept final;
         /// This will be called at the start of each frame
         void update() noexcept;
         /// Multithreaded rendering happens in here
-        void record(
-            scene::Scene* s,
-            camera::Camera* c,
-            light::Directional* l,
-            model::Model* m,
-            const unsigned int kernel_index) noexcept;
+        void record(const math::Mat4x4& mvp, model::Model* m, unsigned int kernel_index) noexcept;
         /// This will be called at the end of each frame for pushing jobs to GPU
         void submit() noexcept;
     };
