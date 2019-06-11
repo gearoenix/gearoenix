@@ -34,3 +34,8 @@ void gearoenix::render::graph::node::Node::set_render_target(texture::Target* co
 {
     render_target = t;
 }
+
+void gearoenix::render::graph::node::Node::set_provider(unsigned int input_link_index,
+                                                        const std::shared_ptr<gearoenix::core::graph::Node> &o) noexcept {
+    Node::set_provider(input_link_index, o);
+}

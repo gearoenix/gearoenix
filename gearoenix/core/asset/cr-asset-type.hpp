@@ -1,10 +1,6 @@
 #ifndef GEAROENIX_CORE_ASSET_TYPE_HPP
 #define GEAROENIX_CORE_ASSET_TYPE_HPP
-
-namespace gearoenix {
-namespace core {
-    namespace asset {
-
+namespace gearoenix::core::asset {
         class Type {
         public:
             typedef enum {
@@ -20,11 +16,8 @@ namespace core {
                 SHADER = 10,
                 SKYBOX = 11,
                 TEXTURE = 12,
+                NODE = 13,
             } Id;
         };
-
-    } // namespace asset
-} // namespace core
-} // namespace gearoenix
-
+    } // namespace gearoenix
 #endif

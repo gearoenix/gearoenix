@@ -54,6 +54,8 @@ namespace graph::node {
 
     public:
         virtual ~Node() noexcept = default;
+        virtual void set_provider(unsigned int input_link_index, const std::shared_ptr<core::graph::Node>& o) noexcept override;
+        virtual void set_consumer(unsigned int output_link_index, const std::weak_ptr<core::graph::Node>& o) noexcept override;
         virtual void set_input_texture(const std::shared_ptr<texture::Texture>& t, unsigned int index) noexcept;
         virtual void set_render_target(texture::Target* t) noexcept;
         virtual const std::shared_ptr<sync::Semaphore>& get_semaphore(unsigned int frame_number) noexcept = 0;
