@@ -5,6 +5,7 @@
 #include "../../pipeline/rnd-pip-type.hpp"
 #include <memory>
 #include <vector>
+#include <map>
 
 /// Node is responsible to record command buffers.
 /// It gathers all the needed data like pipeline, descriptor-sets, ... .
@@ -41,7 +42,11 @@ namespace graph::node {
         engine::Engine* e = nullptr;
         std::vector<std::shared_ptr<texture::Texture>> input_textures;
         std::vector<std::shared_ptr<texture::Texture>> output_textures;
-        texture::Target* render_target = nullptr;
+		std::vector<std::vector<std::shared_ptr<sync::Semaphore>>> link_providers_frames_semaphores;
+		std::vector<std::map<core::Id, std::vector<std::shared_ptr<sync::Semaphore>>>> links_consumers_frames_semaphores;
+		/// These are for preventing redundant allocation&deallocation in render loop 
+		std::vector<sync::Semaphore*> pre_sems, nxt_sems;
+		std::shared_ptr<texture::Target> render_target = nullptr;
         std::shared_ptr<pipeline::Pipeline> render_pipeline = nullptr;
         Node(
             engine::Engine* e,
@@ -54,11 +59,11 @@ namespace graph::node {
 
     public:
         virtual ~Node() noexcept = default;
-        virtual void set_provider(unsigned int input_link_index, const std::shared_ptr<core::graph::Node>& o) noexcept override;
-        virtual void set_consumer(unsigned int output_link_index, const std::weak_ptr<core::graph::Node>& o) noexcept override;
+        virtual void set_provider(unsigned int input_link_index, const std::shared_ptr<core::graph::Node>& o, unsigned int provider_output_link_index) noexcept override;
+        virtual void set_consumer(unsigned int output_link_index, const std::shared_ptr<core::graph::Node>& o, unsigned int consumer_input_link_index) noexcept override;
         virtual void set_input_texture(const std::shared_ptr<texture::Texture>& t, unsigned int index) noexcept;
-        virtual void set_render_target(texture::Target* t) noexcept;
-        virtual const std::shared_ptr<sync::Semaphore>& get_semaphore(unsigned int frame_number) noexcept = 0;
+        virtual void set_render_target(const std::shared_ptr<texture::Target>& t) noexcept;
+        const std::vector<std::shared_ptr<sync::Semaphore>> get_link_frames_semaphore(unsigned int output_link_index, core::Id consumer_id) noexcept;
     };
 }
 }

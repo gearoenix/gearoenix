@@ -25,17 +25,16 @@ gearoenix::render::graph::node::Node::Node(
     }
 }
 
+void gearoenix::render::graph::node::Node::set_provider(const unsigned int input_link_index, const std::shared_ptr<core::graph::Node>& o, const unsigned int provider_output_link_index) noexcept {
+	Node::set_provider(input_link_index, o, provider_output_link_index);
+}
+
 void gearoenix::render::graph::node::Node::set_input_texture(const std::shared_ptr<texture::Texture>& t, const unsigned int index) noexcept
 {
     input_textures[index] = t;
 }
 
-void gearoenix::render::graph::node::Node::set_render_target(texture::Target* const t) noexcept
+void gearoenix::render::graph::node::Node::set_render_target(const std::shared_ptr<texture::Target>& t) noexcept
 {
     render_target = t;
-}
-
-void gearoenix::render::graph::node::Node::set_provider(unsigned int input_link_index,
-                                                        const std::shared_ptr<gearoenix::core::graph::Node> &o) noexcept {
-    Node::set_provider(input_link_index, o);
 }
