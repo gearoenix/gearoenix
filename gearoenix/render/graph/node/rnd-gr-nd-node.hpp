@@ -56,11 +56,13 @@ namespace graph::node {
             const std::vector<std::string>& input_links,
             const std::vector<std::string>& output_links,
             const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
-
+		void update_next_semaphores() noexcept;
+		void update_previous_semaphores() noexcept;
     public:
         virtual ~Node() noexcept = default;
         virtual void set_provider(unsigned int input_link_index, const std::shared_ptr<core::graph::Node>& o, unsigned int provider_output_link_index) noexcept override;
-        virtual void set_consumer(unsigned int output_link_index, const std::shared_ptr<core::graph::Node>& o, unsigned int consumer_input_link_index) noexcept override;
+		virtual void remove_provider(unsigned int input_link_index) noexcept override;
+		virtual void remove_cunsomer(unsigned int output_link_index, core::Id node_id) noexcept override;
         virtual void set_input_texture(const std::shared_ptr<texture::Texture>& t, unsigned int index) noexcept;
         virtual void set_render_target(const std::shared_ptr<texture::Target>& t) noexcept;
         const std::vector<std::shared_ptr<sync::Semaphore>> get_link_frames_semaphore(unsigned int output_link_index, core::Id consumer_id) noexcept;
