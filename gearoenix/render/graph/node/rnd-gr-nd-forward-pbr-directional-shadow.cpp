@@ -85,11 +85,6 @@ void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::set_brdflut(co
     set_input_texture(t, brdflut_index);
 }
 
-const std::shared_ptr<gearoenix::render::sync::Semaphore>& gearoenix::render::graph::node::ForwardPbrDirectionalShadow::get_semaphore(const unsigned int) noexcept
-{
-    GXUNEXPECTED
-}
-
 void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::update() noexcept
 {
     const unsigned int frame_number = e->get_frame_number();
@@ -136,24 +131,13 @@ void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::submit() noexc
 {
     const unsigned int frame_number = e->get_frame_number();
     command::Buffer* cmd = frame->primary_cmd.get();
-    cmd->bind(render_target);
+    cmd->bind(render_target.get());
     for (const std::shared_ptr<ForwardPbrDirectionalShadowKernel>& k : frame->kernels) {
         cmd->record(k->secondary_cmd.get());
     }
-    std::vector<sync::Semaphore*> pss;
-    for (const std::shared_ptr<core::graph::Node>& p : providers) {
-        if (p == nullptr)
-            continue;
-        const std::shared_ptr<Node>& rp = std::static_pointer_cast<Node>(p);
-        if (rp == nullptr)
-            continue;
-        const std::shared_ptr<sync::Semaphore>& ps = rp->get_semaphore(frame_number);
-        if (ps == nullptr)
-            continue;
-        pss.push_back(ps.get());
-    }
-    sync::Semaphore* nxt = frame->semaphore.get();
-    e->submit(pss.size(), pss.data(), 1, &cmd, 1, &nxt);
+    auto& pre = pre_sems[frame_number];
+    auto& nxt = nxt_sems[frame_number];
+    e->submit(pre.size(), pre.data(), 1, &cmd, nxt.size(), nxt.data());
 }
 
 gearoenix::render::graph::node::ForwardPbrDirectionalShadowFrame::ForwardPbrDirectionalShadowFrame(engine::Engine* e) noexcept

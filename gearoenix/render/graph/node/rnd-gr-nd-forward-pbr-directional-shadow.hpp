@@ -79,7 +79,6 @@ namespace graph::node {
         void set_shadow_mapper(const std::shared_ptr<texture::Texture2D>& t) noexcept;
         void set_brdflut(const std::shared_ptr<texture::Texture2D>& t) noexcept;
 
-        const std::shared_ptr<sync::Semaphore>& get_semaphore(unsigned int frame_number) noexcept final;
         /// This will be called at the start of each frame
         void update() noexcept;
         /// Multithreaded rendering happens in here

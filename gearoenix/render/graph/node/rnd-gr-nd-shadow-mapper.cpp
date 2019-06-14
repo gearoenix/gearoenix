@@ -36,7 +36,6 @@ gearoenix::render::graph::node::ShadowMapperKernel::ShadowMapperKernel(
 
 gearoenix::render::graph::node::ShadowMapperFrame::ShadowMapperFrame(engine::Engine* const e) noexcept
     : primary_cmd(e->get_command_manager()->create_primary_command_buffer())
-    , semaphore(e->create_semaphore())
 {
     const unsigned int kernels_count = e->get_kernels()->get_threads_count();
     kernels.resize(kernels_count);
@@ -56,19 +55,14 @@ gearoenix::render::graph::node::ShadowMapper::ShadowMapper(
     }
     const bool week_hwr = e->get_engine_type_id() == engine::Type::OPENGL_ES2;
     texture::SampleInfo s {};
-    render_target = e->create_render_target(
+    render_target = std::shared_ptr<texture::Target>(e->create_render_target(
         core::asset::Manager::create_id(),
         week_hwr ? texture::TextureFormat::R_FLOAT16 : texture::TextureFormat::R_FLOAT32,
         s,
         week_hwr ? 512 : 1024,
         week_hwr ? 512 : 1024,
-        call);
-    output_textures[0] = std::shared_ptr<texture::Texture>(static_cast<texture::Texture*>(render_target));
-}
-
-const std::shared_ptr<gearoenix::render::sync::Semaphore>& gearoenix::render::graph::node::ShadowMapper::get_semaphore(const unsigned int frame_number) noexcept
-{
-    return frames[frame_number]->semaphore;
+        call));
+    output_textures[0] = render_target;
 }
 
 void gearoenix::render::graph::node::ShadowMapper::update() noexcept
@@ -108,22 +102,11 @@ void gearoenix::render::graph::node::ShadowMapper::submit() noexcept
 {
     const unsigned int frame_number = e->get_frame_number();
     command::Buffer* cmd = frame->primary_cmd.get();
-    cmd->bind(render_target);
+    cmd->bind(render_target.get());
     for (const auto& k : frame->kernels) {
         cmd->record(k->secondary_cmd.get());
     }
-    std::vector<sync::Semaphore*> pss;
-    for (const std::shared_ptr<core::graph::Node>& p : providers) {
-        if (p == nullptr)
-            continue;
-        Node* const rp = dynamic_cast<Node*>(p.get());
-        if (rp == nullptr)
-            continue;
-        const std::shared_ptr<sync::Semaphore>& ps = rp->get_semaphore(frame_number);
-        if (ps == nullptr)
-            continue;
-        pss.push_back(ps.get());
-    }
-    sync::Semaphore* nxt = frame->semaphore.get();
-    e->submit(pss.size(), pss.data(), 1, &cmd, 1, &nxt);
+    auto& pre = pre_sems[frame_number];
+    auto& nxt = nxt_sems[frame_number];
+    e->submit(pre.size(), pre.data(), 1, &cmd, nxt.size(), nxt.data());
 }

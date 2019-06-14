@@ -9,6 +9,8 @@
 #include "../../physics/phs-engine.hpp"
 #include "../../system/sys-app.hpp"
 #include "../../system/sys-log.hpp"
+#include "../buffer/rnd-buf-manager.hpp"
+#include "../command/rnd-cmd-manager.hpp"
 #include "../graph/tree/rnd-gr-tr-pbr.hpp"
 #include "../pipeline/rnd-pip-manager.hpp"
 #include "../scene/rnd-scn-manager.hpp"
@@ -50,7 +52,7 @@ void gearoenix::render::engine::Engine::terminate() noexcept
     GXDELETE(physics_engine)
     GXDELETE(kernels)
     GXDELETE(render_tree)
-    GXDELETE(main_render_target)
+    main_render_target = nullptr;
     GXDELETE(pipeline_manager)
     GXDELETE(command_manager)
     GXDELETE(sampler_manager)
@@ -142,12 +144,7 @@ gearoenix::render::engine::Type::Id gearoenix::render::engine::Engine::get_engin
     return engine_type_id;
 }
 
-const gearoenix::render::texture::Target* gearoenix::render::engine::Engine::get_main_render_target() const noexcept
-{
-    return main_render_target;
-}
-
-gearoenix::render::texture::Target* gearoenix::render::engine::Engine::get_main_render_target() noexcept
+const std::shared_ptr<gearoenix::render::texture::Target>& gearoenix::render::engine::Engine::get_main_render_target() const noexcept
 {
     return main_render_target;
 }

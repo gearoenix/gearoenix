@@ -3,7 +3,6 @@
 #include "../../../core/cr-pool.hpp"
 #include "../../../core/sync/cr-sync-end-caller.hpp"
 #include "../../../math/math-matrix.hpp"
-#include "../../../math/math-vector.hpp"
 #include "rnd-gr-nd-node.hpp"
 #include <memory>
 #include <vector>
@@ -27,14 +26,10 @@ namespace model {
     class Mesh;
 }
 namespace pipeline {
-    class ShadowMapper;
     class ShadowMapperResourceSet;
 }
 namespace scene {
     class Scene;
-}
-namespace sync {
-    class Semaphore;
 }
 namespace texture {
     class Cube;
@@ -61,7 +56,6 @@ namespace graph::node {
 
     struct ShadowMapperFrame {
         std::shared_ptr<command::Buffer> primary_cmd = nullptr;
-        std::shared_ptr<sync::Semaphore> semaphore = nullptr;
         std::vector<std::shared_ptr<ShadowMapperKernel>> kernels;
         explicit ShadowMapperFrame(engine::Engine* e) noexcept;
     };
@@ -77,7 +71,6 @@ namespace graph::node {
     public:
         ShadowMapper(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
         ~ShadowMapper() noexcept final = default;
-        const std::shared_ptr<sync::Semaphore>& get_semaphore(unsigned int frame_number) noexcept final;
         /// This will be called at the start of each frame
         void update() noexcept;
         /// Multithreaded rendering happens in here

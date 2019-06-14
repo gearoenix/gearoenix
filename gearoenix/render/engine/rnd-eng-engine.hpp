@@ -76,7 +76,7 @@ namespace render {
             core::FunctionLoader* fun_loader = nullptr;
             physics::Engine* physics_engine = nullptr;
             core::sync::KernelWorker* kernels = nullptr;
-            texture::Target* main_render_target = nullptr;
+            std::shared_ptr<texture::Target> main_render_target = nullptr;
 
             pipeline::Manager* pipeline_manager = nullptr;
             command::Manager* command_manager = nullptr;
@@ -160,8 +160,7 @@ namespace render {
             const core::sync::KernelWorker* get_kernels() const noexcept;
             core::sync::KernelWorker* get_kernels() noexcept;
 
-            const texture::Target* get_main_render_target() const noexcept;
-            texture::Target* get_main_render_target() noexcept;
+            const std::shared_ptr<texture::Target>& get_main_render_target() const noexcept;
 
             Type::Id get_engine_type_id() const noexcept;
             unsigned int get_frame_number() const noexcept;

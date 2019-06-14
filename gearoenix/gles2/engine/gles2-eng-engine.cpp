@@ -42,7 +42,7 @@ std::shared_ptr<gearoenix::gles2::engine::Engine> gearoenix::gles2::engine::Engi
     e->pipeline_manager = new pipeline::Manager(e);
     e->buffer_manager = new buffer::Manager(e.get());
     e->command_manager = new command::Manager();
-    e->main_render_target = new texture::Target(e.get());
+    e->main_render_target = std::shared_ptr<render::texture::Target>(new texture::Target(e.get()));
     return e;
 }
 

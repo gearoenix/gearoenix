@@ -18,10 +18,10 @@ protected:
 
 public:
     virtual ~Node() noexcept = default;
-	virtual void set_provider(unsigned int input_link_index, const std::shared_ptr<Node>& o, unsigned int provider_output_link_index) noexcept;
-	virtual void remove_provider(unsigned int input_link_index) noexcept;
-	virtual void set_consumer(unsigned int output_link_index, const std::shared_ptr<Node>& o, unsigned int consumer_input_link_index) noexcept;
-	virtual void remove_cunsomer(unsigned int output_link_index, Id node_id) noexcept;
+    virtual void set_provider(unsigned int input_link_index, const std::shared_ptr<Node>& o, unsigned int provider_output_link_index) noexcept;
+    virtual void remove_provider(unsigned int input_link_index) noexcept;
+    virtual void set_consumer(unsigned int output_link_index, const std::shared_ptr<Node>& o, unsigned int consumer_input_link_index) noexcept;
+    virtual void remove_consumer(unsigned int output_link_index, Id node_id) noexcept;
     unsigned int get_input_link_index(const std::string& name, bool& exist) const noexcept;
     unsigned int get_output_link_index(const std::string& name, bool& exist) const noexcept;
     const std::vector<std::string> get_input_links_names() const noexcept;
