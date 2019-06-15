@@ -26,6 +26,8 @@ gearoenix::render::graph::node::Node::Node(
     }
     link_providers_frames_semaphores.resize(input_links.size());
     links_consumers_frames_semaphores.resize(output_links.size());
+	update_next_semaphores();
+	update_previous_semaphores();
 }
 
 void gearoenix::render::graph::node::Node::update_next_semaphores() noexcept
@@ -46,8 +48,11 @@ void gearoenix::render::graph::node::Node::update_previous_semaphores() noexcept
     pre_sems.resize(fc);
     for (int i = 0; i < fc; ++i) {
         auto& s = pre_sems[i];
-        for (auto& p : link_providers_frames_semaphores)
-            s.push_back(p[i].get());
+		for (auto& p : link_providers_frames_semaphores)
+		{
+			if (p.size() != fc) continue;
+			s.push_back(p[i].get());
+		}
     }
 }
 
