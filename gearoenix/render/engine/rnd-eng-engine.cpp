@@ -38,6 +38,7 @@ void gearoenix::render::engine::Engine::update() noexcept
     const std::chrono::duration<core::Real> delta_time_duration = now - last_frame_time;
     delta_time = delta_time_duration.count();
     last_frame_time = now;
+	/// TODO: When Vulkan implemented take care of frame_node and do the frame synchronization by it.
 
     ++frame_number;
     frame_number %= frames_count;
@@ -53,6 +54,7 @@ void gearoenix::render::engine::Engine::terminate() noexcept
     GXDELETE(kernels)
     GXDELETE(render_tree)
     main_render_target = nullptr;
+	frame_node = nullptr;
     GXDELETE(pipeline_manager)
     GXDELETE(command_manager)
     GXDELETE(sampler_manager)

@@ -37,8 +37,13 @@ namespace render {
         class Uniform;
         class Manager;
     }
-    namespace graph::tree {
-        class Tree;
+    namespace graph {
+		namespace node {
+			class Node;
+		}
+		namespace tree {
+			class Tree;
+		}
     }
     namespace pipeline {
         class Manager;
@@ -77,12 +82,13 @@ namespace render {
             physics::Engine* physics_engine = nullptr;
             core::sync::KernelWorker* kernels = nullptr;
             std::shared_ptr<texture::Target> main_render_target = nullptr;
+			std::shared_ptr<graph::node::Node> frame_node = nullptr;
 
             pipeline::Manager* pipeline_manager = nullptr;
             command::Manager* command_manager = nullptr;
             sampler::Manager* sampler_manager = nullptr;
             buffer::Manager* buffer_manager = nullptr;
-            /// It is not owned by engine and the user who has set this must delete it.
+            /// It is not owned by engine and the user who had set this, must delete it.
             /// In addition, this design is temporary and in next version of engine it is going to be changed.
             graph::tree::Tree* render_tree = nullptr;
 
