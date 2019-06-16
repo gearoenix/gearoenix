@@ -2,6 +2,8 @@
 #include "../../engine/rnd-eng-engine.hpp"
 #include "../../pipeline/rnd-pip-manager.hpp"
 #include "../../sync/rnd-sy-semaphore.hpp"
+#include "../../command/rnd-cmd-buffer.hpp"
+#include "../../command/rnd-cmd-manager.hpp"
 
 gearoenix::render::graph::node::Node::Node(
     engine::Engine* const e,
@@ -14,6 +16,8 @@ gearoenix::render::graph::node::Node::Node(
     : core::graph::Node(input_links, output_links)
     , e(e)
 {
+	const auto frames_count = e->get_frames_count();
+	const auto& cmd_mgr = e->get_command_manager();
     core::sync::EndCaller<pipeline::Pipeline> pipcall([call](std::shared_ptr<pipeline::Pipeline>) {});
     render_pipeline = e->get_pipeline_manager()->get(pipeline_type_id, pipcall);
     input_textures.resize(input_textures_count);
@@ -28,6 +32,9 @@ gearoenix::render::graph::node::Node::Node(
     links_consumers_frames_semaphores.resize(output_links.size());
 	update_next_semaphores();
 	update_previous_semaphores();
+	frames_primary_cmd.resize(frames_count);
+	for (auto &cmd: frames_primary_cmd)
+		cmd = std::shared_ptr<command::Buffer>(cmd_mgr->create_primary_command_buffer());
 }
 
 void gearoenix::render::graph::node::Node::update_next_semaphores() noexcept
@@ -86,6 +93,21 @@ void gearoenix::render::graph::node::Node::set_input_texture(const std::shared_p
 void gearoenix::render::graph::node::Node::set_render_target(const std::shared_ptr<texture::Target>& t) noexcept
 {
     render_target = t;
+}
+
+void gearoenix::render::graph::node::Node::update() noexcept
+{
+	const unsigned int frame_number = e->get_frame_number();
+	frames_primary_cmd[frame_number]->begin();
+}
+
+void gearoenix::render::graph::node::Node::submit() noexcept
+{
+	const unsigned int frame_number = e->get_frame_number();
+	auto& pre = pre_sems[frame_number];
+	auto& nxt = nxt_sems[frame_number];
+	command::Buffer* cmd = frames_primary_cmd[frame_number].get();
+	e->submit(pre.size(), pre.data(), 1, &cmd, nxt.size(), nxt.data());
 }
 
 const std::vector<std::shared_ptr<gearoenix::render::sync::Semaphore>> gearoenix::render::graph::node::Node::get_link_frames_semaphore(const unsigned int output_link_index, const core::Id consumer_id) noexcept

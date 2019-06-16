@@ -35,7 +35,6 @@ gearoenix::render::graph::node::ShadowMapperKernel::ShadowMapperKernel(
 }
 
 gearoenix::render::graph::node::ShadowMapperFrame::ShadowMapperFrame(engine::Engine* const e) noexcept
-    : primary_cmd(e->get_command_manager()->create_primary_command_buffer())
 {
     const unsigned int kernels_count = e->get_kernels()->get_threads_count();
     kernels.resize(kernels_count);
@@ -67,9 +66,9 @@ gearoenix::render::graph::node::ShadowMapper::ShadowMapper(
 
 void gearoenix::render::graph::node::ShadowMapper::update() noexcept
 {
+	Node::update();
     const unsigned int frame_number = e->get_frame_number();
     frame = frames[frame_number].get();
-    frame->primary_cmd->begin();
     for (const auto& kernel : frame->kernels) {
         kernel->render_data_pool.refresh();
         kernel->secondary_cmd->begin();
@@ -101,12 +100,10 @@ void gearoenix::render::graph::node::ShadowMapper::record(const math::Mat4x4& mv
 void gearoenix::render::graph::node::ShadowMapper::submit() noexcept
 {
     const unsigned int frame_number = e->get_frame_number();
-    command::Buffer* cmd = frame->primary_cmd.get();
+    command::Buffer* cmd = frames_primary_cmd[frame_number].get();
     cmd->bind(render_target.get());
     for (const auto& k : frame->kernels) {
         cmd->record(k->secondary_cmd.get());
     }
-    auto& pre = pre_sems[frame_number];
-    auto& nxt = nxt_sems[frame_number];
-    e->submit(pre.size(), pre.data(), 1, &cmd, nxt.size(), nxt.data());
+	Node::submit();
 }

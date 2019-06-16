@@ -55,7 +55,6 @@ namespace graph::node {
     };
 
     struct ShadowMapperFrame {
-        std::shared_ptr<command::Buffer> primary_cmd = nullptr;
         std::vector<std::shared_ptr<ShadowMapperKernel>> kernels;
         explicit ShadowMapperFrame(engine::Engine* e) noexcept;
     };
@@ -72,11 +71,11 @@ namespace graph::node {
         ShadowMapper(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
         ~ShadowMapper() noexcept final = default;
         /// This will be called at the start of each frame
-        void update() noexcept;
+        void update() noexcept final;
         /// Multithreaded rendering happens in here
         void record(const math::Mat4x4& mvp, model::Model* m, unsigned int kernel_index) noexcept;
         /// This will be called at the end of each frame for pushing jobs to GPU
-        void submit() noexcept;
+        void submit() noexcept final;
     };
 }
 }

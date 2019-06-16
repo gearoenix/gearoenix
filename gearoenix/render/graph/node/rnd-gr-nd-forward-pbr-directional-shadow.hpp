@@ -49,8 +49,6 @@ namespace graph::node {
     };
 
     struct ForwardPbrDirectionalShadowFrame {
-        std::shared_ptr<command::Buffer> primary_cmd = nullptr;
-        std::shared_ptr<sync::Semaphore> semaphore = nullptr;
         std::vector<std::shared_ptr<ForwardPbrDirectionalShadowKernel>> kernels;
         explicit ForwardPbrDirectionalShadowFrame(engine::Engine* e) noexcept;
     };
@@ -80,7 +78,7 @@ namespace graph::node {
         void set_brdflut(const std::shared_ptr<texture::Texture2D>& t) noexcept;
 
         /// This will be called at the start of each frame
-        void update() noexcept;
+        void update() noexcept final;
         /// Multithreaded rendering happens in here
         void record(
             const scene::Scene* s,
@@ -89,7 +87,7 @@ namespace graph::node {
             const model::Model* m,
             unsigned int kernel_index) noexcept;
         /// This will be called at the end of each frame for pushing jobs to GPU
-        void submit() noexcept;
+        void submit() noexcept final;
     };
 }
 }

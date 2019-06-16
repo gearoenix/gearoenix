@@ -87,9 +87,9 @@ void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::set_brdflut(co
 
 void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::update() noexcept
 {
+	Node::update();
     const unsigned int frame_number = e->get_frame_number();
     frame = frames[frame_number].get();
-    frame->primary_cmd->begin();
     for (const std::shared_ptr<ForwardPbrDirectionalShadowKernel>& kernel : frame->kernels) {
         kernel->render_data_pool.refresh();
         kernel->secondary_cmd->begin();
@@ -130,19 +130,15 @@ void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::record(
 void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::submit() noexcept
 {
     const unsigned int frame_number = e->get_frame_number();
-    command::Buffer* cmd = frame->primary_cmd.get();
+    command::Buffer* cmd = frames_primary_cmd[frame_number].get();
     cmd->bind(render_target.get());
     for (const std::shared_ptr<ForwardPbrDirectionalShadowKernel>& k : frame->kernels) {
         cmd->record(k->secondary_cmd.get());
     }
-    auto& pre = pre_sems[frame_number];
-    auto& nxt = nxt_sems[frame_number];
-    e->submit(pre.size(), pre.data(), 1, &cmd, nxt.size(), nxt.data());
+	Node::submit();
 }
 
 gearoenix::render::graph::node::ForwardPbrDirectionalShadowFrame::ForwardPbrDirectionalShadowFrame(engine::Engine* e) noexcept
-    : primary_cmd(e->get_command_manager()->create_primary_command_buffer())
-    , semaphore(e->create_semaphore())
 {
     const unsigned int kernels_count = e->get_kernels()->get_threads_count();
     kernels.resize(kernels_count);
