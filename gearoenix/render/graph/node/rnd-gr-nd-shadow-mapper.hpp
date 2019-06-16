@@ -1,5 +1,5 @@
-#ifndef GEAROENIX_RENDER_GRAPH_NODE_FORWARD_PBR_DIRECTIONAL_SHADOW_HPP
-#define GEAROENIX_RENDER_GRAPH_NODE_FORWARD_PBR_DIRECTIONAL_SHADOW_HPP
+#ifndef GEAROENIX_RENDER_GRAPH_NODE_SHADOW_MAPPER_HPP
+#define GEAROENIX_RENDER_GRAPH_NODE_SHADOW_MAPPER_HPP
 #include "../../../core/cr-pool.hpp"
 #include "../../../core/sync/cr-sync-end-caller.hpp"
 #include "../../../math/math-matrix.hpp"

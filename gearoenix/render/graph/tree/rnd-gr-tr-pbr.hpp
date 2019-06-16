@@ -18,8 +18,7 @@ namespace tree {
         // std::shared_ptr<node::SahdowAccumulatorCone> shdacmcone = nullptr;
         // std::shared_ptr<node::SahdowAccumulatorDirectional> shdacmdir = nullptr;
         // std::shared_ptr<node::SahdowAccumulatorPoint> shdacmpnt = nullptr;
-        /// TODO: In future, this should become several for each light frustum
-        //std::shared_ptr<node::ShadowMapper> shdmap = nullptr;
+        std::shared_ptr<node::ShadowMapper> shdmaps[6];
     public:
         Pbr(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
         void update() noexcept final;

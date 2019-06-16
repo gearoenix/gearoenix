@@ -8,6 +8,7 @@
 #include "../../scene/rnd-scn-manager.hpp"
 #include "../../scene/rnd-scn-scene.hpp"
 #include "../node/rnd-gr-nd-forward-pbr-directional-shadow.hpp"
+#include "../node/rnd-gr-nd-shadow-mapper.hpp"
 #include <memory>
 
 gearoenix::render::graph::tree::Pbr::Pbr(engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
@@ -16,10 +17,12 @@ gearoenix::render::graph::tree::Pbr::Pbr(engine::Engine* const e, const core::sy
 {
     fwddirshd = std::make_shared<node::ForwardPbrDirectionalShadow>(e, call);
     fwddirshd->set_render_target(e->get_main_render_target());
+	for (auto& sm : shdmaps) sm = std::make_shared<node::ShadowMapper>(e, call);
 }
 
 void gearoenix::render::graph::tree::Pbr::update() noexcept
 {
+	for (auto& sm : shdmaps) sm->update();
     fwddirshd->update();
 }
 
@@ -36,10 +39,11 @@ void gearoenix::render::graph::tree::Pbr::record(const unsigned int kernel_index
     task_number = (task_number + 1) % kernels_count
     for (const auto& scene_camera : visible_models) {
         const scene::Scene* scn = scene_camera.first;
-        const std::map<core::Id, std::shared_ptr<light::Light>> lights = scn->get_lights();
+		const std::map<core::Id, std::shared_ptr<light::Light>> lights = scn->get_lights();
         for (const auto& camera_models : scene_camera.second) {
             const camera::Camera* const cam = camera_models.first;
             const auto& models = camera_models.second.first;
+			const auto& cascades_info = camera_models.second.second;
             for (const std::pair<const core::Id, std::shared_ptr<light::Light>>& id_light : lights) {
                 if (!id_light.second->is_shadower())
                     continue;
@@ -61,5 +65,6 @@ void gearoenix::render::graph::tree::Pbr::record(const unsigned int kernel_index
 
 void gearoenix::render::graph::tree::Pbr::submit() noexcept
 {
+	for (auto& sm : shdmaps) sm->submit();
     fwddirshd->submit();
 }
