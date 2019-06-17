@@ -18,8 +18,8 @@ namespace light {
         core::Real strength = 1.0f;
         math::Vec3 direction = math::Vec3(0.0f, 0.0f, -1.0f);
         core::Real reserved_1 = 0.0f;
-        math::Vec4 vps[GX_SHADOW_MAX_CASCADES_COUNT];
-        math::Vec4 vpbs[GX_SHADOW_MAX_CASCADES_COUNT];
+        math::Vec4 vps[GX_MAX_SHADOW_CASCADES];
+        math::Vec4 vpbs[GX_MAX_SHADOW_CASCADES];
     };
 
     class CascadeInfo;

@@ -10,81 +10,56 @@
 #include "../buffer/rnd-buf-uniform.hpp"
 #include "../command/rnd-cmd-buffer.hpp"
 #include "../command/rnd-cmd-manager.hpp"
+#include "../graph/node/rnd-gr-nd-shadow-mapper.hpp"
 #include "../engine/rnd-eng-engine.hpp"
 #include "../model/rnd-mdl-model.hpp"
 #include "../sync/rnd-sy-semaphore.hpp"
 #include <limits>
 
-struct MathCascadeInfo {
-    const gearoenix::math::Mat4x4* zero_located_view = nullptr;
-    const gearoenix::core::OneLoopPool<gearoenix::math::Aabb3>* limit_boxes = nullptr;
-    const std::vector<gearoenix::math::Mat4x4>* vps = nullptr;
-    gearoenix::core::OneLoopPool<gearoenix::math::Aabb3> seen_boxes;
+struct FramePerCascadeInfo {
+	gearoenix::math::Mat4x4 view_projection;
+	gearoenix::math::Aabb3 limit_box;
+	gearoenix::math::Aabb3 max_box;
+	gearoenix::math::Aabb3 intersection_box;
 };
 
 struct KernelRenderCascadeInfo {
-    gearoenix::render::buffer::Uniform* uniform = nullptr;
     std::size_t cascade_index = static_cast<std::size_t>(-1);
     /// It is not owner of model
     const gearoenix::render::model::Model* m = nullptr;
-
-    explicit KernelRenderCascadeInfo(gearoenix::render::engine::Engine* const e) noexcept
-        : uniform(e->get_buffer_manager()->create_uniform(sizeof(gearoenix::math::Mat4x4)))
-    {
-    }
-
-    ~KernelRenderCascadeInfo() noexcept
-    {
-        delete uniform;
-        uniform = nullptr;
-        cascade_index = static_cast<std::size_t>(-1);
-        m = nullptr;
-    }
 };
 
 struct KernelCascadeInfo {
-    gearoenix::render::engine::Engine* const e;
-    const std::size_t kernel_index;
-    MathCascadeInfo math_info;
-    gearoenix::core::OneLoopPool<gearoenix::render::command::Buffer> shadow_mapper_secondary_commands;
-    gearoenix::core::OneLoopPool<KernelRenderCascadeInfo> render_data_pool;
-
-    explicit KernelCascadeInfo(gearoenix::render::engine::Engine* const e, std::size_t kernel_index) noexcept
-        : e(e)
-        , kernel_index(kernel_index)
-    {
-    }
+	const gearoenix::math::Mat4x4 *zero_located_view;
+	const std::vector<FramePerCascadeInfo>* per_cascade = nullptr;
+	/// Per cascade
+	std::vector<gearoenix::math::Aabb3> seen_boxes;
+    std::vector<KernelRenderCascadeInfo> render_data_pool;
 
     void shadow(const gearoenix::render::model::Model* m) noexcept
     {
         const gearoenix::math::Sphere& ms = m->get_occlusion_sphere();
-        const gearoenix::math::Sphere s((*math_info.zero_located_view) * ms.position, ms.radius);
-        const auto& limit_boxes = *(math_info.limit_boxes);
-        auto& seen_boxes = math_info.seen_boxes;
-        const std::size_t cascades_count = limit_boxes.size();
+        const gearoenix::math::Sphere s((*zero_located_view) * ms.position, ms.radius);
+        const std::size_t cascades_count = seen_boxes.size();
         for (std::size_t i = 0; i < cascades_count; ++i) {
-            if (limit_boxes[i].test(s)) {
+            if ((*per_cascade)[i].limit_box.test(s)) {
                 seen_boxes[i].put(s);
-                auto* r = render_data_pool.get_next([this] {
-                    return new KernelRenderCascadeInfo(e);
-                });
-                r->cascade_index = i;
-                r->m = m;
+				KernelRenderCascadeInfo r;
+                r.cascade_index = i;
+                r.m = m;
+				render_data_pool.push_back(r);
             }
         }
     }
 };
 
 struct FrameCascadeInfo {
-    gearoenix::math::Mat4x4 zero_located_view;
-    std::vector<KernelCascadeInfo*> kernels;
     gearoenix::render::engine::Engine* const e;
-    /// For each cascades
-    std::vector<gearoenix::math::Mat4x4> vps;
-    gearoenix::core::OneLoopPool<gearoenix::math::Aabb3> limit_boxes;
-    gearoenix::core::OneLoopPool<gearoenix::render::command::Buffer> shadow_mapper_primary_commands;
-    gearoenix::render::sync::Semaphore* shadow_mappers_semaphore = nullptr;
+    gearoenix::math::Mat4x4 zero_located_view;
+    std::vector<KernelCascadeInfo> kernels;
+    std::vector<FramePerCascadeInfo> per_cascade;
     /// Accumulate shadow
+    /// TODO: place then in a new node structure
     gearoenix::render::command::Buffer* shadow_accumulator_secondary_command = nullptr;
     gearoenix::render::command::Buffer* shadow_accumulator_primary_command = nullptr;
     gearoenix::render::sync::Semaphore* shadow_accumulator_semaphore = nullptr;
@@ -92,28 +67,18 @@ struct FrameCascadeInfo {
     explicit FrameCascadeInfo(gearoenix::render::engine::Engine* e) noexcept
         : kernels(static_cast<std::size_t>(e->get_kernels()->get_threads_count()))
         , e(e)
-        , shadow_mappers_semaphore(e->create_semaphore())
         , shadow_accumulator_secondary_command(e->get_command_manager()->create_secondary_command_buffer())
         , shadow_accumulator_primary_command(e->get_command_manager()->create_primary_command_buffer())
         , shadow_accumulator_semaphore(e->create_semaphore())
     {
-        for (std::size_t i = 0; i < kernels.size(); ++i) {
-            auto k = new KernelCascadeInfo(e, i);
-            kernels[i] = k;
-            auto& math_info = k->math_info;
-            math_info.limit_boxes = &limit_boxes;
-            math_info.zero_located_view = &zero_located_view;
-            math_info.vps = &vps;
+        for (auto &k: kernels) {
+			k.per_cascade = &per_cascade;
+			k.zero_located_view = &zero_located_view;
         }
     }
 
     ~FrameCascadeInfo() noexcept
     {
-        for (KernelCascadeInfo* k : kernels)
-            delete k;
-        kernels.clear();
-        delete shadow_mappers_semaphore;
-        shadow_mappers_semaphore = nullptr;
         delete shadow_accumulator_secondary_command;
         shadow_accumulator_secondary_command = nullptr;
         delete shadow_accumulator_primary_command;
@@ -129,82 +94,80 @@ struct FrameCascadeInfo {
 
     void set_frustum_partitions(const std::vector<std::array<gearoenix::math::Vec3, 4>>& p) noexcept
     {
-        const auto& m = *(kernels[0]->math_info.zero_located_view);
         const std::size_t s = p.size();
         const std::size_t ss = s - 1;
         const std::size_t sss = ss - 1;
         /// This provide the ability to have cameras with different cascaded shadow mapping partitions count
         /// And re-configurable render engine (in runtime cascaded-shadow-partitions-count can be changed.)
-        limit_boxes.refresh();
-        shadow_mapper_primary_commands.refresh();
-        for (auto* k : kernels) {
-            k->render_data_pool.refresh();
-            k->shadow_mapper_secondary_commands.refresh();
-            k->math_info.seen_boxes.refresh();
-        }
+		if (ss != per_cascade.size()) 
+		{
+			per_cascade.resize(ss);
+			for (auto& k : kernels)
+			{
+				k.seen_boxes.resize(ss);
+			}
+		}
+		for (auto& c : per_cascade) 
+		{
+			c.intersection_box.reset();
+			c.limit_box.reset();
+			c.max_box.reset();
+		}
+		for (auto& k : kernels)
+		{
+			auto &seen_boxes = k.seen_boxes;
+			for (auto& s : seen_boxes)
+			{
+				s.reset();
+			}
+			k.render_data_pool.clear();
+		}
         gearoenix::render::command::Manager* cmdmgr = e->get_command_manager();
-        for (std::size_t i = 0; i < ss; ++i) {
-            limit_boxes.get_next([] { return new gearoenix::math::Aabb3; })->reset();
-            shadow_mapper_primary_commands.get_next([cmdmgr] { return cmdmgr->create_primary_command_buffer(); });
-            for (auto* k : kernels) {
-                k->shadow_mapper_secondary_commands.get_next([cmdmgr, k] { return cmdmgr->create_secondary_command_buffer(k->kernel_index); });
-                k->math_info.seen_boxes.get_next([] { return new gearoenix::math::Aabb3; })->reset();
-            }
-        }
         for (const auto& v : p[0]) {
-            limit_boxes[0].put(m * v);
+            per_cascade[0].limit_box.put(zero_located_view * v);
         }
         for (std::size_t i = 1, j = 0; i < ss; ++i, ++j) {
             for (const auto& v : p[i]) {
-                const auto vv = m * v;
-                limit_boxes[i].put(vv);
-                limit_boxes[j].put(vv);
+                const auto vv = zero_located_view * v;
+				per_cascade[i].limit_box.put(vv);
+				per_cascade[j].limit_box.put(vv);
             }
         }
         for (const auto& v : p[ss]) {
-            limit_boxes[sss].put(m * v);
+			per_cascade[sss].limit_box.put(zero_located_view * v);
         }
-        for (auto& l : limit_boxes) {
-            gearoenix::math::Vec3 v = l.mx;
+        for (auto& p : per_cascade) {
+            gearoenix::math::Vec3 v = p.limit_box.mx;
             v[2] = -std::numeric_limits<gearoenix::core::Real>::max();
-            l.put(v);
+			p.limit_box.put(v);
         }
     }
 
     void start() noexcept
     {
-        for (auto* k : kernels)
-            for (gearoenix::render::command::Buffer& c : k->shadow_mapper_secondary_commands)
-                c.begin();
-        for (gearoenix::render::command::Buffer& c : shadow_mapper_primary_commands)
-            c.begin();
+		/// TODO: these must move to new node structure for shadow accumulation
         shadow_accumulator_secondary_command->begin();
         shadow_accumulator_primary_command->begin();
     }
 
     void shadow(const gearoenix::render::model::Model* m, const std::size_t kernel_index) noexcept
     {
-        kernels[kernel_index]->shadow(m);
+        kernels[kernel_index].shadow(m);
     }
 
     void shrink() noexcept
     {
-        const auto cc = limit_boxes.size();
-        auto mxs = new gearoenix::math::Aabb3[cc];
-        auto ins = new gearoenix::math::Aabb3[cc];
+        const auto cc = per_cascade.size();
         for (auto k : kernels) {
-            auto& seen = k->math_info.seen_boxes;
+            auto& seen = k.seen_boxes;
             for (std::size_t i = 0; i < cc; ++i) {
-                mxs[i].put(seen[i]);
+                per_cascade[i].max_box.put(seen[i]);
             }
         }
-        for (std::size_t i = 0; i < cc; ++i) {
-            mxs[i].test(limit_boxes[i], ins[i]);
-        }
-        vps.clear();
-        for (std::size_t i = 0; i < cc; ++i) {
-            const auto& mx = ins[i].mx;
-            const auto& mn = ins[i].mn;
+        for (auto &cas: per_cascade) {
+			cas.max_box.test(cas.limit_box, cas.intersection_box);
+            const auto& mx = cas.intersection_box.mx;
+            const auto& mn = cas.intersection_box.mn;
             const auto c = (mx + mn) * 0.5f;
             const auto d = mx - mn;
             const auto w = d[0] * 0.51f;
@@ -214,10 +177,8 @@ struct FrameCascadeInfo {
             const auto f = depth * 1.03;
             const auto p = gearoenix::math::Mat4x4::orthographic(w, h, n, f);
             const auto t = gearoenix::math::Mat4x4::translator(-gearoenix::math::Vec3(c.xy(), mx[2] + (n * 2.0f)));
-            vps.push_back(p * t * zero_located_view);
+            cas.view_projection = p * t * zero_located_view;
         }
-        delete[] ins;
-        delete[] mxs;
     }
 };
 
@@ -225,8 +186,14 @@ gearoenix::render::light::CascadeInfo::CascadeInfo(engine::Engine* const e) noex
     : e(e)
     , frames(static_cast<std::size_t>(e->get_frames_count()))
 {
+	const core::sync::EndCaller<core::sync::EndCallerIgnore> call([] {});
+	const auto cascades_count = e->get_system_application()->get_configuration().render_config.shadow_cascades_count;
     for (FrameCascadeInfo*& frame : frames)
         frame = new FrameCascadeInfo(e);
+	for (auto i = 0; i < cascades_count; ++i)
+		shadow_mappers.get_next([e, call] {
+			return new graph::node::ShadowMapper(e, call);
+		});
 }
 
 gearoenix::render::light::CascadeInfo::~CascadeInfo() noexcept
@@ -245,6 +212,10 @@ void gearoenix::render::light::CascadeInfo::update(const math::Mat4x4& m, const 
 
 void gearoenix::render::light::CascadeInfo::start() noexcept
 {
+	const auto cc = current_frame->per_cascade.size();
+	shadow_mappers.refresh();
+	for(auto i = 0; i < cc; ++i)
+		shadow_mappers.get_next([this] { return new graph::node::ShadowMapper(e, core::sync::EndCaller<core::sync::EndCallerIgnore>([] {})); })->update();
     current_frame->start();
 }
 
@@ -256,4 +227,13 @@ void gearoenix::render::light::CascadeInfo::shadow(const model::Model* m, const 
 void gearoenix::render::light::CascadeInfo::shrink() noexcept
 {
     current_frame->shrink();
+}
+
+void gearoenix::render::light::CascadeInfo::record(std::size_t kernel_index) noexcept
+{
+
+}
+
+void gearoenix::render::light::CascadeInfo::submit() noexcept
+{
 }

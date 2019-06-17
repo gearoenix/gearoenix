@@ -5,7 +5,6 @@
 namespace gearoenix::render::graph {
 namespace node {
     class ForwardPbrDirectionalShadow;
-    class ShadowMapper;
 }
 namespace tree {
     class Pbr : public Tree {
@@ -18,7 +17,6 @@ namespace tree {
         // std::shared_ptr<node::SahdowAccumulatorCone> shdacmcone = nullptr;
         // std::shared_ptr<node::SahdowAccumulatorDirectional> shdacmdir = nullptr;
         // std::shared_ptr<node::SahdowAccumulatorPoint> shdacmpnt = nullptr;
-        std::shared_ptr<node::ShadowMapper> shdmaps[6];
     public:
         Pbr(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
         void update() noexcept final;

@@ -1,5 +1,6 @@
 #ifndef GEAROENIX_RENDER_LIGHT_CASCADE_INFO_HPP
 #define GEAROENIX_RENDER_LIGHT_CASCADE_INFO_HPP
+#include "../../core/cr-pool.hpp"
 #include "../../math/math-vector.hpp"
 #include <array>
 #include <vector>
@@ -12,6 +13,9 @@ namespace engine {
 }
 namespace model {
     class Model;
+}
+namespace graph::node {
+	class ShadowMapper;
 }
 namespace sync {
     class Semaphore;
@@ -29,6 +33,8 @@ namespace light {
         /// It is now owner of engine
         engine::Engine* const e;
         std::vector<FrameCascadeInfo*> frames;
+		/// Per cascade
+		core::OneLoopPool<graph::node::ShadowMapper> shadow_mappers;
         FrameCascadeInfo* current_frame = nullptr;
 
     public:

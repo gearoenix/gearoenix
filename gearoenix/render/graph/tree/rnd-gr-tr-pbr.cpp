@@ -5,10 +5,10 @@
 #include "../../../system/sys-app.hpp"
 #include "../../engine/rnd-eng-engine.hpp"
 #include "../../light/rnd-lt-directional.hpp"
+#include "../../light/rnd-lt-cascade-info.hpp"
 #include "../../scene/rnd-scn-manager.hpp"
 #include "../../scene/rnd-scn-scene.hpp"
 #include "../node/rnd-gr-nd-forward-pbr-directional-shadow.hpp"
-#include "../node/rnd-gr-nd-shadow-mapper.hpp"
 #include <memory>
 
 gearoenix::render::graph::tree::Pbr::Pbr(engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
@@ -17,12 +17,10 @@ gearoenix::render::graph::tree::Pbr::Pbr(engine::Engine* const e, const core::sy
 {
     fwddirshd = std::make_shared<node::ForwardPbrDirectionalShadow>(e, call);
     fwddirshd->set_render_target(e->get_main_render_target());
-	for (auto& sm : shdmaps) sm = std::make_shared<node::ShadowMapper>(e, call);
 }
 
 void gearoenix::render::graph::tree::Pbr::update() noexcept
 {
-	for (auto& sm : shdmaps) sm->update();
     fwddirshd->update();
 }
 
@@ -43,7 +41,9 @@ void gearoenix::render::graph::tree::Pbr::record(const unsigned int kernel_index
         for (const auto& camera_models : scene_camera.second) {
             const camera::Camera* const cam = camera_models.first;
             const auto& models = camera_models.second.first;
-			const auto& cascades_info = camera_models.second.second;
+			const auto& lights_cascades_info = camera_models.second.second;
+			for (const auto& light_cascades_info : lights_cascades_info)
+				light_cascades_info.second->record(kernel_index);
             for (const std::pair<const core::Id, std::shared_ptr<light::Light>>& id_light : lights) {
                 if (!id_light.second->is_shadower())
                     continue;
@@ -65,6 +65,15 @@ void gearoenix::render::graph::tree::Pbr::record(const unsigned int kernel_index
 
 void gearoenix::render::graph::tree::Pbr::submit() noexcept
 {
-	for (auto& sm : shdmaps) sm->submit();
+	const auto& visible_models = e->get_physics_engine()->get_visible_models();
+	for (const auto& scene_camera : visible_models) {
+		const auto& cameras_data = scene_camera.second;
+		for (const auto& camera_data : cameras_data) {
+			const auto& lights_cascades_info = camera_data.second.second;
+			for (const auto& light_cascades_info : lights_cascades_info) {
+				light_cascades_info.second->submit();
+			}
+		}
+	}
     fwddirshd->submit();
 }
