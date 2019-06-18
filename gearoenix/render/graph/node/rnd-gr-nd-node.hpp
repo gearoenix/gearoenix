@@ -23,9 +23,9 @@
 /// This system can be used to push independent commands on separate queue
 
 namespace gearoenix::render {
-	namespace command {
-		class Buffer;
-	}
+namespace command {
+    class Buffer;
+}
 namespace engine {
     class Engine;
 }
@@ -47,7 +47,7 @@ namespace graph::node {
         std::vector<std::shared_ptr<texture::Texture>> output_textures;
         std::vector<std::vector<std::shared_ptr<sync::Semaphore>>> link_providers_frames_semaphores;
         std::vector<std::map<core::Id, std::vector<std::shared_ptr<sync::Semaphore>>>> links_consumers_frames_semaphores;
-		std::vector<std::shared_ptr<command::Buffer>> frames_primary_cmd;
+        std::vector<std::shared_ptr<command::Buffer>> frames_primary_cmd;
         /// These are for preventing redundant allocation&deallocation in render loop
         std::vector<std::vector<sync::Semaphore*>> pre_sems, nxt_sems;
         std::shared_ptr<texture::Target> render_target = nullptr;
@@ -70,8 +70,8 @@ namespace graph::node {
         void remove_consumer(unsigned int output_link_index, core::Id node_id) noexcept final;
         virtual void set_input_texture(const std::shared_ptr<texture::Texture>& t, unsigned int index) noexcept;
         virtual void set_render_target(const std::shared_ptr<texture::Target>& t) noexcept;
-		virtual void update() noexcept;
-		virtual void submit() noexcept;
+        virtual void update() noexcept;
+        virtual void submit() noexcept;
         const std::vector<std::shared_ptr<sync::Semaphore>> get_link_frames_semaphore(unsigned int output_link_index, core::Id consumer_id) noexcept;
     };
 }

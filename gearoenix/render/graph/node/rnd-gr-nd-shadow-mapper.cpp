@@ -66,7 +66,7 @@ gearoenix::render::graph::node::ShadowMapper::ShadowMapper(
 
 void gearoenix::render::graph::node::ShadowMapper::update() noexcept
 {
-	Node::update();
+    Node::update();
     const unsigned int frame_number = e->get_frame_number();
     frame = frames[frame_number].get();
     for (const auto& kernel : frame->kernels) {
@@ -105,5 +105,5 @@ void gearoenix::render::graph::node::ShadowMapper::submit() noexcept
     for (const auto& k : frame->kernels) {
         cmd->record(k->secondary_cmd.get());
     }
-	Node::submit();
+    Node::submit();
 }

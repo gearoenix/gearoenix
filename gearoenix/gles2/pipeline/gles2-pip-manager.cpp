@@ -20,9 +20,9 @@ std::shared_ptr<gearoenix::render::pipeline::Pipeline> gearoenix::gles2::pipelin
         case render::pipeline::Type::ForwardPbrDirectionalShadow:
             return std::shared_ptr<render::pipeline::Pipeline>(new ForwardPbrDirectionalShadow(gles2eng,
                 core::sync::EndCaller<core::sync::EndCallerIgnore>([end] {})));
-		case render::pipeline::Type::ShadowMapper:
-			return std::shared_ptr<render::pipeline::Pipeline>(new ShadowMapper(gles2eng,
-				core::sync::EndCaller<core::sync::EndCallerIgnore>([end] {})));
+        case render::pipeline::Type::ShadowMapper:
+            return std::shared_ptr<render::pipeline::Pipeline>(new ShadowMapper(gles2eng,
+                core::sync::EndCaller<core::sync::EndCallerIgnore>([end] {})));
         default:
             GXLOGF("Unexpected pipeline type: " << pipeline_type_id);
             break;

@@ -87,7 +87,7 @@ void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::set_brdflut(co
 
 void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::update() noexcept
 {
-	Node::update();
+    Node::update();
     const unsigned int frame_number = e->get_frame_number();
     frame = frames[frame_number].get();
     for (const std::shared_ptr<ForwardPbrDirectionalShadowKernel>& kernel : frame->kernels) {
@@ -135,7 +135,7 @@ void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::submit() noexc
     for (const std::shared_ptr<ForwardPbrDirectionalShadowKernel>& k : frame->kernels) {
         cmd->record(k->secondary_cmd.get());
     }
-	Node::submit();
+    Node::submit();
 }
 
 gearoenix::render::graph::node::ForwardPbrDirectionalShadowFrame::ForwardPbrDirectionalShadowFrame(engine::Engine* e) noexcept
