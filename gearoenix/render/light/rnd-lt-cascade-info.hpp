@@ -2,12 +2,16 @@
 #define GEAROENIX_RENDER_LIGHT_CASCADE_INFO_HPP
 #include "../../core/cr-pool.hpp"
 #include "../../math/math-vector.hpp"
+#include "../../math/math-aabb.hpp"
+#include "../../math/math-matrix.hpp"
 #include <array>
 #include <vector>
-
-struct FrameCascadeInfo;
+#include <memory>
 
 namespace gearoenix::render {
+namespace command {
+	class Buffer;
+}
 namespace engine {
     class Engine;
 }
@@ -29,17 +33,53 @@ namespace light {
     ///     - record (in kernels)
     ///     - submit (in main)
     class CascadeInfo {
-    private:
-        /// It is now owner of engine
+	private:
+		struct RenderData {
+			/// Cascade index
+			std::size_t i = static_cast<std::size_t>(-1);
+			/// It is not owner of model
+			const model::Model * m = nullptr;
+		};
+		struct PerCascade {
+			math::Mat4x4 view_projection;
+			math::Aabb3 limit_box;
+			math::Aabb3 max_box;
+			math::Aabb3 intersection_box;
+			std::unique_ptr<graph::node::ShadowMapper> shadow_mapper = nullptr;
+
+			PerCascade(engine::Engine* e) noexcept;
+		};
+		struct PerKernel {
+			const math::Mat4x4* zero_located_view = nullptr;
+			const core::OneLoopPool<PerCascade>* per_cascade = nullptr;
+			std::vector<RenderData> render_data;
+			/// Per cascade
+			std::vector<math::Aabb3> seen_boxes;
+			void shadow(const model::Model* m) noexcept;
+			void record(std::size_t kernel_index) noexcept;
+		};
+		struct PerFrame {
+			/// Accumulate shadow
+			/// TODO: place then in a new node structure
+			std::unique_ptr<command::Buffer> shadow_accumulator_secondary_command = nullptr;
+			std::unique_ptr<command::Buffer> shadow_accumulator_primary_command = nullptr;
+			std::unique_ptr<sync::Semaphore> shadow_accumulator_semaphore = nullptr;
+
+			void init(engine::Engine* e);
+			void start() noexcept;
+		};
         engine::Engine* const e;
-        std::vector<FrameCascadeInfo*> frames;
+
+		math::Mat4x4 zero_located_view;
+		std::vector<PerKernel> kernels;
+        /// It is now owner of engine
+        std::vector<PerFrame> frames;
 		/// Per cascade
-		core::OneLoopPool<graph::node::ShadowMapper> shadow_mappers;
-        FrameCascadeInfo* current_frame = nullptr;
+		core::OneLoopPool<PerCascade> per_cascade;
+        PerFrame* current_frame = nullptr;
 
     public:
         explicit CascadeInfo(engine::Engine* e) noexcept;
-        ~CascadeInfo() noexcept;
 
         void update(const math::Mat4x4& m, const std::vector<std::array<math::Vec3, 4>>& p) noexcept;
 
