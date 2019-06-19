@@ -27,22 +27,22 @@ void gearoenix::core::graph::Node::remove_provider(const unsigned int input_link
         return;
     const unsigned int l = p.second;
     p = std::make_pair(nullptr, 0);
-    ptr->remove_consumer(l, asset_id);
+    ptr->remove_consumer(l, asset_id, input_link_index);
 }
 
 void gearoenix::core::graph::Node::set_consumer(const unsigned int output_link_index, const std::shared_ptr<Node>& o, const unsigned int consumer_input_link_index) noexcept
 {
-    output_links_consumers_links[output_link_index][o->get_asset_id()] = std::make_pair(o, consumer_input_link_index);
+    output_links_consumers_links[output_link_index][std::make_pair(o->get_asset_id(), consumer_input_link_index)] = o;
 }
 
-void gearoenix::core::graph::Node::remove_consumer(const unsigned int output_link_index, const Id node_id) noexcept
+void gearoenix::core::graph::Node::remove_consumer(const unsigned int output_link_index, const Id node_id, const unsigned int consumer_input_link_index) noexcept
 {
     auto& m = output_links_consumers_links[output_link_index];
-    auto search = m.find(node_id);
+    auto search = m.find(std::make_pair(node_id, consumer_input_link_index));
     if (search == m.end())
         return;
-    const std::shared_ptr<Node> ptr = search->second.first.lock();
-    const unsigned int l = search->second.second;
+    const std::shared_ptr<Node> ptr = search->second.lock();
+    const unsigned int l = search->first.second;
     m.erase(search);
     ptr->remove_provider(l);
 }
@@ -85,4 +85,10 @@ const std::vector<std::string> gearoenix::core::graph::Node::get_output_links_na
         result.push_back(p.first);
     }
     return result;
+}
+
+void gearoenix::core::graph::Node::connect(const std::shared_ptr<Node>& p, const unsigned int po, const std::shared_ptr<Node>&c, const unsigned int ci) noexcept
+{
+	p->set_consumer(po, c, ci);
+	c->set_provider(ci, p, po);
 }

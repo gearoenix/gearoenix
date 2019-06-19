@@ -65,8 +65,12 @@ void gearoenix::render::graph::node::Node::update_previous_semaphores() noexcept
 
 void gearoenix::render::graph::node::Node::set_provider(const unsigned int input_link_index, const std::shared_ptr<core::graph::Node>& o, const unsigned int provider_output_link_index) noexcept
 {
+	auto& cur = input_links_providers_links[input_link_index];
+	/// This is for better performance in shadow assignment.
+	if (cur.first == o && cur.second == provider_output_link_index) return;
     core::graph::Node::set_provider(input_link_index, o, provider_output_link_index);
-    link_providers_frames_semaphores[input_link_index] = dynamic_cast<Node*>(o.get())->get_link_frames_semaphore(provider_output_link_index, asset_id);
+    link_providers_frames_semaphores[input_link_index] = dynamic_cast<Node*>(o.get())->get_link_frames_semaphore(
+		provider_output_link_index, asset_id, input_link_index);
     /// This is because of flexibility in frames-count, and it does'nt happen very offen
     update_previous_semaphores();
 }
@@ -78,11 +82,16 @@ void gearoenix::render::graph::node::Node::remove_provider(const unsigned int in
     update_previous_semaphores();
 }
 
-void gearoenix::render::graph::node::Node::remove_consumer(const unsigned int output_link_index, const core::Id node_id) noexcept
+void gearoenix::render::graph::node::Node::remove_consumer(const unsigned int output_link_index, const core::Id node_id, const unsigned int consumer_input_link_index) noexcept
 {
-    links_consumers_frames_semaphores[output_link_index][node_id].clear();
-    core::graph::Node::remove_consumer(output_link_index, node_id);
+    links_consumers_frames_semaphores[output_link_index][std::make_pair(node_id, consumer_input_link_index)].clear();
+    core::graph::Node::remove_consumer(output_link_index, node_id, consumer_input_link_index);
     update_next_semaphores();
+}
+
+const std::shared_ptr<gearoenix::render::texture::Texture>& gearoenix::render::graph::node::Node::get_output_texture(unsigned int index) const noexcept
+{
+	return output_textures[index];
 }
 
 void gearoenix::render::graph::node::Node::set_input_texture(const std::shared_ptr<texture::Texture>& t, const unsigned int index) noexcept
@@ -110,9 +119,12 @@ void gearoenix::render::graph::node::Node::submit() noexcept
     e->submit(pre.size(), pre.data(), 1, &cmd, nxt.size(), nxt.data());
 }
 
-const std::vector<std::shared_ptr<gearoenix::render::sync::Semaphore>> gearoenix::render::graph::node::Node::get_link_frames_semaphore(const unsigned int output_link_index, const core::Id consumer_id) noexcept
+const std::vector<std::shared_ptr<gearoenix::render::sync::Semaphore>> gearoenix::render::graph::node::Node::get_link_frames_semaphore(
+	const unsigned int output_link_index, 
+	const core::Id consumer_id, 
+	const unsigned int consumer_input_link_index) noexcept
 {
-    auto& v = links_consumers_frames_semaphores[output_link_index][consumer_id];
+    auto& v = links_consumers_frames_semaphores[output_link_index][std::make_pair(consumer_id, consumer_input_link_index)];
     const auto s = e->get_frames_count();
     if (v.size() != s) {
         v.resize(s);

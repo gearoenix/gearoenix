@@ -33,21 +33,22 @@ namespace light {
     ///     - record (in kernels)
     ///     - submit (in main)
     class CascadeInfo {
+	public:
+		struct PerCascade {
+			math::Mat4x4 view_projection;
+			math::Aabb3 limit_box;
+			math::Aabb3 max_box;
+			math::Aabb3 intersection_box;
+			std::shared_ptr<graph::node::ShadowMapper> shadow_mapper;
+
+			explicit PerCascade(engine::Engine* e) noexcept;
+		};
     private:
         struct RenderData {
             /// Cascade index
             std::size_t i = static_cast<std::size_t>(-1);
             /// It is not owner of model
             const model::Model* m = nullptr;
-        };
-        struct PerCascade {
-            math::Mat4x4 view_projection;
-            math::Aabb3 limit_box;
-            math::Aabb3 max_box;
-            math::Aabb3 intersection_box;
-            std::unique_ptr<graph::node::ShadowMapper> shadow_mapper;
-
-            explicit PerCascade(engine::Engine* e) noexcept;
         };
         struct PerKernel {
             const math::Mat4x4* zero_located_view = nullptr;
@@ -92,6 +93,9 @@ namespace light {
         void record(std::size_t kernel_index) noexcept;
 
         void submit() noexcept;
+
+		const core::OneLoopPool<PerCascade>& get_cascades_data() const noexcept;
+		core::OneLoopPool<PerCascade>& get_cascades_data() noexcept;
     };
 }
 }

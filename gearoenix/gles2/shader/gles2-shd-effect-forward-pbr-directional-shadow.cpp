@@ -219,6 +219,9 @@ gearoenix::gles2::shader::ForwardPbrDirectionalShadow::ForwardPbrDirectionalShad
     : Shader(e, c)
 {
     e->get_function_loader()->load([this] {
+#ifdef GX_DEBUG_GLES2
+		gl::Loader::check_for_error();
+#endif
         set_vertex_shader(vertex_shader_code);
         set_fragment_shader(fragment_shader_code);
         link();
@@ -243,6 +246,9 @@ gearoenix::gles2::shader::ForwardPbrDirectionalShadow::ForwardPbrDirectionalShad
         GX_GLES2_THIS_GET_UNIFORM_F(scene_point_lights_color_min_radius);
         GX_GLES2_THIS_GET_UNIFORM_F(scene_point_lights_position_max_radius);
         // GX_GLES2_THIS_GET_UNIFORM_F(scene_ssao_config);
+#ifdef GX_DEBUG_GLES2
+		gl::Loader::check_for_error();
+#endif
     });
     GX_GLES2_SHADER_SET_TEXTURE_INDEX_STARTING
     GX_GLES2_SHADER_MATERIAL_SET_TEXTURE_INDEX
@@ -263,6 +269,9 @@ gearoenix::gles2::shader::ForwardPbrDirectionalShadow::~ForwardPbrDirectionalSha
 
 void gearoenix::gles2::shader::ForwardPbrDirectionalShadow::bind() const
 {
+#ifdef GX_DEBUG_GLES2
+	gl::Loader::check_for_error();
+#endif
     Shader::bind();
     GX_GLES2_SHADER_MATERIAL_SET_TEXTURE_INDEX_UNIFORM
     gl::Loader::uniform1i(effect_diffuse_environment, effect_diffuse_environment_index);
@@ -270,6 +279,9 @@ void gearoenix::gles2::shader::ForwardPbrDirectionalShadow::bind() const
     //gl::Loader::uniform1i(effect_ambient_occlusion, effect_ambient_occlusion_index);
     //gl::Loader::uniform1i(effect_shadow_map, effect_shadow_map_index);
     gl::Loader::uniform1i(effect_brdflut, effect_brdflut_index);
+#ifdef GX_DEBUG_GLES2
+	gl::Loader::check_for_error();
+#endif
 }
 
 #define GXHELPERV(x, t, n)                                                                              \

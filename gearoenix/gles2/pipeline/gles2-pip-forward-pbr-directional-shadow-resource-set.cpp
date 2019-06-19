@@ -12,6 +12,7 @@
 #include "../shader/gles2-shd-effect-forward-pbr-directional-shadow.hpp"
 #include "../texture/gles2-txt-2d.hpp"
 #include "../texture/gles2-txt-cube.hpp"
+#include "../gles2.hpp"
 
 gearoenix::gles2::pipeline::ForwardPbrDirectionalShadowResourceSet::ForwardPbrDirectionalShadowResourceSet(const std::shared_ptr<shader::ForwardPbrDirectionalShadow>& shd)
     : gles2::pipeline::ResourceSet(shd)
@@ -20,6 +21,9 @@ gearoenix::gles2::pipeline::ForwardPbrDirectionalShadowResourceSet::ForwardPbrDi
 
 void gearoenix::gles2::pipeline::ForwardPbrDirectionalShadowResourceSet::bind(gl::uint& bound_shader_program) const
 {
+#ifdef GX_DEBUG_GLES2
+	gl::Loader::check_for_error();
+#endif
     reinterpret_cast<const buffer::Index*>(msh->get_index_buffer())->bind();
     reinterpret_cast<const buffer::Vertex*>(msh->get_vertex_buffer())->bind();
     gles2::pipeline::ResourceSet::bind(bound_shader_program);
@@ -27,6 +31,9 @@ void gearoenix::gles2::pipeline::ForwardPbrDirectionalShadowResourceSet::bind(gl
     auto camera = reinterpret_cast<const render::camera::Uniform*>(camera_uniform_buffer->get_data());
     shdr->set_camera_position_data(camera->position.data());
     shdr->set_camera_vp_data(camera->view_projection.data());
+#ifdef GX_DEBUG_GLES2
+	gl::Loader::check_for_error();
+#endif
     //static_cast<const texture::Texture2D *>(ambient_occlusion.get())->bind(shdr->get_effect_ambient_occlusion_index());
     reinterpret_cast<const texture::Texture2D*>(brdflut)->bind(static_cast<gl::enumerated>(shdr->get_effect_brdflut_index()));
     reinterpret_cast<const texture::Cube*>(diffuse_environment)->bind(static_cast<gl::enumerated>(shdr->get_effect_diffuse_environment_index()));
@@ -51,9 +58,7 @@ void gearoenix::gles2::pipeline::ForwardPbrDirectionalShadowResourceSet::bind(gl
     shdr->set_model_m_data(model->m.data());
     auto scene = reinterpret_cast<const render::scene::Uniform*>(scene_uniform_buffer->get_data());
     //shdr->set_scene_ambient_light_data(scene->ambient_light.data());
-    gl::Loader::check_for_error();
     shdr->set_scene_directional_lights_color_data(scene->directional_lights_color[0].data());
-    gl::Loader::check_for_error();
     shdr->set_scene_directional_lights_direction_data(scene->directional_lights_direction[0].data());
     shdr->set_scene_lights_count_data(scene->lights_count.data());
     shdr->set_scene_point_lights_color_min_radius_data(scene->point_lights_color_min_radius[0].data());

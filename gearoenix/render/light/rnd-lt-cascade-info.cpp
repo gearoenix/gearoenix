@@ -170,3 +170,14 @@ void gearoenix::render::light::CascadeInfo::submit() noexcept
     for (auto& c : per_cascade)
         c.shadow_mapper->submit();
 }
+
+const gearoenix::core::OneLoopPool<gearoenix::render::light::CascadeInfo::PerCascade>& gearoenix::render::light::CascadeInfo::get_cascades_data() const noexcept
+{
+	return per_cascade;
+}
+
+
+gearoenix::core::OneLoopPool<gearoenix::render::light::CascadeInfo::PerCascade>& gearoenix::render::light::CascadeInfo::get_cascades_data() noexcept
+{
+	return per_cascade;
+}

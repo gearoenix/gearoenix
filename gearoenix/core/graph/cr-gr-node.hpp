@@ -13,7 +13,7 @@ protected:
     std::map<std::string, unsigned int> input_links_string_index;
     std::map<std::string, unsigned int> output_links_string_index;
     std::vector<std::pair<std::shared_ptr<Node>, unsigned int>> input_links_providers_links;
-    std::vector<std::map<core::Id, std::pair<std::weak_ptr<Node>, unsigned int>>> output_links_consumers_links;
+    std::vector<std::map<std::pair<core::Id, unsigned int>, std::weak_ptr<Node>>> output_links_consumers_links;
     Node(const std::vector<std::string>& input_links, const std::vector<std::string>& output_links) noexcept;
 
 public:
@@ -21,11 +21,12 @@ public:
     virtual void set_provider(unsigned int input_link_index, const std::shared_ptr<Node>& o, unsigned int provider_output_link_index) noexcept;
     virtual void remove_provider(unsigned int input_link_index) noexcept;
     virtual void set_consumer(unsigned int output_link_index, const std::shared_ptr<Node>& o, unsigned int consumer_input_link_index) noexcept;
-    virtual void remove_consumer(unsigned int output_link_index, Id node_id) noexcept;
+    virtual void remove_consumer(unsigned int output_link_index, Id node_id, unsigned int consumer_input_link_index) noexcept;
     unsigned int get_input_link_index(const std::string& name, bool& exist) const noexcept;
     unsigned int get_output_link_index(const std::string& name, bool& exist) const noexcept;
     const std::vector<std::string> get_input_links_names() const noexcept;
     const std::vector<std::string> get_output_links_names() const noexcept;
+	static void connect(const std::shared_ptr<Node>& p, unsigned int po, const std::shared_ptr<Node>& c, unsigned int ci) noexcept;
 };
 }
 #endif
