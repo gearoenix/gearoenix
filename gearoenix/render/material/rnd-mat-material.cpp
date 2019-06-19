@@ -228,3 +228,12 @@ void gearoenix::render::material::Material::set_roughness_factor(const core::Rea
 {
     uniform.roughness_factor = f;
 }
+
+void gearoenix::render::material::Material::set_color(
+    const core::Real r, const core::Real g, const core::Real b,
+    const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept
+{
+    core::sync::EndCaller<texture::Texture2D> calltxt2d([end](std::shared_ptr<texture::Texture2D>) {});
+    const std::shared_ptr<texture::Manager>& txtmgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
+    color = txtmgr->get_2d(math::Vec3(r, g, b), calltxt2d);
+}

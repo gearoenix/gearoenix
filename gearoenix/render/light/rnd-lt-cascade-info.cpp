@@ -42,12 +42,12 @@ void gearoenix::render::light::CascadeInfo::PerKernel::record(const std::size_t 
     }
 }
 
-void gearoenix::render::light::CascadeInfo::PerFrame::init(engine::Engine* const e)
+void gearoenix::render::light::CascadeInfo::PerFrame::init(engine::Engine* const eng)
 {
-    auto* cmd_mgr = e->get_command_manager();
+    auto* cmd_mgr = eng->get_command_manager();
     shadow_accumulator_secondary_command = std::unique_ptr<command::Buffer>(cmd_mgr->create_secondary_command_buffer());
     shadow_accumulator_primary_command = std::unique_ptr<command::Buffer>(cmd_mgr->create_primary_command_buffer());
-    shadow_accumulator_semaphore = std::unique_ptr<sync::Semaphore>(e->create_semaphore());
+    shadow_accumulator_semaphore = std::unique_ptr<sync::Semaphore>(eng->create_semaphore());
 }
 
 void gearoenix::render::light::CascadeInfo::PerFrame::start() noexcept
@@ -98,8 +98,8 @@ void gearoenix::render::light::CascadeInfo::update(const math::Mat4x4& m, const 
     }
     for (auto& k : kernels) {
         auto& seen_boxes = k.seen_boxes;
-        for (auto& s : seen_boxes) {
-            s.reset();
+        for (auto& seen : seen_boxes) {
+            seen.reset();
         }
         k.render_data.clear();
     }
@@ -116,10 +116,10 @@ void gearoenix::render::light::CascadeInfo::update(const math::Mat4x4& m, const 
     for (const auto& v : p[ss]) {
         per_cascade[sss].limit_box.put(zero_located_view * v);
     }
-    for (auto& p : per_cascade) {
-        gearoenix::math::Vec3 v = p.limit_box.mx;
+    for (auto& c : per_cascade) {
+        gearoenix::math::Vec3 v = c.limit_box.mx;
         v[2] = -std::numeric_limits<gearoenix::core::Real>::max();
-        p.limit_box.put(v);
+        c.limit_box.put(v);
     }
 }
 
@@ -173,11 +173,10 @@ void gearoenix::render::light::CascadeInfo::submit() noexcept
 
 const gearoenix::core::OneLoopPool<gearoenix::render::light::CascadeInfo::PerCascade>& gearoenix::render::light::CascadeInfo::get_cascades_data() const noexcept
 {
-	return per_cascade;
+    return per_cascade;
 }
-
 
 gearoenix::core::OneLoopPool<gearoenix::render::light::CascadeInfo::PerCascade>& gearoenix::render::light::CascadeInfo::get_cascades_data() noexcept
 {
-	return per_cascade;
+    return per_cascade;
 }

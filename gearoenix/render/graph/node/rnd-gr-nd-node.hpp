@@ -68,8 +68,8 @@ namespace graph::node {
         void set_provider(unsigned int input_link_index, const std::shared_ptr<core::graph::Node>& o, unsigned int provider_output_link_index) noexcept final;
         void remove_provider(unsigned int input_link_index) noexcept final;
         void remove_consumer(unsigned int output_link_index, core::Id node_id, unsigned int consumer_input_link_index) noexcept final;
-		const std::shared_ptr<texture::Texture>& get_output_texture(unsigned int index) const noexcept;
-		virtual void set_input_texture(const std::shared_ptr<texture::Texture>& t, unsigned int index) noexcept;
+        const std::shared_ptr<texture::Texture>& get_output_texture(unsigned int index) const noexcept;
+        virtual void set_input_texture(const std::shared_ptr<texture::Texture>& t, unsigned int index) noexcept;
         virtual void set_render_target(const std::shared_ptr<texture::Target>& t) noexcept;
         virtual void update() noexcept;
         virtual void submit() noexcept;

@@ -45,6 +45,9 @@ namespace render {
             const std::shared_ptr<texture::Texture2D>& get_emissive() const noexcept;
             void set_metallic_factor(core::Real f) noexcept;
             void set_roughness_factor(core::Real f) noexcept;
+            void set_color(
+                core::Real r, core::Real g, core::Real b,
+                const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept;
         };
     }
 }

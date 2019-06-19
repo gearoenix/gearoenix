@@ -38,13 +38,15 @@ gearoenix::render::graph::node::ForwardPbrDirectionalShadow::ForwardPbrDirection
         pipeline::Type::ForwardPbrDirectionalShadow,
         5,
         1,
-        { 
-			"diffuse environment",
-			"specular environment",
-			"ambient occlusion",
-			"shadow map", 
-		},
-        { "color", },
+        {
+            "diffuse environment",
+            "specular environment",
+            "ambient occlusion",
+            "shadow map",
+        },
+        {
+            "color",
+        },
         call)
 {
     frames.resize(e->get_frames_count());

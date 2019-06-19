@@ -38,20 +38,20 @@ gearoenix::gles2::engine::Engine::Engine(system::Application* const sys_app) noe
 
 std::shared_ptr<gearoenix::gles2::engine::Engine> gearoenix::gles2::engine::Engine::construct(system::Application* const sys_app) noexcept
 {
-	gl::Loader::get_error();
+    gl::Loader::get_error();
 #ifdef GX_DEBUG_GLES2
-	gl::Loader::check_for_error();
+    gl::Loader::check_for_error();
 #endif
     std::shared_ptr<Engine> e(new Engine(sys_app));
     e->pipeline_manager = new pipeline::Manager(e);
     e->buffer_manager = new buffer::Manager(e.get());
     e->command_manager = new command::Manager();
 #ifdef GX_DEBUG_GLES2
-	gl::Loader::check_for_error();
+    gl::Loader::check_for_error();
 #endif
     e->main_render_target = std::shared_ptr<render::texture::Target>(new texture::Target(e.get()));
 #ifdef GX_DEBUG_GLES2
-	gl::Loader::check_for_error();
+    gl::Loader::check_for_error();
 #endif
     return e;
 }
@@ -64,7 +64,7 @@ gearoenix::gles2::engine::Engine::~Engine() noexcept
 void gearoenix::gles2::engine::Engine::update() noexcept
 {
 #ifdef GX_DEBUG_GLES2
-	gl::Loader::check_for_error();
+    gl::Loader::check_for_error();
 #endif
     gl::Loader::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     render::engine::Engine::update();

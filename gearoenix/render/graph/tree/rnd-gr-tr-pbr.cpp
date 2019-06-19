@@ -22,21 +22,21 @@ gearoenix::render::graph::tree::Pbr::Pbr(engine::Engine* const e, const core::sy
 
 void gearoenix::render::graph::tree::Pbr::update() noexcept
 {
-	const auto& visible_models = e->get_physics_engine()->get_visible_models();
-	for (const auto& scene_camera : visible_models) {
-		const auto& cameras_data = scene_camera.second;
-		for (const auto& camera_data : cameras_data) {
-			const auto& lights_cascades_info = camera_data.second.second;
-			for (const auto& light_cascades_info : lights_cascades_info) {
-				auto& cds = light_cascades_info.second->get_cascades_data();
-				for (auto& c : cds) {
-					auto& shm = c.shadow_mapper;
-					core::graph::Node::connect(shm, 0, fwddirshd, node::ForwardPbrDirectionalShadow::shadow_map_index);
-					fwddirshd->set_input_texture(shm->get_output_texture(0), node::ForwardPbrDirectionalShadow::shadow_map_index);
-				}
-			}
-		}
-	}
+    const auto& visible_models = e->get_physics_engine()->get_visible_models();
+    for (const auto& scene_camera : visible_models) {
+        const auto& cameras_data = scene_camera.second;
+        for (const auto& camera_data : cameras_data) {
+            const auto& lights_cascades_info = camera_data.second.second;
+            for (const auto& light_cascades_info : lights_cascades_info) {
+                auto& cds = light_cascades_info.second->get_cascades_data();
+                for (auto& c : cds) {
+                    auto& shm = c.shadow_mapper;
+                    core::graph::Node::connect(shm, 0, fwddirshd, node::ForwardPbrDirectionalShadow::shadow_map_index);
+                    fwddirshd->set_input_texture(shm->get_output_texture(0), node::ForwardPbrDirectionalShadow::shadow_map_index);
+                }
+            }
+        }
+    }
     fwddirshd->update();
 }
 
@@ -52,8 +52,8 @@ void gearoenix::render::graph::tree::Pbr::record(const unsigned int kernel_index
     }                                  \
     task_number = (task_number + 1) % kernels_count
     for (const auto& scene_camera : visible_models) {
-        const auto *scn = scene_camera.first;
-        const auto &lights = scn->get_lights();
+        const auto* scn = scene_camera.first;
+        const auto& lights = scn->get_lights();
         for (const auto& camera_models : scene_camera.second) {
             const auto* const cam = camera_models.first;
             const auto& models = camera_models.second.first;

@@ -2,6 +2,7 @@
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "rnd-msh-mesh.hpp"
 #include "rnd-msh-type.hpp"
+#include <utility>
 
 gearoenix::render::mesh::Manager::Manager(system::stream::Stream* const s, engine::Engine* const e) noexcept
     : e(e)
@@ -7871,5 +7872,47 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager:
         core::sync::EndCaller<core::sync::EndCallerIgnore>([c] {})));
     c.set_data(m);
     icosphere = m;
+    return m;
+}
+
+std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager::create_plate(core::sync::EndCaller<Mesh>& c) noexcept
+{
+
+    if (std::shared_ptr<Mesh> m = plate.lock())
+        return m;
+    std::vector<math::BasicVertex> vertices = {
+        math::BasicVertex {
+            math::Vec3(-1.f, -1.0f, 0.0f),
+            math::Vec3(0.0f, 0.0f, 1.0f),
+            math::Vec4(1.0f, 0.0f, 0.0f, 1.0f),
+            math::Vec2(0.0f, 0.0f),
+        },
+        math::BasicVertex {
+            math::Vec3(1.0f, -1.0f, 0.0f),
+            math::Vec3(0.0f, 0.0f, 1.0f),
+            math::Vec4(1.0f, 0.0f, 0.0f, 1.0f),
+            math::Vec2(1.0f, 0.0f),
+        },
+        math::BasicVertex {
+            math::Vec3(-1.0f, 1.0f, 0.0f),
+            math::Vec3(0.0f, 0.0f, 1.0f),
+            math::Vec4(1.0f, 0.0f, 0.0f, 1.0f),
+            math::Vec2(0.0f, 1.0f),
+        },
+        math::BasicVertex {
+            math::Vec3(1.0f, 1.0f, 0.0f),
+            math::Vec3(0.0f, 0.0f, 1.0f),
+            math::Vec4(1.0f, 0.0f, 0.0f, 1.0f),
+            math::Vec2(1.0f, 1.0f),
+        },
+    };
+    std::vector<std::uint32_t> indices = { 0, 1, 2, 1, 3, 2 };
+    const static core::Real occlusion_radius = 1.001f;
+    std::shared_ptr<Mesh> m(new Mesh(
+        core::asset::Manager::create_id(),
+        std::move(vertices), std::move(indices), occlusion_radius, e,
+        core::sync::EndCaller<core::sync::EndCallerIgnore>([c] {})));
+    c.set_data(m);
+    plate = m;
     return m;
 }

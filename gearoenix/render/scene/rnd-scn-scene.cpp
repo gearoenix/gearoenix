@@ -46,32 +46,32 @@ gearoenix::render::scene::Scene::Scene(
         const std::shared_ptr<n::Manager>& mgr = astmgr->get_##x##_manager();    \
         std::vector<core::Id> ids;                                               \
         f->read(ids);                                                            \
-        if (ids.size() > 0) {                                                    \
+        if (ids.empty()) {                                                       \
             core::sync::EndCaller<n::cls> call([c](std::shared_ptr<n::cls>) {}); \
             for (const core::Id id : ids)                                        \
                 add_##x(mgr->get_gx3d(id, call));                                \
         }                                                                        \
     }
 
-    GX_HELPER(camera, camera, Camera);
-    GX_HELPER(audio, audio, Audio);
-    GX_HELPER(light, light, Light);
-    GX_HELPER(model, model, Model);
+    GX_HELPER(camera, camera, Camera)
+    GX_HELPER(audio, audio, Audio)
+    GX_HELPER(light, light, Light)
+    GX_HELPER(model, model, Model)
     if (f->read_bool()) {
         core::Id skybox_id = 0;
         f->read(skybox_id);
     }
-    GX_HELPER(constraint, physics::constraint, Constraint);
+    GX_HELPER(constraint, physics::constraint, Constraint)
 
 #undef GX_HELPER
 
     if (f->read_bool()) {
-        GXUNIMPLEMENTED;
+        GXUNIMPLEMENTED
     }
 
-    GXLOGD("Number of models is: " << models.size());
-    GXLOGD("Number of lights is: " << lights.size());
-    GXLOGD("Number of cameras is: " << cameras.size());
+    GXLOGD("Number of models is: " << models.size())
+    GXLOGD("Number of lights is: " << lights.size())
+    GXLOGD("Number of cameras is: " << cameras.size())
 }
 
 gearoenix::render::scene::Scene::Scene(
@@ -109,7 +109,7 @@ void gearoenix::render::scene::Scene::add_camera(const std::shared_ptr<camera::C
     const core::Id oid = o->get_asset_id();
 #ifdef GX_DEBUG_MODE
     if (cameras.find(oid) != cameras.end()) {
-        GXLOGE("Error overriding of a camera with same Id: " << oid);
+        GXLOGE("Error overriding of a camera with same Id: " << oid)
     }
 #endif
     cameras[oid] = o;
@@ -125,7 +125,7 @@ void gearoenix::render::scene::Scene::add_audio(const std::shared_ptr<audio::Aud
     const core::Id oid = o->get_asset_id();
 #ifdef GX_DEBUG_MODE
     if (audios.find(oid) != audios.end()) {
-        GXLOGE("Error overriding of a audio with same Id: " << oid);
+        GXLOGE("Error overriding of a audio with same Id: " << oid)
     }
 #endif
     audios[oid] = o;
@@ -136,7 +136,7 @@ void gearoenix::render::scene::Scene::add_light(const std::shared_ptr<light::Lig
     const core::Id oid = o->get_asset_id();
 #ifdef GX_DEBUG_MODE
     if (lights.find(oid) != lights.end()) {
-        GXLOGE("Error overriding of a light with same Id: " << oid);
+        GXLOGE("Error overriding of a light with same Id: " << oid)
     }
 #endif
     lights[oid] = o;
@@ -161,7 +161,7 @@ void gearoenix::render::scene::Scene::add_model(const std::shared_ptr<model::Mod
     const core::Id mid = m->get_asset_id();
 #ifdef GX_DEBUG_MODE
     if (models.find(mid) != models.end()) {
-        GXLOGE("Error overriding of a model with same Id: " << mid);
+        GXLOGE("Error overriding of a model with same Id: " << mid)
     }
 #endif // GX_DEBUG_MODE
     models[mid] = m;
@@ -186,7 +186,7 @@ void gearoenix::render::scene::Scene::add_constraint(const std::shared_ptr<physi
     const core::Id cid = c->get_asset_id();
 #ifdef GX_DEBUG_MODE
     if (constraints.find(cid) != constraints.end()) {
-        GXLOGE("Error overriding of a constraint with same Id: " << cid);
+        GXLOGE("Error overriding of a constraint with same Id: " << cid)
     }
 #endif // GX_DEBUG_MODE
     constraints[cid] = c;
@@ -210,10 +210,10 @@ void gearoenix::render::scene::Scene::update_uniform() noexcept
 {
     unsigned int dirc = 0;
     unsigned int pntc = 0;
-    for (const std::pair<core::Id, std::shared_ptr<light::Light>>& il : lights) {
+    for (const auto& il : lights) {
         const light::Light* const l = il.second.get();
         {
-            const light::Directional* const dl = dynamic_cast<const light::Directional*>(l);
+            const auto* const dl = dynamic_cast<const light::Directional*>(l);
             if (dl != nullptr && dirc < GX_MAX_DIRECTIONAL_LIGHTS) {
                 uniform.directional_lights_color[dirc] = math::Vec4(dl->get_color(), 0.0f);
                 uniform.directional_lights_direction[dirc] = math::Vec4(dl->get_direction(), 0.0f);
@@ -222,7 +222,7 @@ void gearoenix::render::scene::Scene::update_uniform() noexcept
             }
         }
         {
-            const light::Point* const pl = dynamic_cast<const light::Point*>(l);
+            const auto* const pl = dynamic_cast<const light::Point*>(l);
             if (pl != nullptr && pntc < GX_MAX_POINT_LIGHTS) {
                 // TODO: min radius, remove it or complete it
                 uniform.point_lights_color_min_radius[pntc] = math::Vec4(pl->get_color(), 0.0f);

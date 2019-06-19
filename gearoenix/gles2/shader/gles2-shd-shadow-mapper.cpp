@@ -39,7 +39,7 @@ gearoenix::gles2::shader::ShadowMapper::ShadowMapper(const std::shared_ptr<engin
 {
     e->get_function_loader()->load([this] {
 #ifdef GX_DEBUG_GLES2
-		gl::Loader::check_for_error();
+        gl::Loader::check_for_error();
 #endif
         set_vertex_shader(vertex_shader_code);
         set_fragment_shader(fragment_shader_code);
@@ -47,7 +47,7 @@ gearoenix::gles2::shader::ShadowMapper::ShadowMapper(const std::shared_ptr<engin
         GX_GLES2_SHADER_MATERIAL_GET_UNIFORM_LOCATIONS
         GX_GLES2_THIS_GET_UNIFORM_F(effect_mvp);
 #ifdef GX_DEBUG_GLES2
-		gl::Loader::check_for_error();
+        gl::Loader::check_for_error();
 #endif
     });
     GX_GLES2_SHADER_SET_TEXTURE_INDEX_STARTING

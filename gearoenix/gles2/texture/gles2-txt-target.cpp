@@ -37,7 +37,7 @@ gearoenix::gles2::texture::Target::Target(engine::Engine* const e) noexcept
     : render::texture::Target(core::asset::Manager::create_id(), e)
 {
 #ifdef GX_DEBUG_GLES2
-	gl::Loader::check_for_error();
+    gl::Loader::check_for_error();
 #endif
     img_width = e->get_system_application()->get_width();
     img_height = e->get_system_application()->get_height();
@@ -45,7 +45,7 @@ gearoenix::gles2::texture::Target::Target(engine::Engine* const e) noexcept
     gl::Loader::get_integerv(GL_RENDERBUFFER_BINDING, &depth_buffer);
     state_init();
 #ifdef GX_DEBUG_GLES2
-	gl::Loader::check_for_error();
+    gl::Loader::check_for_error();
 #endif
 }
 
@@ -66,7 +66,7 @@ gearoenix::gles2::texture::Target::Target(
         GXLOGF("This engine only supports depth");
     e->get_function_loader()->load([this, sample_info, call] {
 #ifdef GX_DEBUG_GLES2
-		gl::Loader::check_for_error();
+        gl::Loader::check_for_error();
 #endif
         gl::Loader::gen_framebuffers(1, reinterpret_cast<gl::uint*>(&framebuffer));
         gl::Loader::gen_renderbuffers(1, reinterpret_cast<gl::uint*>(&depth_buffer));
@@ -86,7 +86,7 @@ gearoenix::gles2::texture::Target::Target(
             GXLOGF("Failed to create render target!")
         state_init();
 #ifdef GX_DEBUG_GLES2
-		gl::Loader::check_for_error();
+        gl::Loader::check_for_error();
 #endif
     });
 }

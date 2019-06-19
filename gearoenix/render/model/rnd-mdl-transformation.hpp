@@ -33,6 +33,7 @@ namespace render::model {
         //void local_y_rotate(const core::Real d) noexcept override final;
         //void local_z_rotate(const core::Real d) noexcept override final;
         //void set_orientation(const math::Quat& q) noexcept override final;
+        void scale(core::Real) noexcept;
     };
 }
 }

@@ -19,12 +19,14 @@ namespace render {
             engine::Engine* const e;
             core::cache::File<Mesh> cache;
             std::weak_ptr<Mesh> icosphere;
+            std::weak_ptr<Mesh> plate;
 
         public:
             Manager(system::stream::Stream* s, engine::Engine* e) noexcept;
             ~Manager() noexcept = default;
             std::shared_ptr<Mesh> get_gx3d(core::Id id, core::sync::EndCaller<Mesh>& c) noexcept;
             std::shared_ptr<Mesh> create_icosphere(core::sync::EndCaller<Mesh>& c) noexcept;
+            std::shared_ptr<Mesh> create_plate(core::sync::EndCaller<Mesh>& c) noexcept;
         };
     }
 }

@@ -22,26 +22,26 @@ gearoenix::gles2::pipeline::ShadowMapperResourceSet::ShadowMapperResourceSet(con
 void gearoenix::gles2::pipeline::ShadowMapperResourceSet::bind(gl::uint& bound_shader_program) const
 {
 #ifdef GX_DEBUG_GLES2
-	gl::Loader::check_for_error();
+    gl::Loader::check_for_error();
 #endif
     GX_GLES2_PIPRES_START_DRAWING_MESH;
 #ifdef GX_DEBUG_GLES2
-	gl::Loader::check_for_error();
+    gl::Loader::check_for_error();
 #endif
     GX_GLES2_PIPRES_START_SHADER(ShadowMapper, shd);
 #ifdef GX_DEBUG_GLES2
-	gl::Loader::check_for_error();
+    gl::Loader::check_for_error();
 #endif
     GX_GLES2_PIPRES_BIND_MATERIAL
 #ifdef GX_DEBUG_GLES2
-		gl::Loader::check_for_error();
+    gl::Loader::check_for_error();
 #endif
     GX_GLES2_PIPRES_SET_UNIFORM(effect_mvp, *reinterpret_cast<const render::graph::node::ShadowMapperUniform*>(node_uniform_buffer->get_data())->mvp.data());
 #ifdef GX_DEBUG_GLES2
-	gl::Loader::check_for_error();
+    gl::Loader::check_for_error();
 #endif
     GX_GLES2_PIPRES_END_DRAWING_MESH;
 #ifdef GX_DEBUG_GLES2
-	gl::Loader::check_for_error();
+    gl::Loader::check_for_error();
 #endif
 }

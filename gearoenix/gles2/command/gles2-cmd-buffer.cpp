@@ -7,12 +7,12 @@
 gearoenix::gl::uint gearoenix::gles2::command::Buffer::play(gl::uint bound_shader_program) const noexcept
 {
 #ifdef GX_DEBUG_GLES2
-	gl::Loader::check_for_error();
+    gl::Loader::check_for_error();
 #endif
     if (render_target != nullptr)
         reinterpret_cast<const texture::Target*>(render_target)->bind();
 #ifdef GX_DEBUG_GLES2
-	gl::Loader::check_for_error();
+    gl::Loader::check_for_error();
 #endif
     for (const render::pipeline::ResourceSet* prs : bound_resource_sets) {
         dynamic_cast<const pipeline::ResourceSet*>(prs)->bind(bound_shader_program);

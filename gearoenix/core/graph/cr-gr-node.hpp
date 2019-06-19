@@ -26,7 +26,7 @@ public:
     unsigned int get_output_link_index(const std::string& name, bool& exist) const noexcept;
     const std::vector<std::string> get_input_links_names() const noexcept;
     const std::vector<std::string> get_output_links_names() const noexcept;
-	static void connect(const std::shared_ptr<Node>& p, unsigned int po, const std::shared_ptr<Node>& c, unsigned int ci) noexcept;
+    static void connect(const std::shared_ptr<Node>& p, unsigned int po, const std::shared_ptr<Node>& c, unsigned int ci) noexcept;
 };
 }
 #endif

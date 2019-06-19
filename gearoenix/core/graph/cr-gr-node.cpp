@@ -87,8 +87,8 @@ const std::vector<std::string> gearoenix::core::graph::Node::get_output_links_na
     return result;
 }
 
-void gearoenix::core::graph::Node::connect(const std::shared_ptr<Node>& p, const unsigned int po, const std::shared_ptr<Node>&c, const unsigned int ci) noexcept
+void gearoenix::core::graph::Node::connect(const std::shared_ptr<Node>& p, const unsigned int po, const std::shared_ptr<Node>& c, const unsigned int ci) noexcept
 {
-	p->set_consumer(po, c, ci);
-	c->set_provider(ci, p, po);
+    p->set_consumer(po, c, ci);
+    c->set_provider(ci, p, po);
 }
