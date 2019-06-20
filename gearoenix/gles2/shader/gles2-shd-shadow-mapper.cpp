@@ -31,7 +31,7 @@ const static std::string fragment_shader_code = GX_GLES2_SHADER_SRC_DEFAULT_FRAG
     "    vec4 tmpv4 = texture2D(material_base_color, out_uv);\n"
     "    tmpv4.w *= material_alpha;\n"
     "    if(tmpv4.w < material_alpha_cutoff) discard;\n"
-    "    gl_FragColor = vec4(out_depth, 0.0, 0.0);\n"
+    "    gl_FragColor = vec4(out_depth, 0.0, 1.0);\n"
     "}";
 
 gearoenix::gles2::shader::ShadowMapper::ShadowMapper(const std::shared_ptr<engine::Engine>& e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c)

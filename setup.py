@@ -142,7 +142,7 @@ if 'Windows' in PLATFORM:
         os.path.join(SDL2_BUILD_LIB_DIR_PATH, SDL2_MAIN_LIB),
         os.path.join(LIBS_PATH, SDL2_MAIN_LIB))
 
-elif 'Linux' in PLATFORM:
+else:
     subprocess.run([
         'cmake',
         '--build',

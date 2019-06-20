@@ -13,8 +13,8 @@ gearoenix::gles2::pipeline::ResourceSet::~ResourceSet() {}
 
 void gearoenix::gles2::pipeline::ResourceSet::bind(gl::uint& bound_shader_program) const
 {
-    if (shd->get_shader_program() != bound_shader_program) {
-        bound_shader_program = shd->get_shader_program();
-        shd->bind();
-    }
+    //if (shd->get_shader_program() != bound_shader_program) {
+    bound_shader_program = shd->get_shader_program();
+    shd->bind();
+    //}
 }
