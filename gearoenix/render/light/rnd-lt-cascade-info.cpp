@@ -149,8 +149,8 @@ void gearoenix::render::light::CascadeInfo::shrink() noexcept
         const auto& mn = cas.intersection_box.mn;
         const auto c = (mx + mn) * 0.5f;
         const auto d = mx - mn;
-        const auto w = d[0] * 0.51f;
-        const auto h = d[1] * 0.51f;
+        const auto w = d[0] * 1.01f;
+        const auto h = d[1] * 1.01f;
         const auto depth = d[2];
         const auto n = depth * 0.01;
         const auto f = depth * 1.03;
