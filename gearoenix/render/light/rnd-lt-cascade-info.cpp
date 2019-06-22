@@ -156,7 +156,18 @@ void gearoenix::render::light::CascadeInfo::shrink() noexcept
         const auto f = depth * 1.03;
         const auto p = gearoenix::math::Mat4x4::orthographic(w, h, n, f);
         const auto t = gearoenix::math::Mat4x4::translator(-gearoenix::math::Vec3(c.xy(), mx[2] + (n * 2.0f)));
-        cas.view_projection = p * t * zero_located_view;
+        cas.view_projection = math::Mat4x4(
+                                  1.0f, 0.0f, 0.0f, 0.0f,
+                                  0.0f, 1.0f, 0.0f, 0.0f,
+                                  0.0f, 0.0f, 0.5f, 0.0f,
+                                  0.0f, 0.0f, 0.5f, 1.0f)
+            * p * t * zero_located_view;
+        cas.view_projection_bias = math::Mat4x4(
+                                       0.5f, 0.0f, 0.0f, 0.0f,
+                                       0.0f, 0.5f, 0.0f, 0.0f,
+                                       0.0f, 0.0f, 1.0f, 0.0f,
+                                       0.5f, 0.5f, 0.0f, 1.0f)
+            * cas.view_projection;
     }
 }
 

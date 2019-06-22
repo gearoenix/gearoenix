@@ -212,6 +212,8 @@ void gearoenix::render::scene::Scene::update_uniform() noexcept
     unsigned int pntc = 0;
     for (const auto& il : lights) {
         const light::Light* const l = il.second.get();
+        if (l->is_shadower())
+            continue;
         {
             const auto* const dl = dynamic_cast<const light::Directional*>(l);
             if (dl != nullptr && dirc < GX_MAX_DIRECTIONAL_LIGHTS) {

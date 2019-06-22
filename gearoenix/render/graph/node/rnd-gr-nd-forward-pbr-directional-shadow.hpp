@@ -4,14 +4,15 @@
 #include "../../../core/sync/cr-sync-end-caller.hpp"
 #include "../../../math/math-matrix.hpp"
 #include "../../../math/math-vector.hpp"
+#include "../../buffer/rnd-buf-framed-uniform.hpp"
 #include "rnd-gr-nd-node.hpp"
 #include <memory>
 #include <vector>
 
 namespace gearoenix::render {
 namespace buffer {
-    class Uniform;
     class Manager;
+    class Uniform;
 }
 namespace camera {
     class Camera;
@@ -21,13 +22,13 @@ namespace command {
 }
 namespace light {
     class Directional;
+    class CascadeInfo;
 }
 namespace model {
     class Model;
     class Mesh;
 }
 namespace pipeline {
-    class ForwardPbrDirectionalShadow;
     class ForwardPbrDirectionalShadowResourceSet;
 }
 namespace scene {
@@ -42,14 +43,27 @@ namespace texture {
     class Texture2D;
 }
 namespace graph::node {
+    struct ForwardPbrDirectionalShadowUniform {
+        // Bring lights in here not scene
+        math::Mat4x4 cascades_view_projections_bias[GX_MAX_SHADOW_CASCADES];
+        core::Real cascades_count = static_cast<core::Real>(GX_MAX_SHADOW_CASCADES);
+        explicit ForwardPbrDirectionalShadowUniform(const light::CascadeInfo* cas) noexcept;
+    };
+
+    struct ForwardPbrDirectionalShadowRenderData {
+        std::unique_ptr<pipeline::ForwardPbrDirectionalShadowResourceSet> r;
+        std::unique_ptr<buffer::Uniform> u;
+        ForwardPbrDirectionalShadowRenderData(engine::Engine* e, pipeline::Pipeline* pip) noexcept;
+    };
+
     struct ForwardPbrDirectionalShadowKernel {
-        std::shared_ptr<command::Buffer> secondary_cmd = nullptr;
-        core::OneLoopPool<pipeline::ForwardPbrDirectionalShadowResourceSet> render_data_pool;
+        std::unique_ptr<command::Buffer> secondary_cmd;
+        core::OneLoopPool<ForwardPbrDirectionalShadowRenderData> render_data_pool;
         ForwardPbrDirectionalShadowKernel(engine::Engine* e, unsigned int kernel_index) noexcept;
     };
 
     struct ForwardPbrDirectionalShadowFrame {
-        std::vector<std::shared_ptr<ForwardPbrDirectionalShadowKernel>> kernels;
+        std::vector<ForwardPbrDirectionalShadowKernel> kernels;
         explicit ForwardPbrDirectionalShadowFrame(engine::Engine* e) noexcept;
     };
 
@@ -58,7 +72,7 @@ namespace graph::node {
     /// The user of this class must use its functionalities in their correct contextes.
     class ForwardPbrDirectionalShadow : public Node {
     private:
-        std::vector<std::shared_ptr<ForwardPbrDirectionalShadowFrame>> frames;
+        std::vector<ForwardPbrDirectionalShadowFrame> frames;
         ForwardPbrDirectionalShadowFrame* frame = nullptr;
 
     public:
@@ -85,6 +99,7 @@ namespace graph::node {
             const camera::Camera* c,
             const light::Directional* l,
             const model::Model* m,
+            const light::CascadeInfo* cas,
             unsigned int kernel_index) noexcept;
         /// This will be called at the end of each frame for pushing jobs to GPU
         void submit() noexcept final;

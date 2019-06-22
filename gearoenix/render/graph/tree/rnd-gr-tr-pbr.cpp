@@ -87,9 +87,11 @@ void gearoenix::render::graph::tree::Pbr::submit() noexcept
         for (const auto& camera_data : cameras_data) {
             const auto& lights_cascades_info = camera_data.second.second;
             for (const auto& light_cascades_info : lights_cascades_info) {
-                light_cascades_info.second->submit();
+                auto* cas_inf = light_cascades_info.second;
+                cas_inf->submit();
+                fwddirshd->set_cascades(cas_inf->get_cascades_data());
+                fwddirshd->submit();
             }
         }
     }
-    fwddirshd->submit();
 }

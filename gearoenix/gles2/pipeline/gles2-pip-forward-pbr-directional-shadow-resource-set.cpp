@@ -37,11 +37,11 @@ void gearoenix::gles2::pipeline::ForwardPbrDirectionalShadowResourceSet::bind(gl
     //static_cast<const texture::Texture2D *>(ambient_occlusion.get())->bind(shdr->get_effect_ambient_occlusion_index());
     reinterpret_cast<const texture::Texture2D*>(brdflut)->bind(static_cast<gl::enumerated>(shdr->get_effect_brdflut_index()));
     reinterpret_cast<const texture::Cube*>(diffuse_environment)->bind(static_cast<gl::enumerated>(shdr->get_effect_diffuse_environment_index()));
-    //static_cast<const texture::Texture2D *>(shadow_map.get())->bind(shdr->get_effect_shadow_map_index());
+    reinterpret_cast<const texture::Texture2D*>(shadow_map)->bind(shdr->get_effect_shadow_map_index());
     reinterpret_cast<const texture::Cube*>(specular_environment)->bind(static_cast<gl::enumerated>(shdr->get_effect_specular_environment_index()));
-    //const render::light::DirectionalUniform *light = reinterpret_cast<const render::light::DirectionalUniform *>(light_uniform_buffer->get_data());
-    //shdr->set_light_color_data(light->color_strength.data());
-    //shdr->set_light_direction_data(light->direction.data());
+    const auto* light = reinterpret_cast<const render::light::DirectionalUniform*>(light_uniform_buffer->get_data());
+    shdr->set_light_color_data(light->color.data());
+    shdr->set_light_direction_data(light->direction.data());
     //shdr->set_light_vp_bias_data(light->vpbs[0].data());
     auto material = reinterpret_cast<const render::material::Uniform*>(material_uniform_buffer->get_data());
     shdr->set_material_alpha_data(&(material->alpha));

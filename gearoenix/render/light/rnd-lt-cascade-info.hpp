@@ -36,6 +36,7 @@ namespace light {
     public:
         struct PerCascade {
             math::Mat4x4 view_projection;
+            math::Mat4x4 view_projection_bias;
             math::Aabb3 limit_box;
             math::Aabb3 max_box;
             math::Aabb3 intersection_box;
