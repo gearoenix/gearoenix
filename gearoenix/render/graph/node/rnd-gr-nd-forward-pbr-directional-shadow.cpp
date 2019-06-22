@@ -36,7 +36,7 @@ gearoenix::render::graph::node::ForwardPbrDirectionalShadowUniform::ForwardPbrDi
 {
     const auto& data = cas->get_cascades_data();
     const auto s = data.size();
-    cascades_count = static_cast<core::Real>(s);
+    cascades_count = static_cast<core::Real>(s) + 0.1f;
     for (std::size_t i = 0; i < s; ++i) {
         cascades_view_projections_bias[i] = data[i].view_projection_bias;
     }
