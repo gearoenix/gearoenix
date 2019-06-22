@@ -16,15 +16,15 @@ namespace gles2 {
         class ForwardPbrDirectionalShadow : public Shader {
         private:
             GX_GLES2_SHADER_MATERIAL_UNIFORMS
-			GX_GLES2_UNIFORM_VECTOR(camera_position, 3, 1)
+            GX_GLES2_UNIFORM_VECTOR(camera_position, 3, 1)
             GX_GLES2_UNIFORM_MATRIX(camera_vp, 4, 1)
             GX_GLES2_UNIFORM_TEXTURE(effect_ambient_occlusion)
-			GX_GLES2_UNIFORM_TEXTURE(effect_brdflut)
-			GX_GLES2_UNIFORM_FLOAT(effect_cascades_count)
-			GX_GLES2_UNIFORM_TEXTURE(effect_diffuse_environment)
-			GX_GLES2_UNIFORM_TEXTURE(effect_shadow_map)
-			GX_GLES2_UNIFORM_TEXTURE(effect_specular_environment)
-			GX_GLES2_UNIFORM_MATRIX(effect_view_projection_biases, 4, GX_MAX_SHADOW_CASCADES)
+            GX_GLES2_UNIFORM_TEXTURE(effect_brdflut)
+            GX_GLES2_UNIFORM_FLOAT(effect_cascades_count)
+            GX_GLES2_UNIFORM_TEXTURE(effect_diffuse_environment)
+            GX_GLES2_UNIFORM_TEXTURE(effect_shadow_map)
+            GX_GLES2_UNIFORM_TEXTURE(effect_specular_environment)
+            GX_GLES2_UNIFORM_MATRIX(effect_view_projection_biases, 4, GX_MAX_SHADOW_CASCADES)
             GX_GLES2_UNIFORM_VECTOR(light_color, 3, 1)
             GX_GLES2_UNIFORM_VECTOR(light_direction, 3, 1)
             GX_GLES2_UNIFORM_MATRIX(model_m, 4, 1)

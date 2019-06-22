@@ -78,10 +78,10 @@ void gearoenix::render::light::Light::update_uniform() noexcept
 
 const gearoenix::render::buffer::FramedUniform* gearoenix::render::light::Light::get_uniform_buffers() const noexcept
 {
-	return uniform_buffers.get();
+    return uniform_buffers.get();
 }
 
 gearoenix::render::buffer::FramedUniform* gearoenix::render::light::Light::get_uniform_buffers() noexcept
 {
-	return uniform_buffers.get();
+    return uniform_buffers.get();
 }

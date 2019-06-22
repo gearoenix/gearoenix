@@ -14,7 +14,7 @@
 
 #define GX_GLES2_PIPRES_SET_UNIFORM(x, d)           \
     if (shdr->get_##x() != GX_GLES2_UNIFORM_FAILED) \
-    shdr->set_##x##_data(&(d));
+        shdr->set_##x##_data(&(d));
 
 #define GX_GLES2_PIPRES_SET_TXT(x, txt, cls)        \
     if (shdr->get_##x() != GX_GLES2_UNIFORM_FAILED) \

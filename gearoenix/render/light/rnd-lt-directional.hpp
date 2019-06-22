@@ -23,14 +23,14 @@ namespace light {
     class CascadeInfo;
     class Directional : public Light {
     protected:
-		DirectionalUniform uniform;
+        DirectionalUniform uniform;
 
     public:
         Directional(core::Id my_id, system::stream::Stream* f, engine::Engine* e) noexcept;
         Directional(core::Id my_id, engine::Engine* e) noexcept;
         const math::Vec3& get_direction() const noexcept;
         void set_direction(const math::Vec3& dir) noexcept;
-		void update_uniform() noexcept final;
+        void update_uniform() noexcept final;
     };
 }
 }

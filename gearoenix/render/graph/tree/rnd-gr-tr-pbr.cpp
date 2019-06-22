@@ -58,16 +58,15 @@ void gearoenix::render::graph::tree::Pbr::record(const unsigned int kernel_index
             const auto* const cam = camera_models.first;
             const auto& models = camera_models.second.first;
             const auto& lights_cascades_info = camera_models.second.second;
-			for (const auto& light_cascades_info : lights_cascades_info)
-			{
-				auto* cas = light_cascades_info.second;
-				auto* dirlt = light_cascades_info.first;
-				cas->record(kernel_index);
-				for (const auto* const m : models) {
-					GX_DO_TASK(fwddirshd->record(scn, cam, dirlt, m, cas, kernel_index));
-				}
-			}
-			// TODO: Camera independent lights handles in follow
+            for (const auto& light_cascades_info : lights_cascades_info) {
+                auto* cas = light_cascades_info.second;
+                auto* dirlt = light_cascades_info.first;
+                cas->record(kernel_index);
+                for (const auto* const m : models) {
+                    GX_DO_TASK(fwddirshd->record(scn, cam, dirlt, m, cas, kernel_index));
+                }
+            }
+            // TODO: Camera independent lights handles in follow
             // for (const auto& id_light : lights) {
             //    if (!id_light.second->is_shadower())
             //        continue;

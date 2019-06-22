@@ -31,19 +31,19 @@ const static std::string vertex_shader_code = GX_GLES2_SHADER_SRC_DEFAULT_VERTEX
     "    out_tng = normalize((model_m * vec4(tangent.xyz, 0.0)).xyz);\n"
     "    out_btg = cross(out_nrm, out_tng) * tangent.w;\n"
     "    out_uv = uv;\n"
-	"    int effect_cascades_count_int = int(effect_cascades_count);\n"
+    "    int effect_cascades_count_int = int(effect_cascades_count);\n"
     "    for(int i = 0; i < effect_cascades_count_int; ++i)\n"
     "    {\n"
     "        vec4 light_pos = effect_view_projection_biases[i] * pos;\n"
-	"        if(light_pos.x <= 0.0f || light_pos.x >= 1.0f || light_pos.y <= 0.0f || light_pos.y >= 1.0f)\n"
-	"        {\n"
-	"            out_light_poses[i] = light_pos.xyz;\n"
-	"        }\n"
-	"        else\n"
-	"        {\n"
+    "        if(light_pos.x <= 0.0 || light_pos.x >= 1.0 || light_pos.y <= 0.0 || light_pos.y >= 1.0)\n"
+    "        {\n"
+    "            out_light_poses[i] = light_pos.xyz;\n"
+    "        }\n"
+    "        else\n"
+    "        {\n"
     "            out_light_poses[i] = light_pos.xyz / light_pos.w;\n"
-	"            break;\n"
-	"        }\n"
+    "            break;\n"
+    "        }\n"
     "    }\n"
     "    gl_Position = camera_vp * pos;\n"
     "}";
@@ -210,36 +210,36 @@ const static std::string fragment_shader_code = GX_GLES2_SHADER_SRC_DEFAULT_FRAG
     "    bool is_in_directional_light = true;\n"
     //   TODO: I'm not sure about bias calculation, maybe I should calculate it by vertex normal
     "    float normal_dot_light = max(dot(normal, -light_direction), 0.0);\n"
-    "    float shadow_bias = 0.01f;\n"
-    "    if(normal_dot_light > 0.0f)\n"
+    "    float shadow_bias = 0.01;\n"
+    "    if(normal_dot_light > 0.0)\n"
     "    {\n"
-    "        shadow_bias = clamp(0.005f - (0.005f / (normal_dot_light * normal_dot_light)), 0.0f, 0.01f);\n"
+    "        shadow_bias = clamp(0.005 - (0.005 / (normal_dot_light * normal_dot_light)), 0.0, 0.01);\n"
     "    }\n"
     "    else\n"
     "    {\n"
     "        is_in_directional_light = false;"
     "    }\n"
-	"    if(is_in_directional_light)\n"
-	"    {\n"
-	"        int effect_cascades_count_int = int(effect_cascades_count);\n"
-	"        for(int i = 0; i < effect_cascades_count_int; ++i)\n"
-	"        {\n"
-	"            vec3 lightuv = out_light_poses[i];"
-	"            if (lightuv.x > 0.0f && lightuv.x < 1.0f && lightuv.y > 0.0f && lightuv.y < 1.0f)\n"
-	"            {\n"
+    "    if(is_in_directional_light)\n"
+    "    {\n"
+    "        int effect_cascades_count_int = int(effect_cascades_count);\n"
+    "        for(int i = 0; i < effect_cascades_count_int; ++i)\n"
+    "        {\n"
+    "            vec3 lightuv = out_light_poses[i];"
+    "            if (lightuv.x > 0.0 && lightuv.x < 1.0 && lightuv.y > 0.0 && lightuv.y < 1.0)\n"
+    "            {\n"
     "                vec2 depth_vec = texture2D(effect_shadow_map, lightuv.xy).xy;\n"
     "                float depth = depth_vec.y;\n"
-    "                depth *= 0.00390625f;\n"
+    "                depth *= 0.00390625;\n"
     "                depth += depth_vec.x;\n"
-	"                if(depth + shadow_bias <= lightuv.z)\n"
-	"                {\n"
-	"                    is_in_directional_light = false;\n"
-	"                }\n"
-	"                break;\n"
-	"            }\n"
-	"        }\n"
-	"    }\n"
-	"    if(is_in_directional_light)\n"
+    "                if(depth + shadow_bias <= lightuv.z)\n"
+    "                {\n"
+    "                    is_in_directional_light = false;\n"
+    "                }\n"
+    "                break;\n"
+    "            }\n"
+    "        }\n"
+    "    }\n"
+    "    if(is_in_directional_light)\n"
     "    {\n"
     "        vec3 half_vec = normalize(view - light_direction);\n"
     "        vec3 radiance = light_color.xyz;\n" // 116
@@ -304,11 +304,11 @@ gearoenix::gles2::shader::ForwardPbrDirectionalShadow::ForwardPbrDirectionalShad
         // TODO
         //GX_GLES2_THIS_GET_UNIFORM_F(effect_ambient_occlusion)
         GX_GLES2_THIS_GET_UNIFORM_F(effect_brdflut)
-		GX_GLES2_THIS_GET_UNIFORM_F(effect_cascades_count)
+        GX_GLES2_THIS_GET_UNIFORM_F(effect_cascades_count)
         GX_GLES2_THIS_GET_UNIFORM_F(effect_diffuse_environment)
         GX_GLES2_THIS_GET_UNIFORM_F(effect_shadow_map)
         GX_GLES2_THIS_GET_UNIFORM_F(effect_specular_environment)
-		GX_GLES2_THIS_GET_UNIFORM_F(effect_view_projection_biases)
+        GX_GLES2_THIS_GET_UNIFORM_F(effect_view_projection_biases)
         GX_GLES2_THIS_GET_UNIFORM_F(light_color)
         GX_GLES2_THIS_GET_UNIFORM_F(light_direction)
         GX_GLES2_THIS_GET_UNIFORM_F(model_m)
@@ -325,11 +325,11 @@ gearoenix::gles2::shader::ForwardPbrDirectionalShadow::ForwardPbrDirectionalShad
     });
     GX_GLES2_SHADER_SET_TEXTURE_INDEX_STARTING
     GX_GLES2_SHADER_MATERIAL_SET_TEXTURE_INDEX
-	GX_GLES2_SHADER_SET_TEXTURE_INDEX(effect_ambient_occlusion)
-	GX_GLES2_SHADER_SET_TEXTURE_INDEX(effect_brdflut)
-	GX_GLES2_SHADER_SET_TEXTURE_INDEX(effect_diffuse_environment)
-	GX_GLES2_SHADER_SET_TEXTURE_INDEX(effect_shadow_map)
-	GX_GLES2_SHADER_SET_TEXTURE_INDEX(effect_specular_environment)
+    GX_GLES2_SHADER_SET_TEXTURE_INDEX(effect_ambient_occlusion)
+    GX_GLES2_SHADER_SET_TEXTURE_INDEX(effect_brdflut)
+    GX_GLES2_SHADER_SET_TEXTURE_INDEX(effect_diffuse_environment)
+    GX_GLES2_SHADER_SET_TEXTURE_INDEX(effect_shadow_map)
+    GX_GLES2_SHADER_SET_TEXTURE_INDEX(effect_specular_environment)
 }
 
 gearoenix::gles2::shader::ForwardPbrDirectionalShadow::~ForwardPbrDirectionalShadow()
@@ -343,11 +343,11 @@ void gearoenix::gles2::shader::ForwardPbrDirectionalShadow::bind() const
 #endif
     Shader::bind();
     GX_GLES2_SHADER_MATERIAL_SET_TEXTURE_INDEX_UNIFORM
-	GX_GLES2_SHADER_SET_TEXTURE_INDEX_UNIFORM(effect_ambient_occlusion)
-	GX_GLES2_SHADER_SET_TEXTURE_INDEX_UNIFORM(effect_brdflut)
-	GX_GLES2_SHADER_SET_TEXTURE_INDEX_UNIFORM(effect_diffuse_environment)
-	GX_GLES2_SHADER_SET_TEXTURE_INDEX_UNIFORM(effect_shadow_map)
-	GX_GLES2_SHADER_SET_TEXTURE_INDEX_UNIFORM(effect_specular_environment)
+    GX_GLES2_SHADER_SET_TEXTURE_INDEX_UNIFORM(effect_ambient_occlusion)
+    GX_GLES2_SHADER_SET_TEXTURE_INDEX_UNIFORM(effect_brdflut)
+    GX_GLES2_SHADER_SET_TEXTURE_INDEX_UNIFORM(effect_diffuse_environment)
+    GX_GLES2_SHADER_SET_TEXTURE_INDEX_UNIFORM(effect_shadow_map)
+    GX_GLES2_SHADER_SET_TEXTURE_INDEX_UNIFORM(effect_specular_environment)
 #ifdef GX_DEBUG_GLES2
     gl::Loader::check_for_error();
 #endif

@@ -9,8 +9,8 @@ namespace gles2 {
     }
     namespace shader {
         class ShadowMapper : public Shader {
-        GX_GLES2_SHADER_MATERIAL_UNIFORMS
-		GX_GLES2_UNIFORM_MATRIX(effect_mvp, 4, 1)
+            GX_GLES2_SHADER_MATERIAL_UNIFORMS
+            GX_GLES2_UNIFORM_MATRIX(effect_mvp, 4, 1)
         public:
             ShadowMapper(const std::shared_ptr<engine::Engine>& e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
             ~ShadowMapper() override final;

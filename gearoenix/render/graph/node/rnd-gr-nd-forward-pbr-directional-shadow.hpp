@@ -5,6 +5,9 @@
 #include "../../../math/math-matrix.hpp"
 #include "../../../math/math-vector.hpp"
 #include "../../buffer/rnd-buf-framed-uniform.hpp"
+#include "../../buffer/rnd-buf-uniform.hpp"
+#include "../../command/rnd-cmd-buffer.hpp"
+#include "../../pipeline/rnd-pip-forward-pbr-directional-shadow-resource-set.hpp"
 #include "rnd-gr-nd-node.hpp"
 #include <memory>
 #include <vector>

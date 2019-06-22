@@ -21,7 +21,7 @@ namespace render {
             bool has_shadow = false;
             math::Vec3 color = math::Vec3(1.0f, 1.0f, 1.0f);
             math::Aabb3 influence;
-			std::unique_ptr<buffer::FramedUniform> uniform_buffers;
+            std::unique_ptr<buffer::FramedUniform> uniform_buffers;
 
             Light(core::Id my_id, system::stream::Stream* f, engine::Engine* e) noexcept;
             Light(core::Id my_id, engine::Engine* e) noexcept;
@@ -45,8 +45,8 @@ namespace render {
 
             /// Only a shadow caster should have implement this (or in a very rare conditions)
             /// Otherwise the default implementation will return nullptr
-			virtual const buffer::FramedUniform* get_uniform_buffers() const noexcept;
-			virtual buffer::FramedUniform* get_uniform_buffers() noexcept;
+            virtual const buffer::FramedUniform* get_uniform_buffers() const noexcept;
+            virtual buffer::FramedUniform* get_uniform_buffers() noexcept;
         };
     }
 }

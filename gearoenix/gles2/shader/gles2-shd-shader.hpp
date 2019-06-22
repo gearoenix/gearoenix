@@ -18,28 +18,31 @@
 #define GX_DEBUG_GLES2_GLSL
 #endif
 
-#define GX_GLES2_UNIFORM_TEXTURE(name)                              \
-	private:                                                        \
-        gl::sint name = GX_GLES2_UNIFORM_FAILED;                    \
-        gl::sint name##_index = GX_GLES2_TEXTURE_INDEX_FAILED;      \
-	public:                                                         \
-        GX_GETTER_BUILDER(name)                                     \
-        GX_GETTER_BUILDER(name##_index)
+#define GX_GLES2_UNIFORM_TEXTURE(name)                     \
+private:                                                   \
+    gl::sint name = GX_GLES2_UNIFORM_FAILED;               \
+    gl::sint name##_index = GX_GLES2_TEXTURE_INDEX_FAILED; \
+                                                           \
+public:                                                    \
+    GX_GETTER_BUILDER(name)                                \
+    GX_GETTER_BUILDER(name##_index)
 
-#define GX_GLES2_UNIFORM(name, function)                           \
-	private:                                                       \
-        gl::sint name = GX_GLES2_UNIFORM_FAILED;                   \
-	public:                                                        \
-        GX_GETTER_BUILDER(name)                                    \
-		void set_##name##_data(const float* data) const noexcept { \
-			gl::Loader::uniform##function;                         \
-        }
+#define GX_GLES2_UNIFORM(name, function)                     \
+private:                                                     \
+    gl::sint name = GX_GLES2_UNIFORM_FAILED;                 \
+                                                             \
+public:                                                      \
+    GX_GETTER_BUILDER(name)                                  \
+    void set_##name##_data(const float* data) const noexcept \
+    {                                                        \
+        gl::Loader::uniform##function;                       \
+    }
 
 #define GX_GLES2_UNIFORM_VECTOR(name, element_count, count) \
-	GX_GLES2_UNIFORM(name, element_count##fv(name, count, data))
+    GX_GLES2_UNIFORM(name, element_count##fv(name, count, data))
 
 #define GX_GLES2_UNIFORM_FLOAT(name) \
-	GX_GLES2_UNIFORM(name, 1f(name, *data))
+    GX_GLES2_UNIFORM(name, 1f(name, *data))
 
 #define GX_GLES2_UNIFORM_MATRIX(name, element_count, count) \
     GX_GLES2_UNIFORM(name, _matrix##element_count##fv(name, count, GL_FALSE, data))
