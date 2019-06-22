@@ -19,7 +19,7 @@ GX_HELPER(camera, Camera)
 
 void gearoenix::render::pipeline::ResourceSet::set_light(const light::Light* const l) noexcept
 {
-    const std::shared_ptr<buffer::FramedUniform>& fub = l->get_uniform_buffers();
+	auto *fub = l->get_uniform_buffers();
     if (fub == nullptr)
         light_uniform_buffer = nullptr;
     else

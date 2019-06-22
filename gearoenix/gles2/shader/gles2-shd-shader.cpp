@@ -73,10 +73,10 @@ gearoenix::gl::uint gearoenix::gles2::shader::Shader::add_shader_to_program(cons
     if (!success) {
         gl::sint sts_size;
         gl::Loader::get_shaderiv(shader_obj, GL_INFO_LOG_LENGTH, &sts_size);
-        std::vector<char> info_log;
+        std::string info_log;
         info_log.resize(static_cast<std::size_t>(sts_size));
         gl::Loader::get_shader_info_log(shader_obj, static_cast<gl::sizei>(sts_size), nullptr, &(info_log[0]));
-        GXLOGF("Error compiling shader type. Info: " << &(info_log[0]));
+        GXLOGF("Error compiling shader type. Info: " << info_log);
     }
     gl::Loader::attach_shader(shader_program, shader_obj);
     return shader_obj;

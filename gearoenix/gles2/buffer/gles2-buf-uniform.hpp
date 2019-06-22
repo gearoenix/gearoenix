@@ -16,7 +16,8 @@ namespace buffer {
         Uniform(unsigned int s, engine::Engine* e) noexcept;
         ~Uniform() noexcept final;
         void update(const void* src) noexcept final;
-        const void* get_data() noexcept final;
+		const void* get_data() const noexcept final;
+		void* get_data() noexcept final;
     };
 } // namespace buffer
 } // namespace gearoenix

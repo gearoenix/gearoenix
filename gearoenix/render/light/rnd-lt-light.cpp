@@ -3,8 +3,6 @@
 #include "../../system/sys-log.hpp"
 #include "../engine/rnd-eng-engine.hpp"
 
-static std::shared_ptr<gearoenix::render::buffer::FramedUniform> null_uniforms;
-
 gearoenix::render::light::Light::Light(
     const core::Id my_id,
     system::stream::Stream* const f,
@@ -78,7 +76,12 @@ void gearoenix::render::light::Light::update_uniform() noexcept
 {
 }
 
-const std::shared_ptr<gearoenix::render::buffer::FramedUniform>& gearoenix::render::light::Light::get_uniform_buffers() const noexcept
+const gearoenix::render::buffer::FramedUniform* gearoenix::render::light::Light::get_uniform_buffers() const noexcept
 {
-    return null_uniforms;
+	return uniform_buffers.get();
+}
+
+gearoenix::render::buffer::FramedUniform* gearoenix::render::light::Light::get_uniform_buffers() noexcept
+{
+	return uniform_buffers.get();
 }

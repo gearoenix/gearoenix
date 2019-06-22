@@ -12,7 +12,8 @@ protected:
 public:
     virtual ~Uniform() noexcept = default;
     virtual void update(const void*) noexcept = 0;
-    virtual const void* get_data() noexcept = 0;
+	virtual const void* get_data() const  noexcept = 0;
+	virtual void* get_data() noexcept = 0;
 };
 }
 #endif

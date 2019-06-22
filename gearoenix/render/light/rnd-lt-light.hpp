@@ -3,15 +3,13 @@
 #include "../../core/asset/cr-asset.hpp"
 #include "../../math/math-aabb.hpp"
 #include "../../math/math-vector.hpp"
+#include "../buffer/rnd-buf-framed-uniform.hpp"
 #include <memory>
 namespace gearoenix {
 namespace system::stream {
     class Stream;
 }
 namespace render {
-    namespace buffer {
-        class FramedUniform;
-    }
     namespace engine {
         class Engine;
     }
@@ -23,6 +21,7 @@ namespace render {
             bool has_shadow = false;
             math::Vec3 color = math::Vec3(1.0f, 1.0f, 1.0f);
             math::Aabb3 influence;
+			std::unique_ptr<buffer::FramedUniform> uniform_buffers;
 
             Light(core::Id my_id, system::stream::Stream* f, engine::Engine* e) noexcept;
             Light(core::Id my_id, engine::Engine* e) noexcept;
@@ -46,7 +45,8 @@ namespace render {
 
             /// Only a shadow caster should have implement this (or in a very rare conditions)
             /// Otherwise the default implementation will return nullptr
-            virtual const std::shared_ptr<buffer::FramedUniform>& get_uniform_buffers() const noexcept;
+			virtual const buffer::FramedUniform* get_uniform_buffers() const noexcept;
+			virtual buffer::FramedUniform* get_uniform_buffers() noexcept;
         };
     }
 }

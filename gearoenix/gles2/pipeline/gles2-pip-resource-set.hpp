@@ -6,15 +6,15 @@
 #define GX_GLES2_PIPRES_START_DRAWING_MESH                                     \
     reinterpret_cast<const buffer::Index*>(msh->get_index_buffer())->bind();   \
     reinterpret_cast<const buffer::Vertex*>(msh->get_vertex_buffer())->bind(); \
-    gles2::pipeline::ResourceSet::bind(bound_shader_program)
+    gles2::pipeline::ResourceSet::bind(bound_shader_program);
 
-#define GX_GLES2_PIPRES_END_DRAWING_MESH reinterpret_cast<const buffer::Index*>(msh->get_index_buffer())->draw()
+#define GX_GLES2_PIPRES_END_DRAWING_MESH reinterpret_cast<const buffer::Index*>(msh->get_index_buffer())->draw();
 
-#define GX_GLES2_PIPRES_START_SHADER(cls, shd) const shader::cls* shdr = static_cast<const shader::cls*>(shd.get())
+#define GX_GLES2_PIPRES_START_SHADER(cls, shd) const shader::cls* shdr = static_cast<const shader::cls*>(shd.get());
 
 #define GX_GLES2_PIPRES_SET_UNIFORM(x, d)           \
     if (shdr->get_##x() != GX_GLES2_UNIFORM_FAILED) \
-    shdr->set_##x##_data(&(d))
+    shdr->set_##x##_data(&(d));
 
 #define GX_GLES2_PIPRES_SET_TXT(x, txt, cls)        \
     if (shdr->get_##x() != GX_GLES2_UNIFORM_FAILED) \

@@ -31,8 +31,8 @@ void gearoenix::render::graph::tree::Pbr::update() noexcept
                 auto& cds = light_cascades_info.second->get_cascades_data();
                 for (auto& c : cds) {
                     auto& shm = c.shadow_mapper;
-                    core::graph::Node::connect(shm, 0, fwddirshd, node::ForwardPbrDirectionalShadow::shadow_map_index);
-                    fwddirshd->set_input_texture(shm->get_output_texture(0), node::ForwardPbrDirectionalShadow::shadow_map_index);
+                    core::graph::Node::connect(shm, 0, fwddirshd, node::ForwardPbrDirectionalShadow::SHADOW_MAP_INDEX);
+                    fwddirshd->set_input_texture(shm->get_output_texture(0), node::ForwardPbrDirectionalShadow::SHADOW_MAP_INDEX);
                 }
             }
         }
@@ -58,21 +58,22 @@ void gearoenix::render::graph::tree::Pbr::record(const unsigned int kernel_index
             const auto* const cam = camera_models.first;
             const auto& models = camera_models.second.first;
             const auto& lights_cascades_info = camera_models.second.second;
-            for (const auto& light_cascades_info : lights_cascades_info)
-                light_cascades_info.second->record(kernel_index);
-            for (const auto& id_light : lights) {
-                if (!id_light.second->is_shadower())
-                    continue;
-                auto dirlt = dynamic_cast<const light::Directional*>(id_light.second.get());
-                if (dirlt != nullptr) {
-                    for (const auto* const model : models) {
-                        GX_DO_TASK(fwddirshd->record(scn, cam, dirlt, model, kernel_index));
-                    }
-                    continue; /// This is for future
-                }
-                // const std::shared_ptr<light::Point> pntlt = std::dynamic_pointer_cast<light::Point>(id_light.second);
-                /// like ...
-            }
+			for (const auto& light_cascades_info : lights_cascades_info)
+			{
+				auto* cas = light_cascades_info.second;
+				auto* dirlt = light_cascades_info.first;
+				cas->record(kernel_index);
+				for (const auto* const m : models) {
+					GX_DO_TASK(fwddirshd->record(scn, cam, dirlt, m, cas, kernel_index));
+				}
+			}
+			// TODO: Camera independent lights handles in follow
+            // for (const auto& id_light : lights) {
+            //    if (!id_light.second->is_shadower())
+            //        continue;
+            //    auto pntlt = dynamic_cast<const light::Point *>(id_light.second.get());
+            //    if (pntlt != nullptr) { }
+            // }
         }
         ++scene_number;
     }
@@ -89,7 +90,6 @@ void gearoenix::render::graph::tree::Pbr::submit() noexcept
             for (const auto& light_cascades_info : lights_cascades_info) {
                 auto* cas_inf = light_cascades_info.second;
                 cas_inf->submit();
-                fwddirshd->set_cascades(cas_inf->get_cascades_data());
                 fwddirshd->submit();
             }
         }

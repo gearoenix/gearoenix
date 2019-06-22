@@ -9,16 +9,12 @@ namespace gles2 {
     }
     namespace shader {
         class ShadowMapper : public Shader {
-        private:
-            GX_GLES2_SHADER_MATERIAL_UNIFORMS_LOCATIONS
-            gl::sint effect_mvp = GX_GLES2_UNIFORM_FAILED;
-
+        GX_GLES2_SHADER_MATERIAL_UNIFORMS
+		GX_GLES2_UNIFORM_MATRIX(effect_mvp, 4, 1)
         public:
             ShadowMapper(const std::shared_ptr<engine::Engine>& e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
             ~ShadowMapper() override final;
             void bind() const override final;
-            GX_GLES2_SHADER_MATERIAL_FUNCTION_DECLARATIONS
-            GX_GLES2_SHADER_SET_DATA_FUNCTION_M(effect_mvp, 4, 1)
         };
     }
 }

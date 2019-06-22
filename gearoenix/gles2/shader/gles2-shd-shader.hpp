@@ -12,10 +12,37 @@
 #include <string>
 
 #define GX_GLES2_UNIFORM_FAILED -1
+#define GX_GLES2_TEXTURE_INDEX_FAILED -1
 
 #ifdef GX_DEBUG_GLES2
 #define GX_DEBUG_GLES2_GLSL
 #endif
+
+#define GX_GLES2_UNIFORM_TEXTURE(name)                              \
+	private:                                                        \
+        gl::sint name = GX_GLES2_UNIFORM_FAILED;                    \
+        gl::sint name##_index = GX_GLES2_TEXTURE_INDEX_FAILED;      \
+	public:                                                         \
+        GX_GETTER_BUILDER(name)                                     \
+        GX_GETTER_BUILDER(name##_index)
+
+#define GX_GLES2_UNIFORM(name, function)                           \
+	private:                                                       \
+        gl::sint name = GX_GLES2_UNIFORM_FAILED;                   \
+	public:                                                        \
+        GX_GETTER_BUILDER(name)                                    \
+		void set_##name##_data(const float* data) const noexcept { \
+			gl::Loader::uniform##function;                         \
+        }
+
+#define GX_GLES2_UNIFORM_VECTOR(name, element_count, count) \
+	GX_GLES2_UNIFORM(name, element_count##fv(name, count, data))
+
+#define GX_GLES2_UNIFORM_FLOAT(name) \
+	GX_GLES2_UNIFORM(name, 1f(name, *data))
+
+#define GX_GLES2_UNIFORM_MATRIX(name, element_count, count) \
+    GX_GLES2_UNIFORM(name, _matrix##element_count##fv(name, count, GL_FALSE, data))
 
 #define GX_GLES2_GET_UNIFORM(shd, uniform) uniform = shd->get_uniform_location(#uniform)
 
@@ -28,27 +55,6 @@
 #define GX_GLES2_THIS_GET_UNIFORM(uniform) GX_GLES2_GET_UNIFORM(this, uniform)
 
 #define GX_GLES2_THIS_GET_UNIFORM_F(uniform) GX_GLES2_GET_UNIFORM_F(this, uniform)
-
-#define GX_GLES2_SHADER_SET_DATA_FUNCTION_V(x, t, n) \
-    GX_GETTER_BUILDER(x)                             \
-    void set_##x##_data(const float* data) const     \
-    {                                                \
-        gl::Loader::uniform##t##fv(x, n, data);      \
-    }
-
-#define GX_GLES2_SHADER_SET_DATA_FUNCTION_F(x)   \
-    GX_GETTER_BUILDER(x)                         \
-    void set_##x##_data(const float* data) const \
-    {                                            \
-        gl::Loader::uniform1f(x, *data);         \
-    }
-
-#define GX_GLES2_SHADER_SET_DATA_FUNCTION_M(x, t, n)             \
-    GX_GETTER_BUILDER(x)                                         \
-    void set_##x##_data(const float* data) const                 \
-    {                                                            \
-        gl::Loader::uniform_matrix##t##fv(x, n, GL_FALSE, data); \
-    }
 
 #define GX_GLES2_SHADER_SET_TEXTURE_INDEX_STARTING gl::sint texture_index = 0;
 
@@ -92,37 +98,17 @@
 
 #define GX_GLES2_SHADER_SRC_MATERIAL_RESOURCES GX_GLES2_SHADER_SRC_MATERIAL_UNIFORMS GX_GLES2_SHADER_SRC_MATERIAL_TEXTURES
 
-#define GX_GLES2_SHADER_MATERIAL_UNIFORMS_LOCATIONS                       \
-    gl::sint material_alpha = GX_GLES2_UNIFORM_FAILED;                    \
-    gl::sint material_alpha_cutoff = GX_GLES2_UNIFORM_FAILED;             \
-    gl::sint material_base_color = GX_GLES2_UNIFORM_FAILED;               \
-    gl::sint material_emissive = GX_GLES2_UNIFORM_FAILED;                 \
-    gl::sint material_metallic_factor = GX_GLES2_UNIFORM_FAILED;          \
-    gl::sint material_metallic_roughness = GX_GLES2_UNIFORM_FAILED;       \
-    gl::sint material_normal = GX_GLES2_UNIFORM_FAILED;                   \
-    gl::sint material_normal_scale = GX_GLES2_UNIFORM_FAILED;             \
-    gl::sint material_occlusion_strength = GX_GLES2_UNIFORM_FAILED;       \
-    gl::sint material_roughness_factor = GX_GLES2_UNIFORM_FAILED;         \
-    gl::sint material_base_color_index = GX_GLES2_UNIFORM_FAILED;         \
-    gl::sint material_metallic_roughness_index = GX_GLES2_UNIFORM_FAILED; \
-    gl::sint material_normal_index = GX_GLES2_UNIFORM_FAILED;             \
-    gl::sint material_emissive_index = GX_GLES2_UNIFORM_FAILED;
-
-#define GX_GLES2_SHADER_MATERIAL_FUNCTION_DECLARATIONS               \
-    GX_GETTER_BUILDER(material_base_color)                           \
-    GX_GETTER_BUILDER(material_emissive)                             \
-    GX_GETTER_BUILDER(material_metallic_roughness)                   \
-    GX_GETTER_BUILDER(material_normal)                               \
-    GX_GETTER_BUILDER(material_base_color_index)                     \
-    GX_GETTER_BUILDER(material_metallic_roughness_index)             \
-    GX_GETTER_BUILDER(material_normal_index)                         \
-    GX_GETTER_BUILDER(material_emissive_index)                       \
-    GX_GLES2_SHADER_SET_DATA_FUNCTION_F(material_alpha)              \
-    GX_GLES2_SHADER_SET_DATA_FUNCTION_F(material_alpha_cutoff)       \
-    GX_GLES2_SHADER_SET_DATA_FUNCTION_F(material_metallic_factor)    \
-    GX_GLES2_SHADER_SET_DATA_FUNCTION_F(material_normal_scale)       \
-    GX_GLES2_SHADER_SET_DATA_FUNCTION_F(material_occlusion_strength) \
-    GX_GLES2_SHADER_SET_DATA_FUNCTION_F(material_roughness_factor)
+#define GX_GLES2_SHADER_MATERIAL_UNIFORMS                 \
+    GX_GLES2_UNIFORM_FLOAT(material_alpha)                \
+    GX_GLES2_UNIFORM_FLOAT(material_alpha_cutoff)         \
+    GX_GLES2_UNIFORM_TEXTURE(material_base_color)         \
+    GX_GLES2_UNIFORM_TEXTURE(material_emissive)           \
+    GX_GLES2_UNIFORM_FLOAT(material_metallic_factor)      \
+    GX_GLES2_UNIFORM_TEXTURE(material_metallic_roughness) \
+    GX_GLES2_UNIFORM_TEXTURE(material_normal)             \
+    GX_GLES2_UNIFORM_FLOAT(material_normal_scale)         \
+    GX_GLES2_UNIFORM_FLOAT(material_occlusion_strength)   \
+    GX_GLES2_UNIFORM_FLOAT(material_roughness_factor)
 
 #define GX_GLES2_SHADER_MATERIAL_GET_UNIFORM_LOCATIONS      \
     GX_GLES2_THIS_GET_UNIFORM(material_alpha);              \

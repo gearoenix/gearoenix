@@ -63,7 +63,7 @@ namespace graph::node {
     };
 
     struct ForwardPbrDirectionalShadowFrame {
-        std::vector<ForwardPbrDirectionalShadowKernel> kernels;
+        std::vector<std::unique_ptr<ForwardPbrDirectionalShadowKernel>> kernels;
         explicit ForwardPbrDirectionalShadowFrame(engine::Engine* e) noexcept;
     };
 
@@ -72,15 +72,15 @@ namespace graph::node {
     /// The user of this class must use its functionalities in their correct contextes.
     class ForwardPbrDirectionalShadow : public Node {
     private:
-        std::vector<ForwardPbrDirectionalShadowFrame> frames;
+        std::vector<std::unique_ptr<ForwardPbrDirectionalShadowFrame>> frames;
         ForwardPbrDirectionalShadowFrame* frame = nullptr;
 
     public:
-        const static unsigned int diffuse_environment_index;
-        const static unsigned int specular_environment_index;
-        const static unsigned int ambient_occlusion_index;
-        const static unsigned int shadow_map_index;
-        const static unsigned int brdflut_index;
+        const static unsigned int DIFFUSE_ENVIRONMENT_INDEX;
+        const static unsigned int SPECULAR_ENVIRONMENT_INDEX;
+        const static unsigned int AMBIENT_OCCLUSION_INDEX;
+        const static unsigned int SHADOW_MAP_INDEX;
+        const static unsigned int BRDFLUT_INDEX;
 
         ForwardPbrDirectionalShadow(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
         ~ForwardPbrDirectionalShadow() noexcept final = default;

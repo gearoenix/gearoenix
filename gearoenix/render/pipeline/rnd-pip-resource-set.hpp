@@ -38,7 +38,7 @@ namespace pipeline {
     protected:
         buffer::Uniform* scene_uniform_buffer = nullptr;
         buffer::Uniform* camera_uniform_buffer = nullptr;
-        buffer::Uniform* light_uniform_buffer = nullptr;
+        const buffer::Uniform* light_uniform_buffer = nullptr;
         buffer::Uniform* model_uniform_buffer = nullptr;
         buffer::Uniform* material_uniform_buffer = nullptr;
         buffer::Uniform* node_uniform_buffer = nullptr;

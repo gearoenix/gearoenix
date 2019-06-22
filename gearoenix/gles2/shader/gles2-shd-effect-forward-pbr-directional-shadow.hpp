@@ -15,84 +15,31 @@ namespace gles2 {
     namespace shader {
         class ForwardPbrDirectionalShadow : public Shader {
         private:
-            GX_GLES2_SHADER_MATERIAL_UNIFORMS_LOCATIONS
-            gl::sint camera_position = GX_GLES2_UNIFORM_FAILED;
-            gl::sint camera_vp = GX_GLES2_UNIFORM_FAILED;
-            gl::sint effect_ambient_occlusion = GX_GLES2_UNIFORM_FAILED;
-            gl::sint effect_brdflut = GX_GLES2_UNIFORM_FAILED;
-            gl::sint effect_diffuse_environment = GX_GLES2_UNIFORM_FAILED;
-            gl::sint effect_shadow_map = GX_GLES2_UNIFORM_FAILED;
-            gl::sint effect_specular_environment = GX_GLES2_UNIFORM_FAILED;
-            gl::sint light_color = GX_GLES2_UNIFORM_FAILED;
-            gl::sint light_direction = GX_GLES2_UNIFORM_FAILED;
-            gl::sint light_vp_bias = GX_GLES2_UNIFORM_FAILED;
-            gl::sint model_m = GX_GLES2_UNIFORM_FAILED;
-            gl::sint scene_ambient_light = GX_GLES2_UNIFORM_FAILED;
-            gl::sint scene_directional_lights_color = GX_GLES2_UNIFORM_FAILED;
-            gl::sint scene_directional_lights_direction = GX_GLES2_UNIFORM_FAILED;
-            gl::sint scene_lights_count = GX_GLES2_UNIFORM_FAILED;
-            gl::sint scene_point_lights_color_min_radius = GX_GLES2_UNIFORM_FAILED;
-            gl::sint scene_point_lights_position_max_radius = GX_GLES2_UNIFORM_FAILED;
-            gl::sint scene_ssao_config = GX_GLES2_UNIFORM_FAILED;
-            gl::sint effect_diffuse_environment_index = -1;
-            gl::sint effect_specular_environment_index = -1;
-            gl::sint effect_ambient_occlusion_index = -1;
-            gl::sint effect_shadow_map_index = -1;
-            gl::sint effect_brdflut_index = -1;
+            GX_GLES2_SHADER_MATERIAL_UNIFORMS
+			GX_GLES2_UNIFORM_VECTOR(camera_position, 3, 1)
+            GX_GLES2_UNIFORM_MATRIX(camera_vp, 4, 1)
+            GX_GLES2_UNIFORM_TEXTURE(effect_ambient_occlusion)
+			GX_GLES2_UNIFORM_TEXTURE(effect_brdflut)
+			GX_GLES2_UNIFORM_FLOAT(effect_cascades_count)
+			GX_GLES2_UNIFORM_TEXTURE(effect_diffuse_environment)
+			GX_GLES2_UNIFORM_TEXTURE(effect_shadow_map)
+			GX_GLES2_UNIFORM_TEXTURE(effect_specular_environment)
+			GX_GLES2_UNIFORM_MATRIX(effect_view_projection_biases, 4, GX_MAX_SHADOW_CASCADES)
+            GX_GLES2_UNIFORM_VECTOR(light_color, 3, 1)
+            GX_GLES2_UNIFORM_VECTOR(light_direction, 3, 1)
+            GX_GLES2_UNIFORM_MATRIX(model_m, 4, 1)
+            GX_GLES2_UNIFORM_VECTOR(scene_ambient_light, 3, 1)
+            GX_GLES2_UNIFORM_VECTOR(scene_directional_lights_color, 4, GX_MAX_DIRECTIONAL_LIGHTS)
+            GX_GLES2_UNIFORM_VECTOR(scene_directional_lights_direction, 4, GX_MAX_DIRECTIONAL_LIGHTS)
+            GX_GLES2_UNIFORM_VECTOR(scene_lights_count, 2, 1)
+            GX_GLES2_UNIFORM_VECTOR(scene_point_lights_color_min_radius, 4, GX_MAX_POINT_LIGHTS)
+            GX_GLES2_UNIFORM_VECTOR(scene_point_lights_position_max_radius, 4, GX_MAX_POINT_LIGHTS)
+            GX_GLES2_UNIFORM_VECTOR(scene_ssao_config, 3, 1)
 
         public:
             ForwardPbrDirectionalShadow(const std::shared_ptr<engine::Engine>& e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
             ~ForwardPbrDirectionalShadow() override final;
             void bind() const override final;
-            GX_GLES2_SHADER_MATERIAL_FUNCTION_DECLARATIONS
-            GX_GETTER_BUILDER(camera_position)
-            GX_GETTER_BUILDER(camera_vp)
-            GX_GETTER_BUILDER(effect_ambient_occlusion)
-            GX_GETTER_BUILDER(effect_brdflut)
-            GX_GETTER_BUILDER(effect_diffuse_environment)
-            GX_GETTER_BUILDER(effect_shadow_map)
-            GX_GETTER_BUILDER(effect_specular_environment)
-            GX_GETTER_BUILDER(light_color)
-            GX_GETTER_BUILDER(light_direction)
-            GX_GETTER_BUILDER(light_vp_bias)
-            GX_GETTER_BUILDER(model_m)
-            GX_GETTER_BUILDER(scene_ambient_light)
-            GX_GETTER_BUILDER(scene_directional_lights_color)
-            GX_GETTER_BUILDER(scene_directional_lights_direction)
-            GX_GETTER_BUILDER(scene_lights_count)
-            GX_GETTER_BUILDER(scene_point_lights_color_min_radius)
-            GX_GETTER_BUILDER(scene_point_lights_position_max_radius)
-            GX_GETTER_BUILDER(scene_ssao_config)
-            GX_GETTER_BUILDER(effect_diffuse_environment_index)
-            GX_GETTER_BUILDER(effect_specular_environment_index)
-            GX_GETTER_BUILDER(effect_ambient_occlusion_index)
-            GX_GETTER_BUILDER(effect_shadow_map_index)
-            GX_GETTER_BUILDER(effect_brdflut_index)
-#define GX_HELPER(x) void set_##x##_data(const float* data) const;
-            GX_HELPER(camera_position)
-            GX_HELPER(camera_vp)
-            GX_HELPER(effect_ambient_occlusion)
-            GX_HELPER(effect_brdflut)
-            GX_HELPER(effect_diffuse_environment)
-            GX_HELPER(effect_shadow_map)
-            GX_HELPER(effect_specular_environment)
-            GX_HELPER(light_color)
-            GX_HELPER(light_direction)
-            GX_HELPER(light_vp_bias)
-            GX_HELPER(model_m)
-            GX_HELPER(scene_ambient_light)
-            GX_HELPER(scene_directional_lights_color)
-            GX_HELPER(scene_directional_lights_direction)
-            GX_HELPER(scene_lights_count)
-            GX_HELPER(scene_point_lights_color_min_radius)
-            GX_HELPER(scene_point_lights_position_max_radius)
-            GX_HELPER(scene_ssao_config)
-            GX_HELPER(effect_diffuse_environment_index)
-            GX_HELPER(effect_specular_environment_index)
-            GX_HELPER(effect_ambient_occlusion_index)
-            GX_HELPER(effect_shadow_map_index)
-            GX_HELPER(effect_brdflut_index)
-#undef GX_HELPER
         };
     } // namespace shader
 } // namespace gles2

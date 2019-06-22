@@ -45,6 +45,14 @@ void gearoenix::physics::Engine::update_001_kernel(const unsigned int kernel_ind
         const std::map<core::Id, std::shared_ptr<render::camera::Camera>>& cameras = scene->get_cameras();
         const std::map<core::Id, std::shared_ptr<render::model::Model>>& models = scene->get_models();
         const std::map<core::Id, std::shared_ptr<render::light::Light>>& lights = scene->get_lights();
+		for (const auto& id_light : lights) {
+			const auto& light = id_light.second;
+			if (light->is_enabled()) GX_DO_TASK(light->update_uniform());
+		}
+		for (const auto& id_model : models) {
+			const auto& model = id_model.second;
+			if (model->is_enabled()) GX_DO_TASK(model->update_uniform());
+		}
         for (const std::pair<const core::Id, std::shared_ptr<render::camera::Camera>>& id_camera : cameras) {
             const std::shared_ptr<render::camera::Camera>& camera = id_camera.second;
             if (!camera->is_enabled())
@@ -90,12 +98,6 @@ void gearoenix::physics::Engine::update_001_kernel(const unsigned int kernel_ind
                         current_visible_models.push_back(model.get());
                     });
             }
-        }
-        for (const std::pair<const core::Id, std::shared_ptr<render::model::Model>>& id_model : models) {
-            const std::shared_ptr<render::model::Model>& model = id_model.second;
-            if (!model->is_enabled())
-                continue;
-            GX_DO_TASK(model->update_uniform());
         }
     }
 }

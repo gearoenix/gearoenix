@@ -21,9 +21,14 @@ void gearoenix::gles2::buffer::Uniform::update(const void* const src) noexcept
     std::memcpy(data, src, size);
 }
 
-const void* gearoenix::gles2::buffer::Uniform::get_data() noexcept
+const void* gearoenix::gles2::buffer::Uniform::get_data() const noexcept
 {
-    return data;
+	return data;
+}
+
+void* gearoenix::gles2::buffer::Uniform::get_data() noexcept
+{
+	return data;
 }
 
 #endif

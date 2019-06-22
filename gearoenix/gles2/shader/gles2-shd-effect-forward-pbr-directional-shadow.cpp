@@ -31,10 +31,19 @@ const static std::string vertex_shader_code = GX_GLES2_SHADER_SRC_DEFAULT_VERTEX
     "    out_tng = normalize((model_m * vec4(tangent.xyz, 0.0)).xyz);\n"
     "    out_btg = cross(out_nrm, out_tng) * tangent.w;\n"
     "    out_uv = uv;\n"
-    "    for(int i = 0; i < int(effect_cascades_count); ++i)\n"
+	"    int effect_cascades_count_int = int(effect_cascades_count);\n"
+    "    for(int i = 0; i < effect_cascades_count_int; ++i)\n"
     "    {\n"
-    "        vec4 light_pos = light_vp_bias * pos;\n"
-    "        out_light_poses[i] = light_pos.xyz / light_pos.w;\n"
+    "        vec4 light_pos = effect_view_projection_biases[i] * pos;\n"
+	"        if(light_pos.x <= 0.0f || light_pos.x >= 1.0f || light_pos.y <= 0.0f || light_pos.y >= 1.0f)\n"
+	"        {\n"
+	"            out_light_poses[i] = light_pos.xyz;\n"
+	"        }\n"
+	"        else\n"
+	"        {\n"
+    "            out_light_poses[i] = light_pos.xyz / light_pos.w;\n"
+	"            break;\n"
+	"        }\n"
     "    }\n"
     "    gl_Position = camera_vp * pos;\n"
     "}";
@@ -210,38 +219,51 @@ const static std::string fragment_shader_code = GX_GLES2_SHADER_SRC_DEFAULT_FRAG
     "    {\n"
     "        is_in_directional_light = false;"
     "    }\n"
-    "    for"
-    "    {\n" // shadow caster light
-    "        vec2 depth_vec = texture2D(effect_shadow_map, out_light_pos.xy).xy;\n"
-    "        float depth = depth_vec.y;\n"
-    "        depth *= (1.0f / 256.0f);\n"
-    "        depth += depth_vec.x;\n"
-    "        if(depth + shadow_bias > out_light_pos.z)\n"
-    "        {\n"
-    "            vec3 half_vec = normalize(view - light_direction);\n"
-    "            vec3 radiance = lights_color.xyz;\n" // 116
-    //           Cook-Torrance BRDF
-    "            float ndf = distribution_ggx(normal, half_vec, roughness);\n" // 117
-    "            float geo = geometry_smith(normal_dot_light, normal_dot_view, roughness);\n" // 118
-    "            vec3 frsn = fresnel_schlick(max(dot(half_vec, view), 0.0), f0);\n" // 119
-    "            vec3 nominator = ndf * geo * frsn;\n" // 120
-    //           0.001 to prevent divide by zero.
-    "            float denominator = 4.0 * normal_dot_view * normal_dot_light + 0.001;\n" // 121
-    "            vec3 specular = nominator / denominator;\n" // 122
-    //           kS is equal to Fresnel
-    "            vec3 ks = frsn;\n" // 123
-    //           for energy conservation, the diffuse and specular light can't
-    //           be above 1.0 (unless the surface emits light); to preserve this
-    //           relationship the diffuse component (kD) should equal 1.0 - kS.
-    //           multiply kD by the inverse metalness such that only non-metals
-    //           have diffuse lighting, or a linear blend if partly metal (pure metals
-    //           have no diffuse light).
-    "            vec3 kd = (vec3(1.0) - ks) * (1.0 - metallic);\n" // 124
-    //           scale light by NdotL
-    //           add to outgoing radiance Lo
-    //           note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
-    "            lo += (kd * albedo.xyz / GXPI + specular) * radiance * normal_dot_light;\n"
-    "        }\n"
+	"    if(is_in_directional_light)\n"
+	"    {\n"
+	"        int effect_cascades_count_int = int(effect_cascades_count);\n"
+	"        for(int i = 0; i < effect_cascades_count_int; ++i)\n"
+	"        {\n"
+	"            vec3 lightuv = out_light_poses[i];"
+	"            if (lightuv.x > 0.0f && lightuv.x < 1.0f && lightuv.y > 0.0f && lightuv.y < 1.0f)\n"
+	"            {\n"
+    "                vec2 depth_vec = texture2D(effect_shadow_map, lightuv.xy).xy;\n"
+    "                float depth = depth_vec.y;\n"
+    "                depth *= 0.00390625f;\n"
+    "                depth += depth_vec.x;\n"
+	"                if(depth + shadow_bias <= lightuv.z)\n"
+	"                {\n"
+	"                    is_in_directional_light = false;\n"
+	"                }\n"
+	"                break;\n"
+	"            }\n"
+	"        }\n"
+	"    }\n"
+	"    if(is_in_directional_light)\n"
+    "    {\n"
+    "        vec3 half_vec = normalize(view - light_direction);\n"
+    "        vec3 radiance = light_color.xyz;\n" // 116
+    //       Cook-Torrance BRDF
+    "        float ndf = distribution_ggx(normal, half_vec, roughness);\n" // 117
+    "        float geo = geometry_smith(normal_dot_light, normal_dot_view, roughness);\n" // 118
+    "        vec3 frsn = fresnel_schlick(max(dot(half_vec, view), 0.0), f0);\n" // 119
+    "        vec3 nominator = ndf * geo * frsn;\n" // 120
+    //       0.001 to prevent divide by zero.
+    "        float denominator = 4.0 * normal_dot_view * normal_dot_light + 0.001;\n" // 121
+    "        vec3 specular = nominator / denominator;\n" // 122
+    //       kS is equal to Fresnel
+    "        vec3 ks = frsn;\n" // 123
+    //       for energy conservation, the diffuse and specular light can't
+    //       be above 1.0 (unless the surface emits light); to preserve this
+    //       relationship the diffuse component (kD) should equal 1.0 - kS.
+    //       multiply kD by the inverse metalness such that only non-metals
+    //       have diffuse lighting, or a linear blend if partly metal (pure metals
+    //       have no diffuse light).
+    "        vec3 kd = (vec3(1.0) - ks) * (1.0 - metallic);\n" // 124
+    //       scale light by NdotL
+    //       add to outgoing radiance Lo
+    //       note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
+    "        lo += (kd * albedo.xyz / GXPI + specular) * radiance * normal_dot_light;\n"
     "    }\n" // 126
     //   ambient lighting (we now use IBL as the ambient term)
     "    vec3 frsn = fresnel_schlick_roughness(normal_dot_view, f0, roughness);\n" // 109
@@ -282,12 +304,13 @@ gearoenix::gles2::shader::ForwardPbrDirectionalShadow::ForwardPbrDirectionalShad
         // TODO
         //GX_GLES2_THIS_GET_UNIFORM_F(effect_ambient_occlusion)
         GX_GLES2_THIS_GET_UNIFORM_F(effect_brdflut)
+		GX_GLES2_THIS_GET_UNIFORM_F(effect_cascades_count)
         GX_GLES2_THIS_GET_UNIFORM_F(effect_diffuse_environment)
         GX_GLES2_THIS_GET_UNIFORM_F(effect_shadow_map)
         GX_GLES2_THIS_GET_UNIFORM_F(effect_specular_environment)
+		GX_GLES2_THIS_GET_UNIFORM_F(effect_view_projection_biases)
         GX_GLES2_THIS_GET_UNIFORM_F(light_color)
         GX_GLES2_THIS_GET_UNIFORM_F(light_direction)
-        GX_GLES2_THIS_GET_UNIFORM_F(light_vp_bias)
         GX_GLES2_THIS_GET_UNIFORM_F(model_m)
         // GX_GLES2_THIS_GET_UNIFORM_F(scene_ambient_light)
         GX_GLES2_THIS_GET_UNIFORM_F(scene_directional_lights_color)
@@ -302,15 +325,11 @@ gearoenix::gles2::shader::ForwardPbrDirectionalShadow::ForwardPbrDirectionalShad
     });
     GX_GLES2_SHADER_SET_TEXTURE_INDEX_STARTING
     GX_GLES2_SHADER_MATERIAL_SET_TEXTURE_INDEX
-    effect_diffuse_environment_index = texture_index;
-    ++texture_index;
-    effect_specular_environment_index = texture_index;
-    ++texture_index;
-    effect_ambient_occlusion_index = texture_index;
-    ++texture_index;
-    effect_shadow_map_index = texture_index;
-    ++texture_index;
-    effect_brdflut_index = texture_index;
+	GX_GLES2_SHADER_SET_TEXTURE_INDEX(effect_ambient_occlusion)
+	GX_GLES2_SHADER_SET_TEXTURE_INDEX(effect_brdflut)
+	GX_GLES2_SHADER_SET_TEXTURE_INDEX(effect_diffuse_environment)
+	GX_GLES2_SHADER_SET_TEXTURE_INDEX(effect_shadow_map)
+	GX_GLES2_SHADER_SET_TEXTURE_INDEX(effect_specular_environment)
 }
 
 gearoenix::gles2::shader::ForwardPbrDirectionalShadow::~ForwardPbrDirectionalShadow()
@@ -324,50 +343,13 @@ void gearoenix::gles2::shader::ForwardPbrDirectionalShadow::bind() const
 #endif
     Shader::bind();
     GX_GLES2_SHADER_MATERIAL_SET_TEXTURE_INDEX_UNIFORM
-    gl::Loader::uniform1i(effect_diffuse_environment, effect_diffuse_environment_index);
-    gl::Loader::uniform1i(effect_specular_environment, effect_specular_environment_index);
-    //gl::Loader::uniform1i(effect_ambient_occlusion, effect_ambient_occlusion_index);
-    gl::Loader::uniform1i(effect_shadow_map, effect_shadow_map_index);
-    gl::Loader::uniform1i(effect_brdflut, effect_brdflut_index);
+	GX_GLES2_SHADER_SET_TEXTURE_INDEX_UNIFORM(effect_ambient_occlusion)
+	GX_GLES2_SHADER_SET_TEXTURE_INDEX_UNIFORM(effect_brdflut)
+	GX_GLES2_SHADER_SET_TEXTURE_INDEX_UNIFORM(effect_diffuse_environment)
+	GX_GLES2_SHADER_SET_TEXTURE_INDEX_UNIFORM(effect_shadow_map)
+	GX_GLES2_SHADER_SET_TEXTURE_INDEX_UNIFORM(effect_specular_environment)
 #ifdef GX_DEBUG_GLES2
     gl::Loader::check_for_error();
 #endif
 }
-
-#define GXHELPERV(x, t, n)                                                                              \
-    void gearoenix::gles2::shader::ForwardPbrDirectionalShadow::set_##x##_data(const float* data) const \
-    {                                                                                                   \
-        gl::Loader::uniform##t##fv(x, n, data);                                                         \
-    }
-
-#define GXHELPERF(x)                                                                                    \
-    void gearoenix::gles2::shader::ForwardPbrDirectionalShadow::set_##x##_data(const float* data) const \
-    {                                                                                                   \
-        gl::Loader::uniform1f(x, *data);                                                                \
-    }
-
-#define GXHELPERM(x, t, n)                                                                              \
-    void gearoenix::gles2::shader::ForwardPbrDirectionalShadow::set_##x##_data(const float* data) const \
-    {                                                                                                   \
-        gl::Loader::uniform_matrix##t##fv(x, n, GL_FALSE, data);                                        \
-    }
-
-GXHELPERV(camera_position, 3, 1)
-GXHELPERM(camera_vp, 4, 1)
-GXHELPERV(light_color, 3, 1)
-GXHELPERV(light_direction, 3, 1)
-GXHELPERM(light_vp_bias, 4, 1)
-GXHELPERM(model_m, 4, 1)
-GXHELPERV(scene_ambient_light, 3, 1)
-GXHELPERV(scene_directional_lights_color, 4, GX_MAX_DIRECTIONAL_LIGHTS)
-GXHELPERV(scene_directional_lights_direction, 4, GX_MAX_DIRECTIONAL_LIGHTS)
-GXHELPERV(scene_lights_count, 2, 1)
-GXHELPERV(scene_point_lights_color_min_radius, 4, GX_MAX_POINT_LIGHTS)
-GXHELPERV(scene_point_lights_position_max_radius, 4, GX_MAX_POINT_LIGHTS)
-GXHELPERV(scene_ssao_config, 3, 1)
-
-#undef GXHELPERF
-#undef GXHELPERM
-#undef GXHELPERV
-
 #endif

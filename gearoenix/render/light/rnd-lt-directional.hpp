@@ -18,20 +18,19 @@ namespace light {
         core::Real strength = 1.0f;
         math::Vec3 direction = math::Vec3(0.0f, 0.0f, -1.0f);
         core::Real reserved_1 = 0.0f;
-        math::Vec4 vps[GX_MAX_SHADOW_CASCADES];
-        math::Vec4 vpbs[GX_MAX_SHADOW_CASCADES];
     };
 
     class CascadeInfo;
     class Directional : public Light {
     protected:
-        math::Vec3 direction = math::Vec3(0.0f, 0.0f, -1.0f);
+		DirectionalUniform uniform;
 
     public:
         Directional(core::Id my_id, system::stream::Stream* f, engine::Engine* e) noexcept;
         Directional(core::Id my_id, engine::Engine* e) noexcept;
         const math::Vec3& get_direction() const noexcept;
         void set_direction(const math::Vec3& dir) noexcept;
+		void update_uniform() noexcept final;
     };
 }
 }
