@@ -18,6 +18,7 @@
 #include <cstring>
 #include <functional>
 #include <utility>
+#include <cmath>
 
 void gearoenix::physics::Engine::update_001_kernel(const unsigned int kernel_index) noexcept
 {

@@ -8,6 +8,7 @@
 #include "rnd-txt-texture-2d.hpp"
 #include "rnd-txt-texture-cube.hpp"
 #include "rnd-txt-type.hpp"
+#include <array>
 
 gearoenix::render::texture::Manager::Manager(system::stream::Stream* const s, engine::Engine* const e) noexcept
     : e(e)
@@ -18,11 +19,11 @@ gearoenix::render::texture::Manager::Manager(system::stream::Stream* const s, en
 std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::get_2d(const math::Vec4& color, core::sync::EndCaller<Texture2D>& c) noexcept
 {
     static_assert(sizeof(core::Real) == 4, "Only float 32 bit are supported.");
-    std::shared_ptr<core::Real[]> cc(new core::Real[4]);
-    cc[0] = color[0];
-    cc[1] = color[1];
-    cc[2] = color[2];
-    cc[3] = color[3];
+    std::shared_ptr<std::array<core::Real, 4>> cc(new std::array<core::Real, 4>());
+    (*cc)[0] = color[0];
+    (*cc)[1] = color[1];
+    (*cc)[2] = color[2];
+    (*cc)[3] = color[3];
     SampleInfo sample_info;
     sample_info.mag_filter = Filter::NEAREST;
     sample_info.min_filter = Filter::NEAREST;
@@ -36,7 +37,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
         color_4d_id_t2d[color] = id;
     const std::function<std::shared_ptr<Texture>()> fun = [this, cc, c, id, sample_info] {
         return std::shared_ptr<Texture>(e->create_texture_2d(
-            id, static_cast<const void*>(cc.get()),
+            id, static_cast<const void*>(cc->data()),
             TextureFormat::RGBA_FLOAT32, sample_info, 1, 1,
             core::sync::EndCaller<core::sync::EndCallerIgnore>([c, cc] {})));
     };
@@ -78,11 +79,11 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
 std::shared_ptr<gearoenix::render::texture::Cube> gearoenix::render::texture::Manager::get_cube(const math::Vec4& color, core::sync::EndCaller<Cube>& c) noexcept
 {
     static_assert(sizeof(core::Real) == 4, "Only float 32 bit are supported.");
-    std::shared_ptr<core::Real[]> cc(new core::Real[4]);
-    cc[0] = color[0];
-    cc[1] = color[1];
-    cc[2] = color[2];
-    cc[3] = color[3];
+    std::shared_ptr<std::array<core::Real, 4>> cc(new std::array<core::Real, 4>());
+    (*cc)[0] = color[0];
+    (*cc)[1] = color[1];
+    (*cc)[2] = color[2];
+    (*cc)[3] = color[3];
     SampleInfo sample_info;
     sample_info.mag_filter = Filter::NEAREST;
     sample_info.min_filter = Filter::NEAREST;
@@ -96,7 +97,7 @@ std::shared_ptr<gearoenix::render::texture::Cube> gearoenix::render::texture::Ma
         color_4d_id_cube[color] = id;
     const std::function<std::shared_ptr<Texture>()> fun = [this, cc, c, id, sample_info] {
         return std::shared_ptr<Texture>(e->create_texture_cube(
-            id, static_cast<const void*>(cc.get()),
+            id, static_cast<const void*>(cc->data()),
             TextureFormat::RGBA_FLOAT32, sample_info, 1,
             core::sync::EndCaller<core::sync::EndCallerIgnore>([c, cc] {})));
     };
