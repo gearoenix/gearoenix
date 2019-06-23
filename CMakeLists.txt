@@ -94,6 +94,35 @@ IF (GX_USE_SDL2)
             version
             oleaut32
             imm32)
+    ELSEIF (APPLE)
+        FIND_LIBRARY(COCOA_LIBRARY Cocoa)
+        FIND_LIBRARY(CORE_AUDIO_LIBRARY CoreAudio)
+        FIND_LIBRARY(CORE_VIDEO_LIBRARY CoreVideo)
+        FIND_LIBRARY(CORE_SERVICES_LIBRARY CoreServices)
+        FIND_LIBRARY(AUDIO_TOOLBOX_LIBRARY AudioToolbox)
+        FIND_LIBRARY(FORCE_FEEDBACK_LIBRARY ForceFeedback)
+        FIND_LIBRARY(IO_KIT_LIBRARY IOKit)
+        FIND_LIBRARY(CARBON_LIBRARY Carbon)
+        MARK_AS_ADVANCED(
+            COCOA_LIBRARY
+            CORE_AUDIO_LIBRARY
+            CORE_VIDEO_LIBRARY
+            CORE_SERVICES_LIBRARY
+            AUDIO_TOOLBOX_LIBRARY
+            FORCE_FEEDBACK_LIBRARY
+            IO_KIT_LIBRARY
+            CARBON_LIBRARY)
+        SET (GX_LIBS 
+            ${GX_LIBS}
+            iconv
+            ${COCOA_LIBRARY}
+            ${CORE_AUDIO_LIBRARY}
+            ${CORE_VIDEO_LIBRARY}
+            ${CORE_SERVICES_LIBRARY}
+            ${AUDIO_TOOLBOX_LIBRARY}
+            ${FORCE_FEEDBACK_LIBRARY}
+            ${IO_KIT_LIBRARY}
+            ${CARBON_LIBRARY})
     ELSE ()
         SET (GX_LIBS 
             ${GX_LIBS}
