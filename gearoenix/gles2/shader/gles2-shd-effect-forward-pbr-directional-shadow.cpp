@@ -7,14 +7,15 @@
 #include "../engine/gles2-eng-engine.hpp"
 
 const static std::string vertex_shader_code = GX_GLES2_SHADER_SRC_DEFAULT_VERTEX_STARTING
+    // camera uniform(s)
+    "uniform mat4  camera_vp;\n"
     // effect uniform(s)
-    "uniform mat4 camera_vp;\n"
-    // light uniform(s)
-    "uniform mat4 effect_view_projection_biases[" GX_MAX_SHADOW_CASCADES_STR "];\n"
+    "uniform mat4  effect_view_projection_biases[" GX_MAX_SHADOW_CASCADES_STR "];\n"
     "uniform float effect_cascades_count;\n"
-    "uniform vec3 light_direction;\n"
+    // light uniform(s)
+    "uniform vec3  light_direction;\n"
     // model uniform(s)
-    "uniform mat4 model_m;\n"
+    "uniform mat4  model_m;\n"
     // output(s)
     "varying vec3 out_pos;\n"
     "varying vec3 out_nrm;\n"
@@ -46,161 +47,161 @@ const static std::string vertex_shader_code = GX_GLES2_SHADER_SRC_DEFAULT_VERTEX
 const static std::string fragment_shader_code = GX_GLES2_SHADER_SRC_DEFAULT_FRAGMENT_STARTING
     GX_GLES2_SHADER_SRC_MATERIAL_RESOURCES
     // scenes uniform(s)
-    "uniform vec3      scene_ambient_light;\n" // 15
-    "uniform vec4      scene_directional_lights_color[" GX_MAX_DIRECTIONAL_LIGHTS_STR "];\n" // 16
-    "uniform vec4      scene_directional_lights_direction[" GX_MAX_DIRECTIONAL_LIGHTS_STR "];\n" // 17
-    "uniform vec4      scene_point_lights_color_min_radius[" GX_MAX_POINT_LIGHTS_STR "];\n" // 18
-    "uniform vec4      scene_point_lights_position_max_radius[" GX_MAX_POINT_LIGHTS_STR "];\n" // 19
+    "uniform vec3        scene_ambient_light;\n"
+    "uniform vec4        scene_directional_lights_color[" GX_MAX_DIRECTIONAL_LIGHTS_STR "];\n"
+    "uniform vec4        scene_directional_lights_direction[" GX_MAX_DIRECTIONAL_LIGHTS_STR "];\n"
+    "uniform vec4        scene_point_lights_color_min_radius[" GX_MAX_POINT_LIGHTS_STR "];\n"
+    "uniform vec4        scene_point_lights_position_max_radius[" GX_MAX_POINT_LIGHTS_STR "];\n"
     // directional, point
-    "uniform vec2      scene_lights_count;\n" // 20
+    "uniform vec2        scene_lights_count;\n"
     // samples-count, radius, z-tolerance
-    "uniform vec3      scene_ssao_config;\n" // 21
+    "uniform vec3        scene_ssao_config;\n"
     // effect uniforms
-    "uniform samplerCube effect_diffuse_environment;\n" // 22
-    "uniform samplerCube effect_specular_environment;\n" // 23
-    "uniform sampler2D effect_ambient_occlusion;\n" // 24
-    "uniform sampler2D effect_shadow_map;\n" // 25
-    "uniform sampler2D effect_brdflut;\n" // 26
-    "uniform float effect_cascades_count;\n"
+    "uniform samplerCube effect_diffuse_environment;\n"
+    "uniform samplerCube effect_specular_environment;\n"
+    "uniform sampler2D   effect_ambient_occlusion;\n"
+    "uniform sampler2D   effect_shadow_map;\n"
+    "uniform sampler2D   effect_brdflut;\n"
+    "uniform float       effect_cascades_count;\n"
     // light uniform(s)
-    "uniform vec3      light_color;\n" // 27
-    "uniform vec3      light_direction;\n" // 28
+    "uniform vec3        light_color;\n"
+    "uniform vec3        light_direction;\n"
     // camera uniform(s)
-    "uniform vec3      camera_position;\n" // 29
+    "uniform vec3        camera_position;\n"
     // output(s) of vertex shader
-    "varying vec3 out_pos;\n" // 30
-    "varying vec3 out_nrm;\n" // 31
-    "varying vec3 out_tng;\n" // 32
-    "varying vec3 out_btg;\n" // 33
-    "varying vec2 out_uv;\n" // 34
+    "varying vec3 out_pos;\n"
+    "varying vec3 out_nrm;\n"
+    "varying vec3 out_tng;\n"
+    "varying vec3 out_btg;\n"
+    "varying vec2 out_uv;\n"
     "varying vec3 out_light_poses[" GX_MAX_SHADOW_CASCADES_STR "];\n"
     // Normal Distribution Function Trowbridge-Reitz GGX
-    "float distribution_ggx(const vec3 normal, const vec3 halfway, const float roughness) {\n" // 36
-    "    float roughness2 = roughness * roughness;\n" // 37
-    "    float nh = max(dot(normal, halfway), 0.0);\n" // 38
-    "    float nh2 = nh * nh;\n" // 49
-    "    float nom = roughness2;\n" // 40
-    "    float tmpdenom = nh2 * (roughness2 - 1.0) + 1.0;\n" // 41
-    "    float denom = GXPI * tmpdenom * tmpdenom;\n" // 42
-    "    return nom / denom;\n" // 43
-    "}\n" // 44
-    "float geometry_schlick_ggx(const float nd, const float roughness, const float k, const float k_inv) {\n" // 45
-    "    float nom = nd;\n" // 46
-    "    float denom = nd * k_inv + k;\n" // 47
-    "    return nom / denom;\n" // 48
-    "}\n" // 49
-    "float geometry_smith(const float normal_dot_light, const float normal_dot_view, const float roughness) {\n" // 50
-    "    float k = roughness + 1.0;\n" // 51
-    "    k = (k * k) * (1.0 / 8.0);\n" // 52
-    "    float k_inv = 1.0 - k;\n" // 53
-    "    float ggx2 = geometry_schlick_ggx(normal_dot_view, roughness, k, k_inv);\n" // 54
-    "    float ggx1 = geometry_schlick_ggx(normal_dot_light, roughness, k, k_inv);\n" // 55
-    "    return ggx1 * ggx2;\n" // 56
-    "}\n" // 57
-    "vec3 fresnel_schlick(const float nv, const vec3 f0) {\n" // 58
-    "    float inv = 1.0 - nv;\n" // 59
-    "    float inv2 = inv * inv;\n" // 60
-    "    float inv4 = inv2 * inv2;\n" // 61
-    "    float inv5 = inv4 * inv;\n" // 62
-    "    return f0 + ((1.0 - f0) * inv5);\n" // 63
-    "}\n" // 64
+    "float distribution_ggx(const vec3 normal, const vec3 halfway, const float roughness) {\n"
+    "    float roughness2 = roughness * roughness;\n"
+    "    float nh = max(dot(normal, halfway), 0.0);\n"
+    "    float nh2 = nh * nh;\n"
+    "    float nom = roughness2;\n"
+    "    float tmpdenom = nh2 * (roughness2 - 1.0) + 1.0;\n"
+    "    float denom = GXPI * tmpdenom * tmpdenom;\n"
+    "    return nom / denom;\n"
+    "}\n"
+    "float geometry_schlick_ggx(const float nd, const float roughness, const float k, const float k_inv) {\n"
+    "    float nom = nd;\n"
+    "    float denom = nd * k_inv + k;\n"
+    "    return nom / denom;\n"
+    "}\n"
+    "float geometry_smith(const float normal_dot_light, const float normal_dot_view, const float roughness) {\n"
+    "    float k = roughness + 1.0;\n"
+    "    k = (k * k) * (1.0 / 8.0);\n"
+    "    float k_inv = 1.0 - k;\n"
+    "    float ggx2 = geometry_schlick_ggx(normal_dot_view, roughness, k, k_inv);\n"
+    "    float ggx1 = geometry_schlick_ggx(normal_dot_light, roughness, k, k_inv);\n"
+    "    return ggx1 * ggx2;\n"
+    "}\n"
+    "vec3 fresnel_schlick(const float nv, const vec3 f0) {\n"
+    "    float inv = 1.0 - nv;\n"
+    "    float inv2 = inv * inv;\n"
+    "    float inv4 = inv2 * inv2;\n"
+    "    float inv5 = inv4 * inv;\n"
+    "    return f0 + ((1.0 - f0) * inv5);\n"
+    "}\n"
     // cos_theta is (n dot v)
-    "vec3 fresnel_schlick_roughness(const float nv, const vec3 f0, const float roughness)\n" // 65
-    "{\n" // 66
-    "    float inv = 1.0 - nv;\n" // 67
-    "    float inv2 = inv * inv;\n" // 68
-    "    float inv4 = inv2 * inv2;\n" // 69
-    "    float inv5 = inv4 * inv;\n" // 70
-    "    return f0 + ((max(vec3(1.0 - roughness), f0) - f0) * inv5);\n" // 71
-    "}\n" // 72
-    "void main()\n" // 73
-    "{\n" // 74
+    "vec3 fresnel_schlick_roughness(const float nv, const vec3 f0, const float roughness)\n"
+    "{\n"
+    "    float inv = 1.0 - nv;\n"
+    "    float inv2 = inv * inv;\n"
+    "    float inv4 = inv2 * inv2;\n"
+    "    float inv5 = inv4 * inv;\n"
+    "    return f0 + ((max(vec3(1.0 - roughness), f0) - f0) * inv5);\n"
+    "}\n"
+    "void main()\n"
+    "{\n"
     //   material properties
-    "    vec4 tmpv4 = texture2D(material_base_color, out_uv);\n" // 75
-    "    tmpv4.w *= material_alpha;\n" // 76
-    "    vec4 albedo = tmpv4;\n" // 77
-    "    if(albedo.w < material_alpha_cutoff) discard;\n" // 78
-    "	 tmpv4.xy = texture2D(material_metallic_roughness, out_uv).xy;\n" // 79
-    "    tmpv4.xy *= vec2(material_metallic_factor, material_roughness_factor);\n" // 80
-    "    float metallic = tmpv4.x;\n" // 81
-    "    float roughness = tmpv4.y;\n" // 82
+    "    vec4 tmpv4 = texture2D(material_base_color, out_uv);\n"
+    "    tmpv4.w *= material_alpha;\n"
+    "    vec4 albedo = tmpv4;\n"
+    "    if(albedo.w < material_alpha_cutoff) discard;\n"
+    "	 tmpv4.xy = texture2D(material_metallic_roughness, out_uv).xy;\n"
+    "    tmpv4.xy *= vec2(material_metallic_factor, material_roughness_factor);\n"
+    "    float metallic = tmpv4.x;\n"
+    "    float roughness = tmpv4.y;\n"
     //   TODO: in future maybe I will add ao in here
     //   input lighting data
-    "    vec3 normal = mat3(out_tng, out_btg, out_nrm) * ((texture2D(material_normal, out_uv).xyz - 0.5) * 2.0 * material_normal_scale);\n" // 83
-    "    vec3 view = normalize(camera_position - out_pos);\n" // 84
-    "    vec3 reflection = reflect(-view, normal);\n" // 85
-    "    float normal_dot_view = max(dot(normal, view), 0.0);\n" // 86
+    "    vec3 normal = mat3(out_tng, out_btg, out_nrm) * ((texture2D(material_normal, out_uv).xyz - 0.5) * 2.0 * material_normal_scale);\n"
+    "    vec3 view = normalize(camera_position - out_pos);\n"
+    "    vec3 reflection = reflect(-view, normal);\n"
+    "    float normal_dot_view = max(dot(normal, view), 0.0);\n"
     //   calculate reflectance at normal incidence; if dia-electric (like plastic) use F0
     //   of 0.04 and if it's a metal, use the albedo color as F0 (metallic workflow)
     //   TODO: in future I must bring builder fresnel factor 0 (the hard coded 0.4) from matrial uniform data
-    "    vec3 f0 = mix(vec3(0.04), albedo.xyz, metallic);\n" // 87
+    "    vec3 f0 = mix(vec3(0.04), albedo.xyz, metallic);\n"
     //   reflectance equation
-    "    vec3 lo = vec3(0.0);\n" // 88
+    "    vec3 lo = vec3(0.0);\n"
     //   computing point lights
-    "    for (float i = 0.001; i < scene_lights_count.y; ++i)\n" // 89
-    "    {\n" // 90
-    "        int ii = int(i);\n" // 91
+    "    for (float i = 0.001; i < scene_lights_count.y; ++i)\n"
+    "    {\n"
+    "        int ii = int(i);\n"
     //       calculate per-light radiance
-    "        vec3 light_vec = scene_point_lights_position_max_radius[ii].xyz - out_pos;\n" // 92
+    "        vec3 light_vec = scene_point_lights_position_max_radius[ii].xyz - out_pos;\n"
     //       TODO: in future consider max and min radius
-    "        float distance = length(light_vec);\n" // 93
-    "        float distance_inv = 1.0 / distance;\n" // 94
-    "        vec3 light_direction = light_vec * distance_inv;\n" // 95
-    "        float normal_dot_light = max(dot(normal, light_direction), 0.0);\n" //96
-    "        vec3 half_vec = normalize(view + light_direction);\n" // 97
-    "        float attenuation = distance_inv * distance_inv;\n" // 98
-    "        vec3 radiance = scene_point_lights_color_min_radius[ii].xyz * attenuation;\n" // 99
+    "        float distance = length(light_vec);\n"
+    "        float distance_inv = 1.0 / distance;\n"
+    "        vec3 light_direction = light_vec * distance_inv;\n"
+    "        float normal_dot_light = max(dot(normal, light_direction), 0.0);\n"
+    "        vec3 half_vec = normalize(view + light_direction);\n"
+    "        float attenuation = distance_inv * distance_inv;\n"
+    "        vec3 radiance = scene_point_lights_color_min_radius[ii].xyz * attenuation;\n"
     //       Cook-Torrance BRDF
-    "        float ndf = distribution_ggx(normal, half_vec, roughness);\n" // 100
-    "        float geo = geometry_smith(normal_dot_light, normal_dot_view, roughness);\n" // 101
-    "        vec3 frsn = fresnel_schlick(max(dot(half_vec, view), 0.0), f0);\n" // 102
-    "        vec3 nominator = ndf * geo * frsn;\n" // 103
+    "        float ndf = distribution_ggx(normal, half_vec, roughness);\n" 
+    "        float geo = geometry_smith(normal_dot_light, normal_dot_view, roughness);\n"
+    "        vec3 frsn = fresnel_schlick(max(dot(half_vec, view), 0.0), f0);\n"
+    "        vec3 nominator = ndf * geo * frsn;\n"
     //       0.001 to prevent divide by zero.
-    "        float denominator = 4.0 * normal_dot_view * normal_dot_light + 0.001;\n" // 104
-    "        vec3 specular = nominator / denominator;\n" // 105
+    "        float denominator = 4.0 * normal_dot_view * normal_dot_light + 0.001;\n"
+    "        vec3 specular = nominator / denominator;\n"
     //       kS is equal to Fresnel
-    "        vec3 ks = frsn;\n" // 106
+    "        vec3 ks = frsn;\n"
     //       for energy conservation, the diffuse and specular light can't
     //       be above 1.0 (unless the surface emits light); to preserve this
     //       relationship the diffuse component (kD) should equal 1.0 - kS.
     //       multiply kD by the inverse metalness such that only non-metals
     //       have diffuse lighting, or a linear blend if partly metal (pure metals
     //       have no diffuse light).
-    "        vec3 kd = (vec3(1.0) - ks) * (1.0 - metallic);\n" // 107
+    "        vec3 kd = (vec3(1.0) - ks) * (1.0 - metallic);\n"
     //       scale light by NdotL
     //       add to outgoing radiance Lo
     //       note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
-    "        lo += (kd * albedo.xyz / GXPI + specular) * radiance * normal_dot_light;\n" // 108
-    "    }\n" // 109
+    "        lo += (kd * albedo.xyz / GXPI + specular) * radiance * normal_dot_light;\n"
+    "    }\n"
     //   computing directional lights
-    "    for (float i = 0.001; i < scene_lights_count.x; ++i)\n" // 110
-    "    {\n" // 111
-    "        int ii = int(i);\n" // 112
-    "        vec3 light_direction = -scene_directional_lights_direction[ii].xyz;\n" // 113
-    "        float normal_dot_light = max(dot(normal, light_direction), 0.0);\n" // 114
-    "        vec3 half_vec = normalize(view + light_direction);\n" // 115
-    "        vec3 radiance = scene_directional_lights_color[ii].xyz;\n" // 116
+    "    for (float i = 0.001; i < scene_lights_count.x; ++i)\n"
+    "    {\n"
+    "        int ii = int(i);\n"
+    "        vec3 light_direction = -scene_directional_lights_direction[ii].xyz;\n"
+    "        float normal_dot_light = max(dot(normal, light_direction), 0.0);\n"
+    "        vec3 half_vec = normalize(view + light_direction);\n"
+    "        vec3 radiance = scene_directional_lights_color[ii].xyz;\n"
     //       Cook-Torrance BRDF
-    "        float ndf = distribution_ggx(normal, half_vec, roughness);\n" // 117
-    "        float geo = geometry_smith(normal_dot_light, normal_dot_view, roughness);\n" // 118
-    "        vec3 frsn = fresnel_schlick(max(dot(half_vec, view), 0.0), f0);\n" // 119
-    "        vec3 nominator = ndf * geo * frsn;\n" // 120
+    "        float ndf = distribution_ggx(normal, half_vec, roughness);\n"
+    "        float geo = geometry_smith(normal_dot_light, normal_dot_view, roughness);\n"
+    "        vec3 frsn = fresnel_schlick(max(dot(half_vec, view), 0.0), f0);\n"
+    "        vec3 nominator = ndf * geo * frsn;\n"
     //       0.001 to prevent divide by zero.
-    "        float denominator = 4.0 * normal_dot_view * normal_dot_light + 0.001;\n" // 121
-    "        vec3 specular = nominator / denominator;\n" // 122
+    "        float denominator = 4.0 * normal_dot_view * normal_dot_light + 0.001;\n"
+    "        vec3 specular = nominator / denominator;\n"
     //       kS is equal to Fresnel
-    "        vec3 ks = frsn;\n" // 123
+    "        vec3 ks = frsn;\n"
     //       for energy conservation, the diffuse and specular light can't
     //       be above 1.0 (unless the surface emits light); to preserve this
     //       relationship the diffuse component (kD) should equal 1.0 - kS.
     //       multiply kD by the inverse metalness such that only non-metals
     //       have diffuse lighting, or a linear blend if partly metal (pure metals
     //       have no diffuse light).
-    "        vec3 kd = (vec3(1.0) - ks) * (1.0 - metallic);\n" // 124
+    "        vec3 kd = (vec3(1.0) - ks) * (1.0 - metallic);\n"
     //       scale light by NdotL
     //       add to outgoing radiance Lo
     //       note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
-    "        lo += (kd * albedo.xyz / GXPI + specular) * radiance * normal_dot_light;\n" // 125
+    "        lo += (kd * albedo.xyz / GXPI + specular) * radiance * normal_dot_light;\n"
     "    }\n"
     "    bool is_in_directional_light = true;\n"
     //   TODO: I'm not sure about bias calculation, maybe I should calculate it by vertex normal
@@ -225,14 +226,11 @@ const static std::string fragment_shader_code = GX_GLES2_SHADER_SRC_DEFAULT_FRAG
     //               TODO: it must become for each cascade shadow map
     "                vec2 depth_vec = texture2D(effect_shadow_map, lightuv.xy).xy;\n"
     "                float depth = depth_vec.y;\n"
-    "                depth /= 256.0;\n"
+    "                depth *= 0.00390625;\n"
     "                depth += depth_vec.x;\n"
-    "if(depth_vec.x < 0.001 && depth_vec.y < 0.001)"
-    "{gl_FragColor = vec4(0.0, 0.0, 1.0, 1.0);return;}"
     "                if(depth + shadow_bias <= lightuv.z)\n"
     "                {\n"
     "                    is_in_directional_light = false;\n"
-    //                            "view += 0.00001;\n"
     "                }\n"
     "                break;\n"
     "            }\n"
@@ -241,72 +239,70 @@ const static std::string fragment_shader_code = GX_GLES2_SHADER_SRC_DEFAULT_FRAG
     "    if(is_in_directional_light)\n"
     "    {\n"
     "        vec3 half_vec = normalize(view - light_direction);\n"
-    "        vec3 radiance = light_color.xyz;\n" // 116
+    "        vec3 radiance = light_color.xyz;\n"
     //       Cook-Torrance BRDF
-    "        float ndf = distribution_ggx(normal, half_vec, roughness);\n" // 117
-    "        float geo = geometry_smith(normal_dot_light, normal_dot_view, roughness);\n" // 118
-    "        vec3 frsn = fresnel_schlick(max(dot(half_vec, view), 0.0), f0);\n" // 119
-    "        vec3 nominator = ndf * geo * frsn;\n" // 120
+    "        float ndf = distribution_ggx(normal, half_vec, roughness);\n"
+    "        float geo = geometry_smith(normal_dot_light, normal_dot_view, roughness);\n"
+    "        vec3 frsn = fresnel_schlick(max(dot(half_vec, view), 0.0), f0);\n"
+    "        vec3 nominator = ndf * geo * frsn;\n"
     //       0.001 to prevent divide by zero.
-    "        float denominator = 4.0 * normal_dot_view * normal_dot_light + 0.001;\n" // 121
-    "        vec3 specular = nominator / denominator;\n" // 122
+    "        float denominator = 4.0 * normal_dot_view * normal_dot_light + 0.001;\n"
+    "        vec3 specular = nominator / denominator;\n"
     //       kS is equal to Fresnel
-    "        vec3 ks = frsn;\n" // 123
+    "        vec3 ks = frsn;\n"
     //       for energy conservation, the diffuse and specular light can't
     //       be above 1.0 (unless the surface emits light); to preserve this
     //       relationship the diffuse component (kD) should equal 1.0 - kS.
     //       multiply kD by the inverse metalness such that only non-metals
     //       have diffuse lighting, or a linear blend if partly metal (pure metals
     //       have no diffuse light).
-    "        vec3 kd = (vec3(1.0) - ks) * (1.0 - metallic);\n" // 124
+    "        vec3 kd = (vec3(1.0) - ks) * (1.0 - metallic);\n"
     //       scale light by NdotL
     //       add to outgoing radiance Lo
     //       note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
     "        lo += (kd * albedo.xyz / GXPI + specular) * radiance * normal_dot_light;\n"
-    "    }\n" // 126
+    "    }\n"
     //   ambient lighting (we now use IBL as the ambient term)
-    "    vec3 frsn = fresnel_schlick_roughness(normal_dot_view, f0, roughness);\n" // 109
-    "    vec3 ks = frsn;\n" // 110
-    "    vec3 kd = (1.0 - ks) * (1.0 - metallic);\n" // 111
-    "    vec3 irradiance = textureCube(effect_diffuse_environment, normal).rgb;\n" // 112
-    "    vec3 diffuse = irradiance * albedo.xyz;\n" // 113
+    "    vec3 frsn = fresnel_schlick_roughness(normal_dot_view, f0, roughness);\n"
+    "    vec3 ks = frsn;\n"
+    "    vec3 kd = (1.0 - ks) * (1.0 - metallic);\n"
+    "    vec3 irradiance = textureCube(effect_diffuse_environment, normal).rgb;\n"
+    "    vec3 diffuse = irradiance * albedo.xyz;\n"
     //   sample both the pre-filter map and the BRDF lut and combine them together as per
     //   the Split-Sum approximation to get the IBL specular part.
-    "    float MAX_REFLECTION_LOD = 4.0;\n" // 114
-    "    vec3 prefiltered_color = textureCube(effect_specular_environment, reflection, roughness * MAX_REFLECTION_LOD).rgb;\n" // 115
-    "    vec2 brdf = texture2D(effect_brdflut, vec2(normal_dot_view, roughness)).rg;\n" // 116
-    "    vec3 specular = prefiltered_color * (frsn * brdf.x + brdf.y);\n" // 117
+    "    float MAX_REFLECTION_LOD = 4.0;\n"
+    "    vec3 prefiltered_color = textureCube(effect_specular_environment, reflection, roughness * MAX_REFLECTION_LOD).rgb;\n"
+    "    vec2 brdf = texture2D(effect_brdflut, vec2(normal_dot_view, roughness)).rg;\n"
+    "    vec3 specular = prefiltered_color * (frsn * brdf.x + brdf.y);\n"
     //   TODO: add ambient occlusion (* ao);
-    "    vec3 ambient = kd * diffuse + specular;\n" // 118
-    "    tmpv4.xyz = ambient + lo;\n" // 119
+    "    vec3 ambient = kd * diffuse + specular;\n"
+    "    tmpv4.xyz = ambient + lo;\n"
     //   HDR tonemapping
-    "    tmpv4.xyz = tmpv4.xyz / (tmpv4.xyz + vec3(1.0));\n" // 120
+    "    tmpv4.xyz = tmpv4.xyz / (tmpv4.xyz + vec3(1.0));\n"
     //   gamma correct
-    "    tmpv4.xyz = pow(tmpv4.xyz, vec3(1.0 / 2.2));\n" // 121
+    "    tmpv4.xyz = pow(tmpv4.xyz, vec3(1.0 / 2.2));\n"
     //   TODO don't forget gamma correction it can be part of scene uniform data
-    "    gl_FragColor = vec4(tmpv4.xyz, albedo.w);\n" // 122
+    "    gl_FragColor = vec4(tmpv4.xyz, albedo.w);\n"
     "}"; // 123
 
 gearoenix::gles2::shader::ForwardPbrDirectionalShadow::ForwardPbrDirectionalShadow(const std::shared_ptr<engine::Engine>& e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c)
     : Shader(e, c)
 {
     e->get_function_loader()->load([this] {
-#ifdef GX_DEBUG_GLES2
-        gl::Loader::check_for_error();
-#endif
         set_vertex_shader(vertex_shader_code);
         set_fragment_shader(fragment_shader_code);
         link();
+		GX_GLES2_SHADER_SET_TEXTURE_INDEX_STARTING
         GX_GLES2_SHADER_MATERIAL_GET_UNIFORM_LOCATIONS
         GX_GLES2_THIS_GET_UNIFORM_F(camera_position)
         GX_GLES2_THIS_GET_UNIFORM_F(camera_vp)
         // TODO
         //GX_GLES2_THIS_GET_UNIFORM_F(effect_ambient_occlusion)
-        GX_GLES2_THIS_GET_UNIFORM_F(effect_brdflut)
+        GX_GLES2_THIS_GET_UNIFORM_TEXTURE_F(effect_brdflut)
         GX_GLES2_THIS_GET_UNIFORM_F(effect_cascades_count)
-        GX_GLES2_THIS_GET_UNIFORM_F(effect_diffuse_environment)
-        GX_GLES2_THIS_GET_UNIFORM_F(effect_shadow_map)
-        GX_GLES2_THIS_GET_UNIFORM_F(effect_specular_environment)
+        GX_GLES2_THIS_GET_UNIFORM_TEXTURE_F(effect_diffuse_environment)
+        GX_GLES2_THIS_GET_UNIFORM_TEXTURE_F(effect_shadow_map)
+        GX_GLES2_THIS_GET_UNIFORM_TEXTURE_F(effect_specular_environment)
         GX_GLES2_THIS_GET_UNIFORM_F(effect_view_projection_biases)
         GX_GLES2_THIS_GET_UNIFORM_F(light_color)
         GX_GLES2_THIS_GET_UNIFORM_F(light_direction)
@@ -318,17 +314,7 @@ gearoenix::gles2::shader::ForwardPbrDirectionalShadow::ForwardPbrDirectionalShad
         GX_GLES2_THIS_GET_UNIFORM_F(scene_point_lights_color_min_radius)
         GX_GLES2_THIS_GET_UNIFORM_F(scene_point_lights_position_max_radius)
         // GX_GLES2_THIS_GET_UNIFORM_F(scene_ssao_config)
-#ifdef GX_DEBUG_GLES2
-        gl::Loader::check_for_error();
-#endif
     });
-    GX_GLES2_SHADER_SET_TEXTURE_INDEX_STARTING
-    GX_GLES2_SHADER_MATERIAL_SET_TEXTURE_INDEX
-    GX_GLES2_SHADER_SET_TEXTURE_INDEX(effect_ambient_occlusion)
-    GX_GLES2_SHADER_SET_TEXTURE_INDEX(effect_brdflut)
-    GX_GLES2_SHADER_SET_TEXTURE_INDEX(effect_diffuse_environment)
-    GX_GLES2_SHADER_SET_TEXTURE_INDEX(effect_shadow_map)
-    GX_GLES2_SHADER_SET_TEXTURE_INDEX(effect_specular_environment)
 }
 
 gearoenix::gles2::shader::ForwardPbrDirectionalShadow::~ForwardPbrDirectionalShadow()
@@ -337,9 +323,6 @@ gearoenix::gles2::shader::ForwardPbrDirectionalShadow::~ForwardPbrDirectionalSha
 
 void gearoenix::gles2::shader::ForwardPbrDirectionalShadow::bind() const
 {
-#ifdef GX_DEBUG_GLES2
-    gl::Loader::check_for_error();
-#endif
     Shader::bind();
     GX_GLES2_SHADER_MATERIAL_SET_TEXTURE_INDEX_UNIFORM
     GX_GLES2_SHADER_SET_TEXTURE_INDEX_UNIFORM(effect_ambient_occlusion)
@@ -347,8 +330,5 @@ void gearoenix::gles2::shader::ForwardPbrDirectionalShadow::bind() const
     GX_GLES2_SHADER_SET_TEXTURE_INDEX_UNIFORM(effect_diffuse_environment)
     GX_GLES2_SHADER_SET_TEXTURE_INDEX_UNIFORM(effect_shadow_map)
     GX_GLES2_SHADER_SET_TEXTURE_INDEX_UNIFORM(effect_specular_environment)
-#ifdef GX_DEBUG_GLES2
-    gl::Loader::check_for_error();
-#endif
 }
 #endif

@@ -47,7 +47,7 @@ public:                                                      \
 #define GX_GLES2_UNIFORM_MATRIX(name, element_count, count) \
     GX_GLES2_UNIFORM(name, _matrix##element_count##fv(name, count, GL_FALSE, data))
 
-#define GX_GLES2_GET_UNIFORM(shd, uniform) uniform = shd->get_uniform_location(#uniform)
+#define GX_GLES2_GET_UNIFORM(shd, uniform) uniform = shd->get_uniform_location(#uniform);
 
 #define GX_GLES2_GET_UNIFORM_F(shd, uniform)                 \
     GX_GLES2_GET_UNIFORM(shd, uniform);                      \
@@ -59,11 +59,22 @@ public:                                                      \
 
 #define GX_GLES2_THIS_GET_UNIFORM_F(uniform) GX_GLES2_GET_UNIFORM_F(this, uniform)
 
-#define GX_GLES2_SHADER_SET_TEXTURE_INDEX_STARTING gl::sint texture_index = 0;
-
 #define GX_GLES2_SHADER_SET_TEXTURE_INDEX(x) \
     x##_index = texture_index;               \
     ++texture_index;
+
+#define GX_GLES2_THIS_GET_UNIFORM_TEXTURE(uniform) \
+	GX_GLES2_GET_UNIFORM(this, uniform)            \
+	if(GX_GLES2_UNIFORM_FAILED != uniform)         \
+	{                                              \
+		GX_GLES2_SHADER_SET_TEXTURE_INDEX(uniform) \
+	}
+
+#define GX_GLES2_THIS_GET_UNIFORM_TEXTURE_F(uniform)\
+	GX_GLES2_GET_UNIFORM_F(this, uniform)\
+	GX_GLES2_SHADER_SET_TEXTURE_INDEX(uniform)
+
+#define GX_GLES2_SHADER_SET_TEXTURE_INDEX_STARTING gl::sint texture_index = 0;
 
 #define GX_GLES2_SHADER_SET_TEXTURE_INDEX_UNIFORM(x) \
     if (x != GX_GLES2_UNIFORM_FAILED)                \
@@ -113,29 +124,23 @@ public:                                                      \
     GX_GLES2_UNIFORM_FLOAT(material_occlusion_strength)   \
     GX_GLES2_UNIFORM_FLOAT(material_roughness_factor)
 
-#define GX_GLES2_SHADER_MATERIAL_GET_UNIFORM_LOCATIONS      \
-    GX_GLES2_THIS_GET_UNIFORM(material_alpha);              \
-    GX_GLES2_THIS_GET_UNIFORM(material_alpha_cutoff);       \
-    GX_GLES2_THIS_GET_UNIFORM(material_base_color);         \
-    GX_GLES2_THIS_GET_UNIFORM(material_emissive);           \
-    GX_GLES2_THIS_GET_UNIFORM(material_metallic_factor);    \
-    GX_GLES2_THIS_GET_UNIFORM(material_metallic_roughness); \
-    GX_GLES2_THIS_GET_UNIFORM(material_normal);             \
-    GX_GLES2_THIS_GET_UNIFORM(material_normal_scale);       \
-    GX_GLES2_THIS_GET_UNIFORM(material_occlusion_strength); \
-    GX_GLES2_THIS_GET_UNIFORM(material_roughness_factor);
-
-#define GX_GLES2_SHADER_MATERIAL_SET_TEXTURE_INDEX                 \
-    GX_GLES2_SHADER_SET_TEXTURE_INDEX(material_base_color)         \
-    GX_GLES2_SHADER_SET_TEXTURE_INDEX(material_metallic_roughness) \
-    GX_GLES2_SHADER_SET_TEXTURE_INDEX(material_normal)             \
-    GX_GLES2_SHADER_SET_TEXTURE_INDEX(material_emissive)
+#define GX_GLES2_SHADER_MATERIAL_GET_UNIFORM_LOCATIONS             \
+    GX_GLES2_THIS_GET_UNIFORM(material_alpha)                      \
+    GX_GLES2_THIS_GET_UNIFORM(material_alpha_cutoff)               \
+    GX_GLES2_THIS_GET_UNIFORM_TEXTURE(material_base_color)         \
+    GX_GLES2_THIS_GET_UNIFORM_TEXTURE(material_emissive)           \
+    GX_GLES2_THIS_GET_UNIFORM(material_metallic_factor)            \
+    GX_GLES2_THIS_GET_UNIFORM_TEXTURE(material_metallic_roughness) \
+    GX_GLES2_THIS_GET_UNIFORM_TEXTURE(material_normal)             \
+    GX_GLES2_THIS_GET_UNIFORM(material_normal_scale)               \
+    GX_GLES2_THIS_GET_UNIFORM(material_occlusion_strength)         \
+    GX_GLES2_THIS_GET_UNIFORM(material_roughness_factor)
 
 #define GX_GLES2_SHADER_MATERIAL_SET_TEXTURE_INDEX_UNIFORM                 \
     GX_GLES2_SHADER_SET_TEXTURE_INDEX_UNIFORM(material_base_color)         \
+    GX_GLES2_SHADER_SET_TEXTURE_INDEX_UNIFORM(material_emissive)           \
     GX_GLES2_SHADER_SET_TEXTURE_INDEX_UNIFORM(material_metallic_roughness) \
-    GX_GLES2_SHADER_SET_TEXTURE_INDEX_UNIFORM(material_normal)             \
-    GX_GLES2_SHADER_SET_TEXTURE_INDEX_UNIFORM(material_emissive)
+    GX_GLES2_SHADER_SET_TEXTURE_INDEX_UNIFORM(material_normal)
 
 namespace gearoenix {
 namespace gles2 {

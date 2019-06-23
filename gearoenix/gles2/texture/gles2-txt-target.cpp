@@ -63,11 +63,8 @@ gearoenix::gles2::texture::Target::Target(
     img_height = h;
     const SampleInfo sample_info = SampleInfo(s);
     if (f != render::texture::TextureFormat::R_FLOAT16)
-        GXLOGF("This engine only supports depth");
+        GXLOGF("GLES2 engine only supports depth");
     e->get_function_loader()->load([this, sample_info, call] {
-#ifdef GX_DEBUG_GLES2
-        gl::Loader::check_for_error();
-#endif
         gl::Loader::gen_framebuffers(1, reinterpret_cast<gl::uint*>(&framebuffer));
         gl::Loader::gen_renderbuffers(1, reinterpret_cast<gl::uint*>(&depth_buffer));
         gl::Loader::bind_renderbuffer(GL_RENDERBUFFER, depth_buffer);
@@ -77,17 +74,14 @@ gearoenix::gles2::texture::Target::Target(
         gl::Loader::bind_texture(GL_TEXTURE_2D, texture_object);
         gl::Loader::framebuffer_renderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depth_buffer);
         gl::Loader::tex_image_2d(GL_TEXTURE_2D, 0, GL_RGB, img_width, img_height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
-        gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, sample_info.min_filter);
-        gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, sample_info.mag_filter);
-        gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, sample_info.wrap_s);
-        gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, sample_info.wrap_t);
+        gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         gl::Loader::framebuffer_texture_2d(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture_object, 0);
         if (gl::Loader::check_framebuffer_status(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
             GXLOGF("Failed to create render target!")
         state_init();
-#ifdef GX_DEBUG_GLES2
-        gl::Loader::check_for_error();
-#endif
     });
 }
 
