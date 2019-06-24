@@ -96,7 +96,7 @@ void gearoenix::system::Application::create_window() noexcept
 		gl_context = SDL_GL_CreateContext(window);                        \
 		if (gl_context != nullptr) {                                      \
 			if(gl::Loader::load_library(supported_engine)) {              \
-				GXLOGI("OpenGL window built with: " << #gl_version)       \
+				GXLOGD("OpenGL window built with: " << #gl_version)       \
 				return;                                                   \
 			}                                                             \
             SDL_GL_DeleteContext(gl_context);                             \
@@ -105,6 +105,12 @@ void gearoenix::system::Application::create_window() noexcept
     }
 
 #ifdef GX_USE_OPENGL_ES3
+	CREATE_WINDOW(OPENGL_ES3)
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+	CREATE_WINDOW(OPENGL_ES3)
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+	CREATE_WINDOW(OPENGL_ES3)
+	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 	CREATE_WINDOW(OPENGL_ES3)
 #endif
 #ifdef GX_USE_OPENGL_ES2
