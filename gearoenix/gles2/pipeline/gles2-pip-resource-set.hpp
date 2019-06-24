@@ -1,5 +1,7 @@
 #ifndef GEAROENIX_GLES2_PIPELINE_RESOURCE_SET_HPP
 #define GEAROENIX_GLES2_PIPELINE_RESOURCE_SET_HPP
+#include "../../core/cr-build-configuration.hpp"
+#ifdef GX_USE_OPENGL_ES2
 #include "../../gl/gl-types.hpp"
 #include <memory>
 
@@ -55,4 +57,5 @@ namespace pipeline {
     };
 }
 }
+#endif
 #endif

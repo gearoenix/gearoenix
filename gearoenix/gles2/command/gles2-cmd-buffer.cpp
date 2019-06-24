@@ -1,4 +1,5 @@
 #include "gles2-cmd-buffer.hpp"
+#ifdef GX_USE_OPENGL_ES2
 #include "../../render/pipeline/rnd-pip-resource-set.hpp"
 #include "../../system/sys-log.hpp"
 #include "../pipeline/gles2-pip-resource-set.hpp"
@@ -22,3 +23,4 @@ gearoenix::gl::uint gearoenix::gles2::command::Buffer::play(gl::uint bound_shade
     }
     return bound_shader_program;
 }
+#endif

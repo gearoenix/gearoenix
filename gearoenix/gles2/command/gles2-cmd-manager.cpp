@@ -1,4 +1,5 @@
 #include "gles2-cmd-manager.hpp"
+#ifdef GX_USE_OPENGL_ES2
 #include "../../system/sys-log.hpp"
 #include "gles2-cmd-buffer.hpp"
 
@@ -21,3 +22,4 @@ gearoenix::render::command::Buffer* gearoenix::gles2::command::Manager::create_s
 {
     return new Buffer();
 }
+#endif

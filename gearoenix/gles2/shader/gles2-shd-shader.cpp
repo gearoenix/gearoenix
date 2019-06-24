@@ -160,5 +160,4 @@ void gearoenix::gles2::shader::Shader::bind() const
     if (uv_attribute_location != -1)
         gl::Loader::vertex_attrib_pointer(static_cast<gl::uint>(uv_attribute_location), 2, GL_FLOAT, GL_FALSE, 12 * sizeof(float), reinterpret_cast<void*>(10 * sizeof(float)));
 }
-
 #endif

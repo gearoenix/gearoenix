@@ -1,5 +1,7 @@
 #ifndef GEAROENIX_GLES2_COMMAND_MANAGER_HPP
 #define GEAROENIX_GLES2_COMMAND_MANAGER_HPP
+#include "../../core/cr-build-configuration.hpp"
+#ifdef GX_USE_OPENGL_ES2
 #include "../../render/command/rnd-cmd-manager.hpp"
 namespace gearoenix::gles2::command {
 class Manager : public render::command::Manager {
@@ -10,4 +12,5 @@ public:
     render::command::Buffer* create_secondary_command_buffer(unsigned int kernel_index) final;
 };
 }
+#endif
 #endif

@@ -1,4 +1,5 @@
 #include "gles2-pip-forward-pbr-directional-shadow.hpp"
+#ifdef GX_USE_OPENGL_ES2
 #include "../engine/gles2-eng-engine.hpp"
 #include "../shader/gles2-shd-effect-forward-pbr-directional-shadow.hpp"
 #include "gles2-pip-forward-pbr-directional-shadow-resource-set.hpp"
@@ -13,3 +14,4 @@ gearoenix::render::pipeline::ResourceSet* gearoenix::gles2::pipeline::ForwardPbr
 {
     return new ForwardPbrDirectionalShadowResourceSet(shd);
 }
+#endif

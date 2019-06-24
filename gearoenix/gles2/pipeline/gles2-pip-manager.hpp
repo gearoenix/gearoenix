@@ -1,5 +1,7 @@
 #ifndef GEAROENIX_GLES2_PIPELINE_MANAGER_HPP
 #define GEAROENIX_GLES2_PIPELINE_MANAGER_HPP
+#include "../../core/cr-build-configuration.hpp"
+#ifdef GX_USE_OPENGL_ES2
 #include "../../core/cache/cr-cache-cacher.hpp"
 #include "../../render/pipeline/rnd-pip-manager.hpp"
 namespace gearoenix {
@@ -18,4 +20,5 @@ namespace gles2 {
     }
 }
 }
+#endif
 #endif

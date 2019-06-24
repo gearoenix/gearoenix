@@ -1,4 +1,5 @@
 #include "gles2-pip-forward-pbr-directional-shadow-resource-set.hpp"
+#ifdef GX_USE_OPENGL_ES2
 #include "../../gl/gl-loader.hpp"
 #include "../../render/buffer/rnd-buf-uniform.hpp"
 #include "../../render/camera/rnd-cmr-uniform.hpp"
@@ -51,3 +52,4 @@ void gearoenix::gles2::pipeline::ForwardPbrDirectionalShadowResourceSet::bind(gl
     GX_GLES2_PIPRES_SET_UNIFORM(effect_cascades_count, node->cascades_count)
     GX_GLES2_PIPRES_END_DRAWING_MESH
 }
+#endif

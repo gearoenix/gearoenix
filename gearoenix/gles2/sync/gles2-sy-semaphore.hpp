@@ -1,5 +1,7 @@
 #ifndef GEAROENIX_GLES2_SYNC_SEMAPHORE_HPP
 #define GEAROENIX_GLES2_SYNC_SEMAPHORE_HPP
+#include "../../core/cr-build-configuration.hpp"
+#ifdef GX_USE_OPENGL_ES2
 #include "../../render/sync/rnd-sy-semaphore.hpp"
 namespace gearoenix {
 namespace gles2 {
@@ -10,5 +12,5 @@ namespace gles2 {
     }
 }
 }
-
+#endif
 #endif

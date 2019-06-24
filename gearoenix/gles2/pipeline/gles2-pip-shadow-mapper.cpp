@@ -1,4 +1,5 @@
 #include "gles2-pip-shadow-mapper.hpp"
+#ifdef GX_USE_OPENGL_ES2
 #include "../engine/gles2-eng-engine.hpp"
 #include "../shader/gles2-shd-shadow-mapper.hpp"
 #include "gles2-pip-shadow-mapper-resource-set.hpp"
@@ -13,3 +14,4 @@ gearoenix::render::pipeline::ResourceSet* gearoenix::gles2::pipeline::ShadowMapp
 {
     return new ShadowMapperResourceSet(shd);
 }
+#endif

@@ -1,4 +1,5 @@
 #include "gles2-pip-resource-set.hpp"
+#ifdef GX_USE_OPENGL_ES2
 #include "../../render/mesh/rnd-msh-mesh.hpp"
 #include "../buffer/gles2-buf-index.hpp"
 #include "../buffer/gles2-buf-vertex.hpp"
@@ -18,3 +19,4 @@ void gearoenix::gles2::pipeline::ResourceSet::bind(gl::uint& bound_shader_progra
     shd->bind();
     //}
 }
+#endif

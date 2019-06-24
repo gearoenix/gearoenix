@@ -1,4 +1,5 @@
 #include "gles2-txt-sample.hpp"
+#ifdef GX_USE_OPENGL_ES2
 #include "../../system/sys-log.hpp"
 
 gearoenix::gles2::texture::SampleInfo::SampleInfo(const render::texture::SampleInfo& o) noexcept
@@ -39,3 +40,4 @@ gearoenix::gles2::texture::SampleInfo::SampleInfo(const render::texture::SampleI
     wrap_t = fun(o.wrap_t);
     wrap_r = fun(o.wrap_r);
 }
+#endif

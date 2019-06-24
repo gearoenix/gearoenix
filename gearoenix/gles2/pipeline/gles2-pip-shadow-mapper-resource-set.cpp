@@ -1,4 +1,5 @@
 #include "gles2-pip-shadow-mapper-resource-set.hpp"
+#ifdef GX_USE_OPENGL_ES2
 #include "../../gl/gl-loader.hpp"
 #include "../../render/buffer/rnd-buf-uniform.hpp"
 #include "../../render/camera/rnd-cmr-uniform.hpp"
@@ -27,3 +28,4 @@ void gearoenix::gles2::pipeline::ShadowMapperResourceSet::bind(gl::uint& bound_s
     GX_GLES2_PIPRES_SET_UNIFORM(effect_mvp, *reinterpret_cast<const render::graph::node::ShadowMapperUniform*>(node_uniform_buffer->get_data())->mvp.data());
     GX_GLES2_PIPRES_END_DRAWING_MESH;
 }
+#endif
