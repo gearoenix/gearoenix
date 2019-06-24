@@ -1,8 +1,9 @@
-#ifndef GL_LOADER_HPP
-#define GL_LOADER_HPP
+#ifndef GEAROENIX_GL_LOADER_HPP
+#define GEAROENIX_GL_LOADER_HPP
 #include "../core/cr-build-configuration.hpp"
 #ifdef GX_USE_OPENGL
 #include "gl-types.hpp"
+#include "../render/engine/rnd-eng-engine.hpp"
 
 #if defined(_WIN32) && !defined(__SCITECH_SNAP__)
 #define GXGL_APICALL __declspec(dllimport)
@@ -89,10 +90,9 @@ private:
 public:
     Loader() = delete;
     Loader(const Loader&) = delete;
-    static void load_library();
-    static void unload_library();
-    static void load_functions();
-    static void check_for_error();
+    static bool load_library(render::engine::Type::Id engine_type) noexcept;
+    static void unload_library() noexcept;
+    static void check_for_error() noexcept;
 
     static active_texture_fnp active_texture;
     static attach_shader_fnp attach_shader;

@@ -53,7 +53,6 @@ namespace system {
         render::engine::Type::Id supported_engine = render::engine::Type::UNKNOWN;
 
         void create_window() noexcept;
-        void create_context() noexcept;
         static int SDLCALL event_receiver(void* user_data, SDL_Event* event) noexcept;
 
         Application() noexcept = default;
