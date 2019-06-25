@@ -26,7 +26,7 @@
 //#define GX_USE_VULKAN
 //#define GX_USE_DIRECTX12
 //#define GX_USE_DIRECTX11
-#define GX_USE_OPENGL_ES3
+//#define GX_USE_OPENGL_ES3
 #define GX_USE_OPENGL_ES2
 #define GX_IN_DESKTOP
 #define GX_USE_SDL
