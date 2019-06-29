@@ -26,8 +26,8 @@
 //#define GX_USE_VULKAN
 //#define GX_USE_DIRECTX12
 //#define GX_USE_DIRECTX11
-//#define GX_USE_OPENGL_ES3
-#define GX_USE_OPENGL_ES2
+#define GX_USE_OPENGL_ES3
+//#define GX_USE_OPENGL_ES2
 #define GX_IN_DESKTOP
 #define GX_USE_SDL
 //#define GX_USE_GLFW
@@ -61,8 +61,6 @@
 #define GX_APP_DATA_NAME "data.gx3d"
 // Application compilation mode
 #define GX_DEBUG_MODE
-//#define GX_TEST_MODE
-#define GX_GAME_MODE
 // Application features
 #define GX_LOG_ENABLED
 #ifdef GX_LOG_ENABLED

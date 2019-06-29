@@ -1,26 +1,32 @@
 #include "gles3-buf-uniform.hpp"
-#ifdef USE_OPENGL_ES3
+#ifdef GX_USE_OPENGL_ES3
 #include "../../system/sys-log.hpp"
-#include "../gles3-engine.hpp"
+#include "../engine/gles3-eng-engine.hpp"
 #include <cstring>
 
-gearoenix::gles3::buffer::Uniform::Uniform(unsigned int s, Engine* eng)
-    : render::buffer::Uniform(eng)
+gearoenix::gles3::buffer::Uniform::Uniform(const unsigned int s, engine::Engine* const e) noexcept
+    : render::buffer::Uniform(s, e)
     , data(new unsigned char[s])
 {
 }
 
-gearoenix::gles3::buffer::Uniform::~Uniform()
+gearoenix::gles3::buffer::Uniform::~Uniform() noexcept
 {
     delete[] data;
+    data = nullptr;
 }
 
-void gearoenix::gles3::buffer::Uniform::update(const void* src, unsigned int size)
+void gearoenix::gles3::buffer::Uniform::update(const void* const src) noexcept
 {
     std::memcpy(data, src, size);
 }
 
-void* gearoenix::gles3::buffer::Uniform::get_data()
+const void* gearoenix::gles3::buffer::Uniform::get_data() const noexcept
+{
+    return data;
+}
+
+void* gearoenix::gles3::buffer::Uniform::get_data() noexcept
 {
     return data;
 }
