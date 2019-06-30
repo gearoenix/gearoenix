@@ -31,6 +31,7 @@ gearoenix::gl::delete_renderbuffers_fnp gearoenix::gl::Loader::delete_renderbuff
 gearoenix::gl::delete_shader_fnp gearoenix::gl::Loader::delete_shader;
 gearoenix::gl::delete_textures_fnp gearoenix::gl::Loader::delete_textures;
 gearoenix::gl::depth_mask_fnp gearoenix::gl::Loader::depth_mask;
+gearoenix::gl::disable_fnp gearoenix::gl::Loader::disable;
 gearoenix::gl::draw_elements_fnp gearoenix::gl::Loader::draw_elements;
 gearoenix::gl::enable_fnp gearoenix::gl::Loader::enable;
 gearoenix::gl::enable_vertex_attrib_array_fnp gearoenix::gl::Loader::enable_vertex_attrib_array;
@@ -115,6 +116,7 @@ bool gearoenix::gl::Loader::load_library(const render::engine::Type::Id engine_t
 		GXFUNLDF(glDeleteShader, delete_shader)
 		GXFUNLDF(glDeleteTextures, delete_textures)
 		GXFUNLDF(glDepthMask, depth_mask)
+		GXFUNLDF(glDisable, disable)
 		GXFUNLDF(glDrawElements, draw_elements)
 		GXFUNLDF(glEnable, enable)
 		GXFUNLDF(glEnableVertexAttribArray, enable_vertex_attrib_array)

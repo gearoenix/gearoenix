@@ -115,48 +115,30 @@ subprocess.run([
     '-DCMAKE_BUILD_TYPE=' + SDL2_BUILD_TYPE,
 ])
 
-if 'Windows' in PLATFORM:
-    print('Building with Visual Studio')
-    SDL2_STATIC = 'SDL2-static'
-    SDL2_MAIN = 'SDL2main'
-    SDL2_STATIC_LIB = SDL2_STATIC + '.lib'
-    SDL2_MAIN_LIB = SDL2_MAIN + '.lib'
-    subprocess.run([
-        'msbuild',
-        SDL2_STATIC + '.vcxproj',
-        '/p:configuration=' + SDL2_BUILD_TYPE,
-        '/p:platform=x64'
-    ])
-    subprocess.run([
-        'msbuild',
-        SDL2_MAIN + '.vcxproj',
-        '/p:configuration=' + SDL2_BUILD_TYPE,
-        '/p:platform=x64'
-    ])
-    SDL2_BUILD_LIB_DIR_PATH = os.path.join(
-        SDL2_BUILD_DIR_PATH, SDL2_BUILD_TYPE)
-    shutil.move(
-        os.path.join(SDL2_BUILD_LIB_DIR_PATH, SDL2_STATIC_LIB),
-        os.path.join(LIBS_PATH, SDL2_STATIC_LIB))
-    shutil.move(
-        os.path.join(SDL2_BUILD_LIB_DIR_PATH, SDL2_MAIN_LIB),
-        os.path.join(LIBS_PATH, SDL2_MAIN_LIB))
+sdl2_build_args = [
+    'cmake',
+    '--build',
+    '.',
+    '--config',
+    SDL2_BUILD_TYPE
+]
 
+if 'Windows' in PLATFORM:
+    SDL2_STATIC_LIB = 'SDL2-static.lib'
+    SDL2_MAIN_LIB = 'SDL2main.lib'
+    SDL2_STATIC = os.path.join(SDL2_BUILD_TYPE, SDL2_STATIC_LIB)
+    SDL2_MAIN = os.path.join(SDL2_BUILD_TYPE, SDL2_MAIN_LIB)
 else:
-    subprocess.run([
-        'cmake',
-        '--build',
-        '.',
-        '--config',
-        SDL2_BUILD_TYPE,
-        '--',
-        '-j' + str(multiprocessing.cpu_count())
-    ])
-    SDL2_STATIC = 'libSDL2.a'
-    SDL2_MAIN = 'libSDL2main.a'
-    shutil.move(
-        os.path.join(SDL2_BUILD_DIR_PATH, SDL2_STATIC),
-        os.path.join(LIBS_PATH, SDL2_STATIC))
-    shutil.move(
-        os.path.join(SDL2_BUILD_DIR_PATH, SDL2_MAIN),
-        os.path.join(LIBS_PATH, SDL2_MAIN))
+    SDL2_STATIC_LIB = 'libSDL2.a'
+    SDL2_MAIN_LIB = 'libSDL2main.a'
+    SDL2_STATIC = SDL2_STATIC_LIB
+    SDL2_MAIN = SDL2_MAIN_LIB
+    sdl2_build_args += ['--', '-j' + str(multiprocessing.cpu_count())]
+
+subprocess.run(sdl2_build_args)
+shutil.move(
+    os.path.join(SDL2_BUILD_DIR_PATH, SDL2_STATIC),
+    os.path.join(LIBS_PATH, SDL2_STATIC_LIB))
+shutil.move(
+    os.path.join(SDL2_BUILD_DIR_PATH, SDL2_MAIN),
+    os.path.join(LIBS_PATH, SDL2_MAIN_LIB))

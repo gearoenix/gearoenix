@@ -1,13 +1,16 @@
 #include "gles3-pip-pipeline.hpp"
-#ifdef USE_OPENGL_ES3
+#ifdef GX_USE_OPENGL_ES3
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../system/sys-app.hpp"
 #include "../../system/sys-log.hpp"
-#include "../gles3-engine.hpp"
-#include "../shader/gles3-shader.hpp"
+#include "../engine/gles3-eng-engine.hpp"
+#include "../shader/gles3-shd-shader.hpp"
 
-gearoenix::gles3::pipeline::Pipeline::Pipeline(core::Id sid, Engine* eng, core::sync::EndCaller<core::sync::EndCallerIgnore> call)
-    : render::pipeline::Pipeline(sid, eng, call)
+gearoenix::gles3::pipeline::Pipeline::Pipeline(
+    const render::pipeline::Type::Id pid,
+    const std::shared_ptr<engine::Engine>& e,
+    const core::sync::EndCaller<core::sync::EndCallerIgnore>& call)
+    : render::pipeline::Pipeline(pid, e, call)
 {
 }
 
@@ -17,8 +20,7 @@ gearoenix::gles3::pipeline::Pipeline::~Pipeline()
 
 void gearoenix::gles3::pipeline::Pipeline::bind()
 {
-    shd->use();
-    GXLOGE("It can be better.");
+    GXUNIMPLEMENTED;
 }
 
 #endif

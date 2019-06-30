@@ -6,18 +6,19 @@
 #include "../gles3.hpp"
 #include <memory>
 namespace gearoenix::gles3 {
-    namespace texture {
-        class Texture2D;
-    }
-    class Engine : public render::engine::Engine {
-    private:
+namespace texture {
+    class Texture2D;
+}
+namespace engine {
+	class Engine : public render::engine::Engine {
+	private:
 		void initialize() noexcept;
 		explicit Engine(system::Application* sys_app) noexcept;
-    public:
+	public:
 		static std::shared_ptr<Engine> construct(system::Application* sys_app) noexcept;
-        ~Engine() noexcept final;
-        void update() noexcept final;
-        void terminate() noexcept final;
+		~Engine() noexcept final;
+		void update() noexcept final;
+		void terminate() noexcept final;
 		render::sync::Semaphore* create_semaphore() const noexcept final;
 		render::texture::Texture2D* create_texture_2d(
 			core::Id id,
@@ -48,7 +49,8 @@ namespace gearoenix::gles3 {
 			const render::command::Buffer* const* cmds,
 			std::size_t nxts_count,
 			const render::sync::Semaphore* const* nxts) noexcept final;
-    };
+	};
+}
 }
 #endif
 #endif
