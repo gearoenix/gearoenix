@@ -10,7 +10,7 @@ gearoenix::gles3::buffer::Index::Index(
     std::vector<std::uint32_t> indices,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
-    : render::buffer::Static(static_cast<unsigned int>(indices.size() * sizeof(gl::ushort)), e)
+    : render::buffer::Static(static_cast<unsigned int>(indices.size() * sizeof(gl::uint)), e)
 {
     count = static_cast<gl::sizei>(indices.size());
     e->get_function_loader()->load([this, data { move(indices) }, c] {

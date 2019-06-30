@@ -19,8 +19,8 @@
 void gearoenix::gles3::texture::Target::state_init() const noexcept
 {
     gl::Loader::clear_color(0.0f, 0.0f, 0.0f, 0.0f);
-    gl::Loader::disable(GL_CULL_FACE);
-    //gl::Loader::cull_face(GL_BACK);
+    gl::Loader::enable(GL_CULL_FACE);
+    gl::Loader::cull_face(GL_BACK);
     gl::Loader::enable(GL_BLEND);
     gl::Loader::blend_func(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     gl::Loader::enable(GL_DEPTH_TEST);
