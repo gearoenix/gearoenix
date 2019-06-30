@@ -6,16 +6,16 @@
 #include "../../render/pipeline/rnd-pip-forward-pbr-directional-shadow-resource-set.hpp"
 #include "gles3-pip-resource-set.hpp"
 namespace gearoenix::gles3 {
-    namespace shader {
-        class ForwardPbrDirectionalShadow;
-    }
-    namespace pipeline {
-        class ForwardPbrDirectionalShadowResourceSet : public ResourceSet, public render::pipeline::ForwardPbrDirectionalShadowResourceSet {
-        public:
-            ForwardPbrDirectionalShadowResourceSet(const std::shared_ptr<shader::ForwardPbrDirectionalShadow>& shd);
-            void bind(gl::uint& bound_shader_program) const override final;
-        };
-    }
+namespace shader {
+    class ForwardPbrDirectionalShadow;
+}
+namespace pipeline {
+    class ForwardPbrDirectionalShadowResourceSet : public ResourceSet, public render::pipeline::ForwardPbrDirectionalShadowResourceSet {
+    public:
+        ForwardPbrDirectionalShadowResourceSet(const std::shared_ptr<shader::ForwardPbrDirectionalShadow>& shd);
+        void bind(gl::uint& bound_shader_program) const override final;
+    };
+}
 }
 #endif
 #endif

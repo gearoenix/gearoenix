@@ -152,7 +152,7 @@ const static std::string fragment_shader_code = GX_GLES2_SHADER_SRC_DEFAULT_FRAG
     "        float attenuation = distance_inv * distance_inv;\n"
     "        vec3 radiance = scene_point_lights_color_min_radius[ii].xyz * attenuation;\n"
     //       Cook-Torrance BRDF
-    "        float ndf = distribution_ggx(normal, half_vec, roughness);\n" 
+    "        float ndf = distribution_ggx(normal, half_vec, roughness);\n"
     "        float geo = geometry_smith(normal_dot_light, normal_dot_view, roughness);\n"
     "        vec3 frsn = fresnel_schlick(max(dot(half_vec, view), 0.0), f0);\n"
     "        vec3 nominator = ndf * geo * frsn;\n"
@@ -292,7 +292,7 @@ gearoenix::gles2::shader::ForwardPbrDirectionalShadow::ForwardPbrDirectionalShad
         set_vertex_shader(vertex_shader_code);
         set_fragment_shader(fragment_shader_code);
         link();
-		GX_GLES2_SHADER_SET_TEXTURE_INDEX_STARTING
+        GX_GLES2_SHADER_SET_TEXTURE_INDEX_STARTING
         GX_GLES2_SHADER_MATERIAL_GET_UNIFORM_LOCATIONS
         GX_GLES2_THIS_GET_UNIFORM_F(camera_position)
         GX_GLES2_THIS_GET_UNIFORM_F(camera_vp)

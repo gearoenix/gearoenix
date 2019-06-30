@@ -2,8 +2,8 @@
 #define GEAROENIX_GL_LOADER_HPP
 #include "../core/cr-build-configuration.hpp"
 #ifdef GX_USE_OPENGL
-#include "gl-types.hpp"
 #include "../render/engine/rnd-eng-engine.hpp"
+#include "gl-types.hpp"
 
 #if defined(_WIN32) && !defined(__SCITECH_SNAP__)
 #define GXGL_APICALL __declspec(dllimport)
@@ -45,7 +45,7 @@ typedef GXGL_APICALL void(GXGL_APIENTRY delete_renderbuffers_fnp)(sizei n, const
 typedef GXGL_APICALL void(GXGL_APIENTRY delete_shader_fnp)(uint shader);
 typedef GXGL_APICALL void(GXGL_APIENTRY delete_textures_fnp)(sizei n, const uint* textures);
 typedef GXGL_APICALL void(GXGL_APIENTRY depth_mask_fnp)(boolean flag);
-typedef GXGL_APICALL void(GXGL_APIENTRY disable_fnp) (enumerated cap);
+typedef GXGL_APICALL void(GXGL_APIENTRY disable_fnp)(enumerated cap);
 typedef GXGL_APICALL void(GXGL_APIENTRY draw_elements_fnp)(enumerated mode, sizei count, enumerated type, const void* indices);
 typedef GXGL_APICALL void(GXGL_APIENTRY enable_fnp)(enumerated);
 typedef GXGL_APICALL void(GXGL_APIENTRY enable_vertex_attrib_array_fnp)(uint index);
@@ -118,7 +118,7 @@ public:
     static delete_shader_fnp delete_shader;
     static delete_textures_fnp delete_textures;
     static depth_mask_fnp depth_mask;
-	static disable_fnp disable;
+    static disable_fnp disable;
     static draw_elements_fnp draw_elements;
     static enable_fnp enable;
     static enable_vertex_attrib_array_fnp enable_vertex_attrib_array;

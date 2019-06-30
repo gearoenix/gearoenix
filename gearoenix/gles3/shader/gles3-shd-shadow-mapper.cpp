@@ -41,7 +41,7 @@ gearoenix::gles3::shader::ShadowMapper::ShadowMapper(const std::shared_ptr<engin
         set_vertex_shader(vertex_shader_code);
         set_fragment_shader(fragment_shader_code);
         link();
-		GX_GLES3_SHADER_SET_TEXTURE_INDEX_STARTING
+        GX_GLES3_SHADER_SET_TEXTURE_INDEX_STARTING
         GX_GLES3_SHADER_MATERIAL_GET_UNIFORM_LOCATIONS
         GX_GLES3_THIS_GET_UNIFORM_F(effect_mvp);
     });

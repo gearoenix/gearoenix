@@ -64,15 +64,14 @@ public:                                                      \
     ++texture_index;
 
 #define GX_GLES2_THIS_GET_UNIFORM_TEXTURE(uniform) \
-	GX_GLES2_GET_UNIFORM(this, uniform)            \
-	if(GX_GLES2_UNIFORM_FAILED != uniform)         \
-	{                                              \
-		GX_GLES2_SHADER_SET_TEXTURE_INDEX(uniform) \
-	}
+    GX_GLES2_GET_UNIFORM(this, uniform)            \
+    if (GX_GLES2_UNIFORM_FAILED != uniform) {      \
+        GX_GLES2_SHADER_SET_TEXTURE_INDEX(uniform) \
+    }
 
-#define GX_GLES2_THIS_GET_UNIFORM_TEXTURE_F(uniform)\
-	GX_GLES2_GET_UNIFORM_F(this, uniform)\
-	GX_GLES2_SHADER_SET_TEXTURE_INDEX(uniform)
+#define GX_GLES2_THIS_GET_UNIFORM_TEXTURE_F(uniform) \
+    GX_GLES2_GET_UNIFORM_F(this, uniform)            \
+    GX_GLES2_SHADER_SET_TEXTURE_INDEX(uniform)
 
 #define GX_GLES2_SHADER_SET_TEXTURE_INDEX_STARTING gl::sint texture_index = 0;
 

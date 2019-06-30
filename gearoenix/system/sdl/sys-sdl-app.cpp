@@ -41,35 +41,35 @@ void gearoenix::system::Application::create_window() noexcept
 #endif
     std::uint32_t flags = SDL_WINDOW_SHOWN;
 #ifdef GX_FULLSCREEN
-	flags |= SDL_WINDOW_FULLSCREEN;
-	flags |= SDL_WINDOW_BORDERLESS;
-	flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+    flags |= SDL_WINDOW_FULLSCREEN;
+    flags |= SDL_WINDOW_BORDERLESS;
+    flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
 #else
-	flags |= SDL_WINDOW_RESIZABLE;
+    flags |= SDL_WINDOW_RESIZABLE;
 #endif
 #if defined(GX_IN_MAC) || defined(GX_IN_IOS)
-	flags |= SDL_WINDOW_ALLOW_HIGHDPI;
+    flags |= SDL_WINDOW_ALLOW_HIGHDPI;
 #endif
 
 #ifdef GX_USE_VULKAN
     if (render::engine::Type::VULKAN == supported_engine) {
         flags |= SDL_WINDOW_VULKAN;
-		window = SDL_CreateWindow(
-			GX_APP_NAME,
-			SDL_WINDOWPOS_CENTERED,
-			SDL_WINDOWPOS_CENTERED,
-			static_cast<int>(win_width),
-			static_cast<int>(win_height),
-			flags);
-		if (nullptr != window) {
-			GXLOGI("Vulkan SDL2 window created.")
-			return;
-		}
+        window = SDL_CreateWindow(
+            GX_APP_NAME,
+            SDL_WINDOWPOS_CENTERED,
+            SDL_WINDOWPOS_CENTERED,
+            static_cast<int>(win_width),
+            static_cast<int>(win_height),
+            flags);
+        if (nullptr != window) {
+            GXLOGI("Vulkan SDL2 window created.")
+            return;
+        }
     }
 #endif
 #if defined(GX_USE_OPENGL)
-	SDL_GL_SetSwapInterval(0);
-	flags |= SDL_WINDOW_OPENGL;
+    SDL_GL_SetSwapInterval(0);
+    flags |= SDL_WINDOW_OPENGL;
     SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
@@ -78,52 +78,47 @@ void gearoenix::system::Application::create_window() noexcept
     SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
-    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 32);
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 #endif
-#define CREATE_WINDOW(gl_version)                                         \
-	supported_engine = render::engine::Type::gl_version;                  \
-    window = SDL_CreateWindow(                                            \
-        GX_APP_NAME,                                                      \
-        SDL_WINDOWPOS_CENTERED,                                           \
-        SDL_WINDOWPOS_CENTERED,                                           \
-        static_cast<int>(win_width),                                      \
-        static_cast<int>(win_height),                                     \
-        flags);                                                           \
-    if (nullptr != window) {                                              \
-		gl_context = SDL_GL_CreateContext(window);                        \
-		if (gl_context != nullptr) {                                      \
-			if(gl::Loader::load_library(supported_engine)) {              \
-				GXLOGD("OpenGL window built with: " << #gl_version)       \
-				return;                                                   \
-			}                                                             \
-            SDL_GL_DeleteContext(gl_context);                             \
-		}                                                                 \
-		SDL_DestroyWindow(window);                                        \
+#define CREATE_WINDOW(gl_version)                                   \
+    supported_engine = render::engine::Type::gl_version;            \
+    window = SDL_CreateWindow(                                      \
+        GX_APP_NAME,                                                \
+        SDL_WINDOWPOS_CENTERED,                                     \
+        SDL_WINDOWPOS_CENTERED,                                     \
+        static_cast<int>(win_width),                                \
+        static_cast<int>(win_height),                               \
+        flags);                                                     \
+    if (nullptr != window) {                                        \
+        gl_context = SDL_GL_CreateContext(window);                  \
+        if (gl_context != nullptr) {                                \
+            if (gl::Loader::load_library(supported_engine)) {       \
+                GXLOGD("OpenGL window built with: " << #gl_version) \
+                return;                                             \
+            }                                                       \
+            SDL_GL_DeleteContext(gl_context);                       \
+        }                                                           \
+        SDL_DestroyWindow(window);                                  \
     }
 
 #ifdef GX_USE_OPENGL_ES3
-	CREATE_WINDOW(OPENGL_ES3)
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
-	CREATE_WINDOW(OPENGL_ES3)
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
-	CREATE_WINDOW(OPENGL_ES3)
-	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-	CREATE_WINDOW(OPENGL_ES3)
+    CREATE_WINDOW(OPENGL_ES3)
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+    CREATE_WINDOW(OPENGL_ES3)
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+    CREATE_WINDOW(OPENGL_ES3)
 #endif
 #ifdef GX_USE_OPENGL_ES2
-	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
-	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
-	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
-	CREATE_WINDOW(OPENGL_ES2)
-	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
-	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
-	CREATE_WINDOW(OPENGL_ES2)
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+    CREATE_WINDOW(OPENGL_ES2)
+    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
+    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
+    CREATE_WINDOW(OPENGL_ES2)
 #endif
     GXLOGF("Can not create window with minimum requirements")
 }
@@ -273,9 +268,9 @@ const std::shared_ptr<gearoenix::system::Application> gearoenix::system::Applica
         GXLOGF("Failed to initialize SDL: " << SDL_GetError())
     }
 #ifdef GX_USE_VULKAN
-	if (vulkan::Engine::is_supported()) {
-		result->supported_engine = render::engine::Type::VULKAN;
-	}
+    if (vulkan::Engine::is_supported()) {
+        result->supported_engine = render::engine::Type::VULKAN;
+    }
 #endif
 
 #ifdef GX_FULLSCREEN

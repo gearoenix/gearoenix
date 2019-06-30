@@ -33,7 +33,7 @@ void gearoenix::gles3::texture::Target::state_init() const noexcept
 gearoenix::gles3::texture::Target::Target(engine::Engine* const e) noexcept
     : render::texture::Target(core::asset::Manager::create_id(), e)
 {
-	const auto* sys_app = e->get_system_application();
+    const auto* sys_app = e->get_system_application();
     img_width = sys_app->get_width();
     img_height = sys_app->get_height();
     gl::Loader::get_integerv(GL_FRAMEBUFFER_BINDING, &framebuffer);
@@ -54,7 +54,7 @@ gearoenix::gles3::texture::Target::Target(
     img_width = w;
     img_height = h;
     const SampleInfo sample_info = SampleInfo(s);
-	/// TODO: correct this
+    /// TODO: correct this
     if (f != render::texture::TextureFormat::R_FLOAT16)
         GXLOGF("GLES3 engine only supports depth");
     e->get_function_loader()->load([this, sample_info, call] {

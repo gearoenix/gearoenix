@@ -56,9 +56,9 @@ gearoenix::render::graph::node::ShadowMapper::ShadowMapper(
     texture::SampleInfo s {};
     render_target = std::shared_ptr<texture::Target>(e->create_render_target(
         core::asset::Manager::create_id(),
-		/// TODO: stronger API should use better texture
+        /// TODO: stronger API should use better texture
         // week_hwr ? texture::TextureFormat::R_FLOAT16 : texture::TextureFormat::R_FLOAT32,
-		texture::TextureFormat::R_FLOAT16,
+        texture::TextureFormat::R_FLOAT16,
         s,
         week_hwr ? 512 : 1024,
         week_hwr ? 512 : 1024,

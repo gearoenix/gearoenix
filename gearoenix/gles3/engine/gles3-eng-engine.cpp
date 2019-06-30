@@ -28,86 +28,86 @@ void gearoenix::gles3::engine::Engine::initialize() noexcept
 }
 
 gearoenix::gles3::engine::Engine::Engine(system::Application* const sys_app) noexcept
-	: render::engine::Engine(sys_app, render::engine::Type::OPENGL_ES3)
+    : render::engine::Engine(sys_app, render::engine::Type::OPENGL_ES3)
 {
-	initialize();
+    initialize();
 }
 
 std::shared_ptr<gearoenix::gles3::engine::Engine> gearoenix::gles3::engine::Engine::construct(system::Application* const sys_app) noexcept
 {
-	std::shared_ptr<Engine> e(new Engine(sys_app));
-	e->pipeline_manager = new pipeline::Manager(e);
-	e->buffer_manager = new buffer::Manager(e.get());
-	e->command_manager = new command::Manager();
-	e->main_render_target = std::shared_ptr<render::texture::Target>(new texture::Target(e.get()));
-	return e;
+    std::shared_ptr<Engine> e(new Engine(sys_app));
+    e->pipeline_manager = new pipeline::Manager(e);
+    e->buffer_manager = new buffer::Manager(e.get());
+    e->command_manager = new command::Manager();
+    e->main_render_target = std::shared_ptr<render::texture::Target>(new texture::Target(e.get()));
+    return e;
 }
 
 gearoenix::gles3::engine::Engine::~Engine() noexcept
 {
-	terminate();
+    terminate();
 }
 
 void gearoenix::gles3::engine::Engine::update() noexcept
 {
-	gl::Loader::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-	render::engine::Engine::update();
+    gl::Loader::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    render::engine::Engine::update();
 }
 
 void gearoenix::gles3::engine::Engine::terminate() noexcept
 {
-	render::engine::Engine::terminate();
+    render::engine::Engine::terminate();
 }
 
 gearoenix::render::sync::Semaphore* gearoenix::gles3::engine::Engine::create_semaphore() const noexcept
 {
-	return new sync::Semaphore();
+    return new sync::Semaphore();
 }
 
 gearoenix::render::texture::Texture2D* gearoenix::gles3::engine::Engine::create_texture_2d(
-	const core::Id id,
-	const void* data,
-	const render::texture::TextureFormat::Id f,
-	const render::texture::SampleInfo s,
-	const unsigned int img_width,
-	const unsigned int img_height,
-	const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
+    const core::Id id,
+    const void* data,
+    const render::texture::TextureFormat::Id f,
+    const render::texture::SampleInfo s,
+    const unsigned int img_width,
+    const unsigned int img_height,
+    const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
 {
-	return new texture::Texture2D(id, this, data, f, s, img_width, img_height, call);
+    return new texture::Texture2D(id, this, data, f, s, img_width, img_height, call);
 }
 
 gearoenix::render::texture::Cube* gearoenix::gles3::engine::Engine::create_texture_cube(
-	const core::Id id,
-	const void* data,
-	const render::texture::TextureFormat::Id f,
-	const render::texture::SampleInfo s,
-	const unsigned int aspect,
-	const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
+    const core::Id id,
+    const void* data,
+    const render::texture::TextureFormat::Id f,
+    const render::texture::SampleInfo s,
+    const unsigned int aspect,
+    const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
 {
-	return new texture::Cube(id, this, data, f, s, aspect, call);
+    return new texture::Cube(id, this, data, f, s, aspect, call);
 }
 
 gearoenix::render::texture::Target* gearoenix::gles3::engine::Engine::create_render_target(
-	core::Id id,
-	render::texture::TextureFormat::Id f,
-	render::texture::SampleInfo s,
-	unsigned int width,
-	unsigned int height,
-	const gearoenix::core::sync::EndCaller<gearoenix::core::sync::EndCallerIgnore>& call) noexcept
+    core::Id id,
+    render::texture::TextureFormat::Id f,
+    render::texture::SampleInfo s,
+    unsigned int width,
+    unsigned int height,
+    const gearoenix::core::sync::EndCaller<gearoenix::core::sync::EndCallerIgnore>& call) noexcept
 {
-	return new texture::Target(id, this, f, s, width, height, call);
+    return new texture::Target(id, this, f, s, width, height, call);
 }
 
 void gearoenix::gles3::engine::Engine::submit(
-	const std::size_t,
-	const render::sync::Semaphore* const* const,
-	const std::size_t cmds_count,
-	const render::command::Buffer* const* const cmds,
-	const std::size_t,
-	const render::sync::Semaphore* const* const) noexcept
+    const std::size_t,
+    const render::sync::Semaphore* const* const,
+    const std::size_t cmds_count,
+    const render::command::Buffer* const* const cmds,
+    const std::size_t,
+    const render::sync::Semaphore* const* const) noexcept
 {
-	for (std::size_t i = 0; i < cmds_count; ++i)
-		dynamic_cast<const command::Buffer*>(cmds[i])->play();
+    for (std::size_t i = 0; i < cmds_count; ++i)
+        dynamic_cast<const command::Buffer*>(cmds[i])->play();
 }
 
 #endif
