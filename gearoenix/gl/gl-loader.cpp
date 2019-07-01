@@ -80,11 +80,8 @@ gearoenix::gl::gen_vertex_arrays_fnp gearoenix::gl::Loader::gen_vertex_arrays;
 bool gearoenix::gl::Loader::load_library(const render::engine::Type::Id engine_type) noexcept
 {
 #ifdef GX_DEBUG_MODE
-	if (engine_type != render::engine::Type::OPENGL_ES2 &&
-		engine_type != render::engine::Type::OPENGL_ES3 &&
-		engine_type != render::engine::Type::OPENGL_33 &&
-		engine_type != render::engine::Type::OPENGL_43)
-		GXLOGF("Only OpenGL API is accepted!")
+    if (engine_type != render::engine::Type::OPENGL_ES2 && engine_type != render::engine::Type::OPENGL_ES3 && engine_type != render::engine::Type::OPENGL_33 && engine_type != render::engine::Type::OPENGL_43)
+        GXLOGF("Only OpenGL API is accepted!")
 #endif
 #ifdef GX_USE_SDL
     if (SDL_GL_LoadLibrary(nullptr) != 0) {
@@ -171,9 +168,9 @@ bool gearoenix::gl::Loader::load_library(const render::engine::Type::Id engine_t
     if (engine_type == render::engine::Type::OPENGL_ES2)
         return true;
 #if defined(GX_USE_OPENGL_ES3) || defined(GX_USE_OPENGL_33) || defined(GX_USE_OPENGL_43)
-	GXFUNLDF(glBindVertexArray, bind_vertex_array)
-	GXFUNLDF(glDeleteVertexArrays, delete_vertex_arrays)
-	GXFUNLDF(glGenVertexArrays, gen_vertex_arrays)
+    GXFUNLDF(glBindVertexArray, bind_vertex_array)
+    GXFUNLDF(glDeleteVertexArrays, delete_vertex_arrays)
+    GXFUNLDF(glGenVertexArrays, gen_vertex_arrays)
 #endif
     return true;
 }

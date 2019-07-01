@@ -26,7 +26,7 @@
 gearoenix::gles3::engine::Engine::Engine(system::Application* const sys_app) noexcept
     : render::engine::Engine(sys_app, render::engine::Type::OPENGL_ES3)
 {
-	pipeline_manager = new pipeline::Manager(this);
+    pipeline_manager = new pipeline::Manager(this);
 }
 
 std::shared_ptr<gearoenix::gles3::engine::Engine> gearoenix::gles3::engine::Engine::construct(system::Application* const sys_app) noexcept

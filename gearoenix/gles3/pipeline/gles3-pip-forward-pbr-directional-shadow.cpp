@@ -4,7 +4,7 @@
 #include "../shader/gles3-shd-effect-forward-pbr-directional-shadow.hpp"
 #include "gles3-pip-forward-pbr-directional-shadow-resource-set.hpp"
 
-gearoenix::gles3::pipeline::ForwardPbrDirectionalShadow::ForwardPbrDirectionalShadow(engine::Engine*const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
+gearoenix::gles3::pipeline::ForwardPbrDirectionalShadow::ForwardPbrDirectionalShadow(engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : render::pipeline::ForwardPbrDirectionalShadow(e, c)
     , shd(new shader::ForwardPbrDirectionalShadow(e, c))
 {

@@ -164,9 +164,9 @@ public:
     static vertex_attrib_pointer_fnp vertex_attrib_pointer;
     static viewport_fnp viewport;
 #ifdef GX_USE_OPENGL_ES3
-	static bind_vertex_array_fnp bind_vertex_array;
-	static delete_vertex_arrays_fnp delete_vertex_arrays;
-	static gen_vertex_arrays_fnp gen_vertex_arrays;
+    static bind_vertex_array_fnp bind_vertex_array;
+    static delete_vertex_arrays_fnp delete_vertex_arrays;
+    static gen_vertex_arrays_fnp gen_vertex_arrays;
 #endif
 };
 }

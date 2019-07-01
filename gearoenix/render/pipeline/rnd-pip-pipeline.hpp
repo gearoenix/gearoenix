@@ -15,17 +15,21 @@ namespace pipeline {
     class ResourceSet;
     class Pipeline {
     protected:
-        engine::Engine *const e;
+        engine::Engine* const e;
         const Type::Id pipeline_type;
-		Pipeline(const Type::Id pipeline_type, engine::Engine*const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>&) noexcept
-			: e(e), pipeline_type(pipeline_type) {}
+        Pipeline(const Type::Id pipeline_type, engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>&) noexcept
+            : e(e)
+            , pipeline_type(pipeline_type)
+        {
+        }
 
     public:
-		virtual ~Pipeline() noexcept = default;
+        virtual ~Pipeline() noexcept = default;
 
-		Type::Id get_pipeline_type_id() const noexcept {
-			return pipeline_type;
-		}
+        Type::Id get_pipeline_type_id() const noexcept
+        {
+            return pipeline_type;
+        }
 
         virtual ResourceSet* create_resource_set() const noexcept = 0;
     };

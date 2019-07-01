@@ -11,9 +11,12 @@ namespace pipeline {
     class Pipeline;
     class Manager {
     protected:
-		engine::Engine*const e;
+        engine::Engine* const e;
         core::cache::Cacher<Pipeline, Type::Id> pipelines;
-		Manager(engine::Engine* const e) noexcept : e(e) {}
+        Manager(engine::Engine* const e) noexcept
+            : e(e)
+        {
+        }
 
     public:
         virtual ~Manager() noexcept = default;

@@ -4,8 +4,11 @@
 namespace gearoenix::render::pipeline {
 class ForwardPbrDirectionalShadow : public Pipeline {
 protected:
-	ForwardPbrDirectionalShadow(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
-		: Pipeline(Type::ForwardPbrDirectionalShadow, e, call) {}
+    ForwardPbrDirectionalShadow(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
+        : Pipeline(Type::ForwardPbrDirectionalShadow, e, call)
+    {
+    }
+
 public:
     virtual ~ForwardPbrDirectionalShadow() noexcept = default;
 };

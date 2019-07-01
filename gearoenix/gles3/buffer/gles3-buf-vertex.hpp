@@ -15,7 +15,7 @@ namespace buffer {
     class Vertex : public render::buffer::Static {
     public:
     private:
-		gl::uint vo = 0;
+        gl::uint vo = 0;
         gl::uint bo = 0;
 
     public:

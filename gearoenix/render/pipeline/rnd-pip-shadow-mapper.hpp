@@ -4,10 +4,13 @@
 namespace gearoenix::render::pipeline {
 class ShadowMapper : public Pipeline {
 protected:
-	ShadowMapper(engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
-		: Pipeline(Type::ShadowMapper, e, call) {}
+    ShadowMapper(engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
+        : Pipeline(Type::ShadowMapper, e, call)
+    {
+    }
+
 public:
-	virtual ~ShadowMapper() noexcept = default;
+    virtual ~ShadowMapper() noexcept = default;
 };
 }
 #endif

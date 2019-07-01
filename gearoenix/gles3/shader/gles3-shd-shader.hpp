@@ -80,12 +80,12 @@ public:                                                      \
         gl::Loader::uniform1i(x, x##_index);
 
 #define GX_GLES3_SHADER_SRC_DEFAULT_VERSION \
-	"#version 300 es\n"                     \
-	"#define GXPI 3.141592653589793238\n"   \
-	"precision highp float;\n"              \
-	"precision highp int;\n"                \
-	"precision highp sampler2D;\n"          \
-	"precision highp samplerCube;\n"
+    "#version 300 es\n"                     \
+    "#define GXPI 3.141592653589793238\n"   \
+    "precision highp float;\n"              \
+    "precision highp int;\n"                \
+    "precision highp sampler2D;\n"          \
+    "precision highp samplerCube;\n"
 
 #define GX_GLES3_SHADER_SRC_DEFAULT_ATTRIBUTES \
     "layout(location = 0) in vec3 position;\n" \
@@ -150,7 +150,7 @@ namespace engine {
 namespace shader {
     class Shader {
     protected:
-		engine::Engine *const e;
+        engine::Engine* const e;
         gl::uint shader_program = 0;
         gl::uint vertex_object = 0;
         gl::uint fragment_object = 0;

@@ -8,7 +8,7 @@
 
 gearoenix::gles3::pipeline::Pipeline::Pipeline(
     const render::pipeline::Type::Id pid,
-    engine::Engine*const e,
+    engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call)
     : render::pipeline::Pipeline(pid, e, call)
 {
