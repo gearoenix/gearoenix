@@ -118,17 +118,17 @@ const static std::string fragment_shader_code = GX_GLES3_SHADER_SRC_DEFAULT_FRAG
     "void main()\n"
     "{\n"
     //   material properties
-    "    vec4 tmpv4 = texture2D(material_base_color, out_uv);\n"
+    "    vec4 tmpv4 = texture(material_base_color, out_uv);\n"
     "    tmpv4.w *= material_alpha;\n"
     "    vec4 albedo = tmpv4;\n"
     "    if(albedo.w < material_alpha_cutoff) discard;\n"
-    "	 tmpv4.xy = texture2D(material_metallic_roughness, out_uv).xy;\n"
+    "	 tmpv4.xy = texture(material_metallic_roughness, out_uv).xy;\n"
     "    tmpv4.xy *= vec2(material_metallic_factor, material_roughness_factor);\n"
     "    float metallic = tmpv4.x;\n"
     "    float roughness = tmpv4.y;\n"
     //   TODO: in future maybe I will add ao in here
     //   input lighting data
-    "    vec3 normal = mat3(out_tng, out_btg, out_nrm) * ((texture2D(material_normal, out_uv).xyz - 0.5) * 2.0 * material_normal_scale);\n"
+    "    vec3 normal = mat3(out_tng, out_btg, out_nrm) * ((texture(material_normal, out_uv).xyz - 0.5) * 2.0 * material_normal_scale);\n"
     "    vec3 view = normalize(camera_position - out_pos);\n"
     "    vec3 reflection = reflect(-view, normal);\n"
     "    float normal_dot_view = max(dot(normal, view), 0.0);\n"
@@ -225,7 +225,7 @@ const static std::string fragment_shader_code = GX_GLES3_SHADER_SRC_DEFAULT_FRAG
     "            if (lightuv.x > 0.0 && lightuv.x < 1.0 && lightuv.y > 0.0 && lightuv.y < 1.0)\n"
     "            {\n"
     //               TODO: it must become for each cascade shadow map
-    "                vec2 depth_vec = texture2D(effect_shadow_map, lightuv.xy).xy;\n"
+    "                vec2 depth_vec = texture(effect_shadow_map, lightuv.xy).xy;\n"
     "                float depth = depth_vec.y;\n"
     "                depth *= 0.00390625;\n"
     "                depth += depth_vec.x;\n"
@@ -267,13 +267,13 @@ const static std::string fragment_shader_code = GX_GLES3_SHADER_SRC_DEFAULT_FRAG
     "    vec3 frsn = fresnel_schlick_roughness(normal_dot_view, f0, roughness);\n"
     "    vec3 ks = frsn;\n"
     "    vec3 kd = (1.0 - ks) * (1.0 - metallic);\n"
-    "    vec3 irradiance = textureCube(effect_diffuse_environment, normal).rgb;\n"
+    "    vec3 irradiance = texture(effect_diffuse_environment, normal).rgb;\n"
     "    vec3 diffuse = irradiance * albedo.xyz;\n"
     //   sample both the pre-filter map and the BRDF lut and combine them together as per
     //   the Split-Sum approximation to get the IBL specular part.
     "    float MAX_REFLECTION_LOD = 4.0;\n"
-    "    vec3 prefiltered_color = textureCube(effect_specular_environment, reflection, roughness * MAX_REFLECTION_LOD).rgb;\n"
-    "    vec2 brdf = texture2D(effect_brdflut, vec2(normal_dot_view, roughness)).rg;\n"
+    "    vec3 prefiltered_color = texture(effect_specular_environment, reflection, roughness * MAX_REFLECTION_LOD).rgb;\n"
+    "    vec2 brdf = texture(effect_brdflut, vec2(normal_dot_view, roughness)).rg;\n"
     "    vec3 specular = prefiltered_color * (frsn * brdf.x + brdf.y);\n"
     //   TODO: add ambient occlusion (* ao);
     "    vec3 ambient = kd * diffuse + specular;\n"

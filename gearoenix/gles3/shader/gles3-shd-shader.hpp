@@ -79,7 +79,13 @@ public:                                                      \
     if (x != GX_GLES3_UNIFORM_FAILED)                \
         gl::Loader::uniform1i(x, x##_index);
 
-#define GX_GLES3_SHADER_SRC_DEFAULT_VERSION "#version 300 es\n#define GXPI 3.1415926535897932384626433832795\n"
+#define GX_GLES3_SHADER_SRC_DEFAULT_VERSION \
+	"#version 300 es\n"                     \
+	"#define GXPI 3.141592653589793238\n"   \
+	"precision highp float;\n"              \
+	"precision highp int;\n"                \
+	"precision highp sampler2D;\n"          \
+	"precision highp samplerCube;\n"
 
 #define GX_GLES3_SHADER_SRC_DEFAULT_ATTRIBUTES \
     "layout(location = 0) in vec3 position;\n" \

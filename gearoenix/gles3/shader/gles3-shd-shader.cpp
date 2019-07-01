@@ -27,14 +27,17 @@ void gearoenix::gles3::shader::Shader::link() noexcept
     gl::sint is_success = 0;
     gl::Loader::link_program(shader_program);
     gl::Loader::get_programiv(shader_program, GL_LINK_STATUS, &is_success);
+	gl::sint max_length = 0;
+	gl::Loader::get_programiv(shader_program, GL_INFO_LOG_LENGTH, &max_length);
+	std::string info_log;
+	info_log.resize(static_cast<std::size_t>(max_length));
+	gl::Loader::get_program_info_log(shader_program, static_cast<gl::sizei>(max_length), nullptr, &(info_log[0]));
     if (is_success == 0) {
-        gl::sint max_length = 0;
-        gl::Loader::get_programiv(shader_program, GL_INFO_LOG_LENGTH, &max_length);
-        std::string info_log;
-        info_log.resize(static_cast<std::size_t>(max_length));
-        gl::Loader::get_program_info_log(shader_program, static_cast<gl::sizei>(max_length), nullptr, &(info_log[0]));
         GXLOGF("Error linking shader program: " << info_log)
-    }
+	}
+	else {
+		GXLOGD("Shader linking log is: " << info_log)
+	}
     gl::Loader::use_program(shader_program);
 }
 
@@ -43,14 +46,17 @@ void gearoenix::gles3::shader::Shader::validate() noexcept
     gl::Loader::validate_program(shader_program);
     gl::sint is_success = 0;
     gl::Loader::get_programiv(shader_program, GL_VALIDATE_STATUS, &is_success);
+	gl::sint max_length = 0;
+	gl::Loader::get_programiv(shader_program, GL_INFO_LOG_LENGTH, &max_length);
+	std::string info_log;
+	info_log.resize(static_cast<std::size_t>(max_length));
+	gl::Loader::get_program_info_log(shader_program, static_cast<gl::sizei>(max_length), nullptr, &(info_log[0]));
     if (!is_success) {
-        gl::sint max_length = 0;
-        gl::Loader::get_programiv(shader_program, GL_INFO_LOG_LENGTH, &max_length);
-        std::string info_log;
-        info_log.resize(static_cast<std::size_t>(max_length));
-        gl::Loader::get_program_info_log(shader_program, static_cast<gl::sizei>(max_length), nullptr, &(info_log[0]));
         GXLOGF("Invalid shader program: " << info_log)
-    }
+	}
+	else {
+		GXLOGD("Shader program log is: " << info_log)
+	}
     gl::Loader::use_program(shader_program);
 }
 
@@ -66,14 +72,17 @@ gearoenix::gl::uint gearoenix::gles3::shader::Shader::add_shader_to_program(cons
     gl::Loader::compile_shader(shader_obj);
     gl::sint success;
     gl::Loader::get_shaderiv(shader_obj, GL_COMPILE_STATUS, &success);
+	gl::sint sts_size;
+	gl::Loader::get_shaderiv(shader_obj, GL_INFO_LOG_LENGTH, &sts_size);
+	std::string info_log;
+	info_log.resize(static_cast<std::size_t>(sts_size));
+	gl::Loader::get_shader_info_log(shader_obj, static_cast<gl::sizei>(sts_size), nullptr, &(info_log[0]));
     if (!success) {
-        gl::sint sts_size;
-        gl::Loader::get_shaderiv(shader_obj, GL_INFO_LOG_LENGTH, &sts_size);
-        std::string info_log;
-        info_log.resize(static_cast<std::size_t>(sts_size));
-        gl::Loader::get_shader_info_log(shader_obj, static_cast<gl::sizei>(sts_size), nullptr, &(info_log[0]));
         GXLOGF("Error compiling shader type. Info: " << info_log)
-    }
+	}
+	else {
+		GXLOGD("Shader compiler log is: " << info_log)
+	}
     gl::Loader::attach_shader(shader_program, shader_obj);
     return shader_obj;
 }
