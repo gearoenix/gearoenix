@@ -12,7 +12,6 @@ namespace texture {
 namespace engine {
     class Engine : public render::engine::Engine {
     private:
-        void initialize() noexcept;
         explicit Engine(system::Application* sys_app) noexcept;
 
     public:

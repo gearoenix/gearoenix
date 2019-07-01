@@ -16,8 +16,8 @@ namespace pipeline {
         const std::shared_ptr<shader::ShadowMapper> shd;
 
     public:
-        ShadowMapper(const std::shared_ptr<engine::Engine>& e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
-        render::pipeline::ResourceSet* create_resource_set() const override final;
+        ShadowMapper(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+        render::pipeline::ResourceSet* create_resource_set() const noexcept final;
     };
 }
 }

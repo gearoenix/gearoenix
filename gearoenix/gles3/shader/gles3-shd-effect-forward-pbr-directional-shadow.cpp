@@ -17,12 +17,12 @@ const static std::string vertex_shader_code = GX_GLES3_SHADER_SRC_DEFAULT_VERTEX
     // model uniform(s)
     "uniform mat4  model_m;\n"
     // output(s)
-    "varying vec3 out_pos;\n"
-    "varying vec3 out_nrm;\n"
-    "varying vec3 out_tng;\n"
-    "varying vec3 out_btg;\n"
-    "varying vec2 out_uv;\n"
-    "varying vec3 out_light_poses[" GX_MAX_SHADOW_CASCADES_STR "];\n"
+    "out vec3 out_pos;\n"
+    "out vec3 out_nrm;\n"
+    "out vec3 out_tng;\n"
+    "out vec3 out_btg;\n"
+    "out vec2 out_uv;\n"
+    "out vec3 out_light_poses[" GX_MAX_SHADOW_CASCADES_STR "];\n"
     // Main function
     "void main()\n"
     "{\n"
@@ -69,12 +69,13 @@ const static std::string fragment_shader_code = GX_GLES3_SHADER_SRC_DEFAULT_FRAG
     // camera uniform(s)
     "uniform vec3        camera_position;\n"
     // output(s) of vertex shader
-    "varying vec3 out_pos;\n"
-    "varying vec3 out_nrm;\n"
-    "varying vec3 out_tng;\n"
-    "varying vec3 out_btg;\n"
-    "varying vec2 out_uv;\n"
-    "varying vec3 out_light_poses[" GX_MAX_SHADOW_CASCADES_STR "];\n"
+    "in vec3 out_pos;\n"
+    "in vec3 out_nrm;\n"
+    "in vec3 out_tng;\n"
+    "in vec3 out_btg;\n"
+    "in vec2 out_uv;\n"
+    "in vec3 out_light_poses[" GX_MAX_SHADOW_CASCADES_STR "];\n"
+	"out vec4 frag_color;\n"
     // Normal Distribution Function Trowbridge-Reitz GGX
     "float distribution_ggx(const vec3 normal, const vec3 halfway, const float roughness) {\n"
     "    float roughness2 = roughness * roughness;\n"
@@ -282,10 +283,10 @@ const static std::string fragment_shader_code = GX_GLES3_SHADER_SRC_DEFAULT_FRAG
     //   gamma correct
     "    tmpv4.xyz = pow(tmpv4.xyz, vec3(1.0 / 2.2));\n"
     //   TODO don't forget gamma correction it can be part of scene uniform data
-    "    gl_FragColor = vec4(tmpv4.xyz, albedo.w);\n"
+    "    frag_color = vec4(tmpv4.xyz, albedo.w);\n"
     "}"; // 123
 
-gearoenix::gles3::shader::ForwardPbrDirectionalShadow::ForwardPbrDirectionalShadow(const std::shared_ptr<engine::Engine>& e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c)
+gearoenix::gles3::shader::ForwardPbrDirectionalShadow::ForwardPbrDirectionalShadow(engine::Engine*const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : Shader(e, c)
 {
     e->get_function_loader()->load([this] {
@@ -317,11 +318,11 @@ gearoenix::gles3::shader::ForwardPbrDirectionalShadow::ForwardPbrDirectionalShad
     });
 }
 
-gearoenix::gles3::shader::ForwardPbrDirectionalShadow::~ForwardPbrDirectionalShadow()
+gearoenix::gles3::shader::ForwardPbrDirectionalShadow::~ForwardPbrDirectionalShadow() noexcept
 {
 }
 
-void gearoenix::gles3::shader::ForwardPbrDirectionalShadow::bind() const
+void gearoenix::gles3::shader::ForwardPbrDirectionalShadow::bind() const noexcept
 {
     Shader::bind();
     GX_GLES3_SHADER_MATERIAL_SET_TEXTURE_INDEX_UNIFORM

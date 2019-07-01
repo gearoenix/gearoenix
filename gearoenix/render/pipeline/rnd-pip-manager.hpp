@@ -3,32 +3,22 @@
 #include "../../core/cache/cr-cache-cacher.hpp"
 #include "../../core/sync/cr-sync-end-caller.hpp"
 #include "rnd-pip-type.hpp"
-#include <vector>
+namespace gearoenix::render {
+namespace engine {
+    class Engine;
+}
+namespace pipeline {
+    class Pipeline;
+    class Manager {
+    protected:
+		engine::Engine*const e;
+        core::cache::Cacher<Pipeline, Type::Id> pipelines;
+		Manager(engine::Engine* const e) noexcept : e(e) {}
 
-namespace gearoenix {
-namespace render {
-    namespace buffer {
-        class Uniform;
-    }
-    namespace engine {
-        class Engine;
-    }
-    namespace texture {
-        class Texture;
-    }
-    namespace pipeline {
-        class Pipeline;
-        class Manager {
-        protected:
-            const std::shared_ptr<engine::Engine> e;
-            core::cache::Cacher<Pipeline, Type::Id> pipelines;
-            Manager(const std::shared_ptr<engine::Engine>& e);
-
-        public:
-            virtual ~Manager();
-            virtual std::shared_ptr<Pipeline> get(const Type::Id pipeline_type, core::sync::EndCaller<Pipeline>& end) = 0;
-        };
-    }
+    public:
+        virtual ~Manager() noexcept = default;
+        virtual std::shared_ptr<Pipeline> get(const Type::Id pipeline_type, core::sync::EndCaller<Pipeline>& end) noexcept = 0;
+    };
 }
 }
 #endif

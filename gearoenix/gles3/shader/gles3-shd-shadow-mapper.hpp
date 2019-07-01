@@ -11,9 +11,9 @@ namespace shader {
         GX_GLES3_SHADER_MATERIAL_UNIFORMS
         GX_GLES3_UNIFORM_MATRIX(effect_mvp, 4, 1)
     public:
-        ShadowMapper(const std::shared_ptr<engine::Engine>& e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
-        ~ShadowMapper() override final;
-        void bind() const override final;
+        ShadowMapper(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+        ~ShadowMapper() noexcept final;
+        void bind() const noexcept final;
     };
 }
 }

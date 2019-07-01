@@ -23,20 +23,15 @@
 #include "../texture/gles3-txt-cube.hpp"
 #include "../texture/gles3-txt-target.hpp"
 
-void gearoenix::gles3::engine::Engine::initialize() noexcept
-{
-}
-
 gearoenix::gles3::engine::Engine::Engine(system::Application* const sys_app) noexcept
     : render::engine::Engine(sys_app, render::engine::Type::OPENGL_ES3)
 {
-    initialize();
+	pipeline_manager = new pipeline::Manager(this);
 }
 
 std::shared_ptr<gearoenix::gles3::engine::Engine> gearoenix::gles3::engine::Engine::construct(system::Application* const sys_app) noexcept
 {
     std::shared_ptr<Engine> e(new Engine(sys_app));
-    e->pipeline_manager = new pipeline::Manager(e);
     e->buffer_manager = new buffer::Manager(e.get());
     e->command_manager = new command::Manager();
     e->main_render_target = std::shared_ptr<render::texture::Target>(new texture::Target(e.get()));
@@ -107,7 +102,7 @@ void gearoenix::gles3::engine::Engine::submit(
     const render::sync::Semaphore* const* const) noexcept
 {
     for (std::size_t i = 0; i < cmds_count; ++i)
-        dynamic_cast<const command::Buffer*>(cmds[i])->play();
+        reinterpret_cast<const command::Buffer*>(cmds[i])->play();
 }
 
 #endif

@@ -79,29 +79,25 @@ public:                                                      \
     if (x != GX_GLES3_UNIFORM_FAILED)                \
         gl::Loader::uniform1i(x, x##_index);
 
-#define GX_GLES3_SHADER_SRC_DEFAULT_PERCISION \
-    "precision highp float;\n"                \
-    "precision highp sampler2D;\n"            \
-    "precision highp samplerCube;\n"          \
-    "#define GXPI 3.14159265359\n"
+#define GX_GLES3_SHADER_SRC_DEFAULT_VERSION "#version 300 es\n#define GXPI 3.1415926535897932384626433832795\n"
 
 #define GX_GLES3_SHADER_SRC_DEFAULT_ATTRIBUTES \
-    "attribute vec3 position;\n"               \
-    "attribute vec3 normal;\n"                 \
-    "attribute vec4 tangent;\n"                \
-    "attribute vec2 uv;\n"
+    "layout(location = 0) in vec3 position;\n" \
+    "layout(location = 1) in vec3 normal;\n"   \
+    "layout(location = 2) in vec4 tangent;\n"  \
+    "layout(location = 3) in vec2 uv;\n"
 
-#define GX_GLES3_SHADER_SRC_DEFAULT_VERTEX_STARTING GX_GLES3_SHADER_SRC_DEFAULT_PERCISION GX_GLES3_SHADER_SRC_DEFAULT_ATTRIBUTES
+#define GX_GLES3_SHADER_SRC_DEFAULT_VERTEX_STARTING GX_GLES3_SHADER_SRC_DEFAULT_VERSION GX_GLES3_SHADER_SRC_DEFAULT_ATTRIBUTES
 
-#define GX_GLES3_SHADER_SRC_DEFAULT_FRAGMENT_STARTING GX_GLES3_SHADER_SRC_DEFAULT_PERCISION
+#define GX_GLES3_SHADER_SRC_DEFAULT_FRAGMENT_STARTING GX_GLES3_SHADER_SRC_DEFAULT_VERSION
 
-#define GX_GLES3_SHADER_SRC_MATERIAL_UNIFORMS          \
-    "uniform float     material_alpha;\n"              \
-    "uniform float     material_alpha_cutoff;\n"       \
-    "uniform float     material_metallic_factor;\n"    \
-    "uniform float     material_normal_scale;\n"       \
-    "uniform float     material_occlusion_strength;\n" \
-    "uniform float     material_roughness_factor;\n"
+#define GX_GLES3_SHADER_SRC_MATERIAL_UNIFORMS      \
+    "uniform float material_alpha;\n"              \
+    "uniform float material_alpha_cutoff;\n"       \
+    "uniform float material_metallic_factor;\n"    \
+    "uniform float material_normal_scale;\n"       \
+    "uniform float material_occlusion_strength;\n" \
+    "uniform float material_roughness_factor;\n"
 
 #define GX_GLES3_SHADER_SRC_MATERIAL_TEXTURES          \
     "uniform sampler2D material_base_color;\n"         \
@@ -148,31 +144,27 @@ namespace engine {
 namespace shader {
     class Shader {
     protected:
-        const std::shared_ptr<engine::Engine> e;
+		engine::Engine *const e;
         gl::uint shader_program = 0;
         gl::uint vertex_object = 0;
         gl::uint fragment_object = 0;
-        gl::sint position_attribute_location = -1;
-        gl::sint normal_attribute_location = -1;
-        gl::sint tangent_attribute_location = -1;
-        gl::sint uv_attribute_location = -1;
-        void create_program();
-        void run();
-        void link();
-        void validate();
-        gl::uint add_shader_to_program(const std::string& shd, const gl::enumerated shader_type);
-        gl::uint set_vertex_shader(const std::string& shd);
-        gl::uint set_fragment_shader(const std::string& shd);
-        static void end_program(const gl::uint shader_program);
-        static void end_object(const gl::uint shader_object);
+        void create_program() noexcept;
+        void run() noexcept;
+        void link() noexcept;
+        void validate() noexcept;
+        gl::uint add_shader_to_program(const std::string& shd, const gl::enumerated shader_type) noexcept;
+        gl::uint set_vertex_shader(const std::string& shd) noexcept;
+        gl::uint set_fragment_shader(const std::string& shd) noexcept;
+        static void end_program(const gl::uint shader_program) noexcept;
+        static void end_object(const gl::uint shader_object) noexcept;
 
     public:
-        Shader(const std::shared_ptr<engine::Engine>& e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
-        virtual ~Shader();
+        Shader(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+        virtual ~Shader() noexcept;
         /// On not found returns GX_SHADER_UNIFORM_FAILED
-        gl::sint get_uniform_location(const std::string& name) const;
-        gl::uint get_shader_program() const;
-        virtual void bind() const;
+        gl::sint get_uniform_location(const std::string& name) const noexcept;
+        gl::uint get_shader_program() const noexcept;
+        virtual void bind() const noexcept;
     };
 }
 }

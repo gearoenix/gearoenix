@@ -2,7 +2,7 @@
 #define GEAROENIX_GL_LOADER_HPP
 #include "../core/cr-build-configuration.hpp"
 #ifdef GX_USE_OPENGL
-#include "../render/engine/rnd-eng-engine.hpp"
+#include "../render/engine/rnd-eng-type.hpp"
 #include "gl-types.hpp"
 
 #if defined(_WIN32) && !defined(__SCITECH_SNAP__)
@@ -85,6 +85,11 @@ typedef GXGL_APICALL void(GXGL_APIENTRY use_program_fnp)(uint program);
 typedef GXGL_APICALL void(GXGL_APIENTRY validate_program_fnp)(uint program);
 typedef GXGL_APICALL void(GXGL_APIENTRY vertex_attrib_pointer_fnp)(uint index, sint size, enumerated type, boolean normalized, sizei stride, const void* pointer);
 typedef GXGL_APICALL void(GXGL_APIENTRY viewport_fnp)(sint, sint, sizei, sizei);
+#ifdef GX_USE_OPENGL_ES3
+typedef GXGL_APICALL void(GXGL_APIENTRY bind_vertex_array_fnp)(uint arr);
+typedef GXGL_APICALL void(GXGL_APIENTRY delete_vertex_arrays_fnp)(sizei n, const uint* arrays);
+typedef GXGL_APICALL void(GXGL_APIENTRY gen_vertex_arrays_fnp)(sizei n, uint* arrays);
+#endif
 
 class Loader {
 private:
@@ -158,6 +163,11 @@ public:
     static validate_program_fnp validate_program;
     static vertex_attrib_pointer_fnp vertex_attrib_pointer;
     static viewport_fnp viewport;
+#ifdef GX_USE_OPENGL_ES3
+	static bind_vertex_array_fnp bind_vertex_array;
+	static delete_vertex_arrays_fnp delete_vertex_arrays;
+	static gen_vertex_arrays_fnp gen_vertex_arrays;
+#endif
 };
 }
 #endif

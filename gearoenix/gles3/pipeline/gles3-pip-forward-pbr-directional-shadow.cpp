@@ -4,13 +4,13 @@
 #include "../shader/gles3-shd-effect-forward-pbr-directional-shadow.hpp"
 #include "gles3-pip-forward-pbr-directional-shadow-resource-set.hpp"
 
-gearoenix::gles3::pipeline::ForwardPbrDirectionalShadow::ForwardPbrDirectionalShadow(const std::shared_ptr<engine::Engine>& e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c)
+gearoenix::gles3::pipeline::ForwardPbrDirectionalShadow::ForwardPbrDirectionalShadow(engine::Engine*const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : render::pipeline::ForwardPbrDirectionalShadow(e, c)
     , shd(new shader::ForwardPbrDirectionalShadow(e, c))
 {
 }
 
-gearoenix::render::pipeline::ResourceSet* gearoenix::gles3::pipeline::ForwardPbrDirectionalShadow::create_resource_set() const
+gearoenix::render::pipeline::ResourceSet* gearoenix::gles3::pipeline::ForwardPbrDirectionalShadow::create_resource_set() const noexcept
 {
     return new ForwardPbrDirectionalShadowResourceSet(shd);
 }

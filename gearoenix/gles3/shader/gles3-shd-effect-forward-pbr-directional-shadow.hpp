@@ -36,9 +36,9 @@ namespace shader {
         GX_GLES3_UNIFORM_VECTOR(scene_ssao_config, 3, 1)
 
     public:
-        ForwardPbrDirectionalShadow(const std::shared_ptr<engine::Engine>& e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
-        ~ForwardPbrDirectionalShadow() override final;
-        void bind() const override final;
+        ForwardPbrDirectionalShadow(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+        ~ForwardPbrDirectionalShadow() noexcept final;
+        void bind() const noexcept final;
     };
 }
 }

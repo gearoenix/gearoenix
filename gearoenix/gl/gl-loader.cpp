@@ -71,9 +71,21 @@ gearoenix::gl::use_program_fnp gearoenix::gl::Loader::use_program;
 gearoenix::gl::validate_program_fnp gearoenix::gl::Loader::validate_program;
 gearoenix::gl::vertex_attrib_pointer_fnp gearoenix::gl::Loader::vertex_attrib_pointer;
 gearoenix::gl::viewport_fnp gearoenix::gl::Loader::viewport;
+#ifdef GX_USE_OPENGL_ES3
+gearoenix::gl::bind_vertex_array_fnp gearoenix::gl::Loader::bind_vertex_array;
+gearoenix::gl::delete_vertex_arrays_fnp gearoenix::gl::Loader::delete_vertex_arrays;
+gearoenix::gl::gen_vertex_arrays_fnp gearoenix::gl::Loader::gen_vertex_arrays;
+#endif
 
 bool gearoenix::gl::Loader::load_library(const render::engine::Type::Id engine_type) noexcept
 {
+#ifdef GX_DEBUG_MODE
+	if (engine_type != render::engine::Type::OPENGL_ES2 &&
+		engine_type != render::engine::Type::OPENGL_ES3 &&
+		engine_type != render::engine::Type::OPENGL_33 &&
+		engine_type != render::engine::Type::OPENGL_43)
+		GXLOGF("Only OpenGL API is accepted!")
+#endif
 #ifdef GX_USE_SDL
     if (SDL_GL_LoadLibrary(nullptr) != 0) {
         GXLOGD("Failed to load OpenGL shared library through SDL2 library loader for engine type: " << engine_type)
@@ -156,8 +168,13 @@ bool gearoenix::gl::Loader::load_library(const render::engine::Type::Id engine_t
     GXFUNLDF(glValidateProgram, validate_program)
     GXFUNLDF(glVertexAttribPointer, vertex_attrib_pointer)
     GXFUNLDF(glViewport, viewport)
-    if (engine_type != render::engine::Type::OPENGL_ES3)
+    if (engine_type == render::engine::Type::OPENGL_ES2)
         return true;
+#if defined(GX_USE_OPENGL_ES3) || defined(GX_USE_OPENGL_33) || defined(GX_USE_OPENGL_43)
+	GXFUNLDF(glBindVertexArray, bind_vertex_array)
+	GXFUNLDF(glDeleteVertexArrays, delete_vertex_arrays)
+	GXFUNLDF(glGenVertexArrays, gen_vertex_arrays)
+#endif
     return true;
 }
 
