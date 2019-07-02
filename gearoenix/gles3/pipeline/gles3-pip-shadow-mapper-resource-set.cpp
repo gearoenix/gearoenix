@@ -25,7 +25,7 @@ void gearoenix::gles3::pipeline::ShadowMapperResourceSet::bind(gl::uint& bound_s
     GX_GLES3_PIPRES_START_DRAWING_MESH
     GX_GLES3_PIPRES_START_SHADER(ShadowMapper, shd);
     GX_GLES3_PIPRES_BIND_MATERIAL
-    GX_GLES3_PIPRES_SET_UNIFORM(effect_mvp, *reinterpret_cast<const render::graph::node::ShadowMapperUniform*>(node_uniform_buffer->get_data())->mvp.data());
-    GX_GLES3_PIPRES_END_DRAWING_MESH
+    GX_GLES3_PIPRES_SET_UNIFORM(effect_mvp, *reinterpret_cast<const render::graph::node::ShadowMapperUniform*>(node_uniform_buffer->get_data())->mvp.data()); 
+	GX_GLES3_PIPRES_END_DRAWING_MESH
 }
 #endif

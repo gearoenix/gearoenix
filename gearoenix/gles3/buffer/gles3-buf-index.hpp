@@ -23,7 +23,6 @@ namespace buffer {
             engine::Engine* e,
             const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
         ~Index() noexcept final;
-        void bind() const noexcept;
         void draw() const noexcept;
     };
 }

@@ -5,12 +5,12 @@
 #include "../../gl/gl-types.hpp"
 #include <memory>
 
-#define GX_GLES3_PIPRES_START_DRAWING_MESH                                     \
-    reinterpret_cast<const buffer::Index*>(msh->get_index_buffer())->bind();   \
-    reinterpret_cast<const buffer::Vertex*>(msh->get_vertex_buffer())->bind(); \
-    gles3::pipeline::ResourceSet::bind(bound_shader_program);
+#define GX_GLES3_PIPRES_START_DRAWING_MESH gles3::pipeline::ResourceSet::bind(bound_shader_program);
 
-#define GX_GLES3_PIPRES_END_DRAWING_MESH reinterpret_cast<const buffer::Index*>(msh->get_index_buffer())->draw();
+#define GX_GLES3_PIPRES_END_DRAWING_MESH \
+    reinterpret_cast<const buffer::Vertex*>(msh->get_vertex_buffer())->bind(); \
+	reinterpret_cast<const buffer::Index*>(msh->get_index_buffer())->draw(); \
+	gl::Loader::bind_vertex_array(0);
 
 #define GX_GLES3_PIPRES_START_SHADER(cls, shd) const shader::cls* shdr = static_cast<const shader::cls*>(shd.get());
 
