@@ -225,10 +225,7 @@ const static std::string fragment_shader_code = GX_GLES3_SHADER_SRC_DEFAULT_FRAG
     "            if (lightuv.x > 0.0 && lightuv.x < 1.0 && lightuv.y > 0.0 && lightuv.y < 1.0)\n"
     "            {\n"
     //               TODO: it must become for each cascade shadow map
-    "                vec2 depth_vec = texture(effect_shadow_map, lightuv.xy).xy;\n"
-    "                float depth = depth_vec.y;\n"
-    "                depth *= 0.00390625;\n"
-    "                depth += depth_vec.x;\n"
+    "                float depth = texture(effect_shadow_map, lightuv.xy).x;\n"
     "                if(depth + shadow_bias <= lightuv.z)\n"
     "                {\n"
     "                    is_in_directional_light = false;\n"

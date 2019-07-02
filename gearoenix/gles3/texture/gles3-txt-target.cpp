@@ -44,8 +44,7 @@ gearoenix::gles3::texture::Target::Target(engine::Engine* const e) noexcept
 gearoenix::gles3::texture::Target::Target(
     core::Id my_id,
     engine::Engine* e,
-    render::texture::TextureFormat::Id f,
-    render::texture::SampleInfo s,
+	const std::vector<render::texture::Info>& infos,
     unsigned int w,
     unsigned int h,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
@@ -53,25 +52,36 @@ gearoenix::gles3::texture::Target::Target(
 {
     img_width = w;
     img_height = h;
-    const SampleInfo sample_info = SampleInfo(s);
-    /// TODO: correct this
-    if (f != render::texture::TextureFormat::R_FLOAT16)
-        GXLOGF("GLES3 engine only supports depth");
-    e->get_function_loader()->load([this, sample_info, call] {
-        gl::Loader::gen_framebuffers(1, reinterpret_cast<gl::uint*>(&framebuffer));
-        gl::Loader::gen_renderbuffers(1, reinterpret_cast<gl::uint*>(&depth_buffer));
-        gl::Loader::bind_renderbuffer(GL_RENDERBUFFER, depth_buffer);
-        gl::Loader::renderbuffer_storage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, img_width, img_height);
-        gl::Loader::bind_framebuffer(GL_FRAMEBUFFER, framebuffer);
-        gl::Loader::gen_textures(1, &texture_object);
-        gl::Loader::bind_texture(GL_TEXTURE_2D, texture_object);
-        gl::Loader::framebuffer_renderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depth_buffer);
-        gl::Loader::tex_image_2d(GL_TEXTURE_2D, 0, GL_RGB, img_width, img_height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
-        gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        gl::Loader::framebuffer_texture_2d(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture_object, 0);
+	texture_objects.resize(infos.size());
+    e->get_function_loader()->load([this, infos, call] {
+		gl::Loader::gen_framebuffers(1, reinterpret_cast<gl::uint*>(&framebuffer));
+		gl::Loader::bind_framebuffer(GL_FRAMEBUFFER, framebuffer);
+		gl::Loader::gen_textures(texture_objects.size(), texture_objects.data());
+		for (std::size_t i = 0; i < texture_objects.size(); ++i) {
+			const auto& txt_info = infos[i];
+			const auto& txt_fmt = txt_info.f;
+			const auto& txt = texture_objects[i];
+			if (txt_fmt == render::texture::TextureFormat::D_32) {
+				gl::Loader::check_for_error();
+				gl::Loader::bind_texture(GL_TEXTURE_2D, txt);
+				gl::Loader::check_for_error();
+				gl::Loader::tex_image_2d(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, img_width, img_height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+				gl::Loader::check_for_error();
+				gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+				gl::Loader::check_for_error();
+				gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+				gl::Loader::check_for_error();
+				gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+				gl::Loader::check_for_error();
+				gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+				gl::Loader::check_for_error();
+				gl::Loader::framebuffer_texture_2d(GL_FRAMEBUFFER, GL_DEPTH_COMPONENT, GL_TEXTURE_2D, txt, 0);
+				gl::Loader::check_for_error();
+			}
+			else {
+				GXUNIMPLEMENTED
+			}
+		}
         if (gl::Loader::check_framebuffer_status(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
             GXLOGF("Failed to create render target!")
         state_init();
@@ -80,15 +90,14 @@ gearoenix::gles3::texture::Target::Target(
 
 gearoenix::gles3::texture::Target::~Target() noexcept
 {
-    if (texture_object == 0) // This is main render-target
+    if (texture_objects.size() == 0) // This is main render-target
         return;
     const auto cf = framebuffer;
     const auto cr = depth_buffer;
-    const auto ct = texture_object;
-    render_engine->get_function_loader()->load([cf, cr, ct] {
-        gl::Loader::delete_framebuffers(1, reinterpret_cast<const gl::uint*>(&cf));
-        gl::Loader::delete_renderbuffers(1, reinterpret_cast<const gl::uint*>(&cr));
-        gl::Loader::delete_textures(1, &ct);
+	render_engine->get_function_loader()->load([cf, cr, txts { move(texture_objects) } ]{
+        if(cf != 0) gl::Loader::delete_framebuffers(1, reinterpret_cast<const gl::uint*>(&cf));
+        if(cr != 0) gl::Loader::delete_renderbuffers(1, reinterpret_cast<const gl::uint*>(&cr));
+        for(auto ct: txts) gl::Loader::delete_textures(1, &ct);
     });
 }
 
@@ -100,7 +109,7 @@ void gearoenix::gles3::texture::Target::bind() const noexcept
     gl::Loader::scissor(0, 0, static_cast<gl::sizei>(img_width), static_cast<gl::sizei>(img_height));
     gl::Loader::enable(GL_DEPTH_TEST);
     gl::Loader::depth_mask(GL_TRUE);
-    if (texture_object == 0)
+    if (texture_objects.size() == 0)
         gl::Loader::clear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     else
         gl::Loader::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);

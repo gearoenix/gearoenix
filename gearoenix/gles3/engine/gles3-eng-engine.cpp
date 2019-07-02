@@ -84,13 +84,12 @@ gearoenix::render::texture::Cube* gearoenix::gles3::engine::Engine::create_textu
 
 gearoenix::render::texture::Target* gearoenix::gles3::engine::Engine::create_render_target(
     core::Id id,
-    render::texture::TextureFormat::Id f,
-    render::texture::SampleInfo s,
+    const std::vector<render::texture::Info>& infos,
     unsigned int width,
     unsigned int height,
     const gearoenix::core::sync::EndCaller<gearoenix::core::sync::EndCallerIgnore>& call) noexcept
 {
-    return new texture::Target(id, this, f, s, width, height, call);
+    return new texture::Target(id, this, infos, width, height, call);
 }
 
 void gearoenix::gles3::engine::Engine::submit(

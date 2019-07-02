@@ -24,6 +24,9 @@ public:
         RGB_UINT8 = 14,
         RG_UINT8 = 15,
         R_UINT8 = 16,
+
+		D_16 = 17,
+		D_32 = 18,
     } Id;
 };
 }

@@ -8,7 +8,7 @@
 
 namespace gearoenix::gles3::texture {
 struct SampleInfo {
-    float min_filter = GL_LINEAR_MIPMAP_LINEAR;
+    float min_filter = GL_LINEAR;
     float mag_filter = GL_LINEAR;
     gl::sint wrap_s = GL_REPEAT;
     gl::sint wrap_t = GL_REPEAT;

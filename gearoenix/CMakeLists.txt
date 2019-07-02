@@ -408,6 +408,7 @@ SET (GX_ENGINE_SRC
     "${GX_ENGINE_SRC_DIR}render/sync/rnd-sy-semaphore.hpp"
     "${GX_ENGINE_SRC_DIR}render/texture/rnd-txt-filter.hpp"
     "${GX_ENGINE_SRC_DIR}render/texture/rnd-txt-format.hpp"
+    "${GX_ENGINE_SRC_DIR}render/texture/rnd-txt-info.hpp"
     "${GX_ENGINE_SRC_DIR}render/texture/rnd-txt-manager.cpp"
     "${GX_ENGINE_SRC_DIR}render/texture/rnd-txt-manager.hpp"
     "${GX_ENGINE_SRC_DIR}render/texture/rnd-txt-png.cpp"

@@ -4,26 +4,32 @@
 
 gearoenix::gles3::texture::SampleInfo::SampleInfo(const render::texture::SampleInfo& o) noexcept
 {
-    switch (o.mag_filter) {
-    case render::texture::Filter::NEAREST:
-        mag_filter = GL_NEAREST;
-        break;
-    case render::texture::Filter::LINEAR:
-        mag_filter = GL_LINEAR;
-        break;
-    default:
-        GXUNEXPECTED
-    }
-    switch (o.min_filter) {
-    case render::texture::Filter::NEAREST:
-        min_filter = GL_NEAREST_MIPMAP_NEAREST;
-        break;
-    case render::texture::Filter::LINEAR:
-        min_filter = GL_LINEAR_MIPMAP_LINEAR;
-        break;
-    default:
-        GXUNEXPECTED
-    }
+	const auto filfun = [](render::texture::Filter::Id f) {
+		switch (f) {
+		case render::texture::Filter::NEAREST:
+			return GL_NEAREST;
+		case render::texture::Filter::NEAREST_MIPMAP_LINEAR:
+			return GL_NEAREST_MIPMAP_LINEAR;
+		case render::texture::Filter::NEAREST_MIPMAP_NEAREST:
+			return GL_NEAREST_MIPMAP_NEAREST;
+		case render::texture::Filter::LINEAR:
+			return GL_LINEAR;
+		case render::texture::Filter::LINEAR_MIPMAP_LINEAR:
+			return GL_LINEAR_MIPMAP_LINEAR;
+		case render::texture::Filter::LINEAR_MIPMAP_NEAREST:
+			return GL_LINEAR_MIPMAP_NEAREST;
+		default:
+			GXUNEXPECTED
+		}
+	};
+
+#define GX_HELPER(name) name##_filter = filfun(o.name##_filter);
+	
+	GX_HELPER(mag)
+	GX_HELPER(min)
+
+#undef GX_HELPER
+
     const auto fun = [](render::texture::Wrap::Id w) {
         switch (w) {
         case render::texture::Wrap::CLAMP_TO_EDGE:
@@ -36,8 +42,13 @@ gearoenix::gles3::texture::SampleInfo::SampleInfo(const render::texture::SampleI
             GXUNEXPECTED
         }
     };
-    wrap_s = fun(o.wrap_s);
-    wrap_t = fun(o.wrap_t);
-    wrap_r = fun(o.wrap_r);
+
+#define GX_HELPER(name) wrap_##name = fun(o.wrap_##name);
+
+    GX_HELPER(s);
+    GX_HELPER(t);
+    GX_HELPER(r);
+
+#undef GX_HELPER
 }
 #endif
