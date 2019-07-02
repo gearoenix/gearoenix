@@ -62,29 +62,26 @@ gearoenix::gles3::texture::Target::Target(
 			const auto& txt_fmt = txt_info.f;
 			const auto& txt = texture_objects[i];
 			if (txt_fmt == render::texture::TextureFormat::D_32) {
-				gl::Loader::check_for_error();
 				gl::Loader::bind_texture(GL_TEXTURE_2D, txt);
-				gl::Loader::check_for_error();
-				gl::Loader::tex_image_2d(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, img_width, img_height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
-				gl::Loader::check_for_error();
+				gl::Loader::tex_image_2d(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, img_width, img_height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 				gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-				gl::Loader::check_for_error();
 				gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-				gl::Loader::check_for_error();
 				gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-				gl::Loader::check_for_error();
 				gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 				gl::Loader::check_for_error();
 				gl::Loader::framebuffer_texture_2d(GL_FRAMEBUFFER, GL_DEPTH_COMPONENT, GL_TEXTURE_2D, txt, 0);
 				gl::Loader::check_for_error();
+
 			}
 			else {
 				GXUNIMPLEMENTED
 			}
 		}
+		// TODO: remake the log fatal again
         if (gl::Loader::check_framebuffer_status(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
             GXLOGF("Failed to create render target!")
         state_init();
+		gl::Loader::bind_framebuffer(GL_FRAMEBUFFER, 0);
     });
 }
 
@@ -109,10 +106,10 @@ void gearoenix::gles3::texture::Target::bind() const noexcept
     gl::Loader::scissor(0, 0, static_cast<gl::sizei>(img_width), static_cast<gl::sizei>(img_height));
     gl::Loader::enable(GL_DEPTH_TEST);
     gl::Loader::depth_mask(GL_TRUE);
-    if (texture_objects.size() == 0)
-        gl::Loader::clear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-    else
-        gl::Loader::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    if (texture_objects.size() != 0)
+        gl::Loader::clear(GL_COLOR_BUFFER_BIT);
+	gl::Loader::clear(GL_DEPTH_BUFFER_BIT);
+	gl::Loader::clear(GL_STENCIL_BUFFER_BIT);
 }
 
 #endif

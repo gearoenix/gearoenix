@@ -45,7 +45,9 @@ gearoenix::gles3::engine::Engine::~Engine() noexcept
 
 void gearoenix::gles3::engine::Engine::update() noexcept
 {
-    gl::Loader::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	gl::Loader::clear(GL_COLOR_BUFFER_BIT);
+	gl::Loader::clear(GL_DEPTH_BUFFER_BIT);
+	gl::Loader::clear(GL_STENCIL_BUFFER_BIT);
     render::engine::Engine::update();
 }
 
