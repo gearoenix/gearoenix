@@ -79,12 +79,14 @@ public:                                                      \
     if (x != GX_GLES3_UNIFORM_FAILED)                \
         gl::Loader::uniform1i(x, x##_index);
 
-#define GX_GLES3_SHADER_SRC_DEFAULT_VERSION \
-    "#version 300 es\n"                     \
-    "#define GXPI 3.141592653589793238\n"   \
-    "precision highp float;\n"              \
-    "precision highp int;\n"                \
-    "precision highp sampler2D;\n"          \
+#define GX_GLES3_SHADER_SRC_DEFAULT_VERSION  \
+	"#version " <<                           \
+    ((e->get_engine_type_id() == render::engine::Type::OPENGL_ES3)? "300 es": ((e->get_engine_type_id() == render::engine::Type::OPENGL_33)? "330": "430")) \
+	<< "\n" <<                               \
+    "#define GXPI 3.141592653589793238\n"    \
+    "precision highp float;\n"               \
+    "precision highp int;\n"                 \
+    "precision highp sampler2D;\n"           \
     "precision highp samplerCube;\n"
 
 #define GX_GLES3_SHADER_SRC_DEFAULT_ATTRIBUTES \
@@ -93,9 +95,16 @@ public:                                                      \
     "layout(location = 2) in vec4 tangent;\n"  \
     "layout(location = 3) in vec2 uv;\n"
 
-#define GX_GLES3_SHADER_SRC_DEFAULT_VERTEX_STARTING GX_GLES3_SHADER_SRC_DEFAULT_VERSION GX_GLES3_SHADER_SRC_DEFAULT_ATTRIBUTES
+#define GX_GLES3_SHADER_SRC_DEFAULT_VERTEX_STARTING \
+	std::stringstream vertex_shader_code;           \
+	vertex_shader_code <<                           \
+		GX_GLES3_SHADER_SRC_DEFAULT_VERSION         \
+		GX_GLES3_SHADER_SRC_DEFAULT_ATTRIBUTES
 
-#define GX_GLES3_SHADER_SRC_DEFAULT_FRAGMENT_STARTING GX_GLES3_SHADER_SRC_DEFAULT_VERSION
+#define GX_GLES3_SHADER_SRC_DEFAULT_FRAGMENT_STARTING \
+	std::stringstream fragment_shader_code;           \
+	fragment_shader_code <<                           \
+		GX_GLES3_SHADER_SRC_DEFAULT_VERSION
 
 #define GX_GLES3_SHADER_SRC_MATERIAL_UNIFORMS      \
     "uniform float material_alpha;\n"              \
@@ -111,7 +120,9 @@ public:                                                      \
     "uniform sampler2D material_normal;\n"             \
     "uniform sampler2D material_emissive;\n"
 
-#define GX_GLES3_SHADER_SRC_MATERIAL_RESOURCES GX_GLES3_SHADER_SRC_MATERIAL_UNIFORMS GX_GLES3_SHADER_SRC_MATERIAL_TEXTURES
+#define GX_GLES3_SHADER_SRC_MATERIAL_RESOURCES \
+	GX_GLES3_SHADER_SRC_MATERIAL_UNIFORMS      \
+	GX_GLES3_SHADER_SRC_MATERIAL_TEXTURES
 
 #define GX_GLES3_SHADER_MATERIAL_UNIFORMS                 \
     GX_GLES3_UNIFORM_FLOAT(material_alpha)                \
