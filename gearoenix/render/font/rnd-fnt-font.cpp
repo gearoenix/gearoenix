@@ -28,5 +28,4 @@ gearoenix::render::font::Font* gearoenix::render::font::Font::read(
     default:
         GXUNEXPECTED;
     }
-    return nullptr;
 }

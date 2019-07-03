@@ -1,5 +1,6 @@
 #ifndef GEAROENIX_RENDER_LIGHT_CASCADE_INFO_HPP
 #define GEAROENIX_RENDER_LIGHT_CASCADE_INFO_HPP
+#include "../../core/cr-build-configuration.hpp"
 #include "../../core/cr-pool.hpp"
 #include "../../math/math-aabb.hpp"
 #include "../../math/math-matrix.hpp"
@@ -35,8 +36,14 @@ namespace light {
     class CascadeInfo {
     public:
         struct PerCascade {
-            math::Mat4x4 view_projection;
-            math::Mat4x4 view_projection_bias;
+#ifdef GX_USE_OPENGL_ES2
+			math::Mat4x4 view_projection_gles2;
+			math::Mat4x4 view_projection_bias_gles2;
+#endif
+#ifdef GX_USE_OPENGL_ES3
+			math::Mat4x4 view_projection_gles3;
+			math::Mat4x4 view_projection_bias_gles3;
+#endif
             math::Aabb3 limit_box;
             math::Aabb3 max_box;
             math::Aabb3 intersection_box;
@@ -53,6 +60,7 @@ namespace light {
             const model::Model* m = nullptr;
         };
         struct PerKernel {
+			engine::Engine * e = nullptr;
             const math::Mat4x4* zero_located_view = nullptr;
             const core::OneLoopPool<PerCascade>* per_cascade = nullptr;
             std::vector<RenderData> render_data;
