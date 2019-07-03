@@ -100,4 +100,10 @@
 #if defined(GX_USE_OPENGL_ES3) && (defined(GX_USE_OPENGL_ES2) || defined(GX_USE_OPENGL_33) || defined(GX_USE_OPENGL_43) || defined(GX_USE_DIRECTX11) || defined(GX_USE_DIRECTX12) || defined(GX_USE_VULKAN))
 #define GX_USE_INSTEAD_OF_OPENGL_ES3
 #endif
+#if defined(GX_USE_OPENGL_33) && (defined(GX_USE_OPENGL_ES2) || defined(GX_USE_OPENGL_ES3) || defined(GX_USE_OPENGL_43) || defined(GX_USE_DIRECTX11) || defined(GX_USE_DIRECTX12) || defined(GX_USE_VULKAN))
+#define GX_USE_INSTEAD_OF_OPENGL_33
+#endif
+#if defined(GX_USE_OPENGL_43) && (defined(GX_USE_OPENGL_ES2) || defined(GX_USE_OPENGL_ES3) || defined(GX_USE_OPENGL_33) || defined(GX_USE_DIRECTX11) || defined(GX_USE_DIRECTX12) || defined(GX_USE_VULKAN))
+#define GX_USE_INSTEAD_OF_OPENGL_43
+#endif
 #endif

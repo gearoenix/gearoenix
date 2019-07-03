@@ -40,7 +40,7 @@ namespace light {
 			math::Mat4x4 view_projection_gles2;
 			math::Mat4x4 view_projection_bias_gles2;
 #endif
-#ifdef GX_USE_OPENGL_ES3
+#if defined(GX_USE_OPENGL_ES3) || defined(GX_USE_OPENGL_33) || defined(GX_USE_OPENGL_43)
 			math::Mat4x4 view_projection_gles3;
 			math::Mat4x4 view_projection_bias_gles3;
 #endif

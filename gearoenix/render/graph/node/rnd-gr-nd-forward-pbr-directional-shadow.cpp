@@ -38,6 +38,7 @@ gearoenix::render::graph::node::ForwardPbrDirectionalShadowUniform::ForwardPbrDi
     const auto s = data.size();
     cascades_count = static_cast<core::Real>(s) + 0.1f;
     for (std::size_t i = 0; i < s; ++i) {
+
 #ifdef GX_USE_OPENGL_ES2
 #ifdef GX_USE_INSTEAD_OF_OPENGL_ES2
 		if (e->get_engine_type_id() == engine::Type::OPENGL_ES2) {
@@ -48,23 +49,40 @@ gearoenix::render::graph::node::ForwardPbrDirectionalShadowUniform::ForwardPbrDi
 		}
 #endif
 #endif
-#if defined(GX_USE_OPENGL_ES3) || defined(GX_USE_OPENGL_33) || defined(GX_USE_OPENGL_43)
-		if (
+
 #ifdef GX_USE_OPENGL_ES3
-			e->get_engine_type_id() == engine::Type::OPENGL_ES3 ||
+#ifdef GX_USE_INSTEAD_OF_OPENGL_ES3
+		if (e->get_engine_type_id() == engine::Type::OPENGL_ES3) {
 #endif
-#ifdef GX_USE_OPENGL_ES3
-			e->get_engine_type_id() == engine::Type::OPENGL_33 ||
-#endif 
-#ifdef GX_USE_OPENGL_ES3
-			e->get_engine_type_id() == engine::Type::OPENGL_43 ||
-#endif
-			false // compiler will optimize it out
-			) {
 			cascades_view_projections_bias[i] = data[i].view_projection_bias_gles3;
+#ifdef GX_USE_INSTEAD_OF_OPENGL_ES3
 			continue;
 		}
 #endif
+#endif
+
+#ifdef GX_USE_OPENGL_33
+#ifdef GX_USE_INSTEAD_OF_OPENGL_33
+		if (e->get_engine_type_id() == engine::Type::OPENGL_33) {
+#endif
+			cascades_view_projections_bias[i] = data[i].view_projection_bias_gles3;
+#ifdef GX_USE_INSTEAD_OF_OPENGL_33
+			continue;
+		}
+#endif
+#endif
+
+#ifdef GX_USE_OPENGL_43
+#ifdef GX_USE_INSTEAD_OF_OPENGL_43
+		if (e->get_engine_type_id() == engine::Type::OPENGL_43) {
+#endif
+			cascades_view_projections_bias[i] = data[i].view_projection_bias_gles3;
+#ifdef GX_USE_INSTEAD_OF_OPENGL_43
+			continue;
+		}
+#endif
+#endif
+
     }
 }
 

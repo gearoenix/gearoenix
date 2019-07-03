@@ -40,15 +40,46 @@ void gearoenix::render::light::CascadeInfo::PerKernel::record(const std::size_t 
         auto& c = (*per_cascade)[r.i];
 #ifdef GX_USE_OPENGL_ES2
 #ifdef GX_USE_INSTEAD_OF_OPENGL_ES2
-		if (e->get_engine_type_id() == engine::Type::OPENGL_ES2)
+		if (e->get_engine_type_id() == engine::Type::OPENGL_ES2) {
 #endif
 			c.shadow_mapper->record(c.view_projection_gles2 * r.m->get_model_matrix(), r.m, kernel_index);
+#ifdef GX_USE_INSTEAD_OF_OPENGL_ES2
+			continue;
+		}
 #endif
+#endif
+
 #ifdef GX_USE_OPENGL_ES3
 #ifdef GX_USE_INSTEAD_OF_OPENGL_ES3
-		if (e->get_engine_type_id() == engine::Type::OPENGL_ES3)
+		if (e->get_engine_type_id() == engine::Type::OPENGL_ES3) {
 #endif
 			c.shadow_mapper->record(c.view_projection_gles3 * r.m->get_model_matrix(), r.m, kernel_index);
+#ifdef GX_USE_INSTEAD_OF_OPENGL_ES3
+			continue;
+		}
+#endif
+#endif
+
+#ifdef GX_USE_OPENGL_33
+#ifdef GX_USE_INSTEAD_OF_OPENGL_33
+		if (e->get_engine_type_id() == engine::Type::OPENGL_33) {
+#endif
+			c.shadow_mapper->record(c.view_projection_gles3 * r.m->get_model_matrix(), r.m, kernel_index);
+#ifdef GX_USE_INSTEAD_OF_OPENGL_33
+			continue;
+		}
+#endif
+#endif
+
+#ifdef GX_USE_OPENGL_43
+#ifdef GX_USE_INSTEAD_OF_OPENGL_43
+		if (e->get_engine_type_id() == engine::Type::OPENGL_43) {
+#endif
+			c.shadow_mapper->record(c.view_projection_gles3 * r.m->get_model_matrix(), r.m, kernel_index);
+#ifdef GX_USE_INSTEAD_OF_OPENGL_43
+			continue;
+		}
+#endif
 #endif
     }
 }
@@ -169,6 +200,7 @@ void gearoenix::render::light::CascadeInfo::shrink() noexcept
 		const auto p = gearoenix::math::Mat4x4::orthographic(w, h, n, f);
 		const auto t = gearoenix::math::Mat4x4::translator(-gearoenix::math::Vec3(c.xy(), mx[2] + (n * 2.0f)));
 		const auto mtx = p * t * zero_located_view;
+
 #ifdef GX_USE_OPENGL_ES2
 #ifdef GX_USE_INSTEAD_OF_OPENGL_ES2
 		if (e->get_engine_type_id() == engine::Type::OPENGL_ES2) {
@@ -190,6 +222,7 @@ void gearoenix::render::light::CascadeInfo::shrink() noexcept
 		}
 #endif
 #endif
+
 #ifdef GX_USE_OPENGL_ES3
 #ifdef GX_USE_INSTEAD_OF_OPENGL_ES3
 		if (e->get_engine_type_id() == engine::Type::OPENGL_ES3) {
@@ -203,6 +236,43 @@ void gearoenix::render::light::CascadeInfo::shrink() noexcept
 				* mtx;
 
 #ifdef GX_USE_INSTEAD_OF_OPENGL_ES3
+			continue;
+		}
+#endif
+#endif
+
+#ifdef GX_USE_OPENGL_33
+#ifdef GX_USE_INSTEAD_OF_OPENGL_33
+		if (e->get_engine_type_id() == engine::Type::OPENGL_33) {
+#endif
+			cas.view_projection_gles3 = mtx;
+			cas.view_projection_bias_gles3 = math::Mat4x4(
+				0.5f, 0.0f, 0.0f, 0.0f,
+				0.0f, 0.5f, 0.0f, 0.0f,
+				0.0f, 0.0f, 0.5f, 0.0f,
+				0.5f, 0.5f, 0.5f, 1.0f)
+				* mtx;
+
+#ifdef GX_USE_INSTEAD_OF_OPENGL_33
+			continue;
+		}
+#endif
+#endif
+
+#ifdef GX_USE_OPENGL_43
+#ifdef GX_USE_INSTEAD_OF_OPENGL_43
+		if (e->get_engine_type_id() == engine::Type::OPENGL_43) {
+#endif
+			cas.view_projection_gles3 = mtx;
+			cas.view_projection_bias_gles3 = math::Mat4x4(
+				0.5f, 0.0f, 0.0f, 0.0f,
+				0.0f, 0.5f, 0.0f, 0.0f,
+				0.0f, 0.0f, 0.5f, 0.0f,
+				0.5f, 0.5f, 0.5f, 1.0f)
+				* mtx;
+
+#ifdef GX_USE_INSTEAD_OF_OPENGL_43
+			continue;
 		}
 #endif
 #endif
