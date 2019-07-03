@@ -14,8 +14,8 @@ namespace texture {
     class Target : public render::texture::Target {
     private:
         std::vector<gl::uint> texture_objects;
-        gl::sint framebuffer = 0;
-        gl::sint depth_buffer = 0;
+        gl::sint framebuffer = -1;
+        gl::sint depth_buffer = -1;
 
         void state_init() const noexcept;
 
@@ -29,7 +29,8 @@ namespace texture {
             unsigned int heigt,
             const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
         ~Target() noexcept final;
-        void bind() const noexcept;
+		void bind() const noexcept;
+		void bind_textures(const std::vector<gl::enumerated> texture_units) const noexcept;
     };
 }
 }

@@ -24,7 +24,14 @@ gearoenix::render::engine::Engine::Engine(system::Application* const system_appl
     , kernels(new core::sync::KernelWorker())
 {
     physics_engine = new physics::Engine(system_application, kernels);
-    kernels->add_step([this](const unsigned int kernel_index) { render_tree->record(kernel_index); }, [this] { render_tree->submit(); });
+    kernels->add_step(
+		[this](const unsigned int kernel_index) { 
+			render_tree->record(kernel_index); 
+		}, 
+		[this] {
+			fun_loader->unload();
+			render_tree->submit(); 
+		});
 }
 
 gearoenix::render::engine::Engine::~Engine() noexcept

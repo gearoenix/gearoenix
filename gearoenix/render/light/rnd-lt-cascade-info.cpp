@@ -159,14 +159,14 @@ void gearoenix::render::light::CascadeInfo::shrink() noexcept
         cas.view_projection = math::Mat4x4(
                                   1.0f, 0.0f, 0.0f, 0.0f,
                                   0.0f, 1.0f, 0.0f, 0.0f,
-                                  0.0f, 0.0f, 0.5f, 0.0f,
-                                  0.0f, 0.0f, 0.5f, 1.0f)
+                                  0.0f, 0.0f, 1.0f, 0.0f,
+                                  0.0f, 0.0f, 1.0f, 1.0f)
             * p * t * zero_located_view;
         cas.view_projection_bias = math::Mat4x4(
                                        0.5f, 0.0f, 0.0f, 0.0f,
                                        0.0f, 0.5f, 0.0f, 0.0f,
-                                       0.0f, 0.0f, 1.0f, 0.0f,
-                                       0.5f, 0.5f, 0.0f, 1.0f)
+                                       0.0f, 0.0f, 0.5f, 0.0f,
+                                       0.5f, 0.5f, 0.5f, 1.0f)
             * cas.view_projection;
     }
 }

@@ -5,7 +5,7 @@ namespace gearoenix::render::texture {
 class Target : public Texture2D {
 protected:
     Target(const core::Id my_id, engine::Engine* const e) noexcept
-        : Texture2D(my_id, e)
+        : Texture2D(my_id, e, Type::TARGET_2D)
     {
     }
 

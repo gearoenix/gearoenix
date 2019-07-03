@@ -68,10 +68,7 @@ gearoenix::gles3::texture::Target::Target(
 				gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 				gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 				gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-				gl::Loader::check_for_error();
-				gl::Loader::framebuffer_texture_2d(GL_FRAMEBUFFER, GL_DEPTH_COMPONENT, GL_TEXTURE_2D, txt, 0);
-				gl::Loader::check_for_error();
-
+				gl::Loader::framebuffer_texture_2d(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, txt, 0);
 			}
 			else {
 				GXUNIMPLEMENTED
@@ -92,24 +89,37 @@ gearoenix::gles3::texture::Target::~Target() noexcept
     const auto cf = framebuffer;
     const auto cr = depth_buffer;
 	render_engine->get_function_loader()->load([cf, cr, txts { move(texture_objects) } ]{
-        if(cf != 0) gl::Loader::delete_framebuffers(1, reinterpret_cast<const gl::uint*>(&cf));
-        if(cr != 0) gl::Loader::delete_renderbuffers(1, reinterpret_cast<const gl::uint*>(&cr));
+        if(cf != -1) gl::Loader::delete_framebuffers(1, reinterpret_cast<const gl::uint*>(&cf));
+        if(cr != -1) gl::Loader::delete_renderbuffers(1, reinterpret_cast<const gl::uint*>(&cr));
         for(auto ct: txts) gl::Loader::delete_textures(1, &ct);
     });
 }
 
 void gearoenix::gles3::texture::Target::bind() const noexcept
 {
-    gl::Loader::bind_renderbuffer(GL_RENDERBUFFER, depth_buffer);
+    if(-1 != depth_buffer) gl::Loader::bind_renderbuffer(GL_RENDERBUFFER, depth_buffer);
     gl::Loader::bind_framebuffer(GL_FRAMEBUFFER, framebuffer);
     gl::Loader::viewport(0, 0, static_cast<gl::sizei>(img_width), static_cast<gl::sizei>(img_height));
     gl::Loader::scissor(0, 0, static_cast<gl::sizei>(img_width), static_cast<gl::sizei>(img_height));
-    gl::Loader::enable(GL_DEPTH_TEST);
-    gl::Loader::depth_mask(GL_TRUE);
+	gl::Loader::enable(GL_DEPTH_TEST);
+	gl::Loader::depth_mask(GL_TRUE);
     if (texture_objects.size() != 0)
-        gl::Loader::clear(GL_COLOR_BUFFER_BIT);
-	gl::Loader::clear(GL_DEPTH_BUFFER_BIT);
-	gl::Loader::clear(GL_STENCIL_BUFFER_BIT);
+        gl::Loader::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	else
+		gl::Loader::clear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+}
+
+void gearoenix::gles3::texture::Target::bind_textures(const std::vector<gl::enumerated> texture_units) const noexcept
+{
+#ifdef GX_DEBUG_MODE
+	if (texture_units.size() != texture_objects.size())
+		GXLOGF("Different size for texture units is not acceptable.")
+#endif
+	for (std::size_t i = 0; i < texture_objects.size(); ++i)
+	{
+		gl::Loader::active_texture(GL_TEXTURE0 + texture_units[i]);
+		gl::Loader::bind_texture(GL_TEXTURE_2D, texture_objects[i]);
+	}
 }
 
 #endif

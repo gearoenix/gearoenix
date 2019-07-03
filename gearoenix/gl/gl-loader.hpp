@@ -89,6 +89,7 @@ typedef GXGL_APICALL void(GXGL_APIENTRY viewport_fnp)(sint, sint, sizei, sizei);
 typedef GXGL_APICALL void(GXGL_APIENTRY bind_vertex_array_fnp)(uint arr);
 typedef GXGL_APICALL void(GXGL_APIENTRY delete_vertex_arrays_fnp)(sizei n, const uint* arrays);
 typedef GXGL_APICALL void(GXGL_APIENTRY gen_vertex_arrays_fnp)(sizei n, uint* arrays);
+typedef GXGL_APICALL void(GXGL_APIENTRY read_buffer)(enumerated src);
 #endif
 
 class Loader {

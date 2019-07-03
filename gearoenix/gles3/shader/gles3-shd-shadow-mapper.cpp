@@ -21,13 +21,11 @@ const static std::string vertex_shader_code = GX_GLES3_SHADER_SRC_DEFAULT_VERTEX
 const static std::string fragment_shader_code = GX_GLES3_SHADER_SRC_DEFAULT_FRAGMENT_STARTING
     GX_GLES3_SHADER_SRC_MATERIAL_RESOURCES
     "in vec2 out_uv;\n"
-    "out vec4 frag_color;\n"
     "void main()\n"
     "{\n"
     "    vec4 tmpv4 = texture(material_base_color, out_uv);\n"
     "    tmpv4.w *= material_alpha;\n"
     "    if(tmpv4.w < material_alpha_cutoff) discard;\n"
-    "    frag_color = vec4(0.0, 0.0, 0.0, 1.0);\n"
     "}";
 
 gearoenix::gles3::shader::ShadowMapper::ShadowMapper(engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept

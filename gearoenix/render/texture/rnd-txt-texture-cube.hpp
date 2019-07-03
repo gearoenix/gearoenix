@@ -4,8 +4,8 @@
 namespace gearoenix::render::texture {
 class Cube : public Texture {
 protected:
-    Cube(const core::Id my_id, engine::Engine* const engine) noexcept
-        : Texture(my_id, engine)
+    Cube(const core::Id my_id, engine::Engine* const engine, const Type::Id texture_type = Type::CUBE) noexcept
+        : Texture(my_id, texture_type, engine)
     {
     }
 

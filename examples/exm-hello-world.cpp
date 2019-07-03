@@ -106,6 +106,17 @@ GameApp::GameApp(const std::shared_ptr<gearoenix::system::Application>& sys_app)
             scn->add_model(mdl);
         }
     }
+	/*{
+		const std::shared_ptr<GxMaterial> mat(new GxMaterial(rnd_eng.get(), endcall));
+		mat->set_roughness_factor(0.5f);
+		mat->set_metallic_factor(0.5f);
+		const std::shared_ptr<GxModel> mdl = mdlmgr->create<GxModel>(mdlcall);
+		mdl->add_mesh(std::make_shared<GxMdMesh>(msh, mat));
+		auto& trans = mdl->get_transformation();
+		trans->set_location(GxVec3(0.0f, 0.0f, 0.0f));
+		trans->scale(10.0f);
+		scn->add_model(mdl);
+	}*/
 }
 
 void GameApp::update() noexcept
