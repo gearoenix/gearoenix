@@ -12,10 +12,11 @@ namespace texture {
 namespace engine {
     class Engine : public render::engine::Engine {
     private:
-        explicit Engine(system::Application* sys_app) noexcept;
+        explicit Engine(system::Application* sys_app, render::engine::Type::Id engine_type) noexcept;
 
     public:
-        static std::shared_ptr<Engine> construct(system::Application* sys_app) noexcept;
+		/// TODO: this is temporary and must change in future
+        static std::shared_ptr<Engine> construct(system::Application* sys_app, render::engine::Type::Id engine_type) noexcept;
         ~Engine() noexcept final;
         void update() noexcept final;
         void terminate() noexcept final;

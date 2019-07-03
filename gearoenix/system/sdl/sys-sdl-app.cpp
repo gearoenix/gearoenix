@@ -17,7 +17,7 @@
 #if defined(GX_USE_OPENGL_ES2)
 #include "../../gles2/engine/gles2-eng-engine.hpp"
 #endif
-#if defined(GX_USE_OPENGL_ES3)
+#if defined(GX_USE_OPENGL_ES3) || defined(GX_USE_OPENGL_33) || defined(GX_USE_OPENGL_43)
 #include "../../gles3/engine/gles3-eng-engine.hpp"
 #endif
 #if defined(GX_USE_VULKAN)
@@ -79,9 +79,6 @@ void gearoenix::system::Application::create_window() noexcept
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 #endif
 #define CREATE_WINDOW(gl_version)                                   \
     supported_engine = render::engine::Type::gl_version;            \
@@ -104,7 +101,22 @@ void gearoenix::system::Application::create_window() noexcept
         SDL_DestroyWindow(window);                                  \
     }
 
+#ifdef GX_USE_OPENGL_43
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+	CREATE_WINDOW(OPENGL_43)
+#endif
+#ifdef GX_USE_OPENGL_33
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+	CREATE_WINDOW(OPENGL_33)
+#endif
 #ifdef GX_USE_OPENGL_ES3
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
     CREATE_WINDOW(OPENGL_ES3)
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
     CREATE_WINDOW(OPENGL_ES3)
@@ -308,9 +320,12 @@ const std::shared_ptr<gearoenix::system::Application> gearoenix::system::Applica
     }
 #endif
 
-#ifdef GX_USE_OPENGL_ES3
-    if (nullptr == result->render_engine && result->supported_engine == render::engine::Type::OPENGL_ES3) {
-        result->render_engine = gles3::engine::Engine::construct(result.get());
+#if defined(GX_USE_OPENGL_ES3) || defined(GX_USE_OPENGL_33) || defined(GX_USE_OPENGL_43)
+    if (nullptr == result->render_engine && (
+		result->supported_engine == render::engine::Type::OPENGL_ES3 ||
+		result->supported_engine == render::engine::Type::OPENGL_33 ||
+		result->supported_engine == render::engine::Type::OPENGL_43)) {
+        result->render_engine = gles3::engine::Engine::construct(result.get(), result->supported_engine);
     }
 #endif
 

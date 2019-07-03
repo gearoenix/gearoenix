@@ -23,15 +23,15 @@
 #include "../texture/gles3-txt-cube.hpp"
 #include "../texture/gles3-txt-target.hpp"
 
-gearoenix::gles3::engine::Engine::Engine(system::Application* const sys_app) noexcept
-    : render::engine::Engine(sys_app, render::engine::Type::OPENGL_ES3)
+gearoenix::gles3::engine::Engine::Engine(system::Application* const sys_app, const render::engine::Type::Id engine_type) noexcept
+    : render::engine::Engine(sys_app, engine_type)
 {
     pipeline_manager = new pipeline::Manager(this);
 }
 
-std::shared_ptr<gearoenix::gles3::engine::Engine> gearoenix::gles3::engine::Engine::construct(system::Application* const sys_app) noexcept
+std::shared_ptr<gearoenix::gles3::engine::Engine> gearoenix::gles3::engine::Engine::construct(system::Application* const sys_app, const render::engine::Type::Id engine_type) noexcept
 {
-    std::shared_ptr<Engine> e(new Engine(sys_app));
+    std::shared_ptr<Engine> e(new Engine(sys_app, engine_type));
     e->buffer_manager = new buffer::Manager(e.get());
     e->command_manager = new command::Manager();
     e->main_render_target = std::shared_ptr<render::texture::Target>(new texture::Target(e.get()));

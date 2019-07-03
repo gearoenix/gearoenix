@@ -50,7 +50,7 @@ namespace graph::node {
         // Bring lights in here not scene
         math::Mat4x4 cascades_view_projections_bias[GX_MAX_SHADOW_CASCADES];
         core::Real cascades_count = static_cast<core::Real>(GX_MAX_SHADOW_CASCADES);
-        explicit ForwardPbrDirectionalShadowUniform(const light::CascadeInfo* cas) noexcept;
+        explicit ForwardPbrDirectionalShadowUniform(const light::CascadeInfo* cas, const engine::Engine* e) noexcept;
     };
 
     struct ForwardPbrDirectionalShadowRenderData {
