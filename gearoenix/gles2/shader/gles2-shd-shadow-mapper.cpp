@@ -16,7 +16,7 @@ const static std::string vertex_shader_code = GX_GLES2_SHADER_SRC_DEFAULT_VERTEX
     "void main()\n"
     "{\n"
     "    vec4 pos = effect_mvp * vec4(position, 1.0);\n"
-    "    float depth = pos.z / pos.w;\n"
+    "    float depth = (pos.z / pos.w) * 0.5 + 0.5;\n"
     "    out_depth = vec2(depth, depth * 256.0);\n"
     "    out_uv = uv;\n"
     "    gl_Position = pos;\n"

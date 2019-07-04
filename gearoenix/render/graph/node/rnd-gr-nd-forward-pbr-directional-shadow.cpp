@@ -38,24 +38,12 @@ gearoenix::render::graph::node::ForwardPbrDirectionalShadowUniform::ForwardPbrDi
     const auto s = data.size();
     cascades_count = static_cast<core::Real>(s) + 0.1f;
     for (std::size_t i = 0; i < s; ++i) {
-
-#ifdef GX_USE_OPENGL_ES2
-#ifdef GX_USE_INSTEAD_OF_OPENGL_ES2
-        if (e->get_engine_type_id() == engine::Type::OPENGL_ES2) {
+#ifdef GX_USE_OPENGL
+#ifdef GX_USE_INSTEAD_OF_OPENGL
+        if (GX_RUNTIME_USE_OPENGL) {
 #endif
-            cascades_view_projections_bias[i] = data[i].view_projection_bias_gles2;
-#ifdef GX_USE_INSTEAD_OF_OPENGL_ES2
-            continue;
-        }
-#endif
-#endif
-
-#ifdef GX_USE_OPENGL_CLASS_3
-#ifdef GX_USE_INSTEAD_OF_OPENGL_CLASS_3
-        if (GX_RUNTIME_USE_OPENGL_CLASS_3) {
-#endif
-            cascades_view_projections_bias[i] = data[i].view_projection_bias_gles3;
-#ifdef GX_USE_INSTEAD_OF_OPENGL_CLASS_3
+            cascades_view_projections_bias[i] = data[i].view_projection_bias_gl;
+#ifdef GX_USE_INSTEAD_OF_OPENGL
             continue;
         }
 #endif

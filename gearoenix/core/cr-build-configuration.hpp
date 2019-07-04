@@ -14,9 +14,9 @@
 #elif defined(__unix__)
 #define GX_IN_LINUX
 //#define GX_USE_VULKAN
-//#define GX_USE_OPENGL_43
-//#define GX_USE_OPENGL_33
-//#define GX_USE_OPENGL_ES3
+#define GX_USE_OPENGL_43
+#define GX_USE_OPENGL_33
+#define GX_USE_OPENGL_ES3
 #define GX_USE_OPENGL_ES2
 #define GX_IN_DESKTOP
 #define GX_USE_SDL
@@ -99,6 +99,9 @@
 #endif
 #if defined(GX_USE_DIRECTX11) || defined(GX_USE_DIRECTX12)
 #define GX_USE_DIRECTX
+#endif
+#if defined(GX_USE_OPENGL) && (defined(GX_USE_DIRECTX) || defined(GX_USE_VULKAN))
+#define GX_USE_INSTEAD_OF_OPENGL
 #endif
 #if defined(GX_USE_OPENGL_ES2) && (defined(GX_USE_OPENGL_ES3) || defined(GX_USE_OPENGL_33) || defined(GX_USE_OPENGL_43) || defined(GX_USE_DIRECTX) || defined(GX_USE_VULKAN))
 #define GX_USE_INSTEAD_OF_OPENGL_ES2
