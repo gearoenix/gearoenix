@@ -174,10 +174,10 @@ void gearoenix::render::light::CascadeInfo::shrink() noexcept
 #endif
             cas.view_projection_gl = mtx;
             cas.view_projection_bias_gl = math::Mat4x4(
-                                                 0.5f, 0.0f, 0.0f, 0.0f,
-                                                 0.0f, 0.5f, 0.0f, 0.0f,
-                                                 0.0f, 0.0f, 1.0f, 0.0f,
-                                                 0.5f, 0.5f, 0.0f, 1.0f)
+                                              0.5f, 0.0f, 0.0f, 0.0f,
+                                              0.0f, 0.5f, 0.0f, 0.0f,
+                                              0.0f, 0.0f, 1.0f, 0.0f,
+                                              0.5f, 0.5f, 0.0f, 1.0f)
                 * mtx;
 
 #ifdef GX_USE_INSTEAD_OF_OPENGL
