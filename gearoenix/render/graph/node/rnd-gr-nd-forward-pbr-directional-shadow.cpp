@@ -50,34 +50,12 @@ gearoenix::render::graph::node::ForwardPbrDirectionalShadowUniform::ForwardPbrDi
 #endif
 #endif
 
-#ifdef GX_USE_OPENGL_ES3
-#ifdef GX_USE_INSTEAD_OF_OPENGL_ES3
-		if (e->get_engine_type_id() == engine::Type::OPENGL_ES3) {
+#ifdef GX_USE_OPENGL_CLASS_3
+#ifdef GX_USE_INSTEAD_OF_OPENGL_CLASS_3
+		if (GX_RUNTIME_USE_OPENGL_CLASS_3) {
 #endif
 			cascades_view_projections_bias[i] = data[i].view_projection_bias_gles3;
-#ifdef GX_USE_INSTEAD_OF_OPENGL_ES3
-			continue;
-		}
-#endif
-#endif
-
-#ifdef GX_USE_OPENGL_33
-#ifdef GX_USE_INSTEAD_OF_OPENGL_33
-		if (e->get_engine_type_id() == engine::Type::OPENGL_33) {
-#endif
-			cascades_view_projections_bias[i] = data[i].view_projection_bias_gles3;
-#ifdef GX_USE_INSTEAD_OF_OPENGL_33
-			continue;
-		}
-#endif
-#endif
-
-#ifdef GX_USE_OPENGL_43
-#ifdef GX_USE_INSTEAD_OF_OPENGL_43
-		if (e->get_engine_type_id() == engine::Type::OPENGL_43) {
-#endif
-			cascades_view_projections_bias[i] = data[i].view_projection_bias_gles3;
-#ifdef GX_USE_INSTEAD_OF_OPENGL_43
+#ifdef GX_USE_INSTEAD_OF_OPENGL_CLASS_3
 			continue;
 		}
 #endif

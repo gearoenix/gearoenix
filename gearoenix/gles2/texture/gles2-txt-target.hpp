@@ -4,8 +4,7 @@
 #ifdef GX_USE_OPENGL_ES2
 #include "../../core/sync/cr-sync-end-caller.hpp"
 #include "../../gl/gl-types.hpp"
-#include "../../render/texture/rnd-txt-format.hpp"
-#include "../../render/texture/rnd-txt-sample.hpp"
+#include "../../render/texture/rnd-txt-info.hpp"
 #include "../../render/texture/rnd-txt-target.hpp"
 namespace gearoenix::gles2 {
 namespace engine {
@@ -25,13 +24,13 @@ namespace texture {
         Target(
             core::Id my_id,
             engine::Engine* e,
-            render::texture::TextureFormat::Id f,
-            render::texture::SampleInfo s,
+			const std::vector<render::texture::Info>& infos,
             unsigned int width,
             unsigned int heigt,
             const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
         ~Target() noexcept final;
         void bind() const noexcept;
+		void bind_texture(gl::enumerated texture_unit) const noexcept;
     };
 }
 }

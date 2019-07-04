@@ -46,8 +46,7 @@ public:
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept final;
     render::texture::Target* create_render_target(
         core::Id id,
-        render::texture::TextureFormat::Id f,
-        render::texture::SampleInfo s,
+        const std::vector<render::texture::Info>& infos,
         unsigned int width,
         unsigned int height,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept final;

@@ -4,13 +4,13 @@
 #include "../shader/gles2-shd-shadow-mapper.hpp"
 #include "gles2-pip-shadow-mapper-resource-set.hpp"
 
-gearoenix::gles2::pipeline::ShadowMapper::ShadowMapper(const std::shared_ptr<engine::Engine>& e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c)
+gearoenix::gles2::pipeline::ShadowMapper::ShadowMapper(engine::Engine*const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : render::pipeline::ShadowMapper(e, c)
     , shd(new shader::ShadowMapper(e, c))
 {
 }
 
-gearoenix::render::pipeline::ResourceSet* gearoenix::gles2::pipeline::ShadowMapper::create_resource_set() const
+gearoenix::render::pipeline::ResourceSet* gearoenix::gles2::pipeline::ShadowMapper::create_resource_set() const noexcept
 {
     return new ShadowMapperResourceSet(shd);
 }

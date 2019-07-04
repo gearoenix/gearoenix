@@ -17,8 +17,8 @@
 #if defined(GX_USE_OPENGL_ES2)
 #include "../../gles2/engine/gles2-eng-engine.hpp"
 #endif
-#if defined(GX_USE_OPENGL_ES3) || defined(GX_USE_OPENGL_33) || defined(GX_USE_OPENGL_43)
-#include "../../gles3/engine/gles3-eng-engine.hpp"
+#ifdef GX_USE_OPENGL_CLASS_3
+#include "../../glc3/engine/glc3-eng-engine.hpp"
 #endif
 #if defined(GX_USE_VULKAN)
 #include "../../vulkan/engine/vk-eng-engine.hpp"
@@ -299,7 +299,7 @@ const std::shared_ptr<gearoenix::system::Application> gearoenix::system::Applica
 
     SDL_AddEventWatch(event_receiver, result.get());
 #ifdef GX_USE_OPENGL
-    if (result->supported_engine == render::engine::Type::OPENGL_43 || result->supported_engine == render::engine::Type::OPENGL_33 || result->supported_engine == render::engine::Type::OPENGL_ES3 || result->supported_engine == render::engine::Type::OPENGL_ES2) {
+    if (GX_RUNTIME_USE_OPENGL_V(result->supported_engine)) {
         int w, h;
         SDL_GL_GetDrawableSize(result->window, &w, &h);
         result->win_width = static_cast<unsigned int>(w);
@@ -320,12 +320,9 @@ const std::shared_ptr<gearoenix::system::Application> gearoenix::system::Applica
     }
 #endif
 
-#if defined(GX_USE_OPENGL_ES3) || defined(GX_USE_OPENGL_33) || defined(GX_USE_OPENGL_43)
-    if (nullptr == result->render_engine && (
-		result->supported_engine == render::engine::Type::OPENGL_ES3 ||
-		result->supported_engine == render::engine::Type::OPENGL_33 ||
-		result->supported_engine == render::engine::Type::OPENGL_43)) {
-        result->render_engine = gles3::engine::Engine::construct(result.get(), result->supported_engine);
+#ifdef GX_USE_OPENGL_CLASS_3
+    if (nullptr == result->render_engine && (GX_RUNTIME_USE_OPENGL_CLASS_3_V(result->supported_engine))) {
+        result->render_engine = glc3::engine::Engine::construct(result.get(), result->supported_engine);
     }
 #endif
 
@@ -378,7 +375,7 @@ void gearoenix::system::Application::main_loop()
     core_app->update();
     render_engine->update();
 #ifdef GX_USE_OPENGL
-    if (supported_engine == render::engine::Type::OPENGL_43 || supported_engine == render::engine::Type::OPENGL_33 || supported_engine == render::engine::Type::OPENGL_ES3 || supported_engine == render::engine::Type::OPENGL_ES2) {
+    if (GX_RUNTIME_USE_OPENGL_V(supported_engine)) {
         SDL_GL_SwapWindow(window);
     }
 #endif
@@ -390,8 +387,10 @@ render_engine = nullptr;
 astmgr = nullptr;
 SDL_DelEventWatch(event_receiver, this);
 #ifdef GX_USE_OPENGL
-SDL_GL_DeleteContext(gl_context);
-gl::Loader::unload_library();
+if (GX_RUNTIME_USE_OPENGL_V(supported_engine)) {
+	SDL_GL_DeleteContext(gl_context);
+	gl::Loader::unload_library();
+}
 #endif
 SDL_DestroyWindow(window);
 SDL_Quit();

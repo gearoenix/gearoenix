@@ -71,7 +71,7 @@ gearoenix::gl::use_program_fnp gearoenix::gl::Loader::use_program;
 gearoenix::gl::validate_program_fnp gearoenix::gl::Loader::validate_program;
 gearoenix::gl::vertex_attrib_pointer_fnp gearoenix::gl::Loader::vertex_attrib_pointer;
 gearoenix::gl::viewport_fnp gearoenix::gl::Loader::viewport;
-#ifdef GX_USE_OPENGL_ES3
+#ifdef GX_USE_OPENGL_CLASS_3
 gearoenix::gl::bind_vertex_array_fnp gearoenix::gl::Loader::bind_vertex_array;
 gearoenix::gl::delete_vertex_arrays_fnp gearoenix::gl::Loader::delete_vertex_arrays;
 gearoenix::gl::gen_vertex_arrays_fnp gearoenix::gl::Loader::gen_vertex_arrays;
@@ -167,7 +167,7 @@ bool gearoenix::gl::Loader::load_library(const render::engine::Type::Id engine_t
     GXFUNLDF(glViewport, viewport)
     if (engine_type == render::engine::Type::OPENGL_ES2)
         return true;
-#if defined(GX_USE_OPENGL_ES3) || defined(GX_USE_OPENGL_33) || defined(GX_USE_OPENGL_43)
+#ifdef GX_USE_OPENGL_CLASS_3
     GXFUNLDF(glBindVertexArray, bind_vertex_array)
     GXFUNLDF(glDeleteVertexArrays, delete_vertex_arrays)
     GXFUNLDF(glGenVertexArrays, gen_vertex_arrays)

@@ -34,6 +34,7 @@ gearoenix::gles2::engine::Engine::Engine(system::Application* const sys_app) noe
     : render::engine::Engine(sys_app, render::engine::Type::OPENGL_ES2)
 {
     initialize();
+	pipeline_manager = new pipeline::Manager(this);
 }
 
 std::shared_ptr<gearoenix::gles2::engine::Engine> gearoenix::gles2::engine::Engine::construct(system::Application* const sys_app) noexcept
@@ -43,7 +44,6 @@ std::shared_ptr<gearoenix::gles2::engine::Engine> gearoenix::gles2::engine::Engi
     gl::Loader::check_for_error();
 #endif
     std::shared_ptr<Engine> e(new Engine(sys_app));
-    e->pipeline_manager = new pipeline::Manager(e);
     e->buffer_manager = new buffer::Manager(e.get());
     e->command_manager = new command::Manager();
 #ifdef GX_DEBUG_GLES2
@@ -121,13 +121,12 @@ gearoenix::render::texture::Cube* gearoenix::gles2::engine::Engine::create_textu
 
 gearoenix::render::texture::Target* gearoenix::gles2::engine::Engine::create_render_target(
     core::Id id,
-    render::texture::TextureFormat::Id f,
-    render::texture::SampleInfo s,
+	const std::vector<render::texture::Info>& infos,
     unsigned int width,
     unsigned int height,
     const gearoenix::core::sync::EndCaller<gearoenix::core::sync::EndCallerIgnore>& call) noexcept
 {
-    return new texture::Target(id, this, f, s, width, height, call);
+    return new texture::Target(id, this, infos, width, height, call);
 }
 
 void gearoenix::gles2::engine::Engine::submit(

@@ -34,7 +34,7 @@ const static std::string fragment_shader_code = GX_GLES2_SHADER_SRC_DEFAULT_FRAG
     "    gl_FragColor = vec4(fract(out_depth), 0.0, 1.0);\n"
     "}";
 
-gearoenix::gles2::shader::ShadowMapper::ShadowMapper(const std::shared_ptr<engine::Engine>& e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c)
+gearoenix::gles2::shader::ShadowMapper::ShadowMapper(engine::Engine*const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : Shader(e, c)
 {
     e->get_function_loader()->load([this] {
@@ -47,11 +47,11 @@ gearoenix::gles2::shader::ShadowMapper::ShadowMapper(const std::shared_ptr<engin
     });
 }
 
-gearoenix::gles2::shader::ShadowMapper::~ShadowMapper()
+gearoenix::gles2::shader::ShadowMapper::~ShadowMapper() noexcept
 {
 }
 
-void gearoenix::gles2::shader::ShadowMapper::bind() const
+void gearoenix::gles2::shader::ShadowMapper::bind() const noexcept
 {
     Shader::bind();
     GX_GLES2_SHADER_MATERIAL_SET_TEXTURE_INDEX_UNIFORM

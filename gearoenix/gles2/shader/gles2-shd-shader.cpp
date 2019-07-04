@@ -8,7 +8,7 @@
 #include "../gles2.hpp"
 #include <vector>
 
-void gearoenix::gles2::shader::Shader::create_program()
+void gearoenix::gles2::shader::Shader::create_program()  noexcept
 {
     shader_program = gl::Loader::create_program();
     if (shader_program == 0) {
@@ -16,13 +16,13 @@ void gearoenix::gles2::shader::Shader::create_program()
     }
 }
 
-void gearoenix::gles2::shader::Shader::run()
+void gearoenix::gles2::shader::Shader::run() noexcept
 {
     link();
     gl::Loader::use_program(shader_program);
 }
 
-void gearoenix::gles2::shader::Shader::link()
+void gearoenix::gles2::shader::Shader::link() noexcept
 {
     gl::sint is_success = 0;
     gl::Loader::link_program(shader_program);
@@ -42,7 +42,7 @@ void gearoenix::gles2::shader::Shader::link()
     uv_attribute_location = gl::Loader::get_attrib_location(shader_program, "uv");
 }
 
-void gearoenix::gles2::shader::Shader::validate()
+void gearoenix::gles2::shader::Shader::validate() noexcept
 {
     gl::Loader::validate_program(shader_program);
     gl::sint is_success = 0;
@@ -58,7 +58,7 @@ void gearoenix::gles2::shader::Shader::validate()
     gl::Loader::use_program(shader_program);
 }
 
-gearoenix::gl::uint gearoenix::gles2::shader::Shader::add_shader_to_program(const std::string& shd, const gl::enumerated shader_type)
+gearoenix::gl::uint gearoenix::gles2::shader::Shader::add_shader_to_program(const std::string& shd, const gl::enumerated shader_type) noexcept
 {
     gl::uint shader_obj = gl::Loader::create_shader(shader_type);
     if (shader_obj == 0) {
@@ -82,27 +82,27 @@ gearoenix::gl::uint gearoenix::gles2::shader::Shader::add_shader_to_program(cons
     return shader_obj;
 }
 
-gearoenix::gl::uint gearoenix::gles2::shader::Shader::set_vertex_shader(const std::string& shd)
+gearoenix::gl::uint gearoenix::gles2::shader::Shader::set_vertex_shader(const std::string& shd) noexcept
 {
     return add_shader_to_program(shd, GL_VERTEX_SHADER);
 }
 
-gearoenix::gl::uint gearoenix::gles2::shader::Shader::set_fragment_shader(const std::string& shd)
+gearoenix::gl::uint gearoenix::gles2::shader::Shader::set_fragment_shader(const std::string& shd) noexcept
 {
     return add_shader_to_program(shd, GL_FRAGMENT_SHADER);
 }
 
-void gearoenix::gles2::shader::Shader::end_program(const gl::uint shader_program)
+void gearoenix::gles2::shader::Shader::end_program(const gl::uint shader_program) noexcept
 {
     gl::Loader::delete_program(shader_program);
 }
 
-void gearoenix::gles2::shader::Shader::end_object(const gl::uint shader_object)
+void gearoenix::gles2::shader::Shader::end_object(const gl::uint shader_object) noexcept
 {
     gl::Loader::delete_shader(shader_object);
 }
 
-gearoenix::gles2::shader::Shader::Shader(const std::shared_ptr<engine::Engine>& e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c)
+gearoenix::gles2::shader::Shader::Shader(engine::Engine*const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : e(e)
 {
     e->get_function_loader()->load([c, this] {
@@ -110,7 +110,7 @@ gearoenix::gles2::shader::Shader::Shader(const std::shared_ptr<engine::Engine>& 
     });
 }
 
-gearoenix::gles2::shader::Shader::~Shader()
+gearoenix::gles2::shader::Shader::~Shader() noexcept
 {
     const gl::uint p = shader_program;
     const gl::uint v = vertex_object;
@@ -128,17 +128,17 @@ gearoenix::gles2::shader::Shader::~Shader()
     fragment_object = 0;
 }
 
-gearoenix::gl::sint gearoenix::gles2::shader::Shader::get_uniform_location(const std::string& uname) const
+gearoenix::gl::sint gearoenix::gles2::shader::Shader::get_uniform_location(const std::string& uname) const noexcept
 {
     return gl::Loader::get_uniform_location(shader_program, &(uname[0]));
 }
 
-gearoenix::gl::uint gearoenix::gles2::shader::Shader::get_shader_program() const
+gearoenix::gl::uint gearoenix::gles2::shader::Shader::get_shader_program() const noexcept
 {
     return shader_program;
 }
 
-void gearoenix::gles2::shader::Shader::bind() const
+void gearoenix::gles2::shader::Shader::bind() const noexcept
 {
 
     gl::Loader::use_program(shader_program);

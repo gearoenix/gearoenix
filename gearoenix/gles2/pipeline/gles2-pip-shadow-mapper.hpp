@@ -3,8 +3,7 @@
 #include "../../core/cr-build-configuration.hpp"
 #ifdef GX_USE_OPENGL_ES2
 #include "../../render/pipeline/rnd-pip-shadow-mapper.hpp"
-namespace gearoenix {
-namespace gles2 {
+namespace gearoenix::gles2 {
     namespace engine {
         class Engine;
     }
@@ -17,11 +16,10 @@ namespace gles2 {
             const std::shared_ptr<shader::ShadowMapper> shd;
 
         public:
-            ShadowMapper(const std::shared_ptr<engine::Engine>& e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
-            render::pipeline::ResourceSet* create_resource_set() const override final;
+            ShadowMapper(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+            render::pipeline::ResourceSet* create_resource_set() const noexcept final;
         };
     }
-}
 }
 #endif
 #endif

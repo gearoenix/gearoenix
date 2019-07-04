@@ -29,7 +29,7 @@
 #define GX_USE_OPENGL_43
 #define GX_USE_OPENGL_33
 #define GX_USE_OPENGL_ES3
-//#define GX_USE_OPENGL_ES2
+#define GX_USE_OPENGL_ES2
 #define GX_IN_DESKTOP
 #define GX_USE_SDL
 //#define GX_USE_GLFW
@@ -94,16 +94,86 @@
 #if defined(GX_USE_OPENGL_ES2) || defined(GX_USE_OPENGL_ES3) || defined(GX_USE_OPENGL_33) || defined(GX_USE_OPENGL_43)
 #define GX_USE_OPENGL
 #endif
-#if defined(GX_USE_OPENGL_ES2) && (defined(GX_USE_OPENGL_ES3) || defined(GX_USE_OPENGL_33) || defined(GX_USE_OPENGL_43) || defined(GX_USE_DIRECTX11) || defined(GX_USE_DIRECTX12) || defined(GX_USE_VULKAN))
+#if defined(GX_USE_OPENGL_ES3) || defined(GX_USE_OPENGL_33) || defined(GX_USE_OPENGL_43)
+#define GX_USE_OPENGL_CLASS_3
+#endif
+#if defined(GX_USE_DIRECTX11) || defined(GX_USE_DIRECTX12)
+#define GX_USE_DIRECTX
+#endif
+#if defined(GX_USE_OPENGL_ES2) && (defined(GX_USE_OPENGL_ES3) || defined(GX_USE_OPENGL_33) || defined(GX_USE_OPENGL_43) || defined(GX_USE_DIRECTX) || defined(GX_USE_VULKAN))
 #define GX_USE_INSTEAD_OF_OPENGL_ES2
 #endif
-#if defined(GX_USE_OPENGL_ES3) && (defined(GX_USE_OPENGL_ES2) || defined(GX_USE_OPENGL_33) || defined(GX_USE_OPENGL_43) || defined(GX_USE_DIRECTX11) || defined(GX_USE_DIRECTX12) || defined(GX_USE_VULKAN))
+#if defined(GX_USE_OPENGL_ES3) && (defined(GX_USE_OPENGL_ES2) || defined(GX_USE_OPENGL_33) || defined(GX_USE_OPENGL_43) || defined(GX_USE_DIRECTX) || defined(GX_USE_VULKAN))
 #define GX_USE_INSTEAD_OF_OPENGL_ES3
 #endif
-#if defined(GX_USE_OPENGL_33) && (defined(GX_USE_OPENGL_ES2) || defined(GX_USE_OPENGL_ES3) || defined(GX_USE_OPENGL_43) || defined(GX_USE_DIRECTX11) || defined(GX_USE_DIRECTX12) || defined(GX_USE_VULKAN))
+#if defined(GX_USE_OPENGL_33) && (defined(GX_USE_OPENGL_ES2) || defined(GX_USE_OPENGL_ES3) || defined(GX_USE_OPENGL_43) || defined(GX_USE_DIRECTX) || defined(GX_USE_VULKAN))
 #define GX_USE_INSTEAD_OF_OPENGL_33
 #endif
-#if defined(GX_USE_OPENGL_43) && (defined(GX_USE_OPENGL_ES2) || defined(GX_USE_OPENGL_ES3) || defined(GX_USE_OPENGL_33) || defined(GX_USE_DIRECTX11) || defined(GX_USE_DIRECTX12) || defined(GX_USE_VULKAN))
+#if defined(GX_USE_OPENGL_43) && (defined(GX_USE_OPENGL_ES2) || defined(GX_USE_OPENGL_ES3) || defined(GX_USE_OPENGL_33) || defined(GX_USE_DIRECTX) || defined(GX_USE_VULKAN))
 #define GX_USE_INSTEAD_OF_OPENGL_43
+#endif
+#if defined(GX_USE_OPENGL_CLASS_3) && (defined(GX_USE_OPENGL_ES2) || defined(GX_USE_DIRECTX) || defined(GX_USE_VULKAN))
+#define GX_USE_INSTEAD_OF_OPENGL_CLASS_3
+#endif
+#ifdef GX_USE_OPENGL_ES2
+#define GX_RUNTIME_USE_OPENGL_ES2_V(v) (v) == gearoenix::render::engine::Type::OPENGL_ES2 ||
+#define GX_RUNTIME_USE_OPENGL_ES2_E(e) GX_RUNTIME_USE_OPENGL_ES2_V((e)->get_engine_type_id())
+#define GX_RUNTIME_USE_OPENGL_ES2 GX_RUNTIME_USE_OPENGL_ES2_E(e)
+#else
+#define GX_RUNTIME_USE_OPENGL_ES2_V(v)
+#define GX_RUNTIME_USE_OPENGL_ES2_E(e)
+#define GX_RUNTIME_USE_OPENGL_ES2
+#endif
+#ifdef GX_USE_OPENGL_ES3
+#define GX_RUNTIME_USE_OPENGL_ES3_V(v) (v) == gearoenix::render::engine::Type::OPENGL_ES3 ||
+#define GX_RUNTIME_USE_OPENGL_ES3_E(e) GX_RUNTIME_USE_OPENGL_ES3_V((e)->get_engine_type_id())
+#define GX_RUNTIME_USE_OPENGL_ES3 GX_RUNTIME_USE_OPENGL_ES3_E(e)
+#else
+#define GX_RUNTIME_USE_OPENGL_ES3_V(v)
+#define GX_RUNTIME_USE_OPENGL_ES3_E(e)
+#define GX_RUNTIME_USE_OPENGL_ES3
+#endif
+#ifdef GX_USE_OPENGL_33
+#define GX_RUNTIME_USE_OPENGL_33_V(v) (v) == gearoenix::render::engine::Type::OPENGL_33 ||
+#define GX_RUNTIME_USE_OPENGL_33_E(e) GX_RUNTIME_USE_OPENGL_33_V((e)->get_engine_type_id())
+#define GX_RUNTIME_USE_OPENGL_33 GX_RUNTIME_USE_OPENGL_33_E(e)
+#else
+#define GX_RUNTIME_USE_OPENGL_33_V(v)
+#define GX_RUNTIME_USE_OPENGL_33_E(e)
+#define GX_RUNTIME_USE_OPENGL_33
+#endif
+#ifdef GX_USE_OPENGL_43
+#define GX_RUNTIME_USE_OPENGL_43_V(v) (v) == gearoenix::render::engine::Type::OPENGL_43 ||
+#define GX_RUNTIME_USE_OPENGL_43_E(e) GX_RUNTIME_USE_OPENGL_43_V((e)->get_engine_type_id())
+#define GX_RUNTIME_USE_OPENGL_43 GX_RUNTIME_USE_OPENGL_43_E(e)
+#else
+#define GX_RUNTIME_USE_OPENGL_43_V(v)
+#define GX_RUNTIME_USE_OPENGL_43_E(e)
+#define GX_RUNTIME_USE_OPENGL_43
+#endif
+#ifdef GX_USE_OPENGL_CLASS_3
+#define GX_RUNTIME_USE_OPENGL_CLASS_3_V(v) \
+	GX_RUNTIME_USE_OPENGL_43_V(v)  \
+	GX_RUNTIME_USE_OPENGL_33_V(v)  \
+	GX_RUNTIME_USE_OPENGL_ES3_V(v) \
+    false
+#define GX_RUNTIME_USE_OPENGL_CLASS_3_E(e) GX_RUNTIME_USE_OPENGL_CLASS_3_V((e)->get_engine_type_id())
+#define GX_RUNTIME_USE_OPENGL_CLASS_3 GX_RUNTIME_USE_OPENGL_CLASS_3_E(e)
+#else
+#define GX_RUNTIME_USE_OPENGL_CLASS_3_V(v)
+#define GX_RUNTIME_USE_OPENGL_CLASS_3_E(e)
+#define GX_RUNTIME_USE_OPENGL_CLASS_3
+#endif
+#ifdef GX_USE_OPENGL
+#define GX_RUNTIME_USE_OPENGL_V(v) \
+	GX_RUNTIME_USE_OPENGL_43_V(v)  \
+	GX_RUNTIME_USE_OPENGL_33_V(v)  \
+	GX_RUNTIME_USE_OPENGL_ES3_V(v) \
+	GX_RUNTIME_USE_OPENGL_ES2_V(v) \
+    false
+#define GX_RUNTIME_USE_OPENGL_E(e) GX_RUNTIME_USE_OPENGL_V((e)->get_engine_type_id())
+#define GX_RUNTIME_USE_OPENGL GX_RUNTIME_USE_OPENGL_E(e)
+#else
+#define GX_RUNTIME_USE_OPENGL_E(e)
 #endif
 #endif

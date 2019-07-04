@@ -17,8 +17,8 @@ namespace gles2 {
             const std::shared_ptr<shader::ForwardPbrDirectionalShadow> shd;
 
         public:
-            ForwardPbrDirectionalShadow(const std::shared_ptr<engine::Engine>& e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
-            render::pipeline::ResourceSet* create_resource_set() const override final;
+            ForwardPbrDirectionalShadow(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+            render::pipeline::ResourceSet* create_resource_set() const noexcept final;
         };
     }
 }

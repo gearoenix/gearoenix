@@ -52,8 +52,7 @@ gearoenix::gles2::texture::Target::Target(engine::Engine* const e) noexcept
 gearoenix::gles2::texture::Target::Target(
     core::Id my_id,
     engine::Engine* e,
-    render::texture::TextureFormat::Id f,
-    render::texture::SampleInfo s,
+	const std::vector<render::texture::Info>& infos,
     unsigned int w,
     unsigned int h,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
@@ -61,10 +60,11 @@ gearoenix::gles2::texture::Target::Target(
 {
     img_width = w;
     img_height = h;
-    const SampleInfo sample_info = SampleInfo(s);
-    if (f != render::texture::TextureFormat::R_FLOAT16)
-        GXLOGF("GLES2 engine only supports depth");
-    e->get_function_loader()->load([this, sample_info, call] {
+	if (infos.size() != 1)
+		GXLOGF("GLES2 backend only supports 1 color attachment.");
+    if (infos[0].f != render::texture::TextureFormat::D_16)
+        GXLOGF("GLES2 backend only supports 16bits depth attachment right now.");
+    e->get_function_loader()->load([this, call] {
         gl::Loader::gen_framebuffers(1, reinterpret_cast<gl::uint*>(&framebuffer));
         gl::Loader::gen_renderbuffers(1, reinterpret_cast<gl::uint*>(&depth_buffer));
         gl::Loader::bind_renderbuffer(GL_RENDERBUFFER, depth_buffer);
@@ -113,4 +113,9 @@ void gearoenix::gles2::texture::Target::bind() const noexcept
         gl::Loader::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 }
 
+void gearoenix::gles2::texture::Target::bind_texture(gl::enumerated texture_unit) const noexcept
+{
+	gl::Loader::active_texture(GL_TEXTURE0 + texture_unit);
+	gl::Loader::bind_texture(GL_TEXTURE_2D, texture_object);
+}
 #endif

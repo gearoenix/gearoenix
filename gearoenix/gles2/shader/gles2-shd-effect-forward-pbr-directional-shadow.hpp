@@ -7,8 +7,7 @@
 #include "../gles2.hpp"
 #include "gles2-shd-shader.hpp"
 #include <string>
-namespace gearoenix {
-namespace gles2 {
+namespace gearoenix::gles2 {
     namespace engine {
         class Engine;
     }
@@ -37,12 +36,11 @@ namespace gles2 {
             GX_GLES2_UNIFORM_VECTOR(scene_ssao_config, 3, 1)
 
         public:
-            ForwardPbrDirectionalShadow(const std::shared_ptr<engine::Engine>& e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
-            ~ForwardPbrDirectionalShadow() override final;
-            void bind() const override final;
+            ForwardPbrDirectionalShadow(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+            ~ForwardPbrDirectionalShadow() noexcept final;
+            void bind() const noexcept final;
         };
-    } // namespace shader
-} // namespace gles2
-} // namespace gearoenix
+    }
+}
 #endif
 #endif

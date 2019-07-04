@@ -15,6 +15,7 @@
 #include "../shader/gles2-shd-effect-forward-pbr-directional-shadow.hpp"
 #include "../texture/gles2-txt-2d.hpp"
 #include "../texture/gles2-txt-cube.hpp"
+#include "../texture/gles2-txt-target.hpp"
 
 gearoenix::gles2::pipeline::ForwardPbrDirectionalShadowResourceSet::ForwardPbrDirectionalShadowResourceSet(const std::shared_ptr<shader::ForwardPbrDirectionalShadow>& shd)
     : gles2::pipeline::ResourceSet(shd)
@@ -31,7 +32,10 @@ void gearoenix::gles2::pipeline::ForwardPbrDirectionalShadowResourceSet::bind(gl
     //static_cast<const texture::Texture2D *>(ambient_occlusion.get())->bind(shdr->get_effect_ambient_occlusion_index());
     reinterpret_cast<const texture::Texture2D*>(brdflut)->bind(static_cast<gl::enumerated>(shdr->get_effect_brdflut_index()));
     reinterpret_cast<const texture::Cube*>(diffuse_environment)->bind(static_cast<gl::enumerated>(shdr->get_effect_diffuse_environment_index()));
-    reinterpret_cast<const texture::Texture2D*>(shadow_map)->bind(shdr->get_effect_shadow_map_index());
+	if (render::texture::Type::TARGET_2D == shadow_map->get_texture_type())
+		reinterpret_cast<const texture::Target*>(shadow_map)->bind_texture(static_cast<gl::enumerated>(shdr->get_effect_shadow_map_index()));
+	else
+		reinterpret_cast<const texture::Texture2D*>(shadow_map)->bind(static_cast<gl::enumerated>(shdr->get_effect_shadow_map_index()));
     reinterpret_cast<const texture::Cube*>(specular_environment)->bind(static_cast<gl::enumerated>(shdr->get_effect_specular_environment_index()));
     const auto* light = reinterpret_cast<const render::light::DirectionalUniform*>(light_uniform_buffer->get_data());
     shdr->set_light_color_data(light->color.data());

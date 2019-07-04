@@ -285,7 +285,7 @@ const static std::string fragment_shader_code = GX_GLES2_SHADER_SRC_DEFAULT_FRAG
     "    gl_FragColor = vec4(tmpv4.xyz, albedo.w);\n"
     "}"; // 123
 
-gearoenix::gles2::shader::ForwardPbrDirectionalShadow::ForwardPbrDirectionalShadow(const std::shared_ptr<engine::Engine>& e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c)
+gearoenix::gles2::shader::ForwardPbrDirectionalShadow::ForwardPbrDirectionalShadow(engine::Engine*const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : Shader(e, c)
 {
     e->get_function_loader()->load([this] {
@@ -317,11 +317,11 @@ gearoenix::gles2::shader::ForwardPbrDirectionalShadow::ForwardPbrDirectionalShad
     });
 }
 
-gearoenix::gles2::shader::ForwardPbrDirectionalShadow::~ForwardPbrDirectionalShadow()
+gearoenix::gles2::shader::ForwardPbrDirectionalShadow::~ForwardPbrDirectionalShadow() noexcept
 {
 }
 
-void gearoenix::gles2::shader::ForwardPbrDirectionalShadow::bind() const
+void gearoenix::gles2::shader::ForwardPbrDirectionalShadow::bind() const noexcept
 {
     Shader::bind();
     GX_GLES2_SHADER_MATERIAL_SET_TEXTURE_INDEX_UNIFORM

@@ -4,8 +4,7 @@
 #ifdef GX_USE_OPENGL_ES2
 #include "../../core/cache/cr-cache-cacher.hpp"
 #include "../../render/pipeline/rnd-pip-manager.hpp"
-namespace gearoenix {
-namespace gles2 {
+namespace gearoenix::gles2 {
     namespace engine {
         class Engine;
     }
@@ -13,12 +12,11 @@ namespace gles2 {
         class Pipeline;
         class Manager : public render::pipeline::Manager {
         public:
-            Manager(const std::shared_ptr<engine::Engine>& engine);
-            ~Manager() override final;
-            std::shared_ptr<render::pipeline::Pipeline> get(const render::pipeline::Type::Id pipeline_type_id, core::sync::EndCaller<render::pipeline::Pipeline>& end) override final;
+            Manager(engine::Engine* engine) noexcept;
+            ~Manager() noexcept final;
+            std::shared_ptr<render::pipeline::Pipeline> get(const render::pipeline::Type::Id pipeline_type_id, core::sync::EndCaller<render::pipeline::Pipeline>& end) noexcept final;
         };
     }
-}
 }
 #endif
 #endif

@@ -5,17 +5,17 @@
 #include "gles2-pip-forward-pbr-directional-shadow.hpp"
 #include "gles2-pip-shadow-mapper.hpp"
 
-gearoenix::gles2::pipeline::Manager::Manager(const std::shared_ptr<engine::Engine>& engine)
+gearoenix::gles2::pipeline::Manager::Manager(engine::Engine*const engine) noexcept
     : render::pipeline::Manager(engine)
 {
 }
 
-gearoenix::gles2::pipeline::Manager::~Manager() {}
+gearoenix::gles2::pipeline::Manager::~Manager() noexcept {}
 
-std::shared_ptr<gearoenix::render::pipeline::Pipeline> gearoenix::gles2::pipeline::Manager::get(const render::pipeline::Type::Id pipeline_type_id, core::sync::EndCaller<render::pipeline::Pipeline>& end)
+std::shared_ptr<gearoenix::render::pipeline::Pipeline> gearoenix::gles2::pipeline::Manager::get(const render::pipeline::Type::Id pipeline_type_id, core::sync::EndCaller<render::pipeline::Pipeline>& end) noexcept
 {
     const std::shared_ptr<render::pipeline::Pipeline> p = pipelines.get<render::pipeline::Pipeline>(pipeline_type_id, [this, pipeline_type_id, end] {
-        const std::shared_ptr<engine::Engine> gles2eng = std::static_pointer_cast<engine::Engine>(e);
+        auto gles2eng = reinterpret_cast<engine::Engine*>(e);
         switch (pipeline_type_id) {
         case render::pipeline::Type::ForwardPbrDirectionalShadow:
             return std::shared_ptr<render::pipeline::Pipeline>(new ForwardPbrDirectionalShadow(gles2eng,
