@@ -36,30 +36,29 @@ void gearoenix::render::light::CascadeInfo::PerKernel::shadow(const model::Model
 
 void gearoenix::render::light::CascadeInfo::PerKernel::record(const std::size_t kernel_index) noexcept
 {
-	for (auto& r : render_data) {
-		auto& c = (*per_cascade)[r.i];
+    for (auto& r : render_data) {
+        auto& c = (*per_cascade)[r.i];
 #ifdef GX_USE_OPENGL_ES2
 #ifdef GX_USE_INSTEAD_OF_OPENGL_ES2
-		if (e->get_engine_type_id() == engine::Type::OPENGL_ES2) {
+        if (e->get_engine_type_id() == engine::Type::OPENGL_ES2) {
 #endif
-			c.shadow_mapper->record(c.view_projection_gles2 * r.m->get_model_matrix(), r.m, kernel_index);
+            c.shadow_mapper->record(c.view_projection_gles2 * r.m->get_model_matrix(), r.m, kernel_index);
 #ifdef GX_USE_INSTEAD_OF_OPENGL_ES2
-			continue;
-		}
+            continue;
+        }
 #endif
 #endif
 
 #ifdef GX_USE_OPENGL_CLASS_3
 #ifdef GX_USE_INSTEAD_OF_OPENGL_CLASS_3
-		if (GX_RUNTIME_USE_OPENGL_CLASS_3) {
+        if (GX_RUNTIME_USE_OPENGL_CLASS_3) {
 #endif
-			c.shadow_mapper->record(c.view_projection_gles3 * r.m->get_model_matrix(), r.m, kernel_index);
+            c.shadow_mapper->record(c.view_projection_gles3 * r.m->get_model_matrix(), r.m, kernel_index);
 #ifdef GX_USE_INSTEAD_OF_OPENGL_CLASS_3
-			continue;
-		}
+            continue;
+        }
 #endif
 #endif
-
     }
 }
 
@@ -89,7 +88,7 @@ gearoenix::render::light::CascadeInfo::CascadeInfo(engine::Engine* const e) noex
     for (auto i = 0; i < cascades_count; ++i)
         per_cascade.get_next([e] { return new PerCascade(e); });
     for (auto& k : kernels) {
-		k.e = e;
+        k.e = e;
         k.per_cascade = &per_cascade;
         k.seen_boxes.resize(cascades_count);
         k.zero_located_view = &zero_located_view;
@@ -164,59 +163,59 @@ void gearoenix::render::light::CascadeInfo::shrink() noexcept
             per_cascade[i].max_box.put(seen[i]);
         }
     }
-	for (auto& cas : per_cascade) {
-		cas.shadow_mapper->update();
-		cas.max_box.test(cas.limit_box, cas.intersection_box);
-		const auto& mx = cas.intersection_box.mx;
-		const auto& mn = cas.intersection_box.mn;
-		const auto c = (mx + mn) * 0.5f;
-		const auto d = mx - mn;
-		const auto w = d[0] * 1.01f;
-		const auto h = d[1] * 1.01f;
-		const auto depth = d[2];
-		const auto n = depth * 0.01;
-		const auto f = depth * 1.03;
-		const auto p = gearoenix::math::Mat4x4::orthographic(w, h, n, f);
-		const auto t = gearoenix::math::Mat4x4::translator(-gearoenix::math::Vec3(c.xy(), mx[2] + (n * 2.0f)));
-		const auto mtx = p * t * zero_located_view;
+    for (auto& cas : per_cascade) {
+        cas.shadow_mapper->update();
+        cas.max_box.test(cas.limit_box, cas.intersection_box);
+        const auto& mx = cas.intersection_box.mx;
+        const auto& mn = cas.intersection_box.mn;
+        const auto c = (mx + mn) * 0.5f;
+        const auto d = mx - mn;
+        const auto w = d[0] * 1.01f;
+        const auto h = d[1] * 1.01f;
+        const auto depth = d[2];
+        const auto n = depth * 0.01;
+        const auto f = depth * 1.03;
+        const auto p = gearoenix::math::Mat4x4::orthographic(w, h, n, f);
+        const auto t = gearoenix::math::Mat4x4::translator(-gearoenix::math::Vec3(c.xy(), mx[2] + (n * 2.0f)));
+        const auto mtx = p * t * zero_located_view;
 
 #ifdef GX_USE_OPENGL_ES2
 #ifdef GX_USE_INSTEAD_OF_OPENGL_ES2
-		if (e->get_engine_type_id() == engine::Type::OPENGL_ES2) {
+        if (e->get_engine_type_id() == engine::Type::OPENGL_ES2) {
 #endif
-			cas.view_projection_gles2 = math::Mat4x4(
-				1.0f, 0.0f, 0.0f, 0.0f,
-				0.0f, 1.0f, 0.0f, 0.0f,
-				0.0f, 0.0f, 0.5f, 0.0f,
-				0.0f, 0.0f, 0.5f, 1.0f)
-				* mtx;
-			cas.view_projection_bias_gles2 = math::Mat4x4(
-				0.5f, 0.0f, 0.0f, 0.0f,
-				0.0f, 0.5f, 0.0f, 0.0f,
-				0.0f, 0.0f, 0.5f, 0.0f,
-				0.5f, 0.5f, 0.5f, 1.0f)
-				* mtx;
+            cas.view_projection_gles2 = math::Mat4x4(
+                                            1.0f, 0.0f, 0.0f, 0.0f,
+                                            0.0f, 1.0f, 0.0f, 0.0f,
+                                            0.0f, 0.0f, 0.5f, 0.0f,
+                                            0.0f, 0.0f, 0.5f, 1.0f)
+                * mtx;
+            cas.view_projection_bias_gles2 = math::Mat4x4(
+                                                 0.5f, 0.0f, 0.0f, 0.0f,
+                                                 0.0f, 0.5f, 0.0f, 0.0f,
+                                                 0.0f, 0.0f, 0.5f, 0.0f,
+                                                 0.5f, 0.5f, 0.5f, 1.0f)
+                * mtx;
 
 #ifdef GX_USE_INSTEAD_OF_OPENGL_ES2
-		}
+        }
 #endif
 #endif
 
 #ifdef GX_USE_OPENGL_CLASS_3
 #ifdef GX_USE_INSTEAD_OF_OPENGL_CLASS_3
-		if (GX_RUNTIME_USE_OPENGL_CLASS_3) {
+        if (GX_RUNTIME_USE_OPENGL_CLASS_3) {
 #endif
-			cas.view_projection_gles3 = mtx;
-			cas.view_projection_bias_gles3 = math::Mat4x4(
-				0.5f, 0.0f, 0.0f, 0.0f,
-				0.0f, 0.5f, 0.0f, 0.0f,
-				0.0f, 0.0f, 0.5f, 0.0f,
-				0.5f, 0.5f, 0.5f, 1.0f)
-				* mtx;
+            cas.view_projection_gles3 = mtx;
+            cas.view_projection_bias_gles3 = math::Mat4x4(
+                                                 0.5f, 0.0f, 0.0f, 0.0f,
+                                                 0.0f, 0.5f, 0.0f, 0.0f,
+                                                 0.0f, 0.0f, 0.5f, 0.0f,
+                                                 0.5f, 0.5f, 0.5f, 1.0f)
+                * mtx;
 
 #ifdef GX_USE_INSTEAD_OF_OPENGL_CLASS_3
-			continue;
-		}
+            continue;
+        }
 #endif
 #endif
     }

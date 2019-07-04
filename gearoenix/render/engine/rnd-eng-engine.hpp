@@ -4,8 +4,8 @@
 #include "../../core/cr-types.hpp"
 #include "../../core/sync/cr-sync-end-caller.hpp"
 #include "../texture/rnd-txt-format.hpp"
-#include "../texture/rnd-txt-sample.hpp"
 #include "../texture/rnd-txt-info.hpp"
+#include "../texture/rnd-txt-sample.hpp"
 #include "rnd-eng-type.hpp"
 #include <chrono>
 #include <vector>
@@ -121,7 +121,7 @@ namespace render {
                 = 0;
             virtual texture::Target* create_render_target(
                 core::Id id,
-				const std::vector<texture::Info>& infos,
+                const std::vector<texture::Info>& infos,
                 unsigned int width,
                 unsigned int height,
                 const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept

@@ -7,10 +7,10 @@
 
 #define GX_GLC3_PIPRES_START_DRAWING_MESH glc3::pipeline::ResourceSet::bind(bound_shader_program);
 
-#define GX_GLC3_PIPRES_END_DRAWING_MESH \
+#define GX_GLC3_PIPRES_END_DRAWING_MESH                                        \
     reinterpret_cast<const buffer::Vertex*>(msh->get_vertex_buffer())->bind(); \
-	reinterpret_cast<const buffer::Index*>(msh->get_index_buffer())->draw(); \
-	gl::Loader::bind_vertex_array(0);
+    reinterpret_cast<const buffer::Index*>(msh->get_index_buffer())->draw();   \
+    gl::Loader::bind_vertex_array(0);
 
 #define GX_GLC3_PIPRES_START_SHADER(cls, shd) const shader::cls* shdr = static_cast<const shader::cls*>(shd.get());
 
@@ -26,19 +26,19 @@
 
 #define GX_GLC3_PIPRES_SET_TXTCUBE(x, txt) GX_GLC3_PIPRES_SET_TXT(x, txt, Cube)
 
-#define GX_GLC3_PIPRES_BIND_MATERIAL                                                                                                        \
+#define GX_GLC3_PIPRES_BIND_MATERIAL                                                                                                         \
     {                                                                                                                                        \
         const render::material::Uniform* material = reinterpret_cast<const render::material::Uniform*>(material_uniform_buffer->get_data()); \
-        GX_GLC3_PIPRES_SET_UNIFORM(material_alpha, material->alpha);                                                                        \
-        GX_GLC3_PIPRES_SET_UNIFORM(material_alpha_cutoff, material->alpha_cutoff);                                                          \
-        GX_GLC3_PIPRES_SET_TXT2D(material_base_color, color);                                                                               \
-        GX_GLC3_PIPRES_SET_TXT2D(material_emissive, emissive);                                                                              \
-        GX_GLC3_PIPRES_SET_UNIFORM(material_metallic_factor, material->metallic_factor);                                                    \
-        GX_GLC3_PIPRES_SET_TXT2D(material_metallic_roughness, metallic_roughness);                                                          \
-        GX_GLC3_PIPRES_SET_TXT2D(material_normal, normal);                                                                                  \
-        GX_GLC3_PIPRES_SET_UNIFORM(material_normal_scale, material->normal_scale);                                                          \
-        GX_GLC3_PIPRES_SET_UNIFORM(material_occlusion_strength, material->occlusion_strength);                                              \
-        GX_GLC3_PIPRES_SET_UNIFORM(material_roughness_factor, material->roughness_factor);                                                  \
+        GX_GLC3_PIPRES_SET_UNIFORM(material_alpha, material->alpha);                                                                         \
+        GX_GLC3_PIPRES_SET_UNIFORM(material_alpha_cutoff, material->alpha_cutoff);                                                           \
+        GX_GLC3_PIPRES_SET_TXT2D(material_base_color, color);                                                                                \
+        GX_GLC3_PIPRES_SET_TXT2D(material_emissive, emissive);                                                                               \
+        GX_GLC3_PIPRES_SET_UNIFORM(material_metallic_factor, material->metallic_factor);                                                     \
+        GX_GLC3_PIPRES_SET_TXT2D(material_metallic_roughness, metallic_roughness);                                                           \
+        GX_GLC3_PIPRES_SET_TXT2D(material_normal, normal);                                                                                   \
+        GX_GLC3_PIPRES_SET_UNIFORM(material_normal_scale, material->normal_scale);                                                           \
+        GX_GLC3_PIPRES_SET_UNIFORM(material_occlusion_strength, material->occlusion_strength);                                               \
+        GX_GLC3_PIPRES_SET_UNIFORM(material_roughness_factor, material->roughness_factor);                                                   \
     }
 
 namespace gearoenix::glc3 {

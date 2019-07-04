@@ -4,7 +4,7 @@
 #include "../shader/gles2-shd-shadow-mapper.hpp"
 #include "gles2-pip-shadow-mapper-resource-set.hpp"
 
-gearoenix::gles2::pipeline::ShadowMapper::ShadowMapper(engine::Engine*const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
+gearoenix::gles2::pipeline::ShadowMapper::ShadowMapper(engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : render::pipeline::ShadowMapper(e, c)
     , shd(new shader::ShadowMapper(e, c))
 {

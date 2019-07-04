@@ -29,8 +29,8 @@ namespace texture {
             unsigned int heigt,
             const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
         ~Target() noexcept final;
-		void bind() const noexcept;
-		void bind_textures(const std::vector<gl::enumerated>& texture_units) const noexcept;
+        void bind() const noexcept;
+        void bind_textures(const std::vector<gl::enumerated>& texture_units) const noexcept;
     };
 }
 }

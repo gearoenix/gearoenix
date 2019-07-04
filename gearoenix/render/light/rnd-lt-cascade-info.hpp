@@ -37,12 +37,12 @@ namespace light {
     public:
         struct PerCascade {
 #ifdef GX_USE_OPENGL_ES2
-			math::Mat4x4 view_projection_gles2;
-			math::Mat4x4 view_projection_bias_gles2;
+            math::Mat4x4 view_projection_gles2;
+            math::Mat4x4 view_projection_bias_gles2;
 #endif
 #ifdef GX_USE_OPENGL_CLASS_3
-			math::Mat4x4 view_projection_gles3;
-			math::Mat4x4 view_projection_bias_gles3;
+            math::Mat4x4 view_projection_gles3;
+            math::Mat4x4 view_projection_bias_gles3;
 #endif
             math::Aabb3 limit_box;
             math::Aabb3 max_box;
@@ -60,7 +60,7 @@ namespace light {
             const model::Model* m = nullptr;
         };
         struct PerKernel {
-			engine::Engine * e = nullptr;
+            engine::Engine* e = nullptr;
             const math::Mat4x4* zero_located_view = nullptr;
             const core::OneLoopPool<PerCascade>* per_cascade = nullptr;
             std::vector<RenderData> render_data;

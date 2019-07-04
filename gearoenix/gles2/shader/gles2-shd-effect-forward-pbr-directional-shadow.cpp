@@ -38,8 +38,8 @@ const static std::string vertex_shader_code = GX_GLES2_SHADER_SRC_DEFAULT_VERTEX
     "        vec4 light_pos = effect_view_projection_biases[i] * pos;\n"
     "        light_pos.xyz /= light_pos.w;\n"
     "        out_light_poses[i] = light_pos.xyz;\n"
-    "        if(light_pos.x > 0.0 && light_pos.x < 1.0 && light_pos.y > 0.0 && light_pos.y < 1.0)\n"
-    "            break;\n"
+    //    "        if(light_pos.x > 0.0 && light_pos.x < 1.0 && light_pos.y > 0.0 && light_pos.y < 1.0)\n"
+    //    "            break;\n"
     "    }\n"
     "    gl_Position = camera_vp * pos;\n"
     "}";
@@ -285,7 +285,7 @@ const static std::string fragment_shader_code = GX_GLES2_SHADER_SRC_DEFAULT_FRAG
     "    gl_FragColor = vec4(tmpv4.xyz, albedo.w);\n"
     "}"; // 123
 
-gearoenix::gles2::shader::ForwardPbrDirectionalShadow::ForwardPbrDirectionalShadow(engine::Engine*const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
+gearoenix::gles2::shader::ForwardPbrDirectionalShadow::ForwardPbrDirectionalShadow(engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : Shader(e, c)
 {
     e->get_function_loader()->load([this] {

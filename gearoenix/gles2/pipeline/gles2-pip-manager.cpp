@@ -5,7 +5,7 @@
 #include "gles2-pip-forward-pbr-directional-shadow.hpp"
 #include "gles2-pip-shadow-mapper.hpp"
 
-gearoenix::gles2::pipeline::Manager::Manager(engine::Engine*const engine) noexcept
+gearoenix::gles2::pipeline::Manager::Manager(engine::Engine* const engine) noexcept
     : render::pipeline::Manager(engine)
 {
 }

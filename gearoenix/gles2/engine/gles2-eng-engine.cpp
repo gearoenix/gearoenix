@@ -34,7 +34,7 @@ gearoenix::gles2::engine::Engine::Engine(system::Application* const sys_app) noe
     : render::engine::Engine(sys_app, render::engine::Type::OPENGL_ES2)
 {
     initialize();
-	pipeline_manager = new pipeline::Manager(this);
+    pipeline_manager = new pipeline::Manager(this);
 }
 
 std::shared_ptr<gearoenix::gles2::engine::Engine> gearoenix::gles2::engine::Engine::construct(system::Application* const sys_app) noexcept
@@ -121,7 +121,7 @@ gearoenix::render::texture::Cube* gearoenix::gles2::engine::Engine::create_textu
 
 gearoenix::render::texture::Target* gearoenix::gles2::engine::Engine::create_render_target(
     core::Id id,
-	const std::vector<render::texture::Info>& infos,
+    const std::vector<render::texture::Info>& infos,
     unsigned int width,
     unsigned int height,
     const gearoenix::core::sync::EndCaller<gearoenix::core::sync::EndCallerIgnore>& call) noexcept

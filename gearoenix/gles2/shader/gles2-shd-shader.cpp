@@ -8,7 +8,7 @@
 #include "../gles2.hpp"
 #include <vector>
 
-void gearoenix::gles2::shader::Shader::create_program()  noexcept
+void gearoenix::gles2::shader::Shader::create_program() noexcept
 {
     shader_program = gl::Loader::create_program();
     if (shader_program == 0) {
@@ -102,7 +102,7 @@ void gearoenix::gles2::shader::Shader::end_object(const gl::uint shader_object) 
     gl::Loader::delete_shader(shader_object);
 }
 
-gearoenix::gles2::shader::Shader::Shader(engine::Engine*const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
+gearoenix::gles2::shader::Shader::Shader(engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : e(e)
 {
     e->get_function_loader()->load([c, this] {

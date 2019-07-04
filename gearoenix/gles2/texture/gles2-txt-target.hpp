@@ -24,13 +24,13 @@ namespace texture {
         Target(
             core::Id my_id,
             engine::Engine* e,
-			const std::vector<render::texture::Info>& infos,
+            const std::vector<render::texture::Info>& infos,
             unsigned int width,
             unsigned int heigt,
             const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
         ~Target() noexcept final;
         void bind() const noexcept;
-		void bind_texture(gl::enumerated texture_unit) const noexcept;
+        void bind_texture(gl::enumerated texture_unit) const noexcept;
     };
 }
 }

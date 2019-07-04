@@ -106,7 +106,7 @@ GameApp::GameApp(const std::shared_ptr<gearoenix::system::Application>& sys_app)
             scn->add_model(mdl);
         }
     }
-	/*{
+    /*{
 		const std::shared_ptr<GxMaterial> mat(new GxMaterial(rnd_eng.get(), endcall));
 		mat->set_roughness_factor(0.5f);
 		mat->set_metallic_factor(0.5f);

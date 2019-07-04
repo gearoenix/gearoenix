@@ -32,7 +32,7 @@ const unsigned int gearoenix::render::graph::node::ForwardPbrDirectionalShadow::
 const unsigned int gearoenix::render::graph::node::ForwardPbrDirectionalShadow::SHADOW_MAP_INDEX = 3;
 const unsigned int gearoenix::render::graph::node::ForwardPbrDirectionalShadow::BRDFLUT_INDEX = 4;
 
-gearoenix::render::graph::node::ForwardPbrDirectionalShadowUniform::ForwardPbrDirectionalShadowUniform(const light::CascadeInfo* const cas, const engine::Engine*const e) noexcept
+gearoenix::render::graph::node::ForwardPbrDirectionalShadowUniform::ForwardPbrDirectionalShadowUniform(const light::CascadeInfo* const cas, const engine::Engine* const e) noexcept
 {
     const auto& data = cas->get_cascades_data();
     const auto s = data.size();
@@ -41,26 +41,25 @@ gearoenix::render::graph::node::ForwardPbrDirectionalShadowUniform::ForwardPbrDi
 
 #ifdef GX_USE_OPENGL_ES2
 #ifdef GX_USE_INSTEAD_OF_OPENGL_ES2
-		if (e->get_engine_type_id() == engine::Type::OPENGL_ES2) {
+        if (e->get_engine_type_id() == engine::Type::OPENGL_ES2) {
 #endif
-			cascades_view_projections_bias[i] = data[i].view_projection_bias_gles2;
+            cascades_view_projections_bias[i] = data[i].view_projection_bias_gles2;
 #ifdef GX_USE_INSTEAD_OF_OPENGL_ES2
-			continue;
-		}
+            continue;
+        }
 #endif
 #endif
 
 #ifdef GX_USE_OPENGL_CLASS_3
 #ifdef GX_USE_INSTEAD_OF_OPENGL_CLASS_3
-		if (GX_RUNTIME_USE_OPENGL_CLASS_3) {
+        if (GX_RUNTIME_USE_OPENGL_CLASS_3) {
 #endif
-			cascades_view_projections_bias[i] = data[i].view_projection_bias_gles3;
+            cascades_view_projections_bias[i] = data[i].view_projection_bias_gles3;
 #ifdef GX_USE_INSTEAD_OF_OPENGL_CLASS_3
-			continue;
-		}
+            continue;
+        }
 #endif
 #endif
-
     }
 }
 

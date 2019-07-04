@@ -4,29 +4,29 @@
 
 gearoenix::glc3::texture::SampleInfo::SampleInfo(const render::texture::SampleInfo& o) noexcept
 {
-	const auto filfun = [](render::texture::Filter::Id f) {
-		switch (f) {
-		case render::texture::Filter::NEAREST:
-			return GL_NEAREST;
-		case render::texture::Filter::NEAREST_MIPMAP_LINEAR:
-			return GL_NEAREST_MIPMAP_LINEAR;
-		case render::texture::Filter::NEAREST_MIPMAP_NEAREST:
-			return GL_NEAREST_MIPMAP_NEAREST;
-		case render::texture::Filter::LINEAR:
-			return GL_LINEAR;
-		case render::texture::Filter::LINEAR_MIPMAP_LINEAR:
-			return GL_LINEAR_MIPMAP_LINEAR;
-		case render::texture::Filter::LINEAR_MIPMAP_NEAREST:
-			return GL_LINEAR_MIPMAP_NEAREST;
-		default:
-			GXUNEXPECTED
-		}
-	};
+    const auto filfun = [](render::texture::Filter::Id f) {
+        switch (f) {
+        case render::texture::Filter::NEAREST:
+            return GL_NEAREST;
+        case render::texture::Filter::NEAREST_MIPMAP_LINEAR:
+            return GL_NEAREST_MIPMAP_LINEAR;
+        case render::texture::Filter::NEAREST_MIPMAP_NEAREST:
+            return GL_NEAREST_MIPMAP_NEAREST;
+        case render::texture::Filter::LINEAR:
+            return GL_LINEAR;
+        case render::texture::Filter::LINEAR_MIPMAP_LINEAR:
+            return GL_LINEAR_MIPMAP_LINEAR;
+        case render::texture::Filter::LINEAR_MIPMAP_NEAREST:
+            return GL_LINEAR_MIPMAP_NEAREST;
+        default:
+            GXUNEXPECTED
+        }
+    };
 
 #define GX_HELPER(name) name##_filter = filfun(o.name##_filter);
-	
-	GX_HELPER(mag)
-	GX_HELPER(min)
+
+    GX_HELPER(mag)
+    GX_HELPER(min)
 
 #undef GX_HELPER
 
