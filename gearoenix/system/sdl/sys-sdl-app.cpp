@@ -387,10 +387,14 @@ render_engine = nullptr;
 astmgr = nullptr;
 SDL_DelEventWatch(event_receiver, this);
 #ifdef GX_USE_OPENGL
+#ifdef GX_USE_INSTEAD_OF_OPENGL
 if (GX_RUNTIME_USE_OPENGL_V(supported_engine)) {
+#endif
     SDL_GL_DeleteContext(gl_context);
     gl::Loader::unload_library();
+#ifdef GX_USE_INSTEAD_OF_OPENGL
 }
+#endif
 #endif
 SDL_DestroyWindow(window);
 SDL_Quit();

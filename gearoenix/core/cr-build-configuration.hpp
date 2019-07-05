@@ -47,8 +47,8 @@
 #define GX_IN_MAC
 //#define GX_USE_METAL
 //#define GX_USE_VULKAN
-//#define GX_USE_OPENGL_ES3
-#define GX_USE_OPENGL_ES2
+#define GX_USE_OPENGL_43
+#define GX_USE_OPENGL_33
 #define GX_IN_DESKTOP
 #define GX_USE_SDL
 //#define GX_USE_GLFW

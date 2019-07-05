@@ -6,6 +6,8 @@
 #include "../../gl/gl-types.hpp"
 #include "../../render/texture/rnd-txt-info.hpp"
 #include "../../render/texture/rnd-txt-target.hpp"
+#include <vector>
+
 namespace gearoenix::glc3 {
 namespace engine {
     class Engine;
