@@ -10,7 +10,10 @@ from urllib.request import urlretrieve
 from zipfile import ZipFile
 
 PLATFORM = platform.system()
+IN_MACOS = 'Darwin' in PLATFORM
+
 print("Building in platform:", PLATFORM)
+print("Platform is MacOS:", IN_MACOS)
 
 SRC_PATH = os.path.dirname(os.path.abspath(__file__))
 os.chdir(SRC_PATH)
@@ -142,3 +145,26 @@ shutil.move(
 shutil.move(
     os.path.join(SDL2_BUILD_DIR_PATH, SDL2_MAIN),
     os.path.join(LIBS_PATH, SDL2_MAIN_LIB))
+
+def make_exec_priv(name):
+    subprocess.run(['chmod', '+x', str(name)])
+
+if IN_MACOS:
+    print("Going to build iOS dependancies")
+    SDL2_BUILD_SCRIPTS_PATH = os.path.join(SDL2_DIR_PATH, 'build-scripts')
+    IOS_BUILD_SCRIPT_NAME = 'iosbuild.sh'
+    SDL2_IOS_BUILD_SCRIPTS_PATH = os.path.join(SDL2_DIR_PATH, IOS_BUILD_SCRIPT_NAME)
+    os.chdir(SDL2_DIR_PATH)
+    make_exec_priv('configure')
+    os.chdir(SDL2_BUILD_SCRIPTS_PATH)
+    make_exec_priv(IOS_BUILD_SCRIPT_NAME)
+    ios_build_script_file = open(IOS_BUILD_SCRIPT_NAME, 'rt')
+    ios_build_script = ios_build_script_file.read()
+    ios_build_script_file.close()
+    ios_build_script_file = open(IOS_BUILD_SCRIPT_NAME, 'wt')
+    ios_build_script = ios_build_script.replace('-g -O0', '-Os')
+    ios_build_script_file.write(ios_build_script)
+    ios_build_script_file.close()
+    subprocess.run(['sh', IOS_BUILD_SCRIPT_NAME])
+    # TODO create fat main lib
+    # TODO move these fat files to the lib of sdk 
