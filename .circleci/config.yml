@@ -17,7 +17,7 @@ jobs:
           command: 'python3 ./setup.py'
       - run:
           name: Cmake run
-          command: 'mkdir build; cd build; rm -rf *; cmake -B. -H.. -DCMAKE_BUILD_TYPE=Debug -DGX_ENABLE_TESTS=ON -DGX_ENABLE_COVERAGE=ON .'
+          command: 'cmake clean; mkdir build; cd build; rm -rf *; cmake clean; cmake -B. -H.. -DCMAKE_BUILD_TYPE=Debug -DGX_ENABLE_TESTS=ON -DGX_ENABLE_COVERAGE=ON'
       - run:
           name: Build and tests run
           command: 'cmake --build . --config Debug --target GX_COVERAGE -- -j4'
