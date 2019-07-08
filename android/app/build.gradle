@@ -1,17 +1,17 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
     defaultConfig {
         applicationId "com.geareonix.engine_demo"
         minSdkVersion 15
-        targetSdkVersion 28
+        targetSdkVersion 29
         versionCode 1
         versionName "1.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
             cmake {
-                cppFlags "-std=c++14"
+                abiFilters 'armeabi-v7a' //, 'arm64-v8a', 'x86', 'x86_64'
+                arguments '-DANDROID_TOOLCHAIN=clang', '-DANDROID_STL=c++_static', '-DGX_BUILD_ANDROID=True', '-DGX_ENABLE_EXAMPLE_001_HELLO_WORLD=True'
             }
         }
     }
@@ -23,17 +23,11 @@ android {
     }
     externalNativeBuild {
         cmake {
-            path "src/main/cpp/CMakeLists.txt"
-            version "3.10.2"
+            path "../../CMakeLists.txt"
+            version "3.13.4"
         }
     }
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.android.support:appcompat-v7:28.0.0'
-    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 }

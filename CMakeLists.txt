@@ -16,8 +16,8 @@ OPTION (GX_USE_OPENGL_33 "Activate OpenGL 3.3" ON)
 OPTION (GX_USE_OPENGL_43 "Activate OpenGL 4.3" ON)
 OPTION (GX_USE_VULKAN "Activate Vulkan (WIP)" OFF)
 OPTION (GX_GENERATE_DOCUMENTS "Generate documentation" ON)
-OPTION (GX_ENABLE_TESTS "Enables the tests" OFF)
 OPTION (GX_ENABLE_EXAMPLES "Enables the examples" ON)
+OPTION (GX_ENABLE_TESTS "Enables the tests" OFF)
 OPTION (GX_ENABLE_COVERAGE "Enables the measurement of test coverages" OFF)
 
 SET (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
@@ -81,9 +81,7 @@ IF (GX_USE_SDL2)
     SET (GX_SDL2_PATH "${GX_SDK_PATH}/SDL2")
     ADD_SUBDIRECTORY(${GX_SDL2_PATH})
     INCLUDE_DIRECTORIES (${SDL2_INCLUDE_DIRS})
-    SET (GX_LIBS 
-            ${GX_LIBS}
-            SDL2-static SDL2main)
+    SET (GX_LIBS ${GX_LIBS} SDL2 SDL2main)
     IF (MSVC)
         SET (GX_LIBS ${GX_LIBS} winmm version oleaut32 imm32)
     ELSEIF (APPLE)
@@ -115,6 +113,8 @@ IF (GX_USE_SDL2)
             ${FORCE_FEEDBACK_LIBRARY}
             ${IO_KIT_LIBRARY}
             ${CARBON_LIBRARY})
+    ELSEIF (GX_BUILD_ANDROID)
+        SET (GX_LIBS ${GX_LIBS})
     ELSE ()
         SET (GX_LIBS 
             ${GX_LIBS}
