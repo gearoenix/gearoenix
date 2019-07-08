@@ -17,13 +17,17 @@ jobs:
           command: 'python3 ./setup.py'
       - run:
           name: Cmake run
-          command: 'mkdir build; cd build; rm -rf *; cmake -B. -H.. -DCMAKE_BUILD_TYPE=Debug -DGX_ENABLE_TESTS=ON -DGX_ENABLE_COVERAGE=ON'
+          command: '
+            mkdir build;
+            cd build;
+            rm -rf *;
+            cmake -B. -H.. -DCMAKE_BUILD_TYPE=Debug -DGX_ENABLE_TESTS=ON -DGX_ENABLE_COVERAGE=ON'
       - run:
           name: Build and tests run
-          command: '\
-            ls;\
-            cd build;\
-            echo "Building with `nproc --all` threads";\
+          command: '
+            ls;
+            cd build;
+            echo "Building with `nproc --all` threads";
             cmake --build . --config Debug --target GX_COVERAGE -- -j`nproc --all`'
       - codecov/upload:
           flags: unittest
