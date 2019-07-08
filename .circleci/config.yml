@@ -20,7 +20,7 @@ jobs:
           command: 'mkdir build; cd build; rm -rf *; cmake -B. -H.. -DCMAKE_BUILD_TYPE=Debug -DGX_ENABLE_TESTS=ON -DGX_ENABLE_COVERAGE=ON'
       - run:
           name: Build and tests run
-          command: 'cmake --build . --config Debug --target GX_COVERAGE -- -j4'
+          command: 'ls; cd build; cmake --build . --config Debug --target GX_COVERAGE -- -j`nproc --all`'
       - codecov/upload:
           flags: unittest
           file: 'GX_COVERAGE.info'
