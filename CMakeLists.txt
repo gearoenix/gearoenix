@@ -17,6 +17,7 @@ OPTION (GX_USE_OPENGL_43 "Activate OpenGL 4.3" ON)
 OPTION (GX_USE_VULKAN "Activate Vulkan (WIP)" OFF)
 OPTION (GX_GENERATE_DOCUMENTS "Generate documentation" ON)
 OPTION (GX_ENABLE_TESTS "Enables the tests" OFF)
+OPTION (GX_ENABLE_EXAMPLES "Enables the examples" ON)
 OPTION (GX_ENABLE_COVERAGE "Enables the measurement of test coverages" OFF)
 
 SET (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
@@ -76,25 +77,24 @@ SET(GX_LIBS)
 
 IF (GX_USE_SDL2)
     SET (GX_SDL2_PATH "${GX_SDK_PATH}/SDL2")
-    SET (GX_SDL2_STATIC_LIB "SDL2")
-    SET (GX_SDL2_MAIN_LIB "SDL2main")
-    IF (MSVC)
-        SET(GX_SDL2_STATIC_LIB "SDL2-static")
-    ENDIF (MSVC)
-    GX_MAKE_LIB (GX_SDL2_STATIC_LIB ${GX_SDL2_STATIC_LIB})
-    GX_MAKE_LIB (GX_SDL2_MAIN_LIB ${GX_SDL2_MAIN_LIB})
-    MESSAGE (STATUS "SDL2 libraries are ${GX_SDL2_STATIC_LIB} and ${GX_SDL2_MAIN_LIB}.")
+    # SET (SDL_LOCATION ${GX_SDL2_PATH})
+    ADD_SUBDIRECTORY(${GX_SDL2_PATH})
+    # ADD_LIBRARY( SDL2_image STATIC IMPORTED )
+    # SET (GX_SDL2_STATIC_LIB "SDL2")
+    # SET (GX_SDL2_MAIN_LIB "SDL2main")
+    # IF (MSVC)
+    #     SET(GX_SDL2_STATIC_LIB "SDL2-static")
+    # ENDIF (MSVC)
+    # GX_MAKE_LIB (GX_SDL2_STATIC_LIB ${GX_SDL2_STATIC_LIB})
+    # GX_MAKE_LIB (GX_SDL2_MAIN_LIB ${GX_SDL2_MAIN_LIB})
+    # MESSAGE (STATUS "SDL2 libraries are ${GX_SDL2_STATIC_LIB} and ${GX_SDL2_MAIN_LIB}.")
     SET (GX_LIBS 
             ${GX_LIBS} 
-            "${GX_SDK_LIB_PATH}${GX_SDL2_STATIC_LIB}" 
-            "${GX_SDK_LIB_PATH}${GX_SDL2_MAIN_LIB}")
+            # "${GX_SDK_LIB_PATH}${GX_SDL2_STATIC_LIB}" 
+            # "${GX_SDK_LIB_PATH}${GX_SDL2_MAIN_LIB}"
+            SDL2-static SDL2main)
     IF (MSVC)
-        SET (GX_LIBS 
-            ${GX_LIBS}
-            winmm
-            version
-            oleaut32
-            imm32)
+        SET (GX_LIBS ${GX_LIBS} winmm version oleaut32 imm32)
     ELSEIF (APPLE)
         FIND_LIBRARY(COCOA_LIBRARY Cocoa)
         FIND_LIBRARY(CORE_AUDIO_LIBRARY CoreAudio)
@@ -134,7 +134,10 @@ IF (GX_USE_SDL2)
 ENDIF (GX_USE_SDL2)
 
 ADD_SUBDIRECTORY (gearoenix)
+
+IF(GX_ENABLE_EXAMPLES)
 ADD_SUBDIRECTORY (examples)
+ENDIF(GX_ENABLE_EXAMPLES)
 
 IF(GX_ENABLE_TESTS)
     INCLUDE (CTest)
