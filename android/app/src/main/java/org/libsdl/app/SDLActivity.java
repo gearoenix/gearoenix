@@ -121,7 +121,6 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
         } else {
             library = "libmain.so";
         }
-        Log.e("kosesher", getContext().getApplicationInfo().nativeLibraryDir);
         return getContext().getApplicationInfo().nativeLibraryDir + "/" + library;
     }
 
@@ -251,7 +250,7 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
             mClipboardHandler = new SDLClipboardHandler_Old();
         }
 
-        mHIDDeviceManager = HIDDeviceManager.acquire(this);
+        mHIDDeviceManager = null; // HIDDeviceManager.acquire(this);
 
         // Set up the surface
         mSurface = new SDLSurface(getApplication());
