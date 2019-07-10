@@ -62,14 +62,30 @@ SDL2_DIR_PATH = os.path.join(SDK_PATH, SDL2_DIR_NAME)
 SDL2_VERSION = '2.0.9'
 SDL2_DIR_NAME_VER = SDL2_DIR_NAME + '-' + SDL2_VERSION
 SDL2_DIR_PATH_VER = os.path.join(SDK_PATH, SDL2_DIR_NAME_VER)
-SDL2_BUILD_DIR_PATH = os.path.join(SDK_PATH, 'sdl2-build')
 SDL2_PACK_NAME = SDL2_DIR_NAME_VER + '.zip'
 SDL2_PACK_URL = 'https://www.libsdl.org/release/' + SDL2_PACK_NAME
 SDL2_PACK_PATH = os.path.join(SDK_PATH, SDL2_PACK_NAME)
-SDL2_BUILD_TYPE = 'MinSizeRel'
 download_lib(SDL2_DIR_NAME, SDL2_PACK_PATH, SDL2_PACK_URL)
 if not os.path.exists(SDL2_DIR_PATH):
     shutil.move(SDL2_DIR_PATH_VER, SDL2_DIR_PATH)
+
+def take_careof_sdl2_proj(name, version):
+    dir_name = 'SDL2_' + name
+    dir_path = os.path.join(SDK_PATH, dir_name)
+    dir_name_ver = dir_name + '-' + version
+    dir_path_ver = os.path.join(SDK_PATH, dir_name_ver)
+    pack_name = dir_name_ver + '.zip'
+    pack_url = 'https://www.libsdl.org/projects/SDL_' + name + '/release/' + pack_name
+    pack_path = os.path.join(SDK_PATH, pack_name)
+    download_lib(dir_name, pack_path, pack_url)
+    if not os.path.exists(dir_path):
+        shutil.move(dir_path_ver, dir_path)
+
+take_careof_sdl2_proj('image', '2.0.5')
+take_careof_sdl2_proj('mixer', '2.0.4')
+take_careof_sdl2_proj('net', '2.0.1')
+take_careof_sdl2_proj('ttf', '2.0.15')
+
 
 GLM_VERSION = '0.9.9.5'
 GLM_DIR_NAME = 'glm-' + GLM_VERSION
