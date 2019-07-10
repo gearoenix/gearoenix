@@ -10,10 +10,15 @@
         std::stringstream stringstream;                                             \
         stringstream << __FILE__ << " " << __LINE__ << ": ";                        \
         stringstream << s;                                                          \
-        __android_log_print(p, APPLICATION_NAME, "%s", stringstream.str().c_str()); \
+        __android_log_print(p, GX_APP_NAME, "%s", stringstream.str().c_str()); \
     }
 
 #define GXLOGI(s) GXLOG(ANDROID_LOG_INFO, s)
+#ifdef GX_DEBUG_MODE
+#define GXLOGD(s) GXLOG(ANDROID_LOG_DEBUG, s)
+#else
+#define GXLOGD(s)
+#endif
 #define GXLOGE(s) GXLOG(ANDROID_LOG_ERROR, s)
 #define GXLOGF(s)                    \
     {                                \

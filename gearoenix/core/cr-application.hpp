@@ -3,7 +3,7 @@
 #include "cr-build-configuration.hpp"
 #include "cr-types.hpp"
 #include <memory>
-#ifdef GX_IN_ANDROID
+#if defined(GX_IN_ANDROID) && !defined(GX_USE_SDL)
 #include <android_native_app_glue.h>
 #elif defined(GX_USE_WINAPI)
 #include <Windows.h>
@@ -46,7 +46,7 @@ namespace core {
         app->execute(core_app);                                                     \
         return 0;                                                                   \
     }
-#elif defined(GX_IN_ANDROID)
+#elif defined(GX_IN_ANDROID) && !defined(GX_USE_SDL)
 #define GEAROENIX_START(CoreApp)                                                         \
     void android_main(struct android_app* state)                                         \
     {                                                                                    \

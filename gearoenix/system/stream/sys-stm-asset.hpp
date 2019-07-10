@@ -27,7 +27,7 @@ namespace system {
             std::ifstream file;
 #elif defined(GX_IN_ANDROID)
             //system::Application* sys_app;
-            AAsset* file;
+            AAsset* file = nullptr;
 #else
 #error "File usage is not specified!"
 #endif

@@ -2,12 +2,11 @@
 #define GEAROENIX_CORE_BUILD_CONFIGURATION_HPP
 // Platform definition
 #ifdef ANDROID
-#define GX_IN_LINUX
+#define GX_IN_ANDROID
 //#define GX_USE_VULKAN
 //#define GX_USE_OPENGL_ES3
 #define GX_USE_OPENGL_ES2
 #define GX_USE_SDL
-#define GX_IN_DESKTOP
 #elif defined(__EMSCRIPTEN__)
 #define GX_IN_WEB
 //#define GX_USE_OPENGL_ES3
@@ -73,7 +72,9 @@
 #define GX_LOG_INFO_ENABLED
 #endif
 /// You can comment this for windowed apps
-//#define GX_FULLSCREEN
+#ifndef GX_IN_DESKTOP
+#define GX_FULLSCREEN
+#endif
 #ifndef GX_FULLSCREEN
 /// Window width in windowed mode
 #define GX_DEFAULT_WINDOW_WIDTH 1000

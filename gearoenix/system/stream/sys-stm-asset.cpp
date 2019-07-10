@@ -4,7 +4,7 @@
 #ifdef GX_IN_IOS
 #import <Foundation/Foundation.h>
 //#import "../apple/sys-apl.mm"
-#elif defined(GX_IN_ANDROID)
+#elif defined(GX_IN_ANDROID) && !defined(GX_USE_SDL)
 #include <android_native_app_glue.h>
 #endif
 
@@ -41,12 +41,13 @@ gearoenix::system::stream::Asset* gearoenix::system::stream::Asset::construct(sy
         return nullptr;
     }
 #elif defined(GX_IN_ANDROID)
-    asset->sys_app = sys_app
-                         asset->file
-        = AAssetManager_open(sys_app->get_android_app()->activity->assetManager,
-            name.c_str(), AASSET_MODE_BUFFER);
+//    asset->sys_app = sys_app
+//                         asset->file
+//        = AAssetManager_open(sys_app->get_android_app()->activity->assetManager,
+//            name.c_str(), AASSET_MODE_BUFFER);
     if (asset->file == nullptr) {
-        GXLOGF("Asset not found! " << name);
+        GXLOGD("Asset not found! " << name)
+        return nullptr;
     }
 #else
 #error "Unexpected file interface!"
@@ -58,7 +59,7 @@ gearoenix::system::stream::Asset* gearoenix::system::stream::Asset::construct(sy
 gearoenix::core::Count gearoenix::system::stream::Asset::read(void* data, core::Count length) noexcept
 {
 #ifdef GX_IN_ANDROID
-    core::Count result = static_cast<core::Count>(AAsset_read(file, data, length));
+    const auto result = static_cast<core::Count>(AAsset_read(file, data, static_cast<std::size_t>(length)));
 #elif defined(GX_USE_STD_FILE)
     file.read(static_cast<char*>(data), length);
     core::Count result = static_cast<core::Count>(file.gcount());
@@ -82,7 +83,7 @@ void gearoenix::system::stream::Asset::seek(core::Count offset) noexcept
 #if defined(GX_USE_STD_FILE)
     file.seekg(offset, std::ios::beg);
 #elif defined(GX_IN_ANDROID)
-    AAsset_seek(file, offset, SEEK_SET);
+    AAsset_seek(file, static_cast<off_t>(offset), SEEK_SET);
 #else
 #error "Unexpected file interface"
 #endif

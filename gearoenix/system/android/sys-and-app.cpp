@@ -1,5 +1,5 @@
 #include "sys-and-app.hpp"
-#ifdef IN_ANDROID
+#if defined(GX_IN_ANDROID) && !defined(GX_USE_SDL)
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../core/cr-application.hpp"
 #include "../../core/event/cr-ev-bt-mouse.hpp"
@@ -244,5 +244,4 @@ gearoenix::core::Real gearoenix::system::Application::convert_pixel_y_to_normali
 {
     return (1.0f - (((core::Real)y) * half_height_inversed));
 }
-
 #endif
