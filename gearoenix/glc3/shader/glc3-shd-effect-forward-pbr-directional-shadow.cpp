@@ -65,7 +65,7 @@ gearoenix::glc3::shader::ForwardPbrDirectionalShadow::ForwardPbrDirectionalShado
         "uniform samplerCube effect_specular_environment;\n"
         "uniform sampler2D   effect_ambient_occlusion;\n"
         //        "uniform sampler2DShadow    effect_shadow_map;\n"
-        "uniform sampler2D    effect_shadow_map;\n"
+        "uniform sampler2D   effect_shadow_map;\n"
         "uniform sampler2D   effect_brdflut;\n"
         "uniform float       effect_cascades_count;\n"
         // light uniform(s)
@@ -232,8 +232,8 @@ gearoenix::glc3::shader::ForwardPbrDirectionalShadow::ForwardPbrDirectionalShado
         //               TODO: it must become for each cascade shadow map
         //        "                float depth = texture(effect_shadow_map, lightuv, shadow_bias);\n"
         //"                float depth = texture(effect_shadow_map, lightuv.xy).x * 2.0 - 1.0;\n"
-        "                float depth = texture(effect_shadow_map, lightuv.xy).x;\n"
-        //"                if(depth > 0.001) { frag_color = vec4(vec3(depth), 1.0); return; }\n"
+        "                float depth = texture(effect_shadow_map, lightuv.xy, 0.0).x;\n"
+//        "                if(depth != 0.0) { frag_color = vec4(vec3(abs(depth)), 1.0); return; }\n"
         "                if(depth + shadow_bias <= lightuv.z)\n"
         //        "                if(depth == 0.0)\n"
         "                {\n"
