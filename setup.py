@@ -202,6 +202,19 @@ if IN_MACOS:
         args.append(str(os.path.join(platform_dir, d, 'lib', SDL2_MAIN_LIB)))
     args += ['-create', '-output', str(os.path.join(IOS_LIBS_PATH, SDL2_MAIN_LIB))]
     subprocess.run(args)
+    SDL2_STATIC_IOS_LIBS_PATH = os.path.join(IOS_LIBS_PATH, SDL2_STATIC_LIB)
     shutil.move(
         os.path.join(platform_dir, 'universal', SDL2_STATIC),
-        os.path.join(IOS_LIBS_PATH, SDL2_STATIC_LIB))
+        SDL2_STATIC_IOS_LIBS_PATH)
+    build_dir = os.path.join(SDL2_DIR_PATH, "Xcode-iOS", "SDL")
+    os.chdir(build_dir)
+    args = [
+        'xcodebuild', '"OTHER_CFLAGS=-Os -fembed-bitcode-marker -fembed-bitcode"', 
+        '"OTHER_LDFLAGS=-flto"', '"ONLY_ACTIVE_ARCH=NO"', '-arch', 'arm64', '-arch', 'armv7', 
+        '-arch', 'armv7s', '-project', 'SDL.xcodeproj', '-sdk', 'iphoneos', '-configuration', 
+        'Release', '"-scheme=libSDL"', 'build',
+    ]
+    subprocess.run(args)
+    shutil.move(
+        os.path.join(build_dir, 'build', 'Release-iphoneos', SDL2_STATIC),
+        SDL2_STATIC_IOS_LIBS_PATH)
