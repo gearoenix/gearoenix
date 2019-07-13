@@ -11,6 +11,7 @@ from zipfile import ZipFile
 
 PLATFORM = platform.system()
 IN_MACOS = 'Darwin' in PLATFORM
+IN_WINDOWS = 'Windows' in PLATFORM
 
 print("Building in platform:", PLATFORM)
 print("Platform is MacOS:", IN_MACOS)
@@ -62,9 +63,11 @@ SDL2_DIR_PATH = os.path.join(SDK_PATH, SDL2_DIR_NAME)
 SDL2_VERSION = '2.0.9'
 SDL2_DIR_NAME_VER = SDL2_DIR_NAME + '-' + SDL2_VERSION
 SDL2_DIR_PATH_VER = os.path.join(SDK_PATH, SDL2_DIR_NAME_VER)
+SDL2_BUILD_DIR_PATH = os.path.join(SDK_PATH, 'sdl2-build')
 SDL2_PACK_NAME = SDL2_DIR_NAME_VER + '.zip'
 SDL2_PACK_URL = 'https://www.libsdl.org/release/' + SDL2_PACK_NAME
 SDL2_PACK_PATH = os.path.join(SDK_PATH, SDL2_PACK_NAME)
+SDL2_BUILD_TYPE = 'MinSizeRel'
 download_lib(SDL2_DIR_NAME, SDL2_PACK_PATH, SDL2_PACK_URL)
 if not os.path.exists(SDL2_DIR_PATH):
     shutil.move(SDL2_DIR_PATH_VER, SDL2_DIR_PATH)
@@ -116,3 +119,89 @@ BOOST_PACK_PATH = os.path.join(SDK_PATH, BOOST_PACK_NAME)
 download_lib(BOOST_DIR_NAME, BOOST_PACK_PATH, BOOST_PACK_URL)
 if not os.path.exists(BOOST_DIR_PATH):
     shutil.move(BOOST_DIR_PATH + BOOST_DIR_VERSION, BOOST_DIR_PATH)
+
+if os.path.exists(SDL2_BUILD_DIR_PATH):
+    shutil.rmtree(SDL2_BUILD_DIR_PATH)
+os.makedirs(SDL2_BUILD_DIR_PATH)
+os.chdir(SDL2_BUILD_DIR_PATH)
+
+LIBS_PATH = os.path.join(SDK_PATH, 'libs')
+if os.path.exists(LIBS_PATH):
+    shutil.rmtree(LIBS_PATH)
+os.makedirs(LIBS_PATH)
+
+subprocess.run([
+    'cmake',
+    '-B' + SDL2_BUILD_DIR_PATH,
+    '-H' + SDL2_DIR_PATH,
+    '-DCMAKE_BUILD_TYPE=' + SDL2_BUILD_TYPE,
+])
+
+sdl2_build_args = [
+    'cmake',
+    '--build',
+    '.',
+    '--config',
+    SDL2_BUILD_TYPE
+]
+
+if 'Windows' in PLATFORM:
+    SDL2_STATIC_LIB = 'SDL2-static.lib'
+    SDL2_MAIN_LIB = 'SDL2main.lib'
+    SDL2_STATIC = os.path.join(SDL2_BUILD_TYPE, SDL2_STATIC_LIB)
+    SDL2_MAIN = os.path.join(SDL2_BUILD_TYPE, SDL2_MAIN_LIB)
+else:
+    SDL2_STATIC_LIB = 'libSDL2.a'
+    SDL2_MAIN_LIB = 'libSDL2main.a'
+    SDL2_STATIC = SDL2_STATIC_LIB
+    SDL2_MAIN = SDL2_MAIN_LIB
+    sdl2_build_args += ['--', '-j' + str(multiprocessing.cpu_count())]
+
+subprocess.run(sdl2_build_args)
+shutil.move(
+    os.path.join(SDL2_BUILD_DIR_PATH, SDL2_STATIC),
+    os.path.join(LIBS_PATH, SDL2_STATIC_LIB))
+shutil.move(
+    os.path.join(SDL2_BUILD_DIR_PATH, SDL2_MAIN),
+    os.path.join(LIBS_PATH, SDL2_MAIN_LIB))
+
+def make_exec_priv(name):
+    subprocess.run(['chmod', '+x', str(name)])
+
+if IN_MACOS:
+    IOS_LIBS_PATH = os.path.join(LIBS_PATH, 'ios')
+    if os.path.exists(IOS_LIBS_PATH):
+        shutil.rmtree(IOS_LIBS_PATH)
+    os.makedirs(IOS_LIBS_PATH)
+    print("Going to build iOS dependancies")
+    SDL2_BUILD_SCRIPTS_PATH = os.path.join(SDL2_DIR_PATH, 'build-scripts')
+    IOS_BUILD_SCRIPT_NAME = 'iosbuild.sh'
+    SDL2_IOS_BUILD_SCRIPTS_PATH = os.path.join(SDL2_DIR_PATH, IOS_BUILD_SCRIPT_NAME)
+    os.chdir(SDL2_DIR_PATH)
+    make_exec_priv('configure')
+    os.chdir(SDL2_BUILD_SCRIPTS_PATH)
+    make_exec_priv(IOS_BUILD_SCRIPT_NAME)
+    ios_build_script_file = open(IOS_BUILD_SCRIPT_NAME, 'rt')
+    ios_build_script = ios_build_script_file.read()
+    ios_build_script_file.close()
+    ios_build_script_file = open(IOS_BUILD_SCRIPT_NAME, 'wt')
+    ios_build_script = ios_build_script.replace('BUILD_I386_IOSSIM=YES', 'BUILD_I386_IOSSIM=NO')
+    ios_build_script = ios_build_script.replace('BUILD_X86_64_IOSSIM=YES', 'BUILD_X86_64_IOSSIM=NO')
+    ios_build_script = ios_build_script.replace(
+        '-g -O0 -pipe -fPIC -fobjc-arc"\n', 
+        '-Os -pipe -fPIC -fobjc-arc -fembed-bitcode-marker -fembed-bitcode -x objective-c"\nLDFLAGS="${LDFLAGS} -flto"\n')
+    ios_build_script = ios_build_script.replace('x86_64-sim/lib/libSDL2.a i386-sim/lib/libSDL2.a', '')
+    ios_build_script_file.write(ios_build_script)
+    ios_build_script_file.close()
+    subprocess.run(['sh', IOS_BUILD_SCRIPT_NAME])
+    platform_dir = os.path.join(SDL2_BUILD_SCRIPTS_PATH, 'platform')
+    args = ['lipo', ]
+    for d in os.listdir(platform_dir):
+        if not d.endswith('-ios'):
+            continue
+        args.append(str(os.path.join(platform_dir, d, 'lib', SDL2_MAIN_LIB)))
+    args += ['-create', '-output', str(os.path.join(IOS_LIBS_PATH, SDL2_MAIN_LIB))]
+    subprocess.run(args)
+    shutil.move(
+        os.path.join(platform_dir, 'universal', SDL2_STATIC),
+        os.path.join(IOS_LIBS_PATH, SDL2_STATIC_LIB))

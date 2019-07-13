@@ -29,6 +29,7 @@ gearoenix::system::stream::Asset* gearoenix::system::stream::Asset::construct(sy
 #ifdef GX_USE_STD_FILE
     std::string file_path = name;
 #ifdef GX_IN_IOS
+    return nullptr;
     @autoreleasepool {
         // NSString *f_name = [NSString stringWithCString:name.c_str() encoding:[NSString defaultCStringEncoding]];
         NSString* path = [[NSBundle mainBundle] pathForResource:@"data" ofType:@"gx3d"];

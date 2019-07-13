@@ -80,3 +80,9 @@ CMakeLists.txt.user
 
 .settings/
 /.settings/
+
+ios-build/
+/ios-build/
+
+wasm-build/
+/wasm-build/
