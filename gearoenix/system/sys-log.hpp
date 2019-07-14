@@ -8,11 +8,15 @@
 #elif defined(GX_IN_WEB)
 #include <iostream>
 #define GXLOGI(s)                                                       \
-    std::cout << APPLICATION_NAME << " " << s << " " << __FILE__ << " " \
+    std::cout << GX_APP_NAME << " " << s << " " << __FILE__ << " " \
               << __LINE__ << std::endl;
+#ifdef GX_DEBUG_MODE
 #define GXLOGD(s) GXLOGI(s)
+#else 
+#define GXLOGD(s)
+#endif
 #define GXLOGE(s)                                                              \
-    std::cout << APPLICATION_NAME << " ERROR: " << s << " " << __FILE__ << " " \
+    std::cout << GX_APP_NAME << " ERROR: " << s << " " << __FILE__ << " " \
               << __LINE__ << std::endl;
 #define GXLOGF(s)         \
     {                     \

@@ -355,12 +355,12 @@ void gearoenix::system::Application::execute(const std::shared_ptr<core::Applica
     emscripten_set_main_loop(Application::loop, 0, true);
 }
 
-void gearoenix::system::Application::loop()
+void gearoenix::system::Application::loop() noexcept
 {
     app->main_loop();
 }
 
-void gearoenix::system::Application::main_loop()
+void gearoenix::system::Application::main_loop() noexcept
 {
 #else
     while (running) {

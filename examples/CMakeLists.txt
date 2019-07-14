@@ -1,6 +1,6 @@
 INCLUDE_DIRECTORIES (${CMAKE_SOURCE_DIR})
 
-MESSAGE(STATUS "Compiling examples wit libs: ${GX_LIBS}")
+MESSAGE(STATUS "Compiling examples with libs: ${GX_LIBS}")
 
 SET(GX_EXAMPLE_HELLO_WORLD_SRC exm-hello-world.cpp exm-hello-world.hpp)
 
