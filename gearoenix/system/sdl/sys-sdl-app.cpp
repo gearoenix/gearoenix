@@ -275,6 +275,7 @@ int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_
 
 const std::shared_ptr<gearoenix::system::Application> gearoenix::system::Application::construct() noexcept
 {
+    GXLOGI("Constructing Gearoenix system application monomorphic interface over SDL2.")
     const std::shared_ptr<Application> result(new Application());
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_AUDIO) != 0) {
         GXLOGF("Failed to initialize SDL: " << SDL_GetError())
