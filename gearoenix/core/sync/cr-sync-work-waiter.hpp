@@ -4,32 +4,30 @@
 #include <memory>
 #include <thread>
 
-namespace gearoenix {
-namespace core {
-    class FunctionLoader;
-    namespace sync {
-        class Semaphore;
-        class WorkWaiter {
-        private:
-            typedef enum {
-                WORKING,
-                FINISHED,
-                TERMINATED,
-            } work_state;
+namespace gearoenix::core {
+class FunctionLoader;
+namespace sync {
+    class Semaphore;
+    class WorkWaiter {
+    private:
+        typedef enum {
+            WORKING,
+            FINISHED,
+            TERMINATED,
+        } work_state;
 
-            const std::shared_ptr<Semaphore> semaphore;
-            const std::shared_ptr<FunctionLoader> function_loader;
-            std::thread thread;
-            work_state state = WORKING;
+        const std::shared_ptr<Semaphore> semaphore;
+        const std::shared_ptr<FunctionLoader> function_loader;
+        std::thread thread;
+        work_state state = WORKING;
 
-            void wait_loop();
+        void wait_loop();
 
-        public:
-            WorkWaiter();
-            ~WorkWaiter();
-            void push(std::function<void()> f);
-        };
-    }
+    public:
+        WorkWaiter();
+        ~WorkWaiter();
+        void push(std::function<void()> f);
+    };
 }
 }
 #endif

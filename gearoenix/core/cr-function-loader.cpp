@@ -1,4 +1,5 @@
 #include "cr-function-loader.hpp"
+#include "../system/sys-log.hpp"
 
 gearoenix::core::FunctionLoader::FunctionLoader()
 {

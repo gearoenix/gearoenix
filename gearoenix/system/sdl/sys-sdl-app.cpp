@@ -80,26 +80,32 @@ void gearoenix::system::Application::create_window() noexcept
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 #endif
-#define CREATE_WINDOW(gl_version)                                   \
-    supported_engine = render::engine::Type::gl_version;            \
-    window = SDL_CreateWindow(                                      \
-        GX_APP_NAME,                                                \
-        SDL_WINDOWPOS_CENTERED,                                     \
-        SDL_WINDOWPOS_CENTERED,                                     \
-        static_cast<int>(win_width),                                \
-        static_cast<int>(win_height),                               \
-        flags);                                                     \
-    if (nullptr != window) {                                        \
-        gl_context = SDL_GL_CreateContext(window);                  \
-        if (gl_context != nullptr) {                                \
-            if (gl::Loader::load_library(supported_engine)) {       \
-                GXLOGD("OpenGL window built with: " << #gl_version) \
-                return;                                             \
-            }                                                       \
-            SDL_GL_DeleteContext(gl_context);                       \
-        }                                                           \
-        SDL_DestroyWindow(window);                                  \
-    }
+#define CREATE_WINDOW(gl_version)                                              \
+    supported_engine = render::engine::Type::gl_version;                       \
+    GXLOGD("Trying to build OpenGL window with: " << #gl_version)              \
+    window = SDL_CreateWindow(                                                 \
+        GX_APP_NAME,                                                           \
+        SDL_WINDOWPOS_CENTERED,                                                \
+        SDL_WINDOWPOS_CENTERED,                                                \
+        static_cast<int>(win_width),                                           \
+        static_cast<int>(win_height),                                          \
+        flags);                                                                \
+    if (nullptr != window) {                                                   \
+        GXLOGD("Trying to build OpenGL context with: " << #gl_version)         \
+        gl_context = SDL_GL_CreateContext(window);                             \
+        if (gl_context != nullptr) {                                           \
+            GXLOGD("Trying to load OpenGL library with: " << #gl_version)      \
+            if (gl::Loader::load_library(supported_engine)) {                  \
+                GXLOGD("OpenGL window built with: " << #gl_version)            \
+                return;                                                        \
+            } else                                                             \
+                GXLOGD("Can not load OpenGL library with: " << #gl_version)    \
+            SDL_GL_DeleteContext(gl_context);                                  \
+        } else                                                                 \
+            GXLOGD("Can not build OpenGL context with: " << #gl_version)       \
+        SDL_DestroyWindow(window);                                             \
+    } else                                                                     \
+        GXLOGD("Can not build OpenGL window with: " << #gl_version)
 
 #ifdef GX_USE_OPENGL_43
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
@@ -295,9 +301,7 @@ const std::shared_ptr<gearoenix::system::Application> gearoenix::system::Applica
     result->win_width = GX_DEFAULT_WINDOW_WIDTH;
     result->win_height = GX_DEFAULT_WINDOW_HEIGHT;
 #endif
-
     result->create_window();
-
     SDL_AddEventWatch(event_receiver, result.get());
 #ifdef GX_USE_OPENGL
     if (GX_RUNTIME_USE_OPENGL_V(result->supported_engine)) {
@@ -320,7 +324,6 @@ const std::shared_ptr<gearoenix::system::Application> gearoenix::system::Applica
         result->render_engine = new vulkan::Engine(this);
     }
 #endif
-
 #ifdef GX_USE_OPENGL_CLASS_3
     if (nullptr == result->render_engine && (GX_RUNTIME_USE_OPENGL_CLASS_3_V(result->supported_engine))) {
         result->render_engine = glc3::engine::Engine::construct(result.get(), result->supported_engine);
@@ -336,7 +339,6 @@ const std::shared_ptr<gearoenix::system::Application> gearoenix::system::Applica
     if (result->render_engine == nullptr) {
         GXLOGF("No suitable render engine found.")
     }
-
     result->astmgr = std::make_shared<core::asset::Manager>(result, GX_APP_DATA_NAME);
     return result;
 }
@@ -346,6 +348,7 @@ gearoenix::system::Application::~Application() noexcept
     core_app = nullptr;
     astmgr = nullptr;
     render_engine = nullptr;
+    GXLOGD("Main application (SDL2) has been deleted.")
 }
 
 void gearoenix::system::Application::execute(const std::shared_ptr<core::Application>& app) noexcept

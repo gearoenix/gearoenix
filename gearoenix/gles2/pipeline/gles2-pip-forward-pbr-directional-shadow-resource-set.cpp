@@ -47,7 +47,7 @@ void gearoenix::gles2::pipeline::ForwardPbrDirectionalShadowResourceSet::bind(gl
     //shdr->set_scene_ambient_light_data(scene->ambient_light.data());
     shdr->set_scene_directional_lights_color_data(scene->directional_lights_color[0].data());
     shdr->set_scene_directional_lights_direction_data(scene->directional_lights_direction[0].data());
-    shdr->set_scene_lights_count_data(scene->lights_count.data());
+    GX_GLES2_PIPRES_SET_UNIFORM(scene_lights_count, *(scene->lights_count.data()));
     shdr->set_scene_point_lights_color_min_radius_data(scene->point_lights_color_min_radius[0].data());
     shdr->set_scene_point_lights_position_max_radius_data(scene->point_lights_position_max_radius[0].data());
     //shdr->set_scene_ssao_config_data(scene->ssao_config.data());

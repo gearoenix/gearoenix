@@ -12,14 +12,13 @@ gearoenix::core::sync::Semaphore::~Semaphore() {}
 void gearoenix::core::sync::Semaphore::lock()
 {
     std::unique_lock<std::mutex> lock(m);
-    while (count == 0)
+    while (count <= 0)
         c.wait(lock);
     --count;
 }
 
 void gearoenix::core::sync::Semaphore::release()
 {
-    std::lock_guard<std::mutex> lock(m);
     ++count;
     c.notify_one();
 }

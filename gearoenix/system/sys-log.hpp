@@ -63,7 +63,7 @@ namespace system {
 #define GXASSERT(x) \
     if ((x) == 0)   \
     GXUNEXPECTED
-#define GXREACHED GXLOGI("REACHED-------------------------------------------")
+#define GXREACHED GXLOGD("REACHED-------------------------------------------")
 #else // GX_LOG_ENABLED
 #define GXLOGI(s) ;
 #define GXLOGD(s) ;

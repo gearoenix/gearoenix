@@ -3,22 +3,18 @@
 #include <memory>
 #include <mutex>
 
-namespace gearoenix {
-namespace core {
-    namespace sync {
-        class Semaphore;
-        class StopPoint {
-        private:
-            const std::shared_ptr<Semaphore> sem;
-            const int stoper;
-            volatile int counter = 0;
-            std::mutex counter_lock;
+namespace gearoenix::core::sync {
+class Semaphore;
+class StopPoint {
+private:
+    const std::shared_ptr<Semaphore> sem;
+    const int stoper;
+    volatile int counter = 0;
+    std::mutex counter_lock;
 
-        public:
-            StopPoint(int walkers_count);
-            void all_reach();
-        };
-    }
-}
+public:
+    StopPoint(int walkers_count);
+    void all_reach();
+};
 }
 #endif

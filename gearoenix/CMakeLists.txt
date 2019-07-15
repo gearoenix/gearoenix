@@ -71,8 +71,6 @@ SET (GX_ENGINE_SRC
     "${GX_ENGINE_SRC_DIR}core/sync/cr-sync-kernel-workers.hpp"
     "${GX_ENGINE_SRC_DIR}core/sync/cr-sync-semaphore.cpp"
     "${GX_ENGINE_SRC_DIR}core/sync/cr-sync-semaphore.hpp"
-    "${GX_ENGINE_SRC_DIR}core/sync/cr-sync-signaler.cpp"
-    "${GX_ENGINE_SRC_DIR}core/sync/cr-sync-signaler.hpp"
     "${GX_ENGINE_SRC_DIR}core/sync/cr-sync-stop-point.cpp"
     "${GX_ENGINE_SRC_DIR}core/sync/cr-sync-stop-point.hpp"
     "${GX_ENGINE_SRC_DIR}core/sync/cr-sync-work-waiter.cpp"

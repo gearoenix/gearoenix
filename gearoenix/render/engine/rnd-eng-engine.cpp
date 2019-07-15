@@ -54,6 +54,7 @@ void gearoenix::render::engine::Engine::update() noexcept
     render_tree->update();
     fun_loader->unload();
     kernels->do_steps();
+    GXREACHED
 }
 
 void gearoenix::render::engine::Engine::terminate() noexcept
