@@ -9,19 +9,29 @@ void gearoenix::core::sync::KernelWorker::thread_loop(const unsigned int kernel_
         state = TERMINATED; \
         return;             \
     }
-    while (state = RUNNING) {
+    GXREACHED
+    while (state == RUNNING) {
+        GXREACHED
         signals[kernel_index]->lock();
-        GX_HELPER;
+        GXREACHED
+        GX_HELPER
         std::lock_guard<std::mutex> _lock(*workers_syncers[kernel_index]);
+        GXREACHED
         for (const Worker& worker : workers) {
-            GX_HELPER;
+            GXREACHED
+            GX_HELPER
             worker.waits[kernel_index]->lock();
-            GX_HELPER;
+            GX_HELPER
+            GXREACHED
             worker.worker(kernel_index);
-            GX_HELPER;
+            GX_HELPER
+            GXREACHED
             worker.signals[kernel_index]->release();
+            GXREACHED
         }
+        GXREACHED
     }
+    GXREACHED
 #undef GX_HELPER
 }
 
@@ -56,8 +66,8 @@ void gearoenix::core::sync::KernelWorker::add_step(std::function<void(const unsi
     waits.reserve(kernels_count);
     signals.reserve(kernels_count);
     for (size_t ki = 0; ki < kernels_count; ++ki) {
-        waits.push_back(std::make_shared<Semaphore>(1));
-        signals.push_back(std::make_shared<Semaphore>(1));
+        waits.push_back(std::make_shared<Semaphore>());
+        signals.push_back(std::make_shared<Semaphore>());
     }
     for (std::shared_ptr<std::mutex>& m : workers_syncers)
         m->lock();
@@ -71,12 +81,9 @@ void gearoenix::core::sync::KernelWorker::add_step(std::function<void(const unsi
 
 void gearoenix::core::sync::KernelWorker::do_steps()
 {
-    GXREACHED
     for (const std::shared_ptr<Semaphore>& signal : signals)
         signal->release();
-    GXREACHED
     for (Worker& worker : workers) {
-        GXREACHED
         for (const std::shared_ptr<Semaphore>& wait : worker.waits)
             wait->release();
         GXREACHED

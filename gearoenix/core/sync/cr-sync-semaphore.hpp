@@ -4,13 +4,14 @@
 #include <condition_variable>
 #include <mutex>
 #include <queue>
+#include <atomic>
 
 namespace gearoenix::core::sync {
 class Semaphore {
 private:
     std::mutex m;
     std::condition_variable c;
-    int count = 0;
+    std::atomic<int> count = 0;
 
 public:
     Semaphore(int count = 0);
