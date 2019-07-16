@@ -10,8 +10,10 @@ Yet another cross-platform C++ 3D game engine.
 - It is cross-platform.
 - It is Lightweight.
 - Highly multithreaded architecture.
-- It has a runtime abtraction over Graphic APIs (e.g. `OpenGL ES2`, `OpenGL ES3(WIP)`,
-  `Directx11(WIP)` and `Vulkan(WIP)`).
+- It has a runtime abtraction over Graphic API backends (e.g. `OpenGL ES2`, `OpenGL ES3`,
+  `OpenGL 3.3`, `OpenGL 4.3`, `Directx11(WIP)` and `Vulkan(WIP)`).
+- It can automatically choose the highest available backend and in addition in your build you can
+  off an API backend so it will not compile that API and then your binary size will be reduced.
 - It has its own file format for importing scenes data in to game. This file
   format help the engine to have better performance in loading a scene and
   reduce the size of the data hence It make smaller publishable binaries.
@@ -27,7 +29,7 @@ Yet another cross-platform C++ 3D game engine.
   - 3D texture (WIP, Implemented in blender part, but it is not developed in
     engine yet)
   - Cube texture
-- Painless cross-platform mathematic structures.
+- Painlessly cross-platform and very fast mathematic structures.
 - Lighting
 - Shadowing
 - Skyboxing
@@ -43,9 +45,7 @@ Yet another cross-platform C++ 3D game engine.
 
 ## Demos
 
-I'm developing gearoenix and a game with it, and I'm little on the urge, do not
-expect a full functioning AAA game as a demo from me :D. These are mostly in
-debug mode of code, but still have great performance.
+In this section I need contribution.
 
 - [This is WebAssembly demo (Firefox shows better)](https://hossein-noroozpour.github.io/gearoenix-static-files/web-demo/index.html)
 - [This is Android demo](https://hossein-noroozpour.github.io/gearoenix-static-files/android/android.7z)
@@ -57,22 +57,49 @@ debug mode of code, but still have great performance.
 - Download zip of master branch.
 - Execute the setup.py with your python3 compiler. (This script provide a simple way of gathering
   dependencies of project and organizing the work space.)
+
+### Desktop OSs
+
 - Create a build directory and cd it. (e.g. 'build')
-- Do camke on it. (like: ```cmake -DCMAKE_BUILD_TYPE=Release .```)
+- Do camke on it. (like: ```cmake -DCMAKE_BUILD_TYPE=Release ..```)
 - Build it. (like: ```cmake --build . --config Release```)
 - If you have a problem to initialize the environment,
   you either can use the provided docker images in docker hub or
   look at the provided **Dockerfile** file in project ci part.
 
-## Development Process
+### Android
 
-Design and decision making in development process of this project is dependent
-on games that I'm developing. I design and develop a new feature whenever my
-games need it, sometimes in the
-design and or implementation I makes decisions that are mostly related to my
-game and urge of getting results, but I never ever disregards best practices in
-its development. Test coverage is very low, I will improve it and any contribution
-is highly regarded.
+- You have to have the latest android studio version and ndk installed
+- Open the android folder with android studio.
+- Run and enjoy.
+
+### iOS
+
+- You must have the latest XCode and iOS sdk installed
+- Create a build directory and cd it. (e.g. 'build')
+- Do camke on it. (like: ```cmake -DCMAKE_BUILD_TYPE=Release .. -DCMAKE_SYSTEM_NAME=iOS```)
+- Open the XCode project.
+- Connect your iOS device (currently there is a bug in one of the static library of ios-simulator that prevents the build for it)
+- Sign the project with your ios-developer team
+- Run and enjoy.
+
+### Webassembly
+
+- Support for webassembly is very complete but due to [this issue in Emscripten](https://github.com/emscripten-core/emscripten/issues/6009) you can not run the your build file, however building for webassembly is as follow.
+- Create a build directory and cd it. (e.g. 'wasm-build')
+- Your console must have emscripten sdk in its environment.
+- ```emconfigure cmake -DCMAKE_BUILD_TYPE=Release ..```
+- ```cmake --build . --config Release```
+- If you have python3 in your path do ```python3 -m http.server 8080``` or if you have python2 ```python -m SimpleHTTPServer 8080```
+- Open your browser and go to ```http://localhost:8080/examples/<name-of-example>```
+
+## Contribution
+
+- Test coverage is not very well and I don't have time for it,
+  if you want to contribute in it this is the best place you can start.
+- 3D content development.
+- Promotion of this project.
+- Donating to this project.
 
 ## License
 
