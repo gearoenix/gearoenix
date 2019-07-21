@@ -3,41 +3,28 @@
 #include "../../math/math-vector.hpp"
 #include "rnd-fnt-font.hpp"
 #include <vector>
-namespace gearoenix {
-namespace render {
-    namespace engine {
-        class Engine;
-    }
-    namespace texture {
-        class Texture2D;
-    }
-    namespace font {
-        class Font2D : public Font {
-        public:
-            struct LetterProperties {
-                math::Vec2 uv_min, uv_max;
-                math::Vec2 pos_min, pos_max;
-            };
-            static const int baked_aspect;
-            static const int first_character;
-            static const int last_character;
-            static const int characters_count;
+#include <memory>
+#include <string>
 
-        private:
-            std::vector<LetterProperties> letters_properties;
-            std::shared_ptr<texture::Texture2D> baked_texture;
+struct stbtt_fontinfo;
 
-        public:
-            Font2D(
-                const core::Id my_id,
-                const std::shared_ptr<system::stream::Stream>& f,
-                const std::shared_ptr<engine::Engine>& e,
-                const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
-            ~Font2D();
-            const LetterProperties& get_letter_properties(char c) const;
-            const std::shared_ptr<texture::Texture2D> get_baked_texture() const;
-        };
-    }
+namespace gearoenix::render::texture {
+class Manager;
+class Texture2D;
 }
+
+namespace gearoenix::render::font {
+class Font2D : public Font {
+private:
+	stbtt_fontinfo *stb_font = nullptr;
+
+public:
+    Font2D(
+        const core::Id my_id,
+		system::stream::Stream* f,
+		std::shared_ptr<texture::Manager> txt_mgr) noexcept;
+    ~Font2D() noexcept;
+    const std::shared_ptr<texture::Texture2D> bake(const std::wstring &text) const noexcept;
+};
 }
 #endif

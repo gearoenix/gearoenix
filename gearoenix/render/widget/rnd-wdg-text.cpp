@@ -25,12 +25,8 @@ void gearoenix::render::widget::Text::create_text_mesh(core::sync::EndCaller<cor
         core::Real w = 0.0f, h = 0.0f;
     };
     std::vector<CharacterVerices> cvs(text_size);
-    std::map<char, font::Font2D::LetterProperties> lps;
     core::Real textw = 0.0f;
     for (const char c : text) {
-        const font::Font2D::LetterProperties& lp = fnt->get_letter_properties(c);
-        lps[c] = lp;
-        textw += lp.pos_max[0] - lp.pos_min[0] + space_character;
         if (c == ' ')
             textw += space_word;
     }
@@ -73,27 +69,6 @@ void gearoenix::render::widget::Text::create_text_mesh(core::sync::EndCaller<cor
         break;
     default:
         GXUNEXPECTED;
-    }
-    for (core::Count i = 0; i < text_size; ++i) {
-        const char c = text[i];
-        const font::Font2D::LetterProperties& lp = lps[c];
-        const math::Vec3 pos_min(lp.pos_min[0] + starting_x, lp.pos_min[1] + starting_y, 0.0f);
-        const math::Vec3 pos_max(lp.pos_max[0] + starting_x, lp.pos_max[1] + starting_y, 0.0f);
-        starting_x += lp.pos_max[0] - lp.pos_min[0] + space_character;
-        if (c == ' ')
-            starting_x += space_word;
-
-        cvs[i].v[0].pos = pos_min;
-        cvs[i].v[0].uv = math::Vec2(lp.uv_min[0], lp.uv_max[1]);
-
-        cvs[i].v[1].pos = math::Vec3(pos_max[0], pos_min[1], 0.0f);
-        cvs[i].v[1].uv = lp.uv_max;
-
-        cvs[i].v[2].pos = pos_max;
-        cvs[i].v[2].uv = math::Vec2(lp.uv_max[0], lp.uv_min[1]);
-
-        cvs[i].v[3].pos = math::Vec3(pos_min[0], pos_max[1], 0.0f);
-        cvs[i].v[3].uv = lp.uv_min;
     }
     for (core::Count i = 0; i < text_size; ++i) {
         s.write(cvs[i].v);

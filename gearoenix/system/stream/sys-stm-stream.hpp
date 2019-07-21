@@ -58,16 +58,29 @@ namespace system {
                 return data != 0;
             }
 
-            template <typename T>
-            void read(std::vector<T>& data) noexcept
-            {
-                core::Count c;
-                read(c);
-                data.resize((size_t)c);
-                for (core::Count i = 0; i < c; ++i) {
-                    read(data[i]);
-                }
-            }
+			template <typename T>
+			typename std::enable_if<sizeof(T) != 1, void>::type
+				read(std::vector<T>& data) noexcept
+			{
+				core::Count c;
+				read(c);
+				data.resize((size_t)c);
+				for (core::Count i = 0; i < c; ++i) {
+					read(data[i]);
+				}
+			}
+
+			template <typename T>
+			typename std::enable_if<sizeof(T) == 1, void>::type
+				read(std::vector<T>& data) noexcept
+			{
+				core::Count c;
+				read(c);
+				data.resize((size_t)c);
+				for (core::Count i = 0; i < c; ++i) {
+					read(data[i]);
+				}
+			}
 
             template <typename T>
             typename std::enable_if<sizeof(T) == 1 && (std::is_integral<T>::value || std::is_enum<T>::value), void>::type
