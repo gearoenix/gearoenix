@@ -9,29 +9,19 @@ void gearoenix::core::sync::KernelWorker::thread_loop(const unsigned int kernel_
         state = TERMINATED; \
         return;             \
     }
-    GXREACHED
     while (state == RUNNING) {
-        GXREACHED
         signals[kernel_index]->lock();
-        GXREACHED
         GX_HELPER
         std::lock_guard<std::mutex> _lock(*workers_syncers[kernel_index]);
-        GXREACHED
         for (const Worker& worker : workers) {
-            GXREACHED
             GX_HELPER
             worker.waits[kernel_index]->lock();
             GX_HELPER
-            GXREACHED
             worker.worker(kernel_index);
             GX_HELPER
-            GXREACHED
             worker.signals[kernel_index]->release();
-            GXREACHED
         }
-        GXREACHED
     }
-    GXREACHED
 #undef GX_HELPER
 }
 
@@ -86,14 +76,10 @@ void gearoenix::core::sync::KernelWorker::do_steps()
     for (Worker& worker : workers) {
         for (const std::shared_ptr<Semaphore>& wait : worker.waits)
             wait->release();
-        GXREACHED
         for (const std::shared_ptr<Semaphore>& signal : worker.signals)
             signal->lock();
-        GXREACHED
         worker.boss();
-        GXREACHED
     }
-    GXREACHED
 }
 
 unsigned int gearoenix::core::sync::KernelWorker::get_threads_count() const

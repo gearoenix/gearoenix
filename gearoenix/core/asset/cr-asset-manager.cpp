@@ -37,6 +37,7 @@ gearoenix::core::asset::Manager::Manager(const std::shared_ptr<system::Applicati
         GX_HELPER(scene, render::scene)
 #undef GX_HELPER
     } else {
+		GXLOGD("Asset file found.")
         system::stream::Stream* s = reinterpret_cast<system::stream::Stream*>(file.get());
         last_id.store(s->read<Id>());
         core::Count off;
