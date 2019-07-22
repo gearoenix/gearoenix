@@ -1,22 +1,13 @@
 #ifndef GEAROENIX_EXAMPLE_HELLO_WORLD_HPP
 #define GEAROENIX_EXAMPLE_HELLO_WORLD_HPP
 #include <gearoenix/core/cr-application.hpp>
-#include <memory>
 
-namespace gearoenix::render {
-namespace engine {
-    class Engine;
+namespace gearoenix::render::camera {
+class Transformation;
 }
-namespace camera {
-    class Perspective;
-    class Transformation;
-}
-namespace model {
-    class Model;
-}
-namespace scene {
-    class Scene;
-}
+
+namespace gearoenix::render::scene {
+class Scene;
 }
 
 class GameApp : public gearoenix::core::Application {

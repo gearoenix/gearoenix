@@ -20,173 +20,82 @@ gearoenix::render::material::Material::Material(engine::Engine* const e, const c
     color = txtmgr->get_2d(math::Vec3(1.0f, 0.0f, 0.0f), calltxt2d);
     metallic_roughness = txtmgr->get_2d(math::Vec2(0.5f, 0.5f), calltxt2d);
     normal = txtmgr->get_2d(math::Vec3(0.5f, 0.5f, 1.0f), calltxt2d);
-    emissive = txtmgr->get_2d(math::Vec3(0.0f, 0.0f, 0.0f), calltxt2d);
+    emission = txtmgr->get_2d(math::Vec3(0.0f, 0.0f, 0.0f), calltxt2d);
 }
 
 gearoenix::render::material::Material::Material(system::stream::Stream* const f, engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept
     : e(e)
     , uniform_buffers(std::make_shared<buffer::FramedUniform>(sizeof(Uniform), e))
 {
-#ifdef GX_DEBUG_MATERIAL_IMPORT
-    bool alpha_init = false;
-    bool alpha_cutoff_init = false;
-    bool base_color_init = false;
-    bool emissive_init = false;
-    bool metallic_factor_init = false;
-    bool metallic_roughness_init = false;
-    bool normal_init = false;
-    bool normal_scale_init = false;
-    bool roughness_factor_init = false;
-#endif
-    enum Field : core::TypeId {
-        Float = 1,
-        Texture = 2,
-        Vector = 3,
-    };
     const std::shared_ptr<texture::Manager>& txtmgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
-    auto read_texture = [&, end] {
-        switch (f->read<Field>()) {
-        case Field::Vector: {
-            core::sync::EndCaller<texture::Texture2D> calltxt2d([end](std::shared_ptr<texture::Texture2D>) {});
-            math::Vec4 color_value;
-            color_value.read(f);
-            return txtmgr->get_2d(color_value, calltxt2d);
-        }
-        case Field::Texture: {
-            core::sync::EndCaller<texture::Texture> calltxt([end](std::shared_ptr<texture::Texture>) {});
-            return std::static_pointer_cast<texture::Texture2D>(txtmgr->get_gx3d(f->read<core::Id>(), calltxt));
-        }
-        default:
-            GXUNEXPECTED
-        }
-    };
-
-    auto read_value = [&] {
-        if (f->read<Field>() == Field::Float)
-            return f->read<core::Real>();
-        GXUNEXPECTED
-    };
-
-    const auto elements_count = f->read<std::uint8_t>();
-    for (std::uint8_t ei = 0; ei < elements_count; ++ei) {
-        switch (f->read<core::TypeId>()) {
-        case 1: // Alpha
-#ifdef GX_DEBUG_MATERIAL_IMPORT
-            if (alpha_init)
-                GXUNEXPECTED
-            alpha_init = true;
-#endif
-            switch (f->read<Field>()) {
-            case Field::Float:
-                f->read(uniform.alpha);
-                break;
-            case Field::Texture:
-                f->read<core::Id>();
-                translucency = TranslucencyMode::Tansparent;
-                break;
-            default:
-                GXUNEXPECTED
-            }
-            GXLOGD("Alpha is: " << uniform.alpha)
-            break;
-        case 2: // AlphaCutoff
-#ifdef GX_DEBUG_MATERIAL_IMPORT
-            if (alpha_cutoff_init)
-                GXUNEXPECTED
-            alpha_cutoff_init = true;
-#endif
-            uniform.alpha_cutoff = read_value();
-            GXLOGD("Alpha cutoff is: " << uniform.alpha_cutoff)
-            break;
-        case 3: // BaseColor
-#ifdef GX_DEBUG_MATERIAL_IMPORT
-            if (base_color_init)
-                GXUNEXPECTED
-            base_color_init = true;
-#endif
-            color = read_texture();
-            break;
-        case 4: // Emissive
-#ifdef GX_DEBUG_MATERIAL_IMPORT
-            if (emissive_init)
-                GXUNEXPECTED
-            emissive_init = true;
-#endif
-            emissive = read_texture();
-            break;
-        case 5: // MetallicFactor
-#ifdef GX_DEBUG_MATERIAL_IMPORT
-            if (metallic_factor_init)
-                GXUNEXPECTED
-            metallic_factor_init = true;
-#endif
-            uniform.metallic_factor = read_value();
-            break;
-        case 6: // MetallicRoughness
-#ifdef GX_DEBUG_MATERIAL_IMPORT
-            if (metallic_roughness_init)
-                GXUNEXPECTED
-            metallic_roughness_init = true;
-#endif
-            metallic_roughness = read_texture();
-            break;
-        case 7: // Normal
-#ifdef GX_DEBUG_MATERIAL_IMPORT
-            if (normal_init)
-                GXUNEXPECTED
-            normal_init = true;
-#endif
-            normal = read_texture();
-            break;
-        case 8: // NormalScale
-#ifdef GX_DEBUG_MATERIAL_IMPORT
-            if (normal_scale_init)
-                GXUNEXPECTED
-            normal_scale_init = true;
-#endif
-            uniform.normal_scale = read_value();
-            break;
-        case 9: // RoughnessFactor
-#ifdef GX_DEBUG_MATERIAL_IMPORT
-            if (roughness_factor_init)
-                GXUNEXPECTED
-            roughness_factor_init = true;
-#endif
-            uniform.roughness_factor = read_value();
-            break;
-        default:
-            GXUNEXPECTED
-        }
-    }
-#ifdef GX_DEBUG_MATERIAL_IMPORT
-    if (!alpha_init) {
-        GXLOGF("Alpha is missing.")
-    }
-    if (!alpha_cutoff_init) {
-        GXLOGF("Alpha cutoff is missing.")
-    }
-    if (!base_color_init) {
-        GXLOGF("Base color is missing.")
-    }
-    if (!emissive_init) {
-        GXLOGF("Emissive is missing.")
-    }
-    if (!metallic_factor_init) {
-        GXLOGF("Metallic factor is missing.")
-    }
-    if (!metallic_roughness_init) {
-        GXLOGF("Metallic roughness is missing.")
-    }
-    if (!normal_init) {
-        GXLOGF("Normal is missing.")
-    }
-    if (!normal_scale_init) {
-        GXLOGF("Normal scale is missing.")
-    }
-    if (!roughness_factor_init) {
-        GXLOGF("Roughness factor is missing.")
-    }
-#endif
+    
+	// Reading alpha
+	if (f->read_bool()) 
+	{
+		uniform.alpha = 1.0f;
+	}
+	else 
+	{
+		f->read(uniform.alpha);
+	}
+	// Reading color
+	if (f->read_bool())
+	{
+		color = std::dynamic_pointer_cast<texture::Texture2D>(txtmgr->get_gx3d(
+			f->read<core::Id>(),
+			core::sync::EndCaller<texture::Texture>([end](std::shared_ptr<texture::Texture>) {})));
+	}
+	else {
+		math::Vec4 color_value;
+		color_value.read(f);
+		color = std::dynamic_pointer_cast<texture::Texture2D>(txtmgr->get_2d(
+			color_value,
+			core::sync::EndCaller<texture::Texture2D>([end](std::shared_ptr<texture::Texture2D>) {})));
+	}
+	// Reading emission
+	if (f->read_bool())
+	{
+		emission = std::dynamic_pointer_cast<texture::Texture2D>(txtmgr->get_gx3d(
+			f->read<core::Id>(),
+			core::sync::EndCaller<texture::Texture>([end](std::shared_ptr<texture::Texture>) {})));
+	}
+	else {
+		math::Vec4 emission_value;
+		emission_value.read(f);
+		emission = std::dynamic_pointer_cast<texture::Texture2D>(txtmgr->get_2d(
+			emission_value,
+			core::sync::EndCaller<texture::Texture2D>([end](std::shared_ptr<texture::Texture2D>) {})));
+	}
+	// Reading metallic_roughness
+	if (f->read_bool())
+	{
+		metallic_roughness = std::dynamic_pointer_cast<texture::Texture2D>(txtmgr->get_gx3d(
+			f->read<core::Id>(),
+			core::sync::EndCaller<texture::Texture>([end](std::shared_ptr<texture::Texture>) {})));
+	}
+	else {
+		math::Vec2 metallic_roughness_value;
+		metallic_roughness_value.read(f);
+		metallic_roughness = std::dynamic_pointer_cast<texture::Texture2D>(txtmgr->get_2d(
+			metallic_roughness_value,
+			core::sync::EndCaller<texture::Texture2D>([end](std::shared_ptr<texture::Texture2D>) {})));
+	}
+	// Reading normal
+	if (f->read_bool())
+	{
+		normal = std::dynamic_pointer_cast<texture::Texture2D>(txtmgr->get_gx3d(
+			f->read<core::Id>(),
+			core::sync::EndCaller<texture::Texture>([end](std::shared_ptr<texture::Texture>) {})));
+	}
+	else {
+		normal = std::dynamic_pointer_cast<texture::Texture2D>(txtmgr->get_2d(
+			math::Vec3(0.5f, 0.5f, 1.0f),
+			core::sync::EndCaller<texture::Texture2D>([end](std::shared_ptr<texture::Texture2D>) {})));
+	}
+	// Translucency
+	if (f->read_bool()) translucency = TranslucencyMode::Tansparent;
+	is_shadow_caster = f->read_bool();
+	f->read(uniform.alpha_cutoff);
 }
 
 void gearoenix::render::material::Material::update_uniform() noexcept
@@ -216,7 +125,7 @@ const std::shared_ptr<gearoenix::render::texture::Texture2D>& gearoenix::render:
 
 const std::shared_ptr<gearoenix::render::texture::Texture2D>& gearoenix::render::material::Material::get_emissive() const noexcept
 {
-    return emissive;
+    return emission;
 }
 
 void gearoenix::render::material::Material::set_metallic_factor(const core::Real f) noexcept

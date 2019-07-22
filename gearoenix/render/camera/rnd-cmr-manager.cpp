@@ -20,10 +20,9 @@ std::shared_ptr<gearoenix::render::camera::Camera> gearoenix::render::camera::Ma
             case 1:
                 return std::make_shared<Perspective>(id, file, e);
             case 2:
-                // return std::make_shared<Orthographic>(id, file, e);
-                GXUNIMPLEMENTED
+                return std::make_shared<Orthographic>(id, file, e);
             default:
-                GXUNEXPECTED
+                GXLOGF("Unexpected camera type " << t)
             }
         });
     call.set_data(data);

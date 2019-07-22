@@ -26,10 +26,12 @@ namespace render {
             const std::shared_ptr<buffer::FramedUniform> uniform_buffers;
 
             std::shared_ptr<texture::Texture2D> color = nullptr;
+            std::shared_ptr<texture::Texture2D> emission = nullptr;
             std::shared_ptr<texture::Texture2D> metallic_roughness = nullptr;
             std::shared_ptr<texture::Texture2D> normal = nullptr;
-            std::shared_ptr<texture::Texture2D> emissive = nullptr;
             TranslucencyMode::Id translucency = TranslucencyMode::Opaque;
+
+			bool is_shadow_caster = true;
 
             Uniform uniform;
 

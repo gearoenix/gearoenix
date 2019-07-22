@@ -5,8 +5,8 @@ namespace gearoenix::render::camera {
 class Orthographic : public Camera {
 private:
     core::Real aspects_size = 1.0f;
-    void on_ratio_change() noexcept;
-
+	void update_aspects_size() noexcept;
+	void update_cascades() noexcept;
 protected:
 public:
     Orthographic(

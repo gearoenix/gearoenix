@@ -46,7 +46,7 @@ gearoenix::render::scene::Scene::Scene(
         const std::shared_ptr<n::Manager>& mgr = astmgr->get_##x##_manager();    \
         std::vector<core::Id> ids;                                               \
         f->read(ids);                                                            \
-        if (ids.empty()) {                                                       \
+        if (!ids.empty()) {                                                       \
             core::sync::EndCaller<n::cls> call([c](std::shared_ptr<n::cls>) {}); \
             for (const core::Id id : ids)                                        \
                 add_##x(mgr->get_gx3d(id, call));                                \
