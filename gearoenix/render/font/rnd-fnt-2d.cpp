@@ -24,8 +24,15 @@ gearoenix::render::font::Font2D::Font2D(
 {
 	std::vector<unsigned char> ttf_data;
     f->read(ttf_data);
-	stbtt_InitFont(stb_font, ttf_data.data(), 0);
-    /*baked_texture = e->get_system_application()->get_asset_manager()->get_texture_manager()->create<texture::Texture2D>(c);*/
+#ifdef GX_DEBUG_MODE
+    if (0 ==
+#endif
+        stbtt_InitFont(stb_font, ttf_data.data(), 0)
+#ifdef GX_DEBUG_MODE
+        ) GXLOGF("TTF font failed to load: " << my_id)
+#else
+        ;
+#endif
 }
 
 gearoenix::render::font::Font2D::~Font2D()

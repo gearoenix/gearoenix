@@ -59,9 +59,10 @@ gearoenix::render::camera::Orthographic::Orthographic(
     engine::Engine* const e) noexcept
     : Camera(my_id, f, e)
 {
-    //    f->read(aspects_size);
-    //    c_height = aspects_size;
-    //    on_ratio_change();
+	transformation->set_on_frustum_update([this] { update_cascades(); });
+	f->read(aspects_size);
+	GXLOGD("Aspect size is: " << aspects_size << ", in orthographic camera with id: " << my_id)
+	update_aspects_size();
 }
 
 gearoenix::math::Ray3 gearoenix::render::camera::Orthographic::create_ray3(const core::Real x, const core::Real y) const noexcept
@@ -74,4 +75,16 @@ gearoenix::math::Ray3 gearoenix::render::camera::Orthographic::create_ray3(const
 gearoenix::core::Real gearoenix::render::camera::Orthographic::get_distance(const math::Vec3& model_location) const noexcept
 {
     return (uniform->position - model_location).dot(uniform->z);
+}
+
+void gearoenix::render::camera::Orthographic::set_aspects_size(const core::Real a) noexcept
+{
+	aspects_size = a;
+	update_aspects_size();
+}
+
+void gearoenix::render::camera::Orthographic::set_aspect_ratio(const gearoenix::core::Real ratio) noexcept
+{
+	Camera::set_aspect_ratio(ratio);
+	update_aspects_size();
 }

@@ -7,7 +7,7 @@ namespace render {
     namespace font {
         class Type {
         public:
-            typedef enum : core::Id {
+            typedef enum : core::TypeId {
                 D2 = 1,
                 D3 = 2,
             } Id;

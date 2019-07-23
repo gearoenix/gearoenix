@@ -1,12 +1,11 @@
 #include "rnd-wdg-widget.hpp"
 //#include "../../core/cr-application.hpp"
 //#include "../../core/event/cr-ev-ui-ui.hpp"
-//#include "../../system/stream/sys-stm-stream.hpp"
+#include "../../system/stream/sys-stm-stream.hpp"
 //#include "../../system/sys-app.hpp"
 //#include "../engine/rnd-eng-engine.hpp"
 //#include "rnd-wdg-button.hpp"
-//#include "rnd-wdg-text.hpp"
-//
+#include "rnd-wdg-text.hpp"
 
 //
 //void gearoenix::render::widget::Widget::press_effect()
@@ -108,9 +107,18 @@ gearoenix::render::widget::Widget::~Widget() noexcept
 {
 }
 
-void gearoenix::render::widget::Widget::read_gx3d(const std::shared_ptr<system::stream::Stream>& f, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
+std::shared_ptr<gearoenix::render::widget::Widget> gearoenix::render::widget::Widget::read_gx3d(
+	core::Id my_id, 
+	system::stream::Stream* f, 
+	engine::Engine* e, 
+	const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
 {
-    GXUNIMPLEMENTED;
+	switch (f->read<Type::Id>())
+	{
+	case Type::TEXT:
+		return std::make_shared<Text>(my_id, f, e, c);
+	}
+	GXLOGF("Unexpected widget type in: " << my_id);
 }
 
 void gearoenix::render::widget::Widget::state_change(EventType e) noexcept

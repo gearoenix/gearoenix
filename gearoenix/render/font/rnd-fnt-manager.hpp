@@ -22,7 +22,7 @@ namespace render {
         public:
             Manager(system::stream::Stream* s, engine::Engine* e) noexcept;
             ~Manager() noexcept = default;
-            std::shared_ptr<Font> get(core::Id mid, const core::sync::EndCaller<Font> c) noexcept;
+            std::shared_ptr<Font> get(core::Id mid, core::sync::EndCaller<Font> c) noexcept;
         };
     }
 }
