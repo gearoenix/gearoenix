@@ -23,4 +23,13 @@
         delete (x);       \
         (x) = nullptr;    \
     }
+#define GX_CHECK_NOT_EQAUL(x, y) if ((x) == (y)) GXLOGF("Un-equality check failed.")
+#define GX_CHECK_EQAUL(x, y) if ((x) != (y)) GXLOGF("Equality check failed.")
+#ifdef GX_DEBUG_MODE
+#define GX_CHECK_NOT_EQAUL_D(x, y) GX_CHECK_NOT_EQAUL(x, y)
+#define GX_CHECK_EQAUL_D(x, y) GX_CHECK_EQAUL(x, y)
+#else
+#define GX_CHECK_NOT_EQAUL_D(x, y) {((void)(x)); ((void)(y));}
+#define GX_CHECK_EQAUL_D(x, y) {((void)(x)); ((void)(y));}
+#endif
 #endif
