@@ -35,17 +35,15 @@ gearoenix::render::widget::Text::Text(
     fnt = std::dynamic_pointer_cast<font::Font2D>(astmgr->get_font_manager()->get(f->read<core::Id>(), fend));
     auto mat = std::make_shared<material::Material>(f, e, c);
     core::Real asp = 0.0f;
-    auto txt = fnt->multiline_bake(text, text_color, 1024, 1024, 5, asp, c);
+    auto txt = fnt->multiline_bake(text, text_color, 512, 512, 5, asp, c);
     mat->set_color(txt);
-    mat->set_metallic_factor(0.999);
+    mat->set_metallic_factor(0.001);
     mat->set_roughness_factor(0.999);
     core::sync::EndCaller<mesh::Mesh> mend([c](std::shared_ptr<mesh::Mesh>) {});
     auto msh = astmgr->get_mesh_manager()->create_plate(mend);
     add_mesh(std::make_shared<model::Mesh>(msh, mat));
-    if (asp > 1.0f) {
-        transformation->local_scale(0.7f);
+    if (asp > 1.0f)
         transformation->local_x_scale(asp * 2.0f);
-    }
     else
         GXUNIMPLEMENTED
 }
