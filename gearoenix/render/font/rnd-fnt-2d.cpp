@@ -18,17 +18,16 @@
 
 gearoenix::render::font::Font2D::MultilineTextAspectsInfo gearoenix::render::font::Font2D::compute_multiline_text_aspects(const std::wstring& text) const noexcept
 {
-	bool start_of_line = true;
 	MultilineTextAspectsInfo a;
 	int w = 1;
 	a.height = line_growth + 1;
 	const std::size_t txt_size_less = text.size() - 1;
 	for (std::size_t i = 0; i < txt_size_less;)
 	{
-		const wchar_t c = text[i];
+		const int c = static_cast<int>(text[i]);
 		++i;
-		const wchar_t next_c = text[i];
-		if (c == '\n')
+		const int next_c = static_cast<int>(text[i]);
+		if (c == static_cast<int>('\n'))
 		{
 			a.height += line_growth;
 			w = 1;
@@ -72,13 +71,16 @@ gearoenix::render::font::Font2D::MultilineTextAspectsInfo gearoenix::render::fon
 gearoenix::render::font::Font2D::Font2D(
 	const core::Id my_id,
 	system::stream::Stream* f,
-	std::shared_ptr<texture::Manager> txt_mgr) noexcept
+	const std::shared_ptr<texture::Manager> &txt_mgr) noexcept
     : Font(my_id, Type::D2)
+    , txt_mgr(txt_mgr)
 	, stb_font(new stbtt_fontinfo())
 {
-	std::vector<unsigned char> ttf_data;
     f->read(ttf_data);
 	GX_CHECK_NOT_EQAUL_D(0, stbtt_InitFont(stb_font, ttf_data.data(), 0))
+    stbtt_GetFontVMetrics(stb_font, &ascent, &descent, &line_gap);
+    fnt_height = ascent - descent;
+    line_growth = line_gap + fnt_height;
 }
 
 gearoenix::render::font::Font2D::~Font2D()
@@ -92,7 +94,8 @@ const std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::
 	const int img_width, 
 	const int img_height, 
 	const int img_margin, 
-	core::Real& render_aspect_ratio) const noexcept
+	core::Real& render_aspect_ratio,
+    const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) const noexcept
 {
 	const auto a = compute_multiline_text_aspects(text);
 	const core::Real w_scale = static_cast<core::Real>(img_width - (img_margin << 1)) / static_cast<core::Real>(a.max_width);
@@ -101,7 +104,7 @@ const std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::
 		(h_scale * static_cast<core::Real>(img_margin << 1) + static_cast<core::Real>(a.height));
 
 	core::Real base_line = static_cast<core::Real>(ascent) * h_scale + static_cast<core::Real>(img_margin);
-	std::vector<unsigned char> rnd_data(img_width * img_height);
+	std::vector<unsigned char> rnd_data(static_cast<std::size_t>(img_width) * static_cast<std::size_t>(img_height));
 
 	const core::Real scaled_lg = static_cast<core::Real>(line_growth) * h_scale;
 	const core::Real xpos_start = static_cast<core::Real>(a.max_lsb) * w_scale + static_cast<core::Real>(img_margin);
@@ -145,26 +148,48 @@ const std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::
 	}
 
 	auto color_bytes = reinterpret_cast<const unsigned char*>(&color);
+    const auto pixels_bytes_count = rnd_data.size() << 2;
+	unsigned char * img_pixels = new unsigned char[pixels_bytes_count];
 
-	std::vector<unsigned char> img_pixels(img_width * img_height << 2);
-	int img_index = 0;
-	for (const unsigned char c : rnd_data)
+	for (std::size_t i = 0, ti = 0, img_index = (static_cast<std::size_t>(img_height) - 1) * static_cast<std::size_t>(img_width) << 2; 
+        i < static_cast<std::size_t>(img_height); 
+        ++i, img_index -= (static_cast<std::size_t>(img_width) << 3))
 	{
-		if (c == 0)
-		{
-			img_pixels[img_index++] = 0;
-			img_pixels[img_index++] = 0;
-			img_pixels[img_index++] = 0;
-			img_pixels[img_index++] = 0;
-		}
-		else
-		{
-			img_pixels[img_index++] = color_bytes[0];
-			img_pixels[img_index++] = color_bytes[1];
-			img_pixels[img_index++] = color_bytes[2];
-			img_pixels[img_index++] = static_cast<unsigned char>((static_cast<int>(c) * static_cast<int>(color_bytes[3])) >> 8);
-		}
+        for (std::size_t j = 0; j < static_cast<std::size_t>(img_width); ++j, ++ti)
+        {
+            const int c = static_cast<int>(rnd_data[ti]);
+            if (c == 0)
+            {
+                img_pixels[img_index] = 0;
+                ++img_index;
+                img_pixels[img_index] = 0;
+                ++img_index;
+                img_pixels[img_index] = 0;
+                ++img_index;
+                img_pixels[img_index] = 0;
+                ++img_index;
+            }
+            else
+            {
+                img_pixels[img_index] = color_bytes[0];
+                ++img_index;
+                img_pixels[img_index] = color_bytes[1];
+                ++img_index;
+                img_pixels[img_index] = color_bytes[2];
+                ++img_index;
+                img_pixels[img_index] = static_cast<unsigned char>((static_cast<int>(c) * static_cast<int>(color_bytes[3])) >> 8);
+                ++img_index;
+            }
+        }
 	}
-	GXUNIMPLEMENTED
-	return nullptr;
+    texture::Info txt_info{};
+    txt_info.f = texture::TextureFormat::RGBA_UINT8;
+    txt_info.s.mag_filter = texture::Filter::LINEAR;
+    txt_info.s.min_filter = texture::Filter::LINEAR;
+    txt_info.s.wrap_r = texture::Wrap::CLAMP_TO_EDGE;
+    txt_info.s.wrap_s = texture::Wrap::CLAMP_TO_EDGE;
+    txt_info.s.wrap_t = texture::Wrap::CLAMP_TO_EDGE;
+    txt_info.t = texture::Type::TEXTURE_2D;
+    core::sync::EndCaller<texture::Texture2D> tend([end](std::shared_ptr<texture::Texture2D>) {});
+    return txt_mgr->create_2d(img_pixels, txt_info, img_width, img_height, tend);
 }

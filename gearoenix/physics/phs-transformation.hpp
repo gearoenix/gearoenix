@@ -27,7 +27,8 @@ namespace physics {
         virtual void local_x_rotate(core::Real d) noexcept;
         virtual void local_y_rotate(core::Real d) noexcept;
         virtual void local_z_rotate(core::Real d) noexcept;
-        virtual void scale(core::Real s) noexcept;
+        virtual void local_scale(core::Real s) noexcept;
+        virtual void local_x_scale(core::Real s) noexcept;
         virtual void set_orientation(const math::Quat& q) noexcept;
     };
 }

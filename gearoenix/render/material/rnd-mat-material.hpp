@@ -50,6 +50,7 @@ namespace render {
             void set_color(
                 core::Real r, core::Real g, core::Real b,
                 const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept;
+            void set_color(std::shared_ptr<texture::Texture2D> color) noexcept;
         };
     }
 }

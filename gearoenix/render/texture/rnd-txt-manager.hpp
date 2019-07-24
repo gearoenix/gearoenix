@@ -3,6 +3,7 @@
 #include "../../core/cache/cr-cache-file.hpp"
 #include "../../core/sync/cr-sync-end-caller.hpp"
 #include "../../math/math-vector.hpp"
+#include "rnd-txt-info.hpp"
 #include <map>
 #include <memory>
 
@@ -37,10 +38,13 @@ namespace render {
             std::shared_ptr<Texture2D> get_2d(const math::Vec3& color, core::sync::EndCaller<Texture2D>& c) noexcept;
             std::shared_ptr<Texture2D> get_2d(const math::Vec2& color, core::sync::EndCaller<Texture2D>& c) noexcept;
             std::shared_ptr<Texture2D> get_2d(core::Real value, core::sync::EndCaller<Texture2D>& c) noexcept;
+            /// It will take ownership of data
+            std::shared_ptr<Texture2D> create_2d(unsigned char *data, const Info& info, int img_width, int img_height, core::sync::EndCaller<Texture2D>& c) noexcept;
             std::shared_ptr<Cube> get_cube(const math::Vec4& color, core::sync::EndCaller<Cube>& c) noexcept;
             std::shared_ptr<Cube> get_cube(const math::Vec3& color, core::sync::EndCaller<Cube>& c) noexcept;
             std::shared_ptr<Cube> get_cube(const math::Vec2& color, core::sync::EndCaller<Cube>& c) noexcept;
             std::shared_ptr<Texture> get_gx3d(core::Id id, core::sync::EndCaller<Texture>& c) noexcept;
+            engine::Engine* get_engine() const noexcept;
         };
     }
 }

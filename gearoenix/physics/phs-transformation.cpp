@@ -89,7 +89,12 @@ void gearoenix::physics::Transformation::local_z_rotate(const core::Real) noexce
     GXUNIMPLEMENTED;
 }
 
-void gearoenix::physics::Transformation::scale(const core::Real) noexcept
+void gearoenix::physics::Transformation::local_scale(const core::Real) noexcept
+{
+    GXUNIMPLEMENTED;
+}
+
+void gearoenix::physics::Transformation::local_x_scale(const core::Real) noexcept
 {
     GXUNIMPLEMENTED;
 }

@@ -14,6 +14,7 @@ protected:
     Alignment::Id align;;
     std::shared_ptr<font::Font2D> fnt;
 	core::Id text_mesh_id;
+    std::uint32_t text_color = 0xFFFFFFFF;
 
 public:
     Text(

@@ -138,3 +138,8 @@ void gearoenix::render::material::Material::set_color(
     const std::shared_ptr<texture::Manager>& txtmgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
     color = txtmgr->get_2d(math::Vec3(r, g, b), calltxt2d);
 }
+
+void gearoenix::render::material::Material::set_color(std::shared_ptr<texture::Texture2D> color) noexcept
+{
+    this->color = std::move(color);
+}

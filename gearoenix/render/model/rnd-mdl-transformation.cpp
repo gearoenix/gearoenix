@@ -14,8 +14,14 @@ void gearoenix::render::model::Transformation::set_location(const math::Vec3& l)
     sphere->position = l;
 }
 
-void gearoenix::render::model::Transformation::scale(const core::Real s) noexcept
+void gearoenix::render::model::Transformation::local_scale(const core::Real s) noexcept
 {
     uniform->m.local_scale(s);
+    sphere->radius *= s;
+}
+
+void gearoenix::render::model::Transformation::local_x_scale(const core::Real s) noexcept
+{
+    uniform->m.local_scale(s, 1.0f, 1.0f);
     sphere->radius *= s;
 }
