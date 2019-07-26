@@ -92,7 +92,7 @@ GameApp::GameApp(const std::shared_ptr<gearoenix::system::Application> &sys_app)
         mdl->add_mesh(std::make_shared<GxMdMesh>(plate_mesh, mat));
         auto &trans = mdl->get_transformation();
         trans->set_location(GxVec3(0.0f, 0.0f, -5.0f));
-        trans->scale(14.0f);
+        trans->local_scale(14.0f);
         scn->add_model(mdl);
     }
     for (gearoenix::core::Real y = -10.0f, roughness = 0.1f; y < 10.1f; y += 2.5f, roughness += 0.1f)
