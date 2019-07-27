@@ -141,9 +141,9 @@ void gearoenix::system::Application::create_window() noexcept
 
 int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_Event* e) noexcept
 {
+    core::event::Data event;
     // It's gonna implement whenever needed and as much as needed.
     auto* o = static_cast<Application*>(user_data);
-    core::event::Event* event = nullptr;
     switch (e->type) {
     case SDL_APP_WILLENTERBACKGROUND:
         o->running = false;
@@ -248,6 +248,14 @@ int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_
     case SDL_WINDOWEVENT:
         switch (e->window.event) {
         case SDL_WINDOWEVENT_RESIZED:
+        {
+            core::event::system::WindowSizeChangeData d;
+            d.pre_width = static_cast<core::Real>(o->win_width);
+            d.pre_height = static_cast<core::Real>(o->win_height);
+            d.cur_width = static_cast<core::Real>(e->window.data1);
+            d.cur_height = static_cast<core::Real>(e->window.data2);
+
+
             /*event = new core::event::WindowResize(
                 static_cast<core::Real>(o->win_width),
                 static_cast<core::Real>(o->win_height),
@@ -258,6 +266,7 @@ int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_
             o->screen_ratio = static_cast<core::Real>(o->win_width) / static_cast<core::Real>(o->win_height);
             o->half_height_inversed = 2.0f / static_cast<core::Real>(o->win_height);
             break;
+        }
         default:
             GXTODO
             break;
@@ -267,13 +276,13 @@ int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_
         GXLOGE("Unhandled event " << e->type)
         break;
     }
-    if (event != nullptr) {
-        // TODO: new event system must be implemented
-        GXTODO
-        // o->render_engine->on_event(*event);
-        //o->core_app->on_event(*event);
-        delete event;
-    }
+    //if (event != nullptr) {
+    //    // TODO: new event system must be implemented
+    //    GXTODO
+    //    // o->render_engine->on_event(*event);
+    //    //o->core_app->on_event(*event);
+    //    delete event;
+    //}
     return 1;
 }
 
