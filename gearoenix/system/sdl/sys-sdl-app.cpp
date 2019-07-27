@@ -153,13 +153,13 @@ int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_
     case SDL_KEYDOWN:
         switch (e->key.keysym.sym) {
         case SDLK_LEFT:
-            event = new core::event::button::Keyboard(core::event::button::Keyboard::LEFT, core::event::button::Keyboard::PRESS);
+            //event = new core::event::button::Keyboard(core::event::button::Keyboard::LEFT, core::event::button::Keyboard::PRESS);
             break;
         case SDLK_RIGHT:
-            event = new core::event::button::Keyboard(core::event::button::Keyboard::RIGHT, core::event::button::Keyboard::PRESS);
+            //event = new core::event::button::Keyboard(core::event::button::Keyboard::RIGHT, core::event::button::Keyboard::PRESS);
             break;
         case SDLK_UP:
-            event = new core::event::button::Keyboard(core::event::button::Keyboard::UP, core::event::button::Keyboard::PRESS);
+            //event = new core::event::button::Keyboard(core::event::button::Keyboard::UP, core::event::button::Keyboard::PRESS);
             break;
         case SDLK_ESCAPE:
             o->running = false;
@@ -209,35 +209,35 @@ int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_
     case SDL_MOUSEMOTION: {
         const core::Real x = o->convert_x_to_ratio(e->button.x);
         const core::Real y = o->convert_y_to_ratio(e->button.y);
-        event = new core::event::movement::Mouse(x, y, o->pre_x, o->pre_y);
+        //event = new core::event::movement::Mouse(x, y, o->pre_x, o->pre_y);
         o->pre_x = x;
         o->pre_y = y;
         break;
     }
     case SDL_MOUSEBUTTONUP:
     case SDL_MOUSEBUTTONDOWN: {
-        core::event::button::Button::ActionType a = core::event::button::Button::ActionType::PRESS;
+        //core::event::button::Button::ActionType a = core::event::button::Button::ActionType::PRESS;
         switch (e->type) {
         case SDL_MOUSEBUTTONUP:
-            a = core::event::button::Button::ActionType::RELEASE;
+            //a = core::event::button::Button::ActionType::RELEASE;
             break;
         default:
             break;
         }
-        core::event::button::Button::KeyType k = core::event::button::Button::KeyType::LEFT;
+        //core::event::button::Button::KeyType k = core::event::button::Button::KeyType::LEFT;
         switch (e->button.button) {
         case SDL_BUTTON_RIGHT:
-            k = core::event::button::Button::KeyType::RIGHT;
+            //k = core::event::button::Button::KeyType::RIGHT;
             break;
         case SDL_BUTTON_MIDDLE:
-            k = core::event::button::Button::KeyType::MIDDLE;
+            //k = core::event::button::Button::KeyType::MIDDLE;
             break;
         default:
             break;
         }
         const core::Real x = o->convert_x_to_ratio(e->button.x);
         const core::Real y = o->convert_y_to_ratio(e->button.y);
-        event = new core::event::button::Mouse(k, a, x, y);
+        //event = new core::event::button::Mouse(k, a, x, y);
         break;
     }
     case SDL_MULTIGESTURE:
@@ -250,11 +250,11 @@ int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_
     case SDL_WINDOWEVENT:
         switch (e->window.event) {
         case SDL_WINDOWEVENT_RESIZED:
-            event = new core::event::WindowResize(
+            /*event = new core::event::WindowResize(
                 static_cast<core::Real>(o->win_width),
                 static_cast<core::Real>(o->win_height),
                 static_cast<core::Real>(e->window.data1),
-                static_cast<core::Real>(e->window.data2));
+                static_cast<core::Real>(e->window.data2));*/
             o->win_width = static_cast<unsigned int>(e->window.data1);
             o->win_height = static_cast<unsigned int>(e->window.data2);
             o->screen_ratio = static_cast<core::Real>(o->win_width) / static_cast<core::Real>(o->win_height);

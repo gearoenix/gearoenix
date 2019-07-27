@@ -22,7 +22,7 @@ private:
 	State state;
 	sync::Semaphore signaler;
 	std::mutex guard;
-	std::map<Id::Type, std::map<core::Real, std::set<std::shared_ptr<Listner>>>> events_id_priority_listners;
+	std::map<Id, std::map<core::Real, std::set<std::shared_ptr<Listner>>>> events_id_priority_listners;
 	std::thread event_thread;
 
 	void loop() noexcept;
@@ -30,12 +30,12 @@ private:
 public:
 	Engine() noexcept;
 	~Engine() noexcept;
-	void add_listner(Id::Type event_id, core::Real priority, const std::shared_ptr<Listner>& listner) noexcept;
+	void add_listner(Id event_id, core::Real priority, const std::shared_ptr<Listner>& listner) noexcept;
 	// Best function to remove listner
-	void remove_listner(Id::Type event_id, core::Real priority, const std::shared_ptr<Listner>& listner) noexcept;
-	void remove_listner(Id::Type event_id, const std::shared_ptr<Listner>& listner) noexcept;
+	void remove_listner(Id event_id, core::Real priority, const std::shared_ptr<Listner>& listner) noexcept;
+	void remove_listner(Id event_id, const std::shared_ptr<Listner>& listner) noexcept;
 	void remove_listner(const std::shared_ptr<Listner>& listner) noexcept;
-	void braodcast(Id::Type event_id, Data event_data) noexcept;
+	void braodcast(Id event_id, Data event_data) noexcept;
 };
 }
 #endif

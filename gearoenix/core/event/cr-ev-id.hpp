@@ -1,11 +1,28 @@
 #ifndef GEAROENIX_CORE_EVENT_ID_HPP
 #define GEAROENIX_CORE_EVENT_ID_HPP
 namespace gearoenix::core::event {
-struct Id {
-	Id() = delete;
-	typedef enum {
-
-	} Type;
+enum struct Id {
+    BUTTON_MOUSE,
+    BUTTON_KEYBOARD,
+    MOVEMENT_MOUSE,
+    SYSTEM_PAUSE,
+    SYSTEM_QUIT,
+    SYSTEM_RELOAD,
+    SYSTEM_RESUME,
+    SYSTEM_UNLOAD,
+    SYSTEM_WINDOW_SIZE_CHANGE,
+    UI_PRESSED,
+    UI_PRESS_CANCELED,
+    UI_RELEASED,
+    UI_CLICKED,
+    UI_DOUBLE_CLICKED,
+    UI_TRIPLE_CLICKED,
+    UI_HOVER_IN,
+    UI_HOVER_ON,
+    UI_HOVER_OUT,
+    UI_DRAGGED_IN,
+    UI_DRAGGED_ON,
+    UI_DRAGGED_TO,
 };
 }
 #endif
