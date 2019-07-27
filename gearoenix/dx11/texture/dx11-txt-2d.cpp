@@ -13,7 +13,7 @@ gearoenix::dx11::texture::Texture2D::Texture2D(core::Id my_id, system::stream::S
     unsigned int imgw, imgh;
     render::texture::PNG::decode(file, img_data, imgw, imgh);
     D3D11_TEXTURE2D_DESC desc;
-    GXSETZ(desc);
+    GX_SET_ZERO(desc);
     desc.Width = imgw;
     desc.Height = imgh;
     desc.ArraySize = 1;
@@ -23,7 +23,7 @@ gearoenix::dx11::texture::Texture2D::Texture2D(core::Id my_id, system::stream::S
     desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
     desc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
     D3D11_SHADER_RESOURCE_VIEW_DESC sdesc;
-    GXSETZ(sdesc);
+    GX_SET_ZERO(sdesc);
     sdesc.Format = desc.Format;
     sdesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
     sdesc.Texture2D.MipLevels = -1;

@@ -58,15 +58,15 @@ void gearoenix::render::engine::Engine::update() noexcept
 
 void gearoenix::render::engine::Engine::terminate() noexcept
 {
-    GXDELETE(physics_engine)
-    GXDELETE(kernels)
-    GXDELETE(render_tree)
+    GX_DELETE(physics_engine)
+    GX_DELETE(kernels)
+    GX_DELETE(render_tree)
     main_render_target = nullptr;
     frame_node = nullptr;
-    GXDELETE(pipeline_manager)
-    GXDELETE(command_manager)
-    GXDELETE(sampler_manager)
-    GXDELETE(buffer_manager)
+    GX_DELETE(pipeline_manager)
+    GX_DELETE(command_manager)
+    GX_DELETE(sampler_manager)
+    GX_DELETE(buffer_manager)
     if (fun_loader != nullptr) {
         fun_loader->unload();
         delete fun_loader;

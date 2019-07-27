@@ -250,7 +250,7 @@ gearoenix::system::Application::Application()
     screen_height = GetSystemMetrics(SM_CYSCREEN);
 #ifdef GEAROENIX_FULLSCREEN
     DEVMODE screen_settings;
-    GXSETZ(screen_settings);
+    GX_SET_ZERO(screen_settings);
     screen_settings.dmSize = sizeof(screen_settings);
     screen_settings.dmPelsWidth = (unsigned long)screen_width;
     screen_settings.dmPelsHeight = (unsigned long)screen_height;

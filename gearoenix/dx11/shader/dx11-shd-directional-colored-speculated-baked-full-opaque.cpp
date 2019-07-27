@@ -108,11 +108,11 @@ gearoenix::dx11::shader::DirectionalColoredSpeculatedBakedFullOpaque::Directiona
                            "    return final_color;\n"
                            "}\n";
         std::vector<D3D11_INPUT_ELEMENT_DESC> desc(2);
-        GXSETZ(desc[0]);
+        GX_SET_ZERO(desc[0]);
         desc[0].SemanticName = "POSITION";
         desc[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
         desc[0].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-        GXSETZ(desc[1]);
+        GX_SET_ZERO(desc[1]);
         desc[1].SemanticName = "NORMAL";
         desc[1].Format = DXGI_FORMAT_R32G32B32_FLOAT;
         desc[1].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;

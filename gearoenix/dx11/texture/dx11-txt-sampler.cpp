@@ -8,7 +8,7 @@ gearoenix::dx11::texture::Sampler::Sampler(Engine* engine)
     : engine(engine)
 {
     D3D11_SAMPLER_DESC sampdes;
-    GXSETZ(sampdes);
+    GX_SET_ZERO(sampdes);
     sampdes.Filter = D3D11_FILTER_ANISOTROPIC;
     sampdes.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
     sampdes.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;

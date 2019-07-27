@@ -42,7 +42,7 @@ void gearoenix::dx11::Engine::initial_screen()
     back_buffer_ptr->Release();
     back_buffer_ptr = nullptr;
     D3D11_TEXTURE2D_DESC depth_buffer_desc;
-    GXSETZ(depth_buffer_desc);
+    GX_SET_ZERO(depth_buffer_desc);
     depth_buffer_desc.Width = sys_app->get_width();
     depth_buffer_desc.Height = sys_app->get_height();
     depth_buffer_desc.MipLevels = 1;
@@ -55,7 +55,7 @@ void gearoenix::dx11::Engine::initial_screen()
     depth_buffer_desc.MiscFlags = 0;
     GXHRCHK(device->CreateTexture2D(&depth_buffer_desc, NULL, &main_dsb));
     D3D11_DEPTH_STENCIL_VIEW_DESC depth_stencil_view_desc;
-    GXSETZ(depth_stencil_view_desc);
+    GX_SET_ZERO(depth_stencil_view_desc);
     depth_stencil_view_desc.Format = depth_buffer_desc.Format;
     depth_stencil_view_desc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DMS;
     depth_stencil_view_desc.Texture2D.MipSlice = 0;
@@ -81,7 +81,7 @@ void gearoenix::dx11::Engine::terminate_screen()
 void gearoenix::dx11::Engine::initial_shadow()
 {
     D3D11_TEXTURE2D_DESC tdesc;
-    GXSETZ(tdesc);
+    GX_SET_ZERO(tdesc);
     tdesc.Width = SHADOW_WIDTH;
     tdesc.Height = SHADOW_WIDTH;
     tdesc.MipLevels = 1;
@@ -93,20 +93,20 @@ void gearoenix::dx11::Engine::initial_shadow()
     ID3D11Texture2D* txt = nullptr;
     GXHRCHK(device->CreateTexture2D(&tdesc, nullptr, &txt));
     D3D11_RENDER_TARGET_VIEW_DESC rdesc;
-    GXSETZ(rdesc);
+    GX_SET_ZERO(rdesc);
     rdesc.Format = tdesc.Format;
     rdesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
     rdesc.Texture2D.MipSlice = 0;
     GXHRCHK(device->CreateRenderTargetView(txt, &rdesc, &shadow_rtv));
     D3D11_SHADER_RESOURCE_VIEW_DESC sdesc;
-    GXSETZ(sdesc);
+    GX_SET_ZERO(sdesc);
     sdesc.Format = tdesc.Format;
     sdesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
     sdesc.Texture2D.MipLevels = 1;
     ID3D11ShaderResourceView* shadow_srv;
     GXHRCHK(device->CreateShaderResourceView(txt, &sdesc, &shadow_srv));
     shadow_txt = new texture::Texture2D(sys_app->get_asset_manager()->create_id(), this, shadow_srv);
-    GXSETZ(tdesc);
+    GX_SET_ZERO(tdesc);
     tdesc.Width = SHADOW_WIDTH;
     tdesc.Height = SHADOW_WIDTH;
     tdesc.MipLevels = 1;
@@ -117,7 +117,7 @@ void gearoenix::dx11::Engine::initial_shadow()
     tdesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
     GXHRCHK(device->CreateTexture2D(&tdesc, nullptr, &shadow_dsb));
     D3D11_DEPTH_STENCIL_VIEW_DESC ddesc;
-    GXSETZ(ddesc);
+    GX_SET_ZERO(ddesc);
     ddesc.Format = tdesc.Format;
     ddesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
     ddesc.Texture2D.MipSlice = 0;
@@ -130,7 +130,7 @@ void gearoenix::dx11::Engine::initial_shadow()
     shadow_viewport.TopLeftY = 0.0f;
     txt->Release();
     D3D11_BLEND_DESC blend_desc;
-    GXSETZ(blend_desc);
+    GX_SET_ZERO(blend_desc);
     blend_desc.RenderTarget[0].BlendEnable = false;
     blend_desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
     GXHRCHK(device->CreateBlendState(&blend_desc, &shadow_bs));
@@ -165,7 +165,7 @@ void gearoenix::dx11::Engine::terminate_shadow()
 gearoenix::dx11::Engine::Engine(system::Application* sys_app)
     : render::Engine(sys_app)
 {
-    GXSETZ(sample);
+    GX_SET_ZERO(sample);
     sample.Count = 1;
     IDXGIFactory* factory = nullptr;
     IDXGIAdapter* adapter = nullptr;
@@ -219,7 +219,7 @@ adapter_found_label:
     if (factory != nullptr)
         factory->Release();
     DXGI_SWAP_CHAIN_DESC swap_chain_desc;
-    GXSETZ(swap_chain_desc);
+    GX_SET_ZERO(swap_chain_desc);
     swap_chain_desc.BufferCount = 1;
     swap_chain_desc.BufferDesc.Width = sys_app->get_width();
     swap_chain_desc.BufferDesc.Height = sys_app->get_height();
@@ -282,7 +282,7 @@ adapter_found_label:
         &device, nullptr, &context));
     initial_screen();
     D3D11_DEPTH_STENCIL_DESC depth_stencil_desc;
-    GXSETZ(depth_stencil_desc);
+    GX_SET_ZERO(depth_stencil_desc);
     depth_stencil_desc.DepthEnable = true;
     depth_stencil_desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
     depth_stencil_desc.DepthFunc = D3D11_COMPARISON_LESS;
@@ -300,7 +300,7 @@ adapter_found_label:
     GXHRCHK(device->CreateDepthStencilState(&depth_stencil_desc, &main_dss));
     context->OMSetDepthStencilState(main_dss, 1);
     D3D11_BLEND_DESC blend_desc;
-    GXSETZ(blend_desc);
+    GX_SET_ZERO(blend_desc);
     blend_desc.RenderTarget[0].BlendEnable = true;
     blend_desc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
     blend_desc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
@@ -311,7 +311,7 @@ adapter_found_label:
     blend_desc.RenderTarget[0].RenderTargetWriteMask = 0X0F;
     GXHRCHK(device->CreateBlendState(&blend_desc, &main_bs));
     D3D11_RASTERIZER_DESC raster_desc;
-    GXSETZ(raster_desc);
+    GX_SET_ZERO(raster_desc);
     raster_desc.AntialiasedLineEnable = true;
     raster_desc.CullMode = D3D11_CULL_BACK;
     raster_desc.DepthBiasClamp = 0.0f;

@@ -44,13 +44,13 @@ gearoenix::gles2::texture::Cube::Cube(
         cf = GL_RGBA;
         const gl::sizei pixel_size = gaspect * gaspect * 4;
         const auto* const rdata = reinterpret_cast<const core::Real*>(data);
-        pixels = new std::uint8_t*[GXCOUNTOF(FACES)];
+        pixels = new std::uint8_t*[GX_COUNT_OF(FACES)];
         std::uint8_t p[4];
         p[0] = static_cast<std::uint8_t>(rdata[0] * 255.1f);
         p[1] = static_cast<std::uint8_t>(rdata[1] * 255.1f);
         p[2] = static_cast<std::uint8_t>(rdata[2] * 255.1f);
         p[3] = static_cast<std::uint8_t>(rdata[3] * 255.1f);
-        for (int fi = 0; fi < static_cast<int>(GXCOUNTOF(FACES)); ++fi) {
+        for (int fi = 0; fi < static_cast<int>(GX_COUNT_OF(FACES)); ++fi) {
             pixels[fi] = new std::uint8_t[pixel_size];
             for (gl::sizei i = 0; i < pixel_size;)
                 for (int j = 0; j < 4; ++j, ++i)
@@ -65,14 +65,14 @@ gearoenix::gles2::texture::Cube::Cube(
         gl::Loader::tex_parameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, sample_info.min_filter);
         gl::Loader::tex_parameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, sample_info.wrap_s);
         gl::Loader::tex_parameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, sample_info.wrap_t);
-        for (int fi = 0; fi < static_cast<int>(GXCOUNTOF(FACES)); ++fi) {
+        for (int fi = 0; fi < static_cast<int>(GX_COUNT_OF(FACES)); ++fi) {
             gl::Loader::tex_image_2d(FACES[fi], 0, static_cast<gl::sint>(cf), gaspect, gaspect, 0, cf, GL_UNSIGNED_BYTE, pixels[fi]);
         }
         gl::Loader::check_for_error();
         gl::Loader::generate_mipmap(GL_TEXTURE_CUBE_MAP);
         // It clears the errors, some drivers does not support mip-map generation for cube texture
         gl::Loader::get_error();
-        for (int fi = 0; fi < static_cast<int>(GXCOUNTOF(FACES)); ++fi) {
+        for (int fi = 0; fi < static_cast<int>(GX_COUNT_OF(FACES)); ++fi) {
             delete[] pixels[fi];
         }
         delete[] pixels;

@@ -40,7 +40,7 @@ gearoenix::dx11::shader::Depth::Depth(core::Id my_id, Engine* eng, core::sync::E
                                          "    return output;\n"
                                          "}\n";
         D3D11_INPUT_ELEMENT_DESC desc;
-        GXSETZ(desc);
+        GX_SET_ZERO(desc);
         desc.SemanticName = "POSITION";
         desc.Format = DXGI_FORMAT_R32G32B32_FLOAT;
         desc.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;

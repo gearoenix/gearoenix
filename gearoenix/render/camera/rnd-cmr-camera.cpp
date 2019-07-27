@@ -18,7 +18,7 @@ gearoenix::render::camera::Camera::Camera(const core::Id my_id, engine::Engine* 
     , frustum(new math::ProjectorFrustum(math::Mat4x4()))
     , uniform_buffers(new buffer::FramedUniform(sizeof(Uniform), e))
     , cascaded_shadow_frustum_partitions(new std::vector<std::array<math::Vec3, 4>>(
-          e->get_system_application()->get_configuration().render_config.shadow_cascades_count + 1))
+        static_cast<std::size_t>(e->get_system_application()->get_configuration().render_config.shadow_cascades_count) + 1))
 {
     transformation = std::make_shared<Transformation>(uniform, frustum, cascaded_shadow_frustum_partitions);
     uniform->aspect_ratio = e->get_system_application()->get_window_ratio();
@@ -34,7 +34,7 @@ gearoenix::render::camera::Camera::Camera(
     , frustum(new math::ProjectorFrustum(math::Mat4x4()))
     , uniform_buffers(new buffer::FramedUniform(sizeof(Uniform), e))
     , cascaded_shadow_frustum_partitions(new std::vector<std::array<math::Vec3, 4>>(
-          e->get_system_application()->get_configuration().render_config.shadow_cascades_count + 1))
+          static_cast<std::size_t>(e->get_system_application()->get_configuration().render_config.shadow_cascades_count) + 1))
 {
     transformation = std::make_shared<Transformation>(uniform, frustum, cascaded_shadow_frustum_partitions);
     uniform->aspect_ratio = e->get_system_application()->get_window_ratio();

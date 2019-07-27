@@ -23,7 +23,7 @@ gearoenix::dx11::texture::Cube::Cube(core::Id my_id, system::stream::Stream* fil
         }
     }
     D3D11_TEXTURE2D_DESC desc;
-    GXSETZ(desc);
+    GX_SET_ZERO(desc);
     desc.Width = imgw;
     desc.Height = imgh;
     desc.MipLevels = 1;
@@ -34,7 +34,7 @@ gearoenix::dx11::texture::Cube::Cube(core::Id my_id, system::stream::Stream* fil
     desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
     desc.MiscFlags = D3D11_RESOURCE_MISC_TEXTURECUBE;
     D3D11_SHADER_RESOURCE_VIEW_DESC sdesc;
-    GXSETZ(sdesc);
+    GX_SET_ZERO(sdesc);
     sdesc.Format = desc.Format;
     sdesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
     sdesc.TextureCube.MipLevels = 1;
@@ -43,7 +43,7 @@ gearoenix::dx11::texture::Cube::Cube(core::Id my_id, system::stream::Stream* fil
         ID3D11DeviceContext* ctx = static_cast<Engine*>(render_engine)->get_context();
         ID3D11Texture2D* txt = nullptr;
         D3D11_SUBRESOURCE_DATA facesdata[FACES_COUNT];
-        GXSETARRZ(facesdata);
+        GX_SET_ARRAY_ZERO(facesdata);
         facesdata[0].pSysMem = img_data[2].data();
         facesdata[0].SysMemPitch = desc.Width * 4;
         facesdata[1].pSysMem = img_data[3].data();

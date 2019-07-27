@@ -45,7 +45,7 @@ gearoenix::dx11::shader::SkyboxBasic::SkyboxBasic(core::Id my_id, Engine* eng, c
                                          "    return output;\n"
                                          "}\n";
         std::vector<D3D11_INPUT_ELEMENT_DESC> desc(1);
-        GXSETZ(desc[0]);
+        GX_SET_ZERO(desc[0]);
         desc[0].SemanticName = "POSITION";
         desc[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
         desc[0].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;

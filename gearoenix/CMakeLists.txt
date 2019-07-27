@@ -36,6 +36,7 @@ SET (GX_ENGINE_SRC
     "${GX_ENGINE_SRC_DIR}core/event/cr-ev-engine.hpp"
     "${GX_ENGINE_SRC_DIR}core/event/cr-ev-event.hpp"
     "${GX_ENGINE_SRC_DIR}core/event/cr-ev-id.hpp"
+    "${GX_ENGINE_SRC_DIR}core/event/cr-ev-listner.hpp"
     "${GX_ENGINE_SRC_DIR}core/event/cr-ev-mv-movement.hpp"
     "${GX_ENGINE_SRC_DIR}core/event/cr-ev-sys-system.hpp"
     "${GX_ENGINE_SRC_DIR}core/event/cr-ev-ui-ui.hpp"

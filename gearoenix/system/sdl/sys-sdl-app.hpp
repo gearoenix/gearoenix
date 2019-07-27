@@ -15,6 +15,9 @@ namespace core {
     namespace asset {
         class Manager;
     }
+    namespace event {
+        class Engine;
+    }
     class Application;
 }
 namespace render::engine {
@@ -34,6 +37,7 @@ namespace system {
         std::shared_ptr<render::engine::Engine> render_engine = nullptr;
         std::shared_ptr<core::Application> core_app = nullptr;
         std::shared_ptr<core::asset::Manager> astmgr = nullptr;
+        core::event::Engine* event_engine = nullptr;
 
         unsigned int win_width = 0;
         unsigned int win_height = 0;

@@ -6,21 +6,23 @@
 #endif
 
 #include "../../core/asset/cr-asset-manager.hpp"
+#include "../../core/event/cr-ev-engine.hpp"
 #include "../../core/cr-application.hpp"
+#include "../../core/cr-static.hpp"
 #include "../../core/cr-types.hpp"
 #include "../../core/event/cr-ev-event.hpp"
 #include "../../gl/gl-loader.hpp"
-#if defined(GX_USE_OPENGL_ES2)
+#include "../sys-configuration.hpp"
+#include "../sys-log.hpp"
+#ifdef GX_USE_OPENGL_ES2
 #include "../../gles2/engine/gles2-eng-engine.hpp"
 #endif
 #ifdef GX_USE_OPENGL_CLASS_3
 #include "../../glc3/engine/glc3-eng-engine.hpp"
 #endif
-#if defined(GX_USE_VULKAN)
+#ifdef GX_USE_VULKAN
 #include "../../vulkan/engine/vk-eng-engine.hpp"
 #endif
-#include "../sys-configuration.hpp"
-#include "../sys-log.hpp"
 #include <iostream>
 
 #ifdef GX_IN_WEB
@@ -336,6 +338,7 @@ const std::shared_ptr<gearoenix::system::Application> gearoenix::system::Applica
         GXLOGF("No suitable render engine found.")
     }
     result->astmgr = std::make_shared<core::asset::Manager>(result, GX_APP_DATA_NAME);
+    result->event_engine = new core::event::Engine();
     return result;
 }
 
@@ -344,6 +347,7 @@ gearoenix::system::Application::~Application() noexcept
     core_app = nullptr;
     astmgr = nullptr;
     render_engine = nullptr;
+    GX_DELETE(event_engine)
     GXLOGD("Main application (SDL2) has been deleted.")
 }
 
