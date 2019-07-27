@@ -3,7 +3,6 @@
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../core/event/cr-ev-event.hpp"
 #include "../../core/event/cr-ev-sys-system.hpp"
-#include "../../core/event/cr-ev-window-resize.hpp"
 #include "../../core/sync/cr-sync-end-caller.hpp"
 #include "../../gl/gl-constants.hpp"
 #include "../../gl/gl-loader.hpp"

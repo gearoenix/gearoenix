@@ -8,11 +8,7 @@
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../core/cr-application.hpp"
 #include "../../core/cr-types.hpp"
-#include "../../core/event/cr-ev-bt-keyboard.hpp"
-#include "../../core/event/cr-ev-bt-mouse.hpp"
 #include "../../core/event/cr-ev-event.hpp"
-#include "../../core/event/cr-ev-mv-mouse.hpp"
-#include "../../core/event/cr-ev-window-resize.hpp"
 #include "../../gl/gl-loader.hpp"
 #if defined(GX_USE_OPENGL_ES2)
 #include "../../gles2/engine/gles2-eng-engine.hpp"

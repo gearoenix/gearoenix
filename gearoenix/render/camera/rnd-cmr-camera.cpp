@@ -1,6 +1,5 @@
 #include "rnd-cmr-camera.hpp"
 #include "../../core/event/cr-ev-event.hpp"
-#include "../../core/event/cr-ev-window-resize.hpp"
 #include "../../math/math-projector-frustum.hpp"
 #include "../../math/math-quaternion.hpp"
 #include "../../system/stream/sys-stm-stream.hpp"

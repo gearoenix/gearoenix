@@ -2,7 +2,6 @@
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../core/cr-static.hpp"
 #include "../../core/event/cr-ev-event.hpp"
-#include "../../core/event/cr-ev-window-resize.hpp"
 #include "../../render/engine/rnd-eng-engine.hpp"
 #include "../../render/model/rnd-mdl-model.hpp"
 #include "../../system/stream/sys-stm-stream.hpp"

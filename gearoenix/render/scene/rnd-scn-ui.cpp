@@ -1,7 +1,5 @@
 #include "rnd-scn-ui.hpp"
-#include "../../core/event/cr-ev-bt-mouse.hpp"
 #include "../../core/event/cr-ev-event.hpp"
-#include "../../core/event/cr-ev-mv-mouse.hpp"
 #include "../../physics/animation/phs-anm-once.hpp"
 #include "../../physics/collider/phs-collider.hpp"
 #include "../../physics/phs-engine.hpp"

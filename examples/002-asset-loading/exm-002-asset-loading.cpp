@@ -1,7 +1,5 @@
 #include "exm-002-asset-loading.hpp"
 #include <gearoenix/core/asset/cr-asset-manager.hpp>
-#include <gearoenix/core/event/cr-ev-bt-mouse.hpp>
-#include <gearoenix/core/event/cr-ev-mv-mouse.hpp>
 #include <gearoenix/core/event/cr-ev-sys-system.hpp>
 #include <gearoenix/core/event/cr-ev-ui-ui.hpp>
 #include <gearoenix/physics/body/phs-bd-rigid.hpp>

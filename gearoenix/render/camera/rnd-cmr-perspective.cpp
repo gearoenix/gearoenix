@@ -1,6 +1,5 @@
 #include "rnd-cmr-perspective.hpp"
 #include "../../core/event/cr-ev-event.hpp"
-#include "../../core/event/cr-ev-window-resize.hpp"
 #include "../../system/stream/sys-stm-stream.hpp"
 #include "../../system/sys-app.hpp"
 #include "../../system/sys-configuration.hpp"
