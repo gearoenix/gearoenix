@@ -67,7 +67,7 @@ namespace render {
             const std::shared_ptr<buffer::FramedUniform>& get_uniform_buffers() const noexcept;
             const std::shared_ptr<Transformation>& get_transformation() const noexcept;
             const math::Sphere& get_occlusion_sphere() const noexcept;
-
+            bool get_has_shadow_caster() const noexcept;
             const math::Mat4x4& get_model_matrix() const noexcept;
         };
     }

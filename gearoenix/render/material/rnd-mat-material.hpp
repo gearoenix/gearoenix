@@ -45,6 +45,7 @@ namespace render {
             const std::shared_ptr<texture::Texture2D>& get_metallic_roughness() const noexcept;
             const std::shared_ptr<texture::Texture2D>& get_normal() const noexcept;
             const std::shared_ptr<texture::Texture2D>& get_emissive() const noexcept;
+            bool get_is_shadow_caster() const noexcept;
             void set_metallic_factor(core::Real f) noexcept;
             void set_roughness_factor(core::Real f) noexcept;
             void set_color(

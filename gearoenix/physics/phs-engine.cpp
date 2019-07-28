@@ -143,7 +143,7 @@ void gearoenix::physics::Engine::update_002_kernel(const unsigned int kernel_ind
                 auto* cas = lc.second;
                 for (auto& im : models) {
                     auto& m = im.second;
-                    if (!m->is_enabled())
+                    if (!m->is_enabled() || !m->get_has_shadow_caster())
                         continue;
                     GX_DO_TASK(cas->shadow(m.get(), task_number));
                 }

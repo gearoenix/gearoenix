@@ -120,6 +120,11 @@ const std::shared_ptr<gearoenix::render::texture::Texture2D>& gearoenix::render:
     return emission;
 }
 
+bool gearoenix::render::material::Material::get_is_shadow_caster() const noexcept
+{
+    return is_shadow_caster;
+}
+
 void gearoenix::render::material::Material::set_metallic_factor(const core::Real f) noexcept
 {
     uniform.metallic_factor = f;
