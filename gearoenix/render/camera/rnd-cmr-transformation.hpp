@@ -16,6 +16,7 @@ namespace render::camera {
         const std::shared_ptr<math::ProjectorFrustum> frustum;
         const std::shared_ptr<std::vector<std::array<math::Vec3, 4>>> cascaded_shadow_frustum_partitions;
         std::function<void()> on_frustum_update = [] {};
+        std::function<void()> on_projection_update = [] {};
 
     public:
         Transformation(
@@ -23,8 +24,10 @@ namespace render::camera {
             std::shared_ptr<math::ProjectorFrustum> frustum,
             std::shared_ptr<std::vector<std::array<math::Vec3, 4>>> cascade) noexcept;
         void update_location() noexcept;
+        void update_projection() noexcept;
         void update_view_projection() noexcept;
         void set_on_frustum_update(std::function<void()> f) noexcept;
+        void set_on_projection_update(std::function<void()> f) noexcept;
         void look_at(const math::Vec3& target, const math::Vec3& up) noexcept;
         void look_at(const math::Vec3& origin, const math::Vec3& target, const math::Vec3& up) noexcept;
         // physics::Transformation----------------------------------------------------------------------------

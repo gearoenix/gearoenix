@@ -13,17 +13,7 @@
 void gearoenix::render::camera::Perspective::update_fovy() noexcept
 {
     fovy = static_cast<core::Real>(std::atan(static_cast<double>(tany))) * 2.0f;
-    uniform->projection = math::Mat4x4::perspective(
-        tanx * -uniform->near * 2.0f,
-        tany * -uniform->near * 2.0f,
-        -uniform->near,
-        -uniform->far);
-    uniform->uniform_projection = math::Mat4x4(
-                                      0.5f, 0.0f, 0.0f, 0.0f,
-                                      0.0f, 0.5f, 0.0f, 0.0f,
-                                      0.0f, 0.0f, 1.0f, 0.0f,
-                                      0.5f, 0.5f, 0.0f, 1.0f)
-        * uniform->projection;
+    update_projection();
     lambda = static_cast<core::Real>(
                  std::sin(static_cast<double>(fovx) * 0.5) + std::sin(static_cast<double>(fovy) * 0.5))
         * 0.5f;
@@ -98,6 +88,21 @@ void gearoenix::render::camera::Perspective::update_cascades() noexcept
 #undef GX_HELPER
 }
 
+void gearoenix::render::camera::Perspective::update_projection() noexcept
+{
+    uniform->projection = math::Mat4x4::perspective(
+        tanx * -uniform->near * 2.0f,
+        tany * -uniform->near * 2.0f,
+        -uniform->near,
+        -uniform->far);
+    uniform->uniform_projection = math::Mat4x4(
+        0.5f, 0.0f, 0.0f, 0.0f,
+        0.0f, 0.5f, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f, 0.0f,
+        0.5f, 0.5f, 0.0f, 1.0f)
+        * uniform->projection;
+}
+
 gearoenix::render::camera::Perspective::Perspective(
     const core::Id my_id,
     system::stream::Stream* const f,
@@ -105,6 +110,7 @@ gearoenix::render::camera::Perspective::Perspective(
     : Camera(my_id, f, e)
 {
     transformation->set_on_frustum_update([this] { update_cascades(); });
+    transformation->set_on_projection_update([this] { update_projection(); });
     const auto rad = f->read<core::Real>();
     GXLOGD("Radiant is: " << rad << ", in perspective camera with id: " << my_id)
     set_field_of_view(rad);

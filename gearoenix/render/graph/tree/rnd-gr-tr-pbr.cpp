@@ -31,6 +31,7 @@ void gearoenix::render::graph::tree::Pbr::update() noexcept
                 auto& cds = light_cascades_info.second->get_cascades_data();
                 for (auto& c : cds) {
                     auto& shm = c.shadow_mapper;
+                    /// TODO: I'm not happy with it. It is not too much concerning, because it happens once for each frame but it can be better
                     core::graph::Node::connect(shm, 0, fwddirshd, node::ForwardPbrDirectionalShadow::SHADOW_MAP_INDEX);
                     fwddirshd->set_input_texture(shm->get_output_texture(0), node::ForwardPbrDirectionalShadow::SHADOW_MAP_INDEX);
                 }
@@ -46,11 +47,9 @@ void gearoenix::render::graph::tree::Pbr::record(const unsigned int kernel_index
     unsigned int task_number = 0;
     const auto& visible_models = e->get_physics_engine()->get_visible_models();
     unsigned int scene_number = 0;
-#define GX_DO_TASK(expr)               \
-    if (task_number == kernel_index) { \
-        expr;                          \
-    }                                  \
-    task_number = (task_number + 1) % kernels_count
+#define GX_DO_TASK(expr) {                             \
+    if (task_number == kernel_index) { expr; }         \
+    task_number = (task_number + 1) % kernels_count; }
     for (const auto& scene_camera : visible_models) {
         const auto* scn = scene_camera.first;
         const auto& lights = scn->get_lights();
@@ -63,7 +62,7 @@ void gearoenix::render::graph::tree::Pbr::record(const unsigned int kernel_index
                 auto* dirlt = light_cascades_info.first;
                 cas->record(kernel_index);
                 for (const auto* const m : models) {
-                    GX_DO_TASK(fwddirshd->record(scn, cam, dirlt, m, cas, kernel_index));
+                    GX_DO_TASK(fwddirshd->record(scn, cam, dirlt, m, cas, kernel_index))
                 }
             }
             // TODO: Camera independent lights handles in follow

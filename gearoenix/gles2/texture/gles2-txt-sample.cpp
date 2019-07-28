@@ -16,10 +16,10 @@ gearoenix::gles2::texture::SampleInfo::SampleInfo(const render::texture::SampleI
     }
     switch (o.min_filter) {
     case render::texture::Filter::NEAREST:
-        min_filter = GL_NEAREST_MIPMAP_NEAREST;
+        min_filter = GL_NEAREST;
         break;
     case render::texture::Filter::LINEAR:
-        min_filter = GL_LINEAR_MIPMAP_LINEAR;
+        min_filter = GL_LINEAR;
         break;
     default:
         GXUNEXPECTED

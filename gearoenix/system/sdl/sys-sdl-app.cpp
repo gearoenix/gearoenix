@@ -254,13 +254,8 @@ int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_
             d.pre_height = static_cast<core::Real>(o->win_height);
             d.cur_width = static_cast<core::Real>(e->window.data1);
             d.cur_height = static_cast<core::Real>(e->window.data2);
-
-
-            /*event = new core::event::WindowResize(
-                static_cast<core::Real>(o->win_width),
-                static_cast<core::Real>(o->win_height),
-                static_cast<core::Real>(e->window.data1),
-                static_cast<core::Real>(e->window.data2));*/
+            event.data = d;
+            event.source = core::event::Id::SYSTEM_WINDOW_SIZE_CHANGE;
             o->win_width = static_cast<unsigned int>(e->window.data1);
             o->win_height = static_cast<unsigned int>(e->window.data2);
             o->screen_ratio = static_cast<core::Real>(o->win_width) / static_cast<core::Real>(o->win_height);
@@ -276,13 +271,9 @@ int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_
         GXLOGE("Unhandled event " << e->type)
         break;
     }
-    //if (event != nullptr) {
-    //    // TODO: new event system must be implemented
-    //    GXTODO
-    //    // o->render_engine->on_event(*event);
-    //    //o->core_app->on_event(*event);
-    //    delete event;
-    //}
+    if (event.source != core::event::Id::UNINITIALIZED) {
+        o->event_engine->braodcast(event);
+    }
     return 1;
 }
 
@@ -442,6 +433,16 @@ const std::shared_ptr<gearoenix::core::asset::Manager>& gearoenix::system::Appli
 std::shared_ptr<gearoenix::core::asset::Manager>& gearoenix::system::Application::get_asset_manager() noexcept
 {
     return astmgr;
+}
+
+const gearoenix::core::event::Engine* gearoenix::system::Application::get_event_engine() const noexcept
+{
+    return event_engine;
+}
+
+gearoenix::core::event::Engine* gearoenix::system::Application::get_event_engine() noexcept
+{
+    return event_engine;
 }
 
 const gearoenix::system::Configuration& gearoenix::system::Application::get_configuration() const noexcept

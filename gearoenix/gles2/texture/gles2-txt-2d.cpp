@@ -25,15 +25,15 @@ gearoenix::gles2::texture::Texture2D::Texture2D(
     const gl::sizei gimg_width = GX_GLES2_MIN_TEX2D_ASPECT < img_width ? static_cast<gl::sizei>(img_width) : GX_GLES2_MIN_TEX2D_ASPECT;
     const gl::sizei gimg_height = GX_GLES2_MIN_TEX2D_ASPECT < img_height ? static_cast<gl::sizei>(img_height) : GX_GLES2_MIN_TEX2D_ASPECT;
 #ifdef GX_DEBUG_GLES2
-    if ((img_width != 1 && img_width < GX_GLES2_MIN_TEX2D_ASPECT) || (img_height != 1 && img_height < GX_GLES2_MIN_TEX2D_ASPECT))
+    if ((img_width != 1 && img_width != gimg_width) || (img_height != 1 && img_height != gimg_height))
         GXLOGF("Unsupported image aspect in GLES2 for texture id: " << my_id)
 #endif
     std::uint8_t* pixels = nullptr;
     if (f == render::texture::TextureFormat::RGBA_FLOAT32 && img_width == 1 && img_height == 1) {
         cf = GL_RGBA;
         const gl::sizei pixel_size = gimg_width * gimg_height * 4;
-        const auto rdata = reinterpret_cast<const core::Real*>(data);
         pixels = new std::uint8_t[pixel_size];
+        const auto rdata = reinterpret_cast<const core::Real*>(data);
         pixels[0] = static_cast<std::uint8_t>(rdata[0] * 255.1f);
         pixels[1] = static_cast<std::uint8_t>(rdata[1] * 255.1f);
         pixels[2] = static_cast<std::uint8_t>(rdata[2] * 255.1f);
@@ -41,6 +41,14 @@ gearoenix::gles2::texture::Texture2D::Texture2D(
         for (gl::sizei i = 4; i < pixel_size;)
             for (int j = 0; j < 4; ++j, ++i)
                 pixels[i] = pixels[j];
+    }
+    else if (f == render::texture::TextureFormat::RGBA_UINT8) {
+        cf = GL_RGBA;
+        const gl::sizei pixel_size = gimg_width * gimg_height << 2;
+        pixels = new std::uint8_t[pixel_size];
+        const auto rdata = reinterpret_cast<const std::uint8_t*>(data);
+        for (gl::sizei i = 0; i < pixel_size; ++i)
+            pixels[i] = rdata[i];
     } else
         GXLOGF("Unsupported/Unimplemented setting for texture with id " << my_id)
     e->get_function_loader()->load([this, pixels, cf, gimg_width, gimg_height, sample_info, call] {

@@ -14,8 +14,8 @@
 #error "setz already defined"
 #endif
 #include <cstring>
-#define GX_SET_ZERO(x) std::memset(&(x), 0, sizeof((x)))
-#define GX_SET_ARRAY_ZERO(x) std::memset((x), 0, sizeof((x)))
+#define GX_SET_ZERO(x) std::memset(&(x), 0, sizeof((x)));
+#define GX_SET_ARRAY_ZERO(x) std::memset((x), 0, sizeof((x)));
 #define GX_GETTER_BUILDER(x) \
     decltype(x) get_##x() const { return x; }
 #define GX_DELETE(x)      \
@@ -23,8 +23,8 @@
         delete (x);       \
         (x) = nullptr;    \
     }
-#define GX_CHECK_NOT_EQAUL(x, y) if ((x) == (y)) GXLOGF("Un-equality check failed.")
-#define GX_CHECK_EQAUL(x, y) if ((x) != (y)) GXLOGF("Equality check failed.")
+#define GX_CHECK_NOT_EQAUL(x, y) { if ((x) == (y)) { GXLOGF("Un-equality check failed.") } }
+#define GX_CHECK_EQAUL(x, y) { if ((x) != (y)) { GXLOGF("Equality check failed.") } }
 #ifdef GX_DEBUG_MODE
 #define GX_CHECK_NOT_EQAUL_D(x, y) GX_CHECK_NOT_EQAUL(x, y)
 #define GX_CHECK_EQAUL_D(x, y) GX_CHECK_EQAUL(x, y)

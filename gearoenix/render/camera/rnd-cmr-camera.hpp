@@ -1,6 +1,7 @@
 #ifndef GEAROENIX_RENDER_CAMERA_CAMERA_HPP
 #define GEAROENIX_RENDER_CAMERA_CAMERA_HPP
 #include "../../core/asset/cr-asset.hpp"
+#include "../../core/event/cr-ev-listner.hpp"
 #include "../../math/math-ray.hpp"
 #include <array>
 #include <memory>
@@ -31,7 +32,7 @@ namespace render {
     namespace camera {
         class Transformation;
         struct Uniform;
-        class Camera : public core::asset::Asset {
+        class Camera : public core::asset::Asset, public core::event::Listner {
         protected:
             bool enabled = true;
             engine::Engine* const e;
@@ -45,6 +46,7 @@ namespace render {
             Camera(core::Id my_id, system::stream::Stream* f, engine::Engine* e) noexcept;
 
         public:
+            virtual ~Camera() noexcept;
             const std::shared_ptr<buffer::FramedUniform>& get_uniform_buffers() const;
             const std::shared_ptr<physics::Transformation> get_transformation() const noexcept;
             bool is_enabled() const noexcept;
@@ -56,6 +58,9 @@ namespace render {
             virtual math::Ray3 create_ray3(core::Real x, core::Real y) const = 0;
             virtual core::Real get_distance(const math::Vec3& model_location) const = 0;
             const std::vector<std::array<math::Vec3, 4>>& get_cascaded_shadow_frustum_partitions() noexcept;
+            const Uniform& get_uniform() const noexcept;
+
+            virtual bool on_event(const core::event::Data& d) noexcept override;
         };
     }
 }

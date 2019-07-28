@@ -20,6 +20,12 @@ void gearoenix::render::camera::Transformation::update_location() noexcept
     update_view_projection();
 }
 
+void gearoenix::render::camera::Transformation::update_projection() noexcept
+{
+    on_projection_update();
+    update_view_projection();
+}
+
 void gearoenix::render::camera::Transformation::update_view_projection() noexcept
 {
     uniform->view_projection = uniform->projection * uniform->view;
@@ -36,6 +42,11 @@ void gearoenix::render::camera::Transformation::update_view_projection() noexcep
 void gearoenix::render::camera::Transformation::set_on_frustum_update(std::function<void()> f) noexcept
 {
     on_frustum_update = std::move(f);
+}
+
+void gearoenix::render::camera::Transformation::set_on_projection_update(std::function<void()> f) noexcept
+{
+    on_projection_update = f;
 }
 
 void gearoenix::render::camera::Transformation::look_at(const math::Vec3& target, const math::Vec3& up) noexcept

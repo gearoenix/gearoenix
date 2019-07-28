@@ -26,8 +26,8 @@ void gearoenix::gles2::texture::Target::state_init() const noexcept
     gl::Loader::enable(GL_DEPTH_TEST);
     gl::Loader::enable(GL_SCISSOR_TEST);
     gl::Loader::enable(GL_STENCIL_TEST);
-    gl::Loader::viewport(0, 0, static_cast<gl::sizei>(img_width), static_cast<gl::sizei>(img_height));
-    gl::Loader::scissor(0, 0, static_cast<gl::sizei>(img_width), static_cast<gl::sizei>(img_height));
+    gl::Loader::viewport(0, 0, static_cast<gl::sizei>(clipping_width), static_cast<gl::sizei>(clipping_height));
+    gl::Loader::scissor(0, 0, static_cast<gl::sizei>(clipping_width), static_cast<gl::sizei>(clipping_height));
 #ifdef GX_DEBUG_GLES2_TARGET
     gl::Loader::check_for_error();
 #endif
@@ -41,6 +41,8 @@ gearoenix::gles2::texture::Target::Target(engine::Engine* const e) noexcept
 #endif
     img_width = e->get_system_application()->get_width();
     img_height = e->get_system_application()->get_height();
+    clipping_width = static_cast<core::Real>(img_width);
+    clipping_height = static_cast<core::Real>(img_height);
     gl::Loader::get_integerv(GL_FRAMEBUFFER_BINDING, &framebuffer);
     gl::Loader::get_integerv(GL_RENDERBUFFER_BINDING, &depth_buffer);
     state_init();
@@ -60,6 +62,8 @@ gearoenix::gles2::texture::Target::Target(
 {
     img_width = w;
     img_height = h;
+    clipping_width = static_cast<core::Real>(w);
+    clipping_height = static_cast<core::Real>(h);
     if (infos.size() != 1)
         GXLOGF("GLES2 backend only supports 1 color attachment.");
     if (infos[0].f != render::texture::TextureFormat::D_16)
@@ -74,8 +78,8 @@ gearoenix::gles2::texture::Target::Target(
         gl::Loader::bind_texture(GL_TEXTURE_2D, texture_object);
         gl::Loader::framebuffer_renderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depth_buffer);
         gl::Loader::tex_image_2d(GL_TEXTURE_2D, 0, GL_RGB, img_width, img_height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
-        gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         gl::Loader::framebuffer_texture_2d(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture_object, 0);
@@ -103,8 +107,8 @@ void gearoenix::gles2::texture::Target::bind() const noexcept
 {
     gl::Loader::bind_renderbuffer(GL_RENDERBUFFER, depth_buffer);
     gl::Loader::bind_framebuffer(GL_FRAMEBUFFER, framebuffer);
-    gl::Loader::viewport(0, 0, static_cast<gl::sizei>(img_width), static_cast<gl::sizei>(img_height));
-    gl::Loader::scissor(0, 0, static_cast<gl::sizei>(img_width), static_cast<gl::sizei>(img_height));
+    gl::Loader::viewport(0, 0, static_cast<gl::sizei>(clipping_width), static_cast<gl::sizei>(clipping_height));
+    gl::Loader::scissor(0, 0, static_cast<gl::sizei>(clipping_width), static_cast<gl::sizei>(clipping_height));
     gl::Loader::enable(GL_DEPTH_TEST);
     gl::Loader::depth_mask(GL_TRUE);
     if (texture_object == 0)

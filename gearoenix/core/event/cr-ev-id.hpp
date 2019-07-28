@@ -23,6 +23,7 @@ enum struct Id {
     UI_DRAGGED_IN,
     UI_DRAGGED_ON,
     UI_DRAGGED_TO,
+    UNINITIALIZED,
 };
 }
 #endif

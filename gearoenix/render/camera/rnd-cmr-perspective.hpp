@@ -17,6 +17,7 @@ namespace render::camera {
 
         void update_fovy() noexcept;
         void update_cascades() noexcept;
+        void update_projection() noexcept;
 
     public:
         Perspective(core::Id my_id, system::stream::Stream* f, engine::Engine* e) noexcept;

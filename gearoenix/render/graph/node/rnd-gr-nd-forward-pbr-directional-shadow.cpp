@@ -5,6 +5,7 @@
 #include "../../buffer/rnd-buf-manager.hpp"
 #include "../../buffer/rnd-buf-uniform.hpp"
 #include "../../camera/rnd-cmr-camera.hpp"
+#include "../../camera/rnd-cmr-uniform.hpp"
 #include "../../command/rnd-cmd-buffer.hpp"
 #include "../../command/rnd-cmd-manager.hpp"
 #include "../../engine/rnd-eng-engine.hpp"
@@ -136,6 +137,8 @@ void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::record(
     const light::CascadeInfo* const cas,
     const unsigned int kernel_index) noexcept
 {
+    const auto& cam_uni = c->get_uniform();
+    render_target->set_clipping(cam_uni.clip_width, cam_uni.clip_height);
     auto& kernel = frame->kernels[kernel_index];
     const std::map<core::Id, std::shared_ptr<model::Mesh>>& meshes = m->get_meshes();
     for (const std::pair<const core::Id, std::shared_ptr<model::Mesh>>& id_mesh : meshes) {

@@ -6,12 +6,12 @@
 #include <variant>
 namespace gearoenix::core::event {
 	struct Data {
-		Id source;
+		Id source = Id::UNINITIALIZED;
 		std::variant<
 			button::Data,
             system::WindowSizeChangeData,
             int
-		> data;
+		> data = 0;
 	};
 }
 #endif

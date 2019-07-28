@@ -26,8 +26,8 @@ void gearoenix::glc3::texture::Target::state_init() const noexcept
     gl::Loader::enable(GL_DEPTH_TEST);
     gl::Loader::enable(GL_SCISSOR_TEST);
     gl::Loader::enable(GL_STENCIL_TEST);
-    gl::Loader::viewport(0, 0, static_cast<gl::sizei>(img_width), static_cast<gl::sizei>(img_height));
-    gl::Loader::scissor(0, 0, static_cast<gl::sizei>(img_width), static_cast<gl::sizei>(img_height));
+    gl::Loader::viewport(0, 0, static_cast<gl::sizei>(clipping_width), static_cast<gl::sizei>(clipping_height));
+    gl::Loader::scissor(0, 0, static_cast<gl::sizei>(clipping_width), static_cast<gl::sizei>(clipping_height));
 }
 
 gearoenix::glc3::texture::Target::Target(engine::Engine* const e) noexcept
@@ -36,6 +36,8 @@ gearoenix::glc3::texture::Target::Target(engine::Engine* const e) noexcept
     const auto* sys_app = e->get_system_application();
     img_width = sys_app->get_width();
     img_height = sys_app->get_height();
+    clipping_width = static_cast<core::Real>(img_width);
+    clipping_height = static_cast<core::Real>(img_height);
     gl::Loader::get_integerv(GL_FRAMEBUFFER_BINDING, &framebuffer);
     gl::Loader::get_integerv(GL_RENDERBUFFER_BINDING, &depth_buffer);
     state_init();
@@ -52,6 +54,8 @@ gearoenix::glc3::texture::Target::Target(
 {
     img_width = w;
     img_height = h;
+    clipping_width = static_cast<core::Real>(w);
+    clipping_height = static_cast<core::Real>(h);
     texture_objects.resize(infos.size());
     e->get_function_loader()->load([this, infos, call] {
         gl::Loader::gen_framebuffers(1, reinterpret_cast<gl::uint*>(&framebuffer));
@@ -103,8 +107,8 @@ void gearoenix::glc3::texture::Target::bind() const noexcept
     if (-1 != depth_buffer)
         gl::Loader::bind_renderbuffer(GL_RENDERBUFFER, depth_buffer);
     gl::Loader::bind_framebuffer(GL_FRAMEBUFFER, framebuffer);
-    gl::Loader::viewport(0, 0, static_cast<gl::sizei>(img_width), static_cast<gl::sizei>(img_height));
-    gl::Loader::scissor(0, 0, static_cast<gl::sizei>(img_width), static_cast<gl::sizei>(img_height));
+    gl::Loader::viewport(0, 0, static_cast<gl::sizei>(clipping_width), static_cast<gl::sizei>(clipping_height));
+    gl::Loader::scissor(0, 0, static_cast<gl::sizei>(clipping_width), static_cast<gl::sizei>(clipping_height));
     gl::Loader::enable(GL_DEPTH_TEST);
     gl::Loader::depth_mask(GL_TRUE);
     if (texture_objects.size() != 0)

@@ -1,10 +1,11 @@
 #include "cr-ev-engine.hpp"
 #include "cr-ev-listner.hpp"
+#include "../../system/sys-log.hpp"
 #include <functional>
 
 void gearoenix::core::event::Engine::loop() noexcept
 {
-    while (state != State::RUNNING) {
+    while (state == State::RUNNING) {
         signaler.lock();
         decltype(events) es;
         {
@@ -39,21 +40,22 @@ gearoenix::core::event::Engine::~Engine() noexcept
     state = State::TERMINATING;
     while (state != State::TERMINATED)
         signaler.release();
+    event_thread.join();
 }
 
-void gearoenix::core::event::Engine::add_listner(Id event_id, Real priority, const std::shared_ptr<Listner>& listner) noexcept
+void gearoenix::core::event::Engine::add_listner(Id event_id, Real priority, Listner*const listner) noexcept
 {
     std::lock_guard<std::mutex> _l(listners_guard);
     events_id_priority_listners[event_id][priority].insert(listner);
 }
 
-void gearoenix::core::event::Engine::remove_listner(Id event_id, Real priority, const std::shared_ptr<Listner>& listner) noexcept
+void gearoenix::core::event::Engine::remove_listner(Id event_id, Real priority, Listner*const listner) noexcept
 {
     std::lock_guard<std::mutex> _l(listners_guard);
     events_id_priority_listners[event_id][priority].erase(listner);
 }
 
-void gearoenix::core::event::Engine::remove_listner(Id event_id, const std::shared_ptr<Listner>& listner) noexcept
+void gearoenix::core::event::Engine::remove_listner(Id event_id, Listner*const listner) noexcept
 {
     std::lock_guard<std::mutex> _l(listners_guard);
     auto& e = events_id_priority_listners[event_id];
@@ -61,7 +63,7 @@ void gearoenix::core::event::Engine::remove_listner(Id event_id, const std::shar
         p.second.erase(listner);
 }
 
-void gearoenix::core::event::Engine::remove_listner(const std::shared_ptr<Listner>& listner) noexcept
+void gearoenix::core::event::Engine::remove_listner(Listner*const listner) noexcept
 {
     std::lock_guard<std::mutex> _l(listners_guard);
     for (auto& e : events_id_priority_listners)
@@ -76,4 +78,5 @@ void gearoenix::core::event::Engine::braodcast(Data event_data) noexcept
 {
     std::lock_guard<std::mutex> _l(events_guard);
     events.push_back(event_data);
+    signaler.release();
 }

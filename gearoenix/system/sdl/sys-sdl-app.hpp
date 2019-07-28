@@ -77,6 +77,8 @@ namespace system {
         std::shared_ptr<render::engine::Engine>& get_render_engine() noexcept;
         const std::shared_ptr<core::asset::Manager>& get_asset_manager() const noexcept;
         std::shared_ptr<core::asset::Manager>& get_asset_manager() noexcept;
+        const core::event::Engine* get_event_engine() const noexcept;
+        core::event::Engine* get_event_engine() noexcept;
         const Configuration& get_configuration() const noexcept;
         Configuration& get_configuration() noexcept;
         core::Real get_window_ratio() const noexcept;
