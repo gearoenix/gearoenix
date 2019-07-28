@@ -70,7 +70,7 @@ void check_eq(const gearoenix::core::Real f1, const gearoenix::core::Real f2)
     const float v2 = std::abs(f1 + f2);
     if (GX_IS_ZERO(v1) && GX_IS_ZERO(v2))
         return;
-    if (GX_IS_ZERO(v2) && GXISNOTZERO(v1))
+    if (GX_IS_ZERO(v2) && GX_IS_NOT_ZERO(v1))
         BOOST_TEST(false);
     if (f1 / f2 > 0.01f)
         BOOST_TEST(false);
