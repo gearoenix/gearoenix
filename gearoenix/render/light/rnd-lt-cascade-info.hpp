@@ -43,7 +43,7 @@ namespace light {
             math::Aabb3 limit_box;
             math::Aabb3 max_box;
             math::Aabb3 intersection_box;
-            std::shared_ptr<graph::node::ShadowMapper> shadow_mapper;
+            graph::node::ShadowMapper* shadow_mapper = nullptr;
 
             explicit PerCascade(engine::Engine* e) noexcept;
         };

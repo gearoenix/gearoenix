@@ -14,7 +14,7 @@ gearoenix::core::graph::Node::Node(const std::vector<std::string>& input_links, 
     }
 }
 
-void gearoenix::core::graph::Node::set_provider(const unsigned int input_link_index, const std::shared_ptr<Node>& o, const unsigned int provider_output_link_index) noexcept
+void gearoenix::core::graph::Node::set_provider(const unsigned int input_link_index, Node*const o, const unsigned int provider_output_link_index) noexcept
 {
     input_links_providers_links[input_link_index] = std::make_pair(o, provider_output_link_index);
 }
@@ -22,7 +22,7 @@ void gearoenix::core::graph::Node::set_provider(const unsigned int input_link_in
 void gearoenix::core::graph::Node::remove_provider(const unsigned int input_link_index) noexcept
 {
     auto& p = input_links_providers_links[input_link_index];
-    const std::shared_ptr<Node> ptr = p.first;
+    Node*const ptr = p.first;
     if (ptr == nullptr)
         return;
     const unsigned int l = p.second;
@@ -30,7 +30,7 @@ void gearoenix::core::graph::Node::remove_provider(const unsigned int input_link
     ptr->remove_consumer(l, asset_id, input_link_index);
 }
 
-void gearoenix::core::graph::Node::set_consumer(const unsigned int output_link_index, const std::shared_ptr<Node>& o, const unsigned int consumer_input_link_index) noexcept
+void gearoenix::core::graph::Node::set_consumer(const unsigned int output_link_index, Node*const o, const unsigned int consumer_input_link_index) noexcept
 {
     output_links_consumers_links[output_link_index][std::make_pair(o->get_asset_id(), consumer_input_link_index)] = o;
 }
@@ -41,7 +41,7 @@ void gearoenix::core::graph::Node::remove_consumer(const unsigned int output_lin
     auto search = m.find(std::make_pair(node_id, consumer_input_link_index));
     if (search == m.end())
         return;
-    const std::shared_ptr<Node> ptr = search->second.lock();
+    Node*const ptr = search->second;
     const unsigned int l = search->first.second;
     m.erase(search);
     ptr->remove_provider(l);
@@ -87,7 +87,7 @@ const std::vector<std::string> gearoenix::core::graph::Node::get_output_links_na
     return result;
 }
 
-void gearoenix::core::graph::Node::connect(const std::shared_ptr<Node>& p, const unsigned int po, const std::shared_ptr<Node>& c, const unsigned int ci) noexcept
+void gearoenix::core::graph::Node::connect(Node*const p, const unsigned int po, Node*const c, const unsigned int ci) noexcept
 {
     p->set_consumer(po, c, ci);
     c->set_provider(ci, p, po);

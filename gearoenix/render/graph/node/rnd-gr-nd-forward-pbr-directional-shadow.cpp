@@ -78,7 +78,6 @@ gearoenix::render::graph::node::ForwardPbrDirectionalShadow::ForwardPbrDirection
         call)
     , frames(e->get_frames_count())
 {
-
     for (auto& f : frames) {
         f = std::make_unique<ForwardPbrDirectionalShadowFrame>(e);
     }
@@ -86,34 +85,34 @@ gearoenix::render::graph::node::ForwardPbrDirectionalShadow::ForwardPbrDirection
     core::sync::EndCaller<texture::Cube> txtcubecall([call](std::shared_ptr<texture::Cube>) {});
     core::sync::EndCaller<texture::Texture2D> txt2dcall([call](std::shared_ptr<texture::Texture2D>) {});
 
-    input_textures[DIFFUSE_ENVIRONMENT_INDEX] = txtmgr->get_cube(math::Vec3(0.0f, 0.0f, 0.0f), txtcubecall);
-    input_textures[SPECULAR_ENVIRONMENT_INDEX] = txtmgr->get_cube(math::Vec3(0.0f, 0.0f, 0.0f), txtcubecall);
-    input_textures[AMBIENT_OCCLUSION_INDEX] = txtmgr->get_2d(1.0f, txt2dcall);
-    input_textures[SHADOW_MAP_INDEX] = txtmgr->get_2d(math::Vec2(1.0, 1.0), txt2dcall);
-    input_textures[BRDFLUT_INDEX] = txtmgr->get_2d(math::Vec2(1.0, 1.0), txt2dcall);
+    input_textures[DIFFUSE_ENVIRONMENT_INDEX] = txtmgr->get_cube_zero_3c(txtcubecall).get();
+    input_textures[SPECULAR_ENVIRONMENT_INDEX] = txtmgr->get_cube_zero_3c(txtcubecall).get();
+    input_textures[AMBIENT_OCCLUSION_INDEX] = txtmgr->get_2d_one_1c(txt2dcall).get();
+    input_textures[SHADOW_MAP_INDEX] = txtmgr->get_2d_one_2c(txt2dcall).get();
+    input_textures[BRDFLUT_INDEX] = txtmgr->get_2d_one_2c(txt2dcall).get();
 }
 
-void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::set_diffuse_environment(const std::shared_ptr<texture::Cube>& t) noexcept
+void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::set_diffuse_environment(texture::Cube*const t) noexcept
 {
     set_input_texture(t, DIFFUSE_ENVIRONMENT_INDEX);
 }
 
-void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::set_specular_environment(const std::shared_ptr<texture::Cube>& t) noexcept
+void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::set_specular_environment(texture::Cube*const t) noexcept
 {
     set_input_texture(t, SPECULAR_ENVIRONMENT_INDEX);
 }
 
-void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::set_ambient_occlusion(const std::shared_ptr<texture::Texture2D>& t) noexcept
+void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::set_ambient_occlusion(texture::Texture2D*const t) noexcept
 {
     set_input_texture(t, AMBIENT_OCCLUSION_INDEX);
 }
 
-void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::set_shadow_mapper(const std::shared_ptr<texture::Texture2D>& t) noexcept
+void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::set_shadow_mapper(texture::Texture2D*const t) noexcept
 {
     set_input_texture(t, SHADOW_MAP_INDEX);
 }
 
-void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::set_brdflut(const std::shared_ptr<texture::Texture2D>& t) noexcept
+void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::set_brdflut(texture::Texture2D*const t) noexcept
 {
     set_input_texture(t, BRDFLUT_INDEX);
 }
@@ -156,11 +155,11 @@ void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::record(
         prs->set_model(m);
         prs->set_mesh(msh.get());
         prs->set_material(mat.get());
-        prs->set_diffuse_environment(reinterpret_cast<texture::Cube*>(input_textures[0].get()));
-        prs->set_specular_environment(reinterpret_cast<texture::Cube*>(input_textures[1].get()));
-        prs->set_ambient_occlusion(reinterpret_cast<texture::Texture2D*>(input_textures[2].get()));
-        prs->set_shadow_mapper(reinterpret_cast<texture::Texture2D*>(input_textures[3].get()));
-        prs->set_brdflut(reinterpret_cast<texture::Texture2D*>(input_textures[4].get()));
+        prs->set_diffuse_environment(reinterpret_cast<texture::Cube*>(input_textures[0]));
+        prs->set_specular_environment(reinterpret_cast<texture::Cube*>(input_textures[1]));
+        prs->set_ambient_occlusion(reinterpret_cast<texture::Texture2D*>(input_textures[2]));
+        prs->set_shadow_mapper(reinterpret_cast<texture::Texture2D*>(input_textures[3]));
+        prs->set_brdflut(reinterpret_cast<texture::Texture2D*>(input_textures[4]));
         kernel->secondary_cmd->bind(prs);
     }
 }
@@ -168,7 +167,7 @@ void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::record(
 void gearoenix::render::graph::node::ForwardPbrDirectionalShadow::submit() noexcept
 {
     const unsigned int frame_number = e->get_frame_number();
-    command::Buffer* cmd = frames_primary_cmd[frame_number].get();
+    command::Buffer* cmd = frames_primary_cmd[frame_number];
     cmd->bind(render_target.get());
     for (const auto& k : frame->kernels) {
         cmd->record(k->secondary_cmd.get());

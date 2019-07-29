@@ -77,6 +77,10 @@ namespace graph::node {
     private:
         std::vector<std::unique_ptr<ForwardPbrDirectionalShadowFrame>> frames;
         ForwardPbrDirectionalShadowFrame* frame = nullptr;
+		const scene::Scene* scn = nullptr;
+		const camera::Camera* cam = nullptr;
+		const std::vector<model::Model*>* seen_models = nullptr;
+		const std::vector<std::pair<light::Directional*, light::CascadeInfo*>>* directional_lights = nullptr;
 
     public:
         const static unsigned int DIFFUSE_ENVIRONMENT_INDEX;
@@ -88,22 +92,21 @@ namespace graph::node {
         ForwardPbrDirectionalShadow(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
         ~ForwardPbrDirectionalShadow() noexcept final = default;
 
-        void set_diffuse_environment(const std::shared_ptr<texture::Cube>& t) noexcept;
-        void set_specular_environment(const std::shared_ptr<texture::Cube>& t) noexcept;
-        void set_ambient_occlusion(const std::shared_ptr<texture::Texture2D>& t) noexcept;
-        void set_shadow_mapper(const std::shared_ptr<texture::Texture2D>& t) noexcept;
-        void set_brdflut(const std::shared_ptr<texture::Texture2D>& t) noexcept;
+        void set_diffuse_environment(texture::Cube* t) noexcept;
+        void set_specular_environment(texture::Cube* t) noexcept;
+        void set_ambient_occlusion(texture::Texture2D* t) noexcept;
+        void set_shadow_mapper(texture::Texture2D* t) noexcept;
+        void set_brdflut(texture::Texture2D* t) noexcept;
 
         /// This will be called at the start of each frame
         void update() noexcept final;
         /// Multithreaded rendering happens in here
-        void record(
-            const scene::Scene* s,
-            const camera::Camera* c,
-            const light::Directional* l,
-            const model::Model* m,
-            const light::CascadeInfo* cas,
-            unsigned int kernel_index) noexcept;
+
+		void set_scene(const scene::Scene* scn) noexcept;
+		void set_camera(const camera::Camera* cam) noexcept;
+		void set_seen_models(const std::vector<model::Model*>* models) noexcept;
+		void set_directional_lights(const std::vector<std::pair<light::Directional*, light::CascadeInfo*>>* m) noexcept;
+        void record(unsigned int kernel_index) noexcept;
         /// This will be called at the end of each frame for pushing jobs to GPU
         void submit() noexcept final;
     };
