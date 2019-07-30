@@ -184,6 +184,21 @@ void gearoenix::render::graph::node::ForwardPbr::set_directional_lights(const st
     directional_lights = m;
 }
 
+void gearoenix::render::graph::node::ForwardPbr::record(unsigned int kernel_index) noexcept
+{
+    const unsigned int kernels_count = e->get_kernels()->get_threads_count();
+    unsigned int task_number = 0;
+#define GX_DO_TASK(expr) {           \
+    if (task_number == kernel_index) \
+    {                                \
+        expr;                        \
+    }                                \
+    ++task_number;                   \
+    task_number %= kernels_count;    \
+    }
+
+}
+
 void gearoenix::render::graph::node::ForwardPbr::submit() noexcept
 {
     const unsigned int frame_number = e->get_frame_number();

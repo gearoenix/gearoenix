@@ -14,10 +14,10 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         // camera uniform(s)
         "uniform mat4  camera_vp;\n"
         // effect uniform(s)
-        "uniform mat4  effect_view_projection_biases[" GX_MAX_SHADOW_CASCADES_STR "];\n"
-        "uniform float effect_cascades_count;\n"
+        "uniform mat4  effect_view_projection_biases[" GX_MAX_DIRECTIONAL_LIGHTS_STR " * " GX_MAX_SHADOW_CASCADES_STR "];\n"
+        "uniform float effect_cascades_count[" GX_MAX_DIRECTIONAL_LIGHTS_STR "];\n"
         // light uniform(s)
-        "uniform vec3  light_direction;\n"
+        "uniform vec3  light_directions[" GX_MAX_DIRECTIONAL_LIGHTS_STR "];\n"
         // model uniform(s)
         "uniform mat4  model_m;\n"
         // output(s)
@@ -26,7 +26,7 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         "out vec3 out_tng;\n"
         "out vec3 out_btg;\n"
         "out vec2 out_uv;\n"
-        "out vec3 out_light_poses[" GX_MAX_SHADOW_CASCADES_STR "];\n"
+        "out vec3 out_light_poses[" GX_MAX_DIRECTIONAL_LIGHTS_STR " * " GX_MAX_SHADOW_CASCADES_STR "];\n"
         // Main function
         "void main()\n"
         "{\n"
@@ -37,6 +37,7 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         "    out_btg = cross(out_nrm, out_tng) * tangent.w;\n"
         "    out_uv = uv;\n"
         "    int effect_cascades_count_int = int(effect_cascades_count);\n"
+        
         "    for(int i = 0; i < effect_cascades_count_int; ++i)\n"
         "    {\n"
         "        vec4 light_pos = effect_view_projection_biases[i] * pos;\n"

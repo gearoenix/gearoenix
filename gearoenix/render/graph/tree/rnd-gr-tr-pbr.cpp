@@ -20,14 +20,14 @@ gearoenix::render::graph::tree::Pbr::Pbr(engine::Engine* const e, const core::sy
 
 void gearoenix::render::graph::tree::Pbr::update() noexcept
 {
-	fwddirshds.refresh();
+	fwd.refresh();
     const auto& visible_models = e->get_physics_engine()->get_visible_models();
     for (const auto& scene_camera : visible_models) {
 		const scene::Scene* const scn = scene_camera.first;
         const auto& cameras_data = scene_camera.second;
         for (const auto& camera_data : cameras_data) {
 			const camera::Camera*const cam = camera_data.first;
-			node::ForwardPbr *const fwddirshd = fwddirshds.get_next([this] {
+			node::ForwardPbr *const n = fwd.get_next([this] {
 				auto *const n = new node::ForwardPbr(
 					e,
 					core::sync::EndCaller<core::sync::EndCallerIgnore>([] {}));
@@ -35,11 +35,11 @@ void gearoenix::render::graph::tree::Pbr::update() noexcept
 				return n;
 			});
 
-			fwddirshd->set_scene(scn);
-			fwddirshd->set_camera(cam);
+			n->set_scene(scn);
+			n->set_camera(cam);
 			const auto& models_lights = camera_data.second;
-			fwddirshd->set_directional_lights(&models_lights.second);
-			fwddirshd->set_seen_models(&models_lights.first);
+			n->set_directional_lights(&models_lights.second);
+			n->set_seen_models(&models_lights.first);
             /*const auto& lights_cascades_info = camera_data.second.second;
             for (const auto& light_cascades_info : lights_cascades_info) {
                 auto& cds = light_cascades_info.second->get_cascades_data();
@@ -49,7 +49,7 @@ void gearoenix::render::graph::tree::Pbr::update() noexcept
                     fwddirshd->set_input_texture(shm->get_output_texture(0), node::ForwardPbr::SHADOW_MAP_INDEX);
                 }
             }*/
-			fwddirshd->update();
+			n->update();
         }
     }
 }
@@ -89,7 +89,7 @@ void gearoenix::render::graph::tree::Pbr::record(const unsigned int kernel_index
 //        ++scene_number;
 //    }
 //#undef GX_DO_TASK
-	for (graph::node::ForwardPbr& n : fwddirshds)
+	for (graph::node::ForwardPbr& n : fwd)
 	{
 		n.record(kernel_index);
 	}
@@ -97,7 +97,7 @@ void gearoenix::render::graph::tree::Pbr::record(const unsigned int kernel_index
 
 void gearoenix::render::graph::tree::Pbr::submit() noexcept
 {
-	for (graph::node::ForwardPbr& n : fwddirshds)
+	for (graph::node::ForwardPbr& n : fwd)
 	{
 		n.submit();
 	}

@@ -11,13 +11,9 @@ namespace tree {
     class Pbr : public Tree {
     private:
         bool in_weak_hardware = true;
-        // std::shared_ptr<node::ForwardPbrConeShadow> fwdconshd = nullptr;
-        core::OneLoopPool<node::ForwardPbr> fwddirshds;
-        // std::shared_ptr<node::ForwardPbrPointShadow> fwdpointshd = nullptr;
-        // std::shared_ptr<node::DeferedPbr> deferred = nullptr;
-        // std::shared_ptr<node::SahdowAccumulatorCone> shdacmcone = nullptr;
-        // std::shared_ptr<node::SahdowAccumulatorDirectional> shdacmdir = nullptr;
-        // std::shared_ptr<node::SahdowAccumulatorPoint> shdacmpnt = nullptr;
+        core::OneLoopPool<node::ForwardPbr> fwd;
+        // std::shared_ptr<node::DeferedPbr> dfr = nullptr;
+        // std::shared_ptr<node::SahdowAccumulator> shdacm = nullptr;
     public:
         Pbr(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
         void update() noexcept final;
