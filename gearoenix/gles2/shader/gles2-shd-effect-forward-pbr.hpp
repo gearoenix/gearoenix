@@ -1,5 +1,5 @@
-#ifndef GEAROENIX_GLES2_SHADER_FORWARD_PBR_DIRECTIONAL_SHADOW_HPP
-#define GEAROENIX_GLES2_SHADER_FORWARD_PBR_DIRECTIONAL_SHADOW_HPP
+#ifndef GEAROENIX_GLES2_SHADER_FORWARD_PBR_HPP
+#define GEAROENIX_GLES2_SHADER_FORWARD_PBR_HPP
 #include "../../core/cr-build-configuration.hpp"
 #ifdef GX_USE_OPENGL_ES2
 #include "../../core/cr-static.hpp"
@@ -12,7 +12,7 @@ namespace engine {
     class Engine;
 }
 namespace shader {
-    class ForwardPbrDirectionalShadow : public Shader {
+    class ForwardPbr : public Shader {
     private:
         GX_GLES2_SHADER_MATERIAL_UNIFORMS
         GX_GLES2_UNIFORM_VECTOR(camera_position, 3, 1)
@@ -36,8 +36,8 @@ namespace shader {
         GX_GLES2_UNIFORM_VECTOR(scene_ssao_config, 3, 1)
 
     public:
-        ForwardPbrDirectionalShadow(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
-        ~ForwardPbrDirectionalShadow() noexcept final;
+        ForwardPbr(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+        ~ForwardPbr() noexcept final;
         void bind() const noexcept final;
     };
 }

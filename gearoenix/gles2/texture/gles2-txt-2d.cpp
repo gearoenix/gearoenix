@@ -22,25 +22,23 @@ gearoenix::gles2::texture::Texture2D::Texture2D(
 {
     const SampleInfo sample_info = SampleInfo(s);
     gl::uint cf;
-    const gl::sizei gimg_width = GX_GLES2_MIN_TEX2D_ASPECT < img_width ? static_cast<gl::sizei>(img_width) : GX_GLES2_MIN_TEX2D_ASPECT;
-    const gl::sizei gimg_height = GX_GLES2_MIN_TEX2D_ASPECT < img_height ? static_cast<gl::sizei>(img_height) : GX_GLES2_MIN_TEX2D_ASPECT;
-#ifdef GX_DEBUG_GLES2
-    if ((img_width != 1 && img_width != gimg_width) || (img_height != 1 && img_height != gimg_height))
-        GXLOGF("Unsupported image aspect in GLES2 for texture id: " << my_id)
-#endif
+    const gl::sizei gimg_width = static_cast<gl::sizei>(img_width);
+    const gl::sizei gimg_height = static_cast<gl::sizei>(img_height);
     std::uint8_t* pixels = nullptr;
-    if (f == render::texture::TextureFormat::RGBA_FLOAT32 && img_width == 1 && img_height == 1) {
+    if (f == render::texture::TextureFormat::RGBA_FLOAT32) {
         cf = GL_RGBA;
-        const gl::sizei pixel_size = gimg_width * gimg_height * 4;
+        const gl::sizei pixel_size = gimg_width * gimg_height << 2;
         pixels = new std::uint8_t[pixel_size];
         const auto rdata = reinterpret_cast<const core::Real*>(data);
-        pixels[0] = static_cast<std::uint8_t>(rdata[0] * 255.1f);
-        pixels[1] = static_cast<std::uint8_t>(rdata[1] * 255.1f);
-        pixels[2] = static_cast<std::uint8_t>(rdata[2] * 255.1f);
-        pixels[3] = static_cast<std::uint8_t>(rdata[3] * 255.1f);
-        for (gl::sizei i = 4; i < pixel_size;)
-            for (int j = 0; j < 4; ++j, ++i)
-                pixels[i] = pixels[j];
+        for (gl::sizei i = 0; i < pixel_size; ++i) {
+            const auto c = rdata[i] * 255.1f;
+            if (c >= 255.0f)
+                pixels[i] = 255;
+            else if(c < 0.0f)
+                pixels[i] = 0;
+            else
+                pixels[i] = static_cast<std::uint8_t>(c);
+        }
     }
     else if (f == render::texture::TextureFormat::RGBA_UINT8) {
         cf = GL_RGBA;
@@ -60,7 +58,9 @@ gearoenix::gles2::texture::Texture2D::Texture2D(
         gl::Loader::tex_parameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, sample_info.wrap_t);
         gl::Loader::tex_image_2d(GL_TEXTURE_2D, 0, static_cast<gl::sint>(cf), gimg_width, gimg_height, 0, static_cast<gl::enumerated>(cf), GL_UNSIGNED_BYTE, pixels);
         gl::Loader::generate_mipmap(GL_TEXTURE_2D);
+#ifdef GX_DEBUG_GLES2
         gl::Loader::check_for_error();
+#endif
         delete[] pixels;
     });
 }

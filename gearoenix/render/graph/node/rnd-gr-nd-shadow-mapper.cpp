@@ -101,7 +101,7 @@ void gearoenix::render::graph::node::ShadowMapper::record(const math::Mat4x4& mv
 void gearoenix::render::graph::node::ShadowMapper::submit() noexcept
 {
     const unsigned int frame_number = e->get_frame_number();
-    command::Buffer* cmd = frames_primary_cmd[frame_number].get();
+    command::Buffer* cmd = frames_primary_cmd[frame_number];
     cmd->bind(render_target.get());
     for (const auto& k : frame->kernels) {
         cmd->record(k->secondary_cmd.get());

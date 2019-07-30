@@ -1,7 +1,7 @@
 #include "rnd-pip-resource-set.hpp"
 #include "../buffer/rnd-buf-framed-uniform.hpp"
 #include "../camera/rnd-cmr-camera.hpp"
-#include "../graph/node/rnd-gr-nd-forward-pbr-directional-shadow.hpp"
+#include "../graph/node/rnd-gr-nd-forward-pbr.hpp"
 #include "../light/rnd-lt-light.hpp"
 #include "../material/rnd-mat-material.hpp"
 #include "../mesh/rnd-msh-mesh.hpp"

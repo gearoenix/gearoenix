@@ -7,7 +7,7 @@
 
 gearoenix::render::graph::node::Node::Node(
     engine::Engine* const e,
-    const pipeline::Type::Id pipeline_type_id,
+    const pipeline::Type pipeline_type_id,
     const unsigned int input_textures_count,
     const unsigned int output_textures_count,
     const std::vector<std::string>& input_links,

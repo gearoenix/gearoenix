@@ -1,8 +1,8 @@
-#ifndef GEAROENIX_RENDER_PIPELINE_FORWARD_PBR_DIRECTIONAL_SHADOW_RESOURCE_SET_HPP
-#define GEAROENIX_RENDER_PIPELINE_FORWARD_PBR_DIRECTIONAL_SHADOW_RESOURCE_SET_HPP
+#ifndef GEAROENIX_RENDER_PIPELINE_FORWARD_PBR_RESOURCE_SET_HPP
+#define GEAROENIX_RENDER_PIPELINE_FORWARD_PBR_RESOURCE_SET_HPP
 #include "rnd-pip-resource-set.hpp"
 namespace gearoenix::render::pipeline {
-class ForwardPbrDirectionalShadowResourceSet : public ResourceSet {
+class ForwardPbrResourceSet : public ResourceSet {
 protected:
     texture::Cube* diffuse_environment = nullptr;
     texture::Cube* specular_environment = nullptr;

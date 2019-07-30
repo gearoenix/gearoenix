@@ -55,7 +55,7 @@ namespace graph::node {
         std::shared_ptr<pipeline::Pipeline> render_pipeline = nullptr;
         Node(
             engine::Engine* e,
-            pipeline::Type::Id pipeline_type_id,
+            pipeline::Type pipeline_type_id,
             unsigned int input_textures_count,
             unsigned int output_textures_count,
             const std::vector<std::string>& input_links,

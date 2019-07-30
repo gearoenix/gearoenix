@@ -5,14 +5,14 @@
 #include "rnd-gr-tr-tree.hpp"
 namespace gearoenix::render::graph {
 namespace node {
-    class ForwardPbrDirectionalShadow;
+    class ForwardPbr;
 }
 namespace tree {
     class Pbr : public Tree {
     private:
         bool in_weak_hardware = true;
         // std::shared_ptr<node::ForwardPbrConeShadow> fwdconshd = nullptr;
-        core::OneLoopPool<node::ForwardPbrDirectionalShadow> fwddirshds;
+        core::OneLoopPool<node::ForwardPbr> fwddirshds;
         // std::shared_ptr<node::ForwardPbrPointShadow> fwdpointshd = nullptr;
         // std::shared_ptr<node::DeferedPbr> deferred = nullptr;
         // std::shared_ptr<node::SahdowAccumulatorCone> shdacmcone = nullptr;

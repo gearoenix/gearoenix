@@ -1,4 +1,4 @@
-#include "glc3-shd-effect-forward-pbr-directional-shadow.hpp"
+#include "glc3-shd-effect-forward-pbr.hpp"
 #ifdef GX_USE_OPENGL_CLASS_3
 #include "../../core/cr-function-loader.hpp"
 #include "../../gl/gl-constants.hpp"
@@ -7,7 +7,7 @@
 #include "../engine/glc3-eng-engine.hpp"
 #include <sstream>
 
-gearoenix::glc3::shader::ForwardPbrDirectionalShadow::ForwardPbrDirectionalShadow(engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
+gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : Shader(e, c)
 {
     GX_GLC3_SHADER_SRC_DEFAULT_VERTEX_STARTING <<
@@ -320,11 +320,11 @@ gearoenix::glc3::shader::ForwardPbrDirectionalShadow::ForwardPbrDirectionalShado
     });
 }
 
-gearoenix::glc3::shader::ForwardPbrDirectionalShadow::~ForwardPbrDirectionalShadow() noexcept
+gearoenix::glc3::shader::ForwardPbr::~ForwardPbr() noexcept
 {
 }
 
-void gearoenix::glc3::shader::ForwardPbrDirectionalShadow::bind() const noexcept
+void gearoenix::glc3::shader::ForwardPbr::bind() const noexcept
 {
     Shader::bind();
     GX_GLC3_SHADER_MATERIAL_SET_TEXTURE_INDEX_UNIFORM

@@ -1,4 +1,4 @@
-#include "gles2-shd-effect-forward-pbr-directional-shadow.hpp"
+#include "gles2-shd-effect-forward-pbr.hpp"
 #ifdef GX_USE_OPENGL_ES2
 #include "../../core/cr-function-loader.hpp"
 #include "../../gl/gl-constants.hpp"
@@ -300,7 +300,7 @@ const static std::string fragment_shader_code = GX_GLES2_SHADER_SRC_DEFAULT_FRAG
     "    gl_FragColor = vec4(tmpv4.xyz, albedo.w);\n"
     "}"; // 123
 
-gearoenix::gles2::shader::ForwardPbrDirectionalShadow::ForwardPbrDirectionalShadow(engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
+gearoenix::gles2::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : Shader(e, c)
 {
     e->get_function_loader()->load([this] {
@@ -336,11 +336,11 @@ gearoenix::gles2::shader::ForwardPbrDirectionalShadow::ForwardPbrDirectionalShad
     });
 }
 
-gearoenix::gles2::shader::ForwardPbrDirectionalShadow::~ForwardPbrDirectionalShadow() noexcept
+gearoenix::gles2::shader::ForwardPbr::~ForwardPbr() noexcept
 {
 }
 
-void gearoenix::gles2::shader::ForwardPbrDirectionalShadow::bind() const noexcept
+void gearoenix::gles2::shader::ForwardPbr::bind() const noexcept
 {
     Shader::bind();
     GX_GLES2_SHADER_MATERIAL_SET_TEXTURE_INDEX_UNIFORM

@@ -1,5 +1,5 @@
-#ifndef GEAROENIX_RENDER_GRAPH_NODE_FORWARD_PBR_DIRECTIONAL_SHADOW_HPP
-#define GEAROENIX_RENDER_GRAPH_NODE_FORWARD_PBR_DIRECTIONAL_SHADOW_HPP
+#ifndef GEAROENIX_RENDER_GRAPH_NODE_FORWARD_PBR_HPP
+#define GEAROENIX_RENDER_GRAPH_NODE_FORWARD_PBR_HPP
 #include "../../../core/cr-pool.hpp"
 #include "../../../core/sync/cr-sync-end-caller.hpp"
 #include "../../../math/math-matrix.hpp"
@@ -7,7 +7,7 @@
 #include "../../buffer/rnd-buf-framed-uniform.hpp"
 #include "../../buffer/rnd-buf-uniform.hpp"
 #include "../../command/rnd-cmd-buffer.hpp"
-#include "../../pipeline/rnd-pip-forward-pbr-directional-shadow-resource-set.hpp"
+#include "../../pipeline/rnd-pip-forward-pbr-resource-set.hpp"
 #include "rnd-gr-nd-node.hpp"
 #include <memory>
 #include <vector>
@@ -32,7 +32,7 @@ namespace model {
     class Mesh;
 }
 namespace pipeline {
-    class ForwardPbrDirectionalShadowResourceSet;
+    class ForwardPbrResourceSet;
 }
 namespace scene {
     class Scene;
@@ -46,41 +46,49 @@ namespace texture {
     class Texture2D;
 }
 namespace graph::node {
-    struct ForwardPbrDirectionalShadowUniform {
+    struct ForwardPbrUniform {
         // Bring lights in here not scene
         math::Mat4x4 cascades_view_projections_bias[GX_MAX_SHADOW_CASCADES];
         core::Real cascades_count = static_cast<core::Real>(GX_MAX_SHADOW_CASCADES);
-        explicit ForwardPbrDirectionalShadowUniform(const light::CascadeInfo* cas, const engine::Engine* e) noexcept;
+        explicit ForwardPbrUniform(const light::CascadeInfo* cas, const engine::Engine* e) noexcept;
     };
 
-    struct ForwardPbrDirectionalShadowRenderData {
-        std::unique_ptr<pipeline::ForwardPbrDirectionalShadowResourceSet> r;
+    struct ForwardPbrRenderData {
+        std::unique_ptr<pipeline::ForwardPbrResourceSet> r;
         std::unique_ptr<buffer::Uniform> u;
-        ForwardPbrDirectionalShadowRenderData(engine::Engine* e, pipeline::Pipeline* pip) noexcept;
+        ForwardPbrRenderData(engine::Engine* e, pipeline::Pipeline* pip) noexcept;
     };
 
-    struct ForwardPbrDirectionalShadowKernel {
+    struct ForwardPbrKernel {
         std::unique_ptr<command::Buffer> secondary_cmd;
-        core::OneLoopPool<ForwardPbrDirectionalShadowRenderData> render_data_pool;
-        ForwardPbrDirectionalShadowKernel(engine::Engine* e, unsigned int kernel_index) noexcept;
+        core::OneLoopPool<ForwardPbrRenderData> render_data_pool;
+        ForwardPbrKernel(engine::Engine* e, unsigned int kernel_index) noexcept;
     };
 
-    struct ForwardPbrDirectionalShadowFrame {
-        std::vector<std::unique_ptr<ForwardPbrDirectionalShadowKernel>> kernels;
-        explicit ForwardPbrDirectionalShadowFrame(engine::Engine* e) noexcept;
+    struct ForwardPbrFrame {
+        std::vector<std::unique_ptr<ForwardPbrKernel>> kernels;
+        explicit ForwardPbrFrame(engine::Engine* e) noexcept;
     };
 
     /// This renders only one directional light with one shadow map.
     /// In here I do not care for race issues (for performance reason).
     /// The user of this class must use its functionalities in their correct contextes.
-    class ForwardPbrDirectionalShadow : public Node {
+    class ForwardPbr : public Node {
     private:
-        std::vector<std::unique_ptr<ForwardPbrDirectionalShadowFrame>> frames;
-        ForwardPbrDirectionalShadowFrame* frame = nullptr;
+        std::vector<std::unique_ptr<ForwardPbrFrame>> frames;
+        ForwardPbrFrame* frame = nullptr;
 		const scene::Scene* scn = nullptr;
 		const camera::Camera* cam = nullptr;
 		const std::vector<model::Model*>* seen_models = nullptr;
 		const std::vector<std::pair<light::Directional*, light::CascadeInfo*>>* directional_lights = nullptr;
+
+        void record(
+            const scene::Scene* s,
+            const camera::Camera* c,
+            const light::Directional* l,
+            const model::Model* m,
+            const light::CascadeInfo* cas,
+            unsigned int kernel_index) noexcept;
 
     public:
         const static unsigned int DIFFUSE_ENVIRONMENT_INDEX;
@@ -89,8 +97,8 @@ namespace graph::node {
         const static unsigned int SHADOW_MAP_INDEX;
         const static unsigned int BRDFLUT_INDEX;
 
-        ForwardPbrDirectionalShadow(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
-        ~ForwardPbrDirectionalShadow() noexcept final = default;
+        ForwardPbr(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
+        ~ForwardPbr() noexcept final = default;
 
         void set_diffuse_environment(texture::Cube* t) noexcept;
         void set_specular_environment(texture::Cube* t) noexcept;
