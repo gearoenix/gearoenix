@@ -7,17 +7,21 @@
 #include "../engine/glc3-eng-engine.hpp"
 #include <sstream>
 
+#define GX_GLC3_SHADER_SRC_EFFECT_UNIFORMS \
+    "uniform float effect_directional_lights_cascades_count[" GX_MAX_DIRECTIONAL_LIGHTS_STR "];\n" \
+    "uniform mat4  effect_directional_lights_cascades_view_projection_bias[" GX_MAX_DIRECTIONAL_LIGHTS_STR " * " GX_MAX_SHADOW_CASCADES_STR "];\n" \
+    "uniform float effect_directional_lights_count;\n" \
+    "uniform vec3  effect_directional_lights_color[" GX_MAX_DIRECTIONAL_LIGHTS_STR "];\n" \
+    "uniform vec3  effect_directional_lights_direction[" GX_MAX_DIRECTIONAL_LIGHTS_STR "];\n"
+
+
 gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : Shader(e, c)
 {
     GX_GLC3_SHADER_SRC_DEFAULT_VERTEX_STARTING <<
         // camera uniform(s)
         "uniform mat4  camera_vp;\n"
-        // effect uniform(s)
-        "uniform mat4  effect_view_projection_biases[" GX_MAX_DIRECTIONAL_LIGHTS_STR " * " GX_MAX_SHADOW_CASCADES_STR "];\n"
-        "uniform float effect_cascades_count[" GX_MAX_DIRECTIONAL_LIGHTS_STR "];\n"
-        // light uniform(s)
-        "uniform vec3  light_directions[" GX_MAX_DIRECTIONAL_LIGHTS_STR "];\n"
+        GX_GLC3_SHADER_SRC_EFFECT_UNIFORMS
         // model uniform(s)
         "uniform mat4  model_m;\n"
         // output(s)
@@ -26,7 +30,8 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         "out vec3 out_tng;\n"
         "out vec3 out_btg;\n"
         "out vec2 out_uv;\n"
-        "out vec3 out_light_poses[" GX_MAX_DIRECTIONAL_LIGHTS_STR " * " GX_MAX_SHADOW_CASCADES_STR "];\n"
+        // One thing that I'm not sure about is its interpolating, it may not acceptably result
+        "out vec3 out_directional_lights_cascades_pojected[" GX_MAX_DIRECTIONAL_LIGHTS_STR " * " GX_MAX_SHADOW_CASCADES_STR "];\n"
         // Main function
         "void main()\n"
         "{\n"
@@ -36,17 +41,21 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         "    out_tng = normalize((model_m * vec4(tangent.xyz, 0.0)).xyz);\n"
         "    out_btg = cross(out_nrm, out_tng) * tangent.w;\n"
         "    out_uv = uv;\n"
-        "    int effect_cascades_count_int = int(effect_cascades_count);\n"
-        
-        "    for(int i = 0; i < effect_cascades_count_int; ++i)\n"
+        // Computing cascaded shadows
+        "    int effect_directional_lights_count_int = int(effect_directional_lights_count);\n"
+        "    for(int diri = 0, i = 0; diri < effect_directional_lights_count_int; ++diri)\n"
         "    {\n"
-        "        vec4 light_pos = effect_view_projection_biases[i] * pos;\n"
-        "        light_pos.xyz /= light_pos.w;\n"
-        "        light_pos.z *= 0.5;\n"
-        "        light_pos.z += 0.5;\n"
-        "        out_light_poses[i] = light_pos.xyz;\n"
-        //		"        if(light_pos.x > 0.0 && light_pos.x < 1.0 && light_pos.y > 0.0 && light_pos.y < 1.0)\n"
-        //		"            break;\n"
+        "        int effect_directional_lights_cascades_count_int = int(effect_directional_lights_cascades_count[diri]);\n"
+        "        int diff_ccc_cc = " GX_MAX_SHADOW_CASCADES_STR " - effect_directional_lights_cascades_count_int;\n"
+        "        for(int j = 0; j < effect_directional_lights_cascades_count_int; ++j, ++i)\n"
+        "        {\n"
+        "            vec4 light_pos = effect_directional_lights_cascades_view_projection_bias[i] * pos;\n"
+        "            light_pos.xyz /= light_pos.w;\n"
+        "            light_pos.z *= 0.5;\n"
+        "            light_pos.z += 0.5;\n"
+        "            out_directional_lights_cascades_pojected[i] = light_pos.xyz;\n"
+        "        }\n"
+        "        i += diff_ccc_cc;\n"
         "    }\n"
         "    gl_Position = camera_vp * pos;\n"
         "}";
@@ -65,13 +74,10 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         "uniform samplerCube effect_diffuse_environment;\n"
         "uniform samplerCube effect_specular_environment;\n"
         "uniform sampler2D   effect_ambient_occlusion;\n"
-        //        "uniform sampler2DShadow    effect_shadow_map;\n"
-        "uniform sampler2D   effect_shadow_map;\n"
+        //"uniform sampler2DShadow    effect_shadow_map;\n"
+        "uniform sampler2D   effect_directional_lights_cascades_shadow_map[" GX_MAX_DIRECTIONAL_LIGHTS_STR " * " GX_MAX_SHADOW_CASCADES_STR "];\n"
         "uniform sampler2D   effect_brdflut;\n"
-        "uniform float       effect_cascades_count;\n"
-        // light uniform(s)
-        "uniform vec3        light_color;\n"
-        "uniform vec3        light_direction;\n"
+        GX_GLC3_SHADER_SRC_EFFECT_UNIFORMS
         // camera uniform(s)
         "uniform vec3        camera_position;\n"
         // output(s) of vertex shader
@@ -80,7 +86,7 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         "in vec3 out_tng;\n"
         "in vec3 out_btg;\n"
         "in vec2 out_uv;\n"
-        "in vec3 out_light_poses[" GX_MAX_SHADOW_CASCADES_STR "];\n"
+        "in vec3 out_directional_lights_cascades_pojected[" GX_MAX_DIRECTIONAL_LIGHTS_STR " * " GX_MAX_SHADOW_CASCADES_STR "];\n"
         "out vec4 frag_color;\n"
         // Normal Distribution Function Trowbridge-Reitz GGX
         "float distribution_ggx(const vec3 normal, const vec3 halfway, const float roughness) {\n"
@@ -210,65 +216,68 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         //       note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
         "        lo += (kd * albedo.xyz / GXPI + specular) * radiance * normal_dot_light;\n"
         "    }\n"
-        "    bool is_in_directional_light = true;\n"
-        //   TODO: I'm not sure about bias calculation, maybe I should calculate it by vertex normal
-        "    float normal_dot_light = max(dot(normal, -light_direction), 0.0);\n"
-        "    float shadow_bias = 0.001;\n"
-        "    if(normal_dot_light > 0.0)\n"
+        "    int effect_directional_lights_count_int = int(effect_directional_lights_count);\n"
+        "    for(int diri = 0, lcasi = 0; diri < effect_directional_lights_count_int; ++diri, lcasi = diri * " GX_MAX_SHADOW_CASCADES_STR ")\n"
         "    {\n"
-        "        shadow_bias = clamp(sqrt((0.000025 / (normal_dot_light * normal_dot_light)) - 0.000025), 0.001, 0.02);\n"
-        "    }\n"
-        "    else\n"
-        "    {\n"
-        "        is_in_directional_light = false;"
-        "    }\n"
-        "    if(is_in_directional_light)\n"
-        "    {\n"
-        "        int effect_cascades_count_int = int(effect_cascades_count);\n"
-        "        for(int i = 0; i < effect_cascades_count_int; ++i)\n"
+        "        bool is_in_directional_light = true;\n"
+        "        float normal_dot_light = max(dot(out_nrm, -light_direction), 0.0);\n"
+        "        float shadow_bias = 0.001;\n"
+        "        if(normal_dot_light > 0.0)\n"
         "        {\n"
-        "            vec3 lightuv = out_light_poses[i];\n"
-        "            if (lightuv.x > 0.0 && lightuv.x < 1.0 && lightuv.y > 0.0 && lightuv.y < 1.0)\n"
+        "            shadow_bias = clamp(sqrt((0.000025 / (normal_dot_light * normal_dot_light)) - 0.000025), 0.001, 0.02);\n"
+        "        }\n"
+        "        else\n"
+        "        {\n"
+        "            is_in_directional_light = false;"
+        "        }\n"
+        "        if(is_in_directional_light)\n"
+        "        {\n"
+        "            int effect_directional_lights_cascades_count_int = int(effect_directional_lights_cascades_count[diri]);\n"
+        "            for(int i = 0; i < effect_directional_lights_cascades_count_int; ++i)\n"
         "            {\n"
-        //               TODO: it must become for each cascade shadow map
-        //"                float depth = texture(effect_shadow_map, lightuv, shadow_bias);\n"
-        //"                float depth = texture(effect_shadow_map, lightuv.xy).x * 2.0 - 1.0;\n"
-        "                float depth = texture(effect_shadow_map, lightuv.xy, 0.0).x;\n"
-        //"                if(depth != 0.0) { frag_color = vec4(vec3(abs(depth)), 1.0); return; }\n"
-        "                if(depth + shadow_bias <= lightuv.z)\n"
-        //"                if(depth == 0.0)\n"
+        "                vec3 lightuv = out_directional_lights_cascades_pojected[lcasi];\n"
+        "                if (lightuv.x > 0.0 && lightuv.x < 1.0 && lightuv.y > 0.0 && lightuv.y < 1.0)\n"
         "                {\n"
-        "                    is_in_directional_light = false;\n"
+        //                   TODO: it must become for each cascade shadow map
+        //"                    float depth = texture(effect_shadow_map, lightuv, shadow_bias);\n"
+        //"                    float depth = texture(effect_shadow_map, lightuv.xy).x * 2.0 - 1.0;\n"
+        "                    float depth = texture(effect_directional_lights_cascades_shadow_map[lcasi], lightuv.xy, 0.0).x;\n"
+        //"                    if(depth != 0.0) { frag_color = vec4(vec3(abs(depth)), 1.0); return; }\n"
+        "                    if(depth + shadow_bias <= lightuv.z)\n"
+        //"                    if(depth == 0.0)\n"
+        "                    {\n"
+        "                        is_in_directional_light = false;\n"
+        "                    }\n"
+        "                    break;\n"
         "                }\n"
-        "                break;\n"
         "            }\n"
         "        }\n"
-        "    }\n"
-        "    if(is_in_directional_light)\n"
-        "    {\n"
-        "        vec3 half_vec = normalize(view - light_direction);\n"
-        "        vec3 radiance = light_color.xyz;\n"
-        //       Cook-Torrance BRDF
-        "        float ndf = distribution_ggx(normal, half_vec, roughness);\n"
-        "        float geo = geometry_smith(normal_dot_light, normal_dot_view, roughness);\n"
-        "        vec3 frsn = fresnel_schlick(max(dot(half_vec, view), 0.0), f0);\n"
-        "        vec3 nominator = ndf * geo * frsn;\n"
-        //       0.001 to prevent divide by zero.
-        "        float denominator = 4.0 * normal_dot_view * normal_dot_light + 0.001;\n"
-        "        vec3 specular = nominator / denominator;\n"
-        //       kS is equal to Fresnel
-        "        vec3 ks = frsn;\n"
-        //       for energy conservation, the diffuse and specular light can't
-        //       be above 1.0 (unless the surface emits light); to preserve this
-        //       relationship the diffuse component (kD) should equal 1.0 - kS.
-        //       multiply kD by the inverse metalness such that only non-metals
-        //       have diffuse lighting, or a linear blend if partly metal (pure metals
-        //       have no diffuse light).
-        "        vec3 kd = (vec3(1.0) - ks) * (1.0 - metallic);\n"
-        //       scale light by NdotL
-        //       add to outgoing radiance Lo
-        //       note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
-        "        lo += (kd * albedo.xyz / GXPI + specular) * radiance * normal_dot_light;\n"
+        "        if(is_in_directional_light)\n"
+        "        {\n"
+        "            vec3 half_vec = normalize(view - effect_directional_lights_direction[diri]);\n"
+        "            vec3 radiance = effect_directional_lights_color[diri].xyz;\n"
+        //           Cook-Torrance BRDF
+        "            float ndf = distribution_ggx(normal, half_vec, roughness);\n"
+        "            float geo = geometry_smith(normal_dot_light, normal_dot_view, roughness);\n"
+        "            vec3 frsn = fresnel_schlick(max(dot(half_vec, view), 0.0), f0);\n"
+        "            vec3 nominator = ndf * geo * frsn;\n"
+        //           0.001 to prevent divide by zero.
+        "            float denominator = 4.0 * normal_dot_view * normal_dot_light + 0.001;\n"
+        "            vec3 specular = nominator / denominator;\n"
+        //           kS is equal to Fresnel
+        "            vec3 ks = frsn;\n"
+        //           for energy conservation, the diffuse and specular light can't
+        //           be above 1.0 (unless the surface emits light); to preserve this
+        //           relationship the diffuse component (kD) should equal 1.0 - kS.
+        //           multiply kD by the inverse metalness such that only non-metals
+        //           have diffuse lighting, or a linear blend if partly metal (pure metals
+        //           have no diffuse light).
+        "            vec3 kd = (vec3(1.0) - ks) * (1.0 - metallic);\n"
+        //           scale light by NdotL
+        //           add to outgoing radiance Lo
+        //           note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
+        "            lo += (kd * albedo.xyz / GXPI + specular) * radiance * normal_dot_light;\n"
+        "        }\n"
         "    }\n"
         //   ambient lighting (we now use IBL as the ambient term)
         "    vec3 frsn = fresnel_schlick_roughness(normal_dot_view, f0, roughness);\n"
@@ -303,13 +312,14 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         // TODO
         //GX_GLC3_THIS_GET_UNIFORM_F(effect_ambient_occlusion)
         GX_GLC3_THIS_GET_UNIFORM_TEXTURE_F(effect_brdflut)
-        GX_GLC3_THIS_GET_UNIFORM_F(effect_cascades_count)
+        GX_GLC3_THIS_GET_UNIFORM_F(effect_directional_lights_cascades_count)
         GX_GLC3_THIS_GET_UNIFORM_TEXTURE_F(effect_diffuse_environment)
-        GX_GLC3_THIS_GET_UNIFORM_TEXTURE_F(effect_shadow_map)
+        GX_GLC3_THIS_GET_UNIFORM_TEXTURE_ARRAY_F(effect_directional_lights_cascades_shadow_map)
         GX_GLC3_THIS_GET_UNIFORM_TEXTURE_F(effect_specular_environment)
-        GX_GLC3_THIS_GET_UNIFORM_F(effect_view_projection_biases)
-        GX_GLC3_THIS_GET_UNIFORM_F(light_color)
-        GX_GLC3_THIS_GET_UNIFORM_F(light_direction)
+        GX_GLC3_THIS_GET_UNIFORM_F(effect_directional_lights_cascades_view_projection_bias)
+        GX_GLC3_THIS_GET_UNIFORM_F(effect_directional_lights_color)
+        GX_GLC3_THIS_GET_UNIFORM_F(effect_directional_lights_direction)
+        GX_GLC3_THIS_GET_UNIFORM_F(effect_directional_lights_count)
         GX_GLC3_THIS_GET_UNIFORM_F(model_m)
         // GX_GLES2_THIS_GET_UNIFORM_F(scene_ambient_light)
         GX_GLC3_THIS_GET_UNIFORM_F(scene_directional_lights_color)
@@ -332,7 +342,7 @@ void gearoenix::glc3::shader::ForwardPbr::bind() const noexcept
     GX_GLC3_SHADER_SET_TEXTURE_INDEX_UNIFORM(effect_ambient_occlusion)
     GX_GLC3_SHADER_SET_TEXTURE_INDEX_UNIFORM(effect_brdflut)
     GX_GLC3_SHADER_SET_TEXTURE_INDEX_UNIFORM(effect_diffuse_environment)
-    GX_GLC3_SHADER_SET_TEXTURE_INDEX_UNIFORM(effect_shadow_map)
+    GX_GLC3_SHADER_SET_TEXTURE_INDEX_ARRAY_UNIFORM(effect_directional_lights_cascades_shadow_map)
     GX_GLC3_SHADER_SET_TEXTURE_INDEX_UNIFORM(effect_specular_environment)
 }
 #endif

@@ -60,7 +60,9 @@ gearoenix::gl::tex_parameteriv_fnp gearoenix::gl::Loader::tex_parameteriv;
 gearoenix::gl::scissor_fnp gearoenix::gl::Loader::scissor;
 gearoenix::gl::shader_source_fnp gearoenix::gl::Loader::shader_source;
 gearoenix::gl::uniform1f_fnp gearoenix::gl::Loader::uniform1f;
+gearoenix::gl::uniform1fv_fnp gearoenix::gl::Loader::uniform1fv;
 gearoenix::gl::uniform1i_fnp gearoenix::gl::Loader::uniform1i;
+gearoenix::gl::uniform1iv_fnp gearoenix::gl::Loader::uniform1iv;
 gearoenix::gl::uniform2fv_fnp gearoenix::gl::Loader::uniform2fv;
 gearoenix::gl::uniform3fv_fnp gearoenix::gl::Loader::uniform3fv;
 gearoenix::gl::uniform4fv_fnp gearoenix::gl::Loader::uniform4fv;
@@ -154,7 +156,9 @@ bool gearoenix::gl::Loader::load_library(const render::engine::Type::Id engine_t
     GXFUNLDF(glScissor, scissor)
     GXFUNLDF(glShaderSource, shader_source)
     GXFUNLDF(glUniform1f, uniform1f)
+    GXFUNLDF(glUniform1fv, uniform1fv)
     GXFUNLDF(glUniform1i, uniform1i)
+    GXFUNLDF(glUniform1iv, uniform1iv)
     GXFUNLDF(glUniform2fv, uniform2fv)
     GXFUNLDF(glUniform3fv, uniform3fv)
     GXFUNLDF(glUniform4fv, uniform4fv)

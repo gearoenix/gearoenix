@@ -7,6 +7,7 @@
 #include "../glc3.hpp"
 #include "glc3-shd-shader.hpp"
 #include <string>
+
 namespace gearoenix::glc3 {
 namespace engine {
     class Engine;
@@ -19,13 +20,14 @@ namespace shader {
         GX_GLC3_UNIFORM_MATRIX(camera_vp, 4, 1)
         GX_GLC3_UNIFORM_TEXTURE(effect_ambient_occlusion)
         GX_GLC3_UNIFORM_TEXTURE(effect_brdflut)
-        GX_GLC3_UNIFORM_FLOAT(effect_cascades_count)
         GX_GLC3_UNIFORM_TEXTURE(effect_diffuse_environment)
-        GX_GLC3_UNIFORM_TEXTURE(effect_shadow_map)
+        GX_GLC3_UNIFORM_FLOAT(effect_directional_lights_cascades_count, GX_MAX_DIRECTIONAL_LIGHTS)
+        GX_GLC3_UNIFORM_TEXTURE_ARRAY(effect_directional_lights_cascades_shadow_map, GX_MAX_SHADOW_CASCADES* GX_MAX_DIRECTIONAL_LIGHTS)
+        GX_GLC3_UNIFORM_MATRIX(effect_directional_lights_cascades_view_projection_bias, 4, GX_MAX_SHADOW_CASCADES* GX_MAX_DIRECTIONAL_LIGHTS)
+        GX_GLC3_UNIFORM_VECTOR(effect_directional_lights_color, 3, GX_MAX_DIRECTIONAL_LIGHTS)
+        GX_GLC3_UNIFORM_FLOAT(effect_directional_lights_count, 1)
+        GX_GLC3_UNIFORM_VECTOR(effect_directional_lights_direction, 3, GX_MAX_DIRECTIONAL_LIGHTS)
         GX_GLC3_UNIFORM_TEXTURE(effect_specular_environment)
-        GX_GLC3_UNIFORM_MATRIX(effect_view_projection_biases, 4, GX_MAX_SHADOW_CASCADES)
-        GX_GLC3_UNIFORM_VECTOR(light_color, 3, 1)
-        GX_GLC3_UNIFORM_VECTOR(light_direction, 3, 1)
         GX_GLC3_UNIFORM_MATRIX(model_m, 4, 1)
         GX_GLC3_UNIFORM_VECTOR(scene_ambient_light, 3, 1)
         GX_GLC3_UNIFORM_VECTOR(scene_directional_lights_color, 4, GX_MAX_DIRECTIONAL_LIGHTS)

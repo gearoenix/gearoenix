@@ -74,7 +74,9 @@ typedef GXGL_APICALL void(GXGL_APIENTRY tex_parameteriv_fnp)(enumerated, enumera
 typedef GXGL_APICALL void(GXGL_APIENTRY scissor_fnp)(sint, sint, sizei, sizei);
 typedef GXGL_APICALL void(GXGL_APIENTRY shader_source_fnp)(uint shader, sizei count, const char* const* code, const sint* length);
 typedef GXGL_APICALL void(GXGL_APIENTRY uniform1f_fnp)(sint location, float v0);
+typedef GXGL_APICALL void(GXGL_APIENTRY uniform1fv_fnp)(sint location, sizei count, const void* data);
 typedef GXGL_APICALL void(GXGL_APIENTRY uniform1i_fnp)(sint location, sint v0);
+typedef GXGL_APICALL void(GXGL_APIENTRY uniform1iv_fnp)(sint location, sizei count, const void* data);
 typedef GXGL_APICALL void(GXGL_APIENTRY uniform2fv_fnp)(sint location, sizei count, const void* data);
 typedef GXGL_APICALL void(GXGL_APIENTRY uniform3fv_fnp)(sint location, sizei count, const void* data);
 typedef GXGL_APICALL void(GXGL_APIENTRY uniform4fv_fnp)(sint location, sizei count, const void* data);
@@ -153,7 +155,9 @@ public:
     static scissor_fnp scissor;
     static shader_source_fnp shader_source;
     static uniform1f_fnp uniform1f;
+    static uniform1fv_fnp uniform1fv;
     static uniform1i_fnp uniform1i;
+    static uniform1iv_fnp uniform1iv;
     static uniform2fv_fnp uniform2fv;
     static uniform3fv_fnp uniform3fv;
     static uniform4fv_fnp uniform4fv;
