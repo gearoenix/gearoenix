@@ -8,11 +8,14 @@
 #include <sstream>
 
 #define GX_GLC3_SHADER_SRC_EFFECT_UNIFORMS \
-    "uniform float effect_directional_lights_cascades_count[" GX_MAX_DIRECTIONAL_LIGHTS_STR "];\n" \
-    "uniform mat4  effect_directional_lights_cascades_view_projection_bias[" GX_MAX_DIRECTIONAL_LIGHTS_STR " * " GX_MAX_SHADOW_CASCADES_STR "];\n" \
-    "uniform float effect_directional_lights_count;\n" \
-    "uniform vec3  effect_directional_lights_color[" GX_MAX_DIRECTIONAL_LIGHTS_STR "];\n" \
-    "uniform vec3  effect_directional_lights_direction[" GX_MAX_DIRECTIONAL_LIGHTS_STR "];\n"
+    "uniform float effect_shadow_caster_directional_lights_cascades_count[" GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER_STR "];\n" \
+    "uniform mat4  effect_shadow_caster_directional_lights_cascades_view_projection_bias[" GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER_STR " * " GX_MAX_SHADOW_CASCADES_STR "];\n" \
+    "uniform float effect_shadow_caster_directional_lights_count;\n" \
+    "uniform vec3  effect_shadow_caster_directional_lights_color[" GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER_STR "];\n" \
+    "uniform vec3  effect_shadow_caster_directional_lights_direction[" GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER_STR "];\n" \
+	"uniform vec4  effect_point_lights_color_min_radius[" GX_MAX_POINT_LIGHTS_STR "];\n" \
+	"uniform float effect_point_lights_count;\n" \
+	"uniform vec4  effect_point_lights_position_max_radius[" GX_MAX_POINT_LIGHTS_STR "];\n"
 
 
 gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
@@ -31,7 +34,7 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         "out vec3 out_btg;\n"
         "out vec2 out_uv;\n"
         // One thing that I'm not sure about is its interpolating, it may not acceptably result
-        "out vec3 out_directional_lights_cascades_pojected[" GX_MAX_DIRECTIONAL_LIGHTS_STR " * " GX_MAX_SHADOW_CASCADES_STR "];\n"
+        "out vec3 out_directional_lights_cascades_pojected[" GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER_STR" * " GX_MAX_SHADOW_CASCADES_STR "];\n"
         // Main function
         "void main()\n"
         "{\n"
@@ -42,14 +45,14 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         "    out_btg = cross(out_nrm, out_tng) * tangent.w;\n"
         "    out_uv = uv;\n"
         // Computing cascaded shadows
-        "    int effect_directional_lights_count_int = int(effect_directional_lights_count);\n"
-        "    for(int diri = 0, i = 0; diri < effect_directional_lights_count_int; ++diri)\n"
+        "    int effect_shadow_caster_directional_lights_count_int = int(effect_shadow_caster_directional_lights_count);\n"
+        "    for(int diri = 0, i = 0; diri < effect_shadow_caster_directional_lights_count_int; ++diri)\n"
         "    {\n"
-        "        int effect_directional_lights_cascades_count_int = int(effect_directional_lights_cascades_count[diri]);\n"
-        "        int diff_ccc_cc = " GX_MAX_SHADOW_CASCADES_STR " - effect_directional_lights_cascades_count_int;\n"
-        "        for(int j = 0; j < effect_directional_lights_cascades_count_int; ++j, ++i)\n"
+        "        int effect_shadow_caster_directional_lights_cascades_count_int = int(effect_shadow_caster_directional_lights_cascades_count[diri]);\n"
+        "        int diff_ccc_cc = " GX_MAX_SHADOW_CASCADES_STR " - effect_shadow_caster_directional_lights_cascades_count_int;\n"
+        "        for(int j = 0; j < effect_shadow_caster_directional_lights_cascades_count_int; ++j, ++i)\n"
         "        {\n"
-        "            vec4 light_pos = effect_directional_lights_cascades_view_projection_bias[i] * pos;\n"
+        "            vec4 light_pos = effect_shadow_caster_directional_lights_cascades_view_projection_bias[i] * pos;\n"
         "            light_pos.xyz /= light_pos.w;\n"
         "            light_pos.z *= 0.5;\n"
         "            light_pos.z += 0.5;\n"
@@ -64,8 +67,6 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         "uniform vec3        scene_ambient_light;\n"
         "uniform vec4        scene_directional_lights_color[" GX_MAX_DIRECTIONAL_LIGHTS_STR "];\n"
         "uniform vec4        scene_directional_lights_direction[" GX_MAX_DIRECTIONAL_LIGHTS_STR "];\n"
-        "uniform vec4        scene_point_lights_color_min_radius[" GX_MAX_POINT_LIGHTS_STR "];\n"
-        "uniform vec4        scene_point_lights_position_max_radius[" GX_MAX_POINT_LIGHTS_STR "];\n"
         // directional, point
         "uniform vec2        scene_lights_count;\n"
         // samples-count, radius, z-tolerance
@@ -75,7 +76,7 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         "uniform samplerCube effect_specular_environment;\n"
         "uniform sampler2D   effect_ambient_occlusion;\n"
         //"uniform sampler2DShadow    effect_shadow_map;\n"
-        "uniform sampler2D   effect_directional_lights_cascades_shadow_map[" GX_MAX_DIRECTIONAL_LIGHTS_STR " * " GX_MAX_SHADOW_CASCADES_STR "];\n"
+        "uniform sampler2D   effect_shadow_caster_directional_lights_cascades_shadow_map[" GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER_STR" * " GX_MAX_SHADOW_CASCADES_STR "];\n"
         "uniform sampler2D   effect_brdflut;\n"
         GX_GLC3_SHADER_SRC_EFFECT_UNIFORMS
         // camera uniform(s)
@@ -86,7 +87,7 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         "in vec3 out_tng;\n"
         "in vec3 out_btg;\n"
         "in vec2 out_uv;\n"
-        "in vec3 out_directional_lights_cascades_pojected[" GX_MAX_DIRECTIONAL_LIGHTS_STR " * " GX_MAX_SHADOW_CASCADES_STR "];\n"
+        "in vec3 out_directional_lights_cascades_pojected[" GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER_STR" * " GX_MAX_SHADOW_CASCADES_STR "];\n"
         "out vec4 frag_color;\n"
         // Normal Distribution Function Trowbridge-Reitz GGX
         "float distribution_ggx(const vec3 normal, const vec3 halfway, const float roughness) {\n"
@@ -151,11 +152,12 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         //   reflectance equation
         "    vec3 lo = vec3(0.0);\n"
         //   computing point lights
-        "    for (float i = 0.001; i < scene_lights_count.y; ++i)\n"
+		"    int effect_point_lights_count_int = int(effect_point_lights_count);\n"
+        "    for (float i = 0.001; i < effect_point_lights_count_int; ++i)\n"
         "    {\n"
         "        int ii = int(i);\n"
         //       calculate per-light radiance
-        "        vec3 light_vec = scene_point_lights_position_max_radius[ii].xyz - out_pos;\n"
+        "        vec3 light_vec = effect_point_lights_position_max_radius[ii].xyz - out_pos;\n"
         //       TODO: in future consider max and min radius
         "        float distance = length(light_vec);\n"
         "        float distance_inv = 1.0 / distance;\n"
@@ -163,7 +165,7 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         "        float normal_dot_light = max(dot(normal, light_direction), 0.0);\n"
         "        vec3 half_vec = normalize(view + light_direction);\n"
         "        float attenuation = distance_inv * distance_inv;\n"
-        "        vec3 radiance = scene_point_lights_color_min_radius[ii].xyz * attenuation;\n"
+        "        vec3 radiance = effect_point_lights_color_min_radius[ii].xyz * attenuation;\n"
         //       Cook-Torrance BRDF
         "        float ndf = distribution_ggx(normal, half_vec, roughness);\n"
         "        float geo = geometry_smith(normal_dot_light, normal_dot_view, roughness);\n"
@@ -216,8 +218,8 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         //       note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
         "        lo += (kd * albedo.xyz / GXPI + specular) * radiance * normal_dot_light;\n"
         "    }\n"
-        "    int effect_directional_lights_count_int = int(effect_directional_lights_count);\n"
-        "    for(int diri = 0, lcasi = 0; diri < effect_directional_lights_count_int; ++diri, lcasi = diri * " GX_MAX_SHADOW_CASCADES_STR ")\n"
+        "    int effect_shadow_caster_directional_lights_count_int = int(effect_shadow_caster_directional_lights_count);\n"
+        "    for(int diri = 0, lcasi = 0; diri < effect_shadow_caster_directional_lights_count_int; ++diri, lcasi = diri * " GX_MAX_SHADOW_CASCADES_STR ")\n"
         "    {\n"
         "        bool is_in_directional_light = true;\n"
         "        float normal_dot_light = max(dot(out_nrm, -light_direction), 0.0);\n"
@@ -232,8 +234,8 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         "        }\n"
         "        if(is_in_directional_light)\n"
         "        {\n"
-        "            int effect_directional_lights_cascades_count_int = int(effect_directional_lights_cascades_count[diri]);\n"
-        "            for(int i = 0; i < effect_directional_lights_cascades_count_int; ++i)\n"
+        "            int effect_shadow_caster_directional_lights_cascades_count_int = int(effect_shadow_caster_directional_lights_cascades_count[diri]);\n"
+        "            for(int i = 0; i < effect_shadow_caster_directional_lights_cascades_count_int; ++i)\n"
         "            {\n"
         "                vec3 lightuv = out_directional_lights_cascades_pojected[lcasi];\n"
         "                if (lightuv.x > 0.0 && lightuv.x < 1.0 && lightuv.y > 0.0 && lightuv.y < 1.0)\n"
@@ -241,7 +243,7 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         //                   TODO: it must become for each cascade shadow map
         //"                    float depth = texture(effect_shadow_map, lightuv, shadow_bias);\n"
         //"                    float depth = texture(effect_shadow_map, lightuv.xy).x * 2.0 - 1.0;\n"
-        "                    float depth = texture(effect_directional_lights_cascades_shadow_map[lcasi], lightuv.xy, 0.0).x;\n"
+        "                    float depth = texture(effect_shadow_caster_directional_lights_cascades_shadow_map[lcasi], lightuv.xy, 0.0).x;\n"
         //"                    if(depth != 0.0) { frag_color = vec4(vec3(abs(depth)), 1.0); return; }\n"
         "                    if(depth + shadow_bias <= lightuv.z)\n"
         //"                    if(depth == 0.0)\n"
@@ -254,8 +256,8 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         "        }\n"
         "        if(is_in_directional_light)\n"
         "        {\n"
-        "            vec3 half_vec = normalize(view - effect_directional_lights_direction[diri]);\n"
-        "            vec3 radiance = effect_directional_lights_color[diri].xyz;\n"
+        "            vec3 half_vec = normalize(view - effect_shadow_caster_directional_lights_direction[diri]);\n"
+        "            vec3 radiance = effect_shadow_caster_directional_lights_color[diri].xyz;\n"
         //           Cook-Torrance BRDF
         "            float ndf = distribution_ggx(normal, half_vec, roughness);\n"
         "            float geo = geometry_smith(normal_dot_light, normal_dot_view, roughness);\n"
@@ -312,21 +314,21 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         // TODO
         //GX_GLC3_THIS_GET_UNIFORM_F(effect_ambient_occlusion)
         GX_GLC3_THIS_GET_UNIFORM_TEXTURE_F(effect_brdflut)
-        GX_GLC3_THIS_GET_UNIFORM_F(effect_directional_lights_cascades_count)
         GX_GLC3_THIS_GET_UNIFORM_TEXTURE_F(effect_diffuse_environment)
-        GX_GLC3_THIS_GET_UNIFORM_TEXTURE_ARRAY_F(effect_directional_lights_cascades_shadow_map)
+		GX_GLC3_THIS_GET_UNIFORM_F(effect_point_lights_color_min_radius)
+		GX_GLC3_THIS_GET_UNIFORM_F(effect_point_lights_position_max_radius)
+        GX_GLC3_THIS_GET_UNIFORM_F(effect_shadow_caster_directional_lights_cascades_count)
+        GX_GLC3_THIS_GET_UNIFORM_TEXTURE_ARRAY_F(effect_shadow_caster_directional_lights_cascades_shadow_map)
+        GX_GLC3_THIS_GET_UNIFORM_F(effect_shadow_caster_directional_lights_cascades_view_projection_bias)
+        GX_GLC3_THIS_GET_UNIFORM_F(effect_shadow_caster_directional_lights_color)
+        GX_GLC3_THIS_GET_UNIFORM_F(effect_shadow_caster_directional_lights_direction)
+        GX_GLC3_THIS_GET_UNIFORM_F(effect_shadow_caster_directional_lights_count)
         GX_GLC3_THIS_GET_UNIFORM_TEXTURE_F(effect_specular_environment)
-        GX_GLC3_THIS_GET_UNIFORM_F(effect_directional_lights_cascades_view_projection_bias)
-        GX_GLC3_THIS_GET_UNIFORM_F(effect_directional_lights_color)
-        GX_GLC3_THIS_GET_UNIFORM_F(effect_directional_lights_direction)
-        GX_GLC3_THIS_GET_UNIFORM_F(effect_directional_lights_count)
         GX_GLC3_THIS_GET_UNIFORM_F(model_m)
         // GX_GLES2_THIS_GET_UNIFORM_F(scene_ambient_light)
         GX_GLC3_THIS_GET_UNIFORM_F(scene_directional_lights_color)
         GX_GLC3_THIS_GET_UNIFORM_F(scene_directional_lights_direction)
         GX_GLC3_THIS_GET_UNIFORM_F(scene_lights_count)
-        GX_GLC3_THIS_GET_UNIFORM_F(scene_point_lights_color_min_radius)
-        GX_GLC3_THIS_GET_UNIFORM_F(scene_point_lights_position_max_radius)
         // GX_GLES2_THIS_GET_UNIFORM_F(scene_ssao_config)
     });
 }
@@ -342,7 +344,7 @@ void gearoenix::glc3::shader::ForwardPbr::bind() const noexcept
     GX_GLC3_SHADER_SET_TEXTURE_INDEX_UNIFORM(effect_ambient_occlusion)
     GX_GLC3_SHADER_SET_TEXTURE_INDEX_UNIFORM(effect_brdflut)
     GX_GLC3_SHADER_SET_TEXTURE_INDEX_UNIFORM(effect_diffuse_environment)
-    GX_GLC3_SHADER_SET_TEXTURE_INDEX_ARRAY_UNIFORM(effect_directional_lights_cascades_shadow_map)
+    GX_GLC3_SHADER_SET_TEXTURE_INDEX_ARRAY_UNIFORM(effect_shadow_caster_directional_lights_cascades_shadow_map)
     GX_GLC3_SHADER_SET_TEXTURE_INDEX_UNIFORM(effect_specular_environment)
 }
 #endif

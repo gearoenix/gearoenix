@@ -100,13 +100,12 @@ gearoenix::render::graph::node::ForwardPbr::ForwardPbr(
     : Node(
         e,
         pipeline::Type::ForwardPbr,
-        5,
+        4,
         1,
         {
             "diffuse environment",
             "specular environment",
             "ambient occlusion",
-            "shadow map",
         },
         {
             "color",

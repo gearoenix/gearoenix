@@ -47,9 +47,14 @@ namespace texture {
 }
 namespace graph::node {
     struct ForwardPbrUniform {
-        // Bring lights in here not scene
-        math::Mat4x4 cascades_view_projections_bias[GX_MAX_SHADOW_CASCADES];
-        core::Real cascades_count = static_cast<core::Real>(GX_MAX_SHADOW_CASCADES);
+		math::Vec4 shadow_caster_directional_lights_cascades_count[(GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER >> 2) + (GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER & 3 != 0? 1: 0)];
+		math::Mat4x4 shadow_caster_directional_lights_cascades_view_projections_bias[GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER][GX_MAX_SHADOW_CASCADES] = {};
+		math::Vec4 shadow_caster_directional_lights_color[GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER] = {};
+		math::Vec4 shadow_caster_directional_lights_direction[GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER] = {};
+		math::Vec4 point_lights_color_min_radius[GX_MAX_POINT_LIGHTS] = {};
+		math::Vec4 point_lights_position_max_radius[GX_MAX_POINT_LIGHTS] = {};
+		core::Real point_lights_count = 0.0f;
+		core::Real shadow_caster_directional_lights_count = 0.0f;
         explicit ForwardPbrUniform(const light::CascadeInfo* cas, const engine::Engine* e) noexcept;
     };
 
@@ -94,7 +99,6 @@ namespace graph::node {
         const static unsigned int DIFFUSE_ENVIRONMENT_INDEX;
         const static unsigned int SPECULAR_ENVIRONMENT_INDEX;
         const static unsigned int AMBIENT_OCCLUSION_INDEX;
-        const static unsigned int SHADOW_MAP_INDEX;
         const static unsigned int BRDFLUT_INDEX;
 
         ForwardPbr(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
