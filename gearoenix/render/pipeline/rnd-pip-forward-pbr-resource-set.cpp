@@ -1,4 +1,5 @@
 #include "rnd-pip-forward-pbr-resource-set.hpp"
+#include "../../core/cr-static.hpp"
 
 void gearoenix::render::pipeline::ForwardPbrResourceSet::set_node_uniform_buffer(buffer::Uniform* const uniform_buffer) noexcept
 {
@@ -20,9 +21,9 @@ void gearoenix::render::pipeline::ForwardPbrResourceSet::set_ambient_occlusion(t
     ambient_occlusion = t;
 }
 
-void gearoenix::render::pipeline::ForwardPbrResourceSet::set_shadow_mapper(texture::Texture2D* const t) noexcept
+void gearoenix::render::pipeline::ForwardPbrResourceSet::set_directional_lights_shadow_maps(texture::Texture2D* const t, const int light_index, const int cas_index) noexcept
 {
-    shadow_map = t;
+    directional_lights_shadow_maps[light_index][cas_index] = t;
 }
 
 void gearoenix::render::pipeline::ForwardPbrResourceSet::set_brdflut(texture::Texture2D* const t) noexcept
@@ -36,6 +37,6 @@ void gearoenix::render::pipeline::ForwardPbrResourceSet::clean() noexcept
     diffuse_environment = nullptr;
     specular_environment = nullptr;
     ambient_occlusion = nullptr;
-    shadow_map = nullptr;
+    GX_SET_ARRAY_ZERO(directional_lights_shadow_maps)
     brdflut = nullptr;
 }

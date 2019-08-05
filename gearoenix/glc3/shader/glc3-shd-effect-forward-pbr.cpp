@@ -11,8 +11,8 @@
 	"uniform vec4  effect_point_lights_color_min_radius[" GX_MAX_POINT_LIGHTS_STR "];\n" \
 	"uniform vec4  effect_point_lights_position_max_radius[" GX_MAX_POINT_LIGHTS_STR "];\n" \
     "uniform mat4  effect_shadow_caster_directional_lights_cascades_view_projection_bias[" GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER_STR " * " GX_MAX_SHADOW_CASCADES_STR "];\n" \
-    "uniform vec3  effect_shadow_caster_directional_lights_color_cascades_count[" GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER_STR "];\n" \
-    "uniform vec3  effect_shadow_caster_directional_lights_direction[" GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER_STR "];\n" \
+    "uniform vec4  effect_shadow_caster_directional_lights_color_cascades_count[" GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER_STR "];\n" \
+    "uniform vec4  effect_shadow_caster_directional_lights_direction[" GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER_STR "];\n" \
 	"uniform float effect_point_lights_count;\n" \
     "uniform float effect_shadow_caster_directional_lights_count;\n"
 
@@ -315,10 +315,9 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         GX_GLC3_THIS_GET_UNIFORM_TEXTURE_F(effect_diffuse_environment)
 		GX_GLC3_THIS_GET_UNIFORM_F(effect_point_lights_color_min_radius)
 		GX_GLC3_THIS_GET_UNIFORM_F(effect_point_lights_position_max_radius)
-        GX_GLC3_THIS_GET_UNIFORM_F(effect_shadow_caster_directional_lights_cascades_count)
         GX_GLC3_THIS_GET_UNIFORM_TEXTURE_ARRAY_F(effect_shadow_caster_directional_lights_cascades_shadow_map)
         GX_GLC3_THIS_GET_UNIFORM_F(effect_shadow_caster_directional_lights_cascades_view_projection_bias)
-        GX_GLC3_THIS_GET_UNIFORM_F(effect_shadow_caster_directional_lights_color)
+        GX_GLC3_THIS_GET_UNIFORM_F(effect_shadow_caster_directional_lights_color_cascades_count)
         GX_GLC3_THIS_GET_UNIFORM_F(effect_shadow_caster_directional_lights_direction)
         GX_GLC3_THIS_GET_UNIFORM_F(effect_shadow_caster_directional_lights_count)
         GX_GLC3_THIS_GET_UNIFORM_TEXTURE_F(effect_specular_environment)

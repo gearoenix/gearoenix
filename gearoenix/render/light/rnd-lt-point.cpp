@@ -1,15 +1,36 @@
 #include "rnd-lt-point.hpp"
 #include "../../system/stream/sys-stm-stream.hpp"
+#include "../../core/cr-static.hpp"
 
-gearoenix::render::light::Point::Point(const core::Id my_id, system::stream::Stream* const f, engine::Engine* const e) noexcept
-    : Light(my_id, f, e)
+void gearoenix::render::light::Point::update_influence_area() noexcept
 {
-    f->read(position_radius[0]);
-    f->read(position_radius[1]);
-    f->read(position_radius[2]);
+    const auto red = color[0];
+    const auto grn = color[1];
+    const auto blu = color[2];
+    auto mxc = GX_MAX(red, grn);
+    mxc = GX_MAX(mxc, blu);
+    mxc *= 20.371832715762602978417121711682f;
+    mxc = std::sqrtf(std::abs(mxc));
+    position_max_radius[3] = mxc;
+    influence.reset(position_max_radius.xyz() + mxc);
+    influence.put(position_max_radius.xyz() - mxc);
 }
 
-const gearoenix::math::Vec4& gearoenix::render::light::Point::get_position_radius() const noexcept
+gearoenix::render::light::Point::Point(const core::Id my_id, system::stream::Stream* const f, engine::Engine* const e) noexcept
+    : Light(my_id, f, e, Type::POINT)
 {
-    return position_radius;
+    f->read(position_max_radius[0]);
+    f->read(position_max_radius[1]);
+    f->read(position_max_radius[2]);
+    update_influence_area();
+}
+
+const gearoenix::math::Vec4& gearoenix::render::light::Point::get_position_max_radius() const noexcept
+{
+    return position_max_radius;
+}
+
+const gearoenix::core::Real gearoenix::render::light::Point::get_min_radius() const noexcept
+{
+    return min_radius;
 }

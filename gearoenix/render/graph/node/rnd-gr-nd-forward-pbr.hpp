@@ -49,7 +49,9 @@ namespace graph::node {
 		math::Vec4 shadow_caster_directional_lights_direction[GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER] = {};
 		core::Real point_lights_count = 0.0f;
 		core::Real shadow_caster_directional_lights_count = 0.0f;
-        explicit ForwardPbrUniform(const std::vector<std::pair<light::Directional*, light::CascadeInfo*>>* directional_lights, const scene::Scene* scn) noexcept;
+        explicit ForwardPbrUniform(
+            const std::vector<std::pair<light::Directional*, light::CascadeInfo*>>* directional_lights, 
+            const scene::Scene* scn, const model::Model* mdl) noexcept;
     };
 
     struct ForwardPbrRenderData {
