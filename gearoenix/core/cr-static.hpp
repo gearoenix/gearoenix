@@ -31,4 +31,7 @@
 #define GX_CHECK_NOT_EQAUL_D(x, y) {((void)(x)); ((void)(y));}
 #define GX_CHECK_EQAUL_D(x, y) {((void)(x)); ((void)(y));}
 #endif
+#define GX_CEIL_2(x) (((x) >> 1) + ((x) & 1))
+#define GX_CEIL_4(x) (((x) >> 2) + ((((x) >> 1) & 1) | ((x) & 1)))
+#define GX_CEIL_8(x) (((x) >> 3) + ((((x) >> 2) & 1) | (((x) >> 1) & 1) | ((x) & 1)))
 #endif

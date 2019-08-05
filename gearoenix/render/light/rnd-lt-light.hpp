@@ -4,6 +4,7 @@
 #include "../../math/math-aabb.hpp"
 #include "../../math/math-vector.hpp"
 #include "../buffer/rnd-buf-framed-uniform.hpp"
+#include "rnd-lt-type.hpp"
 #include <memory>
 namespace gearoenix {
 namespace system::stream {
@@ -16,17 +17,22 @@ namespace render {
     namespace light {
         class Light : public core::asset::Asset {
         protected:
+            const Type light_type;
             engine::Engine* const e;
             bool enabled = true;
             bool has_shadow = false;
             math::Vec3 color = math::Vec3(1.0f, 1.0f, 1.0f);
             math::Aabb3 influence;
-            std::unique_ptr<buffer::FramedUniform> uniform_buffers;
+            buffer::FramedUniform *uniform_buffers = nullptr;
 
-            Light(core::Id my_id, system::stream::Stream* f, engine::Engine* e) noexcept;
-            Light(core::Id my_id, engine::Engine* e) noexcept;
+            Light(core::Id my_id, system::stream::Stream* f, engine::Engine* e, Type light_type) noexcept;
+            Light(core::Id my_id, engine::Engine* e, Type light_type) noexcept;
 
         public:
+            virtual ~Light() noexcept;
+
+            Type get_type() const noexcept;
+
             const math::Vec3& get_color() const noexcept;
             void set_color(const math::Vec3& color) noexcept;
 

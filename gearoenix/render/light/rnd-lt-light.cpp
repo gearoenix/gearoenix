@@ -6,8 +6,10 @@
 gearoenix::render::light::Light::Light(
     const core::Id my_id,
     system::stream::Stream* const f,
-    engine::Engine* const e) noexcept
+    engine::Engine* const e, 
+    const Type light_type) noexcept
     : core::asset::Asset(my_id, core::asset::Type::LIGHT)
+    , light_type(light_type)
     , e(e)
 {
     f->read(color[0]);
@@ -16,10 +18,21 @@ gearoenix::render::light::Light::Light(
     has_shadow = f->read_bool();
 }
 
-gearoenix::render::light::Light::Light(const core::Id my_id, engine::Engine* const e) noexcept
+gearoenix::render::light::Light::Light(const core::Id my_id, engine::Engine* const e, const Type light_type) noexcept
     : core::asset::Asset(my_id, core::asset::Type::LIGHT)
+    , light_type(light_type)
     , e(e)
 {
+}
+
+gearoenix::render::light::Light::~Light() noexcept
+{
+    delete uniform_buffers;
+}
+
+gearoenix::render::light::Type gearoenix::render::light::Light::get_type() const noexcept
+{
+    return light_type;
 }
 
 const gearoenix::math::Vec3& gearoenix::render::light::Light::get_color() const noexcept
@@ -78,10 +91,10 @@ void gearoenix::render::light::Light::update_uniform() noexcept
 
 const gearoenix::render::buffer::FramedUniform* gearoenix::render::light::Light::get_uniform_buffers() const noexcept
 {
-    return uniform_buffers.get();
+    return uniform_buffers;
 }
 
 gearoenix::render::buffer::FramedUniform* gearoenix::render::light::Light::get_uniform_buffers() noexcept
 {
-    return uniform_buffers.get();
+    return uniform_buffers;
 }

@@ -8,15 +8,13 @@
 #include <sstream>
 
 #define GX_GLC3_SHADER_SRC_EFFECT_UNIFORMS \
-    "uniform float effect_shadow_caster_directional_lights_cascades_count[" GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER_STR "];\n" \
-    "uniform mat4  effect_shadow_caster_directional_lights_cascades_view_projection_bias[" GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER_STR " * " GX_MAX_SHADOW_CASCADES_STR "];\n" \
-    "uniform float effect_shadow_caster_directional_lights_count;\n" \
-    "uniform vec3  effect_shadow_caster_directional_lights_color[" GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER_STR "];\n" \
-    "uniform vec3  effect_shadow_caster_directional_lights_direction[" GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER_STR "];\n" \
 	"uniform vec4  effect_point_lights_color_min_radius[" GX_MAX_POINT_LIGHTS_STR "];\n" \
+	"uniform vec4  effect_point_lights_position_max_radius[" GX_MAX_POINT_LIGHTS_STR "];\n" \
+    "uniform mat4  effect_shadow_caster_directional_lights_cascades_view_projection_bias[" GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER_STR " * " GX_MAX_SHADOW_CASCADES_STR "];\n" \
+    "uniform vec3  effect_shadow_caster_directional_lights_color_cascades_count[" GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER_STR "];\n" \
+    "uniform vec3  effect_shadow_caster_directional_lights_direction[" GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER_STR "];\n" \
 	"uniform float effect_point_lights_count;\n" \
-	"uniform vec4  effect_point_lights_position_max_radius[" GX_MAX_POINT_LIGHTS_STR "];\n"
-
+    "uniform float effect_shadow_caster_directional_lights_count;\n"
 
 gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : Shader(e, c)

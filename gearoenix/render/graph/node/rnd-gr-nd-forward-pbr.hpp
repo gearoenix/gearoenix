@@ -4,12 +4,7 @@
 #include "../../../core/sync/cr-sync-end-caller.hpp"
 #include "../../../math/math-matrix.hpp"
 #include "../../../math/math-vector.hpp"
-#include "../../buffer/rnd-buf-framed-uniform.hpp"
-#include "../../buffer/rnd-buf-uniform.hpp"
-#include "../../command/rnd-cmd-buffer.hpp"
-#include "../../pipeline/rnd-pip-forward-pbr-resource-set.hpp"
 #include "rnd-gr-nd-node.hpp"
-#include <memory>
 #include <vector>
 
 namespace gearoenix::render {
@@ -47,32 +42,34 @@ namespace texture {
 }
 namespace graph::node {
     struct ForwardPbrUniform {
-		math::Vec4 shadow_caster_directional_lights_cascades_count[(GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER >> 2) + (GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER & 3 != 0? 1: 0)];
-		math::Mat4x4 shadow_caster_directional_lights_cascades_view_projections_bias[GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER][GX_MAX_SHADOW_CASCADES] = {};
-		math::Vec4 shadow_caster_directional_lights_color[GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER] = {};
-		math::Vec4 shadow_caster_directional_lights_direction[GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER] = {};
 		math::Vec4 point_lights_color_min_radius[GX_MAX_POINT_LIGHTS] = {};
 		math::Vec4 point_lights_position_max_radius[GX_MAX_POINT_LIGHTS] = {};
+		math::Mat4x4 shadow_caster_directional_lights_cascades_view_projections_bias[GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER * GX_MAX_SHADOW_CASCADES] = {};
+		math::Vec4 shadow_caster_directional_lights_color_cascades_count[GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER] = {};
+		math::Vec4 shadow_caster_directional_lights_direction[GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER] = {};
 		core::Real point_lights_count = 0.0f;
 		core::Real shadow_caster_directional_lights_count = 0.0f;
-        explicit ForwardPbrUniform(const light::CascadeInfo* cas, const engine::Engine* e) noexcept;
+        explicit ForwardPbrUniform(const std::vector<std::pair<light::Directional*, light::CascadeInfo*>>* directional_lights, const scene::Scene* scn) noexcept;
     };
 
     struct ForwardPbrRenderData {
-        std::unique_ptr<pipeline::ForwardPbrResourceSet> r;
-        std::unique_ptr<buffer::Uniform> u;
+        pipeline::ForwardPbrResourceSet* r = nullptr;
+        buffer::Uniform* u = nullptr;
         ForwardPbrRenderData(engine::Engine* e, pipeline::Pipeline* pip) noexcept;
+        ~ForwardPbrRenderData() noexcept;
     };
 
     struct ForwardPbrKernel {
-        std::unique_ptr<command::Buffer> secondary_cmd;
+        command::Buffer *secondary_cmd = nullptr;
         core::OneLoopPool<ForwardPbrRenderData> render_data_pool;
         ForwardPbrKernel(engine::Engine* e, unsigned int kernel_index) noexcept;
+        ~ForwardPbrKernel() noexcept;
     };
 
     struct ForwardPbrFrame {
-        std::vector<std::unique_ptr<ForwardPbrKernel>> kernels;
+        std::vector<ForwardPbrKernel*> kernels;
         explicit ForwardPbrFrame(engine::Engine* e) noexcept;
+        ~ForwardPbrFrame() noexcept;
     };
 
     /// This renders only one directional light with one shadow map.
@@ -80,7 +77,7 @@ namespace graph::node {
     /// The user of this class must use its functionalities in their correct contextes.
     class ForwardPbr : public Node {
     private:
-        std::vector<std::unique_ptr<ForwardPbrFrame>> frames;
+        std::vector<ForwardPbrFrame*> frames;
         ForwardPbrFrame* frame = nullptr;
 		const scene::Scene* scn = nullptr;
 		const camera::Camera* cam = nullptr;
@@ -100,14 +97,15 @@ namespace graph::node {
         const static unsigned int SPECULAR_ENVIRONMENT_INDEX;
         const static unsigned int AMBIENT_OCCLUSION_INDEX;
         const static unsigned int BRDFLUT_INDEX;
+        const static unsigned int SHADOW_MAP_000_INDEX;
 
         ForwardPbr(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
-        ~ForwardPbr() noexcept final = default;
+        ~ForwardPbr() noexcept final;
 
         void set_diffuse_environment(texture::Cube* t) noexcept;
         void set_specular_environment(texture::Cube* t) noexcept;
         void set_ambient_occlusion(texture::Texture2D* t) noexcept;
-        void set_shadow_mapper(texture::Texture2D* t) noexcept;
+        void set_shadow_mapper(texture::Texture2D* t, int index) noexcept;
         void set_brdflut(texture::Texture2D* t) noexcept;
 
         /// This will be called at the start of each frame

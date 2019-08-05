@@ -3,13 +3,10 @@
 #include "../../core/cr-types.hpp"
 
 namespace gearoenix::render::light {
-class Type {
-public:
-    typedef enum : core::TypeId {
-        CONE = 1,
-        DIRECTIONAL = 2,
-        POINT = 3,
-    } Id;
-};
+enum struct Type : core::TypeId {
+    CONE = 1,
+    DIRECTIONAL = 2,
+    POINT = 3,
+} Id;
 }
 #endif

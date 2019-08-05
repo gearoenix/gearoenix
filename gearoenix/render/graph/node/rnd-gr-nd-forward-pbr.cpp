@@ -20,6 +20,7 @@
 #include "../../pipeline/rnd-pip-manager.hpp"
 #include "../../pipeline/rnd-pip-pipeline.hpp"
 #include "../../pipeline/rnd-pip-resource-set.hpp"
+#include "../../scene/rnd-scn-scene.hpp"
 #include "../../sync/rnd-sy-semaphore.hpp"
 #include "../../texture/rnd-txt-manager.hpp"
 #include "../../texture/rnd-txt-target.hpp"
@@ -30,11 +31,16 @@
 const unsigned int gearoenix::render::graph::node::ForwardPbr::DIFFUSE_ENVIRONMENT_INDEX = 0;
 const unsigned int gearoenix::render::graph::node::ForwardPbr::SPECULAR_ENVIRONMENT_INDEX = 1;
 const unsigned int gearoenix::render::graph::node::ForwardPbr::AMBIENT_OCCLUSION_INDEX = 2;
-const unsigned int gearoenix::render::graph::node::ForwardPbr::SHADOW_MAP_INDEX = 3;
-const unsigned int gearoenix::render::graph::node::ForwardPbr::BRDFLUT_INDEX = 4;
+const unsigned int gearoenix::render::graph::node::ForwardPbr::BRDFLUT_INDEX = 3;
+const unsigned int gearoenix::render::graph::node::ForwardPbr::SHADOW_MAP_000_INDEX = 4;
 
-gearoenix::render::graph::node::ForwardPbrUniform::ForwardPbrUniform(const light::CascadeInfo* const cas, const engine::Engine* const e) noexcept
+gearoenix::render::graph::node::ForwardPbrUniform::ForwardPbrUniform(const std::vector<std::pair<light::Directional*, light::CascadeInfo*>>*const directional_lights, const scene::Scene*const scn) noexcept
 {
+    const auto& lights = scn->get_lights();
+    for (const auto& id_light : lights) {
+        const auto& l = id_light.second;
+        if(l->get_type())
+    }
     const auto& data = cas->get_cascades_data();
     const auto s = data.size();
     cascades_count = static_cast<core::Real>(s) + 0.1f;
