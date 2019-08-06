@@ -68,6 +68,7 @@ namespace graph::node {
         virtual ~Node() noexcept = default;
         void set_provider(unsigned int input_link_index, core::graph::Node* o, unsigned int provider_output_link_index) noexcept final;
         void remove_provider(unsigned int input_link_index) noexcept final;
+		void set_providers_count(std::size_t count) noexcept final;
         void remove_consumer(unsigned int output_link_index, core::Id node_id, unsigned int consumer_input_link_index) noexcept final;
         texture::Texture* get_output_texture(unsigned int index) const noexcept;
         virtual void set_input_texture(texture::Texture* t, unsigned int index) noexcept;

@@ -24,6 +24,11 @@ void gearoenix::core::graph::Node::clear_provider(unsigned int input_link_index)
     input_links_providers_links[input_link_index] = std::make_pair(nullptr, 0);
 }
 
+void gearoenix::core::graph::Node::set_providers_count(const std::size_t count) noexcept
+{
+	input_links_providers_links.resize(count);
+}
+
 void gearoenix::core::graph::Node::remove_provider(const unsigned int input_link_index) noexcept
 {
     auto& p = input_links_providers_links[input_link_index];

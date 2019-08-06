@@ -164,7 +164,7 @@ gearoenix::render::graph::node::ForwardPbr::ForwardPbr(
         call)
     , frames(e->get_frames_count())
 {
-    input_links_providers_links.resize(input_textures.size());
+    set_providers_count(input_textures.size());
     for (auto& f : frames) {
         f = new ForwardPbrFrame(e);
     }

@@ -19,6 +19,7 @@ public:
     virtual ~Node() noexcept = default;
     virtual void set_provider(unsigned int input_link_index, Node* o, unsigned int provider_output_link_index) noexcept;
     virtual void clear_provider(unsigned int input_link_index) noexcept;
+	virtual void set_providers_count(std::size_t count) noexcept;
     virtual void remove_provider(unsigned int input_link_index) noexcept;
     virtual void set_consumer(unsigned int output_link_index, Node* o, unsigned int consumer_input_link_index) noexcept;
     virtual void remove_consumer(unsigned int output_link_index, Id node_id, unsigned int consumer_input_link_index) noexcept;

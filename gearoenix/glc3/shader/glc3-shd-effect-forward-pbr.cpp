@@ -24,7 +24,7 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         "uniform mat4  camera_vp;\n"
         GX_GLC3_SHADER_SRC_EFFECT_UNIFORMS
         // model uniform(s)
-        "uniform mat4  model_m;\n"
+        "uniform mat4 model_m;\n"
         // output(s)
         "out vec3 out_pos;\n"
         "out vec3 out_nrm;\n"
@@ -32,7 +32,7 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         "out vec3 out_btg;\n"
         "out vec2 out_uv;\n"
         // One thing that I'm not sure about is its interpolating, it may not acceptably result
-        "out vec3 out_directional_lights_cascades_pojected[" GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER_STR" * " GX_MAX_SHADOW_CASCADES_STR "];\n"
+        "out vec3 out_directional_lights_cascades_pojected[" GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER_STR " * " GX_MAX_SHADOW_CASCADES_STR "];\n"
         // Main function
         "void main()\n"
         "{\n"
@@ -46,7 +46,7 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         "    int effect_shadow_caster_directional_lights_count_int = int(effect_shadow_caster_directional_lights_count);\n"
         "    for(int diri = 0, i = 0; diri < effect_shadow_caster_directional_lights_count_int; ++diri)\n"
         "    {\n"
-        "        int effect_shadow_caster_directional_lights_cascades_count_int = int(effect_shadow_caster_directional_lights_cascades_count[diri]);\n"
+        "        int effect_shadow_caster_directional_lights_cascades_count_int = int(effect_shadow_caster_directional_lights_color_cascades_count[diri].w);\n"
         "        int diff_ccc_cc = " GX_MAX_SHADOW_CASCADES_STR " - effect_shadow_caster_directional_lights_cascades_count_int;\n"
         "        for(int j = 0; j < effect_shadow_caster_directional_lights_cascades_count_int; ++j, ++i)\n"
         "        {\n"
@@ -220,7 +220,7 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         "    for(int diri = 0, lcasi = 0; diri < effect_shadow_caster_directional_lights_count_int; ++diri, lcasi = diri * " GX_MAX_SHADOW_CASCADES_STR ")\n"
         "    {\n"
         "        bool is_in_directional_light = true;\n"
-        "        float normal_dot_light = max(dot(out_nrm, -light_direction), 0.0);\n"
+        "        float normal_dot_light = max(dot(out_nrm, -effect_shadow_caster_directional_lights_direction[diri].xyz), 0.0);\n"
         "        float shadow_bias = 0.001;\n"
         "        if(normal_dot_light > 0.0)\n"
         "        {\n"
@@ -232,7 +232,7 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         "        }\n"
         "        if(is_in_directional_light)\n"
         "        {\n"
-        "            int effect_shadow_caster_directional_lights_cascades_count_int = int(effect_shadow_caster_directional_lights_cascades_count[diri]);\n"
+        "            int effect_shadow_caster_directional_lights_cascades_count_int = int(effect_shadow_caster_directional_lights_color_cascades_count[diri].w);\n"
         "            for(int i = 0; i < effect_shadow_caster_directional_lights_cascades_count_int; ++i)\n"
         "            {\n"
         "                vec3 lightuv = out_directional_lights_cascades_pojected[lcasi];\n"
@@ -254,8 +254,8 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         "        }\n"
         "        if(is_in_directional_light)\n"
         "        {\n"
-        "            vec3 half_vec = normalize(view - effect_shadow_caster_directional_lights_direction[diri]);\n"
-        "            vec3 radiance = effect_shadow_caster_directional_lights_color[diri].xyz;\n"
+        "            vec3 half_vec = normalize(view - effect_shadow_caster_directional_lights_direction[diri].xyz);\n"
+        "            vec3 radiance = effect_shadow_caster_directional_lights_color_cascades_count[diri].xyz;\n"
         //           Cook-Torrance BRDF
         "            float ndf = distribution_ggx(normal, half_vec, roughness);\n"
         "            float geo = geometry_smith(normal_dot_light, normal_dot_view, roughness);\n"

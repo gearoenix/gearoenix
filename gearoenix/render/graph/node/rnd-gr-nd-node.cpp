@@ -83,6 +83,11 @@ void gearoenix::render::graph::node::Node::remove_provider(const unsigned int in
     update_previous_semaphores();
 }
 
+void gearoenix::render::graph::node::Node::set_providers_count(const std::size_t count) noexcept {
+	core::graph::Node::set_providers_count(count);
+	link_providers_frames_semaphores.resize(count);
+}
+
 void gearoenix::render::graph::node::Node::remove_consumer(const unsigned int output_link_index, const core::Id node_id, const unsigned int consumer_input_link_index) noexcept
 {
     links_consumers_frames_semaphores[output_link_index][std::make_pair(node_id, consumer_input_link_index)].clear();
