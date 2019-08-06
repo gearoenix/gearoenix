@@ -46,11 +46,6 @@ void gearoenix::physics::Engine::update_001_kernel(const unsigned int kernel_ind
         const std::map<core::Id, std::shared_ptr<render::camera::Camera>>& cameras = scene->get_cameras();
         const std::map<core::Id, std::shared_ptr<render::model::Model>>& models = scene->get_models();
         const std::map<core::Id, std::shared_ptr<render::light::Light>>& lights = scene->get_lights();
-        for (const auto& id_light : lights) {
-            const auto& light = id_light.second;
-            if (light->is_enabled())
-                GX_DO_TASK(light->update_uniform());
-        }
         for (const auto& id_model : models) {
             const auto& model = id_model.second;
             if (model->is_enabled())
@@ -72,7 +67,7 @@ void gearoenix::physics::Engine::update_001_kernel(const unsigned int kernel_ind
             for (const std::pair<const core::Id, std::shared_ptr<render::light::Light>>& light : lights) {
                 if (!light.second->is_enabled())
                     continue;
-                if (!light.second->is_shadower())
+                if (!light.second->is_shadow_caster())
                     continue;
                 auto dir_light = dynamic_cast<DirLightPtr>(light.second.get());
                 if (dir_light == nullptr)

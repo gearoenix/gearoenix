@@ -87,11 +87,7 @@ namespace graph::node {
 		const std::vector<std::pair<light::Directional*, light::CascadeInfo*>>* directional_lights = nullptr;
 
         void record(
-            const scene::Scene* s,
-            const camera::Camera* c,
-            const light::Directional* l,
             const model::Model* m,
-            const light::CascadeInfo* cas,
             unsigned int kernel_index) noexcept;
 
     public:
@@ -107,7 +103,6 @@ namespace graph::node {
         void set_diffuse_environment(texture::Cube* t) noexcept;
         void set_specular_environment(texture::Cube* t) noexcept;
         void set_ambient_occlusion(texture::Texture2D* t) noexcept;
-        void set_shadow_mapper(texture::Texture2D* t, int index) noexcept;
         void set_brdflut(texture::Texture2D* t) noexcept;
 
         /// This will be called at the start of each frame

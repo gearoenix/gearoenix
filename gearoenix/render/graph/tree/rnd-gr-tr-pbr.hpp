@@ -12,8 +12,6 @@ namespace tree {
     private:
         bool in_weak_hardware = true;
         core::OneLoopPool<node::ForwardPbr> fwd;
-        // std::shared_ptr<node::DeferedPbr> dfr = nullptr;
-        // std::shared_ptr<node::SahdowAccumulator> shdacm = nullptr;
     public:
         Pbr(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
         void update() noexcept final;

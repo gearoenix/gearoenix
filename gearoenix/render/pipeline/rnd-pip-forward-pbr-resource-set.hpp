@@ -16,7 +16,7 @@ public:
     virtual void set_diffuse_environment(texture::Cube* t) noexcept;
     virtual void set_specular_environment(texture::Cube* t) noexcept;
     virtual void set_ambient_occlusion(texture::Texture2D* t) noexcept;
-    virtual void set_directional_lights_shadow_maps(texture::Texture2D* t, int light_index, int cas_index) noexcept;
+    virtual void set_directional_lights_shadow_map(texture::Texture2D* t, int light_index, int cas_index) noexcept;
     virtual void set_brdflut(texture::Texture2D* t) noexcept;
     virtual void clean() noexcept;
 };

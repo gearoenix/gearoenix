@@ -12,9 +12,7 @@ gearoenix::render::light::Light::Light(
     , light_type(light_type)
     , e(e)
 {
-    f->read(color[0]);
-    f->read(color[1]);
-    f->read(color[2]);
+    color.read(f);
     has_shadow = f->read_bool();
 }
 
@@ -23,11 +21,6 @@ gearoenix::render::light::Light::Light(const core::Id my_id, engine::Engine* con
     , light_type(light_type)
     , e(e)
 {
-}
-
-gearoenix::render::light::Light::~Light() noexcept
-{
-    delete uniform_buffers;
 }
 
 gearoenix::render::light::Type gearoenix::render::light::Light::get_type() const noexcept
@@ -45,7 +38,7 @@ void gearoenix::render::light::Light::set_color(const gearoenix::math::Vec3& c) 
     color = c;
 }
 
-bool gearoenix::render::light::Light::is_shadower() const noexcept
+bool gearoenix::render::light::Light::is_shadow_caster() const noexcept
 {
     return has_shadow;
 }
@@ -73,28 +66,4 @@ void gearoenix::render::light::Light::enable() noexcept
 void gearoenix::render::light::Light::disable() noexcept
 {
     enabled = false;
-}
-
-const gearoenix::math::Aabb3& gearoenix::render::light::Light::get_influence_area() const noexcept
-{
-    return influence;
-}
-
-void gearoenix::render::light::Light::set_influence_area(const gearoenix::math::Aabb3& a) noexcept
-{
-    influence = a;
-}
-
-void gearoenix::render::light::Light::update_uniform() noexcept
-{
-}
-
-const gearoenix::render::buffer::FramedUniform* gearoenix::render::light::Light::get_uniform_buffers() const noexcept
-{
-    return uniform_buffers;
-}
-
-gearoenix::render::buffer::FramedUniform* gearoenix::render::light::Light::get_uniform_buffers() noexcept
-{
-    return uniform_buffers;
 }

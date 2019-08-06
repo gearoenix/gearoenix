@@ -16,16 +16,6 @@
 
 GX_HELPER(scene, Scene)
 GX_HELPER(camera, Camera)
-
-void gearoenix::render::pipeline::ResourceSet::set_light(const light::Light* const l) noexcept
-{
-    auto* fub = l->get_uniform_buffers();
-    if (fub == nullptr)
-        light_uniform_buffer = nullptr;
-    else
-        light_uniform_buffer = fub->get_buffer();
-}
-
 GX_HELPER(model, Model)
 
 void gearoenix::render::pipeline::ResourceSet::set_mesh(const mesh::Mesh* const m) noexcept
@@ -53,7 +43,6 @@ void gearoenix::render::pipeline::ResourceSet::clean() noexcept
 {
     scene_uniform_buffer = nullptr;
     camera_uniform_buffer = nullptr;
-    light_uniform_buffer = nullptr;
     model_uniform_buffer = nullptr;
     material_uniform_buffer = nullptr;
     node_uniform_buffer = nullptr;

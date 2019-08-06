@@ -15,7 +15,7 @@ std::shared_ptr<gearoenix::render::light::Light> gearoenix::render::light::Manag
 {
     std::shared_ptr<Light> l = cache.get<Light>(id, [id, call, this] {
         system::stream::Stream* f = cache.get_file();
-        const auto t = f->read<Type::Id>();
+        const auto t = f->read<Type>();
         switch (t) {
         case Type::CONE:
             GXUNIMPLEMENTED;

@@ -21,7 +21,7 @@ void gearoenix::render::pipeline::ForwardPbrResourceSet::set_ambient_occlusion(t
     ambient_occlusion = t;
 }
 
-void gearoenix::render::pipeline::ForwardPbrResourceSet::set_directional_lights_shadow_maps(texture::Texture2D* const t, const int light_index, const int cas_index) noexcept
+void gearoenix::render::pipeline::ForwardPbrResourceSet::set_directional_lights_shadow_map(texture::Texture2D* const t, const int light_index, const int cas_index) noexcept
 {
     directional_lights_shadow_maps[light_index][cas_index] = t;
 }

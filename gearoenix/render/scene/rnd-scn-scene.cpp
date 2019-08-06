@@ -209,10 +209,9 @@ const std::shared_ptr<gearoenix::render::buffer::FramedUniform>& gearoenix::rend
 void gearoenix::render::scene::Scene::update_uniform() noexcept
 {
     unsigned int dirc = 0;
-    unsigned int pntc = 0;
     for (const auto& il : lights) {
         const light::Light* const l = il.second.get();
-        if (l->is_shadower())
+        if (l->is_shadow_caster())
             continue;
         {
             const auto* const dl = dynamic_cast<const light::Directional*>(l);
@@ -223,18 +222,7 @@ void gearoenix::render::scene::Scene::update_uniform() noexcept
                 continue;
             }
         }
-        {
-            const auto* const pl = dynamic_cast<const light::Point*>(l);
-            if (pl != nullptr && pntc < GX_MAX_POINT_LIGHTS) {
-                // TODO: min radius, remove it or complete it
-                uniform.point_lights_color_min_radius[pntc] = math::Vec4(pl->get_color(), 0.0f);
-                uniform.point_lights_position_max_radius[pntc] = pl->get_position_radius();
-                ++pntc;
-                continue;
-            }
-        }
     }
     uniform.lights_count[0] = static_cast<core::Real>(dirc);
-    uniform.lights_count[1] = static_cast<core::Real>(pntc);
     uniform_buffers->update(&uniform);
 }

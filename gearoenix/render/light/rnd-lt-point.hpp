@@ -15,6 +15,7 @@ public:
     Point(core::Id my_id, system::stream::Stream* f, engine::Engine* e) noexcept;
     const math::Vec4& get_position_max_radius() const noexcept;
     const core::Real get_min_radius() const noexcept;
+    bool is_in_light(const model::Model*) const noexcept;
 };
 }
 #endif

@@ -24,7 +24,7 @@ namespace shader {
         GX_GLC3_UNIFORM_TEXTURE(effect_diffuse_environment)
         GX_GLC3_UNIFORM_TEXTURE(effect_specular_environment)
         GX_GLC3_UNIFORM_TEXTURE_ARRAY(effect_shadow_caster_directional_lights_cascades_shadow_map, GX_MAX_SHADOW_CASCADES * GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER)
-        // effect uniforms
+        // Effect uniforms
 		GX_GLC3_UNIFORM_VECTOR(effect_point_lights_color_min_radius, 4, GX_MAX_POINT_LIGHTS)
 		GX_GLC3_UNIFORM_VECTOR(effect_point_lights_position_max_radius, 4, GX_MAX_POINT_LIGHTS)
         GX_GLC3_UNIFORM_MATRIX(effect_shadow_caster_directional_lights_cascades_view_projection_bias, 4, GX_MAX_SHADOW_CASCADES * GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER)
@@ -32,7 +32,9 @@ namespace shader {
         GX_GLC3_UNIFORM_VECTOR(effect_shadow_caster_directional_lights_direction, 4, GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER)
 		GX_GLC3_UNIFORM_FLOAT(effect_point_lights_count, 1)
 		GX_GLC3_UNIFORM_FLOAT(effect_shadow_caster_directional_lights_count, 1)
+        // Model
         GX_GLC3_UNIFORM_MATRIX(model_m, 4, 1)
+        // Scene
         GX_GLC3_UNIFORM_VECTOR(scene_ambient_light, 3, 1)
         GX_GLC3_UNIFORM_VECTOR(scene_directional_lights_color, 4, GX_MAX_DIRECTIONAL_LIGHTS)
         GX_GLC3_UNIFORM_VECTOR(scene_directional_lights_direction, 4, GX_MAX_DIRECTIONAL_LIGHTS)

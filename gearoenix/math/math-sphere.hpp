@@ -8,7 +8,7 @@ struct Sphere {
     core::Real radius;
 
     Sphere() = delete;
-    explicit Sphere(const Vec3& position, core::Real radius) noexcept;
+    Sphere(const Vec3& position, core::Real radius) noexcept;
     void insert(core::Real r) noexcept;
 
     IntersectionStatus::Type check_intersection(const Sphere& o) const noexcept;
