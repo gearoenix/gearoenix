@@ -23,6 +23,7 @@ std::shared_ptr<gearoenix::render::model::Model> gearoenix::render::model::Manag
         case Type::WIDGET:
 			return widget::Widget::read_gx3d(id, f, e, call);
         }
+        GXLOGF("Unexpected type: " << t << " in model: " << id)
     });
     c.set_data(m);
     return m;
