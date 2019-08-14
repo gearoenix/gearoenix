@@ -22,7 +22,6 @@
 private:                                                  \
     gl::sint name = GX_GLC3_UNIFORM_FAILED;               \
     gl::sint name##_indices[count] = {};                  \
-                                                          \
 public:                                                   \
     GX_GETTER_BUILDER(name)                               \
     GX_GETTER_BUILDER(name##_indices)
@@ -31,7 +30,6 @@ public:                                                   \
 private:                                                  \
     gl::sint name = GX_GLC3_UNIFORM_FAILED;               \
     gl::sint name##_index = GX_GLC3_TEXTURE_INDEX_FAILED; \
-                                                          \
 public:                                                   \
     GX_GETTER_BUILDER(name)                               \
     GX_GETTER_BUILDER(name##_index)
@@ -99,7 +97,7 @@ public:                                                      \
         gl::Loader::uniform1i(x, x##_index);
 
 #define GX_GLC3_SHADER_SET_TEXTURE_INDEX_ARRAY_UNIFORM(x) \
-    if (x != GX_GLC3_UNIFORM_FAILED)                \
+    if (x != GX_GLC3_UNIFORM_FAILED)                      \
         gl::Loader::uniform1iv(x, GX_COUNT_OF(x##_indices), x##_indices);
 
 #define GX_GLC3_SHADER_SRC_DEFAULT_VERSION                                                                                                                                     \
