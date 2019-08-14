@@ -65,6 +65,7 @@ namespace physics {
         using ModelPtrs = std::vector<ModelPtr>;
         using DirLightCascadeInfos = std::vector<std::pair<DirLightPtr, CascadeInfoPtr>>;
         using SceneCameraData = SceneCameraTupledPool<ModelPtrs, DirLightPairedPool<CascadeInfoPtr>>;
+        /// Because it's gonna be prioritized in future, it is better to keep its map-ness
         using GatheredSceneCameraData = std::map<ScenePtr, std::map<CameraPtr, std::pair<ModelPtrs, DirLightCascadeInfos>>>;
         using GatheredCascadeInfos = std::map<ScenePtr, std::map<CameraPtr, std::map<DirLightPtr, CascadeInfoPtr>>>;
         using Partition = std::array<math::Vec3, 4>;

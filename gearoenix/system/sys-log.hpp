@@ -25,12 +25,16 @@
     }
 #else
 #include <fstream>
+#include <mutex>
 namespace gearoenix {
 namespace system {
     class Log {
     public:
         static std::ofstream info;
+#ifdef GX_DEBUG_MODE
         static std::ofstream debug;
+        static std::mutex debug_lock;
+#endif
         static std::ofstream error;
     };
 }
@@ -40,12 +44,15 @@ namespace system {
         gearoenix::system::Log::info << GX_APP_NAME << " " << s << " "            \
                                      << __FILE__ << " " << __LINE__ << std::endl; \
     }
-/// This is gonna be ignored in release mode compilation
+#ifdef GX_DEBUG_MODE
 #define GXLOGD(s)                                                                  \
     {                                                                              \
+        std::lock_guard<std::mutex> _lg(gearoenix::system::Log::debug_lock);       \
         gearoenix::system::Log::debug << GX_APP_NAME << " " << s << " "            \
                                       << __FILE__ << " " << __LINE__ << std::endl; \
     }
+#define GXREACHED GXLOGD("REACHED-------------------------------------------")
+#endif
 #define GXLOGE(s)                                                                  \
     {                                                                              \
         gearoenix::system::Log::error << GX_APP_NAME << " " << s << " "            \
@@ -63,7 +70,6 @@ namespace system {
 #define GXASSERT(x) \
     if ((x) == 0)   \
     GXUNEXPECTED
-#define GXREACHED GXLOGD("REACHED-------------------------------------------")
 #else // GX_LOG_ENABLED
 #define GXLOGI(s) ;
 #define GXLOGD(s) ;

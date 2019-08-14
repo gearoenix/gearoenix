@@ -25,6 +25,11 @@ gearoenix::render::engine::Engine::Engine(system::Application* const system_appl
 {
     physics_engine = new physics::Engine(system_application, kernels);
     kernels->add_step(
+        [this] {
+            fun_loader->unload();
+            render_tree->update();
+            fun_loader->unload();
+        },
         [this](const unsigned int kernel_index) {
             render_tree->record(kernel_index);
         },
@@ -50,8 +55,6 @@ void gearoenix::render::engine::Engine::update() noexcept
     frame_number %= frames_count;
     fun_loader->unload();
     physics_engine->update();
-    fun_loader->unload();
-    render_tree->update();
     fun_loader->unload();
     kernels->do_steps();
 }
