@@ -6,6 +6,7 @@
 #include "../../gl/gl-types.hpp"
 #include "../../render/texture/rnd-txt-info.hpp"
 #include "../../render/texture/rnd-txt-target.hpp"
+#include <vector>
 namespace gearoenix::gles2 {
 namespace engine {
     class Engine;
@@ -13,9 +14,9 @@ namespace engine {
 namespace texture {
     class Target : public render::texture::Target {
     private:
-        gl::uint texture_object = 0;
-        gl::sint framebuffer = 0;
-        gl::sint depth_buffer = 0;
+        std::vector<gl::uint> texture_objects;
+        gl::sint framebuffer = -1;
+        gl::sint depth_buffer = -1;
 
         void state_init() const noexcept;
 
@@ -30,7 +31,7 @@ namespace texture {
             const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
         ~Target() noexcept final;
         void bind() const noexcept;
-        void bind_texture(gl::enumerated texture_unit) const noexcept;
+        void bind_textures(const std::vector<gl::enumerated>& texture_units) const noexcept;
     };
 }
 }

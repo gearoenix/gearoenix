@@ -6,24 +6,28 @@
 #include "../../system/sys-log.hpp"
 #include "../engine/gles2-eng-engine.hpp"
 
+#define GX_GLES2_SHADER_SRC_EFFECT_UNIFORMS \
+	"uniform vec4  effect_point_lights_color_min_radius[" GX_MAX_POINT_LIGHTS_STR "];\n" \
+	"uniform vec4  effect_point_lights_position_max_radius[" GX_MAX_POINT_LIGHTS_STR "];\n" \
+    "uniform mat4  effect_shadow_caster_directional_lights_cascades_view_projection_bias[" GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER_STR " * " GX_MAX_SHADOW_CASCADES_STR "];\n" \
+    "uniform vec4  effect_shadow_caster_directional_lights_color_cascades_count[" GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER_STR "];\n" \
+    "uniform vec4  effect_shadow_caster_directional_lights_direction[" GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER_STR "];\n" \
+	"uniform float effect_point_lights_count;\n" \
+    "uniform float effect_shadow_caster_directional_lights_count;\n"
+
+#define GX_GLES2_SHADER_FWDPBR_VARYING \
+    "varying vec3 out_pos;\n" \
+    "varying vec3 out_nrm;\n" \
+    "varying vec3 out_tng;\n" \
+    "varying vec3 out_btg;\n" \
+    "varying vec2 out_uv;\n" \
+    "varying vec3 out_directional_lights_cascades_pojected[" GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER_STR " * " GX_MAX_SHADOW_CASCADES_STR "];\n"
+
 const static std::string vertex_shader_code = GX_GLES2_SHADER_SRC_DEFAULT_VERTEX_STARTING
-    // camera uniform(s)
     "uniform mat4  camera_vp;\n"
-    // effect uniform(s)
-    "uniform mat4  effect_view_projection_biases[" GX_MAX_SHADOW_CASCADES_STR "];\n"
-    "uniform float effect_cascades_count;\n"
-    // light uniform(s)
-    "uniform vec3  light_direction;\n"
-    // model uniform(s)
+    GX_GLES2_SHADER_SRC_EFFECT_UNIFORMS
     "uniform mat4  model_m;\n"
-    // output(s)
-    "varying vec3 out_pos;\n"
-    "varying vec3 out_nrm;\n"
-    "varying vec3 out_tng;\n"
-    "varying vec3 out_btg;\n"
-    "varying vec2 out_uv;\n"
-    "varying vec3 out_light_poses[" GX_MAX_SHADOW_CASCADES_STR "];\n"
-    // Main function
+    GX_GLES2_SHADER_FWDPBR_VARYING
     "void main()\n"
     "{\n"
     "    vec4 pos = model_m * vec4(position, 1.0);\n"
@@ -32,21 +36,43 @@ const static std::string vertex_shader_code = GX_GLES2_SHADER_SRC_DEFAULT_VERTEX
     "    out_tng = normalize((model_m * vec4(tangent.xyz, 0.0)).xyz);\n"
     "    out_btg = cross(out_nrm, out_tng) * tangent.w;\n"
     "    out_uv = uv;\n"
-    "    int effect_cascades_count_int = int(effect_cascades_count);\n"
+    "    int effect_shadow_caster_directional_lights_count_int = int(effect_shadow_caster_directional_lights_count);\n"
+#ifdef GX_IN_WEB
+#define GX_DIRECTIONAL_LOOP_COUNT GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER_STR
+#else
+#define GX_DIRECTIONAL_LOOP_COUNT "effect_shadow_caster_directional_lights_count_int"
+#endif
+    "    for(int diri = 0, i = 0; diri < " GX_DIRECTIONAL_LOOP_COUNT "; ++diri)\n"
+    "    {\n"
+#ifdef GX_IN_WEB
+    "        if(diri < effect_shadow_caster_directional_lights_count_int) {\n"
+#endif
+    "        int effect_shadow_caster_directional_lights_cascades_count_int = int(effect_shadow_caster_directional_lights_color_cascades_count[diri].w);\n"
+    "        int diff_ccc_cc = " GX_MAX_SHADOW_CASCADES_STR " - effect_shadow_caster_directional_lights_cascades_count_int;\n"
 #ifdef GX_IN_WEB
 #define GX_CASCADE_LOOP_COUNT GX_MAX_SHADOW_CASCADES_STR
 #else
-#define GX_CASCADE_LOOP_COUNT "effect_cascades_count_int"
+#define GX_CASCADE_LOOP_COUNT "effect_shadow_caster_directional_lights_cascades_count_int"
 #endif
-    "    for(int i = 0; i < " GX_CASCADE_LOOP_COUNT "; ++i)\n"
-    "    {\n"
-    "        vec4 light_pos = effect_view_projection_biases[i] * pos;\n"
-    "        light_pos.xyz /= light_pos.w;\n"
-    "        light_pos.z *= 0.5;\n"
-    "        light_pos.z += 0.5;\n"
-    "        out_light_poses[i] = light_pos.xyz;\n"
-    //    "        if(light_pos.x > 0.0 && light_pos.x < 1.0 && light_pos.y > 0.0 && light_pos.y < 1.0)\n"
-    //    "            break;\n"
+    "        for(int j = 0; j < " GX_CASCADE_LOOP_COUNT "; ++j, ++i)\n"
+    "        {\n"
+#ifdef GX_IN_WEB
+    "            if(j < effect_shadow_caster_directional_lights_cascades_count_int) {\n"
+#endif
+    "            vec4 light_pos = effect_shadow_caster_directional_lights_cascades_view_projection_bias[i] * pos;\n"
+    "            light_pos.xyz /= light_pos.w;\n"
+    "            light_pos.z *= 0.5;\n"
+    "            light_pos.z += 0.5;\n"
+    "            out_directional_lights_cascades_pojected[i] = light_pos.xyz;\n"
+#ifdef GX_IN_WEB
+    "            }\n"
+#endif
+    "        }\n"
+#ifndef GX_IN_WEB
+    "        i += diff_ccc_cc;\n"
+#else
+    "        }\n"
+#endif
     "    }\n"
     "    gl_Position = camera_vp * pos;\n"
     "}";
@@ -57,31 +83,14 @@ const static std::string fragment_shader_code = GX_GLES2_SHADER_SRC_DEFAULT_FRAG
     "uniform vec3        scene_ambient_light;\n"
     "uniform vec4        scene_directional_lights_color[" GX_MAX_DIRECTIONAL_LIGHTS_STR "];\n"
     "uniform vec4        scene_directional_lights_direction[" GX_MAX_DIRECTIONAL_LIGHTS_STR "];\n"
-    "uniform vec4        scene_point_lights_color_min_radius[" GX_MAX_POINT_LIGHTS_STR "];\n"
-    "uniform vec4        scene_point_lights_position_max_radius[" GX_MAX_POINT_LIGHTS_STR "];\n"
-    // directional, point
-    "uniform vec2        scene_lights_count;\n"
-    // samples-count, radius, z-tolerance
-    "uniform vec3        scene_ssao_config;\n"
-    // effect uniforms
-    "uniform samplerCube effect_diffuse_environment;\n"
-    "uniform samplerCube effect_specular_environment;\n"
-    "uniform sampler2D   effect_ambient_occlusion;\n"
-    "uniform sampler2D   effect_shadow_map;\n"
-    "uniform sampler2D   effect_brdflut;\n"
-    "uniform float       effect_cascades_count;\n"
-    // light uniform(s)
-    "uniform vec3        light_color;\n"
-    "uniform vec3        light_direction;\n"
+    "uniform float       scene_directional_lights_count;\n"
+    "uniform float       scene_ssao_samples_count;\n"
+    "uniform float       scene_ssao_radius;\n"
+    "uniform float       scene_ssao_z_tolerance;\n"
+    GX_GLES2_SHADER_SRC_EFFECT_UNIFORMS
     // camera uniform(s)
     "uniform vec3        camera_position;\n"
-    // output(s) of vertex shader
-    "varying vec3 out_pos;\n"
-    "varying vec3 out_nrm;\n"
-    "varying vec3 out_tng;\n"
-    "varying vec3 out_btg;\n"
-    "varying vec2 out_uv;\n"
-    "varying vec3 out_light_poses[" GX_MAX_SHADOW_CASCADES_STR "];\n"
+    GX_GLES2_SHADER_FWDPBR_VARYING
     // Normal Distribution Function Trowbridge-Reitz GGX
     "float distribution_ggx(const vec3 normal, const vec3 halfway, const float roughness) {\n"
     "    float roughness2 = roughness * roughness;\n"
@@ -144,17 +153,20 @@ const static std::string fragment_shader_code = GX_GLES2_SHADER_SRC_DEFAULT_FRAG
     "    vec3 f0 = mix(vec3(0.04), albedo.xyz, metallic);\n"
     //   reflectance equation
     "    vec3 lo = vec3(0.0);\n"
-    "    int point_lights_count = int(scene_lights_count.y);\n"
+    "    int effect_point_lights_count_int = int(effect_point_lights_count);\n"
 #ifdef GX_IN_WEB
 #define GX_POINT_LIGHT_LOOP_COUNT GX_MAX_POINT_LIGHTS_STR
 #else
-#define GX_POINT_LIGHT_LOOP_COUNT "point_lights_count"
+#define GX_POINT_LIGHT_LOOP_COUNT "effect_point_lights_count_int"
 #endif
     //   computing point lights
     "    for(int i = 0; i < " GX_POINT_LIGHT_LOOP_COUNT "; ++i)\n"
     "    {\n"
+#ifdef GX_IN_WEB
+    "        if(i < effect_point_lights_count_int) {\n"
+#endif
     //       calculate per-light radiance
-    "        vec3 light_vec = scene_point_lights_position_max_radius[i].xyz - out_pos;\n"
+    "        vec3 light_vec = effect_point_lights_position_max_radius[i].xyz - out_pos;\n"
     //       TODO: in future consider max and min radius
     "        float distance = length(light_vec);\n"
     "        float distance_inv = 1.0 / distance;\n"
@@ -162,7 +174,7 @@ const static std::string fragment_shader_code = GX_GLES2_SHADER_SRC_DEFAULT_FRAG
     "        float normal_dot_light = max(dot(normal, light_direction), 0.0);\n"
     "        vec3 half_vec = normalize(view + light_direction);\n"
     "        float attenuation = distance_inv * distance_inv;\n"
-    "        vec3 radiance = scene_point_lights_color_min_radius[i].xyz * attenuation;\n"
+    "        vec3 radiance = effect_point_lights_color_min_radius[i].xyz * attenuation;\n"
     //       Cook-Torrance BRDF
     "        float ndf = distribution_ggx(normal, half_vec, roughness);\n"
     "        float geo = geometry_smith(normal_dot_light, normal_dot_view, roughness);\n"
@@ -184,16 +196,22 @@ const static std::string fragment_shader_code = GX_GLES2_SHADER_SRC_DEFAULT_FRAG
     //       add to outgoing radiance Lo
     //       note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
     "        lo += (kd * albedo.xyz / GXPI + specular) * radiance * normal_dot_light;\n"
+#ifdef GX_IN_WEB
+    "        }\n"
+#endif
     "    }\n"
-    "    int directional_lights_count = int(scene_lights_count.x);\n"
+    "    int scene_directional_lights_count_int = int(scene_directional_lights_count);\n"
 #ifdef GX_IN_WEB
 #define GX_DIRECTIONAL_LIGHT_LOOP_COUNT GX_MAX_DIRECTIONAL_LIGHTS_STR
 #else
-#define GX_DIRECTIONAL_LIGHT_LOOP_COUNT "directional_lights_count"
+#define GX_DIRECTIONAL_LIGHT_LOOP_COUNT "scene_directional_lights_count_int"
 #endif
     //   computing directional lights
     "    for(int i = 0; i < " GX_DIRECTIONAL_LIGHT_LOOP_COUNT "; ++i)\n"
     "    {\n"
+#ifdef GX_IN_WEB
+    "        if(i < scene_directional_lights_count_int) {\n"
+#endif
     "        vec3 light_direction = -scene_directional_lights_direction[i].xyz;\n"
     "        float normal_dot_light = max(dot(normal, light_direction), 0.0);\n"
     "        vec3 half_vec = normalize(view + light_direction);\n"
@@ -219,63 +237,90 @@ const static std::string fragment_shader_code = GX_GLES2_SHADER_SRC_DEFAULT_FRAG
     //       add to outgoing radiance Lo
     //       note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
     "        lo += (kd * albedo.xyz / GXPI + specular) * radiance * normal_dot_light;\n"
+#ifdef GX_IN_WEB
+    "        }\n"
+#endif
     "    }\n"
-    "    bool is_in_directional_light = true;\n"
-    //   TODO: I'm not sure about bias calculation, maybe I should calculate it by vertex normal
-    "    float normal_dot_light = max(dot(normal, -light_direction), 0.0);\n"
-    "    float shadow_bias = 0.001;\n"
-    "    if(normal_dot_light > 0.0)\n"
+    "    int effect_shadow_caster_directional_lights_count_int = int(effect_shadow_caster_directional_lights_count);\n"
+#ifdef GX_IN_WEB
+#define GX_SHADOW_CASTER_DIRECTIONAL_LIGHT_LOOP_COUNT GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER
+#else
+#define GX_SHADOW_CASTER_DIRECTIONAL_LIGHT_LOOP_COUNT "effect_shadow_caster_directional_lights_count_int"
+#endif
+    "    for(int diri = 0, lcasi = 0; diri < " GX_SHADOW_CASTER_DIRECTIONAL_LIGHT_LOOP_COUNT "; ++diri, lcasi = diri * " GX_MAX_SHADOW_CASCADES_STR ")\n"
     "    {\n"
-    "        shadow_bias = clamp(sqrt((0.000025 / (normal_dot_light * normal_dot_light)) - 0.000025), 0.002, 0.02);\n"
-    "    }\n"
-    "    else\n"
-    "    {\n"
-    "        is_in_directional_light = false;"
-    "    }\n"
-    "    if(is_in_directional_light)\n"
-    "    {\n"
-    "        int effect_cascades_count_int = int(effect_cascades_count);\n"
-    "        for(int i = 0; i < " GX_CASCADE_LOOP_COUNT "; ++i)\n"
+#ifdef GX_IN_WEB
+    "        if(diri < effect_shadow_caster_directional_lights_count_int) {\n"
+#endif
+    "        bool is_in_directional_light = true;\n"
+    "        float normal_dot_light = max(dot(out_nrm, -effect_shadow_caster_directional_lights_direction[diri].xyz), 0.0);\n"
+    "        float shadow_bias = 0.001;\n"
+    "        if(normal_dot_light > 0.0)\n"
     "        {\n"
-    "            vec3 lightuv = out_light_poses[i];\n"
-    "            if (lightuv.x > 0.0 && lightuv.x < 1.0 && lightuv.y > 0.0 && lightuv.y < 1.0)\n"
+    "            shadow_bias = clamp(sqrt((0.000025 / (normal_dot_light * normal_dot_light)) - 0.000025), 0.001, 0.02);\n"
+    "        }\n"
+    "        else\n"
+    "        {\n"
+    "            is_in_directional_light = false;"
+    "        }\n"
+    "        if(is_in_directional_light)\n"
+    "        {\n"
+    "            int cascades_count_int = int(effect_shadow_caster_directional_lights_color_cascades_count[diri].w);\n"
+#ifdef GX_IN_WEB
+#define GX_CASCADE_LOOP_COUNT GX_MAX_SHADOW_CASCADES_STR
+#else
+#define GX_CASCADE_LOOP_COUNT "cascades_count_int"
+#endif
+    "            for(int i = 0; i < " GX_CASCADE_LOOP_COUNT "; ++i)\n"
     "            {\n"
-    //               TODO: it must become for each cascade shadow map
-    "                vec2 depth_vec = texture2D(effect_shadow_map, lightuv.xy).xy;\n"
-    "                float depth = depth_vec.y * 0.00390625 + depth_vec.x;\n"
-    "                if(depth + shadow_bias <= lightuv.z)\n"
+#ifdef GX_IN_WEB
+    "                if(i < cascades_count_int) {\n"
+#endif
+    "                vec3 lightuv = out_directional_lights_cascades_pojected[i];\n"
+    "                if (lightuv.x > 0.0 && lightuv.x < 1.0 && lightuv.y > 0.0 && lightuv.y < 1.0)\n"
     "                {\n"
-    "                    is_in_directional_light = false;\n"
+    "                    vec2 depth_vec = texture2D(effect_shadow_map, lightuv.xy).xy;\n"
+    "                    float depth = depth_vec.y * 0.00390625 + depth_vec.x;\n"
+    "                    if(depth + shadow_bias <= lightuv.z)\n"
+    "                    {\n"
+    "                        is_in_directional_light = false;\n"
+    "                    }\n"
+    "                    break;\n"
     "                }\n"
-    "                break;\n"
+#ifdef GX_IN_WEB
+    "                }\n"
+#endif
     "            }\n"
     "        }\n"
-    "    }\n"
-    "    if(is_in_directional_light)\n"
-    "    {\n"
-    "        vec3 half_vec = normalize(view - light_direction);\n"
-    "        vec3 radiance = light_color.xyz;\n"
-    //       Cook-Torrance BRDF
-    "        float ndf = distribution_ggx(normal, half_vec, roughness);\n"
-    "        float geo = geometry_smith(normal_dot_light, normal_dot_view, roughness);\n"
-    "        vec3 frsn = fresnel_schlick(max(dot(half_vec, view), 0.0), f0);\n"
-    "        vec3 nominator = ndf * geo * frsn;\n"
-    //       0.001 to prevent divide by zero.
-    "        float denominator = 4.0 * normal_dot_view * normal_dot_light + 0.001;\n"
-    "        vec3 specular = nominator / denominator;\n"
-    //       kS is equal to Fresnel
-    "        vec3 ks = frsn;\n"
-    //       for energy conservation, the diffuse and specular light can't
-    //       be above 1.0 (unless the surface emits light); to preserve this
-    //       relationship the diffuse component (kD) should equal 1.0 - kS.
-    //       multiply kD by the inverse metalness such that only non-metals
-    //       have diffuse lighting, or a linear blend if partly metal (pure metals
-    //       have no diffuse light).
-    "        vec3 kd = (vec3(1.0) - ks) * (1.0 - metallic);\n"
-    //       scale light by NdotL
-    //       add to outgoing radiance Lo
-    //       note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
-    "        lo += (kd * albedo.xyz / GXPI + specular) * radiance * normal_dot_light;\n"
+    "        if(is_in_directional_light)\n"
+    "        {\n"
+    "            vec3 half_vec = normalize(view - effect_shadow_caster_directional_lights_direction[diri].xyz);\n"
+    "            vec3 radiance = effect_shadow_caster_directional_lights_color_cascades_count[diri].xyz;\n"
+    //           Cook-Torrance BRDF
+    "            float ndf = distribution_ggx(normal, half_vec, roughness);\n"
+    "            float geo = geometry_smith(normal_dot_light, normal_dot_view, roughness);\n"
+    "            vec3 frsn = fresnel_schlick(max(dot(half_vec, view), 0.0), f0);\n"
+    "            vec3 nominator = ndf * geo * frsn;\n"
+    //           0.001 to prevent divide by zero.
+    "            float denominator = 4.0 * normal_dot_view * normal_dot_light + 0.001;\n"
+    "            vec3 specular = nominator / denominator;\n"
+    //           kS is equal to Fresnel
+    "            vec3 ks = frsn;\n"
+    //           for energy conservation, the diffuse and specular light can't
+    //           be above 1.0 (unless the surface emits light); to preserve this
+    //           relationship the diffuse component (kD) should equal 1.0 - kS.
+    //           multiply kD by the inverse metalness such that only non-metals
+    //           have diffuse lighting, or a linear blend if partly metal (pure metals
+    //           have no diffuse light).
+    "            vec3 kd = (vec3(1.0) - ks) * (1.0 - metallic);\n"
+    //           scale light by NdotL
+    //           add to outgoing radiance Lo
+    //           note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
+    "            lo += (kd * albedo.xyz / GXPI + specular) * radiance * normal_dot_light;\n"
+    "        }\n"
+#ifdef GX_IN_WEB
+    "        }\n"
+#endif
     "    }\n"
     //   ambient lighting (we now use IBL as the ambient term)
     "    vec3 frsn = fresnel_schlick_roughness(normal_dot_view, f0, roughness);\n"
@@ -314,25 +359,23 @@ gearoenix::gles2::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const 
         // TODO
         //GX_GLES2_THIS_GET_UNIFORM_F(effect_ambient_occlusion)
         GX_GLES2_THIS_GET_UNIFORM_TEXTURE_F(effect_brdflut)
-#ifndef GX_IN_WEB
-        GX_GLES2_THIS_GET_UNIFORM_F(effect_cascades_count)
-#endif
         GX_GLES2_THIS_GET_UNIFORM_TEXTURE_F(effect_diffuse_environment)
-        GX_GLES2_THIS_GET_UNIFORM_TEXTURE_F(effect_shadow_map)
+        GX_GLES2_THIS_GET_UNIFORM_F(effect_point_lights_color_min_radius)
+        GX_GLES2_THIS_GET_UNIFORM_F(effect_point_lights_position_max_radius)
+        GX_GLES2_THIS_GET_UNIFORM_TEXTURE_ARRAY_F(effect_shadow_caster_directional_lights_cascades_shadow_map)
+        GX_GLES2_THIS_GET_UNIFORM_F(effect_shadow_caster_directional_lights_cascades_view_projection_bias)
+        GX_GLES2_THIS_GET_UNIFORM_F(effect_shadow_caster_directional_lights_color_cascades_count)
+        GX_GLES2_THIS_GET_UNIFORM_F(effect_shadow_caster_directional_lights_direction)
+        GX_GLES2_THIS_GET_UNIFORM_F(effect_shadow_caster_directional_lights_count)
         GX_GLES2_THIS_GET_UNIFORM_TEXTURE_F(effect_specular_environment)
-        GX_GLES2_THIS_GET_UNIFORM_F(effect_view_projection_biases)
-        GX_GLES2_THIS_GET_UNIFORM_F(light_color)
-        GX_GLES2_THIS_GET_UNIFORM_F(light_direction)
         GX_GLES2_THIS_GET_UNIFORM_F(model_m)
         // GX_GLES2_THIS_GET_UNIFORM_F(scene_ambient_light)
         GX_GLES2_THIS_GET_UNIFORM_F(scene_directional_lights_color)
         GX_GLES2_THIS_GET_UNIFORM_F(scene_directional_lights_direction)
-#ifndef GX_IN_WEB
-        GX_GLES2_THIS_GET_UNIFORM_F(scene_lights_count)
-#endif
-        GX_GLES2_THIS_GET_UNIFORM_F(scene_point_lights_color_min_radius)
-        GX_GLES2_THIS_GET_UNIFORM_F(scene_point_lights_position_max_radius)
-        // GX_GLES2_THIS_GET_UNIFORM_F(scene_ssao_config)
+        GX_GLES2_THIS_GET_UNIFORM_F(scene_directional_lights_count)
+        // GX_GLES2_THIS_GET_UNIFORM_F(scene_ssao_radius)
+        // GX_GLES2_THIS_GET_UNIFORM_F(scene_ssao_samples_count)
+        // GX_GLES2_THIS_GET_UNIFORM_F(scene_ssao_z_tolerance)
     });
 }
 
@@ -347,7 +390,7 @@ void gearoenix::gles2::shader::ForwardPbr::bind() const noexcept
     GX_GLES2_SHADER_SET_TEXTURE_INDEX_UNIFORM(effect_ambient_occlusion)
     GX_GLES2_SHADER_SET_TEXTURE_INDEX_UNIFORM(effect_brdflut)
     GX_GLES2_SHADER_SET_TEXTURE_INDEX_UNIFORM(effect_diffuse_environment)
-    GX_GLES2_SHADER_SET_TEXTURE_INDEX_UNIFORM(effect_shadow_map)
+    GX_GLES2_SHADER_SET_TEXTURE_INDEX_ARRAY_UNIFORM(effect_shadow_caster_directional_lights_cascades_shadow_map)
     GX_GLES2_SHADER_SET_TEXTURE_INDEX_UNIFORM(effect_specular_environment)
 }
 #endif
