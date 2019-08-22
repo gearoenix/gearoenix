@@ -87,6 +87,11 @@ const static std::string fragment_shader_code = GX_GLES2_SHADER_SRC_DEFAULT_FRAG
     "uniform float       scene_ssao_samples_count;\n"
     "uniform float       scene_ssao_radius;\n"
     "uniform float       scene_ssao_z_tolerance;\n"
+    "uniform samplerCube effect_diffuse_environment;\n"
+    "uniform samplerCube effect_specular_environment;\n"
+    "uniform sampler2D   effect_ambient_occlusion;\n"
+	"uniform sampler2D   effect_shadow_caster_directional_lights_cascades_shadow_map[" GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER_STR" * " GX_MAX_SHADOW_CASCADES_STR "];\n"
+	"uniform sampler2D   effect_brdflut;\n"
     GX_GLES2_SHADER_SRC_EFFECT_UNIFORMS
     // camera uniform(s)
     "uniform vec3        camera_position;\n"
@@ -279,7 +284,7 @@ const static std::string fragment_shader_code = GX_GLES2_SHADER_SRC_DEFAULT_FRAG
     "                vec3 lightuv = out_directional_lights_cascades_pojected[i];\n"
     "                if (lightuv.x > 0.0 && lightuv.x < 1.0 && lightuv.y > 0.0 && lightuv.y < 1.0)\n"
     "                {\n"
-    "                    vec2 depth_vec = texture2D(effect_shadow_map, lightuv.xy).xy;\n"
+    "                    vec2 depth_vec = texture2D(effect_shadow_caster_directional_lights_cascades_shadow_map[i], lightuv.xy).xy;\n"
     "                    float depth = depth_vec.y * 0.00390625 + depth_vec.x;\n"
     "                    if(depth + shadow_bias <= lightuv.z)\n"
     "                    {\n"

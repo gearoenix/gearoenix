@@ -106,8 +106,7 @@ public:                                                      \
                 << "#define GXPI 3.141592653589793238\n"                                                                                                                       \
                    "precision highp float;\n"                                                                                                                                  \
                    "precision highp int;\n"                                                                                                                                    \
-                   "precision highp sampler2D;\n"                                                                                                                              \
-                   "precision highp samplerCube;\n"
+                << ((e->get_engine_type_id() == render::engine::Type::OPENGL_ES3) ? "precision highp sampler2D;\nprecision highp samplerCube;\n": "")
 
 #define GX_GLC3_SHADER_SRC_DEFAULT_ATTRIBUTES  \
     "layout(location = 0) in vec3 position;\n" \
@@ -115,14 +114,14 @@ public:                                                      \
     "layout(location = 2) in vec4 tangent;\n"  \
     "layout(location = 3) in vec2 uv;\n"
 
-#define GX_GLC3_SHADER_SRC_DEFAULT_VERTEX_STARTING           \
-    std::stringstream vertex_shader_code;                    \
-    vertex_shader_code << GX_GLC3_SHADER_SRC_DEFAULT_VERSION \
+#define GX_GLC3_SHADER_SRC_DEFAULT_VERTEX_STARTING              \
+    std::stringstream vertex_shader_code;                       \
+    vertex_shader_code << GX_GLC3_SHADER_SRC_DEFAULT_VERSION << \
             GX_GLC3_SHADER_SRC_DEFAULT_ATTRIBUTES
 
 #define GX_GLC3_SHADER_SRC_DEFAULT_FRAGMENT_STARTING \
     std::stringstream fragment_shader_code;          \
-    fragment_shader_code << GX_GLC3_SHADER_SRC_DEFAULT_VERSION
+    fragment_shader_code << GX_GLC3_SHADER_SRC_DEFAULT_VERSION << "#extension GL_EXT_texture_array : enable\n"
 
 #define GX_GLC3_SHADER_SRC_MATERIAL_UNIFORMS       \
     "uniform float material_alpha;\n"              \

@@ -51,7 +51,6 @@ namespace system {
         gearoenix::system::Log::debug << GX_APP_NAME << " " << s << " "            \
                                       << __FILE__ << " " << __LINE__ << std::endl; \
     }
-#define GXREACHED GXLOGD("REACHED-------------------------------------------")
 #endif
 #define GXLOGE(s)                                                                  \
     {                                                                              \
@@ -64,6 +63,7 @@ namespace system {
         std::terminate(); \
     }
 #endif // IN_ANDROID
+#define GXREACHED GXLOGD("REACHED-------------------------------------------")
 #define GXTODO GXLOGE("TODO")
 #define GXUNEXPECTED GXLOGF("Unexpected")
 #define GXUNIMPLEMENTED GXLOGF("Unimplemented")

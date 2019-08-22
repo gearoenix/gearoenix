@@ -73,7 +73,6 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         "uniform samplerCube effect_diffuse_environment;\n"
         "uniform samplerCube effect_specular_environment;\n"
         "uniform sampler2D   effect_ambient_occlusion;\n"
-        //"uniform sampler2DShadow    effect_shadow_map;\n"
         "uniform sampler2D   effect_shadow_caster_directional_lights_cascades_shadow_map[" GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER_STR" * " GX_MAX_SHADOW_CASCADES_STR "];\n"
         "uniform sampler2D   effect_brdflut;\n"
         GX_GLC3_SHADER_SRC_EFFECT_UNIFORMS
@@ -151,11 +150,10 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         "    vec3 lo = vec3(0.0);\n"
         //   computing point lights
 		"    int effect_point_lights_count_int = int(effect_point_lights_count);\n"
-        "    for (float i = 0.001; i < effect_point_lights_count_int; ++i)\n"
+        "    for (int i = 0; i < effect_point_lights_count_int; ++i)\n"
         "    {\n"
-        "        int ii = int(i);\n"
         //       calculate per-light radiance
-        "        vec3 light_vec = effect_point_lights_position_max_radius[ii].xyz - out_pos;\n"
+        "        vec3 light_vec = effect_point_lights_position_max_radius[i].xyz - out_pos;\n"
         //       TODO: in future consider max and min radius
         "        float distance = length(light_vec);\n"
         "        float distance_inv = 1.0 / distance;\n"
@@ -163,7 +161,7 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         "        float normal_dot_light = max(dot(normal, light_direction), 0.0);\n"
         "        vec3 half_vec = normalize(view + light_direction);\n"
         "        float attenuation = distance_inv * distance_inv;\n"
-        "        vec3 radiance = effect_point_lights_color_min_radius[ii].xyz * attenuation;\n"
+        "        vec3 radiance = effect_point_lights_color_min_radius[i].xyz * attenuation;\n"
         //       Cook-Torrance BRDF
         "        float ndf = distribution_ggx(normal, half_vec, roughness);\n"
         "        float geo = geometry_smith(normal_dot_light, normal_dot_view, roughness);\n"
@@ -303,6 +301,7 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         "}";
     e->get_function_loader()->load([this, vertex_shader_code { move(vertex_shader_code.str()) }, fragment_shader_code { move(fragment_shader_code.str()) }] {
         set_vertex_shader(vertex_shader_code);
+        GXLOGD(fragment_shader_code)
         set_fragment_shader(fragment_shader_code);
         link();
         GX_GLC3_SHADER_SET_TEXTURE_INDEX_STARTING

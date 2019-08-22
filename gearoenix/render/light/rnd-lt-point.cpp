@@ -3,6 +3,7 @@
 #include "../../core/cr-static.hpp"
 #include "../../math/math-sphere.hpp"
 #include "../model/rnd-mdl-model.hpp"
+#include <cmath>
 
 void gearoenix::render::light::Point::update_influence_area() noexcept
 {

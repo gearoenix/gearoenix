@@ -86,3 +86,6 @@ ios-build/
 
 wasm-build/
 /wasm-build/
+
+.cxx/
+/.cxx/
