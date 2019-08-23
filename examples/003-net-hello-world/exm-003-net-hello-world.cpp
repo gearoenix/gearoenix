@@ -61,7 +61,7 @@ GameApp::GameApp(const std::shared_ptr<gearoenix::system::Application> &sys_app)
 	const GxReal marginx = 0.02f;
 	const GxReal marginz = 0.01f;
 
-	const ShelfInfo shelves_info[] = {
+	ShelfInfo shelves_info[] = {
 		{
 			std::uniform_real_distribution<GxReal>(marginx - 13.0f, -2.0f - marginx),
 			std::uniform_real_distribution<GxReal>(marginz, 2.0f - marginz),

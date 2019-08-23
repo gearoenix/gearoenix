@@ -121,7 +121,7 @@ public:                                                      \
 
 #define GX_GLC3_SHADER_SRC_DEFAULT_FRAGMENT_STARTING \
     std::stringstream fragment_shader_code;          \
-    fragment_shader_code << GX_GLC3_SHADER_SRC_DEFAULT_VERSION << "#extension GL_EXT_texture_array : enable\n"
+    fragment_shader_code << GX_GLC3_SHADER_SRC_DEFAULT_VERSION
 
 #define GX_GLC3_SHADER_SRC_MATERIAL_UNIFORMS       \
     "uniform float material_alpha;\n"              \

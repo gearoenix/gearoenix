@@ -89,3 +89,5 @@ wasm-build/
 
 .cxx/
 /.cxx/
+
+android/app/release/

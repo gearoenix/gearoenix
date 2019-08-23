@@ -1,5 +1,7 @@
 #ifndef GEAROENIX_RENDER_BUFFER_FRAMED_UNIFORM_HPP
 #define GEAROENIX_RENDER_BUFFER_FRAMED_UNIFORM_HPP
+#include <vector>
+#include <memory>
 namespace gearoenix::render {
 namespace engine {
     class Engine;
@@ -9,7 +11,7 @@ namespace buffer {
     class FramedUniform {
     protected:
         const engine::Engine* const e;
-        Uniform** uniforms;
+        std::vector<std::unique_ptr<Uniform>> uniforms;
 
     public:
         FramedUniform(unsigned int s, engine::Engine* e) noexcept;

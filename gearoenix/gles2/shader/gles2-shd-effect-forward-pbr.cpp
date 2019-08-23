@@ -9,7 +9,7 @@
 #define GX_GLES2_SHADER_SRC_EFFECT_UNIFORMS \
 	"uniform vec4  effect_point_lights_color_min_radius[" GX_MAX_POINT_LIGHTS_STR "];\n" \
 	"uniform vec4  effect_point_lights_position_max_radius[" GX_MAX_POINT_LIGHTS_STR "];\n" \
-    "uniform mat4  effect_shadow_caster_directional_lights_cascades_view_projection_bias[" GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER_STR " * " GX_MAX_SHADOW_CASCADES_STR "];\n" \
+    "uniform mat4  effect_shadow_caster_directional_lights_cascades_view_projection_bias[" GX_MAX_DIRECTIONAL_LIGHTS_CASCADES_STR "];\n" \
     "uniform vec4  effect_shadow_caster_directional_lights_color_cascades_count[" GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER_STR "];\n" \
     "uniform vec4  effect_shadow_caster_directional_lights_direction[" GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER_STR "];\n" \
 	"uniform float effect_point_lights_count;\n" \
@@ -21,7 +21,7 @@
     "varying vec3 out_tng;\n" \
     "varying vec3 out_btg;\n" \
     "varying vec2 out_uv;\n" \
-    "varying vec3 out_directional_lights_cascades_pojected[" GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER_STR " * " GX_MAX_SHADOW_CASCADES_STR "];\n"
+    "varying vec3 out_directional_lights_cascades_pojected[" GX_MAX_DIRECTIONAL_LIGHTS_CASCADES_STR "];\n"
 
 const static std::string vertex_shader_code = GX_GLES2_SHADER_SRC_DEFAULT_VERTEX_STARTING
     "uniform mat4  camera_vp;\n"
@@ -59,7 +59,12 @@ const static std::string vertex_shader_code = GX_GLES2_SHADER_SRC_DEFAULT_VERTEX
 #ifdef GX_IN_WEB
     "            if(j < effect_shadow_caster_directional_lights_cascades_count_int) {\n"
 #endif
-    "            vec4 light_pos = effect_shadow_caster_directional_lights_cascades_view_projection_bias[i] * pos;\n"
+#if GX_MAX_DIRECTIONAL_LIGHTS_CASCADES == 1
+#define GX_SHADOW_INDEX "0"
+#else
+#define GX_SHADOW_INDEX "i"
+#endif
+    "            vec4 light_pos = effect_shadow_caster_directional_lights_cascades_view_projection_bias[" GX_SHADOW_INDEX "] * pos;\n"
     "            light_pos.xyz /= light_pos.w;\n"
     "            light_pos.z *= 0.5;\n"
     "            light_pos.z += 0.5;\n"
@@ -90,7 +95,7 @@ const static std::string fragment_shader_code = GX_GLES2_SHADER_SRC_DEFAULT_FRAG
     "uniform samplerCube effect_diffuse_environment;\n"
     "uniform samplerCube effect_specular_environment;\n"
     "uniform sampler2D   effect_ambient_occlusion;\n"
-	"uniform sampler2D   effect_shadow_caster_directional_lights_cascades_shadow_map[" GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER_STR" * " GX_MAX_SHADOW_CASCADES_STR "];\n"
+	"uniform sampler2D   effect_shadow_caster_directional_lights_cascades_shadow_map[" GX_MAX_DIRECTIONAL_LIGHTS_CASCADES_STR "];\n"
 	"uniform sampler2D   effect_brdflut;\n"
     GX_GLES2_SHADER_SRC_EFFECT_UNIFORMS
     // camera uniform(s)

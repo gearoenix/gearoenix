@@ -10,7 +10,7 @@
 #define GX_GLC3_SHADER_SRC_EFFECT_UNIFORMS \
 	"uniform vec4  effect_point_lights_color_min_radius[" GX_MAX_POINT_LIGHTS_STR "];\n" \
 	"uniform vec4  effect_point_lights_position_max_radius[" GX_MAX_POINT_LIGHTS_STR "];\n" \
-    "uniform mat4  effect_shadow_caster_directional_lights_cascades_view_projection_bias[" GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER_STR " * " GX_MAX_SHADOW_CASCADES_STR "];\n" \
+    "uniform mat4  effect_shadow_caster_directional_lights_cascades_view_projection_bias[" GX_MAX_DIRECTIONAL_LIGHTS_CASCADES_STR "];\n" \
     "uniform vec4  effect_shadow_caster_directional_lights_color_cascades_count[" GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER_STR "];\n" \
     "uniform vec4  effect_shadow_caster_directional_lights_direction[" GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER_STR "];\n" \
 	"uniform float effect_point_lights_count;\n" \
@@ -32,7 +32,7 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         "out vec3 out_btg;\n"
         "out vec2 out_uv;\n"
         // One thing that I'm not sure about is its interpolating, it may not acceptably result
-        "out vec3 out_directional_lights_cascades_pojected[" GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER_STR " * " GX_MAX_SHADOW_CASCADES_STR "];\n"
+        "out vec3 out_directional_lights_cascades_pojected[" GX_MAX_DIRECTIONAL_LIGHTS_CASCADES_STR "];\n"
         // Main function
         "void main()\n"
         "{\n"
@@ -73,7 +73,7 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         "uniform samplerCube effect_diffuse_environment;\n"
         "uniform samplerCube effect_specular_environment;\n"
         "uniform sampler2D   effect_ambient_occlusion;\n"
-        "uniform sampler2D   effect_shadow_caster_directional_lights_cascades_shadow_map[" GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER_STR" * " GX_MAX_SHADOW_CASCADES_STR "];\n"
+        "uniform sampler2D   effect_shadow_caster_directional_lights_cascades_shadow_map[" GX_MAX_DIRECTIONAL_LIGHTS_CASCADES_STR "];\n"
         "uniform sampler2D   effect_brdflut;\n"
         GX_GLC3_SHADER_SRC_EFFECT_UNIFORMS
         // camera uniform(s)
@@ -84,7 +84,7 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         "in vec3 out_tng;\n"
         "in vec3 out_btg;\n"
         "in vec2 out_uv;\n"
-        "in vec3 out_directional_lights_cascades_pojected[" GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER_STR" * " GX_MAX_SHADOW_CASCADES_STR "];\n"
+        "in vec3 out_directional_lights_cascades_pojected[" GX_MAX_DIRECTIONAL_LIGHTS_CASCADES_STR "];\n"
         "out vec4 frag_color;\n"
         // Normal Distribution Function Trowbridge-Reitz GGX
         "float distribution_ggx(const vec3 normal, const vec3 halfway, const float roughness) {\n"
@@ -236,13 +236,13 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         "                vec3 lightuv = out_directional_lights_cascades_pojected[lcasi];\n"
         "                if (lightuv.x > 0.0 && lightuv.x < 1.0 && lightuv.y > 0.0 && lightuv.y < 1.0)\n"
         "                {\n"
-        //                   TODO: it must become for each cascade shadow map
-        //"                    float depth = texture(effect_shadow_map, lightuv, shadow_bias);\n"
-        //"                    float depth = texture(effect_shadow_map, lightuv.xy).x * 2.0 - 1.0;\n"
-        "                    float depth = texture(effect_shadow_caster_directional_lights_cascades_shadow_map[lcasi], lightuv.xy, 0.0).x;\n"
-        //"                    if(depth != 0.0) { frag_color = vec4(vec3(abs(depth)), 1.0); return; }\n"
+#if GX_MAX_DIRECTIONAL_LIGHTS_CASCADES == 1
+#define SHADOW_MAP_INDEX "0"
+#else
+#define SHADOW_MAP_INDEX "lcasi"
+#endif
+        "                    float depth = texture(effect_shadow_caster_directional_lights_cascades_shadow_map[" SHADOW_MAP_INDEX "], lightuv.xy, 0.0).x;\n"
         "                    if(depth + shadow_bias <= lightuv.z)\n"
-        //"                    if(depth == 0.0)\n"
         "                    {\n"
         "                        is_in_directional_light = false;\n"
         "                    }\n"
