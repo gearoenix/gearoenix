@@ -1,23 +1,45 @@
 CMAKE_MINIMUM_REQUIRED (VERSION 3.1 FATAL_ERROR)
 
-PROJECT (GEAROENIX)
+PROJECT (Gearoenix)
 
-SET (PROJECT_DESCRIPTION "\"A cross-platform C++ game engine.\"")
+SET (PROJECT_DESCRIPTION "A cross-platform C++ game engine.")
 
 SET (GX_VERSION_MAJOR 0)
 SET (GX_VERSION_MINOR 2)
 SET (GX_VERSION_PATCH 0)
 SET (GX_VERSION "${GX_VERSION_MAJOR}.${GX_VERSION_MINOR}.${GX_VERSION_PATCH}")
 
-OPTION (GX_USE_SDL2 "Use SDL2 library" ON)
+MESSAGE (STATUS "Gearoenix is going to be compiled for ${CMAKE_SYSTEM_NAME}")
+
+# 1-Project configurations
+# 1-1-System API selection
+# For android default is native activity and for others SDL2
+OPTION (GX_SYSTEM_API "Use SDL2 library" ON)
+IF (CMAKE_SYSTEM_NAME MATCHES "Android")
+SET (GX_DEFAULT_SYSTEM_API "Native")
+ELSE ()
+SET (GX_DEFAULT_SYSTEM_API "SDL2")
+ENDIF ()
+SET (GX_SYSTEM_API "${GX_DEFAULT_SYSTEM_API}" CACHE STRING "Gearoenix System API that interact with operating system." FORCE)
+SET_PROPERTY (CACHE GX_SYSTEM_API PROPERTY STRINGS "SDL2" "Native")
+MESSAGE (STATUS "Gearoenix system API is ${GX_SYSTEM_API}")
+# 1-2-OpenGL ES 2
 OPTION (GX_USE_OPENGL_ES2 "Activate OpenGL ES 2" ON)
+# 1-3-OpenGL ES 3
 OPTION (GX_USE_OPENGL_ES3 "Activate OpenGL ES 3" ON)
+# 1-4-OpenGL 3.3
 OPTION (GX_USE_OPENGL_33 "Activate OpenGL 3.3" ON)
+# 1-5-OpenGL 4.3 (it has compute shader)
 OPTION (GX_USE_OPENGL_43 "Activate OpenGL 4.3" ON)
+# 1-6-Vulkan API (work in progress)
 OPTION (GX_USE_VULKAN "Activate Vulkan (WIP)" OFF)
+# 1-7-Document generation (planned)
 OPTION (GX_GENERATE_DOCUMENTS "Generate documentation (Planned)" OFF)
+# 1-8-Example targets
 OPTION (GX_ENABLE_EXAMPLES "Enables the examples" ON)
+# 1-9-Test
 OPTION (GX_ENABLE_TESTS "Enables the tests" OFF)
+# 1-10-Test coverage
 OPTION (GX_ENABLE_COVERAGE "Enables the measurement of test coverages" OFF)
 
 SET(GX_LIBS)
