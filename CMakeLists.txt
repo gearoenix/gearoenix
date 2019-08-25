@@ -11,8 +11,8 @@ SET (GX_VERSION "${GX_VERSION_MAJOR}.${GX_VERSION_MINOR}.${GX_VERSION_PATCH}")
 
 MESSAGE (STATUS "Gearoenix is going to be compiled for ${CMAKE_SYSTEM_NAME}")
 
-# 1-Project configurations
-# 1-1-System API selection
+# Project configurations
+# System API selection
 # For android default is native activity and for others SDL2
 OPTION (GX_SYSTEM_API "Use SDL2 library" ON)
 IF (CMAKE_SYSTEM_NAME MATCHES "Android")
@@ -23,32 +23,54 @@ ENDIF ()
 SET (GX_SYSTEM_API "${GX_DEFAULT_SYSTEM_API}" CACHE STRING "Gearoenix System API that interact with operating system." FORCE)
 SET_PROPERTY (CACHE GX_SYSTEM_API PROPERTY STRINGS "SDL2" "Native")
 MESSAGE (STATUS "Gearoenix system API is ${GX_SYSTEM_API}")
-# 1-2-OpenGL ES 2
+SET(GX_USE_SDL2 OFF)
+SET(GX_USE_NATIVE OFF)
+IF (GX_SYSTEM_API MATCHES "Native")
+    SET(GX_USE_NATIVE ON)
+ELSEIF (GX_SYSTEM_API MATCHES "SDL2")
+    SET(GX_USE_SDL2 ON)
+ELSE ()
+    MESSAGE (FATAL_ERROR "Unexpected system API selected.")
+ENDIF()
+# OpenGL ES 2
 OPTION (GX_USE_OPENGL_ES2 "Activate OpenGL ES 2" ON)
-# 1-3-OpenGL ES 3
+# OpenGL ES 3
 OPTION (GX_USE_OPENGL_ES3 "Activate OpenGL ES 3" ON)
-# 1-4-OpenGL 3.3
+# OpenGL 3.3
 OPTION (GX_USE_OPENGL_33 "Activate OpenGL 3.3" ON)
-# 1-5-OpenGL 4.3 (it has compute shader)
+# OpenGL 4.3 (it has compute shader)
 OPTION (GX_USE_OPENGL_43 "Activate OpenGL 4.3" ON)
-# 1-6-Vulkan API (work in progress)
+# Vulkan API (work in progress)
 OPTION (GX_USE_VULKAN "Activate Vulkan (WIP)" OFF)
-# 1-7-Document generation (planned)
+IF (MSVC)
+    OPTION (GX_USE_DIRECTX11 "Activate Direct3DX 11 (WIP)" OFF)
+    OPTION (GX_USE_DIRECTX12 "Activate Direct3DX 12 (WIP)" OFF)
+ENDIF ()
+# Document generation (planned)
 OPTION (GX_GENERATE_DOCUMENTS "Generate documentation (Planned)" OFF)
-# 1-8-Example targets
+# Example targets
 OPTION (GX_ENABLE_EXAMPLES "Enables the examples" ON)
-# 1-9-Test
+# Test
 OPTION (GX_ENABLE_TESTS "Enables the tests" OFF)
-# 1-10-Test coverage
+# Test coverage
 OPTION (GX_ENABLE_COVERAGE "Enables the measurement of test coverages" OFF)
-
+# Libraries that are dependencies of the project
 SET(GX_LIBS)
-
-SET (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
+# Configuring the language level
 SET (CMAKE_CXX_STANDARD 17)
 SET (CMAKE_CXX_STANDARD_REQUIRED ON)
-SET (GX_PATH_SEP "/")
-
+IF (MSVC)
+    SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17")
+ELSE ()
+    SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
+ENDIF ()
+IF (APPLE)
+    SET (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -x objective-c")
+    SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -x objective-c++")
+ENDIF ()
+# Cmake modules
+SET (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
+# Test coverage
 IF (GX_ENABLE_TESTS AND GX_ENABLE_COVERAGE)
     INCLUDE (CodeCoverage)
     APPEND_COVERAGE_COMPILER_FLAGS ()
@@ -59,29 +81,13 @@ IF (GX_ENABLE_TESTS AND GX_ENABLE_COVERAGE)
         "${CMAKE_SOURCE_DIR}/tests/*")
     SETUP_TARGET_FOR_COVERAGE (NAME GX_COVERAGE EXECUTABLE ctest DEPENDENCIES GX_TESTS)
 ENDIF (GX_ENABLE_TESTS AND GX_ENABLE_COVERAGE)
-
+# Warning generation
 IF (MSVC)
-    OPTION (GX_USE_DIRECTX11 "Activate Direct3DX 11 (WIP)" OFF)
-    OPTION (GX_USE_DIRECTX12 "Activate Direct3DX 12 (WIP)" OFF)
-    SET (GX_PATH_SEP "\\")
-    SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17 /W4")
-    FUNCTION (GX_MAKE_LIB GX_CROSS_LIB_FILE GX_LIB_NAME)
-        SET (${GX_CROSS_LIB_FILE} "${GX_LIB_NAME}.lib" PARENT_SCOPE)
-    ENDFUNCTION (GX_MAKE_LIB)
+    SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
 ELSE ()
-    SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -Wall -Wextra")
-    FUNCTION (GX_MAKE_LIB GX_CROSS_LIB_FILE GX_LIB_NAME)
-        SET (${GX_CROSS_LIB_FILE} "lib${GX_LIB_NAME}.a" PARENT_SCOPE)
-    ENDFUNCTION (GX_MAKE_LIB)
+    SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 ENDIF (MSVC)
-
-IF (APPLE)
-    SET (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -x objective-c")
-    SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -x objective-c++")
-ENDIF (APPLE)
-
-MESSAGE (STATUS "Gearoenix is getting configured for ${CMAKE_SYSTEM_NAME}")
-
+# Webassembly customized flags
 IF (CMAKE_SYSTEM_NAME MATCHES "Emscripten")
     MESSAGE (STATUS "SDL2 dependancy added for Emscripten.")
     SET (GX_EMS_FLAGS "-s WASM=1 -s USE_PTHREADS=1 -s NO_EXIT_RUNTIME=1 -s BINARYEN=1 -s PTHREAD_POOL_SIZE=8 -s PTHREAD_HINT_NUM_CORES=8 -s USE_SDL=2")
@@ -93,44 +99,46 @@ IF (CMAKE_SYSTEM_NAME MATCHES "Emscripten")
     SET (GX_LIBS ${GX_LIBS} ${GX_EMS_FLAGS})
 ENDIF (CMAKE_SYSTEM_NAME MATCHES "Emscripten")
 
-SET (GX_SDK_PATH "${CMAKE_SOURCE_DIR}/sdk/")
+SET (GX_SDK_PATH "${CMAKE_SOURCE_DIR}/sdk")
 MESSAGE (STATUS "Gearoenix SDK path is '${GX_SDK_PATH}'.")
-
-SET (GX_SDK_LIB_PATH "${GX_SDK_PATH}libs/")
+SET (GX_SDK_LIB_PATH "${GX_SDK_PATH}/libs/")
 MESSAGE (STATUS "Gearoenix SDK libs path is '${GX_SDK_LIB_PATH}'.")
-
 SET (GX_SDK_IOS_LIB_PATH "${GX_SDK_LIB_PATH}ios/")
-
-SET (BOOST_INCLUDE_DIRS "${GX_SDK_PATH}/boost")
-SET (GLM_INCLUDE_DIRS "${GX_SDK_PATH}/glm")
-SET (SDL2_INCLUDE_DIRS "${GX_SDK_PATH}/SDL2/include")
-SET (STB_INCLUDE_DIRS "${GX_SDK_PATH}/stb")
-
-SET (DEFAULT_BUILD_TYPE "MinSizeRel")
+SET (GX_BOOST_INCLUDE_DIRS "${GX_SDK_PATH}/boost")
+SET (GX_GLM_INCLUDE_DIRS "${GX_SDK_PATH}/glm")
+SET (GX_SDL2_PATH "${GX_SDK_PATH}/SDL2")
+SET (GX_SDL2_INCLUDE_DIRS "${GX_SDL2_PATH}/include")
+MESSAGE (STATUS "Gearoenix SDK SDL2 include path is '${GX_SDL2_INCLUDE_DIRS}'.")
+SET (GX_STB_INCLUDE_DIRS "${GX_SDK_PATH}/stb")
+# Build configuration
+SET (GX_DEFAULT_BUILD_TYPE "MinSizeRel")
 if (EXISTS "${CMAKE_SOURCE_DIR}/.git")
-    SET (DEFAULT_BUILD_TYPE "Debug")
+    SET (GX_DEFAULT_BUILD_TYPE "Debug")
 endif ()
- 
 IF (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
-    MESSAGE (STATUS "Setting build type to '${DEFAULT_BUILD_TYPE}' as none was specified.")
-    SET (CMAKE_BUILD_TYPE "${DEFAULT_BUILD_TYPE}" CACHE STRING "Choose the type of build." FORCE)
+    MESSAGE (STATUS "Setting build type to '${GX_DEFAULT_BUILD_TYPE}' as none was specified.")
+    SET (CMAKE_BUILD_TYPE "${GX_DEFAULT_BUILD_TYPE}" CACHE STRING "Choose the type of build." FORCE)
     SET_PROPERTY(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 ENDIF (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
-
-INCLUDE_DIRECTORIES (${STB_INCLUDE_DIRS})
+# Include directories
+INCLUDE_DIRECTORIES (${GX_STB_INCLUDE_DIRS})
 
 IF (GX_USE_SDL2)
-    SET (GX_SDL2_PATH "${GX_SDK_PATH}/SDL2")
     IF (NOT CMAKE_SYSTEM_NAME MATCHES "iOS" AND NOT CMAKE_SYSTEM_NAME MATCHES "Emscripten")
+        SET (GX_ADD_SDL2_AS_SUBDIR ON)
+    ELSE ()
+        SET (GX_ADD_SDL2_AS_SUBDIR OFF)
+    ENDIF ()
+    IF (GX_ADD_SDL2_AS_SUBDIR)
         MESSAGE (STATUS "SDL2 dependancy added as a subdirectory.")
         ADD_SUBDIRECTORY(${GX_SDL2_PATH})
-    ENDIF (NOT CMAKE_SYSTEM_NAME MATCHES "iOS" AND NOT CMAKE_SYSTEM_NAME MATCHES "Emscripten")
-    INCLUDE_DIRECTORIES (${SDL2_INCLUDE_DIRS})
-    IF (GX_BUILD_ANDROID)
+    ENDIF ()
+    INCLUDE_DIRECTORIES (${GX_SDL2_INCLUDE_DIRS})
+    IF (CMAKE_SYSTEM_NAME MATCHES "Android")
         SET (GX_LIBS ${GX_LIBS} SDL2 SDL2main)
-    ELSEIF (NOT CMAKE_SYSTEM_NAME MATCHES "iOS" AND NOT CMAKE_SYSTEM_NAME MATCHES "Emscripten")
+    ELSEIF (GX_ADD_SDL2_AS_SUBDIR)
         SET (GX_LIBS ${GX_LIBS} SDL2-static SDL2main)
-    ENDIF (GX_BUILD_ANDROID)
+    ENDIF ()
     IF (MSVC)
         SET (GX_LIBS ${GX_LIBS} winmm version oleaut32 imm32)
     ELSEIF (APPLE)
@@ -191,7 +199,7 @@ IF (GX_USE_SDL2)
             MARK_AS_ADVANCED(CARBON_LIBRARY)
             SET (GX_LIBS ${GX_LIBS} ${CARBON_LIBRARY})
         ENDIF (CMAKE_SYSTEM_NAME MATCHES "iOS")
-    ELSEIF (NOT GX_BUILD_ANDROID AND NOT CMAKE_SYSTEM_NAME MATCHES "Emscripten")
+    ELSEIF (NOT CMAKE_SYSTEM_NAME MATCHES "Android" AND NOT CMAKE_SYSTEM_NAME MATCHES "Emscripten")
         SET (GX_LIBS ${GX_LIBS} pthread dl sndio)
     ENDIF (MSVC)
 ENDIF (GX_USE_SDL2)
@@ -199,7 +207,7 @@ ENDIF (GX_USE_SDL2)
 ADD_SUBDIRECTORY (gearoenix)
 
 IF(GX_ENABLE_EXAMPLES)
-ADD_SUBDIRECTORY (examples)
+    ADD_SUBDIRECTORY (examples)
 ENDIF(GX_ENABLE_EXAMPLES)
 
 IF(GX_ENABLE_TESTS)
