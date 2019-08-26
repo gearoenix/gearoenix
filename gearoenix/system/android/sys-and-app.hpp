@@ -3,11 +3,9 @@
 #include "../../core/cr-build-configuration.hpp"
 #if defined(GX_IN_ANDROID) && !defined(GX_USE_SDL)
 #include "../../core/cr-types.hpp"
-#include <EGL/egl.h>
-#include <GLContext.h>
-#include <GLES/gl.h>
-#include <android_native_app_glue.h>
-#include <gestureDetector.h>
+
+struct android_app;
+struct AInputEvent;
 
 namespace gearoenix {
 namespace render {
@@ -31,10 +29,6 @@ namespace system {
         unsigned int win_width, win_height;
         core::Real screen_ratio, half_height_inversed;
         core::Real x = 0.0f, y = 0.0f, w = 0.0f;
-        ndk_helper::PinchDetector pinch_detector;
-        ndk_helper::DragDetector drag_detector;
-        ndk_helper::TapDetector tap_detector;
-        ndk_helper::GLContext* gl_ctx = nullptr;
         void handle(android_app* app, int32_t cmd);
         int32_t handle(android_app* app, AInputEvent* e);
         static void handle_cmd(android_app* app, int32_t cmd);

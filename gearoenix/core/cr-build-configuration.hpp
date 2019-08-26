@@ -4,9 +4,8 @@
 #ifdef ANDROID
 #define GX_IN_ANDROID
 //#define GX_USE_VULKAN
-//#define GX_USE_OPENGL_ES3
+#define GX_USE_OPENGL_ES3
 #define GX_USE_OPENGL_ES2
-#define GX_USE_SDL
 #elif defined(__EMSCRIPTEN__)
 #define GX_IN_WEB
 #define GX_USE_OPENGL_ES3

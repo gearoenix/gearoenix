@@ -1,7 +1,7 @@
 package com.geareonix.engine_demo;
 
-import org.libsdl.app.SDLActivity;
+import android.app.NativeActivity;
 
-public class MainActivity extends SDLActivity {
+public class MainActivity extends NativeActivity {
     
 }
