@@ -2,30 +2,79 @@
 #if defined(GX_IN_ANDROID) && !defined(GX_USE_SDL)
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../core/cr-application.hpp"
+#include "../../core/cr-static.hpp"
 #include "../../core/event/cr-ev-sys-system.hpp"
 #include "../sys-log.hpp"
 #include <android_native_app_glue.h>
 #include <string>
 
-void gearoenix::system::Application::handle_cmd(android_app* app, int32_t cmd)
+void gearoenix::system::Application::handle(android_app* a, int32_t cmd) noexcept
 {
-    auto sys_app = static_cast<Application*>(app->userData);
-    sys_app->handle(app, cmd);
+    switch (cmd) {
+        case APP_CMD_INIT_WINDOW:
+            if (and_app->window != nullptr) {
+                if (render_engine == nullptr) {
+//                gl_ctx->Init(and_app->window);
+//                win_width = (unsigned int)gl_ctx->GetScreenWidth();
+//                win_height = (unsigned int)gl_ctx->GetScreenHeight();
+//                screen_ratio = (core::Real)win_width / (core::Real)win_height;
+//                half_height_inversed = 2.0f / (core::Real)win_height;
+//                astmgr = new core::asset::Manager(this, "data.gx3d");
+//                astmgr->initialize();
+//                render_engine = new gles2::Engine(this);
+//                astmgr->set_render_engine(render_engine);
+                } else if (a->window != and_app->window) {
+//                GXLOGE("reached");
+//                core::event::system::System eul(core::event::system::System::Action::UNLOAD);
+//                core_app->on_event(eul);
+//                render_engine->on_event(eul);
+//                gl_ctx->Invalidate();
+//                and_app = a;
+//                gl_ctx->Init(a->window);
+//                core::event::system::System erl(core::event::system::System::Action::RELOAD);
+//                core_app->on_event(erl);
+//                render_engine->on_event(erl);
+//                GXLOGE("reached");
+//            } else if (EGL_SUCCESS == gl_ctx->Resume(a->window)) {
+//                GXLOGE("reached");
+//                core::event::system::System eul(core::event::system::System::Action::UNLOAD);
+//                core_app->on_event(eul);
+//                render_engine->on_event(eul);
+//                core::event::system::System erl(core::event::system::System::Action::RELOAD);
+//                core_app->on_event(erl);
+//                render_engine->on_event(erl);
+//                GXLOGE("reached");
+                } else
+                GXUNEXPECTED;
+//            win_width = (unsigned int)gl_ctx->GetScreenWidth();
+//            win_height = (unsigned int)gl_ctx->GetScreenHeight();
+                screen_ratio = (core::Real)win_width / (core::Real)win_height;
+                half_height_inversed = 2.0f / (core::Real)win_height;
+                active = true;
+            }
+            break;
+        case APP_CMD_TERM_WINDOW: {
+//        if (core_app == nullptr || render_engine == nullptr)
+//            break;
+//        active = false;
+//        core::event::system::System eul(core::event::system::System::Action::UNLOAD);
+//        core_app->on_event(eul);
+//        render_engine->on_event(eul);
+//        gl_ctx->Suspend();
+//        break;
+        }
+        default:
+        GXLOGI("event not handled: " << cmd);
+    }
 }
 
-int32_t gearoenix::system::Application::handle_input(android_app* a, AInputEvent* e)
-{
-    auto sys_app = static_cast<Application*>(a->userData);
-    return sys_app->handle(a, e);
-}
-
-int32_t gearoenix::system::Application::handle(android_app* app, AInputEvent* e)
+int32_t gearoenix::system::Application::handle(android_app* app, AInputEvent* e) noexcept
 {
     core::event::Event* gxe = nullptr;
     const int32_t action = AMotionEvent_getAction(e);
     const auto flags = static_cast<int32_t>(static_cast<unsigned int>(action) & AMOTION_EVENT_ACTION_MASK);
-    const core::Real curx = convert_pixel_x_to_normalized((int)AMotionEvent_getX(e, 0));
-    const core::Real cury = convert_pixel_y_to_normalized((int)AMotionEvent_getY(e, 0));
+    const core::Real curx = convert_x_to_ratio((int)AMotionEvent_getX(e, 0));
+    const core::Real cury = convert_y_to_ratio((int)AMotionEvent_getY(e, 0));
     switch (flags) {
     case AMOTION_EVENT_ACTION_DOWN:
         // TODO
@@ -44,7 +93,19 @@ int32_t gearoenix::system::Application::handle(android_app* app, AInputEvent* e)
     return 0;
 }
 
-gearoenix::system::Application::Application(android_app* and_app)
+void gearoenix::system::Application::handle_cmd(android_app* app, int32_t cmd) noexcept
+{
+    auto sys_app = static_cast<Application*>(app->userData);
+    sys_app->handle(app, cmd);
+}
+
+int32_t gearoenix::system::Application::handle_input(android_app* a, AInputEvent* e) noexcept
+{
+    auto sys_app = static_cast<Application*>(a->userData);
+    return sys_app->handle(a, e);
+}
+
+gearoenix::system::Application::Application(android_app* and_app) noexcept
     : and_app(and_app)
 {
     and_app->userData = this;
@@ -62,61 +123,65 @@ gearoenix::system::Application::Application(android_app* and_app)
     } while (and_app->destroyRequested == 0);
 }
 
-gearoenix::system::Application::~Application()
+gearoenix::system::Application::~Application() noexcept
 {
+    GX_DELETE(core_app);
+    GX_DELETE(render_engine);
+    GX_DELETE(astmgr);
+    GX_DELETE(and_app);
 }
 
-android_app* gearoenix::system::Application::get_android_app() const
+android_app* gearoenix::system::Application::get_android_app() const noexcept
 {
     return and_app;
 }
 
-const gearoenix::core::Application* gearoenix::system::Application::get_core_app() const
+const gearoenix::core::Application* gearoenix::system::Application::get_core_app() const noexcept
 {
     return core_app;
 }
 
-gearoenix::core::Application* gearoenix::system::Application::get_core_app()
+gearoenix::core::Application* gearoenix::system::Application::get_core_app() noexcept
 {
     return core_app;
 }
 
-const gearoenix::render::Engine* gearoenix::system::Application::get_render_engine() const
+const gearoenix::render::Engine* gearoenix::system::Application::get_render_engine() const noexcept
 {
     return render_engine;
 }
 
-gearoenix::render::Engine* gearoenix::system::Application::get_render_engine()
+gearoenix::render::Engine* gearoenix::system::Application::get_render_engine() noexcept
 {
     return render_engine;
 }
 
-const gearoenix::core::asset::Manager* gearoenix::system::Application::get_asset_manager() const
+const gearoenix::core::asset::Manager* gearoenix::system::Application::get_asset_manager() const noexcept
 {
     return astmgr;
 }
 
-gearoenix::core::asset::Manager* gearoenix::system::Application::get_asset_manager()
+gearoenix::core::asset::Manager* gearoenix::system::Application::get_asset_manager() noexcept
 {
     return astmgr;
 }
 
-gearoenix::core::Real gearoenix::system::Application::get_window_ratio() const
+gearoenix::core::Real gearoenix::system::Application::get_window_ratio() const noexcept
 {
     return screen_ratio;
 }
 
-unsigned int gearoenix::system::Application::get_width() const
+unsigned int gearoenix::system::Application::get_width() const noexcept
 {
     return win_width;
 }
 
-unsigned int gearoenix::system::Application::get_height() const
+unsigned int gearoenix::system::Application::get_height() const noexcept
 {
     return win_height;
 }
 
-void gearoenix::system::Application::execute(core::Application* app)
+void gearoenix::system::Application::execute(core::Application* app) noexcept
 {
     core_app = app;
     int events;
@@ -146,83 +211,15 @@ void gearoenix::system::Application::execute(core::Application* app)
     active = false;
     core_app->terminate();
     //render_engine->terminate();
-    delete core_app;
-    core_app = nullptr;
-    delete render_engine;
-    render_engine = nullptr;
-    delete astmgr;
-    astmgr = nullptr;
-    delete and_app;
-    and_app = nullptr;
 }
 
-void gearoenix::system::Application::handle(android_app* a, int32_t cmd)
+gearoenix::core::Real gearoenix::system::Application::convert_x_to_ratio(const int x) const noexcept
 {
-    switch (cmd) {
-    case APP_CMD_INIT_WINDOW:
-        if (and_app->window != nullptr) {
-            if (render_engine == nullptr) {
-//                gl_ctx->Init(and_app->window);
-//                win_width = (unsigned int)gl_ctx->GetScreenWidth();
-//                win_height = (unsigned int)gl_ctx->GetScreenHeight();
-//                screen_ratio = (core::Real)win_width / (core::Real)win_height;
-//                half_height_inversed = 2.0f / (core::Real)win_height;
-//                astmgr = new core::asset::Manager(this, "data.gx3d");
-//                astmgr->initialize();
-//                render_engine = new gles2::Engine(this);
-//                astmgr->set_render_engine(render_engine);
-            } else if (a->window != and_app->window) {
-//                GXLOGE("reached");
-//                core::event::system::System eul(core::event::system::System::Action::UNLOAD);
-//                core_app->on_event(eul);
-//                render_engine->on_event(eul);
-//                gl_ctx->Invalidate();
-//                and_app = a;
-//                gl_ctx->Init(a->window);
-//                core::event::system::System erl(core::event::system::System::Action::RELOAD);
-//                core_app->on_event(erl);
-//                render_engine->on_event(erl);
-//                GXLOGE("reached");
-//            } else if (EGL_SUCCESS == gl_ctx->Resume(a->window)) {
-//                GXLOGE("reached");
-//                core::event::system::System eul(core::event::system::System::Action::UNLOAD);
-//                core_app->on_event(eul);
-//                render_engine->on_event(eul);
-//                core::event::system::System erl(core::event::system::System::Action::RELOAD);
-//                core_app->on_event(erl);
-//                render_engine->on_event(erl);
-//                GXLOGE("reached");
-            } else
-                GXUNEXPECTED;
-//            win_width = (unsigned int)gl_ctx->GetScreenWidth();
-//            win_height = (unsigned int)gl_ctx->GetScreenHeight();
-            screen_ratio = (core::Real)win_width / (core::Real)win_height;
-            half_height_inversed = 2.0f / (core::Real)win_height;
-            active = true;
-        }
-        break;
-    case APP_CMD_TERM_WINDOW: {
-//        if (core_app == nullptr || render_engine == nullptr)
-//            break;
-//        active = false;
-//        core::event::system::System eul(core::event::system::System::Action::UNLOAD);
-//        core_app->on_event(eul);
-//        render_engine->on_event(eul);
-//        gl_ctx->Suspend();
-//        break;
-    }
-    default:
-        GXLOGI("event not handled: " << cmd);
-    }
+    return ((((core::Real)x) * half_height_inverted) - screen_ratio);
 }
 
-gearoenix::core::Real gearoenix::system::Application::convert_pixel_x_to_normalized(int x)
+gearoenix::core::Real gearoenix::system::Application::convert_y_to_ratio(const int y) const noexcept
 {
-    return ((((core::Real)x) * half_height_inversed) - screen_ratio);
-}
-
-gearoenix::core::Real gearoenix::system::Application::convert_pixel_y_to_normalized(int y)
-{
-    return (1.0f - (((core::Real)y) * half_height_inversed));
+    return (1.0F - (((core::Real)y) * half_height_inverted));
 }
 #endif

@@ -38,7 +38,7 @@ namespace system {
         std::shared_ptr<core::Application> core_app = nullptr;
         std::shared_ptr<core::asset::Manager> astmgr = nullptr;
         core::event::Engine* event_engine = nullptr;
-
+        /// TODO: All the surface functionality most move to new class
         unsigned int win_width = 0;
         unsigned int win_height = 0;
 
@@ -71,12 +71,12 @@ namespace system {
         void main_loop() noexcept;
 #endif
 
-        const std::shared_ptr<core::Application>& get_core_app() const noexcept;
-        std::shared_ptr<core::Application>& get_core_app() noexcept;
-        const std::shared_ptr<render::engine::Engine>& get_render_engine() const noexcept;
-        std::shared_ptr<render::engine::Engine>& get_render_engine() noexcept;
-        const std::shared_ptr<core::asset::Manager>& get_asset_manager() const noexcept;
-        std::shared_ptr<core::asset::Manager>& get_asset_manager() noexcept;
+        const core::Application* get_core_app() const noexcept;
+        core::Application* get_core_app() noexcept;
+        const render::engine::Engine* get_render_engine() const noexcept;
+        render::engine::Engine* get_render_engine() noexcept;
+        const core::asset::Manager* get_asset_manager() const noexcept;
+        core::asset::Manager* get_asset_manager() noexcept;
         const core::event::Engine* get_event_engine() const noexcept;
         core::event::Engine* get_event_engine() noexcept;
         const Configuration& get_configuration() const noexcept;
