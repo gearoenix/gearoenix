@@ -4,6 +4,7 @@
 #ifdef GX_USE_SDL
 #include "../../core/cr-types.hpp"
 #include "../../render/engine/rnd-eng-type.hpp"
+#include "../sys-configuration.hpp"
 #define NO_SDL_GLEXT
 #include <SDL.h>
 #include <memory>
@@ -24,7 +25,6 @@ namespace render::engine {
     class Engine;
 }
 namespace system {
-    struct Configuration;
     class Application {
     private:
 #ifdef GX_IN_WEB
@@ -33,10 +33,10 @@ namespace system {
         const static core::Real ROTATION_EPSILON;
         const static core::Real ZOOM_EPSILON;
 
-        std::shared_ptr<Configuration> config = nullptr;
-        std::shared_ptr<render::engine::Engine> render_engine = nullptr;
-        std::shared_ptr<core::Application> core_app = nullptr;
-        std::shared_ptr<core::asset::Manager> astmgr = nullptr;
+        Configuration config;
+        render::engine::Engine* render_engine = nullptr;
+        core::Application* core_app = nullptr;
+        core::asset::Manager* astmgr = nullptr;
         core::event::Engine* event_engine = nullptr;
         /// TODO: All the surface functionality most move to new class
         unsigned int win_width = 0;
@@ -54,7 +54,7 @@ namespace system {
 #endif
 
         bool running = true;
-        render::engine::Type::Id supported_engine = render::engine::Type::UNKNOWN;
+        render::engine::Type supported_engine = render::engine::Type::None;
 
         void create_window() noexcept;
         static int SDLCALL event_receiver(void* user_data, SDL_Event* event) noexcept;
@@ -64,7 +64,7 @@ namespace system {
     public:
         static const std::shared_ptr<Application> construct() noexcept;
         ~Application() noexcept;
-        void execute(const std::shared_ptr<core::Application>& app) noexcept;
+        void execute(core::Application* app) noexcept;
 
 #ifdef GX_IN_WEB
         static void loop() noexcept;

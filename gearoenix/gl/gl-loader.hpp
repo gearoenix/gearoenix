@@ -99,7 +99,7 @@ private:
 public:
     Loader() = delete;
     Loader(const Loader&) = delete;
-    static bool load_library(render::engine::Type::Id engine_type) noexcept;
+    static bool load_library(render::engine::Type engine_type) noexcept;
     static void unload_library() noexcept;
     static void check_for_error() noexcept;
 

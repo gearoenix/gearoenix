@@ -31,9 +31,6 @@
 #define GX_USE_OPENGL_ES3
 #define GX_USE_OPENGL_ES2
 #define GX_IN_DESKTOP
-#define GX_USE_SDL
-//#define GX_USE_GLFW
-//#define GX_USE_WINAPI
 #elif defined(__APPLE__)
 #include "TargetConditionals.h"
 #if TARGET_OS_IPHONE

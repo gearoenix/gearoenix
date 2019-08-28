@@ -16,7 +16,8 @@
 #include <cstring>
 #define GX_SET_ZERO(x) std::memset(&(x), 0, sizeof((x)));
 #define GX_SET_ARRAY_ZERO(x) std::memset((x), 0, sizeof((x)));
-#define GX_GETTER_BUILDER(x) const decltype(x)& get_##x() const { return x; }
+#define GX_GETTER_BUILDER(x) const decltype(x)& get_##x() const noexcept { return x; }
+#define GX_GETTER_BUILDER_V(x) decltype(x) get_##x() const noexcept { return x; }
 #define GX_DELETE(x)      \
     if ((x) != nullptr) { \
         delete (x);       \

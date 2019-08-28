@@ -4,7 +4,13 @@
 #include "../../core/cr-application.hpp"
 #include "../../core/cr-static.hpp"
 #include "../../core/event/cr-ev-sys-system.hpp"
+#include "../../render/engine/rnd-eng-engine.hpp"
 #include "../sys-log.hpp"
+#ifdef GX_USE_OPENGL
+#include "../../glc3/engine/glc3-eng-engine.hpp"
+#include "../../gles2/engine/gles2-eng-engine.hpp"
+#include "sys-gl-context.hpp"
+#endif
 #include <android_native_app_glue.h>
 #include <string>
 
@@ -14,7 +20,13 @@ void gearoenix::system::Application::handle(android_app* a, int32_t cmd) noexcep
         case APP_CMD_INIT_WINDOW:
             if (and_app->window != nullptr) {
                 if (render_engine == nullptr) {
-//                gl_ctx->Init(and_app->window);
+                    // TODO: If Vulkan was supported don't go any further
+                gl_context->init(and_app->window);
+                if(gl_context->get_es3_supported()) {
+                    render_engine = glc3::engine::Engine::construct(this, render::engine::Type::OPENGL_ES3);
+                } else {
+                    render_engine = gles2::engine::Engine::construct(this);
+                }
 //                win_width = (unsigned int)gl_ctx->GetScreenWidth();
 //                win_height = (unsigned int)gl_ctx->GetScreenHeight();
 //                screen_ratio = (core::Real)win_width / (core::Real)win_height;
@@ -49,8 +61,8 @@ void gearoenix::system::Application::handle(android_app* a, int32_t cmd) noexcep
 //            win_width = (unsigned int)gl_ctx->GetScreenWidth();
 //            win_height = (unsigned int)gl_ctx->GetScreenHeight();
                 screen_ratio = (core::Real)win_width / (core::Real)win_height;
-                half_height_inversed = 2.0f / (core::Real)win_height;
-                active = true;
+                half_height_inverted = 2.0F / (core::Real)win_height;
+                running = true;
             }
             break;
         case APP_CMD_TERM_WINDOW: {
@@ -107,6 +119,7 @@ int32_t gearoenix::system::Application::handle_input(android_app* a, AInputEvent
 
 gearoenix::system::Application::Application(android_app* and_app) noexcept
     : and_app(and_app)
+    , gl_context(new GlContext())
 {
     and_app->userData = this;
     and_app->onAppCmd = gearoenix::system::Application::handle_cmd;
@@ -125,10 +138,12 @@ gearoenix::system::Application::Application(android_app* and_app) noexcept
 
 gearoenix::system::Application::~Application() noexcept
 {
-    GX_DELETE(core_app);
-    GX_DELETE(render_engine);
-    GX_DELETE(astmgr);
-    GX_DELETE(and_app);
+    GX_DELETE(core_app)
+    GX_DELETE(event_engine)
+    GX_DELETE(render_engine)
+    GX_DELETE(astmgr)
+    GX_DELETE(gl_context)
+    GX_DELETE(and_app)
 }
 
 android_app* gearoenix::system::Application::get_android_app() const noexcept
@@ -146,12 +161,12 @@ gearoenix::core::Application* gearoenix::system::Application::get_core_app() noe
     return core_app;
 }
 
-const gearoenix::render::Engine* gearoenix::system::Application::get_render_engine() const noexcept
+const gearoenix::render::engine::Engine* gearoenix::system::Application::get_render_engine() const noexcept
 {
     return render_engine;
 }
 
-gearoenix::render::Engine* gearoenix::system::Application::get_render_engine() noexcept
+gearoenix::render::engine::Engine* gearoenix::system::Application::get_render_engine() noexcept
 {
     return render_engine;
 }
@@ -187,15 +202,15 @@ void gearoenix::system::Application::execute(core::Application* app) noexcept
     int events;
     android_poll_source* source;
     do {
-        if (ALooper_pollAll(active ? 0 : -1, nullptr, &events,
+        if (ALooper_pollAll(running ? 0 : -1, nullptr, &events,
                 (void**)&source)
             >= 0) {
             if (source != nullptr)
                 source->process(and_app, source);
         }
-        if (active) {
+        if (running) {
             core_app->update();
-//            render_engine->update();
+            render_engine->update();
 //            if (gl_ctx->Swap() != EGL_SUCCESS) {
 //                GXLOGE("reached");
 //                core::event::system::System eul(core::event::system::System::Action::UNLOAD);
@@ -208,9 +223,9 @@ void gearoenix::system::Application::execute(core::Application* app) noexcept
 //            }
         }
     } while (and_app->destroyRequested == 0);
-    active = false;
+    running = false;
     core_app->terminate();
-    //render_engine->terminate();
+    render_engine->terminate();
 }
 
 gearoenix::core::Real gearoenix::system::Application::convert_x_to_ratio(const int x) const noexcept

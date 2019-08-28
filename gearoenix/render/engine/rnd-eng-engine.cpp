@@ -17,7 +17,7 @@
 #include "../scene/rnd-scn-scene.hpp"
 #include <thread>
 
-gearoenix::render::engine::Engine::Engine(system::Application* const system_application, const Type::Id engine_type_id) noexcept
+gearoenix::render::engine::Engine::Engine(system::Application* const system_application, const Type engine_type_id) noexcept
     : engine_type_id(engine_type_id)
     , sys_app(system_application)
     , fun_loader(new core::FunctionLoader())

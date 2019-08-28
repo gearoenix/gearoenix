@@ -24,7 +24,7 @@ private:
     explicit Engine(system::Application* sys_app) noexcept;
 
 public:
-    static std::shared_ptr<Engine> construct(system::Application* sys_app) noexcept;
+    static Engine* construct(system::Application* sys_app) noexcept;
     ~Engine() noexcept final;
     void update() noexcept final;
     void terminate() noexcept final;

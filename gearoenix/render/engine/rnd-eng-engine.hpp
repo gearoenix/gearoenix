@@ -74,7 +74,7 @@ namespace render {
         protected:
             unsigned int frames_count = 2;
             unsigned int frame_number = 0;
-            const Type::Id engine_type_id;
+            const Type engine_type_id;
             core::Real delta_time = 0.0f;
             std::chrono::time_point<std::chrono::high_resolution_clock> last_frame_time = std::chrono::high_resolution_clock::now();
 
@@ -93,7 +93,7 @@ namespace render {
             /// In addition, this design is temporary and in next version of engine it is going to be changed.
             graph::tree::Tree* render_tree = nullptr;
 
-            Engine(system::Application* system_application, Type::Id engine_type_id) noexcept;
+            Engine(system::Application* system_application, Type engine_type_id) noexcept;
 
         public:
             virtual ~Engine() noexcept;
@@ -168,7 +168,7 @@ namespace render {
 
             const std::shared_ptr<texture::Target>& get_main_render_target() const noexcept;
 
-            Type::Id get_engine_type_id() const noexcept;
+            Type get_engine_type_id() const noexcept;
             unsigned int get_frame_number() const noexcept;
             unsigned int get_frames_count() const noexcept;
             core::Real get_delta_time() const noexcept;

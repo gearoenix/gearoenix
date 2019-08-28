@@ -22,18 +22,18 @@
 #include "../texture/glc3-txt-cube.hpp"
 #include "../texture/glc3-txt-target.hpp"
 
-gearoenix::glc3::engine::Engine::Engine(system::Application* const sys_app, const render::engine::Type::Id engine_type) noexcept
+gearoenix::glc3::engine::Engine::Engine(system::Application* const sys_app, const render::engine::Type engine_type) noexcept
     : render::engine::Engine(sys_app, engine_type)
 {
-    pipeline_manager = new pipeline::Manager(this);
 }
 
-std::shared_ptr<gearoenix::glc3::engine::Engine> gearoenix::glc3::engine::Engine::construct(system::Application* const sys_app, const render::engine::Type::Id engine_type) noexcept
+gearoenix::glc3::engine::Engine* gearoenix::glc3::engine::Engine::construct(system::Application* const sys_app, const render::engine::Type engine_type) noexcept
 {
-    std::shared_ptr<Engine> e(new Engine(sys_app, engine_type));
-    e->buffer_manager = new buffer::Manager(e.get());
+    Engine* e = new Engine(sys_app, engine_type);
+    e->pipeline_manager = new pipeline::Manager(e);
+    e->buffer_manager = new buffer::Manager(e);
     e->command_manager = new command::Manager();
-    e->main_render_target = std::shared_ptr<render::texture::Target>(new texture::Target(e.get()));
+    e->main_render_target = std::shared_ptr<render::texture::Target>(new texture::Target(e));
     return e;
 }
 

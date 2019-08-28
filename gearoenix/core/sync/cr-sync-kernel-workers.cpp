@@ -57,12 +57,12 @@ void gearoenix::core::sync::KernelWorker::add_step(std::function<void()> sender,
 {
     const size_t kernels_count = threads.size();
     std::vector<std::shared_ptr<Semaphore>> waits;
-    std::vector<std::shared_ptr<Semaphore>> signals;
+    std::vector<std::shared_ptr<Semaphore>> worker_signals;
     waits.reserve(kernels_count);
-    signals.reserve(kernels_count);
+    worker_signals.reserve(kernels_count);
     for (size_t ki = 0; ki < kernels_count; ++ki) {
         waits.push_back(std::make_shared<Semaphore>());
-        signals.push_back(std::make_shared<Semaphore>());
+        worker_signals.push_back(std::make_shared<Semaphore>());
     }
     for (std::shared_ptr<std::mutex>& m : workers_syncers)
         m->lock();
@@ -71,7 +71,7 @@ void gearoenix::core::sync::KernelWorker::add_step(std::function<void()> sender,
         sender,
         worker,
         receiver,
-        signals
+        worker_signals
     });
     for (std::shared_ptr<std::mutex>& m : workers_syncers)
         m->unlock();

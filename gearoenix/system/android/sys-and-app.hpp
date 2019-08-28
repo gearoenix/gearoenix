@@ -11,7 +11,9 @@ struct AInputEvent;
 
 namespace gearoenix {
 namespace render {
-    class Engine;
+    namespace engine {
+        class Engine;
+    }
 }
 namespace core {
     namespace asset {
@@ -24,15 +26,19 @@ namespace core {
 }
 namespace system {
     class File;
+    class GlContext;
     class Application {
     private:
         bool running = true;
         Configuration config;
         android_app* and_app = nullptr;
-        render::Engine* render_engine = nullptr;
+        render::engine::Engine* render_engine = nullptr;
         core::Application* core_app = nullptr;
         core::asset::Manager* astmgr = nullptr;
         core::event::Engine* event_engine = nullptr;
+#ifdef GX_USE_OPENGL
+        GlContext *gl_context = nullptr;
+#endif
         unsigned int win_width = 0;
         unsigned int win_height = 0;
         core::Real screen_ratio = 1.0f;
@@ -53,8 +59,8 @@ namespace system {
         android_app* get_android_app() const noexcept;
         const core::Application* get_core_app() const noexcept;
         core::Application* get_core_app() noexcept;
-        const render::Engine* get_render_engine() const noexcept;
-        render::Engine* get_render_engine() noexcept;
+        const render::engine::Engine* get_render_engine() const noexcept;
+        render::engine::Engine* get_render_engine() noexcept;
         const core::asset::Manager* get_asset_manager() const noexcept;
         core::asset::Manager* get_asset_manager() noexcept;
         const core::event::Engine* get_event_engine() const noexcept;

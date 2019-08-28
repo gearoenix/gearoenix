@@ -316,7 +316,6 @@ const std::shared_ptr<gearoenix::system::Application> gearoenix::system::Applica
     result->pre_x = result->convert_x_to_ratio(mx);
     result->pre_y = result->convert_y_to_ratio(my);
 
-    result->config = std::make_shared<Configuration>();
 #ifdef GX_USE_VULKAN
     if (nullptr == result->render_engine && result->supported_engine == render::engine::Type::VULKAN) {
         result->render_engine = new vulkan::Engine(this);
@@ -337,7 +336,7 @@ const std::shared_ptr<gearoenix::system::Application> gearoenix::system::Applica
     if (result->render_engine == nullptr) {
         GXLOGF("No suitable render engine found.")
     }
-    result->astmgr = std::make_shared<core::asset::Manager>(result, GX_APP_DATA_NAME);
+    result->astmgr = new core::asset::Manager(result, GX_APP_DATA_NAME);
     result->event_engine = new core::event::Engine();
     return result;
 }
@@ -351,7 +350,7 @@ gearoenix::system::Application::~Application() noexcept
     GXLOGD("Main application (SDL2) has been deleted.")
 }
 
-void gearoenix::system::Application::execute(const std::shared_ptr<core::Application>& app) noexcept
+void gearoenix::system::Application::execute(core::Application* const app) noexcept
 {
     core_app = app;
 #ifdef GX_IN_WEB
@@ -405,32 +404,32 @@ SDL_Quit();
 #endif
 }
 
-const std::shared_ptr<gearoenix::core::Application>& gearoenix::system::Application::get_core_app() const noexcept
+const gearoenix::core::Application* gearoenix::system::Application::get_core_app() const noexcept
 {
     return core_app;
 }
 
-std::shared_ptr<gearoenix::core::Application>& gearoenix::system::Application::get_core_app() noexcept
+gearoenix::core::Application* gearoenix::system::Application::get_core_app() noexcept
 {
     return core_app;
 }
 
-const std::shared_ptr<gearoenix::render::engine::Engine>& gearoenix::system::Application::get_render_engine() const noexcept
+const gearoenix::render::engine::Engine* gearoenix::system::Application::get_render_engine() const noexcept
 {
     return render_engine;
 }
 
-std::shared_ptr<gearoenix::render::engine::Engine>& gearoenix::system::Application::get_render_engine() noexcept
+gearoenix::render::engine::Engine* gearoenix::system::Application::get_render_engine() noexcept
 {
     return render_engine;
 }
 
-const std::shared_ptr<gearoenix::core::asset::Manager>& gearoenix::system::Application::get_asset_manager() const noexcept
+const gearoenix::core::asset::Manager* gearoenix::system::Application::get_asset_manager() const noexcept
 {
     return astmgr;
 }
 
-std::shared_ptr<gearoenix::core::asset::Manager>& gearoenix::system::Application::get_asset_manager() noexcept
+gearoenix::core::asset::Manager* gearoenix::system::Application::get_asset_manager() noexcept
 {
     return astmgr;
 }

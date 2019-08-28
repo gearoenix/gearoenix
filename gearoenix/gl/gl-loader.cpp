@@ -79,7 +79,7 @@ gearoenix::gl::delete_vertex_arrays_fnp gearoenix::gl::Loader::delete_vertex_arr
 gearoenix::gl::gen_vertex_arrays_fnp gearoenix::gl::Loader::gen_vertex_arrays;
 #endif
 
-bool gearoenix::gl::Loader::load_library(const render::engine::Type::Id engine_type) noexcept
+bool gearoenix::gl::Loader::load_library(const render::engine::Type engine_type) noexcept
 {
 #ifdef GX_DEBUG_MODE
     if (engine_type != render::engine::Type::OPENGL_ES2 && engine_type != render::engine::Type::OPENGL_ES3 && engine_type != render::engine::Type::OPENGL_33 && engine_type != render::engine::Type::OPENGL_43)
