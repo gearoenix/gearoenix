@@ -76,7 +76,7 @@ gearoenix::gles2::texture::Target::Target(
         gl::Loader::renderbuffer_storage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, img_width, img_height);
         gl::Loader::bind_framebuffer(GL_FRAMEBUFFER, framebuffer);
         gl::Loader::framebuffer_renderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depth_buffer);
-        gl::Loader::gen_textures(texture_objects.size(), texture_objects.data());
+        gl::Loader::gen_textures(static_cast<gearoenix::gl::sizei>(texture_objects.size()), texture_objects.data());
         for (std::size_t i = 0; i < texture_objects.size(); ++i) {
             const auto& txt_info = infos[i];
             const auto& txt_fmt = txt_info.f;
@@ -88,7 +88,7 @@ gearoenix::gles2::texture::Target::Target(
                 gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
                 gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
                 gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-                gl::Loader::framebuffer_texture_2d(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, txt, 0);
+                gl::Loader::framebuffer_texture_2d(GL_FRAMEBUFFER, static_cast<gearoenix::gl::enumerated>(GL_COLOR_ATTACHMENT0 + i), GL_TEXTURE_2D, txt, 0);
             }
             else {
                 GXUNEXPECTED
@@ -109,7 +109,7 @@ gearoenix::gles2::texture::Target::~Target() noexcept
     render_engine->get_function_loader()->load([cf, cr, this] {
         if (cf != -1) gl::Loader::delete_framebuffers(1, reinterpret_cast<const gl::uint*>(&cf));
         if (cr != -1) gl::Loader::delete_renderbuffers(1, reinterpret_cast<const gl::uint*>(&cr));
-        gl::Loader::delete_textures(texture_objects.size(), texture_objects.data());
+        gl::Loader::delete_textures(static_cast<gearoenix::gl::sizei>(texture_objects.size()), texture_objects.data());
     });
 }
 

@@ -68,7 +68,7 @@ void gearoenix::render::engine::Engine::terminate() noexcept
     frame_node = nullptr;
     GX_DELETE(pipeline_manager)
     GX_DELETE(command_manager)
-    GX_DELETE(sampler_manager)
+    // GX_DELETE(sampler_manager)
     GX_DELETE(buffer_manager)
     if (fun_loader != nullptr) {
         fun_loader->unload();
@@ -152,7 +152,7 @@ gearoenix::core::FunctionLoader* gearoenix::render::engine::Engine::get_function
     return fun_loader;
 }
 
-gearoenix::render::engine::Type::Id gearoenix::render::engine::Engine::get_engine_type_id() const noexcept
+gearoenix::render::engine::Type gearoenix::render::engine::Engine::get_engine_type_id() const noexcept
 {
     return engine_type_id;
 }

@@ -43,7 +43,7 @@ using GxDirLight = gearoenix::render::light::Directional;
 using GxLtManager = gearoenix::render::light::Manager;
 using GxPersCam = gearoenix::render::camera::Perspective;
 
-static struct ShelfInfo {
+struct ShelfInfo {
 	std::uniform_real_distribution<GxReal> rand_genx;
 	std::uniform_real_distribution<GxReal> rand_genz;
 	GxReal y;
@@ -195,7 +195,7 @@ GameApp::GameApp(const std::shared_ptr<gearoenix::system::Application> &sys_app)
     GxEndCaller<GxModel> mdlcall([endcall](std::shared_ptr<GxModel>) {});
     /// TODO: keep the render tree pointer and delete it later
     rnd_eng->set_render_tree(new GxGrPbr(rnd_eng.get(), endcall));
-    const std::shared_ptr<gearoenix::core::asset::Manager> &astmgr = sys_app->get_asset_manager();
+    gearoenix::core::asset::Manager* const astmgr = sys_app->get_asset_manager();
     scn = astmgr->get_scene_manager()->create<GxScene>(scncall);
 
     std::shared_ptr<GxPersCam> cam = astmgr->get_camera_manager()->create<GxPersCam>();

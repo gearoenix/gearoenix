@@ -276,6 +276,7 @@ const static std::string fragment_shader_code = GX_GLES2_SHADER_SRC_DEFAULT_FRAG
     "        if(is_in_directional_light)\n"
     "        {\n"
     "            int cascades_count_int = int(effect_shadow_caster_directional_lights_color_cascades_count[diri].w);\n"
+#undef GX_CASCADE_LOOP_COUNT
 #ifdef GX_IN_WEB
 #define GX_CASCADE_LOOP_COUNT GX_MAX_SHADOW_CASCADES_STR
 #else

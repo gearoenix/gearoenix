@@ -446,12 +446,12 @@ gearoenix::core::event::Engine* gearoenix::system::Application::get_event_engine
 
 const gearoenix::system::Configuration& gearoenix::system::Application::get_configuration() const noexcept
 {
-    return *config;
+    return config;
 }
 
 gearoenix::system::Configuration& gearoenix::system::Application::get_configuration() noexcept
 {
-    return *config;
+    return config;
 }
 
 gearoenix::core::Real gearoenix::system::Application::get_window_ratio() const noexcept

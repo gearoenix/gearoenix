@@ -69,8 +69,7 @@ namespace core {
     int main(int, char**)                                                                                        \
     {                                                                                                            \
         const std::shared_ptr<gearoenix::system::Application> app = gearoenix::system::Application::construct(); \
-        const std::shared_ptr<CoreApp> core_app(new CoreApp(app));                                               \
-        app->execute(core_app);                                                                                  \
+        app->execute(new CoreApp(app));                                                                          \
         return 0;                                                                                                \
     }
 #else

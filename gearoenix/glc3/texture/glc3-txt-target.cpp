@@ -60,7 +60,7 @@ gearoenix::glc3::texture::Target::Target(
     e->get_function_loader()->load([this, infos, call] {
         gl::Loader::gen_framebuffers(1, reinterpret_cast<gl::uint*>(&framebuffer));
         gl::Loader::bind_framebuffer(GL_FRAMEBUFFER, framebuffer);
-        gl::Loader::gen_textures(texture_objects.size(), texture_objects.data());
+        gl::Loader::gen_textures(static_cast<gearoenix::gl::sizei>(texture_objects.size()), texture_objects.data());
         for (std::size_t i = 0; i < texture_objects.size(); ++i) {
             const auto& txt_info = infos[i];
             const auto& txt_fmt = txt_info.f;

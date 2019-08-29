@@ -144,7 +144,7 @@ void gearoenix::render::material::Material::set_color(
     color = txtmgr->get_2d(math::Vec3(r, g, b), calltxt2d);
 }
 
-void gearoenix::render::material::Material::set_color(std::shared_ptr<texture::Texture2D> color) noexcept
+void gearoenix::render::material::Material::set_color(std::shared_ptr<texture::Texture2D> c) noexcept
 {
-    this->color = std::move(color);
+	color = std::move(c);
 }

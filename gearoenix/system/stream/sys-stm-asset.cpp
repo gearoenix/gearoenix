@@ -54,6 +54,7 @@ gearoenix::system::stream::Asset* gearoenix::system::stream::Asset::construct(sy
 #error "Unexpected file interface!"
 #endif
     asset->check_endian_compatibility();
+	(void)sys_app;
     return asset;
 }
 

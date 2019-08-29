@@ -75,7 +75,7 @@ void gearoenix::physics::Engine::update_001_kernel(const unsigned int kernel_ind
                 GX_DO_TASK(
                     auto light_cascaded_shadow_caster_data = lights_cascade_info.get_next([this] {
                         auto p = new DirLightPairedPool<CascadeInfoPtr>::iterator::value_type;
-                        p->second = new render::light::CascadeInfo(sys_app->get_render_engine().get());
+                        p->second = new render::light::CascadeInfo(sys_app->get_render_engine());
                         return p;
                     });
                     light_cascaded_shadow_caster_data->first = dir_light;

@@ -12,7 +12,7 @@
 #include "../node/rnd-gr-nd-shadow-mapper.hpp"
 #include <memory>
 
-gearoenix::render::graph::tree::Pbr::Pbr(engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
+gearoenix::render::graph::tree::Pbr::Pbr(engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>&) noexcept
     : Tree(e)
     , in_weak_hardware(engine::Type::OPENGL_ES2 == e->get_engine_type_id())
 {

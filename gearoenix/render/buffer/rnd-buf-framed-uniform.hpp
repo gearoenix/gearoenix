@@ -14,7 +14,7 @@ namespace buffer {
         std::vector<std::unique_ptr<Uniform>> uniforms;
 
     public:
-        FramedUniform(unsigned int s, engine::Engine* e) noexcept;
+        FramedUniform(std::size_t s, engine::Engine* e) noexcept;
         ~FramedUniform() noexcept;
         // Update current frame uniform buffer
         void update(const void* data) noexcept;

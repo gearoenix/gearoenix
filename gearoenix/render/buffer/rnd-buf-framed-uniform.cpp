@@ -3,7 +3,7 @@
 #include "rnd-buf-manager.hpp"
 #include "rnd-buf-uniform.hpp"
 
-gearoenix::render::buffer::FramedUniform::FramedUniform(const unsigned int s, engine::Engine* const e) noexcept
+gearoenix::render::buffer::FramedUniform::FramedUniform(const std::size_t s, engine::Engine* const e) noexcept
     : e(e)
     , uniforms(e->get_frames_count())
 {

@@ -40,13 +40,13 @@ gearoenix::render::scene::Scene::Scene(
     , scene_type_id(Type::GAME)
     , uniform_buffers(std::make_shared<buffer::FramedUniform>(static_cast<const unsigned int>(sizeof(Uniform)), e))
 {
-    const std::shared_ptr<core::asset::Manager>& astmgr = e->get_system_application()->get_asset_manager();
+    core::asset::Manager* const astmgr = e->get_system_application()->get_asset_manager();
 #define GX_HELPER(x, n, cls)                                                     \
     {                                                                            \
         const std::shared_ptr<n::Manager>& mgr = astmgr->get_##x##_manager();    \
         std::vector<core::Id> ids;                                               \
         f->read(ids);                                                            \
-        if (!ids.empty()) {                                                       \
+        if (!ids.empty()) {                                                      \
             core::sync::EndCaller<n::cls> call([c](std::shared_ptr<n::cls>) {}); \
             for (const core::Id id : ids)                                        \
                 add_##x(mgr->get_gx3d(id, call));                                \

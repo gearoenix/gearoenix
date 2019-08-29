@@ -18,7 +18,7 @@ namespace physics::collider {
         };
 
     protected:
-        const Type t;
+        const Type collider_type;
         explicit Collider(Type t) noexcept;
 
     public:

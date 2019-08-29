@@ -4,7 +4,7 @@
 #include "../engine/glc3-eng-engine.hpp"
 #include <cstring>
 
-gearoenix::glc3::buffer::Uniform::Uniform(const unsigned int s, engine::Engine* const e) noexcept
+gearoenix::glc3::buffer::Uniform::Uniform(const std::size_t s, engine::Engine* const e) noexcept
     : render::buffer::Uniform(s, e)
     , data(new unsigned char[s])
 {

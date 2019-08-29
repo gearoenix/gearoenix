@@ -41,7 +41,7 @@ void gearoenix::render::graph::node::Node::update_next_semaphores() noexcept
 {
     const auto fc = e->get_frames_count();
     nxt_sems.resize(fc);
-    for (int i = 0; i < fc; ++i) {
+    for (unsigned int i = 0; i < fc; ++i) {
         auto& s = nxt_sems[i];
         for (auto& l : links_consumers_frames_semaphores)
             for (auto& c : l)
@@ -53,7 +53,7 @@ void gearoenix::render::graph::node::Node::update_previous_semaphores() noexcept
 {
     const auto fc = e->get_frames_count();
     pre_sems.resize(fc);
-    for (int i = 0; i < fc; ++i) {
+    for (unsigned int i = 0; i < fc; ++i) {
         auto& s = pre_sems[i];
         for (auto& p : link_providers_frames_semaphores) {
             if (p.size() != fc)
@@ -134,7 +134,7 @@ const std::vector<gearoenix::render::sync::Semaphore*> gearoenix::render::graph:
     const auto s = e->get_frames_count();
     if (v.size() != s) {
         v.resize(s);
-        for (auto i = 0; i < s; ++i)
+        for (unsigned int i = 0; i < s; ++i)
             v[i] = e->create_semaphore();
         /// This is because of flexibility in frames-count, and it does'nt happen very offen
         update_next_semaphores();

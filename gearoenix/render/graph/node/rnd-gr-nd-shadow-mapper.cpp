@@ -76,7 +76,7 @@ void gearoenix::render::graph::node::ShadowMapper::update() noexcept
     }
 }
 
-void gearoenix::render::graph::node::ShadowMapper::record(const math::Mat4x4& mvp, const model::Model* const m, const unsigned int kernel_index) noexcept
+void gearoenix::render::graph::node::ShadowMapper::record(const math::Mat4x4& mvp, const model::Model* const m, const std::size_t kernel_index) noexcept
 {
     const auto& kernel = frame->kernels[kernel_index];
     const std::map<core::Id, std::shared_ptr<model::Mesh>>& meshes = m->get_meshes();

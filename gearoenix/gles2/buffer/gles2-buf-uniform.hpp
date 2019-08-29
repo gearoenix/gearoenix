@@ -13,7 +13,7 @@ namespace buffer {
         unsigned char* data = nullptr;
 
     public:
-        Uniform(unsigned int s, engine::Engine* e) noexcept;
+        Uniform(std::size_t s, engine::Engine* e) noexcept;
         ~Uniform() noexcept final;
         void update(const void* src) noexcept final;
         const void* get_data() const noexcept final;

@@ -54,7 +54,7 @@ namespace system {
 #endif
 
         bool running = true;
-        render::engine::Type supported_engine = render::engine::Type::None;
+        render::engine::Type supported_engine = render::engine::Type::NONE;
 
         void create_window() noexcept;
         static int SDLCALL event_receiver(void* user_data, SDL_Event* event) noexcept;

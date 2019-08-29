@@ -34,7 +34,7 @@ gearoenix::glc3::texture::SampleInfo::SampleInfo(const render::texture::SampleIn
         }
     };
 
-#define GX_HELPER(name) name##_filter = name##_filfun(o.name##_filter);
+#define GX_HELPER(name) name##_filter = static_cast<float>(name##_filfun(o.name##_filter));
 
     GX_HELPER(mag)
     GX_HELPER(min)

@@ -12,7 +12,7 @@ gearoenix::gles2::buffer::Manager::Manager(engine::Engine* const e) noexcept
 {
 }
 
-gearoenix::render::buffer::Uniform* gearoenix::gles2::buffer::Manager::create_uniform(const unsigned int size) noexcept
+gearoenix::render::buffer::Uniform* gearoenix::gles2::buffer::Manager::create_uniform(const std::size_t size) noexcept
 {
     return new Uniform(size, dynamic_cast<engine::Engine*>(e));
 }

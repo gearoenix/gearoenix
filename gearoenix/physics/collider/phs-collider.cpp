@@ -4,7 +4,7 @@
 #include "phs-collider-mesh.hpp"
 
 gearoenix::physics::collider::Collider::Collider(Type t) noexcept
-    : t(t)
+    : collider_type(t)
 {
 }
 

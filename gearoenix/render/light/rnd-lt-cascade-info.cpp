@@ -162,8 +162,8 @@ void gearoenix::render::light::CascadeInfo::shrink() noexcept
         const auto w = d[0] * 1.01f;
         const auto h = d[1] * 1.01f;
         const auto depth = d[2];
-        const auto n = depth * 0.01;
-        const auto f = depth * 1.03;
+        const auto n = depth * 0.01f;
+        const auto f = depth * 1.03f;
         const auto p = gearoenix::math::Mat4x4::orthographic(w, h, n, f);
         const auto t = gearoenix::math::Mat4x4::translator(-gearoenix::math::Vec3(c.xy(), mx[2] + (n * 2.0f)));
         const auto mtx = p * t * zero_located_view;

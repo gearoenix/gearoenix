@@ -294,7 +294,7 @@ gearoenix::render::graph::node::ForwardPbrFrame::ForwardPbrFrame(engine::Engine*
     : kernels(e->get_kernels()->get_threads_count())
 {
     for (std::size_t i = 0; i < kernels.size(); ++i) {
-        kernels[i] = new ForwardPbrKernel(e, i);
+        kernels[i] = new ForwardPbrKernel(e, static_cast<unsigned int>(i));
     }
 }
 

@@ -297,6 +297,7 @@ SET(GX_ENGINE_SRC
         "${GX_ENGINE_SRC_DIR}render/engine/rnd-eng-configuration.hpp"
         "${GX_ENGINE_SRC_DIR}render/engine/rnd-eng-engine.cpp"
         "${GX_ENGINE_SRC_DIR}render/engine/rnd-eng-engine.hpp"
+        "${GX_ENGINE_SRC_DIR}render/engine/rnd-eng-type.cpp"
         "${GX_ENGINE_SRC_DIR}render/engine/rnd-eng-type.hpp"
         "${GX_ENGINE_SRC_DIR}render/font/rnd-fnt-2d.cpp"
         "${GX_ENGINE_SRC_DIR}render/font/rnd-fnt-2d.hpp"

@@ -4,7 +4,7 @@
 namespace gearoenix::render::buffer {
 class Uniform : public Buffer {
 protected:
-    Uniform(const unsigned int s, engine::Engine* const e) noexcept
+    Uniform(const std::size_t s, engine::Engine* const e) noexcept
         : Buffer(s, e)
     {
     }
