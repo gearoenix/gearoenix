@@ -299,7 +299,7 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         //   TODO don't forget gamma correction it can be part of scene uniform data
         "    frag_color = vec4(tmpv4.xyz, albedo.w);\n"
         "}";
-    e->get_function_loader()->load([this, vertex_shader_code { move(vertex_shader_code.str()) }, fragment_shader_code { move(fragment_shader_code.str()) }] {
+    e->get_function_loader()->load([this, vertex_shader_code { vertex_shader_code.str() }, fragment_shader_code { fragment_shader_code.str() }] {
         set_vertex_shader(vertex_shader_code);
         GXLOGD(fragment_shader_code)
         set_fragment_shader(fragment_shader_code);

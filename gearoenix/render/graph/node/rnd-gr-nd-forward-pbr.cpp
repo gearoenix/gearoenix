@@ -43,7 +43,7 @@ gearoenix::render::graph::node::ForwardPbrUniform::ForwardPbrUniform(
     const model::Model*const mdl) noexcept
 {
     // Initializing point lights
-    int lights_count = 0;
+    unsigned int lights_count = 0;
     const auto& lights = scn->get_lights();
     for (const auto& id_light : lights) {
         const auto& l = id_light.second;
@@ -178,7 +178,7 @@ gearoenix::render::graph::node::ForwardPbr::ForwardPbr(
     input_textures[BRDFLUT_INDEX] = txtmgr->get_2d_one_2c(txt2dcall).get();
 }
 
-gearoenix::render::graph::node::ForwardPbr::~ForwardPbr()
+gearoenix::render::graph::node::ForwardPbr::~ForwardPbr() noexcept
 {
     for (ForwardPbrFrame* f: frames)
         delete f;

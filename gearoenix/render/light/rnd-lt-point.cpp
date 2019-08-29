@@ -31,7 +31,7 @@ const gearoenix::math::Vec4& gearoenix::render::light::Point::get_position_max_r
     return position_max_radius;
 }
 
-const gearoenix::core::Real gearoenix::render::light::Point::get_min_radius() const noexcept
+gearoenix::core::Real gearoenix::render::light::Point::get_min_radius() const noexcept
 {
     return min_radius;
 }

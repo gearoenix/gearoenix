@@ -210,7 +210,7 @@ ELSEIF (CMAKE_SYSTEM_NAME MATCHES "Android")
     ADD_LIBRARY (ndk-helper STATIC ${GX_NDK_HELPER_DIR}/JNIHelper.cpp)
     TARGET_INCLUDE_DIRECTORIES (ndk-helper PRIVATE ${GX_APP_GLUE})
     ADD_LIBRARY (native-app-glue STATIC ${GX_APP_GLUE}/android_native_app_glue.c)
-    SET (GX_LIBS ${GX_LIBS} ndk-helper native-app-glue)
+    SET (GX_LIBS ${GX_LIBS} ndk-helper native-app-glue android EGL log)
     INCLUDE_DIRECTORIES (${GX_APP_GLUE} ${GX_NDK_HELPER_DIR})
 ENDIF (GX_USE_SDL2)
 

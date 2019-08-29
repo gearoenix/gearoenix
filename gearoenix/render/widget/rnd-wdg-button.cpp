@@ -144,7 +144,7 @@ gearoenix::render::widget::Button::~Button() noexcept
         anim->terminate();
         anim = nullptr;
     }
-    if (anim = latest_anim.lock()) {
+    if ((anim = latest_anim.lock())) {
         anim->terminate();
         anim = nullptr;
     }

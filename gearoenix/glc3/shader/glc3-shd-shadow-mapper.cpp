@@ -29,7 +29,7 @@ gearoenix::glc3::shader::ShadowMapper::ShadowMapper(engine::Engine* const e, con
         "    tmpv4.w *= material_alpha;\n"
         "    if(tmpv4.w < material_alpha_cutoff) discard;\n"
         "}";
-    e->get_function_loader()->load([this, vertex_shader_code { move(vertex_shader_code.str()) }, fragment_shader_code { move(fragment_shader_code.str()) }] {
+    e->get_function_loader()->load([this, vertex_shader_code { vertex_shader_code.str() }, fragment_shader_code { fragment_shader_code.str() }] {
         set_vertex_shader(vertex_shader_code);
         set_fragment_shader(fragment_shader_code);
         link();

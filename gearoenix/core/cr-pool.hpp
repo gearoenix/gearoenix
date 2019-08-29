@@ -148,7 +148,7 @@ typename std::enable_if<std::is_integral<I>::value, const T&>::type
     gearoenix::core::OneLoopPool<T>::operator[](const I index) const noexcept
 {
 #ifdef GX_DEBUG_MODE
-    if (index < 0 || index >= current_index)
+    if (index < 0 || static_cast<std::size_t>(index) >= current_index)
         GXLOGF("Out of range index {" << index << "}");
 #endif
     return *objects[index];
@@ -160,7 +160,7 @@ typename std::enable_if<std::is_integral<I>::value, T&>::type
     gearoenix::core::OneLoopPool<T>::operator[](const I index) noexcept
 {
 #ifdef GX_DEBUG_MODE
-    if (index < 0 || index >= current_index)
+    if (index < 0 || static_cast<std::size_t>(index) >= current_index)
         GXLOGF("Out of range index {" << index << "}");
 #endif
     return *objects[index];

@@ -4,6 +4,7 @@
 #include "../../core/cr-application.hpp"
 #include "../../core/cr-static.hpp"
 #include "../../core/event/cr-ev-sys-system.hpp"
+#include "../../core/event/cr-ev-engine.hpp"
 #include "../../render/engine/rnd-eng-engine.hpp"
 #include "../sys-log.hpp"
 #ifdef GX_USE_OPENGL
@@ -80,9 +81,9 @@ void gearoenix::system::Application::handle(android_app* a, int32_t cmd) noexcep
     }
 }
 
-int32_t gearoenix::system::Application::handle(android_app* app, AInputEvent* e) noexcept
+int32_t gearoenix::system::Application::handle(android_app*const, AInputEvent*const e) noexcept
 {
-    core::event::Event* gxe = nullptr;
+//    core::event::Event* gxe = nullptr;
     const int32_t action = AMotionEvent_getAction(e);
     const auto flags = static_cast<int32_t>(static_cast<unsigned int>(action) & AMOTION_EVENT_ACTION_MASK);
     const core::Real curx = convert_x_to_ratio((int)AMotionEvent_getX(e, 0));

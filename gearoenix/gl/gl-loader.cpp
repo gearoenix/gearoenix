@@ -4,6 +4,8 @@
 
 #ifdef GX_USE_SDL
 #include <SDL.h>
+#elif defined(GX_IN_ANDROID)
+#include <EGL/egl.h>
 #else
 #error "Not implemented for this platform."
 #endif
@@ -90,6 +92,7 @@ bool gearoenix::gl::Loader::load_library(const render::engine::Type engine_type)
         GXLOGD("Failed to load OpenGL shared library through SDL2 library loader for engine type: " << engine_type)
         return false;
     }
+#elif defined(GX_IN_ANDROID)
 #else
 #error "Not implemented for this platform."
 #endif
@@ -100,6 +103,14 @@ bool gearoenix::gl::Loader::load_library(const render::engine::Type engine_type)
         GXLOGD("Failed to load " << #name)                           \
         unload_library();                                            \
         return false;                                                \
+    }
+#elif defined(GX_IN_ANDROID)
+#define GXFUNLDF(name, fun)                                      \
+    fun = reinterpret_cast<fun##_fnp>(eglGetProcAddress(#name)); \
+    if (fun == nullptr) {                                        \
+        GXLOGD("Failed to load " << #name)                       \
+        unload_library();                                        \
+        return false;                                            \
     }
 #else
 #error "Not implemented for this platform."
@@ -183,6 +194,7 @@ void gearoenix::gl::Loader::unload_library() noexcept
 {
 #ifdef GX_USE_SDL
     SDL_GL_UnloadLibrary();
+#elif defined(GX_IN_ANDROID)
 #else
 #error "Not implemented for this platform."
 #endif

@@ -46,7 +46,7 @@ namespace system {
         core::Real x = 0.0f;
         core::Real y = 0.0f;
         core::Real w = 0.0f;
-        render::engine::Type supported_engine = render::engine::Type::None;
+        render::engine::Type supported_engine = render::engine::Type::NONE;
         void handle(android_app* app, int32_t cmd) noexcept;
         int32_t handle(android_app* app, AInputEvent* e) noexcept;
         static void handle_cmd(android_app* app, int32_t cmd) noexcept;

@@ -7,8 +7,6 @@
 #include "../engine/gles2-eng-engine.hpp"
 #include "gles2-txt-sample.hpp"
 
-static constexpr auto GX_GLES2_MIN_TEX2D_ASPECT = 64;
-
 gearoenix::gles2::texture::Texture2D::Texture2D(
     const core::Id my_id,
     engine::Engine* const e,

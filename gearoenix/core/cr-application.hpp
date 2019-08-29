@@ -26,14 +26,14 @@ namespace core {
     class Application {
     public:
     protected:
-        std::shared_ptr<system::Application> sys_app;
-        std::shared_ptr<render::engine::Engine> rnd_eng;
+        system::Application* system_application = nullptr;
+        render::engine::Engine* render_engine = nullptr;
 
     public:
-        Application(const std::shared_ptr<system::Application>& sys_app);
-        virtual ~Application();
-        virtual void update() = 0;
-        virtual void terminate();
+        Application(system::Application* sys_app) noexcept;
+        virtual ~Application() noexcept;
+        virtual void update() noexcept = 0;
+        virtual void terminate() noexcept;
     };
 }
 }
@@ -68,8 +68,9 @@ namespace core {
 #define GEAROENIX_START(CoreApp)                                                                                 \
     int main(int, char**)                                                                                        \
     {                                                                                                            \
-        const std::shared_ptr<gearoenix::system::Application> app = gearoenix::system::Application::construct(); \
+        gearoenix::system::Application * const app = gearoenix::system::Application::construct();                \
         app->execute(new CoreApp(app));                                                                          \
+        delete app;                                                                                              \
         return 0;                                                                                                \
     }
 #else

@@ -83,7 +83,7 @@ gearoenix::render::font::Font2D::Font2D(
     line_growth = line_gap + fnt_height;
 }
 
-gearoenix::render::font::Font2D::~Font2D()
+gearoenix::render::font::Font2D::~Font2D() noexcept
 {
 	delete stb_font;
 }

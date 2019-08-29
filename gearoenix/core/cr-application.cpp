@@ -2,16 +2,17 @@
 #include "../render/engine/rnd-eng-engine.hpp"
 #include "../system/sys-app.hpp"
 
-gearoenix::core::Application::Application(const std::shared_ptr<system::Application>& sys_app)
-    : sys_app(sys_app)
-    , rnd_eng(sys_app->get_render_engine())
+gearoenix::core::Application::Application(system::Application*const sys_app) noexcept
+    : system_application(sys_app)
+    , render_engine(sys_app->get_render_engine())
 {
 }
 
-gearoenix::core::Application::~Application() {}
+gearoenix::core::Application::~Application() noexcept {
+    system_application = nullptr;
+    render_engine = nullptr;
+}
 
-void gearoenix::core::Application::terminate()
+void gearoenix::core::Application::terminate() noexcept
 {
-    sys_app = nullptr;
-    rnd_eng = nullptr;
 }

@@ -3,8 +3,8 @@
 
 gearoenix::math::Plane::Plane(const Vec3& point, const Vec3& normal) noexcept
     : normal(normal)
-    , point(point)
     , d(-(normal.dot(point)))
+    , point(point)
 {
 }
 
