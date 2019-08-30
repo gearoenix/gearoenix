@@ -29,7 +29,7 @@ gearoenix::glc3::engine::Engine::Engine(system::Application* const sys_app, cons
 
 gearoenix::glc3::engine::Engine* gearoenix::glc3::engine::Engine::construct(system::Application* const sys_app, const render::engine::Type engine_type) noexcept
 {
-    Engine* e = new Engine(sys_app, engine_type);
+    auto e = new Engine(sys_app, engine_type);
     e->pipeline_manager = new pipeline::Manager(e);
     e->buffer_manager = new buffer::Manager(e);
     e->command_manager = new command::Manager();

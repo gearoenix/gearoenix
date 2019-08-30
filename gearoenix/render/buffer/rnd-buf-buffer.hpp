@@ -8,19 +8,18 @@ namespace engine {
 }
 namespace buffer {
     class Buffer {
+        GX_GET_VAL_PRT(std::size_t, size, 0)
     protected:
         engine::Engine* const e;
-        const std::size_t size;
 
         Buffer(const std::size_t size, engine::Engine* const e) noexcept
-            : e(e)
-            , size(size)
+        : size(size)
+                , e(e)
         {
         }
 
     public:
         virtual ~Buffer() noexcept = default;
-		GX_GETTER_BUILDER_V(size)
     };
 }
 }

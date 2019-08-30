@@ -6,29 +6,23 @@
 
 gearoenix::glc3::buffer::Uniform::Uniform(const std::size_t s, engine::Engine* const e) noexcept
     : render::buffer::Uniform(s, e)
-    , data(new unsigned char[s])
+    , data(s)
 {
-}
-
-gearoenix::glc3::buffer::Uniform::~Uniform() noexcept
-{
-    delete[] data;
-    data = nullptr;
 }
 
 void gearoenix::glc3::buffer::Uniform::update(const void* const src) noexcept
 {
-    std::memcpy(data, src, size);
+    std::memcpy(data.data(), src, size);
 }
 
 const void* gearoenix::glc3::buffer::Uniform::get_data() const noexcept
 {
-    return data;
+    return data.data();
 }
 
 void* gearoenix::glc3::buffer::Uniform::get_data() noexcept
 {
-    return data;
+    return data.data();
 }
 
 #endif

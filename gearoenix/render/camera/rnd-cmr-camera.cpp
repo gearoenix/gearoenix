@@ -24,8 +24,8 @@ gearoenix::render::camera::Camera::Camera(const core::Id my_id, engine::Engine* 
     transformation = std::make_shared<Transformation>(uniform, frustum, cascaded_shadow_frustum_partitions);
     const auto& sys_app = e->get_system_application();
     uniform->aspect_ratio = sys_app->get_window_ratio();
-    uniform->clip_width = static_cast<core::Real>(sys_app->get_width());
-    uniform->clip_height = static_cast<core::Real>(sys_app->get_height());
+    uniform->clip_width = static_cast<core::Real>(sys_app->get_window_width());
+    uniform->clip_height = static_cast<core::Real>(sys_app->get_window_height());
     sys_app->get_event_engine()->add_listner(core::event::Id::SYSTEM_WINDOW_SIZE_CHANGE, 1.0f, this);
 }
 
@@ -44,8 +44,8 @@ gearoenix::render::camera::Camera::Camera(
     transformation = std::make_shared<Transformation>(uniform, frustum, cascaded_shadow_frustum_partitions);
     const auto& sys_app = e->get_system_application();
     uniform->aspect_ratio = sys_app->get_window_ratio();
-    uniform->clip_width = static_cast<core::Real>(sys_app->get_width());
-    uniform->clip_height = static_cast<core::Real>(sys_app->get_height());
+    uniform->clip_width = static_cast<core::Real>(sys_app->get_window_width());
+    uniform->clip_height = static_cast<core::Real>(sys_app->get_window_height());
     sys_app->get_event_engine()->add_listner(core::event::Id::SYSTEM_WINDOW_SIZE_CHANGE, 1.0f, this);
     uniform->position.read(f);
     math::Quat q;
@@ -128,8 +128,8 @@ bool gearoenix::render::camera::Camera::on_event(const core::event::Data& d) noe
     switch (d.source)
     {
     case core::event::Id::SYSTEM_WINDOW_SIZE_CHANGE:
-        uniform->clip_width = static_cast<core::Real>(sys_app->get_width());
-        uniform->clip_height = static_cast<core::Real>(sys_app->get_height());
+        uniform->clip_width = static_cast<core::Real>(sys_app->get_window_width());
+        uniform->clip_height = static_cast<core::Real>(sys_app->get_window_height());
         set_aspect_ratio(sys_app->get_window_ratio());
         return false;
     default:

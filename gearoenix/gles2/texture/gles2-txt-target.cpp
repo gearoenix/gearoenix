@@ -39,8 +39,8 @@ gearoenix::gles2::texture::Target::Target(engine::Engine* const e) noexcept
 #ifdef GX_DEBUG_GLES2
     gl::Loader::check_for_error();
 #endif
-    img_width = e->get_system_application()->get_width();
-    img_height = e->get_system_application()->get_height();
+    img_width = e->get_system_application()->get_window_width();
+    img_height = e->get_system_application()->get_window_height();
     clipping_width = static_cast<core::Real>(img_width);
     clipping_height = static_cast<core::Real>(img_height);
     gl::Loader::get_integerv(GL_FRAMEBUFFER_BINDING, &framebuffer);

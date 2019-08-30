@@ -73,19 +73,19 @@ namespace core {
             static std::atomic<Id> last_id;
 
         public:
-            Manager(const std::shared_ptr<system::Application>& sys_app, const std::string& file);
-            const std::shared_ptr<system::stream::Asset>& get_file() const;
-            const std::shared_ptr<render::camera::Manager>& get_camera_manager() const;
-            const std::shared_ptr<audio::Manager>& get_audio_manager() const;
-            const std::shared_ptr<render::light::Manager>& get_light_manager() const;
-            const std::shared_ptr<render::texture::Manager>& get_texture_manager() const;
-            const std::shared_ptr<render::font::Manager>& get_font_manager() const;
-            const std::shared_ptr<render::mesh::Manager>& get_mesh_manager() const;
-            const std::shared_ptr<render::model::Manager>& get_model_manager() const;
-            const std::shared_ptr<render::skybox::Manager>& get_skybox_manager() const;
-            const std::shared_ptr<physics::constraint::Manager>& get_constraint_manager() const;
-            const std::shared_ptr<render::scene::Manager>& get_scene_manager() const;
-            static Id create_id();
+            Manager(system::Application * sys_app, const std::string& file) noexcept;
+            const std::shared_ptr<system::stream::Asset>& get_file() const noexcept;
+            const std::shared_ptr<render::camera::Manager>& get_camera_manager() const noexcept;
+            const std::shared_ptr<audio::Manager>& get_audio_manager() const noexcept;
+            const std::shared_ptr<render::light::Manager>& get_light_manager() const noexcept;
+            const std::shared_ptr<render::texture::Manager>& get_texture_manager() const noexcept;
+            const std::shared_ptr<render::font::Manager>& get_font_manager() const noexcept;
+            const std::shared_ptr<render::mesh::Manager>& get_mesh_manager() const noexcept;
+            const std::shared_ptr<render::model::Manager>& get_model_manager() const noexcept;
+            const std::shared_ptr<render::skybox::Manager>& get_skybox_manager() const noexcept;
+            const std::shared_ptr<physics::constraint::Manager>& get_constraint_manager() const noexcept;
+            const std::shared_ptr<render::scene::Manager>& get_scene_manager() const noexcept;
+            static Id create_id() noexcept;
         };
     } // namespace asset
 } // namespace core

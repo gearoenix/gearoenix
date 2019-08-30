@@ -58,7 +58,7 @@ void gearoenix::system::GlContext::init_egl_surface() noexcept {
     display = eglGetDisplay( EGL_DEFAULT_DISPLAY );
     eglInitialize(display, nullptr, nullptr);
     static const EGLint configs[6][3] = {
-            {EGL_OPENGL_ES3_BIT, 32, 4},
+            {EGL_OPENGL_ES2_BIT, 24, 0},
             {EGL_OPENGL_ES3_BIT, 24, 4},
             {EGL_OPENGL_ES3_BIT, 24, 0},
             {EGL_OPENGL_ES2_BIT, 32, 4},

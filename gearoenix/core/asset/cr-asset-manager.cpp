@@ -17,10 +17,10 @@
 
 std::atomic<gearoenix::core::Id> gearoenix::core::asset::Manager::last_id(0);
 
-gearoenix::core::asset::Manager::Manager(const std::shared_ptr<system::Application>& sys_app, const std::string& name)
+gearoenix::core::asset::Manager::Manager(system::Application * const sys_app, const std::string& name) noexcept
     : sys_app(sys_app)
     , render_engine(sys_app->get_render_engine())
-    , file(system::stream::Asset::construct(sys_app.get(), name))
+    , file(system::stream::Asset::construct(sys_app, name))
 {
     if (file == nullptr) {
 #define GX_HELPER(a, n) a##_manager = std::make_shared<n::Manager>(nullptr, render_engine.get());
@@ -44,7 +44,7 @@ gearoenix::core::asset::Manager::Manager(const std::shared_ptr<system::Applicati
 
 #define GX_HELPER(a, n)                                        \
     off = s->tell();                                           \
-    s = system::stream::Asset::construct(sys_app.get(), name); \
+    s = system::stream::Asset::construct(sys_app, name); \
     s->seek(off);                                              \
     a##_manager = std::make_shared<n::Manager>(s, render_engine.get());
 
@@ -62,62 +62,62 @@ gearoenix::core::asset::Manager::Manager(const std::shared_ptr<system::Applicati
     }
 }
 
-const std::shared_ptr<gearoenix::system::stream::Asset>& gearoenix::core::asset::Manager::get_file() const
+const std::shared_ptr<gearoenix::system::stream::Asset>& gearoenix::core::asset::Manager::get_file() const noexcept
 {
     return file;
 }
 
-const std::shared_ptr<gearoenix::render::camera::Manager>& gearoenix::core::asset::Manager::get_camera_manager() const
+const std::shared_ptr<gearoenix::render::camera::Manager>& gearoenix::core::asset::Manager::get_camera_manager() const noexcept
 {
     return camera_manager;
 }
 
-const std::shared_ptr<gearoenix::audio::Manager>& gearoenix::core::asset::Manager::get_audio_manager() const
+const std::shared_ptr<gearoenix::audio::Manager>& gearoenix::core::asset::Manager::get_audio_manager() const noexcept
 {
     return audio_manager;
 }
 
-const std::shared_ptr<gearoenix::render::light::Manager>& gearoenix::core::asset::Manager::get_light_manager() const
+const std::shared_ptr<gearoenix::render::light::Manager>& gearoenix::core::asset::Manager::get_light_manager() const noexcept
 {
     return light_manager;
 }
 
-const std::shared_ptr<gearoenix::render::texture::Manager>& gearoenix::core::asset::Manager::get_texture_manager() const
+const std::shared_ptr<gearoenix::render::texture::Manager>& gearoenix::core::asset::Manager::get_texture_manager() const noexcept
 {
     return texture_manager;
 }
 
-const std::shared_ptr<gearoenix::render::font::Manager>& gearoenix::core::asset::Manager::get_font_manager() const
+const std::shared_ptr<gearoenix::render::font::Manager>& gearoenix::core::asset::Manager::get_font_manager() const noexcept
 {
     return font_manager;
 }
 
-const std::shared_ptr<gearoenix::render::mesh::Manager>& gearoenix::core::asset::Manager::get_mesh_manager() const
+const std::shared_ptr<gearoenix::render::mesh::Manager>& gearoenix::core::asset::Manager::get_mesh_manager() const noexcept
 {
     return mesh_manager;
 }
 
-const std::shared_ptr<gearoenix::render::model::Manager>& gearoenix::core::asset::Manager::get_model_manager() const
+const std::shared_ptr<gearoenix::render::model::Manager>& gearoenix::core::asset::Manager::get_model_manager() const noexcept
 {
     return model_manager;
 }
 
-const std::shared_ptr<gearoenix::render::skybox::Manager>& gearoenix::core::asset::Manager::get_skybox_manager() const
+const std::shared_ptr<gearoenix::render::skybox::Manager>& gearoenix::core::asset::Manager::get_skybox_manager() const noexcept
 {
     return skybox_manager;
 }
 
-const std::shared_ptr<gearoenix::physics::constraint::Manager>& gearoenix::core::asset::Manager::get_constraint_manager() const
+const std::shared_ptr<gearoenix::physics::constraint::Manager>& gearoenix::core::asset::Manager::get_constraint_manager() const noexcept
 {
     return constraint_manager;
 }
 
-const std::shared_ptr<gearoenix::render::scene::Manager>& gearoenix::core::asset::Manager::get_scene_manager() const
+const std::shared_ptr<gearoenix::render::scene::Manager>& gearoenix::core::asset::Manager::get_scene_manager() const noexcept
 {
     return scene_manager;
 }
 
-gearoenix::core::Id gearoenix::core::asset::Manager::create_id()
+gearoenix::core::Id gearoenix::core::asset::Manager::create_id() noexcept
 {
     return last_id.fetch_add(1);
 }

@@ -40,6 +40,9 @@ gearoenix::glc3::texture::Texture2D::Texture2D(
     } else
         GXLOGF("Unsupported/Unimplemented setting for texture with id " << my_id)
     e->get_function_loader()->load([this, pixels, cf, gimg_width, gimg_height, sample_info, call] {
+#ifdef GX_DEBUG_GL_CLASS_3
+        gl::Loader::check_for_error();
+#endif
         gl::Loader::gen_textures(1, &texture_object);
         gl::Loader::bind_texture(GL_TEXTURE_2D, texture_object);
         gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, sample_info.min_filter);

@@ -8,6 +8,11 @@
 
 namespace gearoenix::system {
     class GlContext {
+    GX_GET_VAL_PRV(int, screen_width, -1)
+    GX_GET_VAL_PRV(int, screen_height, -1)
+    GX_GET_VAL_PRV(int, depth_size, -1)
+    GX_GET_VAL_PRV(int, samples_size, -1)
+    GX_GET_VAL_PRV(bool, es3_supported, false)
     public:
         enum struct State {
             RUNNING,
@@ -20,14 +25,8 @@ namespace gearoenix::system {
         EGLContext context = EGL_NO_CONTEXT;
         EGLConfig config = nullptr;
 
-        int screen_width = -1;
-        int screen_height = -1;
-        int depth_size = -1;
-        int samples_size = -1;
-
         bool gles_initialized = false;
         bool egl_context_initialized = false;
-        bool es3_supported = false;
         bool context_valid = false;
 
         void init_gles() noexcept;
@@ -38,24 +37,14 @@ namespace gearoenix::system {
     public:
         GlContext() noexcept = default;
         ~GlContext() noexcept;
-
         GlContext( GlContext const& ) = delete;
         void operator=( GlContext const& ) = delete;
 
         void init(ANativeWindow* window) noexcept ;
         State swap() noexcept ;
         void invalidate() noexcept ;
-
         void suspend() noexcept ;
         void resume(ANativeWindow* window ) noexcept ;
-
-        GX_GETTER_BUILDER_V(screen_width)
-        GX_GETTER_BUILDER_V(screen_height)
-        GX_GETTER_BUILDER_V(depth_size)
-        GX_GETTER_BUILDER_V(samples_size)
-        GX_GETTER_BUILDER_V(es3_supported)
-
-        bool check_extension( const char* extension ) noexcept;
     };
 }
 #endif

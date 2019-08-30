@@ -5,16 +5,6 @@
 #include "../render/engine/rnd-eng-type.hpp"
 #include "gl-types.hpp"
 
-#if defined(_WIN32) && !defined(__SCITECH_SNAP__)
-#define GXGL_APICALL __declspec(dllimport)
-#elif defined(__SYMBIAN32__)
-#define GXGL_APICALL IMPORT_C
-#elif defined(ANDROID)
-#define GXGL_APICALL __attribute__((visibility("default")))
-#else
-#define GXGL_APICALL
-#endif
-
 #if defined(_WIN32) && !defined(_WIN32_WCE) && !defined(__SCITECH_SNAP__)
 #define GXGL_APIENTRY __stdcall *
 #else
@@ -23,10 +13,6 @@
 
 namespace gearoenix::gl
 {
-#ifdef __cplusplus
-extern "C"
-{
-#endif
     typedef void(GXGL_APIENTRY active_texture_fnp)(enumerated texture);
     typedef void(GXGL_APIENTRY attach_shader_fnp)(uint program, uint shader);
     typedef void(GXGL_APIENTRY bind_attrib_location_fnp)(uint program, uint index,
@@ -145,9 +131,6 @@ extern "C"
     typedef void(GXGL_APIENTRY gen_vertex_arrays_fnp)(sizei n, uint *arrays);
     typedef void(GXGL_APIENTRY read_buffer)(enumerated src);
 #endif
-#ifdef __cplusplus
-}
-#endif
 class Loader
 {
 private:
@@ -156,79 +139,79 @@ public:
     Loader(const Loader &) = delete;
     static bool load_library(render::engine::Type engine_type) noexcept;
     static void unload_library() noexcept;
-    static void check_for_error() noexcept;
+	static void check_for_error() noexcept;
 
-    static GXGL_APICALL active_texture_fnp active_texture;
-    static GXGL_APICALL attach_shader_fnp attach_shader;
-    static GXGL_APICALL bind_attrib_location_fnp bind_attrib_location;
-    static GXGL_APICALL bind_buffer_fnp bind_buffer;
-    static GXGL_APICALL bind_framebuffer_fnp bind_framebuffer;
-    static GXGL_APICALL bind_renderbuffer_fnp bind_renderbuffer;
-    static GXGL_APICALL bind_texture_fnp bind_texture;
-    static GXGL_APICALL blend_func_fnp blend_func;
-    static GXGL_APICALL buffer_data_fnp buffer_data;
-    static GXGL_APICALL check_framebuffer_status_fnp check_framebuffer_status;
-    static GXGL_APICALL clear_color_fnp clear_color;
-    static GXGL_APICALL clear_fnp clear;
-    static GXGL_APICALL compile_shader_fnp compile_shader;
-    static GXGL_APICALL create_program_fnp create_program;
-    static GXGL_APICALL create_shader_fnp create_shader;
-    static GXGL_APICALL cull_face_fnp cull_face;
-    static GXGL_APICALL delete_buffers_fnp delete_buffers;
-    static GXGL_APICALL delete_framebuffers_fnp delete_framebuffers;
-    static GXGL_APICALL delete_program_fnp delete_program;
-    static GXGL_APICALL delete_renderbuffers_fnp delete_renderbuffers;
-    static GXGL_APICALL delete_shader_fnp delete_shader;
-    static GXGL_APICALL delete_textures_fnp delete_textures;
-    static GXGL_APICALL depth_mask_fnp depth_mask;
-    static GXGL_APICALL disable_fnp disable;
-    static GXGL_APICALL draw_elements_fnp draw_elements;
-    static GXGL_APICALL enable_fnp enable;
-    static GXGL_APICALL enable_vertex_attrib_array_fnp enable_vertex_attrib_array;
-    static GXGL_APICALL framebuffer_renderbuffer_fnp framebuffer_renderbuffer;
-    static GXGL_APICALL framebuffer_texture_2d_fnp framebuffer_texture_2d;
-    static GXGL_APICALL gen_buffers_fnp gen_buffers;
-    static GXGL_APICALL gen_framebuffers_fnp gen_framebuffers;
-    static GXGL_APICALL gen_renderbuffers_fnp gen_renderbuffers;
-    static GXGL_APICALL gen_textures_fnp gen_textures;
-    static GXGL_APICALL generate_mipmap_fnp generate_mipmap;
-    static GXGL_APICALL get_attrib_location_fnp get_attrib_location;
-    static GXGL_APICALL get_error_fnp get_error;
-    static GXGL_APICALL get_integerv_fnp get_integerv;
-    static GXGL_APICALL get_programiv_fnp get_programiv;
-    static GXGL_APICALL get_program_info_log_fnp get_program_info_log;
-    static GXGL_APICALL get_shaderiv_fnp get_shaderiv;
-    static GXGL_APICALL get_shader_info_log_fnp get_shader_info_log;
-    static GXGL_APICALL get_uniform_location_fnp get_uniform_location;
-    static GXGL_APICALL link_program_fnp link_program;
-    static GXGL_APICALL renderbuffer_storage_fnp renderbuffer_storage;
-    static GXGL_APICALL tex_image_2d_fnp tex_image_2d;
-    static GXGL_APICALL tex_parameterf_fnp tex_parameterf;
-    static GXGL_APICALL tex_parameterfv_fnp tex_parameterfv;
-    static GXGL_APICALL tex_parameteri_fnp tex_parameteri;
-    static GXGL_APICALL tex_parameteriv_fnp tex_parameteriv;
-    static GXGL_APICALL scissor_fnp scissor;
-    static GXGL_APICALL shader_source_fnp shader_source;
-    static GXGL_APICALL uniform1f_fnp uniform1f;
-    static GXGL_APICALL uniform1fv_fnp uniform1fv;
-    static GXGL_APICALL uniform1i_fnp uniform1i;
-    static GXGL_APICALL uniform1iv_fnp uniform1iv;
-    static GXGL_APICALL uniform2fv_fnp uniform2fv;
-    static GXGL_APICALL uniform3fv_fnp uniform3fv;
-    static GXGL_APICALL uniform4fv_fnp uniform4fv;
-    static GXGL_APICALL uniform_matrix2fv_fnp uniform_matrix2fv;
-    static GXGL_APICALL uniform_matrix3fv_fnp uniform_matrix3fv;
-    static GXGL_APICALL uniform_matrix4fv_fnp uniform_matrix4fv;
-    static GXGL_APICALL use_program_fnp use_program;
-    static GXGL_APICALL validate_program_fnp validate_program;
-    static GXGL_APICALL vertex_attrib_pointer_fnp vertex_attrib_pointer;
-    static GXGL_APICALL viewport_fnp viewport;
+	static active_texture_fnp active_texture;
+	static attach_shader_fnp attach_shader;
+	static bind_attrib_location_fnp bind_attrib_location;
+	static bind_buffer_fnp bind_buffer;
+	static bind_framebuffer_fnp bind_framebuffer;
+	static bind_renderbuffer_fnp bind_renderbuffer;
+	static bind_texture_fnp bind_texture;
+	static blend_func_fnp blend_func;
+	static buffer_data_fnp buffer_data;
+	static check_framebuffer_status_fnp check_framebuffer_status;
+	static clear_color_fnp clear_color;
+	static clear_fnp clear;
+	static compile_shader_fnp compile_shader;
+	static create_program_fnp create_program;
+	static create_shader_fnp create_shader;
+	static cull_face_fnp cull_face;
+	static delete_buffers_fnp delete_buffers;
+	static delete_framebuffers_fnp delete_framebuffers;
+	static delete_program_fnp delete_program;
+	static delete_renderbuffers_fnp delete_renderbuffers;
+	static delete_shader_fnp delete_shader;
+	static delete_textures_fnp delete_textures;
+	static depth_mask_fnp depth_mask;
+	static disable_fnp disable;
+	static draw_elements_fnp draw_elements;
+	static enable_fnp enable;
+	static enable_vertex_attrib_array_fnp enable_vertex_attrib_array;
+	static framebuffer_renderbuffer_fnp framebuffer_renderbuffer;
+	static framebuffer_texture_2d_fnp framebuffer_texture_2d;
+	static gen_buffers_fnp gen_buffers;
+	static gen_framebuffers_fnp gen_framebuffers;
+	static gen_renderbuffers_fnp gen_renderbuffers;
+	static gen_textures_fnp gen_textures;
+	static generate_mipmap_fnp generate_mipmap;
+	static get_attrib_location_fnp get_attrib_location;
+	static get_error_fnp get_error;
+	static get_integerv_fnp get_integerv;
+	static get_programiv_fnp get_programiv;
+	static get_program_info_log_fnp get_program_info_log;
+	static get_shaderiv_fnp get_shaderiv;
+	static get_shader_info_log_fnp get_shader_info_log;
+	static get_uniform_location_fnp get_uniform_location;
+	static link_program_fnp link_program;
+	static renderbuffer_storage_fnp renderbuffer_storage;
+	static tex_image_2d_fnp tex_image_2d;
+	static tex_parameterf_fnp tex_parameterf;
+	static tex_parameterfv_fnp tex_parameterfv;
+	static tex_parameteri_fnp tex_parameteri;
+	static tex_parameteriv_fnp tex_parameteriv;
+	static scissor_fnp scissor;
+	static shader_source_fnp shader_source;
+	static uniform1f_fnp uniform1f;
+	static uniform1fv_fnp uniform1fv;
+	static uniform1i_fnp uniform1i;
+	static uniform1iv_fnp uniform1iv;
+	static uniform2fv_fnp uniform2fv;
+	static uniform3fv_fnp uniform3fv;
+	static uniform4fv_fnp uniform4fv;
+	static uniform_matrix2fv_fnp uniform_matrix2fv;
+	static uniform_matrix3fv_fnp uniform_matrix3fv;
+	static uniform_matrix4fv_fnp uniform_matrix4fv;
+	static use_program_fnp use_program;
+	static validate_program_fnp validate_program;
+	static vertex_attrib_pointer_fnp vertex_attrib_pointer;
+	static viewport_fnp viewport;
 #ifdef GX_USE_OPENGL_CLASS_3
-    static GXGL_APICALL bind_vertex_array_fnp bind_vertex_array;
-    static GXGL_APICALL delete_vertex_arrays_fnp delete_vertex_arrays;
-    static GXGL_APICALL gen_vertex_arrays_fnp gen_vertex_arrays;
+	static bind_vertex_array_fnp bind_vertex_array;
+	static delete_vertex_arrays_fnp delete_vertex_arrays;
+	static gen_vertex_arrays_fnp gen_vertex_arrays;
 #endif
 };
-} // namespace gearoenix::gl
+}
 #endif
 #endif

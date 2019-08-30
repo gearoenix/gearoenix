@@ -41,7 +41,7 @@ using GxDirLight = gearoenix::render::light::Directional;
 using GxLtManager = gearoenix::render::light::Manager;
 using GxPersCam = gearoenix::render::camera::Perspective;
 
-GameApp::GameApp(const std::shared_ptr<gearoenix::system::Application>& sys_app) noexcept
+GameApp::GameApp(gearoenix::system::Application * const sys_app) noexcept
 	: gearoenix::core::Application::Application(sys_app)
 {
 	const GxEndCallerIgnored endcall([this] { scn->enable(); });
@@ -49,7 +49,7 @@ GameApp::GameApp(const std::shared_ptr<gearoenix::system::Application>& sys_app)
 		scn = std::move(s);
 	});
 
-	rnd_eng->set_render_tree(new GxGrPbr(rnd_eng.get(), endcall));
+	render_engine->set_render_tree(new GxGrPbr(render_engine, endcall));
 
 	const auto& astmgr = sys_app->get_asset_manager();
 	const auto& scnmgr = astmgr->get_scene_manager();

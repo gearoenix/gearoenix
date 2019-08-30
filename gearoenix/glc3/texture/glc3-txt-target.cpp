@@ -34,8 +34,8 @@ gearoenix::glc3::texture::Target::Target(engine::Engine* const e) noexcept
     : render::texture::Target(core::asset::Manager::create_id(), e)
 {
     const auto* sys_app = e->get_system_application();
-    img_width = sys_app->get_width();
-    img_height = sys_app->get_height();
+    img_width = sys_app->get_window_width();
+    img_height = sys_app->get_window_height();
     clipping_width = static_cast<core::Real>(img_width);
     clipping_height = static_cast<core::Real>(img_height);
     gl::Loader::get_integerv(GL_FRAMEBUFFER_BINDING, &framebuffer);

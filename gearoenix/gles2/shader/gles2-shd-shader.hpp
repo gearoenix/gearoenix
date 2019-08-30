@@ -18,27 +18,17 @@
 #define GX_DEBUG_GLES2_GLSL
 #endif
 
-#define GX_GLES2_UNIFORM_TEXTURE_ARRAY(name, count)        \
-private:                                                   \
-    gl::sint name = GX_GLES2_UNIFORM_FAILED;               \
-    gl::sint name##_indices[count] = {};                   \
-public:                                                    \
-    GX_GETTER_BUILDER(name)                                \
-    GX_GETTER_BUILDER(name##_indices)
+#define GX_GLES2_UNIFORM_TEXTURE_ARRAY(name, count)         \
+    GX_GET_VAL_PRV(gl::sint, name, GX_GLES2_UNIFORM_FAILED) \
+    GX_GET_ARR_PRV(gl::sint, name##_indices, count)
 
-#define GX_GLES2_UNIFORM_TEXTURE(name)                     \
-private:                                                   \
-    gl::sint name = GX_GLES2_UNIFORM_FAILED;               \
-    gl::sint name##_index = GX_GLES2_TEXTURE_INDEX_FAILED; \
-public:                                                    \
-    GX_GETTER_BUILDER(name)                                \
-    GX_GETTER_BUILDER(name##_index)
+#define GX_GLES2_UNIFORM_TEXTURE(name)                      \
+    GX_GET_VAL_PRV(gl::sint, name, GX_GLES2_UNIFORM_FAILED) \
+    GX_GET_VAL_PRV(gl::sint, name##_index, GX_GLES2_TEXTURE_INDEX_FAILED)
 
 #define GX_GLES2_UNIFORM(name, function)                     \
 private:                                                     \
-    gl::sint name = GX_GLES2_UNIFORM_FAILED;                 \
-public:                                                      \
-    GX_GETTER_BUILDER(name)                                  \
+    GX_GET_VAL_PRV(gl::sint, name, GX_GLES2_UNIFORM_FAILED)  \
     void set_##name##_data(const float* data) const noexcept \
     {                                                        \
         gl::Loader::uniform##function;                       \
