@@ -4,7 +4,7 @@
 #include "../../math/math-aabb.hpp"
 #include "../../math/math-triangle.hpp"
 #include "../../math/math-vector.hpp"
-#include "phs-collider.hpp"
+#include "phs-cld-collider.hpp"
 #include <memory>
 #include <vector>
 namespace gearoenix {
@@ -21,9 +21,8 @@ namespace physics::collider {
 
     public:
         explicit Mesh(system::stream::Stream* f) noexcept;
-        void update(const math::Mat4x4& m) noexcept final;
-        bool hit(const math::Ray3& r, core::Real& distance_from_origin) const noexcept final;
-        bool hit(const math::Ray3& r, core::Real& distance_from_origin, math::Vec2& factors) const noexcept;
+        std::optional<core::Real> hit(const math::Ray3& r) const noexcept final;
+        // std::optional<std::pair<core::Real, math::Vec2>> hit_with_info(const math::Ray3& r) const noexcept;
 
         friend std::ostream& operator<<(std::ostream& os, const Mesh& m) noexcept
         {

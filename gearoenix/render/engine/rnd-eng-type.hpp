@@ -14,6 +14,6 @@ enum struct Type : core::Id {
     DIRECTX_12 = 7,
     METAL = 8,
 };
-std::ostream& operator<<(std::ostream& os, const Type t) noexcept;
+std::ostream& operator<<(std::ostream& os, Type t) noexcept;
 }
 #endif

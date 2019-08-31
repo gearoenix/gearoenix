@@ -3,9 +3,14 @@
 
 #include "cr-types.hpp"
 #include <cstring>
+#include <memory>
 
 #define GX_GET_REF_PRV(t, x) private: t x; public: const t & get_##x() const noexcept { return x; } t & get_##x() noexcept { return x; }
-#define GX_GET_PTR_PRV(t, x) private: t * x = nullptr; public: const t * get_##x() const noexcept { return x; } t * get_##x() noexcept { return x; }
+#define GX_GET_UPTR(v, t, x) v: std::unique_ptr<t> x; public: const t * get_##x() const noexcept { return x.get(); } t * get_##x() noexcept { return x.get(); }
+#define GX_GET_UPTR_PRT(t, x) GX_GET_UPTR(protected, t, x)
+#define GX_GET_PTR(v, t, x) v: t * x = nullptr; public: const t * get_##x() const noexcept { return x; } t * get_##x() noexcept { return x; }
+#define GX_GET_PTR_PRV(t, x) GX_GET_PTR(private, t, x) 
+#define GX_GET_PTR_PRT(t, x) GX_GET_PTR(protected, t, x) 
 #define GX_GET_ARR(v, t, x, c) v: t x[c] = {}; public: const t (&get_##x() const noexcept)[c] { return x; } t (&get_##x() noexcept)[c] { return x; }
 #define GX_GET_ARR_PRV(t, x, c) GX_GET_ARR(private, t, x, c)
 #define GX_GET_VAL(v, t, x, d) v: t x = d; public: t get_##x() const noexcept { return x; }
