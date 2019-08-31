@@ -92,7 +92,7 @@ void gearoenix::physics::Engine::update_001_kernel(const unsigned int kernel_ind
                     continue;
                 GX_DO_TASK(
                     const math::Sphere& sphere = model->get_occlusion_sphere();
-                    if (camera->in_sight(sphere.position, sphere.radius)) {
+                    if (camera->in_sight(sphere.get_position(), sphere.get_radius())) {
                         current_visible_models.push_back(model.get());
                     });
             }

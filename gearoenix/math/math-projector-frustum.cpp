@@ -14,7 +14,7 @@ void gearoenix::math::ProjectorFrustum::set_view_projection(const gearoenix::mat
 
 gearoenix::math::IntersectionStatus::Type gearoenix::math::ProjectorFrustum::check_intersection(const Sphere& s) const noexcept
 {
-    return check_intersection(s.position, s.radius);
+    return check_intersection(s.get_position(), s.get_radius());
 }
 
 gearoenix::math::IntersectionStatus::Type gearoenix::math::ProjectorFrustum::check_intersection(const gearoenix::math::Vec3& position, const core::Real radius) const noexcept

@@ -20,19 +20,21 @@ void gearoenix::math::Sphere::insert(const gearoenix::core::Real r) noexcept
     }
 }
 
-std::optional<gearoenix::core::Real> gearoenix::math::Sphere::hit(const math::Ray3& r) noexcept
+std::optional<gearoenix::core::Real> gearoenix::math::Sphere::hit(const math::Ray3& r) const noexcept
 {
-    const auto dir = position - r.origin;
-    const auto dis = r.normalized_direction.dot(dir);
+    const auto dir = position - r.get_origin();
+    const auto dis = r.get_normalized_direction().dot(dir);
     if(dis <= radius) return std::nullopt;
     const auto dis2 = dis * dis;
     const auto dir2 = dir.dot(dir);
-    if()
-    radius2 - 
+    const auto a2 = dir2 - dis2;
+    if(radius2 <= a2) return std::nullopt;
+    return dis - std::sqrtf(radius2 - a2);
 }
 
-std::optional<gearoenix::core::Real> gearoenix::math::Sphere::hit(const math::Ray3& r, core::Real d_min) noexcept {
-
+std::optional<gearoenix::core::Real> gearoenix::math::Sphere::hit(const math::Ray3& r, core::Real d_min) const noexcept {
+    if(const auto h = hit(r)) if((*h) < d_min) return h;
+    return std::nullopt;
 }
 
 gearoenix::math::IntersectionStatus::Type

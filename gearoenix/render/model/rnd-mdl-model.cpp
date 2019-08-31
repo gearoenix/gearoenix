@@ -1,7 +1,7 @@
 #include "rnd-mdl-model.hpp"
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../core/cr-static.hpp"
-#include "../../physics/collider/phs-collider.hpp"
+#include "../../physics/collider/phs-cld-collider.hpp"
 #include "../../system/stream/sys-stm-asset.hpp"
 #include "../../system/stream/sys-stm-stream.hpp"
 #include "../../system/sys-app.hpp"

@@ -17,8 +17,8 @@ public:
     Sphere(const Vec3& position, core::Real radius) noexcept;
     void set_radius(core::Real r) noexcept;
     void insert(core::Real r) noexcept;
-    std::optional<core::Real> hit(const math::Ray3& r) noexcept;
-    std::optional<core::Real> hit(const math::Ray3& r, core::Real d_min) noexcept;
+    std::optional<core::Real> hit(const math::Ray3& r) const noexcept;
+    std::optional<core::Real> hit(const math::Ray3& r, core::Real d_min) const noexcept;
     IntersectionStatus::Type check_intersection(const Sphere& o) const noexcept;
 };
 }

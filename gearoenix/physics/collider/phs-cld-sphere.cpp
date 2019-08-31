@@ -10,5 +10,5 @@ gearoenix::physics::collider::Sphere::Sphere(const math::Vec3 &c, core::Real r) 
 
 std::optional<gearoenix::core::Real> gearoenix::physics::collider::Sphere::hit(const math::Ray3& r) const noexcept
 {
-    sphere. r.get_origin()
+    return sphere.hit(r);
 }

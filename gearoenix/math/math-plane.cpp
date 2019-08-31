@@ -10,12 +10,12 @@ gearoenix::math::Plane::Plane(const Vec3& point, const Vec3& normal) noexcept
 
 gearoenix::math::IntersectionStatus::Type gearoenix::math::Plane::check_intersection(const Sphere& s) const noexcept
 {
-    const core::Real sd = s.position.dot(normal) + d;
-    if (sd > s.radius)
+    const core::Real sd = s.get_position().dot(normal) + d;
+    if (sd > s.get_radius())
         return IntersectionStatus::Above;
-    if (sd == s.radius)
+    if (sd == s.get_radius())
         return IntersectionStatus::Tangent;
-    if (sd <= -s.radius)
+    if (sd <= -s.get_radius())
         return IntersectionStatus::Under;
     return IntersectionStatus::Cut;
 }

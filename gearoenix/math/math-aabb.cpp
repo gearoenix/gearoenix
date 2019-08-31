@@ -45,8 +45,8 @@ void gearoenix::math::Aabb3::put(const Vec3& p) noexcept
 
 void gearoenix::math::Aabb3::put(const Sphere& o) noexcept
 {
-    put(o.position + o.radius);
-    put(o.position - o.radius);
+    put(o.get_position() + o.get_radius());
+    put(o.get_position() - o.get_radius());
 }
 
 void gearoenix::math::Aabb3::put(const gearoenix::math::Aabb3& o) noexcept
@@ -62,7 +62,7 @@ void gearoenix::math::Aabb3::put(const gearoenix::math::Aabb3& o) noexcept
 bool gearoenix::math::Aabb3::test(const Ray3& ray, core::Real& t_min_result) const noexcept
 {
     const math::Vec3& ro = ray.get_origin();
-    const math::Vec3& rd = ray.get_direction();
+    const math::Vec3& rd = ray.get_normalized_direction();
     core::Real t_max = std::numeric_limits<core::Real>::max();
     core::Real t_min = -t_max;
     for (int i = 0; i < 3; ++i) {
@@ -121,7 +121,7 @@ bool gearoenix::math::Aabb3::test(const Aabb3& o) const noexcept
 
 bool gearoenix::math::Aabb3::test(const gearoenix::math::Sphere& o) const noexcept
 {
-    return test(Aabb3(o.position + o.radius, o.position - o.radius));
+    return test(Aabb3(o.get_position() + o.get_radius(), o.get_position() - o.get_radius()));
 }
 
 gearoenix::math::IntersectionStatus::Type gearoenix::math::Aabb3::check_intersection(const Aabb3& o) const noexcept

@@ -1,7 +1,7 @@
 #include "rnd-scn-ui.hpp"
 #include "../../core/event/cr-ev-event.hpp"
 #include "../../physics/animation/phs-anm-once.hpp"
-#include "../../physics/collider/phs-collider.hpp"
+#include "../../physics/collider/phs-cld-collider.hpp"
 #include "../../physics/phs-engine.hpp"
 #include "../camera/rnd-cmr-camera.hpp"
 #include "../engine/rnd-eng-engine.hpp"
