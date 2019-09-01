@@ -127,7 +127,7 @@ void gearoenix::render::light::CascadeInfo::update(const math::Mat4x4& m, const 
         per_cascade[sss].limit_box.put(zero_located_view * v);
     }
     for (auto& c : per_cascade) {
-        gearoenix::math::Vec3 v = c.limit_box.mx;
+        gearoenix::math::Vec3 v = c.limit_box.get_upper();
         v[2] = -std::numeric_limits<gearoenix::core::Real>::max();
         c.limit_box.put(v);
     }
@@ -155,8 +155,8 @@ void gearoenix::render::light::CascadeInfo::shrink() noexcept
     for (auto& cas : per_cascade) {
         cas.shadow_mapper->update();
         cas.max_box.test(cas.limit_box, cas.intersection_box);
-        const auto& mx = cas.intersection_box.mx;
-        const auto& mn = cas.intersection_box.mn;
+        const auto& mx = cas.intersection_box.get_upper();
+        const auto& mn = cas.intersection_box.get_lower();
         const auto c = (mx + mn) * 0.5f;
         const auto d = mx - mn;
         const auto w = d[0] * 1.01f;

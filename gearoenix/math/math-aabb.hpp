@@ -2,14 +2,22 @@
 #define GEAROENIX_MATH_AABB_HPP
 #include "math-intersection-status.hpp"
 #include "math-vector.hpp"
+#include "../core/cr-static.hpp"
 namespace gearoenix::math {
 struct Ray3;
 struct Sphere;
 struct Aabb3 {
-    Vec3 mx;
-    Vec3 mn;
+    GX_GET_REF_PRV(Vec3, upper)
+    GX_GET_REF_PRV(Vec3, lower)
+    GX_GET_REF_PRV(Vec3, diameter)
+    GX_GET_REF_PRV(Vec3, center)
+    GX_GET_VAL_PRV(core::Real, volume, 0.0f)
+private:
+    void update() noexcept;
+public:
+    /// TODO add without updates
     explicit Aabb3() noexcept;
-    explicit Aabb3(const Vec3& mx, const Vec3& mn) noexcept;
+    explicit Aabb3(const Vec3& upper, const Vec3& lower) noexcept;
     void reset() noexcept;
     void reset(const Vec3& p) noexcept;
     void put(const Vec3& p) noexcept;

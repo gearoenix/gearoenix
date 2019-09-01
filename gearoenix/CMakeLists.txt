@@ -233,6 +233,8 @@ SET(GX_ENGINE_SRC
         "${GX_ENGINE_SRC_DIR}math/math-vector.hpp"
         "${GX_ENGINE_SRC_DIR}math/math-vertex.cpp"
         "${GX_ENGINE_SRC_DIR}math/math-vertex.hpp"
+        "${GX_ENGINE_SRC_DIR}physics/accelerator/phs-acc-bvh.cpp"
+        "${GX_ENGINE_SRC_DIR}physics/accelerator/phs-acc-bvh.hpp"
         "${GX_ENGINE_SRC_DIR}physics/animation/phs-anm-animation.cpp"
         "${GX_ENGINE_SRC_DIR}physics/animation/phs-anm-animation.hpp"
         "${GX_ENGINE_SRC_DIR}physics/animation/phs-anm-once.cpp"

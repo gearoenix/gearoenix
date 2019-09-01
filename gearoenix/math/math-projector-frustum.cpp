@@ -33,17 +33,17 @@ gearoenix::math::IntersectionStatus::Type gearoenix::math::ProjectorFrustum::che
 
 gearoenix::math::IntersectionStatus::Type gearoenix::math::ProjectorFrustum::check_intersection(const Aabb3& aabb) const noexcept
 {
-    const Vec3 c = (aabb.mx + aabb.mn) * 0.5f;
-    const Vec3 r = (aabb.mx - aabb.mn) * 0.5f;
+    const Vec3 &c = aabb.get_center();
+    const Vec3 r = aabb.get_diameter() * 0.5f;
     return check_intersection({
-        aabb.mx,
+        aabb.get_upper(),
         c + Vec3(-r[0], r[1], r[2]),
         c + Vec3(r[0], -r[1], r[2]),
         c + Vec3(-r[0], -r[1], r[2]),
         c + Vec3(r[0], r[1], -r[2]),
         c + Vec3(-r[0], r[1], -r[2]),
         c + Vec3(r[0], -r[1], -r[2]),
-        aabb.mn,
+        aabb.get_lower(),
     });
 }
 
