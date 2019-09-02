@@ -12,17 +12,19 @@ struct Aabb3 {
     GX_GET_REF_PRV(Vec3, diameter)
     GX_GET_REF_PRV(Vec3, center)
     GX_GET_VAL_PRV(core::Real, volume, 0.0f)
-private:
-    void update() noexcept;
 public:
     /// TODO add without updates
     explicit Aabb3() noexcept;
     explicit Aabb3(const Vec3& upper, const Vec3& lower) noexcept;
+    void update() noexcept;
     void reset() noexcept;
     void reset(const Vec3& p) noexcept;
     void put(const Vec3& p) noexcept;
     void put(const Sphere& o) noexcept;
     void put(const Aabb3& o) noexcept;
+    /// For better performance but keep in mind call update after your puts finished
+    /// In case your not sure about it, use put it is safer
+    void put_without_update(const Aabb3& o) noexcept;
     bool test(const Ray3& r, core::Real& t_min_result) const noexcept;
     bool test(const Aabb3& o, Aabb3& intersection) const noexcept;
     bool test(const Aabb3& o) const noexcept;

@@ -5,13 +5,6 @@
 #include "math-sphere.hpp"
 #include <limits>
 
-void gearoenix::math::Aabb3::update() noexcept
-{
-    diameter = upper - lower;
-    center = (upper + lower) * 0.5f;
-    volume = diameter[0] * diameter[1] * diameter[2];
-}
-
 gearoenix::math::Aabb3::Aabb3() noexcept
     : upper(Vec3(-std::numeric_limits<core::Real>::max(), -std::numeric_limits<core::Real>::max(), -std::numeric_limits<core::Real>::max()))
     , lower(Vec3(std::numeric_limits<core::Real>::max(), std::numeric_limits<core::Real>::max(), std::numeric_limits<core::Real>::max()))
@@ -28,6 +21,13 @@ gearoenix::math::Aabb3::Aabb3(const Vec3& u, const Vec3& l) noexcept
     , center((u + l) * 0.5f)
     , volume(diameter[0] * diameter[1] * diameter[2])
 {
+}
+
+void gearoenix::math::Aabb3::update() noexcept
+{
+    diameter = upper - lower;
+    center = (upper + lower) * 0.5f;
+    volume = diameter[0] * diameter[1] * diameter[2];
 }
 
 void gearoenix::math::Aabb3::reset() noexcept
@@ -77,14 +77,18 @@ void gearoenix::math::Aabb3::put(const Sphere& o) noexcept
 
 void gearoenix::math::Aabb3::put(const gearoenix::math::Aabb3& o) noexcept
 {
+    put_without_update(o);
+    update();
+}
+
+void gearoenix::math::Aabb3::put_without_update(const Aabb3& o) noexcept
+{
     upper[0] = GX_MAX(o.upper[0], upper[0]);
     upper[1] = GX_MAX(o.upper[1], upper[1]);
     upper[2] = GX_MAX(o.upper[2], upper[2]);
     lower[0] = GX_MIN(o.lower[0], lower[0]);
     lower[1] = GX_MIN(o.lower[1], lower[1]);
     lower[2] = GX_MIN(o.lower[2], lower[2]);
-
-    update();
 }
 
 bool gearoenix::math::Aabb3::test(const Ray3& ray, core::Real& t_min_result) const noexcept
