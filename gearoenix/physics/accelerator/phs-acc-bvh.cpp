@@ -103,13 +103,13 @@ void gearoenix::physics::accelerator::Bvh::InternalNode::init(const std::vector<
 gearoenix::physics::accelerator::Bvh::InternalNode::InternalNode(const std::vector<const collider::Collider*> &colliders) noexcept
     : Node(Type::INTERNAL)
 {
+	for (const collider::Collider* c : colliders)
+		volume.put_without_update(c->get_box());
+	volume.update();
     if(colliders.size() <= 3) {
-        left = std::make_unique<LeafNode>(colliders);
+        left = std::make_unique<LeafNode>(colliders, volume);
         return;
     }
-    for(const collider::Collider *c: colliders)
-        volume.put_without_update(c->get_box());
-    volume.update();
     init(colliders);
 }
 
@@ -122,4 +122,14 @@ gearoenix::physics::accelerator::Bvh::InternalNode::InternalNode(const std::vect
 void gearoenix::physics::accelerator::Bvh::reset(const std::vector<const collider::Collider*> &colliders) noexcept 
 {
     root = std::make_unique<InternalNode>(colliders);
+}
+
+std::string gearoenix::physics::accelerator::Bvh::to_string() const noexcept {
+	std::string r("{ 'root' : ");
+	if (nullptr != root)
+		r += root.to_string();
+	else
+		r += "''";
+	r += " }";
+	return r;
 }

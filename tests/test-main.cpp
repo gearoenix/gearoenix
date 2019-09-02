@@ -4,3 +4,4 @@
 #include "test-core-pool.hpp"
 #include "test-math-frustum.hpp"
 #include "test-math-vector.hpp"
+#include "test-physics-accelerator-bvh.hpp"
