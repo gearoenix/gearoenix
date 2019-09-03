@@ -10,7 +10,7 @@ gearoenix::physics::collider::Sphere::Sphere(const math::Vec3 &c, core::Real r) 
     box.put(sphere);
 }
 
-std::optional<gearoenix::core::Real> gearoenix::physics::collider::Sphere::hit(const math::Ray3& r) const noexcept
+std::optional<gearoenix::core::Real> gearoenix::physics::collider::Sphere::hit(const math::Ray3& r, const core::Real d_min) const noexcept
 {
-    return sphere.hit(r);
+    return sphere.hit(r, d_min);
 }

@@ -30,7 +30,7 @@ public:
     bool test(const Aabb3& o) const noexcept;
     bool test(const Sphere& o) const noexcept;
     std::optional<core::Real> hit(const math::Ray3& r, core::Real d_min) const noexcept;
-    IntersectionStatus::Type check_intersection(const Aabb3& o) const noexcept;
+    IntersectionStatus check_intersection(const Aabb3& o) const noexcept;
 };
 }
 #endif

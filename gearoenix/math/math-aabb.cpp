@@ -154,7 +154,7 @@ std::optional<gearoenix::core::Real> gearoenix::math::Aabb3::hit(const math::Ray
     return std::nullopt;
 }
 
-gearoenix::math::IntersectionStatus::Type gearoenix::math::Aabb3::check_intersection(const Aabb3& o) const noexcept
+gearoenix::math::IntersectionStatus gearoenix::math::Aabb3::check_intersection(const Aabb3& o) const noexcept
 {
     if (upper[0] > o.upper[0]
         && upper[1] > o.upper[1]
@@ -162,13 +162,13 @@ gearoenix::math::IntersectionStatus::Type gearoenix::math::Aabb3::check_intersec
         && lower[0] < o.lower[0]
         && lower[1] < o.lower[1]
         && lower[2] < o.lower[2])
-        return gearoenix::math::IntersectionStatus::In;
+        return gearoenix::math::IntersectionStatus::IN;
     if (lower[0] < o.upper[0]
         && upper[0] > o.lower[0]
         && lower[1] < o.upper[1]
         && upper[1] > o.lower[1]
         && lower[2] < o.upper[2]
         && upper[2] > o.lower[2])
-        return gearoenix::math::IntersectionStatus::Cut;
-    return gearoenix::math::IntersectionStatus::Out;
+        return gearoenix::math::IntersectionStatus::CUT;
+    return gearoenix::math::IntersectionStatus::OUT;
 }

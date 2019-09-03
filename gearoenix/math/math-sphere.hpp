@@ -19,7 +19,7 @@ public:
     void insert(core::Real r) noexcept;
     std::optional<core::Real> hit(const math::Ray3& r) const noexcept;
     std::optional<core::Real> hit(const math::Ray3& r, core::Real d_min) const noexcept;
-    IntersectionStatus::Type check_intersection(const Sphere& o) const noexcept;
+    IntersectionStatus check_intersection(const Sphere& o) const noexcept;
 };
 }
 #endif

@@ -21,17 +21,15 @@ namespace physics::collider {
 
     public:
         explicit Mesh(system::stream::Stream* f) noexcept;
-        std::optional<core::Real> hit(const math::Ray3& r) const noexcept final;
         // std::optional<std::pair<core::Real, math::Vec2>> hit_with_info(const math::Ray3& r) const noexcept;
 
         friend std::ostream& operator<<(std::ostream& os, const Mesh& m) noexcept
         {
-            os << "MeshCollider { triangles: [";
+            os << "{ 'object_class_name' : 'gearoenix::physics::collider::Mesh', 'triangles' : [";
             for (const math::Triangle3& t : m.ts) {
                 os << " " << t << ",";
             }
-            os << " ],";
-            os << "}";
+            os << " ] }";
             return os;
         }
     };

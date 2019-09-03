@@ -32,13 +32,12 @@ std::optional<gearoenix::core::Real> gearoenix::math::Sphere::hit(const math::Ra
     return dis - std::sqrtf(radius2 - a2);
 }
 
-std::optional<gearoenix::core::Real> gearoenix::math::Sphere::hit(const math::Ray3& r, core::Real d_min) const noexcept {
+std::optional<gearoenix::core::Real> gearoenix::math::Sphere::hit(const math::Ray3& r, const core::Real d_min) const noexcept {
     if(const auto h = hit(r)) if((*h) < d_min) return h;
     return std::nullopt;
 }
 
-gearoenix::math::IntersectionStatus::Type
-gearoenix::math::Sphere::check_intersection(const gearoenix::math::Sphere& o) const noexcept
+gearoenix::math::IntersectionStatus::Type gearoenix::math::Sphere::check_intersection(const gearoenix::math::Sphere& o) const noexcept
 {
     const auto l = (position - o.position).length();
     const auto r = radius + o.radius;

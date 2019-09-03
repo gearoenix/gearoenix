@@ -9,7 +9,7 @@ private:
 public:
     Sphere(const math::Vec3 &c, core::Real r) noexcept;
     ~Sphere() noexcept = default;
-    std::optional<core::Real> hit(const math::Ray3& r) const noexcept final;
+    std::optional<core::Real> hit(const math::Ray3& r, core::Real d_min) const noexcept final;
 };
 }
 #endif
