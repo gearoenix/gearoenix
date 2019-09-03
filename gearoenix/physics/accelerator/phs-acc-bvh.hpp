@@ -4,6 +4,7 @@
 #include "../../math/math-aabb.hpp"
 #include <optional>
 #include <vector>
+#include <string>
 
 namespace gearoenix::math {
 struct Ray3;
@@ -26,24 +27,15 @@ private:
             INTERNAL,
             LEAF,
         };
-		friend std::ostream& operator<<(std::ostream& os, const Type t) noexcept {
-			switch (t) {
-			case Type::INTERNAL:
-				os << "'INTERNAL'";
-				return os;
-			case Type::LEAF:
-				os << "'LEAF'";
-				return os;
-			}
-		}
         GX_GET_CVAL_PRT(Type, node_type)
         GX_GET_REF_PRT(math::Aabb3, volume)
     protected:
         Node(const Type t) noexcept : node_type(t) {}
         Node(const Type t, const math::Aabb3 &volume) noexcept : node_type(t), volume(volume) {}
-		virtual std::string to_string() const noexcept;
     public:
         virtual ~Node() noexcept = default;
+        virtual std::string to_string() const noexcept;
+        virtual std::optional<core::Real> hit(const math::Ray3& r, core::Real d_min) const noexcept;
     };
 
     class LeafNode : public Node {
@@ -51,7 +43,7 @@ private:
     public:
         LeafNode(const std::vector<const collider::Collider*>& colliders, const math::Aabb3& volume) noexcept : 
             Node(Type::LEAF, volume), colliders(colliders) {}
-		friend std::ostream& operator<<(std::ostream& os, const LeafNode& n) noexcept;
+        std::optional<core::Real> hit(const math::Ray3& r, core::Real d_min) const noexcept final;
 		std::string to_string() const noexcept final;
 	};
 
@@ -63,27 +55,8 @@ private:
     public:
         InternalNode(const std::vector<const collider::Collider*> &colliders) noexcept;
         InternalNode(const std::vector<const collider::Collider*> &colliders, const math::Aabb3& volume) noexcept;
+        std::optional<core::Real> hit(const math::Ray3& r, core::Real d_min) const noexcept final;
 		std::string to_string() const noexcept final;
-		friend std::ostream& operator<<(std::ostream& os, const InternalNode& n) noexcept {
-			os << "{ 'node_type' : " << n.node_type << ", 'left' : ";
-			if (nullptr != n.left)
-				if (n.get_node_type() == Type::INTERNAL)
-					os << *reinterpret_cast<InternalNode*>(n.left.get());
-				else
-					os << *reinterpret_cast<LeafNode*>(n.left.get());
-			else
-				os << "''";
-			os << ", 'right' : ";
-			if (nullptr != n.left)
-				if (n.get_node_type() == Type::INTERNAL)
-					os << *reinterpret_cast<InternalNode*>(n.left.get());
-				else
-					os << *reinterpret_cast<LeafNode*>(n.left.get());
-			else
-				os << "''";
-			os << " }";
-			return os;
-		}
     };
 
     std::unique_ptr<InternalNode> root;
@@ -91,7 +64,7 @@ public:
     Bvh() noexcept = default;
     ~Bvh() noexcept = default;
     void reset(const std::vector<const collider::Collider*> &colliders) noexcept;
-    std::optional<core::Real> hit(const math::Ray3& r) const noexcept;
+    std::optional<core::Real> hit(const math::Ray3& r, core::Real d_min) const noexcept;
 	std::string to_string() const noexcept;
 };
 }

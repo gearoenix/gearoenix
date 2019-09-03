@@ -130,6 +130,9 @@ namespace math {
         bool operator<(const Vec4& o) const noexcept;
         bool operator==(const Vec4& o) const noexcept;
         bool operator>(const Vec4& o) const noexcept;
+        Vec4 operator*(core::Real a) const noexcept;
+        core::Real length() const noexcept;
+        core::Real square_length() const noexcept;
         core::Real dot(const Vec4& o) const noexcept;
         Vec4 cross(const Vec4& o) const noexcept;
         Vec4 normalized() const noexcept;

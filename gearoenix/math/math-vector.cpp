@@ -167,22 +167,18 @@ gearoenix::math::Vec2 gearoenix::math::Vec2::operator-() const noexcept
 
 gearoenix::core::Real gearoenix::math::Vec2::length() const noexcept
 {
-    return core::Real(sqrt(static_cast<double>(vec[0] * vec[0] + vec[1] * vec[1])));
+    return std::sqrtf(square_length());
 }
 
 gearoenix::core::Real gearoenix::math::Vec2::square_length() const noexcept
 {
-    return vec[0] * vec[0] + vec[1] * vec[1];
+    return dot(*this);
 }
 
 gearoenix::core::Real gearoenix::math::Vec2::distance(const Vec2& a) const noexcept
 {
-    core::Real t1 = vec[0] - a.vec[0];
-    t1 *= t1;
-    core::Real t2 = vec[1] - a.vec[1];
-    t2 *= t2;
-    t1 += t2;
-    return std::sqrt(t1);
+    const auto v = *this - a;
+    return v.length();
 }
 
 gearoenix::core::Real gearoenix::math::Vec2::square_distance(const Vec2& a) const noexcept
@@ -198,14 +194,13 @@ gearoenix::core::Real gearoenix::math::Vec2::square_distance(const Vec2& a) cons
 
 gearoenix::math::Vec2 gearoenix::math::Vec2::normalized() const noexcept
 {
-    auto l(static_cast<float>(sqrt(static_cast<double>(vec[0] * vec[0] + vec[1] * vec[1]))));
-    return Vec2(vec[0] / l, vec[1] / l);
+    const auto il = 1.0f / length();
+    return *this * il;
 }
 
 void gearoenix::math::Vec2::normalize() noexcept
 {
-    auto l(static_cast<float>(sqrt(static_cast<double>(vec[0] * vec[0] + vec[1] * vec[1]))));
-    l = 1.0f / l;
+    const auto l = 1.0f / length();
     vec[0] *= l;
     vec[1] *= l;
 }
@@ -480,12 +475,12 @@ gearoenix::math::Vec3 gearoenix::math::Vec3::operator-() const noexcept
 
 gearoenix::core::Real gearoenix::math::Vec3::length() const noexcept
 {
-    return core::Real(sqrt(static_cast<double>(vec[0] * vec[0] + vec[1] * vec[1] + vec[2] * vec[2])));
+    return std::sqrtf(square_length());
 }
 
 gearoenix::core::Real gearoenix::math::Vec3::square_length() const noexcept
 {
-    return vec[0] * vec[0] + vec[1] * vec[1] + vec[2] * vec[2];
+    return dot(*this);
 }
 
 gearoenix::core::Real gearoenix::math::Vec3::square_distance(const Vec3& a) const noexcept
@@ -521,13 +516,13 @@ gearoenix::math::Vec3 gearoenix::math::Vec3::cross(const Vec3& o) const noexcept
 
 gearoenix::math::Vec3 gearoenix::math::Vec3::normalized() const noexcept
 {
-    const auto len = core::Real(sqrt(double(vec[0] * vec[0] + vec[1] * vec[1] + vec[2] * vec[2])));
-    return Vec3(vec[0] / len, vec[1] / len, vec[2] / len);
+    const auto ilen = 1.0f / length();
+    return *this * ilen;
 }
 
 void gearoenix::math::Vec3::normalize() noexcept
 {
-    const auto l(1.0f / static_cast<core::Real>(sqrt(static_cast<double>(vec[0] * vec[0] + vec[1] * vec[1] + vec[2] * vec[2]))));
+    const auto l = 1.0f / length();
     vec[0] *= l;
     vec[1] *= l;
     vec[2] *= l;
@@ -674,6 +669,21 @@ bool gearoenix::math::Vec4::operator>(const Vec4& o) const noexcept
     return vec[3] > o.vec[3];
 }
 
+gearoenix::math::Vec4 gearoenix::math::Vec4::operator*(const core::Real a) const noexcept
+{
+    return Vec4(vec[0] * a, vec[1] * a, vec[2] * a, vec[3] * a);
+}
+
+gearoenix::core::Real gearoenix::math::Vec4::length() const noexcept
+{
+    return std::sqrtf(square_length());
+}
+
+gearoenix::core::Real gearoenix::math::Vec4::square_length() const noexcept
+{
+    return dot(*this);
+}
+
 gearoenix::core::Real gearoenix::math::Vec4::dot(const Vec4& o) const noexcept
 {
     return (vec[0] * o.vec[0]) + (vec[1] * o.vec[1]) + (vec[2] * o.vec[2]) + (vec[3] * o.vec[3]);
@@ -689,14 +699,13 @@ gearoenix::math::Vec4 gearoenix::math::Vec4::cross(const Vec4& o) const noexcept
 
 gearoenix::math::Vec4 gearoenix::math::Vec4::normalized() const noexcept
 {
-    const auto len = static_cast<core::Real>(sqrt(static_cast<double>(vec[0] * vec[0] + vec[1] * vec[1] + vec[2] * vec[2] + vec[3] * vec[3])));
-    const Vec4 r(vec[0] / len, vec[1] / len, vec[2] / len, vec[3] / len);
-    return r;
+    const auto ilen = 1.0f / length();
+    return *this * ilen;
 }
 
 void gearoenix::math::Vec4::normalize() noexcept
 {
-    const core::Real ilen = 1.0f / static_cast<core::Real>(sqrt(static_cast<double>(vec[0] * vec[0] + vec[1] * vec[1] + vec[2] * vec[2] + vec[3] * vec[3])));
+    const auto ilen = 1.0f / length();
     vec[0] *= ilen;
     vec[1] *= ilen;
     vec[2] *= ilen;

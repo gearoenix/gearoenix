@@ -91,35 +91,6 @@ void gearoenix::math::Aabb3::put_without_update(const Aabb3& o) noexcept
     lower[2] = GX_MIN(o.lower[2], lower[2]);
 }
 
-bool gearoenix::math::Aabb3::test(const Ray3& ray, core::Real& t_min_result) const noexcept
-{
-    const math::Vec3& ro = ray.get_origin();
-    const math::Vec3& rd = ray.get_normalized_direction();
-    core::Real t_max = std::numeric_limits<core::Real>::max();
-    core::Real t_min = -t_max;
-    for (int i = 0; i < 3; ++i) {
-        if (GX_IS_ZERO(rd[i]))
-            continue;
-        const core::Real oor = upper[i] - ro[i];
-        const core::Real oomr = lower[i] - ro[i];
-        const core::Real rrd = 1.0f / rd[i];
-        const core::Real f1 = oor * rrd;
-        const core::Real f2 = oomr * rrd;
-        const core::Real upperf = GX_MAX(f1, f2);
-        const core::Real lowerf = GX_MIN(f1, f2);
-        t_max = GX_MIN(t_max, upperf);
-        t_min = GX_MAX(t_min, lowerf);
-    }
-    if ((t_max >= t_min) && t_max > 0.0f) {
-        if (t_min_result > t_min) {
-            t_min_result = t_min;
-            return true;
-        }
-    }
-
-    return false;
-}
-
 bool gearoenix::math::Aabb3::test(const Aabb3& o, Aabb3& intersection) const noexcept
 {
     int equals = 0;
@@ -154,6 +125,33 @@ bool gearoenix::math::Aabb3::test(const Aabb3& o) const noexcept
 bool gearoenix::math::Aabb3::test(const gearoenix::math::Sphere& o) const noexcept
 {
     return test(Aabb3(o.get_position() + o.get_radius(), o.get_position() - o.get_radius()));
+}
+
+std::optional<gearoenix::core::Real> gearoenix::math::Aabb3::hit(const math::Ray3& r, const core::Real d_min) const noexcept
+{
+    const math::Vec3& ro = r.get_origin();
+    const math::Vec3& rd = r.get_normalized_direction();
+    core::Real t_max = std::numeric_limits<core::Real>::max();
+    core::Real t_min = -t_max;
+    for (int i = 0; i < 3; ++i) {
+        if (GX_IS_ZERO(rd[i]))
+            continue;
+        const core::Real oor = upper[i] - ro[i];
+        const core::Real oomr = lower[i] - ro[i];
+        const core::Real rrd = 1.0f / rd[i];
+        const core::Real f1 = oor * rrd;
+        const core::Real f2 = oomr * rrd;
+        const core::Real upperf = GX_MAX(f1, f2);
+        const core::Real lowerf = GX_MIN(f1, f2);
+        t_max = GX_MIN(t_max, upperf);
+        t_min = GX_MAX(t_min, lowerf);
+    }
+    if ((t_max >= t_min) && t_max > 0.0f) {
+        if (d_min > t_min) {
+            return t_min;
+        }
+    }
+    return std::nullopt;
 }
 
 gearoenix::math::IntersectionStatus::Type gearoenix::math::Aabb3::check_intersection(const Aabb3& o) const noexcept

@@ -3,6 +3,7 @@
 #include "math-intersection-status.hpp"
 #include "math-vector.hpp"
 #include "../core/cr-static.hpp"
+#include <optional>
 namespace gearoenix::math {
 struct Ray3;
 struct Sphere;
@@ -25,10 +26,10 @@ public:
     /// For better performance but keep in mind call update after your puts finished
     /// In case your not sure about it, use put it is safer
     void put_without_update(const Aabb3& o) noexcept;
-    bool test(const Ray3& r, core::Real& t_min_result) const noexcept;
     bool test(const Aabb3& o, Aabb3& intersection) const noexcept;
     bool test(const Aabb3& o) const noexcept;
     bool test(const Sphere& o) const noexcept;
+    std::optional<core::Real> hit(const math::Ray3& r, core::Real d_min) const noexcept;
     IntersectionStatus::Type check_intersection(const Aabb3& o) const noexcept;
 };
 }
