@@ -13,7 +13,7 @@ namespace math {
         Plane() = delete;
         explicit Plane(const Vec3& point, const Vec3& normal) noexcept;
 
-        IntersectionStatus::Type check_intersection(const Sphere& s) const noexcept;
+        IntersectionStatus check_intersection(const Sphere& s) const noexcept;
     };
 }
 }

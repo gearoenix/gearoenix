@@ -37,7 +37,7 @@ std::optional<gearoenix::core::Real> gearoenix::math::Sphere::hit(const math::Ra
     return std::nullopt;
 }
 
-gearoenix::math::IntersectionStatus::Type gearoenix::math::Sphere::check_intersection(const gearoenix::math::Sphere& o) const noexcept
+gearoenix::math::IntersectionStatus gearoenix::math::Sphere::check_intersection(const gearoenix::math::Sphere& o) const noexcept
 {
     const auto l = (position - o.position).length();
     const auto r = radius + o.radius;

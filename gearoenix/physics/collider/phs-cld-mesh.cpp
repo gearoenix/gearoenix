@@ -37,11 +37,11 @@ gearoenix::physics::collider::Mesh::Mesh(system::stream::Stream* const f) noexce
 //     }
 // }
 
-std::optional<gearoenix::core::Real> gearoenix::physics::collider::Mesh::hit(const math::Ray3&) const noexcept
+std::optional<gearoenix::core::Real> gearoenix::physics::collider::Mesh::hit(const math::Ray3&, const core::Real) const noexcept
 {
-    // auto i = hit_with_info(r);
-    // if(i.has_value()) return i.value().first;
-    return std::nullopt;
+    // first collider base hit (aabb)
+    // second loop over traingles (triangles count must be low)
+    GXUNIMPLEMENTED
 }
 
 // std::optional<std::pair<gearoenix::core::Real, gearoenix::math::Vec2>> gearoenix::physics::collider::Mesh::hit(const math::Ray3& r) const noexcept

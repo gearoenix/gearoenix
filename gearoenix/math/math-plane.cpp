@@ -8,7 +8,7 @@ gearoenix::math::Plane::Plane(const Vec3& point, const Vec3& normal) noexcept
 {
 }
 
-gearoenix::math::IntersectionStatus::Type gearoenix::math::Plane::check_intersection(const Sphere& s) const noexcept
+gearoenix::math::IntersectionStatus gearoenix::math::Plane::check_intersection(const Sphere& s) const noexcept
 {
     const core::Real sd = s.get_position().dot(normal) + d;
     if (sd > s.get_radius())

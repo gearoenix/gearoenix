@@ -11,10 +11,10 @@ struct ProjectorFrustum {
     ProjectorFrustum() = delete;
     explicit ProjectorFrustum(const Mat4x4& view_projection) noexcept;
     void set_view_projection(const Mat4x4& view_projection) noexcept;
-    IntersectionStatus::Type check_intersection(const Sphere& s) const noexcept;
-    IntersectionStatus::Type check_intersection(const Vec3& position, core::Real radius) const noexcept;
-    IntersectionStatus::Type check_intersection(const Aabb3& aabb) const noexcept;
-    IntersectionStatus::Type check_intersection(const Vec3 (&points)[8]) const noexcept;
+    IntersectionStatus check_intersection(const Sphere& s) const noexcept;
+    IntersectionStatus check_intersection(const Vec3& position, core::Real radius) const noexcept;
+    IntersectionStatus check_intersection(const Aabb3& aabb) const noexcept;
+    IntersectionStatus check_intersection(const Vec3 (&points)[8]) const noexcept;
 };
 }
 #endif

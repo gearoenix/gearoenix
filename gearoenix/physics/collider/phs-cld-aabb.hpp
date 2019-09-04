@@ -7,7 +7,7 @@ class AABB: public Collider {
 public:
     AABB() noexcept = default;
     ~AABB() noexcept = default;
-    std::optional<core::Real> hit(const math::Ray3&) const noexcept final { GXUNIMPLEMENTED }
+    std::optional<core::Real> hit(const math::Ray3&, core::Real) const noexcept final { GXUNIMPLEMENTED }
 };
 }
 #endif

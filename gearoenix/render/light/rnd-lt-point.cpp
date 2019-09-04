@@ -38,5 +38,5 @@ gearoenix::core::Real gearoenix::render::light::Point::get_min_radius() const no
 
 bool gearoenix::render::light::Point::is_in_light(const model::Model* m) const noexcept
 {
-    return math::Sphere(position_max_radius.xyz(), position_max_radius[3]).check_intersection(m->get_occlusion_sphere());
+    return math::Sphere(position_max_radius.xyz(), position_max_radius[3]).check_intersection(m->get_occlusion_sphere()) != math::IntersectionStatus::Out;
 }

@@ -98,7 +98,7 @@ void gearoenix::render::camera::Camera::disable() noexcept
 
 bool gearoenix::render::camera::Camera::in_sight(const gearoenix::math::Vec3& location, const core::Real radius) const noexcept
 {
-    return frustum->check_intersection(location, radius);
+    return frustum->check_intersection(location, radius) != math::IntersectionStatus::Out;
 }
 
 void gearoenix::render::camera::Camera::update_uniform()

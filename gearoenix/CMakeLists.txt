@@ -212,6 +212,7 @@ SET(GX_ENGINE_SRC
         "${GX_ENGINE_SRC_DIR}math/math-bezier-curve.hpp"
         "${GX_ENGINE_SRC_DIR}math/math-frustum.cpp"
         "${GX_ENGINE_SRC_DIR}math/math-frustum.hpp"
+        "${GX_ENGINE_SRC_DIR}math/math-intersection-status.cpp"
         "${GX_ENGINE_SRC_DIR}math/math-intersection-status.hpp"
         "${GX_ENGINE_SRC_DIR}math/math-matrix.cpp"
         "${GX_ENGINE_SRC_DIR}math/math-matrix.hpp"
