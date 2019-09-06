@@ -13,7 +13,7 @@ BOOST_AUTO_TEST_CASE(physics_accelerator_bvh)
 	gearoenix::physics::accelerator::Bvh bvh;
 
 	std::vector<std::unique_ptr<gearoenix::physics::collider::Collider>> cs;
-	std::vector<const gearoenix::physics::collider::Collider*> colliders;
+	std::vector<gearoenix::physics::collider::Collider*> colliders;
 
 	cs.push_back(
 		std::make_unique<gearoenix::physics::collider::Sphere>(
@@ -31,11 +31,13 @@ BOOST_AUTO_TEST_CASE(physics_accelerator_bvh)
 		const gearoenix::math::Ray3 r(p, d);                    \
 		const auto hit = bvh.hit(r,                             \
 			std::numeric_limits<gearoenix::core::Real>::max()); \
-		BOOST_TEST(*hit < 9.15f);                               \
-		BOOST_TEST(*hit > 9.05f);                               \
+		BOOST_TEST((*hit).first < 10.1f);                       \
+		BOOST_TEST((*hit).first > 9.00f);                       \
 	}
 
 	GX_TEST_HELPER2(0.0f);
+	GX_TEST_HELPER2(0.89f);
+	GX_TEST_HELPER2(-0.91f);
 
     cs.push_back(
         std::make_unique<gearoenix::physics::collider::Sphere>(

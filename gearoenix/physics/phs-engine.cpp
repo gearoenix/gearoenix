@@ -36,19 +36,19 @@ void gearoenix::physics::Engine::update_001_kernel(const unsigned int kernel_ind
         const std::shared_ptr<render::scene::Scene> scene = is.second.lock();
         if (scene == nullptr)
             continue;
-        if (!scene->is_enabled())
+        if (!scene->get_enability())
             continue;
         auto scene_camera_data = kernel_scene_camera_data.get_next([] { return new SceneCameraData::iterator::value_type; });
         scene_camera_data->first = scene.get();
         auto& cameras_data = scene_camera_data->second;
         cameras_data.refresh();
-        GX_DO_TASK(scene->update_uniform());
+        GX_DO_TASK(scene->update());
         const std::map<core::Id, std::shared_ptr<render::camera::Camera>>& cameras = scene->get_cameras();
         const std::map<core::Id, std::shared_ptr<render::model::Model>>& models = scene->get_models();
         const std::map<core::Id, std::shared_ptr<render::light::Light>>& lights = scene->get_lights();
         for (const auto& id_model : models) {
             const auto& model = id_model.second;
-            if (model->is_enabled())
+            if (model->get_enability())
                 GX_DO_TASK(model->update_uniform());
         }
         for (const std::pair<const core::Id, std::shared_ptr<render::camera::Camera>>& id_camera : cameras) {
@@ -88,7 +88,7 @@ void gearoenix::physics::Engine::update_001_kernel(const unsigned int kernel_ind
             }
             for (const std::pair<const core::Id, std::shared_ptr<render::model::Model>>& id_model : models) {
                 const std::shared_ptr<render::model::Model>& model = id_model.second;
-                if (!model->is_enabled())
+                if (!model->get_enability())
                     continue;
                 GX_DO_TASK(
                     const math::Sphere& sphere = model->get_occlusion_sphere();
@@ -138,7 +138,7 @@ void gearoenix::physics::Engine::update_002_kernel(const unsigned int kernel_ind
                 auto* cas = lc.second;
                 for (auto& im : models) {
                     auto& m = im.second;
-                    if (!m->is_enabled() || !m->get_has_shadow_caster())
+                    if (!m->get_enability() || !m->get_has_shadow_caster())
                         continue;
                     GX_DO_TASK(cas->shadow(m.get(), task_number));
                 }

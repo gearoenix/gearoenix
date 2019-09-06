@@ -7,70 +7,56 @@
 #include "../../math/math-matrix.hpp"
 #include "../../math/math-sphere.hpp"
 #include "../../math/math-vector.hpp"
+#include "../../physics/collider/phs-cld-collider.hpp"
+#include "../buffer/rnd-buf-framed-uniform.hpp"
+#include "rnd-mdl-mesh.hpp"
+#include "rnd-mdl-transformation.hpp"
 #include "rnd-mdl-uniform.hpp"
 #include <map>
 #include <memory>
 #include <vector>
-namespace gearoenix {
-namespace physics::collider {
-    class Collider;
+namespace gearoenix::render {
+namespace buffer {
+    class FramedUniform;
 }
-namespace render {
-    namespace buffer {
-        class FramedUniform;
-    }
-    namespace engine {
-        class Engine;
-    }
-    namespace model {
-        class Mesh;
-        class Transformation;
-        class Model : public core::asset::Asset {
-        protected:
-            engine::Engine* const e;
-            const std::shared_ptr<buffer::FramedUniform> uniform_buffers;
-            const std::shared_ptr<Transformation> transformation;
+namespace engine {
+    class Engine;
+}
+namespace model {
+    class Model : public core::asset::Asset {
+	public:
+		using MapMesh = std::map<core::Id, std::shared_ptr<Mesh>>;
+		using MapModel = std::map<core::Id, std::shared_ptr<Model>>;
 
-            bool is_dynamic = true;
-            bool has_shadow_caster = false;
-            bool has_transparent = false;
-            bool enabled = true;
-
-            Uniform uniform;
-            math::Sphere occlusion_sphere = math::Sphere(math::Vec3(0.0f), 1.0f);
-
-            std::map<core::Id, std::shared_ptr<Mesh>> meshes;
-            std::map<core::Id, std::shared_ptr<Model>> children;
-            std::shared_ptr<physics::collider::Collider> collider = nullptr;
-
-        public:
-            Model(
-                core::Id my_id,
-                system::stream::Stream* f,
-                engine::Engine* e,
-                const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
-            /// It will create an automatic Id for itself
-            Model(
-                core::Id my_id,
-                engine::Engine* e,
-                const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
-            virtual void update_uniform() noexcept;
-            void add_mesh(const std::shared_ptr<Mesh>& m) noexcept;
-            void add_child(const std::shared_ptr<Model>& c) noexcept;
-            bool is_enabled() const noexcept;
-            void enable() noexcept;
-            void disable() noexcept;
-
-            const std::map<core::Id, std::shared_ptr<Model>>& get_children() const noexcept;
-            const std::map<core::Id, std::shared_ptr<Mesh>>& get_meshes() const noexcept;
-            const std::shared_ptr<physics::collider::Collider>& get_collider() const noexcept;
-            const std::shared_ptr<buffer::FramedUniform>& get_uniform_buffers() const noexcept;
-            const std::shared_ptr<Transformation>& get_transformation() const noexcept;
-            const math::Sphere& get_occlusion_sphere() const noexcept;
-            bool get_has_shadow_caster() const noexcept;
-            const math::Mat4x4& get_model_matrix() const noexcept;
-        };
-    }
+		GX_GET_UPTR_PRT(physics::collider::Collider, collider)
+		GX_GET_UCPTR_PRT(buffer::FramedUniform, uniform_buffers)
+		GX_GET_UCPTR_PRT(Transformation, transformation)
+		GX_GET_CREF_PRT(math::Sphere, occlusion_sphere)
+		GX_GET_VAL_PRT(bool, has_shadow_caster, false)
+		GX_GET_VAL_PRT(bool, has_transparent, false)
+		GX_GETSET_VAL_PRT(bool, dynamicity, false)
+		GX_GETSET_VAL_PRT(bool, enability, true)
+		GX_GET_CREF_PRT(MapMesh, meshes)
+		GX_GET_CREF_PRT(MapModel, children)
+    protected:
+        engine::Engine* const e;
+        Uniform uniform;
+    public:
+        Model(
+            core::Id my_id,
+            system::stream::Stream* f,
+            engine::Engine* e,
+            const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+        Model(
+            core::Id my_id,
+            engine::Engine* e,
+            const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+        virtual void update_uniform() noexcept;
+        void add_mesh(const std::shared_ptr<Mesh>& m) noexcept;
+        void add_child(const std::shared_ptr<Model>& c) noexcept;
+		void set_collider(std::unique_ptr<physics::collider::Collider> c) noexcept;
+        const math::Mat4x4& get_model_matrix() const noexcept;
+    };
 }
 }
 #endif

@@ -3,7 +3,9 @@
 #include "../../audio/au-manager.hpp"
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../core/sync/cr-sync-end-caller.hpp"
+#include "../../physics/accelerator/phs-acc-bvh.hpp"
 #include "../../physics/body/phs-bd-body.hpp"
+#include "../../physics/collider/phs-cld-collider.hpp"
 #include "../../physics/constraint/phs-cns-constraint.hpp"
 #include "../../physics/constraint/phs-cns-manager.hpp"
 #include "../../system/stream/sys-stm-stream.hpp"
@@ -37,8 +39,10 @@ gearoenix::render::scene::Scene::Scene(
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : core::asset::Asset(my_id, core::asset::Type::SCENE)
     , e(e)
-    , scene_type_id(Type::GAME)
-    , uniform_buffers(std::make_shared<buffer::FramedUniform>(static_cast<const unsigned int>(sizeof(Uniform)), e))
+    , scene_type_id(Type::Game)
+    , uniform_buffers(new buffer::FramedUniform(static_cast<const unsigned int>(sizeof(Uniform)), e))
+	, static_accelerator(new gearoenix::physics::accelerator::Bvh())
+	, dynamic_accelerator(new gearoenix::physics::accelerator::Bvh())
 {
     core::asset::Manager* const astmgr = e->get_system_application()->get_asset_manager();
 #define GX_HELPER(x, n, cls)                                                     \
@@ -80,28 +84,15 @@ gearoenix::render::scene::Scene::Scene(
     const core::sync::EndCaller<core::sync::EndCallerIgnore>&) noexcept
     : core::asset::Asset(my_id, core::asset::Type::SCENE)
     , e(e)
-    , scene_type_id(Type::GAME)
-    , uniform_buffers(std::make_shared<buffer::FramedUniform>(static_cast<const unsigned int>(sizeof(Uniform)), e))
+    , scene_type_id(Type::Game)
+    , uniform_buffers(new buffer::FramedUniform(static_cast<const unsigned int>(sizeof(Uniform)), e))
+	, static_accelerator(new gearoenix::physics::accelerator::Bvh())
+	, dynamic_accelerator(new gearoenix::physics::accelerator::Bvh())
 {
 }
 
 gearoenix::render::scene::Scene::~Scene() noexcept
 {
-}
-
-void gearoenix::render::scene::Scene::enable() noexcept
-{
-    enabled = true;
-}
-
-void gearoenix::render::scene::Scene::disable() noexcept
-{
-    enabled = false;
-}
-
-bool gearoenix::render::scene::Scene::is_enabled() const noexcept
-{
-    return enabled;
 }
 
 void gearoenix::render::scene::Scene::add_camera(const std::shared_ptr<camera::Camera>& o) noexcept
@@ -113,11 +104,6 @@ void gearoenix::render::scene::Scene::add_camera(const std::shared_ptr<camera::C
     }
 #endif
     cameras[oid] = o;
-}
-
-const std::map<gearoenix::core::Id, std::shared_ptr<gearoenix::render::camera::Camera>>& gearoenix::render::scene::Scene::get_cameras() const noexcept
-{
-    return cameras;
 }
 
 void gearoenix::render::scene::Scene::add_audio(const std::shared_ptr<audio::Audio>& o) noexcept
@@ -151,11 +137,6 @@ const std::shared_ptr<gearoenix::render::light::Light>& gearoenix::render::scene
     return find->second;
 }
 
-const std::map<gearoenix::core::Id, std::shared_ptr<gearoenix::render::light::Light>>& gearoenix::render::scene::Scene::get_lights() const noexcept
-{
-    return lights;
-}
-
 void gearoenix::render::scene::Scene::add_model(const std::shared_ptr<model::Model>& m) noexcept
 {
     const core::Id mid = m->get_asset_id();
@@ -165,6 +146,23 @@ void gearoenix::render::scene::Scene::add_model(const std::shared_ptr<model::Mod
     }
 #endif // GX_DEBUG_MODE
     models[mid] = m;
+	std::function<void(const std::shared_ptr<model::Model>&)> travm = [&travm, this](const std::shared_ptr<model::Model>& mdl) noexcept {
+		auto cld = mdl->get_collider();
+		if (cld != nullptr)
+		{
+			if (mdl->get_dynamicity()) {
+				dynamic_colliders.insert(cld);
+			} else {
+				static_colliders.insert(cld);
+				static_colliders_changed = true;
+			}
+		}
+		auto& children = mdl->get_children();
+		for (auto& c : children)
+			travm(c.second);
+	};
+
+	travm(m);
 }
 
 const std::shared_ptr<gearoenix::render::model::Model>& gearoenix::render::scene::Scene::get_model(const core::Id model_id) const noexcept
@@ -174,11 +172,6 @@ const std::shared_ptr<gearoenix::render::model::Model>& gearoenix::render::scene
         return null_model;
     }
     return find->second;
-}
-
-const std::map<gearoenix::core::Id, std::shared_ptr<gearoenix::render::model::Model>>& gearoenix::render::scene::Scene::get_models() const noexcept
-{
-    return models;
 }
 
 void gearoenix::render::scene::Scene::add_constraint(const std::shared_ptr<physics::constraint::Constraint>& c) noexcept
@@ -201,13 +194,14 @@ const std::shared_ptr<gearoenix::physics::constraint::Constraint>& gearoenix::re
     return find->second;
 }
 
-const std::shared_ptr<gearoenix::render::buffer::FramedUniform>& gearoenix::render::scene::Scene::get_uniform_buffers() const noexcept
+void gearoenix::render::scene::Scene::update() noexcept
 {
-    return uniform_buffers;
-}
-
-void gearoenix::render::scene::Scene::update_uniform() noexcept
-{
+	if (static_colliders_changed) {
+		std::vector<physics::collider::Collider*> clds(static_colliders.size());
+		std::size_t i = 0;
+		for (auto c : static_colliders) clds[i++] = c;
+		static_accelerator->reset(clds);
+	}
     unsigned int dirc = 0;
     for (const auto& il : lights) {
         const light::Light* const l = il.second.get();
@@ -225,4 +219,13 @@ void gearoenix::render::scene::Scene::update_uniform() noexcept
     }
     uniform.lights_count[0] = static_cast<core::Real>(dirc);
     uniform_buffers->update(&uniform);
+}
+
+std::optional<std::pair<gearoenix::core::Real, gearoenix::physics::collider::Collider*>> gearoenix::render::scene::Scene::hit(const math::Ray3& r, core::Real d_min) const noexcept
+{
+	const auto hs = static_accelerator->hit(r, d_min);
+	const auto d_min_l = std::nullopt == hs ? d_min : hs.value().first;
+	const auto hd = dynamic_accelerator->hit(r, d_min_l);
+	if (std::nullopt == hd) return hs;
+	return hd;
 }

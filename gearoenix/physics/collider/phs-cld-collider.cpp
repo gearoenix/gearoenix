@@ -4,11 +4,6 @@
 #include "../phs-transformation.hpp"
 #include "phs-cld-mesh.hpp"
 
-gearoenix::physics::collider::Collider::Collider(const Type t) noexcept : collider_type(t) {}
-
-gearoenix::physics::collider::Collider::~Collider() {
-    transformation = nullptr;
-}
 
 gearoenix::physics::collider::Collider* gearoenix::physics::collider::Collider::read(system::stream::Stream* const f) noexcept
 {

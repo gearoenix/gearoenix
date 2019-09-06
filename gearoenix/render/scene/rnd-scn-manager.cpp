@@ -23,16 +23,16 @@ void gearoenix::render::scene::Manager::get_gx3d(const core::Id mid, core::sync:
 			GXLOGD("Scene with id: " << mid << " is not cached, it is going to be imported.")
 			system::stream::Stream * const file = cache.get_file();
 			const core::sync::EndCaller<core::sync::EndCallerIgnore> call([c] {});
-			const auto t = file->read<Type::Id>();
+			const auto t = file->read<Type>();
 			switch (t) {
-			case Type::GAME:
+			case Type::Game:
 				GXLOGD("Type of scene is game.")
 				return std::make_shared<Scene>(mid, file, e, call);
-			case Type::UI:
+			case Type::Ui:
 				GXLOGD("Type of scene is ui.")
 				return std::make_shared<Ui>(mid, file, e, call);
 			default:
-				GXLOGF("Unexpected scene type: " << t)
+				GXLOGF("Unexpected scene type: " << static_cast<core::TypeId>(t))
 			}
 		}));
     });

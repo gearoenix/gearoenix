@@ -384,6 +384,7 @@ SET(GX_ENGINE_SRC
         "${GX_ENGINE_SRC_DIR}render/scene/rnd-scn-manager.hpp"
         "${GX_ENGINE_SRC_DIR}render/scene/rnd-scn-scene.cpp"
         "${GX_ENGINE_SRC_DIR}render/scene/rnd-scn-scene.hpp"
+        "${GX_ENGINE_SRC_DIR}render/scene/rnd-scn-type.cpp"
         "${GX_ENGINE_SRC_DIR}render/scene/rnd-scn-type.hpp"
         "${GX_ENGINE_SRC_DIR}render/scene/rnd-scn-ui.cpp"
         "${GX_ENGINE_SRC_DIR}render/scene/rnd-scn-ui.hpp"

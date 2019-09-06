@@ -35,27 +35,28 @@ private:
     public:
         virtual ~Node() noexcept = default;
         virtual std::string to_string() const noexcept;
-        virtual std::optional<core::Real> hit(const math::Ray3& r, core::Real d_min) const noexcept;
+        virtual std::optional<std::pair<core::Real, collider::Collider*>> hit(const math::Ray3& r, core::Real d_min) const noexcept;
     };
 
     class LeafNode : public Node {
-        GX_GET_REF_PRV(std::vector<const collider::Collider*>, colliders)
+        GX_GET_REF_PRV(std::vector<collider::Collider*>, colliders)
     public:
-        LeafNode(const std::vector<const collider::Collider*>& colliders, const math::Aabb3& volume) noexcept : 
+        LeafNode(const std::vector<collider::Collider*>& colliders, const math::Aabb3& volume) noexcept : 
             Node(Type::LEAF, volume), colliders(colliders) {}
-        std::optional<core::Real> hit(const math::Ray3& r, core::Real d_min) const noexcept final;
+        std::optional<std::pair<core::Real, collider::Collider*>> hit(const math::Ray3& r, core::Real d_min) const noexcept final;
 		std::string to_string() const noexcept final;
 	};
 
     class InternalNode : public Node {
         GX_GET_UPTR_PRV(Node, left)
         GX_GET_UPTR_PRV(Node, right)
+
     private:
-        void init(const std::vector<const collider::Collider*>& colliders) noexcept;
+        void init(const std::vector<collider::Collider*>& colliders) noexcept;
     public:
-        InternalNode(const std::vector<const collider::Collider*> &colliders) noexcept;
-        InternalNode(const std::vector<const collider::Collider*> &colliders, const math::Aabb3& volume) noexcept;
-        std::optional<core::Real> hit(const math::Ray3& r, core::Real d_min) const noexcept final;
+        InternalNode(const std::vector<collider::Collider*> &colliders) noexcept;
+        InternalNode(const std::vector<collider::Collider*> &colliders, const math::Aabb3& volume) noexcept;
+        std::optional<std::pair<core::Real, collider::Collider*>> hit(const math::Ray3& r, core::Real d_min) const noexcept final;
 		std::string to_string() const noexcept final;
     };
 
@@ -63,8 +64,8 @@ private:
 public:
     Bvh() noexcept = default;
     ~Bvh() noexcept = default;
-    void reset(const std::vector<const collider::Collider*> &colliders) noexcept;
-    std::optional<core::Real> hit(const math::Ray3& r, core::Real d_min) const noexcept;
+    void reset(const std::vector<collider::Collider*> &colliders) noexcept;
+    std::optional<std::pair<core::Real, collider::Collider*>> hit(const math::Ray3& r, core::Real d_min) const noexcept;
 	std::string to_string() const noexcept;
 };
 }

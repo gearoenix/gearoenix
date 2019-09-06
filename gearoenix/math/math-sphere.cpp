@@ -23,10 +23,11 @@ void gearoenix::math::Sphere::insert(const gearoenix::core::Real r) noexcept
 std::optional<gearoenix::core::Real> gearoenix::math::Sphere::hit(const math::Ray3& r) const noexcept
 {
     const auto dir = position - r.get_origin();
+	const auto dir2 = dir.square_length();
+	if (dir2 <= radius2) return std::nullopt;
     const auto dis = r.get_normalized_direction().dot(dir);
-    if(dis <= radius) return std::nullopt;
+	if (dis <= 0.0f) return std::nullopt;
     const auto dis2 = dis * dis;
-    const auto dir2 = dir.dot(dir);
     const auto a2 = dir2 - dis2;
     if(radius2 <= a2) return std::nullopt;
     return dis - std::sqrtf(radius2 - a2);

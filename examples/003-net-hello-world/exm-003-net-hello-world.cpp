@@ -2,7 +2,9 @@
 #include <gearoenix/core/asset/cr-asset-manager.hpp>
 #include <gearoenix/core/event/cr-ev-sys-system.hpp>
 #include <gearoenix/core/event/cr-ev-ui-ui.hpp>
+#include <gearoenix/core/event/cr-ev-engine.hpp>
 #include <gearoenix/physics/body/phs-bd-rigid.hpp>
+#include <gearoenix/physics/collider/phs-cld-sphere.hpp>
 #include <gearoenix/physics/constraint/phs-cns-tracker-spring-joint-spring.hpp>
 #include <gearoenix/render/camera/rnd-cmr-camera.hpp>
 #include <gearoenix/render/camera/rnd-cmr-manager.hpp>
@@ -42,6 +44,7 @@ using GxReal = gearoenix::core::Real;
 using GxDirLight = gearoenix::render::light::Directional;
 using GxLtManager = gearoenix::render::light::Manager;
 using GxPersCam = gearoenix::render::camera::Perspective;
+using GxCldSphere = gearoenix::physics::collider::Sphere;
 
 struct ShelfInfo {
 	std::uniform_real_distribution<GxReal> rand_genx;
@@ -189,7 +192,10 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
 		},
 	};
 
-    const GxEndCallerIgnored endcall([this] { scn->enable(); });
+    const GxEndCallerIgnored endcall([this] { 
+		scn->set_enability(true);
+		system_application->get_event_engine()->add_listner(gearoenix::core::event::Id::ButtonMouse, 1.0f, this);
+	});
     GxEndCaller<GxScene> scncall([endcall](std::shared_ptr<GxScene>) {});
     GxEndCaller<GxMesh> mshcall([endcall](std::shared_ptr<GxMesh>) {});
     GxEndCaller<GxModel> mdlcall([endcall](std::shared_ptr<GxModel>) {});
@@ -198,7 +204,7 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
     gearoenix::core::asset::Manager* const astmgr = sys_app->get_asset_manager();
     scn = astmgr->get_scene_manager()->create<GxScene>(scncall);
 
-    std::shared_ptr<GxPersCam> cam = astmgr->get_camera_manager()->create<GxPersCam>();
+    cam = astmgr->get_camera_manager()->create<GxPersCam>();
     camtrn = std::static_pointer_cast<GxCamTran>(cam->get_transformation());
     camtrn->look_at(GxVec3(20.0f, 20.0f, 10.0f), GxVec3(0.0f, 0.0f, 0.0f), GxVec3(0.0f, 0.0f, 1.0f));
     scn->add_camera(cam);
@@ -233,27 +239,32 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
         mat->set_color(0.0f, 0.999f, 0.0f, endcall);
         const std::shared_ptr<GxModel> mdl = mdlmgr->create<GxModel>(mdlcall);
         mdl->add_mesh(std::make_shared<GxMdMesh>(plate_mesh, mat));
-        auto &trans = mdl->get_transformation();
-        trans->set_location(GxVec3(0.0f, 0.0f, -5.0f));
+        auto *trans = mdl->get_transformation();
+        trans->set_location(GxVec3(0.0f, 0.0f, 0.0f));
         trans->local_scale(14.0f);
-        scn->add_model(mdl);
+        //scn->add_model(mdl);
     }
-	for (auto& s : shelves_info)
+/*	for (auto& s : shelves_info)
 	{
 		const int items_count = rand_gen3(rand_eng);
-		for (int i = 0; i < items_count; ++i) {
+		for (int i = 0; i < items_count; ++i)*/ 
+		{
 			const std::shared_ptr<GxMaterial> mat(new GxMaterial(render_engine, endcall));
 			mat->set_roughness_factor(rand_gen2(rand_eng));
 			mat->set_metallic_factor(rand_gen2(rand_eng));
 			mat->set_color(rand_gen2(rand_eng), rand_gen2(rand_eng), rand_gen2(rand_eng), endcall);
 			const std::shared_ptr<GxModel> mdl = mdlmgr->create<GxModel>(mdlcall);
 			mdl->add_mesh(std::make_shared<GxMdMesh>(msh, mat));
-			auto& tran = mdl->get_transformation();
-			tran->set_location(GxVec3(s.rand_genx(rand_eng), s.y, s.rand_genz(rand_eng)));
-			tran->local_scale(rand_gen1(rand_eng));
+			auto* tran = mdl->get_transformation();
+			//const GxVec3 position(s.rand_genx(rand_eng), s.y, s.rand_genz(rand_eng));
+			const GxVec3 position(0.0f, 0.0f, 15.0f);
+			//const auto scale = rand_gen1(rand_eng);
+			tran->set_location(position);
+			//tran->local_scale(scale);
+			mdl->set_collider(std::make_unique<GxCldSphere>(position, 1.0f));
 			scn->add_model(mdl);
 		}
-	}
+	//}
     /*{
 		const std::shared_ptr<GxMaterial> mat(new GxMaterial(rnd_eng.get(), endcall));
 		mat->set_roughness_factor(0.5f);
@@ -269,7 +280,7 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
 
 void GameApp::update() noexcept
 {
-    camtrn->global_rotate(render_engine->get_delta_time() * 0.1f, GxVec3(0.0f, 0.0f, 1.0f));
+    //camtrn->global_rotate(render_engine->get_delta_time() * 0.1f, GxVec3(0.0f, 0.0f, 1.0f));
 }
 
 void GameApp::terminate() noexcept
@@ -277,6 +288,41 @@ void GameApp::terminate() noexcept
     gearoenix::core::Application::terminate();
     scn = nullptr;
     camtrn = nullptr;
+}
+
+bool GameApp::on_event(const gearoenix::core::event::Data& event_data) noexcept
+{
+	switch (event_data.source)
+	{
+	case gearoenix::core::event::Id::ButtonMouse:
+	{
+		const auto d = std::get<gearoenix::core::event::button::Data>(event_data.data);
+		if (d.key == gearoenix::core::event::button::KeyId::Left) {
+			const auto ray = cam->create_ray3(d.x, d.y);
+			auto &models = scn->get_models();
+			for (auto &m : models) {
+				auto* cld = m.second->get_collider();
+				if (cld == nullptr) continue;
+				auto h = cld->hit(ray, std::numeric_limits<gearoenix::core::Real>::max());
+				if (h.has_value()) {
+					m.second->get_meshes().begin()->second->get_material()->set_color(0.0f, 0.0f, 0.0f, GxEndCallerIgnored([] {}));
+					return false;
+				}
+			}
+			/*auto hit = scn->hit(ray, std::numeric_limits<gearoenix::core::Real>::max());
+			if (hit.has_value()) {
+				auto* cld = hit.value().second;
+				auto* mdl = cld->get_parent();
+				mdl->get_meshes().begin()->second->get_material()->set_color(0.0f, 0.0f, 0.0f, GxEndCallerIgnored([] {}));
+			}*/
+		}
+			
+		break;
+	}
+	default:
+		break;
+	}
+	return false;
 }
 
 GEAROENIX_START(GameApp)

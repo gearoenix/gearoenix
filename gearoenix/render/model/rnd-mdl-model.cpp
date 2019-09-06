@@ -15,9 +15,6 @@
 #include "../pipeline/rnd-pip-manager.hpp"
 #include "../scene/rnd-scn-scene.hpp"
 #include "../widget/rnd-wdg-widget.hpp"
-#include "rnd-mdl-manager.hpp"
-#include "rnd-mdl-mesh.hpp"
-#include "rnd-mdl-transformation.hpp"
 #include <iostream>
 
 gearoenix::render::model::Model::Model(
@@ -27,8 +24,9 @@ gearoenix::render::model::Model::Model(
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : core::asset::Asset(my_id, core::asset::Type::MODEL)
     , e(e)
-    , uniform_buffers(std::make_shared<buffer::FramedUniform>(static_cast<unsigned int>(sizeof(Uniform)), e))
+    , uniform_buffers(new buffer::FramedUniform(static_cast<unsigned int>(sizeof(Uniform)), e))
     , transformation(new Transformation(&uniform, &occlusion_sphere))
+	, occlusion_sphere(math::Vec3(0.0f, 0.0f, 0.0f), 1.0f)
 {
     uniform.m.read(f);
     const auto meshes_count = f->read<core::Count>();
@@ -43,8 +41,9 @@ gearoenix::render::model::Model::Model(
     const core::sync::EndCaller<core::sync::EndCallerIgnore>&) noexcept
     : core::asset::Asset(my_id, core::asset::Type::MODEL)
     , e(e)
-    , uniform_buffers(std::make_shared<buffer::FramedUniform>(static_cast<unsigned int>(sizeof(Uniform)), e))
+    , uniform_buffers(new buffer::FramedUniform(static_cast<unsigned int>(sizeof(Uniform)), e))
     , transformation(new Transformation(&uniform, &occlusion_sphere))
+	, occlusion_sphere(math::Vec3(0.0f, 0.0f, 0.0f), 1.0f)
 {
 }
 
@@ -69,54 +68,10 @@ void gearoenix::render::model::Model::add_child(const std::shared_ptr<Model>&c) 
     children[c->get_asset_id()] = c;
 }
 
-bool gearoenix::render::model::Model::is_enabled() const noexcept
+void gearoenix::render::model::Model::set_collider(std::unique_ptr<physics::collider::Collider> c) noexcept
 {
-    return enabled;
-}
-
-void gearoenix::render::model::Model::enable() noexcept
-{
-    enabled = true;
-}
-
-void gearoenix::render::model::Model::disable() noexcept
-{
-    enabled = false;
-}
-
-const std::map<gearoenix::core::Id, std::shared_ptr<gearoenix::render::model::Model>>& gearoenix::render::model::Model::get_children() const noexcept
-{
-    return children;
-}
-
-const std::map<gearoenix::core::Id, std::shared_ptr<gearoenix::render::model::Mesh>>& gearoenix::render::model::Model::get_meshes() const noexcept
-{
-    return meshes;
-}
-
-const std::shared_ptr<gearoenix::physics::collider::Collider>& gearoenix::render::model::Model::get_collider() const noexcept
-{
-    return collider;
-}
-
-const std::shared_ptr<gearoenix::render::buffer::FramedUniform>& gearoenix::render::model::Model::get_uniform_buffers() const noexcept
-{
-    return uniform_buffers;
-}
-
-const std::shared_ptr<gearoenix::render::model::Transformation>& gearoenix::render::model::Model::get_transformation() const noexcept
-{
-    return transformation;
-}
-
-const gearoenix::math::Sphere& gearoenix::render::model::Model::get_occlusion_sphere() const noexcept
-{
-    return occlusion_sphere;
-}
-
-bool gearoenix::render::model::Model::get_has_shadow_caster() const noexcept
-{
-    return has_shadow_caster;
+	collider = std::move(c);
+	collider->set_parent(this);
 }
 
 const gearoenix::math::Mat4x4& gearoenix::render::model::Model::get_model_matrix() const noexcept

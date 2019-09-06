@@ -12,7 +12,7 @@
 
 void gearoenix::render::camera::Perspective::update_fovy() noexcept
 {
-    fovy = static_cast<core::Real>(std::atan(static_cast<double>(tany))) * 2.0f;
+    fovy = std::atanf(tany) * 2.0f;
     update_projection();
     lambda = static_cast<core::Real>(
                  std::sin(static_cast<double>(fovx) * 0.5) + std::sin(static_cast<double>(fovy) * 0.5))
@@ -91,8 +91,8 @@ void gearoenix::render::camera::Perspective::update_cascades() noexcept
 void gearoenix::render::camera::Perspective::update_projection() noexcept
 {
     uniform->projection = math::Mat4x4::perspective(
-        tanx * -uniform->near * 2.0f,
-        tany * -uniform->near * 2.0f,
+        tanx * uniform->near * -2.0f,
+        tany * uniform->near * -2.0f,
         -uniform->near,
         -uniform->far);
     uniform->uniform_projection = math::Mat4x4(
@@ -135,7 +135,7 @@ void gearoenix::render::camera::Perspective::set_aspect_ratio(const gearoenix::c
 void gearoenix::render::camera::Perspective::set_field_of_view(const core::Real radian) noexcept
 {
     fovx = radian;
-    tanx = static_cast<core::Real>(std::tan(static_cast<double>(radian) * 0.5));
+    tanx = std::tanf(radian * 0.5f);
     tany = tanx / uniform->aspect_ratio;
     update_fovy();
 }

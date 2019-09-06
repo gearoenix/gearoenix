@@ -164,39 +164,36 @@ int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_
             break;
         }
         break;
-
-#ifdef GX_IN_IOS
     case SDL_FINGERDOWN: {
-        const core::Real x = (e->tfinger.x - 0.5f) * 2.0f * o->screen_ratio;
+        /*const core::Real x = (e->tfinger.x - 0.5f) * 2.0f * o->screen_ratio;
         const core::Real y = (0.5f - e->tfinger.y) * 2.0f;
         event = new core::event::button::Mouse(
             core::event::button::Button::KeyType::LEFT,
             core::event::button::Button::ActionType::PRESS,
             x, y);
         o->pre_x = x;
-        o->pre_y = y;
+        o->pre_y = y;*/
         break;
     }
     case SDL_FINGERUP: {
-        const core::Real x = (e->tfinger.x - 0.5f) * 2.0f * o->screen_ratio;
+        /*const core::Real x = (e->tfinger.x - 0.5f) * 2.0f * o->screen_ratio;
         const core::Real y = (0.5f - e->tfinger.y) * 2.0f;
         event = new core::event::button::Mouse(
             core::event::button::Button::KeyType::LEFT,
             core::event::button::Button::ActionType::RELEASE,
             x, y);
         o->pre_x = x;
-        o->pre_y = y;
+        o->pre_y = y;*/
         break;
     }
     case SDL_FINGERMOTION: {
-        const core::Real x = (e->tfinger.x - 0.5f) * 2.0f * o->screen_ratio;
+       /* const core::Real x = (e->tfinger.x - 0.5f) * 2.0f * o->screen_ratio;
         const core::Real y = (0.5f - e->tfinger.y) * 2.0f;
         event = new core::event::movement::Mouse(x, y, o->pre_x, o->pre_y);
         o->pre_x = x;
-        o->pre_y = y;
+        o->pre_y = y;*/
         break;
     }
-#endif
 
     case SDL_MOUSEWHEEL:
         // todo
@@ -211,29 +208,36 @@ int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_
         break;
     }
     case SDL_MOUSEBUTTONUP:
-    case SDL_MOUSEBUTTONDOWN: {
-        //core::event::button::Button::ActionType a = core::event::button::Button::ActionType::PRESS;
-        switch (e->type) {
-        case SDL_MOUSEBUTTONUP:
-            //a = core::event::button::Button::ActionType::RELEASE;
-            break;
-        default:
-            break;
-        }
-        //core::event::button::Button::KeyType k = core::event::button::Button::KeyType::LEFT;
-        switch (e->button.button) {
-        case SDL_BUTTON_RIGHT:
-            //k = core::event::button::Button::KeyType::RIGHT;
-            break;
-        case SDL_BUTTON_MIDDLE:
-            //k = core::event::button::Button::KeyType::MIDDLE;
-            break;
-        default:
-            break;
-        }
-        const core::Real x = o->convert_x_to_ratio(e->button.x);
-        const core::Real y = o->convert_y_to_ratio(e->button.y);
-        //event = new core::event::button::Mouse(k, a, x, y);
+	case SDL_MOUSEBUTTONDOWN: {
+		core::event::button::Data d;
+		d.action = [&] () noexcept {
+			switch (e->type) {
+			case SDL_MOUSEBUTTONUP:
+				return core::event::button::ActionId::Release;
+			case SDL_MOUSEBUTTONDOWN:
+				return core::event::button::ActionId::Press;
+			default:
+				return core::event::button::ActionId::Press;
+			} 
+		} ();
+		d.key = [&] () noexcept {
+			switch (e->button.button) {
+			case SDL_BUTTON_LEFT:
+				return core::event::button::KeyId::Left;
+			case SDL_BUTTON_RIGHT:
+				return core::event::button::KeyId::Right;
+			case SDL_BUTTON_MIDDLE:
+				return core::event::button::KeyId::Middle;
+			default:
+				GXLOGE("Unhandled mouse button, left button returned instead.")
+				return core::event::button::KeyId::Left;
+			}
+		} ();
+		d.x = o->convert_x_to_ratio(e->button.x);
+        d.y = o->convert_y_to_ratio(e->button.y);
+
+		event.source = core::event::Id::ButtonMouse;
+		event.data = d;
         break;
     }
     case SDL_MULTIGESTURE:
@@ -253,7 +257,7 @@ int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_
             d.cur_width = static_cast<core::Real>(e->window.data1);
             d.cur_height = static_cast<core::Real>(e->window.data2);
             event.data = d;
-            event.source = core::event::Id::SYSTEM_WINDOW_SIZE_CHANGE;
+            event.source = core::event::Id::SystemWindowSizeChange;
             o->window_width = static_cast<unsigned int>(e->window.data1);
             o->window_height = static_cast<unsigned int>(e->window.data2);
             o->window_ratio = static_cast<core::Real>(o->window_width) / static_cast<core::Real>(o->window_height);
@@ -269,7 +273,7 @@ int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_
         GXLOGE("Unhandled event " << e->type)
         break;
     }
-    if (event.source != core::event::Id::UNINITIALIZED) {
+    if (event.source != core::event::Id::None) {
         o->event_engine->braodcast(event);
     }
     return 1;

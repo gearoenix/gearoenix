@@ -44,7 +44,7 @@ using GxPersCam = gearoenix::render::camera::Perspective;
 GameApp::GameApp(gearoenix::system::Application * const sys_app) noexcept
     : gearoenix::core::Application::Application(sys_app)
 {
-    const GxEndCallerIgnored endcall([this] { scn->enable(); });
+    const GxEndCallerIgnored endcall([this] { scn->set_enability(true); });
     GxEndCaller<GxScene> scncall([endcall](std::shared_ptr<GxScene>) {});
     GxEndCaller<GxMesh> mshcall([endcall](std::shared_ptr<GxMesh>) {});
     GxEndCaller<GxModel> mdlcall([endcall](std::shared_ptr<GxModel>) {});
@@ -88,7 +88,7 @@ GameApp::GameApp(gearoenix::system::Application * const sys_app) noexcept
         mat->set_color(0.0f, 0.999f, 0.0f, endcall);
         const std::shared_ptr<GxModel> mdl = mdlmgr->create<GxModel>(mdlcall);
         mdl->add_mesh(std::make_shared<GxMdMesh>(plate_mesh, mat));
-        auto &trans = mdl->get_transformation();
+        auto *trans = mdl->get_transformation();
         trans->set_location(GxVec3(0.0f, 0.0f, -5.0f));
         trans->local_scale(14.0f);
         scn->add_model(mdl);

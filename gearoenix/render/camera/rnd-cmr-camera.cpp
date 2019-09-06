@@ -26,7 +26,7 @@ gearoenix::render::camera::Camera::Camera(const core::Id my_id, engine::Engine* 
     uniform->aspect_ratio = sys_app->get_window_ratio();
     uniform->clip_width = static_cast<core::Real>(sys_app->get_window_width());
     uniform->clip_height = static_cast<core::Real>(sys_app->get_window_height());
-    sys_app->get_event_engine()->add_listner(core::event::Id::SYSTEM_WINDOW_SIZE_CHANGE, 1.0f, this);
+    sys_app->get_event_engine()->add_listner(core::event::Id::SystemWindowSizeChange, 1.0f, this);
 }
 
 gearoenix::render::camera::Camera::Camera(
@@ -46,7 +46,7 @@ gearoenix::render::camera::Camera::Camera(
     uniform->aspect_ratio = sys_app->get_window_ratio();
     uniform->clip_width = static_cast<core::Real>(sys_app->get_window_width());
     uniform->clip_height = static_cast<core::Real>(sys_app->get_window_height());
-    sys_app->get_event_engine()->add_listner(core::event::Id::SYSTEM_WINDOW_SIZE_CHANGE, 1.0f, this);
+    sys_app->get_event_engine()->add_listner(core::event::Id::SystemWindowSizeChange, 1.0f, this);
     uniform->position.read(f);
     math::Quat q;
     f->read(q.w);
@@ -68,7 +68,7 @@ gearoenix::render::camera::Camera::Camera(
 
 gearoenix::render::camera::Camera::~Camera() noexcept
 {
-    e->get_system_application()->get_event_engine()->remove_listner(core::event::Id::SYSTEM_WINDOW_SIZE_CHANGE, this);
+    e->get_system_application()->get_event_engine()->remove_listner(core::event::Id::SystemWindowSizeChange, this);
 }
 
 const std::shared_ptr<gearoenix::render::buffer::FramedUniform>& gearoenix::render::camera::Camera::get_uniform_buffers() const
@@ -127,7 +127,7 @@ bool gearoenix::render::camera::Camera::on_event(const core::event::Data& d) noe
     const auto* sys_app = e->get_system_application();
     switch (d.source)
     {
-    case core::event::Id::SYSTEM_WINDOW_SIZE_CHANGE:
+    case core::event::Id::SystemWindowSizeChange:
         uniform->clip_width = static_cast<core::Real>(sys_app->get_window_width());
         uniform->clip_height = static_cast<core::Real>(sys_app->get_window_height());
         set_aspect_ratio(sys_app->get_window_ratio());

@@ -2,12 +2,15 @@
 #define GEAROENIX_RENDER_SCENE_SCENE_HPP
 #include "../../core/asset/cr-asset.hpp"
 #include "../../core/cr-build-configuration.hpp"
+#include "../../core/cr-static.hpp"
 #include "../../core/sync/cr-sync-end-caller.hpp"
 #include "rnd-scn-type.hpp"
 #include "rnd-scn-uniform.hpp"
 #include <map>
 #include <memory>
 #include <vector>
+#include <set>
+#include <optional>
 
 namespace gearoenix {
 namespace audio {
@@ -18,12 +21,21 @@ namespace core {
         class Event;
     }
 }
+namespace math {
+	struct Ray3;
+}
 namespace physics {
     class Kernel;
+	namespace accelerator {
+		class Bvh;
+	}
     namespace body {
         class Body;
         class Rigid;
     }
+	namespace collider {
+		class Collider;
+	}
     namespace constraint {
         class Constraint;
     }
@@ -62,57 +74,56 @@ namespace render {
     }
     namespace scene {
         class Scene : public core::asset::Asset {
+		public:
+			using MapAudio = std::map<core::Id, std::shared_ptr<audio::Audio>>;
+			using MapCamera = std::map<core::Id, std::shared_ptr<camera::Camera>>;
+			using MapConstraint = std::map<core::Id, std::shared_ptr<physics::constraint::Constraint>>;
+			using MapLight = std::map<core::Id, std::shared_ptr<light::Light>>;
+			using MapModel = std::map<core::Id, std::shared_ptr<model::Model>>;
+
+			GX_GET_CVAL_PRT(Type, scene_type_id)
+			GX_GETSET_VAL_PRT(bool, enability, false)
+			GX_GETSET_VAL_PRT(bool, static_colliders_changed, false)
+			GX_GET_UCPTR_PRT(buffer::FramedUniform, uniform_buffers)
+			GX_GET_UCPTR_PRT(physics::accelerator::Bvh, static_accelerator)
+			GX_GET_UCPTR_PRT(physics::accelerator::Bvh, dynamic_accelerator)
+			GX_GET_CREF_PRT(MapAudio, audios)
+			GX_GET_CREF_PRT(MapCamera, cameras)
+			GX_GET_CREF_PRT(MapConstraint, constraints)
+			GX_GET_CREF_PRT(MapLight, lights)
+			GX_GET_CREF_PRT(MapModel, models)
+			GX_GET_CREF_PRT(std::set<physics::collider::Collider*>, static_colliders)
+			GX_GET_CREF_PRT(std::set<physics::collider::Collider*>, dynamic_colliders)
+			GX_GET_CREF_PRT(std::shared_ptr<skybox::Skybox>, skybox)
         protected:
             engine::Engine* const e;
-            const Type::Id scene_type_id;
-            const std::shared_ptr<buffer::FramedUniform> uniform_buffers;
-
-            bool enabled = false;
-
             Uniform uniform;
 
-            std::map<core::Id, std::shared_ptr<camera::Camera>> cameras;
-            std::map<core::Id, std::shared_ptr<audio::Audio>> audios;
-            std::map<core::Id, std::shared_ptr<light::Light>> lights;
-            std::map<core::Id, std::shared_ptr<model::Model>> models;
-            std::map<core::Id, std::shared_ptr<physics::constraint::Constraint>> constraints;
-            std::shared_ptr<skybox::Skybox> skybox;
-
         public:
-            /// It's going to read itself from gx3d stream.
             Scene(
                 const core::Id my_id, system::stream::Stream* f, engine::Engine* e,
                 const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
-
             Scene(
                 const core::Id my_id, engine::Engine* e,
                 const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
-
             virtual ~Scene() noexcept;
-
-            void enable() noexcept;
-            void disable() noexcept;
-            bool is_enabled() const noexcept;
 
 #define GX_HELPER(x, c)                                                      \
     void add_##x(const std::shared_ptr<c>& m) noexcept;                      \
-    const std::shared_ptr<c>& get_##x(const core::Id x##_id) const noexcept; \
-    const std::map<core::Id, std::shared_ptr<c>>& get_##x##s() const noexcept
+    const std::shared_ptr<c>& get_##x(const core::Id x##_id) const noexcept;
 
-            GX_HELPER(camera, camera::Camera);
-            GX_HELPER(audio, audio::Audio);
-            GX_HELPER(light, light::Light);
-            GX_HELPER(model, model::Model);
-            GX_HELPER(constraint, physics::constraint::Constraint);
+            GX_HELPER(camera, camera::Camera)
+            GX_HELPER(audio, audio::Audio)
+            GX_HELPER(light, light::Light)
+            GX_HELPER(model, model::Model)
+            GX_HELPER(constraint, physics::constraint::Constraint)
 
 #undef GX_HELPER
 
-            void set_skybox(const std::shared_ptr<skybox::Skybox>& s) noexcept;
-            const std::shared_ptr<model::Model>& get_skybox(const core::Id skybox_id) const noexcept;
+            void set_skybox(std::shared_ptr<skybox::Skybox> s) noexcept;
 
-            const std::shared_ptr<buffer::FramedUniform>& get_uniform_buffers() const noexcept;
-
-            void update_uniform() noexcept;
+            void update() noexcept;
+			std::optional<std::pair<core::Real, physics::collider::Collider*>> hit(const math::Ray3& r, core::Real d_min) const noexcept;
         };
     }
 }

@@ -38,11 +38,11 @@ namespace pipeline {
     protected:
         /// It is not owner of any of these objects
 
-        buffer::Uniform* scene_uniform_buffer = nullptr;
-        buffer::Uniform* camera_uniform_buffer = nullptr;
-        buffer::Uniform* model_uniform_buffer = nullptr;
-        buffer::Uniform* material_uniform_buffer = nullptr;
-        buffer::Uniform* node_uniform_buffer = nullptr;
+        const buffer::Uniform* scene_uniform_buffer = nullptr;
+        const buffer::Uniform* camera_uniform_buffer = nullptr;
+        const buffer::Uniform* model_uniform_buffer = nullptr;
+        const buffer::Uniform* material_uniform_buffer = nullptr;
+        const buffer::Uniform* node_uniform_buffer = nullptr;
 
         const mesh::Mesh* msh = nullptr;
 
