@@ -143,18 +143,11 @@ const std::shared_ptr<gearoenix::render::light::Light>& gearoenix::render::scene
 
 void gearoenix::render::scene::Scene::add_model(const std::shared_ptr<model::Model>& m) noexcept
 {
-    const core::Id mid = m->get_asset_id();
-#ifdef GX_DEBUG_MODE
-    if (models.find(mid) != models.end()) {
-        GXLOGE("Error overriding of a model with same Id: " << mid)
-    }
-#endif // GX_DEBUG_MODE
-    models[mid] = m;
 	std::function<void(const std::shared_ptr<model::Model>&)> travm = [&travm, this](const std::shared_ptr<model::Model>& mdl) noexcept {
 		auto cld = mdl->get_collider();
 		if (cld != nullptr)
 		{
-			if (mdl->get_dynamicity()) {
+			if (mdl->get_dynamicity() == core::State::Set) {
 				dynamic_colliders.insert(cld);
 			} else {
 				static_colliders.insert(cld);
@@ -162,6 +155,13 @@ void gearoenix::render::scene::Scene::add_model(const std::shared_ptr<model::Mod
 			}
 		}
 		auto& children = mdl->get_children();
+		const core::Id mid = mdl->get_asset_id();
+#ifdef GX_DEBUG_MODE
+		if (models.find(mid) != models.end()) {
+			GXLOGE("Error overriding of a model with same Id: " << mid)
+		}
+#endif // GX_DEBUG_MODE
+		models[mid] = mdl;
 		for (auto& c : children)
 			travm(c.second);
 	};
@@ -201,6 +201,7 @@ const std::shared_ptr<gearoenix::physics::constraint::Constraint>& gearoenix::re
 void gearoenix::render::scene::Scene::update() noexcept
 {
 	if (static_colliders_changed) {
+		static_colliders_changed = false;
 		std::vector<physics::collider::Collider*> clds(static_colliders.size());
 		std::size_t i = 0;
 		for (auto c : static_colliders) clds[i++] = c;

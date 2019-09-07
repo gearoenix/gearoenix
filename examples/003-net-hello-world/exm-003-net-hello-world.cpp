@@ -272,7 +272,8 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
 	}
 
     modal = mdlmgr->create<GxModal>(mdacall);
-    modal->set_enability(false);
+    modal->set_enability(gearoenix::core::State::Unset);
+	modal->get_children().begin()->second->set_enability(gearoenix::core::State::Unset);
     uiscn->add_model(modal);
 }
 
@@ -303,7 +304,8 @@ bool GameApp::on_event(const gearoenix::core::event::Data& event_data) noexcept
 				auto* mdl = cld->get_parent();
                 static float cx = 0.0f, cy = 0.0f, cz = 0.0f; cx = 1.0f - cx; cy = 1.0f - cy; cz = 1.0f - cz;
                 mdl->get_meshes().begin()->second->get_material()->set_color(cx, cy, cz, GxEndCallerIgnored([] {}));
-                modal->set_enability(true);
+                modal->set_enability(gearoenix::core::State::Set);
+				modal->get_children().begin()->second->set_enability(gearoenix::core::State::Set);
 			}
 		}
 			

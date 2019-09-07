@@ -276,15 +276,8 @@ void gearoenix::render::graph::node::ForwardPbr::record(const unsigned int kerne
     task_number %= kernels_count;    \
     }
 
-    std::function<void(model::Model *const mdl)> travm = [&](model::Model * const mdl) noexcept {
-        GX_DO_TASK(record(mdl, kernel_index))
-        auto& children = mdl->get_children();
-        for (auto& c : children)
-            travm(c.second.get());
-    };
-
     for (auto* m : *seen_models) {
-        travm(m);
+		GX_DO_TASK(record(m, kernel_index))
     }
 
 #undef GX_DO_TASK

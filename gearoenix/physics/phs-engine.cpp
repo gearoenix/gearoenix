@@ -48,7 +48,7 @@ void gearoenix::physics::Engine::update_001_kernel(const unsigned int kernel_ind
         const std::map<core::Id, std::shared_ptr<render::light::Light>>& lights = scene->get_lights();
         for (const auto& id_model : models) {
             const auto& model = id_model.second;
-            if (model->get_enability())
+            if (model->get_enability() == core::State::Set)
                 GX_DO_TASK(model->update_uniform());
         }
         for (const std::pair<const core::Id, std::shared_ptr<render::camera::Camera>>& id_camera : cameras) {
@@ -88,13 +88,14 @@ void gearoenix::physics::Engine::update_001_kernel(const unsigned int kernel_ind
             }
             for (const std::pair<const core::Id, std::shared_ptr<render::model::Model>>& id_model : models) {
                 const std::shared_ptr<render::model::Model>& model = id_model.second;
-                if (!model->get_enability())
+                if (model->get_enability() != core::State::Set)
                     continue;
                 GX_DO_TASK(
                     const math::Sphere& sphere = model->get_occlusion_sphere();
                     if (camera->in_sight(sphere.get_position(), sphere.get_radius())) {
                         current_visible_models.push_back(model.get());
-                    });
+                    }
+				);
             }
         }
     }
@@ -138,7 +139,7 @@ void gearoenix::physics::Engine::update_002_kernel(const unsigned int kernel_ind
                 auto* cas = lc.second;
                 for (auto& im : models) {
                     auto& m = im.second;
-                    if (!m->get_enability() || !m->get_has_shadow_caster())
+                    if (m->get_enability() != core::State::Set || !m->get_has_shadow_caster())
                         continue;
                     GX_DO_TASK(cas->shadow(m.get(), task_number));
                 }

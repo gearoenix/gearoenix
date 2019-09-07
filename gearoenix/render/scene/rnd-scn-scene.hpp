@@ -82,6 +82,7 @@ namespace render {
 			using MapModel = std::map<core::Id, std::shared_ptr<model::Model>>;
 
 			GX_GET_CVAL_PRT(Type, scene_type_id)
+			GX_GETSET_VAL_PRT(core::Real, layer, 0.0f)
 			GX_GETSET_VAL_PRT(bool, enability, false)
 			GX_GETSET_VAL_PRT(bool, static_colliders_changed, false)
 			GX_GET_UCPTR_PRT(buffer::FramedUniform, uniform_buffers)

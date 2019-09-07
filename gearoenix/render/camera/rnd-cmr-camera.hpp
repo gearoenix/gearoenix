@@ -3,6 +3,7 @@
 #include "../../core/asset/cr-asset.hpp"
 #include "../../core/event/cr-ev-listner.hpp"
 #include "../../math/math-ray.hpp"
+#include "../../core/cr-static.hpp"
 #include <array>
 #include <memory>
 #include <vector>
@@ -33,6 +34,7 @@ namespace render {
         class Transformation;
         struct Uniform;
         class Camera : public core::asset::Asset, public core::event::Listner {
+			GX_GETSET_VAL_PRT(core::Real, layer, 0.0f)
         protected:
             bool enabled = true;
             engine::Engine* const e;

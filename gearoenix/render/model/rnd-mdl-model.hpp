@@ -34,8 +34,8 @@ namespace model {
 		GX_GET_CREF_PRT(math::Sphere, occlusion_sphere)
 		GX_GET_VAL_PRT(bool, has_shadow_caster, false)
 		GX_GET_VAL_PRT(bool, has_transparent, false)
-		GX_GETSET_VAL_PRT(bool, dynamicity, false)
-		GX_GETSET_VAL_PRT(bool, enability, true)
+		GX_GETSET_VAL_PRT(core::State, dynamicity, core::State::Unset)
+		GX_GETSET_VAL_PRT(core::State, enability, core::State::Set)
 		GX_GET_CREF_PRT(MapMesh, meshes)
 		GX_GET_CREF_PRT(MapModel, children)
     protected:
