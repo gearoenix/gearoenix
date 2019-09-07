@@ -2,7 +2,7 @@
 #include "../../core/sync/cr-sync-work-waiter.hpp"
 #include "../../system/stream/sys-stm-stream.hpp"
 #include "../engine/rnd-eng-engine.hpp"
-#include "rnd-scn-scene.hpp"
+#include "rnd-scn-game.hpp"
 #include "rnd-scn-ui.hpp"
 #include "rnd-scn-type.hpp"
 #include <utility>
@@ -27,7 +27,7 @@ void gearoenix::render::scene::Manager::get_gx3d(const core::Id mid, core::sync:
 			switch (t) {
 			case Type::Game:
 				GXLOGD("Type of scene is game.")
-				return std::make_shared<Scene>(mid, file, e, call);
+				return std::make_shared<Game>(mid, file, e, call);
 			case Type::Ui:
 				GXLOGD("Type of scene is ui.")
 				return std::make_shared<Ui>(mid, file, e, call);

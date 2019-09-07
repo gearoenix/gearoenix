@@ -20,6 +20,7 @@
 #include <gearoenix/render/model/rnd-mdl-model.hpp>
 #include <gearoenix/render/model/rnd-mdl-transformation.hpp>
 #include <gearoenix/render/scene/rnd-scn-manager.hpp>
+#include <gearoenix/render/scene/rnd-scn-game.hpp>
 #include <gearoenix/render/scene/rnd-scn-scene.hpp>
 #include <gearoenix/system/sys-app.hpp>
 #include <gearoenix/system/sys-log.hpp>
@@ -45,13 +46,13 @@ GameApp::GameApp(gearoenix::system::Application * const sys_app) noexcept
     : gearoenix::core::Application::Application(sys_app)
 {
     const GxEndCallerIgnored endcall([this] { scn->set_enability(true); });
-    GxEndCaller<GxScene> scncall([endcall](std::shared_ptr<GxScene>) {});
+    GxEndCaller<GxGameScene> scncall([endcall](std::shared_ptr<GxGameScene>) {});
     GxEndCaller<GxMesh> mshcall([endcall](std::shared_ptr<GxMesh>) {});
     GxEndCaller<GxModel> mdlcall([endcall](std::shared_ptr<GxModel>) {});
 
     render_engine->set_render_tree(new GxGrPbr(render_engine, endcall));
     gearoenix::core::asset::Manager *const astmgr = sys_app->get_asset_manager();
-    scn = astmgr->get_scene_manager()->create<GxScene>(scncall);
+    scn = astmgr->get_scene_manager()->create<GxGameScene>(scncall);
 
     std::shared_ptr<GxPersCam> cam = astmgr->get_camera_manager()->create<GxPersCam>();
     camtrn = std::static_pointer_cast<GxCamTran>(cam->get_transformation());

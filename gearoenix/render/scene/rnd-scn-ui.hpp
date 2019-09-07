@@ -7,9 +7,12 @@ namespace gearoenix::render::scene {
 class Ui : public Scene {
 protected:
 public:
-	Ui(
-		const core::Id my_id, system::stream::Stream* f, engine::Engine* e,
-		const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+    Ui(
+        const core::Id my_id, system::stream::Stream* f, engine::Engine* e,
+        const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+    Ui(
+        const core::Id my_id, engine::Engine* e,
+        const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
 };
 }
 #endif

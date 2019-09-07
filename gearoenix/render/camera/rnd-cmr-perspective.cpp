@@ -142,7 +142,9 @@ void gearoenix::render::camera::Perspective::set_field_of_view(const core::Real 
 
 gearoenix::math::Ray3 gearoenix::render::camera::Perspective::create_ray3(const core::Real x, const core::Real y) const noexcept
 {
-    math::Vec3 dir = (uniform->x * x) + (uniform->y * y) + (uniform->z * uniform->near);
+    math::Vec3 dir = (uniform->x * (x / uniform->aspect_ratio)) + 
+        (uniform->y * (y / uniform->aspect_ratio)) + 
+        (uniform->z * uniform->near);
     const math::Vec3 origin = dir + uniform->position;
     dir.normalize();
     return math::Ray3(origin, dir);

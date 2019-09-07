@@ -37,7 +37,7 @@ BOOST_AUTO_TEST_CASE(physics_accelerator_bvh)
 
 	GX_TEST_HELPER2(0.0f);
 	GX_TEST_HELPER2(0.89f);
-	GX_TEST_HELPER2(-0.91f);
+	GX_TEST_HELPER2(-0.89f);
 
     cs.push_back(
         std::make_unique<gearoenix::physics::collider::Sphere>(
@@ -56,10 +56,14 @@ BOOST_AUTO_TEST_CASE(physics_accelerator_bvh)
 	bvh.reset(colliders);
     GXLOGD(bvh.to_string());
 
-	GX_TEST_HELPER2(2.0f);
+    GX_TEST_HELPER2(1.11f);
+    GX_TEST_HELPER2(2.00f);
+    GX_TEST_HELPER2(2.89f);
 	GX_TEST_HELPER2(1.0f);
 	GX_TEST_HELPER2(-1.0f);
-	GX_TEST_HELPER2(-2.0f);
+    GX_TEST_HELPER2(-1.11f);
+    GX_TEST_HELPER2(-2.0f);
+    GX_TEST_HELPER2(-2.89f);
 
     cs.push_back(
         std::make_unique<gearoenix::physics::collider::Sphere>(

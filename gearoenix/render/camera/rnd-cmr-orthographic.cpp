@@ -65,10 +65,18 @@ gearoenix::render::camera::Orthographic::Orthographic(
 	update_aspects_size();
 }
 
+gearoenix::render::camera::Orthographic::Orthographic(core::Id my_id, engine::Engine* e) noexcept
+    : Camera(my_id, e)
+    , aspects_size(1.0f)
+{
+    transformation->set_on_frustum_update([this] { update_cascades(); });
+    update_aspects_size();
+}
+
 gearoenix::math::Ray3 gearoenix::render::camera::Orthographic::create_ray3(const core::Real x, const core::Real y) const noexcept
 {
     const math::Vec3 dir = -uniform->z;
-    const math::Vec3 origin = (uniform->x * x) + (uniform->y * y) + (dir * uniform->near) + uniform->position;
+    const math::Vec3 origin = (uniform->x * x) + (uniform->y * y) + (dir * -uniform->near) + uniform->position;
     return math::Ray3(origin, dir);
 }
 

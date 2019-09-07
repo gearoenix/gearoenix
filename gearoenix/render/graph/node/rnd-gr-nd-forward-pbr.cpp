@@ -266,6 +266,7 @@ void gearoenix::render::graph::node::ForwardPbr::record(const unsigned int kerne
 {
     const unsigned int kernels_count = e->get_kernels()->get_threads_count();
     unsigned int task_number = 0;
+
 #define GX_DO_TASK(expr) {           \
     if (task_number == kernel_index) \
     {                                \
@@ -274,9 +275,19 @@ void gearoenix::render::graph::node::ForwardPbr::record(const unsigned int kerne
     ++task_number;                   \
     task_number %= kernels_count;    \
     }
+
+    std::function<void(model::Model *const mdl)> travm = [&](model::Model * const mdl) noexcept {
+        GX_DO_TASK(record(mdl, kernel_index))
+        auto& children = mdl->get_children();
+        for (auto& c : children)
+            travm(c.second.get());
+    };
+
     for (auto* m : *seen_models) {
-        GX_DO_TASK(record(m, kernel_index))
+        travm(m);
     }
+
+#undef GX_DO_TASK
 }
 
 void gearoenix::render::graph::node::ForwardPbr::submit() noexcept

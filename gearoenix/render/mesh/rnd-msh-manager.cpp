@@ -7878,8 +7878,10 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager:
 std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager::create_plate(core::sync::EndCaller<Mesh>& c) noexcept
 {
 
-    if (std::shared_ptr<Mesh> m = plate.lock())
+    if (std::shared_ptr<Mesh> m = plate.lock()) {
+        c.set_data(m);
         return m;
+    }
     std::vector<math::BasicVertex> vertices = {
         math::BasicVertex {
             math::Vec3(-1.f, -1.0f, 0.0f),

@@ -5,32 +5,17 @@
 
 namespace gearoenix::render::widget {
 class Widget : public model::Model {
-public:
-    typedef enum : core::Id {
-        NORMAL,
-        PRESSED,
-    } StateType;
-
-    // This is something internal, it's gonna be used between ui-scene & widget
-    typedef enum : core::Id {
-        PRESS,
-        RELEASE,
-        MOVE_OUT,
-    } EventType;
-
+    GX_GET_CVAL_PRT(Type, widget_type)
 protected:
-    StateType state_type = StateType::NORMAL;
-    // at the end it must send event
-    virtual void press_effect() noexcept;
-    virtual void release_effect() noexcept;
-    virtual void cancel_effect() noexcept;
-
 	Widget(
 		core::Id my_id,
+        Type t,
 		system::stream::Stream* s,
 		engine::Engine* e,
 		const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
 	Widget(
+        core::Id my_id,
+        Type t,
 		engine::Engine* e,
 		const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
 public:
@@ -40,7 +25,6 @@ public:
 		system::stream::Stream* f,
 		engine::Engine* e,
 		const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
-    void state_change(EventType e) noexcept;
 };
 }
 #endif

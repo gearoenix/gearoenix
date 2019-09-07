@@ -9,20 +9,29 @@ class Transformation;
 }
 
 namespace gearoenix::render::scene {
-class Scene;
+class Game;
+class Ui;
+}
+
+namespace gearoenix::render::widget {
+class Modal;
 }
 
 class GameApp : 
 	public gearoenix::core::Application, 
 	public gearoenix::core::event::Listner {
 private:
-    using GxScene = gearoenix::render::scene::Scene;
+    using GxGameScene = gearoenix::render::scene::Game;
+    using GxUiScene = gearoenix::render::scene::Ui;
 	using GxCam = gearoenix::render::camera::Camera;
-	using GxCamTran = gearoenix::render::camera::Transformation;
+    using GxCamTran = gearoenix::render::camera::Transformation;
+    using GxModal = gearoenix::render::widget::Modal;
 
-    std::shared_ptr<GxScene> scn;
+    std::shared_ptr<GxGameScene> scn;
+    std::shared_ptr<GxUiScene> uiscn;
     std::shared_ptr<GxCamTran> camtrn;
 	std::shared_ptr<GxCam> cam;
+    std::shared_ptr<GxModal> modal;
 
 public:
     /// This function must be like this

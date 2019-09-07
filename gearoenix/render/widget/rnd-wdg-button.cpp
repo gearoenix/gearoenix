@@ -134,7 +134,7 @@ gearoenix::render::widget::Button::Button(
     system::stream::Stream* const f,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
-    : Widget(my_id, f, e, c)
+    : Widget(my_id, Type::Button, f, e, c)
 {
 }
 

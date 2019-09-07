@@ -99,13 +99,13 @@ namespace render {
             engine::Engine* const e;
             Uniform uniform;
 
+            Scene(
+                core::Id my_id, Type t, engine::Engine* e,
+                const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+            Scene(
+                core::Id my_id, Type t, system::stream::Stream* f, engine::Engine* e,
+                const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
         public:
-            Scene(
-                const core::Id my_id, system::stream::Stream* f, engine::Engine* e,
-                const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
-            Scene(
-                const core::Id my_id, engine::Engine* e,
-                const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
             virtual ~Scene() noexcept;
 
 #define GX_HELPER(x, c)                                                      \

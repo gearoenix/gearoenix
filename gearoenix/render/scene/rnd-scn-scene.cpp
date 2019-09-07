@@ -35,11 +35,28 @@ static const std::shared_ptr<gearoenix::render::model::Model> null_model = nullp
 static const std::shared_ptr<gearoenix::physics::constraint::Constraint> null_constraint = nullptr;
 
 gearoenix::render::scene::Scene::Scene(
-    const core::Id my_id, system::stream::Stream* const f, engine::Engine* const e,
+    const core::Id my_id,
+    const Type t,
+    engine::Engine* const e,
+    const core::sync::EndCaller<core::sync::EndCallerIgnore>&) noexcept
+    : core::asset::Asset(my_id, core::asset::Type::SCENE)
+    , e(e)
+    , scene_type_id(t)
+    , uniform_buffers(new buffer::FramedUniform(static_cast<const unsigned int>(sizeof(Uniform)), e))
+    , static_accelerator(new gearoenix::physics::accelerator::Bvh())
+    , dynamic_accelerator(new gearoenix::physics::accelerator::Bvh())
+{
+}
+
+gearoenix::render::scene::Scene::Scene(
+    const core::Id my_id, 
+    const Type t,
+    system::stream::Stream* const f, 
+    engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : core::asset::Asset(my_id, core::asset::Type::SCENE)
     , e(e)
-    , scene_type_id(Type::Game)
+    , scene_type_id(t)
     , uniform_buffers(new buffer::FramedUniform(static_cast<const unsigned int>(sizeof(Uniform)), e))
 	, static_accelerator(new gearoenix::physics::accelerator::Bvh())
 	, dynamic_accelerator(new gearoenix::physics::accelerator::Bvh())
@@ -76,19 +93,6 @@ gearoenix::render::scene::Scene::Scene(
     GXLOGD("Number of models is: " << models.size())
     GXLOGD("Number of lights is: " << lights.size())
     GXLOGD("Number of cameras is: " << cameras.size())
-}
-
-gearoenix::render::scene::Scene::Scene(
-    const core::Id my_id,
-    engine::Engine* const e,
-    const core::sync::EndCaller<core::sync::EndCallerIgnore>&) noexcept
-    : core::asset::Asset(my_id, core::asset::Type::SCENE)
-    , e(e)
-    , scene_type_id(Type::Game)
-    , uniform_buffers(new buffer::FramedUniform(static_cast<const unsigned int>(sizeof(Uniform)), e))
-	, static_accelerator(new gearoenix::physics::accelerator::Bvh())
-	, dynamic_accelerator(new gearoenix::physics::accelerator::Bvh())
-{
 }
 
 gearoenix::render::scene::Scene::~Scene() noexcept
