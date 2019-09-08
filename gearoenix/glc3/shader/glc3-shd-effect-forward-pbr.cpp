@@ -290,7 +290,7 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         "    vec2 brdf = texture(effect_brdflut, vec2(normal_dot_view, roughness)).rg;\n"
         "    vec3 specular = prefiltered_color * (frsn * brdf.x + brdf.y);\n"
         //   TODO: add ambient occlusion (* ao);
-        "    vec3 ambient = kd * diffuse + specular;\n"
+        "    vec3 ambient = kd * diffuse + specular + scene_ambient_light * albedo.xyz;\n"
         "    tmpv4.xyz = ambient + lo;\n"
         //   HDR tonemapping
         "    tmpv4.xyz = tmpv4.xyz / (tmpv4.xyz + vec3(1.0));\n"
@@ -320,7 +320,7 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         GX_GLC3_THIS_GET_UNIFORM_F(effect_shadow_caster_directional_lights_count)
         GX_GLC3_THIS_GET_UNIFORM_TEXTURE_F(effect_specular_environment)
         GX_GLC3_THIS_GET_UNIFORM_F(model_m)
-        // GX_GLES2_THIS_GET_UNIFORM_F(scene_ambient_light)
+        GX_GLC3_THIS_GET_UNIFORM_F(scene_ambient_light)
         GX_GLC3_THIS_GET_UNIFORM_F(scene_directional_lights_color)
         GX_GLC3_THIS_GET_UNIFORM_F(scene_directional_lights_direction)
         GX_GLC3_THIS_GET_UNIFORM_F(scene_lights_count)

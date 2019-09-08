@@ -8,13 +8,15 @@ namespace math {
 }
 namespace render::model {
     struct Uniform;
+    class Model;
     class Transformation : public physics::Transformation {
     private:
         Uniform* const uniform;
         math::Sphere* const sphere;
+        Model* parent;
 
     public:
-        Transformation(Uniform* uniform, math::Sphere* sphere) noexcept;
+        Transformation(Uniform* uniform, math::Sphere* sphere, Model *parent) noexcept;
         // physics::Transformation----------------------------------------------------------------------------
         //const math::Vec3& get_x_axis() const noexcept override final;
         //const math::Vec3& get_y_axis() const noexcept override final;

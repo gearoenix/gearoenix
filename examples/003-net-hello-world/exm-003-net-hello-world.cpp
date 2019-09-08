@@ -273,8 +273,9 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
 
     modal = mdlmgr->create<GxModal>(mdacall);
     modal->set_enability(gearoenix::core::State::Unset);
-	modal->get_children().begin()->second->set_enability(gearoenix::core::State::Unset);
+    modal->get_transformation()->local_scale(0.5f);
     uiscn->add_model(modal);
+    uiscn->set_layer(scn->get_layer() + 1.0f);
 }
 
 void GameApp::update() noexcept
@@ -286,7 +287,10 @@ void GameApp::terminate() noexcept
 {
     gearoenix::core::Application::terminate();
     scn = nullptr;
+    uiscn = nullptr;
+    cam = nullptr;
     camtrn = nullptr;
+    modal = nullptr;
 }
 
 bool GameApp::on_event(const gearoenix::core::event::Data& event_data) noexcept
@@ -305,7 +309,6 @@ bool GameApp::on_event(const gearoenix::core::event::Data& event_data) noexcept
                 static float cx = 0.0f, cy = 0.0f, cz = 0.0f; cx = 1.0f - cx; cy = 1.0f - cy; cz = 1.0f - cz;
                 mdl->get_meshes().begin()->second->get_material()->set_color(cx, cy, cz, GxEndCallerIgnored([] {}));
                 modal->set_enability(gearoenix::core::State::Set);
-				modal->get_children().begin()->second->set_enability(gearoenix::core::State::Set);
 			}
 		}
 			

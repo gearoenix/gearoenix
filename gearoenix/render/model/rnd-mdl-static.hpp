@@ -31,38 +31,33 @@ namespace model {
 	public:
 		using MapMesh = std::map<core::Id, std::shared_ptr<Mesh>>;
 		using MapModel = std::map<core::Id, std::shared_ptr<Model>>;
-
         GX_GET_CVAL_PRT(Type, model_type)
 		GX_GET_UPTR_PRT(physics::collider::Collider, collider)
 		GX_GET_UCPTR_PRT(buffer::FramedUniform, uniform_buffers)
-		GX_GET_UCPTR_PRT(physics::Transformation, transformation)
-		GX_GET_VAL_PRT(core::State, shadowing, core::State::Unset)
-		GX_GET_VAL_PRT(core::State, transparency, core::State::Unset)
-		GX_GET_VAL_PRT(core::State, dynamicity, core::State::Unset)
+		GX_GET_UCPTR_PRT(Transformation, transformation)
+		GX_GET_CREF_PRT(math::Sphere, occlusion_sphere)
+		GX_GET_VAL_PRT(bool, has_shadow_caster, false)
+		GX_GET_VAL_PRT(bool, has_transparent, false)
+		GX_GETSET_VAL_PRT(core::State, dynamicity, core::State::Unset)
 		GX_GET_VAL_PRT(core::State, enability, core::State::Set)
 		GX_GET_CREF_PRT(MapMesh, meshes)
         GX_GET_CREF_PRT(MapModel, children)
-        GX_GET_CREF_PRT(math::Sphere, occlusion_sphere)
-        GX_GET_PTR_PRT(Model, parent)
+        GX_GETSET_PTR_PRT(Model, parent)
         GX_GET_PTR_PRT(scene::Scene, scene)
     protected:
         engine::Engine* const e;
         Uniform uniform;
+    public:
         Model(
             core::Id my_id,
-            Type t,
-            physics::Transformation *transformation,
             system::stream::Stream* f,
             engine::Engine* e,
             const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
         Model(
             core::Id my_id,
-            Type t,
-            physics::Transformation* transformation,
             engine::Engine* e,
             const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
-    public:
-        virtual void update() noexcept;
+        virtual void update_uniform() noexcept;
         void add_mesh(const std::shared_ptr<Mesh>& m) noexcept;
         void add_child(const std::shared_ptr<Model>& c) noexcept;
 		void set_collider(std::unique_ptr<physics::collider::Collider> c) noexcept;

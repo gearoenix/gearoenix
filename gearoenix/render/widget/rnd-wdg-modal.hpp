@@ -15,6 +15,7 @@ namespace gearoenix::render::widget {
             engine::Engine* e,
             const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
         ~Modal() noexcept;
+        void set_scene(scene::Scene* s) noexcept;
     };
 }
 #endif

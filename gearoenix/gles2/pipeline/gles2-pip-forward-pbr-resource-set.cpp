@@ -51,7 +51,7 @@ void gearoenix::gles2::pipeline::ForwardPbrResourceSet::bind(gl::uint& bound_sha
     auto model = reinterpret_cast<const render::model::Uniform*>(model_uniform_buffer->get_data());
     GX_GLES2_PIPRES_SET_UNIFORM(model_m, *(model->m.data()))
     auto scene = reinterpret_cast<const render::scene::Uniform*>(scene_uniform_buffer->get_data());
-    //shdr->set_scene_ambient_light_data(scene->ambient_light.data());
+    GX_GLES2_PIPRES_SET_UNIFORM(scene_ambient_light, *(scene->ambient_light.data()))
     GX_GLES2_PIPRES_SET_UNIFORM(scene_directional_lights_color, *(scene->directional_lights_color[0].data()))
     GX_GLES2_PIPRES_SET_UNIFORM(scene_directional_lights_direction, *(scene->directional_lights_direction[0].data()))
     GX_GLES2_PIPRES_SET_UNIFORM(scene_directional_lights_count, *(scene->lights_count.data()))

@@ -3,11 +3,11 @@
 #include "phs-cld-collider.hpp"
 #include "../../system/sys-log.hpp"
 namespace gearoenix::physics::collider {
-class AABB: public Collider {
+class Aabb: public Collider {
 public:
-    AABB() noexcept = default;
-    ~AABB() noexcept = default;
-    std::optional<core::Real> hit(const math::Ray3&, core::Real) const noexcept final { GXUNIMPLEMENTED }
+    Aabb(math::Vec3 u, math::Vec3 l) noexcept;
+    ~Aabb() noexcept = default;
+    // std::optional<core::Real> hit(const math::Ray3&, core::Real) const noexcept final;
 };
 }
 #endif

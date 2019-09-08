@@ -1,18 +1,11 @@
 #ifndef GEAROENIX_RENDER_MODEL_TYPE_HPP
 #define GEAROENIX_RENDER_MODEL_TYPE_HPP
 #include "../../core/cr-types.hpp"
-namespace gearoenix {
-namespace render {
-    namespace model {
-        class Type {
-        public:
-            typedef enum : core::TypeId {
-                DYNAMIC = 1,
-                STATIC = 2,
-                WIDGET = 3,
-            } Id;
-        };
-    }
-}
+namespace gearoenix::render::model {
+enum struct Type : core::TypeId {
+    Dynamic = 1,
+    Static = 2,
+    Widget = 3,
+};
 }
 #endif

@@ -3,11 +3,11 @@
 #include "../../core/cr-types.hpp"
 #include <ostream>
 namespace gearoenix::physics::collider {
-enum struct Type : core::Id {
-    GHOST = 1,
-    MESH = 2,
-    AABB = 3,
-    SPHERE = 4,
+enum struct Type : core::TypeId {
+    Ghost = 1,
+    Mesh = 2,
+    Aabb = 3,
+    Sphere = 4,
 };
 std::ostream& operator<<(std::ostream& os, Type t) noexcept;
 }

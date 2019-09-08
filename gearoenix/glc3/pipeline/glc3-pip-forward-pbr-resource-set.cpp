@@ -51,10 +51,10 @@ void gearoenix::glc3::pipeline::ForwardPbrResourceSet::bind(gl::uint& bound_shad
     auto model = reinterpret_cast<const render::model::Uniform*>(model_uniform_buffer->get_data());
     shdr->set_model_m_data(model->m.data());
     auto scene = reinterpret_cast<const render::scene::Uniform*>(scene_uniform_buffer->get_data());
-    //shdr->set_scene_ambient_light_data(scene->ambient_light.data());
-    shdr->set_scene_directional_lights_color_data(scene->directional_lights_color[0].data());
-    shdr->set_scene_directional_lights_direction_data(scene->directional_lights_direction[0].data());
-    shdr->set_scene_lights_count_data(scene->lights_count.data());
+    GX_GLC3_PIPRES_SET_UNIFORM(scene_ambient_light, *(scene->ambient_light.data()))
+    GX_GLC3_PIPRES_SET_UNIFORM(scene_directional_lights_color, *(scene->directional_lights_color[0].data()))
+    GX_GLC3_PIPRES_SET_UNIFORM(scene_directional_lights_direction, *(scene->directional_lights_direction[0].data()))
+    GX_GLC3_PIPRES_SET_UNIFORM(scene_lights_count, *(scene->lights_count.data()))
     //shdr->set_scene_ssao_config_data(scene->ssao_config.data());
     auto node = reinterpret_cast<const render::graph::node::ForwardPbrUniform*>(node_uniform_buffer->get_data());
     GX_GLC3_PIPRES_SET_UNIFORM(effect_point_lights_color_min_radius, *(node->point_lights_color_min_radius[0].data()))

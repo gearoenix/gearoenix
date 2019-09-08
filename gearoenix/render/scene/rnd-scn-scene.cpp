@@ -144,29 +144,21 @@ const std::shared_ptr<gearoenix::render::light::Light>& gearoenix::render::scene
 void gearoenix::render::scene::Scene::add_model(const std::shared_ptr<model::Model>& m) noexcept
 {
 	std::function<void(const std::shared_ptr<model::Model>&)> travm = [&travm, this](const std::shared_ptr<model::Model>& mdl) noexcept {
-		auto cld = mdl->get_collider();
-		if (cld != nullptr)
-		{
-			if (mdl->get_dynamicity() == core::State::Set) {
-				dynamic_colliders.insert(cld);
-			} else {
-				static_colliders.insert(cld);
-				static_colliders_changed = true;
-			}
-		}
 		auto& children = mdl->get_children();
 		const core::Id mid = mdl->get_asset_id();
 #ifdef GX_DEBUG_MODE
 		if (models.find(mid) != models.end()) {
 			GXLOGE("Error overriding of a model with same Id: " << mid)
 		}
-#endif // GX_DEBUG_MODE
+#endif
+        mdl->set_scene(this);
 		models[mid] = mdl;
 		for (auto& c : children)
 			travm(c.second);
 	};
 
 	travm(m);
+    models_changed = true;
 }
 
 const std::shared_ptr<gearoenix::render::model::Model>& gearoenix::render::scene::Scene::get_model(const core::Id model_id) const noexcept
@@ -200,13 +192,27 @@ const std::shared_ptr<gearoenix::physics::constraint::Constraint>& gearoenix::re
 
 void gearoenix::render::scene::Scene::update() noexcept
 {
-	if (static_colliders_changed) {
-		static_colliders_changed = false;
-		std::vector<physics::collider::Collider*> clds(static_colliders.size());
-		std::size_t i = 0;
-		for (auto c : static_colliders) clds[i++] = c;
-		static_accelerator->reset(clds);
-	}
+    if (models_changed) {
+        models_changed = false;
+        dynamic_colliders.clear();
+        static_colliders.clear();
+        for (auto& im : models) {
+            auto& mdl = im.second;
+            auto * const cld = mdl->get_collider();
+            if (cld != nullptr && mdl->get_enability() == core::State::Set)
+            {
+                if (mdl->get_dynamicity() == core::State::Set) {
+                    dynamic_colliders.push_back(cld);
+                }
+                else {
+                    static_colliders.push_back(cld);
+                }
+            }
+        }
+        static_accelerator->reset(static_colliders);
+    }
+    dynamic_accelerator->reset(dynamic_colliders);
+
     unsigned int dirc = 0;
     for (const auto& il : lights) {
         const light::Light* const l = il.second.get();

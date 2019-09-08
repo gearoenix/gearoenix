@@ -10,9 +10,9 @@ gearoenix::physics::collider::Collider* gearoenix::physics::collider::Collider::
     Type collider_type_id;
     f->read(collider_type_id);
     switch (collider_type_id) {
-    case Type::GHOST:
+    case Type::Ghost:
         return nullptr;
-    case Type::MESH:
+    case Type::Mesh:
         return new Mesh(f);
     default:
         GXUNEXPECTED

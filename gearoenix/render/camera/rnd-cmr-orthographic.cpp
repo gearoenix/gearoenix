@@ -12,7 +12,7 @@ void gearoenix::render::camera::Orthographic::update_aspects_size() noexcept
 {
 	uniform->projection = math::Mat4x4::orthographic(
 		aspects_size * uniform->aspect_ratio * 2.0f,
-		aspects_size,
+		aspects_size * 2.0f,
 		std::abs(uniform->near),
 		std::abs(uniform->far));
 	uniform->uniform_projection = math::Mat4x4(

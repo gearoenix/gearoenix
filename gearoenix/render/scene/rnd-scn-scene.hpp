@@ -84,7 +84,7 @@ namespace render {
 			GX_GET_CVAL_PRT(Type, scene_type_id)
 			GX_GETSET_VAL_PRT(core::Real, layer, 0.0f)
 			GX_GETSET_VAL_PRT(bool, enability, false)
-			GX_GETSET_VAL_PRT(bool, static_colliders_changed, false)
+            GX_GETSET_VAL_PRT(bool, models_changed, false)
 			GX_GET_UCPTR_PRT(buffer::FramedUniform, uniform_buffers)
 			GX_GET_UCPTR_PRT(physics::accelerator::Bvh, static_accelerator)
 			GX_GET_UCPTR_PRT(physics::accelerator::Bvh, dynamic_accelerator)
@@ -93,8 +93,8 @@ namespace render {
 			GX_GET_CREF_PRT(MapConstraint, constraints)
 			GX_GET_CREF_PRT(MapLight, lights)
 			GX_GET_CREF_PRT(MapModel, models)
-			GX_GET_CREF_PRT(std::set<physics::collider::Collider*>, static_colliders)
-			GX_GET_CREF_PRT(std::set<physics::collider::Collider*>, dynamic_colliders)
+			GX_GET_CREF_PRT(std::vector<physics::collider::Collider*>, static_colliders)
+			GX_GET_CREF_PRT(std::vector<physics::collider::Collider*>, dynamic_colliders)
 			GX_GET_CREF_PRT(std::shared_ptr<skybox::Skybox>, skybox)
         protected:
             engine::Engine* const e;

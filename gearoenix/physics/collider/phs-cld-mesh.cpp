@@ -5,7 +5,7 @@
 #include "../../system/sys-log.hpp"
 
 gearoenix::physics::collider::Mesh::Mesh(system::stream::Stream* const f) noexcept
-    : Collider(Type::MESH, nullptr)
+    : Collider(Type::Mesh, nullptr)
 {
     const auto cnt = f->read<core::Count>();
     vertices.resize(cnt);

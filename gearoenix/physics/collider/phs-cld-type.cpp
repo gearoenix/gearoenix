@@ -6,17 +6,17 @@ std::ostream& gearoenix::physics::collider::operator<<(std::ostream& os, const T
     os << "physics::collider::Type<";
     switch (t)
     {
-    case Type::GHOST:
-        os << "GHOST";
+    case Type::Ghost:
+        os << "Ghost";
         break;
-    case Type::MESH:
-        os << "MESH";
+    case Type::Mesh:
+        os << "Mesh";
         break;
-    case Type::AABB:
-        os << "AABB";
+    case Type::Aabb:
+        os << "Aabb";
         break;
-    case Type::SPHERE:
-        os << "SPHERE";
+    case Type::Sphere:
+        os << "Sphere";
         break;
     default:
         GXLOGF("Unexpected value for physics::collider::Type.")

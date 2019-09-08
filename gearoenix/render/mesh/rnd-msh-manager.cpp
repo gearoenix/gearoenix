@@ -7866,12 +7866,13 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager:
     };
 
     const static core::Real occlusion_radius = 1.0000001266598622f;
+    const auto id = core::asset::Manager::create_id();
     std::shared_ptr<Mesh> m(new Mesh(
-        core::asset::Manager::create_id(),
-        vertices, indices, occlusion_radius, e,
+        id, vertices, indices, occlusion_radius, e,
         core::sync::EndCaller<core::sync::EndCallerIgnore>([c] {})));
     c.set_data(m);
     icosphere = m;
+    cache.get_cacher().get_cacheds()[id] = m;
     return m;
 }
 
@@ -7909,12 +7910,34 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager:
         },
     };
     std::vector<std::uint32_t> indices = { 0, 1, 2, 1, 3, 2 };
-    const static core::Real occlusion_radius = 1.001f;
+    const static core::Real occlusion_radius = 1.4f;
+    const auto id = core::asset::Manager::create_id();
     std::shared_ptr<Mesh> m(new Mesh(
-        core::asset::Manager::create_id(),
-        std::move(vertices), std::move(indices), occlusion_radius, e,
+        id, std::move(vertices), std::move(indices), occlusion_radius, e,
         core::sync::EndCaller<core::sync::EndCallerIgnore>([c] {})));
     c.set_data(m);
     plate = m;
+    cache.get_cacher().get_cacheds()[id] = m;
     return m;
+}
+
+std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager::create(std::vector<math::BasicVertex> vertices, std::vector<std::uint32_t> indices, core::Real occlusion_radius, core::sync::EndCaller<Mesh>& c) noexcept
+{
+    const auto id = core::asset::Manager::create_id();
+    std::shared_ptr<Mesh> m(new Mesh(
+        id, std::move(vertices), std::move(indices), occlusion_radius, e,
+        core::sync::EndCaller<core::sync::EndCallerIgnore>([c] {})));
+    c.set_data(m);
+    cache.get_cacher().get_cacheds()[id] = m;
+    return m;
+}
+
+std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager::create(std::vector<math::BasicVertex> vertices, std::vector<std::uint32_t> indices, core::sync::EndCaller<Mesh>& c) noexcept
+{
+    core::Real r = 0.0f;
+    for (auto& v : vertices) {
+        const auto l = v.position.length();
+        if (r < l) r = l;
+    }
+    return create(vertices, indices, r, c);
 }
