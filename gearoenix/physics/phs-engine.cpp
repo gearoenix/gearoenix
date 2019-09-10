@@ -49,7 +49,7 @@ void gearoenix::physics::Engine::update_001_kernel(const unsigned int kernel_ind
         for (const auto& id_model : models) {
             const auto& model = id_model.second;
             if (model->get_enability() == core::State::Set)
-                GX_DO_TASK(model->update_uniform());
+                GX_DO_TASK(model->update());
         }
         for (const std::pair<const core::Id, std::shared_ptr<render::camera::Camera>>& id_camera : cameras) {
             const std::shared_ptr<render::camera::Camera>& camera = id_camera.second;
@@ -139,7 +139,8 @@ void gearoenix::physics::Engine::update_002_kernel(const unsigned int kernel_ind
                 auto* cas = lc.second;
                 for (auto& im : models) {
                     auto& m = im.second;
-                    if (m->get_enability() != core::State::Set || !m->get_has_shadow_caster())
+                    if (m->get_enability() != core::State::Set || 
+						m->get_shadowing() != core::State::Set)
                         continue;
                     GX_DO_TASK(cas->shadow(m.get(), task_number));
                 }

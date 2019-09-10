@@ -514,6 +514,24 @@ gearoenix::math::Vec3 gearoenix::math::Vec3::cross(const Vec3& o) const noexcept
         (vec[0] * o.vec[1]) - (vec[1] * o.vec[0]));
 }
 
+gearoenix::math::Vec3 gearoenix::math::Vec3::min(const Vec3& o) const noexcept
+{
+	return Vec3(
+		o[0] < vec[0] ? o[0] : vec[0],
+		o[1] < vec[1] ? o[1] : vec[1],
+		o[2] < vec[2] ? o[2] : vec[2]
+	);
+}
+
+gearoenix::math::Vec3 gearoenix::math::Vec3::max(const Vec3& o) const noexcept
+{
+	return Vec3(
+		o[0] > vec[0] ? o[0] : vec[0],
+		o[1] > vec[1] ? o[1] : vec[1],
+		o[2] > vec[2] ? o[2] : vec[2]
+	);
+}
+
 gearoenix::math::Vec3 gearoenix::math::Vec3::normalized() const noexcept
 {
     const auto ilen = 1.0f / length();

@@ -131,9 +131,21 @@ std::optional<gearoenix::core::Real> gearoenix::math::Aabb3::hit(const math::Ray
 {
     const math::Vec3& ro = r.get_origin();
     const math::Vec3& rd = r.get_normalized_direction();
-    core::Real t_max = std::numeric_limits<core::Real>::max();
-    core::Real t_min = -t_max;
-    for (int i = 0; i < 3; ++i) {
+
+	const math::Vec3 inv_d = math::Vec3(1.0f) / rd;
+	const math::Vec3 t0s = (lower - ro) * inv_d;
+	const math::Vec3 t1s = (upper - ro) * inv_d;
+
+	const math::Vec3 tsmaller = t0s.min(t1s);
+	const math::Vec3 tbigger = t0s.max(t1s);
+
+	const core::Real tmin = GX_MAX(tsmaller[0], GX_MAX(tsmaller[1], tsmaller[2]));
+	const core::Real tmax = GX_MIN(tbigger[0], GX_MIN(tbigger[1], tbigger[2]));
+
+	if (tmin < tmax && tmin < d_min) return tmin;
+	return std::nullopt;
+
+    /*for (int i = 0; i < 3; ++i) {
         if (GX_IS_ZERO(rd[i]))
             continue;
         const core::Real oor = upper[i] - ro[i];
@@ -151,7 +163,7 @@ std::optional<gearoenix::core::Real> gearoenix::math::Aabb3::hit(const math::Ray
             return t_min;
         }
     }
-    return std::nullopt;
+    return std::nullopt;*/
 }
 
 gearoenix::math::IntersectionStatus gearoenix::math::Aabb3::check_intersection(const Aabb3& o) const noexcept

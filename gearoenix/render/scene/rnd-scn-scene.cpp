@@ -201,7 +201,7 @@ void gearoenix::render::scene::Scene::update() noexcept
             auto * const cld = mdl->get_collider();
             if (cld != nullptr && mdl->get_enability() == core::State::Set)
             {
-                if (mdl->get_dynamicity() == core::State::Set) {
+                if (mdl->get_dynamicity()) {
                     dynamic_colliders.push_back(cld);
                 }
                 else {

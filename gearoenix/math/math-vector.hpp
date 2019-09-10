@@ -97,7 +97,9 @@ namespace math {
         core::Real square_distance(const Vec3& a) const noexcept;
         core::Real abs() const noexcept;
         core::Real dot(const Vec3& o) const noexcept;
-        Vec3 cross(const Vec3& o) const noexcept;
+		Vec3 cross(const Vec3& o) const noexcept;
+		Vec3 min(const Vec3& o) const noexcept;
+		Vec3 max(const Vec3& o) const noexcept;
         Vec3 normalized() const noexcept;
         void normalize() noexcept;
         void read(system::stream::Stream* f) noexcept;

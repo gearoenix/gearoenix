@@ -1,5 +1,6 @@
 #include "rnd-scn-ui.hpp"
 #include "../../core/event/cr-ev-event.hpp"
+#include "../../core/event/cr-ev-engine.hpp"
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../physics/animation/phs-anm-once.hpp"
 #include "../../physics/collider/phs-cld-collider.hpp"
@@ -15,10 +16,12 @@
 
 void gearoenix::render::scene::Ui::init() noexcept
 {
-    auto cam = e->get_system_application()->get_asset_manager()->get_camera_manager()->create<camera::Orthographic>();
+	auto* const sys_app = e->get_system_application();
+    auto cam = sys_app->get_asset_manager()->get_camera_manager()->create<camera::Orthographic>();
     add_camera(cam);
     cam->get_transformation()->set_location(math::Vec3(0.0f, 0.0f, 50.0f));
     uniform.ambient_light = math::Vec4(1.0f, 1.0f, 1.0f, 1.0f);
+	sys_app->get_event_engine()->add_listner(core::event::Id::ButtonMouse, 0.0f, this);
 }
 
 gearoenix::render::scene::Ui::Ui(const core::Id my_id, system::stream::Stream* f, engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
@@ -42,14 +45,27 @@ bool gearoenix::render::scene::Ui::on_event(const core::event::Data& d) noexcept
             const auto ray = cameras.begin()->second->create_ray3(data.x, data.y);
             auto h = hit(ray, std::numeric_limits<gearoenix::core::Real>::max());
             if (h.has_value()) {
-                auto* cld = h.value().second;
-                
-                for (auto* mdl = cld->get_parent(); mdl != nullptr;  mdl = mdl->get_parent()) {
-                    mdl->get_type
-                }
-
-                mdl->get_meshes().begin()->second->get_material()->set_color(cx, cy, cz, GxEndCallerIgnored([] {}));
-                modal->set_enability(gearoenix::core::State::Set);
+				const core::Real d_ray = h.value().first;
+				const math::Vec3 point = ray.get_point(d_ray);
+                auto* const cld = h.value().second;
+				auto* const mdl = cld->get_parent();
+				std::vector<model::Model*> children;
+				if (mdl != nullptr) {
+					if (mdl->get_model_type() == model::Type::Widget)
+					{
+						auto* const wdg = dynamic_cast<widget::Widget*>(mdl);
+						wdg->selected(point);
+					}
+					children.push_back(mdl);
+					for (auto* parent = mdl->get_parent(); parent != nullptr; parent = parent->get_parent()) {
+						if (parent->get_model_type() == model::Type::Widget)
+						{
+							auto* const wdg = dynamic_cast<widget::Widget*>(parent);
+							wdg->selected(point, children);
+						}
+						children.push_back(parent);
+					}
+				}
             }
         }
         break;

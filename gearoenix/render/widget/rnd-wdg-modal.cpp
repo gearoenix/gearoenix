@@ -4,6 +4,7 @@
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../mesh/rnd-msh-manager.hpp"
 #include "../model/rnd-mdl-manager.hpp"
+#include "../model/rnd-mdl-static.hpp"
 #include "../engine/rnd-eng-engine.hpp"
 #include "../../physics/collider/phs-cld-aabb.hpp"
 #include "../scene/rnd-scn-ui.hpp"
@@ -16,7 +17,7 @@ gearoenix::render::widget::Modal::Modal(const core::Id my_id, system::stream::St
 gearoenix::render::widget::Modal::Modal(const core::Id my_id, engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : Widget(my_id, Type::Modal, e, c)
 {
-    core::sync::EndCaller<model::Model> mdlcall([c](std::shared_ptr<model::Model>) {});
+    core::sync::EndCaller<model::Static> mdlcall([c](std::shared_ptr<model::Static>) {});
     core::sync::EndCaller<mesh::Mesh> mshcall([c](std::shared_ptr<mesh::Mesh>) {});
     auto* astmgr = e->get_system_application()->get_asset_manager();
     auto &mdlmgr = astmgr->get_model_manager();
@@ -115,14 +116,14 @@ gearoenix::render::widget::Modal::Modal(const core::Id my_id, engine::Engine* co
     {
         const std::shared_ptr<material::Material> mat(new material::Material(e, c));
         mat->set_color(0.02f, 0.02f, 0.02f, c);
-        const auto mdl = mdlmgr->create<model::Model>(mdlcall);
+        const auto mdl = mdlmgr->create<model::Static>(mdlcall);
         mdl->add_mesh(std::make_shared<model::Mesh>(plate_mesh, mat));
         add_child(mdl);
     }
     {
         const std::shared_ptr<material::Material> mat(new material::Material(e, c));
         mat->set_color(0.9999f, 0.999f, 0.999f, c);
-        const auto mdl = mdlmgr->create<model::Model>(mdlcall);
+        const auto mdl = mdlmgr->create<model::Static>(mdlcall);
         mdl->add_mesh(std::make_shared<model::Mesh>(close_mesh, mat));
         auto* tran = mdl->get_transformation();
         const core::Real scale = 0.05f;
@@ -131,6 +132,7 @@ gearoenix::render::widget::Modal::Modal(const core::Id my_id, engine::Engine* co
         tran->set_location(position);
         mdl->set_collider(std::make_unique<physics::collider::Aabb>(position + scale, position - scale));
         add_child(mdl);
+		close_mdl = mdl.get();
     }
 }
 
@@ -141,4 +143,12 @@ gearoenix::render::widget::Modal::~Modal() noexcept
 void gearoenix::render::widget::Modal::set_scene(scene::Scene* const s) noexcept
 {
     Widget::set_scene(s);
+}
+
+void gearoenix::render::widget::Modal::selected(const math::Vec3& point, const std::vector<model::Model*>& children) noexcept
+{
+	if (children.back() == close_mdl) {
+		set_enability(core::State::Unset);
+		scene->set_models_changed(true);
+	}
 }

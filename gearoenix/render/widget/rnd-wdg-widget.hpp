@@ -25,6 +25,9 @@ public:
 		system::stream::Stream* f,
 		engine::Engine* e,
 		const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+	bool get_dynamicity() const noexcept final;
+	virtual void selected(const math::Vec3& point, const std::vector<model::Model*>& children) noexcept;
+	virtual void selected(const math::Vec3& point) noexcept;
 };
 }
 #endif
