@@ -1,6 +1,7 @@
 #include "rnd-fnt-2d.hpp"
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../core/cr-static.hpp"
+#include "../../system/stream/sys-stm-asset.hpp"
 #include "../../system/stream/sys-stm-local.hpp"
 #include "../../system/stream/sys-stm-memory.hpp"
 #include "../../system/sys-app.hpp"
@@ -68,6 +69,14 @@ gearoenix::render::font::Font2D::MultilineTextAspectsInfo gearoenix::render::fon
 	return a;
 }
 
+void gearoenix::render::font::Font2D::init() noexcept
+{
+    GX_CHECK_NOT_EQAUL_D(0, stbtt_InitFont(stb_font, ttf_data.data(), 0))
+    stbtt_GetFontVMetrics(stb_font, &ascent, &descent, &line_gap);
+    fnt_height = ascent - descent;
+    line_growth = line_gap + fnt_height;
+}
+
 gearoenix::render::font::Font2D::Font2D(
 	const core::Id my_id,
 	system::stream::Stream* f,
@@ -77,10 +86,21 @@ gearoenix::render::font::Font2D::Font2D(
 	, stb_font(new stbtt_fontinfo())
 {
     f->read(ttf_data);
-	GX_CHECK_NOT_EQAUL_D(0, stbtt_InitFont(stb_font, ttf_data.data(), 0))
-    stbtt_GetFontVMetrics(stb_font, &ascent, &descent, &line_gap);
-    fnt_height = ascent - descent;
-    line_growth = line_gap + fnt_height;
+    init();
+}
+
+gearoenix::render::font::Font2D::Font2D(const core::Id my_id, const std::shared_ptr<texture::Manager>& txt_mgr) noexcept
+    : Font(my_id, Type::D2)
+    , txt_mgr(txt_mgr)
+    , stb_font(new stbtt_fontinfo())
+{
+    auto* const e = txt_mgr->get_engine();
+    std::unique_ptr<system::stream::Asset> asset(system::stream::Asset::construct(e->get_system_application(), "default.ttf"));
+    asset->seek(0);
+#define DEFAULT_FONT_SIZE 1331943
+    ttf_data.resize(DEFAULT_FONT_SIZE);
+    asset->read(ttf_data.data(), DEFAULT_FONT_SIZE);
+    init();
 }
 
 gearoenix::render::font::Font2D::~Font2D() noexcept

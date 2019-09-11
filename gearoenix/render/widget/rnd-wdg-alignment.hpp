@@ -2,19 +2,16 @@
 #define GEAROENIX_RENDER_WIDGET_ALIGNMENT_HPP
 #include <cstdint>
 namespace gearoenix::render::widget {
-class Alignment {
-public:
-    typedef enum : std::uint8_t {
-        CENTER_BOTTOM = 1,
-        CENTER_MIDDLE = 2,
-        CENTER_TOP = 3,
-        LEFT_BOTTOM = 4,
-        LEFT_MIDDLE = 5,
-        LEFT_TOP = 6,
-        RIGHT_BOTTOM = 7,
-        RIGHT_MIDDLE = 8,
-        RIGHT_TOP = 9,
-    } Id;
+enum struct Alignment : std::uint8_t {
+    CenterBottom = 1,
+    CenterMiddle = 2,
+    CenterTop = 3,
+    LeftBottom = 4,
+    LeftMiddle = 5,
+    LeftTop = 6,
+    RightBottom = 7,
+    RightMiddle = 8,
+    RightTop = 9,
 };
 }
 #endif

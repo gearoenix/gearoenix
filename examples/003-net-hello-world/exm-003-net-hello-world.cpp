@@ -26,6 +26,7 @@
 #include <gearoenix/render/scene/rnd-scn-game.hpp>
 #include <gearoenix/render/scene/rnd-scn-ui.hpp>
 #include <gearoenix/render/widget/rnd-wdg-modal.hpp>
+#include <gearoenix/render/widget/rnd-wdg-text.hpp>
 #include <gearoenix/system/sys-app.hpp>
 #include <gearoenix/system/sys-log.hpp>
 #include <random>
@@ -48,6 +49,7 @@ using GxDirLight = gearoenix::render::light::Directional;
 using GxLtManager = gearoenix::render::light::Manager;
 using GxPersCam = gearoenix::render::camera::Perspective;
 using GxCldSphere = gearoenix::physics::collider::Sphere;
+using GxTextWdg = gearoenix::render::widget::Text;
 
 struct ShelfInfo {
 	std::uniform_real_distribution<GxReal> rand_genx;
@@ -205,6 +207,7 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
     GxEndCaller<GxMesh> mshcall([endcall](std::shared_ptr<GxMesh>) {});
     GxEndCaller<GxStaticModel> mdlcall([endcall](std::shared_ptr<GxStaticModel>) {});
     GxEndCaller<GxModal> mdacall([endcall](std::shared_ptr<GxModal>) {});
+    GxEndCaller<GxTextWdg> txwcall([endcall](std::shared_ptr<GxTextWdg>) {});
     /// TODO: keep the render tree pointer and delete it later
     render_engine->set_render_tree(new GxGrPbr(render_engine, endcall));
     gearoenix::core::asset::Manager* const astmgr = sys_app->get_asset_manager();
@@ -273,6 +276,9 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
 	}
 
     modal = mdlmgr->create<GxModal>(mdacall);
+    auto text1 = mdlmgr->create<GxTextWdg>(txwcall);
+    text1->set_text(L"Hello World");
+    modal->add_child(text1);
     modal->set_enability(gearoenix::core::State::Unset);
     modal->get_transformation()->local_scale(0.5f);
     uiscn->add_model(modal);

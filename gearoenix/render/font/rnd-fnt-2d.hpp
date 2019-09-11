@@ -32,22 +32,26 @@ private:
 	int fnt_height = 0;
 
 	MultilineTextAspectsInfo compute_multiline_text_aspects(const std::wstring& text) const noexcept;
+    void init() noexcept;
 
 public:
     Font2D(
         const core::Id my_id,
-		system::stream::Stream* f,
-		const std::shared_ptr<texture::Manager>& txt_mgr) noexcept;
+        system::stream::Stream* f,
+        const std::shared_ptr<texture::Manager>& txt_mgr) noexcept;
+    Font2D(
+        const core::Id my_id,
+        const std::shared_ptr<texture::Manager>& txt_mgr) noexcept;
     ~Font2D() noexcept;
 	/// This function is a simple and fast way to only render a multiline text to a texture.
 	/// It is not a good way to handle large text area with this function.
 	/// In future, maybe, I will implement a one line fast enough texture baker.
     const std::shared_ptr<texture::Texture2D> multiline_bake(
-		const std::wstring &text, 
-        std::uint32_t color, 
-        int img_width, 
-        int img_height, 
-		int img_margin, 
+		const std::wstring &text,
+        std::uint32_t color,
+        int img_width,
+        int img_height,
+		int img_margin,
         core::Real &render_aspect_ratio,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& end = core::sync::EndCaller<core::sync::EndCallerIgnore>([] {})) const noexcept;
 };
