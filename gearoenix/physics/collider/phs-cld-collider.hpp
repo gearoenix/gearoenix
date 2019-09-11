@@ -20,13 +20,12 @@ class Model;
 
 namespace gearoenix::physics::collider {
 /// Child classes must have a transformation implementation and initialize (and update) box
-class Collider {
+class Collider: public Transformation {
     GX_GET_CVAL_PRT(Type, collider_type)
-    GX_GET_UCPTR_PRT(Transformation, transformation)
-	GX_GET_REF_PRT(math::Aabb3, box)
+    GX_GET_CREF_PRT(math::Aabb3, box)
 	GX_GETSET_PTR_PRT(render::model::Model, parent)
 protected:
-    explicit Collider(const Type t, Transformation *const trans) noexcept : collider_type(t), transformation(trans) {}
+    explicit Collider(const Type t) noexcept : collider_type(t) {}
 
 public:
     virtual ~Collider() noexcept = default;
@@ -34,6 +33,10 @@ public:
     /// It returns minimum distance of collider surface from the ray origin along the ray direction
     ///   if the ray hits the surface and the distance is less than d_min
     virtual std::optional<core::Real> hit(const math::Ray3& r, core::Real d_min) const noexcept;
+
+    virtual void set_location(const math::Vec3&) noexcept override;
+    virtual void local_scale(core::Real s) noexcept override;
+    virtual void local_x_scale(core::Real s) noexcept override;
 };
 }
 #endif

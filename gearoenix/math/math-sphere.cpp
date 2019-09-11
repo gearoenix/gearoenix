@@ -1,8 +1,8 @@
 #include "math-sphere.hpp"
 #include "math-ray.hpp"
 
-gearoenix::math::Sphere::Sphere(const Vec3& position, const core::Real radius) noexcept
-    : position(position)
+gearoenix::math::Sphere::Sphere(const Vec3& center, const core::Real radius) noexcept
+    : center(center)
     , radius(radius)
     , radius2(radius * radius)
 {
@@ -11,6 +11,11 @@ gearoenix::math::Sphere::Sphere(const Vec3& position, const core::Real radius) n
 void gearoenix::math::Sphere::set_radius(const core::Real r) noexcept {
     radius2 = r * r;
     radius = r;
+}
+
+void gearoenix::math::Sphere::set_center(const Vec3& c) noexcept
+{
+    center = c;
 }
 
 void gearoenix::math::Sphere::insert(const gearoenix::core::Real r) noexcept
@@ -22,7 +27,7 @@ void gearoenix::math::Sphere::insert(const gearoenix::core::Real r) noexcept
 
 std::optional<gearoenix::core::Real> gearoenix::math::Sphere::hit(const math::Ray3& r) const noexcept
 {
-    const auto dir = position - r.get_origin();
+    const auto dir = center - r.get_origin();
 	const auto dir2 = dir.square_length();
 	if (dir2 <= radius2) return std::nullopt;
     const auto dis = r.get_normalized_direction().dot(dir);
@@ -40,7 +45,7 @@ std::optional<gearoenix::core::Real> gearoenix::math::Sphere::hit(const math::Ra
 
 gearoenix::math::IntersectionStatus gearoenix::math::Sphere::check_intersection(const gearoenix::math::Sphere& o) const noexcept
 {
-    const auto l = (position - o.position).length();
+    const auto l = (center - o.center).length();
     const auto r = radius + o.radius;
     if (l > r)
         return IntersectionStatus::Out;

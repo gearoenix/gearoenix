@@ -1,5 +1,6 @@
 #include "rnd-mdl-transformation.hpp"
 #include "../../math/math-sphere.hpp"
+#include "../../physics/phs-transformation.hpp"
 #include "rnd-mdl-uniform.hpp"
 #include "rnd-mdl-model.hpp"
 
@@ -10,31 +11,50 @@ gearoenix::render::model::Transformation::Transformation(Uniform* const uniform,
 {
 }
 
+
+const gearoenix::math::Vec3& gearoenix::render::model::Transformation::get_location() const noexcept
+{
+    return sphere->get_center();
+}
+
 void gearoenix::render::model::Transformation::set_location(const math::Vec3& l) noexcept
 {
+    const math::Vec3 trans = l - sphere->get_center();
     uniform->m.set_location(l);
-    sphere->get_position() = l;
-    GXTODO // children, collider
+    sphere->set_center(l);
+    auto* const collider = parent->get_collider();
+    if(nullptr != collider) collider->set_location(l);
+    auto& children = parent->get_children();
+    for (auto& c : children) c.second->get_transformation()->translate(trans);
 }
 
 void gearoenix::render::model::Transformation::local_scale(const core::Real s) noexcept
 {
     uniform->m.local_scale(s);
 	sphere->set_radius(sphere->get_radius() * s);
+    auto* const collider = parent->get_collider();
+    if (nullptr != collider) collider->local_scale(s);
     auto& children = parent->get_children();
     for (auto& c : children) {
         Model* const child = c.second.get();
         auto* const ct = child->get_transformation();
         ct->local_scale(s);
-        const auto cl = (child->get_occlusion_sphere().get_position() - sphere->get_position()) * s + sphere->get_position();
+        const auto cl = (ct->get_location() - sphere->get_center()) * s + sphere->get_center();
         ct->set_location(cl);
     }
-    GXTODO // children, collider
 }
 
 void gearoenix::render::model::Transformation::local_x_scale(const core::Real s) noexcept
 {
     uniform->m.local_scale(s, 1.0f, 1.0f);
-	sphere->set_radius(sphere->get_radius() * s);
-    GXTODO // children, collider
+    auto* const collider = parent->get_collider();
+    if (nullptr != collider) collider->local_x_scale(s);
+    auto & children = parent->get_children();
+    for (auto& c : children) {
+        Model* const child = c.second.get();
+        auto* const ct = child->get_transformation();
+        ct->local_x_scale(s);
+        const auto cl = (ct->get_location() - sphere->get_center()) * math::Vec3(s, 1.0f, 1.0f) + sphere->get_center();
+        ct->set_location(cl);
+    }
 }

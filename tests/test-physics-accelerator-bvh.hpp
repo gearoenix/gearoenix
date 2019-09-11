@@ -36,6 +36,15 @@ BOOST_AUTO_TEST_CASE(physics_accelerator_bvh)
 		BOOST_TEST((*hit).first > 9.00f);                       \
 	}
 
+#define GX_TEST_HELPER3(x) {                                    \
+		const gearoenix::math::Vec3 p(x, 0.0f, 10.0f);          \
+		const gearoenix::math::Vec3 d(0.0f, 0.0f, -1.0f);       \
+		const gearoenix::math::Ray3 r(p, d);                    \
+		const auto hit = bvh.hit(r,                             \
+			std::numeric_limits<gearoenix::core::Real>::max()); \
+		BOOST_TEST(!hit.has_value());                           \
+	}
+
 	GX_TEST_HELPER2(0.0f);
 	GX_TEST_HELPER2(0.89f);
 	GX_TEST_HELPER2(-0.89f);
@@ -142,7 +151,14 @@ BOOST_AUTO_TEST_CASE(physics_accelerator_bvh)
 	GX_TEST_HELPER2(7.0f);
 	GX_TEST_HELPER2(8.0f);
 	GX_TEST_HELPER2(9.0f);
-	GX_TEST_HELPER2(10.0f);
+    GX_TEST_HELPER2(10.0f);
+
+    GX_TEST_HELPER3(12.0f);
+    GX_TEST_HELPER3(13.0f);
+    GX_TEST_HELPER3(14.0f);
+    GX_TEST_HELPER3(15.0f);
+    GX_TEST_HELPER3(-7.0f);
+    GX_TEST_HELPER3(-8.0f);
 
     for (int i = 0; i < 2000; ++i)
     {

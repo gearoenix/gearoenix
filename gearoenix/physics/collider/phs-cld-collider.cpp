@@ -4,7 +4,6 @@
 #include "../phs-transformation.hpp"
 #include "phs-cld-mesh.hpp"
 
-
 gearoenix::physics::collider::Collider* gearoenix::physics::collider::Collider::read(system::stream::Stream* const f) noexcept
 {
     Type collider_type_id;
@@ -21,4 +20,19 @@ gearoenix::physics::collider::Collider* gearoenix::physics::collider::Collider::
 
 std::optional<gearoenix::core::Real> gearoenix::physics::collider::Collider::hit(const math::Ray3& r, const core::Real d_min) const noexcept {
     return box.hit(r, d_min);
+}
+
+void gearoenix::physics::collider::Collider::set_location(const math::Vec3& l) noexcept
+{
+    box.set_center(l);
+}
+
+void gearoenix::physics::collider::Collider::local_scale(const core::Real s) noexcept
+{
+    box.set_diameter(box.get_diameter() * s);
+}
+
+void gearoenix::physics::collider::Collider::local_x_scale(const core::Real s) noexcept
+{
+    box.set_diameter(box.get_diameter() * math::Vec3(s, 0.0f, 0.0f));
 }

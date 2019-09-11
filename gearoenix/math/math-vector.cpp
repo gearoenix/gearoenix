@@ -1,5 +1,6 @@
 #include "math-vector.hpp"
 #include "../core/cr-build-configuration.hpp"
+#include "../core/cr-static.hpp"
 #include "../system/stream/sys-stm-stream.hpp"
 #include "../system/sys-log.hpp"
 #include "math-matrix.hpp"
@@ -514,7 +515,7 @@ gearoenix::math::Vec3 gearoenix::math::Vec3::cross(const Vec3& o) const noexcept
         (vec[0] * o.vec[1]) - (vec[1] * o.vec[0]));
 }
 
-gearoenix::math::Vec3 gearoenix::math::Vec3::min(const Vec3& o) const noexcept
+gearoenix::math::Vec3 gearoenix::math::Vec3::minimum(const Vec3& o) const noexcept
 {
 	return Vec3(
 		o[0] < vec[0] ? o[0] : vec[0],
@@ -523,13 +524,23 @@ gearoenix::math::Vec3 gearoenix::math::Vec3::min(const Vec3& o) const noexcept
 	);
 }
 
-gearoenix::math::Vec3 gearoenix::math::Vec3::max(const Vec3& o) const noexcept
+gearoenix::core::Real gearoenix::math::Vec3::minimum() const noexcept
+{
+    return GX_MIN(vec[0], GX_MIN(vec[1], vec[2]));
+}
+
+gearoenix::math::Vec3 gearoenix::math::Vec3::maximum(const Vec3& o) const noexcept
 {
 	return Vec3(
 		o[0] > vec[0] ? o[0] : vec[0],
 		o[1] > vec[1] ? o[1] : vec[1],
 		o[2] > vec[2] ? o[2] : vec[2]
 	);
+}
+
+gearoenix::core::Real gearoenix::math::Vec3::maximum() const noexcept
+{
+    return GX_MAX(vec[0], GX_MAX(vec[1], vec[2]));
 }
 
 gearoenix::math::Vec3 gearoenix::math::Vec3::normalized() const noexcept

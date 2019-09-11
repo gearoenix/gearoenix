@@ -8,10 +8,10 @@ namespace gearoenix::math {
 struct Ray3;
 struct Sphere;
 struct Aabb3 {
-    GX_GET_REF_PRV(Vec3, upper)
-    GX_GET_REF_PRV(Vec3, lower)
-    GX_GET_REF_PRV(Vec3, diameter)
-    GX_GET_REF_PRV(Vec3, center)
+    GX_GET_CREF_PRV(Vec3, upper)
+    GX_GET_CREF_PRV(Vec3, lower)
+    GX_GET_CREF_PRV(Vec3, diameter)
+    GX_GET_CREF_PRV(Vec3, center)
     GX_GET_VAL_PRV(core::Real, volume, 0.0f)
 public:
     /// TODO add without updates
@@ -31,6 +31,8 @@ public:
     bool test(const Sphere& o) const noexcept;
     std::optional<core::Real> hit(const math::Ray3& r, core::Real d_min) const noexcept;
     IntersectionStatus check_intersection(const Aabb3& o) const noexcept;
+    void set_center(const Vec3& c) noexcept;
+    void set_diameter(const Vec3& d) noexcept;
 };
 }
 #endif

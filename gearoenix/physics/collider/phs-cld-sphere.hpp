@@ -4,11 +4,13 @@
 #include "phs-cld-collider.hpp"
 namespace gearoenix::physics::collider {
 class Sphere : public Collider {
-private:
-    math::Sphere sphere;
+    GX_GET_CREF_PRV(math::Sphere, sphere)
 public:
     Sphere(const math::Vec3 &c, core::Real r) noexcept;
     ~Sphere() noexcept = default;
+    void set_location(const math::Vec3& l) noexcept final;
+    void local_scale(core::Real s) noexcept final;
+    void local_x_scale(core::Real s) noexcept final;
     std::optional<core::Real> hit(const math::Ray3& r, core::Real d_min) const noexcept final;
 };
 }

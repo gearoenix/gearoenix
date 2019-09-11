@@ -21,7 +21,7 @@ gearoenix::render::light::CascadeInfo::PerCascade::PerCascade(engine::Engine* co
 void gearoenix::render::light::CascadeInfo::PerKernel::shadow(const model::Model* const m) noexcept
 {
     const math::Sphere& ms = m->get_occlusion_sphere();
-    const math::Sphere s((*zero_located_view) * ms.get_position(), ms.get_radius());
+    const math::Sphere s((*zero_located_view) * ms.get_center(), ms.get_radius());
     const std::size_t cascades_count = seen_boxes.size();
     for (std::size_t i = 0; i < cascades_count; ++i) {
         if ((*per_cascade)[i].limit_box.test(s)) {

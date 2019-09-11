@@ -4,11 +4,26 @@
 #include "../../math/math-ray.hpp"
 
 gearoenix::physics::collider::Sphere::Sphere(const math::Vec3 &c, core::Real r) noexcept
-    : Collider(Type::Sphere, nullptr) // todo transformation must be initialized
+    : Collider(Type::Sphere)
     , sphere(c, r)
+{}
+
+void gearoenix::physics::collider::Sphere::set_location(const math::Vec3& l) noexcept
 {
-    box.put(sphere);
-    GXTODO
+    Collider::set_location(l);
+    sphere.set_center(l);
+}
+
+void gearoenix::physics::collider::Sphere::local_scale(const core::Real s) noexcept
+{
+    Collider::local_scale(s);
+    sphere.set_radius(sphere.get_radius() * s);
+}
+
+void gearoenix::physics::collider::Sphere::local_x_scale(const core::Real s) noexcept
+{
+    Collider::local_x_scale(s);
+    GXLOGE("It is better to does not use sphere collider for a model that is going to be locally scale in X.")
 }
 
 std::optional<gearoenix::core::Real> gearoenix::physics::collider::Sphere::hit(const math::Ray3& r, const core::Real d_min) const noexcept

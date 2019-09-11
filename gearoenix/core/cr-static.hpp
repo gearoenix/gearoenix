@@ -9,6 +9,7 @@
 #define GX_GET_CREF(v, t, x) v: t x; public: const t & get_##x() const noexcept { return x; }
 #define GX_GET_REF(v, t, x) GX_GET_CREF(v, t, x) t & get_##x() noexcept { return x; }
 #define GX_GET_CREF_PRT(t, x) GX_GET_CREF(protected, t, x)
+#define GX_GET_CREF_PRV(t, x) GX_GET_CREF(private, t, x)
 #define GX_GET_REF_PRT(t, x) GX_GET_REF(protected, t, x)
 #define GX_GET_REF_PRV(t, x) GX_GET_REF(private, t, x)
 #define GX_GET_UPTR(v, c, t, x) v: c std::unique_ptr<t> x; public: const t * get_##x() const noexcept { return x.get(); } t * get_##x() noexcept { return x.get(); }
