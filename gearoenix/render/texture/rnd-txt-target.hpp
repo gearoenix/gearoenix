@@ -14,7 +14,8 @@ protected:
 
 public:
     virtual ~Target() noexcept = default;
-    void set_clipping(core::Real w, core::Real h) noexcept {
+    void set_clipping(core::Real w, core::Real h) noexcept
+    {
         clipping_width = w;
         clipping_height = h;
     }

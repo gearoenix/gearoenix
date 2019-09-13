@@ -11,9 +11,9 @@
 
 gearoenix::physics::constraint::TrackerSpringJointSpring::TrackerSpringJointSpring(
     const core::Id my_id,
-    const std::shared_ptr<system::stream::Stream>& f,
-    const std::shared_ptr<render::engine::Engine>& e,
-    const core::sync::EndCaller<core::sync::EndCallerIgnore> c)
+    system::stream::Stream* const,
+    render::engine::Engine* const,
+    const core::sync::EndCaller<core::sync::EndCallerIgnore>)
     : Constraint(my_id, Type::TRACKER_SPRING_JOINT_SPRING)
 {
     GXUNIMPLEMENTED;
@@ -59,7 +59,7 @@ const std::vector<std::shared_ptr<gearoenix::physics::body::Body>> gearoenix::ph
     return v;
 }
 
-void gearoenix::physics::constraint::TrackerSpringJointSpring::apply(core::Real)
+void gearoenix::physics::constraint::TrackerSpringJointSpring::apply(const core::Real) noexcept
 {
     math::Vec3 actpos, paspos;
     //active->get_body_obj()->get_location(actpos);

@@ -98,6 +98,10 @@ namespace math {
         core::Real abs() const noexcept;
         core::Real dot(const Vec3& o) const noexcept;
         Vec3 cross(const Vec3& o) const noexcept;
+        Vec3 minimum(const Vec3& o) const noexcept;
+        core::Real minimum() const noexcept;
+        Vec3 maximum(const Vec3& o) const noexcept;
+        core::Real maximum() const noexcept;
         Vec3 normalized() const noexcept;
         void normalize() noexcept;
         void read(system::stream::Stream* f) noexcept;
@@ -130,6 +134,9 @@ namespace math {
         bool operator<(const Vec4& o) const noexcept;
         bool operator==(const Vec4& o) const noexcept;
         bool operator>(const Vec4& o) const noexcept;
+        Vec4 operator*(core::Real a) const noexcept;
+        core::Real length() const noexcept;
+        core::Real square_length() const noexcept;
         core::Real dot(const Vec4& o) const noexcept;
         Vec4 cross(const Vec4& o) const noexcept;
         Vec4 normalized() const noexcept;

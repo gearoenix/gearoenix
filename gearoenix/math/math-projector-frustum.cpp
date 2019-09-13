@@ -12,12 +12,12 @@ void gearoenix::math::ProjectorFrustum::set_view_projection(const gearoenix::mat
     view_projection = v;
 }
 
-gearoenix::math::IntersectionStatus::Type gearoenix::math::ProjectorFrustum::check_intersection(const Sphere& s) const noexcept
+gearoenix::math::IntersectionStatus gearoenix::math::ProjectorFrustum::check_intersection(const Sphere& s) const noexcept
 {
-    return check_intersection(s.position, s.radius);
+    return check_intersection(s.get_center(), s.get_radius());
 }
 
-gearoenix::math::IntersectionStatus::Type gearoenix::math::ProjectorFrustum::check_intersection(const gearoenix::math::Vec3& position, const core::Real radius) const noexcept
+gearoenix::math::IntersectionStatus gearoenix::math::ProjectorFrustum::check_intersection(const gearoenix::math::Vec3& position, const core::Real radius) const noexcept
 {
     return check_intersection({
         position + Vec3(radius, radius, radius),
@@ -31,29 +31,30 @@ gearoenix::math::IntersectionStatus::Type gearoenix::math::ProjectorFrustum::che
     });
 }
 
-gearoenix::math::IntersectionStatus::Type gearoenix::math::ProjectorFrustum::check_intersection(const Aabb3& aabb) const noexcept
+gearoenix::math::IntersectionStatus gearoenix::math::ProjectorFrustum::check_intersection(const Aabb3& aabb) const noexcept
 {
-    const Vec3 c = (aabb.mx + aabb.mn) * 0.5f;
-    const Vec3 r = (aabb.mx - aabb.mn) * 0.5f;
+    const Vec3& c = aabb.get_center();
+    const Vec3 r = aabb.get_diameter() * 0.5f;
     return check_intersection({
-        aabb.mx,
+        aabb.get_upper(),
         c + Vec3(-r[0], r[1], r[2]),
         c + Vec3(r[0], -r[1], r[2]),
         c + Vec3(-r[0], -r[1], r[2]),
         c + Vec3(r[0], r[1], -r[2]),
         c + Vec3(-r[0], r[1], -r[2]),
         c + Vec3(r[0], -r[1], -r[2]),
-        aabb.mn,
+        aabb.get_lower(),
     });
 }
 
-gearoenix::math::IntersectionStatus::Type gearoenix::math::ProjectorFrustum::check_intersection(const Vec3 (&points)[8]) const noexcept
+gearoenix::math::IntersectionStatus gearoenix::math::ProjectorFrustum::check_intersection(const Vec3 (&points)[8]) const noexcept
 {
     Aabb3 aabb;
     for (const Vec3& p : points) {
         const Vec4 pp = view_projection * Vec4(p, 1.0f);
         aabb.put(pp.xyz() / pp[3]);
     }
+    // TODO it can be better the z part is redundant
     static const Aabb3 u(Vec3(1.0f, 1.0f, 1.0f), Vec3(-1.0f, -1.0f, -1.0f));
     return u.check_intersection(aabb);
 }

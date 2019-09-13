@@ -86,3 +86,8 @@ ios-build/
 
 wasm-build/
 /wasm-build/
+
+.cxx/
+/.cxx/
+
+android/app/release/

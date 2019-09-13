@@ -39,13 +39,14 @@ gearoenix::system::stream::Asset* gearoenix::system::stream::Asset::construct(sy
     asset->file.open(file_path, std::ios::binary | std::ios::in);
     if (!asset->file.is_open()) {
         GXLOGD("Error in opening assets file: " << name);
+        delete asset;
         return nullptr;
     }
 #elif defined(GX_IN_ANDROID)
-//    asset->sys_app = sys_app
-//                         asset->file
-//        = AAssetManager_open(sys_app->get_android_app()->activity->assetManager,
-//            name.c_str(), AASSET_MODE_BUFFER);
+    //    asset->sys_app = sys_app
+    //                         asset->file
+    //        = AAssetManager_open(sys_app->get_android_app()->activity->assetManager,
+    //            name.c_str(), AASSET_MODE_BUFFER);
     if (asset->file == nullptr) {
         GXLOGD("Asset not found! " << name)
         return nullptr;
@@ -54,6 +55,7 @@ gearoenix::system::stream::Asset* gearoenix::system::stream::Asset::construct(sy
 #error "Unexpected file interface!"
 #endif
     asset->check_endian_compatibility();
+    (void)sys_app;
     return asset;
 }
 

@@ -1,20 +1,19 @@
 #ifndef GEAROENIX_MATH_RAY_HPP
 #define GEAROENIX_MATH_RAY_HPP
+#include "../core/cr-static.hpp"
 #include "math-vector.hpp"
-namespace gearoenix {
-namespace math {
-    struct Triangle3;
-    struct Ray3 {
-        friend struct Triangle3;
-
-    private:
-        Vec3 o;
-        Vec3 d; // this must be normal
-    public:
-        Ray3(const Vec3& origin, const Vec3& normalized_direction);
-        const Vec3& get_origin() const;
-        const Vec3& get_direction() const;
-    };
-}
+#include <utility>
+namespace gearoenix::math {
+struct Ray3 {
+    GX_GET_REF_PRV(Vec3, origin)
+    GX_GET_REF_PRV(Vec3, normalized_direction)
+public:
+    Ray3(Vec3 o, Vec3 nd) noexcept
+        : origin(std::move(o))
+        , normalized_direction(std::move(nd))
+    {
+    }
+    Vec3 get_point(const core::Real d) const noexcept { return normalized_direction * d + origin; }
+};
 }
 #endif

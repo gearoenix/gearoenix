@@ -43,9 +43,10 @@ namespace light {
             math::Aabb3 limit_box;
             math::Aabb3 max_box;
             math::Aabb3 intersection_box;
-            std::shared_ptr<graph::node::ShadowMapper> shadow_mapper;
+            std::unique_ptr<graph::node::ShadowMapper> shadow_mapper;
 
             explicit PerCascade(engine::Engine* e) noexcept;
+            ~PerCascade() noexcept;
         };
 
     private:
@@ -79,7 +80,6 @@ namespace light {
 
         math::Mat4x4 zero_located_view;
         std::vector<PerKernel> kernels;
-        /// It is now owner of engine
         std::vector<PerFrame> frames;
         /// Per cascade
         core::OneLoopPool<PerCascade> per_cascade;
@@ -87,6 +87,7 @@ namespace light {
 
     public:
         explicit CascadeInfo(engine::Engine* e) noexcept;
+        ~CascadeInfo() noexcept;
 
         void update(const math::Mat4x4& m, const std::vector<std::array<math::Vec3, 4>>& p) noexcept;
 
@@ -100,7 +101,7 @@ namespace light {
 
         void submit() noexcept;
 
-        const core::OneLoopPool<PerCascade>& get_cascades_data() const noexcept;
+        [[nodiscard]] const core::OneLoopPool<PerCascade>& get_cascades_data() const noexcept;
         core::OneLoopPool<PerCascade>& get_cascades_data() noexcept;
     };
 }

@@ -34,8 +34,8 @@ gearoenix::glc3::texture::Target::Target(engine::Engine* const e) noexcept
     : render::texture::Target(core::asset::Manager::create_id(), e)
 {
     const auto* sys_app = e->get_system_application();
-    img_width = sys_app->get_width();
-    img_height = sys_app->get_height();
+    img_width = sys_app->get_window_width();
+    img_height = sys_app->get_window_height();
     clipping_width = static_cast<core::Real>(img_width);
     clipping_height = static_cast<core::Real>(img_height);
     gl::Loader::get_integerv(GL_FRAMEBUFFER_BINDING, &framebuffer);
@@ -60,7 +60,7 @@ gearoenix::glc3::texture::Target::Target(
     e->get_function_loader()->load([this, infos, call] {
         gl::Loader::gen_framebuffers(1, reinterpret_cast<gl::uint*>(&framebuffer));
         gl::Loader::bind_framebuffer(GL_FRAMEBUFFER, framebuffer);
-        gl::Loader::gen_textures(texture_objects.size(), texture_objects.data());
+        gl::Loader::gen_textures(static_cast<gearoenix::gl::sizei>(texture_objects.size()), texture_objects.data());
         for (std::size_t i = 0; i < texture_objects.size(); ++i) {
             const auto& txt_info = infos[i];
             const auto& txt_fmt = txt_info.f;

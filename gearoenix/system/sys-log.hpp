@@ -7,15 +7,15 @@
 #include "android/sys-and-log.hpp"
 #elif defined(GX_IN_WEB)
 #include <iostream>
-#define GXLOGI(s)                                                       \
+#define GXLOGI(s)                                                  \
     std::cout << GX_APP_NAME << " " << s << " " << __FILE__ << " " \
               << __LINE__ << std::endl;
 #ifdef GX_DEBUG_MODE
 #define GXLOGD(s) GXLOGI(s)
-#else 
+#else
 #define GXLOGD(s)
 #endif
-#define GXLOGE(s)                                                              \
+#define GXLOGE(s)                                                         \
     std::cout << GX_APP_NAME << " ERROR: " << s << " " << __FILE__ << " " \
               << __LINE__ << std::endl;
 #define GXLOGF(s)         \
@@ -25,12 +25,16 @@
     }
 #else
 #include <fstream>
+#include <mutex>
 namespace gearoenix {
 namespace system {
     class Log {
     public:
         static std::ofstream info;
+#ifdef GX_DEBUG_MODE
         static std::ofstream debug;
+        static std::mutex debug_lock;
+#endif
         static std::ofstream error;
     };
 }
@@ -40,12 +44,14 @@ namespace system {
         gearoenix::system::Log::info << GX_APP_NAME << " " << s << " "            \
                                      << __FILE__ << " " << __LINE__ << std::endl; \
     }
-/// This is gonna be ignored in release mode compilation
+#ifdef GX_DEBUG_MODE
 #define GXLOGD(s)                                                                  \
     {                                                                              \
+        std::lock_guard<std::mutex> _lg(gearoenix::system::Log::debug_lock);       \
         gearoenix::system::Log::debug << GX_APP_NAME << " " << s << " "            \
                                       << __FILE__ << " " << __LINE__ << std::endl; \
     }
+#endif
 #define GXLOGE(s)                                                                  \
     {                                                                              \
         gearoenix::system::Log::error << GX_APP_NAME << " " << s << " "            \
@@ -57,13 +63,13 @@ namespace system {
         std::terminate(); \
     }
 #endif // IN_ANDROID
+#define GXREACHED GXLOGD("REACHED-------------------------------------------")
 #define GXTODO GXLOGE("TODO")
 #define GXUNEXPECTED GXLOGF("Unexpected")
 #define GXUNIMPLEMENTED GXLOGF("Unimplemented")
 #define GXASSERT(x) \
     if ((x) == 0)   \
     GXUNEXPECTED
-#define GXREACHED GXLOGD("REACHED-------------------------------------------")
 #else // GX_LOG_ENABLED
 #define GXLOGI(s) ;
 #define GXLOGD(s) ;

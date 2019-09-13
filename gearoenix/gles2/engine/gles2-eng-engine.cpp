@@ -2,8 +2,6 @@
 #ifdef GX_USE_OPENGL_ES2
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../core/event/cr-ev-event.hpp"
-#include "../../core/event/cr-ev-sys-system.hpp"
-#include "../../core/sync/cr-sync-end-caller.hpp"
 #include "../../gl/gl-constants.hpp"
 #include "../../gl/gl-loader.hpp"
 #include "../../physics/phs-engine.hpp"
@@ -11,7 +9,6 @@
 #include "../../render/pipeline/rnd-pip-manager.hpp"
 #include "../../render/scene/rnd-scn-scene.hpp"
 #include "../../system/sys-app.hpp"
-#include "../../system/sys-log.hpp"
 #include "../buffer/gles2-buf-manager.hpp"
 #include "../buffer/gles2-buf-uniform.hpp"
 #include "../command/gles2-cmd-buffer.hpp"
@@ -33,22 +30,22 @@ gearoenix::gles2::engine::Engine::Engine(system::Application* const sys_app) noe
     : render::engine::Engine(sys_app, render::engine::Type::OPENGL_ES2)
 {
     initialize();
-    pipeline_manager = new pipeline::Manager(this);
+    pipeline_manager = std::make_unique<pipeline::Manager>(this);
 }
 
-std::shared_ptr<gearoenix::gles2::engine::Engine> gearoenix::gles2::engine::Engine::construct(system::Application* const sys_app) noexcept
+gearoenix::gles2::engine::Engine* gearoenix::gles2::engine::Engine::construct(system::Application* const sys_app) noexcept
 {
     gl::Loader::get_error();
 #ifdef GX_DEBUG_GLES2
     gl::Loader::check_for_error();
 #endif
-    std::shared_ptr<Engine> e(new Engine(sys_app));
-    e->buffer_manager = new buffer::Manager(e.get());
-    e->command_manager = new command::Manager();
+    auto* const e = new Engine(sys_app);
+    e->buffer_manager = std::make_unique<buffer::Manager>(e);
+    e->command_manager = std::make_unique<command::Manager>();
 #ifdef GX_DEBUG_GLES2
     gl::Loader::check_for_error();
 #endif
-    e->main_render_target = std::shared_ptr<render::texture::Target>(new texture::Target(e.get()));
+    e->main_render_target = std::make_unique<texture::Target>(e);
 #ifdef GX_DEBUG_GLES2
     gl::Loader::check_for_error();
 #endif

@@ -1,10 +1,10 @@
 #ifndef GEAROENIX_CORE_SYNC_QUEUED_SEMAPHORE_HPP
 #define GEAROENIX_CORE_SYNC_QUEUED_SEMAPHORE_HPP
 #include "../cr-build-configuration.hpp"
+#include <atomic>
 #include <condition_variable>
 #include <mutex>
 #include <queue>
-#include <atomic>
 
 namespace gearoenix::core::sync {
 class Semaphore {
@@ -14,8 +14,10 @@ private:
     std::atomic<int> count = 0;
 
 public:
-    Semaphore(int count = 0);
-    ~Semaphore();
+    explicit Semaphore(int count = 0);
+    Semaphore(Semaphore const&) = delete;
+    void operator=(Semaphore const&) = delete;
+    ~Semaphore() = default;
     void lock();
     void release();
 };

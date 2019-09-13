@@ -16,8 +16,8 @@ namespace pipeline {
     class Pipeline {
     protected:
         engine::Engine* const e;
-        const Type::Id pipeline_type;
-        Pipeline(const Type::Id pipeline_type, engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>&) noexcept
+        const Type pipeline_type;
+        Pipeline(const Type pipeline_type, engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>&) noexcept
             : e(e)
             , pipeline_type(pipeline_type)
         {
@@ -26,7 +26,7 @@ namespace pipeline {
     public:
         virtual ~Pipeline() noexcept = default;
 
-        Type::Id get_pipeline_type_id() const noexcept
+        Type get_pipeline_type_id() const noexcept
         {
             return pipeline_type;
         }

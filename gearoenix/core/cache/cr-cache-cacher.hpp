@@ -53,15 +53,13 @@ std::shared_ptr<C> gearoenix::core::cache::Cacher<T, Key, Compare>::get(const Ke
 {
     auto search = cacheds.find(id);
     if (search == cacheds.end()) {
-        GXLOGF("Object with id: " << id << ", has not been cached.");
-        return nullptr;
+        GXLOGF("Object with id: " << id << ", has not been cached.")
     }
     auto& found = search->second;
     if (auto cached = found.lock()) {
         return std::static_pointer_cast<C>(cached);
     } else {
-        GXLOGF("Object with id: " << id << ", cached but it has been expired.");
-        return nullptr;
+        GXLOGF("Object with id: " << id << ", cached but it has been expired.")
     }
 }
 

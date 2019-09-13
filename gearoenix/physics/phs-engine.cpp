@@ -13,10 +13,8 @@
 #include "../render/scene/rnd-scn-manager.hpp"
 #include "../render/scene/rnd-scn-scene.hpp"
 #include "../system/sys-app.hpp"
-#include "../system/sys-log.hpp"
 #include "animation/phs-anm-animation.hpp"
 #include <cmath>
-#include <cstring>
 #include <functional>
 #include <utility>
 
@@ -36,25 +34,20 @@ void gearoenix::physics::Engine::update_001_kernel(const unsigned int kernel_ind
         const std::shared_ptr<render::scene::Scene> scene = is.second.lock();
         if (scene == nullptr)
             continue;
-        if (!scene->is_enabled())
+        if (!scene->get_enability())
             continue;
         auto scene_camera_data = kernel_scene_camera_data.get_next([] { return new SceneCameraData::iterator::value_type; });
         scene_camera_data->first = scene.get();
         auto& cameras_data = scene_camera_data->second;
         cameras_data.refresh();
-        GX_DO_TASK(scene->update_uniform());
+        GX_DO_TASK(scene->update());
         const std::map<core::Id, std::shared_ptr<render::camera::Camera>>& cameras = scene->get_cameras();
         const std::map<core::Id, std::shared_ptr<render::model::Model>>& models = scene->get_models();
         const std::map<core::Id, std::shared_ptr<render::light::Light>>& lights = scene->get_lights();
-        for (const auto& id_light : lights) {
-            const auto& light = id_light.second;
-            if (light->is_enabled())
-                GX_DO_TASK(light->update_uniform());
-        }
         for (const auto& id_model : models) {
             const auto& model = id_model.second;
-            if (model->is_enabled())
-                GX_DO_TASK(model->update_uniform());
+            if (model->get_enability() == core::State::Set)
+                GX_DO_TASK(model->update());
         }
         for (const std::pair<const core::Id, std::shared_ptr<render::camera::Camera>>& id_camera : cameras) {
             const std::shared_ptr<render::camera::Camera>& camera = id_camera.second;
@@ -72,19 +65,19 @@ void gearoenix::physics::Engine::update_001_kernel(const unsigned int kernel_ind
             for (const std::pair<const core::Id, std::shared_ptr<render::light::Light>>& light : lights) {
                 if (!light.second->is_enabled())
                     continue;
-                if (!light.second->is_shadower())
+                if (!light.second->is_shadow_caster())
                     continue;
                 auto dir_light = dynamic_cast<DirLightPtr>(light.second.get());
                 if (dir_light == nullptr)
                     continue;
                 GX_DO_TASK(
                     auto light_cascaded_shadow_caster_data = lights_cascade_info.get_next([this] {
-                        auto p = new DirLightPairedPool<CascadeInfoPtr>::iterator::value_type;
-                        p->second = new render::light::CascadeInfo(sys_app->get_render_engine().get());
+                        auto p = new DirLightPairedPool<CascadeInfoUPtr>::iterator::value_type;
+                        p->second = std::make_unique<render::light::CascadeInfo>(sys_app->get_render_engine());
                         return p;
                     });
                     light_cascaded_shadow_caster_data->first = dir_light;
-                    auto* cascade_data = light_cascaded_shadow_caster_data->second;
+                    auto* cascade_data = light_cascaded_shadow_caster_data->second.get();
                     const auto& dir = dir_light->get_direction();
                     const auto dot = std::abs(dir.dot(math::Vec3(0.0f, 1.0f, 0.0f))) - 1.0f;
                     const math::Vec3 up = GX_IS_ZERO(dot) ? math::Vec3::Z : math::Vec3::Y;
@@ -93,11 +86,11 @@ void gearoenix::physics::Engine::update_001_kernel(const unsigned int kernel_ind
             }
             for (const std::pair<const core::Id, std::shared_ptr<render::model::Model>>& id_model : models) {
                 const std::shared_ptr<render::model::Model>& model = id_model.second;
-                if (!model->is_enabled())
+                if (model->get_enability() != core::State::Set)
                     continue;
                 GX_DO_TASK(
                     const math::Sphere& sphere = model->get_occlusion_sphere();
-                    if (camera->in_sight(sphere.position, sphere.radius)) {
+                    if (camera->in_sight(sphere.get_center(), sphere.get_radius())) {
                         current_visible_models.push_back(model.get());
                     });
             }
@@ -122,7 +115,7 @@ void gearoenix::physics::Engine::update_001_receiver() noexcept
                     models.push_back(m);
                 for (auto& l : ls) {
                     l.second->start();
-                    cascades.push_back(l);
+                    cascades.emplace_back(l.first, l.second.get());
                 }
             }
         }
@@ -143,7 +136,7 @@ void gearoenix::physics::Engine::update_002_kernel(const unsigned int kernel_ind
                 auto* cas = lc.second;
                 for (auto& im : models) {
                     auto& m = im.second;
-                    if (!m->is_enabled() || !m->get_has_shadow_caster())
+                    if (m->get_enability() != core::State::Set || m->get_shadowing() != core::State::Set)
                         continue;
                     GX_DO_TASK(cas->shadow(m.get(), task_number));
                 }
@@ -174,6 +167,12 @@ gearoenix::physics::Engine::Engine(system::Application* const sysapp, core::sync
 {
     this->kernels->add_step(std::bind(&Engine::update_001_kernel, this, std::placeholders::_1), std::bind(&Engine::update_001_receiver, this));
     this->kernels->add_step(std::bind(&Engine::update_002_kernel, this, std::placeholders::_1), std::bind(&Engine::update_002_receiver, this));
+}
+
+gearoenix::physics::Engine::~Engine() noexcept
+{
+    scenes_camera_data.clear();
+    kernels_scene_camera_data.clear();
 }
 
 void gearoenix::physics::Engine::add_animation(const std::shared_ptr<animation::Animation>& a) noexcept

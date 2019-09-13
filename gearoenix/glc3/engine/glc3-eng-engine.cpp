@@ -2,8 +2,6 @@
 #ifdef GX_USE_OPENGL_CLASS_3
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../core/event/cr-ev-event.hpp"
-#include "../../core/event/cr-ev-sys-system.hpp"
-#include "../../core/sync/cr-sync-end-caller.hpp"
 #include "../../gl/gl-constants.hpp"
 #include "../../gl/gl-loader.hpp"
 #include "../../physics/phs-engine.hpp"
@@ -11,7 +9,6 @@
 #include "../../render/pipeline/rnd-pip-manager.hpp"
 #include "../../render/scene/rnd-scn-scene.hpp"
 #include "../../system/sys-app.hpp"
-#include "../../system/sys-log.hpp"
 #include "../buffer/glc3-buf-manager.hpp"
 #include "../buffer/glc3-buf-uniform.hpp"
 #include "../command/glc3-cmd-buffer.hpp"
@@ -22,18 +19,18 @@
 #include "../texture/glc3-txt-cube.hpp"
 #include "../texture/glc3-txt-target.hpp"
 
-gearoenix::glc3::engine::Engine::Engine(system::Application* const sys_app, const render::engine::Type::Id engine_type) noexcept
+gearoenix::glc3::engine::Engine::Engine(system::Application* const sys_app, const render::engine::Type engine_type) noexcept
     : render::engine::Engine(sys_app, engine_type)
 {
-    pipeline_manager = new pipeline::Manager(this);
 }
 
-std::shared_ptr<gearoenix::glc3::engine::Engine> gearoenix::glc3::engine::Engine::construct(system::Application* const sys_app, const render::engine::Type::Id engine_type) noexcept
+gearoenix::glc3::engine::Engine* gearoenix::glc3::engine::Engine::construct(system::Application* const sys_app, const render::engine::Type engine_type) noexcept
 {
-    std::shared_ptr<Engine> e(new Engine(sys_app, engine_type));
-    e->buffer_manager = new buffer::Manager(e.get());
-    e->command_manager = new command::Manager();
-    e->main_render_target = std::shared_ptr<render::texture::Target>(new texture::Target(e.get()));
+    auto e = new Engine(sys_app, engine_type);
+    e->pipeline_manager = std::make_unique<pipeline::Manager>(e);
+    e->buffer_manager = std::make_unique<buffer::Manager>(e);
+    e->command_manager = std::make_unique<command::Manager>();
+    e->main_render_target = std::make_unique<texture::Target>(e);
     return e;
 }
 
@@ -45,7 +42,13 @@ gearoenix::glc3::engine::Engine::~Engine() noexcept
 void gearoenix::glc3::engine::Engine::update() noexcept
 {
     gl::Loader::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+#ifdef GX_DEBUG_GL_CLASS_3
+    gl::Loader::check_for_error();
+#endif
     render::engine::Engine::update();
+#ifdef GX_DEBUG_GL_CLASS_3
+    gl::Loader::check_for_error();
+#endif
 }
 
 void gearoenix::glc3::engine::Engine::terminate() noexcept

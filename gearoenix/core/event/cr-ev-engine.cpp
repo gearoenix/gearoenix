@@ -1,6 +1,6 @@
 #include "cr-ev-engine.hpp"
-#include "cr-ev-listner.hpp"
 #include "../../system/sys-log.hpp"
+#include "cr-ev-listner.hpp"
 #include <functional>
 
 void gearoenix::core::event::Engine::loop() noexcept
@@ -32,7 +32,6 @@ void gearoenix::core::event::Engine::loop() noexcept
 gearoenix::core::event::Engine::Engine() noexcept
     : event_thread(std::bind(&Engine::loop, this))
 {
-
 }
 
 gearoenix::core::event::Engine::~Engine() noexcept
@@ -43,19 +42,19 @@ gearoenix::core::event::Engine::~Engine() noexcept
     event_thread.join();
 }
 
-void gearoenix::core::event::Engine::add_listner(Id event_id, Real priority, Listner*const listner) noexcept
+void gearoenix::core::event::Engine::add_listner(Id event_id, Real priority, Listner* const listner) noexcept
 {
     std::lock_guard<std::mutex> _l(listners_guard);
     events_id_priority_listners[event_id][priority].insert(listner);
 }
 
-void gearoenix::core::event::Engine::remove_listner(Id event_id, Real priority, Listner*const listner) noexcept
+void gearoenix::core::event::Engine::remove_listner(Id event_id, Real priority, Listner* const listner) noexcept
 {
     std::lock_guard<std::mutex> _l(listners_guard);
     events_id_priority_listners[event_id][priority].erase(listner);
 }
 
-void gearoenix::core::event::Engine::remove_listner(Id event_id, Listner*const listner) noexcept
+void gearoenix::core::event::Engine::remove_listner(Id event_id, Listner* const listner) noexcept
 {
     std::lock_guard<std::mutex> _l(listners_guard);
     auto& e = events_id_priority_listners[event_id];
@@ -63,11 +62,10 @@ void gearoenix::core::event::Engine::remove_listner(Id event_id, Listner*const l
         p.second.erase(listner);
 }
 
-void gearoenix::core::event::Engine::remove_listner(Listner*const listner) noexcept
+void gearoenix::core::event::Engine::remove_listner(Listner* const listner) noexcept
 {
     std::lock_guard<std::mutex> _l(listners_guard);
-    for (auto& e : events_id_priority_listners)
-    {
+    for (auto& e : events_id_priority_listners) {
         auto& ps = e.second;
         for (auto& p : ps)
             p.second.erase(listner);

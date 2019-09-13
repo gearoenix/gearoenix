@@ -2,7 +2,6 @@
 #include "../../core/sync/cr-sync-kernel-workers.hpp"
 #include "../../math/math-sphere.hpp"
 #include "../../system/sys-app.hpp"
-#include "../../system/sys-configuration.hpp"
 #include "../buffer/rnd-buf-manager.hpp"
 #include "../buffer/rnd-buf-uniform.hpp"
 #include "../command/rnd-cmd-buffer.hpp"
@@ -18,10 +17,15 @@ gearoenix::render::light::CascadeInfo::PerCascade::PerCascade(engine::Engine* co
 {
 }
 
+gearoenix::render::light::CascadeInfo::PerCascade::~PerCascade() noexcept
+{
+    shadow_mapper = nullptr;
+}
+
 void gearoenix::render::light::CascadeInfo::PerKernel::shadow(const model::Model* const m) noexcept
 {
     const math::Sphere& ms = m->get_occlusion_sphere();
-    const math::Sphere s((*zero_located_view) * ms.position, ms.radius);
+    const math::Sphere s((*zero_located_view) * ms.get_center(), ms.get_radius());
     const std::size_t cascades_count = seen_boxes.size();
     for (std::size_t i = 0; i < cascades_count; ++i) {
         if ((*per_cascade)[i].limit_box.test(s)) {
@@ -84,6 +88,12 @@ gearoenix::render::light::CascadeInfo::CascadeInfo(engine::Engine* const e) noex
     }
 }
 
+gearoenix::render::light::CascadeInfo::~CascadeInfo() noexcept
+{
+    kernels.clear();
+    frames.clear();
+}
+
 void gearoenix::render::light::CascadeInfo::update(const math::Mat4x4& m, const std::vector<std::array<math::Vec3, 4>>& p) noexcept
 {
     current_frame = &frames[e->get_frame_number()];
@@ -127,7 +137,7 @@ void gearoenix::render::light::CascadeInfo::update(const math::Mat4x4& m, const 
         per_cascade[sss].limit_box.put(zero_located_view * v);
     }
     for (auto& c : per_cascade) {
-        gearoenix::math::Vec3 v = c.limit_box.mx;
+        gearoenix::math::Vec3 v = c.limit_box.get_upper();
         v[2] = -std::numeric_limits<gearoenix::core::Real>::max();
         c.limit_box.put(v);
     }
@@ -155,15 +165,15 @@ void gearoenix::render::light::CascadeInfo::shrink() noexcept
     for (auto& cas : per_cascade) {
         cas.shadow_mapper->update();
         cas.max_box.test(cas.limit_box, cas.intersection_box);
-        const auto& mx = cas.intersection_box.mx;
-        const auto& mn = cas.intersection_box.mn;
+        const auto& mx = cas.intersection_box.get_upper();
+        const auto& mn = cas.intersection_box.get_lower();
         const auto c = (mx + mn) * 0.5f;
         const auto d = mx - mn;
         const auto w = d[0] * 1.01f;
         const auto h = d[1] * 1.01f;
         const auto depth = d[2];
-        const auto n = depth * 0.01;
-        const auto f = depth * 1.03;
+        const auto n = depth * 0.01f;
+        const auto f = depth * 1.03f;
         const auto p = gearoenix::math::Mat4x4::orthographic(w, h, n, f);
         const auto t = gearoenix::math::Mat4x4::translator(-gearoenix::math::Vec3(c.xy(), mx[2] + (n * 2.0f)));
         const auto mtx = p * t * zero_located_view;

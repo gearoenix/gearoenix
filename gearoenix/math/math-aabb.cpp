@@ -6,100 +6,103 @@
 #include <limits>
 
 gearoenix::math::Aabb3::Aabb3() noexcept
-    : mx(Vec3(-std::numeric_limits<core::Real>::max(), -std::numeric_limits<core::Real>::max(), -std::numeric_limits<core::Real>::max()))
-    , mn(Vec3(std::numeric_limits<core::Real>::max(), std::numeric_limits<core::Real>::max(), std::numeric_limits<core::Real>::max()))
+    : upper(Vec3(-std::numeric_limits<core::Real>::max(), -std::numeric_limits<core::Real>::max(), -std::numeric_limits<core::Real>::max()))
+    , lower(Vec3(std::numeric_limits<core::Real>::max(), std::numeric_limits<core::Real>::max(), std::numeric_limits<core::Real>::max()))
+    , diameter(0.0f, 0.0f, 0.0f)
+    , center(0.0f, 0.0f, 0.0f)
+    , volume(0.0f)
 {
 }
 
-gearoenix::math::Aabb3::Aabb3(const Vec3& mx, const Vec3& mn) noexcept
-    : mx(mx)
-    , mn(mn)
+gearoenix::math::Aabb3::Aabb3(const Vec3& u, const Vec3& l) noexcept
+    : upper(u)
+    , lower(l)
+    , diameter(u - l)
+    , center((u + l) * 0.5f)
+    , volume(diameter[0] * diameter[1] * diameter[2])
 {
-#ifdef GX_DEBUG_MODE
-    //if()
-#endif
+}
+
+void gearoenix::math::Aabb3::update() noexcept
+{
+    diameter = upper - lower;
+    center = (upper + lower) * 0.5f;
+    volume = diameter[0] * diameter[1] * diameter[2];
 }
 
 void gearoenix::math::Aabb3::reset() noexcept
 {
-    mx = Vec3(-std::numeric_limits<core::Real>::max(), -std::numeric_limits<core::Real>::max(), -std::numeric_limits<core::Real>::max());
-    mn = Vec3(std::numeric_limits<core::Real>::max(), std::numeric_limits<core::Real>::max(), std::numeric_limits<core::Real>::max());
+    upper = Vec3(-std::numeric_limits<core::Real>::max(), -std::numeric_limits<core::Real>::max(), -std::numeric_limits<core::Real>::max());
+    lower = Vec3(std::numeric_limits<core::Real>::max(), std::numeric_limits<core::Real>::max(), std::numeric_limits<core::Real>::max());
+    diameter = Vec3(0.0f, 0.0f, 0.0f);
+    center = Vec3(0.0f, 0.0f, 0.0f);
+    volume = diameter[0] * diameter[1] * diameter[2];
 }
 
 void gearoenix::math::Aabb3::reset(const Vec3& p) noexcept
 {
-    mx = p;
-    mn = p;
+    upper = p;
+    lower = p;
+    diameter = Vec3(0.0f, 0.0f, 0.0f);
+    center = p;
+    volume = 0.0f;
 }
 
 void gearoenix::math::Aabb3::put(const Vec3& p) noexcept
 {
     for (int i = 0; i < 3; ++i) {
-        if (p[i] > mx[i]) {
-            mx[i] = p[i];
-        } else if (p[i] < mn[i]) {
-            mn[i] = p[i];
+        if (p[i] > upper[i]) {
+            upper[i] = p[i];
+        } else if (p[i] < lower[i]) {
+            lower[i] = p[i];
         }
     }
+    update();
 }
 
 void gearoenix::math::Aabb3::put(const Sphere& o) noexcept
 {
-    put(o.position + o.radius);
-    put(o.position - o.radius);
+    const auto u = o.get_center() + o.get_radius();
+    const auto l = o.get_center() - o.get_radius();
+
+    upper[0] = GX_MAX(u[0], upper[0]);
+    upper[1] = GX_MAX(u[1], upper[1]);
+    upper[2] = GX_MAX(u[2], upper[2]);
+    lower[0] = GX_MIN(l[0], lower[0]);
+    lower[1] = GX_MIN(l[1], lower[1]);
+    lower[2] = GX_MIN(l[2], lower[2]);
+
+    update();
 }
 
 void gearoenix::math::Aabb3::put(const gearoenix::math::Aabb3& o) noexcept
 {
-    mx[0] = GX_MAX(o.mx[0], mx[0]);
-    mx[1] = GX_MAX(o.mx[1], mx[1]);
-    mx[2] = GX_MAX(o.mx[2], mx[2]);
-    mn[0] = GX_MIN(o.mn[0], mn[0]);
-    mn[1] = GX_MIN(o.mn[1], mn[1]);
-    mn[2] = GX_MIN(o.mn[2], mn[2]);
+    put_without_update(o);
+    update();
 }
 
-bool gearoenix::math::Aabb3::test(const Ray3& ray, core::Real& t_min_result) const noexcept
+void gearoenix::math::Aabb3::put_without_update(const Aabb3& o) noexcept
 {
-    const math::Vec3& ro = ray.get_origin();
-    const math::Vec3& rd = ray.get_direction();
-    core::Real t_max = std::numeric_limits<core::Real>::max();
-    core::Real t_min = -t_max;
-    for (int i = 0; i < 3; ++i) {
-        if (GX_IS_ZERO(rd[i]))
-            continue;
-        const core::Real oor = mx[i] - ro[i];
-        const core::Real oomr = mn[i] - ro[i];
-        const core::Real rrd = 1.0f / rd[i];
-        const core::Real f1 = oor * rrd;
-        const core::Real f2 = oomr * rrd;
-        const core::Real mxf = GX_MAX(f1, f2);
-        const core::Real mnf = GX_MIN(f1, f2);
-        t_max = GX_MIN(t_max, mxf);
-        t_min = GX_MAX(t_min, mnf);
-    }
-    if ((t_max >= t_min) && t_max > 0.0f) {
-        if (t_min_result > t_min) {
-            t_min_result = t_min;
-            return true;
-        }
-    }
-
-    return false;
+    upper[0] = GX_MAX(o.upper[0], upper[0]);
+    upper[1] = GX_MAX(o.upper[1], upper[1]);
+    upper[2] = GX_MAX(o.upper[2], upper[2]);
+    lower[0] = GX_MIN(o.lower[0], lower[0]);
+    lower[1] = GX_MIN(o.lower[1], lower[1]);
+    lower[2] = GX_MIN(o.lower[2], lower[2]);
 }
 
 bool gearoenix::math::Aabb3::test(const Aabb3& o, Aabb3& intersection) const noexcept
 {
     int equals = 0;
     for (int i = 0; i < 3; ++i) {
-        const core::Real eb = mn[i];
-        const core::Real oeb = o.mn[i];
+        const core::Real eb = lower[i];
+        const core::Real oeb = o.lower[i];
         const core::Real ieb = GX_MAX(eb, oeb);
-        const core::Real ea = mx[i];
-        const core::Real oea = o.mx[i];
+        const core::Real ea = upper[i];
+        const core::Real oea = o.upper[i];
         const core::Real iea = GX_MIN(ea, oea);
-        intersection.mx[i] = iea;
-        intersection.mn[i] = ieb;
+        intersection.upper[i] = iea;
+        intersection.lower[i] = ieb;
         if (ieb == iea) {
             ++equals;
         } else if (ieb > iea) {
@@ -111,34 +114,68 @@ bool gearoenix::math::Aabb3::test(const Aabb3& o, Aabb3& intersection) const noe
 
 bool gearoenix::math::Aabb3::test(const Aabb3& o) const noexcept
 {
-    return mn[0] < o.mx[0]
-        && mx[0] > o.mn[0]
-        && mn[1] < o.mx[1]
-        && mx[1] > o.mn[1]
-        && mn[2] < o.mx[2]
-        && mx[2] > o.mn[2];
+    return lower[0] < o.upper[0]
+        && upper[0] > o.lower[0]
+        && lower[1] < o.upper[1]
+        && upper[1] > o.lower[1]
+        && lower[2] < o.upper[2]
+        && upper[2] > o.lower[2];
 }
 
 bool gearoenix::math::Aabb3::test(const gearoenix::math::Sphere& o) const noexcept
 {
-    return test(Aabb3(o.position + o.radius, o.position - o.radius));
+    return test(Aabb3(o.get_center() + o.get_radius(), o.get_center() - o.get_radius()));
 }
 
-gearoenix::math::IntersectionStatus::Type gearoenix::math::Aabb3::check_intersection(const Aabb3& o) const noexcept
+std::optional<gearoenix::core::Real> gearoenix::math::Aabb3::hit(const math::Ray3& r, const core::Real d_min) const noexcept
 {
-    if (mx[0] > o.mx[0]
-        && mx[1] > o.mx[1]
-        && mx[2] > o.mx[2]
-        && mn[0] < o.mn[0]
-        && mn[1] < o.mn[1]
-        && mn[2] < o.mn[2])
-        return gearoenix::math::IntersectionStatus::In;
-    if (mn[0] < o.mx[0]
-        && mx[0] > o.mn[0]
-        && mn[1] < o.mx[1]
-        && mx[1] > o.mn[1]
-        && mn[2] < o.mx[2]
-        && mx[2] > o.mn[2])
-        return gearoenix::math::IntersectionStatus::Cut;
-    return gearoenix::math::IntersectionStatus::Out;
+    const Vec3& ro = r.get_origin();
+    const Vec3& rd = r.get_normalized_direction();
+    /// TODO: precompute it in ray
+    const Vec3 rrd = Vec3(1.0f) / rd;
+    const Vec3 t0 = (lower - ro) * rrd;
+    const Vec3 t1 = (upper - ro) * rrd;
+    const Vec3 tsmall = t0.minimum(t1);
+    const Vec3 tbig = t0.maximum(t1);
+    const core::Real tmin = tsmall.maximum();
+    const core::Real tmax = tbig.minimum();
+    if (tmin < tmax && tmin < d_min)
+        return tmin;
+    return std::nullopt;
+}
+
+gearoenix::math::IntersectionStatus gearoenix::math::Aabb3::check_intersection(const Aabb3& o) const noexcept
+{
+    if (upper[0] > o.upper[0]
+        && upper[1] > o.upper[1]
+        && upper[2] > o.upper[2]
+        && lower[0] < o.lower[0]
+        && lower[1] < o.lower[1]
+        && lower[2] < o.lower[2])
+        return IntersectionStatus::In;
+    if (lower[0] < o.upper[0]
+        && upper[0] > o.lower[0]
+        && lower[1] < o.upper[1]
+        && upper[1] > o.lower[1]
+        && lower[2] < o.upper[2]
+        && upper[2] > o.lower[2])
+        return IntersectionStatus::Cut;
+    return IntersectionStatus::Out;
+}
+
+void gearoenix::math::Aabb3::set_center(const Vec3& c) noexcept
+{
+    center = std::move(c);
+    const Vec3 r = diameter * 0.5f;
+    upper = center + r;
+    lower = center - r;
+}
+
+void gearoenix::math::Aabb3::set_diameter(const Vec3& d) noexcept
+{
+    diameter = d;
+    const auto hd = d * 0.5f;
+    upper = center + hd;
+    lower = center - hd;
+    volume = d[0] * d[1] * d[2];
 }

@@ -22,7 +22,7 @@ namespace buffer {
 
     public:
         virtual ~Manager() noexcept = default;
-        virtual Uniform* create_uniform(unsigned int size) noexcept = 0;
+        virtual Uniform* create_uniform(std::size_t size) noexcept = 0;
         virtual Static* create_static(std::vector<math::BasicVertex> vertices, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept = 0;
         virtual Static* create_static(std::vector<std::uint32_t> indices, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept = 0;
     };

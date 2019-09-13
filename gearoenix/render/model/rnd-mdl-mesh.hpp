@@ -35,7 +35,7 @@ namespace render {
                 const std::shared_ptr<mesh::Mesh>& msh,
                 const std::shared_ptr<material::Material>& mat) noexcept;
 
-            ~Mesh();
+            ~Mesh() noexcept;
 
             const std::shared_ptr<mesh::Mesh>& get_mesh() const noexcept;
             const std::shared_ptr<material::Material>& get_material() const noexcept;

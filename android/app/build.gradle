@@ -10,8 +10,8 @@ android {
         versionName "1.0"
         externalNativeBuild {
             cmake {
-                abiFilters 'armeabi-v7a' //, 'arm64-v8a', 'x86', 'x86_64'
-                arguments '-DANDROID_TOOLCHAIN=clang', '-DANDROID_STL=c++_static', '-DGX_BUILD_ANDROID=True', '-DGX_ENABLE_EXAMPLE_001_HELLO_WORLD=True'
+                abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86' //, 'x86_64'
+                arguments '-DANDROID_TOOLCHAIN=clang', '-DANDROID_STL=c++_static', '-DGX_BUILD_ANDROID=True', '-DGX_ENABLE_EXAMPLE_003_NET_HELLO_WORLD=True'
             }
         }
     }

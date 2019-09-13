@@ -58,7 +58,7 @@ void gearoenix::render::camera::Transformation::look_at(const math::Vec3& origin
 {
     uniform->position = origin;
     uniform->z = (origin - target).normalized();
-    uniform->x = up.cross(uniform->z);
+    uniform->x = up.cross(uniform->z).normalized();
     uniform->y = uniform->z.cross(uniform->x);
     uniform->view = math::Mat4x4::look_at(uniform->position, target, uniform->y);
     uniform->inversed_rotation = uniform->view * math::Mat4x4::translator(uniform->position);

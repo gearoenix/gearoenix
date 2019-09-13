@@ -7,20 +7,20 @@ class Transformation;
 }
 
 namespace gearoenix::render::scene {
-class Scene;
+class Game;
 }
 
 class GameApp : public gearoenix::core::Application {
 private:
-    using GxScene = gearoenix::render::scene::Scene;
+    using GxGameScene = gearoenix::render::scene::Game;
     using GxCamTran = gearoenix::render::camera::Transformation;
 
-    std::shared_ptr<GxScene> scn;
+    std::shared_ptr<GxGameScene> scn;
     std::shared_ptr<GxCamTran> camtrn;
 
 public:
     /// This function must be like this
-    GameApp(const std::shared_ptr<gearoenix::system::Application>& sys_app) noexcept;
+    GameApp(gearoenix::system::Application* const sys_app) noexcept;
     ~GameApp() noexcept final = default;
     /// On every screen refresh this function is going to be called
     void update() noexcept final;

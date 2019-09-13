@@ -36,12 +36,13 @@ namespace texture {
 namespace pipeline {
     class ResourceSet {
     protected:
-        buffer::Uniform* scene_uniform_buffer = nullptr;
-        buffer::Uniform* camera_uniform_buffer = nullptr;
-        const buffer::Uniform* light_uniform_buffer = nullptr;
-        buffer::Uniform* model_uniform_buffer = nullptr;
-        buffer::Uniform* material_uniform_buffer = nullptr;
-        buffer::Uniform* node_uniform_buffer = nullptr;
+        /// It is not owner of any of these objects
+
+        const buffer::Uniform* scene_uniform_buffer = nullptr;
+        const buffer::Uniform* camera_uniform_buffer = nullptr;
+        const buffer::Uniform* model_uniform_buffer = nullptr;
+        const buffer::Uniform* material_uniform_buffer = nullptr;
+        const buffer::Uniform* node_uniform_buffer = nullptr;
 
         const mesh::Mesh* msh = nullptr;
 
@@ -55,7 +56,6 @@ namespace pipeline {
 #define GX_HELPER(c, cc) virtual void set_##c(const c::cc* o) noexcept
         GX_HELPER(scene, Scene);
         GX_HELPER(camera, Camera);
-        GX_HELPER(light, Light);
         GX_HELPER(model, Model);
         GX_HELPER(mesh, Mesh);
         GX_HELPER(material, Material);

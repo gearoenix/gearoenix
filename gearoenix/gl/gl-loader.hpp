@@ -5,16 +5,6 @@
 #include "../render/engine/rnd-eng-type.hpp"
 #include "gl-types.hpp"
 
-#if defined(_WIN32) && !defined(__SCITECH_SNAP__)
-#define GXGL_APICALL __declspec(dllimport)
-#elif defined(__SYMBIAN32__)
-#define GXGL_APICALL IMPORT_C
-#elif defined(ANDROID)
-#define GXGL_APICALL __attribute__((visibility("default")))
-#else
-#define GXGL_APICALL
-#endif
-
 #if defined(_WIN32) && !defined(_WIN32_WCE) && !defined(__SCITECH_SNAP__)
 #define GXGL_APIENTRY __stdcall*
 #else
@@ -22,82 +12,130 @@
 #endif
 
 namespace gearoenix::gl {
-typedef GXGL_APICALL void(GXGL_APIENTRY active_texture_fnp)(enumerated texture);
-typedef GXGL_APICALL void(GXGL_APIENTRY attach_shader_fnp)(uint program, uint shader);
-typedef GXGL_APICALL void(GXGL_APIENTRY bind_attrib_location_fnp)(uint program, uint index, const char* name);
-typedef GXGL_APICALL void(GXGL_APIENTRY bind_buffer_fnp)(enumerated, uint);
-typedef GXGL_APICALL void(GXGL_APIENTRY bind_framebuffer_fnp)(enumerated target, uint framebuffer);
-typedef GXGL_APICALL void(GXGL_APIENTRY bind_renderbuffer_fnp)(enumerated target, uint renderbuffer);
-typedef GXGL_APICALL void(GXGL_APIENTRY bind_texture_fnp)(enumerated, uint);
-typedef GXGL_APICALL void(GXGL_APIENTRY blend_func_fnp)(enumerated, enumerated);
-typedef GXGL_APICALL void(GXGL_APIENTRY buffer_data_fnp)(enumerated, sizeiptr, const void*, enumerated);
-typedef GXGL_APICALL enumerated(GXGL_APIENTRY check_framebuffer_status_fnp)(enumerated target);
-typedef GXGL_APICALL void(GXGL_APIENTRY clear_color_fnp)(float, float, float, float);
-typedef GXGL_APICALL void(GXGL_APIENTRY clear_fnp)(bitfield);
-typedef GXGL_APICALL void(GXGL_APIENTRY compile_shader_fnp)(uint shader);
-typedef GXGL_APICALL uint(GXGL_APIENTRY create_program_fnp)();
-typedef GXGL_APICALL uint(GXGL_APIENTRY create_shader_fnp)(enumerated shader_type);
-typedef GXGL_APICALL void(GXGL_APIENTRY cull_face_fnp)(enumerated);
-typedef GXGL_APICALL void(GXGL_APIENTRY delete_buffers_fnp)(sizei n, const uint* buffers);
-typedef GXGL_APICALL void(GXGL_APIENTRY delete_framebuffers_fnp)(sizei n, const uint* framebuffers);
-typedef GXGL_APICALL void(GXGL_APIENTRY delete_program_fnp)(uint program);
-typedef GXGL_APICALL void(GXGL_APIENTRY delete_renderbuffers_fnp)(sizei n, const uint* renderbuffers);
-typedef GXGL_APICALL void(GXGL_APIENTRY delete_shader_fnp)(uint shader);
-typedef GXGL_APICALL void(GXGL_APIENTRY delete_textures_fnp)(sizei n, const uint* textures);
-typedef GXGL_APICALL void(GXGL_APIENTRY depth_mask_fnp)(boolean flag);
-typedef GXGL_APICALL void(GXGL_APIENTRY disable_fnp)(enumerated cap);
-typedef GXGL_APICALL void(GXGL_APIENTRY draw_elements_fnp)(enumerated mode, sizei count, enumerated type, const void* indices);
-typedef GXGL_APICALL void(GXGL_APIENTRY enable_fnp)(enumerated);
-typedef GXGL_APICALL void(GXGL_APIENTRY enable_vertex_attrib_array_fnp)(uint index);
-typedef GXGL_APICALL void(GXGL_APIENTRY framebuffer_renderbuffer_fnp)(enumerated target, enumerated attachment, enumerated renderbuffertarget, uint renderbuffer);
-typedef GXGL_APICALL void(GXGL_APIENTRY framebuffer_texture_2d_fnp)(enumerated target, enumerated attachment, enumerated textarget, uint texture, sint level);
-typedef GXGL_APICALL void(GXGL_APIENTRY gen_buffers_fnp)(sizei, uint*);
-typedef GXGL_APICALL void(GXGL_APIENTRY gen_framebuffers_fnp)(sizei n, uint* framebuffers);
-typedef GXGL_APICALL void(GXGL_APIENTRY gen_renderbuffers_fnp)(sizei n, uint* renderbuffers);
-typedef GXGL_APICALL void(GXGL_APIENTRY gen_textures_fnp)(sizei, uint*);
-typedef GXGL_APICALL void(GXGL_APIENTRY generate_mipmap_fnp)(enumerated target);
-typedef GXGL_APICALL sint(GXGL_APIENTRY get_attrib_location_fnp)(uint program, const char* name);
-typedef GXGL_APICALL enumerated(GXGL_APIENTRY get_error_fnp)();
-typedef GXGL_APICALL void(GXGL_APIENTRY get_integerv_fnp)(enumerated pname, sint* data);
-typedef GXGL_APICALL void(GXGL_APIENTRY get_programiv_fnp)(uint program, enumerated pname, sint* params);
-typedef GXGL_APICALL void(GXGL_APIENTRY get_program_info_log_fnp)(uint program, sizei buf_size, sizei* length, char* info);
-typedef GXGL_APICALL void(GXGL_APIENTRY get_shaderiv_fnp)(uint shader, enumerated pname, sint* params);
-typedef GXGL_APICALL void(GXGL_APIENTRY get_shader_info_log_fnp)(uint shader, sizei bufSize, sizei* length, char* info);
-typedef GXGL_APICALL sint(GXGL_APIENTRY get_uniform_location_fnp)(uint program, const char* name);
-typedef GXGL_APICALL void(GXGL_APIENTRY link_program_fnp)(uint program);
-typedef GXGL_APICALL void(GXGL_APIENTRY renderbuffer_storage_fnp)(enumerated target, enumerated internal_format, sizei img_width, sizei img_height);
-typedef GXGL_APICALL void(GXGL_APIENTRY tex_image_2d_fnp)(enumerated target, sint level, sint internal_format, sizei image_width, sizei image_height, sint border, enumerated format, enumerated data_type, const void* pixels);
-typedef GXGL_APICALL void(GXGL_APIENTRY tex_parameterf_fnp)(enumerated, enumerated, float);
-typedef GXGL_APICALL void(GXGL_APIENTRY tex_parameterfv_fnp)(enumerated, enumerated, const float*);
-typedef GXGL_APICALL void(GXGL_APIENTRY tex_parameteri_fnp)(enumerated, enumerated, sint);
-typedef GXGL_APICALL void(GXGL_APIENTRY tex_parameteriv_fnp)(enumerated, enumerated, const sint*);
-typedef GXGL_APICALL void(GXGL_APIENTRY scissor_fnp)(sint, sint, sizei, sizei);
-typedef GXGL_APICALL void(GXGL_APIENTRY shader_source_fnp)(uint shader, sizei count, const char* const* code, const sint* length);
-typedef GXGL_APICALL void(GXGL_APIENTRY uniform1f_fnp)(sint location, float v0);
-typedef GXGL_APICALL void(GXGL_APIENTRY uniform1i_fnp)(sint location, sint v0);
-typedef GXGL_APICALL void(GXGL_APIENTRY uniform2fv_fnp)(sint location, sizei count, const void* data);
-typedef GXGL_APICALL void(GXGL_APIENTRY uniform3fv_fnp)(sint location, sizei count, const void* data);
-typedef GXGL_APICALL void(GXGL_APIENTRY uniform4fv_fnp)(sint location, sizei count, const void* data);
-typedef GXGL_APICALL void(GXGL_APIENTRY uniform_matrix2fv_fnp)(sint location, sizei count, boolean transpose, const float* value);
-typedef GXGL_APICALL void(GXGL_APIENTRY uniform_matrix3fv_fnp)(sint location, sizei count, boolean transpose, const float* value);
-typedef GXGL_APICALL void(GXGL_APIENTRY uniform_matrix4fv_fnp)(sint location, sizei count, boolean transpose, const float* value);
-typedef GXGL_APICALL void(GXGL_APIENTRY use_program_fnp)(uint program);
-typedef GXGL_APICALL void(GXGL_APIENTRY validate_program_fnp)(uint program);
-typedef GXGL_APICALL void(GXGL_APIENTRY vertex_attrib_pointer_fnp)(uint index, sint size, enumerated type, boolean normalized, sizei stride, const void* pointer);
-typedef GXGL_APICALL void(GXGL_APIENTRY viewport_fnp)(sint, sint, sizei, sizei);
+typedef void(GXGL_APIENTRY active_texture_fnp)(enumerated texture);
+typedef void(GXGL_APIENTRY attach_shader_fnp)(uint program, uint shader);
+typedef void(GXGL_APIENTRY bind_attrib_location_fnp)(uint program, uint index,
+    const char* name);
+typedef void(GXGL_APIENTRY bind_buffer_fnp)(enumerated, uint);
+typedef void(GXGL_APIENTRY bind_framebuffer_fnp)(enumerated target,
+    uint framebuffer);
+typedef void(GXGL_APIENTRY bind_renderbuffer_fnp)(enumerated target,
+    uint renderbuffer);
+typedef void(GXGL_APIENTRY bind_texture_fnp)(enumerated, uint);
+typedef void(GXGL_APIENTRY blend_func_fnp)(enumerated, enumerated);
+typedef void(GXGL_APIENTRY buffer_data_fnp)(enumerated, sizeiptr, const void*,
+    enumerated);
+typedef enumerated(GXGL_APIENTRY check_framebuffer_status_fnp)(enumerated target);
+typedef void(GXGL_APIENTRY clear_color_fnp)(float, float, float, float);
+typedef void(GXGL_APIENTRY clear_fnp)(bitfield);
+typedef void(GXGL_APIENTRY compile_shader_fnp)(uint shader);
+typedef uint(GXGL_APIENTRY create_program_fnp)();
+typedef uint(GXGL_APIENTRY create_shader_fnp)(enumerated shader_type);
+typedef void(GXGL_APIENTRY cull_face_fnp)(enumerated);
+typedef void(GXGL_APIENTRY delete_buffers_fnp)(sizei n, const uint* buffers);
+typedef void(GXGL_APIENTRY delete_framebuffers_fnp)(sizei n,
+    const uint* framebuffers);
+typedef void(GXGL_APIENTRY delete_program_fnp)(uint program);
+typedef void(GXGL_APIENTRY delete_renderbuffers_fnp)(sizei n,
+    const uint* renderbuffers);
+typedef void(GXGL_APIENTRY delete_shader_fnp)(uint shader);
+typedef void(GXGL_APIENTRY delete_textures_fnp)(sizei n, const uint* textures);
+typedef void(GXGL_APIENTRY depth_mask_fnp)(boolean flag);
+typedef void(GXGL_APIENTRY disable_fnp)(enumerated cap);
+typedef void(GXGL_APIENTRY draw_elements_fnp)(enumerated mode, sizei count,
+    enumerated type,
+    const void* indices);
+typedef void(GXGL_APIENTRY enable_fnp)(enumerated);
+typedef void(GXGL_APIENTRY enable_vertex_attrib_array_fnp)(uint index);
+typedef void(GXGL_APIENTRY framebuffer_renderbuffer_fnp)(enumerated target,
+    enumerated attachment,
+    enumerated renderbuffertarget,
+    uint renderbuffer);
+typedef void(GXGL_APIENTRY framebuffer_texture_2d_fnp)(enumerated target,
+    enumerated attachment,
+    enumerated textarget,
+    uint texture, sint level);
+typedef void(GXGL_APIENTRY gen_buffers_fnp)(sizei, uint*);
+typedef void(GXGL_APIENTRY gen_framebuffers_fnp)(sizei n, uint* framebuffers);
+typedef void(GXGL_APIENTRY gen_renderbuffers_fnp)(sizei n, uint* renderbuffers);
+typedef void(GXGL_APIENTRY gen_textures_fnp)(sizei, uint*);
+typedef void(GXGL_APIENTRY generate_mipmap_fnp)(enumerated target);
+typedef sint(GXGL_APIENTRY get_attrib_location_fnp)(uint program,
+    const char* name);
+typedef enumerated(GXGL_APIENTRY get_error_fnp)();
+typedef void(GXGL_APIENTRY get_integerv_fnp)(enumerated pname, sint* data);
+typedef void(GXGL_APIENTRY get_programiv_fnp)(uint program, enumerated pname,
+    sint* params);
+typedef void(GXGL_APIENTRY get_program_info_log_fnp)(uint program, sizei buf_size,
+    sizei* length, char* info);
+typedef void(GXGL_APIENTRY get_shaderiv_fnp)(uint shader, enumerated pname,
+    sint* params);
+typedef void(GXGL_APIENTRY get_shader_info_log_fnp)(uint shader, sizei bufSize,
+    sizei* length, char* info);
+typedef sint(GXGL_APIENTRY get_uniform_location_fnp)(uint program,
+    const char* name);
+typedef void(GXGL_APIENTRY link_program_fnp)(uint program);
+typedef void(GXGL_APIENTRY renderbuffer_storage_fnp)(enumerated target,
+    enumerated internal_format,
+    sizei img_width,
+    sizei img_height);
+typedef void(GXGL_APIENTRY tex_image_2d_fnp)(enumerated target, sint level,
+    sint internal_format,
+    sizei image_width, sizei image_height,
+    sint border, enumerated format,
+    enumerated data_type,
+    const void* pixels);
+typedef void(GXGL_APIENTRY tex_parameterf_fnp)(enumerated, enumerated, float);
+typedef void(GXGL_APIENTRY tex_parameterfv_fnp)(enumerated, enumerated,
+    const float*);
+typedef void(GXGL_APIENTRY tex_parameteri_fnp)(enumerated, enumerated, sint);
+typedef void(GXGL_APIENTRY tex_parameteriv_fnp)(enumerated, enumerated,
+    const sint*);
+typedef void(GXGL_APIENTRY scissor_fnp)(sint, sint, sizei, sizei);
+typedef void(GXGL_APIENTRY shader_source_fnp)(uint shader, sizei count,
+    const char* const* code,
+    const sint* length);
+typedef void(GXGL_APIENTRY uniform1f_fnp)(sint location, float v0);
+typedef void(GXGL_APIENTRY uniform1fv_fnp)(sint location, sizei count,
+    const void* data);
+typedef void(GXGL_APIENTRY uniform1i_fnp)(sint location, sint v0);
+typedef void(GXGL_APIENTRY uniform1iv_fnp)(sint location, sizei count,
+    const void* data);
+typedef void(GXGL_APIENTRY uniform2fv_fnp)(sint location, sizei count,
+    const void* data);
+typedef void(GXGL_APIENTRY uniform3fv_fnp)(sint location, sizei count,
+    const void* data);
+typedef void(GXGL_APIENTRY uniform4fv_fnp)(sint location, sizei count,
+    const void* data);
+typedef void(GXGL_APIENTRY uniform_matrix2fv_fnp)(sint location, sizei count,
+    boolean transpose,
+    const float* value);
+typedef void(GXGL_APIENTRY uniform_matrix3fv_fnp)(sint location, sizei count,
+    boolean transpose,
+    const float* value);
+typedef void(GXGL_APIENTRY uniform_matrix4fv_fnp)(sint location, sizei count,
+    boolean transpose,
+    const float* value);
+typedef void(GXGL_APIENTRY use_program_fnp)(uint program);
+typedef void(GXGL_APIENTRY validate_program_fnp)(uint program);
+typedef void(GXGL_APIENTRY vertex_attrib_pointer_fnp)(uint index, sint size,
+    enumerated type,
+    boolean normalized,
+    sizei stride,
+    const void* pointer);
+typedef void(GXGL_APIENTRY viewport_fnp)(sint, sint, sizei, sizei);
 #ifdef GX_USE_OPENGL_CLASS_3
-typedef GXGL_APICALL void(GXGL_APIENTRY bind_vertex_array_fnp)(uint arr);
-typedef GXGL_APICALL void(GXGL_APIENTRY delete_vertex_arrays_fnp)(sizei n, const uint* arrays);
-typedef GXGL_APICALL void(GXGL_APIENTRY gen_vertex_arrays_fnp)(sizei n, uint* arrays);
-typedef GXGL_APICALL void(GXGL_APIENTRY read_buffer)(enumerated src);
+typedef void(GXGL_APIENTRY bind_vertex_array_fnp)(uint arr);
+typedef void(GXGL_APIENTRY delete_vertex_arrays_fnp)(sizei n, const uint* arrays);
+typedef void(GXGL_APIENTRY gen_vertex_arrays_fnp)(sizei n, uint* arrays);
+typedef void(GXGL_APIENTRY read_buffer)(enumerated src);
 #endif
-
 class Loader {
 private:
 public:
     Loader() = delete;
     Loader(const Loader&) = delete;
-    static bool load_library(render::engine::Type::Id engine_type) noexcept;
+    static bool load_library(render::engine::Type engine_type) noexcept;
     static void unload_library() noexcept;
     static void check_for_error() noexcept;
 
@@ -153,7 +191,9 @@ public:
     static scissor_fnp scissor;
     static shader_source_fnp shader_source;
     static uniform1f_fnp uniform1f;
+    static uniform1fv_fnp uniform1fv;
     static uniform1i_fnp uniform1i;
+    static uniform1iv_fnp uniform1iv;
     static uniform2fv_fnp uniform2fv;
     static uniform3fv_fnp uniform3fv;
     static uniform4fv_fnp uniform4fv;

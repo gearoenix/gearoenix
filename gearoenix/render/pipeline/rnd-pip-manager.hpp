@@ -12,7 +12,7 @@ namespace pipeline {
     class Manager {
     protected:
         engine::Engine* const e;
-        core::cache::Cacher<Pipeline, Type::Id> pipelines;
+        core::cache::Cacher<Pipeline, Type> pipelines;
         Manager(engine::Engine* const e) noexcept
             : e(e)
         {
@@ -20,7 +20,7 @@ namespace pipeline {
 
     public:
         virtual ~Manager() noexcept = default;
-        virtual std::shared_ptr<Pipeline> get(const Type::Id pipeline_type, core::sync::EndCaller<Pipeline>& end) noexcept = 0;
+        virtual std::shared_ptr<Pipeline> get(const Type pipeline_type, core::sync::EndCaller<Pipeline>& end) noexcept = 0;
     };
 }
 }

@@ -42,19 +42,19 @@ namespace texture {
 namespace graph::node {
     class Node : public core::graph::Node {
     protected:
-        engine::Engine* e = nullptr;
-        std::vector<std::shared_ptr<texture::Texture>> input_textures;
+        engine::Engine* const e;
+        std::vector<texture::Texture*> input_textures;
         std::vector<std::shared_ptr<texture::Texture>> output_textures;
-        std::vector<std::vector<std::shared_ptr<sync::Semaphore>>> link_providers_frames_semaphores;
+        std::vector<std::vector<sync::Semaphore*>> link_providers_frames_semaphores;
         std::vector<std::map<std::pair<core::Id, unsigned int>, std::vector<std::shared_ptr<sync::Semaphore>>>> links_consumers_frames_semaphores;
-        std::vector<std::shared_ptr<command::Buffer>> frames_primary_cmd;
-        /// These are for preventing redundant allocation&deallocation in render loop
+        std::vector<std::unique_ptr<command::Buffer>> frames_primary_cmd;
+        /// These are for preventing redundant allocation & deallocation in render loop
         std::vector<std::vector<sync::Semaphore*>> pre_sems, nxt_sems;
         std::shared_ptr<texture::Target> render_target = nullptr;
         std::shared_ptr<pipeline::Pipeline> render_pipeline = nullptr;
         Node(
             engine::Engine* e,
-            pipeline::Type::Id pipeline_type_id,
+            pipeline::Type pipeline_type_id,
             unsigned int input_textures_count,
             unsigned int output_textures_count,
             const std::vector<std::string>& input_links,
@@ -64,16 +64,17 @@ namespace graph::node {
         void update_previous_semaphores() noexcept;
 
     public:
-        virtual ~Node() noexcept = default;
-        void set_provider(unsigned int input_link_index, const std::shared_ptr<core::graph::Node>& o, unsigned int provider_output_link_index) noexcept final;
+        virtual ~Node() noexcept;
+        void set_provider(unsigned int input_link_index, core::graph::Node* o, unsigned int provider_output_link_index) noexcept final;
         void remove_provider(unsigned int input_link_index) noexcept final;
+        void set_providers_count(std::size_t count) noexcept final;
         void remove_consumer(unsigned int output_link_index, core::Id node_id, unsigned int consumer_input_link_index) noexcept final;
-        const std::shared_ptr<texture::Texture>& get_output_texture(unsigned int index) const noexcept;
-        virtual void set_input_texture(const std::shared_ptr<texture::Texture>& t, unsigned int index) noexcept;
+        [[nodiscard]] const std::shared_ptr<texture::Texture>& get_output_texture(unsigned int index) const noexcept;
+        virtual void set_input_texture(texture::Texture* t, unsigned int index) noexcept;
         virtual void set_render_target(const std::shared_ptr<texture::Target>& t) noexcept;
         virtual void update() noexcept;
         virtual void submit() noexcept;
-        const std::vector<std::shared_ptr<sync::Semaphore>> get_link_frames_semaphore(unsigned int output_link_index, core::Id consumer_id, unsigned int consumer_input_link_index) noexcept;
+        const std::vector<std::shared_ptr<sync::Semaphore>>& get_link_frames_semaphore(unsigned int output_link_index, core::Id consumer_id, unsigned int consumer_input_link_index) noexcept;
     };
 }
 }

@@ -2,7 +2,7 @@
 #ifdef GX_USE_OPENGL_ES2
 #include "../buffer/gles2-buf-uniform.hpp"
 #include "../engine/gles2-eng-engine.hpp"
-#include "gles2-pip-forward-pbr-directional-shadow.hpp"
+#include "gles2-pip-forward-pbr.hpp"
 #include "gles2-pip-shadow-mapper.hpp"
 
 gearoenix::gles2::pipeline::Manager::Manager(engine::Engine* const engine) noexcept
@@ -12,19 +12,19 @@ gearoenix::gles2::pipeline::Manager::Manager(engine::Engine* const engine) noexc
 
 gearoenix::gles2::pipeline::Manager::~Manager() noexcept {}
 
-std::shared_ptr<gearoenix::render::pipeline::Pipeline> gearoenix::gles2::pipeline::Manager::get(const render::pipeline::Type::Id pipeline_type_id, core::sync::EndCaller<render::pipeline::Pipeline>& end) noexcept
+std::shared_ptr<gearoenix::render::pipeline::Pipeline> gearoenix::gles2::pipeline::Manager::get(const render::pipeline::Type pipeline_type_id, core::sync::EndCaller<render::pipeline::Pipeline>& end) noexcept
 {
     const std::shared_ptr<render::pipeline::Pipeline> p = pipelines.get<render::pipeline::Pipeline>(pipeline_type_id, [this, pipeline_type_id, end] {
         auto gles2eng = reinterpret_cast<engine::Engine*>(e);
         switch (pipeline_type_id) {
-        case render::pipeline::Type::ForwardPbrDirectionalShadow:
-            return std::shared_ptr<render::pipeline::Pipeline>(new ForwardPbrDirectionalShadow(gles2eng,
+        case render::pipeline::Type::ForwardPbr:
+            return std::shared_ptr<render::pipeline::Pipeline>(new ForwardPbr(gles2eng,
                 core::sync::EndCaller<core::sync::EndCallerIgnore>([end] {})));
         case render::pipeline::Type::ShadowMapper:
             return std::shared_ptr<render::pipeline::Pipeline>(new ShadowMapper(gles2eng,
                 core::sync::EndCaller<core::sync::EndCallerIgnore>([end] {})));
         default:
-            GXLOGF("Unexpected pipeline type: " << pipeline_type_id);
+            GXLOGF("Unexpected pipeline type: " << static_cast<unsigned int>(pipeline_type_id));
             break;
         }
     });

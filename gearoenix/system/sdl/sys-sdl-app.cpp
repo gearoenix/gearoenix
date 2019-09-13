@@ -6,10 +6,8 @@
 #endif
 
 #include "../../core/asset/cr-asset-manager.hpp"
-#include "../../core/event/cr-ev-engine.hpp"
 #include "../../core/cr-application.hpp"
-#include "../../core/cr-static.hpp"
-#include "../../core/cr-types.hpp"
+#include "../../core/event/cr-ev-engine.hpp"
 #include "../../core/event/cr-ev-event.hpp"
 #include "../../gl/gl-loader.hpp"
 #include "../sys-configuration.hpp"
@@ -78,32 +76,33 @@ void gearoenix::system::Application::create_window() noexcept
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 #endif
-#define CREATE_WINDOW(gl_version)                                              \
-    supported_engine = render::engine::Type::gl_version;                       \
-    GXLOGD("Trying to build OpenGL window with: " << #gl_version)              \
-    window = SDL_CreateWindow(                                                 \
-        GX_APP_NAME,                                                           \
-        SDL_WINDOWPOS_CENTERED,                                                \
-        SDL_WINDOWPOS_CENTERED,                                                \
-        static_cast<int>(win_width),                                           \
-        static_cast<int>(win_height),                                          \
-        flags);                                                                \
-    if (nullptr != window) {                                                   \
-        GXLOGD("Trying to build OpenGL context with: " << #gl_version)         \
-        gl_context = SDL_GL_CreateContext(window);                             \
-        if (gl_context != nullptr) {                                           \
-            GXLOGD("Trying to load OpenGL library with: " << #gl_version)      \
-            if (gl::Loader::load_library(supported_engine)) {                  \
-                GXLOGD("OpenGL window built with: " << #gl_version)            \
-                return;                                                        \
-            } else                                                             \
-                GXLOGD("Can not load OpenGL library with: " << #gl_version)    \
-            SDL_GL_DeleteContext(gl_context);                                  \
-        } else                                                                 \
-            GXLOGD("Can not build OpenGL context with: " << #gl_version)       \
-        SDL_DestroyWindow(window);                                             \
-    } else                                                                     \
-        GXLOGD("Can not build OpenGL window with: " << #gl_version)
+#define CREATE_WINDOW(gl_version)                                           \
+    supported_engine = render::engine::Type::gl_version;                    \
+    GXLOGD("Trying to build OpenGL window with: " << #gl_version)           \
+    window = SDL_CreateWindow(                                              \
+        GX_APP_NAME,                                                        \
+        static_cast<int>(SDL_WINDOWPOS_CENTERED),                           \
+        static_cast<int>(SDL_WINDOWPOS_CENTERED),                           \
+        static_cast<int>(window_width),                                     \
+        static_cast<int>(window_height),                                    \
+        flags);                                                             \
+    if (nullptr != window) {                                                \
+        GXLOGD("Trying to build OpenGL context with: " << #gl_version)      \
+        gl_context = SDL_GL_CreateContext(window);                          \
+        if (gl_context != nullptr) {                                        \
+            GXLOGD("Trying to load OpenGL library with: " << #gl_version)   \
+            if (gl::Loader::load_library(supported_engine)) {               \
+                GXLOGD("OpenGL window built with: " << #gl_version)         \
+                return;                                                     \
+            } else                                                          \
+                GXLOGD("Can not load OpenGL library with: " << #gl_version) \
+            SDL_GL_DeleteContext(gl_context);                               \
+        } else                                                              \
+            GXLOGD("Can not build OpenGL context with: " << #gl_version)    \
+        SDL_DestroyWindow(window);                                          \
+    } else {                                                                \
+        GXLOGD("Can not build OpenGL window with: " << #gl_version)         \
+    }
 
 #ifdef GX_USE_OPENGL_43
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
@@ -141,7 +140,7 @@ void gearoenix::system::Application::create_window() noexcept
 
 int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_Event* e) noexcept
 {
-    core::event::Data event;
+    core::event::Data event = {};
     // It's gonna implement whenever needed and as much as needed.
     auto* o = static_cast<Application*>(user_data);
     switch (e->type) {
@@ -166,39 +165,36 @@ int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_
             break;
         }
         break;
-
-#ifdef GX_IN_IOS
     case SDL_FINGERDOWN: {
-        const core::Real x = (e->tfinger.x - 0.5f) * 2.0f * o->screen_ratio;
+        /*const core::Real x = (e->tfinger.x - 0.5f) * 2.0f * o->screen_ratio;
         const core::Real y = (0.5f - e->tfinger.y) * 2.0f;
         event = new core::event::button::Mouse(
             core::event::button::Button::KeyType::LEFT,
             core::event::button::Button::ActionType::PRESS,
             x, y);
         o->pre_x = x;
-        o->pre_y = y;
+        o->pre_y = y;*/
         break;
     }
     case SDL_FINGERUP: {
-        const core::Real x = (e->tfinger.x - 0.5f) * 2.0f * o->screen_ratio;
+        /*const core::Real x = (e->tfinger.x - 0.5f) * 2.0f * o->screen_ratio;
         const core::Real y = (0.5f - e->tfinger.y) * 2.0f;
         event = new core::event::button::Mouse(
             core::event::button::Button::KeyType::LEFT,
             core::event::button::Button::ActionType::RELEASE,
             x, y);
         o->pre_x = x;
-        o->pre_y = y;
+        o->pre_y = y;*/
         break;
     }
     case SDL_FINGERMOTION: {
-        const core::Real x = (e->tfinger.x - 0.5f) * 2.0f * o->screen_ratio;
+        /* const core::Real x = (e->tfinger.x - 0.5f) * 2.0f * o->screen_ratio;
         const core::Real y = (0.5f - e->tfinger.y) * 2.0f;
         event = new core::event::movement::Mouse(x, y, o->pre_x, o->pre_y);
         o->pre_x = x;
-        o->pre_y = y;
+        o->pre_y = y;*/
         break;
     }
-#endif
 
     case SDL_MOUSEWHEEL:
         // todo
@@ -214,28 +210,39 @@ int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_
     }
     case SDL_MOUSEBUTTONUP:
     case SDL_MOUSEBUTTONDOWN: {
-        //core::event::button::Button::ActionType a = core::event::button::Button::ActionType::PRESS;
-        switch (e->type) {
-        case SDL_MOUSEBUTTONUP:
-            //a = core::event::button::Button::ActionType::RELEASE;
-            break;
-        default:
-            break;
+        core::event::button::Data d;
+        d.action = [&]() noexcept
+        {
+            switch (e->type) {
+            case SDL_MOUSEBUTTONUP:
+                return core::event::button::ActionId::Release;
+            case SDL_MOUSEBUTTONDOWN:
+                return core::event::button::ActionId::Press;
+            default:
+                return core::event::button::ActionId::Press;
+            }
         }
-        //core::event::button::Button::KeyType k = core::event::button::Button::KeyType::LEFT;
-        switch (e->button.button) {
-        case SDL_BUTTON_RIGHT:
-            //k = core::event::button::Button::KeyType::RIGHT;
-            break;
-        case SDL_BUTTON_MIDDLE:
-            //k = core::event::button::Button::KeyType::MIDDLE;
-            break;
-        default:
-            break;
+        ();
+        d.key = [&]() noexcept
+        {
+            switch (e->button.button) {
+            case SDL_BUTTON_LEFT:
+                return core::event::button::KeyId::Left;
+            case SDL_BUTTON_RIGHT:
+                return core::event::button::KeyId::Right;
+            case SDL_BUTTON_MIDDLE:
+                return core::event::button::KeyId::Middle;
+            default:
+                GXLOGE("Unhandled mouse button, left button returned instead.")
+                return core::event::button::KeyId::Left;
+            }
         }
-        const core::Real x = o->convert_x_to_ratio(e->button.x);
-        const core::Real y = o->convert_y_to_ratio(e->button.y);
-        //event = new core::event::button::Mouse(k, a, x, y);
+        ();
+        d.x = o->convert_x_to_ratio(e->button.x);
+        d.y = o->convert_y_to_ratio(e->button.y);
+
+        event.source = core::event::Id::ButtonMouse;
+        event.data = d;
         break;
     }
     case SDL_MULTIGESTURE:
@@ -247,19 +254,18 @@ int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_
         break;
     case SDL_WINDOWEVENT:
         switch (e->window.event) {
-        case SDL_WINDOWEVENT_RESIZED:
-        {
+        case SDL_WINDOWEVENT_RESIZED: {
             core::event::system::WindowSizeChangeData d;
-            d.pre_width = static_cast<core::Real>(o->win_width);
-            d.pre_height = static_cast<core::Real>(o->win_height);
+            d.pre_width = static_cast<core::Real>(o->window_width);
+            d.pre_height = static_cast<core::Real>(o->window_height);
             d.cur_width = static_cast<core::Real>(e->window.data1);
             d.cur_height = static_cast<core::Real>(e->window.data2);
             event.data = d;
-            event.source = core::event::Id::SYSTEM_WINDOW_SIZE_CHANGE;
-            o->win_width = static_cast<unsigned int>(e->window.data1);
-            o->win_height = static_cast<unsigned int>(e->window.data2);
-            o->screen_ratio = static_cast<core::Real>(o->win_width) / static_cast<core::Real>(o->win_height);
-            o->half_height_inversed = 2.0f / static_cast<core::Real>(o->win_height);
+            event.source = core::event::Id::SystemWindowSizeChange;
+            o->window_width = static_cast<unsigned int>(e->window.data1);
+            o->window_height = static_cast<unsigned int>(e->window.data2);
+            o->window_ratio = static_cast<core::Real>(o->window_width) / static_cast<core::Real>(o->window_height);
+            o->half_height_inversed = 2.0f / static_cast<core::Real>(o->window_height);
             break;
         }
         default:
@@ -271,16 +277,16 @@ int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_
         GXLOGE("Unhandled event " << e->type)
         break;
     }
-    if (event.source != core::event::Id::UNINITIALIZED) {
+    if (event.source != core::event::Id::None) {
         o->event_engine->braodcast(event);
     }
     return 1;
 }
 
-const std::shared_ptr<gearoenix::system::Application> gearoenix::system::Application::construct() noexcept
+gearoenix::system::Application* gearoenix::system::Application::construct() noexcept
 {
     GXLOGI("Constructing Gearoenix system application monomorphic interface over SDL2.")
-    const std::shared_ptr<Application> result(new Application());
+    auto* const result = new Application();
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_AUDIO) != 0) {
         GXLOGF("Failed to initialize SDL: " << SDL_GetError())
     }
@@ -296,27 +302,26 @@ const std::shared_ptr<gearoenix::system::Application> gearoenix::system::Applica
     result->win_width = static_cast<unsigned int>(display_mode.w);
     result->win_height = static_cast<unsigned int>(display_mode.h);
 #else
-    result->win_width = GX_DEFAULT_WINDOW_WIDTH;
-    result->win_height = GX_DEFAULT_WINDOW_HEIGHT;
+    result->window_width = GX_DEFAULT_WINDOW_WIDTH;
+    result->window_height = GX_DEFAULT_WINDOW_HEIGHT;
 #endif
     result->create_window();
-    SDL_AddEventWatch(event_receiver, result.get());
+    SDL_AddEventWatch(event_receiver, result);
 #ifdef GX_USE_OPENGL
     if (GX_RUNTIME_USE_OPENGL_V(result->supported_engine)) {
         int w, h;
         SDL_GL_GetDrawableSize(result->window, &w, &h);
-        result->win_width = static_cast<unsigned int>(w);
-        result->win_height = static_cast<unsigned int>(h);
+        result->window_width = static_cast<unsigned int>(w);
+        result->window_height = static_cast<unsigned int>(h);
     }
 #endif
-    result->screen_ratio = static_cast<core::Real>(result->win_width) / static_cast<core::Real>(result->win_height);
-    result->half_height_inversed = 2.0f / static_cast<core::Real>(result->win_height);
+    result->window_ratio = static_cast<core::Real>(result->window_width) / static_cast<core::Real>(result->window_height);
+    result->half_height_inversed = 2.0f / static_cast<core::Real>(result->window_height);
     int mx, my;
     SDL_GetMouseState(&mx, &my);
     result->pre_x = result->convert_x_to_ratio(mx);
     result->pre_y = result->convert_y_to_ratio(my);
 
-    result->config = std::make_shared<Configuration>();
 #ifdef GX_USE_VULKAN
     if (nullptr == result->render_engine && result->supported_engine == render::engine::Type::VULKAN) {
         result->render_engine = new vulkan::Engine(this);
@@ -324,36 +329,32 @@ const std::shared_ptr<gearoenix::system::Application> gearoenix::system::Applica
 #endif
 #ifdef GX_USE_OPENGL_CLASS_3
     if (nullptr == result->render_engine && (GX_RUNTIME_USE_OPENGL_CLASS_3_V(result->supported_engine))) {
-        result->render_engine = glc3::engine::Engine::construct(result.get(), result->supported_engine);
+        result->render_engine = std::unique_ptr<render::engine::Engine>(glc3::engine::Engine::construct(result, result->supported_engine));
     }
 #endif
 
 #ifdef GX_USE_OPENGL_ES2
     if (nullptr == result->render_engine && result->supported_engine == render::engine::Type::OPENGL_ES2) {
-        result->render_engine = gles2::engine::Engine::construct(result.get());
+        result->render_engine = std::unique_ptr<render::engine::Engine>(gles2::engine::Engine::construct(result));
     }
 #endif
 
     if (result->render_engine == nullptr) {
         GXLOGF("No suitable render engine found.")
     }
-    result->astmgr = std::make_shared<core::asset::Manager>(result, GX_APP_DATA_NAME);
-    result->event_engine = new core::event::Engine();
+    result->asset_manager = std::make_unique<core::asset::Manager>(result, GX_APP_DATA_NAME);
+    result->event_engine = std::make_unique<core::event::Engine>();
     return result;
 }
 
 gearoenix::system::Application::~Application() noexcept
 {
-    core_app = nullptr;
-    astmgr = nullptr;
-    render_engine = nullptr;
-    GX_DELETE(event_engine)
     GXLOGD("Main application (SDL2) has been deleted.")
 }
 
-void gearoenix::system::Application::execute(const std::shared_ptr<core::Application>& app) noexcept
+void gearoenix::system::Application::execute(core::Application* const app) noexcept
 {
-    core_app = app;
+    core_app = std::unique_ptr<core::Application>(app);
 #ifdef GX_IN_WEB
     Application::app = this;
     emscripten_set_main_loop(Application::loop, 0, true);
@@ -387,8 +388,9 @@ void gearoenix::system::Application::main_loop() noexcept
 }
 core_app->terminate();
 core_app = nullptr;
+event_engine = nullptr;
+asset_manager = nullptr;
 render_engine = nullptr;
-astmgr = nullptr;
 SDL_DelEventWatch(event_receiver, this);
 #ifdef GX_USE_OPENGL
 #ifdef GX_USE_INSTEAD_OF_OPENGL
@@ -405,74 +407,9 @@ SDL_Quit();
 #endif
 }
 
-const std::shared_ptr<gearoenix::core::Application>& gearoenix::system::Application::get_core_app() const noexcept
-{
-    return core_app;
-}
-
-std::shared_ptr<gearoenix::core::Application>& gearoenix::system::Application::get_core_app() noexcept
-{
-    return core_app;
-}
-
-const std::shared_ptr<gearoenix::render::engine::Engine>& gearoenix::system::Application::get_render_engine() const noexcept
-{
-    return render_engine;
-}
-
-std::shared_ptr<gearoenix::render::engine::Engine>& gearoenix::system::Application::get_render_engine() noexcept
-{
-    return render_engine;
-}
-
-const std::shared_ptr<gearoenix::core::asset::Manager>& gearoenix::system::Application::get_asset_manager() const noexcept
-{
-    return astmgr;
-}
-
-std::shared_ptr<gearoenix::core::asset::Manager>& gearoenix::system::Application::get_asset_manager() noexcept
-{
-    return astmgr;
-}
-
-const gearoenix::core::event::Engine* gearoenix::system::Application::get_event_engine() const noexcept
-{
-    return event_engine;
-}
-
-gearoenix::core::event::Engine* gearoenix::system::Application::get_event_engine() noexcept
-{
-    return event_engine;
-}
-
-const gearoenix::system::Configuration& gearoenix::system::Application::get_configuration() const noexcept
-{
-    return *config;
-}
-
-gearoenix::system::Configuration& gearoenix::system::Application::get_configuration() noexcept
-{
-    return *config;
-}
-
-gearoenix::core::Real gearoenix::system::Application::get_window_ratio() const noexcept
-{
-    return screen_ratio;
-}
-
-unsigned int gearoenix::system::Application::get_width() const noexcept
-{
-    return win_width;
-}
-
-unsigned int gearoenix::system::Application::get_height() const noexcept
-{
-    return win_height;
-}
-
 gearoenix::core::Real gearoenix::system::Application::convert_x_to_ratio(int x) const noexcept
 {
-    return (static_cast<core::Real>(x) * half_height_inversed) - screen_ratio;
+    return (static_cast<core::Real>(x) * half_height_inversed) - window_ratio;
 }
 
 gearoenix::core::Real gearoenix::system::Application::convert_y_to_ratio(int y) const noexcept

@@ -28,7 +28,7 @@ gearoenix::glc3::texture::Texture2D::Texture2D(
         const gl::sizei pixel_size = gimg_width * gimg_height << 2;
         auto rdata = reinterpret_cast<const core::Real*>(data);
         pixels = new std::uint8_t[pixel_size];
-        for(gl::sizei i = 0; i < pixel_size; ++i)
+        for (gl::sizei i = 0; i < pixel_size; ++i)
             pixels[i] = static_cast<std::uint8_t>(rdata[i] * 255.1f);
     } else if (f == render::texture::TextureFormat::RGBA_UINT8) {
         const gl::sizei pixel_size = gimg_width * gimg_height << 2;
@@ -40,6 +40,9 @@ gearoenix::glc3::texture::Texture2D::Texture2D(
     } else
         GXLOGF("Unsupported/Unimplemented setting for texture with id " << my_id)
     e->get_function_loader()->load([this, pixels, cf, gimg_width, gimg_height, sample_info, call] {
+#ifdef GX_DEBUG_GL_CLASS_3
+        gl::Loader::check_for_error();
+#endif
         gl::Loader::gen_textures(1, &texture_object);
         gl::Loader::bind_texture(GL_TEXTURE_2D, texture_object);
         gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, sample_info.min_filter);
@@ -67,8 +70,14 @@ gearoenix::glc3::texture::Texture2D::~Texture2D() noexcept
         return;
     const gl::uint c_texture_object = texture_object;
     render_engine->get_function_loader()->load([c_texture_object] {
+#ifdef GX_DEBUG_GL_CLASS_3
+        gl::Loader::check_for_error();
+#endif
         gl::Loader::bind_texture(GL_TEXTURE_2D, 0);
         gl::Loader::delete_textures(1, &c_texture_object);
+#ifdef GX_DEBUG_GL_CLASS_3
+        gl::Loader::check_for_error();
+#endif
     });
     texture_object = 0;
 }

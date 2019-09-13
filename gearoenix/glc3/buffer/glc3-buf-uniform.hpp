@@ -10,11 +10,11 @@ namespace engine {
 namespace buffer {
     class Uniform : public render::buffer::Uniform {
     private:
-        unsigned char* data = nullptr;
+        std::vector<unsigned char> data;
 
     public:
-        Uniform(unsigned int s, engine::Engine* e) noexcept;
-        ~Uniform() noexcept final;
+        Uniform(std::size_t s, engine::Engine* e) noexcept;
+        ~Uniform() noexcept final = default;
         void update(const void* src) noexcept final;
         const void* get_data() const noexcept final;
         void* get_data() noexcept final;

@@ -4,7 +4,6 @@
 #ifdef GX_USE_OPENGL_CLASS_3
 #include "../../render/engine/rnd-eng-engine.hpp"
 #include "../glc3.hpp"
-#include <memory>
 namespace gearoenix::glc3 {
 namespace texture {
     class Texture2D;
@@ -12,11 +11,10 @@ namespace texture {
 namespace engine {
     class Engine : public render::engine::Engine {
     private:
-        explicit Engine(system::Application* sys_app, render::engine::Type::Id engine_type) noexcept;
+        explicit Engine(system::Application* sys_app, render::engine::Type engine_type) noexcept;
 
     public:
-        /// TODO: this is temporary and must change in future
-        static std::shared_ptr<Engine> construct(system::Application* sys_app, render::engine::Type::Id engine_type) noexcept;
+        static Engine* construct(system::Application* sys_app, render::engine::Type engine_type) noexcept;
         ~Engine() noexcept final;
         void update() noexcept final;
         void terminate() noexcept final;

@@ -41,30 +41,32 @@ using GxDirLight = gearoenix::render::light::Directional;
 using GxLtManager = gearoenix::render::light::Manager;
 using GxPersCam = gearoenix::render::camera::Perspective;
 
-GameApp::GameApp(const std::shared_ptr<gearoenix::system::Application>& sys_app) noexcept
-	: gearoenix::core::Application::Application(sys_app)
+GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
+    : gearoenix::core::Application::Application(sys_app)
 {
-	const GxEndCallerIgnored endcall([this] { scn->enable(); });
-	GxEndCaller<GxScene> scncall([this, endcall](std::shared_ptr<GxScene> s) {
-		scn = std::move(s);
-	});
+    const GxEndCallerIgnored endcall([this] { scn->set_enability(true); });
+    GxEndCaller<GxScene> scncall([this, endcall](std::shared_ptr<GxScene> s) {
+        scn = std::move(s);
+    });
 
-	rnd_eng->set_render_tree(new GxGrPbr(rnd_eng.get(), endcall));
+    render_engine->set_render_tree(new GxGrPbr(render_engine, endcall));
 
-	const auto& astmgr = sys_app->get_asset_manager();
-	const auto& scnmgr = astmgr->get_scene_manager();
-	
-	scnmgr->get_gx3d(1024, scncall);
+    const auto& astmgr = sys_app->get_asset_manager();
+    const auto& scnmgr = astmgr->get_scene_manager();
+
+    scnmgr->get_gx3d(1024, scncall);
 }
 
 GameApp::~GameApp() noexcept
-{}
+{
+}
 
 void GameApp::update() noexcept {}
 
-void GameApp::terminate() noexcept {
-	gearoenix::core::Application::terminate();
-	scn = nullptr;
+void GameApp::terminate() noexcept
+{
+    gearoenix::core::Application::terminate();
+    scn = nullptr;
 }
 
 GEAROENIX_START(GameApp)

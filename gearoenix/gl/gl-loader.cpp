@@ -4,6 +4,8 @@
 
 #ifdef GX_USE_SDL
 #include <SDL.h>
+#elif defined(GX_IN_ANDROID)
+#include <EGL/egl.h>
 #else
 #error "Not implemented for this platform."
 #endif
@@ -17,8 +19,8 @@ gearoenix::gl::bind_renderbuffer_fnp gearoenix::gl::Loader::bind_renderbuffer;
 gearoenix::gl::bind_texture_fnp gearoenix::gl::Loader::bind_texture;
 gearoenix::gl::blend_func_fnp gearoenix::gl::Loader::blend_func;
 gearoenix::gl::buffer_data_fnp gearoenix::gl::Loader::buffer_data;
-gearoenix::gl::clear_color_fnp gearoenix::gl::Loader::clear_color;
 gearoenix::gl::check_framebuffer_status_fnp gearoenix::gl::Loader::check_framebuffer_status;
+gearoenix::gl::clear_color_fnp gearoenix::gl::Loader::clear_color;
 gearoenix::gl::clear_fnp gearoenix::gl::Loader::clear;
 gearoenix::gl::compile_shader_fnp gearoenix::gl::Loader::compile_shader;
 gearoenix::gl::create_program_fnp gearoenix::gl::Loader::create_program;
@@ -60,7 +62,9 @@ gearoenix::gl::tex_parameteriv_fnp gearoenix::gl::Loader::tex_parameteriv;
 gearoenix::gl::scissor_fnp gearoenix::gl::Loader::scissor;
 gearoenix::gl::shader_source_fnp gearoenix::gl::Loader::shader_source;
 gearoenix::gl::uniform1f_fnp gearoenix::gl::Loader::uniform1f;
+gearoenix::gl::uniform1fv_fnp gearoenix::gl::Loader::uniform1fv;
 gearoenix::gl::uniform1i_fnp gearoenix::gl::Loader::uniform1i;
+gearoenix::gl::uniform1iv_fnp gearoenix::gl::Loader::uniform1iv;
 gearoenix::gl::uniform2fv_fnp gearoenix::gl::Loader::uniform2fv;
 gearoenix::gl::uniform3fv_fnp gearoenix::gl::Loader::uniform3fv;
 gearoenix::gl::uniform4fv_fnp gearoenix::gl::Loader::uniform4fv;
@@ -77,7 +81,7 @@ gearoenix::gl::delete_vertex_arrays_fnp gearoenix::gl::Loader::delete_vertex_arr
 gearoenix::gl::gen_vertex_arrays_fnp gearoenix::gl::Loader::gen_vertex_arrays;
 #endif
 
-bool gearoenix::gl::Loader::load_library(const render::engine::Type::Id engine_type) noexcept
+bool gearoenix::gl::Loader::load_library(const render::engine::Type engine_type) noexcept
 {
 #ifdef GX_DEBUG_MODE
     if (engine_type != render::engine::Type::OPENGL_ES2 && engine_type != render::engine::Type::OPENGL_ES3 && engine_type != render::engine::Type::OPENGL_33 && engine_type != render::engine::Type::OPENGL_43)
@@ -88,6 +92,7 @@ bool gearoenix::gl::Loader::load_library(const render::engine::Type::Id engine_t
         GXLOGD("Failed to load OpenGL shared library through SDL2 library loader for engine type: " << engine_type)
         return false;
     }
+#elif defined(GX_IN_ANDROID)
 #else
 #error "Not implemented for this platform."
 #endif
@@ -98,6 +103,14 @@ bool gearoenix::gl::Loader::load_library(const render::engine::Type::Id engine_t
         GXLOGD("Failed to load " << #name)                           \
         unload_library();                                            \
         return false;                                                \
+    }
+#elif defined(GX_IN_ANDROID)
+#define GXFUNLDF(name, fun)                                      \
+    fun = reinterpret_cast<fun##_fnp>(eglGetProcAddress(#name)); \
+    if (fun == nullptr) {                                        \
+        GXLOGD("Failed to load " << #name)                       \
+        unload_library();                                        \
+        return false;                                            \
     }
 #else
 #error "Not implemented for this platform."
@@ -154,7 +167,9 @@ bool gearoenix::gl::Loader::load_library(const render::engine::Type::Id engine_t
     GXFUNLDF(glScissor, scissor)
     GXFUNLDF(glShaderSource, shader_source)
     GXFUNLDF(glUniform1f, uniform1f)
+    GXFUNLDF(glUniform1fv, uniform1fv)
     GXFUNLDF(glUniform1i, uniform1i)
+    GXFUNLDF(glUniform1iv, uniform1iv)
     GXFUNLDF(glUniform2fv, uniform2fv)
     GXFUNLDF(glUniform3fv, uniform3fv)
     GXFUNLDF(glUniform4fv, uniform4fv)
@@ -179,6 +194,7 @@ void gearoenix::gl::Loader::unload_library() noexcept
 {
 #ifdef GX_USE_SDL
     SDL_GL_UnloadLibrary();
+#elif defined(GX_IN_ANDROID)
 #else
 #error "Not implemented for this platform."
 #endif

@@ -23,15 +23,15 @@ bool gearoenix::physics::constraint::Constraint::is_alive() const
     return alive;
 }
 
-void gearoenix::physics::constraint::Constraint::apply(const core::Real)
+void gearoenix::physics::constraint::Constraint::apply(const core::Real) noexcept
 {
     applied = true;
 }
 
 gearoenix::physics::constraint::Constraint* gearoenix::physics::constraint::Constraint::read(
-    const core::Id my_id,
+    const core::Id /*my_id*/,
     const std::shared_ptr<system::stream::Stream>& f,
-    const std::shared_ptr<render::engine::Engine>& e,
+    render::engine::Engine* const,
     const core::sync::EndCaller<core::sync::EndCallerIgnore> c)
 {
     const Type::Id t = f->read<Type::Id>();

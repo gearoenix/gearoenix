@@ -14,7 +14,7 @@ namespace pipeline {
     public:
         Manager(engine::Engine* engine) noexcept;
         ~Manager() noexcept final;
-        std::shared_ptr<render::pipeline::Pipeline> get(const render::pipeline::Type::Id pipeline_type_id, core::sync::EndCaller<render::pipeline::Pipeline>& end) noexcept final;
+        std::shared_ptr<render::pipeline::Pipeline> get(const render::pipeline::Type pipeline_type_id, core::sync::EndCaller<render::pipeline::Pipeline>& end) noexcept final;
     };
 }
 }

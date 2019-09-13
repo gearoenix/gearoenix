@@ -5,11 +5,11 @@
 #include <android/log.h>
 #include <sstream>
 
-#define GXLOG(p, s)                                                                 \
-    {                                                                               \
-        std::stringstream stringstream;                                             \
-        stringstream << __FILE__ << " " << __LINE__ << ": ";                        \
-        stringstream << s;                                                          \
+#define GXLOG(p, s)                                                            \
+    {                                                                          \
+        std::stringstream stringstream;                                        \
+        stringstream << __FILE__ << " " << __LINE__ << ": ";                   \
+        stringstream << s;                                                     \
         __android_log_print(p, GX_APP_NAME, "%s", stringstream.str().c_str()); \
     }
 

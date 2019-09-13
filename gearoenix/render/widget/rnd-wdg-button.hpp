@@ -29,8 +29,8 @@ namespace render {
                     IN_MIDDLE_OF_RELEASE,
                 } Type;
             };
-            //std::mutex effect_locker;
-            volatile core::Real current_size = 1.0f;
+            // std::mutex effect_locker;
+            // volatile core::Real current_size = 1.0f;
             EffectState::Type effect_state = EffectState::NO_ANIM;
             std::shared_ptr<physics::animation::Animation> anim;
             std::weak_ptr<physics::animation::Animation> latest_anim;

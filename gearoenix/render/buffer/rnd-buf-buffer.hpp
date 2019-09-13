@@ -1,24 +1,25 @@
 #ifndef GEAROENIX_RENDER_BUFFER_BUFFER_HPP
 #define GEAROENIX_RENDER_BUFFER_BUFFER_HPP
+#include "../../core/cr-static.hpp"
+#include <vector>
 namespace gearoenix::render {
 namespace engine {
     class Engine;
 }
 namespace buffer {
     class Buffer {
+        GX_GET_VAL_PRT(std::size_t, size, 0)
     protected:
         engine::Engine* const e;
-        const unsigned int size;
 
-        Buffer(const unsigned int size, engine::Engine* const e) noexcept
-            : e(e)
-            , size(size)
+        Buffer(const std::size_t size, engine::Engine* const e) noexcept
+            : size(size)
+            , e(e)
         {
         }
 
     public:
         virtual ~Buffer() noexcept = default;
-        unsigned int get_size() const noexcept { return size; };
     };
 }
 }

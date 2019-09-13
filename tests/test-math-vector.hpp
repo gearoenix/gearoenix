@@ -22,10 +22,13 @@
 #include <glm/vec4.hpp>
 #include <random>
 
-static std::random_device rd;
-static std::default_random_engine gen(rd());
-static std::uniform_real_distribution<> dis(0.0, 1.0);
-static long double glmt = 0.0L, gt = 0.0L;
+BOOST_AUTO_TEST_CASE(math_vector_test)
+{
+
+    static std::random_device rd;
+    static std::default_random_engine gen(rd());
+    static std::uniform_real_distribution<> dis(0.0, 1.0);
+    static long double glmt = 0.0L, gt = 0.0L;
 
 #define PROF(x, t)                                                                                                                  \
     {                                                                                                                               \
@@ -36,95 +39,81 @@ static long double glmt = 0.0L, gt = 0.0L;
         t += time_span.count();                                                                                                     \
     }
 
-void rm(glm::mat4& m1, gearoenix::math::Mat4x4& m2)
-{
-    for (unsigned int i = 0; i < 16; ++i) {
-        glm::value_ptr(m1)[i] = static_cast<gearoenix::core::Real>(dis(gen));
-        m2[i] = glm::value_ptr(m1)[i];
+#define RM(m1, m2)                                                                \
+    {                                                                             \
+        for (unsigned int i = 0; i < 16; ++i) {                                   \
+            glm::value_ptr(m1)[i] = static_cast<gearoenix::core::Real>(dis(gen)); \
+            m2[i] = glm::value_ptr(m1)[i];                                        \
+        }                                                                         \
     }
-}
 
-void rv(glm::vec3& v1, gearoenix::math::Vec3& v2)
-{
-    for (int i = 0; i < 3; ++i) {
-        v1[i] = static_cast<gearoenix::core::Real>(dis(gen));
-        v2[i] = v1[i];
+#define RV(v1, v2)                                                \
+    {                                                             \
+        for (int i = 0; i < 3; ++i) {                             \
+            v1[i] = static_cast<gearoenix::core::Real>(dis(gen)); \
+            v2[i] = v1[i];                                        \
+        }                                                         \
     }
-}
 
-void rq(glm::quat& q1, gearoenix::math::Quat& q2)
-{
-    q1.x = static_cast<gearoenix::core::Real>(dis(gen));
-    q2.x = q1.x;
-    q1.y = static_cast<gearoenix::core::Real>(dis(gen));
-    q2.y = q1.y;
-    q1.z = static_cast<gearoenix::core::Real>(dis(gen));
-    q2.z = q1.z;
-    q1.w = static_cast<gearoenix::core::Real>(dis(gen));
-    q2.w = q1.w;
-}
-
-void check_eq(const gearoenix::core::Real f1, const gearoenix::core::Real f2)
-{
-    const float v1 = std::abs(f1 - f2);
-    const float v2 = std::abs(f1 + f2);
-    if (GX_IS_ZERO(v1) && GX_IS_ZERO(v2))
-        return;
-    if (GX_IS_ZERO(v2) && GX_IS_NOT_ZERO(v1))
-        BOOST_TEST(false);
-    if (f1 / f2 > 0.01f)
-        BOOST_TEST(false);
-}
-
-void check(glm::mat4& m1, gearoenix::math::Mat4x4& m2)
-{
-    for (unsigned int i = 0; i < 16; ++i) {
-        float f1 = std::abs(glm::value_ptr(m1)[i] - m2[i]);
-        float f2 = std::abs(glm::value_ptr(m1)[i] + m2[i]);
-        if (f1 > f2)
-            std::swap(f1, f2);
-        if (f1 / f2 > 0.01f) {
-            for (unsigned int j = 0; j < 16; ++j)
-                BOOST_TEST_MESSAGE("Error-" << glm::value_ptr(m1)[j] << ", " << m2[j]);
-            BOOST_TEST(false);
-        }
+#define RQ(q1, q2)                                           \
+    {                                                        \
+        q1.x = static_cast<gearoenix::core::Real>(dis(gen)); \
+        q2.x = q1.x;                                         \
+        q1.y = static_cast<gearoenix::core::Real>(dis(gen)); \
+        q2.y = q1.y;                                         \
+        q1.z = static_cast<gearoenix::core::Real>(dis(gen)); \
+        q2.z = q1.z;                                         \
+        q1.w = static_cast<gearoenix::core::Real>(dis(gen)); \
+        q2.w = q1.w;                                         \
     }
-}
 
-BOOST_AUTO_TEST_CASE(math_vector_test)
-{
+#define CHECK(m1, m2)                                               \
+    {                                                               \
+        for (unsigned int i = 0; i < 16; ++i) {                     \
+            float f1 = std::abs(glm::value_ptr(m1)[i] - m2[i]);     \
+            float f2 = std::abs(glm::value_ptr(m1)[i] + m2[i]);     \
+            if (f1 > f2)                                            \
+                std::swap(f1, f2);                                  \
+            if (f1 / f2 > 0.01f) {                                  \
+                for (unsigned int k = 0; k < 16; ++k)               \
+                    GXLOGE(glm::value_ptr(m1)[k] << ", " << m2[k]); \
+                BOOST_TEST(false);                                  \
+            }                                                       \
+        }                                                           \
+    }
+
     glm::mat4 m1;
     gearoenix::math::Mat4x4 m2;
     glm::vec3 v1;
     gearoenix::math::Vec3 v2;
     float f;
     BOOST_TEST_MESSAGE("Rotation test");
-    for (int i = 0; i < 1000; ++i) {
+    for (int j = 0; j < 1000; ++j) {
         f = static_cast<float>(dis(gen));
-        rv(v1, v2);
+        RV(v1, v2);
         v1 = glm::normalize(v1);
         PROF(m1 = glm::rotate(glm::mat4(1.0f), f, v1), glmt);
         PROF(m2 = gearoenix::math::Mat4x4::rotation(v2, f), gt);
-        check(m1, m2);
+        CHECK(m1, m2);
     }
     BOOST_TEST_MESSAGE("Inversion test");
     BOOST_TEST_MESSAGE("glmt " << glmt << ", gt " << gt);
-    for (int i = 0; i < 1000; ++i) {
+    for (int j = 0; j < 1000; ++j) {
         f = static_cast<float>(dis(gen));
-        rm(m1, m2);
+        RM(m1, m2);
         PROF(m1 = glm::inverse(m1), glmt);
         PROF(m2 = m2.inverted(), gt);
-        check(m1, m2);
+        CHECK(m1, m2);
     }
     BOOST_TEST_MESSAGE("glmt " << glmt << ", gt " << gt);
     BOOST_TEST_MESSAGE("Quaternion tests");
     glm::quat q1;
     gearoenix::math::Quat q2;
-    for (int i = 0; i < 1000; ++i) {
-        rq(q1, q2);
+    for (int j = 0; j < 1000; ++j) {
+        RQ(q1, q2);
         PROF(m1 = glm::toMat4(q1), glmt);
         PROF(m2 = q2.to_mat(), gt);
-        check(m1, m2);
+        CHECK(m1, m2);
     }
     BOOST_TEST_MESSAGE("glmt " << glmt << ", gt " << gt);
     /////////////////////////////////////////////////////////////
@@ -195,3 +184,9 @@ BOOST_AUTO_TEST_CASE(math_vector_test)
     //     }
     // }
 }
+
+#undef PROF
+#undef RM
+#undef RV
+#undef RQ
+#undef CHECK

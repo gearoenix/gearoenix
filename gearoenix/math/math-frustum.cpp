@@ -7,9 +7,9 @@ gearoenix::math::Frustum::Frustum(const Plane (&planes)[6]) noexcept
 {
 }
 
-gearoenix::math::IntersectionStatus::Type gearoenix::math::Frustum::check_intersection(const Sphere& s) const noexcept
+gearoenix::math::IntersectionStatus gearoenix::math::Frustum::check_intersection(const Sphere& s) const noexcept
 {
-    IntersectionStatus::Type state = IntersectionStatus::In;
+    IntersectionStatus state = IntersectionStatus::In;
     for (const Plane& p : planes) {
         switch (p.check_intersection(s)) {
         case IntersectionStatus::Under:

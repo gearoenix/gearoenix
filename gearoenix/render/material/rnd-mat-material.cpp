@@ -17,7 +17,7 @@ gearoenix::render::material::Material::Material(engine::Engine* const e, const c
 {
     core::sync::EndCaller<texture::Texture2D> calltxt2d([end](std::shared_ptr<texture::Texture2D>) {});
     const std::shared_ptr<texture::Manager>& txtmgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
-    color = txtmgr->get_2d(math::Vec3(1.0f, 0.0f, 0.0f), calltxt2d);
+    color_txt = txtmgr->get_2d(math::Vec3(1.0f, 0.0f, 0.0f), calltxt2d);
     metallic_roughness = txtmgr->get_2d(math::Vec2(0.5f, 0.5f), calltxt2d);
     normal = txtmgr->get_2d(math::Vec3(0.5f, 0.5f, 1.0f), calltxt2d);
     emission = txtmgr->get_2d(math::Vec3(0.0f, 0.0f, 0.0f), calltxt2d);
@@ -28,66 +28,56 @@ gearoenix::render::material::Material::Material(system::stream::Stream* const f,
     , uniform_buffers(std::make_shared<buffer::FramedUniform>(sizeof(Uniform), e))
 {
     const std::shared_ptr<texture::Manager>& txtmgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
-    
-	// Reading alpha
-	if (f->read_bool()) 
-	{
-		uniform.alpha = 1.0f;
-	}
-	else 
-	{
-		f->read(uniform.alpha);
-	}
-	// Reading color
-	if (f->read_bool())
-	{
+
+    // Reading alpha
+    if (f->read_bool()) {
+        uniform.alpha = 1.0f;
+    } else {
+        f->read(uniform.alpha);
+    }
+    // Reading color
+    if (f->read_bool()) {
         core::sync::EndCaller<texture::Texture> tcall([end](std::shared_ptr<texture::Texture>) {});
-		color = std::dynamic_pointer_cast<texture::Texture2D>(txtmgr->get_gx3d(f->read<core::Id>(), tcall));
-	}
-	else {
+        color_txt = std::dynamic_pointer_cast<texture::Texture2D>(txtmgr->get_gx3d(f->read<core::Id>(), tcall));
+    } else {
         core::sync::EndCaller<texture::Texture2D> tcall([end](std::shared_ptr<texture::Texture2D>) {});
-		math::Vec4 color_value;
-		color_value.read(f);
-		color = std::dynamic_pointer_cast<texture::Texture2D>(txtmgr->get_2d(color_value, tcall));
-	}
-	// Reading emission
-	if (f->read_bool())
-	{
+        math::Vec4 color_value;
+        color_value.read(f);
+        color_txt = std::dynamic_pointer_cast<texture::Texture2D>(txtmgr->get_2d(color_value, tcall));
+    }
+    // Reading emission
+    if (f->read_bool()) {
         core::sync::EndCaller<texture::Texture> tcall([end](std::shared_ptr<texture::Texture>) {});
-		emission = std::dynamic_pointer_cast<texture::Texture2D>(txtmgr->get_gx3d(f->read<core::Id>(), tcall));
-	}
-	else {
+        emission = std::dynamic_pointer_cast<texture::Texture2D>(txtmgr->get_gx3d(f->read<core::Id>(), tcall));
+    } else {
         core::sync::EndCaller<texture::Texture2D> tcall([end](std::shared_ptr<texture::Texture2D>) {});
-		math::Vec4 emission_value;
-		emission_value.read(f);
-		emission = std::dynamic_pointer_cast<texture::Texture2D>(txtmgr->get_2d(emission_value, tcall));
-	}
-	// Reading metallic_roughness
-	if (f->read_bool())
-	{
+        math::Vec4 emission_value;
+        emission_value.read(f);
+        emission = std::dynamic_pointer_cast<texture::Texture2D>(txtmgr->get_2d(emission_value, tcall));
+    }
+    // Reading metallic_roughness
+    if (f->read_bool()) {
         core::sync::EndCaller<texture::Texture> tcall([end](std::shared_ptr<texture::Texture>) {});
-		metallic_roughness = std::dynamic_pointer_cast<texture::Texture2D>(txtmgr->get_gx3d(f->read<core::Id>(), tcall));
-	}
-	else {
+        metallic_roughness = std::dynamic_pointer_cast<texture::Texture2D>(txtmgr->get_gx3d(f->read<core::Id>(), tcall));
+    } else {
         core::sync::EndCaller<texture::Texture2D> tcall([end](std::shared_ptr<texture::Texture2D>) {});
-		math::Vec2 metallic_roughness_value;
-		metallic_roughness_value.read(f);
-		metallic_roughness = std::dynamic_pointer_cast<texture::Texture2D>(txtmgr->get_2d(metallic_roughness_value, tcall));
-	}
-	// Reading normal
-	if (f->read_bool())
-	{
+        math::Vec2 metallic_roughness_value;
+        metallic_roughness_value.read(f);
+        metallic_roughness = std::dynamic_pointer_cast<texture::Texture2D>(txtmgr->get_2d(metallic_roughness_value, tcall));
+    }
+    // Reading normal
+    if (f->read_bool()) {
         core::sync::EndCaller<texture::Texture> tcall([end](std::shared_ptr<texture::Texture>) {});
-		normal = std::dynamic_pointer_cast<texture::Texture2D>(txtmgr->get_gx3d(f->read<core::Id>(), tcall));
-	}
-	else {
+        normal = std::dynamic_pointer_cast<texture::Texture2D>(txtmgr->get_gx3d(f->read<core::Id>(), tcall));
+    } else {
         core::sync::EndCaller<texture::Texture2D> tcall([end](std::shared_ptr<texture::Texture2D>) {});
-		normal = std::dynamic_pointer_cast<texture::Texture2D>(txtmgr->get_2d(math::Vec3(0.5f, 0.5f, 1.0f), tcall));
-	}
-	// Translucency
-	if (f->read_bool()) translucency = TranslucencyMode::Tansparent;
-	is_shadow_caster = f->read_bool();
-	f->read(uniform.alpha_cutoff);
+        normal = std::dynamic_pointer_cast<texture::Texture2D>(txtmgr->get_2d(math::Vec3(0.5f, 0.5f, 1.0f), tcall));
+    }
+    // Translucency
+    if (f->read_bool())
+        translucency = TranslucencyMode::Tansparent;
+    is_shadow_caster = f->read_bool();
+    f->read(uniform.alpha_cutoff);
 }
 
 void gearoenix::render::material::Material::update_uniform() noexcept
@@ -100,7 +90,12 @@ const std::shared_ptr<gearoenix::render::buffer::FramedUniform>& gearoenix::rend
     return uniform_buffers;
 }
 
-const std::shared_ptr<gearoenix::render::texture::Texture2D>& gearoenix::render::material::Material::get_color() const noexcept
+const std::shared_ptr<gearoenix::render::texture::Texture2D>& gearoenix::render::material::Material::get_color_texture() const noexcept
+{
+    return color_txt;
+}
+
+const std::optional<gearoenix::math::Vec3>& gearoenix::render::material::Material::get_color() const noexcept
 {
     return color;
 }
@@ -141,10 +136,11 @@ void gearoenix::render::material::Material::set_color(
 {
     core::sync::EndCaller<texture::Texture2D> calltxt2d([end](std::shared_ptr<texture::Texture2D>) {});
     const std::shared_ptr<texture::Manager>& txtmgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
-    color = txtmgr->get_2d(math::Vec3(r, g, b), calltxt2d);
+    color_txt = txtmgr->get_2d(math::Vec3(r, g, b), calltxt2d);
+    color = math::Vec3(r, g, b);
 }
 
-void gearoenix::render::material::Material::set_color(std::shared_ptr<texture::Texture2D> color) noexcept
+void gearoenix::render::material::Material::set_color(const std::shared_ptr<texture::Texture2D>& c) noexcept
 {
-    this->color = std::move(color);
+    color_txt = c;
 }

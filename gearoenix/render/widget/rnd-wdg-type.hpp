@@ -2,13 +2,13 @@
 #define GEAROENIX_RENDER_WIDGET_TYPE_HPP
 #include "../../core/cr-types.hpp"
 namespace gearoenix::render::widget {
-class Type {
-public:
-	typedef enum : core::Id {
-		BUTTON = 1,
-		EDIT = 2,
-		TEXT = 3,
-	} Id;
+enum struct Type : core::TypeId {
+    Button = 1,
+    Edit = 2,
+    Text = 3,
+    Modal = 4,
+    Label = 5,
+    ColorChooser = 6,
 };
 }
 #endif

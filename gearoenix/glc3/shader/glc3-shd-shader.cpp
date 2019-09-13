@@ -76,7 +76,7 @@ gearoenix::gl::uint gearoenix::glc3::shader::Shader::add_shader_to_program(const
     info_log.resize(static_cast<std::size_t>(sts_size));
     gl::Loader::get_shader_info_log(shader_obj, static_cast<gl::sizei>(sts_size), nullptr, &(info_log[0]));
     if (!success) {
-        GXLOGF("Error compiling shader type. Info: " << info_log)
+        GXLOGF("Error compiling shader type. Info: " << info_log << ", shader source: " << shd)
     } else {
         GXLOGD("Shader compiler log is: " << info_log)
     }

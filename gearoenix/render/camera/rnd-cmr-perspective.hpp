@@ -1,5 +1,5 @@
-#ifndef GEAROENIX_CORE_STATIC_HPP
-#define GEAROENIX_CORE_STATIC_HPP
+#ifndef GEAROENIX_RENDER_CAMERA_PERSPECTIVE_HPP
+#define GEAROENIX_RENDER_CAMERA_PERSPECTIVE_HPP
 #include "rnd-cmr-camera.hpp"
 namespace gearoenix {
 namespace physics::collider {

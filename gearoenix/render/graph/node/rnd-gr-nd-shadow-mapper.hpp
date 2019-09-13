@@ -42,21 +42,23 @@ namespace graph::node {
     };
 
     struct ShadowMapperRenderData {
-        pipeline::ShadowMapperResourceSet* r = nullptr;
-        buffer::Uniform* u = nullptr;
+        std::unique_ptr<pipeline::ShadowMapperResourceSet> r;
+        std::unique_ptr<buffer::Uniform> u;
         ShadowMapperRenderData(engine::Engine* e, pipeline::Pipeline* pip) noexcept;
         ~ShadowMapperRenderData() noexcept;
     };
 
     struct ShadowMapperKernel {
-        std::shared_ptr<command::Buffer> secondary_cmd = nullptr;
+        std::unique_ptr<command::Buffer> secondary_cmd;
         core::OneLoopPool<ShadowMapperRenderData> render_data_pool;
         ShadowMapperKernel(engine::Engine* e, unsigned int kernel_index) noexcept;
+        ~ShadowMapperKernel() noexcept;
     };
 
     struct ShadowMapperFrame {
-        std::vector<std::shared_ptr<ShadowMapperKernel>> kernels;
+        std::vector<std::unique_ptr<ShadowMapperKernel>> kernels;
         explicit ShadowMapperFrame(engine::Engine* e) noexcept;
+        ~ShadowMapperFrame() noexcept;
     };
 
     /// This renders only one directional light with one shadow map.
@@ -64,16 +66,16 @@ namespace graph::node {
     /// The user of this class must use its functionalities in their correct contextes.
     class ShadowMapper : public Node {
     private:
-        std::vector<std::shared_ptr<ShadowMapperFrame>> frames;
+        std::vector<std::unique_ptr<ShadowMapperFrame>> frames;
         ShadowMapperFrame* frame = nullptr;
 
     public:
         ShadowMapper(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
-        ~ShadowMapper() noexcept final = default;
+        ~ShadowMapper() noexcept final;
         /// This will be called at the start of each frame
         void update() noexcept final;
         /// Multithreaded rendering happens in here
-        void record(const math::Mat4x4& mvp, const model::Model* m, unsigned int kernel_index) noexcept;
+        void record(const math::Mat4x4& mvp, const model::Model* m, std::size_t kernel_index) noexcept;
         /// This will be called at the end of each frame for pushing jobs to GPU
         void submit() noexcept final;
     };

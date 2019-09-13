@@ -1,6 +1,6 @@
 #include "rnd-cmr-camera.hpp"
-#include "../../core/event/cr-ev-event.hpp"
 #include "../../core/event/cr-ev-engine.hpp"
+#include "../../core/event/cr-ev-event.hpp"
 #include "../../math/math-projector-frustum.hpp"
 #include "../../math/math-quaternion.hpp"
 #include "../../system/stream/sys-stm-stream.hpp"
@@ -19,14 +19,14 @@ gearoenix::render::camera::Camera::Camera(const core::Id my_id, engine::Engine* 
     , frustum(new math::ProjectorFrustum(math::Mat4x4()))
     , uniform_buffers(new buffer::FramedUniform(sizeof(Uniform), e))
     , cascaded_shadow_frustum_partitions(new std::vector<std::array<math::Vec3, 4>>(
-        static_cast<std::size_t>(e->get_system_application()->get_configuration().render_config.shadow_cascades_count) + 1))
+          static_cast<std::size_t>(e->get_system_application()->get_configuration().render_config.shadow_cascades_count) + 1))
 {
     transformation = std::make_shared<Transformation>(uniform, frustum, cascaded_shadow_frustum_partitions);
     const auto& sys_app = e->get_system_application();
     uniform->aspect_ratio = sys_app->get_window_ratio();
-    uniform->clip_width = sys_app->get_width();
-    uniform->clip_height = sys_app->get_height();
-    sys_app->get_event_engine()->add_listner(core::event::Id::SYSTEM_WINDOW_SIZE_CHANGE, 1.0f, this);
+    uniform->clip_width = static_cast<core::Real>(sys_app->get_window_width());
+    uniform->clip_height = static_cast<core::Real>(sys_app->get_window_height());
+    sys_app->get_event_engine()->add_listner(core::event::Id::SystemWindowSizeChange, 1.0f, this);
 }
 
 gearoenix::render::camera::Camera::Camera(
@@ -44,9 +44,9 @@ gearoenix::render::camera::Camera::Camera(
     transformation = std::make_shared<Transformation>(uniform, frustum, cascaded_shadow_frustum_partitions);
     const auto& sys_app = e->get_system_application();
     uniform->aspect_ratio = sys_app->get_window_ratio();
-    uniform->clip_width = sys_app->get_width();
-    uniform->clip_height = sys_app->get_height();
-    sys_app->get_event_engine()->add_listner(core::event::Id::SYSTEM_WINDOW_SIZE_CHANGE, 1.0f, this);
+    uniform->clip_width = static_cast<core::Real>(sys_app->get_window_width());
+    uniform->clip_height = static_cast<core::Real>(sys_app->get_window_height());
+    sys_app->get_event_engine()->add_listner(core::event::Id::SystemWindowSizeChange, 1.0f, this);
     uniform->position.read(f);
     math::Quat q;
     f->read(q.w);
@@ -68,7 +68,7 @@ gearoenix::render::camera::Camera::Camera(
 
 gearoenix::render::camera::Camera::~Camera() noexcept
 {
-    e->get_system_application()->get_event_engine()->remove_listner(core::event::Id::SYSTEM_WINDOW_SIZE_CHANGE, this);
+    e->get_system_application()->get_event_engine()->remove_listner(core::event::Id::SystemWindowSizeChange, this);
 }
 
 const std::shared_ptr<gearoenix::render::buffer::FramedUniform>& gearoenix::render::camera::Camera::get_uniform_buffers() const
@@ -79,6 +79,12 @@ const std::shared_ptr<gearoenix::render::buffer::FramedUniform>& gearoenix::rend
 const std::shared_ptr<gearoenix::physics::Transformation> gearoenix::render::camera::Camera::get_transformation() const noexcept
 {
     return transformation;
+}
+
+void gearoenix::render::camera::Camera::set_far(const core::Real f) noexcept
+{
+    uniform->far = -f;
+    transformation->update_projection();
 }
 
 bool gearoenix::render::camera::Camera::is_enabled() const noexcept
@@ -98,7 +104,7 @@ void gearoenix::render::camera::Camera::disable() noexcept
 
 bool gearoenix::render::camera::Camera::in_sight(const gearoenix::math::Vec3& location, const core::Real radius) const noexcept
 {
-    return frustum->check_intersection(location, radius);
+    return frustum->check_intersection(location, radius) != math::IntersectionStatus::Out;
 }
 
 void gearoenix::render::camera::Camera::update_uniform()
@@ -125,16 +131,13 @@ const gearoenix::render::camera::Uniform& gearoenix::render::camera::Camera::get
 bool gearoenix::render::camera::Camera::on_event(const core::event::Data& d) noexcept
 {
     const auto* sys_app = e->get_system_application();
-    switch (d.source)
-    {
-    case core::event::Id::SYSTEM_WINDOW_SIZE_CHANGE:
-        uniform->clip_width = sys_app->get_width();
-        uniform->clip_height = sys_app->get_height();
+    switch (d.source) {
+    case core::event::Id::SystemWindowSizeChange:
+        uniform->clip_width = static_cast<core::Real>(sys_app->get_window_width());
+        uniform->clip_height = static_cast<core::Real>(sys_app->get_window_height());
         set_aspect_ratio(sys_app->get_window_ratio());
         return false;
     default:
         GXLOGF("Unexpected event received this is a fatal bug.")
-        break;
     }
-    return false;
 }

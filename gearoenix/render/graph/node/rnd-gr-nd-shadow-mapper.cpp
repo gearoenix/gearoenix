@@ -15,16 +15,16 @@
 #include "../../texture/rnd-txt-target.hpp"
 
 gearoenix::render::graph::node::ShadowMapperRenderData::ShadowMapperRenderData(engine::Engine* const e, pipeline::Pipeline* const pip) noexcept
+    : r(reinterpret_cast<pipeline::ShadowMapperResourceSet*>(pip->create_resource_set()))
+    , u(e->get_buffer_manager()->create_uniform(sizeof(ShadowMapperUniform)))
 {
-    r = reinterpret_cast<pipeline::ShadowMapperResourceSet*>(pip->create_resource_set());
-    u = e->get_buffer_manager()->create_uniform(sizeof(ShadowMapperUniform));
-    r->set_node_uniform_buffer(u);
+    r->set_node_uniform_buffer(u.get());
 }
 
 gearoenix::render::graph::node::ShadowMapperRenderData::~ShadowMapperRenderData() noexcept
 {
-    delete r;
-    delete u;
+    r = nullptr;
+    u = nullptr;
 }
 
 gearoenix::render::graph::node::ShadowMapperKernel::ShadowMapperKernel(
@@ -34,13 +34,23 @@ gearoenix::render::graph::node::ShadowMapperKernel::ShadowMapperKernel(
 {
 }
 
+gearoenix::render::graph::node::ShadowMapperKernel::~ShadowMapperKernel() noexcept
+{
+    secondary_cmd = nullptr;
+}
+
 gearoenix::render::graph::node::ShadowMapperFrame::ShadowMapperFrame(engine::Engine* const e) noexcept
 {
     const unsigned int kernels_count = e->get_kernels()->get_threads_count();
     kernels.resize(kernels_count);
     for (unsigned int i = 0; i < kernels_count; ++i) {
-        kernels[i] = std::make_shared<ShadowMapperKernel>(e, i);
+        kernels[i] = std::make_unique<ShadowMapperKernel>(e, i);
     }
+}
+
+gearoenix::render::graph::node::ShadowMapperFrame::~ShadowMapperFrame() noexcept
+{
+    kernels.clear();
 }
 
 gearoenix::render::graph::node::ShadowMapper::ShadowMapper(
@@ -50,10 +60,9 @@ gearoenix::render::graph::node::ShadowMapper::ShadowMapper(
 {
     frames.resize(e->get_frames_count());
     for (unsigned int i = 0; i < e->get_frames_count(); ++i) {
-        frames[i] = std::make_shared<ShadowMapperFrame>(e);
+        frames[i] = std::make_unique<ShadowMapperFrame>(e);
     }
-    const bool week_hwr = e->get_engine_type_id() == engine::Type::OPENGL_ES2;
-    texture::SampleInfo s {};
+    const bool week_hwr = e->get_engine_type() == engine::Type::OPENGL_ES2;
     std::vector<texture::Info> txt_infoes = { texture::Info() };
     txt_infoes[0].f = week_hwr ? texture::TextureFormat::D_16 : texture::TextureFormat::D_32;
     render_target = std::shared_ptr<texture::Target>(e->create_render_target(
@@ -63,6 +72,12 @@ gearoenix::render::graph::node::ShadowMapper::ShadowMapper(
         week_hwr ? 512 : 1024,
         call));
     output_textures[0] = render_target;
+}
+
+gearoenix::render::graph::node::ShadowMapper::~ShadowMapper() noexcept
+{
+    frames.clear();
+    frame = nullptr;
 }
 
 void gearoenix::render::graph::node::ShadowMapper::update() noexcept
@@ -76,7 +91,7 @@ void gearoenix::render::graph::node::ShadowMapper::update() noexcept
     }
 }
 
-void gearoenix::render::graph::node::ShadowMapper::record(const math::Mat4x4& mvp, const model::Model* const m, const unsigned int kernel_index) noexcept
+void gearoenix::render::graph::node::ShadowMapper::record(const math::Mat4x4& mvp, const model::Model* const m, const std::size_t kernel_index) noexcept
 {
     const auto& kernel = frame->kernels[kernel_index];
     const std::map<core::Id, std::shared_ptr<model::Mesh>>& meshes = m->get_meshes();
@@ -88,13 +103,13 @@ void gearoenix::render::graph::node::ShadowMapper::record(const math::Mat4x4& mv
         auto* const rd = kernel->render_data_pool.get_next([this] {
             return new ShadowMapperRenderData(e, render_pipeline.get());
         });
-        auto* ub = rd->u;
+        const auto& ub = rd->u;
         ub->update(&mvp);
-        auto* prs = rd->r;
+        const auto& prs = rd->r;
         prs->set_mesh(msh.get());
         prs->set_material(mat.get());
-        const std::shared_ptr<command::Buffer>& cmd = kernel->secondary_cmd;
-        cmd->bind(prs);
+        const auto& cmd = kernel->secondary_cmd;
+        cmd->bind(prs.get());
     }
 }
 

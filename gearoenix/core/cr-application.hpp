@@ -26,26 +26,28 @@ namespace core {
     class Application {
     public:
     protected:
-        std::shared_ptr<system::Application> sys_app;
-        std::shared_ptr<render::engine::Engine> rnd_eng;
+        system::Application* system_application = nullptr;
+        render::engine::Engine* render_engine = nullptr;
 
     public:
-        Application(const std::shared_ptr<system::Application>& sys_app);
-        virtual ~Application();
-        virtual void update() = 0;
-        virtual void terminate();
+        Application(system::Application* sys_app) noexcept;
+        virtual ~Application() noexcept;
+        virtual void update() noexcept = 0;
+        virtual void terminate() noexcept;
     };
 }
 }
-// #ifdef GX_IN_WEB
-// #define GEAROENIX_START(CoreApp)                                                    \
-//     int main(int, char**)                                                           \
-//     {                                                                               \
-//         gearoenix::system::Application* app = new gearoenix::system::Application(); \
-//         CoreApp* core_app = new CoreApp(app);                                       \
-//         app->execute(core_app);                                                     \
-//         return 0;                                                                   \
-//     }
+/*
+#ifdef GX_IN_WEB
+#define GEAROENIX_START(CoreApp)                                                    \
+    int main(int, char**)                                                           \
+    {                                                                               \
+        gearoenix::system::Application* app = new gearoenix::system::Application(); \
+        CoreApp* core_app = new CoreApp(app);                                       \
+        app->execute(core_app);                                                     \
+        return 0;                                                                   \
+    }
+*/
 #if defined(GX_IN_ANDROID) && !defined(GX_USE_SDL)
 #define GEAROENIX_START(CoreApp)                                                         \
     void android_main(struct android_app* state)                                         \
@@ -65,13 +67,13 @@ namespace core {
         return 0;                                                                                                \
     }
 #elif defined(GX_IN_LINUX) || defined(GX_IN_MAC) || defined(GX_IN_IOS) || defined(GX_USE_SDL)
-#define GEAROENIX_START(CoreApp)                                                                                 \
-    int main(int, char**)                                                                                        \
-    {                                                                                                            \
-        const std::shared_ptr<gearoenix::system::Application> app = gearoenix::system::Application::construct(); \
-        const std::shared_ptr<CoreApp> core_app(new CoreApp(app));                                               \
-        app->execute(core_app);                                                                                  \
-        return 0;                                                                                                \
+#define GEAROENIX_START(CoreApp)                                                                 \
+    int main(int, char**)                                                                        \
+    {                                                                                            \
+        gearoenix::system::Application* const app = gearoenix::system::Application::construct(); \
+        app->execute(new CoreApp(app));                                                          \
+        delete app;                                                                              \
+        return 0;                                                                                \
     }
 #else
 #error "Unexpected platform."

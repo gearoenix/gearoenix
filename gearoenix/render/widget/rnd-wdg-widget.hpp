@@ -5,42 +5,30 @@
 
 namespace gearoenix::render::widget {
 class Widget : public model::Model {
-public:
-    typedef enum : core::Id {
-        NORMAL,
-        PRESSED,
-    } StateType;
-
-    // This is something internal, it's gonna be used between ui-scene & widget
-    typedef enum : core::Id {
-        PRESS,
-        RELEASE,
-        MOVE_OUT,
-    } EventType;
-
+    GX_GET_CVAL_PRT(Type, widget_type)
 protected:
-    StateType state_type = StateType::NORMAL;
-    // at the end it must send event
-    virtual void press_effect() noexcept;
-    virtual void release_effect() noexcept;
-    virtual void cancel_effect() noexcept;
+    Widget(
+        core::Id my_id,
+        Type t,
+        system::stream::Stream* s,
+        engine::Engine* e,
+        const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+    Widget(
+        core::Id my_id,
+        Type t,
+        engine::Engine* e,
+        const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
 
-	Widget(
-		core::Id my_id,
-		system::stream::Stream* s,
-		engine::Engine* e,
-		const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
-	Widget(
-		engine::Engine* e,
-		const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
 public:
     virtual ~Widget() noexcept;
     static std::shared_ptr<Widget> read_gx3d(
-		core::Id my_id,
-		system::stream::Stream* f,
-		engine::Engine* e,
-		const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
-    void state_change(EventType e) noexcept;
+        core::Id my_id,
+        system::stream::Stream* f,
+        engine::Engine* e,
+        const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+    bool get_dynamicity() const noexcept final;
+    virtual void selected(const math::Vec3& point, const std::vector<model::Model*>& children) noexcept;
+    virtual void selected(const math::Vec3& point) noexcept;
 };
 }
 #endif

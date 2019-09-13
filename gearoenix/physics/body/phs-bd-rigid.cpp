@@ -9,9 +9,9 @@ gearoenix::physics::body::Rigid::~Rigid()
 {
 }
 
-void gearoenix::physics::body::Rigid::apply_force_on_origin(const math::Vec3& force)
+void gearoenix::physics::body::Rigid::apply_force_on_origin(const math::Vec3& f)
 {
-    this->force += force;
+    force += f;
 }
 
 void gearoenix::physics::body::Rigid::apply_time(const core::Real delta_time)
