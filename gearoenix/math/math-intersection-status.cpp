@@ -3,8 +3,7 @@
 
 std::ostream& operator<<(std::ostream& os, const gearoenix::math::IntersectionStatus i) noexcept
 {
-    switch (i)
-    {
+    switch (i) {
     case gearoenix::math::IntersectionStatus::Above:
         os << "'Above'";
         break;

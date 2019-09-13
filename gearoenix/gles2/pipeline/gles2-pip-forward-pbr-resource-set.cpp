@@ -33,12 +33,11 @@ void gearoenix::gles2::pipeline::ForwardPbrResourceSet::bind(gl::uint& bound_sha
     reinterpret_cast<const texture::Texture2D*>(brdflut)->bind(static_cast<gl::enumerated>(shdr->get_effect_brdflut_index()));
     reinterpret_cast<const texture::Cube*>(diffuse_environment)->bind(static_cast<gl::enumerated>(shdr->get_effect_diffuse_environment_index()));
     auto directional_lights_shadow_map_indices = shdr->get_effect_shadow_caster_directional_lights_cascades_shadow_map_indices();
-    for (int i = 0, tii = 0; i < GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER; ++i)
-    {
-        for (int j = 0; j < GX_MAX_SHADOW_CASCADES; ++j, ++tii)
-        {
+    for (int i = 0, tii = 0; i < GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER; ++i) {
+        for (int j = 0; j < GX_MAX_SHADOW_CASCADES; ++j, ++tii) {
             render::texture::Texture2D* t = directional_lights_shadow_maps[i][j];
-            if (t == nullptr) continue;
+            if (t == nullptr)
+                continue;
             const auto ti = static_cast<gl::enumerated>(directional_lights_shadow_map_indices[tii]);
             if (render::texture::Type::TARGET_2D == t->get_texture_type())
                 reinterpret_cast<const texture::Target*>(t)->bind_textures({ ti });

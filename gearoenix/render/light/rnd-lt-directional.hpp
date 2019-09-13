@@ -16,6 +16,7 @@ namespace light {
     class Directional : public Light {
     private:
         math::Vec3 direction = math::Vec3(0.0f, 0.0f, -1.0f);
+
     public:
         Directional(core::Id my_id, system::stream::Stream* f, engine::Engine* e) noexcept;
         Directional(core::Id my_id, engine::Engine* e) noexcept;

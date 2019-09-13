@@ -7937,7 +7937,8 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager:
     core::Real r = 0.0f;
     for (auto& v : vertices) {
         const auto l = v.position.length();
-        if (r < l) r = l;
+        if (r < l)
+            r = l;
     }
     return create(vertices, indices, r, c);
 }

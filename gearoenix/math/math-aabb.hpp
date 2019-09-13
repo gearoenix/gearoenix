@@ -1,8 +1,8 @@
 #ifndef GEAROENIX_MATH_AABB_HPP
 #define GEAROENIX_MATH_AABB_HPP
+#include "../core/cr-static.hpp"
 #include "math-intersection-status.hpp"
 #include "math-vector.hpp"
-#include "../core/cr-static.hpp"
 #include <optional>
 namespace gearoenix::math {
 struct Ray3;

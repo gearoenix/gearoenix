@@ -42,15 +42,15 @@ namespace texture {
 }
 namespace graph::node {
     struct ForwardPbrUniform {
-		math::Vec4 point_lights_color_min_radius[GX_MAX_POINT_LIGHTS] = {};
-		math::Vec4 point_lights_position_max_radius[GX_MAX_POINT_LIGHTS] = {};
-		math::Mat4x4 shadow_caster_directional_lights_cascades_view_projections_bias[GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER * GX_MAX_SHADOW_CASCADES] = {};
-		math::Vec4 shadow_caster_directional_lights_color_cascades_count[GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER] = {};
-		math::Vec4 shadow_caster_directional_lights_direction[GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER] = {};
-		core::Real point_lights_count = 0.0f;
-		core::Real shadow_caster_directional_lights_count = 0.0f;
+        math::Vec4 point_lights_color_min_radius[GX_MAX_POINT_LIGHTS] = {};
+        math::Vec4 point_lights_position_max_radius[GX_MAX_POINT_LIGHTS] = {};
+        math::Mat4x4 shadow_caster_directional_lights_cascades_view_projections_bias[GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER * GX_MAX_SHADOW_CASCADES] = {};
+        math::Vec4 shadow_caster_directional_lights_color_cascades_count[GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER] = {};
+        math::Vec4 shadow_caster_directional_lights_direction[GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER] = {};
+        core::Real point_lights_count = 0.0f;
+        core::Real shadow_caster_directional_lights_count = 0.0f;
         explicit ForwardPbrUniform(
-            const std::vector<std::pair<light::Directional*, light::CascadeInfo*>>* directional_lights, 
+            const std::vector<std::pair<light::Directional*, light::CascadeInfo*>>* directional_lights,
             const scene::Scene* scn, const model::Model* mdl) noexcept;
     };
 
@@ -62,7 +62,7 @@ namespace graph::node {
     };
 
     struct ForwardPbrKernel {
-        command::Buffer *secondary_cmd = nullptr;
+        command::Buffer* secondary_cmd = nullptr;
         core::OneLoopPool<ForwardPbrRenderData> render_data_pool;
         ForwardPbrKernel(engine::Engine* e, unsigned int kernel_index) noexcept;
         ~ForwardPbrKernel() noexcept;
@@ -81,10 +81,10 @@ namespace graph::node {
     private:
         std::vector<ForwardPbrFrame*> frames;
         ForwardPbrFrame* frame = nullptr;
-		const scene::Scene* scn = nullptr;
-		const camera::Camera* cam = nullptr;
-		const std::vector<model::Model*>* seen_models = nullptr;
-		const std::vector<std::pair<light::Directional*, light::CascadeInfo*>>* directional_lights = nullptr;
+        const scene::Scene* scn = nullptr;
+        const camera::Camera* cam = nullptr;
+        const std::vector<model::Model*>* seen_models = nullptr;
+        const std::vector<std::pair<light::Directional*, light::CascadeInfo*>>* directional_lights = nullptr;
 
         void record(
             const model::Model* m,
@@ -109,10 +109,10 @@ namespace graph::node {
         void update() noexcept final;
         /// Multithreaded rendering happens in here
 
-		void set_scene(const scene::Scene* scn) noexcept;
-		void set_camera(const camera::Camera* cam) noexcept;
-		void set_seen_models(const std::vector<model::Model*>* models) noexcept;
-		void set_directional_lights(const std::vector<std::pair<light::Directional*, light::CascadeInfo*>>* m) noexcept;
+        void set_scene(const scene::Scene* scn) noexcept;
+        void set_camera(const camera::Camera* cam) noexcept;
+        void set_seen_models(const std::vector<model::Model*>* models) noexcept;
+        void set_directional_lights(const std::vector<std::pair<light::Directional*, light::CascadeInfo*>>* m) noexcept;
         void record(unsigned int kernel_index) noexcept;
         /// This will be called at the end of each frame for pushing jobs to GPU
         void submit() noexcept final;

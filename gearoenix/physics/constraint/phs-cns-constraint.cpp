@@ -31,7 +31,7 @@ void gearoenix::physics::constraint::Constraint::apply(const core::Real) noexcep
 gearoenix::physics::constraint::Constraint* gearoenix::physics::constraint::Constraint::read(
     const core::Id /*my_id*/,
     const std::shared_ptr<system::stream::Stream>& f,
-    render::engine::Engine*const ,
+    render::engine::Engine* const,
     const core::sync::EndCaller<core::sync::EndCallerIgnore> c)
 {
     const Type::Id t = f->read<Type::Id>();

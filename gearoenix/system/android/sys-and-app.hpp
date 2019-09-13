@@ -2,10 +2,10 @@
 #define GEAROENIX_SYSTEM_ANDROID_APPLICATION_HPP
 #include "../../core/cr-build-configuration.hpp"
 #if defined(GX_IN_ANDROID) && !defined(GX_USE_SDL)
-#include "../../core/cr-types.hpp"
-#include "../sys-configuration.hpp"
 #include "../../core/cr-static.hpp"
+#include "../../core/cr-types.hpp"
 #include "../../render/engine/rnd-eng-type.hpp"
+#include "../sys-configuration.hpp"
 
 struct android_app;
 struct AInputEvent;
@@ -41,7 +41,7 @@ namespace system {
     private:
         bool running = true;
 #ifdef GX_USE_OPENGL
-        GlContext *gl_context = nullptr;
+        GlContext* gl_context = nullptr;
 #endif
         core::Real half_height_inverted = 1.0f;
         core::Real x = 0.0f;

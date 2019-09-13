@@ -26,14 +26,14 @@ namespace render::engine {
 }
 namespace system {
     class Application {
-		GX_GET_REF_PRV(Configuration, configuration)
-		GX_GET_PTR_PRV(render::engine::Engine, render_engine)
-		GX_GET_PTR_PRV(core::Application, core_app)
-		GX_GET_PTR_PRV(core::asset::Manager, asset_manager)
-		GX_GET_PTR_PRV(core::event::Engine, event_engine)
-		GX_GET_VAL_PRV(unsigned int, window_width, 0)
-		GX_GET_VAL_PRV(unsigned int, window_height, 0)
-		GX_GET_VAL_PRV(core::Real, window_ratio, 1.0F)
+        GX_GET_REF_PRV(Configuration, configuration)
+        GX_GET_UPTR_PRV(render::engine::Engine, render_engine)
+        GX_GET_UPTR_PRV(core::Application, core_app)
+        GX_GET_UPTR_PRV(core::asset::Manager, asset_manager)
+        GX_GET_UPTR_PRV(core::event::Engine, event_engine)
+        GX_GET_VAL_PRV(unsigned int, window_width, 0)
+        GX_GET_VAL_PRV(unsigned int, window_height, 0)
+        GX_GET_VAL_PRV(core::Real, window_ratio, 1.0F)
     private:
 #ifdef GX_IN_WEB
         static Application* app;
@@ -60,7 +60,7 @@ namespace system {
         Application() noexcept = default;
 
     public:
-        static Application * construct() noexcept;
+        static Application* construct() noexcept;
         ~Application() noexcept;
         void execute(core::Application* app) noexcept;
 
@@ -68,8 +68,8 @@ namespace system {
         static void loop() noexcept;
         void main_loop() noexcept;
 #endif
-        core::Real convert_x_to_ratio(int x) const noexcept;
-        core::Real convert_y_to_ratio(int y) const noexcept;
+        [[nodiscard]] core::Real convert_x_to_ratio(int x) const noexcept;
+        [[nodiscard]] core::Real convert_y_to_ratio(int y) const noexcept;
     };
 }
 }

@@ -1,7 +1,7 @@
 #ifndef GEAROENIX_RENDER_PIPELINE_TYPE_HPP
 #define GEAROENIX_RENDER_PIPELINE_TYPE_HPP
 namespace gearoenix::render::pipeline {
-enum struct Type: unsigned int {
+enum struct Type : unsigned int {
     DeferredPbr = 1,
     ForwardPbr = 2,
     GBufferFiller = 3,

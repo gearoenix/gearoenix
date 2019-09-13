@@ -18,7 +18,8 @@ gearoenix::physics::collider::Collider* gearoenix::physics::collider::Collider::
     }
 }
 
-std::optional<gearoenix::core::Real> gearoenix::physics::collider::Collider::hit(const math::Ray3& r, const core::Real d_min) const noexcept {
+std::optional<gearoenix::core::Real> gearoenix::physics::collider::Collider::hit(const math::Ray3& r, const core::Real d_min) const noexcept
+{
     return box.hit(r, d_min);
 }
 

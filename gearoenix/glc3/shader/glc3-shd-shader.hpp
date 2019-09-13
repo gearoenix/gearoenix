@@ -31,7 +31,7 @@
 
 #define GX_GLC3_UNIFORM(name, function)                      \
     GX_GET_VAL_PRV(gl::sint, name, GX_GLC3_UNIFORM_FAILED)   \
-    void set_##name##_data(const float *data) const noexcept \
+    void set_##name##_data(const float* data) const noexcept \
     {                                                        \
         gl::Loader::uniform##function;                       \
     }
@@ -49,8 +49,7 @@
 
 #define GX_GLC3_GET_UNIFORM_F(shd, uniform)                  \
     GX_GLC3_GET_UNIFORM(shd, uniform);                       \
-    if (GX_GLC3_UNIFORM_FAILED == uniform)                   \
-    {                                                        \
+    if (GX_GLC3_UNIFORM_FAILED == uniform) {                 \
         GXLOGF("Failed to locate the uniform " << #uniform); \
     }
 
@@ -63,16 +62,14 @@
     ++texture_index;
 
 #define GX_GLC3_SHADER_SET_TEXTURE_INDEX_ARRAY(x) \
-    for (auto &i : x##_indices)                   \
-    {                                             \
+    for (auto& i : x##_indices) {                 \
         i = texture_index;                        \
         ++texture_index;                          \
     }
 
 #define GX_GLC3_THIS_GET_UNIFORM_TEXTURE(uniform) \
     GX_GLC3_GET_UNIFORM(this, uniform)            \
-    if (GX_GLC3_UNIFORM_FAILED != uniform)        \
-    {                                             \
+    if (GX_GLC3_UNIFORM_FAILED != uniform) {      \
         GX_GLC3_SHADER_SET_TEXTURE_INDEX(uniform) \
     }
 
@@ -94,13 +91,13 @@
     if (x != GX_GLC3_UNIFORM_FAILED)                      \
         gl::Loader::uniform1iv(x, GX_COUNT_OF(x##_indices), x##_indices);
 
-#define GX_GLC3_SHADER_SRC_DEFAULT_VERSION                                                                                                                                     \
-    "#version " << ((e->get_engine_type_id() == render::engine::Type::OPENGL_ES3) ? "300 es" : ((e->get_engine_type_id() == render::engine::Type::OPENGL_33) ? "330" : "430")) \
-                << "\n"                                                                                                                                                        \
-                << "#define GXPI 3.141592653589793238\n"                                                                                                                       \
-                   "precision highp float;\n"                                                                                                                                  \
-                   "precision highp int;\n"                                                                                                                                    \
-                << ((e->get_engine_type_id() == render::engine::Type::OPENGL_ES3) ? "precision highp sampler2D;\nprecision highp samplerCube;\n" : "")
+#define GX_GLC3_SHADER_SRC_DEFAULT_VERSION                                                                                                                               \
+    "#version " << ((e->get_engine_type() == render::engine::Type::OPENGL_ES3) ? "300 es" : ((e->get_engine_type() == render::engine::Type::OPENGL_33) ? "330" : "430")) \
+                << "\n"                                                                                                                                                  \
+                << "#define GXPI 3.141592653589793238\n"                                                                                                                 \
+                   "precision highp float;\n"                                                                                                                            \
+                   "precision highp int;\n"                                                                                                                              \
+                << ((e->get_engine_type() == render::engine::Type::OPENGL_ES3) ? "precision highp sampler2D;\nprecision highp samplerCube;\n" : "")
 
 #define GX_GLC3_SHADER_SRC_DEFAULT_ATTRIBUTES  \
     "layout(location = 0) in vec3 position;\n" \
@@ -165,50 +162,50 @@
     GX_GLC3_SHADER_SET_TEXTURE_INDEX_UNIFORM(material_normal)
 
 namespace gearoenix::glc3 {
-    namespace engine {
-        class Engine;
-    }
-    namespace shader {
-        class Shader {
-        protected:
-            engine::Engine *const e;
-            gl::uint shader_program = 0;
-            gl::uint vertex_object = 0;
-            gl::uint fragment_object = 0;
+namespace engine {
+    class Engine;
+}
+namespace shader {
+    class Shader {
+    protected:
+        engine::Engine* const e;
+        gl::uint shader_program = 0;
+        gl::uint vertex_object = 0;
+        gl::uint fragment_object = 0;
 
-            void create_program() noexcept;
+        void create_program() noexcept;
 
-            void run() noexcept;
+        void run() noexcept;
 
-            void link() noexcept;
+        void link() noexcept;
 
-            void validate() noexcept;
+        void validate() noexcept;
 
-            gl::uint add_shader_to_program(const std::string &shd,
-                                           const gl::enumerated shader_type) noexcept;
+        gl::uint add_shader_to_program(const std::string& shd,
+            const gl::enumerated shader_type) noexcept;
 
-            gl::uint set_vertex_shader(const std::string &shd) noexcept;
+        gl::uint set_vertex_shader(const std::string& shd) noexcept;
 
-            gl::uint set_fragment_shader(const std::string &shd) noexcept;
+        gl::uint set_fragment_shader(const std::string& shd) noexcept;
 
-            static void end_program(const gl::uint shader_program) noexcept;
+        static void end_program(const gl::uint shader_program) noexcept;
 
-            static void end_object(const gl::uint shader_object) noexcept;
+        static void end_object(const gl::uint shader_object) noexcept;
 
-        public:
-            Shader(engine::Engine *e,
-                   const core::sync::EndCaller<core::sync::EndCallerIgnore> &c) noexcept;
+    public:
+        Shader(engine::Engine* e,
+            const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
 
-            virtual ~Shader() noexcept;
+        virtual ~Shader() noexcept;
 
-            /// On not found returns GX_SHADER_UNIFORM_FAILED
-            gl::sint get_uniform_location(const std::string &name) const noexcept;
+        /// On not found returns GX_SHADER_UNIFORM_FAILED
+        gl::sint get_uniform_location(const std::string& name) const noexcept;
 
-            gl::uint get_shader_program() const noexcept;
+        gl::uint get_shader_program() const noexcept;
 
-            virtual void bind() const noexcept;
-        };
-    } // namespace shader
+        virtual void bind() const noexcept;
+    };
+} // namespace shader
 } // namespace gearoenix::glc3
 #endif
 #endif

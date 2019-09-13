@@ -1,7 +1,7 @@
 #ifndef GEAROENIX_RENDER_PIPELINE_FORWARD_PBR_RESOURCE_SET_HPP
 #define GEAROENIX_RENDER_PIPELINE_FORWARD_PBR_RESOURCE_SET_HPP
-#include "rnd-pip-resource-set.hpp"
 #include "../../core/cr-build-configuration.hpp"
+#include "rnd-pip-resource-set.hpp"
 namespace gearoenix::render::pipeline {
 class ForwardPbrResourceSet : public ResourceSet {
 protected:

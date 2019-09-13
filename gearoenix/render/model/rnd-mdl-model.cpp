@@ -18,17 +18,17 @@
 
 gearoenix::render::model::Model::Model(
     const core::Id my_id,
-	const Type t,
-	physics::Transformation * const tran,
+    const Type t,
+    physics::Transformation* const tran,
     system::stream::Stream* const f,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : core::asset::Asset(my_id, core::asset::Type::MODEL)
-	, model_type(t)
-    , e(e)
-    , uniform_buffers(new buffer::FramedUniform(static_cast<unsigned int>(sizeof(Uniform)), e))
+    , model_type(t)
     , transformation(tran)
-	, occlusion_sphere(math::Vec3(0.0f, 0.0f, 0.0f), 1.0f)
+    , uniform_buffers(new buffer::FramedUniform(static_cast<unsigned int>(sizeof(Uniform)), e))
+    , occlusion_sphere(math::Vec3(0.0f, 0.0f, 0.0f), 1.0f)
+    , e(e)
 {
     uniform.m.read(f);
     const auto meshes_count = f->read<core::Count>();
@@ -39,16 +39,16 @@ gearoenix::render::model::Model::Model(
 
 gearoenix::render::model::Model::Model(
     const core::Id my_id,
-	const Type t,
-	physics::Transformation* const transformation,
+    const Type t,
+    physics::Transformation* const transformation,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>&) noexcept
     : core::asset::Asset(my_id, core::asset::Type::MODEL)
-	, model_type(t)
-    , e(e)
-    , uniform_buffers(new buffer::FramedUniform(static_cast<unsigned int>(sizeof(Uniform)), e))
+    , model_type(t)
     , transformation(transformation)
-	, occlusion_sphere(math::Vec3(0.0f, 0.0f, 0.0f), 1.0f)
+    , uniform_buffers(new buffer::FramedUniform(static_cast<unsigned int>(sizeof(Uniform)), e))
+    , occlusion_sphere(math::Vec3(0.0f, 0.0f, 0.0f), 1.0f)
+    , e(e)
 {
 }
 
@@ -65,12 +65,12 @@ void gearoenix::render::model::Model::add_mesh(const std::shared_ptr<Mesh>& m) n
 {
     meshes[m->get_mesh()->get_asset_id()] = m;
     occlusion_sphere.insert(m->get_mesh()->get_radius());
-	if (m->get_material()->get_is_shadow_caster()) {
-		shadowing = gearoenix::core::State::Set;
-	}
+    if (m->get_material()->get_is_shadow_caster()) {
+        shadowing = gearoenix::core::State::Set;
+    }
 }
 
-void gearoenix::render::model::Model::add_child(const std::shared_ptr<Model>&c) noexcept
+void gearoenix::render::model::Model::add_child(const std::shared_ptr<Model>& c) noexcept
 {
     children[c->get_asset_id()] = c;
     c->parent = this;
@@ -78,8 +78,8 @@ void gearoenix::render::model::Model::add_child(const std::shared_ptr<Model>&c) 
 
 void gearoenix::render::model::Model::set_collider(std::unique_ptr<physics::collider::Collider> c) noexcept
 {
-	collider = std::move(c);
-	collider->set_parent(this);
+    collider = std::move(c);
+    collider->set_parent(this);
 }
 
 const gearoenix::math::Mat4x4& gearoenix::render::model::Model::get_model_matrix() const noexcept
@@ -87,14 +87,15 @@ const gearoenix::math::Mat4x4& gearoenix::render::model::Model::get_model_matrix
     return uniform.m;
 }
 
-void gearoenix::render::model::Model::set_enability(const core::State s) noexcept {
+void gearoenix::render::model::Model::set_enability(const core::State s) noexcept
+{
     enability = s;
     for (auto& c : children) {
         c.second->set_enability(s);
     }
-	if (nullptr != scene) {
-		scene->set_models_changed(true);
-	}
+    if (nullptr != scene) {
+        scene->set_models_changed(true);
+    }
 }
 
 void gearoenix::render::model::Model::set_scene(scene::Scene* const s) noexcept

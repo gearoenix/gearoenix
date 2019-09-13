@@ -7,6 +7,7 @@ namespace gearoenix::physics {
 class Transformation {
 protected:
     Transformation() noexcept;
+
 public:
     virtual ~Transformation() noexcept;
     virtual const math::Vec3& get_x_axis() const noexcept;

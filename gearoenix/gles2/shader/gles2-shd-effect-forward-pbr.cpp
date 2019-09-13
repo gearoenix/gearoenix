@@ -6,28 +6,26 @@
 #include "../../system/sys-log.hpp"
 #include "../engine/gles2-eng-engine.hpp"
 
-#define GX_GLES2_SHADER_SRC_EFFECT_UNIFORMS \
-	"uniform vec4  effect_point_lights_color_min_radius[" GX_MAX_POINT_LIGHTS_STR "];\n" \
-	"uniform vec4  effect_point_lights_position_max_radius[" GX_MAX_POINT_LIGHTS_STR "];\n" \
+#define GX_GLES2_SHADER_SRC_EFFECT_UNIFORMS                                                                                              \
+    "uniform vec4  effect_point_lights_color_min_radius[" GX_MAX_POINT_LIGHTS_STR "];\n"                                                 \
+    "uniform vec4  effect_point_lights_position_max_radius[" GX_MAX_POINT_LIGHTS_STR "];\n"                                              \
     "uniform mat4  effect_shadow_caster_directional_lights_cascades_view_projection_bias[" GX_MAX_DIRECTIONAL_LIGHTS_CASCADES_STR "];\n" \
-    "uniform vec4  effect_shadow_caster_directional_lights_color_cascades_count[" GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER_STR "];\n" \
-    "uniform vec4  effect_shadow_caster_directional_lights_direction[" GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER_STR "];\n" \
-	"uniform float effect_point_lights_count;\n" \
+    "uniform vec4  effect_shadow_caster_directional_lights_color_cascades_count[" GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER_STR "];\n"     \
+    "uniform vec4  effect_shadow_caster_directional_lights_direction[" GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER_STR "];\n"                \
+    "uniform float effect_point_lights_count;\n"                                                                                         \
     "uniform float effect_shadow_caster_directional_lights_count;\n"
 
 #define GX_GLES2_SHADER_FWDPBR_VARYING \
-    "varying vec3 out_pos;\n" \
-    "varying vec3 out_nrm;\n" \
-    "varying vec3 out_tng;\n" \
-    "varying vec3 out_btg;\n" \
-    "varying vec2 out_uv;\n" \
+    "varying vec3 out_pos;\n"          \
+    "varying vec3 out_nrm;\n"          \
+    "varying vec3 out_tng;\n"          \
+    "varying vec3 out_btg;\n"          \
+    "varying vec2 out_uv;\n"           \
     "varying vec3 out_directional_lights_cascades_pojected[" GX_MAX_DIRECTIONAL_LIGHTS_CASCADES_STR "];\n"
 
 const static std::string vertex_shader_code = GX_GLES2_SHADER_SRC_DEFAULT_VERTEX_STARTING
-    "uniform mat4  camera_vp;\n"
-    GX_GLES2_SHADER_SRC_EFFECT_UNIFORMS
-    "uniform mat4  model_m;\n"
-    GX_GLES2_SHADER_FWDPBR_VARYING
+    "uniform mat4  camera_vp;\n" GX_GLES2_SHADER_SRC_EFFECT_UNIFORMS
+    "uniform mat4  model_m;\n" GX_GLES2_SHADER_FWDPBR_VARYING
     "void main()\n"
     "{\n"
     "    vec4 pos = model_m * vec4(position, 1.0);\n"
@@ -95,12 +93,10 @@ const static std::string fragment_shader_code = GX_GLES2_SHADER_SRC_DEFAULT_FRAG
     "uniform samplerCube effect_diffuse_environment;\n"
     "uniform samplerCube effect_specular_environment;\n"
     "uniform sampler2D   effect_ambient_occlusion;\n"
-	"uniform sampler2D   effect_shadow_caster_directional_lights_cascades_shadow_map[" GX_MAX_DIRECTIONAL_LIGHTS_CASCADES_STR "];\n"
-	"uniform sampler2D   effect_brdflut;\n"
-    GX_GLES2_SHADER_SRC_EFFECT_UNIFORMS
+    "uniform sampler2D   effect_shadow_caster_directional_lights_cascades_shadow_map[" GX_MAX_DIRECTIONAL_LIGHTS_CASCADES_STR "];\n"
+    "uniform sampler2D   effect_brdflut;\n" GX_GLES2_SHADER_SRC_EFFECT_UNIFORMS
     // camera uniform(s)
-    "uniform vec3        camera_position;\n"
-    GX_GLES2_SHADER_FWDPBR_VARYING
+    "uniform vec3        camera_position;\n" GX_GLES2_SHADER_FWDPBR_VARYING
     // Normal Distribution Function Trowbridge-Reitz GGX
     "float distribution_ggx(const vec3 normal, const vec3 halfway, const float roughness) {\n"
     "    float roughness2 = roughness * roughness;\n"

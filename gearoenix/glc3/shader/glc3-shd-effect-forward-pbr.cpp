@@ -7,13 +7,13 @@
 #include "../engine/glc3-eng-engine.hpp"
 #include <sstream>
 
-#define GX_GLC3_SHADER_SRC_EFFECT_UNIFORMS \
-	"uniform vec4  effect_point_lights_color_min_radius[" GX_MAX_POINT_LIGHTS_STR "];\n" \
-	"uniform vec4  effect_point_lights_position_max_radius[" GX_MAX_POINT_LIGHTS_STR "];\n" \
+#define GX_GLC3_SHADER_SRC_EFFECT_UNIFORMS                                                                                               \
+    "uniform vec4  effect_point_lights_color_min_radius[" GX_MAX_POINT_LIGHTS_STR "];\n"                                                 \
+    "uniform vec4  effect_point_lights_position_max_radius[" GX_MAX_POINT_LIGHTS_STR "];\n"                                              \
     "uniform mat4  effect_shadow_caster_directional_lights_cascades_view_projection_bias[" GX_MAX_DIRECTIONAL_LIGHTS_CASCADES_STR "];\n" \
-    "uniform vec4  effect_shadow_caster_directional_lights_color_cascades_count[" GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER_STR "];\n" \
-    "uniform vec4  effect_shadow_caster_directional_lights_direction[" GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER_STR "];\n" \
-	"uniform float effect_point_lights_count;\n" \
+    "uniform vec4  effect_shadow_caster_directional_lights_color_cascades_count[" GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER_STR "];\n"     \
+    "uniform vec4  effect_shadow_caster_directional_lights_direction[" GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER_STR "];\n"                \
+    "uniform float effect_point_lights_count;\n"                                                                                         \
     "uniform float effect_shadow_caster_directional_lights_count;\n"
 
 gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
@@ -21,8 +21,7 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
 {
     GX_GLC3_SHADER_SRC_DEFAULT_VERTEX_STARTING <<
         // camera uniform(s)
-        "uniform mat4  camera_vp;\n"
-        GX_GLC3_SHADER_SRC_EFFECT_UNIFORMS
+        "uniform mat4  camera_vp;\n" GX_GLC3_SHADER_SRC_EFFECT_UNIFORMS
         // model uniform(s)
         "uniform mat4 model_m;\n"
         // output(s)
@@ -74,8 +73,7 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         "uniform samplerCube effect_specular_environment;\n"
         "uniform sampler2D   effect_ambient_occlusion;\n"
         "uniform sampler2D   effect_shadow_caster_directional_lights_cascades_shadow_map[" GX_MAX_DIRECTIONAL_LIGHTS_CASCADES_STR "];\n"
-        "uniform sampler2D   effect_brdflut;\n"
-        GX_GLC3_SHADER_SRC_EFFECT_UNIFORMS
+        "uniform sampler2D   effect_brdflut;\n" GX_GLC3_SHADER_SRC_EFFECT_UNIFORMS
         // camera uniform(s)
         "uniform vec3        camera_position;\n"
         // output(s) of vertex shader
@@ -149,7 +147,7 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         //   reflectance equation
         "    vec3 lo = vec3(0.0);\n"
         //   computing point lights
-		"    int effect_point_lights_count_int = int(effect_point_lights_count);\n"
+        "    int effect_point_lights_count_int = int(effect_point_lights_count);\n"
         "    for (int i = 0; i < effect_point_lights_count_int; ++i)\n"
         "    {\n"
         //       calculate per-light radiance
@@ -311,8 +309,8 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         //GX_GLC3_THIS_GET_UNIFORM_F(effect_ambient_occlusion)
         GX_GLC3_THIS_GET_UNIFORM_TEXTURE_F(effect_brdflut)
         GX_GLC3_THIS_GET_UNIFORM_TEXTURE_F(effect_diffuse_environment)
-		GX_GLC3_THIS_GET_UNIFORM_F(effect_point_lights_color_min_radius)
-		GX_GLC3_THIS_GET_UNIFORM_F(effect_point_lights_position_max_radius)
+        GX_GLC3_THIS_GET_UNIFORM_F(effect_point_lights_color_min_radius)
+        GX_GLC3_THIS_GET_UNIFORM_F(effect_point_lights_position_max_radius)
         GX_GLC3_THIS_GET_UNIFORM_TEXTURE_ARRAY_F(effect_shadow_caster_directional_lights_cascades_shadow_map)
         GX_GLC3_THIS_GET_UNIFORM_F(effect_shadow_caster_directional_lights_cascades_view_projection_bias)
         GX_GLC3_THIS_GET_UNIFORM_F(effect_shadow_caster_directional_lights_color_cascades_count)

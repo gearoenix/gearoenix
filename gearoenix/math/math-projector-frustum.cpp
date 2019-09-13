@@ -33,7 +33,7 @@ gearoenix::math::IntersectionStatus gearoenix::math::ProjectorFrustum::check_int
 
 gearoenix::math::IntersectionStatus gearoenix::math::ProjectorFrustum::check_intersection(const Aabb3& aabb) const noexcept
 {
-    const Vec3 &c = aabb.get_center();
+    const Vec3& c = aabb.get_center();
     const Vec3 r = aabb.get_diameter() * 0.5f;
     return check_intersection({
         aabb.get_upper(),

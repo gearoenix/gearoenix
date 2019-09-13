@@ -25,7 +25,6 @@
 BOOST_AUTO_TEST_CASE(math_vector_test)
 {
 
-
     static std::random_device rd;
     static std::default_random_engine gen(rd());
     static std::uniform_real_distribution<> dis(0.0, 1.0);
@@ -40,32 +39,32 @@ BOOST_AUTO_TEST_CASE(math_vector_test)
         t += time_span.count();                                                                                                     \
     }
 
-#define RM(m1, m2)                                                                    \
-    {                                                                                 \
-        for (unsigned int i = 0; i < 16; ++i) {                                       \
-            glm::value_ptr(m1)[i] = static_cast<gearoenix::core::Real>(dis(gen));     \
-            m2[i] = glm::value_ptr(m1)[i];                                            \
-        }                                                                             \
+#define RM(m1, m2)                                                                \
+    {                                                                             \
+        for (unsigned int i = 0; i < 16; ++i) {                                   \
+            glm::value_ptr(m1)[i] = static_cast<gearoenix::core::Real>(dis(gen)); \
+            m2[i] = glm::value_ptr(m1)[i];                                        \
+        }                                                                         \
     }
 
-#define RV(v1, v2)                                                  \
-    {                                                               \
-        for (int i = 0; i < 3; ++i) {                               \
-            v1[i] = static_cast<gearoenix::core::Real>(dis(gen));   \
-            v2[i] = v1[i];                                          \
-        }                                                           \
+#define RV(v1, v2)                                                \
+    {                                                             \
+        for (int i = 0; i < 3; ++i) {                             \
+            v1[i] = static_cast<gearoenix::core::Real>(dis(gen)); \
+            v2[i] = v1[i];                                        \
+        }                                                         \
     }
 
-#define RQ(q1, q2)                                             \
-    {                                                          \
-        q1.x = static_cast<gearoenix::core::Real>(dis(gen));   \
-        q2.x = q1.x;                                           \
-        q1.y = static_cast<gearoenix::core::Real>(dis(gen));   \
-        q2.y = q1.y;                                           \
-        q1.z = static_cast<gearoenix::core::Real>(dis(gen));   \
-        q2.z = q1.z;                                           \
-        q1.w = static_cast<gearoenix::core::Real>(dis(gen));   \
-        q2.w = q1.w;                                           \
+#define RQ(q1, q2)                                           \
+    {                                                        \
+        q1.x = static_cast<gearoenix::core::Real>(dis(gen)); \
+        q2.x = q1.x;                                         \
+        q1.y = static_cast<gearoenix::core::Real>(dis(gen)); \
+        q2.y = q1.y;                                         \
+        q1.z = static_cast<gearoenix::core::Real>(dis(gen)); \
+        q2.z = q1.z;                                         \
+        q1.w = static_cast<gearoenix::core::Real>(dis(gen)); \
+        q2.w = q1.w;                                         \
     }
 
 #define CHECK(m1, m2)                                               \

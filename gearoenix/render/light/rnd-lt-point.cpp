@@ -1,7 +1,7 @@
 #include "rnd-lt-point.hpp"
-#include "../../system/stream/sys-stm-stream.hpp"
 #include "../../core/cr-static.hpp"
 #include "../../math/math-sphere.hpp"
+#include "../../system/stream/sys-stm-stream.hpp"
 #include "../model/rnd-mdl-model.hpp"
 #include <cmath>
 
@@ -13,7 +13,7 @@ void gearoenix::render::light::Point::update_influence_area() noexcept
     auto mxc = GX_MAX(red, grn);
     mxc = GX_MAX(mxc, blu);
     mxc *= 20.371832715762602978417121711682f;
-    mxc = std::sqrtf(std::abs(mxc));
+    mxc = sqrtf(std::abs(mxc));
     position_max_radius[3] = mxc;
 }
 

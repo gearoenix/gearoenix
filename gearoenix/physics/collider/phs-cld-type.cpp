@@ -1,11 +1,10 @@
 #include "phs-cld-type.hpp"
 #include "../../system/sys-log.hpp"
 
-std::ostream& gearoenix::physics::collider::operator<<(std::ostream& os, const Type t) noexcept 
+std::ostream& gearoenix::physics::collider::operator<<(std::ostream& os, const Type t) noexcept
 {
     os << "physics::collider::Type<";
-    switch (t)
-    {
+    switch (t) {
     case Type::Ghost:
         os << "Ghost";
         break;

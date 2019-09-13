@@ -13,10 +13,8 @@
 #include "../render/scene/rnd-scn-manager.hpp"
 #include "../render/scene/rnd-scn-scene.hpp"
 #include "../system/sys-app.hpp"
-#include "../system/sys-log.hpp"
 #include "animation/phs-anm-animation.hpp"
 #include <cmath>
-#include <cstring>
 #include <functional>
 #include <utility>
 
@@ -74,12 +72,12 @@ void gearoenix::physics::Engine::update_001_kernel(const unsigned int kernel_ind
                     continue;
                 GX_DO_TASK(
                     auto light_cascaded_shadow_caster_data = lights_cascade_info.get_next([this] {
-                        auto p = new DirLightPairedPool<CascadeInfoPtr>::iterator::value_type;
-                        p->second = new render::light::CascadeInfo(sys_app->get_render_engine());
+                        auto p = new DirLightPairedPool<CascadeInfoUPtr>::iterator::value_type;
+                        p->second = std::make_unique<render::light::CascadeInfo>(sys_app->get_render_engine());
                         return p;
                     });
                     light_cascaded_shadow_caster_data->first = dir_light;
-                    auto* cascade_data = light_cascaded_shadow_caster_data->second;
+                    auto* cascade_data = light_cascaded_shadow_caster_data->second.get();
                     const auto& dir = dir_light->get_direction();
                     const auto dot = std::abs(dir.dot(math::Vec3(0.0f, 1.0f, 0.0f))) - 1.0f;
                     const math::Vec3 up = GX_IS_ZERO(dot) ? math::Vec3::Z : math::Vec3::Y;
@@ -94,8 +92,7 @@ void gearoenix::physics::Engine::update_001_kernel(const unsigned int kernel_ind
                     const math::Sphere& sphere = model->get_occlusion_sphere();
                     if (camera->in_sight(sphere.get_center(), sphere.get_radius())) {
                         current_visible_models.push_back(model.get());
-                    }
-				);
+                    });
             }
         }
     }
@@ -118,7 +115,7 @@ void gearoenix::physics::Engine::update_001_receiver() noexcept
                     models.push_back(m);
                 for (auto& l : ls) {
                     l.second->start();
-                    cascades.push_back(l);
+                    cascades.emplace_back(l.first, l.second.get());
                 }
             }
         }
@@ -139,8 +136,7 @@ void gearoenix::physics::Engine::update_002_kernel(const unsigned int kernel_ind
                 auto* cas = lc.second;
                 for (auto& im : models) {
                     auto& m = im.second;
-                    if (m->get_enability() != core::State::Set || 
-						m->get_shadowing() != core::State::Set)
+                    if (m->get_enability() != core::State::Set || m->get_shadowing() != core::State::Set)
                         continue;
                     GX_DO_TASK(cas->shadow(m.get(), task_number));
                 }
@@ -171,6 +167,12 @@ gearoenix::physics::Engine::Engine(system::Application* const sysapp, core::sync
 {
     this->kernels->add_step(std::bind(&Engine::update_001_kernel, this, std::placeholders::_1), std::bind(&Engine::update_001_receiver, this));
     this->kernels->add_step(std::bind(&Engine::update_002_kernel, this, std::placeholders::_1), std::bind(&Engine::update_002_receiver, this));
+}
+
+gearoenix::physics::Engine::~Engine() noexcept
+{
+    scenes_camera_data.clear();
+    kernels_scene_camera_data.clear();
 }
 
 void gearoenix::physics::Engine::add_animation(const std::shared_ptr<animation::Animation>& a) noexcept

@@ -6,7 +6,7 @@
 gearoenix::render::light::Light::Light(
     const core::Id my_id,
     system::stream::Stream* const f,
-    engine::Engine* const e, 
+    engine::Engine* const e,
     const Type light_type) noexcept
     : core::asset::Asset(my_id, core::asset::Type::LIGHT)
     , light_type(light_type)

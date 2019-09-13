@@ -19,7 +19,6 @@
 #define GX_USE_OPENGL_ES3
 #define GX_USE_OPENGL_ES2
 #define GX_IN_DESKTOP
-#define GX_USE_SDL
 //#define GX_USE_GLFW
 #elif defined(WIN32) || defined(WIN64) || defined(_WIN32) || defined(_WIN64)
 #define GX_IN_WINDOWS
@@ -63,9 +62,6 @@
 // Application features
 #define GX_LOG_ENABLED
 #ifdef GX_LOG_ENABLED
-#define GX_LOG_ERROR_ENABLED
-#define GX_LOG_WARN_ENABLED
-#define GX_LOG_INFO_ENABLED
 #endif
 /// You can comment this for windowed apps
 #ifndef GX_IN_DESKTOP

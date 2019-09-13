@@ -5,8 +5,8 @@
 #include "../../math/math-vector.hpp"
 #include "rnd-mat-translucency-mode.hpp"
 #include "rnd-mat-uniform.hpp"
-#include <vector>
 #include <optional>
+#include <vector>
 namespace gearoenix {
 namespace system::stream {
     class Stream;
@@ -28,14 +28,14 @@ namespace render {
             const std::shared_ptr<buffer::FramedUniform> uniform_buffers;
 
             std::shared_ptr<texture::Texture2D> color_txt = nullptr;
-			std::optional<math::Vec3> color = math::Vec3(0.999f, 0.999f, 0.999f);
+            std::optional<math::Vec3> color = math::Vec3(0.999f, 0.999f, 0.999f);
 
             std::shared_ptr<texture::Texture2D> emission = nullptr;
             std::shared_ptr<texture::Texture2D> metallic_roughness = nullptr;
             std::shared_ptr<texture::Texture2D> normal = nullptr;
             TranslucencyMode::Id translucency = TranslucencyMode::Opaque;
 
-			bool is_shadow_caster = true;
+            bool is_shadow_caster = true;
 
             Uniform uniform;
 
@@ -45,8 +45,8 @@ namespace render {
             ~Material() noexcept = default;
             void update_uniform() noexcept;
             const std::shared_ptr<buffer::FramedUniform>& get_uniform_buffers() const noexcept;
-			const std::shared_ptr<texture::Texture2D>& get_color_texture() const noexcept;
-			const std::optional<math::Vec3>& get_color() const noexcept;
+            const std::shared_ptr<texture::Texture2D>& get_color_texture() const noexcept;
+            const std::optional<math::Vec3>& get_color() const noexcept;
             const std::shared_ptr<texture::Texture2D>& get_metallic_roughness() const noexcept;
             const std::shared_ptr<texture::Texture2D>& get_normal() const noexcept;
             const std::shared_ptr<texture::Texture2D>& get_emissive() const noexcept;
@@ -56,7 +56,7 @@ namespace render {
             void set_color(
                 core::Real r, core::Real g, core::Real b,
                 const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept;
-            void set_color(const std::shared_ptr<texture::Texture2D> &color) noexcept;
+            void set_color(const std::shared_ptr<texture::Texture2D>& color) noexcept;
         };
     }
 }

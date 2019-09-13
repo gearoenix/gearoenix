@@ -168,7 +168,7 @@ gearoenix::math::Vec2 gearoenix::math::Vec2::operator-() const noexcept
 
 gearoenix::core::Real gearoenix::math::Vec2::length() const noexcept
 {
-    return std::sqrtf(square_length());
+    return sqrtf(square_length());
 }
 
 gearoenix::core::Real gearoenix::math::Vec2::square_length() const noexcept
@@ -476,7 +476,7 @@ gearoenix::math::Vec3 gearoenix::math::Vec3::operator-() const noexcept
 
 gearoenix::core::Real gearoenix::math::Vec3::length() const noexcept
 {
-    return std::sqrtf(square_length());
+    return sqrtf(square_length());
 }
 
 gearoenix::core::Real gearoenix::math::Vec3::square_length() const noexcept
@@ -517,11 +517,10 @@ gearoenix::math::Vec3 gearoenix::math::Vec3::cross(const Vec3& o) const noexcept
 
 gearoenix::math::Vec3 gearoenix::math::Vec3::minimum(const Vec3& o) const noexcept
 {
-	return Vec3(
-		o[0] < vec[0] ? o[0] : vec[0],
-		o[1] < vec[1] ? o[1] : vec[1],
-		o[2] < vec[2] ? o[2] : vec[2]
-	);
+    return Vec3(
+        o[0] < vec[0] ? o[0] : vec[0],
+        o[1] < vec[1] ? o[1] : vec[1],
+        o[2] < vec[2] ? o[2] : vec[2]);
 }
 
 gearoenix::core::Real gearoenix::math::Vec3::minimum() const noexcept
@@ -531,11 +530,10 @@ gearoenix::core::Real gearoenix::math::Vec3::minimum() const noexcept
 
 gearoenix::math::Vec3 gearoenix::math::Vec3::maximum(const Vec3& o) const noexcept
 {
-	return Vec3(
-		o[0] > vec[0] ? o[0] : vec[0],
-		o[1] > vec[1] ? o[1] : vec[1],
-		o[2] > vec[2] ? o[2] : vec[2]
-	);
+    return Vec3(
+        o[0] > vec[0] ? o[0] : vec[0],
+        o[1] > vec[1] ? o[1] : vec[1],
+        o[2] > vec[2] ? o[2] : vec[2]);
 }
 
 gearoenix::core::Real gearoenix::math::Vec3::maximum() const noexcept
@@ -705,7 +703,7 @@ gearoenix::math::Vec4 gearoenix::math::Vec4::operator*(const core::Real a) const
 
 gearoenix::core::Real gearoenix::math::Vec4::length() const noexcept
 {
-    return std::sqrtf(square_length());
+    return sqrtf(square_length());
 }
 
 gearoenix::core::Real gearoenix::math::Vec4::square_length() const noexcept

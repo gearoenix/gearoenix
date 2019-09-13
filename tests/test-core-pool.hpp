@@ -23,13 +23,13 @@ BOOST_AUTO_TEST_CASE(math_core_pool)
         ++i;
     }
 
-    BOOST_CHECK_EQUAL(pool.size(), 10);
-    BOOST_CHECK_EQUAL(pool.capacity(), 10);
+    BOOST_CHECK_EQUAL(pool.size(), static_cast<std::size_t>(10));
+    BOOST_CHECK_EQUAL(pool.capacity(), static_cast<std::size_t>(10));
 
     pool.refresh();
 
-    BOOST_CHECK_EQUAL(pool.size(), 0);
-    BOOST_CHECK_EQUAL(pool.capacity(), 10);
+    BOOST_CHECK_EQUAL(pool.size(), static_cast<std::size_t>(0));
+    BOOST_CHECK_EQUAL(pool.capacity(), static_cast<std::size_t>(10));
 
     pool.set_increase_rate(5);
 
@@ -37,13 +37,13 @@ BOOST_AUTO_TEST_CASE(math_core_pool)
         *pool.get_next([] { return new int; }) = i;
     }
 
-    BOOST_CHECK_EQUAL(pool.size(), 10);
-    BOOST_CHECK_EQUAL(pool.capacity(), 10);
+    BOOST_CHECK_EQUAL(pool.size(), static_cast<std::size_t>(10));
+    BOOST_CHECK_EQUAL(pool.capacity(), static_cast<std::size_t>(10));
 
     *pool.get_next([] { return new int; }) = 10;
 
-    BOOST_CHECK_EQUAL(pool.size(), 11);
-    BOOST_CHECK_EQUAL(pool.capacity(), 15);
+    BOOST_CHECK_EQUAL(pool.size(), static_cast<std::size_t>(11));
+    BOOST_CHECK_EQUAL(pool.capacity(), static_cast<std::size_t>(15));
 
     i = 0;
     for (int& o : pool) {

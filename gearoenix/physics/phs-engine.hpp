@@ -44,6 +44,7 @@ namespace physics {
         using TupledPool = core::OneLoopPool<std::tuple<Types...>>;
         using ScenePtr = render::scene::Scene*;
         using CascadeInfoPtr = render::light::CascadeInfo*;
+        using CascadeInfoUPtr = std::unique_ptr<render::light::CascadeInfo>;
         using DirLightPtr = render::light::Directional*;
         using LightPtr = render::light::Light*;
         using CameraPtr = render::camera::Camera*;
@@ -64,7 +65,7 @@ namespace physics {
         using SceneCameraDirLightPairedPool = SceneCameraPairedPool<DirLightPairedPool<T>>;
         using ModelPtrs = std::vector<ModelPtr>;
         using DirLightCascadeInfos = std::vector<std::pair<DirLightPtr, CascadeInfoPtr>>;
-        using SceneCameraData = SceneCameraTupledPool<ModelPtrs, DirLightPairedPool<CascadeInfoPtr>>;
+        using SceneCameraData = SceneCameraTupledPool<ModelPtrs, DirLightPairedPool<CascadeInfoUPtr>>;
         /// Because it's gonna be prioritized in future, it is better to keep its map-ness
         using GatheredSceneCameraData = std::map<ScenePtr, std::map<CameraPtr, std::pair<ModelPtrs, DirLightCascadeInfos>>>;
         using GatheredCascadeInfos = std::map<ScenePtr, std::map<CameraPtr, std::map<DirLightPtr, CascadeInfoPtr>>>;
@@ -104,12 +105,13 @@ namespace physics {
 
     public:
         Engine(system::Application* sysapp, core::sync::KernelWorker* kernels) noexcept;
+        ~Engine() noexcept;
         void add_animation(const std::shared_ptr<animation::Animation>& a) noexcept;
         void remove_animation(const std::shared_ptr<animation::Animation>& a) noexcept;
         void remove_animation(core::Id a) noexcept;
         void update() noexcept;
-        const GatheredSceneCameraData& get_visible_models() const noexcept;
-        GatheredSceneCameraData& get_visible_models() noexcept;
+        [[nodiscard]] const GatheredSceneCameraData& get_visible_models() const noexcept;
+        [[nodiscard]] GatheredSceneCameraData& get_visible_models() noexcept;
     };
 }
 }

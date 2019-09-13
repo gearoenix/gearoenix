@@ -6,8 +6,8 @@
 #endif
 
 #include "../../core/asset/cr-asset-manager.hpp"
-#include "../../core/event/cr-ev-engine.hpp"
 #include "../../core/cr-application.hpp"
+#include "../../core/event/cr-ev-engine.hpp"
 #include "../../core/event/cr-ev-event.hpp"
 #include "../../gl/gl-loader.hpp"
 #include "../sys-configuration.hpp"
@@ -76,32 +76,33 @@ void gearoenix::system::Application::create_window() noexcept
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 #endif
-#define CREATE_WINDOW(gl_version)                                              \
-    supported_engine = render::engine::Type::gl_version;                       \
-    GXLOGD("Trying to build OpenGL window with: " << #gl_version)              \
-    window = SDL_CreateWindow(                                                 \
-        GX_APP_NAME,                                                           \
-        SDL_WINDOWPOS_CENTERED,                                                \
-        SDL_WINDOWPOS_CENTERED,                                                \
-        static_cast<int>(window_width),                                           \
-        static_cast<int>(window_height),                                          \
-        flags);                                                                \
-    if (nullptr != window) {                                                   \
-        GXLOGD("Trying to build OpenGL context with: " << #gl_version)         \
-        gl_context = SDL_GL_CreateContext(window);                             \
-        if (gl_context != nullptr) {                                           \
-            GXLOGD("Trying to load OpenGL library with: " << #gl_version)      \
-            if (gl::Loader::load_library(supported_engine)) {                  \
-                GXLOGD("OpenGL window built with: " << #gl_version)            \
-                return;                                                        \
-            } else                                                             \
-                GXLOGD("Can not load OpenGL library with: " << #gl_version)    \
-            SDL_GL_DeleteContext(gl_context);                                  \
-        } else                                                                 \
-            GXLOGD("Can not build OpenGL context with: " << #gl_version)       \
-        SDL_DestroyWindow(window);                                             \
-    } else                                                                     \
-        GXLOGD("Can not build OpenGL window with: " << #gl_version)
+#define CREATE_WINDOW(gl_version)                                           \
+    supported_engine = render::engine::Type::gl_version;                    \
+    GXLOGD("Trying to build OpenGL window with: " << #gl_version)           \
+    window = SDL_CreateWindow(                                              \
+        GX_APP_NAME,                                                        \
+        static_cast<int>(SDL_WINDOWPOS_CENTERED),                           \
+        static_cast<int>(SDL_WINDOWPOS_CENTERED),                           \
+        static_cast<int>(window_width),                                     \
+        static_cast<int>(window_height),                                    \
+        flags);                                                             \
+    if (nullptr != window) {                                                \
+        GXLOGD("Trying to build OpenGL context with: " << #gl_version)      \
+        gl_context = SDL_GL_CreateContext(window);                          \
+        if (gl_context != nullptr) {                                        \
+            GXLOGD("Trying to load OpenGL library with: " << #gl_version)   \
+            if (gl::Loader::load_library(supported_engine)) {               \
+                GXLOGD("OpenGL window built with: " << #gl_version)         \
+                return;                                                     \
+            } else                                                          \
+                GXLOGD("Can not load OpenGL library with: " << #gl_version) \
+            SDL_GL_DeleteContext(gl_context);                               \
+        } else                                                              \
+            GXLOGD("Can not build OpenGL context with: " << #gl_version)    \
+        SDL_DestroyWindow(window);                                          \
+    } else {                                                                \
+        GXLOGD("Can not build OpenGL window with: " << #gl_version)         \
+    }
 
 #ifdef GX_USE_OPENGL_43
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
@@ -139,7 +140,7 @@ void gearoenix::system::Application::create_window() noexcept
 
 int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_Event* e) noexcept
 {
-    core::event::Data event;
+    core::event::Data event = {};
     // It's gonna implement whenever needed and as much as needed.
     auto* o = static_cast<Application*>(user_data);
     switch (e->type) {
@@ -187,7 +188,7 @@ int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_
         break;
     }
     case SDL_FINGERMOTION: {
-       /* const core::Real x = (e->tfinger.x - 0.5f) * 2.0f * o->screen_ratio;
+        /* const core::Real x = (e->tfinger.x - 0.5f) * 2.0f * o->screen_ratio;
         const core::Real y = (0.5f - e->tfinger.y) * 2.0f;
         event = new core::event::movement::Mouse(x, y, o->pre_x, o->pre_y);
         o->pre_x = x;
@@ -208,36 +209,40 @@ int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_
         break;
     }
     case SDL_MOUSEBUTTONUP:
-	case SDL_MOUSEBUTTONDOWN: {
-		core::event::button::Data d;
-		d.action = [&] () noexcept {
-			switch (e->type) {
-			case SDL_MOUSEBUTTONUP:
-				return core::event::button::ActionId::Release;
-			case SDL_MOUSEBUTTONDOWN:
-				return core::event::button::ActionId::Press;
-			default:
-				return core::event::button::ActionId::Press;
-			} 
-		} ();
-		d.key = [&] () noexcept {
-			switch (e->button.button) {
-			case SDL_BUTTON_LEFT:
-				return core::event::button::KeyId::Left;
-			case SDL_BUTTON_RIGHT:
-				return core::event::button::KeyId::Right;
-			case SDL_BUTTON_MIDDLE:
-				return core::event::button::KeyId::Middle;
-			default:
-				GXLOGE("Unhandled mouse button, left button returned instead.")
-				return core::event::button::KeyId::Left;
-			}
-		} ();
-		d.x = o->convert_x_to_ratio(e->button.x);
+    case SDL_MOUSEBUTTONDOWN: {
+        core::event::button::Data d;
+        d.action = [&]() noexcept
+        {
+            switch (e->type) {
+            case SDL_MOUSEBUTTONUP:
+                return core::event::button::ActionId::Release;
+            case SDL_MOUSEBUTTONDOWN:
+                return core::event::button::ActionId::Press;
+            default:
+                return core::event::button::ActionId::Press;
+            }
+        }
+        ();
+        d.key = [&]() noexcept
+        {
+            switch (e->button.button) {
+            case SDL_BUTTON_LEFT:
+                return core::event::button::KeyId::Left;
+            case SDL_BUTTON_RIGHT:
+                return core::event::button::KeyId::Right;
+            case SDL_BUTTON_MIDDLE:
+                return core::event::button::KeyId::Middle;
+            default:
+                GXLOGE("Unhandled mouse button, left button returned instead.")
+                return core::event::button::KeyId::Left;
+            }
+        }
+        ();
+        d.x = o->convert_x_to_ratio(e->button.x);
         d.y = o->convert_y_to_ratio(e->button.y);
 
-		event.source = core::event::Id::ButtonMouse;
-		event.data = d;
+        event.source = core::event::Id::ButtonMouse;
+        event.data = d;
         break;
     }
     case SDL_MULTIGESTURE:
@@ -249,8 +254,7 @@ int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_
         break;
     case SDL_WINDOWEVENT:
         switch (e->window.event) {
-        case SDL_WINDOWEVENT_RESIZED:
-        {
+        case SDL_WINDOWEVENT_RESIZED: {
             core::event::system::WindowSizeChangeData d;
             d.pre_width = static_cast<core::Real>(o->window_width);
             d.pre_height = static_cast<core::Real>(o->window_height);
@@ -279,10 +283,10 @@ int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_
     return 1;
 }
 
-gearoenix::system::Application * gearoenix::system::Application::construct() noexcept
+gearoenix::system::Application* gearoenix::system::Application::construct() noexcept
 {
     GXLOGI("Constructing Gearoenix system application monomorphic interface over SDL2.")
-    Application * const result = new Application();
+    auto* const result = new Application();
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_AUDIO) != 0) {
         GXLOGF("Failed to initialize SDL: " << SDL_GetError())
     }
@@ -325,36 +329,32 @@ gearoenix::system::Application * gearoenix::system::Application::construct() noe
 #endif
 #ifdef GX_USE_OPENGL_CLASS_3
     if (nullptr == result->render_engine && (GX_RUNTIME_USE_OPENGL_CLASS_3_V(result->supported_engine))) {
-        result->render_engine = glc3::engine::Engine::construct(result, result->supported_engine);
+        result->render_engine = std::unique_ptr<render::engine::Engine>(glc3::engine::Engine::construct(result, result->supported_engine));
     }
 #endif
 
 #ifdef GX_USE_OPENGL_ES2
     if (nullptr == result->render_engine && result->supported_engine == render::engine::Type::OPENGL_ES2) {
-        result->render_engine = gles2::engine::Engine::construct(result);
+        result->render_engine = std::unique_ptr<render::engine::Engine>(gles2::engine::Engine::construct(result));
     }
 #endif
 
     if (result->render_engine == nullptr) {
         GXLOGF("No suitable render engine found.")
     }
-    result->asset_manager = new core::asset::Manager(result, GX_APP_DATA_NAME);
-    result->event_engine = new core::event::Engine();
+    result->asset_manager = std::make_unique<core::asset::Manager>(result, GX_APP_DATA_NAME);
+    result->event_engine = std::make_unique<core::event::Engine>();
     return result;
 }
 
 gearoenix::system::Application::~Application() noexcept
 {
-	GX_DELETE(core_app)
-	GX_DELETE(asset_manager)
-	GX_DELETE(render_engine)
-    GX_DELETE(event_engine)
     GXLOGD("Main application (SDL2) has been deleted.")
 }
 
 void gearoenix::system::Application::execute(core::Application* const app) noexcept
 {
-    core_app = app;
+    core_app = std::unique_ptr<core::Application>(app);
 #ifdef GX_IN_WEB
     Application::app = this;
     emscripten_set_main_loop(Application::loop, 0, true);
@@ -388,8 +388,9 @@ void gearoenix::system::Application::main_loop() noexcept
 }
 core_app->terminate();
 core_app = nullptr;
-render_engine = nullptr;
+event_engine = nullptr;
 asset_manager = nullptr;
+render_engine = nullptr;
 SDL_DelEventWatch(event_receiver, this);
 #ifdef GX_USE_OPENGL
 #ifdef GX_USE_INSTEAD_OF_OPENGL

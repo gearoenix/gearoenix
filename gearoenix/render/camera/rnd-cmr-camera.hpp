@@ -1,9 +1,9 @@
 #ifndef GEAROENIX_RENDER_CAMERA_CAMERA_HPP
 #define GEAROENIX_RENDER_CAMERA_CAMERA_HPP
 #include "../../core/asset/cr-asset.hpp"
+#include "../../core/cr-static.hpp"
 #include "../../core/event/cr-ev-listner.hpp"
 #include "../../math/math-ray.hpp"
-#include "../../core/cr-static.hpp"
 #include <array>
 #include <memory>
 #include <vector>
@@ -34,7 +34,7 @@ namespace render {
         class Transformation;
         struct Uniform;
         class Camera : public core::asset::Asset, public core::event::Listner {
-			GX_GETSET_VAL_PRT(core::Real, layer, 0.0f)
+            GX_GETSET_VAL_PRT(core::Real, layer, 0.0f)
         protected:
             bool enabled = true;
             engine::Engine* const e;
@@ -51,7 +51,7 @@ namespace render {
             virtual ~Camera() noexcept;
             const std::shared_ptr<buffer::FramedUniform>& get_uniform_buffers() const;
             const std::shared_ptr<physics::Transformation> get_transformation() const noexcept;
-			void set_far(core::Real f) noexcept;
+            void set_far(core::Real f) noexcept;
             bool is_enabled() const noexcept;
             void enable() noexcept;
             void disable() noexcept;

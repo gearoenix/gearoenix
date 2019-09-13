@@ -57,8 +57,8 @@ namespace core {
     namespace asset {
         class Manager {
         private:
-            const std::shared_ptr<system::Application> sys_app;
-            const std::shared_ptr<render::engine::Engine> render_engine;
+            system::Application* sys_app = nullptr;
+            render::engine::Engine* render_engine = nullptr;
             const std::shared_ptr<system::stream::Asset> file;
             std::shared_ptr<render::camera::Manager> camera_manager = nullptr;
             std::shared_ptr<audio::Manager> audio_manager = nullptr;
@@ -73,7 +73,7 @@ namespace core {
             static std::atomic<Id> last_id;
 
         public:
-            Manager(system::Application * sys_app, const std::string& file) noexcept;
+            Manager(system::Application* sys_app, const std::string& file) noexcept;
             const std::shared_ptr<system::stream::Asset>& get_file() const noexcept;
             const std::shared_ptr<render::camera::Manager>& get_camera_manager() const noexcept;
             const std::shared_ptr<audio::Manager>& get_audio_manager() const noexcept;

@@ -6,7 +6,7 @@ namespace gearoenix::physics::collider {
 class Sphere : public Collider {
     GX_GET_CREF_PRV(math::Sphere, sphere)
 public:
-    Sphere(const math::Vec3 &c, core::Real r) noexcept;
+    Sphere(const math::Vec3& c, core::Real r) noexcept;
     ~Sphere() noexcept = default;
     void set_location(const math::Vec3& l) noexcept final;
     void local_scale(core::Real s) noexcept final;

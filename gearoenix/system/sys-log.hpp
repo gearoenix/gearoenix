@@ -7,15 +7,15 @@
 #include "android/sys-and-log.hpp"
 #elif defined(GX_IN_WEB)
 #include <iostream>
-#define GXLOGI(s)                                                       \
+#define GXLOGI(s)                                                  \
     std::cout << GX_APP_NAME << " " << s << " " << __FILE__ << " " \
               << __LINE__ << std::endl;
 #ifdef GX_DEBUG_MODE
 #define GXLOGD(s) GXLOGI(s)
-#else 
+#else
 #define GXLOGD(s)
 #endif
-#define GXLOGE(s)                                                              \
+#define GXLOGE(s)                                                         \
     std::cout << GX_APP_NAME << " ERROR: " << s << " " << __FILE__ << " " \
               << __LINE__ << std::endl;
 #define GXLOGF(s)         \

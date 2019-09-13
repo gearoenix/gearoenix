@@ -1,6 +1,7 @@
 #include "cr-sync-kernel-workers.hpp"
+
 #include "cr-sync-semaphore.hpp"
-#include "../../system/sys-log.hpp"
+#include <utility>
 
 void gearoenix::core::sync::KernelWorker::thread_loop(const unsigned int kernel_index) noexcept
 {
@@ -33,7 +34,7 @@ gearoenix::core::sync::KernelWorker::KernelWorker() noexcept
     workers_syncers.reserve(kernels_count);
     for (unsigned int ki = 0; ki < kernels_count; ++ki) {
         signals.push_back(std::make_shared<Semaphore>());
-        threads.push_back(std::thread(std::bind(&KernelWorker::thread_loop, this, ki)));
+        threads.emplace_back(std::bind(&KernelWorker::thread_loop, this, ki));
         workers_syncers.push_back(std::make_shared<std::mutex>());
     }
 }
@@ -50,7 +51,7 @@ gearoenix::core::sync::KernelWorker::~KernelWorker() noexcept
 
 void gearoenix::core::sync::KernelWorker::add_step(std::function<void(const unsigned int)> worker, std::function<void()> receiver) noexcept
 {
-    add_step([] {}, worker, receiver);
+    add_step([] {}, std::move(worker), std::move(receiver));
 }
 
 void gearoenix::core::sync::KernelWorker::add_step(std::function<void()> sender, std::function<void(const unsigned int)> worker, std::function<void()> receiver) noexcept
@@ -66,13 +67,11 @@ void gearoenix::core::sync::KernelWorker::add_step(std::function<void()> sender,
     }
     for (std::shared_ptr<std::mutex>& m : workers_syncers)
         m->lock();
-    workers.push_back({ 
-        waits,
-        sender,
-        worker,
-        receiver,
-        worker_signals
-    });
+    workers.push_back({ waits,
+        std::move(sender),
+        std::move(worker),
+        std::move(receiver),
+        worker_signals });
     for (std::shared_ptr<std::mutex>& m : workers_syncers)
         m->unlock();
 }

@@ -17,13 +17,13 @@
 
 std::atomic<gearoenix::core::Id> gearoenix::core::asset::Manager::last_id(0);
 
-gearoenix::core::asset::Manager::Manager(system::Application * const sys_app, const std::string& name) noexcept
+gearoenix::core::asset::Manager::Manager(system::Application* const sys_app, const std::string& name) noexcept
     : sys_app(sys_app)
     , render_engine(sys_app->get_render_engine())
     , file(system::stream::Asset::construct(sys_app, name))
 {
     if (file == nullptr) {
-#define GX_HELPER(a, n) a##_manager = std::make_shared<n::Manager>(nullptr, render_engine.get());
+#define GX_HELPER(a, n) a##_manager = std::make_shared<n::Manager>(nullptr, render_engine);
 
         GX_HELPER(camera, render::camera)
         GX_HELPER(audio, audio)
@@ -37,16 +37,16 @@ gearoenix::core::asset::Manager::Manager(system::Application * const sys_app, co
         GX_HELPER(scene, render::scene)
 #undef GX_HELPER
     } else {
-		GXLOGD("Asset file found.")
+        GXLOGD("Asset file found.")
         system::stream::Stream* s = reinterpret_cast<system::stream::Stream*>(file.get());
         last_id.store(s->read<Id>());
         core::Count off;
 
-#define GX_HELPER(a, n)                                        \
-    off = s->tell();                                           \
+#define GX_HELPER(a, n)                                  \
+    off = s->tell();                                     \
     s = system::stream::Asset::construct(sys_app, name); \
-    s->seek(off);                                              \
-    a##_manager = std::make_shared<n::Manager>(s, render_engine.get());
+    s->seek(off);                                        \
+    a##_manager = std::make_shared<n::Manager>(s, render_engine);
 
         GX_HELPER(camera, render::camera)
         GX_HELPER(audio, audio)

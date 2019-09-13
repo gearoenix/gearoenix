@@ -20,8 +20,8 @@
 #include <gearoenix/render/model/rnd-mdl-model.hpp>
 #include <gearoenix/render/model/rnd-mdl-static.hpp>
 #include <gearoenix/render/model/rnd-mdl-transformation.hpp>
-#include <gearoenix/render/scene/rnd-scn-manager.hpp>
 #include <gearoenix/render/scene/rnd-scn-game.hpp>
+#include <gearoenix/render/scene/rnd-scn-manager.hpp>
 #include <gearoenix/render/scene/rnd-scn-scene.hpp>
 #include <gearoenix/system/sys-app.hpp>
 #include <gearoenix/system/sys-log.hpp>
@@ -43,7 +43,7 @@ using GxDirLight = gearoenix::render::light::Directional;
 using GxLtManager = gearoenix::render::light::Manager;
 using GxPersCam = gearoenix::render::camera::Perspective;
 
-GameApp::GameApp(gearoenix::system::Application * const sys_app) noexcept
+GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
     : gearoenix::core::Application::Application(sys_app)
 {
     const GxEndCallerIgnored endcall([this] { scn->set_enability(true); });
@@ -52,7 +52,7 @@ GameApp::GameApp(gearoenix::system::Application * const sys_app) noexcept
     GxEndCaller<GxStaticModel> mdlcall([endcall](std::shared_ptr<GxStaticModel>) {});
 
     render_engine->set_render_tree(new GxGrPbr(render_engine, endcall));
-    gearoenix::core::asset::Manager *const astmgr = sys_app->get_asset_manager();
+    gearoenix::core::asset::Manager* const astmgr = sys_app->get_asset_manager();
     scn = astmgr->get_scene_manager()->create<GxGameScene>(scncall);
 
     std::shared_ptr<GxPersCam> cam = astmgr->get_camera_manager()->create<GxPersCam>();
@@ -82,7 +82,7 @@ GameApp::GameApp(gearoenix::system::Application * const sys_app) noexcept
 
     const std::shared_ptr<GxMesh> msh = astmgr->get_mesh_manager()->create_icosphere(mshcall);
     const std::shared_ptr<GxMesh> plate_mesh = astmgr->get_mesh_manager()->create_plate(mshcall);
-    const std::shared_ptr<GxMdManager> &mdlmgr = astmgr->get_model_manager();
+    const std::shared_ptr<GxMdManager>& mdlmgr = astmgr->get_model_manager();
     {
         const std::shared_ptr<GxMaterial> mat(new GxMaterial(render_engine, endcall));
         mat->set_roughness_factor(0.5f);
@@ -90,15 +90,13 @@ GameApp::GameApp(gearoenix::system::Application * const sys_app) noexcept
         mat->set_color(0.0f, 0.999f, 0.0f, endcall);
         const std::shared_ptr<GxStaticModel> mdl = mdlmgr->create<GxStaticModel>(mdlcall);
         mdl->add_mesh(std::make_shared<GxMdMesh>(plate_mesh, mat));
-        auto *trans = mdl->get_transformation();
+        auto* trans = mdl->get_transformation();
         trans->set_location(GxVec3(0.0f, 0.0f, -5.0f));
         trans->local_scale(14.0f);
         scn->add_model(mdl);
     }
-    for (gearoenix::core::Real y = -10.0f, roughness = 0.1f; y < 10.1f; y += 2.5f, roughness += 0.1f)
-    {
-        for (gearoenix::core::Real x = -10.0f, metallic = 0.1f; x < 10.1f; x += 2.5f, metallic += 0.1f)
-        {
+    for (gearoenix::core::Real y = -10.0f, roughness = 0.1f; y < 10.1f; y += 2.5f, roughness += 0.1f) {
+        for (gearoenix::core::Real x = -10.0f, metallic = 0.1f; x < 10.1f; x += 2.5f, metallic += 0.1f) {
             const std::shared_ptr<GxMaterial> mat(new GxMaterial(render_engine, endcall));
             mat->set_roughness_factor(roughness);
             mat->set_metallic_factor(metallic);

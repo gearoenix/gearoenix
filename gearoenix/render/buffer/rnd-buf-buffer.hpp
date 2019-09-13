@@ -1,7 +1,7 @@
 #ifndef GEAROENIX_RENDER_BUFFER_BUFFER_HPP
 #define GEAROENIX_RENDER_BUFFER_BUFFER_HPP
-#include <vector>
 #include "../../core/cr-static.hpp"
+#include <vector>
 namespace gearoenix::render {
 namespace engine {
     class Engine;
@@ -13,8 +13,8 @@ namespace buffer {
         engine::Engine* const e;
 
         Buffer(const std::size_t size, engine::Engine* const e) noexcept
-        : size(size)
-                , e(e)
+            : size(size)
+            , e(e)
         {
         }
 

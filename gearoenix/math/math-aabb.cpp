@@ -139,7 +139,8 @@ std::optional<gearoenix::core::Real> gearoenix::math::Aabb3::hit(const math::Ray
     const Vec3 tbig = t0.maximum(t1);
     const core::Real tmin = tsmall.maximum();
     const core::Real tmax = tbig.minimum();
-    if (tmin < tmax && tmin < d_min) return tmin;
+    if (tmin < tmax && tmin < d_min)
+        return tmin;
     return std::nullopt;
 }
 

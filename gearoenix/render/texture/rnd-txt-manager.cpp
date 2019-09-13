@@ -78,23 +78,23 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
 
 std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::get_2d_one_1c(core::sync::EndCaller<Texture2D>& c) noexcept
 {
-	if (nullptr == default_one_1c_2d)
-		default_one_1c_2d = get_2d(1.0f, c);
-	else
-		c.set_data(default_one_1c_2d);
-	return default_one_1c_2d;
+    if (nullptr == default_one_1c_2d)
+        default_one_1c_2d = get_2d(1.0f, c);
+    else
+        c.set_data(default_one_1c_2d);
+    return default_one_1c_2d;
 }
 
 std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::get_2d_one_2c(core::sync::EndCaller<Texture2D>& c) noexcept
 {
-	if (nullptr == default_one_2c_2d)
-		default_one_2c_2d = get_2d(1.0f, c);
-	else
-		c.set_data(default_one_2c_2d);
-	return default_one_2c_2d;
+    if (nullptr == default_one_2c_2d)
+        default_one_2c_2d = get_2d(1.0f, c);
+    else
+        c.set_data(default_one_2c_2d);
+    return default_one_2c_2d;
 }
 
-std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::create_2d(unsigned char *data, const Info& info, int img_width, int img_height, core::sync::EndCaller<Texture2D>& c) noexcept
+std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::create_2d(unsigned char* data, const Info& info, int img_width, int img_height, core::sync::EndCaller<Texture2D>& c) noexcept
 {
     const auto id = core::asset::Manager::create_id();
     auto t = std::shared_ptr<texture::Texture2D>(e->create_texture_2d(
@@ -104,7 +104,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
         info.s,
         img_width,
         img_height,
-        core::sync::EndCaller<core::sync::EndCallerIgnore>([data, c] { delete data; })));
+        core::sync::EndCaller<core::sync::EndCallerIgnore>([data, c] { delete[] data; })));
     c.set_data(t);
     cache.get_cacher().get_cacheds()[id] = t;
     return t;
@@ -112,7 +112,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
 
 std::shared_ptr<gearoenix::render::texture::Cube> gearoenix::render::texture::Manager::get_cube(const math::Vec4& color, core::sync::EndCaller<Cube>& c) noexcept
 {
-	/// TODO: It is better to have deferent types of color and elements
+    /// TODO: It is better to have deferent types of color and elements
     static_assert(sizeof(core::Real) == 4, "Only float 32 bit are supported.");
     std::shared_ptr<std::array<core::Real, 4>> cc(new std::array<core::Real, 4>());
     (*cc)[0] = color[0];
@@ -163,11 +163,11 @@ std::shared_ptr<gearoenix::render::texture::Cube> gearoenix::render::texture::Ma
 
 std::shared_ptr<gearoenix::render::texture::Cube> gearoenix::render::texture::Manager::get_cube_zero_3c(core::sync::EndCaller<Cube>& c) noexcept
 {
-	if (default_zero_3c_cube == nullptr)
-		default_zero_3c_cube = get_cube(math::Vec3(0.0f, 0.0f, 0.0f), c);
-	else
-		c.set_data(default_zero_3c_cube);
-	return default_zero_3c_cube;
+    if (default_zero_3c_cube == nullptr)
+        default_zero_3c_cube = get_cube(math::Vec3(0.0f, 0.0f, 0.0f), c);
+    else
+        c.set_data(default_zero_3c_cube);
+    return default_zero_3c_cube;
 }
 
 std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::render::texture::Manager::get_gx3d(const core::Id id, core::sync::EndCaller<Texture>& c) noexcept

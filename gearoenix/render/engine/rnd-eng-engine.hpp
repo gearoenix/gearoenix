@@ -1,6 +1,7 @@
 #ifndef GEAROENIX_RENDER_ENGINE_ENGINE_HPP
 #define GEAROENIX_RENDER_ENGINE_ENGINE_HPP
 #include "../../core/cr-build-configuration.hpp"
+#include "../../core/cr-static.hpp"
 #include "../../core/cr-types.hpp"
 #include "../../core/sync/cr-sync-end-caller.hpp"
 #include "../texture/rnd-txt-format.hpp"
@@ -71,35 +72,41 @@ namespace render {
     }
     namespace engine {
         class Engine {
+            GX_GET_CVAL_PRT(Type, engine_type)
+            GX_GET_PTRC_PRT(system::Application, system_application)
+            GX_GET_UPTR_PRT(core::FunctionLoader, function_loader)
+            GX_GET_UPTR_PRT(core::sync::KernelWorker, kernels)
+            GX_GET_UPTR_PRT(physics::Engine, physics_engine)
+            GX_GET_UPTR_PRT(pipeline::Manager, pipeline_manager)
+            GX_GET_UPTR_PRT(command::Manager, command_manager)
+            GX_GET_UPTR_PRT(sampler::Manager, sampler_manager)
+            GX_GET_UPTR_PRT(buffer::Manager, buffer_manager)
+            GX_GET_CREF_PRT(std::shared_ptr<texture::Target>, main_render_target)
+            GX_GET_VAL_PRT(unsigned int, frames_count, 2)
+            GX_GET_VAL_PRT(unsigned int, frame_number, 0)
+            GX_GET_VAL_PRT(core::Real, delta_time, 0.0f)
+            // It is not owned by engine and the user who had set this, must delete it.
+            // In addition, this design is temporary and in next version of engine it is going to be changed.
+            //
+            // TODO: This is (design/mechanism) going to change in far future
+            // game developer must keep all the render-trees by himself/herself
+            // Then every thing based on the following must be chose by render-trees:
+            //   - Type of object/scene (e.g. UI, GAME, MODEL, Widget, etc)
+            //   - Tagging the objects or meshes that must be rendered by which render-tree
+            // This is going to add a great flexibility in render engine
+            //
+            // The other way of accomplishing of this functionality is to create a render-tree
+            // that is composed with several other render-trees
+            GX_GETSET_PTR_PRT(graph::tree::Tree, render_tree)
         protected:
-            unsigned int frames_count = 2;
-            unsigned int frame_number = 0;
-            const Type engine_type_id;
-            core::Real delta_time = 0.0f;
             std::chrono::time_point<std::chrono::high_resolution_clock> last_frame_time = std::chrono::high_resolution_clock::now();
-
-            system::Application* sys_app = nullptr;
-            core::FunctionLoader* fun_loader = nullptr;
-            physics::Engine* physics_engine = nullptr;
-            core::sync::KernelWorker* kernels = nullptr;
-            std::shared_ptr<texture::Target> main_render_target = nullptr;
-            std::shared_ptr<graph::node::Node> frame_node = nullptr;
-
-            pipeline::Manager* pipeline_manager = nullptr;
-            command::Manager* command_manager = nullptr;
-            sampler::Manager* sampler_manager = nullptr;
-            buffer::Manager* buffer_manager = nullptr;
-            /// It is not owned by engine and the user who had set this, must delete it.
-            /// In addition, this design is temporary and in next version of engine it is going to be changed.
-            graph::tree::Tree* render_tree = nullptr;
-
-            Engine(system::Application* system_application, Type engine_type_id) noexcept;
+            Engine(system::Application* system_application, Type engine_type) noexcept;
 
         public:
             virtual ~Engine() noexcept;
             virtual void update() noexcept;
             virtual void terminate() noexcept;
-            virtual sync::Semaphore* create_semaphore() const noexcept = 0;
+            [[nodiscard]] virtual sync::Semaphore* create_semaphore() const noexcept = 0;
             /// Caller of this function must maintain the pointer to data until call of EndCaller.
             virtual texture::Texture2D* create_texture_2d(
                 core::Id id,
@@ -134,44 +141,6 @@ namespace render {
                 std::size_t nxts_count,
                 const sync::Semaphore* const* nxts) noexcept
                 = 0;
-            /// TODO: This is (design/mechanism) going to change in far future
-            /// game developer must keep all the render-trees by himself/herself
-            /// Then every thing based on the following must be chose by render-trees:
-            ///   - Type of object/scene (e.g. UI, GAME, MODEL, Widget, etc)
-            ///   - Tagging the objects or meshes that must be rendered by which render-tree
-            /// This is going to add a great flexibility in rendering of engine
-            ///
-            /// The other way of accomplishing of this functionality is to create a render-tree
-            /// that is composed with several other render-trees
-            virtual void set_render_tree(graph::tree::Tree* tree) noexcept;
-
-            const system::Application* get_system_application() const noexcept;
-            system::Application* get_system_application() noexcept;
-
-            const core::FunctionLoader* get_function_loader() const noexcept;
-            core::FunctionLoader* get_function_loader() noexcept;
-
-            const physics::Engine* get_physics_engine() const noexcept;
-            physics::Engine* get_physics_engine() noexcept;
-
-            const pipeline::Manager* get_pipeline_manager() const noexcept;
-            pipeline::Manager* get_pipeline_manager() noexcept;
-
-            const command::Manager* get_command_manager() const noexcept;
-            command::Manager* get_command_manager() noexcept;
-
-            const buffer::Manager* get_buffer_manager() const noexcept;
-            buffer::Manager* get_buffer_manager() noexcept;
-
-            const core::sync::KernelWorker* get_kernels() const noexcept;
-            core::sync::KernelWorker* get_kernels() noexcept;
-
-            const std::shared_ptr<texture::Target>& get_main_render_target() const noexcept;
-
-            Type get_engine_type_id() const noexcept;
-            unsigned int get_frame_number() const noexcept;
-            unsigned int get_frames_count() const noexcept;
-            core::Real get_delta_time() const noexcept;
         };
     }
 }

@@ -1,6 +1,6 @@
 #include "rnd-cmr-camera.hpp"
-#include "../../core/event/cr-ev-event.hpp"
 #include "../../core/event/cr-ev-engine.hpp"
+#include "../../core/event/cr-ev-event.hpp"
 #include "../../math/math-projector-frustum.hpp"
 #include "../../math/math-quaternion.hpp"
 #include "../../system/stream/sys-stm-stream.hpp"
@@ -19,7 +19,7 @@ gearoenix::render::camera::Camera::Camera(const core::Id my_id, engine::Engine* 
     , frustum(new math::ProjectorFrustum(math::Mat4x4()))
     , uniform_buffers(new buffer::FramedUniform(sizeof(Uniform), e))
     , cascaded_shadow_frustum_partitions(new std::vector<std::array<math::Vec3, 4>>(
-        static_cast<std::size_t>(e->get_system_application()->get_configuration().render_config.shadow_cascades_count) + 1))
+          static_cast<std::size_t>(e->get_system_application()->get_configuration().render_config.shadow_cascades_count) + 1))
 {
     transformation = std::make_shared<Transformation>(uniform, frustum, cascaded_shadow_frustum_partitions);
     const auto& sys_app = e->get_system_application();
@@ -83,8 +83,8 @@ const std::shared_ptr<gearoenix::physics::Transformation> gearoenix::render::cam
 
 void gearoenix::render::camera::Camera::set_far(const core::Real f) noexcept
 {
-	uniform->far = -f;
-	transformation->update_projection();
+    uniform->far = -f;
+    transformation->update_projection();
 }
 
 bool gearoenix::render::camera::Camera::is_enabled() const noexcept
@@ -104,7 +104,7 @@ void gearoenix::render::camera::Camera::disable() noexcept
 
 bool gearoenix::render::camera::Camera::in_sight(const gearoenix::math::Vec3& location, const core::Real radius) const noexcept
 {
-	return frustum->check_intersection(location, radius) != math::IntersectionStatus::Out;
+    return frustum->check_intersection(location, radius) != math::IntersectionStatus::Out;
 }
 
 void gearoenix::render::camera::Camera::update_uniform()
@@ -131,8 +131,7 @@ const gearoenix::render::camera::Uniform& gearoenix::render::camera::Camera::get
 bool gearoenix::render::camera::Camera::on_event(const core::event::Data& d) noexcept
 {
     const auto* sys_app = e->get_system_application();
-    switch (d.source)
-    {
+    switch (d.source) {
     case core::event::Id::SystemWindowSizeChange:
         uniform->clip_width = static_cast<core::Real>(sys_app->get_window_width());
         uniform->clip_height = static_cast<core::Real>(sys_app->get_window_height());

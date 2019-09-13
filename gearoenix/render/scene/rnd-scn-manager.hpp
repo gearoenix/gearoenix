@@ -34,7 +34,7 @@ namespace render {
             template <typename T>
             typename std::enable_if<std::is_base_of<Scene, T>::value, std::shared_ptr<T>>::type
             create(core::sync::EndCaller<T>& c) noexcept;
-            const std::map<core::Id, std::weak_ptr<scene::Scene>>& get_scenes() const noexcept;
+            [[nodiscard]] const std::map<core::Id, std::weak_ptr<scene::Scene>>& get_scenes() const noexcept;
         };
     }
 }

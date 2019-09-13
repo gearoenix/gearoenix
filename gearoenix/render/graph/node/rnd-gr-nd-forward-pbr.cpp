@@ -38,9 +38,9 @@ const unsigned int gearoenix::render::graph::node::ForwardPbr::BRDFLUT_INDEX = 3
 const unsigned int gearoenix::render::graph::node::ForwardPbr::SHADOW_MAP_000_INDEX = 4;
 
 gearoenix::render::graph::node::ForwardPbrUniform::ForwardPbrUniform(
-    const std::vector<std::pair<light::Directional*, light::CascadeInfo*>>*const directional_lights, 
-    const scene::Scene*const scn,
-    const model::Model*const mdl) noexcept
+    const std::vector<std::pair<light::Directional*, light::CascadeInfo*>>* const directional_lights,
+    const scene::Scene* const scn,
+    const model::Model* const mdl) noexcept
 {
     // Initializing point lights
     unsigned int lights_count = 0;
@@ -49,10 +49,8 @@ gearoenix::render::graph::node::ForwardPbrUniform::ForwardPbrUniform(
         const auto& l = id_light.second;
         if (light::Type::POINT == l->get_type()) {
             auto pl = reinterpret_cast<light::Point*>(l.get());
-            if (l->is_in_light(mdl)) 
-            {
-                if (GX_COUNT_OF(point_lights_color_min_radius) <= lights_count)
-                {
+            if (l->is_in_light(mdl)) {
+                if (GX_COUNT_OF(point_lights_color_min_radius) <= lights_count) {
                     GXLOGD("Unexpected number of influencing point lights over model: " << mdl->get_asset_id())
                     break;
                 }
@@ -65,8 +63,7 @@ gearoenix::render::graph::node::ForwardPbrUniform::ForwardPbrUniform(
     point_lights_count = static_cast<core::Real>(lights_count);
     // Initializing directional lights
     lights_count = 0;
-    for (const auto& dir_cas : *directional_lights)
-    {
+    for (const auto& dir_cas : *directional_lights) {
         auto dir = dir_cas.first;
         auto cas = dir_cas.second;
         const auto& data = cas->get_cascades_data();
@@ -119,7 +116,7 @@ void gearoenix::render::graph::node::ForwardPbr::record(
         const std::shared_ptr<material::Material>& mat = id_mesh.second->get_material();
         auto* const rd = kernel->render_data_pool.get_next([this] {
             return new ForwardPbrRenderData(e, render_pipeline.get());
-            });
+        });
         rd->u->update(&u);
         auto* const prs = rd->r;
         prs->set_scene(scn);
@@ -131,12 +128,10 @@ void gearoenix::render::graph::node::ForwardPbr::record(
         prs->set_specular_environment(reinterpret_cast<texture::Cube*>(input_textures[SPECULAR_ENVIRONMENT_INDEX]));
         prs->set_ambient_occlusion(reinterpret_cast<texture::Texture2D*>(input_textures[AMBIENT_OCCLUSION_INDEX]));
         prs->set_brdflut(reinterpret_cast<texture::Texture2D*>(input_textures[BRDFLUT_INDEX]));
-        for (int shadow_caster_directional_light_index = 0, shadow_map_index = SHADOW_MAP_000_INDEX; 
-            shadow_caster_directional_light_index < GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER; 
-            ++shadow_caster_directional_light_index)
-        {
-            for (int cascaded_inex = 0; cascaded_inex < GX_MAX_SHADOW_CASCADES; ++cascaded_inex, ++shadow_map_index)
-            {
+        for (int shadow_caster_directional_light_index = 0, shadow_map_index = SHADOW_MAP_000_INDEX;
+             shadow_caster_directional_light_index < GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER;
+             ++shadow_caster_directional_light_index) {
+            for (int cascaded_inex = 0; cascaded_inex < GX_MAX_SHADOW_CASCADES; ++cascaded_inex, ++shadow_map_index) {
                 prs->set_directional_lights_shadow_map(
                     reinterpret_cast<texture::Texture2D*>(input_textures[shadow_map_index]),
                     shadow_caster_directional_light_index, cascaded_inex);
@@ -169,8 +164,8 @@ gearoenix::render::graph::node::ForwardPbr::ForwardPbr(
         f = new ForwardPbrFrame(e);
     }
     const std::shared_ptr<texture::Manager>& txtmgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
-    core::sync::EndCaller<texture::Cube> txtcubecall([call](std::shared_ptr<texture::Cube>) {});
-    core::sync::EndCaller<texture::Texture2D> txt2dcall([call](std::shared_ptr<texture::Texture2D>) {});
+    core::sync::EndCaller<texture::Cube> txtcubecall([call](const std::shared_ptr<texture::Cube>&) {});
+    core::sync::EndCaller<texture::Texture2D> txt2dcall([call](const std::shared_ptr<texture::Texture2D>&) {});
 
     input_textures[DIFFUSE_ENVIRONMENT_INDEX] = txtmgr->get_cube_zero_3c(txtcubecall).get();
     input_textures[SPECULAR_ENVIRONMENT_INDEX] = txtmgr->get_cube_zero_3c(txtcubecall).get();
@@ -180,26 +175,26 @@ gearoenix::render::graph::node::ForwardPbr::ForwardPbr(
 
 gearoenix::render::graph::node::ForwardPbr::~ForwardPbr() noexcept
 {
-    for (ForwardPbrFrame* f: frames)
+    for (ForwardPbrFrame* f : frames)
         delete f;
 }
 
-void gearoenix::render::graph::node::ForwardPbr::set_diffuse_environment(texture::Cube*const t) noexcept
+void gearoenix::render::graph::node::ForwardPbr::set_diffuse_environment(texture::Cube* const t) noexcept
 {
     set_input_texture(t, DIFFUSE_ENVIRONMENT_INDEX);
 }
 
-void gearoenix::render::graph::node::ForwardPbr::set_specular_environment(texture::Cube*const t) noexcept
+void gearoenix::render::graph::node::ForwardPbr::set_specular_environment(texture::Cube* const t) noexcept
 {
     set_input_texture(t, SPECULAR_ENVIRONMENT_INDEX);
 }
 
-void gearoenix::render::graph::node::ForwardPbr::set_ambient_occlusion(texture::Texture2D*const t) noexcept
+void gearoenix::render::graph::node::ForwardPbr::set_ambient_occlusion(texture::Texture2D* const t) noexcept
 {
     set_input_texture(t, AMBIENT_OCCLUSION_INDEX);
 }
 
-void gearoenix::render::graph::node::ForwardPbr::set_brdflut(texture::Texture2D*const t) noexcept
+void gearoenix::render::graph::node::ForwardPbr::set_brdflut(texture::Texture2D* const t) noexcept
 {
     set_input_texture(t, BRDFLUT_INDEX);
 }
@@ -215,22 +210,22 @@ void gearoenix::render::graph::node::ForwardPbr::update() noexcept
     }
 }
 
-void gearoenix::render::graph::node::ForwardPbr::set_scene(const scene::Scene*const s) noexcept
+void gearoenix::render::graph::node::ForwardPbr::set_scene(const scene::Scene* const s) noexcept
 {
     scn = s;
 }
 
-void gearoenix::render::graph::node::ForwardPbr::set_camera(const camera::Camera*const c) noexcept
+void gearoenix::render::graph::node::ForwardPbr::set_camera(const camera::Camera* const c) noexcept
 {
     cam = c;
 }
 
-void gearoenix::render::graph::node::ForwardPbr::set_seen_models(const std::vector<model::Model*>*const ms) noexcept
+void gearoenix::render::graph::node::ForwardPbr::set_seen_models(const std::vector<model::Model*>* const ms) noexcept
 {
     seen_models = ms;
 }
 
-void gearoenix::render::graph::node::ForwardPbr::set_directional_lights(const std::vector<std::pair<light::Directional*, light::CascadeInfo*>>*const m) noexcept
+void gearoenix::render::graph::node::ForwardPbr::set_directional_lights(const std::vector<std::pair<light::Directional*, light::CascadeInfo*>>* const m) noexcept
 {
     directional_lights = m;
     unsigned int shadow_map_index = node::ForwardPbr::SHADOW_MAP_000_INDEX;
@@ -239,23 +234,20 @@ void gearoenix::render::graph::node::ForwardPbr::set_directional_lights(const st
         auto& cds = light_cascades_info.second->get_cascades_data();
         int cascaded_inex = 0;
         for (const light::CascadeInfo::PerCascade& c : cds) {
-            graph::node::ShadowMapper*const shm = c.shadow_mapper;
+            graph::node::ShadowMapper* const shm = c.shadow_mapper.get();
             core::graph::Node::connect(shm, 0, this, shadow_map_index);
-            input_textures[shadow_map_index] = shm->get_output_texture(0);
+            input_textures[shadow_map_index] = shm->get_output_texture(0).get();
             ++cascaded_inex;
             ++shadow_map_index;
         }
-        for (; cascaded_inex < GX_MAX_SHADOW_CASCADES; ++cascaded_inex, ++shadow_map_index)
-        {
+        for (; cascaded_inex < GX_MAX_SHADOW_CASCADES; ++cascaded_inex, ++shadow_map_index) {
             clear_provider(shadow_map_index);
             input_textures[shadow_map_index] = nullptr;
         }
         ++directional_light_index;
     }
-    for (; directional_light_index < GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER; ++directional_light_index)
-    {
-        for (int cascaded_inex = 0; cascaded_inex < GX_MAX_SHADOW_CASCADES; ++cascaded_inex, ++shadow_map_index)
-        {
+    for (; directional_light_index < GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER; ++directional_light_index) {
+        for (int cascaded_inex = 0; cascaded_inex < GX_MAX_SHADOW_CASCADES; ++cascaded_inex, ++shadow_map_index) {
             clear_provider(shadow_map_index);
             input_textures[shadow_map_index] = nullptr;
         }
@@ -267,17 +259,17 @@ void gearoenix::render::graph::node::ForwardPbr::record(const unsigned int kerne
     const unsigned int kernels_count = e->get_kernels()->get_threads_count();
     unsigned int task_number = 0;
 
-#define GX_DO_TASK(expr) {           \
-    if (task_number == kernel_index) \
-    {                                \
-        expr;                        \
-    }                                \
-    ++task_number;                   \
-    task_number %= kernels_count;    \
+#define GX_DO_TASK(expr)                   \
+    {                                      \
+        if (task_number == kernel_index) { \
+            expr;                          \
+        }                                  \
+        ++task_number;                     \
+        task_number %= kernels_count;      \
     }
 
     for (auto* m : *seen_models) {
-		GX_DO_TASK(record(m, kernel_index))
+        GX_DO_TASK(record(m, kernel_index))
     }
 
 #undef GX_DO_TASK
@@ -286,7 +278,7 @@ void gearoenix::render::graph::node::ForwardPbr::record(const unsigned int kerne
 void gearoenix::render::graph::node::ForwardPbr::submit() noexcept
 {
     const unsigned int frame_number = e->get_frame_number();
-    command::Buffer* cmd = frames_primary_cmd[frame_number];
+    command::Buffer* cmd = frames_primary_cmd[frame_number].get();
     cmd->bind(render_target.get());
     for (const auto& k : frame->kernels) {
         cmd->record(k->secondary_cmd);
@@ -304,8 +296,7 @@ gearoenix::render::graph::node::ForwardPbrFrame::ForwardPbrFrame(engine::Engine*
 
 gearoenix::render::graph::node::ForwardPbrFrame::~ForwardPbrFrame() noexcept
 {
-    for (ForwardPbrKernel*& k : kernels)
-    {
+    for (ForwardPbrKernel*& k : kernels) {
         delete k;
         k = nullptr;
     }

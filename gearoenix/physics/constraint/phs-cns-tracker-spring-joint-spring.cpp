@@ -11,8 +11,8 @@
 
 gearoenix::physics::constraint::TrackerSpringJointSpring::TrackerSpringJointSpring(
     const core::Id my_id,
-    system::stream::Stream * const,
-    render::engine::Engine * const,
+    system::stream::Stream* const,
+    render::engine::Engine* const,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>)
     : Constraint(my_id, Type::TRACKER_SPRING_JOINT_SPRING)
 {

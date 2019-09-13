@@ -7,27 +7,28 @@ namespace gearoenix::render::widget {
 class Widget : public model::Model {
     GX_GET_CVAL_PRT(Type, widget_type)
 protected:
-	Widget(
-		core::Id my_id,
-        Type t,
-		system::stream::Stream* s,
-		engine::Engine* e,
-		const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
-	Widget(
+    Widget(
         core::Id my_id,
         Type t,
-		engine::Engine* e,
-		const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+        system::stream::Stream* s,
+        engine::Engine* e,
+        const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+    Widget(
+        core::Id my_id,
+        Type t,
+        engine::Engine* e,
+        const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+
 public:
     virtual ~Widget() noexcept;
     static std::shared_ptr<Widget> read_gx3d(
-		core::Id my_id,
-		system::stream::Stream* f,
-		engine::Engine* e,
-		const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
-	bool get_dynamicity() const noexcept final;
-	virtual void selected(const math::Vec3& point, const std::vector<model::Model*>& children) noexcept;
-	virtual void selected(const math::Vec3& point) noexcept;
+        core::Id my_id,
+        system::stream::Stream* f,
+        engine::Engine* e,
+        const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+    bool get_dynamicity() const noexcept final;
+    virtual void selected(const math::Vec3& point, const std::vector<model::Model*>& children) noexcept;
+    virtual void selected(const math::Vec3& point) noexcept;
 };
 }
 #endif

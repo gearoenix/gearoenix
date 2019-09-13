@@ -1,7 +1,7 @@
-#include <gearoenix/physics/accelerator/phs-acc-bvh.hpp>
-#include <gearoenix/physics/collider/phs-cld-sphere.hpp>
-#include <gearoenix/physics/collider/phs-cld-aabb.hpp>
 #include <gearoenix/math/math-ray.hpp>
+#include <gearoenix/physics/accelerator/phs-acc-bvh.hpp>
+#include <gearoenix/physics/collider/phs-cld-aabb.hpp>
+#include <gearoenix/physics/collider/phs-cld-sphere.hpp>
 #include <random>
 
 BOOST_AUTO_TEST_CASE(physics_accelerator_bvh)
@@ -11,43 +11,50 @@ BOOST_AUTO_TEST_CASE(physics_accelerator_bvh)
     std::uniform_real_distribution<gearoenix::core::Real> dis1(0.5f, 0.9f);
     std::uniform_real_distribution<gearoenix::core::Real> dis2(-20.0f, 20.0f);
 
-	gearoenix::physics::accelerator::Bvh bvh;
+    gearoenix::physics::accelerator::Bvh bvh;
 
-	std::vector<std::unique_ptr<gearoenix::physics::collider::Collider>> cs;
-	std::vector<gearoenix::physics::collider::Collider*> colliders;
+    std::vector<std::unique_ptr<gearoenix::physics::collider::Collider>> cs;
+    std::vector<gearoenix::physics::collider::Collider*> colliders;
 
-	cs.push_back(
-		std::make_unique<gearoenix::physics::collider::Sphere>(
-			gearoenix::math::Vec3(0.0f, 0.0f, 0.0f), 0.9f));
+    cs.push_back(
+        std::make_unique<gearoenix::physics::collider::Sphere>(
+            gearoenix::math::Vec3(0.0f, 0.0f, 0.0f), 0.9f));
 
-#define GX_TEST_HELPER { colliders.clear(); for(auto& c: cs) colliders.push_back(c.get()); }
+#define GX_TEST_HELPER                    \
+    {                                     \
+        colliders.clear();                \
+        for (auto& c : cs)                \
+            colliders.push_back(c.get()); \
+    }
 
-	GX_TEST_HELPER
-	bvh.reset(colliders);
+    GX_TEST_HELPER
+    bvh.reset(colliders);
     GXLOGD(bvh.to_string());
 
-#define GX_TEST_HELPER2(x) {                                    \
-		const gearoenix::math::Vec3 p(x, 0.0f, 10.0f);          \
-		const gearoenix::math::Vec3 d(0.0f, 0.0f, -1.0f);       \
-		const gearoenix::math::Ray3 r(p, d);                    \
-		const auto hit = bvh.hit(r,                             \
-			std::numeric_limits<gearoenix::core::Real>::max()); \
-		BOOST_TEST((*hit).first < 10.1f);                       \
-		BOOST_TEST((*hit).first > 9.00f);                       \
-	}
+#define GX_TEST_HELPER2(x)                                      \
+    {                                                           \
+        const gearoenix::math::Vec3 p(x, 0.0f, 10.0f);          \
+        const gearoenix::math::Vec3 d(0.0f, 0.0f, -1.0f);       \
+        const gearoenix::math::Ray3 r(p, d);                    \
+        const auto hit = bvh.hit(r,                             \
+            std::numeric_limits<gearoenix::core::Real>::max()); \
+        BOOST_TEST((*hit).first < 10.1f);                       \
+        BOOST_TEST((*hit).first > 9.00f);                       \
+    }
 
-#define GX_TEST_HELPER3(x) {                                    \
-		const gearoenix::math::Vec3 p(x, 0.0f, 10.0f);          \
-		const gearoenix::math::Vec3 d(0.0f, 0.0f, -1.0f);       \
-		const gearoenix::math::Ray3 r(p, d);                    \
-		const auto hit = bvh.hit(r,                             \
-			std::numeric_limits<gearoenix::core::Real>::max()); \
-		BOOST_TEST(!hit.has_value());                           \
-	}
+#define GX_TEST_HELPER3(x)                                      \
+    {                                                           \
+        const gearoenix::math::Vec3 p(x, 0.0f, 10.0f);          \
+        const gearoenix::math::Vec3 d(0.0f, 0.0f, -1.0f);       \
+        const gearoenix::math::Ray3 r(p, d);                    \
+        const auto hit = bvh.hit(r,                             \
+            std::numeric_limits<gearoenix::core::Real>::max()); \
+        BOOST_TEST(!hit.has_value());                           \
+    }
 
-	GX_TEST_HELPER2(0.0f);
-	GX_TEST_HELPER2(0.89f);
-	GX_TEST_HELPER2(-0.89f);
+    GX_TEST_HELPER2(0.0f);
+    GX_TEST_HELPER2(0.89f);
+    GX_TEST_HELPER2(-0.89f);
 
     cs.push_back(
         std::make_unique<gearoenix::physics::collider::Sphere>(
@@ -55,22 +62,22 @@ BOOST_AUTO_TEST_CASE(physics_accelerator_bvh)
     cs.push_back(
         std::make_unique<gearoenix::physics::collider::Sphere>(
             gearoenix::math::Vec3(1.0f, 0.0f, 0.0f), 0.9f));
-	cs.push_back(
-		std::make_unique<gearoenix::physics::collider::Sphere>(
-			gearoenix::math::Vec3(-1.0f, 0.0f, 0.0f), 0.9f));
+    cs.push_back(
+        std::make_unique<gearoenix::physics::collider::Sphere>(
+            gearoenix::math::Vec3(-1.0f, 0.0f, 0.0f), 0.9f));
     cs.push_back(
         std::make_unique<gearoenix::physics::collider::Sphere>(
             gearoenix::math::Vec3(-2.0f, 0.0f, 0.0f), 0.9f));
 
-	GX_TEST_HELPER
-	bvh.reset(colliders);
+    GX_TEST_HELPER
+    bvh.reset(colliders);
     GXLOGD(bvh.to_string());
 
     GX_TEST_HELPER2(1.11f);
     GX_TEST_HELPER2(2.00f);
     GX_TEST_HELPER2(2.89f);
-	GX_TEST_HELPER2(1.0f);
-	GX_TEST_HELPER2(-1.0f);
+    GX_TEST_HELPER2(1.0f);
+    GX_TEST_HELPER2(-1.0f);
     GX_TEST_HELPER2(-1.11f);
     GX_TEST_HELPER2(-2.0f);
     GX_TEST_HELPER2(-2.89f);
@@ -92,10 +99,10 @@ BOOST_AUTO_TEST_CASE(physics_accelerator_bvh)
     bvh.reset(colliders);
     GXLOGD(bvh.to_string());
 
-	GX_TEST_HELPER2(4.0f);
-	GX_TEST_HELPER2(3.0f);
-	GX_TEST_HELPER2(-3.0f);
-	GX_TEST_HELPER2(-4.0f);
+    GX_TEST_HELPER2(4.0f);
+    GX_TEST_HELPER2(3.0f);
+    GX_TEST_HELPER2(-3.0f);
+    GX_TEST_HELPER2(-4.0f);
 
     cs.push_back(
         std::make_unique<gearoenix::physics::collider::Sphere>(
@@ -112,45 +119,45 @@ BOOST_AUTO_TEST_CASE(physics_accelerator_bvh)
     cs.push_back(
         std::make_unique<gearoenix::physics::collider::Sphere>(
             gearoenix::math::Vec3(0.0f, 0.0f, 0.0f), 0.9f));
-
-	GX_TEST_HELPER
-		bvh.reset(colliders);
-	GXLOGD(bvh.to_string());
-
-	GX_TEST_HELPER2(0.0f);
-	GX_TEST_HELPER2(0.0f);
-	GX_TEST_HELPER2(0.0f);
-	GX_TEST_HELPER2(0.0f);
-
-	cs.push_back(
-		std::make_unique<gearoenix::physics::collider::Aabb>(
-			gearoenix::math::Vec3(7.0f, 0.0f, 0.9f), 
-			gearoenix::math::Vec3(5.0f, 0.0f, 0.0f)));
-	cs.push_back(
-		std::make_unique<gearoenix::physics::collider::Aabb>(
-			gearoenix::math::Vec3(8.0f, 0.0f, 0.9f),
-			gearoenix::math::Vec3(6.0f, 0.0f, 0.0f)));
-	cs.push_back(
-		std::make_unique<gearoenix::physics::collider::Aabb>(
-			gearoenix::math::Vec3(9.0f, 0.0f, 0.9f),
-			gearoenix::math::Vec3(7.0f, 0.0f, 0.0f)));
-	cs.push_back(
-		std::make_unique<gearoenix::physics::collider::Aabb>(
-			gearoenix::math::Vec3(10.0f, 0.0f, 0.9f),
-			gearoenix::math::Vec3(8.0f, 0.0f, 0.0f)));
-	cs.push_back(
-		std::make_unique<gearoenix::physics::collider::Aabb>(
-			gearoenix::math::Vec3(11.0f, 0.0f, 0.9f),
-			gearoenix::math::Vec3(9.0f, 0.0f, 0.0f)));
 
     GX_TEST_HELPER
     bvh.reset(colliders);
     GXLOGD(bvh.to_string());
 
-	GX_TEST_HELPER2(6.0f);
-	GX_TEST_HELPER2(7.0f);
-	GX_TEST_HELPER2(8.0f);
-	GX_TEST_HELPER2(9.0f);
+    GX_TEST_HELPER2(0.0f);
+    GX_TEST_HELPER2(0.0f);
+    GX_TEST_HELPER2(0.0f);
+    GX_TEST_HELPER2(0.0f);
+
+    cs.push_back(
+        std::make_unique<gearoenix::physics::collider::Aabb>(
+            gearoenix::math::Vec3(7.0f, 0.0f, 0.9f),
+            gearoenix::math::Vec3(5.0f, 0.0f, 0.0f)));
+    cs.push_back(
+        std::make_unique<gearoenix::physics::collider::Aabb>(
+            gearoenix::math::Vec3(8.0f, 0.0f, 0.9f),
+            gearoenix::math::Vec3(6.0f, 0.0f, 0.0f)));
+    cs.push_back(
+        std::make_unique<gearoenix::physics::collider::Aabb>(
+            gearoenix::math::Vec3(9.0f, 0.0f, 0.9f),
+            gearoenix::math::Vec3(7.0f, 0.0f, 0.0f)));
+    cs.push_back(
+        std::make_unique<gearoenix::physics::collider::Aabb>(
+            gearoenix::math::Vec3(10.0f, 0.0f, 0.9f),
+            gearoenix::math::Vec3(8.0f, 0.0f, 0.0f)));
+    cs.push_back(
+        std::make_unique<gearoenix::physics::collider::Aabb>(
+            gearoenix::math::Vec3(11.0f, 0.0f, 0.9f),
+            gearoenix::math::Vec3(9.0f, 0.0f, 0.0f)));
+
+    GX_TEST_HELPER
+    bvh.reset(colliders);
+    GXLOGD(bvh.to_string());
+
+    GX_TEST_HELPER2(6.0f);
+    GX_TEST_HELPER2(7.0f);
+    GX_TEST_HELPER2(8.0f);
+    GX_TEST_HELPER2(9.0f);
     GX_TEST_HELPER2(10.0f);
 
     GX_TEST_HELPER3(12.0f);
@@ -160,8 +167,7 @@ BOOST_AUTO_TEST_CASE(physics_accelerator_bvh)
     GX_TEST_HELPER3(-7.0f);
     GX_TEST_HELPER3(-8.0f);
 
-    for (int i = 0; i < 2000; ++i)
-    {
+    for (int i = 0; i < 2000; ++i) {
         cs.push_back(
             std::make_unique<gearoenix::physics::collider::Sphere>(
                 gearoenix::math::Vec3(dis2(gen), dis2(gen), dis2(gen)), dis1(gen)));

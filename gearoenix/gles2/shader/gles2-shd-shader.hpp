@@ -60,7 +60,7 @@ private:                                                     \
     ++texture_index;
 
 #define GX_GLES2_SHADER_SET_TEXTURE_INDEX_ARRAY(x) \
-    for(auto &i: x##_indices) {                    \
+    for (auto& i : x##_indices) {                  \
         i = texture_index;                         \
         ++texture_index;                           \
     }

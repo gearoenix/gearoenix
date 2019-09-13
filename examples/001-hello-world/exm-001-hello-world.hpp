@@ -20,7 +20,7 @@ private:
 
 public:
     /// This function must be like this
-    GameApp(gearoenix::system::Application * const sys_app) noexcept;
+    GameApp(gearoenix::system::Application* const sys_app) noexcept;
     ~GameApp() noexcept final = default;
     /// On every screen refresh this function is going to be called
     void update() noexcept final;

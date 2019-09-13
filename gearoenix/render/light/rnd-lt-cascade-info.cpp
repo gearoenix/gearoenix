@@ -2,7 +2,6 @@
 #include "../../core/sync/cr-sync-kernel-workers.hpp"
 #include "../../math/math-sphere.hpp"
 #include "../../system/sys-app.hpp"
-#include "../../system/sys-configuration.hpp"
 #include "../buffer/rnd-buf-manager.hpp"
 #include "../buffer/rnd-buf-uniform.hpp"
 #include "../command/rnd-cmd-buffer.hpp"
@@ -16,6 +15,11 @@
 gearoenix::render::light::CascadeInfo::PerCascade::PerCascade(engine::Engine* const e) noexcept
     : shadow_mapper(new graph::node::ShadowMapper(e, core::sync::EndCaller<core::sync::EndCallerIgnore>([] {})))
 {
+}
+
+gearoenix::render::light::CascadeInfo::PerCascade::~PerCascade() noexcept
+{
+    shadow_mapper = nullptr;
 }
 
 void gearoenix::render::light::CascadeInfo::PerKernel::shadow(const model::Model* const m) noexcept
@@ -82,6 +86,12 @@ gearoenix::render::light::CascadeInfo::CascadeInfo(engine::Engine* const e) noex
         k.seen_boxes.resize(cascades_count);
         k.zero_located_view = &zero_located_view;
     }
+}
+
+gearoenix::render::light::CascadeInfo::~CascadeInfo() noexcept
+{
+    kernels.clear();
+    frames.clear();
 }
 
 void gearoenix::render::light::CascadeInfo::update(const math::Mat4x4& m, const std::vector<std::array<math::Vec3, 4>>& p) noexcept

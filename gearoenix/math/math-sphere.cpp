@@ -1,5 +1,6 @@
 #include "math-sphere.hpp"
 #include "math-ray.hpp"
+#include <cmath>
 
 gearoenix::math::Sphere::Sphere(const Vec3& center, const core::Real radius) noexcept
     : center(center)
@@ -8,7 +9,8 @@ gearoenix::math::Sphere::Sphere(const Vec3& center, const core::Real radius) noe
 {
 }
 
-void gearoenix::math::Sphere::set_radius(const core::Real r) noexcept {
+void gearoenix::math::Sphere::set_radius(const core::Real r) noexcept
+{
     radius2 = r * r;
     radius = r;
 }
@@ -28,18 +30,24 @@ void gearoenix::math::Sphere::insert(const gearoenix::core::Real r) noexcept
 std::optional<gearoenix::core::Real> gearoenix::math::Sphere::hit(const math::Ray3& r) const noexcept
 {
     const auto dir = center - r.get_origin();
-	const auto dir2 = dir.square_length();
-	if (dir2 <= radius2) return std::nullopt;
+    const auto dir2 = dir.square_length();
+    if (dir2 <= radius2)
+        return std::nullopt;
     const auto dis = r.get_normalized_direction().dot(dir);
-	if (dis <= 0.0f) return std::nullopt;
+    if (dis <= 0.0f)
+        return std::nullopt;
     const auto dis2 = dis * dis;
     const auto a2 = dir2 - dis2;
-    if(radius2 <= a2) return std::nullopt;
-    return dis - std::sqrtf(radius2 - a2);
+    if (radius2 <= a2)
+        return std::nullopt;
+    return dis - sqrtf(radius2 - a2);
 }
 
-std::optional<gearoenix::core::Real> gearoenix::math::Sphere::hit(const math::Ray3& r, const core::Real d_min) const noexcept {
-    if(const auto h = hit(r)) if((*h) < d_min) return h;
+std::optional<gearoenix::core::Real> gearoenix::math::Sphere::hit(const math::Ray3& r, const core::Real d_min) const noexcept
+{
+    if (const auto h = hit(r))
+        if ((*h) < d_min)
+            return h;
     return std::nullopt;
 }
 

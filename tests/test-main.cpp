@@ -2,7 +2,13 @@
 #include <boost/test/included/unit_test.hpp>
 // Making types printable for boost
 #include <gearoenix/math/math-intersection-status.hpp>
-#define GX_TEST_PRINT_TYPE_VAL(x) namespace boost::test_tools::tt_detail { template<> struct print_log_value<gearoenix::x> { void operator()(std::ostream& os, const gearoenix::x v) { ::operator<<(os, v); } }; }
+#define GX_TEST_PRINT_TYPE_VAL(x)                                                        \
+    namespace boost::test_tools::tt_detail {                                             \
+    template <>                                                                          \
+    struct print_log_value<gearoenix::x> {                                               \
+        void operator()(std::ostream& os, const gearoenix::x v) { ::operator<<(os, v); } \
+    };                                                                                   \
+    }
 GX_TEST_PRINT_TYPE_VAL(math::IntersectionStatus)
 // Test units
 #include "test-core-pool.hpp"

@@ -20,12 +20,15 @@ class Model;
 
 namespace gearoenix::physics::collider {
 /// Child classes must have a transformation implementation and initialize (and update) box
-class Collider: public Transformation {
+class Collider : public Transformation {
     GX_GET_CVAL_PRT(Type, collider_type)
     GX_GET_CREF_PRT(math::Aabb3, box)
-	GX_GETSET_PTR_PRT(render::model::Model, parent)
+    GX_GETSET_PTR_PRT(render::model::Model, parent)
 protected:
-    explicit Collider(const Type t) noexcept : collider_type(t) {}
+    explicit Collider(const Type t) noexcept
+        : collider_type(t)
+    {
+    }
 
 public:
     virtual ~Collider() noexcept = default;

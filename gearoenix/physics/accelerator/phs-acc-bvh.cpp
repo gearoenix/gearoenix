@@ -22,24 +22,28 @@ std::string gearoenix::physics::accelerator::Bvh::Node::to_string() const noexce
 
 std::optional<std::pair<gearoenix::core::Real, gearoenix::physics::collider::Collider*>> gearoenix::physics::accelerator::Bvh::Node::hit(const math::Ray3& r, const core::Real d_min) const noexcept
 {
-	const auto h = volume.hit(r, d_min);
-	if (h.has_value()) return std::make_pair(*h, nullptr);
-	return std::nullopt;
+    const auto h = volume.hit(r, d_min);
+    if (h.has_value())
+        return std::make_pair(*h, nullptr);
+    return std::nullopt;
 }
 
 std::optional<std::pair<gearoenix::core::Real, gearoenix::physics::collider::Collider*>> gearoenix::physics::accelerator::Bvh::LeafNode::hit(const math::Ray3& r, const core::Real d_min) const noexcept
 {
     auto h = Node::hit(r, d_min);
-    if (h == std::nullopt) return std::nullopt;
+    if (h == std::nullopt)
+        return std::nullopt;
     core::Real d_min_local = d_min;
-	collider::Collider* hited_c = nullptr;
+    collider::Collider* hited_c = nullptr;
     for (auto c : colliders) {
         const auto hc = c->hit(r, d_min_local);
-		if (hc == std::nullopt) continue;
-		d_min_local = hc.value();
-		hited_c = c;
+        if (hc == std::nullopt)
+            continue;
+        d_min_local = hc.value();
+        hited_c = c;
     }
-    if (d_min_local < d_min) return std::make_pair(d_min_local, hited_c);
+    if (d_min_local < d_min)
+        return std::make_pair(d_min_local, hited_c);
     return std::nullopt;
 }
 
@@ -61,9 +65,12 @@ void gearoenix::physics::accelerator::Bvh::InternalNode::init(const std::vector<
     std::pair<int, core::Real> dimi[3];
     for (int i = 0; i < 3; ++i)
         dimi[i] = std::make_pair(i, dims[i]);
-    if (dimi[0].second < dimi[1].second) std::swap(dimi[0], dimi[1]);
-    if (dimi[0].second < dimi[2].second) std::swap(dimi[0], dimi[2]);
-    if (dimi[1].second < dimi[2].second) std::swap(dimi[1], dimi[2]);
+    if (dimi[0].second < dimi[1].second)
+        std::swap(dimi[0], dimi[1]);
+    if (dimi[0].second < dimi[2].second)
+        std::swap(dimi[0], dimi[2]);
+    if (dimi[1].second < dimi[2].second)
+        std::swap(dimi[1], dimi[2]);
 
     for (const auto di : dimi) {
         struct Bin {
@@ -72,7 +79,8 @@ void gearoenix::physics::accelerator::Bvh::InternalNode::init(const std::vector<
             math::Aabb3 b;
         };
         Bin bins[BINS_COUNT];
-        for (Bin& b : bins) b.c.reserve(colliders.size());
+        for (Bin& b : bins)
+            b.c.reserve(colliders.size());
         const core::Real split_size = di.second / static_cast<core::Real>(BINS_COUNT);
         core::Real splits[WALLS_COUNT];
         core::Real wall = volume.get_lower()[di.first];
@@ -101,9 +109,10 @@ void gearoenix::physics::accelerator::Bvh::InternalNode::init(const std::vector<
             if (bins[i].c.size() == colliders.size()) {
                 overlapped = true;
                 break;
-            }
-            else if (bins[i].c.size() != 0) break;
-        if (overlapped) continue;
+            } else if (bins[i].c.size() != 0)
+                break;
+        if (overlapped)
+            continue;
         core::Real best_wall_cost = std::numeric_limits<core::Real>::max();
         int best_wall_index = -1;
         math::Aabb3 best_wall_left_box;
@@ -112,8 +121,7 @@ void gearoenix::physics::accelerator::Bvh::InternalNode::init(const std::vector<
         int best_wall_right_count = -1;
         math::Aabb3 left_box;
         int left_count = 0;
-        for (int i = 0; i < WALLS_COUNT; ++i)
-        {
+        for (int i = 0; i < WALLS_COUNT; ++i) {
             left_box.put(bins[i].b);
             left_count += static_cast<int>(bins[i].c.size());
             const int right_count = static_cast<int>(colliders.size()) - left_count;
@@ -140,22 +148,26 @@ void gearoenix::physics::accelerator::Bvh::InternalNode::init(const std::vector<
         for (int i = best_wall_index; i < WALLS_COUNT; ++i)
             for (auto c : bins[i].c)
                 right_colliders.push_back(c);
-        if (best_wall_left_count <= PER_NODE_COLLIDERS) left = std::make_unique<LeafNode>(left_colliders, best_wall_left_box);
-        else left = std::make_unique<InternalNode>(left_colliders, best_wall_left_box);
-        if (best_wall_right_count <= PER_NODE_COLLIDERS) right = std::make_unique<LeafNode>(right_colliders, best_wall_right_box);
-        else right = std::make_unique<InternalNode>(right_colliders, best_wall_right_box);
+        if (best_wall_left_count <= PER_NODE_COLLIDERS)
+            left = std::make_unique<LeafNode>(left_colliders, best_wall_left_box);
+        else
+            left = std::make_unique<InternalNode>(left_colliders, best_wall_left_box);
+        if (best_wall_right_count <= PER_NODE_COLLIDERS)
+            right = std::make_unique<LeafNode>(right_colliders, best_wall_right_box);
+        else
+            right = std::make_unique<InternalNode>(right_colliders, best_wall_right_box);
         return;
     }
     left = std::make_unique<LeafNode>(colliders, volume);
 }
 
-gearoenix::physics::accelerator::Bvh::InternalNode::InternalNode(const std::vector<collider::Collider*> &colliders) noexcept
+gearoenix::physics::accelerator::Bvh::InternalNode::InternalNode(const std::vector<collider::Collider*>& colliders) noexcept
     : Node(Type::INTERNAL)
 {
-	for (collider::Collider* c : colliders)
-		volume.put_without_update(c->get_box());
-	volume.update();
-    if(colliders.size() <= PER_NODE_COLLIDERS) {
+    for (collider::Collider* c : colliders)
+        volume.put_without_update(c->get_box());
+    volume.update();
+    if (colliders.size() <= PER_NODE_COLLIDERS) {
         left = std::make_unique<LeafNode>(colliders, volume);
         return;
     }
@@ -171,17 +183,19 @@ gearoenix::physics::accelerator::Bvh::InternalNode::InternalNode(const std::vect
 std::optional<std::pair<gearoenix::core::Real, gearoenix::physics::collider::Collider*>> gearoenix::physics::accelerator::Bvh::InternalNode::hit(const math::Ray3& r, const core::Real d_min) const noexcept
 {
     const auto h = Node::hit(r, d_min);
-    if (h == std::nullopt) return std::nullopt;
-    const auto hl = (left == nullptr? std::nullopt: left->hit(r, d_min));
+    if (h == std::nullopt)
+        return std::nullopt;
+    const auto hl = (left == nullptr ? std::nullopt : left->hit(r, d_min));
     const auto [d_min_left, hited_c] = (hl == std::nullopt ? std::make_pair(d_min, nullptr) : *hl);
     const auto hr = (right == nullptr ? std::nullopt : right->hit(r, d_min_left));
-    if (hr == std::nullopt) return hl;
+    if (hr == std::nullopt)
+        return hl;
     return hr;
 }
 
 std::string gearoenix::physics::accelerator::Bvh::InternalNode::to_string() const noexcept
 {
-    std::string r("{ "); 
+    std::string r("{ ");
     r += Node::to_string();
     if (nullptr != left)
         r += ", \"left\" : " + left->to_string();
@@ -191,7 +205,7 @@ std::string gearoenix::physics::accelerator::Bvh::InternalNode::to_string() cons
     return r;
 }
 
-void gearoenix::physics::accelerator::Bvh::reset(const std::vector<collider::Collider*> &colliders) noexcept 
+void gearoenix::physics::accelerator::Bvh::reset(const std::vector<collider::Collider*>& colliders) noexcept
 {
     root = std::make_unique<InternalNode>(colliders);
 }
@@ -203,12 +217,13 @@ std::optional<std::pair<gearoenix::core::Real, gearoenix::physics::collider::Col
     return std::nullopt;
 }
 
-std::string gearoenix::physics::accelerator::Bvh::to_string() const noexcept {
-	std::string r("{ \"root\" : ");
-	if (nullptr != root)
-		r += root->to_string();
-	else
-		r += "\"\"";
-	r += " }";
-	return r;
+std::string gearoenix::physics::accelerator::Bvh::to_string() const noexcept
+{
+    std::string r("{ \"root\" : ");
+    if (nullptr != root)
+        r += root->to_string();
+    else
+        r += "\"\"";
+    r += " }";
+    return r;
 }

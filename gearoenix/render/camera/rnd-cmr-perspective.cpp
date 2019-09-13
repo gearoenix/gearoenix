@@ -12,7 +12,7 @@
 
 void gearoenix::render::camera::Perspective::update_fovy() noexcept
 {
-    fovy = std::atanf(tany) * 2.0f;
+    fovy = atanf(tany) * 2.0f;
     update_projection();
     lambda = static_cast<core::Real>(
                  std::sin(static_cast<double>(fovx) * 0.5) + std::sin(static_cast<double>(fovy) * 0.5))
@@ -96,10 +96,10 @@ void gearoenix::render::camera::Perspective::update_projection() noexcept
         -uniform->near,
         -uniform->far);
     uniform->uniform_projection = math::Mat4x4(
-        0.5f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.5f, 0.0f, 0.0f,
-        0.0f, 0.0f, 1.0f, 0.0f,
-        0.5f, 0.5f, 0.0f, 1.0f)
+                                      0.5f, 0.0f, 0.0f, 0.0f,
+                                      0.0f, 0.5f, 0.0f, 0.0f,
+                                      0.0f, 0.0f, 1.0f, 0.0f,
+                                      0.5f, 0.5f, 0.0f, 1.0f)
         * uniform->projection;
 }
 
@@ -122,7 +122,7 @@ gearoenix::render::camera::Perspective::Perspective(
     : Camera(my_id, e)
 {
     transformation->set_on_frustum_update([this] { update_cascades(); });
-	transformation->set_on_projection_update([this] { update_projection(); });
+    transformation->set_on_projection_update([this] { update_projection(); });
     set_field_of_view(1.571f);
 }
 
@@ -136,16 +136,14 @@ void gearoenix::render::camera::Perspective::set_aspect_ratio(const gearoenix::c
 void gearoenix::render::camera::Perspective::set_field_of_view(const core::Real radian) noexcept
 {
     fovx = radian;
-    tanx = std::tanf(radian * 0.5f);
+    tanx = tanf(radian * 0.5f);
     tany = tanx / uniform->aspect_ratio;
     update_fovy();
 }
 
 gearoenix::math::Ray3 gearoenix::render::camera::Perspective::create_ray3(const core::Real x, const core::Real y) const noexcept
 {
-    math::Vec3 dir = (uniform->x * (x / uniform->aspect_ratio)) + 
-        (uniform->y * (y / uniform->aspect_ratio)) + 
-        (uniform->z * uniform->near);
+    math::Vec3 dir = (uniform->x * (x / uniform->aspect_ratio)) + (uniform->y * (y / uniform->aspect_ratio)) + (uniform->z * uniform->near);
     const math::Vec3 origin = dir + uniform->position;
     dir.normalize();
     return math::Ray3(origin, dir);

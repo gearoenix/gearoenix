@@ -8,6 +8,10 @@ class Camera;
 class Transformation;
 }
 
+namespace gearoenix::render::graph::tree {
+class Pbr;
+}
+
 namespace gearoenix::render::scene {
 class Game;
 class Ui;
@@ -18,23 +22,24 @@ class Modal;
 class Text;
 }
 
-class GameApp : 
-	public gearoenix::core::Application, 
-	public gearoenix::core::event::Listner {
+class GameApp : public gearoenix::core::Application,
+                public gearoenix::core::event::Listner {
 private:
     using GxGameScene = gearoenix::render::scene::Game;
     using GxUiScene = gearoenix::render::scene::Ui;
-	using GxCam = gearoenix::render::camera::Camera;
+    using GxCam = gearoenix::render::camera::Camera;
     using GxCamTran = gearoenix::render::camera::Transformation;
     using GxModal = gearoenix::render::widget::Modal;
-	using GxTextWdg = gearoenix::render::widget::Text;
+    using GxTextWdg = gearoenix::render::widget::Text;
+    using GxGrPbr = gearoenix::render::graph::tree::Pbr;
 
     std::shared_ptr<GxGameScene> scn;
     std::shared_ptr<GxUiScene> uiscn;
     std::shared_ptr<GxCamTran> camtrn;
-	std::shared_ptr<GxCam> cam;
-	std::shared_ptr<GxModal> modal;
-	std::shared_ptr<GxTextWdg> text_location;
+    std::shared_ptr<GxCam> cam;
+    std::shared_ptr<GxModal> modal;
+    std::shared_ptr<GxTextWdg> text_location;
+    std::unique_ptr<GxGrPbr> render_tree;
 
 public:
     /// This function must be like this
@@ -44,7 +49,7 @@ public:
     void update() noexcept final;
     /// Before terminationg everything in engine this function is going to be called
     void terminate() noexcept final;
-	/// Listner function
-	bool on_event(const gearoenix::core::event::Data& event_data) noexcept;
+    /// Listner function
+    bool on_event(const gearoenix::core::event::Data& event_data) noexcept;
 };
 #endif

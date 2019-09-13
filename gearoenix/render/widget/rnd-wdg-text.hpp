@@ -1,8 +1,8 @@
 #ifndef GEAROENIX_RENDER_WIDGET_TEXT_HPP
 #define GEAROENIX_RENDER_WIDGET_TEXT_HPP
 #include "../../core/cr-static.hpp"
-#include "rnd-wdg-widget.hpp"
 #include "rnd-wdg-alignment.hpp"
+#include "rnd-wdg-widget.hpp"
 
 namespace gearoenix::render::font {
 class Font2D;
@@ -27,8 +27,8 @@ public:
         engine::Engine* e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
     ~Text() noexcept final;
-	void set_text(const std::wstring& t, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c = core::sync::EndCaller<core::sync::EndCallerIgnore>([] {})) noexcept;
-	void set_text_color(core::Real red, core::Real green, core::Real blue, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c = core::sync::EndCaller<core::sync::EndCallerIgnore>([] {})) noexcept;
+    void set_text(const std::wstring& t, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c = core::sync::EndCaller<core::sync::EndCallerIgnore>([] {})) noexcept;
+    void set_text_color(core::Real red, core::Real green, core::Real blue, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c = core::sync::EndCaller<core::sync::EndCallerIgnore>([] {})) noexcept;
 };
 }
 #endif

@@ -1,12 +1,13 @@
 #include "phs-cld-sphere.hpp"
+#include "../../math/math-ray.hpp"
 #include "../../system/stream/sys-stm-stream.hpp"
 #include "../../system/sys-log.hpp"
-#include "../../math/math-ray.hpp"
 
-gearoenix::physics::collider::Sphere::Sphere(const math::Vec3 &c, core::Real r) noexcept
+gearoenix::physics::collider::Sphere::Sphere(const math::Vec3& c, core::Real r) noexcept
     : Collider(Type::Sphere)
     , sphere(c, r)
-{}
+{
+}
 
 void gearoenix::physics::collider::Sphere::set_location(const math::Vec3& l) noexcept
 {

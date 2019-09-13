@@ -35,11 +35,11 @@ public:
     KernelWorker() noexcept;
     ~KernelWorker() noexcept;
     void add_step(
-        std::function<void(const unsigned int)> worker, 
+        std::function<void(const unsigned int)> worker,
         std::function<void()> receiver = [] {}) noexcept;
     void add_step(
         std::function<void()> sender,
-        std::function<void(const unsigned int)> worker, 
+        std::function<void(const unsigned int)> worker,
         std::function<void()> boss) noexcept;
     void do_steps() noexcept;
     unsigned int get_threads_count() const noexcept;

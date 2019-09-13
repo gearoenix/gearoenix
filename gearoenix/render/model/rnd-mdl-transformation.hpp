@@ -3,7 +3,7 @@
 #include "../../physics/phs-transformation.hpp"
 
 namespace gearoenix::math {
-    struct Sphere;
+struct Sphere;
 }
 
 namespace gearoenix::render::model {
@@ -16,7 +16,7 @@ private:
     Model* const parent;
 
 public:
-    Transformation(Uniform* uniform, math::Sphere* sphere, Model *parent) noexcept;
+    Transformation(Uniform* uniform, math::Sphere* sphere, Model* parent) noexcept;
     // physics::Transformation----------------------------------------------------------------------------
     //const math::Vec3& get_x_axis() const noexcept override final;
     //const math::Vec3& get_y_axis() const noexcept override final;

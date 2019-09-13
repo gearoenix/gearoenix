@@ -89,8 +89,7 @@ gearoenix::gles2::texture::Target::Target(
                 gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
                 gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
                 gl::Loader::framebuffer_texture_2d(GL_FRAMEBUFFER, static_cast<gearoenix::gl::enumerated>(GL_COLOR_ATTACHMENT0 + i), GL_TEXTURE_2D, txt, 0);
-            }
-            else {
+            } else {
                 GXUNEXPECTED
             }
         }
@@ -107,15 +106,18 @@ gearoenix::gles2::texture::Target::~Target() noexcept
     const auto cf = framebuffer;
     const auto cr = depth_buffer;
     render_engine->get_function_loader()->load([cf, cr, this] {
-        if (cf != -1) gl::Loader::delete_framebuffers(1, reinterpret_cast<const gl::uint*>(&cf));
-        if (cr != -1) gl::Loader::delete_renderbuffers(1, reinterpret_cast<const gl::uint*>(&cr));
+        if (cf != -1)
+            gl::Loader::delete_framebuffers(1, reinterpret_cast<const gl::uint*>(&cf));
+        if (cr != -1)
+            gl::Loader::delete_renderbuffers(1, reinterpret_cast<const gl::uint*>(&cr));
         gl::Loader::delete_textures(static_cast<gearoenix::gl::sizei>(texture_objects.size()), texture_objects.data());
     });
 }
 
 void gearoenix::gles2::texture::Target::bind() const noexcept
 {
-    if (-1 != depth_buffer) gl::Loader::bind_renderbuffer(GL_RENDERBUFFER, depth_buffer);
+    if (-1 != depth_buffer)
+        gl::Loader::bind_renderbuffer(GL_RENDERBUFFER, depth_buffer);
     gl::Loader::bind_framebuffer(GL_FRAMEBUFFER, framebuffer);
     gl::Loader::viewport(0, 0, static_cast<gl::sizei>(clipping_width), static_cast<gl::sizei>(clipping_height));
     gl::Loader::scissor(0, 0, static_cast<gl::sizei>(clipping_width), static_cast<gl::sizei>(clipping_height));
