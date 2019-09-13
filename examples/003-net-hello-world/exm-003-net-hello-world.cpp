@@ -30,6 +30,7 @@
 #include <gearoenix/system/sys-app.hpp>
 #include <gearoenix/system/sys-log.hpp>
 #include <random>
+#include <sstream>
 
 template <class T>
 using GxEndCaller = gearoenix::core::sync::EndCaller<T>;
@@ -49,7 +50,6 @@ using GxDirLight = gearoenix::render::light::Directional;
 using GxLtManager = gearoenix::render::light::Manager;
 using GxPersCam = gearoenix::render::camera::Perspective;
 using GxCldSphere = gearoenix::physics::collider::Sphere;
-using GxTextWdg = gearoenix::render::widget::Text;
 
 struct ShelfInfo {
 	std::uniform_real_distribution<GxReal> rand_genx;
@@ -66,136 +66,43 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
 	std::uniform_real_distribution<GxReal> rand_gen2(0.001f, 0.999f);
 	std::uniform_int_distribution<int> rand_gen3(10, 15);
 
-	const GxReal marginx = 0.02f;
-	const GxReal marginz = 0.01f;
+	constexpr GxReal margin = 3.0f;
+	constexpr GxReal marginz = 0.2f;
+	constexpr GxReal lengthx = 30.0f;
+	constexpr int shelf_floors_count = 3;
+	constexpr GxReal shelf_height = 1.5f;
+	constexpr GxReal shelf_thickness = 1.0f;
+	constexpr int rows_count = 10;
+	constexpr int shelves_in_row_count = 2;
+	constexpr int shelves_in_column_count = 3;
+	constexpr int shelves_count = shelves_in_row_count * shelves_in_column_count * shelf_floors_count * rows_count;
 
-	ShelfInfo shelves_info[] = {
+	ShelfInfo shelves_info[shelves_count];
+
+	GxReal y = margin;
+	for (int rowi = 0, i = 0; rowi < rows_count; ++rowi, y += margin)
+	{
+		for (int shelfi = 0; shelfi < shelves_in_row_count; ++shelfi, y += shelf_thickness)
 		{
-			std::uniform_real_distribution<GxReal>(marginx - 13.0f, -2.0f - marginx),
-			std::uniform_real_distribution<GxReal>(marginz, 2.0f - marginz),
-			9.0f,
-		},
-		{
-			std::uniform_real_distribution<GxReal>(marginx - 13.0f, -2.0f - marginx),
-			std::uniform_real_distribution<GxReal>(marginz - 3.0f, -1.0f - marginz),
-			9.0f,
-		},
-		{
-			std::uniform_real_distribution<GxReal>(marginx + 2.0f, 13.0f - marginx),
-			std::uniform_real_distribution<GxReal>(marginz, 2.0f - marginz),
-			9.0f,
-		},
-		{
-			std::uniform_real_distribution<GxReal>(marginx + 2.0f, 13.0f - marginx),
-			std::uniform_real_distribution<GxReal>(marginz - 3.0f, -1.0f - marginz),
-			9.0f,
-		},
-		/////////////////////////////////////////////////////////////////////////////
-		{
-			std::uniform_real_distribution<GxReal>(marginx - 13.0f, -2.0f - marginx),
-			std::uniform_real_distribution<GxReal>(marginz, 2.0f - marginz),
-			7.0f,
-		},
-		{
-			std::uniform_real_distribution<GxReal>(marginx - 13.0f, -2.0f - marginx),
-			std::uniform_real_distribution<GxReal>(marginz - 3.0f, -1.0f - marginz),
-			7.0f,
-		},
-		{
-			std::uniform_real_distribution<GxReal>(marginx + 2.0f, 13.0f - marginx),
-			std::uniform_real_distribution<GxReal>(marginz, 2.0f - marginz),
-			7.0f,
-		},
-		{
-			std::uniform_real_distribution<GxReal>(marginx + 2.0f, 13.0f - marginx),
-			std::uniform_real_distribution<GxReal>(marginz - 3.0f, -1.0f - marginz),
-			7.0f,
-		},
-		/////////////////////////////////////////////////////////////////////////////
-		{
-			std::uniform_real_distribution<GxReal>(marginx - 13.0f, -2.0f - marginx),
-			std::uniform_real_distribution<GxReal>(marginz, 2.0f - marginz),
-			1.0f,
-		},
-		{
-			std::uniform_real_distribution<GxReal>(marginx - 13.0f, -2.0f - marginx),
-			std::uniform_real_distribution<GxReal>(marginz - 3.0f, -1.0f - marginz),
-			1.0f,
-		},
-		{
-			std::uniform_real_distribution<GxReal>(marginx + 2.0f, 13.0f - marginx),
-			std::uniform_real_distribution<GxReal>(marginz, 2.0f - marginz),
-			1.0f,
-		},
-		{
-			std::uniform_real_distribution<GxReal>(marginx + 2.0f, 13.0f - marginx),
-			std::uniform_real_distribution<GxReal>(marginz - 3.0f, -1.0f - marginz),
-			1.0f,
-		},
-		/////////////////////////////////////////////////////////////////////////////
-		{
-			std::uniform_real_distribution<GxReal>(marginx - 13.0f, -2.0f - marginx),
-			std::uniform_real_distribution<GxReal>(marginz, 2.0f - marginz),
-			-1.0f,
-		},
-		{
-			std::uniform_real_distribution<GxReal>(marginx - 13.0f, -2.0f - marginx),
-			std::uniform_real_distribution<GxReal>(marginz - 3.0f, -1.0f - marginz),
-			-1.0f,
-		},
-		{
-			std::uniform_real_distribution<GxReal>(marginx + 2.0f, 13.0f - marginx),
-			std::uniform_real_distribution<GxReal>(marginz, 2.0f - marginz),
-			-1.0f,
-		},
-		{
-			std::uniform_real_distribution<GxReal>(marginx + 2.0f, 13.0f - marginx),
-			std::uniform_real_distribution<GxReal>(marginz - 3.0f, -1.0f - marginz),
-			-1.0f,
-		},
-		/////////////////////////////////////////////////////////////////////////////
-		{
-			std::uniform_real_distribution<GxReal>(marginx - 13.0f, -2.0f - marginx),
-			std::uniform_real_distribution<GxReal>(marginz, 2.0f - marginz),
-			-7.0f,
-		},
-		{
-			std::uniform_real_distribution<GxReal>(marginx - 13.0f, -2.0f - marginx),
-			std::uniform_real_distribution<GxReal>(marginz - 3.0f, -1.0f - marginz),
-			-7.0f,
-		},
-		{
-			std::uniform_real_distribution<GxReal>(marginx + 2.0f, 13.0f - marginx),
-			std::uniform_real_distribution<GxReal>(marginz, 2.0f - marginz),
-			-7.0f,
-		},
-		{
-			std::uniform_real_distribution<GxReal>(marginx + 2.0f, 13.0f - marginx),
-			std::uniform_real_distribution<GxReal>(marginz - 3.0f, -1.0f - marginz),
-			-7.0f,
-		},
-		/////////////////////////////////////////////////////////////////////////////
-		{
-			std::uniform_real_distribution<GxReal>(marginx - 13.0f, -2.0f - marginx),
-			std::uniform_real_distribution<GxReal>(marginz, 2.0f - marginz),
-			-9.0f,
-		},
-		{
-			std::uniform_real_distribution<GxReal>(marginx - 13.0f, -2.0f - marginx),
-			std::uniform_real_distribution<GxReal>(marginz - 3.0f, -1.0f - marginz),
-			-9.0f,
-		},
-		{
-			std::uniform_real_distribution<GxReal>(marginx + 2.0f, 13.0f - marginx),
-			std::uniform_real_distribution<GxReal>(marginz, 2.0f - marginz),
-			-9.0f,
-		},
-		{
-			std::uniform_real_distribution<GxReal>(marginx + 2.0f, 13.0f - marginx),
-			std::uniform_real_distribution<GxReal>(marginz - 3.0f, -1.0f - marginz),
-			-9.0f,
-		},
-	};
+			GxReal x = margin;
+			for (int ci = 0; ci < shelves_in_column_count; ++ci, x += margin) 
+			{
+				const GxReal endx = x + lengthx;
+				GxReal z = marginz;
+				for (int zi = 0; zi < shelf_floors_count; ++i, ++zi, z += marginz) 
+				{
+					const GxReal endz = z + shelf_height;
+					auto& shelf_info = shelves_info[i];
+					shelf_info.y = y;
+					shelf_info.rand_genx = std::uniform_real_distribution<GxReal>(x, endx);
+					shelf_info.rand_genz = std::uniform_real_distribution<GxReal>(z, endz);
+					z = endz;
+				}
+				x = endx;
+			}
+
+		}
+	}
 
     const GxEndCallerIgnored endcall([this] { 
 		scn->set_enability(true);
@@ -216,7 +123,8 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
 
     cam = astmgr->get_camera_manager()->create<GxPersCam>();
     camtrn = std::static_pointer_cast<GxCamTran>(cam->get_transformation());
-    camtrn->look_at(GxVec3(20.0f, 20.0f, 10.0f), GxVec3(0.0f, 0.0f, 0.0f), GxVec3(0.0f, 0.0f, 1.0f));
+    camtrn->look_at(GxVec3(-10.0f, -10.0f, 40.0f), GxVec3(50.0f, 25.0f, 0.0f), GxVec3(0.0f, 0.0f, 1.0f));
+	cam->set_far(200.0f);
     scn->add_camera(cam);
 
     const std::shared_ptr<GxDirLight> light = astmgr->get_light_manager()->create<GxDirLight>();
@@ -276,9 +184,25 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
 	}
 
     modal = mdlmgr->create<GxModal>(mdacall);
-    auto text1 = mdlmgr->create<GxTextWdg>(txwcall);
-    text1->set_text(L"Hello World");
-    modal->add_child(text1);
+	auto text1 = mdlmgr->create<GxTextWdg>(txwcall);
+	text1->set_text(L"Object Location");
+	auto* const tx1tran = text1->get_transformation();
+	tx1tran->local_scale(0.1f);
+	tx1tran->set_location(GxVec3(0.0f, 0.25f, 0.1f));
+	modal->add_child(text1);
+	text_location = mdlmgr->create<GxTextWdg>(txwcall);
+	text_location->set_text(L"{ 0.00, 0.00, 0.00 }");
+	text_location->set_text_color(0.777f, 0.222f, 0.333f);
+	auto* const text_location_tran = text_location->get_transformation();
+	text_location_tran->local_scale(0.1f);
+	text_location_tran->set_location(GxVec3(0.0f, -0.35f, 0.1f));
+	modal->add_child(text_location);
+	auto text2 = mdlmgr->create<GxTextWdg>(txwcall);
+	text2->set_text(L"& Object Color");
+	auto* const tx2tran = text2->get_transformation();
+	tx2tran->local_scale(0.1f);
+	tx2tran->set_location(GxVec3(0.0f, -0.0f, 0.1f));
+	modal->add_child(text2);
     modal->set_enability(gearoenix::core::State::Unset);
     modal->get_transformation()->local_scale(0.5f);
     uiscn->add_model(modal);
@@ -287,7 +211,7 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
 
 void GameApp::update() noexcept
 {
-    camtrn->global_rotate(render_engine->get_delta_time() * 0.1f, GxVec3(0.0f, 0.0f, 1.0f));
+    camtrn->global_rotate(render_engine->get_delta_time() * 0.06f, GxVec3(0.0f, 0.0f, 1.0f), GxVec3(50.0f, 25.0f, 0.0f));
 }
 
 void GameApp::terminate() noexcept
@@ -311,11 +235,18 @@ bool GameApp::on_event(const gearoenix::core::event::Data& event_data) noexcept
 			const auto ray = cam->create_ray3(d.x, d.y);
 			auto hit = scn->hit(ray, std::numeric_limits<gearoenix::core::Real>::max());
 			if (hit.has_value()) {
+				modal->set_enability(gearoenix::core::State::Unset);
 				auto* cld = hit.value().second;
 				auto* mdl = cld->get_parent();
-                static float cx = 0.0f, cy = 0.0f, cz = 0.0f; cx = 1.0f - cx; cy = 1.0f - cy; cz = 1.0f - cz;
-                mdl->get_meshes().begin()->second->get_material()->set_color(cx, cy, cz, GxEndCallerIgnored([] {}));
-                modal->set_enability(gearoenix::core::State::Set);
+				auto& mdll = mdl->get_occlusion_sphere().get_center();
+                auto color = *(mdl->get_meshes().begin()->second->get_material()->get_color());
+				std::wstringstream tl;
+				tl << "{ " << mdll[0] << ", " << mdll[1] << ", " << mdll[2] << " }";
+				GxEndCallerIgnored call([this] {
+					modal->set_enability(gearoenix::core::State::Set);
+				});
+				text_location->set_text_color(color[0], color[1], color[2], call);
+				text_location->set_text(tl.str(), call);
 			}
 		}
 			

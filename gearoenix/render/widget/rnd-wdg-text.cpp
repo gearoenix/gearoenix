@@ -48,6 +48,7 @@ gearoenix::render::widget::Text::Text(
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : Widget(my_id, Type::Text, e, c)
     , text(L" ")
+	, text_color(0.999f, 0.999f, 0.999f)
 {
     auto astmgr = e->get_system_application()->get_asset_manager();
     core::sync::EndCaller<font::Font> fend([c](std::shared_ptr<font::Font>) {});
@@ -64,18 +65,30 @@ gearoenix::render::widget::Text::Text(
 
 gearoenix::render::widget::Text::~Text() noexcept {}
 
-void gearoenix::render::widget::Text::set_text(const std::wstring& t) noexcept
+void gearoenix::render::widget::Text::set_text(
+	const std::wstring& t, 
+	const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
 {
     text = t;
     auto &mat = meshes[text_mesh_id]->get_material();
     core::Real asp = 0.0f;
-    std::uint32_t txtclr = 0;
-    txtclr |= text_color[0] >= 1.0f ? 255 << 24 : static_cast<std::uint32_t>(text_color[0] * 255) << 24;
-    txtclr |= text_color[1] >= 1.0f ? 255 << 16 : static_cast<std::uint32_t>(text_color[1] * 255) << 16;
-    txtclr |= text_color[2] >= 1.0f ? 255 << 8 : static_cast<std::uint32_t>(text_color[2] * 255) << 8;
-    txtclr |= 255;
-    auto txt = text_font->multiline_bake(text, txtclr, 512, 512, 5, asp);
+    std::uint8_t txtclr[4];
+    txtclr[0] = (text_color[0] >= 1.0f ? 255 : static_cast<std::uint32_t>(text_color[0] * 255));
+    txtclr[1] = (text_color[1] >= 1.0f ? 255 : static_cast<std::uint32_t>(text_color[1] * 255));
+    txtclr[2] = (text_color[2] >= 1.0f ? 255 : static_cast<std::uint32_t>(text_color[2] * 255));
+	txtclr[3] = 255;
+    auto txt = text_font->multiline_bake(text, txtclr, 512, 512, 5, asp, c);
     mat->set_color(txt);
-    current_x_scale = 2.0f * asp;
-    transformation->local_x_scale(asp * 2.0f);
+    transformation->local_x_scale(asp / current_x_scale);
+    current_x_scale = asp;
+}
+
+void gearoenix::render::widget::Text::set_text_color(
+	const core::Real red, 
+	const core::Real green, 
+	const core::Real blue, 
+	const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
+{
+	text_color = math::Vec3(red, green, blue);
+	set_text(text, c);
 }

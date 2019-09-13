@@ -70,8 +70,14 @@ gearoenix::glc3::texture::Texture2D::~Texture2D() noexcept
         return;
     const gl::uint c_texture_object = texture_object;
     render_engine->get_function_loader()->load([c_texture_object] {
+#ifdef GX_DEBUG_GL_CLASS_3
+		gl::Loader::check_for_error();
+#endif
         gl::Loader::bind_texture(GL_TEXTURE_2D, 0);
         gl::Loader::delete_textures(1, &c_texture_object);
+#ifdef GX_DEBUG_GL_CLASS_3
+		gl::Loader::check_for_error();
+#endif
     });
     texture_object = 0;
 }

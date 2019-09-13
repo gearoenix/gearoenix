@@ -15,6 +15,7 @@ class Ui;
 
 namespace gearoenix::render::widget {
 class Modal;
+class Text;
 }
 
 class GameApp : 
@@ -26,12 +27,14 @@ private:
 	using GxCam = gearoenix::render::camera::Camera;
     using GxCamTran = gearoenix::render::camera::Transformation;
     using GxModal = gearoenix::render::widget::Modal;
+	using GxTextWdg = gearoenix::render::widget::Text;
 
     std::shared_ptr<GxGameScene> scn;
     std::shared_ptr<GxUiScene> uiscn;
     std::shared_ptr<GxCamTran> camtrn;
 	std::shared_ptr<GxCam> cam;
-    std::shared_ptr<GxModal> modal;
+	std::shared_ptr<GxModal> modal;
+	std::shared_ptr<GxTextWdg> text_location;
 
 public:
     /// This function must be like this

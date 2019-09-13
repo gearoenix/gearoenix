@@ -51,6 +51,7 @@ namespace render {
             virtual ~Camera() noexcept;
             const std::shared_ptr<buffer::FramedUniform>& get_uniform_buffers() const;
             const std::shared_ptr<physics::Transformation> get_transformation() const noexcept;
+			void set_far(core::Real f) noexcept;
             bool is_enabled() const noexcept;
             void enable() noexcept;
             void disable() noexcept;

@@ -45,7 +45,13 @@ gearoenix::glc3::engine::Engine::~Engine() noexcept
 void gearoenix::glc3::engine::Engine::update() noexcept
 {
     gl::Loader::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+#ifdef GX_DEBUG_GL_CLASS_3
+	gl::Loader::check_for_error();
+#endif
     render::engine::Engine::update();
+#ifdef GX_DEBUG_GL_CLASS_3
+	gl::Loader::check_for_error();
+#endif
 }
 
 void gearoenix::glc3::engine::Engine::terminate() noexcept

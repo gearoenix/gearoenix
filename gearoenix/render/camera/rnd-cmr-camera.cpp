@@ -81,6 +81,12 @@ const std::shared_ptr<gearoenix::physics::Transformation> gearoenix::render::cam
     return transformation;
 }
 
+void gearoenix::render::camera::Camera::set_far(const core::Real f) noexcept
+{
+	uniform->far = -f;
+	transformation->update_projection();
+}
+
 bool gearoenix::render::camera::Camera::is_enabled() const noexcept
 {
     return enabled;
@@ -98,7 +104,7 @@ void gearoenix::render::camera::Camera::disable() noexcept
 
 bool gearoenix::render::camera::Camera::in_sight(const gearoenix::math::Vec3& location, const core::Real radius) const noexcept
 {
-    return frustum->check_intersection(location, radius) != math::IntersectionStatus::Out;
+	return frustum->check_intersection(location, radius) != math::IntersectionStatus::Out;
 }
 
 void gearoenix::render::camera::Camera::update_uniform()

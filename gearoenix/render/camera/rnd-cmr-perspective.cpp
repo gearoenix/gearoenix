@@ -122,6 +122,7 @@ gearoenix::render::camera::Perspective::Perspective(
     : Camera(my_id, e)
 {
     transformation->set_on_frustum_update([this] { update_cascades(); });
+	transformation->set_on_projection_update([this] { update_projection(); });
     set_field_of_view(1.571f);
 }
 

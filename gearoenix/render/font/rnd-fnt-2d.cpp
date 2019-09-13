@@ -97,7 +97,7 @@ gearoenix::render::font::Font2D::Font2D(const core::Id my_id, const std::shared_
     auto* const e = txt_mgr->get_engine();
     std::unique_ptr<system::stream::Asset> asset(system::stream::Asset::construct(e->get_system_application(), "default.ttf"));
     asset->seek(0);
-#define DEFAULT_FONT_SIZE 1331943
+#define DEFAULT_FONT_SIZE 1593268
     ttf_data.resize(DEFAULT_FONT_SIZE);
     asset->read(ttf_data.data(), DEFAULT_FONT_SIZE);
     init();
@@ -110,7 +110,7 @@ gearoenix::render::font::Font2D::~Font2D() noexcept
 
 const std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::font::Font2D::multiline_bake(
 	const std::wstring& text, 
-	const std::uint32_t color, 
+	const std::uint8_t color_bytes[4], 
 	const int img_width, 
 	const int img_height, 
 	const int img_margin, 
@@ -167,7 +167,6 @@ const std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::
 		}
 	}
 
-	auto color_bytes = reinterpret_cast<const unsigned char*>(&color);
     const auto pixels_bytes_count = rnd_data.size() << 2;
 	unsigned char * img_pixels = new unsigned char[pixels_bytes_count];
 

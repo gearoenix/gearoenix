@@ -127,7 +127,7 @@ gearoenix::render::widget::Modal::Modal(const core::Id my_id, engine::Engine* co
         mdl->add_mesh(std::make_shared<model::Mesh>(close_mesh, mat));
         auto* tran = mdl->get_transformation();
         const core::Real scale = 0.05f;
-        const math::Vec3 position(0.9f, 0.9f, 1.0f);
+        const math::Vec3 position(0.9f, 0.9f, 0.1f);
         tran->local_scale(scale);
         tran->set_location(position);
         mdl->set_collider(std::make_unique<physics::collider::Aabb>(position + scale, position - scale));

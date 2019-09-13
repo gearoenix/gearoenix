@@ -14,7 +14,7 @@ class Text : public Widget {
     GX_GET_CREF_PRV(std::shared_ptr<font::Font2D>, text_font)
     GX_GET_CREF_PRV(math::Vec3, text_color)
     GX_GET_VAL_PRV(Alignment, align, Alignment::CenterMiddle)
-    GX_GET_VAL_PRV(core::Id, text_mesh_id, -1)
+    GX_GET_VAL_PRV(core::Id, text_mesh_id, 0)
     GX_GET_VAL_PRV(core::Real, current_x_scale, 1.0f)
 public:
     Text(
@@ -27,7 +27,8 @@ public:
         engine::Engine* e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
     ~Text() noexcept final;
-    void set_text(const std::wstring& t) noexcept;
+	void set_text(const std::wstring& t, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c = core::sync::EndCaller<core::sync::EndCallerIgnore>([] {})) noexcept;
+	void set_text_color(core::Real red, core::Real green, core::Real blue, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c = core::sync::EndCaller<core::sync::EndCallerIgnore>([] {})) noexcept;
 };
 }
 #endif

@@ -48,7 +48,7 @@ public:
 	/// In future, maybe, I will implement a one line fast enough texture baker.
     const std::shared_ptr<texture::Texture2D> multiline_bake(
 		const std::wstring &text,
-        std::uint32_t color,
+        const std::uint8_t color[4],
         int img_width,
         int img_height,
 		int img_margin,
