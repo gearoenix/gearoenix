@@ -1,7 +1,10 @@
 #ifndef GEAROENIX_EXAMPLE_003_NET_HELLO_WORLD_HPP
 #define GEAROENIX_EXAMPLE_003_NET_HELLO_WORLD_HPP
 #include <gearoenix/core/cr-application.hpp>
+#include <gearoenix/core/cr-types.hpp>
 #include <gearoenix/core/event/cr-ev-listner.hpp>
+#include <atomic>
+#include <random>
 
 namespace gearoenix::render::camera {
 class Camera;
@@ -32,6 +35,14 @@ private:
     using GxModal = gearoenix::render::widget::Modal;
     using GxTextWdg = gearoenix::render::widget::Text;
     using GxGrPbr = gearoenix::render::graph::tree::Pbr;
+	using GxReal = gearoenix::core::Real;
+
+
+	struct ShelfInfo {
+		std::uniform_real_distribution<GxReal> rand_genx;
+		std::uniform_real_distribution<GxReal> rand_genz;
+		GxReal y = 0.0f;
+	};
 
     std::shared_ptr<GxGameScene> scn;
     std::shared_ptr<GxUiScene> uiscn;
@@ -40,6 +51,9 @@ private:
     std::shared_ptr<GxModal> modal;
     std::shared_ptr<GxTextWdg> text_location;
     std::unique_ptr<GxGrPbr> render_tree;
+	std::atomic<bool> camera_locked = false;
+	std::atomic<GxReal> camera_forward = 0.0f;
+	std::atomic<GxReal> camera_sideward = 0.0f;
 
 public:
     /// This function must be like this

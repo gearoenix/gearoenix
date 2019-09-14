@@ -43,7 +43,8 @@ void gearoenix::core::event::Engine::loop() noexcept
 }
 
 gearoenix::core::event::Engine::Engine() noexcept
-    : event_thread(std::bind(&Engine::loop, this))
+    : state(State::Running)
+	, event_thread(std::bind(&Engine::loop, this))
 {
 }
 
@@ -90,4 +91,22 @@ void gearoenix::core::event::Engine::braodcast(Data event_data) noexcept
     std::lock_guard<std::mutex> _l(events_guard);
     events.push_back(event_data);
     signaler.release();
+}
+
+void gearoenix::core::event::Engine::set_mouse_position(const math::Vec2& p) noexcept
+{
+	mouse_movement.position = p;
+	mouse_movement.update();
+}
+
+void gearoenix::core::event::Engine::set_mouse_movement(const math::Vec2& p) noexcept
+{
+	mouse_movement.previous_position = mouse_movement.position;
+	mouse_movement.previous_time = mouse_movement.now_time;
+	mouse_movement.position = p;
+	mouse_movement.update();
+	Data d;
+	d.source = Id::MovementMouse;
+	d.data = mouse_movement;
+	braodcast(d);
 }

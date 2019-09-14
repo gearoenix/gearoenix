@@ -42,8 +42,6 @@ namespace system {
         const static core::Real ZOOM_EPSILON;
 
         core::Real half_height_inversed = 0.0f;
-        core::Real pre_x = 0.0f;
-        core::Real pre_y = 0.0f;
 
         SDL_Window* window = nullptr;
 

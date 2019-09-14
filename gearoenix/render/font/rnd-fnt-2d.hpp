@@ -53,7 +53,7 @@ public:
         int img_height,
         int img_margin,
         core::Real& render_aspect_ratio,
-        const core::sync::EndCaller<core::sync::EndCallerIgnore>& end = core::sync::EndCaller<core::sync::EndCallerIgnore>([] {})) const noexcept;
+        core::sync::EndCaller<texture::Texture2D> end) const noexcept;
 };
 }
 #endif

@@ -23,7 +23,6 @@
 #include <gearoenix/render/widget/rnd-wdg-modal.hpp>
 #include <gearoenix/render/widget/rnd-wdg-text.hpp>
 #include <gearoenix/system/sys-app.hpp>
-#include <random>
 #include <sstream>
 
 template <class T>
@@ -38,17 +37,11 @@ using GxMdMesh = gearoenix::render::model::Mesh;
 using GxMesh = gearoenix::render::mesh::Mesh;
 using GxStaticModel = gearoenix::render::model::Static;
 using GxVec3 = gearoenix::math::Vec3;
-using GxReal = gearoenix::core::Real;
 using GxDirLight = gearoenix::render::light::Directional;
 using GxLtManager = gearoenix::render::light::Manager;
 using GxPersCam = gearoenix::render::camera::Perspective;
 using GxCldSphere = gearoenix::physics::collider::Sphere;
 
-struct ShelfInfo {
-    std::uniform_real_distribution<GxReal> rand_genx;
-    std::uniform_real_distribution<GxReal> rand_genz;
-    GxReal y = 0.0f;
-};
 
 GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
     : gearoenix::core::Application::Application(sys_app)
@@ -95,7 +88,10 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
     const GxEndCallerIgnored endcall([this] {
         scn->set_enability(true);
         uiscn->set_enability(true);
-        system_application->get_event_engine()->add_listner(gearoenix::core::event::Id::ButtonMouse, 1.0f, this);
+		auto* const event_engine = system_application->get_event_engine();
+		event_engine->add_listner(gearoenix::core::event::Id::ButtonMouse, 1.0f, this);
+		event_engine->add_listner(gearoenix::core::event::Id::ButtonKeyboard, 1.0f, this);
+		event_engine->add_listner(gearoenix::core::event::Id::MovementMouse, 1.0f, this);
     });
     GxEndCaller<GxGameScene> scncall([endcall](const std::shared_ptr<GxGameScene>&) {});
     GxEndCaller<GxUiScene> uiscncall([endcall](const std::shared_ptr<GxUiScene>&) {});
@@ -201,7 +197,15 @@ GameApp::~GameApp() {
 
 void GameApp::update() noexcept
 {
-    camtrn->global_rotate(render_engine->get_delta_time() * 0.06f, GxVec3(0.0f, 0.0f, 1.0f), GxVec3(50.0f, 25.0f, 0.0f));
+	const GxVec3 translate = ((camtrn->get_z_axis() * -camera_forward) + (camtrn->get_x_axis() * camera_sideward)) * (render_engine->get_delta_time() * 3.0f);
+	GxVec3 loc = camtrn->get_location() + translate;
+	if (loc[0] < -10.0f) loc[0] = -10.0f;
+	else if (loc[0] > 110.0f) loc[0] = 110.0f;
+	if (loc[1] < -10.0f) loc[1] = -10.0f;
+	else if (loc[1] > 60.0f) loc[1] = 60.0f;
+	if (loc[2] < 10.0f) loc[2] = 10.0f;
+	else if (loc[2] > 50.0f) loc[2] = 50.0f;
+    camtrn->set_location(loc);
 }
 
 void GameApp::terminate() noexcept
@@ -220,9 +224,9 @@ bool GameApp::on_event(const gearoenix::core::event::Data& event_data) noexcept
 {
     switch (event_data.source) {
     case gearoenix::core::event::Id::ButtonMouse: {
-        const auto d = std::get<gearoenix::core::event::button::Data>(event_data.data);
-        if (d.key == gearoenix::core::event::button::KeyId::Left && d.action == gearoenix::core::event::button::ActionId::Press) {
-            const auto ray = cam->create_ray3(d.x, d.y);
+        const auto d = std::get<gearoenix::core::event::button::MouseData>(event_data.data);
+        if (d.key == gearoenix::core::event::button::MouseKeyId::Left && d.action == gearoenix::core::event::button::MouseActionId::Press) {
+            const auto ray = cam->create_ray3(d.position[0], d.position[1]);
             auto hit = scn->hit(ray, std::numeric_limits<gearoenix::core::Real>::max());
             if (hit.has_value()) {
                 modal->set_enability(gearoenix::core::State::Unset);
@@ -239,9 +243,53 @@ bool GameApp::on_event(const gearoenix::core::event::Data& event_data) noexcept
                 text_location->set_text(tl.str(), call);
             }
         }
-
+		else if (d.key == gearoenix::core::event::button::MouseKeyId::Right) {
+			if (d.action == gearoenix::core::event::button::MouseActionId::Press)
+			{
+				camera_locked = true;
+			}
+			else {
+				camera_locked = false;
+			}
+		}
         break;
     }
+	case gearoenix::core::event::Id::MovementMouse:
+	{
+		const auto d = std::get<gearoenix::core::event::movement::Data>(event_data.data);
+		if (camera_locked) {
+			auto dir = d.delta_position;
+			camtrn->local_x_rotate(dir[1]);
+			camtrn->global_rotate(dir[0], GxVec3(0.0f, 0.0f, 1.0f));
+		}
+		break;
+	}
+	case gearoenix::core::event::Id::ButtonKeyboard:
+	{
+		const auto d = std::get<gearoenix::core::event::button::KeyboardData>(event_data.data);
+		switch (d.key) {
+		case gearoenix::core::event::button::KeyboardKeyId::Up:
+			if (d.action == gearoenix::core::event::button::KeyboardActionId::Press) camera_forward = 1.0f;
+			else camera_forward = 0.0f;
+			break;
+		case gearoenix::core::event::button::KeyboardKeyId::Down:
+			if (d.action == gearoenix::core::event::button::KeyboardActionId::Press) camera_forward = -1.0f;
+			else camera_forward = 0.0f;
+			break;
+		case gearoenix::core::event::button::KeyboardKeyId::Right:
+			if (d.action == gearoenix::core::event::button::KeyboardActionId::Press) camera_sideward = 1.0f;
+			else camera_sideward = 0.0f;
+			break;
+		case gearoenix::core::event::button::KeyboardKeyId::Left:
+			if (d.action == gearoenix::core::event::button::KeyboardActionId::Press) camera_sideward = -1.0f;
+			else camera_sideward = 0.0f;
+			break;
+		default:
+			break;
+		}
+		break;
+	}
+		break;
     default:
         break;
     }

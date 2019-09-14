@@ -134,7 +134,7 @@ void gearoenix::render::camera::Transformation::global_rotate(const core::Real r
 
 void gearoenix::render::camera::Transformation::global_rotate(const core::Real rad, const math::Vec3& axis) noexcept
 {
-    global_rotate(rad, axis, math::Vec3(0.0f, 0.0f, 0.0f));
+    global_rotate(rad, axis, uniform->position);
 }
 
 void gearoenix::render::camera::Transformation::local_rotate(const core::Real rad, const math::Vec3& vec) noexcept

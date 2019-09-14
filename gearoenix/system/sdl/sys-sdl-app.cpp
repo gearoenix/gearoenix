@@ -147,24 +147,44 @@ int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_
     case SDL_APP_WILLENTERBACKGROUND:
         o->running = false;
         break;
-    case SDL_KEYDOWN:
-        switch (e->key.keysym.sym) {
-        case SDLK_LEFT:
-            //event = new core::event::button::Keyboard(core::event::button::Keyboard::LEFT, core::event::button::Keyboard::PRESS);
-            break;
-        case SDLK_RIGHT:
-            //event = new core::event::button::Keyboard(core::event::button::Keyboard::RIGHT, core::event::button::Keyboard::PRESS);
-            break;
-        case SDLK_UP:
-            //event = new core::event::button::Keyboard(core::event::button::Keyboard::UP, core::event::button::Keyboard::PRESS);
-            break;
-        case SDLK_ESCAPE:
-            o->running = false;
-            break;
-        default:
-            break;
-        }
-        break;
+	case SDL_KEYDOWN:
+	case SDL_KEYUP: {
+		core::event::button::KeyboardData d;
+		d.action = [&]() noexcept
+		{
+			switch (e->type) {
+			case SDL_KEYUP:
+				return core::event::button::KeyboardActionId::Release;
+			case SDL_KEYDOWN:
+				return core::event::button::KeyboardActionId::Press;
+			default:
+				return core::event::button::KeyboardActionId::Press;
+			}
+		}
+		();
+		d.key = [&]() noexcept
+		{
+			switch (e->key.keysym.sym) {
+			case SDLK_LEFT:
+				return core::event::button::KeyboardKeyId::Left;
+			case SDLK_RIGHT:
+				return core::event::button::KeyboardKeyId::Right;
+			case SDLK_UP:
+				return core::event::button::KeyboardKeyId::Up;
+			case SDLK_DOWN:
+				return core::event::button::KeyboardKeyId::Down;
+			case SDLK_ESCAPE:
+				return core::event::button::KeyboardKeyId::Escape;
+			default:
+				GXLOGE("Unhandled mouse button, left button returned instead.")
+					return core::event::button::KeyboardKeyId::Escape;
+			}
+		}
+		();
+		event.source = core::event::Id::ButtonKeyboard;
+		event.data = d;
+		break;
+	}
     case SDL_FINGERDOWN: {
         /*const core::Real x = (e->tfinger.x - 0.5f) * 2.0f * o->screen_ratio;
         const core::Real y = (0.5f - e->tfinger.y) * 2.0f;
@@ -200,26 +220,24 @@ int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_
         // todo
         // o->core_app->on_scroll((core::Real)event->wheel.y);
         break;
-    case SDL_MOUSEMOTION: {
-        const core::Real x = o->convert_x_to_ratio(e->button.x);
-        const core::Real y = o->convert_y_to_ratio(e->button.y);
-        //event = new core::event::movement::Mouse(x, y, o->pre_x, o->pre_y);
-        o->pre_x = x;
-        o->pre_y = y;
+    case SDL_MOUSEMOTION:
+		o->event_engine->set_mouse_movement(math::Vec2(
+			o->convert_x_to_ratio(e->button.x),
+			o->convert_y_to_ratio(e->button.y)
+		));
         break;
-    }
     case SDL_MOUSEBUTTONUP:
     case SDL_MOUSEBUTTONDOWN: {
-        core::event::button::Data d;
+        core::event::button::MouseData d;
         d.action = [&]() noexcept
         {
             switch (e->type) {
             case SDL_MOUSEBUTTONUP:
-                return core::event::button::ActionId::Release;
+                return core::event::button::MouseActionId::Release;
             case SDL_MOUSEBUTTONDOWN:
-                return core::event::button::ActionId::Press;
+                return core::event::button::MouseActionId::Press;
             default:
-                return core::event::button::ActionId::Press;
+                return core::event::button::MouseActionId::Press;
             }
         }
         ();
@@ -227,20 +245,18 @@ int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_
         {
             switch (e->button.button) {
             case SDL_BUTTON_LEFT:
-                return core::event::button::KeyId::Left;
+                return core::event::button::MouseKeyId::Left;
             case SDL_BUTTON_RIGHT:
-                return core::event::button::KeyId::Right;
+                return core::event::button::MouseKeyId::Right;
             case SDL_BUTTON_MIDDLE:
-                return core::event::button::KeyId::Middle;
+                return core::event::button::MouseKeyId::Middle;
             default:
                 GXLOGE("Unhandled mouse button, left button returned instead.")
-                return core::event::button::KeyId::Left;
+                return core::event::button::MouseKeyId::Left;
             }
         }
         ();
-        d.x = o->convert_x_to_ratio(e->button.x);
-        d.y = o->convert_y_to_ratio(e->button.y);
-
+        d.position = math::Vec2(o->convert_x_to_ratio(e->button.x), o->convert_y_to_ratio(e->button.y));
         event.source = core::event::Id::ButtonMouse;
         event.data = d;
         break;
@@ -319,8 +335,6 @@ gearoenix::system::Application* gearoenix::system::Application::construct() noex
     result->half_height_inversed = 2.0f / static_cast<core::Real>(result->window_height);
     int mx, my;
     SDL_GetMouseState(&mx, &my);
-    result->pre_x = result->convert_x_to_ratio(mx);
-    result->pre_y = result->convert_y_to_ratio(my);
 
 #ifdef GX_USE_VULKAN
     if (nullptr == result->render_engine && result->supported_engine == render::engine::Type::VULKAN) {
@@ -344,6 +358,8 @@ gearoenix::system::Application* gearoenix::system::Application::construct() noex
     }
     result->asset_manager = std::make_unique<core::asset::Manager>(result, GX_APP_DATA_NAME);
     result->event_engine = std::make_unique<core::event::Engine>();
+	result->event_engine->set_mouse_position(math::Vec2(
+		result->convert_x_to_ratio(mx), result->convert_y_to_ratio(my)));
     return result;
 }
 

@@ -70,15 +70,17 @@ void gearoenix::render::widget::Text::set_text(
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
 {
     text = t;
-    auto& mat = meshes[text_mesh_id]->get_material();
     core::Real asp = 0.0f;
     std::uint8_t txtclr[4];
     txtclr[0] = (text_color[0] >= 1.0f ? 255 : static_cast<std::uint8_t>(text_color[0] * 255));
     txtclr[1] = (text_color[1] >= 1.0f ? 255 : static_cast<std::uint8_t>(text_color[1] * 255));
     txtclr[2] = (text_color[2] >= 1.0f ? 255 : static_cast<std::uint8_t>(text_color[2] * 255));
     txtclr[3] = 255;
-    auto txt = text_font->multiline_bake(text, txtclr, 512, 512, 5, asp, c);
-    mat->set_color(txt);
+	auto txt = text_font->multiline_bake(text, txtclr, 512, 512, 5, asp, 
+		core::sync::EndCaller<texture::Texture2D>([c, this] (std::shared_ptr<texture::Texture2D> txt) {
+			meshes[text_mesh_id]->get_material()->set_color(txt);
+		})
+	);
     transformation->local_x_scale(asp / current_x_scale);
     current_x_scale = asp;
 }

@@ -110,7 +110,7 @@ const std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::
     const int img_height,
     const int img_margin,
     core::Real& render_aspect_ratio,
-    const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) const noexcept
+    core::sync::EndCaller<texture::Texture2D> end) const noexcept
 {
     const auto a = compute_multiline_text_aspects(text);
     const core::Real w_scale = static_cast<core::Real>(img_width - (img_margin << 1)) / static_cast<core::Real>(a.max_width);
@@ -195,6 +195,8 @@ const std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::
     txt_info.s.wrap_s = texture::Wrap::CLAMP_TO_EDGE;
     txt_info.s.wrap_t = texture::Wrap::CLAMP_TO_EDGE;
     txt_info.t = texture::Type::TEXTURE_2D;
-    core::sync::EndCaller<texture::Texture2D> tend([end](std::shared_ptr<texture::Texture2D>) {});
+	core::sync::EndCaller<texture::Texture2D> tend([end](std::shared_ptr<texture::Texture2D> t) mutable noexcept { 
+		end.set_data(t); 
+	});
     return txt_mgr->create_2d(img_pixels, txt_info, img_width, img_height, tend);
 }

@@ -1,21 +1,15 @@
 #ifndef GEAROENIX_CORE_EVENT_BUTTON_BUTTON_HPP
 #define GEAROENIX_CORE_EVENT_BUTTON_BUTTON_HPP
 #include "../cr-types.hpp"
+#include "../../math/math-vector.hpp"
+
 namespace gearoenix::core::event::button {
-enum struct DeviceId {
-    Joystick = 1,
-    Keyboard = 2,
-    Motion = 3,
-    Mouse = 4,
-};
-enum struct KeyId {
+
+enum struct KeyboardKeyId : int {
     Left,
     Right,
-    Middle,
     Up,
     Down,
-    Front,
-    Back,
     Backscape,
     Escape,
     Enter,
@@ -100,10 +94,6 @@ enum struct KeyId {
     X,
     Y,
     Z,
-    R1,
-    R2,
-    L1,
-    L2,
     F1,
     F2,
     F3,
@@ -117,19 +107,37 @@ enum struct KeyId {
     F11,
     F12,
 };
-enum struct ActionId {
+
+enum struct KeyboardActionId : int {
+	Press,
+	Release,
+};
+
+enum struct MouseKeyId : int {
+	Left,
+	Right,
+	Middle,
+	Front,
+	Back,
+};
+
+enum struct MouseActionId : int {
     Press,
     Release,
     DoubleClick,
     TripleClick,
 };
-struct Data {
-    ActionId action = ActionId::Press;
-    DeviceId device = DeviceId::Keyboard;
-    KeyId key = KeyId::Escape;
-    Real x = 0.0f;
-    Real y = 0.0f;
-    Real z = 0.0f;
+
+struct KeyboardData {
+    KeyboardActionId action = KeyboardActionId::Press;
+    KeyboardKeyId key = KeyboardKeyId::Escape;
 };
+
+struct MouseData {
+	MouseActionId action = MouseActionId::Press;
+	MouseKeyId key = MouseKeyId::Left;
+	math::Vec2 position;
+};
+
 }
 #endif

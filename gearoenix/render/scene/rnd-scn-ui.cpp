@@ -40,9 +40,9 @@ bool gearoenix::render::scene::Ui::on_event(const core::event::Data& d) noexcept
 {
     switch (d.source) {
     case core::event::Id::ButtonMouse: {
-        const auto data = std::get<gearoenix::core::event::button::Data>(d.data);
-        if (data.key == core::event::button::KeyId::Left && data.action == core::event::button::ActionId::Press) {
-            const auto ray = cameras.begin()->second->create_ray3(data.x, data.y);
+        const auto data = std::get<gearoenix::core::event::button::MouseData>(d.data);
+        if (data.key == core::event::button::MouseKeyId::Left && data.action == core::event::button::MouseActionId::Press) {
+            const auto ray = cameras.begin()->second->create_ray3(data.position[0], data.position[1]);
             auto h = hit(ray, std::numeric_limits<gearoenix::core::Real>::max());
             if (h.has_value()) {
                 const core::Real d_ray = h.value().first;
