@@ -29,7 +29,11 @@ gearoenix::render::model::Mesh::Mesh(const std::shared_ptr<mesh::Mesh>& msh, con
 {
 }
 
-gearoenix::render::model::Mesh::~Mesh() noexcept {}
+gearoenix::render::model::Mesh::~Mesh() noexcept 
+{
+	mat = nullptr;
+	msh = nullptr;
+}
 
 const std::shared_ptr<gearoenix::render::mesh::Mesh>& gearoenix::render::model::Mesh::get_mesh() const noexcept
 {

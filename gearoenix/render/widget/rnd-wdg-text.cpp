@@ -34,8 +34,8 @@ gearoenix::render::widget::Text::Text(
     core::sync::EndCaller<font::Font> fend([c](std::shared_ptr<font::Font>) {});
     text_font = std::dynamic_pointer_cast<font::Font2D>(astmgr->get_font_manager()->get(f->read<core::Id>(), fend));
     auto mat = std::make_shared<material::Material>(f, e, c);
-    mat->set_metallic_factor(0.001);
-    mat->set_roughness_factor(0.999);
+    mat->set_metallic_factor(0.001f);
+    mat->set_roughness_factor(0.999f);
     core::sync::EndCaller<mesh::Mesh> mend([c](std::shared_ptr<mesh::Mesh>) {});
     auto msh = astmgr->get_mesh_manager()->create_plate(mend);
     add_mesh(std::make_shared<model::Mesh>(msh, mat));
@@ -54,8 +54,8 @@ gearoenix::render::widget::Text::Text(
     core::sync::EndCaller<font::Font> fend([c](std::shared_ptr<font::Font>) {});
     text_font = astmgr->get_font_manager()->get_default_2d(fend);
     auto mat = std::make_shared<material::Material>(e, c);
-    mat->set_metallic_factor(0.001);
-    mat->set_roughness_factor(0.999);
+    mat->set_metallic_factor(0.001f);
+    mat->set_roughness_factor(0.999f);
     core::sync::EndCaller<mesh::Mesh> mend([c](std::shared_ptr<mesh::Mesh>) {});
     auto msh = astmgr->get_mesh_manager()->create_plate(mend);
     text_mesh_id = msh->get_asset_id();
@@ -73,9 +73,9 @@ void gearoenix::render::widget::Text::set_text(
     auto& mat = meshes[text_mesh_id]->get_material();
     core::Real asp = 0.0f;
     std::uint8_t txtclr[4];
-    txtclr[0] = (text_color[0] >= 1.0f ? 255 : static_cast<std::uint32_t>(text_color[0] * 255));
-    txtclr[1] = (text_color[1] >= 1.0f ? 255 : static_cast<std::uint32_t>(text_color[1] * 255));
-    txtclr[2] = (text_color[2] >= 1.0f ? 255 : static_cast<std::uint32_t>(text_color[2] * 255));
+    txtclr[0] = (text_color[0] >= 1.0f ? 255 : static_cast<std::uint8_t>(text_color[0] * 255));
+    txtclr[1] = (text_color[1] >= 1.0f ? 255 : static_cast<std::uint8_t>(text_color[1] * 255));
+    txtclr[2] = (text_color[2] >= 1.0f ? 255 : static_cast<std::uint8_t>(text_color[2] * 255));
     txtclr[3] = 255;
     auto txt = text_font->multiline_bake(text, txtclr, 512, 512, 5, asp, c);
     mat->set_color(txt);
