@@ -9,17 +9,18 @@
 #include <mutex>
 #include <set>
 #include <thread>
+#include <atomic>
 namespace gearoenix::core::event {
 class Listner;
 class Engine {
 private:
-    enum struct State {
-        RUNNING = 1,
-        TERMINATING = 2,
-        TERMINATED = 3,
+    enum struct State : int {
+        Running = 1,
+        Terminating = 2,
+        Terminated = 3,
     };
 
-    State state = State::RUNNING;
+    std::atomic<State> state = State::Running;
     sync::Semaphore signaler;
     std::mutex events_guard;
     std::vector<Data> events;

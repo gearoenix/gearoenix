@@ -5,28 +5,41 @@
 
 void gearoenix::core::event::Engine::loop() noexcept
 {
-    while (state == State::RUNNING) {
+	state = State::Running;
+    while (state == State::Running) {
         signaler.lock();
+		if (state != State::Running) break;
         decltype(events) es;
         {
             std::lock_guard<std::mutex> _l(events_guard);
             std::swap(events, es);
         }
+		if (state != State::Running) break;
         std::lock_guard<std::mutex> _l(listners_guard);
         for (const auto& e : es) {
+			if (state != State::Running) break;
             auto& ps = events_id_priority_listners[e.source];
+			if (state != State::Running) break;
             for (auto& p : ps) {
+				if (state != State::Running) break;
                 auto& ls = p.second;
+				if (state != State::Running) break;
                 for (auto& l : ls) {
+					if (state != State::Running) break;
                     if (l->on_event(e)) {
+						if (state != State::Running) break;
                         goto event_processed;
                     }
+					if (state != State::Running) break;
                 }
+				if (state != State::Running) break;
             }
-        event_processed:;
+		event_processed:;
+			if (state != State::Running) break;
         }
+		if (state != State::Running) break;
     }
-    state = State::TERMINATED;
+    state = State::Terminated;
 }
 
 gearoenix::core::event::Engine::Engine() noexcept
@@ -36,8 +49,8 @@ gearoenix::core::event::Engine::Engine() noexcept
 
 gearoenix::core::event::Engine::~Engine() noexcept
 {
-    state = State::TERMINATING;
-    while (state != State::TERMINATED)
+    state = State::Terminating;
+    while (state != State::Terminated)
         signaler.release();
     event_thread.join();
 }
