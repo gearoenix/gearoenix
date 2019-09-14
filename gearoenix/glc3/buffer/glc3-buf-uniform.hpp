@@ -3,6 +3,7 @@
 #include "../../core/cr-build-configuration.hpp"
 #ifdef GX_USE_OPENGL_CLASS_3
 #include "../../render/buffer/rnd-buf-uniform.hpp"
+#include <vector>
 namespace gearoenix::glc3 {
 namespace engine {
     class Engine;
