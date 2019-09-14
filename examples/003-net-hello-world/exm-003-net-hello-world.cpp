@@ -195,6 +195,10 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
     uiscn->set_layer(scn->get_layer() + 1.0f);
 }
 
+GameApp::~GameApp() {
+	terminate();
+}
+
 void GameApp::update() noexcept
 {
     camtrn->global_rotate(render_engine->get_delta_time() * 0.06f, GxVec3(0.0f, 0.0f, 1.0f), GxVec3(50.0f, 25.0f, 0.0f));
@@ -202,14 +206,14 @@ void GameApp::update() noexcept
 
 void GameApp::terminate() noexcept
 {
-    gearoenix::core::Application::terminate();
-    scn = nullptr;
-    uiscn = nullptr;
     cam = nullptr;
     camtrn = nullptr;
     modal = nullptr;
     text_location = nullptr;
+	scn = nullptr;
+	uiscn = nullptr;
     render_tree = nullptr;
+	gearoenix::core::Application::terminate();
 }
 
 bool GameApp::on_event(const gearoenix::core::event::Data& event_data) noexcept

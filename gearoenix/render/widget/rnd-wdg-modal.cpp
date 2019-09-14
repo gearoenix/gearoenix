@@ -145,9 +145,9 @@ void gearoenix::render::widget::Modal::set_scene(scene::Scene* const s) noexcept
     Widget::set_scene(s);
 }
 
-void gearoenix::render::widget::Modal::selected(const math::Vec3&, const std::vector<model::Model*>& children) noexcept
+void gearoenix::render::widget::Modal::selected(const math::Vec3&, const std::vector<model::Model*>& selected_children) noexcept
 {
-    if (children.back() == close_mdl) {
+    if (selected_children.back() == close_mdl) {
         set_enability(core::State::Unset);
         scene->set_models_changed(true);
     }

@@ -14,7 +14,7 @@ namespace buffer {
 
     public:
         Uniform(std::size_t s, engine::Engine* e) noexcept;
-        ~Uniform() noexcept final = default;
+        ~Uniform() noexcept final;
         void update(const void* src) noexcept final;
         const void* get_data() const noexcept final;
         void* get_data() noexcept final;

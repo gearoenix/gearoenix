@@ -64,7 +64,7 @@ namespace model {
             const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
 
     public:
-        virtual ~Model() noexcept = default;
+        virtual ~Model() noexcept;
         virtual void update() noexcept;
         void add_mesh(const std::shared_ptr<Mesh>& m) noexcept;
         void add_child(const std::shared_ptr<Model>& c) noexcept;

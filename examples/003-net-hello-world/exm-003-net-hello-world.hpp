@@ -44,7 +44,7 @@ private:
 public:
     /// This function must be like this
     GameApp(gearoenix::system::Application* sys_app) noexcept;
-    ~GameApp() noexcept final = default;
+    ~GameApp() noexcept final;
     /// On every screen refresh this function is going to be called
     void update() noexcept final;
     /// Before terminationg everything in engine this function is going to be called

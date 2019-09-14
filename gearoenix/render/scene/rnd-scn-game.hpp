@@ -11,7 +11,7 @@ public:
     Game(
         core::Id my_id, engine::Engine* e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
-    ~Game() noexcept;
+    ~Game() noexcept final;
 };
 }
 #endif
