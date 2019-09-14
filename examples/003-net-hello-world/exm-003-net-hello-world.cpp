@@ -1,6 +1,7 @@
 #include "exm-003-net-hello-world.hpp"
 #include <gearoenix/core/asset/cr-asset-manager.hpp>
 #include <gearoenix/core/event/cr-ev-engine.hpp>
+#include <gearoenix/math/math-vertex.hpp>
 #include <gearoenix/physics/body/phs-bd-rigid.hpp>
 #include <gearoenix/physics/collider/phs-cld-sphere.hpp>
 #include <gearoenix/physics/constraint/phs-cns-tracker-spring-joint-spring.hpp>
@@ -20,6 +21,8 @@
 #include <gearoenix/render/scene/rnd-scn-game.hpp>
 #include <gearoenix/render/scene/rnd-scn-manager.hpp>
 #include <gearoenix/render/scene/rnd-scn-ui.hpp>
+#include <gearoenix/render/texture/rnd-txt-manager.hpp>
+#include <gearoenix/render/texture/rnd-txt-texture-2d.hpp>
 #include <gearoenix/render/widget/rnd-wdg-modal.hpp>
 #include <gearoenix/render/widget/rnd-wdg-text.hpp>
 #include <gearoenix/system/sys-app.hpp>
@@ -36,12 +39,16 @@ using GxMdManager = gearoenix::render::model::Manager;
 using GxMdMesh = gearoenix::render::model::Mesh;
 using GxMesh = gearoenix::render::mesh::Mesh;
 using GxStaticModel = gearoenix::render::model::Static;
+using GxVec2 = gearoenix::math::Vec2;
 using GxVec3 = gearoenix::math::Vec3;
+using GxVec4 = gearoenix::math::Vec4;
 using GxDirLight = gearoenix::render::light::Directional;
 using GxLtManager = gearoenix::render::light::Manager;
 using GxPersCam = gearoenix::render::camera::Perspective;
+using GxTexture = gearoenix::render::texture::Texture;
+using GxTexture2D = gearoenix::render::texture::Texture2D;
 using GxCldSphere = gearoenix::physics::collider::Sphere;
-
+using GxVertex = gearoenix::math::BasicVertex;
 
 GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
     : gearoenix::core::Application::Application(sys_app)
@@ -93,12 +100,15 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
 		event_engine->add_listner(gearoenix::core::event::Id::ButtonKeyboard, 1.0f, this);
 		event_engine->add_listner(gearoenix::core::event::Id::MovementMouse, 1.0f, this);
     });
+
     GxEndCaller<GxGameScene> scncall([endcall](const std::shared_ptr<GxGameScene>&) {});
     GxEndCaller<GxUiScene> uiscncall([endcall](const std::shared_ptr<GxUiScene>&) {});
     GxEndCaller<GxMesh> mshcall([endcall](const std::shared_ptr<GxMesh>&) {});
     GxEndCaller<GxStaticModel> mdlcall([endcall](const std::shared_ptr<GxStaticModel>&) {});
     GxEndCaller<GxModal> mdacall([endcall](const std::shared_ptr<GxModal>&) {});
-    GxEndCaller<GxTextWdg> txwcall([endcall](const std::shared_ptr<GxTextWdg>&) {});
+	GxEndCaller<GxTextWdg> txwcall([endcall](const std::shared_ptr<GxTextWdg>&) {});
+	GxEndCaller<GxTexture> txtcall([endcall](const std::shared_ptr<GxTexture>&) {});
+
     render_tree = std::make_unique<GxGrPbr>(render_engine, endcall);
     render_engine->set_render_tree(render_tree.get());
     gearoenix::core::asset::Manager* const astmgr = sys_app->get_asset_manager();
@@ -131,19 +141,30 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
     light4->set_color(GxVec3(0.5f, 0.5f, 0.5f));
     scn->add_light(light4);
 
-    const std::shared_ptr<GxMesh> msh = astmgr->get_mesh_manager()->create_icosphere(mshcall);
-    const std::shared_ptr<GxMesh> plate_mesh = astmgr->get_mesh_manager()->create_plate(mshcall);
+	const auto& mshmgr = astmgr->get_mesh_manager();
+	const auto& txtmgr = astmgr->get_texture_manager();
+    const std::shared_ptr<GxMesh> msh = mshmgr->create_icosphere(mshcall);
     const std::shared_ptr<GxMdManager>& mdlmgr = astmgr->get_model_manager();
     {
+		const std::shared_ptr<GxMesh> plate_mesh = mshmgr->create({
+			GxVertex { GxVec3(-55.0f, -30.0f, 0.0f), GxVec3(0.0f, 0.0f, 1.0f), GxVec4(1.0f, 0.0f, 0.0f, 1.0f), GxVec2(0.0f, 0.0f) },
+			GxVertex { GxVec3(55.0f, -30.0f, 0.0f), GxVec3(0.0f, 0.0f, 1.0f), GxVec4(1.0f, 0.0f, 0.0f, 1.0f), GxVec2(110.0f, 0.0f) },
+			GxVertex { GxVec3(-55.0f, 30.0f, 0.0f), GxVec3(0.0f, 0.0f, 1.0f), GxVec4(1.0f, 0.0f, 0.0f, 1.0f), GxVec2(0.0f, 60.0f) },
+			GxVertex { GxVec3(55.0f, 30.0f, 0.0f), GxVec3(0.0f, 0.0f, 1.0f), GxVec4(1.0f, 0.0f, 0.0f, 1.0f), GxVec2(110.0f, 60.0f) }
+			}, {
+				0, 1, 2,
+				1, 3, 2
+			}, 60.0f, mshcall);
+		auto txt = std::dynamic_pointer_cast<GxTexture2D>(txtmgr->get_gx3d(1031, txtcall));
         const std::shared_ptr<GxMaterial> mat(new GxMaterial(render_engine, endcall));
         mat->set_roughness_factor(0.5f);
         mat->set_metallic_factor(0.8f);
-        mat->set_color(0.0f, 0.999f, 0.0f, endcall);
+        mat->set_color(txt);
         const std::shared_ptr<GxStaticModel> mdl = mdlmgr->create<GxStaticModel>(mdlcall);
         mdl->add_mesh(std::make_shared<GxMdMesh>(plate_mesh, mat));
         auto* trans = mdl->get_transformation();
-        trans->set_location(GxVec3(0.0f, 0.0f, -5.0f));
-        trans->local_scale(14.0f);
+        trans->set_location(GxVec3(50.0f, 25.0f, 0.0f));
+        trans->local_scale(1.0f);
         scn->add_model(mdl);
     }
     for (auto& s : shelves_info) {

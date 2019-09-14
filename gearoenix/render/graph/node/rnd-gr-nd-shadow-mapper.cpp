@@ -68,8 +68,8 @@ gearoenix::render::graph::node::ShadowMapper::ShadowMapper(
     render_target = std::shared_ptr<texture::Target>(e->create_render_target(
         core::asset::Manager::create_id(),
         txt_infoes,
-        week_hwr ? 512 : 1024,
-        week_hwr ? 512 : 1024,
+        week_hwr ? 1024 : 2048,
+        week_hwr ? 1024 : 2048,
         call));
     output_textures[0] = render_target;
 }

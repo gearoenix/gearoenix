@@ -4,7 +4,6 @@
 #include "../../system/sys-log.hpp"
 #define STB_IMAGE_IMPLEMENTATION
 #define STBI_NO_STDIO
-#define STBI_ONLY_PNG
 #include <cstring>
 #include <stb_image.h>
 
