@@ -39,7 +39,7 @@ private:
 
     std::map<button::MouseKeyId, MouseButtonState> pressed_mouse_buttons_state;
 
-	movement::Data mouse_movement;
+	movement::Base mouse_movement;
 
     void loop() noexcept;
 
@@ -52,9 +52,9 @@ public:
     void remove_listner(Id event_id, Listner* listner) noexcept;
     void remove_listner(Listner* listner) noexcept;
     void broadcast(Data event_data) noexcept;
-	void set_mouse_position(const math::Vec2& p) noexcept;
-	void set_mouse_movement(const math::Vec2& p) noexcept;
-    void mouse_button(button::MouseKeyId, button::MouseActionId);
+	void set_mouse_position(const math::Vec2& position) noexcept;
+	void set_mouse_movement(const math::Vec2& position) noexcept;
+    void mouse_button(button::MouseKeyId key, button::MouseActionId action);
 };
 }
 #endif

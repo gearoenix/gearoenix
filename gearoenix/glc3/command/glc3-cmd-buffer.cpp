@@ -7,10 +7,12 @@
 
 gearoenix::gl::uint gearoenix::glc3::command::Buffer::play(gl::uint bound_shader_program) const noexcept
 {
-    if (render_target != nullptr)
-        reinterpret_cast<const texture::Target*>(render_target)->bind();
+	if (render_target != nullptr) {
+		reinterpret_cast<const texture::Target*>(render_target)->bind();
+	}
     for (const render::pipeline::ResourceSet* prs : bound_resource_sets) {
-        dynamic_cast<const pipeline::ResourceSet*>(prs)->bind(bound_shader_program);
+		auto* const res = dynamic_cast<const pipeline::ResourceSet*>(prs);
+        res->bind(bound_shader_program);
     }
     for (const render::command::Buffer* c : recorded_secondaries) {
         bound_shader_program = reinterpret_cast<const Buffer*>(c)->play(bound_shader_program);

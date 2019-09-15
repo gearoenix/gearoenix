@@ -24,6 +24,7 @@ enum struct Id: int {
     UiDraggedIn,
     UiDraggedOn,
     UiDraggedTo,
+	GestureDrag,
 	GestureMouseDrag,
 	GestureTouchDrag,
     None,

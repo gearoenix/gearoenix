@@ -207,7 +207,7 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
     text_location->set_text(L"{ 0.00, 0.00, 0.00 }");
     text_location->set_text_color(0.777f, 0.222f, 0.333f);
     auto* const text_location_tran = text_location->get_transformation();
-    text_location_tran->local_scale(0.1f);
+    text_location_tran->local_scale(0.08f);
     text_location_tran->set_location(GxVec3(0.0f, -0.35f, 0.1f));
     modal->add_child(text_location);
     auto text2 = mdlmgr->create<GxTextWdg>(txwcall);
@@ -288,7 +288,7 @@ bool GameApp::on_event(const gearoenix::core::event::Data& event_data) noexcept
     }
 	case gearoenix::core::event::Id::MovementMouse:
 	{
-		const auto d = std::get<gearoenix::core::event::movement::Data>(event_data.data);
+		const auto d = std::get<gearoenix::core::event::movement::Base>(event_data.data);
 		if (camera_locked) {
 			auto dir = d.delta_position;
 			camtrn->local_x_rotate(dir[1]);

@@ -1,7 +1,7 @@
 #include "exm-001-hello-world.hpp"
 #include <gearoenix/core/asset/cr-asset-manager.hpp>
-#include <gearoenix/core/event/cr-ev-sys-system.hpp>
-#include <gearoenix/core/event/cr-ev-ui-ui.hpp>
+#include <gearoenix/core/event/cr-ev-system.hpp>
+#include <gearoenix/core/event/cr-ev-ui.hpp>
 #include <gearoenix/physics/body/phs-bd-rigid.hpp>
 #include <gearoenix/physics/constraint/phs-cns-tracker-spring-joint-spring.hpp>
 #include <gearoenix/render/camera/rnd-cmr-camera.hpp>
