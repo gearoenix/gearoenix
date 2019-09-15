@@ -233,36 +233,31 @@ int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_
     case SDL_MOUSEBUTTONUP:
     case SDL_MOUSEBUTTONDOWN: {
         core::event::button::MouseData d;
-        d.action = [&]() noexcept
-        {
-            switch (e->type) {
-            case SDL_MOUSEBUTTONUP:
-                return core::event::button::MouseActionId::Release;
-            case SDL_MOUSEBUTTONDOWN:
-                return core::event::button::MouseActionId::Press;
-            default:
-                return core::event::button::MouseActionId::Press;
-            }
-        }
-        ();
-        d.key = [&]() noexcept
-        {
-            switch (e->button.button) {
-            case SDL_BUTTON_LEFT:
-                return core::event::button::MouseKeyId::Left;
-            case SDL_BUTTON_RIGHT:
-                return core::event::button::MouseKeyId::Right;
-            case SDL_BUTTON_MIDDLE:
-                return core::event::button::MouseKeyId::Middle;
-            default:
-                GXLOGE("Unhandled mouse button, left button returned instead.")
-                return core::event::button::MouseKeyId::Left;
-            }
-        }
-        ();
-        d.position = math::Vec2(o->convert_x_to_ratio(e->button.x), o->convert_y_to_ratio(e->button.y));
-        event.source = core::event::Id::ButtonMouse;
-        event.data = d;
+        o->event_engine->mouse_button(
+            [&]() noexcept {
+                switch (e->button.button) {
+                case SDL_BUTTON_LEFT:
+                    return core::event::button::MouseKeyId::Left;
+                case SDL_BUTTON_RIGHT:
+                    return core::event::button::MouseKeyId::Right;
+                case SDL_BUTTON_MIDDLE:
+                    return core::event::button::MouseKeyId::Middle;
+                default:
+                    GXLOGE("Unhandled mouse button, left button returned instead.")
+                        return core::event::button::MouseKeyId::Left;
+                }
+            } (),
+            [&]() noexcept {
+                switch (e->type) {
+                case SDL_MOUSEBUTTONUP:
+                    return core::event::button::MouseActionId::Release;
+                case SDL_MOUSEBUTTONDOWN:
+                    return core::event::button::MouseActionId::Press;
+                default:
+                    return core::event::button::MouseActionId::Press;
+                }
+            } ()
+        );
         break;
     }
     case SDL_MULTIGESTURE:
@@ -298,7 +293,7 @@ int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_
         break;
     }
     if (event.source != core::event::Id::None) {
-        o->event_engine->braodcast(event);
+        o->event_engine->broadcast(event);
     }
     return 1;
 }

@@ -64,7 +64,7 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
 {
     std::random_device rand_dev;
     std::default_random_engine rand_eng(rand_dev());
-    std::uniform_real_distribution<GxReal> rand_gen1(0.2f, 0.4f);
+    std::uniform_real_distribution<GxReal> rand_gen1(0.1f, 0.2f);
     std::uniform_real_distribution<GxReal> rand_gen2(0.001f, 0.999f);
     std::uniform_int_distribution<int> rand_gen3(10, 15);
 
@@ -256,7 +256,7 @@ bool GameApp::on_event(const gearoenix::core::event::Data& event_data) noexcept
     case gearoenix::core::event::Id::ButtonMouse: {
         const auto d = std::get<gearoenix::core::event::button::MouseData>(event_data.data);
         if (d.key == gearoenix::core::event::button::MouseKeyId::Left && 
-            d.action == gearoenix::core::event::button::MouseActionId::Press) {
+            d.action == gearoenix::core::event::button::MouseActionId::Click) {
             const auto ray = cam->create_ray3(d.position[0], d.position[1]);
             auto hit = scn->hit(ray, std::numeric_limits<gearoenix::core::Real>::max());
             if (hit.has_value() && !showing_object_details) {

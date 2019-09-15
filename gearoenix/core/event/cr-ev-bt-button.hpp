@@ -124,6 +124,7 @@ enum struct MouseKeyId : int {
 enum struct MouseActionId : int {
     Press,
     Release,
+    Click,
     DoubleClick,
     TripleClick,
 };

@@ -3,6 +3,8 @@
 #include "cr-ev-listner.hpp"
 #include <functional>
 
+constexpr gearoenix::core::Real CLICK_THRESHOLD = 0.2f;
+
 void gearoenix::core::event::Engine::loop() noexcept
 {
 	state = State::Running;
@@ -86,7 +88,7 @@ void gearoenix::core::event::Engine::remove_listner(Listner* const listner) noex
     }
 }
 
-void gearoenix::core::event::Engine::braodcast(Data event_data) noexcept
+void gearoenix::core::event::Engine::broadcast(Data event_data) noexcept
 {
     std::lock_guard<std::mutex> _l(events_guard);
     events.push_back(event_data);
@@ -108,5 +110,47 @@ void gearoenix::core::event::Engine::set_mouse_movement(const math::Vec2& p) noe
 	Data d;
 	d.source = Id::MovementMouse;
 	d.data = mouse_movement;
-	braodcast(d);
+	broadcast(d);
+
+    for (auto& ap : pressed_mouse_buttons_state) {
+        auto& p = ap.second;
+        auto dt = mouse_movement.now_time - p.start_time;
+
+    }
+}
+
+void gearoenix::core::event::Engine::mouse_button(const button::MouseKeyId k, const button::MouseActionId a)
+{
+    button::MouseData bd = {};
+    bd.action = a;
+    bd.key = k;
+    bd.position = mouse_movement.position;
+    
+    core::event::Data e = {};
+    e.source = core::event::Id::ButtonMouse;
+    e.data = bd;
+    broadcast(e);
+
+    if (a == button::MouseActionId::Press) {
+        auto now = std::chrono::high_resolution_clock::now();
+        auto& p = pressed_mouse_buttons_state[k];
+        p = MouseButtonState{};
+        p.starting = mouse_movement.position;
+        p.previous = mouse_movement.position;
+    }
+    else if (a == button::MouseActionId::Release) {
+        auto pi = pressed_mouse_buttons_state.find(k);
+        if (pi == pressed_mouse_buttons_state.begin()) {
+            auto now = std::chrono::high_resolution_clock::now();
+            auto& p = pi->second;
+            const std::chrono::duration<core::Real> dt = now - p.previous_time;
+            const core::Real fdt = dt.count();
+            if (dt.count() < CLICK_THRESHOLD) {
+                bd.action = button::MouseActionId::Click;
+                e.data = bd;
+                broadcast(e);
+            }
+            pressed_mouse_buttons_state.erase(k);
+        }
+    }
 }
