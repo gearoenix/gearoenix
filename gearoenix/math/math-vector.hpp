@@ -82,6 +82,7 @@ namespace math {
         void operator-=(const Vec3& a) noexcept;
         void operator*=(const Vec3& a) noexcept;
         void operator/=(const Vec3& a) noexcept;
+        void operator*=(core::Real a) noexcept;
         void operator/=(core::Real a) noexcept;
         const core::Real& operator[](unsigned int i) const noexcept;
         core::Real& operator[](unsigned int i) noexcept;

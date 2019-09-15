@@ -372,6 +372,13 @@ void gearoenix::math::Vec3::operator/=(const Vec3& a) noexcept
     vec[2] /= a.vec[2];
 }
 
+void gearoenix::math::Vec3::operator*=(const core::Real a) noexcept
+{
+    vec[0] *= a;
+    vec[1] *= a;
+    vec[2] *= a;
+}
+
 void gearoenix::math::Vec3::operator/=(const core::Real a) noexcept
 {
     const core::Real ia = 1.0f / a;

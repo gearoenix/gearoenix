@@ -54,7 +54,7 @@ void GameApp::translate_camera(const GxVec3& t)
     else if (loc[0] > 110.0f) loc[0] = 110.0f;
     if (loc[1] < -10.0f) loc[1] = -10.0f;
     else if (loc[1] > 60.0f) loc[1] = 60.0f;
-    if (loc[2] < 10.0f) loc[2] = 10.0f;
+    if (loc[2] < 1.5f) loc[2] = 1.5f;
     else if (loc[2] > 50.0f) loc[2] = 50.0f;
     camtrn->set_location(loc);
 }
@@ -127,7 +127,7 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
 
     cam = astmgr->get_camera_manager()->create<GxPersCam>();
     camtrn = std::static_pointer_cast<GxCamTran>(cam->get_transformation());
-    camtrn->look_at(GxVec3(-10.0f, -10.0f, 40.0f), GxVec3(50.0f, 25.0f, 0.0f), GxVec3(0.0f, 0.0f, 1.0f));
+    camtrn->look_at(GxVec3(2.0f, 25.0f, 1.5f), GxVec3(50.0f, 25.0f, 0.0f), GxVec3(0.0f, 0.0f, 1.0f));
     cam->set_far(200.0f);
     scn->add_camera(cam);
 
@@ -231,7 +231,11 @@ GameApp::~GameApp() {
 
 void GameApp::update() noexcept
 {
-    translate_camera(((camtrn->get_z_axis() * -camera_forward) + (camtrn->get_x_axis() * camera_sideward)) * (render_engine->get_delta_time() * 3.0f));
+    auto forward = camtrn->get_z_axis() * -camera_forward;
+    forward[2] = 0.0f;
+    auto flength = forward.length();
+    if (flength > 0.001f) forward /= flength;
+    translate_camera((forward + (camtrn->get_x_axis() * camera_sideward)) * (render_engine->get_delta_time() * 3.0f));
 }
 
 void GameApp::terminate() noexcept
