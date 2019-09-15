@@ -217,8 +217,12 @@ int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_
     }
 
     case SDL_MOUSEWHEEL:
-        // todo
-        // o->core_app->on_scroll((core::Real)event->wheel.y);
+        event.source = core::event::Id::ScrollMouse;
+        event.data = core::event::button::MouseScroll {
+            math::Vec2(
+                static_cast<core::Real>(e->wheel.x),
+                static_cast<core::Real>(e->wheel.y))
+        };
         break;
     case SDL_MOUSEMOTION:
 		o->event_engine->set_mouse_movement(math::Vec2(

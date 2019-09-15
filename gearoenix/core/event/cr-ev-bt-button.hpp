@@ -139,5 +139,9 @@ struct MouseData {
 	math::Vec2 position;
 };
 
+struct MouseScroll {
+    math::Vec2 direction;
+};
+
 }
 #endif

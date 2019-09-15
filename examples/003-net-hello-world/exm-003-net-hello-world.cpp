@@ -39,9 +39,6 @@ using GxMdManager = gearoenix::render::model::Manager;
 using GxMdMesh = gearoenix::render::model::Mesh;
 using GxMesh = gearoenix::render::mesh::Mesh;
 using GxStaticModel = gearoenix::render::model::Static;
-using GxVec2 = gearoenix::math::Vec2;
-using GxVec3 = gearoenix::math::Vec3;
-using GxVec4 = gearoenix::math::Vec4;
 using GxDirLight = gearoenix::render::light::Directional;
 using GxLtManager = gearoenix::render::light::Manager;
 using GxPersCam = gearoenix::render::camera::Perspective;
@@ -49,6 +46,18 @@ using GxTexture = gearoenix::render::texture::Texture;
 using GxTexture2D = gearoenix::render::texture::Texture2D;
 using GxCldSphere = gearoenix::physics::collider::Sphere;
 using GxVertex = gearoenix::math::BasicVertex;
+
+void GameApp::translate_camera(const GxVec3& t)
+{
+    GxVec3 loc = camtrn->get_location() + t;
+    if (loc[0] < -10.0f) loc[0] = -10.0f;
+    else if (loc[0] > 110.0f) loc[0] = 110.0f;
+    if (loc[1] < -10.0f) loc[1] = -10.0f;
+    else if (loc[1] > 60.0f) loc[1] = 60.0f;
+    if (loc[2] < 10.0f) loc[2] = 10.0f;
+    else if (loc[2] > 50.0f) loc[2] = 50.0f;
+    camtrn->set_location(loc);
+}
 
 GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
     : gearoenix::core::Application::Application(sys_app)
@@ -98,7 +107,8 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
 		auto* const event_engine = system_application->get_event_engine();
 		event_engine->add_listner(gearoenix::core::event::Id::ButtonMouse, -1.0f, this);
 		event_engine->add_listner(gearoenix::core::event::Id::ButtonKeyboard, 1.0f, this);
-		event_engine->add_listner(gearoenix::core::event::Id::MovementMouse, 1.0f, this);
+        event_engine->add_listner(gearoenix::core::event::Id::MovementMouse, 1.0f, this);
+        event_engine->add_listner(gearoenix::core::event::Id::ScrollMouse, 1.0f, this);
     });
 
     GxEndCaller<GxGameScene> scncall([endcall](const std::shared_ptr<GxGameScene>&) {});
@@ -221,15 +231,7 @@ GameApp::~GameApp() {
 
 void GameApp::update() noexcept
 {
-	const GxVec3 translate = ((camtrn->get_z_axis() * -camera_forward) + (camtrn->get_x_axis() * camera_sideward)) * (render_engine->get_delta_time() * 3.0f);
-	GxVec3 loc = camtrn->get_location() + translate;
-	if (loc[0] < -10.0f) loc[0] = -10.0f;
-	else if (loc[0] > 110.0f) loc[0] = 110.0f;
-	if (loc[1] < -10.0f) loc[1] = -10.0f;
-	else if (loc[1] > 60.0f) loc[1] = 60.0f;
-	if (loc[2] < 10.0f) loc[2] = 10.0f;
-	else if (loc[2] > 50.0f) loc[2] = 50.0f;
-    camtrn->set_location(loc);
+    translate_camera(((camtrn->get_z_axis() * -camera_forward) + (camtrn->get_x_axis() * camera_sideward)) * (render_engine->get_delta_time() * 3.0f));
 }
 
 void GameApp::terminate() noexcept
@@ -260,7 +262,7 @@ bool GameApp::on_event(const gearoenix::core::event::Data& event_data) noexcept
                 auto& mdll = mdl->get_occlusion_sphere().get_center();
                 auto color = *(mdl->get_meshes().begin()->second->get_material()->get_color());
                 std::wstringstream tl;
-                tl << "{ " << mdll[0] << ", " << mdll[1] << ", " << mdll[2] << " }";
+                tl << "{ x: " << mdll[0] << ", y: " << mdll[1] << ", z: " << mdll[2] << " }";
                 GxEndCallerIgnored call([this] {
                     modal->set_enability(gearoenix::core::State::Set);
                 });
@@ -315,7 +317,9 @@ bool GameApp::on_event(const gearoenix::core::event::Data& event_data) noexcept
 		}
 		break;
 	}
-		break;
+    case gearoenix::core::event::Id::ScrollMouse:
+        translate_camera(camtrn->get_z_axis() * -std::get<gearoenix::core::event::button::MouseScroll>(event_data.data).direction[1]);
+        break;
     default:
         break;
     }

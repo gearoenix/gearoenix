@@ -3,6 +3,7 @@
 #include <gearoenix/core/cr-application.hpp>
 #include <gearoenix/core/cr-types.hpp>
 #include <gearoenix/core/event/cr-ev-listner.hpp>
+#include <gearoenix/math/math-vertex.hpp>
 #include <atomic>
 #include <random>
 
@@ -36,6 +37,9 @@ private:
     using GxTextWdg = gearoenix::render::widget::Text;
     using GxGrPbr = gearoenix::render::graph::tree::Pbr;
 	using GxReal = gearoenix::core::Real;
+    using GxVec2 = gearoenix::math::Vec2;
+    using GxVec3 = gearoenix::math::Vec3;
+    using GxVec4 = gearoenix::math::Vec4;
 
 
 	struct ShelfInfo {
@@ -55,6 +59,8 @@ private:
     std::atomic<bool> camera_locked = false;
 	std::atomic<GxReal> camera_forward = 0.0f;
 	std::atomic<GxReal> camera_sideward = 0.0f;
+
+    void translate_camera(const GxVec3& t);
 
 public:
     /// This function must be like this

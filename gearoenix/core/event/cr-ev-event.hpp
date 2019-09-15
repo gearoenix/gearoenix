@@ -10,7 +10,8 @@ struct Data {
     Id source = Id::None;
     std::variant<
 		button::KeyboardData,
-		button::MouseData,
+        button::MouseData,
+        button::MouseScroll,
 		movement::Data,
         system::WindowSizeChangeData,
         int>

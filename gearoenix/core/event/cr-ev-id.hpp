@@ -5,6 +5,7 @@ enum struct Id: int {
     ButtonMouse,
     ButtonKeyboard,
     MovementMouse,
+    ScrollMouse,
     SystemPause,
     SystemQuit,
     SystemReload,
