@@ -96,7 +96,7 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
         scn->set_enability(true);
         uiscn->set_enability(true);
 		auto* const event_engine = system_application->get_event_engine();
-		event_engine->add_listner(gearoenix::core::event::Id::ButtonMouse, 1.0f, this);
+		event_engine->add_listner(gearoenix::core::event::Id::ButtonMouse, -1.0f, this);
 		event_engine->add_listner(gearoenix::core::event::Id::ButtonKeyboard, 1.0f, this);
 		event_engine->add_listner(gearoenix::core::event::Id::MovementMouse, 1.0f, this);
     });
@@ -208,6 +208,9 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
     modal->add_child(text2);
     modal->set_enability(gearoenix::core::State::Unset);
     modal->get_transformation()->local_scale(0.5f);
+    modal->set_on_close([this]() noexcept {
+        showing_object_details = false;
+    });
     uiscn->add_model(modal);
     uiscn->set_layer(scn->get_layer() + 1.0f);
 }
@@ -246,10 +249,11 @@ bool GameApp::on_event(const gearoenix::core::event::Data& event_data) noexcept
     switch (event_data.source) {
     case gearoenix::core::event::Id::ButtonMouse: {
         const auto d = std::get<gearoenix::core::event::button::MouseData>(event_data.data);
-        if (d.key == gearoenix::core::event::button::MouseKeyId::Left && d.action == gearoenix::core::event::button::MouseActionId::Press) {
+        if (d.key == gearoenix::core::event::button::MouseKeyId::Left && 
+            d.action == gearoenix::core::event::button::MouseActionId::Press) {
             const auto ray = cam->create_ray3(d.position[0], d.position[1]);
             auto hit = scn->hit(ray, std::numeric_limits<gearoenix::core::Real>::max());
-            if (hit.has_value()) {
+            if (hit.has_value() && !showing_object_details) {
                 modal->set_enability(gearoenix::core::State::Unset);
                 auto* cld = hit.value().second;
                 auto* mdl = cld->get_parent();
@@ -262,6 +266,7 @@ bool GameApp::on_event(const gearoenix::core::event::Data& event_data) noexcept
                 });
                 text_location->set_text_color(color[0], color[1], color[2], call);
                 text_location->set_text(tl.str(), call);
+                showing_object_details = true;
             }
         }
 		else if (d.key == gearoenix::core::event::button::MouseKeyId::Right) {

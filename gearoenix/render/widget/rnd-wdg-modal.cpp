@@ -150,5 +150,11 @@ void gearoenix::render::widget::Modal::selected(const math::Vec3&, const std::ve
     if (selected_children.back() == close_mdl) {
         set_enability(core::State::Unset);
         scene->set_models_changed(true);
+        on_close();
     }
+}
+
+void gearoenix::render::widget::Modal::set_on_close(const std::function<void()>& f) noexcept
+{
+    on_close = f;
 }

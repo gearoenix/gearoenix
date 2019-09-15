@@ -1,11 +1,13 @@
 #ifndef GEAROENIX_RENDER_WIDGET_MODAL_HPP
 #define GEAROENIX_RENDER_WIDGET_MODAL_HPP
 #include "rnd-wdg-widget.hpp"
+#include <functional>
 
 namespace gearoenix::render::widget {
 class Modal : public Widget {
 private:
     model::Model* close_mdl = nullptr;
+    std::function<void()> on_close = [] () noexcept {};
 
 public:
     Modal(
@@ -20,6 +22,7 @@ public:
     ~Modal() noexcept;
     void set_scene(scene::Scene* s) noexcept;
     void selected(const math::Vec3& point, const std::vector<model::Model*>& children) noexcept final;
+    void set_on_close(const std::function<void()>& f) noexcept;
 };
 }
 #endif
