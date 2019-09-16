@@ -1,6 +1,7 @@
 #ifndef GEAROENIX_PHYSICS_ENGINE_HPP
 #define GEAROENIX_PHYSICS_ENGINE_HPP
 #include "../core/cr-pool.hpp"
+#include "../core/cr-static.hpp"
 #include "../core/cr-types.hpp"
 #include "../math/math-vector.hpp"
 #include <map>
@@ -34,9 +35,10 @@ namespace system {
 }
 namespace physics {
     namespace animation {
-        class Animation;
+        struct Manager;
     }
     class Engine {
+        GX_GET_UCPTR_PRV(animation::Manager, animation_manager)
     public:
         template <class T, class S>
         using PairedPool = core::OneLoopPool<std::pair<T, S>>;
@@ -77,16 +79,9 @@ namespace physics {
     private:
         system::Application* const sys_app;
         core::sync::KernelWorker* const kernels;
-        /// if animation return true on its apply its gonna be deleted
-        std::map<core::Id, std::shared_ptr<animation::Animation>> animations;
         /// visibility checker
         std::vector<SceneCameraData> kernels_scene_camera_data;
         GatheredSceneCameraData scenes_camera_data;
-
-        std::mutex added_animations_locker;
-        std::vector<std::shared_ptr<animation::Animation>> added_animations;
-        std::mutex removed_animations_locker;
-        std::vector<core::Id> removed_animations;
 
         /// It does followings:
         ///    - Uniform buffer update for scene.
@@ -106,9 +101,6 @@ namespace physics {
     public:
         Engine(system::Application* sysapp, core::sync::KernelWorker* kernels) noexcept;
         ~Engine() noexcept;
-        void add_animation(const std::shared_ptr<animation::Animation>& a) noexcept;
-        void remove_animation(const std::shared_ptr<animation::Animation>& a) noexcept;
-        void remove_animation(core::Id a) noexcept;
         void update() noexcept;
         [[nodiscard]] const GatheredSceneCameraData& get_visible_models() const noexcept;
         [[nodiscard]] GatheredSceneCameraData& get_visible_models() noexcept;

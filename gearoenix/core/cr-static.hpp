@@ -68,28 +68,33 @@ public:                                                 \
     v:                       \
     const t x;               \
 public:                      \
-    t get_##x() const noexcept { return x; }
+    [[nodiscard]] t get_##x() const noexcept { return x; }
 #define GX_GET_CVAL_PRT(t, x) GX_GET_CVAL(protected, t, x)
+
 #define GX_GET_VAL(v, t, x, d) \
     v:                         \
     t x = d;                   \
 public:                        \
     [[nodiscard]] t get_##x() const noexcept { return x; }
+#define GX_GETSET_VAL(v, t, x, d) \
+    GX_GET_VAL(v, t, x, d)        \
+    void set_##x(const t _##x) noexcept { x = _##x; }
+#define GX_GET_VAL_PRT(t, x, d) GX_GET_VAL(protected, t, x, d)
+#define GX_GET_VAL_PRV(t, x, d) GX_GET_VAL(private, t, x, d)
+#define GX_GETSET_VAL_PRT(t, x, d) GX_GETSET_VAL(protected, t, x, d)
+#define GX_GETSET_VAL_PRV(t, x, d) GX_GETSET_VAL(protected, t, x, d)
+
 #define GX_GET_AVAL(v, t, x, d) \
     v:                          \
     std::atomic<t> x = d;       \
 public:                         \
-    t get_##x() const noexcept { return x; }
-#define GX_GETSET_VAL(v, t, x, d) \
-    GX_GET_VAL(v, t, x, d)        \
-    void set_##x(const t _##x) noexcept { x = _##x; }
+    [[nodiscard]] t get_##x() const noexcept { return x; }
 #define GX_GETSET_AVAL(v, t, x, d) \
     GX_GET_AVAL(v, t, x, d)        \
     void set_##x(const t _##x) noexcept { x = _##x; }
-#define GX_GET_VAL_PRT(t, x, d) GX_GET_VAL(protected, t, x, d)
-#define GX_GETSET_VAL_PRT(t, x, d) GX_GETSET_VAL(protected, t, x, d)
 #define GX_GETSET_AVAL_PRT(t, x, d) GX_GETSET_AVAL(protected, t, x, d)
-#define GX_GET_VAL_PRV(t, x, d) GX_GET_VAL(private, t, x, d)
+#define GX_GETSET_AVAL_PRV(t, x, d) GX_GETSET_AVAL(private, t, x, d)
+
 #define GX_COUNT_OF(x) (sizeof(x) / sizeof(x[0]))
 #define GX_IS_ZERO(x) (((x) < (GXPOSEPSILON)) && ((x) > (GXNEGEPSILON)))
 #define GX_IS_NOT_ZERO(x) (((x) > (GXPOSEPSILON)) || ((x) < (GXNEGEPSILON)))

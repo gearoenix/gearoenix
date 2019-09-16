@@ -13,7 +13,7 @@
 #include "../render/scene/rnd-scn-manager.hpp"
 #include "../render/scene/rnd-scn-scene.hpp"
 #include "../system/sys-app.hpp"
-#include "animation/phs-anm-animation.hpp"
+#include "animation/phs-anm-manager.hpp"
 #include <cmath>
 #include <functional>
 #include <utility>
@@ -161,7 +161,8 @@ void gearoenix::physics::Engine::update_002_receiver() noexcept
 }
 
 gearoenix::physics::Engine::Engine(system::Application* const sysapp, core::sync::KernelWorker* const kernels) noexcept
-    : sys_app(sysapp)
+    : animation_manager(new animation::Manager(kernels))
+    , sys_app(sysapp)
     , kernels(kernels)
     , kernels_scene_camera_data(this->kernels->get_threads_count())
 {
@@ -173,31 +174,6 @@ gearoenix::physics::Engine::~Engine() noexcept
 {
     scenes_camera_data.clear();
     kernels_scene_camera_data.clear();
-}
-
-void gearoenix::physics::Engine::add_animation(const std::shared_ptr<animation::Animation>& a) noexcept
-{
-    std::lock_guard<std::mutex> _lg(added_animations_locker);
-#ifdef GX_DEBUG_MODE
-    if (animations.find(a->get_id()) != animations.end())
-        GXUNEXPECTED
-#endif
-    added_animations.push_back(a);
-}
-
-void gearoenix::physics::Engine::remove_animation(const std::shared_ptr<animation::Animation>& a) noexcept
-{
-    remove_animation(a->get_id());
-}
-
-void gearoenix::physics::Engine::remove_animation(core::Id a) noexcept
-{
-    std::lock_guard<std::mutex> _lg(removed_animations_locker);
-#ifdef GX_DEBUG_MODE
-    if (animations.find(a) == animations.end())
-        GXUNEXPECTED
-#endif
-    removed_animations.push_back(a);
 }
 
 void gearoenix::physics::Engine::update() noexcept

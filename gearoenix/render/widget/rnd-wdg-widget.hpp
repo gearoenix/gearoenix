@@ -6,6 +6,7 @@
 namespace gearoenix::render::widget {
 class Widget : public model::Model {
     GX_GET_CVAL_PRT(Type, widget_type)
+    GX_GETSET_AVAL_PRT(bool, sensivity, true)
 protected:
     Widget(
         core::Id my_id,

@@ -1,49 +1,32 @@
+#ifndef GEAROENIX_PHYSICS_ANIMATION_ANIMATION_HPP
+#define GEAROENIX_PHYSICS_ANIMATION_ANIMATION_HPP
+
+#include "../../core/cr-static.hpp"
 #include "../../core/cr-types.hpp"
-#include <atomic>
 #include <chrono>
 #include <functional>
 
-namespace gearoenix {
-namespace math {
-    class Transformable;
-}
-namespace physics {
-    namespace animation {
-        class Animation {
-        public:
-            typedef enum : core::Id {
-                LOOP,
-                ONCE,
-            } Type;
+namespace gearoenix::physics::animation {
+    struct Animation {
+        GX_GETSET_AVAL_PRV(bool, activity, true)
+        GX_GETSET_VAL_PRV(core::Real, duration, 0.0f)
+    private:
+        // seconds from start, delta time
+        std::function<void(core::Real, core::Real)> action;
+        std::function<void(core::Real)> on_delete;
+        const std::chrono::high_resolution_clock::time_point start = std::chrono::high_resolution_clock::now();
 
-        protected:
-            static volatile std::atomic<core::Id> last_id;
-            const core::Id my_id;
-            const Type animation_type;
-            // milliseconds from start, delta time
-            std::function<void(core::Real, core::Real)> action;
-            std::function<void()> on_delete;
-            bool ended = false;
-            bool terminated = false;
-            std::chrono::system_clock::time_point start;
-            std::chrono::system_clock::time_point::duration duration;
-            std::chrono::system_clock::time_point end;
-            Animation(Type animation_type, const std::function<void(core::Real, core::Real)>& action, const std::chrono::milliseconds& duration, std::function<void()> on_delete);
-
-        public:
-            virtual ~Animation();
-            virtual void set_start(const std::chrono::system_clock::time_point& t);
-            virtual void set_end(const std::chrono::system_clock::time_point& t);
-            virtual void set_duration(const std::chrono::system_clock::time_point::duration& d);
-            // true means: delete the animation and animation will not apply anymore
-            // false means: animation is working and active
-            virtual bool apply(const std::chrono::system_clock::time_point& now, const core::Real delta_millisecond);
-            core::Id get_id() const;
-            Type get_type() const;
-            bool is_ended() const;
-            void set_on_delete(std::function<void()> f);
-            void terminate();
-        };
-    }
+    public:
+        Animation(
+            const std::function<void(core::Real, core::Real)>& action, 
+            core::Real duration,
+            const std::function<void(core::Real)>& on_delete = [](core::Real) noexcept {}) noexcept;
+        ~Animation() noexcept;
+        Animation(const Animation& other) noexcept = delete;
+        void operator=(const Animation& other) noexcept = delete;
+        // true means: delete the animation and animation will not apply anymore
+        // false means: animation is working and active
+        bool apply(const std::chrono::high_resolution_clock::time_point& now, core::Real delta_seconds) noexcept;
+    };
 }
-}
+#endif

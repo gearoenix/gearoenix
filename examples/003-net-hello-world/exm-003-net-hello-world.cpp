@@ -109,6 +109,7 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
 		event_engine->add_listner(gearoenix::core::event::Id::ButtonKeyboard, 1.0f, this);
         event_engine->add_listner(gearoenix::core::event::Id::MovementMouse, 1.0f, this);
         event_engine->add_listner(gearoenix::core::event::Id::ScrollMouse, 1.0f, this);
+        event_engine->add_listner(gearoenix::core::event::Id::GestureDrag, 1.0f, this);
     });
 
     GxEndCaller<GxGameScene> scncall([endcall](const std::shared_ptr<GxGameScene>&) {});
@@ -253,7 +254,8 @@ void GameApp::terminate() noexcept
 bool GameApp::on_event(const gearoenix::core::event::Data& event_data) noexcept
 {
     switch (event_data.source) {
-    case gearoenix::core::event::Id::ButtonMouse: {
+    case gearoenix::core::event::Id::ButtonMouse: 
+    {
         const auto d = std::get<gearoenix::core::event::button::MouseData>(event_data.data);
         if (d.key == gearoenix::core::event::button::MouseKeyId::Left && 
             d.action == gearoenix::core::event::button::MouseActionId::Click) {
@@ -288,12 +290,6 @@ bool GameApp::on_event(const gearoenix::core::event::Data& event_data) noexcept
     }
 	case gearoenix::core::event::Id::MovementMouse:
 	{
-		const auto d = std::get<gearoenix::core::event::movement::Base>(event_data.data);
-		if (camera_locked) {
-			auto dir = d.delta_position;
-			camtrn->local_x_rotate(dir[1]);
-			camtrn->global_rotate(dir[0], GxVec3(0.0f, 0.0f, 1.0f));
-		}
 		break;
 	}
 	case gearoenix::core::event::Id::ButtonKeyboard:
@@ -322,8 +318,18 @@ bool GameApp::on_event(const gearoenix::core::event::Data& event_data) noexcept
 		break;
 	}
     case gearoenix::core::event::Id::ScrollMouse:
+    {
         translate_camera(camtrn->get_z_axis() * -std::get<gearoenix::core::event::button::MouseScroll>(event_data.data).direction[1]);
         break;
+    }
+    case gearoenix::core::event::Id::GestureDrag:
+    {
+        const auto d = std::get<gearoenix::core::event::gesture::Drag>(event_data.data);
+        const auto& v = d.delta_previous_position;
+        camtrn->local_x_rotate(v[1]);
+        camtrn->global_rotate(v[0], GxVec3(0.0f, 0.0f, 1.0f));
+        break;
+    }
     default:
         break;
     }
