@@ -21,7 +21,7 @@ public:
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
     ~Modal() noexcept;
     void set_scene(scene::Scene* s) noexcept;
-    void selected(const math::Vec3& point, const std::vector<model::Model*>& children) noexcept final;
+    void selected_on(const math::Vec3& point, const std::vector<model::Model*>& children) noexcept final;
     void set_on_close(const std::function<void()>& f) noexcept;
 };
 }

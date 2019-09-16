@@ -52,10 +52,26 @@ bool gearoenix::render::widget::Widget::get_dynamicity() const noexcept
     return false;
 }
 
-void gearoenix::render::widget::Widget::selected(const math::Vec3&, const std::vector<model::Model*>&) noexcept
+void gearoenix::render::widget::Widget::selected(const math::Vec3&) noexcept
 {
 }
 
-void gearoenix::render::widget::Widget::selected(const math::Vec3&) noexcept
+void gearoenix::render::widget::Widget::selected_on(const math::Vec3&, const std::vector<model::Model*>&) noexcept
+{
+}
+
+void gearoenix::render::widget::Widget::select_cancelled(const math::Vec3&) noexcept
+{
+}
+
+void gearoenix::render::widget::Widget::select_released(const math::Vec3&) noexcept
+{
+}
+
+void gearoenix::render::widget::Widget::dragged(const math::Vec3&) noexcept
+{
+}
+
+void gearoenix::render::widget::Widget::dragged_on(const math::Vec3&, const std::vector<model::Model*>&) noexcept
 {
 }
