@@ -93,7 +93,7 @@ bool gearoenix::render::scene::Ui::on_event(const core::event::Data& d) noexcept
 					[this](widget::Widget* const wdg, const math::Vec3& p) noexcept {
 						if (selected_widget == wdg) selected_widget->select_released(p);
 					},
-					[this](widget::Widget* const wdg, const math::Vec3& p, const std::vector<model::Model*>& children) noexcept {
+					[this](widget::Widget* const wdg, const math::Vec3& p, const std::vector<model::Model*>&) noexcept {
 						if (selected_widget == wdg) selected_widget->select_released(p);
 					});
 				selected_widget = nullptr;

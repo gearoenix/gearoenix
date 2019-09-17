@@ -4,9 +4,10 @@
 #include <functional>
 
 namespace gearoenix::render::widget {
+class Button;
 class Modal : public Widget {
 private:
-    model::Model* close_mdl = nullptr;
+    Button* close_mdl = nullptr;
     std::function<void()> on_close = [] () noexcept {};
 
 public:

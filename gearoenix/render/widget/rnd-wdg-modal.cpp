@@ -6,8 +6,9 @@
 #include "../material/rnd-mat-material.hpp"
 #include "../mesh/rnd-msh-manager.hpp"
 #include "../model/rnd-mdl-manager.hpp"
-#include "../model/rnd-mdl-static.hpp"
+#include "../model/rnd-mdl-dynamic.hpp"
 #include "../scene/rnd-scn-ui.hpp"
+#include "rnd-wdg-button.hpp"
 
 gearoenix::render::widget::Modal::Modal(const core::Id my_id, system::stream::Stream* const s, engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : Widget(my_id, Type::Modal, s, e, c)
@@ -17,7 +18,8 @@ gearoenix::render::widget::Modal::Modal(const core::Id my_id, system::stream::St
 gearoenix::render::widget::Modal::Modal(const core::Id my_id, engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : Widget(my_id, Type::Modal, e, c)
 {
-    core::sync::EndCaller<model::Static> mdlcall([c](std::shared_ptr<model::Static>) {});
+    core::sync::EndCaller<Button> btncall([c](std::shared_ptr<Button>) {});
+    core::sync::EndCaller<model::Dynamic> mdlcall([c](std::shared_ptr<model::Dynamic>) {});
     core::sync::EndCaller<mesh::Mesh> mshcall([c](std::shared_ptr<mesh::Mesh>) {});
     auto* astmgr = e->get_system_application()->get_asset_manager();
     auto& mdlmgr = astmgr->get_model_manager();
@@ -116,14 +118,14 @@ gearoenix::render::widget::Modal::Modal(const core::Id my_id, engine::Engine* co
     {
         const std::shared_ptr<material::Material> mat(new material::Material(e, c));
         mat->set_color(0.02f, 0.02f, 0.02f, c);
-        const auto mdl = mdlmgr->create<model::Static>(mdlcall);
+        const auto mdl = mdlmgr->create<model::Dynamic>(mdlcall);
         mdl->add_mesh(std::make_shared<model::Mesh>(plate_mesh, mat));
         add_child(mdl);
     }
     {
         const std::shared_ptr<material::Material> mat(new material::Material(e, c));
         mat->set_color(0.9999f, 0.999f, 0.999f, c);
-        const auto mdl = mdlmgr->create<model::Static>(mdlcall);
+        const auto mdl = mdlmgr->create<Button>(btncall);
         mdl->add_mesh(std::make_shared<model::Mesh>(close_mesh, mat));
         auto* tran = mdl->get_transformation();
         const core::Real scale = 0.05f;
@@ -147,11 +149,11 @@ void gearoenix::render::widget::Modal::set_scene(scene::Scene* const s) noexcept
 
 void gearoenix::render::widget::Modal::selected_on(const math::Vec3&, const std::vector<model::Model*>& selected_children) noexcept
 {
-    if (selected_children.back() == close_mdl) {
+    /*if (selected_children.back() == close_mdl) {
         set_enability(core::State::Unset);
         scene->set_models_changed(true);
         on_close();
-    }
+    }*/
 }
 
 void gearoenix::render::widget::Modal::set_on_close(const std::function<void()>& f) noexcept

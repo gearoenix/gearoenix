@@ -49,7 +49,7 @@ std::shared_ptr<gearoenix::render::widget::Widget> gearoenix::render::widget::Wi
 
 bool gearoenix::render::widget::Widget::get_dynamicity() const noexcept
 {
-    return false;
+    return true;
 }
 
 void gearoenix::render::widget::Widget::selected(const math::Vec3&) noexcept

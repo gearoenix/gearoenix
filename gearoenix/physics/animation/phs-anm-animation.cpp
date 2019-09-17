@@ -14,6 +14,7 @@ gearoenix::physics::animation::Animation::Animation(
 
 gearoenix::physics::animation::Animation::~Animation()
 {
+    if (!activity) return;
     std::chrono::duration<core::Real> dt(std::chrono::high_resolution_clock::now() - start);
     on_delete(dt.count());
 }
