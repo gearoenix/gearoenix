@@ -221,6 +221,7 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
     modal->get_transformation()->local_scale(0.5f);
     modal->set_on_close([this]() noexcept {
         showing_object_details = false;
+        modal->set_enability(gearoenix::core::State::Unset);
     });
     uiscn->add_model(modal);
     uiscn->set_layer(scn->get_layer() + 1.0f);
@@ -257,35 +258,24 @@ bool GameApp::on_event(const gearoenix::core::event::Data& event_data) noexcept
     case gearoenix::core::event::Id::ButtonMouse: 
     {
         const auto d = std::get<gearoenix::core::event::button::MouseData>(event_data.data);
-        if (d.key == gearoenix::core::event::button::MouseKeyId::Left && 
-            d.action == gearoenix::core::event::button::MouseActionId::Click) {
-            const auto ray = cam->create_ray3(d.position[0], d.position[1]);
-            auto hit = scn->hit(ray, std::numeric_limits<gearoenix::core::Real>::max());
-            if (hit.has_value() && !showing_object_details) {
-                modal->set_enability(gearoenix::core::State::Unset);
-                auto* cld = hit.value().second;
-                auto* mdl = cld->get_parent();
-                auto& mdll = mdl->get_occlusion_sphere().get_center();
-                auto color = *(mdl->get_meshes().begin()->second->get_material()->get_color());
-                std::wstringstream tl;
-                tl << "{ x: " << mdll[0] << ", y: " << mdll[1] << ", z: " << mdll[2] << " }";
-                GxEndCallerIgnored call([this] {
+        if (d.key == gearoenix::core::event::button::MouseKeyId::Left) {
+            if (d.action == gearoenix::core::event::button::MouseActionId::Click) {
+                const auto ray = cam->create_ray3(d.position[0], d.position[1]);
+                auto hit = scn->hit(ray, std::numeric_limits<gearoenix::core::Real>::max());
+                if (hit.has_value() && !showing_object_details.exchange(true)) {
+                    auto* cld = hit.value().second;
+                    auto* mdl = cld->get_parent();
+                    auto& mdll = mdl->get_occlusion_sphere().get_center();
+                    auto color = *(mdl->get_meshes().begin()->second->get_material()->get_color());
+                    std::wstringstream tl;
+                    tl << "{ x: " << mdll[0] << ", y: " << mdll[1] << ", z: " << mdll[2] << " }";
+                    const GxEndCallerIgnored call([this] {});
+                    text_location->set_text_color(color[0], color[1], color[2], call);
+                    text_location->set_text(tl.str(), call);
                     modal->set_enability(gearoenix::core::State::Set);
-                });
-                text_location->set_text_color(color[0], color[1], color[2], call);
-                text_location->set_text(tl.str(), call);
-                showing_object_details = true;
+                }
             }
         }
-		else if (d.key == gearoenix::core::event::button::MouseKeyId::Right) {
-			if (d.action == gearoenix::core::event::button::MouseActionId::Press)
-			{
-				camera_locked = true;
-			}
-			else {
-				camera_locked = false;
-			}
-		}
         break;
     }
 	case gearoenix::core::event::Id::MovementMouse:
@@ -319,16 +309,19 @@ bool GameApp::on_event(const gearoenix::core::event::Data& event_data) noexcept
 	}
     case gearoenix::core::event::Id::ScrollMouse:
     {
-        translate_camera(camtrn->get_z_axis() * -std::get<gearoenix::core::event::button::MouseScroll>(event_data.data).direction[1]);
+        if(!showing_object_details) 
+            translate_camera(camtrn->get_z_axis() * -std::get<gearoenix::core::event::button::MouseScroll>(event_data.data).direction[1]);
         break;
     }
     case gearoenix::core::event::Id::GestureDrag:
     {
-        const auto d = std::get<gearoenix::core::event::gesture::Drag>(event_data.data);
-        const auto& v = d.delta_previous_position;
-        camtrn->local_x_rotate(v[1]);
-        camtrn->global_rotate(v[0], GxVec3(0.0f, 0.0f, 1.0f));
-        break;
+        if (!showing_object_details) {
+            const auto d = std::get<gearoenix::core::event::gesture::Drag>(event_data.data);
+            const auto& v = d.delta_previous_position;
+            camtrn->local_x_rotate(v[1]);
+            camtrn->global_rotate(v[0], GxVec3(0.0f, 0.0f, 1.0f));
+            break;
+        }
     }
     default:
         break;

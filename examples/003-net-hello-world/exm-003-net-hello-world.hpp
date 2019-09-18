@@ -56,7 +56,6 @@ private:
     std::shared_ptr<GxTextWdg> text_location;
     std::unique_ptr<GxGrPbr> render_tree;
     std::atomic<bool> showing_object_details = false;
-    std::atomic<bool> camera_locked = false;
 	std::atomic<GxReal> camera_forward = 0.0f;
 	std::atomic<GxReal> camera_sideward = 0.0f;
 

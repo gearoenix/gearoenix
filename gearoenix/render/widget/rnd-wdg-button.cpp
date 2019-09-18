@@ -10,7 +10,7 @@
 #include "../scene/rnd-scn-scene.hpp"
 
 constexpr gearoenix::core::Real PRESSED_SIZE = 0.75f;
-constexpr gearoenix::core::Real ANIMATION_DURATION = 0.3f;
+constexpr gearoenix::core::Real ANIMATION_DURATION = 0.1f;
 
 gearoenix::render::widget::Button::Button(
     const core::Id my_id,
@@ -42,18 +42,16 @@ void gearoenix::render::widget::Button::selected(const math::Vec3&) noexcept
     const auto a = std::make_shared<physics::animation::Animation>(
         [this, myself] (const core::Real from_start, const core::Real) noexcept {
             const auto s = 1.0f - (1.0f - PRESSED_SIZE) * (from_start / ANIMATION_DURATION);
-            transformation->local_scale(s / current_scale);
-            current_scale = s;
+            transformation->local_scale(s / current_scale.exchange(s));
         }, ANIMATION_DURATION,
         [this](const core::Real) noexcept {
-            transformation->local_scale(PRESSED_SIZE / current_scale);
-            current_scale = PRESSED_SIZE;
+            transformation->local_scale(PRESSED_SIZE / current_scale.exchange(PRESSED_SIZE));
         });
     e->get_physics_engine()->get_animation_manager()->add(a);
     animation = a;
 }
 
-void gearoenix::render::widget::Button::select_cancelled(const math::Vec3&) noexcept
+void gearoenix::render::widget::Button::select_cancelled() noexcept
 {
     if (auto a = animation.lock()) a->set_activity(false);
     auto myfun = core::sync::EndCaller<model::Model>([](const std::shared_ptr<model::Model>&) {});
@@ -61,20 +59,18 @@ void gearoenix::render::widget::Button::select_cancelled(const math::Vec3&) noex
     const auto a = std::make_shared<physics::animation::Animation>(
         [this, myself](const core::Real from_start, const core::Real) noexcept {
             const auto s = PRESSED_SIZE + (1.0f - PRESSED_SIZE) * (from_start / ANIMATION_DURATION);
-            transformation->local_scale(s / current_scale);
-            current_scale = s;
+            transformation->local_scale(s / current_scale.exchange(s));
         }, ANIMATION_DURATION,
         [this](const core::Real) noexcept {
-            transformation->local_scale(1.0f / current_scale);
-            current_scale = 1.0f;
+            transformation->local_scale(1.0f / current_scale.exchange(1.0));
         });
     e->get_physics_engine()->get_animation_manager()->add(a);
     animation = a;
 }
 
-void gearoenix::render::widget::Button::select_released(const math::Vec3& p) noexcept
+void gearoenix::render::widget::Button::select_released(const math::Vec3&) noexcept
 {
-    select_cancelled(p);
+    select_cancelled();
     on_click();
 }
 

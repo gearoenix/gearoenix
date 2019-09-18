@@ -7,7 +7,7 @@ namespace gearoenix::render::widget {
 class Button;
 class Modal : public Widget {
 private:
-    Button* close_mdl = nullptr;
+    std::shared_ptr<Button> close_mdl;
     std::function<void()> on_close = [] () noexcept {};
 
 public:
@@ -22,7 +22,6 @@ public:
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
     ~Modal() noexcept;
     void set_scene(scene::Scene* s) noexcept;
-    void selected_on(const math::Vec3& point, const std::vector<model::Model*>& children) noexcept final;
     void set_on_close(const std::function<void()>& f) noexcept;
 };
 }

@@ -10,7 +10,7 @@ namespace gearoenix::render::widget {
         GX_GETSET_AVAL_PRT(core::Real, current_scale, 1.0f)
     protected:
         std::weak_ptr<physics::animation::Animation> animation;
-        std::function<void()> on_click;
+        std::function<void()> on_click = []{};
 
     public:
         Button(
@@ -24,7 +24,7 @@ namespace gearoenix::render::widget {
             const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
         ~Button() noexcept;
         void selected(const math::Vec3& point) noexcept final;
-        void select_cancelled(const math::Vec3& point) noexcept final;
+        void select_cancelled() noexcept final;
         void select_released(const math::Vec3& point) noexcept final;
         void set_on_click(const std::function<void()>& on_click) noexcept;
     };

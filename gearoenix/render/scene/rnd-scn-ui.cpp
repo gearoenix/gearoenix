@@ -43,7 +43,8 @@ bool gearoenix::render::scene::Ui::on_event(const core::event::Data& d) noexcept
 		const core::Real x,
 		const core::Real y,
 		const std::function<void(widget::Widget* const, const math::Vec3&)> &f1,
-		const std::function<void(widget::Widget* const, const math::Vec3&, const std::vector<model::Model*>&)> &f2) noexcept {
+		const std::function<void(widget::Widget* const, const math::Vec3&, const std::vector<model::Model*>&)> &f2,
+        const std::function<void()>& f3) noexcept {
 
 		const auto ray = cameras.begin()->second->create_ray3(x, y);
 		auto h = hit(ray, std::numeric_limits<gearoenix::core::Real>::max());
@@ -67,7 +68,10 @@ bool gearoenix::render::scene::Ui::on_event(const core::event::Data& d) noexcept
 					children.push_back(parent);
 				}
 			}
-		}
+        }
+        else {
+            f3();
+        }
 	};
 
 	switch (d.source) {
@@ -85,7 +89,8 @@ bool gearoenix::render::scene::Ui::on_event(const core::event::Data& d) noexcept
 					[this](widget::Widget* const wdg, const math::Vec3& p, const std::vector<model::Model*>& children) noexcept {
 						wdg->selected_on(p, children);
 						if (selected_widget == nullptr) selected_widget = wdg;
-					});
+					},
+                    []() noexcept {});
 			}
 			else if (data.action == core::event::button::MouseActionId::Release) {
 				find_hited_widgets(
@@ -95,7 +100,8 @@ bool gearoenix::render::scene::Ui::on_event(const core::event::Data& d) noexcept
 					},
 					[this](widget::Widget* const wdg, const math::Vec3& p, const std::vector<model::Model*>&) noexcept {
 						if (selected_widget == wdg) selected_widget->select_released(p);
-					});
+					},
+                    []() noexcept {});
 				selected_widget = nullptr;
 			}
 		break;
@@ -112,7 +118,7 @@ bool gearoenix::render::scene::Ui::on_event(const core::event::Data& d) noexcept
 					selected_widget->dragged(p);
 				}
 				else if (nullptr != selected_widget) {
-					selected_widget->select_cancelled(p);
+					selected_widget->select_cancelled();
 					selected_widget = nullptr;
 				}
 			},
@@ -123,10 +129,16 @@ bool gearoenix::render::scene::Ui::on_event(const core::event::Data& d) noexcept
 					selected_widget->dragged_on(p, children);
 				}
 				else if (nullptr != selected_widget) {
-					selected_widget->select_cancelled(p);
+					selected_widget->select_cancelled();
 					selected_widget = nullptr;
 				}
-			});
+			},
+            [&]() noexcept {
+                if (selected_widget != nullptr) {
+                    selected_widget->select_cancelled();
+                    selected_widget = nullptr;
+                }
+            });
 		break;
 	}
 	default:

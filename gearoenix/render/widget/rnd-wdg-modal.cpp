@@ -125,16 +125,16 @@ gearoenix::render::widget::Modal::Modal(const core::Id my_id, engine::Engine* co
     {
         const std::shared_ptr<material::Material> mat(new material::Material(e, c));
         mat->set_color(0.9999f, 0.999f, 0.999f, c);
-        const auto mdl = mdlmgr->create<Button>(btncall);
-        mdl->add_mesh(std::make_shared<model::Mesh>(close_mesh, mat));
-        auto* tran = mdl->get_transformation();
+        close_mdl = mdlmgr->create<Button>(btncall);
+        close_mdl->add_mesh(std::make_shared<model::Mesh>(close_mesh, mat));
+        auto* tran = close_mdl->get_transformation();
         const core::Real scale = 0.05f;
         const math::Vec3 position(0.9f, 0.9f, 0.1f);
         tran->local_scale(scale);
         tran->set_location(position);
-        mdl->set_collider(std::make_unique<physics::collider::Aabb>(position + scale, position - scale));
-        add_child(mdl);
-        close_mdl = mdl.get();
+        close_mdl->set_collider(std::make_unique<physics::collider::Aabb>(position + scale, position - scale));
+        add_child(close_mdl);
+        close_mdl->set_on_click([this] { on_close(); });
     }
 }
 
@@ -145,15 +145,6 @@ gearoenix::render::widget::Modal::~Modal() noexcept
 void gearoenix::render::widget::Modal::set_scene(scene::Scene* const s) noexcept
 {
     Widget::set_scene(s);
-}
-
-void gearoenix::render::widget::Modal::selected_on(const math::Vec3&, const std::vector<model::Model*>& selected_children) noexcept
-{
-    /*if (selected_children.back() == close_mdl) {
-        set_enability(core::State::Unset);
-        scene->set_models_changed(true);
-        on_close();
-    }*/
 }
 
 void gearoenix::render::widget::Modal::set_on_close(const std::function<void()>& f) noexcept
