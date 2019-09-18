@@ -27,8 +27,8 @@ public:
         engine::Engine* e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
     ~Text() noexcept final;
-    void set_text(const std::wstring& t, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c = core::sync::EndCaller<core::sync::EndCallerIgnore>([] {})) noexcept;
-    void set_text_color(core::Real red, core::Real green, core::Real blue, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c = core::sync::EndCaller<core::sync::EndCallerIgnore>([] {})) noexcept;
+    void set_text(const std::wstring& t, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+    void set_text_color(core::Real red, core::Real green, core::Real blue, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
 };
 }
 #endif

@@ -24,7 +24,7 @@ public:
     const math::Vec3& get_location() const noexcept final;
     //void get_location(math::Vec3& l) const noexcept final;
     void set_location(const math::Vec3& l) noexcept final;
-    //void translate(const math::Vec3& t) noexcept override final;
+    void translate(const math::Vec3& t) noexcept final;
     //void local_x_translate(const core::Real t) noexcept override final;
     //void local_y_translate(const core::Real t) noexcept override final;
     //void local_z_translate(const core::Real t) noexcept override final;

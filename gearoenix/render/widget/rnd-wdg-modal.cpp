@@ -132,7 +132,6 @@ gearoenix::render::widget::Modal::Modal(const core::Id my_id, engine::Engine* co
         const math::Vec3 position(0.9f, 0.9f, 0.1f);
         tran->local_scale(scale);
         tran->set_location(position);
-        close_mdl->set_collider(std::make_unique<physics::collider::Aabb>(position + scale, position - scale));
         add_child(close_mdl);
         close_mdl->set_on_click([this] { on_close(); });
     }

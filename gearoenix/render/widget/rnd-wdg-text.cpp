@@ -39,7 +39,7 @@ gearoenix::render::widget::Text::Text(
     core::sync::EndCaller<mesh::Mesh> mend([c](std::shared_ptr<mesh::Mesh>) {});
     auto msh = astmgr->get_mesh_manager()->create_plate(mend);
     add_mesh(std::make_shared<model::Mesh>(msh, mat));
-    set_text(text);
+    set_text(text, c);
 }
 
 gearoenix::render::widget::Text::Text(
@@ -60,7 +60,7 @@ gearoenix::render::widget::Text::Text(
     auto msh = astmgr->get_mesh_manager()->create_plate(mend);
     text_mesh_id = msh->get_asset_id();
     add_mesh(std::make_shared<model::Mesh>(msh, mat));
-    set_text(text);
+    set_text(text, c);
 }
 
 gearoenix::render::widget::Text::~Text() noexcept {}

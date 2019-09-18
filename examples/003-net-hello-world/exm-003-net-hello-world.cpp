@@ -25,6 +25,7 @@
 #include <gearoenix/render/texture/rnd-txt-texture-2d.hpp>
 #include <gearoenix/render/widget/rnd-wdg-modal.hpp>
 #include <gearoenix/render/widget/rnd-wdg-text.hpp>
+#include <gearoenix/render/widget/rnd-wdg-button.hpp>
 #include <gearoenix/system/sys-app.hpp>
 #include <sstream>
 
@@ -118,7 +119,8 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
     GxEndCaller<GxStaticModel> mdlcall([endcall](const std::shared_ptr<GxStaticModel>&) {});
     GxEndCaller<GxModal> mdacall([endcall](const std::shared_ptr<GxModal>&) {});
 	GxEndCaller<GxTextWdg> txwcall([endcall](const std::shared_ptr<GxTextWdg>&) {});
-	GxEndCaller<GxTexture> txtcall([endcall](const std::shared_ptr<GxTexture>&) {});
+    GxEndCaller<GxTexture> txtcall([endcall](const std::shared_ptr<GxTexture>&) {});
+    GxEndCaller<GxButton> btncall([endcall](const std::shared_ptr<GxButton>&) {});
 
     render_tree = std::make_unique<GxGrPbr>(render_engine, endcall);
     render_engine->set_render_tree(render_tree.get());
@@ -199,30 +201,52 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
 
     modal = mdlmgr->create<GxModal>(mdacall);
     auto text1 = mdlmgr->create<GxTextWdg>(txwcall);
-    text1->set_text(L"Object Location");
+    text1->set_text(L"Object Location", endcall);
     auto* const tx1tran = text1->get_transformation();
     tx1tran->local_scale(0.1f);
     tx1tran->set_location(GxVec3(0.0f, 0.25f, 0.1f));
     modal->add_child(text1);
     text_location = mdlmgr->create<GxTextWdg>(txwcall);
-    text_location->set_text(L"{ 0.00, 0.00, 0.00 }");
-    text_location->set_text_color(0.777f, 0.222f, 0.333f);
+    text_location->set_text(L"{ 0.00, 0.00, 0.00 }", endcall);
+    text_location->set_text_color(0.777f, 0.222f, 0.333f, endcall);
     auto* const text_location_tran = text_location->get_transformation();
     text_location_tran->local_scale(0.08f);
     text_location_tran->set_location(GxVec3(0.0f, -0.35f, 0.1f));
     modal->add_child(text_location);
     auto text2 = mdlmgr->create<GxTextWdg>(txwcall);
-    text2->set_text(L"& Object Color");
+    text2->set_text(L"& Object Color", endcall);
     auto* const tx2tran = text2->get_transformation();
     tx2tran->local_scale(0.1f);
     tx2tran->set_location(GxVec3(0.0f, -0.0f, 0.1f));
     modal->add_child(text2);
+
+    look_at_button = mdlmgr->create<GxButton>(btncall);
+    auto* const look_at_button_tran = look_at_button->get_transformation();
+    look_at_button_tran->local_scale(0.1f);
+    look_at_button_tran->local_x_scale(4.0f);
+    look_at_button_tran->set_location(GxVec3(-0.5f, -0.8f, 0.1f));
+    
+    auto look_at_text = mdlmgr->create<GxTextWdg>(txwcall);
+    look_at_text->set_text(L"Look At Object", endcall);
+    auto* const look_at_text_tran = look_at_text->get_transformation();
+    look_at_text_tran->local_scale(0.06f);
+    look_at_text_tran->set_location(GxVec3(-0.5f, -0.815f, 0.2f));
+    look_at_button->add_child(look_at_text);
+
+    const auto plate_mesh = mshmgr->create_plate(mshcall);
+    const std::shared_ptr<GxMaterial> btnmat(new GxMaterial(render_engine, endcall));
+    btnmat->set_color(0.9f, 0.075f, 0.05f, endcall);
+    look_at_button->add_mesh(std::make_shared<GxMdMesh>(plate_mesh, btnmat));
+
+    modal->add_child(look_at_button);
+
     modal->set_enability(gearoenix::core::State::Unset);
     modal->get_transformation()->local_scale(0.5f);
     modal->set_on_close([this]() noexcept {
         showing_object_details = false;
         modal->set_enability(gearoenix::core::State::Unset);
     });
+
     uiscn->add_model(modal);
     uiscn->set_layer(scn->get_layer() + 1.0f);
 }

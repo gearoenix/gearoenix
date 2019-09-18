@@ -22,6 +22,7 @@ class Ui;
 }
 
 namespace gearoenix::render::widget {
+class Button;
 class Modal;
 class Text;
 }
@@ -34,6 +35,7 @@ private:
     using GxCam = gearoenix::render::camera::Camera;
     using GxCamTran = gearoenix::render::camera::Transformation;
     using GxModal = gearoenix::render::widget::Modal;
+    using GxButton = gearoenix::render::widget::Button;
     using GxTextWdg = gearoenix::render::widget::Text;
     using GxGrPbr = gearoenix::render::graph::tree::Pbr;
 	using GxReal = gearoenix::core::Real;
@@ -53,6 +55,7 @@ private:
     std::shared_ptr<GxCamTran> camtrn;
     std::shared_ptr<GxCam> cam;
     std::shared_ptr<GxModal> modal;
+    std::shared_ptr<GxButton> look_at_button;
     std::shared_ptr<GxTextWdg> text_location;
     std::unique_ptr<GxGrPbr> render_tree;
     std::atomic<bool> showing_object_details = false;

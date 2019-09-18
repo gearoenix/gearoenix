@@ -35,5 +35,5 @@ void gearoenix::physics::collider::Collider::local_scale(const core::Real s) noe
 
 void gearoenix::physics::collider::Collider::local_x_scale(const core::Real s) noexcept
 {
-    box.set_diameter(box.get_diameter() * math::Vec3(s, 0.0f, 0.0f));
+    box.set_diameter(box.get_diameter() * math::Vec3(s, 1.0f, 1.0f));
 }

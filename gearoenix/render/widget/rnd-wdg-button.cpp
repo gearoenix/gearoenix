@@ -4,6 +4,7 @@
 #include "../../physics/animation/phs-anm-animation.hpp"
 #include "../../physics/phs-engine.hpp"
 #include "../../physics/animation/phs-anm-manager.hpp"
+#include "../../physics/collider/phs-cld-aabb.hpp"
 #include "../../system/sys-app.hpp"
 #include "../engine/rnd-eng-engine.hpp"
 #include "../model/rnd-mdl-manager.hpp"
@@ -19,6 +20,7 @@ gearoenix::render::widget::Button::Button(
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : Widget(my_id, Type::Button, f, e, c)
 {
+    set_collider(std::make_unique<physics::collider::Aabb>(math::Vec3(1.0f, 1.0f, 0.001f), math::Vec3(-1.0f, -1.0f, -0.001f)));
 }
 
 gearoenix::render::widget::Button::Button(
@@ -27,6 +29,7 @@ gearoenix::render::widget::Button::Button(
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : Widget(my_id, Type::Button, e, c)
 {
+    set_collider(std::make_unique<physics::collider::Aabb>(math::Vec3(1.0f, 1.0f, 0.001f), math::Vec3(-1.0f, -1.0f, -0.001f)));
 }
 
 gearoenix::render::widget::Button::~Button() noexcept

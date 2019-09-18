@@ -24,9 +24,14 @@ void gearoenix::render::model::Transformation::set_location(const math::Vec3& l)
     auto* const collider = parent->get_collider();
     if (nullptr != collider)
         collider->set_location(l);
-    auto& children = parent->get_children();
+    auto & children = parent->get_children();
     for (auto& c : children)
         c.second->get_transformation()->translate(trans);
+}
+
+void gearoenix::render::model::Transformation::translate(const math::Vec3& l) noexcept
+{
+    set_location(get_location() + l);
 }
 
 void gearoenix::render::model::Transformation::local_scale(const core::Real s) noexcept
