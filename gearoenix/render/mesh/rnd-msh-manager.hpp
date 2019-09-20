@@ -21,6 +21,7 @@ namespace render {
             core::cache::File<Mesh> cache;
             std::weak_ptr<Mesh> icosphere;
             std::weak_ptr<Mesh> plate;
+            std::weak_ptr<Mesh> cube;
 
         public:
             Manager(system::stream::Stream* s, engine::Engine* e) noexcept;
@@ -28,6 +29,7 @@ namespace render {
             std::shared_ptr<Mesh> get_gx3d(core::Id id, core::sync::EndCaller<Mesh>& c) noexcept;
             std::shared_ptr<Mesh> create_icosphere(core::sync::EndCaller<Mesh>& c) noexcept;
             std::shared_ptr<Mesh> create_plate(core::sync::EndCaller<Mesh>& c) noexcept;
+            std::shared_ptr<Mesh> create_cube(core::sync::EndCaller<Mesh>& c) noexcept;
             std::shared_ptr<Mesh> create(std::vector<math::BasicVertex> vertices, std::vector<std::uint32_t> indices, core::Real occlusion_radius, core::sync::EndCaller<Mesh>& c) noexcept;
             std::shared_ptr<Mesh> create(std::vector<math::BasicVertex> vertices, std::vector<std::uint32_t> indices, core::sync::EndCaller<Mesh>& c) noexcept;
         };
