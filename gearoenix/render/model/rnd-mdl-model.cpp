@@ -54,8 +54,8 @@ gearoenix::render::model::Model::Model(
 
 gearoenix::render::model::Model::~Model() noexcept
 {
-	meshes.clear();
-	children.clear();
+    meshes.clear();
+    children.clear();
 }
 
 void gearoenix::render::model::Model::update() noexcept

@@ -1,17 +1,17 @@
 #ifndef GEAROENIX_CORE_EVENT_ENGINE_HPP
 #define GEAROENIX_CORE_EVENT_ENGINE_HPP
+#include "../../math/math-vector.hpp"
 #include "../cr-types.hpp"
 #include "../sync/cr-sync-semaphore.hpp"
-#include "../../math/math-vector.hpp"
 #include "cr-ev-event.hpp"
 #include "cr-ev-id.hpp"
+#include <atomic>
 #include <chrono>
 #include <map>
 #include <memory>
 #include <mutex>
 #include <set>
 #include <thread>
-#include <atomic>
 namespace gearoenix::core::event {
 class Listner;
 class Engine {
@@ -39,7 +39,7 @@ private:
 
     std::map<button::MouseKeyId, MouseButtonState> pressed_mouse_buttons_state;
 
-	movement::Base mouse_movement;
+    movement::Base mouse_movement;
 
     void loop() noexcept;
 
@@ -51,9 +51,9 @@ public:
     void remove_listner(Id event_id, Real priority, Listner* listner) noexcept;
     void remove_listner(Id event_id, Listner* listner) noexcept;
     void remove_listner(Listner* listner) noexcept;
-    void broadcast(Data event_data) noexcept;
-	void set_mouse_position(const math::Vec2& position) noexcept;
-	void set_mouse_movement(const math::Vec2& position) noexcept;
+    void broadcast(const Data& event_data) noexcept;
+    void set_mouse_position(const math::Vec2& position) noexcept;
+    void set_mouse_movement(const math::Vec2& position) noexcept;
     void mouse_button(button::MouseKeyId key, button::MouseActionId action);
 };
 }

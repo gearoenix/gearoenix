@@ -12,7 +12,8 @@ namespace gearoenix::render::scene {
 class Ui : public Scene, public core::event::Listner {
 private:
     void init() noexcept;
-	widget::Widget* selected_widget = nullptr;
+    widget::Widget* selected_widget = nullptr;
+
 public:
     Ui(
         const core::Id my_id, system::stream::Stream* f, engine::Engine* e,

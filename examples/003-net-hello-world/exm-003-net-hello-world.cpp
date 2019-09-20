@@ -23,9 +23,9 @@
 #include <gearoenix/render/scene/rnd-scn-ui.hpp>
 #include <gearoenix/render/texture/rnd-txt-manager.hpp>
 #include <gearoenix/render/texture/rnd-txt-texture-2d.hpp>
+#include <gearoenix/render/widget/rnd-wdg-button.hpp>
 #include <gearoenix/render/widget/rnd-wdg-modal.hpp>
 #include <gearoenix/render/widget/rnd-wdg-text.hpp>
-#include <gearoenix/render/widget/rnd-wdg-button.hpp>
 #include <gearoenix/system/sys-app.hpp>
 #include <sstream>
 
@@ -51,12 +51,18 @@ using GxVertex = gearoenix::math::BasicVertex;
 void GameApp::translate_camera(const GxVec3& t)
 {
     GxVec3 loc = camtrn->get_location() + t;
-    if (loc[0] < -10.0f) loc[0] = -10.0f;
-    else if (loc[0] > 110.0f) loc[0] = 110.0f;
-    if (loc[1] < -10.0f) loc[1] = -10.0f;
-    else if (loc[1] > 60.0f) loc[1] = 60.0f;
-    if (loc[2] < 1.5f) loc[2] = 1.5f;
-    else if (loc[2] > 50.0f) loc[2] = 50.0f;
+    if (loc[0] < -10.0f)
+        loc[0] = -10.0f;
+    else if (loc[0] > 110.0f)
+        loc[0] = 110.0f;
+    if (loc[1] < -10.0f)
+        loc[1] = -10.0f;
+    else if (loc[1] > 60.0f)
+        loc[1] = 60.0f;
+    if (loc[2] < 1.5f)
+        loc[2] = 1.5f;
+    else if (loc[2] > 50.0f)
+        loc[2] = 50.0f;
     camtrn->set_location(loc);
 }
 
@@ -105,9 +111,9 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
     const GxEndCallerIgnored endcall([this] {
         scn->set_enability(true);
         uiscn->set_enability(true);
-		auto* const event_engine = system_application->get_event_engine();
-		event_engine->add_listner(gearoenix::core::event::Id::ButtonMouse, -1.0f, this);
-		event_engine->add_listner(gearoenix::core::event::Id::ButtonKeyboard, 1.0f, this);
+        auto* const event_engine = system_application->get_event_engine();
+        event_engine->add_listner(gearoenix::core::event::Id::ButtonMouse, -1.0f, this);
+        event_engine->add_listner(gearoenix::core::event::Id::ButtonKeyboard, 1.0f, this);
         event_engine->add_listner(gearoenix::core::event::Id::MovementMouse, 1.0f, this);
         event_engine->add_listner(gearoenix::core::event::Id::ScrollMouse, 1.0f, this);
         event_engine->add_listner(gearoenix::core::event::Id::GestureDrag, 1.0f, this);
@@ -118,7 +124,7 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
     GxEndCaller<GxMesh> mshcall([endcall](const std::shared_ptr<GxMesh>&) {});
     GxEndCaller<GxStaticModel> mdlcall([endcall](const std::shared_ptr<GxStaticModel>&) {});
     GxEndCaller<GxModal> mdacall([endcall](const std::shared_ptr<GxModal>&) {});
-	GxEndCaller<GxTextWdg> txwcall([endcall](const std::shared_ptr<GxTextWdg>&) {});
+    GxEndCaller<GxTextWdg> txwcall([endcall](const std::shared_ptr<GxTextWdg>&) {});
     GxEndCaller<GxTexture> txtcall([endcall](const std::shared_ptr<GxTexture>&) {});
     GxEndCaller<GxButton> btncall([endcall](const std::shared_ptr<GxButton>&) {});
 
@@ -154,21 +160,19 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
     light4->set_color(GxVec3(0.5f, 0.5f, 0.5f));
     scn->add_light(light4);
 
-	const auto& mshmgr = astmgr->get_mesh_manager();
-	const auto& txtmgr = astmgr->get_texture_manager();
+    const auto& mshmgr = astmgr->get_mesh_manager();
+    const auto& txtmgr = astmgr->get_texture_manager();
     const std::shared_ptr<GxMesh> msh = mshmgr->create_icosphere(mshcall);
     const std::shared_ptr<GxMdManager>& mdlmgr = astmgr->get_model_manager();
     {
-		const std::shared_ptr<GxMesh> plate_mesh = mshmgr->create({
-			GxVertex { GxVec3(-55.0f, -30.0f, 0.0f), GxVec3(0.0f, 0.0f, 1.0f), GxVec4(1.0f, 0.0f, 0.0f, 1.0f), GxVec2(0.0f, 0.0f) },
-			GxVertex { GxVec3(55.0f, -30.0f, 0.0f), GxVec3(0.0f, 0.0f, 1.0f), GxVec4(1.0f, 0.0f, 0.0f, 1.0f), GxVec2(110.0f, 0.0f) },
-			GxVertex { GxVec3(-55.0f, 30.0f, 0.0f), GxVec3(0.0f, 0.0f, 1.0f), GxVec4(1.0f, 0.0f, 0.0f, 1.0f), GxVec2(0.0f, 60.0f) },
-			GxVertex { GxVec3(55.0f, 30.0f, 0.0f), GxVec3(0.0f, 0.0f, 1.0f), GxVec4(1.0f, 0.0f, 0.0f, 1.0f), GxVec2(110.0f, 60.0f) }
-			}, {
-				0, 1, 2,
-				1, 3, 2
-			}, 60.0f, mshcall);
-		auto txt = std::dynamic_pointer_cast<GxTexture2D>(txtmgr->get_gx3d(1031, txtcall));
+        const std::shared_ptr<GxMesh> plate_mesh = mshmgr->create({ GxVertex { GxVec3(-55.0f, -30.0f, 0.0f), GxVec3(0.0f, 0.0f, 1.0f), GxVec4(1.0f, 0.0f, 0.0f, 1.0f), GxVec2(0.0f, 0.0f) },
+                                                                      GxVertex { GxVec3(55.0f, -30.0f, 0.0f), GxVec3(0.0f, 0.0f, 1.0f), GxVec4(1.0f, 0.0f, 0.0f, 1.0f), GxVec2(110.0f, 0.0f) },
+                                                                      GxVertex { GxVec3(-55.0f, 30.0f, 0.0f), GxVec3(0.0f, 0.0f, 1.0f), GxVec4(1.0f, 0.0f, 0.0f, 1.0f), GxVec2(0.0f, 60.0f) },
+                                                                      GxVertex { GxVec3(55.0f, 30.0f, 0.0f), GxVec3(0.0f, 0.0f, 1.0f), GxVec4(1.0f, 0.0f, 0.0f, 1.0f), GxVec2(110.0f, 60.0f) } },
+            { 0, 1, 2,
+                1, 3, 2 },
+            60.0f, mshcall);
+        auto txt = std::dynamic_pointer_cast<GxTexture2D>(txtmgr->get_gx3d(1031, txtcall));
         const std::shared_ptr<GxMaterial> mat(new GxMaterial(render_engine, endcall));
         mat->set_roughness_factor(0.5f);
         mat->set_metallic_factor(0.8f);
@@ -225,7 +229,7 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
     look_at_button_tran->local_scale(0.1f);
     look_at_button_tran->local_x_scale(4.0f);
     look_at_button_tran->set_location(GxVec3(-0.5f, -0.8f, 0.1f));
-    
+
     auto look_at_text = mdlmgr->create<GxTextWdg>(txwcall);
     look_at_text->set_text(L"Look At Object", endcall);
     auto* const look_at_text_tran = look_at_text->get_transformation();
@@ -251,8 +255,9 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
     uiscn->set_layer(scn->get_layer() + 1.0f);
 }
 
-GameApp::~GameApp() {
-	terminate();
+GameApp::~GameApp()
+{
+    terminate();
 }
 
 void GameApp::update() noexcept
@@ -260,7 +265,8 @@ void GameApp::update() noexcept
     auto forward = camtrn->get_z_axis() * -camera_forward;
     forward[2] = 0.0f;
     auto flength = forward.length();
-    if (flength > 0.001f) forward /= flength;
+    if (flength > 0.001f)
+        forward /= flength;
     translate_camera((forward + (camtrn->get_x_axis() * camera_sideward)) * (render_engine->get_delta_time() * 3.0f));
 }
 
@@ -270,17 +276,16 @@ void GameApp::terminate() noexcept
     camtrn = nullptr;
     modal = nullptr;
     text_location = nullptr;
-	scn = nullptr;
-	uiscn = nullptr;
+    scn = nullptr;
+    uiscn = nullptr;
     render_tree = nullptr;
-	gearoenix::core::Application::terminate();
+    gearoenix::core::Application::terminate();
 }
 
 bool GameApp::on_event(const gearoenix::core::event::Data& event_data) noexcept
 {
     switch (event_data.source) {
-    case gearoenix::core::event::Id::ButtonMouse: 
-    {
+    case gearoenix::core::event::Id::ButtonMouse: {
         const auto d = std::get<gearoenix::core::event::button::MouseData>(event_data.data);
         if (d.key == gearoenix::core::event::button::MouseKeyId::Left) {
             if (d.action == gearoenix::core::event::button::MouseActionId::Click) {
@@ -302,43 +307,47 @@ bool GameApp::on_event(const gearoenix::core::event::Data& event_data) noexcept
         }
         break;
     }
-	case gearoenix::core::event::Id::MovementMouse:
-	{
-		break;
-	}
-	case gearoenix::core::event::Id::ButtonKeyboard:
-	{
-		const auto d = std::get<gearoenix::core::event::button::KeyboardData>(event_data.data);
-		switch (d.key) {
-		case gearoenix::core::event::button::KeyboardKeyId::Up:
-			if (d.action == gearoenix::core::event::button::KeyboardActionId::Press) camera_forward = 1.0f;
-			else camera_forward = 0.0f;
-			break;
-		case gearoenix::core::event::button::KeyboardKeyId::Down:
-			if (d.action == gearoenix::core::event::button::KeyboardActionId::Press) camera_forward = -1.0f;
-			else camera_forward = 0.0f;
-			break;
-		case gearoenix::core::event::button::KeyboardKeyId::Right:
-			if (d.action == gearoenix::core::event::button::KeyboardActionId::Press) camera_sideward = 1.0f;
-			else camera_sideward = 0.0f;
-			break;
-		case gearoenix::core::event::button::KeyboardKeyId::Left:
-			if (d.action == gearoenix::core::event::button::KeyboardActionId::Press) camera_sideward = -1.0f;
-			else camera_sideward = 0.0f;
-			break;
-		default:
-			break;
-		}
-		break;
-	}
-    case gearoenix::core::event::Id::ScrollMouse:
-    {
-        if(!showing_object_details) 
+    case gearoenix::core::event::Id::MovementMouse: {
+        break;
+    }
+    case gearoenix::core::event::Id::ButtonKeyboard: {
+        const auto d = std::get<gearoenix::core::event::button::KeyboardData>(event_data.data);
+        switch (d.key) {
+        case gearoenix::core::event::button::KeyboardKeyId::Up:
+            if (d.action == gearoenix::core::event::button::KeyboardActionId::Press)
+                camera_forward = 1.0f;
+            else
+                camera_forward = 0.0f;
+            break;
+        case gearoenix::core::event::button::KeyboardKeyId::Down:
+            if (d.action == gearoenix::core::event::button::KeyboardActionId::Press)
+                camera_forward = -1.0f;
+            else
+                camera_forward = 0.0f;
+            break;
+        case gearoenix::core::event::button::KeyboardKeyId::Right:
+            if (d.action == gearoenix::core::event::button::KeyboardActionId::Press)
+                camera_sideward = 1.0f;
+            else
+                camera_sideward = 0.0f;
+            break;
+        case gearoenix::core::event::button::KeyboardKeyId::Left:
+            if (d.action == gearoenix::core::event::button::KeyboardActionId::Press)
+                camera_sideward = -1.0f;
+            else
+                camera_sideward = 0.0f;
+            break;
+        default:
+            break;
+        }
+        break;
+    }
+    case gearoenix::core::event::Id::ScrollMouse: {
+        if (!showing_object_details)
             translate_camera(camtrn->get_z_axis() * -std::get<gearoenix::core::event::button::MouseScroll>(event_data.data).direction[1]);
         break;
     }
-    case gearoenix::core::event::Id::GestureDrag:
-    {
+    case gearoenix::core::event::Id::GestureDrag: {
         if (!showing_object_details) {
             const auto d = std::get<gearoenix::core::event::gesture::Drag>(event_data.data);
             const auto& v = d.delta_previous_position;

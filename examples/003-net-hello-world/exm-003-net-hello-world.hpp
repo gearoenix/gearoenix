@@ -1,10 +1,10 @@
 #ifndef GEAROENIX_EXAMPLE_003_NET_HELLO_WORLD_HPP
 #define GEAROENIX_EXAMPLE_003_NET_HELLO_WORLD_HPP
+#include <atomic>
 #include <gearoenix/core/cr-application.hpp>
 #include <gearoenix/core/cr-types.hpp>
 #include <gearoenix/core/event/cr-ev-listner.hpp>
 #include <gearoenix/math/math-vertex.hpp>
-#include <atomic>
 #include <random>
 
 namespace gearoenix::render::camera {
@@ -38,17 +38,16 @@ private:
     using GxButton = gearoenix::render::widget::Button;
     using GxTextWdg = gearoenix::render::widget::Text;
     using GxGrPbr = gearoenix::render::graph::tree::Pbr;
-	using GxReal = gearoenix::core::Real;
+    using GxReal = gearoenix::core::Real;
     using GxVec2 = gearoenix::math::Vec2;
     using GxVec3 = gearoenix::math::Vec3;
     using GxVec4 = gearoenix::math::Vec4;
 
-
-	struct ShelfInfo {
-		std::uniform_real_distribution<GxReal> rand_genx;
-		std::uniform_real_distribution<GxReal> rand_genz;
-		GxReal y = 0.0f;
-	};
+    struct ShelfInfo {
+        std::uniform_real_distribution<GxReal> rand_genx;
+        std::uniform_real_distribution<GxReal> rand_genz;
+        GxReal y = 0.0f;
+    };
 
     std::shared_ptr<GxGameScene> scn;
     std::shared_ptr<GxUiScene> uiscn;
@@ -59,8 +58,8 @@ private:
     std::shared_ptr<GxTextWdg> text_location;
     std::unique_ptr<GxGrPbr> render_tree;
     std::atomic<bool> showing_object_details = false;
-	std::atomic<GxReal> camera_forward = 0.0f;
-	std::atomic<GxReal> camera_sideward = 0.0f;
+    std::atomic<GxReal> camera_forward = 0.0f;
+    std::atomic<GxReal> camera_sideward = 0.0f;
 
     void translate_camera(const GxVec3& t);
 

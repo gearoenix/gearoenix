@@ -10,12 +10,12 @@ namespace gearoenix::core::event {
 struct Data {
     Id source = Id::None;
     std::variant<
-		button::KeyboardData,
+        button::KeyboardData,
         button::MouseData,
         button::MouseScroll,
-		gesture::Drag,
-		gesture::MouseDrag,
-		movement::Base,
+        gesture::Drag,
+        gesture::MouseDrag,
+        movement::Base,
         system::WindowSizeChangeData,
         int>
         data = 0;

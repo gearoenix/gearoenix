@@ -195,8 +195,8 @@ const std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::
     txt_info.s.wrap_s = texture::Wrap::CLAMP_TO_EDGE;
     txt_info.s.wrap_t = texture::Wrap::CLAMP_TO_EDGE;
     txt_info.t = texture::Type::TEXTURE_2D;
-	core::sync::EndCaller<texture::Texture2D> tend([end](std::shared_ptr<texture::Texture2D> t) mutable noexcept { 
-		end.set_data(t); 
-	});
+    core::sync::EndCaller<texture::Texture2D> tend([end](std::shared_ptr<texture::Texture2D> t) mutable noexcept {
+        end.set_data(t);
+    });
     return txt_mgr->create_2d(img_pixels, txt_info, img_width, img_height, tend);
 }

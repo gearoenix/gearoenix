@@ -76,11 +76,10 @@ void gearoenix::render::widget::Text::set_text(
     txtclr[1] = (text_color[1] >= 1.0f ? 255 : static_cast<std::uint8_t>(text_color[1] * 255));
     txtclr[2] = (text_color[2] >= 1.0f ? 255 : static_cast<std::uint8_t>(text_color[2] * 255));
     txtclr[3] = 255;
-	auto txt = text_font->multiline_bake(text, txtclr, 512, 512, 5, asp, 
-		core::sync::EndCaller<texture::Texture2D>([c, this] (std::shared_ptr<texture::Texture2D> txt) {
-			meshes[text_mesh_id]->get_material()->set_color(txt);
-		})
-	);
+    auto txt = text_font->multiline_bake(text, txtclr, 512, 512, 5, asp,
+        core::sync::EndCaller<texture::Texture2D>([c, this](std::shared_ptr<texture::Texture2D> txt) {
+            meshes[text_mesh_id]->get_material()->set_color(txt);
+        }));
     transformation->local_x_scale(asp / current_x_scale);
     current_x_scale = asp;
 }

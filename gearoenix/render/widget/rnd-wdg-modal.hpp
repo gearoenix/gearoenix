@@ -8,7 +8,7 @@ class Button;
 class Modal : public Widget {
 private:
     std::shared_ptr<Button> close_mdl;
-    std::function<void()> on_close = [] () noexcept {};
+    std::function<void()> on_close = []() noexcept {};
 
 public:
     Modal(

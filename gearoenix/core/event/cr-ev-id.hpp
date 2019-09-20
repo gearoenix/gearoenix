@@ -1,7 +1,7 @@
 #ifndef GEAROENIX_CORE_EVENT_ID_HPP
 #define GEAROENIX_CORE_EVENT_ID_HPP
 namespace gearoenix::core::event {
-enum struct Id: int {
+enum struct Id : int {
     ButtonMouse,
     ButtonKeyboard,
     MovementMouse,
@@ -24,9 +24,9 @@ enum struct Id: int {
     UiDraggedIn,
     UiDraggedOn,
     UiDraggedTo,
-	GestureDrag,
-	GestureMouseDrag,
-	GestureTouchDrag,
+    GestureDrag,
+    GestureMouseDrag,
+    GestureTouchDrag,
     None,
 };
 }

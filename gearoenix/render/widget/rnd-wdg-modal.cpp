@@ -5,8 +5,8 @@
 #include "../engine/rnd-eng-engine.hpp"
 #include "../material/rnd-mat-material.hpp"
 #include "../mesh/rnd-msh-manager.hpp"
-#include "../model/rnd-mdl-manager.hpp"
 #include "../model/rnd-mdl-dynamic.hpp"
+#include "../model/rnd-mdl-manager.hpp"
 #include "../scene/rnd-scn-ui.hpp"
 #include "rnd-wdg-button.hpp"
 

@@ -2,9 +2,9 @@
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../core/event/cr-ev-button.hpp"
 #include "../../physics/animation/phs-anm-animation.hpp"
-#include "../../physics/phs-engine.hpp"
 #include "../../physics/animation/phs-anm-manager.hpp"
 #include "../../physics/collider/phs-cld-aabb.hpp"
+#include "../../physics/phs-engine.hpp"
 #include "../../system/sys-app.hpp"
 #include "../engine/rnd-eng-engine.hpp"
 #include "../model/rnd-mdl-manager.hpp"
@@ -34,19 +34,22 @@ gearoenix::render::widget::Button::Button(
 
 gearoenix::render::widget::Button::~Button() noexcept
 {
-    if (auto a = animation.lock()) a->set_activity(false);
+    if (auto a = animation.lock())
+        a->set_activity(false);
 }
 
 void gearoenix::render::widget::Button::selected(const math::Vec3&) noexcept
 {
-    if (auto a = animation.lock()) a->set_activity(false);
+    if (auto a = animation.lock())
+        a->set_activity(false);
     auto myfun = core::sync::EndCaller<model::Model>([](const std::shared_ptr<model::Model>&) {});
     auto myself = e->get_system_application()->get_asset_manager()->get_model_manager()->get_gx3d(asset_id, myfun);
     const auto a = std::make_shared<physics::animation::Animation>(
-        [this, myself] (const core::Real from_start, const core::Real) noexcept {
+        [ this, myself ](const core::Real from_start, const core::Real) noexcept {
             const auto s = 1.0f - (1.0f - PRESSED_SIZE) * (from_start / ANIMATION_DURATION);
             transformation->local_scale(s / current_scale.exchange(s));
-        }, ANIMATION_DURATION,
+        },
+        ANIMATION_DURATION,
         [this](const core::Real) noexcept {
             transformation->local_scale(PRESSED_SIZE / current_scale.exchange(PRESSED_SIZE));
         });
@@ -56,14 +59,16 @@ void gearoenix::render::widget::Button::selected(const math::Vec3&) noexcept
 
 void gearoenix::render::widget::Button::select_cancelled() noexcept
 {
-    if (auto a = animation.lock()) a->set_activity(false);
+    if (auto a = animation.lock())
+        a->set_activity(false);
     auto myfun = core::sync::EndCaller<model::Model>([](const std::shared_ptr<model::Model>&) {});
     auto myself = e->get_system_application()->get_asset_manager()->get_model_manager()->get_gx3d(asset_id, myfun);
     const auto a = std::make_shared<physics::animation::Animation>(
-        [this, myself](const core::Real from_start, const core::Real) noexcept {
+        [ this, myself ](const core::Real from_start, const core::Real) noexcept {
             const auto s = PRESSED_SIZE + (1.0f - PRESSED_SIZE) * (from_start / ANIMATION_DURATION);
             transformation->local_scale(s / current_scale.exchange(s));
-        }, ANIMATION_DURATION,
+        },
+        ANIMATION_DURATION,
         [this](const core::Real) noexcept {
             transformation->local_scale(1.0f / current_scale.exchange(1.0));
         });

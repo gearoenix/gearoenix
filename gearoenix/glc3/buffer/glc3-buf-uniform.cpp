@@ -10,9 +10,9 @@ gearoenix::glc3::buffer::Uniform::Uniform(const std::size_t s, engine::Engine* c
 {
 }
 
-gearoenix::glc3::buffer::Uniform::~Uniform() 
+gearoenix::glc3::buffer::Uniform::~Uniform()
 {
-	data.clear();
+    data.clear();
 }
 
 void gearoenix::glc3::buffer::Uniform::update(const void* const src) noexcept

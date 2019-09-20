@@ -9,6 +9,7 @@
 #define GX_GET_CREF(v, t, x) \
     v:                       \
     t x;                     \
+                             \
 public:                      \
     [[nodiscard]] const t& get_##x() const noexcept { return x; }
 #define GX_GET_REF(v, t, x) \
@@ -22,6 +23,7 @@ public:                      \
 #define GX_GET_UPTR(v, c, t, x)                           \
     v:                                                    \
     c std::unique_ptr<t> x;                               \
+                                                          \
 public:                                                   \
     const t* get_##x() const noexcept { return x.get(); } \
     t* get_##x() noexcept { return x.get(); }
@@ -39,6 +41,7 @@ public:                                                   \
 #define GX_GET_PTR(v, t, x)                         \
     v:                                              \
     t* x = nullptr;                                 \
+                                                    \
 public:                                             \
     const t* get_##x() const noexcept { return x; } \
     t* get_##x() noexcept { return x; }
@@ -52,6 +55,7 @@ public:                                             \
 #define GX_GET_PTRC(v, t, x)                                      \
     v:                                                            \
     t* const x;                                                   \
+                                                                  \
 public:                                                           \
     [[nodiscard]] const t* get_##x() const noexcept { return x; } \
     [[nodiscard]] t* get_##x() noexcept { return x; }
@@ -60,6 +64,7 @@ public:                                                           \
 #define GX_GET_ARR(v, t, x, c)                          \
     v:                                                  \
     t x[c] = {};                                        \
+                                                        \
 public:                                                 \
     const t(&get_##x() const noexcept)[c] { return x; } \
     t(&get_##x() noexcept)[c] { return x; }
@@ -67,6 +72,7 @@ public:                                                 \
 #define GX_GET_CVAL(v, t, x) \
     v:                       \
     const t x;               \
+                             \
 public:                      \
     [[nodiscard]] t get_##x() const noexcept { return x; }
 #define GX_GET_CVAL_PRT(t, x) GX_GET_CVAL(protected, t, x)
@@ -74,6 +80,7 @@ public:                      \
 #define GX_GET_VAL(v, t, x, d) \
     v:                         \
     t x = d;                   \
+                               \
 public:                        \
     [[nodiscard]] t get_##x() const noexcept { return x; }
 #define GX_GETSET_VAL(v, t, x, d) \
@@ -87,6 +94,7 @@ public:                        \
 #define GX_GET_AVAL(v, t, x, d) \
     v:                          \
     std::atomic<t> x = d;       \
+                                \
 public:                         \
     [[nodiscard]] t get_##x() const noexcept { return x; }
 #define GX_GETSET_AVAL(v, t, x, d) \

@@ -1,7 +1,7 @@
 #ifndef GEAROENIX_CORE_EVENT_BUTTON_BUTTON_HPP
 #define GEAROENIX_CORE_EVENT_BUTTON_BUTTON_HPP
-#include "../cr-types.hpp"
 #include "../../math/math-vector.hpp"
+#include "../cr-types.hpp"
 
 namespace gearoenix::core::event::button {
 
@@ -109,16 +109,16 @@ enum struct KeyboardKeyId : int {
 };
 
 enum struct KeyboardActionId : int {
-	Press,
-	Release,
+    Press,
+    Release,
 };
 
 enum struct MouseKeyId : int {
-	Left,
-	Right,
-	Middle,
-	Front,
-	Back,
+    Left,
+    Right,
+    Middle,
+    Front,
+    Back,
 };
 
 enum struct MouseActionId : int {
@@ -135,9 +135,9 @@ struct KeyboardData {
 };
 
 struct MouseData {
-	MouseActionId action = MouseActionId::Press;
-	MouseKeyId key = MouseKeyId::Left;
-	math::Vec2 position;
+    MouseActionId action = MouseActionId::Press;
+    MouseKeyId key = MouseKeyId::Left;
+    math::Vec2 position;
 };
 
 struct MouseScroll {
