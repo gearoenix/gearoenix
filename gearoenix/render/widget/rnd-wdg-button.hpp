@@ -25,7 +25,7 @@ namespace gearoenix::render::widget {
         ~Button() noexcept;
         void selected(const math::Vec3& point) noexcept final;
         void select_cancelled() noexcept final;
-        void select_released(const math::Vec3& point) noexcept final;
+        void select_released() noexcept final;
         void set_on_click(const std::function<void()>& on_click) noexcept;
     };
 }

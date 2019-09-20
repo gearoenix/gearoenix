@@ -64,7 +64,7 @@ void gearoenix::render::widget::Widget::select_cancelled() noexcept
 {
 }
 
-void gearoenix::render::widget::Widget::select_released(const math::Vec3&) noexcept
+void gearoenix::render::widget::Widget::select_released() noexcept
 {
 }
 

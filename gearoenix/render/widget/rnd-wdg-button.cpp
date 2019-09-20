@@ -71,7 +71,7 @@ void gearoenix::render::widget::Button::select_cancelled() noexcept
     animation = a;
 }
 
-void gearoenix::render::widget::Button::select_released(const math::Vec3&) noexcept
+void gearoenix::render::widget::Button::select_released() noexcept
 {
     select_cancelled();
     on_click();

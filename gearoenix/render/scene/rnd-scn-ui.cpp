@@ -93,16 +93,10 @@ bool gearoenix::render::scene::Ui::on_event(const core::event::Data& d) noexcept
                     []() noexcept {});
 			}
 			else if (data.action == core::event::button::MouseActionId::Release) {
-				find_hited_widgets(
-					data.position[0], data.position[1],
-					[this](widget::Widget* const wdg, const math::Vec3& p) noexcept {
-						if (selected_widget == wdg) selected_widget->select_released(p);
-					},
-					[this](widget::Widget* const wdg, const math::Vec3& p, const std::vector<model::Model*>&) noexcept {
-						if (selected_widget == wdg) selected_widget->select_released(p);
-					},
-                    []() noexcept {});
-				selected_widget = nullptr;
+				if (selected_widget != nullptr) {
+					selected_widget->select_released();
+					selected_widget = nullptr;
+				}
 			}
 		break;
 	}
