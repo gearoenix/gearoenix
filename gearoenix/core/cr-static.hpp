@@ -97,6 +97,8 @@ public:                        \
                                 \
 public:                         \
     [[nodiscard]] t get_##x() const noexcept { return x; }
+#define GX_GET_AVAL_PRT(t, x, d) GX_GET_AVAL(protected, t, x, d)
+
 #define GX_GETSET_AVAL(v, t, x, d) \
     GX_GET_AVAL(v, t, x, d)        \
     void set_##x(const t _##x) noexcept { x = _##x; }

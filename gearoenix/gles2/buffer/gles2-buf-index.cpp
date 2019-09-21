@@ -20,7 +20,7 @@ gearoenix::gles2::buffer::Index::Index(
     e->get_function_loader()->load([this, data { move(data) }, c] {
         gl::Loader::gen_buffers(1, &bo);
         gl::Loader::bind_buffer(GL_ELEMENT_ARRAY_BUFFER, bo);
-        gl::Loader::buffer_data(GL_ELEMENT_ARRAY_BUFFER, size, data.data(), GL_STATIC_DRAW);
+        gl::Loader::buffer_data(GL_ELEMENT_ARRAY_BUFFER, buffer_size, data.data(), GL_STATIC_DRAW);
     });
 }
 

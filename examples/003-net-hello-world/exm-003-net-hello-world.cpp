@@ -185,21 +185,19 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
         trans->local_scale(1.0f);
         scn->add_model(mdl);
     }
-
-    //    {
-    //        const std::shared_ptr<GxMaterial> mat(new GxMaterial(render_engine, endcall));
-    //        mat->set_color(1.0f, 0.0f, 0.0, endcall);
-    //        const std::shared_ptr<GxStaticModel> mdl = mdlmgr->create<GxStaticModel>(mdlcall);
-    //        mdl->add_mesh(std::make_shared<GxMdMesh>(msh, mat));
-    //        auto* tran = mdl->get_transformation();
-    ////        const GxVec3 position(s.rand_genx(rand_eng), s.y, s.rand_genz(rand_eng));
-    ////        const auto scale = rand_gen1(rand_eng);
-    ////        tran->set_location(position);
-    //        tran->local_scale(10.0f);
-    //        mdl->set_collider(std::make_unique<GxCldSphere>(GxVec3(), 10.0f));
-    //        scn->add_model(mdl);
-    //    }
-
+    {
+        const std::shared_ptr<GxMaterial> mat(new GxMaterial(render_engine, endcall));
+        mat->set_color(1.0f, 0.0f, 0.0, endcall);
+        const std::shared_ptr<GxStaticModel> mdl = mdlmgr->create<GxStaticModel>(mdlcall);
+        mdl->add_mesh(std::make_shared<GxMdMesh>(cube, mat));
+        auto* tran = mdl->get_transformation();
+        const GxVec3 position(50.0f, 25.0f, 20.0f);
+        const auto scale = 5.0f;
+        tran->set_location(position);
+        tran->local_scale(scale);
+        mdl->set_collider(std::make_unique<GxCldSphere>(position, scale));
+        scn->add_model(mdl);
+    }
     for (auto& s : shelves_info) {
         const int items_count = rand_gen3(rand_eng);
         for (int i = 0; i < items_count; ++i) {

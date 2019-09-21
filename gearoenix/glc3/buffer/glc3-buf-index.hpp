@@ -14,8 +14,8 @@ namespace buffer {
     class Index : public render::buffer::Static {
     public:
     private:
-        gl::uint bo = 0;
-        gl::sizei count = 0;
+        std::atomic<gl::uint> bo;
+        gl::sizei count;
 
     public:
         Index(
