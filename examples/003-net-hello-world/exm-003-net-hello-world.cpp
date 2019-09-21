@@ -185,20 +185,55 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
         trans->local_scale(1.0f);
         scn->add_model(mdl);
     }
-    {
-        const std::shared_ptr<GxMaterial> mat(new GxMaterial(render_engine, endcall));
-        mat->set_color(1.0f, 0.0f, 0.0, endcall);
-        const std::shared_ptr<GxStaticModel> mdl = mdlmgr->create<GxStaticModel>(mdlcall);
-        mdl->add_mesh(std::make_shared<GxMdMesh>(cube, mat));
-        auto* tran = mdl->get_transformation();
-        const GxVec3 position(50.0f, 25.0f, 20.0f);
-        const auto scale = 5.0f;
-        tran->set_location(position);
-        tran->local_scale(scale);
-        mdl->set_collider(std::make_unique<GxCldSphere>(position, scale));
-        scn->add_model(mdl);
-    }
+	{
+		const std::shared_ptr<GxMaterial> mat(new GxMaterial(render_engine, endcall));
+		mat->set_color(0.3f, 0.3f, 0.3, endcall);
+		mat->set_roughness_factor(0.2f);
+		mat->set_metallic_factor(0.9f);
+		const auto mdlmsh = std::make_shared<GxMdMesh>(cube, mat);
+		const GxReal scale = 0.025f;
+		const GxReal scalex = lengthx * 0.5f / scale;
+		const GxReal scaley = shelf_thickness * 0.5f / scale;
+		GxReal y = margin + shelf_thickness * 0.5f;
+		for (int ri = 0; ri < rows_count; ++ri, y += shelf_thickness * 2.0f + margin)
+		{
+			GxReal z = 0.0f;
+			for (int zi = 0; zi <= shelf_floors_count; ++zi, z += shelf_height + marginz)
+			{
+				GxReal x = margin + lengthx * 0.5f;
+				for (int xi = 0; xi < shelves_in_column_count; ++xi, x += margin + lengthx) {
+					const GxVec3 position(x, y, z);
+					std::shared_ptr<GxStaticModel> mdl = mdlmgr->create<GxStaticModel>(mdlcall);
+					mdl->add_mesh(mdlmsh);
+					auto* tran = mdl->get_transformation();
+					tran->set_location(position);
+					tran->local_scale(scale);
+					tran->local_x_scale(scalex);
+					tran->local_y_scale(scaley);
+					mdl->set_collider(std::make_unique<GxCldSphere>(position, scale));
+					scn->add_model(mdl);
+				}
+			}
+		}
+		GxReal x = margin;
+		for (int xi = 0; xi < shelves_in_column_count; ++xi) {
+
+			auto fx = [&] {
+				const GxVec3 position(x, y, );
+				std::shared_ptr<GxStaticModel> mdl = mdlmgr->create<GxStaticModel>(mdlcall);
+				mdl->add_mesh(mdlmsh);
+				auto* tran = mdl->get_transformation();
+				tran->set_location(position);
+				tran->local_scale(scale);
+				tran->local_x_scale(scalex);
+				tran->local_y_scale(scaley);
+				mdl->set_collider(std::make_unique<GxCldSphere>(position, scale));
+				scn->add_model(mdl);
+			};
+		}
+	}
     for (auto& s : shelves_info) {
+		
         const int items_count = rand_gen3(rand_eng);
         for (int i = 0; i < items_count; ++i) {
             const std::shared_ptr<GxMaterial> mat(new GxMaterial(render_engine, endcall));
