@@ -4,9 +4,9 @@
 #include "rnd-cmr-orthographic.hpp"
 #include "rnd-cmr-perspective.hpp"
 
-gearoenix::render::camera::Manager::Manager(system::stream::Stream* const s, engine::Engine* const e) noexcept
+gearoenix::render::camera::Manager::Manager(std::unique_ptr<system::stream::Stream> s, engine::Engine* const e) noexcept
     : e(e)
-    , cache(s)
+    , cache(std::move(s))
 {
 }
 

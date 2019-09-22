@@ -22,7 +22,7 @@ namespace render {
             std::shared_ptr<Font2D> default_2d;
 
         public:
-            Manager(system::stream::Stream* s, engine::Engine* e) noexcept;
+            Manager(std::unique_ptr<system::stream::Stream> s, engine::Engine* e) noexcept;
             ~Manager() noexcept = default;
             std::shared_ptr<Font> get(core::Id mid, core::sync::EndCaller<Font> c) noexcept;
             std::shared_ptr<Font2D> get_default_2d(core::sync::EndCaller<Font> c) noexcept;

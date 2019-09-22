@@ -73,7 +73,7 @@ namespace render {
     namespace engine {
         class Engine {
             GX_GET_CVAL_PRT(Type, engine_type)
-            GX_GET_PTRC_PRT(system::Application, system_application)
+            GX_GET_CPTR_PRT(system::Application, system_application)
             GX_GET_UPTR_PRT(core::FunctionLoader, function_loader)
             GX_GET_UPTR_PRT(core::sync::KernelWorker, kernels)
             GX_GET_UPTR_PRT(physics::Engine, physics_engine)

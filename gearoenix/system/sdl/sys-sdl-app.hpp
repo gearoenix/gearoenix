@@ -28,7 +28,7 @@ namespace system {
     class Application {
         GX_GET_REF_PRV(Configuration, configuration)
         GX_GET_UPTR_PRV(render::engine::Engine, render_engine)
-        GX_GET_UPTR_PRV(core::Application, core_app)
+        GX_GET_UPTR_PRV(core::Application, core_application)
         GX_GET_UPTR_PRV(core::asset::Manager, asset_manager)
         GX_GET_UPTR_PRV(core::event::Engine, event_engine)
         GX_GET_VAL_PRV(unsigned int, window_width, 0)
@@ -54,13 +54,12 @@ namespace system {
 
         void create_window() noexcept;
         static int SDLCALL event_receiver(void* user_data, SDL_Event* event) noexcept;
-
-        Application() noexcept = default;
+		int on_event(SDL_Event* event) noexcept;
 
     public:
-        static Application* construct() noexcept;
+        Application() noexcept;
         ~Application() noexcept;
-        void execute(core::Application* app) noexcept;
+        void execute(std::unique_ptr<core::Application> app) noexcept;
 
 #ifdef GX_IN_WEB
         static void loop() noexcept;

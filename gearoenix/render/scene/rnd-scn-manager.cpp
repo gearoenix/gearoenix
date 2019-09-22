@@ -5,9 +5,9 @@
 #include "rnd-scn-type.hpp"
 #include "rnd-scn-ui.hpp"
 
-gearoenix::render::scene::Manager::Manager(system::stream::Stream* const s, engine::Engine* const e) noexcept
+gearoenix::render::scene::Manager::Manager(std::unique_ptr<system::stream::Stream> s, engine::Engine* const e) noexcept
     : e(e)
-    , cache(s)
+    , cache(std::move(s))
     , io_worker(new core::sync::WorkWaiter())
 {
 }

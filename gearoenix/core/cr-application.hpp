@@ -49,13 +49,11 @@ namespace core {
     }
 */
 #if defined(GX_IN_ANDROID) && !defined(GX_USE_SDL)
-#define GEAROENIX_START(CoreApp)                                                         \
-    void android_main(struct android_app* state)                                         \
-    {                                                                                    \
-        gearoenix::system::Application* app = new gearoenix::system::Application(state); \
-        CoreApp* core_app = new CoreApp(app);                                            \
-        app->execute(core_app);                                                          \
-        delete app;                                                                      \
+#define GEAROENIX_START(CoreApp)                                                  \
+    void android_main(struct android_app* state)                                  \
+    {                                                                             \
+        const auto app = std::make_unique<gearoenix::system::Application>(state); \
+        app->execute(std::make_unique<CoreApp>(app.get()));                       \
     }
 #elif defined(GX_USE_WINAPI)
 #define GEAROENIX_START(CoreApp)                                                                                 \
@@ -67,13 +65,12 @@ namespace core {
         return 0;                                                                                                \
     }
 #elif defined(GX_IN_LINUX) || defined(GX_IN_MAC) || defined(GX_IN_IOS) || defined(GX_USE_SDL)
-#define GEAROENIX_START(CoreApp)                                                                 \
-    int main(int, char**)                                                                        \
-    {                                                                                            \
-        gearoenix::system::Application* const app = gearoenix::system::Application::construct(); \
-        app->execute(new CoreApp(app));                                                          \
-        delete app;                                                                              \
-        return 0;                                                                                \
+#define GEAROENIX_START(CoreApp)                                             \
+    int main(int, char**)                                                    \
+    {                                                                        \
+        const auto app = std::make_unique<gearoenix::system::Application>(); \
+        app->execute(std::make_unique<CoreApp>(app.get()));                  \
+        return 0;                                                            \
     }
 #else
 #error "Unexpected platform."

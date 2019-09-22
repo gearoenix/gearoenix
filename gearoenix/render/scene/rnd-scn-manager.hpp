@@ -26,7 +26,7 @@ namespace render {
             const std::shared_ptr<core::sync::WorkWaiter> io_worker;
 
         public:
-            Manager(system::stream::Stream* s, engine::Engine* e) noexcept;
+            Manager(std::unique_ptr<system::stream::Stream> s, engine::Engine* e) noexcept;
             ~Manager() noexcept = default;
             /// It is gonna load the scene (if exists) in another thread.
             void get_gx3d(core::Id mid, core::sync::EndCaller<Scene> c) noexcept;

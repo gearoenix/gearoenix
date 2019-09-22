@@ -21,7 +21,7 @@ private:
         int max_width = 1;
         int height = 1;
     };
-    const std::shared_ptr<texture::Manager> txt_mgr;
+	texture::Manager* const txt_mgr;
 
     std::vector<unsigned char> ttf_data;
     stbtt_fontinfo* stb_font = nullptr;
@@ -38,10 +38,10 @@ public:
     Font2D(
         const core::Id my_id,
         system::stream::Stream* f,
-        const std::shared_ptr<texture::Manager>& txt_mgr) noexcept;
+        texture::Manager* txt_mgr) noexcept;
     Font2D(
         const core::Id my_id,
-        const std::shared_ptr<texture::Manager>& txt_mgr) noexcept;
+        texture::Manager* txt_mgr) noexcept;
     ~Font2D() noexcept;
     /// This function is a simple and fast way to only render a multiline text to a texture.
     /// It is not a good way to handle large text area with this function.

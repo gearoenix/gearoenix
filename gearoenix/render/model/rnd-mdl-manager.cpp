@@ -6,9 +6,9 @@
 #include "rnd-mdl-static.hpp"
 #include "rnd-mdl-type.hpp"
 
-gearoenix::render::model::Manager::Manager(system::stream::Stream* const s, engine::Engine* const e) noexcept
+gearoenix::render::model::Manager::Manager(std::unique_ptr<system::stream::Stream> s, engine::Engine* const e) noexcept
     : e(e)
-    , cache(s)
+    , cache(std::move(s))
 {
 }
 

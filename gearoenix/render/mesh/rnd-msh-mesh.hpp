@@ -1,72 +1,54 @@
 #ifndef GEAROENIX_RENDER_MESH_MESH_HPP
 #define GEAROENIX_RENDER_MESH_MESH_HPP
 #include "../../core/asset/cr-asset.hpp"
+#include "../../core/cr-static.hpp"
 #include "../../core/cr-types.hpp"
 #include "../../core/sync/cr-sync-end-caller.hpp"
 #include "../../math/math-vertex.hpp"
 #include "rnd-msh-type.hpp"
-namespace gearoenix {
-namespace system::stream {
-    class Stream;
+
+namespace gearoenix::system::stream {
+class Stream;
 }
-namespace render {
-    namespace engine {
-        class Engine;
-    }
-    namespace buffer {
-        class Buffer;
-    }
-    namespace material {
-        class Material;
-    }
-    namespace model {
-        class Model;
-    }
-    namespace scene {
-        class Scene;
-    }
-    namespace texture {
-        class Texture2D;
-    }
-    namespace mesh {
-        class Mesh : public core::asset::Asset {
-        protected:
-            const Type::Id mesh_type_id;
 
-            core::Real radius = 0.0f;
-            buffer::Buffer* vertex_buffer = nullptr;
-            buffer::Buffer* index_buffer = nullptr;
-
-            Mesh(core::Id my_id, Type::Id mesh_type_id) noexcept;
-
-        public:
-            Mesh(
-                core::Id my_id,
-                system::stream::Stream* f,
-                engine::Engine* e,
-                const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
-            Mesh(
-                core::Id my_id,
-                std::vector<math::BasicVertex> vertices,
-                std::vector<std::uint32_t> indices,
-                core::Real radius,
-                engine::Engine* e,
-                const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
-            ~Mesh() noexcept final;
-            void set_vertices(
-                engine::Engine* e,
-                std::vector<math::BasicVertex> vertices,
-                std::vector<std::uint32_t> indices,
-                core::Real radius,
-                const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
-            core::Real get_radius() const noexcept;
-            Type::Id get_mesh_type_id() const noexcept;
-            const buffer::Buffer* get_vertex_buffer() const noexcept;
-            buffer::Buffer* get_vertex_buffer() noexcept;
-            const buffer::Buffer* get_index_buffer() const noexcept;
-            buffer::Buffer* get_index_buffer() noexcept;
-        };
-    }
+namespace gearoenix::render::engine {
+class Engine;
 }
+
+namespace gearoenix::render::buffer {
+class Buffer;
+}
+
+namespace gearoenix::render::mesh {
+/// This class right now have only one implementation and in future if it got another
+/// implementation it will be come an interface (virtual function haver)
+class Mesh : public core::asset::Asset {
+    GX_GET_CVAL_PRT(Type, mesh_type)
+    GX_GET_VAL_PRT(core::Real, radius, 0.0f)
+    GX_GET_UPTR_PRT(buffer::Buffer, vertex_buffer)
+	GX_GET_UPTR_PRT(buffer::Buffer, index_buffer)
+protected:
+    Mesh(core::Id my_id, Type mesh_type) noexcept;
+public:
+    Mesh(
+        core::Id my_id,
+        system::stream::Stream* f,
+        engine::Engine* e,
+        const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+    Mesh(
+        core::Id my_id,
+        std::vector<math::BasicVertex> vertices,
+        std::vector<std::uint32_t> indices,
+        core::Real radius,
+        engine::Engine* e,
+        const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+    ~Mesh() noexcept final;
+    void set_vertices(
+        engine::Engine* e,
+        std::vector<math::BasicVertex> vertices,
+        std::vector<std::uint32_t> indices,
+        core::Real radius,
+        const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+};
 }
 #endif

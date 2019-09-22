@@ -38,7 +38,7 @@ gearoenix::system::stream::Asset* gearoenix::system::stream::Asset::construct(sy
 #endif
     asset->file.open(file_path, std::ios::binary | std::ios::in);
     if (!asset->file.is_open()) {
-        GXLOGD("Error in opening assets file: " << name);
+        GXLOGD("Can not find/open assets file: " << name);
         delete asset;
         return nullptr;
     }

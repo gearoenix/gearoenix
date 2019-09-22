@@ -35,7 +35,7 @@ namespace render {
             std::shared_ptr<Cube> default_zero_3c_cube;
 
         public:
-            Manager(system::stream::Stream* s, engine::Engine* e) noexcept;
+            Manager(std::unique_ptr<system::stream::Stream> s, engine::Engine* e) noexcept;
             ~Manager() noexcept = default;
             std::shared_ptr<Texture2D> get_2d(const math::Vec4& color, core::sync::EndCaller<Texture2D>& c) noexcept;
             std::shared_ptr<Texture2D> get_2d(const math::Vec3& color, core::sync::EndCaller<Texture2D>& c) noexcept;

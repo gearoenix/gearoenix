@@ -165,7 +165,7 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
     const auto& txtmgr = astmgr->get_texture_manager();
     const std::shared_ptr<GxMesh> msh = mshmgr->create_icosphere(mshcall);
     const std::shared_ptr<GxMesh> cube = mshmgr->create_cube(mshcall);
-    const std::shared_ptr<GxMdManager>& mdlmgr = astmgr->get_model_manager();
+    auto * const mdlmgr = astmgr->get_model_manager();
     {
         const std::shared_ptr<GxMesh> plate_mesh = mshmgr->create({ GxVertex { GxVec3(-55.0f, -30.0f, 0.0f), GxVec3(0.0f, 0.0f, 1.0f), GxVec4(1.0f, 0.0f, 0.0f, 1.0f), GxVec2(0.0f, 0.0f) },
                                                                       GxVertex { GxVec3(55.0f, -30.0f, 0.0f), GxVec3(0.0f, 0.0f, 1.0f), GxVec4(1.0f, 0.0f, 0.0f, 1.0f), GxVec2(110.0f, 0.0f) },

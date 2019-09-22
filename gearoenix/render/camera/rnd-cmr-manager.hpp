@@ -20,7 +20,7 @@ namespace render {
             core::cache::File<Camera> cache;
 
         public:
-            Manager(system::stream::Stream* s, engine::Engine* e) noexcept;
+            Manager(std::unique_ptr<system::stream::Stream> s, engine::Engine* e) noexcept;
             ~Manager() noexcept = default;
             std::shared_ptr<Camera> get_gx3d(core::Id cid, core::sync::EndCaller<Camera>& call) noexcept;
             template <typename T>

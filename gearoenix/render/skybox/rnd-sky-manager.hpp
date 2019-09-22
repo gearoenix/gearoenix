@@ -21,7 +21,7 @@ namespace render {
             core::cache::File<Skybox> cache;
 
         public:
-            Manager(system::stream::Stream* s, engine::Engine* e) noexcept;
+            Manager(std::unique_ptr<system::stream::Stream> s, engine::Engine* e) noexcept;
             ~Manager() noexcept = default;
             std::shared_ptr<Skybox> get(core::Id mid, const core::sync::EndCaller<Skybox> c) noexcept;
         };

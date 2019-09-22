@@ -21,9 +21,9 @@ gearoenix::render::widget::Modal::Modal(const core::Id my_id, engine::Engine* co
     core::sync::EndCaller<Button> btncall([c](std::shared_ptr<Button>) {});
     core::sync::EndCaller<model::Dynamic> mdlcall([c](std::shared_ptr<model::Dynamic>) {});
     core::sync::EndCaller<mesh::Mesh> mshcall([c](std::shared_ptr<mesh::Mesh>) {});
-    auto* astmgr = e->get_system_application()->get_asset_manager();
-    auto& mdlmgr = astmgr->get_model_manager();
-    auto& mshmgr = astmgr->get_mesh_manager();
+    auto* const astmgr = e->get_system_application()->get_asset_manager();
+    auto* const mdlmgr = astmgr->get_model_manager();
+    auto* const mshmgr = astmgr->get_mesh_manager();
     auto plate_mesh = mshmgr->create_plate(mshcall);
 
     std::vector<math::BasicVertex> close_vertices = {

@@ -56,10 +56,10 @@ gearoenix::render::scene::Scene::Scene(
     , dynamic_accelerator(new gearoenix::physics::accelerator::Bvh())
     , e(e)
 {
-    core::asset::Manager* const astmgr = e->get_system_application()->get_asset_manager();
+    auto* const astmgr = e->get_system_application()->get_asset_manager();
 #define GX_HELPER(x, n, cls)                                                            \
     {                                                                                   \
-        const std::shared_ptr<n::Manager>& mgr = astmgr->get_##x##_manager();           \
+        auto * const mgr = astmgr->get_##x##_manager();                                 \
         std::vector<core::Id> ids;                                                      \
         f->read(ids);                                                                   \
         if (!ids.empty()) {                                                             \

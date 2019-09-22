@@ -18,7 +18,7 @@ namespace audio {
         core::cache::File<Audio> cache;
 
     public:
-        Manager(system::stream::Stream* s, render::engine::Engine* e) noexcept;
+        Manager(std::unique_ptr<system::stream::Stream> s, render::engine::Engine* e) noexcept;
         ~Manager() noexcept = default;
         std::shared_ptr<Audio> get_gx3d(core::Id mid, core::sync::EndCaller<Audio>& c) noexcept;
     };

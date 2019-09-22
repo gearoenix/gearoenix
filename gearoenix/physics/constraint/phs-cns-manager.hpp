@@ -19,7 +19,7 @@ namespace physics::constraint {
         core::cache::File<Constraint> cache;
 
     public:
-        Manager(system::stream::Stream* s, render::engine::Engine* e) noexcept;
+        Manager(std::unique_ptr<system::stream::Stream> s, render::engine::Engine* e) noexcept;
         ~Manager() noexcept = default;
         std::shared_ptr<Constraint> get_gx3d(core::Id mid, core::sync::EndCaller<Constraint>& c) noexcept;
     };

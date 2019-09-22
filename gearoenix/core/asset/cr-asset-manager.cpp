@@ -23,7 +23,7 @@ gearoenix::core::asset::Manager::Manager(system::Application* const sys_app, con
     , file(system::stream::Asset::construct(sys_app, name))
 {
     if (file == nullptr) {
-#define GX_HELPER(a, n) a##_manager = std::make_shared<n::Manager>(nullptr, render_engine);
+#define GX_HELPER(a, n) a##_manager = std::make_unique<n::Manager>(nullptr, render_engine);
 
         GX_HELPER(camera, render::camera)
         GX_HELPER(audio, audio)
@@ -38,7 +38,7 @@ gearoenix::core::asset::Manager::Manager(system::Application* const sys_app, con
 #undef GX_HELPER
     } else {
         GXLOGD("Asset file found.")
-        system::stream::Stream* s = reinterpret_cast<system::stream::Stream*>(file.get());
+        auto * s = reinterpret_cast<system::stream::Stream*>(file.get());
         last_id.store(s->read<Id>());
         core::Count off;
 
@@ -46,7 +46,7 @@ gearoenix::core::asset::Manager::Manager(system::Application* const sys_app, con
     off = s->tell();                                     \
     s = system::stream::Asset::construct(sys_app, name); \
     s->seek(off);                                        \
-    a##_manager = std::make_shared<n::Manager>(s, render_engine);
+    a##_manager = std::make_unique<n::Manager>(std::unique_ptr<system::stream::Stream>(s), render_engine);
 
         GX_HELPER(camera, render::camera)
         GX_HELPER(audio, audio)
@@ -62,59 +62,8 @@ gearoenix::core::asset::Manager::Manager(system::Application* const sys_app, con
     }
 }
 
-const std::shared_ptr<gearoenix::system::stream::Asset>& gearoenix::core::asset::Manager::get_file() const noexcept
-{
-    return file;
-}
-
-const std::shared_ptr<gearoenix::render::camera::Manager>& gearoenix::core::asset::Manager::get_camera_manager() const noexcept
-{
-    return camera_manager;
-}
-
-const std::shared_ptr<gearoenix::audio::Manager>& gearoenix::core::asset::Manager::get_audio_manager() const noexcept
-{
-    return audio_manager;
-}
-
-const std::shared_ptr<gearoenix::render::light::Manager>& gearoenix::core::asset::Manager::get_light_manager() const noexcept
-{
-    return light_manager;
-}
-
-const std::shared_ptr<gearoenix::render::texture::Manager>& gearoenix::core::asset::Manager::get_texture_manager() const noexcept
-{
-    return texture_manager;
-}
-
-const std::shared_ptr<gearoenix::render::font::Manager>& gearoenix::core::asset::Manager::get_font_manager() const noexcept
-{
-    return font_manager;
-}
-
-const std::shared_ptr<gearoenix::render::mesh::Manager>& gearoenix::core::asset::Manager::get_mesh_manager() const noexcept
-{
-    return mesh_manager;
-}
-
-const std::shared_ptr<gearoenix::render::model::Manager>& gearoenix::core::asset::Manager::get_model_manager() const noexcept
-{
-    return model_manager;
-}
-
-const std::shared_ptr<gearoenix::render::skybox::Manager>& gearoenix::core::asset::Manager::get_skybox_manager() const noexcept
-{
-    return skybox_manager;
-}
-
-const std::shared_ptr<gearoenix::physics::constraint::Manager>& gearoenix::core::asset::Manager::get_constraint_manager() const noexcept
-{
-    return constraint_manager;
-}
-
-const std::shared_ptr<gearoenix::render::scene::Manager>& gearoenix::core::asset::Manager::get_scene_manager() const noexcept
-{
-    return scene_manager;
+gearoenix::core::asset::Manager::~Manager() noexcept {
+	GXLOGD("Asset manager deleted.")
 }
 
 gearoenix::core::Id gearoenix::core::asset::Manager::create_id() noexcept

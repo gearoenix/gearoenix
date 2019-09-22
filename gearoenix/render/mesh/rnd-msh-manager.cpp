@@ -4,9 +4,9 @@
 #include "rnd-msh-type.hpp"
 #include <utility>
 
-gearoenix::render::mesh::Manager::Manager(system::stream::Stream* const s, engine::Engine* const e) noexcept
+gearoenix::render::mesh::Manager::Manager(std::unique_ptr<system::stream::Stream> s, engine::Engine* const e) noexcept
     : e(e)
-    , cache(s)
+    , cache(std::move(s))
 {
 }
 
@@ -14,7 +14,7 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager:
 {
     auto m = cache.get<Mesh>(id, [id, c, this] {
         const auto& f = cache.get_file();
-        switch (f->read<core::TypeId>()) {
+        switch (f->read<Type>()) {
         case Type::BASIC:
             return std::make_shared<Mesh>(id, f, e, core::sync::EndCaller<core::sync::EndCallerIgnore>([c] {}));
         default:

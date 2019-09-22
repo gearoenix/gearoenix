@@ -24,7 +24,7 @@ namespace render {
             std::weak_ptr<Mesh> cube;
 
         public:
-            Manager(system::stream::Stream* s, engine::Engine* e) noexcept;
+            Manager(std::unique_ptr<system::stream::Stream> s, engine::Engine* e) noexcept;
             ~Manager() noexcept = default;
             std::shared_ptr<Mesh> get_gx3d(core::Id id, core::sync::EndCaller<Mesh>& c) noexcept;
             std::shared_ptr<Mesh> create_icosphere(core::sync::EndCaller<Mesh>& c) noexcept;

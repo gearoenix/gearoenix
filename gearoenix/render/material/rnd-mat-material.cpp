@@ -16,7 +16,7 @@ gearoenix::render::material::Material::Material(engine::Engine* const e, const c
     , uniform_buffers(std::make_shared<buffer::FramedUniform>(sizeof(Uniform), e))
 {
     core::sync::EndCaller<texture::Texture2D> calltxt2d([end](std::shared_ptr<texture::Texture2D>) {});
-    const std::shared_ptr<texture::Manager>& txtmgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
+    auto* const txtmgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
     color_txt = txtmgr->get_2d(math::Vec3(1.0f, 0.0f, 0.0f), calltxt2d);
     metallic_roughness = txtmgr->get_2d(math::Vec2(0.5f, 0.5f), calltxt2d);
     normal = txtmgr->get_2d(math::Vec3(0.5f, 0.5f, 1.0f), calltxt2d);
@@ -27,7 +27,7 @@ gearoenix::render::material::Material::Material(system::stream::Stream* const f,
     : e(e)
     , uniform_buffers(std::make_shared<buffer::FramedUniform>(sizeof(Uniform), e))
 {
-    const std::shared_ptr<texture::Manager>& txtmgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
+    auto * const txtmgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
 
     // Reading alpha
     if (f->read_bool()) {
@@ -135,7 +135,7 @@ void gearoenix::render::material::Material::set_color(
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept
 {
     core::sync::EndCaller<texture::Texture2D> calltxt2d([end](std::shared_ptr<texture::Texture2D>) {});
-    const std::shared_ptr<texture::Manager>& txtmgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
+    auto * const txtmgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
     color_txt = txtmgr->get_2d(math::Vec3(r, g, b), calltxt2d);
     color = math::Vec3(r, g, b);
 }

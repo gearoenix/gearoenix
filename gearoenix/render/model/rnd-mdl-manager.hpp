@@ -22,7 +22,7 @@ namespace render {
             core::cache::File<Model> cache;
 
         public:
-            Manager(system::stream::Stream* s, engine::Engine* e) noexcept;
+            Manager(std::unique_ptr<system::stream::Stream> s, engine::Engine* e) noexcept;
             ~Manager() noexcept = default;
             std::shared_ptr<Model> get_gx3d(core::Id mid, core::sync::EndCaller<Model>& c) noexcept;
             /// T must be derived from Model and have the same constructor that Model has.

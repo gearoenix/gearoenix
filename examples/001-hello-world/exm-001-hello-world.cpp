@@ -82,7 +82,7 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
 
     const std::shared_ptr<GxMesh> msh = astmgr->get_mesh_manager()->create_icosphere(mshcall);
     const std::shared_ptr<GxMesh> plate_mesh = astmgr->get_mesh_manager()->create_plate(mshcall);
-    const std::shared_ptr<GxMdManager>& mdlmgr = astmgr->get_model_manager();
+    auto * const mdlmgr = astmgr->get_model_manager();
     {
         const std::shared_ptr<GxMaterial> mat(new GxMaterial(render_engine, endcall));
         mat->set_roughness_factor(0.5f);

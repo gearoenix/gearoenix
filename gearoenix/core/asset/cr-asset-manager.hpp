@@ -1,5 +1,6 @@
 #ifndef GEAROENIX_CORE_ASSET_MANAGER_HPP
 #define GEAROENIX_CORE_ASSET_MANAGER_HPP
+#include "../cr-static.hpp"
 #include "../cr-types.hpp"
 #include "../sync/cr-sync-end-caller.hpp"
 #include <atomic>
@@ -56,35 +57,25 @@ namespace core {
     }
     namespace asset {
         class Manager {
+            GX_GET_CPTR_PRV(system::Application, sys_app)
+            GX_GET_CPTR_PRV(render::engine::Engine, render_engine)
+            GX_GET_UCPTR_PRV(system::stream::Asset, file)
+            GX_GET_UPTR_PRV(render::camera::Manager, camera_manager)
+            GX_GET_UPTR_PRV(audio::Manager, audio_manager)
+            GX_GET_UPTR_PRV(render::light::Manager, light_manager)
+            GX_GET_UPTR_PRV(render::texture::Manager, texture_manager)
+            GX_GET_UPTR_PRV(render::font::Manager, font_manager)
+            GX_GET_UPTR_PRV(render::mesh::Manager, mesh_manager)
+            GX_GET_UPTR_PRV(render::model::Manager, model_manager)
+            GX_GET_UPTR_PRV(render::skybox::Manager, skybox_manager)
+            GX_GET_UPTR_PRV(physics::constraint::Manager, constraint_manager)
+            GX_GET_UPTR_PRV(render::scene::Manager, scene_manager)
         private:
-            system::Application* sys_app = nullptr;
-            render::engine::Engine* render_engine = nullptr;
-            const std::shared_ptr<system::stream::Asset> file;
-            std::shared_ptr<render::camera::Manager> camera_manager = nullptr;
-            std::shared_ptr<audio::Manager> audio_manager = nullptr;
-            std::shared_ptr<render::light::Manager> light_manager = nullptr;
-            std::shared_ptr<render::texture::Manager> texture_manager = nullptr;
-            std::shared_ptr<render::font::Manager> font_manager = nullptr;
-            std::shared_ptr<render::mesh::Manager> mesh_manager = nullptr;
-            std::shared_ptr<render::model::Manager> model_manager = nullptr;
-            std::shared_ptr<render::skybox::Manager> skybox_manager = nullptr;
-            std::shared_ptr<physics::constraint::Manager> constraint_manager = nullptr;
-            std::shared_ptr<render::scene::Manager> scene_manager = nullptr;
             static std::atomic<Id> last_id;
 
         public:
             Manager(system::Application* sys_app, const std::string& file) noexcept;
-            const std::shared_ptr<system::stream::Asset>& get_file() const noexcept;
-            const std::shared_ptr<render::camera::Manager>& get_camera_manager() const noexcept;
-            const std::shared_ptr<audio::Manager>& get_audio_manager() const noexcept;
-            const std::shared_ptr<render::light::Manager>& get_light_manager() const noexcept;
-            const std::shared_ptr<render::texture::Manager>& get_texture_manager() const noexcept;
-            const std::shared_ptr<render::font::Manager>& get_font_manager() const noexcept;
-            const std::shared_ptr<render::mesh::Manager>& get_mesh_manager() const noexcept;
-            const std::shared_ptr<render::model::Manager>& get_model_manager() const noexcept;
-            const std::shared_ptr<render::skybox::Manager>& get_skybox_manager() const noexcept;
-            const std::shared_ptr<physics::constraint::Manager>& get_constraint_manager() const noexcept;
-            const std::shared_ptr<render::scene::Manager>& get_scene_manager() const noexcept;
+			~Manager() noexcept;
             static Id create_id() noexcept;
         };
     } // namespace asset
