@@ -5,12 +5,13 @@
 #include "cr-build-configuration.hpp"
 #include <functional>
 #include <vector>
+#include <memory>
 
 namespace gearoenix::core {
 template <class T>
 class OneLoopPool {
 private:
-    std::vector<T*> objects;
+    std::vector<std::unique_ptr<T>> objects;
     std::size_t current_index = 0;
     std::size_t increase_rate = 1;
 
@@ -92,18 +93,17 @@ gearoenix::core::OneLoopPool<T>::iterator::iterator(std::size_t index, OneLoopPo
 template <class T>
 gearoenix::core::OneLoopPool<T>::~OneLoopPool() noexcept
 {
-    for (T* t : objects)
-        delete t;
+	objects.clear();
 }
 
 template <class T>
 T* gearoenix::core::OneLoopPool<T>::get_next(std::function<T*()> f) noexcept
 {
     if (current_index < objects.size())
-        return objects[current_index++];
+        return objects[current_index++].get();
     for (std::size_t i = 0; i < increase_rate; ++i)
-        objects.push_back(f());
-    return objects[current_index++];
+        objects.push_back(std::unique_ptr<T>(f()));
+    return objects[current_index++].get();
 }
 
 template <class T>
@@ -151,7 +151,7 @@ typename std::enable_if<std::is_integral<I>::value, const T&>::type
     if (index < 0 || static_cast<std::size_t>(index) >= current_index)
         GXLOGF("Out of range index {" << index << "}");
 #endif
-    return *objects[index];
+    return *(objects[index].get());
 }
 
 template <class T>
@@ -163,7 +163,7 @@ typename std::enable_if<std::is_integral<I>::value, T&>::type
     if (index < 0 || static_cast<std::size_t>(index) >= current_index)
         GXLOGF("Out of range index {" << index << "}");
 #endif
-    return *objects[index];
+    return *(objects[index].get());
 }
 
 #endif
