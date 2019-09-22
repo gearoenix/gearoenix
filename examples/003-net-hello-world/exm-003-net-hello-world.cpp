@@ -39,7 +39,6 @@ using GxMaterial = gearoenix::render::material::Material;
 using GxMdManager = gearoenix::render::model::Manager;
 using GxMdMesh = gearoenix::render::model::Mesh;
 using GxMesh = gearoenix::render::mesh::Mesh;
-using GxStaticModel = gearoenix::render::model::Static;
 using GxDirLight = gearoenix::render::light::Directional;
 using GxLtManager = gearoenix::render::light::Manager;
 using GxPersCam = gearoenix::render::camera::Perspective;
@@ -88,22 +87,24 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
 
     ShelfInfo shelves_info[shelves_count];
 
-    GxReal y = margin;
-    for (int rowi = 0, i = 0; rowi < rows_count; ++rowi, y += margin) {
-        for (int shelfi = 0; shelfi < shelves_in_row_count; ++shelfi, y += shelf_thickness) {
-            GxReal x = margin;
-            for (int ci = 0; ci < shelves_in_column_count; ++ci, x += margin) {
-                const GxReal endx = x + lengthx;
-                GxReal z = marginz;
-                for (int zi = 0; zi < shelf_floors_count; ++i, ++zi, z += marginz) {
-                    const GxReal endz = z + shelf_height;
-                    auto& shelf_info = shelves_info[i];
-                    shelf_info.y = y;
-                    shelf_info.rand_genx = std::uniform_real_distribution<GxReal>(x, endx);
-                    shelf_info.rand_genz = std::uniform_real_distribution<GxReal>(z, endz);
-                    z = endz;
+    {
+        GxReal y = margin;
+        for (int rowi = 0, i = 0; rowi < rows_count; ++rowi, y += margin) {
+            for (int shelfi = 0; shelfi < shelves_in_row_count; ++shelfi, y += shelf_thickness) {
+                GxReal x = margin;
+                for (int ci = 0; ci < shelves_in_column_count; ++ci, x += margin) {
+                    const GxReal endx = x + lengthx;
+                    GxReal z = marginz;
+                    for (int zi = 0; zi < shelf_floors_count; ++i, ++zi, z += marginz) {
+                        const GxReal endz = z + shelf_height;
+                        auto& shelf_info = shelves_info[i];
+                        shelf_info.y = y;
+                        shelf_info.rand_genx = std::uniform_real_distribution<GxReal>(x, endx);
+                        shelf_info.rand_genz = std::uniform_real_distribution<GxReal>(z, endz);
+                        z = endz;
+                    }
+                    x = endx;
                 }
-                x = endx;
             }
         }
     }
@@ -112,7 +113,7 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
         scn->set_enability(true);
         uiscn->set_enability(true);
         auto* const event_engine = system_application->get_event_engine();
-        event_engine->add_listner(gearoenix::core::event::Id::ButtonMouse, -1.0f, this);
+        event_engine->add_listner(gearoenix::core::event::Id::ButtonMouse, 1.0f, this);
         event_engine->add_listner(gearoenix::core::event::Id::ButtonKeyboard, 1.0f, this);
         event_engine->add_listner(gearoenix::core::event::Id::MovementMouse, 1.0f, this);
         event_engine->add_listner(gearoenix::core::event::Id::ScrollMouse, 1.0f, this);
@@ -187,13 +188,14 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
     }
 	{
 		const std::shared_ptr<GxMaterial> mat(new GxMaterial(render_engine, endcall));
-		mat->set_color(0.3f, 0.3f, 0.3, endcall);
+		mat->set_color(0.3f, 0.3f, 0.3f, endcall);
 		mat->set_roughness_factor(0.2f);
 		mat->set_metallic_factor(0.9f);
 		const auto mdlmsh = std::make_shared<GxMdMesh>(cube, mat);
 		const GxReal scale = 0.025f;
 		const GxReal scalex = lengthx * 0.5f / scale;
-		const GxReal scaley = shelf_thickness * 0.5f / scale;
+        const GxReal scaley = (shelf_thickness * 0.5f + 0.5f) / scale;
+        const GxReal scalez = (shelf_height * 1.5f + marginz * 2.0f ) / scale;
 		GxReal y = margin + shelf_thickness * 0.5f;
 		for (int ri = 0; ri < rows_count; ++ri, y += shelf_thickness * 2.0f + margin)
 		{
@@ -214,22 +216,25 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
 					scn->add_model(mdl);
 				}
 			}
-		}
-		GxReal x = margin;
-		for (int xi = 0; xi < shelves_in_column_count; ++xi) {
-
-			auto fx = [&] {
-				const GxVec3 position(x, y, );
-				std::shared_ptr<GxStaticModel> mdl = mdlmgr->create<GxStaticModel>(mdlcall);
-				mdl->add_mesh(mdlmsh);
-				auto* tran = mdl->get_transformation();
-				tran->set_location(position);
-				tran->local_scale(scale);
-				tran->local_x_scale(scalex);
-				tran->local_y_scale(scaley);
-				mdl->set_collider(std::make_unique<GxCldSphere>(position, scale));
-				scn->add_model(mdl);
-			};
+            GxReal x = margin;
+            for (int xi = 0; xi < shelves_in_column_count; ++xi) {
+                auto fx = [&] {
+                    const GxVec3 position(x, y, shelf_height * 1.5f + marginz);
+                    std::shared_ptr<GxStaticModel> mdl = mdlmgr->create<GxStaticModel>(mdlcall);
+                    mdl->add_mesh(mdlmsh);
+                    auto* tran = mdl->get_transformation();
+                    tran->set_location(position);
+                    tran->local_scale(scale);
+                    tran->local_y_scale(scaley);
+                    tran->local_z_scale(scalez);
+                    mdl->set_collider(std::make_unique<GxCldSphere>(position, scale));
+                    scn->add_model(mdl);
+                };
+                fx();
+                x += lengthx;
+                fx();
+                x += margin;
+            }
 		}
 	}
     for (auto& s : shelves_info) {
@@ -285,6 +290,13 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
     look_at_text_tran->local_scale(0.06f);
     look_at_text_tran->set_location(GxVec3(-0.5f, -0.815f, 0.2f));
     look_at_button->add_child(look_at_text);
+    selected_item = nullptr;
+    look_at_button->set_on_click([this] {
+        if (nullptr != selected_item) {
+            camtrn->look_at(camtrn->get_location(), selected_item.load()->get_occlusion_sphere().get_center(), GxVec3(0.0f, 0.0f, 1.0f));
+            selected_item = nullptr;
+        }
+    });
 
     const auto plate_mesh = mshmgr->create_plate(mshcall);
     const std::shared_ptr<GxMaterial> btnmat(new GxMaterial(render_engine, endcall));
@@ -296,8 +308,9 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
     modal->set_enability(gearoenix::core::State::Unset);
     modal->get_transformation()->local_scale(0.5f);
     modal->set_on_close([this]() noexcept {
-        showing_object_details = false;
+        last_time_item_detail_modal_closed = std::chrono::high_resolution_clock::now();
         modal->set_enability(gearoenix::core::State::Unset);
+        selected_item = nullptr;
     });
 
     uiscn->add_model(modal);
@@ -340,9 +353,10 @@ bool GameApp::on_event(const gearoenix::core::event::Data& event_data) noexcept
             if (d.action == gearoenix::core::event::button::MouseActionId::Click) {
                 const auto ray = cam->create_ray3(d.position[0], d.position[1]);
                 auto hit = scn->hit(ray, std::numeric_limits<gearoenix::core::Real>::max());
-                if (hit.has_value() && !showing_object_details.exchange(true)) {
+                if (hit.has_value() && std::chrono::duration<GxReal>(std::chrono::high_resolution_clock::now() - last_time_item_detail_modal_closed).count() > 0.5f) {
                     auto* cld = hit.value().second;
                     auto* mdl = cld->get_parent();
+                    selected_item.store(reinterpret_cast<GxStaticModel*>(mdl));
                     auto& mdll = mdl->get_occlusion_sphere().get_center();
                     auto color = *(mdl->get_meshes().begin()->second->get_material()->get_color());
                     std::wstringstream tl;
@@ -392,18 +406,19 @@ bool GameApp::on_event(const gearoenix::core::event::Data& event_data) noexcept
         break;
     }
     case gearoenix::core::event::Id::ScrollMouse: {
-        if (!showing_object_details)
+        if (selected_item == nullptr) {
             translate_camera(camtrn->get_z_axis() * -std::get<gearoenix::core::event::button::MouseScroll>(event_data.data).direction[1]);
+        }
         break;
     }
     case gearoenix::core::event::Id::GestureDrag: {
-        if (!showing_object_details) {
+        if (selected_item == nullptr) {
             const auto& d = std::get<gearoenix::core::event::gesture::Drag>(event_data.data);
             const auto& v = d.delta_previous_position;
             camtrn->local_x_rotate(v[1]);
             camtrn->global_rotate(v[0], GxVec3(0.0f, 0.0f, 1.0f));
-            break;
         }
+        break;
     }
     default:
         break;

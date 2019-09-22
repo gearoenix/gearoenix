@@ -21,6 +21,10 @@ class Game;
 class Ui;
 }
 
+namespace gearoenix::render::model {
+class Static;
+}
+
 namespace gearoenix::render::widget {
 class Button;
 class Modal;
@@ -31,6 +35,7 @@ class GameApp : public gearoenix::core::Application,
                 public gearoenix::core::event::Listner {
 private:
     using GxGameScene = gearoenix::render::scene::Game;
+    using GxStaticModel = gearoenix::render::model::Static;
     using GxUiScene = gearoenix::render::scene::Ui;
     using GxCam = gearoenix::render::camera::Camera;
     using GxCamTran = gearoenix::render::camera::Transformation;
@@ -57,9 +62,10 @@ private:
     std::shared_ptr<GxButton> look_at_button;
     std::shared_ptr<GxTextWdg> text_location;
     std::unique_ptr<GxGrPbr> render_tree;
-    std::atomic<bool> showing_object_details = false;
+    std::chrono::high_resolution_clock::time_point last_time_item_detail_modal_closed = std::chrono::high_resolution_clock::now();
     std::atomic<GxReal> camera_forward = 0.0f;
     std::atomic<GxReal> camera_sideward = 0.0f;
+    std::atomic<GxStaticModel*> selected_item;
 
     void translate_camera(const GxVec3& t);
 
