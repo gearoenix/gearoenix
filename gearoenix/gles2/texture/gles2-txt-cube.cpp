@@ -57,7 +57,7 @@ gearoenix::gles2::texture::Cube::Cube(
         }
     } else
         GXLOGF("Unsupported/Unimplemented setting for cube texture with id " << my_id)
-    engine->get_function_loader()->load([this, gaspect, pixels{ move(pixels) }, cf, sample_info, call]{
+    engine->get_function_loader()->load([this, gaspect, pixels { move(pixels) }, cf, sample_info, call] {
         gl::Loader::gen_textures(1, &texture_object);
         gl::Loader::bind_texture(GL_TEXTURE_CUBE_MAP, texture_object);
         gl::Loader::tex_parameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, sample_info.mag_filter);

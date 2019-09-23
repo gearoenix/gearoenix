@@ -46,9 +46,9 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
     : gearoenix::core::Application::Application(sys_app)
 {
     const GxEndCallerIgnored endcall([this] { scn->set_enability(true); });
-    GxEndCaller<GxGameScene> scncall([endcall](std::shared_ptr<GxGameScene>) {});
-    GxEndCaller<GxMesh> mshcall([endcall](std::shared_ptr<GxMesh>) {});
-    GxEndCaller<GxStaticModel> mdlcall([endcall](std::shared_ptr<GxStaticModel>) {});
+    GxEndCaller<GxGameScene> scncall([endcall](const std::shared_ptr<GxGameScene>&) {});
+    GxEndCaller<GxMesh> mshcall([endcall](const std::shared_ptr<GxMesh>&) {});
+    GxEndCaller<GxStaticModel> mdlcall([endcall](const std::shared_ptr<GxStaticModel>&) {});
 
     render_engine->set_render_tree(new GxGrPbr(render_engine, endcall));
     gearoenix::core::asset::Manager* const astmgr = sys_app->get_asset_manager();
@@ -81,7 +81,7 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
 
     const std::shared_ptr<GxMesh> msh = astmgr->get_mesh_manager()->create_icosphere(mshcall);
     const std::shared_ptr<GxMesh> plate_mesh = astmgr->get_mesh_manager()->create_plate(mshcall);
-    auto * const mdlmgr = astmgr->get_model_manager();
+    auto* const mdlmgr = astmgr->get_model_manager();
     {
         const std::shared_ptr<GxMaterial> mat(new GxMaterial(render_engine, endcall));
         mat->set_roughness_factor(0.5f);

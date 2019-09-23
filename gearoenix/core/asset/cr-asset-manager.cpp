@@ -38,7 +38,7 @@ gearoenix::core::asset::Manager::Manager(system::Application* const sys_app, con
 #undef GX_HELPER
     } else {
         GXLOGD("Asset file found.")
-        auto * s = reinterpret_cast<system::stream::Stream*>(file.get());
+        auto* s = reinterpret_cast<system::stream::Stream*>(file.get());
         last_id.store(s->read<Id>());
         core::Count off;
 
@@ -63,7 +63,7 @@ gearoenix::core::asset::Manager::Manager(system::Application* const sys_app, con
 }
 
 gearoenix::core::asset::Manager::~Manager() noexcept {
-	GXLOGD("Asset manager deleted.")
+    GXLOGD("Asset manager deleted.")
 }
 
 gearoenix::core::Id gearoenix::core::asset::Manager::create_id() noexcept

@@ -96,10 +96,10 @@ void gearoenix::render::camera::Perspective::update_projection() noexcept
         -uniform.near,
         -uniform.far);
     uniform.uniform_projection = math::Mat4x4(
-                                      0.5f, 0.0f, 0.0f, 0.0f,
-                                      0.0f, 0.5f, 0.0f, 0.0f,
-                                      0.0f, 0.0f, 1.0f, 0.0f,
-                                      0.5f, 0.5f, 0.0f, 1.0f)
+                                     0.5f, 0.0f, 0.0f, 0.0f,
+                                     0.0f, 0.5f, 0.0f, 0.0f,
+                                     0.0f, 0.0f, 1.0f, 0.0f,
+                                     0.5f, 0.5f, 0.0f, 1.0f)
         * uniform.projection;
 }
 

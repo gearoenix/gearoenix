@@ -54,11 +54,11 @@ public:                                                           \
     void set_##x(t* const _##x) noexcept { x = _##x; }
 #define GX_GETSET_PTR_PRT(t, x) GX_GETSET_PTR(protected, t, x)
 
-#define GX_GET_ARR(v, t, x, c)                          \
-    v:                                                  \
-    t x[c] = {};                                        \
-                                                        \
-public:                                                 \
+#define GX_GET_ARR(v, t, x, c)                                        \
+    v:                                                                \
+    t x[c] = {};                                                      \
+                                                                      \
+public:                                                               \
     [[nodiscard]] const t(&get_##x() const noexcept)[c] { return x; } \
     [[nodiscard]] t(&get_##x() noexcept)[c] { return x; }
 #define GX_GET_ARR_PRV(t, x, c) GX_GET_ARR(private, t, x, c)

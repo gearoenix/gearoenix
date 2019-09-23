@@ -14,7 +14,7 @@ gearoenix::glc3::buffer::Vertex::Vertex(
 {
     const auto bf_size = static_cast<unsigned int>(vertices.size() * sizeof(math::BasicVertex));
     buffer_size = static_cast<std::size_t>(bf_size);
-    e->get_function_loader()->load([this, vertices{ move(vertices) }, c, bf_size]{
+    e->get_function_loader()->load([this, vertices { move(vertices) }, c, bf_size] {
 #ifdef GX_DEBUG_GL_CLASS_3
         gl::Loader::check_for_error();
 #endif

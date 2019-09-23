@@ -59,7 +59,7 @@ gearoenix::render::scene::Scene::Scene(
     auto* const astmgr = e->get_system_application()->get_asset_manager();
 #define GX_HELPER(x, n, cls)                                                            \
     {                                                                                   \
-        auto * const mgr = astmgr->get_##x##_manager();                                 \
+        auto* const mgr = astmgr->get_##x##_manager();                                  \
         std::vector<core::Id> ids;                                                      \
         f->read(ids);                                                                   \
         if (!ids.empty()) {                                                             \

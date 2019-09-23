@@ -32,13 +32,13 @@ namespace render {
                 const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
 
             Mesh(
-                const std::shared_ptr<mesh::Mesh>& msh,
-                const std::shared_ptr<material::Material>& mat) noexcept;
+                std::shared_ptr<mesh::Mesh> msh,
+                std::shared_ptr<material::Material> mat) noexcept;
 
             ~Mesh() noexcept;
 
-            const std::shared_ptr<mesh::Mesh>& get_mesh() const noexcept;
-            const std::shared_ptr<material::Material>& get_material() const noexcept;
+            [[nodiscard]] const std::shared_ptr<mesh::Mesh>& get_mesh() const noexcept;
+            [[nodiscard]] const std::shared_ptr<material::Material>& get_material() const noexcept;
             void update_uniform() noexcept;
         };
     }

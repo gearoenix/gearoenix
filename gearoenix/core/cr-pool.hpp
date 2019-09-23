@@ -4,8 +4,8 @@
 #include "../system/sys-log.hpp"
 #include "cr-build-configuration.hpp"
 #include <functional>
-#include <vector>
 #include <memory>
+#include <vector>
 
 namespace gearoenix::core {
 template <class T>
@@ -93,7 +93,7 @@ gearoenix::core::OneLoopPool<T>::iterator::iterator(std::size_t index, OneLoopPo
 template <class T>
 gearoenix::core::OneLoopPool<T>::~OneLoopPool() noexcept
 {
-	objects.clear();
+    objects.clear();
 }
 
 template <class T>

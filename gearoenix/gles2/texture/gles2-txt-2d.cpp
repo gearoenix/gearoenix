@@ -46,7 +46,7 @@ gearoenix::gles2::texture::Texture2D::Texture2D(
             pixels[i] = rdata[i];
     } else
         GXLOGF("Unsupported/Unimplemented setting for texture with id " << my_id)
-    e->get_function_loader()->load([this, pixels{ move(pixels) }, cf, gimg_width, gimg_height, sample_info, call]{
+    e->get_function_loader()->load([this, pixels { move(pixels) }, cf, gimg_width, gimg_height, sample_info, call] {
         gl::Loader::gen_textures(1, &texture_object);
         gl::Loader::bind_texture(GL_TEXTURE_2D, texture_object);
         gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, sample_info.min_filter);

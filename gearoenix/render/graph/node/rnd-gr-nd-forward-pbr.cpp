@@ -161,7 +161,7 @@ gearoenix::render::graph::node::ForwardPbr::ForwardPbr(
     for (auto& f : frames) {
         f = std::make_unique<ForwardPbrFrame>(e);
     }
-    auto *const txtmgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
+    auto* const txtmgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
     core::sync::EndCaller<texture::Cube> txtcubecall([call](const std::shared_ptr<texture::Cube>&) {});
     core::sync::EndCaller<texture::Texture2D> txt2dcall([call](const std::shared_ptr<texture::Texture2D>&) {});
 

@@ -16,10 +16,10 @@ void gearoenix::render::camera::Orthographic::update_aspects_size() noexcept
         std::abs(uniform.near),
         std::abs(uniform.far));
     uniform.uniform_projection = math::Mat4x4(
-                                      0.5f, 0.0f, 0.0f, 0.0f,
-                                      0.0f, 0.5f, 0.0f, 0.0f,
-                                      0.0f, 0.0f, 1.0f, 0.0f,
-                                      0.5f, 0.5f, 0.0f, 1.0f)
+                                     0.5f, 0.0f, 0.0f, 0.0f,
+                                     0.0f, 0.5f, 0.0f, 0.0f,
+                                     0.0f, 0.0f, 1.0f, 0.0f,
+                                     0.5f, 0.5f, 0.0f, 1.0f)
         * uniform.projection;
     transformation->update_view_projection();
 }

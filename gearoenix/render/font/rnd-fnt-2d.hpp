@@ -21,7 +21,7 @@ private:
         int max_width = 1;
         int height = 1;
     };
-	texture::Manager* const txt_mgr;
+    texture::Manager* const txt_mgr;
 
     std::vector<unsigned char> ttf_data;
     std::unique_ptr<stbtt_fontinfo> stb_font;

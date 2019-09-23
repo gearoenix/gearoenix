@@ -140,10 +140,10 @@ void gearoenix::system::Application::create_window() noexcept
 
 int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_Event* e) noexcept
 {
-	return reinterpret_cast<Application*>(user_data)->on_event(e);
+    return reinterpret_cast<Application*>(user_data)->on_event(e);
 }
 
-int gearoenix::system::Application::on_event(SDL_Event * const e) noexcept
+int gearoenix::system::Application::on_event(SDL_Event* const e) noexcept
 {
     core::event::Data event = {};
     // It's gonna implement whenever needed and as much as needed.

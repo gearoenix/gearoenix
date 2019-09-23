@@ -165,7 +165,7 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
     const auto& txtmgr = astmgr->get_texture_manager();
     const std::shared_ptr<GxMesh> msh = mshmgr->create_icosphere(mshcall);
     const std::shared_ptr<GxMesh> cube = mshmgr->create_cube(mshcall);
-    auto * const mdlmgr = astmgr->get_model_manager();
+    auto* const mdlmgr = astmgr->get_model_manager();
     {
         const std::shared_ptr<GxMesh> plate_mesh = mshmgr->create({ GxVertex { GxVec3(-55.0f, -30.0f, 0.0f), GxVec3(0.0f, 0.0f, 1.0f), GxVec4(1.0f, 0.0f, 0.0f, 1.0f), GxVec2(0.0f, 0.0f) },
                                                                       GxVertex { GxVec3(55.0f, -30.0f, 0.0f), GxVec3(0.0f, 0.0f, 1.0f), GxVec4(1.0f, 0.0f, 0.0f, 1.0f), GxVec2(110.0f, 0.0f) },
@@ -186,41 +186,45 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
         trans->local_scale(1.0f);
         scn->add_model(mdl);
     }
-	{
-		const std::shared_ptr<GxMaterial> mat(new GxMaterial(render_engine, endcall));
-		mat->set_color(0.3f, 0.3f, 0.3f, endcall);
-		mat->set_roughness_factor(0.2f);
-		mat->set_metallic_factor(0.9f);
-		const auto mdlmsh = std::make_shared<GxMdMesh>(cube, mat);
-		const GxReal scale = 0.025f;
-		const GxReal scalex = lengthx * 0.5f / scale;
+    {
+
+        const GxReal scale = 0.025f;
+        const GxReal scalex = lengthx * 0.5f / scale;
         const GxReal scaley = (shelf_thickness * 0.5f + 0.5f) / scale;
-        const GxReal scalez = (shelf_height * 1.5f + marginz * 2.0f ) / scale;
-		GxReal y = margin + shelf_thickness * 0.5f;
-		for (int ri = 0; ri < rows_count; ++ri, y += shelf_thickness * 2.0f + margin)
-		{
-			GxReal z = 0.0f;
-			for (int zi = 0; zi <= shelf_floors_count; ++zi, z += shelf_height + marginz)
-			{
-				GxReal x = margin + lengthx * 0.5f;
-				for (int xi = 0; xi < shelves_in_column_count; ++xi, x += margin + lengthx) {
-					const GxVec3 position(x, y, z);
-					std::shared_ptr<GxStaticModel> mdl = mdlmgr->create<GxStaticModel>(mdlcall);
-					mdl->add_mesh(mdlmsh);
-					auto* tran = mdl->get_transformation();
-					tran->set_location(position);
-					tran->local_scale(scale);
-					tran->local_x_scale(scalex);
-					tran->local_y_scale(scaley);
-					mdl->set_collider(std::make_unique<GxCldSphere>(position, scale));
-					scn->add_model(mdl);
-				}
-			}
+        const GxReal scalez = (shelf_height * 1.5f + marginz * 2.0f) / scale;
+        GxReal y = margin + shelf_thickness * 0.5f;
+        for (int ri = 0; ri < rows_count; ++ri, y += shelf_thickness * 2.0f + margin) {
+            GxReal z = 0.0f;
+            for (int zi = 0; zi <= shelf_floors_count; ++zi, z += shelf_height + marginz) {
+                GxReal x = margin + lengthx * 0.5f;
+                for (int xi = 0; xi < shelves_in_column_count; ++xi, x += margin + lengthx) {
+                    const GxVec3 position(x, y, z);
+                    std::shared_ptr<GxStaticModel> mdl = mdlmgr->create<GxStaticModel>(mdlcall);
+                    const std::shared_ptr<GxMaterial> mat(new GxMaterial(render_engine, endcall));
+                    mat->set_color(0.3f, 0.3f, 0.3f, endcall);
+                    mat->set_roughness_factor(0.2f);
+                    mat->set_metallic_factor(0.9f);
+                    const auto mdlmsh = std::make_shared<GxMdMesh>(cube, mat);
+                    mdl->add_mesh(mdlmsh);
+                    auto* tran = mdl->get_transformation();
+                    tran->set_location(position);
+                    tran->local_scale(scale);
+                    tran->local_x_scale(scalex);
+                    tran->local_y_scale(scaley);
+                    mdl->set_collider(std::make_unique<GxCldSphere>(position, scale));
+                    scn->add_model(mdl);
+                }
+            }
             GxReal x = margin;
             for (int xi = 0; xi < shelves_in_column_count; ++xi) {
                 auto fx = [&] {
                     const GxVec3 position(x, y, shelf_height * 1.5f + marginz);
                     std::shared_ptr<GxStaticModel> mdl = mdlmgr->create<GxStaticModel>(mdlcall);
+                    const std::shared_ptr<GxMaterial> mat(new GxMaterial(render_engine, endcall));
+                    mat->set_color(0.3f, 0.3f, 0.3f, endcall);
+                    mat->set_roughness_factor(0.2f);
+                    mat->set_metallic_factor(0.9f);
+                    const auto mdlmsh = std::make_shared<GxMdMesh>(cube, mat);
                     mdl->add_mesh(mdlmsh);
                     auto* tran = mdl->get_transformation();
                     tran->set_location(position);
@@ -235,10 +239,10 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
                 fx();
                 x += margin;
             }
-		}
-	}
+        }
+    }
     for (auto& s : shelves_info) {
-		
+
         const int items_count = rand_gen3(rand_eng);
         for (int i = 0; i < items_count; ++i) {
             const std::shared_ptr<GxMaterial> mat(new GxMaterial(render_engine, endcall));

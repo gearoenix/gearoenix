@@ -69,11 +69,11 @@ void gearoenix::render::model::Model::update() noexcept
 
 void gearoenix::render::model::Model::add_mesh(const std::shared_ptr<Mesh>& m) noexcept
 {
-    meshes[m->get_mesh()->get_asset_id()] = m;
     occlusion_sphere.insert(m->get_mesh()->get_radius());
     if (m->get_material()->get_is_shadow_caster()) {
         shadowing = gearoenix::core::State::Set;
     }
+    meshes[m->get_mesh()->get_asset_id()] = m;
 }
 
 void gearoenix::render::model::Model::add_child(const std::shared_ptr<Model>& c) noexcept

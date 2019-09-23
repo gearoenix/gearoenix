@@ -39,7 +39,7 @@ gearoenix::glc3::texture::Texture2D::Texture2D(
             pixels[i] = rdata[i];
     } else
         GXLOGF("Unsupported/Unimplemented setting for texture with id " << my_id)
-        e->get_function_loader()->load([this, pixels{ move(pixels) }, cf, gimg_width, gimg_height, sample_info, call]{
+    e->get_function_loader()->load([this, pixels { move(pixels) }, cf, gimg_width, gimg_height, sample_info, call] {
 #ifdef GX_DEBUG_GL_CLASS_3
         gl::Loader::check_for_error();
 #endif

@@ -13,7 +13,7 @@ gearoenix::glc3::buffer::Index::Index(
     : render::buffer::Static(static_cast<unsigned int>(indices.size() * sizeof(gl::uint)), e)
 {
     count = static_cast<gl::sizei>(indices.size());
-    e->get_function_loader()->load([this, data{ move(indices) }, c, bf_size = buffer_size.load()]{
+    e->get_function_loader()->load([this, data { move(indices) }, c, bf_size = buffer_size.load()] {
         gl::uint tbo;
         gl::Loader::gen_buffers(1, &tbo);
         gl::Loader::bind_buffer(GL_ELEMENT_ARRAY_BUFFER, tbo);

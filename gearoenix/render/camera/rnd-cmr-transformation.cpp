@@ -4,7 +4,7 @@
 #include <utility>
 
 gearoenix::render::camera::Transformation::Transformation(
-    Uniform * const uniform,
+    Uniform* const uniform,
     std::shared_ptr<math::ProjectorFrustum> frustum,
     std::shared_ptr<std::vector<std::array<math::Vec3, 4>>> cascade) noexcept
     : uniform(uniform)

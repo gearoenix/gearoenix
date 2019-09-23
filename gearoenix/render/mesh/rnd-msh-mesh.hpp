@@ -26,9 +26,10 @@ class Mesh : public core::asset::Asset {
     GX_GET_CVAL_PRT(Type, mesh_type)
     GX_GET_VAL_PRT(core::Real, radius, 0.0f)
     GX_GET_UPTR_PRT(buffer::Buffer, vertex_buffer)
-	GX_GET_UPTR_PRT(buffer::Buffer, index_buffer)
+    GX_GET_UPTR_PRT(buffer::Buffer, index_buffer)
 protected:
     Mesh(core::Id my_id, Type mesh_type) noexcept;
+
 public:
     Mesh(
         core::Id my_id,

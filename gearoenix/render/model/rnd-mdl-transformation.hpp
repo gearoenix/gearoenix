@@ -36,9 +36,9 @@ public:
     //void local_z_rotate(const core::Real d) noexcept override final;
     //void set_orientation(const math::Quat& q) noexcept override final;
     void local_scale(core::Real) noexcept final;
-	void local_x_scale(core::Real) noexcept final;
-	void local_y_scale(core::Real) noexcept final;
-	void local_z_scale(core::Real) noexcept final;
+    void local_x_scale(core::Real) noexcept final;
+    void local_y_scale(core::Real) noexcept final;
+    void local_z_scale(core::Real) noexcept final;
 };
 }
 #endif

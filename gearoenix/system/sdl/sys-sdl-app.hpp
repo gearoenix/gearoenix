@@ -54,7 +54,7 @@ namespace system {
 
         void create_window() noexcept;
         static int SDLCALL event_receiver(void* user_data, SDL_Event* event) noexcept;
-		int on_event(SDL_Event* event) noexcept;
+        int on_event(SDL_Event* event) noexcept;
 
     public:
         Application() noexcept;

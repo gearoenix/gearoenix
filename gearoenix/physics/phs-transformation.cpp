@@ -101,12 +101,12 @@ void gearoenix::physics::Transformation::local_x_scale(const core::Real) noexcep
 
 void gearoenix::physics::Transformation::local_y_scale(const core::Real) noexcept
 {
-	GXUNIMPLEMENTED
+    GXUNIMPLEMENTED
 }
 
 void gearoenix::physics::Transformation::local_z_scale(const core::Real) noexcept
 {
-	GXUNIMPLEMENTED
+    GXUNIMPLEMENTED
 }
 
 void gearoenix::physics::Transformation::set_orientation(const math::Quat&) noexcept

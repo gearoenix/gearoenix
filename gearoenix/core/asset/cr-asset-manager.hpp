@@ -75,7 +75,7 @@ namespace core {
 
         public:
             Manager(system::Application* sys_app, const std::string& file) noexcept;
-			~Manager() noexcept;
+            ~Manager() noexcept;
             static Id create_id() noexcept;
         };
     } // namespace asset

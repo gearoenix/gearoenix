@@ -12,7 +12,7 @@ namespace render::camera {
     struct Uniform;
     class Transformation : public physics::Transformation {
     private:
-        Uniform * const uniform;
+        Uniform* const uniform;
         const std::shared_ptr<math::ProjectorFrustum> frustum;
         const std::shared_ptr<std::vector<std::array<math::Vec3, 4>>> cascaded_shadow_frustum_partitions;
         std::function<void()> on_frustum_update = [] {};
