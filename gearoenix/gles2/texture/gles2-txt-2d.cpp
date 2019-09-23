@@ -22,11 +22,11 @@ gearoenix::gles2::texture::Texture2D::Texture2D(
     gl::uint cf;
     const gl::sizei gimg_width = static_cast<gl::sizei>(img_width);
     const gl::sizei gimg_height = static_cast<gl::sizei>(img_height);
-    std::uint8_t* pixels = nullptr;
+    std::vector<std::uint8_t> pixels;
     if (f == render::texture::TextureFormat::RGBA_FLOAT32) {
         cf = GL_RGBA;
         const gl::sizei pixel_size = gimg_width * gimg_height << 2;
-        pixels = new std::uint8_t[pixel_size];
+        pixels.resize(pixel_size);
         const auto rdata = reinterpret_cast<const core::Real*>(data);
         for (gl::sizei i = 0; i < pixel_size; ++i) {
             const auto c = rdata[i] * 255.1f;
@@ -40,25 +40,24 @@ gearoenix::gles2::texture::Texture2D::Texture2D(
     } else if (f == render::texture::TextureFormat::RGBA_UINT8) {
         cf = GL_RGBA;
         const gl::sizei pixel_size = gimg_width * gimg_height << 2;
-        pixels = new std::uint8_t[pixel_size];
+        pixels.resize(pixel_size);
         const auto rdata = reinterpret_cast<const std::uint8_t*>(data);
         for (gl::sizei i = 0; i < pixel_size; ++i)
             pixels[i] = rdata[i];
     } else
         GXLOGF("Unsupported/Unimplemented setting for texture with id " << my_id)
-    e->get_function_loader()->load([this, pixels, cf, gimg_width, gimg_height, sample_info, call] {
+    e->get_function_loader()->load([this, pixels{ move(pixels) }, cf, gimg_width, gimg_height, sample_info, call]{
         gl::Loader::gen_textures(1, &texture_object);
         gl::Loader::bind_texture(GL_TEXTURE_2D, texture_object);
         gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, sample_info.min_filter);
         gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, sample_info.mag_filter);
         gl::Loader::tex_parameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, sample_info.wrap_s);
         gl::Loader::tex_parameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, sample_info.wrap_t);
-        gl::Loader::tex_image_2d(GL_TEXTURE_2D, 0, static_cast<gl::sint>(cf), gimg_width, gimg_height, 0, static_cast<gl::enumerated>(cf), GL_UNSIGNED_BYTE, pixels);
+        gl::Loader::tex_image_2d(GL_TEXTURE_2D, 0, static_cast<gl::sint>(cf), gimg_width, gimg_height, 0, static_cast<gl::enumerated>(cf), GL_UNSIGNED_BYTE, pixels.data());
         gl::Loader::generate_mipmap(GL_TEXTURE_2D);
 #ifdef GX_DEBUG_GLES2
         gl::Loader::check_for_error();
 #endif
-        delete[] pixels;
     });
 }
 

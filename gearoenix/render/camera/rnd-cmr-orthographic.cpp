@@ -10,17 +10,17 @@
 
 void gearoenix::render::camera::Orthographic::update_aspects_size() noexcept
 {
-    uniform->projection = math::Mat4x4::orthographic(
-        aspects_size * uniform->aspect_ratio * 2.0f,
+    uniform.projection = math::Mat4x4::orthographic(
+        aspects_size * uniform.aspect_ratio * 2.0f,
         aspects_size * 2.0f,
-        std::abs(uniform->near),
-        std::abs(uniform->far));
-    uniform->uniform_projection = math::Mat4x4(
+        std::abs(uniform.near),
+        std::abs(uniform.far));
+    uniform.uniform_projection = math::Mat4x4(
                                       0.5f, 0.0f, 0.0f, 0.0f,
                                       0.0f, 0.5f, 0.0f, 0.0f,
                                       0.0f, 0.0f, 1.0f, 0.0f,
                                       0.5f, 0.5f, 0.0f, 1.0f)
-        * uniform->projection;
+        * uniform.projection;
     transformation->update_view_projection();
 }
 
@@ -34,9 +34,9 @@ void gearoenix::render::camera::Orthographic::update_cascades() noexcept
     if (cascaded_shadow_frustum_partitions->size() != sections_count_plus)
         cascaded_shadow_frustum_partitions->resize(sections_count_plus);
 
-    const math::Vec3 x = uniform->x * aspects_size * uniform->aspect_ratio;
-    const math::Vec3 y = uniform->y * aspects_size;
-    const math::Vec3 z = uniform->position + (uniform->z * uniform->near);
+    const math::Vec3 x = uniform.x * aspects_size * uniform.aspect_ratio;
+    const math::Vec3 y = uniform.y * aspects_size;
+    const math::Vec3 z = uniform.position + (uniform.z * uniform.near);
 
     const math::Vec3 zmx = z - x;
     const math::Vec3 zpx = z + x;
@@ -46,7 +46,7 @@ void gearoenix::render::camera::Orthographic::update_cascades() noexcept
     (*cascaded_shadow_frustum_partitions)[0][2] = zpx + y;
     (*cascaded_shadow_frustum_partitions)[0][3] = zmx + y;
 
-    const math::Vec3 z_inc = uniform->z * (std::abs(uniform->far) - std::abs(uniform->near));
+    const math::Vec3 z_inc = uniform.z * (std::abs(uniform.far) - std::abs(uniform.near));
 
     for (std::size_t i = 1, j = 0; i < sections_count_plus; ++i, ++j)
         for (int k = 0; k < 4; ++k)
@@ -75,14 +75,14 @@ gearoenix::render::camera::Orthographic::Orthographic(core::Id my_id, engine::En
 
 gearoenix::math::Ray3 gearoenix::render::camera::Orthographic::create_ray3(const core::Real x, const core::Real y) const noexcept
 {
-    const math::Vec3 dir = -uniform->z;
-    const math::Vec3 origin = (uniform->x * x) + (uniform->y * y) + (dir * -uniform->near) + uniform->position;
+    const math::Vec3 dir = -uniform.z;
+    const math::Vec3 origin = (uniform.x * x) + (uniform.y * y) + (dir * -uniform.near) + uniform.position;
     return math::Ray3(origin, dir);
 }
 
 gearoenix::core::Real gearoenix::render::camera::Orthographic::get_distance(const math::Vec3& model_location) const noexcept
 {
-    return (uniform->position - model_location).dot(uniform->z);
+    return (uniform.position - model_location).dot(uniform.z);
 }
 
 void gearoenix::render::camera::Orthographic::set_aspects_size(const core::Real a) noexcept

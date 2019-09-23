@@ -4,6 +4,7 @@
 #include "../../core/cr-static.hpp"
 #include "../../core/event/cr-ev-listner.hpp"
 #include "../../math/math-ray.hpp"
+#include "rnd-cmr-uniform.hpp"
 #include <array>
 #include <memory>
 #include <vector>
@@ -32,13 +33,12 @@ namespace render {
     }
     namespace camera {
         class Transformation;
-        struct Uniform;
         class Camera : public core::asset::Asset, public core::event::Listner {
             GX_GETSET_VAL_PRT(core::Real, layer, 0.0f)
         protected:
             bool enabled = true;
             engine::Engine* const e;
-            std::shared_ptr<Uniform> uniform;
+            Uniform uniform;
             std::shared_ptr<math::ProjectorFrustum> frustum;
             std::shared_ptr<Transformation> transformation;
             std::shared_ptr<buffer::FramedUniform> uniform_buffers;

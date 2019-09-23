@@ -26,7 +26,7 @@ void gearoenix::gles2::pipeline::ForwardPbrResourceSet::bind(gl::uint& bound_sha
 {
     GX_GLES2_PIPRES_START_DRAWING_MESH
     GX_GLES2_PIPRES_START_SHADER(ForwardPbr, shd)
-    auto camera = reinterpret_cast<const render::camera::Uniform*>(camera_uniform_buffer->get_data());
+    const auto* const camera = camera_uniform_buffer->get_ptr<render::camera::Uniform>();
     GX_GLES2_PIPRES_SET_UNIFORM(camera_position, *(camera->position.data()))
     GX_GLES2_PIPRES_SET_UNIFORM(camera_vp, *(camera->view_projection.data()))
     //static_cast<const texture::Texture2D *>(ambient_occlusion.get())->bind(shdr->get_effect_ambient_occlusion_index());
@@ -47,15 +47,15 @@ void gearoenix::gles2::pipeline::ForwardPbrResourceSet::bind(gl::uint& bound_sha
     }
     reinterpret_cast<const texture::Cube*>(specular_environment)->bind(static_cast<gl::enumerated>(shdr->get_effect_specular_environment_index()));
     GX_GLES2_PIPRES_BIND_MATERIAL
-    auto model = reinterpret_cast<const render::model::Uniform*>(model_uniform_buffer->get_data());
+    const auto* const model = model_uniform_buffer->get_ptr<render::model::Uniform>();
     GX_GLES2_PIPRES_SET_UNIFORM(model_m, *(model->m.data()))
-    auto scene = reinterpret_cast<const render::scene::Uniform*>(scene_uniform_buffer->get_data());
+    const auto* const scene = scene_uniform_buffer->get_ptr<render::scene::Uniform>();
     GX_GLES2_PIPRES_SET_UNIFORM(scene_ambient_light, *(scene->ambient_light.data()))
     GX_GLES2_PIPRES_SET_UNIFORM(scene_directional_lights_color, *(scene->directional_lights_color[0].data()))
     GX_GLES2_PIPRES_SET_UNIFORM(scene_directional_lights_direction, *(scene->directional_lights_direction[0].data()))
     GX_GLES2_PIPRES_SET_UNIFORM(scene_directional_lights_count, *(scene->lights_count.data()))
     //shdr->set_scene_ssao_config_data(scene->ssao_config.data());
-    auto node = reinterpret_cast<const render::graph::node::ForwardPbrUniform*>(node_uniform_buffer->get_data());
+    const auto* const node = node_uniform_buffer->get_ptr<render::graph::node::ForwardPbrUniform>();
     GX_GLES2_PIPRES_SET_UNIFORM(effect_point_lights_color_min_radius, *(node->point_lights_color_min_radius[0].data()))
     GX_GLES2_PIPRES_SET_UNIFORM(effect_point_lights_count, node->point_lights_count)
     GX_GLES2_PIPRES_SET_UNIFORM(effect_point_lights_position_max_radius, *(node->point_lights_position_max_radius[0].data()))

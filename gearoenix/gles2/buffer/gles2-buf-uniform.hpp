@@ -10,14 +10,15 @@ namespace engine {
 namespace buffer {
     class Uniform : public render::buffer::Uniform {
     private:
-        unsigned char* data = nullptr;
+        std::vector<unsigned char> data;
+
+        const void* get_data() const noexcept final;
+        void* get_data() noexcept final;
+        void update(const void* src) noexcept final;
 
     public:
         Uniform(std::size_t s, engine::Engine* e) noexcept;
         ~Uniform() noexcept final;
-        void update(const void* src) noexcept final;
-        const void* get_data() const noexcept final;
-        void* get_data() noexcept final;
     };
 } // namespace buffer
 } // namespace gearoenix

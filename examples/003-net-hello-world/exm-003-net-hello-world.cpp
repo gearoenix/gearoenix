@@ -85,7 +85,7 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
     constexpr int shelves_in_column_count = 3;
     constexpr int shelves_count = shelves_in_row_count * shelves_in_column_count * shelf_floors_count * rows_count;
 
-    ShelfInfo shelves_info[shelves_count];
+    std::vector<ShelfInfo> shelves_info(shelves_count);
 
     {
         GxReal y = margin;

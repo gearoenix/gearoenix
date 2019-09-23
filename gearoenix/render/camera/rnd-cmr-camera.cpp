@@ -10,22 +10,20 @@
 #include "../buffer/rnd-buf-framed-uniform.hpp"
 #include "../engine/rnd-eng-engine.hpp"
 #include "rnd-cmr-transformation.hpp"
-#include "rnd-cmr-uniform.hpp"
 
 gearoenix::render::camera::Camera::Camera(const core::Id my_id, engine::Engine* const e) noexcept
     : core::asset::Asset(my_id, core::asset::Type::CAMERA)
     , e(e)
-    , uniform(new Uniform)
     , frustum(new math::ProjectorFrustum(math::Mat4x4()))
     , uniform_buffers(new buffer::FramedUniform(sizeof(Uniform), e))
     , cascaded_shadow_frustum_partitions(new std::vector<std::array<math::Vec3, 4>>(
           static_cast<std::size_t>(e->get_system_application()->get_configuration().render_config.shadow_cascades_count) + 1))
 {
-    transformation = std::make_shared<Transformation>(uniform, frustum, cascaded_shadow_frustum_partitions);
+    transformation = std::make_shared<Transformation>(&uniform, frustum, cascaded_shadow_frustum_partitions);
     const auto& sys_app = e->get_system_application();
-    uniform->aspect_ratio = sys_app->get_window_ratio();
-    uniform->clip_width = static_cast<core::Real>(sys_app->get_window_width());
-    uniform->clip_height = static_cast<core::Real>(sys_app->get_window_height());
+    uniform.aspect_ratio = sys_app->get_window_ratio();
+    uniform.clip_width = static_cast<core::Real>(sys_app->get_window_width());
+    uniform.clip_height = static_cast<core::Real>(sys_app->get_window_height());
     sys_app->get_event_engine()->add_listner(core::event::Id::SystemWindowSizeChange, 1.0f, this);
 }
 
@@ -35,34 +33,33 @@ gearoenix::render::camera::Camera::Camera(
     engine::Engine* const e) noexcept
     : core::asset::Asset(my_id, core::asset::Type::CAMERA)
     , e(e)
-    , uniform(new Uniform)
     , frustum(new math::ProjectorFrustum(math::Mat4x4()))
     , uniform_buffers(new buffer::FramedUniform(sizeof(Uniform), e))
     , cascaded_shadow_frustum_partitions(new std::vector<std::array<math::Vec3, 4>>(
           static_cast<std::size_t>(e->get_system_application()->get_configuration().render_config.shadow_cascades_count) + 1))
 {
-    transformation = std::make_shared<Transformation>(uniform, frustum, cascaded_shadow_frustum_partitions);
+    transformation = std::make_shared<Transformation>(&uniform, frustum, cascaded_shadow_frustum_partitions);
     const auto& sys_app = e->get_system_application();
-    uniform->aspect_ratio = sys_app->get_window_ratio();
-    uniform->clip_width = static_cast<core::Real>(sys_app->get_window_width());
-    uniform->clip_height = static_cast<core::Real>(sys_app->get_window_height());
+    uniform.aspect_ratio = sys_app->get_window_ratio();
+    uniform.clip_width = static_cast<core::Real>(sys_app->get_window_width());
+    uniform.clip_height = static_cast<core::Real>(sys_app->get_window_height());
     sys_app->get_event_engine()->add_listner(core::event::Id::SystemWindowSizeChange, 1.0f, this);
-    uniform->position.read(f);
+    uniform.position.read(f);
     math::Quat q;
     f->read(q.w);
     f->read(q.x);
     f->read(q.y);
     f->read(q.z);
-    uniform->near = -f->read<core::Real>();
-    uniform->far = -f->read<core::Real>();
+    uniform.near = -f->read<core::Real>();
+    uniform.far = -f->read<core::Real>();
     const math::Mat4x4 r = q.to_mat();
-    uniform->x = r * uniform->x;
-    uniform->y = r * uniform->y;
-    uniform->z = r * uniform->z;
-    uniform->inversed_rotation = math::Quat(q.x, q.y, q.z, -q.w).to_mat();
-    GXLOGD("Position: " << uniform->position)
+    uniform.x = r * uniform.x;
+    uniform.y = r * uniform.y;
+    uniform.z = r * uniform.z;
+    uniform.inversed_rotation = math::Quat(q.x, q.y, q.z, -q.w).to_mat();
+    GXLOGD("Position: " << uniform.position)
     GXLOGD("Quaternion: " << q)
-    GXLOGD("Near: " << uniform->near)
+    GXLOGD("Near: " << uniform.near)
     transformation->update_location();
 }
 
@@ -83,7 +80,7 @@ const std::shared_ptr<gearoenix::physics::Transformation> gearoenix::render::cam
 
 void gearoenix::render::camera::Camera::set_far(const core::Real f) noexcept
 {
-    uniform->far = -f;
+    uniform.far = -f;
     transformation->update_projection();
 }
 
@@ -110,12 +107,12 @@ bool gearoenix::render::camera::Camera::in_sight(const gearoenix::math::Vec3& lo
 
 void gearoenix::render::camera::Camera::update_uniform()
 {
-    uniform_buffers->update(uniform.get());
+    uniform_buffers->update(uniform);
 }
 
 void gearoenix::render::camera::Camera::set_aspect_ratio(const gearoenix::core::Real ratio)
 {
-    uniform->aspect_ratio = ratio;
+    uniform.aspect_ratio = ratio;
 }
 
 const std::vector<std::array<gearoenix::math::Vec3, 4>>&
@@ -126,7 +123,7 @@ gearoenix::render::camera::Camera::get_cascaded_shadow_frustum_partitions() noex
 
 const gearoenix::render::camera::Uniform& gearoenix::render::camera::Camera::get_uniform() const noexcept
 {
-    return *uniform;
+    return uniform;
 }
 
 bool gearoenix::render::camera::Camera::on_event(const core::event::Data& d) noexcept
@@ -134,8 +131,8 @@ bool gearoenix::render::camera::Camera::on_event(const core::event::Data& d) noe
     const auto* sys_app = e->get_system_application();
     switch (d.source) {
     case core::event::Id::SystemWindowSizeChange:
-        uniform->clip_width = static_cast<core::Real>(sys_app->get_window_width());
-        uniform->clip_height = static_cast<core::Real>(sys_app->get_window_height());
+        uniform.clip_width = static_cast<core::Real>(sys_app->get_window_width());
+        uniform.clip_height = static_cast<core::Real>(sys_app->get_window_height());
         set_aspect_ratio(sys_app->get_window_ratio());
         return false;
     default:

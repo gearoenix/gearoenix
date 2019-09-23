@@ -28,12 +28,12 @@ void gearoenix::render::camera::Perspective::update_cascades() noexcept
     if (cascaded_shadow_frustum_partitions->size() != sections_count + 1)
         cascaded_shadow_frustum_partitions->resize(sections_count + 1);
 
-    const math::Vec3 xtanx = uniform->x * tanx;
-    const math::Vec3 ytany = uniform->y * tany;
+    const math::Vec3 xtanx = uniform.x * tanx;
+    const math::Vec3 ytany = uniform.y * tany;
 
-    math::Vec3 x = xtanx * -uniform->near;
-    math::Vec3 y = ytany * -uniform->near;
-    math::Vec3 z = uniform->position + (uniform->z * uniform->near);
+    math::Vec3 x = xtanx * -uniform.near;
+    math::Vec3 y = ytany * -uniform.near;
+    math::Vec3 z = uniform.position + (uniform.z * uniform.near);
 
     math::Vec3 zmx;
     math::Vec3 zpx;
@@ -48,9 +48,9 @@ void gearoenix::render::camera::Perspective::update_cascades() noexcept
 
     GX_HELPER(0);
 
-    x = xtanx * -uniform->far;
-    y = ytany * -uniform->far;
-    z = uniform->position + (uniform->z * uniform->far);
+    x = xtanx * -uniform.far;
+    y = ytany * -uniform.far;
+    z = uniform.position + (uniform.z * uniform.far);
 
     GX_HELPER(sections_count);
 
@@ -64,14 +64,14 @@ void gearoenix::render::camera::Perspective::update_cascades() noexcept
     const core::Real oneminlambda = 1.0f - lambda;
     const core::Real onedivcn = 1.0f / static_cast<core::Real>(sections_count);
     // uniform increament
-    const core::Real unisecinc = oneminlambda * onedivcn * (uniform->far - uniform->near);
-    const core::Real fdivn = uniform->far / uniform->near;
+    const core::Real unisecinc = oneminlambda * onedivcn * (uniform.far - uniform.near);
+    const core::Real fdivn = uniform.far / uniform.near;
     // logarithmic multiplication
     const core::Real logsecmul = std::pow(fdivn, onedivcn);
     // uniform sector
-    core::Real unisec = oneminlambda * uniform->near;
+    core::Real unisec = oneminlambda * uniform.near;
     // logarithmic sector
-    core::Real logsec = lambda * uniform->near;
+    core::Real logsec = lambda * uniform.near;
 
     for (std::size_t i = 1; i < sections_count; ++i) {
         logsec *= logsecmul;
@@ -80,7 +80,7 @@ void gearoenix::render::camera::Perspective::update_cascades() noexcept
         const core::Real l = logsec + unisec;
         x = xtanx * l;
         y = ytany * l;
-        z = uniform->position + (uniform->z * l);
+        z = uniform.position + (uniform.z * l);
 
         GX_HELPER(i);
     }
@@ -90,17 +90,17 @@ void gearoenix::render::camera::Perspective::update_cascades() noexcept
 
 void gearoenix::render::camera::Perspective::update_projection() noexcept
 {
-    uniform->projection = math::Mat4x4::perspective(
-        tanx * uniform->near * -2.0f,
-        tany * uniform->near * -2.0f,
-        -uniform->near,
-        -uniform->far);
-    uniform->uniform_projection = math::Mat4x4(
+    uniform.projection = math::Mat4x4::perspective(
+        tanx * uniform.near * -2.0f,
+        tany * uniform.near * -2.0f,
+        -uniform.near,
+        -uniform.far);
+    uniform.uniform_projection = math::Mat4x4(
                                       0.5f, 0.0f, 0.0f, 0.0f,
                                       0.0f, 0.5f, 0.0f, 0.0f,
                                       0.0f, 0.0f, 1.0f, 0.0f,
                                       0.5f, 0.5f, 0.0f, 1.0f)
-        * uniform->projection;
+        * uniform.projection;
 }
 
 gearoenix::render::camera::Perspective::Perspective(
@@ -137,19 +137,19 @@ void gearoenix::render::camera::Perspective::set_field_of_view(const core::Real 
 {
     fovx = radian;
     tanx = tanf(radian * 0.5f);
-    tany = tanx / uniform->aspect_ratio;
+    tany = tanx / uniform.aspect_ratio;
     update_fovy();
 }
 
 gearoenix::math::Ray3 gearoenix::render::camera::Perspective::create_ray3(const core::Real x, const core::Real y) const noexcept
 {
-    math::Vec3 dir = (uniform->x * (x / uniform->aspect_ratio)) + (uniform->y * (y / uniform->aspect_ratio)) + (uniform->z * uniform->near);
-    const math::Vec3 origin = dir + uniform->position;
+    math::Vec3 dir = (uniform.x * (x / uniform.aspect_ratio)) + (uniform.y * (y / uniform.aspect_ratio)) + (uniform.z * uniform.near);
+    const math::Vec3 origin = dir + uniform.position;
     dir.normalize();
     return math::Ray3(origin, dir);
 }
 
 gearoenix::core::Real gearoenix::render::camera::Perspective::get_distance(const math::Vec3& model_location) const noexcept
 {
-    return (model_location - uniform->position).square_length();
+    return (model_location - uniform.position).square_length();
 }

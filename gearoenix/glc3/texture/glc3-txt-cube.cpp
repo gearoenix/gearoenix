@@ -39,26 +39,25 @@ gearoenix::glc3::texture::Cube::Cube(
     if (aspect != 1 && aspect < GX_GLC3_MIN_TEXCUBE_ASPECT)
         GXLOGF("Unsupported image aspect in GLES2 for cube texture id: " << my_id);
 #endif
-    std::uint8_t** pixels = nullptr;
+    std::vector<std::vector<std::uint8_t>> pixels(GX_COUNT_OF(FACES));
     if (f == render::texture::TextureFormat::RGBA_FLOAT32 && aspect == 1) {
         cf = GL_RGBA;
         const gl::sizei pixel_size = gaspect * gaspect * 4;
         const auto* const rdata = reinterpret_cast<const core::Real*>(data);
-        pixels = new std::uint8_t*[GX_COUNT_OF(FACES)];
         std::uint8_t p[4];
         p[0] = static_cast<std::uint8_t>(rdata[0] * 255.1f);
         p[1] = static_cast<std::uint8_t>(rdata[1] * 255.1f);
         p[2] = static_cast<std::uint8_t>(rdata[2] * 255.1f);
         p[3] = static_cast<std::uint8_t>(rdata[3] * 255.1f);
         for (int fi = 0; fi < static_cast<int>(GX_COUNT_OF(FACES)); ++fi) {
-            pixels[fi] = new std::uint8_t[pixel_size];
+            pixels[fi].resize(pixel_size);
             for (gl::sizei i = 0; i < pixel_size;)
                 for (int j = 0; j < 4; ++j, ++i)
                     pixels[fi][i] = p[j];
         }
     } else
         GXLOGF("Unsupported/Unimplemented setting for cube texture with id " << my_id)
-    engine->get_function_loader()->load([this, gaspect, pixels, cf, sample_info, call] {
+    engine->get_function_loader()->load([this, gaspect, pixels { move(pixels) }, cf, sample_info, call]{
         gl::Loader::gen_textures(1, &texture_object);
         gl::Loader::bind_texture(GL_TEXTURE_CUBE_MAP, texture_object);
         gl::Loader::tex_parameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, sample_info.mag_filter);
@@ -66,16 +65,12 @@ gearoenix::glc3::texture::Cube::Cube(
         gl::Loader::tex_parameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, sample_info.wrap_s);
         gl::Loader::tex_parameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, sample_info.wrap_t);
         for (int fi = 0; fi < static_cast<int>(GX_COUNT_OF(FACES)); ++fi) {
-            gl::Loader::tex_image_2d(FACES[fi], 0, static_cast<gl::sint>(cf), gaspect, gaspect, 0, cf, GL_UNSIGNED_BYTE, pixels[fi]);
+            gl::Loader::tex_image_2d(FACES[fi], 0, static_cast<gl::sint>(cf), gaspect, gaspect, 0, cf, GL_UNSIGNED_BYTE, pixels[fi].data());
         }
         gl::Loader::check_for_error();
         gl::Loader::generate_mipmap(GL_TEXTURE_CUBE_MAP);
         // It clears the errors, some drivers does not support mip-map generation for cube texture
         gl::Loader::get_error();
-        for (int fi = 0; fi < static_cast<int>(GX_COUNT_OF(FACES)); ++fi) {
-            delete[] pixels[fi];
-        }
-        delete[] pixels;
     });
 }
 

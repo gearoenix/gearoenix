@@ -4,10 +4,10 @@
 #include <utility>
 
 gearoenix::render::camera::Transformation::Transformation(
-    std::shared_ptr<Uniform> uniform,
+    Uniform * const uniform,
     std::shared_ptr<math::ProjectorFrustum> frustum,
     std::shared_ptr<std::vector<std::array<math::Vec3, 4>>> cascade) noexcept
-    : uniform(std::move(uniform))
+    : uniform(uniform)
     , frustum(std::move(frustum))
     , cascaded_shadow_frustum_partitions(std::move(cascade))
 {

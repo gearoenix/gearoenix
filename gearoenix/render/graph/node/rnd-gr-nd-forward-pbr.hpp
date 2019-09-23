@@ -55,21 +55,21 @@ namespace graph::node {
     };
 
     struct ForwardPbrRenderData {
-        pipeline::ForwardPbrResourceSet* r = nullptr;
-        buffer::Uniform* u = nullptr;
+        std::unique_ptr<pipeline::ForwardPbrResourceSet> r;
+        std::unique_ptr<buffer::Uniform> u;
         ForwardPbrRenderData(engine::Engine* e, pipeline::Pipeline* pip) noexcept;
         ~ForwardPbrRenderData() noexcept;
     };
 
     struct ForwardPbrKernel {
-        command::Buffer* secondary_cmd = nullptr;
+        std::unique_ptr<command::Buffer> secondary_cmd;
         core::OneLoopPool<ForwardPbrRenderData> render_data_pool;
         ForwardPbrKernel(engine::Engine* e, unsigned int kernel_index) noexcept;
         ~ForwardPbrKernel() noexcept;
     };
 
     struct ForwardPbrFrame {
-        std::vector<ForwardPbrKernel*> kernels;
+        std::vector<std::unique_ptr<ForwardPbrKernel>> kernels;
         explicit ForwardPbrFrame(engine::Engine* e) noexcept;
         ~ForwardPbrFrame() noexcept;
     };
@@ -79,7 +79,7 @@ namespace graph::node {
     /// The user of this class must use its functionalities in their correct contextes.
     class ForwardPbr : public Node {
     private:
-        std::vector<ForwardPbrFrame*> frames;
+        std::vector<std::unique_ptr<ForwardPbrFrame>> frames;
         ForwardPbrFrame* frame = nullptr;
         const scene::Scene* scn = nullptr;
         const camera::Camera* cam = nullptr;

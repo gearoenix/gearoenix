@@ -91,14 +91,12 @@ gearoenix::render::graph::node::ForwardPbrRenderData::ForwardPbrRenderData(engin
     : r(reinterpret_cast<pipeline::ForwardPbrResourceSet*>(pip->create_resource_set()))
     , u(e->get_buffer_manager()->create_uniform(sizeof(ForwardPbrUniform)))
 {
-    r->set_node_uniform_buffer(u);
+    r->set_node_uniform_buffer(u.get());
 }
 
 gearoenix::render::graph::node::ForwardPbrRenderData::~ForwardPbrRenderData() noexcept
 {
-    delete r;
     r = nullptr;
-    delete u;
     u = nullptr;
 }
 
@@ -117,8 +115,8 @@ void gearoenix::render::graph::node::ForwardPbr::record(
         auto* const rd = kernel->render_data_pool.get_next([this] {
             return new ForwardPbrRenderData(e, render_pipeline.get());
         });
-        rd->u->update(&u);
-        auto* const prs = rd->r;
+        rd->u->set_data(u);
+        auto* const prs = rd->r.get();
         prs->set_scene(scn);
         prs->set_camera(cam);
         prs->set_model(m);
@@ -161,7 +159,7 @@ gearoenix::render::graph::node::ForwardPbr::ForwardPbr(
 {
     set_providers_count(input_textures.size());
     for (auto& f : frames) {
-        f = new ForwardPbrFrame(e);
+        f = std::make_unique<ForwardPbrFrame>(e);
     }
     auto *const txtmgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
     core::sync::EndCaller<texture::Cube> txtcubecall([call](const std::shared_ptr<texture::Cube>&) {});
@@ -175,8 +173,7 @@ gearoenix::render::graph::node::ForwardPbr::ForwardPbr(
 
 gearoenix::render::graph::node::ForwardPbr::~ForwardPbr() noexcept
 {
-    for (ForwardPbrFrame* f : frames)
-        delete f;
+    frames.clear();
 }
 
 void gearoenix::render::graph::node::ForwardPbr::set_diffuse_environment(texture::Cube* const t) noexcept
@@ -203,7 +200,7 @@ void gearoenix::render::graph::node::ForwardPbr::update() noexcept
 {
     Node::update();
     const unsigned int frame_number = e->get_frame_number();
-    frame = frames[frame_number];
+    frame = frames[frame_number].get();
     for (auto& kernel : frame->kernels) {
         kernel->render_data_pool.refresh();
         kernel->secondary_cmd->begin();
@@ -281,7 +278,7 @@ void gearoenix::render::graph::node::ForwardPbr::submit() noexcept
     command::Buffer* cmd = frames_primary_cmd[frame_number].get();
     cmd->bind(render_target.get());
     for (const auto& k : frame->kernels) {
-        cmd->record(k->secondary_cmd);
+        cmd->record(k->secondary_cmd.get());
     }
     Node::submit();
 }
@@ -290,16 +287,12 @@ gearoenix::render::graph::node::ForwardPbrFrame::ForwardPbrFrame(engine::Engine*
     : kernels(e->get_kernels()->get_threads_count())
 {
     for (std::size_t i = 0; i < kernels.size(); ++i) {
-        kernels[i] = new ForwardPbrKernel(e, static_cast<unsigned int>(i));
+        kernels[i] = std::make_unique<ForwardPbrKernel>(e, static_cast<unsigned int>(i));
     }
 }
 
 gearoenix::render::graph::node::ForwardPbrFrame::~ForwardPbrFrame() noexcept
 {
-    for (ForwardPbrKernel*& k : kernels) {
-        delete k;
-        k = nullptr;
-    }
     kernels.clear();
 }
 
@@ -310,6 +303,5 @@ gearoenix::render::graph::node::ForwardPbrKernel::ForwardPbrKernel(engine::Engin
 
 gearoenix::render::graph::node::ForwardPbrKernel::~ForwardPbrKernel() noexcept
 {
-    delete secondary_cmd;
     secondary_cmd = nullptr;
 }

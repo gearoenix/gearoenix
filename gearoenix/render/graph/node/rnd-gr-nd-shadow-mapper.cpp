@@ -104,7 +104,7 @@ void gearoenix::render::graph::node::ShadowMapper::record(const math::Mat4x4& mv
             return new ShadowMapperRenderData(e, render_pipeline.get());
         });
         const auto& ub = rd->u;
-        ub->update(&mvp);
+        ub->set_data(mvp);
         const auto& prs = rd->r;
         prs->set_mesh(msh.get());
         prs->set_material(mat.get());

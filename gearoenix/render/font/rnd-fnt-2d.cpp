@@ -34,12 +34,12 @@ gearoenix::render::font::Font2D::MultilineTextAspectsInfo gearoenix::render::fon
         }
         int advance = 0;
         int lsb = 0;
-        stbtt_GetCodepointHMetrics(stb_font, c, &advance, &lsb);
+        stbtt_GetCodepointHMetrics(stb_font.get(), c, &advance, &lsb);
         lsb = w - lsb;
         if (a.max_lsb > lsb)
             a.max_lsb = lsb;
         w += advance;
-        w += stbtt_GetCodepointKernAdvance(stb_font, c, next_c);
+        w += stbtt_GetCodepointKernAdvance(stb_font.get(), c, next_c);
         if (a.max_width < w)
             a.max_width = w;
     }
@@ -50,7 +50,7 @@ gearoenix::render::font::Font2D::MultilineTextAspectsInfo gearoenix::render::fon
         } else {
             int advance = 0;
             int lsb = 0;
-            stbtt_GetCodepointHMetrics(stb_font, c, &advance, &lsb);
+            stbtt_GetCodepointHMetrics(stb_font.get(), c, &advance, &lsb);
             lsb = w - lsb;
             if (a.max_lsb > lsb)
                 a.max_lsb = lsb;
@@ -66,8 +66,8 @@ gearoenix::render::font::Font2D::MultilineTextAspectsInfo gearoenix::render::fon
 
 void gearoenix::render::font::Font2D::init() noexcept
 {
-    GX_CHECK_NOT_EQAUL_D(0, stbtt_InitFont(stb_font, ttf_data.data(), 0))
-    stbtt_GetFontVMetrics(stb_font, &ascent, &descent, &line_gap);
+    GX_CHECK_NOT_EQAUL_D(0, stbtt_InitFont(stb_font.get(), ttf_data.data(), 0))
+    stbtt_GetFontVMetrics(stb_font.get(), &ascent, &descent, &line_gap);
     fnt_height = ascent - descent;
     line_growth = line_gap + fnt_height;
 }
@@ -100,7 +100,7 @@ gearoenix::render::font::Font2D::Font2D(const core::Id my_id, texture::Manager*c
 
 gearoenix::render::font::Font2D::~Font2D() noexcept
 {
-    delete stb_font;
+    stb_font = nullptr;
 }
 
 const std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::font::Font2D::multiline_bake(
@@ -143,18 +143,18 @@ const std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::
         }
         int advance, lsb, x0, y0, x1, y1;
         const core::Real x_shift = xpos - static_cast<core::Real>(floor(xpos));
-        stbtt_GetCodepointHMetrics(stb_font, c, &advance, &lsb);
-        stbtt_GetCodepointBitmapBoxSubpixel(stb_font, c, w_scale, h_scale, x_shift, y_shift, &x0, &y0, &x1, &y1);
-        stbtt_MakeCodepointBitmapSubpixel(stb_font, &rnd_data[index(int(xpos) + x0, int(base_line) + y0)], x1 - x0, y1 - y0, img_width, w_scale, h_scale, x_shift, y_shift, c);
-        xpos += w_scale * (advance + stbtt_GetCodepointKernAdvance(stb_font, c, next_c));
+        stbtt_GetCodepointHMetrics(stb_font.get(), c, &advance, &lsb);
+        stbtt_GetCodepointBitmapBoxSubpixel(stb_font.get(), c, w_scale, h_scale, x_shift, y_shift, &x0, &y0, &x1, &y1);
+        stbtt_MakeCodepointBitmapSubpixel(stb_font.get(), &rnd_data[index(int(xpos) + x0, int(base_line) + y0)], x1 - x0, y1 - y0, img_width, w_scale, h_scale, x_shift, y_shift, c);
+        xpos += w_scale * (advance + stbtt_GetCodepointKernAdvance(stb_font.get(), c, next_c));
     }
     {
         const wchar_t c = text[txt_size_less];
         if (c != '\n') {
             int x0, y0, x1, y1;
             const core::Real x_shift = xpos - static_cast<core::Real>(floor(xpos));
-            stbtt_GetCodepointBitmapBoxSubpixel(stb_font, c, w_scale, h_scale, x_shift, y_shift, &x0, &y0, &x1, &y1);
-            stbtt_MakeCodepointBitmapSubpixel(stb_font, &rnd_data[index(int(xpos) + x0, int(base_line) + y0)], x1 - x0, y1 - y0, img_width, w_scale, h_scale, x_shift, y_shift, c);
+            stbtt_GetCodepointBitmapBoxSubpixel(stb_font.get(), c, w_scale, h_scale, x_shift, y_shift, &x0, &y0, &x1, &y1);
+            stbtt_MakeCodepointBitmapSubpixel(stb_font.get(), &rnd_data[index(int(xpos) + x0, int(base_line) + y0)], x1 - x0, y1 - y0, img_width, w_scale, h_scale, x_shift, y_shift, c);
         }
     }
 

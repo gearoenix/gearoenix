@@ -60,7 +60,7 @@ gearoenix::render::model::Model::~Model() noexcept
 
 void gearoenix::render::model::Model::update() noexcept
 {
-    uniform_buffers->update(&uniform);
+    uniform_buffers->update(uniform);
     for (const auto& msh : meshes)
         msh.second->update_uniform();
     for (const auto& ch : children)

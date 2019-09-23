@@ -24,7 +24,7 @@ private:
 	texture::Manager* const txt_mgr;
 
     std::vector<unsigned char> ttf_data;
-    stbtt_fontinfo* stb_font = nullptr;
+    std::unique_ptr<stbtt_fontinfo> stb_font;
     int ascent = 0;
     int descent = 0;
     int line_gap = 0;

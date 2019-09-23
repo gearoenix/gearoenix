@@ -82,7 +82,7 @@ gearoenix::render::material::Material::Material(system::stream::Stream* const f,
 
 void gearoenix::render::material::Material::update_uniform() noexcept
 {
-    uniform_buffers->update(&uniform);
+    uniform_buffers->update(uniform);
 }
 
 const std::shared_ptr<gearoenix::render::buffer::FramedUniform>& gearoenix::render::material::Material::get_uniform_buffers() const noexcept

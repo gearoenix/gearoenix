@@ -232,7 +232,7 @@ void gearoenix::render::scene::Scene::update() noexcept
         }
     }
     uniform.lights_count[0] = static_cast<core::Real>(dirc);
-    uniform_buffers->update(&uniform);
+    uniform_buffers->update(uniform);
 }
 
 std::optional<std::pair<gearoenix::core::Real, gearoenix::physics::collider::Collider*>> gearoenix::render::scene::Scene::hit(const math::Ray3& r, core::Real d_min) const noexcept

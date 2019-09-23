@@ -111,11 +111,6 @@ public:                         \
     {                                     \
         std::memset((x), 0, sizeof((x))); \
     }
-#define GX_DELETE(x)      \
-    if ((x) != nullptr) { \
-        delete (x);       \
-        (x) = nullptr;    \
-    }
 #define GX_CHECK_NOT_EQAUL(x, y)               \
     {                                          \
         if ((x) == (y)) {                      \
