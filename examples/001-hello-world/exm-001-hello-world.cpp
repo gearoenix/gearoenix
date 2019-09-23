@@ -22,7 +22,6 @@
 #include <gearoenix/render/model/rnd-mdl-transformation.hpp>
 #include <gearoenix/render/scene/rnd-scn-game.hpp>
 #include <gearoenix/render/scene/rnd-scn-manager.hpp>
-#include <gearoenix/render/scene/rnd-scn-scene.hpp>
 #include <gearoenix/system/sys-app.hpp>
 #include <gearoenix/system/sys-log.hpp>
 
@@ -100,7 +99,7 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
             const std::shared_ptr<GxMaterial> mat(new GxMaterial(render_engine, endcall));
             mat->set_roughness_factor(roughness);
             mat->set_metallic_factor(metallic);
-            const std::shared_ptr<GxStaticModel> mdl = mdlmgr->create<GxStaticModel>(mdlcall);
+            const auto mdl = mdlmgr->create<GxStaticModel>(mdlcall);
             mdl->add_mesh(std::make_shared<GxMdMesh>(msh, mat));
             mdl->get_transformation()->set_location(GxVec3(x, y, 0.0f));
             scn->add_model(mdl);
@@ -121,7 +120,7 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
 
 void GameApp::update() noexcept
 {
-    camtrn->global_rotate(render_engine->get_delta_time() * 0.1f, GxVec3(0.0f, 0.0f, 1.0f));
+    camtrn->global_rotate(render_engine->get_delta_time() * 0.1f, GxVec3(0.0f, 0.0f, 1.0f), GxVec3(0.0f, 0.0f, 0.0f));
 }
 
 void GameApp::terminate() noexcept

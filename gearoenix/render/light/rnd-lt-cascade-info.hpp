@@ -102,7 +102,7 @@ namespace light {
         void submit() noexcept;
 
         [[nodiscard]] const core::OneLoopPool<PerCascade>& get_cascades_data() const noexcept;
-        core::OneLoopPool<PerCascade>& get_cascades_data() noexcept;
+        [[nodiscard]] core::OneLoopPool<PerCascade>& get_cascades_data() noexcept;
     };
 }
 }

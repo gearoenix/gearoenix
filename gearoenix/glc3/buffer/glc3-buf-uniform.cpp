@@ -6,13 +6,8 @@
 
 gearoenix::glc3::buffer::Uniform::Uniform(const std::size_t s, engine::Engine* const e) noexcept
     : render::buffer::Uniform(s, e)
+    , data(s)
 {
-    data.resize(s);
-}
-
-gearoenix::glc3::buffer::Uniform::~Uniform()
-{
-    data.clear();
 }
 
 void gearoenix::glc3::buffer::Uniform::update(const void* const src) noexcept
