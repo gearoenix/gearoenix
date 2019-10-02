@@ -1,20 +1,16 @@
 #include "rnd-mdl-model.hpp"
 #include "../../core/asset/cr-asset-manager.hpp"
-#include "../../core/cr-static.hpp"
 #include "../../physics/collider/phs-cld-collider.hpp"
 #include "../../system/stream/sys-stm-asset.hpp"
 #include "../../system/stream/sys-stm-stream.hpp"
 #include "../../system/sys-app.hpp"
 #include "../buffer/rnd-buf-framed-uniform.hpp"
 #include "../camera/rnd-cmr-camera.hpp"
-#include "../camera/rnd-cmr-orthographic.hpp"
-#include "../engine/rnd-eng-engine.hpp"
 #include "../material/rnd-mat-material.hpp"
 #include "../mesh/rnd-msh-manager.hpp"
 #include "../mesh/rnd-msh-mesh.hpp"
 #include "../pipeline/rnd-pip-manager.hpp"
 #include "../scene/rnd-scn-scene.hpp"
-#include "../widget/rnd-wdg-widget.hpp"
 
 gearoenix::render::model::Model::Model(
     const core::Id my_id,
