@@ -5,12 +5,13 @@
 
 void gearoenix::core::sync::KernelWorker::thread_loop(const unsigned int kernel_index) noexcept
 {
-#define GX_HELPER           \
-    if (state != RUNNING) { \
-        state = TERMINATED; \
-        return;             \
+    state = State::Running;
+#define GX_HELPER                  \
+    if (state != State::Running) { \
+        state = State::Terminated; \
+        return;                    \
     }
-    while (state == RUNNING) {
+    while (state == State::Running) {
         signals[kernel_index]->lock();
         GX_HELPER
         std::lock_guard<std::mutex> _lock(*workers_syncers[kernel_index]);
@@ -41,8 +42,8 @@ gearoenix::core::sync::KernelWorker::KernelWorker() noexcept
 
 gearoenix::core::sync::KernelWorker::~KernelWorker() noexcept
 {
-    state = TERMINATING;
-    while (state != TERMINATED)
+    state = State::Terminating;
+    while (state != State::Terminated)
         for (const auto& s : signals)
             s->release();
     for (std::thread& t : threads)

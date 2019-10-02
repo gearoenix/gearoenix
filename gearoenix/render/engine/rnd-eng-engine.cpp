@@ -14,7 +14,6 @@
 #include "../sampler/rnd-smp-manager.hpp"
 #include "../scene/rnd-scn-manager.hpp"
 #include "../scene/rnd-scn-scene.hpp"
-#include <thread>
 
 gearoenix::render::engine::Engine::Engine(system::Application* const system_application, const Type engine_type) noexcept
     : engine_type(engine_type)

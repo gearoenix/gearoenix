@@ -10,11 +10,11 @@ namespace gearoenix::core::sync {
 class Semaphore;
 class KernelWorker {
 private:
-    typedef enum : int {
-        RUNNING,
-        TERMINATING,
-        TERMINATED,
-    } State;
+    enum struct State : int {
+        Running,
+        Terminating,
+        Terminated,
+    };
     struct Worker {
         const std::vector<std::shared_ptr<Semaphore>> waits;
         const std::function<void()> sender;
@@ -27,9 +27,9 @@ private:
     std::vector<Worker> workers;
     // For each thread there is a separate mutex to do not lock all threads by one mutex
     std::vector<std::shared_ptr<std::mutex>> workers_syncers;
-    State state = RUNNING;
+    State state = State::Running;
 
-    void thread_loop(const unsigned int) noexcept;
+    void thread_loop(unsigned int) noexcept;
 
 public:
     KernelWorker() noexcept;
@@ -42,7 +42,7 @@ public:
         std::function<void(const unsigned int)> worker,
         std::function<void()> boss) noexcept;
     void do_steps() noexcept;
-    unsigned int get_threads_count() const noexcept;
+    [[nodiscard]] unsigned int get_threads_count() const noexcept;
 };
 }
 #endif

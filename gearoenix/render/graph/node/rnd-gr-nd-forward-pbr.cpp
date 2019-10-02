@@ -1,12 +1,10 @@
 #include "rnd-gr-nd-forward-pbr.hpp"
 #include "../../../core/asset/cr-asset-manager.hpp"
-#include "../../../core/cr-static.hpp"
 #include "../../../core/sync/cr-sync-kernel-workers.hpp"
 #include "../../../system/sys-app.hpp"
 #include "../../buffer/rnd-buf-manager.hpp"
 #include "../../buffer/rnd-buf-uniform.hpp"
 #include "../../camera/rnd-cmr-camera.hpp"
-#include "../../camera/rnd-cmr-uniform.hpp"
 #include "../../command/rnd-cmd-buffer.hpp"
 #include "../../command/rnd-cmd-manager.hpp"
 #include "../../engine/rnd-eng-engine.hpp"
@@ -18,18 +16,14 @@
 #include "../../model/rnd-mdl-mesh.hpp"
 #include "../../model/rnd-mdl-model.hpp"
 #include "../../pipeline/rnd-pip-forward-pbr-resource-set.hpp"
-#include "../../pipeline/rnd-pip-forward-pbr.hpp"
 #include "../../pipeline/rnd-pip-manager.hpp"
 #include "../../pipeline/rnd-pip-pipeline.hpp"
-#include "../../pipeline/rnd-pip-resource-set.hpp"
 #include "../../scene/rnd-scn-scene.hpp"
 #include "../../sync/rnd-sy-semaphore.hpp"
 #include "../../texture/rnd-txt-manager.hpp"
 #include "../../texture/rnd-txt-target.hpp"
-#include "../../texture/rnd-txt-texture-2d.hpp"
 #include "../../texture/rnd-txt-texture-cube.hpp"
 #include "rnd-gr-nd-shadow-mapper.hpp"
-#include <thread>
 
 const unsigned int gearoenix::render::graph::node::ForwardPbr::DIFFUSE_ENVIRONMENT_INDEX = 0;
 const unsigned int gearoenix::render::graph::node::ForwardPbr::SPECULAR_ENVIRONMENT_INDEX = 1;
