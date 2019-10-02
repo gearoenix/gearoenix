@@ -4,7 +4,7 @@
 #include "phs-cns-placer.hpp"
 
 gearoenix::physics::constraint::Constraint::Constraint(const core::Id my_id, const Type::Id t)
-    : core::asset::Asset(my_id, core::asset::Type::CONSTRAINT)
+    : core::asset::Asset(my_id, core::asset::Type::Constraint)
     , t(t)
 {
 }
@@ -13,7 +13,7 @@ gearoenix::physics::constraint::Constraint::~Constraint()
 {
 }
 
-const std::vector<std::shared_ptr<gearoenix::physics::body::Body>> gearoenix::physics::constraint::Constraint::get_all_bodies() const
+std::vector<std::shared_ptr<gearoenix::physics::body::Body>> gearoenix::physics::constraint::Constraint::get_all_bodies() const
 {
     return std::vector<std::shared_ptr<body::Body>>();
 }
@@ -32,9 +32,9 @@ gearoenix::physics::constraint::Constraint* gearoenix::physics::constraint::Cons
     const core::Id /*my_id*/,
     const std::shared_ptr<system::stream::Stream>& f,
     render::engine::Engine* const,
-    const core::sync::EndCaller<core::sync::EndCallerIgnore> c)
+    const core::sync::EndCaller<core::sync::EndCallerIgnore>& c)
 {
-    const Type::Id t = f->read<Type::Id>();
+    const auto t = f->read<Type::Id>();
     switch (t) {
     case Type::PLACER:
         GXUNEXPECTED;

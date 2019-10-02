@@ -8,7 +8,7 @@ gearoenix::render::light::Light::Light(
     system::stream::Stream* const f,
     engine::Engine* const e,
     const Type light_type) noexcept
-    : core::asset::Asset(my_id, core::asset::Type::LIGHT)
+    : core::asset::Asset(my_id, core::asset::Type::Light)
     , light_type(light_type)
     , e(e)
 {
@@ -17,7 +17,7 @@ gearoenix::render::light::Light::Light(
 }
 
 gearoenix::render::light::Light::Light(const core::Id my_id, engine::Engine* const e, const Type light_type) noexcept
-    : core::asset::Asset(my_id, core::asset::Type::LIGHT)
+    : core::asset::Asset(my_id, core::asset::Type::Light)
     , light_type(light_type)
     , e(e)
 {

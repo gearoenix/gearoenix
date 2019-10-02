@@ -25,8 +25,8 @@ public:
     virtual void remove_consumer(unsigned int output_link_index, Id node_id, unsigned int consumer_input_link_index) noexcept;
     unsigned int get_input_link_index(const std::string& name, bool& exist) const noexcept;
     unsigned int get_output_link_index(const std::string& name, bool& exist) const noexcept;
-    const std::vector<std::string> get_input_links_names() const noexcept;
-    const std::vector<std::string> get_output_links_names() const noexcept;
+    [[nodiscard]] std::vector<std::string> get_input_links_names() const noexcept;
+    [[nodiscard]] std::vector<std::string> get_output_links_names() const noexcept;
     static void connect(Node* p, unsigned int po, Node* c, unsigned int ci) noexcept;
 };
 }

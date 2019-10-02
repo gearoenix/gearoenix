@@ -2,14 +2,11 @@
 #define GEAROENIX_RENDER_TEXTURE_TYPE_HPP
 #include "../../core/cr-types.hpp"
 namespace gearoenix::render::texture {
-class Type {
-public:
-    typedef enum : core::TypeId {
-        TEXTURE_2D = 1,
-        TEXTURE_3D = 2,
-        CUBE = 3,
-        TARGET_2D = 4,
-    } Id;
+enum struct Type : core::TypeId {
+    Texture2D = 1,
+    Texture3D = 2,
+    TextureCube = 3,
+    Target2D = 4,
 };
 }
 #endif

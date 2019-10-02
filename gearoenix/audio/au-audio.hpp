@@ -3,21 +3,19 @@
 #include "../core/asset/cr-asset.hpp"
 #include <memory>
 namespace gearoenix {
-namespace system {
-    namespace stream {
-        class Stream;
-    }
+namespace system::stream {
+    class Stream;
 }
 namespace audio {
     class Audio : public core::asset::Asset {
     private:
     protected:
-        Audio(const core::Id my_id, const std::shared_ptr<system::stream::Stream>& f);
+        Audio(core::Id my_id, const std::shared_ptr<system::stream::Stream>& f) noexcept;
 
     public:
-        virtual ~Audio();
-        static Audio* read(const core::Id my_id, const std::shared_ptr<system::stream::Stream>& f);
+        virtual ~Audio() noexcept;
+        static Audio* read(core::Id my_id, const std::shared_ptr<system::stream::Stream>& f) noexcept;
     };
-} // namespace audio
-} // namespace gearoenix
-#endif // GEAROENIX_AUDIO_AUDIO_HPP
+}
+}
+#endif

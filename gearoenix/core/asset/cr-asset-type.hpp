@@ -1,23 +1,20 @@
 #ifndef GEAROENIX_CORE_ASSET_TYPE_HPP
 #define GEAROENIX_CORE_ASSET_TYPE_HPP
 namespace gearoenix::core::asset {
-class Type {
-public:
-    typedef enum {
-        AUDIO = 1,
-        BODY = 2,
-        CAMERA = 3,
-        CONSTRAINT = 4,
-        FONT = 5,
-        LIGHT = 6,
-        MESH = 7,
-        MODEL = 8,
-        SCENE = 9,
-        SHADER = 10,
-        SKYBOX = 11,
-        TEXTURE = 12,
-        NODE = 13,
-    } Id;
+enum struct Type : int {
+    Audio = 1,
+    Body = 2,
+    Camera = 3,
+    Constraint = 4,
+    Font = 5,
+    Light = 6,
+    Mesh = 7,
+    Model = 8,
+    Scene = 9,
+    Shader = 10,
+    Skybox = 11,
+    Texture = 12,
+    Node = 13,
 };
-} // namespace gearoenix
+}
 #endif

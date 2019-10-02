@@ -7,7 +7,7 @@ namespace gearoenix::render::texture {
 struct Info {
     TextureFormat::Id f = TextureFormat::RGBA_UINT8;
     SampleInfo s;
-    Type::Id t = Type::TEXTURE_2D;
+    Type t = Type::Texture2D;
 };
 }
 #endif

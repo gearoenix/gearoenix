@@ -12,7 +12,7 @@
 #include "rnd-cmr-transformation.hpp"
 
 gearoenix::render::camera::Camera::Camera(const core::Id my_id, engine::Engine* const e) noexcept
-    : core::asset::Asset(my_id, core::asset::Type::CAMERA)
+    : core::asset::Asset(my_id, core::asset::Type::Camera)
     , e(e)
     , frustum(new math::ProjectorFrustum(math::Mat4x4()))
     , uniform_buffers(new buffer::FramedUniform(sizeof(Uniform), e))
@@ -31,7 +31,7 @@ gearoenix::render::camera::Camera::Camera(
     const core::Id my_id,
     system::stream::Stream* const f,
     engine::Engine* const e) noexcept
-    : core::asset::Asset(my_id, core::asset::Type::CAMERA)
+    : core::asset::Asset(my_id, core::asset::Type::Camera)
     , e(e)
     , frustum(new math::ProjectorFrustum(math::Mat4x4()))
     , uniform_buffers(new buffer::FramedUniform(sizeof(Uniform), e))

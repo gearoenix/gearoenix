@@ -2,14 +2,14 @@
 #include "../asset/cr-asset-manager.hpp"
 
 gearoenix::core::graph::Node::Node(const std::vector<std::string>& input_links, const std::vector<std::string>& output_links) noexcept
-    : asset::Asset(asset::Manager::create_id(), asset::Type::NODE)
+    : asset::Asset(asset::Manager::create_id(), asset::Type::Node)
 {
     input_links_providers_links.resize(input_links.size());
-    for (unsigned int i = 0; i < input_links.size(); ++i) {
+    for (std::size_t i = 0; i < input_links.size(); ++i) {
         input_links_string_index[input_links[i]] = i;
     }
     output_links_consumers_links.resize(output_links.size());
-    for (unsigned int i = 0; i < output_links.size(); ++i) {
+    for (std::size_t i = 0; i < output_links.size(); ++i) {
         output_links_string_index[output_links[i]] = i;
     }
 }
@@ -79,7 +79,7 @@ unsigned int gearoenix::core::graph::Node::get_output_link_index(const std::stri
     return a->second;
 }
 
-const std::vector<std::string> gearoenix::core::graph::Node::get_input_links_names() const noexcept
+std::vector<std::string> gearoenix::core::graph::Node::get_input_links_names() const noexcept
 {
     std::vector<std::string> result;
     for (const auto& p : input_links_string_index) {
@@ -88,7 +88,7 @@ const std::vector<std::string> gearoenix::core::graph::Node::get_input_links_nam
     return result;
 }
 
-const std::vector<std::string> gearoenix::core::graph::Node::get_output_links_names() const noexcept
+std::vector<std::string> gearoenix::core::graph::Node::get_output_links_names() const noexcept
 {
     std::vector<std::string> result;
     for (const auto& p : output_links_string_index) {

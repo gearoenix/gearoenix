@@ -39,7 +39,7 @@ void gearoenix::gles2::pipeline::ForwardPbrResourceSet::bind(gl::uint& bound_sha
             if (t == nullptr)
                 continue;
             const auto ti = static_cast<gl::enumerated>(directional_lights_shadow_map_indices[tii]);
-            if (render::texture::Type::TARGET_2D == t->get_texture_type())
+            if (render::texture::Type::Target2D == t->get_texture_type())
                 reinterpret_cast<const texture::Target*>(t)->bind_textures({ ti });
             else
                 reinterpret_cast<const texture::Texture2D*>(t)->bind(ti);

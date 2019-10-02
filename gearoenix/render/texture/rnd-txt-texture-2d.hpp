@@ -6,7 +6,7 @@ class Texture2D : public Texture {
 protected:
     unsigned int img_width = 0;
     unsigned int img_height = 0;
-    Texture2D(const core::Id my_id, engine::Engine* const e, const Type::Id texture_type = Type::TEXTURE_2D) noexcept
+    Texture2D(const core::Id my_id, engine::Engine* const e, const Type texture_type = Type::Texture2D) noexcept
         : Texture(my_id, texture_type, e)
     {
     }

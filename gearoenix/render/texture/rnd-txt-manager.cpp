@@ -174,8 +174,8 @@ std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::render::texture:
 {
     const std::shared_ptr<Texture> o = cache.get<Texture>(id, [this, id, c] {
         system::stream::Stream* const f = cache.get_file();
-        switch (f->read<Type::Id>()) {
-        case Type::TEXTURE_2D: {
+        switch (f->read<Type>()) {
+        case Type::Texture2D: {
             std::shared_ptr<std::vector<unsigned char>> data(new std::vector<unsigned char>);
             unsigned int img_width;
             unsigned int img_height;
@@ -185,9 +185,9 @@ std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::render::texture:
             return std::shared_ptr<Texture>(e->create_texture_2d(
                 id, static_cast<const void*>(data->data()), TextureFormat::RGBA_UINT8, sinfo, img_width, img_height, call));
         }
-        case Type::TEXTURE_3D:
+        case Type::Texture3D:
             GXUNIMPLEMENTED
-        case Type::CUBE:
+        case Type::TextureCube:
             GXUNIMPLEMENTED
         default:
             GXUNEXPECTED

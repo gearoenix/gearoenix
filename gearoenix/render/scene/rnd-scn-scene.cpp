@@ -34,7 +34,7 @@ gearoenix::render::scene::Scene::Scene(
     const Type t,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>&) noexcept
-    : core::asset::Asset(my_id, core::asset::Type::SCENE)
+    : core::asset::Asset(my_id, core::asset::Type::Scene)
     , scene_type_id(t)
     , uniform_buffers(new buffer::FramedUniform(static_cast<unsigned int>(sizeof(Uniform)), e))
     , static_accelerator(new gearoenix::physics::accelerator::Bvh())
@@ -49,7 +49,7 @@ gearoenix::render::scene::Scene::Scene(
     system::stream::Stream* const f,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
-    : core::asset::Asset(my_id, core::asset::Type::SCENE)
+    : core::asset::Asset(my_id, core::asset::Type::Scene)
     , scene_type_id(t)
     , uniform_buffers(new buffer::FramedUniform(static_cast<unsigned int>(sizeof(Uniform)), e))
     , static_accelerator(new gearoenix::physics::accelerator::Bvh())

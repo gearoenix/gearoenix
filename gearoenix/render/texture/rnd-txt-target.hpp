@@ -8,7 +8,7 @@ protected:
     core::Real clipping_height = 0.0f;
 
     Target(const core::Id my_id, engine::Engine* const e) noexcept
-        : Texture2D(my_id, e, Type::TARGET_2D)
+        : Texture2D(my_id, e, Type::Target2D)
     {
     }
 

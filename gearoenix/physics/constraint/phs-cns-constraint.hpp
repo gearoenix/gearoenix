@@ -42,16 +42,16 @@ namespace physics {
             virtual ~Constraint();
             virtual void on_event(const core::event::Event& e) = 0;
             virtual const std::vector<std::pair<core::Id, std::shared_ptr<render::model::Dynamic>>> get_all_models() const = 0;
-            virtual const std::vector<std::shared_ptr<body::Body>> get_all_bodies() const;
+            virtual std::vector<std::shared_ptr<body::Body>> get_all_bodies() const;
             virtual void apply(core::Real delta_time) noexcept;
 
             static Constraint* read(
-                const core::Id my_id,
+                core::Id my_id,
                 const std::shared_ptr<system::stream::Stream>& f,
                 render::engine::Engine* e,
-                const core::sync::EndCaller<core::sync::EndCallerIgnore> c);
+                const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
 
-            bool is_alive() const;
+            [[nodiscard]] bool is_alive() const;
         };
     }
 }

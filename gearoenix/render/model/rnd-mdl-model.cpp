@@ -23,7 +23,7 @@ gearoenix::render::model::Model::Model(
     system::stream::Stream* const f,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
-    : core::asset::Asset(my_id, core::asset::Type::MODEL)
+    : core::asset::Asset(my_id, core::asset::Type::Model)
     , model_type(t)
     , transformation(tran)
     , uniform_buffers(new buffer::FramedUniform(static_cast<unsigned int>(sizeof(Uniform)), e))
@@ -43,7 +43,7 @@ gearoenix::render::model::Model::Model(
     physics::Transformation* const transformation,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>&) noexcept
-    : core::asset::Asset(my_id, core::asset::Type::MODEL)
+    : core::asset::Asset(my_id, core::asset::Type::Model)
     , model_type(t)
     , transformation(transformation)
     , uniform_buffers(new buffer::FramedUniform(static_cast<unsigned int>(sizeof(Uniform)), e))

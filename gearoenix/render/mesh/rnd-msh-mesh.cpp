@@ -9,7 +9,7 @@
 #include <vector>
 
 gearoenix::render::mesh::Mesh::Mesh(const core::Id my_id, const Type t) noexcept
-    : core::asset::Asset(my_id, core::asset::Type::MESH)
+    : core::asset::Asset(my_id, core::asset::Type::Mesh)
     , mesh_type(t)
 {
 }
@@ -19,7 +19,7 @@ gearoenix::render::mesh::Mesh::Mesh(
     system::stream::Stream* const f,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
-    : core::asset::Asset(my_id, core::asset::Type::MESH)
+    : core::asset::Asset(my_id, core::asset::Type::Mesh)
     , mesh_type(Type::BASIC)
 {
     const auto mesh_count = f->read<core::Count>();
@@ -40,7 +40,7 @@ gearoenix::render::mesh::Mesh::Mesh(
     const core::Real radius,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
-    : core::asset::Asset(my_id, core::asset::Type::MESH)
+    : core::asset::Asset(my_id, core::asset::Type::Mesh)
     , mesh_type(Type::BASIC)
 {
     set_vertices(e, std::move(vertices), std::move(indices), radius, c);
