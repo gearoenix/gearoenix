@@ -46,7 +46,6 @@
 #define GX_USE_OPENGL_43
 #define GX_USE_OPENGL_33
 #define GX_IN_DESKTOP
-#define GX_USE_SDL
 //#define GX_USE_GLFW
 #else
 #error "Unknown Apple platform"

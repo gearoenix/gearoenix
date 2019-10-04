@@ -12,7 +12,7 @@ gearoenix::physics::animation::Animation::Animation(
 {
 }
 
-gearoenix::physics::animation::Animation::~Animation()
+gearoenix::physics::animation::Animation::~Animation() noexcept
 {
     if (!activity)
         return;

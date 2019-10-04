@@ -41,7 +41,7 @@ gearoenix::physics::animation::Manager::Manager(core::sync::KernelWorker* const 
         });
 }
 
-gearoenix::physics::animation::Manager::~Manager()
+gearoenix::physics::animation::Manager::~Manager() noexcept
 {
     animations.clear();
     kernels.clear();
