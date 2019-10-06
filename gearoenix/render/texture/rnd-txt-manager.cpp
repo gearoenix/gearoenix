@@ -38,7 +38,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     const std::function<std::shared_ptr<Texture>()> fun = [this, cc, c, id, sample_info] {
         return e->create_texture_2d(
             id, static_cast<const void*>(cc->data()),
-            TextureFormat::RGBA_FLOAT32, sample_info, 1, 1,
+            TextureFormat::RgbaFloat32, sample_info, 1, 1,
             core::sync::EndCaller<core::sync::EndCallerIgnore>([c, cc] {}));
     };
     std::shared_ptr<Texture2D> data = std::dynamic_pointer_cast<Texture2D>(cache.get_cacher().get(id, fun));
@@ -131,10 +131,10 @@ std::shared_ptr<gearoenix::render::texture::Cube> gearoenix::render::texture::Ma
     if (!found)
         color_4d_id_cube[color] = id;
     const std::function<std::shared_ptr<Texture>()> fun = [this, cc, c, id, sample_info] {
-        return std::shared_ptr<Texture>(e->create_texture_cube(
+        return e->create_texture_cube(
             id, static_cast<const void*>(cc->data()),
-            TextureFormat::RGBA_FLOAT32, sample_info, 1,
-            core::sync::EndCaller<core::sync::EndCallerIgnore>([c, cc] {})));
+            TextureFormat::RgbaFloat32, sample_info, 1,
+            core::sync::EndCaller<core::sync::EndCallerIgnore>([c, cc] {}));
     };
     std::shared_ptr<Cube> data = std::dynamic_pointer_cast<Cube>(cache.get_cacher().get(id, fun));
     c.set_data(data);
@@ -183,7 +183,7 @@ std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::render::texture:
             core::sync::EndCaller<core::sync::EndCallerIgnore> call([c, data] {});
             SampleInfo sinfo = SampleInfo();
             return e->create_texture_2d(
-                id, static_cast<const void*>(data->data()), TextureFormat::RGBA_UINT8, sinfo, img_width, img_height, call);
+                id, static_cast<const void*>(data->data()), TextureFormat::RgbaUint8, sinfo, img_width, img_height, call);
         }
         case Type::Texture3D:
             GXUNIMPLEMENTED

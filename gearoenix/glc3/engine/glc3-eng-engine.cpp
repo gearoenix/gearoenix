@@ -56,15 +56,15 @@ void gearoenix::glc3::engine::Engine::terminate() noexcept
     render::engine::Engine::terminate();
 }
 
-gearoenix::render::sync::Semaphore* gearoenix::glc3::engine::Engine::create_semaphore() const noexcept
+std::shared_ptr<gearoenix::render::sync::Semaphore> gearoenix::glc3::engine::Engine::create_semaphore() const noexcept
 {
-    return new sync::Semaphore();
+    return std::shared_ptr<render::sync::Semaphore>(new sync::Semaphore());
 }
 
 std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::glc3::engine::Engine::create_texture_2d(
     const core::Id id,
     const void* data,
-    const render::texture::TextureFormat::Id f,
+    const render::texture::TextureFormat f,
     const render::texture::SampleInfo s,
     const unsigned int img_width,
     const unsigned int img_height,
@@ -73,25 +73,25 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::glc3::engine::
     return texture::Texture2D::construct(id, this, data, f, s, img_width, img_height, call);
 }
 
-gearoenix::render::texture::Cube* gearoenix::glc3::engine::Engine::create_texture_cube(
+std::shared_ptr<gearoenix::render::texture::Cube> gearoenix::glc3::engine::Engine::create_texture_cube(
     const core::Id id,
     const void* data,
-    const render::texture::TextureFormat::Id f,
+    const render::texture::TextureFormat f,
     const render::texture::SampleInfo s,
     const unsigned int aspect,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
 {
-    return new texture::Cube(id, this, data, f, s, aspect, call);
+    return texture::Cube::construct(id, this, data, f, s, aspect, call);
 }
 
-gearoenix::render::texture::Target* gearoenix::glc3::engine::Engine::create_render_target(
+std::shared_ptr<gearoenix::render::texture::Target> gearoenix::glc3::engine::Engine::create_render_target(
     core::Id id,
     const std::vector<render::texture::Info>& infos,
     unsigned int width,
     unsigned int height,
     const gearoenix::core::sync::EndCaller<gearoenix::core::sync::EndCallerIgnore>& call) noexcept
 {
-    return new texture::Target(id, this, infos, width, height, call);
+    return texture::Target::construct(id, this, infos, width, height, call);
 }
 
 void gearoenix::glc3::engine::Engine::submit(

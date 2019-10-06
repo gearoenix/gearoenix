@@ -71,7 +71,7 @@ namespace light {
             /// TODO: place then in a new node structure
             std::unique_ptr<command::Buffer> shadow_accumulator_secondary_command;
             std::unique_ptr<command::Buffer> shadow_accumulator_primary_command;
-            std::unique_ptr<sync::Semaphore> shadow_accumulator_semaphore;
+            std::shared_ptr<sync::Semaphore> shadow_accumulator_semaphore;
 
             void init(engine::Engine* e);
             void start() noexcept;

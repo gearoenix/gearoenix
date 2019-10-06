@@ -5,7 +5,7 @@
 #include "rnd-txt-type.hpp"
 namespace gearoenix::render::texture {
 struct Info {
-    TextureFormat::Id f = TextureFormat::RGBA_UINT8;
+    TextureFormat f = TextureFormat::RgbaUint8;
     SampleInfo s;
     Type t = Type::Texture2D;
 };

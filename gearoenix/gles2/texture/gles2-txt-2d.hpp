@@ -18,11 +18,11 @@ namespace texture {
 
         Texture2D(core::Id my_id, engine::Engine* e) noexcept;
     public:
-        static std::shared_ptr<Texture2D> construct(
+        [[nodiscard]] static std::shared_ptr<Texture2D> construct(
             core::Id my_id,
             engine::Engine* e,
             const void* data,
-            render::texture::TextureFormat::Id f,
+            render::texture::TextureFormat f,
             render::texture::SampleInfo s,
             unsigned int width,
             unsigned int heigt,

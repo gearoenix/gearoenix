@@ -16,12 +16,13 @@ namespace texture {
     private:
         gl::uint texture_object = 0;
 
+        Cube(core::Id my_id, engine::Engine* e) noexcept;
     public:
-        Cube(
+        [[nodiscard]] static std::shared_ptr<Cube> construct(
             core::Id my_id,
-            engine::Engine* engine,
+            engine::Engine* e,
             const void* data,
-            render::texture::TextureFormat::Id f,
+            render::texture::TextureFormat f,
             render::texture::SampleInfo s,
             unsigned int aspect,
             const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;

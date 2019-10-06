@@ -60,7 +60,7 @@ void gearoenix::render::light::CascadeInfo::PerFrame::init(engine::Engine* const
     auto* cmd_mgr = eng->get_command_manager();
     shadow_accumulator_secondary_command = std::unique_ptr<command::Buffer>(cmd_mgr->create_secondary_command_buffer());
     shadow_accumulator_primary_command = std::unique_ptr<command::Buffer>(cmd_mgr->create_primary_command_buffer());
-    shadow_accumulator_semaphore = std::unique_ptr<sync::Semaphore>(eng->create_semaphore());
+    shadow_accumulator_semaphore = eng->create_semaphore();
 }
 
 void gearoenix::render::light::CascadeInfo::PerFrame::start() noexcept

@@ -188,7 +188,7 @@ const std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::
         }
     }
     texture::Info txt_info {};
-    txt_info.f = texture::TextureFormat::RGBA_UINT8;
+    txt_info.f = texture::TextureFormat::RgbaUint8;
     txt_info.s.mag_filter = texture::Filter::LINEAR;
     txt_info.s.min_filter = texture::Filter::LINEAR;
     txt_info.s.wrap_r = texture::Wrap::CLAMP_TO_EDGE;

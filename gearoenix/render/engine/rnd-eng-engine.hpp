@@ -106,27 +106,27 @@ namespace render {
             virtual ~Engine() noexcept;
             virtual void update() noexcept;
             virtual void terminate() noexcept;
-            [[nodiscard]] virtual sync::Semaphore* create_semaphore() const noexcept = 0;
+            [[nodiscard]] virtual std::shared_ptr<sync::Semaphore> create_semaphore() const noexcept = 0;
             /// Caller of this function must maintain the pointer to data until call of EndCaller.
-            virtual std::shared_ptr<texture::Texture2D> create_texture_2d(
+            [[nodiscard]] virtual std::shared_ptr<texture::Texture2D> create_texture_2d(
                 core::Id id,
                 const void* data,
-                texture::TextureFormat::Id f,
+                texture::TextureFormat f,
                 texture::SampleInfo s,
                 unsigned int width,
                 unsigned int height,
                 const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
                 = 0;
             /// Caller of this function must maintain the pointer to data until call of EndCaller.
-            virtual texture::Cube* create_texture_cube(
+            [[nodiscard]] virtual std::shared_ptr<texture::Cube> create_texture_cube(
                 core::Id id,
                 const void* data,
-                texture::TextureFormat::Id f,
+                texture::TextureFormat f,
                 texture::SampleInfo s,
                 unsigned int aspect,
                 const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
                 = 0;
-            virtual texture::Target* create_render_target(
+            [[nodiscard]] virtual std::shared_ptr<texture::Target> create_render_target(
                 core::Id id,
                 const std::vector<texture::Info>& infos,
                 unsigned int width,

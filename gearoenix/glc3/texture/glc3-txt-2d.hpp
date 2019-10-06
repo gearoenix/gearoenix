@@ -23,7 +23,7 @@ namespace texture {
             core::Id my_id,
             engine::Engine* e,
             const void* data,
-            render::texture::TextureFormat::Id f,
+            render::texture::TextureFormat f,
             render::texture::SampleInfo s,
             unsigned int width,
             unsigned int heigt,

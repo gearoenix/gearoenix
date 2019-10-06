@@ -17,6 +17,12 @@ protected:
     {
     }
 
+    Asset(const Id asset_id, const Type asset_type, std::string name) noexcept
+        : asset_id(asset_id)
+        , asset_type(asset_type)
+        , name(name)
+    {
+    }
 public:
     virtual ~Asset() noexcept = default;
     void set_name(const std::string& n) noexcept { name = n; }

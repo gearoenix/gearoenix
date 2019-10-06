@@ -18,23 +18,23 @@ namespace engine {
         ~Engine() noexcept final;
         void update() noexcept final;
         void terminate() noexcept final;
-        render::sync::Semaphore* create_semaphore() const noexcept final;
-        std::shared_ptr<render::texture::Texture2D> create_texture_2d(
+        [[nodiscard]] std::shared_ptr<render::sync::Semaphore> create_semaphore() const noexcept final;
+        [[nodiscard]] std::shared_ptr<render::texture::Texture2D> create_texture_2d(
             core::Id id,
             const void* data,
-            render::texture::TextureFormat::Id f,
+            render::texture::TextureFormat f,
             render::texture::SampleInfo s,
             unsigned int width,
             unsigned int heigt,
             const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept final;
-        render::texture::Cube* create_texture_cube(
+        [[nodiscard]] std::shared_ptr<render::texture::Cube> create_texture_cube(
             core::Id id,
             const void* data,
-            render::texture::TextureFormat::Id f,
+            render::texture::TextureFormat f,
             render::texture::SampleInfo s,
             unsigned int aspect,
             const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept final;
-        render::texture::Target* create_render_target(
+        [[nodiscard]] std::shared_ptr<render::texture::Target> create_render_target(
             core::Id id,
             const std::vector<render::texture::Info>& infos,
             unsigned int width,

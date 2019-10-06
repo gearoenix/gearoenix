@@ -20,9 +20,10 @@ namespace texture {
 
         void state_init() const noexcept;
 
+        Target(core::Id my_id, engine::Engine* e) noexcept;
     public:
         explicit Target(engine::Engine* e) noexcept;
-        Target(
+        [[nodiscard]] static std::shared_ptr<Target> construct(
             core::Id my_id,
             engine::Engine* e,
             const std::vector<render::texture::Info>& infos,

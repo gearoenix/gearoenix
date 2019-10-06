@@ -14,7 +14,7 @@ std::shared_ptr<gearoenix::gles2::texture::Texture2D> gearoenix::gles2::texture:
     const core::Id my_id,
     engine::Engine* const e,
     const void* const data,
-    const render::texture::TextureFormat::Id f,
+    const render::texture::TextureFormat f,
     const render::texture::SampleInfo s,
     const unsigned int img_width,
     const unsigned int img_height,
@@ -26,7 +26,7 @@ std::shared_ptr<gearoenix::gles2::texture::Texture2D> gearoenix::gles2::texture:
     const gl::sizei gimg_width = static_cast<gl::sizei>(img_width);
     const gl::sizei gimg_height = static_cast<gl::sizei>(img_height);
     std::vector<std::uint8_t> pixels;
-    if (f == render::texture::TextureFormat::RGBA_FLOAT32) {
+    if (f == render::texture::TextureFormat::RgbaFloat32) {
         cf = GL_RGBA;
         const gl::sizei pixel_size = gimg_width * gimg_height << 2;
         pixels.resize(pixel_size);
@@ -40,7 +40,7 @@ std::shared_ptr<gearoenix::gles2::texture::Texture2D> gearoenix::gles2::texture:
             else
                 pixels[i] = static_cast<std::uint8_t>(c);
         }
-    } else if (f == render::texture::TextureFormat::RGBA_UINT8) {
+    } else if (f == render::texture::TextureFormat::RgbaUint8) {
         cf = GL_RGBA;
         const gl::sizei pixel_size = gimg_width * gimg_height << 2;
         pixels.resize(pixel_size);
@@ -62,6 +62,7 @@ std::shared_ptr<gearoenix::gles2::texture::Texture2D> gearoenix::gles2::texture:
         gl::Loader::check_for_error();
 #endif
     });
+    return result;
 }
 
 gearoenix::gles2::texture::Texture2D::Texture2D(const core::Id my_id, const gl::uint txtobj, engine::Engine* const e) noexcept

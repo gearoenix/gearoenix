@@ -18,6 +18,9 @@
 
 void gearoenix::gles2::texture::Target::state_init() const noexcept
 {
+#ifdef GX_DEBUG_GLES2_TARGET
+    gl::Loader::check_for_error();
+#endif
     gl::Loader::clear_color(0.0f, 0.0f, 0.0f, 0.0f);
     gl::Loader::enable(GL_CULL_FACE);
     gl::Loader::cull_face(GL_BACK);
@@ -32,6 +35,9 @@ void gearoenix::gles2::texture::Target::state_init() const noexcept
     gl::Loader::check_for_error();
 #endif
 }
+
+gearoenix::gles2::texture::Target::Target(const core::Id my_id, engine::Engine* const e) noexcept
+    : render::texture::Target(my_id, e) {}
 
 gearoenix::gles2::texture::Target::Target(engine::Engine* const e) noexcept
     : render::texture::Target(core::asset::Manager::create_id(), e)
@@ -51,39 +57,39 @@ gearoenix::gles2::texture::Target::Target(engine::Engine* const e) noexcept
 #endif
 }
 
-gearoenix::gles2::texture::Target::Target(
+std::shared_ptr<gearoenix::gles2::texture::Target> gearoenix::gles2::texture::Target::construct(
     core::Id my_id,
     engine::Engine* e,
     const std::vector<render::texture::Info>& infos,
     unsigned int w,
     unsigned int h,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
-    : render::texture::Target(my_id, e)
 {
-    img_width = w;
-    img_height = h;
-    clipping_width = static_cast<core::Real>(w);
-    clipping_height = static_cast<core::Real>(h);
-    texture_objects.resize(infos.size());
+    const std::shared_ptr<Target> result(new Target(my_id, e));
+    result->img_width = w;
+    result->img_height = h;
+    result->clipping_width = static_cast<core::Real>(w);
+    result->clipping_height = static_cast<core::Real>(h);
+    result->texture_objects.resize(infos.size());
     if (infos.size() != 1)
         GXLOGF("GLES2 backend only supports 1 color attachment.");
-    if (infos[0].f != render::texture::TextureFormat::D_16)
+    if (infos[0].f != render::texture::TextureFormat::D16)
         GXLOGF("GLES2 backend only supports 16bits depth attachment right now.");
-    e->get_function_loader()->load([this, call, infos] {
-        gl::Loader::gen_framebuffers(1, reinterpret_cast<gl::uint*>(&framebuffer));
-        gl::Loader::gen_renderbuffers(1, reinterpret_cast<gl::uint*>(&depth_buffer));
-        gl::Loader::bind_renderbuffer(GL_RENDERBUFFER, depth_buffer);
-        gl::Loader::renderbuffer_storage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, img_width, img_height);
-        gl::Loader::bind_framebuffer(GL_FRAMEBUFFER, framebuffer);
-        gl::Loader::framebuffer_renderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depth_buffer);
-        gl::Loader::gen_textures(static_cast<gearoenix::gl::sizei>(texture_objects.size()), texture_objects.data());
-        for (std::size_t i = 0; i < texture_objects.size(); ++i) {
+    e->get_function_loader()->load([result, call, infos] {
+        gl::Loader::gen_framebuffers(1, reinterpret_cast<gl::uint*>(&(result->framebuffer)));
+        gl::Loader::gen_renderbuffers(1, reinterpret_cast<gl::uint*>(&(result->depth_buffer)));
+        gl::Loader::bind_renderbuffer(GL_RENDERBUFFER, result->depth_buffer);
+        gl::Loader::renderbuffer_storage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, result->img_width, result->img_height);
+        gl::Loader::bind_framebuffer(GL_FRAMEBUFFER, result->framebuffer);
+        gl::Loader::framebuffer_renderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, result->depth_buffer);
+        gl::Loader::gen_textures(static_cast<gearoenix::gl::sizei>(result->texture_objects.size()), result->texture_objects.data());
+        for (std::size_t i = 0; i < result->texture_objects.size(); ++i) {
             const auto& txt_info = infos[i];
             const auto& txt_fmt = txt_info.f;
-            const auto& txt = texture_objects[i];
-            if (txt_fmt == render::texture::TextureFormat::D_16) {
+            const auto& txt = result->texture_objects[i];
+            if (txt_fmt == render::texture::TextureFormat::D16) {
                 gl::Loader::bind_texture(GL_TEXTURE_2D, txt);
-                gl::Loader::tex_image_2d(GL_TEXTURE_2D, 0, GL_RGB, img_width, img_height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+                gl::Loader::tex_image_2d(GL_TEXTURE_2D, 0, GL_RGB, result->img_width, result->img_height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
                 gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
                 gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
                 gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -95,8 +101,9 @@ gearoenix::gles2::texture::Target::Target(
         }
         if (gl::Loader::check_framebuffer_status(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
             GXLOGF("Failed to create render target!")
-        state_init();
+        result->state_init();
     });
+    return result;
 }
 
 gearoenix::gles2::texture::Target::~Target() noexcept

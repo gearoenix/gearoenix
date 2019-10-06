@@ -22,16 +22,19 @@ static const gearoenix::gl::enumerated FACES[] = {
     GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
 };
 
-gearoenix::gles2::texture::Cube::Cube(
+gearoenix::gles2::texture::Cube::Cube(const core::Id my_id, engine::Engine* const engine) noexcept
+    : render::texture::Cube(my_id, engine) {}
+
+std::shared_ptr<gearoenix::gles2::texture::Cube> gearoenix::gles2::texture::Cube::construct(
     const core::Id my_id,
-    engine::Engine* const engine,
+    engine::Engine* const e,
     const void* const data,
-    const render::texture::TextureFormat::Id f,
+    const render::texture::TextureFormat f,
     const render::texture::SampleInfo s,
     const unsigned int aspect,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
-    : render::texture::Cube(my_id, engine)
 {
+    const std::shared_ptr<Cube> result(new Cube(my_id, e));
     const SampleInfo sample_info = SampleInfo(s);
     gl::uint cf;
     const gl::sizei gaspect = GX_GLES2_MIN_TEXCUBE_ASPECT < aspect ? static_cast<gl::sizei>(aspect) : GX_GLES2_MIN_TEXCUBE_ASPECT;
@@ -40,7 +43,7 @@ gearoenix::gles2::texture::Cube::Cube(
         GXLOGF("Unsupported image aspect in GLES2 for cube texture id: " << my_id);
 #endif
     std::vector<std::vector<std::uint8_t>> pixels(GX_COUNT_OF(FACES));
-    if (f == render::texture::TextureFormat::RGBA_FLOAT32 && aspect == 1) {
+    if (f == render::texture::TextureFormat::RgbaFloat32 && aspect == 1) {
         cf = GL_RGBA;
         const gl::sizei pixel_size = gaspect * gaspect * 4;
         const auto* const rdata = reinterpret_cast<const core::Real*>(data);
@@ -57,9 +60,9 @@ gearoenix::gles2::texture::Cube::Cube(
         }
     } else
         GXLOGF("Unsupported/Unimplemented setting for cube texture with id " << my_id)
-    engine->get_function_loader()->load([this, gaspect, pixels { move(pixels) }, cf, sample_info, call] {
-        gl::Loader::gen_textures(1, &texture_object);
-        gl::Loader::bind_texture(GL_TEXTURE_CUBE_MAP, texture_object);
+    e->get_function_loader()->load([result, gaspect, pixels { move(pixels) }, cf, sample_info, call] {
+        gl::Loader::gen_textures(1, &(result->texture_object));
+        gl::Loader::bind_texture(GL_TEXTURE_CUBE_MAP, result->texture_object);
         gl::Loader::tex_parameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, sample_info.mag_filter);
         gl::Loader::tex_parameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, sample_info.min_filter);
         gl::Loader::tex_parameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, sample_info.wrap_s);
@@ -72,6 +75,7 @@ gearoenix::gles2::texture::Cube::Cube(
         // It clears the errors, some drivers does not support mip-map generation for cube texture
         gl::Loader::get_error();
     });
+    return result;
 }
 
 gearoenix::gles2::texture::Cube::~Cube() noexcept

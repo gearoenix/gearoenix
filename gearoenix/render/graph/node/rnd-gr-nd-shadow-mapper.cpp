@@ -64,7 +64,7 @@ gearoenix::render::graph::node::ShadowMapper::ShadowMapper(
     }
     const bool week_hwr = e->get_engine_type() == engine::Type::OPENGL_ES2;
     std::vector<texture::Info> txt_infoes = { texture::Info() };
-    txt_infoes[0].f = week_hwr ? texture::TextureFormat::D_16 : texture::TextureFormat::D_32;
+    txt_infoes[0].f = week_hwr ? texture::TextureFormat::D16 : texture::TextureFormat::D32;
     render_target = std::shared_ptr<texture::Target>(e->create_render_target(
         core::asset::Manager::create_id(),
         txt_infoes,

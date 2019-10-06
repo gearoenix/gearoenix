@@ -30,6 +30,9 @@ void gearoenix::glc3::texture::Target::state_init() const noexcept
     gl::Loader::scissor(0, 0, static_cast<gl::sizei>(clipping_width), static_cast<gl::sizei>(clipping_height));
 }
 
+gearoenix::glc3::texture::Target::Target(const core::Id my_id, engine::Engine* const e) noexcept
+    : render::texture::Target(my_id, e) {}
+
 gearoenix::glc3::texture::Target::Target(engine::Engine* const e) noexcept
     : render::texture::Target(core::asset::Manager::create_id(), e)
 {
@@ -43,31 +46,31 @@ gearoenix::glc3::texture::Target::Target(engine::Engine* const e) noexcept
     state_init();
 }
 
-gearoenix::glc3::texture::Target::Target(
+std::shared_ptr<gearoenix::glc3::texture::Target> gearoenix::glc3::texture::Target::construct(
     core::Id my_id,
     engine::Engine* e,
     const std::vector<render::texture::Info>& infos,
     unsigned int w,
     unsigned int h,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
-    : render::texture::Target(my_id, e)
 {
-    img_width = w;
-    img_height = h;
-    clipping_width = static_cast<core::Real>(w);
-    clipping_height = static_cast<core::Real>(h);
-    texture_objects.resize(infos.size());
-    e->get_function_loader()->load([this, infos, call] {
-        gl::Loader::gen_framebuffers(1, reinterpret_cast<gl::uint*>(&framebuffer));
-        gl::Loader::bind_framebuffer(GL_FRAMEBUFFER, framebuffer);
-        gl::Loader::gen_textures(static_cast<gearoenix::gl::sizei>(texture_objects.size()), texture_objects.data());
-        for (std::size_t i = 0; i < texture_objects.size(); ++i) {
+    const std::shared_ptr<Target> result(new Target(my_id, e));
+    result->img_width = w;
+    result->img_height = h;
+    result->clipping_width = static_cast<core::Real>(w);
+    result->clipping_height = static_cast<core::Real>(h);
+    result->texture_objects.resize(infos.size());
+    e->get_function_loader()->load([result, infos, call] {
+        gl::Loader::gen_framebuffers(1, reinterpret_cast<gl::uint*>(&(result->framebuffer)));
+        gl::Loader::bind_framebuffer(GL_FRAMEBUFFER, result->framebuffer);
+        gl::Loader::gen_textures(static_cast<gearoenix::gl::sizei>(result->texture_objects.size()), result->texture_objects.data());
+        for (std::size_t i = 0; i < result->texture_objects.size(); ++i) {
             const auto& txt_info = infos[i];
             const auto& txt_fmt = txt_info.f;
-            const auto& txt = texture_objects[i];
-            if (txt_fmt == render::texture::TextureFormat::D_32) {
+            const auto& txt = result->texture_objects[i];
+            if (txt_fmt == render::texture::TextureFormat::D32) {
                 gl::Loader::bind_texture(GL_TEXTURE_2D, txt);
-                gl::Loader::tex_image_2d(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, img_width, img_height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+                gl::Loader::tex_image_2d(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, result->img_width, result->img_height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
                 /// The nearest filter in here is for workaround for some buggy vendors
                 gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
                 gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -81,9 +84,10 @@ gearoenix::glc3::texture::Target::Target(
         // TODO: remake the log fatal again
         if (gl::Loader::check_framebuffer_status(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
             GXLOGF("Failed to create render target!")
-        state_init();
+        result->state_init();
         gl::Loader::bind_framebuffer(GL_FRAMEBUFFER, 0);
     });
+    return result;
 }
 
 gearoenix::glc3::texture::Target::~Target() noexcept

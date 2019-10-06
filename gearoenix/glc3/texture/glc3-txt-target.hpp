@@ -21,16 +21,17 @@ namespace texture {
 
         void state_init() const noexcept;
 
+        Target(core::Id my_id, engine::Engine* e) noexcept;
     public:
         explicit Target(engine::Engine* e) noexcept;
-        Target(
+        ~Target() noexcept final;
+        [[nodiscard]] static std::shared_ptr<Target> construct(
             core::Id my_id,
             engine::Engine* e,
             const std::vector<render::texture::Info>& infos,
             unsigned int width,
             unsigned int heigt,
             const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
-        ~Target() noexcept final;
         void bind() const noexcept;
         void bind_textures(const std::vector<gl::enumerated>& texture_units) const noexcept;
     };
