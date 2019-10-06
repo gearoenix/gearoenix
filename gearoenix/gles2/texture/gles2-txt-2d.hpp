@@ -16,8 +16,9 @@ namespace texture {
     private:
         gl::uint texture_object = 0;
 
+        Texture2D(core::Id my_id, engine::Engine* e) noexcept;
     public:
-        Texture2D(
+        static std::shared_ptr<Texture2D> construct(
             core::Id my_id,
             engine::Engine* e,
             const void* data,

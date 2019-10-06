@@ -94,7 +94,7 @@ gearoenix::render::sync::Semaphore* gearoenix::gles2::engine::Engine::create_sem
     return new sync::Semaphore();
 }
 
-gearoenix::render::texture::Texture2D* gearoenix::gles2::engine::Engine::create_texture_2d(
+std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::gles2::engine::Engine::create_texture_2d(
     const core::Id id,
     const void* data,
     const render::texture::TextureFormat::Id f,
@@ -103,7 +103,7 @@ gearoenix::render::texture::Texture2D* gearoenix::gles2::engine::Engine::create_
     const unsigned int img_height,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
 {
-    return new texture::Texture2D(id, this, data, f, s, img_width, img_height, call);
+    return texture::Texture2D::construct(id, this, data, f, s, img_width, img_height, call);
 }
 
 gearoenix::render::texture::Cube* gearoenix::gles2::engine::Engine::create_texture_cube(

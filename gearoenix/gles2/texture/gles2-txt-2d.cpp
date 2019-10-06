@@ -7,7 +7,10 @@
 #include "../engine/gles2-eng-engine.hpp"
 #include "gles2-txt-sample.hpp"
 
-gearoenix::gles2::texture::Texture2D::Texture2D(
+gearoenix::gles2::texture::Texture2D::Texture2D(const core::Id my_id, engine::Engine* const e) noexcept
+    : render::texture::Texture2D(my_id, e) {}
+
+std::shared_ptr<gearoenix::gles2::texture::Texture2D> gearoenix::gles2::texture::Texture2D::construct(
     const core::Id my_id,
     engine::Engine* const e,
     const void* const data,
@@ -16,8 +19,8 @@ gearoenix::gles2::texture::Texture2D::Texture2D(
     const unsigned int img_width,
     const unsigned int img_height,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
-    : render::texture::Texture2D(my_id, e)
 {
+    std::shared_ptr<Texture2D> result(new Texture2D(my_id, e));
     const SampleInfo sample_info = SampleInfo(s);
     gl::uint cf;
     const gl::sizei gimg_width = static_cast<gl::sizei>(img_width);
@@ -46,9 +49,9 @@ gearoenix::gles2::texture::Texture2D::Texture2D(
             pixels[i] = rdata[i];
     } else
         GXLOGF("Unsupported/Unimplemented setting for texture with id " << my_id)
-    e->get_function_loader()->load([this, pixels { move(pixels) }, cf, gimg_width, gimg_height, sample_info, call] {
-        gl::Loader::gen_textures(1, &texture_object);
-        gl::Loader::bind_texture(GL_TEXTURE_2D, texture_object);
+    e->get_function_loader()->load([result, pixels { move(pixels) }, cf, gimg_width, gimg_height, sample_info, call] {
+        gl::Loader::gen_textures(1, &(result->texture_object));
+        gl::Loader::bind_texture(GL_TEXTURE_2D, result->texture_object);
         gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, sample_info.min_filter);
         gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, sample_info.mag_filter);
         gl::Loader::tex_parameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, sample_info.wrap_s);

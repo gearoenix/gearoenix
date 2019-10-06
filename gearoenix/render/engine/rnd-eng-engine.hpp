@@ -108,7 +108,7 @@ namespace render {
             virtual void terminate() noexcept;
             [[nodiscard]] virtual sync::Semaphore* create_semaphore() const noexcept = 0;
             /// Caller of this function must maintain the pointer to data until call of EndCaller.
-            virtual texture::Texture2D* create_texture_2d(
+            virtual std::shared_ptr<texture::Texture2D> create_texture_2d(
                 core::Id id,
                 const void* data,
                 texture::TextureFormat::Id f,

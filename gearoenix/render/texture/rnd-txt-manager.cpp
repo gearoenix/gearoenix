@@ -36,12 +36,12 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     if (!found)
         color_4d_id_t2d[color] = id;
     const std::function<std::shared_ptr<Texture>()> fun = [this, cc, c, id, sample_info] {
-        return std::shared_ptr<Texture>(e->create_texture_2d(
+        return e->create_texture_2d(
             id, static_cast<const void*>(cc->data()),
             TextureFormat::RGBA_FLOAT32, sample_info, 1, 1,
-            core::sync::EndCaller<core::sync::EndCallerIgnore>([c, cc] {})));
+            core::sync::EndCaller<core::sync::EndCallerIgnore>([c, cc] {}));
     };
-    std::shared_ptr<Texture2D> data = std::static_pointer_cast<Texture2D>(cache.get_cacher().get(id, fun));
+    std::shared_ptr<Texture2D> data = std::dynamic_pointer_cast<Texture2D>(cache.get_cacher().get(id, fun));
     c.set_data(data);
     return data;
 }
@@ -97,14 +97,14 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
 std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::create_2d(unsigned char* data, const Info& info, int img_width, int img_height, core::sync::EndCaller<Texture2D>& c) noexcept
 {
     const auto id = core::asset::Manager::create_id();
-    auto t = std::shared_ptr<texture::Texture2D>(e->create_texture_2d(
+    auto t = e->create_texture_2d(
         id,
         data,
         info.f,
         info.s,
         img_width,
         img_height,
-        core::sync::EndCaller<core::sync::EndCallerIgnore>([data, c] { delete[] data; })));
+        core::sync::EndCaller<core::sync::EndCallerIgnore>([data, c] { delete[] data; }));
     c.set_data(t);
     cache.get_cacher().get_cacheds()[id] = t;
     return t;
@@ -136,7 +136,7 @@ std::shared_ptr<gearoenix::render::texture::Cube> gearoenix::render::texture::Ma
             TextureFormat::RGBA_FLOAT32, sample_info, 1,
             core::sync::EndCaller<core::sync::EndCallerIgnore>([c, cc] {})));
     };
-    std::shared_ptr<Cube> data = std::static_pointer_cast<Cube>(cache.get_cacher().get(id, fun));
+    std::shared_ptr<Cube> data = std::dynamic_pointer_cast<Cube>(cache.get_cacher().get(id, fun));
     c.set_data(data);
     return data;
 }
@@ -182,8 +182,8 @@ std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::render::texture:
             PNG::decode(f, *(data.get()), img_width, img_height);
             core::sync::EndCaller<core::sync::EndCallerIgnore> call([c, data] {});
             SampleInfo sinfo = SampleInfo();
-            return std::shared_ptr<Texture>(e->create_texture_2d(
-                id, static_cast<const void*>(data->data()), TextureFormat::RGBA_UINT8, sinfo, img_width, img_height, call));
+            return e->create_texture_2d(
+                id, static_cast<const void*>(data->data()), TextureFormat::RGBA_UINT8, sinfo, img_width, img_height, call);
         }
         case Type::Texture3D:
             GXUNIMPLEMENTED

@@ -19,7 +19,7 @@ namespace engine {
         void update() noexcept final;
         void terminate() noexcept final;
         render::sync::Semaphore* create_semaphore() const noexcept final;
-        render::texture::Texture2D* create_texture_2d(
+        std::shared_ptr<render::texture::Texture2D> create_texture_2d(
             core::Id id,
             const void* data,
             render::texture::TextureFormat::Id f,
