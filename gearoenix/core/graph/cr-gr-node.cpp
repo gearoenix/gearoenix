@@ -6,11 +6,11 @@ gearoenix::core::graph::Node::Node(const std::vector<std::string>& input_links, 
 {
     input_links_providers_links.resize(input_links.size());
     for (std::size_t i = 0; i < input_links.size(); ++i) {
-        input_links_string_index[input_links[i]] = i;
+        input_links_string_index[input_links[i]] = static_cast<unsigned int>(i);
     }
     output_links_consumers_links.resize(output_links.size());
     for (std::size_t i = 0; i < output_links.size(); ++i) {
-        output_links_string_index[output_links[i]] = i;
+        output_links_string_index[output_links[i]] = static_cast<unsigned int>(i);
     }
 }
 

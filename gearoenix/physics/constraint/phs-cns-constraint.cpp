@@ -32,7 +32,7 @@ gearoenix::physics::constraint::Constraint* gearoenix::physics::constraint::Cons
     const core::Id /*my_id*/,
     const std::shared_ptr<system::stream::Stream>& f,
     render::engine::Engine* const,
-    const core::sync::EndCaller<core::sync::EndCallerIgnore>& c)
+    const core::sync::EndCaller<core::sync::EndCallerIgnore>&)
 {
     const auto t = f->read<Type::Id>();
     switch (t) {
