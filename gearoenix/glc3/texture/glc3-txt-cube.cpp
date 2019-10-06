@@ -25,7 +25,9 @@ static const gearoenix::gl::enumerated FACES[] = {
 gearoenix::glc3::texture::Cube::Cube(
     const core::Id my_id,
     engine::Engine* const engine) noexcept
-    : render::texture::Cube(my_id, engine) {}
+    : render::texture::Cube(my_id, engine)
+{
+}
 
 std::shared_ptr<gearoenix::glc3::texture::Cube> gearoenix::glc3::texture::Cube::construct(
     const core::Id my_id,

@@ -8,7 +8,9 @@
 #include "glc3-txt-sample.hpp"
 
 gearoenix::glc3::texture::Texture2D::Texture2D(const core::Id my_id, engine::Engine* const e) noexcept
-    : render::texture::Texture2D(my_id, e) {}
+    : render::texture::Texture2D(my_id, e)
+{
+}
 
 std::shared_ptr<gearoenix::glc3::texture::Texture2D> gearoenix::glc3::texture::Texture2D::construct(
     const core::Id my_id,

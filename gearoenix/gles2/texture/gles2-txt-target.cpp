@@ -37,7 +37,9 @@ void gearoenix::gles2::texture::Target::state_init() const noexcept
 }
 
 gearoenix::gles2::texture::Target::Target(const core::Id my_id, engine::Engine* const e) noexcept
-    : render::texture::Target(my_id, e) {}
+    : render::texture::Target(my_id, e)
+{
+}
 
 gearoenix::gles2::texture::Target::Target(engine::Engine* const e) noexcept
     : render::texture::Target(core::asset::Manager::create_id(), e)

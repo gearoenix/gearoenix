@@ -30,7 +30,6 @@ using GxEndCaller = gearoenix::core::sync::EndCaller<T>;
 
 using GxEndCallerIgnore = gearoenix::core::sync::EndCallerIgnore;
 using GxEndCallerIgnored = GxEndCaller<GxEndCallerIgnore>;
-using GxGrPbr = gearoenix::render::graph::tree::Pbr;
 using GxGrTree = gearoenix::render::graph::tree::Tree;
 using GxMaterial = gearoenix::render::material::Material;
 using GxMdManager = gearoenix::render::model::Manager;
@@ -50,7 +49,8 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
     GxEndCaller<GxMesh> mshcall([endcall](const std::shared_ptr<GxMesh>&) {});
     GxEndCaller<GxStaticModel> mdlcall([endcall](const std::shared_ptr<GxStaticModel>&) {});
 
-    render_engine->set_render_tree(new GxGrPbr(render_engine, endcall));
+    render_tree = std::unique_ptr<GxGrPbr>(new GxGrPbr(render_engine, endcall));
+    render_engine->set_render_tree(render_tree.get());
     gearoenix::core::asset::Manager* const astmgr = sys_app->get_asset_manager();
     scn = astmgr->get_scene_manager()->create<GxGameScene>(scncall);
 
@@ -105,17 +105,6 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
             scn->add_model(mdl);
         }
     }
-    /*{
-		const std::shared_ptr<GxMaterial> mat(new GxMaterial(render_engine.get(), endcall));
-		mat->set_roughness_factor(0.5f);
-		mat->set_metallic_factor(0.5f);
-		const std::shared_ptr<GxModel> mdl = mdlmgr->create<GxModel>(mdlcall);
-		mdl->add_mesh(std::make_shared<GxMdMesh>(msh, mat));
-		auto& trans = mdl->get_transformation();
-		trans->set_location(GxVec3(0.0f, 0.0f, 0.0f));
-		trans->scale(10.0f);
-		scn->add_model(mdl);
-	}*/
 }
 
 void GameApp::update() noexcept
@@ -128,6 +117,7 @@ void GameApp::terminate() noexcept
     gearoenix::core::Application::terminate();
     scn = nullptr;
     camtrn = nullptr;
+    render_tree = nullptr;
 }
 
 GEAROENIX_START(GameApp)

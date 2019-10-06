@@ -23,6 +23,7 @@ protected:
         , name(name)
     {
     }
+
 public:
     virtual ~Asset() noexcept = default;
     void set_name(const std::string& n) noexcept { name = n; }

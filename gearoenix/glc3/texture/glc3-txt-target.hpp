@@ -22,6 +22,7 @@ namespace texture {
         void state_init() const noexcept;
 
         Target(core::Id my_id, engine::Engine* e) noexcept;
+
     public:
         explicit Target(engine::Engine* e) noexcept;
         ~Target() noexcept final;

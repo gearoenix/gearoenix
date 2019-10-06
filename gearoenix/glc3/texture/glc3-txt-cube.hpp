@@ -17,6 +17,7 @@ namespace texture {
         gl::uint texture_object = 0;
 
         Cube(core::Id my_id, engine::Engine* engine) noexcept;
+
     public:
         [[nodiscard]] static std::shared_ptr<Cube> construct(
             core::Id my_id,
