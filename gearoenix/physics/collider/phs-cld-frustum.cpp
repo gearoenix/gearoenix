@@ -1,5 +1,3 @@
 #include "phs-cld-frustum.hpp"
 
-gearoenix::physics::collider::Frustum::Frustum()
-{
-}
+gearoenix::physics::collider::Frustum::Frustum() noexcept = default;

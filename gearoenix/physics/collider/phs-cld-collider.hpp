@@ -32,10 +32,10 @@ protected:
 
 public:
     virtual ~Collider() noexcept = default;
-    static Collider* read(system::stream::Stream* f) noexcept;
+    [[nodiscard]] static Collider* read(system::stream::Stream* f) noexcept;
     /// It returns minimum distance of collider surface from the ray origin along the ray direction
     ///   if the ray hits the surface and the distance is less than d_min
-    virtual std::optional<core::Real> hit(const math::Ray3& r, core::Real d_min) const noexcept;
+    [[nodiscard]] virtual std::optional<core::Real> hit(const math::Ray3& r, core::Real d_min) const noexcept;
 
     virtual void set_location(const math::Vec3&) noexcept override;
     virtual void local_scale(core::Real s) noexcept override;

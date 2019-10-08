@@ -6,9 +6,7 @@
 
 gearoenix::physics::collider::Collider* gearoenix::physics::collider::Collider::read(system::stream::Stream* const f) noexcept
 {
-    Type collider_type_id;
-    f->read(collider_type_id);
-    switch (collider_type_id) {
+    switch (f->read<Type>()) {
     case Type::Ghost:
         return nullptr;
     case Type::Mesh:
