@@ -31,15 +31,17 @@ protected:
     }
 
 public:
-    virtual ~Collider() noexcept = default;
+    ~Collider() noexcept override = default;
     [[nodiscard]] static Collider* read(system::stream::Stream* f) noexcept;
     /// It returns minimum distance of collider surface from the ray origin along the ray direction
     ///   if the ray hits the surface and the distance is less than d_min
     [[nodiscard]] virtual std::optional<core::Real> hit(const math::Ray3& r, core::Real d_min) const noexcept;
 
-    virtual void set_location(const math::Vec3&) noexcept override;
-    virtual void local_scale(core::Real s) noexcept override;
-    virtual void local_x_scale(core::Real s) noexcept override;
+    void set_location(const math::Vec3&) noexcept override;
+    void local_scale(core::Real s) noexcept override;
+    void local_x_scale(core::Real s) noexcept override;
+
+    // TODO: I have to implement rotations
 };
 }
 #endif

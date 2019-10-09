@@ -21,7 +21,7 @@ namespace physics::collider {
 
     public:
         explicit Mesh(system::stream::Stream* f) noexcept;
-        std::optional<core::Real> hit(const math::Ray3& ray, core::Real d_min) const noexcept final;
+        [[nodiscard]] std::optional<core::Real> hit(const math::Ray3& ray, core::Real d_min) const noexcept final;
 
         friend std::ostream& operator<<(std::ostream& os, const Mesh& m) noexcept
         {

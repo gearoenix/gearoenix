@@ -5,7 +5,10 @@
 namespace gearoenix::physics::collider {
 class Ghost : public Collider {
 public:
-    Ghost() noexcept : Collider(Type::Ghost) {}
+    Ghost() noexcept
+        : Collider(Type::Ghost)
+    {
+    }
     ~Ghost() noexcept final = default;
     [[nodiscard]] std::optional<core::Real> hit(const math::Ray3&, const core::Real) const noexcept final { return std::nullopt; }
 };

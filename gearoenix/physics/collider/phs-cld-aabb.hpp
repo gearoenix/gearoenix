@@ -4,8 +4,9 @@
 namespace gearoenix::physics::collider {
 class Aabb : public Collider {
 public:
-    Aabb(const math::Vec3 &u, const math::Vec3 &l) noexcept
-            : Collider(Type::Aabb) {
+    Aabb(const math::Vec3& u, const math::Vec3& l) noexcept
+        : Collider(Type::Aabb)
+    {
         box = math::Aabb3(u, l);
     }
     ~Aabb() noexcept final = default;
