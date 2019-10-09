@@ -11,19 +11,18 @@
 #include "../mesh/rnd-msh-mesh.hpp"
 #include "../pipeline/rnd-pip-manager.hpp"
 #include "../scene/rnd-scn-scene.hpp"
+#include "rnd-mdl-transformation.hpp"
 
 gearoenix::render::model::Model::Model(
     const core::Id my_id,
     const Type t,
-    physics::Transformation* const tran,
     system::stream::Stream* const f,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : core::asset::Asset(my_id, core::asset::Type::Model)
     , model_type(t)
-    , transformation(tran)
+    , transformation(new Transformation(&uniform, this))
     , uniform_buffers(new buffer::FramedUniform(static_cast<unsigned int>(sizeof(Uniform)), e))
-    , occlusion_sphere(math::Vec3(0.0f, 0.0f, 0.0f), 1.0f)
     , e(e)
 {
     uniform.m.read(f);
@@ -36,14 +35,12 @@ gearoenix::render::model::Model::Model(
 gearoenix::render::model::Model::Model(
     const core::Id my_id,
     const Type t,
-    physics::Transformation* const transformation,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>&) noexcept
     : core::asset::Asset(my_id, core::asset::Type::Model)
     , model_type(t)
-    , transformation(transformation)
+    , transformation(new Transformation(&uniform, this))
     , uniform_buffers(new buffer::FramedUniform(static_cast<unsigned int>(sizeof(Uniform)), e))
-    , occlusion_sphere(math::Vec3(0.0f, 0.0f, 0.0f), 1.0f)
     , e(e)
 {
 }
@@ -65,8 +62,9 @@ void gearoenix::render::model::Model::update() noexcept
 
 void gearoenix::render::model::Model::add_mesh(const std::shared_ptr<Mesh>& m) noexcept
 {
-    occlusion_sphere.insert(m->get_mesh()->get_radius());
-    if (m->get_material()->get_is_shadow_caster()) {
+    GXTODO // add mesh aabbb into collider
+        if (m->get_material()->get_is_shadow_caster())
+    {
         shadowing = gearoenix::core::State::Set;
     }
     meshes[m->get_mesh()->get_asset_id()] = m;

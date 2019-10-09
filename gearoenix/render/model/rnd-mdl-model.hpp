@@ -42,7 +42,6 @@ namespace model {
         GX_GET_VAL_PRT(core::State, enability, core::State::Set)
         GX_GET_CREF_PRT(MapMesh, meshes)
         GX_GET_CREF_PRT(MapModel, children)
-        GX_GET_CREF_PRT(math::Sphere, occlusion_sphere)
         GX_GET_PTR_PRT(Model, parent)
         GX_GET_PTR_PRT(scene::Scene, scene)
     protected:
@@ -52,27 +51,25 @@ namespace model {
         Model(
             core::Id my_id,
             Type t,
-            physics::Transformation* transformation,
             system::stream::Stream* f,
             engine::Engine* e,
             const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
         Model(
             core::Id my_id,
             Type t,
-            physics::Transformation* transformation,
             engine::Engine* e,
             const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
 
     public:
-        virtual ~Model() noexcept;
+        ~Model() noexcept override;
         virtual void update() noexcept;
         void add_mesh(const std::shared_ptr<Mesh>& m) noexcept;
         void add_child(const std::shared_ptr<Model>& c) noexcept;
         void set_collider(std::unique_ptr<physics::collider::Collider> c) noexcept;
-        const math::Mat4x4& get_model_matrix() const noexcept;
+        [[nodiscard]] const math::Mat4x4& get_model_matrix() const noexcept;
         void set_enability(core::State s) noexcept;
         virtual void set_scene(scene::Scene* s) noexcept;
-        virtual bool get_dynamicity() const noexcept = 0;
+        [[nodiscard]] virtual bool get_dynamicity() const noexcept = 0;
     };
 }
 }

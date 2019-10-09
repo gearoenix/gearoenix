@@ -6,7 +6,7 @@ gearoenix::render::model::Dynamic::Dynamic(
     system::stream::Stream* const f,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
-    : Model(my_id, Type::Dynamic, new Transformation(&uniform, &occlusion_sphere, this), f, e, c)
+    : Model(my_id, Type::Dynamic, f, e, c)
 {
 }
 
@@ -14,6 +14,6 @@ gearoenix::render::model::Dynamic::Dynamic(
     const core::Id my_id,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
-    : Model(my_id, Type::Dynamic, new Transformation(&uniform, &occlusion_sphere, this), e, c)
+    : Model(my_id, Type::Dynamic, e, c)
 {
 }

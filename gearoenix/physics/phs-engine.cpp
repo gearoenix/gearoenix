@@ -88,11 +88,7 @@ void gearoenix::physics::Engine::update_001_kernel(const unsigned int kernel_ind
                 const std::shared_ptr<render::model::Model>& model = id_model.second;
                 if (model->get_enability() != core::State::Set)
                     continue;
-                GX_DO_TASK(
-                    const math::Sphere& sphere = model->get_occlusion_sphere();
-                    if (camera->in_sight(sphere.get_center(), sphere.get_radius())) {
-                        current_visible_models.push_back(model.get());
-                    });
+                GXTODO; // object visibility check
             }
         }
     }

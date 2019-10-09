@@ -6,7 +6,7 @@ gearoenix::render::model::Static::Static(
     system::stream::Stream* const f,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
-    : Model(my_id, Type::Static, new Transformation(&uniform, &occlusion_sphere, this), f, e, c)
+    : Model(my_id, Type::Static, f, e, c)
 {
 }
 
@@ -14,7 +14,7 @@ gearoenix::render::model::Static::Static(
     const core::Id my_id,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
-    : Model(my_id, Type::Static, new Transformation(&uniform, &occlusion_sphere, this), e, c)
+    : Model(my_id, Type::Static, e, c)
 {
 }
 
