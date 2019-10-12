@@ -1,6 +1,6 @@
 #include "rnd-mdl-model.hpp"
 #include "../../core/asset/cr-asset-manager.hpp"
-#include "../../physics/collider/phs-cld-collider.hpp"
+#include "../../physics/collider/phs-cld-ghost.hpp"
 #include "../../system/stream/sys-stm-asset.hpp"
 #include "../../system/stream/sys-stm-stream.hpp"
 #include "../../system/sys-app.hpp"
@@ -21,11 +21,12 @@ gearoenix::render::model::Model::Model(
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : core::asset::Asset(my_id, core::asset::Type::Model)
     , model_type(t)
-    , transformation(new Transformation(&uniform, this))
-    , uniform_buffers(new buffer::FramedUniform(static_cast<unsigned int>(sizeof(Uniform)), e))
+    , collider(new physics::collider::Ghost())
+    , transformation(new Transformation(&model_matrix, this))
+    , uniform_buffers(new buffer::FramedUniform(static_cast<unsigned int>(sizeof(math::Mat4x4)), e))
     , e(e)
 {
-    uniform.m.read(f);
+    model_matrix.read(f);
     const auto meshes_count = f->read<core::Count>();
     for (core::Count i = 0; i < meshes_count; ++i) {
         add_mesh(std::make_shared<Mesh>(f, e, c));
@@ -39,21 +40,24 @@ gearoenix::render::model::Model::Model(
     const core::sync::EndCaller<core::sync::EndCallerIgnore>&) noexcept
     : core::asset::Asset(my_id, core::asset::Type::Model)
     , model_type(t)
-    , transformation(new Transformation(&uniform, this))
-    , uniform_buffers(new buffer::FramedUniform(static_cast<unsigned int>(sizeof(Uniform)), e))
+    , collider(new physics::collider::Ghost())
+    , transformation(new Transformation(&model_matrix, this))
+    , uniform_buffers(new buffer::FramedUniform(static_cast<unsigned int>(sizeof(math::Mat4x4)), e))
     , e(e)
 {
 }
 
 gearoenix::render::model::Model::~Model() noexcept
 {
+    collider = nullptr;
+    transformation = nullptr;
     meshes.clear();
     children.clear();
 }
 
 void gearoenix::render::model::Model::update() noexcept
 {
-    uniform_buffers->update(uniform);
+    uniform_buffers->update(model_matrix);
     for (const auto& msh : meshes)
         msh.second->update_uniform();
     for (const auto& ch : children)
@@ -62,12 +66,18 @@ void gearoenix::render::model::Model::update() noexcept
 
 void gearoenix::render::model::Model::add_mesh(const std::shared_ptr<Mesh>& m) noexcept
 {
-    GXTODO // add mesh aabbb into collider
-        if (m->get_material()->get_is_shadow_caster())
+    material::Material* const mat = m->get_material().get();
+    if (mat->get_is_shadow_caster())
     {
-        shadowing = gearoenix::core::State::Set;
+        shadowing = core::State::Set;
     }
-    meshes[m->get_mesh()->get_asset_id()] = m;
+    if (mat->get_translucency() == material::TranslucencyMode::Tansparent) 
+    {
+        transparency = core::State::Set;
+    }
+    mesh::Mesh* const msh = m->get_mesh().get();
+    collider->put(msh->get_box());
+    meshes[msh->get_asset_id()] = m;
 }
 
 void gearoenix::render::model::Model::add_child(const std::shared_ptr<Model>& c) noexcept
@@ -80,11 +90,6 @@ void gearoenix::render::model::Model::set_collider(std::unique_ptr<physics::coll
 {
     collider = std::move(c);
     collider->set_parent(this);
-}
-
-const gearoenix::math::Mat4x4& gearoenix::render::model::Model::get_model_matrix() const noexcept
-{
-    return uniform.m;
 }
 
 void gearoenix::render::model::Model::set_enability(const core::State s) noexcept

@@ -12,7 +12,6 @@
 #include "../buffer/rnd-buf-framed-uniform.hpp"
 #include "rnd-mdl-mesh.hpp"
 #include "rnd-mdl-type.hpp"
-#include "rnd-mdl-uniform.hpp"
 #include <map>
 #include <memory>
 #include <vector>
@@ -44,9 +43,9 @@ namespace model {
         GX_GET_CREF_PRT(MapModel, children)
         GX_GET_PTR_PRT(Model, parent)
         GX_GET_PTR_PRT(scene::Scene, scene)
+        GX_GET_CREF_PRT(math::Mat4x4, model_matrix)
     protected:
         engine::Engine* const e;
-        Uniform uniform;
 
         Model(
             core::Id my_id,
@@ -66,7 +65,6 @@ namespace model {
         void add_mesh(const std::shared_ptr<Mesh>& m) noexcept;
         void add_child(const std::shared_ptr<Model>& c) noexcept;
         void set_collider(std::unique_ptr<physics::collider::Collider> c) noexcept;
-        [[nodiscard]] const math::Mat4x4& get_model_matrix() const noexcept;
         void set_enability(core::State s) noexcept;
         virtual void set_scene(scene::Scene* s) noexcept;
         [[nodiscard]] virtual bool get_dynamicity() const noexcept = 0;

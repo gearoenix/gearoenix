@@ -19,34 +19,26 @@ namespace render {
     }
     namespace material {
         class Material {
+            GX_GET_UCPTR_PRV(buffer::FramedUniform, uniform_buffers)
+            GX_GET_VAL_PRV(TranslucencyMode, translucency, TranslucencyMode::Opaque)
+            GX_GET_VAL_PRV(bool, is_shadow_caster, true)
+            GX_GET_CREF_PRV(std::shared_ptr<texture::Texture2D>, color_texture)
+            GX_GET_CREF_PRV(std::optional<math::Vec3>, color_value)
+            GX_GET_CREF_PRV(std::shared_ptr<texture::Texture2D>, emission_texture)
+            GX_GET_CREF_PRV(std::optional<math::Vec3>, emission_value)
+            GX_GET_CREF_PRV(std::shared_ptr<texture::Texture2D>, metallic_roughness_texture)
+            GX_GET_CREF_PRV(std::optional<math::Vec2>, metallic_roughness_value)
+            GX_GET_CREF_PRV(std::shared_ptr<texture::Texture2D>, normal_texture)
+            GX_GET_CREF_PRV(std::optional<math::Vec3>, normal_value)
+            GX_GET_CREF_PRV(Uniform, uniform)
         private:
             engine::Engine* const e;
-            const std::shared_ptr<buffer::FramedUniform> uniform_buffers;
-
-            std::shared_ptr<texture::Texture2D> color_txt;
-            std::optional<math::Vec3> color = math::Vec3(0.999f, 0.999f, 0.999f);
-
-            std::shared_ptr<texture::Texture2D> emission;
-            std::shared_ptr<texture::Texture2D> metallic_roughness;
-            std::shared_ptr<texture::Texture2D> normal;
-            TranslucencyMode::Id translucency = TranslucencyMode::Opaque;
-
-            bool is_shadow_caster = true;
-
-            Uniform uniform;
 
         public:
             Material(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept;
             Material(system::stream::Stream* f, engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept;
             ~Material() noexcept = default;
             void update_uniform() noexcept;
-            [[nodiscard]] const std::shared_ptr<buffer::FramedUniform>& get_uniform_buffers() const noexcept;
-            [[nodiscard]] const std::shared_ptr<texture::Texture2D>& get_color_texture() const noexcept;
-            [[nodiscard]] const std::optional<math::Vec3>& get_color() const noexcept;
-            [[nodiscard]] const std::shared_ptr<texture::Texture2D>& get_metallic_roughness() const noexcept;
-            [[nodiscard]] const std::shared_ptr<texture::Texture2D>& get_normal() const noexcept;
-            [[nodiscard]] const std::shared_ptr<texture::Texture2D>& get_emissive() const noexcept;
-            [[nodiscard]] bool get_is_shadow_caster() const noexcept;
             void set_metallic_factor(core::Real f) noexcept;
             void set_roughness_factor(core::Real f) noexcept;
             void set_color(

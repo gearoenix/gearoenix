@@ -4,6 +4,7 @@
 #include "../../core/cr-static.hpp"
 #include "../../core/cr-types.hpp"
 #include "../../core/sync/cr-sync-end-caller.hpp"
+#include "../../math/math-aabb.hpp"
 #include "../../math/math-vertex.hpp"
 #include "rnd-msh-type.hpp"
 
@@ -24,7 +25,7 @@ namespace gearoenix::render::mesh {
 /// implementation it will be come an interface (virtual function haver)
 class Mesh : public core::asset::Asset {
     GX_GET_CVAL_PRT(Type, mesh_type)
-    GX_GET_VAL_PRT(core::Real, radius, 0.0f)
+    GX_GET_CREF_PRT(math::Aabb3, box)
     GX_GET_UPTR_PRT(buffer::Buffer, vertex_buffer)
     GX_GET_UPTR_PRT(buffer::Buffer, index_buffer)
 protected:
@@ -40,7 +41,7 @@ public:
         core::Id my_id,
         std::vector<math::BasicVertex> vertices,
         std::vector<std::uint32_t> indices,
-        core::Real radius,
+        const math::Aabb3& box,
         engine::Engine* e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
     ~Mesh() noexcept final;
@@ -48,7 +49,7 @@ public:
         engine::Engine* e,
         std::vector<math::BasicVertex> vertices,
         std::vector<std::uint32_t> indices,
-        core::Real radius,
+        const math::Aabb3& box,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
 };
 }

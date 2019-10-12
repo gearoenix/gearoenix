@@ -20,7 +20,7 @@ gearoenix::render::mesh::Mesh::Mesh(
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : core::asset::Asset(my_id, core::asset::Type::Mesh)
-    , mesh_type(Type::BASIC)
+    , mesh_type(Type::Basic)
 {
     const auto mesh_count = f->read<core::Count>();
     std::vector<math::BasicVertex> vertices(mesh_count);
@@ -30,25 +30,26 @@ gearoenix::render::mesh::Mesh::Mesh(
     std::vector<std::uint32_t> indices;
     f->read(indices);
     const auto r = f->read<core::Real>();
-    set_vertices(e, std::move(vertices), std::move(indices), r, c);
+    GXTODO // make sure the blender plugin implemented this
+    box.read(f);
+    set_vertices(e, std::move(vertices), std::move(indices), box, c);
 }
 
 gearoenix::render::mesh::Mesh::Mesh(
     const core::Id my_id,
     std::vector<math::BasicVertex> vertices,
     std::vector<std::uint32_t> indices,
-    const core::Real radius,
+    const math::Aabb3& b,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : core::asset::Asset(my_id, core::asset::Type::Mesh)
-    , mesh_type(Type::BASIC)
+    , mesh_type(Type::Basic)
 {
-    set_vertices(e, std::move(vertices), std::move(indices), radius, c);
+    set_vertices(e, std::move(vertices), std::move(indices), b, c);
 }
 
 gearoenix::render::mesh::Mesh::~Mesh() noexcept
 {
-    radius = -1.0f;
     vertex_buffer = nullptr;
     index_buffer = nullptr;
 }
@@ -57,11 +58,11 @@ void gearoenix::render::mesh::Mesh::set_vertices(
     engine::Engine* const e,
     std::vector<math::BasicVertex> vertices,
     std::vector<std::uint32_t> indices,
-    const core::Real r,
+    const math::Aabb3& b,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
 {
     auto* const buf_mgr = e->get_buffer_manager();
     vertex_buffer = std::unique_ptr<buffer::Buffer>(buf_mgr->create_static(std::move(vertices), c));
     index_buffer = std::unique_ptr<buffer::Buffer>(buf_mgr->create_static(std::move(indices), c));
-    radius = r;
+    box = b;
 }

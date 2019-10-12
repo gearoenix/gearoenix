@@ -4,6 +4,11 @@
 #include "math-intersection-status.hpp"
 #include "math-vector.hpp"
 #include <optional>
+
+namespace gearoenix::system::stream {
+    class Stream;
+}
+
 namespace gearoenix::math {
 struct Ray3;
 struct Sphere;
@@ -14,9 +19,9 @@ struct Aabb3 {
     GX_GET_CREF_PRV(Vec3, center)
     GX_GET_VAL_PRV(core::Real, volume, 0.0f)
 public:
-    /// TODO add without updates
-    explicit Aabb3() noexcept;
-    explicit Aabb3(const Vec3& upper, const Vec3& lower) noexcept;
+    Aabb3() noexcept;
+    Aabb3(const Vec3& upper, const Vec3& lower) noexcept;
+    explicit Aabb3(const Vec3& p) noexcept;
     void update() noexcept;
     void reset() noexcept;
     void reset(const Vec3& p) noexcept;
@@ -33,6 +38,7 @@ public:
     IntersectionStatus check_intersection(const Aabb3& o) const noexcept;
     void set_center(const Vec3& c) noexcept;
     void set_diameter(const Vec3& d) noexcept;
+    void read(system::stream::Stream* s) noexcept;
 };
 }
 #endif

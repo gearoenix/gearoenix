@@ -1,6 +1,7 @@
 #include "math-aabb.hpp"
 #include "../core/cr-build-configuration.hpp"
 #include "../core/cr-static.hpp"
+#include "../system/stream/sys-stm-stream.hpp"
 #include "math-ray.hpp"
 #include "math-sphere.hpp"
 #include <limits>
@@ -20,6 +21,15 @@ gearoenix::math::Aabb3::Aabb3(const Vec3& u, const Vec3& l) noexcept
     , diameter(u - l)
     , center((u + l) * 0.5f)
     , volume(diameter[0] * diameter[1] * diameter[2])
+{
+}
+
+gearoenix::math::Aabb3::Aabb3(const Vec3& p) noexcept
+    : upper(p)
+    , lower(p)
+    , diameter(Vec3(0.0f))
+    , center(p)
+    , volume(0.0f)
 {
 }
 
@@ -165,7 +175,7 @@ gearoenix::math::IntersectionStatus gearoenix::math::Aabb3::check_intersection(c
 
 void gearoenix::math::Aabb3::set_center(const Vec3& c) noexcept
 {
-    center = std::move(c);
+    center = c;
     const Vec3 r = diameter * 0.5f;
     upper = center + r;
     lower = center - r;
@@ -178,4 +188,11 @@ void gearoenix::math::Aabb3::set_diameter(const Vec3& d) noexcept
     upper = center + hd;
     lower = center - hd;
     volume = d[0] * d[1] * d[2];
+}
+
+void gearoenix::math::Aabb3::read(system::stream::Stream* s) noexcept
+{
+    upper.read(s);
+    lower.read(s);
+    update();
 }

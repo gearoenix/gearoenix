@@ -297,7 +297,7 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
     selected_item = nullptr;
     look_at_button->set_on_click([this] {
         if (nullptr != selected_item) {
-            camtrn->look_at(camtrn->get_location(), selected_item.load()->get_occlusion_sphere().get_center(), GxVec3(0.0f, 0.0f, 1.0f));
+            camtrn->look_at(camtrn->get_location(), selected_item.load()->get_transformation()->get_location(), GxVec3(0.0f, 0.0f, 1.0f));
             selected_item = nullptr;
         }
     });
@@ -361,7 +361,7 @@ bool GameApp::on_event(const gearoenix::core::event::Data& event_data) noexcept
                     auto* cld = hit.value().second;
                     auto* mdl = cld->get_parent();
                     selected_item.store(reinterpret_cast<GxStaticModel*>(mdl));
-                    auto& mdll = mdl->get_occlusion_sphere().get_center();
+                    auto& mdll = mdl->get_transformation()->get_location();
                     auto color = *(mdl->get_meshes().begin()->second->get_material()->get_color());
                     std::wstringstream tl;
                     tl << "{ x: " << mdll[0] << ", y: " << mdll[1] << ", z: " << mdll[2] << " }";

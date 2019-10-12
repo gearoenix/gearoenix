@@ -3,7 +3,7 @@
 #include "../../core/cr-types.hpp"
 namespace gearoenix::render::mesh {
 enum struct Type : core::TypeId {
-    BASIC = 1,
+    Basic = 1,
 };
 }
 #endif

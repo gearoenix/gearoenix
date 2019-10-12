@@ -1,10 +1,9 @@
 #include "rnd-mdl-transformation.hpp"
 #include "../../physics/phs-transformation.hpp"
 #include "rnd-mdl-model.hpp"
-#include "rnd-mdl-uniform.hpp"
 
-gearoenix::render::model::Transformation::Transformation(Uniform* const uniform, Model* const parent) noexcept
-    : uniform(uniform)
+gearoenix::render::model::Transformation::Transformation(math::Mat4x4* const model_matrix, Model* const parent) noexcept
+    : model_matrix(model_matrix)
     , parent(parent)
 {
 }
@@ -18,7 +17,7 @@ void gearoenix::render::model::Transformation::set_location(const math::Vec3& l)
 {
     physics::collider::Collider* const collider = parent->get_collider();
     const math::Vec3 trans = l - collider->get_location();
-    uniform->m.set_location(l);
+    model_matrix->set_location(l);
     collider->set_location(l);
     const std::map<core::Id, std::shared_ptr<model::Model>>& children = parent->get_children();
     for (const std::pair<const core::Id, std::shared_ptr<model::Model>>& c : children)
@@ -33,7 +32,7 @@ void gearoenix::render::model::Transformation::translate(const math::Vec3& l) no
 void gearoenix::render::model::Transformation::local_scale(const core::Real s) noexcept
 {
     physics::collider::Collider* const collider = parent->get_collider();
-    uniform->m.local_scale(s);
+    model_matrix->local_scale(s);
     collider->local_scale(s);
     const math::Vec3& loc = get_location();
     const std::map<core::Id, std::shared_ptr<model::Model>>& children = parent->get_children();
@@ -47,7 +46,7 @@ void gearoenix::render::model::Transformation::local_scale(const core::Real s) n
 
 void gearoenix::render::model::Transformation::local_x_scale(const core::Real s) noexcept
 {
-    uniform->m.local_scale(s, 1.0f, 1.0f);
+    model_matrix->local_scale(s, 1.0f, 1.0f);
     parent->get_collider()->local_x_scale(s);
     const math::Vec3& loc = get_location();
     const std::map<core::Id, std::shared_ptr<model::Model>>& children = parent->get_children();
@@ -61,7 +60,7 @@ void gearoenix::render::model::Transformation::local_x_scale(const core::Real s)
 
 void gearoenix::render::model::Transformation::local_y_scale(const core::Real s) noexcept
 {
-    uniform->m.local_scale(1.0f, s, 1.0f);
+    model_matrix->local_scale(1.0f, s, 1.0f);
     parent->get_collider()->local_y_scale(s);
     const math::Vec3& loc = get_location();
     const std::map<core::Id, std::shared_ptr<model::Model>>& children = parent->get_children();
@@ -75,7 +74,7 @@ void gearoenix::render::model::Transformation::local_y_scale(const core::Real s)
 
 void gearoenix::render::model::Transformation::local_z_scale(const core::Real s) noexcept
 {
-    uniform->m.local_scale(1.0f, 1.0f, s);
+    model_matrix->local_scale(1.0f, 1.0f, s);
     parent->get_collider()->local_z_scale(s);
     const math::Vec3& loc = get_location();
     const std::map<core::Id, std::shared_ptr<model::Model>>& children = parent->get_children();
