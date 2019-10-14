@@ -7,23 +7,20 @@
 #include "../engine/glc3-eng-engine.hpp"
 
 gearoenix::glc3::buffer::Vertex::Vertex(
-    std::vector<math::BasicVertex> vertices,
+    const std::vector<math::BasicVertex> &vertices,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
-    : render::buffer::Static(0, e)
+    : render::buffer::Static(vertices.size() * sizeof(math::BasicVertex), e)
 {
-    const auto bf_size = static_cast<unsigned int>(vertices.size() * sizeof(math::BasicVertex));
-    buffer_size = static_cast<std::size_t>(bf_size);
-    e->get_function_loader()->load([this, vertices { move(vertices) }, c, bf_size] {
+    e->get_function_loader()->load([this, vertices, c] {
 #ifdef GX_DEBUG_GL_CLASS_3
         gl::Loader::check_for_error();
 #endif
-        gl::uint tvo = 0, tbo = 0;
-        gl::Loader::gen_vertex_arrays(1, &tvo);
-        gl::Loader::bind_vertex_array(tvo);
-        gl::Loader::gen_buffers(1, &tbo);
-        gl::Loader::bind_buffer(GL_ARRAY_BUFFER, tbo);
-        gl::Loader::buffer_data(GL_ARRAY_BUFFER, static_cast<gl::sizeiptr>(bf_size), vertices.data(), GL_STATIC_DRAW);
+        gl::Loader::gen_vertex_arrays(1, &vo);
+        gl::Loader::bind_vertex_array(vo);
+        gl::Loader::gen_buffers(1, &bo);
+        gl::Loader::bind_buffer(GL_ARRAY_BUFFER, bo);
+        gl::Loader::buffer_data(GL_ARRAY_BUFFER, static_cast<gl::sizeiptr>(buffer_size), vertices.data(), GL_STATIC_DRAW);
         gl::Loader::enable_vertex_attrib_array(0);
         gl::Loader::enable_vertex_attrib_array(1);
         gl::Loader::enable_vertex_attrib_array(2);
@@ -33,8 +30,6 @@ gearoenix::glc3::buffer::Vertex::Vertex(
         gl::Loader::vertex_attrib_pointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(math::BasicVertex), reinterpret_cast<void*>(6 * sizeof(float)));
         gl::Loader::vertex_attrib_pointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(math::BasicVertex), reinterpret_cast<void*>(10 * sizeof(float)));
         gl::Loader::bind_vertex_array(0);
-        vo = tvo;
-        bo = tbo;
 #ifdef GX_DEBUG_GL_CLASS_3
         gl::Loader::check_for_error();
 #endif

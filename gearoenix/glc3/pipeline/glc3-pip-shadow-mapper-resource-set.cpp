@@ -7,7 +7,6 @@
 #include "../../render/light/rnd-lt-directional.hpp"
 #include "../../render/material/rnd-mat-uniform.hpp"
 #include "../../render/mesh/rnd-msh-mesh.hpp"
-#include "../../render/model/rnd-mdl-uniform.hpp"
 #include "../../render/scene/rnd-scn-uniform.hpp"
 #include "../buffer/glc3-buf-index.hpp"
 #include "../buffer/glc3-buf-vertex.hpp"

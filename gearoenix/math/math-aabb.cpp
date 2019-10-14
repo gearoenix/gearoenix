@@ -60,13 +60,7 @@ void gearoenix::math::Aabb3::reset(const Vec3& p) noexcept
 
 void gearoenix::math::Aabb3::put(const Vec3& p) noexcept
 {
-    for (int i = 0; i < 3; ++i) {
-        if (p[i] > upper[i]) {
-            upper[i] = p[i];
-        } else if (p[i] < lower[i]) {
-            lower[i] = p[i];
-        }
-    }
+    put_without_update(p);
     update();
 }
 
@@ -91,6 +85,18 @@ void gearoenix::math::Aabb3::put(const gearoenix::math::Aabb3& o) noexcept
     update();
 }
 
+void gearoenix::math::Aabb3::put_without_update(const Vec3& p) noexcept
+{
+    for (int i = 0; i < 3; ++i) {
+        if (p[i] > upper[i]) {
+            upper[i] = p[i];
+        }
+        else if (p[i] < lower[i]) {
+            lower[i] = p[i];
+        }
+    }
+}
+
 void gearoenix::math::Aabb3::put_without_update(const Aabb3& o) noexcept
 {
     upper[0] = GX_MAX(o.upper[0], upper[0]);
@@ -101,7 +107,7 @@ void gearoenix::math::Aabb3::put_without_update(const Aabb3& o) noexcept
     lower[2] = GX_MIN(o.lower[2], lower[2]);
 }
 
-bool gearoenix::math::Aabb3::test(const Aabb3& o, Aabb3& intersection) const noexcept
+bool gearoenix::math::Aabb3::check_intersection(const Aabb3& o, Aabb3& intersection) const noexcept
 {
     int equals = 0;
     for (int i = 0; i < 3; ++i) {
@@ -132,7 +138,7 @@ bool gearoenix::math::Aabb3::test(const Aabb3& o) const noexcept
         && upper[2] > o.lower[2];
 }
 
-bool gearoenix::math::Aabb3::test(const gearoenix::math::Sphere& o) const noexcept
+bool gearoenix::math::Aabb3::check_intersection(const gearoenix::math::Sphere& o) const noexcept
 {
     return test(Aabb3(o.get_center() + o.get_radius(), o.get_center() - o.get_radius()));
 }
@@ -154,7 +160,7 @@ std::optional<gearoenix::core::Real> gearoenix::math::Aabb3::hit(const math::Ray
     return std::nullopt;
 }
 
-gearoenix::math::IntersectionStatus gearoenix::math::Aabb3::check_intersection(const Aabb3& o) const noexcept
+gearoenix::math::IntersectionStatus gearoenix::math::Aabb3::check_intersection_status(const Aabb3& o) const noexcept
 {
     if (upper[0] > o.upper[0]
         && upper[1] > o.upper[1]
@@ -195,4 +201,39 @@ void gearoenix::math::Aabb3::read(system::stream::Stream* s) noexcept
     upper.read(s);
     lower.read(s);
     update();
+}
+
+void gearoenix::math::Aabb3::get_all_corners(math::Vec3(&corners)[8]) noexcept
+{
+    corners[0][0] = upper[0];
+    corners[0][1] = upper[1];
+    corners[0][2] = upper[2];
+
+    corners[1][0] = lower[0];
+    corners[1][1] = upper[1];
+    corners[1][2] = upper[2];
+
+    corners[2][0] = upper[0];
+    corners[2][1] = lower[1];
+    corners[2][2] = upper[2];
+
+    corners[3][0] = lower[0];
+    corners[3][1] = lower[1];
+    corners[3][2] = upper[2];
+
+    corners[4][0] = upper[0];
+    corners[4][1] = upper[1];
+    corners[4][2] = lower[2];
+
+    corners[5][0] = lower[0];
+    corners[5][1] = upper[1];
+    corners[5][2] = lower[2];
+
+    corners[6][0] = upper[0];
+    corners[6][1] = lower[1];
+    corners[6][2] = lower[2];
+
+    corners[7][0] = lower[0];
+    corners[7][1] = lower[1];
+    corners[7][2] = lower[2];
 }

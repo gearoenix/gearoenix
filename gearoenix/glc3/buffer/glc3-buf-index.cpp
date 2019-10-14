@@ -7,17 +7,17 @@
 #include "../engine/glc3-eng-engine.hpp"
 
 gearoenix::glc3::buffer::Index::Index(
-    std::vector<std::uint32_t> indices,
+    const std::vector<std::uint32_t> &indices,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : render::buffer::Static(static_cast<unsigned int>(indices.size() * sizeof(gl::uint)), e)
 {
     count = static_cast<gl::sizei>(indices.size());
-    e->get_function_loader()->load([this, data { move(indices) }, c, bf_size = buffer_size.load()] {
+    e->get_function_loader()->load([this, indices, c] {
         gl::uint tbo;
         gl::Loader::gen_buffers(1, &tbo);
         gl::Loader::bind_buffer(GL_ELEMENT_ARRAY_BUFFER, tbo);
-        gl::Loader::buffer_data(GL_ELEMENT_ARRAY_BUFFER, bf_size, data.data(), GL_STATIC_DRAW);
+        gl::Loader::buffer_data(GL_ELEMENT_ARRAY_BUFFER, buffer_size, indices.data(), GL_STATIC_DRAW);
         bo = tbo;
     });
 }

@@ -7,7 +7,6 @@
 #include "../../render/light/rnd-lt-directional.hpp"
 #include "../../render/material/rnd-mat-uniform.hpp"
 #include "../../render/mesh/rnd-msh-mesh.hpp"
-#include "../../render/model/rnd-mdl-uniform.hpp"
 #include "../../render/scene/rnd-scn-uniform.hpp"
 #include "../buffer/glc3-buf-index.hpp"
 #include "../buffer/glc3-buf-vertex.hpp"
@@ -47,8 +46,8 @@ void gearoenix::glc3::pipeline::ForwardPbrResourceSet::bind(gl::uint& bound_shad
     }
     reinterpret_cast<const texture::Cube*>(specular_environment)->bind(static_cast<gl::enumerated>(shdr->get_effect_specular_environment_index()));
     GX_GLC3_PIPRES_BIND_MATERIAL
-    const auto* const model = model_uniform_buffer->get_ptr<render::model::Uniform>();
-    GX_GLC3_PIPRES_SET_UNIFORM(model_m, *(model->m.data()))
+    const auto* const model = model_uniform_buffer->get_ptr<math::Mat4x4>();
+    GX_GLC3_PIPRES_SET_UNIFORM(model_m, *(model->data()))
     const auto* const scene = scene_uniform_buffer->get_ptr<render::scene::Uniform>();
     GX_GLC3_PIPRES_SET_UNIFORM(scene_ambient_light, *(scene->ambient_light.data()))
     GX_GLC3_PIPRES_SET_UNIFORM(scene_directional_lights_color, *(scene->directional_lights_color[0].data()))

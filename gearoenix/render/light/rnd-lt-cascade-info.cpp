@@ -165,7 +165,7 @@ void gearoenix::render::light::CascadeInfo::shrink() noexcept
     }
     for (auto& cas : per_cascade) {
         cas.shadow_mapper->update();
-        cas.max_box.test(cas.limit_box, cas.intersection_box);
+        cas.max_box.check_intersection(cas.limit_box, cas.intersection_box);
         const auto& mx = cas.intersection_box.get_upper();
         const auto& mn = cas.intersection_box.get_lower();
         const auto c = (mx + mn) * 0.5f;

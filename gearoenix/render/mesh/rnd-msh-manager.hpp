@@ -2,7 +2,7 @@
 #define GEAROENIX_RENDER_MESH_MANAGER_HPP
 #include "../../core/cache/cr-cache-file.hpp"
 #include "../../core/sync/cr-sync-end-caller.hpp"
-#include "../../math/math-vertex.hpp"
+#include "../../math/math-aabb.hpp"
 #include <memory>
 
 namespace gearoenix {
@@ -30,8 +30,8 @@ namespace render {
             std::shared_ptr<Mesh> create_icosphere(core::sync::EndCaller<Mesh>& c) noexcept;
             std::shared_ptr<Mesh> create_plate(core::sync::EndCaller<Mesh>& c) noexcept;
             std::shared_ptr<Mesh> create_cube(core::sync::EndCaller<Mesh>& c) noexcept;
-            std::shared_ptr<Mesh> create(std::vector<math::BasicVertex> vertices, std::vector<std::uint32_t> indices, core::Real occlusion_radius, core::sync::EndCaller<Mesh>& c) noexcept;
-            std::shared_ptr<Mesh> create(std::vector<math::BasicVertex> vertices, std::vector<std::uint32_t> indices, core::sync::EndCaller<Mesh>& c) noexcept;
+            std::shared_ptr<Mesh> create(const std::vector<math::BasicVertex> &vertices, const std::vector<std::uint32_t> &indices, const math::Aabb3& occlusion_box, core::sync::EndCaller<Mesh>& c) noexcept;
+            std::shared_ptr<Mesh> create(const std::vector<math::BasicVertex> &vertices, const std::vector<std::uint32_t> &indices, core::sync::EndCaller<Mesh>& c) noexcept;
         };
     }
 }

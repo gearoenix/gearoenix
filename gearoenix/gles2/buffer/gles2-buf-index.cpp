@@ -7,7 +7,7 @@
 #include "../engine/gles2-eng-engine.hpp"
 
 gearoenix::gles2::buffer::Index::Index(
-    std::vector<std::uint32_t> indices,
+    const std::vector<std::uint32_t>& indices,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : render::buffer::Static(static_cast<unsigned int>(indices.size() * sizeof(gl::ushort)), e)
@@ -17,7 +17,7 @@ gearoenix::gles2::buffer::Index::Index(
         data[i] = static_cast<gl::ushort>(indices[i]);
     }
     count = static_cast<gl::sizei>(indices.size());
-    e->get_function_loader()->load([this, data { move(data) }, c] {
+    e->get_function_loader()->load([this, data, c] {
         gl::Loader::gen_buffers(1, &bo);
         gl::Loader::bind_buffer(GL_ELEMENT_ARRAY_BUFFER, bo);
         gl::Loader::buffer_data(GL_ELEMENT_ARRAY_BUFFER, buffer_size, data.data(), GL_STATIC_DRAW);

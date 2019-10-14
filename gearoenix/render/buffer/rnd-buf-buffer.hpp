@@ -8,7 +8,7 @@ namespace engine {
 }
 namespace buffer {
     class Buffer {
-        GX_GET_AVAL_PRT(std::size_t, buffer_size, 0)
+        GX_GET_VAL_PRT(std::size_t, buffer_size, 0)
     protected:
         engine::Engine* const e;
 

@@ -56,5 +56,5 @@ gearoenix::math::IntersectionStatus gearoenix::math::ProjectorFrustum::check_int
     }
     // TODO it can be better the z part is redundant
     static const Aabb3 u(Vec3(1.0f, 1.0f, 1.0f), Vec3(-1.0f, -1.0f, -1.0f));
-    return u.check_intersection(aabb);
+    return u.check_intersection_status(aabb);
 }

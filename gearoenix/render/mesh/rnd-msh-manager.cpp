@@ -15,7 +15,7 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager:
     auto m = cache.get<Mesh>(id, [id, c, this] {
         const auto& f = cache.get_file();
         switch (f->read<Type>()) {
-        case Type::BASIC:
+        case Type::Basic:
             return std::make_shared<Mesh>(id, f, e, core::sync::EndCaller<core::sync::EndCallerIgnore>([c] {}));
         default:
             GXUNEXPECTED
@@ -7868,8 +7868,9 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager:
     const static core::Real occlusion_radius = 1.0000001266598622f;
     const auto id = core::asset::Manager::create_id();
     std::shared_ptr<Mesh> m(new Mesh(
-        id, vertices, indices, occlusion_radius, e,
-        core::sync::EndCaller<core::sync::EndCallerIgnore>([c] {})));
+        id, vertices, indices, 
+        math::Aabb3(math::Vec3(occlusion_radius), math::Vec3(-occlusion_radius)),
+        e, core::sync::EndCaller<core::sync::EndCallerIgnore>([c] {})));
     c.set_data(m);
     icosphere = m;
     cache.get_cacher().get_cacheds()[id] = m;
@@ -7912,8 +7913,9 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager:
     const static core::Real occlusion_radius = 1.4f;
     const auto id = core::asset::Manager::create_id();
     std::shared_ptr<Mesh> m(new Mesh(
-        id, std::move(vertices), std::move(indices), occlusion_radius, e,
-        core::sync::EndCaller<core::sync::EndCallerIgnore>([c] {})));
+        id, std::move(vertices), std::move(indices),
+        math::Aabb3(math::Vec3(occlusion_radius), math::Vec3(-occlusion_radius)),
+        e, core::sync::EndCaller<core::sync::EndCallerIgnore>([c] {})));
     c.set_data(m);
     plate = m;
     cache.get_cacher().get_cacheds()[id] = m;
@@ -8118,32 +8120,31 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager:
     const static core::Real occlusion_radius = 1.7f;
     const auto id = core::asset::Manager::create_id();
     std::shared_ptr<Mesh> m(new Mesh(
-        id, std::move(vertices), std::move(indices), occlusion_radius, e,
-        core::sync::EndCaller<core::sync::EndCallerIgnore>([c] {})));
+        id, std::move(vertices), std::move(indices),
+        math::Aabb3(math::Vec3(occlusion_radius), math::Vec3(-occlusion_radius)),
+        e, core::sync::EndCaller<core::sync::EndCallerIgnore>([c] {})));
     c.set_data(m);
     cube = m;
     cache.get_cacher().get_cacheds()[id] = m;
     return m;
 }
 
-std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager::create(std::vector<math::BasicVertex> vertices, std::vector<std::uint32_t> indices, core::Real occlusion_radius, core::sync::EndCaller<Mesh>& c) noexcept
+std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager::create(const std::vector<math::BasicVertex>& vertices, const std::vector<std::uint32_t>& indices, const math::Aabb3& occlusion_box, core::sync::EndCaller<Mesh>& c) noexcept
 {
     const auto id = core::asset::Manager::create_id();
     std::shared_ptr<Mesh> m(new Mesh(
-        id, std::move(vertices), std::move(indices), occlusion_radius, e,
-        core::sync::EndCaller<core::sync::EndCallerIgnore>([c] {})));
+        id, vertices, indices, occlusion_box, 
+        e, core::sync::EndCaller<core::sync::EndCallerIgnore>([c] {})));
     c.set_data(m);
     cache.get_cacher().get_cacheds()[id] = m;
     return m;
 }
 
-std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager::create(std::vector<math::BasicVertex> vertices, std::vector<std::uint32_t> indices, core::sync::EndCaller<Mesh>& c) noexcept
+std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager::create(const std::vector<math::BasicVertex>& vertices, const std::vector<std::uint32_t>& indices, core::sync::EndCaller<Mesh>& c) noexcept
 {
-    core::Real r = 0.0f;
-    for (auto& v : vertices) {
-        const auto l = v.position.length();
-        if (r < l)
-            r = l;
-    }
-    return create(vertices, indices, r, c);
+    math::Aabb3 box;
+    for (auto& v : vertices)
+        box.put_without_update(v.position);
+    box.update();
+    return create(vertices, indices, box, c);
 }

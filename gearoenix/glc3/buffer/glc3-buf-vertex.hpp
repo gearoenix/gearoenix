@@ -15,12 +15,12 @@ namespace buffer {
     class Vertex : public render::buffer::Static {
     public:
     private:
-        std::atomic<gl::uint> vo;
-        std::atomic<gl::uint> bo;
+        gl::uint vo = 0;
+        gl::uint bo = 0;
 
     public:
         Vertex(
-            std::vector<math::BasicVertex> vertices,
+            const std::vector<math::BasicVertex> &vertices,
             engine::Engine* e,
             const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
         ~Vertex() noexcept final;

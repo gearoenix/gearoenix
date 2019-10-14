@@ -19,13 +19,13 @@ namespace buffer {
 
     public:
         Index(
-            std::vector<std::uint32_t> indices,
+            const std::vector<std::uint32_t> &indices,
             engine::Engine* e,
             const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
         ~Index() noexcept final;
         void draw() const noexcept;
     };
-} // namespace buffer
-} // namespace gearoenix::glc3
+}
+}
 #endif
 #endif

@@ -47,6 +47,14 @@ namespace math {
         /// It does not change location
         void local_scale(core::Real s) noexcept;
         /// It does not change location
+        void local_x_scale(core::Real s) noexcept;
+        /// It does not change location
+        void local_y_scale(core::Real s) noexcept;
+        /// It does not change location
+        void local_z_scale(core::Real s) noexcept;
+        /// It does not change location
+        void local_w_scale(core::Real s) noexcept;
+        /// It does not change location
         void local_scale(core::Real a, core::Real b, core::Real c) noexcept;
         /// It changes location
         void local_scale(core::Real a, core::Real b, core::Real c, core::Real d) noexcept;
@@ -54,13 +62,13 @@ namespace math {
         void local_scale(const Vec3& s) noexcept;
         /// It changes location
         void local_scale(const Vec4& s) noexcept;
-        /// It does not change location
+        /// It changes location
         void global_scale(core::Real s) noexcept;
-        /// It does not change location
+        /// It changes location
         void global_scale(core::Real a, core::Real b, core::Real c) noexcept;
         /// It changes location
         void global_scale(core::Real a, core::Real b, core::Real c, core::Real d) noexcept;
-        /// It does not change location
+        /// It changes location
         void global_scale(const Vec3& s) noexcept;
         /// It changes location
         void global_scale(const Vec4& s) noexcept;

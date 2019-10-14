@@ -39,16 +39,16 @@ public:
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
     Mesh(
         core::Id my_id,
-        std::vector<math::BasicVertex> vertices,
-        std::vector<std::uint32_t> indices,
+        const std::vector<math::BasicVertex>& vertices,
+        const std::vector<std::uint32_t>& indices,
         const math::Aabb3& box,
         engine::Engine* e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
     ~Mesh() noexcept final;
     void set_vertices(
         engine::Engine* e,
-        std::vector<math::BasicVertex> vertices,
-        std::vector<std::uint32_t> indices,
+        const std::vector<math::BasicVertex>& vertices,
+        const std::vector<std::uint32_t>& indices,
         const math::Aabb3& box,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
 };

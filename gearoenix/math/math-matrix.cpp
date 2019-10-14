@@ -197,54 +197,52 @@ gearoenix::core::Real& gearoenix::math::Mat4x4::operator[](const unsigned int i)
 
 void gearoenix::math::Mat4x4::local_scale(const core::Real s) noexcept
 {
+    local_scale(s, s, s);
+}
+
+void gearoenix::math::Mat4x4::local_x_scale(core::Real s) noexcept
+{
     mat[0] *= s;
     mat[1] *= s;
     mat[2] *= s;
     mat[3] *= s;
+}
+
+void gearoenix::math::Mat4x4::local_y_scale(core::Real s) noexcept
+{
     mat[4] *= s;
     mat[5] *= s;
     mat[6] *= s;
     mat[7] *= s;
+}
+
+void gearoenix::math::Mat4x4::local_z_scale(core::Real s) noexcept
+{
     mat[8] *= s;
     mat[9] *= s;
     mat[10] *= s;
     mat[11] *= s;
 }
 
+void gearoenix::math::Mat4x4::local_w_scale(core::Real s) noexcept
+{
+    mat[12] *= s;
+    mat[13] *= s;
+    mat[14] *= s;
+    mat[15] *= s;
+}
+
 void gearoenix::math::Mat4x4::local_scale(const core::Real a, const core::Real b, const core::Real c) noexcept
 {
-    mat[0] *= a;
-    mat[1] *= a;
-    mat[2] *= a;
-    mat[3] *= a;
-    mat[4] *= b;
-    mat[5] *= b;
-    mat[6] *= b;
-    mat[7] *= b;
-    mat[8] *= c;
-    mat[9] *= c;
-    mat[10] *= c;
-    mat[11] *= c;
+    local_x_scale(a);
+    local_y_scale(b);
+    local_z_scale(c);
 }
 
 void gearoenix::math::Mat4x4::local_scale(const core::Real a, const core::Real b, const core::Real c, const core::Real d) noexcept
 {
-    mat[0] *= a;
-    mat[1] *= a;
-    mat[2] *= a;
-    mat[3] *= a;
-    mat[4] *= b;
-    mat[5] *= b;
-    mat[6] *= b;
-    mat[7] *= b;
-    mat[8] *= c;
-    mat[9] *= c;
-    mat[10] *= c;
-    mat[11] *= c;
-    mat[12] *= d;
-    mat[13] *= d;
-    mat[14] *= d;
-    mat[15] *= d;
+    local_scale(a, b, c);
+    local_w_scale(d);
 }
 
 void gearoenix::math::Mat4x4::local_scale(const Vec3& s) noexcept
@@ -256,6 +254,8 @@ void gearoenix::math::Mat4x4::local_scale(const Vec4& s) noexcept
 {
     local_scale(s[0], s[1], s[2], s[3]);
 }
+
+/// TODO: make global scale as clean as local scale
 
 void gearoenix::math::Mat4x4::global_scale(const core::Real s) noexcept
 {

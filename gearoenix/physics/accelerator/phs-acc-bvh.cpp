@@ -91,16 +91,16 @@ void gearoenix::physics::accelerator::Bvh::InternalNode::init(const std::vector<
         for (collider::Collider* c : colliders) {
             bool not_found = true;
             for (int i = 0; i < WALLS_COUNT; ++i) {
-                if (c->get_box().get_center()[di.first] < splits[i]) {
+                if (c->get_updated_box().get_center()[di.first] < splits[i]) {
                     bins[i].c.push_back(c);
-                    bins[i].b.put_without_update(c->get_box());
+                    bins[i].b.put_without_update(c->get_updated_box());
                     not_found = false;
                     break;
                 }
             }
             if (not_found) {
                 bins[WALLS_COUNT].c.push_back(c);
-                bins[WALLS_COUNT].b.put_without_update(c->get_box());
+                bins[WALLS_COUNT].b.put_without_update(c->get_updated_box());
             }
         }
         // Overlapping centers check
@@ -165,7 +165,7 @@ gearoenix::physics::accelerator::Bvh::InternalNode::InternalNode(const std::vect
     : Node(Type::INTERNAL)
 {
     for (collider::Collider* c : colliders)
-        volume.put_without_update(c->get_box());
+        volume.put_without_update(c->get_updated_box());
     volume.update();
     if (colliders.size() <= PER_NODE_COLLIDERS) {
         left = std::make_unique<LeafNode>(colliders, volume);
