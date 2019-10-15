@@ -31,16 +31,19 @@ namespace system {
     class Log {
     public:
         static std::ofstream info;
+        static std::mutex info_lock;
 #ifdef GX_DEBUG_MODE
         static std::ofstream debug;
         static std::mutex debug_lock;
 #endif
         static std::ofstream error;
+        static std::mutex error_lock;
     };
 }
 }
 #define GXLOGI(s)                                                                 \
     {                                                                             \
+        std::lock_guard<std::mutex> _lg(gearoenix::system::Log::info_lock);       \
         gearoenix::system::Log::info << GX_APP_NAME << " " << s << " "            \
                                      << __FILE__ << " " << __LINE__ << std::endl; \
     }
@@ -54,6 +57,7 @@ namespace system {
 #endif
 #define GXLOGE(s)                                                                  \
     {                                                                              \
+        std::lock_guard<std::mutex> _lg(gearoenix::system::Log::error_lock);       \
         gearoenix::system::Log::error << GX_APP_NAME << " " << s << " "            \
                                       << __FILE__ << " " << __LINE__ << std::endl; \
     }

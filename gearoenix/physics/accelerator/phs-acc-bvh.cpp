@@ -88,7 +88,7 @@ void gearoenix::physics::accelerator::Bvh::InternalNode::init(const std::vector<
             wall += split_size;
             s = wall;
         }
-        for (collider::Collider* c : colliders) {
+        for (collider::Collider* const c : colliders) {
             bool not_found = true;
             for (int i = 0; i < WALLS_COUNT; ++i) {
                 if (c->get_updated_box().get_center()[di.first] < splits[i]) {

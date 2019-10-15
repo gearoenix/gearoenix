@@ -18,15 +18,40 @@
 #include <functional>
 #include <utility>
 
-void gearoenix::physics::Engine::update_001_kernel(const unsigned int kernel_index) noexcept
-{
-    unsigned int task_number = 0;
+#define GX_START_TASKS            \
+    unsigned int task_number = 0; \
     const unsigned int kernels_count = kernels->get_threads_count();
 #define GX_DO_TASK(expr)               \
     if (task_number == kernel_index) { \
         expr;                          \
     }                                  \
-    task_number = (task_number + 1) % kernels_count
+    task_number = (task_number + 1) % kernels_count;
+
+void gearoenix::physics::Engine::update_scenes_kernel(unsigned int kernel_index) noexcept
+{
+    GX_START_TASKS
+    const std::map<core::Id, std::weak_ptr<render::scene::Scene>>& scenes = sys_app->get_asset_manager()->get_scene_manager()->get_scenes();
+    for (const std::pair<const core::Id, std::weak_ptr<render::scene::Scene>>& is : scenes) {
+        GX_DO_TASK(
+            const std::shared_ptr<render::scene::Scene> scene = is.second.lock();
+            if (scene == nullptr)
+                continue;
+            if (!scene->get_enability())
+                continue;
+            scene->update()
+        )
+    }
+
+}
+
+void gearoenix::physics::Engine::update_scenes_receiver() noexcept
+{
+
+}
+
+void gearoenix::physics::Engine::update_visibility_kernel(const unsigned int kernel_index) noexcept
+{
+    GX_START_TASKS
     const std::map<core::Id, std::weak_ptr<render::scene::Scene>>& scenes = sys_app->get_asset_manager()->get_scene_manager()->get_scenes();
     auto& kernel_scene_camera_data = kernels_scene_camera_data[kernel_index];
     kernel_scene_camera_data.refresh();
@@ -40,7 +65,6 @@ void gearoenix::physics::Engine::update_001_kernel(const unsigned int kernel_ind
         scene_camera_data->first = scene.get();
         auto& cameras_data = scene_camera_data->second;
         cameras_data.refresh();
-        GX_DO_TASK(scene->update());
         const std::map<core::Id, std::shared_ptr<render::camera::Camera>>& cameras = scene->get_cameras();
         const std::map<core::Id, std::shared_ptr<render::model::Model>>& models = scene->get_models();
         const std::map<core::Id, std::shared_ptr<render::light::Light>>& lights = scene->get_lights();
@@ -94,7 +118,7 @@ void gearoenix::physics::Engine::update_001_kernel(const unsigned int kernel_ind
     }
 }
 
-void gearoenix::physics::Engine::update_001_receiver() noexcept
+void gearoenix::physics::Engine::update_visibility_receiver() noexcept
 {
     scenes_camera_data.clear();
     for (auto& k : kernels_scene_camera_data) {
@@ -118,10 +142,9 @@ void gearoenix::physics::Engine::update_001_receiver() noexcept
     }
 }
 
-void gearoenix::physics::Engine::update_002_kernel(const unsigned int kernel_index) noexcept
+void gearoenix::physics::Engine::update_shadower_kernel(const unsigned int kernel_index) noexcept
 {
-    unsigned int task_number = 0;
-    const unsigned int kernels_count = kernels->get_threads_count();
+    GX_START_TASKS
     for (auto& scene_camera_data : scenes_camera_data) {
         ScenePtr scene = scene_camera_data.first;
         auto& cameras_data = scene_camera_data.second;
@@ -142,7 +165,7 @@ void gearoenix::physics::Engine::update_002_kernel(const unsigned int kernel_ind
 #undef GX_DO_TASK
 }
 
-void gearoenix::physics::Engine::update_002_receiver() noexcept
+void gearoenix::physics::Engine::update_shadower_receiver() noexcept
 {
     for (auto& scene_camera_data : scenes_camera_data) {
         auto& cameras_data = scene_camera_data.second;
@@ -162,8 +185,11 @@ gearoenix::physics::Engine::Engine(system::Application* const sysapp, core::sync
     , kernels(kernels)
     , kernels_scene_camera_data(this->kernels->get_threads_count())
 {
-    this->kernels->add_step(std::bind(&Engine::update_001_kernel, this, std::placeholders::_1), std::bind(&Engine::update_001_receiver, this));
-    this->kernels->add_step(std::bind(&Engine::update_002_kernel, this, std::placeholders::_1), std::bind(&Engine::update_002_receiver, this));
+#define GX_SET_KERNEL(x) this->kernels->add_step(std::bind(&Engine::update_##x##_kernel, this, std::placeholders::_1), std::bind(&Engine::update_##x##_receiver, this));
+
+    GX_SET_KERNEL(scenes)
+    GX_SET_KERNEL(visibility)
+    GX_SET_KERNEL(shadower)
 }
 
 gearoenix::physics::Engine::~Engine() noexcept

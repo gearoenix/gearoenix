@@ -83,6 +83,11 @@ namespace physics {
         std::vector<SceneCameraData> kernels_scene_camera_data;
         GatheredSceneCameraData scenes_camera_data;
 
+        /// It does:
+        ///    - Updates scenes (uniform buffer, dynamic bvh trees, static bvh tree (if was needed)) 
+        void update_scenes_kernel(unsigned int kernel_index) noexcept;
+        void update_scenes_receiver() noexcept;
+
         /// It does followings:
         ///    - Uniform buffer update for scene.
         ///    - Uniform buffer update for camera.
@@ -90,13 +95,13 @@ namespace physics {
         ///    - Uniform buffer update for model.
         ///    - Update the shadow caster lights.
         ///    - Compute cameras cascaded shadowing partitions
-        void update_001_kernel(unsigned int kernel_index) noexcept;
-        void update_001_receiver() noexcept;
+        void update_visibility_kernel(unsigned int kernel_index) noexcept;
+        void update_visibility_receiver() noexcept;
 
         /// It does followings:
         ///    - Directional shadow caster lights cascade kernels gathering
-        void update_002_kernel(unsigned int kernel_index) noexcept;
-        void update_002_receiver() noexcept;
+        void update_shadower_kernel(unsigned int kernel_index) noexcept;
+        void update_shadower_receiver() noexcept;
 
     public:
         Engine(system::Application* sysapp, core::sync::KernelWorker* kernels) noexcept;

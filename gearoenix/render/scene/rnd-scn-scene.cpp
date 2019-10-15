@@ -221,14 +221,12 @@ void gearoenix::render::scene::Scene::update() noexcept
         const light::Light* const l = il.second.get();
         if (l->is_shadow_caster())
             continue;
-        {
-            const auto* const dl = dynamic_cast<const light::Directional*>(l);
-            if (dl != nullptr && dirc < GX_MAX_DIRECTIONAL_LIGHTS) {
-                uniform.directional_lights_color[dirc] = math::Vec4(dl->get_color(), 0.0f);
-                uniform.directional_lights_direction[dirc] = math::Vec4(dl->get_direction(), 0.0f);
-                ++dirc;
-                continue;
-            }
+        const auto* const dl = dynamic_cast<const light::Directional*>(l);
+        if (dl != nullptr && dirc < GX_MAX_DIRECTIONAL_LIGHTS) {
+            uniform.directional_lights_color[dirc] = math::Vec4(dl->get_color(), 0.0f);
+            uniform.directional_lights_direction[dirc] = math::Vec4(dl->get_direction(), 0.0f);
+            ++dirc;
+            continue;
         }
     }
     uniform.lights_count[0] = static_cast<core::Real>(dirc);
