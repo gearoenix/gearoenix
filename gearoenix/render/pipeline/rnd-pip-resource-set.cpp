@@ -27,9 +27,9 @@ void gearoenix::render::pipeline::ResourceSet::set_material(const material::Mate
 {
     material_uniform_buffer = m->get_uniform_buffers()->get_buffer();
     color = m->get_color_texture().get();
-    metallic_roughness = m->get_metallic_roughness().get();
-    normal = m->get_normal().get();
-    emissive = m->get_emissive().get();
+    metallic_roughness = m->get_metallic_roughness_texture().get();
+    normal = m->get_normal_texture().get();
+    emissive = m->get_emission_texture().get();
 }
 
 #undef GX_HELPER

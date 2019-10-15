@@ -47,7 +47,7 @@ void gearoenix::render::light::CascadeInfo::PerKernel::record(const std::size_t 
 #ifdef GX_USE_INSTEAD_OF_OPENGL
         if (GX_RUNTIME_USE_OPENGL) {
 #endif
-            c.shadow_mapper->record(c.view_projection_gl * r.m->get_model_matrix(), r.m, kernel_index);
+            c.shadow_mapper->record(c.view_projection_gl * r.m->get_collider()->get_model_matrix(), r.m, kernel_index);
 #ifdef GX_USE_INSTEAD_OF_OPENGL
             continue;
         }

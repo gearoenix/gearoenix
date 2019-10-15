@@ -1,6 +1,7 @@
 #include "exm-003-net-hello-world.hpp"
 #include <gearoenix/core/asset/cr-asset-manager.hpp>
 #include <gearoenix/core/event/cr-ev-engine.hpp>
+#include <gearoenix/math/math-aabb.hpp>
 #include <gearoenix/math/math-vertex.hpp>
 #include <gearoenix/physics/body/phs-bd-rigid.hpp>
 #include <gearoenix/physics/collider/phs-cld-sphere.hpp>
@@ -46,6 +47,7 @@ using GxTexture = gearoenix::render::texture::Texture;
 using GxTexture2D = gearoenix::render::texture::Texture2D;
 using GxCldSphere = gearoenix::physics::collider::Sphere;
 using GxVertex = gearoenix::math::BasicVertex;
+using GxAabb3 = gearoenix::math::Aabb3;
 
 void GameApp::translate_camera(const GxVec3& t)
 {
@@ -171,9 +173,7 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
                                                                       GxVertex { GxVec3(55.0f, -30.0f, 0.0f), GxVec3(0.0f, 0.0f, 1.0f), GxVec4(1.0f, 0.0f, 0.0f, 1.0f), GxVec2(110.0f, 0.0f) },
                                                                       GxVertex { GxVec3(-55.0f, 30.0f, 0.0f), GxVec3(0.0f, 0.0f, 1.0f), GxVec4(1.0f, 0.0f, 0.0f, 1.0f), GxVec2(0.0f, 60.0f) },
                                                                       GxVertex { GxVec3(55.0f, 30.0f, 0.0f), GxVec3(0.0f, 0.0f, 1.0f), GxVec4(1.0f, 0.0f, 0.0f, 1.0f), GxVec2(110.0f, 60.0f) } },
-            { 0, 1, 2,
-                1, 3, 2 },
-            60.0f, mshcall);
+            { 0, 1, 2, 1, 3, 2 }, GxAabb3(GxVec3(60.0f), GxVec3(-60.0f)), mshcall);
         auto txt = std::dynamic_pointer_cast<GxTexture2D>(txtmgr->get_gx3d(1031, txtcall));
         const std::shared_ptr<GxMaterial> mat(new GxMaterial(render_engine, endcall));
         mat->set_roughness_factor(0.5f);
@@ -362,7 +362,7 @@ bool GameApp::on_event(const gearoenix::core::event::Data& event_data) noexcept
                     auto* mdl = cld->get_parent();
                     selected_item.store(reinterpret_cast<GxStaticModel*>(mdl));
                     auto& mdll = mdl->get_transformation()->get_location();
-                    auto color = *(mdl->get_meshes().begin()->second->get_material()->get_color());
+                    auto color = *(mdl->get_meshes().begin()->second->get_material()->get_color_value());
                     std::wstringstream tl;
                     tl << "{ x: " << mdll[0] << ", y: " << mdll[1] << ", z: " << mdll[2] << " }";
                     const GxEndCallerIgnored call([] {});

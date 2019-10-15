@@ -7,7 +7,8 @@ public:
     Aabb(const math::Vec3& u, const math::Vec3& l) noexcept
         : Collider(Type::Aabb)
     {
-        box = math::Aabb3(u, l);
+        origin_box = math::Aabb3(u, l);
+        updated_box = origin_box;
     }
     ~Aabb() noexcept final = default;
 };

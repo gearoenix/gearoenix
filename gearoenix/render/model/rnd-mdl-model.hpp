@@ -43,7 +43,6 @@ namespace model {
         GX_GET_CREF_PRT(MapModel, children)
         GX_GET_PTR_PRT(Model, parent)
         GX_GET_PTR_PRT(scene::Scene, scene)
-        GX_GET_CREF_PRT(math::Mat4x4, model_matrix)
     protected:
         engine::Engine* const e;
 

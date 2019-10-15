@@ -3,6 +3,7 @@
 #include "../../core/cache/cr-cache-file.hpp"
 #include "../../core/sync/cr-sync-end-caller.hpp"
 #include "../../math/math-aabb.hpp"
+#include "../../math/math-vertex.hpp"
 #include <memory>
 
 namespace gearoenix {

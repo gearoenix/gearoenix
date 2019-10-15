@@ -32,6 +32,17 @@ std::optional<gearoenix::core::Real> gearoenix::physics::collider::Collider::hit
     return updated_box.hit(r, d_min);
 }
 
+void gearoenix::physics::collider::Collider::put_in_box(const math::Aabb3& b) noexcept
+{
+    origin_box.put(b);
+    update_box();
+}
+
+const gearoenix::math::Vec3& gearoenix::physics::collider::Collider::get_location() const noexcept
+{
+    return updated_box.get_center();
+}
+
 void gearoenix::physics::collider::Collider::set_location(const math::Vec3& l) noexcept
 {
     model_matrix.set_location(l);
@@ -46,6 +57,8 @@ void gearoenix::physics::collider::Collider::local_scale(const core::Real s) noe
 
 void gearoenix::physics::collider::Collider::local_x_scale(const core::Real s) noexcept
 {
-    updated_box.set_diameter(updated_box.get_diameter() * math::Vec3(s, 1.0f, 1.0f));
+    math::Vec3 d = updated_box.get_diameter();
+    d[0] *= s;
+    updated_box.set_diameter(d);
     model_matrix.local_x_scale(s);
 }

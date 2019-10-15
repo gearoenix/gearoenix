@@ -26,7 +26,7 @@ gearoenix::render::widget::Modal::Modal(const core::Id my_id, engine::Engine* co
     auto* const mshmgr = astmgr->get_mesh_manager();
     auto plate_mesh = mshmgr->create_plate(mshcall);
 
-    std::vector<math::BasicVertex> close_vertices = {
+    const std::vector<math::BasicVertex> close_vertices = {
         math::BasicVertex {
             math::Vec3(-1.0f, 1.0f, 0.0f),
             math::Vec3(0.0f, 0.0f, 1.0f),
@@ -103,7 +103,7 @@ gearoenix::render::widget::Modal::Modal(const core::Id my_id, engine::Engine* co
         },
     };
 
-    std::vector<std::uint32_t> close_indices = {
+    const std::vector<std::uint32_t> close_indices = {
         0, 2, 1, 3, 2, 0,
         ////////////////////////////////////////
         5, 6, 4, 6, 5, 7,
@@ -111,9 +111,9 @@ gearoenix::render::widget::Modal::Modal(const core::Id my_id, engine::Engine* co
         11, 9, 8, 9, 11, 10
     };
 
-    const core::Real close_ocr = 1.4f;
+    const math::Aabb3 close_ocr(math::Vec3(1.4f), math::Vec3(-1.4f));
 
-    auto close_mesh = mshmgr->create(std::move(close_vertices), std::move(close_indices), close_ocr, mshcall);
+    auto close_mesh = mshmgr->create(close_vertices, close_indices, close_ocr, mshcall);
 
     {
         const std::shared_ptr<material::Material> mat(new material::Material(e, c));

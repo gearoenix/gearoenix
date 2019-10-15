@@ -21,12 +21,11 @@ gearoenix::render::model::Model::Model(
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : core::asset::Asset(my_id, core::asset::Type::Model)
     , model_type(t)
-    , collider(new physics::collider::Ghost())
-    , transformation(new Transformation(&model_matrix, this))
+    , transformation(new Transformation(this))
     , uniform_buffers(new buffer::FramedUniform(static_cast<unsigned int>(sizeof(math::Mat4x4)), e))
     , e(e)
 {
-    model_matrix.read(f);
+    GXTODO // collider must be initialized
     const auto meshes_count = f->read<core::Count>();
     for (core::Count i = 0; i < meshes_count; ++i) {
         add_mesh(std::make_shared<Mesh>(f, e, c));
@@ -41,7 +40,7 @@ gearoenix::render::model::Model::Model(
     : core::asset::Asset(my_id, core::asset::Type::Model)
     , model_type(t)
     , collider(new physics::collider::Ghost())
-    , transformation(new Transformation(&model_matrix, this))
+    , transformation(new Transformation(this))
     , uniform_buffers(new buffer::FramedUniform(static_cast<unsigned int>(sizeof(math::Mat4x4)), e))
     , e(e)
 {
@@ -57,7 +56,7 @@ gearoenix::render::model::Model::~Model() noexcept
 
 void gearoenix::render::model::Model::update() noexcept
 {
-    uniform_buffers->update(model_matrix);
+    uniform_buffers->update(collider->get_model_matrix());
     for (const auto& msh : meshes)
         msh.second->update_uniform();
     for (const auto& ch : children)
@@ -76,7 +75,7 @@ void gearoenix::render::model::Model::add_mesh(const std::shared_ptr<Mesh>& m) n
         transparency = core::State::Set;
     }
     mesh::Mesh* const msh = m->get_mesh().get();
-    collider->put(msh->get_box());
+    collider->put_in_box(msh->get_box());
     meshes[msh->get_asset_id()] = m;
 }
 

@@ -36,7 +36,7 @@ gearoenix::core::Real gearoenix::render::light::Point::get_min_radius() const no
     return min_radius;
 }
 
-bool gearoenix::render::light::Point::is_in_light(const model::Model* m) const noexcept
+bool gearoenix::render::light::Point::is_in_light(const model::Model* const m) const noexcept
 {
     GXTODO; // check object visibility
     return true;

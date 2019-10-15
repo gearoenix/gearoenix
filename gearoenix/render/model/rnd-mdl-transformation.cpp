@@ -2,9 +2,8 @@
 #include "../../physics/phs-transformation.hpp"
 #include "rnd-mdl-model.hpp"
 
-gearoenix::render::model::Transformation::Transformation(math::Mat4x4* const model_matrix, Model* const parent) noexcept
-    : model_matrix(model_matrix)
-    , parent(parent)
+gearoenix::render::model::Transformation::Transformation(Model* const parent) noexcept
+    : parent(parent)
 {
 }
 
@@ -17,7 +16,6 @@ void gearoenix::render::model::Transformation::set_location(const math::Vec3& l)
 {
     physics::collider::Collider* const collider = parent->get_collider();
     const math::Vec3 trans = l - collider->get_location();
-    model_matrix->set_location(l);
     collider->set_location(l);
     const std::map<core::Id, std::shared_ptr<model::Model>>& children = parent->get_children();
     for (const std::pair<const core::Id, std::shared_ptr<model::Model>>& c : children)
@@ -32,7 +30,6 @@ void gearoenix::render::model::Transformation::translate(const math::Vec3& l) no
 void gearoenix::render::model::Transformation::local_scale(const core::Real s) noexcept
 {
     physics::collider::Collider* const collider = parent->get_collider();
-    model_matrix->local_scale(s);
     collider->local_scale(s);
     const math::Vec3& loc = get_location();
     const std::map<core::Id, std::shared_ptr<model::Model>>& children = parent->get_children();
@@ -46,7 +43,6 @@ void gearoenix::render::model::Transformation::local_scale(const core::Real s) n
 
 void gearoenix::render::model::Transformation::local_x_scale(const core::Real s) noexcept
 {
-    model_matrix->local_scale(s, 1.0f, 1.0f);
     parent->get_collider()->local_x_scale(s);
     const math::Vec3& loc = get_location();
     const std::map<core::Id, std::shared_ptr<model::Model>>& children = parent->get_children();
@@ -54,13 +50,14 @@ void gearoenix::render::model::Transformation::local_x_scale(const core::Real s)
         Model* const child = c.second.get();
         physics::Transformation* const ct = child->get_transformation();
         ct->local_x_scale(s);
-        ct->set_location(((ct->get_location() - loc) * math::Vec3(s, 1.0f, 1.0f)) + loc);
+        math::Vec3 l = ct->get_location() - loc;
+        l[0] *= s;
+        ct->set_location(l + loc);
     }
 }
 
 void gearoenix::render::model::Transformation::local_y_scale(const core::Real s) noexcept
 {
-    model_matrix->local_scale(1.0f, s, 1.0f);
     parent->get_collider()->local_y_scale(s);
     const math::Vec3& loc = get_location();
     const std::map<core::Id, std::shared_ptr<model::Model>>& children = parent->get_children();
@@ -68,13 +65,14 @@ void gearoenix::render::model::Transformation::local_y_scale(const core::Real s)
         Model* const child = c.second.get();
         physics::Transformation* const ct = child->get_transformation();
         ct->local_y_scale(s);
-        ct->set_location((ct->get_location() - loc) * math::Vec3(1.0f, s, 1.0f) + loc);
+        math::Vec3 l = ct->get_location() - loc;
+        l[1] *= s;
+        ct->set_location(l + loc);
     }
 }
 
 void gearoenix::render::model::Transformation::local_z_scale(const core::Real s) noexcept
 {
-    model_matrix->local_scale(1.0f, 1.0f, s);
     parent->get_collider()->local_z_scale(s);
     const math::Vec3& loc = get_location();
     const std::map<core::Id, std::shared_ptr<model::Model>>& children = parent->get_children();
@@ -82,6 +80,8 @@ void gearoenix::render::model::Transformation::local_z_scale(const core::Real s)
         Model* const child = c.second.get();
         physics::Transformation* const ct = child->get_transformation();
         ct->local_z_scale(s);
-        ct->set_location((ct->get_location() - loc) * math::Vec3(1.0f, s, 1.0f) + loc);
+        math::Vec3 l = ct->get_location() - loc;
+        l[2] *= s;
+        ct->set_location(l + loc);
     }
 }
