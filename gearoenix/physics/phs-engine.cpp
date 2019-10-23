@@ -1,9 +1,6 @@
 #include "phs-engine.hpp"
 #include "../core/asset/cr-asset-manager.hpp"
-#include "../core/cr-static.hpp"
-#include "../core/sync/cr-sync-kernel-workers.hpp"
-#include "../core/sync/cr-sync-semaphore.hpp"
-#include "../core/sync/cr-sync-stop-point.hpp"
+#include "../core/sync/cr-sync-channeled-workers.hpp"
 #include "../math/math-sphere.hpp"
 #include "../render/camera/rnd-cmr-camera.hpp"
 #include "../render/engine/rnd-eng-engine.hpp"
@@ -18,43 +15,25 @@
 #include <functional>
 #include <utility>
 
-#define GX_START_TASKS            \
-    unsigned int task_number = 0; \
-    const unsigned int kernels_count = kernels->get_threads_count();
-#define GX_DO_TASK(expr)               \
-    if (task_number == kernel_index) { \
-        expr;                          \
-    }                                  \
-    task_number = (task_number + 1) % kernels_count;
-
-void gearoenix::physics::Engine::update_scenes_kernel(unsigned int kernel_index) noexcept
+void gearoenix::physics::Engine::update_scenes() noexcept
 {
-    GX_START_TASKS
     const std::map<core::Id, std::weak_ptr<render::scene::Scene>>& scenes = sys_app->get_asset_manager()->get_scene_manager()->get_scenes();
     for (const std::pair<const core::Id, std::weak_ptr<render::scene::Scene>>& is : scenes) {
-        GX_DO_TASK(
+        workers->perform([is] (const std::size_t) noexcept {
             const std::shared_ptr<render::scene::Scene> scene = is.second.lock();
             if (scene == nullptr)
-                continue;
+                return;
             if (!scene->get_enability())
-                continue;
-            scene->update()
-        )
+                return;
+            scene->update();
+        });
     }
-
 }
 
-void gearoenix::physics::Engine::update_scenes_receiver() noexcept
+void gearoenix::physics::Engine::update_visibility() noexcept
 {
-
-}
-
-void gearoenix::physics::Engine::update_visibility_kernel(const unsigned int kernel_index) noexcept
-{
-    GX_START_TASKS
     const std::map<core::Id, std::weak_ptr<render::scene::Scene>>& scenes = sys_app->get_asset_manager()->get_scene_manager()->get_scenes();
-    auto& kernel_scene_camera_data = kernels_scene_camera_data[kernel_index];
-    kernel_scene_camera_data.refresh();
+    for(SceneCameraData& d: kernels_scene_camera_data) d.refresh();
     for (const std::pair<const core::Id, std::weak_ptr<render::scene::Scene>>& is : scenes) {
         const std::shared_ptr<render::scene::Scene> scene = is.second.lock();
         if (scene == nullptr)
@@ -200,6 +179,7 @@ gearoenix::physics::Engine::~Engine() noexcept
 
 void gearoenix::physics::Engine::update() noexcept
 {
+    update_scenes();
 }
 
 const gearoenix::physics::Engine::GatheredSceneCameraData& gearoenix::physics::Engine::get_visible_models() const noexcept

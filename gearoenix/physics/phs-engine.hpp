@@ -12,7 +12,7 @@
 #include <vector>
 namespace gearoenix {
 namespace core::sync {
-    class KernelWorker;
+    class ChanneledWorkers;
 }
 namespace render {
     namespace camera {
@@ -40,6 +40,7 @@ namespace physics {
     class Engine {
         GX_GET_UCPTR_PRV(animation::Manager, animation_manager)
     public:
+
         template <class T, class S>
         using PairedPool = core::OneLoopPool<std::pair<T, S>>;
         template <class... Types>
@@ -65,7 +66,7 @@ namespace physics {
         using SceneCameraTupledPool = ScenePairedPool<CameraTupledPool<Types...>>;
         template <class T>
         using SceneCameraDirLightPairedPool = SceneCameraPairedPool<DirLightPairedPool<T>>;
-        using ModelPtrs = std::vector<ModelPtr>;
+        using ModelPtrs = std::set<std::pair<core::Real, ModelPtr>>;
         using DirLightCascadeInfos = std::vector<std::pair<DirLightPtr, CascadeInfoPtr>>;
         using SceneCameraData = SceneCameraTupledPool<ModelPtrs, DirLightPairedPool<CascadeInfoUPtr>>;
         /// Because it's gonna be prioritized in future, it is better to keep its map-ness
@@ -78,15 +79,14 @@ namespace physics {
 
     private:
         system::Application* const sys_app;
-        core::sync::KernelWorker* const kernels;
+        core::sync::ChanneledWorkers* const workers;
         /// visibility checker
         std::vector<SceneCameraData> kernels_scene_camera_data;
         GatheredSceneCameraData scenes_camera_data;
 
         /// It does:
-        ///    - Updates scenes (uniform buffer, dynamic bvh trees, static bvh tree (if was needed)) 
-        void update_scenes_kernel(unsigned int kernel_index) noexcept;
-        void update_scenes_receiver() noexcept;
+        ///    - Updates scenes (uniform buffer, dynamic bvh trees, static bvh tree (if was needed))
+        void update_scenes() noexcept;
 
         /// It does followings:
         ///    - Uniform buffer update for scene.
@@ -104,7 +104,7 @@ namespace physics {
         void update_shadower_receiver() noexcept;
 
     public:
-        Engine(system::Application* sysapp, core::sync::KernelWorker* kernels) noexcept;
+        Engine(system::Application* sysapp, core::sync::ChanneledWorkers* kernels) noexcept;
         ~Engine() noexcept;
         void update() noexcept;
         [[nodiscard]] const GatheredSceneCameraData& get_visible_models() const noexcept;
