@@ -11,7 +11,7 @@
 #include <vector>
 
 namespace gearoenix::core::sync {
-class KernelWorker;
+class KernelWorkers;
 }
 
 namespace gearoenix::physics::animation {
@@ -28,7 +28,7 @@ private:
     core::Real duration = 0.0f;
 
 public:
-    Manager(core::sync::KernelWorker* kernels) noexcept;
+    Manager(core::sync::KernelWorkers* kernels) noexcept;
     ~Manager() noexcept;
     Manager(const Manager& o) noexcept = delete;
     void operator=(const Manager& o) noexcept = delete;

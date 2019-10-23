@@ -8,7 +8,7 @@
 
 namespace gearoenix::core::sync {
 class Semaphore;
-class KernelWorker {
+class KernelWorkers {
 private:
     enum struct State : int {
         Running,
@@ -19,6 +19,7 @@ private:
         const std::vector<std::shared_ptr<Semaphore>> waits;
         const std::function<void()> sender;
         const std::function<void(const unsigned int)> worker;
+        const std::function<void()> meanwhile;
         const std::function<void()> receiver;
         const std::vector<std::shared_ptr<Semaphore>> signals;
     };
@@ -32,14 +33,15 @@ private:
     void thread_loop(unsigned int) noexcept;
 
 public:
-    KernelWorker() noexcept;
-    ~KernelWorker() noexcept;
+    KernelWorkers() noexcept;
+    ~KernelWorkers() noexcept;
     void add_step(
         std::function<void(const unsigned int)> worker,
         std::function<void()> receiver = [] {}) noexcept;
     void add_step(
         std::function<void()> sender,
         std::function<void(const unsigned int)> worker,
+        std::function<void()> meanwhile,
         std::function<void()> boss) noexcept;
     void do_steps() noexcept;
     [[nodiscard]] unsigned int get_threads_count() const noexcept;
