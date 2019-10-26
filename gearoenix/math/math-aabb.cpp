@@ -90,8 +90,7 @@ void gearoenix::math::Aabb3::put_without_update(const Vec3& p) noexcept
     for (int i = 0; i < 3; ++i) {
         if (p[i] > upper[i]) {
             upper[i] = p[i];
-        }
-        else if (p[i] < lower[i]) {
+        } else if (p[i] < lower[i]) {
             lower[i] = p[i];
         }
     }
@@ -203,7 +202,7 @@ void gearoenix::math::Aabb3::read(system::stream::Stream* s) noexcept
     update();
 }
 
-void gearoenix::math::Aabb3::get_all_corners(math::Vec3(&corners)[8]) noexcept
+void gearoenix::math::Aabb3::get_all_corners(math::Vec3 (&corners)[8]) noexcept
 {
     corners[0][0] = upper[0];
     corners[0][1] = upper[1];

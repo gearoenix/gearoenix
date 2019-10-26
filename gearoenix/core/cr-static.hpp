@@ -15,10 +15,17 @@ public:                      \
 #define GX_GET_REF(v, t, x) \
     GX_GET_CREF(v, t, x)    \
     [[nodiscard]] t& get_##x() noexcept { return x; }
+#define GX_GETSET_CREF(v, t, x)         \
+    GX_GET_CREF(v, t, x)                \
+    void set_##x(const t& arg) noexcept \
+    {                                   \
+        x = arg;                        \
+    }
 #define GX_GET_CREF_PRT(t, x) GX_GET_CREF(protected, t, x)
 #define GX_GET_CREF_PRV(t, x) GX_GET_CREF(private, t, x)
 #define GX_GET_REF_PRT(t, x) GX_GET_REF(protected, t, x)
 #define GX_GET_REF_PRV(t, x) GX_GET_REF(private, t, x)
+#define GX_GETSET_CREF_PRT(t, x) GX_GETSET_CREF(protected, t, x)
 
 #define GX_GET_UPTR(v, c, t, x)                                         \
     v:                                                                  \

@@ -17,7 +17,7 @@ gearoenix::render::buffer::Uniform* gearoenix::glc3::buffer::Manager::create_uni
     return new Uniform(size, dynamic_cast<engine::Engine*>(e));
 }
 
-gearoenix::render::buffer::Static* gearoenix::glc3::buffer::Manager::create_static(const std::vector<math::BasicVertex> &vertices, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
+gearoenix::render::buffer::Static* gearoenix::glc3::buffer::Manager::create_static(const std::vector<math::BasicVertex>& vertices, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
 {
     return new Vertex(vertices, dynamic_cast<engine::Engine*>(e), c);
 }

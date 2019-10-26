@@ -14,12 +14,12 @@ private:
     std::atomic<int> count = 0;
 
 public:
-    explicit Semaphore(int count = 0) noexcept ;
+    explicit Semaphore(int count = 0) noexcept;
     Semaphore(Semaphore const&) = delete;
     void operator=(Semaphore const&) = delete;
     ~Semaphore() noexcept = default;
-    void lock() noexcept ;
-    void release() noexcept ;
+    void lock() noexcept;
+    void release() noexcept;
 };
 }
 #endif

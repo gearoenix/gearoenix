@@ -4,6 +4,7 @@
 #include "../../math/math-aabb.hpp"
 #include "../../math/math-vector.hpp"
 #include "rnd-lt-type.hpp"
+
 namespace gearoenix {
 namespace system::stream {
     class Stream;
@@ -17,29 +18,25 @@ namespace render {
     }
     namespace light {
         class Light : public core::asset::Asset {
+            GX_GETSET_VAL_PRT(core::Real, layer, 0.0f)
+            GX_GET_CVAL_PRT(Type, light_type)
+            GX_GETSET_CREF_PRT(math::Vec3, color)
         protected:
-            const Type light_type;
             engine::Engine* const e;
             bool enabled = true;
             bool has_shadow = false;
-            math::Vec3 color = math::Vec3(1.0f, 1.0f, 1.0f);
 
             Light(core::Id my_id, system::stream::Stream* f, engine::Engine* e, Type light_type) noexcept;
             Light(core::Id my_id, engine::Engine* e, Type light_type) noexcept;
 
         public:
-            virtual ~Light() noexcept = default;
+            ~Light() noexcept override = default;
 
-            Type get_type() const noexcept;
-
-            const math::Vec3& get_color() const noexcept;
-            void set_color(const math::Vec3& color) noexcept;
-
-            bool is_shadow_caster() const noexcept;
+            [[nodiscard]] bool is_shadow_caster() const noexcept;
             void enable_shadowing() noexcept;
             void disable_shadowing() noexcept;
 
-            bool is_enabled() const noexcept;
+            [[nodiscard]] bool is_enabled() const noexcept;
             void enable() noexcept;
             void disable() noexcept;
 

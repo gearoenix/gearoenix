@@ -31,8 +31,8 @@ namespace render {
             std::shared_ptr<Mesh> create_icosphere(core::sync::EndCaller<Mesh>& c) noexcept;
             std::shared_ptr<Mesh> create_plate(core::sync::EndCaller<Mesh>& c) noexcept;
             std::shared_ptr<Mesh> create_cube(core::sync::EndCaller<Mesh>& c) noexcept;
-            std::shared_ptr<Mesh> create(const std::vector<math::BasicVertex> &vertices, const std::vector<std::uint32_t> &indices, const math::Aabb3& occlusion_box, core::sync::EndCaller<Mesh>& c) noexcept;
-            std::shared_ptr<Mesh> create(const std::vector<math::BasicVertex> &vertices, const std::vector<std::uint32_t> &indices, core::sync::EndCaller<Mesh>& c) noexcept;
+            std::shared_ptr<Mesh> create(const std::vector<math::BasicVertex>& vertices, const std::vector<std::uint32_t>& indices, const math::Aabb3& occlusion_box, core::sync::EndCaller<Mesh>& c) noexcept;
+            std::shared_ptr<Mesh> create(const std::vector<math::BasicVertex>& vertices, const std::vector<std::uint32_t>& indices, core::sync::EndCaller<Mesh>& c) noexcept;
         };
     }
 }

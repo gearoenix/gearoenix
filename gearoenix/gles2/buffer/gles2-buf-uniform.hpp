@@ -12,8 +12,8 @@ namespace buffer {
     private:
         std::vector<unsigned char> data;
 
-        const void* get_data() const noexcept final;
-        void* get_data() noexcept final;
+        [[nodiscard]] const void* get_data() const noexcept final;
+        [[nodiscard]] void* get_data() noexcept final;
         void update(const void* src) noexcept final;
 
     public:

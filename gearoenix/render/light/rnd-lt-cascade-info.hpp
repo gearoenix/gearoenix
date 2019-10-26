@@ -9,6 +9,10 @@
 #include <memory>
 #include <vector>
 
+namespace gearoenix::physics::accelerator {
+class Bvh;
+}
+
 namespace gearoenix::render {
 namespace command {
     class Buffer;
@@ -93,7 +97,7 @@ namespace light {
 
         void start() noexcept;
 
-        void shadow(const model::Model*, std::size_t kernel_index) noexcept;
+        void shadow(const physics::accelerator::Bvh* bvh, std::size_t kernel_index) noexcept;
 
         void shrink() noexcept;
 

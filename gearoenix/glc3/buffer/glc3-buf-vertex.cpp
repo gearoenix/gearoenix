@@ -7,7 +7,7 @@
 #include "../engine/glc3-eng-engine.hpp"
 
 gearoenix::glc3::buffer::Vertex::Vertex(
-    const std::vector<math::BasicVertex> &vertices,
+    const std::vector<math::BasicVertex>& vertices,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : render::buffer::Static(vertices.size() * sizeof(math::BasicVertex), e)

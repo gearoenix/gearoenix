@@ -26,7 +26,8 @@ gearoenix::render::model::Model::Model(
     , e(e)
 {
     GXTODO // collider must be initialized
-    const auto meshes_count = f->read<core::Count>();
+        const auto meshes_count
+        = f->read<core::Count>();
     for (core::Count i = 0; i < meshes_count; ++i) {
         add_mesh(std::make_shared<Mesh>(f, e, c));
     }
@@ -66,12 +67,10 @@ void gearoenix::render::model::Model::update() noexcept
 void gearoenix::render::model::Model::add_mesh(const std::shared_ptr<Mesh>& m) noexcept
 {
     material::Material* const mat = m->get_material().get();
-    if (mat->get_is_shadow_caster())
-    {
+    if (mat->get_is_shadow_caster()) {
         shadowing = core::State::Set;
     }
-    if (mat->get_translucency() == material::TranslucencyMode::Tansparent) 
-    {
+    if (mat->get_translucency() == material::TranslucencyMode::Tansparent) {
         transparency = core::State::Set;
     }
     mesh::Mesh* const msh = m->get_mesh().get();

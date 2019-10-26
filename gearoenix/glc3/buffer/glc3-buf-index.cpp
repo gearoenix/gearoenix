@@ -7,7 +7,7 @@
 #include "../engine/glc3-eng-engine.hpp"
 
 gearoenix::glc3::buffer::Index::Index(
-    const std::vector<std::uint32_t> &indices,
+    const std::vector<std::uint32_t>& indices,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : render::buffer::Static(static_cast<unsigned int>(indices.size() * sizeof(gl::uint)), e)

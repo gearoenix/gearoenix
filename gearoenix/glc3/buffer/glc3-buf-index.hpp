@@ -19,7 +19,7 @@ namespace buffer {
 
     public:
         Index(
-            const std::vector<std::uint32_t> &indices,
+            const std::vector<std::uint32_t>& indices,
             engine::Engine* e,
             const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
         ~Index() noexcept final;

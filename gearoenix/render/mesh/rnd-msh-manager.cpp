@@ -7868,7 +7868,7 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager:
     const static core::Real occlusion_radius = 1.0000001266598622f;
     const auto id = core::asset::Manager::create_id();
     std::shared_ptr<Mesh> m(new Mesh(
-        id, vertices, indices, 
+        id, vertices, indices,
         math::Aabb3(math::Vec3(occlusion_radius), math::Vec3(-occlusion_radius)),
         e, core::sync::EndCaller<core::sync::EndCallerIgnore>([c] {})));
     c.set_data(m);
@@ -8133,7 +8133,7 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager:
 {
     const auto id = core::asset::Manager::create_id();
     std::shared_ptr<Mesh> m(new Mesh(
-        id, vertices, indices, occlusion_box, 
+        id, vertices, indices, occlusion_box,
         e, core::sync::EndCaller<core::sync::EndCallerIgnore>([c] {})));
     c.set_data(m);
     cache.get_cacher().get_cacheds()[id] = m;

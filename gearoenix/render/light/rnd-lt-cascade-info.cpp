@@ -1,6 +1,7 @@
 #include "rnd-lt-cascade-info.hpp"
 #include "../../core/sync/cr-sync-kernel-workers.hpp"
 #include "../../math/math-sphere.hpp"
+#include "../../physics/accelerator/phs-acc-bvh.hpp"
 #include "../../system/sys-app.hpp"
 #include "../buffer/rnd-buf-manager.hpp"
 #include "../buffer/rnd-buf-uniform.hpp"
@@ -149,7 +150,7 @@ void gearoenix::render::light::CascadeInfo::start() noexcept
     current_frame->start();
 }
 
-void gearoenix::render::light::CascadeInfo::shadow(const model::Model* m, const std::size_t kernel_index) noexcept
+void gearoenix::render::light::CascadeInfo::shadow(const physics::accelerator::Bvh* bvh, const std::size_t kernel_index) noexcept
 {
     kernels[kernel_index].shadow(m);
 }

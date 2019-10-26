@@ -19,7 +19,7 @@ namespace buffer {
 
     public:
         Vertex(
-            const std::vector<math::BasicVertex> &vertices,
+            const std::vector<math::BasicVertex>& vertices,
             engine::Engine* e,
             const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
         ~Vertex() noexcept final;

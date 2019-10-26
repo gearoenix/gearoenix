@@ -31,7 +31,7 @@ gearoenix::render::mesh::Mesh::Mesh(
     f->read(indices);
     const auto r = f->read<core::Real>();
     GXTODO // make sure the blender plugin implemented this
-    box.read(f);
+        box.read(f);
     set_vertices(e, vertices, indices, box, c);
 }
 
@@ -56,8 +56,8 @@ gearoenix::render::mesh::Mesh::~Mesh() noexcept
 
 void gearoenix::render::mesh::Mesh::set_vertices(
     engine::Engine* const e,
-    const std::vector<math::BasicVertex> &vertices,
-    const std::vector<std::uint32_t> &indices,
+    const std::vector<math::BasicVertex>& vertices,
+    const std::vector<std::uint32_t>& indices,
     const math::Aabb3& b,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
 {

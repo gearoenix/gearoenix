@@ -6,7 +6,7 @@
 #include <optional>
 
 namespace gearoenix::system::stream {
-    class Stream;
+class Stream;
 }
 
 namespace gearoenix::math {

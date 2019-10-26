@@ -19,6 +19,9 @@ namespace math {
 }
 namespace physics {
     class Transformation;
+    namespace collider {
+        class Collider;
+    }
 }
 namespace system {
     class Application;
@@ -34,36 +37,33 @@ namespace render {
     namespace camera {
         class Transformation;
         class Camera : public core::asset::Asset, public core::event::Listner {
+        public:
+            typedef std::array<math::Vec3, 4> Partition;
+
             GX_GETSET_VAL_PRT(core::Real, layer, 0.0f)
+            GX_GETSET_UPTR_PRT(physics::collider::Collider, collider)
+            GX_GET_UPTR_PRT(physics::Transformation, transformation)
+            GX_GET_UPTR_PRT(buffer::FramedUniform, uniform_buffers)
+            GX_GET_CREF_PRT(std::vector<Partition>, cascaded_shadow_frustum_partitions)
+            GX_GET_CREF_PRT(Uniform, uniform)
+            GX_GETSET_VAL_PRT(bool, enabled, true)
         protected:
-            bool enabled = true;
             engine::Engine* const e;
-            Uniform uniform;
-            std::shared_ptr<math::ProjectorFrustum> frustum;
-            std::shared_ptr<Transformation> transformation;
-            std::shared_ptr<buffer::FramedUniform> uniform_buffers;
-            std::shared_ptr<std::vector<std::array<math::Vec3, 4>>> cascaded_shadow_frustum_partitions;
+
+            /// TODO change this std::shared_ptr<math::ProjectorFrustum> frustum;
 
             Camera(core::Id my_id, engine::Engine* e) noexcept;
             Camera(core::Id my_id, system::stream::Stream* f, engine::Engine* e) noexcept;
 
         public:
-            virtual ~Camera() noexcept;
-            const std::shared_ptr<buffer::FramedUniform>& get_uniform_buffers() const;
-            const std::shared_ptr<physics::Transformation> get_transformation() const noexcept;
+            ~Camera() noexcept override;
             void set_far(core::Real f) noexcept;
-            bool is_enabled() const noexcept;
-            void enable() noexcept;
-            void disable() noexcept;
-            bool in_sight(const math::Vec3& location, core::Real radius) const noexcept;
             virtual void update_uniform();
             virtual void set_aspect_ratio(core::Real ratio);
-            virtual math::Ray3 create_ray3(core::Real x, core::Real y) const = 0;
-            virtual core::Real get_distance(const math::Vec3& model_location) const = 0;
-            const std::vector<std::array<math::Vec3, 4>>& get_cascaded_shadow_frustum_partitions() noexcept;
-            const Uniform& get_uniform() const noexcept;
+            [[nodiscard]] virtual math::Ray3 create_ray3(core::Real x, core::Real y) const = 0;
+            [[nodiscard]] virtual core::Real get_distance(const math::Vec3& model_location) const = 0;
 
-            virtual bool on_event(const core::event::Data& d) noexcept override;
+            bool on_event(const core::event::Data& d) noexcept override;
         };
     }
 }

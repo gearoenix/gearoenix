@@ -1,6 +1,5 @@
 #include "rnd-lt-light.hpp"
 #include "../../system/stream/sys-stm-stream.hpp"
-#include "../../system/sys-log.hpp"
 #include "../engine/rnd-eng-engine.hpp"
 
 gearoenix::render::light::Light::Light(
@@ -21,21 +20,6 @@ gearoenix::render::light::Light::Light(const core::Id my_id, engine::Engine* con
     , light_type(light_type)
     , e(e)
 {
-}
-
-gearoenix::render::light::Type gearoenix::render::light::Light::get_type() const noexcept
-{
-    return light_type;
-}
-
-const gearoenix::math::Vec3& gearoenix::render::light::Light::get_color() const noexcept
-{
-    return color;
-}
-
-void gearoenix::render::light::Light::set_color(const gearoenix::math::Vec3& c) noexcept
-{
-    color = c;
 }
 
 bool gearoenix::render::light::Light::is_shadow_caster() const noexcept
