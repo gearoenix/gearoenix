@@ -227,3 +227,8 @@ std::string gearoenix::physics::accelerator::Bvh::to_string() const noexcept
     r += " }";
     return r;
 }
+
+void gearoenix::physics::accelerator::Bvh::call_on_intersecting(const collider::Collider* const cld, const std::function<void(collider::Collider* cld)>& collided) const noexcept
+{
+    root->call_on_intersecting(cld, collided);
+}
