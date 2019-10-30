@@ -40,7 +40,7 @@ public:
     void set_center(const Vec3& c) noexcept;
     void set_diameter(const Vec3& d) noexcept;
     void read(system::stream::Stream* s) noexcept;
-    void get_all_corners(math::Vec3 (&corners)[8]) noexcept;
+    void get_all_corners(math::Vec3 (&corners)[8]) const noexcept;
 };
 }
 #endif

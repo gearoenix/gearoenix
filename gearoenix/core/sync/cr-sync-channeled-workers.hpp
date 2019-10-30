@@ -2,31 +2,37 @@
 #define GEAROENIX_CORE_SYNC_CHANNELED_WORKERS_HPP
 #include "cr-sync-channel.hpp"
 #include <functional>
+#include <memory>
+#include <mutex>
 #include <thread>
+#include <vector>
 
 namespace gearoenix::core::sync {
 class ChanneledWorkers {
 private:
     struct Thread {
-        const std::size_t i;
-        Channel<std::function<void(std::size_t)>> c;
-        Semaphore* const s;
-        std::thread t;
+        const std::size_t thread_index;
+        bool running = true;
+        std::mutex pending_lock;
+        std::vector<std::function<void(std::size_t)>> pending;
+        std::vector<std::function<void(std::size_t)>> underprocess;
+        std::size_t underprocess_index = 0;
+        Semaphore signal;
+        std::thread thread;
         void kernel() noexcept;
-        Thread(std::size_t i, Semaphore* s) noexcept;
+        explicit Thread(std::size_t i) noexcept;
+        ~Thread() noexcept;
     };
-    std::vector<Thread> threads;
-    Semaphore s;
-    std::atomic<std::size_t> jobs_count = 0;
+    std::vector<std::unique_ptr<Thread>> threads;
 
 public:
     ChanneledWorkers() noexcept;
+    ~ChanneledWorkers() noexcept;
 
     ChanneledWorkers(const ChanneledWorkers&) noexcept = delete;
     void operator=(const ChanneledWorkers&) noexcept = delete;
 
     void perform(const std::function<void(std::size_t)>& job) noexcept;
-    void wait() noexcept;
 };
 }
 #endif

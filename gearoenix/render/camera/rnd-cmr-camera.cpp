@@ -3,6 +3,7 @@
 #include "../../core/event/cr-ev-event.hpp"
 #include "../../math/math-projector-frustum.hpp"
 #include "../../math/math-quaternion.hpp"
+#include "../../physics/collider/phs-cld-frustum.hpp"
 #include "../../system/stream/sys-stm-stream.hpp"
 #include "../../system/sys-app.hpp"
 #include "../../system/sys-configuration.hpp"
@@ -13,13 +14,12 @@
 
 gearoenix::render::camera::Camera::Camera(const core::Id my_id, engine::Engine* const e) noexcept
     : core::asset::Asset(my_id, core::asset::Type::Camera)
-    , e(e)
-    , frustum(new math::ProjectorFrustum(math::Mat4x4()))
+    , frustum_collider(new physics::collider::Frustum())
     , uniform_buffers(new buffer::FramedUniform(sizeof(Uniform), e))
-    , cascaded_shadow_frustum_partitions(new std::vector<std::array<math::Vec3, 4>>(
-          static_cast<std::size_t>(e->get_system_application()->get_configuration().render_config.shadow_cascades_count) + 1))
+    , cascaded_shadow_frustum_partitions(static_cast<std::size_t>(e->get_system_application()->get_configuration().render_config.shadow_cascades_count) + 1)
+    , e(e)
 {
-    transformation = std::make_shared<Transformation>(&uniform, frustum, cascaded_shadow_frustum_partitions);
+    transformation = std::make_shared<Transformation>(&uniform, frustum_collider.get(), cascaded_shadow_frustum_partitions);
     const auto& sys_app = e->get_system_application();
     uniform.aspect_ratio = sys_app->get_window_ratio();
     uniform.clip_width = static_cast<core::Real>(sys_app->get_window_width());

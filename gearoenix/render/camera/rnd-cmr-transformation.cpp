@@ -1,15 +1,16 @@
 #include "rnd-cmr-transformation.hpp"
 #include "../../math/math-projector-frustum.hpp"
+#include "../../physics/collider/phs-cld-frustum.hpp"
 #include "rnd-cmr-uniform.hpp"
 #include <utility>
 
 gearoenix::render::camera::Transformation::Transformation(
     Uniform* const uniform,
-    std::shared_ptr<math::ProjectorFrustum> frustum,
-    std::shared_ptr<std::vector<std::array<math::Vec3, 4>>> cascade) noexcept
+    physics::collider::Frustum* const frustum_collider,
+    std::vector<std::array<math::Vec3, 4>>* const cascade) noexcept
     : uniform(uniform)
-    , frustum(std::move(frustum))
-    , cascaded_shadow_frustum_partitions(std::move(cascade))
+    , frustum_collider(frustum_collider)
+    , cascaded_shadow_frustum_partitions(cascade)
 {
 }
 

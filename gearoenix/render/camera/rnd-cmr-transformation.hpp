@@ -13,16 +13,16 @@ namespace render::camera {
     class Transformation : public physics::Transformation {
     private:
         Uniform* const uniform;
-        const std::shared_ptr<math::ProjectorFrustum> frustum;
-        const std::shared_ptr<std::vector<std::array<math::Vec3, 4>>> cascaded_shadow_frustum_partitions;
+        physics::collider::Frustum* const frustum_collider;
+        std::vector<std::array<math::Vec3, 4>>* const cascaded_shadow_frustum_partitions;
         std::function<void()> on_frustum_update = [] {};
         std::function<void()> on_projection_update = [] {};
 
     public:
         Transformation(
             Uniform* uniform,
-            std::shared_ptr<math::ProjectorFrustum> frustum,
-            std::shared_ptr<std::vector<std::array<math::Vec3, 4>>> cascade) noexcept;
+            physics::collider::Frustum* frustum_collider,
+            std::vector<std::array<math::Vec3, 4>>* cascade) noexcept;
         void update_location() noexcept;
         void update_projection() noexcept;
         void update_view_projection() noexcept;
@@ -31,10 +31,10 @@ namespace render::camera {
         void look_at(const math::Vec3& target, const math::Vec3& up) noexcept;
         void look_at(const math::Vec3& origin, const math::Vec3& target, const math::Vec3& up) noexcept;
         // physics::Transformation----------------------------------------------------------------------------
-        const math::Vec3& get_x_axis() const noexcept final;
-        const math::Vec3& get_y_axis() const noexcept final;
-        const math::Vec3& get_z_axis() const noexcept final;
-        const math::Vec3& get_location() const noexcept final;
+        [[nodiscard]] const math::Vec3& get_x_axis() const noexcept final;
+        [[nodiscard]] const math::Vec3& get_y_axis() const noexcept final;
+        [[nodiscard]] const math::Vec3& get_z_axis() const noexcept final;
+        [[nodiscard]] const math::Vec3& get_location() const noexcept final;
         void get_location(math::Vec3& l) const noexcept final;
         void set_location(const math::Vec3& l) noexcept final;
         void translate(const math::Vec3& t) noexcept final;

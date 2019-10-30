@@ -61,7 +61,7 @@ void gearoenix::physics::accelerator::Bvh::LeafNode::call_on_intersecting(const 
 {
     for (collider::Collider* const c : colliders) {
         if (c != nullptr) {
-            if (cld->check_intersection(c)) {
+            if (cld->check_intersection(c->get_updated_box())) {
                 collided(c);
             }
         }

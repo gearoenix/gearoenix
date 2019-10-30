@@ -32,9 +32,9 @@ std::optional<gearoenix::core::Real> gearoenix::physics::collider::Collider::hit
     return updated_box.hit(r, d_min);
 }
 
-bool gearoenix::physics::collider::Collider::check_intersection(const Collider* const o) const noexcept
+bool gearoenix::physics::collider::Collider::check_intersection(const math::Aabb3& box) const noexcept
 {
-    return updated_box.check_intersection(o->updated_box);
+    return updated_box.check_intersection(box);
 }
 
 gearoenix::math::IntersectionStatus gearoenix::physics::collider::Collider::check_intersection_status(const math::Aabb3& box) const noexcept

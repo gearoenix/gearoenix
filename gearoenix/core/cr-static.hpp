@@ -26,6 +26,7 @@ public:                      \
 #define GX_GET_REF_PRT(t, x) GX_GET_REF(protected, t, x)
 #define GX_GET_REF_PRV(t, x) GX_GET_REF(private, t, x)
 #define GX_GETSET_CREF_PRT(t, x) GX_GETSET_CREF(protected, t, x)
+#define GX_GETSET_CREF_PRV(t, x) GX_GETSET_CREF(private, t, x)
 
 #define GX_GET_UPTR(v, c, t, x)                                         \
     v:                                                                  \

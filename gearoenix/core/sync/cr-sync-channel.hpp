@@ -35,7 +35,8 @@ public:
     {
         s.lock();
         std::lock_guard<std::mutex> _l(m);
-        const T t = data.pop();
+        const T t = data.front();
+        data.pop();
         return t;
     }
 };

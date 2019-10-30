@@ -8,6 +8,7 @@ enum struct Type : core::TypeId {
     Mesh = 2,
     Aabb = 3,
     Sphere = 4,
+    Frustum = 5,
 };
 std::ostream& operator<<(std::ostream& os, Type t) noexcept;
 }

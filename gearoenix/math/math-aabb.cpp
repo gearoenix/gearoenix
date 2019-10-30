@@ -199,7 +199,7 @@ void gearoenix::math::Aabb3::read(system::stream::Stream* s) noexcept
     update();
 }
 
-void gearoenix::math::Aabb3::get_all_corners(math::Vec3 (&corners)[8]) noexcept
+void gearoenix::math::Aabb3::get_all_corners(math::Vec3 (&corners)[8]) const noexcept
 {
     corners[0][0] = upper[0];
     corners[0][1] = upper[1];

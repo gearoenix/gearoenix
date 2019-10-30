@@ -42,7 +42,7 @@ public:
     /// It returns minimum distance of collider surface from the ray origin along the ray direction
     ///   if the ray hits the surface and the distance is less than d_min
     [[nodiscard]] virtual std::optional<core::Real> hit(const math::Ray3& r, core::Real d_min) const noexcept;
-    [[nodiscard]] virtual bool check_intersection(const Collider* o) const noexcept;
+    [[nodiscard]] virtual bool check_intersection(const math::Aabb3& box) const noexcept;
     [[nodiscard]] virtual math::IntersectionStatus check_intersection_status(const math::Aabb3& box) const noexcept;
     void put_in_box(const math::Aabb3& b) noexcept;
 
