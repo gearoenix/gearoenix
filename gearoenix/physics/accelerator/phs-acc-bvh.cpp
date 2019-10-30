@@ -60,8 +60,10 @@ std::string gearoenix::physics::accelerator::Bvh::LeafNode::to_string() const no
 void gearoenix::physics::accelerator::Bvh::LeafNode::call_on_intersecting(const collider::Collider* const cld, const std::function<void(collider::Collider* const cld)>& collided) const noexcept
 {
     for (collider::Collider* const c : colliders) {
-        if (c.check_intersection(cld)) {
-            collided(c);
+        if (c != nullptr) {
+            if (cld->check_intersection(c)) {
+                collided(c);
+            }
         }
     }
 }
@@ -69,7 +71,9 @@ void gearoenix::physics::accelerator::Bvh::LeafNode::call_on_intersecting(const 
 void gearoenix::physics::accelerator::Bvh::LeafNode::map(const std::function<void(collider::Collider* const cld)>& collided) const noexcept
 {
     for (collider::Collider* const c : colliders) {
-        collided(c);
+        if (c != nullptr) {
+            collided(c);
+        }
     }
 }
 
@@ -237,12 +241,18 @@ void gearoenix::physics::accelerator::Bvh::InternalNode::call_on_intersecting(co
     }
     GX_HELPER(left)
     GX_HELPER(right)
+#undef GX_HELPER
 }
 
 void gearoenix::physics::accelerator::Bvh::InternalNode::map(const std::function<void(collider::Collider* const)>& collided) const noexcept
 {
-    left->map(collided);
-    right->map(collided);
+#define GX_HELPER(n)      \
+    if (nullptr != n) {   \
+        n->map(collided); \
+    }
+    GX_HELPER(left)
+    GX_HELPER(right)
+#undef GX_HELPER
 }
 
 void gearoenix::physics::accelerator::Bvh::reset(const std::vector<collider::Collider*>& colliders) noexcept

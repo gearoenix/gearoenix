@@ -1,5 +1,4 @@
 #include "math-aabb.hpp"
-#include "../core/cr-build-configuration.hpp"
 #include "../core/cr-static.hpp"
 #include "../system/stream/sys-stm-stream.hpp"
 #include "math-ray.hpp"
@@ -127,7 +126,7 @@ bool gearoenix::math::Aabb3::check_intersection(const Aabb3& o, Aabb3& intersect
     return equals < 3;
 }
 
-bool gearoenix::math::Aabb3::test(const Aabb3& o) const noexcept
+bool gearoenix::math::Aabb3::check_intersection(const Aabb3& o) const noexcept
 {
     return lower[0] < o.upper[0]
         && upper[0] > o.lower[0]
@@ -139,15 +138,13 @@ bool gearoenix::math::Aabb3::test(const Aabb3& o) const noexcept
 
 bool gearoenix::math::Aabb3::check_intersection(const gearoenix::math::Sphere& o) const noexcept
 {
-    return test(Aabb3(o.get_center() + o.get_radius(), o.get_center() - o.get_radius()));
+    return check_intersection(Aabb3(o.get_center() + o.get_radius(), o.get_center() - o.get_radius()));
 }
 
 std::optional<gearoenix::core::Real> gearoenix::math::Aabb3::hit(const math::Ray3& r, const core::Real d_min) const noexcept
 {
     const Vec3& ro = r.get_origin();
-    const Vec3& rd = r.get_normalized_direction();
-    /// TODO: precompute it in ray
-    const Vec3 rrd = Vec3(1.0f) / rd;
+    const Vec3& rrd = r.get_reversed_normalized_direction();
     const Vec3 t0 = (lower - ro) * rrd;
     const Vec3 t1 = (upper - ro) * rrd;
     const Vec3 tsmall = t0.minimum(t1);

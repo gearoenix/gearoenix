@@ -32,11 +32,11 @@ public:
     /// In case your not sure about it, use put, it is safer
     void put_without_update(const Vec3& p) noexcept;
     void put_without_update(const Aabb3& o) noexcept;
-    std::optional<core::Real> hit(const math::Ray3& r, core::Real d_min) const noexcept;
-    IntersectionStatus check_intersection_status(const Aabb3& o) const noexcept;
-    bool check_intersection(const Sphere& o) const noexcept;
-    bool check_intersection(const Aabb3& o, Aabb3& intersection) const noexcept;
-    bool test(const Aabb3& o) const noexcept; // TODO it hase to change to check_intersection but be careful about previous check_intersection_status usages
+    [[nodiscard]] std::optional<core::Real> hit(const math::Ray3& r, core::Real d_min) const noexcept;
+    [[nodiscard]] IntersectionStatus check_intersection_status(const Aabb3& o) const noexcept;
+    [[nodiscard]] bool check_intersection(const Sphere& o) const noexcept;
+    [[nodiscard]] bool check_intersection(const Aabb3& o, Aabb3& intersection) const noexcept;
+    [[nodiscard]] bool check_intersection(const Aabb3& o) const noexcept;
     void set_center(const Vec3& c) noexcept;
     void set_diameter(const Vec3& d) noexcept;
     void read(system::stream::Stream* s) noexcept;
