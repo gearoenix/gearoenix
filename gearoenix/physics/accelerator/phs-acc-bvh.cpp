@@ -7,7 +7,7 @@ constexpr int WALLS_COUNT = BINS_COUNT - 1;
 
 std::string gearoenix::physics::accelerator::Bvh::Node::to_string() const noexcept
 {
-    std::string r("\"node_type\" : \"");
+    std::string r(R"("node_type" : ")");
     switch (node_type) {
     case Type::INTERNAL:
         r += "INTERNAL";
@@ -55,6 +55,22 @@ std::string gearoenix::physics::accelerator::Bvh::LeafNode::to_string() const no
     r += std::to_string(colliders.size());
     r += " }";
     return r;
+}
+
+void gearoenix::physics::accelerator::Bvh::LeafNode::call_on_intersecting(const collider::Collider* const cld, const std::function<void(collider::Collider* const cld)>& collided) const noexcept
+{
+    for (collider::Collider* const c : colliders) {
+        if (c.check_intersection(cld)) {
+            collided(c);
+        }
+    }
+}
+
+void gearoenix::physics::accelerator::Bvh::LeafNode::map(const std::function<void(collider::Collider* const cld)>& collided) const noexcept
+{
+    for (collider::Collider* const c : colliders) {
+        collided(c);
+    }
 }
 
 void gearoenix::physics::accelerator::Bvh::InternalNode::init(const std::vector<collider::Collider*>& colliders) noexcept
@@ -105,12 +121,14 @@ void gearoenix::physics::accelerator::Bvh::InternalNode::init(const std::vector<
         }
         // Overlapping centers check
         bool overlapped = false;
-        for (int i = 0; i < BINS_COUNT; ++i)
-            if (bins[i].c.size() == colliders.size()) {
+        for (const Bin& b : bins) {
+            if (b.c.size() == colliders.size()) {
                 overlapped = true;
                 break;
-            } else if (bins[i].c.size() != 0)
+            } else if (!b.c.empty()) {
                 break;
+            }
+        }
         if (overlapped)
             continue;
         core::Real best_wall_cost = std::numeric_limits<core::Real>::max();
@@ -187,6 +205,7 @@ std::optional<std::pair<gearoenix::core::Real, gearoenix::physics::collider::Col
         return std::nullopt;
     const auto hl = (left == nullptr ? std::nullopt : left->hit(r, d_min));
     const auto [d_min_left, hited_c] = (hl == std::nullopt ? std::make_pair(d_min, nullptr) : *hl);
+    (void)hited_c;
     const auto hr = (right == nullptr ? std::nullopt : right->hit(r, d_min_left));
     if (hr == std::nullopt)
         return hl;
@@ -203,6 +222,27 @@ std::string gearoenix::physics::accelerator::Bvh::InternalNode::to_string() cons
         r += ", \"right\" : " + right->to_string();
     r += " }";
     return r;
+}
+
+void gearoenix::physics::accelerator::Bvh::InternalNode::call_on_intersecting(const collider::Collider* const cld, const std::function<void(collider::Collider* const)>& collided) const noexcept
+{
+#define GX_HELPER(n)                                                        \
+    if (n != nullptr) {                                                     \
+        const auto is = cld->check_intersection_status(left->get_volume()); \
+        if (math::IntersectionStatus::Cut == is) {                          \
+            n->call_on_intersecting(cld, collided);                         \
+        } else if (math::IntersectionStatus::In == is) {                    \
+            left->map(collided);                                            \
+        }                                                                   \
+    }
+    GX_HELPER(left)
+    GX_HELPER(right)
+}
+
+void gearoenix::physics::accelerator::Bvh::InternalNode::map(const std::function<void(collider::Collider* const)>& collided) const noexcept
+{
+    left->map(collided);
+    right->map(collided);
 }
 
 void gearoenix::physics::accelerator::Bvh::reset(const std::vector<collider::Collider*>& colliders) noexcept

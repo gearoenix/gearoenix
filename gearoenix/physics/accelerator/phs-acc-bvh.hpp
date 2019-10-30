@@ -46,8 +46,8 @@ private:
         virtual ~Node() noexcept = default;
         [[nodiscard]] virtual std::string to_string() const noexcept;
         [[nodiscard]] virtual std::optional<std::pair<core::Real, collider::Collider*>> hit(const math::Ray3& r, core::Real d_min) const noexcept;
-        virtual void call_on_intersecting(const collider::Collider* cld, const std::function<void(collider::Collider* cld)>& collided) const noexcept = 0;
-        virtual void map(const std::function<void(collider::Collider* cld)>& collided) const noexcept = 0;
+        virtual void call_on_intersecting(const collider::Collider* cld, const std::function<void(collider::Collider* const cld)>& collided) const noexcept = 0;
+        virtual void map(const std::function<void(collider::Collider* const cld)>& collided) const noexcept = 0;
     };
 
     class LeafNode : public Node {
@@ -60,8 +60,8 @@ private:
         }
         [[nodiscard]] std::optional<std::pair<core::Real, collider::Collider*>> hit(const math::Ray3& r, core::Real d_min) const noexcept final;
         [[nodiscard]] std::string to_string() const noexcept final;
-        void call_on_intersecting(const collider::Collider* cld, const std::function<void(collider::Collider* cld)>& collided) const noexcept final;
-        void map(const std::function<void(collider::Collider* cld)>& collided) const noexcept final;
+        void call_on_intersecting(const collider::Collider* cld, const std::function<void(collider::Collider* const cld)>& collided) const noexcept final;
+        void map(const std::function<void(collider::Collider* const cld)>& collided) const noexcept final;
     };
 
     class InternalNode : public Node {
@@ -76,8 +76,8 @@ private:
         InternalNode(const std::vector<collider::Collider*>& colliders, const math::Aabb3& volume) noexcept;
         [[nodiscard]] std::optional<std::pair<core::Real, collider::Collider*>> hit(const math::Ray3& r, core::Real d_min) const noexcept final;
         [[nodiscard]] std::string to_string() const noexcept final;
-        void call_on_intersecting(const collider::Collider* cld, const std::function<void(collider::Collider* cld)>& collided) const noexcept final;
-        void map(const std::function<void(collider::Collider* cld)>& collided) const noexcept final;
+        void call_on_intersecting(const collider::Collider* cld, const std::function<void(collider::Collider* const cld)>& collided) const noexcept final;
+        void map(const std::function<void(collider::Collider* const cld)>& collided) const noexcept final;
     };
 
     std::unique_ptr<InternalNode> root;
