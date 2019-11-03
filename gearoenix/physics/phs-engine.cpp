@@ -80,7 +80,7 @@ void gearoenix::physics::Engine::update_visibility_kernel(const unsigned int ker
 #define GX_CAMVIS(x)                                                                                                 \
     GX_DO_TASK(                                                                                                      \
         x##_accelerator->call_on_intersecting(                                                                       \
-            camera->get_collider(), [&](collider::Collider* const cld) noexcept {                                    \
+            camera->get_frustum_collider(), [&](collider::Collider* const cld) noexcept {                            \
                 auto* const m = cld->get_parent();                                                                   \
                 if (m->get_transparency() == core::State::Set) {                                                     \
                     transparent_container_models[camera->get_distance(m->get_transformation()->get_location())] = m; \

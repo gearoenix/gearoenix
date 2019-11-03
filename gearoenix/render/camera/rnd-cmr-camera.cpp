@@ -12,38 +12,38 @@
 #include "../engine/rnd-eng-engine.hpp"
 #include "rnd-cmr-transformation.hpp"
 
-gearoenix::render::camera::Camera::Camera(const core::Id my_id, engine::Engine* const e) noexcept
-    : core::asset::Asset(my_id, core::asset::Type::Camera)
-    , frustum_collider(new physics::collider::Frustum())
-    , uniform_buffers(new buffer::FramedUniform(sizeof(Uniform), e))
-    , cascaded_shadow_frustum_partitions(static_cast<std::size_t>(e->get_system_application()->get_configuration().render_config.shadow_cascades_count) + 1)
+#define GX_CAMERA_INIT \
+    core::asset::Asset(my_id, core::asset::Type::Camera) \
+    , frustum_collider(new physics::collider::Frustum()) \
+    , uniform_buffers(new buffer::FramedUniform(sizeof(Uniform), e)) \
+    , cascaded_shadow_frustum_partitions(static_cast<std::size_t>(e->get_system_application()->get_configuration().render_config.shadow_cascades_count) + 1) \
+    , transformation(new Transformation(&uniform, frustum_collider.get(), &cascaded_shadow_frustum_partitions)) \
     , e(e)
+
+
+
+void gearoenix::render::camera::Camera::initialize(engine::Engine* const e) noexcept
 {
-    transformation = std::make_shared<Transformation>(&uniform, frustum_collider.get(), cascaded_shadow_frustum_partitions);
-    const auto& sys_app = e->get_system_application();
-    uniform.aspect_ratio = sys_app->get_window_ratio();
-    uniform.clip_width = static_cast<core::Real>(sys_app->get_window_width());
-    uniform.clip_height = static_cast<core::Real>(sys_app->get_window_height());
+    auto* const sys_app = e->get_system_application(); 
+    uniform.aspect_ratio = sys_app->get_window_ratio(); 
+    uniform.clip_width = static_cast<core::Real>(sys_app->get_window_width()); 
+    uniform.clip_height = static_cast<core::Real>(sys_app->get_window_height()); 
     sys_app->get_event_engine()->add_listner(core::event::Id::SystemWindowSizeChange, 1.0f, this);
+}
+
+gearoenix::render::camera::Camera::Camera(const core::Id my_id, engine::Engine* const e) noexcept
+    : GX_CAMERA_INIT
+{
+    initialize(e);
 }
 
 gearoenix::render::camera::Camera::Camera(
     const core::Id my_id,
     system::stream::Stream* const f,
     engine::Engine* const e) noexcept
-    : core::asset::Asset(my_id, core::asset::Type::Camera)
-    , e(e)
-    , frustum(new math::ProjectorFrustum(math::Mat4x4()))
-    , uniform_buffers(new buffer::FramedUniform(sizeof(Uniform), e))
-    , cascaded_shadow_frustum_partitions(new std::vector<std::array<math::Vec3, 4>>(
-          static_cast<std::size_t>(e->get_system_application()->get_configuration().render_config.shadow_cascades_count) + 1))
+    : GX_CAMERA_INIT
 {
-    transformation = std::make_shared<Transformation>(&uniform, frustum, cascaded_shadow_frustum_partitions);
-    const auto& sys_app = e->get_system_application();
-    uniform.aspect_ratio = sys_app->get_window_ratio();
-    uniform.clip_width = static_cast<core::Real>(sys_app->get_window_width());
-    uniform.clip_height = static_cast<core::Real>(sys_app->get_window_height());
-    sys_app->get_event_engine()->add_listner(core::event::Id::SystemWindowSizeChange, 1.0f, this);
+    initialize(e);
     uniform.position.read(f);
     math::Quat q;
     f->read(q.w);
@@ -68,41 +68,10 @@ gearoenix::render::camera::Camera::~Camera() noexcept
     e->get_system_application()->get_event_engine()->remove_listner(core::event::Id::SystemWindowSizeChange, this);
 }
 
-const std::shared_ptr<gearoenix::render::buffer::FramedUniform>& gearoenix::render::camera::Camera::get_uniform_buffers() const
-{
-    return uniform_buffers;
-}
-
-const std::shared_ptr<gearoenix::physics::Transformation> gearoenix::render::camera::Camera::get_transformation() const noexcept
-{
-    return transformation;
-}
-
 void gearoenix::render::camera::Camera::set_far(const core::Real f) noexcept
 {
     uniform.far = -f;
     transformation->update_projection();
-}
-
-bool gearoenix::render::camera::Camera::is_enabled() const noexcept
-{
-    return enabled;
-}
-
-void gearoenix::render::camera::Camera::enable() noexcept
-{
-    enabled = true;
-}
-
-void gearoenix::render::camera::Camera::disable() noexcept
-{
-    enabled = false;
-}
-
-bool gearoenix::render::camera::Camera::in_sight(const gearoenix::math::Vec3& location, const core::Real radius) const noexcept
-{
-    return true;
-    //return frustum->check_intersection(location, radius) != math::IntersectionStatus::Out;
 }
 
 void gearoenix::render::camera::Camera::update_uniform()
@@ -113,17 +82,6 @@ void gearoenix::render::camera::Camera::update_uniform()
 void gearoenix::render::camera::Camera::set_aspect_ratio(const gearoenix::core::Real ratio)
 {
     uniform.aspect_ratio = ratio;
-}
-
-const std::vector<std::array<gearoenix::math::Vec3, 4>>&
-gearoenix::render::camera::Camera::get_cascaded_shadow_frustum_partitions() noexcept
-{
-    return *cascaded_shadow_frustum_partitions;
-}
-
-const gearoenix::render::camera::Uniform& gearoenix::render::camera::Camera::get_uniform() const noexcept
-{
-    return uniform;
 }
 
 bool gearoenix::render::camera::Camera::on_event(const core::event::Data& d) noexcept

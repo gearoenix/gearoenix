@@ -2,7 +2,7 @@
 #include "../../core/sync/cr-sync-kernel-workers.hpp"
 #include "phs-anm-animation.hpp"
 
-gearoenix::physics::animation::Manager::Manager(core::sync::KernelWorker* const kernel_workers) noexcept
+gearoenix::physics::animation::Manager::Manager(core::sync::KernelWorkers* const kernel_workers) noexcept
     : kernels(static_cast<std::size_t>(kernel_workers->get_threads_count()))
 {
     kernel_workers->add_step(
@@ -31,6 +31,7 @@ gearoenix::physics::animation::Manager::Manager(core::sync::KernelWorker* const 
                     })
             }
         },
+            []() {},
         [this]() noexcept {
             for (const auto& k : kernels) {
                 for (const auto& a : k.deleted_animations) {
