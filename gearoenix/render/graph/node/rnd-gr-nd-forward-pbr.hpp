@@ -50,7 +50,7 @@ namespace graph::node {
         core::Real point_lights_count = 0.0f;
         core::Real shadow_caster_directional_lights_count = 0.0f;
         explicit ForwardPbrUniform(
-            const std::vector<std::pair<light::Directional*, light::CascadeInfo*>>* directional_lights,
+            const std::map<core::Real, std::map<light::Directional*, light::CascadeInfo*>>* directional_lights,
             const scene::Scene* scn, const model::Model* mdl) noexcept;
     };
 
@@ -83,8 +83,9 @@ namespace graph::node {
         ForwardPbrFrame* frame = nullptr;
         const scene::Scene* scn = nullptr;
         const camera::Camera* cam = nullptr;
-        const std::vector<model::Model*>* seen_models = nullptr;
-        const std::vector<std::pair<light::Directional*, light::CascadeInfo*>>* directional_lights = nullptr;
+        const std::vector<model::Model*>* opaque_models = nullptr;
+        const std::map<core::Real, model::Model*>* transparent_models = nullptr;
+        const std::map<core::Real, std::map<light::Directional*, light::CascadeInfo*>>* directional_lights = nullptr;
 
         void record(
             const model::Model* m,
@@ -111,8 +112,9 @@ namespace graph::node {
 
         void set_scene(const scene::Scene* scn) noexcept;
         void set_camera(const camera::Camera* cam) noexcept;
-        void set_seen_models(const std::vector<model::Model*>* models) noexcept;
-        void set_directional_lights(const std::vector<std::pair<light::Directional*, light::CascadeInfo*>>* m) noexcept;
+        void set_opaque_models(const std::vector<model::Model*>* models) noexcept;
+        void set_transparent_models(const std::map<core::Real, model::Model*>* models) noexcept;
+        void set_directional_lights(const std::map<core::Real, std::map<light::Directional*, light::CascadeInfo*>>* m) noexcept;
         void record(unsigned int kernel_index) noexcept;
         /// This will be called at the end of each frame for pushing jobs to GPU
         void submit() noexcept final;

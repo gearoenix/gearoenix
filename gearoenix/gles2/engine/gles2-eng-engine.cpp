@@ -135,8 +135,10 @@ void gearoenix::gles2::engine::Engine::submit(
     const std::size_t,
     const render::sync::Semaphore* const* const) noexcept
 {
-    for (std::size_t i = 0; i < cmds_count; ++i)
-        dynamic_cast<const command::Buffer*>(cmds[i])->play();
+    for (std::size_t i = 0; i < cmds_count; ++i) {
+        auto _ = dynamic_cast<const command::Buffer*>(cmds[i])->play();
+        (void)_;
+    }
 }
 
 #endif

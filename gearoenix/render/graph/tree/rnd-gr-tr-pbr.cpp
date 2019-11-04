@@ -29,31 +29,45 @@ void gearoenix::render::graph::tree::Pbr::update() noexcept
     cascades.clear();
     fwd.refresh();
     nodes.clear();
-    const auto& visible_models = e->get_physics_engine()->get_visible_models();
-    for (const auto& scene_camera : visible_models) {
-        const scene::Scene* const scn = scene_camera.first;
-        auto& scene_nodes = nodes[std::make_pair(scn->get_layer(), scn)];
-        const auto& cameras_data = scene_camera.second;
-        for (const auto& camera_data : cameras_data) {
-            const camera::Camera* const cam = camera_data.first;
-            node::ForwardPbr* const n = fwd.get_next([this] {
-                auto* const n = new node::ForwardPbr(
-                    e,
-                    core::sync::EndCaller<core::sync::EndCallerIgnore>([] {}));
-                n->set_render_target(e->get_main_render_target());
-                return n;
-            });
-            scene_nodes[std::make_pair(cam->get_layer(), cam)] = n;
-
-            n->set_scene(scn);
-            n->set_camera(cam);
-            const auto& models_lights = camera_data.second;
-            const auto& lights = models_lights.second;
-            n->set_directional_lights(&lights);
-            n->set_seen_models(&models_lights.first);
-            n->update();
-            for (auto& lc : lights)
-                cascades.push_back(lc.second);
+    const auto& priorities_scenes = e->get_physics_engine()->get_visible_models().priority_ptr_scene;
+    for (const auto& priority_scenes : priorities_scenes) {
+        const core::Real scene_priority = priority_scenes.first;
+        auto& scene_priority_nodes = nodes[scene_priority];
+        const auto& scenes_priorities_cameras = priority_scenes.second;
+        for (const auto& scene_priorities_cameras : scenes_priorities_cameras) {
+            const scene::Scene* const scn = scene_priorities_cameras.first;
+            auto& scene_nodes = scene_priority_nodes[scn];
+            const auto& priorities_cameras = scene_priorities_cameras.second.priority_ptr_camera;
+            for (const auto& priority_cameras : priorities_cameras) {
+                const core::Real camera_priority = priority_cameras.first;
+                const auto& cameras_data = priority_cameras.second;
+                auto& camera_priority_nodes = scene_nodes[camera_priority];
+                for (const auto& camera_data : cameras_data) {
+                    const camera::Camera* const cam = camera_data.first;
+                    node::ForwardPbr* const n = fwd.get_next([this] {
+                        auto* const n = new node::ForwardPbr(
+                            e,
+                            core::sync::EndCaller<core::sync::EndCallerIgnore>([] {}));
+                        n->set_render_target(e->get_main_render_target());
+                        return n;
+                        });
+                    camera_priority_nodes[cam] = n;
+                    n->set_scene(scn);
+                    n->set_camera(cam);
+                    const auto& models_lights = camera_data.second;
+                    const auto& shadow_caster_directional_lights = models_lights.shadow_caster_directional_lights;
+                    n->set_directional_lights(&shadow_caster_directional_lights);
+                    n->set_opaque_models(&models_lights.opaque_container_models);
+                    n->set_transparent_models(&models_lights.transparent_container_models);
+                    n->update();
+                    for (const auto& priority_lights : shadow_caster_directional_lights) {
+                        const auto& lights = priority_lights.second;
+                        for (const auto& light_cascasdes : lights) {
+                            cascades.push_back(light_cascasdes.second);
+                        }
+                    }
+                }
+            }
         }
     }
 }
@@ -64,19 +78,30 @@ void gearoenix::render::graph::tree::Pbr::record(const unsigned int kernel_index
         cas->record(kernel_index);
     }
 
-    for (auto& scene_nodes : nodes) {
-        for (auto& n : scene_nodes.second) {
-            n.second->record(kernel_index);
+    for (auto& nnnn : nodes) {
+        for (auto& nnn : nnnn.second) {
+            for (auto& nn : nnn.second) {
+                for (auto& n : nn.second) {
+                    n.second->record(kernel_index);
+                }
+            }
         }
     }
 }
 
 void gearoenix::render::graph::tree::Pbr::submit() noexcept
 {
-    for (auto* cas : cascades)
+    for (auto* cas : cascades) {
         cas->submit();
+    }
 
-    for (auto& scene_nodes : nodes)
-        for (auto& n : scene_nodes.second)
-            n.second->submit();
+    for (auto& nnnn : nodes) {
+        for (auto& nnn : nnnn.second) {
+            for (auto& nn : nnn.second) {
+                for (auto& n : nn.second) {
+                    n.second->submit();
+                }
+            }
+        }
+    }
 }

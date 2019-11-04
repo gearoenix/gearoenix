@@ -31,8 +31,8 @@ void gearoenix::render::camera::Orthographic::update_cascades() noexcept
     const std::size_t sections_count = eng_conf.shadow_cascades_count;
     const auto sections_count_plus = sections_count + 1;
 
-    if (cascaded_shadow_frustum_partitions->size() != sections_count_plus)
-        cascaded_shadow_frustum_partitions->resize(sections_count_plus);
+    if (cascaded_shadow_frustum_partitions.size() != sections_count_plus)
+        cascaded_shadow_frustum_partitions.resize(sections_count_plus);
 
     const math::Vec3 x = uniform.x * aspects_size * uniform.aspect_ratio;
     const math::Vec3 y = uniform.y * aspects_size;
@@ -41,16 +41,16 @@ void gearoenix::render::camera::Orthographic::update_cascades() noexcept
     const math::Vec3 zmx = z - x;
     const math::Vec3 zpx = z + x;
 
-    (*cascaded_shadow_frustum_partitions)[0][0] = zmx - y;
-    (*cascaded_shadow_frustum_partitions)[0][1] = zpx - y;
-    (*cascaded_shadow_frustum_partitions)[0][2] = zpx + y;
-    (*cascaded_shadow_frustum_partitions)[0][3] = zmx + y;
+    cascaded_shadow_frustum_partitions[0][0] = zmx - y;
+    cascaded_shadow_frustum_partitions[0][1] = zpx - y;
+    cascaded_shadow_frustum_partitions[0][2] = zpx + y;
+    cascaded_shadow_frustum_partitions[0][3] = zmx + y;
 
     const math::Vec3 z_inc = uniform.z * (std::abs(uniform.far) - std::abs(uniform.near));
 
     for (std::size_t i = 1, j = 0; i < sections_count_plus; ++i, ++j)
         for (int k = 0; k < 4; ++k)
-            (*cascaded_shadow_frustum_partitions)[i][k] = (*cascaded_shadow_frustum_partitions)[j][k] + z_inc;
+            cascaded_shadow_frustum_partitions[i][k] = cascaded_shadow_frustum_partitions[j][k] + z_inc;
 }
 
 gearoenix::render::camera::Orthographic::Orthographic(

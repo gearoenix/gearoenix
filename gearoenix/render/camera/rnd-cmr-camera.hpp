@@ -52,7 +52,7 @@ namespace render {
         protected:
             engine::Engine* const e;
 
-            void initialize(engine::Engine* e) noexcept;
+            void initialize() noexcept;
 
             Camera(core::Id my_id, engine::Engine* e) noexcept;
             Camera(core::Id my_id, system::stream::Stream* f, engine::Engine* e) noexcept;

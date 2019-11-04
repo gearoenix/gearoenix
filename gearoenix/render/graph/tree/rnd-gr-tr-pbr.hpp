@@ -26,7 +26,7 @@ class Pbr : public Tree {
 private:
     bool in_weak_hardware = true;
     core::OneLoopPool<node::ForwardPbr> fwd;
-    std::map<std::pair<core::Real, const scene::Scene*>, std::map<std::pair<core::Real, const camera::Camera*>, node::ForwardPbr*>> nodes;
+    std::map<core::Real, std::map<const scene::Scene*, std::map<core::Real, std::map<const camera::Camera*, node::ForwardPbr*>>>> nodes;
     std::vector<light::CascadeInfo*> cascades;
 
 public:

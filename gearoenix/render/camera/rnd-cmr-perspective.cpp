@@ -25,8 +25,8 @@ void gearoenix::render::camera::Perspective::update_cascades() noexcept
     const system::Configuration& sys_conf = e->get_system_application()->get_configuration();
     const engine::Configuration& eng_conf = sys_conf.render_config;
     const std::size_t sections_count = eng_conf.shadow_cascades_count;
-    if (cascaded_shadow_frustum_partitions->size() != sections_count + 1)
-        cascaded_shadow_frustum_partitions->resize(sections_count + 1);
+    if (cascaded_shadow_frustum_partitions.size() != sections_count + 1)
+        cascaded_shadow_frustum_partitions.resize(sections_count + 1);
 
     const math::Vec3 xtanx = uniform.x * tanx;
     const math::Vec3 ytany = uniform.y * tany;
@@ -38,13 +38,13 @@ void gearoenix::render::camera::Perspective::update_cascades() noexcept
     math::Vec3 zmx;
     math::Vec3 zpx;
 
-#define GX_HELPER(index)                                       \
-    zmx = z - x;                                               \
-    zpx = z + x;                                               \
-    (*cascaded_shadow_frustum_partitions)[index][0] = zmx - y; \
-    (*cascaded_shadow_frustum_partitions)[index][1] = zpx - y; \
-    (*cascaded_shadow_frustum_partitions)[index][2] = zpx + y; \
-    (*cascaded_shadow_frustum_partitions)[index][3] = zmx + y
+#define GX_HELPER(index)                                    \
+    zmx = z - x;                                            \
+    zpx = z + x;                                            \
+    cascaded_shadow_frustum_partitions[index][0] = zmx - y; \
+    cascaded_shadow_frustum_partitions[index][1] = zpx - y; \
+    cascaded_shadow_frustum_partitions[index][2] = zpx + y; \
+    cascaded_shadow_frustum_partitions[index][3] = zmx + y
 
     GX_HELPER(0);
 

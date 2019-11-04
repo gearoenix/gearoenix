@@ -12,6 +12,7 @@
 #include "../system/sys-app.hpp"
 #include "accelerator/phs-acc-bvh.hpp"
 #include "animation/phs-anm-manager.hpp"
+#include "collider/phs-cld-frustum.hpp"
 #include <cmath>
 #include <functional>
 #include <utility>

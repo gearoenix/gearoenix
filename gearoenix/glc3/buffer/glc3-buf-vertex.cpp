@@ -10,7 +10,7 @@ gearoenix::glc3::buffer::Vertex::Vertex(
     const std::vector<math::BasicVertex>& vertices,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
-    : render::buffer::Static(vertices.size() * sizeof(math::BasicVertex), e)
+    : render::buffer::Static(static_cast<unsigned int>(vertices.size() * sizeof(math::BasicVertex)), e)
 {
     e->get_function_loader()->load([this, vertices, c] {
 #ifdef GX_DEBUG_GL_CLASS_3

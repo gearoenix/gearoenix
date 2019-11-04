@@ -19,7 +19,7 @@ gearoenix::render::engine::Engine::Engine(system::Application* const system_appl
     : engine_type(engine_type)
     , system_application(system_application)
     , function_loader(new core::FunctionLoader())
-    , kernels(new core::sync::KernelWorker())
+    , kernels(new core::sync::KernelWorkers())
     , physics_engine(new physics::Engine(system_application, kernels.get()))
 {
     kernels->add_step(
@@ -31,6 +31,7 @@ gearoenix::render::engine::Engine::Engine(system::Application* const system_appl
         [this](const unsigned int kernel_index) {
             render_tree->record(kernel_index);
         },
+        [] {},
         [this] {
             function_loader->unload();
             render_tree->submit();

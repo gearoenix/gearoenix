@@ -17,7 +17,7 @@ namespace core {
         class Event;
     }
     namespace sync {
-        class KernelWorker;
+        class KernelWorkers;
     }
 }
 namespace physics {
@@ -75,7 +75,7 @@ namespace render {
             GX_GET_CVAL_PRT(Type, engine_type)
             GX_GET_CPTR_PRT(system::Application, system_application)
             GX_GET_UPTR_PRT(core::FunctionLoader, function_loader)
-            GX_GET_UPTR_PRT(core::sync::KernelWorker, kernels)
+            GX_GET_UPTR_PRT(core::sync::KernelWorkers, kernels)
             GX_GET_UPTR_PRT(physics::Engine, physics_engine)
             GX_GET_UPTR_PRT(pipeline::Manager, pipeline_manager)
             GX_GET_UPTR_PRT(command::Manager, command_manager)

@@ -22,7 +22,7 @@
 
 
 
-void gearoenix::render::camera::Camera::initialize(engine::Engine* const e) noexcept
+void gearoenix::render::camera::Camera::initialize() noexcept
 {
     auto* const sys_app = e->get_system_application(); 
     uniform.aspect_ratio = sys_app->get_window_ratio(); 
@@ -34,7 +34,7 @@ void gearoenix::render::camera::Camera::initialize(engine::Engine* const e) noex
 gearoenix::render::camera::Camera::Camera(const core::Id my_id, engine::Engine* const e) noexcept
     : GX_CAMERA_INIT
 {
-    initialize(e);
+    initialize();
 }
 
 gearoenix::render::camera::Camera::Camera(
@@ -43,7 +43,7 @@ gearoenix::render::camera::Camera::Camera(
     engine::Engine* const e) noexcept
     : GX_CAMERA_INIT
 {
-    initialize(e);
+    initialize();
     uniform.position.read(f);
     math::Quat q;
     f->read(q.w);

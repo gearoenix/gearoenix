@@ -32,7 +32,7 @@ const unsigned int gearoenix::render::graph::node::ForwardPbr::BRDFLUT_INDEX = 3
 const unsigned int gearoenix::render::graph::node::ForwardPbr::SHADOW_MAP_000_INDEX = 4;
 
 gearoenix::render::graph::node::ForwardPbrUniform::ForwardPbrUniform(
-    const std::vector<std::pair<light::Directional*, light::CascadeInfo*>>* const directional_lights,
+    const std::map<core::Real, std::map<light::Directional*, light::CascadeInfo*>>* const directional_lights,
     const scene::Scene* const scn,
     const model::Model* const mdl) noexcept
 {
@@ -41,7 +41,7 @@ gearoenix::render::graph::node::ForwardPbrUniform::ForwardPbrUniform(
     const auto& lights = scn->get_lights();
     for (const auto& id_light : lights) {
         const auto& l = id_light.second;
-        if (light::Type::POINT == l->get_type()) {
+        if (light::Type::POINT == l->get_light_type()) {
             auto pl = reinterpret_cast<light::Point*>(l.get());
             if (l->is_in_light(mdl)) {
                 if (GX_COUNT_OF(point_lights_color_min_radius) <= lights_count) {
@@ -57,26 +57,28 @@ gearoenix::render::graph::node::ForwardPbrUniform::ForwardPbrUniform(
     point_lights_count = static_cast<core::Real>(lights_count);
     // Initializing directional lights
     lights_count = 0;
-    for (const auto& dir_cas : *directional_lights) {
-        auto dir = dir_cas.first;
-        auto cas = dir_cas.second;
-        const auto& data = cas->get_cascades_data();
-        const auto s = data.size();
-        shadow_caster_directional_lights_color_cascades_count[lights_count] = math::Vec4(dir->get_color(), static_cast<core::Real>(s) + 0.1f);
-        shadow_caster_directional_lights_direction[lights_count] = math::Vec4(dir->get_direction(), 0.0f);
-        for (std::size_t i = static_cast<std::size_t>(lights_count) * GX_MAX_SHADOW_CASCADES, j = 0; j < s; ++i, ++j) {
+    for (const auto& pri_dir_cas : *directional_lights) {
+        for (const auto& dir_cas : pri_dir_cas.second) {
+            auto dir = dir_cas.first;
+            auto cas = dir_cas.second;
+            const auto& data = cas->get_cascades_data();
+            const auto s = data.size();
+            shadow_caster_directional_lights_color_cascades_count[lights_count] = math::Vec4(dir->get_color(), static_cast<core::Real>(s) + 0.1f);
+            shadow_caster_directional_lights_direction[lights_count] = math::Vec4(dir->get_direction(), 0.0f);
+            for (std::size_t i = static_cast<std::size_t>(lights_count)* GX_MAX_SHADOW_CASCADES, j = 0; j < s; ++i, ++j) {
 #ifdef GX_USE_OPENGL
 #ifdef GX_USE_INSTEAD_OF_OPENGL
-            if (GX_RUNTIME_USE_OPENGL) {
+                if (GX_RUNTIME_USE_OPENGL) {
 #endif
-                shadow_caster_directional_lights_cascades_view_projections_bias[i] = data[i].view_projection_bias_gl;
+                    shadow_caster_directional_lights_cascades_view_projections_bias[i] = data[i].view_projection_bias_gl;
 #ifdef GX_USE_INSTEAD_OF_OPENGL
-                continue;
+                    continue;
+                }
+#endif
+#endif
             }
-#endif
-#endif
+            ++lights_count;
         }
-        ++lights_count;
     }
     shadow_caster_directional_lights_count = static_cast<core::Real>(lights_count);
 }
@@ -211,31 +213,38 @@ void gearoenix::render::graph::node::ForwardPbr::set_camera(const camera::Camera
     cam = c;
 }
 
-void gearoenix::render::graph::node::ForwardPbr::set_seen_models(const std::vector<model::Model*>* const ms) noexcept
+void gearoenix::render::graph::node::ForwardPbr::set_opaque_models(const std::vector<model::Model*>* const ms) noexcept
 {
-    seen_models = ms;
+    opaque_models = ms;
 }
 
-void gearoenix::render::graph::node::ForwardPbr::set_directional_lights(const std::vector<std::pair<light::Directional*, light::CascadeInfo*>>* const m) noexcept
+void gearoenix::render::graph::node::ForwardPbr::set_transparent_models(const std::map<core::Real, model::Model*>* const ms) noexcept
+{
+    transparent_models = ms;
+}
+
+void gearoenix::render::graph::node::ForwardPbr::set_directional_lights(const std::map<core::Real, std::map<light::Directional*, light::CascadeInfo*>>* const m) noexcept
 {
     directional_lights = m;
     unsigned int shadow_map_index = node::ForwardPbr::SHADOW_MAP_000_INDEX;
     int directional_light_index = 0;
-    for (const auto& light_cascades_info : *m) {
-        auto& cds = light_cascades_info.second->get_cascades_data();
-        int cascaded_inex = 0;
-        for (const light::CascadeInfo::PerCascade& c : cds) {
-            graph::node::ShadowMapper* const shm = c.shadow_mapper.get();
-            core::graph::Node::connect(shm, 0, this, shadow_map_index);
-            input_textures[shadow_map_index] = shm->get_output_texture(0).get();
-            ++cascaded_inex;
-            ++shadow_map_index;
+    for (const auto& priority_lights_cascades_info : *m) {
+        for (const auto& light_cascades_info : priority_lights_cascades_info.second) {
+            auto& cds = light_cascades_info.second->get_cascades_data();
+            int cascaded_inex = 0;
+            for (const light::CascadeInfo::PerCascade& c : cds) {
+                graph::node::ShadowMapper* const shm = c.shadow_mapper.get();
+                core::graph::Node::connect(shm, 0, this, shadow_map_index);
+                input_textures[shadow_map_index] = shm->get_output_texture(0).get();
+                ++cascaded_inex;
+                ++shadow_map_index;
+            }
+            for (; cascaded_inex < GX_MAX_SHADOW_CASCADES; ++cascaded_inex, ++shadow_map_index) {
+                clear_provider(shadow_map_index);
+                input_textures[shadow_map_index] = nullptr;
+            }
+            ++directional_light_index;
         }
-        for (; cascaded_inex < GX_MAX_SHADOW_CASCADES; ++cascaded_inex, ++shadow_map_index) {
-            clear_provider(shadow_map_index);
-            input_textures[shadow_map_index] = nullptr;
-        }
-        ++directional_light_index;
     }
     for (; directional_light_index < GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER; ++directional_light_index) {
         for (int cascaded_inex = 0; cascaded_inex < GX_MAX_SHADOW_CASCADES; ++cascaded_inex, ++shadow_map_index) {
@@ -259,7 +268,7 @@ void gearoenix::render::graph::node::ForwardPbr::record(const unsigned int kerne
         task_number %= kernels_count;      \
     }
 
-    for (auto* m : *seen_models) {
+    for (auto* m : *opaque_models) {
         GX_DO_TASK(record(m, kernel_index))
     }
 
