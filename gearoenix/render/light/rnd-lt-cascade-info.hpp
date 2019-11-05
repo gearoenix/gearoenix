@@ -5,12 +5,17 @@
 #include "../../math/math-aabb.hpp"
 #include "../../math/math-matrix.hpp"
 #include "../../math/math-vector.hpp"
+#include "../../physics/collider/phs-cld-collider.hpp"
 #include <array>
 #include <memory>
 #include <vector>
 
 namespace gearoenix::physics::accelerator {
 class Bvh;
+}
+
+namespace gearoenix::physics::collider {
+class Frustum;
 }
 
 namespace gearoenix::render {
@@ -44,7 +49,7 @@ namespace light {
             math::Mat4x4 view_projection_gl;
             math::Mat4x4 view_projection_bias_gl;
 #endif
-            math::Aabb3 limit_box;
+            std::unique_ptr<physics::collider::Frustum> collider;
             math::Aabb3 max_box;
             math::Aabb3 intersection_box;
             std::unique_ptr<graph::node::ShadowMapper> shadow_mapper;
@@ -62,20 +67,16 @@ namespace light {
         };
         struct PerKernel {
             engine::Engine* e = nullptr;
-            const math::Mat4x4* zero_located_view = nullptr;
             const core::OneLoopPool<PerCascade>* per_cascade = nullptr;
             std::vector<RenderData> render_data;
             /// Per cascade
             std::vector<math::Aabb3> seen_boxes;
-            void shadow(const model::Model* m) noexcept;
+            void shadow(const physics::collider::Collider* cld) noexcept;
             void record(std::size_t kernel_index) noexcept;
         };
         struct PerFrame {
-            /// Accumulate shadow
-            /// TODO: place then in a new node structure
             std::unique_ptr<command::Buffer> shadow_accumulator_secondary_command;
             std::unique_ptr<command::Buffer> shadow_accumulator_primary_command;
-            std::shared_ptr<sync::Semaphore> shadow_accumulator_semaphore;
 
             void init(engine::Engine* e);
             void start() noexcept;

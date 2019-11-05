@@ -50,7 +50,7 @@ void gearoenix::render::graph::tree::Pbr::update() noexcept
                             core::sync::EndCaller<core::sync::EndCallerIgnore>([] {}));
                         n->set_render_target(e->get_main_render_target());
                         return n;
-                        });
+                    });
                     camera_priority_nodes[cam] = n;
                     n->set_scene(scn);
                     n->set_camera(cam);

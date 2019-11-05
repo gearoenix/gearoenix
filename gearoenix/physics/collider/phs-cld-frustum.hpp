@@ -6,6 +6,7 @@ namespace gearoenix::physics::collider {
 class Frustum : public Collider {
 public:
     GX_GETSET_CREF_PRV(math::Mat4x4, view_projection)
+    GX_GET_REF_PRV(math::Aabb3, limit)
 public:
     Frustum() noexcept;
     ~Frustum() noexcept final;

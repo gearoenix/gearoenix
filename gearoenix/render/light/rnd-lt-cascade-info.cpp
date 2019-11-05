@@ -2,6 +2,7 @@
 #include "../../core/sync/cr-sync-kernel-workers.hpp"
 #include "../../math/math-sphere.hpp"
 #include "../../physics/accelerator/phs-acc-bvh.hpp"
+#include "../../physics/collider/phs-cld-frustum.hpp"
 #include "../../system/sys-app.hpp"
 #include "../buffer/rnd-buf-manager.hpp"
 #include "../buffer/rnd-buf-uniform.hpp"
@@ -23,7 +24,7 @@ gearoenix::render::light::CascadeInfo::PerCascade::~PerCascade() noexcept
     shadow_mapper = nullptr;
 }
 
-void gearoenix::render::light::CascadeInfo::PerKernel::shadow(const model::Model* const m) noexcept
+void gearoenix::render::light::CascadeInfo::PerKernel::shadow(const physics::collider::Collider* const cld) noexcept
 {
     GXTODO; // object visibility
     //const math::Sphere& ms = m->get_occlusion_sphere();
@@ -62,12 +63,10 @@ void gearoenix::render::light::CascadeInfo::PerFrame::init(engine::Engine* const
     auto* cmd_mgr = eng->get_command_manager();
     shadow_accumulator_secondary_command = std::unique_ptr<command::Buffer>(cmd_mgr->create_secondary_command_buffer());
     shadow_accumulator_primary_command = std::unique_ptr<command::Buffer>(cmd_mgr->create_primary_command_buffer());
-    shadow_accumulator_semaphore = eng->create_semaphore();
 }
 
 void gearoenix::render::light::CascadeInfo::PerFrame::start() noexcept
 {
-    /// TODO: these must move to new node structure for shadow accumulation
     shadow_accumulator_secondary_command->begin();
     shadow_accumulator_primary_command->begin();
 }
@@ -86,7 +85,6 @@ gearoenix::render::light::CascadeInfo::CascadeInfo(engine::Engine* const e) noex
         k.e = e;
         k.per_cascade = &per_cascade;
         k.seen_boxes.resize(cascades_count);
-        k.zero_located_view = &zero_located_view;
     }
 }
 
@@ -115,7 +113,8 @@ void gearoenix::render::light::CascadeInfo::update(const math::Mat4x4& m, const 
     for (std::size_t i = 0; i < ss; ++i) {
         auto* c = per_cascade.get_next([this] { return new PerCascade(e); });
         c->intersection_box.reset();
-        c->limit_box.reset();
+        c->collider->get_limit().reset();
+        c->collider->set_view_projection(m);
         c->max_box.reset();
     }
     for (auto& k : kernels) {
@@ -126,22 +125,24 @@ void gearoenix::render::light::CascadeInfo::update(const math::Mat4x4& m, const 
         k.render_data.clear();
     }
     for (const auto& v : p[0]) {
-        per_cascade[0].limit_box.put(zero_located_view * v);
+        per_cascade[0].collider->get_limit().put(zero_located_view * v);
     }
     for (std::size_t i = 1, j = 0; i < ss; ++i, ++j) {
         for (const auto& v : p[i]) {
             const auto vv = zero_located_view * v;
-            per_cascade[i].limit_box.put(vv);
-            per_cascade[j].limit_box.put(vv);
+            per_cascade[i].collider->get_limit().put(vv);
+            per_cascade[j].collider->get_limit().put(vv);
         }
     }
     for (const auto& v : p[ss]) {
-        per_cascade[sss].limit_box.put(zero_located_view * v);
+        per_cascade[sss].collider->get_limit().put(zero_located_view * v);
     }
     for (auto& c : per_cascade) {
-        gearoenix::math::Vec3 v = c.limit_box.get_upper();
-        v[2] = -std::numeric_limits<gearoenix::core::Real>::max();
-        c.limit_box.put(v);
+        math::Vec3 v = c.collider->get_limit().get_upper();
+        GXTODO // some doubt about it
+            v[2]
+            = std::numeric_limits<core::Real>::max();
+        c.collider->get_limit().put(v);
     }
 }
 
@@ -152,7 +153,11 @@ void gearoenix::render::light::CascadeInfo::start() noexcept
 
 void gearoenix::render::light::CascadeInfo::shadow(const physics::accelerator::Bvh* bvh, const std::size_t kernel_index) noexcept
 {
-    kernels[kernel_index].shadow(m);
+    for (PerCascade& percas : per_cascade) {
+        bvh->call_on_intersecting(percas.collider.get(), [this, kernel_index](physics::collider::Collider* cld) {
+            kernels[kernel_index].shadow(cld);
+        });
+    }
 }
 
 void gearoenix::render::light::CascadeInfo::shrink() noexcept
@@ -166,7 +171,7 @@ void gearoenix::render::light::CascadeInfo::shrink() noexcept
     }
     for (auto& cas : per_cascade) {
         cas.shadow_mapper->update();
-        cas.max_box.check_intersection(cas.limit_box, cas.intersection_box);
+        (void)cas.max_box.check_intersection(cas.collider->get_limit(), cas.intersection_box);
         const auto& mx = cas.intersection_box.get_upper();
         const auto& mn = cas.intersection_box.get_lower();
         const auto c = (mx + mn) * 0.5f;

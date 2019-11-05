@@ -65,7 +65,7 @@ gearoenix::render::graph::node::ForwardPbrUniform::ForwardPbrUniform(
             const auto s = data.size();
             shadow_caster_directional_lights_color_cascades_count[lights_count] = math::Vec4(dir->get_color(), static_cast<core::Real>(s) + 0.1f);
             shadow_caster_directional_lights_direction[lights_count] = math::Vec4(dir->get_direction(), 0.0f);
-            for (std::size_t i = static_cast<std::size_t>(lights_count)* GX_MAX_SHADOW_CASCADES, j = 0; j < s; ++i, ++j) {
+            for (std::size_t i = static_cast<std::size_t>(lights_count) * GX_MAX_SHADOW_CASCADES, j = 0; j < s; ++i, ++j) {
 #ifdef GX_USE_OPENGL
 #ifdef GX_USE_INSTEAD_OF_OPENGL
                 if (GX_RUNTIME_USE_OPENGL) {

@@ -31,7 +31,7 @@ gearoenix::physics::animation::Manager::Manager(core::sync::KernelWorkers* const
                     })
             }
         },
-            []() {},
+        []() {},
         [this]() noexcept {
             for (const auto& k : kernels) {
                 for (const auto& a : k.deleted_animations) {

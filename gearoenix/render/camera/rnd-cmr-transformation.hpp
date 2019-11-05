@@ -5,8 +5,8 @@
 #include <vector>
 
 namespace gearoenix::physics::collider {
-    class Collider;
-    class Frustum;
+class Collider;
+class Frustum;
 }
 
 namespace gearoenix::render::camera {

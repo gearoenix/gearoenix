@@ -1,10 +1,9 @@
 #include "phs-cld-frustum.hpp"
 #include "../../system/sys-log.hpp"
 
-static const gearoenix::math::Aabb3 HOMOGEN_BOX(gearoenix::math::Vec3(1.0f), gearoenix::math::Vec3(-1.0f));
-
 gearoenix::physics::collider::Frustum::Frustum() noexcept
     : Collider(Type::Frustum)
+    , limit(math::Vec3(1.0f), math::Vec3(-1.0f))
 {
 }
 
@@ -25,13 +24,13 @@ bool gearoenix::physics::collider::Frustum::check_intersection(const math::Aabb3
     proj_box.put(view_projection* cs[i])
 
     GX_MAP_AABB_POINTS;
-    return HOMOGEN_BOX.check_intersection(proj_box);
+    return limit.check_intersection(proj_box);
 }
 
 gearoenix::math::IntersectionStatus gearoenix::physics::collider::Frustum::check_intersection_status(const math::Aabb3& box) const noexcept
 {
     GX_MAP_AABB_POINTS;
-    return HOMOGEN_BOX.check_intersection_status(proj_box);
+    return limit.check_intersection_status(proj_box);
 }
 
 const gearoenix::math::Vec3& gearoenix::physics::collider::Frustum::get_location() const noexcept

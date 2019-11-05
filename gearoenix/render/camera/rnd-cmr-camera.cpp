@@ -13,21 +13,14 @@
 #include "rnd-cmr-transformation.hpp"
 
 #define GX_CAMERA_INIT \
-    core::asset::Asset(my_id, core::asset::Type::Camera) \
-    , frustum_collider(new physics::collider::Frustum()) \
-    , uniform_buffers(new buffer::FramedUniform(sizeof(Uniform), e)) \
-    , cascaded_shadow_frustum_partitions(static_cast<std::size_t>(e->get_system_application()->get_configuration().render_config.shadow_cascades_count) + 1) \
-    , transformation(new Transformation(&uniform, frustum_collider.get(), &cascaded_shadow_frustum_partitions)) \
-    , e(e)
-
-
+    core::asset::Asset(my_id, core::asset::Type::Camera), frustum_collider(new physics::collider::Frustum()), uniform_buffers(new buffer::FramedUniform(sizeof(Uniform), e)), cascaded_shadow_frustum_partitions(static_cast<std::size_t>(e->get_system_application()->get_configuration().render_config.shadow_cascades_count) + 1), transformation(new Transformation(&uniform, frustum_collider.get(), &cascaded_shadow_frustum_partitions)), e(e)
 
 void gearoenix::render::camera::Camera::initialize() noexcept
 {
-    auto* const sys_app = e->get_system_application(); 
-    uniform.aspect_ratio = sys_app->get_window_ratio(); 
-    uniform.clip_width = static_cast<core::Real>(sys_app->get_window_width()); 
-    uniform.clip_height = static_cast<core::Real>(sys_app->get_window_height()); 
+    auto* const sys_app = e->get_system_application();
+    uniform.aspect_ratio = sys_app->get_window_ratio();
+    uniform.clip_width = static_cast<core::Real>(sys_app->get_window_width());
+    uniform.clip_height = static_cast<core::Real>(sys_app->get_window_height());
     sys_app->get_event_engine()->add_listner(core::event::Id::SystemWindowSizeChange, 1.0f, this);
 }
 
