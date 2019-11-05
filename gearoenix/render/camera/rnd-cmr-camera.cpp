@@ -60,7 +60,7 @@ gearoenix::render::camera::Camera::Camera(
     GXLOGD("Position: " << uniform.position)
     GXLOGD("Quaternion: " << q)
     GXLOGD("Near: " << uniform.near)
-    transformation->update_location();
+    reinterpret_cast<Transformation*>(transformation.get())->update_location();
 }
 
 gearoenix::render::camera::Camera::~Camera() noexcept
@@ -71,7 +71,7 @@ gearoenix::render::camera::Camera::~Camera() noexcept
 void gearoenix::render::camera::Camera::set_far(const core::Real f) noexcept
 {
     uniform.far = -f;
-    transformation->update_projection();
+    reinterpret_cast<Transformation*>(transformation.get())->update_projection();
 }
 
 void gearoenix::render::camera::Camera::update_uniform()

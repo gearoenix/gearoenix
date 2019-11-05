@@ -17,7 +17,7 @@ void gearoenix::render::camera::Perspective::update_fovy() noexcept
     lambda = static_cast<core::Real>(
                  std::sin(static_cast<double>(fovx) * 0.5) + std::sin(static_cast<double>(fovy) * 0.5))
         * 0.5f;
-    transformation->update_view_projection();
+    reinterpret_cast<Transformation*>(transformation.get())->update_view_projection();
 }
 
 void gearoenix::render::camera::Perspective::update_cascades() noexcept
@@ -109,8 +109,8 @@ gearoenix::render::camera::Perspective::Perspective(
     engine::Engine* const e) noexcept
     : Camera(my_id, f, e)
 {
-    transformation->set_on_frustum_update([this] { update_cascades(); });
-    transformation->set_on_projection_update([this] { update_projection(); });
+    reinterpret_cast<Transformation*>(transformation.get())->set_on_frustum_update([this] { update_cascades(); });
+    reinterpret_cast<Transformation*>(transformation.get())->set_on_projection_update([this] { update_projection(); });
     const auto rad = f->read<core::Real>();
     GXLOGD("Radiant is: " << rad << ", in perspective camera with id: " << my_id)
     set_field_of_view(rad);
@@ -121,8 +121,8 @@ gearoenix::render::camera::Perspective::Perspective(
     engine::Engine* const e) noexcept
     : Camera(my_id, e)
 {
-    transformation->set_on_frustum_update([this] { update_cascades(); });
-    transformation->set_on_projection_update([this] { update_projection(); });
+    reinterpret_cast<Transformation*>(transformation.get())->set_on_frustum_update([this] { update_cascades(); });
+    reinterpret_cast<Transformation*>(transformation.get())->set_on_projection_update([this] { update_projection(); });
     set_field_of_view(1.571f);
 }
 

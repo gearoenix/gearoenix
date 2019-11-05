@@ -37,7 +37,6 @@ namespace render {
         class Engine;
     }
     namespace camera {
-        class Transformation;
         class Camera : public core::asset::Asset, public core::event::Listner {
         public:
             typedef std::array<math::Vec3, 4> Partition;
@@ -47,7 +46,7 @@ namespace render {
             GX_GET_UPTR_PRT(buffer::FramedUniform, uniform_buffers)
             GX_GET_CREF_PRT(std::vector<Partition>, cascaded_shadow_frustum_partitions)
             GX_GET_CREF_PRT(Uniform, uniform)
-            GX_GET_UPTR_PRT(Transformation, transformation)
+            GX_GET_UPTR_PRT(physics::Transformation, transformation)
             GX_GETSET_VAL_PRT(bool, enabled, true)
         protected:
             engine::Engine* const e;

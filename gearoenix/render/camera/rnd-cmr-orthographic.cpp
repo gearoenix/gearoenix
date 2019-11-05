@@ -21,7 +21,7 @@ void gearoenix::render::camera::Orthographic::update_aspects_size() noexcept
                                      0.0f, 0.0f, 1.0f, 0.0f,
                                      0.5f, 0.5f, 0.0f, 1.0f)
         * uniform.projection;
-    transformation->update_view_projection();
+    reinterpret_cast<Transformation*>(transformation.get())->update_view_projection();
 }
 
 void gearoenix::render::camera::Orthographic::update_cascades() noexcept
@@ -59,7 +59,7 @@ gearoenix::render::camera::Orthographic::Orthographic(
     engine::Engine* const e) noexcept
     : Camera(my_id, f, e)
 {
-    transformation->set_on_frustum_update([this] { update_cascades(); });
+    reinterpret_cast<Transformation*>(transformation.get())->set_on_frustum_update([this] { update_cascades(); });
     f->read(aspects_size);
     GXLOGD("Aspect size is: " << aspects_size << ", in orthographic camera with id: " << my_id)
     update_aspects_size();
@@ -69,7 +69,7 @@ gearoenix::render::camera::Orthographic::Orthographic(core::Id my_id, engine::En
     : Camera(my_id, e)
     , aspects_size(1.0f)
 {
-    transformation->set_on_frustum_update([this] { update_cascades(); });
+    reinterpret_cast<Transformation*>(transformation.get())->set_on_frustum_update([this] { update_cascades(); });
     update_aspects_size();
 }
 
