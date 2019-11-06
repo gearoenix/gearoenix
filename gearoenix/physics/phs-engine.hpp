@@ -46,7 +46,7 @@ namespace physics {
         struct PooledShadowCasterDirectionalLights {
             render::light::Directional* light = nullptr;
             std::unique_ptr<render::light::CascadeInfo> cascades_info;
-            PooledShadowCasterDirectionalLights(render::engine::Engine* eng) noexcept;
+            explicit PooledShadowCasterDirectionalLights(render::engine::Engine* eng) noexcept;
             ~PooledShadowCasterDirectionalLights() noexcept;
         };
 

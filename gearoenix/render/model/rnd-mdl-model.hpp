@@ -36,7 +36,7 @@ namespace model {
         GX_GET_UPTR_PRT(physics::collider::Collider, collider)
         GX_GET_UPTR_PRT(physics::Transformation, transformation)
         GX_GET_UCPTR_PRT(buffer::FramedUniform, uniform_buffers)
-        GX_GET_VAL_PRT(core::State, shadowing, core::State::Unset)
+        GX_GET_VAL_PRT(bool, has_shadow_caster, true)
         GX_GET_VAL_PRT(core::State, transparency, core::State::Unset)
         GX_GET_VAL_PRT(core::State, enability, core::State::Set)
         GX_GET_CREF_PRT(MapMesh, meshes)

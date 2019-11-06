@@ -64,7 +64,6 @@ void gearoenix::physics::Engine::update_visibility_kernel(const unsigned int ker
         const accelerator::Bvh* const dynamic_accelerator = scene->get_static_accelerator();
         const accelerator::Bvh* const static_accelerator = scene->get_static_accelerator();
         const std::map<core::Id, std::shared_ptr<render::camera::Camera>>& cameras = scene->get_cameras();
-        const std::map<core::Id, std::shared_ptr<render::model::Model>>& models = scene->get_models();
         const std::map<core::Id, std::shared_ptr<render::light::Light>>& lights = scene->get_lights();
         for (const std::pair<const core::Id, std::shared_ptr<render::camera::Camera>>& id_camera : cameras) {
             render::camera::Camera* const camera = id_camera.second.get();
@@ -144,6 +143,7 @@ void gearoenix::physics::Engine::update_visibility_receiver() noexcept
 
 void gearoenix::physics::Engine::update_shadower_kernel(const unsigned int kernel_index) noexcept
 {
+    // TODO: I'm not happy with this part it can be much much better, but for this milestone it is ok
     GX_START_TASKS;
     for (auto& priority_scenes_data : scenes_camera_data.priority_ptr_scene) {
         auto& scenes_data = priority_scenes_data.second;
@@ -159,7 +159,7 @@ void gearoenix::physics::Engine::update_shadower_kernel(const unsigned int kerne
                     for (auto& priority_lights_data : priorities_lights_data) {
                         auto& lights_data = priority_lights_data.second;
                         for (auto& lc : lights_data) {
-                            auto* cas = lc.second;
+                            auto* const cas = lc.second;
                             GX_DO_TASK(cas->shadow(static_accelerator, kernel_index););
                             GX_DO_TASK(cas->shadow(dynamic_accelerator, kernel_index););
                         }

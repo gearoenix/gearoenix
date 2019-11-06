@@ -177,10 +177,10 @@ gearoenix::math::IntersectionStatus gearoenix::math::Aabb3::check_intersection_s
 
 void gearoenix::math::Aabb3::set_center(const Vec3& c) noexcept
 {
+    Vec3 t = c - center;
     center = c;
-    const Vec3 r = diameter * 0.5f;
-    upper = center + r;
-    lower = center - r;
+    upper += t;
+    lower += t;
 }
 
 void gearoenix::math::Aabb3::set_diameter(const Vec3& d) noexcept

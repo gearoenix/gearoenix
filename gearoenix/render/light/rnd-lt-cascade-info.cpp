@@ -24,21 +24,18 @@ gearoenix::render::light::CascadeInfo::PerCascade::~PerCascade() noexcept
     shadow_mapper = nullptr;
 }
 
-void gearoenix::render::light::CascadeInfo::PerKernel::shadow(const physics::collider::Collider* const cld) noexcept
+void gearoenix::render::light::CascadeInfo::PerKernel::shadow(const physics::collider::Collider* const cld, const std::size_t cascade_index) noexcept
 {
-    GXTODO; // object visibility
-    //const math::Sphere& ms = m->get_occlusion_sphere();
-    //const math::Sphere s((*zero_located_view) * ms.get_center(), ms.get_radius());
-    const std::size_t cascades_count = seen_boxes.size();
-    for (std::size_t i = 0; i < cascades_count; ++i) {
-        //        if ((*per_cascade)[i].limit_box.test(s)) {
-        //            seen_boxes[i].put(s);
-        //            gearoenix::render::light::CascadeInfo::RenderData r;
-        //            r.i = i;
-        //            r.m = m;
-        //            render_data.push_back(r);
-        //        }
-    }
+    const model::Model *const m = cld->get_parent();
+    if(!m->get_has_shadow_caster()) return;
+    // Be careful, the models should update the collider box
+    math::Aabb3 box = cld->get_updated_box();
+    box.set_center((*per_cascade)[0].collider->get_view_projection() * box.get_center());
+    seen_boxes[cascade_index].put(box);
+    RenderData r;
+    r.i = cascade_index;
+    r.m = m;
+    render_data.push_back(r);
 }
 
 void gearoenix::render::light::CascadeInfo::PerKernel::record(const std::size_t kernel_index) noexcept
@@ -153,9 +150,10 @@ void gearoenix::render::light::CascadeInfo::start() noexcept
 
 void gearoenix::render::light::CascadeInfo::shadow(const physics::accelerator::Bvh* bvh, const std::size_t kernel_index) noexcept
 {
-    for (PerCascade& percas : per_cascade) {
-        bvh->call_on_intersecting(percas.collider.get(), [this, kernel_index](physics::collider::Collider* cld) {
-            kernels[kernel_index].shadow(cld);
+    const std::size_t cascades_count = per_cascade.size();
+    for (std::size_t i = 0; i < cascades_count; ++i) {
+        bvh->call_on_intersecting(per_cascade[i].collider.get(), [this, i, kernel_index](physics::collider::Collider* cld) {
+            kernels[kernel_index].shadow(cld, i);
         });
     }
 }

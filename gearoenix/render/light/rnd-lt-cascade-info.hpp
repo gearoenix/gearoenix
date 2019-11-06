@@ -5,7 +5,6 @@
 #include "../../math/math-aabb.hpp"
 #include "../../math/math-matrix.hpp"
 #include "../../math/math-vector.hpp"
-#include "../../physics/collider/phs-cld-collider.hpp"
 #include <array>
 #include <memory>
 #include <vector>
@@ -15,6 +14,7 @@ class Bvh;
 }
 
 namespace gearoenix::physics::collider {
+    class Collider;
 class Frustum;
 }
 
@@ -71,7 +71,7 @@ namespace light {
             std::vector<RenderData> render_data;
             /// Per cascade
             std::vector<math::Aabb3> seen_boxes;
-            void shadow(const physics::collider::Collider* cld) noexcept;
+            void shadow(const physics::collider::Collider* cld, std::size_t cascade_index) noexcept;
             void record(std::size_t kernel_index) noexcept;
         };
         struct PerFrame {
