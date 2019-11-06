@@ -15,7 +15,7 @@ gearoenix::render::model::Manager::Manager(std::unique_ptr<system::stream::Strea
 std::shared_ptr<gearoenix::render::model::Model> gearoenix::render::model::Manager::get_gx3d(const core::Id id, core::sync::EndCaller<Model>& c) noexcept
 {
     std::shared_ptr<Model> m = cache.get<Model>(
-        id, [ id, c, this ]() noexcept->std::shared_ptr<Model> {
+        id, [id, c, this]() noexcept -> std::shared_ptr<Model> {
             system::stream::Stream* const f = cache.get_file();
             const auto t = f->read<Type>();
             const core::sync::EndCaller<core::sync::EndCallerIgnore> call([c] {});

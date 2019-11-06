@@ -13,7 +13,7 @@ gearoenix::render::camera::Manager::Manager(std::unique_ptr<system::stream::Stre
 std::shared_ptr<gearoenix::render::camera::Camera> gearoenix::render::camera::Manager::get_gx3d(const core::Id id, core::sync::EndCaller<Camera>& call) noexcept
 {
     std::shared_ptr<Camera> data = cache.get<Camera>(
-        id, [ this, id, call ]() noexcept->std::shared_ptr<Camera> {
+        id, [this, id, call]() noexcept -> std::shared_ptr<Camera> {
             system::stream::Stream* const file = cache.get_file();
             const auto t = file->read<core::TypeId>();
             switch (t) {

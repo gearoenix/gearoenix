@@ -14,7 +14,7 @@ class Bvh;
 }
 
 namespace gearoenix::physics::collider {
-    class Collider;
+class Collider;
 class Frustum;
 }
 

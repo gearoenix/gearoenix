@@ -40,13 +40,11 @@ gearoenix::render::scene::Ui::Ui(const core::Id my_id, engine::Engine* e, const 
 bool gearoenix::render::scene::Ui::on_event(const core::event::Data& d) noexcept
 {
     auto find_hited_widgets = [this](
-        const core::Real x,
-        const core::Real y,
-        const std::function<void(widget::Widget* const, const math::Vec3&)>& f1,
-        const std::function<void(widget::Widget* const, const math::Vec3&, const std::vector<model::Model*>&)>& f2,
-        const std::function<void()>& f3) noexcept
-    {
-
+                                  const core::Real x,
+                                  const core::Real y,
+                                  const std::function<void(widget::Widget* const, const math::Vec3&)>& f1,
+                                  const std::function<void(widget::Widget* const, const math::Vec3&, const std::vector<model::Model*>&)>& f2,
+                                  const std::function<void()>& f3) noexcept {
         const auto ray = cameras.begin()->second->create_ray3(x, y);
         auto h = hit(ray, std::numeric_limits<gearoenix::core::Real>::max());
         if (h.has_value()) {

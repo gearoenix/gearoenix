@@ -16,7 +16,7 @@ gearoenix::render::font::Manager::Manager(std::unique_ptr<system::stream::Stream
 std::shared_ptr<gearoenix::render::font::Font> gearoenix::render::font::Manager::get(const core::Id id, core::sync::EndCaller<Font> c) noexcept
 {
     const auto f = cache.get<Font>(
-        id, [ id, c, this ]() noexcept->std::shared_ptr<Font> {
+        id, [id, c, this]() noexcept -> std::shared_ptr<Font> {
             system::stream::Stream* f = cache.get_file();
             const core::sync::EndCaller<core::sync::EndCallerIgnore> call([c] {});
             switch (f->read<Type::Id>()) {

@@ -26,8 +26,9 @@ gearoenix::render::light::CascadeInfo::PerCascade::~PerCascade() noexcept
 
 void gearoenix::render::light::CascadeInfo::PerKernel::shadow(const physics::collider::Collider* const cld, const std::size_t cascade_index) noexcept
 {
-    const model::Model *const m = cld->get_parent();
-    if(!m->get_has_shadow_caster()) return;
+    const model::Model* const m = cld->get_parent();
+    if (!m->get_has_shadow_caster())
+        return;
     // Be careful, the models should update the collider box
     math::Aabb3 box = cld->get_updated_box();
     box.set_center((*per_cascade)[0].collider->get_view_projection() * box.get_center());

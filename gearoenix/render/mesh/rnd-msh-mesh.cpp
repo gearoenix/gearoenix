@@ -30,7 +30,7 @@ gearoenix::render::mesh::Mesh::Mesh(
     std::vector<std::uint32_t> indices;
     f->read(indices);
     GXTODO // make sure the blender plugin implemented this
-    box.read(f);
+        box.read(f);
     set_vertices(e, vertices, indices, box, c);
 }
 

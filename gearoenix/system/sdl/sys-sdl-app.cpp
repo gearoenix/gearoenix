@@ -154,8 +154,7 @@ int gearoenix::system::Application::on_event(SDL_Event* const e) noexcept
     case SDL_KEYDOWN:
     case SDL_KEYUP: {
         core::event::button::KeyboardData d;
-        d.action = [&]() noexcept
-        {
+        d.action = [&]() noexcept {
             switch (e->type) {
             case SDL_KEYUP:
                 return core::event::button::KeyboardActionId::Release;
@@ -164,10 +163,8 @@ int gearoenix::system::Application::on_event(SDL_Event* const e) noexcept
             default:
                 return core::event::button::KeyboardActionId::Press;
             }
-        }
-        ();
-        d.key = [&]() noexcept
-        {
+        }();
+        d.key = [&]() noexcept {
             switch (e->key.keysym.sym) {
             case SDLK_LEFT:
                 return core::event::button::KeyboardKeyId::Left;
@@ -183,8 +180,7 @@ int gearoenix::system::Application::on_event(SDL_Event* const e) noexcept
                 GXLOGE("Unhandled mouse button, left button returned instead.")
                 return core::event::button::KeyboardKeyId::Escape;
             }
-        }
-        ();
+        }();
         event.source = core::event::Id::ButtonKeyboard;
         event.data = d;
         break;

@@ -45,7 +45,7 @@ void gearoenix::render::widget::Button::selected(const math::Vec3&) noexcept
     auto myfun = core::sync::EndCaller<model::Model>([](const std::shared_ptr<model::Model>&) {});
     auto myself = e->get_system_application()->get_asset_manager()->get_model_manager()->get_gx3d(asset_id, myfun);
     const auto a = std::make_shared<physics::animation::Animation>(
-        [ this, myself ](const core::Real from_start, const core::Real) noexcept {
+        [this, myself](const core::Real from_start, const core::Real) noexcept {
             const auto s = 1.0f - (1.0f - PRESSED_SIZE) * (from_start / ANIMATION_DURATION);
             transformation->local_scale(s / current_scale.exchange(s));
         },
@@ -64,7 +64,7 @@ void gearoenix::render::widget::Button::select_cancelled() noexcept
     auto myfun = core::sync::EndCaller<model::Model>([](const std::shared_ptr<model::Model>&) {});
     auto myself = e->get_system_application()->get_asset_manager()->get_model_manager()->get_gx3d(asset_id, myfun);
     const auto a = std::make_shared<physics::animation::Animation>(
-        [ this, myself ](const core::Real from_start, const core::Real) noexcept {
+        [this, myself](const core::Real from_start, const core::Real) noexcept {
             const auto s = PRESSED_SIZE + (1.0f - PRESSED_SIZE) * (from_start / ANIMATION_DURATION);
             transformation->local_scale(s / current_scale.exchange(s));
         },

@@ -15,10 +15,10 @@ gearoenix::render::scene::Manager::Manager(std::unique_ptr<system::stream::Strea
 void gearoenix::render::scene::Manager::get_gx3d(const core::Id mid, core::sync::EndCaller<Scene> c) noexcept
 {
     GXLOGD("Going to load scene with id: " << mid)
-    io_worker->push([ mid, c, this ]() mutable noexcept {
+    io_worker->push([mid, c, this]() mutable noexcept {
         GXLOGD("In IO thread, loading scene with id: " << mid)
         c.set_data(cache.get<Scene>(
-            mid, [ mid, c, this ]() noexcept->std::shared_ptr<Scene> {
+            mid, [mid, c, this]() noexcept -> std::shared_ptr<Scene> {
                 GXLOGD("Scene with id: " << mid << " is not cached, it is going to be imported.")
                 system::stream::Stream* const file = cache.get_file();
                 const core::sync::EndCaller<core::sync::EndCallerIgnore> call([c] {});

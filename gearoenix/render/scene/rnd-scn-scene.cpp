@@ -147,8 +147,7 @@ const std::shared_ptr<gearoenix::render::light::Light>& gearoenix::render::scene
 
 void gearoenix::render::scene::Scene::add_model(const std::shared_ptr<model::Model>& m) noexcept
 {
-    std::function<void(const std::shared_ptr<model::Model>&)> travm = [&travm, this ](const std::shared_ptr<model::Model>& mdl) noexcept
-    {
+    std::function<void(const std::shared_ptr<model::Model>&)> travm = [&travm, this](const std::shared_ptr<model::Model>& mdl) noexcept {
         auto& children = mdl->get_children();
         const core::Id mid = mdl->get_asset_id();
 #ifdef GX_DEBUG_MODE
