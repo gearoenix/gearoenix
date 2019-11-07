@@ -82,7 +82,7 @@ void gearoenix::physics::Engine::update_visibility_kernel(const unsigned int ker
         x##_accelerator->call_on_intersecting(                                                                       \
             camera->get_frustum_collider(), [&](collider::Collider* const cld) noexcept {                            \
                 auto* const m = cld->get_parent();                                                                   \
-                if (m->get_transparency() == core::State::Set) {                                                     \
+                if (m->get_has_transparent()) {                                                                      \
                     transparent_container_models[camera->get_distance(m->get_transformation()->get_location())] = m; \
                 }                                                                                                    \
                 opaque_container_models.push_back(m);                                                                \

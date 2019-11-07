@@ -67,12 +67,8 @@ void gearoenix::render::model::Model::update() noexcept
 void gearoenix::render::model::Model::add_mesh(const std::shared_ptr<Mesh>& m) noexcept
 {
     material::Material* const mat = m->get_material().get();
-    if (mat->get_is_shadow_caster()) {
-        shadowing = core::State::Set;
-    }
-    if (mat->get_translucency() == material::TranslucencyMode::Tansparent) {
-        transparency = core::State::Set;
-    }
+    has_shadow_caster |= mat->get_is_shadow_caster();
+    has_transparent |= (mat->get_translucency() == material::TranslucencyMode::Tansparent);
     mesh::Mesh* const msh = m->get_mesh().get();
     collider->put_in_box(msh->get_box());
     meshes[msh->get_asset_id()] = m;

@@ -21,7 +21,7 @@ private:
     using GxGrPbr = gearoenix::render::graph::tree::Pbr;
 
     std::shared_ptr<GxGameScene> scn;
-    std::shared_ptr<GxCamTran> camtrn;
+    GxCamTran* camtrn = nullptr;
     std::unique_ptr<GxGrPbr> render_tree;
 
 public:
