@@ -56,7 +56,7 @@ private:
 
     std::shared_ptr<GxGameScene> scn;
     std::shared_ptr<GxUiScene> uiscn;
-    std::shared_ptr<GxCamTran> camtrn;
+    GxCamTran* camtrn = nullptr;
     std::shared_ptr<GxCam> cam;
     std::shared_ptr<GxModal> modal;
     std::shared_ptr<GxButton> look_at_button;

@@ -15,7 +15,8 @@
 #include <limits>
 
 gearoenix::render::light::CascadeInfo::PerCascade::PerCascade(engine::Engine* const e) noexcept
-    : shadow_mapper(new graph::node::ShadowMapper(e, core::sync::EndCaller<core::sync::EndCallerIgnore>([] {})))
+    : collider(new physics::collider::Frustum())
+    , shadow_mapper(new graph::node::ShadowMapper(e, core::sync::EndCaller<core::sync::EndCallerIgnore>([] {})))
 {
 }
 

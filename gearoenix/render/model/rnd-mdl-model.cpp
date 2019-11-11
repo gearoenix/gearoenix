@@ -21,10 +21,12 @@ gearoenix::render::model::Model::Model(
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : core::asset::Asset(my_id, core::asset::Type::Model)
     , model_type(t)
+    , collider(new physics::collider::Ghost())
     , transformation(new Transformation(this))
     , uniform_buffers(new buffer::FramedUniform(static_cast<unsigned int>(sizeof(math::Mat4x4)), e))
     , e(e)
 {
+    collider->set_parent(this);
     GXTODO // collider must be initialized
         const auto meshes_count
         = f->read<core::Count>();
@@ -45,6 +47,7 @@ gearoenix::render::model::Model::Model(
     , uniform_buffers(new buffer::FramedUniform(static_cast<unsigned int>(sizeof(math::Mat4x4)), e))
     , e(e)
 {
+    collider->set_parent(this);
 }
 
 gearoenix::render::model::Model::~Model() noexcept

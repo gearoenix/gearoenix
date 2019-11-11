@@ -138,7 +138,7 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
     uiscn = astmgr->get_scene_manager()->create<GxUiScene>(uiscncall);
 
     cam = astmgr->get_camera_manager()->create<GxPersCam>();
-    camtrn = std::static_pointer_cast<GxCamTran>(cam->get_transformation());
+    camtrn = dynamic_cast<GxCamTran*>(cam->get_transformation());
     camtrn->look_at(GxVec3(2.0f, 25.0f, 1.5f), GxVec3(50.0f, 25.0f, 0.0f), GxVec3(0.0f, 0.0f, 1.0f));
     cam->set_far(200.0f);
     scn->add_camera(cam);

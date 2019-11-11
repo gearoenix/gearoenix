@@ -19,13 +19,12 @@
 
 #define GX_START_TASKS            \
     unsigned int task_number = 0; \
-    const unsigned int kernels_count = workers->get_threads_count()
+    const unsigned int kernels_count = workers->get_threads_count();
 
-#define GX_DO_TASK(expr)               \
-    if (task_number == kernel_index) { \
-        expr                           \
-    }                                  \
-    task_number = (task_number + 1) % kernels_count
+#define GX_DO_TASK(expr)                                   \
+    if ((++task_number) % kernels_count == kernel_index) { \
+        expr;                                              \
+    }
 
 gearoenix::physics::Engine::PooledShadowCasterDirectionalLights::PooledShadowCasterDirectionalLights(render::engine::Engine* const e) noexcept
     : cascades_info(new render::light::CascadeInfo(e))
@@ -36,7 +35,7 @@ gearoenix::physics::Engine::PooledShadowCasterDirectionalLights::~PooledShadowCa
 
 void gearoenix::physics::Engine::update_scenes_kernel(const unsigned int kernel_index) noexcept
 {
-    GX_START_TASKS;
+    GX_START_TASKS
     core::OneLoopPool<PooledSceneData>& kd = kernels_scene_camera_data[kernel_index];
     kd.refresh();
     const std::map<core::Id, std::weak_ptr<render::scene::Scene>>& scenes = sys_app->get_asset_manager()->get_scene_manager()->get_scenes();
@@ -48,15 +47,17 @@ void gearoenix::physics::Engine::update_scenes_kernel(const unsigned int kernel_
             } auto* const sd
             = kd.get_next([] { return new PooledSceneData(); });
             sd->scene = scene.get();
-            sd->cameras.refresh(););
+            sd->cameras.refresh())
     }
 }
 
-void gearoenix::physics::Engine::update_scenes_receiver() noexcept {}
+void gearoenix::physics::Engine::update_scenes_receiver() noexcept
+{
+}
 
 void gearoenix::physics::Engine::update_visibility_kernel(const unsigned int kernel_index) noexcept
 {
-    GX_START_TASKS;
+    GX_START_TASKS
     core::OneLoopPool<PooledSceneData>& kd = kernels_scene_camera_data[kernel_index];
     for (PooledSceneData& sd : kd) {
         render::scene::Scene* scene = sd.scene;
@@ -86,10 +87,11 @@ void gearoenix::physics::Engine::update_visibility_kernel(const unsigned int ker
                     transparent_container_models[camera->get_distance(m->get_transformation()->get_location())] = m; \
                 }                                                                                                    \
                 opaque_container_models.push_back(m);                                                                \
-            });)
-            GX_DO_TASK(camera->update_uniform(););
-            GX_CAMVIS(dynamic);
-            GX_CAMVIS(static);
+                GXUNEXPECTED                                                                                         \
+            }))
+            GX_DO_TASK(camera->update_uniform())
+            GX_CAMVIS(dynamic)
+            GX_CAMVIS(static)
             const auto& cascade_partitions = camera->get_cascaded_shadow_frustum_partitions();
             for (const std::pair<const core::Id, std::shared_ptr<render::light::Light>>& id_light : lights) {
                 GX_DO_TASK(
@@ -144,7 +146,7 @@ void gearoenix::physics::Engine::update_visibility_receiver() noexcept
 void gearoenix::physics::Engine::update_shadower_kernel(const unsigned int kernel_index) noexcept
 {
     // TODO: I'm not happy with this part it can be much much better, but for this milestone it is ok
-    GX_START_TASKS;
+    GX_START_TASKS
     for (auto& priority_scenes_data : scenes_camera_data.priority_ptr_scene) {
         auto& scenes_data = priority_scenes_data.second;
         for (auto& scene_data : scenes_data) {
@@ -160,8 +162,8 @@ void gearoenix::physics::Engine::update_shadower_kernel(const unsigned int kerne
                         auto& lights_data = priority_lights_data.second;
                         for (auto& lc : lights_data) {
                             auto* const cas = lc.second;
-                            GX_DO_TASK(cas->shadow(static_accelerator, kernel_index););
-                            GX_DO_TASK(cas->shadow(dynamic_accelerator, kernel_index););
+                            GX_DO_TASK(cas->shadow(static_accelerator, kernel_index))
+                            GX_DO_TASK(cas->shadow(dynamic_accelerator, kernel_index))
                         }
                     }
                 }

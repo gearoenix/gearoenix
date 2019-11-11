@@ -1,4 +1,5 @@
 #include "phs-acc-bvh.hpp"
+#include "../../system/sys-log.hpp"
 #include "../collider/phs-cld-collider.hpp"
 
 constexpr int PER_NODE_COLLIDERS = 3;
@@ -280,5 +281,6 @@ std::string gearoenix::physics::accelerator::Bvh::to_string() const noexcept
 
 void gearoenix::physics::accelerator::Bvh::call_on_intersecting(const collider::Collider* const cld, const std::function<void(collider::Collider* cld)>& collided) const noexcept
 {
-    root->call_on_intersecting(cld, collided);
+    //    root->call_on_intersecting(cld, collided);
+    root->map(collided);
 }

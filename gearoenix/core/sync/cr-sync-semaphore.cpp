@@ -16,7 +16,7 @@ void gearoenix::core::sync::Semaphore::lock() noexcept
 
 void gearoenix::core::sync::Semaphore::release() noexcept
 {
-    //    std::lock_guard<std::mutex> _lock(m);
+    std::lock_guard<std::mutex> _lock(m);
     ++count;
     c.notify_all();
 }
