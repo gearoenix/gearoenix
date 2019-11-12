@@ -42,14 +42,12 @@ void gearoenix::physics::Engine::update_scenes_kernel(const unsigned int kernel_
     kd.refresh();
     const std::map<core::Id, std::weak_ptr<render::scene::Scene>>& scenes = sys_app->get_asset_manager()->get_scene_manager()->get_scenes();
     for (const std::pair<const core::Id, std::weak_ptr<render::scene::Scene>>& is : scenes) {
-        GX_DO_TASK(
-            const std::shared_ptr<render::scene::Scene> scene = is.second.lock();
-            if (scene != nullptr && scene->get_enability()) {
-                scene->update();
-            } auto* const sd
-            = kd.get_next([] { return new PooledSceneData(); });
-            sd->scene = scene.get();
-            sd->cameras.refresh())
+        const std::shared_ptr<render::scene::Scene> scene = is.second.lock();
+        if (scene == nullptr || !scene->get_enability()) continue;
+        GX_DO_TASK(scene->update())
+        auto* const sd = kd.get_next([] { return new PooledSceneData(); });
+        sd->scene = scene.get();
+        sd->cameras.refresh();
     }
 }
 
@@ -86,30 +84,18 @@ void gearoenix::physics::Engine::update_visibility_kernel(const unsigned int ker
                     transparent_container_models[camera->get_distance(m->get_transformation()->get_location())] = m;
                 }
                 opaque_container_models.push_back(m);
-                GXUNEXPECTED
             };
             GX_DO_TASK(camera->update_uniform())
             GX_DO_TASK(dynamic_accelerator->call_on_intersecting(camera->get_frustum_collider(), collided))
             GX_DO_TASK(static_accelerator->call_on_intersecting(camera->get_frustum_collider(), collided))
-            GX_DO_TASK({if(kernel_index == 2) {GXUNEXPECTED}})
-            GX_DO_TASK({if(kernel_index == 2) {GXUNEXPECTED}})
-            GX_DO_TASK({if(kernel_index == 2) {GXUNEXPECTED}})
-            GX_DO_TASK({if(kernel_index == 2) {GXUNEXPECTED}})
-            GX_DO_TASK({if(kernel_index == 2) {GXUNEXPECTED}})
-            GX_DO_TASK({if(kernel_index == 2) {GXUNEXPECTED}})
-            GX_DO_TASK({if(kernel_index == 2) {GXUNEXPECTED}})
-            GX_DO_TASK({if(kernel_index == 2) {GXUNEXPECTED}})
-            GX_DO_TASK({if(kernel_index == 2) {GXUNEXPECTED}})
-            GX_DO_TASK({if(kernel_index == 2) {GXUNEXPECTED}})
-            GX_DO_TASK({if(kernel_index == 2) {GXUNEXPECTED}})
             const auto& cascade_partitions = camera->get_cascaded_shadow_frustum_partitions();
             for (const std::pair<const core::Id, std::shared_ptr<render::light::Light>>& id_light : lights) {
+                auto* const light = id_light.second.get();
+                if (!light->is_enabled()) continue;
+                if (!light->is_shadow_caster()) continue;
+                auto* const dir_light = dynamic_cast<render::light::Directional*>(light);
+                if (dir_light == nullptr) continue;
                 GX_DO_TASK(
-                    auto* const light = id_light.second.get();
-                    if (!light->is_enabled()) continue;
-                    if (!light->is_shadow_caster()) continue;
-                    auto* const dir_light = dynamic_cast<render::light::Directional*>(light);
-                    if (dir_light == nullptr) continue;
                     auto* const light_data = shadow_caster_directional_lights.get_next([&] {
                         return new PooledShadowCasterDirectionalLights(sys_app->get_render_engine());
                     });
