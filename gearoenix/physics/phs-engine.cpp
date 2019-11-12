@@ -21,10 +21,12 @@
     unsigned int task_number = 0; \
     const unsigned int kernels_count = workers->get_threads_count();
 
-#define GX_DO_TASK(expr)                                   \
-    if ((++task_number) % kernels_count == kernel_index) { \
-        expr;                                              \
-    }
+#define GX_DO_TASK(expr)                             \
+    { \
+        if (task_number == kernel_index) {               \
+        expr;                                        \
+        }                                                \
+    task_number = (task_number + 1) % kernels_count;}
 
 gearoenix::physics::Engine::PooledShadowCasterDirectionalLights::PooledShadowCasterDirectionalLights(render::engine::Engine* const e) noexcept
     : cascades_info(new render::light::CascadeInfo(e))
@@ -78,20 +80,28 @@ void gearoenix::physics::Engine::update_visibility_kernel(const unsigned int ker
             opaque_container_models.clear();
             transparent_container_models.clear();
             shadow_caster_directional_lights.refresh();
-#define GX_CAMVIS(x)                                                                                                 \
-    GX_DO_TASK(                                                                                                      \
-        x##_accelerator->call_on_intersecting(                                                                       \
-            camera->get_frustum_collider(), [&](collider::Collider* const cld) noexcept {                            \
-                auto* const m = cld->get_parent();                                                                   \
-                if (m->get_has_transparent()) {                                                                      \
-                    transparent_container_models[camera->get_distance(m->get_transformation()->get_location())] = m; \
-                }                                                                                                    \
-                opaque_container_models.push_back(m);                                                                \
-                GXUNEXPECTED                                                                                         \
-            }))
+            const std::function<void(collider::Collider* const cld)> collided = [&](collider::Collider* const cld) noexcept {                            \
+                auto* const m = cld->get_parent();
+                if (m->get_has_transparent()) {
+                    transparent_container_models[camera->get_distance(m->get_transformation()->get_location())] = m;
+                }
+                opaque_container_models.push_back(m);
+                GXUNEXPECTED
+            };
             GX_DO_TASK(camera->update_uniform())
-            GX_CAMVIS(dynamic)
-            GX_CAMVIS(static)
+            GX_DO_TASK(dynamic_accelerator->call_on_intersecting(camera->get_frustum_collider(), collided))
+            GX_DO_TASK(static_accelerator->call_on_intersecting(camera->get_frustum_collider(), collided))
+            GX_DO_TASK({if(kernel_index == 2) {GXUNEXPECTED}})
+            GX_DO_TASK({if(kernel_index == 2) {GXUNEXPECTED}})
+            GX_DO_TASK({if(kernel_index == 2) {GXUNEXPECTED}})
+            GX_DO_TASK({if(kernel_index == 2) {GXUNEXPECTED}})
+            GX_DO_TASK({if(kernel_index == 2) {GXUNEXPECTED}})
+            GX_DO_TASK({if(kernel_index == 2) {GXUNEXPECTED}})
+            GX_DO_TASK({if(kernel_index == 2) {GXUNEXPECTED}})
+            GX_DO_TASK({if(kernel_index == 2) {GXUNEXPECTED}})
+            GX_DO_TASK({if(kernel_index == 2) {GXUNEXPECTED}})
+            GX_DO_TASK({if(kernel_index == 2) {GXUNEXPECTED}})
+            GX_DO_TASK({if(kernel_index == 2) {GXUNEXPECTED}})
             const auto& cascade_partitions = camera->get_cascaded_shadow_frustum_partitions();
             for (const std::pair<const core::Id, std::shared_ptr<render::light::Light>>& id_light : lights) {
                 GX_DO_TASK(
@@ -109,7 +119,7 @@ void gearoenix::physics::Engine::update_visibility_kernel(const unsigned int ker
                     const auto dot = std::abs(dir.dot(math::Vec3(0.0f, 1.0f, 0.0f))) - 1.0f;
                     const math::Vec3 up = GX_IS_ZERO(dot) ? math::Vec3::Z : math::Vec3::Y;
                     const auto view = math::Mat4x4::look_at(math::Vec3(), dir, up);
-                    cascade_data->update(view, cascade_partitions););
+                    cascade_data->update(view, cascade_partitions))
             }
         }
     }
