@@ -64,7 +64,7 @@ void gearoenix::physics::Engine::update_visibility_kernel(const unsigned int ker
     for (PooledSceneData& sd : kd) {
         render::scene::Scene* const scene = sd.scene;
         core::OneLoopPool<PooledCameraData>& cd = sd.cameras;
-        const accelerator::Bvh* const dynamic_accelerator = scene->get_static_accelerator();
+        const accelerator::Bvh* const dynamic_accelerator = scene->get_dynamic_accelerator();
         const accelerator::Bvh* const static_accelerator = scene->get_static_accelerator();
         const std::map<core::Id, std::shared_ptr<render::camera::Camera>>& cameras = scene->get_cameras();
         const std::map<core::Id, std::shared_ptr<render::light::Light>>& lights = scene->get_lights();
@@ -87,7 +87,6 @@ void gearoenix::physics::Engine::update_visibility_kernel(const unsigned int ker
                 }
                 opaque_container_models.push_back(m);
             };
-
             GX_DO_TASK(camera->update_uniform())
             GX_DO_TASK(dynamic_accelerator->call_on_intersecting(camera->get_frustum_collider(), collided))
             GX_DO_TASK(static_accelerator->call_on_intersecting(camera->get_frustum_collider(), collided))

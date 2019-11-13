@@ -38,7 +38,7 @@ namespace model {
         GX_GET_UCPTR_PRT(buffer::FramedUniform, uniform_buffers)
         GX_GET_VAL_PRT(bool, has_shadow_caster, false)
         GX_GET_VAL_PRT(bool, has_transparent, false)
-        GX_GET_VAL_PRT(bool, enabled, false)
+        GX_GET_VAL_PRT(bool, enabled, true)
         GX_GET_CREF_PRT(MapMesh, meshes)
         GX_GET_CREF_PRT(MapModel, children)
         GX_GET_PTR_PRT(Model, parent)

@@ -95,9 +95,7 @@ void gearoenix::render::model::Model::set_enabled(const bool e) noexcept
     for (auto& c : children) {
         c.second->set_enabled(e);
     }
-    if (nullptr != scene) {
-        scene->set_models_changed(true);
-    }
+    scene->set_models_changed(true);
 }
 
 void gearoenix::render::model::Model::set_scene(scene::Scene* const s) noexcept
