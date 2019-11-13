@@ -1,10 +1,7 @@
 #include "exm-001-hello-world.hpp"
 #include <gearoenix/core/asset/cr-asset-manager.hpp>
-#include <gearoenix/core/event/cr-ev-system.hpp>
-#include <gearoenix/core/event/cr-ev-ui.hpp>
 #include <gearoenix/physics/body/phs-bd-rigid.hpp>
 #include <gearoenix/physics/constraint/phs-cns-tracker-spring-joint-spring.hpp>
-#include <gearoenix/render/camera/rnd-cmr-camera.hpp>
 #include <gearoenix/render/camera/rnd-cmr-manager.hpp>
 #include <gearoenix/render/camera/rnd-cmr-perspective.hpp>
 #include <gearoenix/render/camera/rnd-cmr-transformation.hpp>
@@ -17,13 +14,10 @@
 #include <gearoenix/render/mesh/rnd-msh-mesh.hpp>
 #include <gearoenix/render/model/rnd-mdl-manager.hpp>
 #include <gearoenix/render/model/rnd-mdl-mesh.hpp>
-#include <gearoenix/render/model/rnd-mdl-model.hpp>
 #include <gearoenix/render/model/rnd-mdl-static.hpp>
-#include <gearoenix/render/model/rnd-mdl-transformation.hpp>
 #include <gearoenix/render/scene/rnd-scn-game.hpp>
 #include <gearoenix/render/scene/rnd-scn-manager.hpp>
 #include <gearoenix/system/sys-app.hpp>
-#include <gearoenix/system/sys-log.hpp>
 
 template <class T>
 using GxEndCaller = gearoenix::core::sync::EndCaller<T>;
@@ -94,17 +88,17 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
         trans->local_scale(14.0f);
         scn->add_model(mdl);
     }
-    for (gearoenix::core::Real y = -10.0f, roughness = 0.1f; y < 10.1f; y += 2.5f, roughness += 0.1f) {
-        for (gearoenix::core::Real x = -10.0f, metallic = 0.1f; x < 10.1f; x += 2.5f, metallic += 0.1f) {
-            const std::shared_ptr<GxMaterial> mat(new GxMaterial(render_engine, endcall));
-            mat->set_roughness_factor(roughness);
-            mat->set_metallic_factor(metallic);
-            const auto mdl = mdlmgr->create<GxStaticModel>(mdlcall);
-            mdl->add_mesh(std::make_shared<GxMdMesh>(msh, mat));
-            mdl->get_transformation()->set_location(GxVec3(x, y, 0.0f));
-            scn->add_model(mdl);
-        }
-    }
+    //    for (gearoenix::core::Real y = -10.0f, roughness = 0.1f; y < 10.1f; y += 2.5f, roughness += 0.1f) {
+    //        for (gearoenix::core::Real x = -10.0f, metallic = 0.1f; x < 10.1f; x += 2.5f, metallic += 0.1f) {
+    const std::shared_ptr<GxMaterial> mat(new GxMaterial(render_engine, endcall));
+    //     mat->set_roughness_factor(roughness);
+    //   mat->set_metallic_factor(metallic);
+    const auto mdl = mdlmgr->create<GxStaticModel>(mdlcall);
+    mdl->add_mesh(std::make_shared<GxMdMesh>(msh, mat));
+    // mdl->get_transformation()->set_location(GxVec3(x, y, 0.0f));
+    scn->add_model(mdl);
+    //        }
+    //    }
 }
 
 void GameApp::update() noexcept

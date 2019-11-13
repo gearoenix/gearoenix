@@ -38,7 +38,7 @@ namespace model {
         GX_GET_UCPTR_PRT(buffer::FramedUniform, uniform_buffers)
         GX_GET_VAL_PRT(bool, has_shadow_caster, false)
         GX_GET_VAL_PRT(bool, has_transparent, false)
-        GX_GET_VAL_PRT(core::State, enability, core::State::Set)
+        GX_GET_VAL_PRT(bool, enabled, false)
         GX_GET_CREF_PRT(MapMesh, meshes)
         GX_GET_CREF_PRT(MapModel, children)
         GX_GET_PTR_PRT(Model, parent)
@@ -64,7 +64,7 @@ namespace model {
         void add_mesh(const std::shared_ptr<Mesh>& m) noexcept;
         void add_child(const std::shared_ptr<Model>& c) noexcept;
         void set_collider(std::unique_ptr<physics::collider::Collider> c) noexcept;
-        void set_enability(core::State s) noexcept;
+        void set_enabled(bool s) noexcept;
         virtual void set_scene(scene::Scene* s) noexcept;
         [[nodiscard]] virtual bool get_dynamicity() const noexcept = 0;
     };

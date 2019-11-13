@@ -157,8 +157,9 @@ void gearoenix::render::scene::Scene::add_model(const std::shared_ptr<model::Mod
 #endif
         mdl->set_scene(this);
         models[mid] = mdl;
-        for (auto& c : children)
+        for (auto& c : children) {
             travm(c.second);
+        }
     };
 
     travm(m);
@@ -203,12 +204,12 @@ void gearoenix::render::scene::Scene::update() noexcept
         for (auto& im : models) {
             auto& mdl = im.second;
             auto* const cld = mdl->get_collider();
-            if (cld != nullptr && mdl->get_enability() == core::State::Set) {
-                if (mdl->get_dynamicity()) {
-                    dynamic_colliders.push_back(cld);
-                } else {
-                    static_colliders.push_back(cld);
-                }
+            if (cld == nullptr || !mdl->get_enabled())
+                continue;
+            if (mdl->get_dynamicity()) {
+                dynamic_colliders.push_back(cld);
+            } else {
+                static_colliders.push_back(cld);
             }
         }
         static_accelerator->reset(static_colliders);

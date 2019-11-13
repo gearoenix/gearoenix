@@ -21,12 +21,13 @@
     unsigned int task_number = 0; \
     const unsigned int kernels_count = workers->get_threads_count();
 
-#define GX_DO_TASK(expr)                             \
-    { \
+#define GX_DO_TASK(expr)                                 \
+    {                                                    \
         if (task_number == kernel_index) {               \
-        expr;                                        \
+            expr;                                        \
         }                                                \
-    task_number = (task_number + 1) % kernels_count;}
+        task_number = (task_number + 1) % kernels_count; \
+    }
 
 gearoenix::physics::Engine::PooledShadowCasterDirectionalLights::PooledShadowCasterDirectionalLights(render::engine::Engine* const e) noexcept
     : cascades_info(new render::light::CascadeInfo(e))
@@ -43,7 +44,8 @@ void gearoenix::physics::Engine::update_scenes_kernel(const unsigned int kernel_
     const std::map<core::Id, std::weak_ptr<render::scene::Scene>>& scenes = sys_app->get_asset_manager()->get_scene_manager()->get_scenes();
     for (const std::pair<const core::Id, std::weak_ptr<render::scene::Scene>>& is : scenes) {
         const std::shared_ptr<render::scene::Scene> scene = is.second.lock();
-        if (scene == nullptr || !scene->get_enability()) continue;
+        if (scene == nullptr || !scene->get_enability())
+            continue;
         GX_DO_TASK(scene->update())
         auto* const sd = kd.get_next([] { return new PooledSceneData(); });
         sd->scene = scene.get();
@@ -60,7 +62,7 @@ void gearoenix::physics::Engine::update_visibility_kernel(const unsigned int ker
     GX_START_TASKS
     core::OneLoopPool<PooledSceneData>& kd = kernels_scene_camera_data[kernel_index];
     for (PooledSceneData& sd : kd) {
-        render::scene::Scene* scene = sd.scene;
+        render::scene::Scene* const scene = sd.scene;
         core::OneLoopPool<PooledCameraData>& cd = sd.cameras;
         const accelerator::Bvh* const dynamic_accelerator = scene->get_static_accelerator();
         const accelerator::Bvh* const static_accelerator = scene->get_static_accelerator();
@@ -78,23 +80,27 @@ void gearoenix::physics::Engine::update_visibility_kernel(const unsigned int ker
             opaque_container_models.clear();
             transparent_container_models.clear();
             shadow_caster_directional_lights.refresh();
-            const std::function<void(collider::Collider* const cld)> collided = [&](collider::Collider* const cld) noexcept {                            \
+            const std::function<void(collider::Collider* const cld)> collided = [&](collider::Collider* const cld) noexcept {
                 auto* const m = cld->get_parent();
                 if (m->get_has_transparent()) {
                     transparent_container_models[camera->get_distance(m->get_transformation()->get_location())] = m;
                 }
                 opaque_container_models.push_back(m);
             };
+
             GX_DO_TASK(camera->update_uniform())
             GX_DO_TASK(dynamic_accelerator->call_on_intersecting(camera->get_frustum_collider(), collided))
             GX_DO_TASK(static_accelerator->call_on_intersecting(camera->get_frustum_collider(), collided))
             const auto& cascade_partitions = camera->get_cascaded_shadow_frustum_partitions();
             for (const std::pair<const core::Id, std::shared_ptr<render::light::Light>>& id_light : lights) {
                 auto* const light = id_light.second.get();
-                if (!light->is_enabled()) continue;
-                if (!light->is_shadow_caster()) continue;
+                if (!light->is_enabled())
+                    continue;
+                if (!light->is_shadow_caster())
+                    continue;
                 auto* const dir_light = dynamic_cast<render::light::Directional*>(light);
-                if (dir_light == nullptr) continue;
+                if (dir_light == nullptr)
+                    continue;
                 GX_DO_TASK(
                     auto* const light_data = shadow_caster_directional_lights.get_next([&] {
                         return new PooledShadowCasterDirectionalLights(sys_app->get_render_engine());
@@ -128,8 +134,9 @@ void gearoenix::physics::Engine::update_visibility_receiver() noexcept
                 auto& mt = c.transparent_container_models;
                 auto& ls = c.shadow_caster_directional_lights;
                 opaque_models.reserve(mo.size());
-                for (auto& m : mo)
+                for (auto* const m : mo) {
                     opaque_models.push_back(m);
+                }
                 transparent_models.merge(mt);
                 for (auto& l : ls) {
                     cascades[l.light->get_layer()][l.light] = l.cascades_info.get();
