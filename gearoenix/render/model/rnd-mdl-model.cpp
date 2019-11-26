@@ -63,8 +63,6 @@ void gearoenix::render::model::Model::update() noexcept
     uniform_buffers->update(collider->get_model_matrix());
     for (const auto& msh : meshes)
         msh.second->update_uniform();
-    for (const auto& ch : children)
-        ch.second->update();
 }
 
 void gearoenix::render::model::Model::add_mesh(const std::shared_ptr<Mesh>& m) noexcept

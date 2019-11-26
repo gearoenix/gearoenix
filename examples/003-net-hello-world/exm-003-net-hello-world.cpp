@@ -309,11 +309,11 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
 
     modal->add_child(look_at_button);
 
-    modal->set_enability(gearoenix::core::State::Unset);
+    modal->set_enabled(false);
     modal->get_transformation()->local_scale(0.5f);
     modal->set_on_close([this]() noexcept {
         last_time_item_detail_modal_closed = std::chrono::high_resolution_clock::now();
-        modal->set_enability(gearoenix::core::State::Unset);
+        modal->set_enabled(false);
         selected_item = nullptr;
     });
 
@@ -368,7 +368,7 @@ bool GameApp::on_event(const gearoenix::core::event::Data& event_data) noexcept
                     const GxEndCallerIgnored call([] {});
                     text_location->set_text_color(color[0], color[1], color[2], call);
                     text_location->set_text(tl.str(), call);
-                    modal->set_enability(gearoenix::core::State::Set);
+                    modal->set_enabled(true);
                 }
             }
         }

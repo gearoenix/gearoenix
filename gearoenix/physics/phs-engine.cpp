@@ -82,6 +82,7 @@ void gearoenix::physics::Engine::update_visibility_kernel(const unsigned int ker
             shadow_caster_directional_lights.refresh();
             const std::function<void(collider::Collider* const cld)> collided = [&](collider::Collider* const cld) noexcept {
                 auto* const m = cld->get_parent();
+                m->update();
                 if (m->get_has_transparent()) {
                     transparent_container_models[camera->get_distance(m->get_transformation()->get_location())] = m;
                 }
