@@ -165,12 +165,7 @@ gearoenix::math::IntersectionStatus gearoenix::math::Aabb3::check_intersection_s
         && lower[1] < o.lower[1]
         && lower[2] < o.lower[2])
         return IntersectionStatus::In;
-    if (lower[0] < o.upper[0]
-        && upper[0] > o.lower[0]
-        && lower[1] < o.upper[1]
-        && upper[1] > o.lower[1]
-        && lower[2] < o.upper[2]
-        && upper[2] > o.lower[2])
+    if (check_intersection(o))
         return IntersectionStatus::Cut;
     return IntersectionStatus::Out;
 }

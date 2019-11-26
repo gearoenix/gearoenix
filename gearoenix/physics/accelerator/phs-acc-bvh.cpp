@@ -233,11 +233,11 @@ void gearoenix::physics::accelerator::Bvh::InternalNode::call_on_intersecting(co
 {
 #define GX_HELPER(n)                                                        \
     if (n != nullptr) {                                                     \
-        const auto is = cld->check_intersection_status(left->get_volume()); \
+        const auto is = cld->check_intersection_status(n->get_volume()); \
         if (math::IntersectionStatus::Cut == is) {                          \
             n->call_on_intersecting(cld, collided);                         \
         } else if (math::IntersectionStatus::In == is) {                    \
-            left->map(collided);                                            \
+            n->map(collided);                                            \
         }                                                                   \
     }
     GX_HELPER(left)
@@ -281,6 +281,6 @@ std::string gearoenix::physics::accelerator::Bvh::to_string() const noexcept
 
 void gearoenix::physics::accelerator::Bvh::call_on_intersecting(const collider::Collider* const cld, const std::function<void(collider::Collider* cld)>& collided) const noexcept
 {
-    //root->call_on_intersecting(cld, collided);
-    root->map(collided);
+    root->call_on_intersecting(cld, collided);
+    //root->map(collided);
 }
