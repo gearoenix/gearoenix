@@ -16,12 +16,16 @@ std::optional<gearoenix::core::Real> gearoenix::physics::collider::Frustum::hit(
 
 bool gearoenix::physics::collider::Frustum::check_intersection(const math::Aabb3& box) const noexcept
 {
-#define GX_MAP_AABB_POINTS                        \
-    math::Vec3 cs[8];                             \
-    box.get_all_corners(cs);                      \
-    math::Aabb3 proj_box(view_projection* cs[0]); \
-    for (std::size_t i = 1; i < 8; ++i)           \
-    proj_box.put(view_projection* cs[i])
+#define GX_MAP_AABB_POINTS                                   \
+    math::Vec3 cs[8];                                        \
+    box.get_all_corners(cs);                                 \
+    math::Aabb3 proj_box;                                    \
+    for (const math::Vec3& c3: cs) {                         \
+        math::Vec4 c(c3, 1.0f);                              \
+        c = view_projection* c;                              \
+        proj_box.put_without_update(c.xyz() / c[3]);         \
+    }                                                        \
+    proj_box.update()
 
     GX_MAP_AABB_POINTS;
     return limit.check_intersection(proj_box);

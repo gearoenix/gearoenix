@@ -1,5 +1,4 @@
 #include "rnd-cmr-transformation.hpp"
-#include "../../math/math-projector-frustum.hpp"
 #include "../../physics/collider/phs-cld-frustum.hpp"
 #include "rnd-cmr-uniform.hpp"
 #include <utility>
@@ -47,7 +46,7 @@ void gearoenix::render::camera::Transformation::set_on_frustum_update(std::funct
 
 void gearoenix::render::camera::Transformation::set_on_projection_update(std::function<void()> f) noexcept
 {
-    on_projection_update = f;
+    on_projection_update = std::move(f);
 }
 
 void gearoenix::render::camera::Transformation::look_at(const math::Vec3& target, const math::Vec3& up) noexcept

@@ -84,15 +84,18 @@ void gearoenix::physics::accelerator::Bvh::InternalNode::init(const std::vector<
     /// Sorting dimensions
     const math::Vec3& dims = volume.get_diameter();
     std::pair<int, core::Real> dimi[3];
-    for (int i = 0; i < 3; ++i)
+    for (int i = 0; i < 3; ++i) {
         dimi[i] = std::make_pair(i, dims[i]);
-    if (dimi[0].second < dimi[1].second)
+    }
+    if (dimi[0].second < dimi[1].second) {
         std::swap(dimi[0], dimi[1]);
-    if (dimi[0].second < dimi[2].second)
+    }
+    if (dimi[0].second < dimi[2].second) {
         std::swap(dimi[0], dimi[2]);
-    if (dimi[1].second < dimi[2].second)
+    }
+    if (dimi[1].second < dimi[2].second) {
         std::swap(dimi[1], dimi[2]);
-
+    }
     for (const auto di : dimi) {
         struct Bin {
             std::vector<collider::Collider*> c;
@@ -100,8 +103,9 @@ void gearoenix::physics::accelerator::Bvh::InternalNode::init(const std::vector<
             math::Aabb3 b;
         };
         Bin bins[BINS_COUNT];
-        for (Bin& b : bins)
+        for (Bin& b : bins) {
             b.c.reserve(colliders.size());
+        }
         const core::Real split_size = di.second / static_cast<core::Real>(BINS_COUNT);
         core::Real splits[WALLS_COUNT];
         core::Real wall = volume.get_lower()[di.first];
@@ -134,8 +138,9 @@ void gearoenix::physics::accelerator::Bvh::InternalNode::init(const std::vector<
                 break;
             }
         }
-        if (overlapped)
+        if (overlapped) {
             continue;
+        }
         core::Real best_wall_cost = std::numeric_limits<core::Real>::max();
         int best_wall_index = -1;
         math::Aabb3 best_wall_left_box;
@@ -149,8 +154,9 @@ void gearoenix::physics::accelerator::Bvh::InternalNode::init(const std::vector<
             left_count += static_cast<int>(bins[i].c.size());
             const int right_count = static_cast<int>(colliders.size()) - left_count;
             math::Aabb3 right_box = bins[i + 1].b;
-            for (int j = i + 2; j < BINS_COUNT; ++j)
+            for (int j = i + 2; j < BINS_COUNT; ++j) {
                 right_box.put_without_update(bins[j].b);
+            }
             right_box.update();
             const core::Real cost = left_box.get_volume() * static_cast<core::Real>(left_count) + right_box.get_volume() * static_cast<core::Real>(right_count);
             if (cost < best_wall_cost) {
@@ -164,21 +170,28 @@ void gearoenix::physics::accelerator::Bvh::InternalNode::init(const std::vector<
         }
         ++best_wall_index;
         std::vector<collider::Collider*> left_colliders(std::move(bins[0].c));
-        for (int i = 1; i < best_wall_index; ++i)
-            for (auto c : bins[i].c)
+        for (int i = 1; i < best_wall_index; ++i) {
+            for (auto c : bins[i].c) {
                 left_colliders.push_back(c);
+            }
+        }
         std::vector<collider::Collider*> right_colliders(std::move(bins[WALLS_COUNT].c));
-        for (int i = best_wall_index; i < WALLS_COUNT; ++i)
-            for (auto c : bins[i].c)
+        for (int i = best_wall_index; i < WALLS_COUNT; ++i) {
+            for (auto c : bins[i].c) {
                 right_colliders.push_back(c);
-        if (best_wall_left_count <= PER_NODE_COLLIDERS)
+            }
+        }
+        if (best_wall_left_count <= PER_NODE_COLLIDERS) {
             left = std::make_unique<LeafNode>(left_colliders, best_wall_left_box);
-        else
+        } else {
             left = std::make_unique<InternalNode>(left_colliders, best_wall_left_box);
-        if (best_wall_right_count <= PER_NODE_COLLIDERS)
+        }
+        if (best_wall_right_count <= PER_NODE_COLLIDERS) {
             right = std::make_unique<LeafNode>(right_colliders, best_wall_right_box);
-        else
+        } 
+        else {
             right = std::make_unique<InternalNode>(right_colliders, best_wall_right_box);
+        }
         return;
     }
     left = std::make_unique<LeafNode>(colliders, volume);
@@ -187,8 +200,9 @@ void gearoenix::physics::accelerator::Bvh::InternalNode::init(const std::vector<
 gearoenix::physics::accelerator::Bvh::InternalNode::InternalNode(const std::vector<collider::Collider*>& colliders) noexcept
     : Node(Type::INTERNAL)
 {
-    for (collider::Collider* c : colliders)
+    for (const collider::Collider* const c : colliders) {
         volume.put_without_update(c->get_updated_box());
+    }
     volume.update();
     if (colliders.size() <= PER_NODE_COLLIDERS) {
         left = std::make_unique<LeafNode>(colliders, volume);
@@ -231,14 +245,14 @@ std::string gearoenix::physics::accelerator::Bvh::InternalNode::to_string() cons
 
 void gearoenix::physics::accelerator::Bvh::InternalNode::call_on_intersecting(const collider::Collider* const cld, const std::function<void(collider::Collider* const)>& collided) const noexcept
 {
-#define GX_HELPER(n)                                                        \
-    if (n != nullptr) {                                                     \
+#define GX_HELPER(n)                                                     \
+    if (n != nullptr) {                                                  \
         const auto is = cld->check_intersection_status(n->get_volume()); \
-        if (math::IntersectionStatus::Cut == is) {                          \
-            n->call_on_intersecting(cld, collided);                         \
-        } else if (math::IntersectionStatus::In == is) {                    \
+        if (math::IntersectionStatus::Cut == is) {                       \
+            n->call_on_intersecting(cld, collided);                      \
+        } else if (math::IntersectionStatus::In == is) {                 \
             n->map(collided);                                            \
-        }                                                                   \
+        }                                                                \
     }
     GX_HELPER(left)
     GX_HELPER(right)
