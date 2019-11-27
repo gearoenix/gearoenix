@@ -127,13 +127,6 @@ gearoenix::math::Mat4x4::Mat4x4(const Mat4x4& m) noexcept
     }
 }
 
-gearoenix::math::Vec3 gearoenix::math::Mat4x4::operator*(const Vec3& v) const noexcept
-{
-    return Vec3(mat[0] * v[0] + mat[4] * v[1] + mat[8] * v[2] + mat[12],
-        mat[1] * v[0] + mat[5] * v[1] + mat[9] * v[2] + mat[13],
-        mat[2] * v[0] + mat[6] * v[1] + mat[10] * v[2] + mat[14]);
-}
-
 gearoenix::math::Vec4 gearoenix::math::Mat4x4::operator*(const Vec4& v) const noexcept
 {
     return Vec4(
@@ -530,4 +523,11 @@ gearoenix::math::Mat4x4 gearoenix::math::Mat4x4::transposed() const noexcept
 const gearoenix::core::Real* gearoenix::math::Mat4x4::data() const noexcept
 {
     return mat;
+}
+
+gearoenix::math::Vec3 gearoenix::math::Mat4x4::project(const Vec3& v) const noexcept
+{
+    Vec4 v4(v, 1.0f);
+    v4 = (*this) * v4;
+    return v4.xyz() / v4[3];
 }

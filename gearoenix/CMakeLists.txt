@@ -275,8 +275,6 @@ SET(GX_ENGINE_SRC
         "${GX_ENGINE_SRC_DIR}physics/phs-object.hpp"
         "${GX_ENGINE_SRC_DIR}physics/phs-transformation.cpp"
         "${GX_ENGINE_SRC_DIR}physics/phs-transformation.hpp"
-        "${GX_ENGINE_SRC_DIR}physics/phs-untransformable.cpp"
-        "${GX_ENGINE_SRC_DIR}physics/phs-untransformable.hpp"
         "${GX_ENGINE_SRC_DIR}render/buffer/rnd-buf-buffer.cpp"
         "${GX_ENGINE_SRC_DIR}render/buffer/rnd-buf-buffer.hpp"
         "${GX_ENGINE_SRC_DIR}render/buffer/rnd-buf-dynamic.cpp"

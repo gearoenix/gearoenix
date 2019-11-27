@@ -37,7 +37,6 @@ namespace math {
             core::Real e12, core::Real e13, core::Real e14, core::Real e15) noexcept;
         explicit Mat4x4(system::stream::Stream* f) noexcept;
         Mat4x4(const Mat4x4& m) noexcept;
-        Vec3 operator*(const Vec3& v) const noexcept;
         Vec4 operator*(const Vec4& v) const noexcept;
         Mat4x4 operator*(const Mat4x4& m) const noexcept;
         Mat4x4& operator=(const Mat4x4& m) noexcept;
@@ -83,6 +82,7 @@ namespace math {
         Mat4x4 inverted() const noexcept;
         Mat4x4 transposed() const noexcept;
         const core::Real* data() const noexcept;
+        Vec3 project(const Vec3& v) const noexcept;
         static Mat4x4 look_at(const Vec3& position, const Vec3& target, const Vec3& up) noexcept;
         static Mat4x4 rotation(const Vec3& v, core::Real degree) noexcept;
         static Mat4x4 translator(const Vec3& v) noexcept;

@@ -122,12 +122,12 @@ void gearoenix::render::camera::Transformation::local_z_translate(const core::Re
 
 void gearoenix::render::camera::Transformation::global_rotate(const core::Real rad, const math::Vec3& axis, const math::Vec3& location) noexcept
 {
-    math::Mat4x4 rot = math::Mat4x4::rotation(axis, -rad);
-    math::Mat4x4 irot = math::Mat4x4::rotation(axis, rad);
-    uniform->x = irot * uniform->x;
-    uniform->y = irot * uniform->y;
-    uniform->z = irot * uniform->z;
-    uniform->position = (irot * (uniform->position - location)) + location;
+    const math::Mat4x4 rot = math::Mat4x4::rotation(axis, -rad);
+    const math::Mat4x4 irot = math::Mat4x4::rotation(axis, rad);
+    uniform->x = (irot * math::Vec4(uniform->x, 0.0f)).xyz();
+    uniform->y = (irot * math::Vec4(uniform->y, 0.0f)).xyz();
+    uniform->z = (irot * math::Vec4(uniform->z, 0.0f)).xyz();
+    uniform->position = (irot * math::Vec4(uniform->position - location, 1.0f)).xyz() + location;
     uniform->inversed_rotation *= rot;
     update_location();
 }
@@ -139,41 +139,41 @@ void gearoenix::render::camera::Transformation::global_rotate(const core::Real r
 
 void gearoenix::render::camera::Transformation::local_rotate(const core::Real rad, const math::Vec3& vec) noexcept
 {
-    math::Mat4x4 rot = math::Mat4x4::rotation(vec, -rad);
-    math::Mat4x4 irot = math::Mat4x4::rotation(vec, rad);
-    uniform->x = irot * uniform->x;
-    uniform->y = irot * uniform->y;
-    uniform->z = irot * uniform->z;
+    const math::Mat4x4 rot = math::Mat4x4::rotation(vec, -rad);
+    const math::Mat4x4 irot = math::Mat4x4::rotation(vec, rad);
+    uniform->x = (irot * math::Vec4(uniform->x, 0.0f)).xyz();
+    uniform->y = (irot * math::Vec4(uniform->y, 0.0f)).xyz();
+    uniform->z = (irot * math::Vec4(uniform->z, 0.0f)).xyz();
     uniform->inversed_rotation *= rot;
     update_location();
 }
 
 void gearoenix::render::camera::Transformation::local_x_rotate(const core::Real rad) noexcept
 {
-    math::Mat4x4 rot = math::Mat4x4::rotation(uniform->x, -rad);
-    math::Mat4x4 irot = math::Mat4x4::rotation(uniform->x, rad);
-    uniform->y = irot * uniform->y;
-    uniform->z = irot * uniform->z;
+    const math::Mat4x4 rot = math::Mat4x4::rotation(uniform->x, -rad);
+    const math::Mat4x4 irot = math::Mat4x4::rotation(uniform->x, rad);
+    uniform->y = (irot * math::Vec4(uniform->y, 0.0f)).xyz();
+    uniform->z = (irot * math::Vec4(uniform->z, 0.0f)).xyz();
     uniform->inversed_rotation *= rot;
     update_location();
 }
 
 void gearoenix::render::camera::Transformation::local_y_rotate(const core::Real rad) noexcept
 {
-    math::Mat4x4 rot = math::Mat4x4::rotation(uniform->y, -rad);
-    math::Mat4x4 irot = math::Mat4x4::rotation(uniform->y, rad);
-    uniform->x = irot * uniform->x;
-    uniform->z = irot * uniform->z;
+    const math::Mat4x4 rot = math::Mat4x4::rotation(uniform->y, -rad);
+    const math::Mat4x4 irot = math::Mat4x4::rotation(uniform->y, rad);
+    uniform->x = (irot * math::Vec4(uniform->x, 0.0f)).xyz();
+    uniform->z = (irot * math::Vec4(uniform->z, 0.0f)).xyz();
     uniform->inversed_rotation *= rot;
     update_location();
 }
 
 void gearoenix::render::camera::Transformation::local_z_rotate(const core::Real rad) noexcept
 {
-    math::Mat4x4 rot = math::Mat4x4::rotation(uniform->z, -rad);
-    math::Mat4x4 irot = math::Mat4x4::rotation(uniform->z, rad);
-    uniform->x = irot * uniform->x;
-    uniform->y = irot * uniform->y;
+    const math::Mat4x4 rot = math::Mat4x4::rotation(uniform->z, -rad);
+    const math::Mat4x4 irot = math::Mat4x4::rotation(uniform->z, rad);
+    uniform->x = (irot * math::Vec4(uniform->x, 0.0f)).xyz();
+    uniform->y = (irot * math::Vec4(uniform->y, 0.0f)).xyz();
     uniform->inversed_rotation *= rot;
     update_location();
 }
@@ -181,9 +181,9 @@ void gearoenix::render::camera::Transformation::local_z_rotate(const core::Real 
 void gearoenix::render::camera::Transformation::set_orientation(const math::Quat& q) noexcept
 {
     const math::Mat4x4 r = q.to_mat();
-    uniform->x = r * uniform->x;
-    uniform->y = r * uniform->y;
-    uniform->z = r * uniform->z;
+    uniform->x = (r * math::Vec4::X).xyz();
+    uniform->y = (r * math::Vec4::Y).xyz();
+    uniform->z = (r * math::Vec4::Z).xyz();
     uniform->inversed_rotation = math::Quat(q.x, q.y, q.z, -q.w).to_mat();
     update_location();
 }

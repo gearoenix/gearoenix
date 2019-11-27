@@ -88,17 +88,17 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
         trans->local_scale(14.0f);
         scn->add_model(mdl);
     }
-    //    for (gearoenix::core::Real y = -10.0f, roughness = 0.1f; y < 10.1f; y += 2.5f, roughness += 0.1f) {
-    //        for (gearoenix::core::Real x = -10.0f, metallic = 0.1f; x < 10.1f; x += 2.5f, metallic += 0.1f) {
-    const std::shared_ptr<GxMaterial> mat(new GxMaterial(render_engine, endcall));
-    //     mat->set_roughness_factor(roughness);
-    //   mat->set_metallic_factor(metallic);
-    const auto mdl = mdlmgr->create<GxStaticModel>(mdlcall);
-    mdl->add_mesh(std::make_shared<GxMdMesh>(msh, mat));
-    // mdl->get_transformation()->set_location(GxVec3(x, y, 0.0f));
-    scn->add_model(mdl);
-    //        }
-    //    }
+    for (gearoenix::core::Real y = -10.0f, roughness = 0.1f; y < 10.1f; y += 2.5f, roughness += 0.1f) {
+        for (gearoenix::core::Real x = -10.0f, metallic = 0.1f; x < 10.1f; x += 2.5f, metallic += 0.1f) {
+            const std::shared_ptr<GxMaterial> mat(new GxMaterial(render_engine, endcall));
+            mat->set_roughness_factor(roughness);
+            mat->set_metallic_factor(metallic);
+            const auto mdl = mdlmgr->create<GxStaticModel>(mdlcall);
+            mdl->add_mesh(std::make_shared<GxMdMesh>(msh, mat));
+            mdl->get_transformation()->set_location(GxVec3(x, y, 0.0f));
+            scn->add_model(mdl);
+        }
+    }
 }
 
 void GameApp::update() noexcept

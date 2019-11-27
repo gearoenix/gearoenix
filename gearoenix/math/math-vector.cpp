@@ -569,6 +569,11 @@ void gearoenix::math::Vec3::read(system::stream::Stream* const f) noexcept
     f->read(vec[2]);
 }
 
+
+const gearoenix::math::Vec4 gearoenix::math::Vec4::X(1.0f, 0.0f, 0.0f, 0.0f);
+const gearoenix::math::Vec4 gearoenix::math::Vec4::Y(0.0f, 1.0f, 0.0f, 0.0f);
+const gearoenix::math::Vec4 gearoenix::math::Vec4::Z(0.0f, 0.0f, 1.0f, 0.0f);
+
 gearoenix::math::Vec4::Vec4() noexcept
     : vec { 0.0f, 0.0f, 0.0f, 1.0f }
 {

@@ -32,7 +32,7 @@ void gearoenix::render::light::CascadeInfo::PerKernel::shadow(const physics::col
         return;
     // Be careful, the models should update the collider box
     math::Aabb3 box = cld->get_updated_box();
-    box.set_center((*per_cascade)[0].collider->get_view_projection() * box.get_center());
+    box.set_center((*per_cascade)[0].collider->get_view_projection().project(box.get_center()));
     seen_boxes[cascade_index].put(box);
     RenderData r;
     r.i = cascade_index;
@@ -124,17 +124,17 @@ void gearoenix::render::light::CascadeInfo::update(const math::Mat4x4& m, const 
         k.render_data.clear();
     }
     for (const auto& v : p[0]) {
-        per_cascade[0].collider->get_limit().put(zero_located_view * v);
+        per_cascade[0].collider->get_limit().put(zero_located_view.project(v));
     }
     for (std::size_t i = 1, j = 0; i < ss; ++i, ++j) {
         for (const auto& v : p[i]) {
-            const auto vv = zero_located_view * v;
+            const auto vv = zero_located_view.project(v);
             per_cascade[i].collider->get_limit().put(vv);
             per_cascade[j].collider->get_limit().put(vv);
         }
     }
     for (const auto& v : p[ss]) {
-        per_cascade[sss].collider->get_limit().put(zero_located_view * v);
+        per_cascade[sss].collider->get_limit().put(zero_located_view.project(v));
     }
     for (auto& c : per_cascade) {
         math::Vec3 v = c.collider->get_limit().get_upper();

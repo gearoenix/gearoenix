@@ -9,8 +9,7 @@ void gearoenix::physics::collider::Collider::update_box() noexcept
     origin_box.get_all_corners(updated_points);
     updated_box.reset();
     for (math::Vec3& p : updated_points) {
-        p = model_matrix * p;
-        updated_box.put_without_update(p);
+        updated_box.put_without_update((model_matrix * math::Vec4(p, 1.0f)).xyz());
     }
     updated_box.update();
 }

@@ -46,9 +46,9 @@ gearoenix::render::camera::Camera::Camera(
     uniform.near = -f->read<core::Real>();
     uniform.far = -f->read<core::Real>();
     const math::Mat4x4 r = q.to_mat();
-    uniform.x = r * uniform.x;
-    uniform.y = r * uniform.y;
-    uniform.z = r * uniform.z;
+    uniform.x = (r * math::Vec4(uniform.x, 0.0f)).xyz();
+    uniform.y = (r * math::Vec4(uniform.y, 0.0f)).xyz();
+    uniform.z = (r * math::Vec4(uniform.z, 0.0f)).xyz();
     uniform.inversed_rotation = math::Quat(q.x, q.y, q.z, -q.w).to_mat();
     GXLOGD("Position: " << uniform.position)
     GXLOGD("Quaternion: " << q)

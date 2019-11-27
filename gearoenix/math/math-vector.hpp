@@ -119,6 +119,10 @@ namespace math {
         core::Real vec[4];
 
     public:
+        static const Vec4 X;
+        static const Vec4 Y;
+        static const Vec4 Z;
+
         Vec4() noexcept;
         Vec4(core::Real x, core::Real y, core::Real z, core::Real w) noexcept;
         Vec4(const Vec2& v, core::Real z, core::Real w) noexcept;
