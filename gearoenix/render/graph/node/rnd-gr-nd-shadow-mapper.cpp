@@ -9,6 +9,7 @@
 #include "../../material/rnd-mat-material.hpp"
 #include "../../model/rnd-mdl-mesh.hpp"
 #include "../../model/rnd-mdl-model.hpp"
+#include "../../mesh/rnd-msh-mesh.hpp"
 #include "../../pipeline/rnd-pip-shadow-mapper-resource-set.hpp"
 #include "../../pipeline/rnd-pip-shadow-mapper.hpp"
 #include "../../sync/rnd-sy-semaphore.hpp"

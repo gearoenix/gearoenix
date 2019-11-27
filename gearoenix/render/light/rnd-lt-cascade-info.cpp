@@ -124,24 +124,26 @@ void gearoenix::render::light::CascadeInfo::update(const math::Mat4x4& m, const 
         k.render_data.clear();
     }
     for (const auto& v : p[0]) {
-        per_cascade[0].collider->get_limit().put(zero_located_view.project(v));
+        per_cascade[0].collider->get_limit().put_without_update(zero_located_view.project(v));
     }
     for (std::size_t i = 1, j = 0; i < ss; ++i, ++j) {
         for (const auto& v : p[i]) {
             const auto vv = zero_located_view.project(v);
-            per_cascade[i].collider->get_limit().put(vv);
-            per_cascade[j].collider->get_limit().put(vv);
+            per_cascade[i].collider->get_limit().put_without_update(vv);
+            per_cascade[j].collider->get_limit().put_without_update(vv);
         }
     }
     for (const auto& v : p[ss]) {
-        per_cascade[sss].collider->get_limit().put(zero_located_view.project(v));
+        per_cascade[sss].collider->get_limit().put_without_update(zero_located_view.project(v));
     }
     for (auto& c : per_cascade) {
-        math::Vec3 v = c.collider->get_limit().get_upper();
+        auto& limit = c.collider->get_limit();
+        math::Vec3 v = limit.get_upper();
         GXTODO // some doubt about it
             v[2]
             = std::numeric_limits<core::Real>::max();
-        c.collider->get_limit().put(v);
+        limit.put_without_update(v);
+        limit.update();
     }
 }
 
