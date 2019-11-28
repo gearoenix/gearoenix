@@ -55,6 +55,8 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
 
     const std::shared_ptr<GxDirLight> light = astmgr->get_light_manager()->create<GxDirLight>();
     light->enable_shadowing();
+	light->set_direction(GxVec3(-1.0f, 0.0f, -2.0f).normalized());
+	light->set_color(GxVec3(0.5f, 0.5f, 0.5f));
     scn->add_light(light);
     const std::shared_ptr<GxDirLight> light1 = astmgr->get_light_manager()->create<GxDirLight>();
     light1->set_direction(GxVec3(1.0f, 0.0f, -1.0f).normalized());
