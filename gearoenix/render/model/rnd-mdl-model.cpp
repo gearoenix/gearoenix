@@ -11,6 +11,7 @@
 #include "../mesh/rnd-msh-mesh.hpp"
 #include "../pipeline/rnd-pip-manager.hpp"
 #include "../scene/rnd-scn-scene.hpp"
+#include "rnd-mdl-manager.hpp"
 #include "rnd-mdl-transformation.hpp"
 
 gearoenix::render::model::Model::Model(
@@ -27,11 +28,21 @@ gearoenix::render::model::Model::Model(
     , e(e)
 {
     collider->set_parent(this);
-    GXTODO // collider must be initialized
-        const auto meshes_count
-        = f->read<core::Count>();
+    math::Mat4x4 m;
+    m.read(f);
+    collider->set_model_matrix(m);
+    const auto meshes_count = f->read<core::Count>();
     for (core::Count i = 0; i < meshes_count; ++i) {
         add_mesh(std::make_shared<Mesh>(f, e, c));
+    }
+    std::vector<core::Id> children_ids;
+    f->read(children_ids);
+    if (children_ids.empty())
+        return;
+    core::sync::EndCaller<Model> call([c](const std::shared_ptr<Model>&) {});
+    Manager* const mgr = e->get_system_application()->get_asset_manager()->get_model_manager();
+    for (core::Id c_id : children_ids) {
+        children[c_id] = mgr->get_gx3d(c_id, call);
     }
 }
 

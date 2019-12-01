@@ -71,3 +71,14 @@ void gearoenix::physics::collider::Collider::local_x_scale(const core::Real s) n
     updated_box.set_diameter(d);
     model_matrix.local_x_scale(s);
 }
+
+void gearoenix::physics::collider::Collider::set_model_matrix(const math::Mat4x4& m) noexcept
+{
+    model_matrix = m;
+    origin_box.get_all_corners(updated_points);
+    updated_box.reset();
+    for (math::Vec3& p : updated_points) {
+        p = (model_matrix * math::Vec4(p, 1.0f)).xyz();
+        updated_box.put(p);
+    }
+}

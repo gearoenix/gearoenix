@@ -188,8 +188,7 @@ void gearoenix::physics::accelerator::Bvh::InternalNode::init(const std::vector<
         }
         if (best_wall_right_count <= PER_NODE_COLLIDERS) {
             right = std::make_unique<LeafNode>(right_colliders, best_wall_right_box);
-        } 
-        else {
+        } else {
             right = std::make_unique<InternalNode>(right_colliders, best_wall_right_box);
         }
         return;

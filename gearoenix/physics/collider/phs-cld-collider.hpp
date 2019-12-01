@@ -52,6 +52,8 @@ public:
     void local_x_scale(core::Real s) noexcept override;
 
     // TODO: I have to implement rotations
+
+    virtual void set_model_matrix(const math::Mat4x4& m) noexcept;
 };
 }
 #endif
