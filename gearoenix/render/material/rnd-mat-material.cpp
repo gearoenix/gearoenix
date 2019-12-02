@@ -6,7 +6,7 @@
 
 gearoenix::render::material::Material::Material(engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept
     : uniform_buffers(new buffer::FramedUniform(sizeof(Uniform), e))
-    , color_value(math::Vec3(1.0f, 0.0f, 0.0f))
+    , color_value(math::Vec4(1.0f, 0.0f, 0.0f, 1.0f))
     , emission_value(math::Vec3(0.0f, 0.0f, 0.0f))
     , metallic_roughness_value(math::Vec2(0.5f, 0.5f))
     , normal_value(math::Vec3(0.5f, 0.5f, 1.0f))
@@ -41,8 +41,7 @@ gearoenix::render::material::Material::Material(system::stream::Stream* const f,
         math::Vec4 color;
         color.read(f);
         color_texture = std::dynamic_pointer_cast<texture::Texture2D>(txtmgr->get_2d(color, tcall));
-        color_value = color.xyz();
-        GXTODO // I'm not sure about alpha
+        color_value = color;
     }
     // Reading emission
     if (f->read_bool()) {
@@ -104,7 +103,7 @@ void gearoenix::render::material::Material::set_color(
     core::sync::EndCaller<texture::Texture2D> calltxt2d([end](const std::shared_ptr<texture::Texture2D>&) {});
     auto* const txtmgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
     color_texture = txtmgr->get_2d(math::Vec3(r, g, b), calltxt2d);
-    color_value = math::Vec3(r, g, b);
+    color_value = math::Vec4(r, g, b, 1.0f);
 }
 
 void gearoenix::render::material::Material::set_color(const std::shared_ptr<texture::Texture2D>& c) noexcept

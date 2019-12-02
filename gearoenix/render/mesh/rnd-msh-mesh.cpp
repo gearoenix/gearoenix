@@ -22,16 +22,15 @@ gearoenix::render::mesh::Mesh::Mesh(
     : core::asset::Asset(my_id, core::asset::Type::Mesh)
     , mesh_type(Type::Basic)
 {
-    const auto mesh_count = f->read<core::Count>();
-    std::vector<math::BasicVertex> vertices(mesh_count);
+    const auto vertices_count = f->read<core::Count>();
+    std::vector<math::BasicVertex> vertices(vertices_count);
     for (math::BasicVertex& v : vertices) {
         v.read(f);
     }
     std::vector<std::uint32_t> indices;
     f->read(indices);
-    GXTODO // make sure the blender plugin implemented this
-        box.read(f);
     set_vertices(e, vertices, indices, box, c);
+    box.read(f);
 }
 
 gearoenix::render::mesh::Mesh::Mesh(

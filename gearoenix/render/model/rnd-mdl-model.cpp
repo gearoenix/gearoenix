@@ -98,11 +98,11 @@ void gearoenix::render::model::Model::set_collider(std::unique_ptr<physics::coll
     collider->set_parent(this);
 }
 
-void gearoenix::render::model::Model::set_enabled(const bool e) noexcept
+void gearoenix::render::model::Model::set_enabled(const bool b) noexcept
 {
-    enabled = e;
+    enabled = b;
     for (auto& c : children) {
-        c.second->set_enabled(e);
+        c.second->set_enabled(b);
     }
     scene->set_models_changed(true);
 }

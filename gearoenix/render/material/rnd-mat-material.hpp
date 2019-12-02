@@ -23,7 +23,7 @@ namespace render {
             GX_GET_VAL_PRV(TranslucencyMode, translucency, TranslucencyMode::Opaque)
             GX_GET_VAL_PRV(bool, is_shadow_caster, true)
             GX_GET_CREF_PRV(std::shared_ptr<texture::Texture2D>, color_texture)
-            GX_GET_CREF_PRV(std::optional<math::Vec3>, color_value)
+            GX_GET_CREF_PRV(std::optional<math::Vec4>, color_value)
             GX_GET_CREF_PRV(std::shared_ptr<texture::Texture2D>, emission_texture)
             GX_GET_CREF_PRV(std::optional<math::Vec3>, emission_value)
             GX_GET_CREF_PRV(std::shared_ptr<texture::Texture2D>, metallic_roughness_texture)

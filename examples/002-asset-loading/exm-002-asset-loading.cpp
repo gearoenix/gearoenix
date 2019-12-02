@@ -29,7 +29,6 @@ using GxEndCaller = gearoenix::core::sync::EndCaller<T>;
 
 using GxEndCallerIgnore = gearoenix::core::sync::EndCallerIgnore;
 using GxEndCallerIgnored = GxEndCaller<GxEndCallerIgnore>;
-using GxGrPbr = gearoenix::render::graph::tree::Pbr;
 using GxGrTree = gearoenix::render::graph::tree::Tree;
 using GxMaterial = gearoenix::render::material::Material;
 using GxMdManager = gearoenix::render::model::Manager;
@@ -49,7 +48,8 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
         scn = std::move(s);
     });
 
-    render_engine->set_render_tree(new GxGrPbr(render_engine, endcall));
+    tree = std::unique_ptr<GxGrPbr>(new GxGrPbr(render_engine, endcall));
+    render_engine->set_render_tree(tree.get());
 
     const auto& astmgr = sys_app->get_asset_manager();
     const auto& scnmgr = astmgr->get_scene_manager();
