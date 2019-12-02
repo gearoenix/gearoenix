@@ -35,6 +35,7 @@ namespace system {
             virtual core::Count write(const void* data, core::Count length) noexcept = 0;
             virtual void seek(core::Count offset) noexcept = 0;
             virtual core::Count tell() noexcept = 0;
+            virtual core::Count size() noexcept = 0;
 
             bool get_endian_compatibility() const noexcept
             {

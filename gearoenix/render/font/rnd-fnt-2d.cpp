@@ -91,10 +91,10 @@ gearoenix::render::font::Font2D::Font2D(const core::Id my_id, texture::Manager* 
 {
     auto* const e = txt_mgr->get_engine();
     std::unique_ptr<system::stream::Asset> asset(system::stream::Asset::construct(e->get_system_application(), "default.ttf"));
+    const auto s = asset->size();
+    ttf_data.resize(static_cast<std::size_t>(s));
     asset->seek(0);
-#define DEFAULT_FONT_SIZE 1593268
-    ttf_data.resize(DEFAULT_FONT_SIZE);
-    asset->read(ttf_data.data(), DEFAULT_FONT_SIZE);
+    asset->read(ttf_data.data(), s);
     init();
 }
 

@@ -102,3 +102,18 @@ gearoenix::core::Count gearoenix::system::stream::Asset::tell() noexcept
 #error "Unexpected file interface"
 #endif
 }
+
+gearoenix::core::Count gearoenix::system::stream::Asset::size() noexcept
+{
+#ifdef GX_USE_STD_FILE
+    const auto c = file.tellg();
+    file.seekg(0, std::ios::end);
+    const auto s = static_cast<core::Count>(file.tellg());
+    file.seekg(c);
+    return s;
+#elif defined(GX_IN_ANDROID)
+    GXUNIMPLEMENTED
+#else
+#error "Unexpected file interface"
+#endif
+}

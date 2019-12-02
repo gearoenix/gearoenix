@@ -48,6 +48,8 @@ IF (MSVC)
 ENDIF ()
 # Document generation (planned)
 OPTION (GX_GENERATE_DOCUMENTS "Generate documentation (Planned)" OFF)
+# Tools targets
+OPTION (GX_ENABLE_TOOLS "Enables the tools" ON)
 # Example targets
 OPTION (GX_ENABLE_EXAMPLES "Enables the examples" ON)
 # Test
@@ -219,6 +221,10 @@ ADD_SUBDIRECTORY (gearoenix)
 IF(GX_ENABLE_EXAMPLES)
     ADD_SUBDIRECTORY (examples)
 ENDIF(GX_ENABLE_EXAMPLES)
+
+IF(GX_ENABLE_TOOLS)
+    ADD_SUBDIRECTORY (tools)
+ENDIF(GX_ENABLE_TOOLS)
 
 IF(GX_ENABLE_TESTS)
     INCLUDE (CTest)

@@ -43,6 +43,7 @@ namespace system {
             core::Count write(const void* data, core::Count length) noexcept;
             void seek(core::Count offset) noexcept;
             core::Count tell() noexcept;
+            core::Count size() noexcept final;
         };
     }
 }

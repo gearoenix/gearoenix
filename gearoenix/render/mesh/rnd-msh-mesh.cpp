@@ -29,8 +29,8 @@ gearoenix::render::mesh::Mesh::Mesh(
     }
     std::vector<std::uint32_t> indices;
     f->read(indices);
-    set_vertices(e, vertices, indices, box, c);
     box.read(f);
+    set_vertices(e, vertices, indices, box, c);
 }
 
 gearoenix::render::mesh::Mesh::Mesh(
