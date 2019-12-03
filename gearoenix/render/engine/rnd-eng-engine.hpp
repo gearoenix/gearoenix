@@ -7,6 +7,7 @@
 #include "../texture/rnd-txt-format.hpp"
 #include "../texture/rnd-txt-info.hpp"
 #include "../texture/rnd-txt-sample.hpp"
+#include "rnd-eng-limitations.hpp"
 #include "rnd-eng-type.hpp"
 #include <chrono>
 #include <vector>
@@ -82,6 +83,7 @@ namespace render {
             GX_GET_UPTR_PRT(sampler::Manager, sampler_manager)
             GX_GET_UPTR_PRT(buffer::Manager, buffer_manager)
             GX_GET_CREF_PRT(std::shared_ptr<texture::Target>, main_render_target)
+            GX_GET_CREF_PRT(Limitations, limitations)
             GX_GET_VAL_PRT(unsigned int, frames_count, 2)
             GX_GET_VAL_PRT(unsigned int, frame_number, 0)
             GX_GET_VAL_PRT(core::Real, delta_time, 0.0f)

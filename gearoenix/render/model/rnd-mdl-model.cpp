@@ -80,7 +80,7 @@ void gearoenix::render::model::Model::add_mesh(const std::shared_ptr<Mesh>& m) n
 {
     material::Material* const mat = m->get_material().get();
     has_shadow_caster |= mat->get_is_shadow_caster();
-    has_transparent |= (mat->get_translucency() == material::TranslucencyMode::Tansparent);
+    has_transparent |= (mat->get_translucency() == material::TranslucencyMode::Transparent);
     mesh::Mesh* const msh = m->get_mesh().get();
     collider->put_in_box(msh->get_box());
     meshes[msh->get_asset_id()] = m;

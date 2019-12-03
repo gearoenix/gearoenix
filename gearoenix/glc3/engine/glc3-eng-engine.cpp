@@ -22,6 +22,7 @@
 gearoenix::glc3::engine::Engine::Engine(system::Application* const sys_app, const render::engine::Type engine_type) noexcept
     : render::engine::Engine(sys_app, engine_type)
 {
+    gl::Loader::fill_limitations(limitations);
 }
 
 gearoenix::glc3::engine::Engine* gearoenix::glc3::engine::Engine::construct(system::Application* const sys_app, const render::engine::Type engine_type) noexcept

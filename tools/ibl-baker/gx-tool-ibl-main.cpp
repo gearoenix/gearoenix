@@ -71,15 +71,15 @@ IblBakerApp::IblBakerApp(gearoenix::system::Application* const sys_app) noexcept
     : gearoenix::core::Application::Application(sys_app)
 {
     const GxEndCallerIgnored endcall([this] {
-    //    scn->set_enability(true);
+        //    scn->set_enability(true);
         uiscn->set_enability(true);
-    //    auto* const event_engine = system_application->get_event_engine();
-    //    event_engine->add_listner(gearoenix::core::event::Id::ButtonMouse, 1.0f, this);
-    //    event_engine->add_listner(gearoenix::core::event::Id::ButtonKeyboard, 1.0f, this);
-    //    event_engine->add_listner(gearoenix::core::event::Id::MovementMouse, 1.0f, this);
-    //    event_engine->add_listner(gearoenix::core::event::Id::ScrollMouse, 1.0f, this);
-    //    event_engine->add_listner(gearoenix::core::event::Id::GestureDrag, 1.0f, this);
-        });
+        //    auto* const event_engine = system_application->get_event_engine();
+        //    event_engine->add_listner(gearoenix::core::event::Id::ButtonMouse, 1.0f, this);
+        //    event_engine->add_listner(gearoenix::core::event::Id::ButtonKeyboard, 1.0f, this);
+        //    event_engine->add_listner(gearoenix::core::event::Id::MovementMouse, 1.0f, this);
+        //    event_engine->add_listner(gearoenix::core::event::Id::ScrollMouse, 1.0f, this);
+        //    event_engine->add_listner(gearoenix::core::event::Id::GestureDrag, 1.0f, this);
+    });
 
     //GxEndCaller<GxGameScene> scncall([endcall](const std::shared_ptr<GxGameScene>&) {});
     GxEndCaller<GxUiScene> uiscncall([endcall](const std::shared_ptr<GxUiScene>&) {});
@@ -96,7 +96,7 @@ IblBakerApp::IblBakerApp(gearoenix::system::Application* const sys_app) noexcept
     auto* const astmgr = sys_app->get_asset_manager();
     auto* const mdlmgr = astmgr->get_model_manager();
     auto* const mshmgr = astmgr->get_mesh_manager();
-    
+
     //scn = astmgr->get_scene_manager()->create<GxGameScene>(scncall);
     uiscn = astmgr->get_scene_manager()->create<GxUiScene>(uiscncall);
 

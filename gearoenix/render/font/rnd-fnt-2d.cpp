@@ -1,9 +1,9 @@
 #include "rnd-fnt-2d.hpp"
 #include "../../core/asset/cr-asset-manager.hpp"
+#include "../../math/math-numeric.hpp"
 #include "../../system/stream/sys-stm-asset.hpp"
 #include "../../system/stream/sys-stm-memory.hpp"
 #include "../../system/sys-app.hpp"
-#include "../../math/math-numeric.hpp"
 #include "../engine/rnd-eng-engine.hpp"
 #include "../texture/rnd-txt-manager.hpp"
 #include "../texture/rnd-txt-texture-2d.hpp"
@@ -113,8 +113,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::font::
     core::Real& starting_aspect_ratio,
     core::sync::EndCaller<texture::Texture2D>& end) const noexcept
 {
-    // txt_mgr->get_engine()->get_limitations().max_texture_size
-    const unsigned int max_texture_size = 1024;
+    const unsigned int max_texture_size = txt_mgr->get_engine()->get_limitations().texture_maximum_aspect;
 
     const auto a = compute_text_aspects(text);
 

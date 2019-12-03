@@ -8,31 +8,31 @@
 #include <random>
 
 namespace gearoenix::render::camera {
-    class Camera;
-    class Transformation;
+class Camera;
+class Transformation;
 }
 
 namespace gearoenix::render::graph::tree {
-    class Pbr;
+class Pbr;
 }
 
 namespace gearoenix::render::scene {
-    class Game;
-    class Ui;
+class Game;
+class Ui;
 }
 
 namespace gearoenix::render::model {
-    class Static;
+class Static;
 }
 
 namespace gearoenix::render::widget {
-    class Button;
-    class Modal;
-    class Text;
+class Button;
+class Modal;
+class Text;
 }
 
 class IblBakerApp : public gearoenix::core::Application,
-    public gearoenix::core::event::Listner {
+                    public gearoenix::core::event::Listner {
 private:
     using GxGameScene = gearoenix::render::scene::Game;
     using GxStaticModel = gearoenix::render::model::Static;

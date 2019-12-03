@@ -2,6 +2,7 @@
 #define GEAROENIX_GL_LOADER_HPP
 #include "../core/cr-build-configuration.hpp"
 #ifdef GX_USE_OPENGL
+#include "../render/engine/rnd-eng-limitations.hpp"
 #include "../render/engine/rnd-eng-type.hpp"
 #include "gl-types.hpp"
 
@@ -138,6 +139,7 @@ public:
     static bool load_library(render::engine::Type engine_type) noexcept;
     static void unload_library() noexcept;
     static void check_for_error() noexcept;
+    static void fill_limitations(render::engine::Limitations& limitations) noexcept;
 
     static active_texture_fnp active_texture;
     static attach_shader_fnp attach_shader;

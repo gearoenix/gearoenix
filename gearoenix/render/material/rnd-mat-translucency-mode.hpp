@@ -3,7 +3,7 @@
 #include "../../core/cr-types.hpp"
 namespace gearoenix::render::material {
 enum struct TranslucencyMode : core::TypeId {
-    Tansparent = 1,
+    Transparent = 1,
     Opaque = 2,
 };
 }

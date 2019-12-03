@@ -21,6 +21,9 @@ gearoenix::gles2::texture::SampleInfo::SampleInfo(const render::texture::SampleI
     case render::texture::Filter::LINEAR:
         min_filter = GL_LINEAR;
         break;
+    case render::texture::Filter::LINEAR_MIPMAP_LINEAR:
+        min_filter = GL_LINEAR_MIPMAP_LINEAR;
+        break;
     default:
         GXUNEXPECTED
     }

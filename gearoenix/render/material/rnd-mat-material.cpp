@@ -76,7 +76,7 @@ gearoenix::render::material::Material::Material(system::stream::Stream* const f,
     }
     // Translucency
     if (f->read_bool())
-        translucency = TranslucencyMode::Tansparent;
+        translucency = TranslucencyMode::Transparent;
     is_shadow_caster = f->read_bool();
     f->read(uniform.alpha_cutoff);
 }

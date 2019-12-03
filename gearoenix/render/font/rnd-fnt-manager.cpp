@@ -34,7 +34,7 @@ std::shared_ptr<gearoenix::render::font::Font2D> gearoenix::render::font::Manage
 {
     if (default_2d == nullptr) {
         const auto& astmgr = e->get_system_application()->get_asset_manager();
-        default_2d = std::make_shared<Font2D>(astmgr->create_id(), astmgr->get_texture_manager());
+        default_2d = std::make_shared<Font2D>(core::asset::Manager::create_id(), astmgr->get_texture_manager());
     }
     c.set_data(default_2d);
     return default_2d;

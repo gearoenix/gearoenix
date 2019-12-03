@@ -34,6 +34,7 @@ gearoenix::render::widget::Text::Text(
     auto mat = std::make_shared<material::Material>(f, e, c);
     mat->set_metallic_factor(0.001f);
     mat->set_roughness_factor(0.999f);
+    mat->set_translucency(material::TranslucencyMode::Transparent);
     core::sync::EndCaller<mesh::Mesh> mend([c](const std::shared_ptr<mesh::Mesh>&) {});
     auto msh = astmgr->get_mesh_manager()->create_plate(mend);
     add_mesh(std::make_shared<model::Mesh>(msh, mat));

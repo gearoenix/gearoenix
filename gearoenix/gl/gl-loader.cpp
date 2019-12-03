@@ -219,3 +219,10 @@ void gearoenix::gl::Loader::check_for_error() noexcept
         GXLOGF("Unknown error.")
     }
 }
+
+void gearoenix::gl::Loader::fill_limitations(gearoenix::render::engine::Limitations& limitations) noexcept
+{
+    sint max_texture_size;
+    get_integerv(GL_MAX_TEXTURE_SIZE, &max_texture_size);
+    limitations.texture_maximum_aspect = static_cast<unsigned int>(max_texture_size);
+}

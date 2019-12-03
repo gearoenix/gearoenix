@@ -7,7 +7,7 @@ class Scene;
 }
 
 namespace gearoenix::render::graph::tree {
-    class Pbr;
+class Pbr;
 }
 
 class GameApp : public gearoenix::core::Application {

@@ -21,6 +21,7 @@
 
 void gearoenix::gles2::engine::Engine::initialize() noexcept
 {
+    gl::Loader::fill_limitations(limitations);
 #ifdef GX_GLES2_ENGINE_PROFILING
     prof_last_time_draw = std::chrono::high_resolution_clock::now();
 #endif
