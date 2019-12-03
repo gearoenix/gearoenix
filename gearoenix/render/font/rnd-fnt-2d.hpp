@@ -16,10 +16,10 @@ class Texture2D;
 namespace gearoenix::render::font {
 class Font2D : public Font {
 private:
-    struct MultilineTextAspectsInfo {
-        int max_lsb = 0;
-        int max_width = 1;
-        int height = 1;
+    struct TextAspectsInfo {
+        unsigned int lsb = 0;
+        unsigned int width = 0;
+        unsigned int height = 0;
     };
     texture::Manager* const txt_mgr;
 
@@ -31,29 +31,27 @@ private:
     int line_growth = 0;
     int fnt_height = 0;
 
-    MultilineTextAspectsInfo compute_multiline_text_aspects(const std::wstring& text) const noexcept;
+    [[nodiscard]] TextAspectsInfo compute_text_aspects(const std::wstring& text) const noexcept;
     void init() noexcept;
 
 public:
     Font2D(
-        const core::Id my_id,
+        core::Id my_id,
         system::stream::Stream* f,
         texture::Manager* txt_mgr) noexcept;
     Font2D(
-        const core::Id my_id,
+        core::Id my_id,
         texture::Manager* txt_mgr) noexcept;
-    ~Font2D() noexcept;
-    /// This function is a simple and fast way to only render a multiline text to a texture.
-    /// It is not a good way to handle large text area with this function.
-    /// In future, maybe, I will implement a one line fast enough texture baker.
-    const std::shared_ptr<texture::Texture2D> multiline_bake(
+    ~Font2D() noexcept final;
+    /// This function is a simple and fast way to only render a one-line text to a texture.
+    [[nodiscard]] std::shared_ptr<texture::Texture2D> bake(
         const std::wstring& text,
         const std::uint8_t color[4],
-        int img_width,
-        int img_height,
-        int img_margin,
+        core::Real scale,
+        unsigned int img_margin,
         core::Real& render_aspect_ratio,
-        core::sync::EndCaller<texture::Texture2D> end) const noexcept;
+        core::Real& starting_aspect_ratio,
+        core::sync::EndCaller<texture::Texture2D>& end) const noexcept;
 };
 }
 #endif

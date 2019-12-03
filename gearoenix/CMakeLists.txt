@@ -220,6 +220,8 @@ SET(GX_ENGINE_SRC
         "${GX_ENGINE_SRC_DIR}math/math-intersection-status.hpp"
         "${GX_ENGINE_SRC_DIR}math/math-matrix.cpp"
         "${GX_ENGINE_SRC_DIR}math/math-matrix.hpp"
+        "${GX_ENGINE_SRC_DIR}math/math-numeric.cpp"
+        "${GX_ENGINE_SRC_DIR}math/math-numeric.hpp"
         "${GX_ENGINE_SRC_DIR}math/math-plane.cpp"
         "${GX_ENGINE_SRC_DIR}math/math-plane.hpp"
         "${GX_ENGINE_SRC_DIR}math/math-plotter.cpp"
