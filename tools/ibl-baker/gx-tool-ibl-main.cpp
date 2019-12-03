@@ -217,6 +217,7 @@ IblBakerApp::IblBakerApp(gearoenix::system::Application* const sys_app) noexcept
     tmptran->set_location(GxVec3(0.75f, 0.75f, 0.1f));
 
     tmptxt = mdlmgr->create<GxTextWdg>(txwcall);
+    tmptxt->set_text_color(0.0f, 0.0f, 0.0f, endcall);
     tmptxt->set_text(L"Open File", endcall);
     tmptran = tmptxt->get_transformation();
     tmptran->local_scale(0.03f);

@@ -18,12 +18,12 @@ class Text : public Widget {
     GX_GET_VAL_PRV(core::Real, current_x_scale, 1.0f)
 public:
     Text(
-        const core::Id my_id,
+        core::Id my_id,
         system::stream::Stream* f,
         engine::Engine* e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
     Text(
-        const core::Id my_id,
+        core::Id my_id,
         engine::Engine* e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
     ~Text() noexcept final;
