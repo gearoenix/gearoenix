@@ -12,6 +12,26 @@
 #include <codecvt>
 #include <locale>
 
+void gearoenix::render::widget::Text::private_set_text(
+    const std::wstring& t,
+    const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
+{
+    text = t;
+    core::Real asp = 0.0f;
+    core::Real starting_asp = 0.0f;
+    std::uint8_t txtclr[4];
+    txtclr[0] = (text_color[0] >= 1.0f ? 255 : static_cast<std::uint8_t>(text_color[0] * 255));
+    txtclr[1] = (text_color[1] >= 1.0f ? 255 : static_cast<std::uint8_t>(text_color[1] * 255));
+    txtclr[2] = (text_color[2] >= 1.0f ? 255 : static_cast<std::uint8_t>(text_color[2] * 255));
+    txtclr[3] = 255;
+    auto txtend = core::sync::EndCaller<texture::Texture2D>([c, this](const std::shared_ptr<texture::Texture2D>& txt) {
+        meshes[text_mesh_id]->get_material()->set_color(txt);
+    });
+    auto txt = text_font->bake(text, txtclr, 0.02f, 5, asp, starting_asp, txtend);
+    transformation->local_x_scale(asp / current_x_scale);
+    current_x_scale = asp;
+}
+
 gearoenix::render::widget::Text::Text(
     const core::Id my_id,
     system::stream::Stream* const f,
@@ -28,7 +48,9 @@ gearoenix::render::widget::Text::Text(
         text = converter.from_bytes(s);
     }
     auto astmgr = e->get_system_application()->get_asset_manager();
-    f->read(align);
+    GXTODO // Implement it in blender plugin too
+        f->read(v_align);
+    f->read(h_align);
     core::sync::EndCaller<font::Font> fend([c](const std::shared_ptr<font::Font>&) {});
     text_font = std::dynamic_pointer_cast<font::Font2D>(astmgr->get_font_manager()->get(f->read<core::Id>(), fend));
     auto mat = std::make_shared<material::Material>(f, e, c);
@@ -38,7 +60,7 @@ gearoenix::render::widget::Text::Text(
     core::sync::EndCaller<mesh::Mesh> mend([c](const std::shared_ptr<mesh::Mesh>&) {});
     auto msh = astmgr->get_mesh_manager()->create_plate(mend);
     add_mesh(std::make_shared<model::Mesh>(msh, mat));
-    set_text(text, c);
+    private_set_text(text, c);
 }
 
 gearoenix::render::widget::Text::Text(
@@ -55,11 +77,12 @@ gearoenix::render::widget::Text::Text(
     auto mat = std::make_shared<material::Material>(e, c);
     mat->set_metallic_factor(0.001f);
     mat->set_roughness_factor(0.999f);
+    mat->set_translucency(material::TranslucencyMode::Transparent);
     core::sync::EndCaller<mesh::Mesh> mend([c](const std::shared_ptr<mesh::Mesh>&) {});
     auto msh = astmgr->get_mesh_manager()->create_plate(mend);
     text_mesh_id = msh->get_asset_id();
     add_mesh(std::make_shared<model::Mesh>(msh, mat));
-    set_text(text, c);
+    private_set_text(text, c);
 }
 
 gearoenix::render::widget::Text::~Text() noexcept = default;
@@ -68,20 +91,7 @@ void gearoenix::render::widget::Text::set_text(
     const std::wstring& t,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
 {
-    text = t;
-    core::Real asp = 0.0f;
-    core::Real starting_asp = 0.0f;
-    std::uint8_t txtclr[4];
-    txtclr[0] = (text_color[0] >= 1.0f ? 255 : static_cast<std::uint8_t>(text_color[0] * 255));
-    txtclr[1] = (text_color[1] >= 1.0f ? 255 : static_cast<std::uint8_t>(text_color[1] * 255));
-    txtclr[2] = (text_color[2] >= 1.0f ? 255 : static_cast<std::uint8_t>(text_color[2] * 255));
-    txtclr[3] = 255;
-    auto txtend = core::sync::EndCaller<texture::Texture2D>([c, this](const std::shared_ptr<texture::Texture2D>& txt) {
-        meshes[text_mesh_id]->get_material()->set_color(txt);
-    });
-    auto txt = text_font->bake(text, txtclr, 0.05f, 5, asp, starting_asp, txtend);
-    transformation->local_x_scale(asp / current_x_scale);
-    current_x_scale = asp;
+    private_set_text(t, c);
 }
 
 void gearoenix::render::widget::Text::set_text_color(

@@ -14,7 +14,7 @@ public:
         core::Id my_id,
         engine::Engine* e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
-    bool get_dynamicity() const noexcept final { return true; }
+    [[nodiscard]] bool get_dynamicity() const noexcept final { return true; }
 };
 }
 #endif

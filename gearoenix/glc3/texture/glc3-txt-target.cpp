@@ -5,20 +5,13 @@
 #include "../../gl/gl-constants.hpp"
 #include "../../gl/gl-loader.hpp"
 #include "../../render/texture/rnd-txt-png.hpp"
-#include "../../system/stream/sys-stm-stream.hpp"
 #include "../../system/sys-app.hpp"
-#include "../../system/sys-log.hpp"
 #include "../engine/glc3-eng-engine.hpp"
-#include "../glc3.hpp"
 #include "glc3-txt-sample.hpp"
-
-#ifdef GX_DEBUG_GL_CLASS_3
-#define GX_DEBUG_GL_CLASS_3_TARGET
-#endif
 
 void gearoenix::glc3::texture::Target::state_init() const noexcept
 {
-    gl::Loader::clear_color(0.0f, 0.0f, 0.0f, 0.0f);
+    gl::Loader::clear_color(0.0f, 0.0f, 0.0f, 1.0f);
     gl::Loader::enable(GL_CULL_FACE);
     gl::Loader::cull_face(GL_BACK);
     gl::Loader::enable(GL_BLEND);
@@ -72,7 +65,7 @@ std::shared_ptr<gearoenix::glc3::texture::Target> gearoenix::glc3::texture::Targ
             const auto& txt = result->texture_objects[i];
             if (txt_fmt == render::texture::TextureFormat::D32) {
                 gl::Loader::bind_texture(GL_TEXTURE_2D, txt);
-                gl::Loader::tex_image_2d(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, result->img_width, result->img_height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+                gl::Loader::tex_image_2d(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, result->img_width, result->img_height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
                 /// The nearest filter in here is for workaround for some buggy vendors
                 gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
                 gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -94,7 +87,7 @@ std::shared_ptr<gearoenix::glc3::texture::Target> gearoenix::glc3::texture::Targ
 
 gearoenix::glc3::texture::Target::~Target() noexcept
 {
-    if (texture_objects.size() == 0) // This is main render-target
+    if (texture_objects.empty()) // This is main render-target
         return;
     const auto cf = framebuffer;
     const auto cr = depth_buffer;
@@ -117,7 +110,7 @@ void gearoenix::glc3::texture::Target::bind() const noexcept
     gl::Loader::scissor(0, 0, static_cast<gl::sizei>(clipping_width), static_cast<gl::sizei>(clipping_height));
     gl::Loader::enable(GL_DEPTH_TEST);
     gl::Loader::depth_mask(GL_TRUE);
-    if (texture_objects.size() != 0)
+    if (!texture_objects.empty())
         gl::Loader::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     else
         gl::Loader::clear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);

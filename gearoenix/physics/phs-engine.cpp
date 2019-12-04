@@ -84,7 +84,7 @@ void gearoenix::physics::Engine::update_visibility_kernel(const unsigned int ker
                 auto* const m = cld->get_parent();
                 m->update();
                 if (m->get_has_transparent()) {
-                    transparent_container_models[camera->get_distance(m->get_transformation()->get_location())] = m;
+                    transparent_container_models[camera->get_distance(cld->get_location())].push_back(m);
                 }
                 opaque_container_models.push_back(m);
             };

@@ -53,7 +53,7 @@ namespace physics {
         struct PooledCameraData {
             render::camera::Camera* camera = nullptr;
             std::vector<render::model::Model*> opaque_container_models;
-            std::map<core::Real, render::model::Model*> transparent_container_models;
+            std::map<core::Real, std::vector<render::model::Model*>> transparent_container_models;
             core::OneLoopPool<PooledShadowCasterDirectionalLights> shadow_caster_directional_lights;
         };
 
@@ -64,7 +64,7 @@ namespace physics {
 
         struct GatheredCameraData {
             std::vector<render::model::Model*> opaque_container_models;
-            std::map<core::Real, render::model::Model*> transparent_container_models;
+            std::map<core::Real, std::vector<render::model::Model*>> transparent_container_models;
             std::map<core::Real, std::map<render::light::Directional*, render::light::CascadeInfo*>> shadow_caster_directional_lights;
         };
 

@@ -98,7 +98,8 @@ gearoenix::render::graph::node::ForwardPbrRenderData::~ForwardPbrRenderData() no
 
 void gearoenix::render::graph::node::ForwardPbr::record(
     const model::Model* const m,
-    const unsigned int kernel_index) noexcept
+    const unsigned int kernel_index,
+    const material::TranslucencyMode translucency_mode) noexcept
 {
     const ForwardPbrUniform u(directional_lights, scn, m);
     const auto& cam_uni = cam->get_uniform();
@@ -108,6 +109,8 @@ void gearoenix::render::graph::node::ForwardPbr::record(
     for (const std::pair<const core::Id, std::shared_ptr<model::Mesh>>& id_mesh : meshes) {
         const std::shared_ptr<mesh::Mesh>& msh = id_mesh.second->get_mesh();
         const std::shared_ptr<material::Material>& mat = id_mesh.second->get_material();
+        if (mat->get_translucency() != translucency_mode)
+            continue;
         auto* const rd = kernel->render_data_pool.get_next([this] {
             return new ForwardPbrRenderData(e, render_pipeline.get());
         });
@@ -218,7 +221,7 @@ void gearoenix::render::graph::node::ForwardPbr::set_opaque_models(const std::ve
     opaque_models = ms;
 }
 
-void gearoenix::render::graph::node::ForwardPbr::set_transparent_models(const std::map<core::Real, model::Model*>* const ms) noexcept
+void gearoenix::render::graph::node::ForwardPbr::set_transparent_models(const std::map<core::Real, std::vector<model::Model*>>* const ms) noexcept
 {
     transparent_models = ms;
 }
@@ -268,11 +271,21 @@ void gearoenix::render::graph::node::ForwardPbr::record(const unsigned int kerne
         task_number %= kernels_count;      \
     }
 
-    for (auto* m : *opaque_models) {
+    for (auto* const m : *opaque_models) {
         GX_DO_TASK(record(m, kernel_index))
     }
 
 #undef GX_DO_TASK
+
+    // TODO
+    // This is temporary it is better to have a separate command buffer for transparent objects.
+    if (kernels_count - 1 == kernel_index) {
+        for (const auto& otms : *transparent_models) {
+            for (auto* const m : otms.second) {
+                record(m, kernel_index, material::TranslucencyMode::Transparent);
+            }
+        }
+    }
 }
 
 void gearoenix::render::graph::node::ForwardPbr::submit() noexcept

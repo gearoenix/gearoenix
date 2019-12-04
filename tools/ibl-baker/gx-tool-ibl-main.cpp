@@ -25,6 +25,7 @@
 #include <gearoenix/render/texture/rnd-txt-manager.hpp>
 #include <gearoenix/render/texture/rnd-txt-texture-2d.hpp>
 #include <gearoenix/render/widget/rnd-wdg-button.hpp>
+#include <gearoenix/render/widget/rnd-wdg-edit.hpp>
 #include <gearoenix/render/widget/rnd-wdg-modal.hpp>
 #include <gearoenix/render/widget/rnd-wdg-text.hpp>
 #include <gearoenix/system/sys-app.hpp>
@@ -87,6 +88,7 @@ IblBakerApp::IblBakerApp(gearoenix::system::Application* const sys_app) noexcept
     //GxEndCaller<GxStaticModel> mdlcall([endcall](const std::shared_ptr<GxStaticModel>&) {});
     //GxEndCaller<GxModal> mdacall([endcall](const std::shared_ptr<GxModal>&) {});
     GxEndCaller<GxTextWdg> txwcall([endcall](const std::shared_ptr<GxTextWdg>&) {});
+    GxEndCaller<GxEditWdg> edtcall([endcall](const std::shared_ptr<GxEditWdg>&) {});
     //GxEndCaller<GxTexture> txtcall([endcall](const std::shared_ptr<GxTexture>&) {});
     GxEndCaller<GxButton> btncall([endcall](const std::shared_ptr<GxButton>&) {});
 
@@ -235,6 +237,15 @@ IblBakerApp::IblBakerApp(gearoenix::system::Application* const sys_app) noexcept
     open_button->add_mesh(std::make_shared<GxMdMesh>(plate_mesh, btnmat));
 
     uiscn->add_model(open_button);
+
+    file_location = mdlmgr->create<GxEditWdg>(edtcall);
+    file_location->set_capacity(24);
+    file_location->set_hint_text(L"<Fill it with 'file location'>", endcall);
+    //    file_location->set_hint_text(L"012345678901234567890123456789", endcall);
+    tmptran = file_location->get_transformation();
+    tmptran->local_scale(0.05f);
+    tmptran->set_location(GxVec3(0.0f, 0.75f, 0.1f));
+    uiscn->add_model(file_location);
 
     //modal->add_child(look_at_button);
 

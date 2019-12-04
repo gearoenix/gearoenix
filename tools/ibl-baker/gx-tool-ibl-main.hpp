@@ -29,6 +29,7 @@ namespace gearoenix::render::widget {
 class Button;
 class Modal;
 class Text;
+class Edit;
 }
 
 class IblBakerApp : public gearoenix::core::Application,
@@ -42,6 +43,7 @@ private:
     using GxModal = gearoenix::render::widget::Modal;
     using GxButton = gearoenix::render::widget::Button;
     using GxTextWdg = gearoenix::render::widget::Text;
+    using GxEditWdg = gearoenix::render::widget::Edit;
     using GxGrPbr = gearoenix::render::graph::tree::Pbr;
     using GxReal = gearoenix::core::Real;
     using GxVec2 = gearoenix::math::Vec2;
@@ -61,6 +63,7 @@ private:
     std::shared_ptr<GxModal> modal;
     std::shared_ptr<GxButton> look_at_button;
     std::shared_ptr<GxTextWdg> text_location;
+    std::shared_ptr<GxEditWdg> file_location;
     std::unique_ptr<GxGrPbr> render_tree;
     std::chrono::high_resolution_clock::time_point last_time_item_detail_modal_closed = std::chrono::high_resolution_clock::now();
     std::atomic<GxReal> camera_forward = 0.0f;
