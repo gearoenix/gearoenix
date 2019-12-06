@@ -8,7 +8,7 @@ public:
     template <typename T>
     static T raise_p2(T v) noexcept;
     template <typename T>
-    static T raise_p2_limits(T v, T maximun, T minimum) noexcept;
+    static T raise_p2(T v, T maximun, T minimum) noexcept;
 };
 }
 
@@ -23,7 +23,7 @@ T gearoenix::math::Numeric::raise_p2(const T v) noexcept
 }
 
 template <typename T>
-T gearoenix::math::Numeric::raise_p2_limits(const T v, const T maximun, const T minimum) noexcept
+T gearoenix::math::Numeric::raise_p2(const T v, const T maximun, const T minimum) noexcept
 {
     if (v > maximun)
         return maximun;

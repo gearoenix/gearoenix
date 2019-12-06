@@ -15,7 +15,7 @@ class Edit : public Text {
     GX_GET_CREF_PRV(std::shared_ptr<Text>, hint)
     GX_GET_CREF_PRV(std::shared_ptr<model::Dynamic>, background)
     GX_GET_CREF_PRV(std::shared_ptr<model::Dynamic>, cursor)
-    GX_GET_VAL_PRV(std::size_t, capacity, 20);
+    GX_GET_VAL_PRV(std::size_t, capacity, 28);
     GX_GET_VAL_PRV(bool, cut_string_from_left, true)
 
     [[nodiscard]] std::wstring cut_string(const std::wstring& t) const noexcept;
