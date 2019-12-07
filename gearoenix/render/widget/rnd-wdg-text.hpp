@@ -12,13 +12,10 @@ namespace gearoenix::render::widget {
 class Text : public Widget {
     GX_GET_CREF_PRT(std::wstring, text)
     GX_GET_CREF_PRT(std::shared_ptr<font::Font2D>, text_font)
-    GX_GET_CREF_PRT(math::Vec3, text_color)
+    GX_GET_CREF_PRT(math::Vec4, text_color)
     GX_GET_VAL_PRT(Alignment, v_align, Alignment::Center)
     GX_GET_VAL_PRT(Alignment, h_align, Alignment::Center)
     GX_GET_VAL_PRT(core::Id, text_mesh_id, 0)
-
-    void private_set_text(const std::wstring& t, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
-
 public:
     Text(
         core::Id my_id,
@@ -30,8 +27,12 @@ public:
         engine::Engine* e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
     ~Text() noexcept override;
-    virtual void set_text(const std::wstring& t, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
-    void set_text_color(core::Real red, core::Real green, core::Real blue, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+    void set_text(
+        const std::wstring& t,
+        const core::sync::EndCaller<core::sync::EndCallerIgnore>& c = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
+    void set_text_color(
+        core::Real red, core::Real green, core::Real blue,
+        const core::sync::EndCaller<core::sync::EndCallerIgnore>& c = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
 };
 }
 #endif

@@ -42,7 +42,7 @@ public:
     [[nodiscard]] std::shared_ptr<texture::Texture2D> bake(
         const std::wstring& text,
         const std::vector<core::Real>& txt_widths,
-        const std::uint8_t color[4],
+        const math::Vec4& color,
         core::Real img_width,
         core::Real img_height,
         core::Real img_start_skip,
@@ -50,7 +50,7 @@ public:
     /// This function is a simple and fast way to only render a one-line text to a texture.
     [[nodiscard]] std::shared_ptr<texture::Texture2D> bake(
         const std::wstring& text,
-        const std::uint8_t color[4],
+        const math::Vec4& color,
         core::Real img_height,
         core::Real& img_width,
         core::sync::EndCaller<texture::Texture2D>& end) const noexcept;

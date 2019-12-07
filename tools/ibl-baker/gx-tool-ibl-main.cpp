@@ -29,7 +29,6 @@
 #include <gearoenix/render/widget/rnd-wdg-modal.hpp>
 #include <gearoenix/render/widget/rnd-wdg-text.hpp>
 #include <gearoenix/system/sys-app.hpp>
-#include <sstream>
 
 template <class T>
 using GxEndCaller = gearoenix::core::sync::EndCaller<T>;
@@ -239,12 +238,11 @@ IblBakerApp::IblBakerApp(gearoenix::system::Application* const sys_app) noexcept
     uiscn->add_model(open_button);
 
     file_location = mdlmgr->create<GxEditWdg>(edtcall);
-    file_location->set_capacity(32);
-    //file_location->set_hint_text(L"<Fill it with 'file location'>", endcall);
     tmptran = file_location->get_transformation();
     tmptran->local_scale(0.05f);
+    tmptran->local_x_scale(10.75f);
     tmptran->set_location(GxVec3(0.0f, 0.75f, 0.1f));
-    file_location->set_hint_text(L"012345678901234567890123456789", endcall);
+    file_location->set_hint_text(L"<Fill it with 'file location'>", endcall);
     uiscn->add_model(file_location);
 
     //modal->add_child(look_at_button);

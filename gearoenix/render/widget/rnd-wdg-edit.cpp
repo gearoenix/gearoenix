@@ -1,6 +1,8 @@
 #include "rnd-wdg-edit.hpp"
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../system/sys-app.hpp"
+#include "../font/rnd-fnt-2d.hpp"
+#include "../font/rnd-fnt-manager.hpp"
 #include "../material/rnd-mat-material.hpp"
 #include "../mesh/rnd-msh-manager.hpp"
 #include "../mesh/rnd-msh-mesh.hpp"
@@ -8,60 +10,61 @@
 #include "../model/rnd-mdl-manager.hpp"
 #include "../model/rnd-mdl-mesh.hpp"
 
-std::wstring gearoenix::render::widget::Edit::cut_string(const std::wstring& t) const noexcept
-{
-    if (t.size() <= capacity)
-        return t;
-    if (cut_string_from_left)
-        return t.substr(0, capacity);
-    return t.substr(t.size() - capacity);
-}
-
 gearoenix::render::widget::Edit::Edit(
     const core::Id my_id,
     system::stream::Stream* const f,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
-    : Text(my_id, f, e, c) {
+    : Widget(my_id, Type::Edit, f, e, c) {
         GXUNIMPLEMENTED
     }
 
     gearoenix::render::widget::Edit::Edit(const core::Id my_id, engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
-    : Text(my_id, e, c)
+    : Widget(my_id, Type::Edit, e, c)
+    , text_color(1.0f)
+    , text_material(new material::Material(e, c))
+    , hint_text_color(0.3f, 0.3f, 0.3f, 1.0f)
+    , hint_text_material(new material::Material(e, c))
+    , background_material(new material::Material(e, c))
+    , cursor_material(new material::Material(e, c))
 {
     auto* const astmgr = e->get_system_application()->get_asset_manager();
     auto* const mshmgr = astmgr->get_mesh_manager();
     auto* const mdlmgr = astmgr->get_model_manager();
+    auto* const fntmgr = astmgr->get_font_manager();
 
-    auto mshend = core::sync::EndCaller<mesh::Mesh>([c](const std::shared_ptr<mesh::Mesh>&) {});
+    core::sync::EndCaller<mesh::Mesh> mshend([c](const std::shared_ptr<mesh::Mesh>&) {});
     const auto plate_mesh = mshmgr->create_plate(mshend);
 
-    const std::shared_ptr<material::Material> bgmat(new material::Material(e, c));
-    bgmat->set_color(0.02f, 0.02f, 0.02f, c);
-    const auto bgmsh = std::make_shared<model::Mesh>(plate_mesh, bgmat);
+    core::sync::EndCaller<font::Font> fend([c](const std::shared_ptr<font::Font>&) {});
+    text_font = fntmgr->get_default_2d(fend);
 
-    const std::shared_ptr<material::Material> curmat(new material::Material(e, c));
-    curmat->set_color(0.0f, 0.0f, 0.0f, c);
-    const auto curmsh = std::make_shared<model::Mesh>(plate_mesh, curmat);
+    text_material->set_translucency(material::TranslucencyMode::Transparent);
+    hint_text_material->set_translucency(material::TranslucencyMode::Transparent);
 
-    auto txtend = core::sync::EndCaller<Text>([c](const std::shared_ptr<Text>&) {});
-    hint = mdlmgr->create<Text>(txtend);
-    hint->set_text_color(0.3f, 0.3f, 0.3f, c);
-    auto* const hint_tran = hint->get_transformation();
-    hint_tran->set_location(math::Vec3(0.0f, 0.0f, 0.01f));
-    hint_tran->local_scale(0.95f);
-    add_child(hint);
+    core::sync::EndCaller<model::Dynamic> mdlend([c](const std::shared_ptr<model::Dynamic>&) {});
 
-    auto mdlend = core::sync::EndCaller<model::Dynamic>([c](const std::shared_ptr<model::Dynamic>&) {});
+    text_model = mdlmgr->create<model::Dynamic>(mdlend);
+    text_model->add_mesh(std::make_shared<model::Mesh>(plate_mesh, text_material));
+    add_child(text_model);
+
+    hint_text_model = mdlmgr->create<model::Dynamic>(mdlend);
+    hint_text_model->add_mesh(std::make_shared<model::Mesh>(plate_mesh, hint_text_material));
+    hint_text_model->get_transformation()->set_location(math::Vec3(0.0f, 0.0f, 0.01f));
+    add_child(hint_text_model);
+
+    background_material->set_color(0.02f, 0.02f, 0.02f, c);
     background = mdlmgr->create<model::Dynamic>(mdlend);
-    background->add_mesh(bgmsh);
-    background->get_transformation()->local_x_scale(9.0f);
+    background->add_mesh(std::make_shared<model::Mesh>(plate_mesh, background_material));
     add_child(background);
 
+    cursor_material->set_color(0.0f, 0.0f, 0.0f, c);
     cursor = mdlmgr->create<model::Dynamic>(mdlend);
-    cursor->add_mesh(curmsh);
-    cursor->get_transformation()->local_x_scale(0.01f);
+    cursor->add_mesh(std::make_shared<model::Mesh>(plate_mesh, cursor_material));
+    cursor->get_transformation()->set_location(math::Vec3(0.0f, 0.0f, -0.01f));
     add_child(cursor);
+
+    /// TODO: It can register itself in on scale of transformation
 }
 
 gearoenix::render::widget::Edit::~Edit() noexcept = default;
@@ -70,18 +73,26 @@ void gearoenix::render::widget::Edit::set_text(
     const std::wstring& t,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
 {
-    Text::set_text(cut_string(t), c);
+    GXUNIMPLEMENTED
 }
 
 void gearoenix::render::widget::Edit::set_hint_text(
     const std::wstring& t,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
 {
-    hint->set_text(cut_string(t), c);
-}
-
-void gearoenix::render::widget::Edit::set_capacity(const unsigned int c) noexcept
-{
-    background->get_transformation()->local_x_scale(static_cast<core::Real>(c) / static_cast<core::Real>(capacity));
-    capacity = c;
+    hint_text = t;
+    const auto& scale = collider->get_scale();
+    const auto img_height = scale[1] * 2.0f;
+    text_font->compute_text_widths(t, img_height, hint_text_widths);
+    const auto raw_img_width = scale[0] * 2.0f;
+    const auto is_bigger = raw_img_width < hint_text_widths.back();
+    const auto img_width = is_bigger ? raw_img_width : hint_text_widths.back();
+    core::sync::EndCaller<texture::Texture2D> txtend([c, this](const std::shared_ptr<texture::Texture2D>& txt) {
+        hint_text_material->set_color(txt);
+    });
+    const auto _txt = text_font->bake(
+        hint_text, hint_text_widths, hint_text_color,
+        img_width, img_height, 0.0f, txtend);
+    hint_text_model->get_transformation()->local_x_scale(
+        img_width / (hint_text_model->get_collider()->get_scale()[0] * 2.0f));
 }

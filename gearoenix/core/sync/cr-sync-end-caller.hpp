@@ -5,6 +5,7 @@
 #include <functional>
 #include <memory>
 #include <type_traits>
+#define GX_DEFAULT_IGNORED_END_CALLER gearoenix::core::sync::EndCaller<gearoenix::core::sync::EndCallerIgnore>([]() {})
 
 namespace gearoenix::core::sync {
 template <typename T>
@@ -45,7 +46,6 @@ public:
 };
 typedef struct {
 } EndCallerIgnore;
-#ifdef GX_DEBUG_MODE
 template <>
 class EndCaller<EndCallerIgnore> {
 private:
@@ -74,6 +74,5 @@ public:
     {
     }
 };
-#endif
 }
 #endif

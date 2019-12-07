@@ -12,24 +12,6 @@
 #include <codecvt>
 #include <locale>
 
-void gearoenix::render::widget::Text::private_set_text(
-    const std::wstring& t,
-    const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
-{
-    text = t;
-    core::Real img_width = 0.0f;
-    std::uint8_t txtclr[4];
-    txtclr[0] = (text_color[0] >= 1.0f ? 255 : static_cast<std::uint8_t>(text_color[0] * 255));
-    txtclr[1] = (text_color[1] >= 1.0f ? 255 : static_cast<std::uint8_t>(text_color[1] * 255));
-    txtclr[2] = (text_color[2] >= 1.0f ? 255 : static_cast<std::uint8_t>(text_color[2] * 255));
-    txtclr[3] = 255;
-    auto txtend = core::sync::EndCaller<texture::Texture2D>([c, this](const std::shared_ptr<texture::Texture2D>& txt) {
-        meshes[text_mesh_id]->get_material()->set_color(txt);
-    });
-    auto txt = text_font->bake(text, txtclr, collider->get_scale()[1] * 2.0f, img_width, txtend);
-    transformation->local_x_scale(img_width * 0.5f / collider->get_scale()[0]);
-}
-
 gearoenix::render::widget::Text::Text(
     const core::Id my_id,
     system::stream::Stream* const f,
@@ -58,7 +40,7 @@ gearoenix::render::widget::Text::Text(
     core::sync::EndCaller<mesh::Mesh> mend([c](const std::shared_ptr<mesh::Mesh>&) {});
     auto msh = astmgr->get_mesh_manager()->create_plate(mend);
     add_mesh(std::make_shared<model::Mesh>(msh, mat));
-    private_set_text(text, c);
+    set_text(text, c);
 }
 
 gearoenix::render::widget::Text::Text(
@@ -67,7 +49,7 @@ gearoenix::render::widget::Text::Text(
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : Widget(my_id, Type::Text, e, c)
     , text(L" ")
-    , text_color(0.999f, 0.999f, 0.999f)
+    , text_color(1.0f)
 {
     auto astmgr = e->get_system_application()->get_asset_manager();
     core::sync::EndCaller<font::Font> fend([c](const std::shared_ptr<font::Font>&) {});
@@ -80,7 +62,7 @@ gearoenix::render::widget::Text::Text(
     auto msh = astmgr->get_mesh_manager()->create_plate(mend);
     text_mesh_id = msh->get_asset_id();
     add_mesh(std::make_shared<model::Mesh>(msh, mat));
-    private_set_text(text, c);
+    set_text(text, c);
 }
 
 gearoenix::render::widget::Text::~Text() noexcept = default;
@@ -89,7 +71,13 @@ void gearoenix::render::widget::Text::set_text(
     const std::wstring& t,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
 {
-    private_set_text(t, c);
+    text = t;
+    core::Real img_width = 0.0f;
+    auto txtend = core::sync::EndCaller<texture::Texture2D>([c, this](const std::shared_ptr<texture::Texture2D>& txt) {
+        meshes[text_mesh_id]->get_material()->set_color(txt);
+    });
+    auto txt = text_font->bake(text, text_color, collider->get_scale()[1] * 2.0f, img_width, txtend);
+    transformation->local_x_scale(img_width * 0.5f / collider->get_scale()[0]);
 }
 
 void gearoenix::render::widget::Text::set_text_color(
@@ -98,6 +86,6 @@ void gearoenix::render::widget::Text::set_text_color(
     const core::Real blue,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
 {
-    text_color = math::Vec3(red, green, blue);
+    text_color = math::Vec4(red, green, blue, 1.0f);
     set_text(text, c);
 }

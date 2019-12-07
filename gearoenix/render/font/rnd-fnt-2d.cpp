@@ -120,12 +120,25 @@ void gearoenix::render::font::Font2D::compute_text_widths(
 std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::font::Font2D::bake(
     const std::wstring& text,
     const std::vector<core::Real>& txt_widths,
-    const std::uint8_t color_bytes[4],
+    const math::Vec4& color_vector,
     const core::Real img_width,
     const core::Real img_height,
     const core::Real img_start_skip,
     core::sync::EndCaller<texture::Texture2D>& end) const noexcept
 {
+    const auto converter = [](const core::Real v) {
+        if (v >= 1.0f)
+            return static_cast<std::uint8_t>(255);
+        if (v <= 0.0f)
+            return static_cast<std::uint8_t>(0);
+        return static_cast<std::uint8_t>(v * 255.0f);
+    };
+    const std::uint8_t color_bytes[4] = {
+        converter(color_vector[0]),
+        converter(color_vector[1]),
+        converter(color_vector[2]),
+        converter(color_vector[3]),
+    };
     auto* const render_engine = txt_mgr->get_engine();
     const auto max_texture_size = render_engine->get_limitations().texture_maximum_aspect;
     const auto window_height = render_engine->get_system_application()->get_window_height();
@@ -183,23 +196,15 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::font::
         for (std::size_t j = 0; j < static_cast<std::size_t>(img_width_pixels); ++j, ++ti) {
             const auto c = static_cast<unsigned int>(rnd_data[ti]);
             if (c == 0) {
-                img_pixels[img_index] = 0;
-                ++img_index;
-                img_pixels[img_index] = 0;
-                ++img_index;
-                img_pixels[img_index] = 0;
-                ++img_index;
-                img_pixels[img_index] = 0;
-                ++img_index;
+                img_pixels[img_index++] = 0;
+                img_pixels[img_index++] = 0;
+                img_pixels[img_index++] = 0;
+                img_pixels[img_index++] = 0;
             } else {
-                img_pixels[img_index] = color_bytes[0];
-                ++img_index;
-                img_pixels[img_index] = color_bytes[1];
-                ++img_index;
-                img_pixels[img_index] = color_bytes[2];
-                ++img_index;
-                img_pixels[img_index] = static_cast<unsigned char>((c * static_cast<unsigned int>(color_bytes[3])) / 255);
-                ++img_index;
+                img_pixels[img_index++] = color_bytes[0];
+                img_pixels[img_index++] = color_bytes[1];
+                img_pixels[img_index++] = color_bytes[2];
+                img_pixels[img_index++] = static_cast<unsigned char>((c * static_cast<unsigned int>(color_bytes[3])) / 255);
             }
         }
     }
@@ -216,7 +221,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::font::
 
 std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::font::Font2D::bake(
     const std::wstring& text,
-    const std::uint8_t color[4],
+    const math::Vec4& color,
     const core::Real img_height,
     core::Real& img_width,
     core::sync::EndCaller<texture::Texture2D>& end) const noexcept
