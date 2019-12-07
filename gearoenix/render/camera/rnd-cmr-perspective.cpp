@@ -2,12 +2,9 @@
 #include "../../core/event/cr-ev-event.hpp"
 #include "../../system/stream/sys-stm-stream.hpp"
 #include "../../system/sys-app.hpp"
-#include "../../system/sys-configuration.hpp"
 #include "../../system/sys-log.hpp"
-#include "../engine/rnd-eng-configuration.hpp"
 #include "../engine/rnd-eng-engine.hpp"
 #include "rnd-cmr-transformation.hpp"
-#include "rnd-cmr-uniform.hpp"
 #include <cmath>
 
 void gearoenix::render::camera::Perspective::update_fovy() noexcept
@@ -28,12 +25,12 @@ void gearoenix::render::camera::Perspective::update_cascades() noexcept
     if (cascaded_shadow_frustum_partitions.size() != sections_count + 1)
         cascaded_shadow_frustum_partitions.resize(sections_count + 1);
 
-    const math::Vec3 xtanx = uniform.x * tanx;
-    const math::Vec3 ytany = uniform.y * tany;
+    const math::Vec3 xtanx = transformation->get_x_axis() * tanx;
+    const math::Vec3 ytany = transformation->get_y_axis() * tany;
 
     math::Vec3 x = xtanx * -uniform.near;
     math::Vec3 y = ytany * -uniform.near;
-    math::Vec3 z = uniform.position + (uniform.z * uniform.near);
+    math::Vec3 z = uniform.position + (transformation->get_z_axis() * uniform.near);
 
     math::Vec3 zmx;
     math::Vec3 zpx;
@@ -50,7 +47,7 @@ void gearoenix::render::camera::Perspective::update_cascades() noexcept
 
     x = xtanx * -uniform.far;
     y = ytany * -uniform.far;
-    z = uniform.position + (uniform.z * uniform.far);
+    z = uniform.position + (transformation->get_z_axis() * uniform.far);
 
     GX_HELPER(sections_count);
 
@@ -80,7 +77,7 @@ void gearoenix::render::camera::Perspective::update_cascades() noexcept
         const core::Real l = logsec + unisec;
         x = xtanx * l;
         y = ytany * l;
-        z = uniform.position + (uniform.z * l);
+        z = uniform.position + (transformation->get_z_axis() * l);
 
         GX_HELPER(i);
     }
@@ -143,7 +140,7 @@ void gearoenix::render::camera::Perspective::set_field_of_view(const core::Real 
 
 gearoenix::math::Ray3 gearoenix::render::camera::Perspective::create_ray3(const core::Real x, const core::Real y) const noexcept
 {
-    math::Vec3 dir = (uniform.x * (x / uniform.aspect_ratio)) + (uniform.y * (y / uniform.aspect_ratio)) + (uniform.z * uniform.near);
+    math::Vec3 dir = (transformation->get_x_axis() * (x / uniform.aspect_ratio)) + (transformation->get_y_axis() * (y / uniform.aspect_ratio)) + (transformation->get_z_axis() * uniform.near);
     const math::Vec3 origin = dir + uniform.position;
     dir.normalize();
     return math::Ray3(origin, dir);

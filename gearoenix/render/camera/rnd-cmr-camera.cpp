@@ -2,14 +2,11 @@
 #include "../../core/event/cr-ev-engine.hpp"
 #include "../../core/event/cr-ev-event.hpp"
 #include "../../math/math-projector-frustum.hpp"
-#include "../../math/math-quaternion.hpp"
 #include "../../physics/collider/phs-cld-frustum.hpp"
 #include "../../system/stream/sys-stm-stream.hpp"
 #include "../../system/sys-app.hpp"
-#include "../../system/sys-configuration.hpp"
 #include "../../system/sys-log.hpp"
 #include "../buffer/rnd-buf-framed-uniform.hpp"
-#include "../engine/rnd-eng-engine.hpp"
 #include "rnd-cmr-transformation.hpp"
 
 #define GX_CAMERA_INIT \
@@ -46,9 +43,9 @@ gearoenix::render::camera::Camera::Camera(
     uniform.near = -f->read<core::Real>();
     uniform.far = -f->read<core::Real>();
     const math::Mat4x4 r = q.to_mat();
-    uniform.x = (r * math::Vec4(uniform.x, 0.0f)).xyz();
-    uniform.y = (r * math::Vec4(uniform.y, 0.0f)).xyz();
-    uniform.z = (r * math::Vec4(uniform.z, 0.0f)).xyz();
+    transformation->set_x_axis((r * math::Vec4(transformation->get_x_axis(), 0.0f)).xyz());
+    transformation->set_y_axis((r * math::Vec4(transformation->get_y_axis(), 0.0f)).xyz());
+    transformation->set_z_axis((r * math::Vec4(transformation->get_z_axis(), 0.0f)).xyz());
     uniform.inversed_rotation = math::Quat(q.x, q.y, q.z, -q.w).to_mat();
     GXLOGD("Position: " << uniform.position)
     GXLOGD("Quaternion: " << q)

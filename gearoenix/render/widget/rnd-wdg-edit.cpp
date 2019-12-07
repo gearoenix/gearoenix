@@ -81,7 +81,7 @@ void gearoenix::render::widget::Edit::set_hint_text(
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
 {
     hint_text = t;
-    const auto& scale = collider->get_scale();
+    const auto& scale = collider->get_current_local_scale();
     const auto img_height = scale[1] * 2.0f;
     text_font->compute_text_widths(t, img_height, hint_text_widths);
     const auto raw_img_width = scale[0] * 2.0f;
@@ -94,5 +94,5 @@ void gearoenix::render::widget::Edit::set_hint_text(
         hint_text, hint_text_widths, hint_text_color,
         img_width, img_height, 0.0f, txtend);
     hint_text_model->get_transformation()->local_x_scale(
-        img_width / (hint_text_model->get_collider()->get_scale()[0] * 2.0f));
+        img_width / (hint_text_model->get_collider()->get_current_local_scale()[0] * 2.0f));
 }

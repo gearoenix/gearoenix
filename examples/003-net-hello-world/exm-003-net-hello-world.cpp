@@ -420,7 +420,7 @@ bool GameApp::on_event(const gearoenix::core::event::Data& event_data) noexcept
             const auto& d = std::get<gearoenix::core::event::gesture::Drag>(event_data.data);
             const auto& v = d.delta_previous_position;
             camtrn->local_x_rotate(v[1]);
-            camtrn->global_rotate(v[0], GxVec3(0.0f, 0.0f, 1.0f));
+            camtrn->local_rotate(v[0], GxVec3::Z);
         }
         break;
     }

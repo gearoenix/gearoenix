@@ -189,7 +189,7 @@ BOOST_AUTO_TEST_CASE(physics_accelerator_bvh)
         const gearoenix::math::Vec3 t(dis2(gen), dis2(gen), dis2(gen));
         const gearoenix::math::Ray3 r(p, t.normalized());
         now1 = std::chrono::high_resolution_clock::now();
-        bvh.hit(r, std::numeric_limits<gearoenix::core::Real>::max());
+        (void)bvh.hit(r, std::numeric_limits<gearoenix::core::Real>::max());
         now2 = std::chrono::high_resolution_clock::now();
         dis_time += (now2 - now1).count();
     }

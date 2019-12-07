@@ -10,7 +10,7 @@ private:
     Model* const parent;
 
 public:
-    Transformation(Model* parent) noexcept;
+    explicit Transformation(Model* parent) noexcept;
     // physics::Transformation----------------------------------------------------------------------------
     //const math::Vec3& get_x_axis() const noexcept override final;
     //const math::Vec3& get_y_axis() const noexcept override final;

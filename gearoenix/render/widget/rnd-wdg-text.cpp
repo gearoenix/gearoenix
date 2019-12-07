@@ -76,8 +76,8 @@ void gearoenix::render::widget::Text::set_text(
     auto txtend = core::sync::EndCaller<texture::Texture2D>([c, this](const std::shared_ptr<texture::Texture2D>& txt) {
         meshes[text_mesh_id]->get_material()->set_color(txt);
     });
-    auto txt = text_font->bake(text, text_color, collider->get_scale()[1] * 2.0f, img_width, txtend);
-    transformation->local_x_scale(img_width * 0.5f / collider->get_scale()[0]);
+    auto txt = text_font->bake(text, text_color, collider->get_current_local_scale()[1] * 2.0f, img_width, txtend);
+    transformation->local_x_scale(img_width * 0.5f / collider->get_current_local_scale()[0]);
 }
 
 void gearoenix::render::widget::Text::set_text_color(

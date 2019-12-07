@@ -24,8 +24,8 @@ namespace render::camera {
         Perspective(core::Id my_id, engine::Engine* e) noexcept;
         void set_aspect_ratio(core::Real ratio) noexcept final;
         void set_field_of_view(core::Real radian) noexcept;
-        math::Ray3 create_ray3(core::Real x, core::Real y) const noexcept final;
-        core::Real get_distance(const math::Vec3& model_location) const noexcept final;
+        [[nodiscard]] math::Ray3 create_ray3(core::Real x, core::Real y) const noexcept final;
+        [[nodiscard]] core::Real get_distance(const math::Vec3& model_location) const noexcept final;
     };
 }
 }

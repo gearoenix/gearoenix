@@ -2,27 +2,15 @@
 #include "../system/sys-log.hpp"
 
 gearoenix::physics::Transformation::Transformation() noexcept
+    : x_axis(1.0f, 0.0f, 0.0f)
+    , y_axis(0.0f, 1.0f, 0.0f)
+    , z_axis(0.0f, 0.0f, 1.0f)
+    , current_local_scale(1.0f)
+    , on_scale([] {})
 {
 }
 
-gearoenix::physics::Transformation::~Transformation() noexcept
-{
-}
-
-const gearoenix::math::Vec3& gearoenix::physics::Transformation::get_x_axis() const noexcept
-{
-    GXUNIMPLEMENTED
-}
-
-const gearoenix::math::Vec3& gearoenix::physics::Transformation::get_y_axis() const noexcept
-{
-    GXUNIMPLEMENTED
-}
-
-const gearoenix::math::Vec3& gearoenix::physics::Transformation::get_z_axis() const noexcept
-{
-    GXUNIMPLEMENTED
-}
+gearoenix::physics::Transformation::~Transformation() noexcept = default;
 
 void gearoenix::physics::Transformation::get_location(math::Vec3&) const noexcept
 {
@@ -31,7 +19,7 @@ void gearoenix::physics::Transformation::get_location(math::Vec3&) const noexcep
 
 const gearoenix::math::Vec3& gearoenix::physics::Transformation::get_location() const noexcept
 {
-    GXUNIMPLEMENTED;
+    GXUNIMPLEMENTED
 }
 
 void gearoenix::physics::Transformation::set_location(const math::Vec3&) noexcept
@@ -60,11 +48,6 @@ void gearoenix::physics::Transformation::local_z_translate(const core::Real) noe
 }
 
 void gearoenix::physics::Transformation::global_rotate(const core::Real, const math::Vec3&, const math::Vec3&) noexcept
-{
-    GXUNIMPLEMENTED
-}
-
-void gearoenix::physics::Transformation::global_rotate(const core::Real, const math::Vec3&) noexcept
 {
     GXUNIMPLEMENTED
 }
