@@ -1,5 +1,3 @@
-#define GX_DEBUG_FONT_IMAGE_CREATION
-
 #include "rnd-fnt-2d.hpp"
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../math/math-numeric.hpp"
@@ -9,6 +7,13 @@
 #include "../engine/rnd-eng-engine.hpp"
 #include "../texture/rnd-txt-manager.hpp"
 #include "../texture/rnd-txt-texture-2d.hpp"
+#include <cmath>
+#include <string>
+
+#ifdef GX_DEBUG_MODE
+//#define GX_DEBUG_FONT_IMAGE_CREATION
+#endif
+
 #ifdef GX_IN_WINDOWS
 #define STBI_MSC_SECURE_CRT
 #endif
@@ -19,9 +24,7 @@
 #define STBI_WRITE_NO_STDIO
 #endif
 #define STB_TRUETYPE_IMPLEMENTATION
-#include <cmath>
 #include <stb_truetype.h>
-#include <string>
 
 #ifdef GX_DEBUG_FONT_IMAGE_CREATION
 static int file_index = 0;

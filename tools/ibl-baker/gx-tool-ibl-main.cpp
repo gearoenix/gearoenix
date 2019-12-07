@@ -184,17 +184,17 @@ IblBakerApp::IblBakerApp(gearoenix::system::Application* const sys_app) noexcept
     //modal = mdlmgr->create<GxModal>(mdacall);
 
     auto tmptxt = mdlmgr->create<GxTextWdg>(txwcall);
-    tmptxt->set_text(L"IBL baker for Gearoenix game engine", endcall);
     auto* tmptran = tmptxt->get_transformation();
     tmptran->local_scale(0.04f);
     tmptran->set_location(GxVec3(0.0f, 0.85f, 0.1f));
+    tmptxt->set_text(L"IBL baker for Gearoenix game engine", endcall);
     uiscn->add_model(tmptxt);
 
     tmptxt = mdlmgr->create<GxTextWdg>(txwcall);
-    tmptxt->set_text(L"HDR file location:", endcall);
     tmptran = tmptxt->get_transformation();
     tmptran->local_scale(0.03f);
     tmptran->set_location(GxVec3(-0.75f, 0.75f, 0.1f));
+    tmptxt->set_text(L"HDR file location:", endcall);
     uiscn->add_model(tmptxt);
 
     //modal->add_child(text1);
@@ -219,11 +219,11 @@ IblBakerApp::IblBakerApp(gearoenix::system::Application* const sys_app) noexcept
     tmptran->set_location(GxVec3(0.75f, 0.75f, 0.1f));
 
     tmptxt = mdlmgr->create<GxTextWdg>(txwcall);
-    tmptxt->set_text_color(0.0f, 0.0f, 0.0f, endcall);
-    tmptxt->set_text(L"Open File", endcall);
     tmptran = tmptxt->get_transformation();
     tmptran->local_scale(0.03f);
     tmptran->set_location(GxVec3(0.75f, 0.75f, 0.2f));
+    tmptxt->set_text_color(0.0f, 0.0f, 0.0f, endcall);
+    tmptxt->set_text(L"Open File", endcall);
     open_button->add_child(tmptxt);
     //look_at_button->set_on_click([this] {
     //    if (nullptr != selected_item) {
@@ -241,10 +241,10 @@ IblBakerApp::IblBakerApp(gearoenix::system::Application* const sys_app) noexcept
     file_location = mdlmgr->create<GxEditWdg>(edtcall);
     file_location->set_capacity(32);
     //file_location->set_hint_text(L"<Fill it with 'file location'>", endcall);
-    file_location->set_hint_text(L"012345678901234567890123456789", endcall);
     tmptran = file_location->get_transformation();
     tmptran->local_scale(0.05f);
     tmptran->set_location(GxVec3(0.0f, 0.75f, 0.1f));
+    file_location->set_hint_text(L"012345678901234567890123456789", endcall);
     uiscn->add_model(file_location);
 
     //modal->add_child(look_at_button);

@@ -17,7 +17,7 @@ void gearoenix::render::widget::Text::private_set_text(
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
 {
     text = t;
-    core::Real asp = 0.0f;
+    core::Real img_width = 0.0f;
     std::uint8_t txtclr[4];
     txtclr[0] = (text_color[0] >= 1.0f ? 255 : static_cast<std::uint8_t>(text_color[0] * 255));
     txtclr[1] = (text_color[1] >= 1.0f ? 255 : static_cast<std::uint8_t>(text_color[1] * 255));
@@ -26,9 +26,8 @@ void gearoenix::render::widget::Text::private_set_text(
     auto txtend = core::sync::EndCaller<texture::Texture2D>([c, this](const std::shared_ptr<texture::Texture2D>& txt) {
         meshes[text_mesh_id]->get_material()->set_color(txt);
     });
-    auto txt = text_font->bake(text, txtclr, 0.4f, asp, txtend);
-    transformation->local_x_scale(asp / current_x_scale);
-    current_x_scale = asp;
+    auto txt = text_font->bake(text, txtclr, collider->get_scale()[1] * 2.0f, img_width, txtend);
+    transformation->local_x_scale(img_width * 0.5f / collider->get_scale()[0]);
 }
 
 gearoenix::render::widget::Text::Text(

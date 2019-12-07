@@ -491,6 +491,11 @@ gearoenix::core::Real gearoenix::math::Vec3::square_length() const noexcept
     return dot(*this);
 }
 
+gearoenix::core::Real gearoenix::math::Vec3::abs_length() const noexcept
+{
+    return std::abs(vec[0]) + std::abs(vec[1]) + std::abs(vec[2]);
+}
+
 gearoenix::core::Real gearoenix::math::Vec3::square_distance(const Vec3& a) const noexcept
 {
     core::Real t = a.vec[0] - vec[0];
@@ -505,9 +510,14 @@ gearoenix::core::Real gearoenix::math::Vec3::square_distance(const Vec3& a) cons
     return d;
 }
 
-gearoenix::core::Real gearoenix::math::Vec3::abs() const noexcept
+gearoenix::core::Real gearoenix::math::Vec3::abs_distance(const Vec3& a) const noexcept
 {
-    return std::abs(vec[0]) + std::abs(vec[1]) + std::abs(vec[2]);
+    return ((*this) - a).abs_length();
+}
+
+gearoenix::math::Vec3 gearoenix::math::Vec3::abs() const noexcept
+{
+    return Vec3(std::abs(vec[0]), std::abs(vec[1]), std::abs(vec[2]));
 }
 
 gearoenix::core::Real gearoenix::math::Vec3::dot(const Vec3& o) const noexcept
@@ -710,6 +720,11 @@ bool gearoenix::math::Vec4::operator>(const Vec4& o) const noexcept
 gearoenix::math::Vec4 gearoenix::math::Vec4::operator*(const core::Real a) const noexcept
 {
     return Vec4(vec[0] * a, vec[1] * a, vec[2] * a, vec[3] * a);
+}
+
+gearoenix::math::Vec4 gearoenix::math::Vec4::operator-(const Vec4& a) const noexcept
+{
+    return Vec4(vec[0] - a.vec[0], vec[1] - a.vec[1], vec[2] - a.vec[2], vec[3] - a.vec[3]);
 }
 
 gearoenix::core::Real gearoenix::math::Vec4::length() const noexcept

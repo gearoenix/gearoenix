@@ -60,12 +60,14 @@ void gearoenix::physics::collider::Collider::set_location(const math::Vec3& l) n
 
 void gearoenix::physics::collider::Collider::local_scale(const core::Real s) noexcept
 {
+    scale *= s;
     updated_box.set_diameter(updated_box.get_diameter() * s);
     model_matrix.local_scale(s);
 }
 
 void gearoenix::physics::collider::Collider::local_x_scale(const core::Real s) noexcept
 {
+    scale[0] *= s;
     math::Vec3 d = updated_box.get_diameter();
     d[0] *= s;
     updated_box.set_diameter(d);
@@ -74,6 +76,7 @@ void gearoenix::physics::collider::Collider::local_x_scale(const core::Real s) n
 
 void gearoenix::physics::collider::Collider::set_model_matrix(const math::Mat4x4& m) noexcept
 {
+    scale = ((m * math::Vec4(1.0f, 1.0f, 1.0f, 0.0f)).xyz()).abs();
     model_matrix = m;
     origin_box.get_all_corners(updated_points);
     updated_box.reset();

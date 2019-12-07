@@ -26,6 +26,7 @@ class Collider : public Transformation {
     GX_GET_CREF_PRT(math::Aabb3, updated_box)
     GX_GET_CREF_PRT(math::Mat4x4, model_matrix)
     GX_GETSET_PTR_PRT(render::model::Model, parent)
+    GX_GET_CREF_PRT(math::Vec3, scale)
 protected:
     math::Vec3 updated_points[8];
 
@@ -33,6 +34,7 @@ protected:
 
     explicit Collider(const Type t) noexcept
         : collider_type(t)
+        , scale(1.0f)
     {
     }
 

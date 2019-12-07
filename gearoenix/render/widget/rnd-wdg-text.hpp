@@ -16,7 +16,6 @@ class Text : public Widget {
     GX_GET_VAL_PRT(Alignment, v_align, Alignment::Center)
     GX_GET_VAL_PRT(Alignment, h_align, Alignment::Center)
     GX_GET_VAL_PRT(core::Id, text_mesh_id, 0)
-    GX_GET_VAL_PRT(core::Real, current_x_scale, 1.0f)
 
     void private_set_text(const std::wstring& t, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
 
