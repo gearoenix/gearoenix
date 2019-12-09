@@ -14,7 +14,7 @@ gearoenix::physics::animation::Manager::Manager(core::sync::KernelWorkers* const
         },
         [this](const unsigned int kernel_index) noexcept {
             unsigned int task_number = 0;
-            const unsigned int kernels_count = static_cast<unsigned int>(kernels.size());
+            const auto kernels_count = static_cast<unsigned int>(kernels.size());
 #define GX_DO_TASK(expr)                                 \
     {                                                    \
         if (task_number == kernel_index) {               \

@@ -110,3 +110,8 @@ void gearoenix::render::material::Material::set_color(const std::shared_ptr<text
 {
     color_texture = c;
 }
+
+void gearoenix::render::material::Material::set_alpha(const core::Real a) noexcept
+{
+    uniform.alpha = a;
+}
