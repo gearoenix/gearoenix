@@ -6,6 +6,7 @@
 
 namespace gearoenix::render::widget {
 class Widget;
+class Edit;
 }
 
 namespace gearoenix::render::scene {
@@ -13,13 +14,14 @@ class Ui : public Scene, public core::event::Listner {
 private:
     void init() noexcept;
     widget::Widget* selected_widget = nullptr;
+    widget::Edit* selected_edit = nullptr;
 
 public:
     Ui(
-        const core::Id my_id, system::stream::Stream* f, engine::Engine* e,
+        core::Id my_id, system::stream::Stream* f, engine::Engine* e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
     Ui(
-        const core::Id my_id, engine::Engine* e,
+        core::Id my_id, engine::Engine* e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
     bool on_event(const core::event::Data& d) noexcept final;
 };

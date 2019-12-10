@@ -11,7 +11,6 @@
 #include "../buffer/rnd-buf-framed-uniform.hpp"
 #include "../camera/rnd-cmr-camera.hpp"
 #include "../camera/rnd-cmr-manager.hpp"
-#include "../engine/rnd-eng-engine.hpp"
 #include "../light/rnd-lt-directional.hpp"
 #include "../light/rnd-lt-light.hpp"
 #include "../light/rnd-lt-manager.hpp"
@@ -29,17 +28,15 @@ static const std::shared_ptr<gearoenix::render::light::Light> null_light = nullp
 static const std::shared_ptr<gearoenix::render::model::Model> null_model = nullptr;
 static const std::shared_ptr<gearoenix::physics::constraint::Constraint> null_constraint = nullptr;
 
+#define GX_SCENE_INIT \
+    core::asset::Asset(my_id, core::asset::Type::Scene), scene_type_id(t), uniform_buffers(new buffer::FramedUniform(static_cast<unsigned int>(sizeof(Uniform)), e)), static_accelerator(new gearoenix::physics::accelerator::Bvh()), dynamic_accelerator(new gearoenix::physics::accelerator::Bvh()), e(e)
+
 gearoenix::render::scene::Scene::Scene(
     const core::Id my_id,
     const Type t,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>&) noexcept
-    : core::asset::Asset(my_id, core::asset::Type::Scene)
-    , scene_type_id(t)
-    , uniform_buffers(new buffer::FramedUniform(static_cast<unsigned int>(sizeof(Uniform)), e))
-    , static_accelerator(new gearoenix::physics::accelerator::Bvh())
-    , dynamic_accelerator(new gearoenix::physics::accelerator::Bvh())
-    , e(e)
+    : GX_SCENE_INIT
 {
 }
 
@@ -49,12 +46,7 @@ gearoenix::render::scene::Scene::Scene(
     system::stream::Stream* const f,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
-    : core::asset::Asset(my_id, core::asset::Type::Scene)
-    , scene_type_id(t)
-    , uniform_buffers(new buffer::FramedUniform(static_cast<unsigned int>(sizeof(Uniform)), e))
-    , static_accelerator(new gearoenix::physics::accelerator::Bvh())
-    , dynamic_accelerator(new gearoenix::physics::accelerator::Bvh())
-    , e(e)
+    : GX_SCENE_INIT
 {
     auto* const astmgr = e->get_system_application()->get_asset_manager();
 #define GX_HELPER(x, n, cls)                                                            \
@@ -65,7 +57,7 @@ gearoenix::render::scene::Scene::Scene(
         if (!ids.empty()) {                                                             \
             core::sync::EndCaller<n::cls> call([c](const std::shared_ptr<n::cls>&) {}); \
             for (const core::Id id : ids)                                               \
-                add_##x(mgr->get_gx3d(id, call));                                       \
+                scene_add_##x(mgr->get_gx3d(id, call));                                 \
         }                                                                               \
     }
 
@@ -103,51 +95,31 @@ gearoenix::render::scene::Scene::~Scene() noexcept
     GXLOGD("Scene " << asset_id << " deleted.")
 }
 
-void gearoenix::render::scene::Scene::add_camera(const std::shared_ptr<camera::Camera>& o) noexcept
-{
-    const core::Id oid = o->get_asset_id();
 #ifdef GX_DEBUG_MODE
-    if (cameras.find(oid) != cameras.end()) {
-        GXLOGE("Error overriding of a camera with same Id: " << oid)
+#define GX_CHECK_HELPER(x)                                          \
+    if (x##s.find(id) != x##s.end()) {                              \
+        GXLOGE("Error overriding of a " #x " with same Id: " << id) \
     }
+#else
+#define GX_CHECK_HELPER(x)
 #endif
-    cameras[oid] = o;
-}
 
-void gearoenix::render::scene::Scene::add_audio(const std::shared_ptr<audio::Audio>& o) noexcept
-{
-    const core::Id oid = o->get_asset_id();
-#ifdef GX_DEBUG_MODE
-    if (audios.find(oid) != audios.end()) {
-        GXLOGE("Error overriding of a audio with same Id: " << oid)
+#define GX_SCENE_ADD_HELPER(x, c)                                                             \
+    void gearoenix::render::scene::Scene::scene_add_##x(const std::shared_ptr<c>& o) noexcept \
+    {                                                                                         \
+        const core::Id id = o->get_asset_id();                                                \
+        GX_CHECK_HELPER(x)                                                                    \
+        x##s[id] = o;                                                                         \
     }
-#endif
-    audios[oid] = o;
-}
 
-void gearoenix::render::scene::Scene::add_light(const std::shared_ptr<light::Light>& o) noexcept
-{
-    const core::Id oid = o->get_asset_id();
-#ifdef GX_DEBUG_MODE
-    if (lights.find(oid) != lights.end()) {
-        GXLOGE("Error overriding of a light with same Id: " << oid)
-    }
-#endif
-    lights[oid] = o;
-}
+GX_SCENE_ADD_HELPER(camera, camera::Camera)
+GX_SCENE_ADD_HELPER(audio, audio::Audio)
+GX_SCENE_ADD_HELPER(light, light::Light)
+GX_SCENE_ADD_HELPER(constraint, physics::constraint::Constraint)
 
-const std::shared_ptr<gearoenix::render::light::Light>& gearoenix::render::scene::Scene::get_light(const core::Id id) const noexcept
+void gearoenix::render::scene::Scene::scene_add_model(const std::shared_ptr<model::Model>& m) noexcept
 {
-    const auto& find = lights.find(id);
-    if (lights.end() == find) {
-        return null_light;
-    }
-    return find->second;
-}
-
-void gearoenix::render::scene::Scene::add_model(const std::shared_ptr<model::Model>& m) noexcept
-{
-    std::function<void(const std::shared_ptr<model::Model>&)> travm = [&travm, this](const std::shared_ptr<model::Model>& mdl) noexcept {
+    const std::function<void(const std::shared_ptr<model::Model>&)> travm = [&travm, this](const std::shared_ptr<model::Model>& mdl) noexcept {
         auto& children = mdl->get_children();
         const core::Id mid = mdl->get_asset_id();
 #ifdef GX_DEBUG_MODE
@@ -166,34 +138,22 @@ void gearoenix::render::scene::Scene::add_model(const std::shared_ptr<model::Mod
     models_changed = true;
 }
 
-const std::shared_ptr<gearoenix::render::model::Model>& gearoenix::render::scene::Scene::get_model(const core::Id model_id) const noexcept
-{
-    const auto& find = models.find(model_id);
-    if (models.end() == find) {
-        return null_model;
-    }
-    return find->second;
-}
+#define GX_GET_HELPER(x, c)                                                                                         \
+    const std::shared_ptr<gearoenix::c>& gearoenix::render::scene::Scene::get_##x(const core::Id id) const noexcept \
+    {                                                                                                               \
+        const auto& find = x##s.find(id);                                                                           \
+        if (x##s.end() == find) {                                                                                   \
+            return null_##x;                                                                                        \
+        }                                                                                                           \
+        return find->second;                                                                                        \
+    }                                                                                                               \
+    void gearoenix::render::scene::Scene::add_##x(const std::shared_ptr<c>& m) noexcept { scene_add_##x(m); }
 
-void gearoenix::render::scene::Scene::add_constraint(const std::shared_ptr<physics::constraint::Constraint>& c) noexcept
-{
-    const core::Id cid = c->get_asset_id();
-#ifdef GX_DEBUG_MODE
-    if (constraints.find(cid) != constraints.end()) {
-        GXLOGE("Error overriding of a constraint with same Id: " << cid)
-    }
-#endif // GX_DEBUG_MODE
-    constraints[cid] = c;
-}
-
-const std::shared_ptr<gearoenix::physics::constraint::Constraint>& gearoenix::render::scene::Scene::get_constraint(const core::Id constraint_id) const noexcept
-{
-    const auto& find = constraints.find(constraint_id);
-    if (constraints.end() == find) {
-        return null_constraint;
-    }
-    return find->second;
-}
+GX_GET_HELPER(camera, render::camera::Camera)
+GX_GET_HELPER(audio, audio::Audio)
+GX_GET_HELPER(light, render::light::Light)
+GX_GET_HELPER(model, render::model::Model)
+GX_GET_HELPER(constraint, physics::constraint::Constraint)
 
 void gearoenix::render::scene::Scene::update() noexcept
 {

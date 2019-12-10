@@ -30,6 +30,7 @@ void gearoenix::render::widget::Edit::init(const core::sync::EndCaller<core::syn
 
     text_material->set_translucency(material::TranslucencyMode::Transparent);
     hint_text_material->set_translucency(material::TranslucencyMode::Transparent);
+    hint_text_material->set_color(math::Vec4(0.0f), c);
 
     core::sync::EndCaller<model::Dynamic> mdlend([c](const std::shared_ptr<model::Dynamic>&) {});
 
@@ -91,7 +92,7 @@ void gearoenix::render::widget::Edit::on_scale() noexcept
     } else {
         set_text(text);
     }
-    auto cursor_scale = static_cast<core::Real>(theme.cursor_width) * 0.125f;
+    auto cursor_scale = static_cast<core::Real>(theme.cursor_width) * 0.5f;
     cursor_scale /= static_cast<core::Real>(e->get_system_application()->get_window_width());
     cursor_scale /= cursor_model->get_collider()->get_current_local_scale()[0];
     cursor_model->get_transformation()->local_x_scale(cursor_scale);
@@ -146,6 +147,8 @@ void gearoenix::render::widget::Edit::set_hint_text(
     const std::wstring& t,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
 {
+    if (t.empty())
+        return;
     hint_text = t;
     const auto& scale = collider->get_current_local_scale();
     const auto img_height = scale[1] * 2.0f;

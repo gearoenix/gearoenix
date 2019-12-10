@@ -25,7 +25,7 @@ public:
         math::Vec4 hint_text_color = math::Vec4(0.3f);
         math::Vec4 background_color = math::Vec4(0.1f, 0.1f, 0.1f, 1.0f);
         math::Vec4 cursor_color = math::Vec4(0.0f, 0.0f, 0.0f, 1.0f);
-        std::uint8_t cursor_width = 2;
+        std::uint8_t cursor_width = 4;
         /// Size compare to the height of Edit
         core::Real cursor_size = 0.9f;
         core::Real cursor_state_time = 0.125f;

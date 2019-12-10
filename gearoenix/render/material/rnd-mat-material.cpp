@@ -106,6 +106,15 @@ void gearoenix::render::material::Material::set_color(
     color_value = math::Vec4(r, g, b, 1.0f);
 }
 
+void gearoenix::render::material::Material::set_color(const math::Vec4& c,
+    const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept
+{
+    core::sync::EndCaller<texture::Texture2D> calltxt2d([end](const std::shared_ptr<texture::Texture2D>&) {});
+    auto* const txtmgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
+    color_texture = txtmgr->get_2d(c, calltxt2d);
+    color_value = c;
+}
+
 void gearoenix::render::material::Material::set_color(const std::shared_ptr<texture::Texture2D>& c) noexcept
 {
     color_texture = c;

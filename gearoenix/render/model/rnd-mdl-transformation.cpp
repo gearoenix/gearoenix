@@ -29,8 +29,6 @@ void gearoenix::render::model::Transformation::translate(const math::Vec3& l) no
 
 void gearoenix::render::model::Transformation::local_scale(const core::Real s) noexcept
 {
-    physics::collider::Collider* const collider = parent->get_collider();
-    collider->local_scale(s);
     const math::Vec3& loc = get_location();
     const std::map<core::Id, std::shared_ptr<model::Model>>& children = parent->get_children();
     for (const std::pair<const core::Id, std::shared_ptr<model::Model>>& c : children) {
@@ -39,11 +37,12 @@ void gearoenix::render::model::Transformation::local_scale(const core::Real s) n
         ct->local_scale(s);
         ct->set_location((ct->get_location() - loc) * s + loc);
     }
+    parent->get_collider()->local_scale(s);
+    ;
 }
 
 void gearoenix::render::model::Transformation::local_x_scale(const core::Real s) noexcept
 {
-    parent->get_collider()->local_x_scale(s);
     const math::Vec3& loc = get_location();
     const std::map<core::Id, std::shared_ptr<model::Model>>& children = parent->get_children();
     for (const std::pair<const core::Id, std::shared_ptr<model::Model>>& c : children) {
@@ -54,11 +53,11 @@ void gearoenix::render::model::Transformation::local_x_scale(const core::Real s)
         l[0] *= s;
         ct->set_location(l + loc);
     }
+    parent->get_collider()->local_x_scale(s);
 }
 
 void gearoenix::render::model::Transformation::local_y_scale(const core::Real s) noexcept
 {
-    parent->get_collider()->local_y_scale(s);
     const math::Vec3& loc = get_location();
     const std::map<core::Id, std::shared_ptr<model::Model>>& children = parent->get_children();
     for (const std::pair<const core::Id, std::shared_ptr<model::Model>>& c : children) {
@@ -69,11 +68,11 @@ void gearoenix::render::model::Transformation::local_y_scale(const core::Real s)
         l[1] *= s;
         ct->set_location(l + loc);
     }
+    parent->get_collider()->local_y_scale(s);
 }
 
 void gearoenix::render::model::Transformation::local_z_scale(const core::Real s) noexcept
 {
-    parent->get_collider()->local_z_scale(s);
     const math::Vec3& loc = get_location();
     const std::map<core::Id, std::shared_ptr<model::Model>>& children = parent->get_children();
     for (const std::pair<const core::Id, std::shared_ptr<model::Model>>& c : children) {
@@ -84,4 +83,5 @@ void gearoenix::render::model::Transformation::local_z_scale(const core::Real s)
         l[2] *= s;
         ct->set_location(l + loc);
     }
+    parent->get_collider()->local_z_scale(s);
 }

@@ -105,10 +105,14 @@ namespace render {
                 const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
 
         public:
-            virtual ~Scene() noexcept;
+            ~Scene() noexcept override;
 
-#define GX_HELPER(x, c)                                 \
-    void add_##x(const std::shared_ptr<c>& m) noexcept; \
+#define GX_HELPER(x, c)                                         \
+protected:                                                      \
+    void scene_add_##x(const std::shared_ptr<c>& m) noexcept;   \
+                                                                \
+public:                                                         \
+    virtual void add_##x(const std::shared_ptr<c>& m) noexcept; \
     const std::shared_ptr<c>& get_##x(core::Id x##_id) const noexcept;
 
             GX_HELPER(camera, camera::Camera)

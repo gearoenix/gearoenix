@@ -16,18 +16,16 @@ void gearoenix::system::stream::Asset::check_endian_compatibility() noexcept
     is_endian_compatible = (resource_endian == ((uint8_t*)(&system_endian))[0]);
 }
 
-gearoenix::system::stream::Asset::Asset() noexcept {}
+gearoenix::system::stream::Asset::Asset() noexcept = default;
 
-gearoenix::system::stream::Asset::~Asset() noexcept
-{
-    GXTODO; //android asset free check
+gearoenix::system::stream::Asset::~Asset() noexcept {
+    GXTODO //android asset free check
 }
 
 gearoenix::system::stream::Asset* gearoenix::system::stream::Asset::construct(system::Application* const sys_app, const std::string& name) noexcept
 {
-    Asset* asset = new Asset();
+    auto* const asset = new Asset();
 #ifdef GX_USE_STD_FILE
-    std::string file_path = name;
 #ifdef GX_IN_IOS
     return nullptr;
     @autoreleasepool {
@@ -35,10 +33,12 @@ gearoenix::system::stream::Asset* gearoenix::system::stream::Asset::construct(sy
         NSString* path = [[NSBundle mainBundle] pathForResource:@"data" ofType:@"gx3d"];
         file_path = std::string([path fileSystemRepresentation]);
     }
+#else
+    const std::string& file_path = name;
 #endif
     asset->file.open(file_path, std::ios::binary | std::ios::in);
     if (!asset->file.is_open()) {
-        GXLOGD("Can not find/open assets file: " << name);
+        GXLOGD("Can not find/open assets file: " << name)
         delete asset;
         return nullptr;
     }
@@ -65,20 +65,20 @@ gearoenix::core::Count gearoenix::system::stream::Asset::read(void* data, core::
     const auto result = static_cast<core::Count>(AAsset_read(file, data, static_cast<std::size_t>(length)));
 #elif defined(GX_USE_STD_FILE)
     file.read(static_cast<char*>(data), length);
-    core::Count result = static_cast<core::Count>(file.gcount());
+    auto result = static_cast<core::Count>(file.gcount());
 #else
 #error "Unexpected file interface"
 #endif
 #ifdef GX_DEBUG_MODE
     if (result != length)
-        GXUNEXPECTED;
+        GXUNEXPECTED
 #endif
     return result;
 }
 
 gearoenix::core::Count gearoenix::system::stream::Asset::write(const void*, core::Count) noexcept
 {
-    GXUNEXPECTED;
+    GXUNEXPECTED
 }
 
 void gearoenix::system::stream::Asset::seek(core::Count offset) noexcept
