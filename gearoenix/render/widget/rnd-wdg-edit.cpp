@@ -165,3 +165,8 @@ void gearoenix::render::widget::Edit::set_hint_text(
     hint_text_model->get_transformation()->local_x_scale(
         img_width / (hint_text_model->get_collider()->get_current_local_scale()[0] * 2.0f));
 }
+
+void gearoenix::render::widget::Edit::active(bool b) noexcept
+{
+    cursor_model->set_enabled(b);
+}

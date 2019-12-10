@@ -24,6 +24,8 @@ public:
         core::Id my_id, engine::Engine* e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
     bool on_event(const core::event::Data& d) noexcept final;
+
+    void add_model(const std::shared_ptr<model::Model>& m) noexcept final;
 };
 }
 #endif

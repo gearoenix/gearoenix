@@ -72,6 +72,7 @@ public:
     void set_hint_text(
         const std::wstring& t,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
+    void active(bool b = true) noexcept;
 };
 }
 #endif

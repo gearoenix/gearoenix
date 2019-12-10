@@ -10,6 +10,7 @@
 #include "../camera/rnd-cmr-orthographic.hpp"
 #include "../engine/rnd-eng-engine.hpp"
 #include "../model/rnd-mdl-model.hpp"
+#include "../widget/rnd-wdg-edit.hpp"
 #include "../widget/rnd-wdg-widget.hpp"
 #include <limits>
 
@@ -139,4 +140,22 @@ bool gearoenix::render::scene::Ui::on_event(const core::event::Data& d) noexcept
         GXLOGF("Unexpected event happened.")
     }
     return false;
+}
+
+void gearoenix::render::scene::Ui::add_model(const std::shared_ptr<model::Model>& m) noexcept
+{
+    Scene::scene_add_model(m);
+    // It doesn't matter because its not gonna happen very much.
+    auto* const w = dynamic_cast<widget::Widget*>(m.get());
+    if (w != nullptr) {
+        if (w->get_widget_type() == widget::Type::Edit) {
+            auto* const edt = dynamic_cast<widget::Edit*>(w);
+            if (selected_edit == nullptr) {
+                selected_edit = edt;
+                selected_edit->active();
+            } else {
+                edt->active(false);
+            }
+        }
+    }
 }
