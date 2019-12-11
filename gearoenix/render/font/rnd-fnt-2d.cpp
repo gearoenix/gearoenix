@@ -60,7 +60,7 @@ gearoenix::render::font::Font2D::Font2D(const core::Id my_id, texture::Manager* 
     const auto s = asset->size();
     ttf_data.resize(static_cast<std::size_t>(s));
     asset->seek(0);
-    asset->read(ttf_data.data(), s);
+    (void)asset->read(ttf_data.data(), s);
     init();
 }
 

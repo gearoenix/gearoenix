@@ -13,7 +13,7 @@
 #include <set>
 #include <thread>
 namespace gearoenix::core::event {
-class Listner;
+class Listener;
 class Engine {
 private:
     enum struct State : int {
@@ -27,7 +27,7 @@ private:
     std::mutex events_guard;
     std::vector<Data> events;
     std::mutex listners_guard;
-    std::map<Id, std::map<Real, std::set<Listner*>>> events_id_priority_listners;
+    std::map<Id, std::map<Real, std::set<Listener*>>> events_id_priority_listners;
     std::thread event_thread;
 
     struct MouseButtonState {
@@ -46,11 +46,11 @@ private:
 public:
     Engine() noexcept;
     ~Engine() noexcept;
-    void add_listner(Id event_id, Real priority, Listner* listner) noexcept;
+    void add_listner(Id event_id, Real priority, Listener* listner) noexcept;
     // Best function to remove listner
-    void remove_listner(Id event_id, Real priority, Listner* listner) noexcept;
-    void remove_listner(Id event_id, Listner* listner) noexcept;
-    void remove_listner(Listner* listner) noexcept;
+    void remove_listner(Id event_id, Real priority, Listener* listner) noexcept;
+    void remove_listner(Id event_id, Listener* listner) noexcept;
+    void remove_listner(Listener* listner) noexcept;
     void broadcast(const Data& event_data) noexcept;
     void set_mouse_position(const math::Vec2& position) noexcept;
     void set_mouse_movement(const math::Vec2& position) noexcept;

@@ -10,7 +10,7 @@ class Edit;
 }
 
 namespace gearoenix::render::scene {
-class Ui : public Scene, public core::event::Listner {
+class Ui : public Scene, public core::event::Listener {
 private:
     void init() noexcept;
     widget::Widget* selected_widget = nullptr;

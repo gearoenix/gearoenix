@@ -37,7 +37,7 @@ namespace render {
         class Engine;
     }
     namespace camera {
-        class Camera : public core::asset::Asset, public core::event::Listner {
+        class Camera : public core::asset::Asset, public core::event::Listener {
         public:
             typedef std::array<math::Vec3, 4> Partition;
 

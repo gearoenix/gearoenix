@@ -17,35 +17,33 @@
 #else
 #error "Unknown file implementation!"
 #endif
-namespace gearoenix {
-namespace system {
-    class Application;
-    namespace stream {
-        class Asset : public Stream {
-        private:
+namespace gearoenix::system {
+class Application;
+namespace stream {
+    class Asset : public Stream {
+    private:
 #ifdef GX_USE_STD_FILE
-            std::ifstream file;
+        std::ifstream file;
 #elif defined(GX_IN_ANDROID)
-            //system::Application* sys_app;
-            AAsset* file = nullptr;
+        //system::Application* sys_app;
+        AAsset* file = nullptr;
 #else
 #error "File usage is not specified!"
 #endif
-            void check_endian_compatibility() noexcept;
+        void check_endian_compatibility() noexcept;
 
-            Asset() noexcept;
+        Asset() noexcept;
 
-        public:
-            ~Asset() noexcept;
-            /// It will return null it file does not exist
-            static Asset* construct(system::Application* sys_app, const std::string& name) noexcept;
-            core::Count read(void* data, core::Count length) noexcept;
-            core::Count write(const void* data, core::Count length) noexcept;
-            void seek(core::Count offset) noexcept;
-            core::Count tell() noexcept;
-            core::Count size() noexcept final;
-        };
-    }
+    public:
+        ~Asset() noexcept final;
+        /// It will return null it file does not exist
+        [[nodiscard]] static Asset* construct(system::Application* sys_app, const std::string& name) noexcept;
+        [[nodiscard]] core::Count read(void* data, core::Count length) noexcept final;
+        [[nodiscard]] core::Count write(const void* data, core::Count length) noexcept final;
+        void seek(core::Count offset) noexcept final;
+        [[nodiscard]] core::Count tell() noexcept final;
+        [[nodiscard]] core::Count size() noexcept final;
+    };
 }
 }
 #endif

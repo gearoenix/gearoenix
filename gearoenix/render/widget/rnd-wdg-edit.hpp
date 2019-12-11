@@ -19,7 +19,7 @@ class Dynamic;
 }
 
 namespace gearoenix::render::widget {
-class Edit : public Widget, public core::event::Listner {
+class Edit : public Widget, public core::event::Listener {
 public:
     struct Theme {
         Alignment v_align = Alignment::Center;

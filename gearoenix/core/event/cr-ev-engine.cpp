@@ -71,19 +71,19 @@ gearoenix::core::event::Engine::~Engine() noexcept
     event_thread.join();
 }
 
-void gearoenix::core::event::Engine::add_listner(Id event_id, Real priority, Listner* const listner) noexcept
+void gearoenix::core::event::Engine::add_listner(Id event_id, Real priority, Listener* const listner) noexcept
 {
     std::lock_guard<std::mutex> _l(listners_guard);
     events_id_priority_listners[event_id][priority].insert(listner);
 }
 
-void gearoenix::core::event::Engine::remove_listner(Id event_id, Real priority, Listner* const listner) noexcept
+void gearoenix::core::event::Engine::remove_listner(Id event_id, Real priority, Listener* const listner) noexcept
 {
     std::lock_guard<std::mutex> _l(listners_guard);
     events_id_priority_listners[event_id][priority].erase(listner);
 }
 
-void gearoenix::core::event::Engine::remove_listner(Id event_id, Listner* const listner) noexcept
+void gearoenix::core::event::Engine::remove_listner(Id event_id, Listener* const listner) noexcept
 {
     std::lock_guard<std::mutex> _l(listners_guard);
     auto& e = events_id_priority_listners[event_id];
@@ -91,7 +91,7 @@ void gearoenix::core::event::Engine::remove_listner(Id event_id, Listner* const 
         p.second.erase(listner);
 }
 
-void gearoenix::core::event::Engine::remove_listner(Listner* const listner) noexcept
+void gearoenix::core::event::Engine::remove_listner(Listener* const listner) noexcept
 {
     std::lock_guard<std::mutex> _l(listners_guard);
     for (auto& e : events_id_priority_listners) {

@@ -14,7 +14,7 @@ class Ui;
 }
 
 class Example003UiWidgetsApp : public gearoenix::core::Application,
-                               public gearoenix::core::event::Listner {
+                               public gearoenix::core::event::Listener {
 private:
     using GxUiScene = gearoenix::render::scene::Ui;
     using GxGrPbr = gearoenix::render::graph::tree::Pbr;

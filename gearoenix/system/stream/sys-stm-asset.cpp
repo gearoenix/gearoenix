@@ -13,10 +13,10 @@ void gearoenix::system::stream::Asset::check_endian_compatibility() noexcept
     unsigned int system_endian = 1;
     uint8_t resource_endian;
     Stream::read(resource_endian);
-    is_endian_compatible = (resource_endian == ((uint8_t*)(&system_endian))[0]);
+    endian_compatibility = (resource_endian == ((uint8_t*)(&system_endian))[0]);
 }
 
-gearoenix::system::stream::Asset::Asset() noexcept = default;
+gearoenix::system::stream::Asset::Asset() noexcept {}
 
 gearoenix::system::stream::Asset::~Asset() noexcept {
     GXTODO //android asset free check

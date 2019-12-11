@@ -1,1 +1,33 @@
 #include "sys-stm-stream.hpp"
+
+gearoenix::system::stream::Stream::Stream() noexcept = default;
+
+void gearoenix::system::stream::Stream::built_in_type_read(void* const data, const core::Count length) noexcept
+{
+    (void)read(data, length);
+    if (endian_compatibility)
+        return;
+    auto* const c_data = static_cast<std::uint8_t*>(data);
+    for (core::Count i = 0, j = length - 1; i < j; ++i, --j) {
+        const std::uint8_t tmp = c_data[i];
+        c_data[i] = c_data[j];
+        c_data[j] = tmp;
+    }
+}
+
+std::string gearoenix::system::stream::Stream::read_string() noexcept
+{
+    core::Count c;
+    (void)read(c);
+    std::string s;
+    s.resize(c);
+    (void)read(&(s[0]), c);
+    return s;
+}
+
+bool gearoenix::system::stream::Stream::read_bool() noexcept
+{
+    std::uint8_t data;
+    (void)read(&data, 1);
+    return data != 0;
+}
