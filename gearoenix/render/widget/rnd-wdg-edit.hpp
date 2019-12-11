@@ -1,7 +1,10 @@
 #ifndef GEAROENIX_RENDER_WIDGET_EDIT_HPP
 #define GEAROENIX_RENDER_WIDGET_EDIT_HPP
+
+#include "../../core/event/cr-ev-listner.hpp"
 #include "rnd-wdg-alignment.hpp"
 #include "rnd-wdg-widget.hpp"
+#include <stack>
 
 namespace gearoenix::physics::animation {
 struct Animation;
@@ -16,7 +19,7 @@ class Dynamic;
 }
 
 namespace gearoenix::render::widget {
-class Edit : public Widget {
+class Edit : public Widget, public core::event::Listner {
 public:
     struct Theme {
         Alignment v_align = Alignment::Center;
@@ -46,6 +49,9 @@ public:
     GX_GET_CREF_PRV(std::shared_ptr<material::Material>, cursor_material)
     GX_GET_CREF_PRV(std::shared_ptr<physics::animation::Animation>, cursor_animation)
     GX_GET_CREF_PRV(Theme, theme)
+    GX_GET_VAL_PRV(bool, actived, true)
+    GX_GET_CREF_PRV(std::stack<wchar_t>, left_text)
+    GX_GET_CREF_PRV(std::stack<wchar_t>, right_text)
 private:
     void init(const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
     void on_scale() noexcept;
@@ -73,6 +79,7 @@ public:
         const std::wstring& t,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
     void active(bool b = true) noexcept;
+    [[nodiscard]] bool on_event(const core::event::Data& d) noexcept final;
 };
 }
 #endif

@@ -84,6 +84,14 @@ bool gearoenix::render::scene::Ui::on_event(const core::event::Data& d) noexcept
                     [this](widget::Widget* const wdg, const math::Vec3& p) noexcept {
                         wdg->selected(p);
                         selected_widget = wdg;
+                        if (selected_widget->get_widget_type() == widget::Type::Edit && selected_edit != selected_widget) {
+                            auto* const seledt = dynamic_cast<widget::Edit*>(selected_widget);
+                            if (selected_edit != nullptr) {
+                                selected_edit->active(false);
+                            }
+                            seledt->active();
+                            selected_edit = seledt;
+                        }
                     },
                     [this](widget::Widget* const wdg, const math::Vec3& p,
                         const std::vector<model::Model*>& children) noexcept {
@@ -145,14 +153,13 @@ bool gearoenix::render::scene::Ui::on_event(const core::event::Data& d) noexcept
 void gearoenix::render::scene::Ui::add_model(const std::shared_ptr<model::Model>& m) noexcept
 {
     Scene::scene_add_model(m);
-    // It doesn't matter because its not gonna happen very much.
-    auto* const w = dynamic_cast<widget::Widget*>(m.get());
-    if (w != nullptr) {
+    if (m->get_model_type() == model::Type::Widget) {
+        // It doesn't matter because it's not gonna happen very much.
+        auto* const w = dynamic_cast<widget::Widget*>(m.get());
         if (w->get_widget_type() == widget::Type::Edit) {
             auto* const edt = dynamic_cast<widget::Edit*>(w);
             if (selected_edit == nullptr) {
                 selected_edit = edt;
-                selected_edit->active();
             } else {
                 edt->active(false);
             }

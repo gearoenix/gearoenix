@@ -1,7 +1,10 @@
 #include "rnd-wdg-edit.hpp"
 #include "../../core/asset/cr-asset-manager.hpp"
+#include "../../core/cr-string.hpp"
+#include "../../core/event/cr-ev-engine.hpp"
 #include "../../physics/animation/phs-anm-animation.hpp"
 #include "../../physics/animation/phs-anm-manager.hpp"
+#include "../../physics/collider/phs-cld-aabb.hpp"
 #include "../../physics/phs-engine.hpp"
 #include "../../system/sys-app.hpp"
 #include "../font/rnd-fnt-2d.hpp"
@@ -13,9 +16,18 @@
 #include "../model/rnd-mdl-manager.hpp"
 #include "../model/rnd-mdl-mesh.hpp"
 #include <cmath>
+#include <string>
 
-void gearoenix::render::widget::Edit::init(const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
+#define GX_EDIT_INIT Widget(my_id, Type::Edit, e, c), text_material(new material::Material(e, c)), hint_text_material(new material::Material(e, c)), background_material(new material::Material(e, c)), cursor_material(new material::Material(e, c))
+
+void gearoenix::render::widget::Edit::init(const core::sync::EndCaller<core::sync::EndCallerIgnore>& endcall) noexcept
 {
+    const core::sync::EndCaller<core::sync::EndCallerIgnore> c([endcall, this] {
+        auto* const ee = e->get_system_application()->get_event_engine();
+        ee->add_listner(core::event::Id::ButtonKeyboard, 0.0f, this);
+    });
+
+    set_collider(std::make_unique<physics::collider::Aabb>(math::Vec3(1.0f, 1.0f, 0.001f), math::Vec3(-1.0f, -1.0f, -0.001f)));
 
     auto* const astmgr = e->get_system_application()->get_asset_manager();
     auto* const mshmgr = astmgr->get_mesh_manager();
@@ -30,17 +42,19 @@ void gearoenix::render::widget::Edit::init(const core::sync::EndCaller<core::syn
 
     text_material->set_translucency(material::TranslucencyMode::Transparent);
     hint_text_material->set_translucency(material::TranslucencyMode::Transparent);
-    hint_text_material->set_color(math::Vec4(0.0f), c);
 
     core::sync::EndCaller<model::Dynamic> mdlend([c](const std::shared_ptr<model::Dynamic>&) {});
 
     text_model = mdlmgr->create<model::Dynamic>(mdlend);
     text_model->add_mesh(std::make_shared<model::Mesh>(plate_mesh, text_material));
+    text_model->get_transformation()->set_location(math::Vec3(0.0f, 0.0f, 0.01f));
+    text_model->set_enabled(false);
     add_child(text_model);
 
     hint_text_model = mdlmgr->create<model::Dynamic>(mdlend);
     hint_text_model->add_mesh(std::make_shared<model::Mesh>(plate_mesh, hint_text_material));
     hint_text_model->get_transformation()->set_location(math::Vec3(0.0f, 0.0f, 0.01f));
+    hint_text_model->set_enabled(false);
     add_child(hint_text_model);
 
     background_material->set_color(0.02f, 0.02f, 0.02f, c);
@@ -100,19 +114,15 @@ void gearoenix::render::widget::Edit::on_scale() noexcept
 
 gearoenix::render::widget::Edit::Edit(
     const core::Id my_id,
-    system::stream::Stream* const f,
+    system::stream::Stream* const,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
-    : Widget(my_id, Type::Edit, f, e, c) {
+    : GX_EDIT_INIT {
         GXUNIMPLEMENTED
     }
 
     gearoenix::render::widget::Edit::Edit(const core::Id my_id, engine::Engine* const e, const Theme& theme, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
-    : Widget(my_id, Type::Edit, e, c)
-    , text_material(new material::Material(e, c))
-    , hint_text_material(new material::Material(e, c))
-    , background_material(new material::Material(e, c))
-    , cursor_material(new material::Material(e, c))
+    : GX_EDIT_INIT
     , theme(theme)
 {
     init(c);
@@ -122,11 +132,7 @@ gearoenix::render::widget::Edit::Edit(
     const core::Id my_id,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
-    : Widget(my_id, Type::Edit, e, c)
-    , text_material(new material::Material(e, c))
-    , hint_text_material(new material::Material(e, c))
-    , background_material(new material::Material(e, c))
-    , cursor_material(new material::Material(e, c))
+    : GX_EDIT_INIT
 {
     init(c);
 }
@@ -137,10 +143,34 @@ gearoenix::render::widget::Edit::~Edit() noexcept
 }
 
 void gearoenix::render::widget::Edit::set_text(
-    const std::wstring&,
-    const core::sync::EndCaller<core::sync::EndCallerIgnore>&) noexcept
+    const std::wstring& t,
+    const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
 {
-    GXUNIMPLEMENTED
+    if (t.empty())
+        return;
+    text = t;
+    const auto& scale = collider->get_current_local_scale();
+    const auto img_height = scale[1] * 2.0f;
+    text_font->compute_text_widths(t, img_height, text_widths);
+    const auto raw_img_width = scale[0] * 2.0f;
+    const auto is_bigger = raw_img_width < text_widths.back();
+    const auto img_width = is_bigger ? raw_img_width : text_widths.back();
+    {
+        auto* const tran = cursor_model->get_transformation();
+        math::Vec3 loc = tran->get_location();
+        loc[0] = img_width * 0.5f;
+        tran->set_location(loc);
+    }
+    core::sync::EndCaller<texture::Texture2D> txtend([c, this](const std::shared_ptr<texture::Texture2D>& txt) {
+        text_material->set_color(txt);
+        hint_text_model->set_enabled(false);
+        text_model->set_enabled(true);
+    });
+    const auto _txt = text_font->bake(
+        text, text_widths, theme.text_color,
+        img_width, img_height, 0.0f, txtend);
+    text_model->get_transformation()->local_x_scale(
+        img_width / (text_model->get_collider()->get_current_local_scale()[0] * 2.0f));
 }
 
 void gearoenix::render::widget::Edit::set_hint_text(
@@ -158,6 +188,8 @@ void gearoenix::render::widget::Edit::set_hint_text(
     const auto img_width = is_bigger ? raw_img_width : hint_text_widths.back();
     core::sync::EndCaller<texture::Texture2D> txtend([c, this](const std::shared_ptr<texture::Texture2D>& txt) {
         hint_text_material->set_color(txt);
+        text_model->set_enabled(false);
+        hint_text_model->set_enabled(true);
     });
     const auto _txt = text_font->bake(
         hint_text, hint_text_widths, theme.hint_text_color,
@@ -169,4 +201,24 @@ void gearoenix::render::widget::Edit::set_hint_text(
 void gearoenix::render::widget::Edit::active(bool b) noexcept
 {
     cursor_model->set_enabled(b);
+    actived = b;
+}
+
+bool gearoenix::render::widget::Edit::on_event(const core::event::Data& d) noexcept
+{
+
+    switch (d.source) {
+    case core::event::Id::ButtonKeyboard: {
+        if (actived) {
+            const auto& data = std::get<gearoenix::core::event::button::KeyboardData>(d.data);
+            if (data.action == core::event::button::KeyboardActionId::Press) {
+                set_text(text + core::String::to_character(data.key).value());
+            }
+        }
+        break;
+    }
+    default:
+        GXUNEXPECTED
+    }
+    return false;
 }

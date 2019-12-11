@@ -176,6 +176,58 @@ int gearoenix::system::Application::on_event(SDL_Event* const e) noexcept
                 return core::event::button::KeyboardKeyId::Down;
             case SDLK_ESCAPE:
                 return core::event::button::KeyboardKeyId::Escape;
+            case SDLK_a:
+                return core::event::button::KeyboardKeyId::A;
+            case SDLK_b:
+                return core::event::button::KeyboardKeyId::B;
+            case SDLK_c:
+                return core::event::button::KeyboardKeyId::C;
+            case SDLK_d:
+                return core::event::button::KeyboardKeyId::D;
+            case SDLK_e:
+                return core::event::button::KeyboardKeyId::E;
+            case SDLK_f:
+                return core::event::button::KeyboardKeyId::F;
+            case SDLK_g:
+                return core::event::button::KeyboardKeyId::G;
+            case SDLK_h:
+                return core::event::button::KeyboardKeyId::H;
+            case SDLK_i:
+                return core::event::button::KeyboardKeyId::I;
+            case SDLK_j:
+                return core::event::button::KeyboardKeyId::J;
+            case SDLK_k:
+                return core::event::button::KeyboardKeyId::K;
+            case SDLK_l:
+                return core::event::button::KeyboardKeyId::L;
+            case SDLK_m:
+                return core::event::button::KeyboardKeyId::M;
+            case SDLK_n:
+                return core::event::button::KeyboardKeyId::N;
+            case SDLK_o:
+                return core::event::button::KeyboardKeyId::O;
+            case SDLK_p:
+                return core::event::button::KeyboardKeyId::P;
+            case SDLK_q:
+                return core::event::button::KeyboardKeyId::Q;
+            case SDLK_r:
+                return core::event::button::KeyboardKeyId::R;
+            case SDLK_s:
+                return core::event::button::KeyboardKeyId::S;
+            case SDLK_t:
+                return core::event::button::KeyboardKeyId::T;
+            case SDLK_u:
+                return core::event::button::KeyboardKeyId::U;
+            case SDLK_v:
+                return core::event::button::KeyboardKeyId::V;
+            case SDLK_w:
+                return core::event::button::KeyboardKeyId::W;
+            case SDLK_x:
+                return core::event::button::KeyboardKeyId::X;
+            case SDLK_y:
+                return core::event::button::KeyboardKeyId::Y;
+            case SDLK_z:
+                return core::event::button::KeyboardKeyId::Z;
             default:
                 GXLOGE("Unhandled mouse button, left button returned instead.")
                 return core::event::button::KeyboardKeyId::Escape;

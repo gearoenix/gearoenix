@@ -5,12 +5,12 @@
 
 namespace gearoenix::core::event::button {
 
-enum struct KeyboardKeyId : int {
+enum struct KeyboardKeyId : core::Id {
     Left,
     Right,
     Up,
     Down,
-    Backscape,
+    Backspace,
     Escape,
     Enter,
     Select,
@@ -33,11 +33,11 @@ enum struct KeyboardKeyId : int {
     PageDown,
     PageUp,
     Minus,
-    Plus,
+    Equal,
     LeftBracket,
     RightBracket,
     Semicolon,
-    Qoute,
+    Quote,
     Comma,
     Dot,
     Slash,
