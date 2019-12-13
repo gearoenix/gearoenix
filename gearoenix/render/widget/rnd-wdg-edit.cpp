@@ -47,22 +47,26 @@ void gearoenix::render::widget::Edit::init(const core::sync::EndCaller<core::syn
 
     text_model = mdlmgr->create<model::Dynamic>(mdlend);
     text_model->add_mesh(std::make_shared<model::Mesh>(plate_mesh, text_material));
-    text_model->get_transformation()->set_location(math::Vec3(0.0f, 0.0f, 0.01f));
+    auto* const text_tran = text_model->get_transformation();
+    text_tran->set_location(math::Vec3(0.0f, 0.0f, 0.01f));
+    text_tran->local_scale(theme.text_size);
     text_model->set_enabled(false);
     add_child(text_model);
 
     hint_text_model = mdlmgr->create<model::Dynamic>(mdlend);
     hint_text_model->add_mesh(std::make_shared<model::Mesh>(plate_mesh, hint_text_material));
-    hint_text_model->get_transformation()->set_location(math::Vec3(0.0f, 0.0f, 0.01f));
+    auto* const hint_text_tran = hint_text_model->get_transformation();
+    hint_text_tran->set_location(math::Vec3(0.0f, 0.0f, 0.01f));
+    hint_text_tran->local_scale(theme.hint_text_size);
     hint_text_model->set_enabled(false);
     add_child(hint_text_model);
 
-    background_material->set_color(0.02f, 0.02f, 0.02f, c);
+    background_material->set_color(theme.background_color, c);
     background_model = mdlmgr->create<model::Dynamic>(mdlend);
     background_model->add_mesh(std::make_shared<model::Mesh>(plate_mesh, background_material));
     add_child(background_model);
 
-    cursor_material->set_color(0.0f, 0.0f, 0.0f, c);
+    cursor_material->set_color(theme.cursor_color, c);
     cursor_material->set_translucency(material::TranslucencyMode::Transparent);
     cursor_model = mdlmgr->create<model::Dynamic>(mdlend);
     cursor_model->add_mesh(std::make_shared<model::Mesh>(plate_mesh, cursor_material));
@@ -112,6 +116,26 @@ void gearoenix::render::widget::Edit::on_scale() noexcept
     cursor_model->get_transformation()->local_x_scale(cursor_scale);
 }
 
+gearoenix::core::Real gearoenix::render::widget::Edit::compute_starting() noexcept
+{
+    aspects = collider->get_current_local_scale().xy() * theme.text_size * 2.0f;
+    cursor_pos_in_text = text_widths[left_to_right ? left_text.size() : text.size() - right_text.size()];
+    starting_pos_in_text = left_to_right ? 0.0f : text_widths[text.size()];
+    const auto raw_text_size = std::abs(cursor_pos_in_text - starting_pos_in_text);
+    if (raw_text_size > aspects[0]) {
+        if (left_to_right) {
+            starting_text_cut = cursor_pos_in_text - aspects[0];
+            ending_text_cut = cursor_pos_in_text;
+        } else {
+            starting_text_cut = cursor_pos_in_text;
+            ending_text_cut = cursor_pos_in_text + aspects[0];
+        }
+    } else {
+        starting_text_cut = 0.0f;
+        ending_text_cut = text_widths[text.size()];
+    }
+}
+
 gearoenix::render::widget::Edit::Edit(
     const core::Id my_id,
     system::stream::Stream* const,
@@ -121,7 +145,7 @@ gearoenix::render::widget::Edit::Edit(
         GXUNIMPLEMENTED
     }
 
-    gearoenix::render::widget::Edit::Edit(const core::Id my_id, engine::Engine* const e, const Theme& theme, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
+    gearoenix::render::widget::Edit::Edit(const core::Id my_id, engine::Engine* const e, const EditTheme& theme, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : GX_EDIT_INIT
     , theme(theme)
 {
@@ -221,4 +245,15 @@ bool gearoenix::render::widget::Edit::on_event(const core::event::Data& d) noexc
         GXUNEXPECTED
     }
     return false;
+}
+
+void gearoenix::render::widget::Edit::set_left_to_right(const bool b) noexcept
+{
+    if (left_to_right == b)
+        return;
+    if (left_to_right) {
+
+    } else {
+    }
+    left_to_right = b;
 }

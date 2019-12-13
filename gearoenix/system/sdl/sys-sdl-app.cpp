@@ -11,7 +11,6 @@
 #include "../../core/event/cr-ev-event.hpp"
 #include "../../gl/gl-loader.hpp"
 #include "../sys-configuration.hpp"
-#include "../sys-log.hpp"
 #ifdef GX_USE_OPENGL_ES2
 #include "../../gles2/engine/gles2-eng-engine.hpp"
 #endif
