@@ -160,7 +160,7 @@ int gearoenix::system::Application::on_event(SDL_Event* const e) noexcept
             case SDL_KEYDOWN:
                 return core::event::button::KeyboardActionId::Press;
             default:
-                return core::event::button::KeyboardActionId::Press;
+                return core::event::button::KeyboardActionId::Unknown;
             }
         }();
         d.key = [&]() noexcept {
@@ -227,9 +227,151 @@ int gearoenix::system::Application::on_event(SDL_Event* const e) noexcept
                 return core::event::button::KeyboardKeyId::Y;
             case SDLK_z:
                 return core::event::button::KeyboardKeyId::Z;
+            case SDLK_0:
+                return core::event::button::KeyboardKeyId::Num0;
+            case SDLK_1:
+                return core::event::button::KeyboardKeyId::Num1;
+            case SDLK_2:
+                return core::event::button::KeyboardKeyId::Num2;
+            case SDLK_3:
+                return core::event::button::KeyboardKeyId::Num3;
+            case SDLK_4:
+                return core::event::button::KeyboardKeyId::Num4;
+            case SDLK_5:
+                return core::event::button::KeyboardKeyId::Num5;
+            case SDLK_6:
+                return core::event::button::KeyboardKeyId::Num6;
+            case SDLK_7:
+                return core::event::button::KeyboardKeyId::Num7;
+            case SDLK_8:
+                return core::event::button::KeyboardKeyId::Num8;
+            case SDLK_9:
+                return core::event::button::KeyboardKeyId::Num9;
+            case SDLK_KP_0:
+                return core::event::button::KeyboardKeyId::Numpad0;
+            case SDLK_KP_1:
+                return core::event::button::KeyboardKeyId::Numpad1;
+            case SDLK_KP_2:
+                return core::event::button::KeyboardKeyId::Numpad2;
+            case SDLK_KP_3:
+                return core::event::button::KeyboardKeyId::Numpad3;
+            case SDLK_KP_4:
+                return core::event::button::KeyboardKeyId::Numpad4;
+            case SDLK_KP_5:
+                return core::event::button::KeyboardKeyId::Numpad5;
+            case SDLK_KP_6:
+                return core::event::button::KeyboardKeyId::Numpad6;
+            case SDLK_KP_7:
+                return core::event::button::KeyboardKeyId::Numpad7;
+            case SDLK_KP_8:
+                return core::event::button::KeyboardKeyId::Numpad8;
+            case SDLK_KP_9:
+                return core::event::button::KeyboardKeyId::Numpad9;
+            case SDLK_SPACE:
+                return core::event::button::KeyboardKeyId::Space;
+            case SDLK_LEFTBRACKET:
+                return core::event::button::KeyboardKeyId::LeftBracket;
+            case SDLK_RIGHTBRACKET:
+                return core::event::button::KeyboardKeyId::RightBracket;
+            case SDLK_BACKQUOTE:
+                return core::event::button::KeyboardKeyId::Tilda;
+            case SDLK_BACKSPACE:
+                return core::event::button::KeyboardKeyId::Backspace;
+            case SDLK_BACKSLASH:
+                return core::event::button::KeyboardKeyId::Backslash;
+            case SDLK_SLASH:
+                return core::event::button::KeyboardKeyId::Slash;
+            case SDLK_QUOTE:
+                return core::event::button::KeyboardKeyId::Quote;
+            case SDLK_SEMICOLON:
+                return core::event::button::KeyboardKeyId::Semicolon;
+            case SDLK_MINUS:
+                return core::event::button::KeyboardKeyId::Minus;
+            case SDLK_EQUALS:
+                return core::event::button::KeyboardKeyId::Equal;
+            case SDLK_TAB:
+                return core::event::button::KeyboardKeyId::Tab;
+            case SDLK_CAPSLOCK:
+                return core::event::button::KeyboardKeyId::CapsLock;
+            case SDLK_LSHIFT:
+                return core::event::button::KeyboardKeyId::LeftShift;
+            case SDLK_RSHIFT:
+                return core::event::button::KeyboardKeyId::RightShift;
+            case SDLK_LCTRL:
+                return core::event::button::KeyboardKeyId::LeftControl;
+            case SDLK_RCTRL:
+                return core::event::button::KeyboardKeyId::RightControl;
+            case SDLK_LALT:
+                return core::event::button::KeyboardKeyId::LeftAlt;
+            case SDLK_RALT:
+                return core::event::button::KeyboardKeyId::RightAlt;
+            case SDLK_MENU:
+                return core::event::button::KeyboardKeyId::Menu;
+            case SDLK_COMMA:
+                return core::event::button::KeyboardKeyId::Comma;
+            case SDLK_PERIOD:
+                return core::event::button::KeyboardKeyId::Dot;
+            case SDLK_F1:
+                return core::event::button::KeyboardKeyId::F1;
+            case SDLK_F2:
+                return core::event::button::KeyboardKeyId::F2;
+            case SDLK_F3:
+                return core::event::button::KeyboardKeyId::F3;
+            case SDLK_F4:
+                return core::event::button::KeyboardKeyId::F4;
+            case SDLK_F5:
+                return core::event::button::KeyboardKeyId::F5;
+            case SDLK_F6:
+                return core::event::button::KeyboardKeyId::F6;
+            case SDLK_F7:
+                return core::event::button::KeyboardKeyId::F7;
+            case SDLK_F8:
+                return core::event::button::KeyboardKeyId::F8;
+            case SDLK_F9:
+                return core::event::button::KeyboardKeyId::F9;
+            case SDLK_F10:
+                return core::event::button::KeyboardKeyId::F10;
+            case SDLK_F11:
+                return core::event::button::KeyboardKeyId::F11;
+            case SDLK_F12:
+                return core::event::button::KeyboardKeyId::F12;
+            case SDLK_INSERT:
+                return core::event::button::KeyboardKeyId::Insert;
+            case SDLK_DELETE:
+                return core::event::button::KeyboardKeyId::Delete;
+            case SDLK_HOME:
+                return core::event::button::KeyboardKeyId::Home;
+            case SDLK_END:
+                return core::event::button::KeyboardKeyId::End;
+            case SDLK_PAGEDOWN:
+                return core::event::button::KeyboardKeyId::PageDown;
+            case SDLK_PAGEUP:
+                return core::event::button::KeyboardKeyId::PageUp;
+            case SDLK_SCROLLLOCK:
+                return core::event::button::KeyboardKeyId::ScrollLock;
+            case SDLK_PAUSE:
+                return core::event::button::KeyboardKeyId::Pause;
+            case SDLK_LESS:
+                return core::event::button::KeyboardKeyId::Less;
+            case SDLK_GREATER:
+                return core::event::button::KeyboardKeyId::Greater;
+            case SDLK_NUMLOCKCLEAR:
+                return core::event::button::KeyboardKeyId::NumpadLock;
+            case SDLK_KP_DIVIDE:
+                return core::event::button::KeyboardKeyId::NumpadSlash;
+            case SDLK_KP_MULTIPLY:
+                return core::event::button::KeyboardKeyId::NumpadStar;
+            case SDLK_KP_MINUS:
+                return core::event::button::KeyboardKeyId::NumpadMinus;
+            case SDLK_KP_PLUS:
+                return core::event::button::KeyboardKeyId::NumpadPlus;
+            case SDLK_KP_ENTER:
+                return core::event::button::KeyboardKeyId::NumpadEnter;
+            case SDLK_KP_PERIOD:
+                return core::event::button::KeyboardKeyId::NumpadDot;
             default:
-                GXLOGE("Unhandled mouse button, left button returned instead.")
-                return core::event::button::KeyboardKeyId::Escape;
+                GXLOGD("Unhandled mouse button, left button returned instead. " << static_cast<int>(e->key.keysym.sym))
+                return core::event::button::KeyboardKeyId::Unknown;
             }
         }();
         event.source = core::event::Id::ButtonKeyboard;
@@ -304,7 +446,7 @@ int gearoenix::system::Application::on_event(SDL_Event* const e) noexcept
                 case SDL_MOUSEBUTTONDOWN:
                     return core::event::button::MouseActionId::Press;
                 default:
-                    return core::event::button::MouseActionId::Press;
+                    return core::event::button::MouseActionId::Unknown;
                 }
             }());
         break;

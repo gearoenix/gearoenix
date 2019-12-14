@@ -8,46 +8,15 @@ bool gearoenix::core::String::is_character(const event::button::KeyboardKeyId ki
 std::optional<wchar_t> gearoenix::core::String::to_character(const event::button::KeyboardKeyId ki) noexcept
 {
     switch (ki) {
-    case event::button::KeyboardKeyId::Left:
-    case event::button::KeyboardKeyId::Right:
-    case event::button::KeyboardKeyId::Up:
-    case event::button::KeyboardKeyId::Down:
-    case event::button::KeyboardKeyId::Backspace:
-    case event::button::KeyboardKeyId::Escape:
-    case event::button::KeyboardKeyId::Select:
-    case event::button::KeyboardKeyId::Start:
-    case event::button::KeyboardKeyId::Home:
-    case event::button::KeyboardKeyId::End:
-    case event::button::KeyboardKeyId::Delete:
-    case event::button::KeyboardKeyId::CapsLock:
-    case event::button::KeyboardKeyId::RightShift:
-    case event::button::KeyboardKeyId::LeftShift:
-    case event::button::KeyboardKeyId::RightControl:
-    case event::button::KeyboardKeyId::LeftControl:
-    case event::button::KeyboardKeyId::LeftSuper:
-    case event::button::KeyboardKeyId::RightSuper:
-    case event::button::KeyboardKeyId::LeftAlt:
-    case event::button::KeyboardKeyId::RightAlt:
-    case event::button::KeyboardKeyId::PageDown:
-    case event::button::KeyboardKeyId::PageUp:
-    case event::button::KeyboardKeyId::F1:
-    case event::button::KeyboardKeyId::F2:
-    case event::button::KeyboardKeyId::F3:
-    case event::button::KeyboardKeyId::F4:
-    case event::button::KeyboardKeyId::F5:
-    case event::button::KeyboardKeyId::F6:
-    case event::button::KeyboardKeyId::F7:
-    case event::button::KeyboardKeyId::F8:
-    case event::button::KeyboardKeyId::F9:
-    case event::button::KeyboardKeyId::F10:
-    case event::button::KeyboardKeyId::F11:
-    case event::button::KeyboardKeyId::F12:
-        return std::nullopt;
     case event::button::KeyboardKeyId::Enter:
     case event::button::KeyboardKeyId::NumpadEnter:
         return '\n';
     case event::button::KeyboardKeyId::Tilda:
-        return '~';
+        return '`';
+    case event::button::KeyboardKeyId::Less:
+        return '<';
+    case event::button::KeyboardKeyId::Greater:
+        return '>';
     case event::button::KeyboardKeyId::Tab:
         return '\t';
     case event::button::KeyboardKeyId::Space:
@@ -161,5 +130,7 @@ std::optional<wchar_t> gearoenix::core::String::to_character(const event::button
         return 'y';
     case event::button::KeyboardKeyId::Z:
         return 'z';
+    default:
+        return std::nullopt;
     }
 }

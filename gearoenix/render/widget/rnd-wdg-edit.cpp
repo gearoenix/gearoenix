@@ -136,6 +136,17 @@ gearoenix::core::Real gearoenix::render::widget::Edit::compute_starting() noexce
     }
 }
 
+void gearoenix::render::widget::Edit::refill_text() noexcept
+{
+    text.clear();
+    for (const wchar_t c : left_text) {
+        text.push_back(c);
+    }
+    for (auto i = right_text.rbegin(); i != right_text.rend(); ++i) {
+        text.push_back(*i);
+    }
+}
+
 gearoenix::render::widget::Edit::Edit(
     const core::Id my_id,
     system::stream::Stream* const,
@@ -234,9 +245,9 @@ bool gearoenix::render::widget::Edit::on_event(const core::event::Data& d) noexc
     switch (d.source) {
     case core::event::Id::ButtonKeyboard: {
         if (actived) {
-            const auto& data = std::get<gearoenix::core::event::button::KeyboardData>(d.data);
+            const auto& data = std::get<core::event::button::KeyboardData>(d.data);
             if (data.action == core::event::button::KeyboardActionId::Press) {
-                set_text(text + core::String::to_character(data.key).value());
+                insert(core::String::to_character(data.key).value());
             }
         }
         break;
@@ -252,8 +263,63 @@ void gearoenix::render::widget::Edit::set_left_to_right(const bool b) noexcept
     if (left_to_right == b)
         return;
     if (left_to_right) {
-
+        for (auto i = left_text.size() - 1; i >= 0; --i) {
+            right_text.push_back(left_text[i]);
+        }
+        left_text.clear();
+        text.clear();
+        for (auto i = right_text.size() - 1; i >= 0; --i) {
+            text.push_back(right_text[i]);
+        }
+        cursor_index = 0;
     } else {
+        for (auto i = right_text.size() - 1; i >= 0; --i) {
+            left_text.push_back(right_text[i]);
+        }
+        right_text.clear();
+        text.clear();
+        for (const wchar_t c : left_text) {
+            text.push_back(c);
+        }
+        cursor_index = text.size();
     }
     left_to_right = b;
+}
+
+void gearoenix::render::widget::Edit::insert(
+    const wchar_t character,
+    const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
+{
+    if ((static_cast<int>(character) > 31 && static_cast<int>(character) < 127) || (static_cast<int>(character) > 1631 && static_cast<int>(character) < 1642)) {
+        if (left_to_right) {
+            if (temporary_right > 0) {
+                for (std::size_t i = 0; i < temporary_right; ++i) {
+                    left_text.push_back(right_text.back());
+                    right_text.pop_back();
+                }
+                cursor_index += temporary_right;
+                temporary_right = 0;
+            }
+        } else {
+            ++temporary_left;
+        }
+        ++cursor_index;
+        left_text.push_back(character);
+    } else if ((static_cast<int>(character) > 1535 && static_cast<int>(character) < 1791) || (static_cast<int>(character) > 1871 && static_cast<int>(character) < 1919) || (static_cast<int>(character) > 64335 && static_cast<int>(character) < 65023) || (static_cast<int>(character) > 65135 && static_cast<int>(character) < 65279)) {
+        if (left_to_right) {
+            ++temporary_right;
+        } else {
+            if (temporary_left > 0) {
+                for (std::size_t i = 0; i < temporary_left; ++i) {
+                    right_text.push_back(left_text.back());
+                    left_text.pop_back();
+                }
+                cursor_index -= temporary_left;
+                temporary_left = 0;
+            }
+        }
+        right_text.push_back(character);
+    }
+    refill_text();
+    set_text(text, c);
 }

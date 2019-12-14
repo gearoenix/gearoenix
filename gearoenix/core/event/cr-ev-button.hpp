@@ -18,6 +18,7 @@ enum struct KeyboardKeyId : core::Id {
     Home,
     End,
     Delete,
+    Insert,
     Tilda,
     Tab,
     CapsLock,
@@ -25,11 +26,14 @@ enum struct KeyboardKeyId : core::Id {
     LeftShift,
     RightControl,
     LeftControl,
+    Menu,
     Space,
     LeftSuper,
     RightSuper,
     LeftAlt,
     RightAlt,
+    Less,
+    Greater,
     PageDown,
     PageUp,
     Minus,
@@ -42,6 +46,8 @@ enum struct KeyboardKeyId : core::Id {
     Dot,
     Slash,
     Backslash,
+    ScrollLock,
+    Pause,
     Num0,
     Num1,
     Num2,
@@ -68,6 +74,7 @@ enum struct KeyboardKeyId : core::Id {
     NumpadPlus,
     NumpadEnter,
     NumpadDot,
+    NumpadLock,
     A,
     B,
     C,
@@ -106,19 +113,22 @@ enum struct KeyboardKeyId : core::Id {
     F10,
     F11,
     F12,
+    Unknown,
 };
 
 enum struct KeyboardActionId : int {
     Press,
     Release,
+    Unknown,
 };
 
 enum struct MouseKeyId : int {
     Left,
     Right,
     Middle,
-    Front,
+    Forward,
     Back,
+    Unknown,
 };
 
 enum struct MouseActionId : int {
@@ -127,6 +137,7 @@ enum struct MouseActionId : int {
     Click,
     DoubleClick,
     TripleClick,
+    Unknown,
 };
 
 struct KeyboardData {

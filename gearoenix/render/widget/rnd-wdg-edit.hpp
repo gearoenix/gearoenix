@@ -4,7 +4,7 @@
 #include "../../core/event/cr-ev-listner.hpp"
 #include "rnd-wdg-alignment.hpp"
 #include "rnd-wdg-widget.hpp"
-#include <stack>
+#include <vector>
 
 namespace gearoenix::physics::animation {
 struct Animation;
@@ -53,17 +53,21 @@ public:
     GX_GET_CREF_PRV(EditTheme, theme)
     GX_GET_VAL_PRV(bool, actived, true)
     GX_GET_VAL_PRV(bool, left_to_right, true)
-    GX_GET_CREF_PRV(std::stack<wchar_t>, left_text)
-    GX_GET_CREF_PRV(std::stack<wchar_t>, right_text)
+    GX_GET_CREF_PRV(std::vector<wchar_t>, left_text)
+    GX_GET_CREF_PRV(std::vector<wchar_t>, right_text)
     GX_GET_CREF_PRV(math::Vec2, aspects)
     GX_GET_VAL_PRV(core::Real, cursor_pos_in_text, 0.0f)
     GX_GET_VAL_PRV(core::Real, starting_pos_in_text, 0.0f)
     GX_GET_VAL_PRV(core::Real, starting_text_cut, 0.0f)
     GX_GET_VAL_PRV(core::Real, ending_text_cut, 0.0f)
+    GX_GET_VAL_PRV(std::size_t, cursor_index, 0)
+    GX_GET_VAL_PRV(std::size_t, temporary_left, 0)
+    GX_GET_VAL_PRV(std::size_t, temporary_right, 0)
 private:
     void init(const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
     void on_scale() noexcept;
     [[nodiscard]] core::Real compute_starting() noexcept;
+    void refill_text() noexcept;
 
 public:
     Edit(
@@ -90,6 +94,8 @@ public:
     void active(bool b = true) noexcept;
     [[nodiscard]] bool on_event(const core::event::Data& d) noexcept final;
     void set_left_to_right(bool b) noexcept;
+    void insert(wchar_t character, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
+    void remove(const core::sync::EndCaller<core::sync::EndCallerIgnore>& c = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
 };
 }
 #endif
