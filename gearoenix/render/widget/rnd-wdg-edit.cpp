@@ -99,10 +99,14 @@ void gearoenix::render::widget::Edit::init(const core::sync::EndCaller<core::syn
     e->get_physics_engine()->get_animation_manager()->add(cursor_animation);
 
     collider->set_on_scale(std::bind(&Edit::on_scale, this));
+
+    on_scale();
 }
 
 void gearoenix::render::widget::Edit::on_scale() noexcept
 {
+    aspects[0] = (collider->get_current_local_scale()[0] - (collider->get_current_local_scale()[1] * (1.0f - theme.text_size))) * 2.0f;
+    aspects[1] = collider->get_current_local_scale()[1] * theme.text_size * 2.0f;
     if (text.empty()) {
         if (!hint_text.empty()) {
             set_hint_text(text);
@@ -116,9 +120,9 @@ void gearoenix::render::widget::Edit::on_scale() noexcept
     cursor_model->get_transformation()->local_x_scale(cursor_scale);
 }
 
-gearoenix::core::Real gearoenix::render::widget::Edit::compute_starting() noexcept
+void gearoenix::render::widget::Edit::compute_starting() noexcept
 {
-    aspects = collider->get_current_local_scale().xy() * theme.text_size * 2.0f;
+    text_font->compute_text_widths(text, aspects[1], text_widths);
     cursor_pos_in_text = text_widths[left_to_right ? left_text.size() : text.size() - right_text.size()];
     starting_pos_in_text = left_to_right ? 0.0f : text_widths[text.size()];
     const auto raw_text_size = std::abs(cursor_pos_in_text - starting_pos_in_text);
@@ -183,13 +187,20 @@ void gearoenix::render::widget::Edit::set_text(
 {
     if (t.empty())
         return;
-    text = t;
-    const auto& scale = collider->get_current_local_scale();
-    const auto img_height = scale[1] * 2.0f;
-    text_font->compute_text_widths(t, img_height, text_widths);
-    const auto raw_img_width = scale[0] * 2.0f;
-    const auto is_bigger = raw_img_width < text_widths.back();
-    const auto img_width = is_bigger ? raw_img_width : text_widths.back();
+    if (text != t) {
+        left_text.clear();
+        for (const wchar_t ch : t) {
+            left_text.push_back(ch);
+        }
+        right_text.clear();
+        cursor_index = t.size();
+        temporary_left = 0;
+        temporary_right = 0;
+        text = t;
+    }
+    compute_starting();
+    const auto is_bigger = aspects[0] < text_widths.back();
+    const auto img_width = is_bigger ? aspects[0] : text_widths.back();
     {
         auto* const tran = cursor_model->get_transformation();
         math::Vec3 loc = tran->get_location();
@@ -203,7 +214,7 @@ void gearoenix::render::widget::Edit::set_text(
     });
     const auto _txt = text_font->bake(
         text, text_widths, theme.text_color,
-        img_width, img_height, 0.0f, txtend);
+        img_width, aspects[1], starting_text_cut, txtend);
     text_model->get_transformation()->local_x_scale(
         img_width / (text_model->get_collider()->get_current_local_scale()[0] * 2.0f));
 }
@@ -216,9 +227,9 @@ void gearoenix::render::widget::Edit::set_hint_text(
         return;
     hint_text = t;
     const auto& scale = collider->get_current_local_scale();
-    const auto img_height = scale[1] * 2.0f;
+    const auto img_height = scale[1] * 2.0f * theme.hint_text_size;
     text_font->compute_text_widths(t, img_height, hint_text_widths);
-    const auto raw_img_width = scale[0] * 2.0f;
+    const auto raw_img_width = (scale[0] - scale[1] * (1.0f - theme.hint_text_size)) * 2.0f;
     const auto is_bigger = raw_img_width < hint_text_widths.back();
     const auto img_width = is_bigger ? raw_img_width : hint_text_widths.back();
     core::sync::EndCaller<texture::Texture2D> txtend([c, this](const std::shared_ptr<texture::Texture2D>& txt) {
@@ -284,6 +295,8 @@ void gearoenix::render::widget::Edit::set_left_to_right(const bool b) noexcept
         cursor_index = text.size();
     }
     left_to_right = b;
+    temporary_left = 0;
+    temporary_right = 0;
 }
 
 void gearoenix::render::widget::Edit::insert(
@@ -297,6 +310,7 @@ void gearoenix::render::widget::Edit::insert(
                     left_text.push_back(right_text.back());
                     right_text.pop_back();
                 }
+                right_text.clear();
                 cursor_index += temporary_right;
                 temporary_right = 0;
             }
@@ -314,6 +328,7 @@ void gearoenix::render::widget::Edit::insert(
                     right_text.push_back(left_text.back());
                     left_text.pop_back();
                 }
+                left_text.clear();
                 cursor_index -= temporary_left;
                 temporary_left = 0;
             }

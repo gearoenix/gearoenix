@@ -66,7 +66,7 @@ public:
 private:
     void init(const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
     void on_scale() noexcept;
-    [[nodiscard]] core::Real compute_starting() noexcept;
+    void compute_starting() noexcept;
     void refill_text() noexcept;
 
 public:

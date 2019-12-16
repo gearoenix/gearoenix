@@ -131,7 +131,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::font::
             return static_cast<std::uint8_t>(255);
         if (v <= 0.0f)
             return static_cast<std::uint8_t>(0);
-        return static_cast<std::uint8_t>(v * 255.0f);
+        return static_cast<std::uint8_t>(v * 255.0f + 0.5000001f);
     };
     const std::uint8_t color_bytes[4] = {
         converter(color_vector[0]),
@@ -146,8 +146,9 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::font::
         static_cast<unsigned int>(std::ceil(static_cast<core::Real>(window_height) * img_height)),
         max_texture_size, 16U);
     const auto h_scale = static_cast<core::Real>(img_height_pixels) / static_cast<core::Real>(fnt_height);
-    const auto img_width_pixels_raw = std::ceil(static_cast<core::Real>(window_height) * img_width);
-    const auto img_width_pixels = math::Numeric::raise_p2(static_cast<unsigned int>(img_width_pixels_raw), max_texture_size, 16U);
+    const auto img_width_pixels = math::Numeric::raise_p2(
+        static_cast<unsigned int>(std::ceil(static_cast<core::Real>(window_height) * img_width)),
+        max_texture_size, 16U);
     const auto w_scale = (static_cast<core::Real>(img_width_pixels) * img_height) / (img_width * static_cast<core::Real>(fnt_height));
     const auto width_to_pixel = static_cast<core::Real>(img_width_pixels) / img_width;
     std::size_t index = 0;
@@ -155,7 +156,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::font::
         ++index;
     const auto base_line = static_cast<core::Real>(ascent) * h_scale;
     std::vector<unsigned char> rnd_data(static_cast<std::size_t>(img_width_pixels) * static_cast<std::size_t>(img_height_pixels));
-    const auto xpos_start = txt_widths[index] * width_to_pixel;
+    const auto xpos_start = (txt_widths[index] - img_start_skip) * width_to_pixel;
     const auto txt_end_index = text.size() - 1;
     const auto txt_end_width = img_start_skip + img_width;
     auto xpos = xpos_start;
