@@ -140,15 +140,26 @@ void gearoenix::render::widget::Edit::compute_starting() noexcept
     }
 }
 
-void gearoenix::render::widget::Edit::refill_text() noexcept
+void gearoenix::render::widget::Edit::refill_text(const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
 {
     text.clear();
-    for (const wchar_t c : left_text) {
-        text.push_back(c);
+    for (const wchar_t ch : left_text) {
+        text.push_back(ch);
     }
     for (auto i = right_text.rbegin(); i != right_text.rend(); ++i) {
         text.push_back(*i);
     }
+    set_text(text, c);
+}
+
+void gearoenix::render::widget::Edit::place_cursor() noexcept
+{
+    const auto text_center = text_model->get_transformation()->get_location();
+    const auto text_aspect = text_model->get_collider()->get_current_local_scale().xy();
+    auto* const tran = cursor_model->get_transformation();
+    math::Vec3 loc = tran->get_location();
+    loc[0] = (cursor_pos_in_text - starting_text_cut) - text_aspect[0] + text_center[0];
+    tran->set_location(loc);
 }
 
 gearoenix::render::widget::Edit::Edit(
@@ -201,22 +212,19 @@ void gearoenix::render::widget::Edit::set_text(
     compute_starting();
     const auto is_bigger = aspects[0] < text_widths.back();
     const auto img_width = is_bigger ? aspects[0] : text_widths.back();
-    {
-        auto* const tran = cursor_model->get_transformation();
-        math::Vec3 loc = tran->get_location();
-        loc[0] = img_width * 0.5f;
-        tran->set_location(loc);
-    }
     core::sync::EndCaller<texture::Texture2D> txtend([c, this](const std::shared_ptr<texture::Texture2D>& txt) {
         text_material->set_color(txt);
-        hint_text_model->set_enabled(false);
-        text_model->set_enabled(true);
+        if (hint_text_model->get_enabled())
+            hint_text_model->set_enabled(false);
+        if (!text_model->get_enabled())
+            text_model->set_enabled(true);
     });
     const auto _txt = text_font->bake(
         text, text_widths, theme.text_color,
         img_width, aspects[1], starting_text_cut, txtend);
     text_model->get_transformation()->local_x_scale(
         img_width / (text_model->get_collider()->get_current_local_scale()[0] * 2.0f));
+    place_cursor();
 }
 
 void gearoenix::render::widget::Edit::set_hint_text(
@@ -258,7 +266,26 @@ bool gearoenix::render::widget::Edit::on_event(const core::event::Data& d) noexc
         if (actived) {
             const auto& data = std::get<core::event::button::KeyboardData>(d.data);
             if (data.action == core::event::button::KeyboardActionId::Press) {
-                insert(core::String::to_character(data.key).value());
+                const auto key = core::String::to_character(data.key);
+                if (key.has_value()) {
+                    insert(core::String::to_character(data.key).value());
+                } else if (data.key == core::event::button::KeyboardKeyId::Left) {
+                    temporary_right = 0;
+                    temporary_left = 0;
+                    if (!left_text.empty()) {
+                        right_text.push_back(left_text.back());
+                        left_text.pop_back();
+                        refill_text();
+                    }
+                } else if (data.key == core::event::button::KeyboardKeyId::Right) {
+                    temporary_right = 0;
+                    temporary_left = 0;
+                    if (!right_text.empty()) {
+                        left_text.push_back(right_text.back());
+                        right_text.pop_back();
+                        refill_text();
+                    }
+                }
             }
         }
         break;
@@ -335,6 +362,5 @@ void gearoenix::render::widget::Edit::insert(
         }
         right_text.push_back(character);
     }
-    refill_text();
-    set_text(text, c);
+    refill_text(c);
 }

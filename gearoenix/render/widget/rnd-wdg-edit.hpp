@@ -67,7 +67,8 @@ private:
     void init(const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
     void on_scale() noexcept;
     void compute_starting() noexcept;
-    void refill_text() noexcept;
+    void refill_text(const core::sync::EndCaller<core::sync::EndCallerIgnore>& c = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
+    void place_cursor() noexcept;
 
 public:
     Edit(
