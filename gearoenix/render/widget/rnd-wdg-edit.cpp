@@ -123,10 +123,10 @@ void gearoenix::render::widget::Edit::on_scale() noexcept
 void gearoenix::render::widget::Edit::compute_starting() noexcept
 {
     text_font->compute_text_widths(text, aspects[1], text_widths);
-    cursor_pos_in_text = text_widths[left_to_right ? left_text.size() : text.size() - right_text.size()];
-    starting_pos_in_text = left_to_right ? 0.0f : text_widths[text.size()];
-    const auto raw_text_size = std::abs(cursor_pos_in_text - starting_pos_in_text);
-    if (raw_text_size > aspects[0]) {
+    cursor_pos_in_text = text_widths[left_text.size()];
+    starting_text_cut = 0.0f;
+    ending_text_cut = text_widths[text.size()];
+    if (ending_text_cut > aspects[0]) {
         if (left_to_right) {
             starting_text_cut = cursor_pos_in_text - aspects[0];
             ending_text_cut = cursor_pos_in_text;
@@ -134,13 +134,17 @@ void gearoenix::render::widget::Edit::compute_starting() noexcept
             starting_text_cut = cursor_pos_in_text;
             ending_text_cut = cursor_pos_in_text + aspects[0];
         }
-    } else {
-        starting_text_cut = 0.0f;
-        ending_text_cut = text_widths[text.size()];
     }
 }
 
-void gearoenix::render::widget::Edit::refill_text(const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
+void gearoenix::render::widget::Edit::compute_cuts() noexcept
+{
+    starting_text_cut = GX_MAX(starting_text_cut, 0.0f);
+    ending_text_cut = starting_text_cut + aspects[0];
+    ending_text_cut = GX_MIN(ending_text_cut, text_widths[text.size()]);
+}
+
+void gearoenix::render::widget::Edit::refill_text() noexcept
 {
     text.clear();
     for (const wchar_t ch : left_text) {
@@ -149,7 +153,6 @@ void gearoenix::render::widget::Edit::refill_text(const core::sync::EndCaller<co
     for (auto i = right_text.rbegin(); i != right_text.rend(); ++i) {
         text.push_back(*i);
     }
-    set_text(text, c);
 }
 
 void gearoenix::render::widget::Edit::place_cursor() noexcept
@@ -158,8 +161,25 @@ void gearoenix::render::widget::Edit::place_cursor() noexcept
     const auto text_aspect = text_model->get_collider()->get_current_local_scale().xy();
     auto* const tran = cursor_model->get_transformation();
     math::Vec3 loc = tran->get_location();
-    loc[0] = (cursor_pos_in_text - starting_text_cut) - text_aspect[0] + text_center[0];
+    loc[0] = ((cursor_pos_in_text - starting_text_cut) - text_aspect[0]) + text_center[0];
     tran->set_location(loc);
+}
+
+void gearoenix::render::widget::Edit::render_text(const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
+{
+    const auto img_width = std::abs(ending_text_cut - starting_text_cut) * 1.0001f;
+    core::sync::EndCaller<texture::Texture2D> txtend([c, this](const std::shared_ptr<texture::Texture2D>& txt) {
+        text_material->set_color(txt);
+        if (hint_text_model->get_enabled())
+            hint_text_model->set_enabled(false);
+        if (!text_model->get_enabled())
+            text_model->set_enabled(true);
+    });
+    const auto _txt = text_font->bake(
+        text, text_widths, theme.text_color,
+        img_width, aspects[1], starting_text_cut, txtend);
+    text_model->get_transformation()->local_x_scale(
+        img_width / (text_model->get_collider()->get_current_local_scale()[0] * 2.0f));
 }
 
 gearoenix::render::widget::Edit::Edit(
@@ -204,26 +224,12 @@ void gearoenix::render::widget::Edit::set_text(
             left_text.push_back(ch);
         }
         right_text.clear();
-        cursor_index = t.size();
         temporary_left = 0;
         temporary_right = 0;
         text = t;
     }
     compute_starting();
-    const auto is_bigger = aspects[0] < text_widths.back();
-    const auto img_width = is_bigger ? aspects[0] : text_widths.back();
-    core::sync::EndCaller<texture::Texture2D> txtend([c, this](const std::shared_ptr<texture::Texture2D>& txt) {
-        text_material->set_color(txt);
-        if (hint_text_model->get_enabled())
-            hint_text_model->set_enabled(false);
-        if (!text_model->get_enabled())
-            text_model->set_enabled(true);
-    });
-    const auto _txt = text_font->bake(
-        text, text_widths, theme.text_color,
-        img_width, aspects[1], starting_text_cut, txtend);
-    text_model->get_transformation()->local_x_scale(
-        img_width / (text_model->get_collider()->get_current_local_scale()[0] * 2.0f));
+    render_text(c);
     place_cursor();
 }
 
@@ -260,7 +266,6 @@ void gearoenix::render::widget::Edit::active(bool b) noexcept
 
 bool gearoenix::render::widget::Edit::on_event(const core::event::Data& d) noexcept
 {
-
     switch (d.source) {
     case core::event::Id::ButtonKeyboard: {
         if (actived) {
@@ -275,16 +280,30 @@ bool gearoenix::render::widget::Edit::on_event(const core::event::Data& d) noexc
                     if (!left_text.empty()) {
                         right_text.push_back(left_text.back());
                         left_text.pop_back();
-                        refill_text();
                     }
+                    const auto move = cursor_pos_in_text - starting_text_cut;
+                    cursor_pos_in_text = text_widths[left_text.size()];
+                    if (starting_text_cut != 0.0 && cursor_pos_in_text - starting_text_cut < aspects[0] * 0.2f) {
+                        starting_text_cut = cursor_pos_in_text - move;
+                        compute_cuts();
+                        render_text();
+                    }
+                    place_cursor();
                 } else if (data.key == core::event::button::KeyboardKeyId::Right) {
                     temporary_right = 0;
                     temporary_left = 0;
                     if (!right_text.empty()) {
                         left_text.push_back(right_text.back());
                         right_text.pop_back();
-                        refill_text();
                     }
+                    const auto move = cursor_pos_in_text - starting_text_cut;
+                    cursor_pos_in_text = text_widths[left_text.size()];
+                    if (ending_text_cut != text_widths[text.size()] && ending_text_cut - cursor_pos_in_text < aspects[0] * 0.2f) {
+                        starting_text_cut = cursor_pos_in_text - move;
+                        compute_cuts();
+                        render_text();
+                    }
+                    place_cursor();
                 }
             }
         }
@@ -309,7 +328,6 @@ void gearoenix::render::widget::Edit::set_left_to_right(const bool b) noexcept
         for (auto i = right_text.size() - 1; i >= 0; --i) {
             text.push_back(right_text[i]);
         }
-        cursor_index = 0;
     } else {
         for (auto i = right_text.size() - 1; i >= 0; --i) {
             left_text.push_back(right_text[i]);
@@ -319,7 +337,6 @@ void gearoenix::render::widget::Edit::set_left_to_right(const bool b) noexcept
         for (const wchar_t c : left_text) {
             text.push_back(c);
         }
-        cursor_index = text.size();
     }
     left_to_right = b;
     temporary_left = 0;
@@ -330,6 +347,7 @@ void gearoenix::render::widget::Edit::insert(
     const wchar_t character,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
 {
+    bool increase_to_right = true;
     if ((static_cast<int>(character) > 31 && static_cast<int>(character) < 127) || (static_cast<int>(character) > 1631 && static_cast<int>(character) < 1642)) {
         if (left_to_right) {
             if (temporary_right > 0) {
@@ -338,13 +356,11 @@ void gearoenix::render::widget::Edit::insert(
                     right_text.pop_back();
                 }
                 right_text.clear();
-                cursor_index += temporary_right;
                 temporary_right = 0;
             }
         } else {
             ++temporary_left;
         }
-        ++cursor_index;
         left_text.push_back(character);
     } else if ((static_cast<int>(character) > 1535 && static_cast<int>(character) < 1791) || (static_cast<int>(character) > 1871 && static_cast<int>(character) < 1919) || (static_cast<int>(character) > 64335 && static_cast<int>(character) < 65023) || (static_cast<int>(character) > 65135 && static_cast<int>(character) < 65279)) {
         if (left_to_right) {
@@ -356,11 +372,35 @@ void gearoenix::render::widget::Edit::insert(
                     left_text.pop_back();
                 }
                 left_text.clear();
-                cursor_index -= temporary_left;
                 temporary_left = 0;
             }
         }
         right_text.push_back(character);
+        increase_to_right = false;
     }
-    refill_text(c);
+    const core::Real cursor_before = increase_to_right ? cursor_pos_in_text - starting_text_cut : ending_text_cut - cursor_pos_in_text;
+    const core::Real before = text_widths.empty() ? 0.0f : text_widths[text.size()];
+    refill_text();
+    text_font->compute_text_widths(text, aspects[1], text_widths);
+    cursor_pos_in_text = text_widths[left_text.size()];
+    const core::Real increase = text_widths[text.size()] - before;
+    if (increase_to_right) {
+        if (cursor_before + increase > aspects[0]) {
+            ending_text_cut = cursor_pos_in_text;
+            starting_text_cut = cursor_pos_in_text - aspects[0];
+        } else if (text_widths[text.size()] < aspects[0]) {
+            starting_text_cut = 0.0f;
+            ending_text_cut = text_widths[text.size()];
+        }
+    } else {
+        if (cursor_before - increase < 0.0f) {
+            starting_text_cut = cursor_pos_in_text;
+            ending_text_cut = cursor_pos_in_text + aspects[0];
+        } else if (text_widths[text.size()] < aspects[0]) {
+            starting_text_cut = 0.0f;
+            ending_text_cut = text_widths[text.size()];
+        }
+    }
+    render_text();
+    place_cursor();
 }

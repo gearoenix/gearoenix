@@ -57,7 +57,6 @@ public:
     GX_GET_CREF_PRV(std::vector<wchar_t>, right_text)
     GX_GET_CREF_PRV(math::Vec2, aspects)
     GX_GET_VAL_PRV(core::Real, cursor_pos_in_text, 0.0f)
-    GX_GET_VAL_PRV(core::Real, starting_pos_in_text, 0.0f)
     GX_GET_VAL_PRV(core::Real, starting_text_cut, 0.0f)
     GX_GET_VAL_PRV(core::Real, ending_text_cut, 0.0f)
     GX_GET_VAL_PRV(std::size_t, cursor_index, 0)
@@ -67,8 +66,10 @@ private:
     void init(const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
     void on_scale() noexcept;
     void compute_starting() noexcept;
-    void refill_text(const core::sync::EndCaller<core::sync::EndCallerIgnore>& c = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
+    void compute_cuts() noexcept;
+    void refill_text() noexcept;
     void place_cursor() noexcept;
+    void render_text(const core::sync::EndCaller<core::sync::EndCallerIgnore>& c = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
 
 public:
     Edit(
