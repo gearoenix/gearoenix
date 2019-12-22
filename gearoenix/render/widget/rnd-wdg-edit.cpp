@@ -275,35 +275,39 @@ bool gearoenix::render::widget::Edit::on_event(const core::event::Data& d) noexc
                 if (key.has_value()) {
                     insert(core::String::to_character(data.key).value());
                 } else if (data.key == core::event::button::KeyboardKeyId::Left) {
-                    temporary_right = 0;
-                    temporary_left = 0;
-                    if (!left_text.empty()) {
-                        right_text.push_back(left_text.back());
-                        left_text.pop_back();
+                    if (!text.empty()) {
+                        temporary_right = 0;
+                        temporary_left = 0;
+                        if (!left_text.empty()) {
+                            right_text.push_back(left_text.back());
+                            left_text.pop_back();
+                        }
+                        const auto move = cursor_pos_in_text - starting_text_cut;
+                        cursor_pos_in_text = text_widths[left_text.size()];
+                        if (starting_text_cut != 0.0 && cursor_pos_in_text - starting_text_cut < aspects[0] * 0.2f) {
+                            starting_text_cut = cursor_pos_in_text - move;
+                            compute_cuts();
+                            render_text();
+                        }
+                        place_cursor();
                     }
-                    const auto move = cursor_pos_in_text - starting_text_cut;
-                    cursor_pos_in_text = text_widths[left_text.size()];
-                    if (starting_text_cut != 0.0 && cursor_pos_in_text - starting_text_cut < aspects[0] * 0.2f) {
-                        starting_text_cut = cursor_pos_in_text - move;
-                        compute_cuts();
-                        render_text();
-                    }
-                    place_cursor();
                 } else if (data.key == core::event::button::KeyboardKeyId::Right) {
-                    temporary_right = 0;
-                    temporary_left = 0;
-                    if (!right_text.empty()) {
-                        left_text.push_back(right_text.back());
-                        right_text.pop_back();
+                    if (!text.empty()) {
+                        temporary_right = 0;
+                        temporary_left = 0;
+                        if (!right_text.empty()) {
+                            left_text.push_back(right_text.back());
+                            right_text.pop_back();
+                        }
+                        const auto move = cursor_pos_in_text - starting_text_cut;
+                        cursor_pos_in_text = text_widths[left_text.size()];
+                        if (ending_text_cut != text_widths[text.size()] && ending_text_cut - cursor_pos_in_text < aspects[0] * 0.2f) {
+                            starting_text_cut = cursor_pos_in_text - move;
+                            compute_cuts();
+                            render_text();
+                        }
+                        place_cursor();
                     }
-                    const auto move = cursor_pos_in_text - starting_text_cut;
-                    cursor_pos_in_text = text_widths[left_text.size()];
-                    if (ending_text_cut != text_widths[text.size()] && ending_text_cut - cursor_pos_in_text < aspects[0] * 0.2f) {
-                        starting_text_cut = cursor_pos_in_text - move;
-                        compute_cuts();
-                        render_text();
-                    }
-                    place_cursor();
                 }
             }
         }
@@ -401,6 +405,44 @@ void gearoenix::render::widget::Edit::insert(
             ending_text_cut = text_widths[text.size()];
         }
     }
-    render_text();
+    render_text(c);
+    place_cursor();
+}
+
+void gearoenix::render::widget::Edit::selected(const gearoenix::math::Vec3& point) noexcept
+{
+    if (text.empty())
+        return;
+    auto* const text_tran = text_model->get_transformation();
+    const auto v = point - text_tran->get_location();
+    const auto x = v.dot(text_tran->get_x_axis());
+    const auto pos_in_txt = x + text_model->get_collider()->get_current_local_scale()[0] + starting_text_cut;
+    auto min_dis = (aspects[0] + text_widths[text.size()]) * 10.0f;
+    std::size_t index;
+    for (index = 0; index < text_widths.size(); ++index) {
+        auto dis = std::abs(pos_in_txt - text_widths[index]);
+        if (dis > min_dis) {
+            --index;
+            break;
+        }
+        min_dis = dis;
+    }
+    if (index > text.size()) {
+        index = text.size();
+    } else if (index < 0) {
+        index = 0;
+    }
+    left_text.clear();
+    right_text.clear();
+    for (std::size_t i = 0; i < index; ++i) {
+        left_text.push_back(text[i]);
+    }
+    const int end = static_cast<int>(text.size() - 1);
+    for (int i = end; i >= static_cast<int>(index); --i) {
+        right_text.push_back(text[i]);
+    }
+    cursor_pos_in_text = text_widths[left_text.size()];
+    temporary_left = 0;
+    temporary_right = 0;
     place_cursor();
 }

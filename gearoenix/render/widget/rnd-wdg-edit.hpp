@@ -59,7 +59,6 @@ public:
     GX_GET_VAL_PRV(core::Real, cursor_pos_in_text, 0.0f)
     GX_GET_VAL_PRV(core::Real, starting_text_cut, 0.0f)
     GX_GET_VAL_PRV(core::Real, ending_text_cut, 0.0f)
-    GX_GET_VAL_PRV(std::size_t, cursor_index, 0)
     GX_GET_VAL_PRV(std::size_t, temporary_left, 0)
     GX_GET_VAL_PRV(std::size_t, temporary_right, 0)
 private:
@@ -98,6 +97,7 @@ public:
     void set_left_to_right(bool b) noexcept;
     void insert(wchar_t character, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
     void remove(const core::sync::EndCaller<core::sync::EndCallerIgnore>& c = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
+    void selected(const math::Vec3& point) noexcept final;
 };
 }
 #endif
