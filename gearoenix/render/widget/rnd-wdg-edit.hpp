@@ -67,6 +67,7 @@ private:
     void compute_starting() noexcept;
     void compute_cuts() noexcept;
     void refill_text() noexcept;
+    void refill_text_widths() noexcept;
     void place_cursor() noexcept;
     void render_text(const core::sync::EndCaller<core::sync::EndCallerIgnore>& c = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
 
@@ -96,7 +97,8 @@ public:
     [[nodiscard]] bool on_event(const core::event::Data& d) noexcept final;
     void set_left_to_right(bool b) noexcept;
     void insert(wchar_t character, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
-    void remove(const core::sync::EndCaller<core::sync::EndCallerIgnore>& c = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
+    void backspace(const core::sync::EndCaller<core::sync::EndCallerIgnore>& c = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
+    void del(const core::sync::EndCaller<core::sync::EndCallerIgnore>& c = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
     void selected(const math::Vec3& point) noexcept final;
 };
 }
