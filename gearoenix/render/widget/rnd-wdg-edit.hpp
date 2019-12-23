@@ -70,6 +70,7 @@ private:
     void refill_text_widths() noexcept;
     void place_cursor() noexcept;
     void render_text(const core::sync::EndCaller<core::sync::EndCallerIgnore>& c = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
+    void remove(bool from_left, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c)noexcept;
 
 public:
     Edit(
@@ -100,6 +101,7 @@ public:
     void backspace(const core::sync::EndCaller<core::sync::EndCallerIgnore>& c = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
     void del(const core::sync::EndCaller<core::sync::EndCallerIgnore>& c = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
     void selected(const math::Vec3& point) noexcept final;
+    void clear() noexcept;
 };
 }
 #endif

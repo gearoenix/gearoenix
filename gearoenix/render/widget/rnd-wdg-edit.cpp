@@ -187,6 +187,33 @@ void gearoenix::render::widget::Edit::render_text(const core::sync::EndCaller<co
         img_width / (text_model->get_collider()->get_current_local_scale()[0] * 2.0f));
 }
 
+void gearoenix::render::widget::Edit::remove(const bool from_left, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
+{
+    const auto move = cursor_pos_in_text - starting_text_cut;
+    refill_text();
+    if (text.empty()) {
+        clear();
+    }
+    else {
+        refill_text_widths();
+        cursor_pos_in_text = text_widths[left_text.size()];
+        if (from_left) {
+            if (starting_text_cut > 0.0 && cursor_pos_in_text - starting_text_cut < aspects[0] * 0.2f) {
+                starting_text_cut = cursor_pos_in_text - move;
+            }
+        }
+        else
+        {
+            if (ending_text_cut < text_widths.back() && ending_text_cut - cursor_pos_in_text > aspects[0] * 0.2f) {
+                starting_text_cut = cursor_pos_in_text - move;
+            }
+        }
+        compute_cuts();
+        render_text(c);
+        place_cursor();
+    }
+}
+
 gearoenix::render::widget::Edit::Edit(
     const core::Id my_id,
     system::stream::Stream* const,
@@ -289,7 +316,7 @@ bool gearoenix::render::widget::Edit::on_event(const core::event::Data& d) noexc
                         }
                         const auto move = cursor_pos_in_text - starting_text_cut;
                         cursor_pos_in_text = text_widths[left_text.size()];
-                        if (starting_text_cut != 0.0 && cursor_pos_in_text - starting_text_cut < aspects[0] * 0.2f) {
+                        if (starting_text_cut > 0.0 && cursor_pos_in_text - starting_text_cut < aspects[0] * 0.2f) {
                             starting_text_cut = cursor_pos_in_text - move;
                             compute_cuts();
                             render_text();
@@ -306,17 +333,19 @@ bool gearoenix::render::widget::Edit::on_event(const core::event::Data& d) noexc
                         }
                         const auto move = cursor_pos_in_text - starting_text_cut;
                         cursor_pos_in_text = text_widths[left_text.size()];
-                        if (ending_text_cut != text_widths[text.size()] && ending_text_cut - cursor_pos_in_text < aspects[0] * 0.2f) {
+                        if (ending_text_cut < text_widths[text.size()] && ending_text_cut - cursor_pos_in_text < aspects[0] * 0.2f) {
                             starting_text_cut = cursor_pos_in_text - move;
                             compute_cuts();
                             render_text();
                         }
                         place_cursor();
                     }
-                } else if (data.key == core::event::button::KeyboardKeyId::Backspace) {
-                    if (!text.empty()) {
-                        backspace();
-                    }
+                }
+                else if (data.key == core::event::button::KeyboardKeyId::Backspace) {
+                    backspace();
+                }
+                else if (data.key == core::event::button::KeyboardKeyId::Delete) {
+                    del();
                 }
             }
         }
@@ -458,6 +487,7 @@ void gearoenix::render::widget::Edit::selected(const gearoenix::math::Vec3& poin
 
 void gearoenix::render::widget::Edit::backspace(const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
 {
+    if (text.empty()) return;
     bool removed_from_left = true;
     if (left_to_right) {
         if (temporary_right > 0) {
@@ -465,6 +495,7 @@ void gearoenix::render::widget::Edit::backspace(const core::sync::EndCaller<core
             right_text.pop_back();
             removed_from_left = false;
         } else {
+            if (left_text.empty()) return;
             left_text.pop_back();
         }
     } else {
@@ -472,34 +503,65 @@ void gearoenix::render::widget::Edit::backspace(const core::sync::EndCaller<core
             --temporary_left;
             left_text.pop_back();
         } else {
+            if (right_text.empty()) return;
             removed_from_left = false;
             right_text.pop_back();
         }
     }
-    const auto before = text_widths.back();
-    refill_text();
-    if (text.empty()) {
-        cursor_pos_in_text = 0.0f;
-        starting_text_cut = 0.0f;
-        ending_text_cut = 0.0f;
-    } else {
-        refill_text_widths();
-        const auto move = cursor_pos_in_text - starting_text_cut;
-        cursor_pos_in_text = text_widths[left_text.size()];
-        if (removed_from_left) {
-            if (starting_text_cut > 0.0 && cursor_pos_in_text - starting_text_cut < aspects[0] * 0.2f) {
-                starting_text_cut = cursor_pos_in_text - move;
-                compute_cuts();
-                render_text();
+    remove(removed_from_left, c);
+}
+
+void gearoenix::render::widget::Edit::del(const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
+{
+    if (text.empty()) return;
+    if (left_to_right) {
+        if (temporary_right > 0) {
+            if (right_text.size() > temporary_right) {
+                for (auto i = right_text.size() - (temporary_right + 1); i < right_text.size();) {
+                    auto ii = i + 1;
+                    right_text[i] = right_text[ii];
+                    i = ii;
+                }
+                right_text.pop_back();
             }
-            place_cursor();
-        } else {
-            if (ending_text_cut < text_widths[text.size()] && ending_text_cut - cursor_pos_in_text < aspects[0] * 0.2f) {
-                starting_text_cut = cursor_pos_in_text - move;
-                compute_cuts();
-                render_text();
+            else {
+                return;
             }
         }
+        else {
+            if (right_text.empty()) return;
+            right_text.pop_back();
+        }
     }
-    place_cursor();
+    else {
+        if (temporary_left > 0) {
+            if (left_text.size() > temporary_left) {
+                for (auto i = left_text.size() - (temporary_left + 1); i < left_text.size();) {
+                    auto ii = i + 1;
+                    left_text[i] = left_text[ii];
+                    i = ii;
+                }
+                left_text.pop_back();
+            }
+            else {
+                return;
+            }
+        }
+        else {
+            if (right_text.empty()) return;
+            right_text.pop_back();
+        }
+    }
+    remove(!left_to_right, c);
+}
+
+void gearoenix::render::widget::Edit::clear() noexcept
+{
+    cursor_pos_in_text = 0.0f;
+    starting_text_cut = 0.0f;
+    ending_text_cut = 0.0f;
+    text_model->set_enabled(false);
+    hint_text_model->set_enabled(true);
+    auto* const tran = text_model->get_transformation();
+    cursor_model->get_transformation()->set_location(tran->get_location() + tran->get_z_axis() * 0.02f);
 }
