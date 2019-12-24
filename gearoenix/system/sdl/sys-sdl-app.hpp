@@ -67,6 +67,7 @@ namespace system {
 #endif
         [[nodiscard]] core::Real convert_x_to_ratio(int x) const noexcept;
         [[nodiscard]] core::Real convert_y_to_ratio(int y) const noexcept;
+        [[nodiscard]] const char* get_clipboard() const noexcept;
     };
 }
 }

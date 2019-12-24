@@ -77,6 +77,6 @@ public:
     ~IblBakerApp() noexcept final;
     void update() noexcept final;
     void terminate() noexcept final;
-    bool on_event(const gearoenix::core::event::Data& event_data) noexcept;
+    bool on_event(const gearoenix::core::event::Data& event_data) noexcept final;
 };
 #endif

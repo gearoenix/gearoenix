@@ -18,7 +18,7 @@ protected:
     void built_in_type_read(void* data, core::Count length) noexcept;
 
 public:
-    virtual ~Stream() noexcept {}
+    virtual ~Stream() noexcept = default;
     [[nodiscard]] virtual core::Count read(void* data, core::Count length) noexcept = 0;
     [[nodiscard]] virtual core::Count write(const void* data, core::Count length) noexcept = 0;
     virtual void seek(core::Count offset) noexcept = 0;
@@ -56,7 +56,7 @@ public:
         sizeof(T) == 1 && (std::is_integral<T>::value || std::is_enum<T>::value), void>::type
     read(T& data) noexcept
     {
-        read(&data, sizeof(T));
+        (void)read(&data, sizeof(T));
     }
 
     template <typename T>

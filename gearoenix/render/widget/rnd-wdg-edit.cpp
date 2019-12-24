@@ -300,51 +300,59 @@ bool gearoenix::render::widget::Edit::on_event(const core::event::Data& d) noexc
             const auto& data = std::get<core::event::button::KeyboardData>(d.data);
             if (data.action == core::event::button::KeyboardActionId::Press) {
                 const auto pressed_count = event_engine->get_pressed_keyboard_buttons().size();
-                const bool shift_pressed = pressed_count == 2 && (event_engine->is_pressed(core::event::button::KeyboardKeyId::LeftShift) || event_engine->is_pressed(core::event::button::KeyboardKeyId::RightShift));
+                const bool shift_pressed = event_engine->is_pressed(core::event::button::KeyboardKeyId::LeftShift) || event_engine->is_pressed(core::event::button::KeyboardKeyId::RightShift);
                 const auto key = core::String::to_character(data.key, shift_pressed);
                 if (key.has_value()) {
                     if (pressed_count == 1 || (pressed_count == 2 && shift_pressed)) {
                         insert(key.value());
                     } else if (pressed_count == 2 && (event_engine->is_pressed(core::event::button::KeyboardKeyId::LeftControl) || event_engine->is_pressed(core::event::button::KeyboardKeyId::RightControl)) && event_engine->is_pressed(core::event::button::KeyboardKeyId::V)) {
+                        const char* const clipboard = e->get_system_application()->get_clipboard();
+                        if (clipboard != nullptr) {
+                            for (int i = 0; clipboard[i] != 0; ++i) {
+                                insert(clipboard[i]);
+                            }
+                        }
                     }
-                } else if (data.key == core::event::button::KeyboardKeyId::Left) {
-                    if (!text.empty()) {
-                        temporary_right = 0;
-                        temporary_left = 0;
-                        if (!left_text.empty()) {
-                            right_text.push_back(left_text.back());
-                            left_text.pop_back();
+                } else if (pressed_count == 1) {
+                    if (data.key == core::event::button::KeyboardKeyId::Left) {
+                        if (!text.empty()) {
+                            temporary_right = 0;
+                            temporary_left = 0;
+                            if (!left_text.empty()) {
+                                right_text.push_back(left_text.back());
+                                left_text.pop_back();
+                            }
+                            const auto move = cursor_pos_in_text - starting_text_cut;
+                            cursor_pos_in_text = text_widths[left_text.size()];
+                            if (starting_text_cut > 0.0 && cursor_pos_in_text - starting_text_cut < aspects[0] * 0.2f) {
+                                starting_text_cut = cursor_pos_in_text - move;
+                                compute_cuts();
+                                render_text();
+                            }
+                            place_cursor();
                         }
-                        const auto move = cursor_pos_in_text - starting_text_cut;
-                        cursor_pos_in_text = text_widths[left_text.size()];
-                        if (starting_text_cut > 0.0 && cursor_pos_in_text - starting_text_cut < aspects[0] * 0.2f) {
-                            starting_text_cut = cursor_pos_in_text - move;
-                            compute_cuts();
-                            render_text();
+                    } else if (data.key == core::event::button::KeyboardKeyId::Right) {
+                        if (!text.empty()) {
+                            temporary_right = 0;
+                            temporary_left = 0;
+                            if (!right_text.empty()) {
+                                left_text.push_back(right_text.back());
+                                right_text.pop_back();
+                            }
+                            const auto move = cursor_pos_in_text - starting_text_cut;
+                            cursor_pos_in_text = text_widths[left_text.size()];
+                            if (ending_text_cut < text_widths[text.size()] && ending_text_cut - cursor_pos_in_text < aspects[0] * 0.2f) {
+                                starting_text_cut = cursor_pos_in_text - move;
+                                compute_cuts();
+                                render_text();
+                            }
+                            place_cursor();
                         }
-                        place_cursor();
+                    } else if (data.key == core::event::button::KeyboardKeyId::Backspace) {
+                        backspace();
+                    } else if (data.key == core::event::button::KeyboardKeyId::Delete) {
+                        del();
                     }
-                } else if (data.key == core::event::button::KeyboardKeyId::Right) {
-                    if (!text.empty()) {
-                        temporary_right = 0;
-                        temporary_left = 0;
-                        if (!right_text.empty()) {
-                            left_text.push_back(right_text.back());
-                            right_text.pop_back();
-                        }
-                        const auto move = cursor_pos_in_text - starting_text_cut;
-                        cursor_pos_in_text = text_widths[left_text.size()];
-                        if (ending_text_cut < text_widths[text.size()] && ending_text_cut - cursor_pos_in_text < aspects[0] * 0.2f) {
-                            starting_text_cut = cursor_pos_in_text - move;
-                            compute_cuts();
-                            render_text();
-                        }
-                        place_cursor();
-                    }
-                } else if (data.key == core::event::button::KeyboardKeyId::Backspace) {
-                    backspace();
-                } else if (data.key == core::event::button::KeyboardKeyId::Delete) {
-                    del();
                 }
             }
         }

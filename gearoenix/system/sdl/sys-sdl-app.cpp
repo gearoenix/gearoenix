@@ -621,4 +621,9 @@ gearoenix::core::Real gearoenix::system::Application::convert_y_to_ratio(int y) 
     return 1.0f - (static_cast<core::Real>(y) * half_height_inversed);
 }
 
+const char* gearoenix::system::Application::get_clipboard() const noexcept
+{
+    return SDL_GetClipboardText();
+}
+
 #endif
