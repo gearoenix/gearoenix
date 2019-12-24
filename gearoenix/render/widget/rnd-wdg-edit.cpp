@@ -18,13 +18,12 @@
 #include <cmath>
 #include <string>
 
-#define GX_EDIT_INIT Widget(my_id, Type::Edit, e, c), text_material(new material::Material(e, c)), hint_text_material(new material::Material(e, c)), background_material(new material::Material(e, c)), cursor_material(new material::Material(e, c))
+#define GX_EDIT_INIT Widget(my_id, Type::Edit, e, c), event_engine(e->get_system_application()->get_event_engine()), text_material(new material::Material(e, c)), hint_text_material(new material::Material(e, c)), background_material(new material::Material(e, c)), cursor_material(new material::Material(e, c))
 
 void gearoenix::render::widget::Edit::init(const core::sync::EndCaller<core::sync::EndCallerIgnore>& endcall) noexcept
 {
     const core::sync::EndCaller<core::sync::EndCallerIgnore> c([endcall, this] {
-        auto* const ee = e->get_system_application()->get_event_engine();
-        ee->add_listner(core::event::Id::ButtonKeyboard, 0.0f, this);
+        event_engine->add_listener(core::event::Id::ButtonKeyboard, 0.0f, this);
     });
 
     set_collider(std::make_unique<physics::collider::Aabb>(math::Vec3(1.0f, 1.0f, 0.001f), math::Vec3(-1.0f, -1.0f, -0.001f)));
@@ -193,17 +192,14 @@ void gearoenix::render::widget::Edit::remove(const bool from_left, const core::s
     refill_text();
     if (text.empty()) {
         clear();
-    }
-    else {
+    } else {
         refill_text_widths();
         cursor_pos_in_text = text_widths[left_text.size()];
         if (from_left) {
             if (starting_text_cut > 0.0 && cursor_pos_in_text - starting_text_cut < aspects[0] * 0.2f) {
                 starting_text_cut = cursor_pos_in_text - move;
             }
-        }
-        else
-        {
+        } else {
             if (ending_text_cut < text_widths.back() && ending_text_cut - cursor_pos_in_text > aspects[0] * 0.2f) {
                 starting_text_cut = cursor_pos_in_text - move;
             }
@@ -303,9 +299,14 @@ bool gearoenix::render::widget::Edit::on_event(const core::event::Data& d) noexc
         if (actived) {
             const auto& data = std::get<core::event::button::KeyboardData>(d.data);
             if (data.action == core::event::button::KeyboardActionId::Press) {
-                const auto key = core::String::to_character(data.key);
+                const auto pressed_count = event_engine->get_pressed_keyboard_buttons().size();
+                const bool shift_pressed = pressed_count == 2 && (event_engine->is_pressed(core::event::button::KeyboardKeyId::LeftShift) || event_engine->is_pressed(core::event::button::KeyboardKeyId::RightShift));
+                const auto key = core::String::to_character(data.key, shift_pressed);
                 if (key.has_value()) {
-                    insert(core::String::to_character(data.key).value());
+                    if (pressed_count == 1 || (pressed_count == 2 && shift_pressed)) {
+                        insert(key.value());
+                    } else if (pressed_count == 2 && (event_engine->is_pressed(core::event::button::KeyboardKeyId::LeftControl) || event_engine->is_pressed(core::event::button::KeyboardKeyId::RightControl)) && event_engine->is_pressed(core::event::button::KeyboardKeyId::V)) {
+                    }
                 } else if (data.key == core::event::button::KeyboardKeyId::Left) {
                     if (!text.empty()) {
                         temporary_right = 0;
@@ -340,11 +341,9 @@ bool gearoenix::render::widget::Edit::on_event(const core::event::Data& d) noexc
                         }
                         place_cursor();
                     }
-                }
-                else if (data.key == core::event::button::KeyboardKeyId::Backspace) {
+                } else if (data.key == core::event::button::KeyboardKeyId::Backspace) {
                     backspace();
-                }
-                else if (data.key == core::event::button::KeyboardKeyId::Delete) {
+                } else if (data.key == core::event::button::KeyboardKeyId::Delete) {
                     del();
                 }
             }
@@ -487,7 +486,8 @@ void gearoenix::render::widget::Edit::selected(const gearoenix::math::Vec3& poin
 
 void gearoenix::render::widget::Edit::backspace(const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
 {
-    if (text.empty()) return;
+    if (text.empty())
+        return;
     bool removed_from_left = true;
     if (left_to_right) {
         if (temporary_right > 0) {
@@ -495,7 +495,8 @@ void gearoenix::render::widget::Edit::backspace(const core::sync::EndCaller<core
             right_text.pop_back();
             removed_from_left = false;
         } else {
-            if (left_text.empty()) return;
+            if (left_text.empty())
+                return;
             left_text.pop_back();
         }
     } else {
@@ -503,7 +504,8 @@ void gearoenix::render::widget::Edit::backspace(const core::sync::EndCaller<core
             --temporary_left;
             left_text.pop_back();
         } else {
-            if (right_text.empty()) return;
+            if (right_text.empty())
+                return;
             removed_from_left = false;
             right_text.pop_back();
         }
@@ -513,7 +515,8 @@ void gearoenix::render::widget::Edit::backspace(const core::sync::EndCaller<core
 
 void gearoenix::render::widget::Edit::del(const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
 {
-    if (text.empty()) return;
+    if (text.empty())
+        return;
     if (left_to_right) {
         if (temporary_right > 0) {
             if (right_text.size() > temporary_right) {
@@ -523,17 +526,15 @@ void gearoenix::render::widget::Edit::del(const core::sync::EndCaller<core::sync
                     i = ii;
                 }
                 right_text.pop_back();
-            }
-            else {
+            } else {
                 return;
             }
-        }
-        else {
-            if (right_text.empty()) return;
+        } else {
+            if (right_text.empty())
+                return;
             right_text.pop_back();
         }
-    }
-    else {
+    } else {
         if (temporary_left > 0) {
             if (left_text.size() > temporary_left) {
                 for (auto i = left_text.size() - (temporary_left + 1); i < left_text.size();) {
@@ -542,13 +543,12 @@ void gearoenix::render::widget::Edit::del(const core::sync::EndCaller<core::sync
                     i = ii;
                 }
                 left_text.pop_back();
-            }
-            else {
+            } else {
                 return;
             }
-        }
-        else {
-            if (right_text.empty()) return;
+        } else {
+            if (right_text.empty())
+                return;
             right_text.pop_back();
         }
     }

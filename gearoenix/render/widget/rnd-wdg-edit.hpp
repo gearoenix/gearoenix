@@ -6,6 +6,10 @@
 #include "rnd-wdg-widget.hpp"
 #include <vector>
 
+namespace gearoenix::core::event {
+class Engine;
+}
+
 namespace gearoenix::physics::animation {
 struct Animation;
 }
@@ -24,7 +28,7 @@ struct EditTheme {
     Alignment h_align = Alignment::Center;
     math::Vec4 text_color = math::Vec4(1.0f);
     core::Real text_size = 0.9f;
-    math::Vec4 hint_text_color = math::Vec4(0.3f);
+    math::Vec4 hint_text_color = math::Vec4(0.5f);
     core::Real hint_text_size = 0.9f;
     math::Vec4 background_color = math::Vec4(0.1f, 0.1f, 0.1f, 1.0f);
     math::Vec4 cursor_color = math::Vec4(0.0f, 0.0f, 0.0f, 1.0f);
@@ -36,6 +40,7 @@ struct EditTheme {
 };
 class Edit : public Widget, public core::event::Listener {
 public:
+    GX_GET_CPTR_PRV(core::event::Engine, event_engine)
     GX_GET_CREF_PRV(std::shared_ptr<font::Font2D>, text_font)
     GX_GET_CREF_PRV(std::wstring, text)
     GX_GET_CREF_PRV(std::vector<core::Real>, text_widths)
@@ -70,7 +75,7 @@ private:
     void refill_text_widths() noexcept;
     void place_cursor() noexcept;
     void render_text(const core::sync::EndCaller<core::sync::EndCallerIgnore>& c = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
-    void remove(bool from_left, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c)noexcept;
+    void remove(bool from_left, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
 
 public:
     Edit(

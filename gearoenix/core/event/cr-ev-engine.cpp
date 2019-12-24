@@ -20,11 +20,11 @@ void gearoenix::core::event::Engine::loop() noexcept
         }
         if (state != State::Running)
             break;
-        std::lock_guard<std::mutex> _l(listners_guard);
+        std::lock_guard<std::mutex> _l(listeners_guard);
         for (const auto& e : es) {
             if (state != State::Running)
                 break;
-            auto& ps = events_id_priority_listners[e.source];
+            auto& ps = events_id_priority_listeners[e.source];
             if (state != State::Running)
                 break;
             for (auto& p : ps) {
@@ -71,38 +71,47 @@ gearoenix::core::event::Engine::~Engine() noexcept
     event_thread.join();
 }
 
-void gearoenix::core::event::Engine::add_listner(Id event_id, Real priority, Listener* const listner) noexcept
+void gearoenix::core::event::Engine::add_listener(Id event_id, Real priority, Listener* listener) noexcept
 {
-    std::lock_guard<std::mutex> _l(listners_guard);
-    events_id_priority_listners[event_id][priority].insert(listner);
+    std::lock_guard<std::mutex> _l(listeners_guard);
+    events_id_priority_listeners[event_id][priority].insert(listener);
 }
 
-void gearoenix::core::event::Engine::remove_listner(Id event_id, Real priority, Listener* const listner) noexcept
+void gearoenix::core::event::Engine::remove_listener(Id event_id, Real priority, Listener* listener) noexcept
 {
-    std::lock_guard<std::mutex> _l(listners_guard);
-    events_id_priority_listners[event_id][priority].erase(listner);
+    std::lock_guard<std::mutex> _l(listeners_guard);
+    events_id_priority_listeners[event_id][priority].erase(listener);
 }
 
-void gearoenix::core::event::Engine::remove_listner(Id event_id, Listener* const listner) noexcept
+void gearoenix::core::event::Engine::remove_listener(Id event_id, Listener* listener) noexcept
 {
-    std::lock_guard<std::mutex> _l(listners_guard);
-    auto& e = events_id_priority_listners[event_id];
+    std::lock_guard<std::mutex> _l(listeners_guard);
+    auto& e = events_id_priority_listeners[event_id];
     for (auto& p : e)
-        p.second.erase(listner);
+        p.second.erase(listener);
 }
 
-void gearoenix::core::event::Engine::remove_listner(Listener* const listner) noexcept
+void gearoenix::core::event::Engine::remove_listener(Listener* listener) noexcept
 {
-    std::lock_guard<std::mutex> _l(listners_guard);
-    for (auto& e : events_id_priority_listners) {
+    std::lock_guard<std::mutex> _l(listeners_guard);
+    for (auto& e : events_id_priority_listeners) {
         auto& ps = e.second;
         for (auto& p : ps)
-            p.second.erase(listner);
+            p.second.erase(listener);
     }
 }
 
 void gearoenix::core::event::Engine::broadcast(const Data& event_data) noexcept
 {
+    if (event_data.source == Id::ButtonKeyboard) {
+        const auto& ke = std::get<core::event::button::KeyboardData>(event_data.data);
+        if (ke.action == button::KeyboardActionId::Press) {
+            pressed_keyboard_buttons.insert(ke.key);
+        } else if (ke.action == button::KeyboardActionId::Release) {
+            pressed_keyboard_buttons.erase(ke.key);
+        }
+    }
+
     std::lock_guard<std::mutex> _l(events_guard);
     events.push_back(event_data);
     signaler.release();
@@ -149,7 +158,7 @@ void gearoenix::core::event::Engine::set_mouse_movement(const math::Vec2& positi
     }
 }
 
-void gearoenix::core::event::Engine::mouse_button(const button::MouseKeyId k, const button::MouseActionId a)
+void gearoenix::core::event::Engine::mouse_button(const button::MouseKeyId k, const button::MouseActionId a) noexcept
 {
     button::MouseData bd = {};
     bd.action = a;
@@ -180,4 +189,9 @@ void gearoenix::core::event::Engine::mouse_button(const button::MouseKeyId k, co
             pressed_mouse_buttons_state.erase(k);
         }
     }
+}
+
+bool gearoenix::core::event::Engine::is_pressed(gearoenix::core::event::button::KeyboardKeyId k) noexcept
+{
+    return pressed_keyboard_buttons.find(k) != pressed_keyboard_buttons.end();
 }

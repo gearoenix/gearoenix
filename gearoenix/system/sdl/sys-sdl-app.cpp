@@ -145,7 +145,7 @@ int SDLCALL gearoenix::system::Application::event_receiver(void* user_data, SDL_
 int gearoenix::system::Application::on_event(SDL_Event* const e) noexcept
 {
     core::event::Data event = {};
-    // It's gonna implement whenever needed and as much as needed.
+    // It's gonna be implemented whenever needed and as much as needed.
     switch (e->type) {
     case SDL_APP_WILLENTERBACKGROUND:
         running = false;

@@ -22,8 +22,8 @@ void gearoenix::render::scene::Ui::init() noexcept
     cam->get_transformation()->set_location(math::Vec3(0.0f, 0.0f, 50.0f));
     uniform.ambient_light = math::Vec4(1.0f, 1.0f, 1.0f, 1.0f);
     auto* const event_engine = sys_app->get_event_engine();
-    event_engine->add_listner(core::event::Id::ButtonMouse, 0.0f, this);
-    event_engine->add_listner(core::event::Id::MovementMouse, 0.0f, this);
+    event_engine->add_listener(core::event::Id::ButtonMouse, 0.0f, this);
+    event_engine->add_listener(core::event::Id::MovementMouse, 0.0f, this);
 }
 
 gearoenix::render::scene::Ui::Ui(const core::Id my_id, system::stream::Stream* f, engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept

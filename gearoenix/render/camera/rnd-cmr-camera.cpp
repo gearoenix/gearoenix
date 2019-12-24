@@ -18,7 +18,7 @@ void gearoenix::render::camera::Camera::initialize() noexcept
     uniform.aspect_ratio = sys_app->get_window_ratio();
     uniform.clip_width = static_cast<core::Real>(sys_app->get_window_width());
     uniform.clip_height = static_cast<core::Real>(sys_app->get_window_height());
-    sys_app->get_event_engine()->add_listner(core::event::Id::SystemWindowSizeChange, 1.0f, this);
+    sys_app->get_event_engine()->add_listener(core::event::Id::SystemWindowSizeChange, 1.0f, this);
 }
 
 gearoenix::render::camera::Camera::Camera(const core::Id my_id, engine::Engine* const e) noexcept
@@ -55,7 +55,7 @@ gearoenix::render::camera::Camera::Camera(
 
 gearoenix::render::camera::Camera::~Camera() noexcept
 {
-    e->get_system_application()->get_event_engine()->remove_listner(core::event::Id::SystemWindowSizeChange, this);
+    e->get_system_application()->get_event_engine()->remove_listener(core::event::Id::SystemWindowSizeChange, this);
 }
 
 void gearoenix::render::camera::Camera::set_far(const core::Real f) noexcept

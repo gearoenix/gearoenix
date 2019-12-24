@@ -28,6 +28,7 @@ SET(GX_ENGINE_SRC
         "${GX_ENGINE_SRC_DIR}core/cr-build-configuration.hpp"
         "${GX_ENGINE_SRC_DIR}core/cr-function-loader.cpp"
         "${GX_ENGINE_SRC_DIR}core/cr-function-loader.hpp"
+        "${GX_ENGINE_SRC_DIR}core/cr-language.hpp"
         "${GX_ENGINE_SRC_DIR}core/cr-pool.hpp"
         "${GX_ENGINE_SRC_DIR}core/cr-preprocessor-loop.hpp"
         "${GX_ENGINE_SRC_DIR}core/cr-static.hpp"
