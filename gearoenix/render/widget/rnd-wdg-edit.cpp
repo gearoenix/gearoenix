@@ -188,20 +188,26 @@ void gearoenix::render::widget::Edit::render_text(const core::sync::EndCaller<co
 
 void gearoenix::render::widget::Edit::remove(const bool from_left, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
 {
-    const auto move = cursor_pos_in_text - starting_text_cut;
+    const auto before = text_widths.back();
     refill_text();
     if (text.empty()) {
         clear();
     } else {
         refill_text_widths();
         cursor_pos_in_text = text_widths[left_text.size()];
+        const auto margin = aspects[0] * 0.2f;
+        const auto increase = text_widths.back() - before;
         if (from_left) {
-            if (starting_text_cut > 0.0 && cursor_pos_in_text - starting_text_cut < aspects[0] * 0.2f) {
-                starting_text_cut = cursor_pos_in_text - move;
+            if (ending_text_cut >= text_widths.back()) {
+                starting_text_cut += increase;
+            } else if (starting_text_cut > 0.0 && cursor_pos_in_text - starting_text_cut < margin) {
+                starting_text_cut = cursor_pos_in_text - margin;
             }
         } else {
-            if (ending_text_cut < text_widths.back() && ending_text_cut - cursor_pos_in_text > aspects[0] * 0.2f) {
-                starting_text_cut = cursor_pos_in_text - move;
+            if (ending_text_cut < text_widths.back() && ending_text_cut - cursor_pos_in_text < margin) {
+                starting_text_cut = (cursor_pos_in_text + margin) - aspects[0];
+            } else if (starting_text_cut > 0.0f) {
+                starting_text_cut += increase;
             }
         }
         compute_cuts();
@@ -426,6 +432,8 @@ void gearoenix::render::widget::Edit::insert(
         }
         right_text.push_back(character);
         increase_to_right = false;
+    } else {
+        return;
     }
     const core::Real cursor_before = increase_to_right ? cursor_pos_in_text - starting_text_cut : ending_text_cut - cursor_pos_in_text;
     const core::Real before = text_widths.empty() ? 0.0f : text_widths[text.size()];
