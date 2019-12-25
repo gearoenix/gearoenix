@@ -1,7 +1,6 @@
 #include "rnd-eng-engine.hpp"
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../core/cr-function-loader.hpp"
-#include "../../core/cr-static.hpp"
 #include "../../core/event/cr-ev-event.hpp"
 #include "../../core/sync/cr-sync-kernel-workers.hpp"
 #include "../../core/sync/cr-sync-semaphore.hpp"
@@ -38,10 +37,7 @@ gearoenix::render::engine::Engine::Engine(system::Application* const system_appl
         });
 }
 
-gearoenix::render::engine::Engine::~Engine() noexcept
-{
-    terminate();
-}
+gearoenix::render::engine::Engine::~Engine() noexcept = default;
 
 void gearoenix::render::engine::Engine::update() noexcept
 {

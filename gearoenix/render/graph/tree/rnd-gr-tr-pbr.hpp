@@ -31,7 +31,7 @@ private:
 
 public:
     Pbr(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
-    ~Pbr() noexcept;
+    ~Pbr() noexcept final;
     void update() noexcept final;
     void record(unsigned int kernel_index) noexcept final;
     void submit() noexcept final;
