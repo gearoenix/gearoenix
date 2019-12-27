@@ -62,8 +62,8 @@ void gearoenix::render::graph::tree::Pbr::update() noexcept
                     n->update();
                     for (const auto& priority_lights : shadow_caster_directional_lights) {
                         const auto& lights = priority_lights.second;
-                        for (const auto& light_cascasdes : lights) {
-                            cascades.push_back(light_cascasdes.second);
+                        for (const auto& light_cascades : lights) {
+                            cascades.push_back(light_cascades.second);
                         }
                     }
                 }

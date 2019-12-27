@@ -375,16 +375,16 @@ void gearoenix::render::widget::Edit::set_left_to_right(const bool b) noexcept
     if (left_to_right == b)
         return;
     if (left_to_right) {
-        for (auto i = left_text.size() - 1; i >= 0; --i) {
+        for (int i = static_cast<int>(left_text.size()) - 1; i >= 0; --i) {
             right_text.push_back(left_text[i]);
         }
         left_text.clear();
         text.clear();
-        for (auto i = right_text.size() - 1; i >= 0; --i) {
+        for (int i = static_cast<int>(right_text.size()) - 1; i >= 0; --i) {
             text.push_back(right_text[i]);
         }
     } else {
-        for (auto i = right_text.size() - 1; i >= 0; --i) {
+        for (int i = static_cast<int>(right_text.size()) - 1; i >= 0; --i) {
             left_text.push_back(right_text[i]);
         }
         right_text.clear();
@@ -471,8 +471,8 @@ void gearoenix::render::widget::Edit::selected(const gearoenix::math::Vec3& poin
     const auto x = v.dot(text_tran->get_x_axis());
     const auto pos_in_txt = x + text_model->get_collider()->get_current_local_scale()[0] + starting_text_cut;
     auto min_dis = (aspects[0] + text_widths[text.size()]) * 10.0f;
-    std::size_t index;
-    for (index = 0; index < text_widths.size(); ++index) {
+    int index;
+    for (index = 0; index < static_cast<int>(text_widths.size()); ++index) {
         auto dis = std::abs(pos_in_txt - text_widths[index]);
         if (dis > min_dis) {
             --index;
@@ -480,14 +480,14 @@ void gearoenix::render::widget::Edit::selected(const gearoenix::math::Vec3& poin
         }
         min_dis = dis;
     }
-    if (index > text.size()) {
+    if (index > static_cast<int>(text.size())) {
         index = text.size();
     } else if (index < 0) {
         index = 0;
     }
     left_text.clear();
     right_text.clear();
-    for (std::size_t i = 0; i < index; ++i) {
+    for (int i = 0; i < index; ++i) {
         left_text.push_back(text[i]);
     }
     const int end = static_cast<int>(text.size() - 1);

@@ -11,6 +11,7 @@
 
 namespace gearoenix::render::graph::node {
 class ForwardPbr;
+class Unlit;
 }
 namespace gearoenix::render::light {
 class CascadeInfo;
@@ -25,7 +26,8 @@ namespace gearoenix::render::graph::tree {
 class Pbr : public Tree {
 private:
     bool in_weak_hardware = true;
-    core::OneLoopPool<node::ForwardPbr> fwd;
+    core::OneLoopPool<node::ForwardPbr> fwdpbr;
+    core::OneLoopPool<node::Unlit> unlit;
     std::map<core::Real, std::map<const scene::Scene*, std::map<core::Real, std::map<const camera::Camera*, node::ForwardPbr*>>>> nodes;
     std::vector<light::CascadeInfo*> cascades;
 

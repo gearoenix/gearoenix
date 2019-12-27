@@ -14,7 +14,7 @@ gearoenix::render::model::Mesh::Mesh(system::stream::Stream* const f, engine::En
 {
     core::sync::EndCaller<mesh::Mesh> call([c](const std::shared_ptr<mesh::Mesh>&) {});
     msh = e->get_system_application()->get_asset_manager()->get_mesh_manager()->get_gx3d(f->read<core::Id>(), call);
-    mat = std::make_shared<material::Material>(f, e, core::sync::EndCaller<core::sync::EndCallerIgnore>([c] {}));
+    mat = std::shared_ptr<material::Material>(material::Material::read(f, e, core::sync::EndCaller<core::sync::EndCallerIgnore>([c] {})));
 }
 
 gearoenix::render::model::Mesh::Mesh(std::shared_ptr<mesh::Mesh> msh, std::shared_ptr<material::Material> mat) noexcept
@@ -29,17 +29,7 @@ gearoenix::render::model::Mesh::~Mesh() noexcept
     msh = nullptr;
 }
 
-const std::shared_ptr<gearoenix::render::mesh::Mesh>& gearoenix::render::model::Mesh::get_mesh() const noexcept
+void gearoenix::render::model::Mesh::update() noexcept
 {
-    return msh;
-}
-
-const std::shared_ptr<gearoenix::render::material::Material>& gearoenix::render::model::Mesh::get_material() const noexcept
-{
-    return mat;
-}
-
-void gearoenix::render::model::Mesh::update_uniform() noexcept
-{
-    mat->update_uniform();
+    mat->update();
 }

@@ -3,7 +3,7 @@
 #include <memory>
 
 namespace gearoenix::render::engine {
-    class Engine;
+class Engine;
 }
 
 namespace gearoenix::render::graph::tree {

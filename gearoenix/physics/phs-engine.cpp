@@ -6,6 +6,7 @@
 #include "../render/engine/rnd-eng-engine.hpp"
 #include "../render/light/rnd-lt-cascade-info.hpp"
 #include "../render/light/rnd-lt-directional.hpp"
+#include "../render/material/rnd-mat-material.hpp"
 #include "../render/model/rnd-mdl-model.hpp"
 #include "../render/scene/rnd-scn-manager.hpp"
 #include "../render/scene/rnd-scn-scene.hpp"
@@ -83,10 +84,16 @@ void gearoenix::physics::Engine::update_visibility_kernel(const unsigned int ker
             const std::function<void(collider::Collider* const cld)> collided = [&](collider::Collider* const cld) noexcept {
                 auto* const m = cld->get_parent();
                 m->update();
-                if (m->get_has_transparent()) {
-                    transparent_container_models[-camera->get_distance(cld->get_location())].push_back(m);
+                const auto& model_meshes = m->get_meshes();
+                for (const auto& model_mesh : model_meshes) {
+                    auto* const mat = model_mesh.second->get_mat().get();
+                    auto* const msh = model_mesh.second->get_msh().get();
+                    if (mat->get_translucency() == render::material::TranslucencyMode::Transparent) {
+                        transparent_container_models[-camera->get_distance(cld->get_location())][mat->get_material_type()][m] = msh;
+                    } else {
+                        opaque_container_models[mat->get_material_type()][m] = msh;
+                    }
                 }
-                opaque_container_models.push_back(m);
             };
             GX_DO_TASK(camera->update_uniform())
             GX_DO_TASK(dynamic_accelerator->call_on_intersecting(camera->get_frustum_collider(), collided))
@@ -133,13 +140,10 @@ void gearoenix::physics::Engine::update_visibility_receiver() noexcept
                 auto& mo = c.opaque_container_models;
                 auto& mt = c.transparent_container_models;
                 auto& ls = c.shadow_caster_directional_lights;
-                opaque_models.reserve(mo.size());
-                for (auto* const m : mo) {
-                    opaque_models.push_back(m);
-                }
+                opaque_models.merge(mo);
                 transparent_models.merge(mt);
                 for (auto& l : ls) {
-                    cascades[l.light->get_layer()][l.light] = l.cascades_info.get();
+                    cascades.insert(std::make_tuple(l.light->get_layer(), l.light, l.cascades_info.get()));
                 }
             }
         }
@@ -162,12 +166,9 @@ void gearoenix::physics::Engine::update_shadower_kernel(const unsigned int kerne
                 for (auto& camera : cameras_data) {
                     auto& priorities_lights_data = camera.second.shadow_caster_directional_lights;
                     for (auto& priority_lights_data : priorities_lights_data) {
-                        auto& lights_data = priority_lights_data.second;
-                        for (auto& lc : lights_data) {
-                            auto* const cas = lc.second;
-                            GX_DO_TASK(cas->shadow(static_accelerator, kernel_index))
-                            GX_DO_TASK(cas->shadow(dynamic_accelerator, kernel_index))
-                        }
+                        auto* const cas = std::get<2>(priority_lights_data);
+                        GX_DO_TASK(cas->shadow(static_accelerator, kernel_index))
+                        GX_DO_TASK(cas->shadow(dynamic_accelerator, kernel_index))
                     }
                 }
             }
@@ -187,11 +188,8 @@ void gearoenix::physics::Engine::update_shadower_receiver() noexcept
                 for (auto& camera : cameras_data) {
                     auto& priorities_lights_data = camera.second.shadow_caster_directional_lights;
                     for (auto& priority_lights_data : priorities_lights_data) {
-                        auto& lights_data = priority_lights_data.second;
-                        for (auto& lc : lights_data) {
-                            auto* cas = lc.second;
-                            cas->shrink();
-                        }
+                        auto* const cas = std::get<2>(priority_lights_data);
+                        cas->shrink();
                     }
                 }
             }
@@ -222,14 +220,4 @@ gearoenix::physics::Engine::~Engine() noexcept
 
 void gearoenix::physics::Engine::update() noexcept
 {
-}
-
-const gearoenix::physics::Engine::GatheredData& gearoenix::physics::Engine::get_visible_models() const noexcept
-{
-    return scenes_camera_data;
-}
-
-gearoenix::physics::Engine::GatheredData& gearoenix::physics::Engine::get_visible_models() noexcept
-{
-    return scenes_camera_data;
 }
