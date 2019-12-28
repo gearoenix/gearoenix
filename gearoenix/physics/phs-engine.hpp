@@ -79,7 +79,7 @@ public:
     struct GatheredCameraData {
         OpaqueMeshes opaque_container_models;
         TransparentMeshes transparent_container_models;
-        std::set<std::tuple<core::Real, render::light::Directional*, render::light::CascadeInfo*>> shadow_caster_directional_lights;
+        std::map<core::Real, std::map<render::light::Directional*, render::light::CascadeInfo*>> shadow_caster_directional_lights;
     };
 
     struct GatheredSceneData {

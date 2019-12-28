@@ -143,7 +143,7 @@ void gearoenix::physics::Engine::update_visibility_receiver() noexcept
                 opaque_models.merge(mo);
                 transparent_models.merge(mt);
                 for (auto& l : ls) {
-                    cascades.insert(std::make_tuple(l.light->get_layer(), l.light, l.cascades_info.get()));
+                    cascades[l.light->get_layer()][l.light] = l.cascades_info.get();
                 }
             }
         }
@@ -154,21 +154,24 @@ void gearoenix::physics::Engine::update_shadower_kernel(const unsigned int kerne
 {
     // TODO: I'm not happy with this part it can be much much better, but for this milestone it is ok
     GX_START_TASKS
-    for (auto& priority_scenes_data : scenes_camera_data.priority_ptr_scene) {
-        auto& scenes_data = priority_scenes_data.second;
-        for (auto& scene_data : scenes_data) {
-            auto* const scene = scene_data.first;
+    for (const auto& priority_scenes_data : scenes_camera_data.priority_ptr_scene) {
+        const auto& scenes_data = priority_scenes_data.second;
+        for (const auto& scene_data : scenes_data) {
+            const auto* const scene = scene_data.first;
             const auto* const static_accelerator = scene->get_static_accelerator();
             const auto* const dynamic_accelerator = scene->get_dynamic_accelerator();
-            auto& priorities_cameras_data = scene_data.second.priority_ptr_camera;
-            for (auto& priority_cameras_data : priorities_cameras_data) {
-                auto& cameras_data = priority_cameras_data.second;
-                for (auto& camera : cameras_data) {
-                    auto& priorities_lights_data = camera.second.shadow_caster_directional_lights;
-                    for (auto& priority_lights_data : priorities_lights_data) {
-                        auto* const cas = std::get<2>(priority_lights_data);
-                        GX_DO_TASK(cas->shadow(static_accelerator, kernel_index))
-                        GX_DO_TASK(cas->shadow(dynamic_accelerator, kernel_index))
+            const auto& priorities_cameras_data = scene_data.second.priority_ptr_camera;
+            for (const auto& priority_cameras_data : priorities_cameras_data) {
+                const auto& cameras_data = priority_cameras_data.second;
+                for (const auto& camera : cameras_data) {
+                    const auto& priorities_lights_data = camera.second.shadow_caster_directional_lights;
+                    for (const auto& priority_lights_data : priorities_lights_data) {
+                        const auto& lights_data = priority_lights_data.second;
+                        for (const auto& light_data : lights_data) {
+                            auto* const cas = light_data.second;
+                            GX_DO_TASK(cas->shadow(static_accelerator, kernel_index))
+                            GX_DO_TASK(cas->shadow(dynamic_accelerator, kernel_index))
+                        }
                     }
                 }
             }
@@ -179,17 +182,20 @@ void gearoenix::physics::Engine::update_shadower_kernel(const unsigned int kerne
 
 void gearoenix::physics::Engine::update_shadower_receiver() noexcept
 {
-    for (auto& priority_scenes_data : scenes_camera_data.priority_ptr_scene) {
-        auto& scenes_data = priority_scenes_data.second;
-        for (auto& scene_data : scenes_data) {
-            auto& priorities_cameras_data = scene_data.second.priority_ptr_camera;
-            for (auto& priority_cameras_data : priorities_cameras_data) {
-                auto& cameras_data = priority_cameras_data.second;
-                for (auto& camera : cameras_data) {
-                    auto& priorities_lights_data = camera.second.shadow_caster_directional_lights;
-                    for (auto& priority_lights_data : priorities_lights_data) {
-                        auto* const cas = std::get<2>(priority_lights_data);
-                        cas->shrink();
+    for (const auto& priority_scenes_data : scenes_camera_data.priority_ptr_scene) {
+        const auto& scenes_data = priority_scenes_data.second;
+        for (const auto& scene_data : scenes_data) {
+            const auto& priorities_cameras_data = scene_data.second.priority_ptr_camera;
+            for (const auto& priority_cameras_data : priorities_cameras_data) {
+                const auto& cameras_data = priority_cameras_data.second;
+                for (const auto& camera : cameras_data) {
+                    const auto& priorities_lights_data = camera.second.shadow_caster_directional_lights;
+                    for (const auto& priority_lights_data : priorities_lights_data) {
+                        const auto& lights_data = priority_lights_data.second;
+                        for (const auto& light_data : lights_data) {
+                            auto* const cas = light_data.second;
+                            cas->shrink();
+                        }
                     }
                 }
             }

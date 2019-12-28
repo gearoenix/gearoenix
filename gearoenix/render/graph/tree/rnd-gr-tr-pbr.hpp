@@ -24,11 +24,22 @@ class Camera;
 }
 namespace gearoenix::render::graph::tree {
 class Pbr : public Tree {
+public:
+    struct Nodes {
+        node::ForwardPbr* forward_pbr = nullptr;
+        node::Unlit* unlit = nullptr;
+    };
+    struct CameraData {
+        Nodes opaques;
+        std::map<core::Real, Nodes> transparents;
+    };
+    using SceneData = std::map<core::Real, std::map<const camera::Camera*, CameraData>>;
+
 private:
     bool in_weak_hardware = true;
-    core::OneLoopPool<node::ForwardPbr> fwdpbr;
+    core::OneLoopPool<node::ForwardPbr> forward_pbr;
     core::OneLoopPool<node::Unlit> unlit;
-    std::map<core::Real, std::map<const scene::Scene*, std::map<core::Real, std::map<const camera::Camera*, node::ForwardPbr*>>>> nodes;
+    std::map<core::Real, std::map<const scene::Scene*, SceneData>> nodes;
     std::vector<light::CascadeInfo*> cascades;
 
 public:

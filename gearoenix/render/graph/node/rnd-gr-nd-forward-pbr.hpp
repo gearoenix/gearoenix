@@ -23,6 +23,9 @@ namespace light {
     class Directional;
     class CascadeInfo;
 }
+namespace mesh {
+    class Mesh;
+}
 namespace model {
     class Model;
     class Mesh;
@@ -84,8 +87,7 @@ namespace graph::node {
         ForwardPbrFrame* frame = nullptr;
         const scene::Scene* scn = nullptr;
         const camera::Camera* cam = nullptr;
-        const std::vector<model::Model*>* opaque_models = nullptr;
-        const std::map<core::Real, std::vector<model::Model*>>* transparent_models = nullptr;
+        const std::vector<std::map<model::Model*, mesh::Mesh*>*> models = nullptr;
         const std::map<core::Real, std::map<light::Directional*, light::CascadeInfo*>>* directional_lights = nullptr;
 
         void record(
@@ -114,8 +116,7 @@ namespace graph::node {
 
         void set_scene(const scene::Scene* scn) noexcept;
         void set_camera(const camera::Camera* cam) noexcept;
-        void set_opaque_models(const std::vector<model::Model*>* models) noexcept;
-        void set_transparent_models(const std::map<core::Real, std::vector<model::Model*>>* models) noexcept;
+        void add_models(const std::map<model::Model*, mesh::Mesh*>* models) noexcept;
         void set_directional_lights(const std::map<core::Real, std::map<light::Directional*, light::CascadeInfo*>>* m) noexcept;
         void record(unsigned int kernel_index) noexcept;
         /// This will be called at the end of each frame for pushing jobs to GPU
