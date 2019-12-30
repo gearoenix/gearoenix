@@ -71,11 +71,11 @@ void gearoenix::render::graph::tree::Pbr::update() noexcept
                                 n->set_render_target(e->get_main_render_target());
                                 return n;
                             });
+                            n->update();
                             n->set_scene(scn);
                             n->set_camera(cam);
                             n->set_directional_lights(&shadow_caster_directional_lights);
                             n->add_models(&material_models.second);
-                            n->update();
                             camera_nodes.opaques.forward_pbr = n;
                             break;
                         }
@@ -85,9 +85,9 @@ void gearoenix::render::graph::tree::Pbr::update() noexcept
                                 n->set_render_target(e->get_main_render_target());
                                 return n;
                             });
+                            n->update();
                             n->set_camera(cam);
                             n->add_models(&material_models.second);
-                            n->update();
                             camera_nodes.opaques.unlit = n;
                             break;
                         }
@@ -112,11 +112,11 @@ void gearoenix::render::graph::tree::Pbr::update() noexcept
                                     });
                                     camera_nodes.transparencies.push_back(previous_forward_pbr);
                                 }
+                                previous_forward_pbr->update();
                                 previous_forward_pbr->set_scene(scn);
                                 previous_forward_pbr->set_camera(cam);
                                 previous_forward_pbr->set_directional_lights(&shadow_caster_directional_lights);
                                 previous_forward_pbr->add_models(&material_models.second);
-                                previous_forward_pbr->update();
                                 break;
                             }
                             case material::Type::Unlit: {
@@ -130,9 +130,9 @@ void gearoenix::render::graph::tree::Pbr::update() noexcept
                                     });
                                     camera_nodes.transparencies.push_back(previous_unlit);
                                 }
+                                previous_unlit->update();
                                 previous_unlit->set_camera(cam);
                                 previous_unlit->add_models(&material_models.second);
-                                previous_unlit->update();
                                 break;
                             }
                             default:

@@ -23,9 +23,6 @@ namespace light {
     class Directional;
     class CascadeInfo;
 }
-namespace mesh {
-    class Mesh;
-}
 namespace model {
     class Model;
     class Mesh;
@@ -87,13 +84,14 @@ namespace graph::node {
         ForwardPbrFrame* frame = nullptr;
         const scene::Scene* scn = nullptr;
         const camera::Camera* cam = nullptr;
-        const std::vector<std::map<model::Model*, mesh::Mesh*>*> models = nullptr;
+        std::vector<const std::map<const model::Model*, std::vector<const model::Mesh*>>*> models;
         const std::map<core::Real, std::map<light::Directional*, light::CascadeInfo*>>* directional_lights = nullptr;
 
         void record(
-            const model::Model* m,
-            unsigned int kernel_index,
-            material::TranslucencyMode translucency_mode = material::TranslucencyMode::Opaque) noexcept;
+            const model::Model* mdl,
+            const model::Mesh* msh,
+            const ForwardPbrUniform& u,
+            ForwardPbrKernel* kernel) noexcept;
 
     public:
         const static unsigned int DIFFUSE_ENVIRONMENT_INDEX;
@@ -112,12 +110,11 @@ namespace graph::node {
 
         /// This will be called at the start of each frame
         void update() noexcept final;
-        /// Multithreaded rendering happens in here
-
         void set_scene(const scene::Scene* scn) noexcept;
         void set_camera(const camera::Camera* cam) noexcept;
-        void add_models(const std::map<model::Model*, mesh::Mesh*>* models) noexcept;
+        void add_models(const std::map<const model::Model*, std::vector<const model::Mesh*>>* models) noexcept;
         void set_directional_lights(const std::map<core::Real, std::map<light::Directional*, light::CascadeInfo*>>* m) noexcept;
+        /// Multithreaded rendering happens in here
         void record(unsigned int kernel_index) noexcept;
         void record_continuously(unsigned int kernel_index) noexcept;
         /// This will be called at the end of each frame for pushing jobs to GPU

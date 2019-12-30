@@ -5,18 +5,17 @@
 #include "../../core/sync/cr-sync-end-caller.hpp"
 #include "../../render/pipeline/rnd-pip-forward-pbr-resource-set.hpp"
 #include "glc3-pip-resource-set.hpp"
-
-namespace gearoenix::glc3::shader {
-class ForwardPbr;
+namespace gearoenix::glc3 {
+namespace shader {
+    class ForwardPbr;
 }
-
-namespace gearoenix::glc3::pipeline {
-class ForwardPbrResourceSet : public ResourceSet, public render::pipeline::ForwardPbrResourceSet {
-public:
-    explicit ForwardPbrResourceSet(const std::shared_ptr<shader::ForwardPbr>& shd);
-    void bind(gl::uint& bound_shader_program) const final;
-};
+namespace pipeline {
+    class ForwardPbrResourceSet : public ResourceSet, public render::pipeline::ForwardPbrResourceSet {
+    public:
+        ForwardPbrResourceSet(const std::shared_ptr<shader::ForwardPbr>& shd);
+        void bind(gl::uint& bound_shader_program) const override final;
+    };
 }
-
+}
 #endif
 #endif

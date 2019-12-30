@@ -1,9 +1,44 @@
 #include "rnd-pip-forward-pbr-resource-set.hpp"
 #include "../../core/cr-static.hpp"
+#include "../buffer/rnd-buf-framed-uniform.hpp"
+#include "../camera/rnd-cmr-camera.hpp"
+#include "../light/rnd-lt-light.hpp"
+#include "../material/rnd-mat-material.hpp"
+#include "../material/rnd-mat-pbr.hpp"
+#include "../mesh/rnd-msh-mesh.hpp"
+#include "../model/rnd-mdl-model.hpp"
+#include "../scene/rnd-scn-scene.hpp"
 
-void gearoenix::render::pipeline::ForwardPbrResourceSet::set_node_uniform_buffer(buffer::Uniform* const uniform_buffer) noexcept
+#define GX_HELPER(c, cc)                                                                            \
+    void gearoenix::render::pipeline::ForwardPbrResourceSet::set_##c(const c::cc* const o) noexcept \
+    {                                                                                               \
+        c##_uniform_buffer = o->get_uniform_buffers()->get_buffer();                                \
+    }
+
+GX_HELPER(scene, Scene)
+GX_HELPER(camera, Camera)
+GX_HELPER(model, Model)
+
+#undef GX_HELPER
+
+void gearoenix::render::pipeline::ForwardPbrResourceSet::set_mesh(const mesh::Mesh* const m) noexcept
 {
-    node_uniform_buffer = uniform_buffer;
+    msh = m;
+}
+
+void gearoenix::render::pipeline::ForwardPbrResourceSet::set_material(const material::Material* m) noexcept
+{
+    material_uniform_buffer = m->get_uniform_buffers()->get_buffer();
+    auto* const pbr_mat = reinterpret_cast<const material::Pbr*>(m);
+    color = pbr_mat->get_color_texture().get();
+    metallic_roughness = pbr_mat->get_metallic_roughness_texture().get();
+    normal = pbr_mat->get_normal_texture().get();
+    emissive = pbr_mat->get_emission_texture().get();
+}
+
+void gearoenix::render::pipeline::ForwardPbrResourceSet::set_node_uniform_buffer(buffer::Uniform* b) noexcept
+{
+    node_uniform_buffer = b;
 }
 
 void gearoenix::render::pipeline::ForwardPbrResourceSet::set_diffuse_environment(texture::Cube* const t) noexcept
@@ -33,10 +68,19 @@ void gearoenix::render::pipeline::ForwardPbrResourceSet::set_brdflut(texture::Te
 
 void gearoenix::render::pipeline::ForwardPbrResourceSet::clean() noexcept
 {
-    ResourceSet::clean();
     diffuse_environment = nullptr;
     specular_environment = nullptr;
     ambient_occlusion = nullptr;
     GX_SET_ARRAY_ZERO(directional_lights_shadow_maps)
     brdflut = nullptr;
+    scene_uniform_buffer = nullptr;
+    camera_uniform_buffer = nullptr;
+    model_uniform_buffer = nullptr;
+    material_uniform_buffer = nullptr;
+    node_uniform_buffer = nullptr;
+    msh = nullptr;
+    color = nullptr;
+    metallic_roughness = nullptr;
+    normal = nullptr;
+    emissive = nullptr;
 }

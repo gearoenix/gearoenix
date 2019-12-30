@@ -26,6 +26,7 @@ class Mesh;
 
 namespace gearoenix::render::model {
 class Model;
+class Mesh;
 }
 
 namespace gearoenix::render::pipeline {
@@ -65,14 +66,14 @@ private:
     const camera::Camera* cam = nullptr;
     const std::vector<std::map<model::Model*, mesh::Mesh*>*> models;
 
-    void record(const model::Model* m, unsigned int kernel_index) noexcept;
+    void record(const model::Mesh* msh, const UnlitUniform& u, UnlitKernel* kernel) noexcept;
 
 public:
     Unlit(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
     ~Unlit() noexcept final;
     void update() noexcept final;
     void set_camera(const camera::Camera* cam) noexcept;
-    void add_models(const std::map<model::Model*, mesh::Mesh*>* models) noexcept;
+    void add_models(const std::map<const model::Model*, std::vector<const model::Mesh*>>* models) noexcept;
     void record(unsigned int kernel_index) noexcept;
     void record_continuously(unsigned int kernel_index) noexcept;
     void submit() noexcept final;

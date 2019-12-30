@@ -30,12 +30,9 @@ class CascadeInfo;
 class Light;
 }
 
-namespace gearoenix::render::mesh {
-class Mesh;
-}
-
 namespace gearoenix::render::model {
 class Model;
+class Mesh;
 }
 
 namespace gearoenix::render::scene {
@@ -61,12 +58,12 @@ public:
         ~PooledShadowCasterDirectionalLights() noexcept;
     };
 
-    using OpaqueMeshes = std::map<render::material::Type, std::map<render::model::Model*, render::mesh::Mesh*>>;
-    using TransparentMeshes = std::map<core::Real, std::map<render::material::Type, std::map<render::model::Model*, render::mesh::Mesh*>>>;
+    using Meshes = std::map<const render::material::Type, std::map<const render::model::Model*, std::vector<const render::model::Mesh*>>>;
+    using TransparentMeshes = std::map<core::Real, Meshes>;
 
     struct PooledCameraData {
         render::camera::Camera* camera = nullptr;
-        OpaqueMeshes opaque_container_models;
+        Meshes opaque_container_models;
         TransparentMeshes transparent_container_models;
         core::OneLoopPool<PooledShadowCasterDirectionalLights> shadow_caster_directional_lights;
     };
@@ -77,7 +74,7 @@ public:
     };
 
     struct GatheredCameraData {
-        OpaqueMeshes opaque_container_models;
+        Meshes opaque_container_models;
         TransparentMeshes transparent_container_models;
         std::map<core::Real, std::map<render::light::Directional*, render::light::CascadeInfo*>> shadow_caster_directional_lights;
     };

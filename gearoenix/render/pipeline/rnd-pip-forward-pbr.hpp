@@ -1,6 +1,8 @@
-#ifndef GEAROENIX_RENDER_PIPELINE_FORWARD_PBR_DIRECTIONAL_HPP
-#define GEAROENIX_RENDER_PIPELINE_FORWARD_PBR_DIRECTIONAL_HPP
+#ifndef GEAROENIX_RENDER_PIPELINE_FORWARD_PBR_HPP
+#define GEAROENIX_RENDER_PIPELINE_FORWARD_PBR_HPP
+
 #include "rnd-pip-pipeline.hpp"
+
 namespace gearoenix::render::pipeline {
 class ForwardPbr : public Pipeline {
 protected:
@@ -10,7 +12,7 @@ protected:
     }
 
 public:
-    virtual ~ForwardPbr() noexcept = default;
+    ~ForwardPbr() noexcept override = default;
 };
 }
 #endif

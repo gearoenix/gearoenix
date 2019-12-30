@@ -87,11 +87,11 @@ void gearoenix::physics::Engine::update_visibility_kernel(const unsigned int ker
                 const auto& model_meshes = m->get_meshes();
                 for (const auto& model_mesh : model_meshes) {
                     auto* const mat = model_mesh.second->get_mat().get();
-                    auto* const msh = model_mesh.second->get_msh().get();
+                    auto* const msh = model_mesh.second.get();
                     if (mat->get_translucency() == render::material::TranslucencyMode::Transparent) {
-                        transparent_container_models[-camera->get_distance(cld->get_location())][mat->get_material_type()][m] = msh;
+                        transparent_container_models[-camera->get_distance(cld->get_location())][mat->get_material_type()][m].push_back(msh);
                     } else {
-                        opaque_container_models[mat->get_material_type()][m] = msh;
+                        opaque_container_models[mat->get_material_type()][m].push_back(msh);
                     }
                 }
             };
@@ -203,9 +203,9 @@ void gearoenix::physics::Engine::update_shadower_receiver() noexcept
     }
 }
 
-gearoenix::physics::Engine::Engine(system::Application* const sysapp, core::sync::KernelWorkers* const workers) noexcept
+gearoenix::physics::Engine::Engine(system::Application* const sys_app, core::sync::KernelWorkers* const workers) noexcept
     : animation_manager(new animation::Manager(workers))
-    , sys_app(sysapp)
+    , sys_app(sys_app)
     , workers(workers)
     , kernels_scene_camera_data(this->workers->get_threads_count())
 {

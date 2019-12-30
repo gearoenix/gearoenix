@@ -84,7 +84,7 @@ gearoenix::render::graph::node::ForwardPbrUniform::ForwardPbrUniform(
 }
 
 gearoenix::render::graph::node::ForwardPbrRenderData::ForwardPbrRenderData(engine::Engine* const e, pipeline::Pipeline* const pip) noexcept
-    : r(reinterpret_cast<pipeline::ForwardPbrResourceSet*>(pip->create_resource_set()))
+    : r(dynamic_cast<pipeline::ForwardPbrResourceSet*>(pip->create_resource_set()))
     , u(e->get_buffer_manager()->create_uniform(sizeof(ForwardPbrUniform)))
 {
     r->set_node_uniform_buffer(u.get());
@@ -97,50 +97,41 @@ gearoenix::render::graph::node::ForwardPbrRenderData::~ForwardPbrRenderData() no
 }
 
 void gearoenix::render::graph::node::ForwardPbr::record(
-    const model::Model* const m,
-    const unsigned int kernel_index,
-    const material::TranslucencyMode translucency_mode) noexcept
+    const model::Model* const mdl,
+    const model::Mesh* const msh,
+    const ForwardPbrUniform& u,
+    ForwardPbrKernel* const kernel) noexcept
 {
-    const ForwardPbrUniform u(directional_lights, scn, m);
-    const auto& cam_uni = cam->get_uniform();
-    render_target->set_clipping(cam_uni.clip_width, cam_uni.clip_height);
-    auto& kernel = frame->kernels[kernel_index];
-    const std::map<core::Id, std::shared_ptr<model::Mesh>>& meshes = m->get_meshes();
-    for (const std::pair<const core::Id, std::shared_ptr<model::Mesh>>& id_mesh : meshes) {
-        const std::shared_ptr<mesh::Mesh>& msh = id_mesh.second->get_mesh();
-        const std::shared_ptr<material::Material>& mat = id_mesh.second->get_material();
-        if (mat->get_translucency() != translucency_mode)
-            continue;
-        auto* const rd = kernel->render_data_pool.get_next([this] {
-            return new ForwardPbrRenderData(e, render_pipeline.get());
-        });
-        rd->u->set_data(u);
-        auto* const prs = rd->r.get();
-        prs->set_scene(scn);
-        prs->set_camera(cam);
-        prs->set_model(m);
-        prs->set_mesh(msh.get());
-        prs->set_material(mat.get());
-        prs->set_diffuse_environment(reinterpret_cast<texture::Cube*>(input_textures[DIFFUSE_ENVIRONMENT_INDEX]));
-        prs->set_specular_environment(reinterpret_cast<texture::Cube*>(input_textures[SPECULAR_ENVIRONMENT_INDEX]));
-        prs->set_ambient_occlusion(reinterpret_cast<texture::Texture2D*>(input_textures[AMBIENT_OCCLUSION_INDEX]));
-        prs->set_brdflut(reinterpret_cast<texture::Texture2D*>(input_textures[BRDFLUT_INDEX]));
-        for (int shadow_caster_directional_light_index = 0, shadow_map_index = SHADOW_MAP_000_INDEX;
-             shadow_caster_directional_light_index < GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER;
-             ++shadow_caster_directional_light_index) {
-            for (int cascaded_inex = 0; cascaded_inex < GX_MAX_SHADOW_CASCADES; ++cascaded_inex, ++shadow_map_index) {
-                prs->set_directional_lights_shadow_map(
-                    reinterpret_cast<texture::Texture2D*>(input_textures[shadow_map_index]),
-                    shadow_caster_directional_light_index, cascaded_inex);
-            }
+    auto* const rd = kernel->render_data_pool.get_next([this] {
+        return new ForwardPbrRenderData(e, render_pipeline.get());
+    });
+    rd->u->set_data(u);
+    auto* const prs = rd->r.get();
+    prs->set_scene(scn);
+    prs->set_camera(cam);
+    prs->set_model(mdl);
+    prs->set_mesh(msh->get_msh().get());
+    prs->set_material(msh->get_mat().get());
+    prs->set_diffuse_environment(reinterpret_cast<texture::Cube*>(input_textures[DIFFUSE_ENVIRONMENT_INDEX]));
+    prs->set_specular_environment(reinterpret_cast<texture::Cube*>(input_textures[SPECULAR_ENVIRONMENT_INDEX]));
+    prs->set_ambient_occlusion(reinterpret_cast<texture::Texture2D*>(input_textures[AMBIENT_OCCLUSION_INDEX]));
+    prs->set_brdflut(reinterpret_cast<texture::Texture2D*>(input_textures[BRDFLUT_INDEX]));
+    for (int shadow_caster_directional_light_index = 0, shadow_map_index = SHADOW_MAP_000_INDEX;
+         shadow_caster_directional_light_index < GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER;
+         ++shadow_caster_directional_light_index) {
+        for (int cascaded_index = 0; cascaded_index < GX_MAX_SHADOW_CASCADES; ++cascaded_index, ++shadow_map_index) {
+            prs->set_directional_lights_shadow_map(
+                reinterpret_cast<texture::Texture2D*>(input_textures[shadow_map_index]),
+                shadow_caster_directional_light_index, cascaded_index);
         }
-        kernel->secondary_cmd->bind(prs);
     }
+    kernel->secondary_cmd->bind(prs);
 }
 
 gearoenix::render::graph::node::ForwardPbr::ForwardPbr(
     engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
     : Node(
+        Type::ForwardPbr,
         e,
         pipeline::Type::ForwardPbr,
         4 + GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER * GX_MAX_SHADOW_CASCADES,
@@ -160,14 +151,14 @@ gearoenix::render::graph::node::ForwardPbr::ForwardPbr(
     for (auto& f : frames) {
         f = std::make_unique<ForwardPbrFrame>(e);
     }
-    auto* const txtmgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
-    core::sync::EndCaller<texture::Cube> txtcubecall([call](const std::shared_ptr<texture::Cube>&) {});
-    core::sync::EndCaller<texture::Texture2D> txt2dcall([call](const std::shared_ptr<texture::Texture2D>&) {});
+    auto* const txt_mgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
+    core::sync::EndCaller<texture::Cube> txt_cube_call([call](const std::shared_ptr<texture::Cube>&) {});
+    core::sync::EndCaller<texture::Texture2D> txt_2d_call([call](const std::shared_ptr<texture::Texture2D>&) {});
 
-    input_textures[DIFFUSE_ENVIRONMENT_INDEX] = txtmgr->get_cube_zero_3c(txtcubecall).get();
-    input_textures[SPECULAR_ENVIRONMENT_INDEX] = txtmgr->get_cube_zero_3c(txtcubecall).get();
-    input_textures[AMBIENT_OCCLUSION_INDEX] = txtmgr->get_2d_one_1c(txt2dcall).get();
-    input_textures[BRDFLUT_INDEX] = txtmgr->get_2d_one_2c(txt2dcall).get();
+    input_textures[DIFFUSE_ENVIRONMENT_INDEX] = txt_mgr->get_cube_zero_3c(txt_cube_call).get();
+    input_textures[SPECULAR_ENVIRONMENT_INDEX] = txt_mgr->get_cube_zero_3c(txt_cube_call).get();
+    input_textures[AMBIENT_OCCLUSION_INDEX] = txt_mgr->get_2d_one_1c(txt_2d_call).get();
+    input_textures[BRDFLUT_INDEX] = txt_mgr->get_2d_one_2c(txt_2d_call).get();
 }
 
 gearoenix::render::graph::node::ForwardPbr::~ForwardPbr() noexcept
@@ -204,6 +195,7 @@ void gearoenix::render::graph::node::ForwardPbr::update() noexcept
         kernel->render_data_pool.refresh();
         kernel->secondary_cmd->begin();
     }
+    models.clear();
 }
 
 void gearoenix::render::graph::node::ForwardPbr::set_scene(const scene::Scene* const s) noexcept
@@ -214,16 +206,9 @@ void gearoenix::render::graph::node::ForwardPbr::set_scene(const scene::Scene* c
 void gearoenix::render::graph::node::ForwardPbr::set_camera(const camera::Camera* const c) noexcept
 {
     cam = c;
-}
-
-void gearoenix::render::graph::node::ForwardPbr::set_opaque_models(const std::vector<model::Model*>* const ms) noexcept
-{
-    opaque_models = ms;
-}
-
-void gearoenix::render::graph::node::ForwardPbr::set_transparent_models(const std::map<core::Real, std::vector<model::Model*>>* const ms) noexcept
-{
-    transparent_models = ms;
+    const auto& cam_uni = cam->get_uniform();
+    if (nullptr != render_target)
+        render_target->set_clipping(cam_uni.clip_width, cam_uni.clip_height);
 }
 
 void gearoenix::render::graph::node::ForwardPbr::set_directional_lights(const std::map<core::Real, std::map<light::Directional*, light::CascadeInfo*>>* const m) noexcept
@@ -234,15 +219,15 @@ void gearoenix::render::graph::node::ForwardPbr::set_directional_lights(const st
     for (const auto& priority_lights_cascades_info : *m) {
         for (const auto& light_cascades_info : priority_lights_cascades_info.second) {
             auto& cds = light_cascades_info.second->get_cascades_data();
-            int cascaded_inex = 0;
+            int cascaded_index = 0;
             for (const light::CascadeInfo::PerCascade& c : cds) {
                 graph::node::ShadowMapper* const shm = c.shadow_mapper.get();
                 core::graph::Node::connect(shm, 0, this, shadow_map_index);
                 input_textures[shadow_map_index] = shm->get_output_texture(0).get();
-                ++cascaded_inex;
+                ++cascaded_index;
                 ++shadow_map_index;
             }
-            for (; cascaded_inex < GX_MAX_SHADOW_CASCADES; ++cascaded_inex, ++shadow_map_index) {
+            for (; cascaded_index < GX_MAX_SHADOW_CASCADES; ++cascaded_index, ++shadow_map_index) {
                 clear_provider(shadow_map_index);
                 input_textures[shadow_map_index] = nullptr;
             }
@@ -250,7 +235,7 @@ void gearoenix::render::graph::node::ForwardPbr::set_directional_lights(const st
         }
     }
     for (; directional_light_index < GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER; ++directional_light_index) {
-        for (int cascaded_inex = 0; cascaded_inex < GX_MAX_SHADOW_CASCADES; ++cascaded_inex, ++shadow_map_index) {
+        for (int cascaded_index = 0; cascaded_index < GX_MAX_SHADOW_CASCADES; ++cascaded_index, ++shadow_map_index) {
             clear_provider(shadow_map_index);
             input_textures[shadow_map_index] = nullptr;
         }
@@ -261,6 +246,7 @@ void gearoenix::render::graph::node::ForwardPbr::record(const unsigned int kerne
 {
     const unsigned int kernels_count = e->get_kernels()->get_threads_count();
     unsigned int task_number = 0;
+    auto* const kernel = frame->kernels[kernel_index].get();
 
 #define GX_DO_TASK(expr)                   \
     {                                      \
@@ -271,18 +257,26 @@ void gearoenix::render::graph::node::ForwardPbr::record(const unsigned int kerne
         task_number %= kernels_count;      \
     }
 
-    for (auto* const m : *opaque_models) {
-        GX_DO_TASK(record(m, kernel_index))
+    for (auto* const models_meshes : models) {
+        for (const auto& model_meshes : *models_meshes) {
+            GX_DO_TASK(
+                const ForwardPbrUniform u(directional_lights, scn, model_meshes.first);
+                for (const auto* const msh
+                     : model_meshes.second) {
+                    record(model_meshes.first, msh, u, kernel);
+                })
+        }
     }
+}
 
-#undef GX_DO_TASK
-
-    // TODO
-    // This is temporary it is better to have a separate command buffer for transparent objects.
-    if (kernels_count - 1 == kernel_index) {
-        for (const auto& otms : *transparent_models) {
-            for (auto* const m : otms.second) {
-                record(m, kernel_index, material::TranslucencyMode::Transparent);
+void gearoenix::render::graph::node::ForwardPbr::record_continuously(unsigned int kernel_index) noexcept
+{
+    auto* const kernel = frame->kernels[kernel_index].get();
+    for (auto* const models_meshes : models) {
+        for (const auto& model_meshes : *models_meshes) {
+            const ForwardPbrUniform u(directional_lights, scn, model_meshes.first);
+            for (const auto* const msh : model_meshes.second) {
+                record(model_meshes.first, msh, u, kernel);
             }
         }
     }
@@ -297,6 +291,11 @@ void gearoenix::render::graph::node::ForwardPbr::submit() noexcept
         cmd->record(k->secondary_cmd.get());
     }
     Node::submit();
+}
+
+void gearoenix::render::graph::node::ForwardPbr::add_models(const std::map<const model::Model*, std::vector<const model::Mesh*>>* m) noexcept
+{
+    models.push_back(m);
 }
 
 gearoenix::render::graph::node::ForwardPbrFrame::ForwardPbrFrame(engine::Engine* e) noexcept

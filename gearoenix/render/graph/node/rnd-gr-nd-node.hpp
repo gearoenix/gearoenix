@@ -21,7 +21,7 @@
 /// Each node will get data of the light, scene, camera, model, ...
 /// Always there is and must be a single provider for each dependency
 /// But there might be several or zero consumer for a data
-/// This system can be used to push independent commands on separate queue
+/// This system can be used to push independent commands on separate command queues
 
 namespace gearoenix::render {
 namespace command {
