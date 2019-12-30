@@ -6,6 +6,7 @@
 #include "../../sync/rnd-sy-semaphore.hpp"
 
 gearoenix::render::graph::node::Node::Node(
+    const Type t,
     engine::Engine* const e,
     const pipeline::Type pipeline_type_id,
     const unsigned int input_textures_count,
@@ -14,12 +15,13 @@ gearoenix::render::graph::node::Node::Node(
     const std::vector<std::string>& output_links,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
     : core::graph::Node(input_links, output_links)
+    , render_node_type(t)
     , e(e)
 {
     const auto frames_count = e->get_frames_count();
     const auto& cmd_mgr = e->get_command_manager();
-    core::sync::EndCaller<pipeline::Pipeline> pipcall([call](const std::shared_ptr<pipeline::Pipeline>&) {});
-    render_pipeline = e->get_pipeline_manager()->get(pipeline_type_id, pipcall);
+    core::sync::EndCaller<pipeline::Pipeline> pip_call([call](const std::shared_ptr<pipeline::Pipeline>&) {});
+    render_pipeline = e->get_pipeline_manager()->get(pipeline_type_id, pip_call);
     input_textures.resize(input_textures_count);
     for (unsigned int i = 0; i < input_textures_count; ++i) {
         input_textures[i] = nullptr;
@@ -40,9 +42,9 @@ gearoenix::render::graph::node::Node::Node(
 void gearoenix::render::graph::node::Node::update_next_semaphores() noexcept
 {
     const auto fc = e->get_frames_count();
-    nxt_sems.resize(fc);
+    next_semaphores.resize(fc);
     for (unsigned int i = 0; i < fc; ++i) {
-        auto& s = nxt_sems[i];
+        auto& s = next_semaphores[i];
         for (auto& l : links_consumers_frames_semaphores)
             for (auto& c : l)
                 s.push_back(c.second[i].get());
@@ -52,9 +54,9 @@ void gearoenix::render::graph::node::Node::update_next_semaphores() noexcept
 void gearoenix::render::graph::node::Node::update_previous_semaphores() noexcept
 {
     const auto fc = e->get_frames_count();
-    pre_sems.resize(fc);
+    previous_semaphores.resize(fc);
     for (unsigned int i = 0; i < fc; ++i) {
-        auto& s = pre_sems[i];
+        auto& s = previous_semaphores[i];
         for (auto& p : link_providers_frames_semaphores) {
             if (p.size() != fc)
                 continue;
@@ -79,12 +81,12 @@ void gearoenix::render::graph::node::Node::set_provider(const unsigned int input
     if (cur.first == o && cur.second == provider_output_link_index)
         return;
     core::graph::Node::set_provider(input_link_index, o, provider_output_link_index);
-    const auto& sems = dynamic_cast<Node*>(o)->get_link_frames_semaphore(
+    const auto& semaphores = dynamic_cast<Node*>(o)->get_link_frames_semaphore(
         provider_output_link_index, asset_id, input_link_index);
-    auto& mysems = link_providers_frames_semaphores[input_link_index];
-    mysems.clear();
-    for (const auto& s : sems)
-        mysems.push_back(s.get());
+    auto& my_semaphores = link_providers_frames_semaphores[input_link_index];
+    my_semaphores.clear();
+    for (const auto& s : semaphores)
+        my_semaphores.push_back(s.get());
     /// This is because of flexibility in frames-count, and it does'nt happen very often
     update_previous_semaphores();
 }
@@ -133,8 +135,8 @@ void gearoenix::render::graph::node::Node::update() noexcept
 void gearoenix::render::graph::node::Node::submit() noexcept
 {
     const unsigned int frame_number = e->get_frame_number();
-    auto& pre = pre_sems[frame_number];
-    auto& nxt = nxt_sems[frame_number];
+    auto& pre = previous_semaphores[frame_number];
+    auto& nxt = next_semaphores[frame_number];
     auto* const cmd = frames_primary_cmd[frame_number].get();
     e->submit(pre.size(), pre.data(), 1, &cmd, nxt.size(), nxt.data());
 }

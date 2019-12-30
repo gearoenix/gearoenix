@@ -119,6 +119,7 @@ namespace graph::node {
         void add_models(const std::map<model::Model*, mesh::Mesh*>* models) noexcept;
         void set_directional_lights(const std::map<core::Real, std::map<light::Directional*, light::CascadeInfo*>>* m) noexcept;
         void record(unsigned int kernel_index) noexcept;
+        void record_continuously(unsigned int kernel_index) noexcept;
         /// This will be called at the end of each frame for pushing jobs to GPU
         void submit() noexcept final;
     };

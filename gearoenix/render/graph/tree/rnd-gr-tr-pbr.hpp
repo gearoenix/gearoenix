@@ -11,6 +11,7 @@
 
 namespace gearoenix::render::graph::node {
 class ForwardPbr;
+class Node;
 class Unlit;
 }
 namespace gearoenix::render::light {
@@ -31,7 +32,7 @@ public:
     };
     struct CameraData {
         Nodes opaques;
-        std::map<core::Real, Nodes> transparents;
+        std::vector<node::Node*> transparencies;
     };
     using SceneData = std::map<core::Real, std::map<const camera::Camera*, CameraData>>;
 

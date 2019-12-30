@@ -3,6 +3,7 @@
 #include "../../../core/graph/cr-gr-node.hpp"
 #include "../../../core/sync/cr-sync-end-caller.hpp"
 #include "../../pipeline/rnd-pip-type.hpp"
+#include "rnd-gr-nd-type.hpp"
 #include <map>
 #include <memory>
 #include <vector>
@@ -41,6 +42,7 @@ namespace texture {
 }
 namespace graph::node {
     class Node : public core::graph::Node {
+        GX_GET_CVAL_PRT(Type, render_node_type)
     protected:
         engine::Engine* const e;
         std::vector<texture::Texture*> input_textures;
@@ -49,10 +51,11 @@ namespace graph::node {
         std::vector<std::map<std::pair<core::Id, unsigned int>, std::vector<std::shared_ptr<sync::Semaphore>>>> links_consumers_frames_semaphores;
         std::vector<std::unique_ptr<command::Buffer>> frames_primary_cmd;
         /// These are for preventing redundant allocation & deallocation in render loop
-        std::vector<std::vector<sync::Semaphore*>> pre_sems, nxt_sems;
+        std::vector<std::vector<sync::Semaphore*>> previous_semaphores, next_semaphores;
         std::shared_ptr<texture::Target> render_target = nullptr;
         std::shared_ptr<pipeline::Pipeline> render_pipeline = nullptr;
         Node(
+            Type t,
             engine::Engine* e,
             pipeline::Type pipeline_type_id,
             unsigned int input_textures_count,
@@ -64,7 +67,7 @@ namespace graph::node {
         void update_previous_semaphores() noexcept;
 
     public:
-        virtual ~Node() noexcept;
+        ~Node() noexcept override;
         void set_provider(unsigned int input_link_index, core::graph::Node* o, unsigned int provider_output_link_index) noexcept final;
         void remove_provider(unsigned int input_link_index) noexcept final;
         void set_providers_count(std::size_t count) noexcept final;

@@ -11,6 +11,7 @@
 #include "../../scene/rnd-scn-scene.hpp"
 #include "../node/rnd-gr-nd-forward-pbr.hpp"
 #include "../node/rnd-gr-nd-shadow-mapper.hpp"
+#include "../node/rnd-gr-nd-unlit.hpp"
 #include <memory>
 
 #define GX_START_TASKS            \
@@ -62,66 +63,76 @@ void gearoenix::render::graph::tree::Pbr::update() noexcept
                     const auto& opaque_materials = models_lights.opaque_container_models;
                     const auto& transparent_materials = models_lights.transparent_container_models;
                     CameraData& camera_nodes = camera_priority_nodes[cam];
-#define CREATE_NODE(cls, x, np)                                                                          \
-    {                                                                                                    \
-        auto* const n = np.get_next([this] {                                                             \
-            auto* const n = new node::cls(e, core::sync::EndCaller<core::sync::EndCallerIgnore>([] {})); \
-            n->set_render_target(e->get_main_render_target());                                           \
-            return n;                                                                                    \
-        });                                                                                              \
-        n->set_scene(scn);                                                                               \
-        n->set_camera(cam);                                                                              \
-        n->set_directional_lights(&shadow_caster_directional_lights);                                    \
-        n->add_models(&material_models.second);                                                          \
-        n->update();                                                                                     \
-        x = n;                                                                                           \
-    }
-#define CREATE_NODES(mm)                                                           \
-    for (const auto& material_models : mm) {                                       \
-        switch (material_models.first) {                                           \
-        case material::Type::Pbr: {                                                \
-            CREATE_NODE(ForwardPbr, camera_nodes.opaques.forward_pbr, forward_pbr) \
-            break;                                                                 \
-        }                                                                          \
-        case material::Type::Unlit: {                                              \
-            CREATE_NODE(Unlit, camera_nodes.opaques.unlit, unlit)                  \
-            break;                                                                 \
-        }                                                                          \
-        default:                                                                   \
-            GXUNEXPECTED                                                           \
-        }                                                                          \
-    }
-                    CREATE_NODES(opaque_materials)
-#undef CREATE_NODE
-#define CREATE_NODE(cls, x, np)                                                                          \
-    {                                                                                                    \
-        auto* const n = previous_##np != nullptr ? previous_##np : np.get_next([this] {                  \
-            auto* const n = new node::cls(e, core::sync::EndCaller<core::sync::EndCallerIgnore>([] {})); \
-            n->set_render_target(e->get_main_render_target());                                           \
-            return n;                                                                                    \
-        });                                                                                              \
-        n->set_scene(scn);                                                                               \
-        n->set_camera(cam);                                                                              \
-        n->set_directional_lights(&shadow_caster_directional_lights);                                    \
-        n->add_models(&material_models.second);                                                          \
-        n->update();                                                                                     \
-        x = n;                                                                                           \
-        previous_##np = n;                                                                               \
-    }
+                    for (const auto& material_models : opaque_materials) {
+                        switch (material_models.first) {
+                        case material::Type::Pbr: {
+                            auto* const n = forward_pbr.get_next([this] {
+                                auto* const n = new node::ForwardPbr(e, core::sync::EndCaller<core::sync::EndCallerIgnore>([] {}));
+                                n->set_render_target(e->get_main_render_target());
+                                return n;
+                            });
+                            n->set_scene(scn);
+                            n->set_camera(cam);
+                            n->set_directional_lights(&shadow_caster_directional_lights);
+                            n->add_models(&material_models.second);
+                            n->update();
+                            camera_nodes.opaques.forward_pbr = n;
+                            break;
+                        }
+                        case material::Type::Unlit: {
+                            auto* const n = unlit.get_next([this] {
+                                auto* const n = new node::Unlit(e, core::sync::EndCaller<core::sync::EndCallerIgnore>([] {}));
+                                n->set_render_target(e->get_main_render_target());
+                                return n;
+                            });
+                            n->set_camera(cam);
+                            n->add_models(&material_models.second);
+                            n->update();
+                            camera_nodes.opaques.unlit = n;
+                            break;
+                        }
+                        default:
+                            GXUNEXPECTED
+                        }
+                    }
                     node::ForwardPbr* previous_forward_pbr = nullptr;
                     node::Unlit* previous_unlit = nullptr;
+                    camera_nodes.transparencies.clear();
                     for (const auto& dis : transparent_materials) {
-                        auto& transparent_nodes = camera_nodes.transparents[dis.first];
                         for (const auto& material_models : dis.second) {
                             switch (material_models.first) {
                             case material::Type::Pbr: {
                                 previous_unlit = nullptr;
-                                CREATE_NODE(ForwardPbr, transparent_nodes.forward_pbr, forward_pbr)
+                                if (previous_forward_pbr == nullptr) {
+                                    previous_forward_pbr = forward_pbr.get_next([this] {
+                                        auto* const n = new node::ForwardPbr(
+                                            e, core::sync::EndCaller<core::sync::EndCallerIgnore>([] {}));
+                                        n->set_render_target(e->get_main_render_target());
+                                        return n;
+                                    });
+                                    camera_nodes.transparencies.push_back(previous_forward_pbr);
+                                }
+                                previous_forward_pbr->set_scene(scn);
+                                previous_forward_pbr->set_camera(cam);
+                                previous_forward_pbr->set_directional_lights(&shadow_caster_directional_lights);
+                                previous_forward_pbr->add_models(&material_models.second);
+                                previous_forward_pbr->update();
                                 break;
                             }
                             case material::Type::Unlit: {
                                 previous_forward_pbr = nullptr;
-                                CREATE_NODE(Unlit, transparent_nodes.unlit, unlit)
+                                if (previous_unlit == nullptr) {
+                                    previous_unlit = unlit.get_next([this] {
+                                        auto* const n = new node::Unlit(
+                                            e, core::sync::EndCaller<core::sync::EndCallerIgnore>([] {}));
+                                        n->set_render_target(e->get_main_render_target());
+                                        return n;
+                                    });
+                                    camera_nodes.transparencies.push_back(previous_unlit);
+                                }
+                                previous_unlit->set_camera(cam);
+                                previous_unlit->add_models(&material_models.second);
+                                previous_unlit->update();
                                 break;
                             }
                             default:
@@ -149,26 +160,31 @@ void gearoenix::render::graph::tree::Pbr::record(const unsigned int kernel_index
         cas->record(kernel_index);
     }
 
-    for (const auto& nnnn : nodes) {
-        for (const auto& nnn : nnnn.second) {
-            for (const auto& nn : nnn.second) {
-                for (const auto& n : nn.second) {
-                    const auto& cam = n.second.opaques;
-                    cam.forward_pbr->record(kernel_index);
-                    cam.unlit->record(kernel_index);
+    for (const auto& priority_scenes : nodes) {
+        for (const auto& scene_nodes : priority_scenes.second) {
+            for (const auto& priority_cameras : scene_nodes.second) {
+                for (const auto& camera_nodes : priority_cameras.second) {
+                    const auto& opaques = camera_nodes.second.opaques;
+                    if (opaques.forward_pbr != nullptr)
+                        opaques.forward_pbr->record(kernel_index);
+                    if (opaques.unlit != nullptr)
+                        opaques.unlit->record(kernel_index);
                 }
             }
         }
     }
 
-    for (const auto& nnnn : nodes) {
-        for (const auto& nnn : nnnn.second) {
-            for (const auto& nn : nnn.second) {
-                for (const auto& n : nn.second) {
-                    auto& distances = n.second.transparents;
-                    for (const auto& distance_mdls : distances) {
-                        GX_DO_TASK(distance_mdls.second.forward_pbr->record_continuously(kernel_index))
-                        GX_DO_TASK(distance_mdls.second.unlit->record_continuously(kernel_index))
+    for (const auto& priority_scenes : nodes) {
+        for (const auto& scene_nodes : priority_scenes.second) {
+            for (const auto& priority_cameras : scene_nodes.second) {
+                for (const auto& camera_nodes : priority_cameras.second) {
+                    for (auto* const node : camera_nodes.second.transparencies) {
+                        GX_DO_TASK(
+                            if (node->get_render_node_type() == node::Type::ForwardPbr) {
+                                reinterpret_cast<node::ForwardPbr*>(node)->record_continuously(kernel_index);
+                            } else {
+                                reinterpret_cast<node::Unlit*>(node)->record_continuously(kernel_index);
+                            })
                     }
                 }
             }
@@ -182,26 +198,30 @@ void gearoenix::render::graph::tree::Pbr::submit() noexcept
         cas->submit();
     }
 
-    for (auto& nnnn : nodes) {
-        for (auto& nnn : nnnn.second) {
-            for (auto& nn : nnn.second) {
-                for (auto& n : nn.second) {
-                    const auto& cam = n.second.opaques;
-                    cam.forward_pbr->submit();
-                    cam.unlit->submit();
+    for (auto& priority_scenes : nodes) {
+        for (auto& scene_nodes : priority_scenes.second) {
+            for (auto& priority_cameras : scene_nodes.second) {
+                for (auto& camera_nodes : priority_cameras.second) {
+                    const auto& opaques = camera_nodes.second.opaques;
+                    if (opaques.forward_pbr != nullptr)
+                        opaques.forward_pbr->submit();
+                    if (opaques.unlit != nullptr)
+                        opaques.unlit->submit();
                 }
             }
         }
     }
 
-    for (const auto& nnnn : nodes) {
-        for (const auto& nnn : nnnn.second) {
-            for (const auto& nn : nnn.second) {
-                for (const auto& n : nn.second) {
-                    auto& distances = n.second.transparents;
-                    for (const auto& distance_mdls : distances) {
-                        distance_mdls.second.forward_pbr->submit();
-                        distance_mdls.second.unlit->submit();
+    for (const auto& priority_scenes : nodes) {
+        for (const auto& scene_nodes : priority_scenes.second) {
+            for (const auto& priority_cameras : scene_nodes.second) {
+                for (const auto& camera_nodes : priority_cameras.second) {
+                    for (auto* const node : camera_nodes.second.transparencies) {
+                        if (node->get_render_node_type() == node::Type::ForwardPbr) {
+                            reinterpret_cast<node::ForwardPbr*>(node)->submit();
+                        } else {
+                            reinterpret_cast<node::Unlit*>(node)->submit();
+                        }
                     }
                 }
             }
