@@ -9,9 +9,9 @@ class Engine;
 
 namespace gearoenix::gles2::shader {
 class ShadowMapper : public Shader {
-    GX_GLES2_UNIFORM_FLOAT(material_alpha, 1)
-    GX_GLES2_UNIFORM_FLOAT(material_alpha_cutoff, 1)
     GX_GLES2_UNIFORM_TEXTURE(material_color)
+    GX_GLES2_UNIFORM_FLOAT(effect_alpha, 1)
+    GX_GLES2_UNIFORM_FLOAT(effect_alpha_cutoff, 1)
     GX_GLES2_UNIFORM_MATRIX(effect_mvp, 4, 1)
 public:
     ShadowMapper(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;

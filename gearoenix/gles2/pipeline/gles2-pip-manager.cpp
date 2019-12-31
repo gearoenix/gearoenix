@@ -1,6 +1,5 @@
 #include "gles2-pip-manager.hpp"
 #ifdef GX_USE_OPENGL_ES2
-#include "../buffer/gles2-buf-uniform.hpp"
 #include "../engine/gles2-eng-engine.hpp"
 #include "gles2-pip-forward-pbr.hpp"
 #include "gles2-pip-shadow-mapper.hpp"
@@ -10,7 +9,7 @@ gearoenix::gles2::pipeline::Manager::Manager(engine::Engine* const engine) noexc
 {
 }
 
-gearoenix::gles2::pipeline::Manager::~Manager() noexcept {}
+gearoenix::gles2::pipeline::Manager::~Manager() noexcept = default;
 
 std::shared_ptr<gearoenix::render::pipeline::Pipeline> gearoenix::gles2::pipeline::Manager::get(const render::pipeline::Type pipeline_type_id, core::sync::EndCaller<render::pipeline::Pipeline>& end) noexcept
 {
@@ -24,8 +23,7 @@ std::shared_ptr<gearoenix::render::pipeline::Pipeline> gearoenix::gles2::pipelin
             return std::shared_ptr<render::pipeline::Pipeline>(new ShadowMapper(gles2eng,
                 core::sync::EndCaller<core::sync::EndCallerIgnore>([end] {})));
         default:
-            GXLOGF("Unexpected pipeline type: " << static_cast<unsigned int>(pipeline_type_id));
-            break;
+            GXLOGF("Unexpected pipeline type: " << static_cast<unsigned int>(pipeline_type_id))
         }
     });
     end.set_data(p);

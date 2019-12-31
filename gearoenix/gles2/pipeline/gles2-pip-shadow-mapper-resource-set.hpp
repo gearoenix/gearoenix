@@ -4,19 +4,17 @@
 #ifdef GX_USE_OPENGL_ES2
 #include "../../render/pipeline/rnd-pip-shadow-mapper-resource-set.hpp"
 #include "gles2-pip-resource-set.hpp"
-namespace gearoenix {
-namespace gles2 {
-    namespace shader {
-        class ShadowMapper;
-    }
-    namespace pipeline {
-        class ShadowMapperResourceSet : public ResourceSet, public render::pipeline::ShadowMapperResourceSet {
-        public:
-            ShadowMapperResourceSet(const std::shared_ptr<shader::ShadowMapper>& shd);
-            void bind(gl::uint& bound_shader_program) const override final;
-        };
-    }
+
+namespace gearoenix::gles2::shader {
+class ShadowMapper;
 }
+
+namespace gearoenix::gles2::pipeline {
+class ShadowMapperResourceSet : public ResourceSet, public render::pipeline::ShadowMapperResourceSet {
+public:
+    explicit ShadowMapperResourceSet(const std::shared_ptr<shader::ShadowMapper>& shd) noexcept;
+    void bind(gl::uint& bound_shader_program) const noexcept final;
+};
 }
 #endif
 #endif

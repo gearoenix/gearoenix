@@ -6,7 +6,8 @@
 #include "../../command/rnd-cmd-buffer.hpp"
 #include "../../command/rnd-cmd-manager.hpp"
 #include "../../engine/rnd-eng-engine.hpp"
-#include "../../material/rnd-mat-material.hpp"
+#include "../../material/rnd-mat-pbr.hpp"
+#include "../../material/rnd-mat-unlit.hpp"
 #include "../../mesh/rnd-msh-mesh.hpp"
 #include "../../model/rnd-mdl-mesh.hpp"
 #include "../../model/rnd-mdl-model.hpp"
@@ -64,11 +65,11 @@ gearoenix::render::graph::node::ShadowMapper::ShadowMapper(
         frames[i] = std::make_unique<ShadowMapperFrame>(e);
     }
     const bool week_hwr = e->get_engine_type() == engine::Type::OPENGL_ES2;
-    std::vector<texture::Info> txt_infoes = { texture::Info() };
-    txt_infoes[0].f = week_hwr ? texture::TextureFormat::D16 : texture::TextureFormat::D32;
+    std::vector<texture::Info> txt_infos = { texture::Info() };
+    txt_infos[0].f = week_hwr ? texture::TextureFormat::D16 : texture::TextureFormat::D32;
     render_target = std::shared_ptr<texture::Target>(e->create_render_target(
         core::asset::Manager::create_id(),
-        txt_infoes,
+        txt_infos,
         week_hwr ? 1024 : 2048,
         week_hwr ? 1024 : 2048,
         call));
@@ -97,18 +98,35 @@ void gearoenix::render::graph::node::ShadowMapper::record(const math::Mat4x4& mv
     const auto& kernel = frame->kernels[kernel_index];
     const std::map<core::Id, std::shared_ptr<model::Mesh>>& meshes = m->get_meshes();
     for (const std::pair<const core::Id, std::shared_ptr<model::Mesh>>& id_mesh : meshes) {
-        const auto& mat = id_mesh.second->get_material();
-        /// TODO: check for shadow casting
-        /// if(!mat->is_shadow_caster()) continue;
-        const auto& msh = id_mesh.second->get_mesh();
+        const auto* const mat = id_mesh.second->get_mat().get();
+        const auto* const mat_buff = m->get_uniform_buffers()->get_buffer();
+        ShadowMapperUniform u;
+        u.mvp = mvp;
+        switch (mat->get_material_type()) {
+        case material::Type::Unlit: {
+            const auto* const ptr = mat_buff->get_ptr<material::Unlit::Uniform>();
+            u.alpha = ptr->alpha;
+            u.alpha_cutoff = ptr->alpha_cutoff;
+            break;
+        }
+        case material::Type::Pbr: {
+            const auto* const ptr = mat_buff->get_ptr<material::Pbr::Uniform>();
+            u.alpha = ptr->alpha;
+            u.alpha_cutoff = ptr->alpha_cutoff;
+            break;
+        }
+        default:
+            GXUNEXPECTED
+        }
+        const auto* const msh = id_mesh.second->get_msh().get();
         auto* const rd = kernel->render_data_pool.get_next([this] {
             return new ShadowMapperRenderData(e, render_pipeline.get());
         });
         const auto& ub = rd->u;
-        ub->set_data(mvp);
+        ub->set_data(u);
         const auto& prs = rd->r;
-        prs->set_mesh(msh.get());
-        prs->set_material(mat.get());
+        prs->set_mesh(msh);
+        prs->set_material(mat);
         const auto& cmd = kernel->secondary_cmd;
         cmd->bind(prs.get());
     }

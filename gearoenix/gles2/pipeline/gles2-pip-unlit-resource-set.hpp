@@ -14,7 +14,7 @@ namespace gearoenix::gles2::pipeline {
 class UnlitResourceSet : public ResourceSet, public render::pipeline::UnlitResourceSet {
 public:
     explicit UnlitResourceSet(const std::shared_ptr<shader::Unlit>& shd) noexcept;
-    void bind(gl::uint& bound_shader_program) const final;
+    void bind(gl::uint& bound_shader_program) const noexcept final;
 };
 }
 

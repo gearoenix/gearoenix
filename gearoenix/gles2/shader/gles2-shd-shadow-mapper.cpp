@@ -41,9 +41,9 @@ gearoenix::gles2::shader::ShadowMapper::ShadowMapper(engine::Engine* const e, co
         set_fragment_shader(fragment_shader_code);
         link();
         GX_GLES2_SHADER_SET_TEXTURE_INDEX_STARTING
-        GX_GLES2_THIS_GET_UNIFORM(material_alpha)
-        GX_GLES2_THIS_GET_UNIFORM(material_alpha_cutoff)
         GX_GLES2_THIS_GET_UNIFORM_TEXTURE(material_color)
+        GX_GLES2_THIS_GET_UNIFORM(effect_alpha)
+        GX_GLES2_THIS_GET_UNIFORM(effect_alpha_cutoff)
         GX_GLES2_THIS_GET_UNIFORM(effect_mvp);
     });
 }
