@@ -3,6 +3,7 @@
 #include "../engine/glc3-eng-engine.hpp"
 #include "glc3-pip-forward-pbr.hpp"
 #include "glc3-pip-shadow-mapper.hpp"
+#include "glc3-pip-unlit.hpp"
 
 gearoenix::glc3::pipeline::Manager::Manager(engine::Engine* const engine) noexcept
     : render::pipeline::Manager(engine)
@@ -21,6 +22,9 @@ std::shared_ptr<gearoenix::render::pipeline::Pipeline> gearoenix::glc3::pipeline
                 core::sync::EndCaller<core::sync::EndCallerIgnore>([end] {})));
         case render::pipeline::Type::ShadowMapper:
             return std::shared_ptr<render::pipeline::Pipeline>(new ShadowMapper(gles2eng,
+                core::sync::EndCaller<core::sync::EndCallerIgnore>([end] {})));
+        case render::pipeline::Type::Unlit:
+            return std::shared_ptr<render::pipeline::Pipeline>(new Unlit(gles2eng,
                 core::sync::EndCaller<core::sync::EndCallerIgnore>([end] {})));
         default:
             GXLOGF("Unexpected pipeline type: " << static_cast<unsigned int>(pipeline_type_id))

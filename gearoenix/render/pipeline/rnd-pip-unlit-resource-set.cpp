@@ -10,6 +10,11 @@ void gearoenix::render::pipeline::UnlitResourceSet::set_material(const material:
     color = unlit_mat->get_color_texture().get();
 }
 
+void gearoenix::render::pipeline::UnlitResourceSet::set_mesh(const mesh::Mesh* m) noexcept
+{
+    msh = m;
+}
+
 void gearoenix::render::pipeline::UnlitResourceSet::set_node_uniform_buffer(buffer::Uniform* b) noexcept
 {
     node_uniform_buffer = b;

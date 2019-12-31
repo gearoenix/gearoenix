@@ -58,6 +58,7 @@ void gearoenix::render::graph::node::Unlit::record(
     });
     rd->u->set_data(u);
     auto* const prs = rd->r.get();
+    prs->set_mesh(msh->get_msh().get());
     prs->set_material(msh->get_mat().get());
     kernel->secondary_cmd->bind(prs);
 }

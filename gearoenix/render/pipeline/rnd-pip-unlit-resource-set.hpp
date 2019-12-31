@@ -16,6 +16,7 @@ protected:
 public:
     ~UnlitResourceSet() noexcept override = default;
     void set_material(const material::Material* m) noexcept;
+    void set_mesh(const mesh::Mesh* m) noexcept;
     void set_node_uniform_buffer(buffer::Uniform* node_uniform_buffer) noexcept;
     void clean() noexcept override;
 };

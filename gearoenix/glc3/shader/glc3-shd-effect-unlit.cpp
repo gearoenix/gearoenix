@@ -26,7 +26,7 @@ gearoenix::glc3::shader::Unlit::Unlit(engine::Engine* const e, const core::sync:
                                                     "out vec4 frag_color;\n"
                                                     "void main()\n"
                                                     "{\n"
-                                                    "    vec4 tmp_v4 = texture(material_base_color, out_uv);\n"
+                                                    "    vec4 tmp_v4 = texture(material_color, out_uv);\n"
                                                     "    tmp_v4.w *= material_alpha;\n"
                                                     "    if(tmp_v4.w < material_alpha_cutoff) discard;\n"
                                                     "    frag_color = tmp_v4;\n"
