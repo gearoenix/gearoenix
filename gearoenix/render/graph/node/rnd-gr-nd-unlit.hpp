@@ -20,10 +20,6 @@ namespace gearoenix::render::command {
 class Buffer;
 }
 
-namespace gearoenix::render::mesh {
-class Mesh;
-}
-
 namespace gearoenix::render::model {
 class Model;
 class Mesh;
@@ -64,7 +60,7 @@ private:
     std::vector<std::unique_ptr<UnlitFrame>> frames;
     UnlitFrame* frame = nullptr;
     const camera::Camera* cam = nullptr;
-    const std::vector<std::map<model::Model*, mesh::Mesh*>*> models;
+    std::vector<const std::map<const model::Model*, std::vector<const model::Mesh*>>*> models;
 
     void record(const model::Mesh* msh, const UnlitUniform& u, UnlitKernel* kernel) noexcept;
 

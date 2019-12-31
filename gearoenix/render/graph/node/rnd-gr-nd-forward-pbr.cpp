@@ -207,8 +207,7 @@ void gearoenix::render::graph::node::ForwardPbr::set_camera(const camera::Camera
 {
     cam = c;
     const auto& cam_uni = cam->get_uniform();
-    if (nullptr != render_target)
-        render_target->set_clipping(cam_uni.clip_width, cam_uni.clip_height);
+    render_target->set_clipping(cam_uni.clip_width, cam_uni.clip_height);
 }
 
 void gearoenix::render::graph::node::ForwardPbr::set_directional_lights(const std::map<core::Real, std::map<light::Directional*, light::CascadeInfo*>>* const m) noexcept

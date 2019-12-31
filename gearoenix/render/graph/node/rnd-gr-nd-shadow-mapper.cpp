@@ -57,7 +57,7 @@ gearoenix::render::graph::node::ShadowMapperFrame::~ShadowMapperFrame() noexcept
 gearoenix::render::graph::node::ShadowMapper::ShadowMapper(
     engine::Engine* e,
     const core::sync::EndCaller<gearoenix::core::sync::EndCallerIgnore>& call) noexcept
-    : Node(e, pipeline::Type::ShadowMapper, 0, 1, { "start" }, { "depth" }, call)
+    : Node(Type::ShadowMapper, e, pipeline::Type::ShadowMapper, 0, 1, { "start" }, { "depth" }, call)
 {
     frames.resize(e->get_frames_count());
     for (unsigned int i = 0; i < e->get_frames_count(); ++i) {

@@ -65,5 +65,95 @@ void gearoenix::render::graph::node::Unlit::record(
 gearoenix::render::graph::node::Unlit::Unlit(
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
+    : Node(
+        Type::Unlit,
+        e,
+        pipeline::Type::Unlit,
+        0,
+        1,
+        {},
+        {
+            "color",
+        },
+        call)
+    , frames(e->get_frames_count())
 {
+    set_providers_count(input_textures.size());
+    for (auto& f : frames) {
+        f = std::make_unique<UnlitFrame>(e);
+    }
+}
+
+gearoenix::render::graph::node::Unlit::~Unlit() noexcept = default;
+
+void gearoenix::render::graph::node::Unlit::update() noexcept
+{
+    Node::update();
+    const unsigned int frame_number = e->get_frame_number();
+    frame = frames[frame_number].get();
+    auto& kernels = frame->kernels;
+    for (auto& kernel : kernels) {
+        kernel->render_data_pool.refresh();
+        kernel->secondary_cmd->begin();
+    }
+    models.clear();
+}
+
+void gearoenix::render::graph::node::Unlit::set_camera(const camera::Camera* const c) noexcept
+{
+    cam = c;
+    const auto& cam_uni = cam->get_uniform();
+    render_target->set_clipping(cam_uni.clip_width, cam_uni.clip_height);
+}
+
+void gearoenix::render::graph::node::Unlit::add_models(const std::map<const model::Model*, std::vector<const model::Mesh*>>* ms) noexcept
+{
+    models.push_back(ms);
+}
+
+void gearoenix::render::graph::node::Unlit::record(const unsigned int kernel_index) noexcept
+{
+    const unsigned int kernels_count = e->get_kernels()->get_threads_count();
+    unsigned int task_number = 0;
+    auto* const kernel = frame->kernels[kernel_index].get();
+    for (auto* const models_meshes : models) {
+        for (const auto& model_meshes : *models_meshes) {
+            if (task_number == kernel_index) {
+                const UnlitUniform u {
+                    .mvp = cam->get_uniform().view_projection * model_meshes.first->get_collider()->get_model_matrix()
+                };
+                for (const auto* const msh : model_meshes.second) {
+                    record(msh, u, kernel);
+                }
+            }
+            ++task_number;
+            task_number %= kernels_count;
+        }
+    }
+}
+
+void gearoenix::render::graph::node::Unlit::record_continuously(const unsigned int kernel_index) noexcept
+{
+    auto* const kernel = frame->kernels[kernel_index].get();
+    for (auto* const models_meshes : models) {
+        for (const auto& model_meshes : *models_meshes) {
+            const UnlitUniform u {
+                .mvp = cam->get_uniform().view_projection * model_meshes.first->get_collider()->get_model_matrix()
+            };
+            for (const auto* const msh : model_meshes.second) {
+                record(msh, u, kernel);
+            }
+        }
+    }
+}
+
+void gearoenix::render::graph::node::Unlit::submit() noexcept
+{
+    const unsigned int frame_number = e->get_frame_number();
+    command::Buffer* cmd = frames_primary_cmd[frame_number].get();
+    cmd->bind(render_target.get());
+    for (const auto& k : frame->kernels) {
+        cmd->record(k->secondary_cmd.get());
+    }
+    Node::submit();
 }
