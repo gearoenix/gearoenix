@@ -3,9 +3,7 @@
 #include "../../core/cr-function-loader.hpp"
 #include "../../gl/gl-constants.hpp"
 #include "../../gl/gl-loader.hpp"
-#include "../../system/sys-log.hpp"
 #include "../engine/glc3-eng-engine.hpp"
-#include "../glc3.hpp"
 #include <vector>
 
 void gearoenix::glc3::shader::Shader::create_program() noexcept
@@ -84,14 +82,14 @@ gearoenix::gl::uint gearoenix::glc3::shader::Shader::add_shader_to_program(const
     return shader_obj;
 }
 
-gearoenix::gl::uint gearoenix::glc3::shader::Shader::set_vertex_shader(const std::string& shd) noexcept
+void gearoenix::glc3::shader::Shader::set_vertex_shader(const std::string& shd) noexcept
 {
-    return add_shader_to_program(shd, GL_VERTEX_SHADER);
+    vertex_object = add_shader_to_program(shd, GL_VERTEX_SHADER);
 }
 
-gearoenix::gl::uint gearoenix::glc3::shader::Shader::set_fragment_shader(const std::string& shd) noexcept
+void gearoenix::glc3::shader::Shader::set_fragment_shader(const std::string& shd) noexcept
 {
-    return add_shader_to_program(shd, GL_FRAGMENT_SHADER);
+    fragment_object = add_shader_to_program(shd, GL_FRAGMENT_SHADER);
 }
 
 void gearoenix::glc3::shader::Shader::end_program(const gl::uint shader_program) noexcept

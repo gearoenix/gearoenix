@@ -209,6 +209,8 @@ SET(GX_ENGINE_SRC
         "${GX_ENGINE_SRC_DIR}glc3/pipeline/glc3-pip-unlit.hpp"
         "${GX_ENGINE_SRC_DIR}glc3/shader/glc3-shd-effect-forward-pbr.cpp"
         "${GX_ENGINE_SRC_DIR}glc3/shader/glc3-shd-effect-forward-pbr.hpp"
+        "${GX_ENGINE_SRC_DIR}glc3/shader/glc3-shd-effect-unlit.cpp"
+        "${GX_ENGINE_SRC_DIR}glc3/shader/glc3-shd-effect-unlit.hpp"
         "${GX_ENGINE_SRC_DIR}glc3/shader/glc3-shd-shader.cpp"
         "${GX_ENGINE_SRC_DIR}glc3/shader/glc3-shd-shader.hpp"
         "${GX_ENGINE_SRC_DIR}glc3/shader/glc3-shd-shadow-mapper.cpp"
