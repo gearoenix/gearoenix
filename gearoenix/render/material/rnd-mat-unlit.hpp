@@ -15,7 +15,7 @@ public:
 public:
     Unlit(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept;
     Unlit(system::stream::Stream* f, engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept;
-    ~Unlit() noexcept = default;
+    ~Unlit() noexcept final;
     void update() noexcept final;
     void set_color(
         core::Real r, core::Real g, core::Real b,

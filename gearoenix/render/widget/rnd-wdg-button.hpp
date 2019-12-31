@@ -9,7 +9,7 @@ struct Animation;
 }
 
 namespace gearoenix::render::material {
-class Material;
+class Unlit;
 }
 
 namespace gearoenix::render::widget {
@@ -22,7 +22,7 @@ struct ButtonTheme {
 };
 class Button : public Widget {
     GX_GET_CREF_PRV(std::shared_ptr<Text>, text)
-    GX_GET_CREF_PRV(std::shared_ptr<material::Material>, background_material)
+    GX_GET_CREF_PRV(std::shared_ptr<material::Unlit>, background_material)
     GX_GET_CREF_PRV(ButtonTheme, theme)
 protected:
     core::Real before_click_size = 1.0f;

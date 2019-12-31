@@ -1,7 +1,7 @@
 #ifndef GEAROENIX_RENDER_WIDGET_EDIT_HPP
 #define GEAROENIX_RENDER_WIDGET_EDIT_HPP
 
-#include "../../core/event/cr-ev-listner.hpp"
+#include "../../core/event/cr-ev-listener.hpp"
 #include "rnd-wdg-alignment.hpp"
 #include "rnd-wdg-widget.hpp"
 #include <vector>
@@ -16,6 +16,10 @@ struct Animation;
 
 namespace gearoenix::render::font {
 class Font2D;
+}
+
+namespace gearoenix::render::material {
+class Unlit;
 }
 
 namespace gearoenix::render::model {
@@ -45,15 +49,15 @@ public:
     GX_GET_CREF_PRV(std::wstring, text)
     GX_GET_CREF_PRV(std::vector<core::Real>, text_widths)
     GX_GET_CREF_PRV(std::shared_ptr<model::Dynamic>, text_model)
-    GX_GET_CREF_PRV(std::shared_ptr<material::Material>, text_material)
+    GX_GET_CREF_PRV(std::shared_ptr<material::Unlit>, text_material)
     GX_GET_CREF_PRV(std::wstring, hint_text)
     GX_GET_CREF_PRV(std::vector<core::Real>, hint_text_widths)
     GX_GET_CREF_PRV(std::shared_ptr<model::Dynamic>, hint_text_model)
-    GX_GET_CREF_PRV(std::shared_ptr<material::Material>, hint_text_material)
+    GX_GET_CREF_PRV(std::shared_ptr<material::Unlit>, hint_text_material)
     GX_GET_CREF_PRV(std::shared_ptr<model::Dynamic>, background_model)
-    GX_GET_CREF_PRV(std::shared_ptr<material::Material>, background_material)
+    GX_GET_CREF_PRV(std::shared_ptr<material::Unlit>, background_material)
     GX_GET_CREF_PRV(std::shared_ptr<model::Dynamic>, cursor_model)
-    GX_GET_CREF_PRV(std::shared_ptr<material::Material>, cursor_material)
+    GX_GET_CREF_PRV(std::shared_ptr<material::Unlit>, cursor_material)
     GX_GET_CREF_PRV(std::shared_ptr<physics::animation::Animation>, cursor_animation)
     GX_GET_CREF_PRV(EditTheme, theme)
     GX_GET_VAL_PRV(bool, actived, true)
@@ -67,7 +71,7 @@ public:
     GX_GET_VAL_PRV(std::size_t, temporary_left, 0)
     GX_GET_VAL_PRV(std::size_t, temporary_right, 0)
 private:
-    void init(const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+    void init(const core::sync::EndCaller<core::sync::EndCallerIgnore>& end_call) noexcept;
     void on_scale() noexcept;
     void compute_starting() noexcept;
     void compute_cuts() noexcept;

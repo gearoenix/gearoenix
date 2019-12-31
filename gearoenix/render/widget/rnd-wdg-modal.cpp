@@ -2,8 +2,7 @@
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../physics/collider/phs-cld-aabb.hpp"
 #include "../../system/sys-app.hpp"
-#include "../engine/rnd-eng-engine.hpp"
-#include "../material/rnd-mat-material.hpp"
+#include "../material/rnd-mat-unlit.hpp"
 #include "../mesh/rnd-msh-manager.hpp"
 #include "../model/rnd-mdl-dynamic.hpp"
 #include "../model/rnd-mdl-manager.hpp"
@@ -18,13 +17,13 @@ gearoenix::render::widget::Modal::Modal(const core::Id my_id, system::stream::St
 gearoenix::render::widget::Modal::Modal(const core::Id my_id, engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : Widget(my_id, Type::Modal, e, c)
 {
-    core::sync::EndCaller<Button> btncall([c](std::shared_ptr<Button>) {});
-    core::sync::EndCaller<model::Dynamic> mdlcall([c](std::shared_ptr<model::Dynamic>) {});
-    core::sync::EndCaller<mesh::Mesh> mshcall([c](std::shared_ptr<mesh::Mesh>) {});
-    auto* const astmgr = e->get_system_application()->get_asset_manager();
-    auto* const mdlmgr = astmgr->get_model_manager();
-    auto* const mshmgr = astmgr->get_mesh_manager();
-    auto plate_mesh = mshmgr->create_plate(mshcall);
+    core::sync::EndCaller<Button> btn_call([c](const std::shared_ptr<Button>&) {});
+    core::sync::EndCaller<model::Dynamic> mdl_call([c](const std::shared_ptr<model::Dynamic>&) {});
+    core::sync::EndCaller<mesh::Mesh> msh_call([c](const std::shared_ptr<mesh::Mesh>&) {});
+    auto* const ast_mgr = e->get_system_application()->get_asset_manager();
+    auto* const mdl_mgr = ast_mgr->get_model_manager();
+    auto* const msh_mgr = ast_mgr->get_mesh_manager();
+    auto plate_mesh = msh_mgr->create_plate(msh_call);
 
     const std::vector<math::BasicVertex> close_vertices = {
         math::BasicVertex {
@@ -113,19 +112,19 @@ gearoenix::render::widget::Modal::Modal(const core::Id my_id, engine::Engine* co
 
     const math::Aabb3 close_ocr(math::Vec3(1.4f), math::Vec3(-1.4f));
 
-    auto close_mesh = mshmgr->create(close_vertices, close_indices, close_ocr, mshcall);
+    auto close_mesh = msh_mgr->create(close_vertices, close_indices, close_ocr, msh_call);
 
     {
-        const std::shared_ptr<material::Material> mat(new material::Material(e, c));
+        const std::shared_ptr<material::Unlit> mat(new material::Unlit(e, c));
         mat->set_color(0.02f, 0.02f, 0.02f, c);
-        const auto mdl = mdlmgr->create<model::Dynamic>(mdlcall);
+        const auto mdl = mdl_mgr->create<model::Dynamic>(mdl_call);
         mdl->add_mesh(std::make_shared<model::Mesh>(plate_mesh, mat));
         add_child(mdl);
     }
     {
-        const std::shared_ptr<material::Material> mat(new material::Material(e, c));
+        const std::shared_ptr<material::Unlit> mat(new material::Unlit(e, c));
         mat->set_color(0.9999f, 0.999f, 0.999f, c);
-        close_mdl = mdlmgr->create<Button>(btncall);
+        close_mdl = mdl_mgr->create<Button>(btn_call);
         close_mdl->add_mesh(std::make_shared<model::Mesh>(close_mesh, mat));
         auto* tran = close_mdl->get_transformation();
         const core::Real scale = 0.05f;
@@ -137,9 +136,7 @@ gearoenix::render::widget::Modal::Modal(const core::Id my_id, engine::Engine* co
     }
 }
 
-gearoenix::render::widget::Modal::~Modal() noexcept
-{
-}
+gearoenix::render::widget::Modal::~Modal() noexcept = default;
 
 void gearoenix::render::widget::Modal::set_scene(scene::Scene* const s) noexcept
 {

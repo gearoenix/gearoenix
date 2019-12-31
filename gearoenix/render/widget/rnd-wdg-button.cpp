@@ -5,7 +5,7 @@
 #include "../../physics/collider/phs-cld-aabb.hpp"
 #include "../../physics/phs-engine.hpp"
 #include "../../system/sys-app.hpp"
-#include "../material/rnd-mat-material.hpp"
+#include "../material/rnd-mat-unlit.hpp"
 #include "../mesh/rnd-msh-manager.hpp"
 #include "../mesh/rnd-msh-mesh.hpp"
 #include "../model/rnd-mdl-manager.hpp"
@@ -32,20 +32,20 @@ gearoenix::render::widget::Button::Button(
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : Widget(my_id, Type::Button, e, c)
-    , background_material(new material::Material(e, c))
+    , background_material(new material::Unlit(e, c))
 {
     set_collider(std::make_unique<physics::collider::Aabb>(math::Vec3(1.0f, 1.0f, 0.001f), math::Vec3(-1.0f, -1.0f, -0.001f)));
-    auto* const astmgr = e->get_system_application()->get_asset_manager();
-    auto* const mdlmgr = astmgr->get_model_manager();
-    core::sync::EndCaller<Text> txtcall([c](const std::shared_ptr<Text>&) {});
-    text = mdlmgr->create<Text>(txtcall);
-    auto* const txtran = text->get_transformation();
-    txtran->local_scale(theme.text_scale);
-    txtran->set_location(math::Vec3(0.0f, 0.0f, 0.01f));
+    auto* const ast_mgr = e->get_system_application()->get_asset_manager();
+    auto* const mdl_mgr = ast_mgr->get_model_manager();
+    core::sync::EndCaller<Text> txt_call([c](const std::shared_ptr<Text>&) {});
+    text = mdl_mgr->create<Text>(txt_call);
+    auto* const txt_ran = text->get_transformation();
+    txt_ran->local_scale(theme.text_scale);
+    txt_ran->set_location(math::Vec3(0.0f, 0.0f, 0.01f));
     add_child(text);
     background_material->set_color(0.9f, 0.075f, 0.05f, c);
-    core::sync::EndCaller<mesh::Mesh> mshcall([c](const std::shared_ptr<mesh::Mesh>&) {});
-    const auto plate_mesh = astmgr->get_mesh_manager()->create_plate(mshcall);
+    core::sync::EndCaller<mesh::Mesh> msh_call([c](const std::shared_ptr<mesh::Mesh>&) {});
+    const auto plate_mesh = ast_mgr->get_mesh_manager()->create_plate(msh_call);
     add_mesh(std::make_shared<model::Mesh>(plate_mesh, background_material));
 }
 
@@ -59,8 +59,8 @@ void gearoenix::render::widget::Button::selected(const math::Vec3&) noexcept
 {
     if (auto a = animation.lock())
         a->set_activity(false);
-    auto myfun = core::sync::EndCaller<model::Model>([](const std::shared_ptr<model::Model>&) {});
-    auto myself = e->get_system_application()->get_asset_manager()->get_model_manager()->get_gx3d(asset_id, myfun);
+    auto my_fun = core::sync::EndCaller<model::Model>([](const std::shared_ptr<model::Model>&) {});
+    auto myself = e->get_system_application()->get_asset_manager()->get_model_manager()->get_gx3d(asset_id, my_fun);
     before_click_size = collider->get_current_local_scale()[1];
     const auto a = std::make_shared<physics::animation::Animation>(
         [this, myself, delta_size { before_click_size * PRESSED_DELTA_SIZE }](const core::Real from_start, const core::Real) noexcept {
@@ -79,8 +79,8 @@ void gearoenix::render::widget::Button::select_cancelled() noexcept
 {
     if (auto a = animation.lock())
         a->set_activity(false);
-    auto myfun = core::sync::EndCaller<model::Model>([](const std::shared_ptr<model::Model>&) {});
-    auto myself = e->get_system_application()->get_asset_manager()->get_model_manager()->get_gx3d(asset_id, myfun);
+    auto my_fun = core::sync::EndCaller<model::Model>([](const std::shared_ptr<model::Model>&) {});
+    auto myself = e->get_system_application()->get_asset_manager()->get_model_manager()->get_gx3d(asset_id, my_fun);
     const auto a = std::make_shared<physics::animation::Animation>(
         [this, myself, pressed_size { before_click_size * PRESSED_SIZE }, delta_size { before_click_size * PRESSED_DELTA_SIZE }](const core::Real from_start, const core::Real) noexcept {
             const auto s = pressed_size + delta_size * (from_start / ANIMATION_DURATION);

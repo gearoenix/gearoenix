@@ -4,7 +4,7 @@
 #include "../../system/sys-app.hpp"
 #include "../font/rnd-fnt-2d.hpp"
 #include "../font/rnd-fnt-manager.hpp"
-#include "../material/rnd-mat-material.hpp"
+#include "../material/rnd-mat-unlit.hpp"
 #include "../mesh/rnd-msh-manager.hpp"
 #include "../mesh/rnd-msh-mesh.hpp"
 #include "../model/rnd-mdl-mesh.hpp"
@@ -27,18 +27,16 @@ gearoenix::render::widget::Text::Text(
         std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
         text = converter.from_bytes(s);
     }
-    auto astmgr = e->get_system_application()->get_asset_manager();
+    auto ast_mgr = e->get_system_application()->get_asset_manager();
     GXTODO // Implement it in blender plugin too
         f->read(v_align);
     f->read(h_align);
     core::sync::EndCaller<font::Font> fend([c](const std::shared_ptr<font::Font>&) {});
-    text_font = std::dynamic_pointer_cast<font::Font2D>(astmgr->get_font_manager()->get(f->read<core::Id>(), fend));
-    auto mat = std::make_shared<material::Material>(f, e, c);
-    mat->set_metallic_factor(0.001f);
-    mat->set_roughness_factor(0.999f);
+    text_font = std::dynamic_pointer_cast<font::Font2D>(ast_mgr->get_font_manager()->get(f->read<core::Id>(), fend));
+    auto mat = std::make_shared<material::Unlit>(f, e, c);
     mat->set_translucency(material::TranslucencyMode::Transparent);
     core::sync::EndCaller<mesh::Mesh> mend([c](const std::shared_ptr<mesh::Mesh>&) {});
-    auto msh = astmgr->get_mesh_manager()->create_plate(mend);
+    auto msh = ast_mgr->get_mesh_manager()->create_plate(mend);
     add_mesh(std::make_shared<model::Mesh>(msh, mat));
     set_text(text, c);
 }
@@ -51,15 +49,13 @@ gearoenix::render::widget::Text::Text(
     , text(L" ")
     , text_color(1.0f)
 {
-    auto astmgr = e->get_system_application()->get_asset_manager();
+    auto ast_mgr = e->get_system_application()->get_asset_manager();
     core::sync::EndCaller<font::Font> fend([c](const std::shared_ptr<font::Font>&) {});
-    text_font = astmgr->get_font_manager()->get_default_2d(fend);
-    auto mat = std::make_shared<material::Material>(e, c);
-    mat->set_metallic_factor(0.001f);
-    mat->set_roughness_factor(0.999f);
+    text_font = ast_mgr->get_font_manager()->get_default_2d(fend);
+    auto mat = std::make_shared<material::Unlit>(e, c);
     mat->set_translucency(material::TranslucencyMode::Transparent);
     core::sync::EndCaller<mesh::Mesh> mend([c](const std::shared_ptr<mesh::Mesh>&) {});
-    auto msh = astmgr->get_mesh_manager()->create_plate(mend);
+    auto msh = ast_mgr->get_mesh_manager()->create_plate(mend);
     text_mesh_id = msh->get_asset_id();
     add_mesh(std::make_shared<model::Mesh>(msh, mat));
     set_text(text, c);
@@ -73,10 +69,10 @@ void gearoenix::render::widget::Text::set_text(
 {
     text = t;
     core::Real img_width = 0.0f;
-    auto txtend = core::sync::EndCaller<texture::Texture2D>([c, this](const std::shared_ptr<texture::Texture2D>& txt) {
-        meshes[text_mesh_id]->get_material()->set_color(txt);
+    auto txt_end = core::sync::EndCaller<texture::Texture2D>([c, this](const std::shared_ptr<texture::Texture2D>& txt) {
+        reinterpret_cast<material::Unlit*>(meshes[text_mesh_id]->get_mat().get())->set_color(txt);
     });
-    auto txt = text_font->bake(text, text_color, collider->get_current_local_scale()[1] * 2.0f, img_width, txtend);
+    auto txt = text_font->bake(text, text_color, collider->get_current_local_scale()[1] * 2.0f, img_width, txt_end);
     transformation->local_x_scale(img_width * 0.5f / collider->get_current_local_scale()[0]);
 }
 

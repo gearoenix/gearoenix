@@ -13,8 +13,8 @@ class ForwardPbr;
 namespace gearoenix::glc3::pipeline {
 class ForwardPbrResourceSet : public ResourceSet, public render::pipeline::ForwardPbrResourceSet {
 public:
-    explicit ForwardPbrResourceSet(const std::shared_ptr<shader::ForwardPbr>& shd);
-    void bind(gl::uint& bound_shader_program) const final;
+    explicit ForwardPbrResourceSet(const std::shared_ptr<shader::ForwardPbr>& shd) noexcept;
+    void bind(gl::uint& bound_shader_program) const noexcept final;
 };
 }
 

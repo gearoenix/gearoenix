@@ -5,7 +5,6 @@
 #include "../../physics/collider/phs-cld-collider.hpp"
 #include "../../physics/phs-engine.hpp"
 #include "../../system/sys-app.hpp"
-#include "../camera/rnd-cmr-camera.hpp"
 #include "../camera/rnd-cmr-manager.hpp"
 #include "../camera/rnd-cmr-orthographic.hpp"
 #include "../engine/rnd-eng-engine.hpp"

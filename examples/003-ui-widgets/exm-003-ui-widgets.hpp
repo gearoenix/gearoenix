@@ -2,7 +2,7 @@
 #define GEAROENIX_EXAMPLE_003_UI_WIDGETS_HPP
 #include <atomic>
 #include <gearoenix/core/cr-application.hpp>
-#include <gearoenix/core/event/cr-ev-listner.hpp>
+#include <gearoenix/core/event/cr-ev-listener.hpp>
 #include <random>
 
 namespace gearoenix::render::graph::tree {
@@ -19,11 +19,11 @@ private:
     using GxUiScene = gearoenix::render::scene::Ui;
     using GxGrPbr = gearoenix::render::graph::tree::Pbr;
 
-    std::shared_ptr<GxUiScene> uiscn;
+    std::shared_ptr<GxUiScene> ui_scene;
     std::unique_ptr<GxGrPbr> render_tree;
 
 public:
-    Example003UiWidgetsApp(gearoenix::system::Application* sys_app) noexcept;
+    explicit Example003UiWidgetsApp(gearoenix::system::Application* sys_app) noexcept;
     ~Example003UiWidgetsApp() noexcept final;
     void update() noexcept final;
     void terminate() noexcept final;

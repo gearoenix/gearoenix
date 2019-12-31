@@ -22,53 +22,53 @@ using GxVec3 = gearoenix::math::Vec3;
 Example003UiWidgetsApp::Example003UiWidgetsApp(gearoenix::system::Application* const sys_app) noexcept
     : gearoenix::core::Application::Application(sys_app)
 {
-    const GxEndCallerIgnored endcall([this] {
-        uiscn->set_enability(true);
+    const GxEndCallerIgnored end_call([this] {
+        ui_scene->set_enability(true);
     });
 
-    GxEndCaller<GxUiScene> uiscncall([endcall](const std::shared_ptr<GxUiScene>&) {});
-    GxEndCaller<GxTextWdg> txwcall([endcall](const std::shared_ptr<GxTextWdg>&) {});
-    GxEndCaller<GxEditWdg> edtcall([endcall](const std::shared_ptr<GxEditWdg>&) {});
-    GxEndCaller<GxButton> btncall([endcall](const std::shared_ptr<GxButton>&) {});
+    GxEndCaller<GxUiScene> ui_scn_call([end_call](const std::shared_ptr<GxUiScene>&) {});
+    GxEndCaller<GxTextWdg> txw_call([end_call](const std::shared_ptr<GxTextWdg>&) {});
+    GxEndCaller<GxEditWdg> edt_call([end_call](const std::shared_ptr<GxEditWdg>&) {});
+    GxEndCaller<GxButton> btn_call([end_call](const std::shared_ptr<GxButton>&) {});
 
-    render_tree = std::make_unique<GxGrPbr>(render_engine, endcall);
+    render_tree = std::make_unique<GxGrPbr>(render_engine, end_call);
     render_engine->set_render_tree(render_tree.get());
 
-    auto* const astmgr = sys_app->get_asset_manager();
-    auto* const mdlmgr = astmgr->get_model_manager();
-    auto* const scnmgr = astmgr->get_scene_manager();
+    auto* const ast_mgr = sys_app->get_asset_manager();
+    auto* const mdl_mgr = ast_mgr->get_model_manager();
+    auto* const scn_mgr = ast_mgr->get_scene_manager();
 
-    uiscn = scnmgr->create<GxUiScene>(uiscncall);
+    ui_scene = scn_mgr->create<GxUiScene>(ui_scn_call);
 
-    auto text = mdlmgr->create<GxTextWdg>(txwcall);
-    auto* tmptran = text->get_transformation();
-    tmptran->local_scale(0.04f);
-    tmptran->set_location(GxVec3(0.0f, 0.85f, 0.0f));
-    text->set_text(L"I'm a one line Text widget. I easily grow horizontally and automatically.", endcall);
-    uiscn->add_model(text);
+    auto text = mdl_mgr->create<GxTextWdg>(txw_call);
+    auto* tmp_tran = text->get_transformation();
+    tmp_tran->local_scale(0.04f);
+    tmp_tran->set_location(GxVec3(0.0f, 0.85f, 0.0f));
+    text->set_text(L"I'm a one line Text widget. I easily grow horizontally and automatically.", end_call);
+    ui_scene->add_model(text);
 
-    auto button = mdlmgr->create<GxButton>(btncall);
-    tmptran = button->get_transformation();
-    tmptran->local_scale(0.04f);
-    tmptran->set_location(GxVec3(0.0f, 0.75f, 0.0f));
-    button->set_text(L"I'm a Button widget. I can grow too.", endcall);
-    uiscn->add_model(button);
+    auto button = mdl_mgr->create<GxButton>(btn_call);
+    tmp_tran = button->get_transformation();
+    tmp_tran->local_scale(0.04f);
+    tmp_tran->set_location(GxVec3(0.0f, 0.75f, 0.0f));
+    button->set_text(L"I'm a Button widget. I can grow too.", end_call);
+    ui_scene->add_model(button);
 
-    auto edit = mdlmgr->create<GxEditWdg>(edtcall);
-    tmptran = edit->get_transformation();
-    tmptran->local_scale(0.04f);
-    tmptran->local_x_scale(34.0f);
-    tmptran->set_location(GxVec3(0.0f, 0.65f, 0.0f));
-    edit->set_hint_text(L"I'm a one line Edit text widget. I don't grow, there is a reason behind it, don't you know it.", endcall);
-    uiscn->add_model(edit);
+    auto edit = mdl_mgr->create<GxEditWdg>(edt_call);
+    tmp_tran = edit->get_transformation();
+    tmp_tran->local_scale(0.04f);
+    tmp_tran->local_x_scale(34.0f);
+    tmp_tran->set_location(GxVec3(0.0f, 0.65f, 0.0f));
+    edit->set_hint_text(L"I'm a one line Edit text widget. I don't grow, there is a reason behind it, don't you know it.", end_call);
+    ui_scene->add_model(edit);
 
-    auto edit2 = mdlmgr->create<GxEditWdg>(edtcall);
-    tmptran = edit2->get_transformation();
-    tmptran->local_scale(0.04f);
-    tmptran->local_x_scale(20.0f);
-    tmptran->set_location(GxVec3(0.0f, 0.55f, 0.0f));
-    edit2->set_hint_text(L"I'm another Edit text widget with smaller limit.", endcall);
-    uiscn->add_model(edit2);
+    auto edit2 = mdl_mgr->create<GxEditWdg>(edt_call);
+    tmp_tran = edit2->get_transformation();
+    tmp_tran->local_scale(0.04f);
+    tmp_tran->local_x_scale(20.0f);
+    tmp_tran->set_location(GxVec3(0.0f, 0.55f, 0.0f));
+    edit2->set_hint_text(L"I'm another Edit text widget with smaller limit.", end_call);
+    ui_scene->add_model(edit2);
 }
 
 Example003UiWidgetsApp::~Example003UiWidgetsApp() noexcept
@@ -82,7 +82,7 @@ void Example003UiWidgetsApp::update() noexcept
 
 void Example003UiWidgetsApp::terminate() noexcept
 {
-    uiscn = nullptr;
+    ui_scene = nullptr;
     render_tree = nullptr;
     gearoenix::core::Application::terminate();
 }

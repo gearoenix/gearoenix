@@ -2,8 +2,9 @@
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../system/sys-app.hpp"
 #include "../buffer/rnd-buf-framed-uniform.hpp"
-#include "../engine/rnd-eng-engine.hpp"
 #include "../texture/rnd-txt-manager.hpp"
+#include "../texture/rnd-txt-texture-2d.hpp"
+#include "../texture/rnd-txt-texture-cube.hpp"
 
 gearoenix::render::material::Pbr::Pbr(engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept
     : Material(Type::Pbr, e, sizeof(Uniform))

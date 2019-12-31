@@ -20,8 +20,8 @@ public:
         core::Id my_id,
         engine::Engine* e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
-    ~Modal() noexcept;
-    void set_scene(scene::Scene* s) noexcept;
+    ~Modal() noexcept final;
+    void set_scene(scene::Scene* s) noexcept final;
     void set_on_close(const std::function<void()>& f) noexcept;
 };
 }

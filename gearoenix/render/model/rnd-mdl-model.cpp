@@ -73,15 +73,15 @@ void gearoenix::render::model::Model::update() noexcept
 {
     uniform_buffers->update(collider->get_model_matrix());
     for (const auto& msh : meshes)
-        msh.second->update_uniform();
+        msh.second->update();
 }
 
 void gearoenix::render::model::Model::add_mesh(const std::shared_ptr<Mesh>& m) noexcept
 {
-    material::Material* const mat = m->get_material().get();
+    const material::Material* const mat = m->get_mat().get();
     has_shadow_caster |= mat->get_is_shadow_caster();
     has_transparent |= (mat->get_translucency() == material::TranslucencyMode::Transparent);
-    mesh::Mesh* const msh = m->get_mesh().get();
+    const mesh::Mesh* const msh = m->get_msh().get();
     collider->put_in_box(msh->get_box());
     meshes[msh->get_asset_id()] = m;
 }

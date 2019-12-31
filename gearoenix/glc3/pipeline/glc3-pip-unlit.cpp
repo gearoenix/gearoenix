@@ -1,17 +1,17 @@
-#include "glc3-pip-forward-pbr.hpp"
+#include "glc3-pip-unlit.hpp"
 #ifdef GX_USE_OPENGL_CLASS_3
 #include "../engine/glc3-eng-engine.hpp"
-#include "../shader/glc3-shd-effect-forward-pbr.hpp"
-#include "glc3-pip-forward-pbr-resource-set.hpp"
+#include "../shader/glc3-shd-effect-unlit.hpp"
+#include "glc3-pip-unlit-resource-set.hpp"
 
-gearoenix::glc3::pipeline::ForwardPbr::ForwardPbr(engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
-    : render::pipeline::ForwardPbr(e, c)
-    , shd(new shader::ForwardPbr(e, c))
+gearoenix::glc3::pipeline::Unlit::Unlit(engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
+    : render::pipeline::Unlit(e, c)
+    , shd(new shader::Unlit(e, c))
 {
 }
 
-gearoenix::render::pipeline::ResourceSet* gearoenix::glc3::pipeline::ForwardPbr::create_resource_set() const noexcept
+gearoenix::render::pipeline::ResourceSet* gearoenix::glc3::pipeline::Unlit::create_resource_set() const noexcept
 {
-    return new ForwardPbrResourceSet(shd);
+    return new UnlitResourceSet(shd);
 }
 #endif

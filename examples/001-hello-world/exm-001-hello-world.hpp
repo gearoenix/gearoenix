@@ -21,16 +21,16 @@ private:
     using GxGrPbr = gearoenix::render::graph::tree::Pbr;
 
     std::shared_ptr<GxGameScene> scn;
-    GxCamTran* camtrn = nullptr;
+    GxCamTran* cam_trn = nullptr;
     std::unique_ptr<GxGrPbr> render_tree;
 
 public:
     /// This function must be like this
-    GameApp(gearoenix::system::Application* sys_app) noexcept;
+    explicit GameApp(gearoenix::system::Application* sys_app) noexcept;
     ~GameApp() noexcept final = default;
     /// On every screen refresh this function is going to be called
     void update() noexcept final;
-    /// Before terminationg everything in engine this function is going to be called
+    /// Before terminating everything in engine, this function is going to be called
     void terminate() noexcept final;
 };
 #endif

@@ -9,7 +9,7 @@
 #include "../../system/sys-app.hpp"
 #include "../font/rnd-fnt-2d.hpp"
 #include "../font/rnd-fnt-manager.hpp"
-#include "../material/rnd-mat-material.hpp"
+#include "../material/rnd-mat-unlit.hpp"
 #include "../mesh/rnd-msh-manager.hpp"
 #include "../mesh/rnd-msh-mesh.hpp"
 #include "../model/rnd-mdl-dynamic.hpp"
@@ -18,33 +18,33 @@
 #include <cmath>
 #include <string>
 
-#define GX_EDIT_INIT Widget(my_id, Type::Edit, e, c), event_engine(e->get_system_application()->get_event_engine()), text_material(new material::Material(e, c)), hint_text_material(new material::Material(e, c)), background_material(new material::Material(e, c)), cursor_material(new material::Material(e, c))
+#define GX_EDIT_INIT Widget(my_id, Type::Edit, e, c), event_engine(e->get_system_application()->get_event_engine()), text_material(new material::Unlit(e, c)), hint_text_material(new material::Unlit(e, c)), background_material(new material::Unlit(e, c)), cursor_material(new material::Unlit(e, c))
 
-void gearoenix::render::widget::Edit::init(const core::sync::EndCaller<core::sync::EndCallerIgnore>& endcall) noexcept
+void gearoenix::render::widget::Edit::init(const core::sync::EndCaller<core::sync::EndCallerIgnore>& end_call) noexcept
 {
-    const core::sync::EndCaller<core::sync::EndCallerIgnore> c([endcall, this] {
+    const core::sync::EndCaller<core::sync::EndCallerIgnore> c([end_call, this] {
         event_engine->add_listener(core::event::Id::ButtonKeyboard, 0.0f, this);
     });
 
     set_collider(std::make_unique<physics::collider::Aabb>(math::Vec3(1.0f, 1.0f, 0.001f), math::Vec3(-1.0f, -1.0f, -0.001f)));
 
-    auto* const astmgr = e->get_system_application()->get_asset_manager();
-    auto* const mshmgr = astmgr->get_mesh_manager();
-    auto* const mdlmgr = astmgr->get_model_manager();
-    auto* const fntmgr = astmgr->get_font_manager();
+    auto* const ast_mgr = e->get_system_application()->get_asset_manager();
+    auto* const msh_mgr = ast_mgr->get_mesh_manager();
+    auto* const mdl_mgr = ast_mgr->get_model_manager();
+    auto* const fnt_mgr = ast_mgr->get_font_manager();
 
-    core::sync::EndCaller<mesh::Mesh> mshend([c](const std::shared_ptr<mesh::Mesh>&) {});
-    const auto plate_mesh = mshmgr->create_plate(mshend);
+    core::sync::EndCaller<mesh::Mesh> msh_end([c](const std::shared_ptr<mesh::Mesh>&) {});
+    const auto plate_mesh = msh_mgr->create_plate(msh_end);
 
     core::sync::EndCaller<font::Font> fend([c](const std::shared_ptr<font::Font>&) {});
-    text_font = fntmgr->get_default_2d(fend);
+    text_font = fnt_mgr->get_default_2d(fend);
 
     text_material->set_translucency(material::TranslucencyMode::Transparent);
     hint_text_material->set_translucency(material::TranslucencyMode::Transparent);
 
-    core::sync::EndCaller<model::Dynamic> mdlend([c](const std::shared_ptr<model::Dynamic>&) {});
+    core::sync::EndCaller<model::Dynamic> mdl_end([c](const std::shared_ptr<model::Dynamic>&) {});
 
-    text_model = mdlmgr->create<model::Dynamic>(mdlend);
+    text_model = mdl_mgr->create<model::Dynamic>(mdl_end);
     text_model->add_mesh(std::make_shared<model::Mesh>(plate_mesh, text_material));
     auto* const text_tran = text_model->get_transformation();
     text_tran->set_location(math::Vec3(0.0f, 0.0f, 0.01f));
@@ -52,7 +52,7 @@ void gearoenix::render::widget::Edit::init(const core::sync::EndCaller<core::syn
     text_model->set_enabled(false);
     add_child(text_model);
 
-    hint_text_model = mdlmgr->create<model::Dynamic>(mdlend);
+    hint_text_model = mdl_mgr->create<model::Dynamic>(mdl_end);
     hint_text_model->add_mesh(std::make_shared<model::Mesh>(plate_mesh, hint_text_material));
     auto* const hint_text_tran = hint_text_model->get_transformation();
     hint_text_tran->set_location(math::Vec3(0.0f, 0.0f, 0.01f));
@@ -61,13 +61,13 @@ void gearoenix::render::widget::Edit::init(const core::sync::EndCaller<core::syn
     add_child(hint_text_model);
 
     background_material->set_color(theme.background_color, c);
-    background_model = mdlmgr->create<model::Dynamic>(mdlend);
+    background_model = mdl_mgr->create<model::Dynamic>(mdl_end);
     background_model->add_mesh(std::make_shared<model::Mesh>(plate_mesh, background_material));
     add_child(background_model);
 
     cursor_material->set_color(theme.cursor_color, c);
     cursor_material->set_translucency(material::TranslucencyMode::Transparent);
-    cursor_model = mdlmgr->create<model::Dynamic>(mdlend);
+    cursor_model = mdl_mgr->create<model::Dynamic>(mdl_end);
     cursor_model->add_mesh(std::make_shared<model::Mesh>(plate_mesh, cursor_material));
     auto* const cursor_tran = cursor_model->get_transformation();
     cursor_tran->set_location(math::Vec3(0.0f, 0.0f, 0.02f));
@@ -172,7 +172,7 @@ void gearoenix::render::widget::Edit::place_cursor() noexcept
 void gearoenix::render::widget::Edit::render_text(const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
 {
     const auto img_width = std::abs(ending_text_cut - starting_text_cut) * 1.0001f;
-    core::sync::EndCaller<texture::Texture2D> txtend([c, this](const std::shared_ptr<texture::Texture2D>& txt) {
+    core::sync::EndCaller<texture::Texture2D> txt_end([c, this](const std::shared_ptr<texture::Texture2D>& txt) {
         text_material->set_color(txt);
         if (hint_text_model->get_enabled())
             hint_text_model->set_enabled(false);
@@ -181,7 +181,7 @@ void gearoenix::render::widget::Edit::render_text(const core::sync::EndCaller<co
     });
     const auto _txt = text_font->bake(
         text, text_widths, theme.text_color,
-        img_width, aspects[1], starting_text_cut, txtend);
+        img_width, aspects[1], starting_text_cut, txt_end);
     text_model->get_transformation()->local_x_scale(
         img_width / (text_model->get_collider()->get_current_local_scale()[0] * 2.0f));
 }
@@ -280,14 +280,14 @@ void gearoenix::render::widget::Edit::set_hint_text(
     const auto raw_img_width = (scale[0] - scale[1] * (1.0f - theme.hint_text_size)) * 2.0f;
     const auto is_bigger = raw_img_width < hint_text_widths.back();
     const auto img_width = is_bigger ? raw_img_width : hint_text_widths.back();
-    core::sync::EndCaller<texture::Texture2D> txtend([c, this](const std::shared_ptr<texture::Texture2D>& txt) {
+    core::sync::EndCaller<texture::Texture2D> txt_end([c, this](const std::shared_ptr<texture::Texture2D>& txt) {
         hint_text_material->set_color(txt);
         text_model->set_enabled(false);
         hint_text_model->set_enabled(true);
     });
     const auto _txt = text_font->bake(
         hint_text, hint_text_widths, theme.hint_text_color,
-        img_width, img_height, 0.0f, txtend);
+        img_width, img_height, 0.0f, txt_end);
     hint_text_model->get_transformation()->local_x_scale(
         img_width / (hint_text_model->get_collider()->get_current_local_scale()[0] * 2.0f));
 }
