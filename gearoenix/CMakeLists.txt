@@ -158,6 +158,8 @@ SET(GX_ENGINE_SRC
         "${GX_ENGINE_SRC_DIR}gles2/pipeline/gles2-pip-unlit.hpp"
         "${GX_ENGINE_SRC_DIR}gles2/shader/gles2-shd-effect-forward-pbr.cpp"
         "${GX_ENGINE_SRC_DIR}gles2/shader/gles2-shd-effect-forward-pbr.hpp"
+        "${GX_ENGINE_SRC_DIR}gles2/shader/gles2-shd-effect-unlit.cpp"
+        "${GX_ENGINE_SRC_DIR}gles2/shader/gles2-shd-effect-unlit.hpp"
         "${GX_ENGINE_SRC_DIR}gles2/shader/gles2-shd-shader.cpp"
         "${GX_ENGINE_SRC_DIR}gles2/shader/gles2-shd-shader.hpp"
         "${GX_ENGINE_SRC_DIR}gles2/shader/gles2-shd-shadow-mapper.cpp"

@@ -1,30 +1,30 @@
-#include "gles2-pip-forward-pbr-resource-set.hpp"
+#include "gles2-pip-unlit-resource-set.hpp"
 #ifdef GX_USE_OPENGL_ES2
 #include "../../gl/gl-loader.hpp"
 #include "../../render/buffer/rnd-buf-uniform.hpp"
 #include "../../render/camera/rnd-cmr-uniform.hpp"
-#include "../../render/graph/node/rnd-gr-nd-forward-pbr.hpp"
+#include "../../render/graph/node/rnd-gr-nd-unlit.hpp"
 #include "../../render/light/rnd-lt-directional.hpp"
-#include "../../render/material/rnd-mat-uniform.hpp"
+#include "../../render/material/rnd-mat-unlit.hpp"
 #include "../../render/mesh/rnd-msh-mesh.hpp"
 #include "../../render/scene/rnd-scn-uniform.hpp"
 #include "../buffer/gles2-buf-index.hpp"
 #include "../buffer/gles2-buf-vertex.hpp"
 #include "../gles2.hpp"
-#include "../shader/gles2-shd-effect-forward-pbr.hpp"
+#include "../shader/gles2-shd-effect-unlit.hpp"
 #include "../texture/gles2-txt-2d.hpp"
 #include "../texture/gles2-txt-cube.hpp"
 #include "../texture/gles2-txt-target.hpp"
 
-gearoenix::gles2::pipeline::ForwardPbrResourceSet::ForwardPbrResourceSet(const std::shared_ptr<shader::ForwardPbr>& shd)
+gearoenix::gles2::pipeline::UnlitResourceSet::UnlitResourceSet(const std::shared_ptr<shader::Unlit>& shd) noexcept
     : gles2::pipeline::ResourceSet(shd)
 {
 }
 
-void gearoenix::gles2::pipeline::ForwardPbrResourceSet::bind(gl::uint& bound_shader_program) const
+void gearoenix::gles2::pipeline::UnlitResourceSet::bind(gl::uint& bound_shader_program) const
 {
     GX_GLES2_PIPRES_START_DRAWING_MESH
-    GX_GLES2_PIPRES_START_SHADER(ForwardPbr, shd)
+    GX_GLES2_PIPRES_START_SHADER(Unlit, shd)
     const auto* const camera = camera_uniform_buffer->get_ptr<render::camera::Uniform>();
     GX_GLES2_PIPRES_SET_UNIFORM(camera_position, *(camera->position.data()))
     GX_GLES2_PIPRES_SET_UNIFORM(camera_vp, *(camera->view_projection.data()))
@@ -54,7 +54,7 @@ void gearoenix::gles2::pipeline::ForwardPbrResourceSet::bind(gl::uint& bound_sha
     GX_GLES2_PIPRES_SET_UNIFORM(scene_directional_lights_direction, *(scene->directional_lights_direction[0].data()))
     GX_GLES2_PIPRES_SET_UNIFORM(scene_directional_lights_count, *(scene->lights_count.data()))
     //shdr->set_scene_ssao_config_data(scene->ssao_config.data());
-    const auto* const node = node_uniform_buffer->get_ptr<render::graph::node::ForwardPbrUniform>();
+    const auto* const node = node_uniform_buffer->get_ptr<render::graph::node::UnlitUniform>();
     GX_GLES2_PIPRES_SET_UNIFORM(effect_point_lights_color_min_radius, *(node->point_lights_color_min_radius[0].data()))
     GX_GLES2_PIPRES_SET_UNIFORM(effect_point_lights_count, node->point_lights_count)
     GX_GLES2_PIPRES_SET_UNIFORM(effect_point_lights_position_max_radius, *(node->point_lights_position_max_radius[0].data()))

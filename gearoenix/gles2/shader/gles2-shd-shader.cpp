@@ -60,7 +60,7 @@ void gearoenix::gles2::shader::Shader::validate() noexcept
 
 gearoenix::gl::uint gearoenix::gles2::shader::Shader::add_shader_to_program(const std::string& shd, const gl::enumerated shader_type) noexcept
 {
-    gl::uint shader_obj = gl::Loader::create_shader(shader_type);
+    const gl::uint shader_obj = gl::Loader::create_shader(shader_type);
     if (shader_obj == 0) {
         GXLOGF("Error creating shader type.")
     }
@@ -82,14 +82,14 @@ gearoenix::gl::uint gearoenix::gles2::shader::Shader::add_shader_to_program(cons
     return shader_obj;
 }
 
-gearoenix::gl::uint gearoenix::gles2::shader::Shader::set_vertex_shader(const std::string& shd) noexcept
+void gearoenix::gles2::shader::Shader::set_vertex_shader(const std::string& shd) noexcept
 {
-    return add_shader_to_program(shd, GL_VERTEX_SHADER);
+    vertex_object = add_shader_to_program(shd, GL_VERTEX_SHADER);
 }
 
-gearoenix::gl::uint gearoenix::gles2::shader::Shader::set_fragment_shader(const std::string& shd) noexcept
+void gearoenix::gles2::shader::Shader::set_fragment_shader(const std::string& shd) noexcept
 {
-    return add_shader_to_program(shd, GL_FRAGMENT_SHADER);
+    fragment_object = add_shader_to_program(shd, GL_FRAGMENT_SHADER);
 }
 
 void gearoenix::gles2::shader::Shader::end_program(const gl::uint shader_program) noexcept

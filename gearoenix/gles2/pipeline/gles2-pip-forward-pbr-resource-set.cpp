@@ -5,7 +5,7 @@
 #include "../../render/camera/rnd-cmr-uniform.hpp"
 #include "../../render/graph/node/rnd-gr-nd-forward-pbr.hpp"
 #include "../../render/light/rnd-lt-directional.hpp"
-#include "../../render/material/rnd-mat-uniform.hpp"
+#include "../../render/material/rnd-mat-pbr.hpp"
 #include "../../render/mesh/rnd-msh-mesh.hpp"
 #include "../../render/scene/rnd-scn-uniform.hpp"
 #include "../buffer/gles2-buf-index.hpp"
@@ -16,7 +16,7 @@
 #include "../texture/gles2-txt-cube.hpp"
 #include "../texture/gles2-txt-target.hpp"
 
-gearoenix::gles2::pipeline::ForwardPbrResourceSet::ForwardPbrResourceSet(const std::shared_ptr<shader::ForwardPbr>& shd)
+gearoenix::gles2::pipeline::ForwardPbrResourceSet::ForwardPbrResourceSet(const std::shared_ptr<shader::ForwardPbr>& shd) noexcept
     : gles2::pipeline::ResourceSet(shd)
 {
 }
