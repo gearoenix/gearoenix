@@ -16,7 +16,7 @@ namespace gearoenix::render::widget {
 class Text;
 struct TextTheme;
 struct ButtonTheme {
-    math::Vec4 background_color = math::Vec4(0.6f, 0.37254902f, 0.11372549f, 1.0f);
+    math::Vec4 background_color = math::Vec4(0.4f, 0.37254902f, 0.21372549f, 1.0f);
     core::Real text_scale = 0.9f;
     const TextTheme* text_theme = nullptr;
 };

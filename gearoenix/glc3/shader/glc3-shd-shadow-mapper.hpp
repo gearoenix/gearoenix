@@ -9,8 +9,8 @@ class Engine;
 
 namespace gearoenix::glc3::shader {
 class ShadowMapper : public Shader {
-    GX_GLC3_UNIFORM_FLOAT(material_alpha, 1)
-    GX_GLC3_UNIFORM_FLOAT(material_alpha_cutoff, 1)
+    GX_GLC3_UNIFORM_FLOAT(effect_alpha, 1)
+    GX_GLC3_UNIFORM_FLOAT(effect_alpha_cutoff, 1)
     GX_GLC3_UNIFORM_TEXTURE(material_color)
     GX_GLC3_UNIFORM_MATRIX(effect_mvp, 4, 1)
 public:
