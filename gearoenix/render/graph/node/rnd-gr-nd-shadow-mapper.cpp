@@ -99,7 +99,7 @@ void gearoenix::render::graph::node::ShadowMapper::record(const math::Mat4x4& mv
     const std::map<core::Id, std::shared_ptr<model::Mesh>>& meshes = m->get_meshes();
     for (const std::pair<const core::Id, std::shared_ptr<model::Mesh>>& id_mesh : meshes) {
         const auto* const mat = id_mesh.second->get_mat().get();
-        const auto* const mat_buff = m->get_uniform_buffers()->get_buffer();
+        const auto* const mat_buff = mat->get_uniform_buffers()->get_buffer();
         ShadowMapperUniform u;
         u.mvp = mvp;
         switch (mat->get_material_type()) {

@@ -25,7 +25,7 @@ gearoenix::glc3::shader::ShadowMapper::ShadowMapper(engine::Engine* const e, con
                                                     "in vec2 out_uv;\n"
                                                     "void main()\n"
                                                     "{\n"
-                                                    "    vec4 tmp_v4 = texture(material_base_color, out_uv);\n"
+                                                    "    vec4 tmp_v4 = texture(material_color, out_uv);\n"
                                                     "    tmp_v4.w *= effect_alpha;\n"
                                                     "    if(tmp_v4.w < effect_alpha_cutoff) discard;\n"
                                                     "}";

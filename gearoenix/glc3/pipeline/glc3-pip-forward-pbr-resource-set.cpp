@@ -48,7 +48,7 @@ void gearoenix::glc3::pipeline::ForwardPbrResourceSet::bind(gl::uint& bound_shad
     GX_GLC3_PIP_RES_SET_UNIFORM(material_alpha, material->alpha)
     GX_GLC3_PIP_RES_SET_UNIFORM(material_alpha_cutoff, material->alpha_cutoff)
     GX_GLC3_PIP_RES_SET_TXT_2D(material_base_color, color)
-    GX_GLC3_PIP_RES_SET_TXT_2D(material_emissive, emissive)
+    //    GX_GLC3_PIP_RES_SET_TXT_2D(material_emissive, emissive)
     GX_GLC3_PIP_RES_SET_UNIFORM(material_metallic_factor, material->metallic_factor)
     GX_GLC3_PIP_RES_SET_TXT_2D(material_metallic_roughness, metallic_roughness)
     GX_GLC3_PIP_RES_SET_TXT_2D(material_normal, normal)

@@ -98,7 +98,7 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
                                                     "    float nh2 = nh * nh;\n"
                                                     "    float nom = roughness2;\n"
                                                     "    float tmpdenom = nh2 * (roughness2 - 1.0) + 1.0;\n"
-                                                    "    float denom = GXPI * tmpdenom * tmpdenom;\n"
+                                                    "    float denom = GX_PI * tmpdenom * tmpdenom;\n"
                                                     "    return nom / denom;\n"
                                                     "}\n"
                                                     "float geometry_schlick_ggx(const float nd, const float roughness, const float k, const float k_inv) {\n"
@@ -187,7 +187,7 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
                                                     //       scale light by NdotL
                                                     //       add to outgoing radiance Lo
                                                     //       note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
-                                                    "        lo += (kd * albedo.xyz / GXPI + specular) * radiance * normal_dot_light;\n"
+                                                    "        lo += (kd * albedo.xyz / GX_PI + specular) * radiance * normal_dot_light;\n"
                                                     "    }\n"
                                                     //   computing directional lights
                                                     "    for (float i = 0.001; i < scene_lights_count.x; ++i)\n"
@@ -217,7 +217,7 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
                                                     //       scale light by NdotL
                                                     //       add to outgoing radiance Lo
                                                     //       note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
-                                                    "        lo += (kd * albedo.xyz / GXPI + specular) * radiance * normal_dot_light;\n"
+                                                    "        lo += (kd * albedo.xyz / GX_PI + specular) * radiance * normal_dot_light;\n"
                                                     "    }\n"
                                                     "    int effect_shadow_caster_directional_lights_count_int = int(effect_shadow_caster_directional_lights_count);\n"
                                                     "    for(int diri = 0, lcasi = 0; diri < effect_shadow_caster_directional_lights_count_int; ++diri, lcasi = diri * " GX_MAX_SHADOW_CASCADES_STR ")\n"
@@ -279,7 +279,7 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
                                                     //           scale light by NdotL
                                                     //           add to outgoing radiance Lo
                                                     //           note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
-                                                    "            lo += (kd * albedo.xyz / GXPI + specular) * radiance * normal_dot_light;\n"
+                                                    "            lo += (kd * albedo.xyz / GX_PI + specular) * radiance * normal_dot_light;\n"
                                                     "        }\n"
                                                     "    }\n"
                                                     //   ambient lighting (we now use IBL as the ambient term)
@@ -312,12 +312,12 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         GX_GLC3_THIS_GET_UNIFORM(material_alpha)
         GX_GLC3_THIS_GET_UNIFORM(material_alpha_cutoff)
         GX_GLC3_THIS_GET_UNIFORM_TEXTURE(material_base_color)
-        GX_GLC3_THIS_GET_UNIFORM_TEXTURE(material_emissive)
+        //        GX_GLC3_THIS_GET_UNIFORM_TEXTURE(material_emissive)
         GX_GLC3_THIS_GET_UNIFORM(material_metallic_factor)
         GX_GLC3_THIS_GET_UNIFORM_TEXTURE(material_metallic_roughness)
         GX_GLC3_THIS_GET_UNIFORM_TEXTURE(material_normal)
         GX_GLC3_THIS_GET_UNIFORM(material_normal_scale)
-        GX_GLC3_THIS_GET_UNIFORM(material_occlusion_strength)
+        //        GX_GLC3_THIS_GET_UNIFORM(material_occlusion_strength)
         GX_GLC3_THIS_GET_UNIFORM(material_roughness_factor)
         GX_GLC3_THIS_GET_UNIFORM(camera_position)
         GX_GLC3_THIS_GET_UNIFORM(camera_vp)

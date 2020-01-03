@@ -3,7 +3,6 @@
 #include "../../core/cr-function-loader.hpp"
 #include "../../gl/gl-constants.hpp"
 #include "../../gl/gl-loader.hpp"
-#include "../../system/sys-log.hpp"
 #include "../engine/glc3-eng-engine.hpp"
 
 gearoenix::glc3::buffer::Index::Index(
