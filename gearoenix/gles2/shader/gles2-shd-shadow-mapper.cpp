@@ -25,16 +25,16 @@ gearoenix::gles2::shader::ShadowMapper::ShadowMapper(engine::Engine* const e, co
             "}";
 
         const std::string fragment_shader_code = GX_GLES2_SHADER_SRC_DEFAULT_FRAGMENT_STARTING
-            "uniform float     material_alpha;\n"
-            "uniform float     material_alpha_cutoff;\n"
+            "uniform float     effect_alpha;\n"
+            "uniform float     effect_alpha_cutoff;\n"
             "uniform sampler2D material_color;\n"
             "varying vec2      out_depth;\n"
             "varying vec2      out_uv;\n"
             "void main()\n"
             "{\n"
             "    vec4 temp_v4 = texture2D(material_color, out_uv);\n"
-            "    temp_v4.w *= material_alpha;\n"
-            "    if(temp_v4.w < material_alpha_cutoff) discard;\n"
+            "    temp_v4.w *= effect_alpha;\n"
+            "    if(temp_v4.w < effect_alpha_cutoff) discard;\n"
             "    gl_FragColor = vec4(fract(out_depth), 0.0, 1.0);\n"
             "}";
         set_vertex_shader(vertex_shader_code);
