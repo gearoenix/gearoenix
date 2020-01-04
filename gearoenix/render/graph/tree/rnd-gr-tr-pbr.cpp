@@ -111,8 +111,8 @@ void gearoenix::render::graph::tree::Pbr::update() noexcept
                                         return n;
                                     });
                                     camera_nodes.transparencies.push_back(previous_forward_pbr);
+                                    previous_forward_pbr->update();
                                 }
-                                previous_forward_pbr->update();
                                 previous_forward_pbr->set_scene(scn);
                                 previous_forward_pbr->set_camera(cam);
                                 previous_forward_pbr->set_directional_lights(&shadow_caster_directional_lights);
@@ -129,8 +129,8 @@ void gearoenix::render::graph::tree::Pbr::update() noexcept
                                         return n;
                                     });
                                     camera_nodes.transparencies.push_back(previous_unlit);
+                                    previous_unlit->update();
                                 }
-                                previous_unlit->update();
                                 previous_unlit->set_camera(cam);
                                 previous_unlit->add_models(&material_models.second);
                                 break;
@@ -179,12 +179,16 @@ void gearoenix::render::graph::tree::Pbr::record(const unsigned int kernel_index
             for (const auto& priority_cameras : scene_nodes.second) {
                 for (const auto& camera_nodes : priority_cameras.second) {
                     for (auto* const node : camera_nodes.second.transparencies) {
-                        GX_DO_TASK(
-                            if (node->get_render_node_type() == node::Type::ForwardPbr) {
+                        GX_DO_TASK(switch (node->get_render_node_type()) {
+                            case node::Type::ForwardPbr:
                                 reinterpret_cast<node::ForwardPbr*>(node)->record_continuously(kernel_index);
-                            } else {
+                                break;
+                            case node::Type::Unlit:
                                 reinterpret_cast<node::Unlit*>(node)->record_continuously(kernel_index);
-                            })
+                                break;
+                            default:
+                                GXUNEXPECTED
+                        })
                     }
                 }
             }
@@ -217,10 +221,15 @@ void gearoenix::render::graph::tree::Pbr::submit() noexcept
             for (const auto& priority_cameras : scene_nodes.second) {
                 for (const auto& camera_nodes : priority_cameras.second) {
                     for (auto* const node : camera_nodes.second.transparencies) {
-                        if (node->get_render_node_type() == node::Type::ForwardPbr) {
+                        switch (node->get_render_node_type()) {
+                        case node::Type::ForwardPbr:
                             reinterpret_cast<node::ForwardPbr*>(node)->submit();
-                        } else {
+                            break;
+                        case node::Type::Unlit:
                             reinterpret_cast<node::Unlit*>(node)->submit();
+                            break;
+                        default:
+                            GXUNEXPECTED
                         }
                     }
                 }

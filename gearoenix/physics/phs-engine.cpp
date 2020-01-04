@@ -116,7 +116,7 @@ void gearoenix::physics::Engine::update_visibility_kernel(const unsigned int ker
                     auto* const cascade_data = light_data->cascades_info.get();
                     const auto& dir = dir_light->get_direction();
                     const auto dot = std::abs(dir.dot(math::Vec3(0.0f, 1.0f, 0.0f))) - 1.0f;
-                    const math::Vec3 up = GX_IS_ZERO(dot) ? math::Vec3::Z : math::Vec3::Y;
+                    const auto& up = GX_IS_ZERO(dot) ? math::Vec3::Z : math::Vec3::Y;
                     const auto view = math::Mat4x4::look_at(math::Vec3(), dir, up);
                     cascade_data->update(view, cascade_partitions))
             }
@@ -127,22 +127,43 @@ void gearoenix::physics::Engine::update_visibility_kernel(const unsigned int ker
 void gearoenix::physics::Engine::update_visibility_receiver() noexcept
 {
     scenes_camera_data.priority_ptr_scene.clear();
-    for (auto& k : kernels_scene_camera_data) {
-        for (auto& s : k) {
+    for (const auto& k : kernels_scene_camera_data) {
+        for (const auto& s : k) {
             auto* const scene = s.scene;
             auto& scene_camera_data = scenes_camera_data.priority_ptr_scene[scene->get_layer()][scene];
-            for (auto& c : s.cameras) {
+            for (const auto& c : s.cameras) {
                 auto* const cam = c.camera;
                 auto& camera_data = scene_camera_data.priority_ptr_camera[cam->get_layer()][cam];
                 auto& opaque_models = camera_data.opaque_container_models;
                 auto& transparent_models = camera_data.transparent_container_models;
                 auto& cascades = camera_data.shadow_caster_directional_lights;
-                auto& mo = c.opaque_container_models;
-                auto& mt = c.transparent_container_models;
-                auto& ls = c.shadow_caster_directional_lights;
-                opaque_models.merge(mo);
-                transparent_models.merge(mt);
-                for (auto& l : ls) {
+                const auto& mo = c.opaque_container_models;
+                const auto& mt = c.transparent_container_models;
+                const auto& ls = c.shadow_caster_directional_lights;
+                for (const auto& material_models : mo) {
+                    auto& opaque_models_material = opaque_models[material_models.first];
+                    for (const auto& models : material_models.second) {
+                        auto& opaque_models_model = opaque_models_material[models.first];
+                        opaque_models_model.reserve(models.second.size());
+                        for (auto* const m : models.second) {
+                            opaque_models_model.push_back(m);
+                        }
+                    }
+                }
+                for (const auto& distance_materials : mt) {
+                    auto& transparent_models_distance = transparent_models[distance_materials.first];
+                    for (const auto& material_models : distance_materials.second) {
+                        auto& transparent_models_material = transparent_models_distance[material_models.first];
+                        for (const auto& models : material_models.second) {
+                            auto& transparent_models_model = transparent_models_material[models.first];
+                            transparent_models_model.reserve(models.second.size());
+                            for (auto* const m : models.second) {
+                                transparent_models_model.push_back(m);
+                            }
+                        }
+                    }
+                }
+                for (const auto& l : ls) {
                     cascades[l.light->get_layer()][l.light] = l.cascades_info.get();
                 }
             }
