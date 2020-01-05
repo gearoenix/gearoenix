@@ -39,6 +39,7 @@ gearoenix::render::widget::Button::Button(
     auto* const mdl_mgr = ast_mgr->get_model_manager();
     core::sync::EndCaller<Text> txt_call([c](const std::shared_ptr<Text>&) {});
     text = mdl_mgr->create<Text>(txt_call);
+    text->set_text_color(theme.text_color, c);
     auto* const txt_ran = text->get_transformation();
     txt_ran->local_scale(theme.text_scale);
     txt_ran->set_location(math::Vec3(0.0f, 0.0f, 0.01f));

@@ -309,15 +309,15 @@ bool gearoenix::render::widget::Edit::on_event(const core::event::Data& d) noexc
                 const bool shift_pressed = event_engine->is_pressed(core::event::button::KeyboardKeyId::LeftShift) || event_engine->is_pressed(core::event::button::KeyboardKeyId::RightShift);
                 const auto key = core::String::to_character(data.key, shift_pressed);
                 if (key.has_value()) {
-                    if (pressed_count == 1 || (pressed_count == 2 && shift_pressed)) {
-                        insert(key.value());
-                    } else if (pressed_count == 2 && (event_engine->is_pressed(core::event::button::KeyboardKeyId::LeftControl) || event_engine->is_pressed(core::event::button::KeyboardKeyId::RightControl)) && event_engine->is_pressed(core::event::button::KeyboardKeyId::V)) {
+                    if (pressed_count == 2 && (event_engine->is_pressed(core::event::button::KeyboardKeyId::LeftControl) || event_engine->is_pressed(core::event::button::KeyboardKeyId::RightControl)) && event_engine->is_pressed(core::event::button::KeyboardKeyId::V)) {
                         const char* const clipboard = e->get_system_application()->get_clipboard();
                         if (clipboard != nullptr) {
                             for (int i = 0; clipboard[i] != 0; ++i) {
                                 insert(clipboard[i]);
                             }
                         }
+                    } else {
+                        insert(key.value());
                     }
                 } else if (pressed_count == 1) {
                     if (data.key == core::event::button::KeyboardKeyId::Left) {

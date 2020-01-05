@@ -47,7 +47,7 @@ gearoenix::render::widget::Text::Text(
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : Widget(my_id, Type::Text, e, c)
     , text(L" ")
-    , text_color(1.0f)
+    , text_color(0.7f, 0.7f, 0.7f, 1.0f)
 {
     auto ast_mgr = e->get_system_application()->get_asset_manager();
     core::sync::EndCaller<font::Font> fend([c](const std::shared_ptr<font::Font>&) {});
@@ -82,6 +82,12 @@ void gearoenix::render::widget::Text::set_text_color(
     const core::Real blue,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
 {
-    text_color = math::Vec4(red, green, blue, 1.0f);
+    set_text_color(math::Vec4(red, green, blue, 1.0f), c);
+}
+
+void gearoenix::render::widget::Text::set_text_color(
+    const math::Vec4& v, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
+{
+    text_color = v;
     set_text(text, c);
 }

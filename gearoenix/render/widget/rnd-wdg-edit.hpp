@@ -30,7 +30,7 @@ namespace gearoenix::render::widget {
 
 struct EditTheme {
     Alignment h_align = Alignment::Center;
-    math::Vec4 text_color = math::Vec4(1.0f);
+    math::Vec4 text_color = math::Vec4(0.7f, 0.7f, 0.7f, 1.0f);
     core::Real text_size = 0.9f;
     math::Vec4 hint_text_color = math::Vec4(0.5f);
     core::Real hint_text_size = 0.9f;

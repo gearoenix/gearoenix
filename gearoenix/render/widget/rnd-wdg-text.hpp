@@ -33,6 +33,9 @@ public:
     void set_text_color(
         core::Real red, core::Real green, core::Real blue,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
+    void set_text_color(
+        const math::Vec4& v,
+        const core::sync::EndCaller<core::sync::EndCallerIgnore>& c = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
 };
 }
 #endif
