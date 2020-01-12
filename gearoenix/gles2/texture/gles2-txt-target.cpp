@@ -4,7 +4,7 @@
 #include "../../core/cr-function-loader.hpp"
 #include "../../gl/gl-constants.hpp"
 #include "../../gl/gl-loader.hpp"
-#include "../../render/texture/rnd-txt-png.hpp"
+#include "../../render/texture/rnd-txt-image.hpp"
 #include "../../system/stream/sys-stm-stream.hpp"
 #include "../../system/sys-app.hpp"
 #include "../../system/sys-log.hpp"

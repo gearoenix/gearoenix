@@ -50,30 +50,20 @@ private:
     using GxVec3 = gearoenix::math::Vec3;
     using GxVec4 = gearoenix::math::Vec4;
 
-    struct ShelfInfo {
-        std::uniform_real_distribution<GxReal> rand_genx;
-        std::uniform_real_distribution<GxReal> rand_genz;
-        GxReal y = 0.0f;
-    };
-
     std::shared_ptr<GxGameScene> scn;
     std::shared_ptr<GxUiScene> uiscn;
     GxCamTran* camtrn = nullptr;
     std::shared_ptr<GxCam> cam;
-    std::shared_ptr<GxModal> modal;
-    std::shared_ptr<GxButton> look_at_button;
-    std::shared_ptr<GxTextWdg> text_location;
     std::shared_ptr<GxEditWdg> file_location;
     std::unique_ptr<GxGrPbr> render_tree;
     std::chrono::high_resolution_clock::time_point last_time_item_detail_modal_closed = std::chrono::high_resolution_clock::now();
-    std::atomic<GxReal> camera_forward = 0.0f;
-    std::atomic<GxReal> camera_sideward = 0.0f;
-    std::atomic<GxStaticModel*> selected_item;
+    GxReal camera_forward = 0.0f;
+    GxReal camera_sideward = 0.0f;
 
-    //void translate_camera(const GxVec3& t);
+    void on_open() noexcept;
 
 public:
-    IblBakerApp(gearoenix::system::Application* sys_app) noexcept;
+    explicit IblBakerApp(gearoenix::system::Application* sys_app) noexcept;
     ~IblBakerApp() noexcept final;
     void update() noexcept final;
     void terminate() noexcept final;

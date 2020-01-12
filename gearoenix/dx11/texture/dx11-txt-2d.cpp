@@ -11,7 +11,7 @@ gearoenix::dx11::texture::Texture2D::Texture2D(core::Id my_id, system::stream::S
 {
     std::vector<unsigned char> img_data;
     unsigned int imgw, imgh;
-    render::texture::PNG::decode(file, img_data, imgw, imgh);
+    render::texture::Image::decode(file, img_data, imgw, imgh);
     D3D11_TEXTURE2D_DESC desc;
     GX_SET_ZERO(desc);
     desc.Width = imgw;

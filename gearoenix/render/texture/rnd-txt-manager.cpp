@@ -1,10 +1,8 @@
 #include "rnd-txt-manager.hpp"
 #include "../../core/asset/cr-asset-manager.hpp"
-#include "../../system/stream/sys-stm-stream.hpp"
 #include "../../system/sys-app.hpp"
 #include "../engine/rnd-eng-engine.hpp"
-#include "rnd-txt-format.hpp"
-#include "rnd-txt-png.hpp"
+#include "rnd-txt-image.hpp"
 #include "rnd-txt-texture-2d.hpp"
 #include "rnd-txt-texture-cube.hpp"
 #include "rnd-txt-type.hpp"
@@ -94,7 +92,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     return default_one_2c_2d;
 }
 
-std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::create_2d(unsigned char* data, const Info& info, int img_width, int img_height, core::sync::EndCaller<Texture2D>& c) noexcept
+std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::create_2d(unsigned char* const data, const Info& info, int img_width, int img_height, core::sync::EndCaller<Texture2D>& c) noexcept
 {
     const auto id = core::asset::Manager::create_id();
     auto t = e->create_texture_2d(
@@ -110,9 +108,44 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     return t;
 }
 
+std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::create_2d_f(const unsigned char* const data, const std::size_t size, core::sync::EndCaller<Texture2D>& c) noexcept
+{
+    std::size_t img_width;
+    std::size_t img_height;
+    std::size_t img_channels;
+    std::vector<std::uint16_t> pixels;
+    Image::decode(data, size, std::nullopt, pixels, img_width, img_height, img_channels);
+    Info info;
+    switch (img_channels) {
+    case 1:
+        GXUNIMPLEMENTED
+    case 2:
+        GXUNIMPLEMENTED
+    case 3:
+        info.f = TextureFormat::RgbFloat16;
+        break;
+    case 4:
+        GXUNIMPLEMENTED
+    default:
+        GXUNEXPECTED
+    }
+    const auto id = core::asset::Manager::create_id();
+    auto t = e->create_texture_2d(
+        id,
+        pixels.data(),
+        info.f,
+        info.s,
+        img_width,
+        img_height,
+        core::sync::EndCaller<core::sync::EndCallerIgnore>([c] {}));
+    c.set_data(t);
+    cache.get_cacher().get_cacheds()[id] = t;
+    return t;
+}
+
 std::shared_ptr<gearoenix::render::texture::Cube> gearoenix::render::texture::Manager::get_cube(const math::Vec4& color, core::sync::EndCaller<Cube>& c) noexcept
 {
-    /// TODO: It is better to have deferent types of color and elements
+    /// TODO: It is better to have different types of color and elements
     static_assert(sizeof(core::Real) == 4, "Only float 32 bit are supported.");
     std::shared_ptr<std::array<core::Real, 4>> cc(new std::array<core::Real, 4>());
     (*cc)[0] = color[0];
@@ -179,7 +212,7 @@ std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::render::texture:
             std::shared_ptr<std::vector<unsigned char>> data(new std::vector<unsigned char>);
             unsigned int img_width;
             unsigned int img_height;
-            PNG::decode(f, *(data.get()), img_width, img_height);
+            Image::decode(f, *(data.get()), img_width, img_height);
             core::sync::EndCaller<core::sync::EndCallerIgnore> call([c, data] {});
             SampleInfo sinfo = SampleInfo();
             return e->create_texture_2d(

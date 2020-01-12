@@ -21,7 +21,7 @@ gearoenix::render::texture::Texture2D::Texture2D(system::stream::Stream* file, E
     std::vector<unsigned char> pixels;
     unsigned int img_width, img_height, channels;
     //    LOGE("location " << file->tell());
-    PNG::decode(file, engine, pixels, img_width, img_height, channels);
+    Image::decode(file, engine, pixels, img_width, img_height, channels);
     VkImageCreateInfo image_info;
     device::Logical* dev = engine->get_logical_device();
     memory::Manager* vmemmgr = engine->get_v_memory_manager();

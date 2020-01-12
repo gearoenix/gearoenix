@@ -24,27 +24,40 @@ std::shared_ptr<gearoenix::glc3::texture::Texture2D> gearoenix::glc3::texture::T
 {
     std::shared_ptr<Texture2D> result(new Texture2D(my_id, e));
     const SampleInfo sample_info = SampleInfo(s);
-    gl::uint cf;
+    gl::enumerated cf;
+    gl::sint tf;
+    gl::enumerated ef;
     const auto gimg_width = static_cast<gl::sizei>(img_width);
     const auto gimg_height = static_cast<gl::sizei>(img_height);
     std::vector<std::uint8_t> pixels;
-    if (f == render::texture::TextureFormat::RgbaFloat32) {
+    switch (f) {
+    case render::texture::TextureFormat::RgbaFloat32:
+        // TODO: I can in future check for support of format, if it does not support, convert it
         cf = GL_RGBA;
-        const gl::sizei pixel_size = gimg_width * gimg_height * 4;
-        auto rdata = reinterpret_cast<const core::Real*>(data);
-        pixels.resize(pixel_size);
-        for (gl::sizei i = 0; i < pixel_size; ++i)
-            pixels[i] = static_cast<std::uint8_t>(rdata[i] * 255.1f);
-    } else if (f == render::texture::TextureFormat::RgbaUint8) {
-        const gl::sizei pixel_size = gimg_width * gimg_height * 4;
+        tf = GL_RGBA32F;
+        ef = GL_FLOAT;
+        pixels.resize(gimg_width * gimg_height * 4 * 4);
+        std::memcpy(pixels.data(), data, pixels.size());
+        break;
+    case render::texture::TextureFormat::RgbFloat16:
+        // TODO: I can in future check for support of format, if it does not support, convert it
+        cf = GL_RGB;
+        tf = GL_RGB16F;
+        ef = GL_HALF_FLOAT;
+        pixels.resize(gimg_width * gimg_height * 3 * 2);
+        std::memcpy(pixels.data(), data, pixels.size());
+        break;
+    case render::texture::TextureFormat::RgbaUint8:
         cf = GL_RGBA;
-        auto rdata = reinterpret_cast<const std::uint8_t*>(data);
-        pixels.resize(pixel_size);
-        for (gl::sizei i = 0; i < pixel_size; ++i)
-            pixels[i] = rdata[i];
-    } else
+        tf = GL_RGBA;
+        ef = GL_UNSIGNED_BYTE;
+        pixels.resize(gimg_width * gimg_height * 4);
+        std::memcpy(pixels.data(), data, pixels.size());
+        break;
+    default:
         GXLOGF("Unsupported/Unimplemented setting for texture with id " << my_id)
-    e->get_function_loader()->load([result, pixels { move(pixels) }, cf, gimg_width, gimg_height, sample_info, call] {
+    }
+    e->get_function_loader()->load([result, pixels { move(pixels) }, tf, cf, ef, gimg_width, gimg_height, sample_info, call] {
 #ifdef GX_DEBUG_GL_CLASS_3
         gl::Loader::check_for_error();
 #endif
@@ -54,7 +67,7 @@ std::shared_ptr<gearoenix::glc3::texture::Texture2D> gearoenix::glc3::texture::T
         gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, sample_info.mag_filter);
         gl::Loader::tex_parameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, sample_info.wrap_s);
         gl::Loader::tex_parameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, sample_info.wrap_t);
-        gl::Loader::tex_image_2d(GL_TEXTURE_2D, 0, static_cast<gl::sint>(cf), gimg_width, gimg_height, 0, static_cast<gl::enumerated>(cf), GL_UNSIGNED_BYTE, pixels.data());
+        gl::Loader::tex_image_2d(GL_TEXTURE_2D, 0, tf, gimg_width, gimg_height, 0, cf, ef, pixels.data());
         gl::Loader::generate_mipmap(GL_TEXTURE_2D);
 #ifdef GX_DEBUG_GL_CLASS_3
         gl::Loader::check_for_error();

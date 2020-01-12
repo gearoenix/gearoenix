@@ -30,6 +30,10 @@
 #include <gearoenix/render/widget/rnd-wdg-text.hpp>
 #include <gearoenix/system/sys-app.hpp>
 
+#include <codecvt>
+#include <fstream>
+#include <locale>
+
 template <class T>
 using GxEndCaller = gearoenix::core::sync::EndCaller<T>;
 
@@ -49,58 +53,74 @@ using GxCldSphere = gearoenix::physics::collider::Sphere;
 using GxVertex = gearoenix::math::BasicVertex;
 using GxAabb3 = gearoenix::math::Aabb3;
 
+void IblBakerApp::on_open() noexcept
+{
+    std::ifstream file(
+        std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t>().to_bytes(file_location->get_text()),
+        std::ios::binary | std::ios::in);
+    file.seekg(0, std::ios::end);
+    const std::size_t file_size = file.tellg();
+    file.seekg(0, std::ios::beg);
+    std::vector<char> file_content(file_size);
+    file.read(file_content.data(), file_size);
+    GxEndCaller<GxTexture2D> txt_call([](const std::shared_ptr<GxTexture2D>&) {});
+    system_application->get_asset_manager()->get_texture_manager()->create_2d_f(
+        reinterpret_cast<const unsigned char* const>(file_content.data()), file_size, txt_call);
+}
+
 IblBakerApp::IblBakerApp(gearoenix::system::Application* const sys_app) noexcept
     : gearoenix::core::Application::Application(sys_app)
 {
-    const GxEndCallerIgnored endcall([this] {
+    const GxEndCallerIgnored end_call([this] {
         uiscn->set_enability(true);
     });
 
-    GxEndCaller<GxUiScene> uiscncall([endcall](const std::shared_ptr<GxUiScene>&) {});
-    GxEndCaller<GxMesh> mshcall([endcall](const std::shared_ptr<GxMesh>&) {});
-    GxEndCaller<GxTextWdg> txwcall([endcall](const std::shared_ptr<GxTextWdg>&) {});
-    GxEndCaller<GxEditWdg> edtcall([endcall](const std::shared_ptr<GxEditWdg>&) {});
-    GxEndCaller<GxButton> btncall([endcall](const std::shared_ptr<GxButton>&) {});
+    GxEndCaller<GxUiScene> ui_scn_call([end_call](const std::shared_ptr<GxUiScene>&) {});
+    GxEndCaller<GxMesh> msh_call([end_call](const std::shared_ptr<GxMesh>&) {});
+    GxEndCaller<GxTextWdg> txw_call([end_call](const std::shared_ptr<GxTextWdg>&) {});
+    GxEndCaller<GxEditWdg> edt_call([end_call](const std::shared_ptr<GxEditWdg>&) {});
+    GxEndCaller<GxButton> btn_call([end_call](const std::shared_ptr<GxButton>&) {});
 
-    render_tree = std::make_unique<GxGrPbr>(render_engine, endcall);
+    render_tree = std::make_unique<GxGrPbr>(render_engine, end_call);
     render_engine->set_render_tree(render_tree.get());
 
-    auto* const astmgr = sys_app->get_asset_manager();
-    auto* const mdlmgr = astmgr->get_model_manager();
-    auto* const mshmgr = astmgr->get_mesh_manager();
+    auto* const ast_mgr = sys_app->get_asset_manager();
+    auto* const mdl_mgr = ast_mgr->get_model_manager();
+    auto* const msh_mgr = ast_mgr->get_mesh_manager();
 
-    uiscn = astmgr->get_scene_manager()->create<GxUiScene>(uiscncall);
+    uiscn = ast_mgr->get_scene_manager()->create<GxUiScene>(ui_scn_call);
 
-    const auto plate_mesh = mshmgr->create_plate(mshcall);
+    const auto plate_mesh = msh_mgr->create_plate(msh_call);
 
-    auto tmptxt = mdlmgr->create<GxTextWdg>(txwcall);
-    auto* tmptran = tmptxt->get_transformation();
-    tmptran->local_scale(0.04f);
-    tmptran->set_location(GxVec3(0.0f, 0.85f, 0.1f));
-    tmptxt->set_text(L"IBL baker for Gearoenix game engine", endcall);
-    uiscn->add_model(tmptxt);
+    auto tmp_txt = mdl_mgr->create<GxTextWdg>(txw_call);
+    auto* tmp_tran = tmp_txt->get_transformation();
+    tmp_tran->local_scale(0.04f);
+    tmp_tran->set_location(GxVec3(0.0f, 0.85f, 0.1f));
+    tmp_txt->set_text(L"IBL baker for Gearoenix game engine", end_call);
+    uiscn->add_model(tmp_txt);
 
-    tmptxt = mdlmgr->create<GxTextWdg>(txwcall);
-    tmptran = tmptxt->get_transformation();
-    tmptran->local_scale(0.03f);
-    tmptran->set_location(GxVec3(-0.75f, 0.75f, 0.1f));
-    tmptxt->set_text(L"HDR file location:", endcall);
-    uiscn->add_model(tmptxt);
+    tmp_txt = mdl_mgr->create<GxTextWdg>(txw_call);
+    tmp_tran = tmp_txt->get_transformation();
+    tmp_tran->local_scale(0.03f);
+    tmp_tran->set_location(GxVec3(-0.75f, 0.75f, 0.1f));
+    tmp_txt->set_text(L"HDR file location:", end_call);
+    uiscn->add_model(tmp_txt);
 
-    auto open_button = mdlmgr->create<GxButton>(btncall);
-    tmptran = open_button->get_transformation();
-    tmptran->local_scale(0.04f);
-    tmptran->local_x_scale(4.0f);
-    tmptran->set_location(GxVec3(0.75f, 0.75f, 0.1f));
-    open_button->set_text(L"Open File", endcall);
+    auto open_button = mdl_mgr->create<GxButton>(btn_call);
+    tmp_tran = open_button->get_transformation();
+    tmp_tran->local_scale(0.04f);
+    tmp_tran->local_x_scale(4.0f);
+    tmp_tran->set_location(GxVec3(0.75f, 0.75f, 0.1f));
+    open_button->set_text(L"Open File", end_call);
+    open_button->set_on_click(std::bind(&IblBakerApp::on_open, this));
     uiscn->add_model(open_button);
 
-    file_location = mdlmgr->create<GxEditWdg>(edtcall);
-    tmptran = file_location->get_transformation();
-    tmptran->local_scale(0.04f);
-    tmptran->local_x_scale(14.0f);
-    tmptran->set_location(GxVec3(0.025f, 0.75f, 0.1f));
-    file_location->set_hint_text(L"<Fill it with 'file location'>", endcall);
+    file_location = mdl_mgr->create<GxEditWdg>(edt_call);
+    tmp_tran = file_location->get_transformation();
+    tmp_tran->local_scale(0.04f);
+    tmp_tran->local_x_scale(14.0f);
+    tmp_tran->set_location(GxVec3(0.025f, 0.75f, 0.1f));
+    file_location->set_hint_text(L"<Fill it with 'file location'>", end_call);
     uiscn->add_model(file_location);
 }
 

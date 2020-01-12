@@ -14,10 +14,10 @@ gearoenix::dx11::texture::Cube::Cube(core::Id my_id, system::stream::Stream* fil
 {
     std::vector<std::vector<unsigned char>> img_data(FACES_COUNT);
     unsigned int imgw, imgh;
-    render::texture::PNG::decode(file, img_data[0], imgw, imgh);
+    render::texture::Image::decode(file, img_data[0], imgw, imgh);
     for (int i = 1; i < FACES_COUNT; ++i) {
         unsigned int tmpimgw, tmpimgh;
-        render::texture::PNG::decode(file, img_data[i], tmpimgw, tmpimgh);
+        render::texture::Image::decode(file, img_data[i], tmpimgw, tmpimgh);
         if (imgw != tmpimgw || imgw != tmpimgh) {
             UNEXPECTED;
         }
