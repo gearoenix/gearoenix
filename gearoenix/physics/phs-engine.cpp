@@ -169,6 +169,69 @@ void gearoenix::physics::Engine::update_visibility_receiver() noexcept
             }
         }
     }
+    for (auto priority_scene_iter = scenes_camera_data.priority_ptr_scene.begin(); priority_scene_iter != scenes_camera_data.priority_ptr_scene.end();) {
+        for (auto scene_iter = priority_scene_iter->second.begin(); scene_iter != priority_scene_iter->second.end();) {
+            for (auto priority_camera_iter = scene_iter->second.priority_ptr_camera.begin(); priority_camera_iter != scene_iter->second.priority_ptr_camera.end();) {
+                for (auto camera_iter = priority_camera_iter->second.begin(); camera_iter != priority_camera_iter->second.end();) {
+                    for (auto material_iter = camera_iter->second.opaque_container_models.begin(); material_iter != camera_iter->second.opaque_container_models.end();) {
+                        for (auto model_iter = material_iter->second.begin(); model_iter != material_iter->second.end();) {
+                            if (model_iter->second.empty()) {
+                                model_iter = material_iter->second.erase(model_iter);
+                            } else {
+                                ++model_iter;
+                            }
+                        }
+                        if (material_iter->second.empty()) {
+                            material_iter = camera_iter->second.opaque_container_models.erase(material_iter);
+                        } else {
+                            ++material_iter;
+                        }
+                    }
+                    for (auto distance_iter = camera_iter->second.transparent_container_models.begin(); distance_iter != camera_iter->second.transparent_container_models.end();) {
+                        for (auto material_iter = distance_iter->second.begin(); material_iter != distance_iter->second.end();) {
+                            for (auto model_iter = material_iter->second.begin(); model_iter != material_iter->second.end();) {
+                                if (model_iter->second.empty()) {
+                                    model_iter = material_iter->second.erase(model_iter);
+                                } else {
+                                    ++model_iter;
+                                }
+                            }
+                            if (material_iter->second.empty()) {
+                                material_iter = camera_iter->second.opaque_container_models.erase(material_iter);
+                            } else {
+                                ++material_iter;
+                            }
+                        }
+                        if (distance_iter->second.empty()) {
+                            distance_iter = camera_iter->second.transparent_container_models.erase(distance_iter);
+                        } else {
+                            ++distance_iter;
+                        }
+                    }
+                    if (camera_iter->second.opaque_container_models.empty() && camera_iter->second.transparent_container_models.empty()) {
+                        camera_iter = priority_camera_iter->second.erase(camera_iter);
+                    } else {
+                        ++camera_iter;
+                    }
+                }
+                if (priority_camera_iter->second.empty()) {
+                    priority_camera_iter = scene_iter->second.priority_ptr_camera.erase(priority_camera_iter);
+                } else {
+                    ++priority_camera_iter;
+                }
+            }
+            if (scene_iter->second.priority_ptr_camera.empty()) {
+                scene_iter = priority_scene_iter->second.erase(scene_iter);
+            } else {
+                ++scene_iter;
+            }
+        }
+        if (priority_scene_iter->second.empty()) {
+            priority_scene_iter = scenes_camera_data.priority_ptr_scene.erase(priority_scene_iter);
+        } else {
+            ++priority_scene_iter;
+        }
+    }
 }
 
 void gearoenix::physics::Engine::update_shadower_kernel(const unsigned int kernel_index) noexcept

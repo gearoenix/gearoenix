@@ -335,6 +335,8 @@ SET(GX_ENGINE_SRC
         "${GX_ENGINE_SRC_DIR}render/font/rnd-fnt-type.hpp"
         "${GX_ENGINE_SRC_DIR}render/graph/node/rnd-gr-nd-deferred.cpp"
         "${GX_ENGINE_SRC_DIR}render/graph/node/rnd-gr-nd-deferred.hpp"
+        "${GX_ENGINE_SRC_DIR}render/graph/node/rnd-gr-nd-equirectangular-cube.cpp"
+        "${GX_ENGINE_SRC_DIR}render/graph/node/rnd-gr-nd-equirectangular-cube.hpp"
         "${GX_ENGINE_SRC_DIR}render/graph/node/rnd-gr-nd-forward-pbr.cpp"
         "${GX_ENGINE_SRC_DIR}render/graph/node/rnd-gr-nd-forward-pbr.hpp"
         "${GX_ENGINE_SRC_DIR}render/graph/node/rnd-gr-nd-frame-start.cpp"
