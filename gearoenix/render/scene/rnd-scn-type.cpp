@@ -12,7 +12,6 @@ std::ostream& operator<<(std::ostream& os, gearoenix::render::scene::Type t) noe
         break;
     default:
         GXLOGF("Unexpected scene type " << static_cast<gearoenix::core::TypeId>(t))
-        break;
     }
     return os;
 }

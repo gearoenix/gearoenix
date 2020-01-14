@@ -5,3 +5,12 @@ gearoenix::render::skybox::Manager::Manager(std::unique_ptr<system::stream::Stre
     , cache(std::move(s))
 {
 }
+
+gearoenix::render::skybox::Manager::~Manager() noexcept = default;
+
+std::shared_ptr<gearoenix::render::skybox::Skybox> gearoenix::render::skybox::Manager::get_gx3d(
+    const core::Id mid,
+    core::sync::EndCaller<Skybox>& c) noexcept
+{
+    return std::shared_ptr<Skybox>();
+}

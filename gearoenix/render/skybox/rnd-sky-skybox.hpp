@@ -1,42 +1,40 @@
 #ifndef GEAROENIX_RENDER_SKYBOX_SKYBOX_HPP
 #define GEAROENIX_RENDER_SKYBOX_SKYBOX_HPP
 #include "../../core/asset/cr-asset.hpp"
-#include "../../core/cr-types.hpp"
+#include "../../core/cr-static.hpp"
 #include "../../core/sync/cr-sync-end-caller.hpp"
-#include <memory>
+#include "rnd-sky-type.hpp"
 
-namespace gearoenix {
-namespace system {
-    namespace stream {
-        class Stream;
-    }
+namespace gearoenix::system::stream {
+class Stream;
 }
-namespace render {
-    namespace material {
-        class SkyboxBasic;
-    }
-    namespace mesh {
-        class Mesh;
-    }
-    namespace scene {
-        class Scene;
-    }
-    class Engine;
-    namespace skybox {
-        class Skybox : public core::asset::Asset {
-        private:
-            //std::shared_ptr<mesh::Mesh> msh = nullptr;
-            core::Id mesh_id;
-            //material::SkyboxBasic* mat = nullptr;
 
-        public:
-            //Skybox(core::Id my_id, system::stream::Stream* s, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> c);
-            //~Skybox();
-            //static Skybox* read(core::Id my_id, system::stream::Stream* s, Engine* e, core::sync::EndCaller<core::sync::EndCallerIgnore> c);
-            //void draw();
-            //void update(const scene::Scene* s);
-        };
-    }
+namespace gearoenix::render::material {
+class Material;
 }
+
+namespace gearoenix::render::mesh {
+class Mesh;
+}
+
+namespace gearoenix::render::engine {
+class Engine;
+}
+
+namespace gearoenix::render::skybox {
+class Skybox : public core::asset::Asset {
+    GX_GET_CREF_PRT(std::shared_ptr<mesh::Mesh>, msh)
+    GX_GET_CREF_PRT(std::shared_ptr<material::Material>, mat)
+    GX_GET_CVAL_PRT(Type, skybox_type)
+protected:
+    engine::Engine* const e;
+    void init(const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+
+    Skybox(Type t, core::Id my_id, system::stream::Stream* s, engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+    Skybox(Type t, core::Id my_id, engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+
+public:
+    ~Skybox() noexcept override;
+};
 }
 #endif
