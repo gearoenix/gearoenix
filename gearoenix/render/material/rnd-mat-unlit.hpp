@@ -19,7 +19,7 @@ public:
     void update() noexcept final;
     void set_color(
         core::Real r, core::Real g, core::Real b,
-        const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept;
+        const core::sync::EndCaller<core::sync::EndCallerIgnore>& end = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
     void set_color(const math::Vec4& c,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& end = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
     void set_color(const std::shared_ptr<texture::Texture2D>& color) noexcept;

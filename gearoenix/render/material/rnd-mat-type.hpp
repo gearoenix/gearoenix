@@ -5,6 +5,8 @@ namespace gearoenix::render::material {
 enum struct Type : core::TypeId {
     Pbr = 1,
     Unlit = 2,
+    SkyCube = 3,
+    SkyEquirectangular = 4,
     Unknown,
 };
 }

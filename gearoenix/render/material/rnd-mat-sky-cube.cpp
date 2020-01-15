@@ -1,22 +1,22 @@
+#include "rnd-mat-sky-cube.hpp"
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../system/sys-app.hpp"
 #include "../buffer/rnd-buf-framed-uniform.hpp"
 #include "../pipeline/rnd-pip-manager.hpp"
 #include "../texture/rnd-txt-manager.hpp"
-#include "../texture/rnd-txt-texture-2d.hpp"
-#include "rnd-mat-unlit.hpp"
+#include "../texture/rnd-txt-texture-cube.hpp"
 
-gearoenix::render::material::Unlit::Unlit(engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept
-    : Material(Type::Unlit, e, sizeof(Uniform))
+gearoenix::render::material::SkyCube::SkyCube(engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept
+    : Material(Type::SkyCube, e, sizeof(Uniform))
     , color_value(math::Vec4(1.0f, 0.0f, 0.0f, 1.0f))
 {
-    core::sync::EndCaller<texture::Texture2D> call_txt_2d([end](const std::shared_ptr<texture::Texture2D>&) {});
+    core::sync::EndCaller<texture::Cube> call_txt_2d([end](const std::shared_ptr<texture::Cube>&) {});
     auto* const txt_mgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
-    color_texture = txt_mgr->get_2d(color_value.value(), call_txt_2d);
+    color_texture = txt_mgr->get_cube(color_value.value(), call_txt_2d);
 }
 
-gearoenix::render::material::Unlit::Unlit(system::stream::Stream* const f, engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept
-    : Material(Type::Unlit, e, sizeof(Uniform))
+gearoenix::render::material::SkyCube::SkyCube(system::stream::Stream* const f, engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept
+    : Material(Type::SkyCube, e, sizeof(Uniform))
 {
     auto* const txt_mgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
 
@@ -29,12 +29,12 @@ gearoenix::render::material::Unlit::Unlit(system::stream::Stream* const f, engin
     // Reading color
     if (f->read_bool()) {
         core::sync::EndCaller<texture::Texture> txt_call([end](const std::shared_ptr<texture::Texture>&) {});
-        color_texture = std::dynamic_pointer_cast<texture::Texture2D>(txt_mgr->get_gx3d(f->read<core::Id>(), txt_call));
+        color_texture = std::dynamic_pointer_cast<texture::Cube>(txt_mgr->get_gx3d(f->read<core::Id>(), txt_call));
     } else {
-        core::sync::EndCaller<texture::Texture2D> txt_call([end](const std::shared_ptr<texture::Texture2D>&) {});
+        core::sync::EndCaller<texture::Cube> txt_call([end](const std::shared_ptr<texture::Cube>&) {});
         math::Vec4 color;
         color.read(f);
-        color_texture = std::dynamic_pointer_cast<texture::Texture2D>(txt_mgr->get_2d(color, txt_call));
+        color_texture = txt_mgr->get_cube(color, txt_call);
         color_value = color;
     }
     // Translucency
@@ -44,38 +44,38 @@ gearoenix::render::material::Unlit::Unlit(system::stream::Stream* const f, engin
     f->read(uniform.alpha_cutoff);
 }
 
-gearoenix::render::material::Unlit::~Unlit() noexcept = default;
+gearoenix::render::material::SkyCube::~SkyCube() noexcept = default;
 
-void gearoenix::render::material::Unlit::update() noexcept
+void gearoenix::render::material::SkyCube::update() noexcept
 {
     uniform_buffers->update(uniform);
 }
 
-void gearoenix::render::material::Unlit::set_color(
+void gearoenix::render::material::SkyCube::set_color(
     const core::Real r, const core::Real g, const core::Real b,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept
 {
-    core::sync::EndCaller<texture::Texture2D> call_txt_2d([end](const std::shared_ptr<texture::Texture2D>&) {});
+    core::sync::EndCaller<texture::Cube> call_txt([end](const std::shared_ptr<texture::Cube>&) {});
     auto* const txt_mgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
-    color_texture = txt_mgr->get_2d(math::Vec3(r, g, b), call_txt_2d);
+    color_texture = txt_mgr->get_cube(math::Vec3(r, g, b), call_txt);
     color_value = math::Vec4(r, g, b, 1.0f);
 }
 
-void gearoenix::render::material::Unlit::set_color(const math::Vec4& c,
+void gearoenix::render::material::SkyCube::set_color(const math::Vec4& c,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept
 {
-    core::sync::EndCaller<texture::Texture2D> call_txt_2d([end](const std::shared_ptr<texture::Texture2D>&) {});
+    core::sync::EndCaller<texture::Cube> call_txt([end](const std::shared_ptr<texture::Cube>&) {});
     auto* const txt_mgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
-    color_texture = txt_mgr->get_2d(c, call_txt_2d);
+    color_texture = txt_mgr->get_cube(c, call_txt);
     color_value = c;
 }
 
-void gearoenix::render::material::Unlit::set_color(const std::shared_ptr<texture::Texture2D>& c) noexcept
+void gearoenix::render::material::SkyCube::set_color(const std::shared_ptr<texture::Cube>& c) noexcept
 {
     color_texture = c;
 }
 
-void gearoenix::render::material::Unlit::set_alpha(const core::Real a) noexcept
+void gearoenix::render::material::SkyCube::set_alpha(const core::Real a) noexcept
 {
     uniform.alpha = a;
 }

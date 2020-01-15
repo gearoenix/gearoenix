@@ -1,9 +1,9 @@
-#ifndef GEAROENIX_RENDER_MATERIAL_UNLIT_HPP
-#define GEAROENIX_RENDER_MATERIAL_UNLIT_HPP
+#ifndef GEAROENIX_RENDER_MATERIAL_SKY_EQUIRECTANGULAR_HPP
+#define GEAROENIX_RENDER_MATERIAL_SKY_EQUIRECTANGULAR_HPP
 #include "rnd-mat-material.hpp"
 
 namespace gearoenix::render::material {
-class Unlit : public Material {
+class SkyEquirectangular : public Material {
 public:
     struct Uniform {
         core::Real alpha = 1.0f;
@@ -13,13 +13,13 @@ public:
     GX_GET_CREF_PRV(std::optional<math::Vec4>, color_value)
     GX_GET_CREF_PRV(Uniform, uniform)
 public:
-    Unlit(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept;
-    Unlit(system::stream::Stream* f, engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept;
-    ~Unlit() noexcept final;
+    SkyEquirectangular(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept;
+    SkyEquirectangular(system::stream::Stream* f, engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept;
+    ~SkyEquirectangular() noexcept final;
     void update() noexcept final;
     void set_color(
         core::Real r, core::Real g, core::Real b,
-        const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept;
+        const core::sync::EndCaller<core::sync::EndCallerIgnore>& end = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
     void set_color(const math::Vec4& c,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& end = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
     void set_color(const std::shared_ptr<texture::Texture2D>& color) noexcept;

@@ -7,12 +7,6 @@
 #include <cstring>
 #include <stb_image.h>
 
-#define GEAROENIX_PNG_SIGNATURE_SIZE 8
-
-#ifdef GX_DEBUG_MODE
-#define GEAROENIX_PNG_DEC_DEBUG
-#endif
-
 void gearoenix::render::texture::Image::decode(
     system::stream::Stream* const file,
     std::vector<unsigned char>& data,
