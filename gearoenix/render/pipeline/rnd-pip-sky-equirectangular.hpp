@@ -1,16 +1,16 @@
-#ifndef GEAROENIX_RENDER_PIPELINE_UNLIT_HPP
-#define GEAROENIX_RENDER_PIPELINE_UNLIT_HPP
+#ifndef GEAROENIX_RENDER_PIPELINE_SKY_EQUIRECTANGULAR_HPP
+#define GEAROENIX_RENDER_PIPELINE_SKY_EQUIRECTANGULAR_HPP
 #include "rnd-pip-pipeline.hpp"
 namespace gearoenix::render::pipeline {
-class Unlit : public Pipeline {
+class SkyEquirectangular : public Pipeline {
 protected:
-    Unlit(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
-        : Pipeline(Type::Unlit, e, call)
+    SkyEquirectangular(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
+        : Pipeline(Type::SkyEquirectangular, e, call)
     {
     }
 
 public:
-    ~Unlit() noexcept override = default;
+    ~SkyEquirectangular() noexcept override = default;
 };
 }
 #endif

@@ -1,16 +1,16 @@
-#ifndef GEAROENIX_RENDER_PIPELINE_UNLIT_HPP
-#define GEAROENIX_RENDER_PIPELINE_UNLIT_HPP
+#ifndef GEAROENIX_RENDER_PIPELINE_SKY_CUBE_HPP
+#define GEAROENIX_RENDER_PIPELINE_SKY_CUBE_HPP
 #include "rnd-pip-pipeline.hpp"
 namespace gearoenix::render::pipeline {
-class Unlit : public Pipeline {
+class SkyCube : public Pipeline {
 protected:
-    Unlit(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
-        : Pipeline(Type::Unlit, e, call)
+    SkyCube(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
+        : Pipeline(Type::SkyCube, e, call)
     {
     }
 
 public:
-    ~Unlit() noexcept override = default;
+    ~SkyCube() noexcept override = default;
 };
 }
 #endif
