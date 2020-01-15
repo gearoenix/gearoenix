@@ -1,4 +1,4 @@
-#include "glc3-shd-effect-unlit.hpp"
+#include "glc3-shd-unlit.hpp"
 #ifdef GX_USE_OPENGL_CLASS_3
 #include "../../core/cr-function-loader.hpp"
 #include "../../gl/gl-loader.hpp"

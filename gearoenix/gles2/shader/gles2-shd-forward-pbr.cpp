@@ -1,4 +1,4 @@
-#include "gles2-shd-effect-forward-pbr.hpp"
+#include "gles2-shd-forward-pbr.hpp"
 #ifdef GX_USE_OPENGL_ES2
 #include "../../core/cr-function-loader.hpp"
 #include "../../gl/gl-loader.hpp"

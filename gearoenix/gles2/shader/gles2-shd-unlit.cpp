@@ -1,4 +1,4 @@
-#include "gles2-shd-effect-unlit.hpp"
+#include "gles2-shd-unlit.hpp"
 #ifdef GX_USE_OPENGL_ES2
 #include "../../core/cr-function-loader.hpp"
 #include "../../gl/gl-loader.hpp"

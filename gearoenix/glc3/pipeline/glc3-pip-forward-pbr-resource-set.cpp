@@ -10,7 +10,7 @@
 #include "../../render/scene/rnd-scn-uniform.hpp"
 #include "../buffer/glc3-buf-index.hpp"
 #include "../buffer/glc3-buf-vertex.hpp"
-#include "../shader/glc3-shd-effect-forward-pbr.hpp"
+#include "../shader/glc3-shd-forward-pbr.hpp"
 #include "../texture/glc3-txt-2d.hpp"
 #include "../texture/glc3-txt-cube.hpp"
 #include "../texture/glc3-txt-target.hpp"

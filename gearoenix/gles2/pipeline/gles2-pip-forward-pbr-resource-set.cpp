@@ -10,7 +10,7 @@
 #include "../../render/scene/rnd-scn-uniform.hpp"
 #include "../buffer/gles2-buf-index.hpp"
 #include "../buffer/gles2-buf-vertex.hpp"
-#include "../shader/gles2-shd-effect-forward-pbr.hpp"
+#include "../shader/gles2-shd-forward-pbr.hpp"
 #include "../texture/gles2-txt-2d.hpp"
 #include "../texture/gles2-txt-cube.hpp"
 #include "../texture/gles2-txt-target.hpp"
