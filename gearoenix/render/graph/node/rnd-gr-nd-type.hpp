@@ -4,8 +4,10 @@
 namespace gearoenix::render::graph::node {
 enum struct Type : core::TypeId {
     ForwardPbr = 1,
-    ShadowMapper = 5,
-    Unlit = 10,
+    ShadowMapper = 2,
+    Unlit = 3,
+    SkyCube = 4,
+    SkyEquirectangular = 5,
 };
 }
 #endif
