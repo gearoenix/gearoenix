@@ -1,5 +1,6 @@
 #ifndef GEAROENIX_RENDER_SKYBOX_MANAGER_HPP
 #define GEAROENIX_RENDER_SKYBOX_MANAGER_HPP
+#include "../../core/asset/cr-asset-manager.hpp"
 #include "../../core/cache/cr-cache-file.hpp"
 #include "../../core/cr-types.hpp"
 #include "../../core/sync/cr-sync-end-caller.hpp"
@@ -34,7 +35,12 @@ template <typename T>
 typename std::enable_if<std::is_base_of<gearoenix::render::skybox::Skybox, T>::value, std::shared_ptr<T>>::type
 gearoenix::render::skybox::Manager::create(core::sync::EndCaller<T>& c) noexcept
 {
-    return std::shared_ptr<T>();
+    const core::Id id = core::asset::Manager::create_id();
+    const core::sync::EndCaller<core::sync::EndCallerIgnore> call([c] {});
+    const std::shared_ptr<T> result(new T(id, e, call));
+    c.set_data(result);
+    cache.get_cacher().get_cacheds()[id] = result;
+    return result;
 }
 
 #endif

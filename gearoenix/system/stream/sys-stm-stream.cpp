@@ -1,6 +1,6 @@
 #include "sys-stm-stream.hpp"
-
-gearoenix::system::stream::Stream::Stream() noexcept = default;
+#include "../../core/cr-string.hpp"
+#include <fstream>
 
 void gearoenix::system::stream::Stream::built_in_type_read(void* const data, const core::Count length) noexcept
 {
@@ -30,4 +30,16 @@ bool gearoenix::system::stream::Stream::read_bool() noexcept
     std::uint8_t data;
     (void)read(&data, 1);
     return data != 0;
+}
+
+std::vector<std::uint8_t> gearoenix::system::stream::Stream::get_file_content(const std::wstring& address) noexcept
+{
+    const auto addr = core::String::to_string(address);
+    std::ifstream file(addr, std::ios::binary | std::ios::in);
+    file.seekg(0, std::ios::end);
+    const std::size_t file_size = file.tellg();
+    file.seekg(0, std::ios::beg);
+    std::vector<std::uint8_t> file_content(file_size);
+    file.read(reinterpret_cast<char*>(file_content.data()), file_size);
+    return file_content;
 }

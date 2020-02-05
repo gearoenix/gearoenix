@@ -12,5 +12,6 @@ std::shared_ptr<gearoenix::render::skybox::Skybox> gearoenix::render::skybox::Ma
     const core::Id mid,
     core::sync::EndCaller<Skybox>& c) noexcept
 {
+    GXUNIMPLEMENTED
     return std::shared_ptr<Skybox>();
 }

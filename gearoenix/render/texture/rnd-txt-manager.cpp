@@ -115,6 +115,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     std::size_t img_channels;
     std::vector<std::uint16_t> pixels;
     Image::decode(data, size, std::nullopt, pixels, img_width, img_height, img_channels);
+    GXLOGD("Texture 2D Image imported with file size: " << size << ", width: " << img_width << " height: " << img_height << ", channels: " << img_channels)
     Info info;
     switch (img_channels) {
     case 1:

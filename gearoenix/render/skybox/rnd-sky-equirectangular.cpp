@@ -21,7 +21,6 @@ gearoenix::render::skybox::Equirectangular::Equirectangular(
     , mat_equ(new material::SkyEquirectangular(e, c))
 {
     mat = mat_equ;
-    GXUNIMPLEMENTED
 }
 
 gearoenix::render::skybox::Equirectangular::~Equirectangular() noexcept = default;

@@ -14,7 +14,7 @@ namespace gearoenix::system::stream {
 class Stream {
     GX_GET_VAL_PRT(bool, endian_compatibility, true)
 protected:
-    Stream() noexcept;
+    Stream() noexcept = default;
     void built_in_type_read(void* data, core::Count length) noexcept;
 
 public:
@@ -79,6 +79,8 @@ public:
     {
         write(&d, sizeof(T));
     }
+
+    [[nodiscard]] static std::vector<std::uint8_t> get_file_content(const std::wstring& address) noexcept;
 };
 }
 #endif

@@ -14,6 +14,7 @@
 #include <gearoenix/render/light/rnd-lt-directional.hpp>
 #include <gearoenix/render/light/rnd-lt-manager.hpp>
 #include <gearoenix/render/material/rnd-mat-material.hpp>
+#include <gearoenix/render/material/rnd-mat-sky-equirectangular.hpp>
 #include <gearoenix/render/mesh/rnd-msh-manager.hpp>
 #include <gearoenix/render/mesh/rnd-msh-mesh.hpp>
 #include <gearoenix/render/model/rnd-mdl-manager.hpp>
@@ -22,17 +23,16 @@
 #include <gearoenix/render/scene/rnd-scn-game.hpp>
 #include <gearoenix/render/scene/rnd-scn-manager.hpp>
 #include <gearoenix/render/scene/rnd-scn-ui.hpp>
+#include <gearoenix/render/skybox/rnd-sky-equirectangular.hpp>
+#include <gearoenix/render/skybox/rnd-sky-manager.hpp>
 #include <gearoenix/render/texture/rnd-txt-manager.hpp>
 #include <gearoenix/render/texture/rnd-txt-texture-2d.hpp>
 #include <gearoenix/render/widget/rnd-wdg-button.hpp>
 #include <gearoenix/render/widget/rnd-wdg-edit.hpp>
 #include <gearoenix/render/widget/rnd-wdg-modal.hpp>
 #include <gearoenix/render/widget/rnd-wdg-text.hpp>
+#include <gearoenix/system/stream/sys-stm-stream.hpp>
 #include <gearoenix/system/sys-app.hpp>
-
-#include <codecvt>
-#include <fstream>
-#include <locale>
 
 template <class T>
 using GxEndCaller = gearoenix::core::sync::EndCaller<T>;
@@ -52,20 +52,22 @@ using GxTexture2D = gearoenix::render::texture::Texture2D;
 using GxCldSphere = gearoenix::physics::collider::Sphere;
 using GxVertex = gearoenix::math::BasicVertex;
 using GxAabb3 = gearoenix::math::Aabb3;
+using GxStream = gearoenix::system::stream::Stream;
+using GxSkyEqrect = gearoenix::render::skybox::Equirectangular;
 
 void IblBakerApp::on_open() noexcept
 {
-    std::ifstream file(
-        std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t>().to_bytes(file_location->get_text()),
-        std::ios::binary | std::ios::in);
-    file.seekg(0, std::ios::end);
-    const std::size_t file_size = file.tellg();
-    file.seekg(0, std::ios::beg);
-    std::vector<char> file_content(file_size);
-    file.read(file_content.data(), file_size);
-    GxEndCaller<GxTexture2D> txt_call([](const std::shared_ptr<GxTexture2D>&) {});
-    system_application->get_asset_manager()->get_texture_manager()->create_2d_f(
-        reinterpret_cast<const unsigned char* const>(file_content.data()), file_size, txt_call);
+    auto const file_content = GxStream::get_file_content(file_location->get_text());
+    auto* const ast_mgr = system_application->get_asset_manager();
+    auto* const txt_mgr = ast_mgr->get_texture_manager();
+    auto* const sky_mgr = ast_mgr->get_skybox_manager();
+    GxEndCaller<GxSkyEqrect> sky_call([](const std::shared_ptr<GxSkyEqrect>& sky) {
+        //        scn->add_sky(sky);
+    });
+    GxEndCaller<GxTexture2D> txt_call([sky_call, sky { sky_mgr->create<GxSkyEqrect>(sky_call) }](const std::shared_ptr<GxTexture2D>& t) {
+        sky->get_mat_equ()->set_color(t);
+    });
+    txt_mgr->create_2d_f(reinterpret_cast<const unsigned char* const>(file_content.data()), file_content.size(), txt_call);
 }
 
 IblBakerApp::IblBakerApp(gearoenix::system::Application* const sys_app) noexcept
@@ -73,9 +75,11 @@ IblBakerApp::IblBakerApp(gearoenix::system::Application* const sys_app) noexcept
 {
     const GxEndCallerIgnored end_call([this] {
         uiscn->set_enability(true);
+        scn->set_enability(true);
     });
 
     GxEndCaller<GxUiScene> ui_scn_call([end_call](const std::shared_ptr<GxUiScene>&) {});
+    GxEndCaller<GxGameScene> scn_call([end_call](const std::shared_ptr<GxGameScene>&) {});
     GxEndCaller<GxMesh> msh_call([end_call](const std::shared_ptr<GxMesh>&) {});
     GxEndCaller<GxTextWdg> txw_call([end_call](const std::shared_ptr<GxTextWdg>&) {});
     GxEndCaller<GxEditWdg> edt_call([end_call](const std::shared_ptr<GxEditWdg>&) {});
@@ -89,6 +93,7 @@ IblBakerApp::IblBakerApp(gearoenix::system::Application* const sys_app) noexcept
     auto* const msh_mgr = ast_mgr->get_mesh_manager();
 
     uiscn = ast_mgr->get_scene_manager()->create<GxUiScene>(ui_scn_call);
+    scn = ast_mgr->get_scene_manager()->create<GxGameScene>(scn_call);
 
     const auto plate_mesh = msh_mgr->create_plate(msh_call);
 
