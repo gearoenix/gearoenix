@@ -26,6 +26,7 @@ static const std::shared_ptr<gearoenix::render::camera::Camera> null_camera = nu
 static const std::shared_ptr<gearoenix::audio::Audio> null_audio = nullptr;
 static const std::shared_ptr<gearoenix::render::light::Light> null_light = nullptr;
 static const std::shared_ptr<gearoenix::render::model::Model> null_model = nullptr;
+static const std::shared_ptr<gearoenix::render::skybox::Skybox> null_skybox = nullptr;
 static const std::shared_ptr<gearoenix::physics::constraint::Constraint> null_constraint = nullptr;
 
 #define GX_SCENE_INIT \
@@ -116,6 +117,7 @@ GX_SCENE_ADD_HELPER(camera, camera::Camera)
 GX_SCENE_ADD_HELPER(audio, audio::Audio)
 GX_SCENE_ADD_HELPER(light, light::Light)
 GX_SCENE_ADD_HELPER(constraint, physics::constraint::Constraint)
+GX_SCENE_ADD_HELPER(skybox, skybox::Skybox)
 
 void gearoenix::render::scene::Scene::scene_add_model(const std::shared_ptr<model::Model>& m) noexcept
 {
@@ -154,6 +156,7 @@ GX_GET_HELPER(audio, audio::Audio)
 GX_GET_HELPER(light, render::light::Light)
 GX_GET_HELPER(model, render::model::Model)
 GX_GET_HELPER(constraint, physics::constraint::Constraint)
+GX_GET_HELPER(skybox, render::skybox::Skybox)
 
 void gearoenix::render::scene::Scene::update() noexcept
 {

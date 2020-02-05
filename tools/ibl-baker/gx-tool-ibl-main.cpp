@@ -61,8 +61,8 @@ void IblBakerApp::on_open() noexcept
     auto* const ast_mgr = system_application->get_asset_manager();
     auto* const txt_mgr = ast_mgr->get_texture_manager();
     auto* const sky_mgr = ast_mgr->get_skybox_manager();
-    GxEndCaller<GxSkyEqrect> sky_call([](const std::shared_ptr<GxSkyEqrect>& sky) {
-        //        scn->add_sky(sky);
+    GxEndCaller<GxSkyEqrect> sky_call([this](const std::shared_ptr<GxSkyEqrect>& sky) {
+        scn->add_skybox(sky);
     });
     GxEndCaller<GxTexture2D> txt_call([sky_call, sky { sky_mgr->create<GxSkyEqrect>(sky_call) }](const std::shared_ptr<GxTexture2D>& t) {
         sky->get_mat_equ()->set_color(t);
