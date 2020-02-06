@@ -76,6 +76,8 @@ namespace graph::node {
         virtual void set_input_texture(texture::Texture* t, unsigned int index) noexcept;
         virtual void set_render_target(const std::shared_ptr<texture::Target>& t) noexcept;
         virtual void update() noexcept;
+        virtual void record(unsigned int kernel_index) noexcept;
+        virtual void record_continuously(unsigned int kernel_index) noexcept;
         virtual void submit() noexcept;
         const std::vector<std::shared_ptr<sync::Semaphore>>& get_link_frames_semaphore(unsigned int output_link_index, core::Id consumer_id, unsigned int consumer_input_link_index) noexcept;
     };

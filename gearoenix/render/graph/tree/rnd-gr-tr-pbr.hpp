@@ -13,6 +13,8 @@ namespace gearoenix::render::graph::node {
 class ForwardPbr;
 class Node;
 class Unlit;
+class SkyEquirectangular;
+class SkyCube;
 }
 namespace gearoenix::render::light {
 class CascadeInfo;
@@ -31,6 +33,7 @@ public:
         node::Unlit* unlit = nullptr;
     };
     struct CameraData {
+        std::map<core::Real, std::vector<node::Node*>> skyboxes;
         Nodes opaques;
         std::vector<node::Node*> transparencies;
     };
@@ -39,9 +42,13 @@ public:
 private:
     bool in_weak_hardware = true;
     core::OneLoopPool<node::ForwardPbr> forward_pbr;
+    //    core::OneLoopPool<node::SkyCube> skybox_cube;
+    core::OneLoopPool<node::SkyEquirectangular> skybox_equirectangular;
     core::OneLoopPool<node::Unlit> unlit;
     std::map<core::Real, std::map<const scene::Scene*, SceneData>> nodes;
     std::vector<light::CascadeInfo*> cascades;
+
+    void update_skyboxes(const scene::Scene* scn, const camera::Camera* cam, CameraData& camera_nodes) noexcept;
 
 public:
     Pbr(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;

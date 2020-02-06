@@ -132,6 +132,16 @@ void gearoenix::render::graph::node::Node::update() noexcept
     frames_primary_cmd[frame_number]->begin();
 }
 
+void gearoenix::render::graph::node::Node::record(const unsigned int) noexcept
+{
+    GXUNIMPLEMENTED
+}
+
+void gearoenix::render::graph::node::Node::record_continuously(const unsigned int) noexcept
+{
+    GXUNIMPLEMENTED
+}
+
 void gearoenix::render::graph::node::Node::submit() noexcept
 {
     const unsigned int frame_number = e->get_frame_number();

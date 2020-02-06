@@ -70,8 +70,8 @@ public:
     void update() noexcept final;
     void set_camera(const camera::Camera* cam) noexcept;
     void add_models(const std::map<const model::Model*, std::vector<const model::Mesh*>>* models) noexcept;
-    void record(unsigned int kernel_index) noexcept;
-    void record_continuously(unsigned int kernel_index) noexcept;
+    void record(unsigned int kernel_index) noexcept final;
+    void record_continuously(unsigned int kernel_index) noexcept final;
     void submit() noexcept final;
 };
 }

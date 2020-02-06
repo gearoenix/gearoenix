@@ -9,8 +9,10 @@
 #include "../../light/rnd-lt-directional.hpp"
 #include "../../scene/rnd-scn-manager.hpp"
 #include "../../scene/rnd-scn-scene.hpp"
+#include "../../skybox/rnd-sky-equirectangular.hpp"
 #include "../node/rnd-gr-nd-forward-pbr.hpp"
 #include "../node/rnd-gr-nd-shadow-mapper.hpp"
+#include "../node/rnd-gr-nd-sky-equirectangular.hpp"
 #include "../node/rnd-gr-nd-unlit.hpp"
 #include <memory>
 
@@ -25,6 +27,39 @@
         }                                                \
         task_number = (task_number + 1) % kernels_count; \
     }
+
+void gearoenix::render::graph::tree::Pbr::update_skyboxes(const scene::Scene* const scn, const camera::Camera* const cam, CameraData& camera_nodes) noexcept
+{
+    camera_nodes.skyboxes.clear();
+    node::SkyCube* previous_cube = nullptr;
+    node::SkyEquirectangular* previous_equirectangular = nullptr;
+    for (const auto& id_skybox : scn->get_skyboxs()) {
+        const auto* const sky = id_skybox.second.get();
+        if (!sky->get_enabled())
+            continue;
+        switch (sky->get_skybox_type()) {
+        case skybox::Type::Equirectangular:
+            previous_cube = nullptr;
+            if (previous_equirectangular == nullptr) {
+                previous_equirectangular = skybox_equirectangular.get_next([this] {
+                    auto* const n = new node::SkyEquirectangular(e, GX_DEFAULT_IGNORED_END_CALLER);
+                    n->set_render_target(e->get_main_render_target());
+                    return n;
+                });
+                camera_nodes.skyboxes[sky->get_layer()].push_back(previous_equirectangular);
+            }
+            previous_equirectangular->update();
+            previous_equirectangular->set_camera(cam);
+            previous_equirectangular->add_sky(reinterpret_cast<const skybox::Equirectangular* const>(sky));
+            break;
+        case skybox::Type::Cube:
+            previous_equirectangular = nullptr;
+            GXUNIMPLEMENTED
+        default:
+            GXUNEXPECTED
+        }
+    }
+}
 
 gearoenix::render::graph::tree::Pbr::Pbr(engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>&) noexcept
     : Tree(e)
@@ -63,6 +98,7 @@ void gearoenix::render::graph::tree::Pbr::update() noexcept
                     const auto& opaque_materials = models_lights.opaque_container_models;
                     const auto& transparent_materials = models_lights.transparent_container_models;
                     CameraData& camera_nodes = camera_priority_nodes[cam];
+                    update_skyboxes(scn, cam, camera_nodes);
                     for (const auto& material_models : opaque_materials) {
                         switch (material_models.first) {
                         case material::Type::Pbr: {
@@ -163,37 +199,43 @@ void gearoenix::render::graph::tree::Pbr::record(const unsigned int kernel_index
     for (const auto& priority_scenes : nodes) {
         for (const auto& scene_nodes : priority_scenes.second) {
             for (const auto& priority_cameras : scene_nodes.second) {
-                for (const auto& camera_nodes : priority_cameras.second) {
-                    const auto& opaques = camera_nodes.second.opaques;
+                for (const auto& cam_camera_nodes : priority_cameras.second) {
+                    const CameraData& camera_nodes = cam_camera_nodes.second;
+                    for (const auto& skies : camera_nodes.skyboxes)
+                        for (auto* const sky : skies.second)
+                            GX_DO_TASK(sky->record_continuously(kernel_index))
+                    const auto& opaques = camera_nodes.opaques;
                     if (opaques.forward_pbr != nullptr)
                         opaques.forward_pbr->record(kernel_index);
                     if (opaques.unlit != nullptr)
                         opaques.unlit->record(kernel_index);
+                    for (auto* const node : camera_nodes.transparencies)
+                        GX_DO_TASK(node->record_continuously(kernel_index))
                 }
             }
         }
     }
 
-    for (const auto& priority_scenes : nodes) {
-        for (const auto& scene_nodes : priority_scenes.second) {
-            for (const auto& priority_cameras : scene_nodes.second) {
-                for (const auto& camera_nodes : priority_cameras.second) {
-                    for (auto* const node : camera_nodes.second.transparencies) {
-                        GX_DO_TASK(switch (node->get_render_node_type()) {
-                            case node::Type::ForwardPbr:
-                                reinterpret_cast<node::ForwardPbr*>(node)->record_continuously(kernel_index);
-                                break;
-                            case node::Type::Unlit:
-                                reinterpret_cast<node::Unlit*>(node)->record_continuously(kernel_index);
-                                break;
-                            default:
-                                GXUNEXPECTED
-                        })
-                    }
-                }
-            }
-        }
-    }
+    //    for (const auto& priority_scenes : nodes) {
+    //        for (const auto& scene_nodes : priority_scenes.second) {
+    //            for (const auto& priority_cameras : scene_nodes.second) {
+    //                for (const auto& camera_nodes : priority_cameras.second) {
+    //                    for (auto* const node : camera_nodes.second.transparencies) {
+    //                        GX_DO_TASK(switch (node->get_render_node_type()) {
+    //                            case node::Type::ForwardPbr:
+    //                                reinterpret_cast<node::ForwardPbr*>(node)->record_continuously(kernel_index);
+    //                                break;
+    //                            case node::Type::Unlit:
+    //                                reinterpret_cast<node::Unlit*>(node)->record_continuously(kernel_index);
+    //                                break;
+    //                            default:
+    //                                GXUNEXPECTED
+    //                        })
+    //                    }
+    //                }
+    //            }
+    //        }
+    //    }
 }
 
 void gearoenix::render::graph::tree::Pbr::submit() noexcept
@@ -205,35 +247,41 @@ void gearoenix::render::graph::tree::Pbr::submit() noexcept
     for (auto& priority_scenes : nodes) {
         for (auto& scene_nodes : priority_scenes.second) {
             for (auto& priority_cameras : scene_nodes.second) {
-                for (auto& camera_nodes : priority_cameras.second) {
-                    const auto& opaques = camera_nodes.second.opaques;
+                for (auto& cam_camera_nodes : priority_cameras.second) {
+                    const CameraData& camera_nodes = cam_camera_nodes.second;
+                    for (const auto& skies : camera_nodes.skyboxes)
+                        for (auto* const sky : skies.second)
+                            sky->submit();
+                    const auto& opaques = camera_nodes.opaques;
                     if (opaques.forward_pbr != nullptr)
                         opaques.forward_pbr->submit();
                     if (opaques.unlit != nullptr)
                         opaques.unlit->submit();
+                    for (auto* const node : camera_nodes.transparencies)
+                        node->submit();
                 }
             }
         }
     }
 
-    for (const auto& priority_scenes : nodes) {
-        for (const auto& scene_nodes : priority_scenes.second) {
-            for (const auto& priority_cameras : scene_nodes.second) {
-                for (const auto& camera_nodes : priority_cameras.second) {
-                    for (auto* const node : camera_nodes.second.transparencies) {
-                        switch (node->get_render_node_type()) {
-                        case node::Type::ForwardPbr:
-                            reinterpret_cast<node::ForwardPbr*>(node)->submit();
-                            break;
-                        case node::Type::Unlit:
-                            reinterpret_cast<node::Unlit*>(node)->submit();
-                            break;
-                        default:
-                            GXUNEXPECTED
-                        }
-                    }
-                }
-            }
-        }
-    }
+    //    for (const auto& priority_scenes : nodes) {
+    //        for (const auto& scene_nodes : priority_scenes.second) {
+    //            for (const auto& priority_cameras : scene_nodes.second) {
+    //                for (const auto& camera_nodes : priority_cameras.second) {
+    //                    for (auto* const node : camera_nodes.second.transparencies) {
+    //                        switch (node->get_render_node_type()) {
+    //                        case node::Type::ForwardPbr:
+    //                            reinterpret_cast<node::ForwardPbr*>(node)->submit();
+    //                            break;
+    //                        case node::Type::Unlit:
+    //                            reinterpret_cast<node::Unlit*>(node)->submit();
+    //                            break;
+    //                        default:
+    //                            GXUNEXPECTED
+    //                        }
+    //                    }
+    //                }
+    //            }
+    //        }
+    //    }
 }

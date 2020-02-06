@@ -65,11 +65,9 @@ void gearoenix::gles2::engine::Engine::update() noexcept
 #endif
     gl::Loader::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     render::engine::Engine::update();
-    GXREACHED
 #ifdef GX_DEBUG_GLES2
     gl::Loader::check_for_error();
 #endif
-    GXREACHED
 #ifdef GX_GLES2_ENGINE_PROFILING
     auto now = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>(now - prof_last_time_draw);

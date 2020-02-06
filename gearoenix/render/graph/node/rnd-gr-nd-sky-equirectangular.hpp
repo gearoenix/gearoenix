@@ -25,6 +25,10 @@ class Model;
 class Mesh;
 }
 
+namespace gearoenix::render::skybox {
+class Equirectangular;
+}
+
 namespace gearoenix::render::pipeline {
 class SkyEquirectangularResourceSet;
 }
@@ -60,18 +64,17 @@ private:
     std::vector<std::unique_ptr<SkyEquirectangularFrame>> frames;
     SkyEquirectangularFrame* frame = nullptr;
     const camera::Camera* cam = nullptr;
-    std::vector<const std::map<const model::Model*, std::vector<const model::Mesh*>>*> models;
+    std::vector<const skybox::Equirectangular*> skies;
 
-    void record(const model::Mesh* msh, const SkyEquirectangularUniform& u, SkyEquirectangularKernel* kernel) noexcept;
+    void record_sky(const skybox::Equirectangular* sky, const SkyEquirectangularUniform& u, SkyEquirectangularKernel* kernel) noexcept;
 
 public:
     SkyEquirectangular(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
     ~SkyEquirectangular() noexcept final;
     void update() noexcept final;
     void set_camera(const camera::Camera* cam) noexcept;
-    void add_models(const std::map<const model::Model*, std::vector<const model::Mesh*>>* models) noexcept;
-    void record(unsigned int kernel_index) noexcept;
-    void record_continuously(unsigned int kernel_index) noexcept;
+    void add_sky(const skybox::Equirectangular* sky) noexcept;
+    void record_continuously(unsigned int kernel_index) noexcept final;
     void submit() noexcept final;
 };
 }

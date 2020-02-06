@@ -123,8 +123,8 @@ public:
     void add_models(const std::map<const model::Model*, std::vector<const model::Mesh*>>* models) noexcept;
     void set_directional_lights(const std::map<core::Real, std::map<light::Directional*, light::CascadeInfo*>>* m) noexcept;
     /// Multithreaded rendering happens in here
-    void record(unsigned int kernel_index) noexcept;
-    void record_continuously(unsigned int kernel_index) noexcept;
+    void record(unsigned int kernel_index) noexcept final;
+    void record_continuously(unsigned int kernel_index) noexcept final;
     /// This will be called at the end of each frame for pushing jobs to GPU
     void submit() noexcept final;
 };

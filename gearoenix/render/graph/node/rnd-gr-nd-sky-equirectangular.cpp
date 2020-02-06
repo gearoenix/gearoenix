@@ -8,7 +8,6 @@
 #include "../../command/rnd-cmd-buffer.hpp"
 #include "../../command/rnd-cmd-manager.hpp"
 #include "../../engine/rnd-eng-engine.hpp"
-#include "../../light/rnd-lt-point.hpp"
 #include "../../material/rnd-mat-material.hpp"
 #include "../../mesh/rnd-msh-mesh.hpp"
 #include "../../model/rnd-mdl-mesh.hpp"
@@ -16,7 +15,7 @@
 #include "../../pipeline/rnd-pip-manager.hpp"
 #include "../../pipeline/rnd-pip-pipeline.hpp"
 #include "../../pipeline/rnd-pip-sky-equirectangular-resource-set.hpp"
-#include "../../scene/rnd-scn-scene.hpp"
+#include "../../skybox/rnd-sky-equirectangular.hpp"
 #include "../../sync/rnd-sy-semaphore.hpp"
 #include "../../texture/rnd-txt-manager.hpp"
 #include "../../texture/rnd-txt-target.hpp"
@@ -48,8 +47,8 @@ gearoenix::render::graph::node::SkyEquirectangularFrame::SkyEquirectangularFrame
 
 gearoenix::render::graph::node::SkyEquirectangularFrame::~SkyEquirectangularFrame() noexcept = default;
 
-void gearoenix::render::graph::node::SkyEquirectangular::record(
-    const model::Mesh* const msh,
+void gearoenix::render::graph::node::SkyEquirectangular::record_sky(
+    const skybox::Equirectangular* const sky,
     const SkyEquirectangularUniform& u,
     SkyEquirectangularKernel* const kernel) noexcept
 {
@@ -58,8 +57,8 @@ void gearoenix::render::graph::node::SkyEquirectangular::record(
     });
     rd->u->set_data(u);
     auto* const prs = rd->r.get();
-    prs->set_mesh(msh->get_msh().get());
-    prs->set_material(msh->get_mat().get());
+    prs->set_mesh(sky->get_msh().get());
+    prs->set_material(sky->get_mat().get());
     kernel->secondary_cmd->bind(prs);
 }
 
@@ -97,7 +96,7 @@ void gearoenix::render::graph::node::SkyEquirectangular::update() noexcept
         kernel->render_data_pool.refresh();
         kernel->secondary_cmd->begin();
     }
-    models.clear();
+    skies.clear();
 }
 
 void gearoenix::render::graph::node::SkyEquirectangular::set_camera(const camera::Camera* const c) noexcept
@@ -107,44 +106,19 @@ void gearoenix::render::graph::node::SkyEquirectangular::set_camera(const camera
     render_target->set_clipping(cam_uni.clip_width, cam_uni.clip_height);
 }
 
-void gearoenix::render::graph::node::SkyEquirectangular::add_models(const std::map<const model::Model*, std::vector<const model::Mesh*>>* ms) noexcept
+void gearoenix::render::graph::node::SkyEquirectangular::add_sky(const skybox::Equirectangular* const sky) noexcept
 {
-    models.push_back(ms);
-}
-
-void gearoenix::render::graph::node::SkyEquirectangular::record(const unsigned int kernel_index) noexcept
-{
-    const unsigned int kernels_count = e->get_kernels()->get_threads_count();
-    unsigned int task_number = 0;
-    auto* const kernel = frame->kernels[kernel_index].get();
-    for (auto* const models_meshes : models) {
-        for (const auto& model_meshes : *models_meshes) {
-            if (task_number == kernel_index) {
-                const SkyEquirectangularUniform u {
-                    .mvp = cam->get_uniform().view_projection * model_meshes.first->get_collider()->get_model_matrix()
-                };
-                for (const auto* const msh : model_meshes.second) {
-                    record(msh, u, kernel);
-                }
-            }
-            ++task_number;
-            task_number %= kernels_count;
-        }
-    }
+    skies.push_back(sky);
 }
 
 void gearoenix::render::graph::node::SkyEquirectangular::record_continuously(const unsigned int kernel_index) noexcept
 {
     auto* const kernel = frame->kernels[kernel_index].get();
-    for (auto* const models_meshes : models) {
-        for (const auto& model_meshes : *models_meshes) {
-            const SkyEquirectangularUniform u {
-                .mvp = cam->get_uniform().view_projection * model_meshes.first->get_collider()->get_model_matrix()
-            };
-            for (const auto* const msh : model_meshes.second) {
-                record(msh, u, kernel);
-            }
-        }
+    for (const auto* const sky : skies) {
+        const SkyEquirectangularUniform u {
+            .mvp = cam->get_uniform().view_projection * math::Mat4x4(std::abs(cam->get_uniform().far) * 0.57735026f),
+        };
+        record_sky(sky, u, kernel);
     }
 }
 
