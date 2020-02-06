@@ -52,7 +52,7 @@ private:
 
     std::shared_ptr<GxGameScene> scn;
     std::shared_ptr<GxUiScene> uiscn;
-    GxCamTran* camtrn = nullptr;
+    GxCamTran* cam_trn = nullptr;
     std::shared_ptr<GxCam> cam;
     std::shared_ptr<GxEditWdg> file_location;
     std::unique_ptr<GxGrPbr> render_tree;

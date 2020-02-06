@@ -95,6 +95,11 @@ IblBakerApp::IblBakerApp(gearoenix::system::Application* const sys_app) noexcept
     uiscn = ast_mgr->get_scene_manager()->create<GxUiScene>(ui_scn_call);
     scn = ast_mgr->get_scene_manager()->create<GxGameScene>(scn_call);
 
+    cam = ast_mgr->get_camera_manager()->create<GxPersCam>();
+    cam_trn = dynamic_cast<GxCamTran*>(cam->get_transformation());
+    cam_trn->look_at(GxVec3(0.0f), GxVec3(1.0f, 0.0f, 0.0f), GxVec3(0.0f, 0.0f, 1.0f));
+    scn->add_camera(cam);
+
     const auto plate_mesh = msh_mgr->create_plate(msh_call);
 
     auto tmp_txt = mdl_mgr->create<GxTextWdg>(txw_call);

@@ -10,6 +10,7 @@
 #include "../render/model/rnd-mdl-model.hpp"
 #include "../render/scene/rnd-scn-manager.hpp"
 #include "../render/scene/rnd-scn-scene.hpp"
+#include "../render/skybox/rnd-sky-skybox.hpp"
 #include "../system/sys-app.hpp"
 #include "accelerator/phs-acc-bvh.hpp"
 #include "animation/phs-anm-manager.hpp"
@@ -96,8 +97,8 @@ void gearoenix::physics::Engine::update_visibility_kernel(const unsigned int ker
                 }
             };
             GX_DO_TASK(camera->update_uniform())
-            GX_DO_TASK(dynamic_accelerator->call_on_intersecting(camera->get_frustum_collider(), collided))
-            GX_DO_TASK(static_accelerator->call_on_intersecting(camera->get_frustum_collider(), collided))
+            GX_DO_TASK(if (nullptr != dynamic_accelerator) dynamic_accelerator->call_on_intersecting(camera->get_frustum_collider(), collided))
+            GX_DO_TASK(if (nullptr != static_accelerator) static_accelerator->call_on_intersecting(camera->get_frustum_collider(), collided))
             const auto& cascade_partitions = camera->get_cascaded_shadow_frustum_partitions();
             for (const std::pair<const core::Id, std::shared_ptr<render::light::Light>>& id_light : lights) {
                 auto* const light = id_light.second.get();
@@ -169,11 +170,11 @@ void gearoenix::physics::Engine::update_visibility_receiver() noexcept
             }
         }
     }
-    for (auto priority_scene_iter = scenes_camera_data.priority_ptr_scene.begin(); priority_scene_iter != scenes_camera_data.priority_ptr_scene.end();) {
-        for (auto scene_iter = priority_scene_iter->second.begin(); scene_iter != priority_scene_iter->second.end();) {
-            for (auto priority_camera_iter = scene_iter->second.priority_ptr_camera.begin(); priority_camera_iter != scene_iter->second.priority_ptr_camera.end();) {
-                for (auto camera_iter = priority_camera_iter->second.begin(); camera_iter != priority_camera_iter->second.end();) {
-                    for (auto material_iter = camera_iter->second.opaque_container_models.begin(); material_iter != camera_iter->second.opaque_container_models.end();) {
+    for (auto& priority_scene_iter : scenes_camera_data.priority_ptr_scene) {
+        for (auto& scene_iter : priority_scene_iter.second) {
+            for (auto& priority_camera_iter : scene_iter.second.priority_ptr_camera) {
+                for (auto& camera_iter : priority_camera_iter.second) {
+                    for (auto material_iter = camera_iter.second.opaque_container_models.begin(); material_iter != camera_iter.second.opaque_container_models.end();) {
                         for (auto model_iter = material_iter->second.begin(); model_iter != material_iter->second.end();) {
                             if (model_iter->second.empty()) {
                                 model_iter = material_iter->second.erase(model_iter);
@@ -182,12 +183,12 @@ void gearoenix::physics::Engine::update_visibility_receiver() noexcept
                             }
                         }
                         if (material_iter->second.empty()) {
-                            material_iter = camera_iter->second.opaque_container_models.erase(material_iter);
+                            material_iter = camera_iter.second.opaque_container_models.erase(material_iter);
                         } else {
                             ++material_iter;
                         }
                     }
-                    for (auto distance_iter = camera_iter->second.transparent_container_models.begin(); distance_iter != camera_iter->second.transparent_container_models.end();) {
+                    for (auto distance_iter = camera_iter.second.transparent_container_models.begin(); distance_iter != camera_iter.second.transparent_container_models.end();) {
                         for (auto material_iter = distance_iter->second.begin(); material_iter != distance_iter->second.end();) {
                             for (auto model_iter = material_iter->second.begin(); model_iter != material_iter->second.end();) {
                                 if (model_iter->second.empty()) {
@@ -197,39 +198,19 @@ void gearoenix::physics::Engine::update_visibility_receiver() noexcept
                                 }
                             }
                             if (material_iter->second.empty()) {
-                                material_iter = camera_iter->second.opaque_container_models.erase(material_iter);
+                                material_iter = camera_iter.second.opaque_container_models.erase(material_iter);
                             } else {
                                 ++material_iter;
                             }
                         }
                         if (distance_iter->second.empty()) {
-                            distance_iter = camera_iter->second.transparent_container_models.erase(distance_iter);
+                            distance_iter = camera_iter.second.transparent_container_models.erase(distance_iter);
                         } else {
                             ++distance_iter;
                         }
                     }
-                    if (camera_iter->second.opaque_container_models.empty() && camera_iter->second.transparent_container_models.empty()) {
-                        camera_iter = priority_camera_iter->second.erase(camera_iter);
-                    } else {
-                        ++camera_iter;
-                    }
-                }
-                if (priority_camera_iter->second.empty()) {
-                    priority_camera_iter = scene_iter->second.priority_ptr_camera.erase(priority_camera_iter);
-                } else {
-                    ++priority_camera_iter;
                 }
             }
-            if (scene_iter->second.priority_ptr_camera.empty()) {
-                scene_iter = priority_scene_iter->second.erase(scene_iter);
-            } else {
-                ++scene_iter;
-            }
-        }
-        if (priority_scene_iter->second.empty()) {
-            priority_scene_iter = scenes_camera_data.priority_ptr_scene.erase(priority_scene_iter);
-        } else {
-            ++priority_scene_iter;
         }
     }
 }
