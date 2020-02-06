@@ -14,7 +14,7 @@
 #include <gearoenix/render/light/rnd-lt-directional.hpp>
 #include <gearoenix/render/light/rnd-lt-manager.hpp>
 #include <gearoenix/render/material/rnd-mat-material.hpp>
-#include <gearoenix/render/material/rnd-mat-sky-equirectangular.hpp>
+#include <gearoenix/render/material/rnd-mat-skybox-equirectangular.hpp>
 #include <gearoenix/render/mesh/rnd-msh-manager.hpp>
 #include <gearoenix/render/mesh/rnd-msh-mesh.hpp>
 #include <gearoenix/render/model/rnd-mdl-manager.hpp>

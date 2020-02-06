@@ -12,7 +12,7 @@
 #include "../../skybox/rnd-sky-equirectangular.hpp"
 #include "../node/rnd-gr-nd-forward-pbr.hpp"
 #include "../node/rnd-gr-nd-shadow-mapper.hpp"
-#include "../node/rnd-gr-nd-sky-equirectangular.hpp"
+#include "../node/rnd-gr-nd-skybox-equirectangular.hpp"
 #include "../node/rnd-gr-nd-unlit.hpp"
 #include <memory>
 
@@ -31,8 +31,8 @@
 void gearoenix::render::graph::tree::Pbr::update_skyboxes(const scene::Scene* const scn, const camera::Camera* const cam, CameraData& camera_nodes) noexcept
 {
     camera_nodes.skyboxes.clear();
-    node::SkyCube* previous_cube = nullptr;
-    node::SkyEquirectangular* previous_equirectangular = nullptr;
+    node::SkyboxCube* previous_cube = nullptr;
+    node::SkyboxEquirectangular* previous_equirectangular = nullptr;
     for (const auto& id_skybox : scn->get_skyboxs()) {
         const auto* const sky = id_skybox.second.get();
         if (!sky->get_enabled())
@@ -42,7 +42,7 @@ void gearoenix::render::graph::tree::Pbr::update_skyboxes(const scene::Scene* co
             previous_cube = nullptr;
             if (previous_equirectangular == nullptr) {
                 previous_equirectangular = skybox_equirectangular.get_next([this] {
-                    auto* const n = new node::SkyEquirectangular(e, GX_DEFAULT_IGNORED_END_CALLER);
+                    auto* const n = new node::SkyboxEquirectangular(e, GX_DEFAULT_IGNORED_END_CALLER);
                     n->set_render_target(e->get_main_render_target());
                     return n;
                 });

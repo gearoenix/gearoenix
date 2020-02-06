@@ -77,7 +77,7 @@ namespace graph::node {
         /// This will be called at the start of each frame
         void update() noexcept final;
         /// Multithreaded rendering happens in here
-        void record(const math::Mat4x4& mvp, const model::Model* m, std::size_t kernel_index) noexcept;
+        void record_shadow(const math::Mat4x4& mvp, const model::Model* m, std::size_t kernel_index) noexcept;
         /// This will be called at the end of each frame for pushing jobs to GPU
         void submit() noexcept final;
     };

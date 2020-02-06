@@ -11,8 +11,8 @@ enum struct Type : unsigned int {
     SSAO = 7,
     SSR = 8,
     Unlit = 9,
-    SkyCube = 10,
-    SkyEquirectangular = 11,
+    SkyboxCube = 10,
+    SkyboxEquirectangular = 11,
 };
 }
 #endif

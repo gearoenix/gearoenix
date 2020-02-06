@@ -1,4 +1,4 @@
-#include "rnd-mat-sky-equirectangular.hpp"
+#include "rnd-mat-skybox-equirectangular.hpp"
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../system/sys-app.hpp"
 #include "../buffer/rnd-buf-framed-uniform.hpp"
@@ -6,8 +6,8 @@
 #include "../texture/rnd-txt-manager.hpp"
 #include "../texture/rnd-txt-texture-2d.hpp"
 
-gearoenix::render::material::SkyEquirectangular::SkyEquirectangular(engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept
-    : Material(Type::SkyEquirectangular, e, sizeof(Uniform))
+gearoenix::render::material::SkyboxEquirectangular::SkyboxEquirectangular(engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept
+    : Material(Type::SkyboxEquirectangular, e, sizeof(Uniform))
     , color_value(math::Vec4(1.0f, 0.0f, 0.0f, 1.0f))
 {
     core::sync::EndCaller<texture::Texture2D> call_txt_2d([end](const std::shared_ptr<texture::Texture2D>&) {});
@@ -15,8 +15,8 @@ gearoenix::render::material::SkyEquirectangular::SkyEquirectangular(engine::Engi
     color_texture = txt_mgr->get_2d(color_value.value(), call_txt_2d);
 }
 
-gearoenix::render::material::SkyEquirectangular::SkyEquirectangular(system::stream::Stream* const f, engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept
-    : Material(Type::SkyEquirectangular, e, sizeof(Uniform))
+gearoenix::render::material::SkyboxEquirectangular::SkyboxEquirectangular(system::stream::Stream* const f, engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept
+    : Material(Type::SkyboxEquirectangular, e, sizeof(Uniform))
 {
     auto* const txt_mgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
 
@@ -44,14 +44,14 @@ gearoenix::render::material::SkyEquirectangular::SkyEquirectangular(system::stre
     f->read(uniform.alpha_cutoff);
 }
 
-gearoenix::render::material::SkyEquirectangular::~SkyEquirectangular() noexcept = default;
+gearoenix::render::material::SkyboxEquirectangular::~SkyboxEquirectangular() noexcept = default;
 
-void gearoenix::render::material::SkyEquirectangular::update() noexcept
+void gearoenix::render::material::SkyboxEquirectangular::update() noexcept
 {
     uniform_buffers->update(uniform);
 }
 
-void gearoenix::render::material::SkyEquirectangular::set_color(
+void gearoenix::render::material::SkyboxEquirectangular::set_color(
     const core::Real r, const core::Real g, const core::Real b,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept
 {
@@ -61,7 +61,7 @@ void gearoenix::render::material::SkyEquirectangular::set_color(
     color_value = math::Vec4(r, g, b, 1.0f);
 }
 
-void gearoenix::render::material::SkyEquirectangular::set_color(const math::Vec4& c,
+void gearoenix::render::material::SkyboxEquirectangular::set_color(const math::Vec4& c,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept
 {
     core::sync::EndCaller<texture::Texture2D> call_txt_2d([end](const std::shared_ptr<texture::Texture2D>&) {});
@@ -70,12 +70,12 @@ void gearoenix::render::material::SkyEquirectangular::set_color(const math::Vec4
     color_value = c;
 }
 
-void gearoenix::render::material::SkyEquirectangular::set_color(const std::shared_ptr<texture::Texture2D>& c) noexcept
+void gearoenix::render::material::SkyboxEquirectangular::set_color(const std::shared_ptr<texture::Texture2D>& c) noexcept
 {
     color_texture = c;
 }
 
-void gearoenix::render::material::SkyEquirectangular::set_alpha(const core::Real a) noexcept
+void gearoenix::render::material::SkyboxEquirectangular::set_alpha(const core::Real a) noexcept
 {
     uniform.alpha = a;
 }
