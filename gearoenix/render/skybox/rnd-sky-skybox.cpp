@@ -2,6 +2,7 @@
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../system/sys-app.hpp"
 #include "../engine/rnd-eng-engine.hpp"
+#include "../material/rnd-mat-material.hpp"
 #include "../mesh/rnd-msh-manager.hpp"
 #include "../mesh/rnd-msh-mesh.hpp"
 
@@ -36,6 +37,11 @@ gearoenix::render::skybox::Skybox::Skybox(
     , e(e)
 {
     init(c);
+}
+
+void gearoenix::render::skybox::Skybox::update() noexcept
+{
+    mat->update();
 }
 
 gearoenix::render::skybox::Skybox::~Skybox() noexcept = default;

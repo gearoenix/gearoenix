@@ -11,7 +11,7 @@ void gearoenix::render::texture::Image::decode(
     system::stream::Stream* const file,
     std::vector<unsigned char>& data,
     unsigned int& img_width,
-    unsigned int& img_height)
+    unsigned int& img_height) noexcept
 {
     std::vector<unsigned char> img;
     file->read(img);
@@ -26,7 +26,7 @@ void gearoenix::render::texture::Image::decode(
     std::vector<unsigned char>& decoded_data,
     unsigned int& img_width,
     unsigned int& img_height,
-    unsigned int& img_channels)
+    unsigned int& img_channels) noexcept
 {
     int iw, ih, chs;
     unsigned char* dd = stbi_load_from_memory(data, size, &iw, &ih, &chs, static_cast<int>(src_channels));
@@ -46,10 +46,10 @@ void gearoenix::render::texture::Image::decode(
     const unsigned char* const data,
     const std::size_t size,
     const std::optional<std::size_t> requested_channels,
-    std::vector<std::uint16_t>& decoded_data,
+    std::vector<float>& decoded_data,
     std::size_t& img_width,
     std::size_t& img_height,
-    std::size_t& img_channels)
+    std::size_t& img_channels) noexcept
 {
     int iw, ih, chs;
     float* const dd = stbi_loadf_from_memory(data, size, &iw, &ih, &chs,
@@ -61,6 +61,6 @@ void gearoenix::render::texture::Image::decode(
     img_height = static_cast<std::size_t>(ih);
     img_channels = static_cast<std::size_t>(chs);
     decoded_data.resize(img_width * img_height * (requested_channels.has_value() ? requested_channels.value() : img_channels));
-    std::memcpy(&(decoded_data[0]), dd, decoded_data.size() * 2);
+    std::memcpy(&(decoded_data[0]), dd, decoded_data.size() * sizeof(float));
     stbi_image_free(dd);
 }

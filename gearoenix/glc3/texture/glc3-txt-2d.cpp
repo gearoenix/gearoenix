@@ -39,6 +39,14 @@ std::shared_ptr<gearoenix::glc3::texture::Texture2D> gearoenix::glc3::texture::T
         pixels.resize(gimg_width * gimg_height * 4 * 4);
         std::memcpy(pixels.data(), data, pixels.size());
         break;
+    case render::texture::TextureFormat::RgbFloat32:
+        // TODO: I can in future check for support of format, if it does not support, convert it
+        cf = GL_RGB;
+        tf = GL_RGB32F;
+        ef = GL_FLOAT;
+        pixels.resize(gimg_width * gimg_height * 3 * 4);
+        std::memcpy(pixels.data(), data, pixels.size());
+        break;
     case render::texture::TextureFormat::RgbFloat16:
         // TODO: I can in future check for support of format, if it does not support, convert it
         cf = GL_RGB;

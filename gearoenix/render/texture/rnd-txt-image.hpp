@@ -18,7 +18,7 @@ public:
         system::stream::Stream* file,
         std::vector<unsigned char>& decoded_data,
         unsigned int& img_width,
-        unsigned int& img_height);
+        unsigned int& img_height) noexcept;
     static void decode(
         const unsigned char* formatted_data,
         std::size_t formatted_size,
@@ -26,15 +26,15 @@ public:
         std::vector<unsigned char>& decoded_data,
         unsigned int& img_width,
         unsigned int& img_height,
-        unsigned int& img_channels);
+        unsigned int& img_channels) noexcept;
     static void decode(
         const unsigned char* formatted_data,
         std::size_t formatted_size,
         std::optional<std::size_t> requested_channels,
-        std::vector<std::uint16_t>& decoded_data,
+        std::vector<float>& decoded_data,
         std::size_t& img_width,
         std::size_t& img_height,
-        std::size_t& img_channels);
+        std::size_t& img_channels) noexcept;
 };
 }
 #endif

@@ -25,6 +25,10 @@ namespace gearoenix::render::model {
 class Static;
 }
 
+namespace gearoenix::render::skybox {
+class Equirectangular;
+}
+
 namespace gearoenix::render::widget {
 class Button;
 class Modal;
@@ -49,12 +53,14 @@ private:
     using GxVec2 = gearoenix::math::Vec2;
     using GxVec3 = gearoenix::math::Vec3;
     using GxVec4 = gearoenix::math::Vec4;
+    using GxSkyEqrect = gearoenix::render::skybox::Equirectangular;
 
     std::shared_ptr<GxGameScene> scn;
     std::shared_ptr<GxUiScene> uiscn;
     GxCamTran* cam_trn = nullptr;
     std::shared_ptr<GxCam> cam;
     std::shared_ptr<GxEditWdg> file_location;
+    std::shared_ptr<GxSkyEqrect> sky;
     std::unique_ptr<GxGrPbr> render_tree;
     std::chrono::high_resolution_clock::time_point last_time_item_detail_modal_closed = std::chrono::high_resolution_clock::now();
     GxReal camera_forward = 0.0f;

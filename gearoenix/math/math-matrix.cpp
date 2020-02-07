@@ -61,7 +61,7 @@ gearoenix::math::Mat4x4::Mat4x4(const core::Real e) noexcept
         core::Real(0),
         core::Real(0),
         core::Real(0),
-        e }
+        1.0f }
 {
 }
 

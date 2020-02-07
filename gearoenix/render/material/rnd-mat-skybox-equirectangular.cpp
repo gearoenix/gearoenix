@@ -8,7 +8,7 @@
 
 gearoenix::render::material::SkyboxEquirectangular::SkyboxEquirectangular(engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept
     : Material(Type::SkyboxEquirectangular, e, sizeof(Uniform))
-    , color_value(math::Vec4(1.0f, 0.0f, 0.0f, 1.0f))
+    , color_value(math::Vec4(0.0f, 0.0f, 0.0f, 1.0f))
 {
     core::sync::EndCaller<texture::Texture2D> call_txt_2d([end](const std::shared_ptr<texture::Texture2D>&) {});
     auto* const txt_mgr = e->get_system_application()->get_asset_manager()->get_texture_manager();

@@ -19,23 +19,27 @@ gearoenix::glc3::shader::SkyboxEquirectangular::SkyboxEquirectangular(engine::En
         "    out_pos = position;\n"
         "    gl_Position = effect_mvp * vec4(position, 1.0);\n"
         "}";
-    GX_GLC3_SHADER_SRC_DEFAULT_FRAGMENT_STARTING << "uniform float material_alpha;\n"
-                                                    "uniform float material_alpha_cutoff;\n"
-                                                    "uniform sampler2D material_color;\n"
-                                                    "in vec3 out_pos;\n"
-                                                    "out vec4 frag_color;\n"
-                                                    "const vec2 inv_atan = vec2(0.1591, 0.3183);\n"
-                                                    "vec2 sample_spherical_map(vec3 v)\n"
-                                                    "{\n"
-                                                    "    return vec2(atan(v.z, v.x), asin(v.y)) * inv_atan + 0.5;\n"
-                                                    "}"
-                                                    "void main()\n"
-                                                    "{\n"
-                                                    "    vec4 tmp_v4 = texture(material_color, sample_spherical_map(normalize(out_pos)));\n"
-                                                    "    tmp_v4.w *= material_alpha;\n"
-                                                    "    if(tmp_v4.w < material_alpha_cutoff) discard;\n"
-                                                    "    frag_color = tmp_v4;\n"
-                                                    "}";
+    GX_GLC3_SHADER_SRC_DEFAULT_FRAGMENT_STARTING <<
+        // material uniforms
+        "uniform float material_alpha;\n"
+        "uniform float material_alpha_cutoff;\n"
+        "uniform sampler2D material_color;\n"
+        "in vec3 out_pos;\n"
+        "out vec4 frag_color;\n"
+        "const vec2 inv_atan = vec2(0.1591, 0.3183);\n"
+        "vec2 sample_spherical_map(vec3 v)\n"
+        "{\n"
+        "    return vec2(atan(v.z, v.x), asin(v.y)) * inv_atan + 0.5;\n"
+        "}"
+        "void main()\n"
+        "{\n"
+        "    vec2 uv = sample_spherical_map(normalize(out_pos)).yx;\n"
+        "    uv.y = -uv.y;\n"
+        "    vec4 tmp_v4 = texture(material_color, uv);\n"
+        "    tmp_v4.w *= material_alpha;\n"
+        "    if(tmp_v4.w < material_alpha_cutoff) discard;\n"
+        "    frag_color = tmp_v4;\n"
+        "}";
     e->get_function_loader()->load([this, vertex_shader_code { vertex_shader_code.str() }, fragment_shader_code { fragment_shader_code.str() }] {
         set_vertex_shader(vertex_shader_code);
         set_fragment_shader(fragment_shader_code);

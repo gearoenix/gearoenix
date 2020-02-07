@@ -53,21 +53,19 @@ using GxCldSphere = gearoenix::physics::collider::Sphere;
 using GxVertex = gearoenix::math::BasicVertex;
 using GxAabb3 = gearoenix::math::Aabb3;
 using GxStream = gearoenix::system::stream::Stream;
-using GxSkyEqrect = gearoenix::render::skybox::Equirectangular;
 
 void IblBakerApp::on_open() noexcept
 {
-    auto const file_content = GxStream::get_file_content(file_location->get_text());
+    const auto& f = file_location->get_text();
+    if (f.empty())
+        return;
     auto* const ast_mgr = system_application->get_asset_manager();
     auto* const txt_mgr = ast_mgr->get_texture_manager();
-    auto* const sky_mgr = ast_mgr->get_skybox_manager();
-    GxEndCaller<GxSkyEqrect> sky_call([this](const std::shared_ptr<GxSkyEqrect>& sky) {
-        scn->add_skybox(sky);
-    });
-    GxEndCaller<GxTexture2D> txt_call([sky_call, sky { sky_mgr->create<GxSkyEqrect>(sky_call) }](const std::shared_ptr<GxTexture2D>& t) {
+    GxEndCaller<GxTexture2D> txt_call([this](const std::shared_ptr<GxTexture2D>& t) {
         sky->get_mat_equ()->set_color(t);
     });
-    txt_mgr->create_2d_f(reinterpret_cast<const unsigned char* const>(file_content.data()), file_content.size(), txt_call);
+    /// TODO failure management
+    txt_mgr->create_2d_f(f, txt_call);
 }
 
 IblBakerApp::IblBakerApp(gearoenix::system::Application* const sys_app) noexcept
@@ -80,17 +78,17 @@ IblBakerApp::IblBakerApp(gearoenix::system::Application* const sys_app) noexcept
 
     GxEndCaller<GxUiScene> ui_scn_call([end_call](const std::shared_ptr<GxUiScene>&) {});
     GxEndCaller<GxGameScene> scn_call([end_call](const std::shared_ptr<GxGameScene>&) {});
-    GxEndCaller<GxMesh> msh_call([end_call](const std::shared_ptr<GxMesh>&) {});
     GxEndCaller<GxTextWdg> txw_call([end_call](const std::shared_ptr<GxTextWdg>&) {});
     GxEndCaller<GxEditWdg> edt_call([end_call](const std::shared_ptr<GxEditWdg>&) {});
     GxEndCaller<GxButton> btn_call([end_call](const std::shared_ptr<GxButton>&) {});
+    GxEndCaller<GxSkyEqrect> sky_call([end_call](const std::shared_ptr<GxSkyEqrect>&) {});
 
     render_tree = std::make_unique<GxGrPbr>(render_engine, end_call);
     render_engine->set_render_tree(render_tree.get());
 
     auto* const ast_mgr = sys_app->get_asset_manager();
     auto* const mdl_mgr = ast_mgr->get_model_manager();
-    auto* const msh_mgr = ast_mgr->get_mesh_manager();
+    auto* const sky_mgr = ast_mgr->get_skybox_manager();
 
     uiscn = ast_mgr->get_scene_manager()->create<GxUiScene>(ui_scn_call);
     scn = ast_mgr->get_scene_manager()->create<GxGameScene>(scn_call);
@@ -100,7 +98,8 @@ IblBakerApp::IblBakerApp(gearoenix::system::Application* const sys_app) noexcept
     cam_trn->look_at(GxVec3(0.0f), GxVec3(1.0f, 0.0f, 0.0f), GxVec3(0.0f, 0.0f, 1.0f));
     scn->add_camera(cam);
 
-    const auto plate_mesh = msh_mgr->create_plate(msh_call);
+    sky = sky_mgr->create<GxSkyEqrect>(sky_call);
+    scn->add_skybox(sky);
 
     auto tmp_txt = mdl_mgr->create<GxTextWdg>(txw_call);
     auto* tmp_tran = tmp_txt->get_transformation();

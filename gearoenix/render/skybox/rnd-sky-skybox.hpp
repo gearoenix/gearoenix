@@ -37,6 +37,7 @@ protected:
 
 public:
     ~Skybox() noexcept override;
+    virtual void update() noexcept;
 };
 }
 #endif

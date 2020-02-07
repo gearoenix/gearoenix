@@ -49,6 +49,9 @@ void gearoenix::physics::Engine::update_scenes_kernel(const unsigned int kernel_
         if (scene == nullptr || !scene->get_enability())
             continue;
         GX_DO_TASK(scene->update())
+        const auto& skies = scene->get_skyboxs();
+        for (const auto& sky : skies)
+            GX_DO_TASK(sky.second->update())
         auto* const sd = kd.get_next([] { return new PooledSceneData(); });
         sd->scene = scene.get();
         sd->cameras.refresh();
