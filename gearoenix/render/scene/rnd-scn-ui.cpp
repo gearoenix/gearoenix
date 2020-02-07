@@ -75,7 +75,7 @@ bool gearoenix::render::scene::Ui::on_event(const core::event::Data& d) noexcept
 
     switch (d.source) {
     case core::event::Id::ButtonMouse: {
-        const auto& data = std::get<gearoenix::core::event::button::MouseData>(d.data);
+        const auto& data = std::get<core::event::button::MouseData>(d.data);
         if (data.key == core::event::button::MouseKeyId::Left) {
             if (data.action == core::event::button::MouseActionId::Press) {
                 selected_widget = nullptr;
@@ -110,7 +110,7 @@ bool gearoenix::render::scene::Ui::on_event(const core::event::Data& d) noexcept
         break;
     }
     case core::event::Id::MovementMouse: {
-        const auto& data = std::get<gearoenix::core::event::movement::Base>(d.data);
+        const auto& data = std::get<core::event::movement::Base>(d.data);
         if (selected_widget == nullptr)
             break;
         bool widget_found = false;

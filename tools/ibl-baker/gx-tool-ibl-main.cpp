@@ -53,6 +53,11 @@ using GxCldSphere = gearoenix::physics::collider::Sphere;
 using GxVertex = gearoenix::math::BasicVertex;
 using GxAabb3 = gearoenix::math::Aabb3;
 using GxStream = gearoenix::system::stream::Stream;
+using GxEventId = gearoenix::core::event::Id;
+using GxMouseData = gearoenix::core::event::button::MouseData;
+using GxMouseKeyId = gearoenix::core::event::button::MouseKeyId;
+using GxMouseActionId = gearoenix::core::event::button::MouseActionId;
+using GxMovementBase = gearoenix::core::event::movement::Base;
 
 void IblBakerApp::on_open() noexcept
 {
@@ -74,6 +79,9 @@ IblBakerApp::IblBakerApp(gearoenix::system::Application* const sys_app) noexcept
     const GxEndCallerIgnored end_call([this] {
         uiscn->set_enability(true);
         scn->set_enability(true);
+        auto* const event_engine = system_application->get_event_engine();
+        event_engine->add_listener(GxEventId::ButtonMouse, 0.0f, this);
+        event_engine->add_listener(GxEventId::MovementMouse, 0.0f, this);
     });
 
     GxEndCaller<GxUiScene> ui_scn_call([end_call](const std::shared_ptr<GxUiScene>&) {});
@@ -146,8 +154,28 @@ void IblBakerApp::terminate() noexcept
 {
 }
 
-bool IblBakerApp::on_event(const gearoenix::core::event::Data&) noexcept
+bool IblBakerApp::on_event(const gearoenix::core::event::Data& d) noexcept
 {
+    switch (d.source) {
+    case GxEventId::ButtonMouse: {
+        const auto& data = std::get<GxMouseData>(d.data);
+        if (data.key == GxMouseKeyId::Left)
+            camera_rotation_enabled = data.action == GxMouseActionId::Press;
+        break;
+    }
+    case GxEventId::MovementMouse: {
+        if (camera_rotation_enabled) {
+            const auto& data = std::get<gearoenix::core::event::movement::Base>(d.data);
+            const auto rot_x = data.delta_position[1];
+            const auto rot_z = data.delta_position[0];
+            cam_trn->local_rotate(rot_z, GxVec3::Z);
+            cam_trn->local_x_rotate(rot_x);
+        }
+        break;
+    }
+    default:
+        GXUNEXPECTED
+    }
     return false;
 }
 

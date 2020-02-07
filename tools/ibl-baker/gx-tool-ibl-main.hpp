@@ -62,6 +62,7 @@ private:
     std::shared_ptr<GxEditWdg> file_location;
     std::shared_ptr<GxSkyEqrect> sky;
     std::unique_ptr<GxGrPbr> render_tree;
+    bool camera_rotation_enabled = false;
     std::chrono::high_resolution_clock::time_point last_time_item_detail_modal_closed = std::chrono::high_resolution_clock::now();
     GxReal camera_forward = 0.0f;
     GxReal camera_sideward = 0.0f;
