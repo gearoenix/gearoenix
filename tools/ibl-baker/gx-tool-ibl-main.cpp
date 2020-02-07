@@ -58,6 +58,8 @@ using GxMouseData = gearoenix::core::event::button::MouseData;
 using GxMouseKeyId = gearoenix::core::event::button::MouseKeyId;
 using GxMouseActionId = gearoenix::core::event::button::MouseActionId;
 using GxMovementBase = gearoenix::core::event::movement::Base;
+using GxTxtSampleInfo = gearoenix::render::texture::SampleInfo;
+using GxTxtFilter = gearoenix::render::texture::Filter;
 
 void IblBakerApp::on_open() noexcept
 {
@@ -69,8 +71,10 @@ void IblBakerApp::on_open() noexcept
     GxEndCaller<GxTexture2D> txt_call([this](const std::shared_ptr<GxTexture2D>& t) {
         sky->get_mat_equ()->set_color(t);
     });
+    GxTxtSampleInfo smp;
+    smp.min_filter = GxTxtFilter::LINEAR;
     /// TODO failure management
-    txt_mgr->create_2d_f(f, txt_call);
+    txt_mgr->create_2d_f(f, txt_call, smp);
 }
 
 IblBakerApp::IblBakerApp(gearoenix::system::Application* const sys_app) noexcept

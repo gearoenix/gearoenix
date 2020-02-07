@@ -27,7 +27,7 @@ gearoenix::gles2::texture::SampleInfo::SampleInfo(const render::texture::SampleI
     default:
         GXUNEXPECTED
     }
-    const auto fun = [](render::texture::Wrap::Id w) {
+    const auto fun = [](render::texture::Wrap w) {
         switch (w) {
         case render::texture::Wrap::CLAMP_TO_EDGE:
             return GL_CLAMP_TO_EDGE;

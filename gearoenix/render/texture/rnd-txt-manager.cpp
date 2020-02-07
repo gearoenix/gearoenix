@@ -108,7 +108,10 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     return t;
 }
 
-std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::create_2d_f(const unsigned char* const data, const std::size_t size, core::sync::EndCaller<Texture2D>& c) noexcept
+std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::create_2d_f(
+    const unsigned char* const data,
+    const std::size_t size, core::sync::EndCaller<Texture2D>& c,
+    const SampleInfo& sample_info) noexcept
 {
     std::size_t img_width;
     std::size_t img_height;
@@ -117,6 +120,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     Image::decode(data, size, std::nullopt, pixels, img_width, img_height, img_channels);
     GXLOGD("Texture 2D Image imported with file size: " << size << ", width: " << img_width << " height: " << img_height << ", channels: " << img_channels)
     Info info;
+    info.s = sample_info;
     switch (img_channels) {
     case 1:
         GXUNIMPLEMENTED
@@ -146,10 +150,11 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
 
 std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::create_2d_f(
     const std::wstring& file_address,
-    core::sync::EndCaller<Texture2D>& c) noexcept
+    core::sync::EndCaller<Texture2D>& c,
+    const SampleInfo& sample_info) noexcept
 {
     auto const file_content = system::stream::Stream::get_file_content(file_address);
-    return create_2d_f(reinterpret_cast<const unsigned char* const>(file_content.data()), file_content.size(), c);
+    return create_2d_f(reinterpret_cast<const unsigned char* const>(file_content.data()), file_content.size(), c, sample_info);
 }
 
 std::shared_ptr<gearoenix::render::texture::Cube> gearoenix::render::texture::Manager::get_cube(const math::Vec4& color, core::sync::EndCaller<Cube>& c) noexcept

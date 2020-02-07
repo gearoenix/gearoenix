@@ -4,7 +4,7 @@
 
 gearoenix::glc3::texture::SampleInfo::SampleInfo(const render::texture::SampleInfo& o) noexcept
 {
-    const auto min_filfun = [](render::texture::Filter::Id f) {
+    const auto min_filfun = [](render::texture::Filter f) {
         switch (f) {
         case render::texture::Filter::NEAREST:
             return GL_NEAREST;
@@ -23,7 +23,7 @@ gearoenix::glc3::texture::SampleInfo::SampleInfo(const render::texture::SampleIn
         }
     };
 
-    const auto mag_filfun = [](render::texture::Filter::Id f) {
+    const auto mag_filfun = [](render::texture::Filter f) {
         switch (f) {
         case render::texture::Filter::NEAREST:
             return GL_NEAREST;
@@ -41,7 +41,7 @@ gearoenix::glc3::texture::SampleInfo::SampleInfo(const render::texture::SampleIn
 
 #undef GX_HELPER
 
-    const auto fun = [](render::texture::Wrap::Id w) {
+    const auto fun = [](render::texture::Wrap w) {
         switch (w) {
         case render::texture::Wrap::CLAMP_TO_EDGE:
             return GL_CLAMP_TO_EDGE;
