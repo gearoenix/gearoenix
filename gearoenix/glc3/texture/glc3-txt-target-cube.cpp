@@ -1,15 +1,14 @@
-#include "glc3-txt-target.hpp"
+#include "glc3-txt-target-cube.hpp"
 #ifdef GX_USE_OPENGL_CLASS_3
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../core/cr-function-loader.hpp"
 #include "../../gl/gl-constants.hpp"
 #include "../../gl/gl-loader.hpp"
-#include "../../render/texture/rnd-txt-image.hpp"
 #include "../../system/sys-app.hpp"
 #include "../engine/glc3-eng-engine.hpp"
 #include "glc3-txt-sample.hpp"
 
-void gearoenix::glc3::texture::Target::state_init() const noexcept
+void gearoenix::glc3::texture::TargetCube::state_init() const noexcept
 {
     gl::Loader::clear_color(0.0f, 0.0f, 0.0f, 1.0f);
     gl::Loader::enable(GL_CULL_FACE);
@@ -19,29 +18,31 @@ void gearoenix::glc3::texture::Target::state_init() const noexcept
     gl::Loader::enable(GL_DEPTH_TEST);
     gl::Loader::enable(GL_SCISSOR_TEST);
     gl::Loader::enable(GL_STENCIL_TEST);
-    gl::Loader::viewport(0, 0, static_cast<gl::sizei>(clipping_width), static_cast<gl::sizei>(clipping_height));
-    gl::Loader::scissor(0, 0, static_cast<gl::sizei>(clipping_width), static_cast<gl::sizei>(clipping_height));
+    //    gl::Loader::viewport(0, 0, static_cast<gl::sizei>(clipping_width), static_cast<gl::sizei>(clipping_height));
+    //    gl::Loader::scissor(0, 0, static_cast<gl::sizei>(clipping_width), static_cast<gl::sizei>(clipping_height));
 }
 
-gearoenix::glc3::texture::Target::Target(const core::Id my_id, engine::Engine* const e) noexcept
-    : render::texture::Target(my_id, e)
+gearoenix::glc3::texture::TargetCube::TargetCube(const core::Id id, engine::Engine* const e) noexcept
+    : render::texture::Texture(id, render::texture::Type::TargetCube, e)
+    , render::texture::TargetCube(id, e)
 {
 }
 
-gearoenix::glc3::texture::Target::Target(engine::Engine* const e) noexcept
-    : render::texture::Target(core::asset::Manager::create_id(), e)
+gearoenix::glc3::texture::TargetCube::TargetCube(engine::Engine* const e) noexcept
+    : render::texture::Texture(core::asset::Manager::create_id(), render::texture::Type::TargetCube, e)
+    , render::texture::TargetCube(asset_id, e)
 {
     const auto* sys_app = e->get_system_application();
     img_width = sys_app->get_window_width();
     img_height = sys_app->get_window_height();
-    clipping_width = static_cast<core::Real>(img_width);
-    clipping_height = static_cast<core::Real>(img_height);
+    //    clipping_width = static_cast<core::Real>(img_width);
+    //    clipping_height = static_cast<core::Real>(img_height);
     gl::Loader::get_integerv(GL_FRAMEBUFFER_BINDING, &framebuffer);
     gl::Loader::get_integerv(GL_RENDERBUFFER_BINDING, &depth_buffer);
     state_init();
 }
 
-std::shared_ptr<gearoenix::glc3::texture::Target> gearoenix::glc3::texture::Target::construct(
+std::shared_ptr<gearoenix::glc3::texture::TargetCube> gearoenix::glc3::texture::TargetCube::construct(
     core::Id my_id,
     engine::Engine* e,
     const std::vector<render::texture::Info>& infos,
@@ -49,11 +50,11 @@ std::shared_ptr<gearoenix::glc3::texture::Target> gearoenix::glc3::texture::Targ
     unsigned int h,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
 {
-    const std::shared_ptr<Target> result(new Target(my_id, e));
+    const std::shared_ptr<TargetCube> result(new TargetCube(my_id, e));
     result->img_width = w;
     result->img_height = h;
-    result->clipping_width = static_cast<core::Real>(w);
-    result->clipping_height = static_cast<core::Real>(h);
+    //    result->clipping_width = static_cast<core::Real>(w);
+    //    result->clipping_height = static_cast<core::Real>(h);
     result->texture_objects.resize(infos.size());
     e->get_function_loader()->load([result, infos, call] {
         gl::Loader::gen_framebuffers(1, reinterpret_cast<gl::uint*>(&(result->framebuffer)));
@@ -85,7 +86,7 @@ std::shared_ptr<gearoenix::glc3::texture::Target> gearoenix::glc3::texture::Targ
     return result;
 }
 
-gearoenix::glc3::texture::Target::~Target() noexcept
+gearoenix::glc3::texture::TargetCube::~TargetCube() noexcept
 {
     if (texture_objects.empty()) // This is main render-target
         return;
@@ -101,13 +102,13 @@ gearoenix::glc3::texture::Target::~Target() noexcept
     });
 }
 
-void gearoenix::glc3::texture::Target::bind() const noexcept
+void gearoenix::glc3::texture::TargetCube::bind() const noexcept
 {
     if (-1 != depth_buffer)
         gl::Loader::bind_renderbuffer(GL_RENDERBUFFER, depth_buffer);
     gl::Loader::bind_framebuffer(GL_FRAMEBUFFER, framebuffer);
-    gl::Loader::viewport(0, 0, static_cast<gl::sizei>(clipping_width), static_cast<gl::sizei>(clipping_height));
-    gl::Loader::scissor(0, 0, static_cast<gl::sizei>(clipping_width), static_cast<gl::sizei>(clipping_height));
+    //    gl::Loader::viewport(0, 0, static_cast<gl::sizei>(clipping_width), static_cast<gl::sizei>(clipping_height));
+    //    gl::Loader::scissor(0, 0, static_cast<gl::sizei>(clipping_width), static_cast<gl::sizei>(clipping_height));
     gl::Loader::enable(GL_DEPTH_TEST);
     gl::Loader::depth_mask(GL_TRUE);
     if (!texture_objects.empty())
@@ -116,7 +117,7 @@ void gearoenix::glc3::texture::Target::bind() const noexcept
         gl::Loader::clear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 }
 
-void gearoenix::glc3::texture::Target::bind_textures(const std::vector<gl::enumerated>& texture_units) const noexcept
+void gearoenix::glc3::texture::TargetCube::bind_textures(const std::vector<gl::enumerated>& texture_units) const noexcept
 {
 #ifdef GX_DEBUG_MODE
     if (texture_units.size() != texture_objects.size())

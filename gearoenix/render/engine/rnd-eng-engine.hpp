@@ -80,6 +80,7 @@ class Semaphore;
 namespace gearoenix::render::texture {
 class TextureCube;
 class Target;
+class Target2D;
 class Texture2D;
 }
 
@@ -94,7 +95,7 @@ class Engine {
     GX_GET_UPTR_PRT(command::Manager, command_manager)
     GX_GET_UPTR_PRT(sampler::Manager, sampler_manager)
     GX_GET_UPTR_PRT(buffer::Manager, buffer_manager)
-    GX_GET_CREF_PRT(std::shared_ptr<texture::Target>, main_render_target)
+    GX_GET_CREF_PRT(std::shared_ptr<texture::Target2D>, main_render_target)
     GX_GET_CREF_PRT(Limitations, limitations)
     GX_GET_VAL_PRT(unsigned int, frames_count, 2)
     GX_GET_VAL_PRT(unsigned int, frame_number, 0)

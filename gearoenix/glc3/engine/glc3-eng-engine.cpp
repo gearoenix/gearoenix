@@ -17,6 +17,7 @@
 #include "../sync/glc3-sy-semaphore.hpp"
 #include "../texture/glc3-txt-2d.hpp"
 #include "../texture/glc3-txt-cube.hpp"
+#include "../texture/glc3-txt-target-2d.hpp"
 #include "../texture/glc3-txt-target.hpp"
 
 gearoenix::glc3::engine::Engine::Engine(system::Application* const sys_app, const render::engine::Type engine_type) noexcept
@@ -31,7 +32,7 @@ gearoenix::glc3::engine::Engine* gearoenix::glc3::engine::Engine::construct(syst
     e->pipeline_manager = std::make_unique<pipeline::Manager>(e);
     e->buffer_manager = std::make_unique<buffer::Manager>(e);
     e->command_manager = std::make_unique<command::Manager>();
-    e->main_render_target = std::make_unique<texture::Target>(e);
+    e->main_render_target = std::make_unique<texture::Target2D>(e);
     return e;
 }
 

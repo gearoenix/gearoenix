@@ -27,7 +27,7 @@ private:
 public:
     explicit Target(engine::Engine* e) noexcept;
     virtual ~Target() noexcept;
-    [[nodiscard]] static std::shared_ptr<Target> construct(
+    [[nodiscard]] static std::shared_ptr<render::texture::Target> construct(
         core::Id my_id,
         engine::Engine* e,
         const std::vector<render::texture::Info>& infos,

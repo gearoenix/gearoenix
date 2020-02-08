@@ -41,7 +41,7 @@ gearoenix::glc3::texture::Target::Target(engine::Engine* const e) noexcept
     state_init();
 }
 
-std::shared_ptr<gearoenix::glc3::texture::Target> gearoenix::glc3::texture::Target::construct(
+std::shared_ptr<gearoenix::render::texture::Target> gearoenix::glc3::texture::Target::construct(
     core::Id my_id,
     engine::Engine* e,
     const std::vector<render::texture::Info>& infos,

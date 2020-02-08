@@ -1,4 +1,6 @@
 #include "gles2-eng-engine.hpp"
+
+#include <memory>
 #ifdef GX_USE_OPENGL_ES2
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../core/event/cr-ev-event.hpp"
@@ -17,6 +19,7 @@
 #include "../sync/gles2-sy-semaphore.hpp"
 #include "../texture/gles2-txt-2d.hpp"
 #include "../texture/gles2-txt-cube.hpp"
+#include "../texture/gles2-txt-target-2d.hpp"
 #include "../texture/gles2-txt-target.hpp"
 
 void gearoenix::gles2::engine::Engine::initialize() noexcept
@@ -46,7 +49,7 @@ gearoenix::gles2::engine::Engine* gearoenix::gles2::engine::Engine::construct(sy
 #ifdef GX_DEBUG_GLES2
     gl::Loader::check_for_error();
 #endif
-    e->main_render_target = std::make_unique<texture::Target>(render::texture::Type::Target2D, e);
+    e->main_render_target = std::make_unique<texture::Target2D>(e);
 #ifdef GX_DEBUG_GLES2
     gl::Loader::check_for_error();
 #endif
@@ -90,7 +93,7 @@ void gearoenix::gles2::engine::Engine::terminate() noexcept
 
 std::shared_ptr<gearoenix::render::sync::Semaphore> gearoenix::gles2::engine::Engine::create_semaphore() const noexcept
 {
-    return std::shared_ptr<sync::Semaphore>(new sync::Semaphore());
+    return std::make_shared<sync::Semaphore>();
 }
 
 std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::gles2::engine::Engine::create_texture_2d(

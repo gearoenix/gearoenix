@@ -37,6 +37,6 @@ public:
     void bind_textures(const std::vector<gl::enumerated>& texture_units) const noexcept;
 };
 }
-}
+
 #endif
 #endif
