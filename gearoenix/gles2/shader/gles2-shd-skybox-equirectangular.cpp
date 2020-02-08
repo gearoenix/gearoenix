@@ -29,7 +29,7 @@ gearoenix::gles2::shader::SkyboxEquirectangular::SkyboxEquirectangular(engine::E
             "void main()\n"
             "{\n"
             "    vec4 temp_v4 = vec4(normalize(out_pos), 0.0);\n"
-            "    temp_v4.xy = vec2(atan(temp_v4.z, temp_v4.x), asin(temp_v4.y)) * inv_atan + 0.5;\n"
+            "    temp_v4.xy = vec2(atan(temp_v4.y, temp_v4.x), asin(-temp_v4.z)) * inv_atan + 0.5;\n"
             "    temp_v4 = texture2D(material_color, temp_v4.xy);\n"
             "    temp_v4.w *= material_alpha;\n"
             "    if(temp_v4.w < material_alpha_cutoff) discard;\n"

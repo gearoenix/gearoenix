@@ -43,6 +43,20 @@ std::shared_ptr<gearoenix::gles2::texture::Texture2D> gearoenix::gles2::texture:
             else
                 pixels[i] = static_cast<std::uint8_t>(c);
         }
+    } else if (f == render::texture::TextureFormat::RgbFloat32) {
+        cf = GL_RGB;
+        const gl::sizei pixel_size = gimg_width * gimg_height * 3;
+        pixels.resize(pixel_size);
+        const auto rdata = reinterpret_cast<const core::Real*>(data);
+        for (gl::sizei i = 0; i < pixel_size; ++i) {
+            const auto c = rdata[i] * 255.1f;
+            if (c >= 255.0f)
+                pixels[i] = 255;
+            else if (c < 0.0f)
+                pixels[i] = 0;
+            else
+                pixels[i] = static_cast<std::uint8_t>(c);
+        }
     } else if (f == render::texture::TextureFormat::RgbaUint8) {
         cf = GL_RGBA;
         const gl::sizei pixel_size = gimg_width * gimg_height * 4;

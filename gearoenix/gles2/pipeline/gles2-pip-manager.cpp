@@ -3,6 +3,7 @@
 #include "../engine/gles2-eng-engine.hpp"
 #include "gles2-pip-forward-pbr.hpp"
 #include "gles2-pip-shadow-mapper.hpp"
+#include "gles2-pip-skybox-equirectangular.hpp"
 #include "gles2-pip-unlit.hpp"
 
 gearoenix::gles2::pipeline::Manager::Manager(engine::Engine* const engine) noexcept
@@ -15,17 +16,17 @@ gearoenix::gles2::pipeline::Manager::~Manager() noexcept = default;
 std::shared_ptr<gearoenix::render::pipeline::Pipeline> gearoenix::gles2::pipeline::Manager::get(const render::pipeline::Type pipeline_type_id, core::sync::EndCaller<render::pipeline::Pipeline>& end) noexcept
 {
     const std::shared_ptr<render::pipeline::Pipeline> p = pipelines.get<render::pipeline::Pipeline>(pipeline_type_id, [this, pipeline_type_id, end] {
-        auto gles2eng = reinterpret_cast<engine::Engine*>(e);
+        auto eng = reinterpret_cast<engine::Engine*>(e);
+        const core::sync::EndCaller<core::sync::EndCallerIgnore> c([end] {});
         switch (pipeline_type_id) {
         case render::pipeline::Type::ForwardPbr:
-            return std::shared_ptr<render::pipeline::Pipeline>(new ForwardPbr(gles2eng,
-                core::sync::EndCaller<core::sync::EndCallerIgnore>([end] {})));
+            return std::shared_ptr<render::pipeline::Pipeline>(new ForwardPbr(eng, c));
         case render::pipeline::Type::ShadowMapper:
-            return std::shared_ptr<render::pipeline::Pipeline>(new ShadowMapper(gles2eng,
-                core::sync::EndCaller<core::sync::EndCallerIgnore>([end] {})));
+            return std::shared_ptr<render::pipeline::Pipeline>(new ShadowMapper(eng, c));
         case render::pipeline::Type::Unlit:
-            return std::shared_ptr<render::pipeline::Pipeline>(new Unlit(gles2eng,
-                core::sync::EndCaller<core::sync::EndCallerIgnore>([end] {})));
+            return std::shared_ptr<render::pipeline::Pipeline>(new Unlit(eng, c));
+        case render::pipeline::Type::SkyboxEquirectangular:
+            return std::shared_ptr<render::pipeline::Pipeline>(new SkyboxEquirectangular(eng, c));
         default:
             GXLOGF("Unexpected pipeline type: " << static_cast<unsigned int>(pipeline_type_id))
         }
