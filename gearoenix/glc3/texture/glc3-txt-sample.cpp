@@ -4,7 +4,7 @@
 
 gearoenix::glc3::texture::SampleInfo::SampleInfo(const render::texture::SampleInfo& o) noexcept
 {
-    const auto min_filfun = [](render::texture::Filter f) {
+    const auto min_fil_fun = [](render::texture::Filter f) {
         switch (f) {
         case render::texture::Filter::NEAREST:
             return GL_NEAREST;
@@ -23,7 +23,7 @@ gearoenix::glc3::texture::SampleInfo::SampleInfo(const render::texture::SampleIn
         }
     };
 
-    const auto mag_filfun = [](render::texture::Filter f) {
+    const auto mag_fil_fun = [](render::texture::Filter f) {
         switch (f) {
         case render::texture::Filter::NEAREST:
             return GL_NEAREST;
@@ -34,7 +34,7 @@ gearoenix::glc3::texture::SampleInfo::SampleInfo(const render::texture::SampleIn
         }
     };
 
-#define GX_HELPER(name) name##_filter = static_cast<float>(name##_filfun(o.name##_filter));
+#define GX_HELPER(name) name##_filter = static_cast<float>(name##_fil_fun(o.name##_filter));
 
     GX_HELPER(mag)
     GX_HELPER(min)
@@ -62,4 +62,10 @@ gearoenix::glc3::texture::SampleInfo::SampleInfo(const render::texture::SampleIn
 
 #undef GX_HELPER
 }
+
+bool gearoenix::glc3::texture::SampleInfo::needs_mipmap() const noexcept
+{
+    return min_filter == GL_NEAREST_MIPMAP_LINEAR || min_filter == GL_NEAREST_MIPMAP_NEAREST || min_filter == GL_LINEAR_MIPMAP_LINEAR || min_filter == GL_LINEAR_MIPMAP_NEAREST;
+}
+
 #endif

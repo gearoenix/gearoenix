@@ -24,13 +24,14 @@ std::shared_ptr<gearoenix::gles2::texture::Texture2D> gearoenix::gles2::texture:
 {
     std::shared_ptr<Texture2D> result(new Texture2D(my_id, e));
     const SampleInfo sample_info = SampleInfo(s);
+    const bool needs_mipmap = sample_info.needs_mipmap();
     gl::uint cf;
-    const gl::sizei gimg_width = static_cast<gl::sizei>(img_width);
-    const gl::sizei gimg_height = static_cast<gl::sizei>(img_height);
+    const auto gimg_width = static_cast<gl::sizei>(img_width);
+    const auto gimg_height = static_cast<gl::sizei>(img_height);
     std::vector<std::uint8_t> pixels;
     if (f == render::texture::TextureFormat::RgbaFloat32) {
         cf = GL_RGBA;
-        const gl::sizei pixel_size = gimg_width * gimg_height << 2;
+        const gl::sizei pixel_size = gimg_width * gimg_height * 4;
         pixels.resize(pixel_size);
         const auto rdata = reinterpret_cast<const core::Real*>(data);
         for (gl::sizei i = 0; i < pixel_size; ++i) {
@@ -44,14 +45,14 @@ std::shared_ptr<gearoenix::gles2::texture::Texture2D> gearoenix::gles2::texture:
         }
     } else if (f == render::texture::TextureFormat::RgbaUint8) {
         cf = GL_RGBA;
-        const gl::sizei pixel_size = gimg_width * gimg_height << 2;
+        const gl::sizei pixel_size = gimg_width * gimg_height * 4;
         pixels.resize(pixel_size);
         const auto rdata = reinterpret_cast<const std::uint8_t*>(data);
         for (gl::sizei i = 0; i < pixel_size; ++i)
             pixels[i] = rdata[i];
     } else
         GXLOGF("Unsupported/Unimplemented setting for texture with id " << my_id)
-    e->get_function_loader()->load([result, pixels { move(pixels) }, cf, gimg_width, gimg_height, sample_info, call] {
+    e->get_function_loader()->load([needs_mipmap, result, pixels { move(pixels) }, cf, gimg_width, gimg_height, sample_info, call] {
         gl::Loader::gen_textures(1, &(result->texture_object));
         gl::Loader::bind_texture(GL_TEXTURE_2D, result->texture_object);
         gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, sample_info.min_filter);
@@ -59,7 +60,8 @@ std::shared_ptr<gearoenix::gles2::texture::Texture2D> gearoenix::gles2::texture:
         gl::Loader::tex_parameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, sample_info.wrap_s);
         gl::Loader::tex_parameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, sample_info.wrap_t);
         gl::Loader::tex_image_2d(GL_TEXTURE_2D, 0, static_cast<gl::sint>(cf), gimg_width, gimg_height, 0, static_cast<gl::enumerated>(cf), GL_UNSIGNED_BYTE, pixels.data());
-        gl::Loader::generate_mipmap(GL_TEXTURE_2D);
+        if (needs_mipmap)
+            gl::Loader::generate_mipmap(GL_TEXTURE_2D);
 #ifdef GX_DEBUG_GLES2
         gl::Loader::check_for_error();
 #endif

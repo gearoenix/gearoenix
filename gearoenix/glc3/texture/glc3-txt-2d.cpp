@@ -3,7 +3,6 @@
 #include "../../core/cr-function-loader.hpp"
 #include "../../gl/gl-constants.hpp"
 #include "../../gl/gl-loader.hpp"
-#include "../../system/sys-log.hpp"
 #include "../engine/glc3-eng-engine.hpp"
 #include "glc3-txt-sample.hpp"
 
@@ -24,6 +23,7 @@ std::shared_ptr<gearoenix::glc3::texture::Texture2D> gearoenix::glc3::texture::T
 {
     std::shared_ptr<Texture2D> result(new Texture2D(my_id, e));
     const SampleInfo sample_info = SampleInfo(s);
+    const bool needs_mipmap = sample_info.needs_mipmap();
     gl::enumerated cf;
     gl::sint tf;
     gl::enumerated ef;
@@ -65,7 +65,7 @@ std::shared_ptr<gearoenix::glc3::texture::Texture2D> gearoenix::glc3::texture::T
     default:
         GXLOGF("Unsupported/Unimplemented setting for texture with id " << my_id)
     }
-    e->get_function_loader()->load([result, pixels { move(pixels) }, tf, cf, ef, gimg_width, gimg_height, sample_info, call] {
+    e->get_function_loader()->load([result, needs_mipmap, pixels { move(pixels) }, tf, cf, ef, gimg_width, gimg_height, sample_info, call] {
 #ifdef GX_DEBUG_GL_CLASS_3
         gl::Loader::check_for_error();
 #endif
@@ -76,7 +76,8 @@ std::shared_ptr<gearoenix::glc3::texture::Texture2D> gearoenix::glc3::texture::T
         gl::Loader::tex_parameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, sample_info.wrap_s);
         gl::Loader::tex_parameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, sample_info.wrap_t);
         gl::Loader::tex_image_2d(GL_TEXTURE_2D, 0, tf, gimg_width, gimg_height, 0, cf, ef, pixels.data());
-        gl::Loader::generate_mipmap(GL_TEXTURE_2D);
+        if (needs_mipmap)
+            gl::Loader::generate_mipmap(GL_TEXTURE_2D);
 #ifdef GX_DEBUG_GL_CLASS_3
         gl::Loader::check_for_error();
 #endif
