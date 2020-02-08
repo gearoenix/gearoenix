@@ -50,7 +50,7 @@ void gearoenix::render::graph::tree::Pbr::update_skyboxes(const scene::Scene* co
             }
             previous_equirectangular->update();
             previous_equirectangular->set_camera(cam);
-            previous_equirectangular->add_sky(reinterpret_cast<const skybox::Equirectangular* const>(sky));
+            previous_equirectangular->add_sky(reinterpret_cast<const skybox::Equirectangular*>(sky));
             break;
         case skybox::Type::Cube:
             previous_equirectangular = nullptr;

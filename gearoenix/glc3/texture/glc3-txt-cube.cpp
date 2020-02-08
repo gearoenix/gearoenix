@@ -1,17 +1,12 @@
 #include "glc3-txt-cube.hpp"
 #ifdef GX_USE_OPENGL_CLASS_3
 #include "../../core/cr-function-loader.hpp"
-#include "../../core/cr-static.hpp"
 #include "../../gl/gl-constants.hpp"
 #include "../../gl/gl-loader.hpp"
-#include "../../render/texture/rnd-txt-image.hpp"
 #include "../../system/stream/sys-stm-stream.hpp"
-#include "../../system/sys-log.hpp"
 #include "../engine/glc3-eng-engine.hpp"
 #include "glc3-txt-2d.hpp"
 #include "glc3-txt-sample.hpp"
-
-static constexpr auto GX_GLC3_MIN_TEXCUBE_ASPECT = 16;
 
 static const gearoenix::gl::enumerated FACES[] = {
     GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
@@ -22,14 +17,15 @@ static const gearoenix::gl::enumerated FACES[] = {
     GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
 };
 
-gearoenix::glc3::texture::Cube::Cube(
+gearoenix::glc3::texture::TextureCube::TextureCube(
     const core::Id my_id,
     engine::Engine* const engine) noexcept
-    : render::texture::Cube(my_id, engine)
+    : render::texture::Texture(my_id, render::texture::Type::TextureCube, engine)
+    , render::texture::TextureCube(my_id, engine)
 {
 }
 
-std::shared_ptr<gearoenix::glc3::texture::Cube> gearoenix::glc3::texture::Cube::construct(
+std::shared_ptr<gearoenix::glc3::texture::TextureCube> gearoenix::glc3::texture::TextureCube::construct(
     const core::Id my_id,
     engine::Engine* const engine,
     const void* const data,
@@ -38,14 +34,10 @@ std::shared_ptr<gearoenix::glc3::texture::Cube> gearoenix::glc3::texture::Cube::
     const unsigned int aspect,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
 {
-    const std::shared_ptr<Cube> result(new Cube(my_id, engine));
+    const std::shared_ptr<TextureCube> result(new TextureCube(my_id, engine));
     const SampleInfo sample_info = SampleInfo(s);
     gl::uint cf;
-    const gl::sizei gaspect = GX_GLC3_MIN_TEXCUBE_ASPECT < aspect ? static_cast<gl::sizei>(aspect) : GX_GLC3_MIN_TEXCUBE_ASPECT;
-#ifdef GX_DEBUG_GL_CLASS_3
-    if (aspect != 1 && aspect < GX_GLC3_MIN_TEXCUBE_ASPECT)
-        GXLOGF("Unsupported image aspect in GLES2 for cube texture id: " << my_id);
-#endif
+    const auto gaspect = static_cast<gl::sizei>(aspect);
     std::vector<std::vector<std::uint8_t>> pixels(GX_COUNT_OF(FACES));
     if (f == render::texture::TextureFormat::RgbaFloat32 && aspect == 1) {
         cf = GL_RGBA;
@@ -82,7 +74,7 @@ std::shared_ptr<gearoenix::glc3::texture::Cube> gearoenix::glc3::texture::Cube::
     return result;
 }
 
-gearoenix::glc3::texture::Cube::~Cube() noexcept
+gearoenix::glc3::texture::TextureCube::~TextureCube() noexcept
 {
     if (texture_object == 0)
         return;
@@ -94,7 +86,7 @@ gearoenix::glc3::texture::Cube::~Cube() noexcept
     texture_object = 0;
 }
 
-void gearoenix::glc3::texture::Cube::bind(gl::enumerated texture_unit) const noexcept
+void gearoenix::glc3::texture::TextureCube::bind(gl::enumerated texture_unit) const noexcept
 {
     gl::Loader::active_texture(GL_TEXTURE0 + texture_unit);
     gl::Loader::bind_texture(GL_TEXTURE_CUBE_MAP, texture_object);

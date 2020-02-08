@@ -46,7 +46,7 @@ gearoenix::gles2::engine::Engine* gearoenix::gles2::engine::Engine::construct(sy
 #ifdef GX_DEBUG_GLES2
     gl::Loader::check_for_error();
 #endif
-    e->main_render_target = std::make_unique<texture::Target>(e);
+    e->main_render_target = std::make_unique<texture::Target>(render::texture::Type::Target2D, e);
 #ifdef GX_DEBUG_GLES2
     gl::Loader::check_for_error();
 #endif
@@ -105,7 +105,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::gles2::engine:
     return texture::Texture2D::construct(id, this, data, f, s, img_width, img_height, call);
 }
 
-std::shared_ptr<gearoenix::render::texture::Cube> gearoenix::gles2::engine::Engine::create_texture_cube(
+std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::gles2::engine::Engine::create_texture_cube(
     const core::Id id,
     const void* data,
     const render::texture::TextureFormat f,
@@ -113,7 +113,7 @@ std::shared_ptr<gearoenix::render::texture::Cube> gearoenix::gles2::engine::Engi
     const unsigned int aspect,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
 {
-    return texture::Cube::construct(id, this, data, f, s, aspect, call);
+    return texture::TextureCube::construct(id, this, data, f, s, aspect, call);
 }
 
 std::shared_ptr<gearoenix::render::texture::Target> gearoenix::gles2::engine::Engine::create_render_target(

@@ -7,7 +7,8 @@
 #include "glc3-txt-sample.hpp"
 
 gearoenix::glc3::texture::Texture2D::Texture2D(const core::Id my_id, engine::Engine* const e) noexcept
-    : render::texture::Texture2D(my_id, e)
+    : render::texture::Texture(my_id, render::texture::Type::Texture2D, e)
+    , render::texture::Texture2D(my_id, e)
 {
 }
 
@@ -85,9 +86,10 @@ std::shared_ptr<gearoenix::glc3::texture::Texture2D> gearoenix::glc3::texture::T
     return result;
 }
 
-gearoenix::glc3::texture::Texture2D::Texture2D(const core::Id my_id, const gl::uint txtobj, engine::Engine* const e) noexcept
-    : render::texture::Texture2D(my_id, e)
-    , texture_object(txtobj)
+gearoenix::glc3::texture::Texture2D::Texture2D(const core::Id my_id, const gl::uint txt_obj, engine::Engine* const e) noexcept
+    : render::texture::Texture(my_id, render::texture::Type::Texture2D, e)
+    , render::texture::Texture2D(my_id, e)
+    , texture_object(txt_obj)
 {
 }
 

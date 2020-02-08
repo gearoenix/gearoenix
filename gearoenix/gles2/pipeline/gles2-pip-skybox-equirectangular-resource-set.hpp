@@ -14,7 +14,7 @@ namespace gearoenix::gles2::pipeline {
 class SkyboxEquirectangularResourceSet : public ResourceSet, public render::pipeline::SkyboxEquirectangularResourceSet {
 public:
     explicit SkyboxEquirectangularResourceSet(const std::shared_ptr<shader::SkyboxEquirectangular>& shd) noexcept;
-    void bind(gl::uint& bound_shader_program) const noexcept final;
+    void bind_final(gl::uint& bound_shader_program) const noexcept;
 };
 }
 

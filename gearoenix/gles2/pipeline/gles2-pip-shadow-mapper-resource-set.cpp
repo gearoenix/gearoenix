@@ -14,7 +14,7 @@ gearoenix::gles2::pipeline::ShadowMapperResourceSet::ShadowMapperResourceSet(con
 {
 }
 
-void gearoenix::gles2::pipeline::ShadowMapperResourceSet::bind(gl::uint& bound_shader_program) const noexcept
+void gearoenix::gles2::pipeline::ShadowMapperResourceSet::bind_final(gl::uint& bound_shader_program) const noexcept
 {
     GX_GLES2_PIP_RES_START_DRAWING_MESH
     GX_GLES2_PIP_RES_START_SHADER(ShadowMapper, shd)

@@ -1,4 +1,4 @@
-#include "gles2-txt-target.hpp"
+#include "gles2-txt-target-2d.hpp"
 #ifdef GX_USE_OPENGL_ES2
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../core/cr-function-loader.hpp"
@@ -16,7 +16,7 @@
 #define GX_DEBUG_GLES2_TARGET
 #endif
 
-void gearoenix::gles2::texture::Target::state_init() const noexcept
+void gearoenix::gles2::texture::Target2D::state_init() const noexcept
 {
 #ifdef GX_DEBUG_GLES2_TARGET
     gl::Loader::check_for_error();
@@ -36,21 +36,21 @@ void gearoenix::gles2::texture::Target::state_init() const noexcept
 #endif
 }
 
-gearoenix::gles2::texture::Target::Target(const render::texture::Type t, const core::Id my_id, engine::Engine* const e) noexcept
-    : render::texture::Texture(my_id, t, e)
-    , render::texture::Target(t, my_id, e)
+gearoenix::gles2::texture::Target2D::Target2D(const core::Id my_id, engine::Engine* const e) noexcept
+    : render::texture::Texture(my_id, render::texture::Type::Target2D, e)
+    , render::texture::Target2D(my_id, e)
 {
 }
 
-gearoenix::gles2::texture::Target::Target(const render::texture::Type t, engine::Engine* const e) noexcept
-    : render::texture::Texture(core::asset::Manager::create_id(), t, e)
-    , render::texture::Target(t, asset_id, e)
+gearoenix::gles2::texture::Target2D::Target2D(engine::Engine* const e) noexcept
+    : render::texture::Texture(core::asset::Manager::create_id(), render::texture::Type::Target2D, e)
+    , render::texture::Target2D(asset_id, e)
 {
 #ifdef GX_DEBUG_GLES2
     gl::Loader::check_for_error();
 #endif
-    //    img_width = e->get_system_application()->get_window_width();
-    //    img_height = e->get_system_application()->get_window_height();
+    img_width = e->get_system_application()->get_window_width();
+    img_height = e->get_system_application()->get_window_height();
     //    clipping_width = static_cast<core::Real>(img_width);
     //    clipping_height = static_cast<core::Real>(img_height);
     gl::Loader::get_integerv(GL_FRAMEBUFFER_BINDING, &framebuffer);
@@ -61,7 +61,7 @@ gearoenix::gles2::texture::Target::Target(const render::texture::Type t, engine:
 #endif
 }
 
-std::shared_ptr<gearoenix::gles2::texture::Target> gearoenix::gles2::texture::Target::construct(
+std::shared_ptr<gearoenix::gles2::texture::Target2D> gearoenix::gles2::texture::Target2D::construct(
     core::Id my_id,
     engine::Engine* e,
     const std::vector<render::texture::Info>& infos,
@@ -69,9 +69,9 @@ std::shared_ptr<gearoenix::gles2::texture::Target> gearoenix::gles2::texture::Ta
     unsigned int h,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
 {
-    const std::shared_ptr<Target> result(new Target(render::texture::Type::Target2D, my_id, e));
-    //    result->img_width = w;
-    //    result->img_height = h;
+    const std::shared_ptr<Target2D> result(new Target2D(my_id, e));
+    result->img_width = w;
+    result->img_height = h;
     //    result->clipping_width = static_cast<core::Real>(w);
     //    result->clipping_height = static_cast<core::Real>(h);
     result->texture_objects.resize(infos.size());
@@ -83,7 +83,7 @@ std::shared_ptr<gearoenix::gles2::texture::Target> gearoenix::gles2::texture::Ta
         gl::Loader::gen_framebuffers(1, reinterpret_cast<gl::uint*>(&(result->framebuffer)));
         gl::Loader::gen_renderbuffers(1, reinterpret_cast<gl::uint*>(&(result->depth_buffer)));
         gl::Loader::bind_renderbuffer(GL_RENDERBUFFER, result->depth_buffer);
-        //        gl::Loader::renderbuffer_storage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, result->img_width, result->img_height);
+        gl::Loader::renderbuffer_storage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, result->img_width, result->img_height);
         gl::Loader::bind_framebuffer(GL_FRAMEBUFFER, result->framebuffer);
         gl::Loader::framebuffer_renderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, result->depth_buffer);
         gl::Loader::gen_textures(static_cast<gearoenix::gl::sizei>(result->texture_objects.size()), result->texture_objects.data());
@@ -93,7 +93,7 @@ std::shared_ptr<gearoenix::gles2::texture::Target> gearoenix::gles2::texture::Ta
             const auto& txt = result->texture_objects[i];
             if (txt_fmt == render::texture::TextureFormat::D16) {
                 gl::Loader::bind_texture(GL_TEXTURE_2D, txt);
-                //                gl::Loader::tex_image_2d(GL_TEXTURE_2D, 0, GL_RGB, result->img_width, result->img_height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+                gl::Loader::tex_image_2d(GL_TEXTURE_2D, 0, GL_RGB, result->img_width, result->img_height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
                 gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
                 gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
                 gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -110,7 +110,7 @@ std::shared_ptr<gearoenix::gles2::texture::Target> gearoenix::gles2::texture::Ta
     return result;
 }
 
-gearoenix::gles2::texture::Target::~Target() noexcept
+gearoenix::gles2::texture::Target2D::~Target2D() noexcept
 {
     if (texture_objects.size() == 0) // This is main render-target
         return;
@@ -125,7 +125,7 @@ gearoenix::gles2::texture::Target::~Target() noexcept
     });
 }
 
-void gearoenix::gles2::texture::Target::bind() const noexcept
+void gearoenix::gles2::texture::Target2D::bind() const noexcept
 {
     if (-1 != depth_buffer)
         gl::Loader::bind_renderbuffer(GL_RENDERBUFFER, depth_buffer);
@@ -140,7 +140,7 @@ void gearoenix::gles2::texture::Target::bind() const noexcept
         gl::Loader::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 }
 
-void gearoenix::gles2::texture::Target::bind_textures(const std::vector<gl::enumerated>& texture_units) const noexcept
+void gearoenix::gles2::texture::Target2D::bind_textures(const std::vector<gl::enumerated>& texture_units) const noexcept
 {
 #ifdef GX_DEBUG_MODE
     if (texture_units.size() != texture_objects.size())

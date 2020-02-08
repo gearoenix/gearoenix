@@ -14,7 +14,7 @@
 #include "../../pipeline/rnd-pip-shadow-mapper-resource-set.hpp"
 #include "../../pipeline/rnd-pip-shadow-mapper.hpp"
 #include "../../sync/rnd-sy-semaphore.hpp"
-#include "../../texture/rnd-txt-target.hpp"
+#include "../../texture/rnd-txt-target-2d.hpp"
 
 gearoenix::render::graph::node::ShadowMapperRenderData::ShadowMapperRenderData(engine::Engine* const e, pipeline::Pipeline* const pip) noexcept
     : r(reinterpret_cast<pipeline::ShadowMapperResourceSet*>(pip->create_resource_set()))

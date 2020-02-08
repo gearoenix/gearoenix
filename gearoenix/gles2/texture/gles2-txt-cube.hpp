@@ -12,14 +12,14 @@ namespace engine {
     class Engine;
 }
 namespace texture {
-    class Cube : public render::texture::Cube {
+    class TextureCube : virtual public render::texture::TextureCube {
     private:
         gl::uint texture_object = 0;
 
-        Cube(core::Id my_id, engine::Engine* e) noexcept;
+        TextureCube(core::Id my_id, engine::Engine* e) noexcept;
 
     public:
-        [[nodiscard]] static std::shared_ptr<Cube> construct(
+        [[nodiscard]] static std::shared_ptr<TextureCube> construct(
             core::Id my_id,
             engine::Engine* e,
             const void* data,
@@ -27,7 +27,7 @@ namespace texture {
             render::texture::SampleInfo s,
             unsigned int aspect,
             const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
-        ~Cube() noexcept final;
+        ~TextureCube() noexcept final;
         void bind(gl::enumerated texture_unit) const noexcept;
     };
 }

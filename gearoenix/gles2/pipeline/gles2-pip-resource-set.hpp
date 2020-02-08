@@ -3,6 +3,7 @@
 #include "../../core/cr-build-configuration.hpp"
 #ifdef GX_USE_OPENGL_ES2
 #include "../../gl/gl-types.hpp"
+#include "../../render/pipeline/rnd-pip-resource-set.hpp"
 #include <memory>
 
 #define GX_GLES2_PIP_RES_START_DRAWING_MESH                                    \
@@ -34,7 +35,8 @@ protected:
 
 public:
     virtual ~ResourceSet() noexcept;
-    virtual void bind(gl::uint& bound_shader_program) const noexcept;
+    void bind(gl::uint& bound_shader_program) const noexcept;
+    static void bind(const render::pipeline::ResourceSet* prs, gl::uint& bound_shader_program) noexcept;
 };
 }
 

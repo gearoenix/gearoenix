@@ -17,7 +17,7 @@ gearoenix::gles2::pipeline::UnlitResourceSet::UnlitResourceSet(const std::shared
 {
 }
 
-void gearoenix::gles2::pipeline::UnlitResourceSet::bind(gl::uint& bound_shader_program) const noexcept
+void gearoenix::gles2::pipeline::UnlitResourceSet::bind_final(gl::uint& bound_shader_program) const noexcept
 {
     GX_GLES2_PIP_RES_START_DRAWING_MESH
     GX_GLES2_PIP_RES_START_SHADER(Unlit, shd)

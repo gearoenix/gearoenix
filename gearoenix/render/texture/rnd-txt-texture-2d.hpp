@@ -1,18 +1,20 @@
 #ifndef GEAROENIX_RENDER_TEXTURE_TEXTURE_2D_HPP
 #define GEAROENIX_RENDER_TEXTURE_TEXTURE_2D_HPP
+#include "../../core/cr-static.hpp"
 #include "rnd-txt-texture.hpp"
+
 namespace gearoenix::render::texture {
-class Texture2D : public Texture {
+class Texture2D : virtual public Texture {
+    GX_GET_VAL_PRT(std::size_t, img_width, 0)
+    GX_GET_VAL_PRT(std::size_t, img_height, 0)
 protected:
-    unsigned int img_width = 0;
-    unsigned int img_height = 0;
-    Texture2D(const core::Id my_id, engine::Engine* const e, const Type texture_type = Type::Texture2D) noexcept
-        : Texture(my_id, texture_type, e)
+    Texture2D(const core::Id my_id, engine::Engine* const e) noexcept
+        : Texture(my_id, Type::Texture2D, e)
     {
     }
 
 public:
-    virtual ~Texture2D() noexcept = default;
+    ~Texture2D() noexcept override = default;
 };
 }
 #endif

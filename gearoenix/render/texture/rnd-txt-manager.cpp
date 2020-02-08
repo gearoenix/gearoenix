@@ -154,7 +154,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     const SampleInfo& sample_info) noexcept
 {
     auto const file_content = system::stream::Stream::get_file_content(file_address);
-    return create_2d_f(reinterpret_cast<const unsigned char* const>(file_content.data()), file_content.size(), c, sample_info);
+    return create_2d_f(reinterpret_cast<const unsigned char*>(file_content.data()), file_content.size(), c, sample_info);
 }
 
 std::shared_ptr<gearoenix::render::texture::Cube> gearoenix::render::texture::Manager::get_cube(const math::Vec4& color, core::sync::EndCaller<Cube>& c) noexcept

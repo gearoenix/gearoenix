@@ -17,7 +17,7 @@ gearoenix::gles2::pipeline::SkyboxEquirectangularResourceSet::SkyboxEquirectangu
 {
 }
 
-void gearoenix::gles2::pipeline::SkyboxEquirectangularResourceSet::bind(gl::uint& bound_shader_program) const noexcept
+void gearoenix::gles2::pipeline::SkyboxEquirectangularResourceSet::bind_final(gl::uint& bound_shader_program) const noexcept
 {
     GX_GLES2_PIP_RES_START_DRAWING_MESH
     GX_GLES2_PIP_RES_START_SHADER(SkyboxEquirectangular, shd)

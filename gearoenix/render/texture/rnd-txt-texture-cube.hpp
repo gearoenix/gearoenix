@@ -2,15 +2,17 @@
 #define GEAROENIX_RENDER_TEXTURE_CUBE_HPP
 #include "rnd-txt-texture.hpp"
 namespace gearoenix::render::texture {
-class Cube : public Texture {
+class TextureCube : virtual public Texture {
+    GX_GET_VAL_PRT(std::size_t, img_width, 0)
+    GX_GET_VAL_PRT(std::size_t, img_height, 0)
 protected:
-    Cube(const core::Id my_id, engine::Engine* const engine, const Type texture_type = Type::TextureCube) noexcept
-        : Texture(my_id, texture_type, engine)
+    TextureCube(const core::Id my_id, engine::Engine* const engine) noexcept
+        : Texture(my_id, Type::TextureCube, engine)
     {
     }
 
 public:
-    virtual ~Cube() noexcept = default;
+    ~TextureCube() noexcept override = default;
 };
 }
 #endif

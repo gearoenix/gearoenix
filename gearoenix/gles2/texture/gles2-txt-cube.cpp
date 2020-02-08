@@ -1,12 +1,9 @@
 #include "gles2-txt-cube.hpp"
 #ifdef GX_USE_OPENGL_ES2
 #include "../../core/cr-function-loader.hpp"
-#include "../../core/cr-static.hpp"
 #include "../../gl/gl-constants.hpp"
 #include "../../gl/gl-loader.hpp"
-#include "../../render/texture/rnd-txt-image.hpp"
 #include "../../system/stream/sys-stm-stream.hpp"
-#include "../../system/sys-log.hpp"
 #include "../engine/gles2-eng-engine.hpp"
 #include "gles2-txt-2d.hpp"
 #include "gles2-txt-sample.hpp"
@@ -22,12 +19,13 @@ static const gearoenix::gl::enumerated FACES[] = {
     GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
 };
 
-gearoenix::gles2::texture::Cube::Cube(const core::Id my_id, engine::Engine* const engine) noexcept
-    : render::texture::Cube(my_id, engine)
+gearoenix::gles2::texture::TextureCube::TextureCube(const core::Id my_id, engine::Engine* const engine) noexcept
+    : render::texture::Texture(my_id, render::texture::Type::TextureCube, engine)
+    , render::texture::TextureCube(my_id, engine)
 {
 }
 
-std::shared_ptr<gearoenix::gles2::texture::Cube> gearoenix::gles2::texture::Cube::construct(
+std::shared_ptr<gearoenix::gles2::texture::TextureCube> gearoenix::gles2::texture::TextureCube::construct(
     const core::Id my_id,
     engine::Engine* const e,
     const void* const data,
@@ -36,13 +34,13 @@ std::shared_ptr<gearoenix::gles2::texture::Cube> gearoenix::gles2::texture::Cube
     const unsigned int aspect,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
 {
-    const std::shared_ptr<Cube> result(new Cube(my_id, e));
+    const std::shared_ptr<TextureCube> result(new TextureCube(my_id, e));
     const SampleInfo sample_info = SampleInfo(s);
     gl::uint cf;
     const gl::sizei gaspect = GX_GLES2_MIN_TEXCUBE_ASPECT < aspect ? static_cast<gl::sizei>(aspect) : GX_GLES2_MIN_TEXCUBE_ASPECT;
 #ifdef GX_DEBUG_GLES2
     if (aspect != 1 && aspect < GX_GLES2_MIN_TEXCUBE_ASPECT)
-        GXLOGF("Unsupported image aspect in GLES2 for cube texture id: " << my_id);
+        GXLOGF("Unsupported image aspect in GLES2 for cube texture id: " << my_id)
 #endif
     std::vector<std::vector<std::uint8_t>> pixels(GX_COUNT_OF(FACES));
     if (f == render::texture::TextureFormat::RgbaFloat32 && aspect == 1) {
@@ -80,7 +78,7 @@ std::shared_ptr<gearoenix::gles2::texture::Cube> gearoenix::gles2::texture::Cube
     return result;
 }
 
-gearoenix::gles2::texture::Cube::~Cube() noexcept
+gearoenix::gles2::texture::TextureCube::~TextureCube() noexcept
 {
     if (texture_object == 0)
         return;
@@ -92,7 +90,7 @@ gearoenix::gles2::texture::Cube::~Cube() noexcept
     texture_object = 0;
 }
 
-void gearoenix::gles2::texture::Cube::bind(gl::enumerated texture_unit) const noexcept
+void gearoenix::gles2::texture::TextureCube::bind(gl::enumerated texture_unit) const noexcept
 {
     gl::Loader::active_texture(GL_TEXTURE0 + texture_unit);
     gl::Loader::bind_texture(GL_TEXTURE_CUBE_MAP, texture_object);

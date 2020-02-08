@@ -74,7 +74,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::glc3::engine::
     return texture::Texture2D::construct(id, this, data, f, s, img_width, img_height, call);
 }
 
-std::shared_ptr<gearoenix::render::texture::Cube> gearoenix::glc3::engine::Engine::create_texture_cube(
+std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::glc3::engine::Engine::create_texture_cube(
     const core::Id id,
     const void* data,
     const render::texture::TextureFormat f,
@@ -82,7 +82,7 @@ std::shared_ptr<gearoenix::render::texture::Cube> gearoenix::glc3::engine::Engin
     const unsigned int aspect,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
 {
-    return texture::Cube::construct(id, this, data, f, s, aspect, call);
+    return texture::TextureCube::construct(id, this, data, f, s, aspect, call);
 }
 
 std::shared_ptr<gearoenix::render::texture::Target> gearoenix::glc3::engine::Engine::create_render_target(

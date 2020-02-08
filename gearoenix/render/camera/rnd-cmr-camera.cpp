@@ -64,12 +64,12 @@ void gearoenix::render::camera::Camera::set_far(const core::Real f) noexcept
     reinterpret_cast<Transformation*>(transformation.get())->update_projection();
 }
 
-void gearoenix::render::camera::Camera::update_uniform()
+void gearoenix::render::camera::Camera::update_uniform() noexcept
 {
     uniform_buffers->update(uniform);
 }
 
-void gearoenix::render::camera::Camera::set_aspect_ratio(const gearoenix::core::Real ratio)
+void gearoenix::render::camera::Camera::set_aspect_ratio(const gearoenix::core::Real ratio) noexcept
 {
     uniform.aspect_ratio = ratio;
 }

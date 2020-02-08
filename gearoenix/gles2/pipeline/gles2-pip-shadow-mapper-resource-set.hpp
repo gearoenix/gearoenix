@@ -13,7 +13,7 @@ namespace gearoenix::gles2::pipeline {
 class ShadowMapperResourceSet : public ResourceSet, public render::pipeline::ShadowMapperResourceSet {
 public:
     explicit ShadowMapperResourceSet(const std::shared_ptr<shader::ShadowMapper>& shd) noexcept;
-    void bind(gl::uint& bound_shader_program) const noexcept final;
+    void bind_final(gl::uint& bound_shader_program) const noexcept;
 };
 }
 #endif

@@ -27,7 +27,7 @@ namespace engine {
             unsigned int width,
             unsigned int height,
             const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept final;
-        [[nodiscard]] std::shared_ptr<render::texture::Cube> create_texture_cube(
+        [[nodiscard]] std::shared_ptr<render::texture::TextureCube> create_texture_cube(
             core::Id id,
             const void* data,
             render::texture::TextureFormat f,
