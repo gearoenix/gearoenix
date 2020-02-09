@@ -103,8 +103,6 @@ void gearoenix::render::graph::node::Unlit::update() noexcept
 void gearoenix::render::graph::node::Unlit::set_camera(const camera::Camera* const c) noexcept
 {
     cam = c;
-    const auto& cam_uni = cam->get_uniform();
-    render_target->set_clipping(cam_uni.clip_width, cam_uni.clip_height);
 }
 
 void gearoenix::render::graph::node::Unlit::add_models(const std::map<const model::Model*, std::vector<const model::Mesh*>>* ms) noexcept

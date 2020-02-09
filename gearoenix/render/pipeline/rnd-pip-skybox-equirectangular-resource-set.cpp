@@ -1,6 +1,13 @@
 #include "rnd-pip-skybox-equirectangular-resource-set.hpp"
 #include "../buffer/rnd-buf-framed-uniform.hpp"
 #include "../material/rnd-mat-skybox-equirectangular.hpp"
+#include "rnd-pip-skybox-equirectangular.hpp"
+
+gearoenix::render::pipeline::SkyboxEquirectangularResourceSet::SkyboxEquirectangularResourceSet(
+    std::shared_ptr<SkyboxEquirectangular> pip) noexcept
+    : ResourceSet(std::move(pip))
+{
+}
 
 gearoenix::render::pipeline::SkyboxEquirectangularResourceSet::~SkyboxEquirectangularResourceSet() noexcept = default;
 

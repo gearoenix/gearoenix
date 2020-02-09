@@ -44,9 +44,9 @@ class Semaphore;
 }
 
 namespace gearoenix::render::texture {
-class Cube;
 class Texture;
 class Texture2D;
+class TextureCube;
 }
 
 namespace gearoenix::render::graph::node {
@@ -111,8 +111,8 @@ public:
     ForwardPbr(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
     ~ForwardPbr() noexcept final;
 
-    void set_diffuse_environment(texture::Cube* t) noexcept;
-    void set_specular_environment(texture::Cube* t) noexcept;
+    void set_diffuse_environment(texture::TextureCube* t) noexcept;
+    void set_specular_environment(texture::TextureCube* t) noexcept;
     void set_ambient_occlusion(texture::Texture2D* t) noexcept;
     void set_brdflut(texture::Texture2D* t) noexcept;
 

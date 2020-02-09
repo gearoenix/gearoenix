@@ -8,6 +8,14 @@
 #include "../mesh/rnd-msh-mesh.hpp"
 #include "../model/rnd-mdl-model.hpp"
 #include "../scene/rnd-scn-scene.hpp"
+#include "rnd-pip-forward-pbr.hpp"
+
+gearoenix::render::pipeline::ForwardPbrResourceSet::ForwardPbrResourceSet(std::shared_ptr<ForwardPbr> pip) noexcept
+    : ResourceSet(std::move(pip))
+{
+}
+
+gearoenix::render::pipeline::ForwardPbrResourceSet::~ForwardPbrResourceSet() noexcept = default;
 
 #define GX_HELPER(c, cc)                                                                            \
     void gearoenix::render::pipeline::ForwardPbrResourceSet::set_##c(const c::cc* const o) noexcept \
@@ -41,12 +49,12 @@ void gearoenix::render::pipeline::ForwardPbrResourceSet::set_node_uniform_buffer
     node_uniform_buffer = b;
 }
 
-void gearoenix::render::pipeline::ForwardPbrResourceSet::set_diffuse_environment(texture::Cube* const t) noexcept
+void gearoenix::render::pipeline::ForwardPbrResourceSet::set_diffuse_environment(texture::TextureCube* const t) noexcept
 {
     diffuse_environment = t;
 }
 
-void gearoenix::render::pipeline::ForwardPbrResourceSet::set_specular_environment(texture::Cube* const t) noexcept
+void gearoenix::render::pipeline::ForwardPbrResourceSet::set_specular_environment(texture::TextureCube* const t) noexcept
 {
     specular_environment = t;
 }

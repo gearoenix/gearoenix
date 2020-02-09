@@ -12,8 +12,9 @@
 #include "../shader/gles2-shd-skybox-equirectangular.hpp"
 #include "../texture/gles2-txt-2d.hpp"
 
-gearoenix::gles2::pipeline::SkyboxEquirectangularResourceSet::SkyboxEquirectangularResourceSet(const std::shared_ptr<shader::SkyboxEquirectangular>& shd) noexcept
-    : gles2::pipeline::ResourceSet(shd)
+gearoenix::gles2::pipeline::SkyboxEquirectangularResourceSet::SkyboxEquirectangularResourceSet(const std::shared_ptr<shader::SkyboxEquirectangular>& shd, std::shared_ptr<pipeline::Pipeline> pip) noexcept
+    : render::pipeline::ResourceSet(std::move(pip))
+    , gles2::pipeline::ResourceSet(shd)
 {
 }
 

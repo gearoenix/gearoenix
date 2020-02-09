@@ -157,7 +157,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     return create_2d_f(reinterpret_cast<const unsigned char*>(file_content.data()), file_content.size(), c, sample_info);
 }
 
-std::shared_ptr<gearoenix::render::texture::Cube> gearoenix::render::texture::Manager::get_cube(const math::Vec4& color, core::sync::EndCaller<Cube>& c) noexcept
+std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::render::texture::Manager::get_cube(const math::Vec4& color, core::sync::EndCaller<TextureCube>& c) noexcept
 {
     /// TODO: It is better to have different types of color and elements
     static_assert(sizeof(core::Real) == 4, "Only float 32 bit are supported.");
@@ -183,12 +183,12 @@ std::shared_ptr<gearoenix::render::texture::Cube> gearoenix::render::texture::Ma
             TextureFormat::RgbaFloat32, sample_info, 1,
             core::sync::EndCaller<core::sync::EndCallerIgnore>([c, cc] {}));
     };
-    std::shared_ptr<Cube> data = std::dynamic_pointer_cast<Cube>(cache.get_cacher().get(id, fun));
+    std::shared_ptr<TextureCube> data = std::dynamic_pointer_cast<TextureCube>(cache.get_cacher().get(id, fun));
     c.set_data(data);
     return data;
 }
 
-std::shared_ptr<gearoenix::render::texture::Cube> gearoenix::render::texture::Manager::get_cube(const math::Vec3& color, core::sync::EndCaller<Cube>& c) noexcept
+std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::render::texture::Manager::get_cube(const math::Vec3& color, core::sync::EndCaller<TextureCube>& c) noexcept
 {
     const auto search = color_3d_id_cube.find(color);
     const bool found = color_3d_id_cube.end() != search;
@@ -198,7 +198,7 @@ std::shared_ptr<gearoenix::render::texture::Cube> gearoenix::render::texture::Ma
     return get_cube(math::Vec4(color, 1.0f), c);
 }
 
-std::shared_ptr<gearoenix::render::texture::Cube> gearoenix::render::texture::Manager::get_cube(const math::Vec2& color, core::sync::EndCaller<Cube>& c) noexcept
+std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::render::texture::Manager::get_cube(const math::Vec2& color, core::sync::EndCaller<TextureCube>& c) noexcept
 {
     const auto search = color_2d_id_cube.find(color);
     const bool found = color_2d_id_cube.end() != search;
@@ -208,7 +208,7 @@ std::shared_ptr<gearoenix::render::texture::Cube> gearoenix::render::texture::Ma
     return get_cube(math::Vec4(color, 0.0f, 1.0f), c);
 }
 
-std::shared_ptr<gearoenix::render::texture::Cube> gearoenix::render::texture::Manager::get_cube_zero_3c(core::sync::EndCaller<Cube>& c) noexcept
+std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::render::texture::Manager::get_cube_zero_3c(core::sync::EndCaller<TextureCube>& c) noexcept
 {
     if (default_zero_3c_cube == nullptr)
         default_zero_3c_cube = get_cube(math::Vec3(0.0f, 0.0f, 0.0f), c);

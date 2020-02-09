@@ -1,6 +1,14 @@
 #include "rnd-pip-unlit-resource-set.hpp"
 #include "../buffer/rnd-buf-framed-uniform.hpp"
 #include "../material/rnd-mat-unlit.hpp"
+#include "rnd-pip-unlit.hpp"
+
+gearoenix::render::pipeline::UnlitResourceSet::UnlitResourceSet(std::shared_ptr<Unlit> pip) noexcept
+    : ResourceSet(std::move(pip))
+{
+}
+
+gearoenix::render::pipeline::UnlitResourceSet::~UnlitResourceSet() noexcept = default;
 
 void gearoenix::render::pipeline::UnlitResourceSet::set_material(const material::Material* m) noexcept
 {

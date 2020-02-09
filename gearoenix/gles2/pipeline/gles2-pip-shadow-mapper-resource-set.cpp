@@ -9,8 +9,9 @@
 #include "../shader/gles2-shd-shadow-mapper.hpp"
 #include "../texture/gles2-txt-2d.hpp"
 
-gearoenix::gles2::pipeline::ShadowMapperResourceSet::ShadowMapperResourceSet(const std::shared_ptr<shader::ShadowMapper>& shd) noexcept
-    : gles2::pipeline::ResourceSet(shd)
+gearoenix::gles2::pipeline::ShadowMapperResourceSet::ShadowMapperResourceSet(const std::shared_ptr<shader::ShadowMapper>& shd, std::shared_ptr<pipeline::Pipeline> pip) noexcept
+    : render::pipeline::ResourceSet(std::move(pip))
+    , gles2::pipeline::ResourceSet(shd)
 {
 }
 

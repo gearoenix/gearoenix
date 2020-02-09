@@ -21,4 +21,11 @@ void gearoenix::gles2::pipeline::ResourceSet::bind(gl::uint& bound_shader_progra
     //}
 }
 
+void gearoenix::gles2::pipeline::ResourceSet::bind(
+    const render::pipeline::ResourceSet* const prs,
+    uint& bound_shader_program) noexcept
+{
+    GXUNIMPLEMENTED
+}
+
 #endif

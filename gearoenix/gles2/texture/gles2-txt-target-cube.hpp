@@ -28,13 +28,11 @@ public:
     [[nodiscard]] static std::shared_ptr<TargetCube> construct(
         core::Id my_id,
         engine::Engine* e,
-        const std::vector<render::texture::Info>& infos,
+        const render::texture::Info& info,
         unsigned int width,
         unsigned int height,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
     ~TargetCube() noexcept final;
-    void bind() const noexcept;
-    void bind_textures(const std::vector<gl::enumerated>& texture_units) const noexcept;
 };
 }
 

@@ -1,6 +1,4 @@
 #include "gles2-eng-engine.hpp"
-
-#include <memory>
 #ifdef GX_USE_OPENGL_ES2
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../core/event/cr-ev-event.hpp"
@@ -126,7 +124,9 @@ std::shared_ptr<gearoenix::render::texture::Target> gearoenix::gles2::engine::En
     unsigned int height,
     const gearoenix::core::sync::EndCaller<gearoenix::core::sync::EndCallerIgnore>& call) noexcept
 {
-    return texture::Target::construct(id, this, infos, width, height, call);
+    if (infos.size() > 1)
+        GXLOGF("This engine only support at max one texture for render target.")
+    return texture::Target::construct(id, this, infos[0], width, height, call);
 }
 
 void gearoenix::gles2::engine::Engine::submit(

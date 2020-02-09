@@ -21,7 +21,7 @@ class FramedUniform;
 
 namespace gearoenix::render::texture {
 class Texture2D;
-class Cube;
+class TextureCube;
 }
 
 namespace gearoenix::render::material {

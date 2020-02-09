@@ -1,45 +1,59 @@
 #ifndef GEAROENIX_RENDER_PIPELINE_RESOURCE_SET_HPP
 #define GEAROENIX_RENDER_PIPELINE_RESOURCE_SET_HPP
+#include "../../core/cr-static.hpp"
 
-namespace gearoenix::render {
-namespace buffer {
-    class Uniform;
+namespace gearoenix::render::buffer {
+class Uniform;
 }
-namespace camera {
-    class Camera;
+
+namespace gearoenix::render::camera {
+class Camera;
 }
-namespace command {
-    class Buffer;
+
+namespace gearoenix::render::command {
+class Buffer;
 }
-namespace graph::node {
-    class Node;
+
+namespace gearoenix::render::graph::node {
+class Node;
 }
-namespace light {
-    class Light;
+
+namespace gearoenix::render::light {
+class Light;
 }
-namespace material {
-    class Material;
+
+namespace gearoenix::render::material {
+class Material;
 }
-namespace mesh {
-    class Mesh;
+
+namespace gearoenix::render::mesh {
+class Mesh;
 }
-namespace model {
-    class Model;
+
+namespace gearoenix::render::model {
+class Model;
 }
-namespace scene {
-    class Scene;
+
+namespace gearoenix::render::scene {
+class Scene;
 }
-namespace texture {
-    class Texture2D;
-    class Cube;
+
+namespace gearoenix::render::texture {
+class Texture2D;
+class TextureCube;
 }
-namespace pipeline {
-    class ResourceSet {
-    public:
-        virtual ~ResourceSet() noexcept = default;
-        virtual void clean() noexcept = 0;
-    };
-}
+
+namespace gearoenix::render::pipeline {
+class Pipeline;
+class ResourceSet {
+    GX_GET_CREF_PRV(std::shared_ptr<Pipeline>, pip)
+protected:
+    explicit ResourceSet(std::shared_ptr<Pipeline> pip) noexcept;
+
+public:
+    virtual ~ResourceSet() noexcept;
+    virtual void clean() noexcept = 0;
+};
 }
 
 #endif

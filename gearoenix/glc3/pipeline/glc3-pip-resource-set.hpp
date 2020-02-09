@@ -30,11 +30,12 @@ namespace gearoenix::glc3::pipeline {
 class ResourceSet {
 protected:
     const std::shared_ptr<shader::Shader> shd;
-    explicit ResourceSet(std::shared_ptr<shader::Shader> shd);
+
+    explicit ResourceSet(std::shared_ptr<shader::Shader> shd) noexcept;
 
 public:
-    virtual ~ResourceSet();
-    virtual void bind(gl::uint& bound_shader_program) const;
+    virtual ~ResourceSet() noexcept;
+    void bind(gl::uint& bound_shader_program) const noexcept;
 };
 }
 

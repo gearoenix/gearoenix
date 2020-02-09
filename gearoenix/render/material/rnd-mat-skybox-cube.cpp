@@ -10,7 +10,7 @@ gearoenix::render::material::SkyboxCube::SkyboxCube(engine::Engine* const e, con
     : Material(Type::SkyboxCube, e, sizeof(Uniform))
     , color_value(math::Vec4(1.0f, 0.0f, 0.0f, 1.0f))
 {
-    core::sync::EndCaller<texture::Cube> call_txt_2d([end](const std::shared_ptr<texture::Cube>&) {});
+    core::sync::EndCaller<texture::TextureCube> call_txt_2d([end](const std::shared_ptr<texture::TextureCube>&) {});
     auto* const txt_mgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
     color_texture = txt_mgr->get_cube(color_value.value(), call_txt_2d);
 }
@@ -29,9 +29,9 @@ gearoenix::render::material::SkyboxCube::SkyboxCube(system::stream::Stream* cons
     // Reading color
     if (f->read_bool()) {
         core::sync::EndCaller<texture::Texture> txt_call([end](const std::shared_ptr<texture::Texture>&) {});
-        color_texture = std::dynamic_pointer_cast<texture::Cube>(txt_mgr->get_gx3d(f->read<core::Id>(), txt_call));
+        color_texture = std::dynamic_pointer_cast<texture::TextureCube>(txt_mgr->get_gx3d(f->read<core::Id>(), txt_call));
     } else {
-        core::sync::EndCaller<texture::Cube> txt_call([end](const std::shared_ptr<texture::Cube>&) {});
+        core::sync::EndCaller<texture::TextureCube> txt_call([end](const std::shared_ptr<texture::TextureCube>&) {});
         math::Vec4 color;
         color.read(f);
         color_texture = txt_mgr->get_cube(color, txt_call);
@@ -55,7 +55,7 @@ void gearoenix::render::material::SkyboxCube::set_color(
     const core::Real r, const core::Real g, const core::Real b,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept
 {
-    core::sync::EndCaller<texture::Cube> call_txt([end](const std::shared_ptr<texture::Cube>&) {});
+    core::sync::EndCaller<texture::TextureCube> call_txt([end](const std::shared_ptr<texture::TextureCube>&) {});
     auto* const txt_mgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
     color_texture = txt_mgr->get_cube(math::Vec3(r, g, b), call_txt);
     color_value = math::Vec4(r, g, b, 1.0f);
@@ -64,13 +64,13 @@ void gearoenix::render::material::SkyboxCube::set_color(
 void gearoenix::render::material::SkyboxCube::set_color(const math::Vec4& c,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept
 {
-    core::sync::EndCaller<texture::Cube> call_txt([end](const std::shared_ptr<texture::Cube>&) {});
+    core::sync::EndCaller<texture::TextureCube> call_txt([end](const std::shared_ptr<texture::TextureCube>&) {});
     auto* const txt_mgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
     color_texture = txt_mgr->get_cube(c, call_txt);
     color_value = c;
 }
 
-void gearoenix::render::material::SkyboxCube::set_color(const std::shared_ptr<texture::Cube>& c) noexcept
+void gearoenix::render::material::SkyboxCube::set_color(const std::shared_ptr<texture::TextureCube>& c) noexcept
 {
     color_texture = c;
 }

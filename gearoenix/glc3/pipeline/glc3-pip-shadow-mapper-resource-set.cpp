@@ -11,8 +11,9 @@
 #include "../shader/glc3-shd-shadow-mapper.hpp"
 #include "../texture/glc3-txt-2d.hpp"
 
-gearoenix::glc3::pipeline::ShadowMapperResourceSet::ShadowMapperResourceSet(const std::shared_ptr<shader::ShadowMapper>& shd) noexcept
-    : glc3::pipeline::ResourceSet(shd)
+gearoenix::glc3::pipeline::ShadowMapperResourceSet::ShadowMapperResourceSet(const std::shared_ptr<shader::ShadowMapper>& shd, std::shared_ptr<pipeline::Pipeline> pip) noexcept
+    : render::pipeline::ResourceSet(std::move(pip))
+    , glc3::pipeline::ResourceSet(shd)
 {
 }
 

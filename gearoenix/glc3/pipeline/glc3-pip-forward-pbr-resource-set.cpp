@@ -14,9 +14,11 @@
 #include "../texture/glc3-txt-2d.hpp"
 #include "../texture/glc3-txt-cube.hpp"
 #include "../texture/glc3-txt-texture.hpp"
+#include "glc3-pip-forward-pbr.hpp"
 
-gearoenix::glc3::pipeline::ForwardPbrResourceSet::ForwardPbrResourceSet(const std::shared_ptr<shader::ForwardPbr>& shd) noexcept
-    : glc3::pipeline::ResourceSet(shd)
+gearoenix::glc3::pipeline::ForwardPbrResourceSet::ForwardPbrResourceSet(const std::shared_ptr<shader::ForwardPbr>& shd, std::shared_ptr<ForwardPbr> pip) noexcept
+    : render::pipeline::ResourceSet(std::move(pip))
+    , glc3::pipeline::ResourceSet(shd)
 {
 }
 

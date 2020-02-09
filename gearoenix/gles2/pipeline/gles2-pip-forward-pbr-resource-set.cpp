@@ -13,10 +13,12 @@
 #include "../shader/gles2-shd-forward-pbr.hpp"
 #include "../texture/gles2-txt-2d.hpp"
 #include "../texture/gles2-txt-cube.hpp"
-#include "../texture/gles2-txt-target.hpp"
+#include "../texture/gles2-txt-texture.hpp"
+#include "gles2-pip-forward-pbr.hpp"
 
-gearoenix::gles2::pipeline::ForwardPbrResourceSet::ForwardPbrResourceSet(const std::shared_ptr<shader::ForwardPbr>& shd) noexcept
+gearoenix::gles2::pipeline::ForwardPbrResourceSet::ForwardPbrResourceSet(const std::shared_ptr<shader::ForwardPbr>& shd, std::shared_ptr<ForwardPbr> pip) noexcept
     : gles2::pipeline::ResourceSet(shd)
+    , render::pipeline::ForwardPbrResourceSet(std::move(pip))
 {
 }
 
@@ -37,10 +39,7 @@ void gearoenix::gles2::pipeline::ForwardPbrResourceSet::bind_final(gl::uint& bou
             if (t == nullptr)
                 continue;
             const auto ti = static_cast<gl::enumerated>(directional_lights_shadow_map_indices[tii]);
-            if (render::texture::Type::Target2D == t->get_texture_type())
-                reinterpret_cast<const texture::Target*>(t)->bind_textures({ ti });
-            else
-                reinterpret_cast<const texture::Texture2D*>(t)->bind(ti);
+            texture::Texture::bind(t, ti);
         }
     }
     reinterpret_cast<const texture::TextureCube*>(specular_environment)->bind(static_cast<gl::enumerated>(shdr->get_effect_specular_environment_index()));

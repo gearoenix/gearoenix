@@ -2,7 +2,9 @@
 #define GEAROENIX_RENDER_PIPELINE_UNLIT_RESOURCE_SET_HPP
 #include "../../core/cr-build-configuration.hpp"
 #include "rnd-pip-resource-set.hpp"
+
 namespace gearoenix::render::pipeline {
+class Unlit;
 class UnlitResourceSet : public ResourceSet {
 protected:
     /// It is not owner of any of these pointers
@@ -13,8 +15,10 @@ protected:
 
     const texture::Texture2D* color = nullptr;
 
+    explicit UnlitResourceSet(std::shared_ptr<Unlit> pip) noexcept;
+
 public:
-    ~UnlitResourceSet() noexcept override = default;
+    ~UnlitResourceSet() noexcept override;
     void set_material(const material::Material* m) noexcept;
     void set_mesh(const mesh::Mesh* m) noexcept;
     void set_node_uniform_buffer(buffer::Uniform* node_uniform_buffer) noexcept;

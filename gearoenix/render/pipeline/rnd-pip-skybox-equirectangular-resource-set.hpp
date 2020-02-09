@@ -1,8 +1,9 @@
 #ifndef GEAROENIX_RENDER_PIPELINE_SKYBOX_EQUIRECTANGULAR_RESOURCE_SET_HPP
 #define GEAROENIX_RENDER_PIPELINE_SKYBOX_EQUIRECTANGULAR_RESOURCE_SET_HPP
-#include "../../core/cr-build-configuration.hpp"
 #include "rnd-pip-resource-set.hpp"
+
 namespace gearoenix::render::pipeline {
+class SkyboxEquirectangular;
 class SkyboxEquirectangularResourceSet : public ResourceSet {
 protected:
     /// It is not owner of any of these pointers
@@ -12,6 +13,8 @@ protected:
     const mesh::Mesh* msh = nullptr;
 
     const texture::Texture2D* color = nullptr;
+
+    explicit SkyboxEquirectangularResourceSet(std::shared_ptr<SkyboxEquirectangular> pip) noexcept;
 
 public:
     ~SkyboxEquirectangularResourceSet() noexcept override;

@@ -112,8 +112,8 @@ void gearoenix::render::graph::node::ForwardPbr::record(
     prs->set_model(mdl);
     prs->set_mesh(msh->get_msh().get());
     prs->set_material(msh->get_mat().get());
-    prs->set_diffuse_environment(reinterpret_cast<texture::Cube*>(input_textures[DIFFUSE_ENVIRONMENT_INDEX]));
-    prs->set_specular_environment(reinterpret_cast<texture::Cube*>(input_textures[SPECULAR_ENVIRONMENT_INDEX]));
+    prs->set_diffuse_environment(reinterpret_cast<texture::TextureCube*>(input_textures[DIFFUSE_ENVIRONMENT_INDEX]));
+    prs->set_specular_environment(reinterpret_cast<texture::TextureCube*>(input_textures[SPECULAR_ENVIRONMENT_INDEX]));
     prs->set_ambient_occlusion(reinterpret_cast<texture::Texture2D*>(input_textures[AMBIENT_OCCLUSION_INDEX]));
     prs->set_brdflut(reinterpret_cast<texture::Texture2D*>(input_textures[BRDFLUT_INDEX]));
     for (int shadow_caster_directional_light_index = 0, shadow_map_index = SHADOW_MAP_000_INDEX;
@@ -152,7 +152,7 @@ gearoenix::render::graph::node::ForwardPbr::ForwardPbr(
         f = std::make_unique<ForwardPbrFrame>(e);
     }
     auto* const txt_mgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
-    core::sync::EndCaller<texture::Cube> txt_cube_call([call](const std::shared_ptr<texture::Cube>&) {});
+    core::sync::EndCaller<texture::TextureCube> txt_cube_call([call](const std::shared_ptr<texture::TextureCube>&) {});
     core::sync::EndCaller<texture::Texture2D> txt_2d_call([call](const std::shared_ptr<texture::Texture2D>&) {});
 
     input_textures[DIFFUSE_ENVIRONMENT_INDEX] = txt_mgr->get_cube_zero_3c(txt_cube_call).get();
@@ -166,12 +166,12 @@ gearoenix::render::graph::node::ForwardPbr::~ForwardPbr() noexcept
     frames.clear();
 }
 
-void gearoenix::render::graph::node::ForwardPbr::set_diffuse_environment(texture::Cube* const t) noexcept
+void gearoenix::render::graph::node::ForwardPbr::set_diffuse_environment(texture::TextureCube* const t) noexcept
 {
     set_input_texture(t, DIFFUSE_ENVIRONMENT_INDEX);
 }
 
-void gearoenix::render::graph::node::ForwardPbr::set_specular_environment(texture::Cube* const t) noexcept
+void gearoenix::render::graph::node::ForwardPbr::set_specular_environment(texture::TextureCube* const t) noexcept
 {
     set_input_texture(t, SPECULAR_ENVIRONMENT_INDEX);
 }
@@ -206,8 +206,6 @@ void gearoenix::render::graph::node::ForwardPbr::set_scene(const scene::Scene* c
 void gearoenix::render::graph::node::ForwardPbr::set_camera(const camera::Camera* const c) noexcept
 {
     cam = c;
-    const auto& cam_uni = cam->get_uniform();
-    render_target->set_clipping(cam_uni.clip_width, cam_uni.clip_height);
 }
 
 void gearoenix::render::graph::node::ForwardPbr::set_directional_lights(const std::map<core::Real, std::map<light::Directional*, light::CascadeInfo*>>* const m) noexcept

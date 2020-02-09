@@ -16,9 +16,9 @@ class Engine;
 }
 
 namespace gearoenix::render::texture {
-class Cube;
 class Texture;
 class Texture2D;
+class TextureCube;
 class Manager {
 protected:
     engine::Engine* const e;
@@ -32,7 +32,7 @@ protected:
     std::map<math::Vec2, core::Id> color_2d_id_cube;
     std::shared_ptr<Texture2D> default_one_1c_2d;
     std::shared_ptr<Texture2D> default_one_2c_2d;
-    std::shared_ptr<Cube> default_zero_3c_cube;
+    std::shared_ptr<TextureCube> default_zero_3c_cube;
 
 public:
     Manager(std::unique_ptr<system::stream::Stream> s, engine::Engine* e) noexcept;
@@ -49,10 +49,10 @@ public:
     std::shared_ptr<Texture2D> create_2d_f(const unsigned char* data, std::size_t size, core::sync::EndCaller<Texture2D>& c, const SampleInfo& sample_info = SampleInfo()) noexcept;
     /// It creates 2d floating texture from file
     std::shared_ptr<Texture2D> create_2d_f(const std::wstring& file_address, core::sync::EndCaller<Texture2D>& c, const SampleInfo& sample_info = SampleInfo()) noexcept;
-    std::shared_ptr<Cube> get_cube(const math::Vec4& color, core::sync::EndCaller<Cube>& c) noexcept;
-    std::shared_ptr<Cube> get_cube(const math::Vec3& color, core::sync::EndCaller<Cube>& c) noexcept;
-    std::shared_ptr<Cube> get_cube(const math::Vec2& color, core::sync::EndCaller<Cube>& c) noexcept;
-    std::shared_ptr<Cube> get_cube_zero_3c(core::sync::EndCaller<Cube>& c) noexcept;
+    std::shared_ptr<TextureCube> get_cube(const math::Vec4& color, core::sync::EndCaller<TextureCube>& c) noexcept;
+    std::shared_ptr<TextureCube> get_cube(const math::Vec3& color, core::sync::EndCaller<TextureCube>& c) noexcept;
+    std::shared_ptr<TextureCube> get_cube(const math::Vec2& color, core::sync::EndCaller<TextureCube>& c) noexcept;
+    std::shared_ptr<TextureCube> get_cube_zero_3c(core::sync::EndCaller<TextureCube>& c) noexcept;
     std::shared_ptr<Texture> get_gx3d(core::Id id, core::sync::EndCaller<Texture>& c) noexcept;
     [[nodiscard]] engine::Engine* get_engine() const noexcept;
 };

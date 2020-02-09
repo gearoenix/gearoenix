@@ -2,6 +2,15 @@
 #include "../buffer/rnd-buf-framed-uniform.hpp"
 #include "../material/rnd-mat-pbr.hpp"
 #include "../material/rnd-mat-unlit.hpp"
+#include "rnd-pip-shadow-mapper.hpp"
+
+gearoenix::render::pipeline::ShadowMapperResourceSet::ShadowMapperResourceSet(
+    std::shared_ptr<ShadowMapper> pip) noexcept
+    : ResourceSet(std::move(pip))
+{
+}
+
+gearoenix::render::pipeline::ShadowMapperResourceSet::~ShadowMapperResourceSet() noexcept = default;
 
 void gearoenix::render::pipeline::ShadowMapperResourceSet::set_mesh(const mesh::Mesh* const m) noexcept
 {

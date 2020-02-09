@@ -102,8 +102,6 @@ void gearoenix::render::graph::node::SkyboxEquirectangular::update() noexcept
 void gearoenix::render::graph::node::SkyboxEquirectangular::set_camera(const camera::Camera* const c) noexcept
 {
     cam = c;
-    const auto& cam_uni = cam->get_uniform();
-    render_target->set_clipping(cam_uni.clip_width, cam_uni.clip_height);
 }
 
 void gearoenix::render::graph::node::SkyboxEquirectangular::add_sky(const skybox::Equirectangular* const sky) noexcept

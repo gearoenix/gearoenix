@@ -32,9 +32,9 @@ namespace scene {
     class Scene;
 }
 namespace texture {
-    class Cube;
     class Texture;
     class Texture2D;
+    class TextureCube;
 }
 namespace graph::node {
     struct ShadowMapperUniform {

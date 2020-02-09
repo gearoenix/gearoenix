@@ -9,7 +9,7 @@ public:
         core::Real alpha = 1.0f;
         core::Real alpha_cutoff = 0.001f;
     };
-    GX_GET_CREF_PRV(std::shared_ptr<texture::Cube>, color_texture)
+    GX_GET_CREF_PRV(std::shared_ptr<texture::TextureCube>, color_texture)
     GX_GET_CREF_PRV(std::optional<math::Vec4>, color_value)
     GX_GET_CREF_PRV(Uniform, uniform)
 public:
@@ -22,7 +22,7 @@ public:
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& end = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
     void set_color(const math::Vec4& c,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& end = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
-    void set_color(const std::shared_ptr<texture::Cube>& color) noexcept;
+    void set_color(const std::shared_ptr<texture::TextureCube>& color) noexcept;
     void set_alpha(core::Real) noexcept;
 };
 }

@@ -1,111 +1,22 @@
-#include "gles2-txt-2d.hpp"
+#include "gles2-txt-texture.hpp"
 #ifdef GX_USE_OPENGL_ES2
-#include "../../core/cr-function-loader.hpp"
-#include "../../gl/gl-constants.hpp"
-#include "../../gl/gl-loader.hpp"
-#include "../engine/gles2-eng-engine.hpp"
-#include "gles2-txt-sample.hpp"
+#include "gles2-txt-2d.hpp"
+#include "gles2-txt-target.hpp"
 
-gearoenix::gles2::texture::Texture2D::Texture2D(const core::Id my_id, engine::Engine* const e) noexcept
-    : render::texture::Texture(my_id, render::texture::Type::Texture2D, e)
-    , render::texture::Texture2D(my_id, e)
+void gearoenix::gles2::texture::Texture::bind(
+    const render::texture::Texture* const t,
+    const gl::enumerated texture_unit) noexcept
 {
-}
-
-std::shared_ptr<gearoenix::gles2::texture::Texture2D> gearoenix::gles2::texture::Texture2D::construct(
-    const core::Id my_id,
-    engine::Engine* const e,
-    const void* const data,
-    const render::texture::TextureFormat f,
-    const render::texture::SampleInfo s,
-    const unsigned int img_width,
-    const unsigned int img_height,
-    const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
-{
-    std::shared_ptr<Texture2D> result(new Texture2D(my_id, e));
-    const SampleInfo sample_info = SampleInfo(s);
-    const bool needs_mipmap = sample_info.needs_mipmap();
-    gl::uint cf;
-    const auto gimg_width = static_cast<gl::sizei>(img_width);
-    const auto gimg_height = static_cast<gl::sizei>(img_height);
-    std::vector<std::uint8_t> pixels;
-    if (f == render::texture::TextureFormat::RgbaFloat32) {
-        cf = GL_RGBA;
-        const gl::sizei pixel_size = gimg_width * gimg_height * 4;
-        pixels.resize(pixel_size);
-        const auto rdata = reinterpret_cast<const core::Real*>(data);
-        for (gl::sizei i = 0; i < pixel_size; ++i) {
-            const auto c = rdata[i] * 255.1f;
-            if (c >= 255.0f)
-                pixels[i] = 255;
-            else if (c < 0.0f)
-                pixels[i] = 0;
-            else
-                pixels[i] = static_cast<std::uint8_t>(c);
-        }
-    } else if (f == render::texture::TextureFormat::RgbFloat32) {
-        cf = GL_RGB;
-        const gl::sizei pixel_size = gimg_width * gimg_height * 3;
-        pixels.resize(pixel_size);
-        const auto rdata = reinterpret_cast<const core::Real*>(data);
-        for (gl::sizei i = 0; i < pixel_size; ++i) {
-            const auto c = rdata[i] * 255.1f;
-            if (c >= 255.0f)
-                pixels[i] = 255;
-            else if (c < 0.0f)
-                pixels[i] = 0;
-            else
-                pixels[i] = static_cast<std::uint8_t>(c);
-        }
-    } else if (f == render::texture::TextureFormat::RgbaUint8) {
-        cf = GL_RGBA;
-        const gl::sizei pixel_size = gimg_width * gimg_height * 4;
-        pixels.resize(pixel_size);
-        const auto rdata = reinterpret_cast<const std::uint8_t*>(data);
-        for (gl::sizei i = 0; i < pixel_size; ++i)
-            pixels[i] = rdata[i];
-    } else
-        GXLOGF("Unsupported/Unimplemented setting for texture with id " << my_id)
-    e->get_function_loader()->load([needs_mipmap, result, pixels { move(pixels) }, cf, gimg_width, gimg_height, sample_info, call] {
-        gl::Loader::gen_textures(1, &(result->texture_object));
-        gl::Loader::bind_texture(GL_TEXTURE_2D, result->texture_object);
-        gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, sample_info.min_filter);
-        gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, sample_info.mag_filter);
-        gl::Loader::tex_parameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, sample_info.wrap_s);
-        gl::Loader::tex_parameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, sample_info.wrap_t);
-        gl::Loader::tex_image_2d(GL_TEXTURE_2D, 0, static_cast<gl::sint>(cf), gimg_width, gimg_height, 0, static_cast<gl::enumerated>(cf), GL_UNSIGNED_BYTE, pixels.data());
-        if (needs_mipmap)
-            gl::Loader::generate_mipmap(GL_TEXTURE_2D);
-#ifdef GX_DEBUG_GLES2
-        gl::Loader::check_for_error();
-#endif
-    });
-    return result;
-}
-
-gearoenix::gles2::texture::Texture2D::Texture2D(const core::Id my_id, const gl::uint txtobj, engine::Engine* const e) noexcept
-    : render::texture::Texture(my_id, render::texture::Type::Texture2D, e)
-    , render::texture::Texture2D(my_id, e)
-    , texture_object(txtobj)
-{
-}
-
-gearoenix::gles2::texture::Texture2D::~Texture2D() noexcept
-{
-    if (texture_object == 0)
+    switch (t->get_texture_type()) {
+    case render::texture::Type::Target2D:
+        Target::bind_texture(reinterpret_cast<const render::texture::Target*>(t), texture_unit);
         return;
-    const gl::uint c_texture_object = texture_object;
-    render_engine->get_function_loader()->load([c_texture_object] {
-        gl::Loader::bind_texture(GL_TEXTURE_2D, 0);
-        gl::Loader::delete_textures(1, &c_texture_object);
-    });
-    texture_object = 0;
-}
-
-void gearoenix::gles2::texture::Texture2D::bind(gl::enumerated texture_unit) const noexcept
-{
-    gl::Loader::active_texture(GL_TEXTURE0 + texture_unit);
-    gl::Loader::bind_texture(GL_TEXTURE_2D, texture_object);
+    case render::texture::Type::Texture2D:
+        reinterpret_cast<const texture::Texture2D*>(t)->bind(texture_unit);
+        return;
+    default:
+        GXUNEXPECTED
+    }
 }
 
 #endif

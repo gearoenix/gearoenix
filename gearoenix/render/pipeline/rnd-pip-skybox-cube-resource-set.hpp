@@ -2,6 +2,7 @@
 #define GEAROENIX_RENDER_PIPELINE_SKY_CUBE_RESOURCE_SET_HPP
 #include "../../core/cr-build-configuration.hpp"
 #include "rnd-pip-resource-set.hpp"
+
 namespace gearoenix::render::pipeline {
 class SkyCubeResourceSet : public ResourceSet {
 protected:
@@ -11,7 +12,7 @@ protected:
 
     const mesh::Mesh* msh = nullptr;
 
-    const texture::Cube* color = nullptr;
+    const texture::TextureCube* color = nullptr;
 
 public:
     ~SkyCubeResourceSet() noexcept override = default;

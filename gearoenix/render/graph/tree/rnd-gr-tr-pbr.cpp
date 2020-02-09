@@ -10,6 +10,7 @@
 #include "../../scene/rnd-scn-manager.hpp"
 #include "../../scene/rnd-scn-scene.hpp"
 #include "../../skybox/rnd-sky-equirectangular.hpp"
+#include "../../texture/rnd-txt-target-2d.hpp"
 #include "../node/rnd-gr-nd-forward-pbr.hpp"
 #include "../node/rnd-gr-nd-shadow-mapper.hpp"
 #include "../node/rnd-gr-nd-skybox-equirectangular.hpp"
