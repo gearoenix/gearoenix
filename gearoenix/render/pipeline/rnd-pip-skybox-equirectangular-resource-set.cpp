@@ -11,12 +11,10 @@ gearoenix::render::pipeline::SkyboxEquirectangularResourceSet::SkyboxEquirectang
 
 gearoenix::render::pipeline::SkyboxEquirectangularResourceSet::~SkyboxEquirectangularResourceSet() noexcept = default;
 
-void gearoenix::render::pipeline::SkyboxEquirectangularResourceSet::set_material(const material::Material* m) noexcept
+void gearoenix::render::pipeline::SkyboxEquirectangularResourceSet::set_material(const material::SkyboxEquirectangular* m) noexcept
 {
-
     material_uniform_buffer = m->get_uniform_buffers()->get_buffer();
-    auto* const sky_equirectangular_mat = reinterpret_cast<const material::SkyboxEquirectangular*>(m);
-    color = sky_equirectangular_mat->get_color_texture().get();
+    color = m->get_color_texture().get();
 }
 
 void gearoenix::render::pipeline::SkyboxEquirectangularResourceSet::set_mesh(const mesh::Mesh* m) noexcept

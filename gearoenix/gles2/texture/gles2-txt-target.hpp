@@ -46,6 +46,7 @@ public:
         unsigned int height,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
     void bind() const noexcept;
+    void clear() const noexcept;
     static void bind(const render::texture::Target* target) noexcept;
     void bind_texture(gl::enumerated texture_unit) const noexcept;
     static void bind_texture(const render::texture::Target* t, gl::enumerated texture_unit) noexcept;

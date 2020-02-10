@@ -91,8 +91,8 @@ std::shared_ptr<gearoenix::render::texture::Target> gearoenix::gles2::texture::T
     switch (info.t) {
     case render::texture::Type::Target2D:
         return Target2D::construct(id, e, info, w, h, call);
-    case render::texture::Type::TargetCube:
-        return TargetCube::construct(id, e, info, w, h, call);
+        //    case render::texture::Type::TargetCube:
+        //        return TargetCube::construct(id, e, info, w, h, call);
     default:
         GXUNEXPECTED
     }
@@ -103,13 +103,11 @@ void gearoenix::gles2::texture::Target::bind() const noexcept
     if (-1 != depth_buffer)
         gl::Loader::bind_renderbuffer(GL_RENDERBUFFER, depth_buffer);
     gl::Loader::bind_framebuffer(GL_FRAMEBUFFER, framebuffer);
-    //    gl::Loader::viewport(0, 0, static_cast<gl::sizei>(clipping_width), static_cast<gl::sizei>(clipping_height));
-    //    gl::Loader::scissor(0, 0, static_cast<gl::sizei>(clipping_width), static_cast<gl::sizei>(clipping_height));
     state_init();
+}
 
-    // TODO viewport can be passed as an arg to this function
-    GXUNIMPLEMENTED
-
+void gearoenix::gles2::texture::Target::clear() const noexcept
+{
     if (write_depth) {
         gl::Loader::depth_mask(GL_TRUE);
     } else {
@@ -150,7 +148,8 @@ void gearoenix::gles2::texture::Target::bind(const render::texture::Target* cons
 {
     switch (target->get_texture_type()) {
     case render::texture::Type::Target2D:
-        reinterpret_cast<const Target2D*>(target)->bind();
+        reinterpret_cast<const Target2D*>(target)->bind_final();
+        break;
     default:
         GXUNEXPECTED
     }

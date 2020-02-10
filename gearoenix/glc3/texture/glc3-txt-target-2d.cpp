@@ -71,4 +71,41 @@ std::shared_ptr<gearoenix::glc3::texture::Target2D> gearoenix::glc3::texture::Ta
     return result;
 }
 
+void gearoenix::glc3::texture::Target2D::bind_final() const noexcept
+{
+    bind();
+    gl::Loader::viewport(
+        static_cast<gl::sizei>(clipping_starting_x), static_cast<gl::sizei>(clipping_starting_y),
+        static_cast<gl::sizei>(clipping_width), static_cast<gl::sizei>(clipping_height));
+    gl::Loader::scissor(
+        static_cast<gl::sizei>(clipping_starting_x), static_cast<gl::sizei>(clipping_starting_y),
+        static_cast<gl::sizei>(clipping_width), static_cast<gl::sizei>(clipping_height));
+    clear();
+}
+
 #endif
+
+gearoenix::render::texture::Target* gearoenix::glc3::texture::Target2D::clone() const noexcept
+{
+    auto* const t = new Target2D(gl_e);
+
+    t->texture_objects = texture_objects;
+    t->framebuffer = framebuffer;
+    t->depth_buffer = depth_buffer;
+    t->gl_cull_mode = gl_cull_mode;
+    t->gl_blend_mode = gl_blend_mode;
+    t->depth_test_enabled = depth_test_enabled;
+    t->scissor_test_enabled = scissor_test_enabled;
+    t->stencil_test_enabled = stencil_test_enabled;
+    t->write_depth = write_depth;
+
+    t->clipping_width = clipping_width;
+    t->clipping_height = clipping_height;
+    t->clipping_starting_x = clipping_starting_x;
+    t->clipping_starting_y = clipping_starting_y;
+
+    t->img_width = img_width;
+    t->img_height = img_height;
+
+    return t;
+}

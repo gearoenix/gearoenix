@@ -2,6 +2,10 @@
 #define GEAROENIX_RENDER_PIPELINE_SKYBOX_EQUIRECTANGULAR_RESOURCE_SET_HPP
 #include "rnd-pip-resource-set.hpp"
 
+namespace gearoenix::render::material {
+class SkyboxEquirectangular;
+}
+
 namespace gearoenix::render::pipeline {
 class SkyboxEquirectangular;
 class SkyboxEquirectangularResourceSet : public ResourceSet {
@@ -18,7 +22,7 @@ protected:
 
 public:
     ~SkyboxEquirectangularResourceSet() noexcept override;
-    void set_material(const material::Material* m) noexcept;
+    void set_material(const material::SkyboxEquirectangular* m) noexcept;
     void set_mesh(const mesh::Mesh* m) noexcept;
     void set_node_uniform_buffer(buffer::Uniform* node_uniform_buffer) noexcept;
     void clean() noexcept override;

@@ -24,6 +24,8 @@ public:
         unsigned int width,
         unsigned int height,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
+    void bind_final() const noexcept;
+    [[nodiscard]] render::texture::Target* clone() const noexcept final;
 };
 }
 

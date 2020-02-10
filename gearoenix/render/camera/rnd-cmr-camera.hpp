@@ -56,7 +56,7 @@ public:
     GX_GET_CREF_PRT(std::vector<Partition>, cascaded_shadow_frustum_partitions)
     GX_GET_CREF_PRT(Uniform, uniform)
     GX_GET_UPTR_PRT(physics::Transformation, transformation)
-    GX_GETSET_CREF_PRT(std::shared_ptr<texture::Target>, target)
+    GX_GET_UPTR_PRT(texture::Target, target)
     GX_GETSET_VAL_PRT(bool, enabled, true)
 protected:
     engine::Engine* const e;
@@ -69,6 +69,7 @@ protected:
 public:
     ~Camera() noexcept override;
     void set_far(core::Real f) noexcept;
+    void set_target(const texture::Target* target) noexcept;
     virtual void update_uniform() noexcept;
     virtual void set_aspect_ratio(core::Real ratio) noexcept;
     [[nodiscard]] virtual math::Ray3 create_ray3(core::Real x, core::Real y) const noexcept = 0;

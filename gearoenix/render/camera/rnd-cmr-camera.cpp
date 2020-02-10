@@ -7,6 +7,7 @@
 #include "../../system/sys-app.hpp"
 #include "../../system/sys-log.hpp"
 #include "../buffer/rnd-buf-framed-uniform.hpp"
+#include "../texture/rnd-txt-target-2d.hpp"
 #include "rnd-cmr-transformation.hpp"
 
 #define GX_CAMERA_INIT \
@@ -18,6 +19,7 @@ void gearoenix::render::camera::Camera::initialize() noexcept
     uniform.aspect_ratio = sys_app->get_window_ratio();
     uniform.clip_width = static_cast<core::Real>(sys_app->get_window_width());
     uniform.clip_height = static_cast<core::Real>(sys_app->get_window_height());
+    set_target(e->get_main_render_target().get());
     sys_app->get_event_engine()->add_listener(core::event::Id::SystemWindowSizeChange, 1.0f, this);
 }
 
@@ -62,6 +64,15 @@ void gearoenix::render::camera::Camera::set_far(const core::Real f) noexcept
 {
     uniform.far = -f;
     reinterpret_cast<Transformation*>(transformation.get())->update_projection();
+}
+
+void gearoenix::render::camera::Camera::set_target(const texture::Target* const t) noexcept
+{
+    target = std::unique_ptr<texture::Target>(t->clone());
+    target->set_clipping_width(uniform.clip_width);
+    target->set_clipping_height(uniform.clip_height);
+    target->set_clipping_starting_x(uniform.clip_start_x);
+    target->set_clipping_starting_y(uniform.clip_start_y);
 }
 
 void gearoenix::render::camera::Camera::update_uniform() noexcept
