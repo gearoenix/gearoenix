@@ -109,6 +109,16 @@ void gearoenix::glc3::texture::Target::bind() const noexcept
     }
 }
 
+void gearoenix::glc3::texture::Target::bind(const render::texture::Target* const t) noexcept
+{
+    switch (t->get_texture_type()) {
+    case render::texture::Type::Target2D:
+        reinterpret_cast<const Target2D*>(t)->bind();
+    default:
+        GXUNEXPECTED
+    }
+}
+
 void gearoenix::glc3::texture::Target::bind_textures(
     const gl::enumerated* const texture_units, const std::size_t size) const noexcept
 {

@@ -4,7 +4,7 @@
 #include "rnd-pip-skybox-equirectangular.hpp"
 
 gearoenix::render::pipeline::SkyboxEquirectangularResourceSet::SkyboxEquirectangularResourceSet(
-    std::shared_ptr<SkyboxEquirectangular> pip) noexcept
+    std::shared_ptr<SkyboxEquirectangular const> pip) noexcept
     : ResourceSet(std::move(pip))
 {
 }

@@ -14,7 +14,7 @@ protected:
 
     const texture::Texture2D* color = nullptr;
 
-    explicit SkyboxEquirectangularResourceSet(std::shared_ptr<SkyboxEquirectangular> pip) noexcept;
+    explicit SkyboxEquirectangularResourceSet(std::shared_ptr<SkyboxEquirectangular const> pip) noexcept;
 
 public:
     ~SkyboxEquirectangularResourceSet() noexcept override;

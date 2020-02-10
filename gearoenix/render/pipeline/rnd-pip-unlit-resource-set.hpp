@@ -15,7 +15,7 @@ protected:
 
     const texture::Texture2D* color = nullptr;
 
-    explicit UnlitResourceSet(std::shared_ptr<Unlit> pip) noexcept;
+    explicit UnlitResourceSet(std::shared_ptr<Unlit const> pip) noexcept;
 
 public:
     ~UnlitResourceSet() noexcept override;

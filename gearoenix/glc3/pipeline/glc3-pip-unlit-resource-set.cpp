@@ -11,14 +11,17 @@
 #include "../buffer/glc3-buf-vertex.hpp"
 #include "../shader/glc3-shd-unlit.hpp"
 #include "../texture/glc3-txt-2d.hpp"
+#include "glc3-pip-unlit.hpp"
 
-gearoenix::glc3::pipeline::UnlitResourceSet::UnlitResourceSet(const std::shared_ptr<shader::Unlit>& shd, std::shared_ptr<pipeline::Pipeline> pip) noexcept
-    : render::pipeline::ResourceSet(std::move(pip))
-    , glc3::pipeline::ResourceSet(shd)
+gearoenix::glc3::pipeline::UnlitResourceSet::UnlitResourceSet(const std::shared_ptr<shader::Unlit>& shd, std::shared_ptr<Unlit const> pip) noexcept
+    : glc3::pipeline::ResourceSet(shd)
+    , render::pipeline::UnlitResourceSet(std::move(pip))
 {
 }
 
-void gearoenix::glc3::pipeline::UnlitResourceSet::bind(gl::uint& bound_shader_program) const noexcept
+gearoenix::glc3::pipeline::UnlitResourceSet::~UnlitResourceSet() noexcept = default;
+
+void gearoenix::glc3::pipeline::UnlitResourceSet::bind_final(gl::uint& bound_shader_program) const noexcept
 {
     GX_GLC3_PIP_RES_START_DRAWING_MESH
     GX_GLC3_PIP_RES_START_SHADER(Unlit, shd)
@@ -30,4 +33,5 @@ void gearoenix::glc3::pipeline::UnlitResourceSet::bind(gl::uint& bound_shader_pr
     GX_GLC3_PIP_RES_SET_UNIFORM(effect_mvp, *(node->mvp.data()))
     GX_GLC3_PIP_RES_END_DRAWING_MESH
 }
+
 #endif

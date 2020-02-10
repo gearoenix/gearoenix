@@ -13,12 +13,13 @@ class Unlit;
 }
 
 namespace gearoenix::glc3::pipeline {
-class Unlit : public render::pipeline::Unlit {
+class Unlit : public render::pipeline::Unlit, public std::enable_shared_from_this<Unlit> {
 private:
     const std::shared_ptr<shader::Unlit> shd;
 
 public:
     Unlit(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+    ~Unlit() noexcept final;
     [[nodiscard]] render::pipeline::ResourceSet* create_resource_set() const noexcept final;
 };
 }

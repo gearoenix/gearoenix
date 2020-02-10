@@ -5,7 +5,7 @@
 #include "rnd-pip-shadow-mapper.hpp"
 
 gearoenix::render::pipeline::ShadowMapperResourceSet::ShadowMapperResourceSet(
-    std::shared_ptr<ShadowMapper> pip) noexcept
+    std::shared_ptr<ShadowMapper const> pip) noexcept
     : ResourceSet(std::move(pip))
 {
 }

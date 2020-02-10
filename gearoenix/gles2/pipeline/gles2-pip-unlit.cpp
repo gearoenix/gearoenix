@@ -10,8 +10,11 @@ gearoenix::gles2::pipeline::Unlit::Unlit(engine::Engine* const e, const core::sy
 {
 }
 
+gearoenix::gles2::pipeline::Unlit::~Unlit() noexcept = default;
+
 gearoenix::render::pipeline::ResourceSet* gearoenix::gles2::pipeline::Unlit::create_resource_set() const noexcept
 {
-    return new UnlitResourceSet(shd);
+    return new UnlitResourceSet(shd, shared_from_this());
 }
+
 #endif

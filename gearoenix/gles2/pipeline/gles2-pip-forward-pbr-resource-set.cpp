@@ -16,11 +16,13 @@
 #include "../texture/gles2-txt-texture.hpp"
 #include "gles2-pip-forward-pbr.hpp"
 
-gearoenix::gles2::pipeline::ForwardPbrResourceSet::ForwardPbrResourceSet(const std::shared_ptr<shader::ForwardPbr>& shd, std::shared_ptr<ForwardPbr> pip) noexcept
+gearoenix::gles2::pipeline::ForwardPbrResourceSet::ForwardPbrResourceSet(const std::shared_ptr<shader::ForwardPbr>& shd, std::shared_ptr<ForwardPbr const> pip) noexcept
     : gles2::pipeline::ResourceSet(shd)
     , render::pipeline::ForwardPbrResourceSet(std::move(pip))
 {
 }
+
+gearoenix::gles2::pipeline::ForwardPbrResourceSet::~ForwardPbrResourceSet() noexcept = default;
 
 void gearoenix::gles2::pipeline::ForwardPbrResourceSet::bind_final(gl::uint& bound_shader_program) const noexcept
 {
@@ -72,4 +74,5 @@ void gearoenix::gles2::pipeline::ForwardPbrResourceSet::bind_final(gl::uint& bou
     GX_GLES2_PIP_RES_SET_UNIFORM(effect_shadow_caster_directional_lights_direction, *(node->shadow_caster_directional_lights_direction[0].data()))
     GX_GLES2_PIP_RES_END_DRAWING_MESH
 }
+
 #endif

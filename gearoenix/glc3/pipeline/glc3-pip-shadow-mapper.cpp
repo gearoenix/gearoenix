@@ -10,8 +10,11 @@ gearoenix::glc3::pipeline::ShadowMapper::ShadowMapper(engine::Engine* const e, c
 {
 }
 
+gearoenix::glc3::pipeline::ShadowMapper::~ShadowMapper() noexcept = default;
+
 gearoenix::render::pipeline::ResourceSet* gearoenix::glc3::pipeline::ShadowMapper::create_resource_set() const noexcept
 {
-    return new ShadowMapperResourceSet(shd);
+    return new ShadowMapperResourceSet(shd, shared_from_this());
 }
+
 #endif

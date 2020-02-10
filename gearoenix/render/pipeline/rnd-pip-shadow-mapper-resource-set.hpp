@@ -10,7 +10,7 @@ protected:
     const mesh::Mesh* msh = nullptr;
     const texture::Texture2D* color = nullptr;
 
-    explicit ShadowMapperResourceSet(std::shared_ptr<ShadowMapper> pip) noexcept;
+    explicit ShadowMapperResourceSet(std::shared_ptr<ShadowMapper const> pip) noexcept;
 
 public:
     ~ShadowMapperResourceSet() noexcept override;

@@ -26,6 +26,10 @@ namespace gearoenix::glc3::shader {
 class Shader;
 }
 
+namespace gearoenix::render::pipeline {
+class ResourceSet;
+}
+
 namespace gearoenix::glc3::pipeline {
 class ResourceSet {
 protected:
@@ -36,6 +40,7 @@ protected:
 public:
     virtual ~ResourceSet() noexcept;
     void bind(gl::uint& bound_shader_program) const noexcept;
+    static void bind(const render::pipeline::ResourceSet* prs, gl::uint& bound_shader_program) noexcept;
 };
 }
 

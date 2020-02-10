@@ -13,12 +13,13 @@ class ShadowMapper;
 }
 
 namespace gearoenix::gles2::pipeline {
-class ShadowMapper : public render::pipeline::ShadowMapper {
+class ShadowMapper : public render::pipeline::ShadowMapper, public std::enable_shared_from_this<ShadowMapper> {
 private:
     const std::shared_ptr<shader::ShadowMapper> shd;
 
 public:
     ShadowMapper(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+    ~ShadowMapper() noexcept final;
     [[nodiscard]] render::pipeline::ResourceSet* create_resource_set() const noexcept final;
 };
 }

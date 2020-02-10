@@ -10,8 +10,11 @@ gearoenix::glc3::pipeline::ForwardPbr::ForwardPbr(engine::Engine* const e, const
 {
 }
 
+gearoenix::glc3::pipeline::ForwardPbr::~ForwardPbr() noexcept = default;
+
 gearoenix::render::pipeline::ResourceSet* gearoenix::glc3::pipeline::ForwardPbr::create_resource_set() const noexcept
 {
-    return new ForwardPbrResourceSet(shd);
+    return new ForwardPbrResourceSet(shd, shared_from_this());
 }
+
 #endif

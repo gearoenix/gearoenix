@@ -11,8 +11,11 @@ gearoenix::gles2::pipeline::SkyboxEquirectangular::SkyboxEquirectangular(
 {
 }
 
+gearoenix::gles2::pipeline::SkyboxEquirectangular::~SkyboxEquirectangular() noexcept = default;
+
 gearoenix::render::pipeline::ResourceSet* gearoenix::gles2::pipeline::SkyboxEquirectangular::create_resource_set() const noexcept
 {
-    return new SkyboxEquirectangularResourceSet(shd);
+    return new SkyboxEquirectangularResourceSet(shd, shared_from_this());
 }
+
 #endif

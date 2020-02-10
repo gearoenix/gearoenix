@@ -10,7 +10,7 @@
 #include "../scene/rnd-scn-scene.hpp"
 #include "rnd-pip-forward-pbr.hpp"
 
-gearoenix::render::pipeline::ForwardPbrResourceSet::ForwardPbrResourceSet(std::shared_ptr<ForwardPbr> pip) noexcept
+gearoenix::render::pipeline::ForwardPbrResourceSet::ForwardPbrResourceSet(std::shared_ptr<ForwardPbr const> pip) noexcept
     : ResourceSet(std::move(pip))
 {
 }

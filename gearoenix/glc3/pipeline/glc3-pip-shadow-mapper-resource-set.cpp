@@ -10,14 +10,17 @@
 #include "../buffer/glc3-buf-vertex.hpp"
 #include "../shader/glc3-shd-shadow-mapper.hpp"
 #include "../texture/glc3-txt-2d.hpp"
+#include "glc3-pip-shadow-mapper.hpp"
 
-gearoenix::glc3::pipeline::ShadowMapperResourceSet::ShadowMapperResourceSet(const std::shared_ptr<shader::ShadowMapper>& shd, std::shared_ptr<pipeline::Pipeline> pip) noexcept
-    : render::pipeline::ResourceSet(std::move(pip))
-    , glc3::pipeline::ResourceSet(shd)
+gearoenix::glc3::pipeline::ShadowMapperResourceSet::ShadowMapperResourceSet(const std::shared_ptr<shader::ShadowMapper>& shd, std::shared_ptr<ShadowMapper const> pip) noexcept
+    : glc3::pipeline::ResourceSet(shd)
+    , render::pipeline::ShadowMapperResourceSet(std::move(pip))
 {
 }
 
-void gearoenix::glc3::pipeline::ShadowMapperResourceSet::bind(gl::uint& bound_shader_program) const noexcept
+gearoenix::glc3::pipeline::ShadowMapperResourceSet::~ShadowMapperResourceSet() noexcept = default;
+
+void gearoenix::glc3::pipeline::ShadowMapperResourceSet::bind_final(gl::uint& bound_shader_program) const noexcept
 {
     GX_GLC3_PIP_RES_START_DRAWING_MESH
     GX_GLC3_PIP_RES_START_SHADER(ShadowMapper, shd)

@@ -8,12 +8,15 @@
 #include "../buffer/gles2-buf-vertex.hpp"
 #include "../shader/gles2-shd-shadow-mapper.hpp"
 #include "../texture/gles2-txt-2d.hpp"
+#include "gles2-pip-shadow-mapper.hpp"
 
-gearoenix::gles2::pipeline::ShadowMapperResourceSet::ShadowMapperResourceSet(const std::shared_ptr<shader::ShadowMapper>& shd, std::shared_ptr<pipeline::Pipeline> pip) noexcept
-    : render::pipeline::ResourceSet(std::move(pip))
-    , gles2::pipeline::ResourceSet(shd)
+gearoenix::gles2::pipeline::ShadowMapperResourceSet::ShadowMapperResourceSet(const std::shared_ptr<shader::ShadowMapper>& shd, std::shared_ptr<ShadowMapper const> pip) noexcept
+    : gles2::pipeline::ResourceSet(shd)
+    , render::pipeline::ShadowMapperResourceSet(std::move(pip))
 {
 }
+
+gearoenix::gles2::pipeline::ShadowMapperResourceSet::~ShadowMapperResourceSet() noexcept = default;
 
 void gearoenix::gles2::pipeline::ShadowMapperResourceSet::bind_final(gl::uint& bound_shader_program) const noexcept
 {
@@ -26,4 +29,5 @@ void gearoenix::gles2::pipeline::ShadowMapperResourceSet::bind_final(gl::uint& b
     GX_GLES2_PIP_RES_SET_UNIFORM(effect_alpha_cutoff, node->alpha_cutoff)
     GX_GLES2_PIP_RES_END_DRAWING_MESH
 }
+
 #endif

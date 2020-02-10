@@ -27,7 +27,7 @@ protected:
     const texture::Texture2D* directional_lights_shadow_maps[GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER][GX_MAX_SHADOW_CASCADES] = {};
     const texture::Texture2D* brdflut = nullptr;
 
-    explicit ForwardPbrResourceSet(std::shared_ptr<ForwardPbr> pip) noexcept;
+    explicit ForwardPbrResourceSet(std::shared_ptr<ForwardPbr const> pip) noexcept;
 
 public:
     ~ForwardPbrResourceSet() noexcept override;

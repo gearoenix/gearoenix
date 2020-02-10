@@ -13,12 +13,13 @@ class SkyboxEquirectangular;
 }
 
 namespace gearoenix::gles2::pipeline {
-class SkyboxEquirectangular : public render::pipeline::SkyboxEquirectangular {
+class SkyboxEquirectangular : public render::pipeline::SkyboxEquirectangular, public std::enable_shared_from_this<SkyboxEquirectangular> {
 private:
     const std::shared_ptr<shader::SkyboxEquirectangular> shd;
 
 public:
     SkyboxEquirectangular(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+    ~SkyboxEquirectangular() noexcept final;
     [[nodiscard]] render::pipeline::ResourceSet* create_resource_set() const noexcept final;
 };
 }

@@ -46,9 +46,9 @@ class TextureCube;
 namespace gearoenix::render::pipeline {
 class Pipeline;
 class ResourceSet {
-    GX_GET_CREF_PRV(std::shared_ptr<Pipeline>, pip)
+    GX_GET_CREF_PRV(std::shared_ptr<Pipeline const>, pip)
 protected:
-    explicit ResourceSet(std::shared_ptr<Pipeline> pip) noexcept;
+    explicit ResourceSet(std::shared_ptr<Pipeline const> pip) noexcept;
 
 public:
     virtual ~ResourceSet() noexcept;

@@ -3,7 +3,7 @@
 #include "../material/rnd-mat-unlit.hpp"
 #include "rnd-pip-unlit.hpp"
 
-gearoenix::render::pipeline::UnlitResourceSet::UnlitResourceSet(std::shared_ptr<Unlit> pip) noexcept
+gearoenix::render::pipeline::UnlitResourceSet::UnlitResourceSet(std::shared_ptr<Unlit const> pip) noexcept
     : ResourceSet(std::move(pip))
 {
 }

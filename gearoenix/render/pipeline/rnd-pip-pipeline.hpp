@@ -16,7 +16,7 @@ class Shader;
 
 namespace gearoenix::render::pipeline {
 class ResourceSet;
-class Pipeline : public std::enable_shared_from_this<Pipeline> {
+class Pipeline {
     GX_GET_CVAL_PRT(Type, pipeline_type)
 protected:
     engine::Engine* const e;

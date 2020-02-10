@@ -16,13 +16,15 @@
 #include "../texture/glc3-txt-texture.hpp"
 #include "glc3-pip-forward-pbr.hpp"
 
-gearoenix::glc3::pipeline::ForwardPbrResourceSet::ForwardPbrResourceSet(const std::shared_ptr<shader::ForwardPbr>& shd, std::shared_ptr<ForwardPbr> pip) noexcept
-    : render::pipeline::ResourceSet(std::move(pip))
-    , glc3::pipeline::ResourceSet(shd)
+gearoenix::glc3::pipeline::ForwardPbrResourceSet::ForwardPbrResourceSet(const std::shared_ptr<shader::ForwardPbr>& shd, std::shared_ptr<ForwardPbr const> pip) noexcept
+    : glc3::pipeline::ResourceSet(shd)
+    , render::pipeline::ForwardPbrResourceSet(std::move(pip))
 {
 }
 
-void gearoenix::glc3::pipeline::ForwardPbrResourceSet::bind(gl::uint& bound_shader_program) const noexcept
+gearoenix::glc3::pipeline::ForwardPbrResourceSet::~ForwardPbrResourceSet() noexcept = default;
+
+void gearoenix::glc3::pipeline::ForwardPbrResourceSet::bind_final(gl::uint& bound_shader_program) const noexcept
 {
     GX_GLC3_PIP_RES_START_DRAWING_MESH
     GX_GLC3_PIP_RES_START_SHADER(ForwardPbr, shd)

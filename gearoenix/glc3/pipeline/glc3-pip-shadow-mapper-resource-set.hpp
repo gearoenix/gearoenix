@@ -10,10 +10,12 @@ class ShadowMapper;
 }
 
 namespace gearoenix::glc3::pipeline {
+class ShadowMapper;
 class ShadowMapperResourceSet : public ResourceSet, public render::pipeline::ShadowMapperResourceSet {
 public:
-    explicit ShadowMapperResourceSet(const std::shared_ptr<shader::ShadowMapper>& shd) noexcept;
-    void bind(gl::uint& bound_shader_program) const noexcept final;
+    ShadowMapperResourceSet(const std::shared_ptr<shader::ShadowMapper>& shd, std::shared_ptr<ShadowMapper const> pip) noexcept;
+    ~ShadowMapperResourceSet() noexcept final;
+    void bind_final(gl::uint& bound_shader_program) const noexcept;
 };
 }
 

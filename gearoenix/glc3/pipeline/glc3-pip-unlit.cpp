@@ -12,6 +12,6 @@ gearoenix::glc3::pipeline::Unlit::Unlit(engine::Engine* const e, const core::syn
 
 gearoenix::render::pipeline::ResourceSet* gearoenix::glc3::pipeline::Unlit::create_resource_set() const noexcept
 {
-    return new UnlitResourceSet(shd);
+    return new UnlitResourceSet(shd, shared_from_this());
 }
 #endif
