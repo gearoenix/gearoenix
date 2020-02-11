@@ -72,9 +72,7 @@ gearoenix::glc3::texture::Target::~Target() noexcept
 {
     if (texture_objects.empty()) // This is main render-target
         return;
-    const auto cf = framebuffer;
-    const auto cr = depth_buffer;
-    gl_e->get_function_loader()->load([cf, cr, txts { move(texture_objects) }] {
+    gl_e->get_function_loader()->load([cf { framebuffer }, cr { depth_buffer }, txts { move(texture_objects) }] {
         if (cf != -1)
             gl::Loader::delete_framebuffers(1, reinterpret_cast<const gl::uint*>(&cf));
         if (cr != -1)
@@ -82,6 +80,9 @@ gearoenix::glc3::texture::Target::~Target() noexcept
         for (auto ct : txts)
             gl::Loader::delete_textures(1, &ct);
     });
+    texture_objects.clear();
+    framebuffer = -1;
+    depth_buffer = -1;
 }
 
 void gearoenix::glc3::texture::Target::bind() const noexcept
@@ -111,7 +112,7 @@ void gearoenix::glc3::texture::Target::bind(const render::texture::Target* const
 {
     switch (t->get_texture_type()) {
     case render::texture::Type::Target2D:
-        reinterpret_cast<const Target2D*>(t)->bind_final();
+        static_cast<const Target2D*>(t)->bind();
         break;
     default:
         GXUNEXPECTED
@@ -138,11 +139,50 @@ void gearoenix::glc3::texture::Target::bind_textures(
 {
     switch (t->get_texture_type()) {
     case render::texture::Type::Target2D:
-        reinterpret_cast<const Target2D*>(t)->bind_textures(texture_units, count);
+        static_cast<const Target2D*>(t)->bind_textures(texture_units, count);
         break;
     default:
         GXUNEXPECTED
     }
+}
+
+void gearoenix::glc3::texture::Target::fetch_current_framebuffer() noexcept
+{
+    gl::Loader::get_integerv(GL_FRAMEBUFFER_BINDING, &framebuffer);
+    gl::Loader::get_integerv(GL_RENDERBUFFER_BINDING, &depth_buffer);
+}
+
+void gearoenix::glc3::texture::Target::generate_framebuffer(
+    const std::vector<render::texture::Info>& infos,
+    const unsigned int w,
+    const unsigned int h) noexcept
+{
+    gl::Loader::gen_framebuffers(1, reinterpret_cast<gl::uint*>(&framebuffer));
+    gl::Loader::bind_framebuffer(GL_FRAMEBUFFER, framebuffer);
+    // TODO: check for need of depth buffer, It can be done by looping over infos for depth formats, if there was none so depth buffer must be created.
+    texture_objects.resize(infos.size());
+    gl::Loader::gen_textures(static_cast<gearoenix::gl::sizei>(texture_objects.size()), texture_objects.data());
+    for (std::size_t i = 0; i < texture_objects.size(); ++i) {
+        const auto& txt_info = infos[i];
+        const auto& txt_fmt = txt_info.f;
+        const auto& txt = texture_objects[i];
+        if (txt_fmt == render::texture::TextureFormat::D32) {
+            gl::Loader::bind_texture(GL_TEXTURE_2D, txt);
+            gl::Loader::tex_image_2d(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, w, h, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+            /// The nearest filter in here is for workaround for some buggy vendors
+            gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            gl::Loader::framebuffer_texture_2d(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, txt, 0);
+        } else {
+            GXUNIMPLEMENTED
+        }
+    }
+    if (gl::Loader::check_framebuffer_status(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        GXLOGF("Failed to create render target!")
+    state_init();
+    gl::Loader::bind_framebuffer(GL_FRAMEBUFFER, 0);
 }
 
 #endif

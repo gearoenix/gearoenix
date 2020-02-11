@@ -15,7 +15,7 @@ namespace command {
     protected:
         std::vector<Buffer*> recorded_secondaries;
         std::vector<pipeline::ResourceSet*> bound_resource_sets;
-        texture::Target* render_target = nullptr;
+        const texture::Target* render_target = nullptr;
 
     public:
         virtual ~Buffer() noexcept = default;
@@ -23,7 +23,7 @@ namespace command {
         virtual void end() noexcept;
         virtual void record(Buffer* o) noexcept;
         virtual void bind(pipeline::ResourceSet* r) noexcept;
-        virtual void bind(texture::Target* t) noexcept;
+        virtual void bind(const texture::Target* t) noexcept;
     };
 }
 }

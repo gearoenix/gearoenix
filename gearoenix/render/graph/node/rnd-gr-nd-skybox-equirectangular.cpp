@@ -58,7 +58,7 @@ void gearoenix::render::graph::node::SkyboxEquirectangular::record_sky(
     rd->u->set_data(u);
     auto* const prs = rd->r.get();
     prs->set_mesh(sky->get_msh().get());
-    prs->set_material(sky->get_mat().get());
+    prs->set_material(sky->get_mat_equ().get());
     kernel->secondary_cmd->bind(prs);
 }
 
@@ -102,6 +102,7 @@ void gearoenix::render::graph::node::SkyboxEquirectangular::update() noexcept
 void gearoenix::render::graph::node::SkyboxEquirectangular::set_camera(const camera::Camera* const c) noexcept
 {
     cam = c;
+    render_target = c->get_target();
 }
 
 void gearoenix::render::graph::node::SkyboxEquirectangular::add_sky(const skybox::Equirectangular* const sky) noexcept
@@ -124,7 +125,7 @@ void gearoenix::render::graph::node::SkyboxEquirectangular::submit() noexcept
 {
     const unsigned int frame_number = e->get_frame_number();
     command::Buffer* cmd = frames_primary_cmd[frame_number].get();
-    cmd->bind(render_target.get());
+    cmd->bind(render_target);
     for (const auto& k : frame->kernels) {
         cmd->record(k->secondary_cmd.get());
     }

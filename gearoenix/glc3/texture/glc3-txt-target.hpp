@@ -18,11 +18,11 @@ class Engine;
 
 namespace gearoenix::glc3::texture {
 class Target {
-protected:
-    engine::Engine* const gl_e;
-    std::vector<gl::uint> texture_objects;
+private:
     gl::sint framebuffer = -1;
     gl::sint depth_buffer = -1;
+    std::vector<gl::uint> texture_objects;
+    engine::Engine* const gl_e;
     // settings
     std::optional<gl::enumerated> gl_cull_mode = GL_BACK;
     std::optional<std::pair<gl::enumerated, gl::enumerated>> gl_blend_mode = std::make_pair(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -31,12 +31,9 @@ protected:
     bool stencil_test_enabled = true;
     bool write_depth = true;
 
-    void state_init() const noexcept;
-
-    explicit Target(engine::Engine* e) noexcept;
-
 public:
-    virtual ~Target() noexcept;
+    explicit Target(engine::Engine* e) noexcept;
+    ~Target() noexcept;
     [[nodiscard]] static std::shared_ptr<render::texture::Target> construct(
         core::Id id,
         engine::Engine* e,
@@ -44,6 +41,9 @@ public:
         unsigned int width,
         unsigned int height,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
+    void state_init() const noexcept;
+    void fetch_current_framebuffer() noexcept;
+    void generate_framebuffer(const std::vector<render::texture::Info>& infos, unsigned int w, unsigned int h) noexcept;
     void bind() const noexcept;
     void clear() const noexcept;
     static void bind(const render::texture::Target* t) noexcept;

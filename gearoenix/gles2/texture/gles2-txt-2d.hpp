@@ -13,7 +13,7 @@ class Engine;
 }
 
 namespace gearoenix::gles2::texture {
-class Texture2D : virtual public render::texture::Texture2D {
+class Texture2D : public render::texture::Texture2D {
 private:
     gl::uint texture_object = 0;
 
@@ -29,7 +29,7 @@ public:
         unsigned int width,
         unsigned int height,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
-    Texture2D(core::Id my_id, gl::uint txtobj, engine::Engine* e) noexcept;
+    Texture2D(core::Id my_id, gl::uint txt_obj, engine::Engine* e) noexcept;
     ~Texture2D() noexcept final;
     void bind(gl::enumerated texture_unit) const noexcept;
 };

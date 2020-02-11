@@ -206,6 +206,7 @@ void gearoenix::render::graph::node::ForwardPbr::set_scene(const scene::Scene* c
 void gearoenix::render::graph::node::ForwardPbr::set_camera(const camera::Camera* const c) noexcept
 {
     cam = c;
+    render_target = c->get_target();
 }
 
 void gearoenix::render::graph::node::ForwardPbr::set_directional_lights(const std::map<core::Real, std::map<light::Directional*, light::CascadeInfo*>>* const m) noexcept
@@ -283,7 +284,7 @@ void gearoenix::render::graph::node::ForwardPbr::submit() noexcept
 {
     const unsigned int frame_number = e->get_frame_number();
     command::Buffer* cmd = frames_primary_cmd[frame_number].get();
-    cmd->bind(render_target.get());
+    cmd->bind(render_target);
     for (const auto& k : frame->kernels) {
         cmd->record(k->secondary_cmd.get());
     }

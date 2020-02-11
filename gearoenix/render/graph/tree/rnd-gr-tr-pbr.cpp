@@ -44,7 +44,7 @@ void gearoenix::render::graph::tree::Pbr::update_skyboxes(const scene::Scene* co
             if (previous_equirectangular == nullptr) {
                 previous_equirectangular = skybox_equirectangular.get_next([this] {
                     auto* const n = new node::SkyboxEquirectangular(e, GX_DEFAULT_IGNORED_END_CALLER);
-                    n->set_render_target(e->get_main_render_target());
+                    n->set_render_target(e->get_main_render_target().get());
                     return n;
                 });
                 camera_nodes.skyboxes[sky->get_layer()].push_back(previous_equirectangular);
@@ -105,7 +105,7 @@ void gearoenix::render::graph::tree::Pbr::update() noexcept
                         case material::Type::Pbr: {
                             auto* const n = forward_pbr.get_next([this] {
                                 auto* const n = new node::ForwardPbr(e, core::sync::EndCaller<core::sync::EndCallerIgnore>([] {}));
-                                n->set_render_target(e->get_main_render_target());
+                                n->set_render_target(e->get_main_render_target().get());
                                 return n;
                             });
                             n->update();
@@ -119,7 +119,7 @@ void gearoenix::render::graph::tree::Pbr::update() noexcept
                         case material::Type::Unlit: {
                             auto* const n = unlit.get_next([this] {
                                 auto* const n = new node::Unlit(e, core::sync::EndCaller<core::sync::EndCallerIgnore>([] {}));
-                                n->set_render_target(e->get_main_render_target());
+                                n->set_render_target(e->get_main_render_target().get());
                                 return n;
                             });
                             n->update();
@@ -144,7 +144,7 @@ void gearoenix::render::graph::tree::Pbr::update() noexcept
                                     previous_forward_pbr = forward_pbr.get_next([this] {
                                         auto* const n = new node::ForwardPbr(
                                             e, core::sync::EndCaller<core::sync::EndCallerIgnore>([] {}));
-                                        n->set_render_target(e->get_main_render_target());
+                                        n->set_render_target(e->get_main_render_target().get());
                                         return n;
                                     });
                                     camera_nodes.transparencies.push_back(previous_forward_pbr);
@@ -162,7 +162,7 @@ void gearoenix::render::graph::tree::Pbr::update() noexcept
                                     previous_unlit = unlit.get_next([this] {
                                         auto* const n = new node::Unlit(
                                             e, core::sync::EndCaller<core::sync::EndCallerIgnore>([] {}));
-                                        n->set_render_target(e->get_main_render_target());
+                                        n->set_render_target(e->get_main_render_target().get());
                                         return n;
                                     });
                                     camera_nodes.transparencies.push_back(previous_unlit);

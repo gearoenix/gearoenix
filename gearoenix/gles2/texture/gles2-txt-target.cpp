@@ -137,7 +137,7 @@ void gearoenix::gles2::texture::Target::bind_texture(
 {
     switch (t->get_texture_type()) {
     case render::texture::Type::Target2D:
-        reinterpret_cast<const Target2D*>(t)->bind_texture(texture_unit);
+        static_cast<const Target2D*>(t)->bind_texture(texture_unit);
         break;
     default:
         GXUNEXPECTED
@@ -148,11 +148,48 @@ void gearoenix::gles2::texture::Target::bind(const render::texture::Target* cons
 {
     switch (target->get_texture_type()) {
     case render::texture::Type::Target2D:
-        reinterpret_cast<const Target2D*>(target)->bind_final();
+        static_cast<const Target2D*>(target)->bind();
         break;
     default:
         GXUNEXPECTED
     }
+}
+
+void gearoenix::gles2::texture::Target::fetch_current_framebuffer() noexcept
+{
+    gl::Loader::get_integerv(GL_FRAMEBUFFER_BINDING, &framebuffer);
+    gl::Loader::get_integerv(GL_RENDERBUFFER_BINDING, &depth_buffer);
+}
+
+void gearoenix::gles2::texture::Target::generate_framebuffer(
+    const render::texture::Info& info,
+    const unsigned int w,
+    const unsigned int h) noexcept
+{
+    gl::Loader::gen_renderbuffers(1, reinterpret_cast<gl::uint*>(&depth_buffer));
+    gl::Loader::bind_renderbuffer(GL_RENDERBUFFER, depth_buffer);
+    gl::Loader::renderbuffer_storage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, w, h);
+    gl::Loader::gen_framebuffers(1, reinterpret_cast<gl::uint*>(&framebuffer));
+    gl::Loader::bind_framebuffer(GL_FRAMEBUFFER, framebuffer);
+    gl::Loader::framebuffer_renderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depth_buffer);
+    gl::Loader::gen_textures(1, &texture_object);
+    switch (info.f) {
+    case render::texture::TextureFormat::D16:
+        gl::Loader::bind_texture(GL_TEXTURE_2D, texture_object);
+        gl::Loader::tex_image_2d(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+        gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        gl::Loader::framebuffer_texture_2d(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture_object, 0);
+        break;
+    default:
+        GXUNEXPECTED
+    }
+    if (gl::Loader::check_framebuffer_status(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        GXLOGF("Failed to create render target!")
+    state_init();
+    gl::Loader::bind_framebuffer(GL_FRAMEBUFFER, 0);
 }
 
 #endif

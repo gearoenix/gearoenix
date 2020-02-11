@@ -66,6 +66,8 @@ protected:
     Camera(core::Id my_id, engine::Engine* e) noexcept;
     Camera(core::Id my_id, system::stream::Stream* f, engine::Engine* e) noexcept;
 
+    void config_target() const noexcept;
+
 public:
     ~Camera() noexcept override;
     void set_far(core::Real f) noexcept;

@@ -19,7 +19,7 @@ class Engine;
 
 namespace gearoenix::gles2::texture {
 class Target {
-protected:
+private:
     engine::Engine* const gl_e;
     gl::uint texture_object = gl::uint(-1);
     gl::sint framebuffer = -1;
@@ -32,12 +32,9 @@ protected:
     bool stencil_test_enabled = true;
     bool write_depth = true;
 
-    void state_init() const noexcept;
-
-    explicit Target(engine::Engine* e) noexcept;
-
 public:
-    virtual ~Target() noexcept;
+    explicit Target(engine::Engine* e) noexcept;
+    ~Target() noexcept;
     [[nodiscard]] static std::shared_ptr<render::texture::Target> construct(
         core::Id id,
         engine::Engine* e,
@@ -45,6 +42,9 @@ public:
         unsigned int width,
         unsigned int height,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
+    void state_init() const noexcept;
+    void fetch_current_framebuffer() noexcept;
+    void generate_framebuffer(const render::texture::Info& info, unsigned int w, unsigned int h) noexcept;
     void bind() const noexcept;
     void clear() const noexcept;
     static void bind(const render::texture::Target* target) noexcept;

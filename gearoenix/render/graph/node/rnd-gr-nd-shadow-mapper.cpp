@@ -67,13 +67,14 @@ gearoenix::render::graph::node::ShadowMapper::ShadowMapper(
     const bool week_hwr = e->get_engine_type() == engine::Type::OPENGL_ES2;
     std::vector<texture::Info> txt_infos = { texture::Info() };
     txt_infos[0].f = week_hwr ? texture::TextureFormat::D16 : texture::TextureFormat::D32;
-    render_target = std::shared_ptr<texture::Target>(e->create_render_target(
+    const auto t = std::shared_ptr<texture::Target>(e->create_render_target(
         core::asset::Manager::create_id(),
         txt_infos,
         week_hwr ? 1024 : 2048,
         week_hwr ? 1024 : 2048,
         call));
-    output_textures[0] = render_target;
+    render_target = t.get();
+    output_textures[0] = t;
 }
 
 gearoenix::render::graph::node::ShadowMapper::~ShadowMapper() noexcept
@@ -136,7 +137,7 @@ void gearoenix::render::graph::node::ShadowMapper::submit() noexcept
 {
     const unsigned int frame_number = e->get_frame_number();
     command::Buffer* cmd = frames_primary_cmd[frame_number].get();
-    cmd->bind(render_target.get());
+    cmd->bind(render_target);
     for (const auto& k : frame->kernels) {
         cmd->record(k->secondary_cmd.get());
     }

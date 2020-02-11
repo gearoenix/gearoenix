@@ -1,7 +1,6 @@
 #include "glc3-cmd-buffer.hpp"
 #ifdef GX_USE_OPENGL_CLASS_3
 #include "../../render/pipeline/rnd-pip-resource-set.hpp"
-#include "../../system/sys-log.hpp"
 #include "../pipeline/glc3-pip-resource-set.hpp"
 #include "../texture/glc3-txt-target.hpp"
 
@@ -11,9 +10,8 @@ gearoenix::gl::uint gearoenix::glc3::command::Buffer::play(gl::uint bound_shader
         texture::Target::bind(render_target);
     for (const render::pipeline::ResourceSet* prs : bound_resource_sets)
         pipeline::ResourceSet::bind(prs, bound_shader_program);
-    for (const render::command::Buffer* c : recorded_secondaries) {
+    for (const render::command::Buffer* c : recorded_secondaries)
         bound_shader_program = reinterpret_cast<const Buffer*>(c)->play(bound_shader_program);
-    }
     return bound_shader_program;
 }
 #endif

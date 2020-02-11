@@ -103,6 +103,7 @@ void gearoenix::render::graph::node::Unlit::update() noexcept
 void gearoenix::render::graph::node::Unlit::set_camera(const camera::Camera* const c) noexcept
 {
     cam = c;
+    render_target = c->get_target();
 }
 
 void gearoenix::render::graph::node::Unlit::add_models(const std::map<const model::Model*, std::vector<const model::Mesh*>>* ms) noexcept
@@ -150,7 +151,7 @@ void gearoenix::render::graph::node::Unlit::submit() noexcept
 {
     const unsigned int frame_number = e->get_frame_number();
     command::Buffer* cmd = frames_primary_cmd[frame_number].get();
-    cmd->bind(render_target.get());
+    cmd->bind(render_target);
     for (const auto& k : frame->kernels) {
         cmd->record(k->secondary_cmd.get());
     }

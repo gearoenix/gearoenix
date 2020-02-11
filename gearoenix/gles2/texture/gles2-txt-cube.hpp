@@ -12,7 +12,7 @@ namespace engine {
     class Engine;
 }
 namespace texture {
-    class TextureCube : virtual public render::texture::TextureCube {
+    class TextureCube : public render::texture::TextureCube {
     private:
         gl::uint texture_object = 0;
 

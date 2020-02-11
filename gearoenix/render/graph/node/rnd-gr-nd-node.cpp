@@ -121,7 +121,7 @@ void gearoenix::render::graph::node::Node::set_input_texture(texture::Texture* c
     input_textures[index] = t;
 }
 
-void gearoenix::render::graph::node::Node::set_render_target(const std::shared_ptr<texture::Target>& t) noexcept
+void gearoenix::render::graph::node::Node::set_render_target(const texture::Target* const t) noexcept
 {
     render_target = t;
 }

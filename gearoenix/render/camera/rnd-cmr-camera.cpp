@@ -55,6 +55,14 @@ gearoenix::render::camera::Camera::Camera(
     reinterpret_cast<Transformation*>(transformation.get())->update_location();
 }
 
+void gearoenix::render::camera::Camera::config_target() const noexcept
+{
+    target->set_clipping_width(uniform.clip_width);
+    target->set_clipping_height(uniform.clip_height);
+    target->set_clipping_starting_x(uniform.clip_start_x);
+    target->set_clipping_starting_y(uniform.clip_start_y);
+}
+
 gearoenix::render::camera::Camera::~Camera() noexcept
 {
     e->get_system_application()->get_event_engine()->remove_listener(core::event::Id::SystemWindowSizeChange, this);
@@ -69,10 +77,7 @@ void gearoenix::render::camera::Camera::set_far(const core::Real f) noexcept
 void gearoenix::render::camera::Camera::set_target(const texture::Target* const t) noexcept
 {
     target = std::unique_ptr<texture::Target>(t->clone());
-    target->set_clipping_width(uniform.clip_width);
-    target->set_clipping_height(uniform.clip_height);
-    target->set_clipping_starting_x(uniform.clip_start_x);
-    target->set_clipping_starting_y(uniform.clip_start_y);
+    config_target();
 }
 
 void gearoenix::render::camera::Camera::update_uniform() noexcept
@@ -93,6 +98,7 @@ bool gearoenix::render::camera::Camera::on_event(const core::event::Data& d) noe
         uniform.clip_width = static_cast<core::Real>(sys_app->get_window_width());
         uniform.clip_height = static_cast<core::Real>(sys_app->get_window_height());
         set_aspect_ratio(sys_app->get_window_ratio());
+        config_target();
         return false;
     default:
         GXLOGF("Unexpected event received this is a fatal bug.")

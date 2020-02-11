@@ -10,9 +10,12 @@ class Engine;
 }
 
 namespace gearoenix::gles2::texture {
-class Target2D : public render::texture::Target2D, public Target {
+class Target2D : public render::texture::Target2D {
 private:
+    const std::shared_ptr<gles2::texture::Target> base;
+
     Target2D(core::Id id, engine::Engine* e) noexcept;
+    Target2D(const Target2D& o) noexcept;
 
 public:
     explicit Target2D(engine::Engine* e) noexcept;
@@ -24,7 +27,8 @@ public:
         unsigned int width,
         unsigned int height,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
-    void bind_final() const noexcept;
+    void bind() const noexcept;
+    void bind_texture(gl::enumerated texture_unit) const noexcept;
     [[nodiscard]] render::texture::Target* clone() const noexcept final;
 };
 }

@@ -23,7 +23,7 @@ void gearoenix::render::command::Buffer::bind(pipeline::ResourceSet* const r) no
     bound_resource_sets.push_back(r);
 }
 
-void gearoenix::render::command::Buffer::bind(texture::Target* const t) noexcept
+void gearoenix::render::command::Buffer::bind(const texture::Target* const t) noexcept
 {
 #ifdef GX_DEBUG_MODE
     if (render_target != nullptr)

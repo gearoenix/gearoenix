@@ -52,7 +52,7 @@ namespace graph::node {
         std::vector<std::unique_ptr<command::Buffer>> frames_primary_cmd;
         /// These are for preventing redundant allocation & deallocation in render loop
         std::vector<std::vector<sync::Semaphore*>> previous_semaphores, next_semaphores;
-        std::shared_ptr<texture::Target> render_target = nullptr;
+        const texture::Target* render_target = nullptr;
         std::shared_ptr<pipeline::Pipeline> render_pipeline = nullptr;
         Node(
             Type t,
@@ -74,7 +74,7 @@ namespace graph::node {
         void remove_consumer(unsigned int output_link_index, core::Id node_id, unsigned int consumer_input_link_index) noexcept final;
         [[nodiscard]] const std::shared_ptr<texture::Texture>& get_output_texture(unsigned int index) const noexcept;
         virtual void set_input_texture(texture::Texture* t, unsigned int index) noexcept;
-        virtual void set_render_target(const std::shared_ptr<texture::Target>& t) noexcept;
+        virtual void set_render_target(const texture::Target* t) noexcept;
         virtual void update() noexcept;
         virtual void record(unsigned int kernel_index) noexcept;
         virtual void record_continuously(unsigned int kernel_index) noexcept;
