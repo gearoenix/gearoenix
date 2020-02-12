@@ -18,6 +18,7 @@ class Engine;
 }
 
 namespace gearoenix::gles2::texture {
+class Texture2D;
 class Target {
 private:
     engine::Engine* const gl_e;
@@ -44,11 +45,10 @@ public:
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
     void state_init() const noexcept;
     void fetch_current_framebuffer() noexcept;
-    void generate_framebuffer(const render::texture::Info& info, unsigned int w, unsigned int h) noexcept;
+    void generate_framebuffer(const Texture2D* txt, unsigned int w, unsigned int h) noexcept;
     void bind() const noexcept;
     void clear() const noexcept;
     static void bind(const render::texture::Target* target) noexcept;
-    void bind_texture(gl::enumerated texture_unit) const noexcept;
     static void bind_texture(const render::texture::Target* t, gl::enumerated texture_unit) noexcept;
 };
 }

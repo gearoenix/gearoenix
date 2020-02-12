@@ -6,6 +6,7 @@
 #include "../../gl/gl-loader.hpp"
 #include "../../system/sys-app.hpp"
 #include "../engine/gles2-eng-engine.hpp"
+#include "gles2-txt-2d.hpp"
 #include "gles2-txt-sample.hpp"
 #include "gles2-txt-target-2d.hpp"
 #include "gles2-txt-target-cube.hpp"
@@ -150,7 +151,6 @@ void gearoenix::gles2::texture::Target::fetch_current_framebuffer() noexcept
 
 void gearoenix::gles2::texture::Target::generate_framebuffer(
     const Texture2D* const txt,
-    const render::texture::Info& info,
     const unsigned int w,
     const unsigned int h) noexcept
 {
@@ -161,18 +161,7 @@ void gearoenix::gles2::texture::Target::generate_framebuffer(
     gl::Loader::bind_framebuffer(GL_FRAMEBUFFER, framebuffer);
     gl::Loader::framebuffer_renderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depth_buffer);
     txt->bind();
-    switch (info.f) {
-    case render::texture::TextureFormat::D16:
-        gl::Loader::tex_image_2d(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
-        gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        gl::Loader::framebuffer_texture_2d(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture_object, 0);
-        break;
-    default:
-        GXUNEXPECTED
-    }
+    gl::Loader::framebuffer_texture_2d(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, txt->get_texture_object(), 0);
     if (gl::Loader::check_framebuffer_status(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         GXLOGF("Failed to create render target!")
     state_init();

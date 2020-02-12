@@ -27,7 +27,7 @@ protected:
 
 public:
     virtual ~Target() noexcept = default;
-    [[nodiscard]] virtual const Texture* get_texture(std::size_t index) const noexcept = 0;
+    [[nodiscard]] virtual std::shared_ptr<Texture> get_texture(std::size_t index) const noexcept = 0;
     [[nodiscard]] virtual std::size_t get_textures_count() const noexcept = 0;
     [[nodiscard]] virtual Target* clone() const noexcept = 0;
 };

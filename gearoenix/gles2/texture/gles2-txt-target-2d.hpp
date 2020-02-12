@@ -37,7 +37,7 @@ public:
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
     void bind() const noexcept;
     void bind_texture(gl::enumerated texture_unit) const noexcept;
-    [[nodiscard]] const render::texture::Texture2D* get_texture_2d(std::size_t index) const noexcept final;
+    [[nodiscard]] std::shared_ptr<render::texture::Texture2D> get_texture_2d(std::size_t index) const noexcept final;
     [[nodiscard]] std::size_t get_textures_count() const noexcept final;
     [[nodiscard]] render::texture::Target* clone() const noexcept final;
 };

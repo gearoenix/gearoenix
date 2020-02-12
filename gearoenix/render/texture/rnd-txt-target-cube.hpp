@@ -14,12 +14,12 @@ protected:
 public:
     ~TargetCube() noexcept override = default;
 
-    [[nodiscard]] const Texture* get_texture(const std::size_t index) const noexcept override
+    [[nodiscard]] std::shared_ptr<Texture> get_texture(const std::size_t index) const noexcept override
     {
         return get_texture_cube(index);
     }
 
-    [[nodiscard]] virtual const TextureCube* get_texture_cube(std::size_t index) const noexcept = 0;
+    [[nodiscard]] virtual std::shared_ptr<TextureCube> get_texture_cube(std::size_t index) const noexcept = 0;
 };
 }
 #endif

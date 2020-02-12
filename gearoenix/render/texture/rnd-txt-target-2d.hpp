@@ -14,12 +14,12 @@ protected:
 public:
     ~Target2D() noexcept override = default;
 
-    [[nodiscard]] const Texture* get_texture(const std::size_t index) const noexcept override
+    [[nodiscard]] std::shared_ptr<Texture> get_texture(const std::size_t index) const noexcept override
     {
         return get_texture_2d(index);
     }
 
-    [[nodiscard]] virtual const Texture2D* get_texture_2d(std::size_t index) const noexcept = 0;
+    [[nodiscard]] virtual std::shared_ptr<Texture2D> get_texture_2d(std::size_t index) const noexcept = 0;
 };
 }
 #endif

@@ -74,7 +74,7 @@ gearoenix::render::graph::node::ShadowMapper::ShadowMapper(
         week_hwr ? 1024 : 2048,
         call));
     render_target = t.get();
-    output_textures[0] = t;
+    output_textures[0] = t->get_texture(0);
 }
 
 gearoenix::render::graph::node::ShadowMapper::~ShadowMapper() noexcept

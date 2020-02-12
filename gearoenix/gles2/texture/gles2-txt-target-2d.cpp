@@ -61,11 +61,10 @@ std::shared_ptr<gearoenix::gles2::texture::Target2D> gearoenix::gles2::texture::
     const std::shared_ptr<Target2D> result(new Target2D(id, e, info, w, h, call));
     if (info.f != render::texture::TextureFormat::D16)
         GXLOGF("GLES2 backend only supports 16bits depth attachment right now.")
-    e->get_function_loader()->load([result, call, w, h, info] {
-        result->base->generate_framebuffer(info, w, h);
+    e->get_function_loader()->load([result, call, w, h] {
+        result->base->generate_framebuffer(result->txt.get(), w, h);
     });
-    GXUNIMPLEMENTED // TODO create texture 2d before creation of base & change base creation
-        return result;
+    return result;
 }
 
 void gearoenix::gles2::texture::Target2D::bind() const noexcept
@@ -89,13 +88,13 @@ void gearoenix::gles2::texture::Target2D::bind_texture(const gl::enumerated text
     txt->bind(texture_unit);
 }
 
-const gearoenix::render::texture::Texture2D* gearoenix::gles2::texture::Target2D::get_texture_2d(const std::size_t index) const noexcept
+std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::gles2::texture::Target2D::get_texture_2d(const std::size_t index) const noexcept
 {
 #ifdef GX_DEBUG_GLES2_TARGET
     if (index != 0 && txt == nullptr)
         GXUNEXPECTED
 #endif
-    return txt.get();
+    return txt;
 }
 
 std::size_t gearoenix::gles2::texture::Target2D::get_textures_count() const noexcept

@@ -14,7 +14,7 @@ class Engine;
 namespace gearoenix::gles2::texture {
 class Texture2D : public render::texture::Texture2D {
 private:
-    gl::uint texture_object = 0;
+    GX_GET_VAL_PRV(gl::uint, texture_object, 0)
 
     Texture2D(core::Id my_id, engine::Engine* e) noexcept;
 
