@@ -29,11 +29,11 @@ gearoenix::gles2::texture::SampleInfo::SampleInfo(const render::texture::SampleI
     }
     const auto fun = [](render::texture::Wrap w) {
         switch (w) {
-        case render::texture::Wrap::CLAMP_TO_EDGE:
+        case render::texture::Wrap::ClampToEdge:
             return GL_CLAMP_TO_EDGE;
-        case render::texture::Wrap::MIRROR:
+        case render::texture::Wrap::Mirror:
             return GL_MIRRORED_REPEAT;
-        case render::texture::Wrap::REPEAT:
+        case render::texture::Wrap::Repeat:
             return GL_REPEAT;
         default:
             GXUNEXPECTED

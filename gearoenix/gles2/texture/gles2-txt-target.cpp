@@ -64,18 +64,14 @@ gearoenix::gles2::texture::Target::Target(engine::Engine* const e) noexcept
 
 gearoenix::gles2::texture::Target::~Target() noexcept
 {
-    // check of main render target
-    if (texture_object == gl::uint(-1))
+    if (framebuffer_borrowed)
         return;
-    gl_e->get_function_loader()->load([cf { framebuffer }, cr { depth_buffer }, ct { texture_object }] {
+    gl_e->get_function_loader()->load([cf { framebuffer }, cr { depth_buffer }] {
         if (cf != -1)
             gl::Loader::delete_framebuffers(1, reinterpret_cast<const gl::uint*>(&cf));
         if (cr != -1)
             gl::Loader::delete_renderbuffers(1, reinterpret_cast<const gl::uint*>(&cr));
-        if (ct != gl::uint(-1))
-            gl::Loader::delete_textures(1, &ct);
     });
-    texture_object = gl::uint(-1);
     framebuffer = -1;
     depth_buffer = -1;
 }
@@ -114,30 +110,20 @@ void gearoenix::gles2::texture::Target::clear() const noexcept
         gl::Loader::depth_mask(GL_FALSE);
     }
 
-    if (texture_object == gl::uint(-1)) {
+    if (framebuffer_borrowed) {
         gl::Loader::clear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     } else {
         gl::Loader::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     }
 }
 
-void gearoenix::gles2::texture::Target::bind_texture(const gl::enumerated texture_unit) const noexcept
-{
-#ifdef GX_DEBUG_MODE
-    if (texture_object == gl::uint(-1))
-        GXLOGF("This is the main render target and can not bind as texture.")
-#endif
-    gl::Loader::active_texture(GL_TEXTURE0 + texture_unit);
-    gl::Loader::bind_texture(GL_TEXTURE_2D, texture_object);
-}
-
 void gearoenix::gles2::texture::Target::bind_texture(
     const render::texture::Target* const t,
     const gl::enumerated texture_unit) noexcept
 {
-    switch (t->get_texture_type()) {
+    switch (t->get_target_type()) {
     case render::texture::Type::Target2D:
-        static_cast<const Target2D*>(t)->bind_texture(texture_unit);
+        reinterpret_cast<const Target2D*>(t)->bind_texture(texture_unit);
         break;
     default:
         GXUNEXPECTED
@@ -146,9 +132,9 @@ void gearoenix::gles2::texture::Target::bind_texture(
 
 void gearoenix::gles2::texture::Target::bind(const render::texture::Target* const target) noexcept
 {
-    switch (target->get_texture_type()) {
+    switch (target->get_target_type()) {
     case render::texture::Type::Target2D:
-        static_cast<const Target2D*>(target)->bind();
+        reinterpret_cast<const Target2D*>(target)->bind();
         break;
     default:
         GXUNEXPECTED
@@ -157,11 +143,13 @@ void gearoenix::gles2::texture::Target::bind(const render::texture::Target* cons
 
 void gearoenix::gles2::texture::Target::fetch_current_framebuffer() noexcept
 {
+    framebuffer_borrowed = true;
     gl::Loader::get_integerv(GL_FRAMEBUFFER_BINDING, &framebuffer);
     gl::Loader::get_integerv(GL_RENDERBUFFER_BINDING, &depth_buffer);
 }
 
 void gearoenix::gles2::texture::Target::generate_framebuffer(
+    const Texture2D* const txt,
     const render::texture::Info& info,
     const unsigned int w,
     const unsigned int h) noexcept
@@ -172,10 +160,9 @@ void gearoenix::gles2::texture::Target::generate_framebuffer(
     gl::Loader::gen_framebuffers(1, reinterpret_cast<gl::uint*>(&framebuffer));
     gl::Loader::bind_framebuffer(GL_FRAMEBUFFER, framebuffer);
     gl::Loader::framebuffer_renderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depth_buffer);
-    gl::Loader::gen_textures(1, &texture_object);
+    txt->bind();
     switch (info.f) {
     case render::texture::TextureFormat::D16:
-        gl::Loader::bind_texture(GL_TEXTURE_2D, texture_object);
         gl::Loader::tex_image_2d(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
         gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);

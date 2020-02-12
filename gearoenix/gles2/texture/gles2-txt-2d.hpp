@@ -4,8 +4,7 @@
 #ifdef GX_USE_OPENGL_ES2
 #include "../../core/sync/cr-sync-end-caller.hpp"
 #include "../../gl/gl-types.hpp"
-#include "../../render/texture/rnd-txt-format.hpp"
-#include "../../render/texture/rnd-txt-sample.hpp"
+#include "../../render/texture/rnd-txt-info.hpp"
 #include "../../render/texture/rnd-txt-texture-2d.hpp"
 
 namespace gearoenix::gles2::engine {
@@ -21,7 +20,7 @@ private:
 
 public:
     [[nodiscard]] static std::shared_ptr<Texture2D> construct(
-        core::Id my_id,
+        core::Id id,
         engine::Engine* e,
         const void* data,
         render::texture::TextureFormat f,
@@ -29,9 +28,18 @@ public:
         unsigned int width,
         unsigned int height,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
+    [[nodiscard]] static std::shared_ptr<Texture2D> construct(
+        core::Id id,
+        engine::Engine* e,
+        const render::texture::Info& info,
+        unsigned int width,
+        unsigned int height,
+        const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
     Texture2D(core::Id my_id, gl::uint txt_obj, engine::Engine* e) noexcept;
     ~Texture2D() noexcept final;
     void bind(gl::enumerated texture_unit) const noexcept;
+    void bind() const noexcept;
+    [[nodiscard]] static gl::uint convert(render::texture::TextureFormat f) noexcept;
 };
 }
 #endif

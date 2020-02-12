@@ -2,7 +2,7 @@
 #define GEAROENIX_RENDER_TEXTURE_CUBE_HPP
 #include "rnd-txt-texture.hpp"
 namespace gearoenix::render::texture {
-class TextureCube : virtual public Texture {
+class TextureCube : public Texture {
     GX_GET_VAL_PRT(std::size_t, img_width, 0)
     GX_GET_VAL_PRT(std::size_t, img_height, 0)
 protected:

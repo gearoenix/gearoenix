@@ -25,9 +25,9 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     SampleInfo sample_info;
     sample_info.mag_filter = Filter::NEAREST;
     sample_info.min_filter = Filter::NEAREST;
-    sample_info.wrap_s = Wrap::REPEAT;
-    sample_info.wrap_t = Wrap::REPEAT;
-    sample_info.wrap_r = Wrap::REPEAT;
+    sample_info.wrap_s = Wrap::Repeat;
+    sample_info.wrap_t = Wrap::Repeat;
+    sample_info.wrap_r = Wrap::Repeat;
     const auto search = color_4d_id_t2d.find(color);
     const bool found = color_4d_id_t2d.end() != search;
     const core::Id id = found ? search->second : core::asset::Manager::create_id();
@@ -169,9 +169,9 @@ std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::render::text
     SampleInfo sample_info;
     sample_info.mag_filter = Filter::NEAREST;
     sample_info.min_filter = Filter::NEAREST;
-    sample_info.wrap_s = Wrap::REPEAT;
-    sample_info.wrap_t = Wrap::REPEAT;
-    sample_info.wrap_r = Wrap::REPEAT;
+    sample_info.wrap_s = Wrap::Repeat;
+    sample_info.wrap_t = Wrap::Repeat;
+    sample_info.wrap_r = Wrap::Repeat;
     const auto search = color_4d_id_cube.find(color);
     const bool found = color_4d_id_cube.end() != search;
     const core::Id id = found ? search->second : core::asset::Manager::create_id();

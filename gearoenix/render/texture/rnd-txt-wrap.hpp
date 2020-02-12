@@ -3,9 +3,9 @@
 #include "../../core/cr-types.hpp"
 namespace gearoenix::render::texture {
 enum struct Wrap : core::TypeId {
-    CLAMP_TO_EDGE = 1,
-    MIRROR = 2,
-    REPEAT = 3,
+    ClampToEdge = 1,
+    Mirror = 2,
+    Repeat = 3,
 };
 }
 #endif

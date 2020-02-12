@@ -4,7 +4,7 @@
 #include "rnd-txt-texture.hpp"
 
 namespace gearoenix::render::texture {
-class Texture2D : virtual public Texture {
+class Texture2D : public Texture {
     GX_GET_VAL_PRT(std::size_t, img_width, 0)
     GX_GET_VAL_PRT(std::size_t, img_height, 0)
 protected:

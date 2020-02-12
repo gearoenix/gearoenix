@@ -21,7 +21,6 @@ namespace gearoenix::gles2::texture {
 class Target {
 private:
     engine::Engine* const gl_e;
-    gl::uint texture_object = gl::uint(-1);
     gl::sint framebuffer = -1;
     gl::sint depth_buffer = -1;
     // settings
@@ -31,6 +30,7 @@ private:
     bool scissor_test_enabled = true;
     bool stencil_test_enabled = true;
     bool write_depth = true;
+    bool framebuffer_borrowed = false;
 
 public:
     explicit Target(engine::Engine* e) noexcept;

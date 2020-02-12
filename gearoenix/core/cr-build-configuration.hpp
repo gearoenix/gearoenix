@@ -14,9 +14,9 @@
 #elif defined(__unix__)
 #define GX_IN_LINUX
 //#define GX_USE_VULKAN
-#define GX_USE_OPENGL_43
-#define GX_USE_OPENGL_33
-#define GX_USE_OPENGL_ES3
+//#define GX_USE_OPENGL_43
+//#define GX_USE_OPENGL_33
+//#define GX_USE_OPENGL_ES3
 #define GX_USE_OPENGL_ES2
 #define GX_IN_DESKTOP
 //#define GX_USE_GLFW
