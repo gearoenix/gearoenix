@@ -10,11 +10,20 @@ gearoenix::glc3::pipeline::SkyboxEquirectangular::SkyboxEquirectangular(engine::
 {
 }
 
+std::shared_ptr<gearoenix::glc3::pipeline::SkyboxEquirectangular> gearoenix::glc3::pipeline::SkyboxEquirectangular::construct(
+    engine::Engine* const e,
+    const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
+{
+    const std::shared_ptr<SkyboxEquirectangular> p(new SkyboxEquirectangular(e, c));
+    p->self = p;
+    return p;
+}
+
 gearoenix::glc3::pipeline::SkyboxEquirectangular::~SkyboxEquirectangular() noexcept = default;
 
 gearoenix::render::pipeline::ResourceSet* gearoenix::glc3::pipeline::SkyboxEquirectangular::create_resource_set() const noexcept
 {
-    return new SkyboxEquirectangularResourceSet(shd, shared_from_this());
+    return new SkyboxEquirectangularResourceSet(shd, self.lock());
 }
 
 #endif

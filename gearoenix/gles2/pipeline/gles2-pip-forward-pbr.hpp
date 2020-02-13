@@ -13,12 +13,14 @@ class ForwardPbr;
 }
 
 namespace gearoenix::gles2::pipeline {
-class ForwardPbr : public render::pipeline::ForwardPbr, public std::enable_shared_from_this<ForwardPbr> {
+class ForwardPbr : public render::pipeline::ForwardPbr {
 private:
     const std::shared_ptr<shader::ForwardPbr> shd;
+    std::weak_ptr<ForwardPbr> self;
+    ForwardPbr(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
 
 public:
-    ForwardPbr(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+    [[nodiscard]] static std::shared_ptr<ForwardPbr> construct(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
     ~ForwardPbr() noexcept final;
     [[nodiscard]] render::pipeline::ResourceSet* create_resource_set() const noexcept final;
 };

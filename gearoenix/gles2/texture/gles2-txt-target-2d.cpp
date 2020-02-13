@@ -23,6 +23,8 @@ gearoenix::gles2::texture::Target2D::Target2D(
     , base(new gles2::texture::Target(e))
     , txt(Texture2D::construct(core::asset::Manager::create_id(), e, info, w, h, call))
 {
+    clipping_width = static_cast<core::Real>(w);
+    clipping_height = static_cast<core::Real>(h);
 }
 
 gearoenix::gles2::texture::Target2D::Target2D(const Target2D& o) noexcept

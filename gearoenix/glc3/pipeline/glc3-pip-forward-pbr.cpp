@@ -10,11 +10,20 @@ gearoenix::glc3::pipeline::ForwardPbr::ForwardPbr(engine::Engine* const e, const
 {
 }
 
+std::shared_ptr<gearoenix::glc3::pipeline::ForwardPbr> gearoenix::glc3::pipeline::ForwardPbr::construct(
+    engine::Engine* const e,
+    const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
+{
+    std::shared_ptr<ForwardPbr> p(new ForwardPbr(e, c));
+    p->self = p;
+    return p;
+}
+
 gearoenix::glc3::pipeline::ForwardPbr::~ForwardPbr() noexcept = default;
 
 gearoenix::render::pipeline::ResourceSet* gearoenix::glc3::pipeline::ForwardPbr::create_resource_set() const noexcept
 {
-    return new ForwardPbrResourceSet(shd, shared_from_this());
+    return new ForwardPbrResourceSet(shd, self.lock());
 }
 
 #endif

@@ -33,6 +33,8 @@ gearoenix::glc3::texture::Target2D::Target2D(
     , base(new glc3::texture::Target(e))
     , textures(create_textures(e, infos, w, h, call))
 {
+    clipping_width = static_cast<core::Real>(w);
+    clipping_height = static_cast<core::Real>(h);
 }
 
 gearoenix::glc3::texture::Target2D::Target2D(const Target2D& o) noexcept

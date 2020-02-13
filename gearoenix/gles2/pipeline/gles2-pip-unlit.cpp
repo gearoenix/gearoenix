@@ -10,11 +10,20 @@ gearoenix::gles2::pipeline::Unlit::Unlit(engine::Engine* const e, const core::sy
 {
 }
 
+std::shared_ptr<gearoenix::gles2::pipeline::Unlit> gearoenix::gles2::pipeline::Unlit::construct(
+    engine::Engine* const e,
+    const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
+{
+    const std::shared_ptr<Unlit> p(new Unlit(e, c));
+    p->self = p;
+    return p;
+}
+
 gearoenix::gles2::pipeline::Unlit::~Unlit() noexcept = default;
 
 gearoenix::render::pipeline::ResourceSet* gearoenix::gles2::pipeline::Unlit::create_resource_set() const noexcept
 {
-    return new UnlitResourceSet(shd, shared_from_this());
+    return new UnlitResourceSet(shd, self.lock());
 }
 
 #endif

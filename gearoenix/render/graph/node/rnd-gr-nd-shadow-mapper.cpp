@@ -67,14 +67,17 @@ gearoenix::render::graph::node::ShadowMapper::ShadowMapper(
     const bool week_hwr = e->get_engine_type() == engine::Type::OPENGL_ES2;
     std::vector<texture::Info> txt_infos = { texture::Info() };
     txt_infos[0].f = week_hwr ? texture::TextureFormat::D16 : texture::TextureFormat::D32;
-    const auto t = std::shared_ptr<texture::Target>(e->create_render_target(
+    txt_infos[0].t = texture::Type::Target2D;
+    txt_infos[0].s.min_filter = texture::Filter::NEAREST;
+    txt_infos[0].s.mag_filter = texture::Filter::NEAREST;
+    shadow_map_render_target = std::dynamic_pointer_cast<texture::Target2D>(e->create_render_target(
         core::asset::Manager::create_id(),
         txt_infos,
         week_hwr ? 1024 : 2048,
         week_hwr ? 1024 : 2048,
         call));
-    render_target = t.get();
-    output_textures[0] = t->get_texture(0);
+    render_target = shadow_map_render_target.get();
+    output_textures[0] = shadow_map_render_target->get_texture(0);
 }
 
 gearoenix::render::graph::node::ShadowMapper::~ShadowMapper() noexcept

@@ -10,8 +10,20 @@ gearoenix::glc3::pipeline::Unlit::Unlit(engine::Engine* const e, const core::syn
 {
 }
 
+std::shared_ptr<gearoenix::glc3::pipeline::Unlit> gearoenix::glc3::pipeline::Unlit::construct(
+    engine::Engine* const e,
+    const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
+{
+    const std::shared_ptr<Unlit> p(new Unlit(e, c));
+    p->self = p;
+    return p;
+}
+
+gearoenix::glc3::pipeline::Unlit::~Unlit() noexcept = default;
+
 gearoenix::render::pipeline::ResourceSet* gearoenix::glc3::pipeline::Unlit::create_resource_set() const noexcept
 {
-    return new UnlitResourceSet(shd, shared_from_this());
+    return new UnlitResourceSet(shd, self.lock());
 }
+
 #endif
