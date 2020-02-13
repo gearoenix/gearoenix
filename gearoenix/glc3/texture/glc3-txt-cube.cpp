@@ -20,8 +20,7 @@ static const gearoenix::gl::enumerated FACES[] = {
 gearoenix::glc3::texture::TextureCube::TextureCube(
     const core::Id my_id,
     engine::Engine* const engine) noexcept
-    : render::texture::Texture(my_id, render::texture::Type::TextureCube, engine)
-    , render::texture::TextureCube(my_id, engine)
+    : render::texture::TextureCube(my_id, engine)
 {
 }
 
@@ -37,17 +36,17 @@ std::shared_ptr<gearoenix::glc3::texture::TextureCube> gearoenix::glc3::texture:
     const std::shared_ptr<TextureCube> result(new TextureCube(my_id, engine));
     const SampleInfo sample_info = SampleInfo(s);
     gl::uint cf;
-    const auto gaspect = static_cast<gl::sizei>(aspect);
+    const auto gl_aspect = static_cast<gl::sizei>(aspect);
     std::vector<std::vector<std::uint8_t>> pixels(GX_COUNT_OF(FACES));
     if (f == render::texture::TextureFormat::RgbaFloat32 && aspect == 1) {
         cf = GL_RGBA;
-        const gl::sizei pixel_size = gaspect * gaspect * 4;
-        const auto* const rdata = reinterpret_cast<const core::Real*>(data);
+        const gl::sizei pixel_size = gl_aspect * gl_aspect * 4;
+        const auto* const raw_data = reinterpret_cast<const core::Real*>(data);
         std::uint8_t p[4];
-        p[0] = static_cast<std::uint8_t>(rdata[0] * 255.1f);
-        p[1] = static_cast<std::uint8_t>(rdata[1] * 255.1f);
-        p[2] = static_cast<std::uint8_t>(rdata[2] * 255.1f);
-        p[3] = static_cast<std::uint8_t>(rdata[3] * 255.1f);
+        p[0] = static_cast<std::uint8_t>(raw_data[0] * 255.1f);
+        p[1] = static_cast<std::uint8_t>(raw_data[1] * 255.1f);
+        p[2] = static_cast<std::uint8_t>(raw_data[2] * 255.1f);
+        p[3] = static_cast<std::uint8_t>(raw_data[3] * 255.1f);
         for (int fi = 0; fi < static_cast<int>(GX_COUNT_OF(FACES)); ++fi) {
             pixels[fi].resize(pixel_size);
             for (gl::sizei i = 0; i < pixel_size;)
@@ -56,7 +55,7 @@ std::shared_ptr<gearoenix::glc3::texture::TextureCube> gearoenix::glc3::texture:
         }
     } else
         GXLOGF("Unsupported/Unimplemented setting for cube texture with id " << my_id)
-    engine->get_function_loader()->load([result, gaspect, pixels { move(pixels) }, cf, sample_info, call] {
+    engine->get_function_loader()->load([result, gl_aspect, pixels { move(pixels) }, cf, sample_info, call] {
         gl::Loader::gen_textures(1, &(result->texture_object));
         gl::Loader::bind_texture(GL_TEXTURE_CUBE_MAP, result->texture_object);
         gl::Loader::tex_parameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, sample_info.mag_filter);
@@ -64,7 +63,7 @@ std::shared_ptr<gearoenix::glc3::texture::TextureCube> gearoenix::glc3::texture:
         gl::Loader::tex_parameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, sample_info.wrap_s);
         gl::Loader::tex_parameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, sample_info.wrap_t);
         for (int fi = 0; fi < static_cast<int>(GX_COUNT_OF(FACES)); ++fi) {
-            gl::Loader::tex_image_2d(FACES[fi], 0, static_cast<gl::sint>(cf), gaspect, gaspect, 0, cf, GL_UNSIGNED_BYTE, pixels[fi].data());
+            gl::Loader::tex_image_2d(FACES[fi], 0, static_cast<gl::sint>(cf), gl_aspect, gl_aspect, 0, cf, GL_UNSIGNED_BYTE, pixels[fi].data());
         }
         gl::Loader::check_for_error();
         gl::Loader::generate_mipmap(GL_TEXTURE_CUBE_MAP);

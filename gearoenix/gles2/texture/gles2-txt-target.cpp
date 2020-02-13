@@ -154,6 +154,7 @@ void gearoenix::gles2::texture::Target::generate_framebuffer(
     const unsigned int w,
     const unsigned int h) noexcept
 {
+    framebuffer_borrowed = false;
     gl::Loader::gen_renderbuffers(1, reinterpret_cast<gl::uint*>(&depth_buffer));
     gl::Loader::bind_renderbuffer(GL_RENDERBUFFER, depth_buffer);
     gl::Loader::renderbuffer_storage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, w, h);

@@ -10,6 +10,7 @@
 
 namespace gearoenix::render::texture {
 class Target;
+class Texture;
 }
 
 namespace gearoenix::glc3::engine {
@@ -17,12 +18,12 @@ class Engine;
 }
 
 namespace gearoenix::glc3::texture {
+class Texture2D;
 class Target {
 private:
+    engine::Engine* const gl_e;
     gl::sint framebuffer = -1;
     gl::sint depth_buffer = -1;
-    std::vector<gl::uint> texture_objects;
-    engine::Engine* const gl_e;
     // settings
     std::optional<gl::enumerated> gl_cull_mode = GL_BACK;
     std::optional<std::pair<gl::enumerated, gl::enumerated>> gl_blend_mode = std::make_pair(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -30,6 +31,7 @@ private:
     bool scissor_test_enabled = true;
     bool stencil_test_enabled = true;
     bool write_depth = true;
+    bool framebuffer_borrowed = false;
 
 public:
     explicit Target(engine::Engine* e) noexcept;
@@ -43,11 +45,13 @@ public:
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
     void state_init() const noexcept;
     void fetch_current_framebuffer() noexcept;
-    void generate_framebuffer(const std::vector<render::texture::Info>& infos, unsigned int w, unsigned int h) noexcept;
+    void generate_framebuffer(
+        const std::vector<render::texture::Info>& infos,
+        const std::vector<std::shared_ptr<Texture2D>>& textures,
+        unsigned int w, unsigned int h) noexcept;
     void bind() const noexcept;
     void clear() const noexcept;
     static void bind(const render::texture::Target* t) noexcept;
-    void bind_textures(const gl::enumerated* texture_units, std::size_t count) const noexcept;
     static void bind_textures(const render::texture::Target* t, const gl::enumerated* texture_units, std::size_t count) noexcept;
 };
 }
