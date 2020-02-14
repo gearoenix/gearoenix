@@ -6,7 +6,7 @@
 #include "../../core/cr-application.hpp"
 #include "../../core/cr-static.hpp"
 #include "../../core/event/cr-ev-engine.hpp"
-#include "../../core/event/cr-ev-sys-system.hpp"
+#include "../../core/event/cr-ev-system.hpp"
 #include "../../render/engine/rnd-eng-engine.hpp"
 #include "../sys-log.hpp"
 
@@ -32,15 +32,19 @@ void gearoenix::system::Application::handle(android_app* a, int32_t cmd) noexcep
                 window_width = static_cast<unsigned int>(gl_context->get_screen_width());
                 window_height = static_cast<unsigned int>(gl_context->get_screen_height());
                 compute_screen_ratios();
+#ifdef GX_USE_OPENGL_ES3
                 if (gl_context->get_es3_supported()) {
                     GXLOGD("Going to create OpenGL ES3 render engine.")
-                    render_engine = glc3::engine::Engine::construct(this,
-                        render::engine::Type::OPENGL_ES3);
-                } else {
-                    GXLOGD("Going to create OpenGL ES2 render engine.")
-                    render_engine = gles2::engine::Engine::construct(this);
+                    render_engine = std::unique_ptr<render::engine::Engine>(glc3::engine::Engine::construct(this, render::engine::Type::OPENGL_ES3));
                 }
-                asset_manager = new core::asset::Manager(this, GX_APP_DATA_NAME);
+#endif
+#ifdef GX_USE_OPENGL_ES2
+                if (!gl_context->get_es3_supported()) {
+                    GXLOGD("Going to create OpenGL ES2 render engine.")
+                    render_engine = std::unique_ptr<render::engine::Engine>(gles2::engine::Engine::construct(this));
+                }
+#endif
+                asset_manager = std::make_unique<core::asset::Manager>(this, GX_APP_DATA_NAME);
             } else if (a->window != android_application->window) {
                 //                GXLOGE("reached");
                 //                core::event::system::System eul(core::event::system::System::Action::UNLOAD);
@@ -130,8 +134,8 @@ void gearoenix::system::Application::compute_screen_ratios() noexcept
 
 gearoenix::system::Application::Application(android_app* and_app) noexcept
     : android_application(and_app)
-    , gl_context(new GlContext())
     , event_engine(new core::event::Engine())
+    , gl_context(new GlContext())
 {
     and_app->userData = this;
     and_app->onAppCmd = gearoenix::system::Application::handle_cmd;
@@ -150,17 +154,17 @@ gearoenix::system::Application::Application(android_app* and_app) noexcept
 
 gearoenix::system::Application::~Application() noexcept
 {
-    GX_DELETE(core_app)
-    GX_DELETE(event_engine)
-    GX_DELETE(asset_manager)
-    GX_DELETE(render_engine)
-    GX_DELETE(gl_context)
-    GX_DELETE(android_application)
+    core_application = nullptr;
+    event_engine = nullptr;
+    asset_manager = nullptr;
+    render_engine = nullptr;
+    gl_context = nullptr;
+    android_application = nullptr;
 }
 
-void gearoenix::system::Application::execute(core::Application* app) noexcept
+void gearoenix::system::Application::execute(std::unique_ptr<core::Application> app) noexcept
 {
-    core_app = app;
+    core_application = std::move(app);
     int events;
     android_poll_source* source;
     do {
@@ -168,10 +172,10 @@ void gearoenix::system::Application::execute(core::Application* app) noexcept
                 (void**)&source)
             >= 0) {
             if (source != nullptr)
-                source->process(android_application, source);
+                source->process(android_application.get(), source);
         }
         if (running) {
-            core_app->update();
+            core_application->update();
             render_engine->update();
 #ifdef GX_USE_OPENGL
             if (GX_RUNTIME_USE_OPENGL_E(render_engine)) {
@@ -181,7 +185,7 @@ void gearoenix::system::Application::execute(core::Application* app) noexcept
         }
     } while (android_application->destroyRequested == 0);
     running = false;
-    core_app->terminate();
+    core_application->terminate();
     render_engine->terminate();
 }
 
@@ -195,6 +199,11 @@ gearoenix::core::Real
 gearoenix::system::Application::convert_y_to_ratio(const int y) const noexcept
 {
     return (1.0F - (((core::Real)y) * half_height_inverted));
+}
+
+const char* gearoenix::system::Application::get_clipboard() const noexcept
+{
+    return nullptr;
 }
 
 #endif

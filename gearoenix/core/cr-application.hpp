@@ -10,33 +10,34 @@
 #elif defined(GX_USE_SDL)
 #include <SDL.h>
 #endif
-namespace gearoenix {
-namespace render {
-    namespace engine {
-        class Engine;
-    }
-}
-namespace system {
-    class Application;
-}
-namespace core {
-    namespace event {
-        class Event;
-    }
-    class Application {
-    public:
-    protected:
-        system::Application* system_application = nullptr;
-        render::engine::Engine* render_engine = nullptr;
 
-    public:
-        Application(system::Application* sys_app) noexcept;
-        virtual ~Application() noexcept;
-        virtual void update() noexcept = 0;
-        virtual void terminate() noexcept;
-    };
+namespace gearoenix::render::engine {
+class Engine;
 }
+
+namespace gearoenix::system {
+class Application;
 }
+
+namespace gearoenix::core::event {
+class Event;
+}
+
+namespace gearoenix::core {
+class Application {
+public:
+protected:
+    system::Application* system_application = nullptr;
+    render::engine::Engine* render_engine = nullptr;
+
+public:
+    Application(system::Application* sys_app) noexcept;
+    virtual ~Application() noexcept;
+    virtual void update() noexcept = 0;
+    virtual void terminate() noexcept;
+};
+}
+
 /*
 #ifdef GX_IN_WEB
 #define GEAROENIX_START(CoreApp)                                                    \

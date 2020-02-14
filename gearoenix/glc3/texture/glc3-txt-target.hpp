@@ -6,6 +6,7 @@
 #include "../../gl/gl-constants.hpp"
 #include "../../gl/gl-types.hpp"
 #include "../../render/texture/rnd-txt-info.hpp"
+#include <optional>
 #include <vector>
 
 namespace gearoenix::render::texture {

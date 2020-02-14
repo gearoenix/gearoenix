@@ -118,7 +118,7 @@
 #endif
 #ifdef GX_USE_OPENGL_ES2
 #define GX_RUNTIME_USE_OPENGL_ES2_V(v) (v) == gearoenix::render::engine::Type::OPENGL_ES2 ||
-#define GX_RUNTIME_USE_OPENGL_ES2_E(e) GX_RUNTIME_USE_OPENGL_ES2_V((e)->get_engine_type_id())
+#define GX_RUNTIME_USE_OPENGL_ES2_E(e) GX_RUNTIME_USE_OPENGL_ES2_V((e)->get_engine_type())
 #define GX_RUNTIME_USE_OPENGL_ES2 GX_RUNTIME_USE_OPENGL_ES2_E(e)
 #else
 #define GX_RUNTIME_USE_OPENGL_ES2_V(v)
@@ -127,7 +127,7 @@
 #endif
 #ifdef GX_USE_OPENGL_ES3
 #define GX_RUNTIME_USE_OPENGL_ES3_V(v) (v) == gearoenix::render::engine::Type::OPENGL_ES3 ||
-#define GX_RUNTIME_USE_OPENGL_ES3_E(e) GX_RUNTIME_USE_OPENGL_ES3_V((e)->get_engine_type_id())
+#define GX_RUNTIME_USE_OPENGL_ES3_E(e) GX_RUNTIME_USE_OPENGL_ES3_V((e)->get_engine_type())
 #define GX_RUNTIME_USE_OPENGL_ES3 GX_RUNTIME_USE_OPENGL_ES3_E(e)
 #else
 #define GX_RUNTIME_USE_OPENGL_ES3_V(v)
@@ -158,7 +158,7 @@
     GX_RUNTIME_USE_OPENGL_33_V(v)          \
     GX_RUNTIME_USE_OPENGL_ES3_V(v)         \
     false
-#define GX_RUNTIME_USE_OPENGL_CLASS_3_E(e) GX_RUNTIME_USE_OPENGL_CLASS_3_V((e)->get_engine_type_id())
+#define GX_RUNTIME_USE_OPENGL_CLASS_3_E(e) GX_RUNTIME_USE_OPENGL_CLASS_3_V((e)->get_engine_type())
 #define GX_RUNTIME_USE_OPENGL_CLASS_3 GX_RUNTIME_USE_OPENGL_CLASS_3_E(e)
 #else
 #define GX_RUNTIME_USE_OPENGL_CLASS_3_V(v)
@@ -172,7 +172,7 @@
     GX_RUNTIME_USE_OPENGL_ES3_V(v) \
     GX_RUNTIME_USE_OPENGL_ES2_V(v) \
     false
-#define GX_RUNTIME_USE_OPENGL_E(e) GX_RUNTIME_USE_OPENGL_V((e)->get_engine_type_id())
+#define GX_RUNTIME_USE_OPENGL_E(e) GX_RUNTIME_USE_OPENGL_V((e)->get_engine_type())
 #define GX_RUNTIME_USE_OPENGL GX_RUNTIME_USE_OPENGL_E(e)
 #else
 #define GX_RUNTIME_USE_OPENGL_E(e)

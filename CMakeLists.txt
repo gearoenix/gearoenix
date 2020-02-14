@@ -1,4 +1,4 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 3.1 FATAL_ERROR)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.4 FATAL_ERROR)
 
 PROJECT(Gearoenix)
 
@@ -59,12 +59,10 @@ OPTION(GX_ENABLE_COVERAGE "Enables the measurement of test coverages" OFF)
 # Libraries that are dependencies of the project
 SET(GX_LIBS)
 # Configuring the language level
-SET(CMAKE_CXX_STANDARD 17)
-SET(CMAKE_CXX_STANDARD_REQUIRED ON)
 IF (MSVC)
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++latest")
+    SET(CMAKE_CXX_FLAGS "/std:c++latest ${CMAKE_CXX_FLAGS}")
 ELSE ()
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
+    SET(CMAKE_CXX_FLAGS "-std=c++17 ${CMAKE_CXX_FLAGS}")
 ENDIF ()
 IF (APPLE)
     SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -x objective-c")

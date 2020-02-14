@@ -6,6 +6,7 @@
 #include "../../core/sync/cr-sync-end-caller.hpp"
 #include "../../gl/gl-constants.hpp"
 #include "../../gl/gl-types.hpp"
+#include <optional>
 #include <vector>
 
 namespace gearoenix::render::texture {
