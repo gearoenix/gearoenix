@@ -32,16 +32,16 @@ void gearoenix::glc3::pipeline::ResourceSet::bind(
 {
     switch (prs->get_pip()->get_pipeline_type()) {
     case render::pipeline::Type::ShadowMapper:
-        dynamic_cast<const ShadowMapperResourceSet*>(prs)->bind_final(bound_shader_program);
+        static_cast<const ShadowMapperResourceSet*>(prs)->bind_final(bound_shader_program);
         break;
     case render::pipeline::Type::Unlit:
-        dynamic_cast<const UnlitResourceSet*>(prs)->bind_final(bound_shader_program);
+        static_cast<const UnlitResourceSet*>(prs)->bind_final(bound_shader_program);
         break;
     case render::pipeline::Type::SkyboxEquirectangular:
-        dynamic_cast<const SkyboxEquirectangularResourceSet*>(prs)->bind_final(bound_shader_program);
+        static_cast<const SkyboxEquirectangularResourceSet*>(prs)->bind_final(bound_shader_program);
         break;
     case render::pipeline::Type::ForwardPbr:
-        dynamic_cast<const ForwardPbrResourceSet*>(prs)->bind_final(bound_shader_program);
+        static_cast<const ForwardPbrResourceSet*>(prs)->bind_final(bound_shader_program);
         break;
     default:
         GXUNIMPLEMENTED

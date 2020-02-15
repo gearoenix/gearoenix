@@ -10,11 +10,12 @@
 #include "../buffer/glc3-buf-vertex.hpp"
 #include "../shader/glc3-shd-shadow-mapper.hpp"
 #include "../texture/glc3-txt-2d.hpp"
+#include "glc3-pip-resource-set.hpp"
 #include "glc3-pip-shadow-mapper.hpp"
 
 gearoenix::glc3::pipeline::ShadowMapperResourceSet::ShadowMapperResourceSet(const std::shared_ptr<shader::ShadowMapper>& shd, std::shared_ptr<ShadowMapper const> pip) noexcept
-    : glc3::pipeline::ResourceSet(shd)
-    , render::pipeline::ShadowMapperResourceSet(std::move(pip))
+    : render::pipeline::ShadowMapperResourceSet(std::move(pip))
+    , base(new glc3::pipeline::ResourceSet(shd))
 {
 }
 

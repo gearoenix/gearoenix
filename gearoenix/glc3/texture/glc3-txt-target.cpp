@@ -116,8 +116,8 @@ void gearoenix::glc3::texture::Target::fetch_current_framebuffer() noexcept
 void gearoenix::glc3::texture::Target::generate_framebuffer(
     const std::vector<render::texture::Info>& infos,
     const std::vector<std::shared_ptr<Texture2D>>& textures,
-    const unsigned int w, // this is needed for render buffer in future
-    const unsigned int h) noexcept
+    const unsigned int, // this is needed for render buffer in future
+    const unsigned int) noexcept
 {
     framebuffer_borrowed = false;
     gl::Loader::gen_framebuffers(1, reinterpret_cast<gl::uint*>(&framebuffer));

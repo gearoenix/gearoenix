@@ -15,10 +15,11 @@
 #include "../texture/glc3-txt-cube.hpp"
 #include "../texture/glc3-txt-texture.hpp"
 #include "glc3-pip-forward-pbr.hpp"
+#include "glc3-pip-resource-set.hpp"
 
 gearoenix::glc3::pipeline::ForwardPbrResourceSet::ForwardPbrResourceSet(const std::shared_ptr<shader::ForwardPbr>& shd, std::shared_ptr<ForwardPbr const> pip) noexcept
-    : glc3::pipeline::ResourceSet(shd)
-    , render::pipeline::ForwardPbrResourceSet(std::move(pip))
+    : render::pipeline::ForwardPbrResourceSet(std::move(pip))
+    , base(new glc3::pipeline::ResourceSet(shd))
 {
 }
 

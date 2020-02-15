@@ -15,10 +15,11 @@
 #include "../texture/gles2-txt-cube.hpp"
 #include "../texture/gles2-txt-texture.hpp"
 #include "gles2-pip-forward-pbr.hpp"
+#include "gles2-pip-resource-set.hpp"
 
 gearoenix::gles2::pipeline::ForwardPbrResourceSet::ForwardPbrResourceSet(const std::shared_ptr<shader::ForwardPbr>& shd, std::shared_ptr<ForwardPbr const> pip) noexcept
-    : gles2::pipeline::ResourceSet(shd)
-    , render::pipeline::ForwardPbrResourceSet(std::move(pip))
+    : render::pipeline::ForwardPbrResourceSet(std::move(pip))
+    , base(new gles2::pipeline::ResourceSet(shd))
 {
 }
 

@@ -8,11 +8,12 @@
 #include "../buffer/gles2-buf-vertex.hpp"
 #include "../shader/gles2-shd-shadow-mapper.hpp"
 #include "../texture/gles2-txt-2d.hpp"
+#include "gles2-pip-resource-set.hpp"
 #include "gles2-pip-shadow-mapper.hpp"
 
 gearoenix::gles2::pipeline::ShadowMapperResourceSet::ShadowMapperResourceSet(const std::shared_ptr<shader::ShadowMapper>& shd, std::shared_ptr<ShadowMapper const> pip) noexcept
-    : gles2::pipeline::ResourceSet(shd)
-    , render::pipeline::ShadowMapperResourceSet(std::move(pip))
+    : render::pipeline::ShadowMapperResourceSet(std::move(pip))
+    , base(new gles2::pipeline::ResourceSet(shd))
 {
 }
 

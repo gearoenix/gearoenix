@@ -2,8 +2,8 @@
 #define GEAROENIX_GLC3_PIPELINE_SHADOW_MAPPER_RESOURCE_SET_HPP
 #include "../../core/cr-build-configuration.hpp"
 #ifdef GX_USE_OPENGL_CLASS_3
+#include "../../gl/gl-types.hpp"
 #include "../../render/pipeline/rnd-pip-shadow-mapper-resource-set.hpp"
-#include "glc3-pip-resource-set.hpp"
 
 namespace gearoenix::glc3::shader {
 class ShadowMapper;
@@ -11,7 +11,9 @@ class ShadowMapper;
 
 namespace gearoenix::glc3::pipeline {
 class ShadowMapper;
-class ShadowMapperResourceSet : public ResourceSet, public render::pipeline::ShadowMapperResourceSet {
+class ResourceSet;
+class ShadowMapperResourceSet : public render::pipeline::ShadowMapperResourceSet {
+    GX_GET_UCPTR_PRV(glc3::pipeline::ResourceSet, base)
 public:
     ShadowMapperResourceSet(const std::shared_ptr<shader::ShadowMapper>& shd, std::shared_ptr<ShadowMapper const> pip) noexcept;
     ~ShadowMapperResourceSet() noexcept final;

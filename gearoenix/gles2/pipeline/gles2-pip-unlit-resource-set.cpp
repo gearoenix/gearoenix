@@ -11,11 +11,12 @@
 #include "../buffer/gles2-buf-vertex.hpp"
 #include "../shader/gles2-shd-unlit.hpp"
 #include "../texture/gles2-txt-2d.hpp"
+#include "gles2-pip-resource-set.hpp"
 #include "gles2-pip-unlit.hpp"
 
 gearoenix::gles2::pipeline::UnlitResourceSet::UnlitResourceSet(const std::shared_ptr<shader::Unlit>& shd, std::shared_ptr<Unlit const> pip) noexcept
-    : gles2::pipeline::ResourceSet(shd)
-    , render::pipeline::UnlitResourceSet(std::move(pip))
+    : render::pipeline::UnlitResourceSet(std::move(pip))
+    , base(new gles2::pipeline::ResourceSet(shd))
 {
 }
 

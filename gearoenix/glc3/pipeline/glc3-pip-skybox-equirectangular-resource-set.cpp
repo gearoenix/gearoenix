@@ -11,11 +11,12 @@
 #include "../buffer/glc3-buf-vertex.hpp"
 #include "../shader/glc3-shd-skybox-equirectangular.hpp"
 #include "../texture/glc3-txt-2d.hpp"
+#include "glc3-pip-resource-set.hpp"
 #include "glc3-pip-skybox-equirectangular.hpp"
 
 gearoenix::glc3::pipeline::SkyboxEquirectangularResourceSet::SkyboxEquirectangularResourceSet(const std::shared_ptr<shader::SkyboxEquirectangular>& shd, std::shared_ptr<SkyboxEquirectangular const> pip) noexcept
-    : glc3::pipeline::ResourceSet(shd)
-    , render::pipeline::SkyboxEquirectangularResourceSet(std::move(pip))
+    : render::pipeline::SkyboxEquirectangularResourceSet(std::move(pip))
+    , base(new glc3::pipeline::ResourceSet(shd))
 {
 }
 

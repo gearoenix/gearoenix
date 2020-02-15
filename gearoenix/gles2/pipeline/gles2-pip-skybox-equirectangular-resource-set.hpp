@@ -3,8 +3,8 @@
 #include "../../core/cr-build-configuration.hpp"
 #ifdef GX_USE_OPENGL_ES2
 #include "../../core/sync/cr-sync-end-caller.hpp"
+#include "../../gl/gl-types.hpp"
 #include "../../render/pipeline/rnd-pip-skybox-equirectangular-resource-set.hpp"
-#include "gles2-pip-resource-set.hpp"
 
 namespace gearoenix::gles2::shader {
 class SkyboxEquirectangular;
@@ -12,7 +12,9 @@ class SkyboxEquirectangular;
 
 namespace gearoenix::gles2::pipeline {
 class SkyboxEquirectangular;
-class SkyboxEquirectangularResourceSet : public ResourceSet, public render::pipeline::SkyboxEquirectangularResourceSet {
+class ResourceSet;
+class SkyboxEquirectangularResourceSet : public render::pipeline::SkyboxEquirectangularResourceSet {
+    GX_GET_UCPTR_PRV(gles2::pipeline::ResourceSet, base)
 public:
     SkyboxEquirectangularResourceSet(const std::shared_ptr<shader::SkyboxEquirectangular>& shd, std::shared_ptr<SkyboxEquirectangular const> pip) noexcept;
     ~SkyboxEquirectangularResourceSet() noexcept final;

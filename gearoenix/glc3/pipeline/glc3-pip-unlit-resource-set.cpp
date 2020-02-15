@@ -11,11 +11,12 @@
 #include "../buffer/glc3-buf-vertex.hpp"
 #include "../shader/glc3-shd-unlit.hpp"
 #include "../texture/glc3-txt-2d.hpp"
+#include "glc3-pip-resource-set.hpp"
 #include "glc3-pip-unlit.hpp"
 
 gearoenix::glc3::pipeline::UnlitResourceSet::UnlitResourceSet(const std::shared_ptr<shader::Unlit>& shd, std::shared_ptr<Unlit const> pip) noexcept
-    : glc3::pipeline::ResourceSet(shd)
-    , render::pipeline::UnlitResourceSet(std::move(pip))
+    : render::pipeline::UnlitResourceSet(std::move(pip))
+    , base(new glc3::pipeline::ResourceSet(shd))
 {
 }
 
