@@ -139,8 +139,7 @@ void gearoenix::render::light::CascadeInfo::update(const math::Mat4x4& m, const 
     for (auto& c : per_cascade) {
         auto& limit = c.collider->get_limit();
         math::Vec3 v = limit.get_upper();
-        GXTODO // some doubt about it
-            v[2]
+        v[2]
             = std::numeric_limits<core::Real>::max();
         limit.put_without_update(v);
         limit.update();
