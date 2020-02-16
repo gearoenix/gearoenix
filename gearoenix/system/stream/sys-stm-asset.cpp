@@ -18,8 +18,11 @@ void gearoenix::system::stream::Asset::check_endian_compatibility() noexcept
 
 gearoenix::system::stream::Asset::Asset() noexcept {}
 
-gearoenix::system::stream::Asset::~Asset() noexcept {
-    GXTODO //android asset free check
+gearoenix::system::stream::Asset::~Asset() noexcept
+{
+#ifdef GX_IN_ANDROID
+    AAsset_close(file);
+#endif
 }
 
 gearoenix::system::stream::Asset* gearoenix::system::stream::Asset::construct(system::Application* const sys_app, const std::string& name) noexcept
@@ -43,10 +46,8 @@ gearoenix::system::stream::Asset* gearoenix::system::stream::Asset::construct(sy
         return nullptr;
     }
 #elif defined(GX_IN_ANDROID)
-    //    asset->sys_app = sys_app
-    //                         asset->file
-    //        = AAssetManager_open(sys_app->get_android_app()->activity->assetManager,
-    //            name.c_str(), AASSET_MODE_BUFFER);
+    asset->sys_app = sys_app;
+    asset->file = AAssetManager_open(sys_app->get_android_application()->activity->assetManager, name.c_str(), AASSET_MODE_BUFFER);
     if (asset->file == nullptr) {
         GXLOGD("Asset not found! " << name)
         return nullptr;
@@ -112,7 +113,7 @@ gearoenix::core::Count gearoenix::system::stream::Asset::size() noexcept
     file.seekg(c);
     return s;
 #elif defined(GX_IN_ANDROID)
-    GXUNIMPLEMENTED
+    return static_cast<core::Count>(AAsset_getLength64(file));
 #else
 #error "Unexpected file interface"
 #endif
