@@ -8,15 +8,19 @@ void gearoenix::system::GlContext::init_gles() noexcept
     if (gles_initialized)
         return;
     gles_initialized = true;
+#ifdef GX_USE_OPENGL_ES3
     if (gl::Loader::load_library(render::engine::Type::OPENGL_ES3)) {
         GXLOGD("OpenGL ES3 library loaded.")
         es3_supported = true;
         return;
     }
+#endif
+#ifdef GX_USE_OPENGL_ES2
     if (gl::Loader::load_library(render::engine::Type::OPENGL_ES2)) {
         GXLOGD("OpenGL ES2 library loaded.")
         return;
     }
+#endif
     GXLOGF("No suitable OpenGL library found")
 }
 
@@ -55,27 +59,40 @@ bool gearoenix::system::GlContext::check_surface(const EGLint opengl_version, co
     this->depth_size = static_cast<int>(depth_size);
     this->samples_size = static_cast<int>(samples_size);
     EGLint num_configs;
-    return 0 != eglChooseConfig(display, attribs, &config, 1, &num_configs);
+    return 0 != eglChooseConfig(display, attribs, &config, 1, &num_configs) && num_configs > 0 && config != nullptr;
 }
 
 void gearoenix::system::GlContext::init_egl_surface() noexcept
 {
     display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
     eglInitialize(display, nullptr, nullptr);
-    static const EGLint configs[6][3] = {
-        { EGL_OPENGL_ES2_BIT, 24, 0 },
+#if defined(GX_USE_OPENGL_ES3) && defined(GX_USE_OPENGL_ES2)
+#define GX_EGL_CONFIGS_COUNT 8
+#else
+#define GX_EGL_CONFIGS_COUNT 4
+#endif
+    constexpr EGLint configs[GX_EGL_CONFIGS_COUNT][3] = {
+#ifdef GX_USE_OPENGL_ES3
+        { EGL_OPENGL_ES3_BIT, 32, 4 },
         { EGL_OPENGL_ES3_BIT, 24, 4 },
+        { EGL_OPENGL_ES3_BIT, 32, 0 },
         { EGL_OPENGL_ES3_BIT, 24, 0 },
+#endif
+#ifdef GX_USE_OPENGL_ES2
         { EGL_OPENGL_ES2_BIT, 32, 4 },
         { EGL_OPENGL_ES2_BIT, 24, 4 },
+        { EGL_OPENGL_ES2_BIT, 32, 0 },
         { EGL_OPENGL_ES2_BIT, 24, 0 },
+#endif
     };
     for (auto& c : configs)
         if (check_surface(c[0], c[1], c[2])) {
             surface = eglCreateWindowSurface(display, config, window, nullptr);
+            if (surface == nullptr)
+                continue;
             eglQuerySurface(display, surface, EGL_WIDTH, &screen_width);
             eglQuerySurface(display, surface, EGL_HEIGHT, &screen_height);
-            GXLOGD("Surface with OpenGL: " << c[0] << ", depth: " << c[1] << ", samples: " << c[2])
+            GXLOGD("Surface with OpenGL: " << (c[0] == EGL_OPENGL_ES3_BIT ? "ES3" : "ES2") << ", depth: " << c[1] << ", samples: " << c[2])
             return;
         }
     GXLOGF("No suitable surface found.")
@@ -84,20 +101,24 @@ void gearoenix::system::GlContext::init_egl_surface() noexcept
 void gearoenix::system::GlContext::init_egl_context() noexcept
 {
     context_valid = true;
+#ifdef GX_USE_OPENGL_ES3
     {
         GXLOGD("Trying to create OpenGL context 3")
         const EGLint context_attribs[] = { EGL_CONTEXT_CLIENT_VERSION, 3, EGL_NONE };
         context = eglCreateContext(display, config, nullptr, context_attribs);
-        if (eglMakeCurrent(display, surface, surface, context) != EGL_FALSE)
+        if (context != nullptr && eglMakeCurrent(display, surface, surface, context) != EGL_FALSE)
             return;
     }
+#endif
+#ifdef GX_USE_OPENGL_ES2
     {
         GXLOGD("Trying to create OpenGL context 2")
         const EGLint context_attribs[] = { EGL_CONTEXT_CLIENT_VERSION, 2, EGL_NONE };
         context = eglCreateContext(display, config, nullptr, context_attribs);
-        if (eglMakeCurrent(display, surface, surface, context) != EGL_FALSE)
+        if (context != nullptr && eglMakeCurrent(display, surface, surface, context) != EGL_FALSE)
             return;
     }
+#endif
     GXLOGF("Can not create the required context")
 }
 
