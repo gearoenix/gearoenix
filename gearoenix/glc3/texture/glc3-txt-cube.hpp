@@ -14,9 +14,8 @@ class Engine;
 
 namespace gearoenix::glc3::texture {
 class TextureCube : public render::texture::TextureCube {
+    GX_GET_VAL_PRV(gl::uint, texture_object, 0)
 private:
-    gl::uint texture_object = 0;
-
     TextureCube(core::Id my_id, engine::Engine* engine) noexcept;
 
 public:
@@ -30,6 +29,7 @@ public:
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
     ~TextureCube() noexcept final;
     void bind(gl::enumerated texture_unit) const noexcept;
+    void bind() const noexcept;
 };
 }
 

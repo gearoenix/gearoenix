@@ -6,6 +6,7 @@
 #include "../../gl/gl-constants.hpp"
 #include "../../gl/gl-types.hpp"
 #include "../../render/texture/rnd-txt-info.hpp"
+#include "../../render/texture/rnd-txt-target.hpp"
 #include <optional>
 #include <vector>
 
@@ -20,36 +21,33 @@ class Engine;
 
 namespace gearoenix::glc3::texture {
 class Texture2D;
-class Target {
+class Target : public render::texture::Target {
+    GX_GET_VAL_PRV(gl::sint, framebuffer, -1)
+    GX_GET_VAL_PRV(gl::sint, depth_buffer, -1)
+    GX_GET_CPTR_PRV(engine::Engine, gl_e)
 private:
-    engine::Engine* const gl_e;
-    gl::sint framebuffer = -1;
-    gl::sint depth_buffer = -1;
-    // settings
     std::optional<gl::enumerated> gl_cull_mode = GL_BACK;
     std::optional<std::pair<gl::enumerated, gl::enumerated>> gl_blend_mode = std::make_pair(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    bool depth_test_enabled = true;
-    bool scissor_test_enabled = true;
-    bool stencil_test_enabled = true;
-    bool write_depth = true;
-    bool framebuffer_borrowed = false;
 
-public:
-    explicit Target(engine::Engine* e) noexcept;
-    ~Target() noexcept;
-    [[nodiscard]] static std::shared_ptr<render::texture::Target> construct(
-        core::Id id,
-        engine::Engine* e,
-        const std::vector<render::texture::Info>& infos,
-        unsigned int width,
-        unsigned int height,
+    Target(core::Id id, engine::Engine* e) noexcept;
+
+    void initialize_texture(
+        const std::vector<render::texture::AttachmentInfo>& infos,
+        unsigned int img_width,
+        unsigned int img_height,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
     void state_init() const noexcept;
     void fetch_current_framebuffer() noexcept;
-    void generate_framebuffer(
-        const std::vector<render::texture::Info>& infos,
-        const std::vector<std::shared_ptr<Texture2D>>& textures,
-        unsigned int w, unsigned int h) noexcept;
+    void generate_framebuffer(const std::vector<std::shared_ptr<render::texture::Texture>>& textures, int level) noexcept;
+
+public:
+    explicit Target(engine::Engine* e) noexcept;
+    ~Target() noexcept final;
+    [[nodiscard]] static std::shared_ptr<render::texture::Target> construct(
+        core::Id id,
+        engine::Engine* e,
+        const std::vector<render::texture::AttachmentInfo>& infos,
+        const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
     void bind() const noexcept;
     void clear() const noexcept;
     static void bind(const render::texture::Target* t) noexcept;
