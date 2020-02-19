@@ -6,17 +6,17 @@ gearoenix::glc3::texture::SampleInfo::SampleInfo(const render::texture::SampleIn
 {
     const auto min_fil_fun = [](render::texture::Filter f) {
         switch (f) {
-        case render::texture::Filter::NEAREST:
+        case render::texture::Filter::Nearest:
             return GL_NEAREST;
-        case render::texture::Filter::NEAREST_MIPMAP_LINEAR:
+        case render::texture::Filter::NearestMipmapLinear:
             return GL_NEAREST_MIPMAP_LINEAR;
-        case render::texture::Filter::NEAREST_MIPMAP_NEAREST:
+        case render::texture::Filter::NearestMipmapNearest:
             return GL_NEAREST_MIPMAP_NEAREST;
-        case render::texture::Filter::LINEAR:
+        case render::texture::Filter::Linear:
             return GL_LINEAR;
-        case render::texture::Filter::LINEAR_MIPMAP_LINEAR:
+        case render::texture::Filter::LinearMipmapLinear:
             return GL_LINEAR_MIPMAP_LINEAR;
-        case render::texture::Filter::LINEAR_MIPMAP_NEAREST:
+        case render::texture::Filter::LinearMipmapNearest:
             return GL_LINEAR_MIPMAP_NEAREST;
         default:
             GXUNEXPECTED
@@ -25,9 +25,9 @@ gearoenix::glc3::texture::SampleInfo::SampleInfo(const render::texture::SampleIn
 
     const auto mag_fil_fun = [](render::texture::Filter f) {
         switch (f) {
-        case render::texture::Filter::NEAREST:
+        case render::texture::Filter::Nearest:
             return GL_NEAREST;
-        case render::texture::Filter::LINEAR:
+        case render::texture::Filter::Linear:
             return GL_LINEAR;
         default:
             GXUNEXPECTED

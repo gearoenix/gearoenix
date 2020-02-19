@@ -2,8 +2,10 @@
 #define GEAROENIX_RENDER_TEXTURE_ATTACHMENT_HPP
 #include "../../core/cr-types.hpp"
 #include "rnd-txt-face.hpp"
+#include "rnd-txt-texture-info.hpp"
 #include "rnd-txt-type.hpp"
 #include <memory>
+#include <optional>
 #include <variant>
 
 namespace gearoenix::render::texture {
@@ -25,7 +27,7 @@ struct Attachment2D {
 
 struct AttachmentCube {
     std::shared_ptr<TextureCube> txt;
-    Face face;
+    Face face = Face::PositiveZ;
 
     ~AttachmentCube() noexcept;
 };
@@ -43,12 +45,14 @@ struct Attachment {
 };
 
 struct AttachmentInfo {
-    Type img_type = Type::Texture2D;
+    TextureInfo texture_info;
     unsigned int img_width = 512;
     unsigned int img_height = 512;
     unsigned int img_depth = 0;
     unsigned int mipmap_level = 0;
     UsageFlag usage = UsageFlag::Color;
+    /// This field will be available whenever the attachment is cube map
+    std::optional<Face> face = std::nullopt;
 };
 }
 #endif

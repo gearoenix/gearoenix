@@ -32,7 +32,7 @@ public:
     [[nodiscard]] std::shared_ptr<render::texture::Texture2D> create_texture_2d(
         core::Id id,
         const void* data,
-        render::texture::TextureFormat f,
+        render::texture::TextureFormat format,
         render::texture::SampleInfo s,
         unsigned int width,
         unsigned int heigt,
@@ -40,13 +40,13 @@ public:
     [[nodiscard]] std::shared_ptr<render::texture::TextureCube> create_texture_cube(
         core::Id id,
         const void* data,
-        render::texture::TextureFormat f,
+        render::texture::TextureFormat format,
         render::texture::SampleInfo s,
         unsigned int aspect,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept final;
     [[nodiscard]] std::shared_ptr<render::texture::Target> create_render_target(
         core::Id id,
-        const std::vector<render::texture::Info>& infos,
+        const std::vector<render::texture::TextureInfo>& infos,
         unsigned int width,
         unsigned int height,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept final;

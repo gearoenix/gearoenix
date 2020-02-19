@@ -28,7 +28,7 @@ namespace render {
             Engine* e;
 
         public:
-            Mesh(unsigned int vertex_elements_count, system::stream::Stream* f, Engine* e, std::shared_ptr<core::sync::EndCaller> c);
+            Mesh(unsigned int vertex_elements_count, system::stream::Stream* format, Engine* e, std::shared_ptr<core::sync::EndCaller> c);
             ~Mesh();
             void bind();
             void draw();

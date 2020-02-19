@@ -6,8 +6,11 @@ class TextureCube : public Texture {
     GX_GET_VAL_PRT(std::size_t, img_width, 0)
     GX_GET_VAL_PRT(std::size_t, img_height, 0)
 protected:
-    TextureCube(const core::Id my_id, engine::Engine* const engine) noexcept
-        : Texture(my_id, Type::TextureCube, engine)
+    TextureCube(
+        const core::Id id,
+        const TextureFormat texture_format,
+        engine::Engine* const engine) noexcept
+        : Texture(id, Type::TextureCube, texture_format, engine)
     {
     }
 

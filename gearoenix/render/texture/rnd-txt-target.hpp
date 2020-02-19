@@ -17,7 +17,7 @@ class Target {
     GX_GETSET_VAL_PRT(unsigned int, clipping_height, 0)
     GX_GETSET_VAL_PRT(unsigned int, clipping_starting_x, 0)
     GX_GETSET_VAL_PRT(unsigned int, clipping_starting_y, 0)
-    GX_GET_CREF_PRT(std::vector<Attachment>, attachents)
+    GX_GET_CREF_PRT(std::vector<Attachment>, attachments)
     GX_GETSET_VAL_PRT(bool, depth_test_enabled, true)
     GX_GETSET_VAL_PRT(bool, scissor_test_enabled, true)
     GX_GETSET_VAL_PRT(bool, stencil_test_enabled, true)
@@ -29,10 +29,34 @@ protected:
     {
     }
 
+    Target(const Target& o) noexcept
+        : e(o.e)
+        , target_id(o.target_id)
+        , clipping_width(o.clipping_width)
+        , clipping_height(o.clipping_height)
+        , clipping_starting_x(o.clipping_starting_x)
+        , clipping_starting_y(o.clipping_starting_y)
+        , attachments(o.attachments)
+        , depth_test_enabled(o.depth_test_enabled)
+        , scissor_test_enabled(o.scissor_test_enabled)
+        , stencil_test_enabled(o.stencil_test_enabled)
+        , write_depth(o.write_depth)
+    {
+    }
+
 public:
     virtual ~Target() noexcept = default;
-    [[nodiscard]] virtual std::shared_ptr<Texture> get_texture(std::size_t index) const noexcept = 0;
-    [[nodiscard]] virtual std::size_t get_textures_count() const noexcept = 0;
+
+    [[nodiscard]] const std::shared_ptr<Texture>& get_texture(std::size_t index) const noexcept
+    {
+        return attachments[index].txt;
+    }
+
+    [[nodiscard]] std::size_t get_textures_count() const noexcept
+    {
+        return attachments.size();
+    }
+
     [[nodiscard]] virtual Target* clone() const noexcept = 0;
 };
 }

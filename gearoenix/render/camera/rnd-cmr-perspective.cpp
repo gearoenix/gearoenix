@@ -56,8 +56,8 @@ void gearoenix::render::camera::Perspective::update_cascades() noexcept
         return;
     }
 
-    // Zi = yn(f/n)^(i/N) + (1-y)(n+(i/N)(f-n))
-    // Zi = yn((f/n)^(1/N))^i + (1-y)n + (1-y)((f-n)/N)i
+    // Zi = yn(format/n)^(i/N) + (1-y)(n+(i/N)(format-n))
+    // Zi = yn((format/n)^(1/N))^i + (1-y)n + (1-y)((format-n)/N)i
     const core::Real oneminlambda = 1.0f - lambda;
     const core::Real onedivcn = 1.0f / static_cast<core::Real>(sections_count);
     // uniform increament

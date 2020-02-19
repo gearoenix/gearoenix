@@ -17,7 +17,6 @@
 #include "../sync/glc3-sy-semaphore.hpp"
 #include "../texture/glc3-txt-2d.hpp"
 #include "../texture/glc3-txt-cube.hpp"
-#include "../texture/glc3-txt-target-2d.hpp"
 #include "../texture/glc3-txt-target.hpp"
 
 gearoenix::glc3::engine::Engine::Engine(system::Application* const sys_app, const render::engine::Type engine_type) noexcept
@@ -32,7 +31,7 @@ gearoenix::glc3::engine::Engine* gearoenix::glc3::engine::Engine::construct(syst
     e->pipeline_manager = std::make_unique<pipeline::Manager>(e);
     e->buffer_manager = std::make_unique<buffer::Manager>(e);
     e->command_manager = std::make_unique<command::Manager>();
-    e->main_render_target = std::make_unique<texture::Target2D>(e);
+    e->main_render_target = std::make_unique<texture::Target>(e);
     return e;
 }
 
@@ -66,34 +65,30 @@ std::shared_ptr<gearoenix::render::sync::Semaphore> gearoenix::glc3::engine::Eng
 std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::glc3::engine::Engine::create_texture_2d(
     const core::Id id,
     const void* data,
-    const render::texture::TextureFormat f,
-    const render::texture::SampleInfo s,
+    const render::texture::TextureInfo& info,
     const unsigned int img_width,
     const unsigned int img_height,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
 {
-    return texture::Texture2D::construct(id, this, data, f, s, img_width, img_height, call);
+    return texture::Texture2D::construct(id, this, data, info, img_width, img_height, call);
 }
 
 std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::glc3::engine::Engine::create_texture_cube(
     const core::Id id,
     const void* data,
-    const render::texture::TextureFormat f,
-    const render::texture::SampleInfo s,
+    const render::texture::TextureInfo& info,
     const unsigned int aspect,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
 {
-    return texture::TextureCube::construct(id, this, data, f, s, aspect, call);
+    return texture::TextureCube::construct(id, this, data, info, aspect, call);
 }
 
 std::shared_ptr<gearoenix::render::texture::Target> gearoenix::glc3::engine::Engine::create_render_target(
-    core::Id id,
-    const std::vector<render::texture::Info>& infos,
-    unsigned int width,
-    unsigned int height,
-    const gearoenix::core::sync::EndCaller<gearoenix::core::sync::EndCallerIgnore>& call) noexcept
+    const core::Id id,
+    const std::vector<render::texture::AttachmentInfo>& infos,
+    const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
 {
-    return texture::Target::construct(id, this, infos, width, height, call);
+    return texture::Target::construct(id, this, infos, call);
 }
 
 void gearoenix::glc3::engine::Engine::submit(
@@ -104,8 +99,14 @@ void gearoenix::glc3::engine::Engine::submit(
     const std::size_t,
     const render::sync::Semaphore* const* const) noexcept
 {
+#ifdef GX_DEBUG_GL_CLASS_3
+    gl::Loader::check_for_error();
+#endif
     for (std::size_t i = 0; i < cmds_count; ++i)
         reinterpret_cast<const command::Buffer*>(cmds[i])->play();
+#ifdef GX_DEBUG_GL_CLASS_3
+    gl::Loader::check_for_error();
+#endif
 }
 
 #endif

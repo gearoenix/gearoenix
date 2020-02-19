@@ -11,7 +11,7 @@ echo $output_dir
 mkdir -p $output_dir
 echo "cd $output_dir"
 cd $output_dir
-find ./ -type f -not -name 'data.gx3d' -delete
+find ./ -type format -not -name 'data.gx3d' -delete
 # cpps=$(find ../ -iname *.hpp -o -iname *.cpp | xargs echo)
 source $EMSCRIPTEN_SDK/emsdk_env.sh
 # find ../gearoenix/ -iname *.hpp | while read line; do

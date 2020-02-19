@@ -11,12 +11,12 @@
 //
 //gearoenix::physics::constraint::Placer::Placer(
 //	const core::Id my_id,
-//	const std::shared_ptr<system::stream::Stream> &f,
+//	const std::shared_ptr<system::stream::Stream> &format,
 //	const std::shared_ptr<render::engine::Engine> &e,
 //	const core::sync::EndCaller<core::sync::EndCallerIgnore> c)
 //    : Constraint(my_id, Type::PLACER)
 //{
-//    f->read(t);
+//    format->read(t);
 //    switch (t) {
 //    case DOWN_MIDDLE:
 //        parameters.resize(5);
@@ -25,22 +25,22 @@
 //        // 2 -> ratio
 //        // 3 -> size
 //        // 4 -> next_size
-//        f->read(parameters[2]);
-//        f->read(parameters[0]);
-//        f->read(parameters[1]);
+//        format->read(parameters[2]);
+//        format->read(parameters[0]);
+//        format->read(parameters[1]);
 //        parameters[3] = 2.0f;
 //        parameters[4] = 2.0f * (render_engine->get_system_application()->get_window_ratio() - parameters[0]);
 //        next_position[1] = (parameters[4] / (parameters[2] * 2.0f)) + parameters[1] - 1.0f;
 //        break;
 //    case LEFT:
 //        parameters.resize(1);
-//        f->read(parameters[0]);
+//        format->read(parameters[0]);
 //        position[0] = -1.0f;
 //        next_position[0] = parameters[0] - render_engine->get_system_application()->get_window_ratio();
 //        break;
 //    case RIGHT:
 //        parameters.resize(1);
-//        f->read(parameters[0]);
+//        format->read(parameters[0]);
 //        position[0] = 1.0f;
 //        next_position[0] = render_engine->get_system_application()->get_window_ratio() - parameters[0];
 //        break;
@@ -48,7 +48,7 @@
 //        GXUNEXPECTED;
 //    }
 //    std::vector<core::Id> model_ids;
-//    f->read(model_ids);
+//    format->read(model_ids);
 //    core::asset::Manager* asmgr = render_engine->get_system_application()->get_asset_manager();
 //    for (const core::Id model_id : model_ids) {
 //        std::shared_ptr<render::model::Model> mdl = asmgr->get_model_manager()->get(model_id, core::sync::EndCaller<render::model::Model>(c));

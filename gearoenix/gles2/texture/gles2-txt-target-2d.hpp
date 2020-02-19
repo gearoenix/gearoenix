@@ -19,7 +19,7 @@ private:
     Target2D(
         core::Id id,
         engine::Engine* e,
-        const render::texture::Info& info,
+        const render::texture::TextureInfo& info,
         unsigned int width,
         unsigned int height,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
@@ -31,7 +31,7 @@ public:
     [[nodiscard]] static std::shared_ptr<Target2D> construct(
         core::Id id,
         engine::Engine* e,
-        const render::texture::Info& info,
+        const render::texture::TextureInfo& info,
         unsigned int width,
         unsigned int height,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;

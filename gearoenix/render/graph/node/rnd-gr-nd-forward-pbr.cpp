@@ -21,7 +21,8 @@
 #include "../../scene/rnd-scn-scene.hpp"
 #include "../../sync/rnd-sy-semaphore.hpp"
 #include "../../texture/rnd-txt-manager.hpp"
-#include "../../texture/rnd-txt-target-2d.hpp"
+#include "../../texture/rnd-txt-target.hpp"
+#include "../../texture/rnd-txt-texture-2d.hpp"
 #include "../../texture/rnd-txt-texture-cube.hpp"
 #include "rnd-gr-nd-shadow-mapper.hpp"
 

@@ -19,7 +19,6 @@ gearoenix::render::material::Unlit::Unlit(system::stream::Stream* const f, engin
     : Material(Type::Unlit, e, sizeof(Uniform))
 {
     auto* const txt_mgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
-
     // Reading alpha
     if (f->read_bool()) {
         uniform.alpha = 1.0f;
@@ -57,6 +56,7 @@ void gearoenix::render::material::Unlit::set_color(
 {
     core::sync::EndCaller<texture::Texture2D> call_txt_2d([end](const std::shared_ptr<texture::Texture2D>&) {});
     auto* const txt_mgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
+    e->late_delete(std::move(color_texture));
     color_texture = txt_mgr->get_2d(math::Vec3(r, g, b), call_txt_2d);
     color_value = math::Vec4(r, g, b, 1.0f);
 }
@@ -66,12 +66,14 @@ void gearoenix::render::material::Unlit::set_color(const math::Vec4& c,
 {
     core::sync::EndCaller<texture::Texture2D> call_txt_2d([end](const std::shared_ptr<texture::Texture2D>&) {});
     auto* const txt_mgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
+    e->late_delete(std::move(color_texture));
     color_texture = txt_mgr->get_2d(c, call_txt_2d);
     color_value = c;
 }
 
 void gearoenix::render::material::Unlit::set_color(const std::shared_ptr<texture::Texture2D>& c) noexcept
 {
+    e->late_delete(std::move(color_texture));
     color_texture = c;
 }
 

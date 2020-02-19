@@ -10,25 +10,25 @@
 #include "vk-buf-sub-buffer.hpp"
 #include <functional>
 
-gearoenix::render::buffer::Mesh::Mesh(unsigned int vertex_elements_count, system::stream::Stream* f, Engine* e, std::shared_ptr<core::sync::EndCaller> c)
+gearoenix::render::buffer::Mesh::Mesh(unsigned int vertex_elements_count, system::stream::Stream* format, Engine* e, std::shared_ptr<core::sync::EndCaller> c)
     : e(e)
 {
     Manager* cm = e->get_cpu_buffer_manager();
     Manager* vm = e->get_gpu_buffer_manager();
     core::Count cnt;
-    f->read(cnt);
+    format->read(cnt);
     vc = cnt;
     core::Count vsec = cnt * vertex_elements_count;
     std::vector<core::Real> vd(vsec);
     unsigned int vds = vsec * sizeof(core::Real);
     vs = vds;
     for (core::Count i = 0; i < vsec; ++i)
-        f->read(vd[i]);
-    f->read(cnt);
+        format->read(vd[i]);
+    format->read(cnt);
     ic = cnt;
     std::vector<IndexType> idata(cnt);
     for (core::Count i = 0; i < cnt; ++i)
-        f->read(idata[i]);
+        format->read(idata[i]);
     unsigned int ids = cnt * sizeof(IndexType);
     is = ids;
     vrtbuf = vm->create_subbuffer(vds);

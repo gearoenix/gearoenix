@@ -24,15 +24,30 @@ gearoenix::glc3::pipeline::UnlitResourceSet::~UnlitResourceSet() noexcept = defa
 
 void gearoenix::glc3::pipeline::UnlitResourceSet::bind_final(gl::uint& bound_shader_program) const noexcept
 {
+#ifdef GX_DEBUG_GL_CLASS_3
+    gl::Loader::check_for_error();
+#endif
     GX_GLC3_PIP_RES_START_DRAWING_MESH
     GX_GLC3_PIP_RES_START_SHADER(Unlit, shd)
+#ifdef GX_DEBUG_GL_CLASS_3
+    gl::Loader::check_for_error();
+#endif
     const auto* const material = material_uniform_buffer->get_ptr<render::material::Unlit::Uniform>();
     GX_GLC3_PIP_RES_SET_UNIFORM(material_alpha, material->alpha)
     GX_GLC3_PIP_RES_SET_UNIFORM(material_alpha_cutoff, material->alpha_cutoff)
+#ifdef GX_DEBUG_GL_CLASS_3
+    gl::Loader::check_for_error();
+#endif
     GX_GLC3_PIP_RES_SET_TXT_2D(material_color, color)
+#ifdef GX_DEBUG_GL_CLASS_3
+    gl::Loader::check_for_error();
+#endif
     const auto* const node = node_uniform_buffer->get_ptr<render::graph::node::UnlitUniform>();
     GX_GLC3_PIP_RES_SET_UNIFORM(effect_mvp, *(node->mvp.data()))
     GX_GLC3_PIP_RES_END_DRAWING_MESH
+#ifdef GX_DEBUG_GL_CLASS_3
+    gl::Loader::check_for_error();
+#endif
 }
 
 #endif

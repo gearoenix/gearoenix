@@ -18,7 +18,6 @@
 #include "../../skybox/rnd-sky-equirectangular.hpp"
 #include "../../sync/rnd-sy-semaphore.hpp"
 #include "../../texture/rnd-txt-manager.hpp"
-#include "../../texture/rnd-txt-target-2d.hpp"
 #include "../../texture/rnd-txt-texture-cube.hpp"
 
 gearoenix::render::graph::node::SkyboxEquirectangularRenderData::SkyboxEquirectangularRenderData(engine::Engine* e, pipeline::Pipeline* pip) noexcept

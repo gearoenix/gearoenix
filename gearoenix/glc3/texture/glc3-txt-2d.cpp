@@ -6,8 +6,8 @@
 #include "../engine/glc3-eng-engine.hpp"
 #include "glc3-txt-sample.hpp"
 
-gearoenix::glc3::texture::Texture2D::Texture2D(const core::Id id, engine::Engine* const e) noexcept
-    : render::texture::Texture2D(id, e)
+gearoenix::glc3::texture::Texture2D::Texture2D(const core::Id id, const render::texture::TextureFormat texture_format, engine::Engine* const e) noexcept
+    : render::texture::Texture2D(id, texture_format, e)
 {
 }
 
@@ -15,22 +15,23 @@ std::shared_ptr<gearoenix::glc3::texture::Texture2D> gearoenix::glc3::texture::T
     const core::Id my_id,
     engine::Engine* const e,
     const void* const data,
-    const render::texture::TextureFormat f,
-    const render::texture::SampleInfo s,
+    const render::texture::TextureInfo& info,
     const unsigned int img_width,
     const unsigned int img_height,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
 {
-    std::shared_ptr<Texture2D> result(new Texture2D(my_id, e));
-    const SampleInfo sample_info(s);
-    const bool needs_mipmap = sample_info.needs_mipmap();
-    const auto internal_format = convert_internal_format(f);
-    const auto format = convert_format(f);
-    const auto data_format = convert_data_format(f);
+    std::shared_ptr<Texture2D> result(new Texture2D(my_id, info.format, e));
+    result->img_width = img_width;
+    result->img_height = img_height;
+    const SampleInfo sample_info(info.sample_info);
+    const bool needs_mipmap = info.has_mipmap;
+    const auto internal_format = convert_internal_format(info.format);
+    const auto format = convert_format(info.format);
+    const auto data_format = convert_data_format(info.format);
     const auto gl_img_width = static_cast<gl::sizei>(img_width);
     const auto gl_img_height = static_cast<gl::sizei>(img_height);
     std::vector<std::uint8_t> pixels;
-    switch (f) {
+    switch (info.format) {
     case render::texture::TextureFormat::RgbaFloat32:
         // TODO: I can in future check for support of format, if it does not support, convert it
         pixels.resize(gl_img_width * gl_img_height * 4 * 4);
@@ -76,17 +77,17 @@ std::shared_ptr<gearoenix::glc3::texture::Texture2D> gearoenix::glc3::texture::T
 std::shared_ptr<gearoenix::glc3::texture::Texture2D> gearoenix::glc3::texture::Texture2D::construct(
     const core::Id my_id,
     engine::Engine* const e,
-    const render::texture::Info& info,
+    const render::texture::TextureInfo& info,
     const unsigned int img_width,
     const unsigned int img_height,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
 {
-    std::shared_ptr<Texture2D> result(new Texture2D(my_id, e));
-    const SampleInfo sample_info(info.s);
-    const bool needs_mipmap = sample_info.needs_mipmap();
-    const auto internal_format = convert_internal_format(info.f);
-    const auto format = convert_format(info.f);
-    const auto data_format = convert_data_format(info.f);
+    std::shared_ptr<Texture2D> result(new Texture2D(my_id, info.format, e));
+    const SampleInfo sample_info(info.sample_info);
+    const bool needs_mipmap = info.has_mipmap;
+    const auto internal_format = convert_internal_format(info.format);
+    const auto format = convert_format(info.format);
+    const auto data_format = convert_data_format(info.format);
     const auto gl_img_width = static_cast<gl::sizei>(img_width);
     const auto gl_img_height = static_cast<gl::sizei>(img_height);
     e->get_function_loader()->load([result, needs_mipmap, internal_format, format, data_format, gl_img_width, gl_img_height, sample_info, call] {
@@ -109,8 +110,12 @@ std::shared_ptr<gearoenix::glc3::texture::Texture2D> gearoenix::glc3::texture::T
     return result;
 }
 
-gearoenix::glc3::texture::Texture2D::Texture2D(const core::Id my_id, const gl::uint txt_obj, engine::Engine* const e) noexcept
-    : render::texture::Texture2D(my_id, e)
+gearoenix::glc3::texture::Texture2D::Texture2D(
+    const core::Id id,
+    const gl::uint txt_obj,
+    const render::texture::TextureFormat texture_format,
+    engine::Engine* const e) noexcept
+    : render::texture::Texture2D(id, texture_format, e)
     , texture_object(txt_obj)
 {
 }
@@ -134,8 +139,17 @@ gearoenix::glc3::texture::Texture2D::~Texture2D() noexcept
 
 void gearoenix::glc3::texture::Texture2D::bind(gl::enumerated texture_unit) const noexcept
 {
+#ifdef GX_DEBUG_GL_CLASS_3
+    gl::Loader::check_for_error();
+#endif
     gl::Loader::active_texture(GL_TEXTURE0 + texture_unit);
+#ifdef GX_DEBUG_GL_CLASS_3
+    gl::Loader::check_for_error();
+#endif
     bind();
+#ifdef GX_DEBUG_GL_CLASS_3
+    gl::Loader::check_for_error();
+#endif
 }
 
 void gearoenix::glc3::texture::Texture2D::bind() const noexcept

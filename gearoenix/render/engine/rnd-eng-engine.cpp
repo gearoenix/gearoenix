@@ -14,12 +14,20 @@
 #include "../scene/rnd-scn-manager.hpp"
 #include "../scene/rnd-scn-scene.hpp"
 
+void gearoenix::render::engine::Engine::do_late_delete() noexcept
+{
+    ++late_delete_index;
+    late_delete_index %= late_delete_assets.size();
+    late_delete_assets[late_delete_index].clear();
+}
+
 gearoenix::render::engine::Engine::Engine(system::Application* const system_application, const Type engine_type) noexcept
     : engine_type(engine_type)
     , system_application(system_application)
     , function_loader(new core::FunctionLoader())
     , kernels(new core::sync::KernelWorkers())
     , physics_engine(new physics::Engine(system_application, kernels.get()))
+    , late_delete_assets(10)
 {
     kernels->add_step(
         [this] {
@@ -39,6 +47,12 @@ gearoenix::render::engine::Engine::Engine(system::Application* const system_appl
 
 gearoenix::render::engine::Engine::~Engine() noexcept = default;
 
+void gearoenix::render::engine::Engine::late_delete(std::shared_ptr<core::asset::Asset> asset) noexcept
+{
+    std::lock_guard<std::mutex> _lg(late_delete_assets_guard);
+    late_delete_assets[late_delete_index].push_back(std::move(asset));
+}
+
 void gearoenix::render::engine::Engine::update() noexcept
 {
     const std::chrono::time_point<std::chrono::high_resolution_clock> now = std::chrono::high_resolution_clock::now();
@@ -52,6 +66,7 @@ void gearoenix::render::engine::Engine::update() noexcept
     physics_engine->update();
     function_loader->unload();
     kernels->do_steps();
+    do_late_delete();
 }
 
 void gearoenix::render::engine::Engine::terminate() noexcept

@@ -23,7 +23,7 @@ public:
         core::Id id,
         engine::Engine* e,
         const void* data,
-        render::texture::TextureFormat f,
+        render::texture::TextureFormat format,
         render::texture::SampleInfo s,
         unsigned int width,
         unsigned int height,
@@ -31,7 +31,7 @@ public:
     [[nodiscard]] static std::shared_ptr<Texture2D> construct(
         core::Id id,
         engine::Engine* e,
-        const render::texture::Info& info,
+        const render::texture::TextureInfo& info,
         unsigned int width,
         unsigned int height,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
@@ -39,7 +39,7 @@ public:
     ~Texture2D() noexcept final;
     void bind(gl::enumerated texture_unit) const noexcept;
     void bind() const noexcept;
-    [[nodiscard]] static gl::uint convert(render::texture::TextureFormat f) noexcept;
+    [[nodiscard]] static gl::uint convert(render::texture::TextureFormat format) noexcept;
 };
 }
 #endif

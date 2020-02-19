@@ -8,9 +8,6 @@ void gearoenix::glc3::texture::Texture::bind(
     const gl::enumerated texture_unit) noexcept
 {
     switch (t->get_texture_type()) {
-    case render::texture::Type::Target2D:
-        Target::bind_textures(reinterpret_cast<const render::texture::Target*>(t), &texture_unit, 1);
-        return;
     case render::texture::Type::Texture2D:
         reinterpret_cast<const texture::Texture2D*>(t)->bind(texture_unit);
         return;

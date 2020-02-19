@@ -72,7 +72,7 @@ void IblBakerApp::on_open() noexcept
         sky->get_mat_equ()->set_color(t);
     });
     GxTxtSampleInfo smp;
-    smp.min_filter = GxTxtFilter::LINEAR;
+    smp.min_filter = GxTxtFilter::Linear;
     /// TODO failure management
     txt_mgr->create_2d_f(f, txt_call, smp);
 }

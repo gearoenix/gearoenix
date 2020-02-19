@@ -17,7 +17,7 @@
 
 #define GX_GLC3_PIP_RES_SET_UNIFORM(x, d) shdr->set_##x##_data(&(d));
 
-#define GX_GLC3_PIP_RES_SET_TXT(x, txt, cls) reinterpret_cast<const texture::cls*>(txt)->bind(static_cast<gl::enumerated>(shdr->get_##x##_index()));
+#define GX_GLC3_PIP_RES_SET_TXT(x, txt, cls) static_cast<const texture::cls*>(txt)->bind(static_cast<gl::enumerated>(shdr->get_##x##_index()));
 
 #define GX_GLC3_PIP_RES_SET_TXT_2D(x, txt) GX_GLC3_PIP_RES_SET_TXT(x, txt, Texture2D)
 

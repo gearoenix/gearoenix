@@ -5,23 +5,23 @@
 gearoenix::gles2::texture::SampleInfo::SampleInfo(const render::texture::SampleInfo& o) noexcept
 {
     switch (o.mag_filter) {
-    case render::texture::Filter::NEAREST:
+    case render::texture::Filter::Nearest:
         mag_filter = GL_NEAREST;
         break;
-    case render::texture::Filter::LINEAR:
+    case render::texture::Filter::Linear:
         mag_filter = GL_LINEAR;
         break;
     default:
         GXUNEXPECTED
     }
     switch (o.min_filter) {
-    case render::texture::Filter::NEAREST:
+    case render::texture::Filter::Nearest:
         min_filter = GL_NEAREST;
         break;
-    case render::texture::Filter::LINEAR:
+    case render::texture::Filter::Linear:
         min_filter = GL_LINEAR;
         break;
-    case render::texture::Filter::LINEAR_MIPMAP_LINEAR:
+    case render::texture::Filter::LinearMipmapLinear:
         min_filter = GL_LINEAR_MIPMAP_LINEAR;
         break;
     default:

@@ -114,12 +114,12 @@ gearoenix::gles2::shader::Shader::~Shader() noexcept
 {
     const gl::uint p = shader_program;
     const gl::uint v = vertex_object;
-    const gl::uint f = fragment_object;
-    e->get_function_loader()->load([p, v, f] {
+    const gl::uint format = fragment_object;
+    e->get_function_loader()->load([p, v, format] {
         if (v != 0)
             end_object(v);
-        if (f != 0)
-            end_object(f);
+        if (format != 0)
+            end_object(format);
         if (p != 0)
             end_program(p);
     });

@@ -14,7 +14,7 @@
 #include "../../pipeline/rnd-pip-shadow-mapper-resource-set.hpp"
 #include "../../pipeline/rnd-pip-shadow-mapper.hpp"
 #include "../../sync/rnd-sy-semaphore.hpp"
-#include "../../texture/rnd-txt-target-2d.hpp"
+#include "../../texture/rnd-txt-target.hpp"
 
 gearoenix::render::graph::node::ShadowMapperRenderData::ShadowMapperRenderData(engine::Engine* const e, pipeline::Pipeline* const pip) noexcept
     : r(reinterpret_cast<pipeline::ShadowMapperResourceSet*>(pip->create_resource_set()))
@@ -65,17 +65,26 @@ gearoenix::render::graph::node::ShadowMapper::ShadowMapper(
         frames[i] = std::make_unique<ShadowMapperFrame>(e);
     }
     const bool week_hwr = e->get_engine_type() == engine::Type::OPENGL_ES2;
-    std::vector<texture::Info> txt_infos = { texture::Info() };
-    txt_infos[0].f = week_hwr ? texture::TextureFormat::D16 : texture::TextureFormat::D32;
-    txt_infos[0].t = texture::Type::Target2D;
-    txt_infos[0].s.min_filter = texture::Filter::NEAREST;
-    txt_infos[0].s.mag_filter = texture::Filter::NEAREST;
-    shadow_map_render_target = std::dynamic_pointer_cast<texture::Target2D>(e->create_render_target(
+    shadow_map_render_target = e->create_render_target(
         core::asset::Manager::create_id(),
-        txt_infos,
-        week_hwr ? 1024 : 2048,
-        week_hwr ? 1024 : 2048,
-        call));
+        { texture::AttachmentInfo {
+            .texture_info = texture::TextureInfo {
+                .format = week_hwr ? texture::TextureFormat::D16 : texture::TextureFormat::D32,
+                .texture_type = texture::Type::Texture2D,
+                .sample_info = texture::SampleInfo {
+                    .min_filter = texture::Filter::Nearest,
+                    .mag_filter = texture::Filter::Nearest,
+                    .wrap_s = texture::Wrap::ClampToEdge,
+                    .wrap_t = texture::Wrap::ClampToEdge,
+                    .wrap_r = texture::Wrap::ClampToEdge,
+                },
+                .has_mipmap = false,
+            },
+            .img_width = static_cast<unsigned int>(week_hwr ? 1024 : 2048),
+            .img_height = static_cast<unsigned int>(week_hwr ? 1024 : 2048),
+            .usage = texture::UsageFlag::Depth,
+        } },
+        call);
     render_target = shadow_map_render_target.get();
     output_textures[0] = shadow_map_render_target->get_texture(0);
 }

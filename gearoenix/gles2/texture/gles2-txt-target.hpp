@@ -11,7 +11,7 @@
 
 namespace gearoenix::render::texture {
 class Target;
-struct Info;
+struct TextureInfo;
 }
 
 namespace gearoenix::gles2::engine {
@@ -40,7 +40,7 @@ public:
     [[nodiscard]] static std::shared_ptr<render::texture::Target> construct(
         core::Id id,
         engine::Engine* e,
-        const render::texture::Info& infos,
+        const render::texture::TextureInfo& infos,
         unsigned int width,
         unsigned int height,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;

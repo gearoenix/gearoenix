@@ -80,7 +80,7 @@ gearoenix::gles2::texture::Target::~Target() noexcept
 std::shared_ptr<gearoenix::render::texture::Target> gearoenix::gles2::texture::Target::construct(
     const core::Id id,
     engine::Engine* const e,
-    const render::texture::Info& info,
+    const render::texture::TextureInfo& info,
     unsigned int w,
     unsigned int h,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept

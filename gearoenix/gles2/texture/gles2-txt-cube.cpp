@@ -26,7 +26,7 @@ std::shared_ptr<gearoenix::gles2::texture::TextureCube> gearoenix::gles2::textur
     const core::Id my_id,
     engine::Engine* const e,
     const void* const data,
-    const render::texture::TextureFormat f,
+    const render::texture::TextureFormat format,
     const render::texture::SampleInfo s,
     const unsigned int aspect,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
@@ -36,7 +36,7 @@ std::shared_ptr<gearoenix::gles2::texture::TextureCube> gearoenix::gles2::textur
     gl::uint cf;
     const auto gl_aspect = static_cast<gl::sizei>(aspect);
     std::vector<std::vector<std::uint8_t>> pixels(GX_COUNT_OF(FACES));
-    if (f == render::texture::TextureFormat::RgbaFloat32 && aspect == 1) {
+    if (format == render::texture::TextureFormat::RgbaFloat32 && aspect == 1) {
         cf = GL_RGBA;
         const gl::sizei pixel_size = gl_aspect * gl_aspect * 4;
         const auto* const raw_data = reinterpret_cast<const core::Real*>(data);

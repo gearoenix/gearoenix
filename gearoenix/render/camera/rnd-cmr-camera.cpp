@@ -7,7 +7,7 @@
 #include "../../system/sys-app.hpp"
 #include "../../system/sys-log.hpp"
 #include "../buffer/rnd-buf-framed-uniform.hpp"
-#include "../texture/rnd-txt-target-2d.hpp"
+#include "../texture/rnd-txt-target.hpp"
 #include "rnd-cmr-transformation.hpp"
 
 #define GX_CAMERA_INIT \

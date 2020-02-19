@@ -4,9 +4,7 @@
 #include "../../core/cr-static.hpp"
 #include "../../core/cr-types.hpp"
 #include "../../core/sync/cr-sync-end-caller.hpp"
-#include "../texture/rnd-txt-format.hpp"
-#include "../texture/rnd-txt-info.hpp"
-#include "../texture/rnd-txt-sample.hpp"
+#include "../texture/rnd-txt-attachment.hpp"
 #include "rnd-eng-limitations.hpp"
 #include "rnd-eng-type.hpp"
 #include <chrono>
@@ -14,6 +12,10 @@
 
 namespace gearoenix::core {
 class FunctionLoader;
+}
+
+namespace gearoenix::core::asset {
+class Asset;
 }
 
 namespace gearoenix::core::event {
@@ -80,7 +82,6 @@ class Semaphore;
 namespace gearoenix::render::texture {
 class TextureCube;
 class Target;
-class Target2D;
 class Texture2D;
 }
 
@@ -95,7 +96,7 @@ class Engine {
     GX_GET_UPTR_PRT(command::Manager, command_manager)
     GX_GET_UPTR_PRT(sampler::Manager, sampler_manager)
     GX_GET_UPTR_PRT(buffer::Manager, buffer_manager)
-    GX_GET_CREF_PRT(std::shared_ptr<texture::Target2D>, main_render_target)
+    GX_GET_CREF_PRT(std::shared_ptr<texture::Target>, main_render_target)
     GX_GET_CREF_PRT(Limitations, limitations)
     GX_GET_VAL_PRT(unsigned int, frames_count, 2)
     GX_GET_VAL_PRT(unsigned int, frame_number, 0)
@@ -114,38 +115,39 @@ class Engine {
     // that is composed with several other render-trees
     GX_GETSET_PTR_PRT(graph::tree::Tree, render_tree)
 protected:
+    std::mutex late_delete_assets_guard;
+    std::vector<std::vector<std::shared_ptr<core::asset::Asset>>> late_delete_assets;
+    std::size_t late_delete_index = 0;
     std::chrono::time_point<std::chrono::high_resolution_clock> last_frame_time = std::chrono::high_resolution_clock::now();
     Engine(system::Application* system_application, Type engine_type) noexcept;
+    void do_late_delete() noexcept;
 
 public:
     virtual ~Engine() noexcept;
+    void late_delete(std::shared_ptr<core::asset::Asset> asset) noexcept;
     virtual void update() noexcept;
     virtual void terminate() noexcept;
     [[nodiscard]] virtual std::shared_ptr<sync::Semaphore> create_semaphore() const noexcept = 0;
-    /// Caller of this function must maintain the pointer to data until call of EndCaller.
+    /// Data will be copied
     [[nodiscard]] virtual std::shared_ptr<texture::Texture2D> create_texture_2d(
         core::Id id,
         const void* data,
-        texture::TextureFormat f,
-        texture::SampleInfo s,
-        unsigned int width,
-        unsigned int height,
+        const texture::TextureInfo& info,
+        unsigned int img_width,
+        unsigned int img_height,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
         = 0;
-    /// Caller of this function must maintain the pointer to data until call of EndCaller.
+    /// Data will be copied
     [[nodiscard]] virtual std::shared_ptr<texture::TextureCube> create_texture_cube(
         core::Id id,
         const void* data,
-        texture::TextureFormat f,
-        texture::SampleInfo s,
+        const texture::TextureInfo& info,
         unsigned int aspect,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
         = 0;
     [[nodiscard]] virtual std::shared_ptr<texture::Target> create_render_target(
         core::Id id,
-        const std::vector<texture::Info>& infos,
-        unsigned int width,
-        unsigned int height,
+        const std::vector<texture::AttachmentInfo>& infos,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
         = 0;
     virtual void submit(

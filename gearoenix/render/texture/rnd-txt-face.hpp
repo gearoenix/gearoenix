@@ -3,12 +3,12 @@
 #include "../../core/cr-types.hpp"
 namespace gearoenix::render::texture {
 enum struct Face : core::TypeId {
-    POSITIVE_X = 1,
-    NEGATIVE_X = 2,
-    POSITIVE_Y = 3,
-    NEGATIVE_Y = 4,
-    POSITIVE_Z = 5,
-    NEGATIVE_Z = 6,
+    PositiveX = 1,
+    NegativeX = 2,
+    PositiveY = 3,
+    NegativeY = 4,
+    PositiveZ = 5,
+    NegativeZ = 6,
 };
 }
 #endif

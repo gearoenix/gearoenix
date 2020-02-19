@@ -3,18 +3,18 @@
 #include "../../core/cr-types.hpp"
 namespace gearoenix::render::texture {
 enum struct Filter : core::TypeId {
-    CUBIC = 1,
-    CUBIC_MIPMAP_CUBIC = 2,
-    CUBIC_MIPMAP_LINEAR = 3,
-    CUBIC_MIPMAP_NEAREST = 4,
-    LINEAR = 5,
-    LINEAR_MIPMAP_CUBIC = 6,
-    LINEAR_MIPMAP_LINEAR = 7,
-    LINEAR_MIPMAP_NEAREST = 8,
-    NEAREST = 9,
-    NEAREST_MIPMAP_CUBIC = 10,
-    NEAREST_MIPMAP_LINEAR = 11,
-    NEAREST_MIPMAP_NEAREST = 12,
+    Cubic = 1,
+    CubicMipmapCubic = 2,
+    CubicMipmapLinear = 3,
+    CubicMipmapNearest = 4,
+    Linear = 5,
+    LinearMipmapCubic = 6,
+    LinearMipmapLinear = 7,
+    LinearMipmapNearest = 8,
+    Nearest = 9,
+    NearestMipmapCubic = 10,
+    NearestMipmapLinear = 11,
+    NearestMipmapNearest = 12,
 };
 }
 #endif

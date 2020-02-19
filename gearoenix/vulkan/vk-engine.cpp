@@ -266,8 +266,8 @@ void gearoenix::render::Engine::terminate()
     cmemmgr = nullptr;
     delete vmemmgr;
     vmemmgr = nullptr;
-    for (sync::Fence* f : wait_fences)
-        delete f;
+    for (sync::Fence* format : wait_fences)
+        delete format;
     wait_fences.clear();
     delete render_complete_semaphore;
     render_complete_semaphore = nullptr;
@@ -275,8 +275,8 @@ void gearoenix::render::Engine::terminate()
     present_complete_semaphore = nullptr;
     delete graphic_cmd_pool;
     graphic_cmd_pool = nullptr;
-    for (Framebuffer* f : framebuffers)
-        delete f;
+    for (Framebuffer* format : framebuffers)
+        delete format;
     framebuffers.clear();
     delete render_pass;
     render_pass = nullptr;

@@ -15,7 +15,7 @@ std::shared_ptr<gearoenix::gles2::texture::Texture2D> gearoenix::gles2::texture:
     const core::Id my_id,
     engine::Engine* const e,
     const void* const data,
-    const render::texture::TextureFormat f,
+    const render::texture::TextureFormat format,
     const render::texture::SampleInfo s,
     const unsigned int img_width,
     const unsigned int img_height,
@@ -24,11 +24,11 @@ std::shared_ptr<gearoenix::gles2::texture::Texture2D> gearoenix::gles2::texture:
     std::shared_ptr<Texture2D> result(new Texture2D(my_id, e));
     const SampleInfo sample_info(s);
     const bool needs_mipmap = sample_info.needs_mipmap();
-    const auto cf = convert(f);
+    const auto cf = convert(format);
     const auto gl_img_width = static_cast<gl::sizei>(img_width);
     const auto gl_img_height = static_cast<gl::sizei>(img_height);
     std::vector<std::uint8_t> pixels;
-    if (f == render::texture::TextureFormat::RgbaFloat32) {
+    if (format == render::texture::TextureFormat::RgbaFloat32) {
         const gl::sizei pixel_size = gl_img_width * gl_img_height * 4;
         pixels.resize(pixel_size);
         const auto raw_data = reinterpret_cast<const core::Real*>(data);
@@ -41,7 +41,7 @@ std::shared_ptr<gearoenix::gles2::texture::Texture2D> gearoenix::gles2::texture:
             else
                 pixels[i] = static_cast<std::uint8_t>(c);
         }
-    } else if (f == render::texture::TextureFormat::RgbFloat32) {
+    } else if (format == render::texture::TextureFormat::RgbFloat32) {
         const gl::sizei pixel_size = gl_img_width * gl_img_height * 3;
         pixels.resize(pixel_size);
         const auto raw_data = reinterpret_cast<const core::Real*>(data);
@@ -54,7 +54,7 @@ std::shared_ptr<gearoenix::gles2::texture::Texture2D> gearoenix::gles2::texture:
             else
                 pixels[i] = static_cast<std::uint8_t>(c);
         }
-    } else if (f == render::texture::TextureFormat::RgbaUint8) {
+    } else if (format == render::texture::TextureFormat::RgbaUint8) {
         const gl::sizei pixel_size = gl_img_width * gl_img_height * 4;
         pixels.resize(pixel_size);
         const auto raw_data = reinterpret_cast<const std::uint8_t*>(data);
@@ -82,7 +82,7 @@ std::shared_ptr<gearoenix::gles2::texture::Texture2D> gearoenix::gles2::texture:
 std::shared_ptr<gearoenix::gles2::texture::Texture2D> gearoenix::gles2::texture::Texture2D::construct(
     const core::Id id,
     engine::Engine* const e,
-    const render::texture::Info& info,
+    const render::texture::TextureInfo& info,
     const unsigned int img_width,
     const unsigned int img_height,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
@@ -90,7 +90,7 @@ std::shared_ptr<gearoenix::gles2::texture::Texture2D> gearoenix::gles2::texture:
     std::shared_ptr<Texture2D> result(new Texture2D(id, e));
     const SampleInfo sample_info(info.s);
     const bool needs_mipmap = sample_info.needs_mipmap();
-    const auto cf = convert(info.f);
+    const auto cf = convert(info.format);
     const auto gl_img_width = static_cast<gl::sizei>(img_width);
     const auto gl_img_height = static_cast<gl::sizei>(img_height);
     e->get_function_loader()->load([needs_mipmap, result, cf, gl_img_width, gl_img_height, sample_info, call] {
@@ -141,9 +141,9 @@ void gearoenix::gles2::texture::Texture2D::bind() const noexcept
     gl::Loader::bind_texture(GL_TEXTURE_2D, texture_object);
 }
 
-uint gearoenix::gles2::texture::Texture2D::convert(gearoenix::render::texture::TextureFormat f) noexcept
+uint gearoenix::gles2::texture::Texture2D::convert(gearoenix::render::texture::TextureFormat format) noexcept
 {
-    switch (f) {
+    switch (format) {
     case render::texture::TextureFormat::RgbaFloat32:
         return GL_RGBA;
     case render::texture::TextureFormat::RgbFloat32:
@@ -153,7 +153,7 @@ uint gearoenix::gles2::texture::Texture2D::convert(gearoenix::render::texture::T
     case render::texture::TextureFormat::D16:
         return GL_RGB;
     default:
-        GXLOGF("Unsupported/Unimplemented setting for texture with id " << static_cast<int>(f))
+        GXLOGF("Unsupported/Unimplemented setting for texture with id " << static_cast<int>(format))
     }
 }
 

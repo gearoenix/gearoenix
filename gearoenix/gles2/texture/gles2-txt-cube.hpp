@@ -23,7 +23,7 @@ namespace texture {
             core::Id my_id,
             engine::Engine* e,
             const void* data,
-            render::texture::TextureFormat f,
+            render::texture::TextureFormat format,
             render::texture::SampleInfo s,
             unsigned int aspect,
             const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;

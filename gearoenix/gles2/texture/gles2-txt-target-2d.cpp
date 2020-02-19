@@ -15,7 +15,7 @@
 gearoenix::gles2::texture::Target2D::Target2D(
     const core::Id id,
     engine::Engine* const e,
-    const render::texture::Info& info,
+    const render::texture::TextureInfo& info,
     const unsigned int w,
     const unsigned int h,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
@@ -55,13 +55,13 @@ gearoenix::gles2::texture::Target2D::~Target2D() noexcept = default;
 std::shared_ptr<gearoenix::gles2::texture::Target2D> gearoenix::gles2::texture::Target2D::construct(
     const core::Id id,
     engine::Engine* const e,
-    const render::texture::Info& info,
+    const render::texture::TextureInfo& info,
     const unsigned int w,
     const unsigned int h,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
 {
     const std::shared_ptr<Target2D> result(new Target2D(id, e, info, w, h, call));
-    if (info.f != render::texture::TextureFormat::D16)
+    if (info.format != render::texture::TextureFormat::D16)
         GXLOGF("GLES2 backend only supports 16bits depth attachment right now.")
     e->get_function_loader()->load([result, call, w, h] {
         result->base->generate_framebuffer(result->txt.get(), w, h);

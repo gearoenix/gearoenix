@@ -41,7 +41,7 @@ namespace gearoenix::render::texture {
 class Texture;
 class Texture2D;
 class TextureCube;
-class Target2D;
+class Target;
 }
 
 namespace gearoenix::render::graph::node {
@@ -77,7 +77,7 @@ struct ShadowMapperFrame {
 class ShadowMapper : public Node {
 private:
     std::vector<std::unique_ptr<ShadowMapperFrame>> frames;
-    std::shared_ptr<texture::Target2D> shadow_map_render_target;
+    std::shared_ptr<texture::Target> shadow_map_render_target;
     ShadowMapperFrame* frame = nullptr;
 
 public:

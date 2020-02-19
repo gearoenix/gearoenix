@@ -4,10 +4,11 @@
 #include "rnd-txt-sample.hpp"
 #include "rnd-txt-type.hpp"
 namespace gearoenix::render::texture {
-struct Info {
-    TextureFormat f = TextureFormat::RgbaUint8;
-    SampleInfo s;
-    Type t = Type::Texture2D;
+struct TextureInfo {
+    TextureFormat format = TextureFormat::RgbaUint8;
+    SampleInfo sample_info;
+    Type texture_type = Type::Texture2D;
+    bool has_mipmap = true;
 };
 }
 #endif

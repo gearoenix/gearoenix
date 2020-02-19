@@ -29,7 +29,7 @@
 //        public:
 //            Placer(
 //				const core::Id my_id,
-//				const std::shared_ptr<system::stream::Stream> &f,
+//				const std::shared_ptr<system::stream::Stream> &format,
 //				const std::shared_ptr<render::engine::Engine> &e,
 //				const core::sync::EndCaller<core::sync::EndCallerIgnore> c);
 //            virtual ~Placer();
