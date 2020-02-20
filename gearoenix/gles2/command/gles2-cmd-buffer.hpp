@@ -6,7 +6,7 @@
 #include "../../render/command/rnd-cmd-buffer.hpp"
 
 namespace gearoenix::gles2::command {
-class Buffer : public render::command::Buffer {
+class Buffer final : public render::command::Buffer {
 public:
     ~Buffer() noexcept final = default;
     [[nodiscard]] gl::uint play(gl::uint bound_shader_program = static_cast<gl::uint>(-1)) const noexcept;

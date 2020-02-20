@@ -10,7 +10,7 @@ class Texture2D;
 }
 
 namespace gearoenix::glc3::engine {
-class Engine : public render::engine::Engine {
+class Engine final : public render::engine::Engine {
 private:
     explicit Engine(system::Application* sys_app, render::engine::Type engine_type) noexcept;
 

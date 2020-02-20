@@ -16,8 +16,6 @@ struct SampleInfo {
 
     SampleInfo() noexcept = default;
     explicit SampleInfo(const render::texture::SampleInfo& o) noexcept;
-
-    [[nodiscard]] bool needs_mipmap() const noexcept;
 };
 }
 #endif

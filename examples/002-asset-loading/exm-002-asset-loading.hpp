@@ -10,7 +10,7 @@ namespace gearoenix::render::graph::tree {
 class Pbr;
 }
 
-class GameApp : public gearoenix::core::Application {
+class GameApp final : public gearoenix::core::Application {
 private:
     using GxScene = gearoenix::render::scene::Scene;
     using GxGrPbr = gearoenix::render::graph::tree::Pbr;

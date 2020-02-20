@@ -42,7 +42,7 @@ struct EditTheme {
     core::Real cursor_state_time = 0.125f;
     core::Real cursor_blink_time = 0.125f;
 };
-class Edit : public Widget, public core::event::Listener {
+class Edit final : public Widget, public core::event::Listener {
 public:
     GX_GET_CPTR_PRV(core::event::Engine, event_engine)
     GX_GET_CREF_PRV(std::shared_ptr<font::Font2D>, text_font)

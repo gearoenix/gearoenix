@@ -36,8 +36,8 @@ class Text;
 class Edit;
 }
 
-class IblBakerApp : public gearoenix::core::Application,
-                    public gearoenix::core::event::Listener {
+class IblBakerApp final : public gearoenix::core::Application,
+                          public gearoenix::core::event::Listener {
 private:
     using GxGameScene = gearoenix::render::scene::Game;
     using GxStaticModel = gearoenix::render::model::Static;

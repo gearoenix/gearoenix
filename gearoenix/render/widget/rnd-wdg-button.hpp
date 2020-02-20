@@ -21,7 +21,7 @@ struct ButtonTheme {
     core::Real text_scale = 0.9f;
     const TextTheme* text_theme = nullptr;
 };
-class Button : public Widget {
+class Button final : public Widget {
     GX_GET_CREF_PRV(std::shared_ptr<Text>, text)
     GX_GET_CREF_PRV(std::shared_ptr<material::Unlit>, background_material)
     GX_GET_CREF_PRV(ButtonTheme, theme)

@@ -83,6 +83,8 @@ std::shared_ptr<gearoenix::glc3::texture::Texture2D> gearoenix::glc3::texture::T
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
 {
     std::shared_ptr<Texture2D> result(new Texture2D(my_id, info.format, e));
+    result->img_width = img_width;
+    result->img_height = img_height;
     const SampleInfo sample_info(info.sample_info);
     const bool needs_mipmap = info.has_mipmap;
     const auto internal_format = convert_internal_format(info.format);

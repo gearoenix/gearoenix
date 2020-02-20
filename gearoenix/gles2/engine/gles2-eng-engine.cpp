@@ -17,7 +17,6 @@
 #include "../sync/gles2-sy-semaphore.hpp"
 #include "../texture/gles2-txt-2d.hpp"
 #include "../texture/gles2-txt-cube.hpp"
-#include "../texture/gles2-txt-target-2d.hpp"
 #include "../texture/gles2-txt-target.hpp"
 
 void gearoenix::gles2::engine::Engine::initialize() noexcept
@@ -47,7 +46,7 @@ gearoenix::gles2::engine::Engine* gearoenix::gles2::engine::Engine::construct(sy
 #ifdef GX_DEBUG_GLES2
     gl::Loader::check_for_error();
 #endif
-    e->main_render_target = std::make_unique<texture::Target2D>(e);
+    e->main_render_target = std::make_unique<texture::Target>(e);
 #ifdef GX_DEBUG_GLES2
     gl::Loader::check_for_error();
 #endif
@@ -97,36 +96,32 @@ std::shared_ptr<gearoenix::render::sync::Semaphore> gearoenix::gles2::engine::En
 std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::gles2::engine::Engine::create_texture_2d(
     const core::Id id,
     const void* data,
-    const render::texture::TextureFormat format,
-    const render::texture::SampleInfo s,
+    const render::texture::TextureInfo& info,
     const unsigned int img_width,
     const unsigned int img_height,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
 {
-    return texture::Texture2D::construct(id, this, data, format, s, img_width, img_height, call);
+    return texture::Texture2D::construct(id, this, data, info, img_width, img_height, call);
 }
 
 std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::gles2::engine::Engine::create_texture_cube(
     const core::Id id,
     const void* data,
-    const render::texture::TextureFormat format,
-    const render::texture::SampleInfo s,
+    const render::texture::TextureInfo& info,
     const unsigned int aspect,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
 {
-    return texture::TextureCube::construct(id, this, data, format, s, aspect, call);
+    return texture::TextureCube::construct(id, this, data, info, aspect, call);
 }
 
 std::shared_ptr<gearoenix::render::texture::Target> gearoenix::gles2::engine::Engine::create_render_target(
     core::Id id,
-    const std::vector<render::texture::TextureInfo>& infos,
-    unsigned int width,
-    unsigned int height,
+    const std::vector<render::texture::AttachmentInfo>& infos,
     const gearoenix::core::sync::EndCaller<gearoenix::core::sync::EndCallerIgnore>& call) noexcept
 {
     if (infos.size() > 1)
         GXLOGF("This engine only support at max one texture for render target.")
-    return texture::Target::construct(id, this, infos[0], width, height, call);
+    return texture::Target::construct(id, this, infos[0], call);
 }
 
 void gearoenix::gles2::engine::Engine::submit(

@@ -16,7 +16,7 @@ void gearoenix::system::stream::Asset::check_endian_compatibility() noexcept
     endian_compatibility = (resource_endian == ((uint8_t*)(&system_endian))[0]);
 }
 
-gearoenix::system::stream::Asset::Asset() noexcept {}
+gearoenix::system::stream::Asset::Asset() noexcept { }
 
 gearoenix::system::stream::Asset::~Asset() noexcept
 {

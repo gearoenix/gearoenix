@@ -11,7 +11,6 @@
 
 gearoenix::glc3::texture::Framebuffer::~Framebuffer() noexcept
 {
-
     if (borrowed) // It means that this is the main render target
         return;
     gl_e->get_function_loader()->load([cf { framebuffer }, cr { depth_buffer }] {
@@ -41,7 +40,7 @@ gearoenix::glc3::texture::Target::Target(
 
 gearoenix::glc3::texture::Target::Target(const Target& o) noexcept = default;
 
-void gearoenix::glc3::texture::Target::initialize_texture(
+void gearoenix::glc3::texture::Target::initialize_textures(
     const std::vector<render::texture::AttachmentInfo>& infos,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
 {
@@ -206,7 +205,7 @@ std::shared_ptr<gearoenix::render::texture::Target> gearoenix::glc3::texture::Ta
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
 {
     const std::shared_ptr<Target> result(new Target(id, e));
-    result->initialize_texture(infos, call);
+    result->initialize_textures(infos, call);
     e->get_function_loader()->load([result, call] {
         result->generate_framebuffer();
     });

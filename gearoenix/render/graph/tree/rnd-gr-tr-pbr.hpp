@@ -26,7 +26,7 @@ namespace gearoenix::render::camera {
 class Camera;
 }
 namespace gearoenix::render::graph::tree {
-class Pbr : public Tree {
+class Pbr final : public Tree {
 public:
     struct Nodes {
         node::ForwardPbr* forward_pbr = nullptr;

@@ -34,10 +34,12 @@ std::shared_ptr<gearoenix::glc3::texture::TextureCube> gearoenix::glc3::texture:
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
 {
     const std::shared_ptr<TextureCube> result(new TextureCube(id, info.format, engine));
+    result->aspect = aspect;
     const SampleInfo sample_info = SampleInfo(info.sample_info);
     gl::uint cf;
     const auto gl_aspect = static_cast<gl::sizei>(aspect);
     std::vector<std::vector<std::uint8_t>> pixels(GX_COUNT_OF(FACES));
+    // TODO: change this
     if (info.format == render::texture::TextureFormat::RgbaFloat32 && aspect == 1) {
         cf = GL_RGBA;
         const gl::sizei pixel_size = gl_aspect * gl_aspect * 4;
@@ -131,7 +133,7 @@ gearoenix::glc3::texture::TextureCube::~TextureCube() noexcept
 void gearoenix::glc3::texture::TextureCube::bind(gl::enumerated texture_unit) const noexcept
 {
     gl::Loader::active_texture(GL_TEXTURE0 + texture_unit);
-    gl::Loader::bind_texture(GL_TEXTURE_CUBE_MAP, texture_object);
+    bind();
 }
 
 void gearoenix::glc3::texture::TextureCube::bind() const noexcept

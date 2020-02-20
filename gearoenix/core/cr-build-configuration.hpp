@@ -17,7 +17,7 @@
 #define GX_USE_OPENGL_43
 #define GX_USE_OPENGL_33
 #define GX_USE_OPENGL_ES3
-//#define GX_USE_OPENGL_ES2
+#define GX_USE_OPENGL_ES2
 #define GX_IN_DESKTOP
 //#define GX_USE_GLFW
 #elif defined(WIN32) || defined(WIN64) || defined(_WIN32) || defined(_WIN64)

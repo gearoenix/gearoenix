@@ -11,7 +11,7 @@ namespace engine {
     class Engine;
 }
 namespace buffer {
-    class Index : public render::buffer::Static {
+    class Index final : public render::buffer::Static {
     public:
     private:
         gl::uint bo = 0;

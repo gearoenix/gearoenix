@@ -23,7 +23,7 @@ class Application;
 }
 
 namespace gearoenix::system::stream {
-class Asset : public Stream {
+class Asset final : public Stream {
 private:
 #ifdef GX_USE_STD_FILE
     std::ifstream file;

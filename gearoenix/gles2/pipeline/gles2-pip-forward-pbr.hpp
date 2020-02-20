@@ -13,7 +13,7 @@ class ForwardPbr;
 }
 
 namespace gearoenix::gles2::pipeline {
-class ForwardPbr : public render::pipeline::ForwardPbr {
+class ForwardPbr final : public render::pipeline::ForwardPbr {
 private:
     const std::shared_ptr<shader::ForwardPbr> shd;
     std::weak_ptr<ForwardPbr> self;

@@ -13,7 +13,7 @@ class ShadowMapper;
 }
 
 namespace gearoenix::glc3::pipeline {
-class ShadowMapper : public render::pipeline::ShadowMapper {
+class ShadowMapper final : public render::pipeline::ShadowMapper {
 private:
     const std::shared_ptr<shader::ShadowMapper> shd;
     std::weak_ptr<ShadowMapper> self;

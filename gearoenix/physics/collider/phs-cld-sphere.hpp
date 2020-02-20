@@ -3,7 +3,7 @@
 #include "../../math/math-sphere.hpp"
 #include "phs-cld-collider.hpp"
 namespace gearoenix::physics::collider {
-class Sphere : public Collider {
+class Sphere final : public Collider {
     GX_GET_CREF_PRV(math::Sphere, sphere)
 public:
     Sphere(const math::Vec3& c, core::Real r) noexcept;

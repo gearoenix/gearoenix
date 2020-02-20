@@ -6,10 +6,10 @@
 #include "../../render/command/rnd-cmd-buffer.hpp"
 
 namespace gearoenix::glc3::command {
-class Buffer : public render::command::Buffer {
+class Buffer final : public render::command::Buffer {
 public:
     ~Buffer() noexcept final = default;
-    gl::uint play(gl::uint bound_shader_program = static_cast<gl::uint>(-1)) const noexcept;
+    [[nodiscard]] gl::uint play(gl::uint bound_shader_program = static_cast<gl::uint>(-1)) const noexcept;
 };
 }
 #endif

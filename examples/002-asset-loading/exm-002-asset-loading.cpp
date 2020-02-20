@@ -61,7 +61,7 @@ GameApp::~GameApp() noexcept
 {
 }
 
-void GameApp::update() noexcept {}
+void GameApp::update() noexcept { }
 
 void GameApp::terminate() noexcept
 {

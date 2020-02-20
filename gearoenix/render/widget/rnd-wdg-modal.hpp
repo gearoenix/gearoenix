@@ -5,7 +5,7 @@
 
 namespace gearoenix::render::widget {
 class Button;
-class Modal : public Widget {
+class Modal final : public Widget {
 private:
     std::shared_ptr<Button> close_mdl;
     std::function<void()> on_close = []() noexcept {};

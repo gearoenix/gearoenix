@@ -13,7 +13,7 @@ class Engine;
 }
 
 namespace gearoenix::gles2::shader {
-class Unlit : public Shader {
+class Unlit final : public Shader {
     GX_GLES2_UNIFORM_FLOAT(material_alpha, 1)
     GX_GLES2_UNIFORM_FLOAT(material_alpha_cutoff, 1)
     GX_GLES2_UNIFORM_TEXTURE(material_color)

@@ -3,7 +3,7 @@
 #include "rnd-scn-scene.hpp"
 
 namespace gearoenix::render::scene {
-class Game : public Scene {
+class Game final : public Scene {
 public:
     Game(
         core::Id my_id, system::stream::Stream* f, engine::Engine* e,

@@ -59,7 +59,7 @@ struct SkyboxEquirectangularFrame {
     ~SkyboxEquirectangularFrame() noexcept;
 };
 
-class SkyboxEquirectangular : public Node {
+class SkyboxEquirectangular final : public Node {
 private:
     std::vector<std::unique_ptr<SkyboxEquirectangularFrame>> frames;
     SkyboxEquirectangularFrame* frame = nullptr;

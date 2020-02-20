@@ -211,11 +211,13 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::font::
     }
     constexpr texture::TextureInfo txt_info {
         .format = texture::TextureFormat::RgbaUint8,
-        .sample_info.mag_filter = texture::Filter::Linear,
-        .sample_info.min_filter = texture::Filter::LinearMipmapLinear,
-        .sample_info.wrap_r = texture::Wrap::ClampToEdge,
-        .sample_info.wrap_s = texture::Wrap::ClampToEdge,
-        .sample_info.wrap_t = texture::Wrap::ClampToEdge,
+        .sample_info = texture::SampleInfo {
+            .min_filter = texture::Filter::LinearMipmapLinear,
+            .mag_filter = texture::Filter::Linear,
+            .wrap_s = texture::Wrap::ClampToEdge,
+            .wrap_t = texture::Wrap::ClampToEdge,
+            .wrap_r = texture::Wrap::ClampToEdge,
+        },
         .texture_type = texture::Type::Texture2D,
     };
     return txt_mgr->create_2d(img_pixels, txt_info, img_width_pixels, img_height_pixels, end);

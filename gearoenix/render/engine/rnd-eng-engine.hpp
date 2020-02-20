@@ -135,29 +135,25 @@ public:
         const texture::TextureInfo& info,
         unsigned int img_width,
         unsigned int img_height,
-        const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
-        = 0;
+        const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept = 0;
     /// Data will be copied
     [[nodiscard]] virtual std::shared_ptr<texture::TextureCube> create_texture_cube(
         core::Id id,
         const void* data,
         const texture::TextureInfo& info,
         unsigned int aspect,
-        const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
-        = 0;
+        const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept = 0;
     [[nodiscard]] virtual std::shared_ptr<texture::Target> create_render_target(
         core::Id id,
         const std::vector<texture::AttachmentInfo>& infos,
-        const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
-        = 0;
+        const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept = 0;
     virtual void submit(
         std::size_t pres_count,
         const sync::Semaphore* const* pres,
         std::size_t cmds_count,
         const command::Buffer* const* cmds,
         std::size_t nxts_count,
-        const sync::Semaphore* const* nxts) noexcept
-        = 0;
+        const sync::Semaphore* const* nxts) noexcept = 0;
 };
 }
 #endif

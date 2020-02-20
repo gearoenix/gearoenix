@@ -6,20 +6,18 @@ gearoenix::system::stream::Local::Local(const std::string& name, bool writable) 
     : file(name, std::ios::binary | (writable ? std::ios::out : std::ios::in))
 {
     if (!file.is_open())
-        GXUNEXPECTED;
+        GXUNEXPECTED
 }
 
-gearoenix::system::stream::Local::~Local() noexcept
-{
-}
+gearoenix::system::stream::Local::~Local() noexcept = default;
 
 gearoenix::core::Count gearoenix::system::stream::Local::read(void* data, core::Count length) noexcept
 {
     file.read((char*)data, length);
-    const core::Count result = (core::Count)file.gcount();
+    const auto result = (core::Count)file.gcount();
 #ifdef GX_DEBUG_MODE
     if (0 == result)
-        GXUNEXPECTED;
+        GXUNEXPECTED
 #endif
     file.seekp(file.tellg());
     return result;
@@ -32,7 +30,7 @@ gearoenix::core::Count gearoenix::system::stream::Local::write(const void* data,
     const core::Count result = ((core::Count)file.tellp()) - before;
 #ifdef GX_DEBUG_MODE
     if (0 == result)
-        GXUNEXPECTED;
+        GXUNEXPECTED
 #endif
     file.seekg(file.tellp());
     return result;
@@ -53,4 +51,9 @@ bool gearoenix::system::stream::Local::exist(const std::string& name) noexcept
 {
     std::ifstream f(name);
     return f.good();
+}
+
+gearoenix::core::Count gearoenix::system::stream::Local::size() noexcept
+{
+    GXUNIMPLEMENTED
 }

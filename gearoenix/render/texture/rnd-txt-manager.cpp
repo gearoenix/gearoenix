@@ -27,8 +27,8 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
             TextureInfo {
                 .format = TextureFormat::RgbaFloat32,
                 .sample_info = SampleInfo {
-                    .mag_filter = Filter::Nearest,
                     .min_filter = Filter::Nearest,
+                    .mag_filter = Filter::Nearest,
                     .wrap_s = Wrap::Repeat,
                     .wrap_t = Wrap::Repeat,
                     .wrap_r = Wrap::Repeat,
@@ -169,14 +169,14 @@ std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::render::text
             id, color.data(),
             TextureInfo {
                 .format = TextureFormat::RgbaFloat32,
-                .texture_type = Type::TextureCube,
                 .sample_info = SampleInfo {
-                    .mag_filter = Filter::Nearest,
                     .min_filter = Filter::Nearest,
+                    .mag_filter = Filter::Nearest,
                     .wrap_s = Wrap::Repeat,
                     .wrap_t = Wrap::Repeat,
                     .wrap_r = Wrap::Repeat,
                 },
+                .texture_type = Type::TextureCube,
                 .has_mipmap = false,
             },
             1, core::sync::EndCaller<core::sync::EndCallerIgnore>([c] {}));

@@ -218,7 +218,7 @@ std::size_t gearoenix::core::OneLoopPool<T>::size() const noexcept
 template <class T>
 template <typename I>
 typename std::enable_if<std::is_integral<I>::value, const T&>::type
-    gearoenix::core::OneLoopPool<T>::operator[](const I index) const noexcept
+gearoenix::core::OneLoopPool<T>::operator[](const I index) const noexcept
 {
 #ifdef GX_DEBUG_MODE
     if (index < 0 || static_cast<std::size_t>(index) >= current_index)
@@ -230,7 +230,7 @@ typename std::enable_if<std::is_integral<I>::value, const T&>::type
 template <class T>
 template <typename I>
 typename std::enable_if<std::is_integral<I>::value, T&>::type
-    gearoenix::core::OneLoopPool<T>::operator[](const I index) noexcept
+gearoenix::core::OneLoopPool<T>::operator[](const I index) noexcept
 {
 #ifdef GX_DEBUG_MODE
     if (index < 0 || static_cast<std::size_t>(index) >= current_index)

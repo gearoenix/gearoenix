@@ -86,7 +86,7 @@ struct ForwardPbrFrame {
 /// This renders only one directional light with one shadow map.
 /// In here I do not care for race issues (for performance reason).
 /// The user of this class must use its functionality in their correct contexts.
-class ForwardPbr : public Node {
+class ForwardPbr final : public Node {
 private:
     std::vector<std::unique_ptr<ForwardPbrFrame>> frames;
     ForwardPbrFrame* frame = nullptr;

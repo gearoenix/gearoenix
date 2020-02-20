@@ -7,25 +7,26 @@
 #include "../../math/math-vertex.hpp"
 #include "../../render/buffer/rnd-buf-static.hpp"
 #include <vector>
-namespace gearoenix::gles2 {
-namespace engine {
-    class Engine;
-}
-namespace buffer {
-    class Vertex : public render::buffer::Static {
-    public:
-    private:
-        gl::uint bo = 0;
 
-    public:
-        Vertex(
-            const std::vector<math::BasicVertex>& vertices,
-            engine::Engine* e,
-            const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
-        ~Vertex() noexcept final;
-        void bind() const noexcept;
-    };
+namespace gearoenix::gles2::engine {
+class Engine;
 }
+
+namespace gearoenix::gles2::buffer {
+class Vertex final : public render::buffer::Static {
+public:
+private:
+    gl::uint bo = 0;
+
+public:
+    Vertex(
+        const std::vector<math::BasicVertex>& vertices,
+        engine::Engine* e,
+        const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+    ~Vertex() noexcept final;
+    void bind() const noexcept;
+};
 }
+
 #endif
 #endif

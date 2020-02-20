@@ -13,7 +13,7 @@ class Engine;
 }
 
 namespace gearoenix::glc3::shader {
-class SkyboxEquirectangular : public Shader {
+class SkyboxEquirectangular final : public Shader {
     GX_GLC3_UNIFORM_FLOAT(material_alpha, 1)
     GX_GLC3_UNIFORM_FLOAT(material_alpha_cutoff, 1)
     GX_GLC3_UNIFORM_TEXTURE(material_color)

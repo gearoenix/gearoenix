@@ -4,23 +4,20 @@
 #include "sys-stm-stream.hpp"
 #include <vector>
 
-namespace gearoenix {
-namespace system {
-    namespace stream {
-        class Memory : public Stream {
-        private:
-            std::vector<unsigned char> mem_data;
-            core::Count index = 0;
+namespace gearoenix::system::stream {
+class Memory final : public Stream {
+private:
+    std::vector<unsigned char> mem_data;
+    core::Count index = 0;
 
-        public:
-            Memory() noexcept;
-            ~Memory() noexcept final;
-            core::Count read(void* d, core::Count length) noexcept;
-            core::Count write(const void* d, core::Count length) noexcept;
-            void seek(core::Count offset) noexcept;
-            core::Count tell() noexcept;
-        };
-    }
-}
+public:
+    Memory() noexcept;
+    ~Memory() noexcept final;
+    [[nodiscard]] core::Count read(void* d, core::Count length) noexcept final;
+    [[nodiscard]] core::Count write(const void* d, core::Count length) noexcept final;
+    void seek(core::Count offset) noexcept final;
+    [[nodiscard]] core::Count tell() noexcept final;
+    [[nodiscard]] core::Count size() noexcept final;
+};
 }
 #endif

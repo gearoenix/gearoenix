@@ -6,14 +6,8 @@
 #include "../../gl/gl-constants.hpp"
 #include "../../gl/gl-types.hpp"
 #include "../../render/texture/rnd-txt-target.hpp"
-#include "../../render/texture/rnd-txt-texture-info.hpp"
 #include <optional>
 #include <vector>
-
-namespace gearoenix::render::texture {
-class Target;
-class Texture;
-}
 
 namespace gearoenix::glc3::engine {
 class Engine;
@@ -32,7 +26,7 @@ struct Framebuffer {
     void bind() const noexcept;
 };
 
-class Target : public render::texture::Target {
+class Target final : public render::texture::Target {
     GX_GET_CREF_PRV(std::shared_ptr<Framebuffer>, framebuffer)
     GX_GET_CPTR_PRV(engine::Engine, gl_e)
 private:
@@ -42,7 +36,7 @@ private:
     Target(core::Id id, engine::Engine* e) noexcept;
     Target(const Target&) noexcept;
 
-    void initialize_texture(
+    void initialize_textures(
         const std::vector<render::texture::AttachmentInfo>& infos,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
     void state_init() const noexcept;

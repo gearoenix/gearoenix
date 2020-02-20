@@ -103,7 +103,7 @@ void gearoenix::glc3::engine::Engine::submit(
     gl::Loader::check_for_error();
 #endif
     for (std::size_t i = 0; i < cmds_count; ++i)
-        reinterpret_cast<const command::Buffer*>(cmds[i])->play();
+        (void)static_cast<const command::Buffer*>(cmds[i])->play();
 #ifdef GX_DEBUG_GL_CLASS_3
     gl::Loader::check_for_error();
 #endif

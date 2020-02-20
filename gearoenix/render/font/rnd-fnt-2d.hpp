@@ -14,7 +14,7 @@ class Texture2D;
 }
 
 namespace gearoenix::render::font {
-class Font2D : public Font {
+class Font2D final : public Font {
 private:
     texture::Manager* const txt_mgr;
     std::vector<unsigned char> ttf_data;

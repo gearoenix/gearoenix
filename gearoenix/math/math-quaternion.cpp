@@ -1,6 +1,6 @@
 #include "math-quaternion.hpp"
 
-gearoenix::math::Quat::Quat() {}
+gearoenix::math::Quat::Quat() { }
 
 gearoenix::math::Quat::Quat(const core::Real x, const core::Real y, const core::Real z, const core::Real w)
     : x(x)

@@ -70,7 +70,6 @@ gearoenix::render::graph::node::ShadowMapper::ShadowMapper(
         { texture::AttachmentInfo {
             .texture_info = texture::TextureInfo {
                 .format = week_hwr ? texture::TextureFormat::D16 : texture::TextureFormat::D32,
-                .texture_type = texture::Type::Texture2D,
                 .sample_info = texture::SampleInfo {
                     .min_filter = texture::Filter::Nearest,
                     .mag_filter = texture::Filter::Nearest,
@@ -78,6 +77,7 @@ gearoenix::render::graph::node::ShadowMapper::ShadowMapper(
                     .wrap_t = texture::Wrap::ClampToEdge,
                     .wrap_r = texture::Wrap::ClampToEdge,
                 },
+                .texture_type = texture::Type::Texture2D,
                 .has_mipmap = false,
             },
             .img_width = static_cast<unsigned int>(week_hwr ? 1024 : 2048),

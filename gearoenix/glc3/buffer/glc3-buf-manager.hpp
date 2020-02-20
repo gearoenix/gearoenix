@@ -8,7 +8,7 @@ namespace engine {
     class Engine;
 }
 namespace buffer {
-    class Manager : public render::buffer::Manager {
+    class Manager final : public render::buffer::Manager {
     public:
         explicit Manager(engine::Engine* e) noexcept;
         ~Manager() noexcept final = default;

@@ -8,7 +8,7 @@ class Engine;
 }
 
 namespace gearoenix::gles2::shader {
-class ShadowMapper : public Shader {
+class ShadowMapper final : public Shader {
     GX_GLES2_UNIFORM_TEXTURE(material_color)
     GX_GLES2_UNIFORM_FLOAT(effect_alpha, 1)
     GX_GLES2_UNIFORM_FLOAT(effect_alpha_cutoff, 1)

@@ -13,8 +13,8 @@ namespace gearoenix::render::scene {
 class Ui;
 }
 
-class Example003UiWidgetsApp : public gearoenix::core::Application,
-                               public gearoenix::core::event::Listener {
+class Example003UiWidgetsApp final : public gearoenix::core::Application,
+                                     public gearoenix::core::event::Listener {
 private:
     using GxUiScene = gearoenix::render::scene::Ui;
     using GxGrPbr = gearoenix::render::graph::tree::Pbr;

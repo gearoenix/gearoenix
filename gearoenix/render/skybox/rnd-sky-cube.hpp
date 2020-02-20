@@ -7,7 +7,7 @@ class SkyboxCube;
 }
 
 namespace gearoenix::render::skybox {
-class Cube : public Skybox {
+class Cube final : public Skybox {
     // Just for reducing the unnecessary and repetitive casting
     GX_GET_CREF_PRV(std::shared_ptr<material::SkyboxCube>, mat_equ)
 

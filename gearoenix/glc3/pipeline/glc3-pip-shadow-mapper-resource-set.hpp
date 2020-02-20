@@ -12,7 +12,7 @@ class ShadowMapper;
 namespace gearoenix::glc3::pipeline {
 class ShadowMapper;
 class ResourceSet;
-class ShadowMapperResourceSet : public render::pipeline::ShadowMapperResourceSet {
+class ShadowMapperResourceSet final : public render::pipeline::ShadowMapperResourceSet {
     GX_GET_UCPTR_PRV(glc3::pipeline::ResourceSet, base)
 public:
     ShadowMapperResourceSet(const std::shared_ptr<shader::ShadowMapper>& shd, std::shared_ptr<ShadowMapper const> pip) noexcept;

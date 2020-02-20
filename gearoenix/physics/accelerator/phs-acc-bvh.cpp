@@ -96,7 +96,7 @@ void gearoenix::physics::accelerator::Bvh::InternalNode::init(const std::vector<
     if (dimi[1].second < dimi[2].second) {
         std::swap(dimi[1], dimi[2]);
     }
-    for (const auto di : dimi) {
+    for (const auto& di : dimi) {
         struct Bin {
             std::vector<collider::Collider*> c;
             /// TODO: batch the boxing process

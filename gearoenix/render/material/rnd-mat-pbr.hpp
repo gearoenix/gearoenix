@@ -3,7 +3,7 @@
 #include "rnd-mat-material.hpp"
 
 namespace gearoenix::render::material {
-class Pbr : public Material {
+class Pbr final : public Material {
 public:
     struct Uniform {
         core::Real alpha = 1.0f;

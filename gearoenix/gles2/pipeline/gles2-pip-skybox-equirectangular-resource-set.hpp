@@ -13,7 +13,7 @@ class SkyboxEquirectangular;
 namespace gearoenix::gles2::pipeline {
 class SkyboxEquirectangular;
 class ResourceSet;
-class SkyboxEquirectangularResourceSet : public render::pipeline::SkyboxEquirectangularResourceSet {
+class SkyboxEquirectangularResourceSet final : public render::pipeline::SkyboxEquirectangularResourceSet {
     GX_GET_UCPTR_PRV(gles2::pipeline::ResourceSet, base)
 public:
     SkyboxEquirectangularResourceSet(const std::shared_ptr<shader::SkyboxEquirectangular>& shd, std::shared_ptr<SkyboxEquirectangular const> pip) noexcept;

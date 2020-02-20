@@ -8,7 +8,7 @@ namespace engine {
     class Engine;
 }
 namespace buffer {
-    class Uniform : public render::buffer::Uniform {
+    class Uniform final : public render::buffer::Uniform {
     private:
         std::vector<unsigned char> data;
 

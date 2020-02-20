@@ -6,10 +6,4 @@ gearoenix::core::gc::Range::Range(list::Node<Object*>* start, list::Node<Object*
 {
 }
 
-gearoenix::core::gc::Range::Range() {}
-
-void gearoenix::core::gc::Range::operator=(const Range& r)
-{
-    start = r.start;
-    end = r.end;
-}
+gearoenix::core::gc::Range::Range() = default;

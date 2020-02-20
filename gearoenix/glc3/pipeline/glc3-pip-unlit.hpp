@@ -13,7 +13,7 @@ class Unlit;
 }
 
 namespace gearoenix::glc3::pipeline {
-class Unlit : public render::pipeline::Unlit {
+class Unlit final : public render::pipeline::Unlit {
 private:
     const std::shared_ptr<shader::Unlit> shd;
     std::weak_ptr<Unlit> self;

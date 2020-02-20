@@ -6,29 +6,34 @@
 #include "../engine/gles2-eng-engine.hpp"
 #include "gles2-txt-sample.hpp"
 
-gearoenix::gles2::texture::Texture2D::Texture2D(const core::Id my_id, engine::Engine* const e) noexcept
-    : render::texture::Texture2D(my_id, e)
+gearoenix::gles2::texture::Texture2D::Texture2D(
+    const core::Id id,
+    const render::texture::TextureFormat texture_format,
+    engine::Engine* const e) noexcept
+    : render::texture::Texture2D(id, texture_format, e)
 {
 }
 
 std::shared_ptr<gearoenix::gles2::texture::Texture2D> gearoenix::gles2::texture::Texture2D::construct(
-    const core::Id my_id,
+    const core::Id id,
     engine::Engine* const e,
     const void* const data,
-    const render::texture::TextureFormat format,
-    const render::texture::SampleInfo s,
+    const render::texture::TextureInfo& info,
     const unsigned int img_width,
     const unsigned int img_height,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
 {
-    std::shared_ptr<Texture2D> result(new Texture2D(my_id, e));
-    const SampleInfo sample_info(s);
-    const bool needs_mipmap = sample_info.needs_mipmap();
-    const auto cf = convert(format);
+    const std::shared_ptr<Texture2D> result(new Texture2D(id, info.format, e));
+    result->img_width = img_width;
+    result->img_height = img_height;
+    const SampleInfo sample_info(info.sample_info);
+    const bool needs_mipmap = info.has_mipmap;
+    const auto cf = convert(info.format);
     const auto gl_img_width = static_cast<gl::sizei>(img_width);
     const auto gl_img_height = static_cast<gl::sizei>(img_height);
     std::vector<std::uint8_t> pixels;
-    if (format == render::texture::TextureFormat::RgbaFloat32) {
+    switch (info.format) {
+    case render::texture::TextureFormat::RgbaFloat32: {
         const gl::sizei pixel_size = gl_img_width * gl_img_height * 4;
         pixels.resize(pixel_size);
         const auto raw_data = reinterpret_cast<const core::Real*>(data);
@@ -41,7 +46,9 @@ std::shared_ptr<gearoenix::gles2::texture::Texture2D> gearoenix::gles2::texture:
             else
                 pixels[i] = static_cast<std::uint8_t>(c);
         }
-    } else if (format == render::texture::TextureFormat::RgbFloat32) {
+        break;
+    }
+    case render::texture::TextureFormat::RgbFloat32: {
         const gl::sizei pixel_size = gl_img_width * gl_img_height * 3;
         pixels.resize(pixel_size);
         const auto raw_data = reinterpret_cast<const core::Real*>(data);
@@ -54,14 +61,19 @@ std::shared_ptr<gearoenix::gles2::texture::Texture2D> gearoenix::gles2::texture:
             else
                 pixels[i] = static_cast<std::uint8_t>(c);
         }
-    } else if (format == render::texture::TextureFormat::RgbaUint8) {
+        break;
+    }
+    case render::texture::TextureFormat::RgbaUint8: {
         const gl::sizei pixel_size = gl_img_width * gl_img_height * 4;
         pixels.resize(pixel_size);
         const auto raw_data = reinterpret_cast<const std::uint8_t*>(data);
         for (gl::sizei i = 0; i < pixel_size; ++i)
             pixels[i] = raw_data[i];
-    } else
-        GXLOGF("Unsupported/Unimplemented setting for texture with id " << my_id)
+        break;
+    }
+    default:
+        GXLOGF("Unsupported/Unimplemented setting for texture with id " << id)
+    }
     e->get_function_loader()->load([needs_mipmap, result, pixels { move(pixels) }, cf, gl_img_width, gl_img_height, sample_info, call] {
         gl::Loader::gen_textures(1, &(result->texture_object));
         gl::Loader::bind_texture(GL_TEXTURE_2D, result->texture_object);
@@ -87,9 +99,11 @@ std::shared_ptr<gearoenix::gles2::texture::Texture2D> gearoenix::gles2::texture:
     const unsigned int img_height,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
 {
-    std::shared_ptr<Texture2D> result(new Texture2D(id, e));
-    const SampleInfo sample_info(info.s);
-    const bool needs_mipmap = sample_info.needs_mipmap();
+    std::shared_ptr<Texture2D> result(new Texture2D(id, info.format, e));
+    result->img_width = img_width;
+    result->img_height = img_height;
+    const SampleInfo sample_info(info.sample_info);
+    const bool needs_mipmap = info.has_mipmap;
     const auto cf = convert(info.format);
     const auto gl_img_width = static_cast<gl::sizei>(img_width);
     const auto gl_img_height = static_cast<gl::sizei>(img_height);
@@ -112,11 +126,11 @@ std::shared_ptr<gearoenix::gles2::texture::Texture2D> gearoenix::gles2::texture:
     return result;
 }
 
-gearoenix::gles2::texture::Texture2D::Texture2D(const core::Id my_id, const gl::uint txt_obj, engine::Engine* const e) noexcept
-    : render::texture::Texture2D(my_id, e)
-    , texture_object(txt_obj)
-{
-}
+//gearoenix::gles2::texture::Texture2D::Texture2D(const core::Id my_id, const gl::uint txt_obj, engine::Engine* const e) noexcept
+//    : render::texture::Texture2D(my_id, e)
+//    , texture_object(txt_obj)
+//{
+//}
 
 gearoenix::gles2::texture::Texture2D::~Texture2D() noexcept
 {

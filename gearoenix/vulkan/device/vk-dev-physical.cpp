@@ -131,7 +131,7 @@ gearoenix::render::device::Physical::Physical(Surface* surface)
         vulkan_data, surface->get_vulkan_data(), &surface_capabilities);
 }
 
-gearoenix::render::device::Physical::~Physical() {}
+gearoenix::render::device::Physical::~Physical() { }
 
 const VkPhysicalDeviceMemoryProperties&
 gearoenix::render::device::Physical::get_memory_properties() const

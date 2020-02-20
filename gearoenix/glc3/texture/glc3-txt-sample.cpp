@@ -63,9 +63,4 @@ gearoenix::glc3::texture::SampleInfo::SampleInfo(const render::texture::SampleIn
 #undef GX_HELPER
 }
 
-bool gearoenix::glc3::texture::SampleInfo::needs_mipmap() const noexcept
-{
-    return min_filter == GL_NEAREST_MIPMAP_LINEAR || min_filter == GL_NEAREST_MIPMAP_NEAREST || min_filter == GL_LINEAR_MIPMAP_LINEAR || min_filter == GL_LINEAR_MIPMAP_NEAREST;
-}
-
 #endif

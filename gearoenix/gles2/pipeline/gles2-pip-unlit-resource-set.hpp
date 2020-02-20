@@ -13,7 +13,7 @@ class Unlit;
 namespace gearoenix::gles2::pipeline {
 class Unlit;
 class ResourceSet;
-class UnlitResourceSet : public render::pipeline::UnlitResourceSet {
+class UnlitResourceSet final : public render::pipeline::UnlitResourceSet {
     GX_GET_UCPTR_PRV(gles2::pipeline::ResourceSet, base)
 public:
     UnlitResourceSet(const std::shared_ptr<shader::Unlit>& shd, std::shared_ptr<Unlit const> pip) noexcept;

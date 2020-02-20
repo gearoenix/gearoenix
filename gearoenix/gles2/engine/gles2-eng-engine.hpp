@@ -12,7 +12,7 @@
 #endif
 
 namespace gearoenix::gles2::engine {
-class Engine : public render::engine::Engine {
+class Engine final : public render::engine::Engine {
 private:
     void initialize() noexcept;
 #ifdef GX_GLES2_ENGINE_PROFILING
@@ -32,23 +32,19 @@ public:
     [[nodiscard]] std::shared_ptr<render::texture::Texture2D> create_texture_2d(
         core::Id id,
         const void* data,
-        render::texture::TextureFormat format,
-        render::texture::SampleInfo s,
-        unsigned int width,
-        unsigned int heigt,
+        const render::texture::TextureInfo& info,
+        unsigned int img_width,
+        unsigned int img_height,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept final;
     [[nodiscard]] std::shared_ptr<render::texture::TextureCube> create_texture_cube(
         core::Id id,
         const void* data,
-        render::texture::TextureFormat format,
-        render::texture::SampleInfo s,
+        const render::texture::TextureInfo& info,
         unsigned int aspect,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept final;
     [[nodiscard]] std::shared_ptr<render::texture::Target> create_render_target(
         core::Id id,
-        const std::vector<render::texture::TextureInfo>& infos,
-        unsigned int width,
-        unsigned int height,
+        const std::vector<render::texture::AttachmentInfo>& infos,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept final;
     void submit(
         std::size_t pres_count,

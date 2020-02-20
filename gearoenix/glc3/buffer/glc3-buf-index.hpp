@@ -6,26 +6,27 @@
 #include "../../gl/gl-types.hpp"
 #include "../../render/buffer/rnd-buf-static.hpp"
 #include <vector>
-namespace gearoenix::glc3 {
-namespace engine {
-    class Engine;
-}
-namespace buffer {
-    class Index : public render::buffer::Static {
-    public:
-    private:
-        std::atomic<gl::uint> bo;
-        gl::sizei count;
 
-    public:
-        Index(
-            const std::vector<std::uint32_t>& indices,
-            engine::Engine* e,
-            const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
-        ~Index() noexcept final;
-        void draw() const noexcept;
-    };
+namespace gearoenix::glc3::engine {
+class Engine;
 }
+
+namespace gearoenix::glc3::buffer {
+class Index final : public render::buffer::Static {
+public:
+private:
+    std::atomic<gl::uint> bo;
+    gl::sizei count;
+
+public:
+    Index(
+        const std::vector<std::uint32_t>& indices,
+        engine::Engine* e,
+        const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+    ~Index() noexcept final;
+    void draw() const noexcept;
+};
 }
+
 #endif
 #endif

@@ -14,7 +14,7 @@ namespace gearoenix::render::scene {
 class Game;
 }
 
-class GameApp : public gearoenix::core::Application {
+class GameApp final : public gearoenix::core::Application {
 private:
     using GxGameScene = gearoenix::render::scene::Game;
     using GxCamTran = gearoenix::render::camera::Transformation;

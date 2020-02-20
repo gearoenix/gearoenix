@@ -55,7 +55,7 @@ struct UnlitFrame {
     ~UnlitFrame() noexcept;
 };
 
-class Unlit : public Node {
+class Unlit final : public Node {
 private:
     std::vector<std::unique_ptr<UnlitFrame>> frames;
     UnlitFrame* frame = nullptr;

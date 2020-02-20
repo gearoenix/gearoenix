@@ -13,7 +13,7 @@ class ForwardPbr;
 namespace gearoenix::gles2::pipeline {
 class ForwardPbr;
 class ResourceSet;
-class ForwardPbrResourceSet : public render::pipeline::ForwardPbrResourceSet {
+class ForwardPbrResourceSet final : public render::pipeline::ForwardPbrResourceSet {
     GX_GET_UCPTR_PRV(gles2::pipeline::ResourceSet, base)
 public:
     ForwardPbrResourceSet(const std::shared_ptr<shader::ForwardPbr>& shd, std::shared_ptr<ForwardPbr const> pip) noexcept;

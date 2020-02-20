@@ -7,7 +7,7 @@ class SkyboxEquirectangular;
 }
 
 namespace gearoenix::render::skybox {
-class Equirectangular : public Skybox {
+class Equirectangular final : public Skybox {
     // Just for reducing the unnecessary and repetitive casting
     GX_GET_CREF_PRV(std::shared_ptr<material::SkyboxEquirectangular>, mat_equ)
 

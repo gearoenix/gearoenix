@@ -74,7 +74,7 @@ struct ShadowMapperFrame {
 /// This renders only one directional light with one shadow map.
 /// In here I do not care for race issues (for performance reason).
 /// The user of this class must use its functionality in their correct contexts.
-class ShadowMapper : public Node {
+class ShadowMapper final : public Node {
 private:
     std::vector<std::unique_ptr<ShadowMapperFrame>> frames;
     std::shared_ptr<texture::Target> shadow_map_render_target;

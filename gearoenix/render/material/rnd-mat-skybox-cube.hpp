@@ -3,7 +3,7 @@
 #include "rnd-mat-material.hpp"
 
 namespace gearoenix::render::material {
-class SkyboxCube : public Material {
+class SkyboxCube final : public Material {
 public:
     struct Uniform {
         core::Real alpha = 1.0f;

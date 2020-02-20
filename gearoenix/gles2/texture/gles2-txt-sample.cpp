@@ -43,9 +43,4 @@ gearoenix::gles2::texture::SampleInfo::SampleInfo(const render::texture::SampleI
     wrap_t = fun(o.wrap_t);
     wrap_r = fun(o.wrap_r);
 }
-
-bool gearoenix::gles2::texture::SampleInfo::needs_mipmap() const noexcept
-{
-    return min_filter == GL_NEAREST_MIPMAP_LINEAR || min_filter == GL_NEAREST_MIPMAP_NEAREST || min_filter == GL_LINEAR_MIPMAP_LINEAR || min_filter == GL_LINEAR_MIPMAP_NEAREST;
-}
 #endif

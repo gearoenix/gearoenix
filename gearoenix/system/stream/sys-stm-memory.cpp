@@ -3,9 +3,9 @@
 #include "../sys-log.hpp"
 #include <cstring>
 
-gearoenix::system::stream::Memory::Memory() noexcept {}
+gearoenix::system::stream::Memory::Memory() noexcept { }
 
-gearoenix::system::stream::Memory::~Memory() noexcept {}
+gearoenix::system::stream::Memory::~Memory() noexcept { }
 
 gearoenix::core::Count gearoenix::system::stream::Memory::read(void* d, core::Count length) noexcept
 {
@@ -49,4 +49,9 @@ void gearoenix::system::stream::Memory::seek(core::Count offset) noexcept
 gearoenix::core::Count gearoenix::system::stream::Memory::tell() noexcept
 {
     return index;
+}
+
+gearoenix::core::Count gearoenix::system::stream::Memory::size() noexcept
+{
+    return mem_data.size();
 }

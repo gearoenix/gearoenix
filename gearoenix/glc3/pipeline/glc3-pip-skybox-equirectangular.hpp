@@ -13,7 +13,7 @@ class SkyboxEquirectangular;
 }
 
 namespace gearoenix::glc3::pipeline {
-class SkyboxEquirectangular : public render::pipeline::SkyboxEquirectangular {
+class SkyboxEquirectangular final : public render::pipeline::SkyboxEquirectangular {
 private:
     const std::shared_ptr<shader::SkyboxEquirectangular> shd;
     std::weak_ptr<SkyboxEquirectangular> self;

@@ -69,7 +69,7 @@ gearoenix::render::Engine::Engine(system::Application* sys_app)
     //    setup_draw_buffers();
 }
 
-gearoenix::render::Engine::~Engine() {}
+gearoenix::render::Engine::~Engine() { }
 
 void gearoenix::render::Engine::window_changed()
 {

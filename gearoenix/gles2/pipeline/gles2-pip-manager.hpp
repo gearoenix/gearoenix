@@ -11,7 +11,7 @@ class Engine;
 
 namespace gearoenix::gles2::pipeline {
 class Pipeline;
-class Manager : public render::pipeline::Manager {
+class Manager final : public render::pipeline::Manager {
 public:
     explicit Manager(engine::Engine* engine) noexcept;
     ~Manager() noexcept final;

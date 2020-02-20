@@ -73,7 +73,7 @@ gearoenix::render::descriptor::Set::Set(Pool* pool,
     l->vkUpdateDescriptorSets(vkdev, countof(write_descriptor_sets), write_descriptor_sets, 0, nullptr);
 }
 
-gearoenix::render::descriptor::Set::~Set() {}
+gearoenix::render::descriptor::Set::~Set() { }
 
 const VkDescriptorSet& gearoenix::render::descriptor::Set::get_vulkan_data() const
 {

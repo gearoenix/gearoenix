@@ -12,7 +12,7 @@ class Engine;
 }
 
 namespace gearoenix::glc3::texture {
-class Texture2D : public render::texture::Texture2D {
+class Texture2D final : public render::texture::Texture2D {
 private:
     GX_GET_VAL_PRV(gl::uint, texture_object, 0)
 
@@ -24,15 +24,15 @@ public:
         engine::Engine* e,
         const void* data,
         const render::texture::TextureInfo& info,
-        unsigned int width,
-        unsigned int height,
+        unsigned int img_width,
+        unsigned int img_height,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
     [[nodiscard]] static std::shared_ptr<Texture2D> construct(
         core::Id id,
         engine::Engine* e,
         const render::texture::TextureInfo& info,
-        unsigned int width,
-        unsigned int height,
+        unsigned int img_width,
+        unsigned int img_height,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
     Texture2D(core::Id my_id, gl::uint txt_obj, render::texture::TextureFormat texture_format, engine::Engine* e) noexcept;
     ~Texture2D() noexcept final;
