@@ -165,8 +165,9 @@ std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::render::text
     if (!found)
         color_4d_id_cube[color] = id;
     const std::function<std::shared_ptr<Texture>()> fun = [this, color, c, id] {
+        const math::Vec4 colors[6] = { color, color, color, color, color, color };
         return e->create_texture_cube(
-            id, color.data(),
+            id, colors[0].data(),
             TextureInfo {
                 .format = TextureFormat::RgbaFloat32,
                 .sample_info = SampleInfo {
