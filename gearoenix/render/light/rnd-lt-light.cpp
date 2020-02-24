@@ -2,6 +2,7 @@
 #include "../../system/stream/sys-stm-stream.hpp"
 #include "../engine/rnd-eng-engine.hpp"
 #include "../light/rnd-lt-directional.hpp"
+#include "../scene/rnd-scn-scene.hpp"
 
 void gearoenix::render::light::Light::remove_from_shadow_cascaders() const noexcept
 {

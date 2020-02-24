@@ -1,6 +1,7 @@
 #include "rnd-mdl-transformation.hpp"
 #include "../../physics/phs-transformation.hpp"
 #include "rnd-mdl-model.hpp"
+#include "../../physics/collider/phs-cld-collider.hpp"
 
 gearoenix::render::model::Transformation::Transformation(Model* const parent) noexcept
     : parent(parent)
@@ -38,7 +39,6 @@ void gearoenix::render::model::Transformation::local_scale(const core::Real s) n
         ct->set_location((ct->get_location() - loc) * s + loc);
     }
     parent->get_collider()->local_scale(s);
-    ;
 }
 
 void gearoenix::render::model::Transformation::local_x_scale(const core::Real s) noexcept

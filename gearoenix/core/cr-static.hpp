@@ -46,12 +46,14 @@ public:                                                                 \
 #define GX_GET_UCPTR_PRV(t, x) GX_GET_UCPTR(private, t, x)
 #define GX_GETSET_UPTR_PRT(t, x) GX_GETSET_UPTR(protected, t, x)
 
-#define GX_GET_PTR(v, c, t, x)                                    \
+#define GX_GET_PTRC(v, cc, c, t, x)                               \
     v:                                                            \
-    t* c x = nullptr;                                             \
+    cc t* c x = nullptr;                                          \
                                                                   \
 public:                                                           \
-    [[nodiscard]] const t* get_##x() const noexcept { return x; } \
+    [[nodiscard]] const t* get_##x() const noexcept { return x; }
+
+#define GX_GET_PTR(v, c, t, x) GX_GET_PTRC(v, , c, t, x) \
     [[nodiscard]] t* get_##x() noexcept { return x; }
 #define GX_GET_PTR_PRT(t, x) GX_GET_PTR(protected, , t, x)
 #define GX_GET_PTR_PRV(t, x) GX_GET_PTR(private, , t, x)
@@ -60,8 +62,12 @@ public:                                                           \
 #define GX_GETSET_PTR(v, t, x) \
     GX_GET_PTR(v, , t, x)      \
     void set_##x(t* const _##x) noexcept { x = _##x; }
+#define GX_GETSET_PTRC(v, t, x) \
+    GX_GET_PTRC(v, const, , t, x)      \
+    void set_##x(const t* const _##x) noexcept { x = _##x; }
 #define GX_GETSET_PTR_PRT(t, x) GX_GETSET_PTR(protected, t, x)
 #define GX_GETSET_PTR_PRV(t, x) GX_GETSET_PTR(private, t, x)
+#define GX_GETSET_PTRC_PRV(t, x) GX_GETSET_PTRC(private, t, x)
 
 #define GX_GET_ARRC(v, t, x, c) \
     v:                          \

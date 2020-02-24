@@ -5,6 +5,7 @@
 #include "../../physics/collider/phs-cld-aabb.hpp"
 #include "../../physics/phs-engine.hpp"
 #include "../../system/sys-app.hpp"
+#include "../engine/rnd-eng-engine.hpp"
 #include "../material/rnd-mat-unlit.hpp"
 #include "../mesh/rnd-msh-manager.hpp"
 #include "../mesh/rnd-msh-mesh.hpp"

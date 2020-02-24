@@ -7,6 +7,7 @@
 #include "../../physics/collider/phs-cld-aabb.hpp"
 #include "../../physics/phs-engine.hpp"
 #include "../../system/sys-app.hpp"
+#include "../engine/rnd-eng-engine.hpp"
 #include "../font/rnd-fnt-2d.hpp"
 #include "../font/rnd-fnt-manager.hpp"
 #include "../material/rnd-mat-unlit.hpp"

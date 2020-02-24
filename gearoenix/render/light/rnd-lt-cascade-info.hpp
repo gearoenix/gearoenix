@@ -48,7 +48,7 @@ class Directional;
 ///     - record (in kernels)
 ///     - submit (in main)
 class CascadeInfo {
-    GX_GETSET_PTR_PRT(Directional, source)
+    GX_GETSET_PTRC_PRV(Directional, source)
 public:
     struct PerCascade {
 #ifdef GX_USE_OPENGL

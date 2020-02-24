@@ -2,6 +2,8 @@
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../system/stream/sys-stm-memory.hpp"
 #include "../../system/sys-app.hpp"
+#include "../../physics/collider/phs-cld-collider.hpp"
+#include "../engine/rnd-eng-engine.hpp"
 #include "../font/rnd-fnt-2d.hpp"
 #include "../font/rnd-fnt-manager.hpp"
 #include "../material/rnd-mat-unlit.hpp"

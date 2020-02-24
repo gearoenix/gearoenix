@@ -2,6 +2,7 @@
 #define GEAROENIX_RENDER_WIDGET_WIDGET_HPP
 #include "../model/rnd-mdl-model.hpp"
 #include "rnd-wdg-type.hpp"
+#include "../../math/math-vector.hpp"
 
 namespace gearoenix::render::widget {
 class Widget : public model::Model {

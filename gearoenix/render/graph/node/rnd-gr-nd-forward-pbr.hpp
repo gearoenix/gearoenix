@@ -92,7 +92,7 @@ private:
     ForwardPbrFrame* frame = nullptr;
     const scene::Scene* scn = nullptr;
     const camera::Camera* cam = nullptr;
-    std::vector<const std::map<const model::Model*, std::vector<const model::Mesh*>>*> models;
+    std::vector<std::pair<const model::Model*, const model::Mesh*>> models;
     const std::map<core::Real, std::map<light::Directional*, light::CascadeInfo*>>* directional_lights = nullptr;
 
     void record(

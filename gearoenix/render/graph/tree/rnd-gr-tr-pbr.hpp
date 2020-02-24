@@ -4,6 +4,7 @@
 #include "../../../core/cr-types.hpp"
 #include "../../../core/sync/cr-sync-end-caller.hpp"
 #include "rnd-gr-tr-tree.hpp"
+#include "../../material/rnd-mat-type.hpp"
 #include <map>
 #include <set>
 #include <tuple>
@@ -16,12 +17,23 @@ class Unlit;
 class SkyboxEquirectangular;
 class SkyboxCube;
 }
+
 namespace gearoenix::render::light {
 class CascadeInfo;
 }
-namespace gearoenix::render::scene {
-class Scene;
+
+namespace gearoenix::render::mesh {
+    class Mesh;
 }
+
+namespace gearoenix::render::model {
+    class Model;
+}
+
+namespace gearoenix::render::scene {
+    class Scene;
+}
+
 namespace gearoenix::render::camera {
 class Camera;
 }
@@ -49,6 +61,9 @@ private:
     std::vector<light::CascadeInfo*> cascades;
 
     void update_skyboxes(const scene::Scene* scn, const camera::Camera* cam, CameraData& camera_nodes) noexcept;
+    void update_opaque(
+            const std::vector<std::tuple<const material::Type, mesh::Mesh*const, model::Model*const>>& seen_meshes,
+            const scene::Scene* scn, const camera::Camera* cam, CameraData& camera_nodes) noexcept;
 
 public:
     Pbr(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;

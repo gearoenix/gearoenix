@@ -68,8 +68,8 @@ namespace gearoenix::render::camera {
 class Camera : public core::asset::Asset, public core::event::Listener {
 public:
     typedef std::array<math::Vec3, 4> Partition;
-    typedef std::vector<std::tuple<material::Type, model::Model*, mesh::Mesh*>> Meshes;
-    typedef std::vector<std::tuple<core::Real, material::Type, model::Model*, mesh::Mesh*>> TransparentMeshes;
+    typedef std::vector<std::tuple<const material::Type, model::Model*const, mesh::Mesh*const>> Meshes;
+    typedef std::vector<std::tuple<const core::Real, const material::Type, model::Model*const, mesh::Mesh*const>> TransparentMeshes;
 
     GX_GETSET_VAL_PRT(core::Real, layer, 0.0f)
     GX_GET_UPTR_PRT(physics::collider::Frustum, frustum_collider)
@@ -84,7 +84,9 @@ public:
     GX_GET_CREF_PRT(TransparentMeshes, seen_static_transparent_meshes) // sorted
     GX_GET_CREF_PRT(Meshes, seen_dynamic_opaque_meshes) // sorted
     GX_GET_CREF_PRT(TransparentMeshes, seen_dynamic_transparent_meshes) // sorted
-    GX_GET_CREF_PRT(core::OneLoopPool<light::CascadeInfo>, cascades)
+    GX_GET_CREF_PRT(Meshes, seen_opaque_meshes) // sorted
+    GX_GET_CREF_PRT(TransparentMeshes, seen_transparent_meshes) // sorted
+    GX_GET_REF_PRT(core::OneLoopPool<light::CascadeInfo>, cascades)
 protected:
     engine::Engine* const e;
 
@@ -106,6 +108,7 @@ public:
     void check_static_models(const physics::accelerator::Bvh* bvh) noexcept;
     void check_dynamic_models(const physics::accelerator::Bvh* bvh) noexcept;
     void cascade_shadow(const light::Directional* l) noexcept;
+    void merge_seen_meshes() noexcept;
 
     bool on_event(const core::event::Data& d) noexcept override;
 };

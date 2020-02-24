@@ -63,7 +63,6 @@ void gearoenix::render::engine::Engine::update() noexcept
     ++frame_number_from_start;
     frame_number = frame_number_from_start % frames_count;
     function_loader->unload();
-    physics_engine->update();
     function_loader->unload();
     kernels->do_steps();
     do_late_delete();
