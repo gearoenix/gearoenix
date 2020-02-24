@@ -61,6 +61,7 @@ public:                                                           \
     GX_GET_PTR(v, , t, x)      \
     void set_##x(t* const _##x) noexcept { x = _##x; }
 #define GX_GETSET_PTR_PRT(t, x) GX_GETSET_PTR(protected, t, x)
+#define GX_GETSET_PTR_PRV(t, x) GX_GETSET_PTR(private, t, x)
 
 #define GX_GET_ARRC(v, t, x, c) \
     v:                          \

@@ -10,18 +10,11 @@ gearoenix::render::light::Directional::Directional(const core::Id my_id, system:
 
 gearoenix::render::light::Directional::Directional(const core::Id my_id, engine::Engine* const e) noexcept
     : Light(my_id, e, Type::DIRECTIONAL)
+    , direction(0.0f, 0.0f, -1.0f)
 {
 }
 
-const gearoenix::math::Vec3& gearoenix::render::light::Directional::get_direction() const noexcept
-{
-    return direction;
-}
-
-void gearoenix::render::light::Directional::set_direction(const gearoenix::math::Vec3& dir) noexcept
-{
-    direction = dir;
-}
+gearoenix::render::light::Directional::~Directional() noexcept = default;
 
 bool gearoenix::render::light::Directional::is_in_light(const model::Model*) const noexcept
 {

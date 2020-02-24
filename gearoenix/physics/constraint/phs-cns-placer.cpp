@@ -54,7 +54,7 @@
 //        std::shared_ptr<render::model::Model> mdl = asmgr->get_model_manager()->get(model_id, core::sync::EndCaller<render::model::Model>(c));
 //        if (render::model::Model::RenderModel::STATIC == mdl->get_render_model_type())
 //            GXUNEXPECTED;
-//        models[model_id] = std::static_pointer_cast<render::model::Dynamic>(mdl);
+//        models[model_id] = std::static_pointer_cast<render::model::Runtime>(mdl);
 //    }
 //}
 //
@@ -69,12 +69,12 @@
 //    Constraint::apply(delta_time);
 //    switch (t) {
 //    case DOWN_MIDDLE: {
-//        for (const std::pair<core::Id, std::shared_ptr<render::model::Dynamic>>& id_model : models)
+//        for (const std::pair<core::Id, std::shared_ptr<render::model::Runtime>>& id_model : models)
 //            id_model.second->translate(-position);
 //        const core::Real scale = parameters[4] / parameters[3];
-//        for (const std::pair<core::Id, std::shared_ptr<render::model::Dynamic>>& id_model : models)
+//        for (const std::pair<core::Id, std::shared_ptr<render::model::Runtime>>& id_model : models)
 //            id_model.second->global_scale(scale);
-//        for (const std::pair<core::Id, std::shared_ptr<render::model::Dynamic>>& id_model : models)
+//        for (const std::pair<core::Id, std::shared_ptr<render::model::Runtime>>& id_model : models)
 //            id_model.second->translate(next_position);
 //        parameters[3] = parameters[4];
 //        break;
@@ -82,7 +82,7 @@
 //    case RIGHT:
 //    case LEFT: {
 //        const math::Vec3 trn = next_position - position;
-//        for (const std::pair<core::Id, std::shared_ptr<render::model::Dynamic>>& id_model : models)
+//        for (const std::pair<core::Id, std::shared_ptr<render::model::Runtime>>& id_model : models)
 //            id_model.second->translate(trn);
 //        break;
 //    }
@@ -116,10 +116,10 @@
 //    }
 //}
 //
-//const std::vector<std::pair<gearoenix::core::Id, std::shared_ptr<gearoenix::render::model::Dynamic>>> gearoenix::physics::constraint::Placer::get_all_models() const
+//const std::vector<std::pair<gearoenix::core::Id, std::shared_ptr<gearoenix::render::model::Runtime>>> gearoenix::physics::constraint::Placer::get_all_models() const
 //{
 //    const size_t num_mdl = models.size();
-//    std::vector<std::pair<core::Id, std::shared_ptr<render::model::Dynamic>>> result(num_mdl);
+//    std::vector<std::pair<core::Id, std::shared_ptr<render::model::Runtime>>> result(num_mdl);
 //    size_t i = 0;
 //    for (auto iter = models.begin(); i < num_mdl; ++i, ++iter) {
 //        result[i].first = iter->first;

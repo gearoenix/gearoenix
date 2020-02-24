@@ -56,7 +56,7 @@ class Engine;
 
 namespace gearoenix::render::light {
 class Light;
-class Sun;
+class Directional;
 }
 
 namespace gearoenix::render::material {
@@ -69,6 +69,10 @@ class Mesh;
 
 namespace gearoenix::render::model {
 class Model;
+}
+
+namespace gearoenix::render::reflection {
+class Reflection;
 }
 
 namespace gearoenix::render::skybox {
@@ -86,8 +90,10 @@ public:
     using MapCamera = std::map<core::Id, std::shared_ptr<camera::Camera>>;
     using MapConstraint = std::map<core::Id, std::shared_ptr<physics::constraint::Constraint>>;
     using MapLight = std::map<core::Id, std::shared_ptr<light::Light>>;
+    using MapShadowCascaderLight = std::map<core::Id, std::shared_ptr<light::Directional>>;
     using MapModel = std::map<core::Id, std::shared_ptr<model::Model>>;
     using MapSkybox = std::map<core::Id, std::shared_ptr<skybox::Skybox>>;
+    using MapReflection = std::map<core::Id, std::shared_ptr<reflection::Reflection>>;
 
     GX_GET_CVAL_PRT(Type, scene_type_id)
     GX_GETSET_VAL_PRT(core::Real, layer, 0.0f)
@@ -100,11 +106,12 @@ public:
     GX_GET_CREF_PRT(MapCamera, cameras)
     GX_GET_CREF_PRT(MapConstraint, constraints)
     GX_GET_CREF_PRT(MapLight, lights)
+    GX_GET_CREF_PRT(MapShadowCascaderLight, shadow_cascader_lights)
     GX_GET_CREF_PRT(MapModel, models)
     GX_GET_CREF_PRT(MapSkybox, skyboxs)
+    GX_GET_CREF_PRT(MapReflection, reflections)
     GX_GET_CREF_PRT(std::vector<physics::collider::Collider*>, static_colliders)
     GX_GET_CREF_PRT(std::vector<physics::collider::Collider*>, dynamic_colliders)
-    GX_GET_CREF_PRT(std::shared_ptr<skybox::Skybox>, skybox)
 protected:
     engine::Engine* const e;
     Uniform uniform;
@@ -133,6 +140,7 @@ public:                                                         \
     GX_HELPER(model, model::Model)
     GX_HELPER(constraint, physics::constraint::Constraint)
     GX_HELPER(skybox, skybox::Skybox)
+    GX_HELPER(reflection, reflection::Reflection)
 
 #undef GX_HELPER
 
@@ -140,6 +148,8 @@ public:                                                         \
 
     void update() noexcept;
     [[nodiscard]] std::optional<std::pair<core::Real, physics::collider::Collider*>> hit(const math::Ray3& r, core::Real d_min) const noexcept;
+    void add_shadow_cascader(core::Id light_id) noexcept;
+    void remove_shadow_cascader(core::Id light_id) noexcept;
 };
 }
 #endif

@@ -5,8 +5,8 @@
 
 namespace gearoenix::render::reflection {
 enum struct Type : core::TypeId {
-    Dynamic = 1,
-    Static = 2,
+    Baked = 1,
+    Runtime = 2,
 };
 std::ostream& operator<<(std::ostream& os, Type t) noexcept;
 }

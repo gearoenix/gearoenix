@@ -11,7 +11,7 @@
 *.gch
 *.pch
 
-# Compiled Dynamic libraries
+# Compiled Runtime libraries
 *.so
 *.dylib
 *.dll

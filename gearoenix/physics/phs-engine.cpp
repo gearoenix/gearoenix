@@ -41,8 +41,6 @@ gearoenix::physics::Engine::PooledShadowCasterDirectionalLights::~PooledShadowCa
 void gearoenix::physics::Engine::update_scenes_kernel(const unsigned int kernel_index) noexcept
 {
     GX_START_TASKS
-    core::OneLoopPool<PooledSceneData>& kd = kernels_scene_camera_data[kernel_index];
-    kd.refresh();
     const std::map<core::Id, std::weak_ptr<render::scene::Scene>>& scenes = sys_app->get_asset_manager()->get_scene_manager()->get_scenes();
     for (const std::pair<const core::Id, std::weak_ptr<render::scene::Scene>>& is : scenes) {
         const std::shared_ptr<render::scene::Scene> scene = is.second.lock();
@@ -52,9 +50,9 @@ void gearoenix::physics::Engine::update_scenes_kernel(const unsigned int kernel_
         const auto& skies = scene->get_skyboxs();
         for (const auto& sky : skies)
             GX_DO_TASK(sky.second->update())
-        auto* const sd = kd.get_next([] { return new PooledSceneData(); });
-        sd->scene = scene.get();
-        sd->cameras.refresh();
+        const auto& cameras = scene->get_cameras();
+        for (const auto& cam : cameras)
+            GX_DO_TASK(cam.second->update())
     }
 }
 
@@ -65,43 +63,31 @@ void gearoenix::physics::Engine::update_scenes_receiver() noexcept
 void gearoenix::physics::Engine::update_visibility_kernel(const unsigned int kernel_index) noexcept
 {
     GX_START_TASKS
-    core::OneLoopPool<PooledSceneData>& kd = kernels_scene_camera_data[kernel_index];
-    for (PooledSceneData& sd : kd) {
-        render::scene::Scene* const scene = sd.scene;
-        core::OneLoopPool<PooledCameraData>& cd = sd.cameras;
-        const accelerator::Bvh* const dynamic_accelerator = scene->get_dynamic_accelerator();
-        const accelerator::Bvh* const static_accelerator = scene->get_static_accelerator();
-        const std::map<core::Id, std::shared_ptr<render::camera::Camera>>& cameras = scene->get_cameras();
-        const std::map<core::Id, std::shared_ptr<render::light::Light>>& lights = scene->get_lights();
-        for (const std::pair<const core::Id, std::shared_ptr<render::camera::Camera>>& id_camera : cameras) {
-            render::camera::Camera* const camera = id_camera.second.get();
-            if (!camera->get_enabled())
+    const auto& scenes = sys_app->get_asset_manager()->get_scene_manager()->get_scenes();
+    for (const auto& id_scene : scenes) {
+        const auto scene = id_scene.second.lock();
+        if (scene == nullptr || !scene->get_enability())
+            continue;
+        const auto& cameras = scene->get_cameras();
+        const auto* const dynamic_accelerator = scene->get_dynamic_accelerator();
+        const auto* const static_accelerator = scene->get_static_accelerator();
+        const auto& shadow_cascaders = scene->get_shadow_cascader_lights();
+        for (const auto& id_camera : cameras) {
+            auto* const camera = id_camera.second.get();
+            if (camera == nullptr || !camera->get_enabled())
                 continue;
-            PooledCameraData* const pcd = cd.get_next([] { return new PooledCameraData(); });
-            pcd->camera = camera;
-            auto& opaque_container_models = pcd->opaque_container_models;
-            auto& transparent_container_models = pcd->transparent_container_models;
-            auto& shadow_caster_directional_lights = pcd->shadow_caster_directional_lights;
-            opaque_container_models.clear();
-            transparent_container_models.clear();
-            shadow_caster_directional_lights.refresh();
-            const std::function<void(collider::Collider* const cld)> collided = [&](collider::Collider* const cld) noexcept {
-                auto* const m = cld->get_parent();
-                m->update();
-                const auto& model_meshes = m->get_meshes();
-                for (const auto& model_mesh : model_meshes) {
-                    auto* const mat = model_mesh.second->get_mat().get();
-                    auto* const msh = model_mesh.second.get();
-                    if (mat->get_translucency() == render::material::TranslucencyMode::Transparent) {
-                        transparent_container_models[-camera->get_distance(cld->get_location())][mat->get_material_type()][m].push_back(msh);
-                    } else {
-                        opaque_container_models[mat->get_material_type()][m].push_back(msh);
-                    }
+            if (nullptr != dynamic_accelerator)
+                GX_DO_TASK(camera->check_dynamic_models(dynamic_accelerator))
+            if (nullptr != static_accelerator)
+                GX_DO_TASK(camera->check_static_models(static_accelerator))
+            if (camera->get_cascaded_shadow_enabled()) {
+                for (const auto& id_light : shadow_cascaders) {
+                    auto* const light = id_light.second.get();
+                    if (!light->get_enabled())
+                        continue;
+                    GX_DO_TASK(camera->cascade_shadow(light))
                 }
-            };
-            GX_DO_TASK(camera->update_uniform())
-            GX_DO_TASK(if (nullptr != dynamic_accelerator) dynamic_accelerator->call_on_intersecting(camera->get_frustum_collider(), collided))
-            GX_DO_TASK(if (nullptr != static_accelerator) static_accelerator->call_on_intersecting(camera->get_frustum_collider(), collided))
+            }
             const auto& cascade_partitions = camera->get_cascaded_shadow_frustum_partitions();
             for (const std::pair<const core::Id, std::shared_ptr<render::light::Light>>& id_light : lights) {
                 auto* const light = id_light.second.get();

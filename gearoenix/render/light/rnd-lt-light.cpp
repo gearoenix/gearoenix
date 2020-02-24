@@ -1,6 +1,23 @@
 #include "rnd-lt-light.hpp"
 #include "../../system/stream/sys-stm-stream.hpp"
 #include "../engine/rnd-eng-engine.hpp"
+#include "../light/rnd-lt-directional.hpp"
+
+void gearoenix::render::light::Light::remove_from_shadow_cascaders() const noexcept
+{
+    if (light_type != Type::DIRECTIONAL)
+        return;
+    if (nullptr != parent_scene)
+        parent_scene->remove_shadow_cascader(asset_id);
+}
+
+void gearoenix::render::light::Light::add_to_shadow_cascaders() const noexcept
+{
+    if (light_type != Type::DIRECTIONAL || !shadow_enabled)
+        return;
+    if (nullptr != parent_scene)
+        parent_scene->add_shadow_cascader(asset_id);
+}
 
 gearoenix::render::light::Light::Light(
     const core::Id my_id,
@@ -12,7 +29,7 @@ gearoenix::render::light::Light::Light(
     , e(e)
 {
     color.read(f);
-    has_shadow = f->read_bool();
+    shadow_enabled = f->read_bool();
 }
 
 gearoenix::render::light::Light::Light(const core::Id my_id, engine::Engine* const e, const Type light_type) noexcept
@@ -22,32 +39,23 @@ gearoenix::render::light::Light::Light(const core::Id my_id, engine::Engine* con
 {
 }
 
-bool gearoenix::render::light::Light::is_shadow_caster() const noexcept
-{
-    return has_shadow;
-}
-
 void gearoenix::render::light::Light::enable_shadowing() noexcept
 {
-    has_shadow = true;
+    shadow_enabled = true;
+    add_to_shadow_cascaders();
 }
 
 void gearoenix::render::light::Light::disable_shadowing() noexcept
 {
-    has_shadow = false;
+    shadow_enabled = false;
+    remove_from_shadow_cascaders();
 }
 
-bool gearoenix::render::light::Light::is_enabled() const noexcept
+void gearoenix::render::light::Light::set_scene(scene::Scene* const s) noexcept
 {
-    return enabled;
-}
-
-void gearoenix::render::light::Light::enable() noexcept
-{
-    enabled = true;
-}
-
-void gearoenix::render::light::Light::disable() noexcept
-{
-    enabled = false;
+    if (nullptr != parent_scene) {
+        remove_from_shadow_cascaders();
+    }
+    parent_scene = s;
+    add_to_shadow_cascaders();
 }

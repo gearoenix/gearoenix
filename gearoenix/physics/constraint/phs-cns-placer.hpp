@@ -24,7 +24,7 @@
 //            std::vector<core::Real> parameters;
 //            math::Vec3 position = math::Vec3(0.0f, 0.0f, 0.0f);
 //            math::Vec3 next_position = math::Vec3(0.0f, 0.0f, 0.0f);
-//            std::map<core::Id, std::shared_ptr<render::model::Dynamic>> models;
+//            std::map<core::Id, std::shared_ptr<render::model::Runtime>> models;
 //
 //        public:
 //            Placer(
@@ -34,7 +34,7 @@
 //				const core::sync::EndCaller<core::sync::EndCallerIgnore> c);
 //            virtual ~Placer();
 //            virtual void apply(core::Real delta_time);
-//            virtual const std::vector<std::pair<core::Id, std::shared_ptr<render::model::Dynamic>>> get_all_models() const;
+//            virtual const std::vector<std::pair<core::Id, std::shared_ptr<render::model::Runtime>>> get_all_models() const;
 //            virtual void on_event(const core::event::Event& e);
 //        };
 //    }

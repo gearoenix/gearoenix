@@ -60,8 +60,8 @@ void gearoenix::render::engine::Engine::update() noexcept
     delta_time = delta_time_duration.count();
     last_frame_time = now;
     /// TODO: When Vulkan implemented take care of frame_node and do the frame synchronization by it.
-    ++frame_number;
-    frame_number %= frames_count;
+    ++frame_number_from_start;
+    frame_number = frame_number_from_start % frames_count;
     function_loader->unload();
     physics_engine->update();
     function_loader->unload();

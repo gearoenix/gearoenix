@@ -19,6 +19,7 @@
 #include "../model/rnd-mdl-manager.hpp"
 #include "../model/rnd-mdl-model.hpp"
 #include "../pipeline/rnd-pip-manager.hpp"
+#include "../reflection/rnd-rfl-reflection.hpp"
 #include "../shader/rnd-shd-shader.hpp"
 #include "../skybox/rnd-sky-skybox.hpp"
 
@@ -28,6 +29,7 @@ static const std::shared_ptr<gearoenix::render::light::Light> null_light = nullp
 static const std::shared_ptr<gearoenix::render::model::Model> null_model = nullptr;
 static const std::shared_ptr<gearoenix::render::skybox::Skybox> null_skybox = nullptr;
 static const std::shared_ptr<gearoenix::physics::constraint::Constraint> null_constraint = nullptr;
+static const std::shared_ptr<gearoenix::render::reflection::Reflection> null_reflection = nullptr;
 
 #define GX_SCENE_INIT \
     core::asset::Asset(my_id, core::asset::Type::Scene), scene_type_id(t), uniform_buffers(new buffer::FramedUniform(static_cast<unsigned int>(sizeof(Uniform)), e)), static_accelerator(new gearoenix::physics::accelerator::Bvh()), dynamic_accelerator(new gearoenix::physics::accelerator::Bvh()), e(e)
@@ -90,9 +92,10 @@ gearoenix::render::scene::Scene::~Scene() noexcept
     constraints.clear();
     lights.clear();
     models.clear();
+    skyboxs.clear();
+    reflections.clear();
     static_colliders.clear();
     dynamic_colliders.clear();
-    skybox = nullptr;
     GXLOGD("Scene " << asset_id << " deleted.")
 }
 
@@ -115,9 +118,21 @@ gearoenix::render::scene::Scene::~Scene() noexcept
 
 GX_SCENE_ADD_HELPER(camera, camera::Camera)
 GX_SCENE_ADD_HELPER(audio, audio::Audio)
-GX_SCENE_ADD_HELPER(light, light::Light)
+
+void gearoenix::render::scene::Scene::scene_add_light(const std::shared_ptr<light::Light>& o) noexcept
+{
+    const core::Id id = o->get_asset_id();
+    if (o->get_light_type() == light::Type::DIRECTIONAL) {
+        o->set_scene(this);
+    } else {
+        GX_CHECK_HELPER(light)
+        lights[id] = o;
+    }
+}
+
 GX_SCENE_ADD_HELPER(constraint, physics::constraint::Constraint)
 GX_SCENE_ADD_HELPER(skybox, skybox::Skybox)
+GX_SCENE_ADD_HELPER(reflection, reflection::Reflection)
 
 void gearoenix::render::scene::Scene::scene_add_model(const std::shared_ptr<model::Model>& m) noexcept
 {
@@ -157,6 +172,7 @@ GX_GET_HELPER(light, render::light::Light)
 GX_GET_HELPER(model, render::model::Model)
 GX_GET_HELPER(constraint, physics::constraint::Constraint)
 GX_GET_HELPER(skybox, render::skybox::Skybox)
+GX_GET_HELPER(reflection, render::reflection::Reflection)
 
 void gearoenix::render::scene::Scene::update() noexcept
 {
@@ -182,7 +198,7 @@ void gearoenix::render::scene::Scene::update() noexcept
     unsigned int dirc = 0;
     for (const auto& il : lights) {
         const light::Light* const l = il.second.get();
-        if (l->is_shadow_caster())
+        if (l->get_shadow_enabled())
             continue;
         const auto* const dl = dynamic_cast<const light::Directional*>(l);
         if (dl != nullptr && dirc < GX_MAX_DIRECTIONAL_LIGHTS) {
@@ -204,4 +220,15 @@ std::optional<std::pair<gearoenix::core::Real, gearoenix::physics::collider::Col
     if (std::nullopt == hd)
         return hs;
     return hd;
+}
+
+void gearoenix::render::scene::Scene::add_shadow_cascader(const core::Id light_id) noexcept
+{
+    core::sync::EndCaller<light::Light> call([](const std::shared_ptr<light::Light>&) {});
+    shadow_cascader_lights[light_id] = std::dynamic_pointer_cast<light::Directional>(e->get_system_application()->get_asset_manager()->get_light_manager()->get_gx3d(light_id, call));
+}
+
+void gearoenix::render::scene::Scene::remove_shadow_cascader(const core::Id light_id) noexcept
+{
+    shadow_cascader_lights.erase(light_id);
 }

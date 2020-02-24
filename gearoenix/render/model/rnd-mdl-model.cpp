@@ -12,6 +12,7 @@
 #include "../pipeline/rnd-pip-manager.hpp"
 #include "../scene/rnd-scn-scene.hpp"
 #include "rnd-mdl-manager.hpp"
+#include "rnd-mdl-mesh.hpp"
 #include "rnd-mdl-transformation.hpp"
 
 gearoenix::render::model::Model::Model(
@@ -71,9 +72,12 @@ gearoenix::render::model::Model::~Model() noexcept
 
 void gearoenix::render::model::Model::update() noexcept
 {
+    if (e->get_frame_number_from_start() == latest_frame_update)
+        return;
     uniform_buffers->update(collider->get_model_matrix());
     for (const auto& msh : meshes)
         msh.second->update();
+    latest_frame_update = e->get_frame_number_from_start();
 }
 
 void gearoenix::render::model::Model::add_mesh(const std::shared_ptr<Mesh>& m) noexcept

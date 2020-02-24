@@ -8,11 +8,11 @@ std::ostream& operator<<(std::ostream& os, const Type t) noexcept
         GXUNEXPECTED
     os << "gearoenix::render::reflection { ";
     switch (t) {
-    case Type::Dynamic:
-        os << "Dynamic";
+    case Type::Baked:
+        os << "Baked";
         break;
-    case Type::Static:
-        os << "Static";
+    case Type::Runtime:
+        os << "Runtime";
         break;
     }
     os << " }";

@@ -2,11 +2,16 @@
 #include "../../core/event/cr-ev-engine.hpp"
 #include "../../core/event/cr-ev-event.hpp"
 #include "../../math/math-projector-frustum.hpp"
+#include "../../physics/accelerator/phs-acc-bvh.hpp"
 #include "../../physics/collider/phs-cld-frustum.hpp"
 #include "../../system/stream/sys-stm-stream.hpp"
 #include "../../system/sys-app.hpp"
-#include "../../system/sys-log.hpp"
 #include "../buffer/rnd-buf-framed-uniform.hpp"
+#include "../light/rnd-lt-cascade-info.hpp"
+#include "../light/rnd-lt-directional.hpp"
+#include "../material/rnd-mat-material.hpp"
+#include "../model/rnd-mdl-mesh.hpp"
+#include "../model/rnd-mdl-model.hpp"
 #include "../texture/rnd-txt-target.hpp"
 #include "rnd-cmr-transformation.hpp"
 
@@ -80,14 +85,73 @@ void gearoenix::render::camera::Camera::set_target(const texture::Target* const 
     config_target();
 }
 
-void gearoenix::render::camera::Camera::update_uniform() noexcept
+void gearoenix::render::camera::Camera::update() noexcept
 {
     uniform_buffers->update(uniform);
+
+    seen_static_opaque_meshes.clear();
+    seen_static_transparent_meshes.clear();
+    seen_dynamic_opaque_meshes.clear();
+    seen_dynamic_transparent_meshes.clear();
+
+    cascades.refresh();
 }
 
 void gearoenix::render::camera::Camera::set_aspect_ratio(const gearoenix::core::Real ratio) noexcept
 {
     uniform.aspect_ratio = ratio;
+}
+
+void gearoenix::render::camera::Camera::check_static_models(const physics::accelerator::Bvh* const bvh) noexcept
+{
+    const std::function<void(physics::collider::Collider* const cld)> collided = [this](physics::collider::Collider* const cld) noexcept {
+        auto* const m = cld->get_parent();
+        m->update();
+        const auto& model_meshes = m->get_meshes();
+        for (const auto& model_mesh : model_meshes) {
+            auto* const mat = model_mesh.second->get_mat().get();
+            auto* const msh = model_mesh.second.get();
+            if (mat->get_translucency() == render::material::TranslucencyMode::Transparent) {
+                seen_static_transparent_meshes.emplace_back(get_distance(cld->get_location()), mat->get_material_type(), m, msh);
+            } else {
+                seen_static_opaque_meshes.emplace_back(mat->get_material_type(), m, msh);
+            }
+        }
+    };
+    bvh->call_on_intersecting(frustum_collider.get(), collided);
+}
+
+void gearoenix::render::camera::Camera::check_dynamic_models(const physics::accelerator::Bvh* const bvh) noexcept
+{
+    const std::function<void(physics::collider::Collider* const cld)> collided = [this](physics::collider::Collider* const cld) noexcept {
+        auto* const m = cld->get_parent();
+        m->update();
+        const auto& model_meshes = m->get_meshes();
+        for (const auto& model_mesh : model_meshes) {
+            auto* const mat = model_mesh.second->get_mat().get();
+            auto* const msh = model_mesh.second.get();
+            if (mat->get_translucency() == render::material::TranslucencyMode::Transparent) {
+                seen_dynamic_transparent_meshes.emplace_back(get_distance(cld->get_location()), mat->get_material_type(), m, msh);
+            } else {
+                seen_dynamic_opaque_meshes.emplace_back(mat->get_material_type(), m, msh);
+            }
+        }
+    };
+    bvh->call_on_intersecting(frustum_collider.get(), collided);
+}
+
+void gearoenix::render::camera::Camera::cascade_shadow(const light::Directional* const l) noexcept
+{
+    auto* const cascade_info = cascades.get_next([this] {
+        return new light::CascadeInfo(e);
+    });
+    cascade_info->set_source(l);
+    auto* const cascade_data = light_data->cascades_info.get();
+    const auto& dir = dir_light->get_direction();
+    const auto dot = std::abs(dir.dot(math::Vec3(0.0f, 1.0f, 0.0f))) - 1.0f;
+    const auto& up = GX_IS_ZERO(dot) ? math::Vec3::Z : math::Vec3::Y;
+    const auto view = math::Mat4x4::look_at(math::Vec3(), dir, up);
+    cascade_data->update(view, cascade_partitions))
 }
 
 bool gearoenix::render::camera::Camera::on_event(const core::event::Data& d) noexcept
