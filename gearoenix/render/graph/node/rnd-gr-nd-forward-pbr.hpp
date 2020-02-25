@@ -27,8 +27,8 @@ class CascadeInfo;
 }
 
 namespace gearoenix::render::model {
-class Model;
-class Mesh;
+    class Model;
+    class Mesh;
 }
 
 namespace gearoenix::render::pipeline {
@@ -58,9 +58,6 @@ struct ForwardPbrUniform {
     math::Vec4 shadow_caster_directional_lights_direction[GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER] = {};
     core::Real point_lights_count = 0.0f;
     core::Real shadow_caster_directional_lights_count = 0.0f;
-    explicit ForwardPbrUniform(
-        const std::map<core::Real, std::map<light::Directional*, light::CascadeInfo*>>* directional_lights,
-        const scene::Scene* scn, const model::Model* mdl) noexcept;
 };
 
 struct ForwardPbrRenderData {
@@ -92,8 +89,11 @@ private:
     ForwardPbrFrame* frame = nullptr;
     const scene::Scene* scn = nullptr;
     const camera::Camera* cam = nullptr;
-    std::vector<std::pair<const model::Model*, const model::Mesh*>> models;
-    const std::map<core::Real, std::map<light::Directional*, light::CascadeInfo*>>* directional_lights = nullptr;
+    std::vector<std::pair<const model::Model*, const model::Mesh*>> meshes;
+    std::vector<const light::CascadeInfo*> cascades;
+    unsigned int directional_light_shadow_caster_index = 0;
+    unsigned int shadow_map_index = 0;
+    ForwardPbrUniform uniform;
 
     void record(
         const model::Model* mdl,
@@ -120,8 +120,8 @@ public:
     void update() noexcept final;
     void set_scene(const scene::Scene* scn) noexcept;
     void set_camera(const camera::Camera* cam) noexcept;
-    void add_models(const std::map<const model::Model*, std::vector<const model::Mesh*>>* models) noexcept;
-    void set_directional_lights(const std::map<core::Real, std::map<light::Directional*, light::CascadeInfo*>>* m) noexcept;
+    void add_mesh(std::pair<const model::Model*, const model::Mesh*> msh) noexcept;
+    void add_cascade(const light::CascadeInfo* c) noexcept;
     /// Multithreaded rendering happens in here
     void record(unsigned int kernel_index) noexcept final;
     void record_continuously(unsigned int kernel_index) noexcept final;

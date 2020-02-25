@@ -60,7 +60,7 @@ private:
     std::vector<std::unique_ptr<UnlitFrame>> frames;
     UnlitFrame* frame = nullptr;
     const camera::Camera* cam = nullptr;
-    std::vector<const std::map<const model::Model*, std::vector<const model::Mesh*>>*> models;
+    std::vector<std::pair<model::Model*, model::Mesh*>> meshes;
 
     void record(const model::Mesh* msh, const UnlitUniform& u, UnlitKernel* kernel) noexcept;
 
@@ -69,7 +69,7 @@ public:
     ~Unlit() noexcept final;
     void update() noexcept final;
     void set_camera(const camera::Camera* cam) noexcept;
-    void add_models(const std::map<const model::Model*, std::vector<const model::Mesh*>>* models) noexcept;
+    void add_mesh(std::pair<model::Model*, model::Mesh*> m) noexcept;
     void record(unsigned int kernel_index) noexcept final;
     void record_continuously(unsigned int kernel_index) noexcept final;
     void submit() noexcept final;

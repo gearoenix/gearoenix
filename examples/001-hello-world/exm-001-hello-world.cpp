@@ -50,6 +50,7 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
     scn = ast_mgr->get_scene_manager()->create<GxGameScene>(scn_call);
 
     std::shared_ptr<GxPersCam> cam = ast_mgr->get_camera_manager()->create<GxPersCam>();
+    cam->set_cascaded_shadow_enabled(true);
     cam_trn = dynamic_cast<GxCamTran*>(cam->get_transformation());
     cam_trn->look_at(GxVec3(20.0f, 20.0f, 10.0f), GxVec3(0.0f, 0.0f, 0.0f), GxVec3(0.0f, 0.0f, 1.0f));
     scn->add_camera(cam);

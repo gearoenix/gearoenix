@@ -93,7 +93,6 @@ void gearoenix::render::camera::Camera::update() noexcept
     seen_static_transparent_meshes.clear();
     seen_dynamic_opaque_meshes.clear();
     seen_dynamic_transparent_meshes.clear();
-    seen_opaque_meshes.clear();
     seen_transparent_meshes.clear();
 
     cascades.refresh();
@@ -111,8 +110,8 @@ void gearoenix::render::camera::Camera::check_static_models(const physics::accel
         m->update();
         const auto& model_meshes = m->get_meshes();
         for (const auto& model_mesh : model_meshes) {
-            auto* const mat = model_mesh.second->get_mat().get();
-            auto* const msh = model_mesh.second->get_msh().get();
+            auto* const msh = model_mesh.second.get();
+            auto* const mat = msh->get_mat().get();
             if (mat->get_translucency() == render::material::TranslucencyMode::Transparent) {
                 seen_static_transparent_meshes.emplace_back(get_distance(cld->get_location()), mat->get_material_type(), m, msh);
             } else {
@@ -122,7 +121,6 @@ void gearoenix::render::camera::Camera::check_static_models(const physics::accel
     };
     bvh->call_on_intersecting(frustum_collider.get(), collided);
     std::sort(seen_static_transparent_meshes.begin(), seen_static_transparent_meshes.end());
-    std::sort(seen_static_opaque_meshes.begin(), seen_static_opaque_meshes.end());
 }
 
 void gearoenix::render::camera::Camera::check_dynamic_models(const physics::accelerator::Bvh* const bvh) noexcept
@@ -132,8 +130,8 @@ void gearoenix::render::camera::Camera::check_dynamic_models(const physics::acce
         m->update();
         const auto& model_meshes = m->get_meshes();
         for (const auto& model_mesh : model_meshes) {
-            auto* const mat = model_mesh.second->get_mat().get();
-            auto* const msh = model_mesh.second->get_msh().get();
+            auto* const msh = model_mesh.second.get();
+            auto* const mat = msh->get_mat().get();
             if (mat->get_translucency() == render::material::TranslucencyMode::Transparent) {
                 seen_dynamic_transparent_meshes.emplace_back(get_distance(cld->get_location()), mat->get_material_type(), m, msh);
             } else {
@@ -143,7 +141,6 @@ void gearoenix::render::camera::Camera::check_dynamic_models(const physics::acce
     };
     bvh->call_on_intersecting(frustum_collider.get(), collided);
     std::sort(seen_dynamic_transparent_meshes.begin(), seen_dynamic_transparent_meshes.end());
-    std::sort(seen_dynamic_opaque_meshes.begin(), seen_dynamic_opaque_meshes.end());
 }
 
 void gearoenix::render::camera::Camera::cascade_shadow(const light::Directional* const l) noexcept
@@ -160,9 +157,6 @@ void gearoenix::render::camera::Camera::cascade_shadow(const light::Directional*
 }
 
 void gearoenix::render::camera::Camera::merge_seen_meshes() noexcept {
-    std::merge(seen_dynamic_opaque_meshes.begin(), seen_dynamic_opaque_meshes.end(),
-               seen_static_opaque_meshes.begin(), seen_static_opaque_meshes.end(),
-               std::back_inserter(seen_opaque_meshes));
     std::merge(seen_dynamic_transparent_meshes.begin(), seen_dynamic_transparent_meshes.end(),
                seen_static_transparent_meshes.begin(), seen_static_transparent_meshes.end(),
                std::back_inserter(seen_transparent_meshes));

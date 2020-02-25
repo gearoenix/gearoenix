@@ -22,12 +22,9 @@ namespace gearoenix::render::light {
 class CascadeInfo;
 }
 
-namespace gearoenix::render::mesh {
-    class Mesh;
-}
-
 namespace gearoenix::render::model {
     class Model;
+    class Mesh;
 }
 
 namespace gearoenix::render::scene {
@@ -46,8 +43,10 @@ public:
     };
     struct CameraData {
         std::map<core::Real, std::vector<node::Node*>> skyboxes;
-        Nodes opaques;
+        Nodes opaques {};
         std::vector<node::Node*> transparencies;
+
+        void clear() noexcept ;
     };
     using SceneData = std::map<core::Real, std::map<const camera::Camera*, CameraData>>;
 
@@ -62,7 +61,10 @@ private:
 
     void update_skyboxes(const scene::Scene* scn, const camera::Camera* cam, CameraData& camera_nodes) noexcept;
     void update_opaque(
-            const std::vector<std::tuple<const material::Type, mesh::Mesh*const, model::Model*const>>& seen_meshes,
+            const std::vector<std::tuple<material::Type, model::Model*, model::Mesh*>>& seen_meshes,
+            const scene::Scene* scn, const camera::Camera* cam, CameraData& camera_nodes) noexcept;
+    void update_transparent(
+            const std::vector<std::tuple<core::Real, material::Type, model::Model*, model::Mesh*>>& seen_meshes,
             const scene::Scene* scn, const camera::Camera* cam, CameraData& camera_nodes) noexcept;
 
 public:

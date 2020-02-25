@@ -32,58 +32,6 @@ const unsigned int gearoenix::render::graph::node::ForwardPbr::AMBIENT_OCCLUSION
 const unsigned int gearoenix::render::graph::node::ForwardPbr::BRDFLUT_INDEX = 3;
 const unsigned int gearoenix::render::graph::node::ForwardPbr::SHADOW_MAP_000_INDEX = 4;
 
-gearoenix::render::graph::node::ForwardPbrUniform::ForwardPbrUniform(
-    const std::map<core::Real, std::map<light::Directional*, light::CascadeInfo*>>* const directional_lights,
-    const scene::Scene* const scn,
-    const model::Model* const mdl) noexcept
-{
-    // Initializing point lights
-    unsigned int lights_count = 0;
-    const auto& lights = scn->get_lights();
-    for (const auto& id_light : lights) {
-        const auto& l = id_light.second;
-        if (light::Type::POINT == l->get_light_type()) {
-            auto pl = reinterpret_cast<light::Point*>(l.get());
-            if (l->is_in_light(mdl)) {
-                if (GX_COUNT_OF(point_lights_color_min_radius) <= lights_count) {
-                    GXLOGD("Unexpected number of influencing point lights over model: " << mdl->get_asset_id())
-                    break;
-                }
-                point_lights_color_min_radius[lights_count] = math::Vec4(l->get_color(), pl->get_min_radius());
-                point_lights_position_max_radius[lights_count] = pl->get_position_max_radius();
-                ++lights_count;
-            }
-        }
-    }
-    point_lights_count = static_cast<core::Real>(lights_count);
-    // Initializing directional lights
-    lights_count = 0;
-    for (const auto& pri_dir_cas : *directional_lights) {
-        for (const auto& dir_cas : pri_dir_cas.second) {
-            auto dir = dir_cas.first;
-            auto cas = dir_cas.second;
-            const auto& data = cas->get_cascades_data();
-            const auto s = data.size();
-            shadow_caster_directional_lights_color_cascades_count[lights_count] = math::Vec4(dir->get_color(), static_cast<core::Real>(s) + 0.1f);
-            shadow_caster_directional_lights_direction[lights_count] = math::Vec4(dir->get_direction(), 0.0f);
-            for (std::size_t i = static_cast<std::size_t>(lights_count) * GX_MAX_SHADOW_CASCADES, j = 0; j < s; ++i, ++j) {
-#ifdef GX_USE_OPENGL
-#ifdef GX_USE_INSTEAD_OF_OPENGL
-                if (GX_RUNTIME_USE_OPENGL) {
-#endif
-                    shadow_caster_directional_lights_cascades_view_projections_bias[i] = data[i].view_projection_bias_gl;
-#ifdef GX_USE_INSTEAD_OF_OPENGL
-                    continue;
-                }
-#endif
-#endif
-            }
-            ++lights_count;
-        }
-    }
-    shadow_caster_directional_lights_count = static_cast<core::Real>(lights_count);
-}
-
 gearoenix::render::graph::node::ForwardPbrRenderData::ForwardPbrRenderData(engine::Engine* const e, pipeline::Pipeline* const pip) noexcept
     : r(dynamic_cast<pipeline::ForwardPbrResourceSet*>(pip->create_resource_set()))
     , u(e->get_buffer_manager()->create_uniform(sizeof(ForwardPbrUniform)))
@@ -117,13 +65,9 @@ void gearoenix::render::graph::node::ForwardPbr::record(
     prs->set_specular_environment(reinterpret_cast<texture::TextureCube*>(input_textures[SPECULAR_ENVIRONMENT_INDEX]));
     prs->set_ambient_occlusion(reinterpret_cast<texture::Texture2D*>(input_textures[AMBIENT_OCCLUSION_INDEX]));
     prs->set_brdflut(reinterpret_cast<texture::Texture2D*>(input_textures[BRDFLUT_INDEX]));
-    for (int shadow_caster_directional_light_index = 0, shadow_map_index = SHADOW_MAP_000_INDEX;
-         shadow_caster_directional_light_index < GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER;
-         ++shadow_caster_directional_light_index) {
-        for (int cascaded_index = 0; cascaded_index < GX_MAX_SHADOW_CASCADES; ++cascaded_index, ++shadow_map_index) {
-            prs->set_directional_lights_shadow_map(
-                reinterpret_cast<texture::Texture2D*>(input_textures[shadow_map_index]),
-                shadow_caster_directional_light_index, cascaded_index);
+    for (int di = 0, si = SHADOW_MAP_000_INDEX; di < GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER; ++di) {
+        for (int ci = 0; ci < GX_MAX_SHADOW_CASCADES; ++ci, ++si) {
+            prs->set_directional_lights_shadow_map(dynamic_cast<texture::Texture2D*>(input_textures[si]), di, ci);
         }
     }
     kernel->secondary_cmd->bind(prs);
@@ -196,12 +140,42 @@ void gearoenix::render::graph::node::ForwardPbr::update() noexcept
         kernel->render_data_pool.refresh();
         kernel->secondary_cmd->begin();
     }
-    models.clear();
+    meshes.clear();
+    cascades.clear();
+
+    for (unsigned int di = 0, si = SHADOW_MAP_000_INDEX; di < GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER; ++di) {
+        for (int ci = 0; ci < GX_MAX_SHADOW_CASCADES; ++ci, ++si) {
+            clear_provider(si);
+            input_textures[si] = nullptr;
+        }
+    }
+    shadow_map_index = SHADOW_MAP_000_INDEX;
+    directional_light_shadow_caster_index = 0;
+
+    uniform.point_lights_count = 0.0f;
+    uniform.shadow_caster_directional_lights_count = 0.0f;
 }
 
 void gearoenix::render::graph::node::ForwardPbr::set_scene(const scene::Scene* const s) noexcept
 {
     scn = s;
+    // Initializing point lights
+    unsigned int lights_count = 0;
+    const auto& lights = scn->get_lights();
+    for (const auto& id_light : lights) {
+        const auto& l = id_light.second;
+        if (light::Type::POINT == l->get_light_type()) {
+            auto pl = reinterpret_cast<light::Point *>(l.get());
+            if (GX_COUNT_OF(uniform.point_lights_color_min_radius) <= lights_count) {
+                GXLOGD("Unexpected number of influencing point lights in scene: " << scn->get_asset_id())
+                break;
+            }
+            uniform.point_lights_color_min_radius[lights_count] = math::Vec4(l->get_color(), pl->get_min_radius());
+            uniform.point_lights_position_max_radius[lights_count] = pl->get_position_max_radius();
+            ++lights_count;
+        }
+    }
+    uniform.point_lights_count = static_cast<core::Real>(lights_count);
 }
 
 void gearoenix::render::graph::node::ForwardPbr::set_camera(const camera::Camera* const c) noexcept
@@ -210,35 +184,39 @@ void gearoenix::render::graph::node::ForwardPbr::set_camera(const camera::Camera
     render_target = c->get_target();
 }
 
-void gearoenix::render::graph::node::ForwardPbr::set_directional_lights(const std::map<core::Real, std::map<light::Directional*, light::CascadeInfo*>>* const m) noexcept
+void gearoenix::render::graph::node::ForwardPbr::add_cascade(const light::CascadeInfo *const c) noexcept
 {
-    directional_lights = m;
-    unsigned int shadow_map_index = node::ForwardPbr::SHADOW_MAP_000_INDEX;
-    int directional_light_index = 0;
-    for (const auto& priority_lights_cascades_info : *m) {
-        for (const auto& light_cascades_info : priority_lights_cascades_info.second) {
-            auto& cds = light_cascades_info.second->get_cascades_data();
-            int cascaded_index = 0;
-            for (const light::CascadeInfo::PerCascade& c : cds) {
-                graph::node::ShadowMapper* const shm = c.shadow_mapper.get();
-                core::graph::Node::connect(shm, 0, this, shadow_map_index);
-                input_textures[shadow_map_index] = shm->get_output_texture(0).get();
-                ++cascaded_index;
-                ++shadow_map_index;
-            }
-            for (; cascaded_index < GX_MAX_SHADOW_CASCADES; ++cascaded_index, ++shadow_map_index) {
-                clear_provider(shadow_map_index);
-                input_textures[shadow_map_index] = nullptr;
-            }
-            ++directional_light_index;
-        }
+    cascades.push_back(c);
+    const auto& cds = c->get_cascades_data();
+    int cascaded_index = 0;
+    for (const light::CascadeInfo::PerCascade& pc : cds) {
+        graph::node::ShadowMapper* const shm = pc.shadow_mapper.get();
+        core::graph::Node::connect(shm, 0, this, shadow_map_index);
+        input_textures[shadow_map_index] = shm->get_output_texture(0).get();
+        ++cascaded_index;
+        ++shadow_map_index;
     }
-    for (; directional_light_index < GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER; ++directional_light_index) {
-        for (int cascaded_index = 0; cascaded_index < GX_MAX_SHADOW_CASCADES; ++cascaded_index, ++shadow_map_index) {
-            clear_provider(shadow_map_index);
-            input_textures[shadow_map_index] = nullptr;
-        }
-    }
+    // Initializing directional lights
+    const auto*const dir = c->get_source();
+    const auto s = cds.size();
+    uniform.shadow_caster_directional_lights_color_cascades_count[directional_light_shadow_caster_index] =
+            math::Vec4(dir->get_color(), static_cast<core::Real>(s) + 0.1f);
+    uniform.shadow_caster_directional_lights_direction[directional_light_shadow_caster_index] =
+            math::Vec4(dir->get_direction(), 0.0f);
+    for (std::size_t i = static_cast<std::size_t>(directional_light_shadow_caster_index) * GX_MAX_SHADOW_CASCADES, j = 0; j < s; ++i, ++j) {
+#ifdef GX_USE_OPENGL
+#ifdef GX_USE_INSTEAD_OF_OPENGL
+                if (GX_RUNTIME_USE_OPENGL) {
+#endif
+                uniform.shadow_caster_directional_lights_cascades_view_projections_bias[i] = cds[j].view_projection_bias_gl;
+#ifdef GX_USE_INSTEAD_OF_OPENGL
+                continue;
+                }
+#endif
+#endif
+            }
+    ++directional_light_shadow_caster_index;
+    uniform.shadow_caster_directional_lights_count = static_cast<core::Real>(directional_light_shadow_caster_index);
 }
 
 void gearoenix::render::graph::node::ForwardPbr::record(const unsigned int kernel_index) noexcept
@@ -256,28 +234,16 @@ void gearoenix::render::graph::node::ForwardPbr::record(const unsigned int kerne
         task_number %= kernels_count;      \
     }
 
-    for (auto* const models_meshes : models) {
-        for (const auto& model_meshes : *models_meshes) {
-            GX_DO_TASK(
-                const ForwardPbrUniform u(directional_lights, scn, model_meshes.first);
-                for (const auto* const msh
-                     : model_meshes.second) {
-                    record(model_meshes.first, msh, u, kernel);
-                })
-        }
+    for (const auto [mdl, msh] : meshes) {
+        GX_DO_TASK(record(mdl, msh, uniform, kernel))
     }
 }
 
 void gearoenix::render::graph::node::ForwardPbr::record_continuously(unsigned int kernel_index) noexcept
 {
     auto* const kernel = frame->kernels[kernel_index].get();
-    for (auto* const models_meshes : models) {
-        for (const auto& model_meshes : *models_meshes) {
-            const ForwardPbrUniform u(directional_lights, scn, model_meshes.first);
-            for (const auto* const msh : model_meshes.second) {
-                record(model_meshes.first, msh, u, kernel);
-            }
-        }
+    for (const auto [mdl, msh] : meshes) {
+        record(mdl, msh, uniform, kernel);
     }
 }
 
@@ -292,9 +258,9 @@ void gearoenix::render::graph::node::ForwardPbr::submit() noexcept
     Node::submit();
 }
 
-void gearoenix::render::graph::node::ForwardPbr::add_models(const std::map<const model::Model*, std::vector<const model::Mesh*>>* m) noexcept
+void gearoenix::render::graph::node::ForwardPbr::add_mesh(std::pair<const model::Model*, const model::Mesh*> m) noexcept
 {
-    models.push_back(m);
+    meshes.push_back(std::move(m));
 }
 
 gearoenix::render::graph::node::ForwardPbrFrame::ForwardPbrFrame(engine::Engine* e) noexcept

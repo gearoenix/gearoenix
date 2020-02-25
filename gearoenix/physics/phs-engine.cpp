@@ -15,9 +15,7 @@
 #include "accelerator/phs-acc-bvh.hpp"
 #include "animation/phs-anm-manager.hpp"
 #include "collider/phs-cld-frustum.hpp"
-#include <cmath>
 #include <functional>
-#include <utility>
 
 #define GX_START_TASKS            \
     unsigned int task_number = 0; \
@@ -34,9 +32,8 @@
 void gearoenix::physics::Engine::update_scenes_kernel(const unsigned int kernel_index) noexcept
 {
     GX_START_TASKS
-    const std::map<core::Id, std::weak_ptr<render::scene::Scene>>& scenes = sys_app->get_asset_manager()->get_scene_manager()->get_scenes();
-    for (const std::pair<const core::Id, std::weak_ptr<render::scene::Scene>>& is : scenes) {
-        const std::shared_ptr<render::scene::Scene> scene = is.second.lock();
+    for (const auto& ls : sorted_scenes) {
+        auto * const scene = ls.second;
         if (scene == nullptr || !scene->get_enability())
             continue;
         GX_DO_TASK(scene->update())
@@ -67,12 +64,10 @@ void gearoenix::physics::Engine::update_scenes_kernel(const unsigned int kernel_
 void gearoenix::physics::Engine::update_visibility_kernel(const unsigned int kernel_index) noexcept
 {
     GX_START_TASKS
-    const auto& scenes = sys_app->get_asset_manager()->get_scene_manager()->get_scenes();
-    for (const auto& id_scene : scenes) {
-        const auto scene = id_scene.second.lock();
+    for (const auto& layer_scene : sorted_scenes) {
+        const auto* const scene = layer_scene.second;
         if (scene == nullptr || !scene->get_enability())
             continue;
-        sorted_scenes[scene->get_layer()] = scene.get();
         const auto& cameras = scene->get_cameras();
         const auto* const dynamic_accelerator = scene->get_dynamic_accelerator();
         const auto* const static_accelerator = scene->get_static_accelerator();
@@ -106,6 +101,7 @@ void gearoenix::physics::Engine::update_visibility_receiver() noexcept
             auto* const camera = id_camera.second.get();
             if (camera == nullptr || !camera->get_enabled())
                 continue;
+            camera->merge_seen_meshes();
             auto& cascade_infos = camera->get_cascades();
             for(auto& cascade_info: cascade_infos) {
                 cascade_info.shrink();
@@ -123,6 +119,17 @@ gearoenix::physics::Engine::Engine(system::Application* const sys_app, core::syn
     workers->add_step(
         std::bind(&Engine::update_visibility_kernel, this, std::placeholders::_1),
         std::bind(&Engine::update_visibility_receiver, this));
+}
+
+void gearoenix::physics::Engine::update() noexcept {
+    sorted_scenes.clear();
+    const auto& scenes = sys_app->get_asset_manager()->get_scene_manager()->get_scenes();
+    for (const auto& id_scene : scenes) {
+        const auto scene = id_scene.second.lock();
+        if (scene == nullptr || !scene->get_enability())
+            continue;
+        sorted_scenes.insert({scene->get_layer(), scene.get()});
+    }
 }
 
 gearoenix::physics::Engine::~Engine() noexcept = default;

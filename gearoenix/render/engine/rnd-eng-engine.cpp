@@ -1,7 +1,6 @@
 #include "rnd-eng-engine.hpp"
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../core/cr-function-loader.hpp"
-#include "../../core/event/cr-ev-event.hpp"
 #include "../../core/sync/cr-sync-kernel-workers.hpp"
 #include "../../core/sync/cr-sync-semaphore.hpp"
 #include "../../physics/phs-engine.hpp"
@@ -63,7 +62,7 @@ void gearoenix::render::engine::Engine::update() noexcept
     ++frame_number_from_start;
     frame_number = frame_number_from_start % frames_count;
     function_loader->unload();
-    function_loader->unload();
+    physics_engine->update();
     kernels->do_steps();
     do_late_delete();
 }

@@ -46,6 +46,7 @@ private:
 public:
     Engine(system::Application* sys_app, core::sync::KernelWorkers* workers) noexcept;
     ~Engine() noexcept;
+    void update() noexcept;
 };
 }
 #endif

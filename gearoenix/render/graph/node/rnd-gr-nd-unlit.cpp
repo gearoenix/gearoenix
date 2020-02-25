@@ -97,7 +97,7 @@ void gearoenix::render::graph::node::Unlit::update() noexcept
         kernel->render_data_pool.refresh();
         kernel->secondary_cmd->begin();
     }
-    models.clear();
+    meshes.clear();
 }
 
 void gearoenix::render::graph::node::Unlit::set_camera(const camera::Camera* const c) noexcept
@@ -106,9 +106,9 @@ void gearoenix::render::graph::node::Unlit::set_camera(const camera::Camera* con
     render_target = c->get_target();
 }
 
-void gearoenix::render::graph::node::Unlit::add_models(const std::map<const model::Model*, std::vector<const model::Mesh*>>* ms) noexcept
+void gearoenix::render::graph::node::Unlit::add_mesh(std::pair<model::Model*, model::Mesh*> m) noexcept
 {
-    models.push_back(ms);
+    meshes.push_back(std::move(m));
 }
 
 void gearoenix::render::graph::node::Unlit::record(const unsigned int kernel_index) noexcept
@@ -116,34 +116,32 @@ void gearoenix::render::graph::node::Unlit::record(const unsigned int kernel_ind
     const unsigned int kernels_count = e->get_kernels()->get_threads_count();
     unsigned int task_number = 0;
     auto* const kernel = frame->kernels[kernel_index].get();
-    for (auto* const models_meshes : models) {
-        for (const auto& model_meshes : *models_meshes) {
-            if (task_number == kernel_index) {
-                const UnlitUniform u {
-                    .mvp = cam->get_uniform().view_projection * model_meshes.first->get_collider()->get_model_matrix()
-                };
-                for (const auto* const msh : model_meshes.second) {
-                    record(msh, u, kernel);
-                }
+    model::Model* pre_mdl = nullptr;
+    UnlitUniform u {};
+    for (const auto [mdl, msh] : meshes) {
+        if (task_number == kernel_index) {
+            if(pre_mdl != mdl) {
+                u.mvp = cam->get_uniform().view_projection * mdl->get_collider()->get_model_matrix();
+                pre_mdl = mdl;
             }
-            ++task_number;
-            task_number %= kernels_count;
+            record(msh, u, kernel);
         }
+        ++task_number;
+        task_number %= kernels_count;
     }
 }
 
 void gearoenix::render::graph::node::Unlit::record_continuously(const unsigned int kernel_index) noexcept
 {
     auto* const kernel = frame->kernels[kernel_index].get();
-    for (auto* const models_meshes : models) {
-        for (const auto& model_meshes : *models_meshes) {
-            const UnlitUniform u {
-                .mvp = cam->get_uniform().view_projection * model_meshes.first->get_collider()->get_model_matrix()
-            };
-            for (const auto* const msh : model_meshes.second) {
-                record(msh, u, kernel);
-            }
+    model::Model*pre_mdl = nullptr;
+    UnlitUniform u {};
+    for (const auto [mdl, msh] : meshes) {
+        if(pre_mdl != mdl) {
+            u.mvp  = cam->get_uniform().view_projection * mdl->get_collider()->get_model_matrix();
+            pre_mdl = mdl;
         }
+        record(msh, u, kernel);
     }
 }
 
