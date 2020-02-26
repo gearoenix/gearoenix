@@ -122,7 +122,7 @@ GX_SCENE_ADD_HELPER(audio, audio::Audio)
 void gearoenix::render::scene::Scene::scene_add_light(const std::shared_ptr<light::Light>& o) noexcept
 {
     const core::Id id = o->get_asset_id();
-    if (o->get_light_type() == light::Type::DIRECTIONAL) {
+    if (o->get_light_type() == light::Type::DIRECTIONAL && o->get_shadow_enabled()) {
         o->set_scene(this);
     } else {
         GX_CHECK_HELPER(light)
@@ -224,11 +224,22 @@ std::optional<std::pair<gearoenix::core::Real, gearoenix::physics::collider::Col
 
 void gearoenix::render::scene::Scene::add_shadow_cascader(const core::Id light_id) noexcept
 {
-    core::sync::EndCaller<light::Light> call([](const std::shared_ptr<light::Light>&) {});
-    shadow_cascader_lights[light_id] = std::dynamic_pointer_cast<light::Directional>(e->get_system_application()->get_asset_manager()->get_light_manager()->get_gx3d(light_id, call));
+    const auto search = lights.find(light_id);
+    if (search == lights.end()) {
+        core::sync::EndCaller<light::Light> call([](const std::shared_ptr<light::Light>&) {});
+        shadow_cascader_lights[light_id] = std::dynamic_pointer_cast<light::Directional>(
+            e->get_system_application()->get_asset_manager()->get_light_manager()->get_gx3d(light_id, call));
+    } else {
+        shadow_cascader_lights[search->first] = std::dynamic_pointer_cast<light::Directional>(search->second);
+        lights.erase(search);
+    }
 }
 
 void gearoenix::render::scene::Scene::remove_shadow_cascader(const core::Id light_id) noexcept
 {
-    shadow_cascader_lights.erase(light_id);
+    const auto search = shadow_cascader_lights.find(light_id);
+    if (search == shadow_cascader_lights.end())
+        return;
+    lights[search->first] = std::move(search->second);
+    shadow_cascader_lights.erase(search);
 }

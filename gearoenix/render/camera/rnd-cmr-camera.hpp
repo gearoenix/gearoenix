@@ -54,7 +54,7 @@ class Directional;
 
 namespace gearoenix::render::model {
 class Model;
-    class Mesh;
+class Mesh;
 }
 
 namespace gearoenix::render::texture {

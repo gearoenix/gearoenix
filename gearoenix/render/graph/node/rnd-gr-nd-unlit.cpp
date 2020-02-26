@@ -118,9 +118,9 @@ void gearoenix::render::graph::node::Unlit::record(const unsigned int kernel_ind
     auto* const kernel = frame->kernels[kernel_index].get();
     model::Model* pre_mdl = nullptr;
     UnlitUniform u {};
-    for (const auto [mdl, msh] : meshes) {
+    for (const auto& [mdl, msh] : meshes) {
         if (task_number == kernel_index) {
-            if(pre_mdl != mdl) {
+            if (pre_mdl != mdl) {
                 u.mvp = cam->get_uniform().view_projection * mdl->get_collider()->get_model_matrix();
                 pre_mdl = mdl;
             }
@@ -134,11 +134,11 @@ void gearoenix::render::graph::node::Unlit::record(const unsigned int kernel_ind
 void gearoenix::render::graph::node::Unlit::record_continuously(const unsigned int kernel_index) noexcept
 {
     auto* const kernel = frame->kernels[kernel_index].get();
-    model::Model*pre_mdl = nullptr;
+    model::Model* pre_mdl = nullptr;
     UnlitUniform u {};
-    for (const auto [mdl, msh] : meshes) {
-        if(pre_mdl != mdl) {
-            u.mvp  = cam->get_uniform().view_projection * mdl->get_collider()->get_model_matrix();
+    for (const auto& [mdl, msh] : meshes) {
+        if (pre_mdl != mdl) {
+            u.mvp = cam->get_uniform().view_projection * mdl->get_collider()->get_model_matrix();
             pre_mdl = mdl;
         }
         record(msh, u, kernel);

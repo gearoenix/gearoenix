@@ -1,7 +1,7 @@
 #include "rnd-mdl-transformation.hpp"
+#include "../../physics/collider/phs-cld-collider.hpp"
 #include "../../physics/phs-transformation.hpp"
 #include "rnd-mdl-model.hpp"
-#include "../../physics/collider/phs-cld-collider.hpp"
 
 gearoenix::render::model::Transformation::Transformation(Model* const parent) noexcept
     : parent(parent)

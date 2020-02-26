@@ -1,6 +1,7 @@
 #include "rnd-lt-directional.hpp"
 #include "../../system/stream/sys-stm-stream.hpp"
 #include "../buffer/rnd-buf-framed-uniform.hpp"
+#include "../scene/rnd-scn-scene.hpp"
 
 gearoenix::render::light::Directional::Directional(const core::Id my_id, system::stream::Stream* const f, engine::Engine* const e) noexcept
     : Light(my_id, f, e, Type::DIRECTIONAL)

@@ -33,28 +33,46 @@ void gearoenix::physics::Engine::update_scenes_kernel(const unsigned int kernel_
 {
     GX_START_TASKS
     for (const auto& ls : sorted_scenes) {
-        auto * const scene = ls.second;
-        if (scene == nullptr || !scene->get_enability())
-            continue;
+        auto* const scene = ls.second;
         GX_DO_TASK(scene->update())
         const auto& skies = scene->get_skyboxs();
         for (const auto& sky : skies) {
-            if(!sky.second->get_enabled()) continue;
+            if (!sky.second->get_enabled())
+                continue;
             GX_DO_TASK(sky.second->update())
         }
         const auto& cameras = scene->get_cameras();
         const auto& shadow_cascaders = scene->get_shadow_cascader_lights();
         for (const auto& cam : cameras) {
-            auto*const camera = cam.second.get();
+            auto* const camera = cam.second.get();
             if (camera == nullptr || !camera->get_enabled())
                 continue;
-            GX_DO_TASK(camera->update())
+            GX_DO_TASK(camera->update();
+                       if (camera->get_cascaded_shadow_enabled()) {
+                           for (const auto& id_light : shadow_cascaders) {
+                               auto* const light = id_light.second.get();
+                               if (!light->get_enabled())
+                                   continue;
+                               camera->cascade_shadow(light);
+                           }
+                       })
+        }
+    }
+}
+
+void gearoenix::physics::Engine::update_scenes_receiver() noexcept
+{
+
+    for (const auto& ls : sorted_scenes) {
+        auto* const scene = ls.second;
+        const auto& cameras = scene->get_cameras();
+        for (const auto& cam : cameras) {
+            auto* const camera = cam.second.get();
+            if (camera == nullptr || !camera->get_enabled())
+                continue;
             if (camera->get_cascaded_shadow_enabled()) {
-                for (const auto& id_light : shadow_cascaders) {
-                    auto* const light = id_light.second.get();
-                    if (!light->get_enabled())
-                        continue;
-                    GX_DO_TASK(camera->cascade_shadow(light))
+                for (auto& cascade : camera->get_cascades()) {
+                    cascade.start();
                 }
             }
         }
@@ -66,8 +84,6 @@ void gearoenix::physics::Engine::update_visibility_kernel(const unsigned int ker
     GX_START_TASKS
     for (const auto& layer_scene : sorted_scenes) {
         const auto* const scene = layer_scene.second;
-        if (scene == nullptr || !scene->get_enability())
-            continue;
         const auto& cameras = scene->get_cameras();
         const auto* const dynamic_accelerator = scene->get_dynamic_accelerator();
         const auto* const static_accelerator = scene->get_static_accelerator();
@@ -82,9 +98,11 @@ void gearoenix::physics::Engine::update_visibility_kernel(const unsigned int ker
                 GX_DO_TASK(camera->check_static_models(static_accelerator))
             }
             auto& cascade_infos = camera->get_cascades();
-            for(auto& cascade_info: cascade_infos) {
-                if (nullptr != dynamic_accelerator) GX_DO_TASK(cascade_info.shadow(dynamic_accelerator, kernel_index))
-                if (nullptr != static_accelerator) GX_DO_TASK(cascade_info.shadow(static_accelerator, kernel_index))
+            for (auto& cascade_info : cascade_infos) {
+                if (nullptr != dynamic_accelerator)
+                    GX_DO_TASK(cascade_info.shadow(dynamic_accelerator, kernel_index))
+                if (nullptr != static_accelerator)
+                    GX_DO_TASK(cascade_info.shadow(static_accelerator, kernel_index))
             }
         }
     }
@@ -93,7 +111,7 @@ void gearoenix::physics::Engine::update_visibility_kernel(const unsigned int ker
 void gearoenix::physics::Engine::update_visibility_receiver() noexcept
 {
     for (const auto& id_scene : sorted_scenes) {
-        const auto*const scene = id_scene.second;
+        const auto* const scene = id_scene.second;
         if (scene == nullptr || !scene->get_enability())
             continue;
         const auto& cameras = scene->get_cameras();
@@ -103,7 +121,7 @@ void gearoenix::physics::Engine::update_visibility_receiver() noexcept
                 continue;
             camera->merge_seen_meshes();
             auto& cascade_infos = camera->get_cascades();
-            for(auto& cascade_info: cascade_infos) {
+            for (auto& cascade_info : cascade_infos) {
                 cascade_info.shrink();
             }
         }
@@ -115,20 +133,23 @@ gearoenix::physics::Engine::Engine(system::Application* const sys_app, core::syn
     , sys_app(sys_app)
     , workers(workers)
 {
-    workers->add_step(std::bind(&Engine::update_scenes_kernel, this, std::placeholders::_1));
+    workers->add_step(
+        std::bind(&Engine::update_scenes_kernel, this, std::placeholders::_1),
+        std::bind(&Engine::update_scenes_receiver, this));
     workers->add_step(
         std::bind(&Engine::update_visibility_kernel, this, std::placeholders::_1),
         std::bind(&Engine::update_visibility_receiver, this));
 }
 
-void gearoenix::physics::Engine::update() noexcept {
+void gearoenix::physics::Engine::update() noexcept
+{
     sorted_scenes.clear();
     const auto& scenes = sys_app->get_asset_manager()->get_scene_manager()->get_scenes();
     for (const auto& id_scene : scenes) {
         const auto scene = id_scene.second.lock();
         if (scene == nullptr || !scene->get_enability())
             continue;
-        sorted_scenes.insert({scene->get_layer(), scene.get()});
+        sorted_scenes.insert({ scene->get_layer(), scene.get() });
     }
 }
 

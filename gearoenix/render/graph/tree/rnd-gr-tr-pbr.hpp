@@ -3,8 +3,8 @@
 #include "../../../core/cr-pool.hpp"
 #include "../../../core/cr-types.hpp"
 #include "../../../core/sync/cr-sync-end-caller.hpp"
-#include "rnd-gr-tr-tree.hpp"
 #include "../../material/rnd-mat-type.hpp"
+#include "rnd-gr-tr-tree.hpp"
 #include <map>
 #include <set>
 #include <tuple>
@@ -23,12 +23,12 @@ class CascadeInfo;
 }
 
 namespace gearoenix::render::model {
-    class Model;
-    class Mesh;
+class Model;
+class Mesh;
 }
 
 namespace gearoenix::render::scene {
-    class Scene;
+class Scene;
 }
 
 namespace gearoenix::render::camera {
@@ -46,7 +46,7 @@ public:
         Nodes opaques {};
         std::vector<node::Node*> transparencies;
 
-        void clear() noexcept ;
+        void clear() noexcept;
     };
     using SceneData = std::map<core::Real, std::map<const camera::Camera*, CameraData>>;
 
@@ -61,11 +61,11 @@ private:
 
     void update_skyboxes(const scene::Scene* scn, const camera::Camera* cam, CameraData& camera_nodes) noexcept;
     void update_opaque(
-            const std::vector<std::tuple<material::Type, model::Model*, model::Mesh*>>& seen_meshes,
-            const scene::Scene* scn, const camera::Camera* cam, CameraData& camera_nodes) noexcept;
+        const std::vector<std::tuple<material::Type, model::Model*, model::Mesh*>>& seen_meshes,
+        const scene::Scene* scn, const camera::Camera* cam, CameraData& camera_nodes) noexcept;
     void update_transparent(
-            const std::vector<std::tuple<core::Real, material::Type, model::Model*, model::Mesh*>>& seen_meshes,
-            const scene::Scene* scn, const camera::Camera* cam, CameraData& camera_nodes) noexcept;
+        const std::vector<std::tuple<core::Real, material::Type, model::Model*, model::Mesh*>>& seen_meshes,
+        const scene::Scene* scn, const camera::Camera* cam, CameraData& camera_nodes) noexcept;
 
 public:
     Pbr(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;

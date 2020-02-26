@@ -28,11 +28,12 @@
         task_number = (task_number + 1) % kernels_count; \
     }
 
-void gearoenix::render::graph::tree::Pbr::CameraData::clear() noexcept {
-        skyboxes.clear();
-        opaques.forward_pbr = nullptr;
-        opaques.unlit = nullptr;
-        transparencies.clear();
+void gearoenix::render::graph::tree::Pbr::CameraData::clear() noexcept
+{
+    skyboxes.clear();
+    opaques.forward_pbr = nullptr;
+    opaques.unlit = nullptr;
+    transparencies.clear();
 }
 
 void gearoenix::render::graph::tree::Pbr::update_skyboxes(const scene::Scene* const scn, const camera::Camera* const cam, CameraData& camera_nodes) noexcept
@@ -81,7 +82,7 @@ gearoenix::render::graph::tree::Pbr::~Pbr() noexcept
 void gearoenix::render::graph::tree::Pbr::update() noexcept
 {
     forward_pbr.refresh();
-//    skybox_cube.refresh();
+    //    skybox_cube.refresh();
     skybox_equirectangular.refresh();
     unlit.refresh();
     nodes.clear();
@@ -89,21 +90,21 @@ void gearoenix::render::graph::tree::Pbr::update() noexcept
     const auto& priorities_scenes = e->get_physics_engine()->get_sorted_scenes();
     for (const auto& priority_scenes : priorities_scenes) {
         const core::Real scene_priority = priority_scenes.first;
-        auto &scene_priority_nodes = nodes[scene_priority];
-        const scene::Scene *const scn = priority_scenes.second;
-        auto &scene_nodes = scene_priority_nodes[scn];
-        const auto &cameras = scn->get_cameras();
-        for (const auto &id_camera : cameras) {
-            auto *const cam = id_camera.second.get();
+        auto& scene_priority_nodes = nodes[scene_priority];
+        const scene::Scene* const scn = priority_scenes.second;
+        auto& scene_nodes = scene_priority_nodes[scn];
+        const auto& cameras = scn->get_cameras();
+        for (const auto& id_camera : cameras) {
+            auto* const cam = id_camera.second.get();
             const core::Real camera_priority = cam->get_layer();
-            auto &camera_priority_nodes = scene_nodes[camera_priority];
-            CameraData &camera_nodes = camera_priority_nodes[cam];
+            auto& camera_priority_nodes = scene_nodes[camera_priority];
+            CameraData& camera_nodes = camera_priority_nodes[cam];
             camera_nodes.clear();
             update_skyboxes(scn, cam, camera_nodes);
             update_opaque(cam->get_seen_static_opaque_meshes(), scn, cam, camera_nodes);
             update_opaque(cam->get_seen_dynamic_opaque_meshes(), scn, cam, camera_nodes);
             update_transparent(cam->get_seen_transparent_meshes(), scn, cam, camera_nodes);
-            for (auto &c : cam->get_cascades()) {
+            for (auto& c : cam->get_cascades()) {
                 cascades.push_back(&c);
             }
         }
@@ -209,11 +210,11 @@ void gearoenix::render::graph::tree::Pbr::submit() noexcept
 }
 
 void gearoenix::render::graph::tree::Pbr::update_opaque(
-        const std::vector<std::tuple< material::Type, model::Model*, model::Mesh*>>& seen_meshes,
-        const scene::Scene*const scn, const camera::Camera*const cam, CameraData& camera_nodes
-        ) noexcept {
-    node::ForwardPbr * fwd = camera_nodes.opaques.forward_pbr;
-    if( fwd == nullptr) {
+    const std::vector<std::tuple<material::Type, model::Model*, model::Mesh*>>& seen_meshes,
+    const scene::Scene* const scn, const camera::Camera* const cam, CameraData& camera_nodes) noexcept
+{
+    node::ForwardPbr* fwd = camera_nodes.opaques.forward_pbr;
+    if (fwd == nullptr) {
         fwd = forward_pbr.get_next([this] {
             return new node::ForwardPbr(e, GX_DEFAULT_IGNORED_END_CALLER);
         });
@@ -222,14 +223,14 @@ void gearoenix::render::graph::tree::Pbr::update_opaque(
         fwd->set_camera(cam);
 
         const auto& cs = cam->get_cascades();
-        for(auto& cascade: cs ) {
+        for (auto& cascade : cs) {
             fwd->add_cascade(&cascade);
         }
         camera_nodes.opaques.forward_pbr = fwd;
     }
 
-    node::Unlit *unl = camera_nodes.opaques.unlit;
-    if(unl == nullptr) {
+    node::Unlit* unl = camera_nodes.opaques.unlit;
+    if (unl == nullptr) {
         unl = unlit.get_next([this] {
             return new node::Unlit(e, GX_DEFAULT_IGNORED_END_CALLER);
         });
@@ -238,66 +239,69 @@ void gearoenix::render::graph::tree::Pbr::update_opaque(
         camera_nodes.opaques.unlit = unl;
     }
 
-    for (const auto [material_id, model_ptr, mesh_ptr] : seen_meshes) {
+    for (const auto& [material_id, model_ptr, mesh_ptr] : seen_meshes) {
         switch (material_id) {
-            case material::Type::Pbr: {
-                fwd->add_mesh(std::make_pair(model_ptr, mesh_ptr));
-                break;
-            }
-            case material::Type::Unlit: {
-                unl->add_mesh(std::make_pair(model_ptr, mesh_ptr));
-                break;
-            }
-            default: GXUNEXPECTED
+        case material::Type::Pbr: {
+            fwd->add_mesh(std::make_pair(model_ptr, mesh_ptr));
+            break;
+        }
+        case material::Type::Unlit: {
+            unl->add_mesh(std::make_pair(model_ptr, mesh_ptr));
+            break;
+        }
+        default:
+            GXUNEXPECTED
         }
     }
 }
 
 void gearoenix::render::graph::tree::Pbr::update_transparent(
-        const std::vector<std::tuple<core::Real, material::Type, model::Model *, model::Mesh *>> &seen_meshes,
-        const scene::Scene *scn, const camera::Camera *cam, CameraData &camera_nodes) noexcept {
+    const std::vector<std::tuple<core::Real, material::Type, model::Model*, model::Mesh*>>& seen_meshes,
+    const scene::Scene* scn, const camera::Camera* cam, CameraData& camera_nodes) noexcept
+{
     const auto& cs = cam->get_cascades();
-    node::ForwardPbr *fwd = nullptr;
-    node::Unlit *unl = nullptr;
-    for (const auto [dis, mat_type, mdl, msh] : seen_meshes) {
+    node::ForwardPbr* fwd = nullptr;
+    node::Unlit* unl = nullptr;
+    for (const auto& [dis, mat_type, mdl, msh] : seen_meshes) {
         switch (mat_type) {
-            case material::Type::Pbr: {
-                unl = nullptr;
-                if (fwd == nullptr) {
-                    fwd = forward_pbr.get_next([this] {
-                        auto *const n = new node::ForwardPbr(
-                                e, core::sync::EndCaller<core::sync::EndCallerIgnore>([] {}));
-                        n->set_render_target(e->get_main_render_target().get());
-                        return n;
-                    });
-                    camera_nodes.transparencies.push_back(fwd);
-                    fwd->update();
-                    fwd->set_scene(scn);
-                    fwd->set_camera(cam);
-                    for(auto& c: cs) {
-                        fwd->add_cascade(&c);
-                    }
+        case material::Type::Pbr: {
+            unl = nullptr;
+            if (fwd == nullptr) {
+                fwd = forward_pbr.get_next([this] {
+                    auto* const n = new node::ForwardPbr(
+                        e, core::sync::EndCaller<core::sync::EndCallerIgnore>([] {}));
+                    n->set_render_target(e->get_main_render_target().get());
+                    return n;
+                });
+                camera_nodes.transparencies.push_back(fwd);
+                fwd->update();
+                fwd->set_scene(scn);
+                fwd->set_camera(cam);
+                for (auto& c : cs) {
+                    fwd->add_cascade(&c);
                 }
-                fwd->add_mesh({ mdl, msh });
-                break;
             }
-            case material::Type::Unlit: {
-                fwd = nullptr;
-                if (unl == nullptr) {
-                    unl = unlit.get_next([this] {
-                        auto *const n = new node::Unlit(
-                                e, core::sync::EndCaller<core::sync::EndCallerIgnore>([] {}));
-                        n->set_render_target(e->get_main_render_target().get());
-                        return n;
-                    });
-                    camera_nodes.transparencies.push_back(unl);
-                    unl->update();
-                    unl->set_camera(cam);
-                }
-                unl->add_mesh({mdl, msh});
-                break;
+            fwd->add_mesh({ mdl, msh });
+            break;
+        }
+        case material::Type::Unlit: {
+            fwd = nullptr;
+            if (unl == nullptr) {
+                unl = unlit.get_next([this] {
+                    auto* const n = new node::Unlit(
+                        e, core::sync::EndCaller<core::sync::EndCallerIgnore>([] {}));
+                    n->set_render_target(e->get_main_render_target().get());
+                    return n;
+                });
+                camera_nodes.transparencies.push_back(unl);
+                unl->update();
+                unl->set_camera(cam);
             }
-            default: GXUNEXPECTED
+            unl->add_mesh({ mdl, msh });
+            break;
+        }
+        default:
+            GXUNEXPECTED
         }
         (void)dis;
     }

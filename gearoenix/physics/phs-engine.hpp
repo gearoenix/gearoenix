@@ -12,16 +12,16 @@ class Application;
 }
 
 namespace gearoenix::physics::animation {
-    struct Manager;
+struct Manager;
 }
 
 namespace gearoenix::render::scene {
-    struct Scene;
+class Scene;
 }
 
 namespace gearoenix::physics {
 class Engine {
-    typedef std::multimap<core::Real, render::scene::Scene *> SceneMap;
+    typedef std::multimap<core::Real, render::scene::Scene*> SceneMap;
     GX_GET_UCPTR_PRV(animation::Manager, animation_manager)
     GX_GET_CREF_PRV(SceneMap, sorted_scenes)
 private:
@@ -33,6 +33,7 @@ private:
     ///    - Update the shadow caster lights.
     ///    - Compute cameras cascaded shadowing partitions
     void update_scenes_kernel(unsigned int kernel_index) noexcept;
+    void update_scenes_receiver() noexcept;
 
     /// It does followings:
     ///    - Uniform buffer update for scene.

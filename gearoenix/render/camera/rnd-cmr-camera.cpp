@@ -156,10 +156,11 @@ void gearoenix::render::camera::Camera::cascade_shadow(const light::Directional*
     cascade_info->update(view, cascaded_shadow_frustum_partitions);
 }
 
-void gearoenix::render::camera::Camera::merge_seen_meshes() noexcept {
+void gearoenix::render::camera::Camera::merge_seen_meshes() noexcept
+{
     std::merge(seen_dynamic_transparent_meshes.begin(), seen_dynamic_transparent_meshes.end(),
-               seen_static_transparent_meshes.begin(), seen_static_transparent_meshes.end(),
-               std::back_inserter(seen_transparent_meshes));
+        seen_static_transparent_meshes.begin(), seen_static_transparent_meshes.end(),
+        std::back_inserter(seen_transparent_meshes));
 }
 
 bool gearoenix::render::camera::Camera::on_event(const core::event::Data& d) noexcept

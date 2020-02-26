@@ -27,8 +27,8 @@ class CascadeInfo;
 }
 
 namespace gearoenix::render::model {
-    class Model;
-    class Mesh;
+class Model;
+class Mesh;
 }
 
 namespace gearoenix::render::pipeline {

@@ -6,8 +6,8 @@
 #include "../material/rnd-mat-unlit.hpp"
 #include "../mesh/rnd-msh-manager.hpp"
 #include "../model/rnd-mdl-dynamic.hpp"
-#include "../model/rnd-mdl-mesh.hpp"
 #include "../model/rnd-mdl-manager.hpp"
+#include "../model/rnd-mdl-mesh.hpp"
 #include "../scene/rnd-scn-ui.hpp"
 #include "rnd-wdg-button.hpp"
 

@@ -1,5 +1,7 @@
 #include "exm-003-ui-widgets.hpp"
 #include <gearoenix/core/asset/cr-asset-manager.hpp>
+#include <gearoenix/physics/phs-transformation.hpp>
+#include <gearoenix/render/engine/rnd-eng-engine.hpp>
 #include <gearoenix/render/graph/tree/rnd-gr-tr-pbr.hpp>
 #include <gearoenix/render/model/rnd-mdl-manager.hpp>
 #include <gearoenix/render/scene/rnd-scn-manager.hpp>
