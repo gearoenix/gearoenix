@@ -1,5 +1,7 @@
-#ifndef GL_CONSTANTS_HPP
-#define GL_CONSTANTS_HPP
+#ifndef GEAROENIX_GL_CONSTANTS_HPP
+#define GEAROENIX_GL_CONSTANTS_HPP
+#include "../core/cr-build-configuration.hpp"
+#ifdef GX_USE_OPENGL
 
 #define GL_VERSION_ES_CL_1_0 1
 #define GL_VERSION_ES_CM_1_1 1
@@ -372,4 +374,5 @@
 #define GL_DEPTH_COMPONENT 0x1902
 #define GL_READ_FRAMEBUFFER 0x8CA8
 #define GL_DRAW_FRAMEBUFFER 0x8CA9
+#endif
 #endif

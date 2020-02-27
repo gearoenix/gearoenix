@@ -3,6 +3,7 @@
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../core/cr-function-loader.hpp"
 #include "../../gl/gl-loader.hpp"
+#include "../../gl/gl-utils.hpp"
 #include "../../system/sys-app.hpp"
 #include "../engine/glc3-eng-engine.hpp"
 #include "glc3-txt-2d.hpp"
@@ -62,34 +63,63 @@ void gearoenix::glc3::texture::Target::initialize_textures(
         a.img_depth = info.img_depth;
         a.mipmap_level = info.mipmap_level;
         a.usage = info.usage;
-        switch (info.texture_info.texture_type) {
-        case render::texture::Type::Texture2D: {
-            const auto t = Texture2D::construct(
-                core::asset::Manager::create_id(), gl_e,
-                info.texture_info,
-                info.img_width, info.img_height, call);
-            a.txt = t;
-            a.var = render::texture::Attachment2D {
-                .txt = t,
-            };
-            break;
-        }
-        case render::texture::Type::TextureCube: {
-            if (info.img_width != info.img_height)
-                GXLOGF("This graphic backend does not support un-squared cube maps.")
-            const auto t = TextureCube::construct(
-                core::asset::Manager::create_id(), gl_e,
-                info.texture_info,
-                info.img_width, call);
-            a.txt = t;
-            a.var = render::texture::AttachmentCube {
-                .txt = t,
-                .face = info.face.value(),
-            };
-            break;
-        }
-        default:
-            GXUNEXPECTED
+        if (info.txt.has_value()) {
+            a.txt = info.txt.value();
+            switch (info.texture_info.texture_type) {
+            case render::texture::Type::Texture2D: {
+                a.var = render::texture::Attachment2D {
+                    .txt = std::dynamic_pointer_cast<Texture2D>(info.txt.value()),
+                };
+                break;
+            }
+            case render::texture::Type::TextureCube: {
+#ifdef GX_DEBUG_GL_CLASS_3
+                if (info.img_width != info.img_height)
+                    GXLOGF(
+                        "This graphic backend does not support un-squared cube maps.")
+#endif
+                a.var = render::texture::AttachmentCube {
+                    .txt = std::dynamic_pointer_cast<TextureCube>(info.txt.value()),
+                    .face = info.face.value(),
+                };
+                break;
+            }
+            default:
+                GXUNEXPECTED
+            }
+        } else {
+            switch (info.texture_info.texture_type) {
+            case render::texture::Type::Texture2D: {
+                const auto t = Texture2D::construct(
+                    core::asset::Manager::create_id(), gl_e,
+                    info.texture_info,
+                    info.img_width, info.img_height, call);
+                a.txt = t;
+                a.var = render::texture::Attachment2D {
+                    .txt = t,
+                };
+                break;
+            }
+            case render::texture::Type::TextureCube: {
+#ifdef GX_DEBUG_GL_CLASS_3
+                if (info.img_width != info.img_height)
+                    GXLOGF(
+                        "This graphic backend does not support un-squared cube maps.")
+#endif
+                const auto t = TextureCube::construct(
+                    core::asset::Manager::create_id(), gl_e,
+                    info.texture_info,
+                    info.img_width, call);
+                a.txt = t;
+                a.var = render::texture::AttachmentCube {
+                    .txt = t,
+                    .face = info.face.value(),
+                };
+                break;
+            }
+            default:
+                GXUNEXPECTED
+            }
         }
     }
 }
@@ -146,13 +176,18 @@ void gearoenix::glc3::texture::Target::generate_framebuffer() noexcept
     framebuffer->gl_e = gl_e;
     gl::Loader::gen_framebuffers(1, reinterpret_cast<gl::uint*>(&(framebuffer->framebuffer)));
     gl::Loader::bind_framebuffer(GL_FRAMEBUFFER, framebuffer->framebuffer);
+#ifdef GX_DEBUG_GL_CLASS_3
+    gl::Loader::check_for_error();
+#endif
     // TODO: check for need of depth buffer, It can be done by looping over infos for depth formats, if there was none so depth buffer must be created.
     gl::enumerated color_attachment_count = -1;
+    bool needs_depth_attachment = true;
     for (const auto& attachment : attachments) {
         const auto& txt = attachment.txt;
         const auto glf = [&](const render::texture::UsageFlag u) {
             switch (u) {
             case render::texture::UsageFlag::Depth:
+                needs_depth_attachment = false;
                 return gl::enumerated(GL_DEPTH_ATTACHMENT);
             case render::texture::UsageFlag ::Color:
                 ++color_attachment_count;
@@ -171,14 +206,31 @@ void gearoenix::glc3::texture::Target::generate_framebuffer() noexcept
             case render::texture::Type::TextureCube: {
                 const auto* const t = static_cast<const TextureCube*>(txt.get());
                 t->bind();
-                return std::make_tuple(t->get_texture_object(), gl::enumerated(GL_TEXTURE_CUBE_MAP));
+                return std::make_tuple(
+                    t->get_texture_object(),
+                    gl::convert(std::get<render::texture::AttachmentCube>(attachment.var).face));
             }
             default:
                 GXUNEXPECTED
             }
         }();
+#ifdef GX_DEBUG_GL_CLASS_3
+        gl::Loader::check_for_error();
+#endif
         gl::Loader::framebuffer_texture_2d(GL_FRAMEBUFFER, glf, glt, glo, attachment.mipmap_level);
+#ifdef GX_DEBUG_GL_CLASS_3
+        gl::Loader::check_for_error();
+#endif
     }
+    if (needs_depth_attachment) {
+        gl::Loader::gen_renderbuffers(1, reinterpret_cast<gl::uint*>(&framebuffer->depth_buffer));
+        gl::Loader::bind_renderbuffer(GL_RENDERBUFFER, framebuffer->depth_buffer);
+        gl::Loader::renderbuffer_storage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, attachments[0].img_width, attachments[0].img_height);
+        gl::Loader::framebuffer_renderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, framebuffer->depth_buffer);
+    }
+#ifdef GX_DEBUG_GL_CLASS_3
+    gl::Loader::check_for_error();
+#endif
     if (gl::Loader::check_framebuffer_status(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         GXLOGF("Failed to create render target!")
     state_init();

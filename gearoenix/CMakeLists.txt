@@ -123,6 +123,8 @@ SET(GX_ENGINE_SRC
         "${GX_ENGINE_SRC_DIR}gl/gl-loader.cpp"
         "${GX_ENGINE_SRC_DIR}gl/gl-loader.hpp"
         "${GX_ENGINE_SRC_DIR}gl/gl-types.hpp"
+        "${GX_ENGINE_SRC_DIR}gl/gl-utils.cpp"
+        "${GX_ENGINE_SRC_DIR}gl/gl-utils.hpp"
         "${GX_ENGINE_SRC_DIR}gles2/buffer/gles2-buf-index.cpp"
         "${GX_ENGINE_SRC_DIR}gles2/buffer/gles2-buf-index.hpp"
         "${GX_ENGINE_SRC_DIR}gles2/buffer/gles2-buf-manager.cpp"

@@ -36,28 +36,28 @@ std::shared_ptr<gearoenix::glc3::texture::TextureCube> gearoenix::glc3::texture:
     const std::shared_ptr<TextureCube> result(new TextureCube(id, info.format, engine));
     result->aspect = aspect;
     const SampleInfo sample_info = SampleInfo(info.sample_info);
-    gl::uint cf;
+    const auto internal_format = Texture2D::convert_internal_format(info.format);
+    const auto format = Texture2D::convert_format(info.format);
+    const auto data_format = Texture2D::convert_data_format(info.format);
     const auto gl_aspect = static_cast<gl::sizei>(aspect);
     std::vector<std::vector<std::uint8_t>> pixels(GX_COUNT_OF(FACES));
-    // TODO: change this
-    if (info.format == render::texture::TextureFormat::RgbaFloat32 && aspect == 1) {
-        cf = GL_RGBA;
-        const gl::sizei pixel_size = gl_aspect * gl_aspect * 4;
-        const auto* const raw_data = reinterpret_cast<const core::Real*>(data);
-        std::uint8_t p[4];
-        p[0] = static_cast<std::uint8_t>(raw_data[0] * 255.1f);
-        p[1] = static_cast<std::uint8_t>(raw_data[1] * 255.1f);
-        p[2] = static_cast<std::uint8_t>(raw_data[2] * 255.1f);
-        p[3] = static_cast<std::uint8_t>(raw_data[3] * 255.1f);
-        for (int fi = 0; fi < static_cast<int>(GX_COUNT_OF(FACES)); ++fi) {
-            pixels[fi].resize(pixel_size);
-            for (gl::sizei i = 0; i < pixel_size;)
-                for (int j = 0; j < 4; ++j, ++i)
-                    pixels[fi][i] = p[j];
+    if (nullptr != data) {
+        switch (info.format) {
+        case render::texture::TextureFormat::RgbaFloat32: {
+            const auto pixel_size = gl_aspect * gl_aspect * 4 * 4;
+            auto src = reinterpret_cast<std::size_t>(data);
+            for (int fi = 0; fi < static_cast<int>(GX_COUNT_OF(FACES)); ++fi, src += pixel_size) {
+                auto& face_pixels = pixels[fi];
+                face_pixels.resize(pixel_size);
+                std::memcpy(face_pixels.data(), reinterpret_cast<const void*>(src), pixel_size);
+            }
+            break;
         }
-    } else
-        GXLOGF("Unsupported/Unimplemented setting for cube texture with id " << id)
-    engine->get_function_loader()->load([result, gl_aspect, pixels { move(pixels) }, cf, sample_info, call] {
+        default:
+            GXLOGF("Unsupported/Unimplemented setting for cube texture with id " << id)
+        }
+    }
+    engine->get_function_loader()->load([result, gl_aspect, pixels { move(pixels) }, internal_format, format, data_format, sample_info, call] {
         gl::Loader::gen_textures(1, &(result->texture_object));
         gl::Loader::bind_texture(GL_TEXTURE_CUBE_MAP, result->texture_object);
         gl::Loader::tex_parameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, sample_info.mag_filter);
@@ -65,7 +65,9 @@ std::shared_ptr<gearoenix::glc3::texture::TextureCube> gearoenix::glc3::texture:
         gl::Loader::tex_parameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, sample_info.wrap_s);
         gl::Loader::tex_parameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, sample_info.wrap_t);
         for (int fi = 0; fi < static_cast<int>(GX_COUNT_OF(FACES)); ++fi) {
-            gl::Loader::tex_image_2d(FACES[fi], 0, static_cast<gl::sint>(cf), gl_aspect, gl_aspect, 0, cf, GL_UNSIGNED_BYTE, pixels[fi].data());
+            const auto& face_pixels = pixels[fi];
+            gl::Loader::tex_image_2d(FACES[fi], 0, internal_format, gl_aspect, gl_aspect, 0, format, data_format,
+                face_pixels.empty() ? nullptr : pixels[fi].data());
         }
 #ifdef GX_DEBUG_GL_CLASS_3
         gl::Loader::check_for_error();

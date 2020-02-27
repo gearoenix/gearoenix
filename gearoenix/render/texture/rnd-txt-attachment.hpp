@@ -53,6 +53,8 @@ struct AttachmentInfo {
     UsageFlag usage = UsageFlag::Color;
     /// This field will be available whenever the attachment is cube map
     std::optional<Face> face = std::nullopt;
+    /// This field is for situations that already a texture is allocated.
+    std::optional<std::shared_ptr<Texture>> txt = std::nullopt;
 };
 }
 #endif

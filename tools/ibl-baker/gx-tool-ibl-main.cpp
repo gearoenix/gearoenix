@@ -97,7 +97,7 @@ IblBakerApp::IblBakerApp(gearoenix::system::Application* const sys_app) noexcept
     GxEndCaller<GxEditWdg> edt_call([end_call](const std::shared_ptr<GxEditWdg>&) {});
     GxEndCaller<GxButton> btn_call([end_call](const std::shared_ptr<GxButton>&) {});
     GxEndCaller<GxSkyEqrect> sky_call([end_call](const std::shared_ptr<GxSkyEqrect>&) {});
-    //    GxEndCaller<GxRtReflect> rtr_call([end_call](const std::shared_ptr<GxRtReflect>&) {});
+    GxEndCaller<GxRtReflect> rtr_call([end_call](const std::shared_ptr<GxRtReflect>&) {});
 
     render_tree = std::make_unique<GxGrPbr>(render_engine, end_call);
     render_engine->set_render_tree(render_tree.get());
@@ -105,7 +105,7 @@ IblBakerApp::IblBakerApp(gearoenix::system::Application* const sys_app) noexcept
     auto* const ast_mgr = sys_app->get_asset_manager();
     auto* const mdl_mgr = ast_mgr->get_model_manager();
     auto* const sky_mgr = ast_mgr->get_skybox_manager();
-    //    auto* const rfl_mgr = ast_mgr->get_reflection_manager();
+    auto* const rfl_mgr = ast_mgr->get_reflection_manager();
 
     uiscn = ast_mgr->get_scene_manager()->create<GxUiScene>(ui_scn_call);
     scn = ast_mgr->get_scene_manager()->create<GxGameScene>(scn_call);
@@ -118,7 +118,7 @@ IblBakerApp::IblBakerApp(gearoenix::system::Application* const sys_app) noexcept
     sky = sky_mgr->create<GxSkyEqrect>(sky_call);
     scn->add_skybox(sky);
 
-    //    const auto rtr = rfl_mgr->create<GxRtReflect>(rtr_call);
+    const auto rtr = rfl_mgr->create<GxRtReflect>(rtr_call);
 
     auto tmp_txt = mdl_mgr->create<GxTextWdg>(txw_call);
     auto* tmp_tran = tmp_txt->get_transformation();

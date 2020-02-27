@@ -216,6 +216,18 @@ std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::render::text
     return default_zero_3c_cube;
 }
 
+std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::render::texture::Manager::create_cube(
+    const TextureInfo& info, const int img_aspect, core::sync::EndCaller<TextureCube>& c) noexcept
+{
+    const auto id = core::asset::Manager::create_id();
+    const std::function<std::shared_ptr<Texture>()> fun = [this, &info, img_aspect, &c, id] {
+        return e->create_texture_cube(id, nullptr, info, img_aspect, core::sync::EndCaller<core::sync::EndCallerIgnore>([c] {}));
+    };
+    const auto data = std::dynamic_pointer_cast<TextureCube>(cache.get_cacher().get(id, fun));
+    c.set_data(data);
+    return data;
+}
+
 std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::render::texture::Manager::get_gx3d(const core::Id id, core::sync::EndCaller<Texture>& c) noexcept
 {
     const std::shared_ptr<Texture> o = cache.get<Texture>(id, [this, id, c] {

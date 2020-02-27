@@ -53,6 +53,7 @@ public:
     std::shared_ptr<TextureCube> get_cube(const math::Vec3& color, core::sync::EndCaller<TextureCube>& c) noexcept;
     std::shared_ptr<TextureCube> get_cube(const math::Vec2& color, core::sync::EndCaller<TextureCube>& c) noexcept;
     std::shared_ptr<TextureCube> get_cube_zero_3c(core::sync::EndCaller<TextureCube>& c) noexcept;
+    std::shared_ptr<TextureCube> create_cube(const TextureInfo& info, int img_aspect, core::sync::EndCaller<TextureCube>& c) noexcept;
     std::shared_ptr<Texture> get_gx3d(core::Id id, core::sync::EndCaller<Texture>& c) noexcept;
     [[nodiscard]] engine::Engine* get_engine() const noexcept;
 };

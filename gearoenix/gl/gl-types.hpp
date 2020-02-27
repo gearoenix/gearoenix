@@ -1,5 +1,7 @@
-#ifndef GL_TYPES_HPP
-#define GL_TYPES_HPP
+#ifndef GEAROENIX_GL_TYPES_HPP
+#define GEAROENIX_GL_TYPES_HPP
+#include "../core/cr-build-configuration.hpp"
+#ifdef GX_USE_OPENGL
 #include <cstddef>
 #include <cstdint>
 namespace gearoenix::gl {
@@ -13,4 +15,5 @@ typedef std::int16_t sshort;
 typedef std::uint32_t uint;
 typedef std::uint16_t ushort;
 }
+#endif
 #endif
