@@ -5,7 +5,6 @@
 #include "../../core/cr-static.hpp"
 #include "../../core/event/cr-ev-listener.hpp"
 #include "../../math/math-ray.hpp"
-#include "../../physics/collider/phs-cld-collider.hpp"
 #include "../material/rnd-mat-type.hpp"
 #include "rnd-cmr-uniform.hpp"
 #include <array>
@@ -19,10 +18,6 @@ class Event;
 
 namespace gearoenix::math {
 struct Quat;
-}
-
-namespace gearoenix::physics {
-class Transformation;
 }
 
 namespace gearoenix::physics::collider {
@@ -62,6 +57,7 @@ class Target;
 }
 
 namespace gearoenix::render::camera {
+class Transformation;
 class Camera : public core::asset::Asset, public core::event::Listener {
 public:
     typedef std::array<math::Vec3, 4> Partition;
@@ -71,9 +67,10 @@ public:
     GX_GETSET_VAL_PRT(core::Real, layer, 0.0f)
     GX_GET_UPTR_PRT(physics::collider::Frustum, frustum_collider)
     GX_GET_UPTR_PRT(buffer::FramedUniform, uniform_buffers)
+    GX_GET_VAL_PRT(std::optional<std::size_t>, cascaded_shadow_frustum_partitions_count, std::nullopt)
     GX_GET_CREF_PRT(std::vector<Partition>, cascaded_shadow_frustum_partitions)
     GX_GET_CREF_PRT(Uniform, uniform)
-    GX_GET_UPTR_PRT(physics::Transformation, transformation)
+    GX_GET_UPTR_PRT(Transformation, transformation)
     GX_GET_UPTR_PRT(texture::Target, target)
     GX_GETSET_VAL_PRT(bool, enabled, true)
     GX_GETSET_VAL_PRT(bool, cascaded_shadow_enabled, false)
@@ -97,6 +94,7 @@ public:
     ~Camera() noexcept override;
     void set_far(core::Real f) noexcept;
     void set_target(const texture::Target* target) noexcept;
+    void set_cascaded_shadow_frustum_partitions_count(std::size_t c) noexcept;
     virtual void update() noexcept;
     virtual void set_aspect_ratio(core::Real ratio) noexcept;
     [[nodiscard]] virtual math::Ray3 create_ray3(core::Real x, core::Real y) const noexcept = 0;

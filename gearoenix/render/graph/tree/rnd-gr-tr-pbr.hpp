@@ -48,7 +48,10 @@ public:
 
         void clear() noexcept;
     };
-    using SceneData = std::map<core::Real, std::map<const camera::Camera*, CameraData>>;
+    struct SceneData {
+        std::map<core::Real, std::map<const camera::Camera*, CameraData>> cameras;
+        std::vector<std::pair<const camera::Camera*, CameraData>> runtime_reflections;
+    };
 
 private:
     bool in_weak_hardware = true;

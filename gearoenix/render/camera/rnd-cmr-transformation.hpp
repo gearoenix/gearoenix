@@ -27,6 +27,7 @@ public:
     void update_location() noexcept;
     void update_projection() noexcept;
     void update_view_projection() noexcept;
+    void update_frustum() noexcept;
     void set_on_frustum_update(std::function<void()> f) noexcept;
     void set_on_projection_update(std::function<void()> f) noexcept;
     void look_at(const math::Vec3& target, const math::Vec3& up) noexcept;

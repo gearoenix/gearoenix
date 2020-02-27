@@ -7,6 +7,7 @@
 #include "../../system/sys-app.hpp"
 #include "../camera/rnd-cmr-manager.hpp"
 #include "../camera/rnd-cmr-orthographic.hpp"
+#include "../camera/rnd-cmr-transformation.hpp"
 #include "../engine/rnd-eng-engine.hpp"
 #include "../model/rnd-mdl-model.hpp"
 #include "../widget/rnd-wdg-edit.hpp"

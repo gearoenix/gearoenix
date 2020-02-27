@@ -85,6 +85,12 @@ void gearoenix::render::camera::Camera::set_target(const texture::Target* const 
     config_target();
 }
 
+void gearoenix::render::camera::Camera::set_cascaded_shadow_frustum_partitions_count(const std::size_t c) noexcept
+{
+    cascaded_shadow_frustum_partitions_count = c;
+    transformation->update_frustum();
+}
+
 void gearoenix::render::camera::Camera::update() noexcept
 {
     uniform_buffers->update(uniform);

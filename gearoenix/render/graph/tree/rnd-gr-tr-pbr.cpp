@@ -97,7 +97,7 @@ void gearoenix::render::graph::tree::Pbr::update() noexcept
         for (const auto& id_camera : cameras) {
             auto* const cam = id_camera.second.get();
             const core::Real camera_priority = cam->get_layer();
-            auto& camera_priority_nodes = scene_nodes[camera_priority];
+            auto& camera_priority_nodes = scene_nodes.cameras[camera_priority];
             CameraData& camera_nodes = camera_priority_nodes[cam];
             camera_nodes.clear();
             update_skyboxes(scn, cam, camera_nodes);
@@ -121,7 +121,7 @@ void gearoenix::render::graph::tree::Pbr::record(const unsigned int kernel_index
 
     for (const auto& priority_scenes : nodes) {
         for (const auto& scene_nodes : priority_scenes.second) {
-            for (const auto& priority_cameras : scene_nodes.second) {
+            for (const auto& priority_cameras : scene_nodes.second.cameras) {
                 for (const auto& cam_camera_nodes : priority_cameras.second) {
                     const CameraData& camera_nodes = cam_camera_nodes.second;
                     for (const auto& skies : camera_nodes.skyboxes)
@@ -169,7 +169,7 @@ void gearoenix::render::graph::tree::Pbr::submit() noexcept
 
     for (auto& priority_scenes : nodes) {
         for (auto& scene_nodes : priority_scenes.second) {
-            for (auto& priority_cameras : scene_nodes.second) {
+            for (auto& priority_cameras : scene_nodes.second.cameras) {
                 for (auto& cam_camera_nodes : priority_cameras.second) {
                     const CameraData& camera_nodes = cam_camera_nodes.second;
                     for (const auto& skies : camera_nodes.skyboxes)

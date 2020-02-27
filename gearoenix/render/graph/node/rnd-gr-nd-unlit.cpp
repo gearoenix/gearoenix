@@ -1,6 +1,7 @@
 #include "rnd-gr-nd-unlit.hpp"
 #include "../../../core/asset/cr-asset-manager.hpp"
 #include "../../../core/sync/cr-sync-kernel-workers.hpp"
+#include "../../../physics/collider/phs-cld-collider.hpp"
 #include "../../../system/sys-app.hpp"
 #include "../../buffer/rnd-buf-manager.hpp"
 #include "../../buffer/rnd-buf-uniform.hpp"

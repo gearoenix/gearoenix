@@ -38,7 +38,7 @@ gearoenix::render::reflection::Runtime::Runtime(const core::Id id, engine::Engin
     const auto resolution = static_cast<unsigned int>(sys_app->get_configuration().render_config.runtime_reflection_resolution);
     core::sync::EndCaller<texture::TextureCube> txt_cube_call([call](const std::shared_ptr<texture::TextureCube>&) {});
     environment = txt_mgr->create_cube(texture_info, resolution, txt_cube_call);
-    for (int i = 1; i < 6; ++i) {
+    for (int i = 0; i < 6; ++i) {
         auto& target = targets[i];
         target = e->create_render_target(
             core::asset::Manager::create_id(),
@@ -54,7 +54,17 @@ gearoenix::render::reflection::Runtime::Runtime(const core::Id id, engine::Engin
         auto& cam = cameras[i];
         cam = cam_mgr->create<camera::Perspective>();
         cam->set_target(target.get());
+        cam->set_cascaded_shadow_frustum_partitions_count(1);
     }
+    set_receiving_radius(receiving_radius);
 }
 
 gearoenix::render::reflection::Runtime::~Runtime() noexcept = default;
+
+void gearoenix::render::reflection::Runtime::set_receiving_radius(const core::Real r) noexcept
+{
+    receiving_radius = r;
+    for (const auto& cam : cameras) {
+        cam->set_far(r);
+    }
+}

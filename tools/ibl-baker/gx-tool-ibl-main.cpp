@@ -119,6 +119,7 @@ IblBakerApp::IblBakerApp(gearoenix::system::Application* const sys_app) noexcept
     scn->add_skybox(sky);
 
     const auto rtr = rfl_mgr->create<GxRtReflect>(rtr_call);
+    scn->add_reflection(rtr);
 
     auto tmp_txt = mdl_mgr->create<GxTextWdg>(txw_call);
     auto* tmp_tran = tmp_txt->get_transformation();

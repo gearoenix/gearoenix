@@ -2,7 +2,6 @@
 #include "../../core/event/cr-ev-event.hpp"
 #include "../../system/stream/sys-stm-stream.hpp"
 #include "../../system/sys-app.hpp"
-#include "../../system/sys-log.hpp"
 #include "../engine/rnd-eng-engine.hpp"
 #include "rnd-cmr-transformation.hpp"
 #include <cmath>
@@ -19,9 +18,7 @@ void gearoenix::render::camera::Perspective::update_fovy() noexcept
 
 void gearoenix::render::camera::Perspective::update_cascades() noexcept
 {
-    const system::Configuration& sys_conf = e->get_system_application()->get_configuration();
-    const engine::Configuration& eng_conf = sys_conf.render_config;
-    const std::size_t sections_count = eng_conf.shadow_cascades_count;
+    const std::size_t sections_count = cascaded_shadow_frustum_partitions_count.has_value() ? cascaded_shadow_frustum_partitions_count.value() : e->get_system_application()->get_configuration().render_config.shadow_cascades_count;
     if (cascaded_shadow_frustum_partitions.size() != sections_count + 1)
         cascaded_shadow_frustum_partitions.resize(sections_count + 1);
 
