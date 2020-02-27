@@ -57,6 +57,11 @@ public:
         return attachments.size();
     }
 
+    void set_attachment_face(const std::size_t index, const Face f) noexcept
+    {
+        std::get<AttachmentCube>(attachments[index].var).face = f;
+    }
+
     [[nodiscard]] virtual Target* clone() const noexcept = 0;
 };
 }

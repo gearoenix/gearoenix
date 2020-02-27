@@ -17,11 +17,11 @@ std::shared_ptr<gearoenix::render::light::Light> gearoenix::render::light::Manag
         system::stream::Stream* f = cache.get_file();
         const auto t = f->read<Type>();
         switch (t) {
-        case Type::CONE:
+        case Type::Cone:
             GXUNIMPLEMENTED;
-        case Type::POINT:
+        case Type::Point:
             return std::shared_ptr<Light>(new Point(id, f, e));
-        case Type::DIRECTIONAL:
+        case Type::Directional:
             return std::shared_ptr<Light>(new Directional(id, f, e));
         default:
             GXUNEXPECTED;

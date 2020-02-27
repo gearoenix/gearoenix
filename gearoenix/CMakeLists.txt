@@ -448,6 +448,8 @@ SET(GX_ENGINE_SRC
         "${GX_ENGINE_SRC_DIR}render/pipeline/rnd-pip-unlit-resource-set.hpp"
         "${GX_ENGINE_SRC_DIR}render/reflection/rnd-rfl-baked.cpp"
         "${GX_ENGINE_SRC_DIR}render/reflection/rnd-rfl-baked.hpp"
+        "${GX_ENGINE_SRC_DIR}render/reflection/rnd-rfl-manager.cpp"
+        "${GX_ENGINE_SRC_DIR}render/reflection/rnd-rfl-manager.hpp"
         "${GX_ENGINE_SRC_DIR}render/reflection/rnd-rfl-reflection.cpp"
         "${GX_ENGINE_SRC_DIR}render/reflection/rnd-rfl-reflection.hpp"
         "${GX_ENGINE_SRC_DIR}render/reflection/rnd-rfl-runtime.cpp"

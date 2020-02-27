@@ -12,14 +12,13 @@
 #include "../camera/rnd-cmr-camera.hpp"
 #include "../camera/rnd-cmr-manager.hpp"
 #include "../light/rnd-lt-directional.hpp"
-#include "../light/rnd-lt-light.hpp"
 #include "../light/rnd-lt-manager.hpp"
 #include "../material/rnd-mat-material.hpp"
 #include "../mesh/rnd-msh-mesh.hpp"
 #include "../model/rnd-mdl-manager.hpp"
 #include "../model/rnd-mdl-model.hpp"
 #include "../pipeline/rnd-pip-manager.hpp"
-#include "../reflection/rnd-rfl-reflection.hpp"
+#include "../reflection/rnd-rfl-runtime.hpp"
 #include "../shader/rnd-shd-shader.hpp"
 #include "../skybox/rnd-sky-skybox.hpp"
 
@@ -122,17 +121,25 @@ GX_SCENE_ADD_HELPER(audio, audio::Audio)
 void gearoenix::render::scene::Scene::scene_add_light(const std::shared_ptr<light::Light>& o) noexcept
 {
     const core::Id id = o->get_asset_id();
-    if (o->get_light_type() == light::Type::DIRECTIONAL && o->get_shadow_enabled()) {
+    if (o->get_light_type() == light::Type::Directional && o->get_shadow_enabled()) {
         o->set_scene(this);
-    } else {
-        GX_CHECK_HELPER(light)
-        lights[id] = o;
     }
+    GX_CHECK_HELPER(light)
+    lights[id] = o;
 }
 
 GX_SCENE_ADD_HELPER(constraint, physics::constraint::Constraint)
 GX_SCENE_ADD_HELPER(skybox, skybox::Skybox)
-GX_SCENE_ADD_HELPER(reflection, reflection::Reflection)
+
+void gearoenix::render::scene::Scene::scene_add_reflection(const std::shared_ptr<reflection::Reflection>& o) noexcept
+{
+    const auto id = o->get_asset_id();
+    if (o->get_reflection_type() == reflection::Type::Runtime) {
+        runtime_reflections[id] = std::dynamic_pointer_cast<reflection::Runtime>(o);
+    }
+    GX_CHECK_HELPER(reflection)
+    reflections[id] = o;
+}
 
 void gearoenix::render::scene::Scene::scene_add_model(const std::shared_ptr<model::Model>& m) noexcept
 {

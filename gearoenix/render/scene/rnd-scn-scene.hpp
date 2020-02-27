@@ -73,6 +73,7 @@ class Model;
 
 namespace gearoenix::render::reflection {
 class Reflection;
+class Runtime;
 }
 
 namespace gearoenix::render::skybox {
@@ -94,6 +95,7 @@ public:
     using MapModel = std::map<core::Id, std::shared_ptr<model::Model>>;
     using MapSkybox = std::map<core::Id, std::shared_ptr<skybox::Skybox>>;
     using MapReflection = std::map<core::Id, std::shared_ptr<reflection::Reflection>>;
+    using MapRuntimeReflection = std::map<core::Id, std::shared_ptr<reflection::Runtime>>;
 
     GX_GET_CVAL_PRT(Type, scene_type_id)
     GX_GETSET_VAL_PRT(core::Real, layer, 0.0f)
@@ -110,6 +112,7 @@ public:
     GX_GET_CREF_PRT(MapModel, models)
     GX_GET_CREF_PRT(MapSkybox, skyboxs)
     GX_GET_CREF_PRT(MapReflection, reflections)
+    GX_GET_CREF_PRT(MapRuntimeReflection, runtime_reflections)
     GX_GET_CREF_PRT(std::vector<physics::collider::Collider*>, static_colliders)
     GX_GET_CREF_PRT(std::vector<physics::collider::Collider*>, dynamic_colliders)
 protected:

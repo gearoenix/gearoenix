@@ -6,7 +6,7 @@
 
 void gearoenix::render::light::Light::remove_from_shadow_cascaders() const noexcept
 {
-    if (light_type != Type::DIRECTIONAL)
+    if (light_type != Type::Directional)
         return;
     if (nullptr != parent_scene)
         parent_scene->remove_shadow_cascader(asset_id);
@@ -14,7 +14,7 @@ void gearoenix::render::light::Light::remove_from_shadow_cascaders() const noexc
 
 void gearoenix::render::light::Light::add_to_shadow_cascaders() const noexcept
 {
-    if (light_type != Type::DIRECTIONAL || !shadow_enabled)
+    if (light_type != Type::Directional || !shadow_enabled)
         return;
     if (nullptr != parent_scene)
         parent_scene->add_shadow_cascader(asset_id);

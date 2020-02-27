@@ -7,13 +7,12 @@
 #include "../../render/light/rnd-lt-manager.hpp"
 #include "../../render/mesh/rnd-msh-manager.hpp"
 #include "../../render/model/rnd-mdl-manager.hpp"
+#include "../../render/reflection/rnd-rfl-manager.hpp"
 #include "../../render/scene/rnd-scn-manager.hpp"
 #include "../../render/skybox/rnd-sky-manager.hpp"
 #include "../../render/texture/rnd-txt-manager.hpp"
 #include "../../system/stream/sys-stm-asset.hpp"
 #include "../../system/sys-app.hpp"
-#include "../cache/cr-cache-file.hpp"
-#include "../cr-static.hpp"
 
 std::atomic<gearoenix::core::Id> gearoenix::core::asset::Manager::last_id(0);
 
@@ -32,6 +31,7 @@ gearoenix::core::asset::Manager::Manager(system::Application* const sys_app, con
         GX_HELPER(font, render::font)
         GX_HELPER(mesh, render::mesh)
         GX_HELPER(model, render::model)
+        GX_HELPER(reflection, render::reflection)
         GX_HELPER(skybox, render::skybox)
         GX_HELPER(constraint, physics::constraint)
         GX_HELPER(scene, render::scene)
@@ -55,6 +55,7 @@ gearoenix::core::asset::Manager::Manager(system::Application* const sys_app, con
         GX_HELPER(font, render::font)
         GX_HELPER(mesh, render::mesh)
         GX_HELPER(model, render::model)
+        GX_HELPER(reflection, render::reflection)
         GX_HELPER(skybox, render::skybox)
         GX_HELPER(constraint, physics::constraint)
         GX_HELPER(scene, render::scene)

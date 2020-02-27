@@ -3,9 +3,9 @@
 #include "../../core/cr-types.hpp"
 namespace gearoenix::render::light {
 enum struct Type : core::TypeId {
-    CONE = 1,
-    DIRECTIONAL = 2,
-    POINT = 3,
+    Cone = 1,
+    Directional = 2,
+    Point = 3,
 };
 }
 #endif

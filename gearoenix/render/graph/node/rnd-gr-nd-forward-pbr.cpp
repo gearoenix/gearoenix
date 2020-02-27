@@ -164,7 +164,7 @@ void gearoenix::render::graph::node::ForwardPbr::set_scene(const scene::Scene* c
     const auto& lights = scn->get_lights();
     for (const auto& id_light : lights) {
         const auto& l = id_light.second;
-        if (light::Type::POINT == l->get_light_type()) {
+        if (light::Type::Point == l->get_light_type()) {
             auto pl = reinterpret_cast<light::Point*>(l.get());
             if (GX_COUNT_OF(uniform.point_lights_color_min_radius) <= lights_count) {
                 GXLOGD("Unexpected number of influencing point lights in scene: " << scn->get_asset_id())

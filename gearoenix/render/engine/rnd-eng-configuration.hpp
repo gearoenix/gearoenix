@@ -6,6 +6,7 @@
 namespace gearoenix::render::engine {
 struct Configuration {
     std::int8_t shadow_cascades_count = GX_MAX_SHADOW_CASCADES;
+    std::uint16_t runtime_reflection_resolution = GX_MAX_RUNTIME_REFLECTION_RESOLUTION;
 };
 }
 #endif

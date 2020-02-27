@@ -39,6 +39,10 @@ namespace gearoenix::render::model {
 class Manager;
 }
 
+namespace gearoenix::render::reflection {
+class Manager;
+}
+
 namespace gearoenix::render::skybox {
 class Manager;
 }
@@ -76,6 +80,7 @@ class Manager {
     GX_GET_UPTR_PRV(render::font::Manager, font_manager)
     GX_GET_UPTR_PRV(render::mesh::Manager, mesh_manager)
     GX_GET_UPTR_PRV(render::model::Manager, model_manager)
+    GX_GET_UPTR_PRV(render::reflection::Manager, reflection_manager)
     GX_GET_UPTR_PRV(render::skybox::Manager, skybox_manager)
     GX_GET_UPTR_PRV(physics::constraint::Manager, constraint_manager)
     GX_GET_UPTR_PRV(render::scene::Manager, scene_manager)
