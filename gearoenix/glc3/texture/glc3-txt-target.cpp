@@ -75,8 +75,7 @@ void gearoenix::glc3::texture::Target::initialize_textures(
             case render::texture::Type::TextureCube: {
 #ifdef GX_DEBUG_GL_CLASS_3
                 if (info.img_width != info.img_height)
-                    GXLOGF(
-                        "This graphic backend does not support un-squared cube maps.")
+                    GXLOGF("This graphic backend does not support un-squared cube maps.")
 #endif
                 a.var = render::texture::AttachmentCube {
                     .txt = std::dynamic_pointer_cast<TextureCube>(info.txt.value()),
@@ -103,8 +102,7 @@ void gearoenix::glc3::texture::Target::initialize_textures(
             case render::texture::Type::TextureCube: {
 #ifdef GX_DEBUG_GL_CLASS_3
                 if (info.img_width != info.img_height)
-                    GXLOGF(
-                        "This graphic backend does not support un-squared cube maps.")
+                    GXLOGF("This graphic backend does not support un-squared cube maps.")
 #endif
                 const auto t = TextureCube::construct(
                     core::asset::Manager::create_id(), gl_e,

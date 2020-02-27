@@ -22,14 +22,14 @@ gearoenix::render::reflection::Runtime::Runtime(const core::Id id, engine::Engin
     constexpr texture::TextureInfo texture_info {
         .format = texture::TextureFormat::RgbaFloat32,
         .sample_info = texture::SampleInfo {
-            .min_filter = texture::Filter::LinearMipmapLinear,
+            .min_filter = texture::Filter::Linear,
             .mag_filter = texture::Filter::Linear,
             .wrap_s = texture::Wrap::ClampToEdge,
             .wrap_t = texture::Wrap::ClampToEdge,
             .wrap_r = texture::Wrap::ClampToEdge,
         },
         .texture_type = texture::Type::TextureCube,
-        .has_mipmap = true,
+        .has_mipmap = false,
     };
     auto* const sys_app = e->get_system_application();
     auto* const ast_mgr = sys_app->get_asset_manager();

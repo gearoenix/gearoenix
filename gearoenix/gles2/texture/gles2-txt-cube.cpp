@@ -36,23 +36,24 @@ std::shared_ptr<gearoenix::gles2::texture::TextureCube> gearoenix::gles2::textur
     const std::shared_ptr<TextureCube> result(new TextureCube(id, info.format, e));
     result->aspect = aspect;
     const SampleInfo sample_info = SampleInfo(info.sample_info);
-    gl::uint cf;
+    const auto cf = Texture2D::convert(info.format);
     const auto gl_aspect = static_cast<gl::sizei>(aspect);
     std::vector<std::vector<std::uint8_t>> pixels(GX_COUNT_OF(FACES));
-    switch (info.format) {
-    case render::texture::TextureFormat::RgbaFloat32: {
-        cf = GL_RGBA;
-        const gl::sizei pixel_size = gl_aspect * gl_aspect * 4;
-        const auto* const raw_data = reinterpret_cast<const core::Real*>(data);
-        for (int fi = 0, di = 0; fi < static_cast<int>(GX_COUNT_OF(FACES)); ++fi) {
-            pixels[fi].resize(pixel_size);
-            for (gl::sizei i = 0; i < pixel_size; ++i, ++di)
-                pixels[fi][i] = static_cast<std::uint8_t>(raw_data[di] * 255.1f);
+    if (nullptr != data) {
+        switch (info.format) {
+        case render::texture::TextureFormat::RgbaFloat32: {
+            const gl::sizei pixel_size = gl_aspect * gl_aspect * 4;
+            const auto* const raw_data = reinterpret_cast<const core::Real*>(data);
+            for (int fi = 0, di = 0; fi < static_cast<int>(GX_COUNT_OF(FACES)); ++fi) {
+                pixels[fi].resize(pixel_size);
+                for (gl::sizei i = 0; i < pixel_size; ++i, ++di)
+                    pixels[fi][i] = static_cast<std::uint8_t>(raw_data[di] * 255.1f);
+            }
+            break;
         }
-        break;
-    }
-    default:
-        GXLOGF("Unsupported/Unimplemented setting for cube texture with id " << id)
+        default:
+            GXLOGF("Unsupported/Unimplemented setting for cube texture with id " << id)
+        }
     }
     e->get_function_loader()->load([result, gl_aspect, pixels { move(pixels) }, cf, sample_info, needs_mipmap { info.has_mipmap }, call] {
         gl::Loader::gen_textures(1, &(result->texture_object));
@@ -62,7 +63,9 @@ std::shared_ptr<gearoenix::gles2::texture::TextureCube> gearoenix::gles2::textur
         gl::Loader::tex_parameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, sample_info.wrap_s);
         gl::Loader::tex_parameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, sample_info.wrap_t);
         for (int fi = 0; fi < static_cast<int>(GX_COUNT_OF(FACES)); ++fi) {
-            gl::Loader::tex_image_2d(FACES[fi], 0, static_cast<gl::sint>(cf), gl_aspect, gl_aspect, 0, cf, GL_UNSIGNED_BYTE, pixels[fi].data());
+            const auto& face_pixels = pixels[fi];
+            gl::Loader::tex_image_2d(FACES[fi], 0, static_cast<gl::sint>(cf), gl_aspect, gl_aspect, 0, cf, GL_UNSIGNED_BYTE,
+                face_pixels.empty() ? nullptr : pixels[fi].data());
         }
 #ifdef GX_DEBUG_GLES2
         gl::Loader::check_for_error();

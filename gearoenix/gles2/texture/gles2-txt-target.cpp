@@ -4,6 +4,7 @@
 #include "../../core/cr-function-loader.hpp"
 #include "../../gl/gl-constants.hpp"
 #include "../../gl/gl-loader.hpp"
+#include "../../gl/gl-utils.hpp"
 #include "../../system/sys-app.hpp"
 #include "../engine/gles2-eng-engine.hpp"
 #include "gles2-txt-2d.hpp"
@@ -59,34 +60,61 @@ void gearoenix::gles2::texture::Target::initialize_texture(
     a.img_depth = info.img_depth;
     a.mipmap_level = info.mipmap_level;
     a.usage = info.usage;
-    switch (info.texture_info.texture_type) {
-    case render::texture::Type::Texture2D: {
-        const auto t = Texture2D::construct(
-            core::asset::Manager::create_id(), gl_e,
-            info.texture_info,
-            info.img_width, info.img_height, call);
-        a.txt = t;
-        a.var = render::texture::Attachment2D {
-            .txt = t,
-        };
-        break;
-    }
-    case render::texture::Type::TextureCube: {
-        if (info.img_width != info.img_height)
-            GXLOGF("This graphic backend does not support un-squared cube maps.")
-        const auto t = TextureCube::construct(
-            core::asset::Manager::create_id(), gl_e,
-            info.texture_info,
-            info.img_width, call);
-        a.txt = t;
-        a.var = render::texture::AttachmentCube {
-            .txt = t,
-            .face = info.face.value(),
-        };
-        break;
-    }
-    default:
-        GXUNEXPECTED
+    if (info.txt.has_value()) {
+        a.txt = info.txt.value();
+        switch (info.texture_info.texture_type) {
+        case render::texture::Type::Texture2D: {
+            a.var = render::texture::Attachment2D {
+                .txt = std::dynamic_pointer_cast<Texture2D>(info.txt.value()),
+            };
+            break;
+        }
+        case render::texture::Type::TextureCube: {
+#ifdef GX_DEBUG_GLES2_TARGET
+            if (info.img_width != info.img_height)
+                GXLOGF("This graphic backend does not support un-squared cube maps.")
+#endif
+            a.var = render::texture::AttachmentCube {
+                .txt = std::dynamic_pointer_cast<TextureCube>(info.txt.value()),
+                .face = info.face.value(),
+            };
+            break;
+        }
+        default:
+            GXUNEXPECTED
+        }
+    } else {
+        switch (info.texture_info.texture_type) {
+        case render::texture::Type::Texture2D: {
+            const auto t = Texture2D::construct(
+                core::asset::Manager::create_id(), gl_e,
+                info.texture_info,
+                info.img_width, info.img_height, call);
+            a.txt = t;
+            a.var = render::texture::Attachment2D {
+                .txt = t,
+            };
+            break;
+        }
+        case render::texture::Type::TextureCube: {
+#ifdef GX_DEBUG_GLES2_TARGET
+            if (info.img_width != info.img_height)
+                GXLOGF("This graphic backend does not support un-squared cube maps.")
+#endif
+            const auto t = TextureCube::construct(
+                core::asset::Manager::create_id(), gl_e,
+                info.texture_info,
+                info.img_width, call);
+            a.txt = t;
+            a.var = render::texture::AttachmentCube {
+                .txt = t,
+                .face = info.face.value(),
+            };
+            break;
+        }
+        default:
+            GXUNEXPECTED
+        }
     }
 }
 
@@ -164,7 +192,8 @@ void gearoenix::gles2::texture::Target::generate_framebuffer() noexcept
         case render::texture::Type::TextureCube: {
             const auto* const t = static_cast<const TextureCube*>(txt.get());
             t->bind();
-            return std::make_tuple(t->get_texture_object(), gl::enumerated(GL_TEXTURE_CUBE_MAP));
+            return std::make_tuple(t->get_texture_object(),
+                gl::convert(std::get<render::texture::AttachmentCube>(attachment.var).face));
         }
         default:
             GXUNEXPECTED
@@ -234,30 +263,6 @@ void gearoenix::gles2::texture::Target::clear() const noexcept
         gl::Loader::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     }
 }
-
-//void gearoenix::gles2::texture::Target::bind_texture(
-//    const render::texture::Target* const t,
-//    const gl::enumerated texture_unit) noexcept
-//{
-//    switch (t->get_target_type()) {
-//    case render::texture::Type::Target2D:
-//        reinterpret_cast<const Target2D*>(t)->bind_texture(texture_unit);
-//        break;
-//    default:
-//        GXUNEXPECTED
-//    }
-//}
-//
-//void gearoenix::gles2::texture::Target::bind(const render::texture::Target* const target) noexcept
-//{
-//    switch (target->get_target_type()) {
-//    case render::texture::Type::Target2D:
-//        reinterpret_cast<const Target2D*>(target)->bind();
-//        break;
-//    default:
-//        GXUNEXPECTED
-//    }
-//}
 
 gearoenix::render::texture::Target* gearoenix::gles2::texture::Target::clone() const noexcept
 {
