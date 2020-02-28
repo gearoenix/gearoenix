@@ -117,13 +117,13 @@ gearoenix::render::camera::Perspective::Perspective(
 {
     reinterpret_cast<Transformation*>(transformation.get())->set_on_frustum_update([this] { update_cascades(); });
     reinterpret_cast<Transformation*>(transformation.get())->set_on_projection_update([this] { update_projection(); });
-    set_field_of_view(1.571f);
+    set_field_of_view(1.570796328f);
 }
 
-void gearoenix::render::camera::Perspective::set_aspect_ratio(const gearoenix::core::Real ratio) noexcept
+void gearoenix::render::camera::Perspective::set_aspects(const unsigned int w, const unsigned int h) noexcept
 {
-    Camera::set_aspect_ratio(ratio);
-    tany = tanx / ratio;
+    Camera::set_aspects(w, h);
+    tany = tanx / uniform.aspect_ratio;
     update_fovy();
 }
 

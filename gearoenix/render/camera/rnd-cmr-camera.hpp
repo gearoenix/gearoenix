@@ -96,7 +96,7 @@ public:
     void set_target(const texture::Target* target) noexcept;
     void set_cascaded_shadow_frustum_partitions_count(std::size_t c) noexcept;
     virtual void update() noexcept;
-    virtual void set_aspect_ratio(core::Real ratio) noexcept;
+    virtual void set_aspects(unsigned int w, unsigned int h) noexcept;
     [[nodiscard]] virtual math::Ray3 create_ray3(core::Real x, core::Real y) const noexcept = 0;
     [[nodiscard]] virtual core::Real get_distance(const math::Vec3& model_location) const noexcept = 0;
     void check_static_models(const physics::accelerator::Bvh* bvh) noexcept;

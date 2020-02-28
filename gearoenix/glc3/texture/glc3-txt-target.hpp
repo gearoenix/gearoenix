@@ -6,6 +6,7 @@
 #include "../../gl/gl-constants.hpp"
 #include "../../gl/gl-types.hpp"
 #include "../../render/texture/rnd-txt-target.hpp"
+#include <memory>
 #include <optional>
 #include <vector>
 

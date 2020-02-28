@@ -104,9 +104,12 @@ void gearoenix::render::camera::Camera::update() noexcept
     cascades.refresh();
 }
 
-void gearoenix::render::camera::Camera::set_aspect_ratio(const gearoenix::core::Real ratio) noexcept
+void gearoenix::render::camera::Camera::set_aspects(const unsigned int w, const unsigned h) noexcept
 {
-    uniform.aspect_ratio = ratio;
+    uniform.clip_width = static_cast<core::Real>(w);
+    uniform.clip_height = static_cast<core::Real>(h);
+    uniform.aspect_ratio = uniform.clip_width / uniform.clip_height;
+    config_target();
 }
 
 void gearoenix::render::camera::Camera::check_static_models(const physics::accelerator::Bvh* const bvh) noexcept
@@ -174,10 +177,7 @@ bool gearoenix::render::camera::Camera::on_event(const core::event::Data& d) noe
     const auto* sys_app = e->get_system_application();
     switch (d.source) {
     case core::event::Id::SystemWindowSizeChange:
-        uniform.clip_width = static_cast<core::Real>(sys_app->get_window_width());
-        uniform.clip_height = static_cast<core::Real>(sys_app->get_window_height());
-        set_aspect_ratio(sys_app->get_window_ratio());
-        config_target();
+        set_aspects(sys_app->get_window_width(), sys_app->get_window_height());
         return false;
     default:
         GXLOGF("Unexpected event received this is a fatal bug.")

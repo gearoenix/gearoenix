@@ -3,21 +3,25 @@
 #include "../../system/sys-app.hpp"
 #include "../camera/rnd-cmr-manager.hpp"
 #include "../camera/rnd-cmr-perspective.hpp"
+#include "../camera/rnd-cmr-transformation.hpp"
 #include "../engine/rnd-eng-engine.hpp"
 #include "../texture/rnd-txt-manager.hpp"
 #include "../texture/rnd-txt-target.hpp"
 #include "../texture/rnd-txt-texture-cube.hpp"
 
-gearoenix::render::reflection::Runtime::Runtime(const core::Id id, engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
+gearoenix::render::reflection::Runtime::Runtime(
+    const core::Id id,
+    engine::Engine* const e,
+    const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
     : Reflection(id, Type::Runtime, e)
 {
-    constexpr texture::Face faces[6] = {
-        texture::Face::PositiveX,
-        texture::Face::NegativeX,
-        texture::Face::PositiveY,
-        texture::Face::NegativeY,
-        texture::Face::PositiveZ,
-        texture::Face::NegativeZ,
+    constexpr std::tuple<texture::Face, math::Vec3, math::Vec3> faces[6] = {
+        { texture::Face::PositiveX, math::Vec3(1.0f, 0.0f, 0.0f), math::Vec3(0.0f, 0.0f, 1.0f) },
+        { texture::Face::NegativeX, math::Vec3(-1.0f, 0.0f, 0.0f), math::Vec3(0.0f, 0.0f, 1.0f) },
+        { texture::Face::PositiveY, math::Vec3(0.0f, 1.0f, 0.0f), math::Vec3(0.0f, 0.0f, 1.0f) },
+        { texture::Face::NegativeY, math::Vec3(0.0f, -1.0f, 0.0f), math::Vec3(0.0f, 0.0f, 1.0f) },
+        { texture::Face::PositiveZ, math::Vec3(0.0f, 0.0f, 1.0f), math::Vec3(0.0f, -1.0f, 0.0f) },
+        { texture::Face::NegativeZ, math::Vec3(0.0f, 0.0f, -1.0f), math::Vec3(0.0f, 1.0f, 0.0f) },
     };
     constexpr texture::TextureInfo texture_info {
         .format = texture::TextureFormat::RgbaFloat32,
@@ -47,16 +51,19 @@ gearoenix::render::reflection::Runtime::Runtime(const core::Id id, engine::Engin
                 .img_width = resolution,
                 .img_height = resolution,
                 .usage = texture::UsageFlag::Color,
-                .face = faces[i],
+                .face = std::get<0>(faces[i]),
                 .txt = environment,
             } },
             call);
         auto& cam = cameras[i];
         cam = cam_mgr->create<camera::Perspective>();
-        cam->set_target(target.get());
         cam->set_cascaded_shadow_frustum_partitions_count(1);
+        cam->set_field_of_view(1.570796327f);
+        cam->set_aspects(resolution, resolution);
+        cam->set_target(target.get());
+        cam->get_transformation()->look_at(std::get<1>(faces[i]), std::get<2>(faces[i]));
     }
-    set_receiving_radius(receiving_radius);
+    //    set_receiving_radius(receiving_radius);
 }
 
 gearoenix::render::reflection::Runtime::~Runtime() noexcept = default;

@@ -2,7 +2,7 @@
 #include "../core/asset/cr-asset-manager.hpp"
 #include "../core/sync/cr-sync-kernel-workers.hpp"
 #include "../math/math-sphere.hpp"
-#include "../render/camera/rnd-cmr-camera.hpp"
+#include "../render/camera/rnd-cmr-perspective.hpp"
 #include "../render/engine/rnd-eng-engine.hpp"
 #include "../render/light/rnd-lt-cascade-info.hpp"
 #include "../render/light/rnd-lt-directional.hpp"

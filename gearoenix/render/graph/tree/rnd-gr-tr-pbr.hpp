@@ -62,6 +62,7 @@ private:
     std::map<core::Real, std::map<const scene::Scene*, SceneData>> nodes;
     std::vector<light::CascadeInfo*> cascades;
 
+    void update_camera(const scene::Scene* scn, camera::Camera* cam, CameraData& camera_nodes) noexcept;
     void update_skyboxes(const scene::Scene* scn, const camera::Camera* cam, CameraData& camera_nodes) noexcept;
     void update_opaque(
         const std::vector<std::tuple<material::Type, model::Model*, model::Mesh*>>& seen_meshes,
@@ -69,6 +70,8 @@ private:
     void update_transparent(
         const std::vector<std::tuple<core::Real, material::Type, model::Model*, model::Mesh*>>& seen_meshes,
         const scene::Scene* scn, const camera::Camera* cam, CameraData& camera_nodes) noexcept;
+
+    void submit_camera_data(const CameraData& camera_data) const noexcept;
 
 public:
     Pbr(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;

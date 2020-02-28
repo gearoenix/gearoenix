@@ -22,7 +22,7 @@ namespace render::camera {
     public:
         Perspective(core::Id my_id, system::stream::Stream* f, engine::Engine* e) noexcept;
         Perspective(core::Id my_id, engine::Engine* e) noexcept;
-        void set_aspect_ratio(core::Real ratio) noexcept final;
+        void set_aspects(unsigned int w, unsigned int h) noexcept final;
         void set_field_of_view(core::Real radian) noexcept;
         [[nodiscard]] math::Ray3 create_ray3(core::Real x, core::Real y) const noexcept final;
         [[nodiscard]] core::Real get_distance(const math::Vec3& model_location) const noexcept final;

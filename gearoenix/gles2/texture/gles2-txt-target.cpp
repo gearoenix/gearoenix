@@ -42,6 +42,7 @@ gearoenix::gles2::texture::Target::Target(
     engine::Engine* const e) noexcept
     : render::texture::Target(id, e)
     , gl_e(e)
+    , framebuffer(new Framebuffer())
 {
 }
 
@@ -174,7 +175,6 @@ void gearoenix::gles2::texture::Target::generate_framebuffer() noexcept
 {
     const auto& attachment = attachments[0];
     const auto& txt = attachment.txt;
-    framebuffer = std::make_shared<Framebuffer>();
     framebuffer->gl_e = gl_e;
     gl::Loader::gen_framebuffers(1, reinterpret_cast<gl::uint*>(&(framebuffer->framebuffer)));
     gl::Loader::bind_framebuffer(GL_FRAMEBUFFER, framebuffer->framebuffer);

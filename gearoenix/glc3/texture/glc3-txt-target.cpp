@@ -8,6 +8,7 @@
 #include "../engine/glc3-eng-engine.hpp"
 #include "glc3-txt-2d.hpp"
 #include "glc3-txt-cube.hpp"
+#include <memory>
 #include <tuple>
 
 gearoenix::glc3::texture::Framebuffer::~Framebuffer() noexcept
@@ -35,11 +36,19 @@ gearoenix::glc3::texture::Target::Target(
     const core::Id id,
     engine::Engine* const e) noexcept
     : render::texture::Target(id, e)
+    , framebuffer(new Framebuffer())
     , gl_e(e)
 {
 }
 
-gearoenix::glc3::texture::Target::Target(const Target& o) noexcept = default;
+gearoenix::glc3::texture::Target::Target(const Target& o) noexcept
+    : render::texture::Target(o)
+    , framebuffer(o.framebuffer)
+    , gl_e(o.gl_e)
+    , gl_cull_mode(o.gl_cull_mode)
+    , gl_blend_mode(o.gl_blend_mode)
+{
+}
 
 void gearoenix::glc3::texture::Target::initialize_textures(
     const std::vector<render::texture::AttachmentInfo>& infos,
@@ -170,7 +179,6 @@ void gearoenix::glc3::texture::Target::fetch_current_framebuffer() noexcept
 
 void gearoenix::glc3::texture::Target::generate_framebuffer() noexcept
 {
-    framebuffer = std::make_shared<Framebuffer>();
     framebuffer->gl_e = gl_e;
     gl::Loader::gen_framebuffers(1, reinterpret_cast<gl::uint*>(&(framebuffer->framebuffer)));
     gl::Loader::bind_framebuffer(GL_FRAMEBUFFER, framebuffer->framebuffer);
@@ -292,28 +300,6 @@ void gearoenix::glc3::texture::Target::clear() const noexcept
         gl::Loader::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     }
 }
-
-//void gearoenix::glc3::texture::Target::bind_textures(
-//        const gl::enumerated* const texture_units,
-//        const std::size_t count) const noexcept
-//{
-//#ifdef GX_DEBUG_MODE
-//    if (count != attachments.size())
-//    GXUNEXPECTED
-//#endif
-//    for (std::size_t i = 0; i < count; ++i) {
-//        const auto * const txt = attachments[i].txt.get();
-//        switch(txt->get_texture_type()) {
-//            case render::texture::Type::Texture2D:
-//                static_cast<const Texture2D *>(txt)->bind(texture_units[i]);
-//                break;
-//            case render::texture::Type::TextureCube:
-//                static_cast<const TextureCube *>(txt)->bind(texture_units[i]);
-//                break;
-//            default: GXUNEXPECTED
-//        }
-//    }
-//}
 
 gearoenix::render::texture::Target* gearoenix::glc3::texture::Target::clone() const noexcept
 {

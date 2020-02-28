@@ -91,8 +91,8 @@ void gearoenix::render::camera::Orthographic::set_aspects_size(const core::Real 
     update_aspects_size();
 }
 
-void gearoenix::render::camera::Orthographic::set_aspect_ratio(const gearoenix::core::Real ratio) noexcept
+void gearoenix::render::camera::Orthographic::set_aspects(const unsigned int w, unsigned int h) noexcept
 {
-    Camera::set_aspect_ratio(ratio);
+    Camera::set_aspects(w, h);
     update_aspects_size();
 }

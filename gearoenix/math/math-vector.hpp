@@ -65,8 +65,14 @@ namespace math {
         static const Vec3 Z;
         Vec3() noexcept;
         Vec3(const math::Vec2& o, core::Real e) noexcept;
-        Vec3(core::Real x, core::Real y, core::Real z) noexcept;
-        Vec3(const Vec3& v) noexcept;
+        constexpr Vec3(const core::Real x, const core::Real y, const core::Real z) noexcept
+            : vec { x, y, z }
+        {
+        }
+        constexpr Vec3(const Vec3& v) noexcept
+            : vec { v.vec[0], v.vec[1], v.vec[2] }
+        {
+        }
         explicit Vec3(core::Real e) noexcept;
         Vec3 operator-() const noexcept;
         Vec3 operator+(const Vec3& a) const noexcept;

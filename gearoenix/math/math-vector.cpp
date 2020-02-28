@@ -280,18 +280,8 @@ gearoenix::math::Vec3::Vec3(const core::Real e) noexcept
 {
 }
 
-gearoenix::math::Vec3::Vec3(const core::Real x, const core::Real y, const core::Real z) noexcept
-    : vec { x, y, z }
-{
-}
-
 gearoenix::math::Vec3::Vec3(const math::Vec2& o, const core::Real e) noexcept
     : vec { o[0], o[1], e }
-{
-}
-
-gearoenix::math::Vec3::Vec3(const Vec3& v) noexcept
-    : vec { v.vec[0], v.vec[1], v.vec[2] }
 {
 }
 
