@@ -1,0 +1,61 @@
+#include "glc3-shd-irradiance-convoluter.hpp"
+#ifdef GX_USE_OPENGL_CLASS_3
+#include "../../core/cr-function-loader.hpp"
+#include "../../gl/gl-loader.hpp"
+#include "../engine/glc3-eng-engine.hpp"
+#include <sstream>
+
+gearoenix::glc3::shader::IrradianceConvoluter::IrradianceConvoluter(engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
+    : Shader(e, c)
+{
+    GX_GLC3_SHADER_SRC_DEFAULT_VERTEX_STARTING <<
+        // output
+        "out vec2 out_pos;\n"
+        // Main function
+        "void main()\n"
+        "{\n"
+        "    out_pos = normal;\n"
+        "    gl_Position = vec4(position, 1.0);\n"
+        "}";
+    GX_GLC3_SHADER_SRC_DEFAULT_FRAGMENT_STARTING <<
+        // input
+        "in vec3 out_pos;\n"
+        "out vec4 frag_color;\n"
+        "uniform samplerCube environment;\n"
+        "void main()\n"
+        "{\n"
+        "    vec3 nrm = normalize(out_pos);\n" // TODO move this up right thing in to vertex shader (if it was possible)
+        "    vec3 irradiance = vec3(0.0);\n"
+        "    vec3 up = vec3(0.0, 1.0, 0.0);\n"
+        "    vec3 right = cross(up, N);\n"
+        "    up = cross(N, right);\n"
+        "    float sample_delta = 0.025;\n"
+        "    float samples_count = 0.0f;\n"
+        "    for(float phi = 0.0; phi < 2.0 * PI; phi += sampleDelta) {\n"
+        "        for(float theta = 0.0; theta < 0.5 * PI; theta += sampleDelta, ++samples_count) {\n"
+        "            vec3 tangent_sample = vec3(sin(theta) * cos(phi),  sin(theta) * sin(phi), cos(theta));\n"
+        "            vec3 sample_vec = tangent_sample.x * right + tangent_sample.y * up + tangent_sample.z * nrm;\n"
+        "            irradiance += texture(environment, sample_vec).rgb * cos(theta) * sin(theta);\n"
+        "        }\n"
+        "    }\n"
+        "    irradiance *= GX_PI / samples_count;\n"
+        "    frag_color = vec4(irradiance, 1.0);\n"
+        "}";
+    e->get_function_loader()->load([this, vertex_shader_code { vertex_shader_code.str() }, fragment_shader_code { fragment_shader_code.str() }] {
+        set_vertex_shader(vertex_shader_code);
+        set_fragment_shader(fragment_shader_code);
+        link();
+        GX_GLC3_SHADER_SET_TEXTURE_INDEX_STARTING
+        GX_GLC3_THIS_GET_UNIFORM_TEXTURE(environment)
+    });
+}
+
+gearoenix::glc3::shader::IrradianceConvoluter::~IrradianceConvoluter() noexcept = default;
+
+void gearoenix::glc3::shader::IrradianceConvoluter::bind() const noexcept
+{
+    Shader::bind();
+    GX_GLC3_SHADER_SET_TEXTURE_INDEX_UNIFORM(environment)
+}
+
+#endif

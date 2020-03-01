@@ -4,6 +4,7 @@
 #include "../../core/sync/cr-sync-end-caller.hpp"
 #include "../../math/math-aabb.hpp"
 #include "../../math/math-vertex.hpp"
+#include "../texture/rnd-txt-face.hpp"
 #include <memory>
 
 namespace gearoenix::system::stream {
@@ -24,6 +25,7 @@ private:
     std::weak_ptr<Mesh> plate;
     std::weak_ptr<Mesh> cube;
     std::weak_ptr<Mesh> inward_cube;
+    std::map<texture::Face, std::weak_ptr<Mesh>> face_squares;
 
 public:
     Manager(std::unique_ptr<system::stream::Stream> s, engine::Engine* e) noexcept;
@@ -33,6 +35,7 @@ public:
     [[nodiscard]] std::shared_ptr<Mesh> create_plate(core::sync::EndCaller<Mesh>& c) noexcept;
     [[nodiscard]] std::shared_ptr<Mesh> create_cube(core::sync::EndCaller<Mesh>& c) noexcept;
     [[nodiscard]] std::shared_ptr<Mesh> create_inward_cube(core::sync::EndCaller<Mesh>& c) noexcept;
+    [[nodiscard]] std::shared_ptr<Mesh> create_face_square(texture::Face f, core::sync::EndCaller<Mesh>& c) noexcept;
     [[nodiscard]] std::shared_ptr<Mesh> create(const std::vector<math::BasicVertex>& vertices, const std::vector<std::uint32_t>& indices, const math::Aabb3& occlusion_box, core::sync::EndCaller<Mesh>& c) noexcept;
     [[nodiscard]] std::shared_ptr<Mesh> create(const std::vector<math::BasicVertex>& vertices, const std::vector<std::uint32_t>& indices, core::sync::EndCaller<Mesh>& c) noexcept;
 };

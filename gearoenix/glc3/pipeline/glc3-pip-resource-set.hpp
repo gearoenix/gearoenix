@@ -21,7 +21,7 @@
 
 #define GX_GLC3_PIP_RES_SET_TXT_2D(x, txt) GX_GLC3_PIP_RES_SET_TXT(x, txt, Texture2D)
 
-#define GX_GLC3_PIP_RES_SET_TXT_CUBE(x, txt) GX_GLC3_PIP_RES_SET_TXT(x, txt, Cube)
+#define GX_GLC3_PIP_RES_SET_TXT_CUBE(x, txt) GX_GLC3_PIP_RES_SET_TXT(x, txt, TextureCube)
 
 namespace gearoenix::glc3::shader {
 class Shader;

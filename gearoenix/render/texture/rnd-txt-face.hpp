@@ -10,5 +10,14 @@ enum struct Face : core::TypeId {
     PositiveZ = 5,
     NegativeZ = 6,
 };
+
+constexpr Face FACES[6] = {
+    Face::PositiveX,
+    Face::NegativeX,
+    Face::PositiveY,
+    Face::NegativeY,
+    Face::PositiveZ,
+    Face::NegativeZ,
+};
 }
 #endif

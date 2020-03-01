@@ -8,6 +8,7 @@ enum struct Type : core::TypeId {
     Unlit = 3,
     SkyboxCube = 4,
     SkyboxEquirectangular = 5,
+    IrradianceConvoluter = 6,
 };
 }
 #endif

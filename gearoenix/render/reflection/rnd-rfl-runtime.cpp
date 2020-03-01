@@ -16,12 +16,12 @@ gearoenix::render::reflection::Runtime::Runtime(
     : Reflection(id, Type::Runtime, e)
 {
     constexpr std::tuple<texture::Face, math::Vec3, math::Vec3> faces[6] = {
-        { texture::Face::PositiveX, math::Vec3(1.0f, 0.0f, 0.0f), math::Vec3(0.0f, 0.0f, 1.0f) },
-        { texture::Face::NegativeX, math::Vec3(-1.0f, 0.0f, 0.0f), math::Vec3(0.0f, 0.0f, 1.0f) },
-        { texture::Face::PositiveY, math::Vec3(0.0f, 1.0f, 0.0f), math::Vec3(0.0f, 0.0f, 1.0f) },
-        { texture::Face::NegativeY, math::Vec3(0.0f, -1.0f, 0.0f), math::Vec3(0.0f, 0.0f, 1.0f) },
-        { texture::Face::PositiveZ, math::Vec3(0.0f, 0.0f, 1.0f), math::Vec3(0.0f, -1.0f, 0.0f) },
-        { texture::Face::NegativeZ, math::Vec3(0.0f, 0.0f, -1.0f), math::Vec3(0.0f, 1.0f, 0.0f) },
+        { texture::FACES[0], math::Vec3(1.0f, 0.0f, 0.0f), math::Vec3(0.0f, 0.0f, 1.0f) },
+        { texture::FACES[1], math::Vec3(-1.0f, 0.0f, 0.0f), math::Vec3(0.0f, 0.0f, 1.0f) },
+        { texture::FACES[2], math::Vec3(0.0f, 1.0f, 0.0f), math::Vec3(0.0f, 0.0f, 1.0f) },
+        { texture::FACES[3], math::Vec3(0.0f, -1.0f, 0.0f), math::Vec3(0.0f, 0.0f, 1.0f) },
+        { texture::FACES[4], math::Vec3(0.0f, 0.0f, 1.0f), math::Vec3(0.0f, -1.0f, 0.0f) },
+        { texture::FACES[5], math::Vec3(0.0f, 0.0f, -1.0f), math::Vec3(0.0f, 1.0f, 0.0f) },
     };
     constexpr texture::TextureInfo texture_info {
         .format = texture::TextureFormat::RgbaFloat32,
@@ -43,7 +43,7 @@ gearoenix::render::reflection::Runtime::Runtime(
     core::sync::EndCaller<texture::TextureCube> txt_cube_call([call](const std::shared_ptr<texture::TextureCube>&) {});
     environment = txt_mgr->create_cube(texture_info, resolution, txt_cube_call);
     for (int i = 0; i < 6; ++i) {
-        auto& target = targets[i];
+        auto& target = environment_targets[i];
         target = e->create_render_target(
             core::asset::Manager::create_id(),
             { texture::AttachmentInfo {
@@ -63,7 +63,7 @@ gearoenix::render::reflection::Runtime::Runtime(
         cam->set_target(target.get());
         cam->get_transformation()->look_at(std::get<1>(faces[i]), std::get<2>(faces[i]));
     }
-    //    set_receiving_radius(receiving_radius);
+    set_receiving_radius(receiving_radius);
 }
 
 gearoenix::render::reflection::Runtime::~Runtime() noexcept = default;
