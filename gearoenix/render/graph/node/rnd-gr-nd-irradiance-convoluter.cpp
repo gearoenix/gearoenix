@@ -18,43 +18,34 @@
 #include "../../texture/rnd-txt-target.hpp"
 #include "../../texture/rnd-txt-texture-cube.hpp"
 
-gearoenix::render::graph::node::IrradianceConvoluterRenderData::IrradianceConvoluterRenderData(engine::Engine* e, pipeline::Pipeline* pip) noexcept
-    : r(dynamic_cast<pipeline::IrradianceConvoluterResourceSet*>(pip->create_resource_set()))
-{
-}
-
-gearoenix::render::graph::node::IrradianceConvoluterRenderData::~IrradianceConvoluterRenderData() noexcept = default;
-
-gearoenix::render::graph::node::IrradianceConvoluterKernel::IrradianceConvoluterKernel(engine::Engine* e, const unsigned int kernel_index) noexcept
+gearoenix::render::graph::node::IrradianceConvoluterKernel::IrradianceConvoluterKernel(engine::Engine* e, pipeline::Pipeline* const pip, const unsigned int kernel_index) noexcept
     : secondary_cmd(e->get_command_manager()->create_secondary_command_buffer(kernel_index))
+    , r(dynamic_cast<pipeline::IrradianceConvoluterResourceSet*>(pip->create_resource_set()))
 {
 }
 
 gearoenix::render::graph::node::IrradianceConvoluterKernel::~IrradianceConvoluterKernel() noexcept = default;
 
-gearoenix::render::graph::node::IrradianceConvoluterFrame::IrradianceConvoluterFrame(gearoenix::render::engine::Engine* e) noexcept
+gearoenix::render::graph::node::IrradianceConvoluterFrame::IrradianceConvoluterFrame(engine::Engine* e, pipeline::Pipeline* pip) noexcept
     : kernels(e->get_kernels()->get_threads_count())
 {
     for (std::size_t i = 0; i < kernels.size(); ++i) {
-        kernels[i] = std::make_unique<IrradianceConvoluterKernel>(e, static_cast<unsigned int>(i));
+        kernels[i] = std::make_unique<IrradianceConvoluterKernel>(e, pip, static_cast<unsigned int>(i));
     }
 }
 
 gearoenix::render::graph::node::IrradianceConvoluterFrame::~IrradianceConvoluterFrame() noexcept = default;
 
-void gearoenix::render::graph::node::IrradianceConvoluter::record(
-    const mesh::Mesh* const msh,
-    IrradianceConvoluterKernel* const kernel) noexcept
+void gearoenix::render::graph::node::IrradianceConvoluter::record(IrradianceConvoluterKernel* const kernel) noexcept
 {
-    auto* const rd = kernel->render_data_pool.get_next([this] {
-        return new IrradianceConvoluterRenderData(e, render_pipeline.get());
-    });
-    auto* const prs = rd->r.get();
+    auto* const prs = kernel->r.get();
     prs->set_mesh(msh);
+    prs->set_environment(environment);
     kernel->secondary_cmd->bind(prs);
 }
 
 gearoenix::render::graph::node::IrradianceConvoluter::IrradianceConvoluter(
+        const mesh::Mesh * const msh, const texture::TextureCube* environment,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
     : Node(
@@ -69,10 +60,12 @@ gearoenix::render::graph::node::IrradianceConvoluter::IrradianceConvoluter(
         },
         call)
     , frames(e->get_frames_count())
+    , msh(msh)
+    , environment(environment)
 {
     set_providers_count(input_textures.size());
     for (auto& f : frames) {
-        f = std::make_unique<IrradianceConvoluterFrame>(e);
+        f = std::make_unique<IrradianceConvoluterFrame>(e, render_pipeline.get());
     }
 }
 
@@ -81,11 +74,10 @@ gearoenix::render::graph::node::IrradianceConvoluter::~IrradianceConvoluter() no
 void gearoenix::render::graph::node::IrradianceConvoluter::update() noexcept
 {
     Node::update();
-    const unsigned int frame_number = e->get_frame_number();
+    const auto frame_number = e->get_frame_number();
     frame = frames[frame_number].get();
     auto& kernels = frame->kernels;
     for (auto& kernel : kernels) {
-        kernel->render_data_pool.refresh();
         kernel->secondary_cmd->begin();
     }
 }
@@ -98,9 +90,7 @@ void gearoenix::render::graph::node::IrradianceConvoluter::record(const unsigned
 void gearoenix::render::graph::node::IrradianceConvoluter::record_continuously(const unsigned int kernel_index) noexcept
 {
     auto* const kernel = frame->kernels[kernel_index].get();
-    for (const auto& msh : meshes) {
-        record(msh.get(), kernel);
-    }
+    record(kernel);
 }
 
 void gearoenix::render::graph::node::IrradianceConvoluter::submit() noexcept

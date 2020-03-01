@@ -16,6 +16,7 @@
 #include "../node/rnd-gr-nd-shadow-mapper.hpp"
 #include "../node/rnd-gr-nd-skybox-equirectangular.hpp"
 #include "../node/rnd-gr-nd-unlit.hpp"
+#include "../node/rnd-gr-nd-irradiance-convoluter.hpp"
 
 #define GX_START_TASKS            \
     unsigned int task_number = 0; \
@@ -225,13 +226,16 @@ void gearoenix::render::graph::tree::Pbr::update() noexcept
         for (const auto& id_rtr : runtime_reflections) {
             const auto& rtr = id_rtr.second;
             const auto& cameras = rtr->get_cameras();
-            for (const auto& cam : cameras) {
-                auto& rtr_nodes = scene_nodes.runtime_reflections;
-                rtr_nodes.emplace_back();
-                auto& rtr_cam = rtr_nodes.back();
-                rtr_cam.first = cam.get();
-                CameraData& camera_nodes = rtr_cam.second;
-                update_camera(scn, cam.get(), camera_nodes);
+            const auto& irradiances = rtr->get_irradiance_convoluters();
+            auto& rtrs_nodes = scene_nodes.runtime_reflections;
+            rtrs_nodes.emplace_back();
+            auto& rtr_nodes = rtrs_nodes.back();
+            for (int fi = 0 ; fi < 6; ++fi) {
+                auto &rtr_face_nodes = rtr_nodes.faces[fi];
+                rtr_face_nodes.cam = cameras[fi].get();
+                update_camera(scn, rtr_face_nodes.cam, rtr_face_nodes.camera_data);
+                rtr_face_nodes.irradiance = irradiances[fi].get();
+                rtr_face_nodes.irradiance->update();
             }
         }
         const auto& cameras = scn->get_cameras();
@@ -255,17 +259,19 @@ void gearoenix::render::graph::tree::Pbr::record(const unsigned int kernel_index
 
     for (const auto& priority_scenes : nodes) {
         for ([[maybe_unused]] const auto& [scn, scene_data] : priority_scenes.second) {
-            for ([[maybe_unused]] const auto& [cam, camera_nodes] : scene_data.runtime_reflections) {
-                for (const auto& skies : camera_nodes.skyboxes)
-                    for (auto* const sky : skies.second)
-                        GX_DO_TASK(sky->record_continuously(kernel_index))
-                const auto& opaques = camera_nodes.opaques;
-                if (opaques.forward_pbr != nullptr)
-                    opaques.forward_pbr->record(kernel_index);
-                if (opaques.unlit != nullptr)
-                    opaques.unlit->record(kernel_index);
-                for (auto* const node : camera_nodes.transparencies)
-                    GX_DO_TASK(node->record_continuously(kernel_index))
+            for (const auto& runtime_reflection : scene_data.runtime_reflections) {
+                for(const auto& face: runtime_reflection.faces) {
+                    for (const auto &skies : face.camera_data.skyboxes)
+                        for (auto *const sky : skies.second) GX_DO_TASK(sky->record_continuously(kernel_index))
+                    const auto &opaques = face.camera_data.opaques;
+                    if (opaques.forward_pbr != nullptr)
+                        opaques.forward_pbr->record(kernel_index);
+                    if (opaques.unlit != nullptr)
+                        opaques.unlit->record(kernel_index);
+                    for (auto *const node : face.camera_data.transparencies) GX_DO_TASK(
+                            node->record_continuously(kernel_index))
+                    GX_DO_TASK(face.irradiance->record_continuously(kernel_index))
+                }
             }
             for (const auto& priority_cameras : scene_data.cameras) {
                 for (const auto& cam_camera_nodes : priority_cameras.second) {
@@ -294,8 +300,15 @@ void gearoenix::render::graph::tree::Pbr::submit() noexcept
 
     for (auto& priority_scenes : nodes) {
         for ([[maybe_unused]] const auto& [scn, scene_data] : priority_scenes.second) {
-            for ([[maybe_unused]] const auto& [cam, camera_data] : scene_data.runtime_reflections) {
-                submit_camera_data(camera_data);
+            for (const auto& runtime_reflection : scene_data.runtime_reflections) {
+                for(const auto& face: runtime_reflection.faces) {
+                    submit_camera_data(face.camera_data);
+                }
+            }
+            for (const auto& runtime_reflection : scene_data.runtime_reflections) {
+                for(const auto& face: runtime_reflection.faces) {
+                    face.irradiance->submit();
+                }
             }
             for ([[maybe_unused]] const auto& [priority, cameras] : scene_data.cameras) {
                 for ([[maybe_unused]] const auto& [cam, camera_data] : cameras) {

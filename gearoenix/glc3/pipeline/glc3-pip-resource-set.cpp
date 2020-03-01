@@ -8,6 +8,7 @@
 #include "glc3-pip-shadow-mapper-resource-set.hpp"
 #include "glc3-pip-skybox-equirectangular-resource-set.hpp"
 #include "glc3-pip-unlit-resource-set.hpp"
+#include "glc3-pip-irradiance-convoluter-resource-set.hpp"
 #include <utility>
 
 gearoenix::glc3::pipeline::ResourceSet::ResourceSet(std::shared_ptr<shader::Shader> shd) noexcept
@@ -40,9 +41,12 @@ void gearoenix::glc3::pipeline::ResourceSet::bind(
     case render::pipeline::Type::SkyboxEquirectangular:
         static_cast<const SkyboxEquirectangularResourceSet*>(prs)->bind_final(bound_shader_program);
         break;
-    case render::pipeline::Type::ForwardPbr:
-        static_cast<const ForwardPbrResourceSet*>(prs)->bind_final(bound_shader_program);
-        break;
+        case render::pipeline::Type::ForwardPbr:
+            static_cast<const ForwardPbrResourceSet*>(prs)->bind_final(bound_shader_program);
+            break;
+        case render::pipeline::Type::IrradianceConvoluter:
+            static_cast<const IrradianceConvoluterResourceSet*>(prs)->bind_final(bound_shader_program);
+            break;
     default:
         GXUNIMPLEMENTED
     }

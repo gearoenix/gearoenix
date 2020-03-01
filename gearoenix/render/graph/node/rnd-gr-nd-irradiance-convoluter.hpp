@@ -30,22 +30,16 @@ class IrradianceConvoluterResourceSet;
 
 namespace gearoenix::render::graph::node {
 
-struct IrradianceConvoluterRenderData {
-    std::unique_ptr<pipeline::IrradianceConvoluterResourceSet> r;
-    IrradianceConvoluterRenderData(engine::Engine* e, pipeline::Pipeline* pip) noexcept;
-    ~IrradianceConvoluterRenderData() noexcept;
-};
-
 struct IrradianceConvoluterKernel {
-    std::unique_ptr<command::Buffer> secondary_cmd;
-    core::OneLoopPool<IrradianceConvoluterRenderData> render_data_pool;
-    IrradianceConvoluterKernel(engine::Engine* e, unsigned int kernel_index) noexcept;
+    const std::unique_ptr<command::Buffer> secondary_cmd;
+    const std::unique_ptr<pipeline::IrradianceConvoluterResourceSet> r;
+    IrradianceConvoluterKernel(engine::Engine* e, pipeline::Pipeline* pip, unsigned int kernel_index) noexcept;
     ~IrradianceConvoluterKernel() noexcept;
 };
 
 struct IrradianceConvoluterFrame {
     std::vector<std::unique_ptr<IrradianceConvoluterKernel>> kernels;
-    explicit IrradianceConvoluterFrame(engine::Engine* e) noexcept;
+    explicit IrradianceConvoluterFrame(engine::Engine* e, pipeline::Pipeline* pip) noexcept;
     ~IrradianceConvoluterFrame() noexcept;
 };
 
@@ -53,12 +47,13 @@ class IrradianceConvoluter final : public Node {
 private:
     std::vector<std::unique_ptr<IrradianceConvoluterFrame>> frames;
     IrradianceConvoluterFrame* frame = nullptr;
-    std::shared_ptr<mesh::Mesh> meshes[6];
+    const mesh::Mesh* const msh;
+    const texture::TextureCube* const environment;
 
-    void record(const mesh::Mesh* msh, IrradianceConvoluterKernel* kernel) noexcept;
+    void record(IrradianceConvoluterKernel* kernel) noexcept;
 
 public:
-    IrradianceConvoluter(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
+    IrradianceConvoluter(const mesh::Mesh* msh, const texture::TextureCube* environment, engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
     ~IrradianceConvoluter() noexcept final;
     void update() noexcept final;
     void record(unsigned int kernel_index) noexcept final;

@@ -8387,8 +8387,8 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager:
         break;
     }
     const std::vector<std::uint32_t> indices = {
-        0, 2, 1, // - 1
-        1, 2, 3, // - 2
+        0, 1, 2, // - 1
+        1, 3, 2, // - 2
     };
     const auto id = core::asset::Manager::create_id();
     std::shared_ptr<Mesh> m(new Mesh(

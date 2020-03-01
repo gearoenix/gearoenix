@@ -23,8 +23,8 @@ class Reflection : public core::asset::Asset {
     GX_GETSET_VAL_PRT(bool, enabled, true)
     GX_GET_CPTR_PRT(engine::Engine, e)
     GX_GET_UCPTR_PRT(physics::collider::Sphere, collider)
-    GX_GET_CREF_PRV(std::shared_ptr<texture::TextureCube const>, diffuse)
-    GX_GET_CREF_PRV(std::shared_ptr<texture::TextureCube const>, specular)
+    GX_GET_CREF_PRT(std::shared_ptr<texture::TextureCube>, diffuse)
+    GX_GET_CREF_PRT(std::shared_ptr<texture::TextureCube>, specular)
     GX_GETSET_VAL_PRT(bool, is_dynamic, false)
 protected:
     Reflection(

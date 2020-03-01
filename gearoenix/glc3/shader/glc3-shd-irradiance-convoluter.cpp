@@ -10,11 +10,11 @@ gearoenix::glc3::shader::IrradianceConvoluter::IrradianceConvoluter(engine::Engi
 {
     GX_GLC3_SHADER_SRC_DEFAULT_VERTEX_STARTING <<
         // output
-        "out vec2 out_pos;\n"
+        "out vec3 out_pos;\n"
         // Main function
         "void main()\n"
         "{\n"
-        "    out_pos = normal;\n"
+        "    out_pos = normal;\n" // normal in here is world pos of the face vertex
         "    gl_Position = vec4(position, 1.0);\n"
         "}";
     GX_GLC3_SHADER_SRC_DEFAULT_FRAGMENT_STARTING <<
@@ -27,12 +27,12 @@ gearoenix::glc3::shader::IrradianceConvoluter::IrradianceConvoluter(engine::Engi
         "    vec3 nrm = normalize(out_pos);\n" // TODO move this up right thing in to vertex shader (if it was possible)
         "    vec3 irradiance = vec3(0.0);\n"
         "    vec3 up = vec3(0.0, 1.0, 0.0);\n"
-        "    vec3 right = cross(up, N);\n"
-        "    up = cross(N, right);\n"
+        "    vec3 right = cross(up, nrm);\n"
+        "    up = cross(nrm, right);\n"
         "    float sample_delta = 0.025;\n"
         "    float samples_count = 0.0f;\n"
-        "    for(float phi = 0.0; phi < 2.0 * PI; phi += sampleDelta) {\n"
-        "        for(float theta = 0.0; theta < 0.5 * PI; theta += sampleDelta, ++samples_count) {\n"
+        "    for(float phi = 0.0; phi < 2.0 * GX_PI; phi += sample_delta) {\n"
+        "        for(float theta = 0.0; theta < 0.5 * GX_PI; theta += sample_delta, ++samples_count) {\n"
         "            vec3 tangent_sample = vec3(sin(theta) * cos(phi),  sin(theta) * sin(phi), cos(theta));\n"
         "            vec3 sample_vec = tangent_sample.x * right + tangent_sample.y * up + tangent_sample.z * nrm;\n"
         "            irradiance += texture(environment, sample_vec).rgb * cos(theta) * sin(theta);\n"

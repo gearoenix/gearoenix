@@ -41,8 +41,8 @@ gearoenix::gles2::texture::Target::Target(
     const core::Id id,
     engine::Engine* const e) noexcept
     : render::texture::Target(id, e)
-    , gl_e(e)
     , framebuffer(new Framebuffer())
+    , gl_e(e)
 {
 }
 

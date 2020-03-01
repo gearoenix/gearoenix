@@ -16,6 +16,7 @@ class Node;
 class Unlit;
 class SkyboxEquirectangular;
 class SkyboxCube;
+class IrradianceConvoluter;
 }
 
 namespace gearoenix::render::light {
@@ -37,10 +38,12 @@ class Camera;
 namespace gearoenix::render::graph::tree {
 class Pbr final : public Tree {
 public:
+
     struct Nodes {
         node::ForwardPbr* forward_pbr = nullptr;
         node::Unlit* unlit = nullptr;
     };
+
     struct CameraData {
         std::map<core::Real, std::vector<node::Node*>> skyboxes;
         Nodes opaques {};
@@ -48,9 +51,22 @@ public:
 
         void clear() noexcept;
     };
+
+    struct RuntimeReflectionFaceData {
+        // environment related stuff
+        camera::Camera* cam = nullptr;
+        CameraData camera_data;
+        // irradiance convoluter
+        node::IrradianceConvoluter* irradiance = nullptr;
+    };
+
+    struct RuntimeReflectionData {
+        RuntimeReflectionFaceData faces[6];
+    };
+
     struct SceneData {
         std::map<core::Real, std::map<const camera::Camera*, CameraData>> cameras;
-        std::vector<std::pair<const camera::Camera*, CameraData>> runtime_reflections;
+        std::vector<RuntimeReflectionData> runtime_reflections;
     };
 
 private:

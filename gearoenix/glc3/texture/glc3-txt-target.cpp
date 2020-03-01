@@ -231,7 +231,7 @@ void gearoenix::glc3::texture::Target::generate_framebuffer() noexcept
     if (needs_depth_attachment) {
         gl::Loader::gen_renderbuffers(1, reinterpret_cast<gl::uint*>(&framebuffer->depth_buffer));
         gl::Loader::bind_renderbuffer(GL_RENDERBUFFER, framebuffer->depth_buffer);
-        gl::Loader::renderbuffer_storage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, attachments[0].img_width, attachments[0].img_height);
+        gl::Loader::renderbuffer_storage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT32F, attachments[0].img_width, attachments[0].img_height);
         gl::Loader::framebuffer_renderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, framebuffer->depth_buffer);
     }
 #ifdef GX_DEBUG_GL_CLASS_3

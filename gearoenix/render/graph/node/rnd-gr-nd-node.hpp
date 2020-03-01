@@ -38,6 +38,7 @@ namespace sync {
 }
 namespace texture {
     class Texture;
+    class TextureCube;
     class Target;
 }
 namespace graph::node {
