@@ -45,7 +45,7 @@ void gearoenix::render::graph::node::IrradianceConvoluter::record(IrradianceConv
 }
 
 gearoenix::render::graph::node::IrradianceConvoluter::IrradianceConvoluter(
-        const mesh::Mesh * const msh, const texture::TextureCube* environment,
+    const mesh::Mesh* const msh, const texture::TextureCube* environment,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
     : Node(

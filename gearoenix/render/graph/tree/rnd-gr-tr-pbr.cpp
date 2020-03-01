@@ -13,10 +13,10 @@
 #include "../../skybox/rnd-sky-equirectangular.hpp"
 #include "../../texture/rnd-txt-target.hpp"
 #include "../node/rnd-gr-nd-forward-pbr.hpp"
+#include "../node/rnd-gr-nd-irradiance-convoluter.hpp"
 #include "../node/rnd-gr-nd-shadow-mapper.hpp"
 #include "../node/rnd-gr-nd-skybox-equirectangular.hpp"
 #include "../node/rnd-gr-nd-unlit.hpp"
-#include "../node/rnd-gr-nd-irradiance-convoluter.hpp"
 
 #define GX_START_TASKS            \
     unsigned int task_number = 0; \
@@ -230,8 +230,8 @@ void gearoenix::render::graph::tree::Pbr::update() noexcept
             auto& rtrs_nodes = scene_nodes.runtime_reflections;
             rtrs_nodes.emplace_back();
             auto& rtr_nodes = rtrs_nodes.back();
-            for (int fi = 0 ; fi < 6; ++fi) {
-                auto &rtr_face_nodes = rtr_nodes.faces[fi];
+            for (int fi = 0; fi < 6; ++fi) {
+                auto& rtr_face_nodes = rtr_nodes.faces[fi];
                 rtr_face_nodes.cam = cameras[fi].get();
                 update_camera(scn, rtr_face_nodes.cam, rtr_face_nodes.camera_data);
                 rtr_face_nodes.irradiance = irradiances[fi].get();
@@ -260,15 +260,17 @@ void gearoenix::render::graph::tree::Pbr::record(const unsigned int kernel_index
     for (const auto& priority_scenes : nodes) {
         for ([[maybe_unused]] const auto& [scn, scene_data] : priority_scenes.second) {
             for (const auto& runtime_reflection : scene_data.runtime_reflections) {
-                for(const auto& face: runtime_reflection.faces) {
-                    for (const auto &skies : face.camera_data.skyboxes)
-                        for (auto *const sky : skies.second) GX_DO_TASK(sky->record_continuously(kernel_index))
-                    const auto &opaques = face.camera_data.opaques;
+                for (const auto& face : runtime_reflection.faces) {
+                    for (const auto& skies : face.camera_data.skyboxes)
+                        for (auto* const sky : skies.second)
+                            GX_DO_TASK(sky->record_continuously(kernel_index))
+                    const auto& opaques = face.camera_data.opaques;
                     if (opaques.forward_pbr != nullptr)
                         opaques.forward_pbr->record(kernel_index);
                     if (opaques.unlit != nullptr)
                         opaques.unlit->record(kernel_index);
-                    for (auto *const node : face.camera_data.transparencies) GX_DO_TASK(
+                    for (auto* const node : face.camera_data.transparencies)
+                        GX_DO_TASK(
                             node->record_continuously(kernel_index))
                     GX_DO_TASK(face.irradiance->record_continuously(kernel_index))
                 }
@@ -301,12 +303,12 @@ void gearoenix::render::graph::tree::Pbr::submit() noexcept
     for (auto& priority_scenes : nodes) {
         for ([[maybe_unused]] const auto& [scn, scene_data] : priority_scenes.second) {
             for (const auto& runtime_reflection : scene_data.runtime_reflections) {
-                for(const auto& face: runtime_reflection.faces) {
+                for (const auto& face : runtime_reflection.faces) {
                     submit_camera_data(face.camera_data);
                 }
             }
             for (const auto& runtime_reflection : scene_data.runtime_reflections) {
-                for(const auto& face: runtime_reflection.faces) {
+                for (const auto& face : runtime_reflection.faces) {
                     face.irradiance->submit();
                 }
             }

@@ -5,11 +5,17 @@
 #include "../../gl/gl-types.hpp"
 #include "../../render/command/rnd-cmd-buffer.hpp"
 
+namespace gearoenix::glc3::texture {
+class Target;
+}
+
 namespace gearoenix::glc3::command {
 class Buffer final : public render::command::Buffer {
 public:
     ~Buffer() noexcept final = default;
-    [[nodiscard]] gl::uint play(gl::uint bound_shader_program = static_cast<gl::uint>(-1)) const noexcept;
+    [[nodiscard]] std::pair<gl::uint, const texture::Target*> play(
+        const texture::Target* bound_target,
+        gl::uint bound_shader_program) const noexcept;
 };
 }
 #endif

@@ -2,10 +2,10 @@
 #ifdef GX_USE_OPENGL_CLASS_3
 #include "../engine/glc3-eng-engine.hpp"
 #include "glc3-pip-forward-pbr.hpp"
+#include "glc3-pip-irradiance-convoluter.hpp"
 #include "glc3-pip-shadow-mapper.hpp"
 #include "glc3-pip-skybox-equirectangular.hpp"
 #include "glc3-pip-unlit.hpp"
-#include "glc3-pip-irradiance-convoluter.hpp"
 
 gearoenix::glc3::pipeline::Manager::Manager(engine::Engine* const engine) noexcept
     : render::pipeline::Manager(engine)
@@ -28,10 +28,10 @@ std::shared_ptr<gearoenix::render::pipeline::Pipeline> gearoenix::glc3::pipeline
                 return ShadowMapper::construct(eng, call);
             case render::pipeline::Type::Unlit:
                 return Unlit::construct(eng, call);
-                case render::pipeline::Type::SkyboxEquirectangular:
-                    return SkyboxEquirectangular::construct(eng, call);
-                case render::pipeline::Type::IrradianceConvoluter:
-                    return IrradianceConvoluter::construct(eng, call);
+            case render::pipeline::Type::SkyboxEquirectangular:
+                return SkyboxEquirectangular::construct(eng, call);
+            case render::pipeline::Type::IrradianceConvoluter:
+                return IrradianceConvoluter::construct(eng, call);
             default:
                 GXLOGF("Unexpected pipeline type: " << static_cast<unsigned int>(pipeline_type_id))
             }

@@ -4,14 +4,17 @@
 #include "../pipeline/glc3-pip-resource-set.hpp"
 #include "../texture/glc3-txt-target.hpp"
 
-gearoenix::gl::uint gearoenix::glc3::command::Buffer::play(gl::uint bound_shader_program) const noexcept
+std::pair<gearoenix::gl::uint, const gearoenix::glc3::texture::Target*> gearoenix::glc3::command::Buffer::play(
+    const texture::Target* const bound_target,
+    gl::uint bound_shader_program) const noexcept
 {
-    if (render_target != nullptr)
-        static_cast<const texture::Target*>(render_target)->bind();
+    const auto* const target = static_cast<const texture::Target*>(render_target);
+    if (render_target != nullptr && bound_target != render_target)
+        target->bind(bound_target);
     for (const render::pipeline::ResourceSet* prs : bound_resource_sets)
         pipeline::ResourceSet::bind(prs, bound_shader_program);
     for (const render::command::Buffer* c : recorded_secondaries)
-        bound_shader_program = static_cast<const Buffer*>(c)->play(bound_shader_program);
-    return bound_shader_program;
+        bound_shader_program = static_cast<const Buffer*>(c)->play(target, bound_shader_program).first;
+    return { bound_shader_program, target };
 }
 #endif

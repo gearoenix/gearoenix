@@ -41,14 +41,7 @@ gearoenix::glc3::texture::Target::Target(
 {
 }
 
-gearoenix::glc3::texture::Target::Target(const Target& o) noexcept
-    : render::texture::Target(o)
-    , framebuffer(o.framebuffer)
-    , gl_e(o.gl_e)
-    , gl_cull_mode(o.gl_cull_mode)
-    , gl_blend_mode(o.gl_blend_mode)
-{
-}
+gearoenix::glc3::texture::Target::Target(const Target& o) noexcept = default;
 
 void gearoenix::glc3::texture::Target::initialize_textures(
     const std::vector<render::texture::AttachmentInfo>& infos,
@@ -205,12 +198,12 @@ void gearoenix::glc3::texture::Target::generate_framebuffer() noexcept
         const auto [glo, glt] = [&] {
             switch (txt->get_texture_type()) {
             case render::texture::Type::Texture2D: {
-                const auto* const t = static_cast<const Texture2D*>(txt.get());
+                const auto* const t = dynamic_cast<const Texture2D*>(txt.get());
                 t->bind();
                 return std::make_tuple(t->get_texture_object(), gl::enumerated(GL_TEXTURE_2D));
             }
             case render::texture::Type::TextureCube: {
-                const auto* const t = static_cast<const TextureCube*>(txt.get());
+                const auto* const t = dynamic_cast<const TextureCube*>(txt.get());
                 t->bind();
                 return std::make_tuple(
                     t->get_texture_object(),
@@ -270,7 +263,7 @@ std::shared_ptr<gearoenix::render::texture::Target> gearoenix::glc3::texture::Ta
     return result;
 }
 
-void gearoenix::glc3::texture::Target::bind() const noexcept
+void gearoenix::glc3::texture::Target::bind(const Target* const o) const noexcept
 {
     framebuffer->bind();
 
@@ -283,10 +276,10 @@ void gearoenix::glc3::texture::Target::bind() const noexcept
         static_cast<gl::sizei>(clipping_starting_x), static_cast<gl::sizei>(clipping_starting_y),
         static_cast<gl::sizei>(clipping_width), static_cast<gl::sizei>(clipping_height));
 
-    clear();
+    clear(o);
 }
 
-void gearoenix::glc3::texture::Target::clear() const noexcept
+void gearoenix::glc3::texture::Target::clear(const Target* const o) const noexcept
 {
     if (write_depth) {
         gl::Loader::depth_mask(GL_TRUE);
@@ -294,10 +287,10 @@ void gearoenix::glc3::texture::Target::clear() const noexcept
         gl::Loader::depth_mask(GL_FALSE);
     }
 
-    if (attachments.empty()) {
-        gl::Loader::clear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-    } else {
+    if (o == nullptr || o->framebuffer->framebuffer != framebuffer->framebuffer) {
         gl::Loader::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    } else {
+        gl::Loader::clear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     }
 }
 

@@ -5,12 +5,12 @@
 #include "../camera/rnd-cmr-perspective.hpp"
 #include "../camera/rnd-cmr-transformation.hpp"
 #include "../engine/rnd-eng-engine.hpp"
+#include "../graph/node/rnd-gr-nd-irradiance-convoluter.hpp"
+#include "../mesh/rnd-msh-manager.hpp"
+#include "../mesh/rnd-msh-mesh.hpp"
 #include "../texture/rnd-txt-manager.hpp"
 #include "../texture/rnd-txt-target.hpp"
 #include "../texture/rnd-txt-texture-cube.hpp"
-#include "../mesh/rnd-msh-manager.hpp"
-#include "../mesh/rnd-msh-mesh.hpp"
-#include "../graph/node/rnd-gr-nd-irradiance-convoluter.hpp"
 
 gearoenix::render::reflection::Runtime::Runtime(
     const core::Id id,
@@ -43,17 +43,15 @@ gearoenix::render::reflection::Runtime::Runtime(
     auto* const txt_mgr = ast_mgr->get_texture_manager();
     auto* const cam_mgr = ast_mgr->get_camera_manager();
     auto* const msh_mgr = ast_mgr->get_mesh_manager();
-    const auto environment_resolution =
-            static_cast<unsigned int>(sys_app->get_configuration().render_config.runtime_reflection_environment_resolution);
-    const auto diffuse_resolution =
-            static_cast<unsigned int>(sys_app->get_configuration().render_config.runtime_reflection_diffuse_resolution);
+    const auto environment_resolution = static_cast<unsigned int>(sys_app->get_configuration().render_config.runtime_reflection_environment_resolution);
+    const auto diffuse_resolution = static_cast<unsigned int>(sys_app->get_configuration().render_config.runtime_reflection_diffuse_resolution);
     core::sync::EndCaller<texture::TextureCube> txt_cube_call([call](const std::shared_ptr<texture::TextureCube>&) {});
     core::sync::EndCaller<mesh::Mesh> msh_call([call](const std::shared_ptr<mesh::Mesh>&) {});
     environment = txt_mgr->create_cube(texture_info, environment_resolution, txt_cube_call);
     diffuse = txt_mgr->create_cube(texture_info, diffuse_resolution, txt_cube_call);
     std::vector<texture::AttachmentInfo> target_infos = { texture::AttachmentInfo {
-            .texture_info = texture_info,
-            .usage = texture::UsageFlag::Color,
+        .texture_info = texture_info,
+        .usage = texture::UsageFlag::Color,
     } };
     for (int i = 0; i < 6; ++i) {
         target_infos[0].face = std::get<0>(faces[i]);
@@ -81,7 +79,7 @@ gearoenix::render::reflection::Runtime::Runtime(
         diffuse_target = e->create_render_target(core::asset::Manager::create_id(), target_infos, call);
         auto& irradiance_convoluter = irradiance_convoluters[i];
         irradiance_convoluter = std::make_unique<graph::node::IrradianceConvoluter>(
-                face_mesh.get(), environment.get(), e, call);
+            face_mesh.get(), environment.get(), e, call);
         irradiance_convoluter->set_render_target(diffuse_target.get());
     }
     set_receiving_radius(receiving_radius);

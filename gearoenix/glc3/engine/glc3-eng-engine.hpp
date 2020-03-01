@@ -2,16 +2,21 @@
 #define GEAROENIX_GLC3_ENGINE_HPP
 #include "../../core/cr-build-configuration.hpp"
 #ifdef GX_USE_OPENGL_CLASS_3
+#include "../../gl/gl-types.hpp"
 #include "../../render/engine/rnd-eng-engine.hpp"
 #include "../glc3.hpp"
 
 namespace gearoenix::glc3::texture {
 class Texture2D;
+class Target;
 }
 
 namespace gearoenix::glc3::engine {
 class Engine final : public render::engine::Engine {
 private:
+    const texture::Target* bound_target = nullptr;
+    gl::uint bound_shader = gl::uint(-1);
+
     explicit Engine(system::Application* sys_app, render::engine::Type engine_type) noexcept;
 
 public:

@@ -42,7 +42,9 @@ gearoenix::glc3::engine::Engine::~Engine() noexcept
 
 void gearoenix::glc3::engine::Engine::update() noexcept
 {
-    gl::Loader::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    bound_target = nullptr;
+    bound_shader = gl::uint(-1);
+
 #ifdef GX_DEBUG_GL_CLASS_3
     gl::Loader::check_for_error();
 #endif
@@ -102,8 +104,11 @@ void gearoenix::glc3::engine::Engine::submit(
 #ifdef GX_DEBUG_GL_CLASS_3
     gl::Loader::check_for_error();
 #endif
-    for (std::size_t i = 0; i < cmds_count; ++i)
-        (void)static_cast<const command::Buffer*>(cmds[i])->play();
+    for (std::size_t i = 0; i < cmds_count; ++i) {
+        const auto res = static_cast<const command::Buffer*>(cmds[i])->play(bound_target, bound_shader);
+        bound_shader = res.first;
+        bound_target = res.second;
+    }
 #ifdef GX_DEBUG_GL_CLASS_3
     gl::Loader::check_for_error();
 #endif

@@ -38,7 +38,6 @@ class Camera;
 namespace gearoenix::render::graph::tree {
 class Pbr final : public Tree {
 public:
-
     struct Nodes {
         node::ForwardPbr* forward_pbr = nullptr;
         node::Unlit* unlit = nullptr;
