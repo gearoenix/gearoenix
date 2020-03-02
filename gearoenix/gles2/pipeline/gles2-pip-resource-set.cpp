@@ -5,6 +5,7 @@
 #include "../buffer/gles2-buf-index.hpp"
 #include "../shader/gles2-shd-shader.hpp"
 #include "gles2-pip-forward-pbr-resource-set.hpp"
+#include "gles2-pip-irradiance-convoluter-resource-set.hpp"
 #include "gles2-pip-shadow-mapper-resource-set.hpp"
 #include "gles2-pip-skybox-equirectangular-resource-set.hpp"
 #include "gles2-pip-unlit-resource-set.hpp"
@@ -42,6 +43,9 @@ void gearoenix::gles2::pipeline::ResourceSet::bind(
         break;
     case render::pipeline::Type::ForwardPbr:
         static_cast<const ForwardPbrResourceSet*>(prs)->bind_final(bound_shader_program);
+        break;
+    case render::pipeline::Type::IrradianceConvoluter:
+        static_cast<const IrradianceConvoluterResourceSet*>(prs)->bind_final(bound_shader_program);
         break;
     default:
         GXUNIMPLEMENTED

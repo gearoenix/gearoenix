@@ -2,6 +2,7 @@
 #ifdef GX_USE_OPENGL_ES2
 #include "../engine/gles2-eng-engine.hpp"
 #include "gles2-pip-forward-pbr.hpp"
+#include "gles2-pip-irradiance-convoluter.hpp"
 #include "gles2-pip-shadow-mapper.hpp"
 #include "gles2-pip-skybox-equirectangular.hpp"
 #include "gles2-pip-unlit.hpp"
@@ -22,6 +23,8 @@ std::shared_ptr<gearoenix::render::pipeline::Pipeline> gearoenix::gles2::pipelin
             switch (pipeline_type_id) {
             case render::pipeline::Type::ForwardPbr:
                 return ForwardPbr::construct(eng, c);
+            case render::pipeline::Type::IrradianceConvoluter:
+                return IrradianceConvoluter::construct(eng, c);
             case render::pipeline::Type::ShadowMapper:
                 return ShadowMapper::construct(eng, c);
             case render::pipeline::Type::Unlit:

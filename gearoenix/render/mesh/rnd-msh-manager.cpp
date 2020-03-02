@@ -8383,7 +8383,7 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager:
         vertices[0].normal = math::Vec3(-1.0f, -1.0f, -1.0f);
         vertices[1].normal = math::Vec3(1.0f, -1.0f, -1.0f);
         vertices[2].normal = math::Vec3(-1.0f, 1.0f, -1.0f);
-        vertices[3].normal = math::Vec3(-1.0f, 1.0f, -1.0f);
+        vertices[3].normal = math::Vec3(1.0f, 1.0f, -1.0f);
         break;
     }
     const std::vector<std::uint32_t> indices = {

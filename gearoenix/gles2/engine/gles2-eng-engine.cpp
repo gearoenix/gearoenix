@@ -60,10 +60,11 @@ gearoenix::gles2::engine::Engine::~Engine() noexcept
 
 void gearoenix::gles2::engine::Engine::update() noexcept
 {
+    bound_target = nullptr;
+    bound_shader = gl::uint(-1);
 #ifdef GX_DEBUG_GLES2
     gl::Loader::check_for_error();
 #endif
-    gl::Loader::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     render::engine::Engine::update();
 #ifdef GX_DEBUG_GLES2
     gl::Loader::check_for_error();
@@ -133,8 +134,9 @@ void gearoenix::gles2::engine::Engine::submit(
     const render::sync::Semaphore* const* const) noexcept
 {
     for (std::size_t i = 0; i < cmds_count; ++i) {
-        auto _ = dynamic_cast<const command::Buffer*>(cmds[i])->play();
-        (void)_;
+        const auto bound = dynamic_cast<const command::Buffer*>(cmds[i])->play(bound_target, bound_shader);
+        bound_shader = bound.first;
+        bound_target = bound.second;
     }
 }
 

@@ -21,7 +21,7 @@
 
 #define GX_GLES2_PIP_RES_SET_TXT_2D(x, txt) GX_GLES2_PIP_RES_SET_TXT(x, txt, Texture2D)
 
-#define GX_GLES2_PIP_RES_SET_TXT_CUBE(x, txt) GX_GLES2_PIP_RES_SET_TXT(x, txt, Cube)
+#define GX_GLES2_PIP_RES_SET_TXT_CUBE(x, txt) GX_GLES2_PIP_RES_SET_TXT(x, txt, TextureCube)
 
 namespace gearoenix::gles2::shader {
 class Shader;

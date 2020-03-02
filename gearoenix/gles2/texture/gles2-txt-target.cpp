@@ -233,7 +233,7 @@ std::shared_ptr<gearoenix::render::texture::Target> gearoenix::gles2::texture::T
     return result;
 }
 
-void gearoenix::gles2::texture::Target::bind() const noexcept
+void gearoenix::gles2::texture::Target::bind(const Target* const bound) const noexcept
 {
     framebuffer->bind();
 
@@ -246,10 +246,10 @@ void gearoenix::gles2::texture::Target::bind() const noexcept
         static_cast<gl::sizei>(clipping_starting_x), static_cast<gl::sizei>(clipping_starting_y),
         static_cast<gl::sizei>(clipping_width), static_cast<gl::sizei>(clipping_height));
 
-    clear();
+    clear(bound);
 }
 
-void gearoenix::gles2::texture::Target::clear() const noexcept
+void gearoenix::gles2::texture::Target::clear(const Target* const bound) const noexcept
 {
     if (write_depth) {
         gl::Loader::depth_mask(GL_TRUE);
@@ -257,10 +257,10 @@ void gearoenix::gles2::texture::Target::clear() const noexcept
         gl::Loader::depth_mask(GL_FALSE);
     }
 
-    if (framebuffer->borrowed) {
-        gl::Loader::clear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-    } else {
+    if (bound == nullptr || bound->framebuffer->framebuffer != framebuffer->framebuffer) {
         gl::Loader::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    } else {
+        gl::Loader::clear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     }
 }
 

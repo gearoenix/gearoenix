@@ -3,9 +3,8 @@
 #include "../../core/cr-function-loader.hpp"
 #include "../../gl/gl-constants.hpp"
 #include "../../gl/gl-loader.hpp"
-#include "../../system/sys-log.hpp"
 #include "../engine/gles2-eng-engine.hpp"
-#include "../gles2.hpp"
+#include <string>
 #include <vector>
 
 void gearoenix::gles2::shader::Shader::create_program() noexcept

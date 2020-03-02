@@ -52,8 +52,8 @@ public:
         engine::Engine* e,
         const render::texture::AttachmentInfo& info,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
-    void bind() const noexcept;
-    void clear() const noexcept;
+    void bind(const Target*) const noexcept;
+    void clear(const Target*) const noexcept;
     //    static void bind(const render::texture::Target* target) noexcept;
     //    static void bind_texture(const render::texture::Target* t, gl::enumerated texture_unit) noexcept;
     [[nodiscard]] render::texture::Target* clone() const noexcept final;
