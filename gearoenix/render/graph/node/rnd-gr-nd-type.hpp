@@ -9,7 +9,8 @@ enum struct Type : core::TypeId {
     SkyboxCube = 4,
     SkyboxEquirectangular = 5,
     IrradianceConvoluter = 6,
-    RadianceConvoluter = 6,
+    RadianceConvoluter = 7,
+    MipmapGenerator = 8,
 };
 }
 #endif

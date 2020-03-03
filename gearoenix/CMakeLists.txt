@@ -385,6 +385,8 @@ SET(GX_ENGINE_SRC
         "${GX_ENGINE_SRC_DIR}render/graph/node/rnd-gr-nd-g-buffer-filler.hpp"
         "${GX_ENGINE_SRC_DIR}render/graph/node/rnd-gr-nd-irradiance-convoluter.cpp"
         "${GX_ENGINE_SRC_DIR}render/graph/node/rnd-gr-nd-irradiance-convoluter.hpp"
+        "${GX_ENGINE_SRC_DIR}render/graph/node/rnd-gr-nd-mipmap-generator.cpp"
+        "${GX_ENGINE_SRC_DIR}render/graph/node/rnd-gr-nd-mipmap-generator.hpp"
         "${GX_ENGINE_SRC_DIR}render/graph/node/rnd-gr-nd-node.cpp"
         "${GX_ENGINE_SRC_DIR}render/graph/node/rnd-gr-nd-node.hpp"
         "${GX_ENGINE_SRC_DIR}render/graph/node/rnd-gr-nd-radiance-convoluter.cpp"

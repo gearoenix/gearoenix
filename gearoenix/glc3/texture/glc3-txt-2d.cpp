@@ -211,4 +211,10 @@ gearoenix::gl::enumerated gearoenix::glc3::texture::Texture2D::convert_data_form
     }
 }
 
+void gearoenix::glc3::texture::Texture2D::generate_mipmap() const noexcept
+{
+    bind();
+    gl::Loader::generate_mipmap(GL_TEXTURE_2D);
+}
+
 #endif

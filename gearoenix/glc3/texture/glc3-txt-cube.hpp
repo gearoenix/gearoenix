@@ -34,6 +34,7 @@ public:
     ~TextureCube() noexcept final;
     void bind(gl::enumerated texture_unit) const noexcept;
     void bind() const noexcept;
+    void generate_mipmap() const noexcept;
 };
 }
 

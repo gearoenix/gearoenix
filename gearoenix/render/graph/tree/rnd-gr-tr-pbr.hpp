@@ -17,6 +17,8 @@ class Unlit;
 class SkyboxEquirectangular;
 class SkyboxCube;
 class IrradianceConvoluter;
+class RadianceConvoluter;
+class MipmapGenerator;
 }
 
 namespace gearoenix::render::light {
@@ -55,11 +57,12 @@ public:
         // environment related stuff
         camera::Camera* cam = nullptr;
         CameraData camera_data;
-        // irradiance convoluter
         node::IrradianceConvoluter* irradiance = nullptr;
+        node::RadianceConvoluter* radiances[GX_MAX_RUNTIME_REFLECTION_SPECULAR_LEVELS] = { nullptr };
     };
 
     struct RuntimeReflectionData {
+        node::MipmapGenerator* mipmap_generator = nullptr;
         RuntimeReflectionFaceData faces[6];
     };
 

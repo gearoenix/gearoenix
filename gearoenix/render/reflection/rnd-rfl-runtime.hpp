@@ -10,6 +10,7 @@ class Perspective;
 namespace gearoenix::render::graph::node {
 class IrradianceConvoluter;
 class RadianceConvoluter;
+class MipmapGenerator;
 }
 
 namespace gearoenix::render::mesh {
@@ -23,6 +24,7 @@ class Target;
 namespace gearoenix::render::reflection {
 class Runtime final : public Reflection {
     GX_GET_CREF_PRV(std::shared_ptr<texture::TextureCube>, environment)
+    GX_GET_CREF_PRV(std::shared_ptr<graph::node::MipmapGenerator>, environment_mipmap_generator)
     GX_GET_ARRC_PRV(std::shared_ptr<camera::Perspective>, cameras, 6)
     GX_GET_ARRC_PRV(std::shared_ptr<texture::Target>, environment_targets, 6)
     GX_GET_ARRC_PRV(std::shared_ptr<texture::Target>, diffuse_targets, 6)

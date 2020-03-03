@@ -100,7 +100,7 @@ std::shared_ptr<gearoenix::glc3::texture::TextureCube> gearoenix::glc3::texture:
     default:
         GXUNEXPECTED
     }
-    engine->get_function_loader()->load([result, gl_aspect, internal_format, format, data_format, sample_info, call] {
+    engine->get_function_loader()->load([result, gl_aspect, internal_format, format, data_format, sample_info, has_mipmap { info.has_mipmap }, call] {
         gl::Loader::gen_textures(1, &(result->texture_object));
         gl::Loader::bind_texture(GL_TEXTURE_CUBE_MAP, result->texture_object);
         gl::Loader::tex_parameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, sample_info.mag_filter);
@@ -113,7 +113,8 @@ std::shared_ptr<gearoenix::glc3::texture::TextureCube> gearoenix::glc3::texture:
 #ifdef GX_DEBUG_GL_CLASS_3
         gl::Loader::check_for_error();
 #endif
-        gl::Loader::generate_mipmap(GL_TEXTURE_CUBE_MAP);
+        if (has_mipmap)
+            gl::Loader::generate_mipmap(GL_TEXTURE_CUBE_MAP);
         // It clears the errors, some drivers does not support mip-map generation for cube texture
         gl::Loader::get_error();
     });
@@ -141,6 +142,12 @@ void gearoenix::glc3::texture::TextureCube::bind(gl::enumerated texture_unit) co
 void gearoenix::glc3::texture::TextureCube::bind() const noexcept
 {
     gl::Loader::bind_texture(GL_TEXTURE_CUBE_MAP, texture_object);
+}
+
+void gearoenix::glc3::texture::TextureCube::generate_mipmap() const noexcept
+{
+    bind();
+    gl::Loader::generate_mipmap(GL_TEXTURE_CUBE_MAP);
 }
 
 #endif

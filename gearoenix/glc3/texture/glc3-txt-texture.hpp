@@ -13,6 +13,7 @@ class Texture {
 public:
     Texture() = delete;
     static void bind(const render::texture::Texture* t, gl::enumerated texture_unit) noexcept;
+    static void generate_mipmap(const render::texture::Texture* t) noexcept;
 };
 }
 

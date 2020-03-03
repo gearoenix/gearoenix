@@ -38,6 +38,7 @@ public:
     ~Texture2D() noexcept final;
     void bind(gl::enumerated texture_unit) const noexcept;
     void bind() const noexcept;
+    void generate_mipmap() const noexcept;
     [[nodiscard]] static gl::sint convert_internal_format(render::texture::TextureFormat f) noexcept;
     [[nodiscard]] static gl::enumerated convert_format(render::texture::TextureFormat f) noexcept;
     [[nodiscard]] static gl::enumerated convert_data_format(render::texture::TextureFormat f) noexcept;

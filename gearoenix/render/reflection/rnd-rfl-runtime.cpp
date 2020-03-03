@@ -6,6 +6,7 @@
 #include "../camera/rnd-cmr-transformation.hpp"
 #include "../engine/rnd-eng-engine.hpp"
 #include "../graph/node/rnd-gr-nd-irradiance-convoluter.hpp"
+#include "../graph/node/rnd-gr-nd-mipmap-generator.hpp"
 #include "../graph/node/rnd-gr-nd-radiance-convoluter.hpp"
 #include "../mesh/rnd-msh-manager.hpp"
 #include "../mesh/rnd-msh-mesh.hpp"
@@ -49,9 +50,9 @@ gearoenix::render::reflection::Runtime::Runtime(
     const auto diffuse_resolution = static_cast<unsigned int>(render_config.runtime_reflection_diffuse_resolution);
     const auto specular_resolution = static_cast<unsigned int>(render_config.runtime_reflection_specular_resolution);
     const auto specular_mips_count = render_config.runtime_reflection_specular_levels;
-    for (auto i = specular_mips_count; i > 0; --i) {
+    for (auto i = 0; i < specular_mips_count; ++i) {
         const auto fi = static_cast<core::Real>(i);
-        const auto fm = static_cast<core::Real>(specular_mips_count);
+        const auto fm = static_cast<core::Real>(specular_mips_count - 1);
         roughnesses.push_back((fi + (fm * 0.5f - fi) * 0.001f) / fm);
     }
 #ifdef GX_DEBUG_MODE
@@ -60,7 +61,10 @@ gearoenix::render::reflection::Runtime::Runtime(
 #endif
     core::sync::EndCaller<texture::TextureCube> txt_cube_call([call](const std::shared_ptr<texture::TextureCube>&) {});
     core::sync::EndCaller<mesh::Mesh> msh_call([call](const std::shared_ptr<mesh::Mesh>&) {});
-    environment = txt_mgr->create_cube(texture_info, environment_resolution, txt_cube_call);
+    auto environment_texture_info = texture_info;
+    environment_texture_info.has_mipmap = true;
+    environment = txt_mgr->create_cube(environment_texture_info, environment_resolution, txt_cube_call);
+    environment_mipmap_generator = std::make_shared<graph::node::MipmapGenerator>(environment.get(), e, call);
     diffuse = txt_mgr->create_cube(texture_info, diffuse_resolution, txt_cube_call);
     auto specular_txt_info = texture_info;
     specular_txt_info.sample_info.min_filter = texture::Filter::LinearMipmapLinear;
@@ -73,6 +77,7 @@ gearoenix::render::reflection::Runtime::Runtime(
     auto& target_info = target_infos[0];
     for (int i = 0; i < 6; ++i) {
         target_info.face = std::get<0>(faces[i]);
+        target_info.mipmap_level = 0;
         // environment related stuff
         target_info.img_width = target_info.img_height = environment_resolution;
         target_info.txt = environment;

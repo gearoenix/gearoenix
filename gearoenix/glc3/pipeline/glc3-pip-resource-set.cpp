@@ -6,6 +6,7 @@
 #include "../shader/glc3-shd-shader.hpp"
 #include "glc3-pip-forward-pbr-resource-set.hpp"
 #include "glc3-pip-irradiance-convoluter-resource-set.hpp"
+#include "glc3-pip-radiance-convoluter-resource-set.hpp"
 #include "glc3-pip-shadow-mapper-resource-set.hpp"
 #include "glc3-pip-skybox-equirectangular-resource-set.hpp"
 #include "glc3-pip-unlit-resource-set.hpp"
@@ -46,6 +47,9 @@ void gearoenix::glc3::pipeline::ResourceSet::bind(
         break;
     case render::pipeline::Type::IrradianceConvoluter:
         static_cast<const IrradianceConvoluterResourceSet*>(prs)->bind_final(bound_shader_program);
+        break;
+    case render::pipeline::Type::RadianceConvoluter:
+        static_cast<const RadianceConvoluterResourceSet*>(prs)->bind_final(bound_shader_program);
         break;
     default:
         GXUNIMPLEMENTED

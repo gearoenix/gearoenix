@@ -14,6 +14,8 @@
 #include "../../texture/rnd-txt-target.hpp"
 #include "../node/rnd-gr-nd-forward-pbr.hpp"
 #include "../node/rnd-gr-nd-irradiance-convoluter.hpp"
+#include "../node/rnd-gr-nd-mipmap-generator.hpp"
+#include "../node/rnd-gr-nd-radiance-convoluter.hpp"
 #include "../node/rnd-gr-nd-shadow-mapper.hpp"
 #include "../node/rnd-gr-nd-skybox-equirectangular.hpp"
 #include "../node/rnd-gr-nd-unlit.hpp"
@@ -227,15 +229,27 @@ void gearoenix::render::graph::tree::Pbr::update() noexcept
             const auto& rtr = id_rtr.second;
             const auto& cameras = rtr->get_cameras();
             const auto& irradiances = rtr->get_irradiance_convoluters();
+            const auto& radiances = rtr->get_radiance_convoluters();
             auto& rtrs_nodes = scene_nodes.runtime_reflections;
             rtrs_nodes.emplace_back();
             auto& rtr_nodes = rtrs_nodes.back();
+            rtr_nodes.mipmap_generator = rtr->get_environment_mipmap_generator().get();
+            rtr_nodes.mipmap_generator->update();
             for (int fi = 0; fi < 6; ++fi) {
                 auto& rtr_face_nodes = rtr_nodes.faces[fi];
                 rtr_face_nodes.cam = cameras[fi].get();
                 update_camera(scn, rtr_face_nodes.cam, rtr_face_nodes.camera_data);
                 rtr_face_nodes.irradiance = irradiances[fi].get();
                 rtr_face_nodes.irradiance->update();
+                const auto& face_radiances = radiances[fi];
+                for (std::size_t rad_i = 0; rad_i < face_radiances.size(); ++rad_i) {
+                    auto* const radiance = face_radiances[rad_i].get();
+                    rtr_face_nodes.radiances[rad_i] = radiance;
+                    radiance->update();
+                }
+                for (auto rad_i = face_radiances.size(); rad_i < GX_MAX_RUNTIME_REFLECTION_SPECULAR_LEVELS; ++rad_i) {
+                    rtr_face_nodes.radiances[rad_i] = nullptr;
+                }
             }
         }
         const auto& cameras = scn->get_cameras();
@@ -260,6 +274,7 @@ void gearoenix::render::graph::tree::Pbr::record(const unsigned int kernel_index
     for (const auto& priority_scenes : nodes) {
         for ([[maybe_unused]] const auto& [scn, scene_data] : priority_scenes.second) {
             for (const auto& runtime_reflection : scene_data.runtime_reflections) {
+                GX_DO_TASK(runtime_reflection.mipmap_generator->record_continuously(kernel_index))
                 for (const auto& face : runtime_reflection.faces) {
                     for (const auto& skies : face.camera_data.skyboxes)
                         for (auto* const sky : skies.second)
@@ -273,6 +288,9 @@ void gearoenix::render::graph::tree::Pbr::record(const unsigned int kernel_index
                         GX_DO_TASK(
                             node->record_continuously(kernel_index))
                     GX_DO_TASK(face.irradiance->record_continuously(kernel_index))
+                    for (std::size_t rad_i = 0; rad_i < GX_MAX_RUNTIME_REFLECTION_SPECULAR_LEVELS && face.radiances[rad_i] != nullptr; ++rad_i) {
+                        GX_DO_TASK(face.radiances[rad_i]->record_continuously(kernel_index))
+                    }
                 }
             }
             for (const auto& priority_cameras : scene_data.cameras) {
@@ -306,10 +324,14 @@ void gearoenix::render::graph::tree::Pbr::submit() noexcept
                 for (const auto& face : runtime_reflection.faces) {
                     submit_camera_data(face.camera_data);
                 }
+                runtime_reflection.mipmap_generator->submit();
             }
             for (const auto& runtime_reflection : scene_data.runtime_reflections) {
                 for (const auto& face : runtime_reflection.faces) {
                     face.irradiance->submit();
+                    for (std::size_t rad_i = 0; rad_i < GX_MAX_RUNTIME_REFLECTION_SPECULAR_LEVELS && face.radiances[rad_i] != nullptr; ++rad_i) {
+                        face.radiances[rad_i]->submit();
+                    }
                 }
             }
             for ([[maybe_unused]] const auto& [priority, cameras] : scene_data.cameras) {

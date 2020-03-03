@@ -3,6 +3,7 @@
 #include "../../render/pipeline/rnd-pip-resource-set.hpp"
 #include "../pipeline/glc3-pip-resource-set.hpp"
 #include "../texture/glc3-txt-target.hpp"
+#include "../texture/glc3-txt-texture.hpp"
 
 std::pair<gearoenix::gl::uint, const gearoenix::glc3::texture::Target*> gearoenix::glc3::command::Buffer::play(
     const texture::Target* const bound_target,
@@ -15,6 +16,8 @@ std::pair<gearoenix::gl::uint, const gearoenix::glc3::texture::Target*> gearoeni
         pipeline::ResourceSet::bind(prs, bound_shader_program);
     for (const render::command::Buffer* c : recorded_secondaries)
         bound_shader_program = static_cast<const Buffer*>(c)->play(target, bound_shader_program).first;
+    for (const auto* const t : bound_texture_for_mipmap_generation)
+        texture::Texture::generate_mipmap(t);
     return { bound_shader_program, target };
 }
 #endif
