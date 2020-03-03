@@ -3,6 +3,7 @@
 #include "../engine/glc3-eng-engine.hpp"
 #include "glc3-pip-forward-pbr.hpp"
 #include "glc3-pip-irradiance-convoluter.hpp"
+#include "glc3-pip-radiance-convoluter.hpp"
 #include "glc3-pip-shadow-mapper.hpp"
 #include "glc3-pip-skybox-equirectangular.hpp"
 #include "glc3-pip-unlit.hpp"
@@ -32,6 +33,8 @@ std::shared_ptr<gearoenix::render::pipeline::Pipeline> gearoenix::glc3::pipeline
                 return SkyboxEquirectangular::construct(eng, call);
             case render::pipeline::Type::IrradianceConvoluter:
                 return IrradianceConvoluter::construct(eng, call);
+            case render::pipeline::Type::RadianceConvoluter:
+                return RadianceConvoluter::construct(eng, call);
             default:
                 GXLOGF("Unexpected pipeline type: " << static_cast<unsigned int>(pipeline_type_id))
             }

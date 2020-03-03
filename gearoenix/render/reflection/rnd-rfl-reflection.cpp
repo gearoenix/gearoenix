@@ -1,5 +1,7 @@
 #include "rnd-rfl-reflection.hpp"
 #include "../../physics/collider/phs-cld-sphere.hpp"
+#include "../../system/sys-app.hpp"
+#include "../engine/rnd-eng-engine.hpp"
 
 gearoenix::render::reflection::Reflection::Reflection(
     const core::Id id,

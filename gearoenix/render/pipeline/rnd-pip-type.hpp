@@ -14,6 +14,7 @@ enum struct Type : unsigned int {
     SkyboxCube = 10,
     SkyboxEquirectangular = 11,
     IrradianceConvoluter = 12,
+    RadianceConvoluter = 13,
 };
 }
 #endif

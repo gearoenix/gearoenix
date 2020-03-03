@@ -177,7 +177,8 @@ bool gearoenix::render::camera::Camera::on_event(const core::event::Data& d) noe
     const auto* sys_app = e->get_system_application();
     switch (d.source) {
     case core::event::Id::SystemWindowSizeChange:
-        set_aspects(sys_app->get_window_width(), sys_app->get_window_height());
+        if (target->get_attachments().empty())
+            set_aspects(sys_app->get_window_width(), sys_app->get_window_height());
         return false;
     default:
         GXLOGF("Unexpected event received this is a fatal bug.")

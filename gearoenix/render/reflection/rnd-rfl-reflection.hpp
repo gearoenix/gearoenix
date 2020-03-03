@@ -4,6 +4,7 @@
 #include "../../core/cr-static.hpp"
 #include "../../math/math-vector.hpp"
 #include "rnd-rfl-type.hpp"
+#include <vector>
 
 namespace gearoenix::physics::collider {
 class Sphere;
