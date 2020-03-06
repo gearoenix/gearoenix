@@ -33,6 +33,7 @@ protected:
     std::shared_ptr<Texture2D> default_one_1c_2d;
     std::shared_ptr<Texture2D> default_one_2c_2d;
     std::shared_ptr<TextureCube> default_zero_3c_cube;
+    std::shared_ptr<Texture2D> brdflut;
 
 public:
     Manager(std::unique_ptr<system::stream::Stream> s, engine::Engine* e) noexcept;
@@ -43,6 +44,7 @@ public:
     std::shared_ptr<Texture2D> get_2d(core::Real value, core::sync::EndCaller<Texture2D>& c) noexcept;
     std::shared_ptr<Texture2D> get_2d_one_1c(core::sync::EndCaller<Texture2D>& c) noexcept;
     std::shared_ptr<Texture2D> get_2d_one_2c(core::sync::EndCaller<Texture2D>& c) noexcept;
+    std::shared_ptr<Texture2D> get_brdflut(core::sync::EndCaller<Texture2D>& c) noexcept;
     /// It will take ownership of data
     std::shared_ptr<Texture2D> create_2d(unsigned char* data, const TextureInfo& info, int img_width, int img_height, core::sync::EndCaller<Texture2D>& c) noexcept;
     /// It creates 2d floating texture from formatted data
