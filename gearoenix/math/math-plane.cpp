@@ -1,7 +1,7 @@
 #include "math-plane.hpp"
 #include "math-sphere.hpp"
 
-gearoenix::math::Plane::Plane(const Vec3& point, const Vec3& normal) noexcept
+gearoenix::math::Plane::Plane(const Vec3<double>& point, const Vec3<double>& normal) noexcept
     : normal(normal)
     , d(-(normal.dot(point)))
     , point(point)

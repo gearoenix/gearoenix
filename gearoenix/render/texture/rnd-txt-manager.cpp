@@ -13,9 +13,9 @@ gearoenix::render::texture::Manager::Manager(std::unique_ptr<system::stream::Str
 {
 }
 
-std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::get_2d(const math::Vec4& color, core::sync::EndCaller<Texture2D>& c) noexcept
+std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::get_2d(const math::Vec4<float>& color, core::sync::EndCaller<Texture2D>& c) noexcept
 {
-    static_assert(sizeof(core::Real) == 4, "Only float 32 bit are supported.");
+    static_assert(sizeof(float) == 4, "Only float 32 bit are supported.");
     const auto search = color_4d_id_t2d.find(color);
     const bool found = color_4d_id_t2d.end() != search;
     const core::Id id = found ? search->second : core::asset::Manager::create_id();
@@ -43,7 +43,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     return data;
 }
 
-std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::get_2d(const math::Vec3& color, core::sync::EndCaller<Texture2D>& c) noexcept
+std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::get_2d(const math::Vec3<float>& color, core::sync::EndCaller<Texture2D>& c) noexcept
 {
     const auto search = color_3d_id_t2d.find(color);
     const bool found = color_3d_id_t2d.end() != search;
@@ -53,7 +53,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     return get_2d(math::Vec4(color, 1.0f), c);
 }
 
-std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::get_2d(const math::Vec2& color, core::sync::EndCaller<Texture2D>& c) noexcept
+std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::get_2d(const math::Vec2<float>& color, core::sync::EndCaller<Texture2D>& c) noexcept
 {
     const auto search = color_2d_id_t2d.find(color);
     const bool found = color_2d_id_t2d.end() != search;
@@ -63,7 +63,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     return get_2d(math::Vec4(color, 0.0f, 1.0f), c);
 }
 
-std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::get_2d(const core::Real value, core::sync::EndCaller<Texture2D>& c) noexcept
+std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::get_2d(const float value, core::sync::EndCaller<Texture2D>& c) noexcept
 {
     const auto search = color_1d_id_t2d.find(value);
     const bool found = color_1d_id_t2d.end() != search;
@@ -155,17 +155,17 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     return create_2d_f(reinterpret_cast<const unsigned char*>(file_content.data()), file_content.size(), c, sample_info);
 }
 
-std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::render::texture::Manager::get_cube(const math::Vec4& color, core::sync::EndCaller<TextureCube>& c) noexcept
+std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::render::texture::Manager::get_cube(const math::Vec4<float>& color, core::sync::EndCaller<TextureCube>& c) noexcept
 {
     /// TODO: It is better to have different types of color and elements
-    static_assert(sizeof(core::Real) == 4, "Only float 32 bit are supported.");
+    static_assert(sizeof(float) == 4, "Only float 32 bit are supported.");
     const auto search = color_4d_id_cube.find(color);
     const bool found = color_4d_id_cube.end() != search;
     const core::Id id = found ? search->second : core::asset::Manager::create_id();
     if (!found)
         color_4d_id_cube[color] = id;
     const std::function<std::shared_ptr<Texture>()> fun = [this, color, c, id] {
-        const math::Vec4 colors[6] = { color, color, color, color, color, color };
+        const math::Vec4<float> colors[6] = { color, color, color, color, color, color };
         return e->create_texture_cube(
             id, colors[0].data(),
             TextureInfo {
@@ -187,7 +187,7 @@ std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::render::text
     return data;
 }
 
-std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::render::texture::Manager::get_cube(const math::Vec3& color, core::sync::EndCaller<TextureCube>& c) noexcept
+std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::render::texture::Manager::get_cube(const math::Vec3<float>& color, core::sync::EndCaller<TextureCube>& c) noexcept
 {
     const auto search = color_3d_id_cube.find(color);
     const bool found = color_3d_id_cube.end() != search;
@@ -197,7 +197,7 @@ std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::render::text
     return get_cube(math::Vec4(color, 1.0f), c);
 }
 
-std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::render::texture::Manager::get_cube(const math::Vec2& color, core::sync::EndCaller<TextureCube>& c) noexcept
+std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::render::texture::Manager::get_cube(const math::Vec2<float>& color, core::sync::EndCaller<TextureCube>& c) noexcept
 {
     const auto search = color_2d_id_cube.find(color);
     const bool found = color_2d_id_cube.end() != search;
@@ -266,75 +266,75 @@ gearoenix::render::engine::Engine* gearoenix::render::texture::Manager::get_engi
 std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::get_brdflut(
     core::sync::EndCaller<Texture2D>& c) noexcept
 {
-
-    // ----------------------------------------------------------------------------
-    vec3 ImportanceSampleGGX(vec2 Xi, vec3 N, float roughness)
-    {
-    }
-    // ----------------------------------------------------------------------------
-    float GeometrySchlickGGX(float NdotV, float roughness)
-    {
-        // note that we use a different k for IBL
-        float a = roughness;
-        float k = (a * a) / 2.0;
-
-        float nom = NdotV;
-        float denom = NdotV * (1.0 - k) + k;
-
-        return nom / denom;
-    }
-    // ----------------------------------------------------------------------------
-    float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
-    {
-        float NdotV = max(dot(N, V), 0.0);
-        float NdotL = max(dot(N, L), 0.0);
-        float ggx2 = GeometrySchlickGGX(NdotV, roughness);
-        float ggx1 = GeometrySchlickGGX(NdotL, roughness);
-
-        return ggx1 * ggx2;
-    }
-    // ----------------------------------------------------------------------------
-    vec2 IntegrateBRDF(float NdotV, float roughness)
-    {
-        vec3 V;
-        V.x = sqrt(1.0 - NdotV * NdotV);
-        V.y = 0.0;
-        V.z = NdotV;
-
-        float A = 0.0;
-        float B = 0.0;
-
-        vec3 N = vec3(0.0, 0.0, 1.0);
-
-        const uint SAMPLE_COUNT = 1024u;
-        for (uint i = 0u; i < SAMPLE_COUNT; ++i) {
-            // generates a sample vector that's biased towards the
-            // preferred alignment direction (importance sampling).
-            vec2 Xi = Hammersley(i, SAMPLE_COUNT);
-            vec3 H = ImportanceSampleGGX(Xi, N, roughness);
-            vec3 L = normalize(2.0 * dot(V, H) * H - V);
-
-            float NdotL = max(L.z, 0.0);
-            float NdotH = max(H.z, 0.0);
-            float VdotH = max(dot(V, H), 0.0);
-
-            if (NdotL > 0.0) {
-                float G = GeometrySmith(N, V, L, roughness);
-                float G_Vis = (G * VdotH) / (NdotH * NdotV);
-                float Fc = pow(1.0 - VdotH, 5.0);
-
-                A += (1.0 - Fc) * G_Vis;
-                B += Fc * G_Vis;
-            }
-        }
-        A /= float(SAMPLE_COUNT);
-        B /= float(SAMPLE_COUNT);
-        return vec2(A, B);
-    }
-    // ----------------------------------------------------------------------------
-    void main()
-    {
-        vec2 integratedBRDF = IntegrateBRDF(TexCoords.x, TexCoords.y);
-        FragColor = integratedBRDF;
-    }
+    //
+    //    // ----------------------------------------------------------------------------
+    //    vec3 ImportanceSampleGGX(vec2 Xi, vec3 N, float roughness)
+    //    {
+    //    }
+    //    // ----------------------------------------------------------------------------
+    //    float GeometrySchlickGGX(float NdotV, float roughness)
+    //    {
+    //        // note that we use a different k for IBL
+    //        float a = roughness;
+    //        float k = (a * a) / 2.0;
+    //
+    //        float nom = NdotV;
+    //        float denom = NdotV * (1.0 - k) + k;
+    //
+    //        return nom / denom;
+    //    }
+    //    // ----------------------------------------------------------------------------
+    //    float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
+    //    {
+    //        float NdotV = max(dot(N, V), 0.0);
+    //        float NdotL = max(dot(N, L), 0.0);
+    //        float ggx2 = GeometrySchlickGGX(NdotV, roughness);
+    //        float ggx1 = GeometrySchlickGGX(NdotL, roughness);
+    //
+    //        return ggx1 * ggx2;
+    //    }
+    //    // ----------------------------------------------------------------------------
+    //    vec2 IntegrateBRDF(float NdotV, float roughness)
+    //    {
+    //        vec3 V;
+    //        V.x = sqrt(1.0 - NdotV * NdotV);
+    //        V.y = 0.0;
+    //        V.z = NdotV;
+    //
+    //        float A = 0.0;
+    //        float B = 0.0;
+    //
+    //        vec3 N = vec3(0.0, 0.0, 1.0);
+    //
+    //        const uint SAMPLE_COUNT = 1024u;
+    //        for (uint i = 0u; i < SAMPLE_COUNT; ++i) {
+    //            // generates a sample vector that's biased towards the
+    //            // preferred alignment direction (importance sampling).
+    //            vec2 Xi = Hammersley(i, SAMPLE_COUNT);
+    //            vec3 H = ImportanceSampleGGX(Xi, N, roughness);
+    //            vec3 L = normalize(2.0 * dot(V, H) * H - V);
+    //
+    //            float NdotL = max(L.z, 0.0);
+    //            float NdotH = max(H.z, 0.0);
+    //            float VdotH = max(dot(V, H), 0.0);
+    //
+    //            if (NdotL > 0.0) {
+    //                float G = GeometrySmith(N, V, L, roughness);
+    //                float G_Vis = (G * VdotH) / (NdotH * NdotV);
+    //                float Fc = pow(1.0 - VdotH, 5.0);
+    //
+    //                A += (1.0 - Fc) * G_Vis;
+    //                B += Fc * G_Vis;
+    //            }
+    //        }
+    //        A /= float(SAMPLE_COUNT);
+    //        B /= float(SAMPLE_COUNT);
+    //        return vec2(A, B);
+    //    }
+    //    // ----------------------------------------------------------------------------
+    //    void main()
+    //    {
+    //        vec2 integratedBRDF = IntegrateBRDF(TexCoords.x, TexCoords.y);
+    //        FragColor = integratedBRDF;
+    //    }
 }

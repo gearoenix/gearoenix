@@ -1,21 +1,21 @@
 #ifndef GEAROENIX_MATH_RAY_HPP
 #define GEAROENIX_MATH_RAY_HPP
 #include "../core/cr-static.hpp"
-#include "math-vector.hpp"
+#include "math-vector-3d.hpp"
 #include <utility>
 namespace gearoenix::math {
 struct Ray3 {
-    GX_GET_REF_PRV(Vec3, origin)
-    GX_GET_REF_PRV(Vec3, normalized_direction)
-    GX_GET_REF_PRV(Vec3, reversed_normalized_direction)
+    GX_GET_REF_PRV(Vec3<double>, origin)
+    GX_GET_REF_PRV(Vec3<double>, normalized_direction)
+    GX_GET_REF_PRV(Vec3<double>, reversed_normalized_direction)
 public:
-    Ray3(const Vec3& o, const Vec3& nd) noexcept
+    Ray3(const Vec3<double>& o, const Vec3<double>& nd) noexcept
         : origin(o)
         , normalized_direction(nd)
-        , reversed_normalized_direction(Vec3(1.0f) / nd)
+        , reversed_normalized_direction(Vec3<double>(1.0) / nd)
     {
     }
-    [[nodiscard]] Vec3 get_point(const core::Real d) const noexcept { return normalized_direction * d + origin; }
+    [[nodiscard]] Vec3<double> get_point(const double d) const noexcept { return normalized_direction * d + origin; }
 };
 }
 #endif

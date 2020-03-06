@@ -4,7 +4,6 @@
 #include "../../render/buffer/rnd-buf-uniform.hpp"
 #include "../../render/camera/rnd-cmr-uniform.hpp"
 #include "../../render/graph/node/rnd-gr-nd-unlit.hpp"
-#include "../../render/light/rnd-lt-directional.hpp"
 #include "../../render/material/rnd-mat-unlit.hpp"
 #include "../../render/mesh/rnd-msh-mesh.hpp"
 #include "../buffer/glc3-buf-index.hpp"
@@ -43,7 +42,7 @@ void gearoenix::glc3::pipeline::UnlitResourceSet::bind_final(gl::uint& bound_sha
     gl::Loader::check_for_error();
 #endif
     const auto* const node = node_uniform_buffer->get_ptr<render::graph::node::UnlitUniform>();
-    GX_GLC3_PIP_RES_SET_UNIFORM(effect_mvp, *(node->mvp.data()))
+    GX_GLC3_PIP_RES_SET_UNIFORM(effect_mvp, node->mvp.data[0][0])
     GX_GLC3_PIP_RES_END_DRAWING_MESH
 #ifdef GX_DEBUG_GL_CLASS_3
     gl::Loader::check_for_error();

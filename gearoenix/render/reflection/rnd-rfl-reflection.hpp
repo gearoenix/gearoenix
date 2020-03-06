@@ -2,7 +2,7 @@
 #define GEAROENIX_RENDER_REFLECTION_REFLECTION_HPP
 #include "../../core/asset/cr-asset.hpp"
 #include "../../core/cr-static.hpp"
-#include "../../math/math-vector.hpp"
+#include "../../math/math-vector-3d.hpp"
 #include "rnd-rfl-type.hpp"
 #include <vector>
 
@@ -32,7 +32,7 @@ protected:
         core::Id id,
         Type t,
         engine::Engine* e,
-        const math::Vec3& position = math::Vec3(),
+        const math::Vec3<float>& position = math::Vec3(0.0f),
         core::Real influence_radius = 10.0f) noexcept;
 
 public:

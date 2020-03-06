@@ -2,7 +2,7 @@
 #define GEAROENIX_RENDER_GRAPH_NODE_SHADOW_MAPPER_HPP
 #include "../../../core/cr-pool.hpp"
 #include "../../../core/sync/cr-sync-end-caller.hpp"
-#include "../../../math/math-matrix.hpp"
+#include "../../../math/math-matrix-4d.hpp"
 #include "rnd-gr-nd-node.hpp"
 #include <memory>
 #include <vector>
@@ -46,9 +46,9 @@ class Target;
 
 namespace gearoenix::render::graph::node {
 struct ShadowMapperUniform {
-    math::Mat4x4 mvp;
-    core::Real alpha;
-    core::Real alpha_cutoff;
+    math::Mat4x4<float> mvp;
+    float alpha = 8888.0f; // this is for finding bugs
+    float alpha_cutoff = 8888.0f;
 };
 
 struct ShadowMapperRenderData {
@@ -86,7 +86,7 @@ public:
     /// This will be called at the start of each frame
     void update() noexcept final;
     /// Multithreaded rendering happens in here
-    void record_shadow(const math::Mat4x4& mvp, const model::Model* m, std::size_t kernel_index) noexcept;
+    void record_shadow(const math::Mat4x4<float>& mvp, const model::Model* m, std::size_t kernel_index) noexcept;
     /// This will be called at the end of each frame for pushing jobs to GPU
     void submit() noexcept final;
 };

@@ -67,7 +67,7 @@ struct Mat4x4 {
         return r;
     }
 
-    [[nodiscard]] constexpr Mat4x4<Element>& operator=(const Mat4x4<Element>& m) noexcept
+    constexpr Mat4x4<Element>& operator=(const Mat4x4<Element>& m) noexcept
     {
         for (int i = 0; i < 4; ++i) {
             for (int j = 0; j < 4; ++j) {

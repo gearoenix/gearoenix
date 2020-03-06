@@ -2,7 +2,6 @@
 #define GEAROENIX_RENDER_MATERIAL_MATERIAL_HPP
 #include "../../core/cr-static.hpp"
 #include "../../core/sync/cr-sync-end-caller.hpp"
-#include "../../math/math-vector.hpp"
 #include "rnd-mat-translucency-mode.hpp"
 #include "rnd-mat-type.hpp"
 #include <optional>

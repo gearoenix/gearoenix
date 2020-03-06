@@ -8,8 +8,8 @@ void gearoenix::physics::collider::Collider::update_box() noexcept
 {
     origin_box.get_all_corners(updated_points);
     updated_box.reset();
-    for (math::Vec3& p : updated_points) {
-        updated_box.put_without_update((model_matrix * math::Vec4(p, 1.0f)).xyz());
+    for (const auto& p : updated_points) {
+        updated_box.put_without_update((model_matrix * math::Vec4(p, 1.0)).xyz());
     }
     updated_box.update();
 }
@@ -26,7 +26,7 @@ gearoenix::physics::collider::Collider* gearoenix::physics::collider::Collider::
     }
 }
 
-std::optional<gearoenix::core::Real> gearoenix::physics::collider::Collider::hit(const math::Ray3& r, const core::Real d_min) const noexcept
+std::optional<double> gearoenix::physics::collider::Collider::hit(const math::Ray3& r, const double d_min) const noexcept
 {
     return updated_box.hit(r, d_min);
 }
@@ -47,18 +47,18 @@ void gearoenix::physics::collider::Collider::put_in_box(const math::Aabb3& b) no
     update_box();
 }
 
-const gearoenix::math::Vec3& gearoenix::physics::collider::Collider::get_location() const noexcept
+const gearoenix::math::Vec3<double>& gearoenix::physics::collider::Collider::get_location() const noexcept
 {
     return updated_box.get_center();
 }
 
-void gearoenix::physics::collider::Collider::set_location(const math::Vec3& l) noexcept
+void gearoenix::physics::collider::Collider::set_location(const math::Vec3<double>& l) noexcept
 {
     model_matrix.set_location(l);
     updated_box.set_center(l);
 }
 
-void gearoenix::physics::collider::Collider::local_scale(const core::Real s) noexcept
+void gearoenix::physics::collider::Collider::local_scale(const double s) noexcept
 {
     current_local_scale *= s;
     updated_box.set_diameter(updated_box.get_diameter() * s);
@@ -66,24 +66,24 @@ void gearoenix::physics::collider::Collider::local_scale(const core::Real s) noe
     on_scale();
 }
 
-void gearoenix::physics::collider::Collider::local_x_scale(const core::Real s) noexcept
+void gearoenix::physics::collider::Collider::local_x_scale(const double s) noexcept
 {
     current_local_scale[0] *= s;
-    math::Vec3 d = updated_box.get_diameter();
-    d[0] *= s;
+    auto d = updated_box.get_diameter();
+    d.x *= s;
     updated_box.set_diameter(d);
     model_matrix.local_x_scale(s);
     on_scale();
 }
 
-void gearoenix::physics::collider::Collider::set_model_matrix(const math::Mat4x4& m) noexcept
+void gearoenix::physics::collider::Collider::set_model_matrix(const math::Mat4x4<double>& m) noexcept
 {
-    current_local_scale = ((m * math::Vec4(1.0f, 1.0f, 1.0f, 0.0f)).xyz()).abs();
+    current_local_scale = ((m * math::Vec4(1.0, 1.0, 1.0, 0.0)).xyz()).abs();
     model_matrix = m;
     origin_box.get_all_corners(updated_points);
     updated_box.reset();
-    for (math::Vec3& p : updated_points) {
-        p = (model_matrix * math::Vec4(p, 1.0f)).xyz();
+    for (auto& p : updated_points) {
+        p = (model_matrix * math::Vec4(p, 1.0)).xyz();
         updated_box.put(p);
     }
     on_scale();

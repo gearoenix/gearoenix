@@ -1,6 +1,6 @@
 #ifndef GEAROENIX_CORE_EVENT_BUTTON_BUTTON_HPP
 #define GEAROENIX_CORE_EVENT_BUTTON_BUTTON_HPP
-#include "../../math/math-vector.hpp"
+#include "../../math/math-vector-2d.hpp"
 #include "../cr-types.hpp"
 
 namespace gearoenix::core::event::button {
@@ -148,11 +148,11 @@ struct KeyboardData {
 struct MouseData {
     MouseActionId action = MouseActionId::Press;
     MouseKeyId key = MouseKeyId::Left;
-    math::Vec2 position;
+    math::Vec2<double> position;
 };
 
 struct MouseScroll {
-    math::Vec2 direction;
+    math::Vec2<double> direction;
 };
 
 }

@@ -8,7 +8,7 @@ gearoenix::math::Plotter::Brush::Brush(const int thickness, const std::uint32_t 
     for (int x = -thickness; x <= thickness; ++x) {
         for (int y = -thickness; y <= thickness; ++y) {
             if (x * x + y * y <= radius2) {
-                indices.push_back(std::make_tuple(x, y));
+                indices.emplace_back(x, y);
             }
         }
     }
@@ -34,20 +34,20 @@ gearoenix::math::Plotter::Plotter(std::uint32_t* const pixels, const int img_wid
 {
 }
 
-void gearoenix::math::Plotter::draw_point(const Vec2& pos, const Brush& b)
+void gearoenix::math::Plotter::draw_point(const Vec2<double>& pos, const Brush& b)
 {
-    const int x = static_cast<int>(std::round(pos[0]));
-    const int y = static_cast<int>(std::round(pos[1]));
+    const int x = static_cast<int>(std::round(pos.x));
+    const int y = static_cast<int>(std::round(pos.y));
     plot(x, y, b);
 }
 
-void gearoenix::math::Plotter::draw_line(const Vec2& start, const Vec2& end, const Brush& b)
+void gearoenix::math::Plotter::draw_line(const Vec2<double>& start, const Vec2<double>& end, const Brush& b)
 {
     //    Vec2 d = end - start;
-    int x0 = (int)std::round(start[0]);
-    int y0 = (int)std::round(start[1]);
-    int x1 = (int)std::round(end[0]);
-    int y1 = (int)std::round(end[1]);
+    int x0 = (int)std::round(start.x);
+    int y0 = (int)std::round(start.y);
+    int x1 = (int)std::round(end.x);
+    int y1 = (int)std::round(end.y);
     //    if(x0 > x1 || (x0 == x1 && y0 > y1)) {
     //        int tmp = x0;
     //        x0 = x1;

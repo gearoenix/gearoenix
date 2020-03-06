@@ -2,7 +2,7 @@
 #include "math-ray.hpp"
 #include <cmath>
 
-gearoenix::math::Sphere::Sphere(const Vec3& center, const core::Real radius) noexcept
+gearoenix::math::Sphere::Sphere(const Vec3<double>& center, const core::Real radius) noexcept
     : center(center)
     , radius(radius)
     , radius2(radius * radius)
@@ -15,7 +15,7 @@ void gearoenix::math::Sphere::set_radius(const core::Real r) noexcept
     radius = r;
 }
 
-void gearoenix::math::Sphere::set_center(const Vec3& c) noexcept
+void gearoenix::math::Sphere::set_center(const Vec3<double>& c) noexcept
 {
     center = c;
 }
@@ -40,7 +40,7 @@ std::optional<gearoenix::core::Real> gearoenix::math::Sphere::hit(const math::Ra
     const auto a2 = dir2 - dis2;
     if (radius2 <= a2)
         return std::nullopt;
-    return dis - sqrtf(radius2 - a2);
+    return dis - std::sqrt(radius2 - a2);
 }
 
 std::optional<gearoenix::core::Real> gearoenix::math::Sphere::hit(const math::Ray3& r, const core::Real d_min) const noexcept

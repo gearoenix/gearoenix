@@ -2,8 +2,7 @@
 #define GEAROENIX_RENDER_GRAPH_NODE_UNLIT_HPP
 #include "../../../core/cr-pool.hpp"
 #include "../../../core/sync/cr-sync-end-caller.hpp"
-#include "../../../math/math-matrix.hpp"
-#include "../../../math/math-vector.hpp"
+#include "../../../math/math-matrix-4d.hpp"
 #include "../../material/rnd-mat-translucency-mode.hpp"
 #include "rnd-gr-nd-node.hpp"
 #include <vector>
@@ -32,7 +31,7 @@ class UnlitResourceSet;
 namespace gearoenix::render::graph::node {
 
 struct UnlitUniform {
-    math::Mat4x4 mvp;
+    math::Mat4x4<float> mvp;
 };
 
 struct UnlitRenderData {

@@ -4,7 +4,6 @@
 #include "../../render/buffer/rnd-buf-uniform.hpp"
 #include "../../render/camera/rnd-cmr-uniform.hpp"
 #include "../../render/graph/node/rnd-gr-nd-unlit.hpp"
-#include "../../render/light/rnd-lt-directional.hpp"
 #include "../../render/material/rnd-mat-unlit.hpp"
 #include "../../render/mesh/rnd-msh-mesh.hpp"
 #include "../buffer/gles2-buf-index.hpp"
@@ -31,7 +30,7 @@ void gearoenix::gles2::pipeline::UnlitResourceSet::bind_final(gl::uint& bound_sh
     GX_GLES2_PIP_RES_SET_UNIFORM(material_alpha_cutoff, material->alpha_cutoff)
     GX_GLES2_PIP_RES_SET_TXT_2D(material_color, color)
     const auto* const node = node_uniform_buffer->get_ptr<render::graph::node::UnlitUniform>();
-    GX_GLES2_PIP_RES_SET_UNIFORM(effect_mvp, *(node->mvp.data()))
+    GX_GLES2_PIP_RES_SET_UNIFORM(effect_mvp, node->mvp.data[0][0])
     GX_GLES2_PIP_RES_END_DRAWING_MESH
 }
 

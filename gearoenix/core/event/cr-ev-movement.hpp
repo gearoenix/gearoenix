@@ -1,22 +1,23 @@
 #ifndef GEAROENIX_CORE_EVENT_MOVEMENT_HPP
 #define GEAROENIX_CORE_EVENT_MOVEMENT_HPP
-#include "../../math/math-vector.hpp"
+#include "../../math/math-vector-3d.hpp"
 #include "../cr-types.hpp"
 #include <chrono>
+
 namespace gearoenix::core::event::movement {
 struct Base {
     std::chrono::high_resolution_clock::time_point previous_time = std::chrono::high_resolution_clock::now();
     std::chrono::high_resolution_clock::time_point current_time = std::chrono::high_resolution_clock::now();
 
-    math::Vec3 current_position;
-    math::Vec3 previous_position;
+    math::Vec3<double> current_position;
+    math::Vec3<double> previous_position;
 
-    math::Vec3 delta_position;
-    Real delta_time;
+    math::Vec3<double> delta_position;
+    double delta_time = 0.0;
 
-    math::Vec3 speed;
+    math::Vec3<double> speed;
 
-    void update(const math::Vec3& p) noexcept
+    void update(const math::Vec3<double>& p) noexcept
     {
         previous_position = current_position;
         previous_time = current_time;

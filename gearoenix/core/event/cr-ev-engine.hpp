@@ -1,6 +1,6 @@
 #ifndef GEAROENIX_CORE_EVENT_ENGINE_HPP
 #define GEAROENIX_CORE_EVENT_ENGINE_HPP
-#include "../../math/math-vector.hpp"
+#include "../../math/math-vector-2d.hpp"
 #include "../cr-static.hpp"
 #include "../cr-types.hpp"
 #include "../sync/cr-sync-semaphore.hpp"
@@ -34,8 +34,8 @@ private:
     std::thread event_thread;
 
     struct MouseButtonState {
-        math::Vec2 starting;
-        math::Vec2 previous;
+        math::Vec2<double> starting;
+        math::Vec2<double> previous;
         std::chrono::high_resolution_clock::time_point start_time = std::chrono::high_resolution_clock::now();
         std::chrono::high_resolution_clock::time_point previous_time = std::chrono::high_resolution_clock::now();
     };
@@ -55,8 +55,8 @@ public:
     void remove_listener(Id event_id, Listener* listener) noexcept;
     void remove_listener(Listener* listener) noexcept;
     void broadcast(const Data& event_data) noexcept;
-    void set_mouse_position(const math::Vec2& position) noexcept;
-    void set_mouse_movement(const math::Vec2& position) noexcept;
+    void set_mouse_position(const math::Vec2<double>& position) noexcept;
+    void set_mouse_movement(const math::Vec2<double>& position) noexcept;
     void mouse_button(button::MouseKeyId key, button::MouseActionId action) noexcept;
     bool is_pressed(button::KeyboardKeyId k) noexcept;
 };

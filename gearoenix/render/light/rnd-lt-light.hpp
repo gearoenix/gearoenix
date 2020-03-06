@@ -1,7 +1,7 @@
 #ifndef GEAROENIX_RENDER_LIGHT_LIGHT_HPP
 #define GEAROENIX_RENDER_LIGHT_LIGHT_HPP
 #include "../../core/asset/cr-asset.hpp"
-#include "../../math/math-vector.hpp"
+#include "../../math/math-vector-3d.hpp"
 #include "rnd-lt-type.hpp"
 
 namespace gearoenix::system::stream {
@@ -24,7 +24,7 @@ namespace gearoenix::render::light {
 class Light : public core::asset::Asset {
     GX_GETSET_VAL_PRT(core::Real, layer, 0.0f)
     GX_GET_CVAL_PRT(Type, light_type)
-    GX_GETSET_CREF_PRT(math::Vec3, color)
+    GX_GETSET_CREF_PRT(math::Vec3<float>, color)
     GX_GETSET_VAL_PRT(bool, enabled, true)
     GX_GET_VAL_PRT(bool, shadow_enabled, false)
     GX_GET_CPTR_PRT(engine::Engine, e)

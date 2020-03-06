@@ -10,7 +10,7 @@ public:
         core::Real alpha_cutoff = 0.001f;
     };
     GX_GET_CREF_PRV(std::shared_ptr<texture::Texture2D>, color_texture)
-    GX_GET_CREF_PRV(std::optional<math::Vec4>, color_value)
+    GX_GET_CREF_PRV(std::optional<math::Vec4<float>>, color_value)
     GX_GET_CREF_PRV(Uniform, uniform)
 public:
     SkyboxEquirectangular(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept;
@@ -20,7 +20,7 @@ public:
     void set_color(
         core::Real r, core::Real g, core::Real b,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& end = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
-    void set_color(const math::Vec4& c,
+    void set_color(const math::Vec4<float>& c,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& end = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
     void set_color(const std::shared_ptr<texture::Texture2D>& color) noexcept;
     void set_alpha(core::Real) noexcept;

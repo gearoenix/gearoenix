@@ -2,8 +2,7 @@
 #define GEAROENIX_RENDER_GRAPH_NODE_FORWARD_PBR_HPP
 #include "../../../core/cr-pool.hpp"
 #include "../../../core/sync/cr-sync-end-caller.hpp"
-#include "../../../math/math-matrix.hpp"
-#include "../../../math/math-vector.hpp"
+#include "../../../math/math-matrix-4d.hpp"
 #include "../../material/rnd-mat-translucency-mode.hpp"
 #include "rnd-gr-nd-node.hpp"
 #include <vector>
@@ -51,13 +50,13 @@ class TextureCube;
 
 namespace gearoenix::render::graph::node {
 struct ForwardPbrUniform {
-    math::Vec4 point_lights_color_min_radius[GX_MAX_POINT_LIGHTS] = {};
-    math::Vec4 point_lights_position_max_radius[GX_MAX_POINT_LIGHTS] = {};
-    math::Mat4x4 shadow_caster_directional_lights_cascades_view_projections_bias[GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER * GX_MAX_SHADOW_CASCADES] = {};
-    math::Vec4 shadow_caster_directional_lights_color_cascades_count[GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER] = {};
-    math::Vec4 shadow_caster_directional_lights_direction[GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER] = {};
-    core::Real point_lights_count = 0.0f;
-    core::Real shadow_caster_directional_lights_count = 0.0f;
+    math::Vec4<float> point_lights_color_min_radius[GX_MAX_POINT_LIGHTS];
+    math::Vec4<float> point_lights_position_max_radius[GX_MAX_POINT_LIGHTS];
+    math::Mat4x4<float> shadow_caster_directional_lights_cascades_view_projections_bias[GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER * GX_MAX_SHADOW_CASCADES];
+    math::Vec4<float> shadow_caster_directional_lights_color_cascades_count[GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER];
+    math::Vec4<float> shadow_caster_directional_lights_direction[GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER];
+    float point_lights_count = 0.0f;
+    float shadow_caster_directional_lights_count = 0.0f;
 };
 
 struct ForwardPbrRenderData {

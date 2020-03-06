@@ -7,24 +7,11 @@ template <typename Element>
 struct Vec4 {
     Element x, y, z, w;
 
-    static constexpr const Vec4<Element> X = Vec4<Element>(1, 0, 0, 0);
-    static constexpr const Vec4<Element> Y = Vec4<Element>(0, 1, 0, 0);
-    static constexpr const Vec4<Element> Z = Vec4<Element>(0, 0, 1, 0);
-
     constexpr Vec4(const Element x, const Element y, const Element z, const Element w) noexcept
         : x(x)
         , y(y)
         , z(z)
         , w(w)
-    {
-    }
-
-    template <typename T, typename R, typename S, typename U>
-    constexpr Vec4(const T x, const R y, const S z, const U w) noexcept
-        : x(static_cast<Element>(x))
-        , y(static_cast<Element>(y))
-        , z(static_cast<Element>(z))
-        , w(static_cast<Element>(w))
     {
     }
 
@@ -34,15 +21,6 @@ struct Vec4 {
         , y(v.y)
         , z(z)
         , w(w)
-    {
-    }
-
-    template <typename T, typename R, typename S>
-    constexpr Vec4(const Vec2<T>& v, const R z, const S w) noexcept
-        : x(static_cast<Element>(v.x))
-        , y(static_cast<Element>(v.y))
-        , z(static_cast<Element>(z))
-        , w(static_cast<Element>(w))
     {
     }
 

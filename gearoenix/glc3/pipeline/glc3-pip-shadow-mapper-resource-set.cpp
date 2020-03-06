@@ -27,7 +27,7 @@ void gearoenix::glc3::pipeline::ShadowMapperResourceSet::bind_final(gl::uint& bo
     GX_GLC3_PIP_RES_START_SHADER(ShadowMapper, shd)
     GX_GLC3_PIP_RES_SET_TXT_2D(material_color, color)
     const auto* const node = node_uniform_buffer->get_ptr<render::graph::node::ShadowMapperUniform>();
-    GX_GLC3_PIP_RES_SET_UNIFORM(effect_mvp, *(node->mvp.data()))
+    GX_GLC3_PIP_RES_SET_UNIFORM(effect_mvp, node->mvp.data[0][0])
     GX_GLC3_PIP_RES_SET_UNIFORM(effect_alpha, node->alpha)
     GX_GLC3_PIP_RES_SET_UNIFORM(effect_alpha_cutoff, node->alpha_cutoff)
     GX_GLC3_PIP_RES_END_DRAWING_MESH

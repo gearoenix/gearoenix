@@ -117,14 +117,14 @@ void gearoenix::core::event::Engine::broadcast(const Data& event_data) noexcept
     signaler.release();
 }
 
-void gearoenix::core::event::Engine::set_mouse_position(const math::Vec2& p) noexcept
+void gearoenix::core::event::Engine::set_mouse_position(const math::Vec2<double>& p) noexcept
 {
-    mouse_movement.update(math::Vec3(p, 0.0f));
+    mouse_movement.update(math::Vec3(p, 0.0));
 }
 
-void gearoenix::core::event::Engine::set_mouse_movement(const math::Vec2& position) noexcept
+void gearoenix::core::event::Engine::set_mouse_movement(const math::Vec2<double>& position) noexcept
 {
-    mouse_movement.update(math::Vec3(position, 0.0f));
+    mouse_movement.update(math::Vec3(position, 0.0));
     Data d;
     d.source = Id::MovementMouse;
     d.data = mouse_movement;
@@ -135,10 +135,10 @@ void gearoenix::core::event::Engine::set_mouse_movement(const math::Vec2& positi
         const std::chrono::duration<Real> dt = mouse_movement.current_time - p.start_time;
         if (dt.count() > CLICK_THRESHOLD || mouse_movement.delta_position.length() > MOUSE_DRAG_DISTANCE_THRESHOLD) {
             d.source = Id::GestureDrag;
-            gesture::Drag drag = {};
-            drag.start_position = math::Vec3(p.starting, 0.0f);
+            gesture::Drag drag;
+            drag.start_position = math::Vec3(p.starting);
             drag.start_time = p.start_time;
-            drag.previous_position = math::Vec3(p.previous, 0.0f);
+            drag.previous_position = math::Vec3(p.previous);
             drag.previous_time = p.previous_time;
             drag.update(mouse_movement.current_position);
             if (ap.first == button::MouseKeyId::Left) {
@@ -146,7 +146,7 @@ void gearoenix::core::event::Engine::set_mouse_movement(const math::Vec2& positi
                 d.data = drag;
                 broadcast(d);
             }
-            gesture::MouseDrag mouse_drag = {};
+            gesture::MouseDrag mouse_drag;
             mouse_drag.base = drag;
             mouse_drag.key = ap.first;
             d.source = Id::GestureMouseDrag;
@@ -160,7 +160,7 @@ void gearoenix::core::event::Engine::set_mouse_movement(const math::Vec2& positi
 
 void gearoenix::core::event::Engine::mouse_button(const button::MouseKeyId k, const button::MouseActionId a) noexcept
 {
-    button::MouseData bd = {};
+    button::MouseData bd;
     bd.action = a;
     bd.key = k;
     bd.position = mouse_movement.current_position.xy();
@@ -172,7 +172,7 @@ void gearoenix::core::event::Engine::mouse_button(const button::MouseKeyId k, co
 
     if (a == button::MouseActionId::Press) {
         auto& p = pressed_mouse_buttons_state[k];
-        p = MouseButtonState {};
+        p = MouseButtonState();
         p.starting = mouse_movement.current_position.xy();
         p.previous = mouse_movement.current_position.xy();
     } else if (a == button::MouseActionId::Release) {

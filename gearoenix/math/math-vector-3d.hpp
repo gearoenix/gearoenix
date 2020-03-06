@@ -7,24 +7,18 @@ template <typename Element>
 struct Vec3 {
     Element x, y, z;
 
-    static constexpr Vec3<Element> X = Vec3<Element>(1, 0, 0);
-    static constexpr Vec3<Element> Y = Vec3<Element>(0, 1, 0);
-    static constexpr Vec3<Element> Z = Vec3<Element>(0, 0, 1);
-
-    constexpr Vec3() noexcept
-        : x(static_cast<Element>(0))
-        , y(static_cast<Element>(0))
-        , z(static_cast<Element>(0))
+    constexpr explicit Vec3(const Element e = static_cast<Element>(0)) noexcept
+        : x(e)
+        , y(e)
+        , z(e)
     {
     }
 
-    template <typename T>
-    constexpr explicit Vec3(const Vec2<T>& o, const Element e = static_cast<Element>(0)) noexcept
-        : x(static_cast<Element>(o.x))
-        , y(static_cast<Element>(o.y))
+    constexpr explicit Vec3(const Vec2<Element>& o, const Element e = static_cast<Element>(0)) noexcept
+        : x(o.x)
+        , y(o.y)
         , z(e)
     {
-        GX_SIGNEDNESS_COMPATIBILITY_CHECK(T, Element)
     }
 
     constexpr Vec3(const Element x, const Element y, const Element z) noexcept
@@ -34,221 +28,130 @@ struct Vec3 {
     {
     }
 
-    template <typename T, typename R, typename S>
-    constexpr Vec3(const T x, const R y, const S z) noexcept
-        : x(static_cast<Element>(x))
-        , y(static_cast<Element>(y))
-        , z(static_cast<Element>(z))
+    constexpr Vec3(const Vec3<Element>& o) noexcept
+        : x(o.x)
+        , y(o.y)
+        , z(o.z)
     {
-        GX_SIGNEDNESS_COMPATIBILITY_CHECK(T, Element)
-        GX_SIGNEDNESS_COMPATIBILITY_CHECK(R, Element)
-        GX_SIGNEDNESS_COMPATIBILITY_CHECK(S, Element)
     }
 
-    template <typename T>
-    constexpr explicit Vec3(const Vec3<T>& o) noexcept
-        : x(static_cast<Element>(o.x))
-        , y(static_cast<Element>(o.y))
-        , z(static_cast<Element>(o.z))
+    constexpr Vec3<Element> operator-() const noexcept
     {
-        GX_SIGNEDNESS_COMPATIBILITY_CHECK(T, Element)
+        return Vec3<Element>(-x, -y, -z);
     }
 
-    template <typename T>
-    constexpr explicit Vec3(const T e) noexcept
-        : x(static_cast<Element>(e))
-        , y(static_cast<Element>(e))
-        , z(static_cast<Element>(e))
+    constexpr Vec3<Element> operator+(const Vec3<Element>& o) const noexcept
     {
-        GX_SIGNEDNESS_COMPATIBILITY_CHECK(T, Element)
+        return Vec3<Element>(x + o.x, y + o.y, z + o.z);
     }
 
-    template <typename T>
-    constexpr Vec3<T> operator-() const noexcept
+    constexpr Vec3<Element> operator-(const Vec3<Element>& o) const noexcept
     {
-        GX_SIGNEDNESS_CHECK(T)
         GX_SIGNEDNESS_CHECK(Element)
-        return Vec3<T>(-x, -y, -z);
+        return Vec3<Element>(x - o.x, y - o.y, z - o.z);
     }
 
-    template <typename T, typename R>
-    constexpr Vec3<R> operator+(const Vec3<T>& o) const noexcept
+    constexpr Vec3<Element> operator*(const Vec3<Element>& o) const noexcept
     {
-        GX_SIGNEDNESS_COMPATIBILITY_CHECK(T, Element)
-        GX_SIGNEDNESS_COMPATIBILITY_CHECK(Element, R)
-        return Vec3<R>(
-            x + static_cast<Element>(o.x),
-            y + static_cast<Element>(o.y),
-            z + static_cast<Element>(o.z));
+        return Vec3<Element>(x * o.x, y * o.y, z * o.z);
     }
 
-    template <typename T, typename R>
-    constexpr Vec3<R> operator-(const Vec3<T>& o) const noexcept
+    constexpr Vec3<Element> operator/(const Vec3<Element>& o) const noexcept
     {
-        GX_SIGNEDNESS_CHECK(T)
-        GX_SIGNEDNESS_CHECK(R)
+        return Vec3<Element>(x / o.x, y / o.y, z / o.z);
+    }
+
+    constexpr Vec3<Element> operator+(const Element o) const noexcept
+    {
+        return Vec3<Element>(x + o, y + o, z + o);
+    }
+
+    constexpr Vec3<Element> operator-(const Element o) const noexcept
+    {
         GX_SIGNEDNESS_CHECK(Element)
-        return Vec3<R>(
-            x - static_cast<Element>(o.x),
-            y - static_cast<Element>(o.y),
-            z - static_cast<Element>(o.z));
+        return Vec3<Element>(x - o, y - o, z - o);
     }
 
-    template <typename T, typename R>
-    constexpr Vec3<R> operator*(const Vec3<T>& o) const noexcept
+    constexpr Vec3<Element> operator*(const Element o) const noexcept
     {
-        GX_SIGNEDNESS_COMPATIBILITY_CHECK(T, Element)
-        GX_SIGNEDNESS_COMPATIBILITY_CHECK(Element, R)
-        return Vec3<R>(
-            x * static_cast<Element>(o.x),
-            y * static_cast<Element>(o.y),
-            z * static_cast<Element>(o.z));
+        return Vec3<Element>(x * o, y * o, z * o);
     }
 
-    template <typename T, typename R>
-    constexpr Vec3<R> operator/(const Vec3<T>& o) const noexcept
+    constexpr Vec3<Element> operator/(const Element o) const noexcept
     {
-        GX_SIGNEDNESS_COMPATIBILITY_CHECK(T, Element)
-        GX_SIGNEDNESS_COMPATIBILITY_CHECK(Element, R)
-        return Vec3<R>(
-            x / static_cast<Element>(o.x),
-            y / static_cast<Element>(o.y),
-            z / static_cast<Element>(o.z));
+        const auto m = static_cast<Element>(1) / o;
+        return Vec3<Element>(x * m, y * m, z * m);
     }
 
-    template <typename T, typename R>
-    constexpr Vec3<R> operator+(const T o) const noexcept
+    constexpr Vec3<Element>& operator=(const Vec3<Element>& o) noexcept
     {
-        GX_SIGNEDNESS_COMPATIBILITY_CHECK(T, Element)
-        GX_SIGNEDNESS_COMPATIBILITY_CHECK(Element, R)
-        return Vec3<R>(
-            x + static_cast<Element>(o),
-            y + static_cast<Element>(o),
-            z + static_cast<Element>(o));
-    }
-
-    template <typename T, typename R>
-    constexpr Vec3<R> operator-(const T o) const noexcept
-    {
-        GX_SIGNEDNESS_CHECK(T)
-        GX_SIGNEDNESS_CHECK(R)
-        GX_SIGNEDNESS_CHECK(Element)
-        return Vec3<R>(
-            x - static_cast<Element>(o),
-            y - static_cast<Element>(o),
-            z - static_cast<Element>(o));
-    }
-
-    template <typename T, typename R>
-    constexpr Vec3<R> operator*(const T o) const noexcept
-    {
-        GX_SIGNEDNESS_COMPATIBILITY_CHECK(T, Element)
-        GX_SIGNEDNESS_COMPATIBILITY_CHECK(Element, R)
-        return Vec3<R>(
-            x * static_cast<Element>(o),
-            y * static_cast<Element>(o),
-            z * static_cast<Element>(o));
-    }
-
-    template <typename T, typename R>
-    constexpr Vec3<R> operator/(const T o) const noexcept
-    {
-        GX_SIGNEDNESS_COMPATIBILITY_CHECK(T, Element)
-        GX_SIGNEDNESS_COMPATIBILITY_CHECK(Element, R)
-        const auto m = static_cast<Element>(1) / static_cast<Element>(o);
-        return Vec3<R>(x * m, y * m, z * m);
-    }
-
-    template <typename T>
-    constexpr Vec3<Element>& operator=(const Vec3<T>& o) noexcept
-    {
-        GX_SIGNEDNESS_COMPATIBILITY_CHECK(T, Element)
-        x = static_cast<Element>(o.x);
-        y = static_cast<Element>(o.y);
-        z = static_cast<Element>(o.z);
+        x = o.x;
+        y = o.y;
+        z = o.z;
         return *this;
     }
 
-    template <typename T>
-    constexpr void operator+=(const Vec3<T>& o) noexcept
+    constexpr void operator+=(const Vec3<Element>& o) noexcept
     {
-        GX_SIGNEDNESS_COMPATIBILITY_CHECK(T, Element)
-        x += static_cast<Element>(o.x);
-        y += static_cast<Element>(o.y);
-        z += static_cast<Element>(o.z);
+        x += o.x;
+        y += o.y;
+        z += o.z;
     }
 
-    template <typename T>
-    constexpr void operator-=(const Vec3<T>& o) noexcept
+    constexpr void operator-=(const Vec3<Element>& o) noexcept
     {
         GX_SIGNEDNESS_CHECK(Element)
-        GX_SIGNEDNESS_CHECK(T)
-        x -= static_cast<Element>(o.x);
-        y -= static_cast<Element>(o.y);
-        z -= static_cast<Element>(o.z);
+        x -= o.x;
+        y -= o.y;
+        z -= o.z;
     }
 
-    template <typename T>
-    constexpr void operator*=(const Vec3<T>& o) noexcept
+    constexpr void operator*=(const Vec3<Element>& o) noexcept
     {
-        GX_SIGNEDNESS_COMPATIBILITY_CHECK(T, Element)
-        x *= static_cast<Element>(o.x);
-        y *= static_cast<Element>(o.y);
-        z *= static_cast<Element>(o.z);
+        x *= o.x;
+        y *= o.y;
+        z *= o.z;
     }
 
-    template <typename T>
-    constexpr void operator/=(const Vec3<T>& o) noexcept
+    constexpr void operator/=(const Vec3<Element>& o) noexcept
     {
-        GX_SIGNEDNESS_COMPATIBILITY_CHECK(T, Element)
-        x /= static_cast<Element>(o.x);
-        y /= static_cast<Element>(o.y);
-        z /= static_cast<Element>(o.z);
+        x /= o.x;
+        y /= o.y;
+        z /= o.z;
     }
 
-    template <typename T>
-    constexpr void operator+=(const T o) noexcept
+    constexpr void operator+=(const Element o) noexcept
     {
-        GX_SIGNEDNESS_COMPATIBILITY_CHECK(T, Element)
-        const auto m = static_cast<Element>(o);
-        x += m;
-        y += m;
-        z += m;
+        x += o;
+        y += o;
+        z += o;
     }
 
-    template <typename T>
-    constexpr void operator-=(const T o) noexcept
+    constexpr void operator-=(const Element o) noexcept
     {
         GX_SIGNEDNESS_CHECK(Element)
-        GX_SIGNEDNESS_CHECK(T)
-        const auto m = -static_cast<Element>(o);
-        x += m;
-        y += m;
-        z += m;
+        x -= o;
+        y -= o;
+        z -= o;
     }
 
-    template <typename T>
-    constexpr void operator*=(const T o) noexcept
+    constexpr void operator*=(const Element o) noexcept
     {
-        GX_SIGNEDNESS_COMPATIBILITY_CHECK(T, Element)
-        const auto m = static_cast<Element>(o);
+        x *= o;
+        y *= o;
+        z *= o;
+    }
+
+    constexpr void operator/=(const Element o) noexcept
+    {
+        const auto m = static_cast<Element>(1) / o;
         x *= m;
         y *= m;
         z *= m;
     }
 
     template <typename T>
-    constexpr void operator/=(const T o) noexcept
-    {
-        GX_SIGNEDNESS_COMPATIBILITY_CHECK(T, Element)
-        const auto m = static_cast<Element>(1) / static_cast<Element>(o);
-        x *= m;
-        y *= m;
-        z *= m;
-    }
-
-    template <typename T>
-    [[nodiscard]] constexpr const Element& operator[](const T i) const noexcept
+    [[nodiscard]] const Element& operator[](const T i) const noexcept
     {
         static_assert(std::numeric_limits<T>::is_integer, "Index type must be an integer kind.");
         switch (i) {
@@ -259,12 +162,12 @@ struct Vec3 {
         case static_cast<T>(2):
             return z;
         default:
-            return *reinterpret_cast<Element>(nullptr);
+            GXLOGF("Out of range index. " << i)
         }
     }
 
     template <typename T>
-    [[nodiscard]] constexpr Element& operator[](const T i) noexcept
+    [[nodiscard]] Element& operator[](const T i) noexcept
     {
         static_assert(std::numeric_limits<T>::is_integer, "Index type must be an integer kind.");
         switch (i) {
@@ -275,60 +178,43 @@ struct Vec3 {
         case static_cast<T>(2):
             return z;
         default:
-            return *reinterpret_cast<Element>(nullptr);
+            GXLOGF("Out of range index. " << i)
         }
     }
 
-    template <typename T>
-    [[nodiscard]] constexpr bool operator<(const Vec3<T>& o) const noexcept
+    [[nodiscard]] constexpr bool operator<(const Vec3<Element>& o) const noexcept
     {
-        GX_SIGNEDNESS_COMPATIBILITY_CHECK(T, Element)
-        const Vec3<Element> ov(o);
-        return z < ov.z || (z == ov.z && (y < ov.y || (y == ov.y && z < ov.z)));
+        return z < o.z || (z == o.z && (y < o.y || (y == o.y && z < o.z)));
     }
 
-    template <typename T>
-    [[nodiscard]] constexpr bool operator<=(const Vec3<T>& o) const noexcept
+    [[nodiscard]] constexpr bool operator<=(const Vec3<Element>& o) const noexcept
     {
-        GX_SIGNEDNESS_COMPATIBILITY_CHECK(T, Element)
-        const Vec3<Element> ov(o);
-        return z < ov.z || (z == ov.z && (y < ov.y || (y == ov.y && z <= ov.z)));
+        return z < o.z || (z == o.z && (y < o.y || (y == o.y && z <= o.z)));
     }
 
-    template <typename T>
-    [[nodiscard]] constexpr bool operator==(const Vec3<T>& o) const noexcept
+    [[nodiscard]] constexpr bool operator==(const Vec3<Element>& o) const noexcept
     {
-        GX_SIGNEDNESS_COMPATIBILITY_CHECK(T, Element)
-        const Vec3<Element> ov(o);
-        return z == ov.z && y == ov.y && z == ov.z;
+        return z == o.z && y == o.y && z == o.z;
     }
 
-    template <typename T>
-    [[nodiscard]] constexpr bool operator>(const Vec3<T>& o) const noexcept
+    [[nodiscard]] constexpr bool operator>(const Vec3<Element>& o) const noexcept
     {
-        GX_SIGNEDNESS_COMPATIBILITY_CHECK(T, Element)
-        const Vec3<Element> ov(o);
-        return z > ov.z || (z == ov.z && (y > ov.y || (y == ov.y && z > ov.z)));
+        return z > o.z || (z == o.z && (y > o.y || (y == o.y && z > o.z)));
     }
 
-    template <typename T>
-    [[nodiscard]] constexpr bool operator>=(const Vec3<T>& o) const noexcept
+    [[nodiscard]] constexpr bool operator>=(const Vec3<Element>& o) const noexcept
     {
-        GX_SIGNEDNESS_COMPATIBILITY_CHECK(T, Element)
-        const Vec3<Element> ov(o);
-        return z > ov.z || (z == ov.z && (y > ov.y || (y == ov.y && z >= ov.z)));
+        return z > o.z || (z == o.z && (y > o.y || (y == o.y && z >= o.z)));
     }
 
-    template <typename T>
-    [[nodiscard]] constexpr Vec2<T> xy() const noexcept
+    [[nodiscard]] constexpr Vec2<Element> xy() const noexcept
     {
-        GX_SIGNEDNESS_COMPATIBILITY_CHECK(Element, T)
-        return Vec2<T>(x, y);
+        return Vec2<Element>(x, y);
     }
 
     [[nodiscard]] constexpr const Element* data() const noexcept
     {
-        reinterpret_cast<const Element*>(this);
+        return &x;
     }
 
     [[nodiscard]] constexpr Element* data() noexcept
@@ -339,14 +225,6 @@ struct Vec3 {
     [[nodiscard]] constexpr Element dot(const Vec3<Element>& o) const noexcept
     {
         return x * o.x + y * o.y + z * o.z;
-    }
-
-    template <typename T>
-    [[nodiscard]] constexpr Element dot(const Vec3<T>& o) const noexcept
-    {
-        GX_SIGNEDNESS_COMPATIBILITY_CHECK(T, Element)
-        const Vec3<Element> ov(o);
-        return x * ov.x + y * ov.y + z * ov.z;
     }
 
     [[nodiscard]] constexpr Element square_length() const noexcept
@@ -369,23 +247,9 @@ struct Vec3 {
         return (*this - o).square_length();
     }
 
-    template <typename T>
-    [[nodiscard]] constexpr Element square_distance(const Vec3<T>& o) const noexcept
-    {
-        GX_SIGNEDNESS_COMPATIBILITY_CHECK(T, Element)
-        return (*this - Vec3<Element>(o)).square_length();
-    }
-
     [[nodiscard]] constexpr Element distance(const Vec3<Element>& o) const noexcept
     {
         return (*this - o).length();
-    }
-
-    template <typename T>
-    [[nodiscard]] constexpr Element distance(const Vec3<T>& o) const noexcept
-    {
-        GX_SIGNEDNESS_COMPATIBILITY_CHECK(T, Element)
-        return (*this - Vec3<Element>(o)).length();
     }
 
     [[nodiscard]] constexpr Element abs_distance(const Vec3<Element>& o) const noexcept
@@ -393,30 +257,14 @@ struct Vec3 {
         return (*this - o).abs_length();
     }
 
-    template <typename T>
-    [[nodiscard]] constexpr Element abs_distance(const Vec3<T>& o) const noexcept
+    [[nodiscard]] constexpr Vec3<Element> abs() const noexcept
     {
-        GX_SIGNEDNESS_COMPATIBILITY_CHECK(T, Element)
-        return (*this - Vec3<Element>(o)).abs_length();
-    }
-
-    template <typename T>
-    [[nodiscard]] constexpr Vec3<T> abs() const noexcept
-    {
-        return Vec3<T>(std::abs(x), std::abs(y), std::abs(z));
+        return Vec3<Element>(std::abs(x), std::abs(y), std::abs(z));
     }
 
     [[nodiscard]] constexpr Vec3<Element> cross(const Vec3<Element>& o) const noexcept
     {
         return Vec3<Element>(y * o.z - z * o.y, z * o.x - x * o.z, x * o.y - y * o.x);
-    }
-
-    template <typename T, typename R>
-    [[nodiscard]] constexpr Vec3<R> cross(const Vec3<T>& o) const noexcept
-    {
-        GX_SIGNEDNESS_COMPATIBILITY_CHECK(Element, R)
-        GX_SIGNEDNESS_COMPATIBILITY_CHECK(T, R)
-        return Vec3<R>(*this).cross(Vec3<R>(o));
     }
 
     [[nodiscard]] constexpr Vec3<Element> minimum(const Vec3<Element>& o) const noexcept

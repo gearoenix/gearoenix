@@ -60,7 +60,7 @@ namespace gearoenix::render::camera {
 class Transformation;
 class Camera : public core::asset::Asset, public core::event::Listener {
 public:
-    typedef std::array<math::Vec3, 4> Partition;
+    typedef std::array<math::Vec3<float>, 4> Partition;
     typedef std::vector<std::tuple<material::Type, model::Model*, model::Mesh*>> Meshes;
     typedef std::vector<std::tuple<core::Real, material::Type, model::Model*, model::Mesh*>> TransparentMeshes;
 
@@ -98,7 +98,7 @@ public:
     virtual void update() noexcept;
     virtual void set_aspects(unsigned int w, unsigned int h) noexcept;
     [[nodiscard]] virtual math::Ray3 create_ray3(core::Real x, core::Real y) const noexcept = 0;
-    [[nodiscard]] virtual core::Real get_distance(const math::Vec3& model_location) const noexcept = 0;
+    [[nodiscard]] virtual core::Real get_distance(const math::Vec3<float>& model_location) const noexcept = 0;
     void check_static_models(const physics::accelerator::Bvh* bvh) noexcept;
     void check_dynamic_models(const physics::accelerator::Bvh* bvh) noexcept;
     void cascade_shadow(const light::Directional* l) noexcept;

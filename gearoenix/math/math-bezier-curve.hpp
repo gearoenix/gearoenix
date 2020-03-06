@@ -1,6 +1,6 @@
 #ifndef GEAROENIX_MATH_BEZIER_CURVE_HPP
 #define GEAROENIX_MATH_BEZIER_CURVE_HPP
-#include "math-vector.hpp"
+#include "math-vector-2d.hpp"
 #include <vector>
 namespace gearoenix {
 namespace system {
@@ -10,9 +10,9 @@ namespace math {
     class CubicBezierCurve2D {
     public:
         struct Point {
-            math::Vec2 position;
-            math::Vec2 in;
-            math::Vec2 out;
+            math::Vec2<double> position;
+            math::Vec2<double> in;
+            math::Vec2<double> out;
         };
 
     private:
