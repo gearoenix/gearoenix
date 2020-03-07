@@ -158,7 +158,7 @@ std::optional<double> gearoenix::math::Aabb3::hit(const math::Ray3& r, const dou
     const auto t1 = (upper - ro) * rrd;
     const auto tmin = t0.minimum(t1).maximum();
     const auto tmax = t0.maximum(t1).minimum();
-    if (tmin <= tmax && tmin < d_min)
+    if (tmax >= 0.0 && tmin <= tmax && tmin < d_min)
         return tmin;
     return std::nullopt;
 }

@@ -285,12 +285,58 @@ struct Vec3 {
 
     [[nodiscard]] constexpr Element minimum() const noexcept
     {
+        if (std::is_floating_point<Element>::value) {
+            if (std::isnan(x)) {
+                if (std::isnan(y))
+                    return z;
+                if (std::isnan(z))
+                    return y;
+                return GX_MIN(y, z);
+            }
+            if (std::isnan(y)) {
+                if (std::isnan(x))
+                    return z;
+                if (std::isnan(z))
+                    return x;
+                return GX_MIN(x, z);
+            }
+            if (std::isnan(z)) {
+                if (std::isnan(x))
+                    return y;
+                if (std::isnan(y))
+                    return x;
+                return GX_MIN(x, y);
+            }
+        }
         const auto e = GX_MIN(x, y);
         return GX_MIN(e, z);
     }
 
     [[nodiscard]] constexpr Element maximum() const noexcept
     {
+        if (std::is_floating_point<Element>::value) {
+            if (std::isnan(x)) {
+                if (std::isnan(y))
+                    return z;
+                if (std::isnan(z))
+                    return y;
+                return GX_MAX(y, z);
+            }
+            if (std::isnan(y)) {
+                if (std::isnan(x))
+                    return z;
+                if (std::isnan(z))
+                    return x;
+                return GX_MAX(x, z);
+            }
+            if (std::isnan(z)) {
+                if (std::isnan(x))
+                    return y;
+                if (std::isnan(y))
+                    return x;
+                return GX_MAX(x, y);
+            }
+        }
         const auto e = GX_MAX(x, y);
         return GX_MAX(e, z);
     }
