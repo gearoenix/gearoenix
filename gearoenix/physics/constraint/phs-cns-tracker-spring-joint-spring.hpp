@@ -3,46 +3,44 @@
 
 #include "../../core/cr-types.hpp"
 #include "../../core/sync/cr-sync-end-caller.hpp"
-#include "../../math/math-vector.hpp"
+#include "../../math/math-vector-3d.hpp"
 #include "phs-cns-constraint.hpp"
 #include <memory>
 
-namespace gearoenix {
-namespace physics {
-    namespace body {
-        class Rigid;
-    }
-    namespace constraint {
-        class TrackerSpringJointSpring : public Constraint {
-        private:
-            std::shared_ptr<body::Rigid> active;
-            std::shared_ptr<body::Rigid> passive;
-            core::Real k;
-            math::Vec3 angle;
-            core::Real joint_k;
-            core::Real length;
+namespace gearoenix::physics {
+namespace body {
+    class Rigid;
+}
+namespace constraint {
+    class TrackerSpringJointSpring : public Constraint {
+    private:
+        std::shared_ptr<body::Rigid> active;
+        std::shared_ptr<body::Rigid> passive;
+        double k = 0.0;
+        math::Vec3<double> angle;
+        double joint_k = 0.0;
+        double length = 0.0;
 
-        public:
-            TrackerSpringJointSpring(
-                const core::Id my_id,
-                system::stream::Stream* f,
-                render::engine::Engine* e,
-                const core::sync::EndCaller<core::sync::EndCallerIgnore> c);
-            TrackerSpringJointSpring(
-                const core::Id my_id,
-                const std::shared_ptr<body::Rigid>& active,
-                const std::shared_ptr<body::Rigid>& passive,
-                const core::Real k,
-                const math::Vec3& angle,
-                const core::Real joint_k,
-                const core::Real length);
-            ~TrackerSpringJointSpring();
-            void on_event(const core::event::Event& e);
-            const std::vector<std::pair<core::Id, std::shared_ptr<render::model::Dynamic>>> get_all_models() const;
-            std::vector<std::shared_ptr<body::Body>> get_all_bodies() const;
-            void apply(core::Real delta_time) noexcept final;
-        };
-    }
+    public:
+        TrackerSpringJointSpring(
+            core::Id my_id,
+            system::stream::Stream* f,
+            render::engine::Engine* e,
+            const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
+        TrackerSpringJointSpring(
+            core::Id my_id,
+            std::shared_ptr<body::Rigid> active,
+            std::shared_ptr<body::Rigid> passive,
+            double k,
+            const math::Vec3<double>& angle,
+            double joint_k,
+            double length);
+        ~TrackerSpringJointSpring() override;
+        void on_event(const core::event::Event& e) override;
+        [[nodiscard]] std::vector<std::pair<core::Id, std::shared_ptr<render::model::Dynamic>>> get_all_models() const override;
+        [[nodiscard]] std::vector<std::shared_ptr<body::Body>> get_all_bodies() const override;
+        void apply(double delta_time) noexcept final;
+    };
 }
 }
 #endif

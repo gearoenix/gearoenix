@@ -1,6 +1,6 @@
 #ifndef GEAROENIX_RENDER_WIDGET_WIDGET_HPP
 #define GEAROENIX_RENDER_WIDGET_WIDGET_HPP
-#include "../../math/math-vector.hpp"
+#include "../../math/math-vector-3d.hpp"
 #include "../model/rnd-mdl-model.hpp"
 #include "rnd-wdg-type.hpp"
 
@@ -29,12 +29,12 @@ public:
         engine::Engine* e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
     [[nodiscard]] bool get_dynamicity() const noexcept final;
-    virtual void selected(const math::Vec3& point) noexcept;
-    virtual void selected_on(const math::Vec3& point, const std::vector<model::Model*>& children) noexcept;
+    virtual void selected(const math::Vec3<double>& point) noexcept;
+    virtual void selected_on(const math::Vec3<double>& point, const std::vector<model::Model*>& children) noexcept;
     virtual void select_cancelled() noexcept;
     virtual void select_released() noexcept;
-    virtual void dragged(const math::Vec3& point) noexcept;
-    virtual void dragged_on(const math::Vec3& point, const std::vector<model::Model*>& children) noexcept;
+    virtual void dragged(const math::Vec3<double>& point) noexcept;
+    virtual void dragged_on(const math::Vec3<double>& point, const std::vector<model::Model*>& children) noexcept;
 };
 }
 #endif

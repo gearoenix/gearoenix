@@ -1,10 +1,9 @@
 #include "cr-ev-engine.hpp"
-#include "../../system/sys-log.hpp"
 #include "cr-ev-listener.hpp"
 #include <functional>
 
-constexpr gearoenix::core::Real CLICK_THRESHOLD = 0.2f;
-constexpr gearoenix::core::Real MOUSE_DRAG_DISTANCE_THRESHOLD = 0.1f;
+constexpr double CLICK_THRESHOLD = 0.2f;
+constexpr double MOUSE_DRAG_DISTANCE_THRESHOLD = 0.1f;
 
 void gearoenix::core::event::Engine::loop() noexcept
 {
@@ -71,13 +70,13 @@ gearoenix::core::event::Engine::~Engine() noexcept
     event_thread.join();
 }
 
-void gearoenix::core::event::Engine::add_listener(Id event_id, Real priority, Listener* listener) noexcept
+void gearoenix::core::event::Engine::add_listener(Id event_id, double priority, Listener* listener) noexcept
 {
     std::lock_guard<std::mutex> _l(listeners_guard);
     events_id_priority_listeners[event_id][priority].insert(listener);
 }
 
-void gearoenix::core::event::Engine::remove_listener(Id event_id, Real priority, Listener* listener) noexcept
+void gearoenix::core::event::Engine::remove_listener(Id event_id, double priority, Listener* listener) noexcept
 {
     std::lock_guard<std::mutex> _l(listeners_guard);
     events_id_priority_listeners[event_id][priority].erase(listener);
@@ -132,7 +131,7 @@ void gearoenix::core::event::Engine::set_mouse_movement(const math::Vec2<double>
 
     for (auto& ap : pressed_mouse_buttons_state) {
         auto& p = ap.second;
-        const std::chrono::duration<Real> dt = mouse_movement.current_time - p.start_time;
+        const std::chrono::duration<double> dt = mouse_movement.current_time - p.start_time;
         if (dt.count() > CLICK_THRESHOLD || mouse_movement.delta_position.length() > MOUSE_DRAG_DISTANCE_THRESHOLD) {
             d.source = Id::GestureDrag;
             gesture::Drag drag;
@@ -180,7 +179,7 @@ void gearoenix::core::event::Engine::mouse_button(const button::MouseKeyId k, co
         if (pi == pressed_mouse_buttons_state.begin()) {
             auto now = std::chrono::high_resolution_clock::now();
             auto& p = pi->second;
-            const std::chrono::duration<core::Real> dt = now - p.previous_time;
+            const std::chrono::duration<double> dt = now - p.previous_time;
             if (dt.count() < CLICK_THRESHOLD) {
                 bd.action = button::MouseActionId::Click;
                 e.data = bd;

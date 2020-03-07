@@ -1,5 +1,4 @@
 #include "rnd-lt-light.hpp"
-#include "../../system/stream/sys-stm-stream.hpp"
 #include "../engine/rnd-eng-engine.hpp"
 #include "../light/rnd-lt-directional.hpp"
 #include "../scene/rnd-scn-scene.hpp"

@@ -22,7 +22,7 @@ class Scene;
 
 namespace gearoenix::render::light {
 class Light : public core::asset::Asset {
-    GX_GETSET_VAL_PRT(core::Real, layer, 0.0f)
+    GX_GETSET_VAL_PRT(double, layer, 0.0f)
     GX_GET_CVAL_PRT(Type, light_type)
     GX_GETSET_CREF_PRT(math::Vec3<float>, color)
     GX_GETSET_VAL_PRT(bool, enabled, true)

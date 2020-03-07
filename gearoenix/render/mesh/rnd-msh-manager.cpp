@@ -7865,7 +7865,7 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager:
         628,
     };
 
-    const static core::Real occlusion_radius = 1.0000001266598622f;
+    const static double occlusion_radius = 1.0000001266598622f;
     const auto id = core::asset::Manager::create_id();
     std::shared_ptr<Mesh> m(new Mesh(
         id, vertices, indices,
@@ -7910,7 +7910,7 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager:
         },
     };
     std::vector<std::uint32_t> indices = { 0, 1, 2, 1, 3, 2 };
-    const static core::Real occlusion_radius = 1.4f;
+    const static double occlusion_radius = 1.4f;
     const auto id = core::asset::Manager::create_id();
     std::shared_ptr<Mesh> m(new Mesh(
         id, vertices, indices,
@@ -8117,7 +8117,7 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager:
         22,
         23,
     };
-    const static core::Real occlusion_radius = 1.7f;
+    const static double occlusion_radius = 1.7f;
     const auto id = core::asset::Manager::create_id();
     std::shared_ptr<Mesh> m(new Mesh(
         id, vertices, indices,
@@ -8303,7 +8303,7 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager:
     const auto id = core::asset::Manager::create_id();
     std::shared_ptr<Mesh> m(new Mesh(
         id, vertices, indices,
-        math::Aabb3(math::Vec3(1.0f), math::Vec3(-1.0)),
+        math::Aabb3(math::Vec3(1.0), math::Vec3(-1.0)),
         e, core::sync::EndCaller<core::sync::EndCallerIgnore>([c] {})));
     c.set_data(m);
     inward_cube = m;
@@ -8393,7 +8393,7 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager:
     const auto id = core::asset::Manager::create_id();
     std::shared_ptr<Mesh> m(new Mesh(
         id, vertices, indices,
-        math::Aabb3(math::Vec3(1.0f), math::Vec3(-1.0)),
+        math::Aabb3(math::Vec3(1.0), math::Vec3(-1.0)),
         e, core::sync::EndCaller<core::sync::EndCallerIgnore>([c] {})));
     c.set_data(m);
     cache.get_cacher().get_cacheds()[id] = m;
@@ -8416,7 +8416,7 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager:
 {
     math::Aabb3 box;
     for (auto& v : vertices)
-        box.put_without_update(v.position);
+        box.put_without_update(math::Vec3<double>(v.position));
     box.update();
     return create(vertices, indices, box, c);
 }

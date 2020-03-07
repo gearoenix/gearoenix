@@ -215,11 +215,11 @@ void gearoenix::render::scene::Scene::update() noexcept
             continue;
         }
     }
-    uniform.lights_count[0] = static_cast<core::Real>(dirc);
+    uniform.lights_count.x = static_cast<float>(dirc);
     uniform_buffers->update(uniform);
 }
 
-std::optional<std::pair<gearoenix::core::Real, gearoenix::physics::collider::Collider*>> gearoenix::render::scene::Scene::hit(const math::Ray3& r, core::Real d_min) const noexcept
+std::optional<std::pair<double, gearoenix::physics::collider::Collider*>> gearoenix::render::scene::Scene::hit(const math::Ray3& r, double d_min) const noexcept
 {
     const auto hs = static_accelerator->hit(r, d_min);
     const auto d_min_l = std::nullopt == hs ? d_min : hs.value().first;

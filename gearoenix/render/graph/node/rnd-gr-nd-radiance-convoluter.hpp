@@ -30,23 +30,23 @@ class RadianceConvoluterResourceSet;
 namespace gearoenix::render::graph::node {
 
 struct RadianceConvoluterUniform {
-    core::Real roughness = 0.001f;
-    core::Real roughness_p_4 = 0.000000000001f;
+    float roughness = 0.001f;
+    float roughness_p_4 = 0.000000000001f;
 
-    explicit RadianceConvoluterUniform(core::Real r) noexcept;
+    explicit RadianceConvoluterUniform(float r) noexcept;
 };
 
 struct RadianceConvoluterKernel {
     const std::unique_ptr<command::Buffer> secondary_cmd;
     const std::unique_ptr<pipeline::RadianceConvoluterResourceSet> r;
     const std::unique_ptr<buffer::Uniform> u;
-    RadianceConvoluterKernel(core::Real roughness, engine::Engine* e, pipeline::Pipeline* pip, unsigned int kernel_index) noexcept;
+    RadianceConvoluterKernel(float roughness, engine::Engine* e, pipeline::Pipeline* pip, unsigned int kernel_index) noexcept;
     ~RadianceConvoluterKernel() noexcept;
 };
 
 struct RadianceConvoluterFrame {
     std::vector<std::unique_ptr<RadianceConvoluterKernel>> kernels;
-    RadianceConvoluterFrame(core::Real roughness, engine::Engine* e, pipeline::Pipeline* pip) noexcept;
+    RadianceConvoluterFrame(float roughness, engine::Engine* e, pipeline::Pipeline* pip) noexcept;
     ~RadianceConvoluterFrame() noexcept;
 };
 
@@ -61,7 +61,7 @@ private:
 
 public:
     RadianceConvoluter(
-        core::Real roughness,
+        float roughness,
         const mesh::Mesh* msh,
         const texture::TextureCube* environment,
         engine::Engine* e,

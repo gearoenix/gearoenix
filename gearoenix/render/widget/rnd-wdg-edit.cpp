@@ -27,7 +27,7 @@ void gearoenix::render::widget::Edit::init(const core::sync::EndCaller<core::syn
         event_engine->add_listener(core::event::Id::ButtonKeyboard, 0.0f, this);
     });
 
-    set_collider(std::make_unique<physics::collider::Aabb>(math::Vec3(1.0f, 1.0f, 0.001f), math::Vec3(-1.0f, -1.0f, -0.001f)));
+    set_collider(std::make_unique<physics::collider::Aabb>(math::Vec3(1.0, 1.0, 0.001), math::Vec3(-1.0, -1.0, -0.001)));
 
     auto* const ast_mgr = e->get_system_application()->get_asset_manager();
     auto* const msh_mgr = ast_mgr->get_mesh_manager();
@@ -56,7 +56,7 @@ void gearoenix::render::widget::Edit::init(const core::sync::EndCaller<core::syn
     hint_text_model = mdl_mgr->create<model::Dynamic>(mdl_end);
     hint_text_model->add_mesh(std::make_shared<model::Mesh>(plate_mesh, hint_text_material));
     auto* const hint_text_tran = hint_text_model->get_transformation();
-    hint_text_tran->set_location(math::Vec3(0.0f, 0.0f, 0.01f));
+    hint_text_tran->set_location(math::Vec3(0.0, 0.0, 0.01));
     hint_text_tran->local_scale(theme.hint_text_size);
     hint_text_model->set_enabled(false);
     add_child(hint_text_model);
@@ -71,7 +71,7 @@ void gearoenix::render::widget::Edit::init(const core::sync::EndCaller<core::syn
     cursor_model = mdl_mgr->create<model::Dynamic>(mdl_end);
     cursor_model->add_mesh(std::make_shared<model::Mesh>(plate_mesh, cursor_material));
     auto* const cursor_tran = cursor_model->get_transformation();
-    cursor_tran->set_location(math::Vec3(0.0f, 0.0f, 0.02f));
+    cursor_tran->set_location(math::Vec3(0.0, 0.0, 0.02));
     cursor_tran->local_scale(theme.cursor_size);
     add_child(cursor_model);
 
@@ -83,7 +83,7 @@ void gearoenix::render::widget::Edit::init(const core::sync::EndCaller<core::syn
 
     cursor_animation = std::make_shared<physics::animation::Animation>(
         [cursor_material { cursor_material }, t1, t2, t3, t4, t5](
-            const core::Real from_start, const core::Real) noexcept {
+            const double from_start, const double) noexcept {
             const auto s = from_start - std::floor(from_start / t5) * t5;
             if (t1 > s) {
                 cursor_material->set_alpha(1.0f);
@@ -95,7 +95,7 @@ void gearoenix::render::widget::Edit::init(const core::sync::EndCaller<core::syn
                 cursor_material->set_alpha((s - t4) / t2);
             }
         },
-        std::numeric_limits<core::Real>::max());
+        std::numeric_limits<double>::max());
     e->get_physics_engine()->get_animation_manager()->add(cursor_animation);
 
     collider->set_on_scale(std::bind(&Edit::on_scale, this));
@@ -114,8 +114,8 @@ void gearoenix::render::widget::Edit::on_scale() noexcept
     } else {
         set_text(text);
     }
-    auto cursor_scale = static_cast<core::Real>(theme.cursor_width) * 0.5f;
-    cursor_scale /= static_cast<core::Real>(e->get_system_application()->get_window_width());
+    auto cursor_scale = static_cast<double>(theme.cursor_width) * 0.5f;
+    cursor_scale /= static_cast<double>(e->get_system_application()->get_window_width());
     cursor_scale /= cursor_model->get_collider()->get_current_local_scale()[0];
     cursor_model->get_transformation()->local_x_scale(cursor_scale);
 }
@@ -436,12 +436,12 @@ void gearoenix::render::widget::Edit::insert(
     } else {
         return;
     }
-    const core::Real cursor_before = increase_to_right ? cursor_pos_in_text - starting_text_cut : ending_text_cut - cursor_pos_in_text;
-    const core::Real before = text_widths.empty() ? 0.0f : text_widths[text.size()];
+    const double cursor_before = increase_to_right ? cursor_pos_in_text - starting_text_cut : ending_text_cut - cursor_pos_in_text;
+    const double before = text_widths.empty() ? 0.0f : text_widths[text.size()];
     refill_text();
     text_font->compute_text_widths(text, aspects[1], text_widths);
     cursor_pos_in_text = text_widths[left_text.size()];
-    const core::Real increase = text_widths[text.size()] - before;
+    const double increase = text_widths[text.size()] - before;
     if (increase_to_right) {
         if (cursor_before + increase > aspects[0]) {
             ending_text_cut = cursor_pos_in_text;

@@ -2,7 +2,6 @@
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../physics/collider/phs-cld-ghost.hpp"
 #include "../../system/stream/sys-stm-asset.hpp"
-#include "../../system/stream/sys-stm-stream.hpp"
 #include "../../system/sys-app.hpp"
 #include "../buffer/rnd-buf-framed-uniform.hpp"
 #include "../camera/rnd-cmr-camera.hpp"
@@ -25,13 +24,13 @@ gearoenix::render::model::Model::Model(
     , model_type(t)
     , collider(new physics::collider::Ghost())
     , transformation(new Transformation(this))
-    , uniform_buffers(new buffer::FramedUniform(static_cast<unsigned int>(sizeof(math::Mat4x4)), e))
+    , uniform_buffers(new buffer::FramedUniform(static_cast<unsigned int>(sizeof(math::Mat4x4<float>)), e))
     , e(e)
 {
     collider->set_parent(this);
-    math::Mat4x4 m;
+    math::Mat4x4<float> m;
     m.read(f);
-    collider->set_model_matrix(m);
+    collider->set_model_matrix(math::Mat4x4<double>(m));
     const auto meshes_count = f->read<core::Count>();
     for (core::Count i = 0; i < meshes_count; ++i) {
         add_mesh(std::make_shared<Mesh>(f, e, c));
@@ -56,7 +55,7 @@ gearoenix::render::model::Model::Model(
     , model_type(t)
     , collider(new physics::collider::Ghost())
     , transformation(new Transformation(this))
-    , uniform_buffers(new buffer::FramedUniform(static_cast<unsigned int>(sizeof(math::Mat4x4)), e))
+    , uniform_buffers(new buffer::FramedUniform(static_cast<unsigned int>(sizeof(math::Mat4x4<float>)), e))
     , e(e)
 {
     collider->set_parent(this);

@@ -1,8 +1,5 @@
 #include "rnd-cmr-orthographic.hpp"
-#include "../../core/event/cr-ev-event.hpp"
-#include "../../system/stream/sys-stm-stream.hpp"
 #include "../../system/sys-app.hpp"
-#include "../../system/sys-configuration.hpp"
 #include "../engine/rnd-eng-engine.hpp"
 #include "rnd-cmr-transformation.hpp"
 #include "rnd-cmr-uniform.hpp"
@@ -10,7 +7,7 @@
 
 void gearoenix::render::camera::Orthographic::update_aspects_size() noexcept
 {
-    uniform.projection = math::Mat4x4::orthographic(
+    uniform.projection = math::Mat4x4<float>::orthographic(
         aspects_size * uniform.aspect_ratio * 2.0f,
         aspects_size * 2.0f,
         std::abs(uniform.near),
@@ -36,7 +33,7 @@ void gearoenix::render::camera::Orthographic::update_cascades() noexcept
 
     const math::Vec3 x = transformation->get_x_axis() * aspects_size * uniform.aspect_ratio;
     const math::Vec3 y = transformation->get_y_axis() * aspects_size;
-    const math::Vec3 z = uniform.position + (transformation->get_z_axis() * uniform.near);
+    const math::Vec3 z = math::Vec3<double>(uniform.position) + (transformation->get_z_axis() * uniform.near);
 
     const math::Vec3 zmx = z - x;
     const math::Vec3 zpx = z + x;
@@ -73,19 +70,19 @@ gearoenix::render::camera::Orthographic::Orthographic(core::Id my_id, engine::En
     update_aspects_size();
 }
 
-gearoenix::math::Ray3 gearoenix::render::camera::Orthographic::create_ray3(const core::Real x, const core::Real y) const noexcept
+gearoenix::math::Ray3 gearoenix::render::camera::Orthographic::create_ray3(const double x, const double y) const noexcept
 {
     const math::Vec3 dir = -transformation->get_z_axis();
-    const math::Vec3 origin = (transformation->get_x_axis() * x) + (transformation->get_y_axis() * y) + (dir * -uniform.near) + uniform.position;
+    const math::Vec3 origin = (transformation->get_x_axis() * x) + (transformation->get_y_axis() * y) + (dir * -uniform.near) + math::Vec3<double>(uniform.position);
     return math::Ray3(origin, dir);
 }
 
-gearoenix::core::Real gearoenix::render::camera::Orthographic::get_distance(const math::Vec3& model_location) const noexcept
+double gearoenix::render::camera::Orthographic::get_distance(const math::Vec3<double>& model_location) const noexcept
 {
-    return (uniform.position - model_location).dot(transformation->get_z_axis());
+    return (math::Vec3<double>(uniform.position) - model_location).dot(transformation->get_z_axis());
 }
 
-void gearoenix::render::camera::Orthographic::set_aspects_size(const core::Real a) noexcept
+void gearoenix::render::camera::Orthographic::set_aspects_size(const double a) noexcept
 {
     aspects_size = a;
     update_aspects_size();

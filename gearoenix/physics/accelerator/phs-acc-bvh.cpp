@@ -1,5 +1,4 @@
 #include "phs-acc-bvh.hpp"
-#include "../../system/sys-log.hpp"
 #include "../collider/phs-cld-collider.hpp"
 
 constexpr int PER_NODE_COLLIDERS = 3;
@@ -21,7 +20,7 @@ std::string gearoenix::physics::accelerator::Bvh::Node::to_string() const noexce
     return r;
 }
 
-std::optional<std::pair<gearoenix::core::Real, gearoenix::physics::collider::Collider*>> gearoenix::physics::accelerator::Bvh::Node::hit(const math::Ray3& r, const core::Real d_min) const noexcept
+std::optional<std::pair<double, gearoenix::physics::collider::Collider*>> gearoenix::physics::accelerator::Bvh::Node::hit(const math::Ray3& r, const double d_min) const noexcept
 {
     const auto h = volume.hit(r, d_min);
     if (h.has_value())
@@ -29,22 +28,22 @@ std::optional<std::pair<gearoenix::core::Real, gearoenix::physics::collider::Col
     return std::nullopt;
 }
 
-std::optional<std::pair<gearoenix::core::Real, gearoenix::physics::collider::Collider*>> gearoenix::physics::accelerator::Bvh::LeafNode::hit(const math::Ray3& r, const core::Real d_min) const noexcept
+std::optional<std::pair<double, gearoenix::physics::collider::Collider*>> gearoenix::physics::accelerator::Bvh::LeafNode::hit(const math::Ray3& r, const double d_min) const noexcept
 {
     auto h = Node::hit(r, d_min);
     if (h == std::nullopt)
         return std::nullopt;
-    core::Real d_min_local = d_min;
-    collider::Collider* hited_c = nullptr;
+    double d_min_local = d_min;
+    collider::Collider* hit_c = nullptr;
     for (auto c : colliders) {
         const auto hc = c->hit(r, d_min_local);
         if (hc == std::nullopt)
             continue;
         d_min_local = hc.value();
-        hited_c = c;
+        hit_c = c;
     }
     if (d_min_local < d_min)
-        return std::make_pair(d_min_local, hited_c);
+        return std::make_pair(d_min_local, hit_c);
     return std::nullopt;
 }
 
@@ -82,21 +81,21 @@ void gearoenix::physics::accelerator::Bvh::InternalNode::init(const std::vector<
 {
     static_assert(BINS_COUNT > 3);
     /// Sorting dimensions
-    const math::Vec3& dims = volume.get_diameter();
-    std::pair<int, core::Real> dimi[3];
+    const math::Vec3<double>& dims = volume.get_diameter();
+    std::pair<int, double> dim_i[3];
     for (int i = 0; i < 3; ++i) {
-        dimi[i] = std::make_pair(i, dims[i]);
+        dim_i[i] = std::make_pair(i, dims[i]);
     }
-    if (dimi[0].second < dimi[1].second) {
-        std::swap(dimi[0], dimi[1]);
+    if (dim_i[0].second < dim_i[1].second) {
+        std::swap(dim_i[0], dim_i[1]);
     }
-    if (dimi[0].second < dimi[2].second) {
-        std::swap(dimi[0], dimi[2]);
+    if (dim_i[0].second < dim_i[2].second) {
+        std::swap(dim_i[0], dim_i[2]);
     }
-    if (dimi[1].second < dimi[2].second) {
-        std::swap(dimi[1], dimi[2]);
+    if (dim_i[1].second < dim_i[2].second) {
+        std::swap(dim_i[1], dim_i[2]);
     }
-    for (const auto& di : dimi) {
+    for (const auto& di : dim_i) {
         struct Bin {
             std::vector<collider::Collider*> c;
             /// TODO: batch the boxing process
@@ -106,10 +105,10 @@ void gearoenix::physics::accelerator::Bvh::InternalNode::init(const std::vector<
         for (Bin& b : bins) {
             b.c.reserve(colliders.size());
         }
-        const core::Real split_size = di.second / static_cast<core::Real>(BINS_COUNT);
-        core::Real splits[WALLS_COUNT];
-        core::Real wall = volume.get_lower()[di.first];
-        for (core::Real& s : splits) {
+        const double split_size = di.second / static_cast<double>(BINS_COUNT);
+        double splits[WALLS_COUNT];
+        double wall = volume.get_lower()[di.first];
+        for (double& s : splits) {
             wall += split_size;
             s = wall;
         }
@@ -141,7 +140,7 @@ void gearoenix::physics::accelerator::Bvh::InternalNode::init(const std::vector<
         if (overlapped) {
             continue;
         }
-        core::Real best_wall_cost = std::numeric_limits<core::Real>::max();
+        double best_wall_cost = std::numeric_limits<double>::max();
         int best_wall_index = -1;
         math::Aabb3 best_wall_left_box;
         math::Aabb3 best_wall_right_box;
@@ -158,7 +157,7 @@ void gearoenix::physics::accelerator::Bvh::InternalNode::init(const std::vector<
                 right_box.put_without_update(bins[j].b);
             }
             right_box.update();
-            const core::Real cost = left_box.get_volume() * static_cast<core::Real>(left_count) + right_box.get_volume() * static_cast<core::Real>(right_count);
+            const double cost = left_box.get_volume() * static_cast<double>(left_count) + right_box.get_volume() * static_cast<double>(right_count);
             if (cost < best_wall_cost) {
                 best_wall_cost = cost;
                 best_wall_index = i;
@@ -216,14 +215,14 @@ gearoenix::physics::accelerator::Bvh::InternalNode::InternalNode(const std::vect
     init(colliders);
 }
 
-std::optional<std::pair<gearoenix::core::Real, gearoenix::physics::collider::Collider*>> gearoenix::physics::accelerator::Bvh::InternalNode::hit(const math::Ray3& r, const core::Real d_min) const noexcept
+std::optional<std::pair<double, gearoenix::physics::collider::Collider*>> gearoenix::physics::accelerator::Bvh::InternalNode::hit(const math::Ray3& r, const double d_min) const noexcept
 {
     const auto h = Node::hit(r, d_min);
     if (h == std::nullopt)
         return std::nullopt;
     const auto hl = (left == nullptr ? std::nullopt : left->hit(r, d_min));
-    const auto [d_min_left, hited_c] = (hl == std::nullopt ? std::make_pair(d_min, nullptr) : *hl);
-    (void)hited_c;
+    const auto [d_min_left, hit_c] = (hl == std::nullopt ? std::make_pair(d_min, nullptr) : *hl);
+    (void)hit_c;
     const auto hr = (right == nullptr ? std::nullopt : right->hit(r, d_min_left));
     if (hr == std::nullopt)
         return hl;
@@ -274,7 +273,7 @@ void gearoenix::physics::accelerator::Bvh::reset(const std::vector<collider::Col
     root = std::make_unique<InternalNode>(colliders);
 }
 
-std::optional<std::pair<gearoenix::core::Real, gearoenix::physics::collider::Collider*>> gearoenix::physics::accelerator::Bvh::hit(const math::Ray3& r, const core::Real d_min) const noexcept
+std::optional<std::pair<double, gearoenix::physics::collider::Collider*>> gearoenix::physics::accelerator::Bvh::hit(const math::Ray3& r, const double d_min) const noexcept
 {
     if (root != nullptr)
         return root->hit(r, d_min);

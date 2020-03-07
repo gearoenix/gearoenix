@@ -3,9 +3,10 @@
 
 #include "../core/cr-types.hpp"
 
-#define GX_SIGNEDNESS_COMPATIBILITY_CHECK(ReceivedType, FinalType)                                            \
-    static_assert(!std::numeric_limits<ReceivedType>::is_signed || std::numeric_limits<FinalType>::is_signed, \
-        "This functionality only works when the signedness compatibility is available.");
+// Maybe in future needed
+//#define GX_SIGNEDNESS_COMPATIBILITY_CHECK(ReceivedType, FinalType)                                            \
+//    static_assert(!std::numeric_limits<ReceivedType>::is_signed || std::numeric_limits<FinalType>::is_signed, \
+//        "This functionality only works when the signedness compatibility is available.");
 
 #define GX_SIGNEDNESS_CHECK(Type)                       \
     static_assert(std::numeric_limits<Type>::is_signed, \
@@ -18,9 +19,9 @@ public:
     template <typename T>
     static T raise_p2(T v) noexcept;
     template <typename T>
-    static T raise_p2(T v, T maximun, T minimum) noexcept;
+    static T raise_p2(T v, T maximum, T minimum) noexcept;
 
-    [[nodiscard]] static constexpr core::Real radical_inverse_vdc(std::uint32_t bits) noexcept;
+    [[nodiscard]] static constexpr float radical_inverse_vdc(std::uint32_t bits) noexcept;
 };
 }
 
@@ -35,16 +36,16 @@ T gearoenix::math::Numeric::raise_p2(const T v) noexcept
 }
 
 template <typename T>
-T gearoenix::math::Numeric::raise_p2(const T v, const T maximun, const T minimum) noexcept
+T gearoenix::math::Numeric::raise_p2(const T v, const T maximum, const T minimum) noexcept
 {
-    if (v > maximun)
-        return maximun;
+    if (v > maximum)
+        return maximum;
     if (v < minimum)
         return minimum;
     return raise_p2(v);
 }
 
-constexpr gearoenix::core::Real gearoenix::math::Numeric::radical_inverse_vdc(std::uint32_t bits) noexcept
+constexpr float gearoenix::math::Numeric::radical_inverse_vdc(std::uint32_t bits) noexcept
 {
     bits = (bits << 16u) | (bits >> 16u);
     bits = ((bits & 0x55555555u) << 1u) | ((bits & 0xAAAAAAAAu) >> 1u);

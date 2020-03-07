@@ -36,7 +36,7 @@ std::shared_ptr<gearoenix::gles2::texture::Texture2D> gearoenix::gles2::texture:
     case render::texture::TextureFormat::RgbaFloat32: {
         const gl::sizei pixel_size = gl_img_width * gl_img_height * 4;
         pixels.resize(pixel_size);
-        const auto raw_data = reinterpret_cast<const core::Real*>(data);
+        const auto raw_data = reinterpret_cast<const float*>(data);
         for (gl::sizei i = 0; i < pixel_size; ++i) {
             const auto c = raw_data[i] * 255.1f;
             if (c >= 255.0f)
@@ -51,7 +51,7 @@ std::shared_ptr<gearoenix::gles2::texture::Texture2D> gearoenix::gles2::texture:
     case render::texture::TextureFormat::RgbFloat32: {
         const gl::sizei pixel_size = gl_img_width * gl_img_height * 3;
         pixels.resize(pixel_size);
-        const auto raw_data = reinterpret_cast<const core::Real*>(data);
+        const auto raw_data = reinterpret_cast<const float*>(data);
         for (gl::sizei i = 0; i < pixel_size; ++i) {
             const auto c = raw_data[i] * 255.1f;
             if (c >= 255.0f)

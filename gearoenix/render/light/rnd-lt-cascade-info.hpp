@@ -3,8 +3,7 @@
 #include "../../core/cr-build-configuration.hpp"
 #include "../../core/cr-pool.hpp"
 #include "../../math/math-aabb.hpp"
-#include "../../math/math-matrix.hpp"
-#include "../../math/math-vector.hpp"
+#include "../../math/math-matrix-4d.hpp"
 #include <array>
 #include <memory>
 #include <vector>
@@ -52,8 +51,8 @@ class CascadeInfo {
 public:
     struct PerCascade {
 #ifdef GX_USE_OPENGL
-        math::Mat4x4 view_projection_gl;
-        math::Mat4x4 view_projection_bias_gl;
+        math::Mat4x4<double> view_projection_gl;
+        math::Mat4x4<double> view_projection_bias_gl;
 #endif
         std::unique_ptr<physics::collider::Frustum> collider;
         math::Aabb3 max_box;
@@ -89,7 +88,7 @@ private:
     };
     engine::Engine* const e;
 
-    math::Mat4x4 zero_located_view;
+    math::Mat4x4<double> zero_located_view;
     std::vector<PerKernel> kernels;
     std::vector<PerFrame> frames;
     /// Per cascade
@@ -100,7 +99,7 @@ public:
     explicit CascadeInfo(engine::Engine* e) noexcept;
     ~CascadeInfo() noexcept;
 
-    void update(const math::Mat4x4& m, const std::vector<std::array<math::Vec3, 4>>& p) noexcept;
+    void update(const math::Mat4x4<double>& m, const std::vector<std::array<math::Vec3<double>, 4>>& p) noexcept;
 
     void start() noexcept;
 

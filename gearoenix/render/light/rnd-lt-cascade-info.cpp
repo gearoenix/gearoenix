@@ -93,7 +93,7 @@ gearoenix::render::light::CascadeInfo::~CascadeInfo() noexcept
     frames.clear();
 }
 
-void gearoenix::render::light::CascadeInfo::update(const math::Mat4x4& m, const std::vector<std::array<math::Vec3, 4>>& p) noexcept
+void gearoenix::render::light::CascadeInfo::update(const math::Mat4x4<double>& m, const std::vector<std::array<math::Vec3<double>, 4>>& p) noexcept
 {
     current_frame = &frames[e->get_frame_number()];
     zero_located_view = m;
@@ -140,7 +140,7 @@ void gearoenix::render::light::CascadeInfo::update(const math::Mat4x4& m, const 
         auto& limit = c.collider->get_limit();
         math::Vec3 v = limit.get_upper();
         v[2]
-            = std::numeric_limits<core::Real>::max();
+            = std::numeric_limits<double>::max();
         limit.put_without_update(v);
         limit.update();
     }
@@ -182,8 +182,8 @@ void gearoenix::render::light::CascadeInfo::shrink() noexcept
         const auto depth = d[2];
         const auto n = depth * 0.01f;
         const auto f = depth * 1.03f;
-        const auto p = gearoenix::math::Mat4x4::orthographic(w, h, n, f);
-        const auto t = gearoenix::math::Mat4x4::translator(-gearoenix::math::Vec3(c.xy(), mx[2] + (n * 2.0f)));
+        const auto p = gearoenix::math::Mat4x4<double>::orthographic(w, h, n, f);
+        const auto t = gearoenix::math::Mat4x4<double>::translator(-gearoenix::math::Vec3(c.xy(), mx[2] + (n * 2.0f)));
         const auto mtx = p * t * zero_located_view;
 
 #ifdef GX_USE_OPENGL
@@ -192,10 +192,10 @@ void gearoenix::render::light::CascadeInfo::shrink() noexcept
 #endif
             cas.view_projection_gl = mtx;
             cas.view_projection_bias_gl = math::Mat4x4(
-                                              0.5f, 0.0f, 0.0f, 0.0f,
-                                              0.0f, 0.5f, 0.0f, 0.0f,
-                                              0.0f, 0.0f, 1.0f, 0.0f,
-                                              0.5f, 0.5f, 0.0f, 1.0f)
+                                              0.5, 0.0, 0.0, 0.0,
+                                              0.0, 0.5, 0.0, 0.0,
+                                              0.0, 0.0, 1.0, 0.0,
+                                              0.5, 0.5, 0.0, 1.0)
                 * mtx;
 
 #ifdef GX_USE_INSTEAD_OF_OPENGL

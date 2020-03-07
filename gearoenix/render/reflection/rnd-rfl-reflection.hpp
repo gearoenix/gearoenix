@@ -32,8 +32,8 @@ protected:
         core::Id id,
         Type t,
         engine::Engine* e,
-        const math::Vec3<float>& position = math::Vec3(0.0f),
-        core::Real influence_radius = 10.0f) noexcept;
+        const math::Vec3<double>& position = math::Vec3(0.0),
+        double influence_radius = 10.0f) noexcept;
 
 public:
     ~Reflection() noexcept override;

@@ -31,7 +31,7 @@ gearoenix::render::material::Unlit::Unlit(system::stream::Stream* const f, engin
         color_texture = std::dynamic_pointer_cast<texture::Texture2D>(txt_mgr->get_gx3d(f->read<core::Id>(), txt_call));
     } else {
         core::sync::EndCaller<texture::Texture2D> txt_call([end](const std::shared_ptr<texture::Texture2D>&) {});
-        math::Vec4 color;
+        math::Vec4<float> color;
         color.read(f);
         color_texture = std::dynamic_pointer_cast<texture::Texture2D>(txt_mgr->get_2d(color, txt_call));
         color_value = color;
@@ -51,7 +51,7 @@ void gearoenix::render::material::Unlit::update() noexcept
 }
 
 void gearoenix::render::material::Unlit::set_color(
-    const core::Real r, const core::Real g, const core::Real b,
+    const float r, const float g, const float b,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept
 {
     core::sync::EndCaller<texture::Texture2D> call_txt_2d([end](const std::shared_ptr<texture::Texture2D>&) {});
@@ -61,7 +61,7 @@ void gearoenix::render::material::Unlit::set_color(
     color_value = math::Vec4(r, g, b, 1.0f);
 }
 
-void gearoenix::render::material::Unlit::set_color(const math::Vec4& c,
+void gearoenix::render::material::Unlit::set_color(const math::Vec4<float>& c,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept
 {
     core::sync::EndCaller<texture::Texture2D> call_txt_2d([end](const std::shared_ptr<texture::Texture2D>&) {});
@@ -77,7 +77,7 @@ void gearoenix::render::material::Unlit::set_color(const std::shared_ptr<texture
     color_texture = c;
 }
 
-void gearoenix::render::material::Unlit::set_alpha(const core::Real a) noexcept
+void gearoenix::render::material::Unlit::set_alpha(const float a) noexcept
 {
     uniform.alpha = a;
 }

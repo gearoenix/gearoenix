@@ -30,28 +30,28 @@ namespace gearoenix::render::widget {
 
 struct EditTheme {
     Alignment h_align = Alignment::Center;
-    math::Vec4 text_color = math::Vec4(0.7f, 0.7f, 0.7f, 1.0f);
-    core::Real text_size = 0.9f;
-    math::Vec4 hint_text_color = math::Vec4(0.5f);
-    core::Real hint_text_size = 0.9f;
-    math::Vec4 background_color = math::Vec4(0.4f, 0.4f, 0.4f, 1.0f);
-    math::Vec4 cursor_color = math::Vec4(0.0f, 0.0f, 0.0f, 1.0f);
+    math::Vec4<double> text_color = math::Vec4(0.7, 0.7, 0.7, 1.0);
+    double text_size = 0.9;
+    math::Vec4<double> hint_text_color = math::Vec4(0.5);
+    double hint_text_size = 0.9;
+    math::Vec4<double> background_color = math::Vec4(0.4, 0.4, 0.4, 1.0);
+    math::Vec4<double> cursor_color = math::Vec4(0.0, 0.0, 0.0, 1.0);
     std::uint8_t cursor_width = 4;
     /// Size compare to the height of Edit
-    core::Real cursor_size = 0.9f;
-    core::Real cursor_state_time = 0.125f;
-    core::Real cursor_blink_time = 0.125f;
+    double cursor_size = 0.9;
+    double cursor_state_time = 0.125;
+    double cursor_blink_time = 0.125;
 };
 class Edit final : public Widget, public core::event::Listener {
 public:
     GX_GET_CPTR_PRV(core::event::Engine, event_engine)
     GX_GET_CREF_PRV(std::shared_ptr<font::Font2D>, text_font)
     GX_GET_CREF_PRV(std::wstring, text)
-    GX_GET_CREF_PRV(std::vector<core::Real>, text_widths)
+    GX_GET_CREF_PRV(std::vector<double>, text_widths)
     GX_GET_CREF_PRV(std::shared_ptr<model::Dynamic>, text_model)
     GX_GET_CREF_PRV(std::shared_ptr<material::Unlit>, text_material)
     GX_GET_CREF_PRV(std::wstring, hint_text)
-    GX_GET_CREF_PRV(std::vector<core::Real>, hint_text_widths)
+    GX_GET_CREF_PRV(std::vector<double>, hint_text_widths)
     GX_GET_CREF_PRV(std::shared_ptr<model::Dynamic>, hint_text_model)
     GX_GET_CREF_PRV(std::shared_ptr<material::Unlit>, hint_text_material)
     GX_GET_CREF_PRV(std::shared_ptr<model::Dynamic>, background_model)
@@ -64,10 +64,10 @@ public:
     GX_GET_VAL_PRV(bool, left_to_right, true)
     GX_GET_CREF_PRV(std::vector<wchar_t>, left_text)
     GX_GET_CREF_PRV(std::vector<wchar_t>, right_text)
-    GX_GET_CREF_PRV(math::Vec2, aspects)
-    GX_GET_VAL_PRV(core::Real, cursor_pos_in_text, 0.0f)
-    GX_GET_VAL_PRV(core::Real, starting_text_cut, 0.0f)
-    GX_GET_VAL_PRV(core::Real, ending_text_cut, 0.0f)
+    GX_GET_CREF_PRV(math::Vec2<double>, aspects)
+    GX_GET_VAL_PRV(double, cursor_pos_in_text, 0.0f)
+    GX_GET_VAL_PRV(double, starting_text_cut, 0.0f)
+    GX_GET_VAL_PRV(double, ending_text_cut, 0.0f)
     GX_GET_VAL_PRV(std::size_t, temporary_left, 0)
     GX_GET_VAL_PRV(std::size_t, temporary_right, 0)
 private:
@@ -109,7 +109,7 @@ public:
     void insert(wchar_t character, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
     void backspace(const core::sync::EndCaller<core::sync::EndCallerIgnore>& c = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
     void del(const core::sync::EndCaller<core::sync::EndCallerIgnore>& c = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
-    void selected(const math::Vec3& point) noexcept final;
+    void selected(const math::Vec3<double>& point) noexcept final;
     void clear() noexcept;
 };
 }

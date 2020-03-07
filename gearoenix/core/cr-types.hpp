@@ -11,7 +11,6 @@ typedef std::uint64_t Id;
 typedef std::uint8_t TypeId;
 typedef std::uint64_t Count;
 typedef std::int64_t Offset;
-typedef float Real;
 enum struct State : int { Set = 1,
     Unset = 0,
     Uninitizlized = -1 };

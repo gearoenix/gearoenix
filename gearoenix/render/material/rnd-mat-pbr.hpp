@@ -7,12 +7,12 @@ namespace gearoenix::render::material {
 class Pbr final : public Material {
 public:
     struct Uniform {
-        core::Real alpha = 1.0f;
-        core::Real alpha_cutoff = 0.001f;
-        core::Real metallic_factor = 0.9f;
-        core::Real normal_scale = 1.0f;
-        core::Real occlusion_strength = 1.0f;
-        core::Real roughness_factor = 0.1f;
+        float alpha = 1.0f;
+        float alpha_cutoff = 0.001f;
+        float metallic_factor = 0.9f;
+        float normal_scale = 1.0f;
+        float occlusion_strength = 1.0f;
+        float roughness_factor = 0.1f;
     };
     GX_GET_CREF_PRV(std::shared_ptr<texture::Texture2D>, color_texture)
     GX_GET_CREF_PRV(std::optional<math::Vec4<float>>, color_value)
@@ -28,15 +28,15 @@ public:
     Pbr(system::stream::Stream* f, engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept;
     ~Pbr() noexcept final;
     void update() noexcept final;
-    void set_metallic_factor(core::Real f) noexcept;
-    void set_roughness_factor(core::Real f) noexcept;
+    void set_metallic_factor(float f) noexcept;
+    void set_roughness_factor(float f) noexcept;
     void set_color(
-        core::Real r, core::Real g, core::Real b,
+        float r, float g, float b,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept;
     void set_color(const math::Vec4<float>& c,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& end = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
     void set_color(const std::shared_ptr<texture::Texture2D>& color) noexcept;
-    void set_alpha(core::Real) noexcept;
+    void set_alpha(float) noexcept;
 };
 }
 

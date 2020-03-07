@@ -1,8 +1,6 @@
 #include "phs-cld-mesh.hpp"
-#include "../../math/math-matrix.hpp"
+#include "../../math/math-matrix-4d.hpp"
 #include "../../math/math-ray.hpp"
-#include "../../system/stream/sys-stm-stream.hpp"
-#include "../../system/sys-log.hpp"
 
 gearoenix::physics::collider::Mesh::Mesh(system::stream::Stream* const f) noexcept
     : Collider(Type::Mesh)
@@ -37,16 +35,16 @@ gearoenix::physics::collider::Mesh::Mesh(system::stream::Stream* const f) noexce
 //     }
 // }
 
-std::optional<gearoenix::core::Real> gearoenix::physics::collider::Mesh::hit(const math::Ray3&, const core::Real) const noexcept
+std::optional<double> gearoenix::physics::collider::Mesh::hit(const math::Ray3&, const double) const noexcept
 {
     // first collider base hit (aabb)
     // second loop over traingles (triangles count must be low)
     GXUNIMPLEMENTED
 }
 
-// std::optional<std::pair<gearoenix::core::Real, gearoenix::math::Vec2>> gearoenix::physics::collider::Mesh::hit(const math::Ray3& r) const noexcept
+// std::optional<std::pair<double, gearoenix::math::Vec2>> gearoenix::physics::collider::Mesh::hit(const math::Ray3& r) const noexcept
 // {
-//     core::Real tmpd = d;
+//     double tmpd = d;
 //     if (box.test(r, tmpd)) {
 //         bool result = false;
 //         for (const math::Triangle3& t : ts) {

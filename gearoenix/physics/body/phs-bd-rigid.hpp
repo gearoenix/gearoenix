@@ -1,45 +1,39 @@
 #ifndef GEAROENIX_PHYSICS_BODY_RIGID_HPP
 #define GEAROENIX_PHYSICS_BODY_RIGID_HPP
-#include "../../math/math-vector.hpp"
+#include "../../math/math-vector-3d.hpp"
 #include "phs-bd-body.hpp"
-namespace gearoenix {
-namespace physics {
-    namespace body {
-        class Rigid : public Body {
-        public:
-            class RigidBodyBehavior {
-            public:
-                typedef enum {
-                    ACTIVE,
-                    PASSIVE,
-                } Type;
-            };
 
-        private:
-        protected:
-            math::Vec3 speed;
-            math::Vec3 force;
-            core::Real mass = 1.0f;
-            core::Real inversed_mass = 1.0f;
-            core::Real air_friction = -0.5f; // its nature is to be a negative number
-            core::Real rotational_speed;
-            math::Vec3 rotational_speed_axis;
-            core::Real rotational_acceleration;
-            math::Vec3 rotational_acceleration_axis;
-            core::Real rotational_latency = 0.5f; // its nature is to be a number less than 1
-            core::Real rotational_air_friction = 0.0f; // its nature is to be a negative number
-            core::Real interaction_friction = 0.0f; // its nature is to be a negative number
-            core::Real interaction_bounciness = 1.0f; // its nature is to be a number less than 1
-            RigidBodyBehavior::Type rigid_body_behavior = RigidBodyBehavior::ACTIVE;
+namespace gearoenix::physics::body {
+class Rigid : public Body {
+public:
+    enum struct Behavior {
+        Active = 1,
+        Passive = 2,
+    };
 
-        public:
-            Rigid(const core::Id my_id, const std::shared_ptr<Transferable>& body_obj);
-            virtual ~Rigid();
-            void apply_force_on_origin(const math::Vec3& force);
-            void apply_force(const math::Vec3& force, const math::Vec3& point);
-            void apply_time(const core::Real delta_time);
-        };
-    }
-}
+private:
+protected:
+    math::Vec3<double> speed;
+    math::Vec3<double> force;
+    double mass = 1.0;
+    double inverted_mass = 1.0;
+    double air_friction = -0.5; // its nature is to be a negative number
+    double rotational_speed;
+    math::Vec3<double> rotational_speed_axis;
+    double rotational_acceleration = 0.0;
+    math::Vec3<double> rotational_acceleration_axis;
+    double rotational_latency = 0.5; // its nature is to be a number less than 1
+    double rotational_air_friction = 0.0; // its nature is to be a negative number
+    double interaction_friction = 0.0; // its nature is to be a negative number
+    double interaction_bounciness = 1.0; // its nature is to be a number less than 1
+    Behavior rigid_body_behavior = Behavior::Active;
+
+public:
+    Rigid(core::Id id, const std::shared_ptr<Transferable>& body_obj);
+    ~Rigid() override;
+    void apply_force_on_origin(const math::Vec3<double>& force);
+    void apply_force(const math::Vec3<double>& force, const math::Vec3<double>& point);
+    void apply_time(double delta_time);
+};
 }
 #endif

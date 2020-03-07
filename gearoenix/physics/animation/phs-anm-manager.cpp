@@ -8,7 +8,7 @@ gearoenix::physics::animation::Manager::Manager(core::sync::KernelWorkers* const
     kernel_workers->add_step(
         [this]() noexcept {
             auto now = std::chrono::high_resolution_clock::now();
-            duration = std::chrono::duration<core::Real>(now - time).count();
+            duration = std::chrono::duration<double>(now - time).count();
             time = now;
             animations_guard.lock();
         },

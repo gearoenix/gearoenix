@@ -106,7 +106,7 @@ void gearoenix::render::graph::node::ShadowMapper::update() noexcept
     }
 }
 
-void gearoenix::render::graph::node::ShadowMapper::record_shadow(const math::Mat4x4& mvp, const model::Model* const m, const std::size_t kernel_index) noexcept
+void gearoenix::render::graph::node::ShadowMapper::record_shadow(const math::Mat4x4<double>& mvp, const model::Model* const m, const std::size_t kernel_index) noexcept
 {
     const auto& kernel = frame->kernels[kernel_index];
     const std::map<core::Id, std::shared_ptr<model::Mesh>>& meshes = m->get_meshes();
@@ -114,7 +114,7 @@ void gearoenix::render::graph::node::ShadowMapper::record_shadow(const math::Mat
         const auto* const mat = id_mesh.second->get_mat().get();
         const auto* const mat_buff = mat->get_uniform_buffers()->get_buffer();
         ShadowMapperUniform u;
-        u.mvp = mvp;
+        u.mvp = math::Mat4x4<float>(mvp);
         switch (mat->get_material_type()) {
         case material::Type::Unlit: {
             const auto* const ptr = mat_buff->get_ptr<material::Unlit::Uniform>();

@@ -33,15 +33,15 @@ namespace system {
         GX_GET_UPTR_PRV(core::event::Engine, event_engine)
         GX_GET_VAL_PRV(unsigned int, window_width, 0)
         GX_GET_VAL_PRV(unsigned int, window_height, 0)
-        GX_GET_VAL_PRV(core::Real, window_ratio, 1.0F)
+        GX_GET_VAL_PRV(double, window_ratio, 1.0)
     private:
 #ifdef GX_IN_WEB
         static Application* app;
 #endif
-        const static core::Real ROTATION_EPSILON;
-        const static core::Real ZOOM_EPSILON;
+        const static double ROTATION_EPSILON;
+        const static double ZOOM_EPSILON;
 
-        core::Real half_height_inversed = 0.0f;
+        double half_height_inversed = 0.0f;
 
         SDL_Window* window = nullptr;
 
@@ -65,8 +65,8 @@ namespace system {
         static void loop() noexcept;
         void main_loop() noexcept;
 #endif
-        [[nodiscard]] core::Real convert_x_to_ratio(int x) const noexcept;
-        [[nodiscard]] core::Real convert_y_to_ratio(int y) const noexcept;
+        [[nodiscard]] double convert_x_to_ratio(int x) const noexcept;
+        [[nodiscard]] double convert_y_to_ratio(int y) const noexcept;
         [[nodiscard]] const char* get_clipboard() const noexcept;
     };
 }

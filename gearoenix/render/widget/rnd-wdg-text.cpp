@@ -20,6 +20,7 @@ gearoenix::render::widget::Text::Text(
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : Widget(my_id, Type::Text, f, e, c)
+    , text_color(0.7f, 0.7f, 0.7f, 1.0f)
 {
     {
         // Reading string
@@ -70,7 +71,7 @@ void gearoenix::render::widget::Text::set_text(
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
 {
     text = t;
-    core::Real img_width = 0.0f;
+    float img_width = 0.0f;
     auto txt_end = core::sync::EndCaller<texture::Texture2D>([c, this](const std::shared_ptr<texture::Texture2D>& txt) {
         reinterpret_cast<material::Unlit*>(meshes[text_mesh_id]->get_mat().get())->set_color(txt);
     });
@@ -79,16 +80,16 @@ void gearoenix::render::widget::Text::set_text(
 }
 
 void gearoenix::render::widget::Text::set_text_color(
-    const core::Real red,
-    const core::Real green,
-    const core::Real blue,
+    const float red,
+    const float green,
+    const float blue,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
 {
     set_text_color(math::Vec4(red, green, blue, 1.0f), c);
 }
 
 void gearoenix::render::widget::Text::set_text_color(
-    const math::Vec4& v, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
+    const math::Vec4<float>& v, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
 {
     text_color = v;
     set_text(text, c);

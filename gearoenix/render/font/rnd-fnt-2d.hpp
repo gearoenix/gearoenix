@@ -1,6 +1,6 @@
 #ifndef GEAROENIX_RENDER_FONT_2D_HPP
 #define GEAROENIX_RENDER_FONT_2D_HPP
-#include "../../math/math-vector.hpp"
+#include "../../math/math-vector-4d.hpp"
 #include "rnd-fnt-font.hpp"
 #include <memory>
 #include <string>
@@ -37,22 +37,22 @@ public:
         texture::Manager* txt_mgr) noexcept;
     ~Font2D() noexcept final;
     /// This function returns n+1 horizontal length from start
-    void compute_text_widths(const std::wstring& text, core::Real text_height, std::vector<core::Real>& widths) const noexcept;
+    void compute_text_widths(const std::wstring& text, double text_height, std::vector<double>& widths) const noexcept;
     /// This function is a simple and fast way to only render a one-line text to a texture.
     [[nodiscard]] std::shared_ptr<texture::Texture2D> bake(
         const std::wstring& text,
-        const std::vector<core::Real>& txt_widths,
-        const math::Vec4& color,
-        core::Real img_width,
-        core::Real img_height,
-        core::Real img_start_skip,
+        const std::vector<double>& txt_widths,
+        const math::Vec4<double>& color,
+        double img_width,
+        double img_height,
+        double img_start_skip,
         core::sync::EndCaller<texture::Texture2D>& end) const noexcept;
     /// This function is a simple and fast way to only render a one-line text to a texture.
     [[nodiscard]] std::shared_ptr<texture::Texture2D> bake(
         const std::wstring& text,
-        const math::Vec4& color,
-        core::Real img_height,
-        core::Real& img_width,
+        const math::Vec4<double>& color,
+        double img_height,
+        double& img_width,
         core::sync::EndCaller<texture::Texture2D>& end) const noexcept;
 };
 }

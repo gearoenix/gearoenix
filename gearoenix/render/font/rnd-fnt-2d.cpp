@@ -71,8 +71,8 @@ gearoenix::render::font::Font2D::~Font2D() noexcept
 
 void gearoenix::render::font::Font2D::compute_text_widths(
     const std::wstring& text,
-    const core::Real text_height,
-    std::vector<core::Real>& widths) const noexcept
+    const double text_height,
+    std::vector<double>& widths) const noexcept
 {
 #ifdef GX_DEBUG_MODE
     if (text.empty()) {
@@ -84,27 +84,27 @@ void gearoenix::render::font::Font2D::compute_text_widths(
         }
     }
 #endif
-    const auto txt_scale = text_height / static_cast<core::Real>(fnt_height);
+    const auto txt_scale = text_height / static_cast<double>(fnt_height);
     widths.clear();
-    core::Real total_width;
+    double total_width;
     {
         int advance = 0;
         int lsb = 0;
         stbtt_GetCodepointHMetrics(stb_font.get(), text[0], &advance, &lsb);
-        total_width = static_cast<core::Real>(std::abs(lsb)) * txt_scale;
+        total_width = static_cast<double>(std::abs(lsb)) * txt_scale;
         widths.push_back(total_width);
-        total_width += static_cast<core::Real>(advance) * txt_scale;
+        total_width += static_cast<double>(advance) * txt_scale;
         widths.push_back(total_width);
     }
     const auto end_index = text.size() - 1;
     for (std::size_t i = 0; i < end_index;) {
         const int pre_c = static_cast<int>(text[i]);
         const int cur_c = static_cast<int>(text[++i]);
-        total_width += static_cast<core::Real>(stbtt_GetCodepointKernAdvance(stb_font.get(), pre_c, cur_c)) * txt_scale;
+        total_width += static_cast<double>(stbtt_GetCodepointKernAdvance(stb_font.get(), pre_c, cur_c)) * txt_scale;
         int advance = 0;
         int lsb = 0;
         stbtt_GetCodepointHMetrics(stb_font.get(), cur_c, &advance, &lsb);
-        const auto current_lsb = static_cast<core::Real>(std::abs(lsb)) * txt_scale;
+        const auto current_lsb = static_cast<double>(std::abs(lsb)) * txt_scale;
         if (current_lsb > total_width) {
             const auto addition = current_lsb - total_width;
             for (auto& w : widths) {
@@ -112,21 +112,21 @@ void gearoenix::render::font::Font2D::compute_text_widths(
             }
             total_width = current_lsb;
         }
-        total_width += static_cast<core::Real>(advance) * txt_scale;
+        total_width += static_cast<double>(advance) * txt_scale;
         widths.push_back(total_width);
     }
 }
 
 std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::font::Font2D::bake(
     const std::wstring& text,
-    const std::vector<core::Real>& txt_widths,
-    const math::Vec4& color_vector,
-    const core::Real img_width,
-    const core::Real img_height,
-    const core::Real img_start_skip,
+    const std::vector<double>& txt_widths,
+    const math::Vec4<double>& color_vector,
+    const double img_width,
+    const double img_height,
+    const double img_start_skip,
     core::sync::EndCaller<texture::Texture2D>& end) const noexcept
 {
-    const auto converter = [](const core::Real v) {
+    const auto converter = [](const double v) {
         if (v >= 1.0f)
             return static_cast<std::uint8_t>(255);
         if (v <= 0.0f)
@@ -134,27 +134,27 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::font::
         return static_cast<std::uint8_t>(v * 255.0f + 0.5000001f);
     };
     const std::uint8_t color_bytes[4] = {
-        converter(color_vector[0]),
-        converter(color_vector[1]),
-        converter(color_vector[2]),
-        converter(color_vector[3]),
+        converter(color_vector.x),
+        converter(color_vector.y),
+        converter(color_vector.z),
+        converter(color_vector.w),
     };
     auto* const render_engine = txt_mgr->get_engine();
     const auto max_texture_size = render_engine->get_limitations().texture_maximum_aspect;
     const auto window_height = render_engine->get_system_application()->get_window_height();
     const auto img_height_pixels = math::Numeric::raise_p2(
-        static_cast<unsigned int>(std::ceil(static_cast<core::Real>(window_height) * img_height)),
+        static_cast<unsigned int>(std::ceil(static_cast<double>(window_height) * img_height)),
         max_texture_size, 16U);
-    const auto h_scale = static_cast<core::Real>(img_height_pixels) / static_cast<core::Real>(fnt_height);
+    const auto h_scale = static_cast<double>(img_height_pixels) / static_cast<double>(fnt_height);
     const auto img_width_pixels = math::Numeric::raise_p2(
-        static_cast<unsigned int>(std::ceil(static_cast<core::Real>(window_height) * img_width)),
+        static_cast<unsigned int>(std::ceil(static_cast<double>(window_height) * img_width)),
         max_texture_size, 16U);
-    const auto w_scale = (static_cast<core::Real>(img_width_pixels) * img_height) / (img_width * static_cast<core::Real>(fnt_height));
-    const auto width_to_pixel = static_cast<core::Real>(img_width_pixels) / img_width;
+    const auto w_scale = (static_cast<double>(img_width_pixels) * img_height) / (img_width * static_cast<double>(fnt_height));
+    const auto width_to_pixel = static_cast<double>(img_width_pixels) / img_width;
     std::size_t index = 0;
     while (txt_widths[index] < img_start_skip)
         ++index;
-    const auto base_line = static_cast<core::Real>(ascent) * h_scale;
+    const auto base_line = static_cast<double>(ascent) * h_scale;
     std::vector<unsigned char> rnd_data(static_cast<std::size_t>(img_width_pixels) * static_cast<std::size_t>(img_height_pixels));
     const auto xpos_start = (txt_widths[index] - img_start_skip) * width_to_pixel;
     const auto txt_end_index = text.size() - 1;
@@ -175,7 +175,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::font::
         stbtt_GetCodepointHMetrics(stb_font.get(), c, &advance, &lsb);
         stbtt_GetCodepointBitmapBoxSubpixel(stb_font.get(), c, w_scale, h_scale, x_shift, y_shift, &x0, &y0, &x1, &y1);
         stbtt_MakeCodepointBitmapSubpixel(stb_font.get(), &rnd_data[get_index(x0, y0)], x1 - x0, y1 - y0, img_width_pixels, w_scale, h_scale, x_shift, y_shift, c);
-        xpos += w_scale * static_cast<core::Real>(advance + stbtt_GetCodepointKernAdvance(stb_font.get(), c, next_c));
+        xpos += w_scale * static_cast<double>(advance + stbtt_GetCodepointKernAdvance(stb_font.get(), c, next_c));
     }
     if (txt_widths[index] <= txt_end_width) {
         const wchar_t c = text[index];
@@ -225,12 +225,12 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::font::
 
 std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::font::Font2D::bake(
     const std::wstring& text,
-    const math::Vec4& color,
-    const core::Real img_height,
-    core::Real& img_width,
+    const math::Vec4<double>& color,
+    const double img_height,
+    double& img_width,
     core::sync::EndCaller<texture::Texture2D>& end) const noexcept
 {
-    std::vector<core::Real> widths(text.size() + 1);
+    std::vector<double> widths(text.size() + 1);
     compute_text_widths(text, img_height, widths);
     img_width = widths.back();
     return bake(text, widths, color, img_width, img_height, 0.0f, end);

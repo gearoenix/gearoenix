@@ -13,7 +13,7 @@ class Model;
 
 namespace gearoenix::render::light {
 class Directional final : public Light {
-    GX_GETSET_CREF_PRV(math::Vec3<float>, direction)
+    GX_GETSET_CREF_PRV(math::Vec3<double>, direction)
 public:
     Directional(core::Id id, system::stream::Stream* f, engine::Engine* e) noexcept;
     Directional(core::Id id, engine::Engine* e) noexcept;

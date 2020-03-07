@@ -20,13 +20,13 @@ gearoenix::render::reflection::Runtime::Runtime(
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
     : Reflection(id, Type::Runtime, e)
 {
-    constexpr std::tuple<texture::Face, math::Vec3, math::Vec3> faces[6] = {
-        { texture::FACES[0], math::Vec3(1.0f, 0.0f, 0.0f), math::Vec3(0.0f, 0.0f, 1.0f) },
-        { texture::FACES[1], math::Vec3(-1.0f, 0.0f, 0.0f), math::Vec3(0.0f, 0.0f, 1.0f) },
-        { texture::FACES[2], math::Vec3(0.0f, 1.0f, 0.0f), math::Vec3(0.0f, 0.0f, 1.0f) },
-        { texture::FACES[3], math::Vec3(0.0f, -1.0f, 0.0f), math::Vec3(0.0f, 0.0f, 1.0f) },
-        { texture::FACES[4], math::Vec3(0.0f, 0.0f, 1.0f), math::Vec3(0.0f, -1.0f, 0.0f) },
-        { texture::FACES[5], math::Vec3(0.0f, 0.0f, -1.0f), math::Vec3(0.0f, 1.0f, 0.0f) },
+    constexpr std::tuple<texture::Face, math::Vec3<double>, math::Vec3<double>> faces[6] = {
+        { texture::FACES[0], math::Vec3(1.0, 0.0, 0.0), math::Vec3(0.0, 0.0, 1.0) },
+        { texture::FACES[1], math::Vec3(-1.0, 0.0, 0.0), math::Vec3(0.0, 0.0, 1.0) },
+        { texture::FACES[2], math::Vec3(0.0, 1.0, 0.0), math::Vec3(0.0, 0.0, 1.0) },
+        { texture::FACES[3], math::Vec3(0.0, -1.0, 0.0), math::Vec3(0.0, 0.0, 1.0) },
+        { texture::FACES[4], math::Vec3(0.0, 0.0, 1.0), math::Vec3(0.0, -1.0, 0.0) },
+        { texture::FACES[5], math::Vec3(0.0, 0.0, -1.0), math::Vec3(0.0, 1.0, 0.0) },
     };
     constexpr texture::TextureInfo texture_info {
         .format = texture::TextureFormat::RgbaFloat32,
@@ -51,8 +51,8 @@ gearoenix::render::reflection::Runtime::Runtime(
     const auto specular_resolution = static_cast<unsigned int>(render_config.runtime_reflection_specular_resolution);
     const auto specular_mips_count = render_config.runtime_reflection_specular_levels;
     for (auto i = 0; i < specular_mips_count; ++i) {
-        const auto fi = static_cast<core::Real>(i);
-        const auto fm = static_cast<core::Real>(specular_mips_count - 1);
+        const auto fi = static_cast<double>(i);
+        const auto fm = static_cast<double>(specular_mips_count - 1);
         roughnesses.push_back((fi + (fm * 0.5f - fi) * 0.001f) / fm);
     }
 #ifdef GX_DEBUG_MODE
@@ -124,10 +124,10 @@ gearoenix::render::reflection::Runtime::Runtime(
 
 gearoenix::render::reflection::Runtime::~Runtime() noexcept = default;
 
-void gearoenix::render::reflection::Runtime::set_receiving_radius(const core::Real r) noexcept
+void gearoenix::render::reflection::Runtime::set_receiving_radius(const double r) noexcept
 {
     receiving_radius = r;
     for (const auto& cam : cameras) {
-        cam->set_far(r);
+        cam->set_far(static_cast<float>(r));
     }
 }

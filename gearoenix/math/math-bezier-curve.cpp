@@ -1,5 +1,4 @@
 #include "math-bezier-curve.hpp"
-#include "../core/cr-build-configuration.hpp"
 #include "../system/sys-log.hpp"
 #include "math-plotter.hpp"
 #include <cmath>
@@ -10,18 +9,18 @@ void gearoenix::math::CubicBezierCurve2D::create_smooth_non_overlapping_blunt_cl
     // some mine tricks, becareful it has license! :D
     std::random_device r;
     std::default_random_engine e1(r());
-    std::uniform_real_distribution<core::Real> ud1(0.8f, 1.3f);
-    std::uniform_real_distribution<core::Real> ud2(0.6f, 1.3f);
+    std::uniform_real_distribution<double> ud1(0.8f, 1.3f);
+    std::uniform_real_distribution<double> ud2(0.6f, 1.3f);
     const int cnt = (int)points.size() - 1;
-    const core::Real d = 3.14f / core::Real(cnt);
-    const core::Real d2 = 2.0f * d;
-    const core::Real cl = std::tan(d);
-    const core::Real sin = std::sin(d2);
-    const core::Real cos = std::cos(d2);
+    const double d = 3.14f / double(cnt);
+    const double d2 = 2.0f * d;
+    const double cl = std::tan(d);
+    const double sin = std::sin(d2);
+    const double cos = std::cos(d2);
     const Vec2 rotmr1(cos, -sin);
     const Vec2 rotmr2(sin, cos);
-    Vec2 laspos(1.0f, 0.0f);
-    Vec2 lascrt(0.0f, 1.0f);
+    Vec2 laspos(1.0, 0.0);
+    Vec2 lascrt(0.0, 1.0);
     for (int i = 0; i < cnt; ++i) {
         Point& p = points[i];
         p.position = laspos * ud2(e1);
@@ -32,21 +31,18 @@ void gearoenix::math::CubicBezierCurve2D::create_smooth_non_overlapping_blunt_cl
     }
     points[cnt] = points[0];
     for (int pnti = 0, pntj = 1; pnti < cnt; ++pnti, ++pntj) {
-        Vec2 inter;
-        if (Vec2::intersect(points[pnti].position, points[pnti].out, points[pntj].in, points[pntj].position, inter)) {
-            points[pnti].out = inter;
+        if (const auto inter = Vec2<double>::intersect(points[pnti].position, points[pnti].out, points[pntj].in, points[pntj].position)) {
+            points[pnti].out = *inter;
             if (pnti == 0)
-                points[cnt].out = inter;
-            points[pntj].in = inter;
+                points[cnt].out = *inter;
+            points[pntj].in = *inter;
             if (pntj == cnt)
-                points[0].in = inter;
+                points[0].in = *inter;
         }
     }
 }
 
-gearoenix::math::CubicBezierCurve2D::CubicBezierCurve2D()
-{
-}
+gearoenix::math::CubicBezierCurve2D::CubicBezierCurve2D() = default;
 
 gearoenix::math::CubicBezierCurve2D::CubicBezierCurve2D(const int points_count)
     : points(points_count)
@@ -71,16 +67,16 @@ gearoenix::math::CubicBezierCurve2D::CubicBezierCurve2D(const int points_count, 
         GXUNIMPLEMENTED;
 }
 
-void gearoenix::math::CubicBezierCurve2D::normalize(const core::Real scale)
+void gearoenix::math::CubicBezierCurve2D::normalize(const double scale)
 {
-    const core::Real scale2 = 0.9f * scale;
-    const core::Real scale3 = 0.05f * scale;
+    const double scale2 = 0.9f * scale;
+    const double scale3 = 0.05f * scale;
     const int points_count = (int)points.size();
     if (points_count == 0)
         return;
-    core::Real maxx = points[0].in[0], minx = points[0].in[0];
-    core::Real maxy = points[0].in[1], miny = points[0].in[1];
-    auto mm = [&](const core::Real x, const core::Real y) {
+    double maxx = points[0].in[0], minx = points[0].in[0];
+    double maxy = points[0].in[1], miny = points[0].in[1];
+    auto mm = [&](const double x, const double y) {
         if (maxx < x)
             maxx = x;
         else if (minx > x)
@@ -99,7 +95,7 @@ void gearoenix::math::CubicBezierCurve2D::normalize(const core::Real scale)
     maxy -= miny;
     if (maxx == 0.0f || maxy == 0.0f)
         return;
-    const core::Real s = maxx > maxy ? scale2 / maxx : scale2 / maxy;
+    const double s = maxx > maxy ? scale2 / maxx : scale2 / maxy;
     for (int i = 0; i < points_count; ++i) {
         Point& p = points[i];
         p.in[0] = (p.in[0] - minx) * s + scale3;
@@ -125,23 +121,23 @@ void gearoenix::math::CubicBezierCurve2D::render(std::uint32_t* pixels, const in
     const Plotter::Brush brush2(1, 0XFF00FF00);
     const int cnt = (int)points.size() - 1;
     for (int i = 0; i < cnt;) {
-        const math::Vec2& p1 = points[i].position;
-        const math::Vec2& p2 = points[i].out;
-        const math::Vec2& p3 = points[++i].in;
-        const math::Vec2& p4 = points[i].position;
+        const math::Vec2<double>& p1 = points[i].position;
+        const math::Vec2<double>& p2 = points[i].out;
+        const math::Vec2<double>& p3 = points[++i].in;
+        const math::Vec2<double>& p4 = points[i].position;
         // todo add occlusion culling
-        core::Real tstep = p1.distance(p2);
+        double tstep = p1.distance(p2);
         tstep += p2.distance(p3);
         tstep += p3.distance(p4);
         tstep = 1.0f / tstep;
-        for (core::Real t = tstep; t < 1.0f; t += tstep) {
-            const core::Real nt = 1.0f - t;
-            const core::Real nt2 = nt * nt;
-            const core::Real nt3 = nt2 * nt;
-            const core::Real t2 = t * t;
-            const core::Real t3 = t2 * t;
-            const core::Real ntt23 = nt * t2 * 3.0f;
-            const core::Real nt2t3 = nt2 * t * 3.0f;
+        for (double t = tstep; t < 1.0f; t += tstep) {
+            const double nt = 1.0f - t;
+            const double nt2 = nt * nt;
+            const double nt3 = nt2 * nt;
+            const double t2 = t * t;
+            const double t3 = t2 * t;
+            const double ntt23 = nt * t2 * 3.0f;
+            const double nt2t3 = nt2 * t * 3.0f;
             math::Vec2 p = p1 * nt3 + p2 * nt2t3 + p3 * ntt23 + p4 * t3;
             plotter.draw_point(p, brush1);
         }
@@ -155,36 +151,36 @@ void gearoenix::math::CubicBezierCurve2D::render(std::uint32_t* pixels, const in
     std::vector<Point> mappoints;
     const Plotter::Brush brush3(1, 0XFFFF0000);
     const Plotter::Brush brush4(1, 0XFF0000FF);
-    core::Real polylen = 0.0f;
+    double polylen = 0.0f;
     for (int i = 0; i < cnt;) {
-        const math::Vec2& p1 = points[i].position;
-        const math::Vec2& p2 = points[i].out;
-        const math::Vec2& p3 = points[++i].in;
-        const math::Vec2& p4 = points[i].position;
+        const math::Vec2<double>& p1 = points[i].position;
+        const math::Vec2<double>& p2 = points[i].out;
+        const math::Vec2<double>& p3 = points[++i].in;
+        const math::Vec2<double>& p4 = points[i].position;
         // todo add occlusion culling
-        core::Real tstep = p1.distance(p2);
+        double tstep = p1.distance(p2);
         tstep += p2.distance(p3);
         tstep += p3.distance(p4);
         tstep = 2.0f / tstep;
-        Vec2 prep = p1;
-        for (core::Real t = tstep; t < 1.0f; t += tstep) {
-            const core::Real nt = 1.0f - t;
-            const core::Real nt2 = nt * nt;
-            const core::Real nt3 = nt2 * nt;
-            const core::Real t2 = t * t;
-            const core::Real t3 = t2 * t;
-            const core::Real ntt23 = nt * t2 * 3.0f;
-            const core::Real nt2t3 = nt2 * t * 3.0f;
+        Vec2<double> prep = p1;
+        for (double t = tstep; t < 1.0f; t += tstep) {
+            const double nt = 1.0f - t;
+            const double nt2 = nt * nt;
+            const double nt3 = nt2 * nt;
+            const double t2 = t * t;
+            const double t3 = t2 * t;
+            const double ntt23 = nt * t2 * 3.0f;
+            const double nt2t3 = nt2 * t * 3.0f;
             const math::Vec2 p = p1 * nt3 + p2 * nt2t3 + p3 * ntt23 + p4 * t3;
             math::Vec2 prp = p - prep;
-            const core::Real len = prp.length();
+            const double len = prp.length();
             polylen += len;
             if (polylen > 20.0f && len != 0.0f) {
-                const core::Real ilen = 1.0f / len;
+                const double ilen = 1.0f / len;
                 polylen = 0.0f;
                 prep = p;
                 prp *= ilen;
-                core::Real tmp = prp[0];
+                double tmp = prp[0];
                 prp[0] = -prp[1];
                 prp[1] = tmp;
                 Point curpnt;
@@ -197,17 +193,17 @@ void gearoenix::math::CubicBezierCurve2D::render(std::uint32_t* pixels, const in
         }
     }
     const int prp_count = (int)mappoints.size();
-    Vec2 pathdir;
-    Vec2 laspos = mappoints[0].position;
+    Vec2<double> pathdir;
+    Vec2<double> laspos = mappoints[0].position;
     std::vector<Point> mmapp;
     mmapp.push_back(mappoints[cnt]);
     mmapp.push_back(mappoints[0]);
     pathdir = laspos - mappoints[cnt].position;
     pathdir.normalize();
     for (int i = 1; i < prp_count; ++i) {
-        const Vec2& p1 = mappoints[i].position;
+        const Vec2<double>& p1 = mappoints[i].position;
         const Vec2 curdir = p1 - laspos;
-        const core::Real dv = std::abs(curdir.cross(pathdir));
+        const double dv = std::abs(curdir.cross(pathdir));
         laspos = mappoints[i].position;
         if (dv > 0.5f) {
             pathdir = curdir;

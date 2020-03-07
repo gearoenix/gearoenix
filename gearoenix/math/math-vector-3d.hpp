@@ -35,6 +35,14 @@ struct Vec3 {
     {
     }
 
+    template <typename T>
+    constexpr explicit Vec3(const Vec3<T>& o) noexcept
+        : x(static_cast<Element>(o.x))
+        , y(static_cast<Element>(o.y))
+        , z(static_cast<Element>(o.z))
+    {
+    }
+
     constexpr Vec3<Element> operator-() const noexcept
     {
         return Vec3<Element>(-x, -y, -z);
@@ -145,9 +153,7 @@ struct Vec3 {
     constexpr void operator/=(const Element o) noexcept
     {
         const auto m = static_cast<Element>(1) / o;
-        x *= m;
-        y *= m;
-        z *= m;
+        *this *= m;
     }
 
     template <typename T>
@@ -294,7 +300,7 @@ struct Vec3 {
         return *this / length();
     }
 
-    constexpr void normalize() const noexcept
+    constexpr void normalize() noexcept
     {
         *this /= length();
     }

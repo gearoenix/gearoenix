@@ -7,9 +7,7 @@ gearoenix::physics::body::Body::Body(const core::Id my_id, const Behaviour::Type
 {
 }
 
-gearoenix::physics::body::Body::~Body()
-{
-}
+gearoenix::physics::body::Body::~Body() = default;
 
 gearoenix::physics::body::Body::Behaviour::Type gearoenix::physics::body::Body::get_body_type() const
 {

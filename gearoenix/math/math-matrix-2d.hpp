@@ -11,15 +11,7 @@ struct Mat2x2 {
     Element e2;
     Element e3;
 
-    constexpr Mat2x2() noexcept
-        : e0(static_cast<Element>(0))
-        , e1(static_cast<Element>(0))
-        , e2(static_cast<Element>(0))
-        , e3(static_cast<Element>(0))
-    {
-    }
-
-    constexpr explicit Mat2x2(const Element diameter) noexcept
+    constexpr explicit Mat2x2(const Element diameter = static_cast<Element>(0)) noexcept
         : e0(diameter)
         , e1(static_cast<Element>(0))
         , e2(static_cast<Element>(0))
@@ -53,12 +45,9 @@ struct Mat2x2 {
         return true;
     }
 
-    template <typename T, typename R>
-    constexpr Vec2<R> operator*(const Vec2<T>& v) const noexcept
+    constexpr Vec2<Element> operator*(const Vec2<Element>& v) const noexcept
     {
-        return Vec2(
-            static_cast<R>(e0) * static_cast<R>(v.x) + static_cast<R>(e1) * static_cast<R>(v.y),
-            static_cast<R>(e2) * static_cast<R>(v.x) + static_cast<R>(e3) * static_cast<R>(v.y));
+        return Vec2(e0 * v.x + e1 * v.y, e2 * v.x + e3 * v.y);
     }
 };
 }

@@ -47,6 +47,17 @@ struct Mat4x4 {
     {
     }
 
+    template <typename T>
+    constexpr explicit Mat4x4(const Mat4x4<T>& m) noexcept
+        : data {
+            { static_cast<Element>(m.data[0][0]), static_cast<Element>(m.data[0][1]), static_cast<Element>(m.data[0][2]), static_cast<Element>(m.data[0][3]) },
+            { static_cast<Element>(m.data[1][0]), static_cast<Element>(m.data[1][1]), static_cast<Element>(m.data[1][2]), static_cast<Element>(m.data[1][3]) },
+            { static_cast<Element>(m.data[2][0]), static_cast<Element>(m.data[2][1]), static_cast<Element>(m.data[2][2]), static_cast<Element>(m.data[2][3]) },
+            { static_cast<Element>(m.data[3][0]), static_cast<Element>(m.data[3][1]), static_cast<Element>(m.data[3][2]), static_cast<Element>(m.data[3][3]) },
+        }
+    {
+    }
+
     [[nodiscard]] constexpr Vec4<Element> operator*(const Vec4<Element>& v) const noexcept
     {
         return Vec4<Element>(
@@ -336,22 +347,22 @@ struct Mat4x4 {
 
     [[nodiscard]] constexpr static Mat4x4<Element> rotation(const Vec3<Element>& v, const Element degree) noexcept
     {
-        const auto sinus = static_cast<core::Real>(sin(static_cast<double>(degree)));
-        const auto cosinus = static_cast<core::Real>(cos(static_cast<double>(degree)));
-        const core::Real oneminuscos = 1.0f - cosinus;
+        const auto sinus = static_cast<Element>(sin(static_cast<double>(degree)));
+        const auto cosinus = static_cast<Element>(cos(static_cast<double>(degree)));
+        const Element oneminuscos = 1.0f - cosinus;
         const Vec3 w = v.normalized();
-        const core::Real wx2 = w[0] * w[0];
-        const core::Real wxy = w[0] * w[1];
-        const core::Real wxz = w[0] * w[2];
-        const core::Real wy2 = w[1] * w[1];
-        const core::Real wyz = w[1] * w[2];
-        const core::Real wz2 = w[2] * w[2];
-        const core::Real wxyonemincos = wxy * oneminuscos;
-        const core::Real wxzonemincos = wxz * oneminuscos;
-        const core::Real wyzonemincos = wyz * oneminuscos;
-        const core::Real wxsin = w[0] * sinus;
-        const core::Real wysin = w[1] * sinus;
-        const core::Real wzsin = w[2] * sinus;
+        const Element wx2 = w[0] * w[0];
+        const Element wxy = w[0] * w[1];
+        const Element wxz = w[0] * w[2];
+        const Element wy2 = w[1] * w[1];
+        const Element wyz = w[1] * w[2];
+        const Element wz2 = w[2] * w[2];
+        const Element wxyonemincos = wxy * oneminuscos;
+        const Element wxzonemincos = wxz * oneminuscos;
+        const Element wyzonemincos = wyz * oneminuscos;
+        const Element wxsin = w[0] * sinus;
+        const Element wysin = w[1] * sinus;
+        const Element wzsin = w[2] * sinus;
         Mat4x4 m;
         m.data[0][0] = cosinus + (wx2 * oneminuscos);
         m.data[0][1] = wzsin + wxyonemincos;
@@ -397,21 +408,21 @@ struct Mat4x4 {
     [[nodiscard]] constexpr static Mat4x4<Element> orthographic(const Element width, const Element height, const Element near, const Element far) noexcept
     {
         Mat4x4 r;
-        r.data[0][0] = core::Real(2.0f / width);
+        r.data[0][0] = Element(2.0f / width);
         r.data[0][1] = static_cast<Element>(0);
         r.data[0][2] = static_cast<Element>(0);
         r.data[0][3] = static_cast<Element>(0);
         r.data[1][0] = static_cast<Element>(0);
-        r.data[1][1] = core::Real(2.0f / height);
+        r.data[1][1] = Element(2.0f / height);
         r.data[1][2] = static_cast<Element>(0);
         r.data[1][3] = static_cast<Element>(0);
         r.data[2][0] = static_cast<Element>(0);
         r.data[2][1] = static_cast<Element>(0);
-        r.data[2][2] = core::Real(2.0f / (near - far));
+        r.data[2][2] = Element(2.0f / (near - far));
         r.data[2][3] = static_cast<Element>(0);
         r.data[3][0] = static_cast<Element>(0);
         r.data[3][1] = static_cast<Element>(0);
-        r.data[3][2] = core::Real((far + near) / (near - far));
+        r.data[3][2] = Element((far + near) / (near - far));
         r.data[3][3] = static_cast<Element>(1);
         return r;
     }
@@ -419,21 +430,21 @@ struct Mat4x4 {
     [[nodiscard]] constexpr static Mat4x4<Element> perspective(const Element width, const Element height, const Element near, const Element far) noexcept
     {
         Mat4x4 r;
-        r.data[0][0] = core::Real((2.0f * near) / width);
+        r.data[0][0] = Element((2.0f * near) / width);
         r.data[0][1] = static_cast<Element>(0);
         r.data[0][2] = static_cast<Element>(0);
         r.data[0][3] = static_cast<Element>(0);
         r.data[1][0] = static_cast<Element>(0);
-        r.data[1][1] = core::Real((2.0f * near) / height);
+        r.data[1][1] = Element((2.0f * near) / height);
         r.data[1][2] = static_cast<Element>(0);
         r.data[1][3] = static_cast<Element>(0);
         r.data[2][0] = static_cast<Element>(0);
         r.data[2][1] = static_cast<Element>(0);
-        r.data[2][2] = core::Real((far + near) / (near - far));
-        r.data[2][3] = core::Real(-1.0);
+        r.data[2][2] = Element((far + near) / (near - far));
+        r.data[2][3] = Element(-1.0);
         r.data[3][0] = static_cast<Element>(0);
         r.data[3][1] = static_cast<Element>(0);
-        r.data[3][2] = core::Real((2.0f * far * near) / (near - far));
+        r.data[3][2] = Element((2.0f * far * near) / (near - far));
         r.data[3][3] = static_cast<Element>(0);
         return r;
     }

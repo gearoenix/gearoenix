@@ -4,7 +4,6 @@
 #include "../../render/buffer/rnd-buf-uniform.hpp"
 #include "../../render/camera/rnd-cmr-uniform.hpp"
 #include "../../render/graph/node/rnd-gr-nd-forward-pbr.hpp"
-#include "../../render/light/rnd-lt-directional.hpp"
 #include "../../render/material/rnd-mat-pbr.hpp"
 #include "../../render/mesh/rnd-msh-mesh.hpp"
 #include "../../render/scene/rnd-scn-uniform.hpp"
@@ -31,7 +30,7 @@ void gearoenix::gles2::pipeline::ForwardPbrResourceSet::bind_final(gl::uint& bou
     GX_GLES2_PIP_RES_START_SHADER(ForwardPbr, shd)
     const auto* const camera = camera_uniform_buffer->get_ptr<render::camera::Uniform>();
     GX_GLES2_PIP_RES_SET_UNIFORM(camera_position, *(camera->position.data()))
-    GX_GLES2_PIP_RES_SET_UNIFORM(camera_vp, *(camera->view_projection.data()))
+    GX_GLES2_PIP_RES_SET_UNIFORM(camera_vp, camera->view_projection.data[0][0])
     //static_cast<const texture::Texture2D *>(ambient_occlusion.get())->bind(shdr->get_effect_ambient_occlusion_index());
     reinterpret_cast<const texture::Texture2D*>(brdflut)->bind(static_cast<gl::enumerated>(shdr->get_effect_brdflut_index()));
     reinterpret_cast<const texture::TextureCube*>(diffuse_environment)->bind(static_cast<gl::enumerated>(shdr->get_effect_diffuse_environment_index()));
@@ -57,8 +56,8 @@ void gearoenix::gles2::pipeline::ForwardPbrResourceSet::bind_final(gl::uint& bou
     GX_GLES2_PIP_RES_SET_UNIFORM(material_normal_scale, material->normal_scale)
     //GX_GLES2_PIP_RES_SET_UNIFORM(material_occlusion_strength, material->occlusion_strength)
     GX_GLES2_PIP_RES_SET_UNIFORM(material_roughness_factor, material->roughness_factor)
-    const auto* const model = model_uniform_buffer->get_ptr<math::Mat4x4>();
-    GX_GLES2_PIP_RES_SET_UNIFORM(model_m, *(model->data()))
+    const auto* const model = model_uniform_buffer->get_ptr<math::Mat4x4<float>>();
+    GX_GLES2_PIP_RES_SET_UNIFORM(model_m, model->data[0][0])
     const auto* const scene = scene_uniform_buffer->get_ptr<render::scene::Uniform>();
     GX_GLES2_PIP_RES_SET_UNIFORM(scene_ambient_light, *(scene->ambient_light.data()))
     GX_GLES2_PIP_RES_SET_UNIFORM(scene_directional_lights_color, *(scene->directional_lights_color[0].data()))
@@ -69,7 +68,7 @@ void gearoenix::gles2::pipeline::ForwardPbrResourceSet::bind_final(gl::uint& bou
     GX_GLES2_PIP_RES_SET_UNIFORM(effect_point_lights_color_min_radius, *(node->point_lights_color_min_radius[0].data()))
     GX_GLES2_PIP_RES_SET_UNIFORM(effect_point_lights_count, node->point_lights_count)
     GX_GLES2_PIP_RES_SET_UNIFORM(effect_point_lights_position_max_radius, *(node->point_lights_position_max_radius[0].data()))
-    GX_GLES2_PIP_RES_SET_UNIFORM(effect_shadow_caster_directional_lights_cascades_view_projection_bias, *(node->shadow_caster_directional_lights_cascades_view_projections_bias[0].data()))
+    GX_GLES2_PIP_RES_SET_UNIFORM(effect_shadow_caster_directional_lights_cascades_view_projection_bias, node->shadow_caster_directional_lights_cascades_view_projections_bias[0].data[0][0])
     GX_GLES2_PIP_RES_SET_UNIFORM(effect_shadow_caster_directional_lights_color_cascades_count, *(node->shadow_caster_directional_lights_color_cascades_count[0].data()))
     GX_GLES2_PIP_RES_SET_UNIFORM(effect_shadow_caster_directional_lights_count, node->shadow_caster_directional_lights_count)
     GX_GLES2_PIP_RES_SET_UNIFORM(effect_shadow_caster_directional_lights_direction, *(node->shadow_caster_directional_lights_direction[0].data()))

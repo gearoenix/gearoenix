@@ -133,11 +133,11 @@ struct Vec2 {
     constexpr void operator/=(const Element e) noexcept
     {
         const auto m = static_cast<Element>(1) / e;
-        *this /= m;
+        *this *= m;
     }
 
     template <typename T>
-    [[nodiscard]] constexpr const typename std::enable_if<std::numeric_limits<T>::is_integer, Element>::type&
+    [[nodiscard]] typename std::enable_if<std::numeric_limits<T>::is_integer, Element>::type
     operator[](const T i) const noexcept
     {
         switch (i) {
@@ -146,12 +146,12 @@ struct Vec2 {
         case static_cast<T>(1):
             return y;
         default:
-            return *reinterpret_cast<Element>(nullptr);
+            GXLOGF("Out of bound index: " << i)
         }
     }
 
     template <typename T>
-    [[nodiscard]] constexpr typename std::enable_if<std::numeric_limits<T>::is_integer, Element>::type&
+    [[nodiscard]] typename std::enable_if<std::numeric_limits<T>::is_integer, Element>::type&
     operator[](const T i) noexcept
     {
         switch (i) {
@@ -160,7 +160,7 @@ struct Vec2 {
         case static_cast<T>(1):
             return y;
         default:
-            return *reinterpret_cast<Element>(nullptr);
+            GXLOGF("Out of bound index: " << i)
         }
     }
 
@@ -206,7 +206,7 @@ struct Vec2 {
         return Vec2(GX_MAX(x, o.x), GX_MAX(y, o.y));
     }
 
-    [[nodiscard]] constexpr Vec2<Element> min(const Vec2<Element>& o) const noexcept
+    [[nodiscard]] constexpr Vec2<Element> minimum(const Vec2<Element>& o) const noexcept
     {
         return Vec2(GX_MIN(x, o.x), GX_MIN(y, o.y));
     }
@@ -286,7 +286,7 @@ constexpr std::optional<gearoenix::math::Vec2<Element>> gearoenix::math::Vec2<El
     // d = | v0 v1 | * s
     const auto v0 = s12 - s11;
     const auto v1 = s22 - s21;
-    const Mat2x2 m(v0.x, -v1.x, v0.y, -v1.y);
+    Mat2x2 m(v0.x, -v1.x, v0.y, -v1.y);
     if (!m.invert())
         return std::nullopt;
     const auto d = s21 - s11;

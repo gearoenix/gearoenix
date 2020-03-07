@@ -34,45 +34,45 @@ gearoenix::render::material::Pbr::Pbr(system::stream::Stream* const f, engine::E
     }
     // Reading color
     if (f->read_bool()) {
-        core::sync::EndCaller<texture::Texture> tcall([end](const std::shared_ptr<texture::Texture>&) {});
-        color_texture = std::dynamic_pointer_cast<texture::Texture2D>(txt_mgr->get_gx3d(f->read<core::Id>(), tcall));
+        core::sync::EndCaller<texture::Texture> txt_call([end](const std::shared_ptr<texture::Texture>&) {});
+        color_texture = std::dynamic_pointer_cast<texture::Texture2D>(txt_mgr->get_gx3d(f->read<core::Id>(), txt_call));
     } else {
-        core::sync::EndCaller<texture::Texture2D> tcall([end](const std::shared_ptr<texture::Texture2D>&) {});
-        math::Vec4 color;
+        core::sync::EndCaller<texture::Texture2D> txt_call([end](const std::shared_ptr<texture::Texture2D>&) {});
+        math::Vec4<float> color;
         color.read(f);
-        color_texture = std::dynamic_pointer_cast<texture::Texture2D>(txt_mgr->get_2d(color, tcall));
+        color_texture = std::dynamic_pointer_cast<texture::Texture2D>(txt_mgr->get_2d(color, txt_call));
         color_value = color;
     }
     // Reading emission
     if (f->read_bool()) {
-        core::sync::EndCaller<texture::Texture> tcall([end](const std::shared_ptr<texture::Texture>&) {});
-        emission_texture = std::dynamic_pointer_cast<texture::Texture2D>(txt_mgr->get_gx3d(f->read<core::Id>(), tcall));
+        core::sync::EndCaller<texture::Texture> txt_call([end](const std::shared_ptr<texture::Texture>&) {});
+        emission_texture = std::dynamic_pointer_cast<texture::Texture2D>(txt_mgr->get_gx3d(f->read<core::Id>(), txt_call));
     } else {
-        core::sync::EndCaller<texture::Texture2D> tcall([end](const std::shared_ptr<texture::Texture2D>&) {});
-        math::Vec3 emission;
+        core::sync::EndCaller<texture::Texture2D> txt_call([end](const std::shared_ptr<texture::Texture2D>&) {});
+        math::Vec3<float> emission;
         emission.read(f);
-        emission_texture = std::dynamic_pointer_cast<texture::Texture2D>(txt_mgr->get_2d(emission, tcall));
+        emission_texture = std::dynamic_pointer_cast<texture::Texture2D>(txt_mgr->get_2d(emission, txt_call));
         emission_value = emission;
     }
     // Reading metallic_roughness
     if (f->read_bool()) {
-        core::sync::EndCaller<texture::Texture> tcall([end](const std::shared_ptr<texture::Texture>&) {});
-        metallic_roughness_texture = std::dynamic_pointer_cast<texture::Texture2D>(txt_mgr->get_gx3d(f->read<core::Id>(), tcall));
+        core::sync::EndCaller<texture::Texture> txt_call([end](const std::shared_ptr<texture::Texture>&) {});
+        metallic_roughness_texture = std::dynamic_pointer_cast<texture::Texture2D>(txt_mgr->get_gx3d(f->read<core::Id>(), txt_call));
     } else {
-        core::sync::EndCaller<texture::Texture2D> tcall([end](const std::shared_ptr<texture::Texture2D>&) {});
-        math::Vec2 metallic_roughness;
+        core::sync::EndCaller<texture::Texture2D> txt_call([end](const std::shared_ptr<texture::Texture2D>&) {});
+        math::Vec2<float> metallic_roughness;
         metallic_roughness.read(f);
-        metallic_roughness_texture = std::dynamic_pointer_cast<texture::Texture2D>(txt_mgr->get_2d(metallic_roughness, tcall));
+        metallic_roughness_texture = std::dynamic_pointer_cast<texture::Texture2D>(txt_mgr->get_2d(metallic_roughness, txt_call));
         metallic_roughness_value = metallic_roughness;
     }
     // Reading normal
     if (f->read_bool()) {
-        core::sync::EndCaller<texture::Texture> tcall([end](const std::shared_ptr<texture::Texture>&) {});
-        normal_texture = std::dynamic_pointer_cast<texture::Texture2D>(txt_mgr->get_gx3d(f->read<core::Id>(), tcall));
+        core::sync::EndCaller<texture::Texture> txt_call([end](const std::shared_ptr<texture::Texture>&) {});
+        normal_texture = std::dynamic_pointer_cast<texture::Texture2D>(txt_mgr->get_gx3d(f->read<core::Id>(), txt_call));
     } else {
-        core::sync::EndCaller<texture::Texture2D> tcall([end](const std::shared_ptr<texture::Texture2D>&) {});
+        core::sync::EndCaller<texture::Texture2D> txt_call([end](const std::shared_ptr<texture::Texture2D>&) {});
         normal_value = math::Vec3(0.5f, 0.5f, 1.0f);
-        normal_texture = std::dynamic_pointer_cast<texture::Texture2D>(txt_mgr->get_2d(normal_value.value(), tcall));
+        normal_texture = std::dynamic_pointer_cast<texture::Texture2D>(txt_mgr->get_2d(normal_value.value(), txt_call));
     }
     // Translucency
     if (f->read_bool())
@@ -88,32 +88,32 @@ void gearoenix::render::material::Pbr::Pbr::update() noexcept
     uniform_buffers->update(uniform);
 }
 
-void gearoenix::render::material::Pbr::set_metallic_factor(const core::Real f) noexcept
+void gearoenix::render::material::Pbr::set_metallic_factor(const float f) noexcept
 {
     uniform.metallic_factor = f;
 }
 
-void gearoenix::render::material::Pbr::set_roughness_factor(const core::Real f) noexcept
+void gearoenix::render::material::Pbr::set_roughness_factor(const float f) noexcept
 {
     uniform.roughness_factor = f;
 }
 
 void gearoenix::render::material::Pbr::set_color(
-    const core::Real r, const core::Real g, const core::Real b,
+    const float r, const float g, const float b,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept
 {
-    core::sync::EndCaller<texture::Texture2D> calltxt2d([end](const std::shared_ptr<texture::Texture2D>&) {});
-    auto* const txtmgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
-    color_texture = txtmgr->get_2d(math::Vec3(r, g, b), calltxt2d);
+    core::sync::EndCaller<texture::Texture2D> call_txt_2d([end](const std::shared_ptr<texture::Texture2D>&) {});
+    auto* const txt_mgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
+    color_texture = txt_mgr->get_2d(math::Vec3(r, g, b), call_txt_2d);
     color_value = math::Vec4(r, g, b, 1.0f);
 }
 
-void gearoenix::render::material::Pbr::set_color(const math::Vec4& c,
+void gearoenix::render::material::Pbr::set_color(const math::Vec4<float>& c,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept
 {
-    core::sync::EndCaller<texture::Texture2D> calltxt2d([end](const std::shared_ptr<texture::Texture2D>&) {});
-    auto* const txtmgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
-    color_texture = txtmgr->get_2d(c, calltxt2d);
+    core::sync::EndCaller<texture::Texture2D> call_txt_2d([end](const std::shared_ptr<texture::Texture2D>&) {});
+    auto* const txt_mgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
+    color_texture = txt_mgr->get_2d(c, call_txt_2d);
     color_value = c;
 }
 
@@ -122,7 +122,7 @@ void gearoenix::render::material::Pbr::set_color(const std::shared_ptr<texture::
     color_texture = c;
 }
 
-void gearoenix::render::material::Pbr::set_alpha(const core::Real a) noexcept
+void gearoenix::render::material::Pbr::set_alpha(const float a) noexcept
 {
     uniform.alpha = a;
 }

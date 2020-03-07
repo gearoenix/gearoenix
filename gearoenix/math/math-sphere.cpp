@@ -2,14 +2,14 @@
 #include "math-ray.hpp"
 #include <cmath>
 
-gearoenix::math::Sphere::Sphere(const Vec3<double>& center, const core::Real radius) noexcept
+gearoenix::math::Sphere::Sphere(const Vec3<double>& center, const double radius) noexcept
     : center(center)
     , radius(radius)
     , radius2(radius * radius)
 {
 }
 
-void gearoenix::math::Sphere::set_radius(const core::Real r) noexcept
+void gearoenix::math::Sphere::set_radius(const double r) noexcept
 {
     radius2 = r * r;
     radius = r;
@@ -20,14 +20,14 @@ void gearoenix::math::Sphere::set_center(const Vec3<double>& c) noexcept
     center = c;
 }
 
-void gearoenix::math::Sphere::insert(const gearoenix::core::Real r) noexcept
+void gearoenix::math::Sphere::insert(const double r) noexcept
 {
     if (radius < r) {
         set_radius(r);
     }
 }
 
-std::optional<gearoenix::core::Real> gearoenix::math::Sphere::hit(const math::Ray3& r) const noexcept
+std::optional<double> gearoenix::math::Sphere::hit(const math::Ray3& r) const noexcept
 {
     const auto dir = center - r.get_origin();
     const auto dir2 = dir.square_length();
@@ -43,7 +43,7 @@ std::optional<gearoenix::core::Real> gearoenix::math::Sphere::hit(const math::Ra
     return dis - std::sqrt(radius2 - a2);
 }
 
-std::optional<gearoenix::core::Real> gearoenix::math::Sphere::hit(const math::Ray3& r, const core::Real d_min) const noexcept
+std::optional<double> gearoenix::math::Sphere::hit(const math::Ray3& r, const double d_min) const noexcept
 {
     if (const auto h = hit(r))
         if ((*h) < d_min)
@@ -59,7 +59,7 @@ gearoenix::math::IntersectionStatus gearoenix::math::Sphere::check_intersection(
         return IntersectionStatus::Out;
     if (l == r)
         return IntersectionStatus::Tangent;
-    core::Real mnr, mxr;
+    double mnr, mxr;
     if (radius > o.radius) {
         mnr = o.radius;
         mxr = radius;

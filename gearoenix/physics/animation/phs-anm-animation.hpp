@@ -9,24 +9,24 @@
 namespace gearoenix::physics::animation {
 struct Animation {
     GX_GETSET_AVAL_PRV(bool, activity, true)
-    GX_GETSET_VAL_PRV(core::Real, duration, 0.0f)
+    GX_GETSET_VAL_PRV(double, duration, 0.0)
 private:
     // seconds from start, delta time
-    std::function<void(core::Real, core::Real)> action;
-    std::function<void(core::Real)> on_delete;
+    std::function<void(double, double)> action;
+    std::function<void(double)> on_delete;
     const std::chrono::high_resolution_clock::time_point start = std::chrono::high_resolution_clock::now();
 
 public:
     Animation(
-        const std::function<void(core::Real, core::Real)>& action,
-        core::Real duration,
-        const std::function<void(core::Real)>& on_delete = [](core::Real) noexcept {}) noexcept;
+        std::function<void(double, double)> action,
+        double duration,
+        std::function<void(double)> on_delete = [](double) noexcept {}) noexcept;
     ~Animation() noexcept;
     Animation(const Animation& other) noexcept = delete;
     void operator=(const Animation& other) noexcept = delete;
     // true means: delete the animation and animation will not apply anymore
     // false means: animation is working and active
-    bool apply(const std::chrono::high_resolution_clock::time_point& now, core::Real delta_seconds) noexcept;
+    bool apply(const std::chrono::high_resolution_clock::time_point& now, double delta_seconds) noexcept;
 };
 }
 #endif

@@ -24,7 +24,7 @@ struct Base {
         current_position = p;
         delta_position = current_position - previous_position;
         current_time = std::chrono::high_resolution_clock::now();
-        std::chrono::duration<Real> dt = current_time - previous_time;
+        std::chrono::duration<double> dt = current_time - previous_time;
         delta_time = dt.count();
         speed = delta_position / delta_time;
     }

@@ -7,14 +7,12 @@ gearoenix::render::reflection::Reflection::Reflection(
     const core::Id id,
     const Type t,
     render::engine::Engine* const e,
-    const math::Vec3<float>& position,
-    core::Real influence_radius) noexcept
+    const math::Vec3<double>& position,
+    const double influence_radius) noexcept
     : Asset(id, core::asset::Type::Reflection)
     , reflection_type(t)
     , e(e)
-    , collider(new physics::collider::Sphere(
-          math::Vec3<double>(static_cast<double>(position.x), static_cast<double>(position.y), static_cast<double>(position.z)),
-          static_cast<double>(influence_radius)))
+    , collider(new physics::collider::Sphere(position, influence_radius))
 {
 }
 

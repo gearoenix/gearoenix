@@ -101,7 +101,7 @@ class Engine {
     GX_GET_VAL_PRT(unsigned int, frames_count, 2)
     GX_GET_VAL_PRT(unsigned int, frame_number, 0)
     GX_GET_VAL_PRT(unsigned int, frame_number_from_start, 0)
-    GX_GET_VAL_PRT(core::Real, delta_time, 0.0f)
+    GX_GET_VAL_PRT(double, delta_time, 0.0f)
     // It is not owned by engine and the user who had set this, must delete it.
     // In addition, this design is temporary and in next version of engine it is going to be changed.
     //

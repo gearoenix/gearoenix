@@ -25,10 +25,10 @@ private:
     std::set<std::shared_ptr<Animation>> animations;
     std::vector<Kernel> kernels;
     std::chrono::high_resolution_clock::time_point time = std::chrono::high_resolution_clock::now();
-    core::Real duration = 0.0f;
+    double duration = 0.0;
 
 public:
-    Manager(core::sync::KernelWorkers* kernels) noexcept;
+    explicit Manager(core::sync::KernelWorkers* kernels) noexcept;
     ~Manager() noexcept;
     Manager(const Manager& o) noexcept = delete;
     void operator=(const Manager& o) noexcept = delete;

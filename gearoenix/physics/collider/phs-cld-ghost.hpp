@@ -10,7 +10,7 @@ public:
     {
     }
     ~Ghost() noexcept final = default;
-    [[nodiscard]] std::optional<core::Real> hit(const math::Ray3&, core::Real) const noexcept final { return std::nullopt; }
+    [[nodiscard]] std::optional<double> hit(const math::Ray3&, double) const noexcept final { return std::nullopt; }
 };
 }
 #endif

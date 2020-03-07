@@ -43,7 +43,7 @@ std::shared_ptr<gearoenix::gles2::texture::TextureCube> gearoenix::gles2::textur
         switch (info.format) {
         case render::texture::TextureFormat::RgbaFloat32: {
             const gl::sizei pixel_size = gl_aspect * gl_aspect * 4;
-            const auto* const raw_data = reinterpret_cast<const core::Real*>(data);
+            const auto* const raw_data = reinterpret_cast<const float*>(data);
             for (int fi = 0, di = 0; fi < static_cast<int>(GX_COUNT_OF(FACES)); ++fi) {
                 pixels[fi].resize(pixel_size);
                 for (gl::sizei i = 0; i < pixel_size; ++i, ++di)

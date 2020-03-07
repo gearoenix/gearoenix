@@ -55,7 +55,7 @@ void gearoenix::render::engine::Engine::late_delete(std::shared_ptr<core::asset:
 void gearoenix::render::engine::Engine::update() noexcept
 {
     const std::chrono::time_point<std::chrono::high_resolution_clock> now = std::chrono::high_resolution_clock::now();
-    const std::chrono::duration<core::Real> delta_time_duration = now - last_frame_time;
+    const std::chrono::duration<double> delta_time_duration = now - last_frame_time;
     delta_time = delta_time_duration.count();
     last_frame_time = now;
     /// TODO: When Vulkan implemented take care of frame_node and do the frame synchronization by it.

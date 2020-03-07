@@ -1,6 +1,5 @@
 #include "phs-cns-constraint.hpp"
 #include "../../system/stream/sys-stm-stream.hpp"
-#include "../../system/sys-log.hpp"
 #include "phs-cns-placer.hpp"
 
 gearoenix::physics::constraint::Constraint::Constraint(const core::Id my_id, const Type::Id t)
@@ -9,9 +8,7 @@ gearoenix::physics::constraint::Constraint::Constraint(const core::Id my_id, con
 {
 }
 
-gearoenix::physics::constraint::Constraint::~Constraint()
-{
-}
+gearoenix::physics::constraint::Constraint::~Constraint() = default;
 
 std::vector<std::shared_ptr<gearoenix::physics::body::Body>> gearoenix::physics::constraint::Constraint::get_all_bodies() const
 {
@@ -23,7 +20,7 @@ bool gearoenix::physics::constraint::Constraint::is_alive() const
     return alive;
 }
 
-void gearoenix::physics::constraint::Constraint::apply(const core::Real) noexcept
+void gearoenix::physics::constraint::Constraint::apply(const double) noexcept
 {
     applied = true;
 }

@@ -10,7 +10,7 @@ gearoenix::math::Plane::Plane(const Vec3<double>& point, const Vec3<double>& nor
 
 gearoenix::math::IntersectionStatus gearoenix::math::Plane::check_intersection(const Sphere& s) const noexcept
 {
-    const core::Real sd = s.get_center().dot(normal) + d;
+    const double sd = s.get_center().dot(normal) + d;
     if (sd > s.get_radius())
         return IntersectionStatus::Above;
     if (sd == s.get_radius())

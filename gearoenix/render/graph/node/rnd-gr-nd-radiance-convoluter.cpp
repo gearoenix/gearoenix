@@ -18,14 +18,14 @@
 #include "../../texture/rnd-txt-target.hpp"
 #include "../../texture/rnd-txt-texture-cube.hpp"
 
-gearoenix::render::graph::node::RadianceConvoluterUniform::RadianceConvoluterUniform(core::Real r) noexcept
+gearoenix::render::graph::node::RadianceConvoluterUniform::RadianceConvoluterUniform(float r) noexcept
     : roughness(r)
     , roughness_p_4(r * r * r * r)
 {
 }
 
 gearoenix::render::graph::node::RadianceConvoluterKernel::RadianceConvoluterKernel(
-    const core::Real roughness,
+    const float roughness,
     engine::Engine* const e,
     pipeline::Pipeline* const pip,
     const unsigned int kernel_index) noexcept
@@ -41,7 +41,7 @@ gearoenix::render::graph::node::RadianceConvoluterKernel::RadianceConvoluterKern
 gearoenix::render::graph::node::RadianceConvoluterKernel::~RadianceConvoluterKernel() noexcept = default;
 
 gearoenix::render::graph::node::RadianceConvoluterFrame::RadianceConvoluterFrame(
-    const core::Real roughness,
+    const float roughness,
     engine::Engine* const e,
     pipeline::Pipeline* const pip) noexcept
     : kernels(e->get_kernels()->get_threads_count())
@@ -62,7 +62,7 @@ void gearoenix::render::graph::node::RadianceConvoluter::record(RadianceConvolut
 }
 
 gearoenix::render::graph::node::RadianceConvoluter::RadianceConvoluter(
-    const core::Real roughness,
+    const float roughness,
     const mesh::Mesh* const msh,
     const texture::TextureCube* const environment,
     engine::Engine* const e,

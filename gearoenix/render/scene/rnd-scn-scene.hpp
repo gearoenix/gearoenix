@@ -98,7 +98,7 @@ public:
     using MapRuntimeReflection = std::map<core::Id, std::shared_ptr<reflection::Runtime>>;
 
     GX_GET_CVAL_PRT(Type, scene_type_id)
-    GX_GETSET_VAL_PRT(core::Real, layer, 0.0f)
+    GX_GETSET_VAL_PRT(double, layer, 0.0)
     GX_GETSET_VAL_PRT(bool, enability, false)
     GX_GETSET_VAL_PRT(bool, models_changed, false)
     GX_GET_UCPTR_PRT(buffer::FramedUniform, uniform_buffers)
@@ -150,7 +150,7 @@ public:                                                         \
     // void set_skybox(std::shared_ptr<skybox::Skybox> s) noexcept;
 
     void update() noexcept;
-    [[nodiscard]] std::optional<std::pair<core::Real, physics::collider::Collider*>> hit(const math::Ray3& r, core::Real d_min) const noexcept;
+    [[nodiscard]] std::optional<std::pair<double, physics::collider::Collider*>> hit(const math::Ray3& r, double d_min) const noexcept;
     void add_shadow_cascader(core::Id light_id) noexcept;
     void remove_shadow_cascader(core::Id light_id) noexcept;
 };

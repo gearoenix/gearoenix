@@ -26,8 +26,8 @@
 gearoenix::system::Application* gearoenix::system::Application::app = nullptr;
 #endif
 
-const gearoenix::core::Real gearoenix::system::Application::ROTATION_EPSILON = 3.14f / 180.0f;
-const gearoenix::core::Real gearoenix::system::Application::ZOOM_EPSILON = 0.00001f;
+const double gearoenix::system::Application::ROTATION_EPSILON = 3.14f / 180.0f;
+const double gearoenix::system::Application::ZOOM_EPSILON = 0.00001f;
 
 void gearoenix::system::Application::create_window() noexcept
 {
@@ -379,8 +379,8 @@ int gearoenix::system::Application::on_event(SDL_Event* const e) noexcept
         break;
     }
     case SDL_FINGERDOWN: {
-        /*const core::Real x = (e->tfinger.x - 0.5f) * 2.0f * o->screen_ratio;
-        const core::Real y = (0.5f - e->tfinger.y) * 2.0f;
+        /*const double x = (e->tfinger.x - 0.5f) * 2.0f * o->screen_ratio;
+        const double y = (0.5f - e->tfinger.y) * 2.0f;
         event = new core::event::button::Mouse(
             core::event::button::Button::KeyType::LEFT,
             core::event::button::Button::ActionType::PRESS,
@@ -390,8 +390,8 @@ int gearoenix::system::Application::on_event(SDL_Event* const e) noexcept
         break;
     }
     case SDL_FINGERUP: {
-        /*const core::Real x = (e->tfinger.x - 0.5f) * 2.0f * o->screen_ratio;
-        const core::Real y = (0.5f - e->tfinger.y) * 2.0f;
+        /*const double x = (e->tfinger.x - 0.5f) * 2.0f * o->screen_ratio;
+        const double y = (0.5f - e->tfinger.y) * 2.0f;
         event = new core::event::button::Mouse(
             core::event::button::Button::KeyType::LEFT,
             core::event::button::Button::ActionType::RELEASE,
@@ -401,8 +401,8 @@ int gearoenix::system::Application::on_event(SDL_Event* const e) noexcept
         break;
     }
     case SDL_FINGERMOTION: {
-        /* const core::Real x = (e->tfinger.x - 0.5f) * 2.0f * o->screen_ratio;
-        const core::Real y = (0.5f - e->tfinger.y) * 2.0f;
+        /* const double x = (e->tfinger.x - 0.5f) * 2.0f * o->screen_ratio;
+        const double y = (0.5f - e->tfinger.y) * 2.0f;
         event = new core::event::movement::Mouse(x, y, o->pre_x, o->pre_y);
         o->pre_x = x;
         o->pre_y = y;*/
@@ -413,8 +413,8 @@ int gearoenix::system::Application::on_event(SDL_Event* const e) noexcept
         event.source = core::event::Id::ScrollMouse;
         event.data = core::event::button::MouseScroll {
             math::Vec2(
-                static_cast<core::Real>(e->wheel.x),
-                static_cast<core::Real>(e->wheel.y))
+                static_cast<double>(e->wheel.x),
+                static_cast<double>(e->wheel.y))
         };
         break;
     case SDL_MOUSEMOTION:
@@ -424,7 +424,6 @@ int gearoenix::system::Application::on_event(SDL_Event* const e) noexcept
         break;
     case SDL_MOUSEBUTTONUP:
     case SDL_MOUSEBUTTONDOWN: {
-        core::event::button::MouseData d;
         event_engine->mouse_button(
             [&]() noexcept {
                 switch (e->button.button) {
@@ -462,16 +461,16 @@ int gearoenix::system::Application::on_event(SDL_Event* const e) noexcept
         switch (e->window.event) {
         case SDL_WINDOWEVENT_RESIZED: {
             core::event::system::WindowSizeChangeData d;
-            d.pre_width = static_cast<core::Real>(window_width);
-            d.pre_height = static_cast<core::Real>(window_height);
-            d.cur_width = static_cast<core::Real>(e->window.data1);
-            d.cur_height = static_cast<core::Real>(e->window.data2);
+            d.pre_width = static_cast<double>(window_width);
+            d.pre_height = static_cast<double>(window_height);
+            d.cur_width = static_cast<double>(e->window.data1);
+            d.cur_height = static_cast<double>(e->window.data2);
             event.data = d;
             event.source = core::event::Id::SystemWindowSizeChange;
             window_width = static_cast<unsigned int>(e->window.data1);
             window_height = static_cast<unsigned int>(e->window.data2);
-            window_ratio = static_cast<core::Real>(window_width) / static_cast<core::Real>(window_height);
-            half_height_inversed = 2.0f / static_cast<core::Real>(window_height);
+            window_ratio = static_cast<double>(window_width) / static_cast<double>(window_height);
+            half_height_inversed = 2.0f / static_cast<double>(window_height);
             break;
         }
         default:
@@ -520,8 +519,8 @@ gearoenix::system::Application::Application() noexcept
         window_height = static_cast<unsigned int>(h);
     }
 #endif
-    window_ratio = static_cast<core::Real>(window_width) / static_cast<core::Real>(window_height);
-    half_height_inversed = 2.0f / static_cast<core::Real>(window_height);
+    window_ratio = static_cast<double>(window_width) / static_cast<double>(window_height);
+    half_height_inversed = 2.0f / static_cast<double>(window_height);
     int mx, my;
     SDL_GetMouseState(&mx, &my);
 
@@ -611,14 +610,14 @@ SDL_Quit();
 #endif
 }
 
-gearoenix::core::Real gearoenix::system::Application::convert_x_to_ratio(int x) const noexcept
+double gearoenix::system::Application::convert_x_to_ratio(int x) const noexcept
 {
-    return (static_cast<core::Real>(x) * half_height_inversed) - window_ratio;
+    return (static_cast<double>(x) * half_height_inversed) - window_ratio;
 }
 
-gearoenix::core::Real gearoenix::system::Application::convert_y_to_ratio(int y) const noexcept
+double gearoenix::system::Application::convert_y_to_ratio(int y) const noexcept
 {
-    return 1.0f - (static_cast<core::Real>(y) * half_height_inversed);
+    return 1.0f - (static_cast<double>(y) * half_height_inversed);
 }
 
 const char* gearoenix::system::Application::get_clipboard() const noexcept

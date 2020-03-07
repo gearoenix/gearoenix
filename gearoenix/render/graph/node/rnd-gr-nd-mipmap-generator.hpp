@@ -2,8 +2,7 @@
 #define GEAROENIX_RENDER_GRAPH_NODE_MIPMAP_GENERATOR_HPP
 #include "../../../core/cr-pool.hpp"
 #include "../../../core/sync/cr-sync-end-caller.hpp"
-#include "../../../math/math-matrix.hpp"
-#include "../../../math/math-vector.hpp"
+#include "../../../math/math-matrix-4d.hpp"
 #include "../../material/rnd-mat-translucency-mode.hpp"
 #include "rnd-gr-nd-node.hpp"
 #include <vector>
@@ -22,10 +21,6 @@ class Buffer;
 
 namespace gearoenix::render::mesh {
 class Mesh;
-}
-
-namespace gearoenix::render::pipeline {
-class MipmapGeneratorResourceSet;
 }
 
 namespace gearoenix::render::graph::node {

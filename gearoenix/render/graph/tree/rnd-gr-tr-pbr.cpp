@@ -134,7 +134,7 @@ void gearoenix::render::graph::tree::Pbr::update_opaque(
 }
 
 void gearoenix::render::graph::tree::Pbr::update_transparent(
-    const std::vector<std::tuple<core::Real, material::Type, model::Model*, model::Mesh*>>& seen_meshes,
+    const std::vector<std::tuple<double, material::Type, model::Model*, model::Mesh*>>& seen_meshes,
     const scene::Scene* scn, const camera::Camera* cam, CameraData& camera_nodes) noexcept
 {
     const auto& cs = cam->get_cascades();
@@ -220,7 +220,7 @@ void gearoenix::render::graph::tree::Pbr::update() noexcept
     cascades.clear();
     const auto& priorities_scenes = e->get_physics_engine()->get_sorted_scenes();
     for (const auto& priority_scenes : priorities_scenes) {
-        const core::Real scene_priority = priority_scenes.first;
+        const double scene_priority = priority_scenes.first;
         auto& scene_priority_nodes = nodes[scene_priority];
         const scene::Scene* const scn = priority_scenes.second;
         auto& scene_nodes = scene_priority_nodes[scn];
@@ -255,7 +255,7 @@ void gearoenix::render::graph::tree::Pbr::update() noexcept
         const auto& cameras = scn->get_cameras();
         for (const auto& id_camera : cameras) {
             auto* const cam = id_camera.second.get();
-            const core::Real camera_priority = cam->get_layer();
+            const double camera_priority = cam->get_layer();
             auto& camera_priority_nodes = scene_nodes.cameras[camera_priority];
             CameraData& camera_nodes = camera_priority_nodes[cam];
             update_camera(scn, cam, camera_nodes);

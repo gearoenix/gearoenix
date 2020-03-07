@@ -30,7 +30,7 @@ private:
     std::mutex events_guard;
     std::vector<Data> events;
     std::mutex listeners_guard;
-    std::map<Id, std::map<Real, std::set<Listener*>>> events_id_priority_listeners;
+    std::map<Id, std::map<double, std::set<Listener*>>> events_id_priority_listeners;
     std::thread event_thread;
 
     struct MouseButtonState {
@@ -49,9 +49,9 @@ private:
 public:
     Engine() noexcept;
     ~Engine() noexcept;
-    void add_listener(Id event_id, Real priority, Listener* listener) noexcept;
+    void add_listener(Id event_id, double priority, Listener* listener) noexcept;
     // Best function to remove listener
-    void remove_listener(Id event_id, Real priority, Listener* listener) noexcept;
+    void remove_listener(Id event_id, double priority, Listener* listener) noexcept;
     void remove_listener(Id event_id, Listener* listener) noexcept;
     void remove_listener(Listener* listener) noexcept;
     void broadcast(const Data& event_data) noexcept;
