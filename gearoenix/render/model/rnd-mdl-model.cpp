@@ -73,7 +73,7 @@ void gearoenix::render::model::Model::update() noexcept
 {
     if (e->get_frame_number_from_start() == latest_frame_update)
         return;
-    uniform_buffers->update(collider->get_model_matrix());
+    uniform_buffers->update(math::Mat4x4<float>(collider->get_model_matrix()));
     for (const auto& msh : meshes)
         msh.second->update();
     latest_frame_update = e->get_frame_number_from_start();

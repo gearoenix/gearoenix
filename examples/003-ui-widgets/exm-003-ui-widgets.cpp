@@ -19,7 +19,7 @@ using GxMdManager = gearoenix::render::model::Manager;
 using GxButton = gearoenix::render::widget::Button;
 using GxEditWdg = gearoenix::render::widget::Edit;
 using GxTextWdg = gearoenix::render::widget::Text;
-using GxVec3 = gearoenix::math::Vec3;
+using GxVec3 = gearoenix::math::Vec3<double>;
 
 Example003UiWidgetsApp::Example003UiWidgetsApp(gearoenix::system::Application* const sys_app) noexcept
     : gearoenix::core::Application::Application(sys_app)
@@ -45,30 +45,30 @@ Example003UiWidgetsApp::Example003UiWidgetsApp(gearoenix::system::Application* c
     auto text = mdl_mgr->create<GxTextWdg>(txw_call);
     auto* tmp_tran = text->get_transformation();
     tmp_tran->local_scale(0.04f);
-    tmp_tran->set_location(GxVec3(0.0f, 0.85f, 0.0f));
+    tmp_tran->set_location(GxVec3(0.0, 0.85, 0.0));
     text->set_text(L"I'm a one line Text widget. I easily grow horizontally and automatically.", end_call);
     ui_scene->add_model(text);
 
     auto button = mdl_mgr->create<GxButton>(btn_call);
     tmp_tran = button->get_transformation();
-    tmp_tran->local_scale(0.04f);
-    tmp_tran->set_location(GxVec3(0.0f, 0.75f, 0.0f));
+    tmp_tran->local_scale(0.04);
+    tmp_tran->set_location(GxVec3(0.0, 0.75, 0.0));
     button->set_text(L"I'm a Button widget. I can grow too.", end_call);
     ui_scene->add_model(button);
 
     auto edit = mdl_mgr->create<GxEditWdg>(edt_call);
     tmp_tran = edit->get_transformation();
-    tmp_tran->local_scale(0.04f);
-    tmp_tran->local_x_scale(34.0f);
-    tmp_tran->set_location(GxVec3(0.0f, 0.65f, 0.0f));
+    tmp_tran->local_scale(0.04);
+    tmp_tran->local_x_scale(34.0);
+    tmp_tran->set_location(GxVec3(0.0, 0.65, 0.0));
     edit->set_hint_text(L"I'm a one line Edit text widget. I don't grow, there is a reason behind it, don't you know it.", end_call);
     ui_scene->add_model(edit);
 
     auto edit2 = mdl_mgr->create<GxEditWdg>(edt_call);
     tmp_tran = edit2->get_transformation();
-    tmp_tran->local_scale(0.04f);
-    tmp_tran->local_x_scale(20.0f);
-    tmp_tran->set_location(GxVec3(0.0f, 0.55f, 0.0f));
+    tmp_tran->local_scale(0.04);
+    tmp_tran->local_x_scale(20.0);
+    tmp_tran->set_location(GxVec3(0.0, 0.55, 0.0));
     edit2->set_hint_text(L"I'm another Edit text widget with smaller limit.", end_call);
     ui_scene->add_model(edit2);
 }

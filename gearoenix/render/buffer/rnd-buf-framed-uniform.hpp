@@ -22,8 +22,8 @@ namespace buffer {
         template <typename T>
         void update(const T& data) noexcept;
         // return current frame uniform buffer
-        const Uniform* get_buffer() const noexcept;
-        Uniform* get_buffer() noexcept;
+        [[nodiscard]] const Uniform* get_buffer() const noexcept;
+        [[nodiscard]] Uniform* get_buffer() noexcept;
     };
 
     template <typename T>

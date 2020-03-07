@@ -112,7 +112,7 @@ gearoenix::render::widget::Modal::Modal(const core::Id my_id, engine::Engine* co
         11, 9, 8, 9, 11, 10
     };
 
-    const math::Aabb3 close_ocr(math::Vec3(1.4f), math::Vec3(-1.4f));
+    const math::Aabb3 close_ocr(math::Vec3(1.4), math::Vec3(-1.4));
 
     auto close_mesh = msh_mgr->create(close_vertices, close_indices, close_ocr, msh_call);
 
@@ -129,8 +129,8 @@ gearoenix::render::widget::Modal::Modal(const core::Id my_id, engine::Engine* co
         close_mdl = mdl_mgr->create<Button>(btn_call);
         close_mdl->add_mesh(std::make_shared<model::Mesh>(close_mesh, mat));
         auto* tran = close_mdl->get_transformation();
-        const core::Real scale = 0.05f;
-        const math::Vec3 position(0.9f, 0.9f, 0.1f);
+        const double scale = 0.05;
+        const math::Vec3 position(0.9, 0.9, 0.1);
         tran->local_scale(scale);
         tran->set_location(position);
         add_child(close_mdl);

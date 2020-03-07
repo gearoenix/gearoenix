@@ -170,12 +170,13 @@ void gearoenix::render::graph::node::ForwardPbr::set_scene(const scene::Scene* c
                 GXLOGD("Unexpected number of influencing point lights in scene: " << scn->get_asset_id())
                 break;
             }
-            uniform.point_lights_color_min_radius[lights_count] = math::Vec4(l->get_color(), pl->get_min_radius());
-            uniform.point_lights_position_max_radius[lights_count] = pl->get_position_max_radius();
+            uniform.point_lights_color_min_radius[lights_count] = math::Vec4<float>(
+                math::Vec3<float>(l->get_color()), static_cast<float>(pl->get_min_radius()));
+            uniform.point_lights_position_max_radius[lights_count] = math::Vec4<float>(pl->get_position_max_radius());
             ++lights_count;
         }
     }
-    uniform.point_lights_count = static_cast<core::Real>(lights_count);
+    uniform.point_lights_count = static_cast<float>(lights_count);
 }
 
 void gearoenix::render::graph::node::ForwardPbr::set_camera(const camera::Camera* const c) noexcept
@@ -199,14 +200,14 @@ void gearoenix::render::graph::node::ForwardPbr::add_cascade(const light::Cascad
     // Initializing directional lights
     const auto* const dir = c->get_source();
     const auto s = cds.size();
-    uniform.shadow_caster_directional_lights_color_cascades_count[directional_light_shadow_caster_index] = math::Vec4(dir->get_color(), static_cast<core::Real>(s) + 0.1f);
-    uniform.shadow_caster_directional_lights_direction[directional_light_shadow_caster_index] = math::Vec4(dir->get_direction(), 0.0f);
+    uniform.shadow_caster_directional_lights_color_cascades_count[directional_light_shadow_caster_index] = math::Vec4(math::Vec3<float>(dir->get_color()), static_cast<float>(s + 0.1));
+    uniform.shadow_caster_directional_lights_direction[directional_light_shadow_caster_index] = math::Vec4(math::Vec3<float>(dir->get_direction()), 0.0f);
     for (std::size_t i = static_cast<std::size_t>(directional_light_shadow_caster_index) * GX_MAX_SHADOW_CASCADES, j = 0; j < s; ++i, ++j) {
 #ifdef GX_USE_OPENGL
 #ifdef GX_USE_INSTEAD_OF_OPENGL
         if (GX_RUNTIME_USE_OPENGL) {
 #endif
-            uniform.shadow_caster_directional_lights_cascades_view_projections_bias[i] = cds[j].view_projection_bias_gl;
+            uniform.shadow_caster_directional_lights_cascades_view_projections_bias[i] = math::Mat4x4<float>(cds[j].view_projection_bias_gl);
 #ifdef GX_USE_INSTEAD_OF_OPENGL
             continue;
         }
@@ -214,7 +215,7 @@ void gearoenix::render::graph::node::ForwardPbr::add_cascade(const light::Cascad
 #endif
     }
     ++directional_light_shadow_caster_index;
-    uniform.shadow_caster_directional_lights_count = static_cast<core::Real>(directional_light_shadow_caster_index);
+    uniform.shadow_caster_directional_lights_count = static_cast<float>(directional_light_shadow_caster_index);
 }
 
 void gearoenix::render::graph::node::ForwardPbr::record(const unsigned int kernel_index) noexcept

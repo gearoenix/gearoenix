@@ -10,8 +10,7 @@ struct Ray3;
 struct Sphere {
     GX_GET_CREF_PRV(Vec3<double>, center)
     GX_GET_VAL_PRV(double, radius, 0.0)
-private:
-    double radius2 = 0.0F;
+    GX_GET_VAL_PRV(double, radius2, 0.0)
 
 public:
     Sphere() = delete;
@@ -19,9 +18,9 @@ public:
     void set_radius(double r) noexcept;
     void set_center(const Vec3<double>& center) noexcept;
     void insert(double r) noexcept;
-    std::optional<double> hit(const math::Ray3& r) const noexcept;
-    std::optional<double> hit(const math::Ray3& r, double d_min) const noexcept;
-    IntersectionStatus check_intersection(const Sphere& o) const noexcept;
+    [[nodiscard]] std::optional<double> hit(const math::Ray3& r) const noexcept;
+    [[nodiscard]] std::optional<double> hit(const math::Ray3& r, double d_min) const noexcept;
+    [[nodiscard]] IntersectionStatus check_intersection(const Sphere& o) const noexcept;
 };
 }
 #endif

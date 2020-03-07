@@ -48,7 +48,7 @@ void gearoenix::render::widget::Edit::init(const core::sync::EndCaller<core::syn
     text_model = mdl_mgr->create<model::Dynamic>(mdl_end);
     text_model->add_mesh(std::make_shared<model::Mesh>(plate_mesh, text_material));
     auto* const text_tran = text_model->get_transformation();
-    text_tran->set_location(math::Vec3(0.0f, 0.0f, 0.01f));
+    text_tran->set_location(math::Vec3(0.0, 0.0, 0.01));
     text_tran->local_scale(theme.text_size);
     text_model->set_enabled(false);
     add_child(text_model);
@@ -61,12 +61,12 @@ void gearoenix::render::widget::Edit::init(const core::sync::EndCaller<core::syn
     hint_text_model->set_enabled(false);
     add_child(hint_text_model);
 
-    background_material->set_color(theme.background_color, c);
+    background_material->set_color(math::Vec4<float>(theme.background_color), c);
     background_model = mdl_mgr->create<model::Dynamic>(mdl_end);
     background_model->add_mesh(std::make_shared<model::Mesh>(plate_mesh, background_material));
     add_child(background_model);
 
-    cursor_material->set_color(theme.cursor_color, c);
+    cursor_material->set_color(math::Vec4<float>(theme.cursor_color), c);
     cursor_material->set_translucency(material::TranslucencyMode::Transparent);
     cursor_model = mdl_mgr->create<model::Dynamic>(mdl_end);
     cursor_model->add_mesh(std::make_shared<model::Mesh>(plate_mesh, cursor_material));
@@ -88,11 +88,11 @@ void gearoenix::render::widget::Edit::init(const core::sync::EndCaller<core::syn
             if (t1 > s) {
                 cursor_material->set_alpha(1.0f);
             } else if (t3 > s) {
-                cursor_material->set_alpha(1.0f - (s - t1) / t2);
+                cursor_material->set_alpha(static_cast<float>(1.0 - (s - t1) / t2));
             } else if (t4 > s) {
                 cursor_material->set_alpha(0.0f);
             } else {
-                cursor_material->set_alpha((s - t4) / t2);
+                cursor_material->set_alpha(static_cast<float>((s - t4) / t2));
             }
         },
         std::numeric_limits<double>::max());
@@ -463,7 +463,7 @@ void gearoenix::render::widget::Edit::insert(
     place_cursor();
 }
 
-void gearoenix::render::widget::Edit::selected(const gearoenix::math::Vec3& point) noexcept
+void gearoenix::render::widget::Edit::selected(const math::Vec3<double>& point) noexcept
 {
     if (text.empty())
         return;

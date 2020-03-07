@@ -4,9 +4,9 @@
 #include "../core/cr-types.hpp"
 
 // Maybe in future needed
-//#define GX_SIGNEDNESS_COMPATIBILITY_CHECK(ReceivedType, FinalType)                                            \
-//    static_assert(!std::numeric_limits<ReceivedType>::is_signed || std::numeric_limits<FinalType>::is_signed, \
-//        "This functionality only works when the signedness compatibility is available.");
+#define GX_SIGNEDNESS_COMPATIBILITY_CHECK(ReceivedType, FinalType)                                            \
+    static_assert(!std::numeric_limits<ReceivedType>::is_signed || std::numeric_limits<FinalType>::is_signed, \
+        "This functionality only works when the signedness compatibility is available.");
 
 #define GX_SIGNEDNESS_CHECK(Type)                       \
     static_assert(std::numeric_limits<Type>::is_signed, \

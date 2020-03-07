@@ -40,6 +40,15 @@ struct Vec4 {
     {
     }
 
+    template <typename T>
+    constexpr explicit Vec4(const Vec4<T>& o) noexcept
+        : x(static_cast<Element>(o.x))
+        , y(static_cast<Element>(o.y))
+        , z(static_cast<Element>(o.z))
+        , w(static_cast<Element>(o.w))
+    {
+    }
+
     [[nodiscard]] constexpr Vec3<Element> xyz() const noexcept
     {
         return Vec3<Element>(x, y, z);

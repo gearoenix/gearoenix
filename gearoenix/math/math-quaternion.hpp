@@ -45,7 +45,7 @@ struct Quat {
         m.data[1][2] = static_cast<Element>(2) * (yz + xw);
         m.data[2][0] = static_cast<Element>(2) * (xz + yw);
         m.data[2][1] = static_cast<Element>(2) * (yz - xw);
-        m.data[2][3] = static_cast<Element>(1) - static_cast<Element>(2) * (xx + yy);
+        m.data[2][2] = static_cast<Element>(1) - static_cast<Element>(2) * (xx + yy);
         return m;
     }
 

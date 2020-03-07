@@ -1,10 +1,7 @@
 #include "exm-002-asset-loading.hpp"
 #include <gearoenix/core/asset/cr-asset-manager.hpp>
-#include <gearoenix/core/event/cr-ev-system.hpp>
-#include <gearoenix/core/event/cr-ev-ui.hpp>
 #include <gearoenix/physics/body/phs-bd-rigid.hpp>
 #include <gearoenix/physics/constraint/phs-cns-tracker-spring-joint-spring.hpp>
-#include <gearoenix/render/camera/rnd-cmr-camera.hpp>
 #include <gearoenix/render/camera/rnd-cmr-manager.hpp>
 #include <gearoenix/render/camera/rnd-cmr-perspective.hpp>
 #include <gearoenix/render/camera/rnd-cmr-transformation.hpp>
@@ -18,11 +15,10 @@
 #include <gearoenix/render/model/rnd-mdl-manager.hpp>
 #include <gearoenix/render/model/rnd-mdl-mesh.hpp>
 #include <gearoenix/render/model/rnd-mdl-model.hpp>
-#include <gearoenix/render/model/rnd-mdl-transformation.hpp>
 #include <gearoenix/render/scene/rnd-scn-manager.hpp>
 #include <gearoenix/render/scene/rnd-scn-scene.hpp>
 #include <gearoenix/system/sys-app.hpp>
-#include <gearoenix/system/sys-log.hpp>
+#include <memory>
 
 template <class T>
 using GxEndCaller = gearoenix::core::sync::EndCaller<T>;
@@ -35,7 +31,7 @@ using GxMdManager = gearoenix::render::model::Manager;
 using GxMdMesh = gearoenix::render::model::Mesh;
 using GxMesh = gearoenix::render::mesh::Mesh;
 using GxModel = gearoenix::render::model::Model;
-using GxVec3 = gearoenix::math::Vec3;
+using GxVec3 = gearoenix::math::Vec3<double>;
 using GxDirLight = gearoenix::render::light::Directional;
 using GxLtManager = gearoenix::render::light::Manager;
 using GxPersCam = gearoenix::render::camera::Perspective;
@@ -48,7 +44,7 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
         scn = std::move(s);
     });
 
-    tree = std::unique_ptr<GxGrPbr>(new GxGrPbr(render_engine, endcall));
+    tree = std::make_unique<GxGrPbr>(render_engine, endcall);
     render_engine->set_render_tree(tree.get());
 
     const auto& astmgr = sys_app->get_asset_manager();
@@ -57,9 +53,7 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
     scnmgr->get_gx3d(1024, scncall);
 }
 
-GameApp::~GameApp() noexcept
-{
-}
+GameApp::~GameApp() noexcept = default;
 
 void GameApp::update() noexcept { }
 

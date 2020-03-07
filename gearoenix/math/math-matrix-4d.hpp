@@ -8,12 +8,22 @@ template <typename Element>
 struct Mat4x4 {
     Element data[4][4];
 
-    constexpr explicit Mat4x4(const Element diameter = static_cast<Element>(1)) noexcept
+    constexpr Mat4x4() noexcept
+        : data {
+            { static_cast<Element>(1), static_cast<Element>(0), static_cast<Element>(0), static_cast<Element>(0) },
+            { static_cast<Element>(0), static_cast<Element>(1), static_cast<Element>(0), static_cast<Element>(0) },
+            { static_cast<Element>(0), static_cast<Element>(0), static_cast<Element>(1), static_cast<Element>(0) },
+            { static_cast<Element>(0), static_cast<Element>(0), static_cast<Element>(0), static_cast<Element>(1) }
+        }
+    {
+    }
+
+    constexpr explicit Mat4x4(const Element diameter) noexcept
         : data {
             { diameter, static_cast<Element>(0), static_cast<Element>(0), static_cast<Element>(0) },
             { static_cast<Element>(0), diameter, static_cast<Element>(0), static_cast<Element>(0) },
             { static_cast<Element>(0), static_cast<Element>(0), diameter, static_cast<Element>(0) },
-            { static_cast<Element>(0), static_cast<Element>(0), static_cast<Element>(1) }
+            { static_cast<Element>(0), static_cast<Element>(0), static_cast<Element>(0), static_cast<Element>(1) }
         }
     {
     }
@@ -267,8 +277,9 @@ struct Mat4x4 {
 
     void read(system::stream::Stream* const f) noexcept
     {
-        for (Element& i : data)
-            f->read(i);
+        for (auto& r : data)
+            for (auto& c : r)
+                f->read(c);
     }
 
     [[nodiscard]] constexpr Element determinant() const noexcept

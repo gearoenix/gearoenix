@@ -33,7 +33,6 @@
 #include <gearoenix/render/widget/rnd-wdg-edit.hpp>
 #include <gearoenix/render/widget/rnd-wdg-modal.hpp>
 #include <gearoenix/render/widget/rnd-wdg-text.hpp>
-#include <gearoenix/system/stream/sys-stm-stream.hpp>
 #include <gearoenix/system/sys-app.hpp>
 
 template <class T>
@@ -112,7 +111,7 @@ IblBakerApp::IblBakerApp(gearoenix::system::Application* const sys_app) noexcept
 
     cam = ast_mgr->get_camera_manager()->create<GxPersCam>();
     cam_trn = dynamic_cast<GxCamTran*>(cam->get_transformation());
-    cam_trn->look_at(GxVec3(0.0f), GxVec3(1.0f, 0.0f, 0.0f), GxVec3(0.0f, 0.0f, 1.0f));
+    cam_trn->look_at(GxVec3(0.0), GxVec3(1.0, 0.0, 0.0), GxVec3(0.0, 0.0, 1.0));
     scn->add_camera(cam);
 
     sky = sky_mgr->create<GxSkyEqrect>(sky_call);
@@ -124,14 +123,14 @@ IblBakerApp::IblBakerApp(gearoenix::system::Application* const sys_app) noexcept
     auto tmp_txt = mdl_mgr->create<GxTextWdg>(txw_call);
     auto* tmp_tran = tmp_txt->get_transformation();
     tmp_tran->local_scale(0.04f);
-    tmp_tran->set_location(GxVec3(0.0f, 0.85f, 0.1f));
+    tmp_tran->set_location(GxVec3(0.0, 0.85, 0.1));
     tmp_txt->set_text(L"IBL baker for Gearoenix game engine", end_call);
     uiscn->add_model(tmp_txt);
 
     tmp_txt = mdl_mgr->create<GxTextWdg>(txw_call);
     tmp_tran = tmp_txt->get_transformation();
     tmp_tran->local_scale(0.03f);
-    tmp_tran->set_location(GxVec3(-0.75f, 0.75f, 0.1f));
+    tmp_tran->set_location(GxVec3(-0.75, 0.75, 0.1));
     tmp_txt->set_text(L"HDR file location:", end_call);
     uiscn->add_model(tmp_txt);
 
@@ -139,16 +138,16 @@ IblBakerApp::IblBakerApp(gearoenix::system::Application* const sys_app) noexcept
     tmp_tran = open_button->get_transformation();
     tmp_tran->local_scale(0.04f);
     tmp_tran->local_x_scale(4.0f);
-    tmp_tran->set_location(GxVec3(0.75f, 0.75f, 0.1f));
+    tmp_tran->set_location(GxVec3(0.75, 0.75, 0.1));
     open_button->set_text(L"Open File", end_call);
     open_button->set_on_click(std::bind(&IblBakerApp::on_open, this));
     uiscn->add_model(open_button);
 
     file_location = mdl_mgr->create<GxEditWdg>(edt_call);
     tmp_tran = file_location->get_transformation();
-    tmp_tran->local_scale(0.04f);
-    tmp_tran->local_x_scale(14.0f);
-    tmp_tran->set_location(GxVec3(0.025f, 0.75f, 0.1f));
+    tmp_tran->local_scale(0.04);
+    tmp_tran->local_x_scale(14.0);
+    tmp_tran->set_location(GxVec3(0.025, 0.75, 0.1));
     file_location->set_hint_text(L"<Fill it with 'file location'>", end_call);
     uiscn->add_model(file_location);
 }
@@ -180,7 +179,7 @@ bool IblBakerApp::on_event(const gearoenix::core::event::Data& d) noexcept
             const auto& data = std::get<gearoenix::core::event::movement::Base>(d.data);
             const auto rot_x = data.delta_position[1];
             const auto rot_z = data.delta_position[0];
-            cam_trn->local_rotate(rot_z, GxVec3::Z);
+            cam_trn->local_rotate(rot_z, GxVec3(0.0, 0.0, 1.0));
             cam_trn->local_x_rotate(rot_x);
         }
         break;

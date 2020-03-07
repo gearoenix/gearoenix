@@ -209,8 +209,8 @@ void gearoenix::render::scene::Scene::update() noexcept
             continue;
         const auto* const dl = dynamic_cast<const light::Directional*>(l);
         if (dl != nullptr && dirc < GX_MAX_DIRECTIONAL_LIGHTS) {
-            uniform.directional_lights_color[dirc] = math::Vec4(dl->get_color(), 0.0f);
-            uniform.directional_lights_direction[dirc] = math::Vec4(dl->get_direction(), 0.0f);
+            uniform.directional_lights_color[dirc] = math::Vec4(math::Vec3<float>(dl->get_color()), 0.0f);
+            uniform.directional_lights_direction[dirc] = math::Vec4(math::Vec3<float>(dl->get_direction()), 0.0f);
             ++dirc;
             continue;
         }

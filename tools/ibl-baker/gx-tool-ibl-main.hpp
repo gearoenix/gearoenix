@@ -49,10 +49,9 @@ private:
     using GxTextWdg = gearoenix::render::widget::Text;
     using GxEditWdg = gearoenix::render::widget::Edit;
     using GxGrPbr = gearoenix::render::graph::tree::Pbr;
-    using GxReal = gearoenix::core::Real;
-    using GxVec2 = gearoenix::math::Vec2;
-    using GxVec3 = gearoenix::math::Vec3;
-    using GxVec4 = gearoenix::math::Vec4;
+    using GxVec2 = gearoenix::math::Vec2<double>;
+    using GxVec3 = gearoenix::math::Vec3<double>;
+    using GxVec4 = gearoenix::math::Vec4<double>;
     using GxSkyEqrect = gearoenix::render::skybox::Equirectangular;
 
     std::shared_ptr<GxGameScene> scn;
@@ -64,8 +63,8 @@ private:
     std::unique_ptr<GxGrPbr> render_tree;
     bool camera_rotation_enabled = false;
     std::chrono::high_resolution_clock::time_point last_time_item_detail_modal_closed = std::chrono::high_resolution_clock::now();
-    GxReal camera_forward = 0.0f;
-    GxReal camera_sideward = 0.0f;
+    double camera_forward = 0.0;
+    double camera_sideward = 0.0;
 
     void on_open() noexcept;
 

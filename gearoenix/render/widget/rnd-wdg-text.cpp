@@ -20,7 +20,7 @@ gearoenix::render::widget::Text::Text(
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : Widget(my_id, Type::Text, f, e, c)
-    , text_color(0.7f, 0.7f, 0.7f, 1.0f)
+    , text_color(0.7, 0.7, 0.7, 1.0)
 {
     {
         // Reading string
@@ -50,7 +50,7 @@ gearoenix::render::widget::Text::Text(
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : Widget(my_id, Type::Text, e, c)
     , text(L" ")
-    , text_color(0.7f, 0.7f, 0.7f, 1.0f)
+    , text_color(0.7, 0.7, 0.7, 1.0)
 {
     auto ast_mgr = e->get_system_application()->get_asset_manager();
     core::sync::EndCaller<font::Font> fend([c](const std::shared_ptr<font::Font>&) {});
@@ -71,25 +71,25 @@ void gearoenix::render::widget::Text::set_text(
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
 {
     text = t;
-    float img_width = 0.0f;
+    double img_width = 0.0;
     auto txt_end = core::sync::EndCaller<texture::Texture2D>([c, this](const std::shared_ptr<texture::Texture2D>& txt) {
         reinterpret_cast<material::Unlit*>(meshes[text_mesh_id]->get_mat().get())->set_color(txt);
     });
-    auto txt = text_font->bake(text, text_color, collider->get_current_local_scale()[1] * 2.0f, img_width, txt_end);
+    auto txt = text_font->bake(text, text_color, collider->get_current_local_scale()[1] * 2.0, img_width, txt_end);
     transformation->local_x_scale(img_width * 0.5f / collider->get_current_local_scale()[0]);
 }
 
 void gearoenix::render::widget::Text::set_text_color(
-    const float red,
-    const float green,
-    const float blue,
+    const double red,
+    const double green,
+    const double blue,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
 {
-    set_text_color(math::Vec4(red, green, blue, 1.0f), c);
+    set_text_color(math::Vec4(red, green, blue, 1.0), c);
 }
 
 void gearoenix::render::widget::Text::set_text_color(
-    const math::Vec4<float>& v, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
+    const math::Vec4<double>& v, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
 {
     text_color = v;
     set_text(text, c);

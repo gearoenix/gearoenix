@@ -15,7 +15,11 @@ public:
         , reversed_normalized_direction(Vec3<double>(1.0) / nd)
     {
     }
-    [[nodiscard]] Vec3<double> get_point(const double d) const noexcept { return normalized_direction * d + origin; }
+
+    [[nodiscard]] Vec3<double> get_point(const double d) const noexcept
+    {
+        return (normalized_direction * d) + origin;
+    }
 };
 }
 #endif

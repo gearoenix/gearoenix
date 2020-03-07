@@ -98,7 +98,6 @@ void gearoenix::physics::accelerator::Bvh::InternalNode::init(const std::vector<
     for (const auto& di : dim_i) {
         struct Bin {
             std::vector<collider::Collider*> c;
-            /// TODO: batch the boxing process
             math::Aabb3 b;
         };
         Bin bins[BINS_COUNT];
@@ -142,11 +141,11 @@ void gearoenix::physics::accelerator::Bvh::InternalNode::init(const std::vector<
         }
         double best_wall_cost = std::numeric_limits<double>::max();
         int best_wall_index = -1;
-        math::Aabb3 best_wall_left_box;
-        math::Aabb3 best_wall_right_box;
+        math::Aabb3 best_wall_left_box {};
+        math::Aabb3 best_wall_right_box {};
         int best_wall_left_count = -1;
         int best_wall_right_count = -1;
-        math::Aabb3 left_box;
+        math::Aabb3 left_box {};
         int left_count = 0;
         for (int i = 0; i < WALLS_COUNT; ++i) {
             left_box.put(bins[i].b);

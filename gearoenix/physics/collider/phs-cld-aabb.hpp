@@ -4,7 +4,7 @@
 namespace gearoenix::physics::collider {
 class Aabb final : public Collider {
 public:
-    Aabb(const math::Vec3& u, const math::Vec3& l) noexcept
+    Aabb(const math::Vec3<double>& u, const math::Vec3<double>& l) noexcept
         : Collider(Type::Aabb)
     {
         origin_box = math::Aabb3(u, l);

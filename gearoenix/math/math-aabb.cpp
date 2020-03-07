@@ -7,8 +7,8 @@
 gearoenix::math::Aabb3::Aabb3() noexcept
     : upper(Vec3(-std::numeric_limits<double>::max(), -std::numeric_limits<double>::max(), -std::numeric_limits<double>::max()))
     , lower(Vec3(std::numeric_limits<double>::max(), std::numeric_limits<double>::max(), std::numeric_limits<double>::max()))
-    , diameter(0.0, 0.0, 0.0)
-    , center(0.0, 0.0, 0.0)
+    , diameter(0.0)
+    , center(0.0)
     , volume(0.0)
 {
 }
@@ -25,7 +25,7 @@ gearoenix::math::Aabb3::Aabb3(const Vec3<double>& u, const Vec3<double>& l) noex
 gearoenix::math::Aabb3::Aabb3(const Vec3<double>& p) noexcept
     : upper(p)
     , lower(p)
-    , diameter(Vec3(0.0))
+    , diameter(0.0)
     , center(p)
     , volume(0.0)
 {
@@ -44,14 +44,14 @@ void gearoenix::math::Aabb3::reset() noexcept
     lower = Vec3(std::numeric_limits<double>::max(), std::numeric_limits<double>::max(), std::numeric_limits<double>::max());
     diameter = Vec3(0.0, 0.0, 0.0);
     center = Vec3(0.0, 0.0, 0.0);
-    volume = diameter.x * diameter.y * diameter.z;
+    volume = 0.0;
 }
 
 void gearoenix::math::Aabb3::reset(const Vec3<double>& p) noexcept
 {
     upper = p;
     lower = p;
-    diameter = Vec3(0.0, 0.0, 0.0);
+    diameter = Vec3(0.0);
     center = p;
     volume = 0.0;
 }
@@ -85,12 +85,22 @@ void gearoenix::math::Aabb3::put(const Aabb3& o) noexcept
 
 void gearoenix::math::Aabb3::put_without_update(const Vec3<double>& p) noexcept
 {
-    for (int i = 0; i < 3; ++i) {
-        if (p[i] > upper[i]) {
-            upper[i] = p[i];
-        } else if (p[i] < lower[i]) {
-            lower[i] = p[i];
-        }
+    if (p.x > upper.x) {
+        upper.x = p.x;
+    } else if (p.x < lower.x) {
+        lower.x = p.x;
+    }
+
+    if (p.y > upper.y) {
+        upper.y = p.y;
+    } else if (p.y < lower.y) {
+        lower.y = p.y;
+    }
+
+    if (p.z > upper.z) {
+        upper.z = p.z;
+    } else if (p.z < lower.z) {
+        lower.z = p.z;
     }
 }
 
@@ -146,11 +156,9 @@ std::optional<double> gearoenix::math::Aabb3::hit(const math::Ray3& r, const dou
     const auto& rrd = r.get_reversed_normalized_direction();
     const auto t0 = (lower - ro) * rrd;
     const auto t1 = (upper - ro) * rrd;
-    const auto tsmall = t0.minimum(t1);
-    const auto tbig = t0.maximum(t1);
-    const auto tmin = tsmall.maximum();
-    const auto tmax = tbig.minimum();
-    if (tmin < tmax && tmin < d_min)
+    const auto tmin = t0.minimum(t1).maximum();
+    const auto tmax = t0.maximum(t1).minimum();
+    if (tmin <= tmax && tmin < d_min)
         return tmin;
     return std::nullopt;
 }

@@ -157,7 +157,7 @@ struct Vec3 {
     }
 
     template <typename T>
-    [[nodiscard]] const Element& operator[](const T i) const noexcept
+    [[nodiscard]] Element operator[](const T i) const noexcept
     {
         static_assert(std::numeric_limits<T>::is_integer, "Index type must be an integer kind.");
         switch (i) {

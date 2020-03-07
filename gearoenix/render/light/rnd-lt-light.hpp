@@ -24,7 +24,7 @@ namespace gearoenix::render::light {
 class Light : public core::asset::Asset {
     GX_GETSET_VAL_PRT(double, layer, 0.0f)
     GX_GET_CVAL_PRT(Type, light_type)
-    GX_GETSET_CREF_PRT(math::Vec3<float>, color)
+    GX_GETSET_CREF_PRT(math::Vec3<double>, color)
     GX_GETSET_VAL_PRT(bool, enabled, true)
     GX_GET_VAL_PRT(bool, shadow_enabled, false)
     GX_GET_CPTR_PRT(engine::Engine, e)

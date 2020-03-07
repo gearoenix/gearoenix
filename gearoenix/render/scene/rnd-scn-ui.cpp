@@ -20,11 +20,11 @@ void gearoenix::render::scene::Ui::init() noexcept
     auto* const sys_app = e->get_system_application();
     auto cam = sys_app->get_asset_manager()->get_camera_manager()->create<camera::Orthographic>();
     add_camera(cam);
-    cam->get_transformation()->set_location(math::Vec3(0.0f, 0.0f, 50.0f));
+    cam->get_transformation()->set_location(math::Vec3(0.0, 0.0, 50.0));
     uniform.ambient_light = math::Vec4(1.0f, 1.0f, 1.0f, 1.0f);
     auto* const event_engine = sys_app->get_event_engine();
-    event_engine->add_listener(core::event::Id::ButtonMouse, 0.0f, this);
-    event_engine->add_listener(core::event::Id::MovementMouse, 0.0f, this);
+    event_engine->add_listener(core::event::Id::ButtonMouse, 0.0, this);
+    event_engine->add_listener(core::event::Id::MovementMouse, 0.0, this);
 }
 
 gearoenix::render::scene::Ui::Ui(const core::Id my_id, system::stream::Stream* f, engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
@@ -42,15 +42,15 @@ gearoenix::render::scene::Ui::Ui(const core::Id my_id, engine::Engine* e, const 
 bool gearoenix::render::scene::Ui::on_event(const core::event::Data& d) noexcept
 {
     auto find_hited_widgets = [this](
-                                  const core::Real x,
-                                  const core::Real y,
-                                  const std::function<void(widget::Widget* const, const math::Vec3&)>& f1,
-                                  const std::function<void(widget::Widget* const, const math::Vec3&, const std::vector<model::Model*>&)>& f2,
+                                  const double x,
+                                  const double y,
+                                  const std::function<void(widget::Widget* const, const math::Vec3<double>&)>& f1,
+                                  const std::function<void(widget::Widget* const, const math::Vec3<double>&, const std::vector<model::Model*>&)>& f2,
                                   const std::function<void()>& f3) noexcept {
         const auto ray = cameras.begin()->second->create_ray3(x, y);
-        auto h = hit(ray, std::numeric_limits<gearoenix::core::Real>::max());
+        auto h = hit(ray, std::numeric_limits<double>::max());
         if (h.has_value()) {
-            const core::Real d_ray = h.value().first;
+            const double d_ray = h.value().first;
             const math::Vec3 point = ray.get_point(d_ray);
             auto* const cld = h.value().second;
             auto* const mdl = cld->get_parent();
@@ -82,7 +82,7 @@ bool gearoenix::render::scene::Ui::on_event(const core::event::Data& d) noexcept
                 selected_widget = nullptr;
                 find_hited_widgets(
                     data.position[0], data.position[1],
-                    [this](widget::Widget* const wdg, const math::Vec3& p) noexcept {
+                    [this](widget::Widget* const wdg, const math::Vec3<double>& p) noexcept {
                         wdg->selected(p);
                         selected_widget = wdg;
                         if (selected_widget->get_widget_type() == widget::Type::Edit && selected_edit != selected_widget) {
@@ -94,7 +94,7 @@ bool gearoenix::render::scene::Ui::on_event(const core::event::Data& d) noexcept
                             selected_edit = seledt;
                         }
                     },
-                    [this](widget::Widget* const wdg, const math::Vec3& p,
+                    [this](widget::Widget* const wdg, const math::Vec3<double>& p,
                         const std::vector<model::Model*>& children) noexcept {
                         wdg->selected_on(p, children);
                         if (selected_widget == nullptr)
@@ -117,7 +117,7 @@ bool gearoenix::render::scene::Ui::on_event(const core::event::Data& d) noexcept
         bool widget_found = false;
         find_hited_widgets(
             data.current_position[0], data.current_position[1],
-            [&](widget::Widget* const wdg, const math::Vec3& p) noexcept {
+            [&](widget::Widget* const wdg, const math::Vec3<double>& p) noexcept {
                 if (selected_widget == wdg) {
                     widget_found = true;
                     selected_widget->dragged(p);
@@ -126,7 +126,7 @@ bool gearoenix::render::scene::Ui::on_event(const core::event::Data& d) noexcept
                     selected_widget = nullptr;
                 }
             },
-            [&](widget::Widget* const wdg, const math::Vec3& p, const std::vector<model::Model*>& children) noexcept {
+            [&](widget::Widget* const wdg, const math::Vec3<double>& p, const std::vector<model::Model*>& children) noexcept {
                 if (widget_found)
                     return;
                 if (selected_widget == wdg) {

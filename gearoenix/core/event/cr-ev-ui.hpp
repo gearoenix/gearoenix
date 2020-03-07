@@ -11,17 +11,17 @@ enum struct Source {
     TOUCH,
 };
 struct PressData {
-    Real x = 0.0f, y = 0.0f, z = 0.0f;
+    double x = 0.0f, y = 0.0f, z = 0.0f;
     Source source = Source::MOUSE_LEFT;
     std::uint8_t touch_index = 0;
 };
-struct RelaseData {
-    Real x = 0.0f, y = 0.0f, z = 0.0f;
+struct ReleaseData {
+    double x = 0.0f, y = 0.0f, z = 0.0f;
     Source source = Source::MOUSE_LEFT;
     std::uint8_t touch_index = 0;
 };
 struct ClickedData {
-    Real x = 0.0f, y = 0.0f, z = 0.0f;
+    double x = 0.0f, y = 0.0f, z = 0.0f;
     Source source = Source::MOUSE_LEFT;
     std::uint8_t touch_index = 0;
 };

@@ -2,6 +2,7 @@
 #define GEAROENIX_RENDER_WIDGET_EDIT_HPP
 
 #include "../../core/event/cr-ev-listener.hpp"
+#include "../../math/math-vector-4d.hpp"
 #include "rnd-wdg-alignment.hpp"
 #include "rnd-wdg-widget.hpp"
 #include <vector>

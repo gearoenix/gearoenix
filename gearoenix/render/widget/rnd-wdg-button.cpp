@@ -14,9 +14,9 @@
 #include "../scene/rnd-scn-scene.hpp"
 #include "rnd-wdg-text.hpp"
 
-constexpr gearoenix::core::Real PRESSED_SIZE = 0.75f;
-constexpr gearoenix::core::Real PRESSED_DELTA_SIZE = 1.0f - PRESSED_SIZE;
-constexpr gearoenix::core::Real ANIMATION_DURATION = 0.1f;
+constexpr double PRESSED_SIZE = 0.75f;
+constexpr double PRESSED_DELTA_SIZE = 1.0f - PRESSED_SIZE;
+constexpr double ANIMATION_DURATION = 0.1f;
 
 gearoenix::render::widget::Button::Button(
     const core::Id my_id,
@@ -25,7 +25,7 @@ gearoenix::render::widget::Button::Button(
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : Widget(my_id, Type::Button, f, e, c)
 {
-    set_collider(std::make_unique<physics::collider::Aabb>(math::Vec3(1.0f, 1.0f, 0.001f), math::Vec3(-1.0f, -1.0f, -0.001f)));
+    set_collider(std::make_unique<physics::collider::Aabb>(math::Vec3(1.0, 1.0, 0.001), math::Vec3(-1.0, -1.0, -0.001)));
 }
 
 gearoenix::render::widget::Button::Button(
@@ -35,7 +35,7 @@ gearoenix::render::widget::Button::Button(
     : Widget(my_id, Type::Button, e, c)
     , background_material(new material::Unlit(e, c))
 {
-    set_collider(std::make_unique<physics::collider::Aabb>(math::Vec3(1.0f, 1.0f, 0.001f), math::Vec3(-1.0f, -1.0f, -0.001f)));
+    set_collider(std::make_unique<physics::collider::Aabb>(math::Vec3(1.0, 1.0, 0.001), math::Vec3(-1.0, -1.0, -0.001)));
     auto* const ast_mgr = e->get_system_application()->get_asset_manager();
     auto* const mdl_mgr = ast_mgr->get_model_manager();
     core::sync::EndCaller<Text> txt_call([c](const std::shared_ptr<Text>&) {});
@@ -43,7 +43,7 @@ gearoenix::render::widget::Button::Button(
     text->set_text_color(theme.text_color, c);
     auto* const txt_ran = text->get_transformation();
     txt_ran->local_scale(theme.text_scale);
-    txt_ran->set_location(math::Vec3(0.0f, 0.0f, 0.01f));
+    txt_ran->set_location(math::Vec3(0.0, 0.0, 0.01));
     add_child(text);
     background_material->set_color(0.9f, 0.075f, 0.05f, c);
     core::sync::EndCaller<mesh::Mesh> msh_call([c](const std::shared_ptr<mesh::Mesh>&) {});
@@ -57,7 +57,7 @@ gearoenix::render::widget::Button::~Button() noexcept
         a->set_activity(false);
 }
 
-void gearoenix::render::widget::Button::selected(const math::Vec3&) noexcept
+void gearoenix::render::widget::Button::selected(const math::Vec3<double>&) noexcept
 {
     if (auto a = animation.lock())
         a->set_activity(false);
@@ -65,12 +65,12 @@ void gearoenix::render::widget::Button::selected(const math::Vec3&) noexcept
     auto myself = e->get_system_application()->get_asset_manager()->get_model_manager()->get_gx3d(asset_id, my_fun);
     before_click_size = collider->get_current_local_scale()[1];
     const auto a = std::make_shared<physics::animation::Animation>(
-        [this, myself, delta_size { before_click_size * PRESSED_DELTA_SIZE }](const core::Real from_start, const core::Real) noexcept {
+        [this, myself, delta_size { before_click_size * PRESSED_DELTA_SIZE }](const double from_start, const double) noexcept {
             const auto s = before_click_size - delta_size * (from_start / ANIMATION_DURATION);
             transformation->local_scale(s / collider->get_current_local_scale()[1]);
         },
         ANIMATION_DURATION,
-        [this, pressed_size { before_click_size * PRESSED_SIZE }](const core::Real) noexcept {
+        [this, pressed_size { before_click_size * PRESSED_SIZE }](const double) noexcept {
             transformation->local_scale(pressed_size / collider->get_current_local_scale()[1]);
         });
     e->get_physics_engine()->get_animation_manager()->add(a);
@@ -84,12 +84,12 @@ void gearoenix::render::widget::Button::select_cancelled() noexcept
     auto my_fun = core::sync::EndCaller<model::Model>([](const std::shared_ptr<model::Model>&) {});
     auto myself = e->get_system_application()->get_asset_manager()->get_model_manager()->get_gx3d(asset_id, my_fun);
     const auto a = std::make_shared<physics::animation::Animation>(
-        [this, myself, pressed_size { before_click_size * PRESSED_SIZE }, delta_size { before_click_size * PRESSED_DELTA_SIZE }](const core::Real from_start, const core::Real) noexcept {
+        [this, myself, pressed_size { before_click_size * PRESSED_SIZE }, delta_size { before_click_size * PRESSED_DELTA_SIZE }](const double from_start, const double) noexcept {
             const auto s = pressed_size + delta_size * (from_start / ANIMATION_DURATION);
             transformation->local_scale(s / collider->get_current_local_scale()[1]);
         },
         ANIMATION_DURATION,
-        [this](const core::Real) noexcept {
+        [this](const double) noexcept {
             transformation->local_scale(before_click_size / collider->get_current_local_scale()[1]);
         });
     e->get_physics_engine()->get_animation_manager()->add(a);
