@@ -63,6 +63,24 @@ std::shared_ptr<gearoenix::gles2::texture::Texture2D> gearoenix::gles2::texture:
         }
         break;
     }
+    case render::texture::TextureFormat::RgFloat32: {
+        const gl::sizei pixel_size = gl_img_width * gl_img_height * 3;
+        pixels.resize(pixel_size);
+        const auto raw_data = reinterpret_cast<const float*>(data);
+        for (gl::sizei i = 0, di = 0; i < pixel_size; ++i) {
+            for (int j = 0; j < 2; ++j, ++di, ++i) {
+                const auto c = raw_data[di] * 255.1f;
+                if (c >= 255.0f)
+                    pixels[i] = 255;
+                else if (c < 0.0f)
+                    pixels[i] = 0;
+                else
+                    pixels[i] = static_cast<std::uint8_t>(c);
+            }
+            pixels[i] = 0;
+        }
+        break;
+    }
     case render::texture::TextureFormat::RgbaUint8: {
         const gl::sizei pixel_size = gl_img_width * gl_img_height * 4;
         pixels.resize(pixel_size);
@@ -161,6 +179,7 @@ uint gearoenix::gles2::texture::Texture2D::convert(gearoenix::render::texture::T
     case render::texture::TextureFormat::RgbaFloat32:
         return GL_RGBA;
     case render::texture::TextureFormat::RgbFloat32:
+    case render::texture::TextureFormat::RgFloat32:
         return GL_RGB;
     case render::texture::TextureFormat::RgbaUint8:
         return GL_RGBA;

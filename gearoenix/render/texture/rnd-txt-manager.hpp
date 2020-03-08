@@ -58,6 +58,23 @@ public:
     std::shared_ptr<TextureCube> create_cube(const TextureInfo& info, int img_aspect, core::sync::EndCaller<TextureCube>& c) noexcept;
     std::shared_ptr<Texture> get_gx3d(core::Id id, core::sync::EndCaller<Texture>& c) noexcept;
     [[nodiscard]] engine::Engine* get_engine() const noexcept;
+    [[nodiscard]] static constexpr float geometry_smith(const math::Vec3<float>& n, const math::Vec3<float>& v, const math::Vec3<float>& l, float roughness) noexcept;
+    [[nodiscard]] static math::Vec2<float> integrate_brdf(float n_dot_v, float roughness) noexcept;
+    [[nodiscard]] static std::vector<math::Vec2<float>> create_brdflut_pixels(std::size_t resolution = GX_DEFAULT_BRDFLUT_RESOLUTION) noexcept;
 };
 }
+
+constexpr float gearoenix::render::texture::Manager::geometry_smith(
+    const math::Vec3<float>& n,
+    const math::Vec3<float>& v,
+    const math::Vec3<float>& l,
+    const float roughness) noexcept
+{
+    const auto n_dot_v = math::Numeric::maximum(n.dot(v), 0.0f);
+    const auto n_dot_l = math::Numeric::maximum(n.dot(l), 0.0f);
+    const auto ggx2 = math::Numeric::geometry_schlick_ggx(n_dot_v, roughness);
+    const auto ggx1 = math::Numeric::geometry_schlick_ggx(n_dot_l, roughness);
+    return ggx1 * ggx2;
+}
+
 #endif

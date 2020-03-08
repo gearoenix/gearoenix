@@ -91,6 +91,29 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     return default_one_2c_2d;
 }
 
+std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::get_brdflut(core::sync::EndCaller<Texture2D>& c) noexcept
+{
+    if (nullptr != brdflut)
+        return brdflut;
+    const auto pixels = create_brdflut_pixels();
+    const auto data_size = pixels.size() * sizeof(math::Vec2<float>);
+    auto* const data = new unsigned char[data_size];
+    std::memcpy(data, pixels.data(), data_size);
+    brdflut = create_2d(
+        data,
+        TextureInfo {
+            .format = TextureFormat::RgFloat32,
+            .sample_info = SampleInfo {
+                .wrap_s = Wrap::ClampToEdge,
+                .wrap_t = Wrap::ClampToEdge,
+                .wrap_r = Wrap::ClampToEdge,
+            },
+            .texture_type = Type::Texture2D,
+            .has_mipmap = true },
+        GX_DEFAULT_BRDFLUT_RESOLUTION, GX_DEFAULT_BRDFLUT_RESOLUTION, c);
+    return brdflut;
+}
+
 std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::create_2d(unsigned char* const data, const TextureInfo& info, int img_width, int img_height, core::sync::EndCaller<Texture2D>& c) noexcept
 {
     const auto id = core::asset::Manager::create_id();
@@ -263,78 +286,51 @@ gearoenix::render::engine::Engine* gearoenix::render::texture::Manager::get_engi
     return e;
 }
 
-std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::get_brdflut(
-    core::sync::EndCaller<Texture2D>& c) noexcept
+gearoenix::math::Vec2<float> gearoenix::render::texture::Manager::integrate_brdf(const float n_dot_v, const float roughness) noexcept
 {
-    //
-    //    // ----------------------------------------------------------------------------
-    //    vec3 ImportanceSampleGGX(vec2 Xi, vec3 N, float roughness)
-    //    {
-    //    }
-    //    // ----------------------------------------------------------------------------
-    //    float GeometrySchlickGGX(float NdotV, float roughness)
-    //    {
-    //        // note that we use a different k for IBL
-    //        float a = roughness;
-    //        float k = (a * a) / 2.0;
-    //
-    //        float nom = NdotV;
-    //        float denom = NdotV * (1.0 - k) + k;
-    //
-    //        return nom / denom;
-    //    }
-    //    // ----------------------------------------------------------------------------
-    //    float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
-    //    {
-    //        float NdotV = max(dot(N, V), 0.0);
-    //        float NdotL = max(dot(N, L), 0.0);
-    //        float ggx2 = GeometrySchlickGGX(NdotV, roughness);
-    //        float ggx1 = GeometrySchlickGGX(NdotL, roughness);
-    //
-    //        return ggx1 * ggx2;
-    //    }
-    //    // ----------------------------------------------------------------------------
-    //    vec2 IntegrateBRDF(float NdotV, float roughness)
-    //    {
-    //        vec3 V;
-    //        V.x = sqrt(1.0 - NdotV * NdotV);
-    //        V.y = 0.0;
-    //        V.z = NdotV;
-    //
-    //        float A = 0.0;
-    //        float B = 0.0;
-    //
-    //        vec3 N = vec3(0.0, 0.0, 1.0);
-    //
-    //        const uint SAMPLE_COUNT = 1024u;
-    //        for (uint i = 0u; i < SAMPLE_COUNT; ++i) {
-    //            // generates a sample vector that's biased towards the
-    //            // preferred alignment direction (importance sampling).
-    //            vec2 Xi = Hammersley(i, SAMPLE_COUNT);
-    //            vec3 H = ImportanceSampleGGX(Xi, N, roughness);
-    //            vec3 L = normalize(2.0 * dot(V, H) * H - V);
-    //
-    //            float NdotL = max(L.z, 0.0);
-    //            float NdotH = max(H.z, 0.0);
-    //            float VdotH = max(dot(V, H), 0.0);
-    //
-    //            if (NdotL > 0.0) {
-    //                float G = GeometrySmith(N, V, L, roughness);
-    //                float G_Vis = (G * VdotH) / (NdotH * NdotV);
-    //                float Fc = pow(1.0 - VdotH, 5.0);
-    //
-    //                A += (1.0 - Fc) * G_Vis;
-    //                B += Fc * G_Vis;
-    //            }
-    //        }
-    //        A /= float(SAMPLE_COUNT);
-    //        B /= float(SAMPLE_COUNT);
-    //        return vec2(A, B);
-    //    }
-    //    // ----------------------------------------------------------------------------
-    //    void main()
-    //    {
-    //        vec2 integratedBRDF = IntegrateBRDF(TexCoords.x, TexCoords.y);
-    //        FragColor = integratedBRDF;
-    //    }
+    const math::Vec3<float> v(std::sqrt(1.0f - n_dot_v * n_dot_v), 0.0f, n_dot_v);
+
+    float a = 0.0f;
+    float b = 0.0f;
+
+    const auto n = math::Vec3<float>(0.0f, 0.0f, 1.0f);
+
+    const unsigned int SAMPLE_COUNT = 1024u;
+    for (unsigned int i = 0u; i < SAMPLE_COUNT; ++i) {
+        // generates a sample vector that's biased towards the
+        // preferred alignment direction (importance sampling).
+        const auto xi = math::Vec2<float>::hammersley(i, SAMPLE_COUNT);
+        const auto h = math::Vec3<float>::importance_sample_ggx(xi, n, roughness);
+        const auto l = (h * (2.0f * v.dot(h)) - v).normalized();
+
+        const auto n_dot_l = math::Numeric::maximum(l.z, 0.0f);
+        const auto n_dot_h = math::Numeric::maximum(h.z, 0.0f);
+        const auto v_dot_h = math::Numeric::maximum(v.dot(h), 0.0f);
+
+        if (n_dot_l > 0.0f) {
+            const auto g = geometry_smith(n, v, l, roughness);
+            const auto g_vis = (g * v_dot_h) / (n_dot_h * n_dot_v);
+            auto tmp = 1.0f - v_dot_h;
+            auto tmp_p2 = tmp * tmp;
+            const auto fc = tmp * tmp_p2 * tmp_p2;
+            tmp = fc * g_vis;
+            a += g_vis - tmp;
+            b += tmp;
+        }
+    }
+    a /= float(SAMPLE_COUNT);
+    b /= float(SAMPLE_COUNT);
+    return math::Vec2<float>(a, b);
+}
+
+std::vector<gearoenix::math::Vec2<float>> gearoenix::render::texture::Manager::create_brdflut_pixels(const std::size_t resolution) noexcept
+{
+    std::vector<math::Vec2<float>> pixels(resolution * resolution);
+    const auto inv_res = 1.0f / float(resolution);
+    for (std::size_t r = 0, i = 0; r < resolution; ++r) {
+        for (std::size_t c = 0; c < resolution; ++c, ++i) {
+            pixels[i] = integrate_brdf(float(c) * inv_res, float(r) * inv_res);
+        }
+    }
+    return pixels;
 }

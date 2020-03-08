@@ -103,7 +103,7 @@ gearoenix::render::graph::node::ForwardPbr::ForwardPbr(
     input_textures[DIFFUSE_ENVIRONMENT_INDEX] = txt_mgr->get_cube_zero_3c(txt_cube_call).get();
     input_textures[SPECULAR_ENVIRONMENT_INDEX] = txt_mgr->get_cube_zero_3c(txt_cube_call).get();
     input_textures[AMBIENT_OCCLUSION_INDEX] = txt_mgr->get_2d_one_1c(txt_2d_call).get();
-    input_textures[BRDFLUT_INDEX] = txt_mgr->get_2d_one_2c(txt_2d_call).get();
+    input_textures[BRDFLUT_INDEX] = txt_mgr->get_brdflut(txt_2d_call).get();
 }
 
 gearoenix::render::graph::node::ForwardPbr::~ForwardPbr() noexcept

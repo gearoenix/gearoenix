@@ -203,12 +203,12 @@ struct Vec2 {
 
     [[nodiscard]] constexpr Vec2<Element> maximum(const Vec2<Element>& o) const noexcept
     {
-        return Vec2(GX_MAX(x, o.x), GX_MAX(y, o.y));
+        return Vec2(Numeric::maximum(x, o.x), Numeric::maximum(y, o.y));
     }
 
     [[nodiscard]] constexpr Vec2<Element> minimum(const Vec2<Element>& o) const noexcept
     {
-        return Vec2(GX_MIN(x, o.x), GX_MIN(y, o.y));
+        return Vec2(Numeric::minimum(x, o.x), Numeric::minimum(y, o.y));
     }
 
     [[nodiscard]] constexpr Element length() const noexcept

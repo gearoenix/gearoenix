@@ -224,6 +224,7 @@
 #define GL_RGBA 0x1908
 #define GL_RGBA32F 0x8814
 #define GL_RGB32F 0x8815
+#define GL_RG32F 0x8230
 #define GL_RGBA16F 0x881A
 #define GL_RGB16F 0x881B
 #define GL_LUMINANCE 0x1909

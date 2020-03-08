@@ -42,6 +42,11 @@ std::shared_ptr<gearoenix::glc3::texture::Texture2D> gearoenix::glc3::texture::T
         pixels.resize(gl_img_width * gl_img_height * 3 * 4);
         std::memcpy(pixels.data(), data, pixels.size());
         break;
+    case render::texture::TextureFormat::RgFloat32:
+        // TODO: I can in future check for support of format, if it does not support, convert it
+        pixels.resize(gl_img_width * gl_img_height * 2 * 4);
+        std::memcpy(pixels.data(), data, pixels.size());
+        break;
     case render::texture::TextureFormat::RgbFloat16:
         // TODO: I can in future check for support of format, if it does not support, convert it
         pixels.resize(gl_img_width * gl_img_height * 3 * 2);
@@ -166,6 +171,8 @@ gearoenix::gl::sint gearoenix::glc3::texture::Texture2D::convert_internal_format
         return GL_RGBA32F;
     case render::texture::TextureFormat::RgbFloat32:
         return GL_RGB32F;
+    case render::texture::TextureFormat::RgFloat32:
+        return GL_RG32F;
     case render::texture::TextureFormat::RgbFloat16:
         return GL_RGB16F;
     case render::texture::TextureFormat::RgbaUint8:
@@ -187,6 +194,9 @@ gearoenix::gl::enumerated gearoenix::glc3::texture::Texture2D::convert_format(ge
     case render::texture::TextureFormat::RgbFloat32:
     case render::texture::TextureFormat::RgbFloat16:
         return GL_RGB;
+    case render::texture::TextureFormat::RgFloat32:
+    case render::texture::TextureFormat::RgFloat16:
+        return GL_RG;
     case render::texture::TextureFormat::D32:
         return GL_DEPTH_COMPONENT;
     default:
@@ -200,6 +210,7 @@ gearoenix::gl::enumerated gearoenix::glc3::texture::Texture2D::convert_data_form
     switch (f) {
     case render::texture::TextureFormat::RgbaFloat32:
     case render::texture::TextureFormat::RgbFloat32:
+    case render::texture::TextureFormat::RgFloat32:
     case render::texture::TextureFormat::D32:
         return GL_FLOAT;
     case render::texture::TextureFormat::RgbFloat16:

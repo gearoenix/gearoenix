@@ -275,70 +275,22 @@ struct Vec3 {
 
     [[nodiscard]] constexpr Vec3<Element> minimum(const Vec3<Element>& o) const noexcept
     {
-        return Vec3<Element>(GX_MIN(x, o.x), GX_MIN(y, o.y), GX_MIN(z, o.z));
+        return Vec3<Element>(Numeric::minimum(x, o.x), Numeric::minimum(y, o.y), Numeric::minimum(z, o.z));
     }
 
     [[nodiscard]] constexpr Vec3<Element> maximum(const Vec3<Element>& o) const noexcept
     {
-        return Vec3<Element>(GX_MAX(x, o.x), GX_MAX(y, o.y), GX_MAX(z, o.z));
+        return Vec3<Element>(Numeric::maximum(x, o.x), Numeric::maximum(y, o.y), Numeric::maximum(z, o.z));
     }
 
     [[nodiscard]] constexpr Element minimum() const noexcept
     {
-        if (std::is_floating_point<Element>::value) {
-            if (std::isnan(x)) {
-                if (std::isnan(y))
-                    return z;
-                if (std::isnan(z))
-                    return y;
-                return GX_MIN(y, z);
-            }
-            if (std::isnan(y)) {
-                if (std::isnan(x))
-                    return z;
-                if (std::isnan(z))
-                    return x;
-                return GX_MIN(x, z);
-            }
-            if (std::isnan(z)) {
-                if (std::isnan(x))
-                    return y;
-                if (std::isnan(y))
-                    return x;
-                return GX_MIN(x, y);
-            }
-        }
-        const auto e = GX_MIN(x, y);
-        return GX_MIN(e, z);
+        return Numeric::minimum(Numeric::minimum(x, y), z);
     }
 
     [[nodiscard]] constexpr Element maximum() const noexcept
     {
-        if (std::is_floating_point<Element>::value) {
-            if (std::isnan(x)) {
-                if (std::isnan(y))
-                    return z;
-                if (std::isnan(z))
-                    return y;
-                return GX_MAX(y, z);
-            }
-            if (std::isnan(y)) {
-                if (std::isnan(x))
-                    return z;
-                if (std::isnan(z))
-                    return x;
-                return GX_MAX(x, z);
-            }
-            if (std::isnan(z)) {
-                if (std::isnan(x))
-                    return y;
-                if (std::isnan(y))
-                    return x;
-                return GX_MAX(x, y);
-            }
-        }
-        const auto e = GX_MAX(x, y);
-        return GX_MAX(e, z);
+        return Numeric::maximum(Numeric::maximum(x, y), z);
     }
 
     [[nodiscard]] constexpr Vec3<Element> normalized() const noexcept
