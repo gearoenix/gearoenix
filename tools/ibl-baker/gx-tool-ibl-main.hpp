@@ -55,9 +55,12 @@ private:
     using GxSkyEqrect = gearoenix::render::skybox::Equirectangular;
 
     std::shared_ptr<GxGameScene> scn;
+    std::shared_ptr<GxGameScene> obj_scn;
     std::shared_ptr<GxUiScene> uiscn;
     GxCamTran* cam_trn = nullptr;
     std::shared_ptr<GxCam> cam;
+    GxCamTran* obj_cam_trn = nullptr;
+    std::shared_ptr<GxCam> obj_cam;
     std::shared_ptr<GxEditWdg> file_location;
     std::shared_ptr<GxSkyEqrect> sky;
     std::unique_ptr<GxGrPbr> render_tree;

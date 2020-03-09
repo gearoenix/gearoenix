@@ -13,7 +13,7 @@
 #include <gearoenix/render/graph/tree/rnd-gr-tr-pbr.hpp>
 #include <gearoenix/render/light/rnd-lt-directional.hpp>
 #include <gearoenix/render/light/rnd-lt-manager.hpp>
-#include <gearoenix/render/material/rnd-mat-material.hpp>
+#include <gearoenix/render/material/rnd-mat-pbr.hpp>
 #include <gearoenix/render/material/rnd-mat-skybox-equirectangular.hpp>
 #include <gearoenix/render/mesh/rnd-msh-manager.hpp>
 #include <gearoenix/render/mesh/rnd-msh-mesh.hpp>
@@ -41,7 +41,7 @@ using GxEndCaller = gearoenix::core::sync::EndCaller<T>;
 using GxEndCallerIgnore = gearoenix::core::sync::EndCallerIgnore;
 using GxEndCallerIgnored = GxEndCaller<GxEndCallerIgnore>;
 using GxGrTree = gearoenix::render::graph::tree::Tree;
-using GxMaterial = gearoenix::render::material::Material;
+using GxMatPbr = gearoenix::render::material::Pbr;
 using GxMdManager = gearoenix::render::model::Manager;
 using GxMdMesh = gearoenix::render::model::Mesh;
 using GxMesh = gearoenix::render::mesh::Mesh;
@@ -85,6 +85,7 @@ IblBakerApp::IblBakerApp(gearoenix::system::Application* const sys_app) noexcept
     const GxEndCallerIgnored end_call([this] {
         uiscn->set_enability(true);
         scn->set_enability(true);
+        obj_scn->set_enability(true);
         auto* const event_engine = system_application->get_event_engine();
         event_engine->add_listener(GxEventId::ButtonMouse, 0.0f, this);
         event_engine->add_listener(GxEventId::MovementMouse, 0.0f, this);
@@ -97,11 +98,14 @@ IblBakerApp::IblBakerApp(gearoenix::system::Application* const sys_app) noexcept
     GxEndCaller<GxButton> btn_call([end_call](const std::shared_ptr<GxButton>&) {});
     GxEndCaller<GxSkyEqrect> sky_call([end_call](const std::shared_ptr<GxSkyEqrect>&) {});
     GxEndCaller<GxRtReflect> rtr_call([end_call](const std::shared_ptr<GxRtReflect>&) {});
+    GxEndCaller<GxStaticModel> mdl_call([end_call](const std::shared_ptr<GxStaticModel>&) {});
+    GxEndCaller<GxMesh> msh_call([end_call](const std::shared_ptr<GxMesh>&) {});
 
     render_tree = std::make_unique<GxGrPbr>(render_engine, end_call);
     render_engine->set_render_tree(render_tree.get());
 
     auto* const ast_mgr = sys_app->get_asset_manager();
+    auto* const msh_mgr = ast_mgr->get_mesh_manager();
     auto* const mdl_mgr = ast_mgr->get_model_manager();
     auto* const sky_mgr = ast_mgr->get_skybox_manager();
     auto* const rfl_mgr = ast_mgr->get_reflection_manager();
@@ -150,6 +154,28 @@ IblBakerApp::IblBakerApp(gearoenix::system::Application* const sys_app) noexcept
     tmp_tran->set_location(GxVec3(0.025, 0.75, 0.1));
     file_location->set_hint_text(L"<Fill it with 'file location'>", end_call);
     uiscn->add_model(file_location);
+
+    obj_scn = ast_mgr->get_scene_manager()->create<GxGameScene>(scn_call);
+    obj_scn->set_layer((scn->get_layer() + uiscn->get_layer()) * 0.5);
+
+    obj_cam = ast_mgr->get_camera_manager()->create<GxPersCam>();
+    obj_cam_trn = dynamic_cast<GxCamTran*>(obj_cam->get_transformation());
+    obj_cam_trn->look_at(GxVec3(20.0, 20.0, 10.0), GxVec3(0.0, 0.0, 0.0), GxVec3(0.0, 0.0, 1.0));
+    obj_scn->add_camera(obj_cam);
+
+    const auto obj_msh = msh_mgr->create_icosphere(msh_call);
+
+    for (float y = -10.0f, roughness = 0.1f; y < 10.1f; y += 2.5f, roughness += 0.1f) {
+        for (float x = -10.0f, metallic = 0.1f; x < 10.1f; x += 2.5f, metallic += 0.1f) {
+            const std::shared_ptr<GxMatPbr> mat(new GxMatPbr(render_engine, end_call));
+            mat->set_roughness_factor(roughness);
+            mat->set_metallic_factor(metallic);
+            const auto mdl = mdl_mgr->create<GxStaticModel>(mdl_call);
+            mdl->add_mesh(std::make_shared<GxMdMesh>(obj_msh, mat));
+            mdl->get_transformation()->set_location(GxVec3(x, y, 0.0f));
+            obj_scn->add_model(mdl);
+        }
+    }
 }
 
 IblBakerApp::~IblBakerApp() noexcept
