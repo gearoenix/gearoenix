@@ -82,8 +82,8 @@ gearoenix::render::graph::node::ForwardPbr::ForwardPbr(
         4 + GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER * GX_MAX_SHADOW_CASCADES,
         1,
         {
-            "diffuse environment",
-            "specular environment",
+            "irradiance environment",
+            "radiance environment",
             "ambient occlusion",
         },
         {

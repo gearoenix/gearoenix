@@ -30,6 +30,10 @@ class Model;
 class Mesh;
 }
 
+namespace gearoenix::render::reflection {
+class Runtime;
+}
+
 namespace gearoenix::render::scene {
 class Scene;
 }
@@ -58,17 +62,18 @@ public:
         camera::Camera* cam = nullptr;
         CameraData camera_data;
         node::IrradianceConvoluter* irradiance = nullptr;
-        node::RadianceConvoluter* radiances[GX_MAX_RUNTIME_REFLECTION_SPECULAR_LEVELS] = { nullptr };
+        node::RadianceConvoluter* radiances[GX_MAX_RUNTIME_REFLECTION_RADIANCE_LEVELS] = { nullptr };
     };
 
     struct RuntimeReflectionData {
-        node::MipmapGenerator* mipmap_generator = nullptr;
+        reflection::Runtime* runtime_reflection = nullptr;
+        node::MipmapGenerator* environment_mipmap_generator = nullptr;
+        node::MipmapGenerator* irradiance_mipmap_generator = nullptr;
         RuntimeReflectionFaceData faces[6];
     };
 
     struct SceneData {
         std::map<double, std::map<const camera::Camera*, CameraData>> cameras;
-        std::vector<RuntimeReflectionData> runtime_reflections;
     };
 
 private:
@@ -78,16 +83,20 @@ private:
     core::OneLoopPool<node::SkyboxEquirectangular> skybox_equirectangular;
     core::OneLoopPool<node::Unlit> unlit;
     std::map<double, std::map<const scene::Scene*, SceneData>> nodes;
+    std::vector<RuntimeReflectionData> runtime_reflections_data;
     std::vector<light::CascadeInfo*> cascades;
 
     void update_camera(const scene::Scene* scn, camera::Camera* cam, CameraData& camera_nodes) noexcept;
     void update_skyboxes(const scene::Scene* scn, const camera::Camera* cam, CameraData& camera_nodes) noexcept;
+    void update_runtime_reflection(const scene::Scene* scn) noexcept;
     void update_opaque(
         const std::vector<std::tuple<material::Type, model::Model*, model::Mesh*>>& seen_meshes,
         const scene::Scene* scn, const camera::Camera* cam, CameraData& camera_nodes) noexcept;
     void update_transparent(
         const std::vector<std::tuple<double, material::Type, model::Model*, model::Mesh*>>& seen_meshes,
         const scene::Scene* scn, const camera::Camera* cam, CameraData& camera_nodes) noexcept;
+
+    void record_runtime_reflection(unsigned int& task_number, unsigned int kernel_index, unsigned int kernels_count) noexcept;
 
     void submit_camera_data(const CameraData& camera_data) const noexcept;
 

@@ -47,17 +47,17 @@ gearoenix::render::reflection::Runtime::Runtime(
     auto* const msh_mgr = ast_mgr->get_mesh_manager();
     const auto& render_config = sys_app->get_configuration().render_config;
     const auto environment_resolution = static_cast<unsigned int>(render_config.runtime_reflection_environment_resolution);
-    const auto diffuse_resolution = static_cast<unsigned int>(render_config.runtime_reflection_diffuse_resolution);
-    const auto specular_resolution = static_cast<unsigned int>(render_config.runtime_reflection_specular_resolution);
-    const auto specular_mips_count = render_config.runtime_reflection_specular_levels;
-    for (auto i = 0; i < specular_mips_count; ++i) {
+    const auto irradiance_resolution = static_cast<unsigned int>(render_config.runtime_reflection_irradiance_resolution);
+    const auto radiance_resolution = static_cast<unsigned int>(render_config.runtime_reflection_radiance_resolution);
+    const auto radiance_mips_count = render_config.runtime_reflection_radiance_levels;
+    for (auto i = 0; i < radiance_mips_count; ++i) {
         const auto fi = static_cast<double>(i);
-        const auto fm = static_cast<double>(specular_mips_count - 1);
+        const auto fm = static_cast<double>(radiance_mips_count - 1);
         roughnesses.push_back((fi + (fm * 0.5f - fi) * 0.001f) / fm);
     }
 #ifdef GX_DEBUG_MODE
-    if ((specular_resolution >> specular_mips_count) < 2)
-        GXLOGF("Unexpected resolution and levels for specular convolution in render config.")
+    if ((radiance_resolution >> radiance_mips_count) < 2)
+        GXLOGF("Unexpected resolution and levels for radiance convolution in render config.")
 #endif
     core::sync::EndCaller<texture::TextureCube> txt_cube_call([call](const std::shared_ptr<texture::TextureCube>&) {});
     core::sync::EndCaller<mesh::Mesh> msh_call([call](const std::shared_ptr<mesh::Mesh>&) {});
@@ -65,11 +65,12 @@ gearoenix::render::reflection::Runtime::Runtime(
     environment_texture_info.has_mipmap = true;
     environment = txt_mgr->create_cube(environment_texture_info, environment_resolution, txt_cube_call);
     environment_mipmap_generator = std::make_shared<graph::node::MipmapGenerator>(environment.get(), e, call);
-    diffuse = txt_mgr->create_cube(texture_info, diffuse_resolution, txt_cube_call);
-    auto specular_txt_info = texture_info;
-    specular_txt_info.sample_info.min_filter = texture::Filter::LinearMipmapLinear;
-    specular_txt_info.has_mipmap = true;
-    specular = txt_mgr->create_cube(specular_txt_info, specular_resolution, txt_cube_call);
+    irradiance = txt_mgr->create_cube(texture_info, irradiance_resolution, txt_cube_call);
+    irradiance_mipmap_generator = std::make_shared<graph::node::MipmapGenerator>(irradiance.get(), e, call);
+    auto radiance_txt_info = texture_info;
+    radiance_txt_info.sample_info.min_filter = texture::Filter::LinearMipmapLinear;
+    radiance_txt_info.has_mipmap = true;
+    radiance = txt_mgr->create_cube(radiance_txt_info, radiance_resolution, txt_cube_call);
     std::vector<texture::AttachmentInfo> target_infos = { texture::AttachmentInfo {
         .texture_info = texture_info,
         .usage = texture::UsageFlag::Color,
@@ -93,30 +94,30 @@ gearoenix::render::reflection::Runtime::Runtime(
         // mesh
         auto& face_mesh = face_meshes[i];
         face_mesh = msh_mgr->create_face_square(texture::FACES[i], msh_call);
-        // diffuse related stuff
-        auto& diffuse_target = diffuse_targets[i];
-        target_info.img_width = target_info.img_height = diffuse_resolution;
-        target_info.txt = diffuse;
-        diffuse_target = e->create_render_target(core::asset::Manager::create_id(), target_infos, call);
+        // irradiance related stuff
+        auto& irradiance_target = irradiance_targets[i];
+        target_info.img_width = target_info.img_height = irradiance_resolution;
+        target_info.txt = irradiance;
+        irradiance_target = e->create_render_target(core::asset::Manager::create_id(), target_infos, call);
         auto& irradiance_convoluter = irradiance_convoluters[i];
         irradiance_convoluter = std::make_unique<graph::node::IrradianceConvoluter>(
             face_mesh.get(), environment.get(), e, call);
-        irradiance_convoluter->set_render_target(diffuse_target.get());
-        // specular part
-        auto& specular_face_targets = specular_targets[i];
-        specular_face_targets.resize(roughnesses.size());
+        irradiance_convoluter->set_render_target(irradiance_target.get());
+        // radiance part
+        auto& radiance_face_targets = radiance_targets[i];
+        radiance_face_targets.resize(roughnesses.size());
         auto& radiance_face_convoluters = radiance_convoluters[i];
         radiance_face_convoluters.resize(roughnesses.size());
-        target_info.txt = specular;
+        target_info.txt = radiance;
         for (std::size_t mi = 0; mi < roughnesses.size(); ++mi) {
-            target_info.img_width = target_info.img_height = specular->get_aspect() >> mi;
+            target_info.img_width = target_info.img_height = radiance->get_aspect() >> mi;
             target_info.mipmap_level = mi;
-            auto& specular_target = specular_face_targets[mi];
-            specular_target = e->create_render_target(core::asset::Manager::create_id(), target_infos, call);
+            auto& radiance_target = radiance_face_targets[mi];
+            radiance_target = e->create_render_target(core::asset::Manager::create_id(), target_infos, call);
             auto& radiance_convoluter = radiance_face_convoluters[mi];
             radiance_convoluter = std::make_unique<graph::node::RadianceConvoluter>(
                 roughnesses[mi], face_mesh.get(), environment.get(), e, call);
-            radiance_convoluter->set_render_target(specular_target.get());
+            radiance_convoluter->set_render_target(radiance_target.get());
         }
     }
     set_receiving_radius(receiving_radius);

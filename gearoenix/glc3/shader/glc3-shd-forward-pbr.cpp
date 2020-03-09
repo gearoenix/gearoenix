@@ -176,20 +176,20 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         "        vec3 nominator = ndf * geo * frsn;\n"
         //       0.001 to prevent divide by zero.
         "        float denominator = 4.0 * normal_dot_view * normal_dot_light + 0.001;\n"
-        "        vec3 specular = nominator / denominator;\n"
+        "        vec3 radiance = nominator / denominator;\n"
         //       kS is equal to Fresnel
         "        vec3 ks = frsn;\n"
-        //       for energy conservation, the diffuse and specular light can't
+        //       for energy conservation, the irradiance and radiance light can't
         //       be above 1.0 (unless the surface emits light); to preserve this
-        //       relationship the diffuse component (kD) should equal 1.0 - kS.
+        //       relationship the irradiance component (kD) should equal 1.0 - kS.
         //       multiply kD by the inverse metalness such that only non-metals
-        //       have diffuse lighting, or a linear blend if partly metal (pure metals
-        //       have no diffuse light).
+        //       have irradiance lighting, or a linear blend if partly metal (pure metals
+        //       have no irradiance light).
         "        vec3 kd = (vec3(1.0) - ks) * (1.0 - metallic);\n"
         //       scale light by NdotL
         //       add to outgoing radiance Lo
         //       note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
-        "        lo += (kd * albedo.xyz / GX_PI + specular) * radiance * normal_dot_light;\n"
+        "        lo += (kd * albedo.xyz / GX_PI + radiance) * radiance * normal_dot_light;\n"
         "    }\n"
         //   computing directional lights
         "    for (float i = 0.001; i < scene_lights_count.x; ++i)\n"
@@ -206,20 +206,20 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         "        vec3 nominator = ndf * geo * frsn;\n"
         //       0.001 to prevent divide by zero.
         "        float denominator = 4.0 * normal_dot_view * normal_dot_light + 0.001;\n"
-        "        vec3 specular = nominator / denominator;\n"
+        "        vec3 radiance = nominator / denominator;\n"
         //       kS is equal to Fresnel
         "        vec3 ks = frsn;\n"
-        //       for energy conservation, the diffuse and specular light can't
+        //       for energy conservation, the irradiance and radiance light can't
         //       be above 1.0 (unless the surface emits light); to preserve this
-        //       relationship the diffuse component (kD) should equal 1.0 - kS.
+        //       relationship the irradiance component (kD) should equal 1.0 - kS.
         //       multiply kD by the inverse metalness such that only non-metals
-        //       have diffuse lighting, or a linear blend if partly metal (pure metals
-        //       have no diffuse light).
+        //       have irradiance lighting, or a linear blend if partly metal (pure metals
+        //       have no irradiance light).
         "        vec3 kd = (vec3(1.0) - ks) * (1.0 - metallic);\n"
         //       scale light by NdotL
         //       add to outgoing radiance Lo
         //       note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
-        "        lo += (kd * albedo.xyz / GX_PI + specular) * radiance * normal_dot_light;\n"
+        "        lo += (kd * albedo.xyz / GX_PI + radiance) * radiance * normal_dot_light;\n"
         "    }\n"
         "    int effect_shadow_caster_directional_lights_count_int = int(effect_shadow_caster_directional_lights_count);\n"
         "    for(int diri = 0, lcasi = 0; diri < effect_shadow_caster_directional_lights_count_int; ++diri, lcasi = diri * " GX_MAX_SHADOW_CASCADES_STR ")\n"
@@ -268,20 +268,20 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         "            vec3 nominator = ndf * geo * frsn;\n"
         //           0.001 to prevent divide by zero.
         "            float denominator = 4.0 * normal_dot_view * normal_dot_light + 0.001;\n"
-        "            vec3 specular = nominator / denominator;\n"
+        "            vec3 radiance = nominator / denominator;\n"
         //           kS is equal to Fresnel
         "            vec3 ks = frsn;\n"
-        //           for energy conservation, the diffuse and specular light can't
+        //           for energy conservation, the irradiance and radiance light can't
         //           be above 1.0 (unless the surface emits light); to preserve this
-        //           relationship the diffuse component (kD) should equal 1.0 - kS.
+        //           relationship the irradiance component (kD) should equal 1.0 - kS.
         //           multiply kD by the inverse metalness such that only non-metals
-        //           have diffuse lighting, or a linear blend if partly metal (pure metals
-        //           have no diffuse light).
+        //           have irradiance lighting, or a linear blend if partly metal (pure metals
+        //           have no irradiance light).
         "            vec3 kd = (vec3(1.0) - ks) * (1.0 - metallic);\n"
         //           scale light by NdotL
         //           add to outgoing radiance Lo
         //           note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
-        "            lo += (kd * albedo.xyz / GX_PI + specular) * radiance * normal_dot_light;\n"
+        "            lo += (kd * albedo.xyz / GX_PI + radiance) * radiance * normal_dot_light;\n"
         "        }\n"
         "    }\n"
         //   ambient lighting (we now use IBL as the ambient term)
@@ -289,15 +289,15 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         "    vec3 ks = frsn;\n"
         "    vec3 kd = (1.0 - ks) * (1.0 - metallic);\n"
         "    vec3 irradiance = texture(effect_diffuse_environment, normal).rgb;\n"
-        "    vec3 diffuse = irradiance * albedo.xyz;\n"
+        "    vec3 irradiance = irradiance * albedo.xyz;\n"
         //   sample both the pre-filter map and the BRDF lut and combine them together as per
-        //   the Split-Sum approximation to get the IBL specular part.
+        //   the Split-Sum approximation to get the IBL radiance part.
         "    float MAX_REFLECTION_LOD = 4.0;\n"
         "    vec3 prefiltered_color = texture(effect_specular_environment, reflection, roughness * MAX_REFLECTION_LOD).rgb;\n"
         "    vec2 brdf = texture(effect_brdflut, vec2(normal_dot_view, roughness)).rg;\n"
-        "    vec3 specular = prefiltered_color * (frsn * brdf.x + brdf.y);\n"
+        "    vec3 radiance = prefiltered_color * (frsn * brdf.x + brdf.y);\n"
         //   TODO: add ambient occlusion (* ao);
-        "    vec3 ambient = kd * diffuse + specular + scene_ambient_light * albedo.xyz;\n"
+        "    vec3 ambient = kd * irradiance + radiance + scene_ambient_light * albedo.xyz;\n"
         "    tmpv4.xyz = ambient + lo;\n"
         //   HDR tonemapping
         "    tmpv4.xyz = tmpv4.xyz / (tmpv4.xyz + vec3(1.0));\n"
