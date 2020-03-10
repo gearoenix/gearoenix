@@ -247,6 +247,57 @@ void gearoenix::render::graph::tree::Pbr::update_transparent(
     }
 }
 
+void gearoenix::render::graph::tree::Pbr::record_runtime_reflection(
+    unsigned int& task_number, const unsigned int kernel_index, const unsigned int kernels_count) noexcept
+{
+    switch (runtime_reflection_state) {
+    case RuntimeReflectionState::EnvironmentCubeRender: {
+        for (const auto& runtime_reflection : runtime_reflections_data) {
+            for (const auto& face : runtime_reflection.faces) {
+                for (const auto& skies : face.camera_data.skyboxes)
+                    for (auto* const sky : skies.second)
+                        GX_DO_TASK(sky->record_continuously(kernel_index))
+                const auto& opaques = face.camera_data.opaques;
+                if (opaques.forward_pbr != nullptr)
+                    opaques.forward_pbr->record(kernel_index);
+                if (opaques.unlit != nullptr)
+                    opaques.unlit->record(kernel_index);
+                for (auto* const node : face.camera_data.transparencies)
+                    GX_DO_TASK(
+                        node->record_continuously(kernel_index))
+            }
+        }
+        break;
+    }
+    case RuntimeReflectionState::EnvironmentCubeMipMap: {
+        for (const auto& runtime_reflection : runtime_reflections_data) {
+            GX_DO_TASK(runtime_reflection.environment_mipmap_generator->record_continuously(kernel_index))
+        }
+        break;
+    }
+    case RuntimeReflectionState::IrradianceFace: {
+        for (const auto& runtime_reflection : runtime_reflections_data) {
+            GX_DO_TASK(runtime_reflection.faces[runtime_reflections_irradiance_face].irradiance->record_continuously(kernel_index))
+        }
+        break;
+    }
+    case RuntimeReflectionState::IrradianceMipMap: {
+        for (const auto& runtime_reflection : runtime_reflections_data) {
+            GX_DO_TASK(runtime_reflection.irradiance_mipmap_generator->record_continuously(kernel_index))
+        }
+        break;
+    }
+    case RuntimeReflectionState::RadianceFaceLevel: {
+        for (const auto& runtime_reflection : runtime_reflections_data) {
+            GX_DO_TASK(runtime_reflection.faces[runtime_reflections_radiance_face].radiances[runtime_reflections_radiance_level]->record_continuously(kernel_index))
+        }
+        break;
+    }
+    default:
+        return;
+    }
+}
+
 void gearoenix::render::graph::tree::Pbr::submit_camera_data(const CameraData& camera_data) const noexcept
 {
     for (const auto& skies : camera_data.skyboxes)
@@ -259,6 +310,44 @@ void gearoenix::render::graph::tree::Pbr::submit_camera_data(const CameraData& c
         opaques.unlit->submit();
     for (auto* const node : camera_data.transparencies)
         node->submit();
+}
+
+void gearoenix::render::graph::tree::Pbr::submit_runtime_reflections() noexcept
+{
+    switch (runtime_reflection_state) {
+    case RuntimeReflectionState::EnvironmentCubeRender:
+        for (const auto& runtime_reflection : runtime_reflections_data) {
+            for (const auto& face : runtime_reflection.faces) {
+                submit_camera_data(face.camera_data);
+            }
+        }
+        break;
+    case RuntimeReflectionState::EnvironmentCubeMipMap:
+        for (const auto& runtime_reflection : runtime_reflections_data) {
+            runtime_reflection.environment_mipmap_generator->submit();
+        }
+        break;
+    case RuntimeReflectionState::IrradianceFace:
+        for (const auto& runtime_reflection : runtime_reflections_data) {
+            runtime_reflection.faces[runtime_reflections_irradiance_face].irradiance->submit();
+        }
+        break;
+    case RuntimeReflectionState::IrradianceMipMap:
+        for (const auto& runtime_reflection : runtime_reflections_data) {
+            runtime_reflection.irradiance_mipmap_generator->submit();
+        }
+        break;
+    case RuntimeReflectionState::RadianceFaceLevel:
+        for (const auto& runtime_reflection : runtime_reflections_data) {
+            const auto& face = runtime_reflection.faces[runtime_reflections_radiance_face];
+            auto* const radiance_node = face.radiances[runtime_reflections_radiance_level];
+            if (nullptr != radiance_node)
+                radiance_node->submit();
+        }
+        break;
+    default:
+        return;
+    }
 }
 
 gearoenix::render::graph::tree::Pbr::Pbr(engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>&) noexcept
@@ -306,28 +395,10 @@ void gearoenix::render::graph::tree::Pbr::record(const unsigned int kernel_index
         cas->record(kernel_index);
     }
 
+    record_runtime_reflection(task_number, kernel_index, kernels_count);
+
     for (const auto& priority_scenes : nodes) {
         for ([[maybe_unused]] const auto& [scn, scene_data] : priority_scenes.second) {
-            for (const auto& runtime_reflection : scene_data.runtime_reflections) {
-                GX_DO_TASK(runtime_reflection.mipmap_generator->record_continuously(kernel_index))
-                for (const auto& face : runtime_reflection.faces) {
-                    for (const auto& skies : face.camera_data.skyboxes)
-                        for (auto* const sky : skies.second)
-                            GX_DO_TASK(sky->record_continuously(kernel_index))
-                    const auto& opaques = face.camera_data.opaques;
-                    if (opaques.forward_pbr != nullptr)
-                        opaques.forward_pbr->record(kernel_index);
-                    if (opaques.unlit != nullptr)
-                        opaques.unlit->record(kernel_index);
-                    for (auto* const node : face.camera_data.transparencies)
-                        GX_DO_TASK(
-                            node->record_continuously(kernel_index))
-                    GX_DO_TASK(face.irradiance->record_continuously(kernel_index))
-                    for (std::size_t rad_i = 0; rad_i < GX_MAX_RUNTIME_REFLECTION_RADIANCE_LEVELS && face.radiances[rad_i] != nullptr; ++rad_i) {
-                        GX_DO_TASK(face.radiances[rad_i]->record_continuously(kernel_index))
-                    }
-                }
-            }
             for (const auto& priority_cameras : scene_data.cameras) {
                 for (const auto& cam_camera_nodes : priority_cameras.second) {
                     const CameraData& camera_nodes = cam_camera_nodes.second;
@@ -353,22 +424,10 @@ void gearoenix::render::graph::tree::Pbr::submit() noexcept
         cas->submit();
     }
 
+    submit_runtime_reflections();
+
     for (auto& priority_scenes : nodes) {
         for ([[maybe_unused]] const auto& [scn, scene_data] : priority_scenes.second) {
-            for (const auto& runtime_reflection : scene_data.runtime_reflections) {
-                for (const auto& face : runtime_reflection.faces) {
-                    submit_camera_data(face.camera_data);
-                }
-                runtime_reflection.mipmap_generator->submit();
-            }
-            for (const auto& runtime_reflection : scene_data.runtime_reflections) {
-                for (const auto& face : runtime_reflection.faces) {
-                    face.irradiance->submit();
-                    for (std::size_t rad_i = 0; rad_i < GX_MAX_RUNTIME_REFLECTION_RADIANCE_LEVELS && face.radiances[rad_i] != nullptr; ++rad_i) {
-                        face.radiances[rad_i]->submit();
-                    }
-                }
-            }
             for ([[maybe_unused]] const auto& [priority, cameras] : scene_data.cameras) {
                 for ([[maybe_unused]] const auto& [cam, camera_data] : cameras) {
                     submit_camera_data(camera_data);
@@ -376,4 +435,6 @@ void gearoenix::render::graph::tree::Pbr::submit() noexcept
             }
         }
     }
+
+    update_runtime_reflection_state();
 }

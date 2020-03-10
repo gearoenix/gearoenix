@@ -29,6 +29,8 @@ protected:
     {
     }
 
+    void update_runtime_reflection_state() noexcept;
+
 public:
     virtual ~Tree() noexcept = default;
     /// It is called from graphic thread

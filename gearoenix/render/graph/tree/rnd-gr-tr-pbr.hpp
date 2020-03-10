@@ -99,6 +99,7 @@ private:
     void record_runtime_reflection(unsigned int& task_number, unsigned int kernel_index, unsigned int kernels_count) noexcept;
 
     void submit_camera_data(const CameraData& camera_data) const noexcept;
+    void submit_runtime_reflections() noexcept;
 
 public:
     Pbr(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
