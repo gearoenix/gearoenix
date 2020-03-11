@@ -482,7 +482,7 @@ void gearoenix::render::widget::Edit::selected(const math::Vec3<double>& point) 
         min_dis = dis;
     }
     if (index > static_cast<int>(text.size())) {
-        index = text.size();
+        index = static_cast<int>(text.size());
     } else if (index < 0) {
         index = 0;
     }

@@ -29,7 +29,7 @@ void gearoenix::render::texture::Image::decode(
     unsigned int& img_channels) noexcept
 {
     int iw, ih, chs;
-    unsigned char* dd = stbi_load_from_memory(data, size, &iw, &ih, &chs, static_cast<int>(src_channels));
+    unsigned char* dd = stbi_load_from_memory(data, static_cast<int>(size), &iw, &ih, &chs, static_cast<int>(src_channels));
     if (dd == nullptr) {
         GXLOGF("Image decoder error.")
     }
@@ -52,7 +52,7 @@ void gearoenix::render::texture::Image::decode(
     std::size_t& img_channels) noexcept
 {
     int iw, ih, chs;
-    float* const dd = stbi_loadf_from_memory(data, size, &iw, &ih, &chs,
+    float* const dd = stbi_loadf_from_memory(data, static_cast<int>(size), &iw, &ih, &chs,
         static_cast<int>(requested_channels.has_value() ? requested_channels.value() : 0));
     if (dd == nullptr) {
         GXLOGF("Image decoder error.")

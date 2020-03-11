@@ -82,8 +82,8 @@ void gearoenix::render::camera::Perspective::update_cascades() noexcept
 void gearoenix::render::camera::Perspective::update_projection() noexcept
 {
     uniform.projection = math::Mat4x4<float>::perspective(
-        tanx * uniform.near * -2.0f,
-        tany * uniform.near * -2.0f,
+        static_cast<float>(tanx * uniform.near * -2.0),
+            static_cast<float>(tany * uniform.near * -2.0),
         -uniform.near,
         -uniform.far);
     uniform.uniform_projection = math::Mat4x4(

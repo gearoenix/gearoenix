@@ -11,7 +11,7 @@ void gearoenix::render::light::Point::update_influence_area() noexcept
     auto mxc = GX_MAX(red, grn);
     mxc = GX_MAX(mxc, blu);
     mxc *= 20.371832715762602978417121711682;
-    mxc = sqrtf(std::abs(mxc));
+    mxc = std::sqrt(std::abs(mxc));
     position_max_radius.w = mxc;
 }
 

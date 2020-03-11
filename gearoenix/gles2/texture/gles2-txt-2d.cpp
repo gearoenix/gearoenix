@@ -173,7 +173,7 @@ void gearoenix::gles2::texture::Texture2D::bind() const noexcept
     gl::Loader::bind_texture(GL_TEXTURE_2D, texture_object);
 }
 
-uint gearoenix::gles2::texture::Texture2D::convert(gearoenix::render::texture::TextureFormat format) noexcept
+gearoenix::gl::uint gearoenix::gles2::texture::Texture2D::convert(gearoenix::render::texture::TextureFormat format) noexcept
 {
     switch (format) {
     case render::texture::TextureFormat::RgbaFloat32:

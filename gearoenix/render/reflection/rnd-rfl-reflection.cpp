@@ -1,5 +1,5 @@
 #include "rnd-rfl-reflection.hpp"
-#include "../../physics/collider/phs-cld-sphere.hpp"
+#include "../../physics/collider/phs-cld-aabb.hpp"
 #include "../../system/sys-app.hpp"
 #include "../engine/rnd-eng-engine.hpp"
 
@@ -12,7 +12,7 @@ gearoenix::render::reflection::Reflection::Reflection(
     : Asset(id, core::asset::Type::Reflection)
     , reflection_type(t)
     , e(e)
-    , collider(new physics::collider::Sphere(position, influence_radius))
+    , collider(new physics::collider::Aabb(position + influence_radius,position - influence_radius))
 {
 }
 

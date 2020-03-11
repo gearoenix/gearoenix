@@ -173,16 +173,16 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::font::
         int advance, lsb, x0, y0, x1, y1;
         const auto x_shift = xpos - floor(xpos);
         stbtt_GetCodepointHMetrics(stb_font.get(), c, &advance, &lsb);
-        stbtt_GetCodepointBitmapBoxSubpixel(stb_font.get(), c, w_scale, h_scale, x_shift, y_shift, &x0, &y0, &x1, &y1);
-        stbtt_MakeCodepointBitmapSubpixel(stb_font.get(), &rnd_data[get_index(x0, y0)], x1 - x0, y1 - y0, img_width_pixels, w_scale, h_scale, x_shift, y_shift, c);
+        stbtt_GetCodepointBitmapBoxSubpixel(stb_font.get(), c, static_cast<float>(w_scale), static_cast<float>(h_scale), static_cast<float>(x_shift), static_cast<float>(y_shift), &x0, &y0, &x1, &y1);
+        stbtt_MakeCodepointBitmapSubpixel(stb_font.get(), &rnd_data[get_index(x0, y0)], x1 - x0, y1 - y0, img_width_pixels, static_cast<float>(w_scale), static_cast<float>(h_scale), static_cast<float>(x_shift), static_cast<float>(y_shift), c);
         xpos += w_scale * static_cast<double>(advance + stbtt_GetCodepointKernAdvance(stb_font.get(), c, next_c));
     }
     if (txt_widths[index] <= txt_end_width) {
         const wchar_t c = text[index];
         int x0, y0, x1, y1;
         const auto x_shift = xpos - floor(xpos);
-        stbtt_GetCodepointBitmapBoxSubpixel(stb_font.get(), c, w_scale, h_scale, x_shift, y_shift, &x0, &y0, &x1, &y1);
-        stbtt_MakeCodepointBitmapSubpixel(stb_font.get(), &rnd_data[get_index(x0, y0)], x1 - x0, y1 - y0, img_width_pixels, w_scale, h_scale, x_shift, y_shift, c);
+        stbtt_GetCodepointBitmapBoxSubpixel(stb_font.get(), c, static_cast<float>(w_scale), static_cast<float>(h_scale), static_cast<float>(x_shift), static_cast<float>(y_shift), &x0, &y0, &x1, &y1);
+        stbtt_MakeCodepointBitmapSubpixel(stb_font.get(), &rnd_data[get_index(x0, y0)], x1 - x0, y1 - y0, img_width_pixels, static_cast<float>(w_scale), static_cast<float>(h_scale), static_cast<float>(x_shift), static_cast<float>(y_shift), c);
     }
 
 #ifdef GX_DEBUG_FONT_IMAGE_CREATION

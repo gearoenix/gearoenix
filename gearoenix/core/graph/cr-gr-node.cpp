@@ -57,9 +57,9 @@ void gearoenix::core::graph::Node::remove_consumer(const unsigned int output_lin
     ptr->remove_provider(l);
 }
 
-unsigned int gearoenix::core::graph::Node::get_input_link_index(const std::string& name, bool& exist) const noexcept
+unsigned int gearoenix::core::graph::Node::get_input_link_index(const std::string& n, bool& exist) const noexcept
 {
-    auto a = input_links_string_index.find(name);
+    auto a = input_links_string_index.find(n);
     if (a == input_links_string_index.end()) {
         exist = false;
         return 0;
@@ -68,9 +68,9 @@ unsigned int gearoenix::core::graph::Node::get_input_link_index(const std::strin
     return a->second;
 }
 
-unsigned int gearoenix::core::graph::Node::get_output_link_index(const std::string& name, bool& exist) const noexcept
+unsigned int gearoenix::core::graph::Node::get_output_link_index(const std::string& n, bool& exist) const noexcept
 {
-    auto a = output_links_string_index.find(name);
+    auto a = output_links_string_index.find(n);
     if (a == output_links_string_index.end()) {
         exist = false;
         return 0;

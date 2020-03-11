@@ -179,7 +179,7 @@ void gearoenix::glc3::texture::Target::generate_framebuffer() noexcept
     gl::Loader::check_for_error();
 #endif
     // TODO: check for need of depth buffer, It can be done by looping over infos for depth formats, if there was none so depth buffer must be created.
-    gl::enumerated color_attachment_count = -1;
+    gl::enumerated color_attachment_count = static_cast<gl::enumerated>(-1);
     bool needs_depth_attachment = true;
     for (const auto& attachment : attachments) {
         const auto& txt = attachment.txt;

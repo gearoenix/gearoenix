@@ -110,13 +110,13 @@ gearoenix::render::reflection::Runtime::Runtime(
         radiance_face_convoluters.resize(roughnesses.size());
         target_info.txt = radiance;
         for (std::size_t mi = 0; mi < roughnesses.size(); ++mi) {
-            target_info.img_width = target_info.img_height = radiance->get_aspect() >> mi;
-            target_info.mipmap_level = mi;
+            target_info.img_width = target_info.img_height = static_cast<unsigned int>(radiance->get_aspect() >> mi);
+            target_info.mipmap_level = static_cast<unsigned int>(mi);
             auto& radiance_target = radiance_face_targets[mi];
             radiance_target = e->create_render_target(core::asset::Manager::create_id(), target_infos, call);
             auto& radiance_convoluter = radiance_face_convoluters[mi];
             radiance_convoluter = std::make_unique<graph::node::RadianceConvoluter>(
-                roughnesses[mi], face_mesh.get(), environment.get(), e, call);
+                static_cast<float>(roughnesses[mi]), face_mesh.get(), environment.get(), e, call);
             radiance_convoluter->set_render_target(radiance_target.get());
         }
     }

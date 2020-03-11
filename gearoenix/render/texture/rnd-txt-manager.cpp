@@ -161,8 +161,8 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
         id,
         pixels.data(),
         info,
-        img_width,
-        img_height,
+        static_cast<unsigned int>(img_width),
+        static_cast<unsigned int>(img_height),
         core::sync::EndCaller<core::sync::EndCallerIgnore>([c] {}));
     c.set_data(t);
     cache.get_cacher().get_cacheds()[id] = t;
