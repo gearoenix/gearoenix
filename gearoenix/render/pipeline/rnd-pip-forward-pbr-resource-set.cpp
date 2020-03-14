@@ -42,21 +42,13 @@ void gearoenix::render::pipeline::ForwardPbrResourceSet::set_material(const mate
     metallic_roughness = pbr_mat->get_metallic_roughness_texture().get();
     normal = pbr_mat->get_normal_texture().get();
     emissive = pbr_mat->get_emission_texture().get();
+    irradiance = pbr_mat->get_irradiance();
+    radiance = pbr_mat->get_radiance();
 }
 
 void gearoenix::render::pipeline::ForwardPbrResourceSet::set_node_uniform_buffer(buffer::Uniform* b) noexcept
 {
     node_uniform_buffer = b;
-}
-
-void gearoenix::render::pipeline::ForwardPbrResourceSet::set_diffuse_environment(texture::TextureCube* const t) noexcept
-{
-    diffuse_environment = t;
-}
-
-void gearoenix::render::pipeline::ForwardPbrResourceSet::set_specular_environment(texture::TextureCube* const t) noexcept
-{
-    specular_environment = t;
 }
 
 void gearoenix::render::pipeline::ForwardPbrResourceSet::set_ambient_occlusion(texture::Texture2D* const t) noexcept
@@ -76,8 +68,8 @@ void gearoenix::render::pipeline::ForwardPbrResourceSet::set_brdflut(texture::Te
 
 void gearoenix::render::pipeline::ForwardPbrResourceSet::clean() noexcept
 {
-    diffuse_environment = nullptr;
-    specular_environment = nullptr;
+    irradiance = nullptr;
+    radiance = nullptr;
     ambient_occlusion = nullptr;
     GX_SET_ARRAY_ZERO(directional_lights_shadow_maps)
     brdflut = nullptr;

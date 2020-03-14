@@ -22,6 +22,8 @@ public:
     GX_GET_CREF_PRV(std::optional<math::Vec2<float>>, metallic_roughness_value)
     GX_GET_CREF_PRV(std::shared_ptr<texture::Texture2D>, normal_texture)
     GX_GET_CREF_PRV(std::optional<math::Vec3<float>>, normal_value)
+    GX_GETSET_PTR_PRV(texture::TextureCube, irradiance)
+    GX_GETSET_PTR_PRV(texture::TextureCube, radiance)
     GX_GET_CREF_PRV(Uniform, uniform)
 public:
     Pbr(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept;

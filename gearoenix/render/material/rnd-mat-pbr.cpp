@@ -14,11 +14,13 @@ gearoenix::render::material::Pbr::Pbr(engine::Engine* const e, const core::sync:
     , normal_value(math::Vec3(0.5f, 0.5f, 1.0f))
 {
     core::sync::EndCaller<texture::Texture2D> call_txt_2d([end](const std::shared_ptr<texture::Texture2D>&) {});
+    core::sync::EndCaller<texture::TextureCube> call_txt_cube([end](const std::shared_ptr<texture::TextureCube>&) {});
     auto* const txt_mgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
     color_texture = txt_mgr->get_2d(color_value.value(), call_txt_2d);
     emission_texture = txt_mgr->get_2d(emission_value.value(), call_txt_2d);
     metallic_roughness_texture = txt_mgr->get_2d(metallic_roughness_value.value(), call_txt_2d);
     normal_texture = txt_mgr->get_2d(normal_value.value(), call_txt_2d);
+    irradiance = radiance = txt_mgr->get_cube_zero_3c(call_txt_cube).get();
 }
 
 gearoenix::render::material::Pbr::Pbr(system::stream::Stream* const f, engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept

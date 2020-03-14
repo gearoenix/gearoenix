@@ -174,6 +174,7 @@ IblBakerApp::IblBakerApp(gearoenix::system::Application* const sys_app) noexcept
             mdl->add_mesh(std::make_shared<GxMdMesh>(obj_msh, mat));
             mdl->get_transformation()->set_location(GxVec3(x, y, 0.0f));
             obj_scn->add_model(mdl);
+            mdl->set_hooked_reflection(rtr);
         }
     }
 }

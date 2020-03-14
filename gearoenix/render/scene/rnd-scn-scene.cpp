@@ -4,8 +4,8 @@
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../physics/accelerator/phs-acc-bvh.hpp"
 #include "../../physics/body/phs-bd-body.hpp"
-#include "../../physics/collider/phs-cld-collider.hpp"
 #include "../../physics/collider/phs-cld-aabb.hpp"
+#include "../../physics/collider/phs-cld-collider.hpp"
 #include "../../physics/constraint/phs-cns-constraint.hpp"
 #include "../../physics/constraint/phs-cns-manager.hpp"
 #include "../../system/sys-app.hpp"
@@ -156,14 +156,14 @@ void gearoenix::render::scene::Scene::scene_add_model(const std::shared_ptr<mode
         if (!mdl->get_dynamicity()) {
             /// maybe in future I wanted to add more things about static models
 
-            if (nullptr == mdl->get_locked_reflection()) {
+            if (nullptr == mdl->get_hooked_reflection()) {
                 /// The reason for this loop is, in the real scenarios, reflections count must be low and
                 /// on the other hand bvh tree for reflection is superfluous
-                /// in addition to that the nature of dynamic reflections are like camera, 
+                /// in addition to that the nature of dynamic reflections are like camera,
                 /// they're the queriers not the queree.
                 for (const auto& id_reflection : reflections) {
                     const auto& reflect = id_reflection.second;
-                    if (reflect->get_is_dynamic()) {
+                    if (reflect->get_is_hooked()) {
                         if (math::IntersectionStatus::In == reflect->get_collider()->check_intersection_status(mdl->get_collider()->get_updated_box())) {
                             mdl->set_colliding_reflection(reflect.get());
                             break;

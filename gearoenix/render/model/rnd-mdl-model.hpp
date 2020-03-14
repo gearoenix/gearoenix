@@ -28,6 +28,14 @@ namespace gearoenix::render::scene {
 class Scene;
 }
 
+namespace gearoenix::render::texture {
+class TextureCube;
+}
+
+namespace gearoenix::render::reflection {
+class Reflection;
+}
+
 namespace gearoenix::system::stream {
 class Stream;
 }
@@ -55,13 +63,11 @@ public:
     GX_GET_PTR_PRT(scene::Scene, scene)
     GX_GET_CPTR_PRT(engine::Engine, e)
     GX_GET_VAL_PRT(unsigned int, latest_frame_update, static_cast<unsigned int>(-1))
-        /// This is for the only static reflections or dynamics that 
-        /// their AABB surrends the model and it is one of the children of the model
-        /// or one of the children of one of the fathers of the the model
-        /// This is must be constant after model added to scene
-        GX_GET_CREF_PRT(std::shared_ptr<reflection::Reflection>, locked_reflection)
-        /// In case the upper was not set, the follong must be found and used
-        GX_GET_PTR_PRT(reflection::Reflection, colliding_reflection)
+    /// Thw AABB of reflection must surrounds the model
+    /// and it is one of the children of the model
+    GX_GET_CREF_PRT(std::shared_ptr<reflection::Reflection>, hooked_reflection)
+    /// In case the upper was not set, the following must be found and used
+    GX_GET_PTR_PRT(reflection::Reflection, colliding_reflection)
 protected:
     Model(
         core::Id my_id,
@@ -84,7 +90,7 @@ public:
     void add_child(const std::shared_ptr<Model>& c) noexcept;
     void set_collider(std::unique_ptr<physics::collider::Collider> c) noexcept;
     void set_enabled(bool s) noexcept;
-    void set_locked_reflection(std::shared_ptr<reflection::Reflection> reflection_probe) noexcept;
+    void set_hooked_reflection(std::shared_ptr<reflection::Reflection> reflection_probe) noexcept;
     void set_colliding_reflection(reflection::Reflection* reflection_probe) noexcept;
     void clear_reflection() noexcept;
     virtual void set_scene(scene::Scene* s) noexcept;

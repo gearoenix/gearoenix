@@ -111,7 +111,7 @@ public:
     GX_GET_CREF_PRT(MapShadowCascaderLight, shadow_cascader_lights)
     GX_GET_CREF_PRT(MapModel, models)
     GX_GET_CREF_PRT(MapSkybox, skyboxs)
-        /// Keep its number low (performance issue)
+    /// Keep its number low (performance issue)
     GX_GET_CREF_PRT(MapReflection, reflections)
     GX_GET_CREF_PRT(MapRuntimeReflection, runtime_reflections)
     GX_GET_CREF_PRT(std::vector<physics::collider::Collider*>, static_colliders)

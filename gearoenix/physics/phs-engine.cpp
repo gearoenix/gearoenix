@@ -123,6 +123,12 @@ void gearoenix::physics::Engine::update_visibility_kernel(const unsigned int ker
         const auto* const scene = layer_scene.second;
         const auto* const dynamic_accelerator = scene->get_dynamic_accelerator();
         const auto* const static_accelerator = scene->get_static_accelerator();
+        const auto& reflections = scene->get_reflections();
+        for ([[maybe_unused]] const auto& [rfl_id, rfl] : reflections) {
+            if (rfl->get_is_hooked())
+                continue;
+            GX_DO_TASK(rfl->check_dynamic_models(dynamic_accelerator))
+        }
         if (sys_app->get_render_engine()->get_render_tree()->get_runtime_reflection_state() == render::graph::tree::RuntimeReflectionState::EnvironmentCubeRender) {
             const auto& runtime_reflections = scene->get_runtime_reflections();
             for (const auto& id_rtr : runtime_reflections) {

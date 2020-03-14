@@ -7,12 +7,12 @@
 #include "../camera/rnd-cmr-camera.hpp"
 #include "../material/rnd-mat-material.hpp"
 #include "../material/rnd-mat-pbr.hpp"
-#include "../texture/rnd-txt-manager.hpp"
 #include "../mesh/rnd-msh-manager.hpp"
 #include "../mesh/rnd-msh-mesh.hpp"
 #include "../pipeline/rnd-pip-manager.hpp"
 #include "../reflection/rnd-rfl-reflection.hpp"
 #include "../scene/rnd-scn-scene.hpp"
+#include "../texture/rnd-txt-manager.hpp"
 #include "rnd-mdl-manager.hpp"
 #include "rnd-mdl-mesh.hpp"
 #include "rnd-mdl-transformation.hpp"
@@ -29,6 +29,7 @@ gearoenix::render::model::Model::Model(
     , transformation(new Transformation(this))
     , uniform_buffers(new buffer::FramedUniform(static_cast<unsigned int>(sizeof(math::Mat4x4<float>)), e))
     , e(e)
+    , hooked_reflection(nullptr)
 {
     collider->set_parent(this);
     math::Mat4x4<float> m;
@@ -60,11 +61,12 @@ gearoenix::render::model::Model::Model(
     , transformation(new Transformation(this))
     , uniform_buffers(new buffer::FramedUniform(static_cast<unsigned int>(sizeof(math::Mat4x4<float>)), e))
     , e(e)
+    , hooked_reflection(nullptr)
 {
     collider->set_parent(this);
 }
 
-void gearoenix::render::model::Model::set_reflection(texture::TextureCube*const irradiance, texture::TextureCube*const radiance) noexcept
+void gearoenix::render::model::Model::set_reflection(texture::TextureCube* const irradiance, texture::TextureCube* const radiance) noexcept
 {
     for (const auto& msh : meshes) {
         auto* const mat = msh.second->get_mat().get();
@@ -127,16 +129,20 @@ void gearoenix::render::model::Model::set_enabled(const bool b) noexcept
     }
 }
 
-void gearoenix::render::model::Model::set_locked_reflection(std::shared_ptr<reflection::Reflection> rfl) noexcept
+void gearoenix::render::model::Model::set_hooked_reflection(std::shared_ptr<reflection::Reflection> rfl) noexcept
 {
-    locked_reflection = std::move(rfl);
-    set_reflection(locked_reflection->get_irradiance().get(), locked_reflection->get_radiance().get());
+    for (const auto& m : children)
+        m.second->set_hooked_reflection(rfl);
+    set_reflection(rfl->get_irradiance().get(), rfl->get_radiance().get());
+    hooked_reflection = std::move(rfl);
 }
 
 void gearoenix::render::model::Model::set_colliding_reflection(reflection::Reflection* const rfl) noexcept
 {
     colliding_reflection = rfl;
     set_reflection(rfl->get_irradiance().get(), rfl->get_radiance().get());
+    for (const auto& m : children)
+        m.second->set_colliding_reflection(rfl);
 }
 
 void gearoenix::render::model::Model::clear_reflection() noexcept
@@ -145,6 +151,8 @@ void gearoenix::render::model::Model::clear_reflection() noexcept
         set_reflection(t.get(), t.get());
     });
     e->get_system_application()->get_asset_manager()->get_texture_manager()->get_cube_zero_3c(call);
+    for (const auto& m : children)
+        m.second->clear_reflection();
 }
 
 void gearoenix::render::model::Model::set_scene(scene::Scene* const s) noexcept

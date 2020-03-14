@@ -4,7 +4,6 @@
 #include "../../render/buffer/rnd-buf-uniform.hpp"
 #include "../../render/camera/rnd-cmr-uniform.hpp"
 #include "../../render/graph/node/rnd-gr-nd-forward-pbr.hpp"
-#include "../../render/light/rnd-lt-directional.hpp"
 #include "../../render/material/rnd-mat-pbr.hpp"
 #include "../../render/mesh/rnd-msh-mesh.hpp"
 #include "../../render/scene/rnd-scn-uniform.hpp"
@@ -34,7 +33,7 @@ void gearoenix::glc3::pipeline::ForwardPbrResourceSet::bind_final(gl::uint& boun
     GX_GLC3_PIP_RES_SET_UNIFORM(camera_vp, camera->view_projection.data[0][0])
     //static_cast<const texture::Texture2D *>(ambient_occlusion.get())->bind(shdr->get_effect_ambient_occlusion_index());
     reinterpret_cast<const texture::Texture2D*>(brdflut)->bind(static_cast<gl::enumerated>(shdr->get_effect_brdflut_index()));
-    reinterpret_cast<const texture::TextureCube*>(diffuse_environment)->bind(static_cast<gl::enumerated>(shdr->get_effect_diffuse_environment_index()));
+    reinterpret_cast<const texture::TextureCube*>(irradiance)->bind(static_cast<gl::enumerated>(shdr->get_effect_diffuse_environment_index()));
     auto directional_lights_shadow_map_indices = shdr->get_effect_shadow_caster_directional_lights_cascades_shadow_map_indices();
     for (int i = 0, tii = 0; i < GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER; ++i) {
         for (int j = 0; j < GX_MAX_SHADOW_CASCADES; ++j, ++tii) {
@@ -45,7 +44,7 @@ void gearoenix::glc3::pipeline::ForwardPbrResourceSet::bind_final(gl::uint& boun
             texture::Texture::bind(t, ti);
         }
     }
-    reinterpret_cast<const texture::TextureCube*>(specular_environment)->bind(static_cast<gl::enumerated>(shdr->get_effect_specular_environment_index()));
+    reinterpret_cast<const texture::TextureCube*>(radiance)->bind(static_cast<gl::enumerated>(shdr->get_effect_specular_environment_index()));
     const auto* const material = material_uniform_buffer->get_ptr<render::material::Pbr::Uniform>();
     GX_GLC3_PIP_RES_SET_UNIFORM(material_alpha, material->alpha)
     GX_GLC3_PIP_RES_SET_UNIFORM(material_alpha_cutoff, material->alpha_cutoff)

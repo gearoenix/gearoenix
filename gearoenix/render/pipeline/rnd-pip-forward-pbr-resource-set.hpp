@@ -21,8 +21,8 @@ protected:
     const texture::Texture2D* metallic_roughness = nullptr;
     const texture::Texture2D* normal = nullptr;
     const texture::Texture2D* emissive = nullptr;
-    const texture::TextureCube* diffuse_environment = nullptr;
-    const texture::TextureCube* specular_environment = nullptr;
+    const texture::TextureCube* irradiance = nullptr;
+    const texture::TextureCube* radiance = nullptr;
     const texture::Texture2D* ambient_occlusion = nullptr;
     const texture::Texture2D* directional_lights_shadow_maps[GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER][GX_MAX_SHADOW_CASCADES] = {};
     const texture::Texture2D* brdflut = nullptr;
@@ -40,8 +40,6 @@ public:
 #undef GX_HELPER
 
     void set_node_uniform_buffer(buffer::Uniform* node_uniform_buffer) noexcept;
-    void set_diffuse_environment(texture::TextureCube* t) noexcept;
-    void set_specular_environment(texture::TextureCube* t) noexcept;
     void set_ambient_occlusion(texture::Texture2D* t) noexcept;
     void set_directional_lights_shadow_map(texture::Texture2D* t, int light_index, int cas_index) noexcept;
     void set_brdflut(texture::Texture2D* t) noexcept;

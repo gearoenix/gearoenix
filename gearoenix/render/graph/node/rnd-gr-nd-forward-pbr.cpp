@@ -61,8 +61,6 @@ void gearoenix::render::graph::node::ForwardPbr::record(
     prs->set_model(mdl);
     prs->set_mesh(msh->get_msh().get());
     prs->set_material(msh->get_mat().get());
-    prs->set_diffuse_environment(reinterpret_cast<texture::TextureCube*>(input_textures[DIFFUSE_ENVIRONMENT_INDEX]));
-    prs->set_specular_environment(reinterpret_cast<texture::TextureCube*>(input_textures[SPECULAR_ENVIRONMENT_INDEX]));
     prs->set_ambient_occlusion(reinterpret_cast<texture::Texture2D*>(input_textures[AMBIENT_OCCLUSION_INDEX]));
     prs->set_brdflut(reinterpret_cast<texture::Texture2D*>(input_textures[BRDFLUT_INDEX]));
     for (int di = 0, si = SHADOW_MAP_000_INDEX; di < GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER; ++di) {
