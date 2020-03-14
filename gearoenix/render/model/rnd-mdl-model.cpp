@@ -6,9 +6,12 @@
 #include "../buffer/rnd-buf-framed-uniform.hpp"
 #include "../camera/rnd-cmr-camera.hpp"
 #include "../material/rnd-mat-material.hpp"
+#include "../material/rnd-mat-pbr.hpp"
+#include "../texture/rnd-txt-manager.hpp"
 #include "../mesh/rnd-msh-manager.hpp"
 #include "../mesh/rnd-msh-mesh.hpp"
 #include "../pipeline/rnd-pip-manager.hpp"
+#include "../reflection/rnd-rfl-reflection.hpp"
 #include "../scene/rnd-scn-scene.hpp"
 #include "rnd-mdl-manager.hpp"
 #include "rnd-mdl-mesh.hpp"
@@ -61,6 +64,18 @@ gearoenix::render::model::Model::Model(
     collider->set_parent(this);
 }
 
+void gearoenix::render::model::Model::set_reflection(texture::TextureCube*const irradiance, texture::TextureCube*const radiance) noexcept
+{
+    for (const auto& msh : meshes) {
+        auto* const mat = msh.second->get_mat().get();
+        if (material::Type::Pbr == mat->get_material_type()) {
+            auto* const pbr = static_cast<material::Pbr*>(mat);
+            pbr->set_irradiance(irradiance);
+            pbr->set_radiance(radiance);
+        }
+    }
+}
+
 gearoenix::render::model::Model::~Model() noexcept
 {
     collider = nullptr;
@@ -110,6 +125,26 @@ void gearoenix::render::model::Model::set_enabled(const bool b) noexcept
     if (scene != nullptr) {
         scene->set_models_changed(true);
     }
+}
+
+void gearoenix::render::model::Model::set_locked_reflection(std::shared_ptr<reflection::Reflection> rfl) noexcept
+{
+    locked_reflection = std::move(rfl);
+    set_reflection(locked_reflection->get_irradiance().get(), locked_reflection->get_radiance().get());
+}
+
+void gearoenix::render::model::Model::set_colliding_reflection(reflection::Reflection* const rfl) noexcept
+{
+    colliding_reflection = rfl;
+    set_reflection(rfl->get_irradiance().get(), rfl->get_radiance().get());
+}
+
+void gearoenix::render::model::Model::clear_reflection() noexcept
+{
+    core::sync::EndCaller<texture::TextureCube> call([this](const std::shared_ptr<texture::TextureCube>& t) {
+        set_reflection(t.get(), t.get());
+    });
+    e->get_system_application()->get_asset_manager()->get_texture_manager()->get_cube_zero_3c(call);
 }
 
 void gearoenix::render::model::Model::set_scene(scene::Scene* const s) noexcept

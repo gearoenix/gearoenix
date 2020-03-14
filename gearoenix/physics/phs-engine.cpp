@@ -44,6 +44,10 @@ void gearoenix::physics::Engine::update_scenes_kernel(const unsigned int kernel_
             GX_DO_TASK(sky.second->update())
         }
         const auto& shadow_cascaders = scene->get_shadow_cascader_lights();
+        const auto& reflections = scene->get_reflections();
+        for ([[maybe_unused]] const auto& [id, rfl] : reflections) {
+            GX_DO_TASK(rfl->update())
+        }
         if (sys_app->get_render_engine()->get_render_tree()->get_runtime_reflection_state() == render::graph::tree::RuntimeReflectionState::EnvironmentCubeRender) {
             const auto& runtime_reflections = scene->get_runtime_reflections();
             for (const auto& id_rtr : runtime_reflections) {
@@ -83,7 +87,6 @@ void gearoenix::physics::Engine::update_scenes_kernel(const unsigned int kernel_
 
 void gearoenix::physics::Engine::update_scenes_receiver() noexcept
 {
-
     for (const auto& ls : sorted_scenes) {
         auto* const scene = ls.second;
         if (sys_app->get_render_engine()->get_render_tree()->get_runtime_reflection_state() == render::graph::tree::RuntimeReflectionState::EnvironmentCubeRender) {

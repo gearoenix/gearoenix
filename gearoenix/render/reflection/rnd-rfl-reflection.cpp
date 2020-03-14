@@ -2,6 +2,7 @@
 #include "../../physics/collider/phs-cld-aabb.hpp"
 #include "../../system/sys-app.hpp"
 #include "../engine/rnd-eng-engine.hpp"
+#include "../model/rnd-mdl-model.hpp"
 
 gearoenix::render::reflection::Reflection::Reflection(
     const core::Id id,
@@ -17,3 +18,11 @@ gearoenix::render::reflection::Reflection::Reflection(
 }
 
 gearoenix::render::reflection::Reflection::~Reflection() noexcept = default;
+
+void gearoenix::render::reflection::Reflection::update() noexcept
+{
+    for (auto* const mdl : affected_models) {
+        mdl->clear_reflection();
+    }
+    affected_models.clear();
+}

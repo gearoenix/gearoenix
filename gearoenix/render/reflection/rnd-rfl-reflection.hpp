@@ -21,6 +21,8 @@ class TextureCube;
 namespace gearoenix::render::reflection {
 /// The influencing length indicate the length of the AABB of collider that if any object place (exactly) in it,
 /// the pbr materials of that object will get the properties of colliding reflection.
+    /// No reflection overlaps with another one reflection.
+    /// TODO: no reflection overlaps with another one reflection 
 class Reflection : public core::asset::Asset {
     GX_GET_CVAL_PRT(Type, reflection_type)
     GX_GETSET_VAL_PRT(bool, enabled, true)
@@ -29,7 +31,12 @@ class Reflection : public core::asset::Asset {
     GX_GET_CREF_PRT(std::shared_ptr<texture::TextureCube>, irradiance)
     GX_GET_CREF_PRT(std::shared_ptr<texture::TextureCube>, radiance)
     GX_GET_VAL_PRT(double, influencing_length, 5.0)
-    GX_GETSET_VAL_PRT(bool, is_dynamic, false)
+        /// TODO: it must be changed to a constant after addition to a scene, 
+        /// because ti gonna do so many changes is scene setting
+        /// and currently the design is its gonna be cosntant after the reflection added to scene
+    GX_GETSET_VAL_PRT(bool, is_dynamic, false) 
+        /// This for dynamic type reflections, maybe in future it's gonna have some applications with other types
+        GX_GET_CREF_PRT(std::vector<model::Model *>, affected_models)
 protected:
     Reflection(
         core::Id id,
@@ -40,6 +47,7 @@ protected:
 
 public:
     ~Reflection() noexcept override;
+    void update() noexcept;
 };
 }
 #endif

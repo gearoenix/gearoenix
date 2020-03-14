@@ -34,6 +34,9 @@ class Stream;
 
 namespace gearoenix::render::model {
 class Mesh;
+/// Static models will get static reflection when it was being added to scene
+/// Dynamic models will get reflection in each frame if the locked reflection is null
+///   and exactly residing inside a reflection collider
 class Model : public core::asset::Asset {
 public:
     using MapMesh = std::map<core::Id, std::shared_ptr<Mesh>>;
@@ -52,6 +55,13 @@ public:
     GX_GET_PTR_PRT(scene::Scene, scene)
     GX_GET_CPTR_PRT(engine::Engine, e)
     GX_GET_VAL_PRT(unsigned int, latest_frame_update, static_cast<unsigned int>(-1))
+        /// This is for the only static reflections or dynamics that 
+        /// their AABB surrends the model and it is one of the children of the model
+        /// or one of the children of one of the fathers of the the model
+        /// This is must be constant after model added to scene
+        GX_GET_CREF_PRT(std::shared_ptr<reflection::Reflection>, locked_reflection)
+        /// In case the upper was not set, the follong must be found and used
+        GX_GET_PTR_PRT(reflection::Reflection, colliding_reflection)
 protected:
     Model(
         core::Id my_id,
@@ -65,6 +75,8 @@ protected:
         engine::Engine* e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
 
+    void set_reflection(texture::TextureCube* irradiance, texture::TextureCube* radiance) noexcept;
+
 public:
     ~Model() noexcept override;
     virtual void update() noexcept;
@@ -72,6 +84,9 @@ public:
     void add_child(const std::shared_ptr<Model>& c) noexcept;
     void set_collider(std::unique_ptr<physics::collider::Collider> c) noexcept;
     void set_enabled(bool s) noexcept;
+    void set_locked_reflection(std::shared_ptr<reflection::Reflection> reflection_probe) noexcept;
+    void set_colliding_reflection(reflection::Reflection* reflection_probe) noexcept;
+    void clear_reflection() noexcept;
     virtual void set_scene(scene::Scene* s) noexcept;
     [[nodiscard]] virtual bool get_dynamicity() const noexcept = 0;
 };
