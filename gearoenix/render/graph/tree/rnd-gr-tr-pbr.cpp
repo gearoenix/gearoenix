@@ -87,11 +87,22 @@ void gearoenix::render::graph::tree::Pbr::update_skyboxes(const scene::Scene* co
     }
 }
 
-void gearoenix::render::graph::tree::Pbr::update_runtime_reflection(const scene::Scene* const scn) noexcept
+void gearoenix::render::graph::tree::Pbr::clear_runtime_reflection() noexcept
 {
     switch (runtime_reflection_state) {
     case RuntimeReflectionState::EnvironmentCubeRender: {
         runtime_reflections_data.clear();
+        break;
+    }
+    default:
+        break;
+    }
+}
+
+void gearoenix::render::graph::tree::Pbr::update_runtime_reflection(const scene::Scene* const scn) noexcept
+{
+    switch (runtime_reflection_state) {
+    case RuntimeReflectionState::EnvironmentCubeRender: {
         const auto& runtime_reflections = scn->get_runtime_reflections();
         for (const auto& id_rtr : runtime_reflections) {
             const auto& rtr = id_rtr.second;
@@ -369,6 +380,7 @@ void gearoenix::render::graph::tree::Pbr::update() noexcept
     unlit.refresh();
     nodes.clear();
     cascades.clear();
+    clear_runtime_reflection();
     const auto& priorities_scenes = e->get_physics_engine()->get_sorted_scenes();
     for (const auto& priority_scenes : priorities_scenes) {
         const double scene_priority = priority_scenes.first;
