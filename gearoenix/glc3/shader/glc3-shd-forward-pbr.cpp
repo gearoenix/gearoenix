@@ -292,18 +292,18 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         "    vec3 diffuse = irradiance * albedo.xyz;\n"
         //   sample both the pre-filter map and the BRDF lut and combine them together as per
         //   the Split-Sum approximation to get the IBL radiance part.
-        "    float MAX_REFLECTION_LOD = 4.0;\n"
-        "    vec3 prefiltered_color = texture(effect_specular_environment, reflection, roughness * MAX_REFLECTION_LOD).rgb;\n"
+        "    vec3 prefiltered_color = textureLod(effect_specular_environment, reflection, roughness * " GX_MAX_RUNTIME_REFLECTION_RADIANCE_LEVELS_STR ".0).rgb;\n"
         "    vec2 brdf = texture(effect_brdflut, vec2(normal_dot_view, roughness)).rg;\n"
         "    vec3 specular = prefiltered_color * (frsn * brdf.x + brdf.y);\n"
         //   TODO: add ambient occlusion (* ao);
         "    vec3 ambient = kd * diffuse + specular + scene_ambient_light * albedo.xyz;\n"
         "    tmpv4.xyz = ambient + lo;\n"
-        //   HDR tonemapping
+        //   HDR tone mapping
         "    tmpv4.xyz = tmpv4.xyz / (tmpv4.xyz + vec3(1.0));\n"
         //   gamma correct
         "    tmpv4.xyz = pow(tmpv4.xyz, vec3(1.0 / 2.2));\n"
         //   TODO don't forget gamma correction it can be part of scene uniform data
+        //        "    frag_color = vec4((tmpv4.xyz * 0.001) + textureLod(effect_diffuse_environment, normalize(out_pos), 0.0).xyz, albedo.w);\n"
         "    frag_color = vec4(tmpv4.xyz, albedo.w);\n"
         "}";
     e->get_function_loader()->load([this, vertex_shader_code { vertex_shader_code.str() }, fragment_shader_code { fragment_shader_code.str() }] {

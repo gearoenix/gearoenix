@@ -115,7 +115,7 @@ IblBakerApp::IblBakerApp(gearoenix::system::Application* const sys_app) noexcept
 
     cam = ast_mgr->get_camera_manager()->create<GxPersCam>();
     cam_trn = dynamic_cast<GxCamTran*>(cam->get_transformation());
-    cam_trn->look_at(GxVec3(0.0), GxVec3(1.0, 0.0, 0.0), GxVec3(0.0, 0.0, 1.0));
+    cam_trn->look_at(GxVec3(25.0, 0.0, 0.0), GxVec3(0.0, 0.0, 0.0), GxVec3(0.0, 0.0, 1.0));
     scn->add_camera(cam);
 
     sky = sky_mgr->create<GxSkyEqrect>(sky_call);
@@ -160,8 +160,32 @@ IblBakerApp::IblBakerApp(gearoenix::system::Application* const sys_app) noexcept
 
     obj_cam = ast_mgr->get_camera_manager()->create<GxPersCam>();
     obj_cam_trn = dynamic_cast<GxCamTran*>(obj_cam->get_transformation());
-    obj_cam_trn->look_at(GxVec3(20.0, 20.0, 10.0), GxVec3(0.0, 0.0, 0.0), GxVec3(0.0, 0.0, 1.0));
+    obj_cam_trn->look_at(GxVec3(25.0, 0.0, 0.0), GxVec3(0.0, 0.0, 0.0), GxVec3(0.0, 0.0, 1.0));
     obj_scn->add_camera(obj_cam);
+
+    //    {
+    //        const auto cube_mesh = msh_mgr->create_cube(msh_call);
+    //        const std::shared_ptr<GxMatPbr> mat(new GxMatPbr(render_engine, end_call));
+    //        mat->set_roughness_factor(0.5f);
+    //        mat->set_metallic_factor(0.5f);
+    //        const auto mdl = mdl_mgr->create<GxStaticModel>(mdl_call);
+    //        mdl->add_mesh(std::make_shared<GxMdMesh>(cube_mesh, mat));
+    //        mdl->get_transformation()->local_scale(10.0);
+    //        obj_scn->add_model(mdl);
+    //        mdl->set_hooked_reflection(rtr);
+    //    }
+
+    //    {
+    //        const auto sphere_mesh = msh_mgr->create_icosphere(msh_call);
+    //        const std::shared_ptr<GxMatPbr> mat(new GxMatPbr(render_engine, end_call));
+    //        mat->set_roughness_factor(0.5f);
+    //        mat->set_metallic_factor(0.5f);
+    //        const auto mdl = mdl_mgr->create<GxStaticModel>(mdl_call);
+    //        mdl->add_mesh(std::make_shared<GxMdMesh>(sphere_mesh, mat));
+    //        mdl->get_transformation()->local_scale(10.0);
+    //        obj_scn->add_model(mdl);
+    //        mdl->set_hooked_reflection(rtr);
+    //    }
 
     const auto obj_msh = msh_mgr->create_icosphere(msh_call);
 
@@ -170,6 +194,7 @@ IblBakerApp::IblBakerApp(gearoenix::system::Application* const sys_app) noexcept
             const std::shared_ptr<GxMatPbr> mat(new GxMatPbr(render_engine, end_call));
             mat->set_roughness_factor(roughness);
             mat->set_metallic_factor(metallic);
+            mat->set_color(1.0f, 0.0f, 0.0f, end_call);
             const auto mdl = mdl_mgr->create<GxStaticModel>(mdl_call);
             mdl->add_mesh(std::make_shared<GxMdMesh>(obj_msh, mat));
             mdl->get_transformation()->set_location(GxVec3(x, y, 0.0f));
@@ -208,6 +233,8 @@ bool IblBakerApp::on_event(const gearoenix::core::event::Data& d) noexcept
             const auto rot_z = data.delta_position[0];
             cam_trn->local_rotate(rot_z, GxVec3(0.0, 0.0, 1.0));
             cam_trn->local_x_rotate(rot_x);
+            obj_cam_trn->global_rotate(rot_z, GxVec3(0.0, 0.0, 1.0), GxVec3(0.0, 0.0, 0.0));
+            obj_cam_trn->global_rotate(rot_x, obj_cam_trn->get_x_axis(), GxVec3(0.0, 0.0, 0.0));
         }
         break;
     }

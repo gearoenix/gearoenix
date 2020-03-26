@@ -8350,16 +8350,16 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager:
     };
     switch (f) {
     case texture::Face::PositiveX:
-        vertices[0].normal = math::Vec3(1.0f, 1.0f, -1.0f);
-        vertices[1].normal = math::Vec3(1.0f, -1.0f, -1.0f);
-        vertices[2].normal = math::Vec3(1.0f, 1.0f, 1.0f);
-        vertices[3].normal = math::Vec3(1.0f, -1.0f, 1.0f);
+        vertices[0].normal = math::Vec3(1.0f, 1.0f, 1.0f);
+        vertices[1].normal = math::Vec3(1.0f, 1.0f, -1.0f);
+        vertices[2].normal = math::Vec3(1.0f, -1.0f, 1.0f);
+        vertices[3].normal = math::Vec3(1.0f, -1.0f, -1.0f);
         break;
     case texture::Face::NegativeX:
-        vertices[0].normal = math::Vec3(-1.0f, -1.0f, -1.0f);
-        vertices[1].normal = math::Vec3(-1.0f, 1.0f, -1.0f);
-        vertices[2].normal = math::Vec3(-1.0f, -1.0f, 1.0f);
-        vertices[3].normal = math::Vec3(-1.0f, 1.0f, 1.0f);
+        vertices[0].normal = math::Vec3(-1.0f, 1.0f, -1.0f);
+        vertices[1].normal = math::Vec3(-1.0f, 1.0f, 1.0f);
+        vertices[2].normal = math::Vec3(-1.0f, -1.0f, -1.0f);
+        vertices[3].normal = math::Vec3(-1.0f, -1.0f, 1.0f);
         break;
     case texture::Face::PositiveY:
         vertices[0].normal = math::Vec3(-1.0f, 1.0f, -1.0f);
@@ -8368,10 +8368,10 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager:
         vertices[3].normal = math::Vec3(1.0f, 1.0f, 1.0f);
         break;
     case texture::Face::NegativeY:
-        vertices[0].normal = math::Vec3(1.0f, -1.0f, -1.0f);
-        vertices[1].normal = math::Vec3(-1.0f, -1.0f, -1.0f);
-        vertices[2].normal = math::Vec3(1.0f, -1.0f, 1.0f);
-        vertices[3].normal = math::Vec3(-1.0f, -1.0f, 1.0f);
+        vertices[0].normal = math::Vec3(-1.0f, -1.0f, 1.0f);
+        vertices[1].normal = math::Vec3(1.0f, -1.0f, 1.0f);
+        vertices[2].normal = math::Vec3(-1.0f, -1.0f, -1.0f);
+        vertices[3].normal = math::Vec3(1.0f, -1.0f, -1.0f);
         break;
     case texture::Face::PositiveZ:
         vertices[0].normal = math::Vec3(-1.0f, 1.0f, 1.0f);
@@ -8380,10 +8380,10 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager:
         vertices[3].normal = math::Vec3(1.0f, -1.0f, 1.0f);
         break;
     case texture::Face::NegativeZ:
-        vertices[0].normal = math::Vec3(-1.0f, -1.0f, -1.0f);
-        vertices[1].normal = math::Vec3(1.0f, -1.0f, -1.0f);
-        vertices[2].normal = math::Vec3(-1.0f, 1.0f, -1.0f);
-        vertices[3].normal = math::Vec3(1.0f, 1.0f, -1.0f);
+        vertices[0].normal = math::Vec3(1.0f, 1.0f, -1.0f);
+        vertices[1].normal = math::Vec3(-1.0f, 1.0f, -1.0f);
+        vertices[2].normal = math::Vec3(1.0f, -1.0f, -1.0f);
+        vertices[3].normal = math::Vec3(-1.0f, -1.0f, -1.0f);
         break;
     }
     const std::vector<std::uint32_t> indices = {

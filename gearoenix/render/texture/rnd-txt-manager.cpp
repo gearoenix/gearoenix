@@ -6,6 +6,8 @@
 #include "rnd-txt-texture-2d.hpp"
 #include "rnd-txt-texture-cube.hpp"
 #include <array>
+//#include <algorithm>
+//#include <execution>
 
 gearoenix::render::texture::Manager::Manager(std::unique_ptr<system::stream::Stream> s, engine::Engine* const e) noexcept
     : e(e)
@@ -327,9 +329,17 @@ std::vector<gearoenix::math::Vec2<float>> gearoenix::render::texture::Manager::c
 {
     std::vector<math::Vec2<float>> pixels(resolution * resolution);
     const auto inv_res = 1.0f / float(resolution);
+    // Because the current support of parallel for is incomplete in important compilers, following lines commented out
+    //    std::for_each(std::execution::par, pixels.begin(), pixels.end(), [&](math::Vec2<float> &p) {
+    //        const auto i = (reinterpret_cast<std::size_t>(&p) -
+    //                reinterpret_cast<std::size_t>(&(pixels[0]))) / sizeof(decltype(pixels[0]));
+    //        const auto r = i / resolution;
+    //        const auto c = i - r * resolution;
+    //        p = integrate_brdf(float(c) * inv_res, float(r) * inv_res);
+    //    });
     for (std::size_t r = 0, i = 0; r < resolution; ++r) {
         for (std::size_t c = 0; c < resolution; ++c, ++i) {
-            pixels[i] = integrate_brdf(float(c) * inv_res, float(r) * inv_res);
+            pixels[i] = integrate_brdf((float(c) + 0.5f) * inv_res, (float(r) + 0.5f) * inv_res);
         }
     }
     return pixels;

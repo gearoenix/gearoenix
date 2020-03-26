@@ -23,7 +23,7 @@ void gearoenix::render::pipeline::UnlitResourceSet::set_mesh(const mesh::Mesh* m
     msh = m;
 }
 
-void gearoenix::render::pipeline::UnlitResourceSet::set_node_uniform_buffer(buffer::Uniform* b) noexcept
+void gearoenix::render::pipeline::UnlitResourceSet::set_node_uniform_buffer(buffer::Uniform* const b) noexcept
 {
     node_uniform_buffer = b;
 }

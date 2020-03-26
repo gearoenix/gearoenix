@@ -15,6 +15,7 @@ class Engine;
 namespace gearoenix::glc3::shader {
 class IrradianceConvoluter final : public Shader {
     GX_GLC3_UNIFORM_TEXTURE(environment)
+    GX_GLC3_UNIFORM_MATRIX(mvp, 4, 1)
 public:
     IrradianceConvoluter(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
     ~IrradianceConvoluter() noexcept final;

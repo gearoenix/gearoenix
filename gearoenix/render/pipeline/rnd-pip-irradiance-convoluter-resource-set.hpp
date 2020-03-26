@@ -8,7 +8,7 @@ class IrradianceConvoluter;
 class IrradianceConvoluterResourceSet : public ResourceSet {
 protected:
     const mesh::Mesh* msh = nullptr;
-
+    const buffer::Uniform* node_uniform_buffer = nullptr;
     const texture::TextureCube* environment = nullptr;
 
     explicit IrradianceConvoluterResourceSet(std::shared_ptr<IrradianceConvoluter const> pip) noexcept;
@@ -17,6 +17,7 @@ public:
     ~IrradianceConvoluterResourceSet() noexcept override;
     void set_mesh(const mesh::Mesh* m) noexcept;
     void set_environment(const texture::TextureCube* environment) noexcept;
+    void set_node_uniform_buffer(buffer::Uniform* node_uniform_buffer) noexcept;
     void clean() noexcept override;
 };
 }

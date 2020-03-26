@@ -21,12 +21,12 @@ gearoenix::render::reflection::Runtime::Runtime(
     : Reflection(id, Type::Runtime, e)
 {
     constexpr std::tuple<texture::Face, math::Vec3<double>, math::Vec3<double>> faces[6] = {
-        { texture::FACES[0], math::Vec3(1.0, 0.0, 0.0), math::Vec3(0.0, 0.0, 1.0) },
-        { texture::FACES[1], math::Vec3(-1.0, 0.0, 0.0), math::Vec3(0.0, 0.0, 1.0) },
+        { texture::FACES[0], math::Vec3(1.0, 0.0, 0.0), math::Vec3(0.0, -1.0, 0.0) },
+        { texture::FACES[1], math::Vec3(-1.0, 0.0, 0.0), math::Vec3(0.0, -1.0, 0.0) },
         { texture::FACES[2], math::Vec3(0.0, 1.0, 0.0), math::Vec3(0.0, 0.0, 1.0) },
-        { texture::FACES[3], math::Vec3(0.0, -1.0, 0.0), math::Vec3(0.0, 0.0, 1.0) },
+        { texture::FACES[3], math::Vec3(0.0, -1.0, 0.0), math::Vec3(0.0, 0.0, -1.0) },
         { texture::FACES[4], math::Vec3(0.0, 0.0, 1.0), math::Vec3(0.0, -1.0, 0.0) },
-        { texture::FACES[5], math::Vec3(0.0, 0.0, -1.0), math::Vec3(0.0, 1.0, 0.0) },
+        { texture::FACES[5], math::Vec3(0.0, 0.0, -1.0), math::Vec3(0.0, -1.0, 0.0) },
     };
     constexpr texture::TextureInfo texture_info {
         .format = texture::TextureFormat::RgbaFloat32,
@@ -100,8 +100,8 @@ gearoenix::render::reflection::Runtime::Runtime(
         target_info.txt = irradiance;
         irradiance_target = e->create_render_target(core::asset::Manager::create_id(), target_infos, call);
         auto& irradiance_convoluter = irradiance_convoluters[i];
-        irradiance_convoluter = std::make_unique<graph::node::IrradianceConvoluter>(
-            face_mesh.get(), environment.get(), e, call);
+        const auto mvp = math::Mat4x4<float>::perspective(1.0f, 1.0f, 0.5, 2.0f) * math::Mat4x4<float>::look_at(math::Vec3(0.0f), math::Vec3<float>(std::get<1>(faces[i])), math::Vec3<float>(std::get<2>(faces[i])));
+        irradiance_convoluter = std::make_unique<graph::node::IrradianceConvoluter>(mvp, environment.get(), e, call);
         irradiance_convoluter->set_render_target(irradiance_target.get());
         // radiance part
         auto& radiance_face_targets = radiance_targets[i];

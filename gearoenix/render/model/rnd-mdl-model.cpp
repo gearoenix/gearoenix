@@ -10,7 +10,7 @@
 #include "../mesh/rnd-msh-manager.hpp"
 #include "../mesh/rnd-msh-mesh.hpp"
 #include "../pipeline/rnd-pip-manager.hpp"
-#include "../reflection/rnd-rfl-reflection.hpp"
+#include "../reflection/rnd-rfl-runtime.hpp"
 #include "../scene/rnd-scn-scene.hpp"
 #include "../texture/rnd-txt-manager.hpp"
 #include "rnd-mdl-manager.hpp"
@@ -133,6 +133,7 @@ void gearoenix::render::model::Model::set_hooked_reflection(std::shared_ptr<refl
 {
     for (const auto& m : children)
         m.second->set_hooked_reflection(rfl);
+    //    set_reflection(rfl->get_irradiance().get(), static_cast<reflection::Runtime*>(rfl.get())->get_environment().get());
     set_reflection(rfl->get_irradiance().get(), rfl->get_radiance().get());
     hooked_reflection = std::move(rfl);
 }

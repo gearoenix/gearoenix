@@ -6,6 +6,7 @@
 #include "../../render/graph/node/rnd-gr-nd-irradiance-convoluter.hpp"
 #include "../../render/mesh/rnd-msh-mesh.hpp"
 #include "../buffer/glc3-buf-index.hpp"
+#include "../buffer/glc3-buf-uniform.hpp"
 #include "../buffer/glc3-buf-vertex.hpp"
 #include "../shader/glc3-shd-irradiance-convoluter.hpp"
 #include "../texture/glc3-txt-cube.hpp"
@@ -28,6 +29,8 @@ void gearoenix::glc3::pipeline::IrradianceConvoluterResourceSet::bind_final(gl::
     GX_GLC3_PIP_RES_START_DRAWING_MESH
     GX_GLC3_PIP_RES_START_SHADER(IrradianceConvoluter, shd)
     GX_GLC3_PIP_RES_SET_TXT_CUBE(environment, environment)
+    const auto* const node = node_uniform_buffer->get_ptr<render::graph::node::IrradianceConvoluterUniform>();
+    GX_GLC3_PIP_RES_SET_UNIFORM(mvp, node->mvp.data[0][0])
     GX_GLC3_PIP_RES_END_DRAWING_MESH
 #ifdef GX_DEBUG_GL_CLASS_3
     gl::Loader::check_for_error();

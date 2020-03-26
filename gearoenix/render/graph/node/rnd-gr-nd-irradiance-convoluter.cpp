@@ -9,6 +9,7 @@
 #include "../../command/rnd-cmd-buffer.hpp"
 #include "../../command/rnd-cmd-manager.hpp"
 #include "../../engine/rnd-eng-engine.hpp"
+#include "../../mesh/rnd-msh-manager.hpp"
 #include "../../mesh/rnd-msh-mesh.hpp"
 #include "../../pipeline/rnd-pip-irradiance-convoluter-resource-set.hpp"
 #include "../../pipeline/rnd-pip-manager.hpp"
@@ -39,13 +40,14 @@ gearoenix::render::graph::node::IrradianceConvoluterFrame::~IrradianceConvoluter
 void gearoenix::render::graph::node::IrradianceConvoluter::record(IrradianceConvoluterKernel* const kernel) noexcept
 {
     auto* const prs = kernel->r.get();
-    prs->set_mesh(msh);
+    prs->set_mesh(cube_mesh.get());
     prs->set_environment(environment);
+    prs->set_node_uniform_buffer(uniform.get());
     kernel->secondary_cmd->bind(prs);
 }
 
 gearoenix::render::graph::node::IrradianceConvoluter::IrradianceConvoluter(
-    const mesh::Mesh* const msh, const texture::TextureCube* environment,
+    const math::Mat4x4<float>& mvp, const texture::TextureCube* environment,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
     : Node(
@@ -60,9 +62,12 @@ gearoenix::render::graph::node::IrradianceConvoluter::IrradianceConvoluter(
         },
         call)
     , frames(e->get_frames_count())
-    , msh(msh)
+    , uniform(e->get_buffer_manager()->create_uniform(sizeof(IrradianceConvoluterUniform)))
     , environment(environment)
 {
+    uniform->set_data(mvp);
+    core::sync::EndCaller<mesh::Mesh> mesh_call([call](const std::shared_ptr<mesh::Mesh>&) {});
+    cube_mesh = e->get_system_application()->get_asset_manager()->get_mesh_manager()->create_inward_cube(mesh_call);
     set_providers_count(input_textures.size());
     for (auto& f : frames) {
         f = std::make_unique<IrradianceConvoluterFrame>(e, render_pipeline.get());

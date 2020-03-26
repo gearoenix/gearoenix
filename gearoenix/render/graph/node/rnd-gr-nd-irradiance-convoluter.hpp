@@ -29,6 +29,10 @@ class IrradianceConvoluterResourceSet;
 
 namespace gearoenix::render::graph::node {
 
+struct IrradianceConvoluterUniform {
+    math::Mat4x4<float> mvp;
+};
+
 struct IrradianceConvoluterKernel {
     const std::unique_ptr<command::Buffer> secondary_cmd;
     const std::unique_ptr<pipeline::IrradianceConvoluterResourceSet> r;
@@ -46,13 +50,14 @@ class IrradianceConvoluter final : public Node {
 private:
     std::vector<std::unique_ptr<IrradianceConvoluterFrame>> frames;
     IrradianceConvoluterFrame* frame = nullptr;
-    const mesh::Mesh* const msh;
+    const std::unique_ptr<buffer::Uniform> uniform;
+    std::shared_ptr<mesh::Mesh> cube_mesh;
     const texture::TextureCube* const environment;
 
     void record(IrradianceConvoluterKernel* kernel) noexcept;
 
 public:
-    IrradianceConvoluter(const mesh::Mesh* msh, const texture::TextureCube* environment, engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
+    IrradianceConvoluter(const math::Mat4x4<float>& mvp, const texture::TextureCube* environment, engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
     ~IrradianceConvoluter() noexcept final;
     void update() noexcept final;
     void record(unsigned int kernel_index) noexcept final;

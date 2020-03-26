@@ -38,6 +38,7 @@ gearoenix::glc3::shader::SkyboxEquirectangular::SkyboxEquirectangular(engine::En
         "    tmp_v4.w *= material_alpha;\n"
         "    if(tmp_v4.w < material_alpha_cutoff) discard;\n"
         "    frag_color = tmp_v4;\n"
+        //        "    frag_color = vec4(pow(tmp_v4.xyz / (tmp_v4.xyz + 1.0), vec3(1.0 / 2.2)), tmp_v4.w);\n"
         "}";
     e->get_function_loader()->load([this, vertex_shader_code { vertex_shader_code.str() }, fragment_shader_code { fragment_shader_code.str() }] {
         set_vertex_shader(vertex_shader_code);

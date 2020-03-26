@@ -18,6 +18,11 @@ void gearoenix::render::pipeline::IrradianceConvoluterResourceSet::set_environme
     environment = c;
 }
 
+void gearoenix::render::pipeline::IrradianceConvoluterResourceSet::set_node_uniform_buffer(buffer::Uniform* const b) noexcept
+{
+    node_uniform_buffer = b;
+}
+
 void gearoenix::render::pipeline::IrradianceConvoluterResourceSet::clean() noexcept
 {
     msh = nullptr;

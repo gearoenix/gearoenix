@@ -113,8 +113,9 @@ void gearoenix::render::graph::node::SkyboxEquirectangular::record_continuously(
 {
     auto* const kernel = frame->kernels[kernel_index].get();
     for (const auto* const sky : skies) {
+        const auto& cam_unf = cam->get_uniform();
         const SkyboxEquirectangularUniform u {
-            .mvp = cam->get_uniform().view_projection * math::Mat4x4(std::abs(cam->get_uniform().far) * 0.57735026f),
+            .mvp = cam_unf.view_projection * math::Mat4x4<float>::translator(cam_unf.position) * math::Mat4x4(std::abs(cam_unf.far) * 0.57735026f),
         };
         record_sky(sky, u, kernel);
     }
