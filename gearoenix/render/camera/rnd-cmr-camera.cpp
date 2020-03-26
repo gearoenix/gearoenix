@@ -78,6 +78,11 @@ void gearoenix::render::camera::Camera::set_far(const float f) noexcept
     reinterpret_cast<Transformation*>(transformation.get())->update_projection();
 }
 
+void gearoenix::render::camera::Camera::set_gamma_correction_factor(const float f) noexcept
+{
+    uniform.gamma_correction = f;
+}
+
 void gearoenix::render::camera::Camera::set_target(const texture::Target* const t) noexcept
 {
     target = std::unique_ptr<texture::Target>(t->clone());

@@ -31,6 +31,8 @@ void gearoenix::glc3::pipeline::ForwardPbrResourceSet::bind_final(gl::uint& boun
     const auto* const camera = camera_uniform_buffer->get_ptr<render::camera::Uniform>();
     GX_GLC3_PIP_RES_SET_UNIFORM(camera_position, *(camera->position.data()))
     GX_GLC3_PIP_RES_SET_UNIFORM(camera_vp, camera->view_projection.data[0][0])
+    GX_GLC3_PIP_RES_SET_UNIFORM(camera_hdr_tune_mapping, camera->hdr_tune_mapping)
+    GX_GLC3_PIP_RES_SET_UNIFORM(camera_gamma_correction, camera->gamma_correction)
     //static_cast<const texture::Texture2D *>(ambient_occlusion.get())->bind(shdr->get_effect_ambient_occlusion_index());
     reinterpret_cast<const texture::Texture2D*>(brdflut)->bind(static_cast<gl::enumerated>(shdr->get_effect_brdflut_index()));
     reinterpret_cast<const texture::TextureCube*>(irradiance)->bind(static_cast<gl::enumerated>(shdr->get_effect_diffuse_environment_index()));

@@ -89,6 +89,7 @@ protected:
 public:
     ~Camera() noexcept override;
     void set_far(float f) noexcept;
+    void set_gamma_correction_factor(float f) noexcept;
     void set_target(const texture::Target* target) noexcept;
     void set_cascaded_shadow_frustum_partitions_count(std::size_t c) noexcept;
     virtual void update() noexcept;

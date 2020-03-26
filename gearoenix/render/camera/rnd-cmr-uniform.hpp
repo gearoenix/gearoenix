@@ -14,6 +14,8 @@ struct Uniform {
     float clip_height = 0.0f;
     float clip_start_x = 0.0f;
     float clip_start_y = 0.0f;
+    float hdr_tune_mapping = 1.0f;
+    float gamma_correction = 2.2f;
     math::Mat4x4<float> inverted_rotation;
     math::Mat4x4<float> view;
     math::Mat4x4<float> projection;

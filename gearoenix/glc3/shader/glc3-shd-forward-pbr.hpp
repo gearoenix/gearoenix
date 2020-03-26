@@ -26,6 +26,8 @@ class ForwardPbr final : public Shader {
     GX_GLC3_UNIFORM_FLOAT(material_roughness_factor, 1)
     GX_GLC3_UNIFORM_VECTOR(camera_position, 3, 1)
     GX_GLC3_UNIFORM_MATRIX(camera_vp, 4, 1)
+    GX_GLC3_UNIFORM_FLOAT(camera_hdr_tune_mapping, 1)
+    GX_GLC3_UNIFORM_FLOAT(camera_gamma_correction, 1)
     // Effect textures
     GX_GLC3_UNIFORM_TEXTURE(effect_ambient_occlusion)
     GX_GLC3_UNIFORM_TEXTURE(effect_brdflut)

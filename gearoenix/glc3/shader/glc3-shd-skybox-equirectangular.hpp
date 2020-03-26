@@ -17,6 +17,8 @@ class SkyboxEquirectangular final : public Shader {
     GX_GLC3_UNIFORM_FLOAT(material_alpha, 1)
     GX_GLC3_UNIFORM_FLOAT(material_alpha_cutoff, 1)
     GX_GLC3_UNIFORM_TEXTURE(material_color)
+    GX_GLC3_UNIFORM_FLOAT(camera_hdr_tune_mapping, 1)
+    GX_GLC3_UNIFORM_FLOAT(camera_gamma_correction, 1)
     GX_GLC3_UNIFORM_MATRIX(effect_mvp, 4, 1)
 
 public:

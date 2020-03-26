@@ -24,6 +24,8 @@ gearoenix::glc3::shader::SkyboxEquirectangular::SkyboxEquirectangular(engine::En
         "uniform float material_alpha;\n"
         "uniform float material_alpha_cutoff;\n"
         "uniform sampler2D material_color;\n"
+        "uniform float camera_hdr_tune_mapping;\n"
+        "uniform float camera_gamma_correction;\n"
         "in vec3 out_pos;\n"
         "out vec4 frag_color;\n"
         "const vec2 inv_atan = vec2(0.1591, 0.3183);\n"
@@ -37,8 +39,10 @@ gearoenix::glc3::shader::SkyboxEquirectangular::SkyboxEquirectangular(engine::En
         "    vec4 tmp_v4 = texture(material_color, uv);\n"
         "    tmp_v4.w *= material_alpha;\n"
         "    if(tmp_v4.w < material_alpha_cutoff) discard;\n"
+        "    if(camera_gamma_correction > 0.001) {\n"
+        "        tmp_v4.xyz = pow(tmp_v4.xyz / (tmp_v4.xyz + camera_hdr_tune_mapping), vec3(1.0 / camera_gamma_correction));\n"
+        "    }\n"
         "    frag_color = tmp_v4;\n"
-        //        "    frag_color = vec4(pow(tmp_v4.xyz / (tmp_v4.xyz + 1.0), vec3(1.0 / 2.2)), tmp_v4.w);\n"
         "}";
     e->get_function_loader()->load([this, vertex_shader_code { vertex_shader_code.str() }, fragment_shader_code { fragment_shader_code.str() }] {
         set_vertex_shader(vertex_shader_code);
@@ -48,6 +52,8 @@ gearoenix::glc3::shader::SkyboxEquirectangular::SkyboxEquirectangular(engine::En
         GX_GLC3_THIS_GET_UNIFORM(material_alpha)
         GX_GLC3_THIS_GET_UNIFORM(material_alpha_cutoff)
         GX_GLC3_THIS_GET_UNIFORM_TEXTURE(material_color)
+        GX_GLC3_THIS_GET_UNIFORM(camera_hdr_tune_mapping)
+        GX_GLC3_THIS_GET_UNIFORM(camera_gamma_correction)
         GX_GLC3_THIS_GET_UNIFORM(effect_mvp)
     });
 }

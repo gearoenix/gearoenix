@@ -85,6 +85,8 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         "uniform sampler2D   effect_brdflut;\n" GX_GLC3_SHADER_SRC_EFFECT_UNIFORMS
         // camera uniform(s)
         "uniform vec3        camera_position;\n"
+        "uniform float       camera_hdr_tune_mapping;\n"
+        "uniform float       camera_gamma_correction;\n"
         // output(s) of vertex shader
         "in vec3 out_pos;\n"
         "in vec3 out_nrm;\n"
@@ -298,12 +300,13 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         //   TODO: add ambient occlusion (* ao);
         "    vec3 ambient = kd * diffuse + specular + scene_ambient_light * albedo.xyz;\n"
         "    tmpv4.xyz = ambient + lo;\n"
+        "    if(camera_gamma_correction > 0.001) {\n"
         //   HDR tone mapping
-        "    tmpv4.xyz = tmpv4.xyz / (tmpv4.xyz + vec3(1.0));\n"
+        "        tmpv4.xyz = tmpv4.xyz / (tmpv4.xyz + vec3(camera_hdr_tune_mapping));\n"
         //   gamma correct
-        "    tmpv4.xyz = pow(tmpv4.xyz, vec3(1.0 / 2.2));\n"
-        //   TODO don't forget gamma correction it can be part of scene uniform data
-        //        "    frag_color = vec4((tmpv4.xyz * 0.001) + textureLod(effect_diffuse_environment, normalize(out_pos), 0.0).xyz, albedo.w);\n"
+        "        tmpv4.xyz = pow(tmpv4.xyz, vec3(1.0 / camera_gamma_correction));\n"
+        "}\n"
+        //"  frag_color = vec4((tmpv4.xyz * 0.001) + textureLod(effect_diffuse_environment, normalize(out_pos), 0.0).xyz, albedo.w);\n"
         "    frag_color = vec4(tmpv4.xyz, albedo.w);\n"
         "}";
     e->get_function_loader()->load([this, vertex_shader_code { vertex_shader_code.str() }, fragment_shader_code { fragment_shader_code.str() }] {
@@ -323,6 +326,8 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         GX_GLC3_THIS_GET_UNIFORM(material_roughness_factor)
         GX_GLC3_THIS_GET_UNIFORM(camera_position)
         GX_GLC3_THIS_GET_UNIFORM(camera_vp)
+        GX_GLC3_THIS_GET_UNIFORM(camera_hdr_tune_mapping)
+        GX_GLC3_THIS_GET_UNIFORM(camera_gamma_correction)
         // TODO
         //GX_GLC3_THIS_GET_UNIFORM(effect_ambient_occlusion)
         GX_GLC3_THIS_GET_UNIFORM_TEXTURE(effect_brdflut)

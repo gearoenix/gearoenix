@@ -1,5 +1,6 @@
 #include "rnd-pip-skybox-equirectangular-resource-set.hpp"
 #include "../buffer/rnd-buf-framed-uniform.hpp"
+#include "../camera/rnd-cmr-camera.hpp"
 #include "../material/rnd-mat-skybox-equirectangular.hpp"
 #include "rnd-pip-skybox-equirectangular.hpp"
 
@@ -33,4 +34,9 @@ void gearoenix::render::pipeline::SkyboxEquirectangularResourceSet::clean() noex
     node_uniform_buffer = nullptr;
     msh = nullptr;
     color = nullptr;
+}
+
+void gearoenix::render::pipeline::SkyboxEquirectangularResourceSet::set_camera(const camera::Camera* const c) noexcept
+{
+    camera_uniform_buffer = c->get_uniform_buffers()->get_buffer();
 }

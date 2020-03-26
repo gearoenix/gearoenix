@@ -58,6 +58,7 @@ void gearoenix::render::graph::node::SkyboxEquirectangular::record_sky(
     auto* const prs = rd->r.get();
     prs->set_mesh(sky->get_msh().get());
     prs->set_material(sky->get_mat_equ().get());
+    prs->set_camera(cam);
     kernel->secondary_cmd->bind(prs);
 }
 

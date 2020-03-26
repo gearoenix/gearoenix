@@ -12,6 +12,7 @@ class SkyboxEquirectangularResourceSet : public ResourceSet {
 protected:
     /// It is not owner of any of these pointers
     const buffer::Uniform* material_uniform_buffer = nullptr;
+    const buffer::Uniform* camera_uniform_buffer = nullptr;
     const buffer::Uniform* node_uniform_buffer = nullptr;
 
     const mesh::Mesh* msh = nullptr;
@@ -24,6 +25,7 @@ public:
     ~SkyboxEquirectangularResourceSet() noexcept override;
     void set_material(const material::SkyboxEquirectangular* m) noexcept;
     void set_mesh(const mesh::Mesh* m) noexcept;
+    void set_camera(const camera::Camera* cam) noexcept;
     void set_node_uniform_buffer(buffer::Uniform* node_uniform_buffer) noexcept;
     void clean() noexcept override;
 };

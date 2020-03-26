@@ -91,6 +91,7 @@ gearoenix::render::reflection::Runtime::Runtime(
         cam->set_aspects(environment_resolution, environment_resolution);
         cam->set_target(target.get());
         cam->get_transformation()->look_at(std::get<1>(faces[i]), std::get<2>(faces[i]));
+        cam->set_gamma_correction_factor(0.0f);
         // mesh
         auto& face_mesh = face_meshes[i];
         face_mesh = msh_mgr->create_face_square(texture::FACES[i], msh_call);

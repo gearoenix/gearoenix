@@ -29,6 +29,9 @@ void gearoenix::glc3::pipeline::SkyboxEquirectangularResourceSet::bind_final(gl:
     GX_GLC3_PIP_RES_SET_UNIFORM(material_alpha, material->alpha)
     GX_GLC3_PIP_RES_SET_UNIFORM(material_alpha_cutoff, material->alpha_cutoff)
     GX_GLC3_PIP_RES_SET_TXT_2D(material_color, color)
+    const auto* const camera = camera_uniform_buffer->get_ptr<render::camera::Uniform>();
+    GX_GLC3_PIP_RES_SET_UNIFORM(camera_hdr_tune_mapping, camera->hdr_tune_mapping)
+    GX_GLC3_PIP_RES_SET_UNIFORM(camera_gamma_correction, camera->gamma_correction)
     const auto* const node = node_uniform_buffer->get_ptr<render::graph::node::SkyboxEquirectangularUniform>();
     GX_GLC3_PIP_RES_SET_UNIFORM(effect_mvp, node->mvp.data[0][0])
     GX_GLC3_PIP_RES_END_DRAWING_MESH
