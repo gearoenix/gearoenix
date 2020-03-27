@@ -48,6 +48,8 @@ public:
     /// It will take ownership of data
     std::shared_ptr<Texture2D> create_2d(unsigned char* data, const TextureInfo& info, int img_width, int img_height, core::sync::EndCaller<Texture2D>& c) noexcept;
     /// It creates 2d floating texture from formatted data
+    std::shared_ptr<Texture2D> create_2d(const unsigned char* data, std::size_t size, core::sync::EndCaller<Texture2D>& c, const SampleInfo& sample_info = SampleInfo()) noexcept;
+    /// It creates 2d floating texture from formatted data for final float images
     std::shared_ptr<Texture2D> create_2d_f(const unsigned char* data, std::size_t size, core::sync::EndCaller<Texture2D>& c, const SampleInfo& sample_info = SampleInfo()) noexcept;
     /// It creates 2d floating texture from file
     std::shared_ptr<Texture2D> create_2d_f(const std::wstring& file_address, core::sync::EndCaller<Texture2D>& c, const SampleInfo& sample_info = SampleInfo()) noexcept;

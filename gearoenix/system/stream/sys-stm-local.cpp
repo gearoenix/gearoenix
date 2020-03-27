@@ -2,6 +2,11 @@
 #include "../../core/cr-build-configuration.hpp"
 #include "../sys-log.hpp"
 
+gearoenix::system::stream::Local::Local(std::fstream file) noexcept
+    : file(std::move(file))
+{
+}
+
 gearoenix::system::stream::Local::Local(const std::string& name, bool writable) noexcept
     : file(name, std::ios::binary | (writable ? std::ios::out : std::ios::in))
 {
@@ -10,6 +15,14 @@ gearoenix::system::stream::Local::Local(const std::string& name, bool writable) 
 }
 
 gearoenix::system::stream::Local::~Local() noexcept = default;
+
+gearoenix::system::stream::Local* gearoenix::system::stream::Local::open(const std::string& name, const bool writable) noexcept
+{
+    std::fstream file(name, std::ios::binary | (writable ? std::ios::out : std::ios::in));
+    if (!file.is_open())
+        return nullptr;
+    return new Local(std::move(file));
+}
 
 gearoenix::core::Count gearoenix::system::stream::Local::read(void* data, core::Count length) noexcept
 {
@@ -55,5 +68,9 @@ bool gearoenix::system::stream::Local::exist(const std::string& name) noexcept
 
 gearoenix::core::Count gearoenix::system::stream::Local::size() noexcept
 {
-    GXUNIMPLEMENTED
+    const auto o = file.tellg();
+    file.seekg(0, std::ios::end);
+    const auto s = file.tellg();
+    file.seekg(o);
+    return s;
 }

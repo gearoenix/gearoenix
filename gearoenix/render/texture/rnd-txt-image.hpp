@@ -10,6 +10,9 @@ class Stream;
 
 namespace gearoenix::render::texture {
 class Image {
+
+    static void encode_png_write_func(void* context, void* data, int size) noexcept;
+
 public:
     Image() = delete;
     ~Image() = delete;
@@ -17,16 +20,16 @@ public:
     static void decode(
         system::stream::Stream* file,
         std::vector<unsigned char>& decoded_data,
-        unsigned int& img_width,
-        unsigned int& img_height) noexcept;
+        std::size_t& img_width,
+        std::size_t& img_height) noexcept;
     static void decode(
         const unsigned char* formatted_data,
         std::size_t formatted_size,
-        unsigned int src_channels,
+        std::optional<std::size_t> requested_channels,
         std::vector<unsigned char>& decoded_data,
-        unsigned int& img_width,
-        unsigned int& img_height,
-        unsigned int& img_channels) noexcept;
+        std::size_t& img_width,
+        std::size_t& img_height,
+        std::size_t& img_channels) noexcept;
     static void decode(
         const unsigned char* formatted_data,
         std::size_t formatted_size,
@@ -35,6 +38,12 @@ public:
         std::size_t& img_width,
         std::size_t& img_height,
         std::size_t& img_channels) noexcept;
+    static void encode_png(
+        system::stream::Stream* file,
+        const unsigned char* data,
+        std::size_t img_width,
+        std::size_t img_height,
+        std::size_t components_count) noexcept;
 };
 }
 #endif

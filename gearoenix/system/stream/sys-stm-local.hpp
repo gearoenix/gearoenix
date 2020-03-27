@@ -8,10 +8,12 @@ namespace gearoenix::system::stream {
 class Local final : public Stream {
 private:
     std::fstream file;
+    explicit Local(std::fstream file) noexcept;
 
 public:
-    Local(const std::string& name, bool writable = false) noexcept;
+    explicit Local(const std::string& name, bool writable = false) noexcept;
     ~Local() noexcept final;
+    [[nodiscard]] static Local* open(const std::string& name, bool writable = false) noexcept;
     [[nodiscard]] core::Count read(void* data, core::Count length) noexcept final;
     [[nodiscard]] core::Count write(const void* data, core::Count length) noexcept final;
     void seek(core::Count offset) noexcept final;

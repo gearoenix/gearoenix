@@ -6,30 +6,40 @@
 #define STBI_NO_STDIO
 #include <cstring>
 #include <stb_image.h>
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#define STBI_WRITE_NO_STDIO
+#include <stb_image_write.h>
+
+void gearoenix::render::texture::Image::encode_png_write_func(void* const context, void* const data, const int size) noexcept
+{
+    auto* const file = reinterpret_cast<system::stream::Stream*>(context);
+    (void)file->write(data, size);
+}
 
 void gearoenix::render::texture::Image::decode(
     system::stream::Stream* const file,
     std::vector<unsigned char>& data,
-    unsigned int& img_width,
-    unsigned int& img_height) noexcept
+    std::size_t& img_width,
+    std::size_t& img_height) noexcept
 {
     std::vector<unsigned char> img;
     file->read(img);
-    unsigned int img_channels = 0;
+    std::size_t img_channels = 0;
     decode(img.data(), img.size(), 4, data, img_width, img_height, img_channels);
 }
 
 void gearoenix::render::texture::Image::decode(
     const unsigned char* const data,
     const std::size_t size,
-    const unsigned int src_channels,
+    const std::optional<std::size_t> requested_channels,
     std::vector<unsigned char>& decoded_data,
-    unsigned int& img_width,
-    unsigned int& img_height,
-    unsigned int& img_channels) noexcept
+    std::size_t& img_width,
+    std::size_t& img_height,
+    std::size_t& img_channels) noexcept
 {
     int iw, ih, chs;
-    unsigned char* dd = stbi_load_from_memory(data, static_cast<int>(size), &iw, &ih, &chs, static_cast<int>(src_channels));
+    unsigned char* dd = stbi_load_from_memory(data, static_cast<int>(size), &iw, &ih, &chs,
+        static_cast<int>(requested_channels.has_value() ? requested_channels.value() : 0));
     if (dd == nullptr) {
         GXLOGF("Image decoder error.")
     }
@@ -63,4 +73,14 @@ void gearoenix::render::texture::Image::decode(
     decoded_data.resize(img_width * img_height * (requested_channels.has_value() ? requested_channels.value() : img_channels));
     std::memcpy(&(decoded_data[0]), dd, decoded_data.size() * sizeof(float));
     stbi_image_free(dd);
+}
+
+void gearoenix::render::texture::Image::encode_png(
+    system::stream::Stream* const file,
+    const unsigned char* const data,
+    const std::size_t img_width,
+    const std::size_t img_height,
+    const std::size_t components_count) noexcept
+{
+    stbi_write_png_to_func(encode_png_write_func, file, img_width, img_height, components_count, data, img_width * components_count);
 }

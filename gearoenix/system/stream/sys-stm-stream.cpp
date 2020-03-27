@@ -43,3 +43,10 @@ std::vector<std::uint8_t> gearoenix::system::stream::Stream::get_file_content(co
     file.read(reinterpret_cast<char*>(file_content.data()), file_size);
     return file_content;
 }
+
+std::vector<std::uint8_t> gearoenix::system::stream::Stream::get_file_content() noexcept
+{
+    std::vector<std::uint8_t> result(size());
+    (void)read(result.data(), result.size());
+    return result;
+}

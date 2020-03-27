@@ -10,6 +10,7 @@ struct Configuration {
     std::uint16_t runtime_reflection_irradiance_resolution = GX_MAX_RUNTIME_REFLECTION_IRRADIANCE_RESOLUTION;
     std::uint16_t runtime_reflection_radiance_resolution = GX_MAX_RUNTIME_REFLECTION_RADIANCE_RESOLUTION;
     std::uint8_t runtime_reflection_radiance_levels = GX_MAX_RUNTIME_REFLECTION_RADIANCE_LEVELS;
+    std::uint16_t brdflut_resolution = GX_DEFAULT_BRDFLUT_RESOLUTION;
 };
 }
 #endif

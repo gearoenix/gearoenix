@@ -81,6 +81,7 @@ public:
     }
 
     [[nodiscard]] static std::vector<std::uint8_t> get_file_content(const std::wstring& address) noexcept;
+    [[nodiscard]] std::vector<std::uint8_t> get_file_content() noexcept;
 };
 }
 #endif
