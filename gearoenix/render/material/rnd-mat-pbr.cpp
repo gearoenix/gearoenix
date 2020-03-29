@@ -101,13 +101,21 @@ void gearoenix::render::material::Pbr::set_roughness_factor(const float f) noexc
 }
 
 void gearoenix::render::material::Pbr::set_color(
+    const std::uint32_t code, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept
+{
+    set_color(math::Vec4(
+                  float(code >> 24) / 255.0f,
+                  float((code >> 16) & 255) / 255.0f,
+                  float((code >> 8) & 255) / 255.0f,
+                  float(code & 255) / 255.0f),
+        end);
+}
+
+void gearoenix::render::material::Pbr::set_color(
     const float r, const float g, const float b,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept
 {
-    core::sync::EndCaller<texture::Texture2D> call_txt_2d([end](const std::shared_ptr<texture::Texture2D>&) {});
-    auto* const txt_mgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
-    color_texture = txt_mgr->get_2d(math::Vec3(r, g, b), call_txt_2d);
-    color_value = math::Vec4(r, g, b, 1.0f);
+    set_color(math::Vec4(r, g, b, 1.0f), end);
 }
 
 void gearoenix::render::material::Pbr::set_color(const math::Vec4<float>& c,
@@ -122,6 +130,7 @@ void gearoenix::render::material::Pbr::set_color(const math::Vec4<float>& c,
 void gearoenix::render::material::Pbr::set_color(const std::shared_ptr<texture::Texture2D>& c) noexcept
 {
     color_texture = c;
+    color_value = std::nullopt;
 }
 
 void gearoenix::render::material::Pbr::set_alpha(const float a) noexcept

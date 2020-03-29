@@ -1,5 +1,5 @@
-#ifndef GEAROENIX_TOOL_IBL_BAKER_HPP
-#define GEAROENIX_TOOL_IBL_BAKER_HPP
+#ifndef GEAROENIX_EXAMPLE_004_RUNTIME_REFLECTION_PROBE_HPP
+#define GEAROENIX_EXAMPLE_004_RUNTIME_REFLECTION_PROBE_HPP
 #include <atomic>
 #include <gearoenix/core/cr-application.hpp>
 #include <gearoenix/core/cr-types.hpp>
@@ -55,21 +55,13 @@ private:
     using GxSkyEqrect = gearoenix::render::skybox::Equirectangular;
 
     std::shared_ptr<GxGameScene> scn;
-    std::shared_ptr<GxGameScene> obj_scn;
-    std::shared_ptr<GxUiScene> uiscn;
     GxCamTran* cam_trn = nullptr;
     std::shared_ptr<GxCam> cam;
-    GxCamTran* obj_cam_trn = nullptr;
-    std::shared_ptr<GxCam> obj_cam;
-    std::shared_ptr<GxEditWdg> file_location;
     std::shared_ptr<GxSkyEqrect> sky;
     std::unique_ptr<GxGrPbr> render_tree;
     bool camera_rotation_enabled = false;
-    std::chrono::high_resolution_clock::time_point last_time_item_detail_modal_closed = std::chrono::high_resolution_clock::now();
     double camera_forward = 0.0;
     double camera_sideward = 0.0;
-
-    void on_open() noexcept;
 
 public:
     explicit Example004RuntimeReflectionProbeApp(gearoenix::system::Application* sys_app) noexcept;

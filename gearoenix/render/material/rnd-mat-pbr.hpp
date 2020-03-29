@@ -32,6 +32,7 @@ public:
     void update() noexcept final;
     void set_metallic_factor(float f) noexcept;
     void set_roughness_factor(float f) noexcept;
+    void set_color(std::uint32_t code, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept;
     void set_color(
         float r, float g, float b,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept;

@@ -56,6 +56,10 @@ std::shared_ptr<gearoenix::glc3::texture::Texture2D> gearoenix::glc3::texture::T
         pixels.resize(gl_img_width * gl_img_height * 4);
         std::memcpy(pixels.data(), data, pixels.size());
         break;
+    case render::texture::TextureFormat::RgbUint8:
+        pixels.resize(gl_img_width * gl_img_height * 3);
+        std::memcpy(pixels.data(), data, pixels.size());
+        break;
     default:
         GXLOGF("Unsupported/Unimplemented setting for texture with id " << my_id)
     }
@@ -177,6 +181,8 @@ gearoenix::gl::sint gearoenix::glc3::texture::Texture2D::convert_internal_format
         return GL_RGB16F;
     case render::texture::TextureFormat::RgbaUint8:
         return GL_RGBA;
+    case render::texture::TextureFormat::RgbUint8:
+        return GL_RGB;
     case render::texture::TextureFormat::D32:
         return GL_DEPTH_COMPONENT32F;
     default:
@@ -191,6 +197,7 @@ gearoenix::gl::enumerated gearoenix::glc3::texture::Texture2D::convert_format(ge
     case render::texture::TextureFormat::RgbaUint8:
     case render::texture::TextureFormat::RgbaFloat32:
         return GL_RGBA;
+    case render::texture::TextureFormat::RgbUint8:
     case render::texture::TextureFormat::RgbFloat32:
     case render::texture::TextureFormat::RgbFloat16:
         return GL_RGB;
@@ -216,6 +223,7 @@ gearoenix::gl::enumerated gearoenix::glc3::texture::Texture2D::convert_data_form
     case render::texture::TextureFormat::RgbFloat16:
         return GL_HALF_FLOAT;
     case render::texture::TextureFormat::RgbaUint8:
+    case render::texture::TextureFormat::RgbUint8:
         return GL_UNSIGNED_BYTE;
     default:
         GXLOGF("Unsupported/Unimplemented setting for texture with id " << int(f))

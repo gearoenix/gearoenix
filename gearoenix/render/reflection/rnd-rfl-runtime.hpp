@@ -1,6 +1,7 @@
 #ifndef GEAROENIX_RENDER_REFLECTION_RUNTIME_HPP
 #define GEAROENIX_RENDER_REFLECTION_RUNTIME_HPP
 #include "../../core/sync/cr-sync-end-caller.hpp"
+#include "../../physics/phs-transformation.hpp"
 #include "rnd-rfl-reflection.hpp"
 
 namespace gearoenix::render::camera {
@@ -22,7 +23,7 @@ class Target;
 }
 
 namespace gearoenix::render::reflection {
-class Runtime final : public Reflection {
+class Runtime final : public Reflection, public physics::Transformation {
     GX_GET_CREF_PRV(std::shared_ptr<texture::TextureCube>, environment)
     GX_GET_CREF_PRV(std::shared_ptr<graph::node::MipmapGenerator>, environment_mipmap_generator)
     GX_GET_CREF_PRV(std::shared_ptr<graph::node::MipmapGenerator>, irradiance_mipmap_generator)
@@ -40,6 +41,10 @@ public:
     ~Runtime() noexcept final;
 
     void set_receiving_radius(double r) noexcept;
+
+    // physics::Transformation implementation
+
+    void set_location(const math::Vec3<double>& p) noexcept final;
 };
 }
 #endif
