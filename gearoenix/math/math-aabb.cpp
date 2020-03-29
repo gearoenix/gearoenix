@@ -67,12 +67,8 @@ void gearoenix::math::Aabb3::put(const Sphere& o) noexcept
     const auto u = o.get_center() + o.get_radius();
     const auto l = o.get_center() - o.get_radius();
 
-    upper.x = GX_MAX(u.x, upper.x);
-    upper.y = GX_MAX(u.y, upper.y);
-    upper.z = GX_MAX(u.z, upper.z);
-    lower.x = GX_MIN(l.x, lower.x);
-    lower.y = GX_MIN(l.y, lower.y);
-    lower.z = GX_MIN(l.z, lower.z);
+    upper = upper.maximum(u);
+    lower = lower.minimum(l);
 
     update();
 }
@@ -85,33 +81,14 @@ void gearoenix::math::Aabb3::put(const Aabb3& o) noexcept
 
 void gearoenix::math::Aabb3::put_without_update(const Vec3<double>& p) noexcept
 {
-    if (p.x > upper.x) {
-        upper.x = p.x;
-    } else if (p.x < lower.x) {
-        lower.x = p.x;
-    }
-
-    if (p.y > upper.y) {
-        upper.y = p.y;
-    } else if (p.y < lower.y) {
-        lower.y = p.y;
-    }
-
-    if (p.z > upper.z) {
-        upper.z = p.z;
-    } else if (p.z < lower.z) {
-        lower.z = p.z;
-    }
+    upper = upper.maximum(p);
+    lower = lower.minimum(p);
 }
 
 void gearoenix::math::Aabb3::put_without_update(const Aabb3& o) noexcept
 {
-    upper.x = GX_MAX(o.upper.x, upper.x);
-    upper.y = GX_MAX(o.upper.y, upper.y);
-    upper.z = GX_MAX(o.upper.z, upper.z);
-    lower.x = GX_MIN(o.lower.x, lower.x);
-    lower.y = GX_MIN(o.lower.y, lower.y);
-    lower.z = GX_MIN(o.lower.z, lower.z);
+    upper = upper.maximum(o.upper);
+    lower = lower.minimum(o.lower);
 }
 
 bool gearoenix::math::Aabb3::check_intersection(const Aabb3& o, Aabb3& intersection) const noexcept
@@ -137,6 +114,8 @@ bool gearoenix::math::Aabb3::check_intersection(const Aabb3& o, Aabb3& intersect
 
 bool gearoenix::math::Aabb3::check_intersection(const Aabb3& o) const noexcept
 {
+    // o.upper > lower
+    // o.lower < upper
     return lower.x < o.upper.x
         && upper.x > o.lower.x
         && lower.y < o.upper.y
@@ -203,35 +182,35 @@ void gearoenix::math::Aabb3::read(system::stream::Stream* const s) noexcept
 
 void gearoenix::math::Aabb3::get_all_corners(math::Vec3<double> (&corners)[8]) const noexcept
 {
-    corners[0][0] = upper.x;
-    corners[0][1] = upper.y;
-    corners[0][2] = upper.z;
+    corners[0].x = upper.x;
+    corners[0].y = upper.y;
+    corners[0].z = upper.z;
 
-    corners[1][0] = lower.x;
-    corners[1][1] = upper.y;
-    corners[1][2] = upper.z;
+    corners[1].x = lower.x;
+    corners[1].y = upper.y;
+    corners[1].z = upper.z;
 
-    corners[2][0] = upper.x;
-    corners[2][1] = lower.y;
-    corners[2][2] = upper.z;
+    corners[2].x = upper.x;
+    corners[2].y = lower.y;
+    corners[2].z = upper.z;
 
-    corners[3][0] = lower.x;
-    corners[3][1] = lower.y;
-    corners[3][2] = upper.z;
+    corners[3].x = lower.x;
+    corners[3].y = lower.y;
+    corners[3].z = upper.z;
 
-    corners[4][0] = upper.x;
-    corners[4][1] = upper.y;
-    corners[4][2] = lower.z;
+    corners[4].x = upper.x;
+    corners[4].y = upper.y;
+    corners[4].z = lower.z;
 
-    corners[5][0] = lower.x;
-    corners[5][1] = upper.y;
-    corners[5][2] = lower.z;
+    corners[5].x = lower.x;
+    corners[5].y = upper.y;
+    corners[5].z = lower.z;
 
-    corners[6][0] = upper.x;
-    corners[6][1] = lower.y;
-    corners[6][2] = lower.z;
+    corners[6].x = upper.x;
+    corners[6].y = lower.y;
+    corners[6].z = lower.z;
 
-    corners[7][0] = lower.x;
-    corners[7][1] = lower.y;
-    corners[7][2] = lower.z;
+    corners[7].x = lower.x;
+    corners[7].y = lower.y;
+    corners[7].z = lower.z;
 }

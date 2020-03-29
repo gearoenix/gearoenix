@@ -45,6 +45,7 @@ public:
     // physics::Transformation implementation
 
     void set_location(const math::Vec3<double>& p) noexcept final;
+    void local_scale(double s) noexcept final;
 };
 }
 #endif

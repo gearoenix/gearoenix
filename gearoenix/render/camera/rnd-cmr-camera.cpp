@@ -78,10 +78,20 @@ void gearoenix::render::camera::Camera::set_far(const float f) noexcept
     reinterpret_cast<Transformation*>(transformation.get())->update_projection();
 }
 
+float gearoenix::render::camera::Camera::get_far() const noexcept
+{
+    return std::abs(uniform.far);
+}
+
 void gearoenix::render::camera::Camera::set_near(const float f) noexcept
 {
-    uniform.near = -f;
+    uniform.near = -std::abs(f);
     reinterpret_cast<Transformation*>(transformation.get())->update_projection();
+}
+
+float gearoenix::render::camera::Camera::get_near() const noexcept
+{
+    return std::abs(uniform.near);
 }
 
 void gearoenix::render::camera::Camera::set_gamma_correction_factor(const float f) noexcept

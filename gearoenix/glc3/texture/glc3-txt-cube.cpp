@@ -100,7 +100,10 @@ std::shared_ptr<gearoenix::glc3::texture::TextureCube> gearoenix::glc3::texture:
     default:
         GXUNEXPECTED
     }
-    engine->get_function_loader()->load([result, gl_aspect, internal_format, format, data_format, sample_info, has_mipmap { info.has_mipmap }, call] {
+    const auto zero_data_size = aspect * aspect * 4 * 4;
+    auto* const zero_data = new unsigned char[zero_data_size];
+    std::memset(zero_data, 0, zero_data_size);
+    engine->get_function_loader()->load([result, gl_aspect, internal_format, format, data_format, sample_info, has_mipmap { info.has_mipmap }, call, zero_data] {
         gl::Loader::gen_textures(1, &(result->texture_object));
         gl::Loader::bind_texture(GL_TEXTURE_CUBE_MAP, result->texture_object);
         gl::Loader::tex_parameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, sample_info.mag_filter);
@@ -108,7 +111,7 @@ std::shared_ptr<gearoenix::glc3::texture::TextureCube> gearoenix::glc3::texture:
         gl::Loader::tex_parameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, sample_info.wrap_s);
         gl::Loader::tex_parameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, sample_info.wrap_t);
         for (unsigned int f : FACES) {
-            gl::Loader::tex_image_2d(f, 0, internal_format, gl_aspect, gl_aspect, 0, format, data_format, nullptr);
+            gl::Loader::tex_image_2d(f, 0, internal_format, gl_aspect, gl_aspect, 0, format, data_format, zero_data);
         }
 #ifdef GX_DEBUG_GL_CLASS_3
         gl::Loader::check_for_error();
@@ -117,6 +120,7 @@ std::shared_ptr<gearoenix::glc3::texture::TextureCube> gearoenix::glc3::texture:
             gl::Loader::generate_mipmap(GL_TEXTURE_CUBE_MAP);
         // It clears the errors, some drivers does not support mip-map generation for cube texture
         gl::Loader::get_error();
+        delete[] zero_data;
     });
     return result;
 }

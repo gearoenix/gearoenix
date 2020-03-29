@@ -108,7 +108,8 @@ Example004RuntimeReflectionProbeApp::Example004RuntimeReflectionProbeApp(gearoen
     scn->add_reflection(rtr1);
 
     const auto rtr2 = rfl_mgr->create<GxRtReflect>(rtr_call);
-    rtr2->set_location(GxVec3(-1.75, 0.0, 0.0));
+    rtr2->set_location(GxVec3(-11.0, 0.0, 0.0));
+    rtr2->local_scale(10.0);
     scn->add_reflection(rtr2);
 
     const auto cube_mesh = msh_mgr->create_cube(msh_call);
@@ -131,7 +132,9 @@ Example004RuntimeReflectionProbeApp::Example004RuntimeReflectionProbeApp(gearoen
 
     const auto mdl2 = mdl_mgr->create<GxStaticModel>(mdl_call);
     mdl2->add_mesh(std::make_shared<GxMdMesh>(cube_mesh, mat2));
-    mdl2->get_transformation()->set_location(GxVec3(-1.75, 0.0, 0.0));
+    auto* const mdl2_tran = mdl2->get_transformation();
+    mdl2_tran->set_location(GxVec3(-11.0, 0.0, 0.0));
+    mdl2_tran->local_scale(10.0);
     mdl2->set_hooked_reflection(rtr2);
     scn->add_model(mdl2);
 }

@@ -101,7 +101,11 @@ std::shared_ptr<gearoenix::glc3::texture::Texture2D> gearoenix::glc3::texture::T
     const auto data_format = convert_data_format(info.format);
     const auto gl_img_width = static_cast<gl::sizei>(img_width);
     const auto gl_img_height = static_cast<gl::sizei>(img_height);
-    e->get_function_loader()->load([result, needs_mipmap, internal_format, format, data_format, gl_img_width, gl_img_height, sample_info, call] {
+    auto* const zero_data = new std::uint32_t[img_width * img_height * 4];
+    for (unsigned int i = 0, di = 0; i < img_width; ++i)
+        for (unsigned int j = 0; j < img_height; ++j, ++di)
+            zero_data[di] = 0;
+    e->get_function_loader()->load([result, needs_mipmap, internal_format, format, data_format, gl_img_width, gl_img_height, sample_info, call, zero_data] {
 #ifdef GX_DEBUG_GL_CLASS_3
         gl::Loader::check_for_error();
 #endif
@@ -111,12 +115,13 @@ std::shared_ptr<gearoenix::glc3::texture::Texture2D> gearoenix::glc3::texture::T
         gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, sample_info.mag_filter);
         gl::Loader::tex_parameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, sample_info.wrap_s);
         gl::Loader::tex_parameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, sample_info.wrap_t);
-        gl::Loader::tex_image_2d(GL_TEXTURE_2D, 0, internal_format, gl_img_width, gl_img_height, 0, format, data_format, nullptr);
+        gl::Loader::tex_image_2d(GL_TEXTURE_2D, 0, internal_format, gl_img_width, gl_img_height, 0, format, data_format, zero_data);
         if (needs_mipmap)
             gl::Loader::generate_mipmap(GL_TEXTURE_2D);
 #ifdef GX_DEBUG_GL_CLASS_3
         gl::Loader::check_for_error();
 #endif
+        delete[] zero_data;
     });
     return result;
 }

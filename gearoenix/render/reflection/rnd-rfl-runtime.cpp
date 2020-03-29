@@ -92,7 +92,7 @@ gearoenix::render::reflection::Runtime::Runtime(
         cam->set_target(target.get());
         cam->get_transformation()->look_at(std::get<1>(faces[i]), std::get<2>(faces[i]));
         cam->set_gamma_correction_factor(0.0f);
-        //        cam->set_near(1.7320f);
+        cam->set_near(1.0f);
         // mesh
         auto& face_mesh = face_meshes[i];
         face_mesh = msh_mgr->create_face_square(texture::FACES[i], msh_call);
@@ -141,5 +141,14 @@ void gearoenix::render::reflection::Runtime::set_location(const math::Vec3<doubl
 {
     for (const auto& cam : cameras) {
         cam->get_transformation()->set_location(p);
+    }
+}
+
+void gearoenix::render::reflection::Runtime::local_scale(const double s) noexcept
+{
+    receiving_radius *= s;
+    for (const auto& cam : cameras) {
+        cam->set_near(static_cast<float>(s * cam->get_near()));
+        cam->set_far(static_cast<float>(s * cam->get_far()));
     }
 }
