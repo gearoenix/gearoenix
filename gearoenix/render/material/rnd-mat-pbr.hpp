@@ -9,10 +9,10 @@ public:
     struct Uniform {
         float alpha = 1.0f;
         float alpha_cutoff = 0.001f;
-        float metallic_factor = 0.9f;
+        float metallic_factor = 0.999999f;
         float normal_scale = 1.0f;
         float occlusion_strength = 1.0f;
-        float roughness_factor = 0.1f;
+        float roughness_factor = 0.000001f;
     };
     GX_GET_CREF_PRV(std::shared_ptr<texture::Texture2D>, color_texture)
     GX_GET_CREF_PRV(std::optional<math::Vec4<float>>, color_value)

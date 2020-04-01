@@ -17,6 +17,12 @@ std::ostream& gearoenix::physics::collider::operator<<(std::ostream& os, const T
     case Type::Sphere:
         os << "Sphere";
         break;
+    case Type::Frustum:
+        os << "Frustum";
+        break;
+    case Type::Transform:
+        os << "Transform";
+        break;
     default:
         GXLOGF("Unexpected value for physics::collider::Type.")
     }

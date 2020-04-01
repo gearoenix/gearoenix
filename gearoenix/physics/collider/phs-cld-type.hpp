@@ -9,6 +9,7 @@ enum struct Type : core::TypeId {
     Aabb = 3,
     Sphere = 4,
     Frustum = 5,
+    Transform = 6,
 };
 std::ostream& operator<<(std::ostream& os, Type t) noexcept;
 }

@@ -10,7 +10,7 @@ gearoenix::render::material::Pbr::Pbr(engine::Engine* const e, const core::sync:
     : Material(Type::Pbr, e, sizeof(Uniform))
     , color_value(math::Vec4(1.0f, 0.0f, 0.0f, 1.0f))
     , emission_value(math::Vec3(0.0f, 0.0f, 0.0f))
-    , metallic_roughness_value(math::Vec2(0.5f, 0.5f))
+    , metallic_roughness_value(math::Vec2(1.0f, 1.0f))
     , normal_value(math::Vec3(0.5f, 0.5f, 1.0f))
 {
     core::sync::EndCaller<texture::Texture2D> call_txt_2d([end](const std::shared_ptr<texture::Texture2D>&) {});

@@ -14,7 +14,7 @@ class Bvh;
 
 namespace gearoenix::physics::collider {
 class Collider;
-class Frustum;
+class Transform;
 }
 
 namespace gearoenix::render::command {
@@ -54,7 +54,7 @@ public:
         math::Mat4x4<double> view_projection_gl;
         math::Mat4x4<double> view_projection_bias_gl;
 #endif
-        std::unique_ptr<physics::collider::Frustum> collider;
+        std::unique_ptr<physics::collider::Transform> collider;
         math::Aabb3 max_box;
         math::Aabb3 intersection_box;
         std::unique_ptr<graph::node::ShadowMapper> shadow_mapper;

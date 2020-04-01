@@ -62,7 +62,7 @@ struct Vec4 {
     }
 
     template <typename T>
-    [[nodiscard]] constexpr Element operator[](const T i) const noexcept
+    [[nodiscard]] Element operator[](const T i) const noexcept
     {
         static_assert(std::numeric_limits<T>::is_integer, "Only integer type is acceptable for indexing.");
         switch (i) {
@@ -75,12 +75,12 @@ struct Vec4 {
         case static_cast<T>(3):
             return w;
         default:
-            return *reinterpret_cast<const Element*>(nullptr);
+            GXLOGF("Out of bound index: " << i)
         }
     }
 
     template <typename T>
-    [[nodiscard]] constexpr Element& operator[](const T i) noexcept
+    [[nodiscard]] Element& operator[](const T i) noexcept
     {
         static_assert(std::numeric_limits<T>::is_integer, "Only integer type is acceptable for indexing.");
         switch (i) {
@@ -93,7 +93,7 @@ struct Vec4 {
         case static_cast<T>(3):
             return w;
         default:
-            return *reinterpret_cast<Element*>(nullptr);
+            GXLOGF("Out of bound index: " << i)
         }
     }
 

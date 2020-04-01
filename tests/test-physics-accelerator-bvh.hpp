@@ -1,6 +1,7 @@
 #include <gearoenix/math/math-ray.hpp>
 #include <gearoenix/physics/accelerator/phs-acc-bvh.hpp>
 #include <gearoenix/physics/collider/phs-cld-aabb.hpp>
+#include <gearoenix/physics/collider/phs-cld-frustum.hpp>
 #include <gearoenix/physics/collider/phs-cld-sphere.hpp>
 #include <random>
 
@@ -25,11 +26,11 @@ BOOST_AUTO_TEST_CASE(physics_accelerator_bvh)
         colliders.clear();                \
         for (auto& c : cs)                \
             colliders.push_back(c.get()); \
-    }
+    }                                     \
+    bvh.reset(colliders);                 \
+    GXLOGD(bvh.to_string())
 
     GX_TEST_HELPER
-    bvh.reset(colliders);
-    GXLOGD(bvh.to_string())
 
 #define GX_TEST_HELPER2(x)                                               \
     {                                                                    \
@@ -70,8 +71,6 @@ BOOST_AUTO_TEST_CASE(physics_accelerator_bvh)
             gearoenix::math::Vec3(-2.0, 0.0, 0.0), 0.9));
 
     GX_TEST_HELPER
-    bvh.reset(colliders);
-    GXLOGD(bvh.to_string())
 
     GX_TEST_HELPER2(1.11)
     GX_TEST_HELPER2(2.00)
@@ -96,8 +95,6 @@ BOOST_AUTO_TEST_CASE(physics_accelerator_bvh)
             gearoenix::math::Vec3(-4.0, 0.0, 0.0), 0.9));
 
     GX_TEST_HELPER
-    bvh.reset(colliders);
-    GXLOGD(bvh.to_string())
 
     GX_TEST_HELPER2(4.0)
     GX_TEST_HELPER2(3.0)
@@ -121,8 +118,6 @@ BOOST_AUTO_TEST_CASE(physics_accelerator_bvh)
             gearoenix::math::Vec3(0.0, 0.0, 0.0), 0.9));
 
     GX_TEST_HELPER
-    bvh.reset(colliders);
-    GXLOGD(bvh.to_string())
 
     GX_TEST_HELPER2(0.0)
     GX_TEST_HELPER2(0.0)
@@ -151,8 +146,6 @@ BOOST_AUTO_TEST_CASE(physics_accelerator_bvh)
             gearoenix::math::Vec3(9.0, 0.0, 0.0)));
 
     GX_TEST_HELPER
-    bvh.reset(colliders);
-    GXLOGD(bvh.to_string())
 
     GX_TEST_HELPER2(6.0)
     GX_TEST_HELPER2(7.0)
@@ -194,4 +187,25 @@ BOOST_AUTO_TEST_CASE(physics_accelerator_bvh)
         dis_time += (now2 - now1).count();
     }
     GXLOGD("dis-time for " << hits_count << " hits: " << dis_time)
+
+    //    cs.clear();
+    //    cs.push_back(
+    //            std::make_unique<gearoenix::physics::collider::Aabb>(
+    //                    gearoenix::math::Vec3(-11.0, 0.0, 0.0) + 17.1,
+    //                    gearoenix::math::Vec3(-11.0, 0.0, 0.0) - 17.1));
+    //
+    //    GX_TEST_HELPER
+    //    gearoenix::physics::collider::Frustum frustum;
+    //    frustum.set_view_projection(
+    //            gearoenix::math::Mat4x4<double>::perspective(2.0, 2.0, 1.0, 10) *
+    //                    gearoenix::math::Mat4x4<double>::look_at(
+    //                            gearoenix::math::Vec3(1.75, 0.0, 0.0),
+    //                            gearoenix::math::Vec3(-11.0, 0.0, 0.0),
+    //                            gearoenix::math::Vec3(0.0, 0.0, 1.0)));
+    //    int intersections_count = 0;
+    //    bvh.call_on_intersecting(&frustum, [&](gearoenix::physics::collider::Collider* const) noexcept {
+    //        ++intersections_count;
+    //    });
+    //
+    //    BOOST_TEST(intersections_count > 0);
 }

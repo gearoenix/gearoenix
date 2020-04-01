@@ -2,7 +2,7 @@
 #include "../../core/sync/cr-sync-kernel-workers.hpp"
 #include "../../math/math-sphere.hpp"
 #include "../../physics/accelerator/phs-acc-bvh.hpp"
-#include "../../physics/collider/phs-cld-frustum.hpp"
+#include "../../physics/collider/phs-cld-transform.hpp"
 #include "../../system/sys-app.hpp"
 #include "../buffer/rnd-buf-manager.hpp"
 #include "../buffer/rnd-buf-uniform.hpp"
@@ -15,7 +15,7 @@
 #include <limits>
 
 gearoenix::render::light::CascadeInfo::PerCascade::PerCascade(engine::Engine* const e) noexcept
-    : collider(new physics::collider::Frustum())
+    : collider(new physics::collider::Transform())
     , shadow_mapper(new graph::node::ShadowMapper(e, core::sync::EndCaller<core::sync::EndCallerIgnore>([] {})))
 {
 }
@@ -32,7 +32,7 @@ void gearoenix::render::light::CascadeInfo::PerKernel::shadow(const physics::col
         return;
     // Be careful, the models should update the collider box
     math::Aabb3 box = cld->get_updated_box();
-    box.set_center((*per_cascade)[0].collider->get_view_projection().project(box.get_center()));
+    box.set_center(((*per_cascade)[0].collider->get_matrix() * math::Vec4(box.get_center(), 1.0)).xyz());
     seen_boxes[cascade_index].put(box);
     RenderData r;
     r.i = cascade_index;
@@ -113,7 +113,7 @@ void gearoenix::render::light::CascadeInfo::update(const math::Mat4x4<double>& m
         auto* c = per_cascade.get_next([this] { return new PerCascade(e); });
         c->intersection_box.reset();
         c->collider->get_limit().reset();
-        c->collider->set_view_projection(m);
+        c->collider->set_matrix(m);
         c->max_box.reset();
     }
     for (auto& k : kernels) {

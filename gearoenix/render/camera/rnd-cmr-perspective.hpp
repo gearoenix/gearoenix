@@ -14,7 +14,6 @@ private:
     double tanx = 1.0;
     double tany = 1.0;
     double lambda = 0.3;
-    const std::shared_ptr<physics::collider::Frustum> frustum;
 
     void update_fovy() noexcept;
     void update_cascades() noexcept;

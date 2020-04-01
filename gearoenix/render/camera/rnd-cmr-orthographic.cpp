@@ -1,4 +1,5 @@
 #include "rnd-cmr-orthographic.hpp"
+#include "../../physics/collider/phs-cld-frustum.hpp"
 #include "../../system/sys-app.hpp"
 #include "../engine/rnd-eng-engine.hpp"
 #include "rnd-cmr-transformation.hpp"
@@ -48,6 +49,20 @@ void gearoenix::render::camera::Orthographic::update_cascades() noexcept
     for (std::size_t i = 1, j = 0; i < sections_count_plus; ++i, ++j)
         for (int k = 0; k < 4; ++k)
             cascaded_shadow_frustum_partitions[i][k] = cascaded_shadow_frustum_partitions[j][k] + z_inc;
+
+    const auto far_points = cascaded_shadow_frustum_partitions.back();
+    const auto near_points = cascaded_shadow_frustum_partitions.front();
+
+    frustum_collider->update({
+        far_points[3],
+        far_points[2],
+        far_points[0],
+        far_points[1],
+        near_points[3],
+        near_points[2],
+        near_points[0],
+        near_points[1],
+    });
 }
 
 gearoenix::render::camera::Orthographic::Orthographic(

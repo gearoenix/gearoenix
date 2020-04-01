@@ -35,7 +35,6 @@ void gearoenix::render::camera::Transformation::update_view_projection() noexcep
                                            0.0f, 0.0f, 1.0f, 0.0f,
                                            0.5f, 0.5f, 0.0f, 1.0f)
         * uniform->view_projection;
-    frustum_collider->set_view_projection(math::Mat4x4<double>(uniform->view_projection));
     update_frustum();
 }
 

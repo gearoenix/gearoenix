@@ -38,20 +38,12 @@ BOOST_AUTO_TEST_CASE(math_vector_test)
         t += time_span.count();                                                                                                     \
     }
 
-#define RM(m1, m2)                                                \
-    {                                                             \
-        for (unsigned int i = 0; i < 16; ++i) {                   \
-            glm::value_ptr(m1)[i] = static_cast<float>(dis(gen)); \
-            m2[i] = glm::value_ptr(m1)[i];                        \
-        }                                                         \
-    }
-
-#define RV(v1, v2)                                \
-    {                                             \
-        for (int i = 0; i < 3; ++i) {             \
-            v1[i] = static_cast<float>(dis(gen)); \
-            v2[i] = v1[i];                        \
-        }                                         \
+#define RV(v1, v2)                                                      \
+    {                                                                   \
+        for (unsigned int i = 0; i < sizeof(v2) / sizeof(float); ++i) { \
+            glm::value_ptr(v1)[i] = static_cast<float>(dis(gen));       \
+            v2[i] = glm::value_ptr(v1)[i];                              \
+        }                                                               \
     }
 
 #define RQ(q1, q2)                           \
@@ -68,14 +60,14 @@ BOOST_AUTO_TEST_CASE(math_vector_test)
 
 #define CHECK(m1, m2)                                                                                                   \
     {                                                                                                                   \
-        for (unsigned int i = 0; i < 16; ++i) {                                                                         \
+        for (unsigned int i = 0; i < sizeof(v2) / sizeof(float); ++i) {                                                 \
             auto f1 = std::abs(glm::value_ptr(m1)[i] - m2[i]);                                                          \
             auto f2 = std::abs(glm::value_ptr(m1)[i] + m2[i]);                                                          \
             if (f1 > f2)                                                                                                \
                 std::swap(f1, f2);                                                                                      \
             if (f1 > 0.001f && f1 > 0.001f * f2) {                                                                      \
                 GXLOGE("Error in matrix check happened.")                                                               \
-                for (unsigned int k = 0; k < 16; ++k)                                                                   \
+                for (unsigned int k = 0; k < sizeof(v2) / sizeof(float); ++k)                                           \
                     GXLOGE("glm: " << glm::value_ptr(m1)[k] << ", gxm: " << m2[k] << ", f1: " << f1 << ", f2: " << f2); \
                 BOOST_TEST(false);                                                                                      \
             }                                                                                                           \
@@ -87,6 +79,16 @@ BOOST_AUTO_TEST_CASE(math_vector_test)
     glm::vec3 v1;
     gearoenix::math::Vec3<float> v2;
     float f;
+    BOOST_TEST_MESSAGE("Multiplication test");
+    for (int j = 0; j < 1000; ++j) {
+        glm::vec4 v14;
+        gearoenix::math::Vec4<float> v24;
+        RV(v14, v24)
+        RV(m1, m2)
+        PROF(v14 = m1 * v14, glmt)
+        PROF(v24 = m2 * v24, gt)
+        CHECK(v14, v24)
+    }
     BOOST_TEST_MESSAGE("Rotation test");
     for (int j = 0; j < 1000; ++j) {
         f = static_cast<float>(dis(gen));
@@ -99,7 +101,7 @@ BOOST_AUTO_TEST_CASE(math_vector_test)
     BOOST_TEST_MESSAGE("Inversion test");
     BOOST_TEST_MESSAGE("glmt " << glmt << ", gt " << gt);
     for (int j = 0; j < 1000; ++j) {
-        RM(m1, m2)
+        RV(m1, m2)
         PROF(m1 = glm::inverse(m1), glmt)
         PROF(m2 = m2.inverted(), gt)
         CHECK(m1, m2)

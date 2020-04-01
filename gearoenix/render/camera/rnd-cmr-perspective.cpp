@@ -1,5 +1,6 @@
 #include "rnd-cmr-perspective.hpp"
 #include "../../core/event/cr-ev-event.hpp"
+#include "../../physics/collider/phs-cld-frustum.hpp"
 #include "../../system/sys-app.hpp"
 #include "../engine/rnd-eng-engine.hpp"
 #include "rnd-cmr-transformation.hpp"
@@ -45,6 +46,20 @@ void gearoenix::render::camera::Perspective::update_cascades() noexcept
 
     GX_HELPER(sections_count);
 
+    const auto near_points = cascaded_shadow_frustum_partitions[0];
+    const auto far_points = cascaded_shadow_frustum_partitions[sections_count];
+
+    frustum_collider->update({
+        far_points[3],
+        far_points[2],
+        far_points[0],
+        far_points[1],
+        near_points[3],
+        near_points[2],
+        near_points[0],
+        near_points[1],
+    });
+
     if (sections_count < 2) {
         // it provides a little performance gain for poor hardwares
         return;
@@ -75,7 +90,6 @@ void gearoenix::render::camera::Perspective::update_cascades() noexcept
 
         GX_HELPER(i);
     }
-
 #undef GX_HELPER
 }
 

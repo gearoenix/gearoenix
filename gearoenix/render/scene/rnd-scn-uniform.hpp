@@ -5,7 +5,7 @@
 
 namespace gearoenix::render::scene {
 struct Uniform {
-    math::Vec4<float> ambient_light = math::Vec4(0.05f, 0.05f, 0.05f, 1.0f);
+    math::Vec4<float> ambient_light = math::Vec4(0.01f, 0.01f, 0.01f, 1.0f);
     math::Vec4<float> directional_lights_color[GX_MAX_DIRECTIONAL_LIGHTS];
     math::Vec4<float> directional_lights_direction[GX_MAX_DIRECTIONAL_LIGHTS];
     /// directional, reserved

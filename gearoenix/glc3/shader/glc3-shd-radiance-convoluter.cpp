@@ -84,6 +84,9 @@ gearoenix::glc3::shader::RadianceConvoluter::RadianceConvoluter(engine::Engine* 
         "        }\n"
         "    }\n"
         "    prefilteredColor = prefilteredColor / totalWeight;\n"
+        "    prefilteredColor.x = (prefilteredColor.x <= 0.0 || prefilteredColor.x >= 0.0)? prefilteredColor.x: 0.0;\n"
+        "    prefilteredColor.y = (prefilteredColor.y <= 0.0 || prefilteredColor.y >= 0.0)? prefilteredColor.y: 0.0;\n"
+        "    prefilteredColor.z = (prefilteredColor.z <= 0.0 || prefilteredColor.z >= 0.0)? prefilteredColor.z: 0.0;\n"
         "    frag_color = vec4(prefilteredColor, 1.0);\n"
         "}";
     e->get_function_loader()->load([this, vertex_shader_code { vertex_shader_code.str() }, fragment_shader_code { fragment_shader_code.str() }] {

@@ -1,15 +1,27 @@
 #ifndef GEAROENIX_PHYSICS_COLLIDER_FRUSTUM_HPP
 #define GEAROENIX_PHYSICS_COLLIDER_FRUSTUM_HPP
+#include "../../math/math-frustum.hpp"
 #include "phs-cld-collider.hpp"
 
 namespace gearoenix::physics::collider {
 class Frustum final : public Collider {
 public:
-    GX_GETSET_CREF_PRV(math::Mat4x4<double>, view_projection)
-    GX_GET_REF_PRV(math::Aabb3, limit)
+    GX_GET_REF_PRV(math::Frustum<>, frustum)
 public:
-    Frustum() noexcept;
+    explicit Frustum(const math::Vec3<double> (&points)[8] = {
+                         math::Vec3(-1.0, 1.0, 1.0),
+                         math::Vec3(1.0, 1.0, 1.0),
+                         math::Vec3(-1.0, 1.0, -1.0),
+                         math::Vec3(1.0, 1.0, -1.0),
+                         math::Vec3(-1.0, -1.0, 1.0),
+                         math::Vec3(1.0, -1.0, 1.0),
+                         math::Vec3(-1.0, -1.0, -1.0),
+                         math::Vec3(1.0, -1.0, -1.0),
+                     }) noexcept;
     ~Frustum() noexcept final;
+
+    /// For the arrangement of point go to the math::Frustum constructor
+    void update(const math::Vec3<double> (&points)[8]) noexcept;
 
     [[nodiscard]] std::optional<double> hit(const math::Ray3& r, double d_min) const noexcept final;
     [[nodiscard]] bool check_intersection(const math::Aabb3& box) const noexcept final;

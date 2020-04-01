@@ -40,6 +40,9 @@ gearoenix::glc3::shader::IrradianceConvoluter::IrradianceConvoluter(engine::Engi
         "        }\n"
         "    }\n"
         "    irradiance *= GX_PI / samples_count;\n"
+        "    irradiance.x = (irradiance.x <= 0.0 || irradiance.x >= 0.0)? irradiance.x: 0.0;\n"
+        "    irradiance.y = (irradiance.y <= 0.0 || irradiance.y >= 0.0)? irradiance.y: 0.0;\n"
+        "    irradiance.z = (irradiance.z <= 0.0 || irradiance.z >= 0.0)? irradiance.z: 0.0;\n"
         "    frag_color = vec4(irradiance, 1.0);\n"
         "}";
     e->get_function_loader()->load([this, vertex_shader_code { vertex_shader_code.str() }, fragment_shader_code { fragment_shader_code.str() }] {
