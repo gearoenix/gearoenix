@@ -1,6 +1,8 @@
 #include "cr-update-functions-manager.hpp"
+
 #include "asset/cr-asset-manager.hpp"
 #include "sync/cr-sync-kernel-workers.hpp"
+#include <utility>
 
 void gearoenix::core::UpdateFunctionsManager::update_kernel(const unsigned int kernel_index) noexcept
 {
@@ -29,7 +31,9 @@ gearoenix::core::UpdateFunctionsManager::~UpdateFunctionsManager() noexcept
 gearoenix::core::Id gearoenix::core::UpdateFunctionsManager::add(std::function<void()> fun) noexcept
 {
     std::lock_guard<std::mutex> _l(locker);
-    update_functions[asset::Manager::create_id()] = std::move(fun);
+    const auto id = asset::Manager::create_id();
+    update_functions[id] = std::move(fun);
+    return id;
 }
 
 void gearoenix::core::UpdateFunctionsManager::remove(const Id id) noexcept

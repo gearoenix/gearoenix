@@ -13,16 +13,21 @@
 #include "../texture/rnd-txt-target.hpp"
 #include "rnd-cmr-transformation.hpp"
 
-#define GX_CAMERA_INIT \
-    core::asset::Asset(my_id, core::asset::Type::Camera), frustum_collider(new physics::collider::Frustum()), uniform_buffers(new buffer::FramedUniform(sizeof(Uniform), e)), cascaded_shadow_frustum_partitions(static_cast<std::size_t>(e->get_system_application()->get_configuration().render_config.shadow_cascades_count) + 1), transformation(new Transformation(&uniform, frustum_collider.get(), &cascaded_shadow_frustum_partitions)), e(e)
+#define GX_CAMERA_INIT                                                                                                                                          \
+    core::asset::Asset(my_id, core::asset::Type::Camera),                                                                                                       \
+        frustum_collider(new physics::collider::Frustum()),                                                                                                     \
+        uniform_buffers(new buffer::FramedUniform(sizeof(Uniform), e)),                                                                                         \
+        cascaded_shadow_frustum_partitions(static_cast<std::size_t>(e->get_system_application()->get_configuration().render_config.shadow_cascades_count) + 1), \
+        transformation(new Transformation(&uniform, frustum_collider.get(), &cascaded_shadow_frustum_partitions)),                                              \
+        render_engine(e)
 
 void gearoenix::render::camera::Camera::initialize() noexcept
 {
-    auto* const sys_app = e->get_system_application();
+    auto* const sys_app = render_engine->get_system_application();
     uniform.aspect_ratio = static_cast<float>(sys_app->get_window_ratio());
     uniform.clip_width = static_cast<float>(sys_app->get_window_width());
     uniform.clip_height = static_cast<float>(sys_app->get_window_height());
-    set_target(e->get_main_render_target().get());
+    set_target(render_engine->get_main_render_target().get());
     sys_app->get_event_engine()->add_listener(core::event::Id::SystemWindowSizeChange, 1.0f, this);
 }
 
@@ -68,7 +73,7 @@ void gearoenix::render::camera::Camera::config_target() const noexcept
 
 gearoenix::render::camera::Camera::~Camera() noexcept
 {
-    e->get_system_application()->get_event_engine()->remove_listener(core::event::Id::SystemWindowSizeChange, this);
+    render_engine->get_system_application()->get_event_engine()->remove_listener(core::event::Id::SystemWindowSizeChange, this);
 }
 
 void gearoenix::render::camera::Camera::set_far(const float f) noexcept
@@ -174,7 +179,7 @@ void gearoenix::render::camera::Camera::check_dynamic_models(const physics::acce
 void gearoenix::render::camera::Camera::cascade_shadow(const light::Directional* const l) noexcept
 {
     auto* const cascade_info = cascades.get_next([this] {
-        return new light::CascadeInfo(e);
+        return new light::CascadeInfo(render_engine);
     });
     cascade_info->set_source(l);
     const auto& dir = l->get_direction();
@@ -193,7 +198,7 @@ void gearoenix::render::camera::Camera::merge_seen_meshes() noexcept
 
 bool gearoenix::render::camera::Camera::on_event(const core::event::Data& d) noexcept
 {
-    const auto* sys_app = e->get_system_application();
+    const auto* sys_app = render_engine->get_system_application();
     switch (d.source) {
     case core::event::Id::SystemWindowSizeChange:
         if (target->get_attachments().empty())

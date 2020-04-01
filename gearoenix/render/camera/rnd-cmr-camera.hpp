@@ -76,9 +76,8 @@ public:
     GX_GET_CREF_PRT(TransparentMeshes, seen_dynamic_transparent_meshes) // sorted
     GX_GET_CREF_PRT(TransparentMeshes, seen_transparent_meshes) // sorted
     GX_GET_REF_PRT(core::OneLoopPool<light::CascadeInfo>, cascades)
+    GX_GET_CPTR_PRT(engine::Engine, render_engine)
 protected:
-    engine::Engine* const e;
-
     void initialize() noexcept;
 
     Camera(core::Id my_id, engine::Engine* e) noexcept;

@@ -4,8 +4,9 @@
 namespace gearoenix::core::event {
 class Listener {
 public:
+    virtual ~Listener() noexcept = default;
     /// If it returns true no more process on event will happen
-    virtual bool on_event(const Data& event_data) noexcept = 0;
+    [[nodiscard]] virtual bool on_event(const Data& event_data) noexcept = 0;
 };
 }
 #endif

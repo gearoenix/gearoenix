@@ -16,7 +16,7 @@ void gearoenix::render::camera::Perspective::update_fovy() noexcept
 
 void gearoenix::render::camera::Perspective::update_cascades() noexcept
 {
-    const std::size_t sections_count = cascaded_shadow_frustum_partitions_count.has_value() ? cascaded_shadow_frustum_partitions_count.value() : e->get_system_application()->get_configuration().render_config.shadow_cascades_count;
+    const std::size_t sections_count = cascaded_shadow_frustum_partitions_count.has_value() ? cascaded_shadow_frustum_partitions_count.value() : render_engine->get_system_application()->get_configuration().render_config.shadow_cascades_count;
     if (cascaded_shadow_frustum_partitions.size() != sections_count + 1)
         cascaded_shadow_frustum_partitions.resize(sections_count + 1);
 

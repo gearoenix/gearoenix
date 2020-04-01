@@ -348,6 +348,8 @@ SET(GX_ENGINE_SRC
         "${GX_ENGINE_SRC_DIR}render/buffer/rnd-buf-uniform.hpp"
         "${GX_ENGINE_SRC_DIR}render/camera/rnd-cmr-camera.cpp"
         "${GX_ENGINE_SRC_DIR}render/camera/rnd-cmr-camera.hpp"
+        "${GX_ENGINE_SRC_DIR}render/camera/rnd-cmr-jet-controller.cpp"
+        "${GX_ENGINE_SRC_DIR}render/camera/rnd-cmr-jet-controller.hpp"
         "${GX_ENGINE_SRC_DIR}render/camera/rnd-cmr-manager.cpp"
         "${GX_ENGINE_SRC_DIR}render/camera/rnd-cmr-manager.hpp"
         "${GX_ENGINE_SRC_DIR}render/camera/rnd-cmr-orthographic.cpp"

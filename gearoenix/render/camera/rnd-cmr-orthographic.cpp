@@ -24,7 +24,7 @@ void gearoenix::render::camera::Orthographic::update_aspects_size() noexcept
 
 void gearoenix::render::camera::Orthographic::update_cascades() noexcept
 {
-    const system::Configuration& sys_conf = e->get_system_application()->get_configuration();
+    const system::Configuration& sys_conf = render_engine->get_system_application()->get_configuration();
     const engine::Configuration& eng_conf = sys_conf.render_config;
     const std::size_t sections_count = eng_conf.shadow_cascades_count;
     const auto sections_count_plus = sections_count + 1;
