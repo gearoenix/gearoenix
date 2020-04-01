@@ -35,6 +35,8 @@ SET(GX_ENGINE_SRC
         "${GX_ENGINE_SRC_DIR}core/cr-string.cpp"
         "${GX_ENGINE_SRC_DIR}core/cr-string.hpp"
         "${GX_ENGINE_SRC_DIR}core/cr-types.hpp"
+        "${GX_ENGINE_SRC_DIR}core/cr-update-functions-manager.cpp"
+        "${GX_ENGINE_SRC_DIR}core/cr-update-functions-manager.hpp"
         "${GX_ENGINE_SRC_DIR}core/event/cr-ev-button.hpp"
         "${GX_ENGINE_SRC_DIR}core/event/cr-ev-engine.cpp"
         "${GX_ENGINE_SRC_DIR}core/event/cr-ev-engine.hpp"

@@ -1,6 +1,7 @@
 #include "rnd-eng-engine.hpp"
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../core/cr-function-loader.hpp"
+#include "../../core/cr-update-functions-manager.hpp"
 #include "../../core/sync/cr-sync-kernel-workers.hpp"
 #include "../../core/sync/cr-sync-semaphore.hpp"
 #include "../../physics/phs-engine.hpp"
@@ -26,6 +27,7 @@ gearoenix::render::engine::Engine::Engine(system::Application* const system_appl
     , function_loader(new core::FunctionLoader())
     , kernels(new core::sync::KernelWorkers())
     , physics_engine(new physics::Engine(system_application, kernels.get()))
+    , update_functions_manager(new core::UpdateFunctionsManager(kernels.get()))
     , late_delete_assets(10)
 {
     kernels->add_step(
