@@ -66,7 +66,6 @@ public:
     };
 
     struct RuntimeReflectionData {
-        reflection::Runtime* runtime_reflection = nullptr;
         node::MipmapGenerator* environment_mipmap_generator = nullptr;
         node::MipmapGenerator* irradiance_mipmap_generator = nullptr;
         RuntimeReflectionFaceData faces[6];
@@ -83,12 +82,11 @@ private:
     core::OneLoopPool<node::SkyboxEquirectangular> skybox_equirectangular;
     core::OneLoopPool<node::Unlit> unlit;
     std::map<double, std::map<const scene::Scene*, SceneData>> nodes;
-    std::vector<RuntimeReflectionData> runtime_reflections_data;
+    std::map<reflection::Runtime*, RuntimeReflectionData> runtime_reflections_data;
     std::vector<light::CascadeInfo*> cascades;
 
     void update_camera(const scene::Scene* scn, camera::Camera* cam, CameraData& camera_nodes) noexcept;
     void update_skyboxes(const scene::Scene* scn, const camera::Camera* cam, CameraData& camera_nodes) noexcept;
-    void clear_runtime_reflection() noexcept;
     void update_runtime_reflection(const scene::Scene* scn) noexcept;
     void update_opaque(
         const std::vector<std::tuple<material::Type, model::Model*, model::Mesh*>>& seen_meshes,
@@ -97,10 +95,12 @@ private:
         const std::vector<std::tuple<double, material::Type, model::Model*, model::Mesh*>>& seen_meshes,
         const scene::Scene* scn, const camera::Camera* cam, CameraData& camera_nodes) noexcept;
 
-    void record_runtime_reflection(unsigned int& task_number, unsigned int kernel_index, unsigned int kernels_count) noexcept;
+    void record_runtime_reflection(
+        const scene::Scene* scn, unsigned int& task_number, unsigned int kernel_index,
+        unsigned int kernels_count) noexcept;
 
     void submit_camera_data(const CameraData& camera_data) const noexcept;
-    void submit_runtime_reflections() noexcept;
+    void submit_runtime_reflections(const scene::Scene* scn) noexcept;
 
 public:
     Pbr(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;

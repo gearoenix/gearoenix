@@ -87,76 +87,61 @@ void gearoenix::render::graph::tree::Pbr::update_skyboxes(const scene::Scene* co
     }
 }
 
-void gearoenix::render::graph::tree::Pbr::clear_runtime_reflection() noexcept
-{
-    switch (runtime_reflection_state) {
-    case RuntimeReflectionState::EnvironmentCubeRender: {
-        runtime_reflections_data.clear();
-        break;
-    }
-    default:
-        break;
-    }
-}
-
 void gearoenix::render::graph::tree::Pbr::update_runtime_reflection(const scene::Scene* const scn) noexcept
 {
-    switch (runtime_reflection_state) {
-    case RuntimeReflectionState::EnvironmentCubeRender: {
-        const auto& runtime_reflections = scn->get_runtime_reflections();
-        for (const auto& id_rtr : runtime_reflections) {
-            const auto& rtr = id_rtr.second;
-            auto& rtrs_nodes = runtime_reflections_data;
-            rtrs_nodes.emplace_back();
-            auto& rtr_nodes = rtrs_nodes.back();
-            rtr_nodes.runtime_reflection = rtr.get();
-            const auto& cameras = rtr->get_cameras();
-            for (int fi = 0; fi < 6; ++fi) {
-                auto& rtr_face_nodes = rtr_nodes.faces[fi];
-                rtr_face_nodes.cam = cameras[fi].get();
-                update_camera(scn, rtr_face_nodes.cam, rtr_face_nodes.camera_data);
+    const auto& runtime_reflections = scn->get_runtime_reflections();
+    for (const auto& id_rtr : runtime_reflections) {
+        auto* const rtr = id_rtr.second.get();
+        if (!rtr->get_enabled())
+            continue;
+        switch (rtr->get_state()) {
+        case reflection::Runtime::State::EnvironmentCubeRender: {
+            if (rtr->get_state_environment_face() == 0) {
+                runtime_reflections_data[rtr] = RuntimeReflectionData();
             }
+            auto& rtr_nodes = runtime_reflections_data[rtr];
+            const auto& cam = rtr->get_cameras()[rtr->get_state_environment_face()];
+            auto& rtr_face_nodes = rtr_nodes.faces[rtr->get_state_environment_face()];
+            rtr_face_nodes.cam = cam.get();
+            update_camera(scn, rtr_face_nodes.cam, rtr_face_nodes.camera_data);
+            break;
         }
-        break;
-    }
-    case RuntimeReflectionState::EnvironmentCubeMipMap: {
-        for (auto& rtr_nodes : runtime_reflections_data) {
-            auto* const rtr = rtr_nodes.runtime_reflection;
+        case reflection::Runtime::State::EnvironmentCubeMipMap: {
+            auto& rtr_nodes = runtime_reflections_data[rtr];
             rtr_nodes.environment_mipmap_generator = rtr->get_environment_mipmap_generator().get();
             rtr_nodes.environment_mipmap_generator->update();
             rtr_nodes.irradiance_mipmap_generator = rtr->get_irradiance_mipmap_generator().get();
             rtr_nodes.irradiance_mipmap_generator->update();
-            const auto& irradiances = rtr->get_irradiance_convoluters();
-            for (int fi = 0; fi < 6; ++fi) {
-                auto& rtr_face_nodes = rtr_nodes.faces[fi];
-                rtr_face_nodes.irradiance = irradiances[fi].get();
-                rtr_face_nodes.irradiance->update();
-            }
+            break;
         }
-        break;
-    }
-    case RuntimeReflectionState::IrradianceMipMap: {
-        for (auto& rtr_nodes : runtime_reflections_data) {
-            auto* const rtr = rtr_nodes.runtime_reflection;
+        case reflection::Runtime::State::IrradianceFace: {
+            const auto fi = rtr->get_state_irradiance_face();
+            auto& irradiance = runtime_reflections_data[rtr].faces[fi].irradiance;
+            irradiance = rtr->get_irradiance_convoluters()[fi].get();
+            irradiance->update();
+            break;
+        }
+        case reflection::Runtime::State::IrradianceMipMap: {
+            auto& rtr_nodes = runtime_reflections_data[rtr];
+            rtr_nodes.irradiance_mipmap_generator = rtr->get_irradiance_mipmap_generator().get();
+            rtr_nodes.irradiance_mipmap_generator->update();
+            break;
+        }
+        case reflection::Runtime::State::RadianceFaceLevel: {
+            auto& rtr_nodes = runtime_reflections_data[rtr];
             const auto& radiances = rtr->get_radiance_convoluters();
-            for (int fi = 0; fi < 6; ++fi) {
-                auto& rtr_face_nodes = rtr_nodes.faces[fi];
-                const auto& face_radiances = radiances[fi];
-                for (std::size_t rad_i = 0; rad_i < face_radiances.size(); ++rad_i) {
-                    auto* const radiance = face_radiances[rad_i].get();
-                    rtr_face_nodes.radiances[rad_i] = radiance;
-                    radiance->update();
-                }
-                for (auto rad_i = face_radiances.size();
-                     rad_i < GX_MAX_RUNTIME_REFLECTION_RADIANCE_LEVELS; ++rad_i) {
-                    rtr_face_nodes.radiances[rad_i] = nullptr;
-                }
-            }
+            const auto fi = rtr->get_state_radiance_face();
+            auto& rtr_face_nodes = rtr_nodes.faces[fi];
+            const auto& face_radiances = radiances[fi];
+            const auto li = rtr->get_state_radiance_level();
+            auto* const radiance = face_radiances[li].get();
+            rtr_face_nodes.radiances[li] = radiance;
+            radiance->update();
+            break;
         }
-        break;
-    }
-    default:
-        return;
+        default:
+            return;
+        }
     }
 }
 
@@ -259,53 +244,52 @@ void gearoenix::render::graph::tree::Pbr::update_transparent(
 }
 
 void gearoenix::render::graph::tree::Pbr::record_runtime_reflection(
-    unsigned int& task_number, const unsigned int kernel_index, const unsigned int kernels_count) noexcept
+    const scene::Scene* const scn, unsigned int& task_number, const unsigned int kernel_index,
+    const unsigned int kernels_count) noexcept
 {
-    switch (runtime_reflection_state) {
-    case RuntimeReflectionState::EnvironmentCubeRender: {
-        for (const auto& runtime_reflection : runtime_reflections_data) {
-            for (const auto& face : runtime_reflection.faces) {
-                for (const auto& skies : face.camera_data.skyboxes)
-                    for (auto* const sky : skies.second)
-                        GX_DO_TASK(sky->record_continuously(kernel_index))
-                const auto& opaques = face.camera_data.opaques;
-                if (opaques.forward_pbr != nullptr)
-                    opaques.forward_pbr->record(kernel_index);
-                if (opaques.unlit != nullptr)
-                    opaques.unlit->record(kernel_index);
-                for (auto* const node : face.camera_data.transparencies)
-                    GX_DO_TASK(
-                        node->record_continuously(kernel_index))
+    const auto& runtime_reflections = scn->get_runtime_reflections();
+    for (const auto& id_rtr : runtime_reflections) {
+        auto* const rtr = id_rtr.second.get();
+        if (!rtr->get_enabled())
+            continue;
+        auto& runtime_reflection = runtime_reflections_data[rtr];
+        switch (rtr->get_state()) {
+        case reflection::Runtime::State::EnvironmentCubeRender: {
+            const auto& face = runtime_reflection.faces[rtr->get_state_environment_face()];
+            for (const auto& skies : face.camera_data.skyboxes) {
+                for (auto* const sky : skies.second) {
+                    GX_DO_TASK(sky->record_continuously(kernel_index))
+                }
             }
+            const auto& opaques = face.camera_data.opaques;
+            if (opaques.forward_pbr != nullptr)
+                opaques.forward_pbr->record(kernel_index);
+            if (opaques.unlit != nullptr)
+                opaques.unlit->record(kernel_index);
+            for (auto* const node : face.camera_data.transparencies) {
+                GX_DO_TASK(node->record_continuously(kernel_index))
+            }
+            break;
         }
-        break;
-    }
-    case RuntimeReflectionState::EnvironmentCubeMipMap: {
-        for (const auto& runtime_reflection : runtime_reflections_data) {
+        case reflection::Runtime::State::EnvironmentCubeMipMap: {
             GX_DO_TASK(runtime_reflection.environment_mipmap_generator->record_continuously(kernel_index))
+            break;
         }
-        break;
-    }
-    case RuntimeReflectionState::IrradianceFace: {
-        for (const auto& runtime_reflection : runtime_reflections_data) {
-            GX_DO_TASK(runtime_reflection.faces[runtime_reflections_irradiance_face].irradiance->record_continuously(kernel_index))
+        case reflection::Runtime::State::IrradianceFace: {
+            GX_DO_TASK(runtime_reflection.faces[rtr->get_state_irradiance_face()].irradiance->record_continuously(kernel_index))
+            break;
         }
-        break;
-    }
-    case RuntimeReflectionState::IrradianceMipMap: {
-        for (const auto& runtime_reflection : runtime_reflections_data) {
+        case reflection::Runtime::State::IrradianceMipMap: {
             GX_DO_TASK(runtime_reflection.irradiance_mipmap_generator->record_continuously(kernel_index))
+            break;
         }
-        break;
-    }
-    case RuntimeReflectionState::RadianceFaceLevel: {
-        for (const auto& runtime_reflection : runtime_reflections_data) {
-            GX_DO_TASK(runtime_reflection.faces[runtime_reflections_radiance_face].radiances[runtime_reflections_radiance_level]->record_continuously(kernel_index))
+        case reflection::Runtime::State::RadianceFaceLevel: {
+            GX_DO_TASK(runtime_reflection.faces[rtr->get_state_radiance_face()].radiances[rtr->get_state_radiance_level()]->record_continuously(kernel_index))
+            break;
         }
-        break;
-    }
-    default:
-        return;
+        default:
+            return;
+        }
     }
 }
 
@@ -323,41 +307,37 @@ void gearoenix::render::graph::tree::Pbr::submit_camera_data(const CameraData& c
         node->submit();
 }
 
-void gearoenix::render::graph::tree::Pbr::submit_runtime_reflections() noexcept
+void gearoenix::render::graph::tree::Pbr::submit_runtime_reflections(const scene::Scene* const scn) noexcept
 {
-    switch (runtime_reflection_state) {
-    case RuntimeReflectionState::EnvironmentCubeRender:
-        for (const auto& runtime_reflection : runtime_reflections_data) {
-            for (const auto& face : runtime_reflection.faces) {
-                submit_camera_data(face.camera_data);
-            }
-        }
-        break;
-    case RuntimeReflectionState::EnvironmentCubeMipMap:
-        for (const auto& runtime_reflection : runtime_reflections_data) {
+    const auto& runtime_reflections = scn->get_runtime_reflections();
+    for (const auto& id_rtr : runtime_reflections) {
+        auto* const rtr = id_rtr.second.get();
+        if (!rtr->get_enabled())
+            continue;
+        auto& runtime_reflection = runtime_reflections_data[rtr];
+        switch (rtr->get_state()) {
+        case reflection::Runtime::State::EnvironmentCubeRender:
+            submit_camera_data(runtime_reflection.faces[rtr->get_state_environment_face()].camera_data);
+            break;
+        case reflection::Runtime::State::EnvironmentCubeMipMap:
             runtime_reflection.environment_mipmap_generator->submit();
-        }
-        break;
-    case RuntimeReflectionState::IrradianceFace:
-        for (const auto& runtime_reflection : runtime_reflections_data) {
-            runtime_reflection.faces[runtime_reflections_irradiance_face].irradiance->submit();
-        }
-        break;
-    case RuntimeReflectionState::IrradianceMipMap:
-        for (const auto& runtime_reflection : runtime_reflections_data) {
+            break;
+        case reflection::Runtime::State::IrradianceFace:
+            runtime_reflection.faces[rtr->get_state_irradiance_face()].irradiance->submit();
+            break;
+        case reflection::Runtime::State::IrradianceMipMap:
             runtime_reflection.irradiance_mipmap_generator->submit();
-        }
-        break;
-    case RuntimeReflectionState::RadianceFaceLevel:
-        for (const auto& runtime_reflection : runtime_reflections_data) {
-            const auto& face = runtime_reflection.faces[runtime_reflections_radiance_face];
-            auto* const radiance_node = face.radiances[runtime_reflections_radiance_level];
+            break;
+        case reflection::Runtime::State::RadianceFaceLevel: {
+            auto* const radiance_node = runtime_reflection.faces[rtr->get_state_radiance_face()].radiances[rtr->get_state_radiance_level()];
             if (nullptr != radiance_node)
                 radiance_node->submit();
+            break;
         }
-        break;
-    default:
-        return;
+        default:
+            break;
+        }
+        rtr->update_state();
     }
 }
 
@@ -380,7 +360,6 @@ void gearoenix::render::graph::tree::Pbr::update() noexcept
     unlit.refresh();
     nodes.clear();
     cascades.clear();
-    clear_runtime_reflection();
     const auto& priorities_scenes = e->get_physics_engine()->get_sorted_scenes();
     for (const auto& priority_scenes : priorities_scenes) {
         const double scene_priority = priority_scenes.first;
@@ -407,10 +386,9 @@ void gearoenix::render::graph::tree::Pbr::record(const unsigned int kernel_index
         cas->record(kernel_index);
     }
 
-    record_runtime_reflection(task_number, kernel_index, kernels_count);
-
     for (const auto& priority_scenes : nodes) {
         for ([[maybe_unused]] const auto& [scn, scene_data] : priority_scenes.second) {
+            record_runtime_reflection(scn, task_number, kernel_index, kernels_count);
             for (const auto& priority_cameras : scene_data.cameras) {
                 for (const auto& cam_camera_nodes : priority_cameras.second) {
                     const CameraData& camera_nodes = cam_camera_nodes.second;
@@ -436,10 +414,9 @@ void gearoenix::render::graph::tree::Pbr::submit() noexcept
         cas->submit();
     }
 
-    submit_runtime_reflections();
-
     for (auto& priority_scenes : nodes) {
-        for ([[maybe_unused]] const auto& [scn, scene_data] : priority_scenes.second) {
+        for (const auto& [scn, scene_data] : priority_scenes.second) {
+            submit_runtime_reflections(scn);
             for ([[maybe_unused]] const auto& [priority, cameras] : scene_data.cameras) {
                 for ([[maybe_unused]] const auto& [cam, camera_data] : cameras) {
                     submit_camera_data(camera_data);
@@ -447,6 +424,4 @@ void gearoenix::render::graph::tree::Pbr::submit() noexcept
             }
         }
     }
-
-    update_runtime_reflection_state();
 }

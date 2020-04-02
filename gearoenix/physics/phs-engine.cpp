@@ -48,22 +48,23 @@ void gearoenix::physics::Engine::update_scenes_kernel(const unsigned int kernel_
         for ([[maybe_unused]] const auto& [id, rfl] : reflections) {
             GX_DO_TASK(rfl->update())
         }
-        if (sys_app->get_render_engine()->get_render_tree()->get_runtime_reflection_state() == render::graph::tree::RuntimeReflectionState::EnvironmentCubeRender) {
-            const auto& runtime_reflections = scene->get_runtime_reflections();
-            for (const auto& id_rtr : runtime_reflections) {
-                const auto& cameras = id_rtr.second->get_cameras();
-                for (const auto& camera : cameras) {
-                    GX_DO_TASK(
-                        camera->update();
-                        if (camera->get_cascaded_shadow_enabled()) {
-                            for (const auto& id_light : shadow_cascaders) {
-                                auto* const light = id_light.second.get();
-                                if (!light->get_enabled())
-                                    continue;
-                                camera->cascade_shadow(light);
-                            }
-                        })
-                }
+        const auto& runtime_reflections = scene->get_runtime_reflections();
+        for (const auto& id_rtr : runtime_reflections) {
+            auto* const rtr = id_rtr.second.get();
+            if (!rtr->get_enabled())
+                continue;
+            if (rtr->get_state() == render::reflection::Runtime::State::EnvironmentCubeRender) {
+                const auto& camera = id_rtr.second->get_cameras()[rtr->get_state_environment_face()];
+                GX_DO_TASK(
+                    camera->update();
+                    if (camera->get_cascaded_shadow_enabled()) {
+                        for (const auto& id_light : shadow_cascaders) {
+                            auto* const light = id_light.second.get();
+                            if (!light->get_enabled())
+                                continue;
+                            camera->cascade_shadow(light);
+                        }
+                    })
             }
         }
         const auto& cameras = scene->get_cameras();
@@ -89,19 +90,22 @@ void gearoenix::physics::Engine::update_scenes_receiver() noexcept
 {
     for (const auto& ls : sorted_scenes) {
         auto* const scene = ls.second;
-        if (sys_app->get_render_engine()->get_render_tree()->get_runtime_reflection_state() == render::graph::tree::RuntimeReflectionState::EnvironmentCubeRender) {
-            const auto& runtime_reflections = scene->get_runtime_reflections();
-            for (const auto& id_rtr : runtime_reflections) {
-                const auto& cameras = id_rtr.second->get_cameras();
-                for (const auto& camera : cameras) {
-                    if (camera->get_cascaded_shadow_enabled()) {
-                        for (auto& cascade : camera->get_cascades()) {
-                            cascade.start();
-                        }
+
+        const auto& runtime_reflections = scene->get_runtime_reflections();
+        for (const auto& id_rtr : runtime_reflections) {
+            auto* const rtr = id_rtr.second.get();
+            if (!rtr->get_enabled())
+                continue;
+            if (rtr->get_state() == render::reflection::Runtime::State::EnvironmentCubeRender) {
+                const auto& camera = id_rtr.second->get_cameras()[rtr->get_state_environment_face()];
+                if (camera->get_cascaded_shadow_enabled()) {
+                    for (auto& cascade : camera->get_cascades()) {
+                        cascade.start();
                     }
                 }
             }
         }
+
         const auto& cameras = scene->get_cameras();
         for (const auto& cam : cameras) {
             auto* const camera = cam.second.get();
@@ -129,27 +133,28 @@ void gearoenix::physics::Engine::update_visibility_kernel(const unsigned int ker
                 continue;
             GX_DO_TASK(rfl->check_dynamic_models(dynamic_accelerator))
         }
-        if (sys_app->get_render_engine()->get_render_tree()->get_runtime_reflection_state() == render::graph::tree::RuntimeReflectionState::EnvironmentCubeRender) {
-            const auto& runtime_reflections = scene->get_runtime_reflections();
-            for (const auto& id_rtr : runtime_reflections) {
-                const auto& cameras = id_rtr.second->get_cameras();
-                for (const auto& camera : cameras) {
-                    if (nullptr != dynamic_accelerator) {
-                        GX_DO_TASK(camera->check_dynamic_models(dynamic_accelerator))
-                    }
-                    if (nullptr != static_accelerator) {
-                        GX_DO_TASK(camera->check_static_models(static_accelerator))
-                    }
-                    if (camera->get_cascaded_shadow_enabled()) {
-                        auto& cascade_infos = camera->get_cascades();
-                        for (auto& cascade_info : cascade_infos) {
-                            if (nullptr != dynamic_accelerator)
-                                GX_DO_TASK(
-                                    cascade_info.shadow(dynamic_accelerator, kernel_index))
-                            if (nullptr != static_accelerator)
-                                GX_DO_TASK(
-                                    cascade_info.shadow(static_accelerator, kernel_index))
-                        }
+        const auto& runtime_reflections = scene->get_runtime_reflections();
+        for (const auto& id_rtr : runtime_reflections) {
+            auto* const rtr = id_rtr.second.get();
+            if (!rtr->get_enabled())
+                continue;
+            if (rtr->get_state() == render::reflection::Runtime::State::EnvironmentCubeRender) {
+                const auto& camera = id_rtr.second->get_cameras()[rtr->get_state_environment_face()];
+                if (nullptr != dynamic_accelerator) {
+                    GX_DO_TASK(camera->check_dynamic_models(dynamic_accelerator))
+                }
+                if (nullptr != static_accelerator) {
+                    GX_DO_TASK(camera->check_static_models(static_accelerator))
+                }
+                if (camera->get_cascaded_shadow_enabled()) {
+                    auto& cascade_infos = camera->get_cascades();
+                    for (auto& cascade_info : cascade_infos) {
+                        if (nullptr != dynamic_accelerator)
+                            GX_DO_TASK(
+                                cascade_info.shadow(dynamic_accelerator, kernel_index))
+                        if (nullptr != static_accelerator)
+                            GX_DO_TASK(
+                                cascade_info.shadow(static_accelerator, kernel_index))
                     }
                 }
             }
@@ -184,16 +189,17 @@ void gearoenix::physics::Engine::update_visibility_receiver() noexcept
         const auto* const scene = id_scene.second;
         if (scene == nullptr || !scene->get_enability())
             continue;
-        if (sys_app->get_render_engine()->get_render_tree()->get_runtime_reflection_state() == render::graph::tree::RuntimeReflectionState::EnvironmentCubeRender) {
-            const auto& runtime_reflections = scene->get_runtime_reflections();
-            for (const auto& id_rtr : runtime_reflections) {
-                const auto& cameras = id_rtr.second->get_cameras();
-                for (const auto& camera : cameras) {
-                    camera->merge_seen_meshes();
-                    auto& cascade_infos = camera->get_cascades();
-                    for (auto& cascade_info : cascade_infos) {
-                        cascade_info.shrink();
-                    }
+        const auto& runtime_reflections = scene->get_runtime_reflections();
+        for (const auto& id_rtr : runtime_reflections) {
+            auto* const rtr = id_rtr.second.get();
+            if (!rtr->get_enabled())
+                continue;
+            if (rtr->get_state() == render::reflection::Runtime::State::EnvironmentCubeRender) {
+                const auto& camera = id_rtr.second->get_cameras()[rtr->get_state_environment_face()];
+                camera->merge_seen_meshes();
+                auto& cascade_infos = camera->get_cascades();
+                for (auto& cascade_info : cascade_infos) {
+                    cascade_info.shrink();
                 }
             }
         }

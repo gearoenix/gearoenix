@@ -17,9 +17,13 @@
 gearoenix::render::reflection::Runtime::Runtime(
     const core::Id id,
     engine::Engine* const e,
-    const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
+    const core::sync::EndCaller<core::sync::EndCallerIgnore>& end_call) noexcept
     : Reflection(id, Type::Runtime, e)
+    , on_rendered([] {})
 {
+    core::sync::EndCaller<core::sync::EndCallerIgnore> call([end_call, this] {
+        state = State::Started;
+    });
     constexpr std::tuple<texture::Face, math::Vec3<double>, math::Vec3<double>> faces[6] = {
         { texture::FACES[0], math::Vec3(1.0, 0.0, 0.0), math::Vec3(0.0, -1.0, 0.0) },
         { texture::FACES[1], math::Vec3(-1.0, 0.0, 0.0), math::Vec3(0.0, -1.0, 0.0) },
@@ -150,5 +154,56 @@ void gearoenix::render::reflection::Runtime::local_scale(const double s) noexcep
     for (const auto& cam : cameras) {
         cam->set_near(static_cast<float>(s * cam->get_near()));
         cam->set_far(static_cast<float>(s * cam->get_far()));
+    }
+}
+
+void gearoenix::render::reflection::Runtime::update_state() noexcept
+{
+    // Note this happens when already all the necessary action done for the state
+    switch (state) {
+    case State::Started:
+        state = State::EnvironmentCubeRender;
+        break;
+    case State::EnvironmentCubeRender:
+        ++state_environment_face;
+        if (state_environment_face > 5) {
+            state_environment_face = 0;
+            state = State::EnvironmentCubeMipMap;
+        }
+        break;
+    case State::EnvironmentCubeMipMap:
+        state = State::IrradianceFace;
+        break;
+    case State::IrradianceFace:
+        ++state_irradiance_face;
+        if (state_irradiance_face > 5) {
+            state_irradiance_face = 0;
+            state = State::IrradianceMipMap;
+        }
+        break;
+    case State::IrradianceMipMap:
+        state = State::RadianceFaceLevel;
+        break;
+    case State::RadianceFaceLevel:
+        ++state_radiance_level;
+        if (state_radiance_level >= GX_MAX_RUNTIME_REFLECTION_RADIANCE_LEVELS) {
+            state_radiance_level = 0;
+            ++state_radiance_face;
+            if (state_radiance_face > 5) {
+                state_radiance_face = 0;
+                state = State::Resting;
+                on_rendered();
+            }
+        }
+        break;
+    case State::Resting:
+        ++state_resting_frame;
+        if (state_resting_frame > resting_frames_count) {
+            state_resting_frame = 0;
+            state = State::EnvironmentCubeRender;
+        }
+        break;
+    default:
+        break;
     }
 }
