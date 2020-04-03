@@ -573,6 +573,7 @@ SET(GX_ENGINE_SRC
         "${GX_ENGINE_SRC_DIR}system/stream/sys-stm-stream.hpp"
         "${GX_ENGINE_SRC_DIR}system/sys-app.cpp"
         "${GX_ENGINE_SRC_DIR}system/sys-app.hpp"
+        "${GX_ENGINE_SRC_DIR}system/sys-args.hpp"
         "${GX_ENGINE_SRC_DIR}system/sys-configuration.hpp"
         "${GX_ENGINE_SRC_DIR}system/sys-log.cpp"
         "${GX_ENGINE_SRC_DIR}system/sys-log.hpp"

@@ -10,6 +10,7 @@
 #include "../../core/event/cr-ev-engine.hpp"
 #include "../../core/event/cr-ev-event.hpp"
 #include "../../gl/gl-loader.hpp"
+#include "../sys-args.hpp"
 #include "../sys-configuration.hpp"
 #ifdef GX_USE_OPENGL_ES2
 #include "../../gles2/engine/gles2-eng-engine.hpp"
@@ -488,7 +489,8 @@ int gearoenix::system::Application::on_event(SDL_Event* const e) noexcept
     return 1;
 }
 
-gearoenix::system::Application::Application() noexcept
+gearoenix::system::Application::Application(const int argc, const char* const* const argv) noexcept
+    : arguments(new Args(argc, argv))
 {
     GXLOGI("Constructing Gearoenix system application monomorphic interface over SDL2.")
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_AUDIO) != 0) {
