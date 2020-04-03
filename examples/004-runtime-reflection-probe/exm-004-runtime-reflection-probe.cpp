@@ -84,40 +84,53 @@ Example004RuntimeReflectionProbeApp::Example004RuntimeReflectionProbeApp(gearoen
         scn->add_skybox(std::move(sky));
     }
 
-    const auto rtr1 = rfl_mgr->create<GxRtReflect>(rtr_call);
-    rtr1->set_location(GxVec3(1.75, 0.0, 0.0));
-    scn->add_reflection(rtr1);
-
     const auto rtr2 = rfl_mgr->create<GxRtReflect>(rtr_call);
-    rtr2->set_location(GxVec3(-11.0, 0.0, 0.0));
-    rtr2->local_scale(10.0);
+    rtr2->set_enabled(false);
     scn->add_reflection(rtr2);
 
-    const auto cube_mesh = msh_mgr->create_cube(msh_call);
+    const auto rtr1 = rfl_mgr->create<GxRtReflect>(rtr_call);
+    rtr1->local_scale(10.0);
+    scn->add_reflection(rtr1);
+
+    const auto sphere_mesh = msh_mgr->create_icosphere(msh_call);
 
     const std::shared_ptr<GxMatPbr> mat1(new GxMatPbr(render_engine, end_call));
     mat1->set_color(0xFF4AA2FF, end_call);
-    mat1->set_roughness_factor(0.0001f);
-    mat1->set_metallic_factor(0.9999f);
+    mat1->set_roughness_factor(0.5f);
+    mat1->set_metallic_factor(0.9f);
 
     const std::shared_ptr<GxMatPbr> mat2(new GxMatPbr(render_engine, end_call));
     mat2->set_color(0x724AFFFF, end_call);
-    mat2->set_roughness_factor(0.0001f);
-    mat2->set_metallic_factor(0.9999f);
+    mat2->set_roughness_factor(0.1f);
+    mat2->set_metallic_factor(0.1f);
+
+    const std::shared_ptr<GxMatPbr> mat3(new GxMatPbr(render_engine, end_call));
+    mat3->set_color(0xFF4FFFFF, end_call);
+    mat3->set_roughness_factor(0.00001f);
+    mat3->set_metallic_factor(0.999999f);
 
     const auto mdl1 = mdl_mgr->create<GxStaticModel>(mdl_call);
-    mdl1->add_mesh(std::make_shared<GxMdMesh>(cube_mesh, mat1));
-    mdl1->get_transformation()->set_location(GxVec3(1.75, 0.0, 0.0));
+    mdl1->add_mesh(std::make_shared<GxMdMesh>(sphere_mesh, mat1));
+    mdl1->get_transformation()->set_location(GxVec3(4.0, 0.0, 0.0));
     mdl1->set_hooked_reflection(rtr1);
     scn->add_model(mdl1);
 
     const auto mdl2 = mdl_mgr->create<GxStaticModel>(mdl_call);
-    mdl2->add_mesh(std::make_shared<GxMdMesh>(cube_mesh, mat2));
-    auto* const mdl2_tran = mdl2->get_transformation();
-    mdl2_tran->set_location(GxVec3(-11.0, 0.0, 0.0));
-    mdl2_tran->local_scale(10.0);
-    mdl2->set_hooked_reflection(rtr2);
+    mdl2->add_mesh(std::make_shared<GxMdMesh>(sphere_mesh, mat2));
+    mdl2->get_transformation()->set_location(GxVec3(-4.0, 0.0, 0.0));
+    mdl2->set_hooked_reflection(rtr1);
     scn->add_model(mdl2);
+
+    const auto mdl3 = mdl_mgr->create<GxStaticModel>(mdl_call);
+    mdl3->add_mesh(std::make_shared<GxMdMesh>(sphere_mesh, mat3));
+    mdl3->get_transformation()->local_scale(2.5);
+    mdl3->set_hooked_reflection(rtr1);
+    scn->add_model(mdl3);
+
+    rtr1->set_on_rendered([rtr2, mdl3] {
+        rtr2->set_enabled(true);
+        mdl3->set_hooked_reflection(rtr2);
+    });
 }
 
 Example004RuntimeReflectionProbeApp::~Example004RuntimeReflectionProbeApp() noexcept = default;
