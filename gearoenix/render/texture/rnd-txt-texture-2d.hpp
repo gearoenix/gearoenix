@@ -9,15 +9,16 @@ class Texture2D : public Texture {
     GX_GET_VAL_PRT(std::size_t, img_height, 0)
 protected:
     Texture2D(
-        const core::Id id,
-        const TextureFormat texture_format,
-        engine::Engine* const e) noexcept
-        : Texture(id, Type::Texture2D, texture_format, e)
-    {
-    }
+        core::Id id,
+        TextureFormat texture_format,
+        engine::Engine* e) noexcept;
 
 public:
-    ~Texture2D() noexcept override = default;
+    ~Texture2D() noexcept override;
+
+    void write_gx3d(
+        const std::shared_ptr<system::stream::Stream>& s,
+        const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept override;
 };
 }
 #endif

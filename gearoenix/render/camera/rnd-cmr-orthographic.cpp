@@ -44,14 +44,14 @@ void gearoenix::render::camera::Orthographic::update_cascades() noexcept
     cascaded_shadow_frustum_partitions[0][2] = zpx + y;
     cascaded_shadow_frustum_partitions[0][3] = zmx + y;
 
-    const math::Vec3 z_inc = transformation->get_z_axis() * (std::abs(uniform.far) - std::abs(uniform.near));
+    const math::Vec3 z_inc = transformation->get_z_axis() * ((uniform.far - uniform.near) / double(sections_count));
 
     for (std::size_t i = 1, j = 0; i < sections_count_plus; ++i, ++j)
         for (int k = 0; k < 4; ++k)
             cascaded_shadow_frustum_partitions[i][k] = cascaded_shadow_frustum_partitions[j][k] + z_inc;
 
-    const auto far_points = cascaded_shadow_frustum_partitions.back();
-    const auto near_points = cascaded_shadow_frustum_partitions.front();
+    const auto& far_points = cascaded_shadow_frustum_partitions[sections_count];
+    const auto& near_points = cascaded_shadow_frustum_partitions[0];
 
     frustum_collider->update({
         far_points[3],

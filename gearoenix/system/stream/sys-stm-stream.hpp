@@ -75,12 +75,13 @@ public:
     }
 
     template <typename T>
-    void write(const T& d) noexcept
+    [[nodiscard]] core::Count write(const T& d) noexcept
     {
-        write(&d, sizeof(T));
+        return write(&d, sizeof(T));
     }
 
     [[nodiscard]] static std::vector<std::uint8_t> get_file_content(const std::wstring& address) noexcept;
+    [[nodiscard]] static std::vector<std::uint8_t> get_file_content(const std::string& address) noexcept;
     [[nodiscard]] std::vector<std::uint8_t> get_file_content() noexcept;
 };
 }

@@ -282,6 +282,15 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     return create_2d_f(reinterpret_cast<const unsigned char*>(file_content.data()), file_content.size(), c, sample_info);
 }
 
+std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::create_2d_f(
+    const std::string& file_address,
+    core::sync::EndCaller<render::texture::Texture2D>& c,
+    const SampleInfo& sample_info) noexcept
+{
+    auto const file_content = system::stream::Stream::get_file_content(file_address);
+    return create_2d_f(reinterpret_cast<const unsigned char*>(file_content.data()), file_content.size(), c, sample_info);
+}
+
 std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::render::texture::Manager::get_cube(const math::Vec4<float>& color, core::sync::EndCaller<TextureCube>& c) noexcept
 {
     /// TODO: It is better to have different types of color and elements

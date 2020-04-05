@@ -10,7 +10,7 @@
 #define STBI_WRITE_NO_STDIO
 #include <stb_image_write.h>
 
-void gearoenix::render::texture::Image::encode_png_write_func(void* const context, void* const data, const int size) noexcept
+void gearoenix::render::texture::Image::encode_write_func(void* const context, void* const data, const int size) noexcept
 {
     auto* const file = reinterpret_cast<system::stream::Stream*>(context);
     (void)file->write(data, size);
@@ -82,5 +82,15 @@ void gearoenix::render::texture::Image::encode_png(
     const std::size_t img_height,
     const std::size_t components_count) noexcept
 {
-    stbi_write_png_to_func(encode_png_write_func, file, img_width, img_height, components_count, data, img_width * components_count);
+    stbi_write_png_to_func(encode_write_func, file, img_width, img_height, components_count, data, img_width * components_count);
+}
+
+void gearoenix::render::texture::Image::encode_hdr(
+    system::stream::Stream* const file,
+    const float* const data,
+    const std::size_t img_width,
+    const std::size_t img_height,
+    const std::size_t components_count) noexcept
+{
+    stbi_write_hdr_to_func(encode_write_func, file, img_width, img_height, components_count, data);
 }

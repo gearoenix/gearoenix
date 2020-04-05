@@ -11,7 +11,7 @@ class Stream;
 namespace gearoenix::render::texture {
 class Image {
 
-    static void encode_png_write_func(void* context, void* data, int size) noexcept;
+    static void encode_write_func(void* context, void* data, int size) noexcept;
 
 public:
     Image() = delete;
@@ -41,6 +41,12 @@ public:
     static void encode_png(
         system::stream::Stream* file,
         const unsigned char* data,
+        std::size_t img_width,
+        std::size_t img_height,
+        std::size_t components_count) noexcept;
+    static void encode_hdr(
+        system::stream::Stream* file,
+        const float* data,
         std::size_t img_width,
         std::size_t img_height,
         std::size_t components_count) noexcept;

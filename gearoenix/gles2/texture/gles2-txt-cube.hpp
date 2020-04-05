@@ -32,6 +32,9 @@ public:
         unsigned int aspect,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
     ~TextureCube() noexcept final;
+    void write_gx3d(
+        const std::shared_ptr<system::stream::Stream>& s,
+        const gearoenix::core::sync::EndCaller<gearoenix::core::sync::EndCallerIgnore>&) noexcept final;
     void bind(gl::enumerated texture_unit) const noexcept;
     void bind() const noexcept;
 };

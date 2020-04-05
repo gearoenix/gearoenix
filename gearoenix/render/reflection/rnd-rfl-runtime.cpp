@@ -197,10 +197,16 @@ void gearoenix::render::reflection::Runtime::update_state() noexcept
         }
         break;
     case State::Resting:
-        ++state_resting_frame;
-        if (state_resting_frame > resting_frames_count) {
+        if (pending_to_start) {
+            pending_to_start = false;
             state_resting_frame = 0;
             state = State::EnvironmentCubeRender;
+        } else {
+            ++state_resting_frame;
+            if (state_resting_frame > resting_frames_count) {
+                state_resting_frame = 0;
+                state = State::EnvironmentCubeRender;
+            }
         }
         break;
     default:

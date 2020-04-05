@@ -46,8 +46,8 @@ void gearoenix::render::camera::Perspective::update_cascades() noexcept
 
     GX_HELPER(sections_count);
 
-    const auto near_points = cascaded_shadow_frustum_partitions[0];
-    const auto far_points = cascaded_shadow_frustum_partitions[sections_count];
+    const auto& near_points = cascaded_shadow_frustum_partitions[0];
+    const auto& far_points = cascaded_shadow_frustum_partitions[sections_count];
 
     frustum_collider->update({
         far_points[3],

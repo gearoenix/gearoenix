@@ -34,8 +34,12 @@ bool gearoenix::system::stream::Stream::read_bool() noexcept
 
 std::vector<std::uint8_t> gearoenix::system::stream::Stream::get_file_content(const std::wstring& address) noexcept
 {
-    const auto addr = core::String::to_string(address);
-    std::ifstream file(addr, std::ios::binary | std::ios::in);
+    return get_file_content(core::String::to_string(address));
+}
+
+std::vector<std::uint8_t> gearoenix::system::stream::Stream::get_file_content(const std::string& address) noexcept
+{
+    std::ifstream file(address, std::ios::binary | std::ios::in);
     file.seekg(0, std::ios::end);
     const std::size_t file_size = file.tellg();
     file.seekg(0, std::ios::beg);

@@ -25,6 +25,10 @@ namespace gearoenix::render::model {
 class Static;
 }
 
+namespace gearoenix::render::reflection {
+class Runtime;
+}
+
 namespace gearoenix::render::skybox {
 class Equirectangular;
 }
@@ -53,6 +57,7 @@ private:
     using GxVec3 = gearoenix::math::Vec3<double>;
     using GxVec4 = gearoenix::math::Vec4<double>;
     using GxSkyEqrect = gearoenix::render::skybox::Equirectangular;
+    using GxRtReflect = gearoenix::render::reflection::Runtime;
 
     std::shared_ptr<GxGameScene> scn;
     std::shared_ptr<GxGameScene> obj_scn;
@@ -63,13 +68,17 @@ private:
     std::shared_ptr<GxCam> obj_cam;
     std::shared_ptr<GxEditWdg> file_location;
     std::shared_ptr<GxSkyEqrect> sky;
+    std::shared_ptr<GxRtReflect> rtr;
     std::unique_ptr<GxGrPbr> render_tree;
+    std::string environment_file = "";
+    std::string irradiance_file = "irradiance.hdr";
+    std::string radiance_file = "radiance.hdr";
     bool camera_rotation_enabled = false;
-    std::chrono::high_resolution_clock::time_point last_time_item_detail_modal_closed = std::chrono::high_resolution_clock::now();
-    double camera_forward = 0.0;
-    double camera_sideward = 0.0;
+    const bool called_from_cli;
 
     void on_open() noexcept;
+    void argument_handling() noexcept;
+    void open_environment() noexcept;
 
 public:
     explicit Example004RuntimeReflectionProbeApp(gearoenix::system::Application* sys_app) noexcept;

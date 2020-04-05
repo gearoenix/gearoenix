@@ -91,6 +91,7 @@ public:                         \
 public:                      \
     [[nodiscard]] t get_##x() const noexcept { return x; }
 #define GX_GET_CVAL_PRT(t, x) GX_GET_CVAL(protected, t, x)
+#define GX_GET_CVAL_PRV(t, x) GX_GET_CVAL(private, t, x)
 
 #define GX_GET_VAL(v, t, x, d) \
     v:                         \

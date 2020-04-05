@@ -53,6 +53,7 @@ public:
     std::shared_ptr<Texture2D> create_2d_f(const unsigned char* data, std::size_t size, core::sync::EndCaller<Texture2D>& c, const SampleInfo& sample_info = SampleInfo()) noexcept;
     /// It creates 2d floating texture from file
     std::shared_ptr<Texture2D> create_2d_f(const std::wstring& file_address, core::sync::EndCaller<Texture2D>& c, const SampleInfo& sample_info = SampleInfo()) noexcept;
+    std::shared_ptr<Texture2D> create_2d_f(const std::string& file_address, core::sync::EndCaller<Texture2D>& c, const SampleInfo& sample_info = SampleInfo()) noexcept;
     std::shared_ptr<TextureCube> get_cube(const math::Vec4<float>& color, core::sync::EndCaller<TextureCube>& c) noexcept;
     std::shared_ptr<TextureCube> get_cube(const math::Vec3<float>& color, core::sync::EndCaller<TextureCube>& c) noexcept;
     std::shared_ptr<TextureCube> get_cube(const math::Vec2<float>& color, core::sync::EndCaller<TextureCube>& c) noexcept;

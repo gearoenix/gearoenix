@@ -133,6 +133,13 @@ gearoenix::gles2::texture::TextureCube::~TextureCube() noexcept
     texture_object = 0;
 }
 
+void gearoenix::gles2::texture::TextureCube::write_gx3d(
+    const std::shared_ptr<system::stream::Stream>&,
+    const gearoenix::core::sync::EndCaller<gearoenix::core::sync::EndCallerIgnore>&) noexcept
+{
+    GXUNIMPLEMENTED
+}
+
 void gearoenix::gles2::texture::TextureCube::bind(gl::enumerated texture_unit) const noexcept
 {
     gl::Loader::active_texture(GL_TEXTURE0 + texture_unit);

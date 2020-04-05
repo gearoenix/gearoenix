@@ -53,6 +53,7 @@ gearoenix::gl::get_shaderiv_fnp gearoenix::gl::Loader::get_shaderiv;
 gearoenix::gl::get_shader_info_log_fnp gearoenix::gl::Loader::get_shader_info_log;
 gearoenix::gl::get_uniform_location_fnp gearoenix::gl::Loader::get_uniform_location;
 gearoenix::gl::link_program_fnp gearoenix::gl::Loader::link_program;
+gearoenix::gl::read_pixels_fnp gearoenix::gl::Loader::read_pixels;
 gearoenix::gl::renderbuffer_storage_fnp gearoenix::gl::Loader::renderbuffer_storage;
 gearoenix::gl::tex_image_2d_fnp gearoenix::gl::Loader::tex_image_2d;
 gearoenix::gl::tex_parameterf_fnp gearoenix::gl::Loader::tex_parameterf;
@@ -158,6 +159,7 @@ bool gearoenix::gl::Loader::load_library(const render::engine::Type engine_type)
     GXFUNLDF(glGetShaderInfoLog, get_shader_info_log)
     GXFUNLDF(glGetUniformLocation, get_uniform_location)
     GXFUNLDF(glLinkProgram, link_program)
+    GXFUNLDF(glReadPixels, read_pixels)
     GXFUNLDF(glRenderbufferStorage, renderbuffer_storage)
     GXFUNLDF(glTexImage2D, tex_image_2d)
     GXFUNLDF(glTexParameterf, tex_parameterf)

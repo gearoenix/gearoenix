@@ -1,5 +1,6 @@
 #include "gx-tool-ibl-main.hpp"
 #include <gearoenix/core/asset/cr-asset-manager.hpp>
+#include <gearoenix/core/cr-string.hpp>
 #include <gearoenix/core/event/cr-ev-engine.hpp>
 #include <gearoenix/math/math-aabb.hpp>
 #include <gearoenix/math/math-vertex.hpp>
@@ -29,11 +30,13 @@
 #include <gearoenix/render/skybox/rnd-sky-manager.hpp>
 #include <gearoenix/render/texture/rnd-txt-manager.hpp>
 #include <gearoenix/render/texture/rnd-txt-texture-2d.hpp>
+#include <gearoenix/render/texture/rnd-txt-texture-cube.hpp>
 #include <gearoenix/render/widget/rnd-wdg-button.hpp>
 #include <gearoenix/render/widget/rnd-wdg-edit.hpp>
 #include <gearoenix/render/widget/rnd-wdg-modal.hpp>
 #include <gearoenix/render/widget/rnd-wdg-text.hpp>
 #include <gearoenix/system/sys-app.hpp>
+#include <gearoenix/system/sys-args.hpp>
 
 template <class T>
 using GxEndCaller = gearoenix::core::sync::EndCaller<T>;
@@ -61,27 +64,31 @@ using GxMouseActionId = gearoenix::core::event::button::MouseActionId;
 using GxMovementBase = gearoenix::core::event::movement::Base;
 using GxTxtSampleInfo = gearoenix::render::texture::SampleInfo;
 using GxTxtFilter = gearoenix::render::texture::Filter;
-using GxRtReflect = gearoenix::render::reflection::Runtime;
 
 void Example004RuntimeReflectionProbeApp::on_open() noexcept
 {
     const auto& f = file_location->get_text();
     if (f.empty())
         return;
-    auto* const ast_mgr = system_application->get_asset_manager();
-    auto* const txt_mgr = ast_mgr->get_texture_manager();
-    GxEndCaller<GxTexture2D> txt_call([this](const std::shared_ptr<GxTexture2D>& t) {
-        sky->get_mat_equ()->set_color(t);
-    });
-    GxTxtSampleInfo smp;
-    smp.min_filter = GxTxtFilter::Linear;
-    /// TODO failure management
-    txt_mgr->create_2d_f(f, txt_call, smp);
+    environment_file = gearoenix::core::String::to_string(f);
+    open_environment();
+}
+
+void Example004RuntimeReflectionProbeApp::argument_handling() noexcept
+{
+    const auto* const args = system_application->get_arguments();
+    args->get_value("environment-file", environment_file);
+    args->get_value("irradiance-file", irradiance_file);
+    args->get_value("radiance-file", radiance_file);
 }
 
 Example004RuntimeReflectionProbeApp::Example004RuntimeReflectionProbeApp(gearoenix::system::Application* const sys_app) noexcept
     : gearoenix::core::Application::Application(sys_app)
+    , called_from_cli(system_application->get_arguments()->get_has_tokens())
 {
+    if (called_from_cli)
+        argument_handling();
+
     const GxEndCallerIgnored end_call([this] {
         uiscn->set_enability(true);
         scn->set_enability(true);
@@ -109,6 +116,7 @@ Example004RuntimeReflectionProbeApp::Example004RuntimeReflectionProbeApp(gearoen
     auto* const mdl_mgr = ast_mgr->get_model_manager();
     auto* const sky_mgr = ast_mgr->get_skybox_manager();
     auto* const rfl_mgr = ast_mgr->get_reflection_manager();
+    auto* const txt_mgr = ast_mgr->get_texture_manager();
 
     uiscn = ast_mgr->get_scene_manager()->create<GxUiScene>(ui_scn_call);
     scn = ast_mgr->get_scene_manager()->create<GxGameScene>(scn_call);
@@ -121,7 +129,7 @@ Example004RuntimeReflectionProbeApp::Example004RuntimeReflectionProbeApp(gearoen
     sky = sky_mgr->create<GxSkyEqrect>(sky_call);
     scn->add_skybox(sky);
 
-    const auto rtr = rfl_mgr->create<GxRtReflect>(rtr_call);
+    rtr = rfl_mgr->create<GxRtReflect>(rtr_call);
     scn->add_reflection(rtr);
 
     auto tmp_txt = mdl_mgr->create<GxTextWdg>(txw_call);
@@ -144,7 +152,8 @@ Example004RuntimeReflectionProbeApp::Example004RuntimeReflectionProbeApp(gearoen
     tmp_tran->local_x_scale(4.0f);
     tmp_tran->set_location(GxVec3(0.75, 0.75, 0.1));
     open_button->set_text(L"Open File", end_call);
-    open_button->set_on_click(std::bind(&Example004RuntimeReflectionProbeApp::on_open, this));
+    if (!called_from_cli)
+        open_button->set_on_click(std::bind(&Example004RuntimeReflectionProbeApp::on_open, this));
     uiscn->add_model(open_button);
 
     file_location = mdl_mgr->create<GxEditWdg>(edt_call);
@@ -175,17 +184,17 @@ Example004RuntimeReflectionProbeApp::Example004RuntimeReflectionProbeApp(gearoen
     //        mdl->set_hooked_reflection(rtr);
     //    }
 
-    //    {
-    //        const auto sphere_mesh = msh_mgr->create_icosphere(msh_call);
-    //        const std::shared_ptr<GxMatPbr> mat(new GxMatPbr(render_engine, end_call));
-    //        mat->set_roughness_factor(0.5f);
-    //        mat->set_metallic_factor(0.5f);
-    //        const auto mdl = mdl_mgr->create<GxStaticModel>(mdl_call);
-    //        mdl->add_mesh(std::make_shared<GxMdMesh>(sphere_mesh, mat));
-    //        mdl->get_transformation()->local_scale(10.0);
-    //        obj_scn->add_model(mdl);
-    //        mdl->set_hooked_reflection(rtr);
-    //    }
+    //        {
+    //            const auto sphere_mesh = msh_mgr->create_icosphere(msh_call);
+    //            const std::shared_ptr<GxMatPbr> mat(new GxMatPbr(render_engine, end_call));
+    //            mat->set_roughness_factor(0.999f);
+    //            mat->set_metallic_factor(0.5f);
+    //            const auto mdl = mdl_mgr->create<GxStaticModel>(mdl_call);
+    //            mdl->add_mesh(std::make_shared<GxMdMesh>(sphere_mesh, mat));
+    //            mdl->get_transformation()->local_scale(10.0);
+    //            obj_scn->add_model(mdl);
+    //            mdl->set_hooked_reflection(rtr);
+    //        }
 
     const auto obj_msh = msh_mgr->create_icosphere(msh_call);
 
@@ -201,6 +210,18 @@ Example004RuntimeReflectionProbeApp::Example004RuntimeReflectionProbeApp(gearoen
             obj_scn->add_model(mdl);
             mdl->set_hooked_reflection(rtr);
         }
+    }
+
+    if (called_from_cli) {
+        GxEndCaller<GxTexture2D> txt_call([end_call](const std::shared_ptr<GxTexture2D>&) {});
+        GxTxtSampleInfo smp;
+        smp.min_filter = GxTxtFilter::Linear;
+        sky->get_mat_equ()->set_color(txt_mgr->create_2d_f(environment_file, txt_call, smp));
+
+        rtr->set_on_rendered([this]() {
+            static_cast<gearoenix::render::texture::Texture*>(rtr->get_radiance().get())->write_gx3d(radiance_file, GX_DEFAULT_IGNORED_END_CALLER);
+            static_cast<gearoenix::render::texture::Texture*>(rtr->get_irradiance().get())->write_gx3d(irradiance_file, GX_DEFAULT_IGNORED_END_CALLER);
+        });
     }
 }
 
@@ -242,6 +263,24 @@ bool Example004RuntimeReflectionProbeApp::on_event(const gearoenix::core::event:
         GXUNEXPECTED
     }
     return false;
+}
+
+void Example004RuntimeReflectionProbeApp::open_environment() noexcept
+{
+    auto* const ast_mgr = system_application->get_asset_manager();
+    auto* const txt_mgr = ast_mgr->get_texture_manager();
+    GxEndCaller<GxTexture2D> txt_call([this](const std::shared_ptr<GxTexture2D>& t) {
+        sky->get_mat_equ()->set_color(t);
+        rtr->set_pending_to_start(true);
+        rtr->set_on_rendered([this]() {
+            static_cast<gearoenix::render::texture::Texture*>(rtr->get_radiance().get())->write_gx3d(radiance_file, GX_DEFAULT_IGNORED_END_CALLER);
+            static_cast<gearoenix::render::texture::Texture*>(rtr->get_irradiance().get())->write_gx3d(irradiance_file, GX_DEFAULT_IGNORED_END_CALLER);
+        });
+    });
+    GxTxtSampleInfo smp;
+    smp.min_filter = GxTxtFilter::Linear;
+    /// TODO failure management
+    txt_mgr->create_2d_f(environment_file, txt_call, smp);
 }
 
 GEAROENIX_START(Example004RuntimeReflectionProbeApp)

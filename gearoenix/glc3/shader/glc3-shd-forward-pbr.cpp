@@ -294,7 +294,7 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         "    vec3 diffuse = irradiance * albedo.xyz;\n"
         //   sample both the pre-filter map and the BRDF lut and combine them together as per
         //   the Split-Sum approximation to get the IBL radiance part.
-        "    vec3 prefiltered_color = textureLod(effect_specular_environment, reflection, roughness * " GX_MAX_RUNTIME_REFLECTION_RADIANCE_LEVELS_STR ".0).rgb;\n"
+        "    vec3 prefiltered_color = textureLod(effect_specular_environment, reflection, roughness * (" GX_MAX_RUNTIME_REFLECTION_RADIANCE_LEVELS_STR ".0 - 1.0)).rgb;\n"
         "    vec2 brdf = texture(effect_brdflut, vec2(normal_dot_view, roughness)).rg;\n"
         "    vec3 specular = prefiltered_color * (frsn * brdf.x + brdf.y);\n"
         //   TODO: add ambient occlusion (* ao);

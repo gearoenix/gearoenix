@@ -3,6 +3,8 @@
 #include "../../core/cr-function-loader.hpp"
 #include "../../gl/gl-constants.hpp"
 #include "../../gl/gl-loader.hpp"
+#include "../../render/texture/rnd-txt-image.hpp"
+#include "../../system/stream/sys-stm-local.hpp"
 #include "../../system/stream/sys-stm-stream.hpp"
 #include "../engine/glc3-eng-engine.hpp"
 #include "glc3-txt-2d.hpp"
@@ -135,6 +137,52 @@ gearoenix::glc3::texture::TextureCube::~TextureCube() noexcept
         gl::Loader::delete_textures(1, &c_texture_object);
     });
     texture_object = 0;
+}
+
+void gearoenix::glc3::texture::TextureCube::write_gx3d(
+    const std::shared_ptr<system::stream::Stream>& s,
+    const gearoenix::core::sync::EndCaller<gearoenix::core::sync::EndCallerIgnore>& end_call) noexcept
+{
+    render::texture::TextureCube::write_gx3d(s, end_call);
+    render_engine->get_function_loader()->load([this, s, end_call] {
+        gl::uint framebuffer;
+        gl::Loader::gen_framebuffers(1, &framebuffer);
+        gl::Loader::bind_framebuffer(GL_FRAMEBUFFER, framebuffer);
+        bind();
+        if (render::texture::format_has_float_component(texture_format)) {
+            std::vector<float> data(aspect * aspect * 4);
+            for (int i = 0; i < 6; ++i) {
+                for (unsigned int j = 0, level_aspect = aspect; level_aspect > 0; ++j, level_aspect >>= 1u) {
+                    gl::Loader::framebuffer_texture_2d(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, FACES[i], texture_object,
+                        j);
+                    gl::Loader::read_pixels(0, 0, level_aspect, level_aspect, GL_RGBA, GL_FLOAT, data.data());
+#ifdef GX_DEBUG_MODE
+                    system::stream::Local l(
+                        "texture-cube-glc3-id" + std::to_string(asset_id) + "-face" + std::to_string(i) + "-level" + std::to_string(j) + ".hdr", true);
+                    render::texture::Image::encode_hdr(&l, data.data(), level_aspect, level_aspect, 4);
+#endif
+                    render::texture::Image::encode_hdr(s.get(), data.data(), level_aspect, level_aspect, 4);
+                }
+            }
+        } else {
+            std::vector<unsigned char> data(aspect * aspect * 4);
+            for (int i = 0; i < 6; ++i) {
+                for (unsigned int j = 0, level_aspect = aspect; level_aspect > 0; ++j, level_aspect >>= 1u) {
+                    gl::Loader::framebuffer_texture_2d(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, FACES[i], texture_object,
+                        j);
+                    gl::Loader::read_pixels(0, 0, level_aspect, level_aspect, GL_RGBA, GL_UNSIGNED_BYTE, data.data());
+#ifdef GX_DEBUG_MODE
+                    system::stream::Local l(
+                        "texture-cube-glc3-id" + std::to_string(asset_id) + "-face" + std::to_string(i) + "-level" + std::to_string(j) + ".png", true);
+                    render::texture::Image::encode_png(&l, data.data(), level_aspect, level_aspect, 4);
+#endif
+                    render::texture::Image::encode_png(s.get(), data.data(), level_aspect, level_aspect, 4);
+                }
+            }
+        }
+        gl::Loader::bind_framebuffer(GL_FRAMEBUFFER, 0);
+        gl::Loader::delete_framebuffers(1, &framebuffer);
+    });
 }
 
 void gearoenix::glc3::texture::TextureCube::bind(gl::enumerated texture_unit) const noexcept

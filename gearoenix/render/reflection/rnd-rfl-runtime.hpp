@@ -56,6 +56,7 @@ public:
     GX_GET_VAL_PRV(std::size_t, state_resting_frame, 0)
     GX_GETSET_VAL_PRV(std::size_t, resting_frames_count, std::numeric_limits<std::size_t>::max())
     GX_GETSET_CREF_PRV(std::function<void()>, on_rendered);
+    GX_GETSET_VAL_PRV(bool, pending_to_start, false);
 
 public:
     Runtime(core::Id id, engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept;

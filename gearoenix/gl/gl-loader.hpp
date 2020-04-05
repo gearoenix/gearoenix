@@ -76,6 +76,8 @@ typedef void(GXGL_APIENTRY get_shader_info_log_fnp)(uint shader, sizei bufSize,
 typedef sint(GXGL_APIENTRY get_uniform_location_fnp)(uint program,
     const char* name);
 typedef void(GXGL_APIENTRY link_program_fnp)(uint program);
+typedef void(GXGL_APIENTRY read_pixels_fnp)(
+    sint x, sint y, sizei width, sizei height, enumerated format, enumerated gl_type, void* data);
 typedef void(GXGL_APIENTRY renderbuffer_storage_fnp)(enumerated target,
     enumerated internal_format,
     sizei img_width,
@@ -184,6 +186,7 @@ public:
     static get_shader_info_log_fnp get_shader_info_log;
     static get_uniform_location_fnp get_uniform_location;
     static link_program_fnp link_program;
+    static read_pixels_fnp read_pixels;
     static renderbuffer_storage_fnp renderbuffer_storage;
     static tex_image_2d_fnp tex_image_2d;
     static tex_parameterf_fnp tex_parameterf;
