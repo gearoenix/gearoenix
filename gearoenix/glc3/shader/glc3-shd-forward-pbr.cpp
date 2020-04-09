@@ -2,6 +2,7 @@
 #ifdef GX_USE_OPENGL_CLASS_3
 #include "../../core/cr-function-loader.hpp"
 #include "../../gl/gl-loader.hpp"
+#include "../../system/sys-app.hpp"
 #include "../engine/glc3-eng-engine.hpp"
 #include <sstream>
 
@@ -294,21 +295,23 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         "    vec3 diffuse = irradiance * albedo.xyz;\n"
         //   sample both the pre-filter map and the BRDF lut and combine them together as per
         //   the Split-Sum approximation to get the IBL radiance part.
-        "    vec3 prefiltered_color = textureLod(effect_specular_environment, reflection, roughness * (" GX_MAX_RUNTIME_REFLECTION_RADIANCE_LEVELS_STR ".0 - 1.0)).rgb;\n"
-        "    vec2 brdf = texture(effect_brdflut, vec2(normal_dot_view, roughness)).rg;\n"
-        "    vec3 specular = prefiltered_color * (frsn * brdf.x + brdf.y);\n"
-        //   TODO: add ambient occlusion (* ao);
-        "    vec3 ambient = kd * diffuse + specular + scene_ambient_light * albedo.xyz;\n"
-        "    tmpv4.xyz = ambient + lo;\n"
-        "    if(camera_gamma_correction > 0.001) {\n"
-        //   HDR tone mapping
-        "        tmpv4.xyz = tmpv4.xyz / (tmpv4.xyz + vec3(camera_hdr_tune_mapping));\n"
-        //   gamma correct
-        "        tmpv4.xyz = pow(tmpv4.xyz, vec3(1.0 / camera_gamma_correction));\n"
-        "}\n"
-        //"  frag_color = vec4((tmpv4.xyz * 0.001) + textureLod(effect_diffuse_environment, normalize(out_pos), 0.0).xyz, albedo.w);\n"
-        "    frag_color = vec4(tmpv4.xyz, albedo.w);\n"
-        "}";
+        "    vec3 prefiltered_color = textureLod(effect_specular_environment, reflection, roughness * ("
+                                                 << e->get_system_application()->get_configuration().render_config.get_runtime_reflection_radiance_levels()
+                                                 << ".0 - 1.0)).rgb;\n"
+                                                    "    vec2 brdf = texture(effect_brdflut, vec2(normal_dot_view, roughness)).rg;\n"
+                                                    "    vec3 specular = prefiltered_color * (frsn * brdf.x + brdf.y);\n"
+                                                    //   TODO: add ambient occlusion (* ao);
+                                                    "    vec3 ambient = kd * diffuse + specular + scene_ambient_light * albedo.xyz;\n"
+                                                    "    tmpv4.xyz = ambient + lo;\n"
+                                                    "    if(camera_gamma_correction > 0.001) {\n"
+                                                    //   HDR tone mapping
+                                                    "        tmpv4.xyz = tmpv4.xyz / (tmpv4.xyz + vec3(camera_hdr_tune_mapping));\n"
+                                                    //   gamma correct
+                                                    "        tmpv4.xyz = pow(tmpv4.xyz, vec3(1.0 / camera_gamma_correction));\n"
+                                                    "}\n"
+                                                    //"  frag_color = vec4((tmpv4.xyz * 0.001) + textureLod(effect_diffuse_environment, normalize(out_pos), 0.0).xyz, albedo.w);\n"
+                                                    "    frag_color = vec4(tmpv4.xyz, albedo.w);\n"
+                                                    "}";
     e->get_function_loader()->load([this, vertex_shader_code { vertex_shader_code.str() }, fragment_shader_code { fragment_shader_code.str() }] {
         set_vertex_shader(vertex_shader_code);
         set_fragment_shader(fragment_shader_code);

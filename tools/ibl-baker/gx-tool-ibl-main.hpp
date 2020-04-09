@@ -71,8 +71,12 @@ private:
     std::shared_ptr<GxRtReflect> rtr;
     std::unique_ptr<GxGrPbr> render_tree;
     std::string environment_file = "";
+    std::string baked_cube_file;
+    int baked_cube_resolution = 1024;
     std::string irradiance_file = "irradiance.hdr";
+    int irradiance_resolution = 128;
     std::string radiance_file = "radiance.hdr";
+    int radiance_resolution = 512;
     bool camera_rotation_enabled = false;
     const bool called_from_cli;
 

@@ -75,7 +75,7 @@ gearoenix::render::light::CascadeInfo::CascadeInfo(engine::Engine* const e) noex
     , kernels(static_cast<std::size_t>(e->get_kernels()->get_threads_count()))
     , frames(static_cast<std::size_t>(e->get_frames_count()))
 {
-    const auto cascades_count = e->get_system_application()->get_configuration().render_config.shadow_cascades_count;
+    const auto cascades_count = e->get_system_application()->get_configuration().render_config.get_shadow_cascades_count();
     for (auto& frame : frames)
         frame.init(e);
     for (auto i = 0; i < cascades_count; ++i)

@@ -13,12 +13,12 @@
 #include "../texture/rnd-txt-target.hpp"
 #include "rnd-cmr-transformation.hpp"
 
-#define GX_CAMERA_INIT                                                                                                                                          \
-    core::asset::Asset(my_id, core::asset::Type::Camera),                                                                                                       \
-        frustum_collider(new physics::collider::Frustum()),                                                                                                     \
-        uniform_buffers(new buffer::FramedUniform(sizeof(Uniform), e)),                                                                                         \
-        cascaded_shadow_frustum_partitions(static_cast<std::size_t>(e->get_system_application()->get_configuration().render_config.shadow_cascades_count) + 1), \
-        transformation(new Transformation(&uniform, frustum_collider.get(), &cascaded_shadow_frustum_partitions)),                                              \
+#define GX_CAMERA_INIT                                                                                                                                                \
+    core::asset::Asset(my_id, core::asset::Type::Camera),                                                                                                             \
+        frustum_collider(new physics::collider::Frustum()),                                                                                                           \
+        uniform_buffers(new buffer::FramedUniform(sizeof(Uniform), e)),                                                                                               \
+        cascaded_shadow_frustum_partitions(static_cast<std::size_t>(e->get_system_application()->get_configuration().render_config.get_shadow_cascades_count()) + 1), \
+        transformation(new Transformation(&uniform, frustum_collider.get(), &cascaded_shadow_frustum_partitions)),                                                    \
         render_engine(e)
 
 void gearoenix::render::camera::Camera::initialize() noexcept

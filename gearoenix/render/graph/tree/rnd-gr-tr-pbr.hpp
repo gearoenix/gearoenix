@@ -62,13 +62,30 @@ public:
         camera::Camera* cam = nullptr;
         CameraData camera_data;
         node::IrradianceConvoluter* irradiance = nullptr;
-        node::RadianceConvoluter* radiances[GX_MAX_RUNTIME_REFLECTION_RADIANCE_LEVELS] = { nullptr };
+        std::vector<node::RadianceConvoluter*> radiances;
+
+        explicit RuntimeReflectionFaceData(std::size_t radiance_levels) noexcept
+            : radiances(radiance_levels)
+        {
+        }
     };
 
     struct RuntimeReflectionData {
         node::MipmapGenerator* environment_mipmap_generator = nullptr;
         node::MipmapGenerator* irradiance_mipmap_generator = nullptr;
         RuntimeReflectionFaceData faces[6];
+
+        explicit RuntimeReflectionData(std::size_t radiance_levels) noexcept
+            : faces {
+                RuntimeReflectionFaceData(radiance_levels),
+                RuntimeReflectionFaceData(radiance_levels),
+                RuntimeReflectionFaceData(radiance_levels),
+                RuntimeReflectionFaceData(radiance_levels),
+                RuntimeReflectionFaceData(radiance_levels),
+                RuntimeReflectionFaceData(radiance_levels),
+            }
+        {
+        }
     };
 
     struct SceneData {

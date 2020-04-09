@@ -78,8 +78,16 @@ void Example004RuntimeReflectionProbeApp::argument_handling() noexcept
 {
     const auto* const args = system_application->get_arguments();
     args->get_value("environment-file", environment_file);
+    args->get_value("baked-cube-file", baked_cube_file);
+    args->get_value("baked-cube-resolution", baked_cube_resolution);
     args->get_value("irradiance-file", irradiance_file);
+    args->get_value("irradiance-resolution", irradiance_resolution);
     args->get_value("radiance-file", radiance_file);
+    args->get_value("radiance-resolution", radiance_resolution);
+    auto& conf = system_application->get_configuration().render_config;
+    conf.set_runtime_reflection_environment_resolution(baked_cube_resolution);
+    conf.set_runtime_reflection_irradiance_resolution(irradiance_resolution);
+    conf.set_runtime_reflection_radiance_resolution(radiance_resolution);
 }
 
 Example004RuntimeReflectionProbeApp::Example004RuntimeReflectionProbeApp(gearoenix::system::Application* const sys_app) noexcept
@@ -219,6 +227,7 @@ Example004RuntimeReflectionProbeApp::Example004RuntimeReflectionProbeApp(gearoen
         sky->get_mat_equ()->set_color(txt_mgr->create_2d_f(environment_file, txt_call, smp));
 
         rtr->set_on_rendered([this]() {
+            static_cast<gearoenix::render::texture::Texture*>(rtr->get_environment().get())->write_gx3d(baked_cube_file, GX_DEFAULT_IGNORED_END_CALLER);
             static_cast<gearoenix::render::texture::Texture*>(rtr->get_radiance().get())->write_gx3d(radiance_file, GX_DEFAULT_IGNORED_END_CALLER);
             static_cast<gearoenix::render::texture::Texture*>(rtr->get_irradiance().get())->write_gx3d(irradiance_file, GX_DEFAULT_IGNORED_END_CALLER);
         });

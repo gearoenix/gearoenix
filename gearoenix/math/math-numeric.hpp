@@ -18,13 +18,20 @@ class Numeric {
 public:
     // It will raise given number to the nearest bigger or equal value that is in power of 2
     template <typename T>
-    constexpr static T raise_p2(T v) noexcept;
+    [[nodiscard]] constexpr static T raise_p2(T v) noexcept;
+
     template <typename T>
-    constexpr static T raise_p2(T v, T maximum, T minimum) noexcept;
+    [[nodiscard]] constexpr static T raise_p2(T v, T maximum, T minimum) noexcept;
+
     template <typename T>
-    constexpr static T maximum(T a, T b) noexcept;
+    [[nodiscard]] constexpr static T maximum(T a, T b) noexcept;
+
     template <typename T>
-    constexpr static T minimum(T a, T b) noexcept;
+    [[nodiscard]] constexpr static T minimum(T a, T b) noexcept;
+
+    /// On failure it returns static_cast<T>(-1).
+    template <typename T>
+    [[nodiscard]] constexpr static T floor_log2(T a) noexcept;
 
     [[nodiscard]] static constexpr float radical_inverse_vdc(std::uint32_t bits) noexcept;
 
@@ -76,6 +83,20 @@ constexpr T gearoenix::math::Numeric::minimum(const T a, const T b) noexcept
             return a;
     }
     return GX_MIN(a, b);
+}
+
+template <typename T>
+constexpr T gearoenix::math::Numeric::floor_log2(const T a) noexcept
+{
+    static_assert(std::numeric_limits<T>::is_integer, "Only integer number can be used by this function.");
+    for (T i = 0; i < static_cast<T>(sizeof(T) * 8); ++i) {
+        if (((a >> i) & 1) == 1) {
+            return i;
+        }
+    }
+    if (a == 0)
+        return 0;
+    return static_cast<T>(-1);
 }
 
 constexpr float gearoenix::math::Numeric::radical_inverse_vdc(std::uint32_t bits) noexcept

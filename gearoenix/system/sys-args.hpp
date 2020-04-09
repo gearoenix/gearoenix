@@ -65,6 +65,13 @@ public:
             GXLOGF("The '" << key << "' key is needed only once.");
         }
     }
+
+    void get_value(const std::string& key, int& value) const noexcept
+    {
+        std::string v;
+        get_value(key, v);
+        value = std::stoi(v);
+    }
 };
 }
 

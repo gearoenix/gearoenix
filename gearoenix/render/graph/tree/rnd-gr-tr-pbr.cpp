@@ -97,9 +97,9 @@ void gearoenix::render::graph::tree::Pbr::update_runtime_reflection(const scene:
         switch (rtr->get_state()) {
         case reflection::Runtime::State::EnvironmentCubeRender: {
             if (rtr->get_state_environment_face() == 0) {
-                runtime_reflections_data[rtr] = RuntimeReflectionData();
+                runtime_reflections_data.emplace(rtr, RuntimeReflectionData(rtr->get_radiance_convoluters()[0].size()));
             }
-            auto& rtr_nodes = runtime_reflections_data[rtr];
+            auto& rtr_nodes = runtime_reflections_data.find(rtr)->second;
             const auto& cam = rtr->get_cameras()[rtr->get_state_environment_face()];
             auto& rtr_face_nodes = rtr_nodes.faces[rtr->get_state_environment_face()];
             rtr_face_nodes.cam = cam.get();
@@ -107,7 +107,7 @@ void gearoenix::render::graph::tree::Pbr::update_runtime_reflection(const scene:
             break;
         }
         case reflection::Runtime::State::EnvironmentCubeMipMap: {
-            auto& rtr_nodes = runtime_reflections_data[rtr];
+            auto& rtr_nodes = runtime_reflections_data.find(rtr)->second;
             rtr_nodes.environment_mipmap_generator = rtr->get_environment_mipmap_generator().get();
             rtr_nodes.environment_mipmap_generator->update();
             rtr_nodes.irradiance_mipmap_generator = rtr->get_irradiance_mipmap_generator().get();
@@ -116,19 +116,19 @@ void gearoenix::render::graph::tree::Pbr::update_runtime_reflection(const scene:
         }
         case reflection::Runtime::State::IrradianceFace: {
             const auto fi = rtr->get_state_irradiance_face();
-            auto& irradiance = runtime_reflections_data[rtr].faces[fi].irradiance;
+            auto& irradiance = runtime_reflections_data.find(rtr)->second.faces[fi].irradiance;
             irradiance = rtr->get_irradiance_convoluters()[fi].get();
             irradiance->update();
             break;
         }
         case reflection::Runtime::State::IrradianceMipMap: {
-            auto& rtr_nodes = runtime_reflections_data[rtr];
+            auto& rtr_nodes = runtime_reflections_data.find(rtr)->second;
             rtr_nodes.irradiance_mipmap_generator = rtr->get_irradiance_mipmap_generator().get();
             rtr_nodes.irradiance_mipmap_generator->update();
             break;
         }
         case reflection::Runtime::State::RadianceFaceLevel: {
-            auto& rtr_nodes = runtime_reflections_data[rtr];
+            auto& rtr_nodes = runtime_reflections_data.find(rtr)->second;
             const auto& radiances = rtr->get_radiance_convoluters();
             const auto fi = rtr->get_state_radiance_face();
             auto& rtr_face_nodes = rtr_nodes.faces[fi];
@@ -252,7 +252,7 @@ void gearoenix::render::graph::tree::Pbr::record_runtime_reflection(
         auto* const rtr = id_rtr.second.get();
         if (!rtr->get_enabled())
             continue;
-        auto& runtime_reflection = runtime_reflections_data[rtr];
+        auto& runtime_reflection = runtime_reflections_data.find(rtr)->second;
         switch (rtr->get_state()) {
         case reflection::Runtime::State::EnvironmentCubeRender: {
             const auto& face = runtime_reflection.faces[rtr->get_state_environment_face()];
@@ -314,7 +314,7 @@ void gearoenix::render::graph::tree::Pbr::submit_runtime_reflections(const scene
         auto* const rtr = id_rtr.second.get();
         if (!rtr->get_enabled())
             continue;
-        auto& runtime_reflection = runtime_reflections_data[rtr];
+        auto& runtime_reflection = runtime_reflections_data.find(rtr)->second;
         switch (rtr->get_state()) {
         case reflection::Runtime::State::EnvironmentCubeRender:
             submit_camera_data(runtime_reflection.faces[rtr->get_state_environment_face()].camera_data);

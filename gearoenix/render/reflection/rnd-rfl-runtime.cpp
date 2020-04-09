@@ -50,10 +50,10 @@ gearoenix::render::reflection::Runtime::Runtime(
     auto* const cam_mgr = ast_mgr->get_camera_manager();
     auto* const msh_mgr = ast_mgr->get_mesh_manager();
     const auto& render_config = sys_app->get_configuration().render_config;
-    const auto environment_resolution = static_cast<unsigned int>(render_config.runtime_reflection_environment_resolution);
-    const auto irradiance_resolution = static_cast<unsigned int>(render_config.runtime_reflection_irradiance_resolution);
-    const auto radiance_resolution = static_cast<unsigned int>(render_config.runtime_reflection_radiance_resolution);
-    const auto radiance_mips_count = render_config.runtime_reflection_radiance_levels;
+    const auto environment_resolution = static_cast<unsigned int>(render_config.get_runtime_reflection_environment_resolution());
+    const auto irradiance_resolution = static_cast<unsigned int>(render_config.get_runtime_reflection_irradiance_resolution());
+    const auto radiance_resolution = static_cast<unsigned int>(render_config.get_runtime_reflection_radiance_resolution());
+    const auto radiance_mips_count = render_config.get_runtime_reflection_radiance_levels();
     for (auto i = 0; i < radiance_mips_count; ++i) {
         const auto fi = static_cast<double>(i);
         const auto fm = static_cast<double>(radiance_mips_count - 1);
@@ -186,7 +186,7 @@ void gearoenix::render::reflection::Runtime::update_state() noexcept
         break;
     case State::RadianceFaceLevel:
         ++state_radiance_level;
-        if (state_radiance_level >= GX_MAX_RUNTIME_REFLECTION_RADIANCE_LEVELS) {
+        if (state_radiance_level >= radiance_convoluters[0].size()) {
             state_radiance_level = 0;
             ++state_radiance_face;
             if (state_radiance_face > 5) {

@@ -100,7 +100,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
 
 std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::get_brdflut(core::sync::EndCaller<Texture2D>& c) noexcept
 {
-    const auto resolution = e->get_system_application()->get_configuration().render_config.brdflut_resolution;
+    const auto resolution = e->get_system_application()->get_configuration().render_config.get_brdflut_resolution();
     if (nullptr != brdflut)
         return brdflut;
     {
