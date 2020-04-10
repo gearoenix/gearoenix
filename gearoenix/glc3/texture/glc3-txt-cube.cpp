@@ -161,7 +161,7 @@ void gearoenix::glc3::texture::TextureCube::write_gx3d(
                         "texture-cube-glc3-id" + std::to_string(asset_id) + "-face" + std::to_string(i) + "-level" + std::to_string(j) + ".hdr", true);
                     render::texture::Image::encode_hdr(&l, data.data(), level_aspect, level_aspect, 4);
 #endif
-                    render::texture::Image::encode_hdr(s.get(), data.data(), level_aspect, level_aspect, 4);
+                    write_gx3d_image(s.get(), data.data(), level_aspect, level_aspect, 4);
                 }
             }
         } else {
@@ -176,7 +176,7 @@ void gearoenix::glc3::texture::TextureCube::write_gx3d(
                         "texture-cube-glc3-id" + std::to_string(asset_id) + "-face" + std::to_string(i) + "-level" + std::to_string(j) + ".png", true);
                     render::texture::Image::encode_png(&l, data.data(), level_aspect, level_aspect, 4);
 #endif
-                    render::texture::Image::encode_png(s.get(), data.data(), level_aspect, level_aspect, 4);
+                    write_gx3d_image(s.get(), data.data(), level_aspect, level_aspect, 4);
                 }
             }
         }

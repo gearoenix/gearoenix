@@ -56,7 +56,9 @@ gearoenix::render::font::Font2D::Font2D(const core::Id my_id, texture::Manager* 
     , stb_font(new stbtt_fontinfo())
 {
     auto* const e = txt_mgr->get_engine();
-    std::unique_ptr<system::stream::Asset> asset(system::stream::Asset::construct(e->get_system_application(), "default.ttf"));
+    const std::unique_ptr<system::stream::Asset> asset(system::stream::Asset::construct(e->get_system_application(), "default.ttf"));
+    if (asset == nullptr)
+        GXLOGF("Default font not found.")
     const auto s = asset->size();
     ttf_data.resize(static_cast<std::size_t>(s));
     asset->seek(0);

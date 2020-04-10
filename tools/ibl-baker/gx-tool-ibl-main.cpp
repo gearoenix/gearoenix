@@ -65,7 +65,7 @@ using GxMovementBase = gearoenix::core::event::movement::Base;
 using GxTxtSampleInfo = gearoenix::render::texture::SampleInfo;
 using GxTxtFilter = gearoenix::render::texture::Filter;
 
-void Example004RuntimeReflectionProbeApp::on_open() noexcept
+void IblBaker::on_open() noexcept
 {
     const auto& f = file_location->get_text();
     if (f.empty())
@@ -74,8 +74,9 @@ void Example004RuntimeReflectionProbeApp::on_open() noexcept
     open_environment();
 }
 
-void Example004RuntimeReflectionProbeApp::argument_handling() noexcept
+void IblBaker::argument_handling() noexcept
 {
+    GXLOGD("Going to parsing arguments.")
     const auto* const args = system_application->get_arguments();
     args->get_value("environment-file", environment_file);
     args->get_value("baked-cube-file", baked_cube_file);
@@ -88,12 +89,14 @@ void Example004RuntimeReflectionProbeApp::argument_handling() noexcept
     conf.set_runtime_reflection_environment_resolution(baked_cube_resolution);
     conf.set_runtime_reflection_irradiance_resolution(irradiance_resolution);
     conf.set_runtime_reflection_radiance_resolution(radiance_resolution);
+    GXLOGD("Arguments parsed.")
 }
 
-Example004RuntimeReflectionProbeApp::Example004RuntimeReflectionProbeApp(gearoenix::system::Application* const sys_app) noexcept
+IblBaker::IblBaker(gearoenix::system::Application* const sys_app) noexcept
     : gearoenix::core::Application::Application(sys_app)
     , called_from_cli(system_application->get_arguments()->get_has_tokens())
 {
+    GXLOGD("IBL baker started.")
     if (called_from_cli)
         argument_handling();
 
@@ -161,7 +164,7 @@ Example004RuntimeReflectionProbeApp::Example004RuntimeReflectionProbeApp(gearoen
     tmp_tran->set_location(GxVec3(0.75, 0.75, 0.1));
     open_button->set_text(L"Open File", end_call);
     if (!called_from_cli)
-        open_button->set_on_click(std::bind(&Example004RuntimeReflectionProbeApp::on_open, this));
+        open_button->set_on_click(std::bind(&IblBaker::on_open, this));
     uiscn->add_model(open_button);
 
     file_location = mdl_mgr->create<GxEditWdg>(edt_call);
@@ -227,27 +230,34 @@ Example004RuntimeReflectionProbeApp::Example004RuntimeReflectionProbeApp(gearoen
         sky->get_mat_equ()->set_color(txt_mgr->create_2d_f(environment_file, txt_call, smp));
 
         rtr->set_on_rendered([this]() {
-            static_cast<gearoenix::render::texture::Texture*>(rtr->get_environment().get())->write_gx3d(baked_cube_file, GX_DEFAULT_IGNORED_END_CALLER);
-            static_cast<gearoenix::render::texture::Texture*>(rtr->get_radiance().get())->write_gx3d(radiance_file, GX_DEFAULT_IGNORED_END_CALLER);
-            static_cast<gearoenix::render::texture::Texture*>(rtr->get_irradiance().get())->write_gx3d(irradiance_file, GX_DEFAULT_IGNORED_END_CALLER);
+            GXLOGD("Runtime reflection rendered.")
+
+            GxEndCallerIgnored termination_call([this] {
+                system_application->quit();
+            });
+
+            static_cast<gearoenix::render::texture::Texture*>(rtr->get_environment().get())->write_gx3d(baked_cube_file, termination_call);
+            static_cast<gearoenix::render::texture::Texture*>(rtr->get_radiance().get())->write_gx3d(radiance_file, termination_call);
+            static_cast<gearoenix::render::texture::Texture*>(rtr->get_irradiance().get())->write_gx3d(irradiance_file, termination_call);
         });
     }
+    GXLOGD("Initialization ended.")
 }
 
-Example004RuntimeReflectionProbeApp::~Example004RuntimeReflectionProbeApp() noexcept
+IblBaker::~IblBaker() noexcept
 {
     terminate();
 }
 
-void Example004RuntimeReflectionProbeApp::update() noexcept
+void IblBaker::update() noexcept
 {
 }
 
-void Example004RuntimeReflectionProbeApp::terminate() noexcept
+void IblBaker::terminate() noexcept
 {
 }
 
-bool Example004RuntimeReflectionProbeApp::on_event(const gearoenix::core::event::Data& d) noexcept
+bool IblBaker::on_event(const gearoenix::core::event::Data& d) noexcept
 {
     switch (d.source) {
     case GxEventId::ButtonMouse: {
@@ -274,7 +284,7 @@ bool Example004RuntimeReflectionProbeApp::on_event(const gearoenix::core::event:
     return false;
 }
 
-void Example004RuntimeReflectionProbeApp::open_environment() noexcept
+void IblBaker::open_environment() noexcept
 {
     auto* const ast_mgr = system_application->get_asset_manager();
     auto* const txt_mgr = ast_mgr->get_texture_manager();
@@ -292,4 +302,4 @@ void Example004RuntimeReflectionProbeApp::open_environment() noexcept
     txt_mgr->create_2d_f(environment_file, txt_call, smp);
 }
 
-GEAROENIX_START(Example004RuntimeReflectionProbeApp)
+GEAROENIX_START(IblBaker)

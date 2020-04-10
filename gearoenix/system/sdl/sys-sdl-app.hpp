@@ -74,6 +74,9 @@ public:
     [[nodiscard]] double convert_x_to_ratio(int x) const noexcept;
     [[nodiscard]] double convert_y_to_ratio(int y) const noexcept;
     [[nodiscard]] const char* get_clipboard() const noexcept;
+    /// It is going to break the main loop an then smooth exit will happen
+    /// Core application termination will be called, and then termination of other modules
+    void quit() noexcept;
 };
 }
 #endif

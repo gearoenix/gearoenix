@@ -492,7 +492,7 @@ int gearoenix::system::Application::on_event(SDL_Event* const e) noexcept
 gearoenix::system::Application::Application(const int argc, const char* const* const argv) noexcept
     : arguments(new Args(argc, argv))
 {
-    GXLOGI("Constructing Gearoenix system application monomorphic interface over SDL2.")
+    GXLOGD("Constructing Gearoenix system application monomorphic interface over SDL2.")
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_AUDIO) != 0) {
         GXLOGF("Failed to initialize SDL: " << SDL_GetError())
     }
@@ -546,10 +546,13 @@ gearoenix::system::Application::Application(const int argc, const char* const* c
     if (render_engine == nullptr) {
         GXLOGF("No suitable render engine found.")
     }
+    GXLOGD("Render engine created.")
     asset_manager = std::make_unique<core::asset::Manager>(this, GX_APP_DATA_NAME);
+    GXLOGD("Asset manager created.")
     event_engine = std::make_unique<core::event::Engine>();
     event_engine->set_mouse_position(math::Vec2(
         convert_x_to_ratio(mx), convert_y_to_ratio(my)));
+    GXLOGD("Event engine created.")
 }
 
 gearoenix::system::Application::~Application() noexcept
@@ -560,6 +563,7 @@ gearoenix::system::Application::~Application() noexcept
 void gearoenix::system::Application::execute(std::unique_ptr<core::Application> app) noexcept
 {
     core_application = std::move(app);
+    GXLOGD("SDL2 system interface executed")
 #ifdef GX_IN_WEB
     Application::app = this;
     emscripten_set_main_loop(Application::loop, 0, true);
@@ -625,6 +629,11 @@ double gearoenix::system::Application::convert_y_to_ratio(int y) const noexcept
 const char* gearoenix::system::Application::get_clipboard() const noexcept
 {
     return SDL_GetClipboardText();
+}
+
+void gearoenix::system::Application::quit() noexcept
+{
+    running = false;
 }
 
 #endif

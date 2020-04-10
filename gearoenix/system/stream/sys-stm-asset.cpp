@@ -1,6 +1,8 @@
 #include "sys-stm-asset.hpp"
 #include "../sys-app.hpp"
+#include "../sys-args.hpp"
 #include "../sys-log.hpp"
+
 #ifdef GX_IN_IOS
 #import <Foundation/Foundation.h>
 //#import "../apple/sys-apl.mm"
@@ -16,14 +18,16 @@ void gearoenix::system::stream::Asset::check_endian_compatibility() noexcept
     endian_compatibility = (resource_endian == ((uint8_t*)(&system_endian))[0]);
 }
 
-gearoenix::system::stream::Asset::Asset() noexcept { }
+gearoenix::system::stream::Asset::Asset() noexcept = default;
 
+#ifdef GX_IN_ANDROID
 gearoenix::system::stream::Asset::~Asset() noexcept
 {
-#ifdef GX_IN_ANDROID
     AAsset_close(file);
-#endif
 }
+#else
+gearoenix::system::stream::Asset::~Asset() noexcept = default;
+#endif
 
 gearoenix::system::stream::Asset* gearoenix::system::stream::Asset::construct(system::Application* const sys_app, const std::string& name) noexcept
 {
@@ -37,7 +41,7 @@ gearoenix::system::stream::Asset* gearoenix::system::stream::Asset::construct(sy
         file_path = std::string([path fileSystemRepresentation]);
     }
 #else
-    const std::string& file_path = name;
+    const std::string file_path = sys_app->get_arguments()->get_process_directory() + name;
 #endif
     asset->file.open(file_path, std::ios::binary | std::ios::in);
     if (!asset->file.is_open()) {

@@ -1,5 +1,40 @@
 #include "rnd-txt-texture.hpp"
 #include "../../system/stream/sys-stm-local.hpp"
+#include "rnd-txt-image.hpp"
+
+void gearoenix::render::texture::Texture::write_gx3d_image(
+    system::stream::Stream* const s,
+    const float* const data,
+    const std::size_t img_width,
+    const std::size_t img_height,
+    const std::size_t components_count) noexcept
+{
+    const auto offset_of_size = s->tell();
+    (void)s->write(static_cast<std::uint32_t>(0));
+    const auto offset_after_size = s->tell();
+    render::texture::Image::encode_hdr(s, data, img_width, img_height, components_count);
+    const auto curr_off = s->tell();
+    s->seek(offset_of_size);
+    (void)s->write(static_cast<std::uint32_t>(curr_off - offset_after_size));
+    s->seek(curr_off);
+}
+
+void gearoenix::render::texture::Texture::write_gx3d_image(
+    system::stream::Stream* const s,
+    const unsigned char* const data,
+    const std::size_t img_width,
+    const std::size_t img_height,
+    const std::size_t components_count) noexcept
+{
+    const auto offset_of_size = s->tell();
+    (void)s->write(static_cast<std::uint32_t>(0));
+    const auto offset_after_size = s->tell();
+    render::texture::Image::encode_png(s, data, img_width, img_height, components_count);
+    const auto curr_off = s->tell();
+    s->seek(offset_of_size);
+    (void)s->write(static_cast<std::uint32_t>(curr_off - offset_after_size));
+    s->seek(curr_off);
+}
 
 gearoenix::render::texture::Texture::Texture(
     const core::Id my_id,

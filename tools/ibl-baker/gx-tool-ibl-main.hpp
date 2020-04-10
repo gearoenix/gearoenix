@@ -40,8 +40,8 @@ class Text;
 class Edit;
 }
 
-class Example004RuntimeReflectionProbeApp final : public gearoenix::core::Application,
-                                                  public gearoenix::core::event::Listener {
+class IblBaker final : public gearoenix::core::Application,
+                       public gearoenix::core::event::Listener {
 private:
     using GxGameScene = gearoenix::render::scene::Game;
     using GxStaticModel = gearoenix::render::model::Static;
@@ -85,8 +85,8 @@ private:
     void open_environment() noexcept;
 
 public:
-    explicit Example004RuntimeReflectionProbeApp(gearoenix::system::Application* sys_app) noexcept;
-    ~Example004RuntimeReflectionProbeApp() noexcept final;
+    explicit IblBaker(gearoenix::system::Application* sys_app) noexcept;
+    ~IblBaker() noexcept final;
     void update() noexcept final;
     void terminate() noexcept final;
     bool on_event(const gearoenix::core::event::Data& event_data) noexcept final;
