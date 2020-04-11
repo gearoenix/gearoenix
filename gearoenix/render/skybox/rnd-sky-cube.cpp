@@ -7,9 +7,9 @@ gearoenix::render::skybox::Cube::Cube(
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : Skybox(Type::Cube, my_id, s, e, c)
-    , mat_equ(new material::SkyboxCube(s, e, c))
+    , mat_cube(new material::SkyboxCube(s, e, c))
 {
-    mat = mat_equ;
+    mat = mat_cube;
     GXUNIMPLEMENTED
 }
 
@@ -18,10 +18,9 @@ gearoenix::render::skybox::Cube::Cube(
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : Skybox(Type::Cube, my_id, e, c)
-    , mat_equ(new material::SkyboxCube(e, c))
+    , mat_cube(new material::SkyboxCube(e, c))
 {
-    mat = mat_equ;
-    GXUNIMPLEMENTED
+    mat = mat_cube;
 }
 
 gearoenix::render::skybox::Cube::~Cube() noexcept = default;

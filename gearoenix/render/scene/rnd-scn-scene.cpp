@@ -19,8 +19,10 @@
 #include "../model/rnd-mdl-manager.hpp"
 #include "../model/rnd-mdl-model.hpp"
 #include "../pipeline/rnd-pip-manager.hpp"
+#include "../reflection/rnd-rfl-manager.hpp"
 #include "../reflection/rnd-rfl-runtime.hpp"
 #include "../shader/rnd-shd-shader.hpp"
+#include "../skybox/rnd-sky-manager.hpp"
 #include "../skybox/rnd-sky-skybox.hpp"
 
 static const std::shared_ptr<gearoenix::render::camera::Camera> null_camera = nullptr;
@@ -68,10 +70,8 @@ gearoenix::render::scene::Scene::Scene(
     GX_HELPER(audio, audio, Audio)
     GX_HELPER(light, light, Light)
     GX_HELPER(model, model, Model)
-    if (f->read_bool()) {
-        core::Id skybox_id = 0;
-        f->read(skybox_id);
-    }
+    GX_HELPER(skybox, skybox, Skybox)
+    GX_HELPER(reflection, reflection, Reflection)
     GX_HELPER(constraint, physics::constraint, Constraint)
 
 #undef GX_HELPER
@@ -83,6 +83,7 @@ gearoenix::render::scene::Scene::Scene(
     GXLOGD("Number of models is: " << models.size())
     GXLOGD("Number of lights is: " << lights.size())
     GXLOGD("Number of cameras is: " << cameras.size())
+    GXLOGD("Number of skyboxes is: " << skyboxs.size())
 }
 
 gearoenix::render::scene::Scene::~Scene() noexcept

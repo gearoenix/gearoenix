@@ -66,20 +66,20 @@ std::shared_ptr<gearoenix::render::sync::Semaphore> gearoenix::glc3::engine::Eng
 
 std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::glc3::engine::Engine::create_texture_2d(
     const core::Id id,
-    const void* data,
+    std::vector<std::vector<unsigned char>> data,
     const render::texture::TextureInfo& info,
-    const unsigned int img_width,
-    const unsigned int img_height,
+    const std::size_t img_width,
+    const std::size_t img_height,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
 {
-    return texture::Texture2D::construct(id, this, data, info, img_width, img_height, call);
+    return texture::Texture2D::construct(id, this, std::move(data), info, img_width, img_height, call);
 }
 
 std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::glc3::engine::Engine::create_texture_cube(
     const core::Id id,
-    const void* data,
+    std::vector<std::vector<unsigned char>> data[6],
     const render::texture::TextureInfo& info,
-    const unsigned int aspect,
+    const std::size_t aspect,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
 {
     return texture::TextureCube::construct(id, this, data, info, aspect, call);

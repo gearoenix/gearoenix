@@ -22,7 +22,7 @@ public:
     [[nodiscard]] static std::shared_ptr<Texture2D> construct(
         core::Id id,
         engine::Engine* e,
-        const void* data,
+        std::vector<std::vector<unsigned char>> data,
         const render::texture::TextureInfo& info,
         unsigned int img_width,
         unsigned int img_height,

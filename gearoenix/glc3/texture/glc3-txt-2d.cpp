@@ -14,7 +14,7 @@ gearoenix::glc3::texture::Texture2D::Texture2D(const core::Id id, const render::
 std::shared_ptr<gearoenix::glc3::texture::Texture2D> gearoenix::glc3::texture::Texture2D::construct(
     const core::Id my_id,
     engine::Engine* const e,
-    const void* const data,
+    std::vector<std::vector<unsigned char>> data,
     const render::texture::TextureInfo& info,
     const unsigned int img_width,
     const unsigned int img_height,
@@ -30,7 +30,7 @@ std::shared_ptr<gearoenix::glc3::texture::Texture2D> gearoenix::glc3::texture::T
     const auto data_format = convert_data_format(info.format);
     const auto gl_img_width = static_cast<gl::sizei>(img_width);
     const auto gl_img_height = static_cast<gl::sizei>(img_height);
-    std::vector<std::uint8_t> pixels;
+    std::vector<std::vector<std::uint8_t>> pixels;
     switch (info.format) {
     case render::texture::TextureFormat::RgbaFloat32:
         // TODO: I can in future check for support of format, if it does not support, convert it

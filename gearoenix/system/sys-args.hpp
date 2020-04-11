@@ -2,6 +2,7 @@
 #define GEAROENIX_SYSTEM_ARGS_HPP
 #include "../core/cr-build-configuration.hpp"
 #include "../core/cr-static.hpp"
+#include "sys-log.hpp"
 #include <map>
 #include <optional>
 #include <string>

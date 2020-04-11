@@ -131,20 +131,35 @@ public:
     virtual void update() noexcept;
     virtual void terminate() noexcept;
     [[nodiscard]] virtual std::shared_ptr<sync::Semaphore> create_semaphore() const noexcept = 0;
-    /// Data will be copied
+    /// Function to create texture in the render engine
+    ///
+    /// \param id is Asset-ID of the texture
+    /// \param data will be moved
+    /// \param info is texture creation information
+    /// \param img_width is texture width
+    /// \param img_height is texture height
+    /// \param call is a callback object that will be called whenever the texture is ready to render.
+    /// \return The returned texture is ready to use (not render) only in assignment in the load process.
     [[nodiscard]] virtual std::shared_ptr<texture::Texture2D> create_texture_2d(
         core::Id id,
-        const void* data,
+        std::vector<std::vector<std::uint8_t>> data,
         const texture::TextureInfo& info,
-        unsigned int img_width,
-        unsigned int img_height,
+        std::size_t img_width,
+        std::size_t img_height,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept = 0;
-    /// Data will be copied
+    /// Function to create cube-texture in the render engine
+    ///
+    /// \param id is Asset-ID of the texture
+    /// \param data will be moved
+    /// \param info is texture creation information
+    /// \param aspect is texture aspect
+    /// \param call is a callback object that will be called whenever the texture is ready to render
+    /// \return The returned texture is ready to use (not render) only in assignment in the load process.
     [[nodiscard]] virtual std::shared_ptr<texture::TextureCube> create_texture_cube(
         core::Id id,
-        const void* data,
+        std::vector<std::vector<std::uint8_t>> data[6],
         const texture::TextureInfo& info,
-        unsigned int aspect,
+        std::size_t aspect,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept = 0;
     [[nodiscard]] virtual std::shared_ptr<texture::Target> create_render_target(
         core::Id id,

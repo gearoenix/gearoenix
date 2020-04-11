@@ -19,29 +19,8 @@ gearoenix::render::material::SkyboxCube::SkyboxCube(system::stream::Stream* cons
     : Material(Type::SkyboxCube, e, sizeof(Uniform))
 {
     auto* const txt_mgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
-
-    // Reading alpha
-    if (f->read_bool()) {
-        uniform.alpha = 1.0f;
-    } else {
-        f->read(uniform.alpha);
-    }
-    // Reading color
-    if (f->read_bool()) {
-        core::sync::EndCaller<texture::Texture> txt_call([end](const std::shared_ptr<texture::Texture>&) {});
-        color_texture = std::dynamic_pointer_cast<texture::TextureCube>(txt_mgr->get_gx3d(f->read<core::Id>(), txt_call));
-    } else {
-        core::sync::EndCaller<texture::TextureCube> txt_call([end](const std::shared_ptr<texture::TextureCube>&) {});
-        math::Vec4<float> color;
-        color.read(f);
-        color_texture = txt_mgr->get_cube(color, txt_call);
-        color_value = color;
-    }
-    // Translucency
-    if (f->read_bool())
-        translucency = TranslucencyMode::Transparent;
-    is_shadow_caster = f->read_bool();
-    f->read(uniform.alpha_cutoff);
+    core::sync::EndCaller<texture::Texture> txt_call([end](const std::shared_ptr<texture::Texture>&) {});
+    color_texture = std::dynamic_pointer_cast<texture::TextureCube>(txt_mgr->read_gx3d(txt_call));
 }
 
 gearoenix::render::material::SkyboxCube::~SkyboxCube() noexcept = default;
