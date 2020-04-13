@@ -89,13 +89,11 @@ template <typename T>
 constexpr T gearoenix::math::Numeric::floor_log2(const T a) noexcept
 {
     static_assert(std::numeric_limits<T>::is_integer, "Only integer number can be used by this function.");
-    for (T i = 0; i < static_cast<T>(sizeof(T) * 8); ++i) {
-        if (((a >> i) & 1) == 1) {
-            return i;
+    for (T i = a, j = 0; i > 0; i >>= 1, ++j) {
+        if (i == 1) {
+            return j;
         }
     }
-    if (a == 0)
-        return 0;
     return static_cast<T>(-1);
 }
 

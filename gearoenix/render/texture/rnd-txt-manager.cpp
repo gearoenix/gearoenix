@@ -11,8 +11,75 @@
 #ifndef GX_THREAD_NOT_SUPPORTED
 #include <thread>
 #endif
-//#include <algorithm>
-//#include <execution>
+
+std::vector<std::uint8_t> gearoenix::render::texture::Manager::read_gx3d_image(
+    const TextureFormat format,
+    system::stream::Stream* const s) noexcept
+{
+    std::vector<std::uint8_t> data;
+    s->read(data);
+    std::size_t p;
+    switch (format) {
+    case TextureFormat::RgbaFloat16:
+    case TextureFormat::RgbFloat16:
+    case TextureFormat::RgFloat16:
+    case TextureFormat::Float16:
+    case TextureFormat::RgbaFloat24:
+    case TextureFormat::RgbFloat24:
+    case TextureFormat::RgFloat24:
+    case TextureFormat::Float24:
+        GXLOGF("This format is not supported for importing")
+    default:
+        break;
+    }
+    if (format_has_float_component(format)) {
+        std::vector<float> decoded_data;
+        Image::decode(data.data(), data.size(), format_components_count(format), decoded_data, p, p, p);
+        data.resize(decoded_data.size() * sizeof(float));
+        const auto* const raw_data = reinterpret_cast<std::uint8_t*>(decoded_data.data());
+        for (std::size_t i = 0; i < data.size(); ++i)
+            data[i] = raw_data[i];
+        return data;
+    } else {
+        std::vector<std::uint8_t> decoded_data;
+        Image::decode(data.data(), data.size(), format_components_count(format), decoded_data, p, p, p);
+        return decoded_data;
+    }
+}
+
+std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::render::texture::Manager::read_gx3d(
+    const core::Id id,
+    system::stream::Stream* const s,
+    core::sync::EndCaller<Texture>& c) noexcept
+{
+    TextureInfo info {};
+    s->read(info.texture_type);
+    s->read(info.format);
+    switch (info.texture_type) {
+    case Type::Texture2D:
+    case Type::Texture3D:
+        GXUNIMPLEMENTED
+    case Type::TextureCube: {
+        std::vector<std::vector<std::vector<std::uint8_t>>> data(6);
+        const auto aspect = static_cast<std::size_t>(s->read<std::uint16_t>());
+        const std::size_t level_counts = s->read_bool() ? math::Numeric::floor_log2(aspect) + 1 : 1;
+        for (std::size_t face_index = 0; face_index < 6; ++face_index) {
+            auto& face_data = data[face_index];
+            face_data.reserve(level_counts);
+            for (std::size_t level_index = 0; level_index < level_counts; ++level_index) {
+                face_data.emplace_back(read_gx3d_image(info.format, s));
+            }
+        }
+        const auto t = e->create_texture_cube(
+            id, std::move(data), info, aspect,
+            core::sync::EndCaller<core::sync::EndCallerIgnore>([c] {}));
+        c.set_data(t);
+        return t;
+    }
+    default:
+        GXUNEXPECTED
+    }
+}
 
 gearoenix::render::texture::Manager::Manager(std::unique_ptr<system::stream::Stream> s, engine::Engine* const e) noexcept
     : e(e)
@@ -362,29 +429,9 @@ std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::render::text
 
 std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::render::texture::Manager::get_gx3d(const core::Id id, core::sync::EndCaller<Texture>& c) noexcept
 {
-    const std::shared_ptr<Texture> o = cache.get<Texture>(id, [this, id, c] {
+    const std::shared_ptr<Texture> o = cache.get<Texture>(id, [this, id, &c] {
         system::stream::Stream* const f = cache.get_file();
-        core::sync::EndCaller<core::sync::EndCallerIgnore> call([c] {});
-        switch (f->read<Type>()) {
-        case Type::Texture2D: {
-            std::vector<std::uint8_t> data;
-            std::size_t img_width;
-            std::size_t img_height;
-            Image::decode(f, data, img_width, img_height);
-            return e->create_texture_2d(
-                id, { std::move(data) }, TextureInfo {
-                                             .format = TextureFormat::RgbaUint8,
-                                             .texture_type = Type::Texture2D,
-                                         },
-                img_width, img_height, call);
-        }
-        case Type::Texture3D:
-            GXUNIMPLEMENTED
-        case Type::TextureCube:
-            GXUNIMPLEMENTED
-        default:
-            GXUNEXPECTED
-        }
+        return read_gx3d(id, f, c);
     });
     c.set_data(o);
     return o;
@@ -395,30 +442,9 @@ std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::render::texture:
     core::sync::EndCaller<Texture>& c) noexcept
 {
     const auto id = core::asset::Manager::create_id();
-    const auto t = std::dynamic_pointer_cast<Texture>(cache.get_cacher().get<Texture>(id, [this, &c, id, s]() noexcept -> std::shared_ptr<Texture> {
-        //        core::sync::EndCaller<core::sync::EndCallerIgnore> call([c] {});
-        TextureInfo info;
-        s->read(info.texture_type);
-        s->read(info.format);
-        switch (s->read<Type>()) {
-        case Type::Texture2D:
-        case Type::Texture3D:
-            GXUNIMPLEMENTED
-        case Type::TextureCube: {
-            const auto aspect = static_cast<std::size_t>(s->read<std::uint16_t>());
-            const auto has_mipmap_data = s->read_bool();
-            for (int face_index = 0; face_index < 6; ++face_index) {
-            }
-            GXUNIMPLEMENTED
-            break;
-        }
-        default:
-            GXUNEXPECTED
-        }
-        //        return e->create_texture_cube(id, nullptr, info, img_aspect, core::sync::EndCaller<core::sync::EndCallerIgnore>([c] {}));
-        GXUNEXPECTED
+    const auto t = std::dynamic_pointer_cast<Texture>(cache.get_cacher().get<Texture>(id, [this, id, &c, s] {
+        return read_gx3d(id, s, c);
     }));
-    c.set_data(t);
     return t;
 }
 

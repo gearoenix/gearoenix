@@ -114,7 +114,7 @@ void gearoenix::glc3::texture::TextureCube::write_gx3d(
         gl::Loader::gen_framebuffers(1, &framebuffer);
         gl::Loader::bind_framebuffer(GL_FRAMEBUFFER, framebuffer);
         bind();
-        (void)s->write(true); // It means, texture has mipmap
+        (void)s->write(true); // It means, texture has mipmap data
         if (render::texture::format_has_float_component(texture_format)) {
             std::vector<float> data(aspect * aspect * 4);
             for (int i = 0; i < 6; ++i) {

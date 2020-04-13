@@ -299,7 +299,7 @@ void IblBaker::open_environment() noexcept
     GxTxtSampleInfo smp;
     smp.min_filter = GxTxtFilter::Linear;
     /// TODO failure management
-    txt_mgr->create_2d_f(environment_file, txt_call, smp);
+    (void)txt_mgr->create_2d_f(environment_file, txt_call, smp);
 }
 
 GEAROENIX_START(IblBaker)

@@ -151,7 +151,7 @@ void gearoenix::render::model::Model::clear_reflection() noexcept
     core::sync::EndCaller<texture::TextureCube> call([this](const std::shared_ptr<texture::TextureCube>& t) {
         set_reflection(t.get(), t.get());
     });
-    e->get_system_application()->get_asset_manager()->get_texture_manager()->get_cube_zero_3c(call);
+    (void)e->get_system_application()->get_asset_manager()->get_texture_manager()->get_cube_zero_3c(call);
     for (const auto& m : children)
         m.second->clear_reflection();
 }

@@ -10,12 +10,12 @@ void gearoenix::render::texture::Texture::write_gx3d_image(
     const std::size_t components_count) const noexcept
 {
     const auto offset_of_size = s->tell();
-    (void)s->write(static_cast<std::uint32_t>(0));
+    (void)s->write(static_cast<core::Count>(0));
     const auto offset_after_size = s->tell();
     render::texture::Image::encode_hdr(s, data, img_width, img_height, components_count);
     const auto curr_off = s->tell();
     s->seek(offset_of_size);
-    (void)s->write(static_cast<std::uint32_t>(curr_off - offset_after_size));
+    (void)s->write(static_cast<core::Count>(curr_off - offset_after_size));
     s->seek(curr_off);
 }
 
@@ -27,12 +27,12 @@ void gearoenix::render::texture::Texture::write_gx3d_image(
     const std::size_t components_count) const noexcept
 {
     const auto offset_of_size = s->tell();
-    (void)s->write(static_cast<std::uint32_t>(0));
+    (void)s->write(static_cast<core::Count>(0));
     const auto offset_after_size = s->tell();
     render::texture::Image::encode_png(s, data, img_width, img_height, components_count);
     const auto curr_off = s->tell();
     s->seek(offset_of_size);
-    (void)s->write(static_cast<std::uint32_t>(curr_off - offset_after_size));
+    (void)s->write(static_cast<core::Count>(curr_off - offset_after_size));
     s->seek(curr_off);
 }
 
