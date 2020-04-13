@@ -76,10 +76,6 @@ gearoenix::render::scene::Scene::Scene(
 
 #undef GX_HELPER
 
-    if (f->read_bool()) {
-        GXUNIMPLEMENTED
-    }
-
     GXLOGD("Number of models is: " << models.size())
     GXLOGD("Number of lights is: " << lights.size())
     GXLOGD("Number of cameras is: " << cameras.size())

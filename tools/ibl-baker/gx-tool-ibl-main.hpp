@@ -6,6 +6,7 @@
 #include <gearoenix/core/event/cr-ev-listener.hpp>
 #include <gearoenix/math/math-vertex.hpp>
 #include <random>
+#include <string>
 
 namespace gearoenix::render::camera {
 class Camera;

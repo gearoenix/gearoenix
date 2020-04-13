@@ -24,7 +24,6 @@ gearoenix::render::skybox::Skybox::Skybox(
     , e(e)
 {
     init(c);
-    GXUNIMPLEMENTED
 }
 
 gearoenix::render::skybox::Skybox::Skybox(

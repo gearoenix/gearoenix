@@ -40,6 +40,8 @@ std::vector<std::uint8_t> gearoenix::system::stream::Stream::get_file_content(co
 std::vector<std::uint8_t> gearoenix::system::stream::Stream::get_file_content(const std::string& address) noexcept
 {
     std::ifstream file(address, std::ios::binary | std::ios::in);
+    if (!file.is_open())
+        GXLOGF("File '" << address << "' not found")
     file.seekg(0, std::ios::end);
     const std::size_t file_size = file.tellg();
     file.seekg(0, std::ios::beg);

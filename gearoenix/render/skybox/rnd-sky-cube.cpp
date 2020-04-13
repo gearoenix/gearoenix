@@ -10,7 +10,6 @@ gearoenix::render::skybox::Cube::Cube(
     , mat_cube(new material::SkyboxCube(s, e, c))
 {
     mat = mat_cube;
-    GXUNIMPLEMENTED
 }
 
 gearoenix::render::skybox::Cube::Cube(

@@ -10,6 +10,10 @@
 #include "glc3-txt-2d.hpp"
 #include "glc3-txt-sample.hpp"
 
+#ifdef GX_DEBUG_MODE
+//#define GX_DEBUG_TEXTURE_WRITE
+#endif
+
 static const gearoenix::gl::enumerated FACES[] = {
     GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
     GL_TEXTURE_CUBE_MAP_NEGATIVE_Z,
@@ -42,8 +46,9 @@ std::shared_ptr<gearoenix::glc3::texture::TextureCube> gearoenix::glc3::texture:
     const auto format = Texture2D::convert_format(info.format);
     const auto data_format = Texture2D::convert_data_format(info.format);
     const auto gl_aspect = static_cast<gl::sizei>(aspect);
-    std::vector<std::vector<std::vector<std::uint8_t>>> pixels(GX_COUNT_OF(FACES));
+    std::vector<std::vector<std::vector<std::uint8_t>>> pixels;
     if (data.empty() || data[0].empty() || data[0][0].empty()) {
+        pixels.resize(6);
         std::vector<std::vector<std::uint8_t>> black(1);
         black[0].resize(aspect * aspect * 16);
         for (auto& p : black[0])
@@ -76,8 +81,8 @@ std::shared_ptr<gearoenix::glc3::texture::TextureCube> gearoenix::glc3::texture:
             const auto& face_pixels = pixels[fi];
             for (std::size_t level_index = 0; level_index < face_pixels.size(); ++level_index) {
                 gl::Loader::tex_image_2d(
-                    FACES[fi], level_index, internal_format, gl_aspect, gl_aspect, 0, format, data_format,
-                    face_pixels[level_index].data());
+                    FACES[fi], level_index, internal_format, gl_aspect >> level_index, gl_aspect >> level_index, 0,
+                    format, data_format, face_pixels[level_index].data());
             }
         }
 #ifdef GX_DEBUG_GL_CLASS_3
@@ -122,7 +127,7 @@ void gearoenix::glc3::texture::TextureCube::write_gx3d(
                     gl::Loader::framebuffer_texture_2d(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, FACES[i], texture_object,
                         j);
                     gl::Loader::read_pixels(0, 0, level_aspect, level_aspect, GL_RGBA, GL_FLOAT, data.data());
-#ifdef GX_DEBUG_MODE
+#ifdef GX_DEBUG_TEXTURE_WRITE
                     system::stream::Local l(
                         "texture-cube-glc3-id" + std::to_string(asset_id) + "-face" + std::to_string(i) + "-level" + std::to_string(j) + ".hdr", true);
                     render::texture::Image::encode_hdr(&l, data.data(), level_aspect, level_aspect, 4);
@@ -137,7 +142,7 @@ void gearoenix::glc3::texture::TextureCube::write_gx3d(
                     gl::Loader::framebuffer_texture_2d(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, FACES[i], texture_object,
                         j);
                     gl::Loader::read_pixels(0, 0, level_aspect, level_aspect, GL_RGBA, GL_UNSIGNED_BYTE, data.data());
-#ifdef GX_DEBUG_MODE
+#ifdef GX_DEBUG_TEXTURE_WRITE
                     system::stream::Local l(
                         "texture-cube-glc3-id" + std::to_string(asset_id) + "-face" + std::to_string(i) + "-level" + std::to_string(j) + ".png", true);
                     render::texture::Image::encode_png(&l, data.data(), level_aspect, level_aspect, 4);
