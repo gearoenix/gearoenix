@@ -46,7 +46,7 @@ public:
     std::shared_ptr<Texture2D> get_2d_one_2c(core::sync::EndCaller<Texture2D>& c) noexcept;
     std::shared_ptr<Texture2D> get_brdflut(core::sync::EndCaller<Texture2D>& c) noexcept;
     /// It will take ownership of data
-    std::shared_ptr<Texture2D> create_2d(unsigned char* data, const TextureInfo& info, int img_width, int img_height, core::sync::EndCaller<Texture2D>& c) noexcept;
+    std::shared_ptr<Texture2D> create_2d(std::vector<std::vector<std::uint8_t>> data, const TextureInfo& info, std::size_t img_width, std::size_t img_height, core::sync::EndCaller<Texture2D>& c) noexcept;
     /// It creates 2d floating texture from formatted data
     std::shared_ptr<Texture2D> create_2d(const unsigned char* data, std::size_t size, core::sync::EndCaller<Texture2D>& c, const SampleInfo& sample_info = SampleInfo()) noexcept;
     /// It creates 2d floating texture from formatted data for final float images
@@ -60,7 +60,15 @@ public:
     std::shared_ptr<TextureCube> get_cube_zero_3c(core::sync::EndCaller<TextureCube>& c) noexcept;
     std::shared_ptr<TextureCube> create_cube(const TextureInfo& info, int img_aspect, core::sync::EndCaller<TextureCube>& c) noexcept;
     std::shared_ptr<Texture> get_gx3d(core::Id id, core::sync::EndCaller<Texture>& c) noexcept;
-    std::shared_ptr<Texture> read_gx3d(core::sync::EndCaller<Texture>& c) noexcept;
+    //
+    /// This function reads a gx3d texture in the given stream.
+    ///
+    /// \note The current offset of the stream must be exactly at the start of a gx3d texture, other wise undefined behaviour will happen.
+    /// \note If You want to get access to an already registered texture you must use get_gx3d() instead.
+    /// \param c Callback for the time that texture is ready for rendering.
+    /// \param s is the Stream that the g3dx image resides in.
+    /// \return A texture for use in load process.
+    std::shared_ptr<Texture> read_gx3d(system::stream::Stream* s, core::sync::EndCaller<Texture>& c) noexcept;
     [[nodiscard]] engine::Engine* get_engine() const noexcept;
     [[nodiscard]] static constexpr float geometry_smith(const math::Vec3<float>& n, const math::Vec3<float>& v, const math::Vec3<float>& l, float roughness) noexcept;
     [[nodiscard]] static math::Vec2<float> integrate_brdf(float n_dot_v, float roughness) noexcept;

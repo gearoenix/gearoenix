@@ -7,7 +7,7 @@ void gearoenix::render::texture::Texture::write_gx3d_image(
     const float* const data,
     const std::size_t img_width,
     const std::size_t img_height,
-    const std::size_t components_count) noexcept
+    const std::size_t components_count) const noexcept
 {
     const auto offset_of_size = s->tell();
     (void)s->write(static_cast<std::uint32_t>(0));
@@ -24,7 +24,7 @@ void gearoenix::render::texture::Texture::write_gx3d_image(
     const unsigned char* const data,
     const std::size_t img_width,
     const std::size_t img_height,
-    const std::size_t components_count) noexcept
+    const std::size_t components_count) const noexcept
 {
     const auto offset_of_size = s->tell();
     (void)s->write(static_cast<std::uint32_t>(0));

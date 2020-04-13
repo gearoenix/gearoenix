@@ -22,17 +22,10 @@ public:
     [[nodiscard]] static std::shared_ptr<Texture2D> construct(
         core::Id id,
         engine::Engine* e,
-        std::vector<std::vector<unsigned char>> data,
+        std::vector<std::vector<std::uint8_t>> data,
         const render::texture::TextureInfo& info,
-        unsigned int img_width,
-        unsigned int img_height,
-        const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
-    [[nodiscard]] static std::shared_ptr<Texture2D> construct(
-        core::Id id,
-        engine::Engine* e,
-        const render::texture::TextureInfo& info,
-        unsigned int img_width,
-        unsigned int img_height,
+        std::size_t img_width,
+        std::size_t img_height,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
     Texture2D(core::Id my_id, gl::uint txt_obj, render::texture::TextureFormat texture_format, engine::Engine* e) noexcept;
     ~Texture2D() noexcept final;

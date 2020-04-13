@@ -192,7 +192,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::font::
 #endif
 
     const auto pixels_bytes_count = rnd_data.size() * 4;
-    auto* const img_pixels = new unsigned char[pixels_bytes_count];
+    std::vector<std::uint8_t> img_pixels(pixels_bytes_count);
     for (std::size_t i = 0, ti = 0, img_index = (static_cast<std::size_t>(img_height_pixels) - 1) * static_cast<std::size_t>(img_width_pixels) * 4;
          i < static_cast<std::size_t>(img_height_pixels);
          ++i, img_index -= (static_cast<std::size_t>(img_width_pixels) * 8)) {
@@ -222,7 +222,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::font::
         },
         .texture_type = texture::Type::Texture2D,
     };
-    return txt_mgr->create_2d(img_pixels, txt_info, img_width_pixels, img_height_pixels, end);
+    return txt_mgr->create_2d({ std::move(img_pixels) }, txt_info, img_width_pixels, img_height_pixels, end);
 }
 
 std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::font::Font2D::bake(

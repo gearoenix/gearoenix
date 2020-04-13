@@ -150,14 +150,14 @@ public:
     /// Function to create cube-texture in the render engine
     ///
     /// \param id is Asset-ID of the texture
-    /// \param data will be moved
+    /// \param data will be moved ant it's size must be exactly 6
     /// \param info is texture creation information
     /// \param aspect is texture aspect
     /// \param call is a callback object that will be called whenever the texture is ready to render
     /// \return The returned texture is ready to use (not render) only in assignment in the load process.
     [[nodiscard]] virtual std::shared_ptr<texture::TextureCube> create_texture_cube(
         core::Id id,
-        std::vector<std::vector<std::uint8_t>> data[6],
+        std::vector<std::vector<std::vector<std::uint8_t>>> data,
         const texture::TextureInfo& info,
         std::size_t aspect,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept = 0;

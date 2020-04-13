@@ -20,7 +20,7 @@ gearoenix::render::material::SkyboxCube::SkyboxCube(system::stream::Stream* cons
 {
     auto* const txt_mgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
     core::sync::EndCaller<texture::Texture> txt_call([end](const std::shared_ptr<texture::Texture>&) {});
-    color_texture = std::dynamic_pointer_cast<texture::TextureCube>(txt_mgr->read_gx3d(txt_call));
+    color_texture = std::dynamic_pointer_cast<texture::TextureCube>(txt_mgr->read_gx3d(f, txt_call));
 }
 
 gearoenix::render::material::SkyboxCube::~SkyboxCube() noexcept = default;

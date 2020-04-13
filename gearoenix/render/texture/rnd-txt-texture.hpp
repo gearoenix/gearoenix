@@ -25,19 +25,19 @@ protected:
         TextureFormat texture_format,
         engine::Engine* e) noexcept;
 
-    static void write_gx3d_image(
+    void write_gx3d_image(
         system::stream::Stream* file,
         const float* data,
         std::size_t img_width,
         std::size_t img_height,
-        std::size_t components_count) noexcept;
+        std::size_t components_count) const noexcept;
 
-    static void write_gx3d_image(
+    void write_gx3d_image(
         system::stream::Stream* file,
         const unsigned char* data,
         std::size_t img_width,
         std::size_t img_height,
-        std::size_t components_count) noexcept;
+        std::size_t components_count) const noexcept;
 
 public:
     ~Texture() noexcept override;

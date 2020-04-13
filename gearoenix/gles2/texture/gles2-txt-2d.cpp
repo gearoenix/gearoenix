@@ -17,10 +17,10 @@ gearoenix::gles2::texture::Texture2D::Texture2D(
 std::shared_ptr<gearoenix::gles2::texture::Texture2D> gearoenix::gles2::texture::Texture2D::construct(
     const core::Id id,
     engine::Engine* const e,
-    const void* const data,
+    std::vector<std::vector<std::uint8_t>> data,
     const render::texture::TextureInfo& info,
-    const unsigned int img_width,
-    const unsigned int img_height,
+    const std::size_t img_width,
+    const std::size_t img_height,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
 {
     const std::shared_ptr<Texture2D> result(new Texture2D(id, info.format, e));
@@ -31,66 +31,57 @@ std::shared_ptr<gearoenix::gles2::texture::Texture2D> gearoenix::gles2::texture:
     const auto cf = convert(info.format);
     const auto gl_img_width = static_cast<gl::sizei>(img_width);
     const auto gl_img_height = static_cast<gl::sizei>(img_height);
-    std::vector<std::uint8_t> pixels;
-    switch (info.format) {
-    case render::texture::TextureFormat::RgbaFloat32: {
-        const gl::sizei pixel_size = gl_img_width * gl_img_height * 4;
-        pixels.resize(pixel_size);
-        const auto raw_data = reinterpret_cast<const float*>(data);
-        for (gl::sizei i = 0; i < pixel_size; ++i) {
-            const auto c = raw_data[i] * 255.1f;
-            if (c >= 255.0f)
-                pixels[i] = 255;
-            else if (c < 0.0f)
-                pixels[i] = 0;
-            else
-                pixels[i] = static_cast<std::uint8_t>(c);
-        }
-        break;
-    }
-    case render::texture::TextureFormat::RgbFloat32: {
-        const gl::sizei pixel_size = gl_img_width * gl_img_height * 3;
-        pixels.resize(pixel_size);
-        const auto raw_data = reinterpret_cast<const float*>(data);
-        for (gl::sizei i = 0; i < pixel_size; ++i) {
-            const auto c = raw_data[i] * 255.1f;
-            if (c >= 255.0f)
-                pixels[i] = 255;
-            else if (c < 0.0f)
-                pixels[i] = 0;
-            else
-                pixels[i] = static_cast<std::uint8_t>(c);
-        }
-        break;
-    }
-    case render::texture::TextureFormat::RgFloat32: {
-        const gl::sizei pixel_size = gl_img_width * gl_img_height * 3;
-        pixels.resize(pixel_size);
-        const auto raw_data = reinterpret_cast<const float*>(data);
-        for (gl::sizei i = 0, di = 0; i < pixel_size; ++i) {
-            for (int j = 0; j < 2; ++j, ++di, ++i) {
-                const auto c = raw_data[di] * 255.1f;
-                if (c >= 255.0f)
-                    pixels[i] = 255;
-                else if (c < 0.0f)
-                    pixels[i] = 0;
-                else
-                    pixels[i] = static_cast<std::uint8_t>(c);
+    std::vector<std::vector<std::uint8_t>> pixels;
+    if (data.empty() || data[0].empty()) {
+        pixels.emplace_back(img_width * img_height * 4);
+    } else {
+        pixels.reserve(data.size());
+        switch (info.format) {
+        case render::texture::TextureFormat::RgbaFloat32:
+        case render::texture::TextureFormat::RgbFloat32: {
+            for (std::size_t level_index = 0; level_index < data.size(); ++level_index) {
+                pixels.emplace_back(data.size() / sizeof(float));
+                auto& level_pixels = pixels.back();
+                const auto raw_data = reinterpret_cast<const float*>(data[level_index].data());
+                for (gl::sizei i = 0; i < level_pixels.size(); ++i) {
+                    const auto c = raw_data[i] * 255.1f;
+                    if (c >= 255.0f)
+                        level_pixels[i] = 255;
+                    else if (c < 0.0f)
+                        level_pixels[i] = 0;
+                    else
+                        level_pixels[i] = static_cast<std::uint8_t>(c);
+                }
             }
-            pixels[i] = 0;
+            break;
         }
-        break;
-    }
-    case render::texture::TextureFormat::RgbaUint8: {
-        const gl::sizei pixel_size = gl_img_width * gl_img_height * 4;
-        pixels.resize(pixel_size);
-        const auto raw_data = reinterpret_cast<const std::uint8_t*>(data);
-        for (gl::sizei i = 0; i < pixel_size; ++i)
-            pixels[i] = raw_data[i];
-        break;
-    }
-    default:
-        GXLOGF("Unsupported/Unimplemented setting for texture with id " << id)
+        case render::texture::TextureFormat::RgFloat32: {
+            for (std::size_t level_index = 0; level_index < data.size(); ++level_index) {
+                pixels.emplace_back((3 * data.size()) / (sizeof(float) * 2));
+                auto& level_pixels = pixels.back();
+                const auto raw_data = reinterpret_cast<const float*>(data[level_index].data());
+                for (gl::sizei i = 0; i < level_pixels.size(); ++i) {
+                    for (int j = 0; j < 2; ++j, ++i) {
+                        const auto c = raw_data[i] * 255.1f;
+                        if (c >= 255.0f)
+                            level_pixels[i] = 255;
+                        else if (c < 0.0f)
+                            level_pixels[i] = 0;
+                        else
+                            level_pixels[i] = static_cast<std::uint8_t>(c);
+                    }
+                    level_pixels[i] = 0;
+                }
+            }
+            break;
+        }
+        case render::texture::TextureFormat::RgbaUint8: {
+            pixels = std::move(data);
+            break;
+        }
+        default:
+            GXLOGF("Unsupported/Unimplemented setting for texture with id " << id)
+        }
     }
     e->get_function_loader()->load([needs_mipmap, result, pixels { move(pixels) }, cf, gl_img_width, gl_img_height, sample_info, call] {
         gl::Loader::gen_textures(1, &(result->texture_object));
@@ -99,56 +90,20 @@ std::shared_ptr<gearoenix::gles2::texture::Texture2D> gearoenix::gles2::texture:
         gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, sample_info.mag_filter);
         gl::Loader::tex_parameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, sample_info.wrap_s);
         gl::Loader::tex_parameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, sample_info.wrap_t);
-        gl::Loader::tex_image_2d(GL_TEXTURE_2D, 0, static_cast<gl::sint>(cf), gl_img_width, gl_img_height, 0, static_cast<gl::enumerated>(cf), GL_UNSIGNED_BYTE, pixels.data());
-        if (needs_mipmap)
+        for (std::size_t level_index = 0; level_index < pixels.size(); ++level_index) {
+            gl::Loader::tex_image_2d(
+                GL_TEXTURE_2D, level_index, static_cast<gl::sint>(cf), gl_img_width, gl_img_height, 0,
+                static_cast<gl::enumerated>(cf), GL_UNSIGNED_BYTE, pixels[level_index].data());
+        }
+        if (needs_mipmap && pixels.size() < 2) {
             gl::Loader::generate_mipmap(GL_TEXTURE_2D);
+        }
 #ifdef GX_DEBUG_GLES2
         gl::Loader::check_for_error();
 #endif
     });
     return result;
 }
-
-std::shared_ptr<gearoenix::gles2::texture::Texture2D> gearoenix::gles2::texture::Texture2D::construct(
-    const core::Id id,
-    engine::Engine* const e,
-    const render::texture::TextureInfo& info,
-    const unsigned int img_width,
-    const unsigned int img_height,
-    const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
-{
-    std::shared_ptr<Texture2D> result(new Texture2D(id, info.format, e));
-    result->img_width = img_width;
-    result->img_height = img_height;
-    const SampleInfo sample_info(info.sample_info);
-    const bool needs_mipmap = info.has_mipmap;
-    const auto cf = convert(info.format);
-    const auto gl_img_width = static_cast<gl::sizei>(img_width);
-    const auto gl_img_height = static_cast<gl::sizei>(img_height);
-    e->get_function_loader()->load([needs_mipmap, result, cf, gl_img_width, gl_img_height, sample_info, call] {
-        gl::Loader::gen_textures(1, &(result->texture_object));
-        gl::Loader::bind_texture(GL_TEXTURE_2D, result->texture_object);
-        gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, sample_info.min_filter);
-        gl::Loader::tex_parameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, sample_info.mag_filter);
-        gl::Loader::tex_parameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, sample_info.wrap_s);
-        gl::Loader::tex_parameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, sample_info.wrap_t);
-        gl::Loader::tex_image_2d(
-            GL_TEXTURE_2D, 0, static_cast<gl::sint>(cf), gl_img_width, gl_img_height, 0,
-            static_cast<gl::enumerated>(cf), GL_UNSIGNED_BYTE, nullptr);
-        if (needs_mipmap)
-            gl::Loader::generate_mipmap(GL_TEXTURE_2D);
-#ifdef GX_DEBUG_GLES2
-        gl::Loader::check_for_error();
-#endif
-    });
-    return result;
-}
-
-//gearoenix::gles2::texture::Texture2D::Texture2D(const core::Id my_id, const gl::uint txt_obj, engine::Engine* const e) noexcept
-//    : render::texture::Texture2D(my_id, e)
-//    , texture_object(txt_obj)
-//{
-//}
 
 gearoenix::gles2::texture::Texture2D::~Texture2D() noexcept
 {

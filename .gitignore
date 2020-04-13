@@ -91,3 +91,6 @@ wasm-build/
 /.cxx/
 
 android/app/release/
+
+documentation/*
+!documentation/Doxyfile

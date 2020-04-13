@@ -21,13 +21,7 @@ public:
     [[nodiscard]] static std::shared_ptr<TextureCube> construct(
         core::Id id,
         engine::Engine* e,
-        const void* data,
-        const render::texture::TextureInfo& info,
-        unsigned int aspect,
-        const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
-    [[nodiscard]] static std::shared_ptr<TextureCube> construct(
-        core::Id id,
-        engine::Engine* e,
+        std::vector<std::vector<std::vector<std::uint8_t>>> data,
         const render::texture::TextureInfo& info,
         unsigned int aspect,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;

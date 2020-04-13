@@ -27,14 +27,14 @@ public:
     [[nodiscard]] std::shared_ptr<render::sync::Semaphore> create_semaphore() const noexcept final;
     [[nodiscard]] std::shared_ptr<render::texture::Texture2D> create_texture_2d(
         core::Id id,
-        std::vector<std::vector<unsigned char>> data,
+        std::vector<std::vector<std::uint8_t>> data,
         const render::texture::TextureInfo& info,
         std::size_t img_width,
         std::size_t img_height,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept final;
     [[nodiscard]] std::shared_ptr<render::texture::TextureCube> create_texture_cube(
         core::Id id,
-        std::vector<std::vector<unsigned char>> data[6],
+        std::vector<std::vector<std::vector<std::uint8_t>>> data,
         const render::texture::TextureInfo& info,
         std::size_t aspect,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept final;

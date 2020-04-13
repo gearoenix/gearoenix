@@ -28,7 +28,7 @@ gearoenix::gles2::texture::TextureCube::TextureCube(
 std::shared_ptr<gearoenix::gles2::texture::TextureCube> gearoenix::gles2::texture::TextureCube::construct(
     const core::Id id,
     engine::Engine* const e,
-    const void* const data,
+    std::vector<std::vector<std::vector<std::uint8_t>>> data,
     const render::texture::TextureInfo& info,
     const unsigned int aspect,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
@@ -38,18 +38,46 @@ std::shared_ptr<gearoenix::gles2::texture::TextureCube> gearoenix::gles2::textur
     const SampleInfo sample_info = SampleInfo(info.sample_info);
     const auto cf = Texture2D::convert(info.format);
     const auto gl_aspect = static_cast<gl::sizei>(aspect);
-    std::vector<std::vector<std::uint8_t>> pixels(GX_COUNT_OF(FACES));
-    if (nullptr != data) {
+    std::vector<std::vector<std::vector<std::uint8_t>>> pixels(GX_COUNT_OF(FACES));
+    if (data.empty() || data[0].empty() || data[0][0].empty()) {
+        std::vector<std::vector<std::uint8_t>> black(1);
+        black[0].resize(aspect * aspect * 16);
+        for (auto& p : black[0])
+            p = 0;
+        pixels[0] = black;
+        pixels[1] = black;
+        pixels[2] = black;
+        pixels[3] = black;
+        pixels[4] = black;
+        pixels[5] = std::move(black);
+    } else {
         switch (info.format) {
         case render::texture::TextureFormat::RgbaFloat32: {
-            const gl::sizei pixel_size = gl_aspect * gl_aspect * 4;
-            const auto* const raw_data = reinterpret_cast<const float*>(data);
-            for (int fi = 0, di = 0; fi < static_cast<int>(GX_COUNT_OF(FACES)); ++fi) {
-                pixels[fi].resize(pixel_size);
-                for (gl::sizei i = 0; i < pixel_size; ++i, ++di)
-                    pixels[fi][i] = static_cast<std::uint8_t>(raw_data[di] * 255.1f);
+            for (int face_index = 0; face_index < static_cast<int>(GX_COUNT_OF(FACES)); ++face_index) {
+                auto& face_pixels = pixels[face_index];
+                const auto& face_data = data[face_index];
+                face_pixels.resize(face_data.size());
+                for (std::size_t level_index = 0; level_index < face_data.size(); ++level_index) {
+                    auto& level_pixels = face_pixels[level_index];
+                    const auto& level_data = face_data[level_index];
+                    level_pixels.resize(level_data.size() / 4);
+                    const auto* const raw_data = reinterpret_cast<const float*>(level_data.data());
+                    for (std::size_t pixel_index = 0; pixel_index < level_pixels.size(); ++pixel_index) {
+                        const auto c = raw_data[pixel_index] * 255.1f;
+                        if (c > 255.0f) {
+                            level_pixels[pixel_index] = 255;
+                        } else if (c < 0.0f) {
+                            level_pixels[pixel_index] = 0;
+                        } else {
+                            level_pixels[pixel_index] = static_cast<std::uint8_t>(c);
+                        }
+                    }
+                }
             }
             break;
+        }
+        case render::texture::TextureFormat::RgbaUint8: {
+            pixels = std::move(data);
         }
         default:
             GXLOGF("Unsupported/Unimplemented setting for cube texture with id " << id)
@@ -64,55 +92,16 @@ std::shared_ptr<gearoenix::gles2::texture::TextureCube> gearoenix::gles2::textur
         gl::Loader::tex_parameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, sample_info.wrap_t);
         for (int fi = 0; fi < static_cast<int>(GX_COUNT_OF(FACES)); ++fi) {
             const auto& face_pixels = pixels[fi];
-            gl::Loader::tex_image_2d(FACES[fi], 0, static_cast<gl::sint>(cf), gl_aspect, gl_aspect, 0, cf, GL_UNSIGNED_BYTE,
-                face_pixels.empty() ? nullptr : pixels[fi].data());
+            for (std::size_t level_index = 0; level_index < face_pixels.size(); ++level_index) {
+                gl::Loader::tex_image_2d(
+                    FACES[fi], level_index, static_cast<gl::sint>(cf), gl_aspect, gl_aspect, 0, cf,
+                    GL_UNSIGNED_BYTE, face_pixels[level_index].data());
+            }
         }
 #ifdef GX_DEBUG_GLES2
         gl::Loader::check_for_error();
 #endif
-        if (needs_mipmap) {
-            gl::Loader::generate_mipmap(GL_TEXTURE_CUBE_MAP);
-            // It clears the errors, some drivers does not support mip-map generation for cube texture
-            gl::Loader::get_error();
-        }
-    });
-    return result;
-}
-
-std::shared_ptr<gearoenix::gles2::texture::TextureCube> gearoenix::gles2::texture::TextureCube::construct(
-    const core::Id id,
-    engine::Engine* const e,
-    const render::texture::TextureInfo& info,
-    const unsigned int aspect,
-    const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
-{
-    const std::shared_ptr<TextureCube> result(new TextureCube(id, info.format, e));
-    result->aspect = aspect;
-    const SampleInfo sample_info = SampleInfo(info.sample_info);
-    gl::uint cf;
-    const auto gl_aspect = static_cast<gl::sizei>(aspect);
-    switch (info.format) {
-    case render::texture::TextureFormat::RgbaFloat32: {
-        cf = GL_RGBA;
-        break;
-    }
-    default:
-        GXLOGF("Unsupported/Unimplemented setting for cube texture with id " << id)
-    }
-    e->get_function_loader()->load([result, gl_aspect, cf, sample_info, needs_mipmap { info.has_mipmap }, call] {
-        gl::Loader::gen_textures(1, &(result->texture_object));
-        gl::Loader::bind_texture(GL_TEXTURE_CUBE_MAP, result->texture_object);
-        gl::Loader::tex_parameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, sample_info.mag_filter);
-        gl::Loader::tex_parameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, sample_info.min_filter);
-        gl::Loader::tex_parameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, sample_info.wrap_s);
-        gl::Loader::tex_parameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, sample_info.wrap_t);
-        for (const auto fi : FACES) {
-            gl::Loader::tex_image_2d(fi, 0, static_cast<gl::sint>(cf), gl_aspect, gl_aspect, 0, cf, GL_UNSIGNED_BYTE, nullptr);
-        }
-#ifdef GX_DEBUG_GLES2
-        gl::Loader::check_for_error();
-#endif
-        if (needs_mipmap) {
+        if (needs_mipmap && pixels[0].size() < 2) {
             gl::Loader::generate_mipmap(GL_TEXTURE_CUBE_MAP);
             // It clears the errors, some drivers does not support mip-map generation for cube texture
             gl::Loader::get_error();
