@@ -2,9 +2,9 @@
 #include <gearoenix/core/asset/cr-asset-manager.hpp>
 #include <gearoenix/physics/body/phs-bd-rigid.hpp>
 #include <gearoenix/physics/constraint/phs-cns-tracker-spring-joint-spring.hpp>
+#include <gearoenix/render/camera/rnd-cmr-jet-controller.hpp>
 #include <gearoenix/render/camera/rnd-cmr-manager.hpp>
 #include <gearoenix/render/camera/rnd-cmr-perspective.hpp>
-#include <gearoenix/render/camera/rnd-cmr-transformation.hpp>
 #include <gearoenix/render/engine/rnd-eng-engine.hpp>
 #include <gearoenix/render/graph/tree/rnd-gr-tr-pbr.hpp>
 #include <gearoenix/render/light/rnd-lt-directional.hpp>
@@ -39,18 +39,19 @@ using GxPersCam = gearoenix::render::camera::Perspective;
 GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
     : gearoenix::core::Application::Application(sys_app)
 {
-    const GxEndCallerIgnored endcall([this] { scn->set_enability(true); });
-    GxEndCaller<GxScene> scncall([this, endcall](std::shared_ptr<GxScene> s) {
+    const GxEndCallerIgnored end_call([this] { scn->set_enability(true); });
+    GxEndCaller<GxScene> scn_call([this, end_call](std::shared_ptr<GxScene> s) {
         scn = std::move(s);
+        cam_ctrl = std::make_shared<GxCamCtrl>(scn->get_cameras().begin()->second);
     });
 
-    tree = std::make_unique<GxGrPbr>(render_engine, endcall);
+    tree = std::make_unique<GxGrPbr>(render_engine, end_call);
     render_engine->set_render_tree(tree.get());
 
-    const auto& astmgr = sys_app->get_asset_manager();
-    const auto& scnmgr = astmgr->get_scene_manager();
+    const auto& ast_mgr = sys_app->get_asset_manager();
+    const auto& scn_mgr = ast_mgr->get_scene_manager();
 
-    scnmgr->get_gx3d(1024, scncall);
+    scn_mgr->get_gx3d(1024, scn_call);
 }
 
 GameApp::~GameApp() noexcept = default;

@@ -18,7 +18,7 @@ std::vector<std::uint8_t> gearoenix::render::texture::Manager::read_gx3d_image(
 {
     std::vector<std::uint8_t> data;
     s->read(data);
-    std::size_t p;
+    std::size_t img_width, img_height, img_comps;
     switch (format) {
     case TextureFormat::RgbaFloat16:
     case TextureFormat::RgbFloat16:
@@ -34,15 +34,16 @@ std::vector<std::uint8_t> gearoenix::render::texture::Manager::read_gx3d_image(
     }
     if (format_has_float_component(format)) {
         std::vector<float> decoded_data;
-        Image::decode(data.data(), data.size(), format_components_count(format), decoded_data, p, p, p);
-        data.resize(decoded_data.size() * sizeof(float));
+        Image::decode(data.data(), data.size(), format_components_count(format), decoded_data, img_width, img_height, img_comps);
+        const std::size_t data_size = decoded_data.size() * sizeof(float);
+        data.resize(data_size);
         const auto* const raw_data = reinterpret_cast<std::uint8_t*>(decoded_data.data());
-        for (std::size_t i = 0; i < data.size(); ++i)
+        for (std::size_t i = 0; i < data_size; ++i)
             data[i] = raw_data[i];
         return data;
     } else {
         std::vector<std::uint8_t> decoded_data;
-        Image::decode(data.data(), data.size(), format_components_count(format), decoded_data, p, p, p);
+        Image::decode(data.data(), data.size(), format_components_count(format), decoded_data, img_width, img_height, img_comps);
         return decoded_data;
     }
 }

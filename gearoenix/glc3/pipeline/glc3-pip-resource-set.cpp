@@ -8,6 +8,7 @@
 #include "glc3-pip-irradiance-convoluter-resource-set.hpp"
 #include "glc3-pip-radiance-convoluter-resource-set.hpp"
 #include "glc3-pip-shadow-mapper-resource-set.hpp"
+#include "glc3-pip-skybox-cube-resource-set.hpp"
 #include "glc3-pip-skybox-equirectangular-resource-set.hpp"
 #include "glc3-pip-unlit-resource-set.hpp"
 #include <utility>
@@ -38,6 +39,9 @@ void gearoenix::glc3::pipeline::ResourceSet::bind(
         break;
     case render::pipeline::Type::Unlit:
         static_cast<const UnlitResourceSet*>(prs)->bind_final(bound_shader_program);
+        break;
+    case render::pipeline::Type::SkyboxCube:
+        static_cast<const SkyboxCubeResourceSet*>(prs)->bind_final(bound_shader_program);
         break;
     case render::pipeline::Type::SkyboxEquirectangular:
         static_cast<const SkyboxEquirectangularResourceSet*>(prs)->bind_final(bound_shader_program);

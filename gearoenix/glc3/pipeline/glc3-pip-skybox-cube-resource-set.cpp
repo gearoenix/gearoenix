@@ -1,37 +1,39 @@
-#include "glc3-pip-unlit-resource-set.hpp"
+#include "glc3-pip-skybox-cube-resource-set.hpp"
 #ifdef GX_USE_OPENGL_CLASS_3
 #include "../../gl/gl-loader.hpp"
 #include "../../render/buffer/rnd-buf-uniform.hpp"
 #include "../../render/camera/rnd-cmr-uniform.hpp"
-#include "../../render/graph/node/rnd-gr-nd-unlit.hpp"
-#include "../../render/light/rnd-lt-directional.hpp"
-#include "../../render/material/rnd-mat-unlit.hpp"
+#include "../../render/graph/node/rnd-gr-nd-skybox-cube.hpp"
+#include "../../render/material/rnd-mat-skybox-cube.hpp"
 #include "../../render/mesh/rnd-msh-mesh.hpp"
 #include "../buffer/glc3-buf-index.hpp"
 #include "../buffer/glc3-buf-vertex.hpp"
-#include "../shader/glc3-shd-unlit.hpp"
-#include "../texture/glc3-txt-2d.hpp"
-#include "glc3-pip-unlit.hpp"
+#include "../shader/glc3-shd-skybox-cube.hpp"
+#include "../texture/glc3-txt-cube.hpp"
+#include "glc3-pip-resource-set.hpp"
+#include "glc3-pip-skybox-cube.hpp"
 
-gearoenix::glc3::pipeline::UnlitResourceSet::UnlitResourceSet(const std::shared_ptr<shader::Unlit>& shd, std::shared_ptr<Unlit const> pip) noexcept
-    : glc3::pipeline::ResourceSet(shd)
-    , render::pipeline::UnlitResourceSet(std::move(pip))
+gearoenix::glc3::pipeline::SkyboxCubeResourceSet::SkyboxCubeResourceSet(const std::shared_ptr<shader::SkyboxCube>& shd, std::shared_ptr<SkyboxCube const> pip) noexcept
+    : render::pipeline::SkyboxCubeResourceSet(std::move(pip))
+    , base(new glc3::pipeline::ResourceSet(shd))
 {
 }
 
-gearoenix::glc3::pipeline::UnlitResourceSet::~UnlitResourceSet() noexcept = default;
+gearoenix::glc3::pipeline::SkyboxCubeResourceSet::~SkyboxCubeResourceSet() noexcept = default;
 
-void gearoenix::glc3::pipeline::UnlitResourceSet::bind_final(gl::uint& bound_shader_program) const noexcept
+void gearoenix::glc3::pipeline::SkyboxCubeResourceSet::bind_final(gl::uint& bound_shader_program) const noexcept
 {
     GX_GLC3_PIP_RES_START_DRAWING_MESH
-    GX_GLC3_PIP_RES_START_SHADER(Unlit, shd)
-    const auto* const material = material_uniform_buffer->get_ptr<render::material::Unlit::Uniform>();
+    GX_GLC3_PIP_RES_START_SHADER(SkyboxCube, shd)
+    const auto* const material = material_uniform_buffer->get_ptr<render::material::SkyboxCube::Uniform>();
     GX_GLC3_PIP_RES_SET_UNIFORM(material_alpha, material->alpha)
     GX_GLC3_PIP_RES_SET_UNIFORM(material_alpha_cutoff, material->alpha_cutoff)
-    GX_GLC3_PIP_RES_SET_TXT_2D(material_color, color)
-    const auto* const node = node_uniform_buffer->get_ptr<render::graph::node::UnlitUniform>();
-    GX_GLC3_PIP_RES_SET_UNIFORM(effect_mvp, *(node->mvp.data()))
+    GX_GLC3_PIP_RES_SET_TXT_CUBE(material_color, color)
+    const auto* const camera = camera_uniform_buffer->get_ptr<render::camera::Uniform>();
+    GX_GLC3_PIP_RES_SET_UNIFORM(camera_hdr_tune_mapping, camera->hdr_tune_mapping)
+    GX_GLC3_PIP_RES_SET_UNIFORM(camera_gamma_correction, camera->gamma_correction)
+    const auto* const node = node_uniform_buffer->get_ptr<render::graph::node::SkyboxCubeUniform>();
+    GX_GLC3_PIP_RES_SET_UNIFORM(effect_mvp, node->mvp.data[0][0])
     GX_GLC3_PIP_RES_END_DRAWING_MESH
 }
-
 #endif

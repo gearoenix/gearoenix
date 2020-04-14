@@ -10,6 +10,7 @@
 #include "../../reflection/rnd-rfl-runtime.hpp"
 #include "../../scene/rnd-scn-manager.hpp"
 #include "../../scene/rnd-scn-scene.hpp"
+#include "../../skybox/rnd-sky-cube.hpp"
 #include "../../skybox/rnd-sky-equirectangular.hpp"
 #include "../../texture/rnd-txt-target.hpp"
 #include "../node/rnd-gr-nd-forward-pbr.hpp"
@@ -17,6 +18,7 @@
 #include "../node/rnd-gr-nd-mipmap-generator.hpp"
 #include "../node/rnd-gr-nd-radiance-convoluter.hpp"
 #include "../node/rnd-gr-nd-shadow-mapper.hpp"
+#include "../node/rnd-gr-nd-skybox-cube.hpp"
 #include "../node/rnd-gr-nd-skybox-equirectangular.hpp"
 #include "../node/rnd-gr-nd-unlit.hpp"
 
@@ -80,7 +82,18 @@ void gearoenix::render::graph::tree::Pbr::update_skyboxes(const scene::Scene* co
             break;
         case skybox::Type::Cube:
             previous_equirectangular = nullptr;
-            GXUNIMPLEMENTED
+            if (previous_cube == nullptr) {
+                previous_cube = skybox_cube.get_next([this] {
+                    auto* const n = new node::SkyboxCube(e, GX_DEFAULT_IGNORED_END_CALLER);
+                    n->set_render_target(e->get_main_render_target().get());
+                    return n;
+                });
+                camera_nodes.skyboxes[sky->get_layer()].push_back(previous_cube);
+            }
+            previous_cube->update();
+            previous_cube->set_camera(cam);
+            previous_cube->add_sky(reinterpret_cast<const skybox::Cube*>(sky));
+            break;
         default:
             GXUNEXPECTED
         }

@@ -95,7 +95,7 @@ public:
 private:
     bool in_weak_hardware = true;
     core::OneLoopPool<node::ForwardPbr> forward_pbr;
-    //    core::OneLoopPool<node::SkyCube> skybox_cube;
+    core::OneLoopPool<node::SkyboxCube> skybox_cube;
     core::OneLoopPool<node::SkyboxEquirectangular> skybox_equirectangular;
     core::OneLoopPool<node::Unlit> unlit;
     std::map<double, std::map<const scene::Scene*, SceneData>> nodes;

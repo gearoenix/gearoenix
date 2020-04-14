@@ -5,6 +5,7 @@
 #include "glc3-pip-irradiance-convoluter.hpp"
 #include "glc3-pip-radiance-convoluter.hpp"
 #include "glc3-pip-shadow-mapper.hpp"
+#include "glc3-pip-skybox-cube.hpp"
 #include "glc3-pip-skybox-equirectangular.hpp"
 #include "glc3-pip-unlit.hpp"
 
@@ -29,6 +30,8 @@ std::shared_ptr<gearoenix::render::pipeline::Pipeline> gearoenix::glc3::pipeline
                 return ShadowMapper::construct(eng, call);
             case render::pipeline::Type::Unlit:
                 return Unlit::construct(eng, call);
+            case render::pipeline::Type::SkyboxCube:
+                return SkyboxCube::construct(eng, call);
             case render::pipeline::Type::SkyboxEquirectangular:
                 return SkyboxEquirectangular::construct(eng, call);
             case render::pipeline::Type::IrradianceConvoluter:

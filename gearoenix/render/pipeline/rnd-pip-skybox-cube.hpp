@@ -2,15 +2,15 @@
 #define GEAROENIX_RENDER_PIPELINE_SKY_CUBE_HPP
 #include "rnd-pip-pipeline.hpp"
 namespace gearoenix::render::pipeline {
-class SkyCube : public Pipeline {
+class SkyboxCube : public Pipeline {
 protected:
-    SkyCube(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
-        : Pipeline(Type::SkyCube, e, call)
+    SkyboxCube(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
+        : Pipeline(Type::SkyboxCube, e, call)
     {
     }
 
 public:
-    ~SkyCube() noexcept override = default;
+    ~SkyboxCube() noexcept override = default;
 };
 }
 #endif

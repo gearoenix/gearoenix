@@ -75,6 +75,10 @@ std::shared_ptr<gearoenix::gles2::texture::Texture2D> gearoenix::gles2::texture:
             }
             break;
         }
+        case render::texture::TextureFormat::RgbUint8: {
+            pixels = std::move(data);
+            break;
+        }
         case render::texture::TextureFormat::RgbaUint8: {
             pixels = std::move(data);
             break;
@@ -142,6 +146,7 @@ gearoenix::gl::uint gearoenix::gles2::texture::Texture2D::convert(gearoenix::ren
         return GL_RGBA;
     case render::texture::TextureFormat::RgbFloat32:
     case render::texture::TextureFormat::RgFloat32:
+    case render::texture::TextureFormat::RgbUint8:
         return GL_RGB;
     case render::texture::TextureFormat::RgbaUint8:
         return GL_RGBA;

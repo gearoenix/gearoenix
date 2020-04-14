@@ -4,6 +4,7 @@
 #include "gles2-pip-forward-pbr.hpp"
 #include "gles2-pip-irradiance-convoluter.hpp"
 #include "gles2-pip-shadow-mapper.hpp"
+#include "gles2-pip-skybox-cube.hpp"
 #include "gles2-pip-skybox-equirectangular.hpp"
 #include "gles2-pip-unlit.hpp"
 
@@ -27,10 +28,12 @@ std::shared_ptr<gearoenix::render::pipeline::Pipeline> gearoenix::gles2::pipelin
                 return IrradianceConvoluter::construct(eng, c);
             case render::pipeline::Type::ShadowMapper:
                 return ShadowMapper::construct(eng, c);
-            case render::pipeline::Type::Unlit:
-                return Unlit::construct(eng, c);
+            case render::pipeline::Type::SkyboxCube:
+                return SkyboxCube::construct(eng, c);
             case render::pipeline::Type::SkyboxEquirectangular:
                 return SkyboxEquirectangular::construct(eng, c);
+            case render::pipeline::Type::Unlit:
+                return Unlit::construct(eng, c);
             default:
                 GXLOGF("Unexpected pipeline type: " << static_cast<unsigned int>(pipeline_type_id))
             }
