@@ -35,14 +35,14 @@ gearoenix::render::reflection::Runtime::Runtime(
     constexpr texture::TextureInfo texture_info {
         .format = texture::TextureFormat::RgbaFloat32,
         .sample_info = texture::SampleInfo {
-            .min_filter = texture::Filter::Linear,
+            .min_filter = texture::Filter::LinearMipmapLinear,
             .mag_filter = texture::Filter::Linear,
             .wrap_s = texture::Wrap::ClampToEdge,
             .wrap_t = texture::Wrap::ClampToEdge,
             .wrap_r = texture::Wrap::ClampToEdge,
         },
         .texture_type = texture::Type::TextureCube,
-        .has_mipmap = false,
+        .has_mipmap = true,
     };
     auto* const sys_app = e->get_system_application();
     auto* const ast_mgr = sys_app->get_asset_manager();
@@ -65,16 +65,11 @@ gearoenix::render::reflection::Runtime::Runtime(
 #endif
     core::sync::EndCaller<texture::TextureCube> txt_cube_call([call](const std::shared_ptr<texture::TextureCube>&) {});
     core::sync::EndCaller<mesh::Mesh> msh_call([call](const std::shared_ptr<mesh::Mesh>&) {});
-    auto environment_texture_info = texture_info;
-    environment_texture_info.has_mipmap = true;
-    environment = txt_mgr->create_cube(environment_texture_info, environment_resolution, txt_cube_call);
+    environment = txt_mgr->create_cube(texture_info, environment_resolution, txt_cube_call);
     environment_mipmap_generator = std::make_shared<graph::node::MipmapGenerator>(environment.get(), e, call);
     irradiance = txt_mgr->create_cube(texture_info, irradiance_resolution, txt_cube_call);
     irradiance_mipmap_generator = std::make_shared<graph::node::MipmapGenerator>(irradiance.get(), e, call);
-    auto radiance_txt_info = texture_info;
-    radiance_txt_info.sample_info.min_filter = texture::Filter::LinearMipmapLinear;
-    radiance_txt_info.has_mipmap = true;
-    radiance = txt_mgr->create_cube(radiance_txt_info, radiance_resolution, txt_cube_call);
+    radiance = txt_mgr->create_cube(texture_info, radiance_resolution, txt_cube_call);
     std::vector<texture::AttachmentInfo> target_infos = { texture::AttachmentInfo {
         .texture_info = texture_info,
         .usage = texture::UsageFlag::Color,

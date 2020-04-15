@@ -11,7 +11,7 @@ struct Configuration {
     GX_GETSET_VAL_PRV(std::uint16_t, runtime_reflection_environment_resolution, GX_DEFAULT_RUNTIME_REFLECTION_ENVIRONMENT_RESOLUTION)
     GX_GETSET_VAL_PRV(std::uint16_t, runtime_reflection_irradiance_resolution, GX_DEFAULT_RUNTIME_REFLECTION_IRRADIANCE_RESOLUTION)
     GX_GET_VAL_PRV(std::uint16_t, runtime_reflection_radiance_resolution, GX_DEFAULT_RUNTIME_REFLECTION_RADIANCE_RESOLUTION)
-    GX_GET_VAL_PRV(std::uint16_t, runtime_reflection_radiance_levels, 0)
+    GX_GET_VAL_PRV(std::uint16_t, runtime_reflection_radiance_levels, 1)
     GX_GETSET_VAL_PRV(std::uint16_t, brdflut_resolution, GX_DEFAULT_BRDFLUT_RESOLUTION)
 
     constexpr Configuration() noexcept
