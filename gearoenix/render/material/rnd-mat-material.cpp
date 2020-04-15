@@ -1,9 +1,9 @@
 #include "rnd-mat-material.hpp"
 #include "../../core/asset/cr-asset-manager.hpp"
-#include "../../system/stream/sys-stm-stream.hpp"
 #include "../../system/sys-app.hpp"
 #include "../buffer/rnd-buf-framed-uniform.hpp"
 #include "../texture/rnd-txt-manager.hpp"
+#include "../texture/rnd-txt-texture-2d.hpp"
 #include "rnd-mat-pbr.hpp"
 #include "rnd-mat-unlit.hpp"
 
@@ -24,7 +24,7 @@ float gearoenix::render::material::Material::read_alpha(system::stream::Stream* 
 }
 
 std::pair<std::shared_ptr<gearoenix::render::texture::Texture2D>, std::optional<gearoenix::math::Vec4<float>>>
-gearoenix::render::material::Material::read_color(
+gearoenix::render::material::Material::read_t2d_v4(
     system::stream::Stream* const f,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) const noexcept
 {
@@ -41,7 +41,7 @@ gearoenix::render::material::Material::read_color(
 }
 
 std::pair<std::shared_ptr<gearoenix::render::texture::Texture2D>, std::optional<gearoenix::math::Vec3<float>>>
-gearoenix::render::material::Material::read_emission(
+gearoenix::render::material::Material::read_t2d_v3(
     system::stream::Stream* const f,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) const noexcept
 {
@@ -52,6 +52,23 @@ gearoenix::render::material::Material::read_emission(
     } else {
         core::sync::EndCaller<texture::Texture2D> txt_call([end](const std::shared_ptr<texture::Texture2D>&) {});
         math::Vec3<float> color;
+        color.read(f);
+        return std::make_pair(std::dynamic_pointer_cast<texture::Texture2D>(txt_mgr->get_2d(color, txt_call)), color);
+    }
+}
+
+std::pair<std::shared_ptr<gearoenix::render::texture::Texture2D>, std::optional<gearoenix::math::Vec2<float>>>
+gearoenix::render::material::Material::read_t2d_v2(
+    system::stream::Stream* const f,
+    const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) const noexcept
+{
+    auto* const txt_mgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
+    if (f->read_bool()) {
+        core::sync::EndCaller<texture::Texture> txt_call([end](const std::shared_ptr<texture::Texture>&) {});
+        return std::make_pair(std::dynamic_pointer_cast<texture::Texture2D>(txt_mgr->get_gx3d(f->read<core::Id>(), txt_call)), std::nullopt);
+    } else {
+        core::sync::EndCaller<texture::Texture2D> txt_call([end](const std::shared_ptr<texture::Texture2D>&) {});
+        math::Vec2<float> color;
         color.read(f);
         return std::make_pair(std::dynamic_pointer_cast<texture::Texture2D>(txt_mgr->get_2d(color, txt_call)), color);
     }
@@ -73,36 +90,4 @@ gearoenix::render::material::Material* gearoenix::render::material::Material::re
     default:
         GXUNEXPECTED
     }
-}
-
-std::pair<std::shared_ptr<texture::Texture2D>, std::optional<math::Vec3<float>>>
-gearoenix::render::material::Material::read_emission(gearoenix::system::stream::Stream* f,
-    const gearoenix::core::sync::EndCaller<gearoenix::core::sync::EndCallerIgnore>& end) const noexcept
-{
-    return std::pair<std::shared_ptr<texture::Texture2D>, std::optional<math::Vec3<float>>>();
-}
-
-std::pair<std::shared_ptr<texture::Texture2D>, std::optional<math::Vec3<float>>>
-gearoenix::render::material::Material::read_emission(gearoenix::system::stream::Stream* f,
-    const gearoenix::core::sync::EndCaller<gearoenix::core::sync::EndCallerIgnore>& end) const noexcept
-{
-    return std::pair<std::shared_ptr<texture::Texture2D>, std::optional<math::Vec3<float>>>();
-}
-
-std::pair<std::shared_ptr<texture::Texture2D>, std::optional<math::Vec4<float>>>
-gearoenix::render::material::Material::read_color(gearoenix::system::stream::Stream* f) const noexcept
-{
-    return std::pair<std::shared_ptr<texture::Texture2D>, std::optional<math::Vec4<float>>>();
-}
-
-std::pair<std::shared_ptr<texture::Texture2D>, std::optional<math::Vec4<float>>>
-gearoenix::render::material::Material::read_color(gearoenix::system::stream::Stream* f) const noexcept
-{
-    return std::pair<std::shared_ptr<texture::Texture2D>, std::optional<math::Vec4<float>>>();
-}
-
-std::pair<std::shared_ptr<texture::Texture2D>, std::optional<math::Vec4<float>>>
-gearoenix::render::material::Material::read_color(gearoenix::system::stream::Stream* f) const noexcept
-{
-    return std::pair<std::shared_ptr<texture::Texture2D>, std::optional<math::Vec4<float>>>();
 }

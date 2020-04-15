@@ -184,10 +184,10 @@ struct Vec4 {
 
     void read(system::stream::Stream* f) noexcept
     {
-        f->read(x);
-        f->read(y);
-        f->read(z);
-        f->read(w);
+        x = static_cast<Element>(f->read<float>());
+        y = static_cast<Element>(f->read<float>());
+        z = static_cast<Element>(f->read<float>());
+        w = static_cast<Element>(f->read<float>());
     }
 
     [[nodiscard]] const Element* data() const noexcept

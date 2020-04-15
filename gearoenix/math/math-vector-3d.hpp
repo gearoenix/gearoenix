@@ -329,9 +329,9 @@ struct Vec3 {
 
     void read(system::stream::Stream* f) noexcept
     {
-        f->read(x);
-        f->read(y);
-        f->read(z);
+        x = static_cast<Element>(f->read<float>());
+        y = static_cast<Element>(f->read<float>());
+        z = static_cast<Element>(f->read<float>());
     }
 
     friend std::ostream& operator<<(std::ostream& os, const Vec3<Element>& v) noexcept

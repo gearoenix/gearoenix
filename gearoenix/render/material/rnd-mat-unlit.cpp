@@ -19,24 +19,8 @@ gearoenix::render::material::Unlit::Unlit(system::stream::Stream* const f, engin
     : Material(Type::Unlit, e, sizeof(Uniform))
 {
     auto* const txt_mgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
-    // Reading alpha
-    if (f->read_bool()) {
-        uniform.alpha = 1.0f;
-    } else {
-        f->read(uniform.alpha);
-    }
-    // Reading color
-    if (f->read_bool()) {
-        core::sync::EndCaller<texture::Texture> txt_call([end](const std::shared_ptr<texture::Texture>&) {});
-        color_texture = std::dynamic_pointer_cast<texture::Texture2D>(txt_mgr->get_gx3d(f->read<core::Id>(), txt_call));
-    } else {
-        core::sync::EndCaller<texture::Texture2D> txt_call([end](const std::shared_ptr<texture::Texture2D>&) {});
-        math::Vec4<float> color;
-        color.read(f);
-        color_texture = std::dynamic_pointer_cast<texture::Texture2D>(txt_mgr->get_2d(color, txt_call));
-        color_value = color;
-    }
-    // Translucency
+    uniform.alpha = read_alpha(f);
+    std::tie(color_texture, color_value) = read_t2d_v4(f, end);
     if (f->read_bool())
         translucency = TranslucencyMode::Transparent;
     is_shadow_caster = f->read_bool();

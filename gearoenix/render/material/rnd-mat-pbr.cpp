@@ -28,21 +28,13 @@ gearoenix::render::material::Pbr::Pbr(system::stream::Stream* const f, engine::E
 {
     auto* const txt_mgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
     uniform.alpha = read_alpha(f);
-    // Reading color
-    std::tie(color_texture, color_value) = read_color(f, end);
-    std::tie(emission_texture, emission_value) = read_emission(f, end);
-    std::tie();
-    // Reading metallic_roughness
-    if (f->read_bool()) {
-        core::sync::EndCaller<texture::Texture> txt_call([end](const std::shared_ptr<texture::Texture>&) {});
-        metallic_roughness_texture = std::dynamic_pointer_cast<texture::Texture2D>(txt_mgr->get_gx3d(f->read<core::Id>(), txt_call));
-    } else {
-        core::sync::EndCaller<texture::Texture2D> txt_call([end](const std::shared_ptr<texture::Texture2D>&) {});
-        math::Vec2<float> metallic_roughness;
-        metallic_roughness.read(f);
-        metallic_roughness_texture = std::dynamic_pointer_cast<texture::Texture2D>(txt_mgr->get_2d(metallic_roughness, txt_call));
-        metallic_roughness_value = metallic_roughness;
-    }
+    std::tie(color_texture, color_value) = read_t2d_v4(f, end);
+    if (f->read_bool())
+        translucency = TranslucencyMode::Transparent;
+    is_shadow_caster = f->read_bool();
+    f->read(uniform.alpha_cutoff);
+    std::tie(emission_texture, emission_value) = read_t2d_v3(f, end);
+    std::tie(metallic_roughness_texture, metallic_roughness_value) = read_t2d_v2(f, end);
     // Reading normal
     if (f->read_bool()) {
         core::sync::EndCaller<texture::Texture> txt_call([end](const std::shared_ptr<texture::Texture>&) {});
@@ -52,11 +44,8 @@ gearoenix::render::material::Pbr::Pbr(system::stream::Stream* const f, engine::E
         normal_value = math::Vec3(0.5f, 0.5f, 1.0f);
         normal_texture = std::dynamic_pointer_cast<texture::Texture2D>(txt_mgr->get_2d(normal_value.value(), txt_call));
     }
-    // Translucency
-    if (f->read_bool())
-        translucency = TranslucencyMode::Transparent;
-    is_shadow_caster = f->read_bool();
-    f->read(uniform.alpha_cutoff);
+    core::sync::EndCaller<texture::TextureCube> call_txt_cube([end](const std::shared_ptr<texture::TextureCube>&) {});
+    irradiance = radiance = txt_mgr->get_cube_zero_3c(call_txt_cube).get();
 }
 
 gearoenix::render::material::Pbr::~Pbr() noexcept = default;
@@ -80,10 +69,10 @@ void gearoenix::render::material::Pbr::set_color(
     const std::uint32_t code, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept
 {
     set_color(math::Vec4(
-                  float(code >> 24) / 255.0f,
-                  float((code >> 16) & 255) / 255.0f,
-                  float((code >> 8) & 255) / 255.0f,
-                  float(code & 255) / 255.0f),
+                  float(code >> 24U) / 255.0f,
+                  float((code >> 16U) & 255U) / 255.0f,
+                  float((code >> 8U) & 255U) / 255.0f,
+                  float(code & 255U) / 255.0f),
         end);
 }
 

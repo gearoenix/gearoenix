@@ -38,11 +38,11 @@ protected:
     Material(Type t, engine::Engine* e, std::size_t uniform_size) noexcept;
 
     [[nodiscard]] static float read_alpha(system::stream::Stream* f) noexcept;
-    [[nodiscard]] std::pair<std::shared_ptr<texture::Texture2D>, std::optional<math::Vec4<float>>> read_color(
+    [[nodiscard]] std::pair<std::shared_ptr<texture::Texture2D>, std::optional<math::Vec4<float>>> read_t2d_v4(
         system::stream::Stream* f, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) const noexcept;
-    [[nodiscard]] std::pair<std::shared_ptr<texture::Texture2D>, std::optional<math::Vec3<float>>> read_emission(
+    [[nodiscard]] std::pair<std::shared_ptr<texture::Texture2D>, std::optional<math::Vec3<float>>> read_t2d_v3(
         system::stream::Stream* f, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) const noexcept;
-    [[nodiscard]] std::pair<std::shared_ptr<texture::Texture2D>, std::optional<math::Vec2<float>>> read_metallic_roughness(
+    [[nodiscard]] std::pair<std::shared_ptr<texture::Texture2D>, std::optional<math::Vec2<float>>> read_t2d_v2(
         system::stream::Stream* f, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) const noexcept;
 
 public:

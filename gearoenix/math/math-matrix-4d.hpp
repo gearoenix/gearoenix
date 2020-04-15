@@ -279,7 +279,7 @@ struct Mat4x4 {
     {
         for (auto& r : data)
             for (auto& c : r)
-                f->read(c);
+                c = static_cast<Element>(f->read<float>());
     }
 
     [[nodiscard]] constexpr Element determinant() const noexcept

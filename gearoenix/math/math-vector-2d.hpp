@@ -243,8 +243,8 @@ struct Vec2 {
 
     void read(system::stream::Stream* const f) noexcept
     {
-        f->read(x);
-        f->read(y);
+        x = static_cast<Element>(f->read<float>());
+        y = static_cast<Element>(f->read<float>());
     }
 
     [[nodiscard]] static constexpr std::optional<Vec2<Element>> intersect(
