@@ -27,35 +27,11 @@ gearoenix::render::material::Pbr::Pbr(system::stream::Stream* const f, engine::E
     : Material(Type::Pbr, e, sizeof(Uniform))
 {
     auto* const txt_mgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
-
-    // Reading alpha
-    if (f->read_bool()) {
-        uniform.alpha = 1.0f;
-    } else {
-        f->read(uniform.alpha);
-    }
+    uniform.alpha = read_alpha(f);
     // Reading color
-    if (f->read_bool()) {
-        core::sync::EndCaller<texture::Texture> txt_call([end](const std::shared_ptr<texture::Texture>&) {});
-        color_texture = std::dynamic_pointer_cast<texture::Texture2D>(txt_mgr->get_gx3d(f->read<core::Id>(), txt_call));
-    } else {
-        core::sync::EndCaller<texture::Texture2D> txt_call([end](const std::shared_ptr<texture::Texture2D>&) {});
-        math::Vec4<float> color;
-        color.read(f);
-        color_texture = std::dynamic_pointer_cast<texture::Texture2D>(txt_mgr->get_2d(color, txt_call));
-        color_value = color;
-    }
-    // Reading emission
-    if (f->read_bool()) {
-        core::sync::EndCaller<texture::Texture> txt_call([end](const std::shared_ptr<texture::Texture>&) {});
-        emission_texture = std::dynamic_pointer_cast<texture::Texture2D>(txt_mgr->get_gx3d(f->read<core::Id>(), txt_call));
-    } else {
-        core::sync::EndCaller<texture::Texture2D> txt_call([end](const std::shared_ptr<texture::Texture2D>&) {});
-        math::Vec3<float> emission;
-        emission.read(f);
-        emission_texture = std::dynamic_pointer_cast<texture::Texture2D>(txt_mgr->get_2d(emission, txt_call));
-        emission_value = emission;
-    }
+    std::tie(color_texture, color_value) = read_color(f, end);
+    std::tie(emission_texture, emission_value) = read_emission(f, end);
+    std::tie();
     // Reading metallic_roughness
     if (f->read_bool()) {
         core::sync::EndCaller<texture::Texture> txt_call([end](const std::shared_ptr<texture::Texture>&) {});
