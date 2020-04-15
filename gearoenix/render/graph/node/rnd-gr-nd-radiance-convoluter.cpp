@@ -18,14 +18,16 @@
 #include "../../texture/rnd-txt-target.hpp"
 #include "../../texture/rnd-txt-texture-cube.hpp"
 
-gearoenix::render::graph::node::RadianceConvoluterUniform::RadianceConvoluterUniform(float r) noexcept
+gearoenix::render::graph::node::RadianceConvoluterUniform::RadianceConvoluterUniform(const float r, const float resolution) noexcept
     : roughness(r)
     , roughness_p_4(r * r * r * r)
+    , sa_texel(GX_PI * 4.0f / (6.0f * resolution * resolution))
 {
 }
 
 gearoenix::render::graph::node::RadianceConvoluterKernel::RadianceConvoluterKernel(
     const float roughness,
+    const float resolution,
     engine::Engine* const e,
     pipeline::Pipeline* const pip,
     const unsigned int kernel_index) noexcept
@@ -33,7 +35,7 @@ gearoenix::render::graph::node::RadianceConvoluterKernel::RadianceConvoluterKern
     , r(dynamic_cast<pipeline::RadianceConvoluterResourceSet*>(pip->create_resource_set()))
     , u(e->get_buffer_manager()->create_uniform(sizeof(RadianceConvoluterUniform)))
 {
-    RadianceConvoluterUniform ud(roughness);
+    RadianceConvoluterUniform ud(roughness, resolution);
     u->set_data(ud);
     r->set_node_uniform_buffer(u.get());
 }
@@ -42,12 +44,13 @@ gearoenix::render::graph::node::RadianceConvoluterKernel::~RadianceConvoluterKer
 
 gearoenix::render::graph::node::RadianceConvoluterFrame::RadianceConvoluterFrame(
     const float roughness,
+    const float resolution,
     engine::Engine* const e,
     pipeline::Pipeline* const pip) noexcept
     : kernels(e->get_kernels()->get_threads_count())
 {
     for (std::size_t i = 0; i < kernels.size(); ++i) {
-        kernels[i] = std::make_unique<RadianceConvoluterKernel>(roughness, e, pip, static_cast<unsigned int>(i));
+        kernels[i] = std::make_unique<RadianceConvoluterKernel>(roughness, resolution, e, pip, static_cast<unsigned int>(i));
     }
 }
 
@@ -63,6 +66,7 @@ void gearoenix::render::graph::node::RadianceConvoluter::record(RadianceConvolut
 
 gearoenix::render::graph::node::RadianceConvoluter::RadianceConvoluter(
     const float roughness,
+    const float resolution,
     const mesh::Mesh* const msh,
     const texture::TextureCube* const environment,
     engine::Engine* const e,
@@ -84,7 +88,7 @@ gearoenix::render::graph::node::RadianceConvoluter::RadianceConvoluter(
 {
     set_providers_count(input_textures.size());
     for (auto& f : frames) {
-        f = std::make_unique<RadianceConvoluterFrame>(roughness, e, render_pipeline.get());
+        f = std::make_unique<RadianceConvoluterFrame>(roughness, resolution, e, render_pipeline.get());
     }
 }
 

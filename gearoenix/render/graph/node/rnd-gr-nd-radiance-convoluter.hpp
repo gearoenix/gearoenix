@@ -32,21 +32,22 @@ namespace gearoenix::render::graph::node {
 struct RadianceConvoluterUniform {
     float roughness = 0.001f;
     float roughness_p_4 = 0.000000000001f;
+    float sa_texel = (4.0f * GX_PI) / (6.0 * GX_DEFAULT_RUNTIME_REFLECTION_RADIANCE_RESOLUTION * GX_DEFAULT_RUNTIME_REFLECTION_RADIANCE_RESOLUTION);
 
-    explicit RadianceConvoluterUniform(float r) noexcept;
+    RadianceConvoluterUniform(float r, float resolution) noexcept;
 };
 
 struct RadianceConvoluterKernel {
     const std::unique_ptr<command::Buffer> secondary_cmd;
     const std::unique_ptr<pipeline::RadianceConvoluterResourceSet> r;
     const std::unique_ptr<buffer::Uniform> u;
-    RadianceConvoluterKernel(float roughness, engine::Engine* e, pipeline::Pipeline* pip, unsigned int kernel_index) noexcept;
+    RadianceConvoluterKernel(float roughness, float resolution, engine::Engine* e, pipeline::Pipeline* pip, unsigned int kernel_index) noexcept;
     ~RadianceConvoluterKernel() noexcept;
 };
 
 struct RadianceConvoluterFrame {
     std::vector<std::unique_ptr<RadianceConvoluterKernel>> kernels;
-    RadianceConvoluterFrame(float roughness, engine::Engine* e, pipeline::Pipeline* pip) noexcept;
+    RadianceConvoluterFrame(float roughness, float resolution, engine::Engine* e, pipeline::Pipeline* pip) noexcept;
     ~RadianceConvoluterFrame() noexcept;
 };
 
@@ -62,6 +63,7 @@ private:
 public:
     RadianceConvoluter(
         float roughness,
+        float resolution,
         const mesh::Mesh* msh,
         const texture::TextureCube* environment,
         engine::Engine* e,

@@ -24,6 +24,7 @@ gearoenix::glc3::shader::RadianceConvoluter::RadianceConvoluter(engine::Engine* 
         "uniform samplerCube environment;\n"
         "uniform float roughness;\n"
         "uniform float roughness_p_4;\n"
+        "uniform float sa_texel;\n"
         // TODO lots of performance improvement lies in here
         "float DistributionGGX(vec3 N, vec3 H) {\n"
         "    float NdotH = max(dot(N, H), 0.0);\n"
@@ -75,10 +76,8 @@ gearoenix::glc3::shader::RadianceConvoluter::RadianceConvoluter(engine::Engine* 
         "            float NdotH = max(dot(N, H), 0.0);\n"
         "            float HdotV = max(dot(H, V), 0.0);\n"
         "            float pdf = D * NdotH / (4.0 * HdotV) + 0.0001; \n"
-        "            float resolution = 512.0; // resolution of source cubemap (per face)\n"
-        "            float saTexel  = 4.0 * GX_PI / (6.0 * resolution * resolution);\n"
         "            float saSample = 1.0 / (float(SAMPLE_COUNT) * pdf + 0.0001);\n"
-        "            float mipLevel = roughness == 0.0 ? 0.0 : 0.5 * log2(saSample / saTexel); \n"
+        "            float mipLevel = roughness == 0.0 ? 0.0 : 0.5 * log2(saSample / sa_texel); \n"
         "            prefilteredColor += textureLod(environment, L, mipLevel).rgb * NdotL;\n"
         "            totalWeight      += NdotL;\n"
         "        }\n"
@@ -95,8 +94,8 @@ gearoenix::glc3::shader::RadianceConvoluter::RadianceConvoluter(engine::Engine* 
         link();
         GX_GLC3_SHADER_SET_TEXTURE_INDEX_STARTING
         GX_GLC3_THIS_GET_UNIFORM(roughness)
-        //        GX_GLC3_THIS_GET_UNIFORM(roughness_p_2)
         GX_GLC3_THIS_GET_UNIFORM(roughness_p_4)
+        GX_GLC3_THIS_GET_UNIFORM(sa_texel)
         GX_GLC3_THIS_GET_UNIFORM_TEXTURE(environment)
     });
 }

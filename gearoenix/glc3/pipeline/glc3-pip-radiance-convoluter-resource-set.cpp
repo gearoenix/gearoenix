@@ -31,6 +31,7 @@ void gearoenix::glc3::pipeline::RadianceConvoluterResourceSet::bind_final(gl::ui
     const auto* const node = node_uniform_buffer->get_ptr<render::graph::node::RadianceConvoluterUniform>();
     GX_GLC3_PIP_RES_SET_UNIFORM(roughness, node->roughness)
     GX_GLC3_PIP_RES_SET_UNIFORM(roughness_p_4, node->roughness_p_4)
+    GX_GLC3_PIP_RES_SET_UNIFORM(sa_texel, node->sa_texel)
     GX_GLC3_PIP_RES_END_DRAWING_MESH
 #ifdef GX_DEBUG_GL_CLASS_3
     gl::Loader::check_for_error();

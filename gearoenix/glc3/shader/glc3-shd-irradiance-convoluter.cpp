@@ -25,7 +25,7 @@ gearoenix::glc3::shader::IrradianceConvoluter::IrradianceConvoluter(engine::Engi
         "uniform samplerCube environment;\n"
         "void main()\n"
         "{\n"
-        "    vec3 nrm = normalize(out_pos);\n" // TODO move this up right thing in to vertex shader (if it was possible)
+        "    vec3 nrm = normalize(out_pos);\n"
         "    vec3 irradiance = vec3(0.0);\n"
         "    vec3 up = vec3(0.0, 1.0, 0.0);\n"
         "    vec3 right = normalize(cross(up, nrm));\n"

@@ -122,7 +122,8 @@ gearoenix::render::reflection::Runtime::Runtime(
             radiance_target = e->create_render_target(core::asset::Manager::create_id(), target_infos, call);
             auto& radiance_convoluter = radiance_face_convoluters[mi];
             radiance_convoluter = std::make_unique<graph::node::RadianceConvoluter>(
-                static_cast<float>(roughnesses[mi]), face_mesh.get(), environment.get(), e, call);
+                static_cast<float>(roughnesses[mi]), static_cast<float>(environment_resolution),
+                face_mesh.get(), environment.get(), e, call);
             radiance_convoluter->set_render_target(radiance_target.get());
         }
     }

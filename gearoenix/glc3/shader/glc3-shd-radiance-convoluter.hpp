@@ -16,6 +16,7 @@ namespace gearoenix::glc3::shader {
 class RadianceConvoluter final : public Shader {
     GX_GLC3_UNIFORM_FLOAT(roughness, 1)
     GX_GLC3_UNIFORM_FLOAT(roughness_p_4, 1)
+    GX_GLC3_UNIFORM_FLOAT(sa_texel, 1)
     GX_GLC3_UNIFORM_TEXTURE(environment)
 public:
     RadianceConvoluter(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
