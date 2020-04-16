@@ -46,8 +46,8 @@ public:
     GX_GET_ARRC_PRV(std::vector<std::shared_ptr<texture::Target>>, radiance_targets, 6)
     GX_GET_ARRC_PRV(std::shared_ptr<graph::node::IrradianceConvoluter>, irradiance_convoluters, 6)
     GX_GET_ARRC_PRV(std::vector<std::shared_ptr<graph::node::RadianceConvoluter>>, radiance_convoluters, 6)
-    GX_GET_ARRC_PRV(std::shared_ptr<mesh::Mesh>, face_meshes, 6)
-    GX_GET_VAL_PRV(double, receiving_radius, 20.0)
+    GX_GET_ARRC_PRV(std::shared_ptr<mesh::Mesh>, face_meshes, 6) // todo: remove this
+    GX_GET_VAL_PRV(double, receiving_radius, std::numeric_limits<double>::max() / 2.0)
     GX_GET_VAL_PRV(State, state, State::Uninitialized)
     GX_GET_VAL_PRV(std::size_t, state_environment_face, 0)
     GX_GET_VAL_PRV(std::size_t, state_irradiance_face, 0)

@@ -19,6 +19,7 @@
 #include "../model/rnd-mdl-manager.hpp"
 #include "../model/rnd-mdl-model.hpp"
 #include "../pipeline/rnd-pip-manager.hpp"
+#include "../reflection/rnd-rfl-baked.hpp"
 #include "../reflection/rnd-rfl-manager.hpp"
 #include "../reflection/rnd-rfl-runtime.hpp"
 #include "../shader/rnd-shd-shader.hpp"
@@ -127,7 +128,16 @@ void gearoenix::render::scene::Scene::scene_add_light(const std::shared_ptr<ligh
 }
 
 GX_SCENE_ADD_HELPER(constraint, physics::constraint::Constraint)
-GX_SCENE_ADD_HELPER(skybox, skybox::Skybox)
+
+void gearoenix::render::scene::Scene::scene_add_skybox(const std::shared_ptr<skybox::Skybox>& o) noexcept
+{
+    const auto id = o->get_asset_id();
+    if (nullptr != o->get_baked_reflection()) {
+        set_default_reflection_probe(o->get_baked_reflection());
+    }
+    GX_CHECK_HELPER(skybox)
+    skyboxs[id] = o;
+}
 
 void gearoenix::render::scene::Scene::scene_add_reflection(const std::shared_ptr<reflection::Reflection>& o) noexcept
 {
@@ -158,14 +168,19 @@ void gearoenix::render::scene::Scene::scene_add_model(const std::shared_ptr<mode
                 /// on the other hand bvh tree for reflection is superfluous
                 /// in addition to that the nature of dynamic reflections are like camera,
                 /// they're the queriers not the queree.
+                bool colliding_reflection_not_found = true;
                 for (const auto& id_reflection : reflections) {
                     const auto& reflect = id_reflection.second;
                     if (reflect->get_is_hooked()) {
                         if (math::IntersectionStatus::In == reflect->get_collider()->check_intersection_status(mdl->get_collider()->get_updated_box())) {
                             mdl->set_colliding_reflection(reflect.get());
+                            colliding_reflection_not_found = false;
                             break;
                         }
                     }
+                }
+                if (colliding_reflection_not_found && nullptr != default_reflection_probe) {
+                    mdl->set_colliding_reflection(default_reflection_probe.get());
                 }
             }
         }
@@ -266,4 +281,15 @@ void gearoenix::render::scene::Scene::remove_shadow_cascader(const core::Id ligh
         return;
     lights[search->first] = std::move(search->second);
     shadow_cascader_lights.erase(search);
+}
+
+void gearoenix::render::scene::Scene::set_default_reflection_probe(std::shared_ptr<reflection::Baked> rfl) noexcept
+{
+    for (const auto& id_mdl : models) {
+        auto* const mdl = id_mdl.second.get();
+        if (!mdl->get_dynamicity() && nullptr == mdl->get_colliding_reflection() && nullptr == mdl->get_hooked_reflection()) {
+            mdl->set_colliding_reflection(rfl.get());
+        }
+    }
+    default_reflection_probe = std::move(rfl);
 }

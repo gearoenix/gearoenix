@@ -1,13 +1,13 @@
 # Gearoenix Game Engine
 
-Yet another cross-platform C++ 3D game engine.
+A cross-platform C++ 3D game engine.
 
 [![codecov](https://codecov.io/gh/Hossein-Noroozpour/gearoenix/branch/master/graph/badge.svg)](https://codecov.io/gh/Hossein-Noroozpour/gearoenix)
 [![CircleCI](https://circleci.com/gh/Hossein-Noroozpour/gearoenix.svg?style=svg)](https://circleci.com/gh/Hossein-Noroozpour/gearoenix)
 
 ## Status
 
-This is in migration (0.1 -> 0.2), in case you used it, be patient about bugs and leaks and API changes, soon
+Finalizing 0.2 APIs, in case you used it, be patient about API changes, soon
 it's going to be stabilized.
 
 ## Features
@@ -34,19 +34,21 @@ it's going to be stabilized.
   - 3D texture (WIP, it has been implemented in blender part, but it is not developed in
     engine yet)
   - Cube texture
-- Painlessly cross-platform and very fast mathematic structures.
+- Painlessly cross-platform and very fast mathematics structures.
 - Lighting
 - Shadowing
-- Skyboxing
+- Skyboxing (Cube and Equirectangular)
 - Fast font displaying mechanism.
 - Different type of cameras: Perspective, Orthographic
 - Graphic pipeline management to cache and reduce number of switches and
   increasing performance.
 - Multithreaded occlusion culling.
-- Multithreaded mathematic works for increasing performance.
+- Multithreaded mathematics works for increasing performance.
 - PBR Material.
 - Ability to create customized and or special materials/effects with special behaviors.
-- Adaptive cascaded shadow mapping (WIP)
+- Automatically Adaptive cascaded shadow mapping based on the scene and camera properties.
+- Runtime reflection probe with smooth rendering which divides rendering process between frames.
+- A GUI and CLI tool for baking HDRI to environment, irradiance and radiance cube-maps.
 
 ## Demos
 
@@ -100,11 +102,13 @@ In this section I need contribution.
 
 ## Contribution
 
+- Donating to this project.
+- Promotion of this project.
+- Documentation.
 - Test coverage is not very well and I don't have time for it,
   if you want to contribute in it this is the best place you can start.
+- Documentation.
 - 3D content development.
-- Promotion of this project.
-- Donating to this project.
 
 ## License
 

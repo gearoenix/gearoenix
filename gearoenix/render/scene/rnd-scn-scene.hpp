@@ -72,6 +72,7 @@ class Model;
 }
 
 namespace gearoenix::render::reflection {
+class Baked;
 class Reflection;
 class Runtime;
 }
@@ -111,9 +112,9 @@ public:
     GX_GET_CREF_PRT(MapShadowCascaderLight, shadow_cascader_lights)
     GX_GET_CREF_PRT(MapModel, models)
     GX_GET_CREF_PRT(MapSkybox, skyboxs)
-    /// Keep its number low (performance issue)
     GX_GET_CREF_PRT(MapReflection, reflections)
     GX_GET_CREF_PRT(MapRuntimeReflection, runtime_reflections)
+    GX_GET_CREF_PRT(std::shared_ptr<reflection::Baked>, default_reflection_probe)
     GX_GET_CREF_PRT(std::vector<physics::collider::Collider*>, static_colliders)
     GX_GET_CREF_PRT(std::vector<physics::collider::Collider*>, dynamic_colliders)
 protected:
@@ -154,6 +155,7 @@ public:                                                         \
     [[nodiscard]] std::optional<std::pair<double, physics::collider::Collider*>> hit(const math::Ray3& r, double d_min) const noexcept;
     void add_shadow_cascader(core::Id light_id) noexcept;
     void remove_shadow_cascader(core::Id light_id) noexcept;
+    void set_default_reflection_probe(std::shared_ptr<reflection::Baked> rfl) noexcept;
 };
 }
 #endif

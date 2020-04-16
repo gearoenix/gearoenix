@@ -28,7 +28,7 @@ class Baked;
 namespace gearoenix::render::skybox {
 class Skybox : public core::asset::Asset {
     GX_GET_CREF_PRT(std::shared_ptr<mesh::Mesh>, msh)
-    GX_GET_CREF_PRT(std::shared_ptr<reflection::Baked>, rfl)
+    GX_GET_CREF_PRT(std::shared_ptr<reflection::Baked>, baked_reflection)
     GX_GET_CREF_PRT(std::shared_ptr<material::Material>, mat)
     GX_GET_CVAL_PRT(Type, skybox_type)
     GX_GETSET_VAL_PRT(double, layer, 0.0)
