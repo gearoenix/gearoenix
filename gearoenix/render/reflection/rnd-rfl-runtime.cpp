@@ -57,7 +57,7 @@ gearoenix::render::reflection::Runtime::Runtime(
     for (auto i = 0; i < radiance_mips_count; ++i) {
         const auto fi = static_cast<double>(i);
         const auto fm = static_cast<double>(radiance_mips_count - 1);
-        roughnesses.push_back((fi + (fm * 0.5f - fi) * 0.001f) / fm);
+        roughnesses.push_back(fi / fm);
     }
 #ifdef GX_DEBUG_MODE
     if ((radiance_resolution >> radiance_mips_count) < 2)

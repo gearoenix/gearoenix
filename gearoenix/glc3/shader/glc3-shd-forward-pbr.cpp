@@ -38,7 +38,7 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         "    out_pos = pos.xyz;\n"
         "    out_nrm = normalize((model_m * vec4(normal, 0.0)).xyz);\n"
         "    out_tng = normalize((model_m * vec4(tangent.xyz, 0.0)).xyz);\n"
-        "    out_btg = cross(out_nrm, out_tng) * tangent.w;\n"
+        "    out_btg = normalize(cross(out_nrm, out_tng) * tangent.w);\n"
         "    out_uv = uv;\n"
         // Computing cascaded shadows
         "    int effect_shadow_caster_directional_lights_count_int = int(effect_shadow_caster_directional_lights_count);\n"
@@ -148,9 +148,9 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         "    float roughness = tmpv4.y;\n"
         //   TODO: in future maybe I will add ao in here
         //   input lighting data
-        "    vec3 normal = mat3(out_tng, out_btg, out_nrm) * ((texture(material_normal, out_uv).xyz - 0.5) * 2.0 * material_normal_scale);\n"
+        "    vec3 normal = normalize(mat3(out_tng, out_btg, out_nrm) * ((texture(material_normal, out_uv).xyz - 0.5) * 2.0 * material_normal_scale));\n"
         "    vec3 view = normalize(camera_position - out_pos);\n"
-        "    vec3 reflection = reflect(-view, normal);\n"
+        "    vec3 reflection = normalize(reflect(-view, normal));\n"
         "    float normal_dot_view = max(dot(normal, view), 0.0);\n"
         //   calculate reflectance at normal incidence; if dia-electric (like plastic) use F0
         //   of 0.04 and if it's a metal, use the albedo color as F0 (metallic workflow)
@@ -299,7 +299,7 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
                                                  << e->get_system_application()->get_configuration().render_config.get_runtime_reflection_radiance_levels()
                                                  << ".0 - 1.0)).rgb;\n"
                                                     "    vec2 brdf = texture(effect_brdflut, vec2(normal_dot_view, roughness)).rg;\n"
-                                                    "    vec3 specular = prefiltered_color * (frsn * brdf.x + brdf.y);\n"
+                                                    "    vec3 specular = prefiltered_color * ((frsn * brdf.x) + brdf.y);\n"
                                                     //   TODO: add ambient occlusion (* ao);
                                                     "    vec3 ambient = kd * diffuse + specular + scene_ambient_light * albedo.xyz;\n"
                                                     "    tmpv4.xyz = ambient + lo;\n"

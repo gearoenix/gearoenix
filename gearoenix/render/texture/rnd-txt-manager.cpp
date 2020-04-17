@@ -194,7 +194,11 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
         if (brdf_cached != nullptr) {
             GXLOGD("BRDFLUT baked file has been found.")
             const auto data = brdf_cached->get_file_content();
-            brdflut = create_2d(data.data(), data.size(), c);
+            brdflut = create_2d(data.data(), data.size(), c, SampleInfo {
+                                                                 .wrap_s = Wrap::ClampToEdge,
+                                                                 .wrap_t = Wrap::ClampToEdge,
+                                                                 .wrap_r = Wrap::ClampToEdge,
+                                                             });
             return brdflut;
         }
     }
