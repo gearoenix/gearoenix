@@ -348,8 +348,7 @@ gearoenix::gles2::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const 
             "    vec3 diffuse = irradiance * albedo.xyz;\n"
             //   sample both the pre-filter map and the BRDF lut and combine them together as per
             //   the Split-Sum approximation to get the IBL radiance part.
-            "    float MAX_REFLECTION_LOD = 4.0;\n"
-            "    vec3 prefiltered_color = textureCube(effect_specular_environment, reflection, roughness * MAX_REFLECTION_LOD).rgb;\n"
+            "    vec3 prefiltered_color = textureCube(effect_specular_environment, reflection).rgb;\n"
             "    vec2 brdf = texture2D(effect_brdflut, vec2(normal_dot_view, roughness)).rg;\n"
             "    vec3 specular = prefiltered_color * (frsn * brdf.x + brdf.y);\n"
             "    vec3 ambient = kd * diffuse + specular + scene_ambient_light * albedo.xyz;\n"
@@ -358,7 +357,7 @@ gearoenix::gles2::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const 
             "    tmpv4.xyz = tmpv4.xyz / (tmpv4.xyz + vec3(1.0));\n"
             //   gamma correct
             "    tmpv4.xyz = pow(tmpv4.xyz, vec3(1.0 / 2.2));\n"
-            //   TODO don't forget gamma correction it can be part of scene uniform data
+            //   TODO don't forget gamma correction it can be part of camera uniform data
             "    gl_FragColor = vec4(tmpv4.xyz, albedo.w);\n"
             "}"; // 123
 

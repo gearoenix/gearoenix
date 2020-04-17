@@ -41,7 +41,7 @@ class Reflection : public core::asset::Asset {
     GX_GET_UCPTR_PRT(physics::collider::Aabb, collider)
     GX_GET_CREF_PRT(std::shared_ptr<texture::TextureCube>, irradiance)
     GX_GET_CREF_PRT(std::shared_ptr<texture::TextureCube>, radiance)
-    GX_GET_VAL_PRT(double, influencing_length, std::numeric_limits<double>::max() / 3.0) // because of runtime reflection
+    GX_GET_VAL_PRT(double, influencing_length, std::numeric_limits<double>::max()) // because of runtime reflection
     /// It means it is hooked to model and do reflection for that object only
     GX_GETSET_VAL_PRT(bool, is_hooked, false)
     /// This is for keeping track of the dynamic models affected in previous frame and do clear reflection on them, ...
@@ -52,7 +52,7 @@ protected:
         Type t,
         engine::Engine* e,
         const math::Vec3<double>& position = math::Vec3(0.0),
-        double influence_radius = std::numeric_limits<double>::max() / 3.0) noexcept;
+        double influence_radius = std::numeric_limits<double>::max()) noexcept;
 
 public:
     ~Reflection() noexcept override;

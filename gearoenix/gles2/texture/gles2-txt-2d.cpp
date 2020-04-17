@@ -5,6 +5,7 @@
 #include "../../gl/gl-loader.hpp"
 #include "../engine/gles2-eng-engine.hpp"
 #include "gles2-txt-sample.hpp"
+#include <cmath>
 
 gearoenix::gles2::texture::Texture2D::Texture2D(
     const core::Id id,
@@ -23,7 +24,7 @@ std::shared_ptr<gearoenix::gles2::texture::Texture2D> gearoenix::gles2::texture:
     const std::size_t img_height,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
 {
-    const std::shared_ptr<Texture2D> result(new Texture2D(id, info.format, e));
+    std::shared_ptr<Texture2D> result(new Texture2D(id, info.format, e));
     result->img_width = img_width;
     result->img_height = img_height;
     const SampleInfo sample_info(info.sample_info);
@@ -34,51 +35,50 @@ std::shared_ptr<gearoenix::gles2::texture::Texture2D> gearoenix::gles2::texture:
     std::vector<std::vector<std::uint8_t>> pixels;
     if (data.empty() || data[0].empty()) {
         pixels.emplace_back(img_width * img_height * 4);
+        for (auto& p : pixels[0])
+            p = 0;
     } else {
         pixels.reserve(data.size());
         switch (info.format) {
         case render::texture::TextureFormat::RgbaFloat32:
         case render::texture::TextureFormat::RgbFloat32: {
-            for (std::size_t level_index = 0; level_index < data.size(); ++level_index) {
-                pixels.emplace_back(data.size() / sizeof(float));
+            for (auto& level_data : data) {
+                pixels.emplace_back(level_data.size() / sizeof(float));
                 auto& level_pixels = pixels.back();
-                const auto raw_data = reinterpret_cast<const float*>(data[level_index].data());
-                for (gl::sizei i = 0; i < level_pixels.size(); ++i) {
-                    const auto c = raw_data[i] * 255.1f;
+                const auto raw_data = reinterpret_cast<const float*>(level_data.data());
+                for (std::size_t i = 0; i < level_pixels.size(); ++i) {
+                    const auto c = raw_data[i] * 255.001f;
                     if (c >= 255.0f)
                         level_pixels[i] = 255;
-                    else if (c < 0.0f)
+                    else if (c <= 0.0f)
                         level_pixels[i] = 0;
                     else
-                        level_pixels[i] = static_cast<std::uint8_t>(c);
+                        level_pixels[i] = static_cast<std::uint8_t>(std::round(c));
                 }
             }
             break;
         }
         case render::texture::TextureFormat::RgFloat32: {
-            for (std::size_t level_index = 0; level_index < data.size(); ++level_index) {
-                pixels.emplace_back((3 * data.size()) / (sizeof(float) * 2));
+            for (auto& level_data : data) {
+                pixels.emplace_back((3 * level_data.size()) / (sizeof(float) * 2));
                 auto& level_pixels = pixels.back();
-                const auto raw_data = reinterpret_cast<const float*>(data[level_index].data());
+                const auto raw_data = reinterpret_cast<const float*>(level_data.data());
                 for (gl::sizei i = 0; i < level_pixels.size(); ++i) {
                     for (int j = 0; j < 2; ++j, ++i) {
-                        const auto c = raw_data[i] * 255.1f;
+                        const auto c = raw_data[i] * 255.001f;
                         if (c >= 255.0f)
                             level_pixels[i] = 255;
-                        else if (c < 0.0f)
+                        else if (c <= 0.0f)
                             level_pixels[i] = 0;
                         else
-                            level_pixels[i] = static_cast<std::uint8_t>(c);
+                            level_pixels[i] = static_cast<std::uint8_t>(std::round(c));
                     }
                     level_pixels[i] = 0;
                 }
             }
             break;
         }
-        case render::texture::TextureFormat::RgbUint8: {
-            pixels = std::move(data);
-            break;
-        }
+        case render::texture::TextureFormat::RgbUint8:
         case render::texture::TextureFormat::RgbaUint8: {
             pixels = std::move(data);
             break;
@@ -96,7 +96,8 @@ std::shared_ptr<gearoenix::gles2::texture::Texture2D> gearoenix::gles2::texture:
         gl::Loader::tex_parameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, sample_info.wrap_t);
         for (std::size_t level_index = 0; level_index < pixels.size(); ++level_index) {
             gl::Loader::tex_image_2d(
-                GL_TEXTURE_2D, level_index, static_cast<gl::sint>(cf), gl_img_width, gl_img_height, 0,
+                GL_TEXTURE_2D, level_index, static_cast<gl::sint>(cf),
+                gl_img_width >> level_index, gl_img_height >> level_index, 0,
                 static_cast<gl::enumerated>(cf), GL_UNSIGNED_BYTE, pixels[level_index].data());
         }
         if (needs_mipmap && pixels.size() < 2) {

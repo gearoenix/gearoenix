@@ -86,10 +86,13 @@ Example004RuntimeReflectionProbeApp::Example004RuntimeReflectionProbeApp(gearoen
 
     const auto rtr2 = rfl_mgr->create<GxRtReflect>(rtr_call);
     rtr2->set_enabled(false);
+    rtr2->set_minimum_receiving_radius(3.0);
+    rtr2->set_maximum_receiving_radius(100.0);
     scn->add_reflection(rtr2);
 
     const auto rtr1 = rfl_mgr->create<GxRtReflect>(rtr_call);
-    rtr1->local_scale(10.0);
+    rtr1->set_minimum_receiving_radius(10.0);
+    rtr1->set_maximum_receiving_radius(100.0);
     scn->add_reflection(rtr1);
 
     const auto sphere_mesh = msh_mgr->create_icosphere(msh_call);

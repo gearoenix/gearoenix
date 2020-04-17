@@ -7,6 +7,7 @@
 #include "../engine/gles2-eng-engine.hpp"
 #include "gles2-txt-2d.hpp"
 #include "gles2-txt-sample.hpp"
+#include <cmath>
 
 static const gearoenix::gl::enumerated FACES[] = {
     GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
@@ -33,7 +34,7 @@ std::shared_ptr<gearoenix::gles2::texture::TextureCube> gearoenix::gles2::textur
     const unsigned int aspect,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
 {
-    const std::shared_ptr<TextureCube> result(new TextureCube(id, info.format, e));
+    std::shared_ptr<TextureCube> result(new TextureCube(id, info.format, e));
     result->aspect = aspect;
     const SampleInfo sample_info = SampleInfo(info.sample_info);
     const auto cf = Texture2D::convert(info.format);
@@ -52,31 +53,33 @@ std::shared_ptr<gearoenix::gles2::texture::TextureCube> gearoenix::gles2::textur
         pixels[5] = std::move(black);
     } else {
         switch (info.format) {
-        case render::texture::TextureFormat::RgbaFloat32: {
-            for (int face_index = 0; face_index < static_cast<int>(GX_COUNT_OF(FACES)); ++face_index) {
+        case render::texture::TextureFormat::RgbaFloat32:
+        case render::texture::TextureFormat::RgbFloat32: {
+            for (std::size_t face_index = 0; face_index < GX_COUNT_OF(FACES); ++face_index) {
                 auto& face_pixels = pixels[face_index];
                 const auto& face_data = data[face_index];
                 face_pixels.resize(face_data.size());
                 for (std::size_t level_index = 0; level_index < face_data.size(); ++level_index) {
                     auto& level_pixels = face_pixels[level_index];
                     const auto& level_data = face_data[level_index];
-                    level_pixels.resize(level_data.size() / 4);
+                    level_pixels.resize(level_data.size() / sizeof(float));
                     const auto* const raw_data = reinterpret_cast<const float*>(level_data.data());
                     for (std::size_t pixel_index = 0; pixel_index < level_pixels.size(); ++pixel_index) {
-                        const auto c = raw_data[pixel_index] * 255.1f;
-                        if (c > 255.0f) {
+                        const auto c = raw_data[pixel_index] * 255.001f;
+                        if (c >= 255.0f) {
                             level_pixels[pixel_index] = 255;
-                        } else if (c < 0.0f) {
+                        } else if (c <= 0.0f) {
                             level_pixels[pixel_index] = 0;
                         } else {
-                            level_pixels[pixel_index] = static_cast<std::uint8_t>(c);
+                            level_pixels[pixel_index] = static_cast<std::uint8_t>(std::round(c));
                         }
                     }
                 }
             }
             break;
         }
-        case render::texture::TextureFormat::RgbaUint8: {
+        case render::texture::TextureFormat::RgbaUint8:
+        case render::texture::TextureFormat::RgbUint8: {
             pixels = std::move(data);
         }
         default:

@@ -91,7 +91,6 @@ gearoenix::render::reflection::Runtime::Runtime(
         cam->set_target(target.get());
         cam->get_transformation()->look_at(std::get<1>(faces[i]), std::get<2>(faces[i]));
         cam->set_gamma_correction_factor(0.0f);
-        cam->set_near(1.0f);
         // mesh
         auto& face_mesh = face_meshes[i];
         face_mesh = msh_mgr->create_face_square(texture::FACES[i], msh_call);
@@ -122,16 +121,25 @@ gearoenix::render::reflection::Runtime::Runtime(
             radiance_convoluter->set_render_target(radiance_target.get());
         }
     }
-    set_receiving_radius(receiving_radius);
+    set_maximum_receiving_radius(maximum_receiving_radius);
+    set_minimum_receiving_radius(minimum_receiving_radius);
 }
 
 gearoenix::render::reflection::Runtime::~Runtime() noexcept = default;
 
-void gearoenix::render::reflection::Runtime::set_receiving_radius(const double r) noexcept
+void gearoenix::render::reflection::Runtime::set_maximum_receiving_radius(const double r) noexcept
 {
-    receiving_radius = r;
+    maximum_receiving_radius = r;
     for (const auto& cam : cameras) {
         cam->set_far(static_cast<float>(r));
+    }
+}
+
+void gearoenix::render::reflection::Runtime::set_minimum_receiving_radius(const double r) noexcept
+{
+    minimum_receiving_radius = r;
+    for (const auto& cam : cameras) {
+        cam->set_near(static_cast<float>(r));
     }
 }
 
@@ -146,11 +154,10 @@ void gearoenix::render::reflection::Runtime::set_location(const math::Vec3<doubl
 
 void gearoenix::render::reflection::Runtime::local_scale(const double s) noexcept
 {
-    receiving_radius *= s;
-    for (const auto& cam : cameras) {
-        cam->set_near(static_cast<float>(s * cam->get_near()));
-        cam->set_far(static_cast<float>(s * cam->get_far()));
-    }
+    minimum_receiving_radius *= s;
+    maximum_receiving_radius *= s;
+    set_maximum_receiving_radius(maximum_receiving_radius);
+    set_minimum_receiving_radius(minimum_receiving_radius);
 }
 
 void gearoenix::render::reflection::Runtime::update_state() noexcept

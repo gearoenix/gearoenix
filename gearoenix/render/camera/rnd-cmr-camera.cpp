@@ -78,7 +78,7 @@ gearoenix::render::camera::Camera::~Camera() noexcept
 
 void gearoenix::render::camera::Camera::set_far(const float f) noexcept
 {
-    uniform.far = -f;
+    uniform.far = -std::abs(f);
     reinterpret_cast<Transformation*>(transformation.get())->update_projection();
 }
 
