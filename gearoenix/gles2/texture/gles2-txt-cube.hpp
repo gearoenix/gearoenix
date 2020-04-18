@@ -15,7 +15,11 @@ namespace gearoenix::gles2::texture {
 class TextureCube final : public render::texture::TextureCube {
     GX_GET_VAL_PRV(gl::uint, texture_object, 0)
 private:
-    TextureCube(core::Id id, render::texture::TextureFormat texture_format, engine::Engine* e) noexcept;
+    TextureCube(
+        core::Id id,
+        render::texture::TextureFormat texture_format,
+        const render::texture::SampleInfo& sample_info,
+        engine::Engine* e) noexcept;
 
 public:
     [[nodiscard]] static std::shared_ptr<TextureCube> construct(

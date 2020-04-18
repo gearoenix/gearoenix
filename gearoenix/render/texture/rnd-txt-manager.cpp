@@ -56,6 +56,7 @@ std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::render::texture:
     TextureInfo info {};
     s->read(info.texture_type);
     s->read(info.format);
+    info.sample_info.read(s);
     switch (info.texture_type) {
     case Type::Texture2D:
     case Type::Texture3D:

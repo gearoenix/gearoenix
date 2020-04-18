@@ -7,7 +7,7 @@ void gearoenix::render::texture::Texture::write_gx3d_image(
     const float* const data,
     const std::size_t img_width,
     const std::size_t img_height,
-    const std::size_t components_count) const noexcept
+    const std::size_t components_count) noexcept
 {
     const auto offset_of_size = s->tell();
     (void)s->write(static_cast<core::Count>(0));
@@ -24,7 +24,7 @@ void gearoenix::render::texture::Texture::write_gx3d_image(
     const unsigned char* const data,
     const std::size_t img_width,
     const std::size_t img_height,
-    const std::size_t components_count) const noexcept
+    const std::size_t components_count) noexcept
 {
     const auto offset_of_size = s->tell();
     (void)s->write(static_cast<core::Count>(0));
@@ -40,11 +40,13 @@ gearoenix::render::texture::Texture::Texture(
     const core::Id my_id,
     const Type texture_type,
     const TextureFormat texture_format,
+    const SampleInfo& sample_info,
     engine::Engine* const e) noexcept
     : core::asset::Asset(my_id, core::asset::Type::Texture)
     , texture_type(texture_type)
     , texture_format(texture_format)
     , render_engine(e)
+    , sample_info(sample_info)
 {
 }
 
@@ -64,4 +66,5 @@ void gearoenix::render::texture::Texture::write_gx3d(
 {
     (void)s->write(texture_type);
     (void)s->write(texture_format);
+    sample_info.write(s.get());
 }

@@ -18,7 +18,6 @@ gearoenix::render::material::Unlit::Unlit(engine::Engine* const e, const core::s
 gearoenix::render::material::Unlit::Unlit(system::stream::Stream* const f, engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept
     : Material(Type::Unlit, e, sizeof(Uniform))
 {
-    auto* const txt_mgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
     uniform.alpha = read_alpha(f);
     std::tie(color_texture, color_value) = read_t2d_v4(f, end);
     if (f->read_bool())

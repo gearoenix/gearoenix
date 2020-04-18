@@ -16,7 +16,11 @@ class Texture2D final : public render::texture::Texture2D {
 private:
     GX_GET_VAL_PRV(gl::uint, texture_object, 0)
 
-    Texture2D(core::Id id, render::texture::TextureFormat texture_format, engine::Engine* e) noexcept;
+    Texture2D(
+        core::Id id,
+        render::texture::TextureFormat texture_format,
+        const render::texture::SampleInfo& sample_info,
+        engine::Engine* e) noexcept;
 
 public:
     [[nodiscard]] static std::shared_ptr<Texture2D> construct(

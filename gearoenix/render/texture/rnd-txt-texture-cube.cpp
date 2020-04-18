@@ -4,8 +4,9 @@
 gearoenix::render::texture::TextureCube::TextureCube(
     const core::Id id,
     const TextureFormat texture_format,
+    const SampleInfo& sample_info,
     engine::Engine* const engine) noexcept
-    : Texture(id, Type::TextureCube, texture_format, engine)
+    : Texture(id, Type::TextureCube, texture_format, sample_info, engine)
 {
 }
 

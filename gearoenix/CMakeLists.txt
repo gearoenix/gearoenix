@@ -543,6 +543,7 @@ SET(GX_ENGINE_SRC
         "${GX_ENGINE_SRC_DIR}render/texture/rnd-txt-image.hpp"
         "${GX_ENGINE_SRC_DIR}render/texture/rnd-txt-manager.cpp"
         "${GX_ENGINE_SRC_DIR}render/texture/rnd-txt-manager.hpp"
+        "${GX_ENGINE_SRC_DIR}render/texture/rnd-txt-sample.cpp"
         "${GX_ENGINE_SRC_DIR}render/texture/rnd-txt-sample.hpp"
         "${GX_ENGINE_SRC_DIR}render/texture/rnd-txt-target.hpp"
         "${GX_ENGINE_SRC_DIR}render/texture/rnd-txt-texture.cpp"

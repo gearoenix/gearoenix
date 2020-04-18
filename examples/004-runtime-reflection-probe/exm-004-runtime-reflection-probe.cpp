@@ -115,22 +115,28 @@ Example004RuntimeReflectionProbeApp::Example004RuntimeReflectionProbeApp(gearoen
     const auto mdl1 = mdl_mgr->create<GxStaticModel>(mdl_call);
     mdl1->add_mesh(std::make_shared<GxMdMesh>(sphere_mesh, mat1));
     mdl1->get_transformation()->set_location(GxVec3(4.0, 0.0, 0.0));
+    mdl1->set_enabled(false);
     scn->add_model(mdl1);
 
     const auto mdl2 = mdl_mgr->create<GxStaticModel>(mdl_call);
     mdl2->add_mesh(std::make_shared<GxMdMesh>(sphere_mesh, mat2));
     mdl2->get_transformation()->set_location(GxVec3(-4.0, 0.0, 0.0));
+    mdl2->set_enabled(false);
     scn->add_model(mdl2);
 
     const auto mdl3 = mdl_mgr->create<GxStaticModel>(mdl_call);
     mdl3->add_mesh(std::make_shared<GxMdMesh>(sphere_mesh, mat3));
     mdl3->get_transformation()->local_scale(2.5);
+    mdl3->set_enabled(false);
     scn->add_model(mdl3);
 
     rtr1->set_on_rendered([rtr1, rtr2, mdl1, mdl2, mdl3] {
         mdl1->set_hooked_reflection(rtr1);
         mdl2->set_hooked_reflection(rtr1);
         mdl3->set_hooked_reflection(rtr1);
+        mdl1->set_enabled(true);
+        mdl2->set_enabled(true);
+        mdl3->set_enabled(true);
         rtr2->set_enabled(true);
         rtr2->set_on_rendered([rtr2, mdl3] {
             mdl3->set_hooked_reflection(rtr2);

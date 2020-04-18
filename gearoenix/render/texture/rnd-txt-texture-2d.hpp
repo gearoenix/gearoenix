@@ -11,6 +11,7 @@ protected:
     Texture2D(
         core::Id id,
         TextureFormat texture_format,
+        const SampleInfo& sample_info,
         engine::Engine* e) noexcept;
 
 public:

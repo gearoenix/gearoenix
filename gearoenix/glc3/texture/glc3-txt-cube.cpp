@@ -5,7 +5,6 @@
 #include "../../gl/gl-loader.hpp"
 #include "../../render/texture/rnd-txt-image.hpp"
 #include "../../system/stream/sys-stm-local.hpp"
-#include "../../system/stream/sys-stm-stream.hpp"
 #include "../engine/glc3-eng-engine.hpp"
 #include "glc3-txt-2d.hpp"
 #include "glc3-txt-sample.hpp"
@@ -26,8 +25,9 @@ static const gearoenix::gl::enumerated FACES[] = {
 gearoenix::glc3::texture::TextureCube::TextureCube(
     const core::Id id,
     const render::texture::TextureFormat texture_format,
+    const render::texture::SampleInfo& sample_info,
     engine::Engine* const engine) noexcept
-    : render::texture::TextureCube(id, texture_format, engine)
+    : render::texture::TextureCube(id, texture_format, sample_info, engine)
 {
 }
 
@@ -39,7 +39,7 @@ std::shared_ptr<gearoenix::glc3::texture::TextureCube> gearoenix::glc3::texture:
     const std::size_t aspect,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
 {
-    const std::shared_ptr<TextureCube> result(new TextureCube(id, info.format, engine));
+    const std::shared_ptr<TextureCube> result(new TextureCube(id, info.format, info.sample_info, engine));
     result->aspect = aspect;
     const SampleInfo sample_info = SampleInfo(info.sample_info);
     const auto internal_format = Texture2D::convert_internal_format(info.format);

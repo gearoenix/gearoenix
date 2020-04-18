@@ -4,8 +4,9 @@
 gearoenix::render::texture::Texture2D::Texture2D(
     const core::Id id,
     const TextureFormat texture_format,
+    const SampleInfo& sample_info,
     engine::Engine* const e) noexcept
-    : Texture(id, Type::Texture2D, texture_format, e)
+    : Texture(id, Type::Texture2D, texture_format, sample_info, e)
 {
 }
 

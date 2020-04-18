@@ -8,6 +8,7 @@ protected:
     TextureCube(
         core::Id id,
         TextureFormat texture_format,
+        const SampleInfo& sample_info,
         engine::Engine* engine) noexcept;
 
 public:
