@@ -107,7 +107,9 @@ gearoenix::gles2::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const 
             "uniform sampler2D   effect_shadow_caster_directional_lights_cascades_shadow_map[" GX_MAX_DIRECTIONAL_LIGHTS_CASCADES_STR "];\n"
             "uniform sampler2D   effect_brdflut;\n" GX_GLES2_SHADER_SRC_EFFECT_UNIFORMS
             // camera uniform(s)
-            "uniform vec3        camera_position;\n" GX_GLES2_SHADER_FORWARD_PBR_VARYING
+            "uniform vec3        camera_position;\n"
+            "uniform float       camera_hdr_tune_mapping;\n"
+            "uniform float       camera_gamma_correction;\n" GX_GLES2_SHADER_FORWARD_PBR_VARYING
             // Normal Distribution Function Trowbridge-Reitz GGX
             "float distribution_ggx(const vec3 normal, const vec3 halfway, const float roughness) {\n"
             "    float roughness2 = roughness * roughness;\n"
@@ -353,11 +355,12 @@ gearoenix::gles2::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const 
             "    vec3 specular = prefiltered_color * (frsn * brdf.x + brdf.y);\n"
             "    vec3 ambient = kd * diffuse + specular + scene_ambient_light * albedo.xyz;\n"
             "    tmpv4.xyz = ambient + lo;\n"
-            //   HDR tonemapping
-            "    tmpv4.xyz = tmpv4.xyz / (tmpv4.xyz + vec3(1.0));\n"
-            //   gamma correct
-            "    tmpv4.xyz = pow(tmpv4.xyz, vec3(1.0 / 2.2));\n"
-            //   TODO don't forget gamma correction it can be part of camera uniform data
+            "    if(camera_gamma_correction > 0.001) {\n"
+            //       HDR tone mapping
+            "        tmpv4.xyz = tmpv4.xyz / (tmpv4.xyz + vec3(camera_hdr_tune_mapping));\n"
+            //       gamma correct
+            "        tmpv4.xyz = pow(tmpv4.xyz, vec3(1.0 / camera_gamma_correction));\n"
+            "}\n"
             "    gl_FragColor = vec4(tmpv4.xyz, albedo.w);\n"
             "}"; // 123
 
@@ -377,6 +380,8 @@ gearoenix::gles2::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const 
         GX_GLES2_THIS_GET_UNIFORM(material_roughness_factor)
         GX_GLES2_THIS_GET_UNIFORM(camera_position)
         GX_GLES2_THIS_GET_UNIFORM(camera_vp)
+        GX_GLES2_THIS_GET_UNIFORM(camera_hdr_tune_mapping)
+        GX_GLES2_THIS_GET_UNIFORM(camera_gamma_correction)
         // TODO
         //GX_GLES2_THIS_GET_UNIFORM(effect_ambient_occlusion)
         GX_GLES2_THIS_GET_UNIFORM_TEXTURE(effect_brdflut)

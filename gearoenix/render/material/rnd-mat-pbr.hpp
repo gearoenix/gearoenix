@@ -13,6 +13,7 @@ public:
         float normal_scale = 1.0f;
         float occlusion_strength = 1.0f;
         float roughness_factor = 0.000001f;
+        float radiance_lod_coefficient = 0.0f;
     };
     GX_GET_CREF_PRV(std::shared_ptr<texture::Texture2D>, color_texture)
     GX_GET_CREF_PRV(std::optional<math::Vec4<float>>, color_value)
@@ -23,7 +24,7 @@ public:
     GX_GET_CREF_PRV(std::shared_ptr<texture::Texture2D>, normal_texture)
     GX_GET_CREF_PRV(std::optional<math::Vec3<float>>, normal_value)
     GX_GETSET_PTR_PRV(texture::TextureCube, irradiance)
-    GX_GETSET_PTR_PRV(texture::TextureCube, radiance)
+    GX_GET_PTR_PRV(texture::TextureCube, radiance)
     GX_GET_CREF_PRV(Uniform, uniform)
 public:
     Pbr(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept;
@@ -40,6 +41,7 @@ public:
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& end = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
     void set_color(const std::shared_ptr<texture::Texture2D>& color) noexcept;
     void set_alpha(float) noexcept;
+    void set_radiance(texture::TextureCube*) noexcept;
 };
 }
 

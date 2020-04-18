@@ -24,6 +24,8 @@ class ForwardPbr final : public Shader {
     GX_GLC3_UNIFORM_FLOAT(material_normal_scale, 1)
     GX_GLC3_UNIFORM_FLOAT(material_occlusion_strength, 1)
     GX_GLC3_UNIFORM_FLOAT(material_roughness_factor, 1)
+    GX_GLC3_UNIFORM_FLOAT(material_radiance_lod_coefficient, 1)
+    // Camera uniforms
     GX_GLC3_UNIFORM_VECTOR(camera_position, 3, 1)
     GX_GLC3_UNIFORM_MATRIX(camera_vp, 4, 1)
     GX_GLC3_UNIFORM_FLOAT(camera_hdr_tune_mapping, 1)
@@ -42,14 +44,16 @@ class ForwardPbr final : public Shader {
     GX_GLC3_UNIFORM_VECTOR(effect_shadow_caster_directional_lights_direction, 4, GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER)
     GX_GLC3_UNIFORM_FLOAT(effect_point_lights_count, 1)
     GX_GLC3_UNIFORM_FLOAT(effect_shadow_caster_directional_lights_count, 1)
-    // Model
+    // Model uniforms
     GX_GLC3_UNIFORM_MATRIX(model_m, 4, 1)
-    // Scene
+    // Scene uniforms
     GX_GLC3_UNIFORM_VECTOR(scene_ambient_light, 3, 1)
     GX_GLC3_UNIFORM_VECTOR(scene_directional_lights_color, 4, GX_MAX_DIRECTIONAL_LIGHTS)
     GX_GLC3_UNIFORM_VECTOR(scene_directional_lights_direction, 4, GX_MAX_DIRECTIONAL_LIGHTS)
-    GX_GLC3_UNIFORM_VECTOR(scene_lights_count, 2, 1)
-    GX_GLC3_UNIFORM_VECTOR(scene_ssao_config, 3, 1)
+    GX_GLC3_UNIFORM_FLOAT(scene_directional_lights_count, 1)
+    GX_GLC3_UNIFORM_FLOAT(scene_ssao_samples_count, 1)
+    GX_GLC3_UNIFORM_FLOAT(scene_ssao_radius, 1)
+    GX_GLC3_UNIFORM_FLOAT(scene_ssao_z_tolerance, 1)
 
 public:
     ForwardPbr(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;

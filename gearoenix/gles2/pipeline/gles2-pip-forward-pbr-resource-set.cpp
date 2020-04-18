@@ -1,6 +1,5 @@
 #include "gles2-pip-forward-pbr-resource-set.hpp"
 #ifdef GX_USE_OPENGL_ES2
-#include "../../gl/gl-loader.hpp"
 #include "../../render/buffer/rnd-buf-uniform.hpp"
 #include "../../render/camera/rnd-cmr-uniform.hpp"
 #include "../../render/graph/node/rnd-gr-nd-forward-pbr.hpp"
@@ -31,6 +30,8 @@ void gearoenix::gles2::pipeline::ForwardPbrResourceSet::bind_final(gl::uint& bou
     const auto* const camera = camera_uniform_buffer->get_ptr<render::camera::Uniform>();
     GX_GLES2_PIP_RES_SET_UNIFORM(camera_position, *(camera->position.data()))
     GX_GLES2_PIP_RES_SET_UNIFORM(camera_vp, camera->view_projection.data[0][0])
+    GX_GLES2_PIP_RES_SET_UNIFORM(camera_hdr_tune_mapping, camera->hdr_tune_mapping)
+    GX_GLES2_PIP_RES_SET_UNIFORM(camera_gamma_correction, camera->gamma_correction)
     //static_cast<const texture::Texture2D *>(ambient_occlusion.get())->bind(shdr->get_effect_ambient_occlusion_index());
     reinterpret_cast<const texture::Texture2D*>(brdflut)->bind(static_cast<gl::enumerated>(shdr->get_effect_brdflut_index()));
     reinterpret_cast<const texture::TextureCube*>(irradiance)->bind(static_cast<gl::enumerated>(shdr->get_effect_diffuse_environment_index()));

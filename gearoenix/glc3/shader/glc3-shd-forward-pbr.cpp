@@ -66,18 +66,20 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         "uniform float material_normal_scale;\n"
         "uniform float material_occlusion_strength;\n"
         "uniform float material_roughness_factor;\n"
+        "uniform float material_radiance_lod_coefficient;\n"
         "uniform sampler2D material_base_color;\n"
         "uniform sampler2D material_metallic_roughness;\n"
         "uniform sampler2D material_normal;\n"
         "uniform sampler2D material_emissive;\n"
         // scenes uniform(s)
-        "uniform vec3        scene_ambient_light;\n"
-        "uniform vec4        scene_directional_lights_color[" GX_MAX_DIRECTIONAL_LIGHTS_STR "];\n"
-        "uniform vec4        scene_directional_lights_direction[" GX_MAX_DIRECTIONAL_LIGHTS_STR "];\n"
-        // directional, point
-        "uniform vec2        scene_lights_count;\n"
+        "uniform vec3  scene_ambient_light;\n"
+        "uniform vec4  scene_directional_lights_color[" GX_MAX_DIRECTIONAL_LIGHTS_STR "];\n"
+        "uniform vec4  scene_directional_lights_direction[" GX_MAX_DIRECTIONAL_LIGHTS_STR "];\n"
+        "uniform float scene_directional_lights_count;\n"
         // samples-count, radius, z-tolerance
-        "uniform vec3        scene_ssao_config;\n"
+        "uniform float scene_ssao_samples_count;\n"
+        "uniform float scene_ssao_radius;\n"
+        "uniform float scene_ssao_z_tolerance;\n"
         // effect uniforms
         "uniform samplerCube effect_diffuse_environment;\n"
         "uniform samplerCube effect_specular_environment;\n"
@@ -195,7 +197,7 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         "        lo += (kd * albedo.xyz / GX_PI + specular) * radiance * normal_dot_light;\n"
         "    }\n"
         //   computing directional lights
-        "    for (float i = 0.001; i < scene_lights_count.x; ++i)\n"
+        "    for (float i = 0.001; i < scene_directional_lights_count; ++i)\n"
         "    {\n"
         "        int ii = int(i);\n"
         "        vec3 light_direction = -scene_directional_lights_direction[ii].xyz;\n"
@@ -295,23 +297,21 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         "    vec3 diffuse = irradiance * albedo.xyz;\n"
         //   sample both the pre-filter map and the BRDF lut and combine them together as per
         //   the Split-Sum approximation to get the IBL radiance part.
-        "    vec3 prefiltered_color = textureLod(effect_specular_environment, reflection, roughness * ("
-                                                 << e->get_system_application()->get_configuration().render_config.get_runtime_reflection_radiance_levels()
-                                                 << ".0 - 1.0)).rgb;\n"
-                                                    "    vec2 brdf = texture(effect_brdflut, vec2(normal_dot_view, roughness)).rg;\n"
-                                                    "    vec3 specular = prefiltered_color * ((frsn * brdf.x) + brdf.y);\n"
-                                                    //   TODO: add ambient occlusion (* ao);
-                                                    "    vec3 ambient = kd * diffuse + specular + scene_ambient_light * albedo.xyz;\n"
-                                                    "    tmpv4.xyz = ambient + lo;\n"
-                                                    "    if(camera_gamma_correction > 0.001) {\n"
-                                                    //   HDR tone mapping
-                                                    "        tmpv4.xyz = tmpv4.xyz / (tmpv4.xyz + vec3(camera_hdr_tune_mapping));\n"
-                                                    //   gamma correct
-                                                    "        tmpv4.xyz = pow(tmpv4.xyz, vec3(1.0 / camera_gamma_correction));\n"
-                                                    "}\n"
-                                                    //"  frag_color = vec4((tmpv4.xyz * 0.001) + textureLod(effect_diffuse_environment, normalize(out_pos), 0.0).xyz, albedo.w);\n"
-                                                    "    frag_color = vec4(tmpv4.xyz, albedo.w);\n"
-                                                    "}";
+        "    vec3 prefiltered_color = textureLod(effect_specular_environment, reflection, roughness * material_radiance_lod_coefficient).rgb;\n"
+        "    vec2 brdf = texture(effect_brdflut, vec2(normal_dot_view, roughness)).rg;\n"
+        "    vec3 specular = prefiltered_color * ((frsn * brdf.x) + brdf.y);\n"
+        //   TODO: add ambient occlusion (* ao);
+        "    vec3 ambient = kd * diffuse + specular + scene_ambient_light * albedo.xyz;\n"
+        "    tmpv4.xyz = ambient + lo;\n"
+        "    if(camera_gamma_correction > 0.001) {\n"
+        //       HDR tone mapping
+        "        tmpv4.xyz = tmpv4.xyz / (tmpv4.xyz + vec3(camera_hdr_tune_mapping));\n"
+        //       gamma correct
+        "        tmpv4.xyz = pow(tmpv4.xyz, vec3(1.0 / camera_gamma_correction));\n"
+        "}\n"
+        //"  frag_color = vec4((tmpv4.xyz * 0.001) + textureLod(effect_diffuse_environment, normalize(out_pos), 0.0).xyz, albedo.w);\n"
+        "    frag_color = vec4(tmpv4.xyz, albedo.w);\n"
+        "}";
     e->get_function_loader()->load([this, vertex_shader_code { vertex_shader_code.str() }, fragment_shader_code { fragment_shader_code.str() }] {
         set_vertex_shader(vertex_shader_code);
         set_fragment_shader(fragment_shader_code);
@@ -320,12 +320,13 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         GX_GLC3_THIS_GET_UNIFORM(material_alpha)
         GX_GLC3_THIS_GET_UNIFORM(material_alpha_cutoff)
         GX_GLC3_THIS_GET_UNIFORM_TEXTURE(material_base_color)
-        //        GX_GLC3_THIS_GET_UNIFORM_TEXTURE(material_emissive)
+        // GX_GLC3_THIS_GET_UNIFORM_TEXTURE(material_emissive)
         GX_GLC3_THIS_GET_UNIFORM(material_metallic_factor)
         GX_GLC3_THIS_GET_UNIFORM_TEXTURE(material_metallic_roughness)
         GX_GLC3_THIS_GET_UNIFORM_TEXTURE(material_normal)
         GX_GLC3_THIS_GET_UNIFORM(material_normal_scale)
-        //        GX_GLC3_THIS_GET_UNIFORM(material_occlusion_strength)
+        GX_GLC3_THIS_GET_UNIFORM(material_radiance_lod_coefficient)
+        // GX_GLC3_THIS_GET_UNIFORM(material_occlusion_strength)
         GX_GLC3_THIS_GET_UNIFORM(material_roughness_factor)
         GX_GLC3_THIS_GET_UNIFORM(camera_position)
         GX_GLC3_THIS_GET_UNIFORM(camera_vp)
@@ -347,8 +348,10 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         GX_GLC3_THIS_GET_UNIFORM(scene_ambient_light)
         GX_GLC3_THIS_GET_UNIFORM(scene_directional_lights_color)
         GX_GLC3_THIS_GET_UNIFORM(scene_directional_lights_direction)
-        GX_GLC3_THIS_GET_UNIFORM(scene_lights_count)
-        // GX_GLES2_THIS_GET_UNIFORM(scene_ssao_config)
+        GX_GLC3_THIS_GET_UNIFORM(scene_directional_lights_count)
+        // GX_GLC3_THIS_GET_UNIFORM(scene_ssao_radius)
+        // GX_GLC3_THIS_GET_UNIFORM(scene_ssao_samples_count)
+        // GX_GLC3_THIS_GET_UNIFORM(scene_ssao_z_tolerance)
     });
 }
 

@@ -58,13 +58,14 @@ void gearoenix::glc3::pipeline::ForwardPbrResourceSet::bind_final(gl::uint& boun
     GX_GLC3_PIP_RES_SET_UNIFORM(material_normal_scale, material->normal_scale)
     GX_GLC3_PIP_RES_SET_UNIFORM(material_occlusion_strength, material->occlusion_strength)
     GX_GLC3_PIP_RES_SET_UNIFORM(material_roughness_factor, material->roughness_factor)
+    GX_GLC3_PIP_RES_SET_UNIFORM(material_radiance_lod_coefficient, material->radiance_lod_coefficient)
     const auto* const model = model_uniform_buffer->get_ptr<math::Mat4x4<float>>();
     GX_GLC3_PIP_RES_SET_UNIFORM(model_m, model->data[0][0])
     const auto* const scene = scene_uniform_buffer->get_ptr<render::scene::Uniform>();
     GX_GLC3_PIP_RES_SET_UNIFORM(scene_ambient_light, *(scene->ambient_light.data()))
     GX_GLC3_PIP_RES_SET_UNIFORM(scene_directional_lights_color, *(scene->directional_lights_color[0].data()))
     GX_GLC3_PIP_RES_SET_UNIFORM(scene_directional_lights_direction, *(scene->directional_lights_direction[0].data()))
-    GX_GLC3_PIP_RES_SET_UNIFORM(scene_lights_count, *(scene->lights_count.data()))
+    GX_GLC3_PIP_RES_SET_UNIFORM(scene_directional_lights_count, *(scene->lights_count.data()))
     //shdr->set_scene_ssao_config_data(scene->ssao_config.data());
     const auto* const node = node_uniform_buffer->get_ptr<render::graph::node::ForwardPbrUniform>();
     GX_GLC3_PIP_RES_SET_UNIFORM(effect_point_lights_color_min_radius, *(node->point_lights_color_min_radius[0].data()))

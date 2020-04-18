@@ -13,6 +13,7 @@
 #include "../reflection/rnd-rfl-runtime.hpp"
 #include "../scene/rnd-scn-scene.hpp"
 #include "../texture/rnd-txt-manager.hpp"
+#include "../texture/rnd-txt-texture-cube.hpp"
 #include "rnd-mdl-manager.hpp"
 #include "rnd-mdl-mesh.hpp"
 #include "rnd-mdl-transformation.hpp"

@@ -102,3 +102,10 @@ void gearoenix::render::material::Pbr::set_alpha(const float a) noexcept
 {
     uniform.alpha = a;
 }
+
+void gearoenix::render::material::Pbr::set_radiance(gearoenix::render::texture::TextureCube* const t) noexcept
+{
+    radiance = t;
+    uniform.radiance_lod_coefficient = static_cast<float>(
+        engine::Configuration::compute_runtime_reflection_radiance_levels(t->get_aspect()) - 1);
+}
