@@ -80,8 +80,6 @@ public:
         return write(&d, sizeof(T));
     }
 
-    [[nodiscard]] static std::vector<std::uint8_t> get_file_content(const std::wstring& address) noexcept;
-    [[nodiscard]] static std::vector<std::uint8_t> get_file_content(const std::string& address) noexcept;
     [[nodiscard]] std::vector<std::uint8_t> get_file_content() noexcept;
 };
 }

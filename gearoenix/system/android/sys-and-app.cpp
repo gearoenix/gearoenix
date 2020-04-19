@@ -93,8 +93,8 @@ int32_t gearoenix::system::Application::handle(android_app* const, AInputEvent* 
     //    core::event::Event* gxe = nullptr;
     const int32_t action = AMotionEvent_getAction(e);
     const auto flags = static_cast<int32_t>(static_cast<unsigned int>(action) & AMOTION_EVENT_ACTION_MASK);
-    const core::Real curx = convert_x_to_ratio((int)AMotionEvent_getX(e, 0));
-    const core::Real cury = convert_y_to_ratio((int)AMotionEvent_getY(e, 0));
+    const auto cur_x = convert_x_to_ratio((int)AMotionEvent_getX(e, 0));
+    const auto cur_y = convert_y_to_ratio((int)AMotionEvent_getY(e, 0));
     switch (flags) {
     case AMOTION_EVENT_ACTION_DOWN:
         // TODO
@@ -108,8 +108,8 @@ int32_t gearoenix::system::Application::handle(android_app* const, AInputEvent* 
     default:
         break;
     }
-    x = curx;
-    y = cury;
+    x = cur_x;
+    y = cur_y;
     return 0;
 }
 
@@ -127,9 +127,9 @@ int32_t gearoenix::system::Application::handle_input(android_app* a, AInputEvent
 
 void gearoenix::system::Application::compute_screen_ratios() noexcept
 {
-    constexpr core::Real DOUBLE_F = 2.0F;
-    window_ratio = static_cast<core::Real>(window_width) / static_cast<core::Real>(window_height);
-    half_height_inverted = DOUBLE_F / static_cast<core::Real>(window_height);
+    constexpr double DOUBLE_F = 2.0;
+    window_ratio = static_cast<double>(window_width) / static_cast<double>(window_height);
+    half_height_inverted = DOUBLE_F / static_cast<double>(window_height);
 }
 
 gearoenix::system::Application::Application(android_app* and_app) noexcept
@@ -189,16 +189,14 @@ void gearoenix::system::Application::execute(std::unique_ptr<core::Application> 
     render_engine->terminate();
 }
 
-gearoenix::core::Real
-gearoenix::system::Application::convert_x_to_ratio(const int x) const noexcept
+double gearoenix::system::Application::convert_x_to_ratio(const int x) const noexcept
 {
-    return ((((core::Real)x) * half_height_inverted) - window_ratio);
+    return ((((double)x) * half_height_inverted) - window_ratio);
 }
 
-gearoenix::core::Real
-gearoenix::system::Application::convert_y_to_ratio(const int y) const noexcept
+double gearoenix::system::Application::convert_y_to_ratio(const int y) const noexcept
 {
-    return (1.0F - (((core::Real)y) * half_height_inverted));
+    return (1.0 - (((double)y) * half_height_inverted));
 }
 
 const char* gearoenix::system::Application::get_clipboard() const noexcept

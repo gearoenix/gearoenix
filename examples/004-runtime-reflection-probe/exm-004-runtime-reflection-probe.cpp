@@ -80,7 +80,7 @@ Example004RuntimeReflectionProbeApp::Example004RuntimeReflectionProbeApp(gearoen
         auto sky = sky_mgr->create<GxSkyEqrect>(sky_call);
         GxTxtSampleInfo smp;
         smp.min_filter = GxTxtFilter::Linear;
-        sky->get_mat_equ()->set_color(txt_mgr->create_2d_f(L"default-equirectangular-sky.hdr", txt_call, smp));
+        sky->get_mat_equ()->set_color(txt_mgr->create_2d_f("default-equirectangular-sky.hdr", txt_call, smp));
         scn->add_skybox(std::move(sky));
     }
 

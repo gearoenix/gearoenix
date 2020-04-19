@@ -1,5 +1,6 @@
 #include "sys-stm-stream.hpp"
 #include "../../core/cr-string.hpp"
+#include "sys-stm-asset.hpp"
 #include <fstream>
 
 void gearoenix::system::stream::Stream::built_in_type_read(void* const data, const core::Count length) noexcept
@@ -32,27 +33,10 @@ bool gearoenix::system::stream::Stream::read_bool() noexcept
     return data != 0;
 }
 
-std::vector<std::uint8_t> gearoenix::system::stream::Stream::get_file_content(const std::wstring& address) noexcept
-{
-    return get_file_content(core::String::to_string(address));
-}
-
-std::vector<std::uint8_t> gearoenix::system::stream::Stream::get_file_content(const std::string& address) noexcept
-{
-    std::ifstream file(address, std::ios::binary | std::ios::in);
-    if (!file.is_open())
-        GXLOGF("File '" << address << "' not found")
-    file.seekg(0, std::ios::end);
-    const std::size_t file_size = file.tellg();
-    file.seekg(0, std::ios::beg);
-    std::vector<std::uint8_t> file_content(file_size);
-    file.read(reinterpret_cast<char*>(file_content.data()), file_size);
-    return file_content;
-}
-
 std::vector<std::uint8_t> gearoenix::system::stream::Stream::get_file_content() noexcept
 {
     std::vector<std::uint8_t> result(size());
+    seek(0);
     (void)read(result.data(), result.size());
     return result;
 }

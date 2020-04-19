@@ -1,5 +1,6 @@
 #include "rnd-txt-manager.hpp"
 #include "../../core/asset/cr-asset-manager.hpp"
+#include "../../core/cr-string.hpp"
 #include "../../system/stream/sys-stm-asset.hpp"
 #include "../../system/stream/sys-stm-local.hpp"
 #include "../../system/sys-app.hpp"
@@ -318,6 +319,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     GXLOGD("Texture 2D Image imported with file size: " << size << ", width: " << img_width << " height: " << img_height << ", channels: " << img_channels)
     TextureInfo info;
     info.sample_info = sample_info;
+    info.has_mipmap = sample_info.needs_mipmap();
     switch (img_channels) {
     case 1:
         GXUNIMPLEMENTED
@@ -343,8 +345,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     core::sync::EndCaller<Texture2D>& c,
     const SampleInfo& sample_info) noexcept
 {
-    auto const file_content = system::stream::Stream::get_file_content(file_address);
-    return create_2d_f(reinterpret_cast<const unsigned char*>(file_content.data()), file_content.size(), c, sample_info);
+    return create_2d_f(core::String::to_string(file_address), c, sample_info);
 }
 
 std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::create_2d_f(
@@ -352,8 +353,12 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     core::sync::EndCaller<render::texture::Texture2D>& c,
     const SampleInfo& sample_info) noexcept
 {
-    auto const file_content = system::stream::Stream::get_file_content(file_address);
-    return create_2d_f(reinterpret_cast<const unsigned char*>(file_content.data()), file_content.size(), c, sample_info);
+    const std::unique_ptr<system::stream::Asset> file(system::stream::Asset::construct(
+        e->get_system_application(), file_address));
+    if (file == nullptr)
+        GXLOGF("Texture file " << file_address << " not found.")
+    auto const file_content = file->get_file_content();
+    return create_2d_f(file_content.data(), file_content.size(), c, sample_info);
 }
 
 std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::render::texture::Manager::get_cube(const math::Vec4<float>& color, core::sync::EndCaller<TextureCube>& c) noexcept

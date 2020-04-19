@@ -17,6 +17,7 @@ struct SampleInfo {
 
     void write(system::stream::Stream* s) const noexcept;
     void read(system::stream::Stream* s) noexcept;
+    [[nodiscard]] bool needs_mipmap() const noexcept;
 };
 }
 #endif

@@ -18,3 +18,8 @@ void gearoenix::render::texture::SampleInfo::read(system::stream::Stream* const 
     s->read(wrap_t);
     s->read(wrap_r);
 }
+
+bool gearoenix::render::texture::SampleInfo::needs_mipmap() const noexcept
+{
+    return min_filter == Filter::CubicMipmapCubic || min_filter == Filter::CubicMipmapLinear || min_filter == Filter::CubicMipmapNearest || min_filter == Filter::LinearMipmapCubic || min_filter == Filter::LinearMipmapLinear || min_filter == Filter::LinearMipmapNearest || min_filter == Filter::NearestMipmapCubic || min_filter == Filter::NearestMipmapLinear || min_filter == Filter::NearestMipmapNearest;
+}
