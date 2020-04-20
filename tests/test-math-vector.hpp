@@ -58,20 +58,20 @@ BOOST_AUTO_TEST_CASE(math_vector_test)
         q2.w = q1.w;                         \
     }
 
-#define CHECK(m1, m2)                                                                                                   \
-    {                                                                                                                   \
-        for (unsigned int i = 0; i < sizeof(v2) / sizeof(float); ++i) {                                                 \
-            auto f1 = std::abs(glm::value_ptr(m1)[i] - m2[i]);                                                          \
-            auto f2 = std::abs(glm::value_ptr(m1)[i] + m2[i]);                                                          \
-            if (f1 > f2)                                                                                                \
-                std::swap(f1, f2);                                                                                      \
-            if (f1 > 0.001f && f1 > 0.001f * f2) {                                                                      \
-                GXLOGE("Error in matrix check happened.")                                                               \
-                for (unsigned int k = 0; k < sizeof(v2) / sizeof(float); ++k)                                           \
-                    GXLOGE("glm: " << glm::value_ptr(m1)[k] << ", gxm: " << m2[k] << ", f1: " << f1 << ", f2: " << f2); \
-                BOOST_TEST(false);                                                                                      \
-            }                                                                                                           \
-        }                                                                                                               \
+#define CHECK(m1, m2)                                                                                                          \
+    {                                                                                                                          \
+        for (unsigned int i = 0; i < sizeof(v2) / sizeof(float); ++i) {                                                        \
+            auto f1 = std::abs(glm::value_ptr(m1)[i] - m2[i]);                                                                 \
+            auto f2 = std::abs(glm::value_ptr(m1)[i] + m2[i]);                                                                 \
+            if (f1 > f2)                                                                                                       \
+                std::swap(f1, f2);                                                                                             \
+            if (f1 > 0.001f && f1 > 0.001f * f2) {                                                                             \
+                GXLOGE("Error in matrix check happened.")                                                                      \
+                for (unsigned int k = 0; k < sizeof(v2) / sizeof(float); ++k)                                                  \
+                    GXLOGE("glm: " << glm::value_ptr(m1)[k] << ", gxm: " << m2[k] << ", f1: " << f1 << ", f2: " << f2);        \
+                BOOST_TEST(false, "glm: " << glm::value_ptr(m1)[i] << ", gxm: " << m2[i] << ", f1: " << f1 << ", f2: " << f2); \
+            }                                                                                                                  \
+        }                                                                                                                      \
     }
 
     glm::mat4 m1;

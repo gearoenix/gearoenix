@@ -10,12 +10,14 @@ android {
         versionName "1.0"
         externalNativeBuild {
             cmake {
-                abiFilters 'armeabi-v7a', 'arm64-v8a'//, 'x86_64'
-                arguments '-DANDROID_TOOLCHAIN=clang', '-DANDROID_STL=c++_static', '-DGX_ENABLE_TOOLS=OFF',
-                          '-DGX_ENABLE_EXAMPLE_001_HELLO_WORLD=True'
-//                        '-DGX_ENABLE_EXAMPLE_002_ASSET_LOADING=True'
-//                        '-DGX_ENABLE_EXAMPLE_003_UI_WIDGETS=True'
-//                        '-DGX_ENABLE_EXAMPLE_004_RUNTIME_REFLECTION_PROBE=True'
+                abiFilters 'arm64-v8a', 'armeabi-v7a', 'x86_64'
+                arguments '-DANDROID_TOOLCHAIN=clang',
+                        '-DANDROID_STL=c++_static',
+                        '-DGX_ENABLE_TOOLS=OFF',
+//                      '-DGX_ENABLE_EXAMPLE_001_HELLO_WORLD=True'
+//                      '-DGX_ENABLE_EXAMPLE_002_ASSET_LOADING=True'
+//                      '-DGX_ENABLE_EXAMPLE_003_UI_WIDGETS=True'
+                      '-DGX_ENABLE_EXAMPLE_004_RUNTIME_REFLECTION_PROBE=True'
             }
         }
     }

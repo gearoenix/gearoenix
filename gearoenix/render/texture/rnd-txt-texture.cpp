@@ -1,6 +1,9 @@
 #include "rnd-txt-texture.hpp"
+#include "../../core/sync/cr-sync-parallel-for.hpp"
 #include "../../system/stream/sys-stm-local.hpp"
 #include "rnd-txt-image.hpp"
+#include "rnd-txt-pixel-iterator.hpp"
+#include <cmath>
 
 void gearoenix::render::texture::Texture::write_gx3d_image(
     system::stream::Stream* const s,
@@ -67,4 +70,58 @@ void gearoenix::render::texture::Texture::write_gx3d(
     (void)s->write(texture_type);
     (void)s->write(texture_format);
     sample_info.write(s.get());
+}
+
+std::vector<std::uint8_t> gearoenix::render::texture::Texture::convert_pixels(
+    const float* const data,
+    const std::size_t in_components_count,
+    const std::size_t pixels_count,
+    const std::size_t out_components_count) noexcept
+{
+    auto begin = Pixel<float>::ConstIterator(data, in_components_count, pixels_count);
+    auto end = begin + (pixels_count + 1);
+    std::vector<std::uint8_t> result(out_components_count * pixels_count);
+    core::sync::ParallelFor::exec(begin, end, [in_components_count, out_components_count, &result](const decltype(begin)& iter) {
+        std::size_t i = 0;
+        auto result_index = iter.get_pixel_index() * out_components_count;
+        for (; i < in_components_count && i < out_components_count; ++i) {
+            const float c = std::round((iter[i] * 255.0f)) + 0.1f;
+            result[result_index] = c >= 255.0 ? 255 : c <= 0.0 ? 0 : static_cast<std::uint8_t>(c);
+            ++result_index;
+        }
+        for (; i < out_components_count; ++i) {
+            result[result_index] = i < 4 ? 0 : 255;
+            ++result_index;
+        }
+    });
+    return result;
+}
+
+std::vector<std::vector<std::uint8_t>> gearoenix::render::texture::Texture::convert_float_pixels(
+    const std::vector<std::vector<std::uint8_t>>& data,
+    const std::size_t in_components_count,
+    const std::size_t out_components_count) noexcept
+{
+    std::vector<std::vector<std::uint8_t>> result;
+    result.reserve(data.size());
+    const auto pixel_size = sizeof(float) * in_components_count;
+    for (auto& d : data)
+        result.push_back(convert_pixels(
+            reinterpret_cast<const float*>(d.data()),
+            in_components_count,
+            d.size() / pixel_size,
+            out_components_count));
+    return result;
+}
+
+std::vector<std::vector<std::vector<std::uint8_t>>> gearoenix::render::texture::Texture::convert_float_pixels(
+    const std::vector<std::vector<std::vector<std::uint8_t>>>& data,
+    const std::size_t in_components_count,
+    const std::size_t out_components_count) noexcept
+{
+    std::vector<std::vector<std::vector<std::uint8_t>>> result;
+    result.reserve(data.size());
+    for (auto& d : data)
+        result.push_back(convert_float_pixels(d, in_components_count, out_components_count));
+    return result;
 }

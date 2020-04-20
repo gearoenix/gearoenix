@@ -39,12 +39,12 @@ std::shared_ptr<gearoenix::glc3::texture::TextureCube> gearoenix::glc3::texture:
     const std::size_t aspect,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
 {
-    const std::shared_ptr<TextureCube> result(new TextureCube(id, info.format, info.sample_info, engine));
+    std::shared_ptr<TextureCube> result(new TextureCube(id, info.format, info.sample_info, engine));
     result->aspect = aspect;
     const SampleInfo sample_info = SampleInfo(info.sample_info);
-    const auto internal_format = Texture2D::convert_internal_format(info.format);
-    const auto format = Texture2D::convert_format(info.format);
-    const auto data_format = Texture2D::convert_data_format(info.format);
+    const auto internal_format = Texture2D::convert_internal_format(engine, result->texture_format);
+    const auto format = Texture2D::convert_format(result->texture_format);
+    const auto data_format = Texture2D::convert_data_format(result->texture_format);
     const auto gl_aspect = static_cast<gl::sizei>(aspect);
     std::vector<std::vector<std::vector<std::uint8_t>>> pixels;
     if (data.empty() || data[0].empty() || data[0][0].empty()) {
@@ -62,8 +62,11 @@ std::shared_ptr<gearoenix::glc3::texture::TextureCube> gearoenix::glc3::texture:
     } else {
         switch (info.format) {
         case render::texture::TextureFormat::RgbaFloat32: {
-            /// TODO query device for checking the support of the format
-            pixels = std::move(data);
+            if (engine->get_engine_type() == render::engine::Type::OPENGL_ES3) {
+                pixels = convert_float_pixels(data, 4, 4);
+            } else {
+                pixels = std::move(data);
+            }
             break;
         }
         default:
@@ -122,9 +125,9 @@ void gearoenix::glc3::texture::TextureCube::write_gx3d(
         (void)s->write(true); // It means, texture has mipmap data
         if (render::texture::format_has_float_component(texture_format)) {
             std::vector<float> data(aspect * aspect * 4);
-            for (int i = 0; i < 6; ++i) {
+            for (auto i : FACES) {
                 for (unsigned int j = 0, level_aspect = aspect; level_aspect > 0; ++j, level_aspect >>= 1u) {
-                    gl::Loader::framebuffer_texture_2d(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, FACES[i], texture_object,
+                    gl::Loader::framebuffer_texture_2d(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, i, texture_object,
                         j);
                     gl::Loader::read_pixels(0, 0, level_aspect, level_aspect, GL_RGBA, GL_FLOAT, data.data());
 #ifdef GX_DEBUG_TEXTURE_WRITE
@@ -137,9 +140,9 @@ void gearoenix::glc3::texture::TextureCube::write_gx3d(
             }
         } else {
             std::vector<unsigned char> data(aspect * aspect * 4);
-            for (int i = 0; i < 6; ++i) {
+            for (auto i : FACES) {
                 for (unsigned int j = 0, level_aspect = aspect; level_aspect > 0; ++j, level_aspect >>= 1u) {
-                    gl::Loader::framebuffer_texture_2d(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, FACES[i], texture_object,
+                    gl::Loader::framebuffer_texture_2d(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, i, texture_object,
                         j);
                     gl::Loader::read_pixels(0, 0, level_aspect, level_aspect, GL_RGBA, GL_UNSIGNED_BYTE, data.data());
 #ifdef GX_DEBUG_TEXTURE_WRITE

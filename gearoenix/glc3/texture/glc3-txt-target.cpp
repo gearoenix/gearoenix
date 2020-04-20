@@ -230,8 +230,29 @@ void gearoenix::glc3::texture::Target::generate_framebuffer() noexcept
 #ifdef GX_DEBUG_GL_CLASS_3
     gl::Loader::check_for_error();
 #endif
-    if (gl::Loader::check_framebuffer_status(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-        GXLOGF("Failed to create render target!")
+    const auto framebuffer_status = gl::Loader::check_framebuffer_status(GL_FRAMEBUFFER);
+    switch (framebuffer_status) {
+    case GL_FRAMEBUFFER_UNDEFINED:
+        GXLOGF("Target is the default framebuffer, but the default framebuffer does not exist.")
+    case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+        GXLOGF("One of the framebuffer attachment points are framebuffer incomplete.")
+    case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+        GXLOGF("Framebuffer does not have at least one image attached to it")
+    case GL_FRAMEBUFFER_UNSUPPORTED:
+        GXLOGF("Depth and stencil attachments, if present, are not the same renderbuffer, "
+               "or if the combination of internal formats of the attached images violates "
+               "an implementation-dependent set of restrictions.")
+    case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS:
+        GXLOGF("Incomplete/unsupported dimensions")
+    case GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE:
+        GXLOGF("Value of GL_RENDERBUFFER_SAMPLES is not the same for all attached "
+               "renderbuffers or, if the attached images are a mix of renderbuffers and "
+               "textures, the value of GL_RENDERBUFFER_SAMPLES is not zero. ")
+    case GL_FRAMEBUFFER_COMPLETE:
+        break;
+    default:
+        GXLOGF("Unknown framebuffer error: " << framebuffer_status)
+    }
     state_init();
     gl::Loader::bind_framebuffer(GL_FRAMEBUFFER, 0);
 }

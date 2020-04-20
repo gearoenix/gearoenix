@@ -7,6 +7,7 @@ ADD_EXECUTABLE (GearoenixTests
     test-math-vector.hpp
     test-math-frustum.hpp
     test-physics-accelerator-bvh.hpp
+    test-render-texture.hpp
     test-main.cpp)
 TARGET_LINK_LIBRARIES (GearoenixTests Gearoenix ${GX_TEST_NEEDS})
 ADD_TEST (NAME GearoenixTests COMMAND GearoenixTests)

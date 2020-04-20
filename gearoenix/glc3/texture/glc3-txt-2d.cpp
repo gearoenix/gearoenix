@@ -29,9 +29,9 @@ std::shared_ptr<gearoenix::glc3::texture::Texture2D> gearoenix::glc3::texture::T
     result->img_height = img_height;
     const SampleInfo sample_info(info.sample_info);
     const bool needs_mipmap = info.has_mipmap;
-    const auto internal_format = convert_internal_format(info.format);
-    const auto format = convert_format(info.format);
-    const auto data_format = convert_data_format(info.format);
+    const auto internal_format = convert_internal_format(e, result->texture_format);
+    const auto format = convert_format(result->texture_format);
+    const auto data_format = convert_data_format(result->texture_format);
     const auto gl_img_width = static_cast<gl::sizei>(img_width);
     const auto gl_img_height = static_cast<gl::sizei>(img_height);
     std::vector<std::vector<std::uint8_t>> pixels;
@@ -42,25 +42,30 @@ std::shared_ptr<gearoenix::glc3::texture::Texture2D> gearoenix::glc3::texture::T
     } else {
         switch (info.format) {
         case render::texture::TextureFormat::RgbaFloat32:
-            // TODO: I can in future check for support of format, if it does not support, convert it
-            pixels = std::move(data);
+            if (e->get_engine_type() == render::engine::Type::OPENGL_ES3) {
+                pixels = convert_float_pixels(data, 4, 4);
+            } else {
+                pixels = std::move(data);
+            }
             break;
         case render::texture::TextureFormat::RgbFloat32:
-            // TODO: I can in future check for support of format, if it does not support, convert it
-            pixels = std::move(data);
+            if (e->get_engine_type() == render::engine::Type::OPENGL_ES3) {
+                pixels = convert_float_pixels(data, 3, 3);
+            } else {
+                pixels = std::move(data);
+            }
             break;
         case render::texture::TextureFormat::RgFloat32:
-            // TODO: I can in future check for support of format, if it does not support, convert it
-            pixels = std::move(data);
-            break;
-        case render::texture::TextureFormat::RgbFloat16:
-            // TODO: I can in future check for support of format, if it does not support, convert it
-            pixels = std::move(data);
+            if (e->get_engine_type() == render::engine::Type::OPENGL_ES3) {
+                pixels = convert_float_pixels(data, 2, 2);
+            } else {
+                pixels = std::move(data);
+            }
             break;
         case render::texture::TextureFormat::RgbaUint8:
-            pixels = std::move(data);
-            break;
         case render::texture::TextureFormat::RgbUint8:
+        case render::texture::TextureFormat::RgUint8:
+        case render::texture::TextureFormat::Uint8:
             pixels = std::move(data);
             break;
         default:
@@ -146,16 +151,33 @@ void gearoenix::glc3::texture::Texture2D::bind() const noexcept
     gl::Loader::bind_texture(GL_TEXTURE_2D, texture_object);
 }
 
-gearoenix::gl::sint gearoenix::glc3::texture::Texture2D::convert_internal_format(gearoenix::render::texture::TextureFormat f) noexcept
+gearoenix::gl::sint gearoenix::glc3::texture::Texture2D::convert_internal_format(
+    engine::Engine* const e, render::texture::TextureFormat& f) noexcept
 {
     switch (f) {
     case render::texture::TextureFormat::RgbaFloat32:
+        if (e->get_engine_type() == render::engine::Type::OPENGL_ES3) {
+            f = render::texture::TextureFormat::RgbaUint8;
+            return GL_RGBA;
+        }
         return GL_RGBA32F;
     case render::texture::TextureFormat::RgbFloat32:
+        if (e->get_engine_type() == render::engine::Type::OPENGL_ES3) {
+            f = render::texture::TextureFormat::RgbUint8;
+            return GL_RGB;
+        }
         return GL_RGB32F;
     case render::texture::TextureFormat::RgFloat32:
+        if (e->get_engine_type() == render::engine::Type::OPENGL_ES3) {
+            f = render::texture::TextureFormat::RgUint8;
+            return GL_RG;
+        }
         return GL_RG32F;
     case render::texture::TextureFormat::RgbFloat16:
+        if (e->get_engine_type() == render::engine::Type::OPENGL_ES3) {
+            f = render::texture::TextureFormat::RgbUint8;
+            return GL_RGB;
+        }
         return GL_RGB16F;
     case render::texture::TextureFormat::RgbaUint8:
         return GL_RGBA;

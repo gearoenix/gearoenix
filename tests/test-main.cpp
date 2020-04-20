@@ -15,3 +15,4 @@ GX_TEST_PRINT_TYPE_VAL(math::IntersectionStatus)
 #include "test-math-frustum.hpp"
 #include "test-math-vector.hpp"
 #include "test-physics-accelerator-bvh.hpp"
+#include "test-render-texture.hpp"
