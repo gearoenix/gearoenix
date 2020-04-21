@@ -4,13 +4,13 @@ android {
     compileSdkVersion 29
     defaultConfig {
         applicationId "com.geareonix.engine_demo"
-        minSdkVersion 15
+        minSdkVersion 14
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
         externalNativeBuild {
             cmake {
-                abiFilters 'arm64-v8a', 'armeabi-v7a', 'x86_64'
+                abiFilters 'arm64-v8a', 'armeabi-v7a', 'x86_64', 'x86'
                 arguments '-DANDROID_TOOLCHAIN=clang',
                         '-DANDROID_STL=c++_static',
                         '-DGX_ENABLE_TOOLS=OFF',
@@ -33,6 +33,5 @@ android {
         }
     }
 }
-
 dependencies {
 }

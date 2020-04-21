@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.geareonix.engine_demo">
+    package="com.geareonix.engine">
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <application
         android:allowBackup="true"
-        android:label="Gearoenix Demo"
+        android:label="@string/AppName"
         android:supportsRtl="true"
-        android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
-        android:hardwareAccelerated="true" >
-        <activity android:name=".MainActivity"
-            android:label="Gearoenix Demo"
+        android:hardwareAccelerated="true"
+        android:theme="@style/AppTheme"
+        android:fullBackupContent="true">
+        <activity android:name="com.geareonix.engine.MainActivity"
+            android:label="@string/ActivityName"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout"
-            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
-            android:screenOrientation="landscape">
+            android:screenOrientation="sensorLandscape"
+            android:theme="@style/AppTheme">
             <meta-data android:name="android.app.lib_name" android:value="main"/>
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

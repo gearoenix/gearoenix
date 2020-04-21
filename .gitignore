@@ -80,6 +80,8 @@ CMakeLists.txt.user
 
 .settings/
 /.settings/
+.settings
+/.settings
 
 ios-build/
 /ios-build/
