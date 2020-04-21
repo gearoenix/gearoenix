@@ -27,8 +27,8 @@ jobs:
           command: '
             ls;
             cd build;
-            echo "Building with `nproc --all` threads";
-            CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 cmake --build . --config Debug --target GX_COVERAGE -- -j`nproc --all`'
+            echo "Building...";
+            CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 cmake --build . --config Debug --target GX_COVERAGE'
       - codecov/upload:
           flags: unittest
           file: 'build/GX_COVERAGE.info'
