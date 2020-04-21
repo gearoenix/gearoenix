@@ -39,46 +39,16 @@ std::shared_ptr<gearoenix::gles2::texture::Texture2D> gearoenix::gles2::texture:
         for (auto& p : pixels[0])
             p = 0;
     } else {
-        pixels.reserve(data.size());
         switch (info.format) {
         case render::texture::TextureFormat::RgbaFloat32:
-        case render::texture::TextureFormat::RgbFloat32: {
-            for (auto& level_data : data) {
-                pixels.emplace_back(level_data.size() / sizeof(float));
-                auto& level_pixels = pixels.back();
-                const auto raw_data = reinterpret_cast<const float*>(level_data.data());
-                for (std::size_t i = 0; i < level_pixels.size(); ++i) {
-                    const auto c = raw_data[i] * 255.001f;
-                    if (c >= 255.0f)
-                        level_pixels[i] = 255;
-                    else if (c <= 0.0f)
-                        level_pixels[i] = 0;
-                    else
-                        level_pixels[i] = static_cast<std::uint8_t>(std::round(c));
-                }
-            }
+            pixels = convert_float_pixels(data, 4, 4);
             break;
-        }
-        case render::texture::TextureFormat::RgFloat32: {
-            for (auto& level_data : data) {
-                pixels.emplace_back((3 * level_data.size()) / (sizeof(float) * 2));
-                auto& level_pixels = pixels.back();
-                const auto raw_data = reinterpret_cast<const float*>(level_data.data());
-                for (gl::sizei i = 0; i < level_pixels.size(); ++i) {
-                    for (int j = 0; j < 2; ++j, ++i) {
-                        const auto c = raw_data[i] * 255.001f;
-                        if (c >= 255.0f)
-                            level_pixels[i] = 255;
-                        else if (c <= 0.0f)
-                            level_pixels[i] = 0;
-                        else
-                            level_pixels[i] = static_cast<std::uint8_t>(std::round(c));
-                    }
-                    level_pixels[i] = 0;
-                }
-            }
+        case render::texture::TextureFormat::RgbFloat32:
+            pixels = convert_float_pixels(data, 3, 3);
             break;
-        }
+        case render::texture::TextureFormat::RgFloat32:
+            pixels = convert_float_pixels(data, 2, 3);
+            break;
         case render::texture::TextureFormat::RgbUint8:
         case render::texture::TextureFormat::RgbaUint8: {
             pixels = std::move(data);

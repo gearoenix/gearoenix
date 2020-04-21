@@ -55,34 +55,15 @@ std::shared_ptr<gearoenix::gles2::texture::TextureCube> gearoenix::gles2::textur
     } else {
         switch (info.format) {
         case render::texture::TextureFormat::RgbaFloat32:
-        case render::texture::TextureFormat::RgbFloat32: {
-            for (std::size_t face_index = 0; face_index < GX_COUNT_OF(FACES); ++face_index) {
-                auto& face_pixels = pixels[face_index];
-                const auto& face_data = data[face_index];
-                face_pixels.resize(face_data.size());
-                for (std::size_t level_index = 0; level_index < face_data.size(); ++level_index) {
-                    auto& level_pixels = face_pixels[level_index];
-                    const auto& level_data = face_data[level_index];
-                    level_pixels.resize(level_data.size() / sizeof(float));
-                    const auto* const raw_data = reinterpret_cast<const float*>(level_data.data());
-                    for (std::size_t pixel_index = 0; pixel_index < level_pixels.size(); ++pixel_index) {
-                        const auto c = raw_data[pixel_index] * 255.001f;
-                        if (c >= 255.0f) {
-                            level_pixels[pixel_index] = 255;
-                        } else if (c <= 0.0f) {
-                            level_pixels[pixel_index] = 0;
-                        } else {
-                            level_pixels[pixel_index] = static_cast<std::uint8_t>(std::round(c));
-                        }
-                    }
-                }
-            }
+            pixels = convert_float_pixels(data, 4, 4);
             break;
-        }
+        case render::texture::TextureFormat::RgbFloat32:
+            pixels = convert_float_pixels(data, 3, 3);
+            break;
         case render::texture::TextureFormat::RgbaUint8:
-        case render::texture::TextureFormat::RgbUint8: {
+        case render::texture::TextureFormat::RgbUint8:
             pixels = std::move(data);
-        }
+            break;
         default:
             GXLOGF("Unsupported/Unimplemented setting for cube texture with id " << id)
         }
