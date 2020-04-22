@@ -21,68 +21,55 @@
 #include <android_native_app_glue.h>
 #include <string>
 
-void gearoenix::system::Application::handle(android_app* a, int32_t cmd) noexcept
+void gearoenix::system::Application::handle(android_app* const a, int32_t cmd) noexcept
 {
     switch (cmd) {
-    case APP_CMD_INIT_WINDOW:
-        if (android_application->window != nullptr) {
-            if (render_engine == nullptr) {
-                // TODO: If Vulkan was supported don't go any further
-                gl_context->init(android_application->window);
-                window_width = static_cast<unsigned int>(gl_context->get_screen_width());
-                window_height = static_cast<unsigned int>(gl_context->get_screen_height());
-                compute_screen_ratios();
-#ifdef GX_USE_OPENGL_ES3
-                if (gl_context->get_es3_supported()) {
-                    GXLOGD("Going to create OpenGL ES3 render engine.")
-                    render_engine = std::unique_ptr<render::engine::Engine>(glc3::engine::Engine::construct(this, render::engine::Type::OPENGL_ES3));
-                }
-#endif
-#ifdef GX_USE_OPENGL_ES2
-                if (!gl_context->get_es3_supported()) {
-                    GXLOGD("Going to create OpenGL ES2 render engine.")
-                    render_engine = std::unique_ptr<render::engine::Engine>(gles2::engine::Engine::construct(this));
-                }
-#endif
-                asset_manager = std::make_unique<core::asset::Manager>(this, GX_APP_DATA_NAME);
-            } else if (a->window != android_application->window) {
-                //                GXLOGE("reached");
-                //                core::event::system::System eul(core::event::system::System::Action::UNLOAD);
-                //                core_app->on_event(eul);
-                //                render_engine->on_event(eul);
-                //                gl_ctx->Invalidate();
-                //                and_app = a;
-                //                gl_ctx->Init(a->window);
-                //                core::event::system::System erl(core::event::system::System::Action::RELOAD);
-                //                core_app->on_event(erl);
-                //                render_engine->on_event(erl);
-                //                GXLOGE("reached");
-                //            } else if (EGL_SUCCESS == gl_ctx->Resume(a->window)) {
-                //                GXLOGE("reached");
-                //                core::event::system::System eul(core::event::system::System::Action::UNLOAD);
-                //                core_app->on_event(eul);
-                //                render_engine->on_event(eul);
-                //                core::event::system::System erl(core::event::system::System::Action::RELOAD);
-                //                core_app->on_event(erl);
-                //                render_engine->on_event(erl);
-                //                GXLOGE("reached");
-            } else
-                GXUNEXPECTED;
-            //            win_width = (unsigned int)gl_ctx->GetScreenWidth();
-            //            win_height = (unsigned int)gl_ctx->GetScreenHeight();
-            running = true;
-        }
+    case APP_CMD_START:
+        GXLOGD("Application started.")
+        on_check_ready_to_render(a);
         break;
-    case APP_CMD_TERM_WINDOW: {
-        //        if (core_app == nullptr || render_engine == nullptr)
-        //            break;
-        //        active = false;
-        //        core::event::system::System eul(core::event::system::System::Action::UNLOAD);
-        //        core_app->on_event(eul);
-        //        render_engine->on_event(eul);
-        //        gl_ctx->Suspend();
-        //        break;
-    }
+    case APP_CMD_RESUME:
+        GXLOGD("Application resumed.")
+        resumed = true;
+        on_check_ready_to_render(a);
+        break;
+    case APP_CMD_PAUSE:
+        GXLOGD("Application paused.")
+        on_not_ready_to_render();
+        break;
+    case APP_CMD_STOP:
+        GXLOGD("Application stopped.")
+        on_not_ready_to_render();
+        break;
+    case APP_CMD_DESTROY:
+        GXLOGD("Application destroyed.")
+        break;
+    case APP_CMD_GAINED_FOCUS:
+        GXLOGD("Application focused.")
+        focused = true;
+        on_check_ready_to_render(a);
+        break;
+    case APP_CMD_LOST_FOCUS:
+        GXLOGD("Application unfocused.")
+        on_not_ready_to_render();
+        break;
+    case APP_CMD_INIT_WINDOW:
+        GXLOGD("Application surface ready.")
+        surface_ready = true;
+        on_check_ready_to_render(a);
+        break;
+    case APP_CMD_TERM_WINDOW:
+        GXLOGD("Android window terminated.")
+        on_not_ready_to_render();
+        break;
+    case APP_CMD_WINDOW_RESIZED:
+        GXLOGD("Android window resized.")
+        // todo
+        break;
+    case APP_CMD_CONFIG_CHANGED:
+        GXLOGD("Android config changed.")
+        // todo
+        break;
     default:
         GXLOGI("event not handled: " << cmd);
     }
@@ -113,13 +100,13 @@ int32_t gearoenix::system::Application::handle(android_app* const, AInputEvent* 
     return 0;
 }
 
-void gearoenix::system::Application::handle_cmd(android_app* app, int32_t cmd) noexcept
+void gearoenix::system::Application::handle_cmd(android_app* const a, int32_t cmd) noexcept
 {
-    auto sys_app = static_cast<Application*>(app->userData);
-    sys_app->handle(app, cmd);
+    auto sys_app = static_cast<Application*>(a->userData);
+    sys_app->handle(a, cmd);
 }
 
-int32_t gearoenix::system::Application::handle_input(android_app* a, AInputEvent* e) noexcept
+int32_t gearoenix::system::Application::handle_input(android_app* const a, AInputEvent* const e) noexcept
 {
     auto sys_app = static_cast<Application*>(a->userData);
     return sys_app->handle(a, e);
@@ -130,6 +117,85 @@ void gearoenix::system::Application::compute_screen_ratios() noexcept
     constexpr double DOUBLE_F = 2.0;
     window_ratio = static_cast<double>(window_width) / static_cast<double>(window_height);
     half_height_inverted = DOUBLE_F / static_cast<double>(window_height);
+}
+
+void gearoenix::system::Application::update_window_size() noexcept
+{
+#ifdef GX_USE_OPENGL
+    if (gl_context != nullptr) {
+        window_width = static_cast<unsigned int>(gl_context->get_screen_width());
+        window_height = static_cast<unsigned int>(gl_context->get_screen_height());
+    }
+#endif
+    compute_screen_ratios();
+}
+
+void gearoenix::system::Application::on_check_ready_to_render(android_app* const a) noexcept
+{
+    if (!resumed || !focused || !surface_ready)
+        return;
+    if (android_application->window == nullptr)
+        return;
+    if (render_engine == nullptr) {
+#ifdef GX_USE_OPENGL
+        if (gl_context != nullptr) {
+            gl_context->init(android_application->window);
+        }
+#endif
+        update_window_size();
+#ifdef GX_USE_OPENGL_ES3
+        if (gl_context->get_es3_supported()) {
+            GXLOGD("Going to create OpenGL ES3 render engine.")
+            render_engine = std::unique_ptr<render::engine::Engine>(
+                glc3::engine::Engine::construct(this, render::engine::Type::OPENGL_ES3));
+        }
+#endif
+#ifdef GX_USE_OPENGL_ES2
+        if (!gl_context->get_es3_supported()) {
+            GXLOGD("Going to create OpenGL ES2 render engine.")
+            render_engine = std::unique_ptr<render::engine::Engine>(
+                gles2::engine::Engine::construct(this));
+        }
+#endif
+        asset_manager = std::make_unique<core::asset::Manager>(this, GX_APP_DATA_NAME);
+    } else if (a->window != android_application->window) {
+        GXLOGF("Window reinitialized with different window (not implemented).")
+        // todo
+        // core::event::system::System eul(core::event::system::System::Action::UNLOAD);
+        // core_app->on_event(eul);
+        // render_engine->on_event(eul);
+        // gl_ctx->Invalidate();
+        // and_app = a;
+        // gl_ctx->Init(a->window);
+        // core::event::system::System erl(core::event::system::System::Action::RELOAD);
+        // core_app->on_event(erl);
+        // render_engine->on_event(erl);
+    } else {
+        GXLOGE("Window Reinitialized")
+#ifdef GX_USE_OPENGL
+        if (GX_RUNTIME_USE_OPENGL_E(render_engine)) {
+            gl_context->resume(android_application->window);
+        }
+#endif
+        update_window_size();
+        // todo: send event about reinitialization
+    }
+    running = true;
+}
+
+void gearoenix::system::Application::on_not_ready_to_render() noexcept
+{
+    if (!running)
+        return;
+    running = false;
+    resumed = false;
+    focused = false;
+    surface_ready = false;
+#ifdef GX_USE_OPENGL
+    if (GX_RUNTIME_USE_OPENGL_E(render_engine)) {
+        gl_context->suspend();
+    }
+#endif
 }
 
 gearoenix::system::Application::Application(android_app* and_app) noexcept

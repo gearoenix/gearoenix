@@ -39,19 +39,26 @@ class Application {
     GX_GET_VAL_PRV(unsigned int, window_width, 0)
     GX_GET_VAL_PRV(unsigned int, window_height, 0)
     GX_GET_VAL_PRV(double, window_ratio, 1.0)
-private:
-    bool running = true;
+    GX_GET_VAL_PRV(bool, running, false)
+    GX_GET_VAL_PRV(bool, resumed, false)
+    GX_GET_VAL_PRV(bool, focused, false)
+    GX_GET_VAL_PRV(bool, surface_ready, false)
+    GX_GET_VAL_PRV(double, half_height_inverted, 1.0)
+    GX_GET_VAL_PRV(double, x, 0.0)
+    GX_GET_VAL_PRV(double, y, 0.0)
 #ifdef GX_USE_OPENGL
-    GlContext* gl_context = nullptr;
+    GX_GET_UPTR_PRV(GlContext, gl_context)
 #endif
-    double half_height_inverted = 1.0;
-    double x = 0.0;
-    double y = 0.0;
+
+private:
     void handle(android_app* app, int32_t cmd) noexcept;
     int32_t handle(android_app* app, AInputEvent* e) noexcept;
     static void handle_cmd(android_app* app, int32_t cmd) noexcept;
     static int32_t handle_input(android_app* app, AInputEvent* e) noexcept;
     void compute_screen_ratios() noexcept;
+    void update_window_size() noexcept;
+    void on_check_ready_to_render(android_app*) noexcept;
+    void on_not_ready_to_render() noexcept;
 
 public:
     Application(struct android_app* and_app) noexcept;

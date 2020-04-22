@@ -175,13 +175,13 @@ void gearoenix::system::GlContext::resume(ANativeWindow* const window) noexcept
         init(window);
         return;
     }
-    const int original_widhth = screen_width;
+    const int original_width = screen_width;
     const int original_height = screen_height;
     this->window = window;
     surface = eglCreateWindowSurface(display, config, window, nullptr);
     eglQuerySurface(display, surface, EGL_WIDTH, &screen_width);
     eglQuerySurface(display, surface, EGL_HEIGHT, &screen_height);
-    if (screen_width != original_widhth || screen_height != original_height)
+    if (screen_width != original_width || screen_height != original_height)
         GXLOGD("Screen resized");
     if (eglMakeCurrent(display, surface, surface, context) == EGL_TRUE)
         return;
