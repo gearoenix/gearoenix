@@ -35,7 +35,7 @@ private:
 #endif
     void check_endian_compatibility() noexcept;
 
-    Asset() noexcept;
+    Asset();
 
 public:
     ~Asset() noexcept final;

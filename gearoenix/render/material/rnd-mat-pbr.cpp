@@ -107,5 +107,6 @@ void gearoenix::render::material::Pbr::set_radiance(gearoenix::render::texture::
 {
     radiance = t;
     uniform.radiance_lod_coefficient = static_cast<float>(
-        engine::Configuration::compute_runtime_reflection_radiance_levels(t->get_aspect()) - 1);
+        engine::Configuration::compute_runtime_reflection_radiance_levels(
+            static_cast<int>(t->get_aspect() - 1)));
 }

@@ -112,7 +112,7 @@ std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::gles2::engin
     const std::size_t aspect,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
 {
-    return texture::TextureCube::construct(id, this, std::move(data), info, aspect, call);
+    return texture::TextureCube::construct(id, this, std::move(data), info, static_cast<unsigned int>(aspect), call);
 }
 
 std::shared_ptr<gearoenix::render::texture::Target> gearoenix::gles2::engine::Engine::create_render_target(

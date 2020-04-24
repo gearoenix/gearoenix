@@ -505,8 +505,8 @@ gearoenix::system::Application::Application(const int argc, const char* const* c
 #ifdef GX_FULLSCREEN
     SDL_DisplayMode display_mode;
     SDL_GetCurrentDisplayMode(0, &display_mode);
-    win_width = static_cast<unsigned int>(display_mode.w);
-    win_height = static_cast<unsigned int>(display_mode.h);
+    window_width = static_cast<unsigned int>(display_mode.w);
+    window_height = static_cast<unsigned int>(display_mode.h);
 #else
     window_width = GX_DEFAULT_WINDOW_WIDTH;
     window_height = GX_DEFAULT_WINDOW_HEIGHT;

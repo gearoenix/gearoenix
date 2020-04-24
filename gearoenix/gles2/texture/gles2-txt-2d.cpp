@@ -67,9 +67,11 @@ std::shared_ptr<gearoenix::gles2::texture::Texture2D> gearoenix::gles2::texture:
         gl::Loader::tex_parameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, sample_info.wrap_t);
         for (std::size_t level_index = 0; level_index < pixels.size(); ++level_index) {
             gl::Loader::tex_image_2d(
-                GL_TEXTURE_2D, level_index, static_cast<gl::sint>(cf),
-                gl_img_width >> level_index, gl_img_height >> level_index, 0,
-                static_cast<gl::enumerated>(cf), GL_UNSIGNED_BYTE, pixels[level_index].data());
+                GL_TEXTURE_2D, static_cast<gl::sint>(level_index),
+                static_cast<gl::sint>(cf), gl_img_width >> level_index,
+                gl_img_height >> level_index, 0,
+                static_cast<gl::enumerated>(cf), GL_UNSIGNED_BYTE,
+                pixels[level_index].data());
         }
         if (needs_mipmap && pixels.size() < 2) {
             gl::Loader::generate_mipmap(GL_TEXTURE_2D);

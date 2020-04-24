@@ -523,10 +523,10 @@ std::vector<gearoenix::math::Vec2<float>> gearoenix::render::texture::Manager::c
     std::vector<std::thread> threads;
     const auto threads_count = std::thread::hardware_concurrency();
     const auto rows_per_thread = resolution / threads_count;
-    for (unsigned int thread_index = 0, starting_row = 0; thread_index < threads_count; ++thread_index) {
+    for (std::size_t thread_index = 0, starting_row = 0; thread_index < threads_count; ++thread_index) {
         const auto ending_row = starting_row + rows_per_thread;
         threads.emplace_back([&, starting_row { starting_row }, ending_row { ending_row < resolution ? ending_row : resolution }] {
-            for (unsigned int r = starting_row, i = starting_row * resolution; r < ending_row; ++r) {
+            for (std::size_t r = starting_row, i = starting_row * resolution; r < ending_row; ++r) {
                 for (std::size_t c = 0; c < resolution; ++c, ++i) {
                     pixels[i] = integrate_brdf((float(c) + 0.5f) * inv_res, (float(r) + 0.5f) * inv_res);
                 }

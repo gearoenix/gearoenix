@@ -96,3 +96,8 @@ android/app/release/
 
 documentation/*
 !documentation/Doxyfile
+
+*.xcassets
+*.xcassets/
+/*.xcassets
+/*.xcassets/

@@ -46,7 +46,7 @@ void gearoenix::render::texture::Image::decode(
     img_width = static_cast<unsigned int>(iw);
     img_height = static_cast<unsigned int>(ih);
     img_channels = static_cast<unsigned int>(chs);
-    const unsigned int img_size = img_width * img_height * chs;
+    const auto img_size = static_cast<unsigned int>(img_width * img_height * chs);
     decoded_data.resize(img_size);
     std::memcpy(&(decoded_data[0]), dd, img_size);
     stbi_image_free(dd);
@@ -82,7 +82,13 @@ void gearoenix::render::texture::Image::encode_png(
     const std::size_t img_height,
     const std::size_t components_count) noexcept
 {
-    stbi_write_png_to_func(encode_write_func, file, img_width, img_height, components_count, data, img_width * components_count);
+    stbi_write_png_to_func(
+        encode_write_func, file,
+        static_cast<int>(img_width),
+        static_cast<int>(img_height),
+        static_cast<int>(components_count),
+        data,
+        static_cast<int>(img_width * components_count));
 }
 
 void gearoenix::render::texture::Image::encode_hdr(
@@ -92,5 +98,10 @@ void gearoenix::render::texture::Image::encode_hdr(
     const std::size_t img_height,
     const std::size_t components_count) noexcept
 {
-    stbi_write_hdr_to_func(encode_write_func, file, img_width, img_height, components_count, data);
+    stbi_write_hdr_to_func(
+        encode_write_func, file,
+        static_cast<int>(img_width),
+        static_cast<int>(img_height),
+        static_cast<int>(components_count),
+        data);
 }

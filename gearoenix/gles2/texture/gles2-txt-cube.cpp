@@ -79,9 +79,12 @@ std::shared_ptr<gearoenix::gles2::texture::TextureCube> gearoenix::gles2::textur
             const auto& face_pixels = pixels[fi];
             for (std::size_t level_index = 0; level_index < face_pixels.size(); ++level_index) {
                 gl::Loader::tex_image_2d(
-                    FACES[fi], level_index, static_cast<gl::sint>(cf),
-                    gl_aspect >> level_index, gl_aspect >> level_index, 0, cf,
-                    GL_UNSIGNED_BYTE, face_pixels[level_index].data());
+                    FACES[fi],
+                    static_cast<gl::sint>(level_index),
+                    static_cast<gl::sint>(cf),
+                    static_cast<gl::sizei>(gl_aspect >> level_index),
+                    static_cast<gl::sizei>(gl_aspect >> level_index),
+                    0, cf, GL_UNSIGNED_BYTE, face_pixels[level_index].data());
             }
         }
 #ifdef GX_DEBUG_GLES2

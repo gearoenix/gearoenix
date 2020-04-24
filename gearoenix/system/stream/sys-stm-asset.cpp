@@ -18,7 +18,7 @@ void gearoenix::system::stream::Asset::check_endian_compatibility() noexcept
     endian_compatibility = (resource_endian == ((uint8_t*)(&system_endian))[0]);
 }
 
-gearoenix::system::stream::Asset::Asset() noexcept = default;
+gearoenix::system::stream::Asset::Asset() = default;
 
 #ifdef GX_IN_ANDROID
 gearoenix::system::stream::Asset::~Asset() noexcept
@@ -34,7 +34,7 @@ gearoenix::system::stream::Asset* gearoenix::system::stream::Asset::construct(sy
     auto* const asset = new Asset();
 #ifdef GX_USE_STD_FILE
 #ifdef GX_IN_IOS
-    return nullptr;
+    std::string file_path;
     @autoreleasepool {
         // NSString *f_name = [NSString stringWithCString:name.c_str() encoding:[NSString defaultCStringEncoding]];
         NSString* path = [[NSBundle mainBundle] pathForResource:@"data" ofType:@"gx3d"];
