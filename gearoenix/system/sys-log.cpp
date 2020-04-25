@@ -1,5 +1,5 @@
 #include "sys-log.hpp"
-#if !defined(GX_IN_ANDROID) && !defined(GX_IN_WEB) && defined(GX_LOG_ENABLED)
+#if !defined(GX_IN_ANDROID) && !defined(GX_IN_WEB) && defined(GX_LOG_ENABLED) && !defined(GX_IN_IOS)
 std::ofstream gearoenix::system::Log::info("info.txt");
 std::mutex gearoenix::system::Log::info_lock;
 #ifdef GX_DEBUG_MODE

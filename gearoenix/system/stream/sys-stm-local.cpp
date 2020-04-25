@@ -2,14 +2,34 @@
 #include "../../core/cr-build-configuration.hpp"
 #include "../sys-log.hpp"
 
+#ifdef GX_IN_IOS
+#include "../../core/cr-string.hpp"
+#endif
+
+
 gearoenix::system::stream::Local::Local(std::fstream file) noexcept
     : file(std::move(file))
 {
 }
 
+static std::string create_path(const std::string& name) noexcept {
+    #ifdef GX_IN_IOS
+    @autoreleasepool {
+        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+        NSString* path = [paths objectAtIndex:0];
+        return gearoenix::core::String::join_path(path, name);
+    }
+    #elif defined(GX_IN_ANDROID)
+    GXUNIMPLEMENTED
+    #else
+    return name;
+    #endif
+}
+
 gearoenix::system::stream::Local::Local(const std::string& name, bool writable) noexcept
-    : file(name, std::ios::binary | (writable ? std::ios::out : std::ios::in))
 {
+    const std::string file_path = create_path(name);
+    file.open(file_path, std::ios::binary | (writable ? std::ios::out : std::ios::in));
     if (!file.is_open())
         GXUNEXPECTED
 }
@@ -18,7 +38,8 @@ gearoenix::system::stream::Local::~Local() noexcept = default;
 
 gearoenix::system::stream::Local* gearoenix::system::stream::Local::open(const std::string& name, const bool writable) noexcept
 {
-    std::fstream file(name, std::ios::binary | (writable ? std::ios::out : std::ios::in));
+    const std::string file_path = create_path(name);
+    std::fstream file(file_path, std::ios::binary | (writable ? std::ios::out : std::ios::in));
     if (!file.is_open())
         return nullptr;
     return new Local(std::move(file));

@@ -5,7 +5,7 @@
 #include <exception>
 #ifdef GX_IN_ANDROID
 #include "android/sys-and-log.hpp"
-#elif defined(GX_IN_WEB)
+#elif defined(GX_IN_WEB) || defined(GX_IN_IOS)
 #include <iostream>
 #define GXLOGI(s)                                                  \
     std::cout << GX_APP_NAME << " " << s << " " << __FILE__ << " " \

@@ -8,7 +8,7 @@
 #elif defined(GX_USE_WINAPI)
 #include <Windows.h>
 #elif defined(GX_USE_SDL)
-#include <SDL.h>
+#include <SDL_main.h>
 #endif
 
 namespace gearoenix::render::engine {
@@ -66,12 +66,12 @@ public:
         return 0;                                                                                                \
     }
 #elif defined(GX_IN_LINUX) || defined(GX_IN_MAC) || defined(GX_IN_IOS) || defined(GX_USE_SDL)
-#define GEAROENIX_START(CoreApp)                                                      \
-    int main(const int arc, const char* const* const argv)                            \
-    {                                                                                 \
-        const auto app = std::make_unique<gearoenix::system::Application>(arc, argv); \
-        app->execute(std::make_unique<CoreApp>(app.get()));                           \
-        return 0;                                                                     \
+#define GEAROENIX_START(CoreApp)                                                       \
+    extern "C" int main(int argc, char* argv[])                                        \
+    {                                                                                  \
+        const auto app = std::make_unique<gearoenix::system::Application>(argc, argv); \
+        app->execute(std::make_unique<CoreApp>(app.get()));                            \
+        return 0;                                                                      \
     }
 #else
 #error "Unexpected platform."

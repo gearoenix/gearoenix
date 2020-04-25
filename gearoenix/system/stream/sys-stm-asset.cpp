@@ -4,8 +4,7 @@
 #include "../sys-log.hpp"
 
 #ifdef GX_IN_IOS
-#import <Foundation/Foundation.h>
-//#import "../apple/sys-apl.mm"
+#include "../../core/cr-string.hpp"
 #elif defined(GX_IN_ANDROID) && !defined(GX_USE_SDL)
 #include <android_native_app_glue.h>
 #endif
@@ -36,9 +35,9 @@ gearoenix::system::stream::Asset* gearoenix::system::stream::Asset::construct(sy
 #ifdef GX_IN_IOS
     std::string file_path;
     @autoreleasepool {
-        // NSString *f_name = [NSString stringWithCString:name.c_str() encoding:[NSString defaultCStringEncoding]];
-        NSString* path = [[NSBundle mainBundle] pathForResource:@"data" ofType:@"gx3d"];
-        file_path = std::string([path fileSystemRepresentation]);
+        NSString* path = [[NSBundle mainBundle] resourcePath];
+        file_path = core::String::join_path(path, name);
+        GXLOGD("iOS generated file path is: " << file_path)
     }
 #else
     const std::string file_path = sys_app->get_arguments()->get_process_directory() + name;
