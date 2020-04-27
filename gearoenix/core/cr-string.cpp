@@ -165,21 +165,24 @@ NSString* gearoenix::core::String::to_objc_string(const std::string& s) noexcept
     return to_objc_string(s.c_str());
 }
 
-NSString* gearoenix::core::String::to_objc_string(const char*const s) noexcept
+NSString* gearoenix::core::String::to_objc_string(const char* const s) noexcept
 {
     return [NSString stringWithCString:s encoding:[NSString defaultCStringEncoding]];
 }
 
-std::string gearoenix::core::String::join_path(const NSString* dir, const std::string& s) noexcept {
+std::string gearoenix::core::String::join_path(const NSString* dir, const std::string& s) noexcept
+{
     return join_path(dir, s.c_str());
 }
 
-std::string gearoenix::core::String::join_path(const NSString* dir, const char* s) noexcept {
+std::string gearoenix::core::String::join_path(const NSString* dir, const char* s) noexcept
+{
     return join_path(dir, to_objc_string(s));
 }
 
-std::string gearoenix::core::String::join_path(const NSString* dir, const NSString* s) noexcept {
-    NSArray *parts = [NSArray arrayWithObjects:dir, s, (NSString*)nil];
+std::string gearoenix::core::String::join_path(const NSString* dir, const NSString* s) noexcept
+{
+    NSArray* parts = [NSArray arrayWithObjects:dir, s, (NSString*)nil];
     return std::string([[NSString pathWithComponents:parts] fileSystemRepresentation]);
 }
 

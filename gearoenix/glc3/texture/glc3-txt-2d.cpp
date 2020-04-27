@@ -183,6 +183,8 @@ gearoenix::gl::sint gearoenix::glc3::texture::Texture2D::convert_internal_format
         return GL_RGBA;
     case render::texture::TextureFormat::RgbUint8:
         return GL_RGB;
+    case render::texture::TextureFormat::RgUint8:
+        return GL_RG;
     case render::texture::TextureFormat::D32:
         return GL_DEPTH_COMPONENT32F;
     default:
@@ -201,6 +203,7 @@ gearoenix::gl::enumerated gearoenix::glc3::texture::Texture2D::convert_format(ge
     case render::texture::TextureFormat::RgbFloat32:
     case render::texture::TextureFormat::RgbFloat16:
         return GL_RGB;
+    case render::texture::TextureFormat::RgUint8:
     case render::texture::TextureFormat::RgFloat32:
     case render::texture::TextureFormat::RgFloat16:
         return GL_RG;
@@ -224,6 +227,7 @@ gearoenix::gl::enumerated gearoenix::glc3::texture::Texture2D::convert_data_form
         return GL_HALF_FLOAT;
     case render::texture::TextureFormat::RgbaUint8:
     case render::texture::TextureFormat::RgbUint8:
+    case render::texture::TextureFormat::RgUint8:
         return GL_UNSIGNED_BYTE;
     default:
         GXLOGF("Unsupported/Unimplemented setting for texture with id " << int(f))

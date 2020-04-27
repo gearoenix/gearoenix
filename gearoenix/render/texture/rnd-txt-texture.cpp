@@ -1,6 +1,7 @@
 #include "rnd-txt-texture.hpp"
 #include "../../core/sync/cr-sync-parallel-for.hpp"
 #include "../../system/stream/sys-stm-local.hpp"
+#include "../engine/rnd-eng-engine.hpp"
 #include "rnd-txt-image.hpp"
 #include "rnd-txt-pixel-iterator.hpp"
 #include <cmath>
@@ -59,7 +60,7 @@ void gearoenix::render::texture::Texture::write_gx3d(
     const std::string& file_address,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
 {
-    std::shared_ptr<system::stream::Stream> l(new system::stream::Local(file_address, true));
+    std::shared_ptr<system::stream::Stream> l(new system::stream::Local(render_engine->get_system_application(), file_address, true));
     write_gx3d(l, c);
 }
 

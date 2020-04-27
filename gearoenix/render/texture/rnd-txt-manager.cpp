@@ -192,15 +192,18 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     }
     const auto baked_path = std::string("baked-brdflut-x") + std::to_string(resolution) + ".png";
     {
-        const std::unique_ptr<system::stream::Local> brdf_cached(system::stream::Local::open(baked_path));
+        const std::unique_ptr<system::stream::Local> brdf_cached(system::stream::Local::open(
+            e->get_system_application(), baked_path));
         if (brdf_cached != nullptr) {
             GXLOGD("BRDFLUT baked file has been found.")
             const auto data = brdf_cached->get_file_content();
-            brdflut = create_2d(data.data(), data.size(), c, SampleInfo {
-                                                                 .wrap_s = Wrap::ClampToEdge,
-                                                                 .wrap_t = Wrap::ClampToEdge,
-                                                                 .wrap_r = Wrap::ClampToEdge,
-                                                             });
+            brdflut = create_2d(
+                data.data(), data.size(), c,
+                SampleInfo {
+                    .wrap_s = Wrap::ClampToEdge,
+                    .wrap_t = Wrap::ClampToEdge,
+                    .wrap_r = Wrap::ClampToEdge,
+                });
             return brdflut;
         }
     }
@@ -234,7 +237,8 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
             data[++data_index] = 255;
             ++data_index;
         }
-        const std::unique_ptr<system::stream::Local> brdf_baked(new system::stream::Local(baked_path, true));
+        const std::unique_ptr<system::stream::Local> brdf_baked(new system::stream::Local(
+            e->get_system_application(), baked_path, true));
         Image::encode_png(brdf_baked.get(), data.data(), resolution, resolution, 4);
     }
     const auto data_size = pixels.size() * sizeof(math::Vec2<float>);
