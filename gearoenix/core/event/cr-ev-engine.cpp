@@ -58,7 +58,7 @@ void gearoenix::core::event::Engine::loop() noexcept
 
 gearoenix::core::event::Engine::Engine() noexcept
     : state(State::Running)
-    , event_thread(std::bind(&Engine::loop, this))
+    , event_thread([this] { loop(); })
 {
 }
 
@@ -193,4 +193,16 @@ void gearoenix::core::event::Engine::mouse_button(const button::MouseKeyId k, co
 bool gearoenix::core::event::Engine::is_pressed(gearoenix::core::event::button::KeyboardKeyId k) noexcept
 {
     return pressed_keyboard_buttons.find(k) != pressed_keyboard_buttons.end();
+}
+
+void gearoenix::core::event::Engine::init_window_size(std::size_t w, std::size_t h) noexcept
+{
+}
+
+void gearoenix::core::event::Engine::set_window_size(const std::size_t w, const std::size_t h) noexcept
+{
+    window_width = w;
+    window_height = h;
+    window_rev_half_width = 2.0 / static_cast<double>(w);
+    window_rev_half_height = 2.0 / static_cast<double>(h);
 }

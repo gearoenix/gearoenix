@@ -44,6 +44,12 @@ private:
 
     movement::Base mouse_movement;
 
+    std::size_t window_width = 0;
+    std::size_t window_height = 0;
+
+    double window_rev_half_width = 0.0;
+    double window_rev_half_height = 0.0;
+
     void loop() noexcept;
 
 public:
@@ -59,6 +65,8 @@ public:
     void set_mouse_movement(const math::Vec2<double>& position) noexcept;
     void mouse_button(button::MouseKeyId key, button::MouseActionId action) noexcept;
     bool is_pressed(button::KeyboardKeyId k) noexcept;
+    void init_window_size(std::size_t w, std::size_t h) noexcept;
+    void set_window_size(std::size_t w, std::size_t h) noexcept;
 };
 }
 #endif
