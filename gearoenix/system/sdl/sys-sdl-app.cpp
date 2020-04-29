@@ -83,8 +83,8 @@ void gearoenix::system::Application::create_window() noexcept
         GX_APP_NAME,                                                        \
         static_cast<int>(SDL_WINDOWPOS_CENTERED),                           \
         static_cast<int>(SDL_WINDOWPOS_CENTERED),                           \
-        static_cast<int>(window_width),                                     \
-        static_cast<int>(window_height),                                    \
+        static_cast<int>(event_engine->get_window_width()),                 \
+        static_cast<int>(event_engine->get_window_height()),                \
         flags);                                                             \
     if (nullptr != window) {                                                \
         GXLOGD("Trying to build OpenGL context with: " << #gl_version)      \
@@ -409,8 +409,7 @@ int gearoenix::system::Application::on_event(SDL_Event* const e) noexcept
         o->pre_y = y;*/
         break;
     }
-
-    case SDL_MOUSEWHEEL:
+    case SDL_MOUSEWHEEL: {
         event.source = core::event::Id::ScrollMouse;
         event.data = core::event::button::MouseScroll {
             math::Vec2(
@@ -418,10 +417,9 @@ int gearoenix::system::Application::on_event(SDL_Event* const e) noexcept
                 static_cast<double>(e->wheel.y))
         };
         break;
+    }
     case SDL_MOUSEMOTION:
-        event_engine->set_mouse_movement(math::Vec2(
-            convert_x_to_ratio(e->button.x),
-            convert_y_to_ratio(e->button.y)));
+        event_engine->set_mouse_movement(e->button.x, e->button.y);
         break;
     case SDL_MOUSEBUTTONUP:
     case SDL_MOUSEBUTTONDOWN: {
@@ -461,17 +459,9 @@ int gearoenix::system::Application::on_event(SDL_Event* const e) noexcept
     case SDL_WINDOWEVENT:
         switch (e->window.event) {
         case SDL_WINDOWEVENT_RESIZED: {
-            core::event::system::WindowSizeChangeData d;
-            d.pre_width = static_cast<double>(window_width);
-            d.pre_height = static_cast<double>(window_height);
-            d.cur_width = static_cast<double>(e->window.data1);
-            d.cur_height = static_cast<double>(e->window.data2);
-            event.data = d;
-            event.source = core::event::Id::SystemWindowSizeChange;
-            window_width = static_cast<unsigned int>(e->window.data1);
-            window_height = static_cast<unsigned int>(e->window.data2);
-            window_ratio = static_cast<double>(window_width) / static_cast<double>(window_height);
-            half_height_inversed = 2.0f / static_cast<double>(window_height);
+            event_engine->update_window_size(
+                static_cast<std::size_t>(e->window.data1),
+                static_cast<std::size_t>(e->window.data2));
             break;
         }
         default:
@@ -490,7 +480,8 @@ int gearoenix::system::Application::on_event(SDL_Event* const e) noexcept
 }
 
 gearoenix::system::Application::Application(const int argc, const char* const* const argv) noexcept
-    : arguments(new Args(argc, argv))
+    : event_engine(new core::event::Engine())
+    , arguments(new Args(argc, argv))
 {
     GXLOGD("Constructing Gearoenix system application monomorphic interface over SDL2.")
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_AUDIO) != 0) {
@@ -505,11 +496,9 @@ gearoenix::system::Application::Application(const int argc, const char* const* c
 #ifdef GX_FULLSCREEN
     SDL_DisplayMode display_mode;
     SDL_GetCurrentDisplayMode(0, &display_mode);
-    window_width = static_cast<unsigned int>(display_mode.w);
-    window_height = static_cast<unsigned int>(display_mode.h);
-#else
-    window_width = GX_DEFAULT_WINDOW_WIDTH;
-    window_height = GX_DEFAULT_WINDOW_HEIGHT;
+    event_engine->initialize_window_size(
+        static_cast<std::size_t>(display_mode.w),
+        static_cast<std::size_t>(display_mode.h));
 #endif
     create_window();
     SDL_AddEventWatch(event_receiver, this);
@@ -517,20 +506,21 @@ gearoenix::system::Application::Application(const int argc, const char* const* c
     if (GX_RUNTIME_USE_OPENGL_V(supported_engine)) {
         int w, h;
         SDL_GL_GetDrawableSize(window, &w, &h);
-        window_width = static_cast<unsigned int>(w);
-        window_height = static_cast<unsigned int>(h);
+        event_engine->initialize_window_size(
+            static_cast<std::size_t>(w),
+            static_cast<std::size_t>(h));
     }
 #endif
-    window_ratio = static_cast<double>(window_width) / static_cast<double>(window_height);
-    half_height_inversed = 2.0f / static_cast<double>(window_height);
     int mx, my;
     SDL_GetMouseState(&mx, &my);
+    event_engine->set_mouse_position(mx, my);
 
 #ifdef GX_USE_VULKAN
     if (nullptr == render_engine && supported_engine == render::engine::Type::VULKAN) {
         render_engine = new vulkan::Engine(this);
     }
 #endif
+
 #ifdef GX_USE_OPENGL_CLASS_3
     if (nullptr == render_engine && (GX_RUNTIME_USE_OPENGL_CLASS_3_V(supported_engine))) {
         render_engine = std::unique_ptr<render::engine::Engine>(glc3::engine::Engine::construct(this, supported_engine));
@@ -549,10 +539,6 @@ gearoenix::system::Application::Application(const int argc, const char* const* c
     GXLOGD("Render engine created.")
     asset_manager = std::make_unique<core::asset::Manager>(this, GX_APP_DATA_NAME);
     GXLOGD("Asset manager created.")
-    event_engine = std::make_unique<core::event::Engine>();
-    event_engine->set_mouse_position(math::Vec2(
-        convert_x_to_ratio(mx), convert_y_to_ratio(my)));
-    GXLOGD("Event engine created.")
 }
 
 gearoenix::system::Application::~Application() noexcept
@@ -614,16 +600,6 @@ if (GX_RUNTIME_USE_OPENGL_V(supported_engine)) {
 SDL_DestroyWindow(window);
 SDL_Quit();
 #endif
-}
-
-double gearoenix::system::Application::convert_x_to_ratio(int x) const noexcept
-{
-    return (static_cast<double>(x) * half_height_inversed) - window_ratio;
-}
-
-double gearoenix::system::Application::convert_y_to_ratio(int y) const noexcept
-{
-    return 1.0f - (static_cast<double>(y) * half_height_inversed);
 }
 
 const char* gearoenix::system::Application::get_clipboard() const noexcept

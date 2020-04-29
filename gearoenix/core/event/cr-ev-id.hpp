@@ -12,6 +12,7 @@ enum struct Id : int {
     SystemResume,
     SystemUnload,
     SystemWindowSizeChange,
+    InternalSystemWindowSizeChange,
     UiPressed,
     UiPressCanceled,
     UiReleased,

@@ -8,52 +8,103 @@ constexpr double MOUSE_DRAG_DISTANCE_THRESHOLD = 0.1f;
 void gearoenix::core::event::Engine::loop() noexcept
 {
     state = State::Running;
+#define GX_CHECK                 \
+    if (state != State::Running) \
+    break
     while (state == State::Running) {
-        signaler.lock();
-        if (state != State::Running)
-            break;
+        signaler.lock_until(std::chrono::system_clock::now() + std::chrono::milliseconds(500));
+        GX_CHECK;
         decltype(events) es;
         {
             std::lock_guard<std::mutex> _l(events_guard);
             std::swap(events, es);
         }
-        if (state != State::Running)
-            break;
+        GX_CHECK;
         std::lock_guard<std::mutex> _l(listeners_guard);
         for (const auto& e : es) {
-            if (state != State::Running)
-                break;
+            GX_CHECK;
+            if (update_window_size_state(e))
+                continue;
             auto& ps = events_id_priority_listeners[e.source];
-            if (state != State::Running)
-                break;
+            GX_CHECK;
             for (auto& p : ps) {
-                if (state != State::Running)
-                    break;
+                GX_CHECK;
                 auto& ls = p.second;
-                if (state != State::Running)
-                    break;
+                GX_CHECK;
                 for (auto& l : ls) {
-                    if (state != State::Running)
-                        break;
+                    GX_CHECK;
                     if (l->on_event(e)) {
-                        if (state != State::Running)
-                            break;
+                        GX_CHECK;
                         goto event_processed;
                     }
-                    if (state != State::Running)
-                        break;
+                    GX_CHECK;
                 }
-                if (state != State::Running)
-                    break;
+                GX_CHECK;
             }
         event_processed:;
-            if (state != State::Running)
-                break;
+            GX_CHECK;
         }
-        if (state != State::Running)
-            break;
+        check_window_size_state_timeout();
+        GX_CHECK;
     }
+#undef GX_CHECK
     state = State::Terminated;
+}
+
+bool gearoenix::core::event::Engine::update_window_size_state(const Data& event_data) noexcept
+{
+    if (event_data.source == Id::InternalSystemWindowSizeChange) {
+        previous_window_size_update = std::chrono::high_resolution_clock::now();
+        return true;
+    }
+    return false;
+}
+
+void gearoenix::core::event::Engine::check_window_size_state_timeout() noexcept
+{
+    if (window_width == previous_window_width && window_height == previous_window_height)
+        return;
+    if (std::chrono::high_resolution_clock::now() - previous_window_size_update < std::chrono::milliseconds(500))
+        return;
+    broadcast(Data {
+        .source = Id::SystemWindowSizeChange,
+        .data = system::WindowSizeChangeData {
+            .previous_width = previous_window_width,
+            .previous_height = previous_window_height,
+            .previous_reversed_half_width = previous_window_reversed_half_width,
+            .previous_reversed_half_height = previous_window_reversed_half_height,
+            .previous_ratio = previous_window_ratio,
+            .current_width = window_width,
+            .current_height = window_height,
+            .current_reversed_half_width = window_reversed_half_width,
+            .current_reversed_half_height = window_reversed_half_height,
+            .current_ratio = window_ratio,
+            .delta_width = window_width - previous_window_width,
+            .delta_height = window_height - previous_window_height,
+            .delta_reversed_half_width = window_reversed_half_width - previous_window_reversed_half_width,
+            .delta_reversed_half_height = window_reversed_half_height - previous_window_reversed_half_height,
+            .delta_ratio = window_ratio - previous_window_ratio,
+        },
+    });
+    set_previous_window_size();
+}
+
+void gearoenix::core::event::Engine::set_window_size(std::size_t w, std::size_t h) noexcept
+{
+    window_width = w;
+    window_height = h;
+    window_reversed_half_width = 2.0 / static_cast<double>(w);
+    window_reversed_half_height = 2.0 / static_cast<double>(h);
+    window_ratio = window_reversed_half_height / window_reversed_half_width;
+}
+
+void gearoenix::core::event::Engine::set_previous_window_size() noexcept
+{
+    previous_window_width = window_width;
+    previous_window_height = window_height;
+    previous_window_reversed_half_width = window_reversed_half_width;
+    previous_window_reversed_half_height = window_reversed_half_height;
+    previous_window_ratio = window_ratio;
 }
 
 gearoenix::core::event::Engine::Engine() noexcept
@@ -195,14 +246,17 @@ bool gearoenix::core::event::Engine::is_pressed(gearoenix::core::event::button::
     return pressed_keyboard_buttons.find(k) != pressed_keyboard_buttons.end();
 }
 
-void gearoenix::core::event::Engine::init_window_size(std::size_t w, std::size_t h) noexcept
+void gearoenix::core::event::Engine::initialize_window_size(std::size_t w, std::size_t h) noexcept
 {
+    set_window_size(w, h);
+    set_previous_window_size();
 }
 
-void gearoenix::core::event::Engine::set_window_size(const std::size_t w, const std::size_t h) noexcept
+void gearoenix::core::event::Engine::update_window_size(const std::size_t w, const std::size_t h) noexcept
 {
-    window_width = w;
-    window_height = h;
-    window_rev_half_width = 2.0 / static_cast<double>(w);
-    window_rev_half_height = 2.0 / static_cast<double>(h);
+    set_window_size(w, h);
+    broadcast(Data {
+        .source = Id::InternalSystemWindowSizeChange,
+        .data = 0,
+    });
 }

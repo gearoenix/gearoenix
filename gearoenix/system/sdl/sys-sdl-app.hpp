@@ -37,17 +37,12 @@ class Application {
     GX_GET_UPTR_PRV(core::asset::Manager, asset_manager)
     GX_GET_UPTR_PRV(core::event::Engine, event_engine)
     GX_GET_UPTR_PRV(Args, arguments)
-    GX_GET_VAL_PRV(unsigned int, window_width, 0)
-    GX_GET_VAL_PRV(unsigned int, window_height, 0)
-    GX_GET_VAL_PRV(double, window_ratio, 1.0)
 private:
 #ifdef GX_IN_WEB
     static Application* app;
 #endif
     const static double ROTATION_EPSILON;
     const static double ZOOM_EPSILON;
-
-    double half_height_inversed = 0.0f;
 
     SDL_Window* window = nullptr;
 
@@ -71,8 +66,6 @@ public:
     static void loop() noexcept;
     void main_loop() noexcept;
 #endif
-    [[nodiscard]] double convert_x_to_ratio(int x) const noexcept;
-    [[nodiscard]] double convert_y_to_ratio(int y) const noexcept;
     [[nodiscard]] const char* get_clipboard() const noexcept;
     /// It is going to break the main loop an then smooth exit will happen
     /// Core application termination will be called, and then termination of other modules
