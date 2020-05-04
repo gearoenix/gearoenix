@@ -281,12 +281,13 @@ void gearoenix::core::event::Engine::update_window_size(const std::size_t w, con
 
 void gearoenix::core::event::Engine::touch_down(touch::FingerId finger_id, int x, int y) noexcept
 {
-    touch_states[finger_id] = touch::State(finger_id, math::Vec2(x, y), convert_raw(x, y));
+    touch_states.emplace(std::make_pair(finger_id, touch::State(finger_id, math::Vec2(x, y), convert_raw(x, y))));
 }
 
 void gearoenix::core::event::Engine::touch_move(touch::FingerId finger_id, int x, int y) noexcept
 {
-    touch_states[finger_id].update(math::Vec2(x, y), convert_raw(x, y));
+    auto ts = touch_states.find(finger_id);
+    ts->second.update(math::Vec2(x, y), convert_raw(x, y));
 }
 
 void gearoenix::core::event::Engine::touch_up(touch::FingerId finger_id, int x, int y) noexcept

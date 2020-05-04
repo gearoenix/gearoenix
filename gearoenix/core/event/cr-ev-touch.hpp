@@ -40,6 +40,9 @@ struct State {
     {
     }
 
+    State(const State& o) noexcept = default;
+    State& operator=(const State& o) noexcept = default;
+
     void update(const math::Vec2<int>& raw, const math::Vec2<double>& p) noexcept
     {
         previous_position = current_position;
