@@ -2,6 +2,7 @@
 #ifdef GX_USE_OPENGL_CLASS_3
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../core/cr-function-loader.hpp"
+#include "../../core/event/cr-ev-engine.hpp"
 #include "../../gl/gl-loader.hpp"
 #include "../../gl/gl-utils.hpp"
 #include "../../system/sys-app.hpp"
@@ -262,8 +263,8 @@ gearoenix::glc3::texture::Target::Target(engine::Engine* const e) noexcept
     , gl_e(e)
 {
     const auto* const sys_app = e->get_system_application();
-    clipping_width = static_cast<unsigned int>(sys_app->get_window_width());
-    clipping_height = static_cast<unsigned int>(sys_app->get_window_height());
+    clipping_width = static_cast<unsigned int>(sys_app->get_event_engine()->get_window_width());
+    clipping_height = static_cast<unsigned int>(sys_app->get_event_engine()->get_window_height());
     fetch_current_framebuffer();
     state_init();
 }

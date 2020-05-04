@@ -36,16 +36,10 @@ class Application {
     GX_GET_UPTR_PRV(core::Application, core_application)
     GX_GET_UPTR_PRV(core::asset::Manager, asset_manager)
     GX_GET_UPTR_PRV(core::event::Engine, event_engine)
-    GX_GET_VAL_PRV(unsigned int, window_width, 0)
-    GX_GET_VAL_PRV(unsigned int, window_height, 0)
-    GX_GET_VAL_PRV(double, window_ratio, 1.0)
     GX_GET_VAL_PRV(bool, running, false)
     GX_GET_VAL_PRV(bool, resumed, false)
     GX_GET_VAL_PRV(bool, focused, false)
     GX_GET_VAL_PRV(bool, surface_ready, false)
-    GX_GET_VAL_PRV(double, half_height_inverted, 1.0)
-    GX_GET_VAL_PRV(double, x, 0.0)
-    GX_GET_VAL_PRV(double, y, 0.0)
 #ifdef GX_USE_OPENGL
     GX_GET_UPTR_PRV(GlContext, gl_context)
 #endif
@@ -55,8 +49,6 @@ private:
     int32_t handle(android_app* app, AInputEvent* e) noexcept;
     static void handle_cmd(android_app* app, int32_t cmd) noexcept;
     static int32_t handle_input(android_app* app, AInputEvent* e) noexcept;
-    void compute_screen_ratios() noexcept;
-    void update_window_size() noexcept;
     void on_check_ready_to_render(android_app*) noexcept;
     void on_not_ready_to_render() noexcept;
 
@@ -64,8 +56,6 @@ public:
     Application(struct android_app* and_app) noexcept;
     ~Application() noexcept;
     void execute(std::unique_ptr<core::Application> core_app) noexcept;
-    [[nodiscard]] double convert_x_to_ratio(int x) const noexcept;
-    [[nodiscard]] double convert_y_to_ratio(int y) const noexcept;
     [[nodiscard]] const char* get_clipboard() const noexcept;
 };
 }

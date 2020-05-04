@@ -1,6 +1,5 @@
 #include "rnd-cmr-camera.hpp"
 #include "../../core/event/cr-ev-engine.hpp"
-#include "../../core/event/cr-ev-event.hpp"
 #include "../../physics/accelerator/phs-acc-bvh.hpp"
 #include "../../physics/collider/phs-cld-frustum.hpp"
 #include "../../system/sys-app.hpp"
@@ -24,9 +23,9 @@
 void gearoenix::render::camera::Camera::initialize() noexcept
 {
     auto* const sys_app = render_engine->get_system_application();
-    uniform.aspect_ratio = static_cast<float>(sys_app->get_window_ratio());
-    uniform.clip_width = static_cast<float>(sys_app->get_window_width());
-    uniform.clip_height = static_cast<float>(sys_app->get_window_height());
+    uniform.aspect_ratio = static_cast<float>(sys_app->get_event_engine()->get_window_ratio());
+    uniform.clip_width = static_cast<float>(sys_app->get_event_engine()->get_window_width());
+    uniform.clip_height = static_cast<float>(sys_app->get_event_engine()->get_window_height());
     set_target(render_engine->get_main_render_target().get());
     sys_app->get_event_engine()->add_listener(core::event::Id::SystemWindowSizeChange, 1.0f, this);
 }
@@ -138,7 +137,7 @@ void gearoenix::render::camera::Camera::set_aspects(const unsigned int w, const 
 
 void gearoenix::render::camera::Camera::check_static_models(const physics::accelerator::Bvh* const bvh) noexcept
 {
-    const std::function<void(physics::collider::Collider* const cld)> collided = [this](physics::collider::Collider* const cld) noexcept {
+    const std::function<void(physics::collider::Collider* const)> collided = [this](physics::collider::Collider* const cld) noexcept {
         auto* const m = cld->get_parent();
         m->update();
         const auto& model_meshes = m->get_meshes();
@@ -158,7 +157,7 @@ void gearoenix::render::camera::Camera::check_static_models(const physics::accel
 
 void gearoenix::render::camera::Camera::check_dynamic_models(const physics::accelerator::Bvh* const bvh) noexcept
 {
-    const std::function<void(physics::collider::Collider* const cld)> collided = [this](physics::collider::Collider* const cld) noexcept {
+    const std::function<void(physics::collider::Collider* const)> collided = [this](physics::collider::Collider* const cld) noexcept {
         auto* const m = cld->get_parent();
         m->update();
         const auto& model_meshes = m->get_meshes();
@@ -202,7 +201,9 @@ bool gearoenix::render::camera::Camera::on_event(const core::event::Data& d) noe
     switch (d.source) {
     case core::event::Id::SystemWindowSizeChange:
         if (target->get_attachments().empty())
-            set_aspects(sys_app->get_window_width(), sys_app->get_window_height());
+            set_aspects(
+                sys_app->get_event_engine()->get_window_width(),
+                sys_app->get_event_engine()->get_window_height());
         return false;
     default:
         GXLOGF("Unexpected event received this is a fatal bug.")

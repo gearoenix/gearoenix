@@ -77,26 +77,56 @@ void gearoenix::system::Application::handle(android_app* const a, int32_t cmd) n
 
 int32_t gearoenix::system::Application::handle(android_app* const, AInputEvent* const e) noexcept
 {
-    //    core::event::Event* gxe = nullptr;
-    const int32_t action = AMotionEvent_getAction(e);
-    const auto flags = static_cast<int32_t>(static_cast<unsigned int>(action) & AMOTION_EVENT_ACTION_MASK);
-    const auto cur_x = convert_x_to_ratio((int)AMotionEvent_getX(e, 0));
-    const auto cur_y = convert_y_to_ratio((int)AMotionEvent_getY(e, 0));
-    switch (flags) {
-    case AMOTION_EVENT_ACTION_DOWN:
+    const auto event_type = AInputEvent_getType(e);
+    switch (event_type) {
+    case AINPUT_EVENT_TYPE_KEY: {
         // TODO
-        break;
-    case AMOTION_EVENT_ACTION_MOVE:
-        // TODO
-        break;
-    case AMOTION_EVENT_ACTION_UP:
-        // TODO
-        break;
-    default:
         break;
     }
-    x = cur_x;
-    y = cur_y;
+    case AINPUT_EVENT_TYPE_MOTION: {
+        const auto action = AMotionEvent_getAction(e);
+        const auto flags = action & AMOTION_EVENT_ACTION_MASK;
+        const auto pointer_index = static_cast<size_t>((action & AMOTION_EVENT_ACTION_POINTER_INDEX_MASK) >> AMOTION_EVENT_ACTION_POINTER_INDEX_SHIFT);
+        const auto pointer_id = AMotionEvent_getPointerId(e, pointer_index);
+        const auto x = AMotionEvent_getRawX(e, pointer_index);
+        const auto y = AMotionEvent_getRawY(e, pointer_index);
+        switch (flags) {
+        case AMOTION_EVENT_ACTION_DOWN:
+        case AMOTION_EVENT_ACTION_POINTER_DOWN:
+            event_engine->touch_down(
+                static_cast<core::event::FingerId>(pointer_id),
+                static_cast<int>(x),
+                static_cast<int>(y));
+            break;
+        case AMOTION_EVENT_ACTION_MOVE:
+            event_engine->touch_move(
+                static_cast<core::event::FingerId>(pointer_id),
+                static_cast<int>(x),
+                static_cast<int>(y));
+            break;
+        case AMOTION_EVENT_ACTION_UP:
+        case AMOTION_EVENT_ACTION_POINTER_UP:
+            event_engine->touch_up(
+                static_cast<core::event::FingerId>(pointer_id),
+                static_cast<int>(x),
+                static_cast<int>(y));
+            break;
+        case AMOTION_EVENT_ACTION_CANCEL:
+            event_engine->touch_cancel(
+                static_cast<core::event::FingerId>(pointer_id),
+                static_cast<int>(x),
+                static_cast<int>(y));
+            break;
+        default:
+            GXLOGD("Unhandled motion event flag: " << flags)
+            break;
+        }
+        break;
+    }
+    default:
+        GXLOGE("Unexpected event type value: " << event_type)
+        break;
+    }
     return 0;
 }
 
@@ -112,24 +142,6 @@ int32_t gearoenix::system::Application::handle_input(android_app* const a, AInpu
     return sys_app->handle(a, e);
 }
 
-void gearoenix::system::Application::compute_screen_ratios() noexcept
-{
-    constexpr double DOUBLE_F = 2.0;
-    window_ratio = static_cast<double>(window_width) / static_cast<double>(window_height);
-    half_height_inverted = DOUBLE_F / static_cast<double>(window_height);
-}
-
-void gearoenix::system::Application::update_window_size() noexcept
-{
-#ifdef GX_USE_OPENGL
-    if (gl_context != nullptr) {
-        window_width = static_cast<unsigned int>(gl_context->get_screen_width());
-        window_height = static_cast<unsigned int>(gl_context->get_screen_height());
-    }
-#endif
-    compute_screen_ratios();
-}
-
 void gearoenix::system::Application::on_check_ready_to_render(android_app* const a) noexcept
 {
     if (!resumed || !focused || !surface_ready)
@@ -140,9 +152,11 @@ void gearoenix::system::Application::on_check_ready_to_render(android_app* const
 #ifdef GX_USE_OPENGL
         if (gl_context != nullptr) {
             gl_context->init(android_application->window);
+            event_engine->initialize_window_size(
+                static_cast<std::size_t>(gl_context->get_screen_width()),
+                static_cast<std::size_t>(gl_context->get_screen_height()));
         }
 #endif
-        update_window_size();
 #ifdef GX_USE_OPENGL_ES3
         if (gl_context->get_es3_supported()) {
             GXLOGD("Going to create OpenGL ES3 render engine.")
@@ -175,9 +189,11 @@ void gearoenix::system::Application::on_check_ready_to_render(android_app* const
 #ifdef GX_USE_OPENGL
         if (GX_RUNTIME_USE_OPENGL_E(render_engine)) {
             gl_context->resume(android_application->window);
+            event_engine->initialize_window_size(
+                static_cast<std::size_t>(gl_context->get_screen_width()),
+                static_cast<std::size_t>(gl_context->get_screen_height()));
         }
 #endif
-        update_window_size();
         // todo: send event about reinitialization
     }
     running = true;
@@ -253,16 +269,6 @@ void gearoenix::system::Application::execute(std::unique_ptr<core::Application> 
     running = false;
     core_application->terminate();
     render_engine->terminate();
-}
-
-double gearoenix::system::Application::convert_x_to_ratio(const int x) const noexcept
-{
-    return ((((double)x) * half_height_inverted) - window_ratio);
-}
-
-double gearoenix::system::Application::convert_y_to_ratio(const int y) const noexcept
-{
-    return (1.0 - (((double)y) * half_height_inverted));
 }
 
 const char* gearoenix::system::Application::get_clipboard() const noexcept

@@ -98,7 +98,7 @@ void gearoenix::render::widget::Edit::init(const core::sync::EndCaller<core::syn
         std::numeric_limits<double>::max());
     e->get_physics_engine()->get_animation_manager()->add(cursor_animation);
 
-    collider->set_on_scale(std::bind(&Edit::on_scale, this));
+    collider->set_on_scale([this] { on_scale(); });
 
     on_scale();
 }
@@ -115,7 +115,7 @@ void gearoenix::render::widget::Edit::on_scale() noexcept
         set_text(text);
     }
     auto cursor_scale = static_cast<double>(theme.cursor_width) * 0.5f;
-    cursor_scale /= static_cast<double>(e->get_system_application()->get_window_width());
+    cursor_scale /= static_cast<double>(e->get_system_application()->get_event_engine()->get_window_width());
     cursor_scale /= cursor_model->get_collider()->get_current_local_scale()[0];
     cursor_model->get_transformation()->local_x_scale(cursor_scale);
 }

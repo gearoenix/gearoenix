@@ -107,6 +107,21 @@ void gearoenix::core::event::Engine::set_previous_window_size() noexcept
     previous_window_ratio = window_ratio;
 }
 
+double gearoenix::core::event::Engine::convert_raw_x(const int x) const noexcept
+{
+    return static_cast<double>(x) * window_reversed_half_height - window_ratio;
+}
+
+double gearoenix::core::event::Engine::convert_raw_y(const int y) const noexcept
+{
+    return static_cast<double>(y) * window_reversed_half_height - 1.0;
+}
+
+gearoenix::math::Vec2<double> gearoenix::core::event::Engine::convert_raw(const int x, const int y) const noexcept
+{
+    return math::Vec2(convert_raw_x(x), convert_raw_y(y));
+}
+
 gearoenix::core::event::Engine::Engine() noexcept
     : state(State::Running)
     , event_thread([this] { loop(); })
@@ -167,14 +182,17 @@ void gearoenix::core::event::Engine::broadcast(const Data& event_data) noexcept
     signaler.release();
 }
 
-void gearoenix::core::event::Engine::set_mouse_position(const math::Vec2<double>& p) noexcept
+void gearoenix::core::event::Engine::initialize_mouse_position(const int x, const int y) noexcept
 {
-    mouse_movement.update(math::Vec3(p, 0.0));
+    mouse_movement.update(math::Vec3(
+        convert_raw_x(x),
+        convert_raw_y(y),
+        0.0));
 }
 
-void gearoenix::core::event::Engine::set_mouse_movement(const math::Vec2<double>& position) noexcept
+void gearoenix::core::event::Engine::update_mouse_position(const int x, const int y) noexcept
 {
-    mouse_movement.update(math::Vec3(position, 0.0));
+    initialize_mouse_position(x, y);
     Data d;
     d.source = Id::MovementMouse;
     d.data = mouse_movement;
@@ -203,7 +221,7 @@ void gearoenix::core::event::Engine::set_mouse_movement(const math::Vec2<double>
             d.data = mouse_drag;
             broadcast(d);
         }
-        p.previous = position;
+        p.previous = mouse_movement.current_position.xy();
         p.previous_time = mouse_movement.current_time;
     }
 }
@@ -241,7 +259,7 @@ void gearoenix::core::event::Engine::mouse_button(const button::MouseKeyId k, co
     }
 }
 
-bool gearoenix::core::event::Engine::is_pressed(gearoenix::core::event::button::KeyboardKeyId k) noexcept
+bool gearoenix::core::event::Engine::is_pressed(gearoenix::core::event::button::KeyboardKeyId k) const noexcept
 {
     return pressed_keyboard_buttons.find(k) != pressed_keyboard_buttons.end();
 }
@@ -259,4 +277,24 @@ void gearoenix::core::event::Engine::update_window_size(const std::size_t w, con
         .source = Id::InternalSystemWindowSizeChange,
         .data = 0,
     });
+}
+
+void gearoenix::core::event::Engine::touch_down(touch::FingerId finger_id, int x, int y) noexcept
+{
+    touch_states[finger_id] = touch::State(finger_id, math::Vec2(x, y), convert_raw(x, y));
+}
+
+void gearoenix::core::event::Engine::touch_move(touch::FingerId finger_id, int x, int y) noexcept
+{
+    touch_states[finger_id].update(math::Vec2(x, y), convert_raw(x, y));
+}
+
+void gearoenix::core::event::Engine::touch_up(touch::FingerId finger_id, int x, int y) noexcept
+{
+    touch_states.erase(finger_id);
+}
+
+void gearoenix::core::event::Engine::touch_cancel(touch::FingerId finger_id, int x, int y) noexcept
+{
+    touch_states.erase(finger_id);
 }

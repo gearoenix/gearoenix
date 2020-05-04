@@ -1,6 +1,6 @@
 #include "rnd-fnt-2d.hpp"
 #include "../../core/asset/cr-asset-manager.hpp"
-#include "../../math/math-numeric.hpp"
+#include "../../core/event/cr-ev-engine.hpp"
 #include "../../system/stream/sys-stm-asset.hpp"
 #include "../../system/stream/sys-stm-memory.hpp"
 #include "../../system/sys-app.hpp"
@@ -143,7 +143,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::font::
     };
     auto* const render_engine = txt_mgr->get_engine();
     const auto max_texture_size = render_engine->get_limitations().texture_maximum_aspect;
-    const auto window_height = render_engine->get_system_application()->get_window_height();
+    const auto window_height = render_engine->get_system_application()->get_event_engine()->get_window_height();
     const auto img_height_pixels = math::Numeric::raise_p2(
         static_cast<unsigned int>(std::ceil(static_cast<double>(window_height) * img_height)),
         max_texture_size, 16U);
