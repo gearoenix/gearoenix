@@ -146,9 +146,22 @@ struct KeyboardData {
 };
 
 struct MouseData {
-    MouseActionId action = MouseActionId::Press;
-    MouseKeyId key = MouseKeyId::Left;
-    math::Vec2<double> position;
+    GX_GET_CVAL_PRV(MouseActionId, action)
+    GX_GET_CVAL_PRV(MouseKeyId, key)
+    GX_GET_CREF_PRV(math::Vec2<double>, position)
+    GX_GET_CREF_PRV(math::Vec2<int>, raw_position)
+    GX_GET_CREF_PRV(std::chrono::high_resolution_clock::time_point, start_time)
+
+    MouseData(
+            const MouseActionId action,
+            const MouseKeyId key,
+            const math::Vec2<double>& position,
+            const math::Vec2<int>& raw_position) noexcept
+            : action(action)
+            , key(key)
+            , position(position)
+            , raw_position(raw_position)
+            , start_time(std::chrono::high_resolution_clock::now()) {}
 };
 
 struct MouseScroll {

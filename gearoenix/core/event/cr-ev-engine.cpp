@@ -184,15 +184,14 @@ void gearoenix::core::event::Engine::broadcast(const Data& event_data) noexcept
 
 void gearoenix::core::event::Engine::initialize_mouse_position(const int x, const int y) noexcept
 {
-    mouse_movement.update(math::Vec3(
-        convert_raw_x(x),
-        convert_raw_y(y),
-        0.0));
+    mouse_movement = movement::Base2D({x, y}, convert_raw(x, y));
 }
 
 void gearoenix::core::event::Engine::update_mouse_position(const int x, const int y) noexcept
 {
-    initialize_mouse_position(x, y);
+    const math::Vec2<int> rp(x, y);
+    const auto cp = convert_raw(x, y);
+    mouse_movement.update(rp, cp);
     Data d;
     d.source = Id::MovementMouse;
     d.data = mouse_movement;
@@ -200,59 +199,53 @@ void gearoenix::core::event::Engine::update_mouse_position(const int x, const in
 
     for (auto& ap : pressed_mouse_buttons_state) {
         auto& p = ap.second;
-        const std::chrono::duration<double> dt = mouse_movement.current_time - p.start_time;
-        if (dt.count() > CLICK_THRESHOLD || mouse_movement.delta_position.length() > MOUSE_DRAG_DISTANCE_THRESHOLD) {
+        p.update(rp, cp);
+        const auto dt = mouse_movement.get_point().get_delta_start_time();
+        if (dt > CLICK_THRESHOLD || mouse_movement.get_point().get_delta_start_position().length() > MOUSE_DRAG_DISTANCE_THRESHOLD) {
             d.source = Id::GestureDrag2D;
-            gesture::Drag2D drag(p.);
-            drag.start_position = math::Vec3(p.starting);
-            drag.start_time = p.start_time;
-            drag.previous_position = math::Vec3(p.previous);
-            drag.previous_time = p.previous_time;
-            drag.update(mouse_movement.current_position);
+            gesture::Drag2D drag(p);
             if (ap.first == button::MouseKeyId::Left) {
-                d.source = Id::GestureDrag;
+                d.source = Id::GestureDrag2D;
                 d.data = drag;
                 broadcast(d);
             }
-            gesture::MouseDrag mouse_drag;
-            mouse_drag.base = drag;
-            mouse_drag.key = ap.first;
-            d.source = Id::GestureMouseDrag;
-            d.data = mouse_drag;
-            broadcast(d);
+            broadcast(Data {
+                .source = Id::GestureMouseDrag,
+                .data = gesture::MouseDrag(drag, ap.first),
+            });
         }
-        p.previous = mouse_movement.current_position.xy();
-        p.previous_time = mouse_movement.current_time;
     }
 }
 
 void gearoenix::core::event::Engine::mouse_button(const button::MouseKeyId k, const button::MouseActionId a) noexcept
 {
-    button::MouseData bd;
-    bd.action = a;
-    bd.key = k;
-    bd.position = mouse_movement.current_position.xy();
-
-    core::event::Data e = {};
-    e.source = core::event::Id::ButtonMouse;
-    e.data = bd;
-    broadcast(e);
+    broadcast(Data {
+            .source = core::event::Id::ButtonMouse,
+            .data = button::MouseData(
+                    a, k,
+            mouse_movement.get_point().get_current_position(),
+            mouse_movement.get_point().get_raw_current_position()),
+    });
 
     if (a == button::MouseActionId::Press) {
-        auto& p = pressed_mouse_buttons_state[k];
-        p = MouseButtonState();
-        p.starting = mouse_movement.current_position.xy();
-        p.previous = mouse_movement.current_position.xy();
+        pressed_mouse_buttons_state.emplace(std::make_pair(
+                k, Point2D(
+                        mouse_movement.get_point().get_raw_current_position(),
+                        mouse_movement.get_point().get_current_position())));
     } else if (a == button::MouseActionId::Release) {
         auto pi = pressed_mouse_buttons_state.find(k);
         if (pi == pressed_mouse_buttons_state.begin()) {
             auto now = std::chrono::high_resolution_clock::now();
             auto& p = pi->second;
-            const std::chrono::duration<double> dt = now - p.previous_time;
+            const std::chrono::duration<double> dt = now - p.get_current_time();
             if (dt.count() < CLICK_THRESHOLD) {
-                bd.action = button::MouseActionId::Click;
-                e.data = bd;
-                broadcast(e);
+                broadcast(Data {
+                        .source = core::event::Id::ButtonMouse,
+                        .data = button::MouseData(
+                                button::MouseActionId::Click, k,
+                                mouse_movement.get_point().get_current_position(),
+                                mouse_movement.get_point().get_raw_current_position()),
+                });
             }
             pressed_mouse_buttons_state.erase(k);
         }

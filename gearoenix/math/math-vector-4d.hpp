@@ -33,10 +33,18 @@ struct Vec4 {
     }
 
     constexpr explicit Vec4(const Element e = static_cast<Element>(0)) noexcept
-        : x(e)
-        , y(e)
-        , z(e)
-        , w(e)
+            : x(e)
+            , y(e)
+            , z(e)
+            , w(e)
+    {
+    }
+
+    constexpr Vec4(const Vec4<Element>& o) noexcept
+            : x(o.x)
+            , y(o.y)
+            , z(o.z)
+            , w(o.w)
     {
     }
 
@@ -47,6 +55,7 @@ struct Vec4 {
         , z(static_cast<Element>(o.z))
         , w(static_cast<Element>(o.w))
     {
+        static_assert(!std::is_same_v<Element, T>, "Only different type can be used by this constructor.");
     }
 
     [[nodiscard]] constexpr Vec3<Element> xyz() const noexcept

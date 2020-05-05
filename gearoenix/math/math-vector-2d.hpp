@@ -8,6 +8,7 @@
 #include <limits>
 #include <optional>
 #include <ostream>
+#include <type_traits>
 
 namespace gearoenix::math {
 template <typename Element>
@@ -28,9 +29,17 @@ struct Vec2 {
     }
 
     constexpr Vec2(const Vec2<Element>& o) noexcept
-        : x(o.x)
-        , y(o.y)
+            : x(o.x)
+            , y(o.y)
     {
+    }
+
+    template <typename T>
+    constexpr explicit Vec2(const Vec2<T>& o) noexcept
+            : x(static_cast<Element>(o.x))
+            , y(static_cast<Element>(o.y))
+    {
+        static_assert(!std::is_same_v<Element, T>, "Only different type can be constructed by this constructor.");
     }
 
     [[nodiscard]] constexpr Vec2<Element> operator+(const Vec2<Element>& o) const noexcept

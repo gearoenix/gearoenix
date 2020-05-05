@@ -77,21 +77,21 @@ bool gearoenix::render::scene::Ui::on_event(const core::event::Data& d) noexcept
     switch (d.source) {
     case core::event::Id::ButtonMouse: {
         const auto& data = std::get<core::event::button::MouseData>(d.data);
-        if (data.key == core::event::button::MouseKeyId::Left) {
-            if (data.action == core::event::button::MouseActionId::Press) {
+        if (data.get_key() == core::event::button::MouseKeyId::Left) {
+            if (data.get_action() == core::event::button::MouseActionId::Press) {
                 selected_widget = nullptr;
                 find_hited_widgets(
-                    data.position[0], data.position[1],
+                    data.get_position().x, data.get_position().y,
                     [this](widget::Widget* const wdg, const math::Vec3<double>& p) noexcept {
                         wdg->selected(p);
                         selected_widget = wdg;
                         if (selected_widget->get_widget_type() == widget::Type::Edit && selected_edit != selected_widget) {
-                            auto* const seledt = dynamic_cast<widget::Edit*>(selected_widget);
+                            auto* const select = dynamic_cast<widget::Edit*>(selected_widget);
                             if (selected_edit != nullptr) {
                                 selected_edit->active(false);
                             }
-                            seledt->active();
-                            selected_edit = seledt;
+                            select->active();
+                            selected_edit = select;
                         }
                     },
                     [this](widget::Widget* const wdg, const math::Vec3<double>& p,
@@ -101,7 +101,7 @@ bool gearoenix::render::scene::Ui::on_event(const core::event::Data& d) noexcept
                             selected_widget = wdg;
                     },
                     []() noexcept {});
-            } else if (data.action == core::event::button::MouseActionId::Release) {
+            } else if (data.get_action() == core::event::button::MouseActionId::Release) {
                 if (selected_widget != nullptr) {
                     selected_widget->select_released();
                     selected_widget = nullptr;
@@ -111,12 +111,13 @@ bool gearoenix::render::scene::Ui::on_event(const core::event::Data& d) noexcept
         break;
     }
     case core::event::Id::MovementMouse: {
-        const auto& data = std::get<core::event::movement::Base>(d.data);
+        const auto& data = std::get<core::event::movement::Base2D>(d.data);
         if (selected_widget == nullptr)
             break;
         bool widget_found = false;
         find_hited_widgets(
-            data.current_position[0], data.current_position[1],
+            data.get_point().get_current_position().x,
+            data.get_point().get_current_position().y,
             [&](widget::Widget* const wdg, const math::Vec3<double>& p) noexcept {
                 if (selected_widget == wdg) {
                     widget_found = true;

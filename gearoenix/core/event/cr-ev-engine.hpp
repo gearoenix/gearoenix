@@ -54,7 +54,7 @@ private:
     std::map<Id, std::map<double, std::set<Listener*>>> events_id_priority_listeners;
     std::thread event_thread;
 
-    movement::Base mouse_movement;
+    movement::Base2D mouse_movement;
 
     std::size_t previous_window_width = 0;
     std::size_t previous_window_height = 0;

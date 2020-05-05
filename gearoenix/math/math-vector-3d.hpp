@@ -41,6 +41,7 @@ struct Vec3 {
         , y(static_cast<Element>(o.y))
         , z(static_cast<Element>(o.z))
     {
+        static_assert(!std::is_same_v<Element, T>, "Only different type can be used by this constructor.");
     }
 
     constexpr Vec3<Element> operator-() const noexcept

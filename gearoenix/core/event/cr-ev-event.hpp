@@ -15,7 +15,7 @@ struct Data {
         button::MouseScroll,
         gesture::Drag2D,
         gesture::MouseDrag,
-        movement::Base,
+        movement::Base2D,
         system::WindowSizeChangeData,
         int>
         data = 0;

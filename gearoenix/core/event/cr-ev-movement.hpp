@@ -6,19 +6,21 @@
 namespace gearoenix::core::event::movement {
 struct Base2D {
     GX_GET_CREF_PRV(Point2D, point)
+    GX_GET_CREF_PRV(math::Vec2<double>, raw_speed)
+    GX_GET_CREF_PRV(math::Vec2<double>, speed)
 
-    math::Vec2<double> raw_speed;
-    math::Vec2<double> speed;
-
-    Base2D(const math::Vec2<double>& raw, const math::Vec2<double>& p) noexcept
+    Base2D(const math::Vec2<int>& raw, const math::Vec2<double>& p) noexcept
         : point(raw, p)
     {
     }
 
-    void update(const math::Vec3<int>& raw, const math::Vec3<double>& p) noexcept
-    {
+    Base2D() noexcept : point({0, 0}, {0.0, 0.0}) {}
 
-        speed = delta_position / delta_time;
+    void update(const math::Vec2<int>& raw, const math::Vec2<double>& p) noexcept
+    {
+        point.update(raw, p);
+        raw_speed = math::Vec2<double>(point.get_delta_raw_previous_position()) / point.get_delta_previous_time();
+        speed = point.get_delta_previous_position() / point.get_delta_previous_time();
     }
 };
 }

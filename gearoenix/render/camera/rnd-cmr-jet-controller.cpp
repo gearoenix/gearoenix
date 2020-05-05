@@ -60,15 +60,15 @@ bool gearoenix::render::camera::JetController::on_event(const core::event::Data&
     switch (d.source) {
     case core::event::Id::ButtonMouse: {
         const auto& data = std::get<core::event::button::MouseData>(d.data);
-        if (data.key == core::event::button::MouseKeyId::Left)
-            camera_rotation_enabled = data.action == core::event::button::MouseActionId::Press;
+        if (data.get_key() == core::event::button::MouseKeyId::Left)
+            camera_rotation_enabled = data.get_action() == core::event::button::MouseActionId::Press;
         break;
     }
     case core::event::Id::MovementMouse: {
         if (camera_rotation_enabled) {
-            const auto& data = std::get<gearoenix::core::event::movement::Base>(d.data);
-            rotate_x += data.delta_position[1];
-            rotate_z += data.delta_position[0];
+            const auto& data = std::get<gearoenix::core::event::movement::Base2D>(d.data);
+            rotate_x += data.get_point().get_delta_previous_position().y;
+            rotate_z += data.get_point().get_delta_previous_position().x;
         }
         break;
     }
