@@ -13,7 +13,7 @@ struct Data {
         button::KeyboardData,
         button::MouseData,
         button::MouseScroll,
-        gesture::Drag,
+        gesture::Drag2D,
         gesture::MouseDrag,
         movement::Base,
         system::WindowSizeChangeData,

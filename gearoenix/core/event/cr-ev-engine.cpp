@@ -202,8 +202,8 @@ void gearoenix::core::event::Engine::update_mouse_position(const int x, const in
         auto& p = ap.second;
         const std::chrono::duration<double> dt = mouse_movement.current_time - p.start_time;
         if (dt.count() > CLICK_THRESHOLD || mouse_movement.delta_position.length() > MOUSE_DRAG_DISTANCE_THRESHOLD) {
-            d.source = Id::GestureDrag;
-            gesture::Drag drag;
+            d.source = Id::GestureDrag2D;
+            gesture::Drag2D drag(p.);
             drag.start_position = math::Vec3(p.starting);
             drag.start_time = p.start_time;
             drag.previous_position = math::Vec3(p.previous);
@@ -282,6 +282,8 @@ void gearoenix::core::event::Engine::update_window_size(const std::size_t w, con
 void gearoenix::core::event::Engine::touch_down(touch::FingerId finger_id, int x, int y) noexcept
 {
     touch_states.emplace(std::make_pair(finger_id, touch::State(finger_id, math::Vec2(x, y), convert_raw(x, y))));
+    if (touch_states.size() == 1) {
+    }
 }
 
 void gearoenix::core::event::Engine::touch_move(touch::FingerId finger_id, int x, int y) noexcept

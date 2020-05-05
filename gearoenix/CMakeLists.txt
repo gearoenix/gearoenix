@@ -45,6 +45,7 @@ SET(GX_ENGINE_SRC
         "${GX_ENGINE_SRC_DIR}core/event/cr-ev-id.hpp"
         "${GX_ENGINE_SRC_DIR}core/event/cr-ev-listener.hpp"
         "${GX_ENGINE_SRC_DIR}core/event/cr-ev-movement.hpp"
+        "${GX_ENGINE_SRC_DIR}core/event/cr-ev-point.hpp"
         "${GX_ENGINE_SRC_DIR}core/event/cr-ev-system.hpp"
         "${GX_ENGINE_SRC_DIR}core/event/cr-ev-touch.hpp"
         "${GX_ENGINE_SRC_DIR}core/event/cr-ev-ui.hpp"

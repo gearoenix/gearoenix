@@ -1,31 +1,23 @@
 #ifndef GEAROENIX_CORE_EVENT_MOVEMENT_HPP
 #define GEAROENIX_CORE_EVENT_MOVEMENT_HPP
-#include "../../math/math-vector-3d.hpp"
-#include "../cr-types.hpp"
+#include "cr-ev-point.hpp"
 #include <chrono>
 
 namespace gearoenix::core::event::movement {
-struct Base {
-    std::chrono::high_resolution_clock::time_point previous_time = std::chrono::high_resolution_clock::now();
-    std::chrono::high_resolution_clock::time_point current_time = std::chrono::high_resolution_clock::now();
+struct Base2D {
+    GX_GET_CREF_PRV(Point2D, point)
 
-    math::Vec3<double> current_position;
-    math::Vec3<double> previous_position;
+    math::Vec2<double> raw_speed;
+    math::Vec2<double> speed;
 
-    math::Vec3<double> delta_position;
-    double delta_time = 0.0;
-
-    math::Vec3<double> speed;
-
-    void update(const math::Vec3<double>& p) noexcept
+    Base2D(const math::Vec2<double>& raw, const math::Vec2<double>& p) noexcept
+        : point(raw, p)
     {
-        previous_position = current_position;
-        previous_time = current_time;
-        current_position = p;
-        delta_position = current_position - previous_position;
-        current_time = std::chrono::high_resolution_clock::now();
-        std::chrono::duration<double> dt = current_time - previous_time;
-        delta_time = dt.count();
+    }
+
+    void update(const math::Vec3<int>& raw, const math::Vec3<double>& p) noexcept
+    {
+
         speed = delta_position / delta_time;
     }
 };

@@ -1,43 +1,26 @@
 #ifndef GEAROENIX_CORE_EVENT_GESTURE_HPP
 #define GEAROENIX_CORE_EVENT_GESTURE_HPP
-#include "../../math/math-vector-3d.hpp"
 #include "cr-ev-button.hpp"
+#include "cr-ev-point.hpp"
 #include <chrono>
 
 namespace gearoenix::core::event::gesture {
-struct Drag {
-    std::chrono::high_resolution_clock::time_point start_time = std::chrono::high_resolution_clock::now();
-    std::chrono::high_resolution_clock::time_point previous_time = std::chrono::high_resolution_clock::now();
-    std::chrono::high_resolution_clock::time_point current_time = std::chrono::high_resolution_clock::now();
+struct Drag2D {
+    GX_GET_CREF_PRV(Point2D, point)
 
-    math::Vec3<double> start_position;
-    math::Vec3<double> current_position;
-    math::Vec3<double> previous_position;
-
-    math::Vec3<double> delta_previous_position;
-    math::Vec3<double> delta_start_position;
-
-    double delta_previous_time = 0.0;
-    double delta_start_time = 0.0;
-
-    void update(const math::Vec3<double>& cp) noexcept
+    Drag2D(const math::Vec2<int>& raw, const math::Vec2<double>& p) noexcept
+        : point(raw, p)
     {
-        current_position = cp;
+    }
 
-        delta_previous_position = current_position - previous_position;
-        delta_start_position = start_position - previous_position;
-
-        current_time = std::chrono::high_resolution_clock::now();
-
-        std::chrono::duration<double> dur = previous_time - current_time;
-        delta_previous_time = dur.count();
-        dur = start_time - current_time;
-        delta_start_time = dur.count();
+    void update(const math::Vec2<int>& raw, const math::Vec2<double>& p) noexcept
+    {
+        point.update(raw, p);
     }
 };
 
 struct MouseDrag {
-    Drag base;
+    GX_GET_CREF_PRV(Drag2D, base)
     button::MouseKeyId key = button::MouseKeyId::Unknown;
 };
 }

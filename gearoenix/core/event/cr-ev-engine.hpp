@@ -20,17 +20,10 @@ namespace gearoenix::core::event {
 class Listener;
 class Engine {
 public:
-    struct MouseButtonState {
-        math::Vec2<double> starting;
-        math::Vec2<double> previous;
-        std::chrono::high_resolution_clock::time_point start_time = std::chrono::high_resolution_clock::now();
-        std::chrono::high_resolution_clock::time_point previous_time = std::chrono::high_resolution_clock::now();
-    };
-
-    typedef std::map<button::MouseKeyId, MouseButtonState> MouseButtonStateMap;
+    typedef std::map<button::MouseKeyId, Point2D> MouseStateMap;
     typedef std::map<touch::FingerId, touch::State> TouchStateMap;
 
-    GX_GET_CREF_PRV(MouseButtonStateMap, pressed_mouse_buttons_state)
+    GX_GET_CREF_PRV(MouseStateMap, pressed_mouse_buttons_state)
     GX_GET_CREF_PRV(TouchStateMap, touch_states)
     GX_GET_CREF_PRV(std::set<button::KeyboardKeyId>, pressed_keyboard_buttons)
 #ifdef GX_FULLSCREEN
