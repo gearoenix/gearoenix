@@ -5,20 +5,37 @@
 #include "cr-ev-id.hpp"
 #include "cr-ev-movement.hpp"
 #include "cr-ev-system.hpp"
+#include "cr-ev-touch.hpp"
+#include <utility>
 #include <variant>
+
 namespace gearoenix::core::event {
 struct Data {
-    Id source = Id::None;
-    std::variant<
+    typedef std::variant<
         button::KeyboardData,
         button::MouseData,
         button::MouseScroll,
+        gesture::Click,
         gesture::Drag2D,
+        gesture::Scale,
         gesture::MouseDrag,
+        gesture::TouchClick,
+        gesture::TouchDrag,
+        gesture::TouchScale,
         movement::Base2D,
         system::WindowSizeChangeData,
+        touch::Data,
         int>
-        data = 0;
+        DataVar;
+
+    GX_GET_CVAL_PRV(Id, source)
+    GX_GET_REFC_PRV(DataVar, data)
+
+    Data(const Id source, DataVar data) noexcept
+        : source(source)
+        , data(std::move(data))
+    {
+    }
 };
 }
 #endif

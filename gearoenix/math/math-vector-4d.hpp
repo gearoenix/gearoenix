@@ -33,20 +33,14 @@ struct Vec4 {
     }
 
     constexpr explicit Vec4(const Element e = static_cast<Element>(0)) noexcept
-            : x(e)
-            , y(e)
-            , z(e)
-            , w(e)
+        : x(e)
+        , y(e)
+        , z(e)
+        , w(e)
     {
     }
 
-    constexpr Vec4(const Vec4<Element>& o) noexcept
-            : x(o.x)
-            , y(o.y)
-            , z(o.z)
-            , w(o.w)
-    {
-    }
+    constexpr Vec4(const Vec4<Element>& o) noexcept = default;
 
     template <typename T>
     constexpr explicit Vec4(const Vec4<T>& o) noexcept

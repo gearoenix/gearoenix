@@ -28,12 +28,7 @@ struct Vec3 {
     {
     }
 
-    constexpr Vec3(const Vec3<Element>& o) noexcept
-        : x(o.x)
-        , y(o.y)
-        , z(o.z)
-    {
-    }
+    constexpr Vec3(const Vec3<Element>& o) noexcept = default;
 
     template <typename T>
     constexpr explicit Vec3(const Vec3<T>& o) noexcept

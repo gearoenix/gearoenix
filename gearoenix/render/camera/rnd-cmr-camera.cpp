@@ -198,7 +198,7 @@ void gearoenix::render::camera::Camera::merge_seen_meshes() noexcept
 bool gearoenix::render::camera::Camera::on_event(const core::event::Data& d) noexcept
 {
     const auto* sys_app = render_engine->get_system_application();
-    switch (d.source) {
+    switch (d.get_source()) {
     case core::event::Id::SystemWindowSizeChange:
         if (target->get_attachments().empty())
             set_aspects(

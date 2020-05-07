@@ -1,7 +1,6 @@
 #include "rnd-scn-ui.hpp"
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../core/event/cr-ev-engine.hpp"
-#include "../../core/event/cr-ev-event.hpp"
 #include "../../physics/collider/phs-cld-collider.hpp"
 #include "../../physics/phs-engine.hpp"
 #include "../../system/sys-app.hpp"
@@ -11,7 +10,6 @@
 #include "../engine/rnd-eng-engine.hpp"
 #include "../model/rnd-mdl-model.hpp"
 #include "../widget/rnd-wdg-edit.hpp"
-#include "../widget/rnd-wdg-widget.hpp"
 #include <limits>
 
 void gearoenix::render::scene::Ui::init() noexcept
@@ -74,9 +72,9 @@ bool gearoenix::render::scene::Ui::on_event(const core::event::Data& d) noexcept
         }
     };
 
-    switch (d.source) {
+    switch (d.get_source()) {
     case core::event::Id::ButtonMouse: {
-        const auto& data = std::get<core::event::button::MouseData>(d.data);
+        const auto& data = std::get<core::event::button::MouseData>(d.get_data());
         if (data.get_key() == core::event::button::MouseKeyId::Left) {
             if (data.get_action() == core::event::button::MouseActionId::Press) {
                 selected_widget = nullptr;
@@ -111,7 +109,7 @@ bool gearoenix::render::scene::Ui::on_event(const core::event::Data& d) noexcept
         break;
     }
     case core::event::Id::MovementMouse: {
-        const auto& data = std::get<core::event::movement::Base2D>(d.data);
+        const auto& data = std::get<core::event::movement::Base2D>(d.get_data());
         if (selected_widget == nullptr)
             break;
         bool widget_found = false;

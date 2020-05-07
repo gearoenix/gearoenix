@@ -1,6 +1,7 @@
 #ifndef GEAROENIX_CORE_EVENT_LISTENER_HPP
 #define GEAROENIX_CORE_EVENT_LISTENER_HPP
 #include "cr-ev-event.hpp"
+
 namespace gearoenix::core::event {
 class Listener {
 public:

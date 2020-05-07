@@ -6,23 +6,24 @@
 #include <cstring>
 #include <memory>
 
-#define GX_GET_CREF(v, t, x) \
-    v:                       \
-    t x;                     \
-                             \
-public:                      \
+#define GX_GET_CREF(v, c, t, x) \
+    v:                          \
+    c t x;                      \
+                                \
+public:                         \
     [[nodiscard]] const t& get_##x() const noexcept { return x; }
 #define GX_GET_REF(v, t, x) \
-    GX_GET_CREF(v, t, x)    \
+    GX_GET_CREF(v, , t, x)  \
     [[nodiscard]] t& get_##x() noexcept { return x; }
 #define GX_GETSET_CREF(v, t, x)         \
-    GX_GET_CREF(v, t, x)                \
+    GX_GET_CREF(v, , t, x)              \
     void set_##x(const t& arg) noexcept \
     {                                   \
         x = arg;                        \
     }
-#define GX_GET_CREF_PRT(t, x) GX_GET_CREF(protected, t, x)
-#define GX_GET_CREF_PRV(t, x) GX_GET_CREF(private, t, x)
+#define GX_GET_CREF_PRT(t, x) GX_GET_CREF(protected, , t, x)
+#define GX_GET_CREF_PRV(t, x) GX_GET_CREF(private, , t, x)
+#define GX_GET_REFC_PRV(t, x) GX_GET_CREF(private, const, t, x)
 #define GX_GET_REF_PRT(t, x) GX_GET_REF(protected, t, x)
 #define GX_GET_REF_PRV(t, x) GX_GET_REF(private, t, x)
 #define GX_GETSET_CREF_PRT(t, x) GX_GETSET_CREF(protected, t, x)
@@ -69,6 +70,15 @@ public:                             \
 #define GX_GETSET_PTR_PRT(t, x) GX_GETSET_PTR(protected, t, x)
 #define GX_GETSET_PTR_PRV(t, x) GX_GETSET_PTR(private, t, x)
 #define GX_GETSET_PTRC_PRV(t, x) GX_GETSET_PTRC(private, t, x)
+
+#define GX_GET_CARR(v, t, x, c) \
+    v:                          \
+    const t x[c];               \
+                                \
+public:                         \
+    [[nodiscard]] const t(&get_##x() const noexcept)[c] { return x; }
+
+#define GX_GET_CARR_PRV(t, x, c) GX_GET_CARR(private, t, x, c)
 
 #define GX_GET_ARRC(v, t, x, c) \
     v:                          \

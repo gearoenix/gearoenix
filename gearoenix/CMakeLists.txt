@@ -48,7 +48,6 @@ SET(GX_ENGINE_SRC
         "${GX_ENGINE_SRC_DIR}core/event/cr-ev-point.hpp"
         "${GX_ENGINE_SRC_DIR}core/event/cr-ev-system.hpp"
         "${GX_ENGINE_SRC_DIR}core/event/cr-ev-touch.hpp"
-        "${GX_ENGINE_SRC_DIR}core/event/cr-ev-ui.hpp"
         "${GX_ENGINE_SRC_DIR}core/gc/cr-gc-object.cpp"
         "${GX_ENGINE_SRC_DIR}core/gc/cr-gc-object.hpp"
         "${GX_ENGINE_SRC_DIR}core/gc/cr-gc-range.cpp"

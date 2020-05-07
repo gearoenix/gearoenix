@@ -21,20 +21,20 @@ class Listener;
 class Engine {
 public:
     typedef std::map<button::MouseKeyId, Point2D> MouseStateMap;
-    typedef std::map<touch::FingerId, touch::State> TouchStateMap;
+    typedef std::map<touch::FingerId, Point2D> TouchStateMap;
 
     GX_GET_CREF_PRV(MouseStateMap, pressed_mouse_buttons_state)
     GX_GET_CREF_PRV(TouchStateMap, touch_states)
     GX_GET_CREF_PRV(std::set<button::KeyboardKeyId>, pressed_keyboard_buttons)
 #ifdef GX_FULLSCREEN
-    GX_GET_VAL_PRV(std::size_t, window_width, 0)
-    GX_GET_VAL_PRV(std::size_t, window_height, 0)
+    GX_GET_VAL_PRV(int, window_width, 0)
+    GX_GET_VAL_PRV(int, window_height, 0)
     GX_GET_VAL_PRV(double, window_ratio, 0.0)
     GX_GET_VAL_PRV(double, window_reversed_half_width, 0.0)
     GX_GET_VAL_PRV(double, window_reversed_half_height, 0.0)
 #else
-    GX_GET_VAL_PRV(std::size_t, window_width, GX_DEFAULT_WINDOW_WIDTH)
-    GX_GET_VAL_PRV(std::size_t, window_height, GX_DEFAULT_WINDOW_HEIGHT)
+    GX_GET_VAL_PRV(int, window_width, GX_DEFAULT_WINDOW_WIDTH)
+    GX_GET_VAL_PRV(int, window_height, GX_DEFAULT_WINDOW_HEIGHT)
     GX_GET_VAL_PRV(double, window_ratio, static_cast<double>(GX_DEFAULT_WINDOW_WIDTH) / static_cast<double>(GX_DEFAULT_WINDOW_HEIGHT))
     GX_GET_VAL_PRV(double, window_reversed_half_width, 2.0 / static_cast<double>(GX_DEFAULT_WINDOW_WIDTH))
     GX_GET_VAL_PRV(double, window_reversed_half_height, 2.0 / static_cast<double>(GX_DEFAULT_WINDOW_HEIGHT))
@@ -53,18 +53,16 @@ private:
     std::mutex listeners_guard;
     std::map<Id, std::map<double, std::set<Listener*>>> events_id_priority_listeners;
     std::thread event_thread;
-
-    movement::Base2D mouse_movement;
-
-    std::size_t previous_window_width = 0;
-    std::size_t previous_window_height = 0;
+    Point2D mouse_point;
+    bool click_enabled = true;
+    int previous_window_width = 0;
+    int previous_window_height = 0;
     double previous_window_reversed_half_width = 0.0;
     double previous_window_reversed_half_height = 0.0;
     double previous_window_ratio = 0.0;
     std::chrono::high_resolution_clock::time_point previous_window_size_update = std::chrono::high_resolution_clock::now();
 
     void loop() noexcept;
-
     [[nodiscard]] bool update_window_size_state(const Data& event_data) noexcept;
     void check_window_size_state_timeout() noexcept;
     void set_window_size(std::size_t w, std::size_t h) noexcept;

@@ -28,16 +28,12 @@ struct Vec2 {
     {
     }
 
-    constexpr Vec2(const Vec2<Element>& o) noexcept
-            : x(o.x)
-            , y(o.y)
-    {
-    }
+    constexpr Vec2(const Vec2<Element>& o) noexcept = default;
 
     template <typename T>
     constexpr explicit Vec2(const Vec2<T>& o) noexcept
-            : x(static_cast<Element>(o.x))
-            , y(static_cast<Element>(o.y))
+        : x(static_cast<Element>(o.x))
+        , y(static_cast<Element>(o.y))
     {
         static_assert(!std::is_same_v<Element, T>, "Only different type can be constructed by this constructor.");
     }
@@ -80,7 +76,7 @@ struct Vec2 {
     [[nodiscard]] constexpr Vec2<Element> operator/(const Element e) const noexcept
     {
         const auto m = static_cast<Element>(1) / e;
-        return Vec2(x * e, y * e);
+        return Vec2(x * m, y * m);
     }
 
     [[nodiscard]] constexpr Vec2<Element> operator-() const noexcept

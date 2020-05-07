@@ -141,8 +141,14 @@ enum struct MouseActionId : int {
 };
 
 struct KeyboardData {
-    KeyboardActionId action = KeyboardActionId::Press;
-    KeyboardKeyId key = KeyboardKeyId::Escape;
+    GX_GET_CVAL_PRV(KeyboardActionId, action)
+    GX_GET_CVAL_PRV(KeyboardKeyId, key)
+
+    KeyboardData(const KeyboardActionId action, const KeyboardKeyId key) noexcept
+        : action(action)
+        , key(key)
+    {
+    }
 };
 
 struct MouseData {
@@ -153,19 +159,26 @@ struct MouseData {
     GX_GET_CREF_PRV(std::chrono::high_resolution_clock::time_point, start_time)
 
     MouseData(
-            const MouseActionId action,
-            const MouseKeyId key,
-            const math::Vec2<double>& position,
-            const math::Vec2<int>& raw_position) noexcept
-            : action(action)
-            , key(key)
-            , position(position)
-            , raw_position(raw_position)
-            , start_time(std::chrono::high_resolution_clock::now()) {}
+        const MouseActionId action,
+        const MouseKeyId key,
+        const math::Vec2<double>& position,
+        const math::Vec2<int>& raw_position) noexcept
+        : action(action)
+        , key(key)
+        , position(position)
+        , raw_position(raw_position)
+        , start_time(std::chrono::high_resolution_clock::now())
+    {
+    }
 };
 
 struct MouseScroll {
-    math::Vec2<double> direction;
+    GX_GET_REFC_PRV(math::Vec2<double>, direction)
+
+    explicit MouseScroll(const math::Vec2<double>& direction) noexcept
+        : direction(direction)
+    {
+    }
 };
 
 }

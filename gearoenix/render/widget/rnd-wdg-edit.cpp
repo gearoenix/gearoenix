@@ -301,14 +301,14 @@ void gearoenix::render::widget::Edit::active(bool b) noexcept
 
 bool gearoenix::render::widget::Edit::on_event(const core::event::Data& d) noexcept
 {
-    switch (d.source) {
+    switch (d.get_source()) {
     case core::event::Id::ButtonKeyboard: {
         if (actived) {
-            const auto& data = std::get<core::event::button::KeyboardData>(d.data);
-            if (data.action == core::event::button::KeyboardActionId::Press) {
+            const auto& data = std::get<core::event::button::KeyboardData>(d.get_data());
+            if (data.get_action() == core::event::button::KeyboardActionId::Press) {
                 const auto pressed_count = event_engine->get_pressed_keyboard_buttons().size();
                 const bool shift_pressed = event_engine->is_pressed(core::event::button::KeyboardKeyId::LeftShift) || event_engine->is_pressed(core::event::button::KeyboardKeyId::RightShift);
-                const auto key = core::String::to_character(data.key, shift_pressed);
+                const auto key = core::String::to_character(data.get_key(), shift_pressed);
                 if (key.has_value()) {
                     if (pressed_count == 2 && (event_engine->is_pressed(core::event::button::KeyboardKeyId::LeftControl) || event_engine->is_pressed(core::event::button::KeyboardKeyId::RightControl)) && event_engine->is_pressed(core::event::button::KeyboardKeyId::V)) {
                         const char* const clipboard = e->get_system_application()->get_clipboard();
@@ -321,7 +321,7 @@ bool gearoenix::render::widget::Edit::on_event(const core::event::Data& d) noexc
                         insert(key.value());
                     }
                 } else if (pressed_count == 1) {
-                    if (data.key == core::event::button::KeyboardKeyId::Left) {
+                    if (data.get_key() == core::event::button::KeyboardKeyId::Left) {
                         if (!text.empty()) {
                             temporary_right = 0;
                             temporary_left = 0;
@@ -338,7 +338,7 @@ bool gearoenix::render::widget::Edit::on_event(const core::event::Data& d) noexc
                             }
                             place_cursor();
                         }
-                    } else if (data.key == core::event::button::KeyboardKeyId::Right) {
+                    } else if (data.get_key() == core::event::button::KeyboardKeyId::Right) {
                         if (!text.empty()) {
                             temporary_right = 0;
                             temporary_left = 0;
@@ -355,9 +355,9 @@ bool gearoenix::render::widget::Edit::on_event(const core::event::Data& d) noexc
                             }
                             place_cursor();
                         }
-                    } else if (data.key == core::event::button::KeyboardKeyId::Backspace) {
+                    } else if (data.get_key() == core::event::button::KeyboardKeyId::Backspace) {
                         backspace();
-                    } else if (data.key == core::event::button::KeyboardKeyId::Delete) {
+                    } else if (data.get_key() == core::event::button::KeyboardKeyId::Delete) {
                         del();
                     }
                 }

@@ -3,7 +3,7 @@
 #include <functional>
 
 constexpr double CLICK_THRESHOLD = 0.2f;
-constexpr double MOUSE_DRAG_DISTANCE_THRESHOLD = 0.1f;
+constexpr double CLICK_DISTANCE_THRESHOLD = 0.1f;
 
 void gearoenix::core::event::Engine::loop() noexcept
 {
@@ -25,7 +25,7 @@ void gearoenix::core::event::Engine::loop() noexcept
             GX_CHECK;
             if (update_window_size_state(e))
                 continue;
-            auto& ps = events_id_priority_listeners[e.source];
+            auto& ps = events_id_priority_listeners[e.get_source()];
             GX_CHECK;
             for (auto& p : ps) {
                 GX_CHECK;
@@ -53,7 +53,7 @@ void gearoenix::core::event::Engine::loop() noexcept
 
 bool gearoenix::core::event::Engine::update_window_size_state(const Data& event_data) noexcept
 {
-    if (event_data.source == Id::InternalSystemWindowSizeChange) {
+    if (event_data.get_source() == Id::InternalSystemWindowSizeChange) {
         previous_window_size_update = std::chrono::high_resolution_clock::now();
         return true;
     }
@@ -66,9 +66,9 @@ void gearoenix::core::event::Engine::check_window_size_state_timeout() noexcept
         return;
     if (std::chrono::high_resolution_clock::now() - previous_window_size_update < std::chrono::milliseconds(500))
         return;
-    broadcast(Data {
-        .source = Id::SystemWindowSizeChange,
-        .data = system::WindowSizeChangeData {
+    broadcast(Data(
+        Id::SystemWindowSizeChange,
+        system::WindowSizeChangeData {
             .previous_width = previous_window_width,
             .previous_height = previous_window_height,
             .previous_reversed_half_width = previous_window_reversed_half_width,
@@ -84,8 +84,7 @@ void gearoenix::core::event::Engine::check_window_size_state_timeout() noexcept
             .delta_reversed_half_width = window_reversed_half_width - previous_window_reversed_half_width,
             .delta_reversed_half_height = window_reversed_half_height - previous_window_reversed_half_height,
             .delta_ratio = window_ratio - previous_window_ratio,
-        },
-    });
+        }));
     set_previous_window_size();
 }
 
@@ -125,6 +124,7 @@ gearoenix::math::Vec2<double> gearoenix::core::event::Engine::convert_raw(const 
 gearoenix::core::event::Engine::Engine() noexcept
     : state(State::Running)
     , event_thread([this] { loop(); })
+    , mouse_point({ 0, 0 }, { 0.0, 0.0 })
 {
 }
 
@@ -168,12 +168,12 @@ void gearoenix::core::event::Engine::remove_listener(Listener* listener) noexcep
 
 void gearoenix::core::event::Engine::broadcast(const Data& event_data) noexcept
 {
-    if (event_data.source == Id::ButtonKeyboard) {
-        const auto& ke = std::get<core::event::button::KeyboardData>(event_data.data);
-        if (ke.action == button::KeyboardActionId::Press) {
-            pressed_keyboard_buttons.insert(ke.key);
-        } else if (ke.action == button::KeyboardActionId::Release) {
-            pressed_keyboard_buttons.erase(ke.key);
+    if (event_data.get_source() == Id::ButtonKeyboard) {
+        const auto& ke = std::get<core::event::button::KeyboardData>(event_data.get_data());
+        if (ke.get_action() == button::KeyboardActionId::Press) {
+            pressed_keyboard_buttons.insert(ke.get_key());
+        } else if (ke.get_action() == button::KeyboardActionId::Release) {
+            pressed_keyboard_buttons.erase(ke.get_key());
         }
     }
 
@@ -184,54 +184,42 @@ void gearoenix::core::event::Engine::broadcast(const Data& event_data) noexcept
 
 void gearoenix::core::event::Engine::initialize_mouse_position(const int x, const int y) noexcept
 {
-    mouse_movement = movement::Base2D({x, y}, convert_raw(x, y));
+    mouse_point = Point2D({ x, y }, convert_raw(x, y));
 }
 
 void gearoenix::core::event::Engine::update_mouse_position(const int x, const int y) noexcept
 {
     const math::Vec2<int> rp(x, y);
     const auto cp = convert_raw(x, y);
-    mouse_movement.update(rp, cp);
-    Data d;
-    d.source = Id::MovementMouse;
-    d.data = mouse_movement;
-    broadcast(d);
+    mouse_point.update(rp, cp);
+    broadcast(Data(Id::MovementMouse, movement::Base2D(mouse_point)));
 
     for (auto& ap : pressed_mouse_buttons_state) {
         auto& p = ap.second;
         p.update(rp, cp);
-        const auto dt = mouse_movement.get_point().get_delta_start_time();
-        if (dt > CLICK_THRESHOLD || mouse_movement.get_point().get_delta_start_position().length() > MOUSE_DRAG_DISTANCE_THRESHOLD) {
-            d.source = Id::GestureDrag2D;
+        const auto dt = mouse_point.get_delta_start_time();
+        if (dt > CLICK_THRESHOLD || mouse_point.get_delta_start_position().length() > CLICK_DISTANCE_THRESHOLD) {
             gesture::Drag2D drag(p);
             if (ap.first == button::MouseKeyId::Left) {
-                d.source = Id::GestureDrag2D;
-                d.data = drag;
-                broadcast(d);
+                broadcast(Data(Id::GestureDrag2D, drag));
             }
-            broadcast(Data {
-                .source = Id::GestureMouseDrag,
-                .data = gesture::MouseDrag(drag, ap.first),
-            });
+            broadcast(Data(Id::GestureMouseDrag, gesture::MouseDrag(drag, ap.first)));
         }
     }
 }
 
 void gearoenix::core::event::Engine::mouse_button(const button::MouseKeyId k, const button::MouseActionId a) noexcept
 {
-    broadcast(Data {
-            .source = core::event::Id::ButtonMouse,
-            .data = button::MouseData(
-                    a, k,
-            mouse_movement.get_point().get_current_position(),
-            mouse_movement.get_point().get_raw_current_position()),
-    });
+    broadcast(Data(
+        core::event::Id::ButtonMouse,
+        button::MouseData(
+            a, k,
+            mouse_point.get_current_position(),
+            mouse_point.get_raw_current_position())));
 
     if (a == button::MouseActionId::Press) {
         pressed_mouse_buttons_state.emplace(std::make_pair(
-                k, Point2D(
-                        mouse_movement.get_point().get_raw_current_position(),
-                        mouse_movement.get_point().get_current_position())));
+            k, Point2D(mouse_point.get_raw_current_position(), mouse_point.get_current_position())));
     } else if (a == button::MouseActionId::Release) {
         auto pi = pressed_mouse_buttons_state.find(k);
         if (pi == pressed_mouse_buttons_state.begin()) {
@@ -239,13 +227,11 @@ void gearoenix::core::event::Engine::mouse_button(const button::MouseKeyId k, co
             auto& p = pi->second;
             const std::chrono::duration<double> dt = now - p.get_current_time();
             if (dt.count() < CLICK_THRESHOLD) {
-                broadcast(Data {
-                        .source = core::event::Id::ButtonMouse,
-                        .data = button::MouseData(
-                                button::MouseActionId::Click, k,
-                                mouse_movement.get_point().get_current_position(),
-                                mouse_movement.get_point().get_raw_current_position()),
-                });
+                broadcast(Data(core::event::Id::ButtonMouse,
+                    button::MouseData(
+                        button::MouseActionId::Click, k,
+                        mouse_point.get_current_position(),
+                        mouse_point.get_raw_current_position())));
             }
             pressed_mouse_buttons_state.erase(k);
         }
@@ -266,31 +252,83 @@ void gearoenix::core::event::Engine::initialize_window_size(std::size_t w, std::
 void gearoenix::core::event::Engine::update_window_size(const std::size_t w, const std::size_t h) noexcept
 {
     set_window_size(w, h);
-    broadcast(Data {
-        .source = Id::InternalSystemWindowSizeChange,
-        .data = 0,
-    });
+    broadcast(Data(Id::InternalSystemWindowSizeChange, 0));
 }
 
 void gearoenix::core::event::Engine::touch_down(touch::FingerId finger_id, int x, int y) noexcept
 {
-    touch_states.emplace(std::make_pair(finger_id, touch::State(finger_id, math::Vec2(x, y), convert_raw(x, y))));
-    if (touch_states.size() == 1) {
+    for (auto& t : touch_states)
+        t.second.reinitialize();
+    const Point2D p(math::Vec2(x, y), convert_raw(x, y));
+    const touch::State t(finger_id, p);
+    touch_states.emplace(std::make_pair(finger_id, p));
+    broadcast(Data(Id::Touch, touch::Data(t, touch::Action::Down)));
+    click_enabled = touch_states.size() == 1;
+}
+
+void gearoenix::core::event::Engine::touch_move(const touch::FingerId finger_id, const int x, const int y) noexcept
+{
+    const auto search = touch_states.find(finger_id);
+    if (search == touch_states.end())
+        return;
+    Point2D& p = search->second;
+    p.update(math::Vec2(x, y), convert_raw(x, y));
+    broadcast(Data(Id::Touch, touch::Data(touch::State(finger_id, p), touch::Action::Move)));
+    switch (touch_states.size()) {
+    case 1: {
+        const auto dt = p.get_delta_start_time();
+        if (dt > CLICK_THRESHOLD || p.get_delta_start_position().length() > CLICK_DISTANCE_THRESHOLD) {
+            gesture::Drag2D drag(p);
+            broadcast(Data(Id::GestureDrag2D, drag));
+            broadcast(Data(Id::GestureTouchDrag, gesture::TouchDrag(drag, finger_id)));
+        }
+        break;
+    }
+    case 2: {
+        auto iter = touch_states.begin();
+        const auto& p1 = iter->second;
+        const auto fi1 = iter->first;
+        ++iter;
+        const auto& p2 = iter->second;
+        const auto fi2 = iter->first;
+        const gesture::Scale scale(p1, p2);
+        broadcast(Data(Id::GestureScale, scale));
+        broadcast(Data(Id::GestureTouchScale, gesture::TouchScale(scale, fi1, fi2)));
+        break;
+    }
+    default:
+        break;
     }
 }
 
-void gearoenix::core::event::Engine::touch_move(touch::FingerId finger_id, int x, int y) noexcept
+void gearoenix::core::event::Engine::touch_up(const touch::FingerId finger_id, const int, const int) noexcept
 {
-    auto ts = touch_states.find(finger_id);
-    ts->second.update(math::Vec2(x, y), convert_raw(x, y));
+    const auto search = touch_states.find(finger_id);
+    if (search == touch_states.end())
+        return;
+    const Point2D p = search->second;
+    touch_states.erase(search);
+    for (auto& t : touch_states)
+        t.second.reinitialize();
+    broadcast(Data(Id::Touch, touch::Data(touch::State(finger_id, p), touch::Action::Up)));
+    if (click_enabled && touch_states.empty()) {
+        const auto dt = p.get_delta_start_time();
+        if (dt <= CLICK_THRESHOLD || p.get_delta_start_position().length() <= CLICK_DISTANCE_THRESHOLD) {
+            gesture::Click click(p);
+            broadcast(Data(Id::GestureClick, click));
+            broadcast(Data(Id::GestureTouchClick, gesture::TouchClick(click, finger_id)));
+        }
+    }
 }
 
-void gearoenix::core::event::Engine::touch_up(touch::FingerId finger_id, int x, int y) noexcept
+void gearoenix::core::event::Engine::touch_cancel(const touch::FingerId finger_id, const int, const int) noexcept
 {
-    touch_states.erase(finger_id);
-}
-
-void gearoenix::core::event::Engine::touch_cancel(touch::FingerId finger_id, int x, int y) noexcept
-{
-    touch_states.erase(finger_id);
+    const auto search = touch_states.find(finger_id);
+    if (search == touch_states.end())
+        return;
+    const Point2D p = search->second;
+    touch_states.erase(search);
+    for (auto& t : touch_states)
+        t.second.reinitialize();
+    broadcast(Data(Id::Touch, touch::Data(touch::State(finger_id, p), touch::Action::Cancel)));
 }

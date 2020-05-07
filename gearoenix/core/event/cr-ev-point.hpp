@@ -61,6 +61,16 @@ struct Point2D {
         dur = start_time - current_time;
         delta_start_time = dur.count();
     }
+
+    void reinitialize() noexcept
+    {
+        start_time = previous_time = current_time = std::chrono::high_resolution_clock::now();
+        start_position = previous_position = current_position;
+        raw_start_position = raw_previous_position = raw_current_position;
+        delta_start_position = delta_previous_position = math::Vec2(0.0);
+        delta_raw_start_position = delta_raw_previous_position = math::Vec2(0);
+        delta_start_time = delta_previous_time = 0.0;
+    }
 };
 }
 #endif

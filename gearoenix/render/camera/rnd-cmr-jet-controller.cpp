@@ -57,25 +57,25 @@ gearoenix::render::camera::JetController::~JetController() noexcept
 
 bool gearoenix::render::camera::JetController::on_event(const core::event::Data& d) noexcept
 {
-    switch (d.source) {
+    switch (d.get_source()) {
     case core::event::Id::ButtonMouse: {
-        const auto& data = std::get<core::event::button::MouseData>(d.data);
+        const auto& data = std::get<core::event::button::MouseData>(d.get_data());
         if (data.get_key() == core::event::button::MouseKeyId::Left)
             camera_rotation_enabled = data.get_action() == core::event::button::MouseActionId::Press;
         break;
     }
     case core::event::Id::MovementMouse: {
         if (camera_rotation_enabled) {
-            const auto& data = std::get<gearoenix::core::event::movement::Base2D>(d.data);
+            const auto& data = std::get<gearoenix::core::event::movement::Base2D>(d.get_data());
             rotate_x += data.get_point().get_delta_previous_position().y;
             rotate_z += data.get_point().get_delta_previous_position().x;
         }
         break;
     }
     case core::event::Id::ButtonKeyboard: {
-        const auto& data = std::get<core::event::button::KeyboardData>(d.data);
-        const bool pressed = data.action == core::event::button::KeyboardActionId::Press;
-        switch (data.key) {
+        const auto& data = std::get<core::event::button::KeyboardData>(d.get_data());
+        const bool pressed = data.get_action() == core::event::button::KeyboardActionId::Press;
+        switch (data.get_key()) {
         case core::event::button::KeyboardKeyId::W: {
             move_forward = pressed;
             break;

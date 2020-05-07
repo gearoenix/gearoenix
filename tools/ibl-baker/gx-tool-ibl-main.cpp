@@ -61,7 +61,7 @@ using GxEventId = gearoenix::core::event::Id;
 using GxMouseData = gearoenix::core::event::button::MouseData;
 using GxMouseKeyId = gearoenix::core::event::button::MouseKeyId;
 using GxMouseActionId = gearoenix::core::event::button::MouseActionId;
-using GxMovementBase = gearoenix::core::event::movement::Base;
+using GxMovementBase = gearoenix::core::event::movement::Base2D;
 using GxTxtSampleInfo = gearoenix::render::texture::SampleInfo;
 using GxTxtFilter = gearoenix::render::texture::Filter;
 
@@ -164,7 +164,7 @@ IblBaker::IblBaker(gearoenix::system::Application* const sys_app) noexcept
     tmp_tran->set_location(GxVec3(0.75, 0.75, 0.1));
     open_button->set_text(L"Open File", end_call);
     if (!called_from_cli)
-        open_button->set_on_click(std::bind(&IblBaker::on_open, this));
+        open_button->set_on_click([this] { on_open(); });
     uiscn->add_model(open_button);
 
     file_location = mdl_mgr->create<GxEditWdg>(edt_call);
@@ -259,18 +259,18 @@ void IblBaker::terminate() noexcept
 
 bool IblBaker::on_event(const gearoenix::core::event::Data& d) noexcept
 {
-    switch (d.source) {
+    switch (d.get_source()) {
     case GxEventId::ButtonMouse: {
-        const auto& data = std::get<GxMouseData>(d.data);
-        if (data.key == GxMouseKeyId::Left)
-            camera_rotation_enabled = data.action == GxMouseActionId::Press;
+        const auto& data = std::get<GxMouseData>(d.get_data());
+        if (data.get_key() == GxMouseKeyId::Left)
+            camera_rotation_enabled = data.get_action() == GxMouseActionId::Press;
         break;
     }
     case GxEventId::MovementMouse: {
         if (camera_rotation_enabled) {
-            const auto& data = std::get<gearoenix::core::event::movement::Base>(d.data);
-            const auto rot_x = data.delta_position[1];
-            const auto rot_z = data.delta_position[0];
+            const auto& data = std::get<gearoenix::core::event::movement::Base2D>(d.get_data());
+            const auto rot_x = data.get_point().get_delta_previous_position().y;
+            const auto rot_z = data.get_point().get_delta_previous_position().x;
             cam_trn->local_rotate(rot_z, GxVec3(0.0, 0.0, 1.0));
             cam_trn->local_x_rotate(rot_x);
             obj_cam_trn->global_rotate(rot_z, GxVec3(0.0, 0.0, 1.0), GxVec3(0.0, 0.0, 0.0));
