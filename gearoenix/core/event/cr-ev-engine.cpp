@@ -88,7 +88,7 @@ void gearoenix::core::event::Engine::check_window_size_state_timeout() noexcept
     set_previous_window_size();
 }
 
-void gearoenix::core::event::Engine::set_window_size(std::size_t w, std::size_t h) noexcept
+void gearoenix::core::event::Engine::set_window_size(const int w, const int h) noexcept
 {
     window_width = w;
     window_height = h;
@@ -243,13 +243,13 @@ bool gearoenix::core::event::Engine::is_pressed(gearoenix::core::event::button::
     return pressed_keyboard_buttons.find(k) != pressed_keyboard_buttons.end();
 }
 
-void gearoenix::core::event::Engine::initialize_window_size(std::size_t w, std::size_t h) noexcept
+void gearoenix::core::event::Engine::initialize_window_size(const int w, const int h) noexcept
 {
     set_window_size(w, h);
     set_previous_window_size();
 }
 
-void gearoenix::core::event::Engine::update_window_size(const std::size_t w, const std::size_t h) noexcept
+void gearoenix::core::event::Engine::update_window_size(const int w, const int h) noexcept
 {
     set_window_size(w, h);
     broadcast(Data(Id::InternalSystemWindowSizeChange, 0));

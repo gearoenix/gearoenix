@@ -82,9 +82,11 @@ std::shared_ptr<gearoenix::glc3::texture::TextureCube> gearoenix::glc3::texture:
         gl::Loader::tex_parameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, sample_info.wrap_t);
         for (int fi = 0; fi < static_cast<int>(GX_COUNT_OF(FACES)); ++fi) {
             const auto& face_pixels = pixels[fi];
-            for (std::size_t level_index = 0; level_index < face_pixels.size(); ++level_index) {
+            auto level_aspect = gl_aspect;
+            for (std::size_t level_index = 0; level_index < face_pixels.size(); ++level_index, level_aspect >>= 1) {
                 gl::Loader::tex_image_2d(
-                    FACES[fi], level_index, internal_format, gl_aspect >> level_index, gl_aspect >> level_index, 0,
+                    FACES[fi], static_cast<gl::sint>(level_index), internal_format, 
+                    level_aspect, level_aspect, 0,
                     format, data_format, face_pixels[level_index].data());
             }
         }
@@ -126,9 +128,9 @@ void gearoenix::glc3::texture::TextureCube::write_gx3d(
         if (render::texture::format_has_float_component(texture_format)) {
             std::vector<float> data(aspect * aspect * 4);
             for (auto i : FACES) {
-                for (unsigned int j = 0, level_aspect = aspect; level_aspect > 0; ++j, level_aspect >>= 1u) {
-                    gl::Loader::framebuffer_texture_2d(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, i, texture_object,
-                        j);
+                auto level_aspect = static_cast<gl::sizei>(aspect);
+                for (gl::sint j = 0; level_aspect > 0; ++j, level_aspect >>= 1) {
+                    gl::Loader::framebuffer_texture_2d(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, i, texture_object, j);
                     gl::Loader::read_pixels(0, 0, level_aspect, level_aspect, GL_RGBA, GL_FLOAT, data.data());
 #ifdef GX_DEBUG_TEXTURE_WRITE
                     system::stream::Local l(
@@ -141,9 +143,9 @@ void gearoenix::glc3::texture::TextureCube::write_gx3d(
         } else {
             std::vector<unsigned char> data(aspect * aspect * 4);
             for (auto i : FACES) {
-                for (unsigned int j = 0, level_aspect = aspect; level_aspect > 0; ++j, level_aspect >>= 1u) {
-                    gl::Loader::framebuffer_texture_2d(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, i, texture_object,
-                        j);
+                auto level_aspect = static_cast<gl::sizei>(aspect);
+                for (gl::sint j = 0; level_aspect > 0; ++j, level_aspect >>= 1) {
+                    gl::Loader::framebuffer_texture_2d(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, i, texture_object, j);
                     gl::Loader::read_pixels(0, 0, level_aspect, level_aspect, GL_RGBA, GL_UNSIGNED_BYTE, data.data());
 #ifdef GX_DEBUG_TEXTURE_WRITE
                     system::stream::Local l(

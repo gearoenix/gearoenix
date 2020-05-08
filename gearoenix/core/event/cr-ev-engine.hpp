@@ -65,7 +65,7 @@ private:
     void loop() noexcept;
     [[nodiscard]] bool update_window_size_state(const Data& event_data) noexcept;
     void check_window_size_state_timeout() noexcept;
-    void set_window_size(std::size_t w, std::size_t h) noexcept;
+    void set_window_size(int w, int h) noexcept;
     void set_previous_window_size() noexcept;
     [[nodiscard]] double convert_raw_x(int x) const noexcept;
     [[nodiscard]] double convert_raw_y(int y) const noexcept;
@@ -84,8 +84,8 @@ public:
     void update_mouse_position(int x, int y) noexcept;
     void mouse_button(button::MouseKeyId key, button::MouseActionId action) noexcept;
     [[nodiscard]] bool is_pressed(button::KeyboardKeyId k) const noexcept;
-    void initialize_window_size(std::size_t w, std::size_t h) noexcept;
-    void update_window_size(std::size_t w, std::size_t h) noexcept;
+    void initialize_window_size(int w, int h) noexcept;
+    void update_window_size(int w, int h) noexcept;
     void touch_down(touch::FingerId finger_id, int x, int y) noexcept;
     void touch_move(touch::FingerId finger_id, int x, int y) noexcept;
     void touch_up(touch::FingerId finger_id, int x, int y) noexcept;

@@ -23,7 +23,7 @@ struct Configuration {
     constexpr void set_runtime_reflection_radiance_resolution(const std::uint16_t r) noexcept
     {
         runtime_reflection_radiance_resolution = r;
-        runtime_reflection_radiance_levels = math::Numeric::floor_log2(r) - 2;
+        runtime_reflection_radiance_levels = static_cast<std::uint8_t>(math::Numeric::floor_log2(r) - 2);
     }
 
     static int compute_runtime_reflection_radiance_levels(const int r) noexcept

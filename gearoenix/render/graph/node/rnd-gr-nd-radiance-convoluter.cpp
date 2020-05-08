@@ -21,7 +21,7 @@
 gearoenix::render::graph::node::RadianceConvoluterUniform::RadianceConvoluterUniform(const float r, const float resolution) noexcept
     : roughness(r)
     , roughness_p_4(r * r * r * r)
-    , sa_texel(GX_PI * 4.0f / (6.0f * resolution * resolution))
+    , sa_texel(static_cast<float>(GX_PI * 4.0f / (6.0f * resolution * resolution)))
 {
 }
 

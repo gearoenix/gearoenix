@@ -32,7 +32,7 @@ namespace gearoenix::render::graph::node {
 struct RadianceConvoluterUniform {
     float roughness = 0.001f;
     float roughness_p_4 = 0.000000000001f;
-    float sa_texel = (4.0f * GX_PI) / (6.0 * GX_DEFAULT_RUNTIME_REFLECTION_RADIANCE_RESOLUTION * GX_DEFAULT_RUNTIME_REFLECTION_RADIANCE_RESOLUTION);
+    float sa_texel = static_cast<float>((4.0f * GX_PI) / (6.0 * GX_DEFAULT_RUNTIME_REFLECTION_RADIANCE_RESOLUTION * GX_DEFAULT_RUNTIME_REFLECTION_RADIANCE_RESOLUTION));
 
     RadianceConvoluterUniform(float r, float resolution) noexcept;
 };

@@ -47,10 +47,7 @@ constexpr bool format_has_float_component(const TextureFormat f) noexcept
     case TextureFormat::D24:
     case TextureFormat::D32:
         return true;
-    case TextureFormat::RgbaUint8:
-    case TextureFormat::RgbUint8:
-    case TextureFormat::RgUint8:
-    case TextureFormat::Uint8:
+    default:
         return false;
     }
 }
@@ -81,6 +78,8 @@ constexpr std::size_t format_components_count(const TextureFormat f) noexcept
     case TextureFormat::D24:
     case TextureFormat::D32:
         return 1;
+    default:
+        return 0;
     }
 }
 }

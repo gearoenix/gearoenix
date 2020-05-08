@@ -20,7 +20,7 @@ namespace pipeline {
 
     public:
         virtual ~Manager() noexcept = default;
-        virtual std::shared_ptr<Pipeline> get(const Type pipeline_type, core::sync::EndCaller<Pipeline>& end) noexcept = 0;
+        virtual std::shared_ptr<Pipeline> get(Type pipeline_type, core::sync::EndCaller<Pipeline>& end) noexcept = 0;
     };
 }
 }
