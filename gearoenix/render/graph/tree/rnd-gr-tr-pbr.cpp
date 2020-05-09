@@ -265,7 +265,10 @@ void gearoenix::render::graph::tree::Pbr::record_runtime_reflection(
         auto* const rtr = id_rtr.second.get();
         if (!rtr->get_enabled())
             continue;
-        auto& runtime_reflection = runtime_reflections_data.find(rtr)->second;
+        auto id_rtr_data = runtime_reflections_data.find(rtr);
+        if (runtime_reflections_data.end() == id_rtr_data)
+            continue;
+        auto& runtime_reflection = id_rtr_data->second;
         switch (rtr->get_state()) {
         case reflection::Runtime::State::EnvironmentCubeRender: {
             const auto& face = runtime_reflection.faces[rtr->get_state_environment_face()];
@@ -327,28 +330,31 @@ void gearoenix::render::graph::tree::Pbr::submit_runtime_reflections(const scene
         auto* const rtr = id_rtr.second.get();
         if (!rtr->get_enabled())
             continue;
-        auto& runtime_reflection = runtime_reflections_data.find(rtr)->second;
-        switch (rtr->get_state()) {
-        case reflection::Runtime::State::EnvironmentCubeRender:
-            submit_camera_data(runtime_reflection.faces[rtr->get_state_environment_face()].camera_data);
-            break;
-        case reflection::Runtime::State::EnvironmentCubeMipMap:
-            runtime_reflection.environment_mipmap_generator->submit();
-            break;
-        case reflection::Runtime::State::IrradianceFace:
-            runtime_reflection.faces[rtr->get_state_irradiance_face()].irradiance->submit();
-            break;
-        case reflection::Runtime::State::IrradianceMipMap:
-            runtime_reflection.irradiance_mipmap_generator->submit();
-            break;
-        case reflection::Runtime::State::RadianceFaceLevel: {
-            auto* const radiance_node = runtime_reflection.faces[rtr->get_state_radiance_face()].radiances[rtr->get_state_radiance_level()];
-            if (nullptr != radiance_node)
-                radiance_node->submit();
-            break;
-        }
-        default:
-            break;
+        auto id_rtr_data = runtime_reflections_data.find(rtr);
+        if (runtime_reflections_data.end() != id_rtr_data) {
+            auto& runtime_reflection = id_rtr_data->second;
+            switch (rtr->get_state()) {
+            case reflection::Runtime::State::EnvironmentCubeRender:
+                submit_camera_data(runtime_reflection.faces[rtr->get_state_environment_face()].camera_data);
+                break;
+            case reflection::Runtime::State::EnvironmentCubeMipMap:
+                runtime_reflection.environment_mipmap_generator->submit();
+                break;
+            case reflection::Runtime::State::IrradianceFace:
+                runtime_reflection.faces[rtr->get_state_irradiance_face()].irradiance->submit();
+                break;
+            case reflection::Runtime::State::IrradianceMipMap:
+                runtime_reflection.irradiance_mipmap_generator->submit();
+                break;
+            case reflection::Runtime::State::RadianceFaceLevel: {
+                auto* const radiance_node = runtime_reflection.faces[rtr->get_state_radiance_face()].radiances[rtr->get_state_radiance_level()];
+                if (nullptr != radiance_node)
+                    radiance_node->submit();
+                break;
+            }
+            default:
+                break;
+            }
         }
         rtr->update_state();
     }

@@ -45,8 +45,8 @@ gearoenix::render::camera::JetController::JetController(std::shared_ptr<Camera> 
     , function_id(render_engine->get_update_functions_manager()->add(std::bind(&JetController::update, this)))
 {
     auto* const event_engine = render_engine->get_system_application()->get_event_engine();
-    event_engine->add_listener(core::event::Id::ButtonMouse, 0.0f, this);
-    event_engine->add_listener(core::event::Id::MovementMouse, 0.0f, this);
+    event_engine->add_listener(core::event::Id::GestureDrag2D, 0.0f, this);
+    event_engine->add_listener(core::event::Id::GestureScale, 0.0f, this);
     event_engine->add_listener(core::event::Id::ButtonKeyboard, 0.0f, this);
 }
 
@@ -58,20 +58,18 @@ gearoenix::render::camera::JetController::~JetController() noexcept
 bool gearoenix::render::camera::JetController::on_event(const core::event::Data& d) noexcept
 {
     switch (d.get_source()) {
-    case core::event::Id::ButtonMouse: {
-        const auto& data = std::get<core::event::button::MouseData>(d.get_data());
-        if (data.get_key() == core::event::button::MouseKeyId::Left)
-            camera_rotation_enabled = data.get_action() == core::event::button::MouseActionId::Press;
-        break;
-    }
-    case core::event::Id::MovementMouse: {
-        if (camera_rotation_enabled) {
-            const auto& data = std::get<gearoenix::core::event::movement::Base2D>(d.get_data());
+        case core::event::Id::GestureDrag2D:
+        {
+            const auto& data = std::get<gearoenix::core::event::gesture::Drag2D>(d.get_data());
             rotate_x += data.get_point().get_delta_previous_position().y;
             rotate_z += data.get_point().get_delta_previous_position().x;
+            break;
         }
-        break;
-    }
+        case core::event::Id::GestureScale:
+        {
+            trn->local_z_translate(-std::get<gearoenix::core::event::gesture::Scale>(d.get_data()).get_delta_previous_scale());
+            break;
+        }
     case core::event::Id::ButtonKeyboard: {
         const auto& data = std::get<core::event::button::KeyboardData>(d.get_data());
         const bool pressed = data.get_action() == core::event::button::KeyboardActionId::Press;

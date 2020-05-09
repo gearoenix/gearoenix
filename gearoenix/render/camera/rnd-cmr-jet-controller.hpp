@@ -17,7 +17,6 @@ private:
     engine::Engine* const render_engine;
     const std::shared_ptr<Camera> cam;
     const core::Id function_id;
-    bool camera_rotation_enabled = false;
     double rotate_x = 0.0;
     double rotate_z = 0.0;
     double movement_speed = 0.5;

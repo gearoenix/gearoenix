@@ -62,7 +62,7 @@ gearoenix::glc3::shader::RadianceConvoluter::RadianceConvoluter(engine::Engine* 
         "    const uint SAMPLE_COUNT = 1024u;\n"
         "    vec3 prefilteredColor = vec3(0.0);\n"
         "    float totalWeight = 0.0;\n"
-        "    for(uint i = 0u; i < SAMPLE_COUNT; ++i) {\n"
+        "    for(uint i = uint(0); i < SAMPLE_COUNT; i += uint(1)) {\n"
         "        vec2 Xi = Hammersley(i, SAMPLE_COUNT);\n"
         "        vec3 H = ImportanceSampleGGX(Xi, N);\n"
         "        float NdotH = dot(N, H);\n"
