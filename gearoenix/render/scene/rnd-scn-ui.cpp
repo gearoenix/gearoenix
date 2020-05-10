@@ -39,12 +39,12 @@ gearoenix::render::scene::Ui::Ui(const core::Id my_id, engine::Engine* e, const 
 
 bool gearoenix::render::scene::Ui::on_event(const core::event::Data& d) noexcept
 {
-    auto find_hited_widgets = [this](
-                                  const double x,
-                                  const double y,
-                                  const std::function<void(widget::Widget* const, const math::Vec3<double>&)>& f1,
-                                  const std::function<void(widget::Widget* const, const math::Vec3<double>&, const std::vector<model::Model*>&)>& f2,
-                                  const std::function<void()>& f3) noexcept {
+    auto find_hit_widgets = [this](
+                                const double x,
+                                const double y,
+                                const std::function<void(widget::Widget* const, const math::Vec3<double>&)>& f1,
+                                const std::function<void(widget::Widget* const, const math::Vec3<double>&, const std::vector<model::Model*>&)>& f2,
+                                const std::function<void()>& f3) noexcept {
         const auto ray = cameras.begin()->second->create_ray3(x, y);
         auto h = hit(ray, std::numeric_limits<double>::max());
         if (h.has_value()) {
@@ -78,7 +78,7 @@ bool gearoenix::render::scene::Ui::on_event(const core::event::Data& d) noexcept
         if (data.get_key() == core::event::button::MouseKeyId::Left) {
             if (data.get_action() == core::event::button::MouseActionId::Press) {
                 selected_widget = nullptr;
-                find_hited_widgets(
+                find_hit_widgets(
                     data.get_position().x, data.get_position().y,
                     [this](widget::Widget* const wdg, const math::Vec3<double>& p) noexcept {
                         wdg->selected(p);
@@ -113,7 +113,7 @@ bool gearoenix::render::scene::Ui::on_event(const core::event::Data& d) noexcept
         if (selected_widget == nullptr)
             break;
         bool widget_found = false;
-        find_hited_widgets(
+        find_hit_widgets(
             data.get_point().get_current_position().x,
             data.get_point().get_current_position().y,
             [&](widget::Widget* const wdg, const math::Vec3<double>& p) noexcept {

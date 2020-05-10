@@ -8,10 +8,8 @@
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../core/cr-application.hpp"
 #include "../../core/event/cr-ev-engine.hpp"
-#include "../../core/event/cr-ev-event.hpp"
 #include "../../gl/gl-loader.hpp"
 #include "../sys-args.hpp"
-#include "../sys-configuration.hpp"
 #ifdef GX_USE_OPENGL_ES2
 #include "../../gles2/engine/gles2-eng-engine.hpp"
 #endif
@@ -373,33 +371,24 @@ int gearoenix::system::Application::on_event(SDL_Event* const e) noexcept
         return 1;
     }
     case SDL_FINGERDOWN: {
-        /*const double x = (e->tfinger.x - 0.5f) * 2.0f * o->screen_ratio;
-        const double y = (0.5f - e->tfinger.y) * 2.0f;
-        event = new core::event::button::Mouse(
-            core::event::button::Button::KeyType::LEFT,
-            core::event::button::Button::ActionType::PRESS,
-            x, y);
-        o->pre_x = x;
-        o->pre_y = y;*/
+        event_engine->touch_down(
+            static_cast<core::event::touch::FingerId>(e->tfinger.fingerId),
+            static_cast<int>(e->tfinger.x * static_cast<float>(event_engine->get_window_width())),
+            static_cast<int>(e->tfinger.y * static_cast<float>(event_engine->get_window_height())));
         break;
     }
     case SDL_FINGERUP: {
-        /*const double x = (e->tfinger.x - 0.5f) * 2.0f * o->screen_ratio;
-        const double y = (0.5f - e->tfinger.y) * 2.0f;
-        event = new core::event::button::Mouse(
-            core::event::button::Button::KeyType::LEFT,
-            core::event::button::Button::ActionType::RELEASE,
-            x, y);
-        o->pre_x = x;
-        o->pre_y = y;*/
+        event_engine->touch_up(
+            static_cast<core::event::touch::FingerId>(e->tfinger.fingerId),
+            static_cast<int>(e->tfinger.x * static_cast<float>(event_engine->get_window_width())),
+            static_cast<int>(e->tfinger.y * static_cast<float>(event_engine->get_window_height())));
         break;
     }
     case SDL_FINGERMOTION: {
-        /* const double x = (e->tfinger.x - 0.5f) * 2.0f * o->screen_ratio;
-        const double y = (0.5f - e->tfinger.y) * 2.0f;
-        event = new core::event::movement::Mouse(x, y, o->pre_x, o->pre_y);
-        o->pre_x = x;
-        o->pre_y = y;*/
+        event_engine->touch_move(
+            static_cast<core::event::touch::FingerId>(e->tfinger.fingerId),
+            static_cast<int>(e->tfinger.x * static_cast<float>(event_engine->get_window_width())),
+            static_cast<int>(e->tfinger.y * static_cast<float>(event_engine->get_window_height())));
         break;
     }
     case SDL_MOUSEWHEEL: {
@@ -412,7 +401,7 @@ int gearoenix::system::Application::on_event(SDL_Event* const e) noexcept
         return 1;
     }
     case SDL_MOUSEMOTION:
-        event_engine->update_mouse_position(e->button.x, e->button.y);
+        event_engine->update_mouse_position(e->button.x, event_engine->get_window_height() - e->button.y);
         break;
     case SDL_MOUSEBUTTONUP:
     case SDL_MOUSEBUTTONDOWN: {
@@ -442,13 +431,6 @@ int gearoenix::system::Application::on_event(SDL_Event* const e) noexcept
             }());
         break;
     }
-    case SDL_MULTIGESTURE:
-        if (e->mgesture.dTheta > ROTATION_EPSILON || e->mgesture.dTheta < -ROTATION_EPSILON) {
-            // o->core_app->on_rotate(event->mgesture.dTheta);
-        } else if (e->mgesture.dDist > ZOOM_EPSILON || e->mgesture.dDist < -ZOOM_EPSILON) {
-            // o->core_app->on_zoom(event->mgesture.dDist);
-        }
-        break;
     case SDL_WINDOWEVENT:
         switch (e->window.event) {
         case SDL_WINDOWEVENT_RESIZED: {
@@ -503,7 +485,7 @@ gearoenix::system::Application::Application(const int argc, const char* const* c
 #endif
     int mx, my;
     SDL_GetMouseState(&mx, &my);
-    event_engine->initialize_mouse_position(mx, my);
+    event_engine->initialize_mouse_position(mx, event_engine->get_window_height() - my);
 
 #ifdef GX_USE_VULKAN
     if (nullptr == render_engine && supported_engine == render::engine::Type::VULKAN) {

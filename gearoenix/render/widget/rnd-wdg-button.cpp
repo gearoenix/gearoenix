@@ -14,10 +14,6 @@
 #include "../scene/rnd-scn-scene.hpp"
 #include "rnd-wdg-text.hpp"
 
-constexpr double PRESSED_SIZE = 0.75f;
-constexpr double PRESSED_DELTA_SIZE = 1.0f - PRESSED_SIZE;
-constexpr double ANIMATION_DURATION = 0.1f;
-
 gearoenix::render::widget::Button::Button(
     const core::Id my_id,
     system::stream::Stream* const f,
@@ -61,17 +57,18 @@ void gearoenix::render::widget::Button::selected(const math::Vec3<double>&) noex
 {
     if (auto a = animation.lock())
         a->set_activity(false);
-    auto my_fun = core::sync::EndCaller<model::Model>([](const std::shared_ptr<model::Model>&) {});
-    auto myself = e->get_system_application()->get_asset_manager()->get_model_manager()->get_gx3d(asset_id, my_fun);
-    before_click_size = collider->get_current_local_scale()[1];
+    auto end = core::sync::EndCaller<model::Model>([](const std::shared_ptr<model::Model>&) {});
+    auto myself = e->get_system_application()->get_asset_manager()->get_model_manager()->get_gx3d(asset_id, end);
     const auto a = std::make_shared<physics::animation::Animation>(
-        [this, myself, delta_size { before_click_size * PRESSED_DELTA_SIZE }](const double from_start, const double) noexcept {
-            const auto s = before_click_size - delta_size * (from_start / ANIMATION_DURATION);
-            transformation->local_scale(s / collider->get_current_local_scale()[1]);
+        [this, myself](const double from_start, const double) noexcept {
+            const auto s = 1.0 - (1.0 - pressed_size) * from_start / animation_duration;
+            transformation->local_scale(s / scale_down_progress);
+            scale_down_progress = s;
         },
-        ANIMATION_DURATION,
-        [this, pressed_size { before_click_size * PRESSED_SIZE }](const double) noexcept {
-            transformation->local_scale(pressed_size / collider->get_current_local_scale()[1]);
+        animation_duration,
+        [this](const double) noexcept {
+            transformation->local_scale(pressed_size / scale_down_progress);
+            scale_down_progress = pressed_size;
         });
     e->get_physics_engine()->get_animation_manager()->add(a);
     animation = a;
@@ -84,13 +81,15 @@ void gearoenix::render::widget::Button::select_cancelled() noexcept
     auto my_fun = core::sync::EndCaller<model::Model>([](const std::shared_ptr<model::Model>&) {});
     auto myself = e->get_system_application()->get_asset_manager()->get_model_manager()->get_gx3d(asset_id, my_fun);
     const auto a = std::make_shared<physics::animation::Animation>(
-        [this, myself, pressed_size { before_click_size * PRESSED_SIZE }, delta_size { before_click_size * PRESSED_DELTA_SIZE }](const double from_start, const double) noexcept {
-            const auto s = pressed_size + delta_size * (from_start / ANIMATION_DURATION);
-            transformation->local_scale(s / collider->get_current_local_scale()[1]);
+        [this, myself](const double from_start, const double) noexcept {
+            const auto s = pressed_size + (1.0 - scale_down_progress) * (from_start / animation_duration);
+            transformation->local_scale(s / scale_down_progress);
+            scale_down_progress = s;
         },
-        ANIMATION_DURATION,
+        animation_duration,
         [this](const double) noexcept {
-            transformation->local_scale(before_click_size / collider->get_current_local_scale()[1]);
+            transformation->local_scale(1.0 / scale_down_progress);
+            scale_down_progress = 1.0;
         });
     e->get_physics_engine()->get_animation_manager()->add(a);
     animation = a;

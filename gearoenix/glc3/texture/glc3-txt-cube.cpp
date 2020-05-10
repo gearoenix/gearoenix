@@ -85,7 +85,7 @@ std::shared_ptr<gearoenix::glc3::texture::TextureCube> gearoenix::glc3::texture:
             auto level_aspect = gl_aspect;
             for (std::size_t level_index = 0; level_index < face_pixels.size(); ++level_index, level_aspect >>= 1) {
                 gl::Loader::tex_image_2d(
-                    FACES[fi], static_cast<gl::sint>(level_index), internal_format, 
+                    FACES[fi], static_cast<gl::sint>(level_index), internal_format,
                     level_aspect, level_aspect, 0,
                     format, data_format, face_pixels[level_index].data());
             }

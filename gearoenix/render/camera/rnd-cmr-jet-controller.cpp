@@ -58,18 +58,16 @@ gearoenix::render::camera::JetController::~JetController() noexcept
 bool gearoenix::render::camera::JetController::on_event(const core::event::Data& d) noexcept
 {
     switch (d.get_source()) {
-        case core::event::Id::GestureDrag2D:
-        {
-            const auto& data = std::get<gearoenix::core::event::gesture::Drag2D>(d.get_data());
-            rotate_x += data.get_point().get_delta_previous_position().y;
-            rotate_z += data.get_point().get_delta_previous_position().x;
-            break;
-        }
-        case core::event::Id::GestureScale:
-        {
-            trn->local_z_translate(-std::get<gearoenix::core::event::gesture::Scale>(d.get_data()).get_delta_previous_scale());
-            break;
-        }
+    case core::event::Id::GestureDrag2D: {
+        const auto& data = std::get<gearoenix::core::event::gesture::Drag2D>(d.get_data());
+        rotate_x += data.get_point().get_delta_previous_position().y;
+        rotate_z += data.get_point().get_delta_previous_position().x;
+        break;
+    }
+    case core::event::Id::GestureScale: {
+        trn->local_z_translate(-std::get<gearoenix::core::event::gesture::Scale>(d.get_data()).get_delta_previous_scale());
+        break;
+    }
     case core::event::Id::ButtonKeyboard: {
         const auto& data = std::get<core::event::button::KeyboardData>(d.get_data());
         const bool pressed = data.get_action() == core::event::button::KeyboardActionId::Press;

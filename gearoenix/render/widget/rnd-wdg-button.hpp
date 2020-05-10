@@ -25,8 +25,10 @@ class Button final : public Widget {
     GX_GET_CREF_PRV(std::shared_ptr<Text>, text)
     GX_GET_CREF_PRV(std::shared_ptr<material::Unlit>, background_material)
     GX_GET_CREF_PRV(ButtonTheme, theme)
+    GX_GETSET_VAL_PRV(double, pressed_size, 0.75)
+    GX_GETSET_VAL_PRV(double, animation_duration, 0.1)
 protected:
-    double before_click_size = 1.0;
+    double scale_down_progress = 1.0;
     std::weak_ptr<physics::animation::Animation> animation;
     std::function<void()> on_click = [] {};
 
