@@ -374,23 +374,24 @@ int gearoenix::system::Application::on_event(SDL_Event* const e) noexcept
         event_engine->touch_down(
             static_cast<core::event::touch::FingerId>(e->tfinger.fingerId),
             static_cast<int>(e->tfinger.x * static_cast<float>(event_engine->get_window_width())),
-            static_cast<int>(e->tfinger.y * static_cast<float>(event_engine->get_window_height())));
+            event_engine->get_window_height() - static_cast<int>(e->tfinger.y * static_cast<float>(event_engine->get_window_height())));
         break;
     }
     case SDL_FINGERUP: {
         event_engine->touch_up(
             static_cast<core::event::touch::FingerId>(e->tfinger.fingerId),
             static_cast<int>(e->tfinger.x * static_cast<float>(event_engine->get_window_width())),
-            static_cast<int>(e->tfinger.y * static_cast<float>(event_engine->get_window_height())));
+            event_engine->get_window_height() - static_cast<int>(e->tfinger.y * static_cast<float>(event_engine->get_window_height())));
         break;
     }
     case SDL_FINGERMOTION: {
         event_engine->touch_move(
             static_cast<core::event::touch::FingerId>(e->tfinger.fingerId),
             static_cast<int>(e->tfinger.x * static_cast<float>(event_engine->get_window_width())),
-            static_cast<int>(e->tfinger.y * static_cast<float>(event_engine->get_window_height())));
+            event_engine->get_window_height() - static_cast<int>(e->tfinger.y * static_cast<float>(event_engine->get_window_height())));
         break;
     }
+#ifndef GX_IN_IOS
     case SDL_MOUSEWHEEL: {
         event_engine->broadcast(core::event::Data(
             core::event::Id::ScrollMouse,
@@ -431,12 +432,19 @@ int gearoenix::system::Application::on_event(SDL_Event* const e) noexcept
             }());
         break;
     }
+#else
+    case SDL_MOUSEWHEEL:
+    case SDL_MOUSEMOTION:
+    case SDL_MOUSEBUTTONUP:
+    case SDL_MOUSEBUTTONDOWN:
+        break;
+#endif
     case SDL_WINDOWEVENT:
         switch (e->window.event) {
         case SDL_WINDOWEVENT_RESIZED: {
             event_engine->update_window_size(
-                static_cast<std::size_t>(e->window.data1),
-                static_cast<std::size_t>(e->window.data2));
+                static_cast<int>(e->window.data1),
+                static_cast<int>(e->window.data2));
             break;
         }
         default:
@@ -469,8 +477,8 @@ gearoenix::system::Application::Application(const int argc, const char* const* c
     SDL_DisplayMode display_mode;
     SDL_GetCurrentDisplayMode(0, &display_mode);
     event_engine->initialize_window_size(
-        static_cast<std::size_t>(display_mode.w),
-        static_cast<std::size_t>(display_mode.h));
+        static_cast<int>(display_mode.w),
+        static_cast<int>(display_mode.h));
 #endif
     create_window();
     SDL_AddEventWatch(event_receiver, this);
@@ -479,8 +487,8 @@ gearoenix::system::Application::Application(const int argc, const char* const* c
         int w, h;
         SDL_GL_GetDrawableSize(window, &w, &h);
         event_engine->initialize_window_size(
-            static_cast<std::size_t>(w),
-            static_cast<std::size_t>(h));
+            static_cast<int>(w),
+            static_cast<int>(h));
     }
 #endif
     int mx, my;

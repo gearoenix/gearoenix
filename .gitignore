@@ -48,6 +48,8 @@
 # assets
 *.png
 *.ttf
+*.gx3d
+*.hdr
 
 output/
 /output/

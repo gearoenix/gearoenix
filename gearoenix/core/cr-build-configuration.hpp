@@ -37,7 +37,7 @@
 #define GX_IN_IOS
 //#define GX_USE_METAL
 //#define GX_USE_VULKAN
-//#define GX_USE_OPENGL_ES3
+#define GX_USE_OPENGL_ES3
 #define GX_USE_OPENGL_ES2
 #elif TARGET_OS_MAC
 #define GX_IN_MAC
