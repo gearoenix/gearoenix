@@ -96,26 +96,26 @@ int32_t gearoenix::system::Application::handle(android_app* const, AInputEvent* 
             event_engine->touch_down(
                 static_cast<core::event::touch::FingerId>(pointer_id),
                 static_cast<int>(x),
-                static_cast<int>(y));
+                event_engine->get_window_height() - static_cast<int>(y));
             break;
         case AMOTION_EVENT_ACTION_MOVE:
             event_engine->touch_move(
                 static_cast<core::event::touch::FingerId>(pointer_id),
                 static_cast<int>(x),
-                static_cast<int>(y));
+                event_engine->get_window_height() - static_cast<int>(y));
             break;
         case AMOTION_EVENT_ACTION_UP:
         case AMOTION_EVENT_ACTION_POINTER_UP:
             event_engine->touch_up(
                 static_cast<core::event::touch::FingerId>(pointer_id),
                 static_cast<int>(x),
-                static_cast<int>(y));
+                event_engine->get_window_height() - static_cast<int>(y));
             break;
         case AMOTION_EVENT_ACTION_CANCEL:
             event_engine->touch_cancel(
                 static_cast<core::event::touch::FingerId>(pointer_id),
                 static_cast<int>(x),
-                static_cast<int>(y));
+                event_engine->get_window_height() - static_cast<int>(y));
             break;
         default:
             GXLOGD("Unhandled motion event flag: " << flags)

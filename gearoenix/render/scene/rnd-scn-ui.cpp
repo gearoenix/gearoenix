@@ -10,7 +10,108 @@
 #include "../engine/rnd-eng-engine.hpp"
 #include "../model/rnd-mdl-model.hpp"
 #include "../widget/rnd-wdg-edit.hpp"
-#include <limits>
+
+void gearoenix::render::scene::Ui::find_hit_widgets(
+    const double x, const double y,
+    const std::function<void(widget::Widget* const, const math::Vec3<double>&)>& f1,
+    const std::function<void(widget::Widget* const, const math::Vec3<double>&, const std::vector<model::Model*>&)>& f2,
+    const std::function<void()>& f3) const noexcept
+{
+    const auto ray = cameras.begin()->second->create_ray3(x, y);
+    auto h = hit(ray, std::numeric_limits<double>::max());
+    if (h.has_value()) {
+        const double d_ray = h.value().first;
+        const math::Vec3 point = ray.get_point(d_ray);
+        auto* const cld = h.value().second;
+        auto* const mdl = cld->get_parent();
+        std::vector<model::Model*> children;
+        if (mdl != nullptr) {
+            if (mdl->get_model_type() == model::Type::Widget) {
+                auto* const wdg = dynamic_cast<widget::Widget*>(mdl);
+                f1(wdg, point);
+            }
+            children.push_back(mdl);
+            for (auto* parent = mdl->get_parent(); parent != nullptr; parent = parent->get_parent()) {
+                if (parent->get_model_type() == model::Type::Widget) {
+                    auto* const wdg = dynamic_cast<widget::Widget*>(parent);
+                    f2(wdg, point, children);
+                }
+                children.push_back(parent);
+            }
+        }
+    } else {
+        f3();
+    }
+}
+
+void gearoenix::render::scene::Ui::pointer_down(const double x, const double y) noexcept
+{
+    selected_widget = nullptr;
+    find_hit_widgets(
+        x, y,
+        [this](widget::Widget* const wdg, const math::Vec3<double>& p) noexcept {
+            wdg->selected(p);
+            selected_widget = wdg;
+            if (selected_widget->get_widget_type() == widget::Type::Edit && selected_edit != selected_widget) {
+                auto* const select = dynamic_cast<widget::Edit*>(selected_widget);
+                if (selected_edit != nullptr) {
+                    selected_edit->active(false);
+                }
+                select->active();
+                selected_edit = select;
+            }
+        },
+        [this](widget::Widget* const wdg, const math::Vec3<double>& p,
+            const std::vector<model::Model*>& children) noexcept {
+            wdg->selected_on(p, children);
+            if (selected_widget == nullptr)
+                selected_widget = wdg;
+        },
+        []() noexcept {});
+}
+
+void gearoenix::render::scene::Ui::pointer_up() noexcept
+{
+    if (selected_widget != nullptr) {
+        selected_widget->select_released();
+        selected_widget = nullptr;
+    }
+}
+
+void gearoenix::render::scene::Ui::pointer_move(const double x, const double y) noexcept
+{
+    if (selected_widget == nullptr)
+        return;
+    bool widget_found = false;
+    find_hit_widgets(
+        x, y,
+        [&](widget::Widget* const wdg, const math::Vec3<double>& p) noexcept {
+            if (selected_widget == wdg) {
+                widget_found = true;
+                selected_widget->dragged(p);
+            } else if (nullptr != selected_widget) {
+                selected_widget->select_cancelled();
+                selected_widget = nullptr;
+            }
+        },
+        [&](widget::Widget* const wdg, const math::Vec3<double>& p, const std::vector<model::Model*>& children) noexcept {
+            if (widget_found)
+                return;
+            if (selected_widget == wdg) {
+                widget_found = true;
+                selected_widget->dragged_on(p, children);
+            } else if (nullptr != selected_widget) {
+                selected_widget->select_cancelled();
+                selected_widget = nullptr;
+            }
+        },
+        [&]() noexcept {
+            if (selected_widget != nullptr) {
+                selected_widget->select_cancelled();
+                selected_widget = nullptr;
+            }
+        });
+}
 
 void gearoenix::render::scene::Ui::init() noexcept
 {
@@ -23,6 +124,7 @@ void gearoenix::render::scene::Ui::init() noexcept
     auto* const event_engine = sys_app->get_event_engine();
     event_engine->add_listener(core::event::Id::ButtonMouse, 0.0, this);
     event_engine->add_listener(core::event::Id::MovementMouse, 0.0, this);
+    event_engine->add_listener(core::event::Id::Touch, 0.0, this);
 }
 
 gearoenix::render::scene::Ui::Ui(const core::Id my_id, system::stream::Stream* f, engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
@@ -39,109 +141,47 @@ gearoenix::render::scene::Ui::Ui(const core::Id my_id, engine::Engine* e, const 
 
 bool gearoenix::render::scene::Ui::on_event(const core::event::Data& d) noexcept
 {
-    auto find_hit_widgets = [this](
-                                const double x,
-                                const double y,
-                                const std::function<void(widget::Widget* const, const math::Vec3<double>&)>& f1,
-                                const std::function<void(widget::Widget* const, const math::Vec3<double>&, const std::vector<model::Model*>&)>& f2,
-                                const std::function<void()>& f3) noexcept {
-        const auto ray = cameras.begin()->second->create_ray3(x, y);
-        auto h = hit(ray, std::numeric_limits<double>::max());
-        if (h.has_value()) {
-            const double d_ray = h.value().first;
-            const math::Vec3 point = ray.get_point(d_ray);
-            auto* const cld = h.value().second;
-            auto* const mdl = cld->get_parent();
-            std::vector<model::Model*> children;
-            if (mdl != nullptr) {
-                if (mdl->get_model_type() == model::Type::Widget) {
-                    auto* const wdg = dynamic_cast<widget::Widget*>(mdl);
-                    f1(wdg, point);
-                }
-                children.push_back(mdl);
-                for (auto* parent = mdl->get_parent(); parent != nullptr; parent = parent->get_parent()) {
-                    if (parent->get_model_type() == model::Type::Widget) {
-                        auto* const wdg = dynamic_cast<widget::Widget*>(parent);
-                        f2(wdg, point, children);
-                    }
-                    children.push_back(parent);
-                }
-            }
-        } else {
-            f3();
-        }
-    };
-
     switch (d.get_source()) {
     case core::event::Id::ButtonMouse: {
         const auto& data = std::get<core::event::button::MouseData>(d.get_data());
         if (data.get_key() == core::event::button::MouseKeyId::Left) {
             if (data.get_action() == core::event::button::MouseActionId::Press) {
-                selected_widget = nullptr;
-                find_hit_widgets(
-                    data.get_position().x, data.get_position().y,
-                    [this](widget::Widget* const wdg, const math::Vec3<double>& p) noexcept {
-                        wdg->selected(p);
-                        selected_widget = wdg;
-                        if (selected_widget->get_widget_type() == widget::Type::Edit && selected_edit != selected_widget) {
-                            auto* const select = dynamic_cast<widget::Edit*>(selected_widget);
-                            if (selected_edit != nullptr) {
-                                selected_edit->active(false);
-                            }
-                            select->active();
-                            selected_edit = select;
-                        }
-                    },
-                    [this](widget::Widget* const wdg, const math::Vec3<double>& p,
-                        const std::vector<model::Model*>& children) noexcept {
-                        wdg->selected_on(p, children);
-                        if (selected_widget == nullptr)
-                            selected_widget = wdg;
-                    },
-                    []() noexcept {});
+                const auto& p = data.get_position();
+                pointer_down(p.x, p.y);
             } else if (data.get_action() == core::event::button::MouseActionId::Release) {
-                if (selected_widget != nullptr) {
-                    selected_widget->select_released();
-                    selected_widget = nullptr;
-                }
+                pointer_up();
             }
         }
         break;
     }
     case core::event::Id::MovementMouse: {
-        const auto& data = std::get<core::event::movement::Base2D>(d.get_data());
-        if (selected_widget == nullptr)
+        const auto& p = std::get<core::event::movement::Base2D>(d.get_data()).get_point().get_current_position();
+        pointer_move(p.x, p.y);
+        break;
+    }
+    case core::event::Id::Touch: {
+        const auto& data = std::get<core::event::touch::Data>(d.get_data());
+        switch (data.get_action()) {
+        case core::event::touch::Action::Down: {
+            if (e->get_system_application()->get_event_engine()->get_touch_states().size() == 1) {
+                const auto& p = data.get_state().get_point().get_current_position();
+                pointer_down(p.x, p.y);
+            }
             break;
-        bool widget_found = false;
-        find_hit_widgets(
-            data.get_point().get_current_position().x,
-            data.get_point().get_current_position().y,
-            [&](widget::Widget* const wdg, const math::Vec3<double>& p) noexcept {
-                if (selected_widget == wdg) {
-                    widget_found = true;
-                    selected_widget->dragged(p);
-                } else if (nullptr != selected_widget) {
-                    selected_widget->select_cancelled();
-                    selected_widget = nullptr;
-                }
-            },
-            [&](widget::Widget* const wdg, const math::Vec3<double>& p, const std::vector<model::Model*>& children) noexcept {
-                if (widget_found)
-                    return;
-                if (selected_widget == wdg) {
-                    widget_found = true;
-                    selected_widget->dragged_on(p, children);
-                } else if (nullptr != selected_widget) {
-                    selected_widget->select_cancelled();
-                    selected_widget = nullptr;
-                }
-            },
-            [&]() noexcept {
-                if (selected_widget != nullptr) {
-                    selected_widget->select_cancelled();
-                    selected_widget = nullptr;
-                }
-            });
+        }
+        case core::event::touch::Action::Up: {
+            pointer_up();
+            break;
+        }
+        case core::event::touch::Action::Move:
+            if (e->get_system_application()->get_event_engine()->get_touch_states().size() == 1) {
+                const auto& p = data.get_state().get_point().get_current_position();
+                pointer_move(p.x, p.y);
+            }
+            break;
+        default:
+            break;
+        }
         break;
     }
     default:

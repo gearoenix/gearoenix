@@ -16,6 +16,15 @@ private:
     widget::Widget* selected_widget = nullptr;
     widget::Edit* selected_edit = nullptr;
 
+    void find_hit_widgets(double x, double y,
+        const std::function<void(widget::Widget* const, const math::Vec3<double>&)>& f1,
+        const std::function<void(widget::Widget* const, const math::Vec3<double>&, const std::vector<model::Model*>&)>& f2,
+        const std::function<void()>& f3) const noexcept;
+
+    void pointer_down(double x, double y) noexcept;
+    void pointer_up() noexcept;
+    void pointer_move(double x, double y) noexcept;
+
 public:
     Ui(
         core::Id my_id, system::stream::Stream* f, engine::Engine* e,
