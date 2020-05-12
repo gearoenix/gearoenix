@@ -232,6 +232,10 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::font::
     double& img_width,
     core::sync::EndCaller<texture::Texture2D>& end) const noexcept
 {
+    if (text.empty()) {
+        img_width = img_height;
+        return txt_mgr->get_2d(math::Vec4(0.0f), end);
+    }
     std::vector<double> widths(text.size() + 1);
     compute_text_widths(text, img_height, widths);
     img_width = widths.back();

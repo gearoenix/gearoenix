@@ -46,7 +46,7 @@ Example003UiWidgetsApp::Example003UiWidgetsApp(gearoenix::system::Application* c
     auto* tmp_tran = text->get_transformation();
     tmp_tran->local_scale(0.04f);
     tmp_tran->set_location(GxVec3(0.0, 0.85, 0.0));
-    text->set_text(L"I'm a one line Text widget. I easily grow horizontally and automatically.", end_call);
+    text->set_text(L"I'm an one line Text widget. I easily grow horizontally and automatically.", end_call);
     ui_scene->add_model(text);
 
     auto button = mdl_mgr->create<GxButton>(btn_call);
@@ -61,7 +61,7 @@ Example003UiWidgetsApp::Example003UiWidgetsApp(gearoenix::system::Application* c
     tmp_tran->local_scale(0.04);
     tmp_tran->local_x_scale(34.0);
     tmp_tran->set_location(GxVec3(0.0, 0.65, 0.0));
-    edit->set_hint_text(L"I'm a one line Edit text widget. I don't grow, there is a reason behind it, don't you know it.", end_call);
+    edit->set_hint_text(L"I'm an one line Edit text widget. I don't grow, there is a reason behind it, don't you know it.", end_call);
     ui_scene->add_model(edit);
 
     auto edit2 = mdl_mgr->create<GxEditWdg>(edt_call);

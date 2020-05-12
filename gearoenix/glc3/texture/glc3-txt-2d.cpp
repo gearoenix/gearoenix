@@ -83,9 +83,10 @@ std::shared_ptr<gearoenix::glc3::texture::Texture2D> gearoenix::glc3::texture::T
         gl::Loader::tex_parameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, sample_info.wrap_s);
         gl::Loader::tex_parameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, sample_info.wrap_t);
         for (std::size_t level_index = 0; level_index < pixels.size(); ++level_index) {
-            gl::Loader::tex_image_2d(
-                GL_TEXTURE_2D, static_cast<gl::sint>(level_index), internal_format, gl_img_width, gl_img_height, 0,
-                format, data_format, pixels[level_index].data());
+            const auto li = static_cast<gl::sint>(level_index);
+            const auto lw = static_cast<gl::sizei>(gl_img_width >> level_index);
+            const auto lh = static_cast<gl::sizei>(gl_img_height >> level_index);
+            gl::Loader::tex_image_2d(GL_TEXTURE_2D, li, internal_format, lw, lh, 0, format, data_format, pixels[level_index].data());
         }
         if (needs_mipmap && pixels.size() < 2) {
             gl::Loader::generate_mipmap(GL_TEXTURE_2D);

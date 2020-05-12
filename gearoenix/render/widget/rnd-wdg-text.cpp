@@ -49,7 +49,6 @@ gearoenix::render::widget::Text::Text(
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : Widget(my_id, Type::Text, e, c)
-    , text(L" ")
     , text_color(0.7, 0.7, 0.7, 1.0)
 {
     auto ast_mgr = e->get_system_application()->get_asset_manager();
@@ -72,7 +71,10 @@ void gearoenix::render::widget::Text::set_text(
 {
     text = t;
     double img_width = 0.0;
-    auto txt_end = core::sync::EndCaller<texture::Texture2D>([c, this](const std::shared_ptr<texture::Texture2D>& txt) {
+    auto txt_end = core::sync::EndCaller<texture::Texture2D>([c, t, this](const std::shared_ptr<texture::Texture2D>& txt) {
+        // This is because of controlling latency and over-assignments
+        if (t != text)
+            return;
         reinterpret_cast<material::Unlit*>(meshes[text_mesh_id]->get_mat().get())->set_color(txt);
     });
     auto txt = text_font->bake(text, text_color, collider->get_current_local_scale()[1] * 2.0, img_width, txt_end);

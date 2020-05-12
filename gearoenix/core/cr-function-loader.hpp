@@ -13,7 +13,7 @@ private:
 public:
     FunctionLoader() noexcept;
     ~FunctionLoader() noexcept;
-    void load(std::function<void()> fun) noexcept;
+    void load(const std::function<void()>& fun) noexcept;
     void unload() noexcept;
     [[nodiscard]] unsigned int get_loaded_count() const noexcept;
 };
