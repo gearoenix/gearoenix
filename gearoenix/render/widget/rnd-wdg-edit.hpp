@@ -31,9 +31,9 @@ namespace gearoenix::render::widget {
 
 struct EditTheme {
     Alignment h_align = Alignment::Center;
-    math::Vec4<double> text_color = math::Vec4(0.7, 0.7, 0.7, 1.0);
+    math::Vec4<double> text_color = math::Vec4(0.8, 0.8, 0.8, 1.0);
     double text_size = 0.9;
-    math::Vec4<double> hint_text_color = math::Vec4(0.5);
+    math::Vec4<double> hint_text_color = math::Vec4(0.7);
     double hint_text_size = 0.9;
     math::Vec4<double> background_color = math::Vec4(0.4, 0.4, 0.4, 1.0);
     math::Vec4<double> cursor_color = math::Vec4(0.0, 0.0, 0.0, 1.0);

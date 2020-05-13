@@ -70,6 +70,7 @@ public:
     /// It is going to break the main loop an then smooth exit will happen
     /// Core application termination will be called, and then termination of other modules
     void quit() noexcept;
+    void set_soft_keyboard_visibility(bool show) noexcept;
 };
 }
 #endif

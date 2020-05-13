@@ -57,6 +57,7 @@ public:
     ~Application() noexcept;
     void execute(std::unique_ptr<core::Application> core_app) noexcept;
     [[nodiscard]] const char* get_clipboard() const noexcept;
+    void set_soft_keyboard_visibility(bool show) noexcept;
 };
 }
 

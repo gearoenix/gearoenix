@@ -465,6 +465,7 @@ void gearoenix::render::widget::Edit::insert(
 
 void gearoenix::render::widget::Edit::selected(const math::Vec3<double>& point) noexcept
 {
+    e->get_system_application()->set_soft_keyboard_visibility(true);
     if (text.empty())
         return;
     auto* const text_tran = text_model->get_transformation();

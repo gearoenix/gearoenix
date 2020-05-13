@@ -1,7 +1,9 @@
 package com.geareonix.engine;
 import android.app.NativeActivity;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 
 public class MainActivity extends NativeActivity {
 
@@ -31,5 +33,21 @@ public class MainActivity extends NativeActivity {
 
     void setDecor() {
          getWindow().getDecorView().setSystemUiVisibility(VISIBILITY_OPTS);
+    }
+
+    public void showKeyboard()
+    {
+        InputMethodManager imm = ( InputMethodManager )getSystemService( Context.INPUT_METHOD_SERVICE );
+        if (imm != null) {
+            imm.showSoftInput( this.getWindow().getDecorView(), InputMethodManager.SHOW_FORCED );
+        }
+    }
+
+    public void hideKeyboard()
+    {
+        InputMethodManager imm = ( InputMethodManager )getSystemService( Context.INPUT_METHOD_SERVICE );
+        if (imm != null) {
+            imm.hideSoftInputFromWindow( this.getWindow().getDecorView().getWindowToken(), 0 );
+        }
     }
 }

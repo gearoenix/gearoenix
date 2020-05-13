@@ -592,4 +592,9 @@ void gearoenix::system::Application::quit() noexcept
     running = false;
 }
 
+void gearoenix::system::Application::set_soft_keyboard_visibility(const bool) noexcept
+{
+    // TODO for ios and surface and any other devices/os with soft keyboard
+}
+
 #endif
