@@ -146,7 +146,6 @@ int gearoenix::system::Application::on_event(SDL_Event* const e) noexcept
     // It's gonna be implemented whenever needed and as much as needed.
     switch (e->type) {
     case SDL_APP_WILLENTERBACKGROUND:
-        running = false;
         break;
     case SDL_KEYDOWN:
     case SDL_KEYUP: {
@@ -365,7 +364,7 @@ int gearoenix::system::Application::on_event(SDL_Event* const e) noexcept
                         case SDLK_KP_PERIOD:
                             return core::event::button::KeyboardKeyId::NumpadDot;
                         default:
-                        GXLOGD("Unhandled mouse button, left button returned instead. " << static_cast<int>(e->key.keysym.sym))
+                        GXLOGD("Unhandled button: " << static_cast<int>(e->key.keysym.sym))
                             return core::event::button::KeyboardKeyId::Unknown;
                     } }())));
         return 1;
@@ -451,6 +450,9 @@ int gearoenix::system::Application::on_event(SDL_Event* const e) noexcept
             GXTODO
             break;
         }
+        break;
+    case SDL_TEXTINPUT:
+        GXLOGD("e->text.text " << e->text.text)
         break;
     default:
         GXLOGE("Unhandled event " << e->type)
@@ -545,6 +547,11 @@ void gearoenix::system::Application::main_loop() noexcept
 #else
     while (running) {
 #endif
+    if(gooing_to_show_keyboard.has_value()) {
+        if(true == gooing_to_show_keyboard) SDL_StartTextInput();
+        else if(false == gooing_to_show_keyboard) SDL_StopTextInput();
+        gooing_to_show_keyboard = std::nullopt;
+    }
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
         if (event.type == SDL_QUIT) {
@@ -592,9 +599,13 @@ void gearoenix::system::Application::quit() noexcept
     running = false;
 }
 
-void gearoenix::system::Application::set_soft_keyboard_visibility(const bool) noexcept
+void gearoenix::system::Application::set_soft_keyboard_visibility(const bool show) noexcept
 {
-    // TODO for ios and surface and any other devices/os with soft keyboard
+#ifdef GX_IN_IOS
+    if(show) gooing_to_show_keyboard = true;
+    else gooing_to_show_keyboard = false;
+#endif
+    (void)show;
 }
 
 #endif

@@ -25,6 +25,7 @@ void gearoenix::core::event::Engine::loop() noexcept
             GX_CHECK;
             if (update_window_size_state(e))
                 continue;
+            update_internal_states(e);
             auto& ps = events_id_priority_listeners[e.get_source()];
             GX_CHECK;
             for (auto& p : ps) {
@@ -58,6 +59,65 @@ bool gearoenix::core::event::Engine::update_window_size_state(const Data& event_
         return true;
     }
     return false;
+}
+
+void gearoenix::core::event::Engine::update_internal_states(const Data& event_data) noexcept {
+    switch(event_data.get_source()) {
+        case Id::ButtonKeyboard: {
+            const auto& ke = std::get<core::event::button::KeyboardData>(event_data.get_data());
+            if (ke.get_action() == button::KeyboardActionId::Press) {
+                pressed_keyboard_buttons.insert(ke.get_key());
+            } else if (ke.get_action() == button::KeyboardActionId::Release) {
+                pressed_keyboard_buttons.erase(ke.get_key());
+            }
+            break;
+        }
+        case Id::MovementMouse:
+        {
+            const auto& d = std::get<core::event::movement::Base2D>(event_data.get_data()).get_point();
+            for (auto& ap : pressed_mouse_buttons_state) {
+                auto& p = ap.second;
+                p.update(d.get_raw_current_position(), d.get_current_position());
+                const auto dt = mouse_point.get_delta_start_time();
+                if (dt > CLICK_THRESHOLD || mouse_point.get_delta_start_position().length() > CLICK_DISTANCE_THRESHOLD) {
+                    gesture::Drag2D drag(p);
+                    if (ap.first == button::MouseKeyId::Left) {
+                        broadcast(Data(Id::GestureDrag2D, drag));
+                    }
+                    broadcast(Data(Id::GestureMouseDrag, gesture::MouseDrag(drag, ap.first)));
+                }
+            }
+            break;
+        }
+        case Id::ButtonMouse:
+        {
+            const auto& d = std::get<core::event::button::MouseData>(event_data.get_data());
+            const auto a = d.get_action();
+            const auto k = d.get_key();
+            if (a == button::MouseActionId::Press) {
+                pressed_mouse_buttons_state.emplace(std::make_pair(
+                    k, Point2D(mouse_point.get_raw_current_position(), mouse_point.get_current_position())));
+            } else if (a == button::MouseActionId::Release) {
+                auto pi = pressed_mouse_buttons_state.find(k);
+                if (pi == pressed_mouse_buttons_state.begin()) {
+                    auto now = std::chrono::high_resolution_clock::now();
+                    auto& p = pi->second;
+                    const std::chrono::duration<double> dt = now - p.get_current_time();
+                    if (dt.count() < CLICK_THRESHOLD) {
+                        broadcast(Data(core::event::Id::ButtonMouse,
+                            button::MouseData(
+                                button::MouseActionId::Click, k,
+                                mouse_point.get_current_position(),
+                                mouse_point.get_raw_current_position())));
+                    }
+                    pressed_mouse_buttons_state.erase(k);
+                }
+            }
+            break;
+        }
+        default:
+            break;
+    }
 }
 
 void gearoenix::core::event::Engine::check_window_size_state_timeout() noexcept
@@ -168,15 +228,6 @@ void gearoenix::core::event::Engine::remove_listener(Listener* listener) noexcep
 
 void gearoenix::core::event::Engine::broadcast(const Data& event_data) noexcept
 {
-    if (event_data.get_source() == Id::ButtonKeyboard) {
-        const auto& ke = std::get<core::event::button::KeyboardData>(event_data.get_data());
-        if (ke.get_action() == button::KeyboardActionId::Press) {
-            pressed_keyboard_buttons.insert(ke.get_key());
-        } else if (ke.get_action() == button::KeyboardActionId::Release) {
-            pressed_keyboard_buttons.erase(ke.get_key());
-        }
-    }
-
     std::lock_guard<std::mutex> _l(events_guard);
     events.push_back(event_data);
     signaler.release();
@@ -193,19 +244,6 @@ void gearoenix::core::event::Engine::update_mouse_position(const int x, const in
     const auto cp = convert_raw(x, y);
     mouse_point.update(rp, cp);
     broadcast(Data(Id::MovementMouse, movement::Base2D(mouse_point)));
-
-    for (auto& ap : pressed_mouse_buttons_state) {
-        auto& p = ap.second;
-        p.update(rp, cp);
-        const auto dt = mouse_point.get_delta_start_time();
-        if (dt > CLICK_THRESHOLD || mouse_point.get_delta_start_position().length() > CLICK_DISTANCE_THRESHOLD) {
-            gesture::Drag2D drag(p);
-            if (ap.first == button::MouseKeyId::Left) {
-                broadcast(Data(Id::GestureDrag2D, drag));
-            }
-            broadcast(Data(Id::GestureMouseDrag, gesture::MouseDrag(drag, ap.first)));
-        }
-    }
 }
 
 void gearoenix::core::event::Engine::mouse_button(const button::MouseKeyId k, const button::MouseActionId a) noexcept
@@ -216,26 +254,6 @@ void gearoenix::core::event::Engine::mouse_button(const button::MouseKeyId k, co
             a, k,
             mouse_point.get_current_position(),
             mouse_point.get_raw_current_position())));
-
-    if (a == button::MouseActionId::Press) {
-        pressed_mouse_buttons_state.emplace(std::make_pair(
-            k, Point2D(mouse_point.get_raw_current_position(), mouse_point.get_current_position())));
-    } else if (a == button::MouseActionId::Release) {
-        auto pi = pressed_mouse_buttons_state.find(k);
-        if (pi == pressed_mouse_buttons_state.begin()) {
-            auto now = std::chrono::high_resolution_clock::now();
-            auto& p = pi->second;
-            const std::chrono::duration<double> dt = now - p.get_current_time();
-            if (dt.count() < CLICK_THRESHOLD) {
-                broadcast(Data(core::event::Id::ButtonMouse,
-                    button::MouseData(
-                        button::MouseActionId::Click, k,
-                        mouse_point.get_current_position(),
-                        mouse_point.get_raw_current_position())));
-            }
-            pressed_mouse_buttons_state.erase(k);
-        }
-    }
 }
 
 bool gearoenix::core::event::Engine::is_pressed(gearoenix::core::event::button::KeyboardKeyId k) const noexcept

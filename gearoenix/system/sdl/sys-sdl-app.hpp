@@ -11,6 +11,7 @@
 #ifdef GX_IN_WEB
 #include <emscripten.h>
 #endif
+#include <optional>
 
 namespace gearoenix::core::asset {
 class Manager;
@@ -51,6 +52,7 @@ private:
 #endif
 
     bool running = true;
+    std::optional<bool> gooing_to_show_keyboard = std::nullopt;
     render::engine::Type supported_engine = render::engine::Type::NONE;
 
     void create_window() noexcept;

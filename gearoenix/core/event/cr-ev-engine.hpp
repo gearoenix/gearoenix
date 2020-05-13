@@ -64,6 +64,7 @@ private:
 
     void loop() noexcept;
     [[nodiscard]] bool update_window_size_state(const Data& event_data) noexcept;
+    void update_internal_states(const Data& event_data) noexcept;
     void check_window_size_state_timeout() noexcept;
     void set_window_size(int w, int h) noexcept;
     void set_previous_window_size() noexcept;

@@ -46,6 +46,7 @@ void gearoenix::render::scene::Ui::find_hit_widgets(
 
 void gearoenix::render::scene::Ui::pointer_down(const double x, const double y) noexcept
 {
+    e->get_system_application()->set_soft_keyboard_visibility(false);
     selected_widget = nullptr;
     find_hit_widgets(
         x, y,
