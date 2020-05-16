@@ -61,62 +61,61 @@ bool gearoenix::core::event::Engine::update_window_size_state(const Data& event_
     return false;
 }
 
-void gearoenix::core::event::Engine::update_internal_states(const Data& event_data) noexcept {
-    switch(event_data.get_source()) {
-        case Id::ButtonKeyboard: {
-            const auto& ke = std::get<core::event::button::KeyboardData>(event_data.get_data());
-            if (ke.get_action() == button::KeyboardActionId::Press) {
-                pressed_keyboard_buttons.insert(ke.get_key());
-            } else if (ke.get_action() == button::KeyboardActionId::Release) {
-                pressed_keyboard_buttons.erase(ke.get_key());
-            }
-            break;
+void gearoenix::core::event::Engine::update_internal_states(const Data& event_data) noexcept
+{
+    switch (event_data.get_source()) {
+    case Id::ButtonKeyboard: {
+        const auto& ke = std::get<core::event::button::KeyboardData>(event_data.get_data());
+        if (ke.get_action() == button::KeyboardActionId::Press) {
+            pressed_keyboard_buttons.insert(ke.get_key());
+        } else if (ke.get_action() == button::KeyboardActionId::Release) {
+            pressed_keyboard_buttons.erase(ke.get_key());
         }
-        case Id::MovementMouse:
-        {
-            const auto& d = std::get<core::event::movement::Base2D>(event_data.get_data()).get_point();
-            for (auto& ap : pressed_mouse_buttons_state) {
-                auto& p = ap.second;
-                p.update(d.get_raw_current_position(), d.get_current_position());
-                const auto dt = mouse_point.get_delta_start_time();
-                if (dt > CLICK_THRESHOLD || mouse_point.get_delta_start_position().length() > CLICK_DISTANCE_THRESHOLD) {
-                    gesture::Drag2D drag(p);
-                    if (ap.first == button::MouseKeyId::Left) {
-                        broadcast(Data(Id::GestureDrag2D, drag));
-                    }
-                    broadcast(Data(Id::GestureMouseDrag, gesture::MouseDrag(drag, ap.first)));
+        break;
+    }
+    case Id::MovementMouse: {
+        const auto& d = std::get<core::event::movement::Base2D>(event_data.get_data()).get_point();
+        for (auto& ap : pressed_mouse_buttons_state) {
+            auto& p = ap.second;
+            p.update(d.get_raw_current_position(), d.get_current_position());
+            const auto dt = mouse_point.get_delta_start_time();
+            if (dt > CLICK_THRESHOLD || mouse_point.get_delta_start_position().length() > CLICK_DISTANCE_THRESHOLD) {
+                gesture::Drag2D drag(p);
+                if (ap.first == button::MouseKeyId::Left) {
+                    broadcast(Data(Id::GestureDrag2D, drag));
                 }
+                broadcast(Data(Id::GestureMouseDrag, gesture::MouseDrag(drag, ap.first)));
             }
-            break;
         }
-        case Id::ButtonMouse:
-        {
-            const auto& d = std::get<core::event::button::MouseData>(event_data.get_data());
-            const auto a = d.get_action();
-            const auto k = d.get_key();
-            if (a == button::MouseActionId::Press) {
-                pressed_mouse_buttons_state.emplace(std::make_pair(
-                    k, Point2D(mouse_point.get_raw_current_position(), mouse_point.get_current_position())));
-            } else if (a == button::MouseActionId::Release) {
-                auto pi = pressed_mouse_buttons_state.find(k);
-                if (pi == pressed_mouse_buttons_state.begin()) {
-                    auto now = std::chrono::high_resolution_clock::now();
-                    auto& p = pi->second;
-                    const std::chrono::duration<double> dt = now - p.get_current_time();
-                    if (dt.count() < CLICK_THRESHOLD) {
-                        broadcast(Data(core::event::Id::ButtonMouse,
-                            button::MouseData(
-                                button::MouseActionId::Click, k,
-                                mouse_point.get_current_position(),
-                                mouse_point.get_raw_current_position())));
-                    }
-                    pressed_mouse_buttons_state.erase(k);
+        break;
+    }
+    case Id::ButtonMouse: {
+        const auto& d = std::get<core::event::button::MouseData>(event_data.get_data());
+        const auto a = d.get_action();
+        const auto k = d.get_key();
+        if (a == button::MouseActionId::Press) {
+            pressed_mouse_buttons_state.emplace(std::make_pair(
+                k, Point2D(mouse_point.get_raw_current_position(), mouse_point.get_current_position())));
+        } else if (a == button::MouseActionId::Release) {
+            auto pi = pressed_mouse_buttons_state.find(k);
+            if (pi == pressed_mouse_buttons_state.begin()) {
+                auto now = std::chrono::high_resolution_clock::now();
+                auto& p = pi->second;
+                const std::chrono::duration<double> dt = now - p.get_current_time();
+                if (dt.count() < CLICK_THRESHOLD) {
+                    broadcast(Data(core::event::Id::ButtonMouse,
+                        button::MouseData(
+                            button::MouseActionId::Click, k,
+                            mouse_point.get_current_position(),
+                            mouse_point.get_raw_current_position())));
                 }
+                pressed_mouse_buttons_state.erase(k);
             }
-            break;
         }
-        default:
-            break;
+        break;
+    }
+    default:
+        break;
     }
 }
 

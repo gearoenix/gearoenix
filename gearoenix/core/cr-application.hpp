@@ -33,7 +33,7 @@ protected:
 public:
     Application(system::Application* sys_app) noexcept;
     virtual ~Application() noexcept;
-    virtual void update() noexcept = 0;
+    virtual void update() noexcept;
     virtual void terminate() noexcept;
 };
 }

@@ -1,30 +1,30 @@
 #ifndef GEAROENIX_CORE_CACHE_CACHER_HPP
 #define GEAROENIX_CORE_CACHE_CACHER_HPP
 #include "../../system/sys-log.hpp"
+#include "../cr-static.hpp"
 #include "../cr-types.hpp"
 #include <functional>
 #include <map>
 #include <memory>
+#include <string>
 #include <type_traits>
 
-namespace gearoenix {
-namespace core {
-    namespace cache {
-        template <class T, class Key = Id, class Compare = std::less<Key>>
-        class Cacher {
-        private:
-            std::map<Key, std::weak_ptr<T>, Compare> cacheds;
+namespace gearoenix::core::cache {
+template <class T, class Key = Id, class Compare = std::less<Key>>
+class Cacher {
+public:
+    typedef std::map<Key, std::weak_ptr<T>, Compare> CacheMap;
+    typedef std::map<std::string, Key> NameMap;
 
-        public:
-            template <class C>
-            std::shared_ptr<C> get(const Key& id, const std::function<std::shared_ptr<C>()>& new_fun);
-            template <class C>
-            std::shared_ptr<C> get(const Key& id) const;
-            const std::map<Key, std::weak_ptr<T>, Compare>& get_cacheds() const;
-            std::map<Key, std::weak_ptr<T>, Compare>& get_cacheds() noexcept;
-        };
-    }
-}
+    GX_GET_REF_PRV(CacheMap, cacheds)
+    GX_GET_CREF_PRV(NameMap, name_to_key)
+public:
+    template <class C>
+    std::shared_ptr<C> get(const Key& id, const std::function<std::shared_ptr<C>()>& new_fun);
+    template <class C>
+    std::shared_ptr<C> get(const Key& id) const;
+    void register_name(const std::string& name, const Key& k) noexcept;
+};
 }
 
 template <class T, class Key, class Compare>
@@ -64,15 +64,19 @@ std::shared_ptr<C> gearoenix::core::cache::Cacher<T, Key, Compare>::get(const Ke
 }
 
 template <class T, class Key, class Compare>
-const std::map<Key, std::weak_ptr<T>, Compare>& gearoenix::core::cache::Cacher<T, Key, Compare>::get_cacheds() const
+void gearoenix::core::cache::Cacher<T, Key, Compare>::register_name(const std::string& name, const Key& k) noexcept
 {
-    return cacheds;
-}
-
-template <class T, class Key, class Compare>
-std::map<Key, std::weak_ptr<T>, Compare>& gearoenix::core::cache::Cacher<T, Key, Compare>::get_cacheds() noexcept
-{
-    return cacheds;
+#ifdef GX_DEBUG_MODE
+    const auto search = name_to_key.find(name);
+    if (search != name_to_key.end()) {
+        if (!Compare()(search->second, k) && !Compare()(k, search->second)) {
+            return;
+        } else {
+            GXLOGF("Already registered with name: " << name)
+        }
+    }
+#endif
+    name_to_key.emplace(name, k);
 }
 
 #endif

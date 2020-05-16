@@ -56,8 +56,11 @@ OPTION(GX_ENABLE_EXAMPLES "Enables the examples" ON)
 OPTION(GX_ENABLE_TESTS "Enables the tests" OFF)
 # Test coverage
 OPTION(GX_ENABLE_COVERAGE "Enables the measurement of test coverages" OFF)
+# Demo World Wide Racing
+OPTION(GX_ENABLE_DEMO_WORLD_WIDE_RACING "Enables the compilation of World Wide Racing game demo" OFF)
 # Libraries that are dependencies of the project
 SET(GX_LIBS)
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_GLIBCXX_DEBUG")
 # Configuring the language level
 IF (MSVC)
     SET(CMAKE_CXX_FLAGS "/std:c++latest ${CMAKE_CXX_FLAGS}")
@@ -228,3 +231,7 @@ IF (GX_ENABLE_TESTS)
     ENABLE_TESTING()
     ADD_SUBDIRECTORY(tests)
 ENDIF (GX_ENABLE_TESTS)
+
+IF (GX_ENABLE_DEMO_WORLD_WIDE_RACING)
+    ADD_SUBDIRECTORY(demos/world-wide-racing)
+ENDIF(GX_ENABLE_DEMO_WORLD_WIDE_RACING)

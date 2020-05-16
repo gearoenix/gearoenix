@@ -28,7 +28,7 @@ gearoenix::system::stream::Asset::~Asset() noexcept
 gearoenix::system::stream::Asset::~Asset() noexcept = default;
 #endif
 
-gearoenix::system::stream::Asset* gearoenix::system::stream::Asset::construct(system::Application* const sys_app, const std::string& name) noexcept
+gearoenix::system::stream::Asset* gearoenix::system::stream::Asset::construct(system::Application* const sys_app, const std::string& name, const bool relative_path) noexcept
 {
     auto* const asset = new Asset();
 #ifdef GX_USE_STD_FILE
@@ -40,7 +40,7 @@ gearoenix::system::stream::Asset* gearoenix::system::stream::Asset::construct(sy
         GXLOGD("iOS generated file path is: " << file_path)
     }
 #else
-    const std::string file_path = sys_app->get_arguments()->get_process_directory() + name;
+    const std::string file_path = relative_path ? sys_app->get_arguments()->get_process_directory() + name : name;
 #endif
     asset->file.open(file_path, std::ios::binary | std::ios::in);
     if (!asset->file.is_open()) {

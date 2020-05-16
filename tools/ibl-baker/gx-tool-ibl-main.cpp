@@ -227,7 +227,7 @@ IblBaker::IblBaker(gearoenix::system::Application* const sys_app) noexcept
         GxEndCaller<GxTexture2D> txt_call([end_call](const std::shared_ptr<GxTexture2D>&) {});
         GxTxtSampleInfo smp;
         smp.min_filter = GxTxtFilter::Linear;
-        sky->get_mat_equ()->set_color(txt_mgr->create_2d_f(environment_file, txt_call, smp));
+        sky->get_mat_equ()->set_color(txt_mgr->create_2d_f(environment_file, txt_call, smp, false));
 
         rtr->set_on_rendered([this]() {
             GXLOGD("Runtime reflection rendered.")

@@ -12,7 +12,7 @@ class Application;
 
 namespace gearoenix::system::stream {
 class Stream {
-    GX_GET_VAL_PRT(bool, endian_compatibility, true)
+    GX_GETSET_VAL_PRT(bool, endian_compatibility, true)
 protected:
     Stream() noexcept = default;
     void built_in_type_read(void* data, core::Count length) noexcept;

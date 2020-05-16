@@ -1,0 +1,13 @@
+INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR})
+
+SET(GX_DEMO_WORLD_WIDE_RACING_SRC
+        gx-demo-wwr-main.cpp
+        gx-demo-wwr-main.hpp)
+
+IF (NOT CMAKE_SYSTEM_NAME MATCHES "Android")
+    ADD_EXECUTABLE(GearoenixDemoWorldWideRacing ${GX_DEMO_WORLD_WIDE_RACING_SRC})
+    TARGET_LINK_LIBRARIES(GearoenixDemoWorldWideRacing Gearoenix)
+ELSE ()
+    ADD_LIBRARY(main SHARED ${GX_DEMO_WORLD_WIDE_RACING_SRC})
+    TARGET_LINK_LIBRARIES(main Gearoenix)
+ENDIF ()

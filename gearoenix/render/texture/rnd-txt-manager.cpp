@@ -355,12 +355,14 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
 std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::create_2d_f(
     const std::string& file_address,
     core::sync::EndCaller<render::texture::Texture2D>& c,
-    const SampleInfo& sample_info) noexcept
+    const SampleInfo& sample_info,
+    const bool relative_path) noexcept
 {
     const std::unique_ptr<system::stream::Asset> file(system::stream::Asset::construct(
-        e->get_system_application(), file_address));
+        e->get_system_application(), file_address, relative_path));
     if (file == nullptr)
         GXLOGF("Texture file " << file_address << " not found.")
+    file->set_endian_compatibility(true);
     auto const file_content = file->get_file_content();
     return create_2d_f(file_content.data(), file_content.size(), c, sample_info);
 }

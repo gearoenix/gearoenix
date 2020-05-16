@@ -116,7 +116,7 @@ void gearoenix::render::scene::Ui::pointer_move(const double x, const double y) 
 
 void gearoenix::render::scene::Ui::init() noexcept
 {
-    layer = 0.1f;
+    layer = 0.1;
     auto* const sys_app = e->get_system_application();
     auto cam = sys_app->get_asset_manager()->get_camera_manager()->create<camera::Orthographic>();
     add_camera(cam);

@@ -547,9 +547,11 @@ void gearoenix::system::Application::main_loop() noexcept
 #else
     while (running) {
 #endif
-    if(gooing_to_show_keyboard.has_value()) {
-        if(true == gooing_to_show_keyboard) SDL_StartTextInput();
-        else if(false == gooing_to_show_keyboard) SDL_StopTextInput();
+    if (gooing_to_show_keyboard.has_value()) {
+        if (true == gooing_to_show_keyboard)
+            SDL_StartTextInput();
+        else if (false == gooing_to_show_keyboard)
+            SDL_StopTextInput();
         gooing_to_show_keyboard = std::nullopt;
     }
     SDL_Event event;
@@ -602,8 +604,10 @@ void gearoenix::system::Application::quit() noexcept
 void gearoenix::system::Application::set_soft_keyboard_visibility(const bool show) noexcept
 {
 #ifdef GX_IN_IOS
-    if(show) gooing_to_show_keyboard = true;
-    else gooing_to_show_keyboard = false;
+    if (show)
+        gooing_to_show_keyboard = true;
+    else
+        gooing_to_show_keyboard = false;
 #endif
     (void)show;
 }

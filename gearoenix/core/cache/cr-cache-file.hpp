@@ -33,7 +33,9 @@ gearoenix::core::cache::File<T>::File(std::unique_ptr<system::stream::Stream> f)
         for (Count i = 0; i < c; ++i) {
             const Id id = file->read<Id>();
             const auto off = file->read<Offset>();
+            const auto name = file->read_string();
             offsets[id] = off;
+            cacher.register_name(name, id);
         }
     }
 }

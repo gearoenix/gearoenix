@@ -512,6 +512,8 @@ SET(GX_ENGINE_SRC
         "${GX_ENGINE_SRC_DIR}render/sampler/rnd-smp-manager.hpp"
         "${GX_ENGINE_SRC_DIR}render/scene/rnd-scn-game.cpp"
         "${GX_ENGINE_SRC_DIR}render/scene/rnd-scn-game.hpp"
+        "${GX_ENGINE_SRC_DIR}render/scene/rnd-scn-logo.cpp"
+        "${GX_ENGINE_SRC_DIR}render/scene/rnd-scn-logo.hpp"
         "${GX_ENGINE_SRC_DIR}render/scene/rnd-scn-manager.cpp"
         "${GX_ENGINE_SRC_DIR}render/scene/rnd-scn-manager.hpp"
         "${GX_ENGINE_SRC_DIR}render/scene/rnd-scn-scene.cpp"

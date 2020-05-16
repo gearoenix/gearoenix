@@ -14,6 +14,10 @@ gearoenix::core::Application::~Application() noexcept
     render_engine = nullptr;
 }
 
+void gearoenix::core::Application::update() noexcept
+{
+}
+
 void gearoenix::core::Application::terminate() noexcept
 {
 }
