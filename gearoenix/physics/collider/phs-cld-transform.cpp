@@ -32,7 +32,7 @@ gearoenix::math::IntersectionStatus gearoenix::physics::collider::Transform::che
     return limit.check_intersection_status(proj_box);
 }
 
-const gearoenix::math::Vec3<double>& gearoenix::physics::collider::Transform::get_location() const noexcept
+gearoenix::math::Vec3<double> gearoenix::physics::collider::Transform::get_location() const noexcept
 {
     GXLOGF("This class does not provide implementation for this function.")
 }

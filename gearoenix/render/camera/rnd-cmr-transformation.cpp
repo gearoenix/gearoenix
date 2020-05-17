@@ -69,7 +69,7 @@ void gearoenix::render::camera::Transformation::look_at(const math::Vec3<double>
     update_view_projection();
 }
 
-const gearoenix::math::Vec3<double>& gearoenix::render::camera::Transformation::get_location() const noexcept
+gearoenix::math::Vec3<double> gearoenix::render::camera::Transformation::get_location() const noexcept
 {
     GXUNEXPECTED // It can not provide this functionality
 }

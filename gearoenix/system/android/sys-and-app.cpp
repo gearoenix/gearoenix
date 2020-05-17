@@ -35,10 +35,12 @@ void gearoenix::system::Application::handle(android_app* const a, int32_t cmd) n
         break;
     case APP_CMD_PAUSE:
         GXLOGD("Application paused.")
+        resumed = false;
         on_not_ready_to_render();
         break;
     case APP_CMD_STOP:
         GXLOGD("Application stopped.")
+        resumed = false;
         on_not_ready_to_render();
         break;
     case APP_CMD_DESTROY:
@@ -51,6 +53,7 @@ void gearoenix::system::Application::handle(android_app* const a, int32_t cmd) n
         break;
     case APP_CMD_LOST_FOCUS:
         GXLOGD("Application unfocused.")
+        focused = false;
         on_not_ready_to_render();
         break;
     case APP_CMD_INIT_WINDOW:
@@ -60,6 +63,7 @@ void gearoenix::system::Application::handle(android_app* const a, int32_t cmd) n
         break;
     case APP_CMD_TERM_WINDOW:
         GXLOGD("Android window terminated.")
+        surface_ready = false;
         on_not_ready_to_render();
         break;
     case APP_CMD_WINDOW_RESIZED:
@@ -366,6 +370,8 @@ int32_t gearoenix::system::Application::handle_input(android_app* const a, AInpu
 
 void gearoenix::system::Application::on_check_ready_to_render(android_app* const a) noexcept
 {
+    if (running)
+        return;
     if (!resumed || !focused || !surface_ready)
         return;
     if (android_application->window == nullptr)
@@ -425,10 +431,9 @@ void gearoenix::system::Application::on_not_ready_to_render() noexcept
 {
     if (!running)
         return;
+    if (resumed && surface_ready)
+        return;
     running = false;
-    resumed = false;
-    focused = false;
-    surface_ready = false;
 #ifdef GX_USE_OPENGL
     if (GX_RUNTIME_USE_OPENGL_E(render_engine)) {
         gl_context->suspend();

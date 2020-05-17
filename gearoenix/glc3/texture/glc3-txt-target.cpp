@@ -128,7 +128,7 @@ void gearoenix::glc3::texture::Target::initialize_textures(
 
 void gearoenix::glc3::texture::Target::state_init() const noexcept
 {
-    gl::Loader::clear_color(0.0f, 0.0f, 0.0f, 1.0f);
+    gl::Loader::clear_color(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
 
     if (gl_cull_mode.has_value()) {
         gl::Loader::enable(GL_CULL_FACE);

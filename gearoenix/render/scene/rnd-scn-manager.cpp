@@ -37,6 +37,11 @@ void gearoenix::render::scene::Manager::get_gx3d(const core::Id mid, core::sync:
     });
 }
 
+void gearoenix::render::scene::Manager::get_gx3d(const std::string& name, const core::sync::EndCaller<Scene>& c) noexcept
+{
+    get_gx3d(cache.get_cacher().get_key(name), c);
+}
+
 const std::map<gearoenix::core::Id, std::weak_ptr<gearoenix::render::scene::Scene>>& gearoenix::render::scene::Manager::get_scenes() const noexcept
 {
     return cache.get_cacher().get_cacheds();

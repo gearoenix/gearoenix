@@ -17,6 +17,4 @@ gearoenix::render::scene::Game::Game(
 {
 }
 
-gearoenix::render::scene::Game::~Game() noexcept
-{
-}
+gearoenix::render::scene::Game::~Game() noexcept = default;

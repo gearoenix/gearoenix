@@ -72,7 +72,9 @@ void gearoenix::render::camera::Camera::config_target() const noexcept
 
 gearoenix::render::camera::Camera::~Camera() noexcept
 {
-    render_engine->get_system_application()->get_event_engine()->remove_listener(core::event::Id::SystemWindowSizeChange, this);
+    auto* const event_engine = render_engine->get_system_application()->get_event_engine();
+    if (nullptr != event_engine)
+        event_engine->remove_listener(core::event::Id::SystemWindowSizeChange, this);
 }
 
 void gearoenix::render::camera::Camera::set_far(const float f) noexcept

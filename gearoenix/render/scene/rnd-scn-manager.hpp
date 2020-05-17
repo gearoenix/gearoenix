@@ -30,6 +30,8 @@ namespace render {
             ~Manager() noexcept = default;
             /// It is gonna load the scene (if exists) in another thread.
             void get_gx3d(core::Id mid, core::sync::EndCaller<Scene> c) noexcept;
+            /// It is gonna load the scene (if exists) in another thread.
+            void get_gx3d(const std::string& name, const core::sync::EndCaller<Scene>& c) noexcept;
             /// T must be derived from Scene and have the same constructor that Scene has.
             template <typename T>
             typename std::enable_if<std::is_base_of<Scene, T>::value, std::shared_ptr<T>>::type

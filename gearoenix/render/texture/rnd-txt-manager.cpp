@@ -63,8 +63,8 @@ std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::render::texture:
         const auto img_width = static_cast<std::size_t>(s->read<std::uint16_t>());
         const auto img_height = static_cast<std::size_t>(s->read<std::uint16_t>());
         const auto t = e->create_texture_2d(
-                id, {read_gx3d_image(info.format, s)}, info, img_width, img_height,
-                core::sync::EndCaller<core::sync::EndCallerIgnore>([c] {}));
+            id, { read_gx3d_image(info.format, s) }, info, img_width, img_height,
+            core::sync::EndCaller<core::sync::EndCallerIgnore>([c] {}));
         c.set_data(t);
         return t;
     }

@@ -47,8 +47,9 @@ public:
     [[nodiscard]] virtual math::IntersectionStatus check_intersection_status(const math::Aabb3& box) const noexcept;
     void put_in_box(const math::Aabb3& b) noexcept;
 
-    [[nodiscard]] const math::Vec3<double>& get_location() const noexcept override;
+    [[nodiscard]] math::Vec3<double> get_location() const noexcept override;
     void set_location(const math::Vec3<double>&) noexcept override;
+    void local_z_rotate(const double d) noexcept final;
     void local_scale(double s) noexcept override;
     void local_x_scale(double s) noexcept override;
 

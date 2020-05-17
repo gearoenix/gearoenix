@@ -17,7 +17,7 @@ protected:
 
 public:
     virtual ~Transformation() noexcept;
-    [[nodiscard]] virtual const math::Vec3<double>& get_location() const noexcept;
+    [[nodiscard]] virtual math::Vec3<double> get_location() const noexcept;
     virtual void get_location(math::Vec3<double>& l) const noexcept;
     virtual void set_location(const math::Vec3<double>& l) noexcept;
     virtual void translate(const math::Vec3<double>& t) noexcept;

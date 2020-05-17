@@ -8,6 +8,7 @@
 #include <memory>
 #include <string>
 #include <type_traits>
+#include <variant>
 
 namespace gearoenix::core::cache {
 template <class T, class Key = Id, class Compare = std::less<Key>>
@@ -20,20 +21,32 @@ public:
     GX_GET_CREF_PRV(NameMap, name_to_key)
 public:
     template <class C>
-    std::shared_ptr<C> get(const Key& id, const std::function<std::shared_ptr<C>()>& new_fun);
+    std::shared_ptr<C> get(const std::string& name, const std::function<std::shared_ptr<C>()>& new_fun) noexcept;
     template <class C>
-    std::shared_ptr<C> get(const Key& id) const;
+    std::shared_ptr<C> get(const Key& id, const std::function<std::shared_ptr<C>()>& new_fun) noexcept;
+    template <class C>
+    std::shared_ptr<C> get(const std::string& name) const noexcept;
+    template <class C>
+    std::shared_ptr<C> get(const Key& id) const noexcept;
     void register_name(const std::string& name, const Key& k) noexcept;
+    Key get_key(const std::string& name) const noexcept;
 };
 }
 
 template <class T, class Key, class Compare>
 template <class C>
-std::shared_ptr<C> gearoenix::core::cache::Cacher<T, Key, Compare>::get(const Key& id, const std::function<std::shared_ptr<C>()>& new_fun)
+std::shared_ptr<C> gearoenix::core::cache::Cacher<T, Key, Compare>::get(const std::string& name, const std::function<std::shared_ptr<C>()>& new_fun) noexcept
+{
+    return get(get_key(name), new_fun);
+}
+
+template <class T, class Key, class Compare>
+template <class C>
+std::shared_ptr<C> gearoenix::core::cache::Cacher<T, Key, Compare>::get(const Key& id, const std::function<std::shared_ptr<C>()>& new_fun) noexcept
 {
     auto search = cacheds.find(id);
     if (search == cacheds.end()) {
-        std::shared_ptr<C> new_item = new_fun();
+        auto new_item = new_fun();
         cacheds[id] = new_item;
         return new_item;
     }
@@ -41,7 +54,7 @@ std::shared_ptr<C> gearoenix::core::cache::Cacher<T, Key, Compare>::get(const Ke
     if (auto cached = found.lock()) {
         return std::static_pointer_cast<C>(cached);
     } else {
-        std::shared_ptr<C> new_item = new_fun();
+        auto new_item = new_fun();
         found = new_item;
         return new_item;
     }
@@ -49,14 +62,20 @@ std::shared_ptr<C> gearoenix::core::cache::Cacher<T, Key, Compare>::get(const Ke
 
 template <class T, class Key, class Compare>
 template <class C>
-std::shared_ptr<C> gearoenix::core::cache::Cacher<T, Key, Compare>::get(const Key& id) const
+std::shared_ptr<C> gearoenix::core::cache::Cacher<T, Key, Compare>::get(const std::string& name) const noexcept
 {
-    auto search = cacheds.find(id);
+    return get(get_key(name));
+}
+
+template <class T, class Key, class Compare>
+template <class C>
+std::shared_ptr<C> gearoenix::core::cache::Cacher<T, Key, Compare>::get(const Key& id) const noexcept
+{
+    const auto search = cacheds.find(id);
     if (search == cacheds.end()) {
         GXLOGF("Object with id: " << id << ", has not been cached.")
     }
-    auto& found = search->second;
-    if (auto cached = found.lock()) {
+    if (auto cached = search->second.lock()) {
         return std::static_pointer_cast<C>(cached);
     } else {
         GXLOGF("Object with id: " << id << ", cached but it has been expired.")
@@ -79,4 +98,12 @@ void gearoenix::core::cache::Cacher<T, Key, Compare>::register_name(const std::s
     name_to_key.emplace(name, k);
 }
 
+template <class T, class Key, class Compare>
+Key gearoenix::core::cache::Cacher<T, Key, Compare>::get_key(const std::string& name) const noexcept
+{
+    const auto search = name_to_key.find(name);
+    if (search == name_to_key.end())
+        GXLOGF("Object with name: " << name << "not found.")
+    return search->second;
+}
 #endif

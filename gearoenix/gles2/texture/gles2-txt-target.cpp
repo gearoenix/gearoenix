@@ -17,7 +17,6 @@
 
 gearoenix::gles2::texture::Framebuffer::~Framebuffer() noexcept
 {
-
     if (borrowed) // It means that this is the main render target
         return;
     gl_e->get_function_loader()->load([cf { framebuffer }, cr { depth_buffer }] {
@@ -124,7 +123,7 @@ void gearoenix::gles2::texture::Target::state_init() const noexcept
 #ifdef GX_DEBUG_GLES2_TARGET
     gl::Loader::check_for_error();
 #endif
-    gl::Loader::clear_color(0.0f, 0.0f, 0.0f, 1.0f);
+    gl::Loader::clear_color(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
 
     if (gl_cull_mode.has_value()) {
         gl::Loader::enable(GL_CULL_FACE);

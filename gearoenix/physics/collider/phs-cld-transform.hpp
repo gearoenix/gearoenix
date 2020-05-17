@@ -15,7 +15,7 @@ public:
     [[nodiscard]] bool check_intersection(const math::Aabb3& box) const noexcept final;
     [[nodiscard]] math::IntersectionStatus check_intersection_status(const math::Aabb3& box) const noexcept final;
 
-    [[nodiscard]] const math::Vec3<double>& get_location() const noexcept final;
+    [[nodiscard]] math::Vec3<double> get_location() const noexcept final;
     void set_location(const math::Vec3<double>&) noexcept final;
     void local_scale(double) noexcept final;
     void local_x_scale(double) noexcept final;

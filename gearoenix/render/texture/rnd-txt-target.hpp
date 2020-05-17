@@ -1,6 +1,7 @@
 #ifndef GEAROENIX_RENDER_TEXTURE_TARGET_HPP
 #define GEAROENIX_RENDER_TEXTURE_TARGET_HPP
 #include "../../core/cr-static.hpp"
+#include "../../math/math-vector-4d.hpp"
 #include "rnd-txt-attachment.hpp"
 #include "rnd-txt-type.hpp"
 #include <vector>
@@ -22,6 +23,7 @@ class Target {
     GX_GETSET_VAL_PRT(bool, scissor_test_enabled, true)
     GX_GETSET_VAL_PRT(bool, stencil_test_enabled, true)
     GX_GETSET_VAL_PRT(bool, write_depth, true)
+    GX_GETSET_CREF_PRT(math::Vec4<float>, clear_color)
 protected:
     Target(const core::Id id, engine::Engine* const e) noexcept
         : e(e)

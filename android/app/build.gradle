@@ -13,10 +13,11 @@ android {
                 arguments '-DANDROID_TOOLCHAIN=clang',
                         '-DANDROID_STL=c++_static',
                         '-DGX_ENABLE_TOOLS=OFF',
-                      '-DGX_ENABLE_EXAMPLE_001_HELLO_WORLD=True'
+                        '-DGX_ENABLE_EXAMPLE_001_HELLO_WORLD=True'
 //                      '-DGX_ENABLE_EXAMPLE_002_ASSET_LOADING=True'
 //                      '-DGX_ENABLE_EXAMPLE_003_UI_WIDGETS=True'
 //                      '-DGX_ENABLE_EXAMPLE_004_RUNTIME_REFLECTION_PROBE=True'
+//                      '-DGX_ENABLE_DEMO_WORLD_WIDE_RACING=True'
             }
         }
     }

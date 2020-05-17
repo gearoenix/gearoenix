@@ -7,9 +7,9 @@
 void gearoenix::physics::collider::Collider::update_box() noexcept
 {
     origin_box.get_all_corners(updated_points);
-    updated_box.reset();
-    for (const auto& p : updated_points) {
-        updated_box.put_without_update((model_matrix * math::Vec4(p, 1.0)).xyz());
+    updated_box.reset((model_matrix * math::Vec4(updated_points[0], 1.0)).xyz());
+    for (std::size_t i = 1; i < GX_COUNT_OF(updated_points); ++i) {
+        updated_box.put_without_update((model_matrix * math::Vec4(updated_points[i], 1.0)).xyz());
     }
     updated_box.update();
 }
@@ -47,15 +47,21 @@ void gearoenix::physics::collider::Collider::put_in_box(const math::Aabb3& b) no
     update_box();
 }
 
-const gearoenix::math::Vec3<double>& gearoenix::physics::collider::Collider::get_location() const noexcept
+gearoenix::math::Vec3<double> gearoenix::physics::collider::Collider::get_location() const noexcept
 {
-    return updated_box.get_center();
+    return model_matrix.get_location();
 }
 
 void gearoenix::physics::collider::Collider::set_location(const math::Vec3<double>& l) noexcept
 {
     model_matrix.set_location(l);
     updated_box.set_center(l);
+}
+
+void gearoenix::physics::collider::Collider::local_z_rotate(const double d) noexcept
+{
+    model_matrix *= math::Mat4x4<double>::rotation(z_axis, d);
+    update_box();
 }
 
 void gearoenix::physics::collider::Collider::local_scale(const double s) noexcept

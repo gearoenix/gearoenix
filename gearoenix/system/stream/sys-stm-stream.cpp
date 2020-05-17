@@ -1,6 +1,4 @@
 #include "sys-stm-stream.hpp"
-#include "../../core/cr-string.hpp"
-#include "sys-stm-asset.hpp"
 #include <fstream>
 
 void gearoenix::system::stream::Stream::built_in_type_read(void* const data, const core::Count length) noexcept

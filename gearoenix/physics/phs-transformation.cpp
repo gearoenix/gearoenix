@@ -11,12 +11,11 @@ gearoenix::physics::Transformation::Transformation() noexcept
 
 gearoenix::physics::Transformation::~Transformation() noexcept = default;
 
-void gearoenix::physics::Transformation::get_location(math::Vec3<double>&) const noexcept
-{
+void gearoenix::physics::Transformation::get_location(math::Vec3<double>&) const noexcept {
     GXUNIMPLEMENTED
 }
 
-const gearoenix::math::Vec3<double>& gearoenix::physics::Transformation::get_location() const noexcept
+gearoenix::math::Vec3<double> gearoenix::physics::Transformation::get_location() const noexcept
 {
     GXUNIMPLEMENTED
 }

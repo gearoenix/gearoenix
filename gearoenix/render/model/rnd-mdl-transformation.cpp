@@ -7,7 +7,7 @@ gearoenix::render::model::Transformation::Transformation(Model* const parent) no
 {
 }
 
-const gearoenix::math::Vec3<double>& gearoenix::render::model::Transformation::get_location() const noexcept
+gearoenix::math::Vec3<double> gearoenix::render::model::Transformation::get_location() const noexcept
 {
     return parent->get_collider()->get_location();
 }
@@ -27,15 +27,25 @@ void gearoenix::render::model::Transformation::translate(const math::Vec3<double
     set_location(get_location() + l);
 }
 
+void gearoenix::render::model::Transformation::local_z_rotate(const double d) noexcept
+{
+    physics::collider::Collider* const collider = parent->get_collider();
+    collider->local_z_rotate(d);
+    const auto loc = collider->get_location();
+    const auto& children = parent->get_children();
+    for (const auto& c : children)
+        c.second->get_transformation()->global_rotate(d, z_axis, loc);
+}
+
 void gearoenix::render::model::Transformation::local_scale(const double s) noexcept
 {
-    const math::Vec3<double>& loc = get_location();
-    const std::map<core::Id, std::shared_ptr<model::Model>>& children = parent->get_children();
-    for (const std::pair<const core::Id, std::shared_ptr<model::Model>>& c : children) {
-        Model* const child = c.second.get();
-        physics::Transformation* const ct = child->get_transformation();
+    const auto& loc = get_location();
+    const auto& children = parent->get_children();
+    for (const auto& c : children) {
+        auto* const child = c.second.get();
+        auto* const ct = child->get_transformation();
         ct->local_scale(s);
-        ct->set_location((ct->get_location() - loc) * s + loc);
+        ct->set_location(((ct->get_location() - loc) * s) + loc);
     }
     parent->get_collider()->local_scale(s);
 }

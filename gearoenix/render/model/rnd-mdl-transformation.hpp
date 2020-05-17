@@ -15,7 +15,7 @@ public:
     //const math::Vec3& get_x_axis() const noexcept override final;
     //const math::Vec3& get_y_axis() const noexcept override final;
     //const math::Vec3& get_z_axis() const noexcept override final;
-    [[nodiscard]] const math::Vec3<double>& get_location() const noexcept final;
+    [[nodiscard]] math::Vec3<double> get_location() const noexcept final;
     //void get_location(math::Vec3& l) const noexcept final;
     void set_location(const math::Vec3<double>& l) noexcept final;
     void translate(const math::Vec3<double>& t) noexcept final;
@@ -27,7 +27,7 @@ public:
     //void local_rotate(const double d, const math::Vec3& axis) noexcept override final;
     //void local_x_rotate(const double d) noexcept override final;
     //void local_y_rotate(const double d) noexcept override final;
-    //void local_z_rotate(const double d) noexcept override final;
+    void local_z_rotate(double d) noexcept final;
     //void set_orientation(const math::Quat& q) noexcept override final;
     void local_scale(double) noexcept final;
     void local_x_scale(double) noexcept final;

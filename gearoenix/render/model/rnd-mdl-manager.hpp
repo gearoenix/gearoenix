@@ -25,6 +25,7 @@ namespace render {
             Manager(std::unique_ptr<system::stream::Stream> s, engine::Engine* e) noexcept;
             ~Manager() noexcept = default;
             std::shared_ptr<Model> get_gx3d(core::Id mid, core::sync::EndCaller<Model>& c) noexcept;
+            std::shared_ptr<Model> get_gx3d(const std::string& name, core::sync::EndCaller<Model>& c) noexcept;
             /// T must be derived from Model and have the same constructor that Model has.
             template <typename T>
             typename std::enable_if<std::is_base_of<Model, T>::value, std::shared_ptr<T>>::type

@@ -30,7 +30,7 @@ gearoenix::math::IntersectionStatus gearoenix::physics::collider::Frustum::check
     return frustum.check_intersection_status(box);
 }
 
-const gearoenix::math::Vec3<double>& gearoenix::physics::collider::Frustum::get_location() const noexcept
+gearoenix::math::Vec3<double> gearoenix::physics::collider::Frustum::get_location() const noexcept
 {
     GXLOGF("This class does not provide implementation for this function.")
 }

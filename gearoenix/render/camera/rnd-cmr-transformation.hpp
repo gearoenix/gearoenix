@@ -33,7 +33,7 @@ public:
     void look_at(const math::Vec3<double>& target, const math::Vec3<double>& up) noexcept;
     void look_at(const math::Vec3<double>& origin, const math::Vec3<double>& target, const math::Vec3<double>& up) noexcept;
     // physics::Transformation----------------------------------------------------------------------------
-    [[nodiscard]] const math::Vec3<double>& get_location() const noexcept final;
+    [[nodiscard]] math::Vec3<double> get_location() const noexcept final;
     void get_location(math::Vec3<double>& l) const noexcept final;
     void set_location(const math::Vec3<double>& l) noexcept final;
     void translate(const math::Vec3<double>& t) noexcept final;

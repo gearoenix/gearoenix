@@ -30,3 +30,10 @@ std::shared_ptr<gearoenix::render::model::Model> gearoenix::render::model::Manag
     c.set_data(m);
     return m;
 }
+
+std::shared_ptr<gearoenix::render::model::Model> gearoenix::render::model::Manager::get_gx3d(
+    const std::string& name,
+    core::sync::EndCaller<Model>& c) noexcept
+{
+    return get_gx3d(cache.get_cacher().get_key(name), c);
+}
