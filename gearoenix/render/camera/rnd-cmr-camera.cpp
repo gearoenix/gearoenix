@@ -145,7 +145,7 @@ void gearoenix::render::camera::Camera::check_static_models(const physics::accel
             auto* const msh = model_mesh.second.get();
             auto* const mat = msh->get_mat().get();
             if (mat->get_translucency() == render::material::TranslucencyMode::Transparent) {
-                seen_static_transparent_meshes.emplace_back(get_distance(cld->get_location()), mat->get_material_type(), m, msh);
+                seen_static_transparent_meshes.emplace_back(-get_distance(cld->get_location()), mat->get_material_type(), m, msh);
             } else {
                 seen_static_opaque_meshes.emplace_back(mat->get_material_type(), m, msh);
             }
@@ -165,7 +165,7 @@ void gearoenix::render::camera::Camera::check_dynamic_models(const physics::acce
             auto* const msh = model_mesh.second.get();
             auto* const mat = msh->get_mat().get();
             if (mat->get_translucency() == render::material::TranslucencyMode::Transparent) {
-                seen_dynamic_transparent_meshes.emplace_back(get_distance(cld->get_location()), mat->get_material_type(), m, msh);
+                seen_dynamic_transparent_meshes.emplace_back(-get_distance(cld->get_location()), mat->get_material_type(), m, msh);
             } else {
                 seen_dynamic_opaque_meshes.emplace_back(mat->get_material_type(), m, msh);
             }

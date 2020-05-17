@@ -72,7 +72,7 @@ gearoenix::render::camera::Orthographic::Orthographic(
     : Camera(my_id, f, e)
 {
     reinterpret_cast<Transformation*>(transformation.get())->set_on_frustum_update([this] { update_cascades(); });
-    f->read(aspects_size);
+    aspects_size = static_cast<double>(f->read<float>()) / 4.0;
     GXLOGD("Aspect size is: " << aspects_size << ", in orthographic camera with id: " << my_id)
     update_aspects_size();
 }
