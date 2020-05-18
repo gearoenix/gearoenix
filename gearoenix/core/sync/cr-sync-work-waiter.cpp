@@ -1,9 +1,20 @@
 #include "cr-sync-work-waiter.hpp"
+
+#ifdef GX_THREAD_NOT_SUPPORTED
+
+gearoenix::core::sync::WorkWaiter::WorkWaiter() = default;
+gearoenix::core::sync::WorkWaiter::~WorkWaiter() = default;
+
+void gearoenix::core::sync::WorkWaiter::push(std::function<void()> f)
+{
+    f();
+    (void)this;
+}
+
+#else
 #include "../../system/sys-log.hpp"
 #include "../cr-function-loader.hpp"
 #include "cr-sync-semaphore.hpp"
-
-#include <iostream>
 #include <utility>
 
 void gearoenix::core::sync::WorkWaiter::wait_loop()
@@ -45,3 +56,4 @@ void gearoenix::core::sync::WorkWaiter::push(std::function<void()> f)
     function_loader->load(std::move(f));
     semaphore->release();
 }
+#endif

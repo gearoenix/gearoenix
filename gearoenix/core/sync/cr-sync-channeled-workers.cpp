@@ -1,4 +1,5 @@
 #include "cr-sync-channeled-workers.hpp"
+#ifndef GX_THREAD_NOT_SUPPORTED
 #include "../../system/sys-log.hpp"
 
 void gearoenix::core::sync::ChanneledWorkers::Thread::kernel() noexcept
@@ -63,3 +64,4 @@ void gearoenix::core::sync::ChanneledWorkers::perform(const std::function<void(s
     t->pending.push_back(job);
     t->signal.release();
 }
+#endif

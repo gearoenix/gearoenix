@@ -43,6 +43,7 @@ struct Pixel {
                 current_ptr = end_ptr;
                 pixel_index = pixels_count;
             }
+            return *this;
         }
 
         template <typename I>

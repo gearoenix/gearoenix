@@ -5,15 +5,17 @@
 constexpr double CLICK_THRESHOLD = 0.2f;
 constexpr double CLICK_DISTANCE_THRESHOLD = 0.1f;
 
+#ifndef GX_THREAD_NOT_SUPPORTED
 void gearoenix::core::event::Engine::loop() noexcept
 {
     state = State::Running;
 #define GX_CHECK                 \
     if (state != State::Running) \
-    break
-    while (state == State::Running) {
+        break;
+    while (true) {
+        GX_CHECK
         signaler.lock_until(std::chrono::system_clock::now() + std::chrono::milliseconds(500));
-        GX_CHECK;
+        GX_CHECK
         decltype(events) es;
         {
             std::lock_guard<std::mutex> _l(events_guard);
@@ -22,28 +24,7 @@ void gearoenix::core::event::Engine::loop() noexcept
         GX_CHECK;
         std::lock_guard<std::mutex> _l(listeners_guard);
         for (const auto& e : es) {
-            GX_CHECK;
-            if (update_window_size_state(e))
-                continue;
-            update_internal_states(e);
-            auto& ps = events_id_priority_listeners[e.get_source()];
-            GX_CHECK;
-            for (auto& p : ps) {
-                GX_CHECK;
-                auto& ls = p.second;
-                GX_CHECK;
-                for (auto& l : ls) {
-                    GX_CHECK;
-                    if (l->on_event(e)) {
-                        GX_CHECK;
-                        goto event_processed;
-                    }
-                    GX_CHECK;
-                }
-                GX_CHECK;
-            }
-        event_processed:;
-            GX_CHECK;
+            process(e);
         }
         check_window_size_state_timeout();
         GX_CHECK;
@@ -59,6 +40,26 @@ bool gearoenix::core::event::Engine::update_window_size_state(const Data& event_
         return true;
     }
     return false;
+}
+#endif
+
+void gearoenix::core::event::Engine::process(const Data& e) noexcept
+{
+#ifdef GX_THREAD_NOT_SUPPORTED
+#else
+    if (update_window_size_state(e))
+        return;
+#endif
+    update_internal_states(e);
+    auto& ps = events_id_priority_listeners[e.get_source()];
+    for (auto& p : ps) {
+        auto& ls = p.second;
+        for (auto& l : ls) {
+            if (l->on_event(e)) {
+                return;
+            }
+        }
+    }
 }
 
 void gearoenix::core::event::Engine::update_internal_states(const Data& event_data) noexcept
@@ -119,6 +120,7 @@ void gearoenix::core::event::Engine::update_internal_states(const Data& event_da
     }
 }
 
+#ifndef GX_THREAD_NOT_SUPPORTED
 void gearoenix::core::event::Engine::check_window_size_state_timeout() noexcept
 {
     if (window_width == previous_window_width && window_height == previous_window_height)
@@ -146,6 +148,7 @@ void gearoenix::core::event::Engine::check_window_size_state_timeout() noexcept
         }));
     set_previous_window_size();
 }
+#endif
 
 void gearoenix::core::event::Engine::set_window_size(const int w, const int h) noexcept
 {
@@ -180,36 +183,53 @@ gearoenix::math::Vec2<double> gearoenix::core::event::Engine::convert_raw(const 
     return math::Vec2(convert_raw_x(x), convert_raw_y(y));
 }
 
+#ifdef GX_THREAD_NOT_SUPPORTED
+gearoenix::core::event::Engine::Engine() noexcept
+    : mouse_point({ 0, 0 }, { 0.0, 0.0 })
+{
+}
+#else
 gearoenix::core::event::Engine::Engine() noexcept
     : state(State::Running)
     , event_thread([this] { loop(); })
     , mouse_point({ 0, 0 }, { 0.0, 0.0 })
 {
 }
+#endif
 
 gearoenix::core::event::Engine::~Engine() noexcept
+#ifdef GX_THREAD_NOT_SUPPORTED
+    = default;
+#else
 {
     state = State::Terminating;
     while (state != State::Terminated)
         signaler.release();
     event_thread.join();
 }
+#endif
+
+#ifdef GX_THREAD_NOT_SUPPORTED
+#define GX_GUARD_LISTENERS
+#else
+#define GX_GUARD_LISTNERS std::lock_guard<std::mutex> _l(listeners_guard);
+#endif
 
 void gearoenix::core::event::Engine::add_listener(Id event_id, double priority, Listener* listener) noexcept
 {
-    std::lock_guard<std::mutex> _l(listeners_guard);
+    GX_GUARD_LISTENERS
     events_id_priority_listeners[event_id][priority].insert(listener);
 }
 
 void gearoenix::core::event::Engine::remove_listener(Id event_id, double priority, Listener* listener) noexcept
 {
-    std::lock_guard<std::mutex> _l(listeners_guard);
+    GX_GUARD_LISTENERS
     events_id_priority_listeners[event_id][priority].erase(listener);
 }
 
 void gearoenix::core::event::Engine::remove_listener(Id event_id, Listener* listener) noexcept
 {
-    std::lock_guard<std::mutex> _l(listeners_guard);
+    GX_GUARD_LISTENERS
     auto& e = events_id_priority_listeners[event_id];
     for (auto& p : e)
         p.second.erase(listener);
@@ -217,7 +237,7 @@ void gearoenix::core::event::Engine::remove_listener(Id event_id, Listener* list
 
 void gearoenix::core::event::Engine::remove_listener(Listener* listener) noexcept
 {
-    std::lock_guard<std::mutex> _l(listeners_guard);
+    GX_GUARD_LISTENERS
     for (auto& e : events_id_priority_listeners) {
         auto& ps = e.second;
         for (auto& p : ps)
@@ -227,9 +247,13 @@ void gearoenix::core::event::Engine::remove_listener(Listener* listener) noexcep
 
 void gearoenix::core::event::Engine::broadcast(const Data& event_data) noexcept
 {
+#ifdef GX_THREAD_NOT_SUPPORTED
+    process(event_data);
+#else
     std::lock_guard<std::mutex> _l(events_guard);
     events.push_back(event_data);
     signaler.release();
+#endif
 }
 
 void gearoenix::core::event::Engine::initialize_mouse_position(const int x, const int y) noexcept

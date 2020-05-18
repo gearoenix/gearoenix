@@ -8,13 +8,16 @@
 #include "cr-ev-event.hpp"
 #include "cr-ev-id.hpp"
 #include "cr-ev-touch.hpp"
-#include <atomic>
 #include <chrono>
 #include <map>
 #include <memory>
-#include <mutex>
 #include <set>
+
+#ifndef GX_THREAD_NOT_SUPPORTED
+#include <atomic>
+#include <mutex>
 #include <thread>
+#endif
 
 namespace gearoenix::core::event {
 class Listener;
@@ -40,6 +43,7 @@ public:
     GX_GET_VAL_PRV(double, window_reversed_half_height, 2.0 / static_cast<double>(GX_DEFAULT_WINDOW_HEIGHT))
 #endif
 private:
+#ifndef GX_THREAD_NOT_SUPPORTED
     enum struct State : int {
         Running = 1,
         Terminating = 2,
@@ -51,8 +55,14 @@ private:
     std::mutex events_guard;
     std::vector<Data> events;
     std::mutex listeners_guard;
-    std::map<Id, std::map<double, std::set<Listener*>>> events_id_priority_listeners;
     std::thread event_thread;
+    std::chrono::high_resolution_clock::time_point previous_window_size_update = std::chrono::high_resolution_clock::now();
+
+    void loop() noexcept;
+    [[nodiscard]] bool update_window_size_state(const Data& event_data) noexcept;
+    void check_window_size_state_timeout() noexcept;
+#endif
+    std::map<Id, std::map<double, std::set<Listener*>>> events_id_priority_listeners;
     Point2D mouse_point;
     bool click_enabled = true;
     int previous_window_width = 0;
@@ -60,12 +70,9 @@ private:
     double previous_window_reversed_half_width = 0.0;
     double previous_window_reversed_half_height = 0.0;
     double previous_window_ratio = 0.0;
-    std::chrono::high_resolution_clock::time_point previous_window_size_update = std::chrono::high_resolution_clock::now();
 
-    void loop() noexcept;
-    [[nodiscard]] bool update_window_size_state(const Data& event_data) noexcept;
+    void process(const Data& event_data) noexcept;
     void update_internal_states(const Data& event_data) noexcept;
-    void check_window_size_state_timeout() noexcept;
     void set_window_size(int w, int h) noexcept;
     void set_previous_window_size() noexcept;
     [[nodiscard]] double convert_raw_x(int x) const noexcept;

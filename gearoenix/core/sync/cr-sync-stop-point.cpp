@@ -1,4 +1,5 @@
 #include "cr-sync-stop-point.hpp"
+#ifndef GX_THREAD_NOT_SUPPORTED
 #include "cr-sync-semaphore.hpp"
 
 gearoenix::core::sync::StopPoint::StopPoint(int walkers_count)
@@ -22,3 +23,4 @@ void gearoenix::core::sync::StopPoint::all_reach()
         sem->lock();
     }
 }
+#endif

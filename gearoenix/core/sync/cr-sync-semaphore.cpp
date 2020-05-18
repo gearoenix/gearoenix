@@ -1,4 +1,5 @@
 #include "cr-sync-semaphore.hpp"
+#ifndef GX_THREAD_NOT_SUPPORTED
 
 gearoenix::core::sync::Semaphore::Semaphore(int count) noexcept
     : count(count)
@@ -20,3 +21,4 @@ void gearoenix::core::sync::Semaphore::release() noexcept
     ++count;
     c.notify_all();
 }
+#endif

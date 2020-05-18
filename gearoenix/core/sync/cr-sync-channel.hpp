@@ -1,6 +1,7 @@
 #ifndef GEAROENIX_CORE_SYNC_CHANNEL_HPP
 #define GEAROENIX_CORE_SYNC_CHANNEL_HPP
 #include "../cr-build-configuration.hpp"
+#ifndef GX_THREAD_NOT_SUPPORTED
 #include "../cr-static.hpp"
 #include "cr-sync-semaphore.hpp"
 #include <queue>
@@ -41,4 +42,5 @@ public:
     }
 };
 }
+#endif
 #endif

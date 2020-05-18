@@ -31,7 +31,7 @@ public:
     static void exec(Iter first, Iter end, Fun f)
     {
 #ifdef GX_THREAD_NOT_SUPPORTED
-        for (first != end; ++first)
+        for (; first != end; ++first)
             f(first);
 #else
         exec([f, first, end](unsigned int kernels_count, unsigned int kernel_index) noexcept {
