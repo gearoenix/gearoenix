@@ -1,6 +1,6 @@
 #ifndef GEAROENIX_SYSTEM_LOG_HPP
 #define GEAROENIX_SYSTEM_LOG_HPP
-#include "../core/cr-build-configuration.hpp"
+#include "../core/cr-static.hpp"
 #ifdef GX_LOG_ENABLED
 #include <exception>
 #ifdef GX_IN_ANDROID
@@ -25,39 +25,36 @@
     }
 #else
 #include <fstream>
-#include <mutex>
-namespace gearoenix {
-namespace system {
-    class Log {
-    public:
-        static std::ofstream info;
-        static std::mutex info_lock;
+namespace gearoenix::system {
+class Log {
+public:
+    static std::ofstream info;
+    GX_CREATE_GUARD_S(info);
 #ifdef GX_DEBUG_MODE
-        static std::ofstream debug;
-        static std::mutex debug_lock;
+    static std::ofstream debug;
+    GX_CREATE_GUARD_S(debug)
 #endif
-        static std::ofstream error;
-        static std::mutex error_lock;
-    };
-}
+    static std::ofstream error;
+    GX_CREATE_GUARD_S(error)
+};
 }
 #define GXLOGI(s)                                                                 \
     {                                                                             \
-        std::lock_guard<std::mutex> _lg(gearoenix::system::Log::info_lock);       \
+        GX_GUARD_LOCK(gearoenix::system::Log::info)                               \
         gearoenix::system::Log::info << GX_APP_NAME << " " << s << " "            \
                                      << __FILE__ << " " << __LINE__ << std::endl; \
     }
 #ifdef GX_DEBUG_MODE
 #define GXLOGD(s)                                                                  \
     {                                                                              \
-        std::lock_guard<std::mutex> _lg(gearoenix::system::Log::debug_lock);       \
+        GX_GUARD_LOCK(gearoenix::system::Log::debug)                               \
         gearoenix::system::Log::debug << GX_APP_NAME << " " << s << " "            \
                                       << __FILE__ << " " << __LINE__ << std::endl; \
     }
 #endif
 #define GXLOGE(s)                                                                  \
     {                                                                              \
-        std::lock_guard<std::mutex> _lg(gearoenix::system::Log::error_lock);       \
+        GX_GUARD_LOCK(gearoenix::system::Log::error)                               \
         gearoenix::system::Log::error << GX_APP_NAME << " " << s << " "            \
                                       << __FILE__ << " " << __LINE__ << std::endl; \
     }

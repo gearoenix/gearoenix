@@ -14,8 +14,6 @@
 #include "../../system/stream/sys-stm-asset.hpp"
 #include "../../system/sys-app.hpp"
 
-std::atomic<gearoenix::core::Id> gearoenix::core::asset::Manager::last_id(0);
-
 gearoenix::core::asset::Manager::Manager(system::Application* const sys_app, const std::string& name) noexcept
     : sys_app(sys_app)
     , render_engine(sys_app->get_render_engine())
@@ -39,7 +37,7 @@ gearoenix::core::asset::Manager::Manager(system::Application* const sys_app, con
     } else {
         GXLOGD("Asset file found.")
         auto* s = reinterpret_cast<system::stream::Stream*>(file.get());
-        last_id.store(s->read<Id>());
+        last_id = s->read<Id>();
         core::Count off;
 
 #define GX_HELPER(a, n)                                  \
@@ -63,11 +61,23 @@ gearoenix::core::asset::Manager::Manager(system::Application* const sys_app, con
     }
 }
 
-gearoenix::core::asset::Manager::~Manager() noexcept {
+gearoenix::core::asset::Manager::~Manager() noexcept
+{
     GXLOGD("Asset manager deleted.")
 }
+
+#ifdef GX_THREAD_NOT_SUPPORTED
+gearoenix::core::Id gearoenix::core::asset::Manager::last_id = 0;
+
+gearoenix::core::Id gearoenix::core::asset::Manager::create_id() noexcept
+{
+    return last_id++;
+}
+#else
+std::atomic<gearoenix::core::Id> gearoenix::core::asset::Manager::last_id(0);
 
 gearoenix::core::Id gearoenix::core::asset::Manager::create_id() noexcept
 {
     return last_id.fetch_add(1);
 }
+#endif

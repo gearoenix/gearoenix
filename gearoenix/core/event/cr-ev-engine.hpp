@@ -14,8 +14,6 @@
 #include <set>
 
 #ifndef GX_THREAD_NOT_SUPPORTED
-#include <atomic>
-#include <mutex>
 #include <thread>
 #endif
 
@@ -52,9 +50,7 @@ private:
 
     std::atomic<State> state;
     sync::Semaphore signaler;
-    std::mutex events_guard;
     std::vector<Data> events;
-    std::mutex listeners_guard;
     std::thread event_thread;
     std::chrono::high_resolution_clock::time_point previous_window_size_update = std::chrono::high_resolution_clock::now();
 
@@ -62,6 +58,8 @@ private:
     [[nodiscard]] bool update_window_size_state(const Data& event_data) noexcept;
     void check_window_size_state_timeout() noexcept;
 #endif
+    GX_CREATE_GUARD(events)
+    GX_CREATE_GUARD(events_id_priority_listeners)
     std::map<Id, std::map<double, std::set<Listener*>>> events_id_priority_listeners;
     Point2D mouse_point;
     bool click_enabled = true;

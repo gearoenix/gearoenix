@@ -35,7 +35,7 @@ gearoenix::glc3::buffer::Index::~Index() noexcept
 
 void gearoenix::glc3::buffer::Index::draw() const noexcept
 {
-    gl::Loader::bind_buffer(GL_ELEMENT_ARRAY_BUFFER, bo.load());
+    gl::Loader::bind_buffer(GL_ELEMENT_ARRAY_BUFFER, bo);
     gl::Loader::draw_elements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
 }
 

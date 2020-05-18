@@ -3,9 +3,11 @@
 #include "../cr-static.hpp"
 #include "../cr-types.hpp"
 #include "../sync/cr-sync-end-caller.hpp"
-#include <atomic>
 #include <memory>
 #include <string>
+#ifndef GX_THREAD_NOT_SUPPORTED
+#include <atomic>
+#endif
 
 namespace gearoenix::audio {
 class Manager;
@@ -85,7 +87,11 @@ class Manager {
     GX_GET_UPTR_PRV(physics::constraint::Manager, constraint_manager)
     GX_GET_UPTR_PRV(render::scene::Manager, scene_manager)
 private:
+#ifdef GX_THREAD_NOT_SUPPORTED
+    static Id last_id;
+#else
     static std::atomic<Id> last_id;
+#endif
 
 public:
     Manager(system::Application* sys_app, const std::string& file) noexcept;

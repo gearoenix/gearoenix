@@ -1,5 +1,4 @@
 #include "phs-anm-animation.hpp"
-#include "../../system/sys-log.hpp"
 #include <utility>
 
 gearoenix::physics::animation::Animation::Animation(

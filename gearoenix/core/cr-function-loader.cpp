@@ -12,9 +12,7 @@ gearoenix::core::FunctionLoader::~FunctionLoader() noexcept
 
 void gearoenix::core::FunctionLoader::load(const std::function<void()>& fun) noexcept
 {
-#ifndef GX_THREAD_NOT_SUPPORTED
-    std::lock_guard<std::mutex> _l(locker);
-#endif
+    GX_GUARD_LOCK(load_functions)
     load_functions.push_back(fun);
 }
 
@@ -23,9 +21,7 @@ void gearoenix::core::FunctionLoader::unload() noexcept
     while (!load_functions.empty()) {
         std::vector<std::function<void()>> funs;
         {
-#ifndef GX_THREAD_NOT_SUPPORTED
-            std::lock_guard<std::mutex> _l(locker);
-#endif
+            GX_GUARD_LOCK(load_functions)
             std::swap(load_functions, funs);
         }
         for (const auto& f : funs) {

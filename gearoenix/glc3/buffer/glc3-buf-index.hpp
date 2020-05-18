@@ -15,8 +15,8 @@ namespace gearoenix::glc3::buffer {
 class Index final : public render::buffer::Static {
 public:
 private:
-    std::atomic<gl::uint> bo;
-    gl::sizei count;
+    gl::uint bo = 0;
+    gl::sizei count = 0;
 
 public:
     Index(

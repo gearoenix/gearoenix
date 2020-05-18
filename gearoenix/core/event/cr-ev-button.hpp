@@ -2,6 +2,7 @@
 #define GEAROENIX_CORE_EVENT_BUTTON_BUTTON_HPP
 #include "../../math/math-vector-2d.hpp"
 #include "../cr-types.hpp"
+#include <chrono>
 
 namespace gearoenix::core::event::button {
 

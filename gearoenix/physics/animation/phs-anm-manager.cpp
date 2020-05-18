@@ -10,7 +10,9 @@ gearoenix::physics::animation::Manager::Manager(core::sync::KernelWorkers* const
             auto now = std::chrono::high_resolution_clock::now();
             duration = std::chrono::duration<double>(now - time).count();
             time = now;
-            animations_guard.lock();
+#ifndef GX_THREAD_NOT_SUPPORTED
+            animations_lock.lock();
+#endif
         },
         [this](const unsigned int kernel_index) noexcept {
             unsigned int task_number = 0;
@@ -38,7 +40,9 @@ gearoenix::physics::animation::Manager::Manager(core::sync::KernelWorkers* const
                     animations.erase(a);
                 }
             }
-            animations_guard.unlock();
+#ifndef GX_THREAD_NOT_SUPPORTED
+            animations_lock.unlock();
+#endif
         });
 }
 
@@ -50,6 +54,6 @@ gearoenix::physics::animation::Manager::~Manager() noexcept
 
 void gearoenix::physics::animation::Manager::add(const std::shared_ptr<Animation>& a) noexcept
 {
-    std::lock_guard<std::mutex> _lg(animations_guard);
+    GX_GUARD_LOCK(animations)
     animations.insert(a);
 }

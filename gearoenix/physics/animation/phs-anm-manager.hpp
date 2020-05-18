@@ -6,7 +6,6 @@
 #include <chrono>
 #include <functional>
 #include <memory>
-#include <mutex>
 #include <set>
 #include <vector>
 
@@ -21,7 +20,7 @@ private:
     struct Kernel {
         std::vector<std::shared_ptr<Animation>> deleted_animations;
     };
-    std::mutex animations_guard;
+    GX_CREATE_GUARD(animations)
     std::set<std::shared_ptr<Animation>> animations;
     std::vector<Kernel> kernels;
     std::chrono::high_resolution_clock::time_point time = std::chrono::high_resolution_clock::now();

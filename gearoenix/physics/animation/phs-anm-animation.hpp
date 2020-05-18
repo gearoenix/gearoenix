@@ -8,7 +8,7 @@
 
 namespace gearoenix::physics::animation {
 struct Animation {
-    GX_GETSET_AVAL_PRV(bool, activity, true)
+    GX_GETSET_VAL_PRV(bool, activity, true)
     GX_GETSET_VAL_PRV(double, duration, 0.0)
 private:
     // seconds from start, delta time

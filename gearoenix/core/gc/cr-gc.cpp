@@ -4,7 +4,9 @@
 #include "../list/cr-list.hpp"
 #include "cr-gc-range.hpp"
 #include <utility>
+
 #define DEBUG_GC
+
 void gearoenix::core::gc::Gc::remove_range(const Range& r)
 {
     const unsigned int start_offset = r.start->get_value()->end;
@@ -46,7 +48,7 @@ void gearoenix::core::gc::Gc::add_range(const Range& r)
 
 void gearoenix::core::gc::Gc::deallocate(Object* obj)
 {
-    std::lock_guard<std::mutex> lg(lock);
+    GX_GUARD_LOCK(objects)
     list::Node<Object*>* obj_node = obj->node;
     list::Node<Object*>* start_node = obj_node->get_previous();
     list::Node<Object*>* end_node = obj_node->get_next();
@@ -80,7 +82,7 @@ gearoenix::core::gc::Gc::Gc(unsigned int size, Gc* parent)
 
 gearoenix::core::gc::Gc::~Gc()
 {
-    std::lock_guard<std::mutex> lg(lock);
+    GX_GUARD_LOCK(objects)
     for (auto node = objects->get_front(); node != nullptr; node = node->get_next()) {
         Object* obj = node->get_value();
         obj->garbage_collector = nullptr;
@@ -92,7 +94,7 @@ gearoenix::core::gc::Gc::~Gc()
 
 void gearoenix::core::gc::Gc::allocate(Object* obj)
 {
-    std::lock_guard<std::mutex> lg(lock);
+    GX_GUARD_LOCK(objects)
 #ifdef DEBUG_GC
     if (0 == obj->size) {
         GXLOGF("Wrong object size! (0 size)");

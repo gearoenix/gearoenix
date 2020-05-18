@@ -1,8 +1,7 @@
 #ifndef GEAROENIX_CORE_STATIC_HPP
 #define GEAROENIX_CORE_STATIC_HPP
-
+#include "cr-build-configuration.hpp"
 #include "cr-types.hpp"
-#include <atomic>
 #include <cstring>
 #include <memory>
 
@@ -171,6 +170,22 @@ public:                         \
         ((void)(y));           \
     }
 #endif
+#define GX_CONCAT_0(x, y) x##y
+#define GX_CONCAT_1(x, y) GX_CONCAT_0(x, y)
+#define GX_CONCAT_2(x, y) GX_CONCAT_1(x, y)
+
+#ifdef GX_THREAD_NOT_SUPPORTED
+#define GX_CREATE_GUARD(m)
+#define GX_CREATE_GUARD_S(m)
+#define GX_GUARD_LOCK(m)
+#else
+#include <atomic>
+#include <mutex>
+#define GX_CREATE_GUARD(m) std::mutex m##_lock;
+#define GX_CREATE_GUARD_S(m) static GX_CREATE_GUARD(m)
+#define GX_GUARD_LOCK(m) std::lock_guard<decltype(m##_lock)> GX_CONCAT_2(_gx_guard_lock_, __LINE__)(m##_lock);
+#endif
+
 #define GX_CEIL_2(x) (((x) >> 1) + ((x)&1))
 #define GX_CEIL_4(x) (((x) >> 2) + ((((x) >> 1) & 1) | ((x)&1)))
 #define GX_CEIL_8(x) (((x) >> 3) + ((((x) >> 2) & 1) | (((x) >> 1) & 1) | ((x)&1)))

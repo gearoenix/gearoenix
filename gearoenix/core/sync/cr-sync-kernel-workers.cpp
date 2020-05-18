@@ -87,7 +87,7 @@ void gearoenix::core::sync::KernelWorkers::add_step(std::function<void()> sender
         m->lock();
     workers.push_back(Worker {
         .waits = waits,
-        .worker_signals = worker_signals,
+        .signals = worker_signals,
         .sender = std::move(sender),
         .worker = std::move(worker),
         .meanwhile = std::move(meanwhile),

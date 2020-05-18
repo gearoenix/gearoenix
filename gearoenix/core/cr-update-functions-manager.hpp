@@ -1,9 +1,9 @@
 #ifndef GEAROENIX_CORE_UPDATE_FUNCTIONS_MANAGER_HPP
 #define GEAROENIX_CORE_UPDATE_FUNCTIONS_MANAGER_HPP
+#include "cr-static.hpp"
 #include "cr-types.hpp"
 #include <functional>
 #include <map>
-#include <mutex>
 
 namespace gearoenix::core::sync {
 class KernelWorkers;
@@ -12,7 +12,7 @@ class KernelWorkers;
 namespace gearoenix::core {
 class UpdateFunctionsManager {
 private:
-    std::mutex locker;
+    GX_CREATE_GUARD(update_functions)
     std::map<Id, std::function<void()>> update_functions;
     sync::KernelWorkers* const workers;
 

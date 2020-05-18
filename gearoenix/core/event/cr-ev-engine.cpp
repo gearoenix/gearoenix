@@ -18,16 +18,17 @@ void gearoenix::core::event::Engine::loop() noexcept
         GX_CHECK
         decltype(events) es;
         {
-            std::lock_guard<std::mutex> _l(events_guard);
+            GX_GUARD_LOCK(events)
             std::swap(events, es);
         }
-        GX_CHECK;
-        std::lock_guard<std::mutex> _l(listeners_guard);
+        GX_CHECK
+        GX_GUARD_LOCK(events_id_priority_listeners)
         for (const auto& e : es) {
+            GX_CHECK
             process(e);
         }
         check_window_size_state_timeout();
-        GX_CHECK;
+        GX_CHECK
     }
 #undef GX_CHECK
     state = State::Terminated;
@@ -209,27 +210,21 @@ gearoenix::core::event::Engine::~Engine() noexcept
 }
 #endif
 
-#ifdef GX_THREAD_NOT_SUPPORTED
-#define GX_GUARD_LISTENERS
-#else
-#define GX_GUARD_LISTNERS std::lock_guard<std::mutex> _l(listeners_guard);
-#endif
-
 void gearoenix::core::event::Engine::add_listener(Id event_id, double priority, Listener* listener) noexcept
 {
-    GX_GUARD_LISTENERS
+    GX_GUARD_LOCK(events_id_priority_listeners)
     events_id_priority_listeners[event_id][priority].insert(listener);
 }
 
 void gearoenix::core::event::Engine::remove_listener(Id event_id, double priority, Listener* listener) noexcept
 {
-    GX_GUARD_LISTENERS
+    GX_GUARD_LOCK(events_id_priority_listeners)
     events_id_priority_listeners[event_id][priority].erase(listener);
 }
 
 void gearoenix::core::event::Engine::remove_listener(Id event_id, Listener* listener) noexcept
 {
-    GX_GUARD_LISTENERS
+    GX_GUARD_LOCK(events_id_priority_listeners)
     auto& e = events_id_priority_listeners[event_id];
     for (auto& p : e)
         p.second.erase(listener);
@@ -237,7 +232,7 @@ void gearoenix::core::event::Engine::remove_listener(Id event_id, Listener* list
 
 void gearoenix::core::event::Engine::remove_listener(Listener* listener) noexcept
 {
-    GX_GUARD_LISTENERS
+    GX_GUARD_LOCK(events_id_priority_listeners)
     for (auto& e : events_id_priority_listeners) {
         auto& ps = e.second;
         for (auto& p : ps)
@@ -250,7 +245,7 @@ void gearoenix::core::event::Engine::broadcast(const Data& event_data) noexcept
 #ifdef GX_THREAD_NOT_SUPPORTED
     process(event_data);
 #else
-    std::lock_guard<std::mutex> _l(events_guard);
+    GX_GUARD_LOCK(events)
     events.push_back(event_data);
     signaler.release();
 #endif

@@ -3,7 +3,6 @@
 #include "../../core/cr-function-loader.hpp"
 #include "../../core/cr-update-functions-manager.hpp"
 #include "../../core/sync/cr-sync-kernel-workers.hpp"
-#include "../../core/sync/cr-sync-semaphore.hpp"
 #include "../../physics/phs-engine.hpp"
 #include "../../system/sys-app.hpp"
 #include "../buffer/rnd-buf-manager.hpp"
@@ -12,7 +11,6 @@
 #include "../pipeline/rnd-pip-manager.hpp"
 #include "../sampler/rnd-smp-manager.hpp"
 #include "../scene/rnd-scn-manager.hpp"
-#include "../scene/rnd-scn-scene.hpp"
 
 void gearoenix::render::engine::Engine::do_late_delete() noexcept
 {
@@ -50,7 +48,7 @@ gearoenix::render::engine::Engine::~Engine() noexcept = default;
 
 void gearoenix::render::engine::Engine::late_delete(std::shared_ptr<core::asset::Asset> asset) noexcept
 {
-    std::lock_guard<std::mutex> _lg(late_delete_assets_guard);
+    GX_GUARD_LOCK(late_delete_assets)
     late_delete_assets[late_delete_index].push_back(std::move(asset));
 }
 

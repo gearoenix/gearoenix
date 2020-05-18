@@ -118,7 +118,7 @@ class Engine {
     // that is composed with several other render-trees
     GX_GETSET_PTR_PRT(graph::tree::Tree, render_tree)
 protected:
-    std::mutex late_delete_assets_guard;
+    GX_CREATE_GUARD(late_delete_assets)
     std::vector<std::vector<std::shared_ptr<core::asset::Asset>>> late_delete_assets;
     std::size_t late_delete_index = 0;
     std::chrono::time_point<std::chrono::high_resolution_clock> last_frame_time = std::chrono::high_resolution_clock::now();

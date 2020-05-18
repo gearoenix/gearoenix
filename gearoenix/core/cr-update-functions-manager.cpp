@@ -1,6 +1,6 @@
 #include "cr-update-functions-manager.hpp"
-
 #include "asset/cr-asset-manager.hpp"
+#include "cr-static.hpp"
 #include "sync/cr-sync-kernel-workers.hpp"
 #include <utility>
 
@@ -19,18 +19,18 @@ void gearoenix::core::UpdateFunctionsManager::update_kernel(const unsigned int k
 gearoenix::core::UpdateFunctionsManager::UpdateFunctionsManager(sync::KernelWorkers* const workers) noexcept
     : workers(workers)
 {
-    workers->add_step(std::bind(&UpdateFunctionsManager::update_kernel, this, std::placeholders::_1));
+    workers->add_step([this](const unsigned int ki) { update_kernel(ki); });
 }
 
 gearoenix::core::UpdateFunctionsManager::~UpdateFunctionsManager() noexcept
 {
-    std::lock_guard<std::mutex> _l(locker);
+    GX_GUARD_LOCK(update_functions)
     update_functions.clear();
 }
 
 gearoenix::core::Id gearoenix::core::UpdateFunctionsManager::add(std::function<void()> fun) noexcept
 {
-    std::lock_guard<std::mutex> _l(locker);
+    GX_GUARD_LOCK(update_functions)
     const auto id = asset::Manager::create_id();
     update_functions[id] = std::move(fun);
     return id;
@@ -38,6 +38,6 @@ gearoenix::core::Id gearoenix::core::UpdateFunctionsManager::add(std::function<v
 
 void gearoenix::core::UpdateFunctionsManager::remove(const Id id) noexcept
 {
-    std::lock_guard<std::mutex> _l(locker);
+    GX_GUARD_LOCK(update_functions)
     update_functions.erase(id);
 }
