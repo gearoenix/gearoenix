@@ -41,7 +41,7 @@ void gearoenix::gles2::shader::Shader::link() noexcept
     uv_attribute_location = gl::Loader::get_attrib_location(shader_program, "uv");
 }
 
-void gearoenix::gles2::shader::Shader::validate() noexcept
+void gearoenix::gles2::shader::Shader::validate() const noexcept
 {
     gl::Loader::validate_program(shader_program);
     gl::sint is_success = 0;
@@ -57,7 +57,7 @@ void gearoenix::gles2::shader::Shader::validate() noexcept
     gl::Loader::use_program(shader_program);
 }
 
-gearoenix::gl::uint gearoenix::gles2::shader::Shader::add_shader_to_program(const std::string& shd, const gl::enumerated shader_type) noexcept
+gearoenix::gl::uint gearoenix::gles2::shader::Shader::add_shader_to_program(const std::string& shd, const gl::enumerated shader_type) const noexcept
 {
     const gl::uint shader_obj = gl::Loader::create_shader(shader_type);
     if (shader_obj == 0) {
@@ -75,7 +75,8 @@ gearoenix::gl::uint gearoenix::gles2::shader::Shader::add_shader_to_program(cons
         std::string info_log;
         info_log.resize(static_cast<std::size_t>(sts_size));
         gl::Loader::get_shader_info_log(shader_obj, static_cast<gl::sizei>(sts_size), nullptr, &(info_log[0]));
-        GXLOGF("Error compiling shader type. Info: " << info_log)
+        GXLOGF("Error compiling shader type. Info: " << info_log << "shader-source:\n"
+                                                     << shd)
     }
     gl::Loader::attach_shader(shader_program, shader_obj);
     return shader_obj;

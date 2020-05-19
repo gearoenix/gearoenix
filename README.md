@@ -1,9 +1,14 @@
+<img align="left" alt="" src="https://github.com/Hossein-Noroozpour/gearoenix-static-files/raw/master/logo.png" height="150" />
+
 # Gearoenix Game Engine
 
 A cross-platform C++ 3D game engine.
 
 [![codecov](https://codecov.io/gh/Hossein-Noroozpour/gearoenix/branch/master/graph/badge.svg)](https://codecov.io/gh/Hossein-Noroozpour/gearoenix)
 [![CircleCI](https://circleci.com/gh/Hossein-Noroozpour/gearoenix.svg?style=svg)](https://circleci.com/gh/Hossein-Noroozpour/gearoenix)
+
+<br>
+<br>
 
 ## Status
 
@@ -92,12 +97,16 @@ In this section I need contribution.
 
 ### Webassembly
 
-- Support for Webassembly is very complete but due to [this issue in Emscripten](https://github.com/emscripten-core/emscripten/issues/6009) you can not run the your build file, however building for webassembly is as follow.
-- Create a build directory and `cd` it. (e.g. 'wasm-build')
+- Create `assets` directory in the root of `Gearoenix` project.
+- Place your (or example's) required assets files in `assets` directory.
+- Create a build directory (e.g. `wasm-build`) and `cd` it.
+- You must have Emscripten SDK installed.
 - Your console must have Emscripten SDK in its environment.
-- ```emconfigure cmake -DCMAKE_BUILD_TYPE=Release ..```
+- ```emcmake cmake -DCMAKE_BUILD_TYPE=Release ..```
 - ```cmake --build . --config Release```
-- If you have Python3 in your path do ```python3 -m http.server 8080``` or if you have Python2 ```python -m SimpleHTTPServer 8080```
+- Create a web-server for the application, for example, like following: 
+  - If you have Python3 in your path do ```python3 -m http.server 8080```
+  - For Python2 ```python -m SimpleHTTPServer 8080```
 - Open your browser and go to ```http://localhost:8080/examples/<name-of-example>```
 
 ## Contribution
