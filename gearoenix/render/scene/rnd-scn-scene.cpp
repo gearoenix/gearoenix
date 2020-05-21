@@ -287,7 +287,7 @@ void gearoenix::render::scene::Scene::set_default_reflection_probe(std::shared_p
 {
     for (const auto& id_mdl : models) {
         auto* const mdl = id_mdl.second.get();
-        if (!mdl->get_dynamicity() && nullptr == mdl->get_colliding_reflection() && nullptr == mdl->get_hooked_reflection()) {
+        if (nullptr == mdl->get_colliding_reflection() && nullptr == mdl->get_hooked_reflection()) {
             mdl->set_colliding_reflection(rfl.get());
         }
     }

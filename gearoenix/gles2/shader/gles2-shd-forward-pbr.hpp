@@ -17,6 +17,7 @@ class ForwardPbr final : public Shader {
     GX_GLES2_UNIFORM_FLOAT(material_alpha, 1)
     GX_GLES2_UNIFORM_FLOAT(material_alpha_cutoff, 1)
     GX_GLES2_UNIFORM_TEXTURE(material_base_color)
+    GX_GLES2_UNIFORM_VECTOR(material_emission_factor, 3, 1)
     GX_GLES2_UNIFORM_TEXTURE(material_emissive)
     GX_GLES2_UNIFORM_FLOAT(material_metallic_factor, 1)
     GX_GLES2_UNIFORM_TEXTURE(material_metallic_roughness)

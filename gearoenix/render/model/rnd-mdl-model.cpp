@@ -10,6 +10,7 @@
 #include "../mesh/rnd-msh-manager.hpp"
 #include "../mesh/rnd-msh-mesh.hpp"
 #include "../pipeline/rnd-pip-manager.hpp"
+#include "../reflection/rnd-rfl-baked.hpp"
 #include "../reflection/rnd-rfl-runtime.hpp"
 #include "../scene/rnd-scn-scene.hpp"
 #include "../texture/rnd-txt-manager.hpp"
@@ -149,12 +150,17 @@ void gearoenix::render::model::Model::set_colliding_reflection(reflection::Refle
 
 void gearoenix::render::model::Model::clear_reflection() noexcept
 {
-    core::sync::EndCaller<texture::TextureCube> call([this](const std::shared_ptr<texture::TextureCube>& t) {
-        set_reflection(t.get(), t.get());
-    });
-    (void)e->get_system_application()->get_asset_manager()->get_texture_manager()->get_cube_zero_3c(call);
-    for (const auto& m : children)
-        m.second->clear_reflection();
+    auto* const rfl = scene->get_default_reflection_probe().get();
+    if (rfl == nullptr) {
+        core::sync::EndCaller<texture::TextureCube> call([this](const std::shared_ptr<texture::TextureCube>& t) {
+            set_reflection(t.get(), t.get());
+        });
+        (void)e->get_system_application()->get_asset_manager()->get_texture_manager()->get_cube_zero_3c(call);
+        for (const auto& m : children)
+            m.second->clear_reflection();
+    } else {
+        set_colliding_reflection(rfl);
+    }
 }
 
 void gearoenix::render::model::Model::set_scene(scene::Scene* const s) noexcept

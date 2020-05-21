@@ -70,6 +70,7 @@ gearoenix::gles2::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const 
         const std::string fragment_shader_code = GX_GLES2_SHADER_SRC_DEFAULT_FRAGMENT_STARTING
             "uniform float       material_alpha;\n"
             "uniform float       material_alpha_cutoff;\n"
+            "uniform vec3        material_emission_factor;\n"
             "uniform float       material_metallic_factor;\n"
             "uniform float       material_normal_scale;\n"
             "uniform float       material_occlusion_strength;\n"
@@ -138,6 +139,7 @@ gearoenix::gles2::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const 
             "{\n"
             //   material properties
             "    vec4 tmpv4 = texture2D(material_base_color, out_uv);\n"
+            "    vec3 emission = texture2D(material_emissive, out_uv).xyz * material_emission_factor;\n"
             "    tmpv4.w *= material_alpha;\n"
             "    vec4 albedo = tmpv4;\n"
             "    if(albedo.w < material_alpha_cutoff) discard;\n"
@@ -294,7 +296,7 @@ gearoenix::gles2::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const 
             "    vec2 brdf = texture2D(effect_brdflut, vec2(normal_dot_view, roughness)).rg;\n"
             "    vec3 specular = prefiltered_color * (frsn * brdf.x + brdf.y);\n"
             "    vec3 ambient = kd * diffuse + specular + scene_ambient_light * albedo.xyz;\n"
-            "    tmpv4.xyz = ambient + lo;\n"
+            "    tmpv4.xyz = ambient + lo + emission;\n"
             "    if(camera_gamma_correction > 0.001) {\n"
             //       HDR tone mapping
             "        tmpv4.xyz = tmpv4.xyz / (tmpv4.xyz + vec3(camera_hdr_tune_mapping));\n"
@@ -311,7 +313,8 @@ gearoenix::gles2::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const 
         GX_GLES2_THIS_GET_UNIFORM(material_alpha)
         GX_GLES2_THIS_GET_UNIFORM(material_alpha_cutoff)
         GX_GLES2_THIS_GET_UNIFORM_TEXTURE(material_base_color)
-        //GX_GLES2_THIS_GET_UNIFORM_TEXTURE(material_emissive)
+        GX_GLES2_THIS_GET_UNIFORM(material_emission_factor)
+        GX_GLES2_THIS_GET_UNIFORM_TEXTURE(material_emissive)
         GX_GLES2_THIS_GET_UNIFORM(material_metallic_factor)
         GX_GLES2_THIS_GET_UNIFORM_TEXTURE(material_metallic_roughness)
         GX_GLES2_THIS_GET_UNIFORM_TEXTURE(material_normal)
