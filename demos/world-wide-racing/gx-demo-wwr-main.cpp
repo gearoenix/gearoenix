@@ -11,8 +11,11 @@ gearoenix::demo::wwr::Main::Main(system::Application* const sys_app) noexcept
     render_engine->set_render_tree(tree.get());
     logo_scene = render::scene::Logo::construct(
             system_application,
-            render::scene::Logo::PriorityIds(),
-            [] (const std::vector<std::shared_ptr<render::scene::Scene>>&) {});
+            { {0.0, 1024}, { 0.1, 1070} },
+            [this] (const std::vector<std::shared_ptr<render::scene::Scene>>& s) {
+                active_scenes = s;
+                logo_scene = nullptr;
+            });
 
 }
 

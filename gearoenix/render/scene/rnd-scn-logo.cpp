@@ -15,15 +15,19 @@
 void gearoenix::render::scene::Logo::on_load(const std::shared_ptr<Scene>& s) noexcept
 {
     logo_scene = s;
-
-    core::sync::EndCaller<model::Model> end([](const std::shared_ptr<model::Model>&) {});
-    const auto body = model_manager->get_gx3d("gearoenix-logo", end);
-    const auto gear = model_manager->get_gx3d("gearoenix-logo-gear", end);
-    const auto glare = model_manager->get_gx3d("gearoenix-logo-glare", end);
-    const auto right_wing = model_manager->get_gx3d("gearoenix-logo-right-wing", end);
-    const auto left_wing = model_manager->get_gx3d("gearoenix-logo-left-wing", end);
-
     const auto strong_self = self.lock();
+
+    core::sync::EndCaller<core::sync::EndCallerIgnore> end([this, strong_self] {
+        for (const auto& next_scene : next_scenes)
+            next_scene->set_enability(true);
+        on_finished(next_scenes);
+    });
+    core::sync::EndCaller<model::Model> mdl_end([end](const std::shared_ptr<model::Model>&) {});
+    const auto body = model_manager->get_gx3d("gearoenix-logo", mdl_end);
+    const auto gear = model_manager->get_gx3d("gearoenix-logo-gear", mdl_end);
+    const auto glare = model_manager->get_gx3d("gearoenix-logo-glare", mdl_end);
+    const auto right_wing = model_manager->get_gx3d("gearoenix-logo-right-wing", mdl_end);
+    const auto left_wing = model_manager->get_gx3d("gearoenix-logo-left-wing", mdl_end);
 
     auto* const anm_mgr = render_engine->get_physics_engine()->get_animation_manager();
 
@@ -32,15 +36,16 @@ void gearoenix::render::scene::Logo::on_load(const std::shared_ptr<Scene>& s) no
 
     body->get_transformation()->local_scale(scale);
 
-    anm_mgr->add(std::make_shared<physics::animation::Animation>(
-        [this, strong_self, gear, glare](const double, const double delta_time) noexcept {
+    rotation_animation = std::make_shared<physics::animation::Animation>(
+        [gear_rotation_speed { gear_rotation_speed }, glare_rotation_speed { glare_rotation_speed }, gear, glare](const double, const double delta_time) noexcept {
             gear->get_transformation()->local_z_rotate(delta_time * gear_rotation_speed);
             glare->get_transformation()->local_z_rotate(delta_time * glare_rotation_speed);
         },
-        std::numeric_limits<double>::max()));
+        std::numeric_limits<double>::max());
+    anm_mgr->add(rotation_animation);
 
     anm_mgr->add(std::make_shared<physics::animation::Animation>(
-        [this, strong_self, left_wing, right_wing](const double, const double delta_time) noexcept {
+        [this, left_wing, right_wing, end](const double, const double delta_time) noexcept {
             const auto rot = delta_time * wing_rotation_speed;
             wing_rotation += rot;
             left_wing->get_transformation()->local_z_rotate(rot);
@@ -53,7 +58,7 @@ void gearoenix::render::scene::Logo::on_load(const std::shared_ptr<Scene>& s) no
         }));
 
     anm_mgr->add(std::make_shared<physics::animation::Animation>(
-        [this, strong_self, body](const double time_from_start, const double) noexcept {
+        [this, body, end](const double time_from_start, const double) noexcept {
             const auto current_scale = 1.0 - (1.0 - 1.0 / max_scale) * (1.0 - time_from_start / scale_duration);
             body->get_transformation()->local_scale(current_scale / scale);
             scale = current_scale;
@@ -63,7 +68,17 @@ void gearoenix::render::scene::Logo::on_load(const std::shared_ptr<Scene>& s) no
             body->get_transformation()->local_scale(1.0 / scale);
         }));
 
-    s->get_cameras().begin()->second->get_target()->set_clear_color(math::Vec4(1.0f));
+    auto* const scn_mgr = render_engine->get_system_application()->get_asset_manager()->get_scene_manager();
+
+    for (const auto& pi : next_scenes_priority_id) {
+        if (pi.first > logo_scene->get_layer()) {
+            logo_scene->set_layer(pi.first);
+        }
+        scn_mgr->get_gx3d(pi.second, core::sync::EndCaller<Scene>([this, priority { pi.first }, end](const std::shared_ptr<Scene>& s) {
+            s->set_layer(priority);
+            next_scenes.push_back(s);
+        }));
+    }
 
     s->set_enability(true);
 }
@@ -78,6 +93,11 @@ gearoenix::render::scene::Logo::Logo(
     , next_scenes_priority_id(std::move(next_scenes_priority_id))
     , on_finished(std::move(on_finished))
 {
+}
+
+gearoenix::render::scene::Logo::~Logo() noexcept
+{
+    rotation_animation->set_activity(false);
 }
 
 std::shared_ptr<gearoenix::render::scene::Logo> gearoenix::render::scene::Logo::construct(

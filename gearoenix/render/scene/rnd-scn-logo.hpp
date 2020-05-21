@@ -8,6 +8,10 @@ namespace gearoenix::system {
 class Application;
 }
 
+namespace gearoenix::physics::animation {
+struct Animation;
+}
+
 namespace gearoenix::render::model {
 class Manager;
 }
@@ -36,6 +40,7 @@ private:
     const PriorityIds next_scenes_priority_id;
     const FinishCallback on_finished;
     std::weak_ptr<Logo> self;
+    std::shared_ptr<physics::animation::Animation> rotation_animation;
     const double gear_rotation_speed = 1.5;
     const double glare_rotation_speed = -1.0;
     const double wing_rotation_speed = 0.7;
@@ -54,10 +59,18 @@ private:
         FinishCallback on_finished) noexcept;
 
 public:
+    ~Logo() noexcept;
     static std::shared_ptr<Logo> construct(
         system::Application* sys_app,
         PriorityIds next_scenes_priority_id,
         FinishCallback on_finished) noexcept;
+    /// Hide the Logo scene
+    ///
+    /// This function is used when you what to use the logo appearance
+    /// several times and very fast
+    /// \note In this case the logo resources are going to remain in the VRAM and RAM
+    void hide() noexcept;
+    void show() noexcept;
 };
 }
 #endif
