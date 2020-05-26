@@ -1,5 +1,5 @@
 #include "rnd-wdg-widget.hpp"
-#include "../../system/stream/sys-stm-stream.hpp"
+#include "rnd-wdg-button.hpp"
 #include "rnd-wdg-text.hpp"
 
 gearoenix::render::widget::Widget::Widget(
@@ -35,6 +35,8 @@ std::shared_ptr<gearoenix::render::widget::Widget> gearoenix::render::widget::Wi
     switch (t) {
     case Type::Text:
         return std::shared_ptr<Widget>(new Text(my_id, f, e, c));
+    case Type::Button:
+        return std::shared_ptr<Widget>(new Button(my_id, f, e, c));
     default:
         GXLOGF("Unexpected widget type (" << static_cast<core::TypeId>(t) << ")  in: " << my_id)
     }

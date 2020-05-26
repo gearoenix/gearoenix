@@ -90,7 +90,8 @@ void gearoenix::physics::collider::Collider::set_model_matrix(const math::Mat4x4
     updated_box.reset();
     for (auto& p : updated_points) {
         p = (model_matrix * math::Vec4(p, 1.0)).xyz();
-        updated_box.put(p);
+        updated_box.put_without_update(p);
     }
+    updated_box.update();
     on_scale();
 }

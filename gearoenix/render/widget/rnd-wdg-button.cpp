@@ -21,7 +21,7 @@ gearoenix::render::widget::Button::Button(
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : Widget(my_id, Type::Button, f, e, c)
 {
-    set_collider(std::make_unique<physics::collider::Aabb>(math::Vec3(1.0, 1.0, 0.001), math::Vec3(-1.0, -1.0, -0.001)));
+    set_collider(std::make_unique<physics::collider::Aabb>(*collider));
 }
 
 gearoenix::render::widget::Button::Button(

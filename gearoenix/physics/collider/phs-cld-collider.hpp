@@ -37,6 +37,15 @@ protected:
     {
     }
 
+    Collider(const Type t, const Collider& c) noexcept
+        : collider_type(t)
+        , origin_box(c.origin_box)
+        , updated_box(c.updated_box)
+        , model_matrix(c.model_matrix)
+        , parent(c.parent)
+    {
+    }
+
 public:
     ~Collider() noexcept override = default;
     [[nodiscard]] static Collider* read(system::stream::Stream* f) noexcept;
@@ -49,7 +58,7 @@ public:
 
     [[nodiscard]] math::Vec3<double> get_location() const noexcept override;
     void set_location(const math::Vec3<double>&) noexcept override;
-    void local_z_rotate(const double d) noexcept final;
+    void local_z_rotate(double d) noexcept final;
     void local_scale(double s) noexcept override;
     void local_x_scale(double s) noexcept override;
 

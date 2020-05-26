@@ -374,7 +374,7 @@ gearoenix::render::graph::tree::Pbr::~Pbr() noexcept
 void gearoenix::render::graph::tree::Pbr::update() noexcept
 {
     forward_pbr.refresh();
-    //    skybox_cube.refresh();
+    skybox_cube.refresh();
     skybox_equirectangular.refresh();
     unlit.refresh();
     nodes.clear();

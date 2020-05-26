@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_CASE(render_texture_test)
                 const float c = dis(gen);
                 float_level_data[element_index] = c;
                 const float cc = std::round(c * 255.0f) + 0.1f;
-                compare_level_data[element_index] = cc >= 255.0f ? 255 : cc <= 0.0f ? 0.0 : static_cast<std::uint8_t>(cc);
+                compare_level_data[element_index] = cc >= 255.0f ? 255 : cc <= 0.0f ? 0 : static_cast<std::uint8_t>(cc);
             }
             std::memcpy(level_data.data(), float_level_data.data(), level_data.size());
         }

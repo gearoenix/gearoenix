@@ -10,6 +10,12 @@ public:
         origin_box = math::Aabb3(u, l);
         updated_box = origin_box;
     }
+
+    Aabb(const Collider& o) noexcept
+        : Collider(Type::Aabb, o)
+    {
+    }
+
     ~Aabb() noexcept final = default;
 };
 }
