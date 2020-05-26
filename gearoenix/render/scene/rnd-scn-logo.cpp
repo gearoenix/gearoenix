@@ -71,8 +71,8 @@ void gearoenix::render::scene::Logo::on_load(const std::shared_ptr<Scene>& s) no
     auto* const scn_mgr = render_engine->get_system_application()->get_asset_manager()->get_scene_manager();
 
     for (const auto& pi : next_scenes_priority_id) {
-        if (pi.first > logo_scene->get_layer()) {
-            logo_scene->set_layer(pi.first);
+        if (pi.first >= logo_scene->get_layer()) {
+            logo_scene->set_layer(pi.first + 0.1);
         }
         scn_mgr->get_gx3d(pi.second, core::sync::EndCaller<Scene>([this, priority { pi.first }, end](const std::shared_ptr<Scene>& s) {
             s->set_layer(priority);
@@ -98,6 +98,8 @@ gearoenix::render::scene::Logo::Logo(
 gearoenix::render::scene::Logo::~Logo() noexcept
 {
     rotation_animation->set_activity(false);
+    logo_scene->set_enability(false);
+    render_engine->late_delete(logo_scene);
 }
 
 std::shared_ptr<gearoenix::render::scene::Logo> gearoenix::render::scene::Logo::construct(
