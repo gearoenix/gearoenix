@@ -366,7 +366,7 @@ bool gearoenix::render::widget::Edit::on_event(const core::event::Data& d) noexc
         break;
     }
     default:
-        GXUNEXPECTED
+        GX_UNEXPECTED
     }
     return false;
 }

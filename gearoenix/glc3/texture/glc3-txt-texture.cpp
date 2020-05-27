@@ -12,7 +12,7 @@ void gearoenix::glc3::texture::Texture::bind(
         static_cast<const texture::Texture2D*>(t)->bind(texture_unit);
         return;
     default:
-        GXUNEXPECTED
+        GX_UNEXPECTED
     }
 }
 
@@ -26,7 +26,7 @@ void gearoenix::glc3::texture::Texture::generate_mipmap(const render::texture::T
         static_cast<const texture::TextureCube*>(t)->generate_mipmap();
         return;
     default:
-        GXUNEXPECTED
+        GX_UNEXPECTED
     }
 }
 

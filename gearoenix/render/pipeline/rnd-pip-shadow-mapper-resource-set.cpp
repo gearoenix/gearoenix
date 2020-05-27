@@ -27,7 +27,7 @@ void gearoenix::render::pipeline::ShadowMapperResourceSet::set_material(const ma
         color = reinterpret_cast<const material::Unlit*>(m)->get_color_texture().get();
         break;
     default:
-        GXUNEXPECTED
+        GX_UNEXPECTED
     }
 }
 

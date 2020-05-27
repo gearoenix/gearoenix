@@ -33,7 +33,7 @@ void gearoenix::core::sync::WorkWaiter::wait_loop()
 gearoenix::core::sync::WorkWaiter::WorkWaiter()
     : semaphore(new Semaphore())
     , function_loader(new FunctionLoader())
-    , thread(std::bind(&WorkWaiter::wait_loop, this))
+    , thread([this] { wait_loop(); })
 {
 }
 
@@ -51,9 +51,9 @@ gearoenix::core::sync::WorkWaiter::~WorkWaiter()
     main_thread_state = State::Terminated;
 }
 
-void gearoenix::core::sync::WorkWaiter::push(std::function<void()> f)
+void gearoenix::core::sync::WorkWaiter::push(const std::function<void()>& f)
 {
-    function_loader->load(std::move(f));
+    function_loader->load(f);
     semaphore->release();
 }
 #endif

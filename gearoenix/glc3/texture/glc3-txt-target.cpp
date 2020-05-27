@@ -87,7 +87,7 @@ void gearoenix::glc3::texture::Target::initialize_textures(
                 break;
             }
             default:
-                GXUNEXPECTED
+                GX_UNEXPECTED
             }
         } else {
             switch (info.texture_info.texture_type) {
@@ -120,7 +120,7 @@ void gearoenix::glc3::texture::Target::initialize_textures(
                 break;
             }
             default:
-                GXUNEXPECTED
+                GX_UNEXPECTED
             }
         }
     }
@@ -193,7 +193,7 @@ void gearoenix::glc3::texture::Target::generate_framebuffer() noexcept
                 ++color_attachment_count;
                 return color_attachment_count + GL_COLOR_ATTACHMENT0;
             default:
-                GXUNEXPECTED
+                GX_UNEXPECTED
             }
         }(attachment.usage);
         const auto [glo, glt] = [&] {
@@ -211,7 +211,7 @@ void gearoenix::glc3::texture::Target::generate_framebuffer() noexcept
                     gl::convert(std::get<render::texture::AttachmentCube>(attachment.var).face));
             }
             default:
-                GXUNEXPECTED
+                GX_UNEXPECTED
             }
         }();
 #ifdef GX_DEBUG_GL_CLASS_3

@@ -23,7 +23,7 @@ private:
         {
 #ifdef GX_DEBUG_MODE
             if (nullptr == data)
-                GXUNEXPECTED;
+                GX_UNEXPECTED;
 #endif
             f(data);
         }

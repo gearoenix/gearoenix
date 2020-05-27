@@ -5,7 +5,7 @@ namespace gearoenix::render::reflection {
 std::ostream& operator<<(std::ostream& os, const Type t) noexcept
 {
     if (2 < static_cast<int>(t))
-        GXUNEXPECTED
+        GX_UNEXPECTED
     os << "gearoenix::render::reflection { ";
     switch (t) {
     case Type::Baked:

@@ -129,7 +129,7 @@ void gearoenix::render::graph::node::ShadowMapper::record_shadow(const math::Mat
             break;
         }
         default:
-            GXUNEXPECTED
+            GX_UNEXPECTED
         }
         const auto* const msh = id_mesh.second->get_msh().get();
         auto* const rd = kernel->render_data_pool.get_next([this] {

@@ -81,7 +81,7 @@ void gearoenix::gles2::texture::Target::initialize_texture(
             break;
         }
         default:
-            GXUNEXPECTED
+            GX_UNEXPECTED
         }
     } else {
         switch (info.texture_info.texture_type) {
@@ -113,7 +113,7 @@ void gearoenix::gles2::texture::Target::initialize_texture(
             break;
         }
         default:
-            GXUNEXPECTED
+            GX_UNEXPECTED
         }
     }
 }
@@ -195,7 +195,7 @@ void gearoenix::gles2::texture::Target::generate_framebuffer() noexcept
                 gl::convert(std::get<render::texture::AttachmentCube>(attachment.var).face));
         }
         default:
-            GXUNEXPECTED
+            GX_UNEXPECTED
         }
     }();
     gl::Loader::framebuffer_texture_2d(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, glt, glo, attachment.mipmap_level);

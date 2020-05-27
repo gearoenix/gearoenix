@@ -76,7 +76,7 @@ void gearoenix::render::graph::node::MipmapGenerator::update() noexcept
 
 void gearoenix::render::graph::node::MipmapGenerator::record(const unsigned int) noexcept
 {
-    GXUNEXPECTED
+    GX_UNEXPECTED
 }
 
 void gearoenix::render::graph::node::MipmapGenerator::record_continuously(const unsigned int kernel_index) noexcept

@@ -54,7 +54,7 @@ gearoenix::core::Count gearoenix::system::stream::Local::read(void* data, core::
     const auto result = (core::Count)file.gcount();
 #ifdef GX_DEBUG_MODE
     if (0 == result)
-        GXUNEXPECTED
+        GX_UNEXPECTED
 #endif
     file.seekp(file.tellg());
     return result;
@@ -67,7 +67,7 @@ gearoenix::core::Count gearoenix::system::stream::Local::write(const void* data,
     const core::Count result = ((core::Count)file.tellp()) - before;
 #ifdef GX_DEBUG_MODE
     if (0 == result)
-        GXUNEXPECTED
+        GX_UNEXPECTED
 #endif
     file.seekg(file.tellp());
     return result;

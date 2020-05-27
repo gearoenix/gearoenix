@@ -35,7 +35,7 @@ static const std::shared_ptr<gearoenix::physics::constraint::Constraint> null_co
 static const std::shared_ptr<gearoenix::render::reflection::Reflection> null_reflection = nullptr;
 
 #define GX_SCENE_INIT \
-    core::asset::Asset(my_id, core::asset::Type::Scene), scene_type_id(t), uniform_buffers(new buffer::FramedUniform(static_cast<unsigned int>(sizeof(Uniform)), e)), static_accelerator(new gearoenix::physics::accelerator::Bvh()), dynamic_accelerator(new gearoenix::physics::accelerator::Bvh()), e(e)
+    core::asset::Asset(my_id, core::asset::Type::Scene), scene_type(t), uniform_buffers(new buffer::FramedUniform(static_cast<unsigned int>(sizeof(Uniform)), e)), static_accelerator(new gearoenix::physics::accelerator::Bvh()), dynamic_accelerator(new gearoenix::physics::accelerator::Bvh()), e(e)
 
 gearoenix::render::scene::Scene::Scene(
     const core::Id my_id,

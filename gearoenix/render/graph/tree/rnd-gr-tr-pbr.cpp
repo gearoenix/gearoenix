@@ -95,7 +95,7 @@ void gearoenix::render::graph::tree::Pbr::update_skyboxes(const scene::Scene* co
             previous_cube->add_sky(reinterpret_cast<const skybox::Cube*>(sky));
             break;
         default:
-            GXUNEXPECTED
+            GX_UNEXPECTED
         }
     }
 }
@@ -199,7 +199,7 @@ void gearoenix::render::graph::tree::Pbr::update_opaque(
             break;
         }
         default:
-            GXUNEXPECTED
+            GX_UNEXPECTED
         }
     }
 }
@@ -250,7 +250,7 @@ void gearoenix::render::graph::tree::Pbr::update_transparent(
             break;
         }
         default:
-            GXUNEXPECTED
+            GX_UNEXPECTED
         }
         (void)dis;
     }

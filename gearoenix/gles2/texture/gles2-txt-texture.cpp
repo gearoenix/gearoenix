@@ -15,7 +15,7 @@ void gearoenix::gles2::texture::Texture::bind(
         static_cast<const texture::TextureCube*>(t)->bind(texture_unit);
         return;
     default:
-        GXUNEXPECTED
+        GX_UNEXPECTED
     }
 }
 

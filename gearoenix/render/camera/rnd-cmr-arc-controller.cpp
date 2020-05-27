@@ -1,4 +1,4 @@
-#include "rnd-cmr-jet-controller.hpp"
+#include "rnd-cmr-arc-controller.hpp"
 #include "../../core/cr-update-functions-manager.hpp"
 #include "../../core/event/cr-ev-engine.hpp"
 #include "../../system/sys-app.hpp"
@@ -6,40 +6,67 @@
 #include "rnd-cmr-camera.hpp"
 #include "rnd-cmr-transformation.hpp"
 
-void gearoenix::render::camera::JetController::update() noexcept
+void gearoenix::render::camera::ArcController::update() noexcept
 {
     if (rotate_x != 0.0) {
-        trn->local_x_rotate(rotate_x);
+        const auto new_vertical_angle = math::Numeric::clamp(vertical_angle + rotate_x, max_vertical_angle, min_vertical_angle);
+        trn->global_rotate(new_vertical_angle - vertical_angle, trn->get_x_axis(), target);
         rotate_x = 0.0;
+        vertical_angle = new_vertical_angle;
     }
     if (rotate_z != 0.0) {
-        trn->local_rotate(rotate_z, math::Vec3(0.0, 0.0, 1.0));
+        trn->global_rotate(rotate_z, up, target);
         rotate_z = 0.0;
     }
     const auto delta_movement = movement_speed * render_engine->get_delta_time();
     const auto delta_rotation = rotation_speed * render_engine->get_delta_time();
+    auto new_distance = distance;
     if (move_forward) {
-        trn->local_z_translate(-delta_movement);
+        new_distance -= delta_movement;
     }
     if (move_backward) {
-        trn->local_z_translate(delta_movement);
+        new_distance += delta_movement;
     }
-    if (move_rightward) {
-        trn->local_x_translate(delta_movement);
-    }
-    if (move_leftward) {
-        trn->local_x_translate(-delta_movement);
-    }
+    new_distance = math::Numeric::clamp(new_distance, max_distance, min_distance);
+    trn->local_z_translate(new_distance - distance);
+    distance = new_distance;
     if (rotate_right) {
-        trn->local_rotate(-delta_rotation, math::Vec3(0.0, 0.0, 1.0));
+        trn->global_rotate(-delta_rotation, up, target);
     }
     if (rotate_left) {
-        trn->local_rotate(delta_rotation, math::Vec3(0.0, 0.0, 1.0));
+        trn->global_rotate(delta_rotation, up, target);
     }
 }
 
-gearoenix::render::camera::JetController::JetController(std::shared_ptr<Camera> c) noexcept
-    : trn(c->get_transformation())
+void gearoenix::render::camera::ArcController::values_updated() noexcept
+{
+#ifdef GX_DEBUG_MODE
+    const auto up_len = up.square_length() - 1;
+    if (GX_IS_NOT_ZERO(up_len))
+        GX_UNEXPECTED
+#endif
+    vertical_angle = math::Numeric::clamp(vertical_angle, max_vertical_angle, min_vertical_angle);
+    distance = math::Numeric::clamp(distance, max_distance, min_distance);
+    auto ppd = direction.normalized();
+    ppd = up.normalized_perpendicular(ppd);
+    {
+        const auto len = ppd.length();
+        if (GX_IS_ZERO(len)) {
+            ppd = up.normalized_perpendicular();
+        } else {
+            ppd /= len;
+        }
+    }
+    const auto cos = std::cos(vertical_angle);
+    const auto sin = vertical_angle > 0 ? std::sqrt(1.0 - cos * cos) : -std::sqrt(1.0 - cos * cos);
+    direction = (up * (sin * distance)) + (ppd * (cos * distance));
+    trn->look_at(target + direction, target, up);
+}
+
+gearoenix::render::camera::ArcController::ArcController(std::shared_ptr<Camera> c) noexcept
+    : up(0.0, 0.0, 1.0)
+    , direction(1.0, 0.0, 0.0)
+    , trn(c->get_transformation())
     , render_engine(c->get_render_engine())
     , cam(std::move(c))
     , function_id(render_engine->get_update_functions_manager()->add([this] { update(); }))
@@ -48,14 +75,16 @@ gearoenix::render::camera::JetController::JetController(std::shared_ptr<Camera> 
     event_engine->add_listener(core::event::Id::GestureDrag2D, 0.0f, this);
     event_engine->add_listener(core::event::Id::GestureScale, 0.0f, this);
     event_engine->add_listener(core::event::Id::ButtonKeyboard, 0.0f, this);
+    values_updated();
+    //    trn->look_at(math::Vec3(10.0, 0.0, 0.0), target, up);
 }
 
-gearoenix::render::camera::JetController::~JetController() noexcept
+gearoenix::render::camera::ArcController::~ArcController() noexcept
 {
     render_engine->get_update_functions_manager()->remove(function_id);
 }
 
-bool gearoenix::render::camera::JetController::on_event(const core::event::Data& d) noexcept
+bool gearoenix::render::camera::ArcController::on_event(const core::event::Data& d) noexcept
 {
     switch (d.get_source()) {
     case core::event::Id::GestureDrag2D: {
@@ -65,7 +94,12 @@ bool gearoenix::render::camera::JetController::on_event(const core::event::Data&
         break;
     }
     case core::event::Id::GestureScale: {
-        trn->local_z_translate(-std::get<gearoenix::core::event::gesture::Scale>(d.get_data()).get_delta_previous_scale());
+        auto new_distance = -std::get<gearoenix::core::event::gesture::Scale>(d.get_data()).get_delta_previous_scale();
+        new_distance *= touch_scale_speed;
+        new_distance += distance;
+        new_distance = math::Numeric::clamp(new_distance, max_distance, min_distance);
+        trn->local_z_translate(new_distance - distance);
+        distance = new_distance;
         break;
     }
     case core::event::Id::ButtonKeyboard: {
@@ -78,14 +112,6 @@ bool gearoenix::render::camera::JetController::on_event(const core::event::Data&
         }
         case core::event::button::KeyboardKeyId::S: {
             move_backward = pressed;
-            break;
-        }
-        case core::event::button::KeyboardKeyId::D: {
-            move_rightward = pressed;
-            break;
-        }
-        case core::event::button::KeyboardKeyId::A: {
-            move_leftward = pressed;
             break;
         }
         case core::event::button::KeyboardKeyId::Up: {

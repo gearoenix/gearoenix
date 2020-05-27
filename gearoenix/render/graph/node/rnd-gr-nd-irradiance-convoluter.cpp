@@ -89,7 +89,7 @@ void gearoenix::render::graph::node::IrradianceConvoluter::update() noexcept
 
 void gearoenix::render::graph::node::IrradianceConvoluter::record(const unsigned int) noexcept
 {
-    GXUNEXPECTED
+    GX_UNEXPECTED
 }
 
 void gearoenix::render::graph::node::IrradianceConvoluter::record_continuously(const unsigned int kernel_index) noexcept

@@ -24,7 +24,7 @@ std::shared_ptr<gearoenix::render::light::Light> gearoenix::render::light::Manag
         case Type::Directional:
             return std::shared_ptr<Light>(new Directional(id, f, e));
         default:
-            GXUNEXPECTED;
+            GX_UNEXPECTED;
         }
     });
     call.set_data(l);

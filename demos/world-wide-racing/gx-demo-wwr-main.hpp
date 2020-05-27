@@ -14,11 +14,13 @@ namespace gearoenix::render::graph::tree {
 }
 
 namespace gearoenix::demo::wwr {
+    class Garage;
 class Main final: public core::Application {
 private:
     std::unique_ptr<render::graph::tree::Pbr> tree;
     std::shared_ptr<render::scene::Logo> logo_scene;
-    std::vector<std::shared_ptr<render::scene::Scene>> active_scenes;
+    std::unique_ptr<Garage> garage;
+
 public:
     explicit Main(system::Application* sys_app) noexcept;
 };

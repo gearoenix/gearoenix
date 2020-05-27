@@ -98,7 +98,7 @@ public:
     using MapReflection = std::map<core::Id, std::shared_ptr<reflection::Reflection>>;
     using MapRuntimeReflection = std::map<core::Id, std::shared_ptr<reflection::Runtime>>;
 
-    GX_GET_CVAL_PRT(Type, scene_type_id)
+    GX_GET_CVAL_PRT(Type, scene_type)
     GX_GETSET_VAL_PRT(double, layer, 0.0)
     GX_GETSET_VAL_PRT(bool, enability, false)
     GX_GETSET_VAL_PRT(bool, models_changed, false)

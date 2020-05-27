@@ -25,7 +25,7 @@ std::shared_ptr<gearoenix::render::skybox::Skybox> gearoenix::render::skybox::Ma
             case Type::Equirectangular:
                 return std::shared_ptr<Skybox>(new Cube(id, f, e, call));
             default:
-                GXUNEXPECTED
+                GX_UNEXPECTED
             }
         });
     c.set_data(s);

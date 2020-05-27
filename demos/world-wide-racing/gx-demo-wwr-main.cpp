@@ -1,4 +1,5 @@
 #include "gx-demo-wwr-main.hpp"
+#include "gx-demo-wwr-garage.hpp"
 #include <gearoenix/system/sys-app.hpp>
 #include <gearoenix/render/scene/rnd-scn-logo.hpp>
 #include <gearoenix/render/graph/tree/rnd-gr-tr-pbr.hpp>
@@ -13,7 +14,7 @@ gearoenix::demo::wwr::Main::Main(system::Application* const sys_app) noexcept
             system_application,
             { {0.0, 1024}, { 0.1, 1070} },
             [this] (const std::vector<std::shared_ptr<render::scene::Scene>>& s) {
-                active_scenes = s;
+                garage = std::make_unique<Garage>(s);
                 logo_scene = nullptr;
             });
 

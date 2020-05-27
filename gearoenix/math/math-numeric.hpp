@@ -29,6 +29,9 @@ public:
     template <typename T>
     [[nodiscard]] constexpr static T minimum(T a, T b) noexcept;
 
+    template <typename T>
+    [[nodiscard]] constexpr static T clamp(T v, T mx, T mn) noexcept;
+
     /// On failure it returns static_cast<T>(-1).
     template <typename T>
     [[nodiscard]] constexpr static T floor_log2(T a) noexcept;
@@ -83,6 +86,12 @@ constexpr T gearoenix::math::Numeric::minimum(const T a, const T b) noexcept
             return a;
     }
     return GX_MIN(a, b);
+}
+
+template <typename T>
+constexpr T gearoenix::math::Numeric::clamp(const T v, const T mx, const T mn) noexcept
+{
+    return maximum(minimum(v, mx), mn);
 }
 
 template <typename T>

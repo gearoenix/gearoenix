@@ -88,6 +88,6 @@ gearoenix::render::material::Material* gearoenix::render::material::Material::re
     case Type::Unlit:
         return new Unlit(f, e, end);
     default:
-        GXUNEXPECTED
+        GX_UNEXPECTED
     }
 }

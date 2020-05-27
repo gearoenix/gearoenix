@@ -131,8 +131,8 @@ public:                         \
 #define GX_GETSET_AVAL_PRV(t, x, d) GX_GETSET_AVAL(private, t, x, d)
 
 #define GX_COUNT_OF(x) (sizeof(x) / sizeof(x[0]))
-#define GX_IS_ZERO(x) (((x) < (GXPOSEPSILON)) && ((x) > (GXNEGEPSILON)))
-#define GX_IS_NOT_ZERO(x) (((x) > (GXPOSEPSILON)) || ((x) < (GXNEGEPSILON)))
+#define GX_IS_ZERO(x) (((x) < (GX_POS_EPSILON)) && ((x) > (GX_NEG_EPSILON)))
+#define GX_IS_NOT_ZERO(x) (((x) > (GX_POS_EPSILON)) || ((x) < (GX_NEG_EPSILON)))
 #define GX_MAX(x, y) (((x) > (y)) ? (x) : (y))
 #define GX_MIN(x, y) (((x) < (y)) ? (x) : (y))
 #define GX_SET_ZERO(x)                     \
@@ -143,10 +143,10 @@ public:                         \
     {                                     \
         std::memset((x), 0, sizeof((x))); \
     }
-#define GX_CHECK_NOT_EQAUL(x, y)               \
+#define GX_CHECK_NOT_EQUAL(x, y)               \
     {                                          \
         if ((x) == (y)) {                      \
-            GXLOGF("Unequality check failed.") \
+            GXLOGF("Inequality check failed.") \
         }                                      \
     }
 #define GX_CHECK_EQAUL(x, y)                 \
@@ -156,15 +156,15 @@ public:                         \
         }                                    \
     }
 #ifdef GX_DEBUG_MODE
-#define GX_CHECK_NOT_EQAUL_D(x, y) GX_CHECK_NOT_EQAUL(x, y)
-#define GX_CHECK_EQAUL_D(x, y) GX_CHECK_EQAUL(x, y)
+#define GX_CHECK_NOT_EQUAL_D(x, y) GX_CHECK_NOT_EQUAL(x, y)
+#define GX_CHECK_EQUAL_D(x, y) GX_CHECK_EQAUL(x, y)
 #else
-#define GX_CHECK_NOT_EQAUL_D(x, y) \
+#define GX_CHECK_NOT_EQUAL_D(x, y) \
     {                              \
         ((void)(x));               \
         ((void)(y));               \
     }
-#define GX_CHECK_EQAUL_D(x, y) \
+#define GX_CHECK_EQUAL_D(x, y) \
     {                          \
         ((void)(x));           \
         ((void)(y));           \

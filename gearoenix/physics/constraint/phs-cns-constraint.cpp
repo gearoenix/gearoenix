@@ -34,9 +34,9 @@ gearoenix::physics::constraint::Constraint* gearoenix::physics::constraint::Cons
     const auto t = f->read<Type::Id>();
     switch (t) {
     case Type::PLACER:
-        GXUNEXPECTED;
+        GX_UNEXPECTED;
         //return new Placer(t, my_id, format, e, c);
     default:
-        GXUNEXPECTED;
+        GX_UNEXPECTED;
     }
 }

@@ -19,7 +19,7 @@ gearoenix::glc3::texture::SampleInfo::SampleInfo(const render::texture::SampleIn
         case render::texture::Filter::LinearMipmapNearest:
             return GL_LINEAR_MIPMAP_NEAREST;
         default:
-            GXUNEXPECTED
+            GX_UNEXPECTED
         }
     };
 
@@ -30,7 +30,7 @@ gearoenix::glc3::texture::SampleInfo::SampleInfo(const render::texture::SampleIn
         case render::texture::Filter::Linear:
             return GL_LINEAR;
         default:
-            GXUNEXPECTED
+            GX_UNEXPECTED
         }
     };
 
@@ -50,7 +50,7 @@ gearoenix::glc3::texture::SampleInfo::SampleInfo(const render::texture::SampleIn
         case render::texture::Wrap::Repeat:
             return GL_REPEAT;
         default:
-            GXUNEXPECTED
+            GX_UNEXPECTED
         }
     };
 

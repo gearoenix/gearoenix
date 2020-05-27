@@ -12,7 +12,7 @@ gearoenix::gles2::texture::SampleInfo::SampleInfo(const render::texture::SampleI
         mag_filter = GL_LINEAR;
         break;
     default:
-        GXUNEXPECTED
+        GX_UNEXPECTED
     }
     switch (o.min_filter) {
     case render::texture::Filter::Nearest:
@@ -25,7 +25,7 @@ gearoenix::gles2::texture::SampleInfo::SampleInfo(const render::texture::SampleI
         min_filter = GL_LINEAR_MIPMAP_LINEAR;
         break;
     default:
-        GXUNEXPECTED
+        GX_UNEXPECTED
     }
     const auto fun = [](render::texture::Wrap w) {
         switch (w) {
@@ -36,7 +36,7 @@ gearoenix::gles2::texture::SampleInfo::SampleInfo(const render::texture::SampleI
         case render::texture::Wrap::Repeat:
             return GL_REPEAT;
         default:
-            GXUNEXPECTED
+            GX_UNEXPECTED
         }
     };
     wrap_s = fun(o.wrap_s);

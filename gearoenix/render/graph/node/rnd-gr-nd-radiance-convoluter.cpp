@@ -107,7 +107,7 @@ void gearoenix::render::graph::node::RadianceConvoluter::update() noexcept
 
 void gearoenix::render::graph::node::RadianceConvoluter::record(const unsigned int) noexcept
 {
-    GXUNEXPECTED
+    GX_UNEXPECTED
 }
 
 void gearoenix::render::graph::node::RadianceConvoluter::record_continuously(const unsigned int kernel_index) noexcept

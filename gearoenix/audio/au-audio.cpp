@@ -24,6 +24,6 @@ gearoenix::audio::Audio* gearoenix::audio::Audio::read(const core::Id my_id, con
     case 20:
         return new Speaker(my_id, f);
     default:
-        GXUNEXPECTED
+        GX_UNEXPECTED
     }
 }

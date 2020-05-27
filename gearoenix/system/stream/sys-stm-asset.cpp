@@ -76,14 +76,14 @@ gearoenix::core::Count gearoenix::system::stream::Asset::read(void* data, core::
 #endif
 #ifdef GX_DEBUG_MODE
     if (result != length)
-        GXUNEXPECTED
+        GX_UNEXPECTED
 #endif
     return result;
 }
 
 gearoenix::core::Count gearoenix::system::stream::Asset::write(const void*, core::Count) noexcept
 {
-    GXUNEXPECTED
+    GX_UNEXPECTED
 }
 
 void gearoenix::system::stream::Asset::seek(core::Count offset) noexcept

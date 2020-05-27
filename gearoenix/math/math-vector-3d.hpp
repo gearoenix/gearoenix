@@ -259,6 +259,28 @@ struct Vec3 {
         return (*this - o).abs_length();
     }
 
+    /// \note Only on unit(normalized) vectors will give expected result.
+    [[nodiscard]] constexpr Vec3 normalized_perpendicular() const noexcept
+    {
+        math::Vec3 result(static_cast<Element>(1), static_cast<Element>(0), static_cast<Element>(0));
+        auto d = dot(result);
+        const auto zero = d - 1;
+        if (GX_IS_ZERO(zero)) {
+            result.x = static_cast<Element>(0);
+            result.y = static_cast<Element>(1);
+            d = dot(result);
+        }
+        result -= *this * d;
+        result.normalize();
+        return result;
+    }
+
+    /// \note Only on (this) unit(normalized) vectors will give expected result.
+    [[nodiscard]] constexpr Vec3 normalized_perpendicular(const Vec3& o) const noexcept
+    {
+        return o - (*this * dot(o));
+    }
+
     [[nodiscard]] constexpr Vec3<Element> abs() const noexcept
     {
         return Vec3<Element>(std::abs(x), std::abs(y), std::abs(z));

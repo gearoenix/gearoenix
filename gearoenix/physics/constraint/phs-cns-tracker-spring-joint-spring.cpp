@@ -56,7 +56,7 @@ void gearoenix::physics::constraint::TrackerSpringJointSpring::apply(const doubl
     const double distance = direction.length();
     direction /= distance;
     const double delta_length = distance - length;
-    if (delta_length > GXPOSEPSILON || delta_length < GXNEGEPSILON) {
+    if (delta_length > GX_POS_EPSILON || delta_length < GX_NEG_EPSILON) {
         const double tracker_force = delta_length * k;
         passive->apply_force_on_origin(direction * tracker_force);
     }

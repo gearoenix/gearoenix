@@ -66,18 +66,18 @@ public:
 #endif // IN_ANDROID
 #define GXREACHED GXLOGD("REACHED-------------------------------------------")
 #define GXTODO GXLOGE("TODO")
-#define GXUNEXPECTED GXLOGF("Unexpected")
+#define GX_UNEXPECTED GXLOGF("Unexpected")
 #define GXUNIMPLEMENTED GXLOGF("Unimplemented")
 #define GXASSERT(x) \
     if ((x) == 0)   \
-    GXUNEXPECTED
+    GX_UNEXPECTED
 #else // GX_LOG_ENABLED
 #define GXLOGI(s) ;
 #define GXLOGD(s) ;
 #define GXLOGE(s) ;
 #define GXLOGF(s) std::terminate();
 #define GXTODO ;
-#define GXUNEXPECTED std::terminate();
+#define GX_UNEXPECTED std::terminate();
 #define GXUNIMPLEMENTED std::terminate();
 #endif // LOG_ENABLED
 #endif // GEAROENIX_SYSTEM_LOG_HPP

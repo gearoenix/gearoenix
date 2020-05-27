@@ -32,7 +32,7 @@ static int file_index = 0;
 
 void gearoenix::render::font::Font2D::init() noexcept
 {
-    GX_CHECK_NOT_EQAUL_D(0, stbtt_InitFont(stb_font.get(), ttf_data.data(), 0))
+    GX_CHECK_NOT_EQUAL_D(0, stbtt_InitFont(stb_font.get(), ttf_data.data(), 0))
     stbtt_GetFontVMetrics(stb_font.get(), &ascent, &descent, &line_gap);
     fnt_height = ascent - descent;
     line_growth = line_gap + fnt_height;
@@ -78,11 +78,11 @@ void gearoenix::render::font::Font2D::compute_text_widths(
 {
 #ifdef GX_DEBUG_MODE
     if (text.empty()) {
-        GXUNEXPECTED
+        GX_UNEXPECTED
     }
     for (const auto c : text) {
         if (c == static_cast<int>('\n')) {
-            GXUNEXPECTED
+            GX_UNEXPECTED
         }
     }
 #endif

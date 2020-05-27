@@ -19,7 +19,7 @@ gearoenix::gl::enumerated gearoenix::gl::convert(const render::texture::Face f) 
     case render::texture::Face::NegativeZ:
         return GL_TEXTURE_CUBE_MAP_NEGATIVE_Z;
     }
-    GXUNEXPECTED
+    GX_UNEXPECTED
 }
 
 #endif

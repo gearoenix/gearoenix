@@ -23,7 +23,7 @@ std::ostream& operator<<(std::ostream& os, const gearoenix::math::IntersectionSt
         os << "'Under'";
         break;
     default:
-        GXUNEXPECTED
+        GX_UNEXPECTED
         break;
     }
     return os;

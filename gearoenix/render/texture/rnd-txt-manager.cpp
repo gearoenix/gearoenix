@@ -88,7 +88,7 @@ std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::render::texture:
         return t;
     }
     default:
-        GXUNEXPECTED
+        GX_UNEXPECTED
     }
 }
 
@@ -312,7 +312,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
         info.format = TextureFormat::RgbaUint8;
         break;
     default:
-        GXUNEXPECTED
+        GX_UNEXPECTED
     }
     info.texture_type = Type::Texture2D;
     return create_2d({ pixels }, info, img_width, img_height, c);
@@ -343,7 +343,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     case 4:
         GXUNIMPLEMENTED
     default:
-        GXUNEXPECTED
+        GX_UNEXPECTED
     }
     info.texture_type = Type::Texture2D;
     std::vector<std::vector<std::uint8_t>> pixels_data(1);

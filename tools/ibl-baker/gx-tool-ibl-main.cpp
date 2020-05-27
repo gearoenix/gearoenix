@@ -279,7 +279,7 @@ bool IblBaker::on_event(const gearoenix::core::event::Data& d) noexcept
         break;
     }
     default:
-        GXUNEXPECTED
+        GX_UNEXPECTED
     }
     return false;
 }

@@ -49,7 +49,7 @@ gearoenix::math::CubicBezierCurve2D::CubicBezierCurve2D(const int points_count)
 {
 #ifdef GX_DEBUG_MODE
     if (points_count == 0)
-        GXUNEXPECTED;
+        GX_UNEXPECTED;
 #endif
 }
 
@@ -58,7 +58,7 @@ gearoenix::math::CubicBezierCurve2D::CubicBezierCurve2D(const int points_count, 
 {
 #ifdef GX_DEBUG_MODE
     if (points_count == 0)
-        GXUNEXPECTED;
+        GX_UNEXPECTED;
 #endif
     // only 1 case scenario from 16 is needed right now, others are todo when needed
     if (smooth && !overlapable && !fast_curvable && closed)
