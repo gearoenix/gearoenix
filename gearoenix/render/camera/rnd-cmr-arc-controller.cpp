@@ -47,8 +47,7 @@ void gearoenix::render::camera::ArcController::values_updated() noexcept
 #endif
     vertical_angle = math::Numeric::clamp(vertical_angle, max_vertical_angle, min_vertical_angle);
     distance = math::Numeric::clamp(distance, max_distance, min_distance);
-    auto ppd = direction.normalized();
-    ppd = up.normalized_perpendicular(ppd);
+    auto ppd = up.normalized_perpendicular(direction);
     {
         const auto len = ppd.length();
         if (GX_IS_ZERO(len)) {
@@ -58,7 +57,10 @@ void gearoenix::render::camera::ArcController::values_updated() noexcept
         }
     }
     const auto cos = std::cos(vertical_angle);
-    const auto sin = vertical_angle > 0 ? std::sqrt(1.0 - cos * cos) : -std::sqrt(1.0 - cos * cos);
+    auto sin = std::sqrt(1.0 - cos * cos);
+    if (vertical_angle < 0) {
+        sin = -sin;
+    }
     direction = (up * (sin * distance)) + (ppd * (cos * distance));
     trn->look_at(target + direction, target, up);
 }
@@ -82,6 +84,48 @@ gearoenix::render::camera::ArcController::ArcController(std::shared_ptr<Camera> 
 gearoenix::render::camera::ArcController::~ArcController() noexcept
 {
     render_engine->get_update_functions_manager()->remove(function_id);
+}
+
+void gearoenix::render::camera::ArcController::set_vertical_angle(const double a) noexcept
+{
+    vertical_angle = a;
+    values_updated();
+}
+
+void gearoenix::render::camera::ArcController::set_min_vertical_angle(const double a) noexcept
+{
+    min_vertical_angle = a;
+    values_updated();
+}
+
+void gearoenix::render::camera::ArcController::set_max_vertical_angle(const double a) noexcept
+{
+    max_vertical_angle = a;
+    values_updated();
+}
+
+void gearoenix::render::camera::ArcController::set_distance(const double d) noexcept
+{
+    distance = d;
+    values_updated();
+}
+
+void gearoenix::render::camera::ArcController::set_min_distance(const double d) noexcept
+{
+    min_distance = d;
+    values_updated();
+}
+
+void gearoenix::render::camera::ArcController::set_max_distance(const double d) noexcept
+{
+    max_distance = d;
+    values_updated();
+}
+
+void gearoenix::render::camera::ArcController::set_target(const math::Vec3<double>& t) noexcept
+{
+    target = t;
+    values_updated();
 }
 
 bool gearoenix::render::camera::ArcController::on_event(const core::event::Data& d) noexcept

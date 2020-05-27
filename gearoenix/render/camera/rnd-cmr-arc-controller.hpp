@@ -43,6 +43,13 @@ private:
 public:
     explicit ArcController(std::shared_ptr<Camera> cam) noexcept;
     ~ArcController() noexcept final;
+    void set_vertical_angle(double) noexcept;
+    void set_min_vertical_angle(double) noexcept;
+    void set_max_vertical_angle(double) noexcept;
+    void set_distance(double) noexcept;
+    void set_min_distance(double) noexcept;
+    void set_max_distance(double) noexcept;
+    void set_target(const math::Vec3<double>&) noexcept;
     [[nodiscard]] bool on_event(const core::event::Data& event_data) noexcept final;
 };
 }
