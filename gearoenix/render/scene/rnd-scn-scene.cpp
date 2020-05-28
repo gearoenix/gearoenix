@@ -35,7 +35,7 @@ static const std::shared_ptr<gearoenix::physics::constraint::Constraint> null_co
 static const std::shared_ptr<gearoenix::render::reflection::Reflection> null_reflection = nullptr;
 
 #define GX_SCENE_INIT \
-    core::asset::Asset(my_id, core::asset::Type::Scene), scene_type(t), uniform_buffers(new buffer::FramedUniform(static_cast<unsigned int>(sizeof(Uniform)), e)), static_accelerator(new gearoenix::physics::accelerator::Bvh()), dynamic_accelerator(new gearoenix::physics::accelerator::Bvh()), e(e)
+    core::asset::Asset(my_id, core::asset::Type::Scene), scene_type(t), uniform_buffers(new buffer::FramedUniform(static_cast<unsigned int>(sizeof(Uniform)), e)), static_accelerator(new gearoenix::physics::accelerator::Bvh()), dynamic_accelerator(new gearoenix::physics::accelerator::Bvh()), e(e), model_manager(e->get_system_application()->get_asset_manager()->get_model_manager())
 
 gearoenix::render::scene::Scene::Scene(
     const core::Id my_id,
@@ -209,6 +209,12 @@ GX_GET_HELPER(camera, render::camera::Camera)
 GX_GET_HELPER(audio, audio::Audio)
 GX_GET_HELPER(light, render::light::Light)
 GX_GET_HELPER(model, render::model::Model)
+
+const std::shared_ptr<gearoenix::render::model::Model>& gearoenix::render::scene::Scene::get_model(const std::string& model_name) const noexcept
+{
+    return get_model(model_manager->get_cache().get_cacher().get_key(model_name));
+}
+
 GX_GET_HELPER(constraint, physics::constraint::Constraint)
 GX_GET_HELPER(skybox, render::skybox::Skybox)
 GX_GET_HELPER(reflection, render::reflection::Reflection)

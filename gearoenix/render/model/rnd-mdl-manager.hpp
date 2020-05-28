@@ -7,32 +7,29 @@
 #include "rnd-mdl-model.hpp"
 #include <memory>
 
-namespace gearoenix {
-namespace system::stream {
-    class Stream;
+namespace gearoenix::system::stream {
+class Stream;
 }
-namespace render {
-    namespace engine {
-        class Engine;
-    }
-    namespace model {
-        class Manager {
-        protected:
-            engine::Engine* const e;
-            core::cache::File<Model> cache;
 
-        public:
-            Manager(std::unique_ptr<system::stream::Stream> s, engine::Engine* e) noexcept;
-            ~Manager() noexcept = default;
-            std::shared_ptr<Model> get_gx3d(core::Id mid, core::sync::EndCaller<Model>& c) noexcept;
-            std::shared_ptr<Model> get_gx3d(const std::string& name, core::sync::EndCaller<Model>& c) noexcept;
-            /// T must be derived from Model and have the same constructor that Model has.
-            template <typename T>
-            typename std::enable_if<std::is_base_of<Model, T>::value, std::shared_ptr<T>>::type
-            create(core::sync::EndCaller<T>& c) noexcept;
-        };
-    }
+namespace gearoenix::render::engine {
+class Engine;
 }
+
+namespace gearoenix::render::model {
+class Manager {
+    GX_GET_CPTR_PRV(engine::Engine, e)
+    GX_GET_CREF_PRV(core::cache::File<Model>, cache)
+
+public:
+    Manager(std::unique_ptr<system::stream::Stream> s, engine::Engine* e) noexcept;
+    ~Manager() noexcept = default;
+    [[nodiscard]] std::shared_ptr<Model> get_gx3d(core::Id mid, core::sync::EndCaller<Model>& c) noexcept;
+    [[nodiscard]] std::shared_ptr<Model> get_gx3d(const std::string& name, core::sync::EndCaller<Model>& c) noexcept;
+    /// T must be derived from Model and have the same constructor that Model has.
+    template <typename T>
+    [[nodiscard]] typename std::enable_if<std::is_base_of<Model, T>::value, std::shared_ptr<T>>::type
+    create(core::sync::EndCaller<T>& c) noexcept;
+};
 }
 
 template <typename T>

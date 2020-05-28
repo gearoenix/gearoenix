@@ -17,6 +17,9 @@ class Text : public Widget {
     GX_GET_VAL_PRT(Alignment, v_align, Alignment::Center)
     GX_GET_VAL_PRT(Alignment, h_align, Alignment::Center)
     GX_GET_VAL_PRT(core::Id, text_mesh_id, 0)
+
+    void initialize(const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+
 public:
     Text(
         core::Id my_id,

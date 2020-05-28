@@ -69,6 +69,7 @@ class Mesh;
 
 namespace gearoenix::render::model {
 class Model;
+class Manager;
 }
 
 namespace gearoenix::render::reflection {
@@ -117,10 +118,10 @@ public:
     GX_GET_CREF_PRT(std::shared_ptr<reflection::Baked>, default_reflection_probe)
     GX_GET_CREF_PRT(std::vector<physics::collider::Collider*>, static_colliders)
     GX_GET_CREF_PRT(std::vector<physics::collider::Collider*>, dynamic_colliders)
+    GX_GET_CPTR_PRT(engine::Engine, e)
+    GX_GET_CREF_PRT(Uniform, uniform)
+    GX_GET_CPTR_PRT(model::Manager, model_manager)
 protected:
-    engine::Engine* const e;
-    Uniform uniform;
-
     Scene(
         core::Id my_id, Type t, engine::Engine* e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
@@ -131,13 +132,14 @@ protected:
 public:
     ~Scene() noexcept override;
 
-#define GX_HELPER(x, c)                                         \
-protected:                                                      \
-    void scene_add_##x(const std::shared_ptr<c>& m) noexcept;   \
-                                                                \
-public:                                                         \
-    virtual void add_##x(const std::shared_ptr<c>& m) noexcept; \
-    [[nodiscard]] const std::shared_ptr<c>& get_##x(core::Id x##_id) const noexcept;
+#define GX_HELPER(x, c)                                                              \
+protected:                                                                           \
+    void scene_add_##x(const std::shared_ptr<c>& m) noexcept;                        \
+                                                                                     \
+public:                                                                              \
+    virtual void add_##x(const std::shared_ptr<c>& m) noexcept;                      \
+    [[nodiscard]] const std::shared_ptr<c>& get_##x(core::Id x##_id) const noexcept; \
+    [[nodiscard]] const std::shared_ptr<c>& get_##x(const std::string& x##_name) const noexcept;
 
     GX_HELPER(camera, camera::Camera)
     GX_HELPER(audio, audio::Audio)

@@ -8,33 +8,37 @@
 
 void gearoenix::render::camera::ArcController::update() noexcept
 {
+    bool values_changed = false;
     if (rotate_x != 0.0) {
-        const auto new_vertical_angle = math::Numeric::clamp(vertical_angle + rotate_x, max_vertical_angle, min_vertical_angle);
-        trn->global_rotate(new_vertical_angle - vertical_angle, trn->get_x_axis(), target);
+        vertical_angle += rotate_x;
         rotate_x = 0.0;
-        vertical_angle = new_vertical_angle;
+        values_changed = true;
     }
     if (rotate_z != 0.0) {
         trn->global_rotate(rotate_z, up, target);
+        direction = trn->get_z_axis();
         rotate_z = 0.0;
     }
     const auto delta_movement = movement_speed * render_engine->get_delta_time();
     const auto delta_rotation = rotation_speed * render_engine->get_delta_time();
-    auto new_distance = distance;
     if (move_forward) {
-        new_distance -= delta_movement;
+        distance -= delta_movement;
+        values_changed = true;
     }
     if (move_backward) {
-        new_distance += delta_movement;
+        distance += delta_movement;
+        values_changed = true;
     }
-    new_distance = math::Numeric::clamp(new_distance, max_distance, min_distance);
-    trn->local_z_translate(new_distance - distance);
-    distance = new_distance;
     if (rotate_right) {
         trn->global_rotate(-delta_rotation, up, target);
+        direction = trn->get_z_axis();
     }
     if (rotate_left) {
         trn->global_rotate(delta_rotation, up, target);
+        direction = trn->get_z_axis();
+    }
+    if (values_changed) {
+        values_updated();
     }
 }
 

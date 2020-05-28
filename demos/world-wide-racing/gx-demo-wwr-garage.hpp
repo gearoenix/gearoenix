@@ -12,11 +12,16 @@ namespace gearoenix::render::scene {
 }
 
 namespace gearoenix::demo::wwr {
+    class RotatingButton;
     class Garage final {
     private:
         std::shared_ptr<render::scene::Scene> game_scene, ui_scene;
         std::unique_ptr<render::camera::ArcController> cam_ctrl;
+        std::unique_ptr<RotatingButton> shop_button;
 
+        void initialize_scenes(const std::vector<std::shared_ptr<render::scene::Scene>>& scenes) noexcept;
+        void initialize_camera() noexcept;
+        void initialize_buttons() noexcept;
     public:
         explicit Garage(const std::vector<std::shared_ptr<render::scene::Scene>>& scenes) noexcept;
         ~Garage() noexcept;
