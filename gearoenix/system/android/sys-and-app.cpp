@@ -456,8 +456,10 @@ gearoenix::system::Application::Application(android_app* and_app) noexcept
             if (source != nullptr)
                 source->process(and_app, source);
         }
-        if (render_engine != nullptr)
+        if (render_engine != nullptr) {
+            event_engine->initialize_render_engine(render_engine.get());
             break;
+        }
     } while (and_app->destroyRequested == 0);
 }
 

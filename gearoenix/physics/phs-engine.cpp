@@ -11,7 +11,6 @@
 #include "../render/model/rnd-mdl-model.hpp"
 #include "../render/reflection/rnd-rfl-runtime.hpp"
 #include "../render/scene/rnd-scn-manager.hpp"
-#include "../render/scene/rnd-scn-scene.hpp"
 #include "../render/skybox/rnd-sky-skybox.hpp"
 #include "../system/sys-app.hpp"
 #include "accelerator/phs-acc-bvh.hpp"

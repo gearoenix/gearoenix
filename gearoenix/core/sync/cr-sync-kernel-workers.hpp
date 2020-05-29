@@ -55,7 +55,7 @@ public:
         std::function<void()> sender,
         std::function<void(const unsigned int)> worker,
         std::function<void()> meanwhile,
-        std::function<void()> boss) noexcept;
+        std::function<void()> receiver) noexcept;
     void do_steps() noexcept;
     [[nodiscard]] unsigned int get_threads_count() const noexcept;
 };

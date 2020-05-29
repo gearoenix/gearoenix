@@ -519,6 +519,7 @@ gearoenix::system::Application::Application(const int argc, const char* const* c
         GXLOGF("No suitable render engine found.")
     }
     GXLOGD("Render engine created.")
+    event_engine->initialize_render_engine(render_engine.get());
     asset_manager = std::make_unique<core::asset::Manager>(this, GX_APP_DATA_NAME);
     GXLOGD("Asset manager created.")
 }

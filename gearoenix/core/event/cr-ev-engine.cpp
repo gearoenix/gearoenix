@@ -1,57 +1,62 @@
 #include "cr-ev-engine.hpp"
+#include "../../render/engine/rnd-eng-engine.hpp"
+#include "../sync/cr-sync-kernel-workers.hpp"
 #include "cr-ev-listener.hpp"
 #include <functional>
 
 constexpr double CLICK_THRESHOLD = 0.2f;
 constexpr double CLICK_DISTANCE_THRESHOLD = 0.1f;
 
-#ifndef GX_THREAD_NOT_SUPPORTED
-void gearoenix::core::event::Engine::loop() noexcept
+void gearoenix::core::event::Engine::update() noexcept
 {
-    state = State::Running;
-#define GX_CHECK                 \
-    if (state != State::Running) \
-        break;
-    while (true) {
-        GX_CHECK
-        signaler.lock_until(std::chrono::system_clock::now() + std::chrono::milliseconds(500));
-        GX_CHECK
-        decltype(events) es;
-        {
-            GX_GUARD_LOCK(events)
-            std::swap(events, es);
-        }
-        GX_CHECK
-        GX_GUARD_LOCK(events_id_priority_listeners)
-        for (const auto& e : es) {
-            GX_CHECK
-            process(e);
-        }
-        check_window_size_state_timeout();
-        GX_CHECK
-    }
-#undef GX_CHECK
-    state = State::Terminated;
+    std::swap(current_event_index, next_event_index);
+    check_window_size_state_timeout();
+    update_listeners();
 }
 
-bool gearoenix::core::event::Engine::update_window_size_state(const Data& event_data) noexcept
+void gearoenix::core::event::Engine::receiver() noexcept
 {
-    if (event_data.get_source() == Id::InternalSystemWindowSizeChange) {
-        previous_window_size_update = std::chrono::high_resolution_clock::now();
-        return true;
-    }
-    return false;
+    events[current_event_index].clear();
 }
-#endif
+
+void gearoenix::core::event::Engine::update_listeners() noexcept
+{
+    GX_GUARD_LOCK(events_id_priority_listeners)
+    const auto fun = [](std::map<double, std::set<Listener*>>& listeners, std::optional<double> pri, Listener* o) {
+        if (pri.has_value()) {
+            listeners[*pri].erase(o);
+        } else {
+            for (auto& ls : listeners) {
+                ls.second.erase(o);
+            }
+        }
+    };
+    for (const auto& [action, id, pri, o] : events_id_priority_listeners_actions) {
+        if (action == Action::Add) {
+            events_id_priority_listeners[*id][*pri].insert(o);
+        } else {
+            if (id.has_value()) {
+                fun(events_id_priority_listeners[*id], pri, o);
+            } else {
+                for (auto& ls : events_id_priority_listeners) {
+                    fun(ls.second, pri, o);
+                }
+            }
+        }
+    }
+    events_id_priority_listeners_actions.clear();
+}
+
+void gearoenix::core::event::Engine::process_events(unsigned int kernel_index) noexcept
+{
+    GX_START_MULTITHREADED_TASKS
+    for (const auto& e : events[current_event_index]) {
+        GX_DO_MULTITHREADED_TASK(process(e))
+    }
+}
 
 void gearoenix::core::event::Engine::process(const Data& e) noexcept
 {
-#ifdef GX_THREAD_NOT_SUPPORTED
-#else
-    if (update_window_size_state(e))
-        return;
-#endif
-    update_internal_states(e);
     auto& ps = events_id_priority_listeners[e.get_source()];
     for (auto& p : ps) {
         auto& ls = p.second;
@@ -121,7 +126,6 @@ void gearoenix::core::event::Engine::update_internal_states(const Data& event_da
     }
 }
 
-#ifndef GX_THREAD_NOT_SUPPORTED
 void gearoenix::core::event::Engine::check_window_size_state_timeout() noexcept
 {
     if (window_width == previous_window_width && window_height == previous_window_height)
@@ -149,7 +153,6 @@ void gearoenix::core::event::Engine::check_window_size_state_timeout() noexcept
         }));
     set_previous_window_size();
 }
-#endif
 
 void gearoenix::core::event::Engine::set_window_size(const int w, const int h) noexcept
 {
@@ -184,71 +187,44 @@ gearoenix::math::Vec2<double> gearoenix::core::event::Engine::convert_raw(const 
     return math::Vec2(convert_raw_x(x), convert_raw_y(y));
 }
 
-#ifdef GX_THREAD_NOT_SUPPORTED
 gearoenix::core::event::Engine::Engine() noexcept
     : mouse_point({ 0, 0 }, { 0.0, 0.0 })
 {
 }
-#else
-gearoenix::core::event::Engine::Engine() noexcept
-    : state(State::Running)
-    , event_thread([this] { loop(); })
-    , mouse_point({ 0, 0 }, { 0.0, 0.0 })
-{
-}
-#endif
 
-gearoenix::core::event::Engine::~Engine() noexcept
-#ifdef GX_THREAD_NOT_SUPPORTED
-    = default;
-#else
-{
-    state = State::Terminating;
-    while (state != State::Terminated)
-        signaler.release();
-    event_thread.join();
-}
-#endif
+gearoenix::core::event::Engine::~Engine() noexcept = default;
 
 void gearoenix::core::event::Engine::add_listener(Id event_id, double priority, Listener* listener) noexcept
 {
     GX_GUARD_LOCK(events_id_priority_listeners)
-    events_id_priority_listeners[event_id][priority].insert(listener);
+    events_id_priority_listeners_actions.emplace_back(Action::Add, event_id, priority, listener);
 }
 
 void gearoenix::core::event::Engine::remove_listener(Id event_id, double priority, Listener* listener) noexcept
 {
     GX_GUARD_LOCK(events_id_priority_listeners)
-    events_id_priority_listeners[event_id][priority].erase(listener);
+    events_id_priority_listeners_actions.emplace_back(Action::Remove, event_id, priority, listener);
 }
 
 void gearoenix::core::event::Engine::remove_listener(Id event_id, Listener* listener) noexcept
 {
     GX_GUARD_LOCK(events_id_priority_listeners)
-    auto& e = events_id_priority_listeners[event_id];
-    for (auto& p : e)
-        p.second.erase(listener);
+    events_id_priority_listeners_actions.emplace_back(Action::Remove, event_id, std::nullopt, listener);
 }
 
 void gearoenix::core::event::Engine::remove_listener(Listener* listener) noexcept
 {
     GX_GUARD_LOCK(events_id_priority_listeners)
-    for (auto& e : events_id_priority_listeners) {
-        auto& ps = e.second;
-        for (auto& p : ps)
-            p.second.erase(listener);
-    }
+    events_id_priority_listeners_actions.emplace_back(Action::Remove, std::nullopt, std::nullopt, listener);
 }
 
 void gearoenix::core::event::Engine::broadcast(const Data& event_data) noexcept
 {
-#ifdef GX_THREAD_NOT_SUPPORTED
-    process(event_data);
-#else
-    GX_GUARD_LOCK(events)
-    events.push_back(event_data);
-    signaler.release();
-#endif
+    {
+        GX_GUARD_LOCK(events)
+        events[next_event_index].push_back(event_data);
+    }
+    update_internal_states(event_data);
 }
 
 void gearoenix::core::event::Engine::initialize_mouse_position(const int x, const int y) noexcept
@@ -288,7 +264,7 @@ void gearoenix::core::event::Engine::initialize_window_size(const int w, const i
 void gearoenix::core::event::Engine::update_window_size(const int w, const int h) noexcept
 {
     set_window_size(w, h);
-    broadcast(Data(Id::InternalSystemWindowSizeChange, 0));
+    previous_window_size_update = std::chrono::high_resolution_clock::now();
 }
 
 void gearoenix::core::event::Engine::touch_down(touch::FingerId finger_id, int x, int y) noexcept
@@ -367,4 +343,15 @@ void gearoenix::core::event::Engine::touch_cancel(const touch::FingerId finger_i
     for (auto& t : touch_states)
         t.second.reinitialize();
     broadcast(Data(Id::Touch, touch::Data(touch::State(finger_id, p), touch::Action::Cancel)));
+}
+
+void gearoenix::core::event::Engine::initialize_render_engine(render::engine::Engine* render_engine) noexcept
+{
+    auto* const kernel_workers = render_engine->get_kernels();
+    kernels_count = kernel_workers->get_threads_count();
+    kernel_workers->add_step(
+        [this] { update(); },
+        [this](const unsigned int ki) { process_events(ki); },
+        [] {},
+        [this] { receiver(); });
 }

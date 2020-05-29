@@ -1,10 +1,10 @@
 #ifndef GEAROENIX_CORE_EVENT_ENGINE_HPP
 #define GEAROENIX_CORE_EVENT_ENGINE_HPP
+
 #include "../../math/math-vector-2d.hpp"
 #include "../cr-build-configuration.hpp"
 #include "../cr-static.hpp"
 #include "../cr-types.hpp"
-#include "../sync/cr-sync-semaphore.hpp"
 #include "cr-ev-event.hpp"
 #include "cr-ev-id.hpp"
 #include "cr-ev-touch.hpp"
@@ -12,10 +12,21 @@
 #include <map>
 #include <memory>
 #include <set>
+#include <tuple>
 
-#ifndef GX_THREAD_NOT_SUPPORTED
-#include <thread>
+#ifndef GX_DEFAULT_WINDOW_WIDTH
+#define GX_DEFAULT_WINDOW_WIDTH 1
+#define GX_UNDEF_DEFAULT_WINDOW_WIDTH
 #endif
+
+#ifndef GX_DEFAULT_WINDOW_HEIGHT
+#define GX_DEFAULT_WINDOW_HEIGHT 1
+#define GX_UNDEF_DEFAULT_WINDOW_HEIGHT
+#endif
+
+namespace gearoenix::render::engine {
+class Engine;
+}
 
 namespace gearoenix::core::event {
 class Listener;
@@ -27,40 +38,22 @@ public:
     GX_GET_CREF_PRV(MouseStateMap, pressed_mouse_buttons_state)
     GX_GET_CREF_PRV(TouchStateMap, touch_states)
     GX_GET_CREF_PRV(std::set<button::KeyboardKeyId>, pressed_keyboard_buttons)
-#ifdef GX_FULLSCREEN
-    GX_GET_VAL_PRV(int, window_width, 0)
-    GX_GET_VAL_PRV(int, window_height, 0)
-    GX_GET_VAL_PRV(double, window_ratio, 0.0)
-    GX_GET_VAL_PRV(double, window_reversed_half_width, 0.0)
-    GX_GET_VAL_PRV(double, window_reversed_half_height, 0.0)
-#else
     GX_GET_VAL_PRV(int, window_width, GX_DEFAULT_WINDOW_WIDTH)
     GX_GET_VAL_PRV(int, window_height, GX_DEFAULT_WINDOW_HEIGHT)
     GX_GET_VAL_PRV(double, window_ratio, static_cast<double>(GX_DEFAULT_WINDOW_WIDTH) / static_cast<double>(GX_DEFAULT_WINDOW_HEIGHT))
     GX_GET_VAL_PRV(double, window_reversed_half_width, 2.0 / static_cast<double>(GX_DEFAULT_WINDOW_WIDTH))
     GX_GET_VAL_PRV(double, window_reversed_half_height, 2.0 / static_cast<double>(GX_DEFAULT_WINDOW_HEIGHT))
-#endif
+
 private:
-#ifndef GX_THREAD_NOT_SUPPORTED
-    enum struct State : int {
-        Running = 1,
-        Terminating = 2,
-        Terminated = 3,
-    };
-
-    std::atomic<State> state;
-    sync::Semaphore signaler;
-    std::vector<Data> events;
-    std::thread event_thread;
-    std::chrono::high_resolution_clock::time_point previous_window_size_update = std::chrono::high_resolution_clock::now();
-
-    void loop() noexcept;
-    [[nodiscard]] bool update_window_size_state(const Data& event_data) noexcept;
-    void check_window_size_state_timeout() noexcept;
-#endif
     GX_CREATE_GUARD(events)
+    std::vector<Data> events[2];
+    std::size_t current_event_index = 0, next_event_index = 1;
+    std::chrono::high_resolution_clock::time_point previous_window_size_update = std::chrono::high_resolution_clock::now();
     GX_CREATE_GUARD(events_id_priority_listeners)
     std::map<Id, std::map<double, std::set<Listener*>>> events_id_priority_listeners;
+    enum struct Action { Add,
+        Remove };
+    std::vector<std::tuple<Action, std::optional<Id>, std::optional<double>, Listener*>> events_id_priority_listeners_actions;
     Point2D mouse_point;
     bool click_enabled = true;
     int previous_window_width = 0;
@@ -68,7 +61,13 @@ private:
     double previous_window_reversed_half_width = 0.0;
     double previous_window_reversed_half_height = 0.0;
     double previous_window_ratio = 0.0;
+    unsigned int kernels_count = 0;
 
+    void update() noexcept;
+    void receiver() noexcept;
+    void update_listeners() noexcept;
+    void process_events(unsigned int kernel_index) noexcept;
+    void check_window_size_state_timeout() noexcept;
     void process(const Data& event_data) noexcept;
     void update_internal_states(const Data& event_data) noexcept;
     void set_window_size(int w, int h) noexcept;
@@ -81,7 +80,7 @@ public:
     Engine() noexcept;
     ~Engine() noexcept;
     void add_listener(Id event_id, double priority, Listener* listener) noexcept;
-    // Best function to remove listener
+    /// \note This is the best function to remove a listener.
     void remove_listener(Id event_id, double priority, Listener* listener) noexcept;
     void remove_listener(Id event_id, Listener* listener) noexcept;
     void remove_listener(Listener* listener) noexcept;
@@ -96,6 +95,16 @@ public:
     void touch_move(touch::FingerId finger_id, int x, int y) noexcept;
     void touch_up(touch::FingerId finger_id, int x, int y) noexcept;
     void touch_cancel(touch::FingerId finger_id, int x, int y) noexcept;
+    void initialize_render_engine(render::engine::Engine* render_engine) noexcept;
 };
 }
+
+#ifdef GX_UNDEF_DEFAULT_WINDOW_WIDTH
+#undef GX_DEFAULT_WINDOW_WIDTH
+#endif
+
+#ifdef GX_UNDEF_DEFAULT_WINDOW_HEIGHT
+#undef GX_DEFAULT_WINDOW_HEIGHT
+#endif
+
 #endif
