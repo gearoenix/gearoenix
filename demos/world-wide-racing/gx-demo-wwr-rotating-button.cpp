@@ -21,7 +21,7 @@ gearoenix::demo::wwr::RotatingButton::RotatingButton(std::shared_ptr <render::mo
                         },
                     std::numeric_limits<double>::max()
                     ));
-            anm_mgr->add(a);
+            anm_mgr->add(button->get_root()->get_asset_id(), a);
             animations.push_back(std::move(a));
             odd = !odd;
         }

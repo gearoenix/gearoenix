@@ -15,29 +15,25 @@ gearoenix::physics::animation::Manager::Manager(core::sync::KernelWorkers* const
 #endif
         },
         [this](const unsigned int kernel_index) noexcept {
-            unsigned int task_number = 0;
             const auto kernels_count = static_cast<unsigned int>(kernels.size());
-#define GX_DO_TASK(expr)                                 \
-    {                                                    \
-        if (task_number == kernel_index) {               \
-            expr;                                        \
-        }                                                \
-        task_number = (task_number + 1) % kernels_count; \
-    }
+            GX_START_MULTITHREADED_TASKS
             auto& kda = kernels[kernel_index].deleted_animations;
             kda.clear();
-            for (const auto& a : animations) {
-                GX_DO_TASK(
-                    if (a->apply(time, duration)) {
-                        kda.push_back(a);
+            for (const auto& aa : animations) {
+                GX_DO_MULTITHREADED_TASK(
+                    for (const auto& a
+                         : aa.second) {
+                        if (a.second->apply(time, duration)) {
+                            kda.emplace_back(aa.first, a.first);
+                        }
                     })
             }
         },
         []() {},
         [this]() noexcept {
-            for (const auto& k : kernels) {
+            for (auto& k : kernels) {
                 for (const auto& a : k.deleted_animations) {
-                    animations.erase(a);
+                    animations[a.first].erase(a.second);
                 }
             }
 #ifndef GX_THREAD_NOT_SUPPORTED
@@ -52,8 +48,8 @@ gearoenix::physics::animation::Manager::~Manager() noexcept
     kernels.clear();
 }
 
-void gearoenix::physics::animation::Manager::add(const std::shared_ptr<Animation>& a) noexcept
+void gearoenix::physics::animation::Manager::add(const core::Id animated_object_id, const std::shared_ptr<Animation>& a) noexcept
 {
     GX_GUARD_LOCK(animations)
-    animations.insert(a);
+    animations[animated_object_id].emplace(a->get_asset_id(), a);
 }

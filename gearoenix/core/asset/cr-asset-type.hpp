@@ -15,7 +15,8 @@ enum struct Type : int {
     Skybox = 11,
     Texture = 12,
     Reflection = 13,
-    Node = 14,
+    Animation = 14,
+    Node = 128,
 };
 }
 #endif

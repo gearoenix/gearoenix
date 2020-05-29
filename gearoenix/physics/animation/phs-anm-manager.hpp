@@ -5,8 +5,8 @@
 #include "../../core/cr-types.hpp"
 #include <chrono>
 #include <functional>
+#include <map>
 #include <memory>
-#include <set>
 #include <vector>
 
 namespace gearoenix::core::sync {
@@ -18,10 +18,10 @@ struct Animation;
 struct Manager {
 private:
     struct Kernel {
-        std::vector<std::shared_ptr<Animation>> deleted_animations;
+        std::vector<std::pair<core::Id, core::Id>> deleted_animations;
     };
     GX_CREATE_GUARD(animations)
-    std::set<std::shared_ptr<Animation>> animations;
+    std::map<core::Id, std::map<core::Id, std::shared_ptr<Animation>>> animations;
     std::vector<Kernel> kernels;
     std::chrono::high_resolution_clock::time_point time = std::chrono::high_resolution_clock::now();
     double duration = 0.0;
@@ -31,7 +31,7 @@ public:
     ~Manager() noexcept;
     Manager(const Manager& o) noexcept = delete;
     void operator=(const Manager& o) noexcept = delete;
-    void add(const std::shared_ptr<Animation>& a) noexcept;
+    void add(core::Id animated_root_object_id, const std::shared_ptr<Animation>& a) noexcept;
 };
 }
 #endif

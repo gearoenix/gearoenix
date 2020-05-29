@@ -1,11 +1,13 @@
 #include "phs-anm-animation.hpp"
+#include "../../core/asset/cr-asset-manager.hpp"
 #include <utility>
 
 gearoenix::physics::animation::Animation::Animation(
     std::function<void(double, double)> a,
     const double d,
     std::function<void(double)> del) noexcept
-    : duration(d)
+    : core::asset::Asset(core::asset::Manager::create_id(), core::asset::Type::Animation)
+    , duration(d)
     , action(std::move(a))
     , on_delete(std::move(del))
 {

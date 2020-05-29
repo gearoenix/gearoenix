@@ -70,7 +70,7 @@ void gearoenix::render::widget::Button::selected(const math::Vec3<double>&) noex
             transformation->local_scale(pressed_size / scale_down_progress);
             scale_down_progress = pressed_size;
         });
-    e->get_physics_engine()->get_animation_manager()->add(a);
+    e->get_physics_engine()->get_animation_manager()->add(get_root()->get_asset_id(), a);
     animation = a;
 }
 
@@ -91,7 +91,7 @@ void gearoenix::render::widget::Button::select_cancelled() noexcept
             transformation->local_scale(1.0 / scale_down_progress);
             scale_down_progress = 1.0;
         });
-    e->get_physics_engine()->get_animation_manager()->add(a);
+    e->get_physics_engine()->get_animation_manager()->add(get_root()->get_asset_id(), a);
     animation = a;
 }
 

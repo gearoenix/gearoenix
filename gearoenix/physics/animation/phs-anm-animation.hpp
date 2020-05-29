@@ -1,13 +1,14 @@
 #ifndef GEAROENIX_PHYSICS_ANIMATION_ANIMATION_HPP
 #define GEAROENIX_PHYSICS_ANIMATION_ANIMATION_HPP
 
+#include "../../core/asset/cr-asset.hpp"
 #include "../../core/cr-static.hpp"
 #include "../../core/cr-types.hpp"
 #include <chrono>
 #include <functional>
 
 namespace gearoenix::physics::animation {
-struct Animation {
+struct Animation final : public core::asset::Asset {
     GX_GETSET_VAL_PRV(bool, activity, true)
     GX_GETSET_VAL_PRV(double, duration, 0.0)
 private:
@@ -21,7 +22,7 @@ public:
         std::function<void(double, double)> action,
         double duration,
         std::function<void(double)> on_delete = [](double) noexcept {}) noexcept;
-    ~Animation() noexcept;
+    ~Animation() noexcept final;
     Animation(const Animation& other) noexcept = delete;
     void operator=(const Animation& other) noexcept = delete;
     // true means: delete the animation and animation will not apply anymore

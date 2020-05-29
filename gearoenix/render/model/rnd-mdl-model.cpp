@@ -167,3 +167,17 @@ void gearoenix::render::model::Model::set_scene(scene::Scene* const s) noexcept
 {
     scene = s;
 }
+
+gearoenix::render::model::Model* gearoenix::render::model::Model::get_root() noexcept
+{
+    if (parent == nullptr)
+        return this;
+    return parent->get_root();
+}
+
+const gearoenix::render::model::Model* gearoenix::render::model::Model::get_root() const noexcept
+{
+    if (parent == nullptr)
+        return this;
+    return parent->get_root();
+}

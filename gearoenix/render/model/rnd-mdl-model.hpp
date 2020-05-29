@@ -95,6 +95,8 @@ public:
     void clear_reflection() noexcept;
     virtual void set_scene(scene::Scene* s) noexcept;
     [[nodiscard]] virtual bool get_dynamicity() const noexcept = 0;
+    Model* get_root() noexcept;
+    const Model* get_root() const noexcept;
 };
 }
 #endif
