@@ -56,7 +56,7 @@ void gearoenix::glc3::pipeline::ResourceSet::bind(
         static_cast<const RadianceConvoluterResourceSet*>(prs)->bind_final(bound_shader_program);
         break;
     default:
-        GXUNIMPLEMENTED
+        GX_UNIMPLEMENTED
     }
 }
 

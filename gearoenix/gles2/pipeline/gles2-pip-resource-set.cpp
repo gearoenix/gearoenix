@@ -52,7 +52,7 @@ void gearoenix::gles2::pipeline::ResourceSet::bind(
         static_cast<const IrradianceConvoluterResourceSet*>(prs)->bind_final(bound_shader_program);
         break;
     default:
-        GXUNIMPLEMENTED
+        GX_UNIMPLEMENTED
     }
 }
 

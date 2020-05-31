@@ -72,9 +72,6 @@ private:
     void update_internal_states(const Data& event_data) noexcept;
     void set_window_size(int w, int h) noexcept;
     void set_previous_window_size() noexcept;
-    [[nodiscard]] double convert_raw_x(int x) const noexcept;
-    [[nodiscard]] double convert_raw_y(int y) const noexcept;
-    [[nodiscard]] math::Vec2<double> convert_raw(int x, int y) const noexcept;
 
 public:
     Engine() noexcept;
@@ -96,6 +93,10 @@ public:
     void touch_up(touch::FingerId finger_id, int x, int y) noexcept;
     void touch_cancel(touch::FingerId finger_id, int x, int y) noexcept;
     void initialize_render_engine(render::engine::Engine* render_engine) noexcept;
+    [[nodiscard]] double convert_raw_x(int x) const noexcept;
+    [[nodiscard]] double convert_raw_y(int y) const noexcept;
+    [[nodiscard]] math::Vec2<double> convert_raw(int x, int y) const noexcept;
+    [[nodiscard]] math::Vec2<double> convert_raw(const math::Vec2<int>& p) const noexcept;
 };
 }
 

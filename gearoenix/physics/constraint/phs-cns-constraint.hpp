@@ -1,56 +1,58 @@
 #ifndef GEAROENIX_PHYSICS_CONSTRAINT_CONSTRAINT_HPP
 #define GEAROENIX_PHYSICS_CONSTRAINT_CONSTRAINT_HPP
 #include "../../core/asset/cr-asset.hpp"
-#include "../../core/cr-types.hpp"
-#include "../../core/sync/cr-sync-end-caller.hpp"
+#include "../../system/sys-log.hpp"
 #include "phs-cns-type.hpp"
+#include <map>
 #include <memory>
-#include <vector>
 
-namespace gearoenix {
-namespace core::event {
-    class Event;
+namespace gearoenix::core::event {
+class Engine;
 }
-namespace render {
-    namespace engine {
-        class Engine;
-    }
-    namespace model {
-        class Dynamic;
-    }
+
+namespace gearoenix::render::engine {
+class Engine;
 }
-namespace system::stream {
-    class Stream;
+
+namespace gearoenix::render::model {
+class Model;
 }
-namespace physics {
-    namespace body {
-        class Body;
-    }
-    namespace constraint {
-        class Constraint : public core::asset::Asset {
-        protected:
-            bool applied = false;
-            bool alive = true;
-            const Type::Id t;
 
-            Constraint(core::Id my_id, Type::Id t);
-
-        public:
-            ~Constraint() override;
-            virtual void on_event(const core::event::Event& e) = 0;
-            [[nodiscard]] virtual std::vector<std::pair<core::Id, std::shared_ptr<render::model::Dynamic>>> get_all_models() const = 0;
-            [[nodiscard]] virtual std::vector<std::shared_ptr<body::Body>> get_all_bodies() const;
-            virtual void apply(double delta_time) noexcept;
-
-            static Constraint* read(
-                core::Id my_id,
-                const std::shared_ptr<system::stream::Stream>& f,
-                render::engine::Engine* e,
-                const core::sync::EndCaller<core::sync::EndCallerIgnore>& c);
-
-            [[nodiscard]] bool is_alive() const;
-        };
-    }
+namespace gearoenix::system::stream {
+class Stream;
 }
+
+namespace gearoenix::physics::constraint {
+class Constraint : public core::asset::Asset {
+public:
+    typedef std::map<core::Id, std::shared_ptr<render::model::Model>> ModelMap;
+    typedef std::map<core::Id, std::shared_ptr<Constraint>> ConstraintMap;
+    GX_GET_CVAL_PRT(Type, constraint_type)
+    GX_GET_CVAL_PRT(bool, active)
+    GX_GET_VAL_PRT(bool, enabled, true)
+    GX_GET_CREF_PRT(ModelMap, affected_models)
+    GX_GET_CREF_PRT(ConstraintMap, after_constraints)
+
+protected:
+    Constraint(core::Id id, Type t, bool active = true) noexcept;
+
+    /// Thi function will be called after the parent constraint applied on its models
+    virtual void update() noexcept { }
+
+public:
+    ~Constraint() override;
+    virtual void apply(double delta_time_from_start, double delta_time_from_previous) noexcept = 0;
+
+    void add(const std::shared_ptr<Constraint>& c) noexcept
+    {
+#ifdef GX_DEBUG_MODE
+        if (after_constraints.find(c->get_asset_id()) != after_constraints.end())
+            GX_UNEXPECTED
+#endif
+        after_constraints.emplace(c->get_asset_id(), c);
+    }
+
+    void add_affected(const std::shared_ptr<render::model::Model>& m) noexcept;
+};
 }
 #endif

@@ -36,5 +36,5 @@ double gearoenix::render::light::Point::get_min_radius() const noexcept
 
 bool gearoenix::render::light::Point::is_in_light(const model::Model* const) const noexcept
 {
-    GXUNIMPLEMENTED // check object visibility
+    GX_UNIMPLEMENTED // check object visibility
 }

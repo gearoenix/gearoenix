@@ -39,7 +39,7 @@ std::optional<double> gearoenix::physics::collider::Mesh::hit(const math::Ray3&,
 {
     // first collider base hit (aabb)
     // second loop over traingles (triangles count must be low)
-    GXUNIMPLEMENTED
+    GX_UNIMPLEMENTED
 }
 
 // std::optional<std::pair<double, gearoenix::math::Vec2>> gearoenix::physics::collider::Mesh::hit(const math::Ray3& r) const noexcept

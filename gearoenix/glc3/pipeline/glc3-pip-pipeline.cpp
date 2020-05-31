@@ -20,7 +20,7 @@ gearoenix::glc3::pipeline::Pipeline::~Pipeline()
 
 void gearoenix::glc3::pipeline::Pipeline::bind()
 {
-    GXUNIMPLEMENTED;
+    GX_UNIMPLEMENTED;
 }
 
 #endif

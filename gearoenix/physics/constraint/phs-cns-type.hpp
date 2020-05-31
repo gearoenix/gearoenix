@@ -1,18 +1,11 @@
 #ifndef GEAROENIX_PHYSICS_CONSTRAINT_TYPE_HPP
 #define GEAROENIX_PHYSICS_CONSTRAINT_TYPE_HPP
 #include "../../core/cr-types.hpp"
-namespace gearoenix {
-namespace physics {
-    namespace constraint {
-        class Type {
-        public:
-            typedef enum : core::Id {
-                PLACER = 1,
-                TRACKER_SPRING_JOINT_SPRING = 2,
-                LOOKER = 3,
-            } Id;
-        };
-    }
-}
+namespace gearoenix::physics::constraint {
+enum struct Type : core::Id {
+    WindowPlacer = 1,
+    Tracker = 2,
+    Joint = 3,
+};
 }
 #endif

@@ -223,7 +223,7 @@ gearoenix::render::widget::Edit::Edit(
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : GX_EDIT_INIT {
-        GXUNIMPLEMENTED
+        GX_UNIMPLEMENTED
     }
 
     gearoenix::render::widget::Edit::Edit(const core::Id my_id, engine::Engine* const e, const EditTheme& theme, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept

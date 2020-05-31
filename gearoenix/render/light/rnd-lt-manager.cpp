@@ -18,7 +18,7 @@ std::shared_ptr<gearoenix::render::light::Light> gearoenix::render::light::Manag
         const auto t = f->read<Type>();
         switch (t) {
         case Type::Cone:
-            GXUNIMPLEMENTED;
+            GX_UNIMPLEMENTED;
         case Type::Point:
             return std::shared_ptr<Light>(new Point(id, f, e));
         case Type::Directional:

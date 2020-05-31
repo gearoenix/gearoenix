@@ -355,3 +355,8 @@ void gearoenix::core::event::Engine::initialize_render_engine(render::engine::En
         [] {},
         [this] { receiver(); });
 }
+
+gearoenix::math::Vec2<double> gearoenix::core::event::Engine::convert_raw(const math::Vec2<int>& p) const noexcept
+{
+    return convert_raw(p.x, p.y);
+}

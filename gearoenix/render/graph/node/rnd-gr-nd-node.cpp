@@ -134,12 +134,12 @@ void gearoenix::render::graph::node::Node::update() noexcept
 
 void gearoenix::render::graph::node::Node::record(const unsigned int) noexcept
 {
-    GXUNIMPLEMENTED
+    GX_UNIMPLEMENTED
 }
 
 void gearoenix::render::graph::node::Node::record_continuously(const unsigned int) noexcept
 {
-    GXUNIMPLEMENTED
+    GX_UNIMPLEMENTED
 }
 
 void gearoenix::render::graph::node::Node::submit() noexcept

@@ -17,7 +17,7 @@ gearoenix::dx11::shader::Resources::~Resources()
 
 void gearoenix::dx11::shader::Resources::bind()
 {
-    GXUNIMPLEMENTED;
+    GX_UNIMPLEMENTED;
 }
 
 #endif

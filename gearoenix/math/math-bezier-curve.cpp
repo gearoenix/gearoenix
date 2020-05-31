@@ -64,7 +64,7 @@ gearoenix::math::CubicBezierCurve2D::CubicBezierCurve2D(const int points_count, 
     if (smooth && !overlapable && !fast_curvable && closed)
         create_smooth_non_overlapping_blunt_closed();
     else
-        GXUNIMPLEMENTED;
+        GX_UNIMPLEMENTED;
 }
 
 void gearoenix::math::CubicBezierCurve2D::normalize(const double scale)

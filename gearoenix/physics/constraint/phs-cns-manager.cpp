@@ -6,7 +6,10 @@ gearoenix::physics::constraint::Manager::Manager(std::unique_ptr<system::stream:
 {
 }
 
+gearoenix::physics::constraint::Manager::~Manager() noexcept = default;
+
 std::shared_ptr<gearoenix::physics::constraint::Constraint> gearoenix::physics::constraint::Manager::get_gx3d(const core::Id, core::sync::EndCaller<Constraint>&) noexcept
 {
-    GXUNIMPLEMENTED
+    (void)this;
+    GX_UNIMPLEMENTED
 }

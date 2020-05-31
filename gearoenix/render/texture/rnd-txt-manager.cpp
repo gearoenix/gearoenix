@@ -69,7 +69,7 @@ std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::render::texture:
         return t;
     }
     case Type::Texture3D:
-        GXUNIMPLEMENTED
+        GX_UNIMPLEMENTED
     case Type::TextureCube: {
         std::vector<std::vector<std::vector<std::uint8_t>>> data(6);
         const auto aspect = static_cast<std::size_t>(s->read<std::uint16_t>());
@@ -334,14 +334,14 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     info.has_mipmap = sample_info.needs_mipmap();
     switch (img_channels) {
     case 1:
-        GXUNIMPLEMENTED
+        GX_UNIMPLEMENTED
     case 2:
-        GXUNIMPLEMENTED
+        GX_UNIMPLEMENTED
     case 3:
         info.format = TextureFormat::RgbFloat32;
         break;
     case 4:
-        GXUNIMPLEMENTED
+        GX_UNIMPLEMENTED
     default:
         GX_UNEXPECTED
     }

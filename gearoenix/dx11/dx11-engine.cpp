@@ -445,7 +445,7 @@ gearoenix::render::shader::Shader* gearoenix::dx11::Engine::create_shader(core::
     case render::shader::Id::SKYBOX_BASIC:
         return new shader::SkyboxBasic(sid, this, c);
     default:
-        GXUNIMPLEMENTED;
+        GX_UNIMPLEMENTED;
         break;
     }
     return nullptr;
@@ -485,7 +485,7 @@ gearoenix::render::shader::Resources* gearoenix::dx11::Engine::create_shader_res
     case render::shader::Id::SKYBOX_BASIC:
         return new shader::SkyboxBasic::Resources(this, pip, u);
     default:
-        GXUNIMPLEMENTED;
+        GX_UNIMPLEMENTED;
         break;
     }
     return nullptr;

@@ -99,7 +99,7 @@ void gearoenix::gles2::texture::Texture2D::write_gx3d(
     const std::shared_ptr<system::stream::Stream>&,
     const gearoenix::core::sync::EndCaller<gearoenix::core::sync::EndCallerIgnore>&) noexcept
 {
-    GXUNIMPLEMENTED
+    GX_UNIMPLEMENTED
 }
 
 void gearoenix::gles2::texture::Texture2D::bind(gl::enumerated texture_unit) const noexcept

@@ -4,6 +4,8 @@
 #include <gearoenix/render/camera/rnd-cmr-arc-controller.hpp>
 #include <gearoenix/render/model/rnd-mdl-manager.hpp>
 #include <gearoenix/render/engine/rnd-eng-engine.hpp>
+#include <gearoenix/physics/constraint/phs-cns-manager.hpp>
+#include <gearoenix/physics/constraint/phs-cns-window-placer.hpp>
 #include <gearoenix/system/sys-app.hpp>
 
 void gearoenix::demo::wwr::Garage::initialize_scenes(
@@ -37,7 +39,17 @@ void gearoenix::demo::wwr::Garage::initialize_camera() noexcept {
 }
 
 void gearoenix::demo::wwr::Garage::initialize_buttons() noexcept {
+    auto *const cns_mgr = ui_scene->get_e()->get_system_application()->get_asset_manager()->get_constraint_manager();
     shop_button = std::make_unique<RotatingButton>(ui_scene->get_model("button-shop"));
+
+    next_button_placer = cns_mgr->create<physics::constraint::WindowPlacer>();
+    next_button_placer->set_width_percentage(1.0);
+    next_button_placer->add_affected(ui_scene->get_model("button-next"));
+    next_button_placer->set_distance(math::Vec2(-0.1, 0.0));
+
+    previous_button_placer = cns_mgr->create<physics::constraint::WindowPlacer>();
+    previous_button_placer->add_affected(ui_scene->get_model("button-previous"));
+    previous_button_placer->set_distance(math::Vec2(0.1, 0.0));
 }
 
 gearoenix::demo::wwr::Garage::Garage(const std::vector <std::shared_ptr<render::scene::Scene>> &scenes) noexcept {

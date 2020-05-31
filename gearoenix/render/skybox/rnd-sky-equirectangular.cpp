@@ -10,7 +10,7 @@ gearoenix::render::skybox::Equirectangular::Equirectangular(
     , mat_equ(new material::SkyboxEquirectangular(s, e, c))
 {
     mat = mat_equ;
-    GXUNIMPLEMENTED
+    GX_UNIMPLEMENTED
 }
 
 gearoenix::render::skybox::Equirectangular::Equirectangular(

@@ -19,9 +19,9 @@ std::shared_ptr<gearoenix::render::reflection::Reflection> gearoenix::render::re
             const auto t = file->read<Type>();
             switch (t) {
             case Type::Runtime:
-                GXUNIMPLEMENTED
+                GX_UNIMPLEMENTED
             case Type::Baked:
-                GXUNIMPLEMENTED
+                GX_UNIMPLEMENTED
             }
         });
     call.set_data(data);

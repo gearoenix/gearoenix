@@ -67,7 +67,7 @@ public:
 #define GXREACHED GXLOGD("REACHED-------------------------------------------")
 #define GXTODO GXLOGE("TODO")
 #define GX_UNEXPECTED GXLOGF("Unexpected")
-#define GXUNIMPLEMENTED GXLOGF("Unimplemented")
+#define GX_UNIMPLEMENTED GXLOGF("Unimplemented")
 #define GXASSERT(x) \
     if ((x) == 0)   \
     GX_UNEXPECTED
@@ -78,6 +78,6 @@ public:
 #define GXLOGF(s) std::terminate();
 #define GXTODO ;
 #define GX_UNEXPECTED std::terminate();
-#define GXUNIMPLEMENTED std::terminate();
+#define GX_UNIMPLEMENTED std::terminate();
 #endif // LOG_ENABLED
 #endif // GEAROENIX_SYSTEM_LOG_HPP
