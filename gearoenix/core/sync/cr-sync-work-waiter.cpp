@@ -5,7 +5,7 @@
 gearoenix::core::sync::WorkWaiter::WorkWaiter() = default;
 gearoenix::core::sync::WorkWaiter::~WorkWaiter() = default;
 
-void gearoenix::core::sync::WorkWaiter::push(std::function<void()> f)
+void gearoenix::core::sync::WorkWaiter::push(const std::function<void()>& f)
 {
     f();
     (void)this;

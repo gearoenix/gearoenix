@@ -29,6 +29,18 @@ jobs:
             cd build;
             echo "Building...";
             CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 cmake --build . --config Debug --target GX_COVERAGE'
+      - run:
+          name: Build Webassembly
+          command: '
+            git clone --depth=1 https://github.com/emscripten-core/emsdk.git;
+            cd emsdk;
+            ./emsdk install latest;
+            ./emsdk install latest-upstream;
+            ./emsdk activate latest;
+            source ./emsdk_env.sh;
+            cd ../;
+            ./wasm-build.sh
+          '
       - codecov/upload:
           flags: unittest
           file: 'build/GX_COVERAGE.info'
