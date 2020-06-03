@@ -28,7 +28,7 @@ jobs:
             ls;
             cd build;
             echo "Building...";
-            CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 cmake --build . --config Debug --target GX_COVERAGE'
+            CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 cmake --build . --config Debug --target GX_COVERAGE --parallel 4'
       - run:
           name: Build Webassembly
           command: '
