@@ -55,7 +55,6 @@ void gearoenix::demo::wwr::Garage::initialize_buttons() noexcept {
     bottom_button_scaler->set_max_size_scale(2.5);
     bottom_button_scaler->add_affected(bottom_button);
     bottom_button_scaler->set_current_size(2.0);
-    bottom_button_scaler->register_listener();
 
     auto bottom_button_placer = cns_mgr->create<physics::constraint::WindowPlacer>();
     bottom_button_placer->set_width_percentage(0.5);
@@ -65,6 +64,7 @@ void gearoenix::demo::wwr::Garage::initialize_buttons() noexcept {
     });
 
     bottom_button_scaler->add(bottom_button_placer);
+    bottom_button_scaler->register_listener();
 
     next_button_placer = cns_mgr->create<physics::constraint::WindowPlacer>();
     next_button_placer->set_width_percentage(1.0);
