@@ -36,8 +36,14 @@ public:
 protected:
     Constraint(core::Id id, Type t, bool active = true) noexcept;
 
-    /// Thi function will be called after the parent constraint applied on its models
+    /// This function will be called after the parent constraint applied on its models
     virtual void update() noexcept { }
+    void update_chained_constraints() noexcept
+    {
+        for (const auto& c : after_constraints) {
+            c.second->update();
+        }
+    }
 
 public:
     ~Constraint() override;

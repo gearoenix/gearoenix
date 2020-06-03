@@ -337,6 +337,8 @@ SET(GX_ENGINE_SRC
         "${GX_ENGINE_SRC_DIR}physics/constraint/phs-cns-type.hpp"
         "${GX_ENGINE_SRC_DIR}physics/constraint/phs-cns-window-placer.cpp"
         "${GX_ENGINE_SRC_DIR}physics/constraint/phs-cns-window-placer.hpp"
+        "${GX_ENGINE_SRC_DIR}physics/constraint/phs-cns-window-scaler.cpp"
+        "${GX_ENGINE_SRC_DIR}physics/constraint/phs-cns-window-scaler.hpp"
         "${GX_ENGINE_SRC_DIR}physics/phs-engine.cpp"
         "${GX_ENGINE_SRC_DIR}physics/phs-engine.hpp"
         "${GX_ENGINE_SRC_DIR}physics/phs-object.cpp"

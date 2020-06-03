@@ -4,8 +4,9 @@
 namespace gearoenix::physics::constraint {
 enum struct Type : core::Id {
     WindowPlacer = 1,
-    Tracker = 2,
-    Joint = 3,
+    WindowScaler = 2,
+    Tracker = 3,
+    Joint = 4,
 };
 }
 #endif

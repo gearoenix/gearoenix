@@ -6,6 +6,8 @@
 #include <gearoenix/render/engine/rnd-eng-engine.hpp>
 #include <gearoenix/physics/constraint/phs-cns-manager.hpp>
 #include <gearoenix/physics/constraint/phs-cns-window-placer.hpp>
+#include <gearoenix/physics/constraint/phs-cns-window-scaler.hpp>
+#include <gearoenix/physics/collider/phs-cld-collider.hpp>
 #include <gearoenix/system/sys-app.hpp>
 
 void gearoenix::demo::wwr::Garage::initialize_scenes(
@@ -40,14 +42,38 @@ void gearoenix::demo::wwr::Garage::initialize_camera() noexcept {
 
 void gearoenix::demo::wwr::Garage::initialize_buttons() noexcept {
     auto *const cns_mgr = ui_scene->get_e()->get_system_application()->get_asset_manager()->get_constraint_manager();
+
     shop_button = std::make_unique<RotatingButton>(ui_scene->get_model("button-shop"));
+    multiplayer_button = std::make_unique<RotatingButton>(ui_scene->get_model("button-multiplayer"));
+    tuning_button = std::make_unique<RotatingButton>(ui_scene->get_model("button-tuning"));
+    training_button = std::make_unique<RotatingButton>(ui_scene->get_model("button-training"));
+
+    auto bottom_button = ui_scene->get_model("bottom-garage-buttons");
+
+    bottom_button_scaler = cns_mgr->create<physics::constraint::WindowScaler>();
+    bottom_button_scaler->set_size_percentage(0.8);
+    bottom_button_scaler->set_max_size_scale(2.5);
+    bottom_button_scaler->add_affected(bottom_button);
+    bottom_button_scaler->set_current_size(2.0);
+    bottom_button_scaler->register_listener();
+
+    auto bottom_button_placer = cns_mgr->create<physics::constraint::WindowPlacer>();
+    bottom_button_placer->set_width_percentage(0.5);
+    bottom_button_placer->add_affected(bottom_button);
+    bottom_button_placer->set_distance([bottom_button { move(bottom_button) }] {
+        return math::Vec2(0.0, bottom_button->get_collider()->get_current_local_scale().y * 1.2);
+    });
+
+    bottom_button_scaler->add(bottom_button_placer);
 
     next_button_placer = cns_mgr->create<physics::constraint::WindowPlacer>();
     next_button_placer->set_width_percentage(1.0);
+    next_button_placer->set_height_percentage(0.5);
     next_button_placer->add_affected(ui_scene->get_model("button-next"));
     next_button_placer->set_distance(math::Vec2(-0.1, 0.0));
 
     previous_button_placer = cns_mgr->create<physics::constraint::WindowPlacer>();
+    previous_button_placer->set_height_percentage(0.5);
     previous_button_placer->add_affected(ui_scene->get_model("button-previous"));
     previous_button_placer->set_distance(math::Vec2(0.1, 0.0));
 }
