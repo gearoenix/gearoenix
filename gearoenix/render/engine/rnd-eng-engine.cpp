@@ -24,8 +24,8 @@ gearoenix::render::engine::Engine::Engine(system::Application* const system_appl
     , system_application(system_application)
     , function_loader(new core::FunctionLoader())
     , kernels(new core::sync::KernelWorkers())
-    , physics_engine(new physics::Engine(system_application, kernels.get()))
     , update_functions_manager(new core::UpdateFunctionsManager(kernels.get()))
+    , physics_engine(new physics::Engine(system_application, kernels.get()))
     , late_delete_assets(10)
 {
     kernels->add_step(

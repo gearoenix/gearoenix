@@ -103,3 +103,7 @@ documentation/*
 *.xcassets/
 /*.xcassets
 /*.xcassets/
+
+error.txt
+debug.txt
+info.txt
