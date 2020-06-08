@@ -72,13 +72,41 @@ void gearoenix::physics::collider::Collider::local_scale(const double s) noexcep
     on_scale();
 }
 
+void gearoenix::physics::collider::Collider::local_scale(const math::Vec3<double>& s) noexcept
+{
+    current_local_scale *= s;
+    updated_box.set_diameter(updated_box.get_diameter() * s);
+    model_matrix.local_scale(s);
+    on_scale();
+}
+
 void gearoenix::physics::collider::Collider::local_x_scale(const double s) noexcept
 {
-    current_local_scale[0] *= s;
+    current_local_scale.x *= s;
     auto d = updated_box.get_diameter();
     d.x *= s;
     updated_box.set_diameter(d);
     model_matrix.local_x_scale(s);
+    on_scale();
+}
+
+void gearoenix::physics::collider::Collider::local_y_scale(const double s) noexcept
+{
+    current_local_scale.y *= s;
+    auto d = updated_box.get_diameter();
+    d.y *= s;
+    updated_box.set_diameter(d);
+    model_matrix.local_y_scale(s);
+    on_scale();
+}
+
+void gearoenix::physics::collider::Collider::local_z_scale(const double s) noexcept
+{
+    current_local_scale.z *= s;
+    auto d = updated_box.get_diameter();
+    d.z *= s;
+    updated_box.set_diameter(d);
+    model_matrix.local_z_scale(s);
     on_scale();
 }
 

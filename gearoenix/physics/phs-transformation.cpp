@@ -75,6 +75,13 @@ void gearoenix::physics::Transformation::local_scale(const double) noexcept
     GX_UNIMPLEMENTED
 }
 
+void gearoenix::physics::Transformation::local_scale(const math::Vec3<double>& s) noexcept
+{
+    local_x_scale(s.x);
+    local_y_scale(s.y);
+    local_z_scale(s.z);
+}
+
 void gearoenix::physics::Transformation::local_x_scale(const double) noexcept
 {
     GX_UNIMPLEMENTED

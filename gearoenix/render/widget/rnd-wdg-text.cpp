@@ -8,6 +8,8 @@
 #include "../material/rnd-mat-unlit.hpp"
 #include "../mesh/rnd-msh-manager.hpp"
 #include "../mesh/rnd-msh-mesh.hpp"
+#include "../model/rnd-mdl-dynamic.hpp"
+#include "../model/rnd-mdl-manager.hpp"
 #include "../model/rnd-mdl-mesh.hpp"
 #include "../shader/rnd-shd-shader.hpp"
 #include <codecvt>
@@ -16,13 +18,46 @@
 void gearoenix::render::widget::Text::initialize(const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
 {
     auto ast_mgr = e->get_system_application()->get_asset_manager();
-    auto mat = std::make_shared<material::Unlit>(e, c);
-    mat->set_translucency(material::TranslucencyMode::Transparent);
+    text_mesh_material = std::make_shared<material::Unlit>(e, c);
+    text_mesh_material->set_translucency(material::TranslucencyMode::Transparent);
     core::sync::EndCaller<mesh::Mesh> mend([c](const std::shared_ptr<mesh::Mesh>&) {});
+    core::sync::EndCaller<model::Dynamic> dyn_mdl_end([c](const std::shared_ptr<model::Dynamic>&) {});
     auto msh = ast_mgr->get_mesh_manager()->create_plate(mend);
-    text_mesh_id = msh->get_asset_id();
-    add_mesh(std::make_shared<model::Mesh>(msh, mat));
+    text_model = ast_mgr->get_model_manager()->create<model::Dynamic>(dyn_mdl_end);
+    text_model->add_mesh(std::make_shared<model::Mesh>(msh, text_mesh_material));
+    text_model->get_transformation()->local_scale(collider->get_current_local_scale());
+    add_child(text_model);
     set_text(text, c);
+}
+
+void gearoenix::render::widget::Text::update_alignment() noexcept
+{
+    math::Vec3 trl(0.0);
+    switch (h_align) {
+    case Alignment::Center:
+        break;
+    case Alignment::Start:
+        trl.x = get_text_width() * 0.5;
+        break;
+    case Alignment::End:
+        trl.x = get_text_width() * -0.5;
+        break;
+    default:
+        break;
+    }
+    switch (v_align) {
+    case Alignment::Center:
+        break;
+    case Alignment::Start:
+        trl.y = get_text_height() * -0.5;
+        break;
+    case Alignment::End:
+        trl.y = get_text_height() * 0.5;
+        break;
+    default:
+        break;
+    }
+    text_model->get_transformation()->set_location(transformation->get_location() + trl);
 }
 
 gearoenix::render::widget::Text::Text(
@@ -77,10 +112,11 @@ void gearoenix::render::widget::Text::set_text(
         // This is because of controlling latency and over-assignments
         if (t != text)
             return;
-        reinterpret_cast<material::Unlit*>(meshes[text_mesh_id]->get_mat().get())->set_color(txt);
+        text_mesh_material->set_color(txt);
     });
-    auto txt = text_font->bake(text, text_color, collider->get_current_local_scale()[1] * 2.0, img_width, txt_end);
-    transformation->local_x_scale(img_width * 0.5f / collider->get_current_local_scale()[0]);
+    auto txt = text_font->bake(text, text_color, get_text_height(), img_width, txt_end);
+    text_model->get_transformation()->local_x_scale(img_width / get_text_width());
+    update_alignment();
 }
 
 void gearoenix::render::widget::Text::set_text_color(
@@ -97,4 +133,13 @@ void gearoenix::render::widget::Text::set_text_color(
 {
     text_color = v;
     set_text(text, c);
+}
+
+double gearoenix::render::widget::Text::get_text_width() const noexcept
+{
+    return text_model->get_collider()->get_current_local_scale().x * 2.0;
+}
+double gearoenix::render::widget::Text::get_text_height() const noexcept
+{
+    return text_model->get_collider()->get_current_local_scale().y * 2.0;
 }

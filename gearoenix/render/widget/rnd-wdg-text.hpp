@@ -9,6 +9,14 @@ namespace gearoenix::render::font {
 class Font2D;
 }
 
+namespace gearoenix::render::model {
+class Dynamic;
+}
+
+namespace gearoenix::render::material {
+class Unlit;
+}
+
 namespace gearoenix::render::widget {
 class Text : public Widget {
     GX_GET_CREF_PRT(std::wstring, text)
@@ -16,9 +24,11 @@ class Text : public Widget {
     GX_GET_CREF_PRT(math::Vec4<double>, text_color)
     GX_GET_VAL_PRT(Alignment, v_align, Alignment::Center)
     GX_GET_VAL_PRT(Alignment, h_align, Alignment::Center)
-    GX_GET_VAL_PRT(core::Id, text_mesh_id, 0)
+    GX_GET_CREF_PRT(std::shared_ptr<model::Dynamic>, text_model)
+    GX_GET_CREF_PRT(std::shared_ptr<material::Unlit>, text_mesh_material)
 
     void initialize(const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+    void update_alignment() noexcept;
 
 public:
     Text(
@@ -40,6 +50,8 @@ public:
     void set_text_color(
         const math::Vec4<double>& v,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
+    [[nodiscard]] double get_text_width() const noexcept;
+    [[nodiscard]] double get_text_height() const noexcept;
 };
 }
 #endif

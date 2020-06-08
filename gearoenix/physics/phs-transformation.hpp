@@ -30,6 +30,7 @@ public:
     virtual void local_y_rotate(double d) noexcept;
     virtual void local_z_rotate(double d) noexcept;
     virtual void local_scale(double s) noexcept;
+    virtual void local_scale(const math::Vec3<double>& s) noexcept;
     virtual void local_x_scale(double s) noexcept;
     virtual void local_y_scale(double s) noexcept;
     virtual void local_z_scale(double s) noexcept;

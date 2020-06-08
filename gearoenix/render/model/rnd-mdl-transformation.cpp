@@ -50,6 +50,19 @@ void gearoenix::render::model::Transformation::local_scale(const double s) noexc
     parent->get_collider()->local_scale(s);
 }
 
+void gearoenix::render::model::Transformation::local_scale(const math::Vec3<double>& s) noexcept
+{
+    const auto& loc = get_location();
+    const auto& children = parent->get_children();
+    for (const auto& c : children) {
+        auto* const child = c.second.get();
+        auto* const ct = child->get_transformation();
+        ct->local_scale(s);
+        ct->set_location(((ct->get_location() - loc) * s) + loc);
+    }
+    parent->get_collider()->local_scale(s);
+}
+
 void gearoenix::render::model::Transformation::local_x_scale(const double s) noexcept
 {
     const math::Vec3<double>& loc = get_location();

@@ -30,6 +30,7 @@ public:
     void local_z_rotate(double d) noexcept final;
     //void set_orientation(const math::Quat& q) noexcept override final;
     void local_scale(double) noexcept final;
+    void local_scale(const math::Vec3<double>& s) noexcept final;
     void local_x_scale(double) noexcept final;
     void local_y_scale(double) noexcept final;
     void local_z_scale(double) noexcept final;

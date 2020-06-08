@@ -23,8 +23,8 @@ std::shared_ptr<gearoenix::render::reflection::Reflection> gearoenix::render::re
             case Type::Baked:
                 GX_UNIMPLEMENTED
             }
-            (void) id;
-            (void) call;
+            (void)id;
+            (void)call;
             GX_UNEXPECTED
         });
     call.set_data(data);

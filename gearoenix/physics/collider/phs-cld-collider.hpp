@@ -60,7 +60,10 @@ public:
     void set_location(const math::Vec3<double>&) noexcept override;
     void local_z_rotate(double d) noexcept final;
     void local_scale(double s) noexcept override;
+    void local_scale(const math::Vec3<double>& s) noexcept override;
     void local_x_scale(double s) noexcept override;
+    void local_y_scale(double s) noexcept override;
+    void local_z_scale(double s) noexcept override;
 
     // TODO: I have to implement rotations
 

@@ -20,7 +20,7 @@ void gearoenix::physics::body::Rigid::apply_time(const double delta_time)
     const auto translation = (curspeed * hdt) + (speed * delta_time);
     force = math::Vec3<double>();
     speed += curspeed;
-    (void) translation;
+    (void)translation;
     GX_UNIMPLEMENTED
     //body_obj->translate(translation);
     /*const math::Vec3 rotacc = (rotational_force + (rotational_speed * rotational_air_friction)) * rotational_latency;
