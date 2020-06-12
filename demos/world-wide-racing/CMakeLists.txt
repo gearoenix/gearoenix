@@ -6,7 +6,9 @@ SET(GX_DEMO_WORLD_WIDE_RACING_SRC
         gx-demo-wwr-main.cpp
         gx-demo-wwr-main.hpp
         gx-demo-wwr-rotating-button.cpp
-        gx-demo-wwr-rotating-button.hpp)
+        gx-demo-wwr-rotating-button.hpp
+        gx-demo-wwr-training.cpp
+        gx-demo-wwr-training.hpp)
 
 IF (NOT CMAKE_SYSTEM_NAME MATCHES "Android")
     ADD_EXECUTABLE(GearoenixDemoWorldWideRacing ${GX_DEMO_WORLD_WIDE_RACING_SRC})

@@ -1,8 +1,11 @@
 #include "gx-demo-wwr-garage.hpp"
 #include "gx-demo-wwr-rotating-button.hpp"
+#include "gx-demo-wwr-training.hpp"
 #include <gearoenix/render/scene/rnd-scn-ui.hpp>
+#include <gearoenix/render/scene/rnd-scn-logo.hpp>
 #include <gearoenix/render/camera/rnd-cmr-arc-controller.hpp>
 #include <gearoenix/render/model/rnd-mdl-manager.hpp>
+#include <gearoenix/render/widget/rnd-wdg-button.hpp>
 #include <gearoenix/render/engine/rnd-eng-engine.hpp>
 #include <gearoenix/physics/constraint/phs-cns-manager.hpp>
 #include <gearoenix/physics/constraint/phs-cns-window-placer.hpp>
@@ -43,10 +46,12 @@ void gearoenix::demo::wwr::Garage::initialize_camera() noexcept {
 void gearoenix::demo::wwr::Garage::initialize_buttons() noexcept {
     auto *const cns_mgr = ui_scene->get_e()->get_system_application()->get_asset_manager()->get_constraint_manager();
 
-    shop_button = std::make_unique<RotatingButton>(ui_scene->get_model("button-shop"));
-    multiplayer_button = std::make_unique<RotatingButton>(ui_scene->get_model("button-multiplayer"));
-    tuning_button = std::make_unique<RotatingButton>(ui_scene->get_model("button-tuning"));
-    training_button = std::make_unique<RotatingButton>(ui_scene->get_model("button-training"));
+    shop_button = std::make_unique<RotatingButton>(std::dynamic_pointer_cast<render::widget::Button>(ui_scene->get_model("button-shop")));
+    multiplayer_button = std::make_unique<RotatingButton>(std::dynamic_pointer_cast<render::widget::Button>(ui_scene->get_model("button-multiplayer")));
+    tuning_button = std::make_unique<RotatingButton>(std::dynamic_pointer_cast<render::widget::Button>(ui_scene->get_model("button-tuning")));
+
+    training_button = std::make_unique<RotatingButton>(std::dynamic_pointer_cast<render::widget::Button>(ui_scene->get_model("button-training")));
+    training_button->get_button()->set_on_click([this] { load_training_scene(); });
 
     auto bottom_button = ui_scene->get_model("bottom-garage-buttons");
 
@@ -76,9 +81,32 @@ void gearoenix::demo::wwr::Garage::initialize_buttons() noexcept {
     previous_button_placer->set_height_percentage(0.5);
     previous_button_placer->add_affected(ui_scene->get_model("button-previous"));
     previous_button_placer->set_distance(math::Vec2(0.1, 0.0));
+
+    player_name_placer = cns_mgr->create<physics::constraint::WindowPlacer>();
+    player_name_placer->set_height_percentage(1.0);
+    player_name_placer->add_affected(ui_scene->get_model("text-player-name"));
+    player_name_placer->set_distance(math::Vec2(0.05, -0.05));
+
+    score_placer = cns_mgr->create<physics::constraint::WindowPlacer>();
+    score_placer->set_width_percentage(1.0);
+    score_placer->set_height_percentage(1.0);
+    score_placer->add_affected(ui_scene->get_model("text-money"));
+    score_placer->set_distance(math::Vec2(-0.05, -0.05));
 }
 
-gearoenix::demo::wwr::Garage::Garage(const std::vector <std::shared_ptr<render::scene::Scene>> &scenes) noexcept {
+void gearoenix::demo::wwr::Garage::load_training_scene() noexcept {
+    logo_scene = render::scene::Logo::construct(
+            system_application,
+            { {1.0, "game"} },
+            [this] (const std::vector<std::shared_ptr<render::scene::Scene>>& s) {
+                training = std::make_unique<Training>(s);
+                logo_scene = nullptr;
+            });
+}
+
+gearoenix::demo::wwr::Garage::Garage(const std::vector <std::shared_ptr<render::scene::Scene>> &scenes) noexcept
+    : system_application(scenes[0]->get_e()->get_system_application())
+{
     initialize_scenes(scenes);
     initialize_camera();
     initialize_buttons();

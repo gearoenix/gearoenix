@@ -2,6 +2,7 @@
 #define GEAROENIX_RENDER_SCENE_LOGO_HPP
 #include "../../core/cr-static.hpp"
 #include <functional>
+#include <variant>
 #include <vector>
 
 namespace gearoenix::system {
@@ -30,7 +31,7 @@ class Scene;
 class Logo final {
 public:
     typedef std::function<void(const std::vector<std::shared_ptr<Scene>>&)> FinishCallback;
-    typedef std::vector<std::pair<double, core::Id>> PriorityIds;
+    typedef std::vector<std::pair<double, std::variant<core::Id, std::string>>> PriorityIds;
 
     GX_GET_CREF_PRV(std::shared_ptr<Scene>, logo_scene)
     GX_GET_CREF_PRV(std::vector<std::shared_ptr<Scene>>, next_scenes)

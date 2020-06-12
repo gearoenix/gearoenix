@@ -2,44 +2,42 @@
 #define GEAROENIX_RENDER_SCENE_MANAGER_HPP
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../core/cache/cr-cache-file.hpp"
-#include "../../core/cr-types.hpp"
+#include "../../core/cr-static.hpp"
 #include "../../core/sync/cr-sync-end-caller.hpp"
 #include "rnd-scn-scene.hpp"
 #include <memory>
 
-namespace gearoenix {
-namespace core::sync {
-    class WorkWaiter;
+namespace gearoenix::core::sync {
+class WorkWaiter;
 }
-namespace system::stream {
-    class Stream;
-}
-namespace render {
-    namespace engine {
-        class Engine;
-    }
-    namespace scene {
-        class Manager {
-        protected:
-            engine::Engine* const e;
-            core::cache::File<Scene> cache;
-            const std::shared_ptr<core::sync::WorkWaiter> io_worker;
 
-        public:
-            Manager(std::unique_ptr<system::stream::Stream> s, engine::Engine* e) noexcept;
-            ~Manager() noexcept = default;
-            /// It is gonna load the scene (if exists) in another thread.
-            void get_gx3d(core::Id mid, core::sync::EndCaller<Scene> c) noexcept;
-            /// It is gonna load the scene (if exists) in another thread.
-            void get_gx3d(const std::string& name, const core::sync::EndCaller<Scene>& c) noexcept;
-            /// T must be derived from Scene and have the same constructor that Scene has.
-            template <typename T>
-            typename std::enable_if<std::is_base_of<Scene, T>::value, std::shared_ptr<T>>::type
-            create(core::sync::EndCaller<T>& c) noexcept;
-            [[nodiscard]] const std::map<core::Id, std::weak_ptr<scene::Scene>>& get_scenes() const noexcept;
-        };
-    }
+namespace gearoenix::system::stream {
+class Stream;
 }
+
+namespace gearoenix::render::engine {
+class Engine;
+}
+
+namespace gearoenix::render::scene {
+class Manager {
+    GX_GET_PTRC_PRV(engine::Engine, e)
+    GX_GET_CREF_PRV(core::cache::File<Scene>, cache)
+    GX_GET_UCPTR_PRV(core::sync::WorkWaiter, io_worker)
+
+public:
+    Manager(std::unique_ptr<system::stream::Stream> s, engine::Engine* e) noexcept;
+    ~Manager() noexcept;
+    /// It is gonna load the scene (if exists) in another thread.
+    void get_gx3d(core::Id mid, core::sync::EndCaller<Scene> c) noexcept;
+    /// It is gonna load the scene (if exists) in another thread.
+    void get_gx3d(const std::string& name, const core::sync::EndCaller<Scene>& c) noexcept;
+    /// T must be derived from Scene and have the same constructor that Scene has.
+    template <typename T>
+    typename std::enable_if<std::is_base_of<Scene, T>::value, std::shared_ptr<T>>::type
+    create(core::sync::EndCaller<T>& c) noexcept;
+    [[nodiscard]] const std::map<core::Id, std::weak_ptr<scene::Scene>>& get_scenes() const noexcept;
+};
 }
 
 template <typename T>

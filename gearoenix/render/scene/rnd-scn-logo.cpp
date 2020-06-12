@@ -63,7 +63,8 @@ void gearoenix::render::scene::Logo::on_load(const std::shared_ptr<Scene>& s) no
         if (pi.first >= logo_scene->get_layer()) {
             logo_scene->set_layer(pi.first + 0.1);
         }
-        scn_mgr->get_gx3d(pi.second, core::sync::EndCaller<Scene>([this, priority { pi.first }, end](const std::shared_ptr<Scene>& s) {
+        const auto scene_id = pi.second.index() == 0 ? std::get<core::Id>(pi.second) : scn_mgr->get_cache().get_cacher().get_key(std::get<std::string>(pi.second));
+        scn_mgr->get_gx3d(scene_id, core::sync::EndCaller<Scene>([this, priority { pi.first }, end](const std::shared_ptr<Scene>& s) {
             s->set_layer(priority);
             next_scenes.push_back(s);
         }));

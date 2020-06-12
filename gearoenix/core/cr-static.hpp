@@ -52,7 +52,7 @@ public:                                                                 \
                                     \
 public:                             \
     [[nodiscard]] const t* get_##x() const noexcept { return x; }
-
+#define GX_GET_PTRC_PRV(t, x) GX_GET_PTRC(private, , const, t, x)
 #define GX_GET_PTR(v, c, t, x) \
     GX_GET_PTRC(v, , c, t, x)  \
     [[nodiscard]] t* get_##x() noexcept { return x; }

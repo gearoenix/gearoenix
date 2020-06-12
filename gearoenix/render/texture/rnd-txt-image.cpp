@@ -46,6 +46,7 @@ void gearoenix::render::texture::Image::decode(
     img_width = static_cast<unsigned int>(iw);
     img_height = static_cast<unsigned int>(ih);
     img_channels = static_cast<unsigned int>(chs);
+    chs = requested_channels.has_value() ? static_cast<int>(requested_channels.value()) : chs;
     const auto img_size = static_cast<unsigned int>(img_width * img_height * chs);
     decoded_data.resize(img_size);
     std::memcpy(&(decoded_data[0]), dd, img_size);

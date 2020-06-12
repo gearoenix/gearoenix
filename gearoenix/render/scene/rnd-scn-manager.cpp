@@ -12,6 +12,8 @@ gearoenix::render::scene::Manager::Manager(std::unique_ptr<system::stream::Strea
 {
 }
 
+gearoenix::render::scene::Manager::~Manager() noexcept = default;
+
 void gearoenix::render::scene::Manager::get_gx3d(const core::Id mid, core::sync::EndCaller<Scene> c) noexcept
 {
     GXLOGD("Going to load scene with id: " << mid)

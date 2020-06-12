@@ -9,19 +9,19 @@ namespace gearoenix::physics::animation {
     struct Animation;
 }
 
-namespace gearoenix::render::model {
-    class Model;
+namespace gearoenix::render::widget {
+    class Button;
 }
 
 namespace gearoenix::demo::wwr {
     class RotatingButton final {
-    GX_GET_CREF_PRV(std::shared_ptr<render::model::Model>, button)
+    GX_GET_CREF_PRV(std::shared_ptr<render::widget::Button>, button)
     GX_GET_CREF_PRV(std::vector<std::shared_ptr<physics::animation::Animation>>, animations)
 
     private:
         std::shared_ptr<double> rotation_speed = std::make_shared<double>(0.05);
     public:
-        explicit RotatingButton(std::shared_ptr<render::model::Model> button) noexcept;
+        explicit RotatingButton(std::shared_ptr<render::widget::Button> button) noexcept;
         ~RotatingButton() noexcept;
     };
 }

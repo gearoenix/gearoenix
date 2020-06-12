@@ -12,7 +12,7 @@ gearoenix::demo::wwr::Main::Main(system::Application* const sys_app) noexcept
     render_engine->set_render_tree(tree.get());
     logo_scene = render::scene::Logo::construct(
             system_application,
-            { {0.0, 1024}, { 0.1, 1070} },
+            { {0.0, "garage"}, { 0.1, "garage-main-ui"} },
             [this] (const std::vector<std::shared_ptr<render::scene::Scene>>& s) {
                 garage = std::make_unique<Garage>(s);
                 logo_scene = nullptr;
