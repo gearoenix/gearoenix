@@ -188,13 +188,23 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     const auto resolution = e->get_system_application()->get_configuration().render_config.get_brdflut_resolution();
     if (nullptr != brdflut)
         return brdflut;
+    const auto texture_info = TextureInfo {
+        .format = TextureFormat::RgFloat32,
+        .sample_info = SampleInfo {
+            .wrap_s = Wrap::ClampToEdge,
+            .wrap_t = Wrap::ClampToEdge,
+            .wrap_r = Wrap::ClampToEdge,
+        },
+        .texture_type = Type::Texture2D,
+        .has_mipmap = true
+    };
     {
         const std::unique_ptr<system::stream::Asset> brdf_asset(
             system::stream::Asset::construct(e->get_system_application(), "default-brdflut.png"));
         if (brdf_asset != nullptr) {
             GXLOGD("BRDFLUT asset has been found.")
             const auto data = brdf_asset->get_file_content();
-            brdflut = create_2d(data.data(), data.size(), c);
+            brdflut = create_2d(data.data(), data.size(), c, texture_info.sample_info);
             return brdflut;
         }
     }
@@ -205,13 +215,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
         if (brdf_cached != nullptr) {
             GXLOGD("BRDFLUT baked file has been found.")
             const auto data = brdf_cached->get_file_content();
-            brdflut = create_2d(
-                data.data(), data.size(), c,
-                SampleInfo {
-                    .wrap_s = Wrap::ClampToEdge,
-                    .wrap_t = Wrap::ClampToEdge,
-                    .wrap_r = Wrap::ClampToEdge,
-                });
+            brdflut = create_2d(data.data(), data.size(), c, texture_info.sample_info);
             return brdflut;
         }
     }
@@ -252,18 +256,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     const auto data_size = pixels.size() * sizeof(math::Vec2<float>);
     std::vector<std::uint8_t> data(data_size);
     std::memcpy(data.data(), reinterpret_cast<const std::uint8_t*>(pixels.data()), data_size);
-    brdflut = create_2d(
-        { data },
-        TextureInfo {
-            .format = TextureFormat::RgFloat32,
-            .sample_info = SampleInfo {
-                .wrap_s = Wrap::ClampToEdge,
-                .wrap_t = Wrap::ClampToEdge,
-                .wrap_r = Wrap::ClampToEdge,
-            },
-            .texture_type = Type::Texture2D,
-            .has_mipmap = true },
-        resolution, resolution, c);
+    brdflut = create_2d({ data }, texture_info, resolution, resolution, c);
     return brdflut;
 }
 
