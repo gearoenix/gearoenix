@@ -7,6 +7,8 @@ SET(GX_DEMO_WORLD_WIDE_RACING_SRC
         gx-demo-wwr-main.hpp
         gx-demo-wwr-rotating-button.cpp
         gx-demo-wwr-rotating-button.hpp
+        gx-demo-wwr-terrain-manager.cpp
+        gx-demo-wwr-terrain-manager.hpp
         gx-demo-wwr-training.cpp
         gx-demo-wwr-training.hpp)
 
