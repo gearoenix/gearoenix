@@ -30,8 +30,10 @@ public:
 public:
     Pbr(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept;
     Pbr(system::stream::Stream* f, engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept;
+    Pbr(const Pbr& o) noexcept;
     ~Pbr() noexcept final;
     void update() noexcept final;
+    [[nodiscard]] Material* clone() const noexcept final;
     void set_metallic_factor(float f) noexcept;
     void set_roughness_factor(float f) noexcept;
     void set_color(std::uint32_t code, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept;

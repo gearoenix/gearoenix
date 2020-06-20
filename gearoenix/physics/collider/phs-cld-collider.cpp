@@ -14,6 +14,29 @@ void gearoenix::physics::collider::Collider::update_box() noexcept
     updated_box.update();
 }
 
+gearoenix::physics::collider::Collider::Collider(const Type t) noexcept
+    : collider_type(t)
+{
+}
+
+gearoenix::physics::collider::Collider::Collider(const Type t, const Collider& c) noexcept
+    : collider_type(t)
+    , origin_box(c.origin_box)
+    , updated_box(c.updated_box)
+    , model_matrix(c.model_matrix)
+    , parent(c.parent)
+{
+}
+
+gearoenix::physics::collider::Collider::Collider(const Collider& c) noexcept
+    : collider_type(c.collider_type)
+    , origin_box(c.origin_box)
+    , updated_box(c.updated_box)
+    , model_matrix(c.model_matrix)
+    , parent(c.parent)
+{
+}
+
 gearoenix::physics::collider::Collider* gearoenix::physics::collider::Collider::read(system::stream::Stream* const f) noexcept
 {
     switch (f->read<Type>()) {
@@ -39,6 +62,11 @@ bool gearoenix::physics::collider::Collider::check_intersection(const math::Aabb
 gearoenix::math::IntersectionStatus gearoenix::physics::collider::Collider::check_intersection_status(const math::Aabb3& box) const noexcept
 {
     return updated_box.check_intersection_status(box);
+}
+
+gearoenix::physics::collider::Collider* gearoenix::physics::collider::Collider::clone() const noexcept
+{
+    GX_UNIMPLEMENTED // It's never going to be implemented, the inherited class must do it.
 }
 
 void gearoenix::physics::collider::Collider::put_in_box(const math::Aabb3& b) noexcept

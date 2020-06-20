@@ -37,6 +37,7 @@ public:
     ~Mesh() noexcept;
 
     void update() noexcept;
+    [[nodiscard]] Mesh* clone() const noexcept;
 };
 }
 #endif

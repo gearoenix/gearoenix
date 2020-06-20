@@ -36,6 +36,7 @@ class Material {
 protected:
     engine::Engine* const e;
     Material(Type t, engine::Engine* e, std::size_t uniform_size) noexcept;
+    Material(const Material& o) noexcept;
 
     [[nodiscard]] static float read_alpha(system::stream::Stream* f) noexcept;
     [[nodiscard]] std::pair<std::shared_ptr<texture::Texture2D>, std::optional<math::Vec4<float>>> read_t2d_v4(
@@ -48,7 +49,8 @@ protected:
 public:
     virtual ~Material() noexcept;
     virtual void update() noexcept = 0;
-    static Material* read(system::stream::Stream* f, engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept;
+    [[nodiscard]] static Material* read(system::stream::Stream* f, engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept;
+    [[nodiscard]] virtual Material* clone() const noexcept;
 };
 }
 #endif

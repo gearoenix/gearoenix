@@ -17,3 +17,7 @@ gearoenix::render::model::Dynamic::Dynamic(
     : Model(my_id, Type::Dynamic, e, c)
 {
 }
+
+gearoenix::render::model::Dynamic::Dynamic(const Dynamic& o) noexcept
+    : Model(o)
+{}

@@ -14,6 +14,12 @@ gearoenix::render::material::Material::Material(const Type t, engine::Engine* co
 {
 }
 
+gearoenix::render::material::Material::Material(const Material& o) noexcept
+    : material_type(o.material_type)
+    , uniform_buffers(new buffer::FramedUniform(o.uniform_buffers->get_buffer()->get_buffer_size(), o.e))
+    , e(o.e)
+{}
+
 float gearoenix::render::material::Material::read_alpha(system::stream::Stream* const f) noexcept
 {
     if (f->read_bool()) {
@@ -90,4 +96,9 @@ gearoenix::render::material::Material* gearoenix::render::material::Material::re
     default:
         GX_UNEXPECTED
     }
+}
+
+gearoenix::render::material::Material* gearoenix::render::material::Material::clone() const noexcept
+{
+    GX_UNIMPLEMENTED
 }

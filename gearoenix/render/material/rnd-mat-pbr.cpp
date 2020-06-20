@@ -48,11 +48,31 @@ gearoenix::render::material::Pbr::Pbr(system::stream::Stream* const f, engine::E
     irradiance = radiance = txt_mgr->get_cube_zero_3c(call_txt_cube).get();
 }
 
+gearoenix::render::material::Pbr::Pbr(const Pbr& o) noexcept
+    : Material(o)
+    , color_texture(o.color_texture)
+    , color_value(o.color_value)
+    , emission_texture(o.emission_texture)
+    , emission_value(o.emission_value)
+    , metallic_roughness_texture(o.metallic_roughness_texture)
+    , metallic_roughness_value(o.metallic_roughness_value)
+    , normal_texture(o.normal_texture)
+    , normal_value(o.normal_value)
+    , irradiance(o.irradiance)
+    , radiance(o.radiance)
+    , uniform(o.uniform)
+{}
+
 gearoenix::render::material::Pbr::~Pbr() noexcept = default;
 
 void gearoenix::render::material::Pbr::Pbr::update() noexcept
 {
     uniform_buffers->update(uniform);
+}
+
+gearoenix::render::material::Material* gearoenix::render::material::Pbr::clone() const noexcept
+{
+    return new Pbr(*this);
 }
 
 void gearoenix::render::material::Pbr::set_metallic_factor(const float f) noexcept

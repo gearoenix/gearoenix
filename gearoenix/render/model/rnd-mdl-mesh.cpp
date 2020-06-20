@@ -32,3 +32,8 @@ void gearoenix::render::model::Mesh::update() noexcept
 {
     mat->update();
 }
+
+gearoenix::render::model::Mesh* gearoenix::render::model::Mesh::clone() const noexcept
+{
+    return new Mesh(msh, std::shared_ptr<material::Material>(mat->clone()));
+}

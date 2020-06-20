@@ -80,6 +80,7 @@ protected:
         Type t,
         engine::Engine* e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+    Model(const Model& o) noexcept;
 
     void set_reflection(texture::TextureCube* irradiance, texture::TextureCube* radiance) noexcept;
 
@@ -97,6 +98,7 @@ public:
     [[nodiscard]] virtual bool get_dynamicity() const noexcept = 0;
     Model* get_root() noexcept;
     const Model* get_root() const noexcept;
+    [[nodiscard]] virtual Model* clone() const noexcept;
 };
 }
 #endif

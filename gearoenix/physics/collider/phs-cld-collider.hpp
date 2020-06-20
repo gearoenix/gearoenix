@@ -32,19 +32,9 @@ protected:
 
     void update_box() noexcept;
 
-    explicit Collider(const Type t) noexcept
-        : collider_type(t)
-    {
-    }
-
-    Collider(const Type t, const Collider& c) noexcept
-        : collider_type(t)
-        , origin_box(c.origin_box)
-        , updated_box(c.updated_box)
-        , model_matrix(c.model_matrix)
-        , parent(c.parent)
-    {
-    }
+    explicit Collider(const Type t) noexcept;
+    Collider(const Type t, const Collider& c) noexcept;
+    Collider(const Collider& c) noexcept;
 
 public:
     ~Collider() noexcept override = default;
@@ -54,6 +44,7 @@ public:
     [[nodiscard]] virtual std::optional<double> hit(const math::Ray3& r, double d_min) const noexcept;
     [[nodiscard]] virtual bool check_intersection(const math::Aabb3& box) const noexcept;
     [[nodiscard]] virtual math::IntersectionStatus check_intersection_status(const math::Aabb3& box) const noexcept;
+    [[nodiscard]] virtual Collider* clone() const noexcept;
     void put_in_box(const math::Aabb3& b) noexcept;
 
     [[nodiscard]] math::Vec3<double> get_location() const noexcept override;

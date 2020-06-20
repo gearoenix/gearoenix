@@ -68,6 +68,31 @@ gearoenix::render::model::Model::Model(
     collider->set_parent(this);
 }
 
+gearoenix::render::model::Model::Model(const Model& o) noexcept
+    : core::asset::Asset(o.asset_id, core::asset::Type::Model)
+    , model_type(o.model_type)
+    , collider(o.collider->clone())
+    , transformation(new Transformation(this))
+    , uniform_buffers(new buffer::FramedUniform(static_cast<unsigned int>(sizeof(math::Mat4x4<float>)), o.e))
+    , has_shadow_caster(o.has_shadow_caster)
+    , has_transparent(o.has_transparent)
+    , enabled(o.enabled)
+    , parent(o.parent)
+    , scene(o.scene)
+    , e(o.e)
+    , latest_frame_update(o.latest_frame_update)
+    , hooked_reflection(o.hooked_reflection)
+    , colliding_reflection(o.colliding_reflection)
+{
+    for (const auto& [id, msh] : o.meshes) {
+        meshes[id] = std::shared_ptr<Mesh>(msh->clone());
+    }
+
+    for(const auto& [id, mdl] : o.children) {
+        children[id] = std::shared_ptr<Model>(mdl->clone());
+    }
+}
+
 void gearoenix::render::model::Model::set_reflection(texture::TextureCube* const irradiance, texture::TextureCube* const radiance) noexcept
 {
     for (const auto& msh : meshes) {
@@ -180,4 +205,9 @@ const gearoenix::render::model::Model* gearoenix::render::model::Model::get_root
     if (parent == nullptr)
         return this;
     return parent->get_root();
+}
+
+gearoenix::render::model::Model* gearoenix::render::model::Model::clone() const noexcept
+{
+    GX_UNIMPLEMENTED
 }
