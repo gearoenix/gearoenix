@@ -1,7 +1,4 @@
 #include "phs-cld-collider.hpp"
-#include "../../system/stream/sys-stm-stream.hpp"
-#include "../../system/sys-log.hpp"
-#include "../phs-transformation.hpp"
 #include "phs-cld-mesh.hpp"
 
 void gearoenix::physics::collider::Collider::update_box() noexcept
@@ -28,14 +25,7 @@ gearoenix::physics::collider::Collider::Collider(const Type t, const Collider& c
 {
 }
 
-gearoenix::physics::collider::Collider::Collider(const Collider& c) noexcept
-    : collider_type(c.collider_type)
-    , origin_box(c.origin_box)
-    , updated_box(c.updated_box)
-    , model_matrix(c.model_matrix)
-    , parent(c.parent)
-{
-}
+gearoenix::physics::collider::Collider::Collider(const Collider& c) noexcept = default;
 
 gearoenix::physics::collider::Collider* gearoenix::physics::collider::Collider::read(system::stream::Stream* const f) noexcept
 {

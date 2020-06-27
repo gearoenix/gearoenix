@@ -1,7 +1,10 @@
 #include "gx-demo-wwr-training.hpp"
 #include "gx-demo-wwr-rotating-button.hpp"
+#include "gx-demo-wwr-terrain-manager.hpp"
+#include <gearoenix/render/scene/rnd-scn-game.hpp>
 #include <gearoenix/render/scene/rnd-scn-ui.hpp>
 #include <gearoenix/render/camera/rnd-cmr-camera.hpp>
+#include <gearoenix/render/camera/rnd-cmr-arc-controller.hpp>
 #include <gearoenix/render/camera/rnd-cmr-transformation.hpp>
 #include <gearoenix/render/model/rnd-mdl-manager.hpp>
 #include <gearoenix/render/engine/rnd-eng-engine.hpp>
@@ -19,10 +22,10 @@ void gearoenix::demo::wwr::Training::initialize_scenes(
     for(const auto& s: scenes) {
         switch (s->get_scene_type()) {
             case render::scene::Type::Game:
-                game_scene = s;
+                game_scene = std::dynamic_pointer_cast<render::scene::Game>(s);
                 break;
             case render::scene::Type::Ui:
-                ui_scene = s;
+                ui_scene = std::dynamic_pointer_cast<render::scene::Ui>(s);
                 break;
             default:
             GX_UNEXPECTED
@@ -31,14 +34,14 @@ void gearoenix::demo::wwr::Training::initialize_scenes(
 }
 
 void gearoenix::demo::wwr::Training::initialize_camera() noexcept {
-    // cam_ctrl = std::make_unique<render::camera::ArcController>(game_scene->get_cameras().begin()->second);
-    // cam_ctrl->set_max_vertical_angle(0.8);
-    // cam_ctrl->set_min_vertical_angle(0.2);
-    // cam_ctrl->set_vertical_angle(0.4);
-    // cam_ctrl->set_max_distance(6.0);
-    // cam_ctrl->set_min_distance(4.0);
-    // cam_ctrl->set_distance(5.0);
-    // cam_ctrl->set_target(math::Vec3(0.0, 0.0, 0.0));
+     cam_ctrl = std::make_unique<render::camera::ArcController>(game_scene->get_cameras().begin()->second);
+     cam_ctrl->set_max_vertical_angle(0.8);
+     cam_ctrl->set_min_vertical_angle(0.2);
+     cam_ctrl->set_vertical_angle(0.4);
+     cam_ctrl->set_max_distance(6.0);
+     cam_ctrl->set_min_distance(4.0);
+     cam_ctrl->set_distance(5.0);
+     cam_ctrl->set_target(math::Vec3(0.0, 0.0, 0.0));
 }
 
 void gearoenix::demo::wwr::Training::initialize_buttons() noexcept {
@@ -99,11 +102,16 @@ void gearoenix::demo::wwr::Training::initialize_cars() noexcept {
         math::Vec3(0.0, 0.0, 1.0));
 }
 
+void gearoenix::demo::wwr::Training::initialize_terrain() noexcept {
+    terrain_manager = std::make_unique<TerrainManager>(game_scene);
+}
+
 gearoenix::demo::wwr::Training::Training(const std::vector <std::shared_ptr<render::scene::Scene>> &scenes) noexcept {
     initialize_scenes(scenes);
     initialize_camera();
     initialize_buttons();
-    initialize_cars();
+//    initialize_cars();
+    initialize_terrain();
 }
 
 gearoenix::demo::wwr::Training::~Training() noexcept = default;

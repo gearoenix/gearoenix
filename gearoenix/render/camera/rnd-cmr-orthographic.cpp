@@ -67,9 +67,10 @@ void gearoenix::render::camera::Orthographic::update_cascades() noexcept
 
 gearoenix::render::camera::Orthographic::Orthographic(
     const core::Id my_id,
+    std::string name,
     system::stream::Stream* const f,
     engine::Engine* const e) noexcept
-    : Camera(my_id, f, e)
+    : Camera(my_id, std::move(name), f, e)
 {
     reinterpret_cast<Transformation*>(transformation.get())->set_on_frustum_update([this] { update_cascades(); });
     aspects_size = static_cast<double>(f->read<float>()) / 4.0;
@@ -77,8 +78,11 @@ gearoenix::render::camera::Orthographic::Orthographic(
     update_aspects_size();
 }
 
-gearoenix::render::camera::Orthographic::Orthographic(core::Id my_id, engine::Engine* e) noexcept
-    : Camera(my_id, e)
+gearoenix::render::camera::Orthographic::Orthographic(
+    core::Id my_id,
+    std::string name,
+    engine::Engine* e) noexcept
+    : Camera(my_id, std::move(name), e)
     , aspects_size(1.0f)
 {
     reinterpret_cast<Transformation*>(transformation.get())->set_on_frustum_update([this] { update_cascades(); });

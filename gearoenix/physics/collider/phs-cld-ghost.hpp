@@ -9,8 +9,14 @@ public:
         : Collider(Type::Ghost)
     {
     }
+    Ghost(const Ghost& o) noexcept = default;
     ~Ghost() noexcept final = default;
     [[nodiscard]] std::optional<double> hit(const math::Ray3&, double) const noexcept final { return std::nullopt; }
+
+    [[nodiscard]] Collider* clone() const noexcept final
+    {
+        return new Ghost(*this);
+    }
 };
 }
 #endif

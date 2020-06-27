@@ -15,10 +15,12 @@ template <class T, class Key = Id, class Compare = std::less<Key>>
 class Cacher {
 public:
     typedef std::map<Key, std::weak_ptr<T>, Compare> CacheMap;
-    typedef std::map<std::string, Key> NameMap;
+    typedef std::map<std::string, Key> NameKeyMap;
+    typedef std::map<Key, std::string> KeyNameMap;
 
     GX_GET_REF_PRV(CacheMap, cacheds)
-    GX_GET_CREF_PRV(NameMap, name_to_key)
+    GX_GET_CREF_PRV(NameKeyMap, name_to_key)
+    GX_GET_CREF_PRV(KeyNameMap, key_to_name)
 public:
     template <class C>
     std::shared_ptr<C> get(const std::string& name, const std::function<std::shared_ptr<C>()>& new_fun) noexcept;
@@ -30,6 +32,7 @@ public:
     std::shared_ptr<C> get(const Key& id) const noexcept;
     void register_name(const std::string& name, const Key& k) noexcept;
     Key get_key(const std::string& name) const noexcept;
+    std::optional<Key> try_get_key(const std::string& name) const noexcept;
 };
 }
 
@@ -48,6 +51,8 @@ std::shared_ptr<C> gearoenix::core::cache::Cacher<T, Key, Compare>::get(const Ke
     if (search == cacheds.end()) {
         auto new_item = new_fun();
         cacheds[id] = new_item;
+        if (key_to_name.find(id) == key_to_name.end())
+            register_name(new_item->get_name(), id);
         return new_item;
     }
     auto& found = search->second;
@@ -96,6 +101,7 @@ void gearoenix::core::cache::Cacher<T, Key, Compare>::register_name(const std::s
     }
 #endif
     name_to_key.emplace(name, k);
+    key_to_name.emplace(k, name);
 }
 
 template <class T, class Key, class Compare>
@@ -106,4 +112,15 @@ Key gearoenix::core::cache::Cacher<T, Key, Compare>::get_key(const std::string& 
         GXLOGF("Object with name: " << name << "not found.")
     return search->second;
 }
+
+template <class T, class Key, class Compare>
+std::optional<Key>
+gearoenix::core::cache::Cacher<T, Key, Compare>::try_get_key(const std::string& name) const noexcept
+{
+    const auto search = name_to_key.find(name);
+    if (search == name_to_key.end())
+        return std::nullopt;
+    return search->second;
+}
+
 #endif

@@ -4,26 +4,23 @@
 #include "../../core/cr-types.hpp"
 #include "../../core/sync/cr-sync-end-caller.hpp"
 #include "rnd-fnt-type.hpp"
-namespace gearoenix {
-namespace system {
-    namespace stream {
-        class Stream;
-    }
-}
-namespace render {
-    namespace engine {
-        class Engine;
-    }
-    namespace font {
-        class Font {
-        protected:
-            const Type::Id font_type_id;
-            Font(const core::Id my_id, const Type::Id t) noexcept;
 
-        public:
-            virtual ~Font() noexcept;
-        };
-    }
+namespace gearoenix::system::stream {
+class Stream;
 }
+
+namespace gearoenix::render::engine {
+class Engine;
+}
+
+namespace gearoenix::render::font {
+class Font : public core::asset::Asset {
+protected:
+    const Type::Id font_type_id;
+    Font(core::Id my_id, std::string name, Type::Id t) noexcept;
+
+public:
+    ~Font() noexcept override;
+};
 }
 #endif

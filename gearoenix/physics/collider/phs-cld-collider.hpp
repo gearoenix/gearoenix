@@ -32,8 +32,8 @@ protected:
 
     void update_box() noexcept;
 
-    explicit Collider(const Type t) noexcept;
-    Collider(const Type t, const Collider& c) noexcept;
+    explicit Collider(Type t) noexcept;
+    Collider(Type t, const Collider& c) noexcept;
     Collider(const Collider& c) noexcept;
 
 public:

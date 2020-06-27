@@ -69,7 +69,7 @@ gearoenix::render::model::Model::Model(
 }
 
 gearoenix::render::model::Model::Model(const Model& o) noexcept
-    : core::asset::Asset(o.asset_id, core::asset::Type::Model)
+    : core::asset::Asset(core::asset::Manager::create_id(), core::asset::Type::Model)
     , model_type(o.model_type)
     , collider(o.collider->clone())
     , transformation(new Transformation(this))
@@ -88,7 +88,7 @@ gearoenix::render::model::Model::Model(const Model& o) noexcept
         meshes[id] = std::shared_ptr<Mesh>(msh->clone());
     }
 
-    for(const auto& [id, mdl] : o.children) {
+    for (const auto& [id, mdl] : o.children) {
         children[id] = std::shared_ptr<Model>(mdl->clone());
     }
 }

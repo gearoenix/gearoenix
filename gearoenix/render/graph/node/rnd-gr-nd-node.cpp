@@ -6,6 +6,7 @@
 #include "../../sync/rnd-sy-semaphore.hpp"
 
 gearoenix::render::graph::node::Node::Node(
+    std::string name,
     const Type t,
     engine::Engine* const e,
     const pipeline::Type pipeline_type_id,
@@ -14,7 +15,7 @@ gearoenix::render::graph::node::Node::Node(
     const std::vector<std::string>& input_links,
     const std::vector<std::string>& output_links,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
-    : core::graph::Node(input_links, output_links)
+    : core::graph::Node(std::move(name), input_links, output_links)
     , render_node_type(t)
     , e(e)
 {

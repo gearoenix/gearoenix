@@ -15,8 +15,12 @@ void gearoenix::render::light::Point::update_influence_area() noexcept
     position_max_radius.w = mxc;
 }
 
-gearoenix::render::light::Point::Point(const core::Id my_id, system::stream::Stream* const f, engine::Engine* const e) noexcept
-    : Light(my_id, f, e, Type::Point)
+gearoenix::render::light::Point::Point(
+    const core::Id my_id,
+    std::string name,
+    system::stream::Stream* const f,
+    engine::Engine* const e) noexcept
+    : Light(my_id, std::move(name), f, e, Type::Point)
 {
     f->read(position_max_radius.x);
     f->read(position_max_radius.y);

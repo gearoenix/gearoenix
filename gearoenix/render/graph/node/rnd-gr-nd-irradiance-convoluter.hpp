@@ -57,7 +57,12 @@ private:
     void record(IrradianceConvoluterKernel* kernel) noexcept;
 
 public:
-    IrradianceConvoluter(const math::Mat4x4<float>& mvp, const texture::TextureCube* environment, engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
+    IrradianceConvoluter(
+        std::string name,
+        const math::Mat4x4<float>& mvp,
+        const texture::TextureCube* environment,
+        engine::Engine* e,
+        const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
     ~IrradianceConvoluter() noexcept final;
     void update() noexcept final;
     void record(unsigned int kernel_index) noexcept final;

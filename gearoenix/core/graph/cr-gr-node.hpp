@@ -13,10 +13,10 @@ protected:
     std::map<std::string, unsigned int> output_links_string_index;
     std::vector<std::pair<Node*, unsigned int>> input_links_providers_links;
     std::vector<std::map<std::pair<core::Id, unsigned int>, Node*>> output_links_consumers_links;
-    Node(const std::vector<std::string>& input_links, const std::vector<std::string>& output_links) noexcept;
+    Node(std::string name, const std::vector<std::string>& input_links, const std::vector<std::string>& output_links) noexcept;
 
 public:
-    virtual ~Node() noexcept = default;
+    ~Node() noexcept override;
     virtual void set_provider(unsigned int input_link_index, Node* o, unsigned int provider_output_link_index) noexcept;
     virtual void clear_provider(unsigned int input_link_index) noexcept;
     virtual void set_providers_count(std::size_t count) noexcept;

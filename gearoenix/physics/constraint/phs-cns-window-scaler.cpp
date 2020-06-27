@@ -23,8 +23,8 @@ void gearoenix::physics::constraint::WindowScaler::update() noexcept
     update_chained_constraints();
 }
 
-gearoenix::physics::constraint::WindowScaler::WindowScaler(const core::Id id, render::engine::Engine* const e) noexcept
-    : Constraint(id, Type::WindowScaler)
+gearoenix::physics::constraint::WindowScaler::WindowScaler(const core::Id id, std::string name, render::engine::Engine* const e) noexcept
+    : Constraint(id, Type::WindowScaler, std::move(name))
     , event_engine(e->get_system_application()->get_event_engine())
 {
 }

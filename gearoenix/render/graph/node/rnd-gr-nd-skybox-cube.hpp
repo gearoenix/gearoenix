@@ -68,7 +68,10 @@ private:
     void record_sky(const skybox::Cube* sky, const SkyboxCubeUniform& u, SkyboxCubeKernel* kernel) noexcept;
 
 public:
-    SkyboxCube(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
+    SkyboxCube(
+        std::string name,
+        engine::Engine* e,
+        const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
     ~SkyboxCube() noexcept final;
     void update() noexcept final;
     void set_camera(const camera::Camera* cam) noexcept;

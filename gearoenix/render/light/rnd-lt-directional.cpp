@@ -2,14 +2,21 @@
 #include "../buffer/rnd-buf-framed-uniform.hpp"
 #include "../scene/rnd-scn-scene.hpp"
 
-gearoenix::render::light::Directional::Directional(const core::Id my_id, system::stream::Stream* const f, engine::Engine* const e) noexcept
-    : Light(my_id, f, e, Type::Directional)
+gearoenix::render::light::Directional::Directional(
+    const core::Id my_id,
+    std::string name,
+    system::stream::Stream* const f,
+    engine::Engine* const e) noexcept
+    : Light(my_id, std::move(name), f, e, Type::Directional)
 {
     direction.read(f);
 }
 
-gearoenix::render::light::Directional::Directional(const core::Id my_id, engine::Engine* const e) noexcept
-    : Light(my_id, e, Type::Directional)
+gearoenix::render::light::Directional::Directional(
+    const core::Id my_id,
+    std::string name,
+    engine::Engine* const e) noexcept
+    : Light(my_id, std::move(name), e, Type::Directional)
     , direction(0.0f, 0.0f, -1.0f)
 {
 }

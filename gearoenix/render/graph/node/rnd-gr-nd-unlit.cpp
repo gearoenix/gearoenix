@@ -65,9 +65,11 @@ void gearoenix::render::graph::node::Unlit::record(
 }
 
 gearoenix::render::graph::node::Unlit::Unlit(
+    std::string name,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
     : Node(
+        std::move(name),
         Type::Unlit,
         e,
         pipeline::Type::Unlit,

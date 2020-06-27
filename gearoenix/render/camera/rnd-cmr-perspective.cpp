@@ -1,5 +1,4 @@
 #include "rnd-cmr-perspective.hpp"
-#include "../../core/event/cr-ev-event.hpp"
 #include "../../physics/collider/phs-cld-frustum.hpp"
 #include "../../system/sys-app.hpp"
 #include "../engine/rnd-eng-engine.hpp"
@@ -110,9 +109,10 @@ void gearoenix::render::camera::Perspective::update_projection() noexcept
 
 gearoenix::render::camera::Perspective::Perspective(
     const core::Id my_id,
+    std::string name,
     system::stream::Stream* const f,
     engine::Engine* const e) noexcept
-    : Camera(my_id, f, e)
+    : Camera(my_id, std::move(name), f, e)
 {
     reinterpret_cast<Transformation*>(transformation.get())->set_on_frustum_update([this] { update_cascades(); });
     reinterpret_cast<Transformation*>(transformation.get())->set_on_projection_update([this] { update_projection(); });
@@ -123,8 +123,9 @@ gearoenix::render::camera::Perspective::Perspective(
 
 gearoenix::render::camera::Perspective::Perspective(
     const core::Id my_id,
+    std::string name,
     engine::Engine* const e) noexcept
-    : Camera(my_id, e)
+    : Camera(my_id, std::move(name), e)
 {
     reinterpret_cast<Transformation*>(transformation.get())->set_on_frustum_update([this] { update_cascades(); });
     reinterpret_cast<Transformation*>(transformation.get())->set_on_projection_update([this] { update_projection(); });

@@ -47,10 +47,13 @@ void gearoenix::render::graph::node::IrradianceConvoluter::record(IrradianceConv
 }
 
 gearoenix::render::graph::node::IrradianceConvoluter::IrradianceConvoluter(
-    const math::Mat4x4<float>& mvp, const texture::TextureCube* environment,
+    std::string name,
+    const math::Mat4x4<float>& mvp,
+    const texture::TextureCube* environment,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
     : Node(
+        std::move(name),
         Type::IrradianceConvoluter,
         e,
         pipeline::Type::IrradianceConvoluter,

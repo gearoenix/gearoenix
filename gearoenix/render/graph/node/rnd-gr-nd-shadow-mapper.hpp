@@ -81,7 +81,7 @@ private:
     ShadowMapperFrame* frame = nullptr;
 
 public:
-    ShadowMapper(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
+    ShadowMapper(std::string name, engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
     ~ShadowMapper() noexcept final;
     /// This will be called at the start of each frame
     void update() noexcept final;

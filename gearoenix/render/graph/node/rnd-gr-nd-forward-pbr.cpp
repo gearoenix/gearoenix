@@ -72,8 +72,11 @@ void gearoenix::render::graph::node::ForwardPbr::record(
 }
 
 gearoenix::render::graph::node::ForwardPbr::ForwardPbr(
-    engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
+    std::string name,
+    engine::Engine* e,
+    const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
     : Node(
+        std::move(name),
         Type::ForwardPbr,
         e,
         pipeline::Type::ForwardPbr,

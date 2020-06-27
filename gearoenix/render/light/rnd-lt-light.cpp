@@ -21,10 +21,11 @@ void gearoenix::render::light::Light::add_to_shadow_cascaders() const noexcept
 
 gearoenix::render::light::Light::Light(
     const core::Id my_id,
+    std::string name,
     system::stream::Stream* const f,
     engine::Engine* const e,
     const Type light_type) noexcept
-    : core::asset::Asset(my_id, core::asset::Type::Light)
+    : core::asset::Asset(my_id, core::asset::Type::Light, std::move(name))
     , light_type(light_type)
     , e(e)
 {
@@ -32,8 +33,12 @@ gearoenix::render::light::Light::Light(
     shadow_enabled = f->read_bool();
 }
 
-gearoenix::render::light::Light::Light(const core::Id my_id, engine::Engine* const e, const Type light_type) noexcept
-    : core::asset::Asset(my_id, core::asset::Type::Light)
+gearoenix::render::light::Light::Light(
+    const core::Id my_id,
+    std::string name,
+    engine::Engine* const e,
+    const Type light_type) noexcept
+    : core::asset::Asset(my_id, core::asset::Type::Light, std::move(name))
     , light_type(light_type)
     , e(e)
 {

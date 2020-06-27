@@ -46,7 +46,7 @@ private:
     void record(MipmapGeneratorKernel* kernel) noexcept;
 
 public:
-    MipmapGenerator(texture::Texture* base_texture, engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
+    MipmapGenerator(std::string name, texture::Texture* base_texture, engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
     ~MipmapGenerator() noexcept final;
     void update() noexcept final;
     void record(unsigned int kernel_index) noexcept final;

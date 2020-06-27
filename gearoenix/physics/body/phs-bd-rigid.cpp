@@ -1,18 +1,18 @@
 #include "phs-bd-rigid.hpp"
 
-gearoenix::physics::body::Rigid::Rigid(const core::Id id, const std::shared_ptr<Transferable>& body_obj)
-    : Body(id, Behaviour::RIGID, body_obj)
+gearoenix::physics::body::Rigid::Rigid(const core::Id id, std::string name, const std::shared_ptr<Transferable>& body_obj) noexcept
+    : Body(id, std::move(name), Behaviour::RIGID, body_obj)
 {
 }
 
-gearoenix::physics::body::Rigid::~Rigid() = default;
+gearoenix::physics::body::Rigid::~Rigid() noexcept = default;
 
-void gearoenix::physics::body::Rigid::apply_force_on_origin(const math::Vec3<double>& f)
+void gearoenix::physics::body::Rigid::apply_force_on_origin(const math::Vec3<double>& f) noexcept
 {
     force += f;
 }
 
-void gearoenix::physics::body::Rigid::apply_time(const double delta_time)
+void gearoenix::physics::body::Rigid::apply_time(const double delta_time) noexcept
 {
     const auto hdt = delta_time * 0.5;
     const auto acc = (force + (speed * air_friction)) * inverted_mass;

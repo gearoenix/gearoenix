@@ -61,7 +61,8 @@ gearoenix::render::material::Pbr::Pbr(const Pbr& o) noexcept
     , irradiance(o.irradiance)
     , radiance(o.radiance)
     , uniform(o.uniform)
-{}
+{
+}
 
 gearoenix::render::material::Pbr::~Pbr() noexcept = default;
 

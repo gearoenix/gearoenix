@@ -62,6 +62,7 @@ private:
 
 public:
     RadianceConvoluter(
+        std::string name,
         float roughness,
         float resolution,
         const mesh::Mesh* msh,

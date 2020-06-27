@@ -29,13 +29,13 @@ private:
     const std::shared_ptr<render::scene::Game> scene;
     const std::shared_ptr<render::model::Dynamic> asphalt_piece;
     const std::shared_ptr<render::camera::Camera> camera;
-    const std::shared_ptr<render::model::Dynamic> asphalt_pieces[2];
+    const std::shared_ptr<render::model::Dynamic> asphalt_pieces[ground_pieces_count];
     physics::Transformation *const camera_tran;
 
     void update() noexcept;
 
     public:
-    TerrainManager(std::shared_ptr<render::scene::Game> scene) noexcept;
+    explicit TerrainManager(std::shared_ptr<render::scene::Game> scene) noexcept;
     ~TerrainManager() noexcept;
 
 };

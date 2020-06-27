@@ -13,7 +13,7 @@
 #include "rnd-cmr-transformation.hpp"
 
 #define GX_CAMERA_INIT                                                                                                                                                \
-    core::asset::Asset(my_id, core::asset::Type::Camera),                                                                                                             \
+    core::asset::Asset(my_id, core::asset::Type::Camera, std::move(name)),                                                                                            \
         frustum_collider(new physics::collider::Frustum()),                                                                                                           \
         uniform_buffers(new buffer::FramedUniform(sizeof(Uniform), e)),                                                                                               \
         cascaded_shadow_frustum_partitions(static_cast<std::size_t>(e->get_system_application()->get_configuration().render_config.get_shadow_cascades_count()) + 1), \
@@ -30,7 +30,7 @@ void gearoenix::render::camera::Camera::initialize() noexcept
     sys_app->get_event_engine()->add_listener(core::event::Id::SystemWindowSizeChange, 1.0f, this);
 }
 
-gearoenix::render::camera::Camera::Camera(const core::Id my_id, engine::Engine* const e) noexcept
+gearoenix::render::camera::Camera::Camera(const core::Id my_id, std::string name, engine::Engine* const e) noexcept
     : GX_CAMERA_INIT
 {
     initialize();
@@ -38,6 +38,7 @@ gearoenix::render::camera::Camera::Camera(const core::Id my_id, engine::Engine* 
 
 gearoenix::render::camera::Camera::Camera(
     const core::Id my_id,
+    std::string name,
     system::stream::Stream* const f,
     engine::Engine* const e) noexcept
     : GX_CAMERA_INIT

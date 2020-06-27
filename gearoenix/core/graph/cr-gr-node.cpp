@@ -1,8 +1,8 @@
 #include "cr-gr-node.hpp"
 #include "../asset/cr-asset-manager.hpp"
 
-gearoenix::core::graph::Node::Node(const std::vector<std::string>& input_links, const std::vector<std::string>& output_links) noexcept
-    : asset::Asset(asset::Manager::create_id(), asset::Type::Node)
+gearoenix::core::graph::Node::Node(std::string n, const std::vector<std::string>& input_links, const std::vector<std::string>& output_links) noexcept
+    : asset::Asset(asset::Manager::create_id(), asset::Type::Node, std::move(n))
 {
     input_links_providers_links.resize(input_links.size());
     for (std::size_t i = 0; i < input_links.size(); ++i) {
@@ -13,6 +13,8 @@ gearoenix::core::graph::Node::Node(const std::vector<std::string>& input_links, 
         output_links_string_index[output_links[i]] = static_cast<unsigned int>(i);
     }
 }
+
+gearoenix::core::graph::Node::~Node() noexcept = default;
 
 void gearoenix::core::graph::Node::set_provider(const unsigned int input_link_index, Node* const o, const unsigned int provider_output_link_index) noexcept
 {

@@ -1,8 +1,8 @@
 #include "phs-cns-constraint.hpp"
 #include "../../render/model/rnd-mdl-model.hpp"
 
-gearoenix::physics::constraint::Constraint::Constraint(const core::Id id, const Type t, const bool a) noexcept
-    : core::asset::Asset(id, core::asset::Type::Constraint)
+gearoenix::physics::constraint::Constraint::Constraint(const core::Id id, const Type t, std::string n, const bool a) noexcept
+    : core::asset::Asset(id, core::asset::Type::Constraint, std::move(n))
     , constraint_type(t)
     , active(a)
 {

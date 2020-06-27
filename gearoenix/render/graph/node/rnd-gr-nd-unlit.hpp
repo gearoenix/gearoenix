@@ -64,7 +64,10 @@ private:
     void record(const model::Mesh* msh, const UnlitUniform& u, UnlitKernel* kernel) noexcept;
 
 public:
-    Unlit(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
+    Unlit(
+        std::string name,
+        engine::Engine* e,
+        const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
     ~Unlit() noexcept final;
     void update() noexcept final;
     void set_camera(const camera::Camera* cam) noexcept;

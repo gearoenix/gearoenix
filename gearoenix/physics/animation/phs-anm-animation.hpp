@@ -19,6 +19,7 @@ private:
 
 public:
     Animation(
+        std::string name,
         std::function<void(double, double)> action,
         double duration,
         std::function<void(double)> on_delete = [](double) noexcept {}) noexcept;

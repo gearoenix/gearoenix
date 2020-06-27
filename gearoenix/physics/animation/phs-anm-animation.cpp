@@ -3,10 +3,11 @@
 #include <utility>
 
 gearoenix::physics::animation::Animation::Animation(
+    std::string name,
     std::function<void(double, double)> a,
     const double d,
     std::function<void(double)> del) noexcept
-    : core::asset::Asset(core::asset::Manager::create_id(), core::asset::Type::Animation)
+    : core::asset::Asset(core::asset::Manager::create_id(), core::asset::Type::Animation, std::move(name))
     , duration(d)
     , action(std::move(a))
     , on_delete(std::move(del))

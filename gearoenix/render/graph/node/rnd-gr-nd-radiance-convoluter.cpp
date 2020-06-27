@@ -65,6 +65,7 @@ void gearoenix::render::graph::node::RadianceConvoluter::record(RadianceConvolut
 }
 
 gearoenix::render::graph::node::RadianceConvoluter::RadianceConvoluter(
+    std::string name,
     const float roughness,
     const float resolution,
     const mesh::Mesh* const msh,
@@ -72,6 +73,7 @@ gearoenix::render::graph::node::RadianceConvoluter::RadianceConvoluter(
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
     : Node(
+        std::move(name),
         Type::RadianceConvoluter,
         e,
         pipeline::Type::RadianceConvoluter,

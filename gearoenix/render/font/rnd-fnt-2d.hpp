@@ -30,10 +30,12 @@ private:
 public:
     Font2D(
         core::Id my_id,
+        std::string name,
         system::stream::Stream* f,
         texture::Manager* txt_mgr) noexcept;
     Font2D(
         core::Id my_id,
+        std::string name,
         texture::Manager* txt_mgr) noexcept;
     ~Font2D() noexcept final;
     /// This function returns n+1 horizontal length from start

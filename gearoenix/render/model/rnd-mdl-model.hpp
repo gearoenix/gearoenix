@@ -71,12 +71,14 @@ public:
 protected:
     Model(
         core::Id my_id,
+        std::string name,
         Type t,
         system::stream::Stream* f,
         engine::Engine* e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
     Model(
         core::Id my_id,
+        std::string name,
         Type t,
         engine::Engine* e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;

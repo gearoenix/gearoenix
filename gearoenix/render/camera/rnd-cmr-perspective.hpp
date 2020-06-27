@@ -20,8 +20,8 @@ private:
     void update_projection() noexcept;
 
 public:
-    Perspective(core::Id my_id, system::stream::Stream* f, engine::Engine* e) noexcept;
-    Perspective(core::Id my_id, engine::Engine* e) noexcept;
+    Perspective(core::Id my_id, std::string name, system::stream::Stream* f, engine::Engine* e) noexcept;
+    Perspective(core::Id my_id, std::string name, engine::Engine* e) noexcept;
     void set_aspects(unsigned int w, unsigned int h) noexcept final;
     void set_field_of_view(double radian) noexcept;
     [[nodiscard]] math::Ray3 create_ray3(double x, double y) const noexcept final;

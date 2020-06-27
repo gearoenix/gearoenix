@@ -17,7 +17,7 @@ private:
 public:
     explicit File(std::unique_ptr<system::stream::Stream> file) noexcept;
     template <class C>
-    std::shared_ptr<C> get(Id id, std::function<std::shared_ptr<C>()> new_fun) noexcept;
+    std::shared_ptr<C> get(Id id, std::function<std::shared_ptr<C>(std::string)> new_fun) noexcept;
     template <class C>
     std::shared_ptr<C> get(Id id) const noexcept;
 };
@@ -42,7 +42,7 @@ gearoenix::core::cache::File<T>::File(std::unique_ptr<system::stream::Stream> f)
 
 template <class T>
 template <class C>
-std::shared_ptr<C> gearoenix::core::cache::File<T>::get(const Id id, std::function<std::shared_ptr<C>()> new_fun) noexcept
+std::shared_ptr<C> gearoenix::core::cache::File<T>::get(const Id id, std::function<std::shared_ptr<C>(std::string)> new_fun) noexcept
 {
     std::function<std::shared_ptr<C>()> fn_new = [new_fun, this, id] {
 #ifdef GX_DEBUG_MODE
@@ -54,7 +54,7 @@ std::shared_ptr<C> gearoenix::core::cache::File<T>::get(const Id id, std::functi
 #else
         file->seek(offsets[id]);
 #endif
-        return new_fun();
+        return new_fun(cacher.get_key_to_name().find(id)->second);
     };
     return cacher.get(id, fn_new);
 }

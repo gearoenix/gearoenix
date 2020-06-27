@@ -63,9 +63,11 @@ void gearoenix::render::graph::node::SkyboxCube::record_sky(
 }
 
 gearoenix::render::graph::node::SkyboxCube::SkyboxCube(
+    std::string name,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
     : Node(
+        std::move(name),
         Type::SkyboxCube,
         e,
         pipeline::Type::SkyboxCube,

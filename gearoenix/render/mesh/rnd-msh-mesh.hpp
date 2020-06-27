@@ -29,16 +29,18 @@ class Mesh final : public core::asset::Asset {
     GX_GET_UPTR_PRT(buffer::Buffer, vertex_buffer)
     GX_GET_UPTR_PRT(buffer::Buffer, index_buffer)
 protected:
-    Mesh(core::Id my_id, Type mesh_type) noexcept;
+    Mesh(core::Id my_id, std::string name, Type mesh_type) noexcept;
 
 public:
     Mesh(
         core::Id my_id,
+        std::string name,
         system::stream::Stream* f,
         engine::Engine* e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
     Mesh(
         core::Id my_id,
+        std::string name,
         const std::vector<math::BasicVertex>& vertices,
         const std::vector<std::uint32_t>& indices,
         const math::Aabb3& box,

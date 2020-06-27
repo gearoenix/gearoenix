@@ -19,7 +19,7 @@ namespace gearoenix::demo::wwr {
     GX_GET_CREF_PRV(std::vector<std::shared_ptr<physics::animation::Animation>>, animations)
 
     private:
-        std::shared_ptr<double> rotation_speed = std::make_shared<double>(0.05);
+        std::shared_ptr<double> rotation_speed = std::make_shared<double>(0.2);
     public:
         explicit RotatingButton(std::shared_ptr<render::widget::Button> button) noexcept;
         ~RotatingButton() noexcept;

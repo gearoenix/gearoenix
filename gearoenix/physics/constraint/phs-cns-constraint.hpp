@@ -34,7 +34,7 @@ public:
     GX_GET_CREF_PRT(ConstraintMap, after_constraints)
 
 protected:
-    Constraint(core::Id id, Type t, bool active = true) noexcept;
+    Constraint(core::Id id, Type t, std::string name, bool active = true) noexcept;
 
     /// This function will be called after the parent constraint applied on its models
     virtual void update() noexcept { }

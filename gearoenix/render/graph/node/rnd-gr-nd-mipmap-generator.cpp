@@ -38,10 +38,12 @@ void gearoenix::render::graph::node::MipmapGenerator::record(MipmapGeneratorKern
 }
 
 gearoenix::render::graph::node::MipmapGenerator::MipmapGenerator(
+    std::string name,
     texture::Texture* const base_texture,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
     : Node(
+        std::move(name),
         Type::MipmapGenerator,
         e,
         pipeline::Type::Unlit, // this is just for filling

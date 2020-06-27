@@ -29,11 +29,11 @@ protected:
     Behavior rigid_body_behavior = Behavior::Active;
 
 public:
-    Rigid(core::Id id, const std::shared_ptr<Transferable>& body_obj);
-    ~Rigid() override;
-    void apply_force_on_origin(const math::Vec3<double>& force);
-    void apply_force(const math::Vec3<double>& force, const math::Vec3<double>& point);
-    void apply_time(double delta_time);
+    Rigid(core::Id id, std::string name, const std::shared_ptr<Transferable>& body_obj) noexcept;
+    ~Rigid() noexcept override;
+    void apply_force_on_origin(const math::Vec3<double>& force) noexcept;
+    void apply_force(const math::Vec3<double>& force, const math::Vec3<double>& point) noexcept;
+    void apply_time(double delta_time) noexcept;
 };
 }
 #endif

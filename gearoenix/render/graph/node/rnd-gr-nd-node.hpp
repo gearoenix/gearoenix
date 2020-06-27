@@ -56,6 +56,7 @@ namespace graph::node {
         const texture::Target* render_target = nullptr;
         std::shared_ptr<pipeline::Pipeline> render_pipeline = nullptr;
         Node(
+            std::string name,
             Type t,
             engine::Engine* e,
             pipeline::Type pipeline_type_id,

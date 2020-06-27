@@ -80,8 +80,8 @@ public:
 protected:
     void initialize() noexcept;
 
-    Camera(core::Id my_id, engine::Engine* e) noexcept;
-    Camera(core::Id my_id, system::stream::Stream* f, engine::Engine* e) noexcept;
+    Camera(core::Id my_id, std::string name, engine::Engine* e) noexcept;
+    Camera(core::Id my_id, std::string name, system::stream::Stream* f, engine::Engine* e) noexcept;
 
     void config_target() const noexcept;
 

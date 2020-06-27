@@ -18,11 +18,13 @@ namespace gearoenix::render::pipeline {
 class ResourceSet;
 class Pipeline {
     GX_GET_CVAL_PRT(Type, pipeline_type)
+    GX_GET_REFC_PRT(std::string, name)
 protected:
     engine::Engine* const e;
 
     Pipeline(const Type pipeline_type, engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>&) noexcept
         : pipeline_type(pipeline_type)
+        , name(std::to_string(pipeline_type))
         , e(e)
     {
     }

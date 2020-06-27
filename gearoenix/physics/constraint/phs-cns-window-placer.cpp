@@ -13,8 +13,8 @@ void gearoenix::physics::constraint::WindowPlacer::update() noexcept
     update_chained_constraints();
 }
 
-gearoenix::physics::constraint::WindowPlacer::WindowPlacer(const core::Id id, render::engine::Engine* const e) noexcept
-    : Constraint(id, Type::WindowPlacer)
+gearoenix::physics::constraint::WindowPlacer::WindowPlacer(const core::Id id, std::string name, render::engine::Engine* const e) noexcept
+    : Constraint(id, Type::WindowPlacer, std::move(name))
     , distance([] { return math::Vec2(0.0); })
     , event_engine(e->get_system_application()->get_event_engine())
 {

@@ -1,24 +1,23 @@
 #include "rnd-msh-mesh.hpp"
-#include "../../core/sync/cr-sync-end-caller.hpp"
-#include "../../math/math-vertex.hpp"
 #include "../buffer/rnd-buf-manager.hpp"
 #include "../buffer/rnd-buf-static.hpp"
 #include "../engine/rnd-eng-engine.hpp"
 #include "../material/rnd-mat-material.hpp"
 #include <vector>
 
-gearoenix::render::mesh::Mesh::Mesh(const core::Id my_id, const Type t) noexcept
-    : core::asset::Asset(my_id, core::asset::Type::Mesh)
+gearoenix::render::mesh::Mesh::Mesh(const core::Id my_id, std::string name, const Type t) noexcept
+    : core::asset::Asset(my_id, core::asset::Type::Mesh, std::move(name))
     , mesh_type(t)
 {
 }
 
 gearoenix::render::mesh::Mesh::Mesh(
     const core::Id my_id,
+    std::string name,
     system::stream::Stream* const f,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
-    : core::asset::Asset(my_id, core::asset::Type::Mesh)
+    : core::asset::Asset(my_id, core::asset::Type::Mesh, std::move(name))
     , mesh_type(Type::Basic)
 {
     const auto vertices_count = f->read<core::Count>();
@@ -34,12 +33,13 @@ gearoenix::render::mesh::Mesh::Mesh(
 
 gearoenix::render::mesh::Mesh::Mesh(
     const core::Id my_id,
+    std::string name,
     const std::vector<math::BasicVertex>& vertices,
     const std::vector<std::uint32_t>& indices,
     const math::Aabb3& b,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
-    : core::asset::Asset(my_id, core::asset::Type::Mesh)
+    : core::asset::Asset(my_id, core::asset::Type::Mesh, std::move(name))
     , mesh_type(Type::Basic)
 {
     set_vertices(e, vertices, indices, b, c);

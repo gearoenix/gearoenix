@@ -33,8 +33,8 @@ protected:
     void remove_from_shadow_cascaders() const noexcept;
     void add_to_shadow_cascaders() const noexcept;
 
-    Light(core::Id id, system::stream::Stream* f, engine::Engine* e, Type light_type) noexcept;
-    Light(core::Id id, engine::Engine* e, Type light_type) noexcept;
+    Light(core::Id id, std::string name, system::stream::Stream* f, engine::Engine* e, Type light_type) noexcept;
+    Light(core::Id id, std::string name, engine::Engine* e, Type light_type) noexcept;
 
 public:
     ~Light() noexcept override = default;

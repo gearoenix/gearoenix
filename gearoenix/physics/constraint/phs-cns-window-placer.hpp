@@ -24,7 +24,7 @@ private:
     void update() noexcept final;
 
 public:
-    WindowPlacer(core::Id id, render::engine::Engine* e) noexcept;
+    WindowPlacer(core::Id id, std::string name, render::engine::Engine* e) noexcept;
     ~WindowPlacer() noexcept final;
 
     void apply(double, double) noexcept final { }

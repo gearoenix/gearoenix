@@ -107,7 +107,10 @@ public:
     const static unsigned int BRDFLUT_INDEX;
     const static unsigned int SHADOW_MAP_000_INDEX;
 
-    ForwardPbr(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
+    ForwardPbr(
+        std::string name,
+        engine::Engine* e,
+        const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
     ~ForwardPbr() noexcept final;
 
     void set_diffuse_environment(texture::TextureCube* t) noexcept;

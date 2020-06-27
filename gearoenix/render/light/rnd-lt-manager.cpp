@@ -13,18 +13,18 @@ gearoenix::render::light::Manager::Manager(std::unique_ptr<system::stream::Strea
 std::shared_ptr<gearoenix::render::light::Light> gearoenix::render::light::Manager::get_gx3d(
     const core::Id id, core::sync::EndCaller<Light>& call) noexcept
 {
-    std::shared_ptr<Light> l = cache.get<Light>(id, [id, call, this] {
-        system::stream::Stream* f = cache.get_file();
+    auto l = cache.get<Light>(id, [id, call, this](std::string name) {
+        system::stream::Stream* const f = cache.get_file();
         const auto t = f->read<Type>();
         switch (t) {
         case Type::Cone:
-            GX_UNIMPLEMENTED;
+            GX_UNIMPLEMENTED
         case Type::Point:
-            return std::shared_ptr<Light>(new Point(id, f, e));
+            return std::shared_ptr<Light>(new Point(id, std::move(name), f, e));
         case Type::Directional:
-            return std::shared_ptr<Light>(new Directional(id, f, e));
+            return std::shared_ptr<Light>(new Directional(id, std::move(name), f, e));
         default:
-            GX_UNEXPECTED;
+            GX_UNEXPECTED
         }
     });
     call.set_data(l);

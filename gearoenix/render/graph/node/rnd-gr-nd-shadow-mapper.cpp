@@ -3,7 +3,6 @@
 #include "../../../core/sync/cr-sync-kernel-workers.hpp"
 #include "../../buffer/rnd-buf-framed-uniform.hpp"
 #include "../../buffer/rnd-buf-manager.hpp"
-#include "../../buffer/rnd-buf-uniform.hpp"
 #include "../../command/rnd-cmd-buffer.hpp"
 #include "../../command/rnd-cmd-manager.hpp"
 #include "../../material/rnd-mat-pbr.hpp"
@@ -56,9 +55,19 @@ gearoenix::render::graph::node::ShadowMapperFrame::~ShadowMapperFrame() noexcept
 }
 
 gearoenix::render::graph::node::ShadowMapper::ShadowMapper(
+    std::string name,
     engine::Engine* e,
     const core::sync::EndCaller<gearoenix::core::sync::EndCallerIgnore>& call) noexcept
-    : Node(Type::ShadowMapper, e, pipeline::Type::ShadowMapper, 0, 1, { "start" }, { "depth" }, call)
+    : Node(
+        std::move(name),
+        Type::ShadowMapper,
+        e,
+        pipeline::Type::ShadowMapper,
+        0,
+        1,
+        { "start" },
+        { "depth" },
+        call)
 {
     frames.resize(e->get_frames_count());
     for (unsigned int i = 0; i < e->get_frames_count(); ++i) {

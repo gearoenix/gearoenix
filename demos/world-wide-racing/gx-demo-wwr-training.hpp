@@ -17,15 +17,20 @@ namespace gearoenix::render::model {
 
 namespace gearoenix::render::scene {
     class Logo;
+    class Game;
     class Scene;
+    class Ui;
 }
 
 namespace gearoenix::demo::wwr {
+    class TerrainManager;
     class Training final {
     private:
-        std::shared_ptr<render::scene::Scene> game_scene, ui_scene;
+        std::shared_ptr<render::scene::Game> game_scene;
+        std::shared_ptr<render::scene::Ui> ui_scene;
         std::shared_ptr<render::model::Model> car;
-        // std::unique_ptr<render::camera::ArcController> cam_ctrl;
+        std::unique_ptr<TerrainManager> terrain_manager;
+        std::unique_ptr<render::camera::ArcController> cam_ctrl;
         // std::unique_ptr<RotatingButton> shop_button, multiplayer_button, tuning_button, training_button;
         // std::shared_ptr<physics::constraint::WindowPlacer> next_button_placer, previous_button_placer, player_name_placer, score_placer;
         // std::shared_ptr<physics::constraint::WindowScaler> bottom_button_scaler;
@@ -34,6 +39,7 @@ namespace gearoenix::demo::wwr {
         void initialize_camera() noexcept;
         void initialize_buttons() noexcept;
         void initialize_cars() noexcept;
+        void initialize_terrain() noexcept;
     public:
         explicit Training(const std::vector<std::shared_ptr<render::scene::Scene>>& scenes) noexcept;
         ~Training() noexcept;

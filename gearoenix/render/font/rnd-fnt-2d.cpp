@@ -40,9 +40,10 @@ void gearoenix::render::font::Font2D::init() noexcept
 
 gearoenix::render::font::Font2D::Font2D(
     const core::Id my_id,
+    std::string name,
     system::stream::Stream* f,
     texture::Manager* const txt_mgr) noexcept
-    : Font(my_id, Type::D2)
+    : Font(my_id, std::move(name), Type::D2)
     , txt_mgr(txt_mgr)
     , stb_font(new stbtt_fontinfo())
 {
@@ -50,8 +51,11 @@ gearoenix::render::font::Font2D::Font2D(
     init();
 }
 
-gearoenix::render::font::Font2D::Font2D(const core::Id my_id, texture::Manager* const txt_mgr) noexcept
-    : Font(my_id, Type::D2)
+gearoenix::render::font::Font2D::Font2D(
+    const core::Id my_id,
+    std::string name,
+    texture::Manager* const txt_mgr) noexcept
+    : Font(my_id, std::move(name), Type::D2)
     , txt_mgr(txt_mgr)
     , stb_font(new stbtt_fontinfo())
 {

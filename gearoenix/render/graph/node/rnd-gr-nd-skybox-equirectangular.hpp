@@ -68,7 +68,10 @@ private:
     void record_sky(const skybox::Equirectangular* sky, const SkyboxEquirectangularUniform& u, SkyboxEquirectangularKernel* kernel) noexcept;
 
 public:
-    SkyboxEquirectangular(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
+    SkyboxEquirectangular(
+        std::string name,
+        engine::Engine* e,
+        const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
     ~SkyboxEquirectangular() noexcept final;
     void update() noexcept final;
     void set_camera(const camera::Camera* cam) noexcept;

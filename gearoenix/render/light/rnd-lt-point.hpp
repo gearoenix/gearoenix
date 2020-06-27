@@ -13,7 +13,7 @@ private:
     void update_influence_area() noexcept;
 
 public:
-    Point(core::Id id, system::stream::Stream* f, engine::Engine* e) noexcept;
+    Point(core::Id id, std::string name, system::stream::Stream* f, engine::Engine* e) noexcept;
     [[nodiscard]] const math::Vec4<double>& get_position_max_radius() const noexcept;
     [[nodiscard]] double get_min_radius() const noexcept;
     bool is_in_light(const model::Model*) const noexcept override;
