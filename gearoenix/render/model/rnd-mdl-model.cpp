@@ -89,6 +89,8 @@ gearoenix::render::model::Model::Model(const Model& o) noexcept
     , hooked_reflection(o.hooked_reflection)
     , colliding_reflection(o.colliding_reflection)
 {
+    collider->set_parent(this);
+
     for (const auto& [id, msh] : o.meshes) {
         meshes[id] = std::shared_ptr<Mesh>(msh->clone());
     }

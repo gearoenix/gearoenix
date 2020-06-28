@@ -41,6 +41,7 @@ void gearoenix::demo::wwr::Training::initialize_camera() noexcept {
      cam_ctrl->set_max_distance(6.0);
      cam_ctrl->set_min_distance(4.0);
      cam_ctrl->set_distance(5.0);
+     cam_ctrl->set_rotate_z(3.14);
      cam_ctrl->set_target(math::Vec3(0.0, 0.0, 0.0));
 }
 
@@ -110,7 +111,7 @@ gearoenix::demo::wwr::Training::Training(const std::vector <std::shared_ptr<rend
     initialize_scenes(scenes);
     initialize_camera();
     initialize_buttons();
-//    initialize_cars();
+    initialize_cars();
     initialize_terrain();
 }
 

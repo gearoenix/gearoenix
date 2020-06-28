@@ -16,6 +16,7 @@ class ArcController final : public core::event::Listener {
     GX_GETSET_VAL_PRV(double, movement_speed, 0.5)
     GX_GETSET_VAL_PRV(double, touch_scale_speed, 1.5)
     GX_GETSET_VAL_PRV(double, rotation_speed, 0.5)
+    GX_GETSET_VAL_PRV(double, rotate_z, 0.0)
     GX_GET_CREF_PRV(math::Vec3<double>, target)
     GX_GET_CREF_PRV(math::Vec3<double>, up)
     GX_GET_CREF_PRV(math::Vec3<double>, direction)
@@ -31,7 +32,6 @@ private:
     const std::shared_ptr<Camera> cam;
     const core::Id function_id;
     double rotate_x = 0.0;
-    double rotate_z = 0.0;
     bool move_forward = false;
     bool move_backward = false;
     bool rotate_left = false;

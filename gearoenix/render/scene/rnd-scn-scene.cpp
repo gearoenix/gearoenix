@@ -164,28 +164,24 @@ void gearoenix::render::scene::Scene::scene_add_model(const std::shared_ptr<mode
         }
 #endif
         mdl->set_scene(this);
-        if (!mdl->get_dynamicity()) {
-            /// maybe in future I wanted to add more things about static models
-
-            if (nullptr == mdl->get_hooked_reflection()) {
-                /// The reason for this loop is, in the real scenarios, reflections count must be low and
-                /// on the other hand bvh tree for reflection is superfluous
-                /// in addition to that the nature of dynamic reflections are like camera,
-                /// they're the queriers not the queree.
-                bool colliding_reflection_not_found = true;
-                for (const auto& id_reflection : reflections) {
-                    const auto& reflect = id_reflection.second;
-                    if (reflect->get_is_hooked()) {
-                        if (math::IntersectionStatus::In == reflect->get_collider()->check_intersection_status(mdl->get_collider()->get_updated_box())) {
-                            mdl->set_colliding_reflection(reflect.get());
-                            colliding_reflection_not_found = false;
-                            break;
-                        }
+        if (nullptr == mdl->get_hooked_reflection()) {
+            /// The reason for this loop is, in the real scenarios, reflections count must be low and
+            /// on the other hand bvh tree for reflection is superfluous
+            /// in addition to that the nature of dynamic reflections are like camera,
+            /// they're the queriers not the queree.
+            bool colliding_reflection_not_found = true;
+            for (const auto& id_reflection : reflections) {
+                const auto& reflect = id_reflection.second;
+                if (reflect->get_is_hooked()) {
+                    if (math::IntersectionStatus::In == reflect->get_collider()->check_intersection_status(mdl->get_collider()->get_updated_box())) {
+                        mdl->set_colliding_reflection(reflect.get());
+                        colliding_reflection_not_found = false;
+                        break;
                     }
                 }
-                if (colliding_reflection_not_found && nullptr != default_reflection_probe) {
-                    mdl->set_colliding_reflection(default_reflection_probe.get());
-                }
+            }
+            if (colliding_reflection_not_found && nullptr != default_reflection_probe) {
+                mdl->set_colliding_reflection(default_reflection_probe.get());
             }
         }
         models[mid] = mdl;
