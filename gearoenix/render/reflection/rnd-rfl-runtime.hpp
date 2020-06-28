@@ -60,7 +60,11 @@ public:
     GX_GETSET_VAL_PRV(bool, pending_to_start, false);
 
 public:
-    Runtime(core::Id id, engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept;
+    Runtime(
+        core::Id id,
+        std::string name,
+        engine::Engine* e,
+        const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept;
     ~Runtime() noexcept final;
 
     void set_maximum_receiving_radius(double r) noexcept;

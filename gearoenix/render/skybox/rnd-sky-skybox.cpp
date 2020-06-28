@@ -16,10 +16,11 @@ void gearoenix::render::skybox::Skybox::init(const core::sync::EndCaller<core::s
 gearoenix::render::skybox::Skybox::Skybox(
     const Type t,
     const core::Id id,
+    std::string name,
     system::stream::Stream* const,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
-    : core::asset::Asset(id, core::asset::Type::Skybox)
+    : core::asset::Asset(id, core::asset::Type::Skybox, std::move(name))
     , skybox_type(t)
     , e(e)
 {
@@ -29,9 +30,10 @@ gearoenix::render::skybox::Skybox::Skybox(
 gearoenix::render::skybox::Skybox::Skybox(
     const Type t,
     const core::Id id,
+    std::string name,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
-    : core::asset::Asset(id, core::asset::Type::Skybox)
+    : core::asset::Asset(id, core::asset::Type::Skybox, std::move(name))
     , skybox_type(t)
     , e(e)
 {

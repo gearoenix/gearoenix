@@ -6,10 +6,10 @@ namespace gearoenix::render::scene {
 class Game final : public Scene {
 public:
     Game(
-        core::Id my_id, system::stream::Stream* f, engine::Engine* e,
+        core::Id my_id, std::string name, system::stream::Stream* f, engine::Engine* e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
     Game(
-        core::Id my_id, engine::Engine* e,
+        core::Id my_id, std::string name, engine::Engine* e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
     ~Game() noexcept final;
 };

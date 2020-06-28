@@ -40,23 +40,23 @@ Example003UiWidgetsApp::Example003UiWidgetsApp(gearoenix::system::Application* c
     auto* const mdl_mgr = ast_mgr->get_model_manager();
     auto* const scn_mgr = ast_mgr->get_scene_manager();
 
-    ui_scene = scn_mgr->create<GxUiScene>(ui_scn_call);
+    ui_scene = scn_mgr->create<GxUiScene>("ui", ui_scn_call);
 
-    auto text = mdl_mgr->create<GxTextWdg>(txw_call);
+    auto text = mdl_mgr->create<GxTextWdg>("txt-1", txw_call);
     auto* tmp_tran = text->get_transformation();
     tmp_tran->local_scale(0.04f);
     tmp_tran->set_location(GxVec3(0.0, 0.85, 0.0));
     text->set_text(L"I'm an one line Text widget. I easily grow horizontally and automatically.", end_call);
     ui_scene->add_model(text);
 
-    auto button = mdl_mgr->create<GxButton>(btn_call);
+    auto button = mdl_mgr->create<GxButton>("btn-1", btn_call);
     tmp_tran = button->get_transformation();
     tmp_tran->local_scale(0.04);
     tmp_tran->set_location(GxVec3(0.0, 0.75, 0.0));
     button->set_text(L"I'm a Button widget. I can grow too.", end_call);
     ui_scene->add_model(button);
 
-    auto edit = mdl_mgr->create<GxEditWdg>(edt_call);
+    auto edit = mdl_mgr->create<GxEditWdg>("edt-1", edt_call);
     tmp_tran = edit->get_transformation();
     tmp_tran->local_scale(0.04);
     tmp_tran->local_x_scale(34.0);
@@ -64,7 +64,7 @@ Example003UiWidgetsApp::Example003UiWidgetsApp(gearoenix::system::Application* c
     edit->set_hint_text(L"I'm an one line Edit text widget. I don't grow, there is a reason behind it, don't you know it.", end_call);
     ui_scene->add_model(edit);
 
-    auto edit2 = mdl_mgr->create<GxEditWdg>(edt_call);
+    auto edit2 = mdl_mgr->create<GxEditWdg>("edt-2", edt_call);
     tmp_tran = edit2->get_transformation();
     tmp_tran->local_scale(0.04);
     tmp_tran->local_x_scale(20.0);

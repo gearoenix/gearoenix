@@ -13,8 +13,8 @@ gearoenix::render::reflection::Manager::~Manager() noexcept = default;
 
 std::shared_ptr<gearoenix::render::reflection::Reflection> gearoenix::render::reflection::Manager::get_gx3d(const core::Id id, core::sync::EndCaller<Reflection>& call) noexcept
 {
-    const std::shared_ptr<Reflection> data = cache.get<Reflection>(
-        id, [this, id, call]() noexcept -> std::shared_ptr<Reflection> {
+    auto data = cache.get<Reflection>(
+        id, [this, id, call](std::string) noexcept -> std::shared_ptr<Reflection> {
             system::stream::Stream* const file = cache.get_file();
             const auto t = file->read<Type>();
             switch (t) {

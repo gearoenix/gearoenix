@@ -46,32 +46,32 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
     render_tree = std::make_unique<GxGrPbr>(render_engine, end_call);
     render_engine->set_render_tree(render_tree.get());
     gearoenix::core::asset::Manager* const ast_mgr = sys_app->get_asset_manager();
-    scn = ast_mgr->get_scene_manager()->create<GxGameScene>(scn_call);
+    scn = ast_mgr->get_scene_manager()->create<GxGameScene>("scene", scn_call);
 
-    std::shared_ptr<GxPersCam> cam = ast_mgr->get_camera_manager()->create<GxPersCam>();
+    std::shared_ptr<GxPersCam> cam = ast_mgr->get_camera_manager()->create<GxPersCam>("cam-pers");
     cam->set_cascaded_shadow_enabled(true);
     cam_trn = dynamic_cast<GxCamTran*>(cam->get_transformation());
     cam_trn->look_at(GxVec3(20.0f, 20.0f, 10.0f), GxVec3(0.0f, 0.0f, 0.0f), GxVec3(0.0f, 0.0f, 1.0f));
     scn->add_camera(cam);
 
-    const std::shared_ptr<GxDirLight> light = ast_mgr->get_light_manager()->create<GxDirLight>();
+    const std::shared_ptr<GxDirLight> light = ast_mgr->get_light_manager()->create<GxDirLight>("shadow-light");
     light->enable_shadowing();
     light->set_direction(GxVec3(-1.0f, 0.0f, -2.0f).normalized());
     light->set_color(GxVec3(0.5f, 0.5f, 0.5f));
     scn->add_light(light);
-    const std::shared_ptr<GxDirLight> light1 = ast_mgr->get_light_manager()->create<GxDirLight>();
+    const std::shared_ptr<GxDirLight> light1 = ast_mgr->get_light_manager()->create<GxDirLight>("l1");
     light1->set_direction(GxVec3(1.0f, 0.0f, -1.0f).normalized());
     light1->set_color(GxVec3(0.5f, 0.5f, 0.5f));
     scn->add_light(light1);
-    const std::shared_ptr<GxDirLight> light2 = ast_mgr->get_light_manager()->create<GxDirLight>();
+    const std::shared_ptr<GxDirLight> light2 = ast_mgr->get_light_manager()->create<GxDirLight>("l2");
     light2->set_direction(GxVec3(-1.0f, 0.0f, -1.0f).normalized());
     light2->set_color(GxVec3(0.5f, 0.5f, 0.5f));
     scn->add_light(light2);
-    const std::shared_ptr<GxDirLight> light3 = ast_mgr->get_light_manager()->create<GxDirLight>();
+    const std::shared_ptr<GxDirLight> light3 = ast_mgr->get_light_manager()->create<GxDirLight>("l3");
     light3->set_direction(GxVec3(0.0f, 1.0f, -1.0f).normalized());
     light3->set_color(GxVec3(0.5f, 0.5f, 0.5f));
     scn->add_light(light3);
-    const std::shared_ptr<GxDirLight> light4 = ast_mgr->get_light_manager()->create<GxDirLight>();
+    const std::shared_ptr<GxDirLight> light4 = ast_mgr->get_light_manager()->create<GxDirLight>("l4");
     light4->set_direction(GxVec3(0.0f, -1.0f, -1.0f).normalized());
     light4->set_color(GxVec3(0.5f, 0.5f, 0.5f));
     scn->add_light(light4);
@@ -84,7 +84,7 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
         mat->set_roughness_factor(0.5f);
         mat->set_metallic_factor(0.8f);
         mat->set_color(0.0f, 0.999f, 0.0f, end_call);
-        const std::shared_ptr<GxStaticModel> mdl = mdl_mgr->create<GxStaticModel>(mdl_call);
+        const std::shared_ptr<GxStaticModel> mdl = mdl_mgr->create<GxStaticModel>("ground", mdl_call);
         mdl->add_mesh(std::make_shared<GxMdMesh>(plate_mesh, mat));
         auto* trans = mdl->get_transformation();
         trans->set_location(GxVec3(0.0f, 0.0f, -5.0f));
@@ -96,7 +96,9 @@ GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
             const std::shared_ptr<GxMaterial> mat(new GxMaterial(render_engine, end_call));
             mat->set_roughness_factor(roughness);
             mat->set_metallic_factor(metallic);
-            const auto mdl = mdl_mgr->create<GxStaticModel>(mdl_call);
+            const auto mdl = mdl_mgr->create<GxStaticModel>(
+                "model-" + std::to_string(metallic) + "-" + std::to_string(roughness),
+                mdl_call);
             mdl->add_mesh(std::make_shared<GxMdMesh>(msh, mat));
             mdl->get_transformation()->set_location(GxVec3(x, y, 0.0f));
             scn->add_model(mdl);

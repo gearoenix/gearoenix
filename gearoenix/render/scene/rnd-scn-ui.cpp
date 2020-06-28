@@ -118,7 +118,8 @@ void gearoenix::render::scene::Ui::init() noexcept
 {
     layer = 0.1;
     auto* const sys_app = e->get_system_application();
-    auto cam = sys_app->get_asset_manager()->get_camera_manager()->create<camera::Orthographic>();
+    auto cam = sys_app->get_asset_manager()->get_camera_manager()->create<camera::Orthographic>(
+        "ui-scene-" + name + "-ortho");
     add_camera(cam);
     cam->get_transformation()->set_location(math::Vec3(0.0, 0.0, 50.0));
     uniform.ambient_light = math::Vec4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -128,14 +129,23 @@ void gearoenix::render::scene::Ui::init() noexcept
     event_engine->add_listener(core::event::Id::Touch, 0.0, this);
 }
 
-gearoenix::render::scene::Ui::Ui(const core::Id my_id, system::stream::Stream* f, engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
-    : Scene(my_id, Type::Ui, f, e, c)
+gearoenix::render::scene::Ui::Ui(
+    const core::Id my_id,
+    std::string name,
+    system::stream::Stream* const f,
+    engine::Engine* const e,
+    const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
+    : Scene(my_id, std::move(name), Type::Ui, f, e, c)
 {
     init();
 }
 
-gearoenix::render::scene::Ui::Ui(const core::Id my_id, engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
-    : Scene(my_id, Type::Ui, e, c)
+gearoenix::render::scene::Ui::Ui(
+    const core::Id my_id,
+    std::string name,
+    engine::Engine* const e,
+    const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
+    : Scene(my_id, std::move(name), Type::Ui, e, c)
 {
     init();
 }

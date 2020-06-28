@@ -3,9 +3,10 @@
 #include "../texture/rnd-txt-texture-cube.hpp"
 
 gearoenix::render::reflection::Baked::Baked(
+    std::string name,
     std::shared_ptr<texture::TextureCube> irr,
     std::shared_ptr<texture::TextureCube> rad) noexcept
-    : Reflection(core::asset::Manager::create_id(), Type::Baked, irr->get_render_engine())
+    : Reflection(core::asset::Manager::create_id(), std::move(name), Type::Baked, irr->get_render_engine())
 {
     irradiance = std::move(irr);
     radiance = std::move(rad);

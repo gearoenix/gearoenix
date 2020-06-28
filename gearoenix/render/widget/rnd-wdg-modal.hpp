@@ -13,11 +13,13 @@ private:
 public:
     Modal(
         core::Id my_id,
+        std::string name,
         system::stream::Stream* s,
         engine::Engine* e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
     Modal(
         core::Id my_id,
+        std::string name,
         engine::Engine* e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
     ~Modal() noexcept final;

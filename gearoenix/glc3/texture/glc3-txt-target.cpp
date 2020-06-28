@@ -93,7 +93,9 @@ void gearoenix::glc3::texture::Target::initialize_textures(
             switch (info.texture_info.texture_type) {
             case render::texture::Type::Texture2D: {
                 const auto t = Texture2D::construct(
-                    core::asset::Manager::create_id(), gl_e, std::vector<std::vector<std::uint8_t>>(),
+                    core::asset::Manager::create_id(),
+                    "target-" + std::to_string(target_id) + "-2d",
+                    gl_e, std::vector<std::vector<std::uint8_t>>(),
                     info.texture_info,
                     info.img_width, info.img_height, call);
                 a.txt = t;
@@ -108,7 +110,9 @@ void gearoenix::glc3::texture::Target::initialize_textures(
                     GXLOGF("This graphic backend does not support un-squared cube maps.")
 #endif
                 const auto t = TextureCube::construct(
-                    core::asset::Manager::create_id(), gl_e,
+                    core::asset::Manager::create_id(),
+                    "target-" + std::to_string(target_id) + "-cube",
+                    gl_e,
                     {},
                     info.texture_info,
                     info.img_width, call);

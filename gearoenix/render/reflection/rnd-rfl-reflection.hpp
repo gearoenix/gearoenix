@@ -48,6 +48,7 @@ class Reflection : public core::asset::Asset {
 protected:
     Reflection(
         core::Id id,
+        std::string name,
         Type t,
         engine::Engine* e,
         const math::Vec3<double>& position = math::Vec3(0.0),

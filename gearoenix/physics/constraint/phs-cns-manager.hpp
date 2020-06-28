@@ -25,16 +25,16 @@ public:
     std::shared_ptr<Constraint> get_gx3d(core::Id mid, core::sync::EndCaller<Constraint>& c) noexcept;
     template <typename T>
     [[nodiscard]] typename std::enable_if<std::is_base_of<Constraint, T>::value, std::shared_ptr<T>>::type
-    create() noexcept;
+    create(std::string name) noexcept;
 };
 }
 
 template <typename T>
 typename std::enable_if<std::is_base_of<gearoenix::physics::constraint::Constraint, T>::value, std::shared_ptr<T>>::type
-gearoenix::physics::constraint::Manager::create() noexcept
+gearoenix::physics::constraint::Manager::create(std::string name) noexcept
 {
     const core::Id id = core::asset::Manager::create_id();
-    const std::shared_ptr<T> result(new T(id, e));
+    const std::shared_ptr<T> result(new T(id, std::move(name), e));
     cache.get_cacher().get_cacheds().emplace(id, result);
     return result;
 }

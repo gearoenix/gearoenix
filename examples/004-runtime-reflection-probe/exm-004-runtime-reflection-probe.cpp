@@ -67,30 +67,30 @@ Example004RuntimeReflectionProbeApp::Example004RuntimeReflectionProbeApp(gearoen
     render_tree = std::make_unique<GxGrPbr>(render_engine, end_call);
     render_engine->set_render_tree(render_tree.get());
 
-    scn = ast_mgr->get_scene_manager()->create<GxGameScene>(scn_call);
+    scn = ast_mgr->get_scene_manager()->create<GxGameScene>("scn", scn_call);
 
     {
-        auto cam = ast_mgr->get_camera_manager()->create<GxPersCam>();
+        auto cam = ast_mgr->get_camera_manager()->create<GxPersCam>("cam");
         cam->get_transformation()->look_at(GxVec3(0.0, 5.0, 0.0), GxVec3(0.0, 0.0, 0.0), GxVec3(0.0, 0.0, 1.0));
         scn->add_camera(cam);
         cam_ctrl = std::make_shared<GxCamCtrl>(std::move(cam));
     }
 
     {
-        auto sky = sky_mgr->create<GxSkyEqrect>(sky_call);
+        auto sky = sky_mgr->create<GxSkyEqrect>("sky", sky_call);
         GxTxtSampleInfo smp;
         smp.min_filter = GxTxtFilter::Linear;
-        sky->get_mat_equ()->set_color(txt_mgr->create_2d_f("default-equirectangular-sky.hdr", txt_call, smp));
+        sky->get_mat_equ()->set_color(txt_mgr->create_2d_f("sky", "default-equirectangular-sky.hdr", txt_call, smp));
         scn->add_skybox(std::move(sky));
     }
 
-    const auto rtr2 = rfl_mgr->create<GxRtReflect>(rtr_call);
+    const auto rtr2 = rfl_mgr->create<GxRtReflect>("rtr2", rtr_call);
     rtr2->set_enabled(false);
     rtr2->set_minimum_receiving_radius(3.0);
     rtr2->set_maximum_receiving_radius(100.0);
     scn->add_reflection(rtr2);
 
-    const auto rtr1 = rfl_mgr->create<GxRtReflect>(rtr_call);
+    const auto rtr1 = rfl_mgr->create<GxRtReflect>("rtr1", rtr_call);
     rtr1->set_minimum_receiving_radius(10.0);
     rtr1->set_maximum_receiving_radius(100.0);
     scn->add_reflection(rtr1);
@@ -112,19 +112,19 @@ Example004RuntimeReflectionProbeApp::Example004RuntimeReflectionProbeApp(gearoen
     mat3->set_roughness_factor(0.00001f);
     mat3->set_metallic_factor(0.999999f);
 
-    const auto mdl1 = mdl_mgr->create<GxStaticModel>(mdl_call);
+    const auto mdl1 = mdl_mgr->create<GxStaticModel>("mdl1", mdl_call);
     mdl1->add_mesh(std::make_shared<GxMdMesh>(sphere_mesh, mat1));
     mdl1->get_transformation()->set_location(GxVec3(4.0, 0.0, 0.0));
     mdl1->set_enabled(false);
     scn->add_model(mdl1);
 
-    const auto mdl2 = mdl_mgr->create<GxStaticModel>(mdl_call);
+    const auto mdl2 = mdl_mgr->create<GxStaticModel>("mdl2", mdl_call);
     mdl2->add_mesh(std::make_shared<GxMdMesh>(sphere_mesh, mat2));
     mdl2->get_transformation()->set_location(GxVec3(-4.0, 0.0, 0.0));
     mdl2->set_enabled(false);
     scn->add_model(mdl2);
 
-    const auto mdl3 = mdl_mgr->create<GxStaticModel>(mdl_call);
+    const auto mdl3 = mdl_mgr->create<GxStaticModel>("mdl3", mdl_call);
     mdl3->add_mesh(std::make_shared<GxMdMesh>(sphere_mesh, mat3));
     mdl3->get_transformation()->local_scale(2.5);
     mdl3->set_enabled(false);

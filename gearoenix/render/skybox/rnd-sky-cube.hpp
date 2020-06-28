@@ -12,8 +12,8 @@ class Cube final : public Skybox {
     GX_GET_CREF_PRV(std::shared_ptr<material::SkyboxCube>, mat_cube)
 
 public:
-    Cube(core::Id my_id, system::stream::Stream* s, engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
-    Cube(core::Id my_id, engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+    Cube(core::Id id, std::string name, system::stream::Stream* s, engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+    Cube(core::Id id, std::string name, engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
     ~Cube() noexcept final;
 };
 }

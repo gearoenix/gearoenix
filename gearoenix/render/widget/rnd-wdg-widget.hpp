@@ -11,12 +11,14 @@ class Widget : public model::Model {
 protected:
     Widget(
         core::Id my_id,
+        std::string name,
         Type t,
         system::stream::Stream* s,
         engine::Engine* e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
     Widget(
         core::Id my_id,
+        std::string name,
         Type t,
         engine::Engine* e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
@@ -25,6 +27,7 @@ public:
     ~Widget() noexcept override;
     static std::shared_ptr<Widget> read_gx3d(
         core::Id my_id,
+        std::string name,
         system::stream::Stream* f,
         engine::Engine* e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;

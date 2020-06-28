@@ -21,11 +21,12 @@
 
 gearoenix::render::model::Model::Model(
     const core::Id my_id,
+    std::string name,
     const Type t,
     system::stream::Stream* const f,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
-    : core::asset::Asset(my_id, core::asset::Type::Model)
+    : core::asset::Asset(my_id, core::asset::Type::Model, std::move(name))
     , model_type(t)
     , collider(new physics::collider::Ghost())
     , transformation(new Transformation(this))
@@ -54,10 +55,11 @@ gearoenix::render::model::Model::Model(
 
 gearoenix::render::model::Model::Model(
     const core::Id my_id,
+    std::string name,
     const Type t,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>&) noexcept
-    : core::asset::Asset(my_id, core::asset::Type::Model)
+    : core::asset::Asset(my_id, core::asset::Type::Model, std::move(name))
     , model_type(t)
     , collider(new physics::collider::Ghost())
     , transformation(new Transformation(this))
@@ -69,7 +71,10 @@ gearoenix::render::model::Model::Model(
 }
 
 gearoenix::render::model::Model::Model(const Model& o) noexcept
-    : core::asset::Asset(core::asset::Manager::create_id(), core::asset::Type::Model)
+    : core::asset::Asset(
+        core::asset::Manager::create_id(),
+        core::asset::Type::Model,
+        o.name + "-clone-" + std::to_string(o.asset_id) + "-" + std::to_string(core::asset::Manager::create_id()))
     , model_type(o.model_type)
     , collider(o.collider->clone())
     , transformation(new Transformation(this))

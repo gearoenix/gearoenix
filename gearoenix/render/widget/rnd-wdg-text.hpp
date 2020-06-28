@@ -33,11 +33,13 @@ class Text : public Widget {
 public:
     Text(
         core::Id my_id,
+        std::string name,
         system::stream::Stream* f,
         engine::Engine* e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
     Text(
         core::Id my_id,
+        std::string name,
         engine::Engine* e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
     ~Text() noexcept override;

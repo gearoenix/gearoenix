@@ -15,6 +15,7 @@ gearoenix::demo::wwr::RotatingButton::RotatingButton(std::shared_ptr<render::wid
         const auto &child = c.second;
         if(child->get_model_type() == render::model::Type::Dynamic) {
             std::shared_ptr<physics::animation::Animation> a(new physics::animation::Animation(
+                    child->get_name() + "-rot-anm",
                     [odd { odd }, rotation_speed { rotation_speed }, child] (double, double delta_time) {
                         if(odd) delta_time = -delta_time;
                         child->get_transformation()->local_z_rotate(*rotation_speed * delta_time);

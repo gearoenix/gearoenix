@@ -42,11 +42,12 @@ void gearoenix::render::texture::Texture::write_gx3d_image(
 
 gearoenix::render::texture::Texture::Texture(
     const core::Id my_id,
+    std::string name,
     const Type texture_type,
     const TextureFormat texture_format,
     const SampleInfo& sample_info,
     engine::Engine* const e) noexcept
-    : core::asset::Asset(my_id, core::asset::Type::Texture)
+    : core::asset::Asset(my_id, core::asset::Type::Texture, std::move(name))
     , texture_type(texture_type)
     , texture_format(texture_format)
     , render_engine(e)

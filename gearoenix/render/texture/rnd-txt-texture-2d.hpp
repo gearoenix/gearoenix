@@ -10,6 +10,7 @@ class Texture2D : public Texture {
 protected:
     Texture2D(
         core::Id id,
+        std::string name,
         TextureFormat texture_format,
         const SampleInfo& sample_info,
         engine::Engine* e) noexcept;

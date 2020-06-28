@@ -3,9 +3,7 @@
 #include "../../audio/au-manager.hpp"
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../physics/accelerator/phs-acc-bvh.hpp"
-#include "../../physics/body/phs-bd-body.hpp"
 #include "../../physics/collider/phs-cld-aabb.hpp"
-#include "../../physics/collider/phs-cld-collider.hpp"
 #include "../../physics/constraint/phs-cns-constraint.hpp"
 #include "../../physics/constraint/phs-cns-manager.hpp"
 #include "../../system/sys-app.hpp"
@@ -17,14 +15,12 @@
 #include "../material/rnd-mat-material.hpp"
 #include "../mesh/rnd-msh-mesh.hpp"
 #include "../model/rnd-mdl-manager.hpp"
-#include "../model/rnd-mdl-model.hpp"
 #include "../pipeline/rnd-pip-manager.hpp"
 #include "../reflection/rnd-rfl-baked.hpp"
 #include "../reflection/rnd-rfl-manager.hpp"
 #include "../reflection/rnd-rfl-runtime.hpp"
 #include "../shader/rnd-shd-shader.hpp"
 #include "../skybox/rnd-sky-manager.hpp"
-#include "../skybox/rnd-sky-skybox.hpp"
 
 static const std::shared_ptr<gearoenix::render::camera::Camera> null_camera = nullptr;
 static const std::shared_ptr<gearoenix::audio::Audio> null_audio = nullptr;
@@ -34,11 +30,18 @@ static const std::shared_ptr<gearoenix::render::skybox::Skybox> null_skybox = nu
 static const std::shared_ptr<gearoenix::physics::constraint::Constraint> null_constraint = nullptr;
 static const std::shared_ptr<gearoenix::render::reflection::Reflection> null_reflection = nullptr;
 
-#define GX_SCENE_INIT \
-    core::asset::Asset(my_id, core::asset::Type::Scene), scene_type(t), uniform_buffers(new buffer::FramedUniform(static_cast<unsigned int>(sizeof(Uniform)), e)), static_accelerator(new gearoenix::physics::accelerator::Bvh()), dynamic_accelerator(new gearoenix::physics::accelerator::Bvh()), e(e), model_manager(e->get_system_application()->get_asset_manager()->get_model_manager())
+#define GX_SCENE_INIT                                                                              \
+    core::asset::Asset(my_id, core::asset::Type::Scene, std::move(name)),                          \
+        scene_type(t),                                                                             \
+        uniform_buffers(new buffer::FramedUniform(static_cast<unsigned int>(sizeof(Uniform)), e)), \
+        static_accelerator(new gearoenix::physics::accelerator::Bvh()),                            \
+        dynamic_accelerator(new gearoenix::physics::accelerator::Bvh()),                           \
+        e(e),                                                                                      \
+        model_manager(e->get_system_application()->get_asset_manager()->get_model_manager())
 
 gearoenix::render::scene::Scene::Scene(
     const core::Id my_id,
+    std::string name,
     const Type t,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>&) noexcept
@@ -48,6 +51,7 @@ gearoenix::render::scene::Scene::Scene(
 
 gearoenix::render::scene::Scene::Scene(
     const core::Id my_id,
+    std::string name,
     const Type t,
     system::stream::Stream* const f,
     engine::Engine* const e,

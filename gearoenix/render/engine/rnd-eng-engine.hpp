@@ -142,6 +142,7 @@ public:
     /// \return The returned texture is ready to use (not render) only in assignment in the load process.
     [[nodiscard]] virtual std::shared_ptr<texture::Texture2D> create_texture_2d(
         core::Id id,
+        std::string name,
         std::vector<std::vector<std::uint8_t>> data,
         const texture::TextureInfo& info,
         std::size_t img_width,
@@ -157,6 +158,7 @@ public:
     /// \return The returned texture is ready to use (not render) only in assignment in the load process.
     [[nodiscard]] virtual std::shared_ptr<texture::TextureCube> create_texture_cube(
         core::Id id,
+        std::string name,
         std::vector<std::vector<std::vector<std::uint8_t>>> data,
         const texture::TextureInfo& info,
         std::size_t aspect,

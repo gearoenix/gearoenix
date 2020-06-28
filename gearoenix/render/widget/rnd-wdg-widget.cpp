@@ -4,21 +4,23 @@
 
 gearoenix::render::widget::Widget::Widget(
     const core::Id my_id,
+    std::string name,
     const Type t,
     system::stream::Stream* const s,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
-    : model::Model(my_id, model::Type::Widget, s, e, c)
+    : model::Model(my_id, std::move(name), model::Type::Widget, s, e, c)
     , widget_type(t)
 {
 }
 
 gearoenix::render::widget::Widget::Widget(
     const core::Id my_id,
+    std::string name,
     const Type t,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
-    : model::Model(my_id, model::Type::Widget, e, c)
+    : model::Model(my_id, std::move(name), model::Type::Widget, e, c)
     , widget_type(t)
 {
 }
@@ -27,6 +29,7 @@ gearoenix::render::widget::Widget::~Widget() noexcept = default;
 
 std::shared_ptr<gearoenix::render::widget::Widget> gearoenix::render::widget::Widget::read_gx3d(
     const core::Id my_id,
+    std::string name,
     system::stream::Stream* const f,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
@@ -34,9 +37,9 @@ std::shared_ptr<gearoenix::render::widget::Widget> gearoenix::render::widget::Wi
     const auto t = f->read<Type>();
     switch (t) {
     case Type::Text:
-        return std::shared_ptr<Widget>(new Text(my_id, f, e, c));
+        return std::shared_ptr<Widget>(new Text(my_id, std::move(name), f, e, c));
     case Type::Button:
-        return std::shared_ptr<Widget>(new Button(my_id, f, e, c));
+        return std::shared_ptr<Widget>(new Button(my_id, std::move(name), f, e, c));
     default:
         GXLOGF("Unexpected widget type (" << static_cast<core::TypeId>(t) << ")  in: " << my_id)
     }

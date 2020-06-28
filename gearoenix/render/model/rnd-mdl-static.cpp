@@ -3,18 +3,20 @@
 
 gearoenix::render::model::Static::Static(
     const core::Id my_id,
+    std::string name,
     system::stream::Stream* const f,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
-    : Model(my_id, Type::Static, f, e, c)
+    : Model(my_id, std::move(name), Type::Static, f, e, c)
 {
 }
 
 gearoenix::render::model::Static::Static(
     const core::Id my_id,
+    std::string name,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
-    : Model(my_id, Type::Static, e, c)
+    : Model(my_id, std::move(name), Type::Static, e, c)
 {
 }
 

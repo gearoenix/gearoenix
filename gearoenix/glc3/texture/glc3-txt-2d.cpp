@@ -8,15 +8,17 @@
 
 gearoenix::glc3::texture::Texture2D::Texture2D(
     const core::Id id,
+    std::string name,
     const render::texture::TextureFormat texture_format,
     const render::texture::SampleInfo& sample_info,
     engine::Engine* const e) noexcept
-    : render::texture::Texture2D(id, texture_format, sample_info, e)
+    : render::texture::Texture2D(id, std::move(name), texture_format, sample_info, e)
 {
 }
 
 std::shared_ptr<gearoenix::glc3::texture::Texture2D> gearoenix::glc3::texture::Texture2D::construct(
     const core::Id my_id,
+    std::string name,
     engine::Engine* const e,
     std::vector<std::vector<std::uint8_t>> data,
     const render::texture::TextureInfo& info,
@@ -24,7 +26,7 @@ std::shared_ptr<gearoenix::glc3::texture::Texture2D> gearoenix::glc3::texture::T
     const std::size_t img_height,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
 {
-    std::shared_ptr<Texture2D> result(new Texture2D(my_id, info.format, info.sample_info, e));
+    std::shared_ptr<Texture2D> result(new Texture2D(my_id, std::move(name), info.format, info.sample_info, e));
     result->img_width = img_width;
     result->img_height = img_height;
     const SampleInfo sample_info(info.sample_info);
@@ -100,10 +102,11 @@ std::shared_ptr<gearoenix::glc3::texture::Texture2D> gearoenix::glc3::texture::T
 
 gearoenix::glc3::texture::Texture2D::Texture2D(
     const core::Id id,
+    std::string name,
     const gl::uint txt_obj,
     const render::texture::TextureFormat texture_format,
     engine::Engine* const e) noexcept
-    : render::texture::Texture2D(id, texture_format, render::texture::SampleInfo(), e)
+    : render::texture::Texture2D(id, std::move(name), texture_format, render::texture::SampleInfo(), e)
     , texture_object(txt_obj)
 {
 }

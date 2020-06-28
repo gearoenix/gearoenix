@@ -226,7 +226,9 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::font::
         },
         .texture_type = texture::Type::Texture2D,
     };
-    return txt_mgr->create_2d({ std::move(img_pixels) }, txt_info, img_width_pixels, img_height_pixels, end);
+    return txt_mgr->create_2d(
+        "baked-tex2d-" + std::to_string(core::asset::Manager::create_id()),
+        { std::move(img_pixels) }, txt_info, img_width_pixels, img_height_pixels, end);
 }
 
 std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::font::Font2D::bake(

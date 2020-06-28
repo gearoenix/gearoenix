@@ -7,6 +7,7 @@ class TextureCube : public Texture {
 protected:
     TextureCube(
         core::Id id,
+        std::string name,
         TextureFormat texture_format,
         const SampleInfo& sample_info,
         engine::Engine* engine) noexcept;

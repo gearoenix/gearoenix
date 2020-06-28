@@ -24,22 +24,24 @@ static const gearoenix::gl::enumerated FACES[] = {
 
 gearoenix::glc3::texture::TextureCube::TextureCube(
     const core::Id id,
+    std::string name,
     const render::texture::TextureFormat texture_format,
     const render::texture::SampleInfo& sample_info,
     engine::Engine* const engine) noexcept
-    : render::texture::TextureCube(id, texture_format, sample_info, engine)
+    : render::texture::TextureCube(id, std::move(name), texture_format, sample_info, engine)
 {
 }
 
 std::shared_ptr<gearoenix::glc3::texture::TextureCube> gearoenix::glc3::texture::TextureCube::construct(
     const core::Id id,
+    std::string name,
     engine::Engine* const engine,
     std::vector<std::vector<std::vector<std::uint8_t>>> data,
     const render::texture::TextureInfo& info,
     const std::size_t aspect,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
 {
-    std::shared_ptr<TextureCube> result(new TextureCube(id, info.format, info.sample_info, engine));
+    std::shared_ptr<TextureCube> result(new TextureCube(id, std::move(name), info.format, info.sample_info, engine));
     result->aspect = aspect;
     const SampleInfo sample_info = SampleInfo(info.sample_info);
     const auto internal_format = Texture2D::convert_internal_format(engine, result->texture_format);

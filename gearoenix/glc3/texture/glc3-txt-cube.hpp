@@ -17,6 +17,7 @@ class TextureCube final : public render::texture::TextureCube {
 private:
     TextureCube(
         core::Id id,
+        std::string name,
         render::texture::TextureFormat texture_format,
         const render::texture::SampleInfo& sample_info,
         engine::Engine* engine) noexcept;
@@ -24,6 +25,7 @@ private:
 public:
     [[nodiscard]] static std::shared_ptr<TextureCube> construct(
         core::Id id,
+        std::string name,
         engine::Engine* engine,
         std::vector<std::vector<std::vector<std::uint8_t>>> data,
         const render::texture::TextureInfo& info,

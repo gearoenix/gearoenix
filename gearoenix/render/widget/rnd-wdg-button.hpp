@@ -35,11 +35,13 @@ protected:
 public:
     Button(
         core::Id my_id,
+        std::string name,
         system::stream::Stream* f,
         engine::Engine* e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
     Button(
         core::Id my_id,
+        std::string name,
         engine::Engine* e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
     ~Button() noexcept final;

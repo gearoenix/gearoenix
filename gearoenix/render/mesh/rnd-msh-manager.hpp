@@ -36,8 +36,17 @@ public:
     [[nodiscard]] std::shared_ptr<Mesh> create_cube(core::sync::EndCaller<Mesh>& c) noexcept;
     [[nodiscard]] std::shared_ptr<Mesh> create_inward_cube(core::sync::EndCaller<Mesh>& c) noexcept;
     [[nodiscard]] std::shared_ptr<Mesh> create_face_square(texture::Face f, core::sync::EndCaller<Mesh>& c) noexcept;
-    [[nodiscard]] std::shared_ptr<Mesh> create(const std::vector<math::BasicVertex>& vertices, const std::vector<std::uint32_t>& indices, const math::Aabb3& occlusion_box, core::sync::EndCaller<Mesh>& c) noexcept;
-    [[nodiscard]] std::shared_ptr<Mesh> create(const std::vector<math::BasicVertex>& vertices, const std::vector<std::uint32_t>& indices, core::sync::EndCaller<Mesh>& c) noexcept;
+    [[nodiscard]] std::shared_ptr<Mesh> create(
+        std::string name,
+        const std::vector<math::BasicVertex>& vertices,
+        const std::vector<std::uint32_t>& indices,
+        const math::Aabb3& occlusion_box,
+        core::sync::EndCaller<Mesh>& c) noexcept;
+    [[nodiscard]] std::shared_ptr<Mesh> create(
+        std::string name,
+        const std::vector<math::BasicVertex>& vertices,
+        const std::vector<std::uint32_t>& indices,
+        core::sync::EndCaller<Mesh>& c) noexcept;
 };
 }
 

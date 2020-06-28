@@ -11,13 +11,22 @@
 #include "../scene/rnd-scn-ui.hpp"
 #include "rnd-wdg-button.hpp"
 
-gearoenix::render::widget::Modal::Modal(const core::Id my_id, system::stream::Stream* const s, engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
-    : Widget(my_id, Type::Modal, s, e, c)
+gearoenix::render::widget::Modal::Modal(
+    const core::Id my_id,
+    std::string name,
+    system::stream::Stream* const s,
+    engine::Engine* const e,
+    const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
+    : Widget(my_id, std::move(name), Type::Modal, s, e, c)
 {
 }
 
-gearoenix::render::widget::Modal::Modal(const core::Id my_id, engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
-    : Widget(my_id, Type::Modal, e, c)
+gearoenix::render::widget::Modal::Modal(
+    const core::Id my_id,
+    std::string name,
+    engine::Engine* const e,
+    const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
+    : Widget(my_id, std::move(name), Type::Modal, e, c)
 {
     core::sync::EndCaller<Button> btn_call([c](const std::shared_ptr<Button>&) {});
     core::sync::EndCaller<model::Dynamic> mdl_call([c](const std::shared_ptr<model::Dynamic>&) {});
@@ -114,19 +123,20 @@ gearoenix::render::widget::Modal::Modal(const core::Id my_id, engine::Engine* co
 
     const math::Aabb3 close_ocr(math::Vec3(1.4), math::Vec3(-1.4));
 
-    auto close_mesh = msh_mgr->create(close_vertices, close_indices, close_ocr, msh_call);
+    auto close_mesh = msh_mgr->create(
+        "modal-" + this->name + "-close", close_vertices, close_indices, close_ocr, msh_call);
 
     {
         const std::shared_ptr<material::Unlit> mat(new material::Unlit(e, c));
         mat->set_color(0.02f, 0.02f, 0.02f, c);
-        const auto mdl = mdl_mgr->create<model::Dynamic>(mdl_call);
+        const auto mdl = mdl_mgr->create<model::Dynamic>("gx-modal-" + this->name + "-bg", mdl_call);
         mdl->add_mesh(std::make_shared<model::Mesh>(plate_mesh, mat));
         add_child(mdl);
     }
     {
         const std::shared_ptr<material::Unlit> mat(new material::Unlit(e, c));
         mat->set_color(0.9999f, 0.999f, 0.999f, c);
-        close_mdl = mdl_mgr->create<Button>(btn_call);
+        close_mdl = mdl_mgr->create<Button>("gx-modal-" + this->name + "-btn", btn_call);
         close_mdl->add_mesh(std::make_shared<model::Mesh>(close_mesh, mat));
         auto* tran = close_mdl->get_transformation();
         const double scale = 0.05;

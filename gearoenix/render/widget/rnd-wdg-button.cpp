@@ -16,26 +16,28 @@
 
 gearoenix::render::widget::Button::Button(
     const core::Id my_id,
+    std::string name,
     system::stream::Stream* const f,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
-    : Widget(my_id, Type::Button, f, e, c)
+    : Widget(my_id, std::move(name), Type::Button, f, e, c)
 {
     set_collider(std::make_unique<physics::collider::Aabb>(*collider));
 }
 
 gearoenix::render::widget::Button::Button(
     const core::Id my_id,
+    std::string name,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
-    : Widget(my_id, Type::Button, e, c)
+    : Widget(my_id, std::move(name), Type::Button, e, c)
     , background_material(new material::Unlit(e, c))
 {
     set_collider(std::make_unique<physics::collider::Aabb>(math::Vec3(1.0, 1.0, 0.001), math::Vec3(-1.0, -1.0, -0.001)));
     auto* const ast_mgr = e->get_system_application()->get_asset_manager();
     auto* const mdl_mgr = ast_mgr->get_model_manager();
     core::sync::EndCaller<Text> txt_call([c](const std::shared_ptr<Text>&) {});
-    text = mdl_mgr->create<Text>(txt_call);
+    text = mdl_mgr->create<Text>("button-" + this->name + "-text", txt_call);
     text->set_text_color(theme.text_color, c);
     auto* const txt_ran = text->get_transformation();
     txt_ran->local_scale(theme.text_scale);
@@ -60,6 +62,7 @@ void gearoenix::render::widget::Button::selected(const math::Vec3<double>&) noex
     auto end = core::sync::EndCaller<model::Model>([](const std::shared_ptr<model::Model>&) {});
     auto myself = e->get_system_application()->get_asset_manager()->get_model_manager()->get_gx3d(asset_id, end);
     const auto a = std::make_shared<physics::animation::Animation>(
+        "button-" + name + "-select",
         [this, myself](const double from_start, const double) noexcept {
             const auto s = 1.0 - (1.0 - pressed_size) * from_start / animation_duration;
             transformation->local_scale(s / scale_down_progress);
@@ -81,6 +84,7 @@ void gearoenix::render::widget::Button::select_cancelled() noexcept
     auto my_fun = core::sync::EndCaller<model::Model>([](const std::shared_ptr<model::Model>&) {});
     auto myself = e->get_system_application()->get_asset_manager()->get_model_manager()->get_gx3d(asset_id, my_fun);
     const auto a = std::make_shared<physics::animation::Animation>(
+        "button-" + name + "-up",
         [this, myself](const double from_start, const double) noexcept {
             const auto s = pressed_size + (1.0 - scale_down_progress) * (from_start / animation_duration);
             transformation->local_scale(s / scale_down_progress);
@@ -109,7 +113,7 @@ void gearoenix::render::widget::Button::set_on_click(const std::function<void()>
 void gearoenix::render::widget::Button::set_text(const std::wstring& t, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
 {
     text->set_text(t, c);
-    const auto scale = text->get_collider()->get_current_local_scale()[0] / (theme.text_scale * collider->get_current_local_scale()[0]);
+    const auto scale = text->get_text_width() * 0.5 / (theme.text_scale * collider->get_current_local_scale()[0]);
     transformation->local_x_scale(scale);
     text->get_transformation()->local_x_scale(1.0f / scale);
 }

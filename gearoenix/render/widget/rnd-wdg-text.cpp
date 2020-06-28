@@ -23,7 +23,8 @@ void gearoenix::render::widget::Text::initialize(const core::sync::EndCaller<cor
     core::sync::EndCaller<mesh::Mesh> mend([c](const std::shared_ptr<mesh::Mesh>&) {});
     core::sync::EndCaller<model::Dynamic> dyn_mdl_end([c](const std::shared_ptr<model::Dynamic>&) {});
     auto msh = ast_mgr->get_mesh_manager()->create_plate(mend);
-    text_model = ast_mgr->get_model_manager()->create<model::Dynamic>(dyn_mdl_end);
+    text_model = ast_mgr->get_model_manager()->create<model::Dynamic>(
+        "text-" + name + "-model", dyn_mdl_end);
     text_model->add_mesh(std::make_shared<model::Mesh>(msh, text_mesh_material));
     text_model->get_transformation()->local_scale(collider->get_current_local_scale());
     add_child(text_model);
@@ -62,10 +63,11 @@ void gearoenix::render::widget::Text::update_alignment() noexcept
 
 gearoenix::render::widget::Text::Text(
     const core::Id my_id,
+    std::string name,
     system::stream::Stream* const f,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
-    : Widget(my_id, Type::Text, f, e, c)
+    : Widget(my_id, std::move(name), Type::Text, f, e, c)
 {
     {
         // Reading string
@@ -89,9 +91,10 @@ gearoenix::render::widget::Text::Text(
 
 gearoenix::render::widget::Text::Text(
     const core::Id my_id,
+    std::string name,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
-    : Widget(my_id, Type::Text, e, c)
+    : Widget(my_id, std::move(name), Type::Text, e, c)
     , text_color(0.7, 0.7, 0.7, 1.0)
 {
     auto ast_mgr = e->get_system_application()->get_asset_manager();

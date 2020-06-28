@@ -15,7 +15,7 @@ std::shared_ptr<gearoenix::render::skybox::Skybox> gearoenix::render::skybox::Ma
     core::sync::EndCaller<Skybox>& c) noexcept
 {
     std::shared_ptr<Skybox> s = cache.get<Skybox>(
-        id, [id, c, this]() noexcept {
+        id, [id, c, this](std::string name) noexcept {
             GXLOGD("Going to load Skybox: " << id)
             system::stream::Stream* const f = cache.get_file();
             const auto t = f->read<Type>();
@@ -23,7 +23,7 @@ std::shared_ptr<gearoenix::render::skybox::Skybox> gearoenix::render::skybox::Ma
             switch (t) {
             case Type::Cube:
             case Type::Equirectangular:
-                return std::shared_ptr<Skybox>(new Cube(id, f, e, call));
+                return std::shared_ptr<Skybox>(new Cube(id, std::move(name), f, e, call));
             default:
                 GX_UNEXPECTED
             }

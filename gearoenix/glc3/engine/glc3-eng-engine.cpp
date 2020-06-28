@@ -2,7 +2,6 @@
 #ifdef GX_USE_OPENGL_CLASS_3
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../core/event/cr-ev-event.hpp"
-#include "../../gl/gl-constants.hpp"
 #include "../../gl/gl-loader.hpp"
 #include "../../physics/phs-engine.hpp"
 #include "../../render/camera/rnd-cmr-camera.hpp"
@@ -66,23 +65,25 @@ std::shared_ptr<gearoenix::render::sync::Semaphore> gearoenix::glc3::engine::Eng
 
 std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::glc3::engine::Engine::create_texture_2d(
     const core::Id id,
+    std::string name,
     std::vector<std::vector<std::uint8_t>> data,
     const render::texture::TextureInfo& info,
     const std::size_t img_width,
     const std::size_t img_height,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
 {
-    return texture::Texture2D::construct(id, this, std::move(data), info, img_width, img_height, call);
+    return texture::Texture2D::construct(id, std::move(name), this, std::move(data), info, img_width, img_height, call);
 }
 
 std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::glc3::engine::Engine::create_texture_cube(
     const core::Id id,
+    std::string name,
     std::vector<std::vector<std::vector<std::uint8_t>>> data,
     const render::texture::TextureInfo& info,
     const std::size_t aspect,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
 {
-    return texture::TextureCube::construct(id, this, std::move(data), info, aspect, call);
+    return texture::TextureCube::construct(id, std::move(name), this, std::move(data), info, aspect, call);
 }
 
 std::shared_ptr<gearoenix::render::texture::Target> gearoenix::glc3::engine::Engine::create_render_target(

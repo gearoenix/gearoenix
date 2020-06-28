@@ -19,7 +19,13 @@
 #include <cmath>
 #include <string>
 
-#define GX_EDIT_INIT Widget(my_id, Type::Edit, e, c), event_engine(e->get_system_application()->get_event_engine()), text_material(new material::Unlit(e, c)), hint_text_material(new material::Unlit(e, c)), background_material(new material::Unlit(e, c)), cursor_material(new material::Unlit(e, c))
+#define GX_EDIT_INIT                                                   \
+    Widget(my_id, std::move(name), Type::Edit, e, c),                  \
+        event_engine(e->get_system_application()->get_event_engine()), \
+        text_material(new material::Unlit(e, c)),                      \
+        hint_text_material(new material::Unlit(e, c)),                 \
+        background_material(new material::Unlit(e, c)),                \
+        cursor_material(new material::Unlit(e, c))
 
 void gearoenix::render::widget::Edit::init(const core::sync::EndCaller<core::sync::EndCallerIgnore>& end_call) noexcept
 {
@@ -45,7 +51,7 @@ void gearoenix::render::widget::Edit::init(const core::sync::EndCaller<core::syn
 
     core::sync::EndCaller<model::Dynamic> mdl_end([c](const std::shared_ptr<model::Dynamic>&) {});
 
-    text_model = mdl_mgr->create<model::Dynamic>(mdl_end);
+    text_model = mdl_mgr->create<model::Dynamic>("gx-edit-" + name + "-txt", mdl_end);
     text_model->add_mesh(std::make_shared<model::Mesh>(plate_mesh, text_material));
     auto* const text_tran = text_model->get_transformation();
     text_tran->set_location(math::Vec3(0.0, 0.0, 0.01));
@@ -53,7 +59,7 @@ void gearoenix::render::widget::Edit::init(const core::sync::EndCaller<core::syn
     text_model->set_enabled(false);
     add_child(text_model);
 
-    hint_text_model = mdl_mgr->create<model::Dynamic>(mdl_end);
+    hint_text_model = mdl_mgr->create<model::Dynamic>("gx-edit-" + name + "-hint-txt", mdl_end);
     hint_text_model->add_mesh(std::make_shared<model::Mesh>(plate_mesh, hint_text_material));
     auto* const hint_text_tran = hint_text_model->get_transformation();
     hint_text_tran->set_location(math::Vec3(0.0, 0.0, 0.01));
@@ -62,13 +68,13 @@ void gearoenix::render::widget::Edit::init(const core::sync::EndCaller<core::syn
     add_child(hint_text_model);
 
     background_material->set_color(math::Vec4<float>(theme.background_color), c);
-    background_model = mdl_mgr->create<model::Dynamic>(mdl_end);
+    background_model = mdl_mgr->create<model::Dynamic>("gx-edit-" + name + "-bg", mdl_end);
     background_model->add_mesh(std::make_shared<model::Mesh>(plate_mesh, background_material));
     add_child(background_model);
 
     cursor_material->set_color(math::Vec4<float>(theme.cursor_color), c);
     cursor_material->set_translucency(material::TranslucencyMode::Transparent);
-    cursor_model = mdl_mgr->create<model::Dynamic>(mdl_end);
+    cursor_model = mdl_mgr->create<model::Dynamic>("gx-edit-" + name + "-crs", mdl_end);
     cursor_model->add_mesh(std::make_shared<model::Mesh>(plate_mesh, cursor_material));
     auto* const cursor_tran = cursor_model->get_transformation();
     cursor_tran->set_location(math::Vec3(0.0, 0.0, 0.02));
@@ -82,6 +88,7 @@ void gearoenix::render::widget::Edit::init(const core::sync::EndCaller<core::syn
     const auto t5 = t4 + theme.cursor_blink_time;
 
     cursor_animation = std::make_shared<physics::animation::Animation>(
+        "gx-edit-" + name + "-crs-anm",
         [cursor_material { cursor_material }, t1, t2, t3, t4, t5](
             const double from_start, const double) noexcept {
             const auto s = from_start - std::floor(from_start / t5) * t5;
@@ -219,6 +226,7 @@ void gearoenix::render::widget::Edit::remove(const bool from_left, const core::s
 
 gearoenix::render::widget::Edit::Edit(
     const core::Id my_id,
+    std::string name,
     system::stream::Stream* const,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
@@ -226,7 +234,7 @@ gearoenix::render::widget::Edit::Edit(
         GX_UNIMPLEMENTED
     }
 
-    gearoenix::render::widget::Edit::Edit(const core::Id my_id, engine::Engine* const e, const EditTheme& theme, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
+    gearoenix::render::widget::Edit::Edit(const core::Id my_id, std::string name, engine::Engine* const e, const EditTheme& theme, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : GX_EDIT_INIT
     , theme(theme)
 {
@@ -235,6 +243,7 @@ gearoenix::render::widget::Edit::Edit(
 
 gearoenix::render::widget::Edit::Edit(
     const core::Id my_id,
+    std::string name,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : GX_EDIT_INIT
@@ -251,6 +260,7 @@ void gearoenix::render::widget::Edit::set_text(
     const std::wstring& t,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
 {
+    GX_GUARD_LOCK(text)
     if (t.empty())
         return;
     if (text != t) {
@@ -272,6 +282,7 @@ void gearoenix::render::widget::Edit::set_hint_text(
     const std::wstring& t,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
 {
+    GX_GUARD_LOCK(text)
     if (t.empty())
         return;
     hint_text = t;
@@ -373,6 +384,7 @@ bool gearoenix::render::widget::Edit::on_event(const core::event::Data& d) noexc
 
 void gearoenix::render::widget::Edit::set_left_to_right(const bool b) noexcept
 {
+    GX_GUARD_LOCK(text)
     if (left_to_right == b)
         return;
     if (left_to_right) {
@@ -403,6 +415,7 @@ void gearoenix::render::widget::Edit::insert(
     const wchar_t character,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
 {
+    GX_GUARD_LOCK(text)
     bool increase_to_right = true;
     if ((static_cast<int>(character) > 31 && static_cast<int>(character) < 127) || (static_cast<int>(character) > 1631 && static_cast<int>(character) < 1642)) {
         if (left_to_right) {
@@ -504,6 +517,7 @@ void gearoenix::render::widget::Edit::selected(const math::Vec3<double>& point) 
 
 void gearoenix::render::widget::Edit::backspace(const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
 {
+    GX_GUARD_LOCK(text)
     if (text.empty())
         return;
     bool removed_from_left = true;
@@ -533,6 +547,7 @@ void gearoenix::render::widget::Edit::backspace(const core::sync::EndCaller<core
 
 void gearoenix::render::widget::Edit::del(const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
 {
+    GX_GUARD_LOCK(text)
     if (text.empty())
         return;
     if (left_to_right) {
@@ -575,6 +590,7 @@ void gearoenix::render::widget::Edit::del(const core::sync::EndCaller<core::sync
 
 void gearoenix::render::widget::Edit::clear() noexcept
 {
+    GX_GUARD_LOCK(text)
     cursor_pos_in_text = 0.0f;
     starting_text_cut = 0.0f;
     ending_text_cut = 0.0f;

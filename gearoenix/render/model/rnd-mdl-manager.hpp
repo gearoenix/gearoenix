@@ -28,17 +28,17 @@ public:
     /// T must be derived from Model and have the same constructor that Model has.
     template <typename T>
     [[nodiscard]] typename std::enable_if<std::is_base_of<Model, T>::value, std::shared_ptr<T>>::type
-    create(core::sync::EndCaller<T>& c) noexcept;
+    create(std::string name, core::sync::EndCaller<T>& c) noexcept;
 };
 }
 
 template <typename T>
 typename std::enable_if<std::is_base_of<gearoenix::render::model::Model, T>::value, std::shared_ptr<T>>::type
-gearoenix::render::model::Manager::create(core::sync::EndCaller<T>& c) noexcept
+gearoenix::render::model::Manager::create(std::string name, core::sync::EndCaller<T>& c) noexcept
 {
     const core::Id id = core::asset::Manager::create_id();
     const core::sync::EndCaller<core::sync::EndCallerIgnore> call([c] {});
-    const std::shared_ptr<T> result(new T(id, e, call));
+    const std::shared_ptr<T> result(new T(id, std::move(name), e, call));
     c.set_data(result);
     cache.get_cacher().get_cacheds()[id] = result;
     return result;

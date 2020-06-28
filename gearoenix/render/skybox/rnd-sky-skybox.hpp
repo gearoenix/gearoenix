@@ -37,8 +37,8 @@ protected:
     engine::Engine* const e;
     void init(const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
 
-    Skybox(Type t, core::Id my_id, system::stream::Stream* s, engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
-    Skybox(Type t, core::Id my_id, engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+    Skybox(Type t, core::Id id, std::string name, system::stream::Stream* s, engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+    Skybox(Type t, core::Id id, std::string name, engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
 
 public:
     ~Skybox() noexcept override;

@@ -55,13 +55,13 @@ void gearoenix::demo::wwr::Garage::initialize_buttons() noexcept {
 
     auto bottom_button = ui_scene->get_model("bottom-garage-buttons");
 
-    bottom_button_scaler = cns_mgr->create<physics::constraint::WindowScaler>();
+    bottom_button_scaler = cns_mgr->create<physics::constraint::WindowScaler>("bottom_button_scaler");
     bottom_button_scaler->set_size_percentage(0.8);
     bottom_button_scaler->set_max_size_scale(2.5);
     bottom_button_scaler->add_affected(bottom_button);
     bottom_button_scaler->set_current_size(2.0);
 
-    auto bottom_button_placer = cns_mgr->create<physics::constraint::WindowPlacer>();
+    auto bottom_button_placer = cns_mgr->create<physics::constraint::WindowPlacer>("bottom_button_placer");
     bottom_button_placer->set_width_percentage(0.5);
     bottom_button_placer->add_affected(bottom_button);
     bottom_button_placer->set_distance([bottom_button { move(bottom_button) }] {
@@ -71,23 +71,23 @@ void gearoenix::demo::wwr::Garage::initialize_buttons() noexcept {
     bottom_button_scaler->add(bottom_button_placer);
     bottom_button_scaler->register_listener();
 
-    next_button_placer = cns_mgr->create<physics::constraint::WindowPlacer>();
+    next_button_placer = cns_mgr->create<physics::constraint::WindowPlacer>("next_button_placer");
     next_button_placer->set_width_percentage(1.0);
     next_button_placer->set_height_percentage(0.5);
     next_button_placer->add_affected(ui_scene->get_model("button-next"));
     next_button_placer->set_distance(math::Vec2(-0.1, 0.0));
 
-    previous_button_placer = cns_mgr->create<physics::constraint::WindowPlacer>();
+    previous_button_placer = cns_mgr->create<physics::constraint::WindowPlacer>("previous_button_placer");
     previous_button_placer->set_height_percentage(0.5);
     previous_button_placer->add_affected(ui_scene->get_model("button-previous"));
     previous_button_placer->set_distance(math::Vec2(0.1, 0.0));
 
-    player_name_placer = cns_mgr->create<physics::constraint::WindowPlacer>();
+    player_name_placer = cns_mgr->create<physics::constraint::WindowPlacer>("player_name_placer");
     player_name_placer->set_height_percentage(1.0);
     player_name_placer->add_affected(ui_scene->get_model("text-player-name"));
     player_name_placer->set_distance(math::Vec2(0.05, -0.05));
 
-    score_placer = cns_mgr->create<physics::constraint::WindowPlacer>();
+    score_placer = cns_mgr->create<physics::constraint::WindowPlacer>("score_placer");
     score_placer->set_width_percentage(1.0);
     score_placer->set_height_percentage(1.0);
     score_placer->add_affected(ui_scene->get_model("text-money"));

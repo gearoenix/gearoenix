@@ -27,16 +27,16 @@ public:
     std::shared_ptr<Light> get_gx3d(core::Id mid, core::sync::EndCaller<Light>& c) noexcept;
     template <typename T>
     typename std::enable_if<std::is_base_of<gearoenix::render::light::Light, T>::value, std::shared_ptr<T>>::type
-    create() noexcept;
+    create(std::string name) noexcept;
 };
 }
 
 template <typename T>
 typename std::enable_if<std::is_base_of<gearoenix::render::light::Light, T>::value, std::shared_ptr<T>>::type
-gearoenix::render::light::Manager::create() noexcept
+gearoenix::render::light::Manager::create(std::string name) noexcept
 {
     const core::Id id = core::asset::Manager::create_id();
-    const std::shared_ptr<T> result(new T(id, e));
+    const std::shared_ptr<T> result(new T(id, std::move(name), e));
     const std::weak_ptr<Light> w = result;
     cache.get_cacher().get_cacheds()[id] = w;
     return result;

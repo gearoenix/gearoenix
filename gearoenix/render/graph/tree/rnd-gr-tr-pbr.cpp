@@ -9,7 +9,6 @@
 #include "../../light/rnd-lt-directional.hpp"
 #include "../../reflection/rnd-rfl-runtime.hpp"
 #include "../../scene/rnd-scn-manager.hpp"
-#include "../../scene/rnd-scn-scene.hpp"
 #include "../../skybox/rnd-sky-cube.hpp"
 #include "../../skybox/rnd-sky-equirectangular.hpp"
 #include "../../texture/rnd-txt-target.hpp"
@@ -70,7 +69,7 @@ void gearoenix::render::graph::tree::Pbr::update_skyboxes(const scene::Scene* co
             previous_cube = nullptr;
             if (previous_equirectangular == nullptr) {
                 previous_equirectangular = skybox_equirectangular.get_next([this] {
-                    auto* const n = new node::SkyboxEquirectangular(e, GX_DEFAULT_IGNORED_END_CALLER);
+                    auto* const n = new node::SkyboxEquirectangular("pbr-sky-equ", e, GX_DEFAULT_IGNORED_END_CALLER);
                     n->set_render_target(e->get_main_render_target().get());
                     return n;
                 });
@@ -84,7 +83,7 @@ void gearoenix::render::graph::tree::Pbr::update_skyboxes(const scene::Scene* co
             previous_equirectangular = nullptr;
             if (previous_cube == nullptr) {
                 previous_cube = skybox_cube.get_next([this] {
-                    auto* const n = new node::SkyboxCube(e, GX_DEFAULT_IGNORED_END_CALLER);
+                    auto* const n = new node::SkyboxCube("pbr-sky-cube", e, GX_DEFAULT_IGNORED_END_CALLER);
                     n->set_render_target(e->get_main_render_target().get());
                     return n;
                 });
@@ -165,7 +164,7 @@ void gearoenix::render::graph::tree::Pbr::update_opaque(
     node::ForwardPbr* fwd = camera_nodes.opaques.forward_pbr;
     if (fwd == nullptr) {
         fwd = forward_pbr.get_next([this] {
-            return new node::ForwardPbr(e, GX_DEFAULT_IGNORED_END_CALLER);
+            return new node::ForwardPbr("pbr-fwd-pbr", e, GX_DEFAULT_IGNORED_END_CALLER);
         });
         fwd->update();
         fwd->set_scene(scn);
@@ -181,7 +180,7 @@ void gearoenix::render::graph::tree::Pbr::update_opaque(
     node::Unlit* unl = camera_nodes.opaques.unlit;
     if (unl == nullptr) {
         unl = unlit.get_next([this] {
-            return new node::Unlit(e, GX_DEFAULT_IGNORED_END_CALLER);
+            return new node::Unlit("pbr-tree-unlit", e, GX_DEFAULT_IGNORED_END_CALLER);
         });
         unl->update();
         unl->set_camera(cam);
@@ -218,7 +217,7 @@ void gearoenix::render::graph::tree::Pbr::update_transparent(
             if (fwd == nullptr) {
                 fwd = forward_pbr.get_next([this] {
                     auto* const n = new node::ForwardPbr(
-                        e, core::sync::EndCaller<core::sync::EndCallerIgnore>([] {}));
+                        "pbr-tree-pbr", e, core::sync::EndCaller<core::sync::EndCallerIgnore>([] {}));
                     n->set_render_target(e->get_main_render_target().get());
                     return n;
                 });
@@ -238,7 +237,7 @@ void gearoenix::render::graph::tree::Pbr::update_transparent(
             if (unl == nullptr) {
                 unl = unlit.get_next([this] {
                     auto* const n = new node::Unlit(
-                        e, core::sync::EndCaller<core::sync::EndCallerIgnore>([] {}));
+                        "pbr-tree-unlit", e, core::sync::EndCaller<core::sync::EndCallerIgnore>([] {}));
                     n->set_render_target(e->get_main_render_target().get());
                     return n;
                 });

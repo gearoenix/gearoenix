@@ -24,16 +24,17 @@ public:
     ~Manager() noexcept;
     std::shared_ptr<Reflection> get_gx3d(core::Id id, core::sync::EndCaller<Reflection>& call) noexcept;
     template <typename T>
-    typename std::enable_if<std::is_base_of<Reflection, T>::value, std::shared_ptr<T>>::type create(core::sync::EndCaller<T>& c) noexcept;
+    typename std::enable_if<std::is_base_of<Reflection, T>::value, std::shared_ptr<T>>::type
+    create(std::string name, core::sync::EndCaller<T>& c) noexcept;
 };
 }
 
 template <typename T>
 typename std::enable_if<std::is_base_of<gearoenix::render::reflection::Reflection, T>::value, std::shared_ptr<T>>::type
-gearoenix::render::reflection::Manager::create(core::sync::EndCaller<T>& c) noexcept
+gearoenix::render::reflection::Manager::create(std::string name, core::sync::EndCaller<T>& c) noexcept
 {
     const core::Id id = core::asset::Manager::create_id();
-    const std::shared_ptr<T> result(new T(id, e, core::sync::EndCaller<core::sync::EndCallerIgnore>([c] {})));
+    const std::shared_ptr<T> result(new T(id, std::move(name), e, core::sync::EndCaller<core::sync::EndCallerIgnore>([c] {})));
     const std::weak_ptr<Reflection> w = result;
     cache.get_cacher().get_cacheds()[id] = w;
     c.set_data(result);

@@ -96,23 +96,25 @@ std::shared_ptr<gearoenix::render::sync::Semaphore> gearoenix::gles2::engine::En
 
 std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::gles2::engine::Engine::create_texture_2d(
     const core::Id id,
+    std::string name,
     std::vector<std::vector<unsigned char>> data,
     const render::texture::TextureInfo& info,
     const std::size_t img_width,
     const std::size_t img_height,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
 {
-    return texture::Texture2D::construct(id, this, std::move(data), info, img_width, img_height, call);
+    return texture::Texture2D::construct(id, std::move(name), this, std::move(data), info, img_width, img_height, call);
 }
 
 std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::gles2::engine::Engine::create_texture_cube(
     const core::Id id,
+    std::string name,
     std::vector<std::vector<std::vector<unsigned char>>> data,
     const render::texture::TextureInfo& info,
     const std::size_t aspect,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
 {
-    return texture::TextureCube::construct(id, this, std::move(data), info, static_cast<unsigned int>(aspect), call);
+    return texture::TextureCube::construct(id, std::move(name), this, std::move(data), info, static_cast<unsigned int>(aspect), call);
 }
 
 std::shared_ptr<gearoenix::render::texture::Target> gearoenix::gles2::engine::Engine::create_render_target(

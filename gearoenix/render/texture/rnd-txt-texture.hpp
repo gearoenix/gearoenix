@@ -23,6 +23,7 @@ class Texture : public core::asset::Asset {
 protected:
     Texture(
         core::Id my_id,
+        std::string name,
         Type texture_type,
         TextureFormat texture_format,
         const SampleInfo& sample_info,

@@ -128,35 +128,35 @@ IblBaker::IblBaker(gearoenix::system::Application* const sys_app) noexcept
     auto* const rfl_mgr = ast_mgr->get_reflection_manager();
     auto* const txt_mgr = ast_mgr->get_texture_manager();
 
-    uiscn = ast_mgr->get_scene_manager()->create<GxUiScene>(ui_scn_call);
-    scn = ast_mgr->get_scene_manager()->create<GxGameScene>(scn_call);
+    uiscn = ast_mgr->get_scene_manager()->create<GxUiScene>("ui", ui_scn_call);
+    scn = ast_mgr->get_scene_manager()->create<GxGameScene>("scn", scn_call);
 
-    cam = ast_mgr->get_camera_manager()->create<GxPersCam>();
+    cam = ast_mgr->get_camera_manager()->create<GxPersCam>("pers");
     cam_trn = dynamic_cast<GxCamTran*>(cam->get_transformation());
     cam_trn->look_at(GxVec3(25.0, 0.0, 0.0), GxVec3(0.0, 0.0, 0.0), GxVec3(0.0, 0.0, 1.0));
     scn->add_camera(cam);
 
-    sky = sky_mgr->create<GxSkyEqrect>(sky_call);
+    sky = sky_mgr->create<GxSkyEqrect>("sky", sky_call);
     scn->add_skybox(sky);
 
-    rtr = rfl_mgr->create<GxRtReflect>(rtr_call);
+    rtr = rfl_mgr->create<GxRtReflect>("rtr", rtr_call);
     scn->add_reflection(rtr);
 
-    auto tmp_txt = mdl_mgr->create<GxTextWdg>(txw_call);
+    auto tmp_txt = mdl_mgr->create<GxTextWdg>("title", txw_call);
     auto* tmp_tran = tmp_txt->get_transformation();
     tmp_tran->local_scale(0.04f);
     tmp_tran->set_location(GxVec3(0.0, 0.85, 0.1));
     tmp_txt->set_text(L"IBL baker for Gearoenix game engine", end_call);
     uiscn->add_model(tmp_txt);
 
-    tmp_txt = mdl_mgr->create<GxTextWdg>(txw_call);
+    tmp_txt = mdl_mgr->create<GxTextWdg>("hdr loc", txw_call);
     tmp_tran = tmp_txt->get_transformation();
     tmp_tran->local_scale(0.03f);
     tmp_tran->set_location(GxVec3(-0.75, 0.75, 0.1));
     tmp_txt->set_text(L"HDR file location:", end_call);
     uiscn->add_model(tmp_txt);
 
-    auto open_button = mdl_mgr->create<GxButton>(btn_call);
+    auto open_button = mdl_mgr->create<GxButton>("open button", btn_call);
     tmp_tran = open_button->get_transformation();
     tmp_tran->local_scale(0.04f);
     tmp_tran->local_x_scale(4.0f);
@@ -166,7 +166,7 @@ IblBaker::IblBaker(gearoenix::system::Application* const sys_app) noexcept
         open_button->set_on_click([this] { on_open(); });
     uiscn->add_model(open_button);
 
-    file_location = mdl_mgr->create<GxEditWdg>(edt_call);
+    file_location = mdl_mgr->create<GxEditWdg>("file", edt_call);
     tmp_tran = file_location->get_transformation();
     tmp_tran->local_scale(0.04);
     tmp_tran->local_x_scale(14.0);
@@ -174,10 +174,10 @@ IblBaker::IblBaker(gearoenix::system::Application* const sys_app) noexcept
     file_location->set_hint_text(L"<Fill it with 'file location'>", end_call);
     uiscn->add_model(file_location);
 
-    obj_scn = ast_mgr->get_scene_manager()->create<GxGameScene>(scn_call);
+    obj_scn = ast_mgr->get_scene_manager()->create<GxGameScene>("obj scene", scn_call);
     obj_scn->set_layer((scn->get_layer() + uiscn->get_layer()) * 0.5);
 
-    obj_cam = ast_mgr->get_camera_manager()->create<GxPersCam>();
+    obj_cam = ast_mgr->get_camera_manager()->create<GxPersCam>("obj pers");
     obj_cam_trn = dynamic_cast<GxCamTran*>(obj_cam->get_transformation());
     obj_cam_trn->look_at(GxVec3(25.0, 0.0, 0.0), GxVec3(0.0, 0.0, 0.0), GxVec3(0.0, 0.0, 1.0));
     obj_scn->add_camera(obj_cam);
@@ -214,7 +214,9 @@ IblBaker::IblBaker(gearoenix::system::Application* const sys_app) noexcept
             mat->set_roughness_factor(roughness);
             mat->set_metallic_factor(metallic);
             mat->set_color(1.0f, 0.0f, 0.0f, end_call);
-            const auto mdl = mdl_mgr->create<GxStaticModel>(mdl_call);
+            const auto mdl = mdl_mgr->create<GxStaticModel>(
+                "model-" + std::to_string(metallic) + "-" + std::to_string(roughness),
+                mdl_call);
             mdl->add_mesh(std::make_shared<GxMdMesh>(obj_msh, mat));
             mdl->get_transformation()->set_location(GxVec3(x, y, 0.0f));
             obj_scn->add_model(mdl);
@@ -226,7 +228,7 @@ IblBaker::IblBaker(gearoenix::system::Application* const sys_app) noexcept
         GxEndCaller<GxTexture2D> txt_call([end_call](const std::shared_ptr<GxTexture2D>&) {});
         GxTxtSampleInfo smp;
         smp.min_filter = GxTxtFilter::Linear;
-        sky->get_mat_equ()->set_color(txt_mgr->create_2d_f(environment_file, txt_call, smp, false));
+        sky->get_mat_equ()->set_color(txt_mgr->create_2d_f("env", environment_file, txt_call, smp, false));
 
         rtr->set_on_rendered([this]() {
             GXLOGD("Runtime reflection rendered.")
@@ -298,7 +300,9 @@ void IblBaker::open_environment() noexcept
     GxTxtSampleInfo smp;
     smp.min_filter = GxTxtFilter::Linear;
     /// TODO failure management
-    (void)txt_mgr->create_2d_f(environment_file, txt_call, smp);
+    static int env_i = 0;
+    ++env_i;
+    (void)txt_mgr->create_2d_f("env-" + std::to_string(env_i), environment_file, txt_call, smp, false);
 }
 
 GEAROENIX_START(IblBaker)

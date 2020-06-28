@@ -44,7 +44,6 @@ struct EditTheme {
     double cursor_blink_time = 0.125;
 };
 class Edit final : public Widget, public core::event::Listener {
-public:
     GX_GET_CPTR_PRV(core::event::Engine, event_engine)
     GX_GET_CREF_PRV(std::shared_ptr<font::Font2D>, text_font)
     GX_GET_CREF_PRV(std::wstring, text)
@@ -72,6 +71,8 @@ public:
     GX_GET_VAL_PRV(std::size_t, temporary_left, 0)
     GX_GET_VAL_PRV(std::size_t, temporary_right, 0)
 private:
+    GX_CREATE_GUARD(text)
+
     void init(const core::sync::EndCaller<core::sync::EndCallerIgnore>& end_call) noexcept;
     void on_scale() noexcept;
     void compute_starting() noexcept;
@@ -85,16 +86,19 @@ private:
 public:
     Edit(
         core::Id my_id,
+        std::string name,
         system::stream::Stream* f,
         engine::Engine* e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
     Edit(
         core::Id my_id,
+        std::string name,
         engine::Engine* e,
         const EditTheme& theme,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
     Edit(
         core::Id my_id,
+        std::string name,
         engine::Engine* e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
     ~Edit() noexcept final;

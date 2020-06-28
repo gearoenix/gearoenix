@@ -51,6 +51,7 @@ std::vector<std::uint8_t> gearoenix::render::texture::Manager::read_gx3d_image(
 
 std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::render::texture::Manager::read_gx3d(
     const core::Id id,
+    std::string name,
     system::stream::Stream* const s,
     core::sync::EndCaller<Texture>& c) noexcept
 {
@@ -63,7 +64,7 @@ std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::render::texture:
         const auto img_width = static_cast<std::size_t>(s->read<std::uint16_t>());
         const auto img_height = static_cast<std::size_t>(s->read<std::uint16_t>());
         const auto t = e->create_texture_2d(
-            id, { read_gx3d_image(info.format, s) }, info, img_width, img_height,
+            id, std::move(name), { read_gx3d_image(info.format, s) }, info, img_width, img_height,
             core::sync::EndCaller<core::sync::EndCallerIgnore>([c] {}));
         c.set_data(t);
         return t;
@@ -82,7 +83,7 @@ std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::render::texture:
             }
         }
         const auto t = e->create_texture_cube(
-            id, std::move(data), info, aspect,
+            id, std::move(name), std::move(data), info, aspect,
             core::sync::EndCaller<core::sync::EndCallerIgnore>([c] {}));
         c.set_data(t);
         return t;
@@ -115,7 +116,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     }
     const std::function<std::shared_ptr<Texture>()> fun = [this, color_data { move(color_data) }, c, id]() mutable {
         return e->create_texture_2d(
-            id, std::move(color_data),
+            id, "color-4d-" + std::to_string(id), std::move(color_data),
             TextureInfo {
                 .format = TextureFormat::RgbaFloat32,
                 .sample_info = SampleInfo {
@@ -204,7 +205,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
         if (brdf_asset != nullptr) {
             GXLOGD("BRDFLUT asset has been found.")
             const auto data = brdf_asset->get_file_content();
-            brdflut = create_2d(data.data(), data.size(), c, texture_info.sample_info);
+            brdflut = create_2d("default-brdflut", data.data(), data.size(), c, texture_info.sample_info);
             return brdflut;
         }
     }
@@ -215,7 +216,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
         if (brdf_cached != nullptr) {
             GXLOGD("BRDFLUT baked file has been found.")
             const auto data = brdf_cached->get_file_content();
-            brdflut = create_2d(data.data(), data.size(), c, texture_info.sample_info);
+            brdflut = create_2d("default-brdflut", data.data(), data.size(), c, texture_info.sample_info);
             return brdflut;
         }
     }
@@ -256,17 +257,19 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     const auto data_size = pixels.size() * sizeof(math::Vec2<float>);
     std::vector<std::uint8_t> data(data_size);
     std::memcpy(data.data(), reinterpret_cast<const std::uint8_t*>(pixels.data()), data_size);
-    brdflut = create_2d({ data }, texture_info, resolution, resolution, c);
+    brdflut = create_2d("default-brdflut", { data }, texture_info, resolution, resolution, c);
     return brdflut;
 }
 
 std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::create_2d(
+    std::string name,
     std::vector<std::vector<std::uint8_t>> data, const TextureInfo& info,
     const std::size_t img_width, const std::size_t img_height, core::sync::EndCaller<Texture2D>& c) noexcept
 {
     const auto id = core::asset::Manager::create_id();
     auto t = e->create_texture_2d(
         id,
+        std::move(name),
         std::move(data),
         info,
         img_width,
@@ -278,6 +281,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
 }
 
 std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::create_2d(
+    std::string name,
     const unsigned char* const data,
     const std::size_t size,
     core::sync::EndCaller<Texture2D>& c,
@@ -308,10 +312,11 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
         GX_UNEXPECTED
     }
     info.texture_type = Type::Texture2D;
-    return create_2d({ pixels }, info, img_width, img_height, c);
+    return create_2d(std::move(name), { pixels }, info, img_width, img_height, c);
 }
 
 std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::create_2d_f(
+    std::string name,
     const unsigned char* const data,
     const std::size_t size, core::sync::EndCaller<Texture2D>& c,
     const SampleInfo& sample_info) noexcept
@@ -342,18 +347,20 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     std::vector<std::vector<std::uint8_t>> pixels_data(1);
     pixels_data[0].resize(pixels.size() * sizeof(float));
     std::memcpy(pixels_data[0].data(), pixels.data(), pixels_data[0].size());
-    return create_2d(std::move(pixels_data), info, img_width, img_height, c);
+    return create_2d(std::move(name), std::move(pixels_data), info, img_width, img_height, c);
 }
 
 std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::create_2d_f(
+    std::string name,
     const std::wstring& file_address,
     core::sync::EndCaller<Texture2D>& c,
     const SampleInfo& sample_info) noexcept
 {
-    return create_2d_f(core::String::to_string(file_address), c, sample_info);
+    return create_2d_f(std::move(name), core::String::to_string(file_address), c, sample_info);
 }
 
 std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::create_2d_f(
+    std::string name,
     const std::string& file_address,
     core::sync::EndCaller<render::texture::Texture2D>& c,
     const SampleInfo& sample_info,
@@ -365,7 +372,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
         GXLOGF("Texture file " << file_address << " not found.")
     file->set_endian_compatibility(true);
     auto const file_content = file->get_file_content();
-    return create_2d_f(file_content.data(), file_content.size(), c, sample_info);
+    return create_2d_f(std::move(name), file_content.data(), file_content.size(), c, sample_info);
 }
 
 std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::render::texture::Manager::get_cube(const math::Vec4<float>& color, core::sync::EndCaller<TextureCube>& c) noexcept
@@ -384,6 +391,7 @@ std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::render::text
     const std::function<std::shared_ptr<Texture>()> fun = [this, colors { move(colors) }, c, id]() mutable {
         return e->create_texture_cube(
             id,
+            "texture-cube-colored-" + std::to_string(id),
             std::move(colors),
             TextureInfo {
                 .format = TextureFormat::RgbaFloat32,
@@ -434,11 +442,12 @@ std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::render::text
 }
 
 std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::render::texture::Manager::create_cube(
+    std::string name,
     const TextureInfo& info, const int img_aspect, core::sync::EndCaller<TextureCube>& c) noexcept
 {
     const auto id = core::asset::Manager::create_id();
-    const std::function<std::shared_ptr<Texture>()> fun = [this, &info, img_aspect, &c, id] {
-        return e->create_texture_cube(id, {}, info, img_aspect, core::sync::EndCaller<core::sync::EndCallerIgnore>([c] {}));
+    const std::function<std::shared_ptr<Texture>()> fun = [this, &info, name { move(name) }, img_aspect, &c, id] {
+        return e->create_texture_cube(id, std::move(name), {}, info, img_aspect, core::sync::EndCaller<core::sync::EndCallerIgnore>([c] {}));
     };
     const auto data = std::dynamic_pointer_cast<TextureCube>(cache.get_cacher().get(id, fun));
     c.set_data(data);
@@ -447,22 +456,25 @@ std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::render::text
 
 std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::render::texture::Manager::get_gx3d(const core::Id id, core::sync::EndCaller<Texture>& c) noexcept
 {
-    const std::shared_ptr<Texture> o = cache.get<Texture>(id, [this, id, &c] {
+    const std::shared_ptr<Texture> o = cache.get<Texture>(id, [this, id, &c](std::string name) noexcept {
         system::stream::Stream* const f = cache.get_file();
-        return read_gx3d(id, f, c);
+        return read_gx3d(id, std::move(name), f, c);
     });
     c.set_data(o);
     return o;
 }
 
 std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::render::texture::Manager::read_gx3d(
+    std::string name,
     system::stream::Stream* const s,
     core::sync::EndCaller<Texture>& c) noexcept
 {
     const auto id = core::asset::Manager::create_id();
-    const auto t = std::dynamic_pointer_cast<Texture>(cache.get_cacher().get<Texture>(id, [this, id, &c, s] {
-        return read_gx3d(id, s, c);
-    }));
+    const auto t = std::dynamic_pointer_cast<Texture>(cache.get_cacher().get<Texture>(
+        id,
+        [this, name { move(name) }, id, &c, s]() noexcept {
+            return read_gx3d(id, std::move(name), s, c);
+        }));
     return t;
 }
 

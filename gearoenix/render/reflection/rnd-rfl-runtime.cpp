@@ -16,9 +16,10 @@
 
 gearoenix::render::reflection::Runtime::Runtime(
     const core::Id id,
+    std::string name,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& end_call) noexcept
-    : Reflection(id, Type::Runtime, e)
+    : Reflection(id, std::move(name), Type::Runtime, e)
     , on_rendered([] {})
 {
     core::sync::EndCaller<core::sync::EndCallerIgnore> call([end_call, this] {
@@ -65,11 +66,19 @@ gearoenix::render::reflection::Runtime::Runtime(
 #endif
     core::sync::EndCaller<texture::TextureCube> txt_cube_call([call](const std::shared_ptr<texture::TextureCube>&) {});
     core::sync::EndCaller<mesh::Mesh> msh_call([call](const std::shared_ptr<mesh::Mesh>&) {});
-    environment = txt_mgr->create_cube(texture_info, environment_resolution, txt_cube_call);
-    environment_mipmap_generator = std::make_shared<graph::node::MipmapGenerator>(environment.get(), e, call);
-    irradiance = txt_mgr->create_cube(texture_info, irradiance_resolution, txt_cube_call);
-    irradiance_mipmap_generator = std::make_shared<graph::node::MipmapGenerator>(irradiance.get(), e, call);
-    radiance = txt_mgr->create_cube(texture_info, radiance_resolution, txt_cube_call);
+    environment = txt_mgr->create_cube(
+        "runtime-reflection-" + this->name + "-environment-texture",
+        texture_info, environment_resolution, txt_cube_call);
+    environment_mipmap_generator = std::make_shared<graph::node::MipmapGenerator>(
+        "runtime-reflection-" + this->name + "-environment-mipmap-generator", environment.get(), e, call);
+    irradiance = txt_mgr->create_cube(
+        "runtime-reflection-" + this->name + "-environment-irradiance",
+        texture_info, irradiance_resolution, txt_cube_call);
+    irradiance_mipmap_generator = std::make_shared<graph::node::MipmapGenerator>(
+        "runtime-reflection-" + this->name + "-irradiance-mipmap-generator", irradiance.get(), e, call);
+    radiance = txt_mgr->create_cube(
+        "runtime-reflection-" + this->name + "-radiance-texture",
+        texture_info, radiance_resolution, txt_cube_call);
     std::vector<texture::AttachmentInfo> target_infos = { texture::AttachmentInfo {
         .texture_info = texture_info,
         .usage = texture::UsageFlag::Color,
@@ -84,7 +93,7 @@ gearoenix::render::reflection::Runtime::Runtime(
         auto& target = environment_targets[i];
         target = e->create_render_target(core::asset::Manager::create_id(), target_infos, call);
         auto& cam = cameras[i];
-        cam = cam_mgr->create<camera::Perspective>();
+        cam = cam_mgr->create<camera::Perspective>("runtime-reflection-" + this->name + "-camera");
         cam->set_cascaded_shadow_frustum_partitions_count(1);
         cam->set_field_of_view(1.570796327f);
         cam->set_aspects(environment_resolution, environment_resolution);
@@ -101,7 +110,9 @@ gearoenix::render::reflection::Runtime::Runtime(
         irradiance_target = e->create_render_target(core::asset::Manager::create_id(), target_infos, call);
         auto& irradiance_convoluter = irradiance_convoluters[i];
         const auto mvp = math::Mat4x4<float>::perspective(1.0f, 1.0f, 0.5, 2.0f) * math::Mat4x4<float>::look_at(math::Vec3(0.0f), math::Vec3<float>(std::get<1>(faces[i])), math::Vec3<float>(std::get<2>(faces[i])));
-        irradiance_convoluter = std::make_unique<graph::node::IrradianceConvoluter>(mvp, environment.get(), e, call);
+        irradiance_convoluter = std::make_unique<graph::node::IrradianceConvoluter>(
+            "runtime-reflection-" + this->name + "-irradiance-convoluter-" + std::to_string(i),
+            mvp, environment.get(), e, call);
         irradiance_convoluter->set_render_target(irradiance_target.get());
         // radiance part
         auto& radiance_face_targets = radiance_targets[i];
@@ -116,6 +127,7 @@ gearoenix::render::reflection::Runtime::Runtime(
             radiance_target = e->create_render_target(core::asset::Manager::create_id(), target_infos, call);
             auto& radiance_convoluter = radiance_face_convoluters[mi];
             radiance_convoluter = std::make_unique<graph::node::RadianceConvoluter>(
+                "runtime-reflection-" + this->name + "-radiance-convoluter-" + std::to_string(i) + "-" + std::to_string(mi),
                 static_cast<float>(roughnesses[mi]), static_cast<float>(environment_resolution),
                 face_mesh.get(), environment.get(), e, call);
             radiance_convoluter->set_render_target(radiance_target.get());

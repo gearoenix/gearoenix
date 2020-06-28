@@ -27,12 +27,12 @@ private:
 
 public:
     Ui(
-        core::Id my_id, system::stream::Stream* f, engine::Engine* e,
+        core::Id my_id, std::string name, system::stream::Stream* f, engine::Engine* e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
     Ui(
-        core::Id my_id, engine::Engine* e,
+        core::Id my_id, std::string name, engine::Engine* e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
-    bool on_event(const core::event::Data& d) noexcept final;
+    [[nodiscard]] bool on_event(const core::event::Data& d) noexcept final;
 
     void add_model(const std::shared_ptr<model::Model>& m) noexcept final;
 };

@@ -6,7 +6,10 @@ namespace gearoenix::render::reflection {
 class Baked final : public Reflection {
 public:
     /// This function can be used for creating skybox baked reflection probe
-    Baked(std::shared_ptr<texture::TextureCube> irradiance, std::shared_ptr<texture::TextureCube> radiance) noexcept;
+    Baked(
+        std::string name,
+        std::shared_ptr<texture::TextureCube> irradiance,
+        std::shared_ptr<texture::TextureCube> radiance) noexcept;
     ~Baked() noexcept final;
 };
 }

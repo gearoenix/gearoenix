@@ -12,8 +12,8 @@ class Equirectangular final : public Skybox {
     GX_GET_CREF_PRV(std::shared_ptr<material::SkyboxEquirectangular>, mat_equ)
 
 public:
-    Equirectangular(core::Id my_id, system::stream::Stream* s, engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
-    Equirectangular(core::Id my_id, engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+    Equirectangular(core::Id my_id, std::string name, system::stream::Stream* s, engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+    Equirectangular(core::Id my_id, std::string name, engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
     ~Equirectangular() noexcept final;
 };
 }

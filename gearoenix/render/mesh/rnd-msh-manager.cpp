@@ -12,11 +12,11 @@ gearoenix::render::mesh::Manager::Manager(std::unique_ptr<system::stream::Stream
 
 std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager::get_gx3d(const core::Id id, core::sync::EndCaller<Mesh>& c) noexcept
 {
-    auto m = cache.get<Mesh>(id, [id, c, this] {
+    auto m = cache.get<Mesh>(id, [id, c, this](std::string name) {
         const auto& f = cache.get_file();
         switch (f->read<Type>()) {
         case Type::Basic:
-            return std::make_shared<Mesh>(id, f, e, core::sync::EndCaller<core::sync::EndCallerIgnore>([c] {}));
+            return std::make_shared<Mesh>(id, std::move(name), f, e, core::sync::EndCaller<core::sync::EndCallerIgnore>([c] {}));
         default:
             GX_UNEXPECTED
         }
@@ -7868,7 +7868,7 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager:
     const static double occlusion_radius = 1.0000001266598622f;
     const auto id = core::asset::Manager::create_id();
     std::shared_ptr<Mesh> m(new Mesh(
-        id, vertices, indices,
+        id, "icosphere", vertices, indices,
         math::Aabb3(math::Vec3(occlusion_radius), math::Vec3(-occlusion_radius)),
         e, core::sync::EndCaller<core::sync::EndCallerIgnore>([c] {})));
     c.set_data(m);
@@ -7913,7 +7913,7 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager:
     const static double occlusion_radius = 1.4f;
     const auto id = core::asset::Manager::create_id();
     std::shared_ptr<Mesh> m(new Mesh(
-        id, vertices, indices,
+        id, "plate", vertices, indices,
         math::Aabb3(math::Vec3(occlusion_radius), math::Vec3(-occlusion_radius)),
         e, core::sync::EndCaller<core::sync::EndCallerIgnore>([c] {})));
     c.set_data(m);
@@ -8120,7 +8120,7 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager:
     const static double occlusion_radius = 1.7f;
     const auto id = core::asset::Manager::create_id();
     std::shared_ptr<Mesh> m(new Mesh(
-        id, vertices, indices,
+        id, "cube", vertices, indices,
         math::Aabb3(math::Vec3(occlusion_radius), math::Vec3(-occlusion_radius)),
         e, core::sync::EndCaller<core::sync::EndCallerIgnore>([c] {})));
     c.set_data(m);
@@ -8302,7 +8302,7 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager:
     };
     const auto id = core::asset::Manager::create_id();
     std::shared_ptr<Mesh> m(new Mesh(
-        id, vertices, indices,
+        id, "inward-cube", vertices, indices,
         math::Aabb3(math::Vec3(1.0), math::Vec3(-1.0)),
         e, core::sync::EndCaller<core::sync::EndCallerIgnore>([c] {})));
     c.set_data(m);
@@ -8392,7 +8392,7 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager:
     };
     const auto id = core::asset::Manager::create_id();
     std::shared_ptr<Mesh> m(new Mesh(
-        id, vertices, indices,
+        id, std::string("mesh-face-") + std::to_string(f), vertices, indices,
         math::Aabb3(math::Vec3(1.0), math::Vec3(-1.0)),
         e, core::sync::EndCaller<core::sync::EndCallerIgnore>([c] {})));
     c.set_data(m);
@@ -8401,22 +8401,31 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager:
     return m;
 }
 
-std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager::create(const std::vector<math::BasicVertex>& vertices, const std::vector<std::uint32_t>& indices, const math::Aabb3& occlusion_box, core::sync::EndCaller<Mesh>& c) noexcept
+std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager::create(
+    std::string name,
+    const std::vector<math::BasicVertex>& vertices,
+    const std::vector<std::uint32_t>& indices,
+    const math::Aabb3& occlusion_box,
+    core::sync::EndCaller<Mesh>& c) noexcept
 {
     const auto id = core::asset::Manager::create_id();
     std::shared_ptr<Mesh> m(new Mesh(
-        id, vertices, indices, occlusion_box,
+        id, std::move(name), vertices, indices, occlusion_box,
         e, core::sync::EndCaller<core::sync::EndCallerIgnore>([c] {})));
     c.set_data(m);
     cache.get_cacher().get_cacheds()[id] = m;
     return m;
 }
 
-std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager::create(const std::vector<math::BasicVertex>& vertices, const std::vector<std::uint32_t>& indices, core::sync::EndCaller<Mesh>& c) noexcept
+std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager::create(
+    std::string name,
+    const std::vector<math::BasicVertex>& vertices,
+    const std::vector<std::uint32_t>& indices,
+    core::sync::EndCaller<Mesh>& c) noexcept
 {
     math::Aabb3 box;
     for (auto& v : vertices)
         box.put_without_update(math::Vec3<double>(v.position));
     box.update();
-    return create(vertices, indices, box, c);
+    return create(std::move(name), vertices, indices, box, c);
 }

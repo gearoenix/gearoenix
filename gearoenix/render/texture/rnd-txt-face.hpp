@@ -1,6 +1,8 @@
 #ifndef GEAROENIX_RENDER_TEXTURE_FACE_HPP
 #define GEAROENIX_RENDER_TEXTURE_FACE_HPP
 #include "../../core/cr-types.hpp"
+#include <string>
+
 namespace gearoenix::render::texture {
 enum struct Face : core::TypeId {
     PositiveX = 1,
@@ -20,4 +22,9 @@ constexpr Face FACES[6] = {
     Face::NegativeZ,
 };
 }
+
+namespace std {
+[[nodiscard]] std::string to_string(const gearoenix::render::texture::Face f) noexcept;
+}
+
 #endif

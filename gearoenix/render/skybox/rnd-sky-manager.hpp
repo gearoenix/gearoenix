@@ -27,17 +27,17 @@ public:
     [[nodiscard]] std::shared_ptr<Skybox> get_gx3d(core::Id mid, core::sync::EndCaller<Skybox>& c) noexcept;
     template <typename T>
     [[nodiscard]] typename std::enable_if<std::is_base_of<Skybox, T>::value, std::shared_ptr<T>>::type
-    create(core::sync::EndCaller<T>& c) noexcept;
+    create(std::string name, core::sync::EndCaller<T>& c) noexcept;
 };
 }
 
 template <typename T>
 typename std::enable_if<std::is_base_of<gearoenix::render::skybox::Skybox, T>::value, std::shared_ptr<T>>::type
-gearoenix::render::skybox::Manager::create(core::sync::EndCaller<T>& c) noexcept
+gearoenix::render::skybox::Manager::create(std::string name, core::sync::EndCaller<T>& c) noexcept
 {
     const core::Id id = core::asset::Manager::create_id();
     const core::sync::EndCaller<core::sync::EndCallerIgnore> call([c] {});
-    const std::shared_ptr<T> result(new T(id, e, call));
+    const std::shared_ptr<T> result(new T(id, std::move(name), e, call));
     c.set_data(result);
     cache.get_cacher().get_cacheds()[id] = result;
     return result;
