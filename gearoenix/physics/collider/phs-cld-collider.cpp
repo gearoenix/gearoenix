@@ -25,7 +25,23 @@ gearoenix::physics::collider::Collider::Collider(const Type t, const Collider& c
 {
 }
 
-gearoenix::physics::collider::Collider::Collider(const Collider& c) noexcept = default;
+gearoenix::physics::collider::Collider::Collider(const Collider& o) noexcept
+    : collider_type(o.collider_type)
+    , origin_box(o.origin_box)
+    , updated_box(o.updated_box)
+    , model_matrix(o.model_matrix)
+    , parent(o.parent)
+    , updated_points {
+        o.updated_points[0],
+        o.updated_points[1],
+        o.updated_points[2],
+        o.updated_points[3],
+        o.updated_points[4],
+        o.updated_points[5],
+        o.updated_points[6],
+        o.updated_points[7],
+    }
+{}
 
 gearoenix::physics::collider::Collider* gearoenix::physics::collider::Collider::read(system::stream::Stream* const f) noexcept
 {
