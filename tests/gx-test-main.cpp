@@ -11,8 +11,9 @@
     }
 GX_TEST_PRINT_TYPE_VAL(math::IntersectionStatus)
 // Test units
-#include "test-core-pool.hpp"
-#include "test-math-frustum.hpp"
-#include "test-math-vector.hpp"
-#include "test-physics-accelerator-bvh.hpp"
-#include "test-render-texture.hpp"
+#include "gx-test-ai-graph.hpp"
+#include "gx-test-core-pool.hpp"
+#include "gx-test-math-frustum.hpp"
+#include "gx-test-math-vector.hpp"
+#include "gx-test-physics-accelerator-bvh.hpp"
+#include "gx-test-render-texture.hpp"

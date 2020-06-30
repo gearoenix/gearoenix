@@ -41,7 +41,8 @@ gearoenix::physics::collider::Collider::Collider(const Collider& o) noexcept
         o.updated_points[6],
         o.updated_points[7],
     }
-{}
+{
+}
 
 gearoenix::physics::collider::Collider* gearoenix::physics::collider::Collider::read(system::stream::Stream* const f) noexcept
 {

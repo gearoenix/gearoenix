@@ -5,6 +5,10 @@ MESSAGE(STATUS "Source directory is '${GX_ENGINE_SRC_DIR}'.")
 MESSAGE(STATUS "Source libraries are ${GX_LIBS}.")
 
 SET(GX_ENGINE_SRC
+        "${GX_ENGINE_SRC_DIR}ai/gx-ai-dijkstra.cpp"
+        "${GX_ENGINE_SRC_DIR}ai/gx-ai-dijkstra.hpp"
+        "${GX_ENGINE_SRC_DIR}ai/gx-ai-graph.cpp"
+        "${GX_ENGINE_SRC_DIR}ai/gx-ai-graph.hpp"
         "${GX_ENGINE_SRC_DIR}audio/au-audio.cpp"
         "${GX_ENGINE_SRC_DIR}audio/au-audio.hpp"
         "${GX_ENGINE_SRC_DIR}audio/au-manager.cpp"

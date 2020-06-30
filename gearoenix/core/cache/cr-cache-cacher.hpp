@@ -6,10 +6,10 @@
 #include <functional>
 #include <map>
 #include <memory>
+#include <optional>
 #include <string>
 #include <type_traits>
 #include <variant>
-#include <optional>
 
 namespace gearoenix::core::cache {
 template <class T, class Key = Id, class Compare = std::less<Key>>
