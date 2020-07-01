@@ -11,6 +11,7 @@
     }
 GX_TEST_PRINT_TYPE_VAL(math::IntersectionStatus)
 // Test units
+#include "gx-test-ai-dijkstra.hpp"
 #include "gx-test-ai-graph.hpp"
 #include "gx-test-core-pool.hpp"
 #include "gx-test-math-frustum.hpp"
