@@ -23,7 +23,7 @@ namespace gearoenix::render::scene {
 namespace gearoenix::demo::wwr {
 class TerrainManager {
 public:
-    constexpr static std::size_t ground_pieces_count = 2;
+    constexpr static std::size_t ground_pieces_count = 3;
     constexpr static double ground_pieces_breadth = 6.0;
 private:
     const std::shared_ptr<render::scene::Game> scene;

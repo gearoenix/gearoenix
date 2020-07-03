@@ -13,11 +13,12 @@ gearoenix::demo::wwr::TerrainManager::TerrainManager(std::shared_ptr<render::sce
 	, asphalt_piece(std::dynamic_pointer_cast<render::model::Dynamic>(scene->get_model("asphalt-ground")))
 	, camera(scene->get_cameras().begin()->second)
 	, asphalt_pieces {
+        asphalt_piece,
 		std::make_shared<render::model::Dynamic>(*asphalt_piece),
 		std::make_shared<render::model::Dynamic>(*asphalt_piece) }
 	, camera_tran(camera->get_transformation())
 {
-	math::Vec3 location(ground_pieces_breadth, 0.0, 0.0);
+	math::Vec3 location(-ground_pieces_breadth, 0.0, 0.0);
 	for (const auto& m : asphalt_pieces) {
 		m->get_transformation()->set_location(location);
 		scene->add_model(m);

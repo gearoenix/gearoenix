@@ -1,7 +1,7 @@
 #ifndef GEAROENIX_PHYSICS_BODY_STATIC_HPP
 #define GEAROENIX_PHYSICS_BODY_STATIC_HPP
 #include "../../math/math-vector.hpp"
-#include "phs-bd-body.hpp"
+#include "gx-phs-bd-body.hpp"
 namespace gearoenix {
 namespace physics {
     namespace body {

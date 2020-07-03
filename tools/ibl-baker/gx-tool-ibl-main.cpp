@@ -4,7 +4,7 @@
 #include <gearoenix/core/event/cr-ev-engine.hpp>
 #include <gearoenix/math/math-aabb.hpp>
 #include <gearoenix/math/math-vertex.hpp>
-#include <gearoenix/physics/body/phs-bd-rigid.hpp>
+#include <gearoenix/physics/body/gx-phs-bd-rigid.hpp>
 #include <gearoenix/physics/collider/phs-cld-sphere.hpp>
 #include <gearoenix/render/camera/rnd-cmr-manager.hpp>
 #include <gearoenix/render/camera/rnd-cmr-perspective.hpp>

@@ -1,6 +1,6 @@
 #include "exm-002-asset-loading.hpp"
 #include <gearoenix/core/asset/cr-asset-manager.hpp>
-#include <gearoenix/physics/body/phs-bd-rigid.hpp>
+#include <gearoenix/physics/body/gx-phs-bd-rigid.hpp>
 #include <gearoenix/render/camera/rnd-cmr-jet-controller.hpp>
 #include <gearoenix/render/camera/rnd-cmr-manager.hpp>
 #include <gearoenix/render/camera/rnd-cmr-perspective.hpp>

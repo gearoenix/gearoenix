@@ -10,7 +10,7 @@ BOOST_AUTO_TEST_CASE(render_texture_test)
     static std::default_random_engine gen(rd());
     static std::uniform_real_distribution<float> dis(-0.5f, 1.5f);
 
-    constexpr std::size_t aspect = 1024;
+    constexpr std::size_t aspect = 32;
     constexpr std::size_t components_count = 4;
 
     std::vector<std::vector<std::vector<float>>> float_data(6);

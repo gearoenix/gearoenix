@@ -37,7 +37,8 @@ struct Graph {
 
     ~Graph() noexcept
     {
-        head->clear();
+        if (head != nullptr)
+            head->clear();
     }
 
     [[nodiscard]] bool operator==(const Graph& o) const noexcept

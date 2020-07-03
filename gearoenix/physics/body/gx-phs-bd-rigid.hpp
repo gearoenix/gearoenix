@@ -1,7 +1,7 @@
 #ifndef GEAROENIX_PHYSICS_BODY_RIGID_HPP
 #define GEAROENIX_PHYSICS_BODY_RIGID_HPP
 #include "../../math/math-vector-3d.hpp"
-#include "phs-bd-body.hpp"
+#include "gx-phs-bd-body.hpp"
 
 namespace gearoenix::physics::body {
 class Rigid : public Body {
@@ -18,7 +18,7 @@ protected:
     double mass = 1.0;
     double inverted_mass = 1.0;
     double air_friction = -0.5; // its nature is to be a negative number
-    double rotational_speed;
+    double rotational_speed = 0.0;
     math::Vec3<double> rotational_speed_axis;
     double rotational_acceleration = 0.0;
     math::Vec3<double> rotational_acceleration_axis;
@@ -29,7 +29,7 @@ protected:
     Behavior rigid_body_behavior = Behavior::Active;
 
 public:
-    Rigid(core::Id id, std::string name, const std::shared_ptr<Transferable>& body_obj) noexcept;
+    Rigid(core::Id id, std::string name, std::shared_ptr<render::model::Model> model) noexcept;
     ~Rigid() noexcept override;
     void apply_force_on_origin(const math::Vec3<double>& force) noexcept;
     void apply_force(const math::Vec3<double>& force, const math::Vec3<double>& point) noexcept;
