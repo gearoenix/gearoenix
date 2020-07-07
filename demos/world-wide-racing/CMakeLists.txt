@@ -15,6 +15,7 @@ SET(GX_DEMO_WORLD_WIDE_RACING_SRC
 IF (NOT CMAKE_SYSTEM_NAME MATCHES "Android")
     ADD_EXECUTABLE(GearoenixDemoWorldWideRacing ${GX_DEMO_WORLD_WIDE_RACING_SRC})
     TARGET_LINK_LIBRARIES(GearoenixDemoWorldWideRacing Gearoenix)
+    MESSAGE(STATUS "World wide racing demo has been configured.")
 ELSE ()
     ADD_LIBRARY(main SHARED ${GX_DEMO_WORLD_WIDE_RACING_SRC})
     TARGET_LINK_LIBRARIES(main Gearoenix)

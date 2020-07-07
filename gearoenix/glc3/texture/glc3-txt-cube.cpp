@@ -71,6 +71,10 @@ std::shared_ptr<gearoenix::glc3::texture::TextureCube> gearoenix::glc3::texture:
             }
             break;
         }
+        case render::texture::TextureFormat::RgbaUint8: {
+            pixels = std::move(data);
+            break;
+        }
         default:
             GXLOGF("Unsupported/Unimplemented setting for cube texture with id " << id)
         }

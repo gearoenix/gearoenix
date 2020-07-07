@@ -97,7 +97,7 @@ void gearoenix::demo::wwr::Garage::initialize_buttons() noexcept {
 void gearoenix::demo::wwr::Garage::load_training_scene() noexcept {
     logo_scene = render::scene::Logo::construct(
             system_application,
-            { {1.0, "game"} },
+            { {1.0, "game"}, {1.1, "game-hud"} },
             [this] (const std::vector<std::shared_ptr<render::scene::Scene>>& s) {
                 training = std::make_unique<Training>(s);
                 logo_scene = nullptr;
