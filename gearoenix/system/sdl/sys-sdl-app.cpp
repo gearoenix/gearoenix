@@ -447,7 +447,7 @@ int gearoenix::system::Application::on_event(SDL_Event* const e) noexcept
             break;
         }
         default:
-            GXTODO
+            GXLOGE("Unhandled windows event: " << static_cast<int>(e->window.event))
             break;
         }
         break;

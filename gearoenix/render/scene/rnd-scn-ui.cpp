@@ -221,7 +221,8 @@ void gearoenix::render::scene::Ui::add_model(const std::shared_ptr<model::Model>
 
 void gearoenix::render::scene::Ui::set_enabled(const bool enb) noexcept
 {
-    if (enb == enability) return;
+    if (enb == enability)
+        return;
     Scene::set_enabled(enb);
     auto* const event_engine = e->get_system_application()->get_event_engine();
     if (enb) {

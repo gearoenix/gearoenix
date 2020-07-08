@@ -57,11 +57,9 @@ it's going to be stabilized.
 
 ## Demos
 
-In this section I need contribution.
+In this section I need contribution. (Note: Webassembly is not main target of this project.)
 
-- [This is WebAssembly demo (Firefox shows better)](https://hossein-noroozpour.github.io/gearoenix-static-files/web-demo/index.html)
-- [This is Android demo](https://hossein-noroozpour.github.io/gearoenix-static-files/android/android.7z)
-- [This is Linux demo](https://hossein-noroozpour.github.io/gearoenix-static-files/linux/linux.7z)
+- [This is WebAssembly demo (Firefox shows better)](https://hossein-noroozpour.github.io/gearoenix-static-files/web-demo/GearoenixDemoWorldWideRacing.html)
 
 ## How to Build
 
