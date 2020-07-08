@@ -1,4 +1,5 @@
 #include "rnd-pip-type.hpp"
+#include "../../system/sys-log.hpp"
 
 std::string std::to_string(const gearoenix::render::pipeline::Type t) noexcept
 {
@@ -30,4 +31,5 @@ std::string std::to_string(const gearoenix::render::pipeline::Type t) noexcept
     case gearoenix::render::pipeline::Type::RadianceConvoluter:
         return "RadianceConvoluter";
     }
+    GX_UNEXPECTED
 }

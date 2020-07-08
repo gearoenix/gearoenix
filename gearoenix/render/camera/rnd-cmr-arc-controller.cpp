@@ -82,12 +82,15 @@ gearoenix::render::camera::ArcController::ArcController(std::shared_ptr<Camera> 
     event_engine->add_listener(core::event::Id::GestureScale, 0.0f, this);
     event_engine->add_listener(core::event::Id::ButtonKeyboard, 0.0f, this);
     values_updated();
-    //    trn->look_at(math::Vec3(10.0, 0.0, 0.0), target, up);
 }
 
 gearoenix::render::camera::ArcController::~ArcController() noexcept
 {
     render_engine->get_update_functions_manager()->remove(function_id);
+    auto* const event_engine = render_engine->get_system_application()->get_event_engine();
+    event_engine->remove_listener(core::event::Id::GestureDrag2D, 0.0f, this);
+    event_engine->remove_listener(core::event::Id::GestureScale, 0.0f, this);
+    event_engine->remove_listener(core::event::Id::ButtonKeyboard, 0.0f, this);
 }
 
 void gearoenix::render::camera::ArcController::set_vertical_angle(const double a) noexcept

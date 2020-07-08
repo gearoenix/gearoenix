@@ -25,7 +25,7 @@ Example003UiWidgetsApp::Example003UiWidgetsApp(gearoenix::system::Application* c
     : gearoenix::core::Application::Application(sys_app)
 {
     const GxEndCallerIgnored end_call([this] {
-        ui_scene->set_enability(true);
+        ui_scene->set_enabled(true);
     });
 
     GxEndCaller<GxUiScene> ui_scn_call([end_call](const std::shared_ptr<GxUiScene>&) {});

@@ -101,7 +101,7 @@ public:
 
     GX_GET_CVAL_PRT(Type, scene_type)
     GX_GETSET_VAL_PRT(double, layer, 0.0)
-    GX_GETSET_VAL_PRT(bool, enability, false)
+    GX_GET_VAL_PRT(bool, enability, false)
     GX_GETSET_VAL_PRT(bool, models_changed, false)
     GX_GET_UCPTR_PRT(buffer::FramedUniform, uniform_buffers)
     GX_GET_UCPTR_PRT(physics::accelerator::Bvh, static_accelerator)
@@ -165,6 +165,7 @@ public:                                                                         
     void add_shadow_cascader(core::Id light_id) noexcept;
     void remove_shadow_cascader(core::Id light_id) noexcept;
     void set_default_reflection_probe(std::shared_ptr<reflection::Baked> rfl) noexcept;
+    virtual void set_enabled(bool) noexcept;
 };
 }
 #endif

@@ -38,7 +38,7 @@ using GxPersCam = gearoenix::render::camera::Perspective;
 GameApp::GameApp(gearoenix::system::Application* const sys_app) noexcept
     : gearoenix::core::Application::Application(sys_app)
 {
-    const GxEndCallerIgnored end_call([this] { scn->set_enability(true); });
+    const GxEndCallerIgnored end_call([this] { scn->set_enabled(true); });
     GxEndCaller<GxScene> scn_call([this, end_call](std::shared_ptr<GxScene> s) {
         scn = std::move(s);
         cam_ctrl = std::make_shared<GxCamCtrl>(scn->get_cameras().begin()->second);

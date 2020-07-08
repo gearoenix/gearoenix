@@ -382,7 +382,7 @@ void gearoenix::render::graph::tree::Pbr::update() noexcept
     for (const auto& priority_scenes : priorities_scenes) {
         const double scene_priority = priority_scenes.first;
         auto& scene_priority_nodes = nodes[scene_priority];
-        const scene::Scene* const scn = priority_scenes.second;
+        const scene::Scene* const scn = priority_scenes.second.get();
         auto& scene_nodes = scene_priority_nodes[scn];
         update_runtime_reflection(scn);
         const auto& cameras = scn->get_cameras();

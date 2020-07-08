@@ -10,7 +10,7 @@ class Edit;
 }
 
 namespace gearoenix::render::scene {
-class Ui : public Scene, public core::event::Listener {
+class Ui final: public Scene, public core::event::Listener {
 private:
     void init() noexcept;
     widget::Widget* selected_widget = nullptr;
@@ -32,9 +32,11 @@ public:
     Ui(
         core::Id my_id, std::string name, engine::Engine* e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+    ~Ui() noexcept final;
     [[nodiscard]] bool on_event(const core::event::Data& d) noexcept final;
 
     void add_model(const std::shared_ptr<model::Model>& m) noexcept final;
+    void set_enabled(bool) noexcept final;
 };
 }
 #endif

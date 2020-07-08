@@ -34,7 +34,7 @@ void gearoenix::physics::Engine::update_scenes_kernel(const unsigned int kernel_
 {
     GX_START_TASKS
     for (const auto& ls : sorted_scenes) {
-        auto* const scene = ls.second;
+        auto* const scene = ls.second.get();
         GX_DO_TASK(scene->update())
         const auto& skies = scene->get_skyboxs();
         for (const auto& sky : skies) {
@@ -88,7 +88,7 @@ void gearoenix::physics::Engine::update_scenes_kernel(const unsigned int kernel_
 void gearoenix::physics::Engine::update_scenes_receiver() noexcept
 {
     for (const auto& ls : sorted_scenes) {
-        auto* const scene = ls.second;
+        auto* const scene = ls.second.get();
 
         const auto& runtime_reflections = scene->get_runtime_reflections();
         for (const auto& id_rtr : runtime_reflections) {
@@ -123,7 +123,7 @@ void gearoenix::physics::Engine::update_visibility_kernel(const unsigned int ker
 {
     GX_START_TASKS
     for (const auto& layer_scene : sorted_scenes) {
-        const auto* const scene = layer_scene.second;
+        const auto* const scene = layer_scene.second.get();
         const auto* const dynamic_accelerator = scene->get_dynamic_accelerator();
         const auto* const static_accelerator = scene->get_static_accelerator();
         const auto& reflections = scene->get_reflections();
@@ -185,7 +185,7 @@ void gearoenix::physics::Engine::update_visibility_kernel(const unsigned int ker
 void gearoenix::physics::Engine::update_visibility_receiver() noexcept
 {
     for (const auto& id_scene : sorted_scenes) {
-        const auto* const scene = id_scene.second;
+        const auto* const scene = id_scene.second.get();
         if (scene == nullptr || !scene->get_enability())
             continue;
         const auto& runtime_reflections = scene->get_runtime_reflections();
@@ -237,7 +237,7 @@ void gearoenix::physics::Engine::update() noexcept
         const auto scene = id_scene.second.lock();
         if (scene == nullptr || !scene->get_enability())
             continue;
-        sorted_scenes.insert({ scene->get_layer(), scene.get() });
+        sorted_scenes.insert({ scene->get_layer(), std::move(scene) });
     }
 }
 

@@ -573,9 +573,9 @@ void gearoenix::system::Application::main_loop() noexcept
 }
 core_application->terminate();
 core_application = nullptr;
-event_engine = nullptr;
 asset_manager = nullptr;
 render_engine = nullptr;
+event_engine = nullptr;
 SDL_DelEventWatch(event_receiver, this);
 #ifdef GX_USE_OPENGL
 #ifdef GX_USE_INSTEAD_OF_OPENGL

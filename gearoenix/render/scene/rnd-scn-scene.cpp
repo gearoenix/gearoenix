@@ -299,3 +299,8 @@ void gearoenix::render::scene::Scene::set_default_reflection_probe(std::shared_p
     }
     default_reflection_probe = std::move(rfl);
 }
+
+void gearoenix::render::scene::Scene::set_enabled(const bool e) noexcept
+{
+    enability = e;
+}

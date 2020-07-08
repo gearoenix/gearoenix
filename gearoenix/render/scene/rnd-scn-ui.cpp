@@ -123,10 +123,6 @@ void gearoenix::render::scene::Ui::init() noexcept
     add_camera(cam);
     cam->get_transformation()->set_location(math::Vec3(0.0, 0.0, 50.0));
     uniform.ambient_light = math::Vec4(1.0f, 1.0f, 1.0f, 1.0f);
-    auto* const event_engine = sys_app->get_event_engine();
-    event_engine->add_listener(core::event::Id::ButtonMouse, 0.0, this);
-    event_engine->add_listener(core::event::Id::MovementMouse, 0.0, this);
-    event_engine->add_listener(core::event::Id::Touch, 0.0, this);
 }
 
 gearoenix::render::scene::Ui::Ui(
@@ -148,6 +144,11 @@ gearoenix::render::scene::Ui::Ui(
     : Scene(my_id, std::move(name), Type::Ui, e, c)
 {
     init();
+}
+
+gearoenix::render::scene::Ui::~Ui() noexcept
+{
+    Ui::set_enabled(false);
 }
 
 bool gearoenix::render::scene::Ui::on_event(const core::event::Data& d) noexcept
@@ -215,5 +216,21 @@ void gearoenix::render::scene::Ui::add_model(const std::shared_ptr<model::Model>
                 edt->active(false);
             }
         }
+    }
+}
+
+void gearoenix::render::scene::Ui::set_enabled(const bool enb) noexcept
+{
+    if (enb == enability) return;
+    Scene::set_enabled(enb);
+    auto* const event_engine = e->get_system_application()->get_event_engine();
+    if (enb) {
+        event_engine->add_listener(core::event::Id::ButtonMouse, 0.0, this);
+        event_engine->add_listener(core::event::Id::MovementMouse, 0.0, this);
+        event_engine->add_listener(core::event::Id::Touch, 0.0, this);
+    } else {
+        event_engine->remove_listener(core::event::Id::ButtonMouse, 0.0, this);
+        event_engine->remove_listener(core::event::Id::MovementMouse, 0.0, this);
+        event_engine->remove_listener(core::event::Id::Touch, 0.0, this);
     }
 }

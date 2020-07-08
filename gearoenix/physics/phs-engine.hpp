@@ -21,7 +21,7 @@ class Scene;
 
 namespace gearoenix::physics {
 class Engine {
-    typedef std::multimap<double, render::scene::Scene*> SceneMap;
+    typedef std::multimap<double, std::shared_ptr<render::scene::Scene>> SceneMap;
     GX_GET_UCPTR_PRV(animation::Manager, animation_manager)
     GX_GET_CREF_PRV(SceneMap, sorted_scenes)
 private:

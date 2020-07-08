@@ -19,7 +19,7 @@ void gearoenix::render::scene::Logo::on_load(const std::shared_ptr<Scene>& s) no
 
     core::sync::EndCaller<core::sync::EndCallerIgnore> end([this, strong_self] {
         for (const auto& next_scene : next_scenes)
-            next_scene->set_enability(true);
+            next_scene->set_enabled(true);
         on_finished(next_scenes);
     });
     core::sync::EndCaller<model::Model> mdl_end([end](const std::shared_ptr<model::Model>&) {});
@@ -73,7 +73,7 @@ void gearoenix::render::scene::Logo::on_load(const std::shared_ptr<Scene>& s) no
         }));
     }
 
-    s->set_enability(true);
+    s->set_enabled(true);
 }
 
 gearoenix::render::scene::Logo::Logo(
@@ -91,7 +91,7 @@ gearoenix::render::scene::Logo::Logo(
 gearoenix::render::scene::Logo::~Logo() noexcept
 {
     rotation_animation->set_activity(false);
-    logo_scene->set_enability(false);
+    logo_scene->set_enabled(false);
     render_engine->late_delete(logo_scene);
 }
 

@@ -47,7 +47,7 @@ Example004RuntimeReflectionProbeApp::Example004RuntimeReflectionProbeApp(gearoen
     : gearoenix::core::Application::Application(sys_app)
 {
     const GxEndCallerIgnored end_call([this] {
-        scn->set_enability(true);
+        scn->set_enabled(true);
     });
 
     GxEndCaller<GxGameScene> scn_call([end_call](const std::shared_ptr<GxGameScene>&) {});

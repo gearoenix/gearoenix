@@ -1,4 +1,5 @@
 #include "rnd-txt-face.hpp"
+#include "../../system/sys-log.hpp"
 
 std::string std::to_string(const gearoenix::render::texture::Face f) noexcept
 {
@@ -16,4 +17,5 @@ std::string std::to_string(const gearoenix::render::texture::Face f) noexcept
     case gearoenix::render::texture::Face::NegativeZ:
         return "NegativeZ";
     }
+    GX_UNEXPECTED
 }

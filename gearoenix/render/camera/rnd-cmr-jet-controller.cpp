@@ -53,6 +53,10 @@ gearoenix::render::camera::JetController::JetController(std::shared_ptr<Camera> 
 gearoenix::render::camera::JetController::~JetController() noexcept
 {
     render_engine->get_update_functions_manager()->remove(function_id);
+    auto* const event_engine = render_engine->get_system_application()->get_event_engine();
+    event_engine->remove_listener(core::event::Id::GestureDrag2D, 0.0f, this);
+    event_engine->remove_listener(core::event::Id::GestureScale, 0.0f, this);
+    event_engine->remove_listener(core::event::Id::ButtonKeyboard, 0.0f, this);
 }
 
 bool gearoenix::render::camera::JetController::on_event(const core::event::Data& d) noexcept

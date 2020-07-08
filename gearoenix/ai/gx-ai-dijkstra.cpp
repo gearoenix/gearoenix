@@ -30,7 +30,7 @@ gearoenix::ai::Graph<int, int> gearoenix::ai::Dijkstra::best_graph(const int sta
             const auto& v = seen_vertices[j];
             if (v.not_best && v.weight < min_w) {
                 min_w = v.weight;
-                idx = j;
+                idx = static_cast<int>(j);
             }
         }
         seen_vertices[idx].not_best = false;

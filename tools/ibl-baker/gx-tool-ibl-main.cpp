@@ -85,9 +85,9 @@ void IblBaker::argument_handling() noexcept
     args->get_value("radiance-file", radiance_file);
     args->get_value("radiance-resolution", radiance_resolution);
     auto& conf = system_application->get_configuration().render_config;
-    conf.set_runtime_reflection_environment_resolution(baked_cube_resolution);
-    conf.set_runtime_reflection_irradiance_resolution(irradiance_resolution);
-    conf.set_runtime_reflection_radiance_resolution(radiance_resolution);
+    conf.set_runtime_reflection_environment_resolution(static_cast<std::uint16_t>(baked_cube_resolution));
+    conf.set_runtime_reflection_irradiance_resolution(static_cast<std::uint16_t>(irradiance_resolution));
+    conf.set_runtime_reflection_radiance_resolution(static_cast<std::uint16_t>(radiance_resolution));
     GXLOGD("Arguments parsed.")
 }
 
@@ -100,9 +100,9 @@ IblBaker::IblBaker(gearoenix::system::Application* const sys_app) noexcept
         argument_handling();
 
     const GxEndCallerIgnored end_call([this] {
-        uiscn->set_enability(true);
-        scn->set_enability(true);
-        obj_scn->set_enability(true);
+        uiscn->set_enabled(true);
+        scn->set_enabled(true);
+        obj_scn->set_enabled(true);
         auto* const event_engine = system_application->get_event_engine();
         event_engine->add_listener(GxEventId::ButtonMouse, 0.0f, this);
         event_engine->add_listener(GxEventId::MovementMouse, 0.0f, this);
