@@ -99,7 +99,7 @@ void gearoenix::demo::wwr::Garage::load_training_scene() noexcept {
             system_application,
             { {1.0, "game"}, {1.1, "game-hud"} },
             [this] (const std::vector<std::shared_ptr<render::scene::Scene>>& s) {
-                training = std::make_unique<Training>(s);
+                training = std::make_unique<Training>(s, this);
                 logo_scene = nullptr;
             });
 }
@@ -113,3 +113,18 @@ gearoenix::demo::wwr::Garage::Garage(const std::vector <std::shared_ptr<render::
 }
 
 gearoenix::demo::wwr::Garage::~Garage() noexcept = default;
+
+void gearoenix::demo::wwr::Garage::clear() noexcept {
+    cam_ctrl = nullptr;
+    shop_button = nullptr;
+    multiplayer_button = nullptr;
+    tuning_button = nullptr;
+    training_button = nullptr;
+    next_button_placer = nullptr;
+    previous_button_placer = nullptr;
+    player_name_placer = nullptr;
+    score_placer = nullptr;
+    bottom_button_scaler = nullptr;
+    game_scene = nullptr;
+    ui_scene = nullptr;
+}

@@ -39,6 +39,7 @@ namespace gearoenix::demo::wwr {
     public:
         explicit Garage(const std::vector<std::shared_ptr<render::scene::Scene>>& scenes) noexcept;
         ~Garage() noexcept;
+        void clear() noexcept;
     };
 }
 #endif

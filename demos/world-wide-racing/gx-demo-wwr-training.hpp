@@ -24,6 +24,7 @@ namespace gearoenix::render::scene {
 
 namespace gearoenix::demo::wwr {
     class TerrainManager;
+    class Garage;
     class Training final {
     private:
         std::shared_ptr<render::scene::Game> game_scene;
@@ -39,7 +40,7 @@ namespace gearoenix::demo::wwr {
         void initialize_cars() noexcept;
         void initialize_terrain() noexcept;
     public:
-        explicit Training(const std::vector<std::shared_ptr<render::scene::Scene>>& scenes) noexcept;
+        Training(const std::vector<std::shared_ptr<render::scene::Scene>>& scenes, Garage * garage) noexcept;
         ~Training() noexcept;
     };
 }

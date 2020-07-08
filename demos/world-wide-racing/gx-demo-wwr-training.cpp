@@ -1,4 +1,5 @@
 #include "gx-demo-wwr-training.hpp"
+#include "gx-demo-wwr-garage.hpp"
 #include "gx-demo-wwr-rotating-button.hpp"
 #include "gx-demo-wwr-terrain-manager.hpp"
 #include <gearoenix/physics/constraint/phs-cns-manager.hpp>
@@ -74,12 +75,15 @@ void gearoenix::demo::wwr::Training::initialize_terrain() noexcept {
     terrain_manager = std::make_unique<TerrainManager>(game_scene);
 }
 
-gearoenix::demo::wwr::Training::Training(const std::vector <std::shared_ptr<render::scene::Scene>> &scenes) noexcept {
+gearoenix::demo::wwr::Training::Training(
+        const std::vector <std::shared_ptr<render::scene::Scene>> &scenes,
+        Garage * const garage) noexcept {
     initialize_scenes(scenes);
     initialize_camera();
     initialize_buttons();
     initialize_cars();
     initialize_terrain();
+    garage->clear();
 }
 
 gearoenix::demo::wwr::Training::~Training() noexcept = default;
