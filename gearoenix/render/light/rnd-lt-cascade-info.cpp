@@ -79,7 +79,7 @@ gearoenix::render::light::CascadeInfo::CascadeInfo(engine::Engine* const e) noex
     for (auto& frame : frames)
         frame.init(e);
     for (auto i = 0; i < cascades_count; ++i)
-        per_cascade.get_next([e] { return new PerCascade(e); });
+        (void)per_cascade.get_next([e] { return new PerCascade(e); });
     for (auto& k : kernels) {
         k.e = e;
         k.per_cascade = &per_cascade;
