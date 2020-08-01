@@ -78,7 +78,6 @@ constexpr T gearoenix::math::Numeric::maximum(const T a, const T b) noexcept
 template <typename T>
 constexpr T gearoenix::math::Numeric::minimum(const T a, const T b) noexcept
 {
-
     if (std::is_floating_point<T>::value) {
         if (std::isnan(a))
             return b;

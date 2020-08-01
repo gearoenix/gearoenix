@@ -1,5 +1,4 @@
 #include "math-aabb.hpp"
-#include "../system/stream/sys-stm-stream.hpp"
 #include "math-ray.hpp"
 #include "math-sphere.hpp"
 #include <limits>
@@ -94,22 +93,22 @@ void gearoenix::math::Aabb3::put_without_update(const Aabb3& o) noexcept
 bool gearoenix::math::Aabb3::check_intersection(const Aabb3& o, Aabb3& intersection) const noexcept
 {
     int equals = 0;
+    const auto u = upper.minimum(o.upper);
+    const auto l = lower.maximum(o.lower);
     for (int i = 0; i < 3; ++i) {
-        const double eb = lower[i];
-        const double oeb = o.lower[i];
-        const double ieb = GX_MAX(eb, oeb);
-        const double ea = upper[i];
-        const double oea = o.upper[i];
-        const double iea = GX_MIN(ea, oea);
-        intersection.upper[i] = iea;
-        intersection.lower[i] = ieb;
-        if (ieb == iea) {
+        const auto uv = u[i];
+        const auto lv = l[i];
+        if (uv == lv) {
             ++equals;
-        } else if (ieb > iea) {
+        } else if (lv > uv) {
             return false;
         }
     }
-    return equals < 3;
+    if (equals < 3) {
+        intersection = Aabb3(u, l);
+        return true;
+    }
+    return false;
 }
 
 bool gearoenix::math::Aabb3::check_intersection(const Aabb3& o) const noexcept
@@ -135,10 +134,10 @@ std::optional<double> gearoenix::math::Aabb3::hit(const math::Ray3& r, const dou
     const auto& rrd = r.get_reversed_normalized_direction();
     const auto t0 = (lower - ro) * rrd;
     const auto t1 = (upper - ro) * rrd;
-    const auto tmin = t0.minimum(t1).maximum();
-    const auto tmax = t0.maximum(t1).minimum();
-    if (tmax >= 0.0 && tmin <= tmax && tmin < d_min)
-        return tmin;
+    const auto t_min = t0.minimum(t1).maximum();
+    const auto t_max = t0.maximum(t1).minimum();
+    if (t_max >= 0.0 && t_min <= t_max && t_min < d_min)
+        return t_min;
     return std::nullopt;
 }
 

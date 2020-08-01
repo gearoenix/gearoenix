@@ -9,7 +9,7 @@
 #include <vector>
 
 namespace gearoenix::physics::accelerator {
-class Bvh;
+struct Bvh;
 }
 
 namespace gearoenix::physics::collider {

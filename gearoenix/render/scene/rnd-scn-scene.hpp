@@ -25,7 +25,7 @@ struct Ray3;
 }
 
 namespace gearoenix::physics::accelerator {
-class Bvh;
+struct Bvh;
 }
 namespace gearoenix::physics::body {
 class Body;

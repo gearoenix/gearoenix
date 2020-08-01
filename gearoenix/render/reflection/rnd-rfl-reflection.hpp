@@ -11,7 +11,7 @@ class Aabb;
 }
 
 namespace gearoenix::physics::accelerator {
-class Bvh;
+struct Bvh;
 }
 
 namespace gearoenix::render::engine {

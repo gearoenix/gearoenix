@@ -27,7 +27,7 @@ class File;
 }
 
 namespace gearoenix::physics::accelerator {
-class Bvh;
+struct Bvh;
 }
 
 namespace gearoenix::render::buffer {

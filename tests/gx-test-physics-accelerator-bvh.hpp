@@ -27,8 +27,7 @@ BOOST_AUTO_TEST_CASE(physics_accelerator_bvh)
         for (auto& c : cs)                \
             colliders.push_back(c.get()); \
     }                                     \
-    bvh.reset(colliders);                 \
-    GXLOGD(bvh.to_string())
+    bvh.reset(colliders);
 
     GX_TEST_HELPER
 
@@ -171,7 +170,6 @@ BOOST_AUTO_TEST_CASE(physics_accelerator_bvh)
     bvh.reset(colliders);
     auto now2 = std::chrono::high_resolution_clock::now();
     GXLOGD("dis-time: " << (now2 - now1).count())
-    GXLOGD(bvh.to_string())
 
     long double dis_time = 0.0L;
 
