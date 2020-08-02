@@ -106,7 +106,7 @@ private:
     void update_skyboxes(const scene::Scene* scn, const camera::Camera* cam, CameraData& camera_nodes) noexcept;
     void update_runtime_reflection(const scene::Scene* scn) noexcept;
     void update_opaque(
-        const std::vector<std::tuple<material::Type, model::Model*, model::Mesh*>>& seen_meshes,
+        const std::vector<std::tuple<double, material::Type, model::Model*, model::Mesh*>>& seen_meshes,
         const scene::Scene* scn, const camera::Camera* cam, CameraData& camera_nodes) noexcept;
     void update_transparent(
         const std::vector<std::tuple<double, material::Type, model::Model*, model::Mesh*>>& seen_meshes,

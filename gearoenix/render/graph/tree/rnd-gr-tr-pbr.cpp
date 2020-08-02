@@ -158,7 +158,7 @@ void gearoenix::render::graph::tree::Pbr::update_runtime_reflection(const scene:
 }
 
 void gearoenix::render::graph::tree::Pbr::update_opaque(
-    const std::vector<std::tuple<material::Type, model::Model*, model::Mesh*>>& seen_meshes,
+    const std::vector<std::tuple<double, material::Type, model::Model*, model::Mesh*>>& seen_meshes,
     const scene::Scene* const scn, const camera::Camera* const cam, CameraData& camera_nodes) noexcept
 {
     node::ForwardPbr* fwd = camera_nodes.opaques.forward_pbr;
@@ -187,7 +187,7 @@ void gearoenix::render::graph::tree::Pbr::update_opaque(
         camera_nodes.opaques.unlit = unl;
     }
 
-    for (const auto& [material_id, model_ptr, mesh_ptr] : seen_meshes) {
+    for (const auto& [dis, material_id, model_ptr, mesh_ptr] : seen_meshes) {
         switch (material_id) {
         case material::Type::Pbr: {
             fwd->add_mesh(std::make_pair(model_ptr, mesh_ptr));

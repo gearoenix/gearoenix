@@ -57,8 +57,7 @@ class Transformation;
 class Camera : public core::asset::Asset, public core::event::Listener {
 public:
     typedef std::array<math::Vec3<double>, 4> Partition;
-    typedef std::vector<std::tuple<material::Type, model::Model*, model::Mesh*>> Meshes;
-    typedef std::vector<std::tuple<double, material::Type, model::Model*, model::Mesh*>> TransparentMeshes;
+    typedef std::vector<std::tuple<double, material::Type, model::Model*, model::Mesh*>> Meshes;
 
     GX_GETSET_VAL_PRT(double, layer, 0.0)
     GX_GET_UPTR_PRT(physics::collider::Frustum, frustum_collider)
@@ -71,10 +70,10 @@ public:
     GX_GETSET_VAL_PRT(bool, enabled, true)
     GX_GETSET_VAL_PRT(bool, cascaded_shadow_enabled, false)
     GX_GET_CREF_PRT(Meshes, seen_static_opaque_meshes) // sorted
-    GX_GET_CREF_PRT(TransparentMeshes, seen_static_transparent_meshes) // sorted
+    GX_GET_CREF_PRT(Meshes, seen_static_transparent_meshes) // sorted
     GX_GET_CREF_PRT(Meshes, seen_dynamic_opaque_meshes) // sorted
-    GX_GET_CREF_PRT(TransparentMeshes, seen_dynamic_transparent_meshes) // sorted
-    GX_GET_CREF_PRT(TransparentMeshes, seen_transparent_meshes) // sorted
+    GX_GET_CREF_PRT(Meshes, seen_dynamic_transparent_meshes) // sorted
+    GX_GET_CREF_PRT(Meshes, seen_transparent_meshes) // sorted
     GX_GET_REF_PRT(core::OneLoopPool<light::CascadeInfo>, cascades)
     GX_GET_CPTR_PRT(engine::Engine, render_engine)
 protected:
