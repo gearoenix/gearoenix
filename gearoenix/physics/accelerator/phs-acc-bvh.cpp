@@ -2,10 +2,8 @@
 #include "../collider/phs-cld-collider.hpp"
 
 void gearoenix::physics::accelerator::Bvh::Node::init(
-    std::vector<Node>& nodes,
-    std::size_t& nodes_current_index,
-    std::size_t colliders_splits_starting_index,
-    std::size_t colliders_splits_ending_index,
+    const std::size_t colliders_splits_starting_index,
+    const std::size_t colliders_splits_ending_index,
     std::vector<collider::Collider*>& colliders_splits,
     Bin (&bins)[bins_count],
     const gearoenix::math::Aabb3& v) noexcept
@@ -15,12 +13,13 @@ void gearoenix::physics::accelerator::Bvh::Node::init(
 
     volume = v;
     colliders.clear();
-    left_index = static_cast<std::size_t>(-1);
-    left = nullptr;
-    right_index = static_cast<std::size_t>(-1);
-    right = nullptr;
 
     const auto colliders_splits_size = colliders_splits_ending_index - colliders_splits_starting_index;
+
+#ifdef GX_DEBUG_MODE
+    if (colliders_splits_size <= 0)
+        GX_UNEXPECTED
+#endif
 
     if (colliders_splits_size <= per_node_colliders_count) {
         for (auto i = colliders_splits_starting_index; i < colliders_splits_ending_index; ++i)
@@ -42,13 +41,13 @@ void gearoenix::physics::accelerator::Bvh::Node::init(
     if (dim_i[1].second < dim_i[2].second) {
         std::swap(dim_i[1], dim_i[2]);
     }
-    /// Clearing bins
-    for (auto& bin : bins) {
-        bin.volume.reset();
-        bin.colliders.clear();
-    }
     /// Searching for dimension with a good split
     for (const auto& di : dim_i) {
+        /// Clearing bins
+        for (auto& bin : bins) {
+            bin.volume.reset();
+            bin.colliders.clear();
+        }
         const auto split_size = di.second / static_cast<double>(bins_count);
         double splits[walls_count] = { 0.0 };
         double wall = volume.get_lower()[di.first];
@@ -89,14 +88,19 @@ void gearoenix::physics::accelerator::Bvh::Node::init(
         }
         auto best_wall_cost = std::numeric_limits<double>::max();
         auto best_wall_index = static_cast<std::size_t>(-1);
-        math::Aabb3 best_wall_left_box {};
-        math::Aabb3 best_wall_right_box {};
-        math::Aabb3 left_box {};
+        math::Aabb3 best_wall_left_box;
+        math::Aabb3 best_wall_right_box;
+        math::Aabb3 left_box;
         std::size_t left_count = 0;
         for (std::size_t i = 0; i < walls_count; ++i) {
-            left_box.put(bins[i].volume);
-            left_count += bins[i].colliders.size();
+            const auto& left_bin = bins[i];
+            left_count += left_bin.colliders.size();
+            if (0 >= left_count)
+                continue;
+            left_box.put(left_bin.volume);
             const auto right_count = colliders_splits_size - left_count;
+            if (0 >= right_count)
+                break;
             math::Aabb3 right_box = bins[i + 1].volume;
             for (auto j = i + 2; j < bins_count; ++j) {
                 right_box.put_without_update(bins[j].volume);
@@ -110,44 +114,38 @@ void gearoenix::physics::accelerator::Bvh::Node::init(
                 best_wall_right_box = right_box;
             }
         }
+
         ++best_wall_index;
 
-        std::size_t left_colliders_splits_starting_index = colliders_splits.size();
+        const std::size_t left_colliders_splits_starting_index = colliders_splits.size();
         for (std::size_t i = 0; i < best_wall_index; ++i) {
             for (auto c : bins[i].colliders) {
                 colliders_splits.push_back(c);
             }
         }
-        std::size_t left_colliders_splits_ending_index = colliders_splits.size();
+        const std::size_t left_colliders_splits_ending_index = colliders_splits.size();
 
-        std::size_t right_colliders_splits_starting_index = colliders_splits.size();
-        for (auto i = best_wall_index; i < walls_count; ++i) {
+        const std::size_t right_colliders_splits_starting_index = colliders_splits.size();
+        for (auto i = best_wall_index; i < bins_count; ++i) {
             for (auto c : bins[i].colliders) {
                 colliders_splits.push_back(c);
             }
         }
-        std::size_t right_colliders_splits_ending_index = colliders_splits.size();
+        const std::size_t right_colliders_splits_ending_index = colliders_splits.size();
 
-        ++nodes_current_index;
-        left_index = nodes_current_index;
-        ++nodes_current_index;
-        right_index = nodes_current_index;
+        if (nullptr == left)
+            left = std::make_unique<Node>();
+        if (nullptr == right)
+            right = std::make_unique<Node>();
 
-        while (nodes_current_index >= nodes.size())
-            nodes.emplace_back();
-
-        nodes[left_index].init(
-            nodes,
-            nodes_current_index,
+        left->init(
             left_colliders_splits_starting_index,
             left_colliders_splits_ending_index,
             colliders_splits,
             bins,
             best_wall_left_box);
 
-        nodes[right_index].init(
-            nodes,
-            nodes_current_index,
+        right->init(
             right_colliders_splits_starting_index,
             right_colliders_splits_ending_index,
             colliders_splits,
@@ -160,52 +158,42 @@ void gearoenix::physics::accelerator::Bvh::Node::init(
         colliders.push_back(colliders_splits[i]);
 }
 
-void gearoenix::physics::accelerator::Bvh::Node::set_pointers(std::vector<Node>& nodes) noexcept
-{
-    if (left_index == static_cast<std::size_t>(-1))
-        return;
-    left = &nodes[left_index];
-    right = &nodes[right_index];
-    left->set_pointers(nodes);
-    right->set_pointers(nodes);
-}
-
 std::optional<std::pair<double, gearoenix::physics::collider::Collider*>> gearoenix::physics::accelerator::Bvh::Node::hit(const math::Ray3& r, const double d_min) const noexcept
 {
     auto min_dis = d_min;
     std::optional<std::pair<double, collider::Collider*>> result = std::nullopt;
-    if (nullptr == left) {
-        for (auto* const c : colliders) {
-            if (auto d = c->hit(r, min_dis)) {
-                min_dis = *d;
-                result = std::make_pair(min_dis, c);
-            }
-        }
-        return result;
-    }
-    if (auto left_dis = left->volume.hit(r, min_dis)) {
-        if (auto right_dis = right->volume.hit(r, min_dis)) {
-            if (*left_dis < *right_dis) {
-                result = left->hit(r, min_dis);
+    if (colliders.empty()) {
+        if (auto left_dis = left->volume.hit(r, min_dis)) {
+            if (auto right_dis = right->volume.hit(r, min_dis)) {
+                if (*left_dis < *right_dis) {
+                    result = left->hit(r, min_dis);
+                    if (result) {
+                        min_dis = result->first;
+                    }
+                    if (auto right_result = right->hit(r, min_dis))
+                        result = right_result;
+                    return result;
+                }
+                result = right->hit(r, min_dis);
                 if (result) {
                     min_dis = result->first;
                 }
-                if (auto right_result = right->hit(r, min_dis))
-                    result = right_result;
+                if (auto left_result = left->hit(r, min_dis))
+                    result = left_result;
                 return result;
             }
-            result = right->hit(r, min_dis);
-            if (result) {
-                min_dis = result->first;
-            }
-            if (auto left_result = left->hit(r, min_dis))
-                result = left_result;
-            return result;
+            return left->hit(r, min_dis);
         }
-        return left->hit(r, min_dis);
+        if (right->volume.hit(r, min_dis)) {
+            return right->hit(r, min_dis);
+        }
+        return std::nullopt;
     }
-    if (right->volume.hit(r, min_dis)) {
-        return right->hit(r, min_dis);
+    for (auto* const c : colliders) {
+        if (auto d = c->hit(r, min_dis)) {
+            min_dis = *d;
+            result = std::make_pair(min_dis, c);
+        }
     }
     return result;
 }
@@ -223,15 +211,15 @@ void gearoenix::physics::accelerator::Bvh::Node::call_on_intersecting(
             n->map(collided);                                      \
         }                                                          \
     }
-    if (nullptr == left) {
+    if (colliders.empty()) {
+        GX_HELPER(left)
+        GX_HELPER(right)
+    } else {
         for (collider::Collider* const c : colliders) {
             if (cld->check_intersection(c->get_updated_box())) {
                 collided(c);
             }
         }
-    } else {
-        GX_HELPER(left)
-        GX_HELPER(right)
     }
 #undef GX_HELPER
 }
@@ -239,43 +227,42 @@ void gearoenix::physics::accelerator::Bvh::Node::call_on_intersecting(
 void gearoenix::physics::accelerator::Bvh::Node::map(
     const std::function<void(collider::Collider* const)>& collided) const noexcept
 {
-    if (nullptr == left) {
+    if (colliders.empty()) {
+        left->map(collided);
+        right->map(collided);
+    } else {
         for (collider::Collider* const c : colliders) {
             collided(c);
         }
-    } else {
-        left->map(collided);
-        right->map(collided);
     }
 }
 
 void gearoenix::physics::accelerator::Bvh::reset(const std::vector<collider::Collider*>& colliders) noexcept
 {
+    if (colliders.empty())
+        return;
+    if (nullptr == root)
+        root = std::make_unique<Node>();
     math::Aabb3 volume;
     collider_splits.clear();
-    /// Because of std for loop for vector is not constexpr in Linux
     for (auto c : colliders) {
         volume.put_without_update(c->get_updated_box());
         collider_splits.push_back(c);
     }
     volume.update();
-    std::size_t node_current_index = 0;
-    nodes_pool[0].init(
-        nodes_pool,
-        node_current_index,
+    root->init(
         0,
         colliders.size(),
         collider_splits,
         bins_pool,
         volume);
-
-    root = &nodes_pool[0];
-    root->set_pointers(nodes_pool);
 }
 
 std::optional<std::pair<double, gearoenix::physics::collider::Collider*>> gearoenix::physics::accelerator::Bvh::hit(
     const math::Ray3& r, const double d_min) const noexcept
 {
+    if (nullptr == root)
+        return std::nullopt;
     return root->hit(r, d_min);
 }
 
@@ -283,5 +270,7 @@ void gearoenix::physics::accelerator::Bvh::call_on_intersecting(
     const collider::Collider* const cld,
     const std::function<void(collider::Collider*)>& collided) const noexcept
 {
+    if (nullptr == root)
+        return;
     root->call_on_intersecting(cld, collided);
 }

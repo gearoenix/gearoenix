@@ -35,27 +35,21 @@ private:
     struct Node {
         math::Aabb3 volume;
         std::vector<collider::Collider*> colliders;
-        std::size_t left_index = static_cast<std::size_t>(-1);
-        Node* left = nullptr;
-        std::size_t right_index = static_cast<std::size_t>(-1);
-        Node* right = nullptr;
+        std::unique_ptr<Node> left = nullptr;
+        std::unique_ptr<Node> right = nullptr;
 
         void init(
-            std::vector<Node>& nodes,
-            std::size_t& nodes_current_index,
             std::size_t colliders_splits_starting_index,
             std::size_t colliders_splits_ending_index,
             std::vector<collider::Collider*>& colliders_splits,
             Bin (&bins)[bins_count],
             const math::Aabb3& volume) noexcept;
-        void set_pointers(std::vector<Node>& nodes) noexcept;
         [[nodiscard]] std::optional<std::pair<double, collider::Collider*>> hit(const math::Ray3& r, double d_min) const noexcept;
         void call_on_intersecting(const collider::Collider* cld, const std::function<void(collider::Collider* const cld)>& collided) const noexcept;
         void map(const std::function<void(collider::Collider* const cld)>& collided) const noexcept;
     };
 
-    std::vector<Node> nodes_pool = { Node() };
-    Node* root = nullptr;
+    std::unique_ptr<Node> root;
     Bin bins_pool[bins_count];
     std::vector<collider::Collider*> collider_splits;
 

@@ -173,7 +173,7 @@ BOOST_AUTO_TEST_CASE(physics_accelerator_bvh)
 
     long double dis_time = 0.0L;
 
-    constexpr int hits_count = 100000;
+    constexpr int hits_count = 1000000;
 
     for (int i = 0; i < hits_count; ++i) {
         const gearoenix::math::Vec3 p(dis2(gen), dis2(gen), dis2(gen));

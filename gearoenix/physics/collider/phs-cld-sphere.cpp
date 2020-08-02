@@ -5,6 +5,8 @@ gearoenix::physics::collider::Sphere::Sphere(const math::Vec3<double>& c, double
     : Collider(Type::Sphere)
     , sphere(c, r)
 {
+    origin_box.put(sphere);
+    update_box();
 }
 
 void gearoenix::physics::collider::Sphere::set_location(const math::Vec3<double>& l) noexcept
