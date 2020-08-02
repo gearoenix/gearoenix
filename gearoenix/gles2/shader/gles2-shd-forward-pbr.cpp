@@ -284,18 +284,7 @@ gearoenix::gles2::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const 
             "        }\n"
             "        lcasi = diri * " GX_MAX_SHADOW_CASCADES_STR ";\n"
             "    }\n"
-            //   ambient lighting (we now use IBL as the ambient term)
-            "    vec3 frsn = fresnel_schlick_roughness(normal_dot_view, f0, roughness);\n"
-            "    vec3 ks = frsn;\n"
-            "    vec3 kd = (1.0 - ks) * (1.0 - metallic);\n"
-            "    vec3 irradiance = textureCube(effect_diffuse_environment, normal).rgb;\n"
-            "    vec3 diffuse = irradiance * albedo.xyz;\n"
-            //   sample both the pre-filter map and the BRDF lut and combine them together as per
-            //   the Split-Sum approximation to get the IBL radiance part.
-            "    vec3 prefiltered_color = textureCube(effect_specular_environment, reflection).rgb;\n"
-            "    vec2 brdf = texture2D(effect_brdflut, vec2(normal_dot_view, roughness)).rg;\n"
-            "    vec3 specular = prefiltered_color * (frsn * brdf.x + brdf.y);\n"
-            "    vec3 ambient = kd * diffuse + specular + scene_ambient_light * albedo.xyz;\n"
+            "    vec3 ambient = scene_ambient_light * albedo.xyz;\n"
             "    tmpv4.xyz = ambient + lo + emission;\n"
             "    if(camera_gamma_correction > 0.001) {\n"
             //       HDR tone mapping
@@ -304,7 +293,7 @@ gearoenix::gles2::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const 
             "        tmpv4.xyz = pow(tmpv4.xyz, vec3(1.0 / camera_gamma_correction));\n"
             "    }\n"
             "    gl_FragColor = vec4(tmpv4.xyz, albedo.w);\n"
-            "}"; // 123
+            "}";
 
         set_vertex_shader(vertex_shader_code);
         set_fragment_shader(fragment_shader_code);
@@ -327,8 +316,6 @@ gearoenix::gles2::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const 
         GX_GLES2_THIS_GET_UNIFORM(camera_gamma_correction)
         // TODO
         //GX_GLES2_THIS_GET_UNIFORM(effect_ambient_occlusion)
-        GX_GLES2_THIS_GET_UNIFORM_TEXTURE(effect_brdflut)
-        GX_GLES2_THIS_GET_UNIFORM_TEXTURE(effect_diffuse_environment)
         GX_GLES2_THIS_GET_UNIFORM(effect_point_lights_color_min_radius)
         GX_GLES2_THIS_GET_UNIFORM(effect_point_lights_position_max_radius)
         GX_GLES2_THIS_GET_UNIFORM_TEXTURE_ARRAY(effect_shadow_caster_directional_lights_cascades_shadow_map)
@@ -336,7 +323,6 @@ gearoenix::gles2::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const 
         GX_GLES2_THIS_GET_UNIFORM(effect_shadow_caster_directional_lights_color_cascades_count)
         GX_GLES2_THIS_GET_UNIFORM(effect_shadow_caster_directional_lights_direction)
         GX_GLES2_THIS_GET_UNIFORM(effect_shadow_caster_directional_lights_count)
-        GX_GLES2_THIS_GET_UNIFORM_TEXTURE(effect_specular_environment)
         GX_GLES2_THIS_GET_UNIFORM(model_m)
         GX_GLES2_THIS_GET_UNIFORM(scene_ambient_light)
         GX_GLES2_THIS_GET_UNIFORM(scene_directional_lights_color)
@@ -357,10 +343,7 @@ void gearoenix::gles2::shader::ForwardPbr::bind() const noexcept
     GX_GLES2_SHADER_SET_TEXTURE_INDEX_UNIFORM(material_emissive)
     GX_GLES2_SHADER_SET_TEXTURE_INDEX_UNIFORM(material_metallic_roughness)
     GX_GLES2_SHADER_SET_TEXTURE_INDEX_UNIFORM(material_normal)
-    GX_GLES2_SHADER_SET_TEXTURE_INDEX_UNIFORM(effect_ambient_occlusion)
-    GX_GLES2_SHADER_SET_TEXTURE_INDEX_UNIFORM(effect_brdflut)
-    GX_GLES2_SHADER_SET_TEXTURE_INDEX_UNIFORM(effect_diffuse_environment)
+    // GX_GLES2_SHADER_SET_TEXTURE_INDEX_UNIFORM(effect_ambient_occlusion)
     GX_GLES2_SHADER_SET_TEXTURE_INDEX_ARRAY_UNIFORM(effect_shadow_caster_directional_lights_cascades_shadow_map)
-    GX_GLES2_SHADER_SET_TEXTURE_INDEX_UNIFORM(effect_specular_environment)
 }
 #endif
