@@ -1,7 +1,6 @@
 #include "glc3-shd-forward-pbr.hpp"
 #ifdef GX_USE_OPENGL_CLASS_3
 #include "../../core/cr-function-loader.hpp"
-#include "../../gl/gl-loader.hpp"
 #include "../../system/sys-app.hpp"
 #include "../engine/glc3-eng-engine.hpp"
 #include <sstream>
@@ -30,7 +29,7 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         "out vec3 out_btg;\n"
         "out vec2 out_uv;\n"
         // One thing that I'm not sure about is its interpolating, it may not acceptably result
-        "out vec3 out_directional_lights_cascades_pojected[" GX_MAX_DIRECTIONAL_LIGHTS_CASCADES_STR "];\n"
+        "out vec3 out_directional_lights_cascades_projected[" GX_MAX_DIRECTIONAL_LIGHTS_CASCADES_STR "];\n"
         // Main function
         "void main()\n"
         "{\n"
@@ -52,7 +51,7 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         "            light_pos.xyz /= light_pos.w;\n"
         "            light_pos.z *= 0.5;\n"
         "            light_pos.z += 0.5;\n"
-        "            out_directional_lights_cascades_pojected[i] = light_pos.xyz;\n"
+        "            out_directional_lights_cascades_projected[i] = light_pos.xyz;\n"
         "        }\n"
         "        i += diff_ccc_cc;\n"
         "    }\n"
@@ -97,7 +96,7 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         "in vec3 out_tng;\n"
         "in vec3 out_btg;\n"
         "in vec2 out_uv;\n"
-        "in vec3 out_directional_lights_cascades_pojected[" GX_MAX_DIRECTIONAL_LIGHTS_CASCADES_STR "];\n"
+        "in vec3 out_directional_lights_cascades_projected[" GX_MAX_DIRECTIONAL_LIGHTS_CASCADES_STR "];\n"
         "out vec4 frag_color;\n"
         // Normal Distribution Function Trowbridge-Reitz GGX
         "float distribution_ggx(const vec3 normal, const vec3 halfway, const float roughness_p2, const float roughness_p2_minus_1) {\n"
@@ -163,15 +162,15 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         "}\n"
         "void main() {\n"
         //   material properties
-        "    vec4 tmpv4 = texture(material_base_color, out_uv);\n"
+        "    vec4 tmp_v4 = texture(material_base_color, out_uv);\n"
         "    vec3 emission = texture(material_emissive, out_uv).xyz * material_emission_factor;\n"
-        "    tmpv4.w *= material_alpha;\n"
-        "    vec4 albedo = tmpv4;\n"
+        "    tmp_v4.w *= material_alpha;\n"
+        "    vec4 albedo = tmp_v4;\n"
         "    if(albedo.w < material_alpha_cutoff) discard;\n"
-        "	 tmpv4.xy = texture(material_metallic_roughness, out_uv).xy;\n"
-        "    tmpv4.xy *= vec2(material_metallic_factor, material_roughness_factor);\n"
-        "    float metallic = tmpv4.x;\n"
-        "    float roughness = tmpv4.y;\n"
+        "	 tmp_v4.xy = texture(material_metallic_roughness, out_uv).xy;\n"
+        "    tmp_v4.xy *= vec2(material_metallic_factor, material_roughness_factor);\n"
+        "    float metallic = tmp_v4.x;\n"
+        "    float roughness = tmp_v4.y;\n"
         "    float roughness_p2 = roughness * roughness;\n"
         "    float roughness_p2_minus_1 = roughness_p2 - 1.0;\n"
         "    float geometry_schlick_k = roughness + 1.0;\n"
@@ -187,7 +186,7 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         "    float normal_dot_view = max(dot(normal, view), 0.0);\n"
         //   calculate reflectance at normal incidence; if dia-electric (like plastic) use F0
         //   of 0.04 and if it's a metal, use the albedo color as F0 (metallic workflow)
-        //   TODO: in future I must bring builder fresnel factor 0 (the hard coded 0.4) from matrial uniform data
+        //   TODO: in future I must bring builder fresnel factor 0 (the hard coded 0.4) from material uniform data
         "    vec3 f0 = mix(vec3(0.04), albedo.xyz, metallic);\n"
         "    vec3 f0_inv = vec3(1.0) - f0;\n"
         //   reflectance equation
@@ -216,7 +215,7 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         "            geometry_schlick_k_inv, f0, f0_inv, one_minus_metallic, albedo.xyz);\n"
         "    }\n"
         "    int effect_shadow_caster_directional_lights_count_int = int(effect_shadow_caster_directional_lights_count);\n"
-        "    for(int dir_i = 0, lcasi = 0; dir_i < effect_shadow_caster_directional_lights_count_int; ++dir_i, lcasi = dir_i * " GX_MAX_SHADOW_CASCADES_STR ")\n"
+        "    for(int dir_i = 0, l_cas_i = 0; dir_i < effect_shadow_caster_directional_lights_count_int; ++dir_i, l_cas_i = dir_i * " GX_MAX_SHADOW_CASCADES_STR ")\n"
         "    {\n"
         "        bool is_in_directional_light = true;\n"
         "        float normal_dot_light = max(dot(out_nrm, -effect_shadow_caster_directional_lights_direction[dir_i].xyz), 0.0);\n"
@@ -229,15 +228,15 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         "        if(is_in_directional_light) {\n"
         "            int effect_shadow_caster_directional_lights_cascades_count_int = int(effect_shadow_caster_directional_lights_color_cascades_count[dir_i].w);\n"
         "            for(int i = 0; i < effect_shadow_caster_directional_lights_cascades_count_int; ++i) {\n"
-        "                vec3 lightuv = out_directional_lights_cascades_pojected[lcasi];\n"
-        "                if (lightuv.x > 0.0 && lightuv.x < 1.0 && lightuv.y > 0.0 && lightuv.y < 1.0) {\n"
+        "                vec3 light_uv = out_directional_lights_cascades_projected[l_cas_i];\n"
+        "                if (light_uv.x > 0.0 && light_uv.x < 1.0 && light_uv.y > 0.0 && light_uv.y < 1.0) {\n"
 #if GX_MAX_DIRECTIONAL_LIGHTS_CASCADES == 1
 #define SHADOW_MAP_INDEX "0"
 #else
-#define SHADOW_MAP_INDEX "lcasi"
+#define SHADOW_MAP_INDEX "l_cas_i"
 #endif
-        "                    float depth = texture(effect_shadow_caster_directional_lights_cascades_shadow_map[" SHADOW_MAP_INDEX "], lightuv.xy, 0.0).x;\n"
-        "                    if(depth + shadow_bias <= lightuv.z) {\n"
+        "                    float depth = texture(effect_shadow_caster_directional_lights_cascades_shadow_map[" SHADOW_MAP_INDEX "], light_uv.xy, 0.0).x;\n"
+        "                    if(depth + shadow_bias <= light_uv.z) {\n"
         "                        is_in_directional_light = false;\n"
         "                    }\n"
         "                    break;\n"
@@ -252,8 +251,8 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         "        }\n"
         "    }\n"
         //   ambient lighting (we now use IBL as the ambient term)
-        "    vec3 frsn = fresnel_schlick_roughness(normal_dot_view, f0, roughness);\n"
-        "    vec3 ks = frsn;\n"
+        "    vec3 fresnel = fresnel_schlick_roughness(normal_dot_view, f0, roughness);\n"
+        "    vec3 ks = fresnel;\n"
         "    vec3 kd = (1.0 - ks) * (1.0 - metallic);\n"
         "    vec3 irradiance = texture(effect_diffuse_environment, normal).rgb;\n"
         "    vec3 diffuse = irradiance * albedo.xyz;\n"
@@ -261,18 +260,18 @@ gearoenix::glc3::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const c
         //   the Split-Sum approximation to get the IBL radiance part.
         "    vec3 prefiltered_color = textureLod(effect_specular_environment, reflection, roughness * material_radiance_lod_coefficient).rgb;\n"
         "    vec2 brdf = texture(effect_brdflut, vec2(normal_dot_view, roughness)).rg;\n"
-        "    vec3 specular = prefiltered_color * ((frsn * brdf.x) + brdf.y);\n"
+        "    vec3 specular = prefiltered_color * ((fresnel * brdf.x) + brdf.y);\n"
         //   TODO: add ambient occlusion (* ao);
         "    vec3 ambient = kd * diffuse + specular + scene_ambient_light * albedo.xyz;\n"
-        "    tmpv4.xyz = ambient + lo + emission;\n"
+        "    tmp_v4.xyz = ambient + lo + emission;\n"
         "    if(camera_gamma_correction > 0.001) {\n"
         //       HDR tone mapping
-        "        tmpv4.xyz = tmpv4.xyz / (tmpv4.xyz + vec3(camera_hdr_tune_mapping));\n"
+        "        tmp_v4.xyz = tmp_v4.xyz / (tmp_v4.xyz + vec3(camera_hdr_tune_mapping));\n"
         //       gamma correct
-        "        tmpv4.xyz = pow(tmpv4.xyz, vec3(1.0 / camera_gamma_correction));\n"
+        "        tmp_v4.xyz = pow(tmp_v4.xyz, vec3(1.0 / camera_gamma_correction));\n"
         "}\n"
-        //"  frag_color = vec4((tmpv4.xyz * 0.001) + textureLod(effect_diffuse_environment, normalize(out_pos), 0.0).xyz, albedo.w);\n"
-        "    frag_color = vec4(tmpv4.xyz, albedo.w);\n"
+        //"  frag_color = vec4((tmp_v4.xyz * 0.001) + textureLod(effect_diffuse_environment, normalize(out_pos), 0.0).xyz, albedo.w);\n"
+        "    frag_color = vec4(tmp_v4.xyz, albedo.w);\n"
         "}";
     e->get_function_loader()->load([this, vertex_shader_code { vertex_shader_code.str() }, fragment_shader_code { fragment_shader_code.str() }] {
         set_vertex_shader(vertex_shader_code);

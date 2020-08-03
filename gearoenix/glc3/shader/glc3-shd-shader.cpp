@@ -1,8 +1,6 @@
 #include "glc3-shd-shader.hpp"
 #ifdef GX_USE_OPENGL_CLASS_3
 #include "../../core/cr-function-loader.hpp"
-#include "../../gl/gl-constants.hpp"
-#include "../../gl/gl-loader.hpp"
 #include "../engine/glc3-eng-engine.hpp"
 #include <vector>
 
@@ -20,7 +18,7 @@ void gearoenix::glc3::shader::Shader::run() noexcept
     gl::Loader::use_program(shader_program);
 }
 
-void gearoenix::glc3::shader::Shader::link() noexcept
+void gearoenix::glc3::shader::Shader::link() const noexcept
 {
     gl::sint is_success = 0;
     gl::Loader::link_program(shader_program);
@@ -38,7 +36,7 @@ void gearoenix::glc3::shader::Shader::link() noexcept
     gl::Loader::use_program(shader_program);
 }
 
-void gearoenix::glc3::shader::Shader::validate() noexcept
+void gearoenix::glc3::shader::Shader::validate() const noexcept
 {
     gl::Loader::validate_program(shader_program);
     gl::sint is_success = 0;
@@ -56,15 +54,15 @@ void gearoenix::glc3::shader::Shader::validate() noexcept
     gl::Loader::use_program(shader_program);
 }
 
-gearoenix::gl::uint gearoenix::glc3::shader::Shader::add_shader_to_program(const std::string& shd, const gl::enumerated shader_type) noexcept
+gearoenix::gl::uint gearoenix::glc3::shader::Shader::add_shader_to_program(const std::string& shd, const gl::enumerated shader_type) const noexcept
 {
     gl::uint shader_obj = gl::Loader::create_shader(shader_type);
     if (shader_obj == 0) {
         GXLOGF("Error creating shader type.")
     }
-    const char* chtemp = shd.c_str();
-    const auto uintemp = static_cast<gl::sint>(shd.length());
-    gl::Loader::shader_source(shader_obj, 1, &(chtemp), &(uintemp));
+    const char* const shader_src_ptr = shd.c_str();
+    const auto shader_src_len = static_cast<gl::sint>(shd.length());
+    gl::Loader::shader_source(shader_obj, 1, &(shader_src_ptr), &(shader_src_len));
     gl::Loader::compile_shader(shader_obj);
     gl::sint success;
     gl::Loader::get_shaderiv(shader_obj, GL_COMPILE_STATUS, &success);

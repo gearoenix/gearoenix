@@ -113,9 +113,9 @@ protected:
 
     void create_program() noexcept;
     void run() noexcept;
-    void link() noexcept;
-    void validate() noexcept;
-    [[nodiscard]] gl::uint add_shader_to_program(const std::string& shd, gl::enumerated shader_type) noexcept;
+    void link() const noexcept;
+    void validate() const noexcept;
+    [[nodiscard]] gl::uint add_shader_to_program(const std::string& shd, gl::enumerated shader_type) const noexcept;
     void set_vertex_shader(const std::string& shd) noexcept;
     void set_fragment_shader(const std::string& shd) noexcept;
     static void end_program(gl::uint shader_program) noexcept;
