@@ -158,8 +158,7 @@ gearoenix::gles2::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const 
             //   note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
             "    return (kd * albedo * ( 1.0 / GX_PI) + specular) * light_color * normal_dot_light;\n"
             "}\n"
-            "void main()\n"
-            "{\n"
+            "void main() {\n"
             //   material properties
             "    vec4 tmp_v4 = texture2D(material_base_color, out_uv);\n"
             "    vec3 emission = texture2D(material_emissive, out_uv).xyz * material_emission_factor;\n"
