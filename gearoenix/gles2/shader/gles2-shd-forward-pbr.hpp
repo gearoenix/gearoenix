@@ -30,10 +30,7 @@ class ForwardPbr final : public Shader {
     GX_GLES2_UNIFORM_FLOAT(camera_hdr_tune_mapping, 1)
     GX_GLES2_UNIFORM_FLOAT(camera_gamma_correction, 1)
     // Effect textures
-    GX_GLES2_UNIFORM_TEXTURE(effect_ambient_occlusion)
-    GX_GLES2_UNIFORM_TEXTURE(effect_brdflut)
-    GX_GLES2_UNIFORM_TEXTURE(effect_diffuse_environment)
-    GX_GLES2_UNIFORM_TEXTURE(effect_specular_environment)
+    // GX_GLES2_UNIFORM_TEXTURE(effect_ambient_occlusion)
     GX_GLES2_UNIFORM_TEXTURE_ARRAY(effect_shadow_caster_directional_lights_cascades_shadow_map, GX_MAX_SHADOW_CASCADES* GX_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER)
     // Effect uniforms
     GX_GLES2_UNIFORM_VECTOR(effect_point_lights_color_min_radius, 4, GX_MAX_POINT_LIGHTS)
