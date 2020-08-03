@@ -96,13 +96,8 @@ gearoenix::gles2::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const 
             "uniform vec3        camera_position;\n"
             "uniform float       camera_hdr_tune_mapping;\n"
             "uniform float       camera_gamma_correction;\n" GX_GLES2_SHADER_FORWARD_PBR_VARYING
-            // Reusable variables
-            "float roughness_p2;\n"
-            "float roughness_p2_minus_1;\n"
-            "float geometry_schlick_k;\n"
-            "float geometry_schlick_k_inv;\n"
             // Normal Distribution Function Trowbridge-Reitz GGX
-            "float distribution_ggx(const vec3 normal, const vec3 halfway, const float roughness) {\n"
+            "float distribution_ggx(const vec3 normal, const vec3 halfway, const float roughness_p2, const float roughness_p2_minus_1) {\n"
             "    float denom = max(dot(normal, halfway), 0.0);\n"
             "    denom *= denom;\n"
             "    denom *= roughness_p2_minus_1;\n"
@@ -111,23 +106,21 @@ gearoenix::gles2::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const 
             "    denom *= GX_PI;\n"
             "    return roughness_p2 / denom;\n"
             "}\n"
-            "float geometry_schlick_ggx(const float nd, const float k, const float k_inv) {\n"
-            "    return nd / (nd * geometry_schlick_k_inv + geometry_schlick_k);\n"
+            "float geometry_schlick_ggx(const float nd, const float geometry_schlick_k, const float geometry_schlick_k_inv) {\n"
+            "    return 1.0 / (nd * geometry_schlick_k_inv + geometry_schlick_k);\n"
             "}\n"
-            "float geometry_smith(const float normal_dot_light, const float normal_dot_view, const float roughness) {\n"
-            "    float k = roughness + 1.0;\n"
-            "    k = (k * k) * (1.0 / 8.0);\n"
-            "    float k_inv = 1.0 - k;\n"
-            "    float ggx2 = geometry_schlick_ggx(normal_dot_view, k, k_inv);\n"
-            "    float ggx1 = geometry_schlick_ggx(normal_dot_light, k, k_inv);\n"
+            "float geometry_smith(const float normal_dot_light, const float normal_dot_view, const float geometry_schlick_k, const float geometry_schlick_k_inv) {\n"
+            "    float ggx2 = geometry_schlick_ggx(normal_dot_view, geometry_schlick_k, geometry_schlick_k_inv);\n"
+            "    float ggx1 = geometry_schlick_ggx(normal_dot_light, geometry_schlick_k, geometry_schlick_k_inv);\n"
             "    return ggx1 * ggx2;\n"
             "}\n"
-            "vec3 fresnel_schlick(const float nv, const vec3 f0) {\n"
+            // f0_inv = 1.0 - f0
+            "vec3 fresnel_schlick(const float nv, const vec3 f0, const vec3 f0_inv) {\n"
             "    float inv = 1.0 - nv;\n"
             "    float inv2 = inv * inv;\n"
             "    float inv4 = inv2 * inv2;\n"
             "    float inv5 = inv4 * inv;\n"
-            "    return f0 + ((1.0 - f0) * inv5);\n"
+            "    return f0 + (f0_inv * inv5);\n"
             "}\n"
             // cos_theta is (n dot v)
             "vec3 fresnel_schlick_roughness(const float nv, const vec3 f0, const float roughness)\n"
@@ -137,6 +130,33 @@ gearoenix::gles2::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const 
             "    float inv4 = inv2 * inv2;\n"
             "    float inv5 = inv4 * inv;\n"
             "    return f0 + ((max(vec3(1.0 - roughness), f0) - f0) * inv5);\n"
+            "}\n"
+            "vec3 compute_light(\n"
+            "    const vec3 light_direction, const vec3 light_color, const vec3 view, const vec3 normal,\n"
+            "    const float normal_dot_view, const float roughness_p2, const float roughness_p2_minus_1,\n"
+            "    const float geometry_schlick_k, const float geometry_schlick_k_inv, const vec3 f0,\n"
+            "    const vec3 f0_inv, const float one_minus_metallic, const vec3 albedo) {\n"
+            "    float normal_dot_light = dot(normal, light_direction);\n"
+            "    if(normal_dot_light <= 0.0) return vec3(0.0);\n"
+            "    vec3 half_vec = normalize(view + light_direction);\n"
+            //   Cook-Torrance BRDF
+            "    float ndf = distribution_ggx(normal, half_vec, roughness_p2, roughness_p2_minus_1);\n"
+            "    float geo = geometry_smith(normal_dot_light, normal_dot_view, geometry_schlick_k, geometry_schlick_k_inv);\n"
+            "    vec3 frsn = fresnel_schlick(dot(half_vec, view), f0, f0_inv);\n"
+            "    vec3 specular = ndf * geo * frsn * 0.25;\n"
+            //   kS is equal to Fresnel
+            "    vec3 ks = frsn;\n"
+            //   for energy conservation, the irradiance and radiance light can't
+            //   be above 1.0 (unless the surface emits light); to preserve this
+            //   relationship the irradiance component (kD) should equal 1.0 - kS.
+            //   multiply kD by the inverse metalness such that only non-metals
+            //   have irradiance lighting, or a linear blend if partly metal (pure metals
+            //   have no irradiance light).
+            "    vec3 kd = (vec3(1.0) - ks) * one_minus_metallic;\n"
+            //   scale light by NdotL
+            //   add to outgoing radiance Lo
+            //   note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
+            "    return (kd * albedo * ( 1.0 / GX_PI) + specular) * light_color * normal_dot_light;\n"
             "}\n"
             "void main()\n"
             "{\n"
@@ -150,8 +170,13 @@ gearoenix::gles2::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const 
             "    tmpv4.xy *= vec2(material_metallic_factor, material_roughness_factor);\n"
             "    float metallic = tmpv4.x;\n"
             "    float roughness = tmpv4.y;\n"
-            "    roughness_p2 = roughness * roughness;\n"
-            "    roughness_p2_minus_1 = roughness_p2 - 1.0;\n"
+            "    float roughness_p2 = roughness * roughness;\n"
+            "    float roughness_p2_minus_1 = roughness_p2 - 1.0;\n"
+            "    float geometry_schlick_k = roughness + 1.0;\n"
+            "    geometry_schlick_k *= geometry_schlick_k;\n"
+            "    geometry_schlick_k *= 0.125;\n"
+            "    float geometry_schlick_k_inv = 1.0 - geometry_schlick_k;\n"
+            "    float one_minus_metallic = 1.0 - metallic;\n"
             //   TODO: in future maybe I will add ao in here
             //   input lighting data
             "    vec3 normal = mat3(out_tng, out_btg, out_nrm) * ((texture2D(material_normal, out_uv).xyz - 0.5) * 2.0 * material_normal_scale);\n"
@@ -162,6 +187,7 @@ gearoenix::gles2::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const 
             //   of 0.04 and if it's a metal, use the albedo color as F0 (metallic workflow)
             //   TODO: in future I must bring builder fresnel factor 0 (the hard coded 0.4) from matrial uniform data
             "    vec3 f0 = mix(vec3(0.04), albedo.xyz, metallic);\n"
+            "    vec3 f0_inv = vec3(1.0) - f0;\n"
             //   reflectance equation
             "    vec3 lo = vec3(0.0);\n"
             "    int effect_point_lights_count_int = int(effect_point_lights_count);\n"
@@ -171,66 +197,26 @@ gearoenix::gles2::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const 
             "        if(i < effect_point_lights_count_int) {\n"
             //           calculate per-light radiance
             "            vec3 light_vec = effect_point_lights_position_max_radius[i].xyz - out_pos;\n"
-            //           TODO: in future consider max and min radius
+            //           TODO: in future consider max and min radius (in physics)
             "            float distance = length(light_vec);\n"
             "            float distance_inv = 1.0 / distance;\n"
             "            vec3 light_direction = light_vec * distance_inv;\n"
-            "            float normal_dot_light = max(dot(normal, light_direction), 0.0);\n"
-            "            vec3 half_vec = normalize(view + light_direction);\n"
             "            float attenuation = distance_inv * distance_inv;\n"
             "            vec3 radiance = effect_point_lights_color_min_radius[i].xyz * attenuation;\n"
-            //           Cook-Torrance BRDF
-            "            float ndf = distribution_ggx(normal, half_vec, roughness);\n"
-            "            float geo = geometry_smith(normal_dot_light, normal_dot_view, roughness);\n"
-            "            vec3 frsn = fresnel_schlick(max(dot(half_vec, view), 0.0), f0);\n"
-            "            vec3 nominator = ndf * geo * frsn;\n"
-            //           0.001 to prevent divide by zero.
-            "            float denominator = 4.0 * normal_dot_view * normal_dot_light + 0.001;\n"
-            "            vec3 specular = nominator / denominator;\n"
-            //           kS is equal to Fresnel
-            "            vec3 ks = frsn;\n"
-            //           for energy conservation, the irradiance and radiance light can't
-            //           be above 1.0 (unless the surface emits light); to preserve this
-            //           relationship the irradiance component (kD) should equal 1.0 - kS.
-            //           multiply kD by the inverse metalness such that only non-metals
-            //           have irradiance lighting, or a linear blend if partly metal (pure metals
-            //           have no irradiance light).
-            "            vec3 kd = (vec3(1.0) - ks) * (1.0 - metallic);\n"
-            //           scale light by NdotL
-            //           add to outgoing radiance Lo
-            //           note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
-            "            lo += (kd * albedo.xyz / GX_PI + specular) * radiance * normal_dot_light;\n"
+            "            lo += compute_light(light_direction, radiance, view, normal, normal_dot_view, roughness_p2,\n"
+            "                roughness_p2_minus_1, geometry_schlick_k, geometry_schlick_k_inv, f0, f0_inv,\n"
+            "                one_minus_metallic, albedo.xyz);\n"
             "        }\n"
             "    }\n"
             "    int scene_directional_lights_count_int = int(scene_directional_lights_count);\n"
             //   computing directional lights
             "    for(int i = 0; i < " GX_MAX_DIRECTIONAL_LIGHTS_STR "; ++i) {\n"
             "        if(i < scene_directional_lights_count_int) {\n"
-            "            vec3 light_direction = -scene_directional_lights_direction[i].xyz;\n"
-            "            float normal_dot_light = max(dot(normal, light_direction), 0.0);\n"
-            "            vec3 half_vec = normalize(view + light_direction);\n"
-            "            vec3 radiance = scene_directional_lights_color[i].xyz;\n"
-            //           Cook-Torrance BRDF
-            "            float ndf = distribution_ggx(normal, half_vec, roughness);\n"
-            "            float geo = geometry_smith(normal_dot_light, normal_dot_view, roughness);\n"
-            "            vec3 frsn = fresnel_schlick(max(dot(half_vec, view), 0.0), f0);\n"
-            "            vec3 nominator = ndf * geo * frsn;\n"
-            //           0.001 to prevent divide by zero.
-            "            float denominator = 4.0 * normal_dot_view * normal_dot_light + 0.001;\n"
-            "            vec3 specular = nominator / denominator;\n"
-            //           kS is equal to Fresnel
-            "            vec3 ks = frsn;\n"
-            //           for energy conservation, the irradiance and radiance light can't
-            //           be above 1.0 (unless the surface emits light); to preserve this
-            //           relationship the irradiance component (kD) should equal 1.0 - kS.
-            //           multiply kD by the inverse metalness such that only non-metals
-            //           have irradiance lighting, or a linear blend if partly metal (pure metals
-            //           have no irradiance light).
-            "            vec3 kd = (vec3(1.0) - ks) * (1.0 - metallic);\n"
-            //           scale light by NdotL
-            //           add to outgoing radiance Lo
-            //           note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
-            "            lo += (kd * albedo.xyz / GX_PI + specular) * radiance * normal_dot_light;\n"
+            "            lo += compute_light(\n"
+            "                -scene_directional_lights_direction[i].xyz,\n"
+            "                scene_directional_lights_color[i].xyz,\n"
+            "                view, normal, normal_dot_view, roughness_p2, roughness_p2_minus_1, geometry_schlick_k,\n"
+            "                geometry_schlick_k_inv, f0, f0_inv, one_minus_metallic, albedo.xyz);\n"
             "        }\n"
             "    }\n"
             "    int effect_shadow_caster_directional_lights_count_int = int(effect_shadow_caster_directional_lights_count);\n"
@@ -262,29 +248,10 @@ gearoenix::gles2::shader::ForwardPbr::ForwardPbr(engine::Engine* const e, const 
             "                }\n"
             "            }\n"
             "            if(is_in_directional_light) {\n"
-            "                vec3 half_vec = normalize(view - effect_shadow_caster_directional_lights_direction[diri].xyz);\n"
-            "                vec3 radiance = effect_shadow_caster_directional_lights_color_cascades_count[diri].xyz;\n"
-            //               Cook-Torrance BRDF
-            "                float ndf = distribution_ggx(normal, half_vec, roughness);\n"
-            "                float geo = geometry_smith(normal_dot_light, normal_dot_view, roughness);\n"
-            "                vec3 frsn = fresnel_schlick(max(dot(half_vec, view), 0.0), f0);\n"
-            "                vec3 nominator = ndf * geo * frsn;\n"
-            //               0.001 to prevent divide by zero.
-            "                float denominator = 4.0 * normal_dot_view * normal_dot_light + 0.001;\n"
-            "                vec3 specular = nominator / denominator;\n"
-            //               kS is equal to Fresnel
-            "                vec3 ks = frsn;\n"
-            //               for energy conservation, the irradiance and radiance light can't
-            //               be above 1.0 (unless the surface emits light); to preserve this
-            //               relationship the irradiance component (kD) should equal 1.0 - kS.
-            //               multiply kD by the inverse metalness such that only non-metals
-            //               have irradiance lighting, or a linear blend if partly metal (pure metals
-            //               have no irradiance light).
-            "                vec3 kd = (vec3(1.0) - ks) * (1.0 - metallic);\n"
-            //               scale light by NdotL
-            //               add to outgoing radiance Lo
-            //               note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
-            "                lo += (kd * albedo.xyz / GX_PI + specular) * radiance * normal_dot_light;\n"
+            "                lo += compute_light(-effect_shadow_caster_directional_lights_direction[diri].xyz,\n"
+            "                    effect_shadow_caster_directional_lights_color_cascades_count[diri].xyz,\n"
+            "                    view, normal, normal_dot_view, roughness_p2, roughness_p2_minus_1, geometry_schlick_k,\n"
+            "                    geometry_schlick_k_inv, f0, f0_inv, one_minus_metallic, albedo.xyz);\n"
             "            }\n"
             "        }\n"
             "        lcasi = diri * " GX_MAX_SHADOW_CASCADES_STR ";\n"

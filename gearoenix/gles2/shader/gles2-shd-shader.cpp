@@ -1,8 +1,6 @@
 #include "gles2-shd-shader.hpp"
 #ifdef GX_USE_OPENGL_ES2
 #include "../../core/cr-function-loader.hpp"
-#include "../../gl/gl-constants.hpp"
-#include "../../gl/gl-loader.hpp"
 #include "../engine/gles2-eng-engine.hpp"
 #include <string>
 #include <vector>
@@ -63,9 +61,9 @@ gearoenix::gl::uint gearoenix::gles2::shader::Shader::add_shader_to_program(cons
     if (shader_obj == 0) {
         GXLOGF("Error creating shader type.")
     }
-    const char* chtemp = shd.c_str();
-    const auto uintemp = static_cast<gl::sint>(shd.length());
-    gl::Loader::shader_source(shader_obj, 1, &(chtemp), &(uintemp));
+    const char* const shader_src_ptr = shd.c_str();
+    const auto shader_src_length = static_cast<gl::sint>(shd.length());
+    gl::Loader::shader_source(shader_obj, 1, &(shader_src_ptr), &(shader_src_length));
     gl::Loader::compile_shader(shader_obj);
     gl::sint success;
     gl::Loader::get_shaderiv(shader_obj, GL_COMPILE_STATUS, &success);
