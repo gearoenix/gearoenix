@@ -104,8 +104,8 @@ void gearoenix::render::font::Font2D::compute_text_widths(
     }
     const auto end_index = text.size() - 1;
     for (std::size_t i = 0; i < end_index;) {
-        const int pre_c = static_cast<int>(text[i]);
-        const int cur_c = static_cast<int>(text[++i]);
+        const auto pre_c = static_cast<int>(static_cast<unsigned char>(text[i]));
+        const auto cur_c = static_cast<int>(static_cast<unsigned char>(text[++i]));
         total_width += static_cast<double>(stbtt_GetCodepointKernAdvance(stb_font.get(), pre_c, cur_c)) * txt_scale;
         int advance = 0;
         int lsb = 0;
@@ -162,12 +162,12 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::font::
         ++index;
     const auto base_line = static_cast<double>(ascent) * h_scale;
     std::vector<unsigned char> rnd_data(static_cast<std::size_t>(img_width_pixels) * static_cast<std::size_t>(img_height_pixels));
-    const auto xpos_start = (txt_widths[index] - img_start_skip) * width_to_pixel;
+    const auto x_pos_start = (txt_widths[index] - img_start_skip) * width_to_pixel;
     const auto txt_end_index = text.size() - 1;
     const auto txt_end_width = img_start_skip + img_width;
-    auto xpos = xpos_start;
+    auto x_pos = x_pos_start;
     const auto get_index = [&](const int x, const int y) {
-        return (static_cast<int>(base_line) + y) * img_width_pixels + x + static_cast<int>(xpos);
+        return (static_cast<int>(base_line) + y) * img_width_pixels + x + static_cast<int>(x_pos);
     };
     const auto y_shift = base_line - floor(base_line);
     while (index < txt_end_index) {
@@ -177,16 +177,16 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::font::
             break;
         const wchar_t next_c = text[index];
         int advance, lsb, x0, y0, x1, y1;
-        const auto x_shift = xpos - floor(xpos);
+        const auto x_shift = x_pos - floor(x_pos);
         stbtt_GetCodepointHMetrics(stb_font.get(), c, &advance, &lsb);
         stbtt_GetCodepointBitmapBoxSubpixel(stb_font.get(), c, static_cast<float>(w_scale), static_cast<float>(h_scale), static_cast<float>(x_shift), static_cast<float>(y_shift), &x0, &y0, &x1, &y1);
         stbtt_MakeCodepointBitmapSubpixel(stb_font.get(), &rnd_data[get_index(x0, y0)], x1 - x0, y1 - y0, img_width_pixels, static_cast<float>(w_scale), static_cast<float>(h_scale), static_cast<float>(x_shift), static_cast<float>(y_shift), c);
-        xpos += w_scale * static_cast<double>(advance + stbtt_GetCodepointKernAdvance(stb_font.get(), c, next_c));
+        x_pos += w_scale * static_cast<double>(advance + stbtt_GetCodepointKernAdvance(stb_font.get(), c, next_c));
     }
     if (txt_widths[index] <= txt_end_width) {
         const wchar_t c = text[index];
         int x0, y0, x1, y1;
-        const auto x_shift = xpos - floor(xpos);
+        const auto x_shift = x_pos - floor(x_pos);
         stbtt_GetCodepointBitmapBoxSubpixel(stb_font.get(), c, static_cast<float>(w_scale), static_cast<float>(h_scale), static_cast<float>(x_shift), static_cast<float>(y_shift), &x0, &y0, &x1, &y1);
         stbtt_MakeCodepointBitmapSubpixel(stb_font.get(), &rnd_data[get_index(x0, y0)], x1 - x0, y1 - y0, img_width_pixels, static_cast<float>(w_scale), static_cast<float>(h_scale), static_cast<float>(x_shift), static_cast<float>(y_shift), c);
     }
