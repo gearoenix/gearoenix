@@ -27,20 +27,34 @@ class Button final : public Widget {
     GX_GET_CREF_PRV(ButtonTheme, theme)
     GX_GETSET_VAL_PRV(double, pressed_size, 0.75)
     GX_GETSET_VAL_PRV(double, animation_duration, 0.1)
+    GX_GETSET_VAL_PRV(bool, multiple_pressable, false)
+    GX_GET_CREF_PRV(std::weak_ptr<Button>, button_self)
 protected:
     double scale_down_progress = 1.0;
     std::weak_ptr<physics::animation::Animation> animation;
     std::function<void()> on_click = [] {};
 
-public:
     Button(
-        core::Id my_id,
+        core::Id id,
         std::string name,
         system::stream::Stream* f,
         engine::Engine* e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
     Button(
-        core::Id my_id,
+        core::Id id,
+        std::string name,
+        engine::Engine* e,
+        const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+
+public:
+    [[nodiscard]] static std::shared_ptr<Button> construct(
+        core::Id id,
+        std::string name,
+        system::stream::Stream* f,
+        engine::Engine* e,
+        const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+    [[nodiscard]] static std::shared_ptr<Button> construct(
+        core::Id id,
         std::string name,
         engine::Engine* e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;

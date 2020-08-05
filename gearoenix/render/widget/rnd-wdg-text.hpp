@@ -26,19 +26,32 @@ class Text : public Widget {
     GX_GET_VAL_PRT(Alignment, h_align, Alignment::Center)
     GX_GET_CREF_PRT(std::shared_ptr<model::Dynamic>, text_model)
     GX_GET_CREF_PRT(std::shared_ptr<material::Unlit>, text_mesh_material)
-
+    GX_GET_CREF_PRT(std::weak_ptr<Text>, text_self)
+private:
     void initialize(const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
     void update_alignment() noexcept;
 
-public:
     Text(
-        core::Id my_id,
+        core::Id id,
         std::string name,
         system::stream::Stream* f,
         engine::Engine* e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
     Text(
-        core::Id my_id,
+        core::Id id,
+        std::string name,
+        engine::Engine* e,
+        const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+
+public:
+    [[nodiscard]] static std::shared_ptr<Text> construct(
+        core::Id id,
+        std::string name,
+        system::stream::Stream* f,
+        engine::Engine* e,
+        const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+    [[nodiscard]] static std::shared_ptr<Text> construct(
+        core::Id id,
         std::string name,
         engine::Engine* e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;

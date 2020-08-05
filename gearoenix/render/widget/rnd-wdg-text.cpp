@@ -103,6 +103,32 @@ gearoenix::render::widget::Text::Text(
     initialize(c);
 }
 
+#define GX_TEST_CONS(...)                              \
+    std::shared_ptr<Text> self(new Text(__VA_ARGS__)); \
+    self->model_self = self;                           \
+    self->widget_self = self;                          \
+    self->text_self = self;                            \
+    return self
+
+std::shared_ptr<gearoenix::render::widget::Text> gearoenix::render::widget::Text::construct(
+    const core::Id id,
+    std::string name,
+    system::stream::Stream* const f,
+    engine::Engine* const e,
+    const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
+{
+    GX_TEST_CONS(id, std::move(name), f, e, c);
+}
+
+std::shared_ptr<gearoenix::render::widget::Text> gearoenix::render::widget::Text::construct(
+    const core::Id id,
+    std::string name,
+    engine::Engine* const e,
+    const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
+{
+    GX_TEST_CONS(id, std::move(name), e, c);
+}
+
 gearoenix::render::widget::Text::~Text() noexcept = default;
 
 void gearoenix::render::widget::Text::set_text(

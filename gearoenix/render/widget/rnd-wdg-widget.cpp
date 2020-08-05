@@ -37,9 +37,9 @@ std::shared_ptr<gearoenix::render::widget::Widget> gearoenix::render::widget::Wi
     const auto t = f->read<Type>();
     switch (t) {
     case Type::Text:
-        return std::shared_ptr<Widget>(new Text(my_id, std::move(name), f, e, c));
+        return Text::construct(my_id, std::move(name), f, e, c);
     case Type::Button:
-        return std::shared_ptr<Widget>(new Button(my_id, std::move(name), f, e, c));
+        return Button::construct(my_id, std::move(name), f, e, c);
     default:
         GXLOGF("Unexpected widget type (" << static_cast<core::TypeId>(t) << ")  in: " << my_id)
     }

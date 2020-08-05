@@ -68,6 +68,7 @@ public:
     GX_GET_CREF_PRT(std::shared_ptr<reflection::Reflection>, hooked_reflection)
     /// In case the upper was not set, the following must be found and used
     GX_GET_PTR_PRT(reflection::Reflection, colliding_reflection)
+    GX_GET_CREF_PRT(std::weak_ptr<Model>, model_self)
 protected:
     Model(
         core::Id my_id,
@@ -98,9 +99,9 @@ public:
     void clear_reflection() noexcept;
     virtual void set_scene(scene::Scene* s) noexcept;
     [[nodiscard]] virtual bool get_dynamicity() const noexcept = 0;
-    Model* get_root() noexcept;
-    const Model* get_root() const noexcept;
-    [[nodiscard]] virtual Model* clone() const noexcept;
+    [[nodiscard]] Model* get_root() noexcept;
+    [[nodiscard]] const Model* get_root() const noexcept;
+    [[nodiscard]] virtual std::shared_ptr<Model> clone() const noexcept;
 };
 }
 #endif

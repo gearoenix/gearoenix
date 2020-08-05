@@ -38,7 +38,7 @@ gearoenix::render::model::Manager::create(std::string name, core::sync::EndCalle
 {
     const core::Id id = core::asset::Manager::create_id();
     const core::sync::EndCaller<core::sync::EndCallerIgnore> call([c] {});
-    const std::shared_ptr<T> result(new T(id, std::move(name), e, call));
+    const auto result = T::construct(id, std::move(name), e, call);
     c.set_data(result);
     cache.get_cacher().get_cacheds()[id] = result;
     return result;

@@ -14,8 +14,8 @@ gearoenix::demo::wwr::TerrainManager::TerrainManager(std::shared_ptr<render::sce
 	, camera(scene->get_cameras().begin()->second)
 	, asphalt_pieces {
         asphalt_piece,
-		std::make_shared<render::model::Dynamic>(*asphalt_piece),
-		std::make_shared<render::model::Dynamic>(*asphalt_piece) }
+		std::dynamic_pointer_cast<render::model::Dynamic>(asphalt_piece->clone()),
+		std::dynamic_pointer_cast<render::model::Dynamic>(asphalt_piece->clone()) }
 	, camera_tran(camera->get_transformation())
 {
 	math::Vec3 location(-ground_pieces_breadth, 0.0, 0.0);

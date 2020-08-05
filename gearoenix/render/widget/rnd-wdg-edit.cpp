@@ -251,6 +251,42 @@ gearoenix::render::widget::Edit::Edit(
     init(c);
 }
 
+#define GX_EDIT_CONS(...)                              \
+    std::shared_ptr<Edit> self(new Edit(__VA_ARGS__)); \
+    self->model_self = self;                           \
+    self->widget_self = self;                          \
+    self->edit_self = self;                            \
+    return self
+
+std::shared_ptr<gearoenix::render::widget::Edit> gearoenix::render::widget::Edit::construct(
+    const core::Id id,
+    std::string name,
+    system::stream::Stream* const f,
+    engine::Engine* const e,
+    const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
+{
+    GX_EDIT_CONS(id, std::move(name), f, e, c);
+}
+
+std::shared_ptr<gearoenix::render::widget::Edit> gearoenix::render::widget::Edit::construct(
+    const core::Id id,
+    std::string name,
+    engine::Engine* const e,
+    const EditTheme& theme,
+    const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
+{
+    GX_EDIT_CONS(id, std::move(name), e, theme, c);
+}
+
+std::shared_ptr<gearoenix::render::widget::Edit> gearoenix::render::widget::Edit::construct(
+    const core::Id id,
+    std::string name,
+    engine::Engine* const e,
+    const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
+{
+    GX_EDIT_CONS(id, std::move(name), e, c);
+}
+
 gearoenix::render::widget::Edit::~Edit() noexcept
 {
     cursor_animation->set_activity(false);

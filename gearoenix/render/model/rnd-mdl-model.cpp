@@ -214,7 +214,7 @@ const gearoenix::render::model::Model* gearoenix::render::model::Model::get_root
     return parent->get_root();
 }
 
-gearoenix::render::model::Model* gearoenix::render::model::Model::clone() const noexcept
+std::shared_ptr<gearoenix::render::model::Model> gearoenix::render::model::Model::clone() const noexcept
 {
     GX_UNIMPLEMENTED
 }

@@ -70,6 +70,7 @@ class Edit final : public Widget, public core::event::Listener {
     GX_GET_VAL_PRV(double, ending_text_cut, 0.0f)
     GX_GET_VAL_PRV(std::size_t, temporary_left, 0)
     GX_GET_VAL_PRV(std::size_t, temporary_right, 0)
+    GX_GET_CREF_PRV(std::weak_ptr<Edit>, edit_self)
 private:
     GX_CREATE_GUARD(text)
 
@@ -83,21 +84,39 @@ private:
     void render_text(const core::sync::EndCaller<core::sync::EndCallerIgnore>& c = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
     void remove(bool from_left, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
 
-public:
     Edit(
-        core::Id my_id,
+        core::Id id,
         std::string name,
         system::stream::Stream* f,
         engine::Engine* e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
     Edit(
-        core::Id my_id,
+        core::Id id,
         std::string name,
         engine::Engine* e,
         const EditTheme& theme,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
     Edit(
-        core::Id my_id,
+        core::Id id,
+        std::string name,
+        engine::Engine* e,
+        const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+
+public:
+    [[nodiscard]] static std::shared_ptr<Edit> construct(
+        core::Id id,
+        std::string name,
+        system::stream::Stream* f,
+        engine::Engine* e,
+        const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+    [[nodiscard]] static std::shared_ptr<Edit> construct(
+        core::Id id,
+        std::string name,
+        engine::Engine* e,
+        const EditTheme& theme,
+        const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+    [[nodiscard]] static std::shared_ptr<Edit> construct(
+        core::Id id,
         std::string name,
         engine::Engine* e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;

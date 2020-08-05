@@ -7,6 +7,7 @@
 namespace gearoenix::render::widget {
 class Widget : public model::Model {
     GX_GET_CVAL_PRT(Type, widget_type)
+    GX_GET_CREF_PRT(std::weak_ptr<Widget>, widget_self)
     GX_GETSET_VAL_PRT(bool, sensivity, true)
 protected:
     Widget(
