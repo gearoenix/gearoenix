@@ -44,72 +44,109 @@ void gearoenix::render::scene::Ui::find_hit_widgets(
     }
 }
 
-void gearoenix::render::scene::Ui::pointer_down(const double x, const double y) noexcept
+void gearoenix::render::scene::Ui::pointer_down(const double x, const double y, const core::event::touch::FingerId finger_id) noexcept
 {
+    bool widget_not_found = true;
+    const auto f_select = [&](widget::Widget* const wgd, const math::Vec3<double>& p) noexcept {
+        const auto selected_widgets_search = selected_widgets.find(finger_id);
+        const auto f = [&] {
+            wgd->selected(p);
+            selected_widgets.emplace(finger_id, wgd->get_widget_self());
+        };
+        std::shared_ptr<widget::Widget> pre_wdg;
+        if (selected_widgets.end() != selected_widgets_search && (pre_wdg = selected_widgets_search->second.lock()) && pre_wdg != nullptr) {
+            if (pre_wdg->get_asset_id() != wgd->get_asset_id()) {
+                pre_wdg->select_cancelled();
+                f();
+            }
+        } else {
+            f();
+        }
+    };
     e->get_system_application()->set_soft_keyboard_visibility(false);
-    selected_widget = nullptr;
     find_hit_widgets(
         x, y,
-        [this](widget::Widget* const wdg, const math::Vec3<double>& p) noexcept {
-            wdg->selected(p);
-            selected_widget = wdg;
-            if (selected_widget->get_widget_type() == widget::Type::Edit && selected_edit != selected_widget) {
-                auto* const select = dynamic_cast<widget::Edit*>(selected_widget);
-                if (selected_edit != nullptr) {
-                    selected_edit->active(false);
+        [&](
+            widget::Widget* const wgd,
+            const math::Vec3<double>& p) noexcept {
+            widget_not_found = false;
+            f_select(wgd, p);
+            if (wgd->get_widget_type() == widget::Type::Edit) {
+                const auto e_select = [&] {
+                    auto* const selected_edit = dynamic_cast<widget::Edit*>(wgd);
+                    selected_edit->active();
+                };
+                if (const auto edit = active_edit.lock()) {
+                    if (edit->get_asset_id() != wgd->get_asset_id()) {
+                        edit->active(false);
+                        e_select();
+                    }
+                } else {
+                    e_select();
                 }
-                select->active();
-                selected_edit = select;
             }
         },
-        [this](widget::Widget* const wdg, const math::Vec3<double>& p,
+        [&](
+            widget::Widget* const wdg,
+            const math::Vec3<double>& p,
             const std::vector<model::Model*>& children) noexcept {
             wdg->selected_on(p, children);
-            if (selected_widget == nullptr)
-                selected_widget = wdg;
+            if (widget_not_found) {
+                f_select(wdg, p);
+                widget_not_found = false;
+            }
         },
         []() noexcept {});
 }
 
-void gearoenix::render::scene::Ui::pointer_up() noexcept
+void gearoenix::render::scene::Ui::pointer_up(const core::event::touch::FingerId finger_id) noexcept
 {
-    if (selected_widget != nullptr) {
-        selected_widget->select_released();
-        selected_widget = nullptr;
+    const auto search = selected_widgets.find(finger_id);
+    if (search == selected_widgets.end())
+        return;
+    if (const auto wdg = search->second.lock()) {
+        wdg->select_released();
     }
+    selected_widgets.erase(search);
 }
 
-void gearoenix::render::scene::Ui::pointer_move(const double x, const double y) noexcept
+void gearoenix::render::scene::Ui::pointer_move(const double x, const double y, const core::event::touch::FingerId finger_id) noexcept
 {
-    if (selected_widget == nullptr)
+    const auto search = selected_widgets.find(finger_id);
+    if (search == selected_widgets.end())
+        return;
+    auto selected_widget = search->second.lock();
+    if (nullptr == selected_widget)
         return;
     bool widget_found = false;
+    const auto cancel_func = [&] {
+        selected_widget->select_cancelled();
+        selected_widgets.erase(search);
+        selected_widget = nullptr;
+    };
     find_hit_widgets(
         x, y,
         [&](widget::Widget* const wdg, const math::Vec3<double>& p) noexcept {
-            if (selected_widget == wdg) {
+            if (selected_widget.get() == wdg) {
                 widget_found = true;
                 selected_widget->dragged(p);
             } else if (nullptr != selected_widget) {
-                selected_widget->select_cancelled();
-                selected_widget = nullptr;
+                cancel_func();
             }
         },
         [&](widget::Widget* const wdg, const math::Vec3<double>& p, const std::vector<model::Model*>& children) noexcept {
             if (widget_found)
                 return;
-            if (selected_widget == wdg) {
+            if (selected_widget.get() == wdg) {
                 widget_found = true;
                 selected_widget->dragged_on(p, children);
             } else if (nullptr != selected_widget) {
-                selected_widget->select_cancelled();
-                selected_widget = nullptr;
+                cancel_func();
             }
         },
         [&]() noexcept {
-            if (selected_widget != nullptr) {
-                selected_widget->select_cancelled();
-                selected_widget = nullptr;
+            if (nullptr != selected_widget) {
+                cancel_func();
             }
         });
 }
@@ -159,16 +196,16 @@ bool gearoenix::render::scene::Ui::on_event(const core::event::Data& d) noexcept
         if (data.get_key() == core::event::button::MouseKeyId::Left) {
             if (data.get_action() == core::event::button::MouseActionId::Press) {
                 const auto& p = data.get_position();
-                pointer_down(p.x, p.y);
+                pointer_down(p.x, p.y, std::numeric_limits<core::event::touch::FingerId>::max());
             } else if (data.get_action() == core::event::button::MouseActionId::Release) {
-                pointer_up();
+                pointer_up(std::numeric_limits<core::event::touch::FingerId>::max());
             }
         }
         break;
     }
     case core::event::Id::MovementMouse: {
         const auto& p = std::get<core::event::movement::Base2D>(d.get_data()).get_point().get_current_position();
-        pointer_move(p.x, p.y);
+        pointer_move(p.x, p.y, std::numeric_limits<core::event::touch::FingerId>::max());
         break;
     }
     case core::event::Id::Touch: {
@@ -177,18 +214,18 @@ bool gearoenix::render::scene::Ui::on_event(const core::event::Data& d) noexcept
         case core::event::touch::Action::Down: {
             if (e->get_system_application()->get_event_engine()->get_touch_states().size() == 1) {
                 const auto& p = data.get_state().get_point().get_current_position();
-                pointer_down(p.x, p.y);
+                pointer_down(p.x, p.y, data.get_state().get_finger_id());
             }
             break;
         }
         case core::event::touch::Action::Up: {
-            pointer_up();
+            pointer_up(data.get_state().get_finger_id());
             break;
         }
         case core::event::touch::Action::Move:
             if (e->get_system_application()->get_event_engine()->get_touch_states().size() == 1) {
                 const auto& p = data.get_state().get_point().get_current_position();
-                pointer_move(p.x, p.y);
+                pointer_move(p.x, p.y, data.get_state().get_finger_id());
             }
             break;
         default:
@@ -207,13 +244,12 @@ void gearoenix::render::scene::Ui::add_model(const std::shared_ptr<model::Model>
     Scene::scene_add_model(m);
     if (m->get_model_type() == model::Type::Widget) {
         // It doesn't matter because it's not gonna happen very much.
-        auto* const w = dynamic_cast<widget::Widget*>(m.get());
-        if (w->get_widget_type() == widget::Type::Edit) {
-            auto* const edt = dynamic_cast<widget::Edit*>(w);
-            if (selected_edit == nullptr) {
-                selected_edit = edt;
+        auto* const edit = dynamic_cast<widget::Edit*>(m.get());
+        if (nullptr != edit) {
+            if (active_edit.expired()) {
+                active_edit = edit->get_edit_self();
             } else {
-                edt->active(false);
+                edit->active(false);
             }
         }
     }
