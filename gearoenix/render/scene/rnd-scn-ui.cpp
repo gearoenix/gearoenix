@@ -230,7 +230,6 @@ bool gearoenix::render::scene::Ui::on_event(const core::event::Data& d) noexcept
         case core::event::touch::Action::Move: {
             const auto& s = data.get_state();
             const auto& p = s.get_point().get_current_position();
-            GXLOGE("move finger_id: " << s.get_finger_id())
             pointer_move(p.x, p.y, s.get_finger_id());
             break;
         }

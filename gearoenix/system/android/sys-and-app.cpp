@@ -314,6 +314,7 @@ int32_t gearoenix::system::Application::handle(android_app* const, AInputEvent* 
         const auto flags = action & AMOTION_EVENT_ACTION_MASK;
         const auto pointer_index = static_cast<size_t>((action & AMOTION_EVENT_ACTION_POINTER_INDEX_MASK) >> AMOTION_EVENT_ACTION_POINTER_INDEX_SHIFT);
         const auto pointer_id = AMotionEvent_getPointerId(e, pointer_index);
+        const auto pointer_counts = AMotionEvent_getPointerCount(e);
         const auto x = AMotionEvent_getRawX(e, pointer_index);
         const auto y = AMotionEvent_getRawY(e, pointer_index);
         switch (flags) {
@@ -325,10 +326,12 @@ int32_t gearoenix::system::Application::handle(android_app* const, AInputEvent* 
                 event_engine->get_window_height() - static_cast<int>(y));
             break;
         case AMOTION_EVENT_ACTION_MOVE:
-            event_engine->touch_move(
-                static_cast<core::event::touch::FingerId>(pointer_id),
-                static_cast<int>(x),
-                event_engine->get_window_height() - static_cast<int>(y));
+            for (auto pi = decltype(pointer_counts) { 0 }; pi < pointer_counts; ++pi) {
+                event_engine->touch_move(
+                    static_cast<core::event::touch::FingerId>(AMotionEvent_getPointerId(e, pi)),
+                    static_cast<int>(AMotionEvent_getRawX(e, pi)),
+                    event_engine->get_window_height() - static_cast<int>(AMotionEvent_getRawY(e, pi)));
+            }
             break;
         case AMOTION_EVENT_ACTION_UP:
         case AMOTION_EVENT_ACTION_POINTER_UP:
@@ -514,7 +517,7 @@ void gearoenix::system::Application::set_soft_keyboard_visibility(const bool sho
     JavaVMAttachArgs java_vm_attach_args;
     java_vm_attach_args.version = JNI_VERSION_1_6;
     java_vm_attach_args.name = "NativeThread";
-    java_vm_attach_args.group = NULL;
+    java_vm_attach_args.group = nullptr;
     if (JNI_ERR == java_vm->AttachCurrentThread(&jni_env, &java_vm_attach_args)) {
         GXLOGE("Error in attaching current thread to JVM")
         return;
