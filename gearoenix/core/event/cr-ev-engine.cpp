@@ -267,7 +267,7 @@ void gearoenix::core::event::Engine::update_window_size(const int w, const int h
     previous_window_size_update = std::chrono::high_resolution_clock::now();
 }
 
-void gearoenix::core::event::Engine::touch_down(touch::FingerId finger_id, int x, int y) noexcept
+void gearoenix::core::event::Engine::touch_down(const touch::FingerId finger_id, const int x, const int y) noexcept
 {
     for (auto& t : touch_states)
         t.second.reinitialize();

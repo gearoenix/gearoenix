@@ -13,6 +13,7 @@ namespace gearoenix::render::scene {
 class Ui final : public Scene, public core::event::Listener {
 private:
     void init() noexcept;
+    GX_CREATE_GUARD(events)
     std::map<core::event::touch::FingerId, std::weak_ptr<widget::Widget>> selected_widgets;
     std::weak_ptr<widget::Edit> active_edit;
 

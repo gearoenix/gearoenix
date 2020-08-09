@@ -63,7 +63,7 @@ void gearoenix::render::scene::Ui::pointer_down(const double x, const double y, 
             f();
         }
     };
-    e->get_system_application()->set_soft_keyboard_visibility(false);
+
     find_hit_widgets(
         x, y,
         [&](
@@ -84,6 +84,8 @@ void gearoenix::render::scene::Ui::pointer_down(const double x, const double y, 
                 } else {
                     e_select();
                 }
+            } else {
+                e->get_system_application()->set_soft_keyboard_visibility(false);
             }
         },
         [&](
@@ -97,6 +99,9 @@ void gearoenix::render::scene::Ui::pointer_down(const double x, const double y, 
             }
         },
         []() noexcept {});
+    if (widget_not_found) {
+        e->get_system_application()->set_soft_keyboard_visibility(false);
+    }
 }
 
 void gearoenix::render::scene::Ui::pointer_up(const core::event::touch::FingerId finger_id) noexcept
@@ -116,13 +121,17 @@ void gearoenix::render::scene::Ui::pointer_move(const double x, const double y, 
     if (search == selected_widgets.end())
         return;
     auto selected_widget = search->second.lock();
-    if (nullptr == selected_widget)
+    if (nullptr == selected_widget) {
+        selected_widgets.erase(search);
         return;
+    }
     bool widget_found = false;
     const auto cancel_func = [&] {
-        selected_widget->select_cancelled();
+        if (nullptr != selected_widget) {
+            selected_widget->select_cancelled();
+            selected_widget = nullptr;
+        }
         selected_widgets.erase(search);
-        selected_widget = nullptr;
     };
     find_hit_widgets(
         x, y,
@@ -130,9 +139,8 @@ void gearoenix::render::scene::Ui::pointer_move(const double x, const double y, 
             if (selected_widget.get() == wdg) {
                 widget_found = true;
                 selected_widget->dragged(p);
-            } else if (nullptr != selected_widget) {
+            } else
                 cancel_func();
-            }
         },
         [&](widget::Widget* const wdg, const math::Vec3<double>& p, const std::vector<model::Model*>& children) noexcept {
             if (widget_found)
@@ -140,14 +148,11 @@ void gearoenix::render::scene::Ui::pointer_move(const double x, const double y, 
             if (selected_widget.get() == wdg) {
                 widget_found = true;
                 selected_widget->dragged_on(p, children);
-            } else if (nullptr != selected_widget) {
+            } else
                 cancel_func();
-            }
         },
         [&]() noexcept {
-            if (nullptr != selected_widget) {
-                cancel_func();
-            }
+            cancel_func();
         });
 }
 
@@ -190,6 +195,7 @@ gearoenix::render::scene::Ui::~Ui() noexcept
 
 bool gearoenix::render::scene::Ui::on_event(const core::event::Data& d) noexcept
 {
+    GX_GUARD_LOCK(events)
     switch (d.get_source()) {
     case core::event::Id::ButtonMouse: {
         const auto& data = std::get<core::event::button::MouseData>(d.get_data());
@@ -212,22 +218,22 @@ bool gearoenix::render::scene::Ui::on_event(const core::event::Data& d) noexcept
         const auto& data = std::get<core::event::touch::Data>(d.get_data());
         switch (data.get_action()) {
         case core::event::touch::Action::Down: {
-            if (e->get_system_application()->get_event_engine()->get_touch_states().size() == 1) {
-                const auto& p = data.get_state().get_point().get_current_position();
-                pointer_down(p.x, p.y, data.get_state().get_finger_id());
-            }
+            const auto& s = data.get_state();
+            const auto& p = s.get_point().get_current_position();
+            pointer_down(p.x, p.y, s.get_finger_id());
             break;
         }
         case core::event::touch::Action::Up: {
             pointer_up(data.get_state().get_finger_id());
             break;
         }
-        case core::event::touch::Action::Move:
-            if (e->get_system_application()->get_event_engine()->get_touch_states().size() == 1) {
-                const auto& p = data.get_state().get_point().get_current_position();
-                pointer_move(p.x, p.y, data.get_state().get_finger_id());
-            }
+        case core::event::touch::Action::Move: {
+            const auto& s = data.get_state();
+            const auto& p = s.get_point().get_current_position();
+            GXLOGE("move finger_id: " << s.get_finger_id())
+            pointer_move(p.x, p.y, s.get_finger_id());
             break;
+        }
         default:
             break;
         }
