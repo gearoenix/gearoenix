@@ -2,6 +2,14 @@
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../render/model/rnd-mdl-dynamic.hpp"
 
+void gearoenix::physics::body::SmoothRoadCar::update() noexcept
+{
+    if (steering_angle > steering_angle_max)
+        steering_angle = steering_angle_max;
+    else if (steering_angle < steering_angle_min)
+        steering_angle = steering_angle_min;
+}
+
 gearoenix::physics::body::SmoothRoadCar::SmoothRoadCar(
     std::string name,
     std::shared_ptr<render::model::Dynamic> car_body,
