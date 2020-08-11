@@ -321,6 +321,22 @@ struct Vec3 {
         *this /= length();
     }
 
+    constexpr Vec3 atan() const noexcept
+    {
+        return Vec3(
+            static_cast<Element>(std::atan(static_cast<double>(x))),
+            static_cast<Element>(std::atan(static_cast<double>(y))),
+            static_cast<Element>(std::atan(static_cast<double>(z))));
+    }
+
+    constexpr Vec3 sign() const noexcept
+    {
+        return Vec3(
+            std::signbit(x) ? static_cast<Element>(-1) : static_cast<Element>(1),
+            std::signbit(y) ? static_cast<Element>(-1) : static_cast<Element>(1),
+            std::signbit(z) ? static_cast<Element>(-1) : static_cast<Element>(1));
+    }
+
     [[nodiscard]] static constexpr Vec3<Element> importance_sample_ggx(
         const Vec2<Element>& xi, const Vec3<Element>& n, const Element roughness,
         const Element tolerance = static_cast<Element>(0.001)) noexcept
