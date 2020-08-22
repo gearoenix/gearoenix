@@ -35,6 +35,7 @@ void gearoenix::demo::wwr::Training::initialize_scenes(
 
 void gearoenix::demo::wwr::Training::initialize_camera() noexcept {
      cam_ctrl = std::make_unique<render::camera::ArcController>(game_scene->get_cameras().begin()->second);
+     cam_ctrl->get_controlled_camera()->set_cascaded_shadow_enabled(true);
      cam_ctrl->set_max_vertical_angle(0.8);
      cam_ctrl->set_min_vertical_angle(0.2);
      cam_ctrl->set_vertical_angle(0.4);

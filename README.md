@@ -24,9 +24,9 @@ it's going to be stabilized.
   `OpenGL 3.3`, `OpenGL 4.3`, `Directx11(WIP)` and `Vulkan(WIP)`).
 - It can automatically choose the highest available backend and in addition in your build you can
   off an API backend so it will not compile that API and then your binary size will be reduced.
-- It has its own file format for importing scenes data in to game. This file
+- It has its own file format for importing scenes data in to the game. This file
   format help the engine to have better performance in loading a scene and
-  reduce the size of the data hence It make smaller publishable binaries.
+  reduce the size of the data hence it makes smaller publishable binaries.
 - It has its own
   [blender file exporter](https://github.com/Hossein-Noroozpour/gearoenix-blender)
   that try to force best practices in data creation and have control
@@ -119,9 +119,9 @@ In this section I need contribution. (Note: Webassembly is not main target of th
 - Promotion of this project.
 - Documentation.
 - Test coverage is not very well and I don't have time for it,
-  if you want to contribute in it this is the best place you can start.
-- Documentation.
+  if you want to contribute to it, this is the best place you can start.
 - 3D content development.
+- Code.
 
 ## License
 

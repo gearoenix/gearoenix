@@ -26,10 +26,10 @@ class ArcController final : public core::event::Listener {
     GX_GET_VAL_PRV(double, max_distance, 10.0)
     GX_GET_VAL_PRV(double, min_distance, 1.0)
     GX_GET_VAL_PRV(double, distance, (max_distance + min_distance) * 0.5)
+    GX_GET_REFC_PRV(std::shared_ptr<Camera>, controlled_camera)
 private:
     Transformation* const trn;
     engine::Engine* const render_engine;
-    const std::shared_ptr<Camera> cam;
     const core::Id function_id;
     double rotate_x = 0.0;
     bool move_forward = false;

@@ -15,6 +15,10 @@ class Dynamic;
 namespace gearoenix::physics::body {
 class Car : public Body {
 public:
+    struct Wheel {
+        /// The
+        double load;
+    };
     /// sorted (starting engine_rpm, engine_torque_function)
     using TorqueRpmDiagramPoints = std::array<std::pair<double, std::function<double(double)>>, 4>;
 

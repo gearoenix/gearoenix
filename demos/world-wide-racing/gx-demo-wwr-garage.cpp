@@ -4,6 +4,7 @@
 #include <gearoenix/render/scene/rnd-scn-ui.hpp>
 #include <gearoenix/render/scene/rnd-scn-logo.hpp>
 #include <gearoenix/render/camera/rnd-cmr-arc-controller.hpp>
+#include <gearoenix/render/camera/rnd-cmr-camera.hpp>
 #include <gearoenix/render/model/rnd-mdl-manager.hpp>
 #include <gearoenix/render/widget/rnd-wdg-button.hpp>
 #include <gearoenix/render/engine/rnd-eng-engine.hpp>
@@ -34,6 +35,7 @@ void gearoenix::demo::wwr::Garage::initialize_scenes(
 
 void gearoenix::demo::wwr::Garage::initialize_camera() noexcept {
     cam_ctrl = std::make_unique<render::camera::ArcController>(game_scene->get_cameras().begin()->second);
+    cam_ctrl->get_controlled_camera()->set_cascaded_shadow_enabled(true);
     cam_ctrl->set_max_vertical_angle(0.8);
     cam_ctrl->set_min_vertical_angle(0.2);
     cam_ctrl->set_vertical_angle(0.4);

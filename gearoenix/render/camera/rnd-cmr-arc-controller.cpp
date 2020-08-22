@@ -72,9 +72,9 @@ void gearoenix::render::camera::ArcController::values_updated() noexcept
 gearoenix::render::camera::ArcController::ArcController(std::shared_ptr<Camera> c) noexcept
     : up(0.0, 0.0, 1.0)
     , direction(1.0, 0.0, 0.0)
-    , trn(c->get_transformation())
-    , render_engine(c->get_render_engine())
-    , cam(std::move(c))
+    , controlled_camera(std::move(c))
+    , trn(controlled_camera->get_transformation())
+    , render_engine(controlled_camera->get_render_engine())
     , function_id(render_engine->get_update_functions_manager()->add([this] { update(); }))
 {
     auto* const event_engine = render_engine->get_system_application()->get_event_engine();
