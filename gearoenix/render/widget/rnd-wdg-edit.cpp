@@ -103,7 +103,7 @@ void gearoenix::render::widget::Edit::init(const core::sync::EndCaller<core::syn
             }
         },
         std::numeric_limits<double>::max());
-    e->get_physics_engine()->get_animation_manager()->add(get_root()->get_asset_id(), cursor_animation);
+    e->get_physics_engine()->get_animation_manager()->add(get_root()->get_id(), cursor_animation);
 
     collider->set_on_scale([this] { on_scale(); });
 

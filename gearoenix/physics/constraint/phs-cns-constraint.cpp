@@ -13,8 +13,8 @@ gearoenix::physics::constraint::Constraint::~Constraint() = default;
 void gearoenix::physics::constraint::Constraint::add_affected(const std::shared_ptr<render::model::Model>& m) noexcept
 {
 #ifdef GX_DEBUG_MODE
-    if (m->get_model_type() == render::model::Type::Static || affected_models.find(m->get_asset_id()) != affected_models.end())
+    if (m->get_model_type() == render::model::Type::Static || affected_models.find(m->get_id()) != affected_models.end())
         GX_UNEXPECTED
 #endif
-    affected_models.emplace(m->get_asset_id(), m);
+    affected_models.emplace(m->get_id(), m);
 }

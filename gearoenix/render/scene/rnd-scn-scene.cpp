@@ -31,7 +31,7 @@ static const std::shared_ptr<gearoenix::physics::constraint::Constraint> null_co
 static const std::shared_ptr<gearoenix::render::reflection::Reflection> null_reflection = nullptr;
 
 #define GX_SCENE_INIT                                                                              \
-    core::asset::Asset(my_id, core::asset::Type::Scene, std::move(name)),                          \
+    core::asset::Asset(id, core::asset::Type::Scene, std::move(name)),                          \
         scene_type(t),                                                                             \
         uniform_buffers(new buffer::FramedUniform(static_cast<unsigned int>(sizeof(Uniform)), e)), \
         static_accelerator(new gearoenix::physics::accelerator::Bvh()),                            \
@@ -40,7 +40,7 @@ static const std::shared_ptr<gearoenix::render::reflection::Reflection> null_ref
         model_manager(e->get_system_application()->get_asset_manager()->get_model_manager())
 
 gearoenix::render::scene::Scene::Scene(
-    const core::Id my_id,
+    const core::Id id,
     std::string name,
     const Type t,
     engine::Engine* const e,
@@ -98,7 +98,7 @@ gearoenix::render::scene::Scene::~Scene() noexcept
     reflections.clear();
     static_colliders.clear();
     dynamic_colliders.clear();
-    GXLOGD("Scene " << asset_id << " deleted.")
+    GXLOGD("Scene " << id << " deleted.")
 }
 
 #ifdef GX_DEBUG_MODE
@@ -113,7 +113,7 @@ gearoenix::render::scene::Scene::~Scene() noexcept
 #define GX_SCENE_ADD_HELPER(x, c)                                                             \
     void gearoenix::render::scene::Scene::scene_add_##x(const std::shared_ptr<c>& o) noexcept \
     {                                                                                         \
-        const core::Id id = o->get_asset_id();                                                \
+        const core::Id id = o->get_id();                                                \
         GX_CHECK_HELPER(x)                                                                    \
         x##s[id] = o;                                                                         \
     }
@@ -123,7 +123,7 @@ GX_SCENE_ADD_HELPER(audio, audio::Audio)
 
 void gearoenix::render::scene::Scene::scene_add_light(const std::shared_ptr<light::Light>& o) noexcept
 {
-    const core::Id id = o->get_asset_id();
+    const core::Id id = o->get_id();
     if (o->get_light_type() == light::Type::Directional && o->get_shadow_enabled()) {
         o->set_scene(this);
     }
@@ -135,7 +135,7 @@ GX_SCENE_ADD_HELPER(constraint, physics::constraint::Constraint)
 
 void gearoenix::render::scene::Scene::scene_add_skybox(const std::shared_ptr<skybox::Skybox>& o) noexcept
 {
-    const auto id = o->get_asset_id();
+    const auto id = o->get_id();
     if (nullptr != o->get_baked_reflection()) {
         set_default_reflection_probe(o->get_baked_reflection());
     }
@@ -145,7 +145,7 @@ void gearoenix::render::scene::Scene::scene_add_skybox(const std::shared_ptr<sky
 
 void gearoenix::render::scene::Scene::scene_add_reflection(const std::shared_ptr<reflection::Reflection>& o) noexcept
 {
-    const auto id = o->get_asset_id();
+    const auto id = o->get_id();
     if (o->get_reflection_type() == reflection::Type::Runtime) {
         runtime_reflections[id] = std::dynamic_pointer_cast<reflection::Runtime>(o);
     }
@@ -157,7 +157,7 @@ void gearoenix::render::scene::Scene::scene_add_model(const std::shared_ptr<mode
 {
     const std::function<void(const std::shared_ptr<model::Model>&)> travm = [&travm, this](const std::shared_ptr<model::Model>& mdl) noexcept {
         auto& children = mdl->get_children();
-        const core::Id mid = mdl->get_asset_id();
+        const core::Id mid = mdl->get_id();
 #ifdef GX_DEBUG_MODE
         if (models.find(mid) != models.end()) {
             GXLOGE("Error overriding of a model with same Id: " << mid)

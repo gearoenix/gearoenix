@@ -39,12 +39,12 @@ void gearoenix::core::graph::Node::remove_provider(const unsigned int input_link
         return;
     const unsigned int l = p.second;
     p = std::make_pair(nullptr, 0);
-    ptr->remove_consumer(l, asset_id, input_link_index);
+    ptr->remove_consumer(l, id, input_link_index);
 }
 
 void gearoenix::core::graph::Node::set_consumer(const unsigned int output_link_index, Node* const o, const unsigned int consumer_input_link_index) noexcept
 {
-    output_links_consumers_links[output_link_index][std::make_pair(o->get_asset_id(), consumer_input_link_index)] = o;
+    output_links_consumers_links[output_link_index][std::make_pair(o->get_id(), consumer_input_link_index)] = o;
 }
 
 void gearoenix::core::graph::Node::remove_consumer(const unsigned int output_link_index, const Id node_id, const unsigned int consumer_input_link_index) noexcept

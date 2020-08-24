@@ -83,7 +83,7 @@ void gearoenix::render::graph::node::Node::set_provider(const unsigned int input
         return;
     core::graph::Node::set_provider(input_link_index, o, provider_output_link_index);
     const auto& semaphores = dynamic_cast<Node*>(o)->get_link_frames_semaphore(
-        provider_output_link_index, asset_id, input_link_index);
+        provider_output_link_index, id, input_link_index);
     auto& my_semaphores = link_providers_frames_semaphores[input_link_index];
     my_semaphores.clear();
     for (const auto& s : semaphores)

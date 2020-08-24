@@ -55,7 +55,7 @@ void gearoenix::render::scene::Ui::pointer_down(const double x, const double y, 
         };
         std::shared_ptr<widget::Widget> pre_wdg;
         if (selected_widgets.end() != selected_widgets_search && (pre_wdg = selected_widgets_search->second.lock()) && pre_wdg != nullptr) {
-            if (pre_wdg->get_asset_id() != wgd->get_asset_id()) {
+            if (pre_wdg->get_id() != wgd->get_id()) {
                 pre_wdg->select_cancelled();
                 f();
             }
@@ -77,7 +77,7 @@ void gearoenix::render::scene::Ui::pointer_down(const double x, const double y, 
                     selected_edit->active();
                 };
                 if (const auto edit = active_edit.lock()) {
-                    if (edit->get_asset_id() != wgd->get_asset_id()) {
+                    if (edit->get_id() != wgd->get_id()) {
                         edit->active(false);
                         e_select();
                     }

@@ -51,5 +51,5 @@ gearoenix::physics::animation::Manager::~Manager() noexcept
 void gearoenix::physics::animation::Manager::add(const core::Id animated_object_id, const std::shared_ptr<Animation>& a) noexcept
 {
     GX_GUARD_LOCK(animations)
-    animations[animated_object_id].emplace(a->get_asset_id(), a);
+    animations[animated_object_id].emplace(a->get_id(), a);
 }

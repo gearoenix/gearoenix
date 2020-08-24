@@ -7,7 +7,7 @@ namespace gearoenix::physics::body {
 enum struct Type : core::TypeId {
     Static = 1,
     Rigid = 2,
-    SmoothRoadCar = 3,
+    Car = 3,
 };
 }
 

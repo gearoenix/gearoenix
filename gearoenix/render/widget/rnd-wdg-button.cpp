@@ -86,7 +86,7 @@ void gearoenix::render::widget::Button::selected(const math::Vec3<double>&) noex
     if (auto a = animation.lock())
         a->set_activity(false);
     auto end = core::sync::EndCaller<model::Model>([](const std::shared_ptr<model::Model>&) {});
-    auto myself = e->get_system_application()->get_asset_manager()->get_model_manager()->get_gx3d(asset_id, end);
+    auto myself = e->get_system_application()->get_asset_manager()->get_model_manager()->get_gx3d(id, end);
     const auto a = std::make_shared<physics::animation::Animation>(
         "button-" + name + "-select",
         [this, myself](const double from_start, const double) noexcept {
@@ -99,7 +99,7 @@ void gearoenix::render::widget::Button::selected(const math::Vec3<double>&) noex
             transformation->local_scale(pressed_size / scale_down_progress);
             scale_down_progress = pressed_size;
         });
-    e->get_physics_engine()->get_animation_manager()->add(get_root()->get_asset_id(), a);
+    e->get_physics_engine()->get_animation_manager()->add(get_root()->get_id(), a);
     animation = a;
 }
 
@@ -108,7 +108,7 @@ void gearoenix::render::widget::Button::select_cancelled() noexcept
     if (auto a = animation.lock())
         a->set_activity(false);
     auto my_fun = core::sync::EndCaller<model::Model>([](const std::shared_ptr<model::Model>&) {});
-    auto myself = e->get_system_application()->get_asset_manager()->get_model_manager()->get_gx3d(asset_id, my_fun);
+    auto myself = e->get_system_application()->get_asset_manager()->get_model_manager()->get_gx3d(id, my_fun);
     const auto a = std::make_shared<physics::animation::Animation>(
         "button-" + name + "-up",
         [this, myself](const double from_start, const double) noexcept {
@@ -121,7 +121,7 @@ void gearoenix::render::widget::Button::select_cancelled() noexcept
             transformation->local_scale(1.0 / scale_down_progress);
             scale_down_progress = 1.0;
         });
-    e->get_physics_engine()->get_animation_manager()->add(get_root()->get_asset_id(), a);
+    e->get_physics_engine()->get_animation_manager()->add(get_root()->get_id(), a);
     animation = a;
 }
 

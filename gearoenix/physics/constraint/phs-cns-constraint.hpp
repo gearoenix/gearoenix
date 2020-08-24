@@ -52,10 +52,10 @@ public:
     void add(const std::shared_ptr<Constraint>& c) noexcept
     {
 #ifdef GX_DEBUG_MODE
-        if (after_constraints.find(c->get_asset_id()) != after_constraints.end())
+        if (after_constraints.find(c->get_id()) != after_constraints.end())
             GX_UNEXPECTED
 #endif
-        after_constraints.emplace(c->get_asset_id(), c);
+        after_constraints.emplace(c->get_id(), c);
     }
 
     void add_affected(const std::shared_ptr<render::model::Model>& m) noexcept;

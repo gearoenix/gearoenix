@@ -1,5 +1,6 @@
 #ifndef GEAROENIX_MATH_VECTOR_3D_HPP
 #define GEAROENIX_MATH_VECTOR_3D_HPP
+
 #include "math-vector-2d.hpp"
 
 namespace gearoenix::math {
@@ -7,7 +8,14 @@ template <typename Element>
 struct Vec3 {
     Element x, y, z;
 
-    constexpr explicit Vec3(const Element e = static_cast<Element>(0)) noexcept
+    constexpr Vec3() noexcept
+        : x(static_cast<Element>(0))
+        , y(static_cast<Element>(0))
+        , z(static_cast<Element>(0))
+    {
+    }
+
+    constexpr explicit Vec3(const Element e) noexcept
         : x(e)
         , y(e)
         , z(e)

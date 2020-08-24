@@ -8,12 +8,12 @@
 #include <utility>
 namespace gearoenix::core::asset {
 class Asset {
-    GX_GET_CVAL_PRT(Id, asset_id)
+    GX_GET_CVAL_PRT(Id, id)
     GX_GET_CVAL_PRT(Type, asset_type)
     GX_GET_REFC_PRT(std::string, name)
 protected:
-    Asset(const Id asset_id, const Type asset_type, std::string name) noexcept
-        : asset_id(asset_id)
+    Asset(const Id id, const Type asset_type, std::string name) noexcept
+        : id(id)
         , asset_type(asset_type)
         , name(std::move(name))
     {

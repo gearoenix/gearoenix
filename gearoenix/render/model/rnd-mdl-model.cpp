@@ -74,7 +74,7 @@ gearoenix::render::model::Model::Model(const Model& o) noexcept
     : core::asset::Asset(
         core::asset::Manager::create_id(),
         core::asset::Type::Model,
-        o.name + "-clone-" + std::to_string(o.asset_id) + "-" + std::to_string(core::asset::Manager::create_id()))
+        o.name + "-clone-" + std::to_string(o.id) + "-" + std::to_string(core::asset::Manager::create_id()))
     , model_type(o.model_type)
     , collider(o.collider->clone())
     , transformation(new Transformation(this))
@@ -137,12 +137,12 @@ void gearoenix::render::model::Model::add_mesh(const std::shared_ptr<Mesh>& m) n
     has_transparent |= (mat->get_translucency() == material::TranslucencyMode::Transparent);
     const mesh::Mesh* const msh = m->get_msh().get();
     collider->put_in_box(msh->get_box());
-    meshes[msh->get_asset_id()] = m;
+    meshes[msh->get_id()] = m;
 }
 
 void gearoenix::render::model::Model::add_child(const std::shared_ptr<Model>& c) noexcept
 {
-    children[c->get_asset_id()] = c;
+    children[c->get_id()] = c;
     c->parent = this;
 }
 
