@@ -1,8 +1,8 @@
 #include "rnd-eng-engine.hpp"
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../core/cr-function-loader.hpp"
-#include "../../core/cr-update-functions-manager.hpp"
 #include "../../core/sync/cr-sync-kernel-workers.hpp"
+#include "../../core/sync/gx-cr-sync-update-manager.hpp"
 #include "../../physics/phs-engine.hpp"
 #include "../../system/sys-app.hpp"
 #include "../buffer/rnd-buf-manager.hpp"
@@ -24,7 +24,7 @@ gearoenix::render::engine::Engine::Engine(system::Application* const system_appl
     , system_application(system_application)
     , function_loader(new core::FunctionLoader())
     , kernels(new core::sync::KernelWorkers())
-    , update_functions_manager(new core::UpdateFunctionsManager(kernels.get()))
+    , update_manager(new core::sync::UpdateManager(kernels.get()))
     , physics_engine(new physics::Engine(system_application, kernels.get()))
     , late_delete_assets(10)
 {
