@@ -62,16 +62,16 @@ gearoenix::physics::body::Car::Car(
     std::shared_ptr<render::model::Dynamic> car_right_rear_wheel) noexcept
     : Body(core::asset::Manager::create_id(), std::move(name), Type::Car, _car_body)
     , car_body(std::move(_car_body))
-    , front_axle{
-        .left_wheel{.model = std::move(car_left_front_wheel)},
-        .right_wheel{.model = std::move(car_right_front_wheel)},
+    , front_axle {
+        .left_wheel { .model = std::move(car_left_front_wheel) },
+        .right_wheel { .model = std::move(car_right_front_wheel) },
     }
-    , rear_axle{
-        .left_wheel{.model = std::move(car_left_rear_wheel)},
-        .right_wheel{.model = std::move(car_right_rear_wheel)},
+    , rear_axle {
+        .left_wheel { .model = std::move(car_left_rear_wheel) },
+        .right_wheel { .model = std::move(car_right_rear_wheel) },
     }
 {
-    std::vector<core::Id> influence_ids{
+    std::vector<core::Id> influence_ids {
         car_body->get_id(),
         front_axle.left_wheel.model->get_id(),
         front_axle.right_wheel.model->get_id(),

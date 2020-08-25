@@ -31,7 +31,7 @@ static const std::shared_ptr<gearoenix::physics::constraint::Constraint> null_co
 static const std::shared_ptr<gearoenix::render::reflection::Reflection> null_reflection = nullptr;
 
 #define GX_SCENE_INIT                                                                              \
-    core::asset::Asset(id, core::asset::Type::Scene, std::move(name)),                          \
+    core::asset::Asset(id, core::asset::Type::Scene, std::move(name)),                             \
         scene_type(t),                                                                             \
         uniform_buffers(new buffer::FramedUniform(static_cast<unsigned int>(sizeof(Uniform)), e)), \
         static_accelerator(new gearoenix::physics::accelerator::Bvh()),                            \
@@ -50,7 +50,7 @@ gearoenix::render::scene::Scene::Scene(
 }
 
 gearoenix::render::scene::Scene::Scene(
-    const core::Id my_id,
+    const core::Id id,
     std::string name,
     const Type t,
     system::stream::Stream* const f,
@@ -113,7 +113,7 @@ gearoenix::render::scene::Scene::~Scene() noexcept
 #define GX_SCENE_ADD_HELPER(x, c)                                                             \
     void gearoenix::render::scene::Scene::scene_add_##x(const std::shared_ptr<c>& o) noexcept \
     {                                                                                         \
-        const core::Id id = o->get_id();                                                \
+        const core::Id id = o->get_id();                                                      \
         GX_CHECK_HELPER(x)                                                                    \
         x##s[id] = o;                                                                         \
     }

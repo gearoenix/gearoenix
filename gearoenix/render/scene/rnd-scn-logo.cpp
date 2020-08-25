@@ -46,7 +46,7 @@ void gearoenix::render::scene::Logo::on_load(const std::shared_ptr<Scene>& s) no
     anm_mgr->add(body->get_id(), rotation_animation);
 
     anm_mgr->add(body->get_id(), std::make_shared<physics::animation::Animation>(
-                                           "gearoenix-logo-wings", [this, left_wing, right_wing, end](const double, const double delta_time) noexcept {
+                                     "gearoenix-logo-wings", [this, left_wing, right_wing, end](const double, const double delta_time) noexcept {
             const auto rot = delta_time * wing_rotation_speed;
             wing_rotation += rot;
             left_wing->get_transformation()->local_z_rotate(rot);
@@ -55,7 +55,7 @@ void gearoenix::render::scene::Logo::on_load(const std::shared_ptr<Scene>& s) no
             right_wing->get_transformation()->local_z_rotate(wing_rotation); }));
 
     anm_mgr->add(body->get_id(), std::make_shared<physics::animation::Animation>(
-                                           "gearoenix-logo-scale", [this, body, end](const double time_from_start, const double) noexcept {
+                                     "gearoenix-logo-scale", [this, body, end](const double time_from_start, const double) noexcept {
             const auto current_scale = 1.0 - (1.0 - 1.0 / max_scale) * (1.0 - time_from_start / scale_duration);
             body->get_transformation()->local_scale(current_scale / scale);
             scale = current_scale; }, scale_duration, [this, body](double) { body->get_transformation()->local_scale(1.0 / scale); }));

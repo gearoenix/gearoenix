@@ -18,3 +18,4 @@ GX_TEST_PRINT_TYPE_VAL(math::IntersectionStatus)
 #include "gx-test-math-vector.hpp"
 #include "gx-test-physics-accelerator-bvh.hpp"
 #include "gx-test-render-texture.hpp"
+#include <gearoenix/core/sync/gx-cr-sync-influence-manager-test.hpp>

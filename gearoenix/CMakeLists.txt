@@ -73,6 +73,8 @@ SET(GX_ENGINE_SRC
         "${GX_ENGINE_SRC_DIR}core/sync/cr-sync-channeled-workers.hpp"
         "${GX_ENGINE_SRC_DIR}core/sync/cr-sync-end-caller.cpp"
         "${GX_ENGINE_SRC_DIR}core/sync/cr-sync-end-caller.hpp"
+        "${GX_ENGINE_SRC_DIR}core/sync/gx-cr-sync-influence-manager.cpp"
+        "${GX_ENGINE_SRC_DIR}core/sync/gx-cr-sync-influence-manager.hpp"
         "${GX_ENGINE_SRC_DIR}core/sync/cr-sync-kernel-workers.cpp"
         "${GX_ENGINE_SRC_DIR}core/sync/cr-sync-kernel-workers.hpp"
         "${GX_ENGINE_SRC_DIR}core/sync/cr-sync-parallel-for.cpp"
