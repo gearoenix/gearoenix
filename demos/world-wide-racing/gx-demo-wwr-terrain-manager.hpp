@@ -1,6 +1,8 @@
 #ifndef GX_DEMO_WWR_TERRAIN_MANAGER_HPP
 #define GX_DEMO_WWR_TERRAIN_MANAGER_HPP
 
+#include <gearoenix/core/cr-types.hpp>
+
 #include <memory>
 #include <vector>
 
@@ -24,17 +26,17 @@ namespace gearoenix::demo::wwr {
 class TerrainManager {
 public:
     constexpr static std::size_t ground_pieces_count = 3;
-    constexpr static double ground_pieces_breadth = 6.0;
 private:
     const std::shared_ptr<render::scene::Game> scene;
     const std::shared_ptr<render::model::Dynamic> asphalt_piece;
     const std::shared_ptr<render::camera::Camera> camera;
     const std::shared_ptr<render::model::Dynamic> asphalt_pieces[ground_pieces_count];
     physics::Transformation *const camera_tran;
+    core::Id update_function_id;
 
     void update() noexcept;
 
-    public:
+public:
     explicit TerrainManager(std::shared_ptr<render::scene::Game> scene) noexcept;
     ~TerrainManager() noexcept;
 
