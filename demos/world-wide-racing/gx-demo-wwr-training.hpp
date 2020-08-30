@@ -25,6 +25,7 @@ namespace gearoenix::render::scene {
 namespace gearoenix::demo::wwr {
     class TerrainManager;
     class Garage;
+    class CountDown;
     class Training final {
     private:
         std::shared_ptr<render::scene::Game> game_scene;
@@ -33,12 +34,15 @@ namespace gearoenix::demo::wwr {
         std::unique_ptr<TerrainManager> terrain_manager;
         std::unique_ptr<render::camera::ArcController> cam_ctrl;
         std::shared_ptr<physics::constraint::WindowPlacer> break_button_placer, accelerator_button_placer;
+        std::shared_ptr<CountDown> count_down;
 
         void initialize_scenes(const std::vector<std::shared_ptr<render::scene::Scene>>& scenes) noexcept;
         void initialize_camera() noexcept;
+        void initialize_ui() noexcept;
         void initialize_buttons() noexcept;
         void initialize_cars() noexcept;
         void initialize_terrain() noexcept;
+        void count_down_finished() noexcept;
     public:
         Training(const std::vector<std::shared_ptr<render::scene::Scene>>& scenes, Garage * garage) noexcept;
         ~Training() noexcept;

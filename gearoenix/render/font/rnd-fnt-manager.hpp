@@ -16,9 +16,9 @@ namespace gearoenix::render::font {
 class Font;
 class Font2D;
 class Manager {
+    GX_GET_CREF_PRV(core::cache::File<Font>, cache)
 protected:
     engine::Engine* const e;
-    core::cache::File<Font> cache;
     std::shared_ptr<Font2D> default_2d;
 
 public:

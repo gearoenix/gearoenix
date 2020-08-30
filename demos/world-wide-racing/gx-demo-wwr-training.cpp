@@ -13,6 +13,7 @@
 #include <gearoenix/render/engine/rnd-eng-engine.hpp>
 #include <gearoenix/physics/collider/phs-cld-collider.hpp>
 #include <gearoenix/system/sys-app.hpp>
+#include "gx-demo-wwr-count-down.hpp"
 
 void gearoenix::demo::wwr::Training::initialize_scenes(
         const std::vector<std::shared_ptr<render::scene::Scene>> &scenes) noexcept {
@@ -46,6 +47,10 @@ void gearoenix::demo::wwr::Training::initialize_camera() noexcept {
      cam_ctrl->set_target(math::Vec3(0.0, 0.0, 0.0));
 }
 
+void gearoenix::demo::wwr::Training::initialize_ui() noexcept {
+    initialize_buttons();
+}
+
 void gearoenix::demo::wwr::Training::initialize_buttons() noexcept {
      auto *const cns_mgr = ui_scene->get_e()->get_system_application()->get_asset_manager()->get_constraint_manager();
 
@@ -76,15 +81,20 @@ void gearoenix::demo::wwr::Training::initialize_terrain() noexcept {
     terrain_manager = std::make_unique<TerrainManager>(game_scene);
 }
 
+void gearoenix::demo::wwr::Training::count_down_finished() noexcept {
+
+}
+
 gearoenix::demo::wwr::Training::Training(
         const std::vector <std::shared_ptr<render::scene::Scene>> &scenes,
         Garage * const garage) noexcept {
     initialize_scenes(scenes);
     initialize_camera();
-    initialize_buttons();
+    initialize_ui();
     initialize_cars();
     initialize_terrain();
     garage->clear();
+    count_down = CountDown::construct(ui_scene, [this]{count_down_finished();});
 }
 
 gearoenix::demo::wwr::Training::~Training() noexcept = default;
