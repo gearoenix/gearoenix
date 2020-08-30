@@ -39,6 +39,16 @@ void gearoenix::render::font::Font2D::init() noexcept
 }
 
 gearoenix::render::font::Font2D::Font2D(
+    const core::Id id,
+    std::string name,
+    texture::Manager* const txt_mgr) noexcept
+    : Font(id, std::move(name), Type::D2)
+    , txt_mgr(txt_mgr)
+    , stb_font(new stbtt_fontinfo())
+{
+}
+
+gearoenix::render::font::Font2D::Font2D(
     const core::Id my_id,
     std::string name,
     system::stream::Stream* f,
@@ -51,23 +61,25 @@ gearoenix::render::font::Font2D::Font2D(
     init();
 }
 
-gearoenix::render::font::Font2D::Font2D(
-    const core::Id my_id,
+std::shared_ptr<gearoenix::render::font::Font2D> gearoenix::render::font::Font2D::construct_default(
+    const core::Id id,
     std::string name,
     texture::Manager* const txt_mgr) noexcept
-    : Font(my_id, std::move(name), Type::D2)
-    , txt_mgr(txt_mgr)
-    , stb_font(new stbtt_fontinfo())
 {
     auto* const e = txt_mgr->get_engine();
-    const std::unique_ptr<system::stream::Asset> asset(system::stream::Asset::construct(e->get_system_application(), "default.ttf"));
-    if (asset == nullptr)
-        GXLOGF("Default font not found.")
+    const std::unique_ptr<system::stream::Asset> asset(system::stream::Asset::construct(
+        e->get_system_application(), "default.ttf"));
+    if (asset == nullptr) {
+        GXLOGD("Default font-2d not found.")
+        return nullptr;
+    }
+    std::shared_ptr<Font2D> result(new Font2D(id, std::move(name), txt_mgr));
     const auto s = asset->size();
-    ttf_data.resize(static_cast<std::size_t>(s));
+    result->ttf_data.resize(static_cast<std::size_t>(s));
     asset->seek(0);
-    (void)asset->read(ttf_data.data(), s);
-    init();
+    (void)asset->read(result->ttf_data.data(), s);
+    result->init();
+    return result;
 }
 
 gearoenix::render::font::Font2D::~Font2D() noexcept

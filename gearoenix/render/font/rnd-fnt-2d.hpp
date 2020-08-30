@@ -27,14 +27,16 @@ private:
 
     void init() noexcept;
 
+    Font2D(core::Id id, std::string name, texture::Manager* txt_mgr) noexcept;
+
 public:
     Font2D(
         core::Id my_id,
         std::string name,
         system::stream::Stream* f,
         texture::Manager* txt_mgr) noexcept;
-    Font2D(
-        core::Id my_id,
+    [[nodiscard]] static std::shared_ptr<Font2D> construct_default(
+        core::Id id,
         std::string name,
         texture::Manager* txt_mgr) noexcept;
     ~Font2D() noexcept final;
