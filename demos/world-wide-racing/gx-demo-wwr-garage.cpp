@@ -1,39 +1,42 @@
 #include "gx-demo-wwr-garage.hpp"
 #include "gx-demo-wwr-rotating-button.hpp"
 #include "gx-demo-wwr-training.hpp"
-#include <gearoenix/render/scene/rnd-scn-ui.hpp>
-#include <gearoenix/render/scene/rnd-scn-logo.hpp>
-#include <gearoenix/render/camera/rnd-cmr-arc-controller.hpp>
-#include <gearoenix/render/camera/rnd-cmr-camera.hpp>
-#include <gearoenix/render/model/rnd-mdl-manager.hpp>
-#include <gearoenix/render/widget/rnd-wdg-button.hpp>
-#include <gearoenix/render/engine/rnd-eng-engine.hpp>
+#include <gearoenix/physics/collider/phs-cld-collider.hpp>
 #include <gearoenix/physics/constraint/phs-cns-manager.hpp>
 #include <gearoenix/physics/constraint/phs-cns-window-placer.hpp>
 #include <gearoenix/physics/constraint/phs-cns-window-scaler.hpp>
-#include <gearoenix/physics/collider/phs-cld-collider.hpp>
+#include <gearoenix/render/camera/rnd-cmr-arc-controller.hpp>
+#include <gearoenix/render/camera/rnd-cmr-camera.hpp>
+#include <gearoenix/render/engine/rnd-eng-engine.hpp>
+#include <gearoenix/render/model/rnd-mdl-manager.hpp>
+#include <gearoenix/render/scene/rnd-scn-logo.hpp>
+#include <gearoenix/render/scene/rnd-scn-ui.hpp>
+#include <gearoenix/render/widget/rnd-wdg-button.hpp>
 #include <gearoenix/system/sys-app.hpp>
 
 void gearoenix::demo::wwr::Garage::initialize_scenes(
-        const std::vector<std::shared_ptr<render::scene::Scene>> &scenes) noexcept {
+    const std::vector<std::shared_ptr<render::scene::Scene>>& scenes) noexcept
+{
 #ifdef GX_DEBUG_MODE
-    if(scenes.size() != 2) GX_UNEXPECTED
+    if (scenes.size() != 2)
+        GX_UNEXPECTED
 #endif
-    for(const auto& s: scenes) {
+    for (const auto& s : scenes) {
         switch (s->get_scene_type()) {
-            case render::scene::Type::Game:
-                game_scene = s;
-                break;
-            case render::scene::Type::Ui:
-                ui_scene = s;
-                break;
-            default:
+        case render::scene::Type::Game:
+            game_scene = s;
+            break;
+        case render::scene::Type::Ui:
+            ui_scene = s;
+            break;
+        default:
             GX_UNEXPECTED
         }
     }
 }
 
-void gearoenix::demo::wwr::Garage::initialize_camera() noexcept {
+void gearoenix::demo::wwr::Garage::initialize_camera() noexcept
+{
     cam_ctrl = std::make_unique<render::camera::ArcController>(game_scene->get_cameras().begin()->second);
     cam_ctrl->get_controlled_camera()->set_cascaded_shadow_enabled(true);
     cam_ctrl->set_max_vertical_angle(0.8);
@@ -45,8 +48,9 @@ void gearoenix::demo::wwr::Garage::initialize_camera() noexcept {
     cam_ctrl->set_target(math::Vec3(0.0, 0.0, 0.0));
 }
 
-void gearoenix::demo::wwr::Garage::initialize_buttons() noexcept {
-    auto *const cns_mgr = ui_scene->get_e()->get_system_application()->get_asset_manager()->get_constraint_manager();
+void gearoenix::demo::wwr::Garage::initialize_buttons() noexcept
+{
+    auto* const cns_mgr = ui_scene->get_e()->get_system_application()->get_asset_manager()->get_constraint_manager();
 
     shop_button = std::make_unique<RotatingButton>(std::dynamic_pointer_cast<render::widget::Button>(ui_scene->get_model("button-shop")));
     multiplayer_button = std::make_unique<RotatingButton>(std::dynamic_pointer_cast<render::widget::Button>(ui_scene->get_model("button-multiplayer")));
@@ -96,17 +100,18 @@ void gearoenix::demo::wwr::Garage::initialize_buttons() noexcept {
     score_placer->set_distance(math::Vec2(-0.05, -0.05));
 }
 
-void gearoenix::demo::wwr::Garage::load_training_scene() noexcept {
+void gearoenix::demo::wwr::Garage::load_training_scene() noexcept
+{
     logo_scene = render::scene::Logo::construct(
-            system_application,
-            { {1.0, "game"}, {1.1, "game-hud"} },
-            [this] (const std::vector<std::shared_ptr<render::scene::Scene>>& s) {
-                training = std::make_unique<Training>(s, this);
-                logo_scene = nullptr;
-            });
+        system_application,
+        { { 1.0, "game" }, { 1.1, "game-hud" } },
+        [this](const std::vector<std::shared_ptr<render::scene::Scene>>& s) {
+            training = std::make_unique<Training>(s, this);
+            logo_scene = nullptr;
+        });
 }
 
-gearoenix::demo::wwr::Garage::Garage(const std::vector <std::shared_ptr<render::scene::Scene>> &scenes) noexcept
+gearoenix::demo::wwr::Garage::Garage(const std::vector<std::shared_ptr<render::scene::Scene>>& scenes) noexcept
     : system_application(scenes[0]->get_e()->get_system_application())
 {
     initialize_scenes(scenes);
@@ -116,7 +121,8 @@ gearoenix::demo::wwr::Garage::Garage(const std::vector <std::shared_ptr<render::
 
 gearoenix::demo::wwr::Garage::~Garage() noexcept = default;
 
-void gearoenix::demo::wwr::Garage::clear() noexcept {
+void gearoenix::demo::wwr::Garage::clear() noexcept
+{
     cam_ctrl = nullptr;
     shop_button = nullptr;
     multiplayer_button = nullptr;

@@ -7,31 +7,32 @@
 #include <vector>
 
 namespace gearoenix::physics {
-    class Transformation;
+class Transformation;
 }
 
 namespace gearoenix::render::camera {
-    class Camera;
+class Camera;
 }
 
 namespace gearoenix::render::model {
-    class Dynamic;
+class Dynamic;
 }
 
 namespace gearoenix::render::scene {
-    class Game;
+class Game;
 }
 
 namespace gearoenix::demo::wwr {
 class TerrainManager {
 public:
     constexpr static std::size_t ground_pieces_count = 3;
+
 private:
     const std::shared_ptr<render::scene::Game> scene;
     const std::shared_ptr<render::model::Dynamic> asphalt_piece;
     const std::shared_ptr<render::camera::Camera> camera;
     const std::shared_ptr<render::model::Dynamic> asphalt_pieces[ground_pieces_count];
-    physics::Transformation *const camera_tran;
+    physics::Transformation* const camera_tran;
     core::Id update_function_id;
 
     void update() noexcept;
@@ -39,7 +40,6 @@ private:
 public:
     explicit TerrainManager(std::shared_ptr<render::scene::Game> scene) noexcept;
     ~TerrainManager() noexcept;
-
 };
 }
 
