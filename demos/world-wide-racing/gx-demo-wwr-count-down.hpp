@@ -1,8 +1,11 @@
 #ifndef GX_DEMO_WWR_COUNT_DOWN_HPP
 #define GX_DEMO_WWR_COUNT_DOWN_HPP
 
+#include <functional>
 #include <gearoenix/core/cr-static.hpp>
 #include <gearoenix/core/sync/cr-sync-end-caller.hpp>
+#include <memory>
+#include <vector>
 
 namespace gearoenix::render::engine {
 class Engine;

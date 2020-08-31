@@ -28,11 +28,12 @@ namespace gearoenix::demo::wwr {
 class TerrainManager;
 class Garage;
 class CountDown;
+class Car;
 class Training final {
 private:
     std::shared_ptr<render::scene::Game> game_scene;
     std::shared_ptr<render::scene::Ui> ui_scene;
-    std::shared_ptr<render::model::Model> car;
+    std::unique_ptr<Car> car;
     std::unique_ptr<TerrainManager> terrain_manager;
     std::unique_ptr<render::camera::ArcController> cam_ctrl;
     std::shared_ptr<physics::constraint::WindowPlacer> break_button_placer, accelerator_button_placer;
