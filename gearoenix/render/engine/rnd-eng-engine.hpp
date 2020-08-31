@@ -12,7 +12,6 @@
 
 namespace gearoenix::core {
 class FunctionLoader;
-class UpdateFunctionsManager;
 }
 
 namespace gearoenix::core::asset {
@@ -25,6 +24,7 @@ class Event;
 
 namespace gearoenix::core::sync {
 class KernelWorkers;
+class UpdateManager;
 }
 
 namespace gearoenix::physics {
@@ -92,7 +92,7 @@ class Engine {
     GX_GET_CPTR_PRT(system::Application, system_application)
     GX_GET_UPTR_PRT(core::FunctionLoader, function_loader)
     GX_GET_UPTR_PRT(core::sync::KernelWorkers, kernels)
-    GX_GET_UPTR_PRT(core::UpdateFunctionsManager, update_functions_manager)
+    GX_GET_UPTR_PRT(core::sync::UpdateManager, update_manager)
     GX_GET_UPTR_PRT(physics::Engine, physics_engine)
     GX_GET_UPTR_PRT(pipeline::Manager, pipeline_manager)
     GX_GET_UPTR_PRT(command::Manager, command_manager)

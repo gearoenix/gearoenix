@@ -1,6 +1,8 @@
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR})
 
 SET(GX_DEMO_WORLD_WIDE_RACING_SRC
+        gx-demo-wwr-count-down.cpp
+        gx-demo-wwr-count-down.hpp
         gx-demo-wwr-garage.cpp
         gx-demo-wwr-garage.hpp
         gx-demo-wwr-main.cpp

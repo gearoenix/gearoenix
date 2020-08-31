@@ -1,6 +1,6 @@
 #include "rnd-cmr-arc-controller.hpp"
-#include "../../core/cr-update-functions-manager.hpp"
 #include "../../core/event/cr-ev-engine.hpp"
+#include "../../core/sync/gx-cr-sync-update-manager.hpp"
 #include "../../system/sys-app.hpp"
 #include "../engine/rnd-eng-engine.hpp"
 #include "rnd-cmr-camera.hpp"
@@ -75,7 +75,7 @@ gearoenix::render::camera::ArcController::ArcController(std::shared_ptr<Camera> 
     , controlled_camera(std::move(c))
     , trn(controlled_camera->get_transformation())
     , render_engine(controlled_camera->get_render_engine())
-    , function_id(render_engine->get_update_functions_manager()->add([this] { update(); }))
+    , function_id(render_engine->get_update_manager()->add({ controlled_camera->get_id() }, 0.0, [this] { update(); }))
 {
     auto* const event_engine = render_engine->get_system_application()->get_event_engine();
     event_engine->add_listener(core::event::Id::GestureDrag2D, 0.0f, this);
@@ -86,7 +86,7 @@ gearoenix::render::camera::ArcController::ArcController(std::shared_ptr<Camera> 
 
 gearoenix::render::camera::ArcController::~ArcController() noexcept
 {
-    render_engine->get_update_functions_manager()->remove(function_id);
+    render_engine->get_update_manager()->remove(function_id);
     auto* const event_engine = render_engine->get_system_application()->get_event_engine();
     event_engine->remove_listener(core::event::Id::GestureDrag2D, 0.0f, this);
     event_engine->remove_listener(core::event::Id::GestureScale, 0.0f, this);

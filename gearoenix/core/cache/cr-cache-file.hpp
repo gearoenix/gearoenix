@@ -9,10 +9,11 @@
 namespace gearoenix::core::cache {
 template <class T>
 class File {
+public:
+    typedef std::map<Id, Offset> IdOffsetMap;
     GX_GET_REF_PRV(Cacher<T>, cacher)
     GX_GET_UCPTR_PRV(system::stream::Stream, file)
-private:
-    std::map<Id, Offset> offsets;
+    GX_GET_CREF_PRV(IdOffsetMap, offsets)
 
 public:
     explicit File(std::unique_ptr<system::stream::Stream> file) noexcept;

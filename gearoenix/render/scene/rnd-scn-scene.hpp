@@ -145,6 +145,7 @@ protected:                                                                      
                                                                                      \
 public:                                                                              \
     virtual void add_##x(const std::shared_ptr<c>& m) noexcept;                      \
+    virtual void remove_##x(core::Id x##_id) noexcept;                               \
     [[nodiscard]] const std::shared_ptr<c>& get_##x(core::Id x##_id) const noexcept; \
     [[nodiscard]] const std::shared_ptr<c>& get_##x(const std::string& x##_name) const noexcept;
 

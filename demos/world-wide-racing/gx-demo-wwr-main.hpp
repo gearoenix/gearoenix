@@ -5,17 +5,17 @@
 #include <vector>
 
 namespace gearoenix::render::scene {
-    class Logo;
-    class Scene;
+class Logo;
+class Scene;
 }
 
 namespace gearoenix::render::graph::tree {
-    class Pbr;
+class Pbr;
 }
 
 namespace gearoenix::demo::wwr {
-    class Garage;
-class Main final: public core::Application {
+class Garage;
+class Main final : public core::Application {
 private:
     std::unique_ptr<render::graph::tree::Pbr> tree;
     std::shared_ptr<render::scene::Logo> logo_scene;

@@ -203,7 +203,15 @@ void gearoenix::render::scene::Scene::scene_add_model(const std::shared_ptr<mode
         }                                                                                                               \
         return find->second;                                                                                            \
     }                                                                                                                   \
-    void gearoenix::render::scene::Scene::add_##x(const std::shared_ptr<c>& m) noexcept { scene_add_##x(m); }
+    void gearoenix::render::scene::Scene::add_##x(const std::shared_ptr<c>& m) noexcept { scene_add_##x(m); }           \
+    void gearoenix::render::scene::Scene::remove_##x(const core::Id x##_id) noexcept                                    \
+    {                                                                                                                   \
+        auto search = x##s.find(x##_id);                                                                                \
+        if (x##s.end() == search)                                                                                       \
+            return;                                                                                                     \
+        e->late_delete(search->second);                                                                                 \
+        x##s.erase(search);                                                                                             \
+    }
 
 GX_GET_HELPER(camera, render::camera::Camera)
 GX_GET_HELPER(audio, audio::Audio)
