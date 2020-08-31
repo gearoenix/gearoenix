@@ -66,8 +66,8 @@ gearoenix::render::scene::Scene::Scene(
         f->read(ids);                                                                   \
         if (!ids.empty()) {                                                             \
             core::sync::EndCaller<n::cls> call([c](const std::shared_ptr<n::cls>&) {}); \
-            for (const core::Id id : ids)                                               \
-                scene_add_##x(mgr->get_gx3d(id, call));                                 \
+            for (const core::Id x##_id : ids)                                           \
+                scene_add_##x(mgr->get_gx3d(x##_id, call));                             \
         }                                                                               \
     }
 
@@ -102,9 +102,9 @@ gearoenix::render::scene::Scene::~Scene() noexcept
 }
 
 #ifdef GX_DEBUG_MODE
-#define GX_CHECK_HELPER(x)                                          \
-    if (x##s.find(id) != x##s.end()) {                              \
-        GXLOGE("Error overriding of a " #x " with same Id: " << id) \
+#define GX_CHECK_HELPER(x)                                              \
+    if (x##s.find(x##_id) != x##s.end()) {                              \
+        GXLOGE("Error overriding of a " #x " with same Id: " << x##_id) \
     }
 #else
 #define GX_CHECK_HELPER(x)
@@ -113,9 +113,9 @@ gearoenix::render::scene::Scene::~Scene() noexcept
 #define GX_SCENE_ADD_HELPER(x, c)                                                             \
     void gearoenix::render::scene::Scene::scene_add_##x(const std::shared_ptr<c>& o) noexcept \
     {                                                                                         \
-        const core::Id id = o->get_id();                                                      \
+        const core::Id x##_id = o->get_id();                                                  \
         GX_CHECK_HELPER(x)                                                                    \
-        x##s[id] = o;                                                                         \
+        x##s[x##_id] = o;                                                                     \
     }
 
 GX_SCENE_ADD_HELPER(camera, camera::Camera)
@@ -123,34 +123,34 @@ GX_SCENE_ADD_HELPER(audio, audio::Audio)
 
 void gearoenix::render::scene::Scene::scene_add_light(const std::shared_ptr<light::Light>& o) noexcept
 {
-    const core::Id id = o->get_id();
+    const core::Id light_id = o->get_id();
     if (o->get_light_type() == light::Type::Directional && o->get_shadow_enabled()) {
         o->set_scene(this);
     }
     GX_CHECK_HELPER(light)
-    lights[id] = o;
+    lights[light_id] = o;
 }
 
 GX_SCENE_ADD_HELPER(constraint, physics::constraint::Constraint)
 
 void gearoenix::render::scene::Scene::scene_add_skybox(const std::shared_ptr<skybox::Skybox>& o) noexcept
 {
-    const auto id = o->get_id();
+    const auto skybox_id = o->get_id();
     if (nullptr != o->get_baked_reflection()) {
         set_default_reflection_probe(o->get_baked_reflection());
     }
     GX_CHECK_HELPER(skybox)
-    skyboxs[id] = o;
+    skyboxs[skybox_id] = o;
 }
 
 void gearoenix::render::scene::Scene::scene_add_reflection(const std::shared_ptr<reflection::Reflection>& o) noexcept
 {
-    const auto id = o->get_id();
+    const auto reflection_id = o->get_id();
     if (o->get_reflection_type() == reflection::Type::Runtime) {
         runtime_reflections[id] = std::dynamic_pointer_cast<reflection::Runtime>(o);
     }
     GX_CHECK_HELPER(reflection)
-    reflections[id] = o;
+    reflections[reflection_id] = o;
 }
 
 void gearoenix::render::scene::Scene::scene_add_model(const std::shared_ptr<model::Model>& m) noexcept
@@ -194,15 +194,15 @@ void gearoenix::render::scene::Scene::scene_add_model(const std::shared_ptr<mode
     models_changed = true;
 }
 
-#define GX_GET_HELPER(x, c)                                                                                         \
-    const std::shared_ptr<gearoenix::c>& gearoenix::render::scene::Scene::get_##x(const core::Id id) const noexcept \
-    {                                                                                                               \
-        const auto& find = x##s.find(id);                                                                           \
-        if (x##s.end() == find) {                                                                                   \
-            return null_##x;                                                                                        \
-        }                                                                                                           \
-        return find->second;                                                                                        \
-    }                                                                                                               \
+#define GX_GET_HELPER(x, c)                                                                                             \
+    const std::shared_ptr<gearoenix::c>& gearoenix::render::scene::Scene::get_##x(const core::Id x##_id) const noexcept \
+    {                                                                                                                   \
+        const auto& find = x##s.find(x##_id);                                                                           \
+        if (x##s.end() == find) {                                                                                       \
+            return null_##x;                                                                                            \
+        }                                                                                                               \
+        return find->second;                                                                                            \
+    }                                                                                                                   \
     void gearoenix::render::scene::Scene::add_##x(const std::shared_ptr<c>& m) noexcept { scene_add_##x(m); }
 
 GX_GET_HELPER(camera, render::camera::Camera)
@@ -300,7 +300,7 @@ void gearoenix::render::scene::Scene::set_default_reflection_probe(std::shared_p
     default_reflection_probe = std::move(rfl);
 }
 
-void gearoenix::render::scene::Scene::set_enabled(const bool e) noexcept
+void gearoenix::render::scene::Scene::set_enabled(const bool b) noexcept
 {
-    enability = e;
+    enability = b;
 }

@@ -91,12 +91,12 @@ gearoenix::render::model::Model::Model(const Model& o) noexcept
 {
     collider->set_parent(this);
 
-    for (const auto& [id, msh] : o.meshes) {
-        meshes[id] = std::shared_ptr<Mesh>(msh->clone());
+    for (const auto& [mesh_id, msh] : o.meshes) {
+        meshes[mesh_id] = std::shared_ptr<Mesh>(msh->clone());
     }
 
-    for (const auto& [id, mdl] : o.children) {
-        children[id] = std::shared_ptr<Model>(mdl->clone());
+    for (const auto& [child_id, mdl] : o.children) {
+        children[child_id] = std::shared_ptr<Model>(mdl->clone());
     }
 }
 
