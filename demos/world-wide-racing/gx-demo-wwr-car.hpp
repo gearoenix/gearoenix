@@ -2,6 +2,8 @@
 #define GX_DEMO_WWR_CAR_HPP
 
 #include <gearoenix/core/cr-static.hpp>
+#include <memory>
+#include <string>
 
 namespace gearoenix::render::model {
 class Dynamic;
