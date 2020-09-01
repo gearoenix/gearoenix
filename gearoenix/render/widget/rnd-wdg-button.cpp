@@ -101,6 +101,7 @@ void gearoenix::render::widget::Button::selected(const math::Vec3<double>&) noex
         });
     e->get_physics_engine()->get_animation_manager()->add(get_root()->get_id(), a);
     animation = a;
+    on_press(true);
 }
 
 void gearoenix::render::widget::Button::select_cancelled() noexcept
@@ -123,17 +124,24 @@ void gearoenix::render::widget::Button::select_cancelled() noexcept
         });
     e->get_physics_engine()->get_animation_manager()->add(get_root()->get_id(), a);
     animation = a;
+    on_press(false);
 }
 
 void gearoenix::render::widget::Button::select_released() noexcept
 {
     select_cancelled();
+    on_press(false);
     on_click();
 }
 
 void gearoenix::render::widget::Button::set_on_click(const std::function<void()>& f) noexcept
 {
     on_click = f;
+}
+
+void gearoenix::render::widget::Button::set_on_press(const std::function<void(bool)>& f) noexcept
+{
+    on_press = f;
 }
 
 void gearoenix::render::widget::Button::set_text(const std::wstring& t, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept

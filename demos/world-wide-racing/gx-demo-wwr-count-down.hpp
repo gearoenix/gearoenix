@@ -33,9 +33,11 @@ class CountDown final {
 private:
     void update() noexcept;
     void loaded() noexcept;
+    void unregister_update_function() noexcept;
     CountDown() noexcept;
 
 public:
+    ~CountDown() noexcept;
     [[nodiscard]] static std::shared_ptr<CountDown> construct(
         std::shared_ptr<render::scene::Ui> scene,
         std::function<void()> end,

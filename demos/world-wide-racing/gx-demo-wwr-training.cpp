@@ -38,12 +38,13 @@ void gearoenix::demo::wwr::Training::initialize_scenes(
     }
 }
 
-void gearoenix::demo::wwr::Training::accelerator_pressed() noexcept
+void gearoenix::demo::wwr::Training::accelerator_pressed(const bool b) noexcept
 {
     if (!started) {
         started = true;
         count_down->start();
     }
+    car->accelerator_pressed(b);
 }
 
 void gearoenix::demo::wwr::Training::initialize_camera() noexcept
@@ -76,7 +77,7 @@ void gearoenix::demo::wwr::Training::initialize_buttons() noexcept
     accelerator_button_placer->set_width_percentage(0.95);
     accelerator_button_placer->add_affected(accelerator_button);
     accelerator_button_placer->set_height_percentage(0.15);
-    accelerator_button->set_on_click([this] { accelerator_pressed(); });
+    accelerator_button->set_on_press([this](const bool b) { accelerator_pressed(b); });
 
     break_button_placer = cns_mgr->create<physics::constraint::WindowPlacer>("break-button");
     break_button_placer->set_width_percentage(0.1);

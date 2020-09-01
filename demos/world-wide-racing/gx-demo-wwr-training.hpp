@@ -47,7 +47,7 @@ private:
     void initialize_cars() noexcept;
     void initialize_terrain() noexcept;
     void count_down_finished() noexcept;
-    void accelerator_pressed() noexcept;
+    void accelerator_pressed(bool b) noexcept;
 
 public:
     Training(const std::vector<std::shared_ptr<render::scene::Scene>>& scenes, Garage* garage) noexcept;

@@ -4,7 +4,6 @@
 #include <gearoenix/physics/collider/phs-cld-collider.hpp>
 #include <gearoenix/render/engine/rnd-eng-engine.hpp>
 #include <gearoenix/render/model/rnd-mdl-manager.hpp>
-#include <gearoenix/render/model/rnd-mdl-transformation.hpp>
 #include <gearoenix/render/scene/rnd-scn-ui.hpp>
 #include <gearoenix/render/widget/rnd-wdg-text.hpp>
 #include <gearoenix/system/sys-app.hpp>
@@ -17,7 +16,7 @@ void gearoenix::demo::wwr::CountDown::update() noexcept
     times_left -= t;
     if (times_left < 0.0) {
         is_running = false;
-        e->get_update_manager()->remove(function_id);
+        unregister_update_function();
         texts[0]->get_transformation()->set_location(math::Vec3(0.0, 10.0, 0.0));
         for (const auto& text : texts)
             scene->remove_model(text->get_id());
@@ -48,10 +47,23 @@ void gearoenix::demo::wwr::CountDown::loaded() noexcept
         scene->add_model(text);
         texts_ids[i] = text->get_id();
     }
-    function_id = e->get_update_manager()->add(texts_ids, 0.0, [self { self.lock() }] { self->update(); });
+    function_id = e->get_update_manager()->add(texts_ids, 0.0, [this] { update(); });
+}
+
+void gearoenix::demo::wwr::CountDown::unregister_update_function() noexcept
+{
+    if (function_id != 0) {
+        e->get_update_manager()->remove(function_id);
+        function_id = 0;
+    }
 }
 
 gearoenix::demo::wwr::CountDown::CountDown() noexcept = default;
+
+gearoenix::demo::wwr::CountDown::~CountDown() noexcept
+{
+    unregister_update_function();
+}
 
 std::shared_ptr<gearoenix::demo::wwr::CountDown> gearoenix::demo::wwr::CountDown::construct(
     std::shared_ptr<render::scene::Ui> s,

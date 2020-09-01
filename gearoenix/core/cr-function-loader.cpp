@@ -19,12 +19,12 @@ void gearoenix::core::FunctionLoader::load(const std::function<void()>& fun) noe
 void gearoenix::core::FunctionLoader::unload() noexcept
 {
     while (!load_functions.empty()) {
-        std::vector<std::function<void()>> funs;
+        std::vector<std::function<void()>> functions;
         {
             GX_GUARD_LOCK(load_functions)
-            std::swap(load_functions, funs);
+            std::swap(load_functions, functions);
         }
-        for (const auto& f : funs) {
+        for (const auto& f : functions) {
             f();
         }
     }

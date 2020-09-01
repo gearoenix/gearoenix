@@ -71,6 +71,7 @@ void gearoenix::render::engine::Engine::terminate() noexcept
 {
     if (function_loader == nullptr)
         return;
+    update_manager = nullptr;
     buffer_manager = nullptr;
     sampler_manager = nullptr;
     command_manager = nullptr;

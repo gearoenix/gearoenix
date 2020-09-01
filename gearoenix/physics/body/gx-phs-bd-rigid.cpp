@@ -3,7 +3,7 @@
 gearoenix::physics::body::Rigid::Rigid(
     const core::Id id,
     std::string name,
-    std::shared_ptr<render::model::Model> model) noexcept
+    std::shared_ptr<render::model::Dynamic> model) noexcept
     : Body(id, std::move(name), Type::Rigid, std::move(model))
 {
 }

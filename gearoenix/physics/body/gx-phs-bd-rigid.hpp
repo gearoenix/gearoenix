@@ -29,7 +29,7 @@ protected:
     Behavior rigid_body_behavior = Behavior::Active;
 
 public:
-    Rigid(core::Id id, std::string name, std::shared_ptr<render::model::Model> model) noexcept;
+    Rigid(core::Id id, std::string name, std::shared_ptr<render::model::Dynamic> model) noexcept;
     ~Rigid() noexcept override;
     void apply_force_on_origin(const math::Vec3<double>& force) noexcept;
     void apply_force(const math::Vec3<double>& force, const math::Vec3<double>& point) noexcept;

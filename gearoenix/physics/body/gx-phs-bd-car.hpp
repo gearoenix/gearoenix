@@ -91,7 +91,6 @@ public:
     GX_GET_VAL_PRV(double, engine_torque, 0.0)
     /// T_wheels = T_engine * gear_ratio * G (final drive ratio)
     GX_GET_VAL_PRV(double, wheels_torque, 0.0)
-    GX_GET_REFC_PRV(std::shared_ptr<render::model::Dynamic>, car_body)
     GX_GET_REF_PRV(Axle, front_axle)
     GX_GET_REF_PRV(Axle, rear_axle)
 private:

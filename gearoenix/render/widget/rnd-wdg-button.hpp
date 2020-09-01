@@ -33,6 +33,7 @@ protected:
     double scale_down_progress = 1.0;
     std::weak_ptr<physics::animation::Animation> animation;
     std::function<void()> on_click = [] {};
+    std::function<void(bool)> on_press = [](bool) {};
 
     Button(
         core::Id id,
@@ -63,6 +64,7 @@ public:
     void select_cancelled() noexcept final;
     void select_released() noexcept final;
     void set_on_click(const std::function<void()>& on_click) noexcept;
+    void set_on_press(const std::function<void(bool)>& on_press) noexcept;
     void set_text(const std::wstring& t, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
 };
 }
