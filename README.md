@@ -14,7 +14,7 @@ OpenGL part.
 But start of the design was based on Vulkan and it remained as the
 main criteria of design of the new features.
 Right now Vulkan part of the Gearoenix can not compile and it has
-a long road to became compatible with new changes in engine and to
+a long road to become compatible with new changes in engine and to
 reach something integratable and testable and also there are several
 decisions to change in some part of the design of Gearoenix.
 After the promising results from this project has been shown, it is
@@ -23,7 +23,7 @@ going to be integrated to Gearoenix.
 
 ## Decisions
 
-- Right now a standalone application is going to be implemented not a library.
+- Right now a standalone application is going to be implemented, not a library.
 - The only advantage of Vulkan over OpenGL (modern versions) for Gearoenix is
   better multithreaded rendering and ray tracing
 - GLTF file is going to be used as the main asset provider format instead of
