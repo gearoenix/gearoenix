@@ -77,13 +77,13 @@
 
 #define GX_GLC3_SHADER_SET_TEXTURE_INDEX_ARRAY_UNIFORM(x) gl::Loader::uniform1iv(x, GX_COUNT_OF(x##_indices), x##_indices);
 
-#define GX_GLC3_SHADER_SRC_DEFAULT_VERSION                                                                                                                               \
-    "#version " << ((e->get_engine_type() == render::engine::Type::OPENGL_ES3) ? "300 es" : ((e->get_engine_type() == render::engine::Type::OPENGL_33) ? "330" : "430")) \
-                << "\n"                                                                                                                                                  \
-                << "#define GX_PI 3.141592653589793238\n"                                                                                                                \
-                   "precision highp float;\n"                                                                                                                            \
-                   "precision highp int;\n"                                                                                                                              \
-                << ((e->get_engine_type() == render::engine::Type::OPENGL_ES3) ? "precision highp sampler2D;\nprecision highp samplerCube;\n" : "")
+#define GX_GLC3_SHADER_SRC_DEFAULT_VERSION                                                                                                                             \
+    "#version " << ((e->get_engine_type() == render::engine::Type::OpenGLES3) ? "300 es" : ((e->get_engine_type() == render::engine::Type::OpenGL33) ? "330" : "430")) \
+                << "\n"                                                                                                                                                \
+                << "#define GX_PI 3.141592653589793238\n"                                                                                                              \
+                   "precision highp float;\n"                                                                                                                          \
+                   "precision highp int;\n"                                                                                                                            \
+                << ((e->get_engine_type() == render::engine::Type::OpenGLES3) ? "precision highp sampler2D;\nprecision highp samplerCube;\n" : "")
 
 #define GX_GLC3_SHADER_SRC_DEFAULT_ATTRIBUTES  \
     "layout(location = 0) in vec3 position;\n" \

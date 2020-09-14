@@ -85,7 +85,7 @@ gearoenix::gl::gen_vertex_arrays_fnp gearoenix::gl::Loader::gen_vertex_arrays;
 bool gearoenix::gl::Loader::load_library(const render::engine::Type engine_type) noexcept
 {
 #ifdef GX_DEBUG_MODE
-    if (engine_type != render::engine::Type::OPENGL_ES2 && engine_type != render::engine::Type::OPENGL_ES3 && engine_type != render::engine::Type::OPENGL_33 && engine_type != render::engine::Type::OPENGL_43)
+    if (engine_type != render::engine::Type::OpenGLES2 && engine_type != render::engine::Type::OpenGLES3 && engine_type != render::engine::Type::OpenGL33 && engine_type != render::engine::Type::OpenGL43)
         GXLOGF("Only OpenGL API is accepted!")
 #endif
 #ifdef GX_USE_SDL
@@ -182,7 +182,7 @@ bool gearoenix::gl::Loader::load_library(const render::engine::Type engine_type)
     GXFUNLDF(glValidateProgram, validate_program)
     GXFUNLDF(glVertexAttribPointer, vertex_attrib_pointer)
     GXFUNLDF(glViewport, viewport)
-    if (engine_type == render::engine::Type::OPENGL_ES2)
+    if (engine_type == render::engine::Type::OpenGLES2)
         return true;
 #ifdef GX_USE_OPENGL_CLASS_3
     GXFUNLDF(glBindVertexArray, bind_vertex_array)

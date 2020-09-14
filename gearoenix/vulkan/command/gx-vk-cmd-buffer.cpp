@@ -1,28 +1,26 @@
-#include "vk-cmd-buffer.hpp"
+#include "gx-vk-cmd-buffer.hpp"
 #ifdef GX_USE_VULKAN
-#ifdef DEBUG_MODE
-#define VK_CMD_BUFF_DEBUG
+#ifdef GX_DEBUG_MODE
+#define GX_VK_CMD_BUFF_DEBUG
 #endif
 #include "../../core/cr-static.hpp"
+#include "../../render/command/rnd-cmd-buffer.hpp"
 #include "../device/vk-dev-logical.hpp"
 #include "../device/vk-dev-physical.hpp"
+#include "../gx-vk-check.hpp"
+#include "../gx-vk-instance.hpp"
 #include "../sync/vk-sync-fence.hpp"
-#include "../vk-check.hpp"
-#include "../vk-instance.hpp"
-#include "..\..\render\command\rnd-cmd-buffer.hpp"
-#include "vk-cmd-pool.hpp"
+#include "gx-vk-cmd-pool.hpp"
 
-gearoenix::render::command::Buffer::Buffer(Pool* pool)
-    : pool(pool)
+gearoenix::render::command::Buffer::Buffer(std::shared_ptr<Pool> p) noexcept
+    : pool(std::move(p))
 {
     device::Logical* dev = pool->get_logical_device();
     VkDevice vkdev = dev->get_vulkan_data();
     device::Physical* pdev = dev->get_physical_device();
     Instance* ins = pdev->get_instance();
-    Linker* l = ins->get_linker();
-    linker = l;
     VkCommandBufferAllocateInfo cmd_buf_allocate_info;
-    setz(cmd_buf_allocate_info);
+    GX_SET_ZERO(cmd_buf_allocate_info)
     cmd_buf_allocate_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
     cmd_buf_allocate_info.commandPool = pool->get_vulkan_data();
     cmd_buf_allocate_info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;

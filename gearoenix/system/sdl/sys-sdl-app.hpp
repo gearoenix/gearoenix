@@ -53,7 +53,7 @@ private:
 
     bool running = true;
     std::optional<bool> gooing_to_show_keyboard = std::nullopt;
-    render::engine::Type supported_engine = render::engine::Type::NONE;
+    render::engine::Type supported_engine = render::engine::Type::None;
 
     void create_window() noexcept;
     static int SDLCALL event_receiver(void* user_data, SDL_Event* event) noexcept;

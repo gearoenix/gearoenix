@@ -44,21 +44,21 @@ std::shared_ptr<gearoenix::glc3::texture::Texture2D> gearoenix::glc3::texture::T
     } else {
         switch (info.format) {
         case render::texture::TextureFormat::RgbaFloat32:
-            if (e->get_engine_type() == render::engine::Type::OPENGL_ES3) {
+            if (e->get_engine_type() == render::engine::Type::OpenGLES3) {
                 pixels = convert_float_pixels(data, 4, 4);
             } else {
                 pixels = std::move(data);
             }
             break;
         case render::texture::TextureFormat::RgbFloat32:
-            if (e->get_engine_type() == render::engine::Type::OPENGL_ES3) {
+            if (e->get_engine_type() == render::engine::Type::OpenGLES3) {
                 pixels = convert_float_pixels(data, 3, 3);
             } else {
                 pixels = std::move(data);
             }
             break;
         case render::texture::TextureFormat::RgFloat32:
-            if (e->get_engine_type() == render::engine::Type::OPENGL_ES3) {
+            if (e->get_engine_type() == render::engine::Type::OpenGLES3) {
                 pixels = convert_float_pixels(data, 2, 2);
             } else {
                 pixels = std::move(data);
@@ -160,25 +160,25 @@ gearoenix::gl::sint gearoenix::glc3::texture::Texture2D::convert_internal_format
 {
     switch (f) {
     case render::texture::TextureFormat::RgbaFloat32:
-        if (e->get_engine_type() == render::engine::Type::OPENGL_ES3) {
+        if (e->get_engine_type() == render::engine::Type::OpenGLES3) {
             f = render::texture::TextureFormat::RgbaUint8;
             return GL_RGBA;
         }
         return GL_RGBA32F;
     case render::texture::TextureFormat::RgbFloat32:
-        if (e->get_engine_type() == render::engine::Type::OPENGL_ES3) {
+        if (e->get_engine_type() == render::engine::Type::OpenGLES3) {
             f = render::texture::TextureFormat::RgbUint8;
             return GL_RGB;
         }
         return GL_RGB32F;
     case render::texture::TextureFormat::RgFloat32:
-        if (e->get_engine_type() == render::engine::Type::OPENGL_ES3) {
+        if (e->get_engine_type() == render::engine::Type::OpenGLES3) {
             f = render::texture::TextureFormat::RgUint8;
             return GL_RG;
         }
         return GL_RG32F;
     case render::texture::TextureFormat::RgbFloat16:
-        if (e->get_engine_type() == render::engine::Type::OPENGL_ES3) {
+        if (e->get_engine_type() == render::engine::Type::OpenGLES3) {
             f = render::texture::TextureFormat::RgbUint8;
             return GL_RGB;
         }

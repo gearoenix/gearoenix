@@ -1,4 +1,4 @@
-#include "vk-surface.hpp"
+#include "gx-vk-surface.hpp"
 #ifdef USE_VULKAN
 #include "../core/cr-application.hpp"
 #include "../core/cr-build-configuration.hpp"

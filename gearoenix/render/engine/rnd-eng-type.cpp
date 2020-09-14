@@ -4,32 +4,32 @@ namespace gearoenix::render::engine {
 std::ostream& operator<<(std::ostream& os, const Type t) noexcept
 {
     switch (t) {
-    case Type::NONE:
-        os << "NONE";
+    case Type::None:
+        os << "None";
         break;
-    case Type::VULKAN:
-        os << "VULKAN";
+    case Type::Vulkan:
+        os << "Vulkan";
         break;
-    case Type::OPENGL_43:
-        os << "OPENGL_43";
+    case Type::OpenGL43:
+        os << "OpenGL43";
         break;
-    case Type::OPENGL_33:
-        os << "OPENGL_33";
+    case Type::OpenGL33:
+        os << "OpenGL33";
         break;
-    case Type::OPENGL_ES3:
-        os << "OPENGL_ES3";
+    case Type::OpenGLES3:
+        os << "OpenGLES3";
         break;
-    case Type::OPENGL_ES2:
-        os << "OPENGL_ES2";
+    case Type::OpenGLES2:
+        os << "OpenGLES2";
         break;
-    case Type::DIRECTX_11:
-        os << "DIRECTX_11";
+    case Type::DirectX11:
+        os << "DirectX11";
         break;
-    case Type::DIRECTX_12:
-        os << "DIRECTX_12";
+    case Type::DirectX12:
+        os << "DirectX12";
         break;
-    case Type::METAL:
-        os << "METAL";
+    case Type::Metal:
+        os << "Metal";
         break;
     }
     return os;

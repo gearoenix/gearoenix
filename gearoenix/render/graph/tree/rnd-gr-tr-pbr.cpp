@@ -361,7 +361,7 @@ void gearoenix::render::graph::tree::Pbr::submit_runtime_reflections(const scene
 
 gearoenix::render::graph::tree::Pbr::Pbr(engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>&) noexcept
     : Tree(e)
-    , in_weak_hardware(engine::Type::OPENGL_ES2 == e->get_engine_type())
+    , in_weak_hardware(engine::Type::OpenGLES2 == e->get_engine_type())
 {
 }
 

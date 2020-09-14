@@ -2,7 +2,6 @@
 #ifdef GX_USE_OPENGL_ES2
 #include "../../core/asset/cr-asset-manager.hpp"
 #include "../../core/event/cr-ev-event.hpp"
-#include "../../gl/gl-constants.hpp"
 #include "../../gl/gl-loader.hpp"
 #include "../../physics/phs-engine.hpp"
 #include "../../render/camera/rnd-cmr-camera.hpp"
@@ -28,7 +27,7 @@ void gearoenix::gles2::engine::Engine::initialize() noexcept
 }
 
 gearoenix::gles2::engine::Engine::Engine(system::Application* const sys_app) noexcept
-    : render::engine::Engine(sys_app, render::engine::Type::OPENGL_ES2)
+    : render::engine::Engine(sys_app, render::engine::Type::OpenGLES2)
 {
     initialize();
     pipeline_manager = std::make_unique<pipeline::Manager>(this);

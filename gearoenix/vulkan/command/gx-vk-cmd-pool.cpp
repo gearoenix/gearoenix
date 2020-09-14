@@ -1,4 +1,4 @@
-#include "vk-cmd-pool.hpp"
+#include "gx-vk-cmd-pool.hpp"
 #ifdef USE_VULKAN
 #include "../../core/cr-static.hpp"
 #include "../device/vk-dev-logical.hpp"

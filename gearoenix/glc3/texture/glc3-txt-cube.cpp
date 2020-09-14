@@ -64,7 +64,7 @@ std::shared_ptr<gearoenix::glc3::texture::TextureCube> gearoenix::glc3::texture:
     } else {
         switch (info.format) {
         case render::texture::TextureFormat::RgbaFloat32: {
-            if (engine->get_engine_type() == render::engine::Type::OPENGL_ES3) {
+            if (engine->get_engine_type() == render::engine::Type::OpenGLES3) {
                 pixels = convert_float_pixels(data, 4, 4);
             } else {
                 pixels = std::move(data);

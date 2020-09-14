@@ -17,7 +17,7 @@
 #include "../../glc3/engine/glc3-eng-engine.hpp"
 #endif
 #ifdef GX_USE_VULKAN
-#include "../../vulkan/engine/vk-eng-engine.hpp"
+#include "../../vulkan/engine/gx-vk-eng-engine.hpp"
 #endif
 #include <iostream>
 
@@ -106,32 +106,32 @@ void gearoenix::system::Application::create_window() noexcept
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-    CREATE_WINDOW(OPENGL_43)
+    CREATE_WINDOW(OpenGL43)
 #endif
 #ifdef GX_USE_OPENGL_33
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-    CREATE_WINDOW(OPENGL_33)
+    CREATE_WINDOW(OpenGL33)
 #endif
 #ifdef GX_USE_OPENGL_ES3
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
-    CREATE_WINDOW(OPENGL_ES3)
+    CREATE_WINDOW(OpenGLES3)
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
-    CREATE_WINDOW(OPENGL_ES3)
+    CREATE_WINDOW(OpenGLES3)
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
-    CREATE_WINDOW(OPENGL_ES3)
+    CREATE_WINDOW(OpenGLES3)
 #endif
 #ifdef GX_USE_OPENGL_ES2
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
-    CREATE_WINDOW(OPENGL_ES2)
+    CREATE_WINDOW(OpenGLES2)
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
-    CREATE_WINDOW(OPENGL_ES2)
+    CREATE_WINDOW(OpenGLES2)
 #endif
     GXLOGF("Can not create window with minimum requirements")
 }
@@ -510,7 +510,7 @@ gearoenix::system::Application::Application(const int argc, const char* const* c
 #endif
 
 #ifdef GX_USE_OPENGL_ES2
-    if (nullptr == render_engine && supported_engine == render::engine::Type::OPENGL_ES2) {
+    if (nullptr == render_engine && supported_engine == render::engine::Type::OpenGLES2) {
         render_engine = std::unique_ptr<render::engine::Engine>(gles2::engine::Engine::construct(this));
     }
 #endif

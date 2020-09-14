@@ -73,7 +73,7 @@ gearoenix::render::graph::node::ShadowMapper::ShadowMapper(
     for (unsigned int i = 0; i < e->get_frames_count(); ++i) {
         frames[i] = std::make_unique<ShadowMapperFrame>(e);
     }
-    const bool week_hwr = e->get_engine_type() == engine::Type::OPENGL_ES2;
+    const bool week_hwr = e->get_engine_type() == engine::Type::OpenGLES2;
     shadow_map_render_target = e->create_render_target(
         core::asset::Manager::create_id(),
         { texture::AttachmentInfo {

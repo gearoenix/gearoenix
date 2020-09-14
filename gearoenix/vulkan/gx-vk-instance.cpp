@@ -1,34 +1,40 @@
-#include "vk-instance.hpp"
-#ifdef USE_VULKAN
+#include "gx-vk-instance.hpp"
+#ifdef GX_USE_VULKAN
 #include "../core/cr-static.hpp"
-#include "vk-check.hpp"
+#include "../system/sys-log.hpp"
+#include "gx-vk-check.hpp"
 #include <sstream>
 #include <vector>
-#ifdef VULKAN_INSTANCE_DEBUG
 
-static VkBool32 VKAPI_PTR vkDebugReportCallbackEX_impl(
+#ifdef GX_VULKAN_INSTANCE_DEBUG
+
+static VkBool32 VKAPI_PTR implVkDebugReportCallbackEXT(
     VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objectType,
     uint64_t object, size_t location, int32_t messageCode,
     const char* pLayerPrefix, const char* pMessage, void* pUserData)
 {
     std::stringstream msg;
     msg << "Vulkan ";
+    bool is_error = false;
     if (flags & VK_DEBUG_REPORT_INFORMATION_BIT_EXT) {
-        msg << "Information";
+        msg << "Information ";
     }
     if (flags & VK_DEBUG_REPORT_WARNING_BIT_EXT) {
-        msg << "Warning";
+        is_error = true;
+        msg << "Warning ";
     }
     if (flags & VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT) {
-        msg << "Performance";
+        is_error = true;
+        msg << "Performance ";
     }
     if (flags & VK_DEBUG_REPORT_ERROR_BIT_EXT) {
-        msg << "Error";
+        is_error = true;
+        msg << "Error ";
     }
     if (flags & VK_DEBUG_REPORT_DEBUG_BIT_EXT) {
-        msg << "Debug";
+        msg << "Debug ";
     }
-    msg << " Message: object_type: ";
+    msg << "Message: object_type: ";
     switch (objectType) {
     case VK_DEBUG_REPORT_OBJECT_TYPE_UNKNOWN_EXT:
         msg << "VK_DEBUG_REPORT_OBJECT_TYPE_UNKNOWN_EXT";
@@ -121,7 +127,7 @@ static VkBool32 VKAPI_PTR vkDebugReportCallbackEX_impl(
         msg << "VK_DEBUG_REPORT_OBJECT_TYPE_MAX_ENUM_EXT";
         break;
     case VK_DEBUG_REPORT_OBJECT_TYPE_DEBUG_REPORT_EXT:
-        msg << "VK_DEBUG_REPORT_OBJECT_TYPE_MAX_ENUM_EXT";
+        msg << "VK_DEBUG_REPORT_OBJECT_TYPE_DEBUG_REPORT_EXT";
         break;
     default:
         msg << "UNKNOWN_TYPE(" << objectType << ")";
@@ -132,52 +138,50 @@ static VkBool32 VKAPI_PTR vkDebugReportCallbackEX_impl(
     msg << " layer-prefix " << pLayerPrefix;
     msg << " pMessage " << pMessage;
     msg << " userdata " << pUserData;
-    auto smsg = msg.str();
-    if ((flags & (VK_DEBUG_REPORT_INFORMATION_BIT_EXT | VK_DEBUG_REPORT_DEBUG_BIT_EXT)) != 0) {
-        LOGI(smsg);
-    }
-    if ((flags & (VK_DEBUG_REPORT_WARNING_BIT_EXT | VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT | VK_DEBUG_REPORT_ERROR_BIT_EXT)) != 0) {
-        LOGE(smsg);
+    const auto msg_str = msg.str();
+    if (is_error) {
+        GXLOGE(msg_str)
+    } else {
+        GXLOGI(msg_str)
     }
     return VK_FALSE;
 }
 #endif
 
-gearoenix::render::Instance::Instance(Linker* l)
-    : linker(l)
+gearoenix::vulkan::Instance::Instance() noexcept
 {
     VkApplicationInfo app_info;
-    setz(app_info);
+    GX_SET_ZERO(app_info)
     app_info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
     app_info.apiVersion = VK_MAKE_VERSION(1, 0, 0);
     app_info.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
     app_info.engineVersion = VK_MAKE_VERSION(1, 0, 0);
-    app_info.pApplicationName = "Demo App";
+    app_info.pApplicationName = "Gearoenix based application";
     app_info.pEngineName = "Gearoenix";
     const char* instance_extensions[] = {
         VK_KHR_SURFACE_EXTENSION_NAME,
-#ifdef IN_ANDROID
+#ifdef GX_IN_ANDROID
         VK_KHR_ANDROID_SURFACE_EXTENSION_NAME,
-#elif defined(IN_LINUX)
+#elif defined(GX_IN_LINUX)
         VK_KHR_XCB_SURFACE_EXTENSION_NAME,
 #elif defined(GX_IN_WINDOWS)
         VK_KHR_WIN32_SURFACE_EXTENSION_NAME,
 #else
 #error "Not implemented yet!"
 #endif
-#ifdef VULKAN_INSTANCE_DEBUG
+#ifdef GX_VULKAN_INSTANCE_DEBUG
         VK_EXT_DEBUG_REPORT_EXTENSION_NAME,
 #endif
     };
-#ifdef VULKAN_INSTANCE_DEBUG
+#ifdef GX_VULKAN_INSTANCE_DEBUG
     uint32_t layers_count = 0;
-    l->vkEnumerateInstanceLayerProperties(&layers_count, nullptr);
+    Loader::vkEnumerateInstanceLayerProperties(&layers_count, nullptr);
     int property_count = layers_count;
     std::vector<VkLayerProperties> properties(property_count);
     std::vector<const char*> instance_layers(property_count);
-    l->vkEnumerateInstanceLayerProperties(&layers_count, properties.data());
+    Loader::vkEnumerateInstanceLayerProperties(&layers_count, properties.data());
     for (int i = 0; i < property_count; ++i) {
-        LOGI(std::string(" layer-") + std::to_string(i) + ":  " + std::string(properties[i].layerName));
+        GXLOGI(" layer-" << i << ":  " << properties[i].layerName)
         instance_layers[i] = properties[i].layerName;
     }
     const char* google_threading = "VK_LAYER_GOOGLE_threading";
@@ -213,60 +217,50 @@ gearoenix::render::Instance::Instance(Linker* l)
             instance_layers[instance_layers.size() - 1] = google_unique;
         }
     }
-    LOGI(std::string("Layers order:"));
+    GXLOGI("Layers order:")
     for (unsigned int i = 0; i < instance_layers.size(); ++i) {
-        LOGI(std::string("    layer-") + std::to_string(i) + ":  " + std::string(instance_layers[i]));
+        GXLOGI("layer-" << i << ":  " << instance_layers[i])
     }
 #endif
     VkInstanceCreateInfo instance_create_info;
-    setz(instance_create_info);
+    GX_SET_ZERO(instance_create_info)
     instance_create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     instance_create_info.pApplicationInfo = &app_info;
-    instance_create_info.enabledExtensionCount = countof(instance_extensions);
+    instance_create_info.enabledExtensionCount = GX_COUNT_OF(instance_extensions);
     instance_create_info.ppEnabledExtensionNames = instance_extensions;
-#ifdef VULKAN_INSTANCE_DEBUG
+#ifdef GX_VULKAN_INSTANCE_DEBUG
     instance_create_info.enabledLayerCount = static_cast<uint32_t>(instance_layers.size());
     instance_create_info.ppEnabledLayerNames = instance_layers.data();
 #endif
-    VKC(l->vkCreateInstance(&instance_create_info, 0, &vulkan_data));
-#define VKL(fun_name)                                          \
-    if ((l->fun_name) == 0) {                                  \
-        l->fun_name = static_cast<PFN_##fun_name>(             \
-            l->vkGetInstanceProcAddr(vulkan_data, #fun_name)); \
+    GX_VK_CHK(Loader::vkCreateInstance(&instance_create_info, nullptr, &vulkan_data))
+    // Loading instance functions
+#define VKL(fun_name)                                               \
+    if ((Loader::fun_name) == nullptr) {                            \
+        Loader::fun_name = reinterpret_cast<PFN_##fun_name>(        \
+            Loader::vkGetInstanceProcAddr(vulkan_data, #fun_name)); \
     }
-    VKL(vkCreateDebugReportCallbackEXT);
-    VKL(vkDestroyDebugReportCallbackEXT);
-    VKL(vkDebugReportMessageEXT);
+    VKL(vkCreateDebugReportCallbackEXT)
+    VKL(vkDestroyDebugReportCallbackEXT)
+    VKL(vkDebugReportMessageEXT)
+
     VkDebugReportCallbackCreateInfoEXT dbg_info;
-    setz(dbg_info);
+    GX_SET_ZERO(dbg_info)
     dbg_info.sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CREATE_INFO_EXT;
     dbg_info.flags = VK_DEBUG_REPORT_WARNING_BIT_EXT | VK_DEBUG_REPORT_DEBUG_BIT_EXT | VK_DEBUG_REPORT_INFORMATION_BIT_EXT | VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT | VK_DEBUG_REPORT_ERROR_BIT_EXT;
-    dbg_info.pfnCallback = vkDebugReportCallbackEX_impl;
+    dbg_info.pfnCallback = implVkDebugReportCallbackEXT;
     dbg_info.pUserData = this;
-    VKC(l->vkCreateDebugReportCallbackEXT(vulkan_data, &dbg_info, nullptr,
-        &report_callback));
+    GX_VK_CHK(Loader::vkCreateDebugReportCallbackEXT(vulkan_data, &dbg_info, nullptr, &report_callback))
 }
 
-gearoenix::render::Instance::~Instance()
+gearoenix::vulkan::Instance::~Instance() noexcept
 {
-#ifdef VULKAN_INSTANCE_DEBUG
-    linker->vkDestroyDebugReportCallbackEXT(vulkan_data, report_callback,
-        nullptr);
+#ifdef GX_VULKAN_INSTANCE_DEBUG
+    Loader::vkDestroyDebugReportCallbackEXT(vulkan_data, report_callback, nullptr);
 #endif
-    linker->vkDestroyInstance(vulkan_data, 0);
+    Loader::vkDestroyInstance(vulkan_data, nullptr);
 }
 
-gearoenix::render::Linker* gearoenix::render::Instance::get_linker()
-{
-    return linker;
-}
-
-const gearoenix::render::Linker* gearoenix::render::Instance::get_linker() const
-{
-    return linker;
-}
-
-const VkInstance& gearoenix::render::Instance::get_vulkan_data() const
+const VkInstance& gearoenix::vulkan::Instance::get_vulkan_data() const noexcept
 {
     return vulkan_data;
 }
