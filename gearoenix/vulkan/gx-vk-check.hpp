@@ -8,7 +8,7 @@
 
 #define GX_VK_CHK(func)                                         \
     {                                                           \
-        VkResult res = func;                                    \
+        const VkResult res = Loader::func;                      \
         if (VK_SUCCESS != res) {                                \
             GXLOGF("Error in vulkan, result is " << res << ".") \
         }                                                       \

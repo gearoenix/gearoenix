@@ -1,30 +1,35 @@
 #include "gx-vk-surface.hpp"
-#ifdef USE_VULKAN
+#ifdef GX_USE_VULKAN
 #include "../core/gx-cr-application.hpp"
-#include "../core/gx-cr-build-configuration.hpp"
 #include "../core/gx-cr-static.hpp"
 #include "../system/gx-sys-app.hpp"
 #include "gx-vk-check.hpp"
 #include "gx-vk-instance.hpp"
+#include <SDL_vulkan.h>
 #include <cstring>
-#ifdef IN_ANDROID
+
+#ifdef GX_IN_ANDROID
 #include <android_native_app_glue.h>
 #endif
-gearoenix::render::Surface::Surface(Instance* instance,
-    system::Application* sys_app)
-    : instance(instance)
+
+gearoenix::vulkan::Surface::Surface(std::shared_ptr<Instance> ins, const system::Application* const sys_app) noexcept
+    : instance(std::move(ins))
     , sys_app(sys_app)
 {
-#ifdef IN_ANDROID
+#ifdef GX_USE_SDL
+    if (!SDL_Vulkan_CreateSurface(sys_app->get_window(), instance->get_vulkan_data(), &vulkan_data)) {
+        GXLOGF("Unable to create Vulkan Surface from SDL2 system application interface.")
+    }
+#elif defined(GX_IN_ANDROID)
     VkAndroidSurfaceCreateInfoKHR create_info;
     std::memset(&create_info, 0, sizeof(create_info));
     create_info.sType = VK_STRUCTURE_TYPE_ANDROID_SURFACE_CREATE_INFO_KHR;
     create_info.window = sys_app->get_android_app()->window;
     VKC(instance->get_linker()->vkCreateAndroidSurfaceKHR(
         instance->get_vulkan_data(), &create_info, 0, &vulkan_data));
-#elif defined(IN_LINUX)
+#elif defined(GX_IN_LINUX)
     VkXcbSurfaceCreateInfoKHR create_info;
-    setz(create_info);
+    GX_SET_ZERO(create_info);
     create_info.sType = VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR;
     create_info.connection = sys_app->get_connection();
     create_info.window = sys_app->get_window();
@@ -43,29 +48,22 @@ gearoenix::render::Surface::Surface(Instance* instance,
 #endif
 }
 
-gearoenix::render::Surface::~Surface()
+gearoenix::vulkan::Surface::~Surface() noexcept
 {
-    instance->get_linker()->vkDestroySurfaceKHR(instance->get_vulkan_data(),
-        vulkan_data, 0);
+    Loader::vkDestroySurfaceKHR(instance->get_vulkan_data(), vulkan_data, nullptr);
 }
 
-const gearoenix::render::Instance* gearoenix::render::Surface::get_instance() const
-{
-    return instance;
-}
-
-gearoenix::render::Instance* gearoenix::render::Surface::get_instance()
+const std::shared_ptr<gearoenix::vulkan::Instance>& gearoenix::vulkan::Surface::get_instance() const noexcept
 {
     return instance;
 }
 
-const VkSurfaceKHR& gearoenix::render::Surface::get_vulkan_data() const
+VkSurfaceKHR gearoenix::vulkan::Surface::get_vulkan_data() const noexcept
 {
     return vulkan_data;
 }
 
-const gearoenix::system::Application* gearoenix::render::Surface::get_sys_app()
-    const
+const gearoenix::system::Application* gearoenix::vulkan::Surface::get_sys_app() const noexcept
 {
     return sys_app;
 }

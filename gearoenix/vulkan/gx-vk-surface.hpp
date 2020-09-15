@@ -1,31 +1,29 @@
-#ifndef GEAROENIX_VULKAN_SURFAE_HPP
-#define GEAROENIX_VULKAN_SURFAE_HPP
+#ifndef GEAROENIX_VULKAN_SURFACE_HPP
+#define GEAROENIX_VULKAN_SURFACE_HPP
 #include "../core/gx-cr-build-configuration.hpp"
-#ifdef USE_VULKAN
-#include "gx-vk-linker.hpp"
+#ifdef GX_USE_VULKAN
+#include "gx-vk-loader.hpp"
 #include <memory>
-namespace gearoenix {
-namespace system {
-    class Application;
-}
-namespace render {
-    class Instance;
-    class Surface {
-    private:
-        Instance* instance;
-        VkSurfaceKHR vulkan_data;
-        system::Application* sys_app;
 
-    public:
-        Surface(Instance* instance,
-            system::Application* sys_app);
-        ~Surface();
-        const Instance* get_instance() const;
-        Instance* get_instance();
-        const VkSurfaceKHR& get_vulkan_data() const;
-        const system::Application* get_sys_app() const;
-    };
+namespace gearoenix::system {
+class Application;
 }
+
+namespace gearoenix::vulkan {
+class Instance;
+class Surface {
+private:
+    const std::shared_ptr<Instance> instance;
+    const system::Application* const sys_app;
+    VkSurfaceKHR vulkan_data = nullptr;
+
+public:
+    Surface(std::shared_ptr<Instance> instance, const system::Application* sys_app) noexcept;
+    ~Surface() noexcept;
+    [[nodiscard]] const std::shared_ptr<Instance>& get_instance() const noexcept;
+    [[nodiscard]] VkSurfaceKHR get_vulkan_data() const noexcept;
+    [[nodiscard]] const system::Application* get_sys_app() const noexcept;
+};
 }
 #endif
 #endif

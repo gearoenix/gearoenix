@@ -33,10 +33,10 @@
 gearoenix::vulkan::engine::Engine::Engine(system::Application* sys_app) noexcept
     : render::engine::Engine(sys_app, render::engine::Type::Vulkan)
 {
-    linker = new Linker();
-    instance = new Instance(linker);
-    surface = new Surface(instance, this->sys_app);
-    physical_device = new device::Physical(surface);
+    Loader::load();
+    instance = std::make_shared<Instance>();
+    surface = std::make_shared<Surface>(instance, this->sys_app);
+    physical_device = std::make_shared<device::Physical>(surface);
     logical_device = new device::Logical(physical_device);
     swapchain = new Swapchain(logical_device);
     depth_stencil = image::View::create_depth_stencil(logical_device);

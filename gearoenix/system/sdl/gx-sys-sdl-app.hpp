@@ -73,6 +73,7 @@ public:
     /// Core application termination will be called, and then termination of other modules
     void quit() noexcept;
     void set_soft_keyboard_visibility(bool show) noexcept;
+    [[nodiscard]] SDL_Window* get_window() const noexcept;
 };
 }
 #endif

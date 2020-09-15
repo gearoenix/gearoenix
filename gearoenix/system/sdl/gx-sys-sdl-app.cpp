@@ -46,14 +46,14 @@ void gearoenix::system::Application::create_window() noexcept
 #endif
 
 #ifdef GX_USE_VULKAN
-    if (render::engine::Type::VULKAN == supported_engine) {
+    if (render::engine::Type::Vulkan == supported_engine) {
         flags |= SDL_WINDOW_VULKAN;
         window = SDL_CreateWindow(
             GX_APP_NAME,
             SDL_WINDOWPOS_CENTERED,
             SDL_WINDOWPOS_CENTERED,
-            static_cast<int>(win_width),
-            static_cast<int>(win_height),
+            static_cast<int>(event_engine->get_window_width()),
+            static_cast<int>(event_engine->get_window_height()),
             flags);
         if (nullptr != window) {
             GXLOGI("Vulkan SDL2 window created.")
@@ -611,6 +611,11 @@ void gearoenix::system::Application::set_soft_keyboard_visibility(const bool sho
         gooing_to_show_keyboard = false;
 #endif
     (void)show;
+}
+
+SDL_Window* gearoenix::system::Application::get_window() const noexcept
+{
+    return window;
 }
 
 #endif

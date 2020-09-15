@@ -54,32 +54,33 @@ namespace gearoenix::vulkan::texture {
 class Sampler2D;
 }
 
-namespace gearoenix::vulkan::engine {
+namespace gearoenix::vulkan {
 class Framebuffer;
 class Instance;
-class Linker;
 class RenderPass;
 class Surface;
 class Swapchain;
+}
+
+namespace gearoenix::vulkan::engine {
 class Engine final : public render::engine::Engine {
 private:
     system::Application* sys_app;
-    Linker* linker;
-    Instance* instance;
-    Surface* surface;
-    device::Physical* physical_device;
-    device::Logical* logical_device;
-    Swapchain* swapchain;
-    image::View* depth_stencil;
-    RenderPass* render_pass;
-    std::vector<Framebuffer*> framebuffers;
-    command::Pool* graphic_cmd_pool;
-    sync::Semaphore* present_complete_semaphore;
-    sync::Semaphore* render_complete_semaphore;
-    std::vector<sync::Fence*> wait_fences;
-    memory::Manager* vmemmgr;
-    buffer::Manager* vbufmgr;
-    std::vector<buffer::Manager*> uvbufmgr;
+    std::shared_ptr<Instance> instance;
+    std::shared_ptr<Surface> surface;
+    std::shared_ptr<device::Physical> physical_device;
+    std::shared_ptr<device::Logical> logical_device;
+    std::shared_ptr<Swapchain> swapchain;
+    std::shared_ptr<image::View> depth_stencil;
+    std::shared_ptr<RenderPass> render_pass;
+    std::vector<std::shared_ptr<Framebuffer>> framebuffers;
+    std::shared_ptr<command::Pool> graphic_cmd_pool;
+    std::shared_ptr<sync::Semaphore> present_complete_semaphore;
+    std::shared_ptr<sync::Semaphore> render_complete_semaphore;
+    std::vector<std::shared_ptr<sync::Fence>> wait_fences;
+    std::shared_ptr<memory::Manager> vmemmgr;
+    std::shared_ptr<buffer::Manager> vbufmgr;
+    std::vector<std::shared_ptr<buffer::Manager>> uvbufmgr;
     memory::Manager* cmemmgr;
     buffer::Manager* cbufmgr;
     std::vector<buffer::Manager*> ucbufmgr;
