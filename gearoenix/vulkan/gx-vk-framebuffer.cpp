@@ -1,13 +1,13 @@
 #include "gx-vk-framebuffer.hpp"
 #ifdef USE_VULKAN
-#include "../core/cr-static.hpp"
-#include "device/vk-dev-logical.hpp"
-#include "device/vk-dev-physical.hpp"
-#include "image/vk-img-image.hpp"
-#include "image/vk-img-view.hpp"
-#include "vk-check.hpp"
-#include "vk-instance.hpp"
-#include "vk-render-pass.hpp"
+#include "../core/gx-cr-static.hpp"
+#include "device/gx-vk-dev-logical.hpp"
+#include "device/gx-vk-dev-physical.hpp"
+#include "gx-vk-check.hpp"
+#include "gx-vk-instance.hpp"
+#include "gx-vk-render-pass.hpp"
+#include "image/gx-vk-img-image.hpp"
+#include "image/gx-vk-img-view.hpp"
 
 gearoenix::render::Framebuffer::Framebuffer(image::View* view, image::View* depth, RenderPass* render_pass)
     : view(view)

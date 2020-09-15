@@ -1,6 +1,9 @@
+#ifndef GEAROENIX_TEST_RENDER_TEXTURE_HPP
+#define GEAROENIX_TEST_RENDER_TEXTURE_HPP
+
 #include <algorithm>
 #include <chrono>
-#include <gearoenix/render/texture/rnd-txt-texture.hpp>
+#include <gearoenix/render/texture/gx-rnd-txt-texture.hpp>
 #include <random>
 
 BOOST_AUTO_TEST_CASE(render_texture_test)
@@ -59,3 +62,5 @@ BOOST_AUTO_TEST_CASE(render_texture_test)
         }
     }
 }
+
+#endif

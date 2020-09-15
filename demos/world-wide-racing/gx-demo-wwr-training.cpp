@@ -4,18 +4,18 @@
 #include "gx-demo-wwr-garage.hpp"
 #include "gx-demo-wwr-rotating-button.hpp"
 #include "gx-demo-wwr-terrain-manager.hpp"
-#include <gearoenix/physics/collider/phs-cld-collider.hpp>
-#include <gearoenix/physics/constraint/phs-cns-manager.hpp>
-#include <gearoenix/physics/constraint/phs-cns-window-placer.hpp>
-#include <gearoenix/render/camera/rnd-cmr-arc-controller.hpp>
-#include <gearoenix/render/camera/rnd-cmr-camera.hpp>
-#include <gearoenix/render/camera/rnd-cmr-transformation.hpp>
-#include <gearoenix/render/engine/rnd-eng-engine.hpp>
-#include <gearoenix/render/model/rnd-mdl-manager.hpp>
-#include <gearoenix/render/scene/rnd-scn-game.hpp>
-#include <gearoenix/render/scene/rnd-scn-ui.hpp>
-#include <gearoenix/render/widget/rnd-wdg-button.hpp>
-#include <gearoenix/system/sys-app.hpp>
+#include <gearoenix/physics/collider/gx-phs-cld-collider.hpp>
+#include <gearoenix/physics/constraint/gx-phs-cns-manager.hpp>
+#include <gearoenix/physics/constraint/gx-phs-cns-window-placer.hpp>
+#include <gearoenix/render/camera/gx-rnd-cmr-arc-controller.hpp>
+#include <gearoenix/render/camera/gx-rnd-cmr-camera.hpp>
+#include <gearoenix/render/camera/gx-rnd-cmr-transformation.hpp>
+#include <gearoenix/render/engine/gx-rnd-eng-engine.hpp>
+#include <gearoenix/render/model/gx-rnd-mdl-manager.hpp>
+#include <gearoenix/render/scene/gx-rnd-scn-game.hpp>
+#include <gearoenix/render/scene/gx-rnd-scn-ui.hpp>
+#include <gearoenix/render/widget/gx-rnd-wdg-button.hpp>
+#include <gearoenix/system/gx-sys-app.hpp>
 
 void gearoenix::demo::wwr::Training::initialize_scenes(
     const std::vector<std::shared_ptr<render::scene::Scene>>& scenes) noexcept

@@ -1,10 +1,10 @@
 #ifndef GEAROENIX_TOOL_IBL_BAKER_HPP
 #define GEAROENIX_TOOL_IBL_BAKER_HPP
 #include <atomic>
-#include <gearoenix/core/cr-application.hpp>
-#include <gearoenix/core/cr-types.hpp>
-#include <gearoenix/core/event/cr-ev-listener.hpp>
-#include <gearoenix/math/math-vertex.hpp>
+#include <gearoenix/core/event/gx-cr-ev-listener.hpp>
+#include <gearoenix/core/gx-cr-application.hpp>
+#include <gearoenix/core/gx-cr-types.hpp>
+#include <gearoenix/math/gx-math-vertex.hpp>
 #include <random>
 #include <string>
 

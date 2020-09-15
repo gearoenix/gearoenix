@@ -1,6 +1,6 @@
 #include "gx-vk-loader.hpp"
 #ifdef GX_USE_VULKAN
-#include "../system/sys-log.hpp"
+#include "../system/gx-sys-log.hpp"
 #include <string>
 #if defined(GX_IN_LINUX) || defined(GX_IN_ANDROID)
 #include <dlfcn.h>

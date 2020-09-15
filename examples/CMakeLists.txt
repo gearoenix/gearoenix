@@ -1,20 +1,20 @@
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR})
 
 SET(GX_EXAMPLE_001_HELLO_WORLD_SRC
-        001-hello-world/exm-001-hello-world.cpp
-        001-hello-world/exm-001-hello-world.hpp)
+        001-hello-world/gx-exm-001-hello-world.cpp
+        001-hello-world/gx-exm-001-hello-world.hpp)
 
 SET(GX_EXAMPLE_002_ASSET_LOADING_SRC
-        002-asset-loading/exm-002-asset-loading.cpp
-        002-asset-loading/exm-002-asset-loading.hpp)
+        002-asset-loading/gx-exm-002-asset-loading.cpp
+        002-asset-loading/gx-exm-002-asset-loading.hpp)
 
 SET(GX_EXAMPLE_003_UI_WIDGETS_SRC
-        003-ui-widgets/exm-003-ui-widgets.cpp
-        003-ui-widgets/exm-003-ui-widgets.hpp)
+        003-ui-widgets/gx-exm-003-ui-widgets.cpp
+        003-ui-widgets/gx-exm-003-ui-widgets.hpp)
 
 SET(GX_EXAMPLE_004_RUNTIME_REFLECTION_PROBE_SRC
-        004-runtime-reflection-probe/exm-004-runtime-reflection-probe.cpp
-        004-runtime-reflection-probe/exm-004-runtime-reflection-probe.hpp)
+        004-runtime-reflection-probe/gx-exm-004-runtime-reflection-probe.cpp
+        004-runtime-reflection-probe/gx-exm-004-runtime-reflection-probe.hpp)
 
 IF (NOT CMAKE_SYSTEM_NAME MATCHES "Android")
     ADD_EXECUTABLE(GearoenixExample001HelloWorld ${GX_EXAMPLE_001_HELLO_WORLD_SRC})

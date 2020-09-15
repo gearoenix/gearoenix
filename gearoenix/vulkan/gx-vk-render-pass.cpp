@@ -1,11 +1,11 @@
 #include "gx-vk-render-pass.hpp"
 #ifdef USE_VULKAN
-#include "../core/cr-static.hpp"
-#include "device/vk-dev-logical.hpp"
-#include "device/vk-dev-physical.hpp"
-#include "vk-check.hpp"
-#include "vk-instance.hpp"
-#include "vk-swapchain.hpp"
+#include "../core/gx-cr-static.hpp"
+#include "device/gx-vk-dev-logical.hpp"
+#include "device/gx-vk-dev-physical.hpp"
+#include "gx-vk-check.hpp"
+#include "gx-vk-instance.hpp"
+#include "gx-vk-swapchain.hpp"
 
 gearoenix::render::RenderPass::RenderPass(Swapchain* swapchain)
     : swapchain(swapchain)

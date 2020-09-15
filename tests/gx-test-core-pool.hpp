@@ -1,5 +1,5 @@
-#include <gearoenix/core/cr-pool.hpp>
-#include <gearoenix/system/sys-log.hpp>
+#include <gearoenix/core/gx-cr-pool.hpp>
+#include <gearoenix/system/gx-sys-log.hpp>
 
 BOOST_AUTO_TEST_CASE(math_core_pool)
 {

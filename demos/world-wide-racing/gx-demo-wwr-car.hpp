@@ -1,7 +1,7 @@
 #ifndef GX_DEMO_WWR_CAR_HPP
 #define GX_DEMO_WWR_CAR_HPP
 
-#include <gearoenix/core/cr-static.hpp>
+#include <gearoenix/core/gx-cr-static.hpp>
 #include <memory>
 #include <string>
 

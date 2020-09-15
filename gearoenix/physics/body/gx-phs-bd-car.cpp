@@ -1,6 +1,6 @@
 #include "gx-phs-bd-car.hpp"
-#include "../../core/asset/cr-asset-manager.hpp"
-#include "../../render/model/rnd-mdl-dynamic.hpp"
+#include "../../core/asset/gx-cr-asset-manager.hpp"
+#include "../../render/model/gx-rnd-mdl-dynamic.hpp"
 #include "../gx-phs-constants.hpp"
 
 void gearoenix::physics::body::Car::update_steering_angle() noexcept

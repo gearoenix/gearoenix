@@ -1,7 +1,7 @@
 #ifndef GEAROENIX_PHYSICS_BODY_BODY_HPP
 #define GEAROENIX_PHYSICS_BODY_BODY_HPP
-#include "../../core/asset/cr-asset.hpp"
-#include "../../core/cr-static.hpp"
+#include "../../core/asset/gx-cr-asset.hpp"
+#include "../../core/gx-cr-static.hpp"
 #include "gx-phs-bd-type.hpp"
 #include <memory>
 

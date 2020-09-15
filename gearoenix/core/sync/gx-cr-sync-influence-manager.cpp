@@ -1,5 +1,5 @@
 #include "gx-cr-sync-influence-manager.hpp"
-#include "../asset/cr-asset-manager.hpp"
+#include "../asset/gx-cr-asset-manager.hpp"
 
 gearoenix::core::Id gearoenix::core::sync::InfluenceManager::add(
     std::vector<Id> influenced_ids,

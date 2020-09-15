@@ -1,7 +1,10 @@
-#include <gearoenix/math/math-aabb.hpp>
-#include <gearoenix/math/math-frustum.hpp>
-#include <gearoenix/math/math-matrix-4d.hpp>
-#include <gearoenix/math/math-sphere.hpp>
+#ifndef GEAROENIX_TEST_MATH_FRUSTUM_HPP
+#define GEAROENIX_TEST_MATH_FRUSTUM_HPP
+
+#include <gearoenix/math/gx-math-aabb.hpp>
+#include <gearoenix/math/gx-math-frustum.hpp>
+#include <gearoenix/math/gx-math-matrix-4d.hpp>
+#include <gearoenix/math/gx-math-sphere.hpp>
 
 BOOST_AUTO_TEST_CASE(math_frustum_test)
 {
@@ -22,3 +25,5 @@ BOOST_AUTO_TEST_CASE(math_frustum_test)
 
     BOOST_CHECK(f.check_intersection_status(box001) == gxm::IntersectionStatus::In);
 }
+
+#endif

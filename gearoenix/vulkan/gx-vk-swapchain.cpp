@@ -1,14 +1,14 @@
 #include "gx-vk-swapchain.hpp"
 #ifdef USE_VULKAN
-#include "../core/cr-static.hpp"
-#include "device/vk-dev-logical.hpp"
-#include "device/vk-dev-physical.hpp"
-#include "image/vk-img-image.hpp"
-#include "image/vk-img-view.hpp"
-#include "sync/vk-sync-semaphore.hpp"
-#include "vk-check.hpp"
-#include "vk-instance.hpp"
-#include "vk-surface.hpp"
+#include "../core/gx-cr-static.hpp"
+#include "device/gx-vk-dev-logical.hpp"
+#include "device/gx-vk-dev-physical.hpp"
+#include "gx-vk-check.hpp"
+#include "gx-vk-instance.hpp"
+#include "gx-vk-surface.hpp"
+#include "image/gx-vk-img-image.hpp"
+#include "image/gx-vk-img-view.hpp"
+#include "sync/gx-vk-sync-semaphore.hpp"
 
 #define DEBUG_SWAPCHAIN
 

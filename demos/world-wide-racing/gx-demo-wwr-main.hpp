@@ -1,7 +1,7 @@
 #ifndef GX_DEMO_WWR_MAIN_HPP
 #define GX_DEMO_WWR_MAIN_HPP
 
-#include <gearoenix/core/cr-application.hpp>
+#include <gearoenix/core/gx-cr-application.hpp>
 #include <vector>
 
 namespace gearoenix::render::scene {

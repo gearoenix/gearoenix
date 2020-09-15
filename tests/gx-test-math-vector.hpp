@@ -1,10 +1,13 @@
-#include <gearoenix/core/cr-static.hpp>
-#include <gearoenix/math/math-aabb.hpp>
-#include <gearoenix/math/math-matrix-4d.hpp>
-#include <gearoenix/math/math-quaternion.hpp>
-#include <gearoenix/math/math-ray.hpp>
-#include <gearoenix/math/math-triangle.hpp>
-#include <gearoenix/system/sys-log.hpp>
+#ifndef GEAROENIX_TEST_MATH_VECTOR_HPP
+#define GEAROENIX_TEST_MATH_VECTOR_HPP
+
+#include <gearoenix/core/gx-cr-static.hpp>
+#include <gearoenix/math/gx-math-aabb.hpp>
+#include <gearoenix/math/gx-math-matrix-4d.hpp>
+#include <gearoenix/math/gx-math-quaternion.hpp>
+#include <gearoenix/math/gx-math-ray.hpp>
+#include <gearoenix/math/gx-math-triangle.hpp>
+#include <gearoenix/system/gx-sys-log.hpp>
 #define GLM_FORCE_CXX14
 #define GLM_FORCE_SIMD_SSE42
 #define GLM_ENABLE_EXPERIMENTAL
@@ -191,3 +194,5 @@ BOOST_AUTO_TEST_CASE(math_vector_test)
 #undef RV
 #undef RQ
 #undef CHECK
+
+#endif

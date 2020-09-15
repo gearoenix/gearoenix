@@ -1,7 +1,7 @@
 #include "gx-vk-instance.hpp"
 #ifdef GX_USE_VULKAN
-#include "../core/cr-static.hpp"
-#include "../system/sys-log.hpp"
+#include "../core/gx-cr-static.hpp"
+#include "../system/gx-sys-log.hpp"
 #include "gx-vk-check.hpp"
 #include <sstream>
 #include <vector>

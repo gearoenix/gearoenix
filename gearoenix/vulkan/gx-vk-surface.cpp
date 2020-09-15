@@ -1,11 +1,11 @@
 #include "gx-vk-surface.hpp"
 #ifdef USE_VULKAN
-#include "../core/cr-application.hpp"
-#include "../core/cr-build-configuration.hpp"
-#include "../core/cr-static.hpp"
-#include "../system/sys-app.hpp"
-#include "vk-check.hpp"
-#include "vk-instance.hpp"
+#include "../core/gx-cr-application.hpp"
+#include "../core/gx-cr-build-configuration.hpp"
+#include "../core/gx-cr-static.hpp"
+#include "../system/gx-sys-app.hpp"
+#include "gx-vk-check.hpp"
+#include "gx-vk-instance.hpp"
 #include <cstring>
 #ifdef IN_ANDROID
 #include <android_native_app_glue.h>

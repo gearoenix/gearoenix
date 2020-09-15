@@ -1,6 +1,6 @@
 #ifndef GEAROENIX_PHYSICS_BODY_RIGID_HPP
 #define GEAROENIX_PHYSICS_BODY_RIGID_HPP
-#include "../../math/math-vector-3d.hpp"
+#include "../../math/gx-math-vector-3d.hpp"
 #include "gx-phs-bd-body.hpp"
 
 namespace gearoenix::physics::body {

@@ -1,8 +1,11 @@
-#include <gearoenix/math/math-ray.hpp>
-#include <gearoenix/physics/accelerator/phs-acc-bvh.hpp>
-#include <gearoenix/physics/collider/phs-cld-aabb.hpp>
-#include <gearoenix/physics/collider/phs-cld-frustum.hpp>
-#include <gearoenix/physics/collider/phs-cld-sphere.hpp>
+#ifndef GEAROENIX_TEST_PHYSICS_ACCELERATOR_HPP
+#define GEAROENIX_TEST_PHYSICS_ACCELERATOR_HPP
+
+#include <gearoenix/math/gx-math-ray.hpp>
+#include <gearoenix/physics/accelerator/gx-phs-acc-bvh.hpp>
+#include <gearoenix/physics/collider/gx-phs-cld-aabb.hpp>
+#include <gearoenix/physics/collider/gx-phs-cld-frustum.hpp>
+#include <gearoenix/physics/collider/gx-phs-cld-sphere.hpp>
 #include <random>
 
 BOOST_AUTO_TEST_CASE(physics_accelerator_bvh)
@@ -207,3 +210,5 @@ BOOST_AUTO_TEST_CASE(physics_accelerator_bvh)
     //
     //    BOOST_TEST(intersections_count > 0);
 }
+
+#endif

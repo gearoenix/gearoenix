@@ -1,5 +1,5 @@
 #include "gx-phs-bd-body.hpp"
-#include "../../render/model/rnd-mdl-dynamic.hpp"
+#include "../../render/model/gx-rnd-mdl-dynamic.hpp"
 #include <utility>
 
 gearoenix::physics::body::Body::Body(

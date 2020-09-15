@@ -1,10 +1,10 @@
 #include "gx-demo-wwr-rotating-button.hpp"
-#include <gearoenix/physics/animation/phs-anm-animation.hpp>
-#include <gearoenix/physics/animation/phs-anm-manager.hpp>
-#include <gearoenix/physics/phs-engine.hpp>
-#include <gearoenix/render/engine/rnd-eng-engine.hpp>
-#include <gearoenix/render/model/rnd-mdl-transformation.hpp>
-#include <gearoenix/render/widget/rnd-wdg-button.hpp>
+#include <gearoenix/physics/animation/gx-phs-anm-animation.hpp>
+#include <gearoenix/physics/animation/gx-phs-anm-manager.hpp>
+#include <gearoenix/physics/gx-phs-engine.hpp>
+#include <gearoenix/render/engine/gx-rnd-eng-engine.hpp>
+#include <gearoenix/render/model/gx-rnd-mdl-transformation.hpp>
+#include <gearoenix/render/widget/gx-rnd-wdg-button.hpp>
 
 gearoenix::demo::wwr::RotatingButton::RotatingButton(std::shared_ptr<render::widget::Button> b) noexcept
     : button(std::move(b))

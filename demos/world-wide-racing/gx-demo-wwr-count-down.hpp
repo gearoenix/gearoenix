@@ -2,8 +2,8 @@
 #define GX_DEMO_WWR_COUNT_DOWN_HPP
 
 #include <functional>
-#include <gearoenix/core/cr-static.hpp>
-#include <gearoenix/core/sync/cr-sync-end-caller.hpp>
+#include <gearoenix/core/gx-cr-static.hpp>
+#include <gearoenix/core/sync/gx-cr-sync-end-caller.hpp>
 #include <memory>
 #include <vector>
 

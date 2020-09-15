@@ -1,8 +1,8 @@
 #ifndef GEAROENIX_VULKAN_SURFAE_HPP
 #define GEAROENIX_VULKAN_SURFAE_HPP
-#include "../core/cr-build-configuration.hpp"
+#include "../core/gx-cr-build-configuration.hpp"
 #ifdef USE_VULKAN
-#include "vk-linker.hpp"
+#include "gx-vk-linker.hpp"
 #include <memory>
 namespace gearoenix {
 namespace system {

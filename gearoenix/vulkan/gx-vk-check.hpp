@@ -1,8 +1,8 @@
 #ifndef GEAROENIX_VULKAN_CHECK_HPP
 #define GEAROENIX_VULKAN_CHECK_HPP
-#include "../core/cr-build-configuration.hpp"
+#include "../core/gx-cr-build-configuration.hpp"
 #ifdef GX_USE_VULKAN
-#include "../system/sys-log.hpp"
+#include "../system/gx-sys-log.hpp"
 #include "gx-vk-loader.hpp"
 #include <string>
 

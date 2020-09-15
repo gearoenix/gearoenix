@@ -1,5 +1,5 @@
 #include <gearoenix/ai/gx-ai-dijkstra.hpp>
-#include <gearoenix/system/sys-log.hpp>
+#include <gearoenix/system/gx-sys-log.hpp>
 #include <sstream>
 
 BOOST_AUTO_TEST_CASE(gx_ai_dijkstra)

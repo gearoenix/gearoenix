@@ -1,10 +1,10 @@
 #include "gx-vk-cmd-pool.hpp"
 #ifdef USE_VULKAN
-#include "../../core/cr-static.hpp"
-#include "../device/vk-dev-logical.hpp"
-#include "../device/vk-dev-physical.hpp"
-#include "../vk-check.hpp"
-#include "../vk-instance.hpp"
+#include "../../core/gx-cr-static.hpp"
+#include "../device/gx-vk-dev-logical.hpp"
+#include "../device/gx-vk-dev-physical.hpp"
+#include "../gx-vk-check.hpp"
+#include "../gx-vk-instance.hpp"
 
 gearoenix::render::command::Pool::Pool(device::Logical* logical_device)
     : logical_device(logical_device)

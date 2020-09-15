@@ -1,6 +1,6 @@
 #ifndef GEAROENIX_VULKAN_INSTANCE_HPP
 #define GEAROENIX_VULKAN_INSTANCE_HPP
-#include "../core/cr-build-configuration.hpp"
+#include "../core/gx-cr-build-configuration.hpp"
 
 #ifdef GX_USE_VULKAN
 

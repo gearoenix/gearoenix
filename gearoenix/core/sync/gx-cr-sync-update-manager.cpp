@@ -1,5 +1,5 @@
 #include "gx-cr-sync-update-manager.hpp"
-#include "cr-sync-kernel-workers.hpp"
+#include "gx-cr-sync-kernel-workers.hpp"
 
 void gearoenix::core::sync::UpdateManager::update() noexcept
 {

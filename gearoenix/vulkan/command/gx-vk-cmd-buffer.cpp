@@ -3,13 +3,13 @@
 #ifdef GX_DEBUG_MODE
 #define GX_VK_CMD_BUFF_DEBUG
 #endif
-#include "../../core/cr-static.hpp"
-#include "../../render/command/rnd-cmd-buffer.hpp"
-#include "../device/vk-dev-logical.hpp"
-#include "../device/vk-dev-physical.hpp"
+#include "../../core/gx-cr-static.hpp"
+#include "../../render/command/gx-rnd-cmd-buffer.hpp"
+#include "../device/gx-vk-dev-logical.hpp"
+#include "../device/gx-vk-dev-physical.hpp"
 #include "../gx-vk-check.hpp"
 #include "../gx-vk-instance.hpp"
-#include "../sync/vk-sync-fence.hpp"
+#include "../sync/gx-vk-sync-fence.hpp"
 #include "gx-vk-cmd-pool.hpp"
 
 gearoenix::render::command::Buffer::Buffer(std::shared_ptr<Pool> p) noexcept

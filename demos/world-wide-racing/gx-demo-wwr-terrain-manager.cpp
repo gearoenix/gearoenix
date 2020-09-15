@@ -1,11 +1,11 @@
 #include "gx-demo-wwr-terrain-manager.hpp"
 #include <gearoenix/core/sync/gx-cr-sync-update-manager.hpp>
-#include <gearoenix/physics/collider/phs-cld-collider.hpp>
-#include <gearoenix/render/camera/rnd-cmr-camera.hpp>
-#include <gearoenix/render/camera/rnd-cmr-transformation.hpp>
-#include <gearoenix/render/engine/rnd-eng-engine.hpp>
-#include <gearoenix/render/model/rnd-mdl-dynamic.hpp>
-#include <gearoenix/render/scene/rnd-scn-game.hpp>
+#include <gearoenix/physics/collider/gx-phs-cld-collider.hpp>
+#include <gearoenix/render/camera/gx-rnd-cmr-camera.hpp>
+#include <gearoenix/render/camera/gx-rnd-cmr-transformation.hpp>
+#include <gearoenix/render/engine/gx-rnd-eng-engine.hpp>
+#include <gearoenix/render/model/gx-rnd-mdl-dynamic.hpp>
+#include <gearoenix/render/scene/gx-rnd-scn-game.hpp>
 
 void gearoenix::demo::wwr::TerrainManager::update() noexcept
 {

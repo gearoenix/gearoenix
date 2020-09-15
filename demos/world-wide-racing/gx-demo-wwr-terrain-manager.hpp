@@ -1,7 +1,7 @@
 #ifndef GX_DEMO_WWR_TERRAIN_MANAGER_HPP
 #define GX_DEMO_WWR_TERRAIN_MANAGER_HPP
 
-#include <gearoenix/core/cr-types.hpp>
+#include <gearoenix/core/gx-cr-types.hpp>
 
 #include <memory>
 #include <vector>

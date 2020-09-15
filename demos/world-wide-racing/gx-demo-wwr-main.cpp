@@ -1,9 +1,9 @@
 #include "gx-demo-wwr-main.hpp"
 #include "gx-demo-wwr-garage.hpp"
-#include <gearoenix/render/engine/rnd-eng-engine.hpp>
-#include <gearoenix/render/graph/tree/rnd-gr-tr-pbr.hpp>
-#include <gearoenix/render/scene/rnd-scn-logo.hpp>
-#include <gearoenix/system/sys-app.hpp>
+#include <gearoenix/render/engine/gx-rnd-eng-engine.hpp>
+#include <gearoenix/render/graph/tree/gx-rnd-gr-tr-pbr.hpp>
+#include <gearoenix/render/scene/gx-rnd-scn-logo.hpp>
+#include <gearoenix/system/gx-sys-app.hpp>
 
 gearoenix::demo::wwr::Main::Main(system::Application* const sys_app) noexcept
     : core::Application(sys_app)

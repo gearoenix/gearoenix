@@ -1,10 +1,10 @@
 #ifndef GEAROENIX_VULKAN_ENGINE_HPP
 #define GEAROENIX_VULKAN_ENGINE_HPP
-#include "../../core/cr-build-configuration.hpp"
+#include "../../core/gx-cr-build-configuration.hpp"
 #ifdef GX_USE_VULKAN
 
-#include "../../core/cr-types.hpp"
-#include "../../render/engine/rnd-eng-engine.hpp"
+#include "../../core/gx-cr-types.hpp"
+#include "../../render/engine/gx-rnd-eng-engine.hpp"
 #include <functional>
 #include <memory>
 #include <mutex>
