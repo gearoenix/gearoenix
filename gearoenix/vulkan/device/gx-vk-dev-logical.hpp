@@ -1,30 +1,24 @@
 #ifndef GEAROENIX_VULKAN_DEVICE_LOGICAL_HPP
 #define GEAROENIX_VULKAN_DEVICE_LOGICAL_HPP
 #include "../../core/gx-cr-build-configuration.hpp"
-#ifdef USE_VULKAN
-#include "../gx-vk-linker.hpp"
+#ifdef GX_USE_VULKAN
+#include "../../core/gx-cr-static.hpp"
+#include "../gx-vk-loader.hpp"
 #include <memory>
-namespace gearoenix {
-namespace render {
-    namespace device {
-        class Physical;
-        class Logical {
-        private:
-            Physical* physical_device;
-            VkDevice vulkan_data;
-            VkQueue vk_graphic_queue;
 
-        public:
-            Logical(Physical* p);
-            ~Logical();
-            const Physical* get_physical_device() const;
-            Physical* get_physical_device();
-            const VkDevice& get_vulkan_data() const;
-            const VkQueue& get_graphic_queue() const;
-            void wait_to_finish();
-        };
-    }
-}
+namespace gearoenix::vulkan::device {
+class Physical;
+class Logical final {
+private:
+    GX_GET_REFC_PRV(std::shared_ptr<Physical>, physical_device)
+    GX_GET_VAL_PRV(VkDevice, vulkan_data, nullptr)
+    GX_GET_VAL_PRV(VkQueue, graphic_queue, nullptr)
+
+public:
+    explicit Logical(std::shared_ptr<Physical> p) noexcept;
+    ~Logical() noexcept;
+    void wait_to_finish() noexcept;
+};
 }
 #endif
 #endif

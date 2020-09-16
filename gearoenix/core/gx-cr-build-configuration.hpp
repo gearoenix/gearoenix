@@ -14,7 +14,7 @@
 #define GX_THREAD_NOT_SUPPORTED
 #elif defined(__unix__)
 #define GX_IN_LINUX
-//#define GX_USE_VULKAN
+#define GX_USE_VULKAN
 #define GX_USE_OPENGL_43
 #define GX_USE_OPENGL_33
 #define GX_USE_OPENGL_ES3
