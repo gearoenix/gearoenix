@@ -37,7 +37,7 @@ gearoenix::vulkan::engine::Engine::Engine(system::Application* sys_app) noexcept
     instance = std::make_shared<Instance>();
     surface = std::make_shared<Surface>(instance, this->sys_app);
     physical_device = std::make_shared<device::Physical>(surface);
-    logical_device = new device::Logical(physical_device);
+    logical_device = std::make_shared<device::Logical>(physical_device);
     swapchain = new Swapchain(logical_device);
     depth_stencil = image::View::create_depth_stencil(logical_device);
     render_pass = new RenderPass(swapchain);

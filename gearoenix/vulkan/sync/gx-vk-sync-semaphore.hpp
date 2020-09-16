@@ -1,27 +1,23 @@
 #ifndef GEAROENIX_VULKAN_SYNC_SEMAPHORE_HPP
 #define GEAROENIX_VULKAN_SYNC_SEMAPHORE_HPP
 #include "../../core/gx-cr-build-configuration.hpp"
-#ifdef USE_VULKAN
-#include "../gx-vk-linker.hpp"
-namespace gearoenix {
-namespace render {
-    namespace device {
-        class Logical;
-    }
-    namespace sync {
-        class Semaphore {
-        private:
-            device::Logical* logical_device;
-            VkSemaphore vulkan_data;
+#ifdef GX_USE_VULKAN
+#include "../../core/gx-cr-static.hpp"
+#include "../gx-vk-loader.hpp"
 
-        public:
-            Semaphore(device::Logical* logical_device);
-            ~Semaphore();
-            const device::Logical* get_logical_device() const;
-            const VkSemaphore& get_vulkan_data() const;
-        };
-    } // namespace sync
-} // namespace render
-} // namespace gearoenix
+namespace gearoenix::vulkan::device {
+class Logical;
+}
+
+namespace gearoenix::vulkan::sync {
+class Semaphore final {
+    GX_GET_REFC_PRV(std::shared_ptr<device::Logical>, logical_device)
+    GX_GET_VAL_PRV(VkSemaphore, vulkan_data, nullptr)
+
+public:
+    explicit Semaphore(std::shared_ptr<device::Logical> logical_device) noexcept;
+    ~Semaphore() noexcept;
+};
+}
 #endif
-#endif // GEAROENIX_RENDER_SYNC_SEMAPHORE_HPP
+#endif

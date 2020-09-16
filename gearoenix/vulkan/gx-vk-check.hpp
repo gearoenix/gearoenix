@@ -6,12 +6,16 @@
 #include "gx-vk-loader.hpp"
 #include <string>
 
-#define GX_VK_CHK(func)                                         \
-    {                                                           \
-        const VkResult res = Loader::func;                      \
-        if (VK_SUCCESS != res) {                                \
-            GXLOGF("Error in vulkan, result is " << res << ".") \
-        }                                                       \
+namespace gearoenix::vulkan {
+const char* result_to_string(VkResult res) noexcept;
+}
+
+#define GX_VK_CHK(func)                                                \
+    {                                                                  \
+        const VkResult GX_CONCAT_2(_vk_res_, __LINE__) = Loader::func; \
+        if (VK_SUCCESS != GX_CONCAT_2(_vk_res_, __LINE__)) {           \
+            GXLOGF(result_to_string(GX_CONCAT_2(_vk_res_, __LINE__)))  \
+        }                                                              \
     }
 
 #endif
