@@ -1,8 +1,7 @@
 #include "gx-vk-img-image.hpp"
-#ifdef USE_VULKAN
+#ifdef GX_USE_VULKAN
 #include "../../core/gx-cr-static.hpp"
 #include "../buffer/gx-vk-buf-buffer.hpp"
-#include "../buffer/gx-vk-buf-sub-buffer.hpp"
 #include "../command/gx-vk-cmd-buffer.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../device/gx-vk-dev-physical.hpp"
