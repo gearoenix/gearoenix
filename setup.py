@@ -23,8 +23,8 @@ if not os.path.exists(SDK_PATH):
     os.makedirs(SDK_PATH)
 
 
-def report_hook(blocknum, blocksize, totalsize):
-    bytesread = blocknum * blocksize
+def report_hook(block_num, block_size, totalsize):
+    bytesread = block_num * block_size
     if totalsize > 0:
         percent = bytesread * 1e2 / totalsize
         s = "\r%5.1f%% (%*d / %d bytes)" % (
@@ -45,9 +45,9 @@ def download_lib(lib_name, lib_pack_path, lib_url):
         urlretrieve(lib_url, lib_pack_path, report_hook)
         print('Download', lib_name, 'finished.')
         print('Extracting', lib_name, '...')
-        zip = ZipFile(lib_pack_path, 'r')
-        zip.extractall(SDK_PATH)
-        zip.close()
+        zip_file = ZipFile(lib_pack_path, 'r')
+        zip_file.extractall(SDK_PATH)
+        zip_file.close()
     else:
         print(lib_name, 'pack has been already downloaded.')
         print('If', lib_name,
@@ -59,7 +59,7 @@ def download_lib(lib_name, lib_pack_path, lib_url):
 
 SDL2_DIR_NAME = 'SDL2'
 SDL2_DIR_PATH = os.path.join(SDK_PATH, SDL2_DIR_NAME)
-SDL2_VERSION = '2.0.10'
+SDL2_VERSION = '2.0.12'
 SDL2_DIR_NAME_VER = SDL2_DIR_NAME + '-' + SDL2_VERSION
 SDL2_DIR_PATH_VER = os.path.join(SDK_PATH, SDL2_DIR_NAME_VER)
 SDL2_BUILD_DIR_PATH = os.path.join(SDK_PATH, 'sdl2-build')
@@ -72,7 +72,7 @@ if not os.path.exists(SDL2_DIR_PATH):
     shutil.move(SDL2_DIR_PATH_VER, SDL2_DIR_PATH)
 
 
-def take_careof_sdl2_proj(name, version):
+def take_care_of_sdl2_proj(name, version):
     dir_name = 'SDL2_' + name
     dir_path = os.path.join(SDK_PATH, dir_name)
     dir_name_ver = dir_name + '-' + version
@@ -85,18 +85,17 @@ def take_careof_sdl2_proj(name, version):
         shutil.move(dir_path_ver, dir_path)
 
 
-take_careof_sdl2_proj('image', '2.0.5')
-take_careof_sdl2_proj('mixer', '2.0.4')
-take_careof_sdl2_proj('net', '2.0.1')
-take_careof_sdl2_proj('ttf', '2.0.15')
+take_care_of_sdl2_proj('image', '2.0.5')
+take_care_of_sdl2_proj('mixer', '2.0.4')
+take_care_of_sdl2_proj('net', '2.0.1')
+take_care_of_sdl2_proj('ttf', '2.0.15')
 
-
-GLM_VERSION = '0.9.9.5'
+GLM_VERSION = '0.9.9.8'
 GLM_DIR_NAME = 'glm-' + GLM_VERSION
 GLM_DIR_PATH = os.path.join(SDK_PATH, GLM_DIR_NAME)
 GLM_PACK_NAME = GLM_DIR_NAME + '.zip'
 GLM_PACK_URL = 'https://github.com/g-truc/glm/releases/download/' + \
-    GLM_VERSION + '/' + GLM_PACK_NAME
+               GLM_VERSION + '/' + GLM_PACK_NAME
 GLM_PACK_PATH = os.path.join(SDK_PATH, GLM_PACK_NAME)
 download_lib(GLM_DIR_NAME, GLM_PACK_PATH, GLM_PACK_URL)
 
@@ -109,13 +108,22 @@ download_lib(STB_DIR_NAME, STB_PACK_PATH, STB_PACK_URL)
 if not os.path.exists(STB_DIR_PATH):
     shutil.move(os.path.join(SDK_PATH, 'stb-master'), STB_DIR_PATH)
 
-BOOST_VERSION = '1_72_0'
+VMA_DIR_NAME = 'vma'
+VMA_DIR_PATH = os.path.join(SDK_PATH, VMA_DIR_NAME)
+VMA_PACK_NAME = VMA_DIR_NAME + '.zip'
+VMA_PACK_URL = 'https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator/archive/master.zip'
+VMA_PACK_PATH = os.path.join(SDK_PATH, VMA_PACK_NAME)
+download_lib(VMA_DIR_NAME, VMA_PACK_PATH, VMA_PACK_URL)
+if not os.path.exists(VMA_DIR_PATH):
+    shutil.move(os.path.join(SDK_PATH, 'VulkanMemoryAllocator-master'), VMA_DIR_PATH)
+
+BOOST_VERSION = '1_74_0'
 BOOST_URL_VERSION = BOOST_VERSION.replace('_', '.')
 BOOST_DIR_VERSION = '_' + BOOST_VERSION
 BOOST_DIR_NAME = 'boost'
 BOOST_DIR_PATH = os.path.join(SDK_PATH, BOOST_DIR_NAME)
 BOOST_PACK_NAME = BOOST_DIR_NAME + BOOST_DIR_VERSION + '.zip'
-BOOST_PACK_URL = 'https://dl.bintray.com/boostorg/release/1.72.0/source/' + BOOST_PACK_NAME
+BOOST_PACK_URL = 'https://dl.bintray.com/boostorg/release/1.74.0/source/' + BOOST_PACK_NAME
 BOOST_PACK_PATH = os.path.join(SDK_PATH, BOOST_PACK_NAME)
 download_lib(BOOST_DIR_NAME, BOOST_PACK_PATH, BOOST_PACK_URL)
 if not os.path.exists(BOOST_DIR_PATH):
@@ -176,7 +184,7 @@ if IN_MACOS:
     if os.path.exists(IOS_LIBS_PATH):
         shutil.rmtree(IOS_LIBS_PATH)
     os.makedirs(IOS_LIBS_PATH)
-    print("Going to build iOS dependancies")
+    print("Going to build iOS dependencies")
     SDL2_BUILD_SCRIPTS_PATH = os.path.join(SDL2_DIR_PATH, 'build-scripts')
     IOS_BUILD_SCRIPT_NAME = 'iosbuild.sh'
     SDL2_IOS_BUILD_SCRIPTS_PATH = os.path.join(
@@ -195,7 +203,8 @@ if IN_MACOS:
         'BUILD_X86_64_IOSSIM=YES', 'BUILD_X86_64_IOSSIM=NO')
     ios_build_script = ios_build_script.replace(
         '-g -O0 -pipe -fPIC -fobjc-arc"\n',
-        '-Os -pipe -fPIC -fobjc-arc -fembed-bitcode-marker -fembed-bitcode -x objective-c"\nLDFLAGS="${LDFLAGS} -flto"\n')
+        '-Os -pipe -fPIC -fobjc-arc -fembed-bitcode-marker -fembed-bitcode -x objective-c"\nLDFLAGS="${LDFLAGS} '
+        '-flto"\n')
     ios_build_script = ios_build_script.replace(
         'x86_64-sim/lib/libSDL2.a i386-sim/lib/libSDL2.a', '')
     ios_build_script_file.write(ios_build_script)

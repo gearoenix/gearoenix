@@ -1,4 +1,5 @@
 #include "gx-vk-check.hpp"
+#ifdef GX_USE_VULKAN
 
 const char* gearoenix::vulkan::result_to_string(const VkResult res) noexcept
 {
@@ -73,3 +74,5 @@ const char* gearoenix::vulkan::result_to_string(const VkResult res) noexcept
         return "VK_RESULT_UNKNOWN";
     }
 }
+
+#endif
