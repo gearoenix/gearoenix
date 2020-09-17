@@ -1,38 +1,25 @@
 #ifndef GEAROENIX_VULKAN_MEMORY_MANAGER_HPP
 #define GEAROENIX_VULKAN_MEMORY_MANAGER_HPP
 #include "../../core/gx-cr-build-configuration.hpp"
-#ifdef USE_VULKAN
-#include "../../core/gc/gx-cr-gc.hpp"
-#include "../gx-vk-linker.hpp"
-namespace gearoenix {
-namespace render {
-    namespace device {
-        class Logical;
-    }
-    namespace memory {
-        class Memory;
-        class SubMemory;
-        class Manager : public core::gc::Gc {
-        public:
-            typedef enum : unsigned int {
-                GPU_LOCAL,
-                CPU_COHERENT,
-            } Place;
+#ifdef GX_USE_VULKAN
+#include "../../core/gx-cr-static.hpp"
+#include "../gx-vk-loader.hpp"
 
-        private:
-            unsigned int align, comalign, decomalign;
-            Memory* mem;
-            VkMemoryRequirements mem_reqs;
+#include <vk_mem_alloc.h>
 
-        public:
-            Manager(device::Logical* logical_device, unsigned int size, const Place& place = GPU_LOCAL);
-            ~Manager();
-            Memory* get_memory();
-            const Memory* get_memory() const;
-            SubMemory* create_submemory(unsigned int size);
-        };
-    } // namespace memory
-} // namespace render
-} // namespace gearoenix
+namespace gearoenix::vulkan::device {
+class Logical;
+}
+
+namespace gearoenix::vulkan::memory {
+class Memory;
+class Manager final {
+    GX_GET_REFC_PRV(std::shared_ptr<device::Logical>, logical_device)
+    GX_GET_VAL_PRV(VmaAllocator, allocator, nullptr)
+public:
+    explicit Manager(std::shared_ptr<device::Logical> logical_device) noexcept;
+    ~Manager() noexcept;
+};
+}
 #endif
-#endif // GEAROENIX_VULKAN_MEMORY_MANAGER_HPP
+#endif

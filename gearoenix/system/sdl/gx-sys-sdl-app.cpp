@@ -471,7 +471,7 @@ gearoenix::system::Application::Application(const int argc, const char* const* c
     }
 #ifdef GX_USE_VULKAN
     if (vulkan::Engine::is_supported()) {
-        supported_engine = render::engine::Type::VULKAN;
+        supported_engine = render::engine::Type::Vulkan;
     }
 #endif
 

@@ -2,16 +2,17 @@
 #define GEAROENIX_VULKAN_COMMAND_BUFFER_HPP
 #include "../../core/gx-cr-build-configuration.hpp"
 #ifdef GX_USE_VULKAN
+#include "../../core/gx-cr-static.hpp"
 #include "../gx-vk-loader.hpp"
 #include <memory>
 #include <vector>
 
-namespace gearoenix::render::command {
+namespace gearoenix::vulkan::command {
 class Pool;
-class Buffer {
+class Buffer final {
 private:
-    const std::shared_ptr<Pool> pool;
-    VkCommandBuffer vulkan_data {};
+    GX_GET_REFC_PRV(std::shared_ptr<Pool>, pool)
+    GX_GET_VAL_PRV(VkCommandBuffer, vulkan_data, nullptr)
 
 public:
     explicit Buffer(std::shared_ptr<Pool> pool) noexcept;
@@ -20,7 +21,6 @@ public:
     void reset() noexcept;
     void copy_buffer(VkBuffer src, VkBuffer des, const VkBufferCopy& region) noexcept;
     void flush() noexcept;
-    [[nodiscard]] const VkCommandBuffer& get_vulkan_data() const noexcept;
     void begin_render_pass_with_info(const VkRenderPassBeginInfo& render_pass_begin_info) noexcept;
     void set_viewport(const VkViewport& viewport) noexcept;
     void set_scissor(const VkRect2D& scissor) noexcept;

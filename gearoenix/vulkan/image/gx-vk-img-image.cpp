@@ -1,3 +1,4 @@
+#define VMA_IMPLEMENTATION
 #include "gx-vk-img-image.hpp"
 #ifdef GX_USE_VULKAN
 #include "../../core/gx-cr-static.hpp"
@@ -11,36 +12,43 @@
 #include "../memory/gx-vk-mem-memory.hpp"
 #include "../memory/gx-vk-mem-sub-memory.hpp"
 
-gearoenix::render::image::Image::Image(device::Logical* logical_device, const VkImage& vulkan_data, memory::Memory* mem)
-    : logical_device(logical_device)
+gearoenix::vulkan::image::Image::Image(
+    std::shared_ptr<device::Logical> ld,
+    VkImage vulkan_data,
+    std::shared_ptr<memory::Memory> mm) noexcept
+    : logical_device(std::move(ld))
+    , mem(std::move(mm))
     , vulkan_data(vulkan_data)
-    , mem(mem)
 {
 }
 
-gearoenix::render::image::Image::Image(device::Logical* logical_device, const VkImageCreateInfo& info, memory::Manager* mem_mgr)
-    : logical_device(logical_device)
-    , img_width(info.extent.width)
-    , img_height(info.extent.height)
-    , fmt(info.format)
+gearoenix::vulkan::image::Image::Image(
+    std::shared_ptr<device::Logical> ld,
+    const VkImageCreateInfo& info,
+    std::shared_ptr<memory::Manager> mem_mgr) noexcept
+    : logical_device(std::move(ld))
+    , image_width(info.extent.width)
+    , image_height(info.extent.height)
+    , format(info.format)
 {
-    const device::Physical* p = logical_device->get_physical_device();
-    const Linker* l = p->get_instance()->get_linker();
-    const VkDevice vk_dev = logical_device->get_vulkan_data();
-    VKC(l->vkCreateImage(vk_dev, &info, nullptr, &vulkan_data));
+    const auto vk_dev = logical_device->get_vulkan_data();
+    GX_VK_CHK(vkCreateImage(vk_dev, &info, nullptr, &vulkan_data))
     VkMemoryRequirements mem_requirements;
-    setz(mem_requirements);
-    l->vkGetImageMemoryRequirements(vk_dev, vulkan_data, &mem_requirements);
-    if (mem_mgr == nullptr) {
-        mem = new memory::Memory(logical_device, mem_requirements);
-        VKC(l->vkBindImageMemory(vk_dev, vulkan_data, mem->get_vulkan_data(), 0));
-    } else {
+    GX_SET_ZERO(mem_requirements)
+    Loader::vkGetImageMemoryRequirements(vk_dev, vulkan_data, &mem_requirements);
+    vmaCreateImage() if (mem_mgr == nullptr)
+    {
+        mem = std::make_shared<memory::Memory>(logical_device, mem_requirements);
+        GX_VK_CHK(vkBindImageMemory(vk_dev, vulkan_data, mem->get_vulkan_data(), 0))
+    }
+    else
+    {
         submem = mem_mgr->create_submemory(mem_requirements.size);
         VKC(l->vkBindImageMemory(vk_dev, vulkan_data, submem->get_memory()->get_vulkan_data(), submem->get_offset()));
     }
 }
 
-gearoenix::render::image::Image::~Image()
+gearoenix::vulkan::image::Image::~Image()
 {
     if (mem != nullptr || submem != nullptr) {
         const device::Physical* p = logical_device->get_physical_device();
@@ -53,17 +61,17 @@ gearoenix::render::image::Image::~Image()
     }
 }
 
-const VkImage& gearoenix::render::image::Image::get_vulkan_data() const
+const VkImage& gearoenix::vulkan::image::Image::get_vulkan_data() const
 {
     return vulkan_data;
 }
 
-const gearoenix::render::device::Logical* gearoenix::render::image::Image::get_logical_device() const
+const gearoenix::vulkan::device::Logical* gearoenix::vulkan::image::Image::get_logical_device() const
 {
     return logical_device;
 }
 
-void gearoenix::render::image::Image::transit(command::Buffer* c, const VkImageLayout& old_lyt, const VkImageLayout& new_lyt)
+void gearoenix::vulkan::image::Image::transit(command::Buffer* c, const VkImageLayout& old_lyt, const VkImageLayout& new_lyt)
 {
     const device::Physical* p = logical_device->get_physical_device();
     const Linker* l = p->get_instance()->get_linker();
@@ -104,12 +112,12 @@ void gearoenix::render::image::Image::transit(command::Buffer* c, const VkImageL
         1, &barrier);
 }
 
-void gearoenix::render::image::Image::transit_for_writing(command::Buffer* c)
+void gearoenix::vulkan::image::Image::transit_for_writing(command::Buffer* c)
 {
     transit(c, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 }
 
-void gearoenix::render::image::Image::copy_from_buffer(command::Buffer* c, buffer::SubBuffer* b)
+void gearoenix::vulkan::image::Image::copy_from_buffer(command::Buffer* c, buffer::SubBuffer* b)
 {
     const device::Physical* p = logical_device->get_physical_device();
     const Linker* l = p->get_instance()->get_linker();
@@ -147,12 +155,12 @@ void gearoenix::render::image::Image::copy_from_buffer(command::Buffer* c, buffe
         &region);
 }
 
-void gearoenix::render::image::Image::transit_for_reading(command::Buffer* c)
+void gearoenix::vulkan::image::Image::transit_for_reading(command::Buffer* c)
 {
     transit(c, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
-VkFormat gearoenix::render::image::Image::get_format() const
+VkFormat gearoenix::vulkan::image::Image::get_format() const
 {
 #ifdef DEBUG_MODE
     if (fmt == VK_FORMAT_UNDEFINED) {

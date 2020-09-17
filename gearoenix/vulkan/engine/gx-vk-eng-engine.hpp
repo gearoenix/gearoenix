@@ -131,7 +131,7 @@ public:
         const render::sync::Semaphore* const* nxts) noexcept final;
     //    Engine(system::Application* sys_app);
     //    ~Engine();
-    //    static bool is_supported();
+    [[nodiscard]] static bool is_supported() noexcept;
     //    void window_changed();
     //    void update();
     //    void terminate();
