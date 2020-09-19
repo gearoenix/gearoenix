@@ -10,75 +10,50 @@
 #include "../gx-vk-instance.hpp"
 #include "../memory/gx-vk-mem-manager.hpp"
 #include "../memory/gx-vk-mem-memory.hpp"
-#include "../memory/gx-vk-mem-sub-memory.hpp"
+#include "../memory/gx-vk-mem-vma.hpp"
 
 gearoenix::vulkan::image::Image::Image(
-    std::shared_ptr<device::Logical> ld,
+    std::shared_ptr<memory::Manager> mem_mgr,
     VkImage vulkan_data,
     std::shared_ptr<memory::Memory> mm) noexcept
-    : logical_device(std::move(ld))
-    , mem(std::move(mm))
+    : logical_device(mem_mgr->get_logical_device())
+    , memory_manager(std::move(mem_mgr))
+    , allocated_memory(std::move(mm))
     , vulkan_data(vulkan_data)
 {
 }
 
 gearoenix::vulkan::image::Image::Image(
-    std::shared_ptr<device::Logical> ld,
-    const VkImageCreateInfo& info,
+    std::uint32_t image_width,
+    std::uint32_t image_height,
+    VkFormat format,
     std::shared_ptr<memory::Manager> mem_mgr) noexcept
-    : logical_device(std::move(ld))
-    , image_width(info.extent.width)
-    , image_height(info.extent.height)
-    , format(info.format)
+    : logical_device(mem_mgr->get_logical_device())
+    , memory_manager(std::move(mem_mgr))
+    , image_width(image_width)
+    , image_height(image_height)
+    , format(format)
 {
-    const auto vk_dev = logical_device->get_vulkan_data();
-    GX_VK_CHK(vkCreateImage(vk_dev, &info, nullptr, &vulkan_data))
-    VkMemoryRequirements mem_requirements;
-    GX_SET_ZERO(mem_requirements)
-    Loader::vkGetImageMemoryRequirements(vk_dev, vulkan_data, &mem_requirements);
-    vmaCreateImage() if (mem_mgr == nullptr)
-    {
-        mem = std::make_shared<memory::Memory>(logical_device, mem_requirements);
-        GX_VK_CHK(vkBindImageMemory(vk_dev, vulkan_data, mem->get_vulkan_data(), 0))
-    }
-    else
-    {
-        submem = mem_mgr->create_submemory(mem_requirements.size);
-        VKC(l->vkBindImageMemory(vk_dev, vulkan_data, submem->get_memory()->get_vulkan_data(), submem->get_offset()));
-    }
+    VkImageCreateInfo info;
+    GX_SET_ZERO(info)
+    info.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+    info.extent.width = image_width;
+    info.extent.height = image_height;
+    std::tie(vulkan_data, allocated_memory) = memory_manager->create_image(info);
 }
 
-gearoenix::vulkan::image::Image::~Image()
+gearoenix::vulkan::image::Image::~Image() noexcept
 {
-    if (mem != nullptr || submem != nullptr) {
-        const device::Physical* p = logical_device->get_physical_device();
-        const Linker* l = p->get_instance()->get_linker();
-        l->vkDestroyImage(logical_device->get_vulkan_data(), vulkan_data, nullptr);
-        if (mem != nullptr)
-            delete mem;
-        if (submem != nullptr)
-            delete submem;
-    }
+    if (nullptr != allocated_memory)
+        memory_manager->destroy_image(vulkan_data, allocated_memory);
 }
 
-const VkImage& gearoenix::vulkan::image::Image::get_vulkan_data() const
+void gearoenix::vulkan::image::Image::transit(command::Buffer& c, const VkImageLayout& old_lyt, const VkImageLayout& new_lyt) noexcept
 {
-    return vulkan_data;
-}
-
-const gearoenix::vulkan::device::Logical* gearoenix::vulkan::image::Image::get_logical_device() const
-{
-    return logical_device;
-}
-
-void gearoenix::vulkan::image::Image::transit(command::Buffer* c, const VkImageLayout& old_lyt, const VkImageLayout& new_lyt)
-{
-    const device::Physical* p = logical_device->get_physical_device();
-    const Linker* l = p->get_instance()->get_linker();
     VkPipelineStageFlags src_stage;
     VkPipelineStageFlags dst_stage;
     VkImageMemoryBarrier barrier;
-    setz(barrier);
+    GX_SET_ZERO(barrier)
     barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
     barrier.oldLayout = old_lyt;
     barrier.newLayout = new_lyt;
@@ -101,10 +76,10 @@ void gearoenix::vulkan::image::Image::transit(command::Buffer* c, const VkImageL
         src_stage = VK_PIPELINE_STAGE_TRANSFER_BIT;
         dst_stage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
     } else {
-        LOGF("Unexpected");
+        GXLOGF("Unexpected layouts.")
     }
-    l->vkCmdPipelineBarrier(
-        c->get_vulkan_data(),
+    Loader::vkCmdPipelineBarrier(
+        c.get_vulkan_data(),
         src_stage, dst_stage,
         0,
         0, nullptr,
@@ -112,61 +87,48 @@ void gearoenix::vulkan::image::Image::transit(command::Buffer* c, const VkImageL
         1, &barrier);
 }
 
-void gearoenix::vulkan::image::Image::transit_for_writing(command::Buffer* c)
+void gearoenix::vulkan::image::Image::transit_for_writing(command::Buffer& c) noexcept
 {
     transit(c, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 }
 
-void gearoenix::vulkan::image::Image::copy_from_buffer(command::Buffer* c, buffer::SubBuffer* b)
+void gearoenix::vulkan::image::Image::copy_from_buffer(command::Buffer& c, buffer::Buffer& b) noexcept
 {
-    const device::Physical* p = logical_device->get_physical_device();
-    const Linker* l = p->get_instance()->get_linker();
-    const buffer::Buffer* buf = b->get_buffer();
     VkBufferImageCopy region;
-    setz(region);
-    region.bufferOffset = b->get_offset();
-    //    switch (fmt) {
-    //    case VK_FORMAT_R8G8B8A8_UNORM:
-    //        region.bufferRowLength = 4 * img_width;
-    //        break;
-    //    case VK_FORMAT_R8G8B8_UNORM:
-    //        region.bufferRowLength = 3 * img_width;
-    //        break;
-    //    default:
-    //        LOGF("Unexpected");
-    //    }
-    //    region.bufferImageHeight = img_height;
+    GX_SET_ZERO(region)
+    region.bufferOffset = b.get_offset();
+    switch (format) {
+    case VK_FORMAT_R8G8B8A8_UNORM:
+        region.bufferRowLength = 4 * image_width;
+        break;
+    case VK_FORMAT_R8G8B8_UNORM:
+        region.bufferRowLength = 3 * image_width;
+        break;
+    default:
+        GXLOGF("Unexpected format")
+    }
+    region.bufferImageHeight = image_height;
     region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
     region.imageSubresource.mipLevel = 0;
     region.imageSubresource.baseArrayLayer = 0;
     region.imageSubresource.layerCount = 1;
     region.imageOffset = { 0, 0, 0 };
     region.imageExtent = {
-        img_width,
-        img_height,
+        image_width,
+        image_height,
         1
     };
-    l->vkCmdCopyBufferToImage(
-        c->get_vulkan_data(),
-        buf->get_vulkan_data(),
+    Loader::vkCmdCopyBufferToImage(
+        c.get_vulkan_data(),
+        b.get_vulkan_data(),
         vulkan_data,
         VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
         1,
         &region);
 }
 
-void gearoenix::vulkan::image::Image::transit_for_reading(command::Buffer* c)
+void gearoenix::vulkan::image::Image::transit_for_reading(command::Buffer& c) noexcept
 {
     transit(c, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-}
-
-VkFormat gearoenix::vulkan::image::Image::get_format() const
-{
-#ifdef DEBUG_MODE
-    if (fmt == VK_FORMAT_UNDEFINED) {
-        LOGF("Unexpected");
-    }
-#endif
-    return fmt;
 }
 #endif
