@@ -115,20 +115,21 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
         leyer_color_data[i] = raw_color[i];
     }
     const std::function<std::shared_ptr<Texture>()> fun = [this, color_data { move(color_data) }, c, id]() mutable {
+        const TextureInfo txt_info {
+            .format = TextureFormat::RgbaFloat32,
+            .sample_info = SampleInfo {
+                .min_filter = Filter::Nearest,
+                .mag_filter = Filter::Nearest,
+                .wrap_s = Wrap::Repeat,
+                .wrap_t = Wrap::Repeat,
+                .wrap_r = Wrap::Repeat,
+            },
+            .texture_type = Type::Texture2D,
+            .has_mipmap = false,
+        };
         return e->create_texture_2d(
             id, "color-4d-" + std::to_string(id), std::move(color_data),
-            TextureInfo {
-                .format = TextureFormat::RgbaFloat32,
-                .sample_info = SampleInfo {
-                    .min_filter = Filter::Nearest,
-                    .mag_filter = Filter::Nearest,
-                    .wrap_s = Wrap::Repeat,
-                    .wrap_t = Wrap::Repeat,
-                    .wrap_r = Wrap::Repeat,
-                },
-                .texture_type = Type::Texture2D,
-                .has_mipmap = false,
-            },
+            txt_info,
             1, 1, core::sync::EndCaller<core::sync::EndCallerIgnore>([c] {}));
     };
     std::shared_ptr<Texture2D> data = std::dynamic_pointer_cast<Texture2D>(cache.get_cacher().get(id, fun));
@@ -189,7 +190,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     const auto resolution = e->get_system_application()->get_configuration().render_config.get_brdflut_resolution();
     if (nullptr != brdflut)
         return brdflut;
-    const auto texture_info = TextureInfo {
+    const TextureInfo texture_info {
         .format = TextureFormat::RgFloat32,
         .sample_info = SampleInfo {
             .wrap_s = Wrap::ClampToEdge,
@@ -389,23 +390,21 @@ std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::render::text
     std::vector<std::vector<std::uint8_t>> c2 = { std::move(c1) };
     std::vector<std::vector<std::vector<std::uint8_t>>> colors = { c2, c2, c2, c2, c2, std::move(c2) };
     const std::function<std::shared_ptr<Texture>()> fun = [this, colors { move(colors) }, c, id]() mutable {
-        return e->create_texture_cube(
-            id,
-            "texture-cube-colored-" + std::to_string(id),
-            std::move(colors),
-            TextureInfo {
-                .format = TextureFormat::RgbaFloat32,
-                .sample_info = SampleInfo {
-                    .min_filter = Filter::Nearest,
-                    .mag_filter = Filter::Nearest,
-                    .wrap_s = Wrap::Repeat,
-                    .wrap_t = Wrap::Repeat,
-                    .wrap_r = Wrap::Repeat,
-                },
-                .texture_type = Type::TextureCube,
-                .has_mipmap = false,
+        const TextureInfo txt_info {
+            .format = TextureFormat::RgbaFloat32,
+            .sample_info = SampleInfo {
+                .min_filter = Filter::Nearest,
+                .mag_filter = Filter::Nearest,
+                .wrap_s = Wrap::Repeat,
+                .wrap_t = Wrap::Repeat,
+                .wrap_r = Wrap::Repeat,
             },
-            1, core::sync::EndCaller<core::sync::EndCallerIgnore>([c] {}));
+            .texture_type = Type::TextureCube,
+            .has_mipmap = false,
+        };
+        return e->create_texture_cube(
+            id, "texture-cube-colored-" + std::to_string(id), std::move(colors), txt_info, 1,
+            core::sync::EndCaller<core::sync::EndCallerIgnore>([c] {}));
     };
     std::shared_ptr<TextureCube> data = std::dynamic_pointer_cast<TextureCube>(cache.get_cacher().get(id, fun));
     c.set_data(data);
@@ -446,17 +445,17 @@ std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::render::text
     const TextureInfo& info, const int img_aspect, core::sync::EndCaller<TextureCube>& c) noexcept
 {
     const auto id = core::asset::Manager::create_id();
-    const std::function<std::shared_ptr<Texture>()> fun = [this, &info, name { move(name) }, img_aspect, &c, id] {
+    const std::function<std::shared_ptr<Texture>()> fun = [this, &info, name { move(name) }, img_aspect, &c, id]() mutable noexcept {
         return e->create_texture_cube(id, std::move(name), {}, info, img_aspect, core::sync::EndCaller<core::sync::EndCallerIgnore>([c] {}));
     };
-    const auto data = std::dynamic_pointer_cast<TextureCube>(cache.get_cacher().get(id, fun));
+    auto data = std::dynamic_pointer_cast<TextureCube>(cache.get_cacher().get(id, fun));
     c.set_data(data);
     return data;
 }
 
 std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::render::texture::Manager::get_gx3d(const core::Id id, core::sync::EndCaller<Texture>& c) noexcept
 {
-    const std::shared_ptr<Texture> o = cache.get<Texture>(id, [this, id, &c](std::string name) noexcept {
+    std::shared_ptr<Texture> o = cache.get<Texture>(id, [this, id, &c](std::string name) noexcept {
         system::stream::Stream* const f = cache.get_file();
         return read_gx3d(id, std::move(name), f, c);
     });
@@ -470,9 +469,9 @@ std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::render::texture:
     core::sync::EndCaller<Texture>& c) noexcept
 {
     const auto id = core::asset::Manager::create_id();
-    const auto t = std::dynamic_pointer_cast<Texture>(cache.get_cacher().get<Texture>(
+    auto t = std::dynamic_pointer_cast<Texture>(cache.get_cacher().get<Texture>(
         id,
-        [this, name { move(name) }, id, &c, s]() noexcept {
+        [this, name { move(name) }, id, &c, s]() mutable noexcept {
             return read_gx3d(id, std::move(name), s, c);
         }));
     return t;

@@ -74,26 +74,27 @@ gearoenix::render::graph::node::ShadowMapper::ShadowMapper(
         frames[i] = std::make_unique<ShadowMapperFrame>(e);
     }
     const bool week_hwr = e->get_engine_type() == engine::Type::OpenGLES2;
+    const texture::TextureInfo txt_info {
+        .format = week_hwr ? texture::TextureFormat::D16 : texture::TextureFormat::D32,
+        .sample_info = texture::SampleInfo {
+            .min_filter = texture::Filter::Nearest,
+            .mag_filter = texture::Filter::Nearest,
+            .wrap_s = texture::Wrap::ClampToEdge,
+            .wrap_t = texture::Wrap::ClampToEdge,
+            .wrap_r = texture::Wrap::ClampToEdge,
+        },
+        .texture_type = texture::Type::Texture2D,
+        .has_mipmap = false,
+    };
+    const texture::AttachmentInfo info {
+        .texture_info = txt_info,
+        .img_width = static_cast<unsigned int>(week_hwr ? 1024 : 2048),
+        .img_height = static_cast<unsigned int>(week_hwr ? 1024 : 2048),
+        .usage = texture::UsageFlag::Depth,
+    };
+    const std::vector<texture::AttachmentInfo> infos { info };
     shadow_map_render_target = e->create_render_target(
-        core::asset::Manager::create_id(),
-        { texture::AttachmentInfo {
-            .texture_info = texture::TextureInfo {
-                .format = week_hwr ? texture::TextureFormat::D16 : texture::TextureFormat::D32,
-                .sample_info = texture::SampleInfo {
-                    .min_filter = texture::Filter::Nearest,
-                    .mag_filter = texture::Filter::Nearest,
-                    .wrap_s = texture::Wrap::ClampToEdge,
-                    .wrap_t = texture::Wrap::ClampToEdge,
-                    .wrap_r = texture::Wrap::ClampToEdge,
-                },
-                .texture_type = texture::Type::Texture2D,
-                .has_mipmap = false,
-            },
-            .img_width = static_cast<unsigned int>(week_hwr ? 1024 : 2048),
-            .img_height = static_cast<unsigned int>(week_hwr ? 1024 : 2048),
-            .usage = texture::UsageFlag::Depth,
-        } },
-        call);
+        core::asset::Manager::create_id(), infos, call);
     render_target = shadow_map_render_target.get();
     output_textures[0] = shadow_map_render_target->get_texture(0);
 }

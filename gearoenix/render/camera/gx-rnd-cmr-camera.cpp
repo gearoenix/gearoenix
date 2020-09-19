@@ -11,6 +11,7 @@
 #include "../model/gx-rnd-mdl-model.hpp"
 #include "../texture/gx-rnd-txt-target.hpp"
 #include "gx-rnd-cmr-transformation.hpp"
+#include <algorithm>
 
 #define GX_CAMERA_INIT                                                                                                                                                \
     core::asset::Asset(my_id, core::asset::Type::Camera, std::move(name)),                                                                                            \
