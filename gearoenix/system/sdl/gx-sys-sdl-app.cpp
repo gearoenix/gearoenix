@@ -470,7 +470,7 @@ gearoenix::system::Application::Application(const int argc, const char* const* c
         GXLOGF("Failed to initialize SDL: " << SDL_GetError())
     }
 #ifdef GX_USE_VULKAN
-    if (vulkan::Engine::is_supported()) {
+    if (vulkan::engine::Engine::is_supported()) {
         supported_engine = render::engine::Type::Vulkan;
     }
 #endif
@@ -498,8 +498,8 @@ gearoenix::system::Application::Application(const int argc, const char* const* c
     event_engine->initialize_mouse_position(mx, event_engine->get_window_height() - my);
 
 #ifdef GX_USE_VULKAN
-    if (nullptr == render_engine && supported_engine == render::engine::Type::VULKAN) {
-        render_engine = new vulkan::Engine(this);
+    if (nullptr == render_engine && supported_engine == render::engine::Type::Vulkan) {
+        render_engine = std::unique_ptr<vulkan::engine::Engine>(vulkan::engine::Engine::construct(this));
     }
 #endif
 

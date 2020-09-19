@@ -6,7 +6,6 @@
 #include "../gx-vk-loader.hpp"
 
 #include <memory>
-#include <vk_mem_alloc.h>
 
 namespace gearoenix::vulkan::buffer {
 class Buffer;
@@ -38,18 +37,21 @@ private:
 
 public:
     Image(
-        std::shared_ptr<memory::Manager> memory_manager,
+        std::shared_ptr<device::Logical> logical_device,
         VkImage vulkan_data,
         std::shared_ptr<memory::Memory> allocated_memory = nullptr) noexcept;
     Image(
         std::uint32_t image_width,
         std::uint32_t image_height,
+        std::uint32_t image_depth,
+        std::uint32_t mipmap_level,
+        std::uint32_t array_layers,
         VkFormat format,
         std::shared_ptr<memory::Manager> memory_manager) noexcept;
     ~Image() noexcept;
     void transit(command::Buffer& cmd, const VkImageLayout& old_lyt, const VkImageLayout& new_lyt) noexcept;
     void transit_for_writing(command::Buffer& cmd) noexcept;
-    void copy_from_buffer(command::Buffer& cmd, buffer::Buffer& buf) noexcept;
+    void copy_from_buffer(command::Buffer& cmd, const buffer::Buffer& buf) noexcept;
     void transit_for_reading(command::Buffer& cmd) noexcept;
 };
 }

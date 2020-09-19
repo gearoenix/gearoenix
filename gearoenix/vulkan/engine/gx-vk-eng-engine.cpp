@@ -38,13 +38,13 @@ gearoenix::vulkan::engine::Engine::Engine(system::Application* sys_app) noexcept
     surface = std::make_shared<Surface>(instance, this->sys_app);
     physical_device = std::make_shared<device::Physical>(surface);
     logical_device = std::make_shared<device::Logical>(physical_device);
-    swapchain = new Swapchain(logical_device);
-    depth_stencil = image::View::create_depth_stencil(logical_device);
+    swapchain = std::make_shared<Swapchain>(logical_device);
+    memory_manager = std::make_shared<memory::Manager>(logical_device);
+    depth_stencil = image::View::create_depth_stencil(*memory_manager);
     render_pass = new RenderPass(swapchain);
     const std::vector<image::View*>& frame_views = swapchain->get_image_views();
     graphic_cmd_pool = new command::Pool(logical_device);
     vmemmgr = new memory::Manager(logical_device, 1024 * 1024 * 10);
-    cmemmgr = new memory::Manager(logical_device, 1024 * 1024 * 10, memory::Manager::CPU_COHERENT);
     vbufmgr = new buffer::Manager(vmemmgr, 5 * 1024 * 1024);
     cbufmgr = new buffer::Manager(cmemmgr, 10 * 1024 * 1024);
     frames_count = frame_views.size();

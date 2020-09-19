@@ -1,23 +1,19 @@
-#define VMA_IMPLEMENTATION
 #include "gx-vk-img-image.hpp"
 #ifdef GX_USE_VULKAN
-#include "../../core/gx-cr-static.hpp"
 #include "../buffer/gx-vk-buf-buffer.hpp"
 #include "../command/gx-vk-cmd-buffer.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../device/gx-vk-dev-physical.hpp"
 #include "../gx-vk-check.hpp"
-#include "../gx-vk-instance.hpp"
 #include "../memory/gx-vk-mem-manager.hpp"
 #include "../memory/gx-vk-mem-memory.hpp"
-#include "../memory/gx-vk-mem-vma.hpp"
 
 gearoenix::vulkan::image::Image::Image(
-    std::shared_ptr<memory::Manager> mem_mgr,
+    std::shared_ptr<device::Logical> ld,
     VkImage vulkan_data,
     std::shared_ptr<memory::Memory> mm) noexcept
-    : logical_device(mem_mgr->get_logical_device())
-    , memory_manager(std::move(mem_mgr))
+    : logical_device(std::move(ld))
+    , memory_manager(nullptr)
     , allocated_memory(std::move(mm))
     , vulkan_data(vulkan_data)
 {
@@ -92,7 +88,7 @@ void gearoenix::vulkan::image::Image::transit_for_writing(command::Buffer& c) no
     transit(c, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 }
 
-void gearoenix::vulkan::image::Image::copy_from_buffer(command::Buffer& c, buffer::Buffer& b) noexcept
+void gearoenix::vulkan::image::Image::copy_from_buffer(command::Buffer& c, const buffer::Buffer& b) noexcept
 {
     VkBufferImageCopy region;
     GX_SET_ZERO(region)

@@ -70,6 +70,7 @@ private:
     std::shared_ptr<Surface> surface;
     std::shared_ptr<device::Physical> physical_device;
     std::shared_ptr<device::Logical> logical_device;
+    std::shared_ptr<memory::Manager> memory_manager;
     std::shared_ptr<Swapchain> swapchain;
     std::shared_ptr<image::View> depth_stencil;
     std::shared_ptr<RenderPass> render_pass;
@@ -81,7 +82,6 @@ private:
     std::shared_ptr<memory::Manager> vmemmgr;
     std::shared_ptr<buffer::Manager> vbufmgr;
     std::vector<std::shared_ptr<buffer::Manager>> uvbufmgr;
-    memory::Manager* cmemmgr;
     buffer::Manager* cbufmgr;
     std::vector<buffer::Manager*> ucbufmgr;
     pipeline::Manager* pipmgr;
@@ -98,7 +98,7 @@ private:
     explicit Engine(system::Application* sys_app) noexcept;
 
 public:
-    static Engine* construct(system::Application* sys_app) noexcept;
+    [[nodiscard]] static Engine* construct(system::Application* sys_app) noexcept;
     ~Engine() noexcept final;
     void update() noexcept final;
     void terminate() noexcept final;

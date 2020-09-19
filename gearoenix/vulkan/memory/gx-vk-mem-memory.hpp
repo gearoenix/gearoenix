@@ -7,6 +7,10 @@
 
 #include "gx-vk-mem-vma.hpp"
 
+#ifdef GX_DEBUG_MODE
+#define GX_DEBUG_VK_MEM
+#endif
+
 namespace gearoenix::vulkan::device {
 class Logical;
 }
@@ -16,7 +20,9 @@ class Manager;
 class Memory final {
     GX_GET_REFC_PRV(std::shared_ptr<Manager>, manager)
     GX_GET_VAL_PRV(VmaAllocation, allocation, nullptr)
-
+#ifdef GX_DEBUG_VK_MEM
+    GX_GETSET_VAL_PRV(bool, not_deleted, true)
+#endif
 public:
     Memory(std::shared_ptr<Manager> manager, VmaAllocation allocation) noexcept;
     ~Memory() noexcept;

@@ -11,6 +11,10 @@ namespace gearoenix::vulkan::device {
 class Logical;
 }
 
+namespace gearoenix::vulkan::buffer {
+class Buffer;
+}
+
 namespace gearoenix::vulkan::memory {
 class Memory;
 class Manager final : std::enable_shared_from_this<Manager> {
@@ -23,6 +27,7 @@ public:
     ~Manager() noexcept;
     [[nodiscard]] std::tuple<VkImage, std::shared_ptr<Memory>> create_image(const VkImageCreateInfo& info) noexcept;
     void destroy_image(VkImage image, std::shared_ptr<Memory>& mem) noexcept;
+    // [[nodiscard]] std::shared_ptr<buffer::Buffer>
 };
 }
 #endif

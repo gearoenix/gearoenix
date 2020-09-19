@@ -39,6 +39,7 @@ std::tuple<VkImage, std::shared_ptr<gearoenix::vulkan::memory::Memory>> gearoeni
 void gearoenix::vulkan::memory::Manager::destroy_image(VkImage image, std::shared_ptr<Memory>& mem) noexcept
 {
     vmaDestroyImage(allocator, image, mem->get_allocation());
+    mem->set_not_deleted(false);
 }
 
 #endif

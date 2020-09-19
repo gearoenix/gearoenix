@@ -1,6 +1,5 @@
 #include "gx-vk-swapchain.hpp"
 #ifdef GX_USE_VULKAN
-#include "../core/gx-cr-static.hpp"
 #include "device/gx-vk-dev-logical.hpp"
 #include "device/gx-vk-dev-physical.hpp"
 #include "gx-vk-check.hpp"
@@ -102,14 +101,14 @@ void gearoenix::vulkan::Swapchain::initialize() noexcept
     } else {
         GXLOGF("Error composite is unknown.")
     }
-    GX_VK_CHK(vkCreateSwapchainKHR(logical_device->get_vulkan_data(), &swapchain_create_info, nullptr, &vulkan_data))
+    GX_VK_CHK_L(vkCreateSwapchainKHR(logical_device->get_vulkan_data(), &swapchain_create_info, nullptr, &vulkan_data))
     std::uint32_t count = 0;
-    GX_VK_CHK(vkGetSwapchainImagesKHR(logical_device->get_vulkan_data(), vulkan_data, &count, nullptr))
+    GX_VK_CHK_L(vkGetSwapchainImagesKHR(logical_device->get_vulkan_data(), vulkan_data, &count, nullptr))
     std::vector<VkImage> images(count);
-    GX_VK_CHK(vkGetSwapchainImagesKHR(logical_device->get_vulkan_data(), vulkan_data, &count, images.data()))
+    GX_VK_CHK_L(vkGetSwapchainImagesKHR(logical_device->get_vulkan_data(), vulkan_data, &count, images.data()))
     image_views.reserve(static_cast<std::size_t>(count));
     for (uint32_t i = 0; i < count; ++i) {
-        image_views.emplace_back(new image::View(new image::Image(d, images[i]), format.format));
+        image_views.emplace_back(new image::View(std::make_shared<image::Image>(logical_device, images[i])));
     }
     if (nullptr != old_swapchain) {
         Loader::vkDestroySwapchainKHR(logical_device->get_vulkan_data(), old_swapchain, nullptr);

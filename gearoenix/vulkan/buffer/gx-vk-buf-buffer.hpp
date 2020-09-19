@@ -2,6 +2,7 @@
 #define GEAROENIX_VULKAN_BUFFER_BUFFER_HPP
 #include "../../core/gx-cr-build-configuration.hpp"
 #ifdef GX_USE_VULKAN
+#include "../../core/gx-cr-static.hpp"
 #include "../gx-vk-loader.hpp"
 
 namespace gearoenix::vulkan::command {
@@ -14,16 +15,14 @@ class Logical;
 
 namespace gearoenix::vulkan::memory {
 class Manager;
-class SubMemory;
+class Memory;
 }
 
 namespace gearoenix::vulkan::buffer {
-class Buffer {
-private:
-    device::Logical* device;
-    memory::SubMemory* smem;
-    void* buffer_data;
-    VkBuffer vulkan_data;
+class Buffer final {
+    GX_GET_CREF_PRV(std::shared_ptr<memory::Memory>, allocated_memory)
+    GX_GET_VAL_PRV(VkBuffer, vulkan_data, nullptr)
+    GX_GET_VAL_PRV(std::uint32_t, offset, 0)
 
 public:
     Buffer(
