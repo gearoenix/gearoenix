@@ -8,7 +8,11 @@
 #include <Windows.h>
 #endif
 
+#ifdef GX_IN_WINDOWS
+HMODULE gearoenix::vulkan::Loader::lib = nullptr;
+#else
 void* gearoenix::vulkan::Loader::lib = nullptr;
+#endif
 
 #define GX_HELPER(x) PFN_##x gearoenix::vulkan::Loader::x = nullptr
 GX_HELPER(vkCreateInstance);
@@ -226,7 +230,7 @@ void gearoenix::vulkan::Loader::load() noexcept
         GXLOGF("Vulkan library is not available.")
     }
 #ifdef GX_IN_WINDOWS
-#define VKL(x) x = static_cast<PFN_##x>(GetProcAddress(libvulkan, #x))
+#define VKL(x) x = reinterpret_cast<PFN_##x>(GetProcAddress(lib, #x))
 #else
 #define VKL(x) x = reinterpret_cast<PFN_##x>(dlsym(lib, #x))
 #endif

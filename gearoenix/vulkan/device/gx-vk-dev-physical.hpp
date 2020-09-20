@@ -4,6 +4,7 @@
 #ifdef GX_USE_VULKAN
 #include "../../core/gx-cr-static.hpp"
 #include "../gx-vk-loader.hpp"
+#include <limits>
 #include <memory>
 #include <vector>
 

@@ -24,7 +24,7 @@ namespace gearoenix::vulkan {
 class Loader {
 private:
 #ifdef GX_IN_WINDOWS
-    HMODULE lib;
+    static HMODULE lib;
 #else
     static void* lib;
 #endif
