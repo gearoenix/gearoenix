@@ -46,19 +46,17 @@ void gearoenix::system::Application::create_window() noexcept
 #endif
 
 #ifdef GX_USE_VULKAN
-    if (render::engine::Type::Vulkan == supported_engine) {
-        flags |= SDL_WINDOW_VULKAN;
-        window = SDL_CreateWindow(
-            GX_APP_NAME,
-            SDL_WINDOWPOS_CENTERED,
-            SDL_WINDOWPOS_CENTERED,
-            static_cast<int>(event_engine->get_window_width()),
-            static_cast<int>(event_engine->get_window_height()),
-            flags);
-        if (nullptr != window) {
-            GXLOGI("Vulkan SDL2 window created.")
-            return;
-        }
+    const auto vulkan_create_window_flags = flags | SDL_WINDOW_VULKAN;
+    window = SDL_CreateWindow(
+        GX_APP_NAME,
+        SDL_WINDOWPOS_CENTERED,
+        SDL_WINDOWPOS_CENTERED,
+        static_cast<int>(event_engine->get_window_width()),
+        static_cast<int>(event_engine->get_window_height()),
+        vulkan_create_window_flags);
+    if (nullptr != window) {
+        GXLOGD("Vulkan SDL2  window created.")
+        return;
     }
 #endif
 #if defined(GX_USE_OPENGL)
@@ -469,11 +467,6 @@ gearoenix::system::Application::Application(const int argc, const char* const* c
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_AUDIO) != 0) {
         GXLOGF("Failed to initialize SDL: " << SDL_GetError())
     }
-#ifdef GX_USE_VULKAN
-    if (vulkan::engine::Engine::is_supported()) {
-        supported_engine = render::engine::Type::Vulkan;
-    }
-#endif
 
 #ifdef GX_FULLSCREEN
     SDL_DisplayMode display_mode;

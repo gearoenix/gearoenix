@@ -12,7 +12,7 @@ gearoenix::vulkan::command::Pool::Pool(std::shared_ptr<device::Logical> ld) noex
     vk_cmd_pool_info.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
     vk_cmd_pool_info.queueFamilyIndex = logical_device->get_physical_device()->get_graphics_queue_node_index();
     vk_cmd_pool_info.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
-    GX_VK_CHK(vkCreateCommandPool(logical_device->get_vulkan_data(), &vk_cmd_pool_info, nullptr, &vulkan_data))
+    GX_VK_CHK_L(vkCreateCommandPool(logical_device->get_vulkan_data(), &vk_cmd_pool_info, nullptr, &vulkan_data))
 }
 
 gearoenix::vulkan::command::Pool::~Pool() noexcept

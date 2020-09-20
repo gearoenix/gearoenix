@@ -2,13 +2,19 @@
 #include "../../core/gx-cr-build-configuration.hpp"
 #include "../../system/gx-sys-log.hpp"
 #include "../../system/stream/gx-sys-stm-stream.hpp"
+// This is a workaround for warnings in stb
+#include "../../core/gx-cr-disable-warnings.hpp"
+
 #define STB_IMAGE_IMPLEMENTATION
 #define STBI_NO_STDIO
-#include <cstring>
 #include <stb_image.h>
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #define STBI_WRITE_NO_STDIO
 #include <stb_image_write.h>
+// Returning to our warning level
+#include "../../core/gx-cr-enable-warnings.hpp"
+
+#include <cstring>
 
 void gearoenix::render::texture::Image::encode_write_func(void* const context, void* const data, const int size) noexcept
 {

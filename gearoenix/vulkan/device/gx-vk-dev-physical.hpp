@@ -29,7 +29,17 @@ class Physical final {
     GX_GET_VAL_PRV(std::uint32_t, transfer_queue_node_index, std::numeric_limits<std::uint32_t>::max())
     GX_GET_VAL_PRV(std::uint32_t, compute_queue_node_index, std::numeric_limits<std::uint32_t>::max())
     GX_GET_VAL_PRV(std::uint32_t, present_queue_node_index, std::numeric_limits<std::uint32_t>::max())
-    int is_good(VkPhysicalDevice gpu) noexcept;
+
+    constexpr static VkFormat acceptable_depth_formats[] = {
+        VK_FORMAT_D32_SFLOAT_S8_UINT,
+        VK_FORMAT_D32_SFLOAT,
+        VK_FORMAT_D24_UNORM_S8_UINT,
+        VK_FORMAT_D16_UNORM_S8_UINT,
+        VK_FORMAT_D16_UNORM,
+    };
+
+private:
+    [[nodiscard]] int is_good(VkPhysicalDevice gpu) noexcept;
 
 public:
     explicit Physical(std::shared_ptr<Surface> surface) noexcept;

@@ -30,6 +30,8 @@ SET(GX_ENGINE_SRC
         "${GX_ENGINE_SRC_DIR}core/gx-cr-application.cpp"
         "${GX_ENGINE_SRC_DIR}core/gx-cr-application.hpp"
         "${GX_ENGINE_SRC_DIR}core/gx-cr-build-configuration.hpp"
+        "${GX_ENGINE_SRC_DIR}core/gx-cr-disable-warnings.hpp"
+        "${GX_ENGINE_SRC_DIR}core/gx-cr-enable-warnings.hpp"
         "${GX_ENGINE_SRC_DIR}core/gx-cr-function-loader.cpp"
         "${GX_ENGINE_SRC_DIR}core/gx-cr-function-loader.hpp"
         "${GX_ENGINE_SRC_DIR}core/gx-cr-language.hpp"

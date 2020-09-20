@@ -21,8 +21,7 @@ private:
     GX_GET_VAL_PRV(VkImageView, vulkan_data, nullptr)
 
 public:
-    View(std::shared_ptr<Image> img) noexcept;
-    //            View(Image* img, const VkImageViewCreateInfo& info);
+    explicit View(std::shared_ptr<Image> img) noexcept;
     ~View() noexcept;
     [[nodiscard]] static std::shared_ptr<View> create_depth_stencil(memory::Manager& mem_mgr) noexcept;
 };

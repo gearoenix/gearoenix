@@ -38,7 +38,7 @@ gearoenix::vulkan::device::Logical::Logical(std::shared_ptr<Physical> p) noexcep
     device_create_info.enabledExtensionCount = GX_COUNT_OF(device_extensions);
     device_create_info.ppEnabledExtensionNames = device_extensions;
     device_create_info.pEnabledFeatures = &device_features;
-    GX_VK_CHK(vkCreateDevice(physical_device->get_vulkan_data(), &device_create_info, nullptr, &vulkan_data));
+    GX_VK_CHK_L(vkCreateDevice(physical_device->get_vulkan_data(), &device_create_info, nullptr, &vulkan_data))
     Loader::vkGetDeviceQueue(vulkan_data, physical_device->get_graphics_queue_node_index(), 0, &graphic_queue);
 }
 

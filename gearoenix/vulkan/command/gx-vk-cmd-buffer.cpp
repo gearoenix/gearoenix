@@ -19,7 +19,7 @@ gearoenix::vulkan::command::Buffer::Buffer(std::shared_ptr<Pool> p) noexcept
     cmd_buf_allocate_info.commandPool = pool->get_vulkan_data();
     cmd_buf_allocate_info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
     cmd_buf_allocate_info.commandBufferCount = 1;
-    GX_VK_CHK(vkAllocateCommandBuffers(pool->get_logical_device()->get_vulkan_data(), &cmd_buf_allocate_info, &vulkan_data))
+    GX_VK_CHK_L(vkAllocateCommandBuffers(pool->get_logical_device()->get_vulkan_data(), &cmd_buf_allocate_info, &vulkan_data))
 }
 
 gearoenix::vulkan::command::Buffer::~Buffer() noexcept
@@ -34,7 +34,7 @@ void gearoenix::vulkan::command::Buffer::begin() noexcept
     VkCommandBufferBeginInfo cmd_buf_info;
     GX_SET_ZERO(cmd_buf_info)
     cmd_buf_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-    GX_VK_CHK(vkBeginCommandBuffer(vulkan_data, &cmd_buf_info))
+    GX_VK_CHK_L(vkBeginCommandBuffer(vulkan_data, &cmd_buf_info))
 }
 
 void gearoenix::vulkan::command::Buffer::copy_buffer(
@@ -46,13 +46,13 @@ void gearoenix::vulkan::command::Buffer::copy_buffer(
 void gearoenix::vulkan::command::Buffer::flush() noexcept
 {
     sync::Fence fence(pool->get_logical_device());
-    GX_VK_CHK(vkEndCommandBuffer(vulkan_data))
+    GX_VK_CHK_L(vkEndCommandBuffer(vulkan_data))
     VkSubmitInfo submit_info;
     GX_SET_ZERO(submit_info)
     submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
     submit_info.commandBufferCount = 1;
     submit_info.pCommandBuffers = &vulkan_data;
-    GX_VK_CHK(vkQueueSubmit(
+    GX_VK_CHK_L(vkQueueSubmit(
         pool->get_logical_device()->get_graphic_queue(),
         1, &submit_info, fence.get_vulkan_data()))
     fence.wait();
@@ -77,7 +77,7 @@ void gearoenix::vulkan::command::Buffer::set_scissor(const VkRect2D& scissor) no
 
 void gearoenix::vulkan::command::Buffer::end() noexcept
 {
-    GX_VK_CHK(vkEndCommandBuffer(vulkan_data))
+    GX_VK_CHK_L(vkEndCommandBuffer(vulkan_data))
 }
 
 //void gearoenix::vulkan::command::Buffer::bind(const std::shared_ptr<pipeline::ResourceSet>& r) noexcept

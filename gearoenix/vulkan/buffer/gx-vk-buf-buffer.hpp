@@ -26,16 +26,14 @@ class Buffer final {
 
 public:
     Buffer(
-        memory::Manager* mem_mgr, unsigned int size,
-        uint32_t usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
-    ~Buffer();
-    const VkBuffer& get_vulkan_data() const;
-    void copy(command::Buffer* command, Buffer* src);
-    void push_memory_barrier(command::Buffer* command) const;
-    const device::Logical* get_logical_device() const;
-    device::Logical* get_logical_device();
-    static uint32_t get_memory_type_bits(device::Logical* device, bool in_gpu);
-    void write(const void* data, unsigned int data_size, unsigned int offset);
+        memory::Manager& mem_mgr,
+        std::uint32_t size,
+        std::uint32_t usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT) noexcept;
+    ~Buffer() noexcept;
+    void copy(command::Buffer& command, const Buffer& src) noexcept;
+    void push_memory_barrier(command::Buffer& command) const noexcept;
+    [[nodiscard]] static std::uint32_t get_memory_type_bits(device::Logical& device, bool in_gpu) noexcept;
+    void write(const void* data, unsigned int data_size, unsigned int offset) noexcept;
 };
 }
 #endif

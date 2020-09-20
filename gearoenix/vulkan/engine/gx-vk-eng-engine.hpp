@@ -129,33 +129,8 @@ public:
         const render::command::Buffer* const* cmds,
         std::size_t nxts_count,
         const render::sync::Semaphore* const* nxts) noexcept final;
-    //    Engine(system::Application* sys_app);
-    //    ~Engine();
-    [[nodiscard]] static bool is_supported() noexcept;
     //    void window_changed();
-    //    void update();
-    //    void terminate();
-    //    const Linker* get_linker() const;
-    //    const device::Logical* get_logical_device() const;
-    //    device::Logical* get_logical_device();
-    //    RenderPass* get_render_pass();
-    //    buffer::Manager* get_gpu_buffer_manager();
-    //    buffer::Manager* get_cpu_buffer_manager();
-    //    buffer::Manager* get_uniform_gpu_buffer_manager(unsigned int i);
-    //    buffer::Manager* get_uniform_cpu_buffer_manager(unsigned int i);
-    //    system::Application* get_system_application();
-    //    memory::Manager* get_v_memory_manager();
-    //    memory::Manager* get_cpu_memory_manager();
-    //    const pipeline::Manager* get_pipeline_manager() const;
-    //    pipeline::Manager* get_pipeline_manager();
-    //    const texture::Sampler2D* get_sampler_2d() const;
-    //    texture::Sampler2D* get_sampler_2d();
-    //    unsigned int get_frames_count() const;
-    //    unsigned int get_current_frame_index() const;
     //    command::Buffer* get_current_command_buffer();
-    //    unsigned int load_scene(
-    //        core::Id scene_id, std::function<void(unsigned int)> on_load = [](unsigned int) {});
-    //    void push_todo(std::function<std::function<void()>(command::Buffer*)> fun);
 };
 }
 #endif

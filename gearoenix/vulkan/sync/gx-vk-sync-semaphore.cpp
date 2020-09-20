@@ -10,7 +10,7 @@ gearoenix::vulkan::sync::Semaphore::Semaphore(std::shared_ptr<device::Logical> l
     VkSemaphoreCreateInfo semaphore_create_info;
     GX_SET_ZERO(semaphore_create_info);
     semaphore_create_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-    GX_VK_CHK(vkCreateSemaphore(logical_device->get_vulkan_data(), &semaphore_create_info, nullptr, &vulkan_data))
+    GX_VK_CHK_L(vkCreateSemaphore(logical_device->get_vulkan_data(), &semaphore_create_info, nullptr, &vulkan_data))
 }
 
 gearoenix::vulkan::sync::Semaphore::~Semaphore() noexcept

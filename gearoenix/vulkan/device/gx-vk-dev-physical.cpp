@@ -78,9 +78,9 @@ gearoenix::vulkan::device::Physical::Physical(std::shared_ptr<Surface> surf) noe
     const auto& instance = surface->get_instance();
     const auto vk_ins = instance->get_vulkan_data();
     std::uint32_t gpu_count = 0;
-    GX_VK_CHK(vkEnumeratePhysicalDevices(vk_ins, &gpu_count, nullptr))
+    GX_VK_CHK_L(vkEnumeratePhysicalDevices(vk_ins, &gpu_count, nullptr))
     std::vector<VkPhysicalDevice> gpus(static_cast<std::size_t>(gpu_count));
-    GX_VK_CHK(vkEnumeratePhysicalDevices(vk_ins, &gpu_count, gpus.data()))
+    GX_VK_CHK_L(vkEnumeratePhysicalDevices(vk_ins, &gpu_count, gpus.data()))
     int best_device_index = -1;
     int best_device_point = -1;
     for (std::uint32_t i = 0; i < gpu_count; ++i) {
@@ -124,13 +124,8 @@ gearoenix::vulkan::device::Physical::Physical(std::shared_ptr<Surface> surf) noe
     Loader::vkGetPhysicalDeviceSurfaceFormatsKHR(vulkan_data, surface->get_vulkan_data(), &count, nullptr);
     surface_formats.resize(static_cast<std::size_t>(count));
     Loader::vkGetPhysicalDeviceSurfaceFormatsKHR(vulkan_data, surface->get_vulkan_data(), &count, surface_formats.data());
-    std::vector<VkFormat> depth_formats {
-        VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D32_SFLOAT,
-        VK_FORMAT_D24_UNORM_S8_UINT, VK_FORMAT_D16_UNORM_S8_UINT,
-        VK_FORMAT_D16_UNORM
-    };
     VkFormatProperties format_props;
-    for (auto& format : depth_formats) {
+    for (auto format : acceptable_depth_formats) {
         Loader::vkGetPhysicalDeviceFormatProperties(vulkan_data, format, &format_props);
         if (format_props.optimalTilingFeatures & VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT) {
             supported_depth_format = format;

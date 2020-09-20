@@ -13,19 +13,21 @@ gearoenix::vulkan::image::Image::Image(
     VkImage vulkan_data,
     std::shared_ptr<memory::Memory> mm) noexcept
     : logical_device(std::move(ld))
-    , memory_manager(nullptr)
     , allocated_memory(std::move(mm))
     , vulkan_data(vulkan_data)
 {
 }
 
 gearoenix::vulkan::image::Image::Image(
-    std::uint32_t image_width,
-    std::uint32_t image_height,
-    VkFormat format,
-    std::shared_ptr<memory::Manager> mem_mgr) noexcept
-    : logical_device(mem_mgr->get_logical_device())
-    , memory_manager(std::move(mem_mgr))
+    const std::uint32_t image_width,
+    const std::uint32_t image_height,
+    const std::uint32_t image_depth,
+    const std::uint32_t mipmap_level,
+    const std::uint32_t array_layers,
+    const VkImageUsageFlags usage,
+    const VkFormat format,
+    memory::Manager& mem_mgr) noexcept
+    : logical_device(mem_mgr.get_logical_device())
     , image_width(image_width)
     , image_height(image_height)
     , format(format)
@@ -33,15 +35,24 @@ gearoenix::vulkan::image::Image::Image(
     VkImageCreateInfo info;
     GX_SET_ZERO(info)
     info.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+    info.imageType = VK_IMAGE_TYPE_2D;
+    info.format = format;
     info.extent.width = image_width;
     info.extent.height = image_height;
-    std::tie(vulkan_data, allocated_memory) = memory_manager->create_image(info);
+    info.extent.depth = image_depth;
+    info.mipLevels = mipmap_level;
+    info.arrayLayers = array_layers;
+    info.samples = VK_SAMPLE_COUNT_1_BIT;
+    info.tiling = VK_IMAGE_TILING_OPTIMAL;
+    info.usage = usage;
+    info.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    std::tie(vulkan_data, allocated_memory) = mem_mgr.create_image(info);
 }
 
 gearoenix::vulkan::image::Image::~Image() noexcept
 {
     if (nullptr != allocated_memory)
-        memory_manager->destroy_image(vulkan_data, allocated_memory);
+        allocated_memory->get_manager()->destroy_image(vulkan_data, allocated_memory);
 }
 
 void gearoenix::vulkan::image::Image::transit(command::Buffer& c, const VkImageLayout& old_lyt, const VkImageLayout& new_lyt) noexcept
@@ -127,4 +138,5 @@ void gearoenix::vulkan::image::Image::transit_for_reading(command::Buffer& c) no
 {
     transit(c, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
+
 #endif
