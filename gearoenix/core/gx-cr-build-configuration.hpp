@@ -54,7 +54,8 @@
 #error "Not implemetned yet."
 #endif
 // Application constant definitions
-#define GX_APP_NAME "Gearoenix Demo App"
+#define GX_ENGINE_NAME "Gearoenix"
+#define GX_APP_NAME GX_ENGINE_NAME " Demo App"
 #define GX_APP_DATA_NAME "data.gx3d"
 // Application compilation mode
 #define GX_DEBUG_MODE

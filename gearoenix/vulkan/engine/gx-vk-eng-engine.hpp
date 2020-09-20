@@ -65,7 +65,6 @@ class Swapchain;
 namespace gearoenix::vulkan::engine {
 class Engine final : public render::engine::Engine {
 private:
-    system::Application* sys_app;
     std::shared_ptr<Instance> instance;
     std::shared_ptr<Surface> surface;
     std::shared_ptr<device::Physical> physical_device;
@@ -87,7 +86,6 @@ private:
     pipeline::Manager* pipmgr;
     texture::Sampler2D* sampler_2d;
     std::vector<command::Buffer*> cmd_bufs;
-    std::mutex todos_mutex;
     std::vector<std::function<std::function<void()>(command::Buffer*)>> todos;
     std::vector<std::vector<std::function<void()>>> frames_cleanups;
     std::vector<std::shared_ptr<scene::Scene>> loaded_scenes;

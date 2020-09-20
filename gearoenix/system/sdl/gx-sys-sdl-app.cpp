@@ -55,6 +55,7 @@ void gearoenix::system::Application::create_window() noexcept
         static_cast<int>(event_engine->get_window_height()),
         vulkan_create_window_flags);
     if (nullptr != window) {
+        supported_engine = render::engine::Type::Vulkan;
         GXLOGD("Vulkan SDL2  window created.")
         return;
     }

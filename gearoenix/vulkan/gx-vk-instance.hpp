@@ -3,7 +3,8 @@
 #include "../core/gx-cr-build-configuration.hpp"
 
 #ifdef GX_USE_VULKAN
-
+//SDL_Vulkan_GetInstanceExtensions
+#include "../core/gx-cr-static.hpp"
 #include "gx-vk-loader.hpp"
 #include <memory>
 #include <set>
@@ -12,17 +13,19 @@
 #define GX_VULKAN_INSTANCE_DEBUG
 #endif
 
+namespace gearoenix::system {
+class Application;
+}
+
 namespace gearoenix::vulkan {
 class Instance final {
-private:
-    VkInstance vulkan_data {};
+    GX_GET_VAL_PRV(VkInstance, vulkan_data, nullptr)
 #ifdef GX_VULKAN_INSTANCE_DEBUG
-    VkDebugReportCallbackEXT report_callback {};
+    GX_GET_VAL_PRV(VkDebugReportCallbackEXT, report_callback, nullptr)
 #endif
 public:
-    Instance() noexcept;
+    explicit Instance(system::Application* sys_app) noexcept;
     ~Instance() noexcept;
-    [[nodiscard]] const VkInstance& get_vulkan_data() const noexcept;
 };
 }
 #endif

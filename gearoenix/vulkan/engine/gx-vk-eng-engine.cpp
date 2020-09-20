@@ -30,12 +30,12 @@
 #include "../sync/gx-vk-sync-semaphore.hpp"
 #include "../texture/gx-vk-txt-sampler-2d.hpp"
 
-gearoenix::vulkan::engine::Engine::Engine(system::Application* sys_app) noexcept
+gearoenix::vulkan::engine::Engine::Engine(system::Application* const sys_app) noexcept
     : render::engine::Engine(sys_app, render::engine::Type::Vulkan)
 {
     Loader::load();
-    instance = std::make_shared<Instance>();
-    surface = std::make_shared<Surface>(instance, this->sys_app);
+    instance = std::make_shared<Instance>(sys_app);
+    surface = std::make_shared<Surface>(instance, sys_app);
     physical_device = std::make_shared<device::Physical>(surface);
     logical_device = std::make_shared<device::Logical>(physical_device);
     swapchain = std::make_shared<Swapchain>(logical_device);

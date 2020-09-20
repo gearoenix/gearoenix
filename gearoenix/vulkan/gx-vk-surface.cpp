@@ -3,13 +3,14 @@
 #include "../core/gx-cr-application.hpp"
 #include "../core/gx-cr-static.hpp"
 #include "../system/gx-sys-app.hpp"
-#include "gx-vk-check.hpp"
 #include "gx-vk-instance.hpp"
-#include <SDL_vulkan.h>
-#include <cstring>
 
 #ifdef GX_IN_ANDROID
 #include <android_native_app_glue.h>
+#endif
+
+#ifdef GX_USE_SDL
+#include <SDL_vulkan.h>
 #endif
 
 gearoenix::vulkan::Surface::Surface(std::shared_ptr<Instance> ins, const system::Application* const sys_app) noexcept

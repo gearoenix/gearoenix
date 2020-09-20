@@ -17,7 +17,7 @@ gearoenix::vulkan::memory::Manager::Manager(std::shared_ptr<device::Logical> ld)
     allocator_info.physicalDevice = phy_dev->get_vulkan_data();
     allocator_info.device = logical_device->get_vulkan_data();
     allocator_info.instance = phy_dev->get_surface()->get_instance()->get_vulkan_data();
-    GX_VK_CHK(vmaCreateAllocator(&allocator_info, &allocator))
+    allocator_info.pVulkanFunctions.GX_VK_CHK(vmaCreateAllocator(&allocator_info, &allocator))
 }
 
 gearoenix::vulkan::memory::Manager::~Manager() noexcept
