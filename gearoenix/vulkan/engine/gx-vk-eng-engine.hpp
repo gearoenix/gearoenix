@@ -2,7 +2,7 @@
 #define GEAROENIX_VULKAN_ENGINE_HPP
 #include "../../core/gx-cr-build-configuration.hpp"
 #ifdef GX_USE_VULKAN
-
+#include "../../core/gx-cr-static.hpp"
 #include "../../core/gx-cr-types.hpp"
 #include "../../render/engine/gx-rnd-eng-engine.hpp"
 #include <functional>
@@ -64,19 +64,18 @@ class Swapchain;
 
 namespace gearoenix::vulkan::engine {
 class Engine final : public render::engine::Engine {
-private:
-    std::shared_ptr<Instance> instance;
-    std::shared_ptr<Surface> surface;
-    std::shared_ptr<device::Physical> physical_device;
-    std::shared_ptr<device::Logical> logical_device;
-    std::shared_ptr<memory::Manager> memory_manager;
-    std::shared_ptr<Swapchain> swapchain;
-    std::shared_ptr<image::View> depth_stencil;
-    std::shared_ptr<RenderPass> render_pass;
-    std::vector<std::shared_ptr<Framebuffer>> framebuffers;
-    std::shared_ptr<command::Pool> graphic_cmd_pool;
-    std::shared_ptr<sync::Semaphore> present_complete_semaphore;
-    std::shared_ptr<sync::Semaphore> render_complete_semaphore;
+    GX_GET_CREF_PRV(std::shared_ptr<Instance>, instance)
+    GX_GET_CREF_PRV(std::shared_ptr<Surface>, surface)
+    GX_GET_CREF_PRV(std::shared_ptr<device::Physical>, physical_device)
+    GX_GET_CREF_PRV(std::shared_ptr<device::Logical>, logical_device)
+    GX_GET_CREF_PRV(std::shared_ptr<memory::Manager>, memory_manager)
+    GX_GET_CREF_PRV(std::shared_ptr<Swapchain>, swapchain)
+    GX_GET_CREF_PRV(std::shared_ptr<image::View>, depth_stencil)
+    GX_GET_CREF_PRV(std::shared_ptr<RenderPass>, render_pass)
+    GX_GET_CREF_PRV(std::vector<std::shared_ptr<Framebuffer>>, framebuffers)
+    GX_GET_CREF_PRV(std::shared_ptr<command::Pool>, graphic_cmd_pool)
+    GX_GET_CREF_PRV(std::shared_ptr<sync::Semaphore>, present_complete_semaphore)
+    GX_GET_CREF_PRV(std::shared_ptr<sync::Semaphore>, render_complete_semaphore)
     std::vector<std::shared_ptr<sync::Fence>> wait_fences;
     std::shared_ptr<memory::Manager> vmemmgr;
     std::shared_ptr<buffer::Manager> vbufmgr;

@@ -17,8 +17,35 @@ gearoenix::vulkan::memory::Manager::Manager(std::shared_ptr<device::Logical> ld)
     allocator_info.physicalDevice = phy_dev->get_vulkan_data();
     allocator_info.device = logical_device->get_vulkan_data();
     allocator_info.instance = phy_dev->get_surface()->get_instance()->get_vulkan_data();
-    //allocator_info.pVulkanFunctions.
+    static const VmaVulkanFunctions pointers {
+        .vkGetPhysicalDeviceProperties = Loader::vkGetPhysicalDeviceProperties,
+        .vkGetPhysicalDeviceMemoryProperties = Loader::vkGetPhysicalDeviceMemoryProperties,
+        .vkAllocateMemory = Loader::vkAllocateMemory,
+        .vkFreeMemory = Loader::vkFreeMemory,
+        .vkMapMemory = Loader::vkMapMemory,
+        .vkUnmapMemory = Loader::vkUnmapMemory,
+        .vkFlushMappedMemoryRanges = Loader::vkFlushMappedMemoryRanges,
+        .vkInvalidateMappedMemoryRanges = Loader::vkInvalidateMappedMemoryRanges,
+        .vkBindBufferMemory = Loader::vkBindBufferMemory,
+        .vkBindImageMemory = Loader::vkBindImageMemory,
+        .vkGetBufferMemoryRequirements = Loader::vkGetBufferMemoryRequirements,
+        .vkGetImageMemoryRequirements = Loader::vkGetImageMemoryRequirements,
+        .vkCreateBuffer = Loader::vkCreateBuffer,
+        .vkDestroyBuffer = Loader::vkDestroyBuffer,
+        .vkCreateImage = Loader::vkCreateImage,
+        .vkDestroyImage = Loader::vkDestroyImage,
+        .vkCmdCopyBuffer = Loader::vkCmdCopyBuffer,
+    };
+    allocator_info.pVulkanFunctions = &pointers;
     GX_VK_CHK(vmaCreateAllocator(&allocator_info, &allocator))
+}
+
+std::shared_ptr<gearoenix::vulkan::memory::Manager> gearoenix::vulkan::memory::Manager::construct(
+    std::shared_ptr<device::Logical> logical_device) noexcept
+{
+    std::shared_ptr<Manager> mgr(new Manager(std::move(logical_device)));
+    mgr->self = mgr;
+    return mgr;
 }
 
 gearoenix::vulkan::memory::Manager::~Manager() noexcept
@@ -31,10 +58,11 @@ std::tuple<VkImage, std::shared_ptr<gearoenix::vulkan::memory::Memory>> gearoeni
     VmaAllocationCreateInfo alloc_info {
         .usage = VMA_MEMORY_USAGE_GPU_ONLY
     };
-    VkImage img;
-    VmaAllocation alc;
-    GX_VK_CHK(vmaCreateImage(allocator, &info, &alloc_info, &img, &alc, nullptr))
-    return std::make_tuple(img, std::make_shared<Memory>(shared_from_this(), alc));
+    VkImage img = nullptr;
+    VmaAllocation alc = nullptr;
+    VmaAllocationInfo mem_info {};
+    GX_VK_CHK(vmaCreateImage(allocator, &info, &alloc_info, &img, &alc, &mem_info))
+    return std::make_tuple(img, std::make_shared<Memory>(self.lock(), alc));
 }
 
 void gearoenix::vulkan::memory::Manager::destroy_image(VkImage image, std::shared_ptr<Memory>& mem) noexcept

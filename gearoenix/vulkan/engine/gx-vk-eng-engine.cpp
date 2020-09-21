@@ -39,9 +39,9 @@ gearoenix::vulkan::engine::Engine::Engine(system::Application* const sys_app) no
     physical_device = std::make_shared<device::Physical>(surface);
     logical_device = std::make_shared<device::Logical>(physical_device);
     swapchain = std::make_shared<Swapchain>(logical_device);
-    memory_manager = std::make_shared<memory::Manager>(logical_device);
+    memory_manager = memory::Manager::construct(logical_device);
     depth_stencil = image::View::create_depth_stencil(*memory_manager);
-    //    render_pass = new RenderPass(swapchain);
+    render_pass = std::make_shared<RenderPass>(swapchain);
     //    const std::vector<image::View*>& frame_views = swapchain->get_image_views();
     //    graphic_cmd_pool = new command::Pool(logical_device);
     //    vmemmgr = new memory::Manager(logical_device, 1024 * 1024 * 10);
