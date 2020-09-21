@@ -12,6 +12,7 @@ class Target;
 namespace gearoenix::glc3::command {
 class Buffer final : public render::command::Buffer {
 public:
+    explicit Buffer(render::command::Type command_buffer_type) noexcept;
     ~Buffer() noexcept final = default;
     [[nodiscard]] std::pair<gl::uint, const texture::Target*> play(
         const texture::Target* bound_target,

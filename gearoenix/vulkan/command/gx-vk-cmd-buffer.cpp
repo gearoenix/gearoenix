@@ -10,16 +10,20 @@
 #define GX_VK_CMD_BUFF_DEBUG
 #endif
 
-gearoenix::vulkan::command::Buffer::Buffer(std::shared_ptr<Pool> p) noexcept
-    : pool(std::move(p))
+gearoenix::vulkan::command::Buffer::Buffer(
+    std::shared_ptr<Pool> p,
+    const render::command::Type command_buffer_type) noexcept
+    : render::command::Buffer(command_buffer_type)
+    , pool(std::move(p))
 {
-    VkCommandBufferAllocateInfo cmd_buf_allocate_info;
-    GX_SET_ZERO(cmd_buf_allocate_info)
-    cmd_buf_allocate_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    cmd_buf_allocate_info.commandPool = pool->get_vulkan_data();
-    cmd_buf_allocate_info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    cmd_buf_allocate_info.commandBufferCount = 1;
-    GX_VK_CHK_L(vkAllocateCommandBuffers(pool->get_logical_device()->get_vulkan_data(), &cmd_buf_allocate_info, &vulkan_data))
+    VkCommandBufferAllocateInfo info;
+    GX_SET_ZERO(info)
+    info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    info.commandPool = pool->get_vulkan_data();
+    info.level = (command_buffer_type == render::command::Type::Primary) ? VK_COMMAND_BUFFER_LEVEL_PRIMARY : VK_COMMAND_BUFFER_LEVEL_SECONDARY;
+    info.commandBufferCount = 1;
+    GX_VK_CHK_L(vkAllocateCommandBuffers(
+        pool->get_logical_device()->get_vulkan_data(), &info, &vulkan_data))
 }
 
 gearoenix::vulkan::command::Buffer::~Buffer() noexcept

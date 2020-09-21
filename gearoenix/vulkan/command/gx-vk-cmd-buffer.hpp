@@ -2,29 +2,26 @@
 #define GEAROENIX_VULKAN_COMMAND_BUFFER_HPP
 #include "../../core/gx-cr-build-configuration.hpp"
 #ifdef GX_USE_VULKAN
-#include "../../core/gx-cr-static.hpp"
+#include "../../render/command/gx-rnd-cmd-buffer.hpp"
 #include "../gx-vk-loader.hpp"
-#include <memory>
-#include <vector>
 
 namespace gearoenix::vulkan::command {
 class Pool;
-class Buffer final {
+class Buffer final : public render::command::Buffer {
 private:
     GX_GET_REFC_PRV(std::shared_ptr<Pool>, pool)
     GX_GET_VAL_PRV(VkCommandBuffer, vulkan_data, nullptr)
 
 public:
-    explicit Buffer(std::shared_ptr<Pool> pool) noexcept;
-    ~Buffer() noexcept;
-    void begin() noexcept;
-    void reset() noexcept;
+    Buffer(std::shared_ptr<Pool> pool, render::command::Type command_buffer_type) noexcept;
+    ~Buffer() noexcept final;
+    void begin() noexcept final;
     void copy_buffer(VkBuffer src, VkBuffer des, const VkBufferCopy& region) noexcept;
     void flush() noexcept;
     void begin_render_pass_with_info(const VkRenderPassBeginInfo& render_pass_begin_info) noexcept;
     void set_viewport(const VkViewport& viewport) noexcept;
     void set_scissor(const VkRect2D& scissor) noexcept;
-    void end() noexcept;
+    void end() noexcept final;
     void end_render_pass() noexcept;
     void bind_pipeline(VkPipeline pip) noexcept;
     void bind_descriptor_set(

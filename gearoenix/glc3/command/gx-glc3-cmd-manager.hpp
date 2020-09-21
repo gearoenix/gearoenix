@@ -7,10 +7,9 @@
 namespace gearoenix::glc3::command {
 class Manager : public render::command::Manager {
 public:
-    render::command::Buffer* create_primary_command_buffer() noexcept final;
-    render::command::Buffer* create_secondary_command_buffer() noexcept final;
-    render::command::Buffer* create_primary_command_buffer(unsigned int kernel_index) noexcept final;
-    render::command::Buffer* create_secondary_command_buffer(unsigned int kernel_index) noexcept final;
+    [[nodiscard]] render::command::Buffer* create_command_buffer(
+        render::command::Type command_buffer_type,
+        std::optional<std::size_t> thread_id) noexcept final;
 };
 }
 #endif

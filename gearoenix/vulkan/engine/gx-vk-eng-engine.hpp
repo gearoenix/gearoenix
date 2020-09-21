@@ -21,6 +21,7 @@ class Manager;
 
 namespace gearoenix::vulkan::command {
 class Buffer;
+class Manager;
 class Pool;
 }
 

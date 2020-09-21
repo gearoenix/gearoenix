@@ -1,6 +1,10 @@
 #include "gx-rnd-cmd-buffer.hpp"
-#include "../../core/gx-cr-build-configuration.hpp"
 #include "../../system/gx-sys-log.hpp"
+
+gearoenix::render::command::Buffer::Buffer(Type command_buffer_type) noexcept
+    : command_buffer_type(command_buffer_type)
+{
+}
 
 void gearoenix::render::command::Buffer::begin() noexcept
 {

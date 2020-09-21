@@ -10,6 +10,7 @@
 #include "../buffer/gx-vk-buf-buffer.hpp"
 #include "../buffer/gx-vk-buf-manager.hpp"
 #include "../command/gx-vk-cmd-buffer.hpp"
+#include "../command/gx-vk-cmd-manager.hpp"
 #include "../command/gx-vk-cmd-pool.hpp"
 #include "../descriptor/gx-vk-des-pool.hpp"
 #include "../descriptor/gx-vk-des-set.hpp"
@@ -42,8 +43,9 @@ gearoenix::vulkan::engine::Engine::Engine(system::Application* const sys_app) no
     memory_manager = memory::Manager::construct(logical_device);
     depth_stencil = image::View::create_depth_stencil(*memory_manager);
     render_pass = std::make_shared<RenderPass>(swapchain);
-    //    const std::vector<image::View*>& frame_views = swapchain->get_image_views();
-    //    graphic_cmd_pool = new command::Pool(logical_device);
+    const auto& frame_views = swapchain->get_image_views();
+    command_manager = std::make_unique<command::Manager>(logical_device);
+    graphic_cmd_pool = std::make_shared<command::Pool>(logical_device);
     //    vmemmgr = new memory::Manager(logical_device, 1024 * 1024 * 10);
     //    vbufmgr = new buffer::Manager(vmemmgr, 5 * 1024 * 1024);
     //    cbufmgr = new buffer::Manager(cmemmgr, 10 * 1024 * 1024);
