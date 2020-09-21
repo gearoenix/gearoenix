@@ -3,7 +3,6 @@
 #include <gearoenix/core/event/gx-cr-ev-engine.hpp>
 #include <gearoenix/core/gx-cr-string.hpp>
 #include <gearoenix/math/gx-math-aabb.hpp>
-#include <gearoenix/math/gx-math-vertex.hpp>
 #include <gearoenix/physics/body/gx-phs-bd-rigid.hpp>
 #include <gearoenix/physics/collider/gx-phs-cld-sphere.hpp>
 #include <gearoenix/render/camera/gx-rnd-cmr-manager.hpp>
@@ -42,26 +41,19 @@ using GxEndCaller = gearoenix::core::sync::EndCaller<T>;
 
 using GxEndCallerIgnore = gearoenix::core::sync::EndCallerIgnore;
 using GxEndCallerIgnored = GxEndCaller<GxEndCallerIgnore>;
-using GxGrTree = gearoenix::render::graph::tree::Tree;
 using GxMatPbr = gearoenix::render::material::Pbr;
-using GxMdManager = gearoenix::render::model::Manager;
 using GxMdMesh = gearoenix::render::model::Mesh;
 using GxMesh = gearoenix::render::mesh::Mesh;
 using GxDirLight = gearoenix::render::light::Directional;
-using GxLtManager = gearoenix::render::light::Manager;
 using GxPersCam = gearoenix::render::camera::Perspective;
 using GxTexture = gearoenix::render::texture::Texture;
 using GxTexture2D = gearoenix::render::texture::Texture2D;
-using GxCldSphere = gearoenix::physics::collider::Sphere;
-using GxVertex = gearoenix::math::BasicVertex;
 using GxAabb3 = gearoenix::math::Aabb3;
-using GxStream = gearoenix::system::stream::Stream;
 using GxEventId = gearoenix::core::event::Id;
 using GxMouseData = gearoenix::core::event::button::MouseData;
 using GxMouseKeyId = gearoenix::core::event::button::MouseKeyId;
 using GxMouseActionId = gearoenix::core::event::button::MouseActionId;
-using GxMovementBase = gearoenix::core::event::movement::Base2D;
-using GxTxtSampleInfo = gearoenix::render::texture::SampleInfo;
+using GxTxtSamplerInfo = gearoenix::render::texture::SamplerInfo;
 using GxTxtFilter = gearoenix::render::texture::Filter;
 
 void IblBaker::on_open() noexcept
@@ -226,7 +218,7 @@ IblBaker::IblBaker(gearoenix::system::Application* const sys_app) noexcept
 
     if (called_from_cli) {
         GxEndCaller<GxTexture2D> txt_call([end_call](const std::shared_ptr<GxTexture2D>&) {});
-        GxTxtSampleInfo smp;
+        GxTxtSamplerInfo smp;
         smp.min_filter = GxTxtFilter::Linear;
         sky->get_mat_equ()->set_color(txt_mgr->create_2d_f("env", environment_file, txt_call, smp, false));
 
@@ -297,7 +289,7 @@ void IblBaker::open_environment() noexcept
             static_cast<gearoenix::render::texture::Texture*>(rtr->get_irradiance().get())->write_gx3d(irradiance_file, GX_DEFAULT_IGNORED_END_CALLER);
         });
     });
-    GxTxtSampleInfo smp;
+    GxTxtSamplerInfo smp;
     smp.min_filter = GxTxtFilter::Linear;
     /// TODO failure management
     static int env_i = 0;

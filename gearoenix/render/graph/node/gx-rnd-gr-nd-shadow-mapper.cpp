@@ -76,7 +76,7 @@ gearoenix::render::graph::node::ShadowMapper::ShadowMapper(
     const bool week_hwr = e->get_engine_type() == engine::Type::OpenGLES2;
     const texture::TextureInfo txt_info {
         .format = week_hwr ? texture::TextureFormat::D16 : texture::TextureFormat::D32,
-        .sample_info = texture::SampleInfo {
+        .sampler_info = texture::SamplerInfo {
             .min_filter = texture::Filter::Nearest,
             .mag_filter = texture::Filter::Nearest,
             .wrap_s = texture::Wrap::ClampToEdge,

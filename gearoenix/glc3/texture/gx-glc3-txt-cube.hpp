@@ -19,7 +19,7 @@ private:
         core::Id id,
         std::string name,
         render::texture::TextureFormat texture_format,
-        const render::texture::SampleInfo& sample_info,
+        const render::texture::SamplerInfo& sample_info,
         engine::Engine* engine) noexcept;
 
 public:

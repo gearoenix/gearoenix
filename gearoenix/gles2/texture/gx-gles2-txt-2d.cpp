@@ -11,9 +11,9 @@ gearoenix::gles2::texture::Texture2D::Texture2D(
     const core::Id id,
     std::string name,
     const render::texture::TextureFormat texture_format,
-    const render::texture::SampleInfo& sample_info,
+    const render::texture::SamplerInfo& sampler_info,
     engine::Engine* const e) noexcept
-    : render::texture::Texture2D(id, std::move(name), texture_format, sample_info, e)
+    : render::texture::Texture2D(id, std::move(name), texture_format, sampler_info, e)
 {
 }
 
@@ -27,10 +27,10 @@ std::shared_ptr<gearoenix::gles2::texture::Texture2D> gearoenix::gles2::texture:
     const std::size_t img_height,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
 {
-    std::shared_ptr<Texture2D> result(new Texture2D(id, std::move(name), info.format, info.sample_info, e));
+    std::shared_ptr<Texture2D> result(new Texture2D(id, std::move(name), info.format, info.sampler_info, e));
     result->img_width = img_width;
     result->img_height = img_height;
-    const SampleInfo sample_info(info.sample_info);
+    const SamplerInfo sample_info(info.sampler_info);
     const bool needs_mipmap = info.has_mipmap;
     const auto cf = convert(info.format);
     const auto gl_img_width = static_cast<gl::sizei>(img_width);

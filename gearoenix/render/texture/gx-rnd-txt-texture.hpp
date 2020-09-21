@@ -3,7 +3,7 @@
 #include "../../core/asset/gx-cr-asset.hpp"
 #include "../../core/sync/gx-cr-sync-end-caller.hpp"
 #include "gx-rnd-txt-format.hpp"
-#include "gx-rnd-txt-sample.hpp"
+#include "gx-rnd-txt-sampler.hpp"
 #include "gx-rnd-txt-type.hpp"
 
 namespace gearoenix::render::engine {
@@ -19,14 +19,14 @@ class Texture : public core::asset::Asset {
     GX_GET_CVAL_PRT(Type, texture_type)
     GX_GET_VAL_PRT(TextureFormat, texture_format, TextureFormat::RgbaUint8)
     GX_GET_CPTR_PRT(engine::Engine, render_engine)
-    GX_GET_CREF_PRT(SampleInfo, sample_info)
+    GX_GET_CREF_PRT(SamplerInfo, sample_info)
 protected:
     Texture(
         core::Id my_id,
         std::string name,
         Type texture_type,
         TextureFormat texture_format,
-        const SampleInfo& sample_info,
+        const SamplerInfo& sample_info,
         engine::Engine* e) noexcept;
 
     static void write_gx3d_image(

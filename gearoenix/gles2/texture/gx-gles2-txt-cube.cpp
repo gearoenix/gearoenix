@@ -22,9 +22,9 @@ gearoenix::gles2::texture::TextureCube::TextureCube(
     const core::Id id,
     std::string name,
     const render::texture::TextureFormat texture_format,
-    const render::texture::SampleInfo& sample_info,
+    const render::texture::SamplerInfo& sampler_info,
     engine::Engine* const engine) noexcept
-    : render::texture::TextureCube(id, std::move(name), texture_format, sample_info, engine)
+    : render::texture::TextureCube(id, std::move(name), texture_format, sampler_info, engine)
 {
 }
 
@@ -37,9 +37,9 @@ std::shared_ptr<gearoenix::gles2::texture::TextureCube> gearoenix::gles2::textur
     const unsigned int aspect,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
 {
-    std::shared_ptr<TextureCube> result(new TextureCube(id, std::move(name), info.format, info.sample_info, e));
+    std::shared_ptr<TextureCube> result(new TextureCube(id, std::move(name), info.format, info.sampler_info, e));
     result->aspect = aspect;
-    const SampleInfo sample_info = SampleInfo(info.sample_info);
+    const SamplerInfo sample_info = SamplerInfo(info.sampler_info);
     const auto cf = Texture2D::convert(info.format);
     const auto gl_aspect = static_cast<gl::sizei>(aspect);
     std::vector<std::vector<std::vector<std::uint8_t>>> pixels(GX_COUNT_OF(FACES));

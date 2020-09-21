@@ -2,7 +2,7 @@
 #ifdef GX_USE_OPENGL_ES2
 #include "../../system/gx-sys-log.hpp"
 
-gearoenix::gles2::texture::SampleInfo::SampleInfo(const render::texture::SampleInfo& o) noexcept
+gearoenix::gles2::texture::SamplerInfo::SamplerInfo(const render::texture::SamplerInfo& o) noexcept
 {
     switch (o.mag_filter) {
     case render::texture::Filter::Nearest:

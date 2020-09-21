@@ -51,8 +51,8 @@ class Fence;
 class Semaphore;
 }
 
-namespace gearoenix::vulkan::texture {
-class Sampler2D;
+namespace gearoenix::vulkan::sampler {
+class Manager;
 }
 
 namespace gearoenix::vulkan {
@@ -70,6 +70,7 @@ class Engine final : public render::engine::Engine {
     GX_GET_CREF_PRV(std::shared_ptr<device::Physical>, physical_device)
     GX_GET_CREF_PRV(std::shared_ptr<device::Logical>, logical_device)
     GX_GET_CREF_PRV(std::shared_ptr<memory::Manager>, memory_manager)
+    GX_GET_CREF_PRV(std::shared_ptr<sampler::Manager>, sampler_manager)
     GX_GET_CREF_PRV(std::shared_ptr<Swapchain>, swapchain)
     GX_GET_CREF_PRV(std::shared_ptr<image::View>, depth_stencil)
     GX_GET_CREF_PRV(std::shared_ptr<RenderPass>, render_pass)
@@ -77,21 +78,8 @@ class Engine final : public render::engine::Engine {
     GX_GET_CREF_PRV(std::shared_ptr<command::Pool>, graphic_cmd_pool)
     GX_GET_CREF_PRV(std::shared_ptr<sync::Semaphore>, present_complete_semaphore)
     GX_GET_CREF_PRV(std::shared_ptr<sync::Semaphore>, render_complete_semaphore)
-    std::vector<std::shared_ptr<sync::Fence>> wait_fences;
-    std::shared_ptr<memory::Manager> vmemmgr;
-    std::shared_ptr<buffer::Manager> vbufmgr;
-    std::vector<std::shared_ptr<buffer::Manager>> uvbufmgr;
-    buffer::Manager* cbufmgr;
-    std::vector<buffer::Manager*> ucbufmgr;
-    pipeline::Manager* pipmgr;
-    texture::Sampler2D* sampler_2d;
-    std::vector<command::Buffer*> cmd_bufs;
-    std::vector<std::function<std::function<void()>(command::Buffer*)>> todos;
-    std::vector<std::vector<std::function<void()>>> frames_cleanups;
-    std::vector<std::shared_ptr<scene::Scene>> loaded_scenes;
-    uint32_t current_frame = 9999999;
-    uint32_t frames_count = 9999999;
-    //    void setup_draw_buffers();
+    GX_GET_CREF_PRV(std::vector<std::shared_ptr<sync::Fence>>, wait_fences)
+    GX_GET_CREF_PRV(std::vector<std::shared_ptr<command::Buffer>>, frames_command_buffers)
 
     explicit Engine(system::Application* sys_app) noexcept;
 
@@ -127,8 +115,6 @@ public:
         const render::command::Buffer* const* cmds,
         std::size_t nxts_count,
         const render::sync::Semaphore* const* nxts) noexcept final;
-    //    void window_changed();
-    //    command::Buffer* get_current_command_buffer();
 };
 }
 #endif

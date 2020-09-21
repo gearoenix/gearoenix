@@ -26,9 +26,9 @@ gearoenix::glc3::texture::TextureCube::TextureCube(
     const core::Id id,
     std::string name,
     const render::texture::TextureFormat texture_format,
-    const render::texture::SampleInfo& sample_info,
+    const render::texture::SamplerInfo& sampler_info,
     engine::Engine* const engine) noexcept
-    : render::texture::TextureCube(id, std::move(name), texture_format, sample_info, engine)
+    : render::texture::TextureCube(id, std::move(name), texture_format, sampler_info, engine)
 {
 }
 
@@ -41,9 +41,9 @@ std::shared_ptr<gearoenix::glc3::texture::TextureCube> gearoenix::glc3::texture:
     const std::size_t aspect,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
 {
-    std::shared_ptr<TextureCube> result(new TextureCube(id, std::move(name), info.format, info.sample_info, engine));
+    std::shared_ptr<TextureCube> result(new TextureCube(id, std::move(name), info.format, info.sampler_info, engine));
     result->aspect = aspect;
-    const SampleInfo sample_info = SampleInfo(info.sample_info);
+    const SampleInfo sample_info = SampleInfo(info.sampler_info);
     const auto internal_format = Texture2D::convert_internal_format(engine, result->texture_format);
     const auto format = Texture2D::convert_format(result->texture_format);
     const auto data_format = Texture2D::convert_data_format(result->texture_format);
@@ -89,7 +89,7 @@ std::shared_ptr<gearoenix::glc3::texture::TextureCube> gearoenix::glc3::texture:
         for (int fi = 0; fi < static_cast<int>(GX_COUNT_OF(FACES)); ++fi) {
             const auto& face_pixels = pixels[fi];
             auto level_aspect = gl_aspect;
-            for (std::size_t level_index = 0; level_index < face_pixels.size(); ++level_index, level_aspect >>= 1) {
+            for (std::size_t level_index = 0; level_index < face_pixels.size(); ++level_index, level_aspect >>= 1u) {
                 gl::Loader::tex_image_2d(
                     FACES[fi], static_cast<gl::sint>(level_index), internal_format,
                     level_aspect, level_aspect, 0,
@@ -135,7 +135,7 @@ void gearoenix::glc3::texture::TextureCube::write_gx3d(
             std::vector<float> data(aspect * aspect * 4);
             for (auto i : FACES) {
                 auto level_aspect = static_cast<gl::sizei>(aspect);
-                for (gl::sint j = 0; level_aspect > 0; ++j, level_aspect >>= 1) {
+                for (gl::sint j = 0; level_aspect > 0; ++j, level_aspect >>= 1u) {
                     gl::Loader::framebuffer_texture_2d(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, i, texture_object, j);
                     gl::Loader::read_pixels(0, 0, level_aspect, level_aspect, GL_RGBA, GL_FLOAT, data.data());
 #ifdef GX_DEBUG_TEXTURE_WRITE
@@ -150,7 +150,7 @@ void gearoenix::glc3::texture::TextureCube::write_gx3d(
             std::vector<unsigned char> data(aspect * aspect * 4);
             for (auto i : FACES) {
                 auto level_aspect = static_cast<gl::sizei>(aspect);
-                for (gl::sint j = 0; level_aspect > 0; ++j, level_aspect >>= 1) {
+                for (gl::sint j = 0; level_aspect > 0; ++j, level_aspect >>= 1u) {
                     gl::Loader::framebuffer_texture_2d(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, i, texture_object, j);
                     gl::Loader::read_pixels(0, 0, level_aspect, level_aspect, GL_RGBA, GL_UNSIGNED_BYTE, data.data());
 #ifdef GX_DEBUG_TEXTURE_WRITE

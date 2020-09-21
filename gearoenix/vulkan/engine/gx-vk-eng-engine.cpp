@@ -27,9 +27,9 @@
 #include "../image/gx-vk-img-view.hpp"
 #include "../memory/gx-vk-mem-manager.hpp"
 #include "../pipeline/gx-vk-pip-manager.hpp"
+#include "../sampler/gx-vk-smp-manager.hpp"
 #include "../sync/gx-vk-sync-fence.hpp"
 #include "../sync/gx-vk-sync-semaphore.hpp"
-#include "../texture/gx-vk-txt-sampler-2d.hpp"
 
 gearoenix::vulkan::engine::Engine::Engine(system::Application* const sys_app) noexcept
     : render::engine::Engine(sys_app, render::engine::Type::Vulkan)
@@ -41,6 +41,7 @@ gearoenix::vulkan::engine::Engine::Engine(system::Application* const sys_app) no
     logical_device = std::make_shared<device::Logical>(physical_device);
     swapchain = std::make_shared<Swapchain>(logical_device);
     memory_manager = memory::Manager::construct(logical_device);
+    sampler_manager = std::make_shared<sampler::Manager>(logical_device);
     depth_stencil = image::View::create_depth_stencil(*memory_manager);
     render_pass = std::make_shared<RenderPass>(swapchain);
     const auto& frame_views = swapchain->get_image_views();

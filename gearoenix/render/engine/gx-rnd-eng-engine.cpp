@@ -9,7 +9,6 @@
 #include "../command/gx-rnd-cmd-manager.hpp"
 #include "../graph/tree/gx-rnd-gr-tr-pbr.hpp"
 #include "../pipeline/gx-rnd-pip-manager.hpp"
-#include "../sampler/gx-rnd-smp-manager.hpp"
 #include "../scene/gx-rnd-scn-manager.hpp"
 
 void gearoenix::render::engine::Engine::do_late_delete() noexcept
@@ -73,7 +72,6 @@ void gearoenix::render::engine::Engine::terminate() noexcept
         return;
     update_manager = nullptr;
     buffer_manager = nullptr;
-    sampler_manager = nullptr;
     command_manager = nullptr;
     pipeline_manager = nullptr;
     physics_engine = nullptr;

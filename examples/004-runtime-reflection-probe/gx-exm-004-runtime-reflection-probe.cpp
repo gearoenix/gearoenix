@@ -29,14 +29,12 @@ using GxEndCaller = gearoenix::core::sync::EndCaller<T>;
 
 using GxEndCallerIgnore = gearoenix::core::sync::EndCallerIgnore;
 using GxEndCallerIgnored = GxEndCaller<GxEndCallerIgnore>;
-using GxGrTree = gearoenix::render::graph::tree::Tree;
 using GxMatPbr = gearoenix::render::material::Pbr;
-using GxMdManager = gearoenix::render::model::Manager;
 using GxMdMesh = gearoenix::render::model::Mesh;
 using GxMesh = gearoenix::render::mesh::Mesh;
 using GxPersCam = gearoenix::render::camera::Perspective;
 using GxTexture2D = gearoenix::render::texture::Texture2D;
-using GxTxtSampleInfo = gearoenix::render::texture::SampleInfo;
+using GxTxtSamplerInfo = gearoenix::render::texture::SamplerInfo;
 using GxTxtFilter = gearoenix::render::texture::Filter;
 using GxRtReflect = gearoenix::render::reflection::Runtime;
 using GxVec3 = gearoenix::math::Vec3<double>;
@@ -78,10 +76,10 @@ Example004RuntimeReflectionProbeApp::Example004RuntimeReflectionProbeApp(gearoen
 
     {
         auto sky = sky_mgr->create<GxSkyEqrect>("sky", sky_call);
-        GxTxtSampleInfo smp;
+        GxTxtSamplerInfo smp;
         smp.min_filter = GxTxtFilter::Linear;
         sky->get_mat_equ()->set_color(txt_mgr->create_2d_f("sky", "default-equirectangular-sky.hdr", txt_call, smp));
-        scn->add_skybox(std::move(sky));
+        scn->add_skybox(sky);
     }
 
     const auto rtr2 = rfl_mgr->create<GxRtReflect>("rtr2", rtr_call);

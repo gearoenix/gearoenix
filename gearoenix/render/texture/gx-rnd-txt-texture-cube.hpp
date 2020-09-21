@@ -9,7 +9,7 @@ protected:
         core::Id id,
         std::string name,
         TextureFormat texture_format,
-        const SampleInfo& sample_info,
+        const SamplerInfo& sample_info,
         engine::Engine* engine) noexcept;
 
 public:

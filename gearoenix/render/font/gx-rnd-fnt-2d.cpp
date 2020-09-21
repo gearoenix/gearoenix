@@ -229,7 +229,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::font::
     }
     constexpr texture::TextureInfo txt_info {
         .format = texture::TextureFormat::RgbaUint8,
-        .sample_info = texture::SampleInfo {
+        .sampler_info = texture::SamplerInfo {
             .min_filter = texture::Filter::LinearMipmapLinear,
             .mag_filter = texture::Filter::Linear,
             .wrap_s = texture::Wrap::ClampToEdge,

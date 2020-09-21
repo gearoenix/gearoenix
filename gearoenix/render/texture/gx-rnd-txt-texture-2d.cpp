@@ -5,9 +5,9 @@ gearoenix::render::texture::Texture2D::Texture2D(
     const core::Id id,
     std::string name,
     const TextureFormat texture_format,
-    const SampleInfo& sample_info,
+    const SamplerInfo& sampler_info,
     engine::Engine* const e) noexcept
-    : Texture(id, std::move(name), Type::Texture2D, texture_format, sample_info, e)
+    : Texture(id, std::move(name), Type::Texture2D, texture_format, sampler_info, e)
 {
 }
 

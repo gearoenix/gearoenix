@@ -45,13 +45,13 @@ gearoenix::render::texture::Texture::Texture(
     std::string name,
     const Type texture_type,
     const TextureFormat texture_format,
-    const SampleInfo& sample_info,
+    const SamplerInfo& sampler_info,
     engine::Engine* const e) noexcept
     : core::asset::Asset(my_id, core::asset::Type::Texture, std::move(name))
     , texture_type(texture_type)
     , texture_format(texture_format)
     , render_engine(e)
-    , sample_info(sample_info)
+    , sample_info(sampler_info)
 {
 }
 

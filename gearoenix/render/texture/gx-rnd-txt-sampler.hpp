@@ -8,12 +8,13 @@ class Stream;
 }
 
 namespace gearoenix::render::texture {
-struct SampleInfo {
+struct SamplerInfo {
     Filter min_filter = Filter::LinearMipmapLinear;
     Filter mag_filter = Filter::Linear;
     Wrap wrap_s = Wrap::Repeat;
     Wrap wrap_t = Wrap::Repeat;
     Wrap wrap_r = Wrap::Repeat;
+    std::uint8_t anisotropic_level = 1;
 
     void write(system::stream::Stream* s) const noexcept;
     void read(system::stream::Stream* s) noexcept;

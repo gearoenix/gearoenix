@@ -50,12 +50,12 @@ public:
     [[nodiscard]] std::shared_ptr<Texture2D> get_brdflut(core::sync::EndCaller<Texture2D>& c) noexcept;
     [[nodiscard]] std::shared_ptr<Texture2D> create_2d(std::string name, std::vector<std::vector<std::uint8_t>> data, const TextureInfo& info, std::size_t img_width, std::size_t img_height, core::sync::EndCaller<Texture2D>& c) noexcept;
     /// It creates 2d floating texture from formatted data
-    [[nodiscard]] std::shared_ptr<Texture2D> create_2d(std::string name, const unsigned char* data, std::size_t size, core::sync::EndCaller<Texture2D>& c, const SampleInfo& sample_info = SampleInfo()) noexcept;
+    [[nodiscard]] std::shared_ptr<Texture2D> create_2d(std::string name, const unsigned char* data, std::size_t size, core::sync::EndCaller<Texture2D>& c, const SamplerInfo& sample_info = SamplerInfo()) noexcept;
     /// It creates 2d floating texture from formatted data for final float images
-    [[nodiscard]] std::shared_ptr<Texture2D> create_2d_f(std::string name, const unsigned char* data, std::size_t size, core::sync::EndCaller<Texture2D>& c, const SampleInfo& sample_info = SampleInfo()) noexcept;
+    [[nodiscard]] std::shared_ptr<Texture2D> create_2d_f(std::string name, const unsigned char* data, std::size_t size, core::sync::EndCaller<Texture2D>& c, const SamplerInfo& sample_info = SamplerInfo()) noexcept;
     /// It creates 2d floating texture from file
-    [[nodiscard]] std::shared_ptr<Texture2D> create_2d_f(std::string name, const std::wstring& file_address, core::sync::EndCaller<Texture2D>& c, const SampleInfo& sample_info = SampleInfo()) noexcept;
-    [[nodiscard]] std::shared_ptr<Texture2D> create_2d_f(std::string name, const std::string& file_address, core::sync::EndCaller<Texture2D>& c, const SampleInfo& sample_info = SampleInfo(), bool relative_path = true) noexcept;
+    [[nodiscard]] std::shared_ptr<Texture2D> create_2d_f(std::string name, const std::wstring& file_address, core::sync::EndCaller<Texture2D>& c, const SamplerInfo& sample_info = SamplerInfo()) noexcept;
+    [[nodiscard]] std::shared_ptr<Texture2D> create_2d_f(std::string name, const std::string& file_address, core::sync::EndCaller<Texture2D>& c, const SamplerInfo& sample_info = SamplerInfo(), bool relative_path = true) noexcept;
     [[nodiscard]] std::shared_ptr<TextureCube> get_cube(const math::Vec4<float>& color, core::sync::EndCaller<TextureCube>& c) noexcept;
     [[nodiscard]] std::shared_ptr<TextureCube> get_cube(const math::Vec3<float>& color, core::sync::EndCaller<TextureCube>& c) noexcept;
     [[nodiscard]] std::shared_ptr<TextureCube> get_cube(const math::Vec2<float>& color, core::sync::EndCaller<TextureCube>& c) noexcept;

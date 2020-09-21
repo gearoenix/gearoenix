@@ -4,7 +4,7 @@
 #ifdef GX_USE_OPENGL_CLASS_3
 #include "../../gl/gx-gl-constants.hpp"
 #include "../../gl/gx-gl-types.hpp"
-#include "../../render/texture/gx-rnd-txt-sample.hpp"
+#include "../../render/texture/gx-rnd-txt-sampler.hpp"
 
 namespace gearoenix::glc3::texture {
 struct SampleInfo {
@@ -15,7 +15,7 @@ struct SampleInfo {
     gl::sint wrap_r = GL_REPEAT;
 
     SampleInfo() noexcept = default;
-    explicit SampleInfo(const render::texture::SampleInfo& o) noexcept;
+    explicit SampleInfo(const render::texture::SamplerInfo& o) noexcept;
 };
 }
 #endif

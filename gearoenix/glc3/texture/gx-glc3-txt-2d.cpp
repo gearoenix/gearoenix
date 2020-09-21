@@ -10,9 +10,9 @@ gearoenix::glc3::texture::Texture2D::Texture2D(
     const core::Id id,
     std::string name,
     const render::texture::TextureFormat texture_format,
-    const render::texture::SampleInfo& sample_info,
+    const render::texture::SamplerInfo& sampler_info,
     engine::Engine* const e) noexcept
-    : render::texture::Texture2D(id, std::move(name), texture_format, sample_info, e)
+    : render::texture::Texture2D(id, std::move(name), texture_format, sampler_info, e)
 {
 }
 
@@ -26,10 +26,10 @@ std::shared_ptr<gearoenix::glc3::texture::Texture2D> gearoenix::glc3::texture::T
     const std::size_t img_height,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
 {
-    std::shared_ptr<Texture2D> result(new Texture2D(my_id, std::move(name), info.format, info.sample_info, e));
+    std::shared_ptr<Texture2D> result(new Texture2D(my_id, std::move(name), info.format, info.sampler_info, e));
     result->img_width = img_width;
     result->img_height = img_height;
-    const SampleInfo sample_info(info.sample_info);
+    const SampleInfo sample_info(info.sampler_info);
     const bool needs_mipmap = info.has_mipmap;
     const auto internal_format = convert_internal_format(e, result->texture_format);
     const auto format = convert_format(result->texture_format);
@@ -106,7 +106,7 @@ gearoenix::glc3::texture::Texture2D::Texture2D(
     const gl::uint txt_obj,
     const render::texture::TextureFormat texture_format,
     engine::Engine* const e) noexcept
-    : render::texture::Texture2D(id, std::move(name), texture_format, render::texture::SampleInfo(), e)
+    : render::texture::Texture2D(id, std::move(name), texture_format, render::texture::SamplerInfo(), e)
     , texture_object(txt_obj)
 {
 }

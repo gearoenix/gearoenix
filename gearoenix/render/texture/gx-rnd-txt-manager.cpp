@@ -58,7 +58,7 @@ std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::render::texture:
     TextureInfo info {};
     s->read(info.texture_type);
     s->read(info.format);
-    info.sample_info.read(s);
+    info.sampler_info.read(s);
     switch (info.texture_type) {
     case Type::Texture2D: {
         const auto img_width = static_cast<std::size_t>(s->read<std::uint16_t>());
@@ -117,7 +117,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     const std::function<std::shared_ptr<Texture>()> fun = [this, color_data { move(color_data) }, c, id]() mutable {
         const TextureInfo txt_info {
             .format = TextureFormat::RgbaFloat32,
-            .sample_info = SampleInfo {
+            .sampler_info = SamplerInfo {
                 .min_filter = Filter::Nearest,
                 .mag_filter = Filter::Nearest,
                 .wrap_s = Wrap::Repeat,
@@ -192,7 +192,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
         return brdflut;
     const TextureInfo texture_info {
         .format = TextureFormat::RgFloat32,
-        .sample_info = SampleInfo {
+        .sampler_info = SamplerInfo {
             .wrap_s = Wrap::ClampToEdge,
             .wrap_t = Wrap::ClampToEdge,
             .wrap_r = Wrap::ClampToEdge,
@@ -206,7 +206,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
         if (brdf_asset != nullptr) {
             GXLOGD("BRDFLUT asset has been found.")
             const auto data = brdf_asset->get_file_content();
-            brdflut = create_2d("default-brdflut", data.data(), data.size(), c, texture_info.sample_info);
+            brdflut = create_2d("default-brdflut", data.data(), data.size(), c, texture_info.sampler_info);
             return brdflut;
         }
     }
@@ -217,7 +217,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
         if (brdf_cached != nullptr) {
             GXLOGD("BRDFLUT baked file has been found.")
             const auto data = brdf_cached->get_file_content();
-            brdflut = create_2d("default-brdflut", data.data(), data.size(), c, texture_info.sample_info);
+            brdflut = create_2d("default-brdflut", data.data(), data.size(), c, texture_info.sampler_info);
             return brdflut;
         }
     }
@@ -286,7 +286,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     const unsigned char* const data,
     const std::size_t size,
     core::sync::EndCaller<Texture2D>& c,
-    const SampleInfo& sample_info) noexcept
+    const SamplerInfo& sampler_info) noexcept
 {
     std::size_t img_width;
     std::size_t img_height;
@@ -295,7 +295,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     Image::decode(data, size, std::nullopt, pixels, img_width, img_height, img_channels);
     GXLOGD("Texture 2D Image imported with file size: " << size << ", width: " << img_width << " height: " << img_height << ", channels: " << img_channels)
     TextureInfo info;
-    info.sample_info = sample_info;
+    info.sampler_info = sampler_info;
     switch (img_channels) {
     case 1:
         info.format = TextureFormat::Uint8;
@@ -320,7 +320,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     std::string name,
     const unsigned char* const data,
     const std::size_t size, core::sync::EndCaller<Texture2D>& c,
-    const SampleInfo& sample_info) noexcept
+    const SamplerInfo& sampler_info) noexcept
 {
     std::size_t img_width;
     std::size_t img_height;
@@ -329,8 +329,8 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     Image::decode(data, size, std::nullopt, pixels, img_width, img_height, img_channels);
     GXLOGD("Texture 2D Image imported with file size: " << size << ", width: " << img_width << " height: " << img_height << ", channels: " << img_channels)
     TextureInfo info;
-    info.sample_info = sample_info;
-    info.has_mipmap = sample_info.needs_mipmap();
+    info.sampler_info = sampler_info;
+    info.has_mipmap = sampler_info.needs_mipmap();
     switch (img_channels) {
     case 1:
         GX_UNIMPLEMENTED
@@ -355,7 +355,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     std::string name,
     const std::wstring& file_address,
     core::sync::EndCaller<Texture2D>& c,
-    const SampleInfo& sample_info) noexcept
+    const SamplerInfo& sample_info) noexcept
 {
     return create_2d_f(std::move(name), core::String::to_string(file_address), c, sample_info);
 }
@@ -364,7 +364,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     std::string name,
     const std::string& file_address,
     core::sync::EndCaller<render::texture::Texture2D>& c,
-    const SampleInfo& sample_info,
+    const SamplerInfo& sample_info,
     const bool relative_path) noexcept
 {
     const std::unique_ptr<system::stream::Asset> file(system::stream::Asset::construct(
@@ -392,7 +392,7 @@ std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::render::text
     const std::function<std::shared_ptr<Texture>()> fun = [this, colors { move(colors) }, c, id]() mutable {
         const TextureInfo txt_info {
             .format = TextureFormat::RgbaFloat32,
-            .sample_info = SampleInfo {
+            .sampler_info = SamplerInfo {
                 .min_filter = Filter::Nearest,
                 .mag_filter = Filter::Nearest,
                 .wrap_s = Wrap::Repeat,

@@ -5,9 +5,9 @@ gearoenix::render::texture::TextureCube::TextureCube(
     const core::Id id,
     std::string name,
     const TextureFormat texture_format,
-    const SampleInfo& sample_info,
+    const SamplerInfo& sampler_info,
     engine::Engine* const engine) noexcept
-    : Texture(id, std::move(name), Type::TextureCube, texture_format, sample_info, engine)
+    : Texture(id, std::move(name), Type::TextureCube, texture_format, sampler_info, engine)
 {
 }
 

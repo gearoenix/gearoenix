@@ -2,7 +2,7 @@
 #ifdef GX_USE_OPENGL_CLASS_3
 #include "../../system/gx-sys-log.hpp"
 
-gearoenix::glc3::texture::SampleInfo::SampleInfo(const render::texture::SampleInfo& o) noexcept
+gearoenix::glc3::texture::SampleInfo::SampleInfo(const render::texture::SamplerInfo& o) noexcept
 {
     const auto min_fil_fun = [](render::texture::Filter f) {
         switch (f) {
@@ -56,9 +56,9 @@ gearoenix::glc3::texture::SampleInfo::SampleInfo(const render::texture::SampleIn
 
 #define GX_HELPER(name) wrap_##name = fun(o.wrap_##name);
 
-    GX_HELPER(s);
-    GX_HELPER(t);
-    GX_HELPER(r);
+    GX_HELPER(s)
+    GX_HELPER(t)
+    GX_HELPER(r)
 
 #undef GX_HELPER
 }
