@@ -2,31 +2,22 @@
 #ifdef GX_USE_VULKAN
 #include "../../core/asset/gx-cr-asset-manager.hpp"
 #include "../../core/gx-cr-application.hpp"
-#include "../../core/gx-cr-static.hpp"
-#include "../../core/sync/gx-cr-sync-end-caller.hpp"
 #include "../../render/scene/gx-rnd-scn-scene.hpp"
 #include "../../system/gx-sys-app.hpp"
-#include "../../system/gx-sys-log.hpp"
 #include "../buffer/gx-vk-buf-buffer.hpp"
-#include "../buffer/gx-vk-buf-manager.hpp"
 #include "../command/gx-vk-cmd-buffer.hpp"
 #include "../command/gx-vk-cmd-manager.hpp"
 #include "../command/gx-vk-cmd-pool.hpp"
-#include "../descriptor/gx-vk-des-pool.hpp"
-#include "../descriptor/gx-vk-des-set.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../device/gx-vk-dev-physical.hpp"
 #include "../gx-vk-check.hpp"
-#include "../gx-vk-framebuffer.hpp"
 #include "../gx-vk-instance.hpp"
-#include "../gx-vk-loader.hpp"
 #include "../gx-vk-render-pass.hpp"
 #include "../gx-vk-surface.hpp"
 #include "../gx-vk-swapchain.hpp"
 #include "../image/gx-vk-img-image.hpp"
 #include "../image/gx-vk-img-view.hpp"
 #include "../memory/gx-vk-mem-manager.hpp"
-#include "../pipeline/gx-vk-pip-manager.hpp"
 #include "../sampler/gx-vk-smp-manager.hpp"
 #include "../sync/gx-vk-sync-fence.hpp"
 #include "../sync/gx-vk-sync-semaphore.hpp"
@@ -42,33 +33,17 @@ gearoenix::vulkan::engine::Engine::Engine(system::Application* const sys_app) no
     swapchain = std::make_shared<Swapchain>(logical_device);
     memory_manager = memory::Manager::construct(logical_device);
     sampler_manager = std::make_shared<sampler::Manager>(logical_device);
+    command_manager = std::make_unique<command::Manager>(logical_device);
     depth_stencil = image::View::create_depth_stencil(*memory_manager);
     render_pass = std::make_shared<RenderPass>(swapchain);
     const auto& frame_views = swapchain->get_image_views();
-    command_manager = std::make_unique<command::Manager>(logical_device);
-    graphic_cmd_pool = std::make_shared<command::Pool>(logical_device);
-    //    vmemmgr = new memory::Manager(logical_device, 1024 * 1024 * 10);
-    //    vbufmgr = new buffer::Manager(vmemmgr, 5 * 1024 * 1024);
-    //    cbufmgr = new buffer::Manager(cmemmgr, 10 * 1024 * 1024);
-    //    frames_count = frame_views.size();
-    //    framebuffers.resize(frames_count);
-    //    wait_fences.resize(frames_count);
-    //    frames_cleanups.resize(frames_count);
-    //    cmd_bufs.resize(frames_count);
-    //    ucbufmgr.resize(frames_count);
-    //    uvbufmgr.resize(frames_count);
-    //    for (unsigned int i = 0; i < frames_count; ++i) {
-    //        framebuffers[i] = new Framebuffer(frame_views[i], depth_stencil, render_pass);
-    //        wait_fences[i] = new sync::Fence(logical_device, true);
-    //        cmd_bufs[i] = new command::Buffer(graphic_cmd_pool);
-    //        ucbufmgr[i] = new buffer::Manager(1024 * 1024, cbufmgr);
-    //        uvbufmgr[i] = new buffer::Manager(1024 * 1024, vbufmgr);
-    //    }
-    //    present_complete_semaphore = new sync::Semaphore(logical_device);
-    //    render_complete_semaphore = new sync::Semaphore(logical_device);
-    //    pipmgr = new pipeline::Manager(this);
-    //    sampler_2d = new texture::Sampler2D(logical_device);
-    //    setup_draw_buffers();
+    frames_count = frame_views.size();
+    framebuffers.resize(frames_count);
+    wait_fences.resize(frames_count);
+    for (auto i = decltype(frames_count) { 0 }; i < frames_count; ++i) {
+        framebuffers[i] = std::make_shared<Framebuffer>(frame_views[i], depth_stencil, render_pass);
+        wait_fences[i] = std::make_shared<sync::Fence>(logical_device, true);
+    }
 }
 
 gearoenix::vulkan::engine::Engine* gearoenix::vulkan::engine::Engine::construct(
@@ -299,58 +274,6 @@ void gearoenix::vulkan::engine::Engine::submit(
 {
 }
 
-//{
-//    // GXTODO think about todos
-//    // GXTODO think about cleanups
-//    logical_device->wait_to_finish();
-//    for (buffer::Manager* u : uvbufmgr)
-//        delete u;
-//    for (buffer::Manager* u : ucbufmgr)
-//        delete u;
-//    for (command::Buffer* c : cmd_bufs)
-//        delete c;
-//    delete sampler_2d;
-//    sampler_2d = nullptr;
-//    delete pipmgr;
-//    pipmgr = nullptr;
-//    delete cbufmgr;
-//    cbufmgr = nullptr;
-//    delete vbufmgr;
-//    vbufmgr = nullptr;
-//    delete cmemmgr;
-//    cmemmgr = nullptr;
-//    delete vmemmgr;
-//    vmemmgr = nullptr;
-//    for (sync::Fence* format : wait_fences)
-//        delete format;
-//    wait_fences.clear();
-//    delete render_complete_semaphore;
-//    render_complete_semaphore = nullptr;
-//    delete present_complete_semaphore;
-//    present_complete_semaphore = nullptr;
-//    delete graphic_cmd_pool;
-//    graphic_cmd_pool = nullptr;
-//    for (Framebuffer* format : framebuffers)
-//        delete format;
-//    framebuffers.clear();
-//    delete render_pass;
-//    render_pass = nullptr;
-//    delete depth_stencil;
-//    depth_stencil = nullptr;
-//    delete swapchain;
-//    swapchain = nullptr;
-//    delete logical_device;
-//    logical_device = nullptr;
-//    delete physical_device;
-//    physical_device = nullptr;
-//    delete surface;
-//    surface = nullptr;
-//    delete instance;
-//    instance = nullptr;
-//    delete linker;
-//    linker = nullptr;
-//}
-
 //void gearoenix::render::Engine::setup_draw_buffers()
 //{
 //    VkClearValue clear_values[2];
@@ -409,110 +332,4 @@ void gearoenix::vulkan::engine::Engine::submit(
 //    }
 //}
 
-//const gearoenix::render::Linker* gearoenix::render::Engine::get_linker() const
-//{
-//    return linker;
-//}
-//
-//gearoenix::render::device::Logical* gearoenix::render::Engine::get_logical_device()
-//{
-//    return logical_device;
-//}
-//
-//const gearoenix::render::device::Logical* gearoenix::render::Engine::get_logical_device() const
-//{
-//    return logical_device;
-//}
-//
-//gearoenix::render::RenderPass* gearoenix::render::Engine::get_render_pass()
-//{
-//    return render_pass;
-//}
-//
-//gearoenix::render::buffer::Manager* gearoenix::render::Engine::get_gpu_buffer_manager()
-//{
-//    return vbufmgr;
-//}
-//
-//gearoenix::render::buffer::Manager* gearoenix::render::Engine::get_cpu_buffer_manager()
-//{
-//    return cbufmgr;
-//}
-//
-//gearoenix::render::buffer::Manager* gearoenix::render::Engine::get_uniform_gpu_buffer_manager(unsigned int i)
-//{
-//    return uvbufmgr[i];
-//}
-//
-//gearoenix::render::buffer::Manager* gearoenix::render::Engine::get_uniform_cpu_buffer_manager(unsigned int i)
-//{
-//    return ucbufmgr[i];
-//}
-//
-//gearoenix::system::Application* gearoenix::render::Engine::get_system_application()
-//{
-//    return sys_app;
-//}
-//
-//gearoenix::render::memory::Manager* gearoenix::render::Engine::get_v_memory_manager()
-//{
-//    return vmemmgr;
-//}
-//
-//gearoenix::render::memory::Manager* gearoenix::render::Engine::get_cpu_memory_manager()
-//{
-//    return cmemmgr;
-//}
-//
-//gearoenix::render::pipeline::Manager* gearoenix::render::Engine::get_pipeline_manager()
-//{
-//    return pipmgr;
-//}
-//
-//const gearoenix::render::pipeline::Manager* gearoenix::render::Engine::get_pipeline_manager() const
-//{
-//    return pipmgr;
-//}
-//
-//const gearoenix::render::texture::Sampler2D* gearoenix::render::Engine::get_sampler_2d() const
-//{
-//    return sampler_2d;
-//}
-//
-//gearoenix::render::texture::Sampler2D* gearoenix::render::Engine::get_sampler_2d()
-//{
-//    return sampler_2d;
-//}
-//
-//unsigned int gearoenix::render::Engine::get_frames_count() const
-//{
-//    return framebuffers.size();
-//}
-//
-//unsigned int gearoenix::render::Engine::load_scene(core::Id scene_id, std::function<void(unsigned int)> on_load)
-//{
-//    unsigned int result = loaded_scenes.size();
-//    loaded_scenes.push_back(sys_app->get_asset_manager()->get_scene(scene_id, core::sync::EndCaller::create([this, result, on_load] {
-//        loaded_scenes[result]->set_renderable(true);
-//        on_load(result);
-//    })));
-//    return result;
-//}
-//
-//void gearoenix::render::Engine::push_todo(std::function<std::function<void()>(command::Buffer*)> fun)
-//{
-//    std::lock_guard<std::mutex> lock(todos_mutex);
-//    todos.push_back(fun);
-//    (void)lock;
-//}
-//
-//unsigned int gearoenix::render::Engine::get_current_frame_index() const
-//{
-//    return current_frame;
-//}
-//
-//gearoenix::render::command::Buffer* gearoenix::render::Engine::get_current_command_buffer()
-//{
-//    return cmd_bufs[current_frame];
-//}
 #endif

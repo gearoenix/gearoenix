@@ -63,10 +63,6 @@ class Manager;
 class Pipeline;
 }
 
-namespace gearoenix::render::sampler {
-class Manager;
-}
-
 namespace gearoenix::render::scene {
 class Scene;
 }
