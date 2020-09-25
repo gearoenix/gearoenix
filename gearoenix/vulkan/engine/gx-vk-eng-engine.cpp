@@ -11,6 +11,7 @@
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../device/gx-vk-dev-physical.hpp"
 #include "../gx-vk-check.hpp"
+#include "../gx-vk-framebuffer.hpp"
 #include "../gx-vk-instance.hpp"
 #include "../gx-vk-render-pass.hpp"
 #include "../gx-vk-surface.hpp"

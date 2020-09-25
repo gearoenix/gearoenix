@@ -20,18 +20,22 @@
 #define VK_NO_PROTOTYPES 1
 #include <vulkan/vulkan.h>
 
+#include <memory>
+
+namespace gearoenix::system {
+class Library;
+}
+
 namespace gearoenix::vulkan {
 class Loader {
 private:
-#ifdef GX_IN_WINDOWS
-    static HMODULE lib;
-#else
-    static void* lib;
-#endif
+    static std::unique_ptr<system::Library> lib;
+
 public:
     Loader() noexcept = delete;
 
     static void load() noexcept;
+    static void unload() noexcept;
 
 #define GX_HELPER(x) static PFN_##x x
 

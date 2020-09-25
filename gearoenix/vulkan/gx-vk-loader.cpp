@@ -1,18 +1,9 @@
 #include "gx-vk-loader.hpp"
 #ifdef GX_USE_VULKAN
+#include "../system/gx-sys-library.hpp"
 #include "../system/gx-sys-log.hpp"
-#include <string>
-#if defined(GX_IN_LINUX) || defined(GX_IN_ANDROID)
-#include <dlfcn.h>
-#elif defined(GX_IN_WINDOWS)
-#include <Windows.h>
-#endif
 
-#ifdef GX_IN_WINDOWS
-HMODULE gearoenix::vulkan::Loader::lib = nullptr;
-#else
-void* gearoenix::vulkan::Loader::lib = nullptr;
-#endif
+std::unique_ptr<gearoenix::system::Library> gearoenix::vulkan::Loader::lib = nullptr;
 
 #define GX_HELPER(x) PFN_##x gearoenix::vulkan::Loader::x = nullptr
 GX_HELPER(vkCreateInstance);
@@ -221,19 +212,19 @@ GX_HELPER(vkDebugReportMessageEXT);
 
 void gearoenix::vulkan::Loader::load() noexcept
 {
+    lib = std::unique_ptr<system::Library>(system::Library::construct(
 #ifdef GX_IN_WINDOWS
-    lib = LoadLibrary("vulkan-1.dll");
+        "vulkan-1.dll"
 #else
-    lib = dlopen("libvulkan.so", RTLD_NOW | RTLD_LOCAL);
+        "libvulkan.so"
 #endif
+        ));
     if (nullptr == lib) {
-        GXLOGF("Vulkan library is not available.")
+        GXLOGD("Vulkan library is not available.")
+        return;
     }
-#ifdef GX_IN_WINDOWS
-#define VKL(x) x = reinterpret_cast<PFN_##x>(GetProcAddress(lib, #x))
-#else
-#define VKL(x) x = reinterpret_cast<PFN_##x>(dlsym(lib, #x))
-#endif
+#define VKL(x) x = lib->load<PFN_##x>(#x)
+
     VKL(vkCreateInstance);
     VKL(vkDestroyInstance);
     VKL(vkEnumeratePhysicalDevices);
@@ -417,6 +408,11 @@ void gearoenix::vulkan::Loader::load() noexcept
     VKL(vkDestroyDebugReportCallbackEXT);
     VKL(vkDebugReportMessageEXT);
 #endif
+}
+
+void gearoenix::vulkan::Loader::unload() noexcept
+{
+    lib = nullptr;
 }
 
 #undef VKL

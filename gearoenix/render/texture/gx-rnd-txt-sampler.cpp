@@ -23,3 +23,27 @@ bool gearoenix::render::texture::SamplerInfo::needs_mipmap() const noexcept
 {
     return min_filter == Filter::CubicMipmapCubic || min_filter == Filter::CubicMipmapLinear || min_filter == Filter::CubicMipmapNearest || min_filter == Filter::LinearMipmapCubic || min_filter == Filter::LinearMipmapLinear || min_filter == Filter::LinearMipmapNearest || min_filter == Filter::NearestMipmapCubic || min_filter == Filter::NearestMipmapLinear || min_filter == Filter::NearestMipmapNearest;
 }
+
+bool gearoenix::render::texture::SamplerInfo::operator<(const SamplerInfo& o) const noexcept
+{
+#define GX_HELPER(x) \
+    if (x < o.x)     \
+        return true; \
+    if (x > o.x)     \
+        return false;
+    GX_HELPER(min_filter)
+    GX_HELPER(mag_filter)
+    GX_HELPER(wrap_s)
+    GX_HELPER(wrap_r)
+    GX_HELPER(wrap_t)
+    GX_HELPER(anisotropic_level)
+    return false;
+#undef GX_HELPER
+}
+
+bool gearoenix::render::texture::SamplerInfo::operator==(const SamplerInfo& o) const noexcept
+{
+#define GX_HELPER(x) (x == o.x)
+    return GX_HELPER(min_filter) || GX_HELPER(mag_filter) || GX_HELPER(wrap_s) || GX_HELPER(wrap_r) || GX_HELPER(wrap_t) || GX_HELPER(anisotropic_level);
+#undef GX_HELPER
+}

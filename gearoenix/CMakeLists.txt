@@ -610,6 +610,8 @@ SET(GX_ENGINE_SRC
         "${GX_ENGINE_SRC_DIR}system/gx-sys-app.hpp"
         "${GX_ENGINE_SRC_DIR}system/gx-sys-args.hpp"
         "${GX_ENGINE_SRC_DIR}system/gx-sys-configuration.hpp"
+        "${GX_ENGINE_SRC_DIR}system/gx-sys-library.cpp"
+        "${GX_ENGINE_SRC_DIR}system/gx-sys-library.hpp"
         "${GX_ENGINE_SRC_DIR}system/gx-sys-log.cpp"
         "${GX_ENGINE_SRC_DIR}system/gx-sys-log.hpp"
         "${GX_ENGINE_SRC_DIR}system/win/gx-sys-win-app.cpp"

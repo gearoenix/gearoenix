@@ -19,6 +19,8 @@ struct SamplerInfo {
     void write(system::stream::Stream* s) const noexcept;
     void read(system::stream::Stream* s) noexcept;
     [[nodiscard]] bool needs_mipmap() const noexcept;
+    [[nodiscard]] bool operator<(const SamplerInfo& o) const noexcept;
+    [[nodiscard]] bool operator==(const SamplerInfo& o) const noexcept;
 };
 }
 #endif

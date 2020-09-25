@@ -1,51 +1,41 @@
 #include "gx-vk-framebuffer.hpp"
-#ifdef USE_VULKAN
-#include "../core/gx-cr-static.hpp"
+#ifdef GX_USE_VULKAN
 #include "device/gx-vk-dev-logical.hpp"
 #include "device/gx-vk-dev-physical.hpp"
 #include "gx-vk-check.hpp"
-#include "gx-vk-instance.hpp"
 #include "gx-vk-render-pass.hpp"
 #include "image/gx-vk-img-image.hpp"
 #include "image/gx-vk-img-view.hpp"
 
-gearoenix::render::Framebuffer::Framebuffer(image::View* view, image::View* depth, RenderPass* render_pass)
-    : view(view)
-    , depth(depth)
-    , render_pass(render_pass)
+gearoenix::vulkan::Framebuffer::Framebuffer(
+    std::shared_ptr<image::View> v,
+    std::shared_ptr<image::View> d,
+    std::shared_ptr<RenderPass> rp) noexcept
+    : view(std::move(v))
+    , depth(std::move(d))
+    , render_pass(std::move(rp))
 {
-    const image::Image* img = view->get_image();
-    const device::Logical* d = img->get_logical_device();
-    const device::Physical* p = d->get_physical_device();
-    const Linker* l = p->get_instance()->get_linker();
-    const VkSurfaceCapabilitiesKHR& cap = p->get_surface_capabilities();
-    VkImageView attachments[2] = {
+    const auto& img = view->get_image();
+    const auto& logical_device = img->get_logical_device();
+    const VkImageView attachments[2] {
         view->get_vulkan_data(),
         depth->get_vulkan_data(),
     };
-    VkFramebufferCreateInfo fb_create_info;
-    setz(fb_create_info);
-    fb_create_info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-    fb_create_info.renderPass = render_pass->get_vulkan_data();
-    fb_create_info.layers = 1;
-    fb_create_info.attachmentCount = 2;
-    fb_create_info.pAttachments = attachments;
-    fb_create_info.width = cap.currentExtent.width;
-    fb_create_info.height = cap.currentExtent.height;
-    VKC(l->vkCreateFramebuffer(d->get_vulkan_data(), &fb_create_info, 0, &vulkan_data));
+    VkFramebufferCreateInfo info;
+    GX_SET_ZERO(info)
+    info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+    info.renderPass = render_pass->get_vulkan_data();
+    info.layers = 1;
+    info.attachmentCount = 2;
+    info.pAttachments = attachments;
+    info.width = img->get_image_width();
+    info.height = img->get_image_height();
+    GX_VK_CHK_L(vkCreateFramebuffer(logical_device->get_vulkan_data(), &info, nullptr, &vulkan_data))
 }
 
-gearoenix::render::Framebuffer::~Framebuffer()
+gearoenix::vulkan::Framebuffer::~Framebuffer() noexcept
 {
-    const image::Image* img = view->get_image();
-    const device::Logical* d = img->get_logical_device();
-    const device::Physical* p = d->get_physical_device();
-    const Linker* l = p->get_instance()->get_linker();
-    l->vkDestroyFramebuffer(d->get_vulkan_data(), vulkan_data, nullptr);
-}
-
-const VkFramebuffer& gearoenix::render::Framebuffer::get_vulkan_data() const
-{
-    return vulkan_data;
+    const auto& logical_device = view->get_image()->get_logical_device();
+    Loader::vkDestroyFramebuffer(logical_device->get_vulkan_data(), vulkan_data, nullptr);
 }
 #endif
