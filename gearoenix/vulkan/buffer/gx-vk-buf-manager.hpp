@@ -1,41 +1,28 @@
 #ifndef GEAROENIX_VULKAN_BUFFER_MANAGER_HPP
 #define GEAROENIX_VULKAN_BUFFER_MANAGER_HPP
 #include "../../core/gx-cr-build-configuration.hpp"
-#ifdef USE_VULKAN
-#include "../../core/gc/gx-cr-gc.hpp"
-namespace gearoenix {
-namespace render {
-    namespace memory {
-        class Manager;
-    }
-    namespace buffer {
-        class Buffer;
-        class SubBuffer;
-        class Manager : public core::gc::Gc {
-        public:
-            typedef enum : unsigned int {
-                VERTEX = 1,
-                INDEX = 2,
-                UNIFORM = 4,
-            } Usage;
+#ifdef GX_USE_VULKAN
+#include "../../core/gx-cr-static.hpp"
+#include "../../render/buffer/gx-rnd-buf-manager.hpp"
 
-        private:
-            memory::Manager* mem_mgr;
-            Buffer* buff;
-            Usage usage;
-            unsigned int align, coalign, decoalign;
-            Manager* parent = nullptr;
-
-        public:
-            Manager(memory::Manager* mem_mgr, unsigned int size, Usage usage = (Usage)(VERTEX | INDEX | UNIFORM));
-            Manager(unsigned int size, Manager* parent);
-            ~Manager();
-            const Buffer* get_buffer() const;
-            Buffer* get_buffer();
-            SubBuffer* create_subbuffer(unsigned int size);
-        };
-    }
+namespace gearoenix::vulkan::engine {
+class Engine;
 }
+
+namespace gearoenix::vulkan::memory {
+class Manager;
+}
+
+namespace gearoenix::vulkan::buffer {
+class Manager final : public render::buffer::Manager {
+    GX_GET_REFC_PRV(std::shared_ptr<memory::Manager>, memory_manager)
+public:
+    Manager(std::shared_ptr<memory::Manager> memory_manager, engine::Engine* eng) noexcept;
+    ~Manager() noexcept final;
+    [[nodiscard]] render::buffer::Uniform* create_uniform(std::size_t size) noexcept final;
+    [[nodiscard]] render::buffer::Static* create_static(const std::vector<math::BasicVertex>& vertices, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept final;
+    [[nodiscard]] render::buffer::Static* create_static(const std::vector<std::uint32_t>& indices, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept final;
+};
 }
 #endif
 #endif

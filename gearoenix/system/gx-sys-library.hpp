@@ -3,6 +3,9 @@
 
 #include "../core/gx-cr-build-configuration.hpp"
 
+#ifndef GX_IN_WEB
+#define GX_SHARED_LINKAGE_SUPPORTED
+
 namespace gearoenix::system {
 class Library {
 private:
@@ -25,4 +28,5 @@ FunctionPtr gearoenix::system::Library::load(const char* function_name) noexcept
     return reinterpret_cast<FunctionPtr>(raw_load(function_name));
 }
 
+#endif
 #endif

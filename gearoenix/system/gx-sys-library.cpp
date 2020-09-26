@@ -1,4 +1,5 @@
 #include "gx-sys-library.hpp"
+#ifdef GX_SHARED_LINKAGE_SUPPORTED
 #ifdef GX_IN_WINDOWS
 #include <Windows.h>
 #elif defined(GX_IN_LINUX) || defined(GX_IN_ANDROID)
@@ -38,3 +39,4 @@ void* gearoenix::system::Library::raw_load(const char* function_name) noexcept
     return dlsym(lib, function_name);
 #endif
 }
+#endif

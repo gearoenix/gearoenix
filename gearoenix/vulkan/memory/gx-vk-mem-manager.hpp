@@ -29,7 +29,8 @@ public:
     ~Manager() noexcept;
     [[nodiscard]] std::tuple<VkImage, std::shared_ptr<Memory>> create_image(const VkImageCreateInfo& info) noexcept;
     void destroy_image(VkImage image, std::shared_ptr<Memory>& mem) noexcept;
-    // [[nodiscard]] std::shared_ptr<buffer::Buffer>
+    [[nodiscard]] std::tuple<VkBuffer, std::shared_ptr<Memory>> create_buffer(const VkBufferCreateInfo& info) noexcept;
+    void destroy_buffer(VkBuffer, std::shared_ptr<Memory>& mem) noexcept;
 };
 }
 #endif
