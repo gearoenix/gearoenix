@@ -46,13 +46,13 @@ gearoenix::vulkan::image::Image::Image(
     info.tiling = VK_IMAGE_TILING_OPTIMAL;
     info.usage = usage;
     info.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    std::tie(vulkan_data, allocated_memory) = mem_mgr.create_image(info);
+    std::tie(vulkan_data, allocated_memory) = mem_mgr.create(info);
 }
 
 gearoenix::vulkan::image::Image::~Image() noexcept
 {
     if (nullptr != allocated_memory)
-        allocated_memory->get_manager()->destroy_image(vulkan_data, allocated_memory);
+        allocated_memory->get_manager()->destroy(vulkan_data, allocated_memory);
 }
 
 void gearoenix::vulkan::image::Image::transit(command::Buffer& c, const VkImageLayout& old_lyt, const VkImageLayout& new_lyt) noexcept

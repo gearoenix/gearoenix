@@ -8,6 +8,7 @@
 #include <SDL_vulkan.h>
 #endif
 
+#include <set>
 #include <sstream>
 #include <vector>
 
@@ -155,7 +156,7 @@ gearoenix::vulkan::Instance::Instance(system::Application* const sys_app) noexce
     VkApplicationInfo app_info;
     GX_SET_ZERO(app_info)
     app_info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-    app_info.apiVersion = VK_MAKE_VERSION(1, 0, 0);
+    app_info.apiVersion = VK_MAKE_VERSION(1, 2, 0);
     app_info.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
     app_info.engineVersion = VK_MAKE_VERSION(1, 0, 0);
     app_info.pApplicationName = GX_APP_NAME;
@@ -181,52 +182,25 @@ gearoenix::vulkan::Instance::Instance(system::Application* const sys_app) noexce
 #endif
 #ifdef GX_VULKAN_INSTANCE_DEBUG
     instance_extensions.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
-    uint32_t layers_count = 0;
+    std::uint32_t layers_count = 0;
     Loader::vkEnumerateInstanceLayerProperties(&layers_count, nullptr);
     int property_count = layers_count;
-    std::vector<VkLayerProperties> properties(property_count);
-    std::vector<const char*> instance_layers(property_count);
+    std::vector<VkLayerProperties> properties(static_cast<std::size_t>(property_count));
+    std::set<std::string> available_layers;
     Loader::vkEnumerateInstanceLayerProperties(&layers_count, properties.data());
-    for (int i = 0; i < property_count; ++i) {
-        GXLOGD(" layer-" << i << ":  " << properties[i].layerName)
-        instance_layers[i] = properties[i].layerName;
+    for (const auto& prop : properties) {
+        GXLOGD("Available layer: " << prop.layerName)
+        available_layers.emplace(prop.layerName);
     }
-    const char* google_threading = "VK_LAYER_GOOGLE_threading";
-    const char* google_unique = "VK_LAYER_GOOGLE_unique_objects";
-    const std::string lunarg_trace("VK_LAYER_LUNARG_vktrace");
-    const std::string lunarg_api_dump("VK_LAYER_LUNARG_api_dump");
-    const std::string steam32("VK_LAYER_VALVE_steam_overlay_32");
-    const std::string steam64("VK_LAYER_VALVE_steam_overlay_64");
-    // const std::string renderdoc_capture("VK_LAYER_RENDERDOC_Capture");
-    // const std::string lunarg_screenshot("VK_LAYER_LUNARG_screenshot");
-    // const std::string lunarg_monitor("VK_LAYER_LUNARG_monitor");
-    // removing annoying layers
-    for (auto iter = instance_layers.begin(); iter != instance_layers.end();) {
-        const std::string layer_name(*iter);
-        if (layer_name == lunarg_trace || layer_name == lunarg_api_dump || layer_name == steam32 || layer_name == steam64
-            //|| layer_name == renderdoc_capture
-            //|| layer_name == lunarg_screenshot
-            //|| layer_name == lunarg_monitor
-        ) {
-            iter = instance_layers.erase(iter);
-        } else {
-            ++iter;
+    std::vector<const char*> instance_layers;
+    const auto insert_layer = [&](const char* const layer_name) {
+        if (available_layers.contains(layer_name)) {
+            instance_layers.emplace_back(layer_name);
         }
-    }
-    // ordering
-    for (unsigned int i = 1; i < instance_layers.size() - 1; ++i) {
-        const std::string layer_name(instance_layers[i]);
-        if (layer_name == google_threading) {
-            instance_layers[i] = instance_layers[0];
-            instance_layers[0] = google_threading;
-        } else if (layer_name == google_unique) {
-            instance_layers[i] = instance_layers[instance_layers.size() - 1];
-            instance_layers[instance_layers.size() - 1] = google_unique;
-        }
-    }
-    GXLOGD("Layers order:")
-    for (unsigned int i = 0; i < instance_layers.size(); ++i) {
-        GXLOGD("layer-" << i << ": " << instance_layers[i])
+    };
+    insert_layer("VK_LAYER_KHRONOS_validation");
+    for (const char* const layer_name : instance_layers) {
+        GXLOGD("Instance layer: " << layer_name)
     }
     for (std::size_t i = 0; i < instance_extensions.size(); ++i) {
         GXLOGD("extension-" << i << ": " << instance_extensions[i])

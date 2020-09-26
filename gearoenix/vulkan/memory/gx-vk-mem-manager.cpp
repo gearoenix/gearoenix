@@ -76,7 +76,7 @@ std::tuple<VkBuffer, std::shared_ptr<gearoenix::vulkan::memory::Memory>, void*> 
     const VkBufferCreateInfo& info, const Usage usage) noexcept
 {
     const VmaAllocationCreateInfo alloc_info {
-        .flags = (usage == Usage::CpuToGpu || usage == Usage::Cpu) ? VMA_ALLOCATION_CREATE_MAPPED_BIT : static_cast<VmaAllocationCreateFlagBits>(0),
+        .flags = (usage == Usage::CpuToGpu || usage == Usage::Cpu) ? VMA_ALLOCATION_CREATE_MAPPED_BIT : static_cast<VmaAllocationCreateFlags>(0),
         .usage = convert(usage),
     };
     VkBuffer buffer;
