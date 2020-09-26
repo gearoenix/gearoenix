@@ -5,10 +5,10 @@ gearoenix::render::buffer::FramedUniform::FramedUniform(const std::size_t s, eng
     : e(e)
     , uniforms(e->get_frames_count())
 {
-    auto* const buffmgr = e->get_buffer_manager();
+    auto* const buff_mgr = e->get_buffer_manager();
     const unsigned int fc = e->get_frames_count();
     for (unsigned int i = 0; i < fc; ++i)
-        uniforms[i] = std::unique_ptr<Uniform>(buffmgr->create_uniform(s));
+        uniforms[i] = std::shared_ptr<Uniform>(buff_mgr->create_uniform(s));
 }
 
 gearoenix::render::buffer::FramedUniform::~FramedUniform() noexcept

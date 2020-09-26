@@ -6,12 +6,12 @@
 #include "../../render/pipeline/gx-rnd-pip-resource-set.hpp"
 #include <memory>
 
-#define GX_GLES2_PIP_RES_START_DRAWING_MESH                                    \
-    reinterpret_cast<const buffer::Index*>(msh->get_index_buffer())->bind();   \
-    reinterpret_cast<const buffer::Vertex*>(msh->get_vertex_buffer())->bind(); \
+#define GX_GLES2_PIP_RES_START_DRAWING_MESH                                          \
+    reinterpret_cast<const buffer::Index*>(msh->get_index_buffer().get())->bind();   \
+    reinterpret_cast<const buffer::Vertex*>(msh->get_vertex_buffer().get())->bind(); \
     base->bind(bound_shader_program);
 
-#define GX_GLES2_PIP_RES_END_DRAWING_MESH reinterpret_cast<const buffer::Index*>(msh->get_index_buffer())->draw();
+#define GX_GLES2_PIP_RES_END_DRAWING_MESH reinterpret_cast<const buffer::Index*>(msh->get_index_buffer().get())->draw();
 
 #define GX_GLES2_PIP_RES_START_SHADER(cls, shd) const shader::cls* shdr = reinterpret_cast<const shader::cls*>(base->get_shd().get());
 

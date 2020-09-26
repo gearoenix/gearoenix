@@ -3,9 +3,15 @@
 #include "../../system/gx-sys-log.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
 
-gearoenix::vulkan::memory::Memory::Memory(std::shared_ptr<Manager> manager, VmaAllocation allocation) noexcept
+gearoenix::vulkan::memory::Memory::Memory(
+    std::shared_ptr<Manager> manager,
+    VmaAllocation allocation,
+    const VmaAllocationInfo& info) noexcept
     : manager(std::move(manager))
     , allocation(allocation)
+    , memory(info.deviceMemory)
+    , size(static_cast<std::size_t>(info.size))
+    , offset(static_cast<std::size_t>(info.offset))
 {
 }
 

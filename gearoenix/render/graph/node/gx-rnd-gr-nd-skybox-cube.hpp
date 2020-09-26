@@ -40,7 +40,7 @@ struct SkyboxCubeUniform {
 
 struct SkyboxCubeRenderData {
     std::unique_ptr<pipeline::SkyboxCubeResourceSet> r;
-    std::unique_ptr<buffer::Uniform> u;
+    std::shared_ptr<buffer::Uniform> u;
     SkyboxCubeRenderData(engine::Engine* e, pipeline::Pipeline* pip) noexcept;
     ~SkyboxCubeRenderData() noexcept;
 };

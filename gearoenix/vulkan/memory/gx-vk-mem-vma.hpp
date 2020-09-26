@@ -1,5 +1,5 @@
-#ifndef GEAROENIX_VULKAN_MEMORY_SUB_MEMORY_HPP
-#define GEAROENIX_VULKAN_MEMORY_SUB_MEMORY_HPP
+#ifndef GEAROENIX_VULKAN_MEMORY_VMA_HPP
+#define GEAROENIX_VULKAN_MEMORY_VMA_HPP
 #include "../../core/gx-cr-build-configuration.hpp"
 #ifdef GX_USE_VULKAN
 

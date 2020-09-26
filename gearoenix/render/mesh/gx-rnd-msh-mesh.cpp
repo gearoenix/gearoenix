@@ -59,7 +59,7 @@ void gearoenix::render::mesh::Mesh::set_vertices(
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
 {
     auto* const buf_mgr = e->get_buffer_manager();
-    vertex_buffer = std::unique_ptr<buffer::Buffer>(buf_mgr->create_static(vertices, c));
-    index_buffer = std::unique_ptr<buffer::Buffer>(buf_mgr->create_static(indices, c));
+    vertex_buffer = buf_mgr->create_static(vertices, c);
+    index_buffer = buf_mgr->create_static(indices, c);
     box = b;
 }

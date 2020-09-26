@@ -40,7 +40,7 @@ struct SkyboxEquirectangularUniform {
 
 struct SkyboxEquirectangularRenderData {
     std::unique_ptr<pipeline::SkyboxEquirectangularResourceSet> r;
-    std::unique_ptr<buffer::Uniform> u;
+    std::shared_ptr<buffer::Uniform> u;
     SkyboxEquirectangularRenderData(engine::Engine* e, pipeline::Pipeline* pip) noexcept;
     ~SkyboxEquirectangularRenderData() noexcept;
 };

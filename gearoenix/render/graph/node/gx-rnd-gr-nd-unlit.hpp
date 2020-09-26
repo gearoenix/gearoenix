@@ -36,7 +36,7 @@ struct UnlitUniform {
 
 struct UnlitRenderData {
     std::unique_ptr<pipeline::UnlitResourceSet> r;
-    std::unique_ptr<buffer::Uniform> u;
+    std::shared_ptr<buffer::Uniform> u;
     UnlitRenderData(engine::Engine* e, pipeline::Pipeline* pip) noexcept;
     ~UnlitRenderData() noexcept;
 };

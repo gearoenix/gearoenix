@@ -22,12 +22,12 @@ class Buffer;
 
 namespace gearoenix::render::mesh {
 /// This class right now have only one implementation and in future if it got another
-/// implementation it will be come an interface (virtual function haver)
+/// implementation it will become an interface (virtual function haver)
 class Mesh final : public core::asset::Asset {
     GX_GET_CVAL_PRT(Type, mesh_type)
     GX_GET_CREF_PRT(math::Aabb3, box)
-    GX_GET_UPTR_PRT(buffer::Buffer, vertex_buffer)
-    GX_GET_UPTR_PRT(buffer::Buffer, index_buffer)
+    GX_GET_CREF_PRT(std::shared_ptr<buffer::Buffer>, vertex_buffer)
+    GX_GET_CREF_PRT(std::shared_ptr<buffer::Buffer>, index_buffer)
 protected:
     Mesh(core::Id my_id, std::string name, Type mesh_type) noexcept;
 

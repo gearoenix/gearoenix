@@ -53,7 +53,7 @@ struct ShadowMapperUniform {
 
 struct ShadowMapperRenderData {
     std::unique_ptr<pipeline::ShadowMapperResourceSet> r;
-    std::unique_ptr<buffer::Uniform> u;
+    std::shared_ptr<buffer::Uniform> u;
     ShadowMapperRenderData(engine::Engine* e, pipeline::Pipeline* pip) noexcept;
     ~ShadowMapperRenderData() noexcept;
 };

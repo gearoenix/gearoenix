@@ -22,9 +22,9 @@ protected:
 
 public:
     virtual ~Manager() noexcept = default;
-    [[nodiscard]] virtual Uniform* create_uniform(std::size_t size) noexcept = 0;
-    [[nodiscard]] virtual Static* create_static(const std::vector<math::BasicVertex>& vertices, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept = 0;
-    [[nodiscard]] virtual Static* create_static(const std::vector<std::uint32_t>& indices, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept = 0;
+    [[nodiscard]] virtual std::shared_ptr<Uniform> create_uniform(std::size_t size) noexcept = 0;
+    [[nodiscard]] virtual std::shared_ptr<Static> create_static(const std::vector<math::BasicVertex>& vertices, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept = 0;
+    [[nodiscard]] virtual std::shared_ptr<Static> create_static(const std::vector<std::uint32_t>& indices, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept = 0;
 };
 }
 #endif

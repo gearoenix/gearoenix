@@ -53,22 +53,65 @@ gearoenix::vulkan::memory::Manager::~Manager() noexcept
     vmaDestroyAllocator(allocator);
 }
 
-std::tuple<VkImage, std::shared_ptr<gearoenix::vulkan::memory::Memory>> gearoenix::vulkan::memory::Manager::create_image(const VkImageCreateInfo& info) noexcept
+std::tuple<VkImage, std::shared_ptr<gearoenix::vulkan::memory::Memory>> gearoenix::vulkan::memory::Manager::create(
+    const VkImageCreateInfo& info) noexcept
 {
-    VmaAllocationCreateInfo alloc_info {
+    const VmaAllocationCreateInfo alloc_info {
         .usage = VMA_MEMORY_USAGE_GPU_ONLY
     };
     VkImage img = nullptr;
     VmaAllocation alc = nullptr;
     VmaAllocationInfo mem_info {};
     GX_VK_CHK(vmaCreateImage(allocator, &info, &alloc_info, &img, &alc, &mem_info))
-    return std::make_tuple(img, std::make_shared<Memory>(self.lock(), alc));
+    return std::make_tuple(img, std::make_shared<Memory>(self.lock(), alc, mem_info));
 }
 
-void gearoenix::vulkan::memory::Manager::destroy_image(VkImage image, std::shared_ptr<Memory>& mem) noexcept
+void gearoenix::vulkan::memory::Manager::destroy(VkImage image, std::shared_ptr<Memory>& mem) noexcept
 {
     vmaDestroyImage(allocator, image, mem->get_allocation());
     mem->set_not_deleted(false);
+}
+
+std::tuple<VkBuffer, std::shared_ptr<gearoenix::vulkan::memory::Memory>, void*> gearoenix::vulkan::memory::Manager::create(
+    const VkBufferCreateInfo& info, const Usage usage) noexcept
+{
+    const VmaAllocationCreateInfo alloc_info {
+        .flags = (usage == Usage::CpuToGpu || usage == Usage::Cpu) ? VMA_ALLOCATION_CREATE_MAPPED_BIT : static_cast<VmaAllocationCreateFlagBits>(0),
+        .usage = convert(usage),
+    };
+    VkBuffer buffer;
+    VmaAllocation allocation;
+    VmaAllocationInfo allocation_info;
+    vmaCreateBuffer(allocator, &info, &alloc_info, &buffer, &allocation, &allocation_info);
+    return std::make_tuple(
+        buffer,
+        std::make_shared<Memory>(self.lock(), allocation, allocation_info),
+        allocation_info.pMappedData);
+}
+
+void gearoenix::vulkan::memory::Manager::destroy(VkBuffer buff, std::shared_ptr<Memory>& mem) noexcept
+{
+    vmaDestroyBuffer(allocator, buff, mem->get_allocation());
+    mem->set_not_deleted(false);
+}
+
+VmaMemoryUsage gearoenix::vulkan::memory::Manager::convert(const Usage usage) noexcept
+{
+    switch (usage) {
+    case Usage::Unknown:
+        return VMA_MEMORY_USAGE_UNKNOWN;
+    case Usage::Cpu:
+        return VMA_MEMORY_USAGE_CPU_ONLY;
+    case Usage::CpuCopy:
+        return VMA_MEMORY_USAGE_CPU_COPY;
+    case Usage::CpuToGpu:
+        return VMA_MEMORY_USAGE_CPU_TO_GPU;
+    case Usage::Gpu:
+        return VMA_MEMORY_USAGE_GPU_ONLY;
+    case Usage::GpuToCpu:
+        return VMA_MEMORY_USAGE_GPU_TO_CPU;
+    }
+    GX_UNEXPECTED
 }
 
 #endif

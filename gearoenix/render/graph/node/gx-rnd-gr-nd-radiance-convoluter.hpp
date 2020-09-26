@@ -40,7 +40,7 @@ struct RadianceConvoluterUniform {
 struct RadianceConvoluterKernel {
     const std::unique_ptr<command::Buffer> secondary_cmd;
     const std::unique_ptr<pipeline::RadianceConvoluterResourceSet> r;
-    const std::unique_ptr<buffer::Uniform> u;
+    const std::shared_ptr<buffer::Uniform> u;
     RadianceConvoluterKernel(float roughness, float resolution, engine::Engine* e, pipeline::Pipeline* pip, unsigned int kernel_index) noexcept;
     ~RadianceConvoluterKernel() noexcept;
 };

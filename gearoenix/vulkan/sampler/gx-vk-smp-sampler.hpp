@@ -1,4 +1,4 @@
-#ifndef GEAROENIX_VULKAN_SAMPLER_SAMPLER__HPP
+#ifndef GEAROENIX_VULKAN_SAMPLER_SAMPLER_HPP
 #define GEAROENIX_VULKAN_SAMPLER_SAMPLER_HPP
 #include "../../core/gx-cr-build-configuration.hpp"
 #ifdef GX_USE_VULKAN

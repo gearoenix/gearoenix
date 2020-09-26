@@ -8,9 +8,9 @@
 
 #define GX_GLC3_PIP_RES_START_DRAWING_MESH base->bind(bound_shader_program);
 
-#define GX_GLC3_PIP_RES_END_DRAWING_MESH                                       \
-    reinterpret_cast<const buffer::Vertex*>(msh->get_vertex_buffer())->bind(); \
-    reinterpret_cast<const buffer::Index*>(msh->get_index_buffer())->draw();   \
+#define GX_GLC3_PIP_RES_END_DRAWING_MESH                                             \
+    reinterpret_cast<const buffer::Vertex*>(msh->get_vertex_buffer().get())->bind(); \
+    reinterpret_cast<const buffer::Index*>(msh->get_index_buffer().get())->draw();   \
     gl::Loader::bind_vertex_array(0);
 
 #define GX_GLC3_PIP_RES_START_SHADER(cls, shd) const shader::cls* shdr = reinterpret_cast<const shader::cls*>(base->get_shd().get());

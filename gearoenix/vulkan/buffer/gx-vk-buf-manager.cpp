@@ -2,6 +2,7 @@
 #ifdef GX_USE_VULKAN
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "../memory/gx-vk-mem-manager.hpp"
+#include "gx-vk-buf-uniform.hpp"
 
 gearoenix::vulkan::buffer::Manager::Manager(
     std::shared_ptr<memory::Manager> mm,
@@ -13,8 +14,14 @@ gearoenix::vulkan::buffer::Manager::Manager(
 
 gearoenix::vulkan::buffer::Manager::~Manager() noexcept = default;
 
-gearoenix::render::buffer::Uniform* gearoenix::vulkan::buffer::Manager::create_uniform(const std::size_t size) noexcept
+std::shared_ptr<gearoenix::render::buffer::Uniform> gearoenix::vulkan::buffer::Manager::create_uniform(const std::size_t size) noexcept
 {
-    return nullptr;
+    VkBufferCreateInfo info;
+    GX_SET_ZERO(info)
+    info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+    info.size = static_cast<VkDeviceSize>(size);
+    info.usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
+    auto [buff, mem, data] = memory_manager->create(info, memory::Usage::CpuToGpu);
+    return std::make_shared<Uniform>(size, buff, std::move(mem), data, dynamic_cast<engine::Engine*>(e));
 }
 #endif

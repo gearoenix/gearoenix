@@ -13,7 +13,7 @@ namespace buffer {
     class FramedUniform {
     protected:
         const engine::Engine* const e;
-        std::vector<std::unique_ptr<Uniform>> uniforms;
+        std::vector<std::shared_ptr<Uniform>> uniforms;
 
     public:
         FramedUniform(std::size_t s, engine::Engine* e) noexcept;

@@ -61,7 +61,7 @@ struct ForwardPbrUniform {
 
 struct ForwardPbrRenderData {
     std::unique_ptr<pipeline::ForwardPbrResourceSet> r;
-    std::unique_ptr<buffer::Uniform> u;
+    std::shared_ptr<buffer::Uniform> u;
     ForwardPbrRenderData(engine::Engine* e, pipeline::Pipeline* pip) noexcept;
     ~ForwardPbrRenderData() noexcept;
 };

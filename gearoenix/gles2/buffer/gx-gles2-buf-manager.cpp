@@ -11,19 +11,19 @@ gearoenix::gles2::buffer::Manager::Manager(engine::Engine* const e) noexcept
 {
 }
 
-gearoenix::render::buffer::Uniform* gearoenix::gles2::buffer::Manager::create_uniform(const std::size_t size) noexcept
+std::shared_ptr<gearoenix::render::buffer::Uniform> gearoenix::gles2::buffer::Manager::create_uniform(const std::size_t size) noexcept
 {
-    return new Uniform(size, dynamic_cast<engine::Engine*>(e));
+    return std::make_shared<Uniform>(size, dynamic_cast<engine::Engine*>(e));
 }
 
-gearoenix::render::buffer::Static* gearoenix::gles2::buffer::Manager::create_static(const std::vector<math::BasicVertex>& vertices, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
+std::shared_ptr<gearoenix::render::buffer::Static> gearoenix::gles2::buffer::Manager::create_static(const std::vector<math::BasicVertex>& vertices, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
 {
-    return new Vertex(vertices, dynamic_cast<engine::Engine*>(e), c);
+    return std::make_shared<Vertex>(vertices, dynamic_cast<engine::Engine*>(e), c);
 }
 
-gearoenix::render::buffer::Static* gearoenix::gles2::buffer::Manager::create_static(const std::vector<std::uint32_t>& indices, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
+std::shared_ptr<gearoenix::render::buffer::Static> gearoenix::gles2::buffer::Manager::create_static(const std::vector<std::uint32_t>& indices, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
 {
-    return new Index(indices, dynamic_cast<engine::Engine*>(e), c);
+    return std::make_shared<Index>(indices, dynamic_cast<engine::Engine*>(e), c);
 }
 
 #endif

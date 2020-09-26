@@ -50,7 +50,7 @@ class IrradianceConvoluter final : public Node {
 private:
     std::vector<std::unique_ptr<IrradianceConvoluterFrame>> frames;
     IrradianceConvoluterFrame* frame = nullptr;
-    const std::unique_ptr<buffer::Uniform> uniform;
+    const std::shared_ptr<buffer::Uniform> uniform;
     std::shared_ptr<mesh::Mesh> cube_mesh;
     const texture::TextureCube* const environment;
 

@@ -12,8 +12,8 @@ protected:
     {
     }
 
-    virtual const void* get_data() const noexcept = 0;
-    virtual void* get_data() noexcept = 0;
+    [[nodiscard]] virtual const void* get_data() const noexcept = 0;
+    [[nodiscard]] virtual void* get_data() noexcept = 0;
     virtual void update(const void*) noexcept = 0;
 
 public:
