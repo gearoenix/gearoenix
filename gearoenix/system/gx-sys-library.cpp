@@ -35,6 +35,6 @@ void* gearoenix::system::Library::raw_load(const char* function_name) noexcept
 #ifdef GX_IN_WINDOWS
     return reinterpret_cast<void*>(GetProcAddress(reinterpret_cast<HMODULE>(lib), function_name));
 #else
-    return dlsym(lib, function_name)
+    return dlsym(lib, function_name);
 #endif
 }
