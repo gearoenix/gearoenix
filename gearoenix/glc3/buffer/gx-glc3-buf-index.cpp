@@ -16,7 +16,7 @@ gearoenix::glc3::buffer::Index::Index(
         gl::uint tbo;
         gl::Loader::gen_buffers(1, &tbo);
         gl::Loader::bind_buffer(GL_ELEMENT_ARRAY_BUFFER, tbo);
-        gl::Loader::buffer_data(GL_ELEMENT_ARRAY_BUFFER, buffer_size, indices.data(), GL_STATIC_DRAW);
+        gl::Loader::buffer_data(GL_ELEMENT_ARRAY_BUFFER, size, indices.data(), GL_STATIC_DRAW);
         bo = tbo;
     });
 }

@@ -3,7 +3,6 @@
 #include "../../core/gx-cr-function-loader.hpp"
 #include "../../gl/gx-gl-constants.hpp"
 #include "../../gl/gx-gl-loader.hpp"
-#include "../../system/gx-sys-log.hpp"
 #include "../engine/gx-glc3-eng-engine.hpp"
 
 gearoenix::glc3::buffer::Vertex::Vertex(
@@ -20,7 +19,7 @@ gearoenix::glc3::buffer::Vertex::Vertex(
         gl::Loader::bind_vertex_array(vo);
         gl::Loader::gen_buffers(1, &bo);
         gl::Loader::bind_buffer(GL_ARRAY_BUFFER, bo);
-        gl::Loader::buffer_data(GL_ARRAY_BUFFER, static_cast<gl::sizeiptr>(buffer_size), vertices.data(), GL_STATIC_DRAW);
+        gl::Loader::buffer_data(GL_ARRAY_BUFFER, static_cast<gl::sizeiptr>(size), vertices.data(), GL_STATIC_DRAW);
         gl::Loader::enable_vertex_attrib_array(0);
         gl::Loader::enable_vertex_attrib_array(1);
         gl::Loader::enable_vertex_attrib_array(2);

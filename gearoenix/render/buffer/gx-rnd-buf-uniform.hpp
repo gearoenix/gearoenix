@@ -29,7 +29,7 @@ template <typename T>
 inline const T* Uniform::get_ptr() const noexcept
 {
 #ifdef GX_DEBUG_MODE
-    if (buffer_size != sizeof(T))
+    if (size != sizeof(T))
         GX_UNEXPECTED
 #endif
     return reinterpret_cast<const T*>(get_data());
@@ -38,7 +38,7 @@ template <typename T>
 inline void Uniform::set_data(const T& d) noexcept
 {
 #ifdef GX_DEBUG_MODE
-    if (buffer_size != sizeof(T))
+    if (size != sizeof(T))
         GX_UNEXPECTED
 #endif
     update(&d);

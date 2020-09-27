@@ -3,7 +3,6 @@
 #include "../../core/gx-cr-function-loader.hpp"
 #include "../../gl/gx-gl-constants.hpp"
 #include "../../gl/gx-gl-loader.hpp"
-#include "../../system/gx-sys-log.hpp"
 #include "../engine/gx-gles2-eng-engine.hpp"
 
 gearoenix::gles2::buffer::Vertex::Vertex(
@@ -15,7 +14,7 @@ gearoenix::gles2::buffer::Vertex::Vertex(
     e->get_function_loader()->load([this, vertices, c] {
         gl::Loader::gen_buffers(1, &bo);
         gl::Loader::bind_buffer(GL_ARRAY_BUFFER, bo);
-        gl::Loader::buffer_data(GL_ARRAY_BUFFER, buffer_size, vertices.data(), GL_STATIC_DRAW);
+        gl::Loader::buffer_data(GL_ARRAY_BUFFER, size, vertices.data(), GL_STATIC_DRAW);
     });
 }
 

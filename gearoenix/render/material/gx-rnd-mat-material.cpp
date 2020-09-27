@@ -16,7 +16,7 @@ gearoenix::render::material::Material::Material(const Type t, engine::Engine* co
 
 gearoenix::render::material::Material::Material(const Material& o) noexcept
     : material_type(o.material_type)
-    , uniform_buffers(new buffer::FramedUniform(o.uniform_buffers->get_buffer()->get_buffer_size(), o.e))
+    , uniform_buffers(new buffer::FramedUniform(o.uniform_buffers->get_buffer()->get_size(), o.e))
     , e(o.e)
 {
 }
