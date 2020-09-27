@@ -73,42 +73,48 @@ void gearoenix::vulkan::Swapchain::initialize() noexcept
     if (format_props.optimalTilingFeatures & VK_FORMAT_FEATURE_BLIT_DST_BIT) {
         image_usage |= VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
     }
-    VkSwapchainCreateInfoKHR swapchain_create_info;
-    GX_SET_ZERO(swapchain_create_info)
-    swapchain_create_info.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-    swapchain_create_info.surface = surface->get_vulkan_data();
-    swapchain_create_info.minImageCount = swapchain_images_count;
-    swapchain_create_info.imageFormat = format.format;
-    swapchain_create_info.imageColorSpace = format.colorSpace;
-    swapchain_create_info.imageExtent = caps.currentExtent;
-    swapchain_create_info.imageUsage = image_usage;
-    swapchain_create_info.preTransform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
-    swapchain_create_info.imageArrayLayers = 1;
-    swapchain_create_info.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
-    swapchain_create_info.presentMode = VK_PRESENT_MODE_FIFO_KHR;
-    swapchain_create_info.oldSwapchain = old_swapchain;
-    swapchain_create_info.clipped = VK_TRUE;
+    VkSwapchainCreateInfoKHR info;
+    GX_SET_ZERO(info)
+    info.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+    info.surface = surface->get_vulkan_data();
+    info.minImageCount = swapchain_images_count;
+    info.imageFormat = format.format;
+    info.imageColorSpace = format.colorSpace;
+    info.imageExtent = caps.currentExtent;
+    info.imageUsage = image_usage;
+    info.preTransform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
+    info.imageArrayLayers = 1;
+    info.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+    info.presentMode = VK_PRESENT_MODE_FIFO_KHR;
+    info.oldSwapchain = old_swapchain;
+    info.clipped = VK_TRUE;
     if ((caps.supportedCompositeAlpha & VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR) != 0) {
-        swapchain_create_info.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+        info.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
     } else if ((caps.supportedCompositeAlpha & VK_COMPOSITE_ALPHA_INHERIT_BIT_KHR) != 0) {
-        swapchain_create_info.compositeAlpha = VK_COMPOSITE_ALPHA_INHERIT_BIT_KHR;
+        info.compositeAlpha = VK_COMPOSITE_ALPHA_INHERIT_BIT_KHR;
     } else if ((caps.supportedCompositeAlpha & VK_COMPOSITE_ALPHA_PRE_MULTIPLIED_BIT_KHR) != 0) {
-        swapchain_create_info.compositeAlpha = VK_COMPOSITE_ALPHA_PRE_MULTIPLIED_BIT_KHR;
+        info.compositeAlpha = VK_COMPOSITE_ALPHA_PRE_MULTIPLIED_BIT_KHR;
     } else if ((caps.supportedCompositeAlpha & VK_COMPOSITE_ALPHA_POST_MULTIPLIED_BIT_KHR) != 0) {
-        swapchain_create_info.compositeAlpha = VK_COMPOSITE_ALPHA_POST_MULTIPLIED_BIT_KHR;
+        info.compositeAlpha = VK_COMPOSITE_ALPHA_POST_MULTIPLIED_BIT_KHR;
     } else if ((caps.supportedCompositeAlpha & VK_COMPOSITE_ALPHA_FLAG_BITS_MAX_ENUM_KHR) != 0) {
-        swapchain_create_info.compositeAlpha = VK_COMPOSITE_ALPHA_FLAG_BITS_MAX_ENUM_KHR;
+        info.compositeAlpha = VK_COMPOSITE_ALPHA_FLAG_BITS_MAX_ENUM_KHR;
     } else {
         GXLOGF("Error composite is unknown.")
     }
-    GX_VK_CHK_L(vkCreateSwapchainKHR(logical_device->get_vulkan_data(), &swapchain_create_info, nullptr, &vulkan_data))
+    GX_VK_CHK_L(vkCreateSwapchainKHR(logical_device->get_vulkan_data(), &info, nullptr, &vulkan_data))
     std::uint32_t count = 0;
     GX_VK_CHK_L(vkGetSwapchainImagesKHR(logical_device->get_vulkan_data(), vulkan_data, &count, nullptr))
     std::vector<VkImage> images(count);
     GX_VK_CHK_L(vkGetSwapchainImagesKHR(logical_device->get_vulkan_data(), vulkan_data, &count, images.data()))
     image_views.reserve(static_cast<std::size_t>(count));
     for (uint32_t i = 0; i < count; ++i) {
-        image_views.emplace_back(new image::View(std::make_shared<image::Image>(logical_device, images[i])));
+        image_views.emplace_back(new image::View(std::make_shared<image::Image>(
+            logical_device,
+            images[i],
+            info.imageExtent.width,
+            info.imageExtent.height,
+            info.imageUsage,
+            info.imageFormat)));
     }
     if (nullptr != old_swapchain) {
         Loader::vkDestroySwapchainKHR(logical_device->get_vulkan_data(), old_swapchain, nullptr);

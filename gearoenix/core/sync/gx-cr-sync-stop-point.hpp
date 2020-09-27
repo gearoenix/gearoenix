@@ -11,7 +11,7 @@ class StopPoint {
 private:
     const std::shared_ptr<Semaphore> sem;
     const int stopper;
-    volatile int counter = 0;
+    int counter = 0;
     std::mutex counter_lock;
 
 public:

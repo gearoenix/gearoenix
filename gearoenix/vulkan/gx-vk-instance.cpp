@@ -12,8 +12,8 @@
 #include <sstream>
 #include <vector>
 
+namespace gearoenix::vulkan {
 #ifdef GX_VULKAN_INSTANCE_DEBUG
-
 static VkBool32 VKAPI_PTR implVkDebugReportCallbackEXT(
     VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objectType,
     uint64_t object, size_t location, int32_t messageCode,
@@ -143,7 +143,11 @@ static VkBool32 VKAPI_PTR implVkDebugReportCallbackEXT(
     msg << " userdata " << pUserData;
     const auto msg_str = msg.str();
     if (is_error) {
+#ifdef GX_DEBUG_MODE
+        GXLOGF(msg_str)
+#else
         GXLOGE(msg_str)
+#endif
     } else {
         GXLOGD(msg_str)
     }
@@ -151,12 +155,25 @@ static VkBool32 VKAPI_PTR implVkDebugReportCallbackEXT(
 }
 #endif
 
+static std::uint32_t find_api_version() noexcept
+{
+    const std::uint32_t min_version = VK_MAKE_VERSION(1, 0, 0);
+    std::uint32_t result;
+    if (nullptr != Loader::vkEnumerateInstanceVersion) {
+        GX_VK_CHK_L(vkEnumerateInstanceVersion(&result))
+    }
+    result = std::max(result, min_version);
+    GXLOGD("Instance version is: " << VK_VERSION_MAJOR(result) << "." << VK_VERSION_MINOR(result))
+    return result;
+}
+}
+
 gearoenix::vulkan::Instance::Instance(system::Application* const sys_app) noexcept
 {
     VkApplicationInfo app_info;
     GX_SET_ZERO(app_info)
     app_info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-    app_info.apiVersion = VK_MAKE_VERSION(1, 2, 0);
+    app_info.apiVersion = find_api_version();
     app_info.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
     app_info.engineVersion = VK_MAKE_VERSION(1, 0, 0);
     app_info.pApplicationName = GX_APP_NAME;
@@ -184,8 +201,7 @@ gearoenix::vulkan::Instance::Instance(system::Application* const sys_app) noexce
     instance_extensions.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
     std::uint32_t layers_count = 0;
     Loader::vkEnumerateInstanceLayerProperties(&layers_count, nullptr);
-    int property_count = layers_count;
-    std::vector<VkLayerProperties> properties(static_cast<std::size_t>(property_count));
+    std::vector<VkLayerProperties> properties(static_cast<std::size_t>(layers_count));
     std::set<std::string> available_layers;
     Loader::vkEnumerateInstanceLayerProperties(&layers_count, properties.data());
     for (const auto& prop : properties) {

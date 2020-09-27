@@ -41,6 +41,7 @@ public:
 
     GX_HELPER(vkCreateInstance);
     GX_HELPER(vkDestroyInstance);
+    GX_HELPER(vkEnumerateInstanceVersion);
     GX_HELPER(vkEnumeratePhysicalDevices);
     GX_HELPER(vkGetPhysicalDeviceFeatures);
     GX_HELPER(vkGetPhysicalDeviceFormatProperties);

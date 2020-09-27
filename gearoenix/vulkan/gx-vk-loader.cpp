@@ -8,6 +8,7 @@ std::unique_ptr<gearoenix::system::Library> gearoenix::vulkan::Loader::lib = nul
 #define GX_HELPER(x) PFN_##x gearoenix::vulkan::Loader::x = nullptr
 GX_HELPER(vkCreateInstance);
 GX_HELPER(vkDestroyInstance);
+GX_HELPER(vkEnumerateInstanceVersion);
 GX_HELPER(vkEnumeratePhysicalDevices);
 GX_HELPER(vkGetPhysicalDeviceFeatures);
 GX_HELPER(vkGetPhysicalDeviceFormatProperties);
@@ -227,6 +228,7 @@ void gearoenix::vulkan::Loader::load() noexcept
 
     VKL(vkCreateInstance);
     VKL(vkDestroyInstance);
+    VKL(vkEnumerateInstanceVersion);
     VKL(vkEnumeratePhysicalDevices);
     VKL(vkGetPhysicalDeviceFeatures);
     VKL(vkGetPhysicalDeviceFormatProperties);

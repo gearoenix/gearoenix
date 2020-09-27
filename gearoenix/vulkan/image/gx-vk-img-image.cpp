@@ -11,10 +11,18 @@
 gearoenix::vulkan::image::Image::Image(
     std::shared_ptr<device::Logical> ld,
     VkImage vulkan_data,
+    const std::uint32_t image_width,
+    const std::uint32_t image_height,
+    const VkImageUsageFlags usage,
+    const VkFormat format,
     std::shared_ptr<memory::Memory> mm) noexcept
     : logical_device(std::move(ld))
     , allocated_memory(std::move(mm))
     , vulkan_data(vulkan_data)
+    , image_width(image_width)
+    , image_height(image_height)
+    , format(format)
+    , usage(usage)
 {
 }
 
@@ -31,6 +39,7 @@ gearoenix::vulkan::image::Image::Image(
     , image_width(image_width)
     , image_height(image_height)
     , format(format)
+    , usage(usage)
 {
     VkImageCreateInfo info;
     GX_SET_ZERO(info)

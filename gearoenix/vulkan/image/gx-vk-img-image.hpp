@@ -30,15 +30,19 @@ private:
     GX_GET_REFC_PRV(std::shared_ptr<device::Logical>, logical_device)
     GX_GET_CREF_PRV(std::shared_ptr<memory::Memory>, allocated_memory)
     GX_GET_VAL_PRV(VkImage, vulkan_data, nullptr)
-    GX_GET_VAL_PRV(std::uint32_t, image_width, 0)
-    GX_GET_VAL_PRV(std::uint32_t, image_height, 0)
-    GX_GET_VAL_PRV(VkFormat, format, VK_FORMAT_UNDEFINED)
-    GX_GET_VAL_PRV(VkImageUsageFlags, usage, 0)
+    GX_GET_CVAL_PRV(std::uint32_t, image_width)
+    GX_GET_CVAL_PRV(std::uint32_t, image_height)
+    GX_GET_CVAL_PRV(VkFormat, format)
+    GX_GET_CVAL_PRV(VkImageUsageFlags, usage)
 
 public:
     Image(
         std::shared_ptr<device::Logical> logical_device,
         VkImage vulkan_data,
+        std::uint32_t image_width,
+        std::uint32_t image_height,
+        VkImageUsageFlags usage,
+        VkFormat format,
         std::shared_ptr<memory::Memory> allocated_memory = nullptr) noexcept;
 
     Image(
