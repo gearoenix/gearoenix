@@ -1,40 +1,21 @@
-#ifndef GEAROENIX_VULKAN_BUFFER_MESH_HPP
-#define GEAROENIX_VULKAN_BUFFER_MESH_HPP
+#ifndef GEAROENIX_VULKAN_BUFFER_STATIC_HPP
+#define GEAROENIX_VULKAN_BUFFER_STATIC_HPP
 #include "../../core/gx-cr-build-configuration.hpp"
-#ifdef USE_VULKAN
-#include <memory>
-namespace gearoenix {
-namespace core {
-    class EndCaller;
-}
-namespace system {
-    class File;
-}
-namespace render {
-    class Engine;
-    namespace buffer {
-        class SubBuffer;
-        class Mesh {
-        public:
-            typedef uint32_t IndexType;
+#ifdef GX_USE_VULKAN
+#include "../../render/buffer/gx-rnd-buf-static.hpp"
+#include "gx-vk-buf-buffer.hpp"
 
-        private:
-            SubBuffer* vrtbuf;
-            SubBuffer* indbuf;
-            unsigned int vc; // I have doubt, it is necessary to keep this I will see it near future
-            unsigned int vs; // I have doubt, it is necessary to keep this I will see it near future
-            unsigned int ic;
-            unsigned int is; // I have doubt, it is necessary to keep this I will see it near future
-            Engine* e;
-
-        public:
-            Mesh(unsigned int vertex_elements_count, system::stream::Stream* format, Engine* e, std::shared_ptr<core::sync::EndCaller> c);
-            ~Mesh();
-            void bind();
-            void draw();
-        };
-    } // namespace buffer
-} // namespace render
-} // namespace gearoenix
+namespace gearoenix::vulkan::buffer {
+class Static final : public render::buffer::Static, public Buffer {
+public:
+    Static(
+        std::size_t size,
+        std::uint32_t offset,
+        VkBuffer vulkan_data,
+        std::shared_ptr<memory::Memory> allocated_memory,
+        engine::Engine* eng) noexcept;
+    ~Static() noexcept final;
+};
+}
 #endif
-#endif // GEAROENIX_VULKAN_BUFFER_MESH_HPP
+#endif

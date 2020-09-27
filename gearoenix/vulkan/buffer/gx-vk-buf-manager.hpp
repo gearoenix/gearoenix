@@ -18,13 +18,13 @@ class Manager;
 }
 
 namespace gearoenix::vulkan::buffer {
-class Buffer;
+class Static;
+class Uniform;
 class Manager final : public render::buffer::Manager {
     GX_GET_REFC_PRV(std::shared_ptr<memory::Manager>, memory_manager)
 private:
-    // src->dst
-    std::vector<std::tuple<std::shared_ptr<Buffer>, std::shared_ptr<Buffer>>> copy_buffers;
-    std::vector<std::tuple<std::shared_ptr<Buffer>, std::shared_ptr<image::Image>>> copy_images;
+    std::vector<std::tuple<std::shared_ptr<Uniform>, std::shared_ptr<Static>>> copy_buffers;
+    std::vector<std::tuple<std::shared_ptr<Uniform>, std::shared_ptr<image::Image>>> copy_images;
 
 public:
     Manager(std::shared_ptr<memory::Manager> memory_manager, engine::Engine* eng) noexcept;

@@ -12,24 +12,23 @@ void* gearoenix::vulkan::buffer::Uniform::get_data() noexcept
     return data;
 }
 
-void gearoenix::vulkan::buffer::Uniform::update(const void* src) noexcept
-{
-    std::memcpy(data, src, buffer_size);
-}
-
 gearoenix::vulkan::buffer::Uniform::Uniform(
     const std::size_t size,
-    VkBuffer buffer,
-    std::shared_ptr<memory::Memory> memory,
+    const std::uint32_t offset,
+    VkBuffer vulkan_data,
+    std::shared_ptr<memory::Memory> allocated_memory,
     void* const data,
     engine::Engine* const eng) noexcept
     : render::buffer::Uniform(size, eng)
-    , buffer(buffer)
-    , memory(std::move(memory))
-    , data(data)
+    , vulkan::buffer::Buffer(vulkan_data, std::move(allocated_memory), data, offset)
 {
 }
 
 gearoenix::vulkan::buffer::Uniform::~Uniform() noexcept = default;
+
+void gearoenix::vulkan::buffer::Uniform::update(const void* src) noexcept
+{
+    std::memcpy(data, src, buffer_size);
+}
 
 #endif
