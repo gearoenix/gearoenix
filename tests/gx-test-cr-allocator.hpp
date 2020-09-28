@@ -19,7 +19,7 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_allocator_test)
     BOOST_TEST(70 == a5->get_offset());
     a4 = nullptr;
     auto a6 = alc->allocate(5);
-    BOOST_TEST(90 == a5->get_offset());
+    BOOST_TEST(90 == a6->get_offset());
     a5 = nullptr;
 }
 #endif

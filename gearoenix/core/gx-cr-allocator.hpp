@@ -27,7 +27,7 @@ private:
     Allocator* first_child = nullptr;
 
     Allocator(std::size_t size, std::size_t offset) noexcept;
-    void deallocat(const Allocator* child) noexcept;
+    void deallocate(const Allocator* child) noexcept;
 
 public:
     [[nodiscard]] static std::shared_ptr<Allocator> construct(std::size_t size, std::size_t offset = 0) noexcept;

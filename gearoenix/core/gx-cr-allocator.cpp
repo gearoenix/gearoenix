@@ -11,7 +11,7 @@ gearoenix::core::Allocator::Allocator(
 {
 }
 
-void gearoenix::core::Allocator::deallocat(const Allocator* const child) noexcept
+void gearoenix::core::Allocator::deallocate(const Allocator* const child) noexcept
 {
     GX_GUARD_LOCK(this)
     auto* const child_previous = child->previous;
@@ -54,7 +54,7 @@ std::shared_ptr<gearoenix::core::Allocator> gearoenix::core::Allocator::construc
 gearoenix::core::Allocator::~Allocator() noexcept
 {
     if (nullptr != parent)
-        parent->deallocat(this);
+        parent->deallocate(this);
 }
 
 std::shared_ptr<gearoenix::core::Allocator> gearoenix::core::Allocator::allocate(
