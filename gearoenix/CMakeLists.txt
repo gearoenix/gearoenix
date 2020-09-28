@@ -649,7 +649,6 @@ SET(GX_ENGINE_SRC
         "${GX_ENGINE_SRC_DIR}vulkan/memory/gx-vk-mem-memory.cpp"
         "${GX_ENGINE_SRC_DIR}vulkan/memory/gx-vk-mem-memory.hpp"
         "${GX_ENGINE_SRC_DIR}vulkan/memory/gx-vk-mem-usage.hpp"
-        "${GX_ENGINE_SRC_DIR}vulkan/memory/gx-vk-mem-vma.hpp"
         "${GX_ENGINE_SRC_DIR}vulkan/pipeline/gx-vk-pip-cache.cpp"
         "${GX_ENGINE_SRC_DIR}vulkan/pipeline/gx-vk-pip-cache.hpp"
         "${GX_ENGINE_SRC_DIR}vulkan/pipeline/gx-vk-pip-layout.cpp"
