@@ -1,7 +1,7 @@
 #include "gx-rnd-wdg-text.hpp"
 #include "../../core/asset/gx-cr-asset-manager.hpp"
 #include "../../physics/collider/gx-phs-cld-collider.hpp"
-#include "../../system/gx-sys-app.hpp"
+#include "../../system/gx-sys-application.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "../font/gx-rnd-fnt-2d.hpp"
 #include "../font/gx-rnd-fnt-manager.hpp"

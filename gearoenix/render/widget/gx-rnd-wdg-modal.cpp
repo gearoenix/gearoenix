@@ -1,7 +1,7 @@
 #include "gx-rnd-wdg-modal.hpp"
 #include "../../core/asset/gx-cr-asset-manager.hpp"
 #include "../../physics/collider/gx-phs-cld-aabb.hpp"
-#include "../../system/gx-sys-app.hpp"
+#include "../../system/gx-sys-application.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "../material/gx-rnd-mat-unlit.hpp"
 #include "../mesh/gx-rnd-msh-manager.hpp"

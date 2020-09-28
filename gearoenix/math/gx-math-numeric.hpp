@@ -39,6 +39,9 @@ public:
     [[nodiscard]] static constexpr float radical_inverse_vdc(std::uint32_t bits) noexcept;
 
     [[nodiscard]] static constexpr float geometry_schlick_ggx(float n_dot_v, float roughness) noexcept;
+
+    template <typename T>
+    [[nodiscard]] static constexpr T align(T value, T alignment) noexcept;
 };
 }
 
@@ -47,7 +50,7 @@ constexpr T gearoenix::math::Numeric::raise_p2(const T v) noexcept
 {
     unsigned long long i = 1;
     while (v > static_cast<T>(i)) {
-        i <<= 1;
+        i <<= 1u;
     }
     return static_cast<T>(i);
 }
@@ -122,6 +125,13 @@ constexpr float gearoenix::math::Numeric::geometry_schlick_ggx(const float n_dot
     float nom = n_dot_v;
     float denom = n_dot_v * (1.0f - k) + k;
     return nom / denom;
+}
+
+template <typename T>
+constexpr T gearoenix::math::Numeric::align(const T value, const T alignment) noexcept
+{
+    const T r = value % alignment;
+    return r != 0 ? value + (alignment - r) : value;
 }
 
 #endif

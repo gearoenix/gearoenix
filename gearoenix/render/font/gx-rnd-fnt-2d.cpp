@@ -1,7 +1,7 @@
 #include "gx-rnd-fnt-2d.hpp"
 #include "../../core/asset/gx-cr-asset-manager.hpp"
 #include "../../core/event/gx-cr-ev-engine.hpp"
-#include "../../system/gx-sys-app.hpp"
+#include "../../system/gx-sys-application.hpp"
 #include "../../system/stream/gx-sys-stm-asset.hpp"
 #include "../../system/stream/gx-sys-stm-memory.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"

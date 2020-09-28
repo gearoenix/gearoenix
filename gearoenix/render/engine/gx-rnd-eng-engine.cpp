@@ -4,7 +4,7 @@
 #include "../../core/sync/gx-cr-sync-kernel-workers.hpp"
 #include "../../core/sync/gx-cr-sync-update-manager.hpp"
 #include "../../physics/gx-phs-engine.hpp"
-#include "../../system/gx-sys-app.hpp"
+#include "../../system/gx-sys-application.hpp"
 #include "../buffer/gx-rnd-buf-manager.hpp"
 #include "../command/gx-rnd-cmd-manager.hpp"
 #include "../graph/tree/gx-rnd-gr-tr-pbr.hpp"

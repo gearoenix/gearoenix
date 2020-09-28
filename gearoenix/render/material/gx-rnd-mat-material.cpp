@@ -1,6 +1,6 @@
 #include "gx-rnd-mat-material.hpp"
 #include "../../core/asset/gx-cr-asset-manager.hpp"
-#include "../../system/gx-sys-app.hpp"
+#include "../../system/gx-sys-application.hpp"
 #include "../buffer/gx-rnd-buf-framed-uniform.hpp"
 #include "../texture/gx-rnd-txt-manager.hpp"
 #include "../texture/gx-rnd-txt-texture-2d.hpp"

@@ -1,6 +1,6 @@
 #include "gx-rnd-rfl-runtime.hpp"
 #include "../../core/asset/gx-cr-asset-manager.hpp"
-#include "../../system/gx-sys-app.hpp"
+#include "../../system/gx-sys-application.hpp"
 #include "../camera/gx-rnd-cmr-manager.hpp"
 #include "../camera/gx-rnd-cmr-perspective.hpp"
 #include "../camera/gx-rnd-cmr-transformation.hpp"
@@ -50,7 +50,7 @@ gearoenix::render::reflection::Runtime::Runtime(
     auto* const txt_mgr = ast_mgr->get_texture_manager();
     auto* const cam_mgr = ast_mgr->get_camera_manager();
     auto* const msh_mgr = ast_mgr->get_mesh_manager();
-    const auto& render_config = sys_app->get_configuration().render_config;
+    const auto& render_config = sys_app->get_configuration().get_render();
     const auto environment_resolution = static_cast<unsigned int>(render_config.get_runtime_reflection_environment_resolution());
     const auto irradiance_resolution = static_cast<unsigned int>(render_config.get_runtime_reflection_irradiance_resolution());
     const auto radiance_resolution = static_cast<unsigned int>(render_config.get_runtime_reflection_radiance_resolution());

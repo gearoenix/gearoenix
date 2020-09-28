@@ -11,7 +11,7 @@
 #include "../../render/scene/gx-rnd-scn-manager.hpp"
 #include "../../render/skybox/gx-rnd-sky-manager.hpp"
 #include "../../render/texture/gx-rnd-txt-manager.hpp"
-#include "../../system/gx-sys-app.hpp"
+#include "../../system/gx-sys-application.hpp"
 #include "../../system/stream/gx-sys-stm-asset.hpp"
 
 gearoenix::core::asset::Manager::Manager(system::Application* const sys_app, const std::string& name) noexcept

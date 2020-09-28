@@ -1,6 +1,6 @@
 #include "gx-rnd-cmr-perspective.hpp"
 #include "../../physics/collider/gx-phs-cld-frustum.hpp"
-#include "../../system/gx-sys-app.hpp"
+#include "../../system/gx-sys-application.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "gx-rnd-cmr-transformation.hpp"
 #include <cmath>
@@ -15,15 +15,15 @@ void gearoenix::render::camera::Perspective::update_fovy() noexcept
 
 void gearoenix::render::camera::Perspective::update_cascades() noexcept
 {
-    const std::size_t sections_count = cascaded_shadow_frustum_partitions_count.has_value() ? cascaded_shadow_frustum_partitions_count.value() : render_engine->get_system_application()->get_configuration().render_config.get_shadow_cascades_count();
+    const std::size_t sections_count = cascaded_shadow_frustum_partitions_count.has_value() ? cascaded_shadow_frustum_partitions_count.value() : render_engine->get_system_application()->get_configuration().get_render().get_shadow_cascades_count();
     if (cascaded_shadow_frustum_partitions.size() != sections_count + 1)
         cascaded_shadow_frustum_partitions.resize(sections_count + 1);
 
-    const math::Vec3<double> xtanx = transformation->get_x_axis() * tanx;
-    const math::Vec3<double> ytany = transformation->get_y_axis() * tany;
+    const math::Vec3<double> x_tan_x = transformation->get_x_axis() * tanx;
+    const math::Vec3<double> y_tan_y = transformation->get_y_axis() * tany;
 
-    math::Vec3<double> x = xtanx * -uniform.near;
-    math::Vec3<double> y = ytany * -uniform.near;
+    math::Vec3<double> x = x_tan_x * -uniform.near;
+    math::Vec3<double> y = y_tan_y * -uniform.near;
     math::Vec3<double> z = math::Vec3<double>(uniform.position) + (transformation->get_z_axis() * static_cast<double>(uniform.near));
 
     math::Vec3<double> zmx;
@@ -39,8 +39,8 @@ void gearoenix::render::camera::Perspective::update_cascades() noexcept
 
     GX_HELPER(0);
 
-    x = xtanx * -uniform.far;
-    y = ytany * -uniform.far;
+    x = x_tan_x * -uniform.far;
+    y = y_tan_y * -uniform.far;
     z = math::Vec3<double>(uniform.position) + (transformation->get_z_axis() * static_cast<double>(uniform.far));
 
     GX_HELPER(sections_count);
@@ -60,31 +60,31 @@ void gearoenix::render::camera::Perspective::update_cascades() noexcept
     });
 
     if (sections_count < 2) {
-        // it provides a little performance gain for poor hardwares
+        // it provides a little performance gain for poor hardware
         return;
     }
 
     // Zi = yn(format/n)^(i/N) + (1-y)(n+(i/N)(format-n))
     // Zi = yn((format/n)^(1/N))^i + (1-y)n + (1-y)((format-n)/N)i
-    const double oneminlambda = 1.0f - lambda;
-    const double onedivcn = 1.0f / static_cast<double>(sections_count);
-    // uniform increament
-    const double unisecinc = oneminlambda * onedivcn * (uniform.far - uniform.near);
-    const double fdivn = uniform.far / uniform.near;
+    const double one_min_lambda = 1.0f - lambda;
+    const double one_div_cn = 1.0f / static_cast<double>(sections_count);
+    // uniform increment
+    const double uni_sec_inc = one_min_lambda * one_div_cn * (uniform.far - uniform.near);
+    const double f_div_n = uniform.far / uniform.near;
     // logarithmic multiplication
-    const double logsecmul = std::pow(fdivn, onedivcn);
+    const double log_sec_mul = std::pow(f_div_n, one_div_cn);
     // uniform sector
-    double unisec = oneminlambda * uniform.near;
+    double uni_sec = one_min_lambda * uniform.near;
     // logarithmic sector
-    double logsec = lambda * uniform.near;
+    double log_sec = lambda * uniform.near;
 
     for (std::size_t i = 1; i < sections_count; ++i) {
-        logsec *= logsecmul;
-        unisec += unisecinc;
+        log_sec *= log_sec_mul;
+        uni_sec += uni_sec_inc;
 
-        const double l = logsec + unisec;
-        x = xtanx * l;
-        y = ytany * l;
+        const double l = log_sec + uni_sec;
+        x = x_tan_x * l;
+        y = y_tan_y * l;
         z = math::Vec3<double>(uniform.position) + (transformation->get_z_axis() * l);
 
         GX_HELPER(i);

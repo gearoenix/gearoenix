@@ -1,6 +1,6 @@
 #include "gx-rnd-cmr-orthographic.hpp"
 #include "../../physics/collider/gx-phs-cld-frustum.hpp"
-#include "../../system/gx-sys-app.hpp"
+#include "../../system/gx-sys-application.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "gx-rnd-cmr-transformation.hpp"
 #include "gx-rnd-cmr-uniform.hpp"
@@ -25,8 +25,8 @@ void gearoenix::render::camera::Orthographic::update_aspects_size() noexcept
 void gearoenix::render::camera::Orthographic::update_cascades() noexcept
 {
     const system::Configuration& sys_conf = render_engine->get_system_application()->get_configuration();
-    const engine::Configuration& eng_conf = sys_conf.render_config;
-    const std::size_t sections_count = eng_conf.get_shadow_cascades_count();
+    const engine::Configuration& eng_conf = sys_conf.get_render();
+    const auto sections_count = static_cast<std::size_t>(static_cast<std::uint8_t>(eng_conf.get_shadow_cascades_count()));
     const auto sections_count_plus = sections_count + 1;
 
     if (cascaded_shadow_frustum_partitions.size() != sections_count_plus)

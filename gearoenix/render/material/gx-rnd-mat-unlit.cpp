@@ -1,6 +1,6 @@
 #include "gx-rnd-mat-unlit.hpp"
 #include "../../core/asset/gx-cr-asset-manager.hpp"
-#include "../../system/gx-sys-app.hpp"
+#include "../../system/gx-sys-application.hpp"
 #include "../buffer/gx-rnd-buf-framed-uniform.hpp"
 #include "../pipeline/gx-rnd-pip-manager.hpp"
 #include "../texture/gx-rnd-txt-manager.hpp"

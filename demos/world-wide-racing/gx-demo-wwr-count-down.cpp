@@ -6,7 +6,7 @@
 #include <gearoenix/render/model/gx-rnd-mdl-manager.hpp>
 #include <gearoenix/render/scene/gx-rnd-scn-ui.hpp>
 #include <gearoenix/render/widget/gx-rnd-wdg-text.hpp>
-#include <gearoenix/system/gx-sys-app.hpp>
+#include <gearoenix/system/gx-sys-application.hpp>
 
 void gearoenix::demo::wwr::CountDown::update() noexcept
 {

@@ -5,7 +5,7 @@
 #include "../../core/gx-cr-function-loader.hpp"
 #include "../../gl/gx-gl-loader.hpp"
 #include "../../gl/gx-gl-utils.hpp"
-#include "../../system/gx-sys-app.hpp"
+#include "../../system/gx-sys-application.hpp"
 #include "../engine/gx-gles2-eng-engine.hpp"
 #include "gx-gles2-txt-2d.hpp"
 #include "gx-gles2-txt-cube.hpp"

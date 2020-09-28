@@ -12,7 +12,7 @@
 #include "../render/reflection/gx-rnd-rfl-runtime.hpp"
 #include "../render/scene/gx-rnd-scn-manager.hpp"
 #include "../render/skybox/gx-rnd-sky-skybox.hpp"
-#include "../system/gx-sys-app.hpp"
+#include "../system/gx-sys-application.hpp"
 #include "accelerator/gx-phs-acc-bvh.hpp"
 #include "animation/gx-phs-anm-manager.hpp"
 #include "collider/gx-phs-cld-frustum.hpp"

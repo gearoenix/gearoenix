@@ -4,7 +4,7 @@
 
 namespace gearoenix::system {
 struct Configuration {
-    render::engine::Configuration render_config;
+    GX_GET_REF_PRV(render::engine::Configuration, render)
 };
 }
 #endif

@@ -15,7 +15,7 @@
 #include <gearoenix/render/scene/gx-rnd-scn-game.hpp>
 #include <gearoenix/render/scene/gx-rnd-scn-ui.hpp>
 #include <gearoenix/render/widget/gx-rnd-wdg-button.hpp>
-#include <gearoenix/system/gx-sys-app.hpp>
+#include <gearoenix/system/gx-sys-application.hpp>
 
 void gearoenix::demo::wwr::Training::initialize_scenes(
     const std::vector<std::shared_ptr<render::scene::Scene>>& scenes) noexcept

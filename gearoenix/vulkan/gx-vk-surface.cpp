@@ -2,7 +2,7 @@
 #ifdef GX_USE_VULKAN
 #include "../core/gx-cr-application.hpp"
 #include "../core/gx-cr-static.hpp"
-#include "../system/gx-sys-app.hpp"
+#include "../system/gx-sys-application.hpp"
 #include "gx-vk-instance.hpp"
 
 #ifdef GX_IN_ANDROID
@@ -13,9 +13,9 @@
 #include <SDL_vulkan.h>
 #endif
 
-gearoenix::vulkan::Surface::Surface(std::shared_ptr<Instance> ins, const system::Application* const sys_app) noexcept
+gearoenix::vulkan::Surface::Surface(std::shared_ptr<Instance> ins, system::Application* const sys_app) noexcept
     : instance(std::move(ins))
-    , sys_app(sys_app)
+    , system_application(sys_app)
 {
 #ifdef GX_USE_SDL
     if (!SDL_Vulkan_CreateSurface(sys_app->get_window(), instance->get_vulkan_data(), &vulkan_data)) {
@@ -52,20 +52,5 @@ gearoenix::vulkan::Surface::Surface(std::shared_ptr<Instance> ins, const system:
 gearoenix::vulkan::Surface::~Surface() noexcept
 {
     Loader::vkDestroySurfaceKHR(instance->get_vulkan_data(), vulkan_data, nullptr);
-}
-
-const std::shared_ptr<gearoenix::vulkan::Instance>& gearoenix::vulkan::Surface::get_instance() const noexcept
-{
-    return instance;
-}
-
-VkSurfaceKHR gearoenix::vulkan::Surface::get_vulkan_data() const noexcept
-{
-    return vulkan_data;
-}
-
-const gearoenix::system::Application* gearoenix::vulkan::Surface::get_sys_app() const noexcept
-{
-    return sys_app;
 }
 #endif

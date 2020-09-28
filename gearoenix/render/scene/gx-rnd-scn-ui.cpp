@@ -3,7 +3,7 @@
 #include "../../core/event/gx-cr-ev-engine.hpp"
 #include "../../physics/collider/gx-phs-cld-collider.hpp"
 #include "../../physics/gx-phs-engine.hpp"
-#include "../../system/gx-sys-app.hpp"
+#include "../../system/gx-sys-application.hpp"
 #include "../camera/gx-rnd-cmr-manager.hpp"
 #include "../camera/gx-rnd-cmr-orthographic.hpp"
 #include "../camera/gx-rnd-cmr-transformation.hpp"

@@ -9,7 +9,7 @@
 #include <gearoenix/render/widget/gx-rnd-wdg-button.hpp>
 #include <gearoenix/render/widget/gx-rnd-wdg-edit.hpp>
 #include <gearoenix/render/widget/gx-rnd-wdg-text.hpp>
-#include <gearoenix/system/gx-sys-app.hpp>
+#include <gearoenix/system/gx-sys-application.hpp>
 
 template <class T>
 using GxEndCaller = gearoenix::core::sync::EndCaller<T>;

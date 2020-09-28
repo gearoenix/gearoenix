@@ -1,17 +1,13 @@
-#ifndef GEAROENIX_VULKAN_MEMORY_USAGE_HPP
-#define GEAROENIX_VULKAN_MEMORY_USAGE_HPP
+#ifndef GEAROENIX_VULKAN_MEMORY_PLACE_HPP
+#define GEAROENIX_VULKAN_MEMORY_PLACE_HPP
 #include "../../core/gx-cr-build-configuration.hpp"
 #ifdef GX_USE_VULKAN
 #include "../../core/gx-cr-types.hpp"
 
 namespace gearoenix::vulkan::memory {
-enum struct Usage : core::TypeId {
-    Unknown = 0,
+enum struct Place : core::TypeId {
     Gpu = 1,
     Cpu = 2,
-    CpuToGpu = 3,
-    GpuToCpu = 4,
-    CpuCopy = 5,
 };
 }
 #endif

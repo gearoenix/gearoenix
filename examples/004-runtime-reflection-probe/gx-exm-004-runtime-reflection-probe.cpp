@@ -22,7 +22,7 @@
 #include <gearoenix/render/skybox/gx-rnd-sky-manager.hpp>
 #include <gearoenix/render/texture/gx-rnd-txt-manager.hpp>
 #include <gearoenix/render/texture/gx-rnd-txt-texture-2d.hpp>
-#include <gearoenix/system/gx-sys-app.hpp>
+#include <gearoenix/system/gx-sys-application.hpp>
 
 template <class T>
 using GxEndCaller = gearoenix::core::sync::EndCaller<T>;

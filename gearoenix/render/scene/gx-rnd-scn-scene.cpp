@@ -6,7 +6,7 @@
 #include "../../physics/collider/gx-phs-cld-aabb.hpp"
 #include "../../physics/constraint/gx-phs-cns-constraint.hpp"
 #include "../../physics/constraint/gx-phs-cns-manager.hpp"
-#include "../../system/gx-sys-app.hpp"
+#include "../../system/gx-sys-application.hpp"
 #include "../buffer/gx-rnd-buf-framed-uniform.hpp"
 #include "../camera/gx-rnd-cmr-camera.hpp"
 #include "../camera/gx-rnd-cmr-manager.hpp"

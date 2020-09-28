@@ -1,7 +1,7 @@
 #include "gx-glc3-shd-forward-pbr.hpp"
 #ifdef GX_USE_OPENGL_CLASS_3
 #include "../../core/gx-cr-function-loader.hpp"
-#include "../../system/gx-sys-app.hpp"
+#include "../../system/gx-sys-application.hpp"
 #include "../engine/gx-glc3-eng-engine.hpp"
 #include <sstream>
 

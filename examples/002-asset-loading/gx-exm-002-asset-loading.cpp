@@ -16,7 +16,7 @@
 #include <gearoenix/render/model/gx-rnd-mdl-model.hpp>
 #include <gearoenix/render/scene/gx-rnd-scn-manager.hpp>
 #include <gearoenix/render/scene/gx-rnd-scn-scene.hpp>
-#include <gearoenix/system/gx-sys-app.hpp>
+#include <gearoenix/system/gx-sys-application.hpp>
 #include <memory>
 
 template <class T>

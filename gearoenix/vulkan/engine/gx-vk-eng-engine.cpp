@@ -3,7 +3,7 @@
 #include "../../core/asset/gx-cr-asset-manager.hpp"
 #include "../../core/gx-cr-application.hpp"
 #include "../../render/scene/gx-rnd-scn-scene.hpp"
-#include "../../system/gx-sys-app.hpp"
+#include "../../system/gx-sys-application.hpp"
 #include "../buffer/gx-vk-buf-buffer.hpp"
 #include "../command/gx-vk-cmd-buffer.hpp"
 #include "../command/gx-vk-cmd-manager.hpp"

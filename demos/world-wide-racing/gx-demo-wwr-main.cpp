@@ -3,7 +3,7 @@
 #include <gearoenix/render/engine/gx-rnd-eng-engine.hpp>
 #include <gearoenix/render/graph/tree/gx-rnd-gr-tr-pbr.hpp>
 #include <gearoenix/render/scene/gx-rnd-scn-logo.hpp>
-#include <gearoenix/system/gx-sys-app.hpp>
+#include <gearoenix/system/gx-sys-application.hpp>
 
 gearoenix::demo::wwr::Main::Main(system::Application* const sys_app) noexcept
     : core::Application(sys_app)

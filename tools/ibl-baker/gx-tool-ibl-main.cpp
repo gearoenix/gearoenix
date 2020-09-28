@@ -33,7 +33,7 @@
 #include <gearoenix/render/widget/gx-rnd-wdg-edit.hpp>
 #include <gearoenix/render/widget/gx-rnd-wdg-modal.hpp>
 #include <gearoenix/render/widget/gx-rnd-wdg-text.hpp>
-#include <gearoenix/system/gx-sys-app.hpp>
+#include <gearoenix/system/gx-sys-application.hpp>
 #include <gearoenix/system/gx-sys-args.hpp>
 
 template <class T>
@@ -76,7 +76,7 @@ void IblBaker::argument_handling() noexcept
     args->get_value("irradiance-resolution", irradiance_resolution);
     args->get_value("radiance-file", radiance_file);
     args->get_value("radiance-resolution", radiance_resolution);
-    auto& conf = system_application->get_configuration().render_config;
+    auto& conf = system_application->get_configuration().get_render();
     conf.set_runtime_reflection_environment_resolution(static_cast<std::uint16_t>(baked_cube_resolution));
     conf.set_runtime_reflection_irradiance_resolution(static_cast<std::uint16_t>(irradiance_resolution));
     conf.set_runtime_reflection_radiance_resolution(static_cast<std::uint16_t>(radiance_resolution));

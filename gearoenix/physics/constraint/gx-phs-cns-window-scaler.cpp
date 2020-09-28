@@ -3,7 +3,7 @@
 #include "../../render/engine/gx-rnd-eng-engine.hpp"
 #include "../../render/model/gx-rnd-mdl-model.hpp"
 #include "../../render/model/gx-rnd-mdl-transformation.hpp"
-#include "../../system/gx-sys-app.hpp"
+#include "../../system/gx-sys-application.hpp"
 
 void gearoenix::physics::constraint::WindowScaler::update() noexcept
 {

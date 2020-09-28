@@ -1,6 +1,6 @@
 #include "gx-cr-application.hpp"
 #include "../render/engine/gx-rnd-eng-engine.hpp"
-#include "../system/gx-sys-app.hpp"
+#include "../system/gx-sys-application.hpp"
 
 gearoenix::core::Application::Application(system::Application* const sys_app) noexcept
     : system_application(sys_app)

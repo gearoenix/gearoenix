@@ -1,7 +1,7 @@
 #include "gx-rnd-cmr-arc-controller.hpp"
 #include "../../core/event/gx-cr-ev-engine.hpp"
 #include "../../core/sync/gx-cr-sync-update-manager.hpp"
-#include "../../system/gx-sys-app.hpp"
+#include "../../system/gx-sys-application.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "gx-rnd-cmr-camera.hpp"
 #include "gx-rnd-cmr-transformation.hpp"

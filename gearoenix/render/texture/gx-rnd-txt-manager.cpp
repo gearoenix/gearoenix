@@ -1,7 +1,7 @@
 #include "gx-rnd-txt-manager.hpp"
 #include "../../core/asset/gx-cr-asset-manager.hpp"
 #include "../../core/gx-cr-string.hpp"
-#include "../../system/gx-sys-app.hpp"
+#include "../../system/gx-sys-application.hpp"
 #include "../../system/stream/gx-sys-stm-asset.hpp"
 #include "../../system/stream/gx-sys-stm-local.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
@@ -187,7 +187,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
 
 std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::get_brdflut(core::sync::EndCaller<Texture2D>& c) noexcept
 {
-    const auto resolution = e->get_system_application()->get_configuration().render_config.get_brdflut_resolution();
+    const auto resolution = e->get_system_application()->get_configuration().get_render().get_brdflut_resolution();
     if (nullptr != brdflut)
         return brdflut;
     const TextureInfo texture_info {

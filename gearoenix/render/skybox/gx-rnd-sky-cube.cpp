@@ -1,6 +1,6 @@
 #include "gx-rnd-sky-cube.hpp"
 #include "../../core/asset/gx-cr-asset-manager.hpp"
-#include "../../system/gx-sys-app.hpp"
+#include "../../system/gx-sys-application.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "../material/gx-rnd-mat-skybox-cube.hpp"
 #include "../reflection/gx-rnd-rfl-baked.hpp"

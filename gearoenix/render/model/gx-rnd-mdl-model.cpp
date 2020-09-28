@@ -1,7 +1,7 @@
 #include "gx-rnd-mdl-model.hpp"
 #include "../../core/asset/gx-cr-asset-manager.hpp"
 #include "../../physics/collider/gx-phs-cld-ghost.hpp"
-#include "../../system/gx-sys-app.hpp"
+#include "../../system/gx-sys-application.hpp"
 #include "../../system/stream/gx-sys-stm-asset.hpp"
 #include "../buffer/gx-rnd-buf-framed-uniform.hpp"
 #include "../camera/gx-rnd-cmr-camera.hpp"

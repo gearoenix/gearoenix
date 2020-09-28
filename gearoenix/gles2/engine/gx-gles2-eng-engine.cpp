@@ -7,7 +7,7 @@
 #include "../../render/camera/gx-rnd-cmr-camera.hpp"
 #include "../../render/pipeline/gx-rnd-pip-manager.hpp"
 #include "../../render/scene/gx-rnd-scn-scene.hpp"
-#include "../../system/gx-sys-app.hpp"
+#include "../../system/gx-sys-application.hpp"
 #include "../buffer/gx-gles2-buf-manager.hpp"
 #include "../buffer/gx-gles2-buf-uniform.hpp"
 #include "../command/gx-gles2-cmd-buffer.hpp"

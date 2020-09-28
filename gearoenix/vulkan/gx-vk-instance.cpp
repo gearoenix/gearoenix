@@ -1,7 +1,6 @@
 #include "gx-vk-instance.hpp"
 #ifdef GX_USE_VULKAN
-#include "../system/gx-sys-app.hpp"
-#include "../system/gx-sys-log.hpp"
+#include "../system/gx-sys-application.hpp"
 #include "gx-vk-check.hpp"
 
 #ifdef GX_USE_SDL
@@ -169,6 +168,7 @@ static std::uint32_t find_api_version() noexcept
 }
 
 gearoenix::vulkan::Instance::Instance(system::Application* const sys_app) noexcept
+    : system_application(sys_app)
 {
     VkApplicationInfo app_info;
     GX_SET_ZERO(app_info)

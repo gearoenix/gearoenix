@@ -2,7 +2,7 @@
 #include "../../core/event/gx-cr-ev-engine.hpp"
 #include "../../physics/accelerator/gx-phs-acc-bvh.hpp"
 #include "../../physics/collider/gx-phs-cld-frustum.hpp"
-#include "../../system/gx-sys-app.hpp"
+#include "../../system/gx-sys-application.hpp"
 #include "../buffer/gx-rnd-buf-framed-uniform.hpp"
 #include "../light/gx-rnd-lt-cascade-info.hpp"
 #include "../light/gx-rnd-lt-directional.hpp"
@@ -13,12 +13,12 @@
 #include "gx-rnd-cmr-transformation.hpp"
 #include <algorithm>
 
-#define GX_CAMERA_INIT                                                                                                                                                \
-    core::asset::Asset(my_id, core::asset::Type::Camera, std::move(name)),                                                                                            \
-        frustum_collider(new physics::collider::Frustum()),                                                                                                           \
-        uniform_buffers(new buffer::FramedUniform(sizeof(Uniform), e)),                                                                                               \
-        cascaded_shadow_frustum_partitions(static_cast<std::size_t>(e->get_system_application()->get_configuration().render_config.get_shadow_cascades_count()) + 1), \
-        transformation(new Transformation(&uniform, frustum_collider.get(), &cascaded_shadow_frustum_partitions)),                                                    \
+#define GX_CAMERA_INIT                                                                                                                                               \
+    core::asset::Asset(my_id, core::asset::Type::Camera, std::move(name)),                                                                                           \
+        frustum_collider(new physics::collider::Frustum()),                                                                                                          \
+        uniform_buffers(new buffer::FramedUniform(sizeof(Uniform), e)),                                                                                              \
+        cascaded_shadow_frustum_partitions(static_cast<std::size_t>(e->get_system_application()->get_configuration().get_render().get_shadow_cascades_count()) + 1), \
+        transformation(new Transformation(&uniform, frustum_collider.get(), &cascaded_shadow_frustum_partitions)),                                                   \
         render_engine(e)
 
 void gearoenix::render::camera::Camera::initialize() noexcept
