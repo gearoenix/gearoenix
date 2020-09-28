@@ -24,7 +24,7 @@
 #include <glm/vec4.hpp>
 #include <random>
 
-BOOST_AUTO_TEST_CASE(math_vector_test)
+BOOST_AUTO_TEST_CASE(gearoenix_math_vector_test)
 {
 
     static std::random_device rd;

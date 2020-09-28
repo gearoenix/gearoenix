@@ -28,7 +28,7 @@ gearoenix::vulkan::buffer::Uniform::~Uniform() noexcept = default;
 
 void gearoenix::vulkan::buffer::Uniform::update(const void* src) noexcept
 {
-    std::memcpy(data, src, buffer_size);
+    std::memcpy(data, src, size);
 }
 
 #endif

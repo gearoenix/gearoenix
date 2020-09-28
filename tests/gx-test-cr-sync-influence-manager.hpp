@@ -1,9 +1,9 @@
-#ifndef GEAROENIX_CORE_SYNC_INFLUENCE_MANAGER_TEST_HPP
-#define GEAROENIX_CORE_SYNC_INFLUENCE_MANAGER_TEST_HPP
+#ifndef GEAROENIX_TEST_CORE_SYNC_INFLUENCE_MANAGER_HPP
+#define GEAROENIX_TEST_CORE_SYNC_INFLUENCE_MANAGER_HPP
 
-#include "gx-cr-sync-influence-manager.hpp"
+#include "../gearoenix/core/sync/gx-cr-sync-influence-manager.hpp"
 
-BOOST_AUTO_TEST_CASE(gx_core_sync_influence_manager)
+BOOST_AUTO_TEST_CASE(gearoenix_core_sync_influence_manager_test)
 {
     gearoenix::core::sync::InfluenceManager inf_mgr;
     (void)inf_mgr.add({ 1, 2, 3 }, 1.0, [] {});

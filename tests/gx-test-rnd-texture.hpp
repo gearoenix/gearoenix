@@ -6,7 +6,7 @@
 #include <gearoenix/render/texture/gx-rnd-txt-texture.hpp>
 #include <random>
 
-BOOST_AUTO_TEST_CASE(render_texture_test)
+BOOST_AUTO_TEST_CASE(gearoenix_render_texture_test)
 {
 
     static std::random_device rd;

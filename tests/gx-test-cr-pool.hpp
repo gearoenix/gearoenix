@@ -1,7 +1,9 @@
+#ifndef GEAROENIX_TEST_CORE_POOL_HPP
+#define GEAROENIX_TEST_CORE_POOL_HPP
 #include <gearoenix/core/gx-cr-pool.hpp>
 #include <gearoenix/system/gx-sys-log.hpp>
 
-BOOST_AUTO_TEST_CASE(math_core_pool)
+BOOST_AUTO_TEST_CASE(gearoenix_math_core_pool_test)
 {
     gearoenix::core::OneLoopPool<int> pool;
 
@@ -53,3 +55,4 @@ BOOST_AUTO_TEST_CASE(math_core_pool)
     }
     BOOST_CHECK_EQUAL(i, 11);
 }
+#endif

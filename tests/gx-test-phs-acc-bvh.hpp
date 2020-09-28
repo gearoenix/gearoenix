@@ -8,7 +8,7 @@
 #include <gearoenix/physics/collider/gx-phs-cld-sphere.hpp>
 #include <random>
 
-BOOST_AUTO_TEST_CASE(physics_accelerator_bvh)
+BOOST_AUTO_TEST_CASE(gearoenix_physics_accelerator_bvh_test)
 {
     std::random_device rd;
     std::default_random_engine gen(rd());

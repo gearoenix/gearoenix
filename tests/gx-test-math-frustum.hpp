@@ -6,7 +6,7 @@
 #include <gearoenix/math/gx-math-matrix-4d.hpp>
 #include <gearoenix/math/gx-math-sphere.hpp>
 
-BOOST_AUTO_TEST_CASE(math_frustum_test)
+BOOST_AUTO_TEST_CASE(gearoenix_math_frustum_test)
 {
     namespace gxm = gearoenix::math;
 
