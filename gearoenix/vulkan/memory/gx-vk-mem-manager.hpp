@@ -22,7 +22,8 @@ public:
     GX_GET_REFC_PRV(std::shared_ptr<device::Logical>, logical_device)
 private:
     std::weak_ptr<Manager> self;
-    std::map<Place, int> memories;
+    /// type-index -> memory
+    std::map<std::uint32_t, std::weak_ptr<Memory>> memories;
 
     explicit Manager(std::shared_ptr<device::Logical> logical_device) noexcept;
 
@@ -30,7 +31,7 @@ public:
     [[nodiscard]] static std::shared_ptr<Manager> construct(std::shared_ptr<device::Logical> logical_device) noexcept;
     ~Manager() noexcept;
 
-    [[nodiscard]] std::shared_ptr<Memory> allocate(std::size_t size, Place place) noexcept;
+    [[nodiscard]] std::shared_ptr<Memory> allocate(std::size_t size, std::uint32_t type_bits, Place place) noexcept;
 };
 }
 #endif

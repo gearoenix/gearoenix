@@ -5,9 +5,9 @@
 #include "../../core/gx-cr-static.hpp"
 #include "../gx-vk-loader.hpp"
 
-#ifdef GX_DEBUG_MODE
-#define GX_DEBUG_VK_MEM
-#endif
+namespace gearoenix::core {
+class Allocator;
+}
 
 namespace gearoenix::vulkan::device {
 class Logical;
@@ -17,15 +17,18 @@ namespace gearoenix::vulkan::memory {
 class Manager;
 class Memory final {
     GX_GET_REFC_PRV(std::shared_ptr<Manager>, manager)
-    GX_GET_VAL_PRV(VkDeviceMemory, memory, nullptr)
-    GX_GET_CVAL_PRV(std::size_t, size)
-    GX_GET_CVAL_PRV(std::size_t, offset)
-#ifdef GX_DEBUG_VK_MEM
-    GX_GETSET_VAL_PRV(bool, not_deleted, true)
-#endif
+    GX_GET_REFC_PRV(std::shared_ptr<Memory>, parent)
+    GX_GET_REFC_PRV(std::shared_ptr<core::Allocator>, allocator)
+    GX_GET_VAL_PRV(VkDeviceMemory, vulkan_data, nullptr)
+private:
+    std::weak_ptr<Memory> self;
+
+    Memory(std::shared_ptr<Manager> manager, std::shared_ptr<Memory> parent, std::shared_ptr<core::Allocator> allocator) noexcept;
+
 public:
-    Memory(std::shared_ptr<Manager> manager) noexcept;
+    [[nodiscard]] static std::shared_ptr<Memory> construct(std::size_t size, std::uint32_t index, std::shared_ptr<Manager> manager) noexcept;
     ~Memory() noexcept;
+    [[nodiscard]] std::shared_ptr<Memory> allocate(std::size_t size) noexcept;
 };
 }
 #endif
