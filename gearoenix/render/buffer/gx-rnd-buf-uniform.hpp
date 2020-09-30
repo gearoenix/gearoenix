@@ -6,9 +6,11 @@
 
 namespace gearoenix::render::buffer {
 class Uniform : public Buffer {
+    GX_GET_CVAL_PRT(std::size_t, frame_number)
 protected:
-    Uniform(const std::size_t s, engine::Engine* const e) noexcept
+    Uniform(const std::size_t s, std::size_t frame_number, engine::Engine* const e) noexcept
         : Buffer(s, e)
+        , frame_number(frame_number)
     {
     }
 

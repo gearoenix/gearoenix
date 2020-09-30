@@ -1,5 +1,6 @@
 #include "gx-vk-dev-physical.hpp"
 #ifdef GX_USE_VULKAN
+#include "../../math/gx-math-numeric.hpp"
 #include "../gx-vk-check.hpp"
 #include "../gx-vk-instance.hpp"
 #include "../gx-vk-surface.hpp"
@@ -164,6 +165,11 @@ std::uint32_t gearoenix::vulkan::device::Physical::get_memory_type_index(
         type_bits >>= 1u;
     }
     GXLOGF("Could not find the requested memory type.")
+}
+
+std::size_t gearoenix::vulkan::device::Physical::align_size(const std::size_t size) const noexcept
+{
+    return math::Numeric::align(size, static_cast<std::size_t>(max_memory_alignment));
 }
 
 #endif

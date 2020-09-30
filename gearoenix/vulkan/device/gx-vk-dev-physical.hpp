@@ -46,6 +46,7 @@ public:
     explicit Physical(std::shared_ptr<Surface> surface) noexcept;
     ~Physical() noexcept;
     [[nodiscard]] std::uint32_t get_memory_type_index(std::uint32_t type_bits, std::uint32_t mem_properties) const noexcept;
+    [[nodiscard]] std::size_t align_size(std::size_t size) const noexcept;
 };
 }
 #endif

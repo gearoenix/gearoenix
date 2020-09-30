@@ -1,5 +1,6 @@
 #include "gx-vk-buf-buffer.hpp"
 #ifdef GX_USE_VULKAN
+#include "../../core/gx-cr-allocator.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../device/gx-vk-dev-physical.hpp"
 #include "../gx-vk-check.hpp"
@@ -7,20 +8,57 @@
 #include "../memory/gx-vk-mem-memory.hpp"
 
 gearoenix::vulkan::buffer::Buffer::Buffer(
-    VkBuffer vd,
+    std::shared_ptr<core::Allocator> alc,
+    std::shared_ptr<Buffer> prt,
     std::shared_ptr<memory::Memory> mem,
-    void* const d,
-    const std::uint32_t off) noexcept
-    : allocated_memory(std::move(mem))
-    , vulkan_data(vd)
-    , offset(off)
-    , data(d)
+    VkBuffer vulkan_data) noexcept
+    : allocator(std::move(alc))
+    , parent(std::move(prt))
+    , allocated_memory(std::move(mem))
+    , vulkan_data(vulkan_data)
 {
+}
+
+std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Buffer::construct(
+    const std::size_t size,
+    const memory::Place place,
+    memory::Manager& memory_manager) noexcept
+{
+    auto* const logical_device = memory_manager.get_logical_device().get();
+    const auto aligned_size = logical_device->get_physical_device()->align_size(size);
+    auto allocator = core::Allocator::construct(aligned_size);
+    VkBufferCreateInfo info;
+    GX_SET_ZERO(info)
+    info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+    info.size = static_cast<VkDeviceSize>(aligned_size);
+    info.usage = place == memory::Place::Cpu ? VK_BUFFER_USAGE_TRANSFER_SRC_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT : VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
+    VkBuffer vulkan_data = nullptr;
+    VkDevice dev = logical_device->get_vulkan_data();
+    GX_VK_CHK_L(vkCreateBuffer(dev, &info, nullptr, &vulkan_data))
+    VkMemoryRequirements mem_req;
+    Loader::vkGetBufferMemoryRequirements(dev, vulkan_data, &mem_req);
+    auto allocated_memory = memory_manager.allocate(aligned_size, mem_req.memoryTypeBits, place);
+    std::shared_ptr<Buffer> result(new Buffer(std::move(allocator), nullptr, std::move(allocated_memory), vulkan_data));
+    result->self = result;
+    return result;
 }
 
 gearoenix::vulkan::buffer::Buffer::~Buffer() noexcept
 {
-    allocated_memory->get_manager()->destroy(vulkan_data, allocated_memory);
+    if (nullptr == parent)
+        Loader::vkDestroyBuffer(allocated_memory->get_manager()->get_logical_device()->get_vulkan_data(), vulkan_data, nullptr);
+}
+
+std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Buffer::allocate(const std::size_t size) noexcept
+{
+    const auto aligned_size = allocated_memory->get_manager()->get_logical_device()->get_physical_device()->align_size(size);
+    std::shared_ptr<Buffer> result(new Buffer(
+        allocator->allocate(aligned_size),
+        self.lock(),
+        allocated_memory->allocate(aligned_size),
+        vulkan_data));
+    result->self = result;
+    return result;
 }
 
 //void gearoenix::render::buffer::Buffer::copy(command::Buffer* copy_cmd, Buffer* src)

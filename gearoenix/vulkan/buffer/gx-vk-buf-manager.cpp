@@ -1,5 +1,6 @@
 #include "gx-vk-buf-manager.hpp"
 #ifdef GX_USE_VULKAN
+#include "../../core/gx-cr-allocator.hpp"
 #include "../../system/gx-sys-application.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "../memory/gx-vk-mem-manager.hpp"
@@ -12,7 +13,7 @@ std::vector<std::shared_ptr<gearoenix::vulkan::buffer::Buffer>> gearoenix::vulka
     const auto sz = e->get_system_application()->get_configuration().get_render().get_maximum_cpu_render_memory_size() / (count + 1);
     std::vector<std::shared_ptr<Buffer>> result(count);
     for (auto i = decltype(count) { 0 }; i < count; ++i)
-        result[i] = Buffer::construct(sz, memory::Place::Cpu);
+        result[i] = Buffer::construct(sz, memory::Place::Cpu, *memory_manager);
     return result;
 }
 
@@ -22,8 +23,8 @@ gearoenix::vulkan::buffer::Manager::Manager(
     : render::buffer::Manager(eng)
     , memory_manager(std::move(mm))
     , per_frame_cpu_root_buffers(create_per_frame_cpu_root_buffers())
-    , upload_root_buffer(Buffer::construct(per_frame_cpu_root_buffers[0]->size(), memory::Place::Cpu))
-    , gpu_root_buffer(Buffer::construct(e->get_system_application()->get_configuration().get_render().get_maximum_gpu_buffer_size(), memory::Place::Gpu))
+    , upload_root_buffer(Buffer::construct(per_frame_cpu_root_buffers[0]->get_allocator()->get_size(), memory::Place::Cpu, *memory_manager))
+    , gpu_root_buffer(Buffer::construct(e->get_system_application()->get_configuration().get_render().get_maximum_gpu_buffer_size(), memory::Place::Gpu, *memory_manager))
 {
 }
 
