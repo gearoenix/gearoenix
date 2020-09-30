@@ -24,7 +24,7 @@
 #elif defined(WIN32) || defined(WIN64) || defined(_WIN32) || defined(_WIN64)
 #define NOMINMAX
 #define GX_IN_WINDOWS
-//#define GX_USE_VULKAN
+#define GX_USE_VULKAN
 //#define GX_USE_DIRECTX12
 //#define GX_USE_DIRECTX11
 #define GX_USE_OPENGL_43

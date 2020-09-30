@@ -18,16 +18,23 @@ class Manager;
 }
 
 namespace gearoenix::vulkan::buffer {
+class Buffer;
 class Static;
-class Uniform;
 class Manager final : public render::buffer::Manager {
     GX_GET_REFC_PRV(std::shared_ptr<memory::Manager>, memory_manager)
 private:
-    std::vector<std::tuple<std::shared_ptr<Uniform>, std::shared_ptr<Static>>> copy_buffers;
-    std::vector<std::tuple<std::shared_ptr<Uniform>, std::shared_ptr<image::Image>>> copy_images;
+    std::weak_ptr<Manager> self;
+    std::vector<std::shared_ptr<Buffer>> per_frame_cpu_root_buffers;
+    std::shared_ptr<Buffer> upload_root_buffer;
+    std::shared_ptr<Buffer> gpu_root_buffer;
+
+    std::vector<std::tuple<std::shared_ptr<Buffer>, std::shared_ptr<Static>>> copy_buffers;
+    std::vector<std::tuple<std::shared_ptr<Buffer>, std::shared_ptr<image::Image>>> copy_images;
+
+    Manager(std::shared_ptr<memory::Manager> memory_manager, engine::Engine* eng) noexcept;
 
 public:
-    Manager(std::shared_ptr<memory::Manager> memory_manager, engine::Engine* eng) noexcept;
+    [[nodiscard]] static std::shared_ptr<Manager> construct(std::shared_ptr<memory::Manager> memory_manager, engine::Engine* eng) noexcept;
     ~Manager() noexcept final;
     [[nodiscard]] std::shared_ptr<render::buffer::Uniform> create_uniform(std::size_t size) noexcept final;
     [[nodiscard]] std::shared_ptr<render::buffer::Static> create_static(const std::vector<math::BasicVertex>& vertices, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept final;
