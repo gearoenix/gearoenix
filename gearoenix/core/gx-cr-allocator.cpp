@@ -4,9 +4,11 @@
 
 gearoenix::core::Allocator::Allocator(
     const std::size_t size,
-    const std::size_t offset) noexcept
+    const std::size_t offset,
+    const std::size_t root_offset) noexcept
     : size(size)
     , offset(offset)
+    , root_offset(root_offset)
     , ranges { { { size, 0 }, { nullptr, nullptr } } }
 {
 }
@@ -43,10 +45,10 @@ void gearoenix::core::Allocator::deallocate(const Allocator* const child) noexce
 }
 
 std::shared_ptr<gearoenix::core::Allocator> gearoenix::core::Allocator::construct(
-    const std::size_t size, const std::size_t offset) noexcept
+    const std::size_t size, const std::size_t offset, const std::size_t root_offset) noexcept
 {
     GX_CHECK_NOT_EQUAL_D(size, 0)
-    std::shared_ptr<Allocator> r(new Allocator(size, offset));
+    std::shared_ptr<Allocator> r(new Allocator(size, offset, root_offset));
     r->self = r;
     return r;
 }
@@ -72,7 +74,7 @@ std::shared_ptr<gearoenix::core::Allocator> gearoenix::core::Allocator::allocate
     }
     const auto found_size = search->first.first;
     const auto found_offset = search->first.second;
-    auto result = construct(sz, found_offset);
+    auto result = construct(sz, found_offset, root_offset + found_offset);
     result->parent = self.lock();
     const auto del_range = search->second;
     ranges.erase(search);

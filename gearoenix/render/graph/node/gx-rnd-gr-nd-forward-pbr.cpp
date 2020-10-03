@@ -32,9 +32,12 @@ const unsigned int gearoenix::render::graph::node::ForwardPbr::AMBIENT_OCCLUSION
 const unsigned int gearoenix::render::graph::node::ForwardPbr::BRDFLUT_INDEX = 3;
 const unsigned int gearoenix::render::graph::node::ForwardPbr::SHADOW_MAP_000_INDEX = 4;
 
-gearoenix::render::graph::node::ForwardPbrRenderData::ForwardPbrRenderData(engine::Engine* const e, pipeline::Pipeline* const pip) noexcept
+gearoenix::render::graph::node::ForwardPbrRenderData::ForwardPbrRenderData(
+    engine::Engine* const e,
+    pipeline::Pipeline* const pip,
+    const std::size_t frame_number) noexcept
     : r(dynamic_cast<pipeline::ForwardPbrResourceSet*>(pip->create_resource_set()))
-    , u(e->get_buffer_manager()->create_uniform(sizeof(ForwardPbrUniform)))
+    , u(e->get_buffer_manager()->create_uniform(sizeof(ForwardPbrUniform), frame_number))
 {
     r->set_node_uniform_buffer(u.get());
 }
@@ -52,7 +55,7 @@ void gearoenix::render::graph::node::ForwardPbr::record(
     ForwardPbrKernel* const kernel) noexcept
 {
     auto* const rd = kernel->render_data_pool.get_next([this] {
-        return new ForwardPbrRenderData(e, render_pipeline.get());
+        return new ForwardPbrRenderData(e, render_pipeline.get(), frame_number);
     });
     rd->u->set_data(u);
     auto* const prs = rd->r.get();
@@ -135,7 +138,7 @@ void gearoenix::render::graph::node::ForwardPbr::set_brdflut(texture::Texture2D*
 void gearoenix::render::graph::node::ForwardPbr::update() noexcept
 {
     Node::update();
-    const unsigned int frame_number = e->get_frame_number();
+    frame_number = static_cast<std::size_t>(e->get_frame_number());
     frame = frames[frame_number].get();
     for (auto& kernel : frame->kernels) {
         kernel->render_data_pool.refresh();
@@ -222,20 +225,10 @@ void gearoenix::render::graph::node::ForwardPbr::add_cascade(const light::Cascad
 void gearoenix::render::graph::node::ForwardPbr::record(const unsigned int kernel_index) noexcept
 {
     const unsigned int kernels_count = e->get_kernels()->get_threads_count();
-    unsigned int task_number = 0;
     auto* const kernel = frame->kernels[kernel_index].get();
-
-#define GX_DO_TASK(expr)                   \
-    {                                      \
-        if (task_number == kernel_index) { \
-            expr;                          \
-        }                                  \
-        ++task_number;                     \
-        task_number %= kernels_count;      \
-    }
-
+    GX_START_MULTITHREADED_TASKS
     for (const auto& [mdl, msh] : meshes) {
-        GX_DO_TASK(record(mdl, msh, uniform, kernel))
+        GX_DO_MULTITHREADED_TASK(record(mdl, msh, uniform, kernel))
     }
 }
 
@@ -249,7 +242,6 @@ void gearoenix::render::graph::node::ForwardPbr::record_continuously(unsigned in
 
 void gearoenix::render::graph::node::ForwardPbr::submit() noexcept
 {
-    const unsigned int frame_number = e->get_frame_number();
     command::Buffer* cmd = frames_primary_cmd[frame_number].get();
     cmd->bind(render_target);
     for (const auto& k : frame->kernels) {

@@ -5,7 +5,7 @@
 namespace gearoenix::render::buffer {
 class Static : public Buffer {
 protected:
-    Static(const unsigned int size, engine::Engine* const e) noexcept
+    Static(const std::size_t size, engine::Engine* const e) noexcept
         : Buffer(size, e)
     {
     }

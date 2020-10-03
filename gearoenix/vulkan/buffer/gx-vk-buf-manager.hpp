@@ -20,6 +20,7 @@ class Manager;
 namespace gearoenix::vulkan::buffer {
 class Buffer;
 class Static;
+class Uniform;
 class Manager final : public render::buffer::Manager {
     GX_GET_REFC_PRV(std::shared_ptr<memory::Manager>, memory_manager)
 private:
@@ -28,10 +29,11 @@ private:
     const std::shared_ptr<Buffer> upload_root_buffer;
     const std::shared_ptr<Buffer> gpu_root_buffer;
 
-    std::vector<std::tuple<std::shared_ptr<Buffer>, std::shared_ptr<Static>>> copy_buffers;
-    std::vector<std::tuple<std::shared_ptr<Buffer>, std::shared_ptr<image::Image>>> copy_images;
+    std::vector<std::tuple<std::shared_ptr<Uniform>, std::shared_ptr<Static>>> copy_buffers;
+    std::vector<std::tuple<std::shared_ptr<Uniform>, std::shared_ptr<image::Image>>> copy_images;
 
     [[nodiscard]] std::vector<std::shared_ptr<Buffer>> create_per_frame_cpu_root_buffers() const noexcept;
+    [[nodiscard]] std::shared_ptr<render::buffer::Static> create_static(std::size_t size, const void* data) noexcept;
 
 public:
     Manager(std::shared_ptr<memory::Manager> memory_manager, engine::Engine* eng) noexcept;

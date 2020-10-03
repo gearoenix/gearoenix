@@ -5,6 +5,7 @@
 #include "../../../math/gx-math-matrix-4d.hpp"
 #include "../../material/gx-rnd-mat-translucency-mode.hpp"
 #include "gx-rnd-gr-nd-node.hpp"
+#include <limits>
 #include <vector>
 
 namespace gearoenix::render::buffer {
@@ -41,7 +42,7 @@ struct SkyboxEquirectangularUniform {
 struct SkyboxEquirectangularRenderData {
     std::unique_ptr<pipeline::SkyboxEquirectangularResourceSet> r;
     std::shared_ptr<buffer::Uniform> u;
-    SkyboxEquirectangularRenderData(engine::Engine* e, pipeline::Pipeline* pip) noexcept;
+    SkyboxEquirectangularRenderData(engine::Engine* e, pipeline::Pipeline* pip, std::size_t frame_number) noexcept;
     ~SkyboxEquirectangularRenderData() noexcept;
 };
 
@@ -62,6 +63,7 @@ class SkyboxEquirectangular final : public Node {
 private:
     std::vector<std::unique_ptr<SkyboxEquirectangularFrame>> frames;
     SkyboxEquirectangularFrame* frame = nullptr;
+    std::size_t frame_number = std::numeric_limits<std::size_t>::max();
     const camera::Camera* cam = nullptr;
     std::vector<const skybox::Equirectangular*> skies;
 

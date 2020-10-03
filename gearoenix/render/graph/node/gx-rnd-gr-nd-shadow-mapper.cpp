@@ -15,9 +15,12 @@
 #include "../../sync/gx-rnd-sy-semaphore.hpp"
 #include "../../texture/gx-rnd-txt-target.hpp"
 
-gearoenix::render::graph::node::ShadowMapperRenderData::ShadowMapperRenderData(engine::Engine* const e, pipeline::Pipeline* const pip) noexcept
+gearoenix::render::graph::node::ShadowMapperRenderData::ShadowMapperRenderData(
+    engine::Engine* const e,
+    pipeline::Pipeline* const pip,
+    const std::size_t frame_number) noexcept
     : r(reinterpret_cast<pipeline::ShadowMapperResourceSet*>(pip->create_resource_set()))
-    , u(e->get_buffer_manager()->create_uniform(sizeof(ShadowMapperUniform)))
+    , u(e->get_buffer_manager()->create_uniform(sizeof(ShadowMapperUniform), frame_number))
 {
     r->set_node_uniform_buffer(u.get());
 }
@@ -108,7 +111,7 @@ gearoenix::render::graph::node::ShadowMapper::~ShadowMapper() noexcept
 void gearoenix::render::graph::node::ShadowMapper::update() noexcept
 {
     Node::update();
-    const unsigned int frame_number = e->get_frame_number();
+    frame_number = static_cast<std::size_t>(e->get_frame_number());
     frame = frames[frame_number].get();
     for (const auto& kernel : frame->kernels) {
         kernel->render_data_pool.refresh();
@@ -143,7 +146,7 @@ void gearoenix::render::graph::node::ShadowMapper::record_shadow(const math::Mat
         }
         const auto* const msh = id_mesh.second->get_msh().get();
         auto* const rd = kernel->render_data_pool.get_next([this] {
-            return new ShadowMapperRenderData(e, render_pipeline.get());
+            return new ShadowMapperRenderData(e, render_pipeline.get(), frame_number);
         });
         const auto& ub = rd->u;
         ub->set_data(u);
@@ -157,7 +160,6 @@ void gearoenix::render::graph::node::ShadowMapper::record_shadow(const math::Mat
 
 void gearoenix::render::graph::node::ShadowMapper::submit() noexcept
 {
-    const unsigned int frame_number = e->get_frame_number();
     command::Buffer* cmd = frames_primary_cmd[frame_number].get();
     cmd->bind(render_target);
     for (const auto& k : frame->kernels) {

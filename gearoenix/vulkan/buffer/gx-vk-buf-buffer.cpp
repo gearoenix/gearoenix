@@ -26,7 +26,7 @@ std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Bu
 {
     auto* const logical_device = memory_manager.get_logical_device().get();
     const auto aligned_size = logical_device->get_physical_device()->align_size(size);
-    auto allocator = core::Allocator::construct(aligned_size);
+    auto allocator = core::Allocator::construct(aligned_size, 0, 0);
     VkBufferCreateInfo info;
     GX_SET_ZERO(info)
     info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;

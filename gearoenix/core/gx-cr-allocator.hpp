@@ -6,7 +6,7 @@
 #include <optional>
 
 namespace gearoenix::core {
-struct Allocator final {
+class Allocator final {
     /// size, offset (within itself)
     typedef std::pair<std::size_t, std::size_t> SizeOffset;
     /// allocator that is before free space, allocator that is after space
@@ -15,6 +15,8 @@ struct Allocator final {
     GX_GET_CVAL_PRV(std::size_t, size)
     /// It is the offset from the direct parent not the origin parent
     GX_GET_CVAL_PRV(std::size_t, offset)
+    /// It is the offset from the root
+    GX_GET_CVAL_PRV(std::size_t, root_offset)
 private:
     GX_CREATE_GUARD(this)
     std::map<SizeOffset, Range> ranges;
@@ -26,11 +28,11 @@ private:
     Allocator* next = nullptr;
     Allocator* first_child = nullptr;
 
-    Allocator(std::size_t size, std::size_t offset) noexcept;
+    Allocator(std::size_t size, std::size_t offset, std::size_t root_offset) noexcept;
     void deallocate(const Allocator* child) noexcept;
 
 public:
-    [[nodiscard]] static std::shared_ptr<Allocator> construct(std::size_t size, std::size_t offset = 0) noexcept;
+    [[nodiscard]] static std::shared_ptr<Allocator> construct(std::size_t size, std::size_t offset, std::size_t root_offset) noexcept;
     ~Allocator() noexcept;
     [[nodiscard]] std::shared_ptr<Allocator> allocate(std::size_t size) noexcept;
 };

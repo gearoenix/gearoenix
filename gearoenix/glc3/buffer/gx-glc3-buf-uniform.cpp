@@ -3,8 +3,8 @@
 #include "../engine/gx-glc3-eng-engine.hpp"
 #include <cstring>
 
-gearoenix::glc3::buffer::Uniform::Uniform(const std::size_t s, engine::Engine* const e) noexcept
-    : render::buffer::Uniform(s, e)
+gearoenix::glc3::buffer::Uniform::Uniform(const std::size_t s, const std::size_t fn, engine::Engine* const e) noexcept
+    : render::buffer::Uniform(s, fn, e)
     , data(s)
 {
 }

@@ -15,7 +15,7 @@ private:
     std::vector<unsigned char> data;
 
 public:
-    Uniform(std::size_t s, engine::Engine* e) noexcept;
+    Uniform(std::size_t s, std::size_t frame_number, engine::Engine* e) noexcept;
     ~Uniform() noexcept final = default;
     void update(const void* src) noexcept final;
     [[nodiscard]] const void* get_data() const noexcept final;

@@ -5,6 +5,7 @@
 #include "../../../math/gx-math-matrix-4d.hpp"
 #include "../../material/gx-rnd-mat-translucency-mode.hpp"
 #include "gx-rnd-gr-nd-node.hpp"
+#include <limits>
 #include <vector>
 
 namespace gearoenix::render::buffer {
@@ -37,7 +38,7 @@ struct UnlitUniform {
 struct UnlitRenderData {
     std::unique_ptr<pipeline::UnlitResourceSet> r;
     std::shared_ptr<buffer::Uniform> u;
-    UnlitRenderData(engine::Engine* e, pipeline::Pipeline* pip) noexcept;
+    UnlitRenderData(engine::Engine* e, pipeline::Pipeline* pip, std::size_t frame_number) noexcept;
     ~UnlitRenderData() noexcept;
 };
 
@@ -58,6 +59,7 @@ class Unlit final : public Node {
 private:
     std::vector<std::unique_ptr<UnlitFrame>> frames;
     UnlitFrame* frame = nullptr;
+    std::size_t frame_number = std::numeric_limits<std::size_t>::max();
     const camera::Camera* cam = nullptr;
     std::vector<std::pair<model::Model*, model::Mesh*>> meshes;
 

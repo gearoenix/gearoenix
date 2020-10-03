@@ -26,7 +26,7 @@ std::shared_ptr<gearoenix::vulkan::memory::Memory> gearoenix::vulkan::memory::Me
     const auto* const logical_device = manager->get_logical_device().get();
     const auto aligned_size = math::Numeric::align(
         size, static_cast<std::size_t>(logical_device->get_physical_device()->get_max_memory_alignment()));
-    std::shared_ptr<Memory> result(new Memory(std::move(manager), nullptr, core::Allocator::construct(aligned_size)));
+    std::shared_ptr<Memory> result(new Memory(std::move(manager), nullptr, core::Allocator::construct(aligned_size, 0, 0)));
     result->self = result;
     VkMemoryAllocateInfo info;
     GX_SET_ZERO(info)

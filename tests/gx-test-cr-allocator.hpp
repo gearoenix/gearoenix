@@ -4,7 +4,7 @@
 
 BOOST_AUTO_TEST_CASE(gearoenix_core_allocator_test)
 {
-    auto alc = gearoenix::core::Allocator::construct(100);
+    auto alc = gearoenix::core::Allocator::construct(100, 0, 0);
     auto a1 = alc->allocate(50);
     BOOST_TEST(0 == a1->get_offset());
     auto a2 = alc->allocate(50);

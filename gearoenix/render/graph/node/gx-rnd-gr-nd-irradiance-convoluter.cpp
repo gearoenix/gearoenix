@@ -65,7 +65,7 @@ gearoenix::render::graph::node::IrradianceConvoluter::IrradianceConvoluter(
         },
         call)
     , frames(e->get_frames_count())
-    , uniform(e->get_buffer_manager()->create_uniform(sizeof(IrradianceConvoluterUniform)))
+    , uniform(e->get_buffer_manager()->create_uniform(sizeof(IrradianceConvoluterUniform), 0))
     , environment(environment)
 {
     uniform->set_data(mvp);
@@ -82,8 +82,7 @@ gearoenix::render::graph::node::IrradianceConvoluter::~IrradianceConvoluter() no
 void gearoenix::render::graph::node::IrradianceConvoluter::update() noexcept
 {
     Node::update();
-    const auto frame_number = e->get_frame_number();
-    frame = frames[frame_number].get();
+    frame = frames[e->get_frame_number()].get();
     auto& kernels = frame->kernels;
     for (auto& kernel : kernels) {
         kernel->secondary_cmd->begin();
@@ -103,8 +102,7 @@ void gearoenix::render::graph::node::IrradianceConvoluter::record_continuously(c
 
 void gearoenix::render::graph::node::IrradianceConvoluter::submit() noexcept
 {
-    const unsigned int frame_number = e->get_frame_number();
-    command::Buffer* cmd = frames_primary_cmd[frame_number].get();
+    command::Buffer* const cmd = frames_primary_cmd[e->get_frame_number()].get();
     cmd->bind(render_target);
     for (const auto& k : frame->kernels) {
         cmd->record(k->secondary_cmd.get());

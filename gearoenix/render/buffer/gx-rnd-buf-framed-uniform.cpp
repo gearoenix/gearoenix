@@ -6,9 +6,9 @@ gearoenix::render::buffer::FramedUniform::FramedUniform(const std::size_t s, eng
     , uniforms(e->get_frames_count())
 {
     auto* const buff_mgr = e->get_buffer_manager();
-    const unsigned int fc = e->get_frames_count();
-    for (unsigned int i = 0; i < fc; ++i)
-        uniforms[i] = std::shared_ptr<Uniform>(buff_mgr->create_uniform(s));
+    const auto fc = static_cast<std::size_t>(e->get_frames_count());
+    for (std::size_t i = 0; i < fc; ++i)
+        uniforms[i] = std::shared_ptr<Uniform>(buff_mgr->create_uniform(s, i));
 }
 
 gearoenix::render::buffer::FramedUniform::~FramedUniform() noexcept

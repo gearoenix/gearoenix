@@ -4,6 +4,7 @@
 #include "../../../core/sync/gx-cr-sync-end-caller.hpp"
 #include "../../../math/gx-math-matrix-4d.hpp"
 #include "gx-rnd-gr-nd-node.hpp"
+#include <limits>
 #include <memory>
 #include <vector>
 
@@ -54,7 +55,7 @@ struct ShadowMapperUniform {
 struct ShadowMapperRenderData {
     std::unique_ptr<pipeline::ShadowMapperResourceSet> r;
     std::shared_ptr<buffer::Uniform> u;
-    ShadowMapperRenderData(engine::Engine* e, pipeline::Pipeline* pip) noexcept;
+    ShadowMapperRenderData(engine::Engine* e, pipeline::Pipeline* pip, std::size_t frame_number) noexcept;
     ~ShadowMapperRenderData() noexcept;
 };
 
@@ -79,6 +80,7 @@ private:
     std::vector<std::unique_ptr<ShadowMapperFrame>> frames;
     std::shared_ptr<texture::Target> shadow_map_render_target;
     ShadowMapperFrame* frame = nullptr;
+    std::size_t frame_number = std::numeric_limits<std::size_t>::max();
 
 public:
     ShadowMapper(std::string name, engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;

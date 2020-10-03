@@ -23,9 +23,12 @@
 #include "../../texture/gx-rnd-txt-target.hpp"
 #include "../../texture/gx-rnd-txt-texture-cube.hpp"
 
-gearoenix::render::graph::node::UnlitRenderData::UnlitRenderData(engine::Engine* e, pipeline::Pipeline* pip) noexcept
+gearoenix::render::graph::node::UnlitRenderData::UnlitRenderData(
+    engine::Engine* const e,
+    pipeline::Pipeline* const pip,
+    const std::size_t frame_number) noexcept
     : r(dynamic_cast<pipeline::UnlitResourceSet*>(pip->create_resource_set()))
-    , u(e->get_buffer_manager()->create_uniform(sizeof(UnlitUniform)))
+    , u(e->get_buffer_manager()->create_uniform(sizeof(UnlitUniform), frame_number))
 {
     r->set_node_uniform_buffer(u.get());
 }
@@ -55,7 +58,7 @@ void gearoenix::render::graph::node::Unlit::record(
     UnlitKernel* const kernel) noexcept
 {
     auto* const rd = kernel->render_data_pool.get_next([this] {
-        return new UnlitRenderData(e, render_pipeline.get());
+        return new UnlitRenderData(e, render_pipeline.get(), frame_number);
     });
     rd->u->set_data(u);
     auto* const prs = rd->r.get();
@@ -93,7 +96,7 @@ gearoenix::render::graph::node::Unlit::~Unlit() noexcept = default;
 void gearoenix::render::graph::node::Unlit::update() noexcept
 {
     Node::update();
-    const unsigned int frame_number = e->get_frame_number();
+    frame_number = static_cast<std::size_t>(e->get_frame_number());
     frame = frames[frame_number].get();
     auto& kernels = frame->kernels;
     for (auto& kernel : kernels) {
@@ -150,7 +153,6 @@ void gearoenix::render::graph::node::Unlit::record_continuously(const unsigned i
 
 void gearoenix::render::graph::node::Unlit::submit() noexcept
 {
-    const unsigned int frame_number = e->get_frame_number();
     command::Buffer* cmd = frames_primary_cmd[frame_number].get();
     cmd->bind(render_target);
     for (const auto& k : frame->kernels) {

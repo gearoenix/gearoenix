@@ -5,6 +5,7 @@
 #include "../../../math/gx-math-matrix-4d.hpp"
 #include "../../material/gx-rnd-mat-translucency-mode.hpp"
 #include "gx-rnd-gr-nd-node.hpp"
+#include <limits>
 #include <vector>
 
 namespace gearoenix::render::buffer {
@@ -41,7 +42,7 @@ struct SkyboxCubeUniform {
 struct SkyboxCubeRenderData {
     std::unique_ptr<pipeline::SkyboxCubeResourceSet> r;
     std::shared_ptr<buffer::Uniform> u;
-    SkyboxCubeRenderData(engine::Engine* e, pipeline::Pipeline* pip) noexcept;
+    SkyboxCubeRenderData(engine::Engine* e, pipeline::Pipeline* pip, std::size_t frame_number) noexcept;
     ~SkyboxCubeRenderData() noexcept;
 };
 
@@ -62,6 +63,7 @@ class SkyboxCube final : public Node {
 private:
     std::vector<std::unique_ptr<SkyboxCubeFrame>> frames;
     SkyboxCubeFrame* frame = nullptr;
+    std::size_t frame_number = std::numeric_limits<std::size_t>::max();
     const camera::Camera* cam = nullptr;
     std::vector<const skybox::Cube*> skies;
 

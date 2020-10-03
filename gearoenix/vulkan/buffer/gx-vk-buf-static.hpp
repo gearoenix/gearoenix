@@ -3,16 +3,19 @@
 #include "../../core/gx-cr-build-configuration.hpp"
 #ifdef GX_USE_VULKAN
 #include "../../render/buffer/gx-rnd-buf-static.hpp"
-#include "gx-vk-buf-buffer.hpp"
+
+namespace gearoenix::vulkan::engine {
+class Engine;
+}
 
 namespace gearoenix::vulkan::buffer {
-class Static final : public render::buffer::Static, public Buffer {
+class Buffer;
+class Static final : public render::buffer::Static {
+    GX_GET_REFC_PRV(std::shared_ptr<vulkan::buffer::Buffer>, allocated_buffer)
 public:
     Static(
+        std::shared_ptr<vulkan::buffer::Buffer> allocated_buffer,
         std::size_t size,
-        std::uint32_t offset,
-        VkBuffer vulkan_data,
-        std::shared_ptr<memory::Memory> allocated_memory,
         engine::Engine* eng) noexcept;
     ~Static() noexcept final;
 };

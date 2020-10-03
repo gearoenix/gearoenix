@@ -11,9 +11,9 @@ gearoenix::glc3::buffer::Manager::Manager(engine::Engine* const e) noexcept
 {
 }
 
-std::shared_ptr<gearoenix::render::buffer::Uniform> gearoenix::glc3::buffer::Manager::create_uniform(const std::size_t size) noexcept
+std::shared_ptr<gearoenix::render::buffer::Uniform> gearoenix::glc3::buffer::Manager::create_uniform(const std::size_t size, std::size_t frame_number) noexcept
 {
-    return std::make_shared<Uniform>(size, dynamic_cast<engine::Engine*>(e));
+    return std::make_shared<Uniform>(size, frame_number, dynamic_cast<engine::Engine*>(e));
 }
 
 std::shared_ptr<gearoenix::render::buffer::Static> gearoenix::glc3::buffer::Manager::create_static(const std::vector<math::BasicVertex>& vertices, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept

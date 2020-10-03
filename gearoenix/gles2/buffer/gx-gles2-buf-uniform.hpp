@@ -17,7 +17,7 @@ namespace buffer {
         void update(const void* src) noexcept final;
 
     public:
-        Uniform(std::size_t s, engine::Engine* e) noexcept;
+        Uniform(std::size_t s, std::size_t frame_number, engine::Engine* e) noexcept;
         ~Uniform() noexcept final;
     };
 } // namespace buffer

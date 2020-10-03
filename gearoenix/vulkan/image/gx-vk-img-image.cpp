@@ -1,5 +1,6 @@
 #include "gx-vk-img-image.hpp"
 #ifdef GX_USE_VULKAN
+#include "../../core/gx-cr-allocator.hpp"
 #include "../buffer/gx-vk-buf-buffer.hpp"
 #include "../command/gx-vk-cmd-buffer.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
@@ -55,13 +56,20 @@ gearoenix::vulkan::image::Image::Image(
     info.tiling = VK_IMAGE_TILING_OPTIMAL;
     info.usage = usage;
     info.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    std::tie(vulkan_data, allocated_memory) = mem_mgr.create(info);
+    VkDevice vk_dev = logical_device->get_vulkan_data();
+    GX_VK_CHK_L(vkCreateImage(vk_dev, &info, nullptr, &vulkan_data))
+    VkMemoryRequirements mem_req;
+    GX_SET_ZERO(mem_req)
+    Loader::vkGetImageMemoryRequirements(vk_dev, vulkan_data, &mem_req);
+    allocated_memory = mem_mgr.allocate(mem_req.size, mem_req.memoryTypeBits, memory::Place::Gpu);
 }
 
 gearoenix::vulkan::image::Image::~Image() noexcept
 {
-    if (nullptr != allocated_memory)
-        allocated_memory->get_manager()->destroy(vulkan_data, allocated_memory);
+    if (nullptr != allocated_memory) {
+        Loader::vkDestroyImage(logical_device->get_vulkan_data(), vulkan_data, nullptr);
+        allocated_memory = nullptr;
+    }
 }
 
 void gearoenix::vulkan::image::Image::transit(command::Buffer& c, const VkImageLayout& old_lyt, const VkImageLayout& new_lyt) noexcept
@@ -112,7 +120,7 @@ void gearoenix::vulkan::image::Image::copy_from_buffer(command::Buffer& c, const
 {
     VkBufferImageCopy region;
     GX_SET_ZERO(region)
-    region.bufferOffset = b.get_offset();
+    region.bufferOffset = b.get_allocator()->get_root_offset();
     switch (format) {
     case VK_FORMAT_R8G8B8A8_UNORM:
         region.bufferRowLength = 4 * image_width;

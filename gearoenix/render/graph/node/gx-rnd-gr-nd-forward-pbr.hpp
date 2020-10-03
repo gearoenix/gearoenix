@@ -5,6 +5,7 @@
 #include "../../../math/gx-math-matrix-4d.hpp"
 #include "../../material/gx-rnd-mat-translucency-mode.hpp"
 #include "gx-rnd-gr-nd-node.hpp"
+#include <limits>
 #include <vector>
 
 namespace gearoenix::render::buffer {
@@ -62,7 +63,7 @@ struct ForwardPbrUniform {
 struct ForwardPbrRenderData {
     std::unique_ptr<pipeline::ForwardPbrResourceSet> r;
     std::shared_ptr<buffer::Uniform> u;
-    ForwardPbrRenderData(engine::Engine* e, pipeline::Pipeline* pip) noexcept;
+    ForwardPbrRenderData(engine::Engine* e, pipeline::Pipeline* pip, std::size_t frame_number) noexcept;
     ~ForwardPbrRenderData() noexcept;
 };
 
@@ -86,6 +87,7 @@ class ForwardPbr final : public Node {
 private:
     std::vector<std::unique_ptr<ForwardPbrFrame>> frames;
     ForwardPbrFrame* frame = nullptr;
+    std::size_t frame_number = std::numeric_limits<std::size_t>::max();
     const scene::Scene* scn = nullptr;
     const camera::Camera* cam = nullptr;
     std::vector<std::pair<const model::Model*, const model::Mesh*>> meshes;

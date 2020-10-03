@@ -33,7 +33,7 @@ gearoenix::render::graph::node::RadianceConvoluterKernel::RadianceConvoluterKern
     const unsigned int kernel_index) noexcept
     : secondary_cmd(e->get_command_manager()->create_secondary_command_buffer(kernel_index))
     , r(dynamic_cast<pipeline::RadianceConvoluterResourceSet*>(pip->create_resource_set()))
-    , u(e->get_buffer_manager()->create_uniform(sizeof(RadianceConvoluterUniform)))
+    , u(e->get_buffer_manager()->create_uniform(sizeof(RadianceConvoluterUniform), 0))
 {
     RadianceConvoluterUniform ud(roughness, resolution);
     u->set_data(ud);
