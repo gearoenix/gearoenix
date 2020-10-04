@@ -5,6 +5,7 @@
 #include "../../render/scene/gx-rnd-scn-scene.hpp"
 #include "../../system/gx-sys-application.hpp"
 #include "../buffer/gx-vk-buf-buffer.hpp"
+#include "../buffer/gx-vk-buf-manager.hpp"
 #include "../command/gx-vk-cmd-buffer.hpp"
 #include "../command/gx-vk-cmd-manager.hpp"
 #include "../command/gx-vk-cmd-pool.hpp"
@@ -45,6 +46,7 @@ gearoenix::vulkan::engine::Engine::Engine(system::Application* const sys_app) no
         framebuffers[i] = std::make_shared<Framebuffer>(frame_views[i], depth_stencil, render_pass);
         wait_fences[i] = std::make_shared<sync::Fence>(logical_device, true);
     }
+    buffer_manager = std::make_unique<buffer::Manager>(memory_manager, this);
 }
 
 gearoenix::vulkan::engine::Engine* gearoenix::vulkan::engine::Engine::construct(

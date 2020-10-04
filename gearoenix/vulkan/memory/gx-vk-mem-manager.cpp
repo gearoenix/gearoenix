@@ -36,7 +36,7 @@ std::shared_ptr<gearoenix::vulkan::memory::Memory> gearoenix::vulkan::memory::Ma
     if (nullptr == mem) {
         const auto& cfg = physical_device->get_surface()->get_system_application()->get_configuration().get_render();
         const auto sz = place == Place::Gpu ? cfg.get_maximum_gpu_render_memory_size() : cfg.get_maximum_cpu_render_memory_size();
-        mem = Memory::construct(sz, index, self.lock());
+        mem = Memory::construct(sz, index, self.lock(), place);
         memories[index] = mem;
     }
     return mem->allocate(size);

@@ -62,6 +62,9 @@ gearoenix::vulkan::image::Image::Image(
     GX_SET_ZERO(mem_req)
     Loader::vkGetImageMemoryRequirements(vk_dev, vulkan_data, &mem_req);
     allocated_memory = mem_mgr.allocate(mem_req.size, mem_req.memoryTypeBits, memory::Place::Gpu);
+    GX_VK_CHK_L(vkBindImageMemory(
+        vk_dev, vulkan_data, allocated_memory->get_vulkan_data(),
+        allocated_memory->get_allocator()->get_root_offset()))
 }
 
 gearoenix::vulkan::image::Image::~Image() noexcept

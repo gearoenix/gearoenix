@@ -13,8 +13,6 @@ class Buffer;
 class Uniform final : public render::buffer::Uniform {
     GX_GET_REFC_PRV(std::shared_ptr<vulkan::buffer::Buffer>, allocated_buffer)
 private:
-    void* data = nullptr;
-
     [[nodiscard]] const void* get_data() const noexcept final;
     [[nodiscard]] void* get_data() noexcept final;
 

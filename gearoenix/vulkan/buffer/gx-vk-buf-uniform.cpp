@@ -10,12 +10,12 @@
 
 const void* gearoenix::vulkan::buffer::Uniform::get_data() const noexcept
 {
-    return data;
+    return allocated_buffer->get_allocated_memory()->get_data();
 }
 
 void* gearoenix::vulkan::buffer::Uniform::get_data() noexcept
 {
-    return data;
+    return allocated_buffer->get_allocated_memory()->get_data();
 }
 
 gearoenix::vulkan::buffer::Uniform::Uniform(
@@ -26,21 +26,13 @@ gearoenix::vulkan::buffer::Uniform::Uniform(
     : render::buffer::Uniform(size, frame_number, eng)
     , allocated_buffer(std::move(alc))
 {
-    const auto& mem = allocated_buffer->get_allocated_memory();
-    // It can be happened one time but some vendors/drivers may complain it.
-    GX_VK_CHK_L(vkMapMemory(
-        mem->get_manager()->get_logical_device()->get_vulkan_data(),
-        mem->get_vulkan_data(),
-        static_cast<VkDeviceSize>(mem->get_allocator()->get_root_offset()),
-        static_cast<VkDeviceSize>(size),
-        0, &data))
 }
 
 gearoenix::vulkan::buffer::Uniform::~Uniform() noexcept = default;
 
 void gearoenix::vulkan::buffer::Uniform::update(const void* src) noexcept
 {
-    std::memcpy(data, src, size);
+    std::memcpy(allocated_buffer->get_allocated_memory()->get_data(), src, size);
 }
 
 #endif

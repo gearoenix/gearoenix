@@ -38,6 +38,9 @@ std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Bu
     VkMemoryRequirements mem_req;
     Loader::vkGetBufferMemoryRequirements(dev, vulkan_data, &mem_req);
     auto allocated_memory = memory_manager.allocate(aligned_size, mem_req.memoryTypeBits, place);
+    GX_VK_CHK_L(vkBindBufferMemory(
+        dev, vulkan_data, allocated_memory->get_vulkan_data(),
+        allocated_memory->get_allocator()->get_root_offset()))
     std::shared_ptr<Buffer> result(new Buffer(std::move(allocator), nullptr, std::move(allocated_memory), vulkan_data));
     result->self = result;
     return result;
