@@ -31,12 +31,12 @@ std::shared_ptr<gearoenix::vulkan::memory::Memory> gearoenix::vulkan::memory::Ma
 {
     const auto& physical_device = logical_device->get_physical_device();
     const auto memory_properties = place == Place::Gpu ? VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT : VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
-    const auto index = physical_device->get_memory_type_index(type_bits, memory_properties);
+    const auto index = std::make_pair(physical_device->get_memory_type_index(type_bits, memory_properties), place);
     auto mem = memories[index].lock();
     if (nullptr == mem) {
         const auto& cfg = physical_device->get_surface()->get_system_application()->get_configuration().get_render();
         const auto sz = place == Place::Gpu ? cfg.get_maximum_gpu_render_memory_size() : cfg.get_maximum_cpu_render_memory_size();
-        mem = Memory::construct(sz, index, self.lock(), place);
+        mem = Memory::construct(sz, index.first, self.lock(), place);
         memories[index] = mem;
     }
     return mem->allocate(size);

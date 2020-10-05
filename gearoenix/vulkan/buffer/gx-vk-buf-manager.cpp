@@ -2,6 +2,8 @@
 #ifdef GX_USE_VULKAN
 #include "../../core/gx-cr-allocator.hpp"
 #include "../../system/gx-sys-application.hpp"
+#include "../device/gx-vk-dev-logical.hpp"
+#include "../device/gx-vk-dev-physical.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "../memory/gx-vk-mem-manager.hpp"
 #include "gx-vk-buf-buffer.hpp"
@@ -12,7 +14,7 @@
 std::vector<std::shared_ptr<gearoenix::vulkan::buffer::Buffer>> gearoenix::vulkan::buffer::Manager::create_per_frame_cpu_root_buffers() const noexcept
 {
     const auto count = e->get_frames_count();
-    const auto sz = e->get_system_application()->get_configuration().get_render().get_maximum_cpu_render_memory_size() / (count + 1);
+    const auto sz = (e->get_system_application()->get_configuration().get_render().get_maximum_cpu_render_memory_size() / (count + 1)) - memory_manager->get_logical_device()->get_physical_device()->get_max_memory_alignment();
     std::vector<std::shared_ptr<Buffer>> result(count);
     for (auto i = decltype(count) { 0 }; i < count; ++i)
         result[i] = Buffer::construct(sz, memory::Place::Cpu, *memory_manager);

@@ -23,7 +23,7 @@ public:
 private:
     std::weak_ptr<Manager> self;
     /// type-index -> memory
-    std::map<std::uint32_t, std::weak_ptr<Memory>> memories;
+    std::map<std::pair<std::uint32_t, Place>, std::weak_ptr<Memory>> memories;
 
     explicit Manager(std::shared_ptr<device::Logical> logical_device) noexcept;
 

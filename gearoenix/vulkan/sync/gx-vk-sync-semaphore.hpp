@@ -3,6 +3,7 @@
 #include "../../core/gx-cr-build-configuration.hpp"
 #ifdef GX_USE_VULKAN
 #include "../../core/gx-cr-static.hpp"
+#include "../../render/sync/gx-rnd-sy-semaphore.hpp"
 #include "../gx-vk-loader.hpp"
 
 namespace gearoenix::vulkan::device {
@@ -10,13 +11,13 @@ class Logical;
 }
 
 namespace gearoenix::vulkan::sync {
-class Semaphore final {
+class Semaphore final : public render::sync::Semaphore {
     GX_GET_REFC_PRV(std::shared_ptr<device::Logical>, logical_device)
     GX_GET_VAL_PRV(VkSemaphore, vulkan_data, nullptr)
 
 public:
     explicit Semaphore(std::shared_ptr<device::Logical> logical_device) noexcept;
-    ~Semaphore() noexcept;
+    ~Semaphore() noexcept final;
 };
 }
 #endif

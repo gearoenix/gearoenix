@@ -1,14 +1,11 @@
 #ifndef GEAROENIX_RENDER_SYNC_SEMAPHORE_HPP
 #define GEAROENIX_RENDER_SYNC_SEMAPHORE_HPP
 
-namespace gearoenix {
-namespace render {
-    namespace sync {
-        class Semaphore {
-        public:
-        };
-    }
-}
+namespace gearoenix::render::sync {
+class Semaphore {
+public:
+    virtual ~Semaphore() noexcept = default;
+};
 }
 
 #endif

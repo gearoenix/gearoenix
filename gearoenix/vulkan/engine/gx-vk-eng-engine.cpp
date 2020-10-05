@@ -12,17 +12,13 @@
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../device/gx-vk-dev-physical.hpp"
 #include "../gx-vk-check.hpp"
-#include "../gx-vk-framebuffer.hpp"
 #include "../gx-vk-instance.hpp"
-#include "../gx-vk-render-pass.hpp"
 #include "../gx-vk-surface.hpp"
-#include "../gx-vk-swapchain.hpp"
 #include "../image/gx-vk-img-image.hpp"
-#include "../image/gx-vk-img-view.hpp"
 #include "../memory/gx-vk-mem-manager.hpp"
 #include "../sampler/gx-vk-smp-manager.hpp"
-#include "../sync/gx-vk-sync-fence.hpp"
 #include "../sync/gx-vk-sync-semaphore.hpp"
+#include "../texture/gx-vk-txt-main-target.hpp"
 
 gearoenix::vulkan::engine::Engine::Engine(system::Application* const sys_app) noexcept
     : render::engine::Engine(sys_app, render::engine::Type::Vulkan)
@@ -32,20 +28,12 @@ gearoenix::vulkan::engine::Engine::Engine(system::Application* const sys_app) no
     surface = std::make_shared<Surface>(instance, sys_app);
     physical_device = std::make_shared<device::Physical>(surface);
     logical_device = std::make_shared<device::Logical>(physical_device);
-    swapchain = std::make_shared<Swapchain>(logical_device);
     memory_manager = memory::Manager::construct(logical_device);
     sampler_manager = std::make_shared<sampler::Manager>(logical_device);
     command_manager = std::make_unique<command::Manager>(logical_device);
-    depth_stencil = image::View::create_depth_stencil(*memory_manager);
-    render_pass = std::make_shared<RenderPass>(swapchain);
-    const auto& frame_views = swapchain->get_image_views();
-    frames_count = frame_views.size();
-    framebuffers.resize(frames_count);
-    wait_fences.resize(frames_count);
-    for (auto i = decltype(frames_count) { 0 }; i < frames_count; ++i) {
-        framebuffers[i] = std::make_shared<Framebuffer>(frame_views[i], depth_stencil, render_pass);
-        wait_fences[i] = std::make_shared<sync::Fence>(logical_device, true);
-    }
+    main_render_target = std::make_shared<texture::MainTarget>(*memory_manager, this);
+    frames_count = dynamic_cast<texture::MainTarget*>(main_render_target.get())->get_frames().size();
+    // Buffer manager needs the number of frames
     buffer_manager = std::make_unique<buffer::Manager>(memory_manager, this);
 }
 
@@ -233,7 +221,7 @@ void gearoenix::vulkan::engine::Engine::terminate() noexcept { }
 
 std::shared_ptr<gearoenix::render::sync::Semaphore> gearoenix::vulkan::engine::Engine::create_semaphore() const noexcept
 {
-    return std::shared_ptr<render::sync::Semaphore>();
+    return std::make_shared<sync::Semaphore>(logical_device);
 }
 
 std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::vulkan::engine::Engine::create_texture_2d(
@@ -243,9 +231,8 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::vulkan::engine
     const render::texture::TextureInfo& info,
     std::size_t img_width,
     std::size_t img_height,
-    const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
-{
-    return std::shared_ptr<render::texture::Texture2D>();
+    const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept {
+    GX_UNIMPLEMENTED
 }
 
 std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::vulkan::engine::Engine::create_texture_cube(
@@ -254,9 +241,8 @@ std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::vulkan::engi
     std::vector<std::vector<std::vector<std::uint8_t>>> data,
     const render::texture::TextureInfo& info,
     std::size_t aspect,
-    const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
-{
-    return std::shared_ptr<render::texture::TextureCube>();
+    const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept {
+    GX_UNIMPLEMENTED
 }
 
 std::shared_ptr<gearoenix::render::texture::Target> gearoenix::vulkan::engine::Engine::create_render_target(
@@ -264,7 +250,7 @@ std::shared_ptr<gearoenix::render::texture::Target> gearoenix::vulkan::engine::E
     const std::vector<render::texture::AttachmentInfo>& infos,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
 {
-    return std::shared_ptr<render::texture::Target>();
+    GX_UNIMPLEMENTED
 }
 
 void gearoenix::vulkan::engine::Engine::submit(
@@ -275,6 +261,7 @@ void gearoenix::vulkan::engine::Engine::submit(
     const std::size_t nxts_count,
     const render::sync::Semaphore* const* nxts) noexcept
 {
+    GX_UNIMPLEMENTED
 }
 
 //void gearoenix::render::Engine::setup_draw_buffers()

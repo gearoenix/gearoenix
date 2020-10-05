@@ -40,10 +40,7 @@ std::shared_ptr<gearoenix::vulkan::memory::Memory> gearoenix::vulkan::memory::Me
     void* data = nullptr;
     GX_VK_CHK_L(vkAllocateMemory(vk_dev, &info, nullptr, &vulkan_data))
     if (Place::Cpu == place) {
-        GX_VK_CHK_L(vkMapMemory(vk_dev, vulkan_data,
-            static_cast<VkDeviceSize>(allocator->get_root_offset()),
-            static_cast<VkDeviceSize>(size),
-            0, &data))
+        GX_VK_CHK_L(vkMapMemory(vk_dev, vulkan_data, 0, static_cast<VkDeviceSize>(aligned_size), 0, &data))
     }
     std::shared_ptr<Memory> result(new Memory(std::move(manager), nullptr, std::move(allocator), data));
     result->vulkan_data = vulkan_data;

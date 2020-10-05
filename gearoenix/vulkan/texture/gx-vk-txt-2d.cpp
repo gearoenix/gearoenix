@@ -1,4 +1,4 @@
-#include "gx-vk-txt-texture-2d.hpp"
+#include "gx-vk-txt-2d.hpp"
 #ifdef USE_VULKAN
 #include "../../core/gx-cr-static.hpp"
 #include "../../core/sync/gx-cr-sync-end-caller.hpp"

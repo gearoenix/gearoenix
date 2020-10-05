@@ -59,11 +59,6 @@ class Engine final : public render::engine::Engine {
     GX_GET_CREF_PRV(std::shared_ptr<device::Logical>, logical_device)
     GX_GET_CREF_PRV(std::shared_ptr<memory::Manager>, memory_manager)
     GX_GET_CREF_PRV(std::shared_ptr<sampler::Manager>, sampler_manager)
-    GX_GET_CREF_PRV(std::shared_ptr<Swapchain>, swapchain)
-    GX_GET_CREF_PRV(std::shared_ptr<image::View>, depth_stencil)
-    GX_GET_CREF_PRV(std::shared_ptr<RenderPass>, render_pass)
-    GX_GET_CREF_PRV(std::vector<std::shared_ptr<Framebuffer>>, framebuffers)
-    GX_GET_CREF_PRV(std::vector<std::shared_ptr<sync::Fence>>, wait_fences)
 
     explicit Engine(system::Application* sys_app) noexcept;
 
