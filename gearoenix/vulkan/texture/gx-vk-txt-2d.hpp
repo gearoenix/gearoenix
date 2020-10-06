@@ -1,37 +1,45 @@
 #ifndef GEAROENIX_VULKAN_TEXTURE_2D_HPP
 #define GEAROENIX_VULKAN_TEXTURE_2D_HPP
 #include "../../core/gx-cr-build-configuration.hpp"
-#ifdef USE_VULKAN
-#include "../../render/texture/gx-rnd-txt-texture.hpp"
-#include "../gx-vk-linker.hpp"
-#include <memory>
-namespace gearoenix {
-namespace core {
-    class EndCaller;
-}
-namespace system {
-    class File;
-}
-namespace render {
-    namespace image {
-        class View;
-    }
-    class Engine;
-    namespace texture {
-        class Sampler2D;
-        class Texture2D : public Texture {
-        private:
-            image::View* iv;
+#ifdef GX_USE_VULKAN
+#include "../../core/sync/gx-cr-sync-end-caller.hpp"
+#include "../../render/texture/gx-rnd-txt-texture-2d.hpp"
+#include "../../render/texture/gx-rnd-txt-texture-info.hpp"
+#include "../gx-vk-loader.hpp"
 
-        public:
-            Texture2D(system::stream::Stream* file, Engine* engine, std::shared_ptr<core::sync::EndCaller> end);
-            ~Texture2D();
-            image::View* get_view();
-            static uint32_t get_memory_type_bits(Engine* engine);
-            static void fill_info(VkImageCreateInfo& info, unsigned int img_width, unsigned int img_height, unsigned int channels);
-        };
-    }
+namespace gearoenix::vulkan::engine {
+class Engine;
 }
+
+namespace gearoenix::vulkan::image {
+class View;
+}
+
+namespace gearoenix::vulkan::texture {
+class Texture2D final : public render::texture::Texture2D {
+    GX_GET_REFC_PRV(std::shared_ptr<image::View>, view)
+private:
+    [[nodiscard]] static std::uint32_t compute_mipmaps_count(
+        const render::texture::TextureInfo& info,
+        std::size_t img_width,
+        std::size_t img_height) noexcept;
+
+public:
+    Texture2D(
+        core::Id id,
+        std::string name,
+        engine::Engine* e,
+        const std::vector<std::vector<std::uint8_t>>& data,
+        const render::texture::TextureInfo& info,
+        std::size_t img_width,
+        std::size_t img_height,
+        const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
+    ~Texture2D() noexcept final;
+    void write_gx3d(
+        const std::shared_ptr<system::stream::Stream>& s,
+        const gearoenix::core::sync::EndCaller<gearoenix::core::sync::EndCallerIgnore>&) noexcept final;
+    [[nodiscard]] static VkFormat convert(render::texture::TextureFormat format) noexcept;
+};
 }
 #endif
 #endif

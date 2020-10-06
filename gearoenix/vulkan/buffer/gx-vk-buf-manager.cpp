@@ -77,4 +77,10 @@ std::shared_ptr<gearoenix::render::buffer::Static> gearoenix::vulkan::buffer::Ma
     return create_static(size, values.data());
 }
 
+std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Manager::create_upload_buffer(
+    const std::size_t size) noexcept
+{
+    return upload_root_buffer->allocate(size);
+}
+
 #endif

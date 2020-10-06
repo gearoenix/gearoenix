@@ -15,9 +15,11 @@
 #include "../gx-vk-instance.hpp"
 #include "../gx-vk-surface.hpp"
 #include "../image/gx-vk-img-image.hpp"
+#include "../image/gx-vk-img-manager.hpp"
 #include "../memory/gx-vk-mem-manager.hpp"
 #include "../sampler/gx-vk-smp-manager.hpp"
 #include "../sync/gx-vk-sync-semaphore.hpp"
+#include "../texture/gx-vk-txt-2d.hpp"
 #include "../texture/gx-vk-txt-main-target.hpp"
 
 gearoenix::vulkan::engine::Engine::Engine(system::Application* const sys_app) noexcept
@@ -29,12 +31,14 @@ gearoenix::vulkan::engine::Engine::Engine(system::Application* const sys_app) no
     physical_device = std::make_shared<device::Physical>(surface);
     logical_device = std::make_shared<device::Logical>(physical_device);
     memory_manager = memory::Manager::construct(logical_device);
+    image_manager = std::make_shared<image::Manager>();
     sampler_manager = std::make_shared<sampler::Manager>(logical_device);
     command_manager = std::make_unique<command::Manager>(logical_device);
     main_render_target = std::make_shared<texture::MainTarget>(*memory_manager, this);
     frames_count = dynamic_cast<texture::MainTarget*>(main_render_target.get())->get_frames().size();
     // Buffer manager needs the number of frames
-    buffer_manager = std::make_unique<buffer::Manager>(memory_manager, this);
+    vulkan_buffer_manager = std::make_unique<buffer::Manager>(memory_manager, this);
+    buffer_manager = vulkan_buffer_manager;
 }
 
 gearoenix::vulkan::engine::Engine* gearoenix::vulkan::engine::Engine::construct(
@@ -229,10 +233,11 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::vulkan::engine
     std::string name,
     std::vector<std::vector<std::uint8_t>> data,
     const render::texture::TextureInfo& info,
-    std::size_t img_width,
-    std::size_t img_height,
-    const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept {
-    GX_UNIMPLEMENTED
+    const std::size_t img_width,
+    const std::size_t img_height,
+    const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
+{
+    return std::make_shared<texture::Texture2D>(id, std::move(name), this, data, info, img_width, img_height, call);
 }
 
 std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::vulkan::engine::Engine::create_texture_cube(

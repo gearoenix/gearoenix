@@ -41,6 +41,7 @@ public:
     [[nodiscard]] std::shared_ptr<render::buffer::Uniform> create_uniform(std::size_t size, std::size_t frame_number) noexcept final;
     [[nodiscard]] std::shared_ptr<render::buffer::Static> create_static(const std::vector<math::BasicVertex>& vertices, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept final;
     [[nodiscard]] std::shared_ptr<render::buffer::Static> create_static(const std::vector<std::uint32_t>& indices, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept final;
+    [[nodiscard]] std::shared_ptr<buffer::Buffer> create_upload_buffer(std::size_t size) noexcept;
 };
 }
 #endif

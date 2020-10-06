@@ -12,6 +12,10 @@ class Application;
 class File;
 }
 
+namespace gearoenix::vulkan::buffer {
+class Manager;
+}
+
 namespace gearoenix::vulkan::command {
 class Buffer;
 class Pool;
@@ -24,6 +28,7 @@ class Logical;
 
 namespace gearoenix::vulkan::image {
 class View;
+class Manager;
 }
 
 namespace gearoenix::vulkan::memory {
@@ -59,6 +64,8 @@ class Engine final : public render::engine::Engine {
     GX_GET_CREF_PRV(std::shared_ptr<device::Logical>, logical_device)
     GX_GET_CREF_PRV(std::shared_ptr<memory::Manager>, memory_manager)
     GX_GET_CREF_PRV(std::shared_ptr<sampler::Manager>, sampler_manager)
+    GX_GET_CREF_PRV(std::shared_ptr<image::Manager>, image_manager)
+    GX_GET_CREF_PRV(std::shared_ptr<buffer::Manager>, vulkan_buffer_manager)
 
     explicit Engine(system::Application* sys_app) noexcept;
 

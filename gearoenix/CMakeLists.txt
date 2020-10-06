@@ -642,6 +642,8 @@ SET(GX_ENGINE_SRC
         "${GX_ENGINE_SRC_DIR}vulkan/engine/gx-vk-eng-engine.hpp"
         "${GX_ENGINE_SRC_DIR}vulkan/image/gx-vk-img-image.cpp"
         "${GX_ENGINE_SRC_DIR}vulkan/image/gx-vk-img-image.hpp"
+        "${GX_ENGINE_SRC_DIR}vulkan/image/gx-vk-img-manager.cpp"
+        "${GX_ENGINE_SRC_DIR}vulkan/image/gx-vk-img-manager.hpp"
         "${GX_ENGINE_SRC_DIR}vulkan/image/gx-vk-img-view.cpp"
         "${GX_ENGINE_SRC_DIR}vulkan/image/gx-vk-img-view.hpp"
         "${GX_ENGINE_SRC_DIR}vulkan/memory/gx-vk-mem-manager.cpp"
