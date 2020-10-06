@@ -34,6 +34,7 @@ gearoenix::vulkan::image::Image::Image(
     const std::uint32_t mipmap_level,
     const std::uint32_t array_layers,
     const VkImageUsageFlags usage,
+    const VkImageCreateFlags flags,
     const VkFormat format,
     memory::Manager& mem_mgr) noexcept
     : logical_device(mem_mgr.get_logical_device())
@@ -55,6 +56,7 @@ gearoenix::vulkan::image::Image::Image(
     info.samples = VK_SAMPLE_COUNT_1_BIT;
     info.tiling = VK_IMAGE_TILING_OPTIMAL;
     info.usage = usage;
+    info.flags = flags;
     info.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
     VkDevice vk_dev = logical_device->get_vulkan_data();
     GX_VK_CHK_L(vkCreateImage(vk_dev, &info, nullptr, &vulkan_data))

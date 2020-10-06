@@ -45,7 +45,7 @@ std::shared_ptr<gearoenix::vulkan::image::View> gearoenix::vulkan::image::View::
         surf_cap.currentExtent.width,
         surf_cap.currentExtent.height,
         1, 1, 1,
-        VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT,
+        VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT, 0,
         depth_format, mem_mgr));
 }
 #endif

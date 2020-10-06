@@ -67,6 +67,10 @@ public:
         const std::vector<std::vector<std::vector<std::uint8_t>>>& data,
         std::size_t in_components_count,
         std::size_t out_components_count) noexcept;
+
+    [[nodiscard]] static std::size_t compute_mipmaps_count(
+        std::size_t img_width,
+        std::size_t img_height) noexcept;
 };
 }
 

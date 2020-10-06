@@ -27,7 +27,14 @@ gearoenix::vulkan::texture::MainTarget::Frame::Frame(
 {
 }
 
-gearoenix::vulkan::texture::MainTarget::MainTarget(const MainTarget& o) noexcept = default;
+gearoenix::vulkan::texture::MainTarget::MainTarget(const MainTarget& o) noexcept
+    : render::texture::Target(o)
+    , swapchain(o.swapchain)
+    , depth_stencil(o.depth_stencil)
+    , render_pass(o.render_pass)
+    , frames(o.frames)
+{
+}
 
 gearoenix::vulkan::texture::MainTarget::MainTarget(memory::Manager& mem_mgr, engine::Engine* e) noexcept
     : render::texture::Target(core::asset::Manager::create_id(), e)
@@ -40,11 +47,10 @@ gearoenix::vulkan::texture::MainTarget::MainTarget(memory::Manager& mem_mgr, eng
     depth_stencil = image::View::create_depth_stencil(mem_mgr);
     render_pass = std::make_shared<RenderPass>(swapchain);
     const auto& frame_views = swapchain->get_image_views();
-    const auto frames_count = frame_views.size();
-    frames.reserve(frames_count);
-    for (auto i = decltype(frames_count) { 0 }; i < frames_count; ++i) {
+    frames.reserve(frame_views.size());
+    for (const auto& frame_view : frame_views) {
         frames.emplace_back(
-            std::make_shared<Framebuffer>(frame_views[i], depth_stencil, render_pass),
+            std::make_shared<Framebuffer>(frame_view, depth_stencil, render_pass),
             std::make_shared<sync::Fence>(logical_device, true),
             std::make_shared<sync::Semaphore>(logical_device),
             std::make_shared<sync::Semaphore>(logical_device));

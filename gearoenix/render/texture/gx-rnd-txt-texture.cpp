@@ -1,5 +1,6 @@
 #include "gx-rnd-txt-texture.hpp"
 #include "../../core/sync/gx-cr-sync-parallel-for.hpp"
+#include "../../math/gx-math-numeric.hpp"
 #include "../../system/stream/gx-sys-stm-local.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "gx-rnd-txt-image.hpp"
@@ -126,4 +127,10 @@ std::vector<std::vector<std::vector<std::uint8_t>>> gearoenix::render::texture::
     for (auto& d : data)
         result.push_back(convert_float_pixels(d, in_components_count, out_components_count));
     return result;
+}
+
+std::size_t gearoenix::render::texture::Texture::compute_mipmaps_count(
+    const std::size_t img_width, const std::size_t img_height) noexcept
+{
+    return math::Numeric::floor_log2(GX_MAX(img_width, img_height)) + 1;
 }

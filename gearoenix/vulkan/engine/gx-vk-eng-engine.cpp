@@ -20,6 +20,7 @@
 #include "../sampler/gx-vk-smp-manager.hpp"
 #include "../sync/gx-vk-sync-semaphore.hpp"
 #include "../texture/gx-vk-txt-2d.hpp"
+#include "../texture/gx-vk-txt-cube.hpp"
 #include "../texture/gx-vk-txt-main-target.hpp"
 
 gearoenix::vulkan::engine::Engine::Engine(system::Application* const sys_app) noexcept
@@ -35,7 +36,7 @@ gearoenix::vulkan::engine::Engine::Engine(system::Application* const sys_app) no
     sampler_manager = std::make_shared<sampler::Manager>(logical_device);
     command_manager = std::make_unique<command::Manager>(logical_device);
     main_render_target = std::make_shared<texture::MainTarget>(*memory_manager, this);
-    frames_count = dynamic_cast<texture::MainTarget*>(main_render_target.get())->get_frames().size();
+    frames_count = static_cast<decltype(frames_count)>(dynamic_cast<texture::MainTarget*>(main_render_target.get())->get_frames().size());
     // Buffer manager needs the number of frames
     vulkan_buffer_manager = std::make_unique<buffer::Manager>(memory_manager, this);
     buffer_manager = vulkan_buffer_manager;
@@ -246,8 +247,9 @@ std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::vulkan::engi
     std::vector<std::vector<std::vector<std::uint8_t>>> data,
     const render::texture::TextureInfo& info,
     std::size_t aspect,
-    const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept {
-    GX_UNIMPLEMENTED
+    const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
+{
+    return std::make_shared<texture::TextureCube>(id, std::move(name), this, data, info, aspect, call);
 }
 
 std::shared_ptr<gearoenix::render::texture::Target> gearoenix::vulkan::engine::Engine::create_render_target(

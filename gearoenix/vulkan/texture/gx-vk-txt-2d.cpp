@@ -10,15 +10,6 @@
 #include "../image/gx-vk-img-view.hpp"
 #include "../memory/gx-vk-mem-memory.hpp"
 
-std::uint32_t gearoenix::vulkan::texture::Texture2D::compute_mipmaps_count(
-    const gearoenix::render::texture::TextureInfo& info,
-    const std::size_t img_width, const std::size_t img_height) noexcept
-{
-    if (!info.has_mipmap)
-        return 1;
-    return math::Numeric::floor_log2(math::Numeric::maximum(img_width, img_height)) + 1;
-}
-
 gearoenix::vulkan::texture::Texture2D::Texture2D(
     const core::Id id,
     std::string name,
@@ -31,19 +22,18 @@ gearoenix::vulkan::texture::Texture2D::Texture2D(
     : render::texture::Texture2D(id, std::move(name), info.format, info.sampler_info, e)
     , view(new image::View(std::make_shared<image::Image>(
           static_cast<std::uint32_t>(img_width), static_cast<std::uint32_t>(img_height), 1u,
-          compute_mipmaps_count(info, img_width, img_height), 1u,
-          VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
+          static_cast<std::uint32_t>(compute_mipmaps_count(img_width, img_height)), 1u,
+          VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, 0,
           convert(info.format), *e->get_memory_manager())))
 {
     const auto sz = view->get_image()->get_allocated_memory()->get_allocator()->get_size();
     auto buff = e->get_vulkan_buffer_manager()->create_upload_buffer(sz);
-    std::vector<std::uint8_t> gathered_data(sz);
-    std::size_t index = 0;
+    std::vector<std::uint8_t> gathered_data;
+    gathered_data.reserve(sz);
     for (const auto& d : data) {
-        std::memcpy(&gathered_data[index], d.data(), d.size());
-        index += d.size();
+        gathered_data.insert(gathered_data.end(), d.begin(), d.end());
     }
-    std::memcpy(buff->get_allocated_memory()->get_data(), gathered_data.data(), index);
+    std::memcpy(buff->get_allocated_memory()->get_data(), gathered_data.data(), gathered_data.size());
     e->get_image_manager()->upload(view->get_image(), std::move(buff), call);
 }
 

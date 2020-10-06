@@ -52,6 +52,7 @@ public:
         std::uint32_t mipmap_level,
         std::uint32_t array_layers,
         VkImageUsageFlags usage,
+        VkImageCreateFlags flags,
         VkFormat format,
         memory::Manager& memory_manager) noexcept;
     ~Image() noexcept;

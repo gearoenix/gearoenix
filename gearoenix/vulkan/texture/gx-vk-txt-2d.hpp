@@ -18,12 +18,6 @@ class View;
 namespace gearoenix::vulkan::texture {
 class Texture2D final : public render::texture::Texture2D {
     GX_GET_REFC_PRV(std::shared_ptr<image::View>, view)
-private:
-    [[nodiscard]] static std::uint32_t compute_mipmaps_count(
-        const render::texture::TextureInfo& info,
-        std::size_t img_width,
-        std::size_t img_height) noexcept;
-
 public:
     Texture2D(
         core::Id id,
