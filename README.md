@@ -29,6 +29,6 @@ going to be integrated to Gearoenix.
 - GLTF file is going to be used as the main asset provider format instead of
   GX3D file of the Gearoenix, it provides better mechanism for testing and
   speeds the implementation process.
-- Instead of GC structure of the Gearoenix, VulkanMemoryAllocator is going
+- <s>Instead of GC structure of the Gearoenix, VulkanMemoryAllocator is going
   to be used and after several benchmarking maybe GC structure is going to be
-  used.
+  used</s> The Gearoenix own allocator structure is going to be used as the memory manager and allocator.

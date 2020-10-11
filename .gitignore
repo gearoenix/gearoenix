@@ -33,6 +33,8 @@
 
 
 build/
+cmake-build-*/
 .vscode/
 .settings
 .idea/
+sdk/
