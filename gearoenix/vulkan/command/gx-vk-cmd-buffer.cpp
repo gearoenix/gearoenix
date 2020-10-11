@@ -120,6 +120,6 @@ void gearoenix::vulkan::command::Buffer::bind_index_buffer(VkBuffer buf, VkDevic
 
 void gearoenix::vulkan::command::Buffer::draw_indexed(VkDeviceSize count) noexcept
 {
-    Loader::vkCmdDrawIndexed(vulkan_data, count, 1, 0, 0, 1);
+    Loader::vkCmdDrawIndexed(vulkan_data, static_cast<std::uint32_t>(count), 1, 0, 0, 1);
 }
 #endif

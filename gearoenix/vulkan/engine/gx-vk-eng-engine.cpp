@@ -22,6 +22,7 @@
 #include "../texture/gx-vk-txt-2d.hpp"
 #include "../texture/gx-vk-txt-cube.hpp"
 #include "../texture/gx-vk-txt-main-target.hpp"
+#include "../texture/gx-vk-txt-target.hpp"
 
 gearoenix::vulkan::engine::Engine::Engine(system::Application* const sys_app) noexcept
     : render::engine::Engine(sys_app, render::engine::Type::Vulkan)
@@ -257,7 +258,7 @@ std::shared_ptr<gearoenix::render::texture::Target> gearoenix::vulkan::engine::E
     const std::vector<render::texture::AttachmentInfo>& infos,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
 {
-    GX_UNIMPLEMENTED
+    return std::make_shared<texture::Target>(id, infos, this, call);
 }
 
 void gearoenix::vulkan::engine::Engine::submit(

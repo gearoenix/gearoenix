@@ -136,7 +136,7 @@ gearoenix::vulkan::device::Physical::Physical(std::shared_ptr<Surface> surf) noe
     if (VK_FORMAT_UNDEFINED == supported_depth_format)
         GXLOGF("Error required depth format not found.")
     auto& limits = properties.limits;
-    max_memory_alignment = std::max(
+    max_memory_alignment = static_cast<std::uint32_t>(std::max(
         std::max(
             std::max(
                 limits.minMemoryMapAlignment,
@@ -148,7 +148,7 @@ gearoenix::vulkan::device::Physical::Physical(std::shared_ptr<Surface> surf) noe
             std::max(
                 limits.optimalBufferCopyOffsetAlignment,
                 limits.optimalBufferCopyRowPitchAlignment),
-            limits.bufferImageGranularity));
+            limits.bufferImageGranularity)));
 }
 
 gearoenix::vulkan::device::Physical::~Physical() noexcept = default;

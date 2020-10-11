@@ -52,7 +52,7 @@ public:
     MainTarget(const MainTarget& o) noexcept;
 
 public:
-    explicit MainTarget(memory::Manager& memory_manager, engine::Engine* e) noexcept;
+    MainTarget(memory::Manager& memory_manager, engine::Engine* e) noexcept;
     ~MainTarget() noexcept final;
     [[nodiscard]] render::texture::Target* clone() const noexcept final;
 };

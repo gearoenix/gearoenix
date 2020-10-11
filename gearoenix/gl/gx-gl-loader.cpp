@@ -1,4 +1,5 @@
 #include "gx-gl-loader.hpp"
+#ifdef GX_USE_OPENGL
 #include "../system/gx-sys-log.hpp"
 #include "gx-gl-constants.hpp"
 
@@ -228,3 +229,4 @@ void gearoenix::gl::Loader::fill_limitations(gearoenix::render::engine::Limitati
     get_integerv(GL_MAX_TEXTURE_SIZE, &max_texture_size);
     limitations.texture_maximum_aspect = static_cast<unsigned int>(max_texture_size);
 }
+#endif

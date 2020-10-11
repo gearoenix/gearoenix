@@ -54,6 +54,9 @@ void gearoenix::render::light::CascadeInfo::PerKernel::record(const std::size_t 
         }
 #endif
 #endif
+#ifdef GX_USE_VULKAN
+        GX_UNIMPLEMENTED
+#endif
     }
 }
 
