@@ -3,6 +3,7 @@
 #include "../../core/asset/gx-cr-asset-manager.hpp"
 #include "../../core/event/gx-cr-ev-engine.hpp"
 #include "../../system/gx-sys-application.hpp"
+#include "../device/gx-vk-dev-logical.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "../gx-vk-check.hpp"
 #include "../gx-vk-framebuffer.hpp"
@@ -62,6 +63,30 @@ gearoenix::vulkan::texture::MainTarget::~MainTarget() noexcept = default;
 gearoenix::render::texture::Target* gearoenix::vulkan::texture::MainTarget::clone() const noexcept
 {
     return new MainTarget(*this);
+}
+
+void gearoenix::vulkan::texture::MainTarget::update() noexcept
+{
+    current_frame = &frames[e->get_frame_number()];
+    GX_CHECK_NOT_EQUAL_D(swapchain->get_next_image_index(current_frame->start_semaphore), 0xFFFFFFFF)
+    current_frame->wait_fence->wait();
+    current_frame->wait_fence->reset();
+}
+
+void gearoenix::vulkan::texture::MainTarget::present() noexcept
+{
+    auto vk_swap = swapchain->get_vulkan_data();
+    const auto frame_number = static_cast<std::uint32_t>(e->get_frame_number());
+    VkSemaphore sem = current_frame->end_semaphore->get_vulkan_data();
+    VkPresentInfoKHR info;
+    GX_SET_ZERO(info)
+    info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+    info.swapchainCount = 1;
+    info.pSwapchains = &vk_swap;
+    info.pImageIndices = &frame_number;
+    info.pWaitSemaphores = &sem;
+    info.waitSemaphoreCount = 1;
+    GX_VK_CHK_L(vkQueuePresentKHR(swapchain->get_logical_device()->get_graphic_queue(), &info))
 }
 
 #endif

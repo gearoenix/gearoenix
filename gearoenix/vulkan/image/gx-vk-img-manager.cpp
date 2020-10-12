@@ -1,9 +1,14 @@
 #include "gx-vk-img-manager.hpp"
 #ifdef GX_USE_VULKAN
 #include "../buffer/gx-vk-buf-buffer.hpp"
+#include "../engine/gx-vk-eng-engine.hpp"
 #include "gx-vk-img-image.hpp"
 
-gearoenix::vulkan::image::Manager::Manager() noexcept = default;
+gearoenix::vulkan::image::Manager::Manager(engine::Engine* const e) noexcept
+    : frame_upload_images(e->get_frames_count())
+    , e(e)
+{
+}
 
 gearoenix::vulkan::image::Manager::~Manager() noexcept = default;
 
@@ -18,7 +23,8 @@ void gearoenix::vulkan::image::Manager::upload(
 
 void gearoenix::vulkan::image::Manager::update(command::Buffer& cmd) noexcept
 {
-    decltype(upload_images) images;
+    auto& images = frame_upload_images[e->get_frame_number()];
+    images.clear();
     {
         GX_GUARD_LOCK(upload_images)
         std::swap(upload_images, images);

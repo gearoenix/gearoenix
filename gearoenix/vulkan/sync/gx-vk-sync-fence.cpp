@@ -25,4 +25,10 @@ void gearoenix::vulkan::sync::Fence::wait() noexcept
 {
     GX_VK_CHK_L(vkWaitForFences(logical_device->get_vulkan_data(), 1, &vulkan_data, VK_TRUE, UINT64_MAX))
 }
+
+void gearoenix::vulkan::sync::Fence::reset() noexcept
+{
+    GX_VK_CHK_L(vkResetFences(logical_device->get_vulkan_data(), 1, &vulkan_data))
+}
+
 #endif

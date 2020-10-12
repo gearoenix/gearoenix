@@ -48,6 +48,10 @@ namespace gearoenix::vulkan::sampler {
 class Manager;
 }
 
+namespace gearoenix::vulkan::texture {
+class MainTarget;
+}
+
 namespace gearoenix::vulkan {
 class Framebuffer;
 class Instance;
@@ -66,6 +70,9 @@ class Engine final : public render::engine::Engine {
     GX_GET_CREF_PRV(std::shared_ptr<sampler::Manager>, sampler_manager)
     GX_GET_CREF_PRV(std::shared_ptr<image::Manager>, image_manager)
     GX_GET_CREF_PRV(std::shared_ptr<buffer::Manager>, vulkan_buffer_manager)
+    GX_GET_CREF_PRV(std::shared_ptr<texture::MainTarget>, vulkan_main_render_target)
+    GX_GET_CREF_PRV(std::vector<std::shared_ptr<command::Buffer>>, upload_command_buffers)
+    GX_GET_CREF_PRV(std::vector<std::shared_ptr<sync::Semaphore>>, upload_semaphore)
 
     explicit Engine(system::Application* sys_app) noexcept;
 

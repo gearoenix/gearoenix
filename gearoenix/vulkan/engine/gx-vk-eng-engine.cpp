@@ -33,14 +33,20 @@ gearoenix::vulkan::engine::Engine::Engine(system::Application* const sys_app) no
     physical_device = std::make_shared<device::Physical>(surface);
     logical_device = std::make_shared<device::Logical>(physical_device);
     memory_manager = memory::Manager::construct(logical_device);
-    image_manager = std::make_shared<image::Manager>();
     sampler_manager = std::make_shared<sampler::Manager>(logical_device);
     command_manager = std::make_unique<command::Manager>(logical_device);
-    main_render_target = std::make_shared<texture::MainTarget>(*memory_manager, this);
-    frames_count = static_cast<decltype(frames_count)>(dynamic_cast<texture::MainTarget*>(main_render_target.get())->get_frames().size());
+    main_render_target = vulkan_main_render_target = std::make_shared<texture::MainTarget>(*memory_manager, this);
+    frames_count = static_cast<decltype(frames_count)>(vulkan_main_render_target->get_frames().size());
     // Buffer manager needs the number of frames
-    vulkan_buffer_manager = std::make_unique<buffer::Manager>(memory_manager, this);
-    buffer_manager = vulkan_buffer_manager;
+    image_manager = std::make_shared<image::Manager>(this);
+    buffer_manager = vulkan_buffer_manager = std::make_unique<buffer::Manager>(memory_manager, this);
+    upload_command_buffers.reserve(static_cast<std::size_t>(frames_count));
+    upload_semaphore.reserve(static_cast<std::size_t>(frames_count));
+    for (auto fi = decltype(frames_count) { 0 }; fi < frames_count; ++fi) {
+        upload_command_buffers.emplace_back(
+            dynamic_cast<command::Buffer*>(command_manager->create_primary_command_buffer()));
+        upload_semaphore.push_back(std::make_shared<sync::Semaphore>(logical_device));
+    }
 }
 
 gearoenix::vulkan::engine::Engine* gearoenix::vulkan::engine::Engine::construct(
@@ -68,21 +74,20 @@ gearoenix::vulkan::engine::Engine::~Engine() noexcept = default;
 //    setup_draw_buffers();
 //}
 //
-void gearoenix::vulkan::engine::Engine::update() noexcept { }
-//{
-//    LOGE("TODO: it can be much much better remove all duplicate calls, remove same initializations.");
-//    const VkDevice vkdev = logical_device->get_vulkan_data();
-//    const VkQueue vkqu = logical_device->get_graphic_queue();
-//    current_frame = swapchain->get_next_image_index(present_complete_semaphore);
-//    if (current_frame == 0xffffffff) {
-//        window_changed();
-//        return;
-//    }
-//    const VkFence vkcurfnc = wait_fences[current_frame]->get_vulkan_data();
-//
-//    VKC(linker->vkWaitForFences(vkdev, 1, &vkcurfnc, 1, UINT64_MAX));
-//    VKC(linker->vkResetFences(vkdev, 1, &vkcurfnc));
-//
+void gearoenix::vulkan::engine::Engine::update() noexcept
+{
+    render::engine::Engine::update();
+    vulkan_main_render_target->update();
+    auto* const up_cmd = upload_command_buffers[frame_number].get();
+    up_cmd->begin();
+    image_manager->update(*up_cmd);
+    up_cmd->end();
+    const render::sync::Semaphore* const pre_sem = vulkan_main_render_target->get_current_frame()->start_semaphore.get();
+    const render::sync::Semaphore* const nxt_sem = upload_semaphore[frame_number].get();
+    const render::command::Buffer* const cmd = up_cmd;
+    submit(1, &pre_sem, 1, &cmd, 1, &nxt_sem);
+}
+
 //    command::Buffer* gcmd = cmd_bufs[current_frame];
 //    gcmd->begin();
 //
@@ -199,31 +204,14 @@ void gearoenix::vulkan::engine::Engine::update() noexcept { }
 //
 //    gcmd->end_render_pass();
 //    gcmd->end();
-//
-//    uint32_t wait_stage_mask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-//    VkSubmitInfo submit_info;
-//    setz(submit_info);
-//    submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-//    submit_info.pWaitDstStageMask = &wait_stage_mask;
-//    submit_info.pWaitSemaphores = &(present_complete_semaphore->get_vulkan_data());
-//    submit_info.waitSemaphoreCount = 1;
-//    submit_info.pSignalSemaphores = &(render_complete_semaphore->get_vulkan_data());
-//    submit_info.signalSemaphoreCount = 1;
-//    submit_info.pCommandBuffers = &gcmd->get_vulkan_data();
-//    submit_info.commandBufferCount = 1;
-//    VKC(linker->vkQueueSubmit(vkqu, 1, &submit_info, vkcurfnc));
-//    VkPresentInfoKHR present_info;
-//    setz(present_info);
-//    present_info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
-//    present_info.swapchainCount = 1;
-//    present_info.pSwapchains = &(swapchain->get_vulkan_data());
-//    present_info.pImageIndices = &current_frame;
-//    present_info.pWaitSemaphores = &(render_complete_semaphore->get_vulkan_data());
-//    present_info.waitSemaphoreCount = 1;
-//    VKC(linker->vkQueuePresentKHR(vkqu, &present_info));
-//}
-//
-void gearoenix::vulkan::engine::Engine::terminate() noexcept { }
+// submission
+// present of main target
+
+void gearoenix::vulkan::engine::Engine::terminate() noexcept
+{
+    render::engine::Engine::terminate();
+    logical_device->wait_to_finish();
+}
 
 std::shared_ptr<gearoenix::render::sync::Semaphore> gearoenix::vulkan::engine::Engine::create_semaphore() const noexcept
 {
@@ -263,13 +251,32 @@ std::shared_ptr<gearoenix::render::texture::Target> gearoenix::vulkan::engine::E
 
 void gearoenix::vulkan::engine::Engine::submit(
     const std::size_t pres_count,
-    const render::sync::Semaphore* const* pres,
+    const render::sync::Semaphore* const* const pres,
     const std::size_t cmds_count,
-    const render::command::Buffer* const* cmds,
+    const render::command::Buffer* const* const cmds,
     const std::size_t nxts_count,
-    const render::sync::Semaphore* const* nxts) noexcept
+    const render::sync::Semaphore* const* const nxts) noexcept
 {
-    GX_UNIMPLEMENTED
+    std::vector<VkSemaphore> previous_semaphores(pres_count), next_semaphores(nxts_count);
+    std::vector<VkCommandBuffer> commands(cmds_count);
+    for (auto i = decltype(pres_count) { 0 }; i < pres_count; ++i)
+        previous_semaphores[i] = dynamic_cast<const sync::Semaphore*>(pres[i])->get_vulkan_data();
+    for (auto i = decltype(nxts_count) { 0 }; i < nxts_count; ++i)
+        next_semaphores[i] = dynamic_cast<const sync::Semaphore*>(nxts[i])->get_vulkan_data();
+    for (auto i = decltype(cmds_count) { 0 }; i < cmds_count; ++i)
+        commands[i] = dynamic_cast<const command::Buffer*>(cmds[i])->get_vulkan_data();
+    std::uint32_t wait_stage_mask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    VkSubmitInfo info;
+    GX_SET_ZERO(info)
+    info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    info.pWaitDstStageMask = &wait_stage_mask;
+    info.pWaitSemaphores = previous_semaphores.data();
+    info.waitSemaphoreCount = static_cast<std::uint32_t>(previous_semaphores.size());
+    info.pSignalSemaphores = next_semaphores.data();
+    info.signalSemaphoreCount = static_cast<std::uint32_t>(next_semaphores.size());
+    info.pCommandBuffers = commands.data();
+    info.commandBufferCount = static_cast<std::uint32_t>(commands.size());
+    GX_VK_CHK_L(vkQueueSubmit(logical_device->get_graphic_queue(), 1, &info, nullptr))
 }
 
 //void gearoenix::render::Engine::setup_draw_buffers()

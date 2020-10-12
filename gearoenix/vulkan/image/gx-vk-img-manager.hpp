@@ -15,6 +15,10 @@ namespace gearoenix::vulkan::command {
 class Buffer;
 }
 
+namespace gearoenix::vulkan::engine {
+class Engine;
+}
+
 namespace gearoenix::vulkan::image {
 class Image;
 class Manager final {
@@ -25,9 +29,11 @@ private:
         std::shared_ptr<buffer::Buffer>,
         core::sync::EndCaller<core::sync::EndCallerIgnore>>>
         upload_images;
+    std::vector<decltype(upload_images)> frame_upload_images;
+    engine::Engine* const e;
 
 public:
-    Manager() noexcept;
+    explicit Manager(engine::Engine* e) noexcept;
     ~Manager() noexcept;
     void upload(
         std::shared_ptr<Image> img,

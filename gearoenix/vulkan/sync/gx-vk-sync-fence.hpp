@@ -18,6 +18,7 @@ public:
     explicit Fence(std::shared_ptr<device::Logical> logical_device, bool signaled = false) noexcept;
     ~Fence() noexcept;
     void wait() noexcept;
+    void reset() noexcept;
 };
 }
 #endif

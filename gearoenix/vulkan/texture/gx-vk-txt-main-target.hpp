@@ -48,6 +48,7 @@ public:
     GX_GET_CREF_PRV(std::shared_ptr<image::View>, depth_stencil)
     GX_GET_CREF_PRV(std::shared_ptr<RenderPass>, render_pass)
     GX_GET_CREF_PRV(std::vector<Frame>, frames)
+    GX_GET_PTR_PRV(Frame, current_frame)
 
     MainTarget(const MainTarget& o) noexcept;
 
@@ -55,6 +56,8 @@ public:
     MainTarget(memory::Manager& memory_manager, engine::Engine* e) noexcept;
     ~MainTarget() noexcept final;
     [[nodiscard]] render::texture::Target* clone() const noexcept final;
+    void update() noexcept;
+    void present() noexcept;
 };
 }
 #endif

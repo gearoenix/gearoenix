@@ -35,10 +35,10 @@ gearoenix::vulkan::command::Buffer::~Buffer() noexcept
 
 void gearoenix::vulkan::command::Buffer::begin() noexcept
 {
-    VkCommandBufferBeginInfo cmd_buf_info;
-    GX_SET_ZERO(cmd_buf_info)
-    cmd_buf_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-    GX_VK_CHK_L(vkBeginCommandBuffer(vulkan_data, &cmd_buf_info))
+    VkCommandBufferBeginInfo info;
+    GX_SET_ZERO(info)
+    info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    GX_VK_CHK_L(vkBeginCommandBuffer(vulkan_data, &info))
 }
 
 void gearoenix::vulkan::command::Buffer::copy_buffer(

@@ -133,6 +133,9 @@ void gearoenix::vulkan::image::Image::copy_from_buffer(command::Buffer& c, const
     case VK_FORMAT_R8G8B8_UNORM:
         region.bufferRowLength = 3 * image_width;
         break;
+    case VK_FORMAT_R32G32B32A32_SFLOAT:
+        region.bufferRowLength = 4 * 4 * image_width;
+        break;
     default:
         GXLOGF("Unexpected format")
     }
