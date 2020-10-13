@@ -28,7 +28,7 @@ ENDIF ()
 SET(GX_SDK_PATH "${CMAKE_SOURCE_DIR}/sdk")
 SET(GX_SDK_LIB_PATH "${GX_SDK_PATH}/libs/")
 
-SET(GX_SDL2_PATH "${GX_SDK_PATH}/SDL2")
+SET(GX_SDL2_PATH "${GX_SDK_PATH}/sdl2")
 GX_DOWNLOAD_FILE("https://www.libsdl.org/release/SDL2-2.0.12.zip" "${GX_SDL2_PATH}")
 SET(GX_SDL2_INCLUDE_DIRS "${GX_SDL2_PATH}/include")
 INCLUDE_DIRECTORIES(${GX_SDL2_INCLUDE_DIRS})
@@ -37,3 +37,12 @@ SET(GX_STB_PATH "${GX_SDK_PATH}/stb")
 GX_DOWNLOAD_FILE("https://github.com/nothings/stb/archive/master.zip" "${GX_STB_PATH}")
 SET(GX_STB_INCLUDE_DIRS "${GX_STB_PATH}")
 INCLUDE_DIRECTORIES(${GX_STB_INCLUDE_DIRS})
+
+SET(GX_BULLET3_PATH "${GX_SDK_PATH}/bullet3")
+GX_DOWNLOAD_FILE("https://github.com/bulletphysics/bullet3/archive/master.zip" "${GX_BULLET3_PATH}")
+
+SET(GX_IMGUI_PATH "${GX_SDK_PATH}/imgui")
+GX_DOWNLOAD_FILE("https://github.com/ocornut/imgui/archive/master.zip" "${GX_IMGUI_PATH}")
+
+SET(GX_BOOST_PATH "${GX_SDK_PATH}/boost")
+GX_DOWNLOAD_FILE("https://dl.bintray.com/boostorg/release/1.74.0/source/boost_1_74_0.zip" "${GX_BOOST_PATH}")
