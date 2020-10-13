@@ -13,7 +13,9 @@ jobs:
       - name: Update
         run: sudo apt-get update
       - name: Install dependancies
-        run: sudo apt-get install clang++-10 clang-10 wget
+        run: sudo apt-get install clang++-10 clang-10 wget -y &&
+          echo "CC=/usr/bin/clang-10" >> $GITHUB_PATH &&
+          echo "CXX=/usr/bin/clang++-10" >> $GITHUB_PATH
       - name: Echo places
         run: echo $HOME && echo `pwd`
       - name: Install CMake
