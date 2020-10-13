@@ -15,7 +15,8 @@ jobs:
       - name: Install dependancies
         run: sudo apt-get install clang++-10 clang-10 wget -y &&
           echo "CC=/usr/bin/clang-10" >> $GITHUB_ENV &&
-          echo "CXX=/usr/bin/clang++-10" >> $GITHUB_ENV
+          echo "CXX=/usr/bin/clang++-10" >> $GITHUB_ENV &&
+          echo "CMAKE_BUILD_PARALLEL_LEVEL=`nproc --all`" >> $GITHUB_ENV
       - name: Echo places
         run: echo $HOME && echo `pwd`
       - name: Install CMake
@@ -23,4 +24,4 @@ jobs:
           tar -xf cmake-3.18.4-Linux-x86_64.tar.gz && ls && rm cmake-3.18.4-Linux-x86_64.tar.gz &&
           echo "`pwd`/cmake-3.18.4-Linux-x86_64/bin" >> $GITHUB_PATH
       - name: Building Release for Linux
-        run: mkdir build && cd build && cmake .. && cmake --build . --config Release --parallel `nproc`
+        run: mkdir build && cd build && cmake .. && cmake --build . --config Release
