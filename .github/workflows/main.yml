@@ -19,7 +19,10 @@ jobs:
       - name: Install CMake
         run: wget "https://github.com/Kitware/CMake/releases/download/v3.18.4/cmake-3.18.4-Linux-x86_64.tar.gz" &&
           tar -xf cmake-3.18.4-Linux-x86_64.tar.gz && ls && rm cmake-3.18.4-Linux-x86_64.tar.gz &&
-          echo "PATH=\"`pwd`/cmake-3.18.4-Linux-x86_64/bin:$PATH\"" &&
           echo "`pwd`/cmake-3.18.4-Linux-x86_64/bin" >> $GITHUB_PATH
       - name: Cmake version check
         run: cmake --version
+      - name: Building Release for Linux
+        run: mkdir build &&
+          cmake .. &&
+          cmake --build . --config Release --parallel `nproc`
