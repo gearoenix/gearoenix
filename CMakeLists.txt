@@ -10,7 +10,8 @@ SET(GX_VERSION_PATCH 0)
 SET(GX_VERSION "${GX_VERSION_MAJOR}.${GX_VERSION_MINOR}.${GX_VERSION_PATCH}")
 
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake/)
-INCLUDE(download)
+INCLUDE(gx-compile-lib)
+INCLUDE(gx-download-file)
 
 MESSAGE(STATUS "Gearoenix is going to be compiled for ${CMAKE_SYSTEM_NAME}")
 
@@ -30,6 +31,7 @@ SET(GX_SDK_LIB_PATH "${GX_SDK_PATH}/libs/")
 
 SET(GX_SDL2_PATH "${GX_SDK_PATH}/sdl2")
 GX_DOWNLOAD_FILE("https://www.libsdl.org/release/SDL2-2.0.12.zip" "${GX_SDL2_PATH}")
+GX_COMPILE_LIB(${GX_SDL2_PATH})
 SET(GX_SDL2_INCLUDE_DIRS "${GX_SDL2_PATH}/include")
 INCLUDE_DIRECTORIES(${GX_SDL2_INCLUDE_DIRS})
 
@@ -40,6 +42,7 @@ INCLUDE_DIRECTORIES(${GX_STB_INCLUDE_DIRS})
 
 SET(GX_BULLET3_PATH "${GX_SDK_PATH}/bullet3")
 GX_DOWNLOAD_FILE("https://github.com/bulletphysics/bullet3/archive/master.zip" "${GX_BULLET3_PATH}")
+GX_COMPILE_LIB(${GX_BULLET3_PATH})
 
 SET(GX_IMGUI_PATH "${GX_SDK_PATH}/imgui")
 GX_DOWNLOAD_FILE("https://github.com/ocornut/imgui/archive/master.zip" "${GX_IMGUI_PATH}")

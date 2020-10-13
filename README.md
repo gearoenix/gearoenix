@@ -32,3 +32,4 @@ going to be integrated to Gearoenix.
 - <s>Instead of GC structure of the Gearoenix, VulkanMemoryAllocator is going
   to be used and after several benchmarking maybe GC structure is going to be
   used</s> The Gearoenix own allocator structure is going to be used as the memory manager and allocator.
+- CI/CD will always look for newest dependencies to keep the project as update as possible.
