@@ -23,6 +23,4 @@ jobs:
       - name: Cmake version check
         run: cmake --version
       - name: Building Release for Linux
-        run: mkdir build &&
-          cmake .. &&
-          cmake --build . --config Release --parallel `nproc`
+        run: mkdir build && cd build && cmake .. && cmake --build . --config Release --parallel `nproc`
