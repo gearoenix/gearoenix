@@ -12,15 +12,13 @@ jobs:
       - uses: actions/checkout@v2
       - name: Update
         run: sudo apt-get update
-      - name: Upgrade
-        run: sudo apt-get dist-upgrade -y
       - name: Install dependancies
         run: sudo apt-get install clang++-10 clang-10 wget
       - name: Echo places
         run: echo $HOME && echo `pwd`
       - name: Install CMake
         run: wget "https://github.com/Kitware/CMake/releases/download/v3.18.4/cmake-3.18.4-Linux-x86_64.tar.gz" &&
-             tar x cmake-3.18.4-Linux-x86_64.tar.gz &&
+             tar -xf cmake-3.18.4-Linux-x86_64.tar.gz &&
              mv cmake* cmake &&
              export PATH="$HOME/cmake/bin:$PATH"
       - name: Cmake version check
