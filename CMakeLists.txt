@@ -49,3 +49,5 @@ GX_DOWNLOAD_FILE("https://github.com/ocornut/imgui/archive/master.zip" "${GX_IMG
 
 SET(GX_BOOST_PATH "${GX_SDK_PATH}/boost")
 GX_DOWNLOAD_FILE("https://dl.bintray.com/boostorg/release/1.74.0/source/boost_1_74_0.zip" "${GX_BOOST_PATH}")
+
+ADD_SUBDIRECTORY(gearoenix)
