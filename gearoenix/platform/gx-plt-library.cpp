@@ -1,17 +1,17 @@
-#include "gx-sys-library.hpp"
+#include "gx-plt-library.hpp"
 #ifdef GX_SHARED_LINKAGE_SUPPORTED
-#ifdef GX_IN_WINDOWS
+#ifdef GX_PLT_WINAPI
 #include <Windows.h>
 #elif defined(GX_IN_LINUX) || defined(GX_IN_ANDROID)
 #include <dlfcn.h>
 #endif
 
-gearoenix::system::Library::Library() noexcept = default;
+gearoenix::platform::Library::Library() noexcept = default;
 
-gearoenix::system::Library* gearoenix::system::Library::construct(const char* name) noexcept
+gearoenix::platform::Library* gearoenix::platform::Library::construct(const char* name) noexcept
 {
-#ifdef GX_IN_WINDOWS
-    HMODULE lib = LoadLibrary(name);
+#ifdef GX_PLT_WINAPI
+    auto* const lib = static_cast<void*>(LoadLibraryA(name));
 #else
     void* const lib = dlopen(name, RTLD_NOW | RTLD_LOCAL);
 #endif
@@ -22,18 +22,18 @@ gearoenix::system::Library* gearoenix::system::Library::construct(const char* na
     return l;
 }
 
-gearoenix::system::Library::~Library() noexcept
+gearoenix::platform::Library::~Library() noexcept
 {
-#ifdef GX_IN_WINDOWS
+#ifdef GX_PLT_WINAPI
     FreeLibrary(reinterpret_cast<HMODULE>(lib));
 #else
     dlclose(lib);
 #endif
 }
 
-void* gearoenix::system::Library::raw_load(const char* function_name) noexcept
+void* gearoenix::platform::Library::raw_load(const char* function_name) noexcept
 {
-#ifdef GX_IN_WINDOWS
+#ifdef GX_PLT_WINAPI
     return reinterpret_cast<void*>(GetProcAddress(reinterpret_cast<HMODULE>(lib), function_name));
 #else
     return dlsym(lib, function_name);

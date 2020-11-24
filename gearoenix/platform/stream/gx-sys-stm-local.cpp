@@ -1,7 +1,7 @@
 #include "gx-sys-stm-local.hpp"
 #include "../../core/gx-cr-build-configuration.hpp"
-#include "../gx-sys-application.hpp"
-#include "../gx-sys-log.hpp"
+#include "../gx-plt-application.hpp"
+#include "../gx-plt-log.hpp"
 
 #ifdef GX_IN_IOS
 #include "../../core/gx-cr-string.hpp"

@@ -1,12 +1,12 @@
 #ifndef GEAROENIX_SYSTEM_LIBRARY_HPP
 #define GEAROENIX_SYSTEM_LIBRARY_HPP
 
-#include "../core/gx-cr-build-configuration.hpp"
+#include "gx-plt-build-configuration.hpp"
 
-#ifndef GX_IN_WEB
+#ifndef GX_PLT_WEB
 #define GX_SHARED_LINKAGE_SUPPORTED
 
-namespace gearoenix::system {
+namespace gearoenix::platform {
 class Library {
 private:
     void* lib = nullptr;
@@ -23,7 +23,7 @@ public:
 }
 
 template <typename FunctionPtr>
-FunctionPtr gearoenix::system::Library::load(const char* function_name) noexcept
+FunctionPtr gearoenix::platform::Library::load(const char* function_name) noexcept
 {
     return reinterpret_cast<FunctionPtr>(raw_load(function_name));
 }

@@ -1,6 +1,6 @@
 #include "gx-sys-stm-memory.hpp"
 #include "../../core/gx-cr-build-configuration.hpp"
-#include "../gx-sys-log.hpp"
+#include "../gx-plt-log.hpp"
 #include <cstring>
 
 gearoenix::system::stream::Memory::Memory() noexcept { }

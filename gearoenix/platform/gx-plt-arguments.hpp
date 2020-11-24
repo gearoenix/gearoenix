@@ -2,7 +2,7 @@
 #define GEAROENIX_SYSTEM_ARGUMENTS_HPP
 #include "../core/gx-cr-build-configuration.hpp"
 #include "../core/gx-cr-static.hpp"
-#include "gx-sys-log.hpp"
+#include "gx-plt-log.hpp"
 #include <map>
 #include <optional>
 #include <string>

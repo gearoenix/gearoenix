@@ -1,43 +1,25 @@
-#include "gx-sys-win-application.hpp"
-#ifdef USE_WINAPI
-//#define GEAROENIX_FULLSCREEN
-//#define GEAROENIX_NO_CURSOR
-#include "../../core/asset/gx-cr-asset-manager.hpp"
-#include "../../core/event/gx-cr-ev-bt-keyboard.hpp"
-#include "../../core/event/gx-cr-ev-bt-mouse.hpp"
-#include "../../core/event/gx-cr-ev-mv-mouse.hpp"
-#include "../../core/event/gx-cr-ev-window-resize.hpp"
-#include "../../core/gx-cr-application.hpp"
-#include "../../core/gx-cr-static.hpp"
-#include "../gx-sys-log.hpp"
-#ifdef USE_VULKAN
-#include "../../vulkan/gx-vk-engine.hpp"
-#endif
-#ifdef USE_DIRECTX12
-#include "../../dx12/dx12-engine.hpp"
-#endif
-#ifdef USE_DIRECTX11
-#include "../../dx11/dx11-engine.hpp"
-#endif
-#ifdef USE_OPENGL_41
-#include "../../gl41/gl41-engine.hpp"
-#endif
-#ifdef USE_OPENGL_33
-#include "../../gl31/gl31-engine.hpp"
-#endif
-LRESULT CALLBACK gearoenix::system::Application::wnd_proc(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam)
+#include "gx-plt-win-application.hpp"
+#ifdef GX_PLT_WINAPI
+
+#include <Windows.h>
+
+LRESULT CALLBACK gearoenix::platform::Application::static_handler(
+    HWND hwnd,
+    const UINT message,
+    const WPARAM w_param,
+    const LPARAM l_param) noexcept
 {
     auto sys_app = reinterpret_cast<Application*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
-    if (WM_CREATE == umessage) {
-        CREATESTRUCT* create_structure = reinterpret_cast<CREATESTRUCT*>(lparam);
+    if (WM_CREATE == message) {
+        CREATESTRUCT* create_structure = reinterpret_cast<CREATESTRUCT*>(l_param);
         sys_app = static_cast<Application*>(create_structure->lpCreateParams);
         SetWindowLongPtr(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(sys_app));
     }
     if (nullptr == sys_app) {
-        GXLOGE("Unexpected message for nullptr sys app uMsg is: " << umessage);
-        return (DefWindowProc(hwnd, umessage, wparam, lparam));
+        GX_LOG_E("Unexpected message for nullptr sys app uMsg is: " << message);
+        return (DefWindowProc(hwnd, message, w_param, l_param));
     }
-    return sys_app->handler(hwnd, umessage, wparam, lparam);
+    return sys_app->handler(hwnd, message, w_param, l_param);
 }
 
 LRESULT CALLBACK gearoenix::system::Application::handler(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam)
@@ -343,54 +325,4 @@ void gearoenix::system::Application::execute(core::Application* core_app)
     render_engine = nullptr;
 }
 
-gearoenix::render::Engine* gearoenix::system::Application::get_render_engine()
-{
-    return render_engine;
-}
-
-const gearoenix::render::Engine* gearoenix::system::Application::get_render_engine() const
-{
-    return render_engine;
-}
-
-gearoenix::core::Application* gearoenix::system::Application::get_core_app()
-{
-    return core_app;
-}
-
-const gearoenix::core::Application* gearoenix::system::Application::get_core_app() const
-{
-    return core_app;
-}
-
-gearoenix::core::asset::Manager* gearoenix::system::Application::get_asset_manager()
-{
-    return astmgr;
-}
-
-const gearoenix::core::asset::Manager* gearoenix::system::Application::get_asset_manager() const
-{
-    return astmgr;
-}
-
-gearoenix::core::Real gearoenix::system::Application::get_window_ratio() const
-{
-    return ((core::Real)screen_width) / ((core::Real)screen_height);
-}
-
-unsigned int gearoenix::system::Application::get_width() const
-{
-    return (unsigned int)screen_width;
-}
-
-unsigned int gearoenix::system::Application::get_height() const
-{
-    return (unsigned int)screen_height;
-}
-
-HWND gearoenix::system::Application::get_window()
-{
-    return window;
-}
-
-#endif // USE_WINAPI
+#endif
