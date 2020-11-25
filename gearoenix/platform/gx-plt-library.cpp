@@ -2,7 +2,7 @@
 #ifdef GX_SHARED_LINKAGE_SUPPORTED
 #ifdef GX_PLT_WINAPI
 #include <Windows.h>
-#elif defined(GX_IN_LINUX) || defined(GX_IN_ANDROID)
+#else
 #include <dlfcn.h>
 #endif
 

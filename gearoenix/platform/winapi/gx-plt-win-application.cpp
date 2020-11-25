@@ -1,5 +1,6 @@
 #include "gx-plt-win-application.hpp"
 #ifdef GX_PLT_WINAPI
+#include "../gx-plt-log.hpp"
 
 #include <Windows.h>
 
@@ -22,7 +23,7 @@ LRESULT CALLBACK gearoenix::platform::Application::static_handler(
     return sys_app->handler(hwnd, message, w_param, l_param);
 }
 
-LRESULT CALLBACK gearoenix::system::Application::handler(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam)
+LRESULT CALLBACK gearoenix::platform::Application::handler(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam)
 {
     core::event::Event* event = nullptr;
     switch (umessage) {
@@ -172,16 +173,6 @@ LRESULT CALLBACK gearoenix::system::Application::handler(HWND hwnd, UINT umessag
         delete event;
     }
     return (DefWindowProc(hwnd, umessage, wparam, lparam));
-}
-
-gearoenix::core::Real gearoenix::system::Application::pixel_to_normal_pos_x(int x) const
-{
-    return (((core::Real)x) * half_height_inversed) - screen_ratio;
-}
-
-gearoenix::core::Real gearoenix::system::Application::pixel_to_normal_pos_y(int y) const
-{
-    return 1.0f - (((core::Real)y) * half_height_inversed);
 }
 
 void gearoenix::system::Application::update_mouse_position()
