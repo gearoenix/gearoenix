@@ -3,10 +3,16 @@
 #include "../gx-plt-build-configuration.hpp"
 
 #ifdef GX_PLT_WINAPI
+
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../gx-plt-application.hpp"
 #include "../gx-plt-runtime-configuration.hpp"
 #include <Windows.h>
+
+namespace gearoenix::core {
+struct Application;
+}
+
 namespace gearoenix::platform {
 struct Application final {
     GX_GET_VAL_PRV(HINSTANCE, instance, nullptr)

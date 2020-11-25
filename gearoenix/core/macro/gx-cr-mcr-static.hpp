@@ -10,14 +10,7 @@
 #define GX_IS_NOT_ZERO(x) (((x) > (GX_POS_EPSILON)) || ((x) < (GX_NEG_EPSILON)))
 #define GX_MAX(x, y) (((x) > (y)) ? (x) : (y))
 #define GX_MIN(x, y) (((x) < (y)) ? (x) : (y))
-#define GX_SET_ZERO(x)                     \
-    {                                      \
-        std::memset(&(x), 0, sizeof((x))); \
-    }
-#define GX_SET_ARRAY_ZERO(x)              \
-    {                                     \
-        std::memset((x), 0, sizeof((x))); \
-    }
+
 #define GX_CHECK_NOT_EQUAL(x, y)               \
     {                                          \
         if ((x) == (y)) {                      \

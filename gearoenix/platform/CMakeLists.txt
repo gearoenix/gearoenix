@@ -17,10 +17,11 @@ SET(GX_ENGINE_PLATFORM_SRC
 #        ${GX_ENGINE_PLATFORM_SRC_DIR}/stream/gx-plt-stm-memory.hpp
 #        ${GX_ENGINE_PLATFORM_SRC_DIR}/stream/gx-plt-stm-stream.cpp
 #        ${GX_ENGINE_PLATFORM_SRC_DIR}/stream/gx-plt-stm-stream.hpp
-#        ${GX_ENGINE_PLATFORM_SRC_DIR}/winapi/gx-plt-win-application.cpp
+        ${GX_ENGINE_PLATFORM_SRC_DIR}/winapi/gx-plt-win-application.cpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/winapi/gx-plt-win-application.hpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/winapi/gx-plt-win-log.hpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/winapi/gx-plt-win-main-entry.hpp
+        ${GX_ENGINE_PLATFORM_SRC_DIR}/gx-plt-application.cpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/gx-plt-application.hpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/gx-plt-arguments.hpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/gx-plt-build-configuration.hpp

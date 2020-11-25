@@ -11,7 +11,7 @@
 
 #define GX_LOG_F(s)                                                                                       \
     {                                                                                                     \
-        GX_PLT_LOG_COMMON(s, FATAL)                                                                       \
+        GX_PLT_LOG_COMMON(s, "FATAL")                                                                     \
         (void)MessageBoxA(nullptr, GX_PLT_LOG_SS_VAR.str().c_str(), "Fatal error", MB_OK | MB_ICONERROR); \
         std::terminate();                                                                                 \
     }
