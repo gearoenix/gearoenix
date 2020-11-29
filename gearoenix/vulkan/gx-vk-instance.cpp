@@ -1,12 +1,8 @@
 #include "gx-vk-instance.hpp"
-#ifdef GX_USE_VULKAN
-#include "../system/gx-sys-application.hpp"
+#ifdef GX_RENDER_VULKAN_ENABLED
+#include "../core/macro/gx-cr-mcr-zeroer.hpp"
+#include "../platform/gx-plt-application.hpp"
 #include "gx-vk-check.hpp"
-
-#ifdef GX_USE_SDL
-#include <SDL_vulkan.h>
-#endif
-
 #include <set>
 #include <sstream>
 #include <vector>
@@ -21,22 +17,22 @@ static VkBool32 VKAPI_PTR implVkDebugReportCallbackEXT(
     std::stringstream msg;
     msg << "Vulkan ";
     bool is_error = false;
-    if (flags & VK_DEBUG_REPORT_INFORMATION_BIT_EXT) {
+    if (flags & static_cast<decltype(flags)>(VK_DEBUG_REPORT_INFORMATION_BIT_EXT)) {
         msg << "Information ";
     }
-    if (flags & VK_DEBUG_REPORT_WARNING_BIT_EXT) {
+    if (flags & static_cast<decltype(flags)>(VK_DEBUG_REPORT_WARNING_BIT_EXT)) {
         is_error = true;
         msg << "Warning ";
     }
-    if (flags & VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT) {
+    if (flags & static_cast<decltype(flags)>(VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT)) {
         is_error = true;
         msg << "Performance ";
     }
-    if (flags & VK_DEBUG_REPORT_ERROR_BIT_EXT) {
+    if (flags & static_cast<decltype(flags)>(VK_DEBUG_REPORT_ERROR_BIT_EXT)) {
         is_error = true;
         msg << "Error ";
     }
-    if (flags & VK_DEBUG_REPORT_DEBUG_BIT_EXT) {
+    if (flags & static_cast<decltype(flags)>(VK_DEBUG_REPORT_DEBUG_BIT_EXT)) {
         msg << "Debug ";
     }
     msg << "Message: object_type: ";
@@ -143,12 +139,12 @@ static VkBool32 VKAPI_PTR implVkDebugReportCallbackEXT(
     const auto msg_str = msg.str();
     if (is_error) {
 #ifdef GX_DEBUG_MODE
-        GXLOGF(msg_str)
+        GX_LOG_F(msg_str)
 #else
-        GXLOGE(msg_str)
+        GX_LOG_E(msg_str)
 #endif
     } else {
-        GXLOGD(msg_str)
+        GX_LOG_D(msg_str)
     }
     return VK_FALSE;
 }
@@ -156,46 +152,38 @@ static VkBool32 VKAPI_PTR implVkDebugReportCallbackEXT(
 
 static std::uint32_t find_api_version() noexcept
 {
-    const std::uint32_t min_version = VK_MAKE_VERSION(1, 0, 0);
+    const std::uint32_t min_version = VK_MAKE_VERSION(1u, 0u, 0u);
     std::uint32_t result;
     if (nullptr != Loader::vkEnumerateInstanceVersion) {
         GX_VK_CHK_L(vkEnumerateInstanceVersion(&result))
     }
     result = std::max(result, min_version);
-    GXLOGD("Instance version is: " << VK_VERSION_MAJOR(result) << "." << VK_VERSION_MINOR(result))
+    GX_LOG_D("Instance version is: " << VK_VERSION_MAJOR(result) << "." << VK_VERSION_MINOR(result))
     return result;
 }
 }
 
-gearoenix::vulkan::Instance::Instance(system::Application* const sys_app) noexcept
-    : system_application(sys_app)
+gearoenix::vulkan::Instance::Instance(std::shared_ptr<platform::Application> plt_app) noexcept
+    : platform_application(std::move(plt_app))
 {
     VkApplicationInfo app_info;
     GX_SET_ZERO(app_info)
     app_info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
     app_info.apiVersion = find_api_version();
-    app_info.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
-    app_info.engineVersion = VK_MAKE_VERSION(1, 0, 0);
-    app_info.pApplicationName = GX_APP_NAME;
+    app_info.applicationVersion = VK_MAKE_VERSION(1u, 0u, 0u);
+    app_info.engineVersion = VK_MAKE_VERSION(1u, 0u, 0u);
+    app_info.pApplicationName = platform_application->get_base().get_configuration().get_application_name().c_str();
     app_info.pEngineName = GX_ENGINE_NAME;
     std::vector<const char*> instance_extensions;
-#ifdef GX_USE_SDL
-    unsigned int sdl_ext_count = 0;
-    GX_CHECK_EQUAL_D(SDL_Vulkan_GetInstanceExtensions(sys_app->get_window(), &sdl_ext_count, nullptr), SDL_TRUE)
-    const auto sdl_ext_index = instance_extensions.size();
-    instance_extensions.resize(sdl_ext_index + static_cast<std::size_t>(sdl_ext_count));
-    GX_CHECK_EQUAL_D(SDL_Vulkan_GetInstanceExtensions(sys_app->get_window(), &sdl_ext_count, &instance_extensions[sdl_ext_index]), SDL_TRUE)
-#else
     instance_extensions.push_back(VK_KHR_SURFACE_EXTENSION_NAME);
-#ifdef GX_IN_ANDROID
+#ifdef GX_PLATFORM_ANDROID
     instance_extensions.push_back(VK_KHR_ANDROID_SURFACE_EXTENSION_NAME);
-#elif defined(GX_IN_LINUX)
+#elif defined(GX_PLATFORM_LINUX)
     instance_extensions.push_back(VK_KHR_XCB_SURFACE_EXTENSION_NAME);
-#elif defined(GX_IN_WINDOWS)
+#elif defined(GX_PLATFORM_WINDOWS)
     instance_extensions.push_back(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
 #else
 #error "Not implemented yet!"
-#endif
 #endif
 #ifdef GX_VULKAN_INSTANCE_DEBUG
     instance_extensions.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
@@ -205,7 +193,7 @@ gearoenix::vulkan::Instance::Instance(system::Application* const sys_app) noexce
     std::set<std::string> available_layers;
     Loader::vkEnumerateInstanceLayerProperties(&layers_count, properties.data());
     for (const auto& prop : properties) {
-        GXLOGD("Available layer: " << prop.layerName)
+        GX_LOG_D("Available layer: " << prop.layerName)
         available_layers.emplace(prop.layerName);
     }
     std::vector<const char*> instance_layers;
@@ -216,10 +204,10 @@ gearoenix::vulkan::Instance::Instance(system::Application* const sys_app) noexce
     };
     insert_layer("VK_LAYER_KHRONOS_validation");
     for (const char* const layer_name : instance_layers) {
-        GXLOGD("Instance layer: " << layer_name)
+        GX_LOG_D("Instance layer: " << layer_name)
     }
     for (std::size_t i = 0; i < instance_extensions.size(); ++i) {
-        GXLOGD("extension-" << i << ": " << instance_extensions[i])
+        GX_LOG_D("extension-" << i << ": " << instance_extensions[i])
     }
 #endif
     VkInstanceCreateInfo instance_create_info;
@@ -246,7 +234,7 @@ gearoenix::vulkan::Instance::Instance(system::Application* const sys_app) noexce
     VkDebugReportCallbackCreateInfoEXT dbg_info;
     GX_SET_ZERO(dbg_info)
     dbg_info.sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CREATE_INFO_EXT;
-    dbg_info.flags = VK_DEBUG_REPORT_WARNING_BIT_EXT | VK_DEBUG_REPORT_DEBUG_BIT_EXT | VK_DEBUG_REPORT_INFORMATION_BIT_EXT | VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT | VK_DEBUG_REPORT_ERROR_BIT_EXT;
+    dbg_info.flags = static_cast<decltype(dbg_info.flags)>(VK_DEBUG_REPORT_WARNING_BIT_EXT) | static_cast<decltype(dbg_info.flags)>(VK_DEBUG_REPORT_DEBUG_BIT_EXT) | static_cast<decltype(dbg_info.flags)>(VK_DEBUG_REPORT_INFORMATION_BIT_EXT) | static_cast<decltype(dbg_info.flags)>(VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT) | static_cast<decltype(dbg_info.flags)>(VK_DEBUG_REPORT_ERROR_BIT_EXT);
     dbg_info.pfnCallback = implVkDebugReportCallbackEXT;
     dbg_info.pUserData = this;
     GX_VK_CHK_L(vkCreateDebugReportCallbackEXT(vulkan_data, &dbg_info, nullptr, &report_callback))

@@ -1,9 +1,9 @@
 #include "gx-vk-loader.hpp"
-#ifdef GX_USE_VULKAN
-#include "../system/gx-sys-library.hpp"
-#include "../system/gx-sys-log.hpp"
+#ifdef GX_RENDER_VULKAN_ENABLED
+#include "../platform/gx-plt-library.hpp"
+#include "../platform/gx-plt-log.hpp"
 
-std::unique_ptr<gearoenix::system::Library> gearoenix::vulkan::Loader::lib = nullptr;
+std::unique_ptr<gearoenix::platform::Library> gearoenix::vulkan::Loader::lib = nullptr;
 
 #define GX_HELPER(x) PFN_##x gearoenix::vulkan::Loader::x = nullptr
 GX_HELPER(vkCreateInstance);
@@ -211,19 +211,28 @@ GX_HELPER(vkDebugReportMessageEXT);
 
 #undef GX_HELPER
 
+bool gearoenix::vulkan::Loader::is_loaded() noexcept
+{
+    return vkCreateInstance != nullptr;
+}
+
 void gearoenix::vulkan::Loader::load() noexcept
 {
-    lib = std::unique_ptr<system::Library>(system::Library::construct(
-#ifdef GX_IN_WINDOWS
+    if (is_loaded())
+        return;
+    lib = std::unique_ptr<platform::Library>(platform::Library::construct(
+#ifdef GX_PLATFORM_WINDOWS
         "vulkan-1.dll"
 #else
         "libvulkan.so"
 #endif
         ));
+
     if (nullptr == lib) {
-        GXLOGD("Vulkan library is not available.")
+        GX_LOG_D("Vulkan library is not available.")
         return;
     }
+
 #define VKL(x) x = lib->load<PFN_##x>(#x)
 
     VKL(vkCreateInstance);

@@ -1,6 +1,7 @@
 #include "gx-plt-win-application.hpp"
-#ifdef GX_PLT_WINAPI
+#ifdef GX_PLATFORM_WINDOWS
 #include "../../core/macro/gx-cr-mcr-zeroer.hpp"
+#include "../../render/engine/gx-rnd-eng-engine.hpp"
 #include "../gx-plt-log.hpp"
 #include <Windows.h>
 
@@ -207,10 +208,10 @@ LRESULT gearoenix::platform::Application::handler(
 gearoenix::platform::Application::Application(const RuntimeConfiguration& config) noexcept
     : base(config)
 {
-    WNDCLASSEX wc;
+    WNDCLASSEXA wc;
     GX_SET_ZERO(wc)
     instance = GetModuleHandle(nullptr);
-    wc.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
+    wc.style = static_cast<UINT>(CS_HREDRAW) | static_cast<UINT>(CS_VREDRAW) | static_cast<UINT>(CS_OWNDC);
     wc.lpfnWndProc = static_handler;
     wc.cbClsExtra = 0;
     wc.cbWndExtra = 0;
@@ -220,11 +221,11 @@ gearoenix::platform::Application::Application(const RuntimeConfiguration& config
     wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
     wc.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
     wc.lpszMenuName = nullptr;
-    wc.lpszClassName = GX_APPLICATION_NAME;
-    wc.cbSize = sizeof(WNDCLASSEX);
-    RegisterClassEx(&wc);
-    DWORD style = WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_POPUP;
-    if (config.fullscreen) {
+    wc.lpszClassName = config.get_application_name().c_str();
+    wc.cbSize = sizeof(WNDCLASSEXA);
+    RegisterClassExA(&wc);
+    DWORD style = static_cast<DWORD>(WS_VISIBLE) | static_cast<DWORD>(WS_OVERLAPPEDWINDOW);
+    if (config.get_fullscreen()) {
         base.initialize_window_size(
             GetSystemMetrics(SM_CXSCREEN),
             GetSystemMetrics(SM_CYSCREEN));
@@ -234,16 +235,17 @@ gearoenix::platform::Application::Application(const RuntimeConfiguration& config
         screen_settings.dmPelsWidth = static_cast<decltype(screen_settings.dmPelsWidth)>(base.window_width);
         screen_settings.dmPelsHeight = static_cast<decltype(screen_settings.dmPelsHeight)>(base.window_height);
         screen_settings.dmBitsPerPel = 32;
-        screen_settings.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
+        screen_settings.dmFields = static_cast<DWORD>(DM_BITSPERPEL) | static_cast<DWORD>(DM_PELSWIDTH) | static_cast<DWORD>(DM_PELSHEIGHT);
         ChangeDisplaySettings(&screen_settings, CDS_FULLSCREEN);
         base.initialize_window_position(0, 0);
-        style |= WS_OVERLAPPEDWINDOW;
+        style |= WS_POPUP;
     } else {
         base.initialize_window_position(
             (GetSystemMetrics(SM_CXSCREEN) - base.window_width) / 2,
             (GetSystemMetrics(SM_CYSCREEN) - base.window_height) / 2);
+        style |= static_cast<DWORD>(WS_CAPTION) | static_cast<DWORD>(WS_SYSMENU) | static_cast<DWORD>(WS_THICKFRAME) | static_cast<DWORD>(WS_MINIMIZEBOX) | static_cast<DWORD>(WS_MAXIMIZEBOX);
     }
-    window = CreateWindowEx(
+    window = CreateWindowExA(
         WS_EX_APPWINDOW, GX_APPLICATION_NAME, GX_APPLICATION_NAME, style,
         base.window_x, base.window_y, base.window_width, base.window_height,
         nullptr, nullptr, instance, this);
@@ -251,46 +253,29 @@ gearoenix::platform::Application::Application(const RuntimeConfiguration& config
     SetForegroundWindow(window);
     SetFocus(window);
     UpdateWindow(window);
-    ShowCursor(config.show_cursor);
+    ShowCursor(config.get_show_cursor());
     while (!base.window_is_up) {
         MSG msg;
         GetMessage(&msg, nullptr, 0, 0);
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
-//    update_screen_sizes();
-//    update_mouse_position();
-//    astmgr = new core::asset::Manager(this, "data.gx3d");
-//    astmgr->initialize();
-#ifdef USE_VULKAN
-    if (vulkan::Engine::is_supported())
-        render_engine = new vulkan::Engine(this);
-    else
-#endif
-#ifdef USE_DIRECTX12
-        if (dx12::Engine::is_supported())
-        render_engine = new dx12::Engine(this);
-    else
-#endif
-#ifdef USE_DIRECTX11
-        if (dx11::Engine::is_supported())
-        render_engine = new dx11::Engine(this);
-    else
-#endif
-#ifdef USE_OPENGL_41
-        if (gl41::Engine::is_supported())
-        render_engine = new gl41::Engine(this);
-    else
-#endif
-#ifdef USE_OPENGL_33
-        if (gl33::Engine::is_supported())
-        render_engine = new gl33::Engine(this);
-    else
-#endif
-    //    {
-    //        GXLOGF("No suitable API found.");
-    //    }
+    //    update_screen_sizes();
+    //    update_mouse_position();
+}
+
+std::shared_ptr<gearoenix::platform::Application> gearoenix::platform::Application::construct(
+    const RuntimeConfiguration& config) noexcept
+{
+    std::shared_ptr<Application> result(new Application(config));
+    result->self = result;
+    result->base.render_engine = render::engine::Engine::construct(config.get_render_configuration(), result);
+    GX_TODO
+    //    astmgr = new core::asset::Manager(this, "data.gx3d");
+    //    astmgr->initialize();
     //    astmgr->set_render_engine(render_engine);
+
+    return result;
 }
 
 gearoenix::platform::Application::~Application() noexcept = default;

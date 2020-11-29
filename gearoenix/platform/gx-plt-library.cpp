@@ -1,6 +1,6 @@
 #include "gx-plt-library.hpp"
 #ifdef GX_SHARED_LINKAGE_SUPPORTED
-#ifdef GX_PLT_WINAPI
+#ifdef GX_PLATFORM_WINDOWS
 #include <Windows.h>
 #else
 #include <dlfcn.h>
@@ -10,7 +10,7 @@ gearoenix::platform::Library::Library() noexcept = default;
 
 gearoenix::platform::Library* gearoenix::platform::Library::construct(const char* name) noexcept
 {
-#ifdef GX_PLT_WINAPI
+#ifdef GX_PLATFORM_WINDOWS
     auto* const lib = static_cast<void*>(LoadLibraryA(name));
 #else
     void* const lib = dlopen(name, RTLD_NOW | RTLD_LOCAL);
@@ -24,7 +24,7 @@ gearoenix::platform::Library* gearoenix::platform::Library::construct(const char
 
 gearoenix::platform::Library::~Library() noexcept
 {
-#ifdef GX_PLT_WINAPI
+#ifdef GX_PLATFORM_WINDOWS
     FreeLibrary(reinterpret_cast<HMODULE>(lib));
 #else
     dlclose(lib);
@@ -33,7 +33,7 @@ gearoenix::platform::Library::~Library() noexcept
 
 void* gearoenix::platform::Library::raw_load(const char* function_name) noexcept
 {
-#ifdef GX_PLT_WINAPI
+#ifdef GX_PLATFORM_WINDOWS
     return reinterpret_cast<void*>(GetProcAddress(reinterpret_cast<HMODULE>(lib), function_name));
 #else
     return dlsym(lib, function_name);

@@ -3,6 +3,7 @@
 
 #include "../core/gx-cr-types.hpp"
 #include <cmath>
+#include <limits>
 
 // Maybe in future needed
 #define GX_SIGNEDNESS_COMPATIBILITY_CHECK(ReceivedType, FinalType)                                            \

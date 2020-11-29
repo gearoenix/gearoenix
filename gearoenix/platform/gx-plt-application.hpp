@@ -4,6 +4,11 @@
 //#include "../core/event/gx-cr-ev-event.hpp"
 #include "gx-plt-build-configuration.hpp"
 #include "gx-plt-runtime-configuration.hpp"
+#include <memory>
+
+namespace gearoenix::render::engine {
+struct Engine;
+}
 
 namespace gearoenix::platform {
 struct Application;
@@ -46,6 +51,8 @@ struct BaseApplication final {
     GX_GET_VAL_PRV(double, delta_mouse_x_nrm, 0.0)
     GX_GET_VAL_PRV(double, delta_mouse_y_nrm, 0.0)
 
+    GX_GET_CREF_PRV(std::shared_ptr<render::engine::Engine>, render_engine)
+
 private:
     BaseApplication(const RuntimeConfiguration& configuration) noexcept;
 
@@ -63,8 +70,8 @@ private:
 
 #if defined(GX_PLT_ANDROID)
 #include "android/gx-sys-and-app.hpp"
-#elif defined(GX_PLT_WINAPI)
-#include "winapi/gx-plt-win-application.hpp"
+#elif defined(GX_PLATFORM_WINDOWS)
+#include "windows/gx-plt-win-application.hpp"
 #else
 #error "Unspecified platform application interface."
 #endif

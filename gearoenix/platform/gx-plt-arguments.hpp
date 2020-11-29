@@ -1,5 +1,5 @@
-#ifndef GEAROENIX_SYSTEM_ARGUMENTS_HPP
-#define GEAROENIX_SYSTEM_ARGUMENTS_HPP
+#ifndef GEAROENIX_PLATFORM_ARGUMENTS_HPP
+#define GEAROENIX_PLATFORM_ARGUMENTS_HPP
 #include "../core/gx-cr-build-configuration.hpp"
 #include "../core/gx-cr-static.hpp"
 #include "gx-plt-log.hpp"

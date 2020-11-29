@@ -1,14 +1,14 @@
 #ifndef GEAROENIX_VULKAN_DEVICE_LOGICAL_HPP
 #define GEAROENIX_VULKAN_DEVICE_LOGICAL_HPP
-#include "../../core/gx-cr-build-configuration.hpp"
-#ifdef GX_USE_VULKAN
-#include "../../core/gx-cr-static.hpp"
+#include "../../render/gx-rnd-build-configuration.hpp"
+#ifdef GX_RENDER_VULKAN_ENABLED
+#include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../gx-vk-loader.hpp"
 #include <memory>
 
 namespace gearoenix::vulkan::device {
-class Physical;
-class Logical final {
+struct Physical;
+struct Logical final {
 private:
     GX_GET_REFC_PRV(std::shared_ptr<Physical>, physical_device)
     GX_GET_VAL_PRV(VkDevice, vulkan_data, nullptr)

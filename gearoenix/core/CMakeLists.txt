@@ -29,7 +29,10 @@ SET(GX_ENGINE_CORE_SRC
 #        ${GX_ENGINE_CORE_SRC_DIR}/list/gx-cr-list-node.hpp
 #        ${GX_ENGINE_CORE_SRC_DIR}/list/gx-cr-list.cpp
 #        ${GX_ENGINE_CORE_SRC_DIR}/list/gx-cr-list.hpp
+        ${GX_ENGINE_CORE_SRC_DIR}/macro/gx-cr-mcr-assert.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/macro/gx-cr-mcr-concatenate.hpp
+        ${GX_ENGINE_CORE_SRC_DIR}/macro/gx-cr-mcr-counter.hpp
+        ${GX_ENGINE_CORE_SRC_DIR}/macro/gx-cr-mcr-flagger.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/macro/gx-cr-mcr-getter-setter.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/macro/gx-cr-mcr-loop.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/macro/gx-cr-mcr-stringifier.hpp

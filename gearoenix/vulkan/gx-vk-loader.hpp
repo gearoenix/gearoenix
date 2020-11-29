@@ -1,13 +1,13 @@
 #ifndef GEAROENIX_VULKAN_LINKER_HPP
 #define GEAROENIX_VULKAN_LINKER_HPP
+#include "../render/gx-rnd-build-configuration.hpp"
+#ifdef GX_RENDER_VULKAN_ENABLED
 #include "../core/gx-cr-build-configuration.hpp"
-
-#ifdef GX_USE_VULKAN
-#ifdef GX_IN_ANDROID
+#ifdef GX_PLATFORM_ANDROID
 #define VK_USE_PLATFORM_ANDROID_KHR
-#elif defined(GX_IN_LINUX)
+#elif defined(GX_PLATFORM_LINUX)
 #define VK_USE_PLATFORM_XCB_KHR
-#elif defined(GX_IN_WINDOWS)
+#elif defined(GX_PLATFORM_WINDOWS)
 #define VK_USE_PLATFORM_WIN32_KHR
 #else
 #error "It is not implemented yet!"
@@ -22,18 +22,19 @@
 
 #include <memory>
 
-namespace gearoenix::system {
-class Library;
+namespace gearoenix::platform {
+struct Library;
 }
 
 namespace gearoenix::vulkan {
-class Loader {
+struct Loader {
 private:
-    static std::unique_ptr<system::Library> lib;
+    static std::unique_ptr<platform::Library> lib;
 
 public:
     Loader() noexcept = delete;
 
+    [[nodiscard]] static bool is_loaded() noexcept;
     static void load() noexcept;
     static void unload() noexcept;
 

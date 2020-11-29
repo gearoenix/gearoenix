@@ -1,5 +1,5 @@
-#ifndef GEAROENIX_SYSTEM_LIBRARY_HPP
-#define GEAROENIX_SYSTEM_LIBRARY_HPP
+#ifndef GEAROENIX_PLATFORM_LIBRARY_HPP
+#define GEAROENIX_PLATFORM_LIBRARY_HPP
 
 #include "gx-plt-build-configuration.hpp"
 
@@ -7,7 +7,7 @@
 #define GX_SHARED_LINKAGE_SUPPORTED
 
 namespace gearoenix::platform {
-class Library {
+struct Library {
 private:
     void* lib = nullptr;
     Library() noexcept;

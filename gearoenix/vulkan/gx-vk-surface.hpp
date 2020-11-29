@@ -1,24 +1,24 @@
 #ifndef GEAROENIX_VULKAN_SURFACE_HPP
 #define GEAROENIX_VULKAN_SURFACE_HPP
-#include "../core/gx-cr-build-configuration.hpp"
-#ifdef GX_USE_VULKAN
-#include "../core/gx-cr-static.hpp"
+#include "../render/gx-rnd-build-configuration.hpp"
+#ifdef GX_RENDER_VULKAN_ENABLED
+#include "../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "gx-vk-loader.hpp"
 #include <memory>
 
-namespace gearoenix::system {
-class Application;
+namespace gearoenix::platform {
+struct Application;
 }
 
 namespace gearoenix::vulkan {
-class Instance;
-class Surface {
+struct Instance;
+struct Surface {
     GX_GET_REFC_PRV(std::shared_ptr<Instance>, instance)
-    GX_GET_PTRC_PRV(system::Application, system_application);
+    GX_GET_CREF_PRV(std::shared_ptr<platform::Application>, platform_application);
     GX_GET_VAL_PRV(VkSurfaceKHR, vulkan_data, nullptr)
 
 public:
-    Surface(std::shared_ptr<Instance> instance, system::Application* sys_app) noexcept;
+    Surface(std::shared_ptr<Instance> instance, std::shared_ptr<platform::Application> platform_application) noexcept;
     ~Surface() noexcept;
 };
 }

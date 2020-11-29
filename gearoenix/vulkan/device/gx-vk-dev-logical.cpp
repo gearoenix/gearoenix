@@ -1,5 +1,7 @@
 #include "gx-vk-dev-logical.hpp"
-#ifdef GX_USE_VULKAN
+#ifdef GX_RENDER_VULKAN_ENABLED
+#include "../../core/macro/gx-cr-mcr-counter.hpp"
+#include "../../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../gx-vk-check.hpp"
 #include "../gx-vk-instance.hpp"
 #include "gx-vk-dev-physical.hpp"
@@ -25,7 +27,7 @@ gearoenix::vulkan::device::Logical::Logical(std::shared_ptr<Physical> p) noexcep
         queue_create_info.queueCount = 1;
         queue_create_info.queueFamilyIndex = q;
         queue_create_info.pQueuePriorities = queue_priorities;
-        GXLOGD("queue node index added is " << q)
+        GX_LOG_D("queue node index added is " << q)
     }
     VkPhysicalDeviceFeatures device_features;
     GX_SET_ZERO(device_features)

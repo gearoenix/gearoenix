@@ -2,8 +2,8 @@
 #define GEAROENIX_PLATFORM_MAIN_ENTRY_HPP
 #include "gx-plt-build-configuration.hpp"
 
-#ifdef GX_PLT_WINAPI
-#include "winapi/gx-plt-win-main-entry.hpp"
+#ifdef GX_PLATFORM_WINDOWS
+#include "windows/gx-plt-win-main-entry.hpp"
 #else
 #error "Unimplemented or unexpected platform interface."
 #endif

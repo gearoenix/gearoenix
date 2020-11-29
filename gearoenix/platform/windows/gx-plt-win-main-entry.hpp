@@ -1,7 +1,7 @@
-#ifndef GEAROENIX_PLATFORM_WINAPI_MAIN_ENTRY_HPP
-#define GEAROENIX_PLATFORM_WINAPI_MAIN_ENTRY_HPP
+#ifndef GEAROENIX_PLATFORM_WINDOWS_MAIN_ENTRY_HPP
+#define GEAROENIX_PLATFORM_WINDOWS_MAIN_ENTRY_HPP
 #include "../gx-plt-build-configuration.hpp"
-#ifdef GX_PLT_WINAPI
+#ifdef GX_PLATFORM_WINDOWS
 #include <WinBase.h>
 
 #define GX_MAIN_ENTRY_ARGS                            \

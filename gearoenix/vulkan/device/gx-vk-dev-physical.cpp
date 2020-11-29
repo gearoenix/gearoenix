@@ -1,5 +1,6 @@
 #include "gx-vk-dev-physical.hpp"
-#ifdef GX_USE_VULKAN
+#ifdef GX_RENDER_VULKAN_ENABLED
+#include "../../core/macro/gx-cr-mcr-flagger.hpp"
 #include "../../math/gx-math-numeric.hpp"
 #include "../gx-vk-check.hpp"
 #include "../gx-vk-instance.hpp"
@@ -20,20 +21,20 @@ int gearoenix::vulkan::device::Physical::is_good(VkPhysicalDevice gpu) noexcept
         Loader::vkGetPhysicalDeviceSurfaceSupportKHR(gpu, i, surface->get_vulkan_data(), &(supports_present[i]));
     }
     for (std::uint32_t i = 0; i < queue_count; i++) {
-        if (((queue_props[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) != 0) && ((queue_props[i].queueFlags & VK_QUEUE_TRANSFER_BIT) != 0) && ((queue_props[i].queueFlags & VK_QUEUE_COMPUTE_BIT) != 0) && supports_present[i] == VK_TRUE) {
+        if (GX_FLAG_CHECK(queue_props[i].queueFlags, VK_QUEUE_GRAPHICS_BIT) && GX_FLAG_CHECK(queue_props[i].queueFlags, VK_QUEUE_TRANSFER_BIT) && GX_FLAG_CHECK(queue_props[i].queueFlags, VK_QUEUE_COMPUTE_BIT) && supports_present[i] == VK_TRUE) {
             graphics_queue_node_index = i;
             transfer_queue_node_index = i;
             compute_queue_node_index = i;
             present_queue_node_index = i;
             return 100;
         }
-        if ((queue_props[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) != 0) {
+        if GX_FLAG_CHECK (queue_props[i].queueFlags, VK_QUEUE_GRAPHICS_BIT) {
             graphics_queue_node_index = i;
         }
-        if ((queue_props[i].queueFlags & VK_QUEUE_TRANSFER_BIT) != 0) {
+        if GX_FLAG_CHECK (queue_props[i].queueFlags, VK_QUEUE_TRANSFER_BIT) {
             transfer_queue_node_index = i;
         }
-        if ((queue_props[i].queueFlags & VK_QUEUE_COMPUTE_BIT) != 0) {
+        if GX_FLAG_CHECK (queue_props[i].queueFlags, VK_QUEUE_COMPUTE_BIT) {
             compute_queue_node_index = i;
         }
         if (supports_present[i] == VK_TRUE) {
@@ -41,7 +42,7 @@ int gearoenix::vulkan::device::Physical::is_good(VkPhysicalDevice gpu) noexcept
         }
     }
     for (std::uint32_t i = 0; i < queue_count; i++) {
-        if (((queue_props[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) != 0) && ((queue_props[i].queueFlags & VK_QUEUE_TRANSFER_BIT) != 0) && supports_present[i] == VK_TRUE) {
+        if (GX_FLAG_CHECK(queue_props[i].queueFlags, VK_QUEUE_GRAPHICS_BIT) && GX_FLAG_CHECK(queue_props[i].queueFlags, VK_QUEUE_TRANSFER_BIT) && supports_present[i] == VK_TRUE) {
             graphics_queue_node_index = i;
             transfer_queue_node_index = i;
             present_queue_node_index = i;
@@ -53,7 +54,7 @@ int gearoenix::vulkan::device::Physical::is_good(VkPhysicalDevice gpu) noexcept
         }
     }
     for (uint32_t i = 0; i < queue_count; i++) {
-        if (((queue_props[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) != 0) && supports_present[i] == VK_TRUE) {
+        if (GX_FLAG_CHECK(queue_props[i].queueFlags, VK_QUEUE_GRAPHICS_BIT) && supports_present[i] == VK_TRUE) {
             graphics_queue_node_index = i;
             present_queue_node_index = i;
             if (compute_queue_node_index != UINT32_MAX && transfer_queue_node_index != UINT32_MAX) {
@@ -65,7 +66,7 @@ int gearoenix::vulkan::device::Physical::is_good(VkPhysicalDevice gpu) noexcept
             }
         }
     }
-    GXLOGE("Separate graphics and presenting queues are not supported yet!")
+    GX_LOG_E("Separate graphics and presenting queues are not supported yet!")
     return -1;
 }
 
@@ -92,17 +93,17 @@ gearoenix::vulkan::device::Physical::Physical(std::shared_ptr<Surface> surf) noe
         }
     }
     if (best_device_index == -1 || best_device_point == -1) {
-        GXLOGF("Physical device minimum requirement is not satisfied.")
+        GX_LOG_F("Physical device minimum requirement is not satisfied.")
     }
     vulkan_data = gpus[best_device_index];
-    GXLOGD("Physical device point is: " << is_good(vulkan_data))
+    GX_LOG_D("Physical device point is: " << is_good(vulkan_data))
     Loader::vkGetPhysicalDeviceProperties(vulkan_data, &properties);
     Loader::vkGetPhysicalDeviceFeatures(vulkan_data, &features);
     Loader::vkGetPhysicalDeviceMemoryProperties(vulkan_data, &memory_properties);
     uint32_t queue_family_count = 0;
     Loader::vkGetPhysicalDeviceQueueFamilyProperties(vulkan_data, &queue_family_count, nullptr);
     if (1 > queue_family_count) {
-        GXLOGF("queue_family_count value is unexpected.")
+        GX_LOG_F("queue_family_count value is unexpected.")
     }
     queue_family_properties.resize(queue_family_count);
     Loader::vkGetPhysicalDeviceQueueFamilyProperties(vulkan_data, &queue_family_count, queue_family_properties.data());
@@ -116,9 +117,9 @@ gearoenix::vulkan::device::Physical::Physical(std::shared_ptr<Surface> surf) noe
             }
         }
     }
-    GXLOGD("Supported extensions are:")
+    GX_LOG_D("Supported extensions are:")
     for (auto& s : supported_extensions) {
-        GXLOGD("    " << s)
+        GX_LOG_D("    " << s)
     }
     Loader::vkGetPhysicalDeviceSurfaceCapabilitiesKHR(vulkan_data, surface->get_vulkan_data(), &surface_capabilities);
     std::uint32_t count = 0;
@@ -128,13 +129,13 @@ gearoenix::vulkan::device::Physical::Physical(std::shared_ptr<Surface> surf) noe
     VkFormatProperties format_props;
     for (auto format : acceptable_depth_formats) {
         Loader::vkGetPhysicalDeviceFormatProperties(vulkan_data, format, &format_props);
-        if (format_props.optimalTilingFeatures & VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT) {
+        if GX_FLAG_CHECK (format_props.optimalTilingFeatures, VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT) {
             supported_depth_format = format;
             break;
         }
     }
     if (VK_FORMAT_UNDEFINED == supported_depth_format)
-        GXLOGF("Error required depth format not found.")
+        GX_LOG_F("Error required depth format not found.")
     auto& limits = properties.limits;
     max_memory_alignment = static_cast<std::uint32_t>(std::max(
         std::max(
@@ -164,7 +165,7 @@ std::uint32_t gearoenix::vulkan::device::Physical::get_memory_type_index(
         }
         type_bits >>= 1u;
     }
-    GXLOGF("Could not find the requested memory type.")
+    GX_LOG_F("Could not find the requested memory type.")
 }
 
 std::size_t gearoenix::vulkan::device::Physical::align_size(const std::size_t size) const noexcept

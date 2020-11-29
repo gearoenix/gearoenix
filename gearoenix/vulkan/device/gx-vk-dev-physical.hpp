@@ -1,20 +1,21 @@
 #ifndef GEAROENIX_VULKAN_DEVICE_PHYSICAL_HPP
 #define GEAROENIX_VULKAN_DEVICE_PHYSICAL_HPP
-#include "../../core/gx-cr-build-configuration.hpp"
-#ifdef GX_USE_VULKAN
-#include "../../core/gx-cr-static.hpp"
+#include "../../render/gx-rnd-build-configuration.hpp"
+#ifdef GX_RENDER_VULKAN_ENABLED
+#include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../gx-vk-loader.hpp"
 #include <limits>
 #include <memory>
+#include <string>
 #include <vector>
 
 namespace gearoenix::vulkan {
-class Instance;
-class Surface;
+struct Instance;
+struct Surface;
 }
 
 namespace gearoenix::vulkan::device {
-class Physical final {
+struct Physical final {
     GX_GET_REFC_PRV(std::shared_ptr<Surface>, surface)
     GX_GET_VAL_PRV(VkPhysicalDevice, vulkan_data, nullptr)
     GX_GET_CREF_PRV(VkPhysicalDeviceProperties, properties)

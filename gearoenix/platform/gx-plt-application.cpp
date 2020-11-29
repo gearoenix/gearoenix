@@ -4,10 +4,10 @@
 gearoenix::platform::BaseApplication::BaseApplication(const RuntimeConfiguration& configuration) noexcept
     : configuration(configuration)
 {
-    if (!configuration.fullscreen) {
+    if (!configuration.get_fullscreen()) {
         initialize_window_size(
-            static_cast<decltype(window_width)>(configuration.window_width),
-            static_cast<decltype(window_height)>(configuration.window_height));
+            static_cast<decltype(window_width)>(configuration.get_window_width()),
+            static_cast<decltype(window_height)>(configuration.get_window_height()));
     }
 }
 
