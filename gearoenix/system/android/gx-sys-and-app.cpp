@@ -392,7 +392,7 @@ void gearoenix::system::Application::on_check_ready_to_render(android_app* const
         if (gl_context->get_es3_supported()) {
             GXLOGD("Going to create OpenGL ES3 render engine.")
             render_engine = std::unique_ptr<render::engine::Engine>(
-                glc3::engine::Engine::construct(this, render::engine::Type::OPENGL_ES3));
+                glc3::engine::Engine::construct(this, render::engine::Type::OpenGLES3));
         }
 #endif
 #ifdef GX_USE_OPENGL_ES2
