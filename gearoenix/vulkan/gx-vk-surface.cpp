@@ -26,10 +26,10 @@ gearoenix::vulkan::Surface::Surface(
     VkXcbSurfaceCreateInfoKHR create_info;
     GX_SET_ZERO(create_info);
     create_info.sType = VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR;
-    create_info.connection = sys_app->get_connection();
-    create_info.window = sys_app->get_window();
-    VKC(instance->get_linker()->vkCreateXcbSurfaceKHR(
-        instance->get_vulkan_data(), &create_info, 0, &vulkan_data));
+    create_info.connection = platform_application->get_connection();
+    create_info.window = platform_application->get_window();
+    GX_VK_CHK_L(vkCreateXcbSurfaceKHR(
+        instance->get_vulkan_data(), &create_info, nullptr, &vulkan_data));
 #elif defined(GX_PLATFORM_WINDOWS)
     VkWin32SurfaceCreateInfoKHR create_info;
     GX_SET_ZERO(create_info)

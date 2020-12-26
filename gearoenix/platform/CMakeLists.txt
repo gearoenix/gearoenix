@@ -5,7 +5,9 @@ SET(GX_ENGINE_PLATFORM_SRC
 #        ${GX_ENGINE_PLATFORM_SRC_DIR}/android/gx-plt-and-log.cpp
 #        ${GX_ENGINE_PLATFORM_SRC_DIR}/android/gx-plt-and-log.hpp
 #        ${GX_ENGINE_PLATFORM_SRC_DIR}/android/gx-plt-gl-context.cpp
-#        ${GX_ENGINE_PLATFORM_SRC_DIR}/android/gx-plt-gl-context.hpp
+        ${GX_ENGINE_PLATFORM_SRC_DIR}/linux/gx-plt-lnx-application.cpp
+        ${GX_ENGINE_PLATFORM_SRC_DIR}/linux/gx-plt-lnx-application.hpp
+        ${GX_ENGINE_PLATFORM_SRC_DIR}/linux/gx-plt-lnx-log.hpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/macro/gx-plt-mcr-disable-warnings.hpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/macro/gx-plt-mcr-enable-warnings.hpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/macro/gx-plt-mcr-lock.hpp

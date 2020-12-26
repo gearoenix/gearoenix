@@ -72,6 +72,8 @@ private:
 #include "android/gx-sys-and-app.hpp"
 #elif defined(GX_PLATFORM_WINDOWS)
 #include "windows/gx-plt-win-application.hpp"
+#elif defined(GX_PLATFORM_LINUX)
+#include "linux/gx-plt-lnx-application.hpp"
 #else
 #error "Unspecified platform application interface."
 #endif

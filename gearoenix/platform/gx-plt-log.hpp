@@ -26,11 +26,19 @@
 #define GX_PLT_LOG_END_OF_MSG
 #endif
 
+#ifdef GX_PLATFORM_LINUX
+#define GX_PLT_LOG_CALL GX_PLT_LOG_LOCAL = *std::localtime(&GX_PLT_LOG_TIME);
+#elif defined(GX_PLATFORM_WINDOWS)
+#define GX_PLT_LOG_CALL localtime_s(&GX_PLT_LOG_LOCAL, &GX_PLT_LOG_TIME);
+#else
+#error "Unexpected platform interface."
+#endif
+
 #define GX_PLT_LOG_COMMON_STR(msg, msg_type)                                                      \
     std::stringstream GX_PLT_LOG_SS_VAR;                                                          \
     auto GX_PLT_LOG_TIME = std::time(nullptr);                                                    \
     std::tm GX_PLT_LOG_LOCAL {};                                                                  \
-    localtime_s(&GX_PLT_LOG_LOCAL, &GX_PLT_LOG_TIME);                                             \
+    GX_PLT_LOG_CALL                                             \
     GX_PLT_LOG_SS_VAR << std::put_time(&GX_PLT_LOG_LOCAL, "%d-%m-%Y %H-%M-%S")                    \
                       << " [thread:" << std::this_thread::get_id() << "]-["                       \
                       << __FILE__ << ":" << __LINE__ << "]-[" << msg_type << "] " << msg << "\n"; \

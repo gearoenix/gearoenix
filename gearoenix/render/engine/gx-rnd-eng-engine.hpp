@@ -10,6 +10,7 @@
 #include "gx-rnd-eng-type.hpp"
 #include <chrono>
 #include <vector>
+#include <memory>
 
 namespace gearoenix::core {
 struct FunctionLoader;
