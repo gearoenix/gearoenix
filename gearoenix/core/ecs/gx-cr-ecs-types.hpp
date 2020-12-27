@@ -4,7 +4,7 @@
 #include <cstdint>
 
 namespace gearoenix::core::ecs {
-    typedef std::uint32_t entity_id_t;
+typedef std::uint32_t entity_id_t;
 }
 
 #endif

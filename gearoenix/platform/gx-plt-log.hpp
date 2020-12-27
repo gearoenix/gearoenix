@@ -38,7 +38,7 @@
     std::stringstream GX_PLT_LOG_SS_VAR;                                                          \
     auto GX_PLT_LOG_TIME = std::time(nullptr);                                                    \
     std::tm GX_PLT_LOG_LOCAL {};                                                                  \
-    GX_PLT_LOG_CALL                                             \
+    GX_PLT_LOG_CALL                                                                               \
     GX_PLT_LOG_SS_VAR << std::put_time(&GX_PLT_LOG_LOCAL, "%d-%m-%Y %H-%M-%S")                    \
                       << " [thread:" << std::this_thread::get_id() << "]-["                       \
                       << __FILE__ << ":" << __LINE__ << "]-[" << msg_type << "] " << msg << "\n"; \

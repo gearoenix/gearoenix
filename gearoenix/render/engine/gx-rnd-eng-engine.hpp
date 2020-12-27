@@ -9,8 +9,8 @@
 #include "gx-rnd-eng-limitations.hpp"
 #include "gx-rnd-eng-type.hpp"
 #include <chrono>
-#include <vector>
 #include <memory>
+#include <vector>
 
 namespace gearoenix::core {
 struct FunctionLoader;
