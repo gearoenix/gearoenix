@@ -9,14 +9,14 @@ void gearoenix::system::GlContext::init_gles() noexcept
         return;
     gles_initialized = true;
 #ifdef GX_USE_OPENGL_ES3
-    if (gl::Loader::load_library(render::engine::Type::OPENGL_ES3)) {
+    if (gl::Loader::load_library(render::engine::Type::OpenGLES3)) {
         GXLOGD("OpenGL ES3 library loaded.")
         es3_supported = true;
         return;
     }
 #endif
 #ifdef GX_USE_OPENGL_ES2
-    if (gl::Loader::load_library(render::engine::Type::OPENGL_ES2)) {
+    if (gl::Loader::load_library(render::engine::Type::OpenGLES2)) {
         GXLOGD("OpenGL ES2 library loaded.")
         return;
     }
