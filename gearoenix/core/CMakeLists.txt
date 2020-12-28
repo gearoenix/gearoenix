@@ -70,6 +70,7 @@ SET(GX_ENGINE_CORE_SRC
 #        ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-pool.hpp
 #        ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-preprocessor-loop.hpp
 #        ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-static.hpp
+        ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-range.hpp
 #        ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-string.cpp
 #        ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-string.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-types.hpp)
