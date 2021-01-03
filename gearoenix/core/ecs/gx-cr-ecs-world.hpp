@@ -2,8 +2,11 @@
 #define GEAROENIX_CORE_ECS_WORLD_HPP
 
 #include "../../platform/macro/gx-plt-mcr-lock.hpp"
+#include "../gx-cr-range.hpp"
 #include "gx-cr-ecs-types.hpp"
+#include <algorithm>
 #include <array>
+#include <execution>
 #include <functional>
 #include <map>
 #include <string>
@@ -88,45 +91,83 @@ void gearoenix::core::ecs::World::parallel_system(
     const std::function<void(entity_id_t, ComponentsTypes&...)>& fun) noexcept
 {
     constexpr auto cms_sz = sizeof...(ComponentsTypes);
+    static_assert(cms_sz != 0, "Number of components can not be zero!");
     constexpr auto not_sz = CountNot<ComponentsTypes...>::value;
     constexpr auto pos_sz = cms_sz - not_sz;
-    std::type_index pos_type_indices[pos_sz];
-    std::type_index not_type_indices[not_sz];
+    std::size_t component_index_in_archetype[cms_sz] = {
+        (IsNot<ComponentsTypes>::value ? static_cast<std::size_t>(-1) : 0)...,
+    };
+    std::uint8_t* component_ptr_in_archetype[cms_sz] = { nullptr };
+    std::uint8_t fake_pos_type_indices[pos_sz * sizeof(std::type_index)] = {};
+    std::uint8_t fake_not_type_indices[not_sz * sizeof(std::type_index)] = {};
+    auto* const pos_type_indices = reinterpret_cast<std::type_index*>(fake_pos_type_indices);
+    auto* const not_type_indices = reinterpret_cast<std::type_index*>(fake_not_type_indices);
     std::size_t not_index = 0;
     std::size_t pos_index = 0;
-    (([&]<typename T>(std::type_index&& ti) {
+    std::size_t index = 0;
+    std::size_t pos_indices[pos_sz];
+    (([&]<typename T>(T*) {
+        const auto ti = std::type_index(typeid(T));
         if (IsNot<T>::value) {
             not_type_indices[not_index] = ti;
             ++not_index;
         } else {
             pos_type_indices[pos_index] = ti;
+            component_ptr_in_archetype[index] = components_map[ti].data();
+            pos_indices[pos_index] = index;
             ++pos_index;
         }
-    }(std::type_index(typeid(ComponentsTypes)))),
+        ++index;
+    }(reinterpret_cast<ComponentsTypes*>(0))),
         ...);
     for (const auto& archetype : archetypes) {
-        bool pos_compatible[pos_sz] = { false };
-        const auto& type_indices = archetype.first;
-        for (const auto& type_index : type_indices) {
-            for (const auto& not_ti : not_type_indices)
-                if (not_ti == type_index)
-                    goto continue_archetypes;
-            for (std::size_t i = 0; i < pos_sz; ++i) {
-                if (pos_type_indices[i] == type_index) {
-                    pos_compatible[i] = true;
+        {
+            bool pos_compatible[pos_sz];
+            for (std::size_t i = 0; i < pos_sz; ++i)
+                pos_compatible[i] = false;
+            const auto& type_indices = archetype.first;
+            for (index = 0; index < type_indices.size(); ++index) {
+                const auto& type_index = type_indices[index];
+                for (std::size_t not_ti_i = 0; not_ti_i < not_sz; ++not_ti_i) {
+                    if (not_type_indices[not_ti_i] == type_index) {
+                        goto continue_archetypes;
+                    }
+                }
+                for (std::size_t i = 0; i < pos_sz; ++i) {
+                    if (pos_type_indices[i] == type_index) {
+                        pos_compatible[i] = true;
+                        component_index_in_archetype[pos_indices[i]] = index;
+                    }
                 }
             }
-        }
-        for (bool b : pos_compatible) {
-            if (!b) {
-                goto continue_archetypes;
+            for (bool b : pos_compatible) {
+                if (!b) {
+                    goto continue_archetypes;
+                }
             }
-        }
-        auto& entities = archetype.second;
-        for (std::size_t archetype_index = 0; archetype_index < entities.size();) {
+            auto& entities = archetype.second;
+            const auto entity_size = sizeof(entity_id_t) + sizeof(component_index_t) * type_indices.size();
+            auto range = PtrRange(entities.data(), entities.size(), entity_size);
+            std::for_each(std::execution::par_unseq, range.begin(), range.end(), [&](const std::uint8_t* ptr) {
+                const auto entity_id = *reinterpret_cast<const entity_id_t*>(ptr);
+                ptr += sizeof(entity_id_t);
+                const auto* const com_indices = reinterpret_cast<const component_index_t*>(ptr);
+                index = 0;
+                void* com_ptr[cms_sz] = { nullptr };
+                (([&]<typename T>(T*) {
+                    const auto idx = component_index_in_archetype[index];
+                    if (idx != -1) {
+                        com_ptr[index] = component_ptr_in_archetype[com_indices[idx]];
+                    }
+                    ++index;
+                }(reinterpret_cast<ComponentsTypes*>(0))),
+                    ...);
+                index = 0;
+                fun(entity_id, (*reinterpret_cast<ComponentsTypes*>(com_ptr[index++]))...);
+            });
         }
     continue_archetypes:
-        (void)0;
+        continue;
     }
 }
 

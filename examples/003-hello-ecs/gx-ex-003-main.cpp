@@ -17,6 +17,10 @@ void start()
     const auto entity = w.create_entity(Position { 2.0, 3.0 }, Speed { 4.0, 5.0 });
     auto& p = w.get_component<Position>(entity);
     auto& s = w.get_component<Speed>(entity);
+    std::function<void(gearoenix::core::ecs::entity_id_t, Position&)> f = [&](gearoenix::core::ecs::entity_id_t ent, Position& p) {
+        GX_LOG_D("entity: " << ent << ", Position { " << p.x << ", " << p.y << " }")
+    };
+    w.parallel_system(f);
     GX_LOG_D("Position { " << p.x << ", " << p.y << " }")
     GX_LOG_D("Speed { " << s.x << ", " << s.y << " }")
     GX_LOG_D("Ended!");
