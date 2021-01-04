@@ -34,7 +34,10 @@ SET(GX_SDK_LIB_PATH "${GX_SDK_PATH}/libs/")
 
 FIND_PACKAGE(Vulkan)
 IF(Vulkan_FOUND)
+    MESSAGE(STATUS "Gearoenix build find the Vulkan library.")
     INCLUDE_DIRECTORIES(${Vulkan_INCLUDE_DIRS})
+ELSE()
+    MESSAGE(STATUS "Gearoenix build does not found the Vulkan library.")
 ENDIF()
 
 SET(GX_SDL2_PATH "${GX_SDK_PATH}/sdl2")

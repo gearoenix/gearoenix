@@ -16,9 +16,9 @@ private:
 public:
     struct Iterator {
     private:
-        T* ptr;
-        T* end_ptr;
-        std::size_t jump;
+        T* ptr = nullptr;
+        T* end_ptr = nullptr;
+        std::size_t jump = 0;
 
     public:
         typedef std::ptrdiff_t difference_type;
@@ -27,8 +27,9 @@ public:
         typedef value_type* pointer;
         typedef std::forward_iterator_tag iterator_category;
 
+        constexpr Iterator() noexcept = default;
         constexpr Iterator(T* ptr, std::size_t jump, T* end_ptr) noexcept;
-        constexpr ~Iterator() noexcept = default;
+        ~Iterator() noexcept = default;
         constexpr Iterator(const Iterator&) noexcept;
         constexpr Iterator& operator=(const Iterator&) noexcept;
         constexpr Iterator& operator++() noexcept;
@@ -85,11 +86,6 @@ constexpr typename gearoenix::core::PtrRange<T>::Iterator& gearoenix::core::PtrR
         ptr = end_ptr;
     return *this;
 }
-
-//template<typename T>
-//constexpr typename gearoenix::core::PtrRange<T>::Iterator::reference gearoenix::core::PtrRange<T>::Iterator::operator*() const noexcept {
-//    return *ptr;
-//}
 
 template <typename T>
 constexpr typename gearoenix::core::PtrRange<T>::Iterator::reference gearoenix::core::PtrRange<T>::Iterator::operator*() noexcept
