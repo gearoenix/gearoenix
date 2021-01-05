@@ -40,16 +40,14 @@ jobs:
           Write-Host "Goint to install the Vulkan SDK."
           .\vulkan-sdk.exe /S
           Write-Host "Add Vulkan SDK to PATH."
-      - name: Echo places
+          Set-Location -Path "$((Get-ChildItem -Path "C:\VulkanSDK\*" | Select-Object -First 1).FullName)"
+          Dir .
+          Add-Content -Path "$env:GITHUB_PATH" -Value "$((Get-Item .).FullName)\Bin"
+          Add-Content -Path "$env:GITHUB_ENV" -Value "VULKAN_SDK=$((Get-Item .).FullName)"
+      - name: Echo settings
         shell: powershell
         run: |
           Write-Host "Vulkan SDK Path: $env:VULKAN_SDK"
           Write-Host "Path: $env:Path"
           Write-Host "CMake thread option: $env:CMAKE_BUILD_PARALLEL_LEVEL"
-          Dir "C:\"
-          Dir "C:\VulkanSDK"
-          Dir "C:\VulkanSDK\*"
-          Dir "D:\"
-          Dir "D:\VulkanSDK"
-          Dir "D:\VulkanSDK\*"
-
+          Write-Host "CMake thread option: $env:VULKAN_SDK"
