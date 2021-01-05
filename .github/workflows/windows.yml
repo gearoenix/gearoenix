@@ -13,7 +13,7 @@ jobs:
       - name: Install CMake
         shell: powershell
         run: |
-          Write-Host "GITHUB_PATH: ${GITHUB_PATH}"
+          Write-Host "GITHUB_PATH: $env:GITHUB_PATH"
 #          Write-Host "GITHUB_ENV: ${GITHUB_ENV}"
 #          New-Item -ItemType Directory -Force -Path build
 #          Set-Location -Path build
