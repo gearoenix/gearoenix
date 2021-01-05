@@ -1,6 +1,8 @@
-# gearoenix-vulkan
+# Gearoenix (vulkan-backend)
 
-Gearoenix vulkan backend
+Vulkan backend of Gearoenix game engine.
+
+![Ubuntu 20.04 release build](https://github.com/Hossein-Noroozpour/gearoenix-vulkan-ray-tracing/workflows/Ubuntu%2020.04%20release%20build/badge.svg)
 
 
 ## Why a separate repository?
