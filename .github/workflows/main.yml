@@ -16,7 +16,7 @@ jobs:
         run: sudo apt-get install clang++-10 clang-10 wget libvulkan-dev -y &&
           echo "CC=/usr/bin/clang-10" >> $GITHUB_ENV &&
           echo "CXX=/usr/bin/clang++-10" >> $GITHUB_ENV &&
-          echo "CMAKE_BUILD_PARALLEL_LEVEL=`nproc --all`" >> $GITHUB_ENV &&
+          echo "CMAKE_BUILD_PARALLEL_LEVEL=`expr `nproc --all` \* 16`" >> $GITHUB_ENV &&
           cat $GITHUB_ENV
       - name: Echo places
         run: echo $HOME && echo `pwd`
