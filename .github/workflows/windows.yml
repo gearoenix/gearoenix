@@ -21,25 +21,35 @@ jobs:
           Set-Location -Path build
           $cmake_ver = "3.19.2"
           $cmake_address = "https://github.com/Kitware/CMake/releases/download/v${cmake_ver}/cmake-${cmake_ver}-win64-x64.zip"
-          Write-Host "Going to download CMake from: ${cmake_address}"
+          Write-Host "Going to download CMake from: ${cmake_address}."
           Invoke-WebRequest "${cmake_address}" -OutFile "cmake.zip"
-          Write-Host "Going to uncompress the cmake.zip"
+          Write-Host "Going to uncompress the cmake.zip."
           Expand-Archive "cmake.zip" -DestinationPath "cmake"
-          Write-Host "Going to delete cmake.zip"
+          Write-Host "Going to delete cmake.zip."
           Remove-Item -Path "cmake.zip"
-          Write-Host "Add cmake to PATH"
-          Add-Content -Path "$env:GITHUB_PATH" -Value ";$((Get-Item .).FullName)\cmake\cmake-${cmake_ver}-win64-x64\bin"
-          Add-Content -Path "$env:GITHUB_ENV" -Value "$CMAKE_BUILD_PARALLEL_LEVEL = $((Get-CimInstance Win32_ComputerSystem).NumberOfLogicalProcessors * 8)"
+          Write-Host "Add cmake to PATH."
+          Add-Content -Path "$env:GITHUB_PATH" -Value "$((Get-Item .).FullName)\cmake\cmake-${cmake_ver}-win64-x64\bin"
+          Add-Content -Path "$env:GITHUB_ENV" -Value "CMAKE_BUILD_PARALLEL_LEVEL=$((Get-CimInstance Win32_ComputerSystem).NumberOfLogicalProcessors * 8)"
       - name: Install Vulkan SDK
         shell: powershell
         run: |
           New-Item -ItemType Directory -Force -Path build
           Set-Location -Path build
+          Write-Host "Goint to download the latest Vulkan SDK."
           Invoke-WebRequest "https://sdk.lunarg.com/sdk/download/latest/windows/vulkan-sdk.exe" -OutFile vulkan-sdk.exe
+          Write-Host "Goint to install the Vulkan SDK."
           .\vulkan-sdk.exe /S
+          Write-Host "Add Vulkan SDK to PATH."
       - name: Echo places
         shell: powershell
         run: |
           Write-Host "Vulkan SDK Path: $env:VULKAN_SDK"
           Write-Host "Path: $env:Path"
-          Write-Host "Cmake thread option: $env:CMAKE_BUILD_PARALLEL_LEVEL"
+          Write-Host "CMake thread option: $env:CMAKE_BUILD_PARALLEL_LEVEL"
+          Dir "C:\"
+          Dir "C:\VulkanSDK"
+          Dir "C:\VulkanSDK\*"
+          Dir "D:\"
+          Dir "D:\VulkanSDK"
+          Dir "D:\VulkanSDK\*"
+
