@@ -11,18 +11,24 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Update
-        run: sudo apt-get update
+        run: sudo apt-get update && sudo apt-get dist-upgrade -y
       - name: Install dependancies
         run: sudo apt-get install clang++-10 clang-10 wget libvulkan-dev -y &&
           echo "CC=/usr/bin/clang-10" >> $GITHUB_ENV &&
           echo "CXX=/usr/bin/clang++-10" >> $GITHUB_ENV &&
           echo "CMAKE_BUILD_PARALLEL_LEVEL=`nproc --all`" >> $GITHUB_ENV &&
-          echo $GITHUB_ENV
+          cat $GITHUB_ENV
       - name: Echo places
         run: echo $HOME && echo `pwd`
       - name: Install CMake
-        run: wget "https://github.com/Kitware/CMake/releases/download/v3.18.4/cmake-3.18.4-Linux-x86_64.tar.gz" &&
-          tar -xf cmake-3.18.4-Linux-x86_64.tar.gz && ls && rm cmake-3.18.4-Linux-x86_64.tar.gz &&
-          echo "`pwd`/cmake-3.18.4-Linux-x86_64/bin" >> $GITHUB_PATH
+        run: CMAKE_VER="3.19.2" &&
+          wget "https://github.com/Kitware/CMake/releases/download/v${CMAKE_VER}/cmake-${CMAKE_VER}-Linux-x86_64.tar.gz" &&
+          tar -xf "cmake-${CMAKE_VER}-Linux-x86_64.tar.gz" &&
+          ls &&
+          rm "cmake-${CMAKE_VER}-Linux-x86_64.tar.gz" &&
+          echo "`pwd`/cmake-${CMAKE_VER}-Linux-x86_64/bin" >> $GITHUB_PATH
       - name: Building Release for Linux
-        run: mkdir build && cd build && cmake .. && cmake --build . --config Release
+        run: mkdir build &&
+          cd build &&
+          cmake .. &&
+          cmake --build . --config Release
