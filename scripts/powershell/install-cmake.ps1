@@ -1,3 +1,7 @@
+$ErrorView = "NormalView"
+Write-Host "GITHUB_PATH: ${GITHUB_PATH}"
+Write-Host "GITHUB_ENV: ${GITHUB_ENV}"
+
 New-Item -ItemType Directory -Force -Path build
 Set-Location -Path build
 $cmake_ver = "3.19.2"
@@ -5,8 +9,9 @@ Invoke-WebRequest https://github.com/Kitware/CMake/releases/download/v${cmake_ve
 Expand-Archive build\cmake.zip -DestinationPath build\cmake
 Remove-Item –path build\cmake.zip
 
-Write-Host "${GITHUB_PATH}"
-Write-Host "${GITHUB_ENV}"
+echo "$((Get-Item .).FullName)\build\cmake\cmake-${cmake_ver}-win64-x64\bin"
+echo "CMAKE_BUILD_PARALLEL_LEVEL=$((Get-CimInstance Win32_ComputerSystem).NumberOfLogicalProcessors * 8)"
+
 Write-Host "$((Get-Item .).FullName)\build\cmake\cmake-${cmake_ver}-win64-x64\bin"
 Write-Host "CMAKE_BUILD_PARALLEL_LEVEL=$((Get-CimInstance Win32_ComputerSystem).NumberOfLogicalProcessors * 8)"
 
