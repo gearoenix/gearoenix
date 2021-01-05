@@ -31,7 +31,15 @@ jobs:
           Add-Content -Path "$env:GITHUB_PATH" -Value ";$((Get-Item .).FullName)\cmake\cmake-${cmake_ver}-win64-x64\bin"
           Add-Content -Path "$env:GITHUB_ENV" -Value "$CMAKE_BUILD_PARALLEL_LEVEL = $((Get-CimInstance Win32_ComputerSystem).NumberOfLogicalProcessors * 8)"
       - name: Install Vulkan SDK
-        run: powershell -noexit -File .\scripts\powershell\install-vulkan-sdk.ps1
-      - name: Echo places
-        run: echo $env:VULKAN_SDK ; echo $env:Path
         shell: powershell
+        run: |
+          New-Item -ItemType Directory -Force -Path build
+          Set-Location -Path build
+          Invoke-WebRequest "https://sdk.lunarg.com/sdk/download/latest/windows/vulkan-sdk.exe" -OutFile vulkan-sdk.exe
+          .\vulkan-sdk.exe /S
+      - name: Echo places
+        shell: powershell
+        run: |
+          Write-Host "Vulkan SDK Path: $env:VULKAN_SDK"
+          Write-Host "Path: $env:Path"
+          Write-Host "Cmake thread option: $env:CMAKE_BUILD_PARALLEL_LEVEL"
