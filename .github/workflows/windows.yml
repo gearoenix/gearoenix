@@ -11,11 +11,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Install CMake
-        run: .\scripts\powershell\install-cmake.ps1
-        shell: powershell
+        run: powershell -noexit -File .\scripts\powershell\install-cmake.ps1
       - name: Install Vulkan SDK
-        run: .\scripts\powershell\install-vulkan-sdk.ps1
-        shell: powershell
+        run: powershell -noexit -File .\scripts\powershell\install-vulkan-sdk.ps1
       - name: Echo places
         run: echo $env:VULKAN_SDK ; echo $env:Path
         shell: powershell
