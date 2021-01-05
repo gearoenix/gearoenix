@@ -20,10 +20,14 @@ jobs:
           New-Item -ItemType Directory -Force -Path build
           Set-Location -Path build
           $cmake_ver = "3.19.2"
-          Write-Host "Going to download CMake from: https://github.com/Kitware/CMake/releases/download/v${cmake_ver}/cmake-${cmake_ver}-win64-x64.zip"
-          Invoke-WebRequest "https://github.com/Kitware/CMake/releases/download/v${cmake_ver}/cmake-${cmake_ver}-win64-x64.zip" -OutFile "cmake.zip"
+          $cmake_address = "https://github.com/Kitware/CMake/releases/download/v${cmake_ver}/cmake-${cmake_ver}-win64-x64.zip"
+          Write-Host "Going to download CMake from: ${cmake_address}"
+          Invoke-WebRequest "${cmake_address}" -OutFile "cmake.zip"
+          Write-Host "Going to uncompress the cmake.zip"
           Expand-Archive "cmake.zip" -DestinationPath "cmake"
+          Write-Host "Going to delete cmake.zip"
           Remove-Item -Path "cmake.zip"
+          Write-Host "Add cmake to PATH"
           Add-Content -Path "$env:GITHUB_PATH" -Value ";$((Get-Item .).FullName)\cmake\cmake-${cmake_ver}-win64-x64\bin"
 #          Add-Content -Path "$env:GITHUB_ENV" -Value "$CMAKE_BUILD_PARALLEL_LEVEL = $((Get-CimInstance Win32_ComputerSystem).NumberOfLogicalProcessors * 8)"
       - name: Install Vulkan SDK
