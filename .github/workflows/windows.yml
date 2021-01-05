@@ -29,7 +29,7 @@ jobs:
           Remove-Item -Path "cmake.zip"
           Write-Host "Add cmake to PATH"
           Add-Content -Path "$env:GITHUB_PATH" -Value ";$((Get-Item .).FullName)\cmake\cmake-${cmake_ver}-win64-x64\bin"
-#          Add-Content -Path "$env:GITHUB_ENV" -Value "$CMAKE_BUILD_PARALLEL_LEVEL = $((Get-CimInstance Win32_ComputerSystem).NumberOfLogicalProcessors * 8)"
+          Add-Content -Path "$env:GITHUB_ENV" -Value "$CMAKE_BUILD_PARALLEL_LEVEL = $((Get-CimInstance Win32_ComputerSystem).NumberOfLogicalProcessors * 8)"
       - name: Install Vulkan SDK
         run: powershell -noexit -File .\scripts\powershell\install-vulkan-sdk.ps1
       - name: Echo places
