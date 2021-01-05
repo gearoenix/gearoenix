@@ -135,13 +135,14 @@ void gearoenix::core::ecs::World::parallel_system(
                 ptr += sizeof(entity_id_t);
                 const auto* const component_indices = reinterpret_cast<const component_index_t*>(ptr);
                 std::size_t index = 0;
-                fun(entity_id, [&]<typename T>(T* t) -> T& {
+                const auto component_maker = [&]<typename T>(T* t) -> T& {
                     const auto& info = query_info[index];
                     ++index;
                     if (IsNot<T>::value)
                         return *t;
                     return *reinterpret_cast<T*>(&info.starting_pointer[component_indices[info.index_in_archetype]]);
-                }(reinterpret_cast<ComponentsTypes*>(0))...);
+                };
+                fun(entity_id, component_maker(reinterpret_cast<ComponentsTypes*>(0))...);
             });
         }
     continue_archetypes:
