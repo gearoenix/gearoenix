@@ -102,7 +102,7 @@ void gearoenix::core::ecs::World::parallel_system(
     SystemQueryInfo query_info[all_components_count] = {
         SystemQueryInfo {
             .is_not = IsNot<ComponentsTypes>::value,
-            .type_index = std::type_index(IsNot<ComponentsTypes>::value ? typeid(IsNot<ComponentsTypes>::type) : typeid(ComponentsTypes)),
+            .type_index = std::type_index(IsNot<ComponentsTypes>::value ? typeid(typename IsNot<ComponentsTypes>::type) : typeid(ComponentsTypes)),
             .starting_pointer = IsNot<ComponentsTypes>::value ? nullptr : components_storage[std::type_index(typeid(ComponentsTypes))].data(),
         }...,
     };

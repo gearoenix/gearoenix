@@ -89,7 +89,8 @@ std::vector<std::uint8_t> gearoenix::render::texture::Texture::convert_pixels(
         auto result_index = iter.get_pixel_index() * out_components_count;
         for (; i < in_components_count && i < out_components_count; ++i) {
             const float c = std::round((iter[i] * 255.0f)) + 0.1f;
-            result[result_index] = c >= 255.0 ? 255 : c <= 0.0 ? 0 : static_cast<std::uint8_t>(c);
+            result[result_index] = c >= 255.0 ? 255 : c <= 0.0 ? 0
+                                                               : static_cast<std::uint8_t>(c);
             ++result_index;
         }
         for (; i < out_components_count; ++i) {
