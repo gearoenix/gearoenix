@@ -13,10 +13,11 @@ jobs:
       - name: Update
         run: sudo apt-get update
       - name: Install dependancies
-        run: sudo apt-get install clang++-10 clang-10 wget -y &&
-          echo "CC=/usr/bin/clang-10" >> $GITHUB_ENV &&
-          echo "CXX=/usr/bin/clang++-10" >> $GITHUB_ENV &&
-          echo "CMAKE_BUILD_PARALLEL_LEVEL=`nproc --all`" >> $GITHUB_ENV
+        run: sudo apt-get install clang++-11 clang-11 wget libvulkan-dev -y &&
+          echo "CC=/usr/bin/clang-11" >> $GITHUB_ENV &&
+          echo "CXX=/usr/bin/clang++-11" >> $GITHUB_ENV &&
+          echo "CMAKE_BUILD_PARALLEL_LEVEL=`nproc --all`" >> $GITHUB_ENV &&
+          echo $GITHUB_ENV
       - name: Echo places
         run: echo $HOME && echo `pwd`
       - name: Install CMake
