@@ -1,0 +1,21 @@
+name: Windows 2019 release build
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: windows-2019
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install CMake
+        run: .\scripts\powershell\install-cmake.ps1
+        shell: powershell
+      - name: Install Vulkan SDK
+        run: .\scripts\powershell\install-vulkan-sdk.ps1
+        shell: powershell
+      - name: Echo places
+        run: echo $env:VULKAN_SDK ; echo $env:Path
+        shell: powershell
