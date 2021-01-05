@@ -1,4 +1,4 @@
-name: Windows 2019 release build
+name: Windows 2019 release build ->
 on:
   push:
     branches: [ master ]
