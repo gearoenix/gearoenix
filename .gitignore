@@ -33,6 +33,8 @@
 
 
 build/
+build-debug/
+build-coverage/
 cmake-build-*/
 .vscode/
 .settings

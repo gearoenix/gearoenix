@@ -13,22 +13,48 @@ jobs:
       - name: Update
         run: sudo apt-get update
       - name: Install dependancies
-        run: sudo apt-get install clang++-10 clang-10 wget libvulkan-dev -y &&
+        run: |
+          sudo apt-get install clang++-10 clang-10 wget libvulkan-dev lcov gcovr -y &&
           echo "CC=/usr/bin/clang-10" >> $GITHUB_ENV &&
           echo "CXX=/usr/bin/clang++-10" >> $GITHUB_ENV &&
           echo "CMAKE_BUILD_PARALLEL_LEVEL=$(expr $(nproc --all) \* 8)" >> $GITHUB_ENV &&
+          echo "LLVM_PROFILE_FILE=\"gearoenix.profraw\"" >> $GITHUB_ENV &&
           cat $GITHUB_ENV
-      - name: Echo places
-        run: echo $HOME && echo `pwd`
+      - name: Echos
+        run: |
+          echo $HOME
+          echo `pwd`
+          echo $CMAKE_BUILD_PARALLEL_LEVEL
+          echo $LLVM_PROFILE_FILE
       - name: Install CMake
-        run: CMAKE_VER="3.19.2" &&
+        run: |
+          CMAKE_VER="3.19.2" &&
           wget "https://github.com/Kitware/CMake/releases/download/v${CMAKE_VER}/cmake-${CMAKE_VER}-Linux-x86_64.tar.gz" &&
           tar -xf "cmake-${CMAKE_VER}-Linux-x86_64.tar.gz" &&
           ls &&
           rm "cmake-${CMAKE_VER}-Linux-x86_64.tar.gz" &&
           echo "`pwd`/cmake-${CMAKE_VER}-Linux-x86_64/bin" >> $GITHUB_PATH
-      - name: Building Release for Linux
-        run: mkdir build &&
+      - name: Building Release
+        run: |
+          mkdir build &&
           cd build &&
           cmake .. &&
           cmake --build . --config Release
+      - name: Building debug, tests and coverage
+        run: |
+          mkdir build-debug &&
+          cd build-debug &&
+          cmake .. -DCMAKE_BUILD_TYPE=Debug -DGX_COVERAGE_ENABLED=ON &&
+          cmake --build . --config Debug &&
+          cd tests &&
+          ctest &&
+          llvm-profdata-10 merge -sparse $LLVM_PROFILE_FILE -o gearoenix.profdata &&
+          llvm-cov-10 show ./GearoenixGameEngineTests -instr-profile=gearoenix.profdata > coverage.txt
+      - uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: coverage.txt
+          flags: unittests
+          name: gearoenix-test-coverage
+          fail_ci_if_error: false
+          verbose: true
