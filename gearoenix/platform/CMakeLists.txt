@@ -32,5 +32,5 @@ SET(GX_ENGINE_PLATFORM_SRC
         ${GX_ENGINE_PLATFORM_SRC_DIR}/gx-plt-log.cpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/gx-plt-log.hpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/gx-plt-main-entry.hpp
-        ${GX_ENGINE_PLATFORM_SRC_DIR}/gx-plt-runtime-configuration.hpp)
-SET(GX_ENGINE_PLATFORM_SRC ${GX_ENGINE_PLATFORM_SRC} PARENT_SCOPE)
+        ${GX_ENGINE_PLATFORM_SRC_DIR}/gx-plt-runtime-configuration.hpp
+        PARENT_SCOPE)
