@@ -1,4 +1,4 @@
-name: Ubuntu 20.04 release build ->
+name: Ubuntu-20.04
 on:
   push:
     branches: [ master ]
@@ -14,7 +14,7 @@ jobs:
         run: sudo apt-get update
       - name: Install dependancies
         run: |
-          sudo apt-get install clang++-10 clang-10 wget libvulkan-dev lcov gcovr -y &&
+          sudo apt-get install clang++-10 clang-10 wget -y &&
           echo "CC=/usr/bin/clang-10" >> $GITHUB_ENV &&
           echo "CXX=/usr/bin/clang++-10" >> $GITHUB_ENV &&
           echo "CMAKE_BUILD_PARALLEL_LEVEL=$(expr $(nproc --all) \* 8)" >> $GITHUB_ENV &&

@@ -2,9 +2,10 @@
 
 Vulkan backend of Gearoenix game engine.
 
-![Ubuntu 20.04 release build](https://github.com/Hossein-Noroozpour/gearoenix-vulkan-ray-tracing/workflows/Ubuntu%2020.04%20release%20build%20-%3E/badge.svg)
+![Ubuntu 20.04](https://github.com/Hossein-Noroozpour/gearoenix-vulkan-ray-tracing/workflows/Ubuntu-20.04/badge.svg)
+![Windows 2019](https://github.com/Hossein-Noroozpour/gearoenix-vulkan-ray-tracing/workflows/Windows-2019/badge.svg)
+[![codecov](https://codecov.io/gh/Hossein-Noroozpour/gearoenix-vulkan-ray-tracing/branch/master/graph/badge.svg?token=48NJY46U15)](https://codecov.io/gh/Hossein-Noroozpour/gearoenix-vulkan-ray-tracing)
 
-![Windows 2019 release build](https://github.com/Hossein-Noroozpour/gearoenix-vulkan-ray-tracing/workflows/Windows%202019%20release%20build%20-%3E/badge.svg)
 
 ## Why a separate repository?
 
