@@ -22,7 +22,7 @@ struct Application final {
     GX_GET_VAL_PRV(xcb_window_t, window, 0)
 
 private:
-    Application(const RuntimeConfiguration& config) noexcept;
+    explicit Application(const RuntimeConfiguration& config) noexcept;
 
 public:
     [[nodiscard]] static std::shared_ptr<Application> construct(const RuntimeConfiguration& config = RuntimeConfiguration()) noexcept;
