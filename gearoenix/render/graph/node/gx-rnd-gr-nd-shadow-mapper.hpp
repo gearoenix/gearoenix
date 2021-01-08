@@ -9,40 +9,40 @@
 #include <vector>
 
 namespace gearoenix::render::buffer {
-class Uniform;
-class Manager;
+struct Uniform;
+struct Manager;
 }
 
 namespace gearoenix::render::camera {
-class Camera;
+struct Camera;
 }
 
 namespace gearoenix::render::command {
-class Buffer;
+struct Buffer;
 }
 
 namespace gearoenix::render::light {
-class Directional;
+struct Directional;
 }
 
 namespace gearoenix::render::model {
-class Model;
-class Mesh;
+struct Model;
+struct Mesh;
 }
 
 namespace gearoenix::render::pipeline {
-class ShadowMapperResourceSet;
+struct ShadowMapperResourceSet;
 }
 
 namespace gearoenix::render::scene {
-class Scene;
+struct Scene;
 }
 
 namespace gearoenix::render::texture {
-class Texture;
-class Texture2D;
-class TextureCube;
-class Target;
+struct Texture;
+struct Texture2D;
+struct TextureCube;
+struct Target;
 }
 
 namespace gearoenix::render::graph::node {
@@ -74,8 +74,8 @@ struct ShadowMapperFrame {
 
 /// This renders only one directional light with one shadow map.
 /// In here I do not care for race issues (for performance reason).
-/// The user of this class must use its functionality in their correct contexts.
-class ShadowMapper final : public Node {
+/// The user of this struct must use its functionality in their correct contexts.
+struct ShadowMapper final : public Node {
 private:
     std::vector<std::unique_ptr<ShadowMapperFrame>> frames;
     std::shared_ptr<texture::Target> shadow_map_render_target;

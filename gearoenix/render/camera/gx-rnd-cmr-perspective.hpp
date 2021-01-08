@@ -3,11 +3,11 @@
 #include "gx-rnd-cmr-camera.hpp"
 
 namespace gearoenix::physics::collider {
-class Frustum;
+struct Frustum;
 }
 
 namespace gearoenix::render::camera {
-class Perspective : public Camera {
+struct Perspective : public Camera {
 private:
     double fovx = 1.0;
     double fovy = 1.0;
@@ -20,7 +20,7 @@ private:
     void update_projection() noexcept;
 
 public:
-    Perspective(core::Id my_id, std::string name, system::stream::Stream* f, engine::Engine* e) noexcept;
+    Perspective(core::Id my_id, std::string name, platform::stream::Stream* f, engine::Engine* e) noexcept;
     Perspective(core::Id my_id, std::string name, engine::Engine* e) noexcept;
     void set_aspects(unsigned int w, unsigned int h) noexcept final;
     void set_field_of_view(double radian) noexcept;

@@ -1,6 +1,6 @@
 #include "gx-rnd-mat-pbr.hpp"
 #include "../../core/asset/gx-cr-asset-manager.hpp"
-#include "../../system/gx-sys-application.hpp"
+#include "../../platform/gx-plt-application.hpp"
 #include "../buffer/gx-rnd-buf-framed-uniform.hpp"
 #include "../texture/gx-rnd-txt-manager.hpp"
 #include "../texture/gx-rnd-txt-texture-2d.hpp"
@@ -15,7 +15,7 @@ gearoenix::render::material::Pbr::Pbr(engine::Engine* const e, const core::sync:
 {
     core::sync::EndCaller<texture::Texture2D> call_txt_2d([end](const std::shared_ptr<texture::Texture2D>&) {});
     core::sync::EndCaller<texture::TextureCube> call_txt_cube([end](const std::shared_ptr<texture::TextureCube>&) {});
-    auto* const txt_mgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
+    auto* const txt_mgr = e->get_platform_application()->get_asset_manager()->get_texture_manager();
     color_texture = txt_mgr->get_2d(color_value.value(), call_txt_2d);
     emission_texture = txt_mgr->get_2d(emission_value.value(), call_txt_2d);
     metallic_roughness_texture = txt_mgr->get_2d(metallic_roughness_value.value(), call_txt_2d);
@@ -23,10 +23,10 @@ gearoenix::render::material::Pbr::Pbr(engine::Engine* const e, const core::sync:
     irradiance = radiance = txt_mgr->get_cube_zero_3c(call_txt_cube).get();
 }
 
-gearoenix::render::material::Pbr::Pbr(system::stream::Stream* const f, engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept
+gearoenix::render::material::Pbr::Pbr(platform::stream::Stream* const f, engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept
     : Material(Type::Pbr, e, sizeof(Uniform))
 {
-    auto* const txt_mgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
+    auto* const txt_mgr = e->get_platform_application()->get_asset_manager()->get_texture_manager();
     uniform.alpha = read_alpha(f);
     std::tie(color_texture, color_value) = read_t2d_v4(f, end);
     if (f->read_bool())
@@ -108,7 +108,7 @@ void gearoenix::render::material::Pbr::set_color(const math::Vec4<float>& c,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept
 {
     core::sync::EndCaller<texture::Texture2D> call_txt_2d([end](const std::shared_ptr<texture::Texture2D>&) {});
-    auto* const txt_mgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
+    auto* const txt_mgr = e->get_platform_application()->get_asset_manager()->get_texture_manager();
     color_texture = txt_mgr->get_2d(c, call_txt_2d);
     color_value = c;
 }

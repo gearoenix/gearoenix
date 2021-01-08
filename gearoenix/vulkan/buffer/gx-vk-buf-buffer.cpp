@@ -1,25 +1,27 @@
 #include "gx-vk-buf-buffer.hpp"
-#ifdef GX_USE_VULKAN
+#ifdef GX_RENDER_VULKAN_ENABLED
 #include "../../core/gx-cr-allocator.hpp"
+#include "../../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../device/gx-vk-dev-physical.hpp"
 #include "../gx-vk-check.hpp"
 #include "../memory/gx-vk-mem-manager.hpp"
-#include "../memory/gx-vk-mem-memory.hpp"
 
 gearoenix::vulkan::buffer::Buffer::Buffer(
     std::shared_ptr<core::Allocator> alc,
-    std::shared_ptr<Buffer> prt,
-    std::shared_ptr<memory::Memory> mem,
+    Buffer* const prt,
+    memory::Memory&& mem,
     VkBuffer vulkan_data) noexcept
     : allocator(std::move(alc))
-    , parent(std::move(prt))
+    , parent(prt)
     , allocated_memory(std::move(mem))
     , vulkan_data(vulkan_data)
 {
 }
 
-std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Buffer::construct(
+gearoenix::vulkan::buffer::Buffer::Buffer(Buffer&&) noexcept = default;
+
+gearoenix::vulkan::buffer::Buffer gearoenix::vulkan::buffer::Buffer::construct(
     const std::size_t size,
     const memory::Place place,
     memory::Manager& memory_manager) noexcept
@@ -39,29 +41,26 @@ std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Bu
     Loader::vkGetBufferMemoryRequirements(dev, vulkan_data, &mem_req);
     auto allocated_memory = memory_manager.allocate(aligned_size, mem_req.memoryTypeBits, place);
     GX_VK_CHK_L(vkBindBufferMemory(
-        dev, vulkan_data, allocated_memory->get_vulkan_data(),
-        allocated_memory->get_allocator()->get_root_offset()))
-    std::shared_ptr<Buffer> result(new Buffer(std::move(allocator), nullptr, std::move(allocated_memory), vulkan_data));
-    result->self = result;
-    return result;
+        dev, vulkan_data, allocated_memory.get_vulkan_data(),
+        allocated_memory.get_allocator()->get_root_offset()))
+    return Buffer(std::move(allocator), nullptr, std::move(allocated_memory), vulkan_data);
 }
 
 gearoenix::vulkan::buffer::Buffer::~Buffer() noexcept
 {
     if (nullptr == parent)
-        Loader::vkDestroyBuffer(allocated_memory->get_manager()->get_logical_device()->get_vulkan_data(), vulkan_data, nullptr);
+        Loader::vkDestroyBuffer(
+            allocated_memory.get_manager()->get_logical_device()->get_vulkan_data(), vulkan_data, nullptr);
 }
 
-std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Buffer::allocate(const std::size_t size) noexcept
+gearoenix::vulkan::buffer::Buffer gearoenix::vulkan::buffer::Buffer::allocate(const std::size_t size) noexcept
 {
-    const auto aligned_size = allocated_memory->get_manager()->get_logical_device()->get_physical_device()->align_size(size);
-    std::shared_ptr<Buffer> result(new Buffer(
+    const auto aligned_size = allocated_memory.get_manager()->get_logical_device()->get_physical_device()->align_size(size);
+    return Buffer(
         allocator->allocate(aligned_size),
-        self.lock(),
-        allocated_memory->allocate(aligned_size),
-        vulkan_data));
-    result->self = result;
-    return result;
+        this,
+        allocated_memory.allocate(aligned_size),
+        vulkan_data);
 }
 
 //void gearoenix::render::buffer::Buffer::copy(command::Buffer* copy_cmd, Buffer* src)

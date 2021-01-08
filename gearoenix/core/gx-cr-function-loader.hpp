@@ -5,7 +5,7 @@
 #include <vector>
 
 namespace gearoenix::core {
-class FunctionLoader {
+struct FunctionLoader {
 private:
     GX_CREATE_GUARD(load_functions)
     std::vector<std::function<void()>> load_functions;

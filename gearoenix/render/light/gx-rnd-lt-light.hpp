@@ -4,24 +4,24 @@
 #include "../../math/gx-math-vector-3d.hpp"
 #include "gx-rnd-lt-type.hpp"
 
-namespace gearoenix::system::stream {
-class Stream;
+namespace gearoenix::platform::stream {
+struct Stream;
 }
 
 namespace gearoenix::render::engine {
-class Engine;
+struct Engine;
 }
 
 namespace gearoenix::render::model {
-class Model;
+struct Model;
 }
 
 namespace gearoenix::render::scene {
-class Scene;
+struct Scene;
 }
 
 namespace gearoenix::render::light {
-class Light : public core::asset::Asset {
+struct Light : public core::asset::Asset {
     GX_GETSET_VAL_PRT(double, layer, 0.0f)
     GX_GET_CVAL_PRT(Type, light_type)
     GX_GETSET_CREF_PRT(math::Vec3<double>, color)
@@ -33,7 +33,7 @@ protected:
     void remove_from_shadow_cascaders() const noexcept;
     void add_to_shadow_cascaders() const noexcept;
 
-    Light(core::Id id, std::string name, system::stream::Stream* f, engine::Engine* e, Type light_type) noexcept;
+    Light(core::Id id, std::string name, platform::stream::Stream* f, engine::Engine* e, Type light_type) noexcept;
     Light(core::Id id, std::string name, engine::Engine* e, Type light_type) noexcept;
 
 public:

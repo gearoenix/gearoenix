@@ -9,44 +9,44 @@
 #include <vector>
 
 namespace gearoenix::render::buffer {
-class Manager;
-class Uniform;
+struct Manager;
+struct Uniform;
 }
 
 namespace gearoenix::render::camera {
-class Camera;
+struct Camera;
 }
 
 namespace gearoenix::render::command {
-class Buffer;
+struct Buffer;
 }
 
 namespace gearoenix::render::light {
-class Directional;
-class CascadeInfo;
+struct Directional;
+struct CascadeInfo;
 }
 
 namespace gearoenix::render::model {
-class Model;
-class Mesh;
+struct Model;
+struct Mesh;
 }
 
 namespace gearoenix::render::pipeline {
-class ForwardPbrResourceSet;
+struct ForwardPbrResourceSet;
 }
 
 namespace gearoenix::render::scene {
-class Scene;
+struct Scene;
 }
 
 namespace gearoenix::render::sync {
-class Semaphore;
+struct Semaphore;
 }
 
 namespace gearoenix::render::texture {
-class Texture;
-class Texture2D;
-class TextureCube;
+struct Texture;
+struct Texture2D;
+struct TextureCube;
 }
 
 namespace gearoenix::render::graph::node {
@@ -82,8 +82,8 @@ struct ForwardPbrFrame {
 
 /// This renders only one directional light with one shadow map.
 /// In here I do not care for race issues (for performance reason).
-/// The user of this class must use its functionality in their correct contexts.
-class ForwardPbr final : public Node {
+/// The user of this struct must use its functionality in their correct contexts.
+struct ForwardPbr final : public Node {
 private:
     std::vector<std::unique_ptr<ForwardPbrFrame>> frames;
     ForwardPbrFrame* frame = nullptr;

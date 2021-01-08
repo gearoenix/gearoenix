@@ -1,21 +1,21 @@
 #ifndef GEAROENIX_VULKAN_IMAGE_VIEW_HPP
 #define GEAROENIX_VULKAN_IMAGE_VIEW_HPP
-#include "../../core/gx-cr-build-configuration.hpp"
-#ifdef GX_USE_VULKAN
-#include "../../core/gx-cr-static.hpp"
+#include "../../render/gx-rnd-build-configuration.hpp"
+#ifdef GX_RENDER_VULKAN_ENABLED
+#include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../gx-vk-loader.hpp"
 
 namespace gearoenix::vulkan::memory {
-class Manager;
+struct Manager;
 }
 
 namespace gearoenix::vulkan::device {
-class Logical;
+struct Logical;
 }
 
 namespace gearoenix::vulkan::image {
-class Image;
-class View {
+struct Image;
+struct View {
 private:
     GX_GET_REFC_PRV(std::shared_ptr<Image>, image)
     GX_GET_VAL_PRV(VkImageView, vulkan_data, nullptr)

@@ -7,13 +7,13 @@
 namespace gearoenix {
 namespace render {
     namespace device {
-        class Logical;
+        struct Logical;
     }
     namespace descriptor {
-        class SetLayout;
+        struct SetLayout;
     }
     namespace pipeline {
-        class Layout {
+        struct Layout {
         private:
             descriptor::SetLayout* dessetlay;
             VkPipelineLayout vulkan_data;

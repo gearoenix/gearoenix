@@ -4,12 +4,12 @@
 #include <optional>
 #include <vector>
 
-namespace gearoenix::system::stream {
-class Stream;
+namespace gearoenix::platform::stream {
+struct Stream;
 }
 
 namespace gearoenix::render::texture {
-class Image {
+struct Image {
 
     static void encode_write_func(void* context, void* data, int size) noexcept;
 
@@ -18,7 +18,7 @@ public:
     ~Image() = delete;
 
     static void decode(
-        system::stream::Stream* file,
+        platform::stream::Stream* file,
         std::vector<unsigned char>& decoded_data,
         std::size_t& img_width,
         std::size_t& img_height) noexcept;
@@ -39,13 +39,13 @@ public:
         std::size_t& img_height,
         std::size_t& img_channels) noexcept;
     static void encode_png(
-        system::stream::Stream* file,
+        platform::stream::Stream* file,
         const unsigned char* data,
         std::size_t img_width,
         std::size_t img_height,
         std::size_t components_count) noexcept;
     static void encode_hdr(
-        system::stream::Stream* file,
+        platform::stream::Stream* file,
         const float* data,
         std::size_t img_width,
         std::size_t img_height,

@@ -5,22 +5,22 @@
 #include "../../core/sync/gx-cr-sync-end-caller.hpp"
 #include "gx-rnd-rfl-reflection.hpp"
 
-namespace gearoenix::system::stream {
-class Stream;
+namespace gearoenix::platform::stream {
+struct Stream;
 }
 
 namespace gearoenix::render::engine {
-class Engine;
+struct Engine;
 }
 
 namespace gearoenix::render::reflection {
-class Manager {
+struct Manager {
 protected:
     engine::Engine* const e;
     core::cache::File<Reflection> cache;
 
 public:
-    Manager(std::unique_ptr<system::stream::Stream> s, engine::Engine* e) noexcept;
+    Manager(std::unique_ptr<platform::stream::Stream> s, engine::Engine* e) noexcept;
     ~Manager() noexcept;
     std::shared_ptr<Reflection> get_gx3d(core::Id id, core::sync::EndCaller<Reflection>& call) noexcept;
     template <typename T>

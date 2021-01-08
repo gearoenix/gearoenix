@@ -10,12 +10,12 @@
 #include <thread>
 
 namespace gearoenix::core::sync {
-class Semaphore;
+struct Semaphore;
 }
 #endif
 
 namespace gearoenix::core::sync {
-class KernelWorkers {
+struct KernelWorkers {
 private:
     struct Worker {
 #ifndef GX_THREAD_NOT_SUPPORTED

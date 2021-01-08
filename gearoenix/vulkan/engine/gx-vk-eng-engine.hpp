@@ -3,6 +3,7 @@
 #include "../../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
 #include "../../render/engine/gx-rnd-eng-engine.hpp"
+#include "../memory/gx-vk-mem-manager.hpp"
 #include <functional>
 #include <mutex>
 
@@ -21,10 +22,6 @@ struct Logical;
 
 namespace gearoenix::vulkan::image {
 struct View;
-struct Manager;
-}
-
-namespace gearoenix::vulkan::memory {
 struct Manager;
 }
 
@@ -52,11 +49,11 @@ struct Engine final : public render::engine::Engine {
     GX_GET_CREF_PRV(std::shared_ptr<Surface>, surface)
     GX_GET_CREF_PRV(std::shared_ptr<device::Physical>, physical_device)
     GX_GET_CREF_PRV(std::shared_ptr<device::Logical>, logical_device)
-    //    GX_GET_CREF_PRV(std::shared_ptr<memory::Manager>, memory_manager)
-    //    GX_GET_CREF_PRV(std::shared_ptr<sampler::Manager>, sampler_manager)
-    //    GX_GET_CREF_PRV(std::shared_ptr<image::Manager>, image_manager)
-    //    GX_GET_CREF_PRV(std::shared_ptr<buffer::Manager>, vulkan_buffer_manager)
-    //    GX_GET_CREF_PRV(std::shared_ptr<texture::MainTarget>, vulkan_main_render_target)
+    GX_GET_CREF_PRV(memory::Manager, memory_manager)
+    GX_GET_CREF_PRV(std::shared_ptr<sampler::Manager>, sampler_manager)
+    GX_GET_CREF_PRV(std::shared_ptr<image::Manager>, image_manager)
+    GX_GET_CREF_PRV(std::shared_ptr<buffer::Manager>, vulkan_buffer_manager)
+    GX_GET_CREF_PRV(std::shared_ptr<texture::MainTarget>, vulkan_main_render_target)
     //    GX_GET_CREF_PRV(std::vector<std::shared_ptr<command::Buffer>>, upload_command_buffers)
     //    GX_GET_CREF_PRV(std::vector<std::shared_ptr<sync::Semaphore>>, upload_semaphore)
 private:

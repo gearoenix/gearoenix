@@ -3,10 +3,10 @@
 #include "gx-au-audio.hpp"
 
 namespace gearoenix::audio {
-class Speaker : public Audio {
+struct Speaker : public Audio {
 private:
 public:
-    Speaker(core::Id my_id, std::string name, const std::shared_ptr<system::stream::Stream>& f);
+    Speaker(core::Id my_id, std::string name, const std::shared_ptr<platform::stream::Stream>& f);
 };
 }
 #endif

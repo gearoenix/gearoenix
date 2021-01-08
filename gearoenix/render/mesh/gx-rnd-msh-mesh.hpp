@@ -8,22 +8,22 @@
 #include "../../math/gx-math-vertex.hpp"
 #include "gx-rnd-msh-type.hpp"
 
-namespace gearoenix::system::stream {
-class Stream;
+namespace gearoenix::platform::stream {
+struct Stream;
 }
 
 namespace gearoenix::render::engine {
-class Engine;
+struct Engine;
 }
 
 namespace gearoenix::render::buffer {
-class Buffer;
+struct Buffer;
 }
 
 namespace gearoenix::render::mesh {
-/// This class right now have only one implementation and in future if it got another
+/// This struct right now have only one implementation and in future if it got another
 /// implementation it will become an interface (virtual function haver)
-class Mesh final : public core::asset::Asset {
+struct Mesh final : public core::asset::Asset {
     GX_GET_CVAL_PRT(Type, mesh_type)
     GX_GET_CREF_PRT(math::Aabb3, box)
     GX_GET_CREF_PRT(std::shared_ptr<buffer::Buffer>, vertex_buffer)
@@ -35,7 +35,7 @@ public:
     Mesh(
         core::Id my_id,
         std::string name,
-        system::stream::Stream* f,
+        platform::stream::Stream* f,
         engine::Engine* e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
     Mesh(

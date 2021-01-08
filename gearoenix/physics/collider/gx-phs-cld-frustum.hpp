@@ -4,7 +4,7 @@
 #include "gx-phs-cld-collider.hpp"
 
 namespace gearoenix::physics::collider {
-class Frustum final : public Collider {
+struct Frustum final : public Collider {
 public:
     GX_GET_REF_PRV(math::Frustum<>, frustum)
 public:

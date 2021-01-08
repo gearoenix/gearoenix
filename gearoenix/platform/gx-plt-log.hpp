@@ -72,7 +72,7 @@
     }
 
 #ifdef GX_PLT_ANDROID
-#include "android/gx-sys-and-log.hpp"
+#include "android/gx-plt-and-log.hpp"
 #elif defined(GX_PLATFORM_WINDOWS)
 #include "windows/gx-plt-win-log.hpp"
 #endif

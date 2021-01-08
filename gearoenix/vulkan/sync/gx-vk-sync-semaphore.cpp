@@ -1,5 +1,6 @@
 #include "gx-vk-sync-semaphore.hpp"
-#ifdef GX_USE_VULKAN
+#ifdef GX_RENDER_VULKAN_ENABLED
+#include "../../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../device/gx-vk-dev-physical.hpp"
 #include "../gx-vk-check.hpp"
@@ -8,7 +9,7 @@ gearoenix::vulkan::sync::Semaphore::Semaphore(std::shared_ptr<device::Logical> l
     : logical_device(std::move(ld))
 {
     VkSemaphoreCreateInfo semaphore_create_info;
-    GX_SET_ZERO(semaphore_create_info);
+    GX_SET_ZERO(semaphore_create_info)
     semaphore_create_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
     GX_VK_CHK_L(vkCreateSemaphore(logical_device->get_vulkan_data(), &semaphore_create_info, nullptr, &vulkan_data))
 }

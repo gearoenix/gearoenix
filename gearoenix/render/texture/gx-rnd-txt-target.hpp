@@ -1,17 +1,17 @@
 #ifndef GEAROENIX_RENDER_TEXTURE_TARGET_HPP
 #define GEAROENIX_RENDER_TEXTURE_TARGET_HPP
-#include "../../core/gx-cr-static.hpp"
+#include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../../math/gx-math-vector-4d.hpp"
 #include "gx-rnd-txt-attachment.hpp"
 #include "gx-rnd-txt-type.hpp"
 #include <vector>
 
 namespace gearoenix::render::engine {
-class Engine;
+struct Engine;
 }
 
 namespace gearoenix::render::texture {
-class Target {
+struct Target {
     GX_GET_CPTR_PRT(engine::Engine, e)
     GX_GET_CVAL_PRT(core::Id, target_id)
     GX_GETSET_VAL_PRT(unsigned int, clipping_width, 0)

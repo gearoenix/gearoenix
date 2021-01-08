@@ -1,29 +1,29 @@
 #ifndef GEAROENIX_PHYSICS_CONSTRAINT_CONSTRAINT_HPP
 #define GEAROENIX_PHYSICS_CONSTRAINT_CONSTRAINT_HPP
 #include "../../core/asset/gx-cr-asset.hpp"
-#include "../../system/gx-sys-log.hpp"
+#include "../../platform/gx-plt-log.hpp"
 #include "gx-phs-cns-type.hpp"
 #include <map>
 #include <memory>
 
 namespace gearoenix::core::event {
-class Engine;
+struct Engine;
 }
 
 namespace gearoenix::render::engine {
-class Engine;
+struct Engine;
 }
 
 namespace gearoenix::render::model {
-class Model;
+struct Model;
 }
 
-namespace gearoenix::system::stream {
-class Stream;
+namespace gearoenix::platform::stream {
+struct Stream;
 }
 
 namespace gearoenix::physics::constraint {
-class Constraint : public core::asset::Asset {
+struct Constraint : public core::asset::Asset {
 public:
     typedef std::map<core::Id, std::shared_ptr<render::model::Model>> ModelMap;
     typedef std::map<core::Id, std::shared_ptr<Constraint>> ConstraintMap;

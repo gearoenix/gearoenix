@@ -1,5 +1,5 @@
 #include "gx-cr-function-loader.hpp"
-#include "../system/gx-sys-log.hpp"
+#include "../platform/gx-plt-log.hpp"
 
 gearoenix::core::FunctionLoader::FunctionLoader() noexcept = default;
 

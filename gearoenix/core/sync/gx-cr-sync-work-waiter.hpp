@@ -10,14 +10,14 @@
 #endif
 
 namespace gearoenix::core {
-class FunctionLoader;
+struct FunctionLoader;
 }
 
 namespace gearoenix::core::sync {
 #ifndef GX_THREAD_NOT_SUPPORTED
-class Semaphore;
+struct Semaphore;
 #endif
-class WorkWaiter {
+struct WorkWaiter {
 #ifndef GX_THREAD_NOT_SUPPORTED
 private:
     enum struct State : int {

@@ -5,7 +5,7 @@
 #include "gx-rnd-scn-type.hpp"
 #include "gx-rnd-scn-ui.hpp"
 
-gearoenix::render::scene::Manager::Manager(std::unique_ptr<system::stream::Stream> s, engine::Engine* const e) noexcept
+gearoenix::render::scene::Manager::Manager(std::unique_ptr<platform::stream::Stream> s, engine::Engine* const e) noexcept
     : e(e)
     , cache(std::move(s))
     , io_worker(new core::sync::WorkWaiter())
@@ -22,7 +22,7 @@ void gearoenix::render::scene::Manager::get_gx3d(const core::Id mid, core::sync:
         c.set_data(cache.get<Scene>(
             mid, [mid, c, this](std::string name) noexcept {
                 GXLOGD("Scene with id: " << mid << " is not cached, it is going to be imported.")
-                system::stream::Stream* const file = cache.get_file();
+                platform::stream::Stream* const file = cache.get_file();
                 const core::sync::EndCaller<core::sync::EndCallerIgnore> call([c] {});
                 const auto t = file->read<Type>();
                 switch (t) {

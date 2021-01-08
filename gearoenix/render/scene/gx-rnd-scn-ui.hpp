@@ -5,12 +5,12 @@
 #include <chrono>
 
 namespace gearoenix::render::widget {
-class Widget;
-class Edit;
+struct Widget;
+struct Edit;
 }
 
 namespace gearoenix::render::scene {
-class Ui final : public Scene, public core::event::Listener {
+struct Ui final : public Scene, public core::event::Listener {
 private:
     void init() noexcept;
     GX_CREATE_GUARD(events)
@@ -28,7 +28,7 @@ private:
 
 public:
     Ui(
-        core::Id my_id, std::string name, system::stream::Stream* f, engine::Engine* e,
+        core::Id my_id, std::string name, platform::stream::Stream* f, engine::Engine* e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
     Ui(
         core::Id my_id, std::string name, engine::Engine* e,

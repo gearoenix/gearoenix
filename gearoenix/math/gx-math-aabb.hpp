@@ -1,12 +1,12 @@
 #ifndef GEAROENIX_MATH_AABB_HPP
 #define GEAROENIX_MATH_AABB_HPP
-#include "../core/gx-cr-static.hpp"
+#include "../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "gx-math-intersection-status.hpp"
 #include "gx-math-vector-3d.hpp"
 #include <optional>
 
-namespace gearoenix::system::stream {
-class Stream;
+namespace gearoenix::platform::stream {
+struct Stream;
 }
 
 namespace gearoenix::math {
@@ -39,7 +39,7 @@ public:
     [[nodiscard]] bool check_intersection(const Aabb3& o) const noexcept;
     void set_center(const Vec3<double>& c) noexcept;
     void set_diameter(const Vec3<double>& d) noexcept;
-    void read(system::stream::Stream* s) noexcept;
+    void read(platform::stream::Stream& s) noexcept;
     void get_all_corners(math::Vec3<double> (&corners)[8]) const noexcept;
 };
 }

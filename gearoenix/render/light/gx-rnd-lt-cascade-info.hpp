@@ -13,32 +13,32 @@ struct Bvh;
 }
 
 namespace gearoenix::physics::collider {
-class Collider;
-class Transform;
+struct Collider;
+struct Transform;
 }
 
 namespace gearoenix::render::command {
-class Buffer;
+struct Buffer;
 }
 
 namespace gearoenix::render::engine {
-class Engine;
+struct Engine;
 }
 
 namespace gearoenix::render::model {
-class Model;
+struct Model;
 }
 
 namespace gearoenix::render::graph::node {
-class ShadowMapper;
+struct ShadowMapper;
 }
 
 namespace gearoenix::render::sync {
-class Semaphore;
+struct Semaphore;
 }
 
 namespace gearoenix::render::light {
-class Directional;
+struct Directional;
 /// For shadow rendering following function happen in order:
 ///     - update (in kernels)
 ///     - start  (in main)    [because it begins command buffers]
@@ -46,7 +46,7 @@ class Directional;
 ///     - shrink (in main)
 ///     - record (in kernels)
 ///     - submit (in main)
-class CascadeInfo {
+struct CascadeInfo {
     GX_GETSET_PTRC_PRV(Directional, source)
 public:
     struct PerCascade {

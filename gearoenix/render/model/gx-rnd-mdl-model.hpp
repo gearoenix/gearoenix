@@ -9,43 +9,43 @@
 #include <vector>
 
 namespace gearoenix::render::buffer {
-class FramedUniform;
+struct FramedUniform;
 }
 
 namespace gearoenix::physics::collider {
-class Collider;
+struct Collider;
 }
 
 namespace gearoenix::physics {
-class Transformation;
+struct Transformation;
 }
 
 namespace gearoenix::render::engine {
-class Engine;
+struct Engine;
 }
 
 namespace gearoenix::render::scene {
-class Scene;
+struct Scene;
 }
 
 namespace gearoenix::render::texture {
-class TextureCube;
+struct TextureCube;
 }
 
 namespace gearoenix::render::reflection {
-class Reflection;
+struct Reflection;
 }
 
-namespace gearoenix::system::stream {
-class Stream;
+namespace gearoenix::platform::stream {
+struct Stream;
 }
 
 namespace gearoenix::render::model {
-class Mesh;
+struct Mesh;
 /// Static models will get static reflection when it was being added to scene
 /// Dynamic models will get reflection in each frame if the locked reflection is null
 ///   and exactly residing inside a reflection collider
-class Model : public core::asset::Asset {
+struct Model : public core::asset::Asset {
 public:
     using MapMesh = std::map<core::Id, std::shared_ptr<Mesh>>;
     using MapModel = std::map<core::Id, std::shared_ptr<Model>>;
@@ -74,7 +74,7 @@ protected:
         core::Id my_id,
         std::string name,
         Type t,
-        system::stream::Stream* f,
+        platform::stream::Stream* f,
         engine::Engine* e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
     Model(

@@ -1,6 +1,6 @@
 #include "gx-rnd-mat-unlit.hpp"
 #include "../../core/asset/gx-cr-asset-manager.hpp"
-#include "../../system/gx-sys-application.hpp"
+#include "../../platform/gx-plt-application.hpp"
 #include "../buffer/gx-rnd-buf-framed-uniform.hpp"
 #include "../pipeline/gx-rnd-pip-manager.hpp"
 #include "../texture/gx-rnd-txt-manager.hpp"
@@ -11,11 +11,11 @@ gearoenix::render::material::Unlit::Unlit(engine::Engine* const e, const core::s
     , color_value(math::Vec4(1.0f, 0.0f, 0.0f, 1.0f))
 {
     core::sync::EndCaller<texture::Texture2D> call_txt_2d([end](const std::shared_ptr<texture::Texture2D>&) {});
-    auto* const txt_mgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
+    auto* const txt_mgr = e->get_platform_application()->get_asset_manager()->get_texture_manager();
     color_texture = txt_mgr->get_2d(color_value.value(), call_txt_2d);
 }
 
-gearoenix::render::material::Unlit::Unlit(system::stream::Stream* const f, engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept
+gearoenix::render::material::Unlit::Unlit(platform::stream::Stream* const f, engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept
     : Material(Type::Unlit, e, sizeof(Uniform))
 {
     uniform.alpha = read_alpha(f);
@@ -38,7 +38,7 @@ void gearoenix::render::material::Unlit::set_color(
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept
 {
     core::sync::EndCaller<texture::Texture2D> call_txt_2d([end](const std::shared_ptr<texture::Texture2D>&) {});
-    auto* const txt_mgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
+    auto* const txt_mgr = e->get_platform_application()->get_asset_manager()->get_texture_manager();
     e->late_delete(std::move(color_texture));
     color_texture = txt_mgr->get_2d(math::Vec3(r, g, b), call_txt_2d);
     color_value = math::Vec4(r, g, b, 1.0f);
@@ -48,7 +48,7 @@ void gearoenix::render::material::Unlit::set_color(const math::Vec4<float>& c,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept
 {
     core::sync::EndCaller<texture::Texture2D> call_txt_2d([end](const std::shared_ptr<texture::Texture2D>&) {});
-    auto* const txt_mgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
+    auto* const txt_mgr = e->get_platform_application()->get_asset_manager()->get_texture_manager();
     e->late_delete(std::move(color_texture));
     color_texture = txt_mgr->get_2d(c, call_txt_2d);
     color_value = c;

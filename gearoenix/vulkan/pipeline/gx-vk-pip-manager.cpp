@@ -2,7 +2,7 @@
 #ifdef USE_VULKAN
 #include "../../core/asset/gx-cr-asset-manager.hpp"
 #include "../../core/cache/gx-cr-cache-cacher.hpp"
-#include "../../system/gx-sys-app.hpp"
+#include "../../platform/gx-plt-app.hpp"
 #include "../descriptor/gx-vk-des-pool.hpp"
 #include "../descriptor/gx-vk-des-set-layout.hpp"
 #include "../gx-vk-engine.hpp"
@@ -31,7 +31,7 @@ std::shared_ptr<gearoenix::render::pipeline::Pipeline> gearoenix::render::pipeli
         return std::shared_ptr<Pipeline>(
             new Pipeline(
                 sid, cache, rndpass,
-                engine->get_system_application()->get_asset_manager()->get_shader(sid),
+                engine->get_platform_application()->get_asset_manager()->get_shader(sid),
                 new descriptor::SetLayout(engine->get_logical_device(), sid), engine));
     };
     return cacher->get(static_cast<core::Id>(sid), fn_new);

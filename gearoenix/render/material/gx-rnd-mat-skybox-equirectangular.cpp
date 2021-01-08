@@ -1,6 +1,6 @@
 #include "gx-rnd-mat-skybox-equirectangular.hpp"
 #include "../../core/asset/gx-cr-asset-manager.hpp"
-#include "../../system/gx-sys-application.hpp"
+#include "../../platform/gx-plt-application.hpp"
 #include "../buffer/gx-rnd-buf-framed-uniform.hpp"
 #include "../pipeline/gx-rnd-pip-manager.hpp"
 #include "../texture/gx-rnd-txt-manager.hpp"
@@ -11,14 +11,14 @@ gearoenix::render::material::SkyboxEquirectangular::SkyboxEquirectangular(engine
     , color_value(math::Vec4(0.0f, 0.0f, 0.0f, 1.0f))
 {
     core::sync::EndCaller<texture::Texture2D> call_txt_2d([end](const std::shared_ptr<texture::Texture2D>&) {});
-    auto* const txt_mgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
+    auto* const txt_mgr = e->get_platform_application()->get_asset_manager()->get_texture_manager();
     color_texture = txt_mgr->get_2d(color_value.value(), call_txt_2d);
 }
 
-gearoenix::render::material::SkyboxEquirectangular::SkyboxEquirectangular(system::stream::Stream* const f, engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept
+gearoenix::render::material::SkyboxEquirectangular::SkyboxEquirectangular(platform::stream::Stream* const f, engine::Engine* const e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept
     : Material(Type::SkyboxEquirectangular, e, sizeof(Uniform))
 {
-    auto* const txt_mgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
+    auto* const txt_mgr = e->get_platform_application()->get_asset_manager()->get_texture_manager();
 
     // Reading alpha
     if (f->read_bool()) {
@@ -56,7 +56,7 @@ void gearoenix::render::material::SkyboxEquirectangular::set_color(
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept
 {
     core::sync::EndCaller<texture::Texture2D> call_txt_2d([end](const std::shared_ptr<texture::Texture2D>&) {});
-    auto* const txt_mgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
+    auto* const txt_mgr = e->get_platform_application()->get_asset_manager()->get_texture_manager();
     color_texture = txt_mgr->get_2d(math::Vec3(r, g, b), call_txt_2d);
     color_value = math::Vec4(r, g, b, 1.0f);
 }
@@ -65,7 +65,7 @@ void gearoenix::render::material::SkyboxEquirectangular::set_color(const math::V
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept
 {
     core::sync::EndCaller<texture::Texture2D> call_txt_2d([end](const std::shared_ptr<texture::Texture2D>&) {});
-    auto* const txt_mgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
+    auto* const txt_mgr = e->get_platform_application()->get_asset_manager()->get_texture_manager();
     color_texture = txt_mgr->get_2d(c, call_txt_2d);
     color_value = c;
 }

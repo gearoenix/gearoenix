@@ -3,7 +3,7 @@
 #include "../../core/event/gx-cr-ev-engine.hpp"
 #include "../../physics/collider/gx-phs-cld-collider.hpp"
 #include "../../physics/gx-phs-engine.hpp"
-#include "../../system/gx-sys-application.hpp"
+#include "../../platform/gx-plt-application.hpp"
 #include "../camera/gx-rnd-cmr-manager.hpp"
 #include "../camera/gx-rnd-cmr-orthographic.hpp"
 #include "../camera/gx-rnd-cmr-transformation.hpp"
@@ -85,7 +85,7 @@ void gearoenix::render::scene::Ui::pointer_down(const double x, const double y, 
                     e_select();
                 }
             } else {
-                e->get_system_application()->set_soft_keyboard_visibility(false);
+                e->get_platform_application()->set_soft_keyboard_visibility(false);
             }
         },
         [&](
@@ -100,7 +100,7 @@ void gearoenix::render::scene::Ui::pointer_down(const double x, const double y, 
         },
         []() noexcept {});
     if (widget_not_found) {
-        e->get_system_application()->set_soft_keyboard_visibility(false);
+        e->get_platform_application()->set_soft_keyboard_visibility(false);
     }
 }
 
@@ -159,7 +159,7 @@ void gearoenix::render::scene::Ui::pointer_move(const double x, const double y, 
 void gearoenix::render::scene::Ui::init() noexcept
 {
     layer = 0.1;
-    auto* const sys_app = e->get_system_application();
+    auto* const sys_app = e->get_platform_application();
     auto cam = sys_app->get_asset_manager()->get_camera_manager()->create<camera::Orthographic>(
         "ui-scene-" + name + "-ortho");
     add_camera(cam);
@@ -170,7 +170,7 @@ void gearoenix::render::scene::Ui::init() noexcept
 gearoenix::render::scene::Ui::Ui(
     const core::Id my_id,
     std::string name,
-    system::stream::Stream* const f,
+    platform::stream::Stream* const f,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : Scene(my_id, std::move(name), Type::Ui, f, e, c)
@@ -265,7 +265,7 @@ void gearoenix::render::scene::Ui::set_enabled(const bool enb) noexcept
     if (enb == enability)
         return;
     Scene::set_enabled(enb);
-    auto* const event_engine = e->get_system_application()->get_event_engine();
+    auto* const event_engine = e->get_platform_application()->get_event_engine();
     if (enb) {
         event_engine->add_listener(core::event::Id::ButtonMouse, 0.0, this);
         event_engine->add_listener(core::event::Id::MovementMouse, 0.0, this);

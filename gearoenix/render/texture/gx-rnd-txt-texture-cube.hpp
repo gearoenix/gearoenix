@@ -2,7 +2,7 @@
 #define GEAROENIX_RENDER_TEXTURE_CUBE_HPP
 #include "gx-rnd-txt-texture.hpp"
 namespace gearoenix::render::texture {
-class TextureCube : public Texture {
+struct TextureCube : public Texture {
     GX_GET_VAL_PRT(std::size_t, aspect, 0)
 protected:
     TextureCube(
@@ -16,7 +16,7 @@ public:
     ~TextureCube() noexcept override;
 
     void write_gx3d(
-        const std::shared_ptr<system::stream::Stream>& s,
+        const std::shared_ptr<platform::stream::Stream>& s,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept override;
 };
 }

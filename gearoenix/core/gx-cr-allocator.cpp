@@ -1,5 +1,6 @@
 #include "gx-cr-allocator.hpp"
-#include "../system/gx-sys-log.hpp"
+#include "../platform/gx-plt-log.hpp"
+#include "macro/gx-cr-mcr-assert.hpp"
 #include <algorithm>
 
 gearoenix::core::Allocator::Allocator(
@@ -69,7 +70,7 @@ std::shared_ptr<gearoenix::core::Allocator> gearoenix::core::Allocator::allocate
             return a <= b.first.first;
         });
     if (ranges.end() == search) {
-        GXLOGD("Not enough space left to allocate: " << sz)
+        GX_LOG_D("Not enough space left to allocate: " << sz)
         return nullptr;
     }
     const auto found_size = search->first.first;

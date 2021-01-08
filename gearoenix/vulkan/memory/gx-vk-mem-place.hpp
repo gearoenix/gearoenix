@@ -1,7 +1,7 @@
 #ifndef GEAROENIX_VULKAN_MEMORY_PLACE_HPP
 #define GEAROENIX_VULKAN_MEMORY_PLACE_HPP
-#include "../../core/gx-cr-build-configuration.hpp"
-#ifdef GX_USE_VULKAN
+#include "../../render/gx-rnd-build-configuration.hpp"
+#ifdef GX_RENDER_VULKAN_ENABLED
 #include "../../core/gx-cr-types.hpp"
 
 namespace gearoenix::vulkan::memory {
@@ -10,5 +10,7 @@ enum struct Place : core::TypeId {
     Cpu = 2,
 };
 }
+
 #endif
+
 #endif

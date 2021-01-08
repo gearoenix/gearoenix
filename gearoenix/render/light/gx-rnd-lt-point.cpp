@@ -18,7 +18,7 @@ void gearoenix::render::light::Point::update_influence_area() noexcept
 gearoenix::render::light::Point::Point(
     const core::Id my_id,
     std::string name,
-    system::stream::Stream* const f,
+    platform::stream::Stream* const f,
     engine::Engine* const e) noexcept
     : Light(my_id, std::move(name), f, e, Type::Point)
 {

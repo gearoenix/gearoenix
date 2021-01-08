@@ -6,7 +6,7 @@
 #include <functional>
 
 namespace gearoenix::physics {
-class Transformation {
+struct Transformation {
     GX_GETSET_CREF_PRT(math::Vec3<double>, x_axis)
     GX_GETSET_CREF_PRT(math::Vec3<double>, y_axis)
     GX_GETSET_CREF_PRT(math::Vec3<double>, z_axis)

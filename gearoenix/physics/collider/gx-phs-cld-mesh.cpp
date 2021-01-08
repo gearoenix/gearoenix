@@ -2,7 +2,7 @@
 #include "../../math/gx-math-matrix-4d.hpp"
 #include "../../math/gx-math-ray.hpp"
 
-gearoenix::physics::collider::Mesh::Mesh(system::stream::Stream* const f) noexcept
+gearoenix::physics::collider::Mesh::Mesh(platform::stream::Stream* const f) noexcept
     : Collider(Type::Mesh)
 {
     const auto cnt = f->read<core::Count>();

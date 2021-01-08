@@ -1,5 +1,4 @@
 #include "gx-math-bezier-curve.hpp"
-#include "../system/gx-sys-log.hpp"
 #include "gx-math-plotter.hpp"
 #include <cmath>
 #include <random>

@@ -5,7 +5,7 @@
 #include "gx-rnd-wdg-type.hpp"
 
 namespace gearoenix::render::widget {
-class Widget : public model::Model {
+struct Widget : public model::Model {
     GX_GET_CVAL_PRT(Type, widget_type)
     GX_GET_CREF_PRT(std::weak_ptr<Widget>, widget_self)
     GX_GETSET_VAL_PRT(bool, sensivity, true)
@@ -14,7 +14,7 @@ protected:
         core::Id my_id,
         std::string name,
         Type t,
-        system::stream::Stream* s,
+        platform::stream::Stream* s,
         engine::Engine* e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
     Widget(
@@ -29,7 +29,7 @@ public:
     static std::shared_ptr<Widget> read_gx3d(
         core::Id my_id,
         std::string name,
-        system::stream::Stream* f,
+        platform::stream::Stream* f,
         engine::Engine* e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
     [[nodiscard]] bool get_dynamicity() const noexcept final;

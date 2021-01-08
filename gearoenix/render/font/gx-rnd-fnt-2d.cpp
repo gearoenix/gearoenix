@@ -1,9 +1,9 @@
 #include "gx-rnd-fnt-2d.hpp"
 #include "../../core/asset/gx-cr-asset-manager.hpp"
 #include "../../core/event/gx-cr-ev-engine.hpp"
-#include "../../system/gx-sys-application.hpp"
-#include "../../system/stream/gx-sys-stm-asset.hpp"
-#include "../../system/stream/gx-sys-stm-memory.hpp"
+#include "../../platform/gx-plt-application.hpp"
+#include "../../platform/stream/gx-plt-stm-asset.hpp"
+#include "../../platform/stream/gx-plt-stm-memory.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "../texture/gx-rnd-txt-manager.hpp"
 #include "../texture/gx-rnd-txt-texture-2d.hpp"
@@ -51,7 +51,7 @@ gearoenix::render::font::Font2D::Font2D(
 gearoenix::render::font::Font2D::Font2D(
     const core::Id my_id,
     std::string name,
-    system::stream::Stream* f,
+    platform::stream::Stream* f,
     texture::Manager* const txt_mgr) noexcept
     : Font(my_id, std::move(name), Type::D2)
     , txt_mgr(txt_mgr)
@@ -67,8 +67,8 @@ std::shared_ptr<gearoenix::render::font::Font2D> gearoenix::render::font::Font2D
     texture::Manager* const txt_mgr) noexcept
 {
     auto* const e = txt_mgr->get_engine();
-    const std::unique_ptr<system::stream::Asset> asset(system::stream::Asset::construct(
-        e->get_system_application(), "default.ttf"));
+    const std::unique_ptr<platform::stream::Asset> asset(platform::stream::Asset::construct(
+        e->get_platform_application(), "default.ttf"));
     if (asset == nullptr) {
         GXLOGD("Default font-2d not found.")
         return nullptr;
@@ -159,7 +159,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::font::
     };
     auto* const render_engine = txt_mgr->get_engine();
     const auto max_texture_size = render_engine->get_limitations().texture_maximum_aspect;
-    const auto window_height = render_engine->get_system_application()->get_event_engine()->get_window_height();
+    const auto window_height = render_engine->get_platform_application()->get_event_engine()->get_window_height();
     const auto img_height_pixels = math::Numeric::raise_p2(
         static_cast<unsigned int>(std::ceil(static_cast<double>(window_height) * img_height)),
         max_texture_size, 16U);

@@ -4,7 +4,7 @@
 #include "gx-rnd-txt-texture.hpp"
 
 namespace gearoenix::render::texture {
-class Texture2D : public Texture {
+struct Texture2D : public Texture {
     GX_GET_VAL_PRT(std::size_t, img_width, 0)
     GX_GET_VAL_PRT(std::size_t, img_height, 0)
 protected:
@@ -19,7 +19,7 @@ public:
     ~Texture2D() noexcept override;
 
     void write_gx3d(
-        const std::shared_ptr<system::stream::Stream>& s,
+        const std::shared_ptr<platform::stream::Stream>& s,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept override;
 };
 }

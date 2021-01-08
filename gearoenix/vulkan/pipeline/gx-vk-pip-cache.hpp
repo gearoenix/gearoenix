@@ -7,10 +7,10 @@
 namespace gearoenix {
 namespace render {
     namespace device {
-        class Logical;
+        struct Logical;
     }
     namespace pipeline {
-        class Cache {
+        struct Cache {
         private:
             device::Logical* logical_device;
             VkPipelineCache vulkan_data;

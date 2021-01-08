@@ -4,7 +4,7 @@
 gearoenix::render::model::Dynamic::Dynamic(
     const core::Id my_id,
     std::string name,
-    system::stream::Stream* const f,
+    platform::stream::Stream* const f,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : Model(my_id, std::move(name), Type::Dynamic, f, e, c)
@@ -31,7 +31,7 @@ gearoenix::render::model::Dynamic::Dynamic(const Dynamic& o) noexcept = default;
 std::shared_ptr<gearoenix::render::model::Dynamic> gearoenix::render::model::Dynamic::construct(
     const core::Id id,
     std::string name,
-    system::stream::Stream* const f,
+    platform::stream::Stream* const f,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
 {

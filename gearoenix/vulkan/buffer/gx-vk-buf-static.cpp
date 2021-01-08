@@ -1,18 +1,13 @@
 #include "gx-vk-buf-static.hpp"
-#ifdef GX_USE_VULKAN
+#ifdef GX_RENDER_VULKAN_ENABLED
 #include "../engine/gx-vk-eng-engine.hpp"
-#include "../memory/gx-vk-mem-memory.hpp"
-#include "gx-vk-buf-buffer.hpp"
 
 gearoenix::vulkan::buffer::Static::Static(
-    std::shared_ptr<vulkan::buffer::Buffer> alc,
-    std::size_t size,
-    engine::Engine* eng) noexcept
-    : render::buffer::Static(size, eng)
-    , allocated_buffer(std::move(alc))
+    vulkan::buffer::Buffer&& b,
+    const std::size_t size) noexcept
+    : size(size)
+    , base(std::move(b))
 {
 }
-
-gearoenix::vulkan::buffer::Static::~Static() noexcept = default;
 
 #endif

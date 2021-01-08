@@ -2,9 +2,9 @@
 #define GEAROENIX_PHYSICS_OBJECT_HPP
 namespace gearoenix {
 namespace physics {
-    class Object {
+    struct Object {
     public:
-        class PhysicsObject {
+        struct PhysicsObject {
         public:
             typedef enum {
                 ANIMATION,

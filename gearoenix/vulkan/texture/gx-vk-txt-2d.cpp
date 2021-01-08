@@ -1,5 +1,5 @@
 #include "gx-vk-txt-2d.hpp"
-#ifdef GX_USE_VULKAN
+#ifdef GX_RENDER_VULKAN_ENABLED
 #include "../../core/gx-cr-allocator.hpp"
 #include "../buffer/gx-vk-buf-buffer.hpp"
 #include "../buffer/gx-vk-buf-manager.hpp"
@@ -40,7 +40,7 @@ gearoenix::vulkan::texture::Texture2D::Texture2D(
 gearoenix::vulkan::texture::Texture2D::~Texture2D() noexcept = default;
 
 void gearoenix::vulkan::texture::Texture2D::write_gx3d(
-    const std::shared_ptr<system::stream::Stream>&,
+    const std::shared_ptr<platform::stream::Stream>&,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>&) noexcept {
     GX_UNEXPECTED
 }

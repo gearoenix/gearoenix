@@ -9,7 +9,7 @@
 #include <queue>
 
 namespace gearoenix::core::sync {
-class Semaphore {
+struct Semaphore {
 private:
     std::mutex m;
     std::condition_variable c;
@@ -21,13 +21,13 @@ public:
     void operator=(Semaphore const&) = delete;
     ~Semaphore() noexcept = default;
     void lock() noexcept;
-    template <class Clock, class Duration>
+    template <typename Clock, struct Duration>
     void lock_until(const std::chrono::time_point<Clock, Duration>& timeout_time) noexcept;
     void release() noexcept;
 };
 }
 
-template <class Clock, class Duration>
+template <typename Clock, struct Duration>
 void gearoenix::core::sync::Semaphore::lock_until(
     const std::chrono::time_point<Clock, Duration>& timeout_time) noexcept
 {

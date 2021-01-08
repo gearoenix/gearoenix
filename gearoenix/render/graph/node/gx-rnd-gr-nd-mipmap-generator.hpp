@@ -8,19 +8,19 @@
 #include <vector>
 
 namespace gearoenix::render::buffer {
-class Uniform;
+struct Uniform;
 }
 
 namespace gearoenix::render::camera {
-class Camera;
+struct Camera;
 }
 
 namespace gearoenix::render::command {
-class Buffer;
+struct Buffer;
 }
 
 namespace gearoenix::render::mesh {
-class Mesh;
+struct Mesh;
 }
 
 namespace gearoenix::render::graph::node {
@@ -37,7 +37,7 @@ struct MipmapGeneratorFrame {
     ~MipmapGeneratorFrame() noexcept;
 };
 
-class MipmapGenerator final : public Node {
+struct MipmapGenerator final : public Node {
 private:
     std::vector<std::unique_ptr<MipmapGeneratorFrame>> frames;
     MipmapGeneratorFrame* frame = nullptr;

@@ -4,21 +4,21 @@
 #ifdef USE_VULKAN
 namespace gearoenix {
 namespace render {
-    class Engine;
+    struct Engine;
     namespace buffer {
-        class Uniform;
+        struct Uniform;
     }
     namespace descriptor {
-        class Set;
+        struct Set;
     }
     namespace pipeline {
-        class Pipeline;
+        struct Pipeline;
     }
     namespace texture {
-        class Texture2D;
+        struct Texture2D;
     }
     namespace shader {
-        class Resources {
+        struct Resources {
         private:
             Engine* e;
             descriptor::Set** dessets;

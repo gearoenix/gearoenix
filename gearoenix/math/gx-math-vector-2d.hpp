@@ -1,8 +1,8 @@
 #ifndef GEAROENIX_MATH_VECTOR_2D_HPP
 #define GEAROENIX_MATH_VECTOR_2D_HPP
 
-#include "../system/gx-sys-log.hpp"
-#include "../system/stream/gx-sys-stm-stream.hpp"
+#include "../platform/gx-plt-log.hpp"
+#include "../platform/stream/gx-plt-stm-stream.hpp"
 #include "gx-math-numeric.hpp"
 #include <cmath>
 #include <limits>
@@ -151,7 +151,7 @@ struct Vec2 {
         case static_cast<T>(1):
             return y;
         default:
-            GXLOGF("Out of bound index: " << i)
+            GX_LOG_F("Out of bound index: " << i)
         }
     }
 
@@ -165,7 +165,7 @@ struct Vec2 {
         case static_cast<T>(1):
             return y;
         default:
-            GXLOGF("Out of bound index: " << i)
+            GX_LOG_F("Out of bound index: " << i)
         }
     }
 
@@ -246,10 +246,10 @@ struct Vec2 {
         *this /= length();
     }
 
-    void read(system::stream::Stream* const f) noexcept
+    void read(platform::stream::Stream& f) noexcept
     {
-        x = static_cast<Element>(f->read<float>());
-        y = static_cast<Element>(f->read<float>());
+        x = static_cast<Element>(f.read<float>());
+        y = static_cast<Element>(f.read<float>());
     }
 
     [[nodiscard]] static constexpr std::optional<Vec2<Element>> intersect(

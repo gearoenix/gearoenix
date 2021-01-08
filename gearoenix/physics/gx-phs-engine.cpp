@@ -2,6 +2,7 @@
 #include "../core/asset/gx-cr-asset-manager.hpp"
 #include "../core/sync/gx-cr-sync-kernel-workers.hpp"
 #include "../math/gx-math-sphere.hpp"
+#include "../platform/gx-plt-application.hpp"
 #include "../render/camera/gx-rnd-cmr-perspective.hpp"
 #include "../render/engine/gx-rnd-eng-engine.hpp"
 #include "../render/graph/tree/gx-rnd-gr-tr-tree.hpp"
@@ -12,7 +13,6 @@
 #include "../render/reflection/gx-rnd-rfl-runtime.hpp"
 #include "../render/scene/gx-rnd-scn-manager.hpp"
 #include "../render/skybox/gx-rnd-sky-skybox.hpp"
-#include "../system/gx-sys-application.hpp"
 #include "accelerator/gx-phs-acc-bvh.hpp"
 #include "animation/gx-phs-anm-manager.hpp"
 #include "collider/gx-phs-cld-frustum.hpp"
@@ -216,7 +216,7 @@ void gearoenix::physics::Engine::update_visibility_receiver() noexcept
     }
 }
 
-gearoenix::physics::Engine::Engine(system::Application* const sys_app, core::sync::KernelWorkers* const workers) noexcept
+gearoenix::physics::Engine::Engine(platform::Application* const sys_app, core::sync::KernelWorkers* const workers) noexcept
     : animation_manager(new animation::Manager(workers))
     , sys_app(sys_app)
     , workers(workers)

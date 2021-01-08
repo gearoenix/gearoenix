@@ -8,25 +8,25 @@
 #include <memory>
 
 namespace gearoenix::core::sync {
-class WorkWaiter;
+struct WorkWaiter;
 }
 
-namespace gearoenix::system::stream {
-class Stream;
+namespace gearoenix::platform::stream {
+struct Stream;
 }
 
 namespace gearoenix::render::engine {
-class Engine;
+struct Engine;
 }
 
 namespace gearoenix::render::scene {
-class Manager {
+struct Manager {
     GX_GET_PTRC_PRV(engine::Engine, e)
     GX_GET_CREF_PRV(core::cache::File<Scene>, cache)
     GX_GET_UCPTR_PRV(core::sync::WorkWaiter, io_worker)
 
 public:
-    Manager(std::unique_ptr<system::stream::Stream> s, engine::Engine* e) noexcept;
+    Manager(std::unique_ptr<platform::stream::Stream> s, engine::Engine* e) noexcept;
     ~Manager() noexcept;
     /// It is gonna load the scene (if exists) in another thread.
     void get_gx3d(core::Id mid, core::sync::EndCaller<Scene> c) noexcept;

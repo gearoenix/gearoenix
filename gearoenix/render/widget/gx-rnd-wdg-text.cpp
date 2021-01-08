@@ -1,7 +1,7 @@
 #include "gx-rnd-wdg-text.hpp"
 #include "../../core/asset/gx-cr-asset-manager.hpp"
 #include "../../physics/collider/gx-phs-cld-collider.hpp"
-#include "../../system/gx-sys-application.hpp"
+#include "../../platform/gx-plt-application.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "../font/gx-rnd-fnt-2d.hpp"
 #include "../font/gx-rnd-fnt-manager.hpp"
@@ -17,7 +17,7 @@
 
 void gearoenix::render::widget::Text::initialize(const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
 {
-    auto ast_mgr = e->get_system_application()->get_asset_manager();
+    auto ast_mgr = e->get_platform_application()->get_asset_manager();
     text_mesh_material = std::make_shared<material::Unlit>(e, c);
     text_mesh_material->set_translucency(material::TranslucencyMode::Transparent);
     core::sync::EndCaller<mesh::Mesh> mend([c](const std::shared_ptr<mesh::Mesh>&) {});
@@ -64,7 +64,7 @@ void gearoenix::render::widget::Text::update_alignment() noexcept
 gearoenix::render::widget::Text::Text(
     const core::Id my_id,
     std::string name,
-    system::stream::Stream* const f,
+    platform::stream::Stream* const f,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : Widget(my_id, std::move(name), Type::Text, f, e, c)
@@ -77,7 +77,7 @@ gearoenix::render::widget::Text::Text(
         std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
         text = converter.from_bytes(s);
     }
-    auto ast_mgr = e->get_system_application()->get_asset_manager();
+    auto ast_mgr = e->get_platform_application()->get_asset_manager();
     f->read(v_align);
     f->read(h_align);
     core::sync::EndCaller<font::Font> fend([c](const std::shared_ptr<font::Font>&) {});
@@ -97,7 +97,7 @@ gearoenix::render::widget::Text::Text(
     : Widget(my_id, std::move(name), Type::Text, e, c)
     , text_color(0.7, 0.7, 0.7, 1.0)
 {
-    auto ast_mgr = e->get_system_application()->get_asset_manager();
+    auto ast_mgr = e->get_platform_application()->get_asset_manager();
     core::sync::EndCaller<font::Font> fend([c](const std::shared_ptr<font::Font>&) {});
     text_font = ast_mgr->get_font_manager()->get_default_2d(fend);
     initialize(c);
@@ -113,7 +113,7 @@ gearoenix::render::widget::Text::Text(
 std::shared_ptr<gearoenix::render::widget::Text> gearoenix::render::widget::Text::construct(
     const core::Id id,
     std::string name,
-    system::stream::Stream* const f,
+    platform::stream::Stream* const f,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
 {

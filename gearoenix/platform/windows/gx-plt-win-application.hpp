@@ -1,9 +1,7 @@
 #ifndef GEAROENIX_PLATFORM_WINDOWS_APPLICATION_HPP
 #define GEAROENIX_PLATFORM_WINDOWS_APPLICATION_HPP
 #include "../gx-plt-build-configuration.hpp"
-
 #ifdef GX_PLATFORM_WINDOWS
-
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../gx-plt-application.hpp"
 #include "../gx-plt-runtime-configuration.hpp"
@@ -24,10 +22,11 @@ private:
     [[nodiscard]] static LRESULT CALLBACK static_handler(HWND hwnd, UINT message, WPARAM w_param, LPARAM l_param) noexcept;
     [[nodiscard]] LRESULT handler(HWND hwnd, UINT message, WPARAM w_param, LPARAM l_param) noexcept;
 
-    Application(const RuntimeConfiguration& config) noexcept;
+    explicit Application(GX_MAIN_ENTRY_ARGS_DEF, const RuntimeConfiguration& config) noexcept;
 
 public:
-    [[nodiscard]] static std::shared_ptr<Application> construct(const RuntimeConfiguration& config = RuntimeConfiguration()) noexcept;
+    [[nodiscard]] static std::shared_ptr<Application> construct(
+        GX_MAIN_ENTRY_ARGS_DEF, const RuntimeConfiguration& config = RuntimeConfiguration()) noexcept;
     ~Application() noexcept;
     void run() noexcept;
 };

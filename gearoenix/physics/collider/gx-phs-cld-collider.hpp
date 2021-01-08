@@ -11,17 +11,17 @@ namespace gearoenix::math {
 struct Ray3;
 }
 
-namespace gearoenix::system::stream {
-class Stream;
+namespace gearoenix::platform::stream {
+struct Stream;
 }
 
 namespace gearoenix::render::model {
-class Model;
+struct Model;
 }
 
 namespace gearoenix::physics::collider {
 /// Child classes must have a transformation implementation and initialize (and update) box
-class Collider : public Transformation {
+struct Collider : public Transformation {
     GX_GET_CVAL_PRT(Type, collider_type)
     GX_GET_CREF_PRT(math::Aabb3, origin_box)
     GX_GET_CREF_PRT(math::Aabb3, updated_box)
@@ -38,7 +38,7 @@ protected:
 
 public:
     ~Collider() noexcept override = default;
-    [[nodiscard]] static Collider* read(system::stream::Stream* f) noexcept;
+    [[nodiscard]] static Collider* read(platform::stream::Stream* f) noexcept;
     /// It returns minimum distance of collider surface from the ray origin along the ray direction
     ///   if the ray hits the surface and the distance is less than d_min
     [[nodiscard]] virtual std::optional<double> hit(const math::Ray3& r, double d_min) const noexcept;

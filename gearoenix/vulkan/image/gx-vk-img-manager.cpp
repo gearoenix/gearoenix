@@ -1,5 +1,6 @@
 #include "gx-vk-img-manager.hpp"
-#ifdef GX_USE_VULKAN
+#ifdef GX_RENDER_VULKAN_ENABLED
+#include "../../platform/gx-plt-log.hpp"
 #include "../buffer/gx-vk-buf-buffer.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "gx-vk-img-image.hpp"
@@ -29,7 +30,7 @@ void gearoenix::vulkan::image::Manager::update(command::Buffer& cmd) noexcept
         GX_GUARD_LOCK(upload_images)
         std::swap(upload_images, images);
     }
-    GXTODO
+    GX_TODO
     // todo check for sync
     for (const auto& img_call : images) {
         std::get<0>(img_call)->transit_for_writing(cmd);

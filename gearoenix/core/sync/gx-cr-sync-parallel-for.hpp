@@ -7,13 +7,13 @@
 #include <thread>
 
 namespace gearoenix::core::sync {
-class KernelWorkers;
+struct KernelWorkers;
 }
 
 #endif
 
 namespace gearoenix::core::sync {
-class ParallelFor {
+struct ParallelFor {
 #ifndef GX_THREAD_NOT_SUPPORTED
 public:
     typedef std::map<std::thread::id, std::pair<std::unique_ptr<KernelWorkers>, std::function<void(unsigned int, unsigned int)>>> Map;
@@ -27,7 +27,7 @@ public:
     ParallelFor() = delete;
     ~ParallelFor() = delete;
 
-    template <class Iter, class Fun>
+    template <typename Iter, struct Fun>
     static void exec(Iter first, Iter end, Fun f)
     {
 #ifdef GX_THREAD_NOT_SUPPORTED

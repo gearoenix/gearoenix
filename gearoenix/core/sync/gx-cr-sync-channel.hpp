@@ -8,7 +8,7 @@
 
 namespace gearoenix::core::sync {
 template <typename T>
-class Channel {
+struct Channel {
     GX_GET_CREF_PRV(std::queue<T>, data)
 private:
     std::mutex m;

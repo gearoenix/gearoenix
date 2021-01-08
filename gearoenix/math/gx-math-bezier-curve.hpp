@@ -4,7 +4,7 @@
 #include <vector>
 
 namespace gearoenix::math {
-class CubicBezierCurve2D {
+struct CubicBezierCurve2D {
 public:
     struct Point {
         math::Vec2<double> position;

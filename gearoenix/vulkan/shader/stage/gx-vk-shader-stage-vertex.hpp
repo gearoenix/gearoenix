@@ -5,10 +5,10 @@
 #include "gx-vk-shader-stage.hpp"
 namespace gearoenix {
 namespace render {
-    class Engine;
+    struct Engine;
     namespace shader {
         namespace stage {
-            class Vertex : public Stage {
+            struct Vertex : public Stage {
             private:
             public:
                 Vertex(std::vector<unsigned char>& data, Engine* engine);

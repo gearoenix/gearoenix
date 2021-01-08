@@ -4,7 +4,7 @@
 #include "gx-rnd-mat-material.hpp"
 
 namespace gearoenix::render::material {
-class Pbr final : public Material {
+struct Pbr final : public Material {
 public:
     struct Uniform {
         float alpha = 1.0f;
@@ -29,7 +29,7 @@ public:
     GX_GET_CREF_PRV(Uniform, uniform)
 public:
     Pbr(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept;
-    Pbr(system::stream::Stream* f, engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept;
+    Pbr(platform::stream::Stream* f, engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept;
     Pbr(const Pbr& o) noexcept;
     ~Pbr() noexcept final;
     void update() noexcept final;

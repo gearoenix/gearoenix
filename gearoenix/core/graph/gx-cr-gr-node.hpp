@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 namespace gearoenix::core::graph {
-class Node : public asset::Asset {
+struct Node : public asset::Asset {
 private:
 protected:
     std::map<std::string, unsigned int> input_links_string_index;

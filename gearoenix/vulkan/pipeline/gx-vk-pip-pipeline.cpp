@@ -2,9 +2,9 @@
 #ifdef USE_VULKAN
 #include "../../core/gx-cr-application.hpp"
 #include "../../core/gx-cr-static.hpp"
+#include "../../platform/gx-plt-app.hpp"
+#include "../../platform/stream/gx-plt-fl-file.hpp"
 #include "../../render/shader/gx-rnd-shd-shader.hpp"
-#include "../../system/gx-sys-app.hpp"
-#include "../../system/stream/gx-sys-fl-file.hpp"
 #include "../command/gx-vk-cmd-buffer.hpp"
 #include "../descriptor/gx-vk-des-set-layout.hpp"
 #include "../device/gx-vk-dev-logical.hpp"

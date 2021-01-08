@@ -2,7 +2,7 @@
 #include "../../physics/animation/gx-phs-anm-animation.hpp"
 #include "../../physics/animation/gx-phs-anm-manager.hpp"
 #include "../../physics/gx-phs-engine.hpp"
-#include "../../system/gx-sys-application.hpp"
+#include "../../platform/gx-plt-application.hpp"
 #include "../camera/gx-rnd-cmr-camera.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "../model/gx-rnd-mdl-manager.hpp"
@@ -60,7 +60,7 @@ void gearoenix::render::scene::Logo::on_load(const std::shared_ptr<Scene>& s) no
             body->get_transformation()->local_scale(current_scale / scale);
             scale = current_scale; }, scale_duration, [this, body](double) { body->get_transformation()->local_scale(1.0 / scale); }));
 
-    auto* const scn_mgr = render_engine->get_system_application()->get_asset_manager()->get_scene_manager();
+    auto* const scn_mgr = render_engine->get_platform_application()->get_asset_manager()->get_scene_manager();
 
     for (const auto& pi : next_scenes_priority_id) {
         if (pi.first >= logo_scene->get_layer()) {
@@ -96,7 +96,7 @@ gearoenix::render::scene::Logo::~Logo() noexcept
 }
 
 std::shared_ptr<gearoenix::render::scene::Logo> gearoenix::render::scene::Logo::construct(
-    system::Application* const sys_app,
+    platform::Application* const sys_app,
     PriorityIds next_scenes_priority_id,
     FinishCallback on_finished) noexcept
 {

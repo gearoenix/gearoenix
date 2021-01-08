@@ -3,9 +3,9 @@
 #include "../../core/gx-cr-types.hpp"
 namespace gearoenix {
 namespace render {
-    class Engine;
+    struct Engine;
     namespace font {
-        class Type {
+        struct Type {
         public:
             typedef enum : core::TypeId {
                 D2 = 1,

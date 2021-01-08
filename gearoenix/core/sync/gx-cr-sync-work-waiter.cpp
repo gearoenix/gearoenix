@@ -12,7 +12,7 @@ void gearoenix::core::sync::WorkWaiter::push(const std::function<void()>& f)
 }
 
 #else
-#include "../../system/gx-sys-log.hpp"
+#include "../../platform/gx-plt-log.hpp"
 #include "../gx-cr-function-loader.hpp"
 #include "gx-cr-sync-semaphore.hpp"
 #include <utility>

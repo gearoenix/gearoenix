@@ -9,7 +9,7 @@
 #include <vector>
 
 namespace gearoenix::physics::collider {
-class Mesh : public Collider {
+struct Mesh : public Collider {
 private:
     std::vector<std::uint32_t> indices;
     std::vector<math::Vec3<double>> vertices;
@@ -17,7 +17,7 @@ private:
     math::Aabb3 box;
 
 public:
-    explicit Mesh(system::stream::Stream* f) noexcept;
+    explicit Mesh(platform::stream::Stream* f) noexcept;
     [[nodiscard]] std::optional<double> hit(const math::Ray3& ray, double d_min) const noexcept final;
 
     friend std::ostream& operator<<(std::ostream& os, const Mesh& m) noexcept

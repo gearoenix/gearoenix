@@ -2,7 +2,7 @@
 #include "gx-rnd-sky-cube.hpp"
 #include "gx-rnd-sky-equirectangular.hpp"
 
-gearoenix::render::skybox::Manager::Manager(std::unique_ptr<system::stream::Stream> s, engine::Engine* const e) noexcept
+gearoenix::render::skybox::Manager::Manager(std::unique_ptr<platform::stream::Stream> s, engine::Engine* const e) noexcept
     : e(e)
     , cache(std::move(s))
 {
@@ -17,7 +17,7 @@ std::shared_ptr<gearoenix::render::skybox::Skybox> gearoenix::render::skybox::Ma
     std::shared_ptr<Skybox> s = cache.get<Skybox>(
         id, [id, c, this](std::string name) noexcept {
             GXLOGD("Going to load Skybox: " << id)
-            system::stream::Stream* const f = cache.get_file();
+            platform::stream::Stream* const f = cache.get_file();
             const auto t = f->read<Type>();
             const core::sync::EndCaller<core::sync::EndCallerIgnore> call([c] {});
             switch (t) {

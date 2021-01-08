@@ -1,10 +1,10 @@
 #include "gx-au-audio.hpp"
-#include "../system/gx-sys-log.hpp"
-#include "../system/stream/gx-sys-stm-stream.hpp"
+#include "../platform/gx-plt-log.hpp"
+#include "../platform/stream/gx-plt-stm-stream.hpp"
 #include "gx-au-music.hpp"
 #include "gx-au-speaker.hpp"
 
-gearoenix::audio::Audio::Audio(const core::Id my_id, std::string n, const std::shared_ptr<system::stream::Stream>& f) noexcept
+gearoenix::audio::Audio::Audio(const core::Id my_id, std::string n, const std::shared_ptr<platform::stream::Stream>& f) noexcept
     : core::asset::Asset(my_id, core::asset::Type::Audio, std::move(n))
 {
     std::vector<uint8_t> bytes;
@@ -14,7 +14,7 @@ gearoenix::audio::Audio::Audio(const core::Id my_id, std::string n, const std::s
 
 gearoenix::audio::Audio::~Audio() noexcept = default;
 
-gearoenix::audio::Audio* gearoenix::audio::Audio::read(const core::Id my_id, std::string name, const std::shared_ptr<system::stream::Stream>& f) noexcept
+gearoenix::audio::Audio* gearoenix::audio::Audio::read(const core::Id my_id, std::string name, const std::shared_ptr<platform::stream::Stream>& f) noexcept
 {
     core::Id audio_type;
     f->read(audio_type);

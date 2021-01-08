@@ -1,6 +1,6 @@
 #ifndef GEAROENIX_MATH_RAY_HPP
 #define GEAROENIX_MATH_RAY_HPP
-#include "../core/gx-cr-static.hpp"
+#include "../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "gx-math-vector-3d.hpp"
 #include <utility>
 namespace gearoenix::math {

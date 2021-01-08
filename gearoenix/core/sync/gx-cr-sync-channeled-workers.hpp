@@ -9,7 +9,7 @@
 #include <vector>
 
 namespace gearoenix::core::sync {
-class ChanneledWorkers {
+struct ChanneledWorkers {
 private:
     struct Thread {
         const std::size_t thread_index;

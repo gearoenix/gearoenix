@@ -7,7 +7,7 @@
 #include <vector>
 
 namespace gearoenix::physics::collider {
-class Aabb;
+struct Aabb;
 }
 
 namespace gearoenix::physics::accelerator {
@@ -15,25 +15,25 @@ struct Bvh;
 }
 
 namespace gearoenix::render::engine {
-class Engine;
+struct Engine;
 }
 
 namespace gearoenix::render::model {
-class Model;
+struct Model;
 }
 
 namespace gearoenix::render::texture {
-class TextureCube;
+struct TextureCube;
 }
 
 namespace gearoenix::render::reflection {
-/// Base class for reflection
+/// Base struct for reflection
 ///
 /// The influencing length indicate the length of the AABB of collider that if any object place (exactly) in it,
 /// the pbr materials of that object will get the properties of colliding reflection.
 /// No reflection should overlaps with another one reflection.
 /// \todo check for no reflection overlaps with another one reflection, and fire a error message
-class Reflection : public core::asset::Asset {
+struct Reflection : public core::asset::Asset {
     GX_GET_CVAL_PRT(Type, reflection_type)
     GX_GETSET_VAL_PRT(bool, enabled, true)
     GX_GET_CPTR_PRT(engine::Engine, e)

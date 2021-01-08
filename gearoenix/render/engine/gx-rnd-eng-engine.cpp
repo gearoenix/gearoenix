@@ -34,7 +34,7 @@ gearoenix::render::engine::Engine::Engine(
 //    , function_loader(new core::FunctionLoader())
 //    , kernels(new core::sync::KernelWorkers())
 //    , update_manager(new core::sync::UpdateManager(kernels.get()))
-//    , physics_engine(new physics::Engine(system_application, kernels.get()))
+//    , physics_engine(new physics::Engine(platform_application, kernels.get()))
 //    , late_delete_assets(10)
 {
     //    kernels->add_step(

@@ -7,7 +7,7 @@ namespace gearoenix {
 namespace render {
     namespace shader {
         namespace stage {
-            class Fragment : public Stage {
+            struct Fragment : public Stage {
             private:
             public:
                 Fragment(std::vector<unsigned char>& data, Engine* engine);

@@ -11,38 +11,38 @@
 #include <vector>
 
 namespace gearoenix::render::graph::node {
-class ForwardPbr;
-class Node;
-class Unlit;
-class SkyboxEquirectangular;
-class SkyboxCube;
-class IrradianceConvoluter;
-class RadianceConvoluter;
-class MipmapGenerator;
+struct ForwardPbr;
+struct Node;
+struct Unlit;
+struct SkyboxEquirectangular;
+struct SkyboxCube;
+struct IrradianceConvoluter;
+struct RadianceConvoluter;
+struct MipmapGenerator;
 }
 
 namespace gearoenix::render::light {
-class CascadeInfo;
+struct CascadeInfo;
 }
 
 namespace gearoenix::render::model {
-class Model;
-class Mesh;
+struct Model;
+struct Mesh;
 }
 
 namespace gearoenix::render::reflection {
-class Runtime;
+struct Runtime;
 }
 
 namespace gearoenix::render::scene {
-class Scene;
+struct Scene;
 }
 
 namespace gearoenix::render::camera {
-class Camera;
+struct Camera;
 }
 namespace gearoenix::render::graph::tree {
-class Pbr final : public Tree {
+struct Pbr final : public Tree {
 public:
     struct Nodes {
         node::ForwardPbr* forward_pbr = nullptr;

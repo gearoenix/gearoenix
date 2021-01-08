@@ -1,7 +1,7 @@
 #include "gx-rnd-wdg-modal.hpp"
 #include "../../core/asset/gx-cr-asset-manager.hpp"
 #include "../../physics/collider/gx-phs-cld-aabb.hpp"
-#include "../../system/gx-sys-application.hpp"
+#include "../../platform/gx-plt-application.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "../material/gx-rnd-mat-unlit.hpp"
 #include "../mesh/gx-rnd-msh-manager.hpp"
@@ -14,7 +14,7 @@
 gearoenix::render::widget::Modal::Modal(
     const core::Id my_id,
     std::string name,
-    system::stream::Stream* const s,
+    platform::stream::Stream* const s,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : Widget(my_id, std::move(name), Type::Modal, s, e, c)
@@ -31,7 +31,7 @@ gearoenix::render::widget::Modal::Modal(
     core::sync::EndCaller<Button> btn_call([c](const std::shared_ptr<Button>&) {});
     core::sync::EndCaller<model::Dynamic> mdl_call([c](const std::shared_ptr<model::Dynamic>&) {});
     core::sync::EndCaller<mesh::Mesh> msh_call([c](const std::shared_ptr<mesh::Mesh>&) {});
-    auto* const ast_mgr = e->get_system_application()->get_asset_manager();
+    auto* const ast_mgr = e->get_platform_application()->get_asset_manager();
     auto* const mdl_mgr = ast_mgr->get_model_manager();
     auto* const msh_mgr = ast_mgr->get_mesh_manager();
     auto plate_mesh = msh_mgr->create_plate(msh_call);
@@ -158,7 +158,7 @@ gearoenix::render::widget::Modal::Modal(
 std::shared_ptr<gearoenix::render::widget::Modal> gearoenix::render::widget::Modal::construct(
     const core::Id id,
     std::string name,
-    system::stream::Stream* const s,
+    platform::stream::Stream* const s,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
 {

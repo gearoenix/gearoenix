@@ -4,7 +4,7 @@
 #include "gx-phs-bd-body.hpp"
 
 namespace gearoenix::physics::body {
-class Rigid : public Body {
+struct Rigid : public Body {
 public:
     enum struct Behavior {
         Active = 1,

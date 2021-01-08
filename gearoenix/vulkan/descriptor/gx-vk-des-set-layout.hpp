@@ -7,10 +7,10 @@
 namespace gearoenix {
 namespace render {
     namespace device {
-        class Logical;
+        struct Logical;
     }
     namespace descriptor {
-        class SetLayout {
+        struct SetLayout {
         private:
             device::Logical* dev;
             VkDescriptorSetLayout vulkan_data;

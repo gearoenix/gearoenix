@@ -1,14 +1,14 @@
 #include "gx-rnd-txt-texture.hpp"
 #include "../../core/sync/gx-cr-sync-parallel-for.hpp"
 #include "../../math/gx-math-numeric.hpp"
-#include "../../system/stream/gx-sys-stm-local.hpp"
+#include "../../platform/stream/gx-plt-stm-local.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "gx-rnd-txt-image.hpp"
 #include "gx-rnd-txt-pixel-iterator.hpp"
 #include <cmath>
 
 void gearoenix::render::texture::Texture::write_gx3d_image(
-    system::stream::Stream* const s,
+    platform::stream::Stream* const s,
     const float* const data,
     const std::size_t img_width,
     const std::size_t img_height,
@@ -25,7 +25,7 @@ void gearoenix::render::texture::Texture::write_gx3d_image(
 }
 
 void gearoenix::render::texture::Texture::write_gx3d_image(
-    system::stream::Stream* const s,
+    platform::stream::Stream* const s,
     const unsigned char* const data,
     const std::size_t img_width,
     const std::size_t img_height,
@@ -62,12 +62,12 @@ void gearoenix::render::texture::Texture::write_gx3d(
     const std::string& file_address,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
 {
-    std::shared_ptr<system::stream::Stream> l(new system::stream::Local(render_engine->get_system_application(), file_address, true));
+    std::shared_ptr<platform::stream::Stream> l(new platform::stream::Local(render_engine->get_platform_application(), file_address, true));
     write_gx3d(l, c);
 }
 
 void gearoenix::render::texture::Texture::write_gx3d(
-    const std::shared_ptr<system::stream::Stream>& s,
+    const std::shared_ptr<platform::stream::Stream>& s,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>&) noexcept
 {
     (void)s->write(texture_type);

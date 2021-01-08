@@ -6,21 +6,21 @@
 #include "gx-rnd-cmr-camera.hpp"
 
 namespace gearoenix {
-namespace system::stream {
-    class Stream;
+namespace platform::stream {
+    struct Stream;
 }
 namespace render {
     namespace engine {
-        class Engine;
+        struct Engine;
     }
     namespace camera {
-        class Manager {
+        struct Manager {
         protected:
             engine::Engine* const e;
             core::cache::File<Camera> cache;
 
         public:
-            Manager(std::unique_ptr<system::stream::Stream> s, engine::Engine* e) noexcept;
+            Manager(std::unique_ptr<platform::stream::Stream> s, engine::Engine* e) noexcept;
             ~Manager() noexcept = default;
             std::shared_ptr<Camera> get_gx3d(core::Id cid, core::sync::EndCaller<Camera>& call) noexcept;
             template <typename T>

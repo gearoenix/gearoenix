@@ -6,13 +6,13 @@
 #include <memory>
 
 namespace gearoenix::render::engine {
-class Engine;
+struct Engine;
 }
 
 namespace gearoenix::render::camera {
-class Camera;
-class Transformation;
-class ArcController final : public core::event::Listener {
+struct Camera;
+struct Transformation;
+struct ArcController final : public core::event::Listener {
     GX_GETSET_VAL_PRV(double, movement_speed, 0.5)
     GX_GETSET_VAL_PRV(double, touch_scale_speed, 1.5)
     GX_GETSET_VAL_PRV(double, rotation_speed, 0.5)

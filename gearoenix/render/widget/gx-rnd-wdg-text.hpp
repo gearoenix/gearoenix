@@ -6,19 +6,19 @@
 #include "gx-rnd-wdg-widget.hpp"
 
 namespace gearoenix::render::font {
-class Font2D;
+struct Font2D;
 }
 
 namespace gearoenix::render::model {
-class Dynamic;
+struct Dynamic;
 }
 
 namespace gearoenix::render::material {
-class Unlit;
+struct Unlit;
 }
 
 namespace gearoenix::render::widget {
-class Text : public Widget {
+struct Text : public Widget {
     GX_GET_CREF_PRT(std::wstring, text)
     GX_GET_CREF_PRT(std::shared_ptr<font::Font2D>, text_font)
     GX_GET_CREF_PRT(math::Vec4<double>, text_color)
@@ -34,7 +34,7 @@ private:
     Text(
         core::Id id,
         std::string name,
-        system::stream::Stream* f,
+        platform::stream::Stream* f,
         engine::Engine* e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
     Text(
@@ -47,7 +47,7 @@ public:
     [[nodiscard]] static std::shared_ptr<Text> construct(
         core::Id id,
         std::string name,
-        system::stream::Stream* f,
+        platform::stream::Stream* f,
         engine::Engine* e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
     [[nodiscard]] static std::shared_ptr<Text> construct(

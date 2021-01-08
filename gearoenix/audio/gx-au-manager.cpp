@@ -2,7 +2,7 @@
 #include "gx-au-audio.hpp"
 #include "gx-au-type.hpp"
 
-gearoenix::audio::Manager::Manager(std::unique_ptr<system::stream::Stream> s, render::engine::Engine* const e) noexcept
+gearoenix::audio::Manager::Manager(std::unique_ptr<platform::stream::Stream> s, render::engine::Engine* const e) noexcept
     : e(e)
     , cache(std::move(s))
 {

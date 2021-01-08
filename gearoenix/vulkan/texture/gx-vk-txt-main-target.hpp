@@ -1,36 +1,36 @@
 #ifndef GEAROENIX_VULKAN_TEXTURE_MAIN_TARGET_HPP
 #define GEAROENIX_VULKAN_TEXTURE_MAIN_TARGET_HPP
-#include "../../core/gx-cr-build-configuration.hpp"
-#ifdef GX_USE_VULKAN
+#include "../../render/gx-rnd-build-configuration.hpp"
+#ifdef GX_RENDER_VULKAN_ENABLED
 #include "../../render/texture/gx-rnd-txt-target.hpp"
 
 namespace gearoenix::vulkan {
-class Framebuffer;
-class Instance;
-class RenderPass;
-class Surface;
-class Swapchain;
+struct Framebuffer;
+struct Instance;
+struct RenderPass;
+struct Surface;
+struct Swapchain;
 }
 
 namespace gearoenix::vulkan::engine {
-class Engine;
+struct Engine;
 }
 
 namespace gearoenix::vulkan::image {
-class View;
+struct View;
 }
 
 namespace gearoenix::vulkan::memory {
-class Manager;
+struct Manager;
 }
 
 namespace gearoenix::vulkan::sync {
-class Fence;
-class Semaphore;
+struct Fence;
+struct Semaphore;
 }
 
 namespace gearoenix::vulkan::texture {
-class MainTarget final : public render::texture::Target {
+struct MainTarget final : public render::texture::Target {
 public:
     struct Frame {
         std::shared_ptr<Framebuffer> framebuffer;

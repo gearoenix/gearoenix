@@ -4,7 +4,7 @@
 #include "gx-phs-cld-collider.hpp"
 
 namespace gearoenix::physics::collider {
-class Sphere final : public Collider {
+struct Sphere final : public Collider {
     GX_GET_CREF_PRV(math::Sphere, sphere)
 public:
     Sphere(const math::Vec3<double>& c, double r) noexcept;

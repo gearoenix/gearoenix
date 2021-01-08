@@ -2,7 +2,9 @@
 #define GEAROENIX_PLATFORM_APPLICATION_HPP
 #include "../core/macro/gx-cr-mcr-getter-setter.hpp"
 //#include "../core/event/gx-cr-ev-event.hpp"
+#include "gx-plt-arguments.hpp"
 #include "gx-plt-build-configuration.hpp"
+#include "gx-plt-main-entry.hpp"
 #include "gx-plt-runtime-configuration.hpp"
 #include <memory>
 
@@ -16,6 +18,7 @@ struct BaseApplication final {
     friend struct Application;
 
     GX_GET_CREF_PRV(RuntimeConfiguration, configuration)
+    GX_GET_CREF_PRV(Arguments, arguments)
 
     GX_GET_VAL_PRV(bool, running, true)
 
@@ -54,7 +57,7 @@ struct BaseApplication final {
     GX_GET_CREF_PRV(std::shared_ptr<render::engine::Engine>, render_engine)
 
 private:
-    BaseApplication(const RuntimeConfiguration& configuration) noexcept;
+    BaseApplication(GX_MAIN_ENTRY_ARGS_DEF, const RuntimeConfiguration& configuration) noexcept;
 
     void initialize_window_position(int x, int y) noexcept;
 
@@ -69,7 +72,7 @@ private:
 }
 
 #if defined(GX_PLT_ANDROID)
-#include "android/gx-sys-and-app.hpp"
+#include "android/gx-plt-and-app.hpp"
 #elif defined(GX_PLATFORM_WINDOWS)
 #include "windows/gx-plt-win-application.hpp"
 #elif defined(GX_PLATFORM_LINUX)

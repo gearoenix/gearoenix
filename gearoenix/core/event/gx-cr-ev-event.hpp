@@ -23,7 +23,7 @@ struct Data {
         gesture::TouchDrag,
         gesture::TouchScale,
         movement::Base2D,
-        system::WindowSizeChangeData,
+        platform::WindowSizeChangeData,
         touch::Data,
         int>
         DataVar;

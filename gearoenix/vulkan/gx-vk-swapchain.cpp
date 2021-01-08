@@ -1,5 +1,6 @@
 #include "gx-vk-swapchain.hpp"
-#ifdef GX_USE_VULKAN
+#ifdef GX_RENDER_VULKAN_ENABLED
+#include "../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "device/gx-vk-dev-logical.hpp"
 #include "device/gx-vk-dev-physical.hpp"
 #include "gx-vk-check.hpp"
@@ -40,7 +41,7 @@ std::uint32_t gearoenix::vulkan::Swapchain::get_next_image_index(const std::shar
     case VK_SUCCESS:
         return image_index;
     default:
-        GXLOGF("Swapchain failed to get the next image, result: " << result_to_string(result))
+        GX_LOG_F("Swapchain failed to get the next image, result: " << result_to_string(result))
     }
 }
 
@@ -57,7 +58,7 @@ void gearoenix::vulkan::Swapchain::initialize() noexcept
             break;
     }
     if (chosen_format_index >= formats.size()) {
-        GXLOGD("VK_FORMAT_R8G8B8A8_UNORM not found in the surface.")
+        GX_LOG_D("VK_FORMAT_R8G8B8A8_UNORM not found in the surface.")
         chosen_format_index = 0;
     }
     format = formats[chosen_format_index];
@@ -97,7 +98,7 @@ void gearoenix::vulkan::Swapchain::initialize() noexcept
     } else if ((caps.supportedCompositeAlpha & VK_COMPOSITE_ALPHA_FLAG_BITS_MAX_ENUM_KHR) != 0) {
         info.compositeAlpha = VK_COMPOSITE_ALPHA_FLAG_BITS_MAX_ENUM_KHR;
     } else {
-        GXLOGF("Error composite is unknown.")
+        GX_LOG_F("Error composite is unknown.")
     }
     GX_VK_CHK_L(vkCreateSwapchainKHR(logical_device->get_vulkan_data(), &info, nullptr, &vulkan_data))
     std::uint32_t count = 0;

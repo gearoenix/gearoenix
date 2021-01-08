@@ -3,9 +3,9 @@
 #include "gx-cr-list-node.hpp"
 
 namespace gearoenix::core::list {
-template <class T>
-class List {
-    friend class Node<T>;
+template <typename T>
+struct List {
+    friend struct Node<T>;
 
 private:
     Node<T>* front;
@@ -24,14 +24,14 @@ public:
 };
 }
 
-template <class T>
+template <typename T>
 gearoenix::core::list::List<T>::List()
     : front(nullptr)
     , end(nullptr)
 {
 }
 
-template <class T>
+template <typename T>
 gearoenix::core::list::List<T>::~List()
 {
     Node<T>* node = front;
@@ -42,31 +42,31 @@ gearoenix::core::list::List<T>::~List()
     }
 }
 
-template <class T>
+template <typename T>
 gearoenix::core::list::Node<T>* gearoenix::core::list::List<T>::get_front()
 {
     return front;
 }
 
-template <class T>
+template <typename T>
 const gearoenix::core::list::Node<T>* gearoenix::core::list::List<T>::get_front() const
 {
     return front;
 }
 
-template <class T>
+template <typename T>
 gearoenix::core::list::Node<T>* gearoenix::core::list::List<T>::get_end()
 {
     return end;
 }
 
-template <class T>
+template <typename T>
 const gearoenix::core::list::Node<T>* gearoenix::core::list::List<T>::get_end() const
 {
     return end;
 }
 
-template <class T>
+template <typename T>
 void gearoenix::core::list::List<T>::add_front(const T& val)
 {
     if (front != nullptr) {
@@ -77,7 +77,7 @@ void gearoenix::core::list::List<T>::add_front(const T& val)
     }
 }
 
-template <class T>
+template <typename T>
 void gearoenix::core::list::List<T>::add_end(const T& val)
 {
     if (end != nullptr) {

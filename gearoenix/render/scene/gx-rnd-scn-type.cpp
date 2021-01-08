@@ -1,5 +1,5 @@
 #include "gx-rnd-scn-type.hpp"
-#include "../../system/gx-sys-log.hpp"
+#include "../../platform/gx-plt-log.hpp"
 
 std::ostream& operator<<(std::ostream& os, gearoenix::render::scene::Type t) noexcept
 {

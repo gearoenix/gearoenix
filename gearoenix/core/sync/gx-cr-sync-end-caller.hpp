@@ -1,17 +1,18 @@
 #ifndef GEAROENIX_CORE_SYNC_END_CALLER_HPP
 #define GEAROENIX_CORE_SYNC_END_CALLER_HPP
-#include "../../system/gx-sys-log.hpp"
+#include "../../platform/gx-plt-log.hpp"
 #include "../gx-cr-build-configuration.hpp"
 #include <functional>
 #include <memory>
 #include <type_traits>
+
 #define GX_DEFAULT_IGNORED_END_CALLER gearoenix::core::sync::EndCaller<gearoenix::core::sync::EndCallerIgnore>([]() {})
 
 namespace gearoenix::core::sync {
 template <typename T>
-class EndCaller {
+struct EndCaller {
 private:
-    class Caller {
+    struct Caller {
     public:
         std::function<void(std::shared_ptr<T>)> f;
         std::shared_ptr<T> data = nullptr;
@@ -47,9 +48,9 @@ public:
 typedef struct {
 } EndCallerIgnore;
 template <>
-class EndCaller<EndCallerIgnore> {
+struct EndCaller<EndCallerIgnore> {
 private:
-    class Caller {
+    struct Caller {
     public:
         std::function<void()> f;
         Caller(std::function<void()> f)

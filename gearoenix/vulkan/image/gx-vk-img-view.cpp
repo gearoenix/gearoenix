@@ -1,5 +1,7 @@
 #include "gx-vk-img-view.hpp"
-#ifdef GX_USE_VULKAN
+#ifdef GX_RENDER_VULKAN_ENABLED
+#include "../../core/macro/gx-cr-mcr-flagger.hpp"
+#include "../../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../device/gx-vk-dev-physical.hpp"
 #include "../gx-vk-check.hpp"
@@ -21,7 +23,7 @@ gearoenix::vulkan::image::View::View(std::shared_ptr<Image> img) noexcept
     info.components.a = VK_COMPONENT_SWIZZLE_A;
     info.subresourceRange.levelCount = 1;
     info.subresourceRange.layerCount = 1;
-    if (GX_FLAG_CHECK(image->get_usage(), VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT)) {
+    if GX_FLAG_CHECK (image->get_usage(), VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT) {
         info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT;
     } else {
         info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;

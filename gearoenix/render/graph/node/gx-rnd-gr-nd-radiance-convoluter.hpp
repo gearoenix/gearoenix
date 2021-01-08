@@ -8,23 +8,23 @@
 #include <vector>
 
 namespace gearoenix::render::buffer {
-class Uniform;
+struct Uniform;
 }
 
 namespace gearoenix::render::camera {
-class Camera;
+struct Camera;
 }
 
 namespace gearoenix::render::command {
-class Buffer;
+struct Buffer;
 }
 
 namespace gearoenix::render::mesh {
-class Mesh;
+struct Mesh;
 }
 
 namespace gearoenix::render::pipeline {
-class RadianceConvoluterResourceSet;
+struct RadianceConvoluterResourceSet;
 }
 
 namespace gearoenix::render::graph::node {
@@ -51,7 +51,7 @@ struct RadianceConvoluterFrame {
     ~RadianceConvoluterFrame() noexcept;
 };
 
-class RadianceConvoluter final : public Node {
+struct RadianceConvoluter final : public Node {
 private:
     std::vector<std::unique_ptr<RadianceConvoluterFrame>> frames;
     RadianceConvoluterFrame* frame = nullptr;

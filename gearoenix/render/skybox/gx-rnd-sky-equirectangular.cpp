@@ -4,7 +4,7 @@
 gearoenix::render::skybox::Equirectangular::Equirectangular(
     const core::Id my_id,
     std::string name,
-    system::stream::Stream* const s,
+    platform::stream::Stream* const s,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : Skybox(Type::Equirectangular, my_id, std::move(name), s, e, c)

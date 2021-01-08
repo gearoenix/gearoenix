@@ -172,7 +172,7 @@ void gearoenix::math::Aabb3::set_diameter(const Vec3<double>& d) noexcept
     volume = d.x * d.y * d.z;
 }
 
-void gearoenix::math::Aabb3::read(system::stream::Stream* const s) noexcept
+void gearoenix::math::Aabb3::read(platform::stream::Stream& s) noexcept
 {
     upper.read(s);
     lower.read(s);

@@ -7,7 +7,7 @@
 #include <string>
 #include <utility>
 namespace gearoenix::core::asset {
-class Asset {
+struct Asset {
     GX_GET_CVAL_PRT(Id, id)
     GX_GET_CVAL_PRT(Type, asset_type)
     GX_GET_REFC_PRT(std::string, name)

@@ -15,7 +15,7 @@
         "This functionality only works when the signedness compatibility is available.");
 
 namespace gearoenix::math {
-class Numeric {
+struct Numeric {
 public:
     // It will raise given number to the nearest bigger or equal value that is in power of 2
     template <typename T>
@@ -76,7 +76,7 @@ constexpr T gearoenix::math::Numeric::maximum(const T a, const T b) noexcept
         if (std::isnan(b))
             return a;
     }
-    return GX_MAX(a, b);
+    return a > b ? a : b;
 }
 
 template <typename T>
@@ -88,7 +88,7 @@ constexpr T gearoenix::math::Numeric::minimum(const T a, const T b) noexcept
         if (std::isnan(b))
             return a;
     }
-    return GX_MIN(a, b);
+    return a > b ? b : a;
 }
 
 template <typename T>

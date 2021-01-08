@@ -4,7 +4,7 @@
 #include "../../physics/animation/gx-phs-anm-manager.hpp"
 #include "../../physics/collider/gx-phs-cld-aabb.hpp"
 #include "../../physics/gx-phs-engine.hpp"
-#include "../../system/gx-sys-application.hpp"
+#include "../../platform/gx-plt-application.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "../material/gx-rnd-mat-unlit.hpp"
 #include "../mesh/gx-rnd-msh-manager.hpp"
@@ -17,7 +17,7 @@
 gearoenix::render::widget::Button::Button(
     const core::Id my_id,
     std::string name,
-    system::stream::Stream* const f,
+    platform::stream::Stream* const f,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : Widget(my_id, std::move(name), Type::Button, f, e, c)
@@ -34,7 +34,7 @@ gearoenix::render::widget::Button::Button(
     , background_material(new material::Unlit(e, c))
 {
     set_collider(std::make_unique<physics::collider::Aabb>(math::Vec3(1.0, 1.0, 0.001), math::Vec3(-1.0, -1.0, -0.001)));
-    auto* const ast_mgr = e->get_system_application()->get_asset_manager();
+    auto* const ast_mgr = e->get_platform_application()->get_asset_manager();
     auto* const mdl_mgr = ast_mgr->get_model_manager();
     core::sync::EndCaller<Text> txt_call([c](const std::shared_ptr<Text>&) {});
     text = mdl_mgr->create<Text>("button-" + this->name + "-text", txt_call);
@@ -59,7 +59,7 @@ gearoenix::render::widget::Button::Button(
 std::shared_ptr<gearoenix::render::widget::Button> gearoenix::render::widget::Button::construct(
     const core::Id id,
     std::string name,
-    system::stream::Stream* const f,
+    platform::stream::Stream* const f,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
 {
@@ -86,7 +86,7 @@ void gearoenix::render::widget::Button::selected(const math::Vec3<double>&) noex
     if (auto a = animation.lock())
         a->set_activity(false);
     auto end = core::sync::EndCaller<model::Model>([](const std::shared_ptr<model::Model>&) {});
-    auto myself = e->get_system_application()->get_asset_manager()->get_model_manager()->get_gx3d(id, end);
+    auto myself = e->get_platform_application()->get_asset_manager()->get_model_manager()->get_gx3d(id, end);
     const auto a = std::make_shared<physics::animation::Animation>(
         "button-" + name + "-select",
         [this, myself](const double from_start, const double) noexcept {
@@ -109,7 +109,7 @@ void gearoenix::render::widget::Button::select_cancelled() noexcept
     if (auto a = animation.lock())
         a->set_activity(false);
     auto my_fun = core::sync::EndCaller<model::Model>([](const std::shared_ptr<model::Model>&) {});
-    auto myself = e->get_system_application()->get_asset_manager()->get_model_manager()->get_gx3d(id, my_fun);
+    auto myself = e->get_platform_application()->get_asset_manager()->get_model_manager()->get_gx3d(id, my_fun);
     const auto a = std::make_shared<physics::animation::Animation>(
         "button-" + name + "-up",
         [this, myself](const double from_start, const double) noexcept {

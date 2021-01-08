@@ -6,13 +6,13 @@
 #include <vector>
 namespace gearoenix {
 namespace render {
-    class Engine;
+    struct Engine;
     namespace device {
-        class Logical;
+        struct Logical;
     }
     namespace shader {
         namespace stage {
-            class Stage {
+            struct Stage {
             private:
                 VkShaderModule vulkan_data;
                 device::Logical* device;

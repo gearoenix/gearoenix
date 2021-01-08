@@ -1,7 +1,7 @@
 #include "gx-rnd-txt-image.hpp"
 #include "../../core/gx-cr-build-configuration.hpp"
-#include "../../system/gx-sys-log.hpp"
-#include "../../system/stream/gx-sys-stm-stream.hpp"
+#include "../../platform/gx-plt-log.hpp"
+#include "../../platform/stream/gx-plt-stm-stream.hpp"
 // This is a workaround for warnings in stb
 #include "../../core/gx-cr-disable-warnings.hpp"
 
@@ -18,12 +18,12 @@
 
 void gearoenix::render::texture::Image::encode_write_func(void* const context, void* const data, const int size) noexcept
 {
-    auto* const file = reinterpret_cast<system::stream::Stream*>(context);
+    auto* const file = reinterpret_cast<platform::stream::Stream*>(context);
     (void)file->write(data, size);
 }
 
 void gearoenix::render::texture::Image::decode(
-    system::stream::Stream* const file,
+    platform::stream::Stream* const file,
     std::vector<unsigned char>& data,
     std::size_t& img_width,
     std::size_t& img_height) noexcept
@@ -83,7 +83,7 @@ void gearoenix::render::texture::Image::decode(
 }
 
 void gearoenix::render::texture::Image::encode_png(
-    system::stream::Stream* const file,
+    platform::stream::Stream* const file,
     const unsigned char* const data,
     const std::size_t img_width,
     const std::size_t img_height,
@@ -99,7 +99,7 @@ void gearoenix::render::texture::Image::encode_png(
 }
 
 void gearoenix::render::texture::Image::encode_hdr(
-    system::stream::Stream* const file,
+    platform::stream::Stream* const file,
     const float* const data,
     const std::size_t img_width,
     const std::size_t img_height,

@@ -7,19 +7,19 @@
 namespace gearoenix {
 namespace core {
     namespace cache {
-        class Cacher;
+        struct Cacher;
     }
 }
 namespace render {
-    class Engine;
-    class RenderPass;
+    struct Engine;
+    struct RenderPass;
     namespace descriptor {
-        class Pool;
+        struct Pool;
     }
     namespace pipeline {
-        class Cache;
-        class Pipeline;
-        class Manager {
+        struct Cache;
+        struct Pipeline;
+        struct Manager {
         private:
             Cache* cache;
             RenderPass* rndpass;

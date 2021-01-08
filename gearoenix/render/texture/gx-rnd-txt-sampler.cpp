@@ -1,7 +1,7 @@
 #include "gx-rnd-txt-sampler.hpp"
-#include "../../system/stream/gx-sys-stm-stream.hpp"
+#include "../../platform/stream/gx-plt-stm-stream.hpp"
 
-void gearoenix::render::texture::SamplerInfo::write(system::stream::Stream* const s) const noexcept
+void gearoenix::render::texture::SamplerInfo::write(platform::stream::Stream* const s) const noexcept
 {
     (void)s->write(min_filter);
     (void)s->write(mag_filter);
@@ -10,7 +10,7 @@ void gearoenix::render::texture::SamplerInfo::write(system::stream::Stream* cons
     (void)s->write(wrap_r);
 }
 
-void gearoenix::render::texture::SamplerInfo::read(system::stream::Stream* const s) noexcept
+void gearoenix::render::texture::SamplerInfo::read(platform::stream::Stream* const s) noexcept
 {
     s->read(min_filter);
     s->read(mag_filter);

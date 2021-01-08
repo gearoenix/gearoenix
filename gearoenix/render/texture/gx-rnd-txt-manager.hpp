@@ -7,19 +7,19 @@
 #include <map>
 #include <memory>
 
-namespace gearoenix::system::stream {
-class Stream;
+namespace gearoenix::platform::stream {
+struct Stream;
 }
 
 namespace gearoenix::render::engine {
-class Engine;
+struct Engine;
 }
 
 namespace gearoenix::render::texture {
-class Texture;
-class Texture2D;
-class TextureCube;
-class Manager {
+struct Texture;
+struct Texture2D;
+struct TextureCube;
+struct Manager {
 protected:
     engine::Engine* const e;
     core::cache::File<Texture> cache;
@@ -35,11 +35,11 @@ protected:
     std::shared_ptr<TextureCube> default_zero_3c_cube;
     std::shared_ptr<Texture2D> brdflut;
 
-    [[nodiscard]] static std::vector<std::uint8_t> read_gx3d_image(TextureFormat format, system::stream::Stream* s) noexcept;
-    [[nodiscard]] std::shared_ptr<Texture> read_gx3d(core::Id id, std::string name, system::stream::Stream* s, core::sync::EndCaller<Texture>& c) noexcept;
+    [[nodiscard]] static std::vector<std::uint8_t> read_gx3d_image(TextureFormat format, platform::stream::Stream* s) noexcept;
+    [[nodiscard]] std::shared_ptr<Texture> read_gx3d(core::Id id, std::string name, platform::stream::Stream* s, core::sync::EndCaller<Texture>& c) noexcept;
 
 public:
-    Manager(std::unique_ptr<system::stream::Stream> s, engine::Engine* e) noexcept;
+    Manager(std::unique_ptr<platform::stream::Stream> s, engine::Engine* e) noexcept;
     ~Manager() noexcept = default;
     [[nodiscard]] std::shared_ptr<Texture2D> get_2d(const math::Vec4<float>& color, core::sync::EndCaller<Texture2D>& c) noexcept;
     [[nodiscard]] std::shared_ptr<Texture2D> get_2d(const math::Vec3<float>& color, core::sync::EndCaller<Texture2D>& c) noexcept;
@@ -70,7 +70,7 @@ public:
     /// \param c Callback for the time that texture is ready for rendering.
     /// \param s is the Stream that the g3dx image resides in.
     /// \return A texture for use in load process.
-    [[nodiscard]] std::shared_ptr<Texture> read_gx3d(std::string name, system::stream::Stream* s, core::sync::EndCaller<Texture>& c) noexcept;
+    [[nodiscard]] std::shared_ptr<Texture> read_gx3d(std::string name, platform::stream::Stream* s, core::sync::EndCaller<Texture>& c) noexcept;
     [[nodiscard]] engine::Engine* get_engine() const noexcept;
     [[nodiscard]] static constexpr float geometry_smith(const math::Vec3<float>& n, const math::Vec3<float>& v, const math::Vec3<float>& l, float roughness) noexcept;
     [[nodiscard]] static math::Vec2<float> integrate_brdf(float n_dot_v, float roughness) noexcept;

@@ -1,5 +1,5 @@
 #include "gx-phs-cld-type.hpp"
-#include "../../system/gx-sys-log.hpp"
+#include "../../platform/gx-plt-log.hpp"
 
 std::ostream& gearoenix::physics::collider::operator<<(std::ostream& os, const Type t) noexcept
 {

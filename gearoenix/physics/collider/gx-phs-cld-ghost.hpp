@@ -3,7 +3,7 @@
 #include "gx-phs-cld-collider.hpp"
 
 namespace gearoenix::physics::collider {
-class Ghost final : public Collider {
+struct Ghost final : public Collider {
 public:
     Ghost() noexcept
         : Collider(Type::Ghost)

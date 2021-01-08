@@ -3,7 +3,7 @@
 #include "../../math/gx-math-sphere.hpp"
 #include "../../physics/accelerator/gx-phs-acc-bvh.hpp"
 #include "../../physics/collider/gx-phs-cld-transform.hpp"
-#include "../../system/gx-sys-application.hpp"
+#include "../../platform/gx-plt-application.hpp"
 #include "../buffer/gx-rnd-buf-manager.hpp"
 #include "../buffer/gx-rnd-buf-uniform.hpp"
 #include "../command/gx-rnd-cmd-buffer.hpp"
@@ -78,7 +78,7 @@ gearoenix::render::light::CascadeInfo::CascadeInfo(engine::Engine* const e) noex
     , kernels(static_cast<std::size_t>(e->get_kernels()->get_threads_count()))
     , frames(static_cast<std::size_t>(e->get_frames_count()))
 {
-    const auto cascades_count = e->get_system_application()->get_configuration().get_render().get_shadow_cascades_count();
+    const auto cascades_count = e->get_platform_application()->get_configuration().get_render().get_shadow_cascades_count();
     for (auto& frame : frames)
         frame.init(e);
     for (auto i = 0; i < cascades_count; ++i)

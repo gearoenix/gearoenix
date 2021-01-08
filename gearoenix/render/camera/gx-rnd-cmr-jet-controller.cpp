@@ -1,7 +1,7 @@
 #include "gx-rnd-cmr-jet-controller.hpp"
 #include "../../core/event/gx-cr-ev-engine.hpp"
 #include "../../core/sync/gx-cr-sync-update-manager.hpp"
-#include "../../system/gx-sys-application.hpp"
+#include "../../platform/gx-plt-application.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "gx-rnd-cmr-camera.hpp"
 #include "gx-rnd-cmr-transformation.hpp"
@@ -44,7 +44,7 @@ gearoenix::render::camera::JetController::JetController(std::shared_ptr<Camera> 
     , cam(std::move(c))
     , function_id(render_engine->get_update_manager()->add({ cam->get_id() }, 0.0, [this] { update(); }))
 {
-    auto* const event_engine = render_engine->get_system_application()->get_event_engine();
+    auto* const event_engine = render_engine->get_platform_application()->get_event_engine();
     event_engine->add_listener(core::event::Id::GestureDrag2D, 0.0f, this);
     event_engine->add_listener(core::event::Id::GestureScale, 0.0f, this);
     event_engine->add_listener(core::event::Id::ButtonKeyboard, 0.0f, this);
@@ -53,7 +53,7 @@ gearoenix::render::camera::JetController::JetController(std::shared_ptr<Camera> 
 gearoenix::render::camera::JetController::~JetController() noexcept
 {
     render_engine->get_update_manager()->remove(function_id);
-    auto* const event_engine = render_engine->get_system_application()->get_event_engine();
+    auto* const event_engine = render_engine->get_platform_application()->get_event_engine();
     event_engine->remove_listener(core::event::Id::GestureDrag2D, 0.0f, this);
     event_engine->remove_listener(core::event::Id::GestureScale, 0.0f, this);
     event_engine->remove_listener(core::event::Id::ButtonKeyboard, 0.0f, this);

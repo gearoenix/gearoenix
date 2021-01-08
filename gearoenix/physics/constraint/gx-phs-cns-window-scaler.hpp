@@ -11,7 +11,7 @@
 #include <vector>
 
 namespace gearoenix::physics::constraint {
-class WindowScaler final : public Constraint, public core::event::Listener {
+struct WindowScaler final : public Constraint, public core::event::Listener {
     GX_GET_VAL_PRV(double, size_percentage, 1.0)
     GX_GET_VAL_PRV(std::optional<double>, max_size_scale, std::nullopt)
     GX_GET_VAL_PRV(std::optional<double>, min_size_scale, std::nullopt)

@@ -4,8 +4,8 @@
 #include <functional>
 
 namespace gearoenix::render::widget {
-class Button;
-class Modal final : public Widget {
+struct Button;
+struct Modal final : public Widget {
     GX_GET_CREF_PRV(std::weak_ptr<Modal>, modal_self)
 private:
     std::shared_ptr<Button> close_mdl;
@@ -14,7 +14,7 @@ private:
     Modal(
         core::Id id,
         std::string name,
-        system::stream::Stream* s,
+        platform::stream::Stream* s,
         engine::Engine* e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
     Modal(
@@ -27,7 +27,7 @@ public:
     [[nodiscard]] static std::shared_ptr<Modal> construct(
         core::Id id,
         std::string name,
-        system::stream::Stream* s,
+        platform::stream::Stream* s,
         engine::Engine* e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
     [[nodiscard]] static std::shared_ptr<Modal> construct(

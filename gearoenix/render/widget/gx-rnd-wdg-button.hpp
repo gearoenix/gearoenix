@@ -9,11 +9,11 @@ struct Animation;
 }
 
 namespace gearoenix::render::material {
-class Unlit;
+struct Unlit;
 }
 
 namespace gearoenix::render::widget {
-class Text;
+struct Text;
 struct TextTheme;
 struct ButtonTheme {
     math::Vec4<double> background_color = math::Vec4(0.4, 0.37254902, 0.21372549, 1.0);
@@ -21,7 +21,7 @@ struct ButtonTheme {
     double text_scale = 0.9f;
     const TextTheme* text_theme = nullptr;
 };
-class Button final : public Widget {
+struct Button final : public Widget {
     GX_GET_CREF_PRV(std::shared_ptr<Text>, text)
     GX_GET_CREF_PRV(std::shared_ptr<material::Unlit>, background_material)
     GX_GET_CREF_PRV(ButtonTheme, theme)
@@ -38,7 +38,7 @@ protected:
     Button(
         core::Id id,
         std::string name,
-        system::stream::Stream* f,
+        platform::stream::Stream* f,
         engine::Engine* e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
     Button(
@@ -51,7 +51,7 @@ public:
     [[nodiscard]] static std::shared_ptr<Button> construct(
         core::Id id,
         std::string name,
-        system::stream::Stream* f,
+        platform::stream::Stream* f,
         engine::Engine* e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
     [[nodiscard]] static std::shared_ptr<Button> construct(

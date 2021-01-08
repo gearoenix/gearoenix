@@ -1,7 +1,7 @@
 #ifndef GEAROENIX_CORE_POOL_HPP
 #define GEAROENIX_CORE_POOL_HPP
 
-#include "../system/gx-sys-log.hpp"
+#include "../platform/gx-plt-log.hpp"
 #include "gx-cr-build-configuration.hpp"
 #include <functional>
 #include <memory>
@@ -78,7 +78,7 @@ public:
 };
 }
 
-template <class T>
+template <typename T>
 constexpr typename gearoenix::core::OneLoopPool<T>::iterator& gearoenix::core::OneLoopPool<T>::iterator::operator++() noexcept
 {
     if (index < pool->current_index)
@@ -86,45 +86,45 @@ constexpr typename gearoenix::core::OneLoopPool<T>::iterator& gearoenix::core::O
     return *this;
 }
 
-template <class T>
+template <typename T>
 constexpr typename gearoenix::core::OneLoopPool<T>::iterator::reference gearoenix::core::OneLoopPool<T>::iterator::operator*() noexcept
 {
     return *(pool->objects[index]);
 }
 
-template <class T>
+template <typename T>
 constexpr typename gearoenix::core::OneLoopPool<T>::iterator::pointer gearoenix::core::OneLoopPool<T>::iterator::operator->() noexcept
 {
     return pool->objects[index];
 }
 
-template <class T>
+template <typename T>
 constexpr bool gearoenix::core::OneLoopPool<T>::iterator::operator==(const gearoenix::core::OneLoopPool<T>::iterator& rhs) const noexcept
 {
     return index == rhs.index;
 }
 
-template <class T>
+template <typename T>
 constexpr bool gearoenix::core::OneLoopPool<T>::iterator::operator!=(const gearoenix::core::OneLoopPool<T>::iterator& rhs) const noexcept
 {
     return index != rhs.index;
 }
 
-template <class T>
+template <typename T>
 constexpr gearoenix::core::OneLoopPool<T>::iterator::iterator(const std::size_t index, OneLoopPool<T>* const pool) noexcept
     : index(index)
     , pool(pool)
 {
 }
 
-template <class T>
+template <typename T>
 constexpr gearoenix::core::OneLoopPool<T>::const_iterator::const_iterator(const std::size_t index, const OneLoopPool* const pool) noexcept
     : index(index)
     , pool(pool)
 {
 }
 
-template <class T>
+template <typename T>
 constexpr typename gearoenix::core::OneLoopPool<T>::const_iterator& gearoenix::core::OneLoopPool<T>::const_iterator::operator++() noexcept
 {
     if (index < pool->current_index)
@@ -132,31 +132,31 @@ constexpr typename gearoenix::core::OneLoopPool<T>::const_iterator& gearoenix::c
     return *this;
 }
 
-template <class T>
+template <typename T>
 constexpr typename gearoenix::core::OneLoopPool<T>::const_iterator::reference gearoenix::core::OneLoopPool<T>::const_iterator::operator*() noexcept
 {
     return *(pool->objects[index]);
 }
 
-template <class T>
+template <typename T>
 constexpr typename gearoenix::core::OneLoopPool<T>::const_iterator::pointer gearoenix::core::OneLoopPool<T>::const_iterator::operator->() noexcept
 {
     return pool->objects[index];
 }
 
-template <class T>
+template <typename T>
 constexpr bool gearoenix::core::OneLoopPool<T>::const_iterator::operator==(const gearoenix::core::OneLoopPool<T>::const_iterator& rhs) const noexcept
 {
     return index == rhs.index;
 }
 
-template <class T>
+template <typename T>
 constexpr bool gearoenix::core::OneLoopPool<T>::const_iterator::operator!=(const gearoenix::core::OneLoopPool<T>::const_iterator& rhs) const noexcept
 {
     return index != rhs.index;
 }
 
-template <class T>
+template <typename T>
 template <typename F>
 constexpr T* gearoenix::core::OneLoopPool<T>::get_next(const F&& f) noexcept
 {
@@ -167,55 +167,55 @@ constexpr T* gearoenix::core::OneLoopPool<T>::get_next(const F&& f) noexcept
     return objects[current_index++].get();
 }
 
-template <class T>
+template <typename T>
 constexpr void gearoenix::core::OneLoopPool<T>::refresh() noexcept
 {
     current_index = 0;
 }
 
-template <class T>
+template <typename T>
 constexpr void gearoenix::core::OneLoopPool<T>::set_increase_rate(const std::size_t i) noexcept
 {
     increase_rate = i;
 }
 
-template <class T>
+template <typename T>
 constexpr typename gearoenix::core::OneLoopPool<T>::iterator gearoenix::core::OneLoopPool<T>::begin() noexcept
 {
     return iterator(0, this);
 }
 
-template <class T>
+template <typename T>
 constexpr typename gearoenix::core::OneLoopPool<T>::iterator gearoenix::core::OneLoopPool<T>::end() noexcept
 {
     return iterator(current_index, this);
 }
 
-template <class T>
+template <typename T>
 constexpr typename gearoenix::core::OneLoopPool<T>::const_iterator gearoenix::core::OneLoopPool<T>::begin() const noexcept
 {
     return const_iterator(0, this);
 }
 
-template <class T>
+template <typename T>
 constexpr typename gearoenix::core::OneLoopPool<T>::const_iterator gearoenix::core::OneLoopPool<T>::end() const noexcept
 {
     return const_iterator(current_index, this);
 }
 
-template <class T>
+template <typename T>
 constexpr std::size_t gearoenix::core::OneLoopPool<T>::capacity() const noexcept
 {
     return objects.size();
 }
 
-template <class T>
+template <typename T>
 constexpr std::size_t gearoenix::core::OneLoopPool<T>::size() const noexcept
 {
     return current_index;
 }
 
-template <class T>
+template <typename T>
 template <typename I>
 GX_CORE_POOL_INDEX_FUNC_EXPR const T& gearoenix::core::OneLoopPool<T>::operator[](const I index) const noexcept
 {
@@ -227,7 +227,7 @@ GX_CORE_POOL_INDEX_FUNC_EXPR const T& gearoenix::core::OneLoopPool<T>::operator[
     return *(objects[index].get());
 }
 
-template <class T>
+template <typename T>
 template <typename I>
 GX_CORE_POOL_INDEX_FUNC_EXPR T& gearoenix::core::OneLoopPool<T>::operator[](const I index) noexcept
 {

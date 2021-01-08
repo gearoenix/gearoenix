@@ -1,5 +1,5 @@
 #include "gx-rnd-sky-type.hpp"
-#include "../../system/gx-sys-log.hpp"
+#include "../../platform/gx-plt-log.hpp"
 
 std::ostream& operator<<(std::ostream& os, gearoenix::render::skybox::Type t) noexcept
 {

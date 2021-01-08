@@ -1,7 +1,7 @@
 #ifndef GEAROENIX_CORE_EVENT_SYSTEM_SYSTEM_HPP
 #define GEAROENIX_CORE_EVENT_SYSTEM_SYSTEM_HPP
 #include "../gx-cr-types.hpp"
-namespace gearoenix::core::event::system {
+namespace gearoenix::core::event::platform {
 struct WindowSizeChangeData {
     int previous_width = 0;
     int previous_height = 0;

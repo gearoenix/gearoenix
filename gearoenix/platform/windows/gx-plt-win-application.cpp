@@ -179,7 +179,7 @@ LRESULT gearoenix::platform::Application::handler(
     return DefWindowProc(hwnd, message, w_param, l_param);
 }
 
-//void gearoenix::system::Application::update_mouse_position()
+//void gearoenix::platform::Application::update_mouse_position()
 //{
 //    POINT p;
 //    if (GetCursorPos(&p)) {
@@ -192,7 +192,7 @@ LRESULT gearoenix::platform::Application::handler(
 //    }
 //}
 //
-//void gearoenix::system::Application::update_screen_sizes()
+//void gearoenix::platform::Application::update_screen_sizes()
 //{
 //    RECT rcc, rcw;
 //    GetClientRect(window, &rcc);
@@ -205,9 +205,11 @@ LRESULT gearoenix::platform::Application::handler(
 //    screen_ratio = (core::Real)screen_width / (core::Real)screen_height;
 //}
 
-gearoenix::platform::Application::Application(const RuntimeConfiguration& config) noexcept
-    : base(config)
+gearoenix::platform::Application::Application(GX_MAIN_ENTRY_ARGS_DEF, const RuntimeConfiguration& config) noexcept
+    : base(GX_MAIN_ENTRY_ARGS, config)
 {
+    SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_SYSTEM_AWARE);
+
     WNDCLASSEXA wc;
     GX_SET_ZERO(wc)
     instance = GetModuleHandle(nullptr);
@@ -265,9 +267,10 @@ gearoenix::platform::Application::Application(const RuntimeConfiguration& config
 }
 
 std::shared_ptr<gearoenix::platform::Application> gearoenix::platform::Application::construct(
+    GX_MAIN_ENTRY_ARGS_DEF,
     const RuntimeConfiguration& config) noexcept
 {
-    std::shared_ptr<Application> result(new Application(config));
+    std::shared_ptr<Application> result(new Application(GX_MAIN_ENTRY_ARGS, config));
     result->self = result;
     result->base.render_engine = render::engine::Engine::construct(config.get_render_configuration(), result);
     GX_TODO

@@ -6,25 +6,25 @@
 #include <limits>
 
 namespace gearoenix::render::camera {
-class Perspective;
+struct Perspective;
 }
 
 namespace gearoenix::render::graph::node {
-class IrradianceConvoluter;
-class RadianceConvoluter;
-class MipmapGenerator;
+struct IrradianceConvoluter;
+struct RadianceConvoluter;
+struct MipmapGenerator;
 }
 
 namespace gearoenix::render::mesh {
-class Mesh;
+struct Mesh;
 }
 
 namespace gearoenix::render::texture {
-class Target;
+struct Target;
 }
 
 namespace gearoenix::render::reflection {
-class Runtime final : public Reflection, public physics::Transformation {
+struct Runtime final : public Reflection, public physics::Transformation {
 public:
     enum struct State {
         Uninitialized = 0,

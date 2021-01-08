@@ -3,13 +3,13 @@
 #include "gx-rnd-mdl-model.hpp"
 
 namespace gearoenix::render::model {
-class Static final : public Model {
+struct Static final : public Model {
     GX_GET_CREF_PRV(std::shared_ptr<Static>, static_model_self)
 private:
     Static(
         core::Id id,
         std::string name,
-        system::stream::Stream* f,
+        platform::stream::Stream* f,
         engine::Engine* e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
     Static(
@@ -22,7 +22,7 @@ public:
     [[nodiscard]] static std::shared_ptr<Static> construct(
         core::Id id,
         std::string name,
-        system::stream::Stream* f,
+        platform::stream::Stream* f,
         engine::Engine* e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
     [[nodiscard]] static std::shared_ptr<Static> construct(

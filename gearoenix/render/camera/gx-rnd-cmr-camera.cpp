@@ -2,7 +2,7 @@
 #include "../../core/event/gx-cr-ev-engine.hpp"
 #include "../../physics/accelerator/gx-phs-acc-bvh.hpp"
 #include "../../physics/collider/gx-phs-cld-frustum.hpp"
-#include "../../system/gx-sys-application.hpp"
+#include "../../platform/gx-plt-application.hpp"
 #include "../buffer/gx-rnd-buf-framed-uniform.hpp"
 #include "../light/gx-rnd-lt-cascade-info.hpp"
 #include "../light/gx-rnd-lt-directional.hpp"
@@ -13,17 +13,17 @@
 #include "gx-rnd-cmr-transformation.hpp"
 #include <algorithm>
 
-#define GX_CAMERA_INIT                                                                                                                                               \
-    core::asset::Asset(my_id, core::asset::Type::Camera, std::move(name)),                                                                                           \
-        frustum_collider(new physics::collider::Frustum()),                                                                                                          \
-        uniform_buffers(new buffer::FramedUniform(sizeof(Uniform), e)),                                                                                              \
-        cascaded_shadow_frustum_partitions(static_cast<std::size_t>(e->get_system_application()->get_configuration().get_render().get_shadow_cascades_count()) + 1), \
-        transformation(new Transformation(&uniform, frustum_collider.get(), &cascaded_shadow_frustum_partitions)),                                                   \
+#define GX_CAMERA_INIT                                                                                                                                                 \
+    core::asset::Asset(my_id, core::asset::Type::Camera, std::move(name)),                                                                                             \
+        frustum_collider(new physics::collider::Frustum()),                                                                                                            \
+        uniform_buffers(new buffer::FramedUniform(sizeof(Uniform), e)),                                                                                                \
+        cascaded_shadow_frustum_partitions(static_cast<std::size_t>(e->get_platform_application()->get_configuration().get_render().get_shadow_cascades_count()) + 1), \
+        transformation(new Transformation(&uniform, frustum_collider.get(), &cascaded_shadow_frustum_partitions)),                                                     \
         render_engine(e)
 
 void gearoenix::render::camera::Camera::initialize() noexcept
 {
-    auto* const sys_app = render_engine->get_system_application();
+    auto* const sys_app = render_engine->get_platform_application();
     uniform.aspect_ratio = static_cast<float>(sys_app->get_event_engine()->get_window_ratio());
     uniform.clip_width = static_cast<float>(sys_app->get_event_engine()->get_window_width());
     uniform.clip_height = static_cast<float>(sys_app->get_event_engine()->get_window_height());
@@ -40,7 +40,7 @@ gearoenix::render::camera::Camera::Camera(const core::Id my_id, std::string name
 gearoenix::render::camera::Camera::Camera(
     const core::Id my_id,
     std::string name,
-    system::stream::Stream* const f,
+    platform::stream::Stream* const f,
     engine::Engine* const e) noexcept
     : GX_CAMERA_INIT
 {
@@ -74,7 +74,7 @@ void gearoenix::render::camera::Camera::config_target() const noexcept
 
 gearoenix::render::camera::Camera::~Camera() noexcept
 {
-    auto* const event_engine = render_engine->get_system_application()->get_event_engine();
+    auto* const event_engine = render_engine->get_platform_application()->get_event_engine();
     if (nullptr != event_engine)
         event_engine->remove_listener(core::event::Id::SystemWindowSizeChange, this);
 }
@@ -205,7 +205,7 @@ void gearoenix::render::camera::Camera::merge_seen_meshes() noexcept
 
 bool gearoenix::render::camera::Camera::on_event(const core::event::Data& d) noexcept
 {
-    const auto* sys_app = render_engine->get_system_application();
+    const auto* sys_app = render_engine->get_platform_application();
     switch (d.get_source()) {
     case core::event::Id::SystemWindowSizeChange:
         if (target->get_attachments().empty())

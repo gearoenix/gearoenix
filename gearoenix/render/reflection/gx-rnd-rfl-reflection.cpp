@@ -1,7 +1,7 @@
 #include "gx-rnd-rfl-reflection.hpp"
 #include "../../physics/accelerator/gx-phs-acc-bvh.hpp"
 #include "../../physics/collider/gx-phs-cld-aabb.hpp"
-#include "../../system/gx-sys-application.hpp"
+#include "../../platform/gx-plt-application.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "../model/gx-rnd-mdl-model.hpp"
 

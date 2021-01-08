@@ -7,15 +7,15 @@
 #include "gx-rnd-txt-type.hpp"
 
 namespace gearoenix::render::engine {
-class Engine;
+struct Engine;
 }
 
-namespace gearoenix::system::stream {
-class Stream;
+namespace gearoenix::platform::stream {
+struct Stream;
 }
 
 namespace gearoenix::render::texture {
-class Texture : public core::asset::Asset {
+struct Texture : public core::asset::Asset {
     GX_GET_CVAL_PRT(Type, texture_type)
     GX_GET_VAL_PRT(TextureFormat, texture_format, TextureFormat::RgbaUint8)
     GX_GET_CPTR_PRT(engine::Engine, render_engine)
@@ -30,14 +30,14 @@ protected:
         engine::Engine* e) noexcept;
 
     static void write_gx3d_image(
-        system::stream::Stream* file,
+        platform::stream::Stream* file,
         const float* data,
         std::size_t img_width,
         std::size_t img_height,
         std::size_t components_count) noexcept;
 
     static void write_gx3d_image(
-        system::stream::Stream* file,
+        platform::stream::Stream* file,
         const unsigned char* data,
         std::size_t img_width,
         std::size_t img_height,
@@ -49,7 +49,7 @@ public:
         const std::string& file_address,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
     virtual void write_gx3d(
-        const std::shared_ptr<system::stream::Stream>& s,
+        const std::shared_ptr<platform::stream::Stream>& s,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
 
     [[nodiscard]] static std::vector<std::uint8_t> convert_pixels(

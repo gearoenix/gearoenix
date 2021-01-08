@@ -6,12 +6,12 @@
 #include <optional>
 #include <string>
 
-#ifdef GX_IN_IOS
+#ifdef GX_PLATFORM_IOS
 #import <Foundation/Foundation.h>
 #endif
 
 namespace gearoenix::core {
-class String {
+struct String {
 public:
     [[nodiscard]] static bool is_character(event::button::KeyboardKeyId) noexcept;
     [[nodiscard]] static std::optional<wchar_t> to_character(event::button::KeyboardKeyId, bool shift_pressed = false, Language language = Language::English) noexcept;

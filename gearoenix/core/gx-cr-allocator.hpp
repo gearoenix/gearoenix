@@ -1,12 +1,13 @@
 #ifndef GEAROENIX_CORE_ALLOCATOR_HPP
 #define GEAROENIX_CORE_ALLOCATOR_HPP
-#include "gx-cr-static.hpp"
+#include "../platform/macro/gx-plt-mcr-lock.hpp"
+#include "macro/gx-cr-mcr-getter-setter.hpp"
 #include <map>
 #include <memory>
 #include <optional>
 
 namespace gearoenix::core {
-class Allocator final {
+struct Allocator final {
     /// size, offset (within itself)
     typedef std::pair<std::size_t, std::size_t> SizeOffset;
     /// allocator that is before free space, allocator that is after space

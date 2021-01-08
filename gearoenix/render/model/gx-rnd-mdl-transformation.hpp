@@ -4,8 +4,8 @@
 
 namespace gearoenix::render::model {
 struct Uniform;
-class Model;
-class Transformation : public physics::Transformation {
+struct Model;
+struct Transformation : public physics::Transformation {
 private:
     Model* const parent;
 

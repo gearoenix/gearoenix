@@ -4,18 +4,18 @@
 #include "gx-rnd-lt-light.hpp"
 
 namespace gearoenix::render::camera {
-class Camera;
+struct Camera;
 }
 
 namespace gearoenix::render::model {
-class Model;
+struct Model;
 }
 
 namespace gearoenix::render::light {
-class Directional final : public Light {
+struct Directional final : public Light {
     GX_GETSET_CREF_PRV(math::Vec3<double>, direction)
 public:
-    Directional(core::Id id, std::string name, system::stream::Stream* f, engine::Engine* e) noexcept;
+    Directional(core::Id id, std::string name, platform::stream::Stream* f, engine::Engine* e) noexcept;
     Directional(core::Id id, std::string name, engine::Engine* e) noexcept;
     ~Directional() noexcept final;
     bool is_in_light(const model::Model*) const noexcept final;

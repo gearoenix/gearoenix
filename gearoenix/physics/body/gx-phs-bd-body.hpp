@@ -6,11 +6,11 @@
 #include <memory>
 
 namespace gearoenix::render::model {
-class Dynamic;
+struct Dynamic;
 }
 
 namespace gearoenix::physics::body {
-class Body : public core::asset::Asset {
+struct Body : public core::asset::Asset {
     GX_GET_CVAL_PRT(Type, body_type)
     GX_GET_REFC_PRT(std::shared_ptr<render::model::Dynamic>, model)
     Body(core::Id id, std::string name, Type body_type, std::shared_ptr<render::model::Dynamic> model) noexcept;

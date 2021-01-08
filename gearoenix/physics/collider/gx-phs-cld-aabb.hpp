@@ -2,7 +2,7 @@
 #define GEAROENIX_PHYSICS_COLLIDER_AABB_HPP
 #include "gx-phs-cld-collider.hpp"
 namespace gearoenix::physics::collider {
-class Aabb final : public Collider {
+struct Aabb final : public Collider {
 public:
     Aabb(const math::Vec3<double>& u, const math::Vec3<double>& l) noexcept
         : Collider(Type::Aabb)

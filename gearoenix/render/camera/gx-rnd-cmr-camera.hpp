@@ -13,17 +13,17 @@
 #include <vector>
 
 namespace gearoenix::core::event {
-class Event;
+struct Event;
 }
 
 namespace gearoenix::physics::collider {
-class Collider;
-class Frustum;
+struct Collider;
+struct Frustum;
 }
 
-namespace gearoenix::system {
-class Application;
-class File;
+namespace gearoenix::platform {
+struct Application;
+struct File;
 }
 
 namespace gearoenix::physics::accelerator {
@@ -31,30 +31,30 @@ struct Bvh;
 }
 
 namespace gearoenix::render::buffer {
-class FramedUniform;
+struct FramedUniform;
 }
 
 namespace gearoenix::render::engine {
-class Engine;
+struct Engine;
 }
 
 namespace gearoenix::render::light {
-class CascadeInfo;
-class Directional;
+struct CascadeInfo;
+struct Directional;
 }
 
 namespace gearoenix::render::model {
-class Model;
-class Mesh;
+struct Model;
+struct Mesh;
 }
 
 namespace gearoenix::render::texture {
-class Target;
+struct Target;
 }
 
 namespace gearoenix::render::camera {
-class Transformation;
-class Camera : public core::asset::Asset, public core::event::Listener {
+struct Transformation;
+struct Camera : public core::asset::Asset, public core::event::Listener {
 public:
     typedef std::array<math::Vec3<double>, 4> Partition;
     typedef std::vector<std::tuple<double, material::Type, model::Model*, model::Mesh*>> Meshes;
@@ -80,7 +80,7 @@ protected:
     void initialize() noexcept;
 
     Camera(core::Id my_id, std::string name, engine::Engine* e) noexcept;
-    Camera(core::Id my_id, std::string name, system::stream::Stream* f, engine::Engine* e) noexcept;
+    Camera(core::Id my_id, std::string name, platform::stream::Stream* f, engine::Engine* e) noexcept;
 
     void config_target() const noexcept;
 

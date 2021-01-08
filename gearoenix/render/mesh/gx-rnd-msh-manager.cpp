@@ -4,7 +4,7 @@
 #include "gx-rnd-msh-type.hpp"
 #include <utility>
 
-gearoenix::render::mesh::Manager::Manager(std::unique_ptr<system::stream::Stream> s, engine::Engine* const e) noexcept
+gearoenix::render::mesh::Manager::Manager(std::unique_ptr<platform::stream::Stream> s, engine::Engine* const e) noexcept
     : e(e)
     , cache(std::move(s))
 {

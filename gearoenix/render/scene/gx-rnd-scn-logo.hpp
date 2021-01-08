@@ -5,8 +5,8 @@
 #include <variant>
 #include <vector>
 
-namespace gearoenix::system {
-class Application;
+namespace gearoenix::platform {
+struct Application;
 }
 
 namespace gearoenix::physics::animation {
@@ -14,21 +14,21 @@ struct Animation;
 }
 
 namespace gearoenix::render::model {
-class Manager;
+struct Manager;
 }
 
 namespace gearoenix::render::engine {
-class Engine;
+struct Engine;
 }
 
 namespace gearoenix::render::scene {
-class Scene;
-/// This is a helper class to display Gearoenix logo for loading
+struct Scene;
+/// This is a helper struct to display Gearoenix logo for loading
 ///
-/// You can use this class to display Gearoenix logo for loading other scene.
+/// You can use this struct to display Gearoenix logo for loading other scene.
 /// It can be used for cut scenes and starting scene and on the other hand it can be a good acknowledgement for
 /// this project
-class Logo final {
+struct Logo final {
 public:
     typedef std::function<void(const std::vector<std::shared_ptr<Scene>>&)> FinishCallback;
     typedef std::vector<std::pair<double, std::variant<core::Id, std::string>>> PriorityIds;
@@ -62,7 +62,7 @@ private:
 public:
     ~Logo() noexcept;
     static std::shared_ptr<Logo> construct(
-        system::Application* sys_app,
+        platform::Application* sys_app,
         PriorityIds next_scenes_priority_id,
         FinishCallback on_finished) noexcept;
     /// Hide the Logo scene

@@ -1,8 +1,9 @@
 #include "gx-vk-txt-main-target.hpp"
-#ifdef GX_USE_VULKAN
+#ifdef GX_RENDER_VULKAN_ENABLED
 #include "../../core/asset/gx-cr-asset-manager.hpp"
-#include "../../core/event/gx-cr-ev-engine.hpp"
-#include "../../system/gx-sys-application.hpp"
+#include "../../core/macro/gx-cr-mcr-assert.hpp"
+#include "../../core/macro/gx-cr-mcr-zeroer.hpp"
+#include "../../platform/gx-plt-application.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "../gx-vk-check.hpp"
@@ -40,9 +41,9 @@ gearoenix::vulkan::texture::MainTarget::MainTarget(const MainTarget& o) noexcept
 gearoenix::vulkan::texture::MainTarget::MainTarget(memory::Manager& mem_mgr, engine::Engine* e) noexcept
     : render::texture::Target(core::asset::Manager::create_id(), e)
 {
-    const auto* const sys_app = e->get_system_application();
-    clipping_width = static_cast<unsigned int>(sys_app->get_event_engine()->get_window_width());
-    clipping_height = static_cast<unsigned int>(sys_app->get_event_engine()->get_window_height());
+    const auto* const plt_app = e->get_platform_application().get();
+    clipping_width = static_cast<unsigned int>(plt_app->get_base().get_window_width());
+    clipping_height = static_cast<unsigned int>(plt_app->get_base().get_window_height());
     const auto& logical_device = mem_mgr.get_logical_device();
     swapchain = std::make_shared<Swapchain>(logical_device);
     depth_stencil = image::View::create_depth_stencil(mem_mgr);

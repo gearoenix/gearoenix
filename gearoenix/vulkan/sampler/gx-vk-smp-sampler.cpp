@@ -1,6 +1,7 @@
 #include "gx-vk-smp-sampler.hpp"
-#ifdef GX_USE_VULKAN
-#include "../../system/gx-sys-log.hpp"
+#ifdef GX_RENDER_VULKAN_ENABLED
+#include "../../core/macro/gx-cr-mcr-zeroer.hpp"
+#include "../../platform/gx-plt-log.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../gx-vk-check.hpp"
 

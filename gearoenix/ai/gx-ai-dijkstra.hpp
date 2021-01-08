@@ -7,7 +7,7 @@
 #include <vector>
 
 namespace gearoenix::ai {
-class Dijkstra {
+struct Dijkstra {
     /// vertex->weight->index
     std::vector<std::map<int, int>> graph;
 

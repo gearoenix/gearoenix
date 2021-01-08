@@ -1,6 +1,6 @@
 #include "gx-rnd-mat-material.hpp"
 #include "../../core/asset/gx-cr-asset-manager.hpp"
-#include "../../system/gx-sys-application.hpp"
+#include "../../platform/gx-plt-application.hpp"
 #include "../buffer/gx-rnd-buf-framed-uniform.hpp"
 #include "../texture/gx-rnd-txt-manager.hpp"
 #include "../texture/gx-rnd-txt-texture-2d.hpp"
@@ -21,7 +21,7 @@ gearoenix::render::material::Material::Material(const Material& o) noexcept
 {
 }
 
-float gearoenix::render::material::Material::read_alpha(system::stream::Stream* const f) noexcept
+float gearoenix::render::material::Material::read_alpha(platform::stream::Stream* const f) noexcept
 {
     if (f->read_bool()) {
         return 1.0f;
@@ -32,10 +32,10 @@ float gearoenix::render::material::Material::read_alpha(system::stream::Stream* 
 
 std::pair<std::shared_ptr<gearoenix::render::texture::Texture2D>, std::optional<gearoenix::math::Vec4<float>>>
 gearoenix::render::material::Material::read_t2d_v4(
-    system::stream::Stream* const f,
+    platform::stream::Stream* const f,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) const noexcept
 {
-    auto* const txt_mgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
+    auto* const txt_mgr = e->get_platform_application()->get_asset_manager()->get_texture_manager();
     if (f->read_bool()) {
         core::sync::EndCaller<texture::Texture> txt_call([end](const std::shared_ptr<texture::Texture>&) {});
         return std::make_pair(std::dynamic_pointer_cast<texture::Texture2D>(txt_mgr->get_gx3d(f->read<core::Id>(), txt_call)), std::nullopt);
@@ -49,10 +49,10 @@ gearoenix::render::material::Material::read_t2d_v4(
 
 std::pair<std::shared_ptr<gearoenix::render::texture::Texture2D>, std::optional<gearoenix::math::Vec3<float>>>
 gearoenix::render::material::Material::read_t2d_v3(
-    system::stream::Stream* const f,
+    platform::stream::Stream* const f,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) const noexcept
 {
-    auto* const txt_mgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
+    auto* const txt_mgr = e->get_platform_application()->get_asset_manager()->get_texture_manager();
     if (f->read_bool()) {
         core::sync::EndCaller<texture::Texture> txt_call([end](const std::shared_ptr<texture::Texture>&) {});
         return std::make_pair(std::dynamic_pointer_cast<texture::Texture2D>(txt_mgr->get_gx3d(f->read<core::Id>(), txt_call)), std::nullopt);
@@ -66,10 +66,10 @@ gearoenix::render::material::Material::read_t2d_v3(
 
 std::pair<std::shared_ptr<gearoenix::render::texture::Texture2D>, std::optional<gearoenix::math::Vec2<float>>>
 gearoenix::render::material::Material::read_t2d_v2(
-    system::stream::Stream* const f,
+    platform::stream::Stream* const f,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) const noexcept
 {
-    auto* const txt_mgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
+    auto* const txt_mgr = e->get_platform_application()->get_asset_manager()->get_texture_manager();
     if (f->read_bool()) {
         core::sync::EndCaller<texture::Texture> txt_call([end](const std::shared_ptr<texture::Texture>&) {});
         return std::make_pair(std::dynamic_pointer_cast<texture::Texture2D>(txt_mgr->get_gx3d(f->read<core::Id>(), txt_call)), std::nullopt);
@@ -84,7 +84,7 @@ gearoenix::render::material::Material::read_t2d_v2(
 gearoenix::render::material::Material::~Material() noexcept = default;
 
 gearoenix::render::material::Material* gearoenix::render::material::Material::read(
-    system::stream::Stream* const f,
+    platform::stream::Stream* const f,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept
 {

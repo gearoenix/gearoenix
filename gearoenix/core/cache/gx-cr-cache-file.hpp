@@ -1,31 +1,31 @@
 #ifndef GEAROENIX_CORE_CACHE_FILE_HPP
 #define GEAROENIX_CORE_CACHE_FILE_HPP
-#include "../../system/gx-sys-log.hpp"
-#include "../../system/stream/gx-sys-stm-stream.hpp"
+#include "../../platform/gx-plt-log.hpp"
+#include "../../platform/stream/gx-plt-stm-stream.hpp"
 #include "../gx-cr-build-configuration.hpp"
 #include "../gx-cr-static.hpp"
 #include "gx-cr-cache-cacher.hpp"
 
 namespace gearoenix::core::cache {
-template <class T>
-class File {
+template <typename T>
+struct File {
 public:
     typedef std::map<Id, Offset> IdOffsetMap;
     GX_GET_REF_PRV(Cacher<T>, cacher)
-    GX_GET_UCPTR_PRV(system::stream::Stream, file)
+    GX_GET_UCPTR_PRV(platform::stream::Stream, file)
     GX_GET_CREF_PRV(IdOffsetMap, offsets)
 
 public:
-    explicit File(std::unique_ptr<system::stream::Stream> file) noexcept;
-    template <class C>
+    explicit File(std::unique_ptr<platform::stream::Stream> file) noexcept;
+    template <typename C>
     std::shared_ptr<C> get(Id id, std::function<std::shared_ptr<C>(std::string)> new_fun) noexcept;
-    template <class C>
+    template <typename C>
     std::shared_ptr<C> get(Id id) const noexcept;
 };
 }
 
-template <class T>
-gearoenix::core::cache::File<T>::File(std::unique_ptr<system::stream::Stream> f) noexcept
+template <typename T>
+gearoenix::core::cache::File<T>::File(std::unique_ptr<platform::stream::Stream> f) noexcept
     : file(std::move(f))
 {
     if (file != nullptr) {
@@ -41,8 +41,8 @@ gearoenix::core::cache::File<T>::File(std::unique_ptr<system::stream::Stream> f)
     }
 }
 
-template <class T>
-template <class C>
+template <typename T>
+template <typename C>
 std::shared_ptr<C> gearoenix::core::cache::File<T>::get(const Id id, std::function<std::shared_ptr<C>(std::string)> new_fun) noexcept
 {
     std::function<std::shared_ptr<C>()> fn_new = [new_fun, this, id] {
@@ -60,8 +60,8 @@ std::shared_ptr<C> gearoenix::core::cache::File<T>::get(const Id id, std::functi
     return cacher.get(id, fn_new);
 }
 
-template <class T>
-template <class C>
+template <typename T>
+template <typename C>
 inline std::shared_ptr<C> gearoenix::core::cache::File<T>::get(const Id id) const noexcept
 {
     return cacher.template get<C>(id);

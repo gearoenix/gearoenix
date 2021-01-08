@@ -44,7 +44,7 @@ gearoenix::physics::collider::Collider::Collider(const Collider& o) noexcept
 {
 }
 
-gearoenix::physics::collider::Collider* gearoenix::physics::collider::Collider::read(system::stream::Stream* const f) noexcept
+gearoenix::physics::collider::Collider* gearoenix::physics::collider::Collider::read(platform::stream::Stream* const f) noexcept
 {
     switch (f->read<Type>()) {
     case Type::Ghost:
@@ -73,7 +73,7 @@ gearoenix::math::IntersectionStatus gearoenix::physics::collider::Collider::chec
 
 gearoenix::physics::collider::Collider* gearoenix::physics::collider::Collider::clone() const noexcept
 {
-    GX_UNIMPLEMENTED // It's never going to be implemented, the inherited class must do it.
+    GX_UNIMPLEMENTED // It's never going to be implemented, the inherited struct must do it.
 }
 
 void gearoenix::physics::collider::Collider::put_in_box(const math::Aabb3& b) noexcept

@@ -7,17 +7,17 @@
 #include "../texture/gx-rnd-txt-face.hpp"
 #include <memory>
 
-namespace gearoenix::system::stream {
-class Stream;
+namespace gearoenix::platform::stream {
+struct Stream;
 }
 
 namespace gearoenix::render::engine {
-class Engine;
+struct Engine;
 }
 
 namespace gearoenix::render::mesh {
-class Mesh;
-class Manager {
+struct Mesh;
+struct Manager {
 private:
     engine::Engine* const e;
     core::cache::File<Mesh> cache;
@@ -28,7 +28,7 @@ private:
     std::map<texture::Face, std::weak_ptr<Mesh>> face_squares;
 
 public:
-    Manager(std::unique_ptr<system::stream::Stream> s, engine::Engine* e) noexcept;
+    Manager(std::unique_ptr<platform::stream::Stream> s, engine::Engine* e) noexcept;
     ~Manager() noexcept = default;
     [[nodiscard]] std::shared_ptr<Mesh> get_gx3d(core::Id id, core::sync::EndCaller<Mesh>& c) noexcept;
     [[nodiscard]] std::shared_ptr<Mesh> create_icosphere(core::sync::EndCaller<Mesh>& c) noexcept;

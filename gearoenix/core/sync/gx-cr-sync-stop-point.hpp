@@ -6,8 +6,8 @@
 #include <mutex>
 
 namespace gearoenix::core::sync {
-class Semaphore;
-class StopPoint {
+struct Semaphore;
+struct StopPoint {
 private:
     const std::shared_ptr<Semaphore> sem;
     const int stopper;

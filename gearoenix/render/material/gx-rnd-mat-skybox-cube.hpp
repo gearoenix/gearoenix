@@ -4,7 +4,7 @@
 #include "gx-rnd-mat-material.hpp"
 
 namespace gearoenix::render::material {
-class SkyboxCube final : public Material {
+struct SkyboxCube final : public Material {
 public:
     struct Uniform {
         float alpha = 1.0f;
@@ -15,7 +15,7 @@ public:
     GX_GET_CREF_PRV(Uniform, uniform)
 public:
     SkyboxCube(engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept;
-    SkyboxCube(system::stream::Stream* f, engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept;
+    SkyboxCube(platform::stream::Stream* f, engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& end) noexcept;
     ~SkyboxCube() noexcept final;
     void update() noexcept final;
     void set_color(

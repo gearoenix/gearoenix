@@ -172,7 +172,7 @@ struct Vec3 {
         case static_cast<T>(2):
             return z;
         default:
-            GXLOGF("Out of range index. " << i)
+            GX_LOG_F("Out of range index. " << i)
         }
     }
 
@@ -188,7 +188,7 @@ struct Vec3 {
         case static_cast<T>(2):
             return z;
         default:
-            GXLOGF("Out of range index. " << i)
+            GX_LOG_F("Out of range index. " << i)
         }
     }
 
@@ -369,11 +369,11 @@ struct Vec3 {
         return sample_vec.normalized();
     }
 
-    void read(system::stream::Stream* f) noexcept
+    void read(platform::stream::Stream& f) noexcept
     {
-        x = static_cast<Element>(f->read<float>());
-        y = static_cast<Element>(f->read<float>());
-        z = static_cast<Element>(f->read<float>());
+        x = static_cast<Element>(f.read<float>());
+        y = static_cast<Element>(f.read<float>());
+        z = static_cast<Element>(f.read<float>());
     }
 
     friend std::ostream& operator<<(std::ostream& os, const Vec3<Element>& v) noexcept

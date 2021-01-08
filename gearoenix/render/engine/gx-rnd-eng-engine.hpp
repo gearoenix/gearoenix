@@ -1,11 +1,8 @@
 #ifndef GEAROENIX_RENDER_ENGINE_ENGINE_HPP
 #define GEAROENIX_RENDER_ENGINE_ENGINE_HPP
-//#include "../../core/gx-cr-build-configuration.hpp"
-//#include "../../core/gx-cr-static.hpp"
-//#include "../../core/gx-cr-types.hpp"
-//#include "../../core/sync/gx-cr-sync-end-caller.hpp"
-//#include "../texture/gx-rnd-txt-attachment.hpp"
+#include "../../core/sync/gx-cr-sync-end-caller.hpp"
 #include "../gx-rnd-runtime-configuration.hpp"
+#include "../texture/gx-rnd-txt-attachment.hpp"
 #include "gx-rnd-eng-limitations.hpp"
 #include "gx-rnd-eng-type.hpp"
 #include <chrono>
@@ -37,7 +34,7 @@ namespace gearoenix::platform {
 struct Application;
 }
 
-namespace gearoenix::system::stream {
+namespace gearoenix::platform::stream {
 struct Stream;
 }
 
@@ -94,28 +91,12 @@ struct Engine {
     //    GX_GET_UPTR_PRT(core::sync::KernelWorkers, kernels)
     //    GX_GET_UPTR_PRT(core::sync::UpdateManager, update_manager)
     //    GX_GET_UPTR_PRT(physics::Engine, physics_engine)
-    //    GX_GET_UPTR_PRT(pipeline::Manager, pipeline_manager)
-    //    GX_GET_UPTR_PRT(command::Manager, command_manager)
-    //    GX_GET_CREF_PRT(std::shared_ptr<buffer::Manager>, buffer_manager)
-    //    GX_GET_CREF_PRT(std::shared_ptr<texture::Target>, main_render_target)
-    //    GX_GET_CREF_PRT(Limitations, limitations)
+    GX_GET_CREF_PRT(Limitations, limitations)
     GX_GET_VAL_PRT(unsigned int, frames_count, 2)
     GX_GET_VAL_PRT(unsigned int, frame_number, 0)
     GX_GET_VAL_PRT(unsigned int, frame_number_from_start, 0)
     GX_GET_VAL_PRT(double, delta_time, 0.0f)
-    // It is not owned by engine and the user who had set this, must delete it.
-    // In addition, this design is temporary and in next version of engine it is going to be changed.
-    //
-    // TODO: This is (design/mechanism) going to change in far future
-    // game developer must keep all the render-trees by himself/herself
-    // Then every thing based on the following must be chose by render-trees:
-    //   - Type of object/scene (e.g. UI, GAME, MODEL, Widget, etc)
-    //   - Tagging the objects or meshes that must be rendered by which render-tree
-    // This is going to add a great flexibility in render engine
-    //
-    // The other way of accomplishing of this functionality is to create a render-tree
-    // that is composed with several other render-trees
-    //    GX_GETSET_PTR_PRT(graph::tree::Tree, render_tree)
+
 protected:
     //    GX_CREATE_GUARD(late_delete_assets)
     //    std::vector<std::vector<std::shared_ptr<core::asset::Asset>>> late_delete_assets;

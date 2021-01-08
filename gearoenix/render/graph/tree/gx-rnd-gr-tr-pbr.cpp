@@ -2,7 +2,7 @@
 #include "../../../core/asset/gx-cr-asset-manager.hpp"
 #include "../../../core/sync/gx-cr-sync-kernel-workers.hpp"
 #include "../../../physics/gx-phs-engine.hpp"
-#include "../../../system/gx-sys-application.hpp"
+#include "../../../platform/gx-plt-application.hpp"
 #include "../../camera/gx-rnd-cmr-perspective.hpp"
 #include "../../engine/gx-rnd-eng-engine.hpp"
 #include "../../light/gx-rnd-lt-cascade-info.hpp"

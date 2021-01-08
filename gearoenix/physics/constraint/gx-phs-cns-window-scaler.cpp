@@ -1,9 +1,9 @@
 #include "gx-phs-cns-window-scaler.hpp"
 #include "../../core/event/gx-cr-ev-engine.hpp"
+#include "../../platform/gx-plt-application.hpp"
 #include "../../render/engine/gx-rnd-eng-engine.hpp"
 #include "../../render/model/gx-rnd-mdl-model.hpp"
 #include "../../render/model/gx-rnd-mdl-transformation.hpp"
-#include "../../system/gx-sys-application.hpp"
 
 void gearoenix::physics::constraint::WindowScaler::update() noexcept
 {
@@ -25,7 +25,7 @@ void gearoenix::physics::constraint::WindowScaler::update() noexcept
 
 gearoenix::physics::constraint::WindowScaler::WindowScaler(const core::Id id, std::string name, render::engine::Engine* const e) noexcept
     : Constraint(id, Type::WindowScaler, std::move(name))
-    , event_engine(e->get_system_application()->get_event_engine())
+    , event_engine(e->get_platform_application()->get_event_engine())
 {
 }
 

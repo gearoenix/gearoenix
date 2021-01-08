@@ -1,5 +1,5 @@
 #include "gx-rnd-rfl-type.hpp"
-#include "../../system/gx-sys-log.hpp"
+#include "../../platform/gx-plt-log.hpp"
 
 namespace gearoenix::render::reflection {
 std::ostream& operator<<(std::ostream& os, const Type t) noexcept

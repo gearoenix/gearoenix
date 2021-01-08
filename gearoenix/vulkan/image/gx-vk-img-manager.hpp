@@ -1,27 +1,28 @@
 #ifndef GEAROENIX_VULKAN_IMAGE_MANAGER_HPP
 #define GEAROENIX_VULKAN_IMAGE_MANAGER_HPP
-#include "../../core/gx-cr-build-configuration.hpp"
-#ifdef GX_USE_VULKAN
-#include "../../core/gx-cr-static.hpp"
+#include "../../render/gx-rnd-build-configuration.hpp"
+#ifdef GX_RENDER_VULKAN_ENABLED
+#include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../../core/sync/gx-cr-sync-end-caller.hpp"
+#include "../../platform/macro/gx-plt-mcr-lock.hpp"
 #include <tuple>
 #include <vector>
 
 namespace gearoenix::vulkan::buffer {
-class Buffer;
+struct Buffer;
 }
 
 namespace gearoenix::vulkan::command {
-class Buffer;
+struct Buffer;
 }
 
 namespace gearoenix::vulkan::engine {
-class Engine;
+struct Engine;
 }
 
 namespace gearoenix::vulkan::image {
-class Image;
-class Manager final {
+struct Image;
+struct Manager final {
 private:
     GX_CREATE_GUARD(upload_images)
     std::vector<std::tuple<

@@ -1,6 +1,6 @@
 #include "gx-rnd-cmr-orthographic.hpp"
 #include "../../physics/collider/gx-phs-cld-frustum.hpp"
-#include "../../system/gx-sys-application.hpp"
+#include "../../platform/gx-plt-application.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "gx-rnd-cmr-transformation.hpp"
 #include "gx-rnd-cmr-uniform.hpp"
@@ -24,7 +24,7 @@ void gearoenix::render::camera::Orthographic::update_aspects_size() noexcept
 
 void gearoenix::render::camera::Orthographic::update_cascades() noexcept
 {
-    const system::Configuration& sys_conf = render_engine->get_system_application()->get_configuration();
+    const platform::Configuration& sys_conf = render_engine->get_platform_application()->get_configuration();
     const engine::Configuration& eng_conf = sys_conf.get_render();
     const auto sections_count = static_cast<std::size_t>(static_cast<std::uint8_t>(eng_conf.get_shadow_cascades_count()));
     const auto sections_count_plus = sections_count + 1;
@@ -68,7 +68,7 @@ void gearoenix::render::camera::Orthographic::update_cascades() noexcept
 gearoenix::render::camera::Orthographic::Orthographic(
     const core::Id my_id,
     std::string name,
-    system::stream::Stream* const f,
+    platform::stream::Stream* const f,
     engine::Engine* const e) noexcept
     : Camera(my_id, std::move(name), f, e)
 {

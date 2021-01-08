@@ -1,6 +1,6 @@
 #include "gx-cr-sync-channeled-workers.hpp"
 #ifndef GX_THREAD_NOT_SUPPORTED
-#include "../../system/gx-sys-log.hpp"
+#include "../../platform/gx-plt-log.hpp"
 
 void gearoenix::core::sync::ChanneledWorkers::Thread::kernel() noexcept
 {

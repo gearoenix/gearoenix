@@ -5,28 +5,28 @@
 #include "../../core/sync/gx-cr-sync-end-caller.hpp"
 #include "gx-rnd-sky-type.hpp"
 
-namespace gearoenix::system::stream {
-class Stream;
+namespace gearoenix::platform::stream {
+struct Stream;
 }
 
 namespace gearoenix::render::material {
-class Material;
+struct Material;
 }
 
 namespace gearoenix::render::mesh {
-class Mesh;
+struct Mesh;
 }
 
 namespace gearoenix::render::engine {
-class Engine;
+struct Engine;
 }
 
 namespace gearoenix::render::reflection {
-class Baked;
+struct Baked;
 }
 
 namespace gearoenix::render::skybox {
-class Skybox : public core::asset::Asset {
+struct Skybox : public core::asset::Asset {
     GX_GET_CREF_PRT(std::shared_ptr<mesh::Mesh>, msh)
     GX_GET_CREF_PRT(std::shared_ptr<reflection::Baked>, baked_reflection)
     GX_GET_CREF_PRT(std::shared_ptr<material::Material>, mat)
@@ -37,7 +37,7 @@ protected:
     engine::Engine* const e;
     void init(const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
 
-    Skybox(Type t, core::Id id, std::string name, system::stream::Stream* s, engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+    Skybox(Type t, core::Id id, std::string name, platform::stream::Stream* s, engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
     Skybox(Type t, core::Id id, std::string name, engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
 
 public:

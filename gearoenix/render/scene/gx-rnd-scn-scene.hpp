@@ -13,11 +13,11 @@
 #include <vector>
 
 namespace gearoenix::audio {
-class Audio;
+struct Audio;
 }
 
 namespace gearoenix::core::event {
-class Event;
+struct Event;
 }
 
 namespace gearoenix::math {
@@ -28,66 +28,66 @@ namespace gearoenix::physics::accelerator {
 struct Bvh;
 }
 namespace gearoenix::physics::body {
-class Body;
-class Rigid;
+struct Body;
+struct Rigid;
 }
 namespace gearoenix::physics::collider {
-class Collider;
+struct Collider;
 }
 namespace gearoenix::physics::constraint {
-class Constraint;
+struct Constraint;
 }
 
-namespace gearoenix::system {
-class File;
+namespace gearoenix::platform {
+struct File;
 }
 
 namespace gearoenix::render::buffer {
-class FramedUniform;
+struct FramedUniform;
 }
 
 namespace gearoenix::render::camera {
-class Camera;
+struct Camera;
 }
 
 namespace gearoenix::render::engine {
-class Engine;
+struct Engine;
 }
 
 namespace gearoenix::render::light {
-class Light;
-class Directional;
+struct Light;
+struct Directional;
 }
 
 namespace gearoenix::render::material {
-class Material;
+struct Material;
 }
 
 namespace gearoenix::render::mesh {
-class Mesh;
+struct Mesh;
 }
 
 namespace gearoenix::render::model {
-class Model;
-class Manager;
+struct Model;
+struct Manager;
 }
 
 namespace gearoenix::render::reflection {
-class Baked;
-class Reflection;
-class Runtime;
+struct Baked;
+struct Reflection;
+struct Runtime;
 }
 
 namespace gearoenix::render::skybox {
-class Skybox;
+struct Skybox;
 }
 
 namespace gearoenix::render::texture {
-class Texture2D;
+struct Texture2D;
 }
 
 namespace gearoenix::render::scene {
-class Scene : public core::asset::Asset {
+struct Scene : public core::asset::Asset {
 public:
     using MapAudio = std::map<core::Id, std::shared_ptr<audio::Audio>>;
     using MapCamera = std::map<core::Id, std::shared_ptr<camera::Camera>>;
@@ -132,7 +132,7 @@ protected:
         core::Id my_id,
         std::string name,
         Type t,
-        system::stream::Stream* f,
+        platform::stream::Stream* f,
         engine::Engine* e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
 

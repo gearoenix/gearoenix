@@ -4,13 +4,13 @@
 #include <memory>
 
 namespace gearoenix::render::engine {
-class Engine;
+struct Engine;
 }
 
 namespace gearoenix::render::camera {
-class Camera;
-class Transformation;
-class JetController final : public core::event::Listener {
+struct Camera;
+struct Transformation;
+struct JetController final : public core::event::Listener {
 private:
     Transformation* const trn;
     engine::Engine* const render_engine;

@@ -42,7 +42,7 @@ struct Mat4x4 {
     {
     }
 
-    explicit Mat4x4(system::stream::Stream* const f) noexcept
+    explicit Mat4x4(platform::stream::Stream* const f) noexcept
     {
         read(f);
     }
@@ -275,7 +275,7 @@ struct Mat4x4 {
         }
     }
 
-    void read(system::stream::Stream* const f) noexcept
+    void read(platform::stream::Stream* const f) noexcept
     {
         for (auto& r : data)
             for (auto& c : r)

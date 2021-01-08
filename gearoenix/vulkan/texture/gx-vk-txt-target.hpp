@@ -1,29 +1,29 @@
 #ifndef GEAROENIX_VULKAN_TEXTURE_TARGET_HPP
 #define GEAROENIX_VULKAN_TEXTURE_TARGET_HPP
-#include "../../core/gx-cr-build-configuration.hpp"
-#ifdef GX_USE_VULKAN
+#include "../../render/gx-rnd-build-configuration.hpp"
+#ifdef GX_RENDER_VULKAN_ENABLED
 #include "../../core/sync/gx-cr-sync-end-caller.hpp"
 #include "../../render/texture/gx-rnd-txt-target.hpp"
 
 namespace gearoenix::vulkan {
-class Framebuffer;
-class RenderPass;
+struct Framebuffer;
+struct RenderPass;
 }
 
 namespace gearoenix::vulkan::engine {
-class Engine;
+struct Engine;
 }
 
 namespace gearoenix::vulkan::memory {
-class Manager;
+struct Manager;
 }
 
 namespace gearoenix::vulkan::sync {
-class Semaphore;
+struct Semaphore;
 }
 
 namespace gearoenix::vulkan::texture {
-class Target final : public render::texture::Target {
+struct Target final : public render::texture::Target {
     GX_GET_CREF_PRV(std::shared_ptr<RenderPass>, render_pass)
     GX_GET_CREF_PRV(std::shared_ptr<sync::Semaphore>, start_semaphore)
     GX_GET_CREF_PRV(std::shared_ptr<sync::Semaphore>, end_semaphore)

@@ -7,20 +7,20 @@
 #include "../gx-vk-linker.hpp"
 namespace gearoenix {
 namespace core {
-    class Application;
+    struct Application;
 }
 namespace render {
     namespace device {
-        class Logical;
+        struct Logical;
     }
     namespace descriptor {
-        class SetLayout;
+        struct SetLayout;
     }
-    class RenderPass;
+    struct RenderPass;
     namespace pipeline {
-        class Cache;
-        class Layout;
-        class Pipeline : public core::cache::Cached {
+        struct Cache;
+        struct Layout;
+        struct Pipeline : public core::cache::Cached {
         private:
             shader::Id sid;
             device::Logical* dev;

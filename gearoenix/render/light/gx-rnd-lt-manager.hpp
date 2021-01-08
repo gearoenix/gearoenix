@@ -6,23 +6,23 @@
 #include "../../core/sync/gx-cr-sync-end-caller.hpp"
 #include <memory>
 
-namespace gearoenix::system::stream {
-class Stream;
+namespace gearoenix::platform::stream {
+struct Stream;
 }
 
 namespace gearoenix::render::engine {
-class Engine;
+struct Engine;
 }
 
 namespace gearoenix::render::light {
-class Light;
-class Manager {
+struct Light;
+struct Manager {
 protected:
     engine::Engine* const e;
     core::cache::File<Light> cache;
 
 public:
-    Manager(std::unique_ptr<system::stream::Stream> s, engine::Engine* e) noexcept;
+    Manager(std::unique_ptr<platform::stream::Stream> s, engine::Engine* e) noexcept;
     ~Manager() noexcept = default;
     std::shared_ptr<Light> get_gx3d(core::Id mid, core::sync::EndCaller<Light>& c) noexcept;
     template <typename T>

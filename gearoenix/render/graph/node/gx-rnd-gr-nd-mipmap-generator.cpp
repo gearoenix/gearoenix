@@ -1,7 +1,7 @@
 #include "gx-rnd-gr-nd-mipmap-generator.hpp"
 #include "../../../core/asset/gx-cr-asset-manager.hpp"
 #include "../../../core/sync/gx-cr-sync-kernel-workers.hpp"
-#include "../../../system/gx-sys-application.hpp"
+#include "../../../platform/gx-plt-application.hpp"
 #include "../../buffer/gx-rnd-buf-manager.hpp"
 #include "../../buffer/gx-rnd-buf-uniform.hpp"
 #include "../../command/gx-rnd-cmd-buffer.hpp"

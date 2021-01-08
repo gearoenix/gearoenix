@@ -134,7 +134,7 @@ void gearoenix::core::event::Engine::check_window_size_state_timeout() noexcept
         return;
     broadcast(Data(
         Id::SystemWindowSizeChange,
-        system::WindowSizeChangeData {
+        platform::WindowSizeChangeData {
             .previous_width = previous_window_width,
             .previous_height = previous_window_height,
             .previous_reversed_half_width = previous_window_reversed_half_width,

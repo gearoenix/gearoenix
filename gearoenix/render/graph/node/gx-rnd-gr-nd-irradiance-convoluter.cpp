@@ -2,7 +2,7 @@
 #include "../../../core/asset/gx-cr-asset-manager.hpp"
 #include "../../../core/sync/gx-cr-sync-kernel-workers.hpp"
 #include "../../../physics/collider/gx-phs-cld-collider.hpp"
-#include "../../../system/gx-sys-application.hpp"
+#include "../../../platform/gx-plt-application.hpp"
 #include "../../buffer/gx-rnd-buf-manager.hpp"
 #include "../../buffer/gx-rnd-buf-uniform.hpp"
 #include "../../camera/gx-rnd-cmr-camera.hpp"
@@ -70,7 +70,7 @@ gearoenix::render::graph::node::IrradianceConvoluter::IrradianceConvoluter(
 {
     uniform->set_data(mvp);
     core::sync::EndCaller<mesh::Mesh> mesh_call([call](const std::shared_ptr<mesh::Mesh>&) {});
-    cube_mesh = e->get_system_application()->get_asset_manager()->get_mesh_manager()->create_inward_cube(mesh_call);
+    cube_mesh = e->get_platform_application()->get_asset_manager()->get_mesh_manager()->create_inward_cube(mesh_call);
     set_providers_count(input_textures.size());
     for (auto& f : frames) {
         f = std::make_unique<IrradianceConvoluterFrame>(e, render_pipeline.get());

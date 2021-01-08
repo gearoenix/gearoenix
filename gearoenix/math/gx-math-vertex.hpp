@@ -11,8 +11,8 @@ struct BasicVertex {
 
     BasicVertex() noexcept = default;
     BasicVertex(const Vec3<float>& position, const Vec3<float>& normal, const Vec4<float>& tangent, const Vec2<float>& uv) noexcept;
-    explicit BasicVertex(system::stream::Stream* f) noexcept;
-    void read(system::stream::Stream* f) noexcept;
+    explicit BasicVertex(platform::stream::Stream& f) noexcept;
+    void read(platform::stream::Stream& f) noexcept;
 
     friend std::ostream& operator<<(std::ostream& os, const BasicVertex& v) noexcept
     {

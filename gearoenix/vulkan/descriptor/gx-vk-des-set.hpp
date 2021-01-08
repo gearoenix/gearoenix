@@ -7,15 +7,15 @@
 namespace gearoenix {
 namespace render {
     namespace command {
-        class Buffer;
+        struct Buffer;
     }
     namespace pipeline {
-        class Pipeline;
+        struct Pipeline;
     }
     namespace descriptor {
-        class SetLayout;
-        class Pool;
-        class Set : public core::cache::Cached {
+        struct SetLayout;
+        struct Pool;
+        struct Set : public core::cache::Cached {
         private:
             Pool* pool;
             VkDescriptorSetLayout layout;

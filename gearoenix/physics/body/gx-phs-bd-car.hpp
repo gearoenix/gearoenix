@@ -9,11 +9,11 @@
 #include <vector>
 
 namespace gearoenix::render::model {
-class Dynamic;
+struct Dynamic;
 }
 
 namespace gearoenix::physics::body {
-class Car : public Body {
+struct Car : public Body {
 public:
     struct Wheel {
         /// The amount of weight on the wheel

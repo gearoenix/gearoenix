@@ -6,21 +6,21 @@
 #include "../../core/sync/gx-cr-sync-end-caller.hpp"
 
 namespace gearoenix::render::engine {
-class Engine;
+struct Engine;
 }
 
-namespace gearoenix::system::stream {
-class Stream;
+namespace gearoenix::platform::stream {
+struct Stream;
 }
 
 namespace gearoenix::physics::constraint {
-class Constraint;
-class Manager {
+struct Constraint;
+struct Manager {
     GX_GET_CPTR_PRV(render::engine::Engine, e)
     GX_GET_CREF_PRV(core::cache::File<Constraint>, cache)
 
 public:
-    Manager(std::unique_ptr<system::stream::Stream> s, render::engine::Engine* e) noexcept;
+    Manager(std::unique_ptr<platform::stream::Stream> s, render::engine::Engine* e) noexcept;
     ~Manager() noexcept;
     std::shared_ptr<Constraint> get_gx3d(core::Id mid, core::sync::EndCaller<Constraint>& c) noexcept;
     template <typename T>

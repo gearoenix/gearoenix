@@ -7,21 +7,21 @@
 #include "gx-rnd-mdl-model.hpp"
 #include <memory>
 
-namespace gearoenix::system::stream {
-class Stream;
+namespace gearoenix::platform::stream {
+struct Stream;
 }
 
 namespace gearoenix::render::engine {
-class Engine;
+struct Engine;
 }
 
 namespace gearoenix::render::model {
-class Manager {
+struct Manager {
     GX_GET_CPTR_PRV(engine::Engine, e)
     GX_GET_CREF_PRV(core::cache::File<Model>, cache)
 
 public:
-    Manager(std::unique_ptr<system::stream::Stream> s, engine::Engine* e) noexcept;
+    Manager(std::unique_ptr<platform::stream::Stream> s, engine::Engine* e) noexcept;
     ~Manager() noexcept = default;
     [[nodiscard]] std::shared_ptr<Model> get_gx3d(core::Id mid, core::sync::EndCaller<Model>& c) noexcept;
     [[nodiscard]] std::shared_ptr<Model> get_gx3d(const std::string& name, core::sync::EndCaller<Model>& c) noexcept;

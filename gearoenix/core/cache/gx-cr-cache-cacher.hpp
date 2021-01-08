@@ -1,6 +1,6 @@
 #ifndef GEAROENIX_CORE_CACHE_CACHER_HPP
 #define GEAROENIX_CORE_CACHE_CACHER_HPP
-#include "../../system/gx-sys-log.hpp"
+#include "../../platform/gx-plt-log.hpp"
 #include "../gx-cr-static.hpp"
 #include "../gx-cr-types.hpp"
 #include <functional>
@@ -12,8 +12,8 @@
 #include <variant>
 
 namespace gearoenix::core::cache {
-template <class T, class Key = Id, class Compare = std::less<Key>>
-class Cacher {
+template <typename T, struct Key = Id, struct Compare = std::less<Key>>
+struct Cacher {
 public:
     typedef std::map<Key, std::weak_ptr<T>, Compare> CacheMap;
     typedef std::map<std::string, Key> NameKeyMap;
@@ -23,13 +23,13 @@ public:
     GX_GET_CREF_PRV(NameKeyMap, name_to_key)
     GX_GET_CREF_PRV(KeyNameMap, key_to_name)
 public:
-    template <class C>
+    template <typename C>
     std::shared_ptr<C> get(const std::string& name, const std::function<std::shared_ptr<C>()>& new_fun) noexcept;
-    template <class C>
+    template <typename C>
     std::shared_ptr<C> get(const Key& id, const std::function<std::shared_ptr<C>()>& new_fun) noexcept;
-    template <class C>
+    template <typename C>
     std::shared_ptr<C> get(const std::string& name) const noexcept;
-    template <class C>
+    template <typename C>
     std::shared_ptr<C> get(const Key& id) const noexcept;
     void register_name(const std::string& name, const Key& k) noexcept;
     Key get_key(const std::string& name) const noexcept;
@@ -37,15 +37,15 @@ public:
 };
 }
 
-template <class T, class Key, class Compare>
-template <class C>
+template <typename T, struct Key, struct Compare>
+template <typename C>
 std::shared_ptr<C> gearoenix::core::cache::Cacher<T, Key, Compare>::get(const std::string& name, const std::function<std::shared_ptr<C>()>& new_fun) noexcept
 {
     return get(get_key(name), new_fun);
 }
 
-template <class T, class Key, class Compare>
-template <class C>
+template <typename T, struct Key, struct Compare>
+template <typename C>
 std::shared_ptr<C> gearoenix::core::cache::Cacher<T, Key, Compare>::get(const Key& id, const std::function<std::shared_ptr<C>()>& new_fun) noexcept
 {
     auto search = cacheds.find(id);
@@ -66,15 +66,15 @@ std::shared_ptr<C> gearoenix::core::cache::Cacher<T, Key, Compare>::get(const Ke
     }
 }
 
-template <class T, class Key, class Compare>
-template <class C>
+template <typename T, struct Key, struct Compare>
+template <typename C>
 std::shared_ptr<C> gearoenix::core::cache::Cacher<T, Key, Compare>::get(const std::string& name) const noexcept
 {
     return get(get_key(name));
 }
 
-template <class T, class Key, class Compare>
-template <class C>
+template <typename T, struct Key, struct Compare>
+template <typename C>
 std::shared_ptr<C> gearoenix::core::cache::Cacher<T, Key, Compare>::get(const Key& id) const noexcept
 {
     const auto search = cacheds.find(id);
@@ -88,7 +88,7 @@ std::shared_ptr<C> gearoenix::core::cache::Cacher<T, Key, Compare>::get(const Ke
     }
 }
 
-template <class T, class Key, class Compare>
+template <typename T, struct Key, struct Compare>
 void gearoenix::core::cache::Cacher<T, Key, Compare>::register_name(const std::string& name, const Key& k) noexcept
 {
 #ifdef GX_DEBUG_MODE
@@ -105,7 +105,7 @@ void gearoenix::core::cache::Cacher<T, Key, Compare>::register_name(const std::s
     key_to_name.emplace(k, name);
 }
 
-template <class T, class Key, class Compare>
+template <typename T, struct Key, struct Compare>
 Key gearoenix::core::cache::Cacher<T, Key, Compare>::get_key(const std::string& name) const noexcept
 {
     const auto search = name_to_key.find(name);
@@ -114,7 +114,7 @@ Key gearoenix::core::cache::Cacher<T, Key, Compare>::get_key(const std::string& 
     return search->second;
 }
 
-template <class T, class Key, class Compare>
+template <typename T, struct Key, struct Compare>
 std::optional<Key>
 gearoenix::core::cache::Cacher<T, Key, Compare>::try_get_key(const std::string& name) const noexcept
 {

@@ -1,8 +1,8 @@
 #include "gx-rnd-mdl-model.hpp"
 #include "../../core/asset/gx-cr-asset-manager.hpp"
 #include "../../physics/collider/gx-phs-cld-ghost.hpp"
-#include "../../system/gx-sys-application.hpp"
-#include "../../system/stream/gx-sys-stm-asset.hpp"
+#include "../../platform/gx-plt-application.hpp"
+#include "../../platform/stream/gx-plt-stm-asset.hpp"
 #include "../buffer/gx-rnd-buf-framed-uniform.hpp"
 #include "../camera/gx-rnd-cmr-camera.hpp"
 #include "../material/gx-rnd-mat-material.hpp"
@@ -23,7 +23,7 @@ gearoenix::render::model::Model::Model(
     const core::Id my_id,
     std::string name,
     const Type t,
-    system::stream::Stream* const f,
+    platform::stream::Stream* const f,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : core::asset::Asset(my_id, core::asset::Type::Model, std::move(name))
@@ -47,7 +47,7 @@ gearoenix::render::model::Model::Model(
     if (children_ids.empty())
         return;
     core::sync::EndCaller<Model> call([c](const std::shared_ptr<Model>&) {});
-    Manager* const mgr = e->get_system_application()->get_asset_manager()->get_model_manager();
+    Manager* const mgr = e->get_platform_application()->get_asset_manager()->get_model_manager();
     for (core::Id c_id : children_ids) {
         children[c_id] = mgr->get_gx3d(c_id, call);
     }
@@ -187,7 +187,7 @@ void gearoenix::render::model::Model::clear_reflection() noexcept
         core::sync::EndCaller<texture::TextureCube> call([this](const std::shared_ptr<texture::TextureCube>& t) {
             set_reflection(t.get(), t.get());
         });
-        (void)e->get_system_application()->get_asset_manager()->get_texture_manager()->get_cube_zero_3c(call);
+        (void)e->get_platform_application()->get_asset_manager()->get_texture_manager()->get_cube_zero_3c(call);
         for (const auto& m : children)
             m.second->clear_reflection();
     } else {

@@ -6,10 +6,10 @@
 namespace gearoenix {
 namespace render {
     namespace device {
-        class Logical;
+        struct Logical;
     }
     namespace descriptor {
-        class Pool {
+        struct Pool {
         private:
             device::Logical* logical_device;
             VkDescriptorPool vulkan_data;

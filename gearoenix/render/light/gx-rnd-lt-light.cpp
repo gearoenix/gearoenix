@@ -22,7 +22,7 @@ void gearoenix::render::light::Light::add_to_shadow_cascaders() const noexcept
 gearoenix::render::light::Light::Light(
     const core::Id my_id,
     std::string name,
-    system::stream::Stream* const f,
+    platform::stream::Stream* const f,
     engine::Engine* const e,
     const Type light_type) noexcept
     : core::asset::Asset(my_id, core::asset::Type::Light, std::move(name))

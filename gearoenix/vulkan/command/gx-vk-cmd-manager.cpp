@@ -1,5 +1,5 @@
 #include "gx-vk-cmd-manager.hpp"
-#ifdef GX_USE_VULKAN
+#ifdef GX_RENDER_VULKAN_ENABLED
 #include "../device/gx-vk-dev-logical.hpp"
 #include "gx-vk-cmd-buffer.hpp"
 #include "gx-vk-cmd-pool.hpp"

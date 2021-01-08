@@ -1,7 +1,7 @@
 #include "gx-rnd-gr-nd-forward-pbr.hpp"
 #include "../../../core/asset/gx-cr-asset-manager.hpp"
 #include "../../../core/sync/gx-cr-sync-kernel-workers.hpp"
-#include "../../../system/gx-sys-application.hpp"
+#include "../../../platform/gx-plt-application.hpp"
 #include "../../buffer/gx-rnd-buf-manager.hpp"
 #include "../../buffer/gx-rnd-buf-uniform.hpp"
 #include "../../camera/gx-rnd-cmr-camera.hpp"
@@ -100,7 +100,7 @@ gearoenix::render::graph::node::ForwardPbr::ForwardPbr(
     for (auto& f : frames) {
         f = std::make_unique<ForwardPbrFrame>(e);
     }
-    auto* const txt_mgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
+    auto* const txt_mgr = e->get_platform_application()->get_asset_manager()->get_texture_manager();
     core::sync::EndCaller<texture::TextureCube> txt_cube_call([call](const std::shared_ptr<texture::TextureCube>&) {});
     core::sync::EndCaller<texture::Texture2D> txt_2d_call([call](const std::shared_ptr<texture::Texture2D>&) {});
 

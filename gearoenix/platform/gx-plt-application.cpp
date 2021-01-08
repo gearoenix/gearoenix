@@ -1,8 +1,9 @@
 #include "gx-plt-application.hpp"
 #include "gx-plt-log.hpp"
 
-gearoenix::platform::BaseApplication::BaseApplication(const RuntimeConfiguration& configuration) noexcept
+gearoenix::platform::BaseApplication::BaseApplication(GX_MAIN_ENTRY_ARGS_DEF, const RuntimeConfiguration& configuration) noexcept
     : configuration(configuration)
+    , arguments(GX_MAIN_ENTRY_ARGS)
 {
     if (!configuration.get_fullscreen()) {
         initialize_window_size(

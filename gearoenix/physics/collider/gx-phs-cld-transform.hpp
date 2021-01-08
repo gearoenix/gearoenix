@@ -3,7 +3,7 @@
 #include "gx-phs-cld-collider.hpp"
 
 namespace gearoenix::physics::collider {
-class Transform final : public Collider {
+struct Transform final : public Collider {
 public:
     GX_GETSET_CREF_PRV(math::Mat4x4<double>, matrix)
     GX_GET_REF_PRV(math::Aabb3, limit)

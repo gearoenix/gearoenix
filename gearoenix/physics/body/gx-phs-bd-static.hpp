@@ -3,7 +3,7 @@
 #include "gx-phs-bd-body.hpp"
 
 namespace gearoenix::physics::body {
-class Static : public Body {
+struct Static : public Body {
 private:
     double friction;
     double bounciness;

@@ -10,7 +10,7 @@
 #include <vector>
 
 namespace gearoenix::core::sync {
-class KernelWorkers;
+struct KernelWorkers;
 }
 
 namespace gearoenix::physics::animation {

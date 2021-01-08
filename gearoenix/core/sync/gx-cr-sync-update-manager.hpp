@@ -3,8 +3,8 @@
 #include "gx-cr-sync-influence-manager.hpp"
 
 namespace gearoenix::core::sync {
-class KernelWorkers;
-class UpdateManager {
+struct KernelWorkers;
+struct UpdateManager {
 private:
     InfluenceManager influence_manager;
     sync::KernelWorkers* const workers;

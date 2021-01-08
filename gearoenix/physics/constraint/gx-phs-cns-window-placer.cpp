@@ -1,9 +1,9 @@
 #include "gx-phs-cns-window-placer.hpp"
 #include "../../core/event/gx-cr-ev-engine.hpp"
+#include "../../platform/gx-plt-application.hpp"
 #include "../../render/engine/gx-rnd-eng-engine.hpp"
 #include "../../render/model/gx-rnd-mdl-model.hpp"
 #include "../../render/model/gx-rnd-mdl-transformation.hpp"
-#include "../../system/gx-sys-application.hpp"
 
 void gearoenix::physics::constraint::WindowPlacer::update() noexcept
 {
@@ -16,7 +16,7 @@ void gearoenix::physics::constraint::WindowPlacer::update() noexcept
 gearoenix::physics::constraint::WindowPlacer::WindowPlacer(const core::Id id, std::string name, render::engine::Engine* const e) noexcept
     : Constraint(id, Type::WindowPlacer, std::move(name))
     , distance([] { return math::Vec2(0.0); })
-    , event_engine(e->get_system_application()->get_event_engine())
+    , event_engine(e->get_platform_application()->get_event_engine())
 {
     event_engine->add_listener(core::event::Id::SystemWindowSizeChange, 0.0, this);
 }

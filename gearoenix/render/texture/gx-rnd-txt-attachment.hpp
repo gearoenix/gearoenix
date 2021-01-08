@@ -15,9 +15,9 @@ enum struct UsageFlag : core::TypeId {
     Stencil = 4,
 };
 
-class Texture;
-class TextureCube;
-class Texture2D;
+struct Texture;
+struct TextureCube;
+struct Texture2D;
 
 struct Attachment2D {
     std::shared_ptr<Texture2D> txt;

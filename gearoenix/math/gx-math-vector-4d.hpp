@@ -78,7 +78,7 @@ struct Vec4 {
         case static_cast<T>(3):
             return w;
         default:
-            GXLOGF("Out of bound index: " << i)
+            GX_LOG_F("Out of bound index: " << i)
         }
     }
 
@@ -96,7 +96,7 @@ struct Vec4 {
         case static_cast<T>(3):
             return w;
         default:
-            GXLOGF("Out of bound index: " << i)
+            GX_LOG_F("Out of bound index: " << i)
         }
     }
 
@@ -185,12 +185,12 @@ struct Vec4 {
         *this /= length();
     }
 
-    void read(system::stream::Stream* f) noexcept
+    void read(platform::stream::Stream& f) noexcept
     {
-        x = static_cast<Element>(f->read<float>());
-        y = static_cast<Element>(f->read<float>());
-        z = static_cast<Element>(f->read<float>());
-        w = static_cast<Element>(f->read<float>());
+        x = static_cast<Element>(f.read<float>());
+        y = static_cast<Element>(f.read<float>());
+        z = static_cast<Element>(f.read<float>());
+        w = static_cast<Element>(f.read<float>());
     }
 
     [[nodiscard]] const Element* data() const noexcept

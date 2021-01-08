@@ -8,7 +8,7 @@
 #include <vector>
 
 namespace gearoenix::core::event {
-class Engine;
+struct Engine;
 }
 
 namespace gearoenix::physics::animation {
@@ -16,15 +16,15 @@ struct Animation;
 }
 
 namespace gearoenix::render::font {
-class Font2D;
+struct Font2D;
 }
 
 namespace gearoenix::render::material {
-class Unlit;
+struct Unlit;
 }
 
 namespace gearoenix::render::model {
-class Dynamic;
+struct Dynamic;
 }
 
 namespace gearoenix::render::widget {
@@ -43,7 +43,7 @@ struct EditTheme {
     double cursor_state_time = 0.125;
     double cursor_blink_time = 0.125;
 };
-class Edit final : public Widget, public core::event::Listener {
+struct Edit final : public Widget, public core::event::Listener {
     GX_GET_CPTR_PRV(core::event::Engine, event_engine)
     GX_GET_CREF_PRV(std::shared_ptr<font::Font2D>, text_font)
     GX_GET_CREF_PRV(std::wstring, text)
@@ -87,7 +87,7 @@ private:
     Edit(
         core::Id id,
         std::string name,
-        system::stream::Stream* f,
+        platform::stream::Stream* f,
         engine::Engine* e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
     Edit(
@@ -106,7 +106,7 @@ public:
     [[nodiscard]] static std::shared_ptr<Edit> construct(
         core::Id id,
         std::string name,
-        system::stream::Stream* f,
+        platform::stream::Stream* f,
         engine::Engine* e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
     [[nodiscard]] static std::shared_ptr<Edit> construct(

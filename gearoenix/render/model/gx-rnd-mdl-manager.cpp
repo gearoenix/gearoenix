@@ -4,7 +4,7 @@
 #include "gx-rnd-mdl-static.hpp"
 #include "gx-rnd-mdl-type.hpp"
 
-gearoenix::render::model::Manager::Manager(std::unique_ptr<system::stream::Stream> s, engine::Engine* const e) noexcept
+gearoenix::render::model::Manager::Manager(std::unique_ptr<platform::stream::Stream> s, engine::Engine* const e) noexcept
     : e(e)
     , cache(std::move(s))
 {
@@ -15,7 +15,7 @@ std::shared_ptr<gearoenix::render::model::Model> gearoenix::render::model::Manag
     std::shared_ptr<Model> m = cache.get<Model>(
         id, [id, c, this](std::string name) noexcept -> std::shared_ptr<Model> {
             GXLOGD("Going to load Model: " << id)
-            system::stream::Stream* const f = cache.get_file();
+            platform::stream::Stream* const f = cache.get_file();
             const auto t = f->read<Type>();
             const core::sync::EndCaller<core::sync::EndCallerIgnore> call([c] {});
             switch (t) {

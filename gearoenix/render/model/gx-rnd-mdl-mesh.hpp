@@ -4,29 +4,29 @@
 #include "../../core/sync/gx-cr-sync-end-caller.hpp"
 #include <memory>
 
-namespace gearoenix::system::stream {
-class Stream;
+namespace gearoenix::platform::stream {
+struct Stream;
 }
 
 namespace gearoenix::render::engine {
-class Engine;
+struct Engine;
 }
 
 namespace gearoenix::render::material {
-class Material;
+struct Material;
 }
 
 namespace gearoenix::render::mesh {
-class Mesh;
+struct Mesh;
 }
 
 namespace gearoenix::render::model {
-class Mesh {
+struct Mesh {
     GX_GET_CREF_PRV(std::shared_ptr<mesh::Mesh>, msh)
     GX_GET_CREF_PRV(std::shared_ptr<material::Material>, mat)
 public:
     Mesh(
-        system::stream::Stream* f,
+        platform::stream::Stream* f,
         engine::Engine* e,
         const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
 

@@ -4,7 +4,7 @@
 gearoenix::render::model::Static::Static(
     const core::Id my_id,
     std::string name,
-    system::stream::Stream* const f,
+    platform::stream::Stream* const f,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : Model(my_id, std::move(name), Type::Static, f, e, c)
@@ -29,7 +29,7 @@ gearoenix::render::model::Static::Static(
 std::shared_ptr<gearoenix::render::model::Static> gearoenix::render::model::Static::construct(
     const core::Id id,
     std::string name,
-    system::stream::Stream* const f,
+    platform::stream::Stream* const f,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
 {

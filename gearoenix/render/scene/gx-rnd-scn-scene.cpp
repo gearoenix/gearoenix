@@ -6,7 +6,7 @@
 #include "../../physics/collider/gx-phs-cld-aabb.hpp"
 #include "../../physics/constraint/gx-phs-cns-constraint.hpp"
 #include "../../physics/constraint/gx-phs-cns-manager.hpp"
-#include "../../system/gx-sys-application.hpp"
+#include "../../platform/gx-plt-application.hpp"
 #include "../buffer/gx-rnd-buf-framed-uniform.hpp"
 #include "../camera/gx-rnd-cmr-camera.hpp"
 #include "../camera/gx-rnd-cmr-manager.hpp"
@@ -37,7 +37,7 @@ static const std::shared_ptr<gearoenix::render::reflection::Reflection> null_ref
         static_accelerator(new gearoenix::physics::accelerator::Bvh()),                            \
         dynamic_accelerator(new gearoenix::physics::accelerator::Bvh()),                           \
         e(e),                                                                                      \
-        model_manager(e->get_system_application()->get_asset_manager()->get_model_manager())
+        model_manager(e->get_platform_application()->get_asset_manager()->get_model_manager())
 
 gearoenix::render::scene::Scene::Scene(
     const core::Id id,
@@ -53,12 +53,12 @@ gearoenix::render::scene::Scene::Scene(
     const core::Id id,
     std::string name,
     const Type t,
-    system::stream::Stream* const f,
+    platform::stream::Stream* const f,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : GX_SCENE_INIT
 {
-    auto* const astmgr = e->get_system_application()->get_asset_manager();
+    auto* const astmgr = e->get_platform_application()->get_asset_manager();
 #define GX_HELPER(x, n, cls)                                                            \
     {                                                                                   \
         auto* const mgr = astmgr->get_##x##_manager();                                  \
@@ -281,7 +281,7 @@ void gearoenix::render::scene::Scene::add_shadow_cascader(const core::Id light_i
     if (search == lights.end()) {
         core::sync::EndCaller<light::Light> call([](const std::shared_ptr<light::Light>&) {});
         shadow_cascader_lights[light_id] = std::dynamic_pointer_cast<light::Directional>(
-            e->get_system_application()->get_asset_manager()->get_light_manager()->get_gx3d(light_id, call));
+            e->get_platform_application()->get_asset_manager()->get_light_manager()->get_gx3d(light_id, call));
     } else {
         shadow_cascader_lights[search->first] = std::dynamic_pointer_cast<light::Directional>(search->second);
         lights.erase(search);

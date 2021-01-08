@@ -6,7 +6,7 @@ gearoenix::render::widget::Widget::Widget(
     const core::Id my_id,
     std::string name,
     const Type t,
-    system::stream::Stream* const s,
+    platform::stream::Stream* const s,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : model::Model(my_id, std::move(name), model::Type::Widget, s, e, c)
@@ -30,7 +30,7 @@ gearoenix::render::widget::Widget::~Widget() noexcept = default;
 std::shared_ptr<gearoenix::render::widget::Widget> gearoenix::render::widget::Widget::read_gx3d(
     const core::Id my_id,
     std::string name,
-    system::stream::Stream* const f,
+    platform::stream::Stream* const f,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
 {

@@ -1,6 +1,6 @@
 #include "gx-rnd-rfl-runtime.hpp"
 #include "../../core/asset/gx-cr-asset-manager.hpp"
-#include "../../system/gx-sys-application.hpp"
+#include "../../platform/gx-plt-application.hpp"
 #include "../camera/gx-rnd-cmr-manager.hpp"
 #include "../camera/gx-rnd-cmr-perspective.hpp"
 #include "../camera/gx-rnd-cmr-transformation.hpp"
@@ -45,7 +45,7 @@ gearoenix::render::reflection::Runtime::Runtime(
         .texture_type = texture::Type::TextureCube,
         .has_mipmap = true,
     };
-    auto* const sys_app = e->get_system_application();
+    auto* const sys_app = e->get_platform_application();
     auto* const ast_mgr = sys_app->get_asset_manager();
     auto* const txt_mgr = ast_mgr->get_texture_manager();
     auto* const cam_mgr = ast_mgr->get_camera_manager();

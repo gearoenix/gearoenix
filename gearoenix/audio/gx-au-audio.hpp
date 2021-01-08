@@ -3,18 +3,18 @@
 #include "../core/asset/gx-cr-asset.hpp"
 #include <memory>
 
-namespace gearoenix::system::stream {
-class Stream;
+namespace gearoenix::platform::stream {
+struct Stream;
 }
 namespace gearoenix::audio {
-class Audio : public core::asset::Asset {
+struct Audio : public core::asset::Asset {
 private:
 protected:
-    Audio(core::Id my_id, std::string name, const std::shared_ptr<system::stream::Stream>& f) noexcept;
+    Audio(core::Id my_id, std::string name, const std::shared_ptr<platform::stream::Stream>& f) noexcept;
 
 public:
     ~Audio() noexcept override;
-    [[nodiscard]] static Audio* read(core::Id my_id, std::string name, const std::shared_ptr<system::stream::Stream>& f) noexcept;
+    [[nodiscard]] static Audio* read(core::Id my_id, std::string name, const std::shared_ptr<platform::stream::Stream>& f) noexcept;
 };
 }
 #endif

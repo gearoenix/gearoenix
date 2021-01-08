@@ -1,48 +1,53 @@
 #ifndef GEAROENIX_VULKAN_BUFFER_MANAGER_HPP
 #define GEAROENIX_VULKAN_BUFFER_MANAGER_HPP
-#include "../../core/gx-cr-build-configuration.hpp"
-#ifdef GX_USE_VULKAN
-#include "../../core/gx-cr-static.hpp"
-#include "../../render/buffer/gx-rnd-buf-manager.hpp"
+#include "../../render/gx-rnd-build-configuration.hpp"
+#ifdef GX_RENDER_VULKAN_ENABLED
+#include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
+#include "../../math/gx-math-vertex.hpp"
+#include "gx-vk-buf-static.hpp"
+#include "gx-vk-buf-uniform.hpp"
 
 namespace gearoenix::vulkan::engine {
-class Engine;
+struct Engine;
 }
 
 namespace gearoenix::vulkan::image {
-class Image;
+struct Image;
 }
 
 namespace gearoenix::vulkan::memory {
-class Manager;
+struct Manager;
 }
 
 namespace gearoenix::vulkan::buffer {
-class Buffer;
-class Static;
-class Uniform;
-class Manager final : public render::buffer::Manager {
-    GX_GET_REFC_PRV(std::shared_ptr<memory::Manager>, memory_manager)
+struct Manager final {
+    GX_GET_PTR_PRV(memory::Manager, memory_manager)
+    GX_GET_PTRC_PRV(engine::Engine, e)
 private:
-    /// These buffers will take care of their life time and there is no need for weak pointer of self
-    const std::vector<std::shared_ptr<Buffer>> per_frame_cpu_root_buffers;
-    const std::shared_ptr<Buffer> upload_root_buffer;
-    const std::shared_ptr<Buffer> gpu_root_buffer;
+    std::vector<Buffer> per_frame_cpu_root_buffers;
+    Buffer upload_root_buffer;
+    Buffer gpu_root_buffer;
 
-    std::vector<std::tuple<std::shared_ptr<Uniform>, std::shared_ptr<Static>>> copy_buffers;
-    std::vector<std::tuple<std::shared_ptr<Uniform>, std::shared_ptr<image::Image>>> copy_images;
+    std::vector<std::pair<Uniform, Static*>> copy_buffers;
+    std::vector<std::pair<Uniform, image::Image*>> copy_images;
 
-    [[nodiscard]] std::vector<std::shared_ptr<Buffer>> create_per_frame_cpu_root_buffers() const noexcept;
-    [[nodiscard]] std::shared_ptr<render::buffer::Static> create_static(std::size_t size, const void* data) noexcept;
+    [[nodiscard]] std::vector<Buffer> create_per_frame_cpu_root_buffers() const noexcept;
+    [[nodiscard]] Static create_static(std::size_t size, const void* data) noexcept;
 
 public:
-    Manager(std::shared_ptr<memory::Manager> memory_manager, engine::Engine* eng) noexcept;
-    ~Manager() noexcept final;
-    [[nodiscard]] std::shared_ptr<render::buffer::Uniform> create_uniform(std::size_t size, std::size_t frame_number) noexcept final;
-    [[nodiscard]] std::shared_ptr<render::buffer::Static> create_static(const std::vector<math::BasicVertex>& vertices, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept final;
-    [[nodiscard]] std::shared_ptr<render::buffer::Static> create_static(const std::vector<std::uint32_t>& indices, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept final;
-    [[nodiscard]] std::shared_ptr<buffer::Buffer> create_upload_buffer(std::size_t size) noexcept;
+    Manager(memory::Manager* memory_manager, engine::Engine* e) noexcept;
+    ~Manager() noexcept;
+    [[nodiscard]] Uniform create_uniform(std::size_t size, std::size_t frame_number) noexcept;
+    template <typename T>
+    [[nodiscard]] Static create_static(const std::vector<T>& data) noexcept;
 };
 }
+
+template <typename T>
+gearoenix::vulkan::buffer::Static gearoenix::vulkan::buffer::Manager::create_static(const std::vector<T>& data) noexcept
+{
+    return create_static(data.size() * sizeof(std::remove_reference<decltype(data)>::type::value_type), data.data());
+}
+
 #endif
 #endif

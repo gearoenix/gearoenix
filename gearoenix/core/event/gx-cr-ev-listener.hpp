@@ -3,7 +3,7 @@
 #include "gx-cr-ev-event.hpp"
 
 namespace gearoenix::core::event {
-class Listener {
+struct Listener {
 public:
     virtual ~Listener() noexcept = default;
     /// If it returns true no more process on event will happen

@@ -1,7 +1,7 @@
 #ifndef GEAROENIX_CORE_ASSET_MANAGER_HPP
 #define GEAROENIX_CORE_ASSET_MANAGER_HPP
-#include "../gx-cr-static.hpp"
 #include "../gx-cr-types.hpp"
+#include "../macro/gx-cr-mcr-getter-setter.hpp"
 #include "../sync/gx-cr-sync-end-caller.hpp"
 #include <memory>
 #include <string>
@@ -10,71 +10,71 @@
 #endif
 
 namespace gearoenix::audio {
-class Manager;
+struct Manager;
 }
 
 namespace gearoenix::physics::constraint {
-class Manager;
+struct Manager;
 }
 
 namespace gearoenix::render::camera {
-class Manager;
+struct Manager;
 }
 
 namespace gearoenix::render::engine {
-class Engine;
+struct Engine;
 }
 
 namespace gearoenix::render::font {
-class Manager;
+struct Manager;
 }
 
 namespace gearoenix::render::light {
-class Manager;
+struct Manager;
 }
 
 namespace gearoenix::render::mesh {
-class Manager;
+struct Manager;
 }
 
 namespace gearoenix::render::model {
-class Manager;
+struct Manager;
 }
 
 namespace gearoenix::render::reflection {
-class Manager;
+struct Manager;
 }
 
 namespace gearoenix::render::skybox {
-class Manager;
+struct Manager;
 }
 
 namespace gearoenix::render::scene {
-class Manager;
+struct Manager;
 }
 
 namespace gearoenix::render::texture {
-class Manager;
+struct Manager;
 }
 
-namespace gearoenix::system {
-class Application;
+namespace gearoenix::platform {
+struct Application;
 }
 
-namespace gearoenix::system::stream {
-class Asset;
+namespace gearoenix::platform::stream {
+struct Asset;
 }
 
 namespace gearoenix::core::cache {
-template <class T>
-class File;
+template <typename T>
+struct File;
 }
 
 namespace gearoenix::core::asset {
-class Manager {
-    GX_GET_CPTR_PRV(system::Application, sys_app)
+struct Manager {
+    GX_GET_CPTR_PRV(platform::Application, sys_app)
     GX_GET_CPTR_PRV(render::engine::Engine, render_engine)
-    GX_GET_UCPTR_PRV(system::stream::Asset, file)
+    GX_GET_UCPTR_PRV(platform::stream::Asset, file)
     GX_GET_UPTR_PRV(render::camera::Manager, camera_manager)
     GX_GET_UPTR_PRV(audio::Manager, audio_manager)
     GX_GET_UPTR_PRV(render::light::Manager, light_manager)
@@ -94,7 +94,7 @@ private:
 #endif
 
 public:
-    Manager(system::Application* sys_app, const std::string& file) noexcept;
+    Manager(platform::Application* sys_app, const std::string& file) noexcept;
     ~Manager() noexcept;
     static Id create_id() noexcept;
 };

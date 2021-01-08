@@ -3,12 +3,12 @@
 #include "../../../core/gx-cr-static.hpp"
 
 namespace gearoenix::render::engine {
-class Engine;
+struct Engine;
 }
 
 namespace gearoenix::render::graph::tree {
 
-class Tree {
+struct Tree {
 protected:
     engine::Engine* const e;
     explicit Tree(engine::Engine* const e) noexcept

@@ -1,9 +1,9 @@
 #include "gx-rnd-txt-manager.hpp"
 #include "../../core/asset/gx-cr-asset-manager.hpp"
 #include "../../core/gx-cr-string.hpp"
-#include "../../system/gx-sys-application.hpp"
-#include "../../system/stream/gx-sys-stm-asset.hpp"
-#include "../../system/stream/gx-sys-stm-local.hpp"
+#include "../../platform/gx-plt-application.hpp"
+#include "../../platform/stream/gx-plt-stm-asset.hpp"
+#include "../../platform/stream/gx-plt-stm-local.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "gx-rnd-txt-image.hpp"
 #include "gx-rnd-txt-texture-2d.hpp"
@@ -15,7 +15,7 @@
 
 std::vector<std::uint8_t> gearoenix::render::texture::Manager::read_gx3d_image(
     const TextureFormat format,
-    system::stream::Stream* const s) noexcept
+    platform::stream::Stream* const s) noexcept
 {
     std::vector<std::uint8_t> data;
     s->read(data);
@@ -52,7 +52,7 @@ std::vector<std::uint8_t> gearoenix::render::texture::Manager::read_gx3d_image(
 std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::render::texture::Manager::read_gx3d(
     const core::Id id,
     std::string name,
-    system::stream::Stream* const s,
+    platform::stream::Stream* const s,
     core::sync::EndCaller<Texture>& c) noexcept
 {
     TextureInfo info {};
@@ -93,7 +93,7 @@ std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::render::texture:
     }
 }
 
-gearoenix::render::texture::Manager::Manager(std::unique_ptr<system::stream::Stream> s, engine::Engine* const e) noexcept
+gearoenix::render::texture::Manager::Manager(std::unique_ptr<platform::stream::Stream> s, engine::Engine* const e) noexcept
     : e(e)
     , cache(std::move(s))
 {
@@ -187,7 +187,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
 
 std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::get_brdflut(core::sync::EndCaller<Texture2D>& c) noexcept
 {
-    const auto resolution = e->get_system_application()->get_configuration().get_render().get_brdflut_resolution();
+    const auto resolution = e->get_platform_application()->get_configuration().get_render().get_brdflut_resolution();
     if (nullptr != brdflut)
         return brdflut;
     const TextureInfo texture_info {
@@ -201,8 +201,8 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
         .has_mipmap = true
     };
     {
-        const std::unique_ptr<system::stream::Asset> brdf_asset(
-            system::stream::Asset::construct(e->get_system_application(), "default-brdflut.png"));
+        const std::unique_ptr<platform::stream::Asset> brdf_asset(
+            platform::stream::Asset::construct(e->get_platform_application(), "default-brdflut.png"));
         if (brdf_asset != nullptr) {
             GXLOGD("BRDFLUT asset has been found.")
             const auto data = brdf_asset->get_file_content();
@@ -212,8 +212,8 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     }
     const auto baked_path = std::string("baked-brdflut-x") + std::to_string(resolution) + ".png";
     {
-        const std::unique_ptr<system::stream::Local> brdf_cached(system::stream::Local::open(
-            e->get_system_application(), baked_path));
+        const std::unique_ptr<platform::stream::Local> brdf_cached(platform::stream::Local::open(
+            e->get_platform_application(), baked_path));
         if (brdf_cached != nullptr) {
             GXLOGD("BRDFLUT baked file has been found.")
             const auto data = brdf_cached->get_file_content();
@@ -251,8 +251,8 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
             data[++data_index] = 255;
             ++data_index;
         }
-        const std::unique_ptr<system::stream::Local> brdf_baked(new system::stream::Local(
-            e->get_system_application(), baked_path, true));
+        const std::unique_ptr<platform::stream::Local> brdf_baked(new platform::stream::Local(
+            e->get_platform_application(), baked_path, true));
         Image::encode_png(brdf_baked.get(), data.data(), resolution, resolution, 4);
     }
     const auto data_size = pixels.size() * sizeof(math::Vec2<float>);
@@ -367,8 +367,8 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     const SamplerInfo& sample_info,
     const bool relative_path) noexcept
 {
-    const std::unique_ptr<system::stream::Asset> file(system::stream::Asset::construct(
-        e->get_system_application(), file_address, relative_path));
+    const std::unique_ptr<platform::stream::Asset> file(platform::stream::Asset::construct(
+        e->get_platform_application(), file_address, relative_path));
     if (file == nullptr)
         GXLOGF("Texture file " << file_address << " not found.")
     file->set_endian_compatibility(true);
@@ -456,7 +456,7 @@ std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::render::text
 std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::render::texture::Manager::get_gx3d(const core::Id id, core::sync::EndCaller<Texture>& c) noexcept
 {
     std::shared_ptr<Texture> o = cache.get<Texture>(id, [this, id, &c](std::string name) noexcept {
-        system::stream::Stream* const f = cache.get_file();
+        platform::stream::Stream* const f = cache.get_file();
         return read_gx3d(id, std::move(name), f, c);
     });
     c.set_data(o);
@@ -465,7 +465,7 @@ std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::render::texture:
 
 std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::render::texture::Manager::read_gx3d(
     std::string name,
-    system::stream::Stream* const s,
+    platform::stream::Stream* const s,
     core::sync::EndCaller<Texture>& c) noexcept
 {
     const auto id = core::asset::Manager::create_id();

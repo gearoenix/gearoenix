@@ -9,24 +9,24 @@
 #include <vector>
 
 namespace gearoenix::render::buffer {
-class Uniform;
+struct Uniform;
 }
 
 namespace gearoenix::render::camera {
-class Camera;
+struct Camera;
 }
 
 namespace gearoenix::render::command {
-class Buffer;
+struct Buffer;
 }
 
 namespace gearoenix::render::model {
-class Model;
-class Mesh;
+struct Model;
+struct Mesh;
 }
 
 namespace gearoenix::render::pipeline {
-class UnlitResourceSet;
+struct UnlitResourceSet;
 }
 
 namespace gearoenix::render::graph::node {
@@ -55,7 +55,7 @@ struct UnlitFrame {
     ~UnlitFrame() noexcept;
 };
 
-class Unlit final : public Node {
+struct Unlit final : public Node {
 private:
     std::vector<std::unique_ptr<UnlitFrame>> frames;
     UnlitFrame* frame = nullptr;

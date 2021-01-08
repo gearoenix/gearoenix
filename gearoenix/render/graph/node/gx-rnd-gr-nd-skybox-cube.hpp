@@ -9,28 +9,28 @@
 #include <vector>
 
 namespace gearoenix::render::buffer {
-class Uniform;
+struct Uniform;
 }
 
 namespace gearoenix::render::camera {
-class Camera;
+struct Camera;
 }
 
 namespace gearoenix::render::command {
-class Buffer;
+struct Buffer;
 }
 
 namespace gearoenix::render::model {
-class Model;
-class Mesh;
+struct Model;
+struct Mesh;
 }
 
 namespace gearoenix::render::skybox {
-class Cube;
+struct Cube;
 }
 
 namespace gearoenix::render::pipeline {
-class SkyboxCubeResourceSet;
+struct SkyboxCubeResourceSet;
 }
 
 namespace gearoenix::render::graph::node {
@@ -59,7 +59,7 @@ struct SkyboxCubeFrame {
     ~SkyboxCubeFrame() noexcept;
 };
 
-class SkyboxCube final : public Node {
+struct SkyboxCube final : public Node {
 private:
     std::vector<std::unique_ptr<SkyboxCubeFrame>> frames;
     SkyboxCubeFrame* frame = nullptr;

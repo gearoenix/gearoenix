@@ -8,12 +8,12 @@ gearoenix::math::BasicVertex::BasicVertex(const Vec3<float>& position, const Vec
 {
 }
 
-gearoenix::math::BasicVertex::BasicVertex(system::stream::Stream* const f) noexcept
+gearoenix::math::BasicVertex::BasicVertex(platform::stream::Stream& f) noexcept
 {
     read(f);
 }
 
-void gearoenix::math::BasicVertex::read(system::stream::Stream* const f) noexcept
+void gearoenix::math::BasicVertex::read(platform::stream::Stream& f) noexcept
 {
     position.read(f);
     normal.read(f);

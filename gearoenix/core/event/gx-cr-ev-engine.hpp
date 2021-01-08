@@ -25,12 +25,12 @@
 #endif
 
 namespace gearoenix::render::engine {
-class Engine;
+struct Engine;
 }
 
 namespace gearoenix::core::event {
-class Listener;
-class Engine {
+struct Listener;
+struct Engine {
 public:
     typedef std::map<button::MouseKeyId, Point2D> MouseStateMap;
     typedef std::map<touch::FingerId, Point2D> TouchStateMap;

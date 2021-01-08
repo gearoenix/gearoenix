@@ -4,7 +4,7 @@
 #include "gx-rnd-lt-type.hpp"
 #include <memory>
 
-gearoenix::render::light::Manager::Manager(std::unique_ptr<system::stream::Stream> s, engine::Engine* const e) noexcept
+gearoenix::render::light::Manager::Manager(std::unique_ptr<platform::stream::Stream> s, engine::Engine* const e) noexcept
     : e(e)
     , cache(std::move(s))
 {
@@ -14,7 +14,7 @@ std::shared_ptr<gearoenix::render::light::Light> gearoenix::render::light::Manag
     const core::Id id, core::sync::EndCaller<Light>& call) noexcept
 {
     auto l = cache.get<Light>(id, [id, call, this](std::string name) {
-        system::stream::Stream* const f = cache.get_file();
+        platform::stream::Stream* const f = cache.get_file();
         const auto t = f->read<Type>();
         switch (t) {
         case Type::Cone:

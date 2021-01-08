@@ -6,7 +6,7 @@
 #include "../../physics/animation/gx-phs-anm-manager.hpp"
 #include "../../physics/collider/gx-phs-cld-aabb.hpp"
 #include "../../physics/gx-phs-engine.hpp"
-#include "../../system/gx-sys-application.hpp"
+#include "../../platform/gx-plt-application.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "../font/gx-rnd-fnt-2d.hpp"
 #include "../font/gx-rnd-fnt-manager.hpp"
@@ -19,12 +19,12 @@
 #include <cmath>
 #include <string>
 
-#define GX_EDIT_INIT                                                   \
-    Widget(my_id, std::move(name), Type::Edit, e, c),                  \
-        event_engine(e->get_system_application()->get_event_engine()), \
-        text_material(new material::Unlit(e, c)),                      \
-        hint_text_material(new material::Unlit(e, c)),                 \
-        background_material(new material::Unlit(e, c)),                \
+#define GX_EDIT_INIT                                                     \
+    Widget(my_id, std::move(name), Type::Edit, e, c),                    \
+        event_engine(e->get_platform_application()->get_event_engine()), \
+        text_material(new material::Unlit(e, c)),                        \
+        hint_text_material(new material::Unlit(e, c)),                   \
+        background_material(new material::Unlit(e, c)),                  \
         cursor_material(new material::Unlit(e, c))
 
 void gearoenix::render::widget::Edit::init(const core::sync::EndCaller<core::sync::EndCallerIgnore>& end_call) noexcept
@@ -35,7 +35,7 @@ void gearoenix::render::widget::Edit::init(const core::sync::EndCaller<core::syn
 
     set_collider(std::make_unique<physics::collider::Aabb>(math::Vec3(1.0, 1.0, 0.001), math::Vec3(-1.0, -1.0, -0.001)));
 
-    auto* const ast_mgr = e->get_system_application()->get_asset_manager();
+    auto* const ast_mgr = e->get_platform_application()->get_asset_manager();
     auto* const msh_mgr = ast_mgr->get_mesh_manager();
     auto* const mdl_mgr = ast_mgr->get_model_manager();
     auto* const fnt_mgr = ast_mgr->get_font_manager();
@@ -122,7 +122,7 @@ void gearoenix::render::widget::Edit::on_scale() noexcept
         set_text(text);
     }
     auto cursor_scale = static_cast<double>(theme.cursor_width) * 0.5f;
-    cursor_scale /= static_cast<double>(e->get_system_application()->get_event_engine()->get_window_width());
+    cursor_scale /= static_cast<double>(e->get_platform_application()->get_event_engine()->get_window_width());
     cursor_scale /= cursor_model->get_collider()->get_current_local_scale()[0];
     cursor_model->get_transformation()->local_x_scale(cursor_scale);
 }
@@ -227,7 +227,7 @@ void gearoenix::render::widget::Edit::remove(const bool from_left, const core::s
 gearoenix::render::widget::Edit::Edit(
     const core::Id my_id,
     std::string name,
-    system::stream::Stream* const,
+    platform::stream::Stream* const,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : GX_EDIT_INIT {
@@ -261,7 +261,7 @@ gearoenix::render::widget::Edit::Edit(
 std::shared_ptr<gearoenix::render::widget::Edit> gearoenix::render::widget::Edit::construct(
     const core::Id id,
     std::string name,
-    system::stream::Stream* const f,
+    platform::stream::Stream* const f,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
 {
@@ -358,7 +358,7 @@ bool gearoenix::render::widget::Edit::on_event(const core::event::Data& d) noexc
                 const auto key = core::String::to_character(data.get_key(), shift_pressed);
                 if (key.has_value()) {
                     if (pressed_count == 2 && (event_engine->is_pressed(core::event::button::KeyboardKeyId::LeftControl) || event_engine->is_pressed(core::event::button::KeyboardKeyId::RightControl)) && event_engine->is_pressed(core::event::button::KeyboardKeyId::V)) {
-                        const char* const clipboard = e->get_system_application()->get_clipboard();
+                        const char* const clipboard = e->get_platform_application()->get_clipboard();
                         if (clipboard != nullptr) {
                             for (int i = 0; clipboard[i] != 0; ++i) {
                                 insert(clipboard[i]);
@@ -514,7 +514,7 @@ void gearoenix::render::widget::Edit::insert(
 
 void gearoenix::render::widget::Edit::selected(const math::Vec3<double>& point) noexcept
 {
-    e->get_system_application()->set_soft_keyboard_visibility(true);
+    e->get_platform_application()->set_soft_keyboard_visibility(true);
     if (text.empty())
         return;
     auto* const text_tran = text_model->get_transformation();

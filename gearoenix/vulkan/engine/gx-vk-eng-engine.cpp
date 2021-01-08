@@ -6,10 +6,9 @@
 #include "../../platform/gx-plt-application.hpp"
 #include "../../platform/gx-plt-log.hpp"
 //#include "../buffer/gx-vk-buf-buffer.hpp"
-//#include "../buffer/gx-vk-buf-manager.hpp"
+#include "../buffer/gx-vk-buf-manager.hpp"
 //#include "../command/gx-vk-cmd-buffer.hpp"
-//#include "../command/gx-vk-cmd-manager.hpp"
-//#include "../command/gx-vk-cmd-pool.hpp"
+#include "../command/gx-vk-cmd-manager.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../device/gx-vk-dev-physical.hpp"
 //#include "../gx-vk-check.hpp"
@@ -17,33 +16,33 @@
 #include "../gx-vk-surface.hpp"
 //#include "../gx-vk-loader.hpp"
 //#include "../image/gx-vk-img-image.hpp"
-//#include "../image/gx-vk-img-manager.hpp"
-//#include "../memory/gx-vk-mem-manager.hpp"
-//#include "../sampler/gx-vk-smp-manager.hpp"
-//#include "../sync/gx-vk-sync-semaphore.hpp"
+#include "../image/gx-vk-img-manager.hpp"
+#include "../memory/gx-vk-mem-manager.hpp"
+#include "../sampler/gx-vk-smp-manager.hpp"
+#include "../sync/gx-vk-sync-semaphore.hpp"
 //#include "../texture/gx-vk-txt-2d.hpp"
 //#include "../texture/gx-vk-txt-cube.hpp"
-//#include "../texture/gx-vk-txt-main-target.hpp"
+#include "../texture/gx-vk-txt-main-target.hpp"
 //#include "../texture/gx-vk-txt-target.hpp"
 
 gearoenix::vulkan::engine::Engine::Engine(
     const render::RuntimeConfiguration& configuration,
     std::shared_ptr<platform::Application> plt_app) noexcept
     : render::engine::Engine(configuration, std::move(plt_app), render::engine::Type::Vulkan)
+    , instance(std::make_shared<Instance>(platform_application))
+    , surface(std::make_shared<Surface>(instance, platform_application))
+    , physical_device(std::make_shared<device::Physical>(surface))
+    , logical_device(std::make_shared<device::Logical>(physical_device))
+    , memory_manager(logical_device)
 {
-    Loader::load();
-    instance = std::make_shared<Instance>(platform_application);
-    surface = std::make_shared<Surface>(instance, platform_application);
-    physical_device = std::make_shared<device::Physical>(surface);
-    logical_device = std::make_shared<device::Logical>(physical_device);
-    //    memory_manager = memory::Manager::construct(logical_device);
-    //    sampler_manager = std::make_shared<sampler::Manager>(logical_device);
-    //    command_manager = std::make_unique<command::Manager>(logical_device);
-    //    main_render_target = vulkan_main_render_target = std::make_shared<texture::MainTarget>(*memory_manager, this);
-    //    frames_count = static_cast<decltype(frames_count)>(vulkan_main_render_target->get_frames().size());
+    ;
+    sampler_manager = std::make_shared<sampler::Manager>(logical_device);
+    command_manager = std::make_unique<command::Manager>(logical_device);
+    main_render_target = vulkan_main_render_target = std::make_shared<texture::MainTarget>(memory_manager, this);
+    frames_count = static_cast<decltype(frames_count)>(vulkan_main_render_target->get_frames().size());
     // Buffer manager needs the number of frames
-    //    image_manager = std::make_shared<image::Manager>(this);
-    //    buffer_manager = vulkan_buffer_manager = std::make_unique<buffer::Manager>(memory_manager, this);
+    image_manager = std::make_shared<image::Manager>(this);
+    buffer_manager = vulkan_buffer_manager = std::make_shared<buffer::Manager>(memory_manager, this);
     //    upload_command_buffers.reserve(static_cast<std::size_t>(frames_count));
     //    upload_semaphore.reserve(static_cast<std::size_t>(frames_count));
     //    for (auto fi = decltype(frames_count) { 0 }; fi < frames_count; ++fi) {
@@ -341,7 +340,7 @@ void gearoenix::vulkan::engine::Engine::update() noexcept
 
 bool gearoenix::vulkan::engine::Engine::is_supported() noexcept
 {
-    GX_TODO
+    Loader::load();
     return true;
 }
 

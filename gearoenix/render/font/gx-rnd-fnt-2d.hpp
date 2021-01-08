@@ -9,12 +9,12 @@
 struct stbtt_fontinfo;
 
 namespace gearoenix::render::texture {
-class Manager;
-class Texture2D;
+struct Manager;
+struct Texture2D;
 }
 
 namespace gearoenix::render::font {
-class Font2D final : public Font {
+struct Font2D final : public Font {
 private:
     texture::Manager* const txt_mgr;
     std::vector<unsigned char> ttf_data;
@@ -33,7 +33,7 @@ public:
     Font2D(
         core::Id my_id,
         std::string name,
-        system::stream::Stream* f,
+        platform::stream::Stream* f,
         texture::Manager* txt_mgr) noexcept;
     [[nodiscard]] static std::shared_ptr<Font2D> construct_default(
         core::Id id,

@@ -1,5 +1,5 @@
 #include "gx-rnd-txt-texture-2d.hpp"
-#include "../../system/stream/gx-sys-stm-stream.hpp"
+#include "../../platform/stream/gx-plt-stm-stream.hpp"
 
 gearoenix::render::texture::Texture2D::Texture2D(
     const core::Id id,
@@ -14,7 +14,7 @@ gearoenix::render::texture::Texture2D::Texture2D(
 gearoenix::render::texture::Texture2D::~Texture2D() noexcept = default;
 
 void gearoenix::render::texture::Texture2D::write_gx3d(
-    const std::shared_ptr<system::stream::Stream>& s,
+    const std::shared_ptr<platform::stream::Stream>& s,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
 {
     Texture::write_gx3d(s, c);

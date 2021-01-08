@@ -2,7 +2,7 @@
 #include "../../../core/asset/gx-cr-asset-manager.hpp"
 #include "../../../core/sync/gx-cr-sync-kernel-workers.hpp"
 #include "../../../physics/collider/gx-phs-cld-collider.hpp"
-#include "../../../system/gx-sys-application.hpp"
+#include "../../../platform/gx-plt-application.hpp"
 #include "../../buffer/gx-rnd-buf-manager.hpp"
 #include "../../buffer/gx-rnd-buf-uniform.hpp"
 #include "../../camera/gx-rnd-cmr-camera.hpp"

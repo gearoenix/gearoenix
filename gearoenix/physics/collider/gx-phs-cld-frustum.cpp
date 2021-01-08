@@ -10,7 +10,7 @@ gearoenix::physics::collider::Frustum::~Frustum() noexcept = default;
 
 std::optional<double> gearoenix::physics::collider::Frustum::hit(const math::Ray3&, const double) const noexcept
 {
-    GXLOGF("This class does not provide implementation for this function.")
+    GXLOGF("This struct does not provide implementation for this function.")
 }
 
 bool gearoenix::physics::collider::Frustum::check_intersection(const math::Aabb3& box) const noexcept
@@ -32,22 +32,22 @@ gearoenix::math::IntersectionStatus gearoenix::physics::collider::Frustum::check
 
 gearoenix::math::Vec3<double> gearoenix::physics::collider::Frustum::get_location() const noexcept
 {
-    GXLOGF("This class does not provide implementation for this function.")
+    GXLOGF("This struct does not provide implementation for this function.")
 }
 
 void gearoenix::physics::collider::Frustum::set_location(const math::Vec3<double>&) noexcept
 {
-    GXLOGF("This class does not provide implementation for this function.")
+    GXLOGF("This struct does not provide implementation for this function.")
 }
 
 void gearoenix::physics::collider::Frustum::local_scale(const double) noexcept
 {
-    GXLOGF("This class does not provide implementation for this function.")
+    GXLOGF("This struct does not provide implementation for this function.")
 }
 
 void gearoenix::physics::collider::Frustum::local_x_scale(const double) noexcept
 {
-    GXLOGF("This class does not provide implementation for this function.")
+    GXLOGF("This struct does not provide implementation for this function.")
 }
 
 void gearoenix::physics::collider::Frustum::update(const math::Vec3<double> (&points)[8]) noexcept

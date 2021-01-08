@@ -9,7 +9,7 @@ gearoenix::physics::collider::Transform::~Transform() noexcept = default;
 
 std::optional<double> gearoenix::physics::collider::Transform::hit(const math::Ray3&, const double) const noexcept
 {
-    GXLOGF("This class does not provide implementation for this function.")
+    GXLOGF("This struct does not provide implementation for this function.")
 }
 
 bool gearoenix::physics::collider::Transform::check_intersection(const math::Aabb3& box) const noexcept
@@ -34,20 +34,20 @@ gearoenix::math::IntersectionStatus gearoenix::physics::collider::Transform::che
 
 gearoenix::math::Vec3<double> gearoenix::physics::collider::Transform::get_location() const noexcept
 {
-    GXLOGF("This class does not provide implementation for this function.")
+    GXLOGF("This struct does not provide implementation for this function.")
 }
 
 void gearoenix::physics::collider::Transform::set_location(const math::Vec3<double>&) noexcept
 {
-    GXLOGF("This class does not provide implementation for this function.")
+    GXLOGF("This struct does not provide implementation for this function.")
 }
 
 void gearoenix::physics::collider::Transform::local_scale(const double) noexcept
 {
-    GXLOGF("This class does not provide implementation for this function.")
+    GXLOGF("This struct does not provide implementation for this function.")
 }
 
 void gearoenix::physics::collider::Transform::local_x_scale(const double) noexcept
 {
-    GXLOGF("This class does not provide implementation for this function.")
+    GXLOGF("This struct does not provide implementation for this function.")
 }

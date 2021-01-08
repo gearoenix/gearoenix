@@ -1,17 +1,5 @@
 SET(GX_ENGINE_RENDER_SRC_DIR ${GX_ENGINE_SRC_DIR}/render)
 SET(GX_ENGINE_RENDER_SRC
-#        ${GX_ENGINE_RENDER_SRC_DIR}/buffer/gx-rnd-buf-buffer.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/buffer/gx-rnd-buf-buffer.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/buffer/gx-rnd-buf-dynamic.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/buffer/gx-rnd-buf-dynamic.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/buffer/gx-rnd-buf-framed-uniform.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/buffer/gx-rnd-buf-framed-uniform.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/buffer/gx-rnd-buf-manager.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/buffer/gx-rnd-buf-manager.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/buffer/gx-rnd-buf-static.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/buffer/gx-rnd-buf-static.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/buffer/gx-rnd-buf-uniform.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/buffer/gx-rnd-buf-uniform.hpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-arc-controller.cpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-arc-controller.hpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-camera.cpp
@@ -28,11 +16,6 @@ SET(GX_ENGINE_RENDER_SRC
 #        ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-transformation.hpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-uniform.cpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-uniform.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/command/gx-rnd-cmd-buffer.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/command/gx-rnd-cmd-buffer.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/command/gx-rnd-cmd-manager.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/command/gx-rnd-cmd-manager.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/command/gx-rnd-cmd-type.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/engine/gx-rnd-eng-engine.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/engine/gx-rnd-eng-engine.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/engine/gx-rnd-eng-limitations.hpp
@@ -120,42 +103,6 @@ SET(GX_ENGINE_RENDER_SRC
 #        ${GX_ENGINE_RENDER_SRC_DIR}/model/gx-rnd-mdl-transformation.cpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/model/gx-rnd-mdl-transformation.hpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/model/gx-rnd-mdl-type.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/pipeline/gx-rnd-pip-forward-pbr.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/pipeline/gx-rnd-pip-forward-pbr.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/pipeline/gx-rnd-pip-forward-pbr-resource-set.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/pipeline/gx-rnd-pip-forward-pbr-resource-set.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/pipeline/gx-rnd-pip-irradiance-convoluter.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/pipeline/gx-rnd-pip-irradiance-convoluter.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/pipeline/gx-rnd-pip-irradiance-convoluter-resource-set.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/pipeline/gx-rnd-pip-irradiance-convoluter-resource-set.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/pipeline/gx-rnd-pip-manager.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/pipeline/gx-rnd-pip-manager.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/pipeline/gx-rnd-pip-pipeline.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/pipeline/gx-rnd-pip-pipeline.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/pipeline/gx-rnd-pip-radiance-convoluter.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/pipeline/gx-rnd-pip-radiance-convoluter.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/pipeline/gx-rnd-pip-radiance-convoluter-resource-set.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/pipeline/gx-rnd-pip-radiance-convoluter-resource-set.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/pipeline/gx-rnd-pip-resource-set.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/pipeline/gx-rnd-pip-resource-set.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/pipeline/gx-rnd-pip-shadow-mapper-resource-set.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/pipeline/gx-rnd-pip-shadow-mapper-resource-set.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/pipeline/gx-rnd-pip-shadow-mapper.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/pipeline/gx-rnd-pip-shadow-mapper.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/pipeline/gx-rnd-pip-skybox-cube.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/pipeline/gx-rnd-pip-skybox-cube.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/pipeline/gx-rnd-pip-skybox-cube-resource-set.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/pipeline/gx-rnd-pip-skybox-cube-resource-set.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/pipeline/gx-rnd-pip-skybox-equirectangular.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/pipeline/gx-rnd-pip-skybox-equirectangular.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/pipeline/gx-rnd-pip-skybox-equirectangular-resource-set.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/pipeline/gx-rnd-pip-skybox-equirectangular-resource-set.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/pipeline/gx-rnd-pip-type.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/pipeline/gx-rnd-pip-type.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/pipeline/gx-rnd-pip-unlit.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/pipeline/gx-rnd-pip-unlit.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/pipeline/gx-rnd-pip-unlit-resource-set.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/pipeline/gx-rnd-pip-unlit-resource-set.hpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/reflection/gx-rnd-rfl-baked.cpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/reflection/gx-rnd-rfl-baked.hpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/reflection/gx-rnd-rfl-manager.cpp
@@ -179,10 +126,6 @@ SET(GX_ENGINE_RENDER_SRC
 #        ${GX_ENGINE_RENDER_SRC_DIR}/scene/gx-rnd-scn-ui.cpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/scene/gx-rnd-scn-ui.hpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/scene/gx-rnd-scn-uniform.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/shader/gx-rnd-shd-resources.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/shader/gx-rnd-shd-resources.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/shader/gx-rnd-shd-shader.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/shader/gx-rnd-shd-shader.hpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/skybox/gx-rnd-sky-cube.cpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/skybox/gx-rnd-sky-cube.hpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/skybox/gx-rnd-sky-equirectangular.cpp
@@ -193,8 +136,6 @@ SET(GX_ENGINE_RENDER_SRC
 #        ${GX_ENGINE_RENDER_SRC_DIR}/skybox/gx-rnd-sky-skybox.hpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/skybox/gx-rnd-sky-type.cpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/skybox/gx-rnd-sky-type.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/sync/gx-rnd-sy-semaphore.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/sync/gx-rnd-sy-semaphore.hpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/texture/gx-rnd-txt-face.cpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/texture/gx-rnd-txt-face.hpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/texture/gx-rnd-txt-attachment.cpp

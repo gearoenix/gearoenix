@@ -1,6 +1,7 @@
 #include "gx-vk-img-image.hpp"
-#ifdef GX_USE_VULKAN
+#ifdef GX_RENDER_VULKAN_ENABLED
 #include "../../core/gx-cr-allocator.hpp"
+#include "../../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../buffer/gx-vk-buf-buffer.hpp"
 #include "../command/gx-vk-cmd-buffer.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
@@ -105,7 +106,7 @@ void gearoenix::vulkan::image::Image::transit(command::Buffer& c, const VkImageL
         src_stage = VK_PIPELINE_STAGE_TRANSFER_BIT;
         dst_stage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
     } else {
-        GXLOGF("Unexpected layouts.")
+        GX_LOG_F("Unexpected layouts.")
     }
     Loader::vkCmdPipelineBarrier(
         c.get_vulkan_data(),
@@ -137,7 +138,7 @@ void gearoenix::vulkan::image::Image::copy_from_buffer(command::Buffer& c, const
         region.bufferRowLength = 4 * 4 * image_width;
         break;
     default:
-        GXLOGF("Unexpected format")
+        GX_LOG_F("Unexpected format")
     }
     region.bufferImageHeight = image_height;
     region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;

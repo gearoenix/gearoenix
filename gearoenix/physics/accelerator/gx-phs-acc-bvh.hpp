@@ -12,12 +12,12 @@ namespace gearoenix::math {
 struct Ray3;
 }
 
-namespace gearoenix::system::stream {
-class Stream;
+namespace gearoenix::platform::stream {
+struct Stream;
 }
 
 namespace gearoenix::physics::collider {
-class Collider;
+struct Collider;
 }
 
 namespace gearoenix::physics::accelerator {

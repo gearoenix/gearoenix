@@ -14,7 +14,7 @@ gearoenix::render::mesh::Mesh::Mesh(const core::Id my_id, std::string name, cons
 gearoenix::render::mesh::Mesh::Mesh(
     const core::Id my_id,
     std::string name,
-    system::stream::Stream* const f,
+    platform::stream::Stream* const f,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : core::asset::Asset(my_id, core::asset::Type::Mesh, std::move(name))

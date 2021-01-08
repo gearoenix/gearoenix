@@ -6,10 +6,10 @@
 #include <vector>
 
 namespace gearoenix::math {
-class Plotter {
+struct Plotter {
 public:
-    class Brush {
-        friend class Plotter;
+    struct Brush {
+        friend struct Plotter;
 
     private:
         const std::uint32_t color;

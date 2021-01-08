@@ -7,22 +7,22 @@
 #include "gx-rnd-sky-skybox.hpp"
 #include <memory>
 
-namespace gearoenix::system::stream {
-class Stream;
+namespace gearoenix::platform::stream {
+struct Stream;
 }
 
 namespace gearoenix::render::engine {
-class Engine;
+struct Engine;
 }
 
 namespace gearoenix::render::skybox {
-class Manager {
+struct Manager {
 protected:
     engine::Engine* const e;
     core::cache::File<Skybox> cache;
 
 public:
-    Manager(std::unique_ptr<system::stream::Stream> s, engine::Engine* e) noexcept;
+    Manager(std::unique_ptr<platform::stream::Stream> s, engine::Engine* e) noexcept;
     ~Manager() noexcept;
     [[nodiscard]] std::shared_ptr<Skybox> get_gx3d(core::Id mid, core::sync::EndCaller<Skybox>& c) noexcept;
     template <typename T>

@@ -4,11 +4,11 @@
 #include <map>
 
 namespace gearoenix::core::sync {
-class KernelWorkers;
+struct KernelWorkers;
 }
 
-namespace gearoenix::system {
-class Application;
+namespace gearoenix::platform {
+struct Application;
 }
 
 namespace gearoenix::physics::animation {
@@ -16,16 +16,16 @@ struct Manager;
 }
 
 namespace gearoenix::render::scene {
-class Scene;
+struct Scene;
 }
 
 namespace gearoenix::physics {
-class Engine {
+struct Engine {
     typedef std::multimap<double, std::shared_ptr<render::scene::Scene>> SceneMap;
     GX_GET_UCPTR_PRV(animation::Manager, animation_manager)
     GX_GET_CREF_PRV(SceneMap, sorted_scenes)
 private:
-    system::Application* const sys_app;
+    platform::Application* const sys_app;
     core::sync::KernelWorkers* const workers;
 
     /// It does:
@@ -45,7 +45,7 @@ private:
     void update_visibility_receiver() noexcept;
 
 public:
-    Engine(system::Application* sys_app, core::sync::KernelWorkers* workers) noexcept;
+    Engine(platform::Application* sys_app, core::sync::KernelWorkers* workers) noexcept;
     ~Engine() noexcept;
     void update() noexcept;
 };

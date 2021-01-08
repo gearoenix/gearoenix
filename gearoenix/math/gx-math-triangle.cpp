@@ -12,7 +12,7 @@ bool gearoenix::math::Triangle3::intersect(const Ray3& r, const double tmin, Vec
 {
     const Vec3 pvec = r.get_normalized_direction().cross(edge[1]);
     const double det = edge[0].dot(pvec);
-    if (GX_IS_ZERO(det)) {
+    if (-0.001 < det && det < 0.001) {
         return false;
     }
     const double inv_det = 1.0f / det;

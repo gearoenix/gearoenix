@@ -1,6 +1,6 @@
 #include "gx-rnd-sky-cube.hpp"
 #include "../../core/asset/gx-cr-asset-manager.hpp"
-#include "../../system/gx-sys-application.hpp"
+#include "../../platform/gx-plt-application.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "../material/gx-rnd-mat-skybox-cube.hpp"
 #include "../reflection/gx-rnd-rfl-baked.hpp"
@@ -10,14 +10,14 @@
 gearoenix::render::skybox::Cube::Cube(
     const core::Id my_id,
     std::string name,
-    system::stream::Stream* const s,
+    platform::stream::Stream* const s,
     engine::Engine* const e,
     const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
     : Skybox(Type::Cube, my_id, std::move(name), s, e, c)
     , mat_cube(new material::SkyboxCube(s, e, c))
 {
     mat = mat_cube;
-    auto* const txt_mgr = e->get_system_application()->get_asset_manager()->get_texture_manager();
+    auto* const txt_mgr = e->get_platform_application()->get_asset_manager()->get_texture_manager();
     core::sync::EndCaller<texture::Texture> txt_call([c](const std::shared_ptr<texture::Texture>&) {});
     auto irr = std::dynamic_pointer_cast<texture::TextureCube>(txt_mgr->read_gx3d(
         this->name + "-irr", s, txt_call));

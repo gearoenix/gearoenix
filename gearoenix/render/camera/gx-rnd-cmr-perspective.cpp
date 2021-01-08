@@ -1,6 +1,6 @@
 #include "gx-rnd-cmr-perspective.hpp"
 #include "../../physics/collider/gx-phs-cld-frustum.hpp"
-#include "../../system/gx-sys-application.hpp"
+#include "../../platform/gx-plt-application.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "gx-rnd-cmr-transformation.hpp"
 #include <cmath>
@@ -15,7 +15,7 @@ void gearoenix::render::camera::Perspective::update_fovy() noexcept
 
 void gearoenix::render::camera::Perspective::update_cascades() noexcept
 {
-    const std::size_t sections_count = cascaded_shadow_frustum_partitions_count.has_value() ? cascaded_shadow_frustum_partitions_count.value() : render_engine->get_system_application()->get_configuration().get_render().get_shadow_cascades_count();
+    const std::size_t sections_count = cascaded_shadow_frustum_partitions_count.has_value() ? cascaded_shadow_frustum_partitions_count.value() : render_engine->get_platform_application()->get_configuration().get_render().get_shadow_cascades_count();
     if (cascaded_shadow_frustum_partitions.size() != sections_count + 1)
         cascaded_shadow_frustum_partitions.resize(sections_count + 1);
 
@@ -110,7 +110,7 @@ void gearoenix::render::camera::Perspective::update_projection() noexcept
 gearoenix::render::camera::Perspective::Perspective(
     const core::Id my_id,
     std::string name,
-    system::stream::Stream* const f,
+    platform::stream::Stream* const f,
     engine::Engine* const e) noexcept
     : Camera(my_id, std::move(name), f, e)
 {

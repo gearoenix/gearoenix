@@ -1,5 +1,6 @@
 #include "gx-vk-cmd-buffer.hpp"
-#ifdef GX_USE_VULKAN
+#ifdef GX_RENDER_VULKAN_ENABLED
+#include "../../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../device/gx-vk-dev-physical.hpp"
 #include "../gx-vk-check.hpp"
@@ -10,27 +11,44 @@
 #define GX_VK_CMD_BUFF_DEBUG
 #endif
 
-gearoenix::vulkan::command::Buffer::Buffer(
-    std::shared_ptr<Pool> p,
-    const render::command::Type command_buffer_type) noexcept
-    : render::command::Buffer(command_buffer_type)
-    , pool(std::move(p))
+gearoenix::vulkan::command::Buffer::Buffer(Pool* const pool, VkCommandBuffer vulkan_data) noexcept
+    : pool(pool)
+    , vulkan_data(vulkan_data)
+{
+}
+
+gearoenix::vulkan::command::Buffer::~Buffer() noexcept
+{
+#ifdef GX_VK_CMD_BUFF_DEBUG
+    if (nullptr == vulkan_data)
+        GX_UNEXPECTED
+#endif
+    Loader::vkFreeCommandBuffers(
+        pool->get_logical_device()->get_vulkan_data(),
+        pool->get_vulkan_data(), 1, &vulkan_data);
+}
+
+gearoenix::vulkan::command::Buffer gearoenix::vulkan::command::Buffer::create(Pool* const pool, bool is_primary) noexcept
 {
     VkCommandBufferAllocateInfo info;
     GX_SET_ZERO(info)
     info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
     info.commandPool = pool->get_vulkan_data();
-    info.level = (command_buffer_type == render::command::Type::Primary) ? VK_COMMAND_BUFFER_LEVEL_PRIMARY : VK_COMMAND_BUFFER_LEVEL_SECONDARY;
+    info.level = is_primary ? VK_COMMAND_BUFFER_LEVEL_PRIMARY : VK_COMMAND_BUFFER_LEVEL_SECONDARY;
     info.commandBufferCount = 1;
-    GX_VK_CHK_L(vkAllocateCommandBuffers(
-        pool->get_logical_device()->get_vulkan_data(), &info, &vulkan_data))
+    VkCommandBuffer vulkan_data;
+    GX_VK_CHK_L(vkAllocateCommandBuffers(pool->get_logical_device()->get_vulkan_data(), &info, &vulkan_data))
+    return Buffer(pool, vulkan_data);
 }
 
-gearoenix::vulkan::command::Buffer::~Buffer() noexcept
+gearoenix::vulkan::command::Buffer gearoenix::vulkan::command::Buffer::create_primary(Pool* const pool) noexcept
 {
-    Loader::vkFreeCommandBuffers(
-        pool->get_logical_device()->get_vulkan_data(),
-        pool->get_vulkan_data(), 1, &vulkan_data);
+    return create(pool, true);
+}
+
+gearoenix::vulkan::command::Buffer gearoenix::vulkan::command::Buffer::create_secondary(Pool* const pool) noexcept
+{
+    return create(pool, false);
 }
 
 void gearoenix::vulkan::command::Buffer::begin() noexcept
@@ -39,12 +57,6 @@ void gearoenix::vulkan::command::Buffer::begin() noexcept
     GX_SET_ZERO(info)
     info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
     GX_VK_CHK_L(vkBeginCommandBuffer(vulkan_data, &info))
-}
-
-void gearoenix::vulkan::command::Buffer::copy_buffer(
-    VkBuffer src, VkBuffer des, const VkBufferCopy& region) noexcept
-{
-    Loader::vkCmdCopyBuffer(vulkan_data, src, des, 1, &region);
 }
 
 void gearoenix::vulkan::command::Buffer::flush() noexcept
@@ -62,64 +74,68 @@ void gearoenix::vulkan::command::Buffer::flush() noexcept
     fence.wait();
 }
 
-void gearoenix::vulkan::command::Buffer::begin_render_pass_with_info(
-    const VkRenderPassBeginInfo& render_pass_begin_info) noexcept
-{
-    Loader::vkCmdBeginRenderPass(vulkan_data, &render_pass_begin_info, VK_SUBPASS_CONTENTS_INLINE);
-}
-
-void gearoenix::vulkan::command::Buffer::set_viewport(
-    const VkViewport& viewport) noexcept
-{
-    Loader::vkCmdSetViewport(vulkan_data, 0, 1, &viewport);
-}
-
-void gearoenix::vulkan::command::Buffer::set_scissor(const VkRect2D& scissor) noexcept
-{
-    Loader::vkCmdSetScissor(vulkan_data, 0, 1, &scissor);
-}
-
 void gearoenix::vulkan::command::Buffer::end() noexcept
 {
     GX_VK_CHK_L(vkEndCommandBuffer(vulkan_data))
 }
-
-//void gearoenix::vulkan::command::Buffer::bind(const std::shared_ptr<pipeline::ResourceSet>& r) noexcept
+//
+//void gearoenix::vulkan::command::Buffer::copy_buffer(
+//    VkBuffer src, VkBuffer des, const VkBufferCopy& region) noexcept
 //{
+//    Loader::vkCmdCopyBuffer(vulkan_data, src, des, 1, &region);
 //}
+//
+//void gearoenix::vulkan::command::Buffer::begin_render_pass_with_info(
+//    const VkRenderPassBeginInfo& render_pass_begin_info) noexcept
+//{
+//    Loader::vkCmdBeginRenderPass(vulkan_data, &render_pass_begin_info, VK_SUBPASS_CONTENTS_INLINE);
+//}
+//
+//void gearoenix::vulkan::command::Buffer::set_viewport(
+//    const VkViewport& viewport) noexcept
+//{
+//    Loader::vkCmdSetViewport(vulkan_data, 0, 1, &viewport);
+//}
+//
+//void gearoenix::vulkan::command::Buffer::set_scissor(const VkRect2D& scissor) noexcept
+//{
+//    Loader::vkCmdSetScissor(vulkan_data, 0, 1, &scissor);
+//}
+//
 
 void gearoenix::vulkan::command::Buffer::end_render_pass() noexcept
 {
     Loader::vkCmdEndRenderPass(vulkan_data);
 }
 
-void gearoenix::vulkan::command::Buffer::bind_pipeline(VkPipeline pip) noexcept
-{
-    Loader::vkCmdBindPipeline(vulkan_data, VK_PIPELINE_BIND_POINT_GRAPHICS, pip);
-}
-
-void gearoenix::vulkan::command::Buffer::bind_descriptor_set(
-    VkPipelineBindPoint pipeline_bind_point,
-    VkPipelineLayout pipeline_layout,
-    uint32_t first_set,
-    const VkDescriptorSet& des_set) noexcept
-{
-    Loader::vkCmdBindDescriptorSets(
-        vulkan_data, pipeline_bind_point, pipeline_layout, first_set, 1, &des_set, 0, nullptr);
-}
-
-void gearoenix::vulkan::command::Buffer::bind_vertex_buffers(VkBuffer buf, VkDeviceSize offset) noexcept
-{
-    Loader::vkCmdBindVertexBuffers(vulkan_data, 0, 1, &buf, &offset);
-}
-
-void gearoenix::vulkan::command::Buffer::bind_index_buffer(VkBuffer buf, VkDeviceSize offset) noexcept
-{
-    Loader::vkCmdBindIndexBuffer(vulkan_data, buf, offset, VK_INDEX_TYPE_UINT32);
-}
+//void gearoenix::vulkan::command::Buffer::bind_pipeline(VkPipeline pip) noexcept
+//{
+//    Loader::vkCmdBindPipeline(vulkan_data, VK_PIPELINE_BIND_POINT_GRAPHICS, pip);
+//}
+//
+//void gearoenix::vulkan::command::Buffer::bind_descriptor_set(
+//    VkPipelineBindPoint pipeline_bind_point,
+//    VkPipelineLayout pipeline_layout,
+//    uint32_t first_set,
+//    const VkDescriptorSet& des_set) noexcept
+//{
+//    Loader::vkCmdBindDescriptorSets(
+//        vulkan_data, pipeline_bind_point, pipeline_layout, first_set, 1, &des_set, 0, nullptr);
+//}
+//
+//void gearoenix::vulkan::command::Buffer::bind_vertex_buffers(VkBuffer buf, VkDeviceSize offset) noexcept
+//{
+//    Loader::vkCmdBindVertexBuffers(vulkan_data, 0, 1, &buf, &offset);
+//}
+//
+//void gearoenix::vulkan::command::Buffer::bind_index_buffer(VkBuffer buf, VkDeviceSize offset) noexcept
+//{
+//    Loader::vkCmdBindIndexBuffer(vulkan_data, buf, offset, VK_INDEX_TYPE_UINT32);
+//}
 
 void gearoenix::vulkan::command::Buffer::draw_indexed(VkDeviceSize count) noexcept
 {
     Loader::vkCmdDrawIndexed(vulkan_data, static_cast<std::uint32_t>(count), 1, 0, 0, 1);
 }
+
 #endif

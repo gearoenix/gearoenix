@@ -5,13 +5,13 @@
 #include <vector>
 
 namespace gearoenix::physics::collider {
-class Collider;
-class Frustum;
+struct Collider;
+struct Frustum;
 }
 
 namespace gearoenix::render::camera {
 struct Uniform;
-class Transformation : public physics::Transformation {
+struct Transformation : public physics::Transformation {
 private:
     Uniform* const uniform;
     physics::collider::Frustum* const frustum_collider;

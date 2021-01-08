@@ -25,24 +25,24 @@
 
 namespace gearoenix::render {
 namespace command {
-    class Buffer;
+    struct Buffer;
 }
 namespace engine {
-    class Engine;
+    struct Engine;
 }
 namespace pipeline {
-    class Pipeline;
+    struct Pipeline;
 }
 namespace sync {
-    class Semaphore;
+    struct Semaphore;
 }
 namespace texture {
-    class Texture;
-    class TextureCube;
-    class Target;
+    struct Texture;
+    struct TextureCube;
+    struct Target;
 }
 namespace graph::node {
-    class Node : public core::graph::Node {
+    struct Node : public core::graph::Node {
         GX_GET_CVAL_PRT(Type, render_node_type)
     protected:
         engine::Engine* const e;
