@@ -3,7 +3,6 @@
 #include "../../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
-#include "../../render/command/gx-rnd-cmd-manager.hpp"
 #include <map>
 #include <thread>
 
@@ -13,7 +12,7 @@ struct Logical;
 
 namespace gearoenix::vulkan::command {
 struct Pool;
-struct Manager final : public render::command::Manager {
+struct Manager final {
     GX_GET_REFC_PRV(std::shared_ptr<device::Logical>, logical_device)
 private:
     std::map<std::size_t, std::shared_ptr<Pool>> indexed_pools;
@@ -21,10 +20,10 @@ private:
 
 public:
     explicit Manager(std::shared_ptr<device::Logical> logical_device) noexcept;
-    ~Manager() noexcept final;
-    [[nodiscard]] render::command::Buffer* create_command_buffer(
+    ~Manager() noexcept;
+    [[nodiscard]] Buffer* create_command_buffer(
         render::command::Type command_buffer_type,
-        std::optional<std::size_t> thread_id) noexcept final;
+        std::optional<std::size_t> thread_id) noexcept;
 };
 }
 #endif

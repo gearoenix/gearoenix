@@ -73,3 +73,7 @@ SET(GX_ENGINE_CORE_SRC
         ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-string.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-types.hpp
         PARENT_SCOPE)
+
+SET(GX_ENGINE_CORE_TEST_SRC
+        ${GX_ENGINE_CORE_SRC_DIR}/ecs/gx-cr-ecs-world-test.hpp
+        PARENT_SCOPE)

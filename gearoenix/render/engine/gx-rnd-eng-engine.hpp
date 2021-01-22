@@ -38,41 +38,8 @@ namespace gearoenix::platform::stream {
 struct Stream;
 }
 
-namespace gearoenix::render::command {
-struct Buffer;
-struct Manager;
-}
-
-namespace gearoenix::render::buffer {
-struct Mesh;
-struct Uniform;
-struct Manager;
-}
-
-namespace gearoenix::render::graph::node {
-struct Node;
-}
-
-namespace gearoenix::render::graph::tree {
-struct Tree;
-}
-
-namespace gearoenix::render::pipeline {
-struct Manager;
-struct Pipeline;
-}
-
 namespace gearoenix::render::scene {
 struct Scene;
-}
-
-namespace gearoenix::render::shader {
-struct Shader;
-struct Resources;
-}
-
-namespace gearoenix::render::sync {
-struct Semaphore;
 }
 
 namespace gearoenix::render::texture {

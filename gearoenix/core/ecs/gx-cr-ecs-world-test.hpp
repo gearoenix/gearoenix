@@ -1,11 +1,25 @@
-#ifndef GEAROENIX_TEST_CORE_ECS_HPP
-#define GEAROENIX_TEST_CORE_ECS_HPP
+#ifndef GEAROENIX_CORE_ECS_WORLD_TEST_HPP
+#define GEAROENIX_CORE_ECS_WORLD_TEST_HPP
 
-#include <gearoenix/core/ecs/gx-cr-ecs-world.hpp>
+#include "gx-cr-ecs-world.hpp"
+#include "../../platform/gx-plt-log.hpp"
 
 struct Position {
     double x;
     double y;
+
+    Position(const double x, const double y) noexcept: x(x), y(y) {}
+
+    Position(const Position&) noexcept = delete;
+    Position& operator=(const Position&) noexcept = delete;
+
+    Position(Position&&) noexcept = default;
+
+    Position& operator=(const Position&& o) noexcept {
+        x = o.x;
+        y = o.y;
+        return *this;
+    }
 };
 
 struct Speed {
@@ -13,7 +27,7 @@ struct Speed {
     double y;
 };
 
-BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_test)
+BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
 {
     using namespace gearoenix::core::ecs;
     World w;
@@ -22,19 +36,19 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_test)
     (void)w.create_entity(Speed { 10.0, 11.0 }, Position { 8.0, 9.0 });
     (void)w.create_entity(Speed { 12.0, 13.0 });
     w.parallel_system((std::function<void(entity_id_t, Position&)>)[&](entity_id_t ent, Position & p) {
-        BOOST_TEST_MESSAGE("Entity: " << ent << ", Position { " << p.x << ", " << p.y << " }");
+        GX_LOG_I("Entity: " << ent << ", Position { " << p.x << ", " << p.y << " }")
     });
     w.parallel_system((std::function<void(entity_id_t, Not<Speed>&)>)[&](entity_id_t ent, Not<Speed>&) {
-        BOOST_TEST_MESSAGE("Entity: " << ent << ", Without Speed");
+        GX_LOG_I("Entity: " << ent << ", Without Speed")
     });
     w.parallel_system((std::function<void(entity_id_t, Not<Position>&)>)[&](entity_id_t ent, Not<Position>&) {
-        BOOST_TEST_MESSAGE("Entity: " << ent << ", Without Position");
+        GX_LOG_I("Entity: " << ent << ", Without Position")
     });
     w.parallel_system((std::function<void(entity_id_t, Speed&)>)[&](entity_id_t ent, Speed & s) {
-        BOOST_TEST_MESSAGE("Entity: " << ent << ", Speed {" << s.x << ", " << s.y << "}");
+        GX_LOG_I("Entity: " << ent << ", Speed {" << s.x << ", " << s.y << "}")
     });
     w.parallel_system((std::function<void(entity_id_t, Speed&, Position&)>)[&](entity_id_t ent, Speed & s, Position & p) {
-        BOOST_TEST_MESSAGE("Entity: " << ent << ", Speed {" << s.x << ", " << s.y << "}, Position {" << p.x << "," << p.y << "}");
+        GX_LOG_I("Entity: " << ent << ", Speed {" << s.x << ", " << s.y << "}, Position {" << p.x << "," << p.y << "}")
     });
 
     auto& p = w.get_component<Position>(entity);

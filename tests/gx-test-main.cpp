@@ -16,7 +16,7 @@
 //#include "gx-test-ai-dijkstra.hpp"
 //#include "gx-test-ai-graph.hpp"
 //#include "gx-test-cr-allocator.hpp"
-#include "gx-test-cr-ecs.hpp"
+#include <gearoenix/core/ecs/gx-cr-ecs-world-test.hpp>
 //#include "gx-test-cr-pool.hpp"
 //#include "gx-test-cr-sync-influence-manager.hpp"
 //#include "gx-test-math-frustum.hpp"
