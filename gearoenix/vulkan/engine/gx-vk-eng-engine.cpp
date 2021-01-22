@@ -36,12 +36,12 @@ gearoenix::vulkan::engine::Engine::Engine(
 //    , memory_manager(logical_device)
 {
     ;
-//    sampler_manager = std::make_shared<sampler::Manager>(logical_device);
+    //    sampler_manager = std::make_shared<sampler::Manager>(logical_device);
     // command_manager = std::make_unique<command::Manager>(logical_device);
     // main_render_target = vulkan_main_render_target = std::make_shared<texture::MainTarget>(memory_manager, this);
-//    frames_count = static_cast<decltype(frames_count)>(vulkan_main_render_target->get_frames().size());
+    //    frames_count = static_cast<decltype(frames_count)>(vulkan_main_render_target->get_frames().size());
     // Buffer manager needs the number of frames
-//    image_manager = std::make_shared<image::Manager>(this);
+    //    image_manager = std::make_shared<image::Manager>(this);
     // buffer_manager = vulkan_buffer_manager = std::make_shared<buffer::Manager>(memory_manager, this);
     //    upload_command_buffers.reserve(static_cast<std::size_t>(frames_count));
     //    upload_semaphore.reserve(static_cast<std::size_t>(frames_count));
