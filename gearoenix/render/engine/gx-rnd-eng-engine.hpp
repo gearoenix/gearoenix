@@ -50,14 +50,10 @@ struct Texture2D;
 
 namespace gearoenix::render::engine {
 struct Engine {
-    GX_GET_CREF_PRT(std::weak_ptr<Engine>, self)
     GX_GET_CVAL_PRT(Type, engine_type)
-    GX_GET_CREF_PRT(RuntimeConfiguration, configuration)
-    GX_GET_CREF_PRT(std::shared_ptr<platform::Application>, platform_application)
-    //    GX_GET_UPTR_PRT(core::FunctionLoader, function_loader)
-    //    GX_GET_UPTR_PRT(core::sync::KernelWorkers, kernels)
-    //    GX_GET_UPTR_PRT(core::sync::UpdateManager, update_manager)
-    //    GX_GET_UPTR_PRT(physics::Engine, physics_engine)
+    GX_GET_CRRF_PRT(platform::Application, platform_application)
+    // GX_GET_UPTR_PRT(core::FunctionLoader, function_loader)
+    // GX_GET_UPTR_PRT(physics::Engine, physics_engine)
     GX_GET_CREF_PRT(Limitations, limitations)
     GX_GET_VAL_PRT(unsigned int, frames_count, 2)
     GX_GET_VAL_PRT(unsigned int, frame_number, 0)
@@ -69,11 +65,11 @@ protected:
     //    std::vector<std::vector<std::shared_ptr<core::asset::Asset>>> late_delete_assets;
     //    std::size_t late_delete_index = 0;
     std::chrono::time_point<std::chrono::high_resolution_clock> last_frame_time = std::chrono::high_resolution_clock::now();
-    Engine(const RuntimeConfiguration& configuration, std::shared_ptr<platform::Application> platform_application, Type engine_type) noexcept;
+    Engine(Type engine_type, const platform::Application& platform_application) noexcept;
     //    void do_late_delete() noexcept;
 
 public:
-    [[nodiscard]] static std::shared_ptr<Engine> construct(const RuntimeConfiguration& configuration, std::shared_ptr<platform::Application> platform_application) noexcept;
+    [[nodiscard]] static std::unique_ptr<Engine> construct(const platform::Application& platform_application) noexcept;
     virtual ~Engine() noexcept;
     //    void late_delete(std::shared_ptr<core::asset::Asset> asset) noexcept;
     virtual void update() noexcept;

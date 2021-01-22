@@ -264,21 +264,7 @@ gearoenix::platform::Application::Application(GX_MAIN_ENTRY_ARGS_DEF, const Runt
     }
     //    update_screen_sizes();
     //    update_mouse_position();
-}
-
-std::shared_ptr<gearoenix::platform::Application> gearoenix::platform::Application::construct(
-    GX_MAIN_ENTRY_ARGS_DEF,
-    const RuntimeConfiguration& config) noexcept
-{
-    std::shared_ptr<Application> result(new Application(GX_MAIN_ENTRY_ARGS, config));
-    result->self = result;
-    result->base.render_engine = render::engine::Engine::construct(config.get_render_configuration(), result);
-    GX_TODO
-    //    astmgr = new core::asset::Manager(this, "data.gx3d");
-    //    astmgr->initialize();
-    //    astmgr->set_render_engine(render_engine);
-
-    return result;
+    base.render_engine = render::engine::Engine::construct(*this);
 }
 
 gearoenix::platform::Application::~Application() noexcept = default;

@@ -17,16 +17,12 @@ struct Application final {
     GX_GET_VAL_PRV(HINSTANCE, instance, nullptr)
     GX_GET_VAL_PRV(HWND, window, nullptr)
     GX_GET_CREF_PRV(BaseApplication, base)
-    GX_GET_CREF_PRV(std::weak_ptr<Application>, self)
 private:
     [[nodiscard]] static LRESULT CALLBACK static_handler(HWND hwnd, UINT message, WPARAM w_param, LPARAM l_param) noexcept;
     [[nodiscard]] LRESULT handler(HWND hwnd, UINT message, WPARAM w_param, LPARAM l_param) noexcept;
 
-    explicit Application(GX_MAIN_ENTRY_ARGS_DEF, const RuntimeConfiguration& config) noexcept;
-
 public:
-    [[nodiscard]] static std::shared_ptr<Application> construct(
-        GX_MAIN_ENTRY_ARGS_DEF, const RuntimeConfiguration& config = RuntimeConfiguration()) noexcept;
+    Application(GX_MAIN_ENTRY_ARGS_DEF, const RuntimeConfiguration& config = RuntimeConfiguration()) noexcept;
     ~Application() noexcept;
     void run() noexcept;
 };

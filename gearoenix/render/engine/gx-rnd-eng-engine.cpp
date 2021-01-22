@@ -25,12 +25,10 @@
 //}
 
 gearoenix::render::engine::Engine::Engine(
-    const RuntimeConfiguration& configuration,
-    std::shared_ptr<platform::Application> platform_application,
-    const Type engine_type) noexcept
+    const Type engine_type,
+    const platform::Application& platform_application) noexcept
     : engine_type(engine_type)
-    , configuration(configuration)
-    , platform_application(std::move(platform_application))
+    , platform_application(platform_application)
 //    , function_loader(new core::FunctionLoader())
 //    , kernels(new core::sync::KernelWorkers())
 //    , update_manager(new core::sync::UpdateManager(kernels.get()))
@@ -53,14 +51,14 @@ gearoenix::render::engine::Engine::Engine(
     //        });
 }
 
-std::shared_ptr<gearoenix::render::engine::Engine> gearoenix::render::engine::Engine::construct(
-    const RuntimeConfiguration& configuration,
-    std::shared_ptr<platform::Application> platform_application) noexcept
+std::unique_ptr<gearoenix::render::engine::Engine> gearoenix::render::engine::Engine::construct(
+    const platform::Application& platform_application) noexcept
 {
-    std::shared_ptr<Engine> result;
+    std::unique_ptr<Engine> result;
+    const auto& configuration = platform_application.get_base().get_configuration().get_render_configuration();
 #ifdef GX_RENDER_VULKAN_ENABLED
     if (configuration.get_vulkan_render_backend_enabled() && vulkan::engine::Engine::is_supported()) {
-        result = vulkan::engine::Engine::construct(configuration, std::move(platform_application));
+        result = std::make_unique<vulkan::engine::Engine>(platform_application);
     }
 #endif
 #ifdef GX_RENDER_DIRECT3DX_ENABLED
@@ -79,7 +77,6 @@ std::shared_ptr<gearoenix::render::engine::Engine> gearoenix::render::engine::En
     }
 #endif
     GX_CHECK_NOT_EQUAL(result, nullptr)
-    result->self = result;
     return result;
 }
 
