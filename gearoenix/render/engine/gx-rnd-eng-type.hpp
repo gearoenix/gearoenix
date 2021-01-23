@@ -5,7 +5,6 @@
 
 namespace gearoenix::render::engine {
 enum struct Type : core::Id {
-    None = 0,
     Vulkan = 1,
     OpenGL43 = 2,
     OpenGL33 = 3,

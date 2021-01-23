@@ -6,16 +6,16 @@
 #include "../gx-vk-instance.hpp"
 #include "gx-vk-dev-physical.hpp"
 
-gearoenix::vulkan::device::Logical::Logical(std::shared_ptr<Physical> p) noexcept
-    : physical_device(std::move(p))
+gearoenix::vulkan::device::Logical::Logical(const Physical& p) noexcept
+    : physical_device(p)
 {
     const char* const device_extensions[] = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
     const float queue_priorities[] = { 1.0f };
     std::set<std::uint32_t> queue_index_set;
-    queue_index_set.insert(physical_device->get_graphics_queue_node_index());
-    queue_index_set.insert(physical_device->get_transfer_queue_node_index());
-    queue_index_set.insert(physical_device->get_compute_queue_node_index());
-    queue_index_set.insert(physical_device->get_present_queue_node_index());
+    queue_index_set.insert(physical_device.get_graphics_queue_node_index());
+    queue_index_set.insert(physical_device.get_transfer_queue_node_index());
+    queue_index_set.insert(physical_device.get_compute_queue_node_index());
+    queue_index_set.insert(physical_device.get_present_queue_node_index());
     std::vector<VkDeviceQueueCreateInfo> queue_create_infos(static_cast<std::size_t>(queue_index_set.size()));
     std::size_t queue_create_infos_index = 0;
     for (auto q : queue_index_set) {
@@ -40,8 +40,8 @@ gearoenix::vulkan::device::Logical::Logical(std::shared_ptr<Physical> p) noexcep
     device_create_info.enabledExtensionCount = GX_COUNT_OF(device_extensions);
     device_create_info.ppEnabledExtensionNames = device_extensions;
     device_create_info.pEnabledFeatures = &device_features;
-    GX_VK_CHK_L(vkCreateDevice(physical_device->get_vulkan_data(), &device_create_info, nullptr, &vulkan_data))
-    Loader::vkGetDeviceQueue(vulkan_data, physical_device->get_graphics_queue_node_index(), 0, &graphic_queue);
+    GX_VK_CHK_L(vkCreateDevice(physical_device.get_vulkan_data(), &device_create_info, nullptr, &vulkan_data))
+    Loader::vkGetDeviceQueue(vulkan_data, physical_device.get_graphics_queue_node_index(), 0, &graphic_queue);
 }
 
 gearoenix::vulkan::device::Logical::~Logical() noexcept

@@ -48,9 +48,9 @@ std::uint32_t gearoenix::vulkan::Swapchain::get_next_image_index(const std::shar
 void gearoenix::vulkan::Swapchain::initialize() noexcept
 {
     const auto& physical_device = logical_device->get_physical_device();
-    const auto& surface = physical_device->get_surface();
-    const VkSurfaceCapabilitiesKHR& caps = physical_device->get_surface_capabilities();
-    const auto& formats = physical_device->get_surface_formats();
+    const auto& surface = physical_device.get_surface();
+    const VkSurfaceCapabilitiesKHR& caps = physical_device.get_surface_capabilities();
+    const auto& formats = physical_device.get_surface_formats();
     const auto old_swapchain = vulkan_data;
     std::uint32_t chosen_format_index;
     for (chosen_format_index = 0; chosen_format_index < formats.size(); ++chosen_format_index) {
@@ -68,14 +68,14 @@ void gearoenix::vulkan::Swapchain::initialize() noexcept
     }
     std::uint32_t image_usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
     VkFormatProperties format_props;
-    Loader::vkGetPhysicalDeviceFormatProperties(physical_device->get_vulkan_data(), format.format, &format_props);
+    Loader::vkGetPhysicalDeviceFormatProperties(physical_device.get_vulkan_data(), format.format, &format_props);
     if (format_props.optimalTilingFeatures & VK_FORMAT_FEATURE_BLIT_DST_BIT) {
         image_usage |= VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
     }
     VkSwapchainCreateInfoKHR info;
     GX_SET_ZERO(info)
     info.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-    info.surface = surface->get_vulkan_data();
+    info.surface = surface.get_vulkan_data();
     info.minImageCount = swapchain_images_count;
     info.imageFormat = format.format;
     info.imageColorSpace = format.colorSpace;

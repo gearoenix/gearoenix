@@ -16,7 +16,7 @@ struct Surface;
 
 namespace gearoenix::vulkan::device {
 struct Physical final {
-    GX_GET_REFC_PRV(std::shared_ptr<Surface>, surface)
+    GX_GET_CRRF_PRV(Surface, surface)
     GX_GET_VAL_PRV(VkPhysicalDevice, vulkan_data, nullptr)
     GX_GET_CREF_PRV(VkPhysicalDeviceProperties, properties)
     GX_GET_CREF_PRV(VkPhysicalDeviceFeatures, features)
@@ -44,7 +44,7 @@ private:
     [[nodiscard]] int is_good(VkPhysicalDevice gpu) noexcept;
 
 public:
-    explicit Physical(std::shared_ptr<Surface> surface) noexcept;
+    explicit Physical(const Surface& surface) noexcept;
     ~Physical() noexcept;
     [[nodiscard]] std::uint32_t get_memory_type_index(std::uint32_t type_bits, std::uint32_t mem_properties) const noexcept;
     [[nodiscard]] std::size_t align_size(std::size_t size) const noexcept;

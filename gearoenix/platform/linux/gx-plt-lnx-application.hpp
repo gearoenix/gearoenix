@@ -19,12 +19,13 @@ namespace gearoenix::platform {
 struct Application final {
     GX_GET_CREF_PRV(BaseApplication, base)
     GX_GET_PTR_PRV(Display, display)
+    GX_GET_PTR_PRV(Screen, screen)
     GX_GET_VAL_PRV(Window, window, 0)
 
 private:
     Atom close_message;
 
-    [[nodiscard]] bool fetch_events(XEvent& event) noexcept;
+    void fetch_events() noexcept;
 
 public:
     explicit Application(GX_MAIN_ENTRY_ARGS_DEF, const RuntimeConfiguration& config = RuntimeConfiguration()) noexcept;

@@ -18,7 +18,7 @@ int gearoenix::vulkan::device::Physical::is_good(VkPhysicalDevice gpu) noexcept
         queue_props.data());
     std::vector<VkBool32> supports_present(queue_count);
     for (uint32_t i = 0; i < queue_count; ++i) {
-        Loader::vkGetPhysicalDeviceSurfaceSupportKHR(gpu, i, surface->get_vulkan_data(), &(supports_present[i]));
+        Loader::vkGetPhysicalDeviceSurfaceSupportKHR(gpu, i, surface.get_vulkan_data(), &(supports_present[i]));
     }
     for (std::uint32_t i = 0; i < queue_count; i++) {
         if (GX_FLAG_CHECK(queue_props[i].queueFlags, VK_QUEUE_GRAPHICS_BIT) && GX_FLAG_CHECK(queue_props[i].queueFlags, VK_QUEUE_TRANSFER_BIT) && GX_FLAG_CHECK(queue_props[i].queueFlags, VK_QUEUE_COMPUTE_BIT) && supports_present[i] == VK_TRUE) {
@@ -70,15 +70,15 @@ int gearoenix::vulkan::device::Physical::is_good(VkPhysicalDevice gpu) noexcept
     return -1;
 }
 
-gearoenix::vulkan::device::Physical::Physical(std::shared_ptr<Surface> surf) noexcept
-    : surface(std::move(surf))
+gearoenix::vulkan::device::Physical::Physical(const Surface& surf) noexcept
+    : surface(surf)
     , properties {}
     , features {}
     , memory_properties {}
     , surface_capabilities {}
 {
-    const auto& instance = surface->get_instance();
-    const auto vk_ins = instance->get_vulkan_data();
+    const auto& instance = surface.get_instance();
+    const auto vk_ins = instance.get_vulkan_data();
     std::uint32_t gpu_count = 0;
     GX_VK_CHK_L(vkEnumeratePhysicalDevices(vk_ins, &gpu_count, nullptr))
     std::vector<VkPhysicalDevice> gpus(static_cast<std::size_t>(gpu_count));
@@ -121,11 +121,11 @@ gearoenix::vulkan::device::Physical::Physical(std::shared_ptr<Surface> surf) noe
     for (auto& s : supported_extensions) {
         GX_LOG_D("    " << s)
     }
-    Loader::vkGetPhysicalDeviceSurfaceCapabilitiesKHR(vulkan_data, surface->get_vulkan_data(), &surface_capabilities);
+    Loader::vkGetPhysicalDeviceSurfaceCapabilitiesKHR(vulkan_data, surface.get_vulkan_data(), &surface_capabilities);
     std::uint32_t count = 0;
-    Loader::vkGetPhysicalDeviceSurfaceFormatsKHR(vulkan_data, surface->get_vulkan_data(), &count, nullptr);
+    Loader::vkGetPhysicalDeviceSurfaceFormatsKHR(vulkan_data, surface.get_vulkan_data(), &count, nullptr);
     surface_formats.resize(static_cast<std::size_t>(count));
-    Loader::vkGetPhysicalDeviceSurfaceFormatsKHR(vulkan_data, surface->get_vulkan_data(), &count, surface_formats.data());
+    Loader::vkGetPhysicalDeviceSurfaceFormatsKHR(vulkan_data, surface.get_vulkan_data(), &count, surface_formats.data());
     VkFormatProperties format_props;
     for (auto format : acceptable_depth_formats) {
         Loader::vkGetPhysicalDeviceFormatProperties(vulkan_data, format, &format_props);

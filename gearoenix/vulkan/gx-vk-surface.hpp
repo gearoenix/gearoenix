@@ -13,12 +13,12 @@ struct Application;
 namespace gearoenix::vulkan {
 struct Instance;
 struct Surface {
-    GX_GET_REFC_PRV(std::shared_ptr<Instance>, instance)
-    GX_GET_CREF_PRV(std::shared_ptr<platform::Application>, platform_application);
+    GX_GET_CRRF_PRV(Instance, instance)
+    GX_GET_CRRF_PRV(platform::Application, platform_application);
     GX_GET_VAL_PRV(VkSurfaceKHR, vulkan_data, nullptr)
 
 public:
-    Surface(std::shared_ptr<Instance> instance, std::shared_ptr<platform::Application> platform_application) noexcept;
+    Surface(const Instance& instance, const platform::Application& platform_application) noexcept;
     ~Surface() noexcept;
 };
 }

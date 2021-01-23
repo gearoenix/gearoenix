@@ -14,9 +14,9 @@
 namespace gearoenix::vulkan::engine {
 struct Engine final : public render::engine::Engine {
     GX_GET_CREF_PRV(Instance, instance)
-    //    GX_GET_CREF_PRV(Surface, surface)
-    //    GX_GET_CREF_PRV(device::Physical, physical_device)
-    //    GX_GET_CREF_PRV(device::Logical, logical_device)
+    GX_GET_CREF_PRV(Surface, surface)
+    GX_GET_CREF_PRV(device::Physical, physical_device)
+    GX_GET_CREF_PRV(device::Logical, logical_device)
     //    GX_GET_CREF_PRV(memory::Manager, memory_manager)
     //    GX_GET_CREF_PRV(std::shared_ptr<sampler::Manager>, sampler_manager)
     //    GX_GET_CREF_PRV(std::shared_ptr<image::Manager>, image_manager)

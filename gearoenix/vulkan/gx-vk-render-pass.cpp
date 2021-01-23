@@ -24,7 +24,7 @@ gearoenix::vulkan::RenderPass::RenderPass(std::shared_ptr<Swapchain> sw) noexcep
     attachment_descriptions[0].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
     attachment_descriptions[0].finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
 
-    attachment_descriptions[1].format = p->get_supported_depth_format();
+    attachment_descriptions[1].format = p.get_supported_depth_format();
     attachment_descriptions[1].samples = VK_SAMPLE_COUNT_1_BIT;
     attachment_descriptions[1].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
     attachment_descriptions[1].storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;

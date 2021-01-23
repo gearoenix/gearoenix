@@ -5,32 +5,13 @@
 //#include "../../render/scene/gx-rnd-scn-scene.hpp"
 #include "../../platform/gx-plt-application.hpp"
 #include "../../platform/gx-plt-log.hpp"
-//#include "../buffer/gx-vk-buf-buffer.hpp"
-//#include "../buffer/gx-vk-buf-manager.hpp"
-//#include "../command/gx-vk-cmd-buffer.hpp"
-//#include "../command/gx-vk-cmd-manager.hpp"
-#include "../device/gx-vk-dev-logical.hpp"
-#include "../device/gx-vk-dev-physical.hpp"
-//#include "../gx-vk-check.hpp"
-#include "../gx-vk-instance.hpp"
-#include "../gx-vk-surface.hpp"
-//#include "../gx-vk-loader.hpp"
-//#include "../image/gx-vk-img-image.hpp"
-//#include "../image/gx-vk-img-manager.hpp"
-//#include "../memory/gx-vk-mem-manager.hpp"
-//#include "../sampler/gx-vk-smp-manager.hpp"
-//#include "../sync/gx-vk-sync-semaphore.hpp"
-//#include "../texture/gx-vk-txt-2d.hpp"
-//#include "../texture/gx-vk-txt-cube.hpp"
-//#include "../texture/gx-vk-txt-main-target.hpp"
-//#include "../texture/gx-vk-txt-target.hpp"
 
 gearoenix::vulkan::engine::Engine::Engine(const platform::Application& platform_application) noexcept
     : render::engine::Engine(render::engine::Type::Vulkan, platform_application)
     , instance(platform_application)
-//    , surface(std::make_shared<Surface>(instance, platform_application))
-//    , physical_device(std::make_shared<device::Physical>(surface))
-//    , logical_device(std::make_shared<device::Logical>(physical_device))
+    , surface(instance, platform_application)
+    , physical_device(surface)
+    , logical_device(physical_device)
 //    , memory_manager(logical_device)
 {
     ;

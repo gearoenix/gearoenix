@@ -4,9 +4,6 @@ namespace gearoenix::render::engine {
 std::ostream& operator<<(std::ostream& os, const Type t) noexcept
 {
     switch (t) {
-    case Type::None:
-        os << "None";
-        break;
     case Type::Vulkan:
         os << "Vulkan";
         break;
