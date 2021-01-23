@@ -11,7 +11,7 @@ gearoenix::vulkan::RenderPass::RenderPass(std::shared_ptr<Swapchain> sw) noexcep
     : swapchain(std::move(sw))
 {
     const auto& d = swapchain->get_logical_device();
-    const auto& p = d->get_physical_device();
+    const auto& p = d.get_physical_device();
 
     VkAttachmentDescription attachment_descriptions[2];
     GX_SET_ZERO(attachment_descriptions)
@@ -77,12 +77,12 @@ gearoenix::vulkan::RenderPass::RenderPass(std::shared_ptr<Swapchain> sw) noexcep
     render_pass_create_info.dependencyCount = GX_COUNT_OF(dependencies);
     render_pass_create_info.pDependencies = dependencies;
 
-    GX_VK_CHK_L(vkCreateRenderPass(d->get_vulkan_data(), &render_pass_create_info, nullptr, &vulkan_data))
+    GX_VK_CHK_L(vkCreateRenderPass(d.get_vulkan_data(), &render_pass_create_info, nullptr, &vulkan_data))
 }
 
 gearoenix::vulkan::RenderPass::~RenderPass() noexcept
 {
-    Loader::vkDestroyRenderPass(swapchain->get_logical_device()->get_vulkan_data(), vulkan_data, nullptr);
+    Loader::vkDestroyRenderPass(swapchain->get_logical_device().get_vulkan_data(), vulkan_data, nullptr);
 }
 
 #endif

@@ -2,9 +2,14 @@
 #define GEAROENIX_VULKAN_DEVICE_LOGICAL_HPP
 #include "../../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
+#include "../../core/gx-cr-build-configuration.hpp"
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../gx-vk-loader.hpp"
 #include <memory>
+
+#ifdef GX_DEBUG_MODE
+#define GX_VULKAN_DEVICE_DEBUG_MODE
+#endif
 
 namespace gearoenix::vulkan::device {
 struct Physical;

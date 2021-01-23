@@ -1,8 +1,5 @@
 #include "gx-vk-eng-engine.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
-//#include "../../core/asset/gx-cr-asset-manager.hpp"
-//#include "../../core/gx-cr-application.hpp"
-//#include "../../render/scene/gx-rnd-scn-scene.hpp"
 #include "../../platform/gx-plt-application.hpp"
 #include "../../platform/gx-plt-log.hpp"
 
@@ -12,6 +9,9 @@ gearoenix::vulkan::engine::Engine::Engine(const platform::Application& platform_
     , surface(instance, platform_application)
     , physical_device(surface)
     , logical_device(physical_device)
+    , present_complete(logical_device)
+    , render_complete(logical_device)
+    , swapchain(logical_device)
 //    , memory_manager(logical_device)
 {
     ;

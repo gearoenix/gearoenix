@@ -28,12 +28,12 @@ SET(GX_ENGINE_VULKAN_SRC
         ${GX_ENGINE_VULKAN_SRC_DIR}/device/gx-vk-dev-physical.hpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/engine/gx-vk-eng-engine.cpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/engine/gx-vk-eng-engine.hpp
-#        ${GX_ENGINE_VULKAN_SRC_DIR}/image/gx-vk-img-image.cpp
-#        ${GX_ENGINE_VULKAN_SRC_DIR}/image/gx-vk-img-image.hpp
-#        ${GX_ENGINE_VULKAN_SRC_DIR}/image/gx-vk-img-manager.cpp
-#        ${GX_ENGINE_VULKAN_SRC_DIR}/image/gx-vk-img-manager.hpp
-#        ${GX_ENGINE_VULKAN_SRC_DIR}/image/gx-vk-img-view.cpp
-#        ${GX_ENGINE_VULKAN_SRC_DIR}/image/gx-vk-img-view.hpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/image/gx-vk-img-image.cpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/image/gx-vk-img-image.hpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/image/gx-vk-img-manager.cpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/image/gx-vk-img-manager.hpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/image/gx-vk-img-view.cpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/image/gx-vk-img-view.hpp
 #        ${GX_ENGINE_VULKAN_SRC_DIR}/memory/gx-vk-mem-manager.cpp
 #        ${GX_ENGINE_VULKAN_SRC_DIR}/memory/gx-vk-mem-manager.hpp
 #        ${GX_ENGINE_VULKAN_SRC_DIR}/memory/gx-vk-mem-memory.cpp

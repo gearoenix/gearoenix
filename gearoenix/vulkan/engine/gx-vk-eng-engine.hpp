@@ -7,7 +7,9 @@
 #include "../device/gx-vk-dev-physical.hpp"
 #include "../gx-vk-instance.hpp"
 #include "../gx-vk-surface.hpp"
+#include "../gx-vk-swapchain.hpp"
 #include "../memory/gx-vk-mem-manager.hpp"
+#include "../sync/gx-vk-sync-semaphore.hpp"
 #include <functional>
 #include <mutex>
 
@@ -17,6 +19,9 @@ struct Engine final : public render::engine::Engine {
     GX_GET_CREF_PRV(Surface, surface)
     GX_GET_CREF_PRV(device::Physical, physical_device)
     GX_GET_CREF_PRV(device::Logical, logical_device)
+    GX_GET_CREF_PRV(sync::Semaphore, present_complete)
+    GX_GET_CREF_PRV(sync::Semaphore, render_complete)
+    GX_GET_CREF_PRV(Swapchain, swapchain)
     //    GX_GET_CREF_PRV(memory::Manager, memory_manager)
     //    GX_GET_CREF_PRV(std::shared_ptr<sampler::Manager>, sampler_manager)
     //    GX_GET_CREF_PRV(std::shared_ptr<image::Manager>, image_manager)

@@ -221,15 +221,7 @@ gearoenix::vulkan::Instance::Instance(const platform::Application& platform_appl
 #endif
     GX_VK_CHK_L(vkCreateInstance(&instance_create_info, nullptr, &vulkan_data))
     // Loading instance functions
-#define VKL(fun_name)                                               \
-    if ((Loader::fun_name) == nullptr) {                            \
-        Loader::fun_name = reinterpret_cast<PFN_##fun_name>(        \
-            Loader::vkGetInstanceProcAddr(vulkan_data, #fun_name)); \
-    }
-    VKL(vkCreateDebugReportCallbackEXT)
-    VKL(vkDestroyDebugReportCallbackEXT)
-    VKL(vkDebugReportMessageEXT)
-
+    Loader::load(vulkan_data);
     VkDebugReportCallbackCreateInfoEXT dbg_info;
     GX_SET_ZERO(dbg_info)
     dbg_info.sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CREATE_INFO_EXT;

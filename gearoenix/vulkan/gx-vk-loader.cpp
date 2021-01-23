@@ -419,6 +419,36 @@ void gearoenix::vulkan::Loader::load() noexcept
     VKL(vkDestroyDebugReportCallbackEXT);
     VKL(vkDebugReportMessageEXT);
 #endif
+#undef VKL
+}
+
+void gearoenix::vulkan::Loader::load([[maybe_unused]] VkInstance instance) noexcept
+{
+#define VKL(fun_name)                                                                            \
+    if (fun_name == nullptr) {                                                                   \
+        fun_name = reinterpret_cast<PFN_##fun_name>(vkGetInstanceProcAddr(instance, #fun_name)); \
+    }
+#ifdef GX_USE_DEBUG_EXTENSIONS
+    VKL(vkCreateDebugReportCallbackEXT)
+    VKL(vkDestroyDebugReportCallbackEXT)
+    VKL(vkDebugReportMessageEXT)
+#endif
+#undef VKL
+}
+
+void gearoenix::vulkan::Loader::load([[maybe_unused]] VkDevice device) noexcept
+{
+#define VKL(fun_name)                                                                        \
+    if (fun_name == nullptr) {                                                               \
+        fun_name = reinterpret_cast<PFN_##fun_name>(vkGetDeviceProcAddr(device, #fun_name)); \
+    }
+#ifdef GX_USE_DEBUG_EXTENSIONS
+    VKL(vkDebugMarkerSetObjectTagEXT)
+    VKL(vkDebugMarkerSetObjectNameEXT)
+    VKL(vkCmdDebugMarkerBeginEXT)
+    VKL(vkCmdDebugMarkerEndEXT)
+    VKL(vkCmdDebugMarkerInsertEXT)
+#endif
 }
 
 void gearoenix::vulkan::Loader::unload() noexcept
@@ -426,5 +456,4 @@ void gearoenix::vulkan::Loader::unload() noexcept
     lib = nullptr;
 }
 
-#undef VKL
 #endif

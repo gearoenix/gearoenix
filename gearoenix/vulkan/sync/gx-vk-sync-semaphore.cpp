@@ -5,18 +5,18 @@
 #include "../device/gx-vk-dev-physical.hpp"
 #include "../gx-vk-check.hpp"
 
-gearoenix::vulkan::sync::Semaphore::Semaphore(std::shared_ptr<device::Logical> ld) noexcept
-    : logical_device(std::move(ld))
+gearoenix::vulkan::sync::Semaphore::Semaphore(const device::Logical& ld) noexcept
+    : logical_device(ld)
 {
-    VkSemaphoreCreateInfo semaphore_create_info;
-    GX_SET_ZERO(semaphore_create_info)
-    semaphore_create_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-    GX_VK_CHK_L(vkCreateSemaphore(logical_device->get_vulkan_data(), &semaphore_create_info, nullptr, &vulkan_data))
+    VkSemaphoreCreateInfo info;
+    GX_SET_ZERO(info)
+    info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+    GX_VK_CHK_L(vkCreateSemaphore(logical_device.get_vulkan_data(), &info, nullptr, &vulkan_data))
 }
 
 gearoenix::vulkan::sync::Semaphore::~Semaphore() noexcept
 {
-    Loader::vkDestroySemaphore(logical_device->get_vulkan_data(), vulkan_data, nullptr);
+    Loader::vkDestroySemaphore(logical_device.get_vulkan_data(), vulkan_data, nullptr);
 }
 
 #endif

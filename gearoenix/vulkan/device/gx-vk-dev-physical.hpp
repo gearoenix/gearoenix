@@ -6,6 +6,7 @@
 #include "../gx-vk-loader.hpp"
 #include <limits>
 #include <memory>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -23,7 +24,7 @@ struct Physical final {
     GX_GET_CREF_PRV(VkPhysicalDeviceMemoryProperties, memory_properties)
     GX_GET_CREF_PRV(VkSurfaceCapabilitiesKHR, surface_capabilities)
     GX_GET_CREF_PRV(std::vector<VkQueueFamilyProperties>, queue_family_properties)
-    GX_GET_CREF_PRV(std::vector<std::string>, supported_extensions)
+    GX_GET_CREF_PRV(std::set<std::string>, supported_extensions)
     GX_GET_CREF_PRV(std::vector<VkSurfaceFormatKHR>, surface_formats)
     GX_GET_VAL_PRV(VkFormat, supported_depth_format, VK_FORMAT_UNDEFINED)
     GX_GET_VAL_PRV(std::uint32_t, max_memory_alignment, std::numeric_limits<std::uint32_t>::max())

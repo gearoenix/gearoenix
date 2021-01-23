@@ -1,6 +1,5 @@
 #include "gx-vk-dev-logical.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
-#include "../../core/macro/gx-cr-mcr-counter.hpp"
 #include "../../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../gx-vk-check.hpp"
 #include "../gx-vk-instance.hpp"
@@ -9,7 +8,13 @@
 gearoenix::vulkan::device::Logical::Logical(const Physical& p) noexcept
     : physical_device(p)
 {
-    const char* const device_extensions[] = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
+    std::vector<const char*> device_extensions;
+    device_extensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
+#ifdef GX_VULKAN_DEVICE_DEBUG_MODE
+    if (p.get_supported_extensions().contains(VK_EXT_DEBUG_MARKER_EXTENSION_NAME)) {
+        device_extensions.push_back(VK_EXT_DEBUG_MARKER_EXTENSION_NAME);
+    }
+#endif
     const float queue_priorities[] = { 1.0f };
     std::set<std::uint32_t> queue_index_set;
     queue_index_set.insert(physical_device.get_graphics_queue_node_index());
@@ -37,11 +42,12 @@ gearoenix::vulkan::device::Logical::Logical(const Physical& p) noexcept
     device_create_info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
     device_create_info.queueCreateInfoCount = static_cast<std::uint32_t>(queue_create_infos.size());
     device_create_info.pQueueCreateInfos = queue_create_infos.data();
-    device_create_info.enabledExtensionCount = GX_COUNT_OF(device_extensions);
-    device_create_info.ppEnabledExtensionNames = device_extensions;
+    device_create_info.enabledExtensionCount = static_cast<std::uint32_t>(device_extensions.size());
+    device_create_info.ppEnabledExtensionNames = device_extensions.data();
     device_create_info.pEnabledFeatures = &device_features;
     GX_VK_CHK_L(vkCreateDevice(physical_device.get_vulkan_data(), &device_create_info, nullptr, &vulkan_data))
     Loader::vkGetDeviceQueue(vulkan_data, physical_device.get_graphics_queue_node_index(), 0, &graphic_queue);
+    Loader::load(vulkan_data);
 }
 
 gearoenix::vulkan::device::Logical::~Logical() noexcept

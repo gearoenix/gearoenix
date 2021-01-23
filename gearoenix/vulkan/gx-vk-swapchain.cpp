@@ -7,15 +7,14 @@
 #include "gx-vk-instance.hpp"
 #include "gx-vk-surface.hpp"
 #include "image/gx-vk-img-image.hpp"
-#include "image/gx-vk-img-view.hpp"
 #include "sync/gx-vk-sync-semaphore.hpp"
 
 #ifdef GX_DEBUG_MODE
 #define GX_DEBUG_SWAPCHAIN
 #endif
 
-gearoenix::vulkan::Swapchain::Swapchain(std::shared_ptr<device::Logical> d) noexcept
-    : logical_device(std::move(d))
+gearoenix::vulkan::Swapchain::Swapchain(const device::Logical& d) noexcept
+    : logical_device(d)
     , format {}
 {
     initialize();
@@ -24,16 +23,16 @@ gearoenix::vulkan::Swapchain::Swapchain(std::shared_ptr<device::Logical> d) noex
 gearoenix::vulkan::Swapchain::~Swapchain() noexcept
 {
     image_views.clear();
-    Loader::vkDestroySwapchainKHR(logical_device->get_vulkan_data(), vulkan_data, nullptr);
+    Loader::vkDestroySwapchainKHR(logical_device.get_vulkan_data(), vulkan_data, nullptr);
 }
 
-std::uint32_t gearoenix::vulkan::Swapchain::get_next_image_index(const std::shared_ptr<sync::Semaphore>& semaphore) noexcept
+std::uint32_t gearoenix::vulkan::Swapchain::get_next_image_index(const sync::Semaphore& semaphore) noexcept
 {
     std::uint32_t image_index = 0;
     const VkResult result = Loader::vkAcquireNextImageKHR(
-        logical_device->get_vulkan_data(), vulkan_data,
+        logical_device.get_vulkan_data(), vulkan_data,
         std::numeric_limits<std::uint64_t>::max(),
-        semaphore->get_vulkan_data(), nullptr, &image_index);
+        semaphore.get_vulkan_data(), nullptr, &image_index);
     switch (result) {
     case VK_ERROR_OUT_OF_DATE_KHR:
     case VK_ERROR_INITIALIZATION_FAILED:
@@ -47,7 +46,7 @@ std::uint32_t gearoenix::vulkan::Swapchain::get_next_image_index(const std::shar
 
 void gearoenix::vulkan::Swapchain::initialize() noexcept
 {
-    const auto& physical_device = logical_device->get_physical_device();
+    const auto& physical_device = logical_device.get_physical_device();
     const auto& surface = physical_device.get_surface();
     const VkSurfaceCapabilitiesKHR& caps = physical_device.get_surface_capabilities();
     const auto& formats = physical_device.get_surface_formats();
@@ -100,23 +99,23 @@ void gearoenix::vulkan::Swapchain::initialize() noexcept
     } else {
         GX_LOG_F("Error composite is unknown.")
     }
-    GX_VK_CHK_L(vkCreateSwapchainKHR(logical_device->get_vulkan_data(), &info, nullptr, &vulkan_data))
+    GX_VK_CHK_L(vkCreateSwapchainKHR(logical_device.get_vulkan_data(), &info, nullptr, &vulkan_data))
     std::uint32_t count = 0;
-    GX_VK_CHK_L(vkGetSwapchainImagesKHR(logical_device->get_vulkan_data(), vulkan_data, &count, nullptr))
+    GX_VK_CHK_L(vkGetSwapchainImagesKHR(logical_device.get_vulkan_data(), vulkan_data, &count, nullptr))
     std::vector<VkImage> images(count);
-    GX_VK_CHK_L(vkGetSwapchainImagesKHR(logical_device->get_vulkan_data(), vulkan_data, &count, images.data()))
+    GX_VK_CHK_L(vkGetSwapchainImagesKHR(logical_device.get_vulkan_data(), vulkan_data, &count, images.data()))
     image_views.reserve(static_cast<std::size_t>(count));
     for (uint32_t i = 0; i < count; ++i) {
-        image_views.emplace_back(new image::View(std::make_shared<image::Image>(
+        image_views.emplace_back(
             logical_device,
             images[i],
             info.imageExtent.width,
             info.imageExtent.height,
             info.imageUsage,
-            info.imageFormat)));
+            info.imageFormat);
     }
     if (nullptr != old_swapchain) {
-        Loader::vkDestroySwapchainKHR(logical_device->get_vulkan_data(), old_swapchain, nullptr);
+        Loader::vkDestroySwapchainKHR(logical_device.get_vulkan_data(), old_swapchain, nullptr);
     }
 }
 #endif

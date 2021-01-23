@@ -36,6 +36,8 @@ public:
 
     [[nodiscard]] static bool is_loaded() noexcept;
     static void load() noexcept;
+    static void load(VkInstance instance) noexcept;
+    static void load(VkDevice device) noexcept;
     static void unload() noexcept;
 
 #define GX_HELPER(x) static PFN_##x x
@@ -246,6 +248,12 @@ public:
     GX_HELPER(vkCreateDebugReportCallbackEXT);
     GX_HELPER(vkDestroyDebugReportCallbackEXT);
     GX_HELPER(vkDebugReportMessageEXT);
+    // VK_EXT_debug_marker
+    GX_HELPER(vkDebugMarkerSetObjectTagEXT);
+    GX_HELPER(vkDebugMarkerSetObjectNameEXT);
+    GX_HELPER(vkCmdDebugMarkerBeginEXT);
+    GX_HELPER(vkCmdDebugMarkerEndEXT);
+    GX_HELPER(vkCmdDebugMarkerInsertEXT);
 #endif
 };
 }

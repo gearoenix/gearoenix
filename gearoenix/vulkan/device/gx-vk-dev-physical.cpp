@@ -113,7 +113,7 @@ gearoenix::vulkan::device::Physical::Physical(const Surface& surf) noexcept
         std::vector<VkExtensionProperties> extensions(ext_count);
         if (Loader::vkEnumerateDeviceExtensionProperties(vulkan_data, nullptr, &ext_count, &extensions.front()) == VK_SUCCESS) {
             for (auto ext : extensions) {
-                supported_extensions.emplace_back(ext.extensionName);
+                supported_extensions.emplace(ext.extensionName);
             }
         }
     }

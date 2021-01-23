@@ -4,7 +4,7 @@
 #ifdef GX_RENDER_VULKAN_ENABLED
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../gx-vk-loader.hpp"
-
+#include "../memory/gx-vk-mem-memory.hpp"
 #include <memory>
 
 namespace gearoenix::vulkan::buffer {
@@ -21,14 +21,13 @@ struct Logical;
 
 namespace gearoenix::vulkan::memory {
 struct Manager;
-struct Memory;
 }
 
 namespace gearoenix::vulkan::image {
 struct Image {
 private:
-    GX_GET_REFC_PRV(std::shared_ptr<device::Logical>, logical_device)
-    GX_GET_CREF_PRV(std::shared_ptr<memory::Memory>, allocated_memory)
+    GX_GET_CRRF_PRV(device::Logical, logical_device)
+    GX_GET_CREF_PRV(memory::Memory, allocated_memory)
     GX_GET_VAL_PRV(VkImage, vulkan_data, nullptr)
     GX_GET_CVAL_PRV(std::uint32_t, image_width)
     GX_GET_CVAL_PRV(std::uint32_t, image_height)
@@ -37,7 +36,7 @@ private:
 
 public:
     Image(
-        std::shared_ptr<device::Logical> logical_device,
+        const device::Logical& logical_device,
         VkImage vulkan_data,
         std::uint32_t image_width,
         std::uint32_t image_height,
