@@ -3,8 +3,8 @@
 
 void start(GX_MAIN_ENTRY_ARGS_DEF) noexcept
 {
-    const auto plt_app = gearoenix::platform::Application::construct(GX_MAIN_ENTRY_ARGS);
-    plt_app->run();
+    auto plt_app = gearoenix::platform::Application(GX_MAIN_ENTRY_ARGS);
+    plt_app.run();
     GX_LOG_D("Ended.")
 }
 

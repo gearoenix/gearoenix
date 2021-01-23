@@ -6,9 +6,10 @@
 
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../gx-plt-application.hpp"
+#include "../gx-plt-main-entry.hpp"
 #include "../gx-plt-runtime-configuration.hpp"
+#include <X11/Xlib.h>
 #include <memory>
-#include <xcb/xcb.h>
 
 namespace gearoenix::core {
 struct Application;
@@ -17,16 +18,18 @@ struct Application;
 namespace gearoenix::platform {
 struct Application final {
     GX_GET_CREF_PRV(BaseApplication, base)
-    GX_GET_CREF_PRV(std::weak_ptr<Application>, self)
-    GX_GET_PTR_PRV(xcb_connection_t, connection)
-    GX_GET_VAL_PRV(xcb_window_t, window, 0)
+    GX_GET_PTR_PRV(Display, display)
+    GX_GET_VAL_PRV(Window, window, 0)
 
 private:
-    explicit Application(const RuntimeConfiguration& config) noexcept;
+    Atom close_message;
+
+    [[nodiscard]] bool fetch_events(XEvent& event) noexcept;
 
 public:
-    [[nodiscard]] static std::shared_ptr<Application> construct(const RuntimeConfiguration& config = RuntimeConfiguration()) noexcept;
+    explicit Application(GX_MAIN_ENTRY_ARGS_DEF, const RuntimeConfiguration& config = RuntimeConfiguration()) noexcept;
     ~Application() noexcept;
+
     void run() noexcept;
 };
 }

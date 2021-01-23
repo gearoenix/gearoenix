@@ -179,7 +179,7 @@ gearoenix::vulkan::Instance::Instance(std::shared_ptr<platform::Application> plt
 #ifdef GX_PLATFORM_ANDROID
     instance_extensions.push_back(VK_KHR_ANDROID_SURFACE_EXTENSION_NAME);
 #elif defined(GX_PLATFORM_LINUX)
-    instance_extensions.push_back(VK_KHR_XCB_SURFACE_EXTENSION_NAME);
+    instance_extensions.push_back(VK_KHR_XLIB_SURFACE_EXTENSION_NAME);
 #elif defined(GX_PLATFORM_WINDOWS)
     instance_extensions.push_back(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
 #else

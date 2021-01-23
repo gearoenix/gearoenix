@@ -23,13 +23,13 @@ gearoenix::vulkan::Surface::Surface(
     VKC(instance->get_linker()->vkCreateAndroidSurfaceKHR(
         instance->get_vulkan_data(), &create_info, 0, &vulkan_data));
 #elif defined(GX_PLATFORM_LINUX)
-    VkXcbSurfaceCreateInfoKHR create_info;
-    GX_SET_ZERO(create_info);
-    create_info.sType = VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR;
-    create_info.connection = platform_application->get_connection();
-    create_info.window = platform_application->get_window();
-    GX_VK_CHK_L(vkCreateXcbSurfaceKHR(
-        instance->get_vulkan_data(), &create_info, nullptr, &vulkan_data));
+    VkXlibSurfaceCreateInfoKHR info;
+    GX_SET_ZERO(info)
+    info.sType = VK_STRUCTURE_TYPE_XLIB_SURFACE_CREATE_INFO_KHR;
+    info.dpy = platform_application->get_display();
+    info.window = platform_application->get_window();
+    GX_VK_CHK_L(vkCreateXlibSurfaceKHR(
+        instance->get_vulkan_data(), &info, nullptr, &vulkan_data))
 #elif defined(GX_PLATFORM_WINDOWS)
     VkWin32SurfaceCreateInfoKHR create_info;
     GX_SET_ZERO(create_info)

@@ -16,6 +16,7 @@
     int WINAPI WinMain(GX_MAIN_ENTRY_ARGS_DEF) \
     {                                          \
         expr;                                  \
+        return 0;                              \
     }
 
 #endif
