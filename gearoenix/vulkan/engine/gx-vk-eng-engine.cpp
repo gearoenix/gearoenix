@@ -25,14 +25,12 @@
 //#include "../texture/gx-vk-txt-main-target.hpp"
 //#include "../texture/gx-vk-txt-target.hpp"
 
-gearoenix::vulkan::engine::Engine::Engine(
-    const render::RuntimeConfiguration& configuration,
-    std::shared_ptr<platform::Application> plt_app) noexcept
-    : render::engine::Engine(configuration, std::move(plt_app), render::engine::Type::Vulkan)
-    , instance(std::make_shared<Instance>(platform_application))
-    , surface(std::make_shared<Surface>(instance, platform_application))
-    , physical_device(std::make_shared<device::Physical>(surface))
-    , logical_device(std::make_shared<device::Logical>(physical_device))
+gearoenix::vulkan::engine::Engine::Engine(const platform::Application& platform_application) noexcept
+    : render::engine::Engine(render::engine::Type::Vulkan, platform_application)
+    , instance(platform_application)
+//    , surface(std::make_shared<Surface>(instance, platform_application))
+//    , physical_device(std::make_shared<device::Physical>(surface))
+//    , logical_device(std::make_shared<device::Logical>(physical_device))
 //    , memory_manager(logical_device)
 {
     ;
@@ -52,16 +50,9 @@ gearoenix::vulkan::engine::Engine::Engine(
     //    }
 }
 
-std::shared_ptr<gearoenix::vulkan::engine::Engine> gearoenix::vulkan::engine::Engine::construct(
-    const render::RuntimeConfiguration& configuration,
-    std::shared_ptr<platform::Application> platform_application) noexcept
-{
-    return std::shared_ptr<Engine>(new Engine(configuration, std::move(platform_application)));
-}
-
 gearoenix::vulkan::engine::Engine::~Engine() noexcept
 {
-    logical_device->wait_to_finish();
+    //    logical_device->wait_to_finish();
 }
 
 //void gearoenix::render::Engine::window_changed()

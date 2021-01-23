@@ -19,12 +19,11 @@ struct Application;
 namespace gearoenix::vulkan {
 struct Instance final {
     GX_GET_VAL_PRV(VkInstance, vulkan_data, nullptr)
-    GX_GET_CREF_PRV(std::shared_ptr<platform::Application>, platform_application)
 #ifdef GX_VULKAN_INSTANCE_DEBUG
     GX_GET_VAL_PRV(VkDebugReportCallbackEXT, report_callback, nullptr)
 #endif
 public:
-    explicit Instance(std::shared_ptr<platform::Application> platform_application) noexcept;
+    explicit Instance(const platform::Application& platform_application) noexcept;
     ~Instance() noexcept;
 };
 }

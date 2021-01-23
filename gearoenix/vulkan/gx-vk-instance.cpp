@@ -163,8 +163,7 @@ static std::uint32_t find_api_version() noexcept
 }
 }
 
-gearoenix::vulkan::Instance::Instance(std::shared_ptr<platform::Application> plt_app) noexcept
-    : platform_application(std::move(plt_app))
+gearoenix::vulkan::Instance::Instance(const platform::Application& platform_application) noexcept
 {
     VkApplicationInfo app_info;
     GX_SET_ZERO(app_info)
@@ -172,7 +171,7 @@ gearoenix::vulkan::Instance::Instance(std::shared_ptr<platform::Application> plt
     app_info.apiVersion = find_api_version();
     app_info.applicationVersion = VK_MAKE_VERSION(1u, 0u, 0u);
     app_info.engineVersion = VK_MAKE_VERSION(1u, 0u, 0u);
-    app_info.pApplicationName = platform_application->get_base().get_configuration().get_application_name().c_str();
+    app_info.pApplicationName = platform_application.get_base().get_configuration().get_application_name().c_str();
     app_info.pEngineName = GX_ENGINE_NAME;
     std::vector<const char*> instance_extensions;
     instance_extensions.push_back(VK_KHR_SURFACE_EXTENSION_NAME);

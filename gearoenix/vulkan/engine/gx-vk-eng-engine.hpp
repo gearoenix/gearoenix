@@ -3,52 +3,20 @@
 #include "../../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
 #include "../../render/engine/gx-rnd-eng-engine.hpp"
+#include "../device/gx-vk-dev-logical.hpp"
+#include "../device/gx-vk-dev-physical.hpp"
+#include "../gx-vk-instance.hpp"
+#include "../gx-vk-surface.hpp"
 #include "../memory/gx-vk-mem-manager.hpp"
 #include <functional>
 #include <mutex>
 
-namespace gearoenix::vulkan::buffer {
-struct Manager;
-}
-
-namespace gearoenix::vulkan::command {
-struct Buffer;
-}
-
-namespace gearoenix::vulkan::device {
-struct Physical;
-struct Logical;
-}
-
-namespace gearoenix::vulkan::image {
-struct View;
-struct Manager;
-}
-
-namespace gearoenix::vulkan::sync {
-struct Semaphore;
-}
-
-namespace gearoenix::vulkan::sampler {
-struct Manager;
-}
-
-namespace gearoenix::vulkan::texture {
-struct MainTarget;
-}
-
-namespace gearoenix::vulkan {
-struct Instance;
-struct Surface;
-struct Swapchain;
-}
-
 namespace gearoenix::vulkan::engine {
 struct Engine final : public render::engine::Engine {
-    GX_GET_CREF_PRV(std::shared_ptr<Instance>, instance)
-    GX_GET_CREF_PRV(std::shared_ptr<Surface>, surface)
-    GX_GET_CREF_PRV(std::shared_ptr<device::Physical>, physical_device)
-    GX_GET_CREF_PRV(std::shared_ptr<device::Logical>, logical_device)
+    GX_GET_CREF_PRV(Instance, instance)
+    //    GX_GET_CREF_PRV(Surface, surface)
+    //    GX_GET_CREF_PRV(device::Physical, physical_device)
+    //    GX_GET_CREF_PRV(device::Logical, logical_device)
     //    GX_GET_CREF_PRV(memory::Manager, memory_manager)
     //    GX_GET_CREF_PRV(std::shared_ptr<sampler::Manager>, sampler_manager)
     //    GX_GET_CREF_PRV(std::shared_ptr<image::Manager>, image_manager)
@@ -56,15 +24,9 @@ struct Engine final : public render::engine::Engine {
     //    GX_GET_CREF_PRV(std::shared_ptr<texture::MainTarget>, vulkan_main_render_target)
     //    GX_GET_CREF_PRV(std::vector<std::shared_ptr<command::Buffer>>, upload_command_buffers)
     //    GX_GET_CREF_PRV(std::vector<std::shared_ptr<sync::Semaphore>>, upload_semaphore)
-private:
-    Engine(
-        const render::RuntimeConfiguration& configuration,
-        std::shared_ptr<platform::Application> platform_application) noexcept;
 
 public:
-    [[nodiscard]] static std::shared_ptr<Engine> construct(
-        const render::RuntimeConfiguration& configuration,
-        std::shared_ptr<platform::Application> platform_application) noexcept;
+    explicit Engine(const platform::Application& platform_application) noexcept;
     ~Engine() noexcept final;
     void update() noexcept final;
     //    [[nodiscard]] std::shared_ptr<render::sync::Semaphore> create_semaphore() const noexcept final;
