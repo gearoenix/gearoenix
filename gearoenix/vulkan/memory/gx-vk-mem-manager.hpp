@@ -21,8 +21,12 @@ private:
     std::map<std::pair<std::uint32_t, Place>, Memory> memories;
 
 public:
+    Manager(const Manager&) = delete;
+    Manager(Manager&&) = delete;
     explicit Manager(const device::Logical& logical_device) noexcept;
     ~Manager() noexcept;
+    Manager& operator=(const Manager&) = delete;
+    Manager& operator=(Manager&&) = delete;
     [[nodiscard]] std::size_t align(std::size_t) const noexcept;
     [[nodiscard]] std::optional<Memory> allocate(std::size_t size, std::uint32_t type_bits, Place place) noexcept;
 };

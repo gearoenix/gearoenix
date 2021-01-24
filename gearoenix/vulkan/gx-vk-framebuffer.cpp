@@ -5,7 +5,6 @@
 #include "device/gx-vk-dev-physical.hpp"
 #include "gx-vk-check.hpp"
 #include "gx-vk-render-pass.hpp"
-#include "image/gx-vk-img-image.hpp"
 #include "image/gx-vk-img-view.hpp"
 
 gearoenix::vulkan::Framebuffer::Framebuffer(
@@ -17,7 +16,7 @@ gearoenix::vulkan::Framebuffer::Framebuffer(
     , render_pass(std::move(rp))
 {
     const auto& img = view->get_image();
-    const auto& logical_device = img->get_logical_device();
+    const auto& logical_device = img.get_logical_device();
     const VkImageView attachments[2] {
         view->get_vulkan_data(),
         depth->get_vulkan_data(),
@@ -29,14 +28,14 @@ gearoenix::vulkan::Framebuffer::Framebuffer(
     info.layers = 1;
     info.attachmentCount = 2;
     info.pAttachments = attachments;
-    info.width = img->get_image_width();
-    info.height = img->get_image_height();
+    info.width = img.get_image_width();
+    info.height = img.get_image_height();
     GX_VK_CHK_L(vkCreateFramebuffer(logical_device->get_vulkan_data(), &info, nullptr, &vulkan_data))
 }
 
 gearoenix::vulkan::Framebuffer::~Framebuffer() noexcept
 {
-    const auto& logical_device = view->get_image()->get_logical_device();
+    const auto& logical_device = view->get_image().get_logical_device();
     Loader::vkDestroyFramebuffer(logical_device->get_vulkan_data(), vulkan_data, nullptr);
 }
 #endif

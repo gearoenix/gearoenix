@@ -106,13 +106,9 @@ void gearoenix::vulkan::Swapchain::initialize() noexcept
     GX_VK_CHK_L(vkGetSwapchainImagesKHR(logical_device.get_vulkan_data(), vulkan_data, &count, images.data()))
     image_views.reserve(static_cast<std::size_t>(count));
     for (uint32_t i = 0; i < count; ++i) {
-        image_views.emplace_back(
-            logical_device,
-            images[i],
-            info.imageExtent.width,
-            info.imageExtent.height,
-            info.imageUsage,
-            info.imageFormat);
+        image_views.emplace_back(image::Image(
+            &logical_device, info.imageExtent.width, info.imageExtent.height, 1, 1, 1,
+            info.imageFormat, 0, info.imageUsage, images[i]));
     }
     if (nullptr != old_swapchain) {
         Loader::vkDestroySwapchainKHR(logical_device.get_vulkan_data(), old_swapchain, nullptr);

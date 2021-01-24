@@ -12,5 +12,4 @@ enum struct Place : core::TypeId {
 }
 
 #endif
-
 #endif

@@ -56,8 +56,8 @@ public:                             \
     [[nodiscard]] t* get_##x() noexcept { return x; }
 #define GX_GET_PTR_PRT(t, x) GX_GET_PTR(protected, , t, x)
 #define GX_GET_PTR_PRV(t, x) GX_GET_PTR(private, , t, x)
-#define GX_GET_CPTR_PRT(t, x) GX_GET_PTR(protected, const, t, x)
-#define GX_GET_CPTR_PRV(t, x) GX_GET_PTR(private, const, t, x)
+#define GX_GET_CPTR_PRT(t, x) GX_GET_PTRC(protected, const, , t, x)
+#define GX_GET_CPTR_PRV(t, x) GX_GET_PTRC(private, const, , t, x)
 #define GX_GETSET_PTR(v, t, x) \
     GX_GET_PTR(v, , t, x)      \
     void set_##x(t* const _##x) noexcept { x = _##x; }

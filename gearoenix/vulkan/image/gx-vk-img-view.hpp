@@ -9,14 +9,17 @@
 namespace gearoenix::vulkan::image {
 struct View final {
 private:
-    GX_GET_REFC_PRV(Image, image)
+    GX_GET_CREF_PRV(Image, image)
     GX_GET_VAL_PRV(VkImageView, vulkan_data, nullptr)
 
 public:
     explicit View(Image&& img) noexcept;
-    View(View&& o) noexcept;
+    View(View&&) noexcept;
+    View(const View&) = delete;
     ~View() noexcept;
-    [[nodiscard]] static View create_depth_stencil(memory::Manager& mem_mgr) noexcept;
+    View& operator=(View&&) noexcept;
+    View& operator=(const View&) = delete;
+    //    [[nodiscard]] static View create_depth_stencil(memory::Manager& mem_mgr) noexcept;
 };
 }
 #endif

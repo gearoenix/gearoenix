@@ -207,6 +207,12 @@ GX_HELPER(vkGetPhysicalDeviceWin32PresentationSupportKHR);
 GX_HELPER(vkCreateDebugReportCallbackEXT);
 GX_HELPER(vkDestroyDebugReportCallbackEXT);
 GX_HELPER(vkDebugReportMessageEXT);
+// VK_EXT_debug_marker
+GX_HELPER(vkDebugMarkerSetObjectTagEXT);
+GX_HELPER(vkDebugMarkerSetObjectNameEXT);
+GX_HELPER(vkCmdDebugMarkerBeginEXT);
+GX_HELPER(vkCmdDebugMarkerEndEXT);
+GX_HELPER(vkCmdDebugMarkerInsertEXT);
 #endif
 
 #undef GX_HELPER
