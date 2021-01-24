@@ -1,103 +1,91 @@
 #include "gx-cr-allocator.hpp"
-#include "../platform/gx-plt-log.hpp"
-#include "macro/gx-cr-mcr-assert.hpp"
-#include <algorithm>
+
+void gearoenix::core::Allocator::deallocate(const std::size_t sz, const std::size_t off) noexcept
+{
+    const auto end = off + sz;
+    auto final_end = end;
+    auto final_start = off;
+    GX_GUARD_LOCK(this)
+    {
+        auto end_search = start_to_end.find(end);
+        if (start_to_end.end() != end_search) {
+            final_end = end_search->second;
+            end_to_start.erase(final_end);
+            size_start.erase(std::make_pair(final_end - end_search->first, end_search->first));
+            start_to_end.erase(end_search);
+        }
+    }
+    {
+        auto start_search = end_to_start.find(off);
+        if (end_to_start.end() != start_search) {
+            final_start = start_search->second;
+            start_to_end.erase(final_start);
+            size_start.erase(std::make_pair(start_search->first - final_start, final_start));
+            end_to_start.erase(start_search);
+        }
+    }
+    const auto final_size = final_end - final_start;
+    size_start.emplace(final_size, final_start);
+    start_to_end.emplace(final_start, final_end);
+    end_to_start.emplace(final_end, final_start);
+}
 
 gearoenix::core::Allocator::Allocator(
     const std::size_t size,
     const std::size_t offset,
-    const std::size_t root_offset) noexcept
+    Allocator* const parent) noexcept
     : size(size)
     , offset(offset)
-    , root_offset(root_offset)
-    , ranges { { { size, 0 }, { nullptr, nullptr } } }
+    , parent(parent)
 {
+    const auto end = offset + size;
+    size_start.emplace(size, offset);
+    start_to_end.emplace(offset, end);
+    end_to_start.emplace(end, offset);
 }
 
-void gearoenix::core::Allocator::deallocate(const Allocator* const child) noexcept
+gearoenix::core::Allocator::Allocator(Allocator&& o) noexcept
+    : size(o.size)
+    , offset(o.offset)
+    , size_start(std::move(o.size_start))
+    , start_to_end(std::move(o.start_to_end))
+    , end_to_start(std::move(o.end_to_start))
+    , parent(o.parent)
 {
-    GX_GUARD_LOCK(this)
-    auto* const child_previous = child->previous;
-    auto* const child_next = child->next;
-    const auto new_range = std::make_pair(child_previous, child_next);
-    SizeOffset new_key { child->size, child->offset };
-    const auto child_previous_key = child->previous_key;
-    const auto child_next_key = child->next_key;
-    if (child_previous_key.has_value()) {
-        new_key.first += child_previous_key->first;
-        new_key.second = child_previous_key->second;
-        ranges.erase(*child_previous_key);
-    }
-    if (child_next_key.has_value()) {
-        new_key.first += child_next_key->first;
-        ranges.erase(*child_next_key);
-    }
-    if (nullptr == child_previous) {
-        first_child = child_next;
-    } else {
-        child_previous->next = child_next;
-        child_previous->next_key = new_key;
-    }
-    if (nullptr != child_next) {
-        child_next->previous = child_previous;
-        child_next->previous_key = new_key;
-    }
-    ranges.emplace(new_key, new_range);
-}
-
-std::shared_ptr<gearoenix::core::Allocator> gearoenix::core::Allocator::construct(
-    const std::size_t size, const std::size_t offset, const std::size_t root_offset) noexcept
-{
-    GX_CHECK_NOT_EQUAL_D(size, 0)
-    std::shared_ptr<Allocator> r(new Allocator(size, offset, root_offset));
-    r->self = r;
-    return r;
 }
 
 gearoenix::core::Allocator::~Allocator() noexcept
 {
     if (nullptr != parent)
-        parent->deallocate(this);
+        parent->deallocate(size, offset);
 }
 
-std::shared_ptr<gearoenix::core::Allocator> gearoenix::core::Allocator::allocate(
-    const std::size_t sz) noexcept
+gearoenix::core::Allocator& gearoenix::core::Allocator::operator=(Allocator&& o) noexcept
+{
+    size = o.size;
+    offset = o.offset;
+    size_start = std::move(o.size_start);
+    start_to_end = std::move(o.start_to_end);
+    end_to_start = std::move(o.end_to_start);
+    parent = o.parent;
+    return *this;
+}
+
+std::optional<gearoenix::core::Allocator> gearoenix::core::Allocator::allocate(const std::size_t sz) noexcept
 {
     GX_GUARD_LOCK(this)
-    auto search = std::upper_bound(
-        ranges.begin(), ranges.end(), sz,
-        [](const std::size_t a, const decltype(ranges)::value_type& b) {
-            return a <= b.first.first;
-        });
-    if (ranges.end() == search) {
-        GX_LOG_D("Not enough space left to allocate: " << sz)
-        return nullptr;
+    const auto size_search = size_start.lower_bound(std::make_pair(sz, 0));
+    if (size_start.end() == size_search)
+        return std::nullopt;
+    const auto result_offset = size_search->second;
+    const auto final_size = size_search->first - sz;
+    size_start.erase(size_search);
+    if (final_size > 0) {
+        const auto start = result_offset + sz;
+        const auto end = start + final_size;
+        size_start.emplace(final_size, start);
+        start_to_end.emplace(start, end);
+        end_to_start.emplace(end, start);
     }
-    const auto found_size = search->first.first;
-    const auto found_offset = search->first.second;
-    auto result = construct(sz, found_offset, root_offset + found_offset);
-    result->parent = self.lock();
-    const auto del_range = search->second;
-    ranges.erase(search);
-    auto* const result_previous = del_range.first;
-    if (nullptr == result_previous) {
-        first_child = result.get();
-    } else {
-        result_previous->next_key = std::nullopt;
-        result_previous->next = result.get();
-        result->previous = result_previous;
-    }
-    auto* const result_next = del_range.second;
-    const auto new_size = found_size - sz;
-    const auto new_key = new_size == 0 ? std::nullopt : std::make_optional(std::make_pair(new_size, found_offset + sz));
-    if (new_key.has_value()) {
-        result->next_key = new_key;
-        ranges.emplace(*new_key, std::make_pair(result.get(), result_next));
-    }
-    if (nullptr != result_next) {
-        result_next->previous_key = new_key;
-        result_next->previous = result.get();
-        result->next = result_next;
-    }
-    return result;
+    return Allocator(sz, result_offset, this);
 }

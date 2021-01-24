@@ -34,11 +34,11 @@ SET(GX_ENGINE_VULKAN_SRC
         ${GX_ENGINE_VULKAN_SRC_DIR}/image/gx-vk-img-manager.hpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/image/gx-vk-img-view.cpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/image/gx-vk-img-view.hpp
-#        ${GX_ENGINE_VULKAN_SRC_DIR}/memory/gx-vk-mem-manager.cpp
-#        ${GX_ENGINE_VULKAN_SRC_DIR}/memory/gx-vk-mem-manager.hpp
-#        ${GX_ENGINE_VULKAN_SRC_DIR}/memory/gx-vk-mem-memory.cpp
-#        ${GX_ENGINE_VULKAN_SRC_DIR}/memory/gx-vk-mem-memory.hpp
-#        ${GX_ENGINE_VULKAN_SRC_DIR}/memory/gx-vk-mem-place.hpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/memory/gx-vk-mem-manager.cpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/memory/gx-vk-mem-manager.hpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/memory/gx-vk-mem-memory.cpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/memory/gx-vk-mem-memory.hpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/memory/gx-vk-mem-place.hpp
 #        ${GX_ENGINE_VULKAN_SRC_DIR}/pipeline/gx-vk-pip-cache.cpp
 #        ${GX_ENGINE_VULKAN_SRC_DIR}/pipeline/gx-vk-pip-cache.hpp
 #        ${GX_ENGINE_VULKAN_SRC_DIR}/pipeline/gx-vk-pip-layout.cpp

@@ -41,8 +41,7 @@ public:
         std::uint32_t image_width,
         std::uint32_t image_height,
         VkImageUsageFlags usage,
-        VkFormat format,
-        std::shared_ptr<memory::Memory> allocated_memory = nullptr) noexcept;
+        VkFormat format) noexcept;
 
     Image(
         std::uint32_t image_width,
