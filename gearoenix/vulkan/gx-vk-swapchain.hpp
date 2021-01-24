@@ -5,7 +5,6 @@
 #include "../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "gx-vk-loader.hpp"
 #include "image/gx-vk-img-view.hpp"
-#include <memory>
 #include <vector>
 
 namespace gearoenix::vulkan::device {

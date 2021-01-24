@@ -3,27 +3,31 @@
 #include "../../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
+#include "../../platform/macro/gx-plt-mcr-lock.hpp"
+#include "gx-vk-cmd-buffer.hpp"
+#include "gx-vk-cmd-pool.hpp"
+#include "gx-vk-cmd-type.hpp"
 #include <map>
+#include <optional>
 #include <thread>
 
-namespace gearoenix::vulkan::device {
-struct Logical;
-}
-
 namespace gearoenix::vulkan::command {
-struct Pool;
 struct Manager final {
-    GX_GET_REFC_PRV(std::shared_ptr<device::Logical>, logical_device)
+    GX_GET_CRRF_PRV(device::Logical, logical_device)
+
 private:
-    std::map<std::size_t, std::shared_ptr<Pool>> indexed_pools;
-    std::map<std::thread::id, std::shared_ptr<Pool>> threads_pools;
+    GX_CREATE_GUARD(this)
+    std::map<std::size_t, Pool> indexed_pools;
+    std::map<std::thread::id, Pool> threads_pools;
 
 public:
-    explicit Manager(std::shared_ptr<device::Logical> logical_device) noexcept;
+    Manager(const Manager&) = delete;
+    Manager(Manager&&) = delete;
+    explicit Manager(const device::Logical& logical_device) noexcept;
     ~Manager() noexcept;
-    [[nodiscard]] Buffer* create_command_buffer(
-        render::command::Type command_buffer_type,
-        std::optional<std::size_t> thread_id) noexcept;
+    Manager& operator=(const Manager&) = delete;
+    Manager& operator=(Manager&&) = delete;
+    [[nodiscard]] Buffer create(Type buffer_type, std::optional<std::size_t> thread_index = std::nullopt) noexcept;
 };
 }
 #endif

@@ -19,7 +19,7 @@ public:
     ~View() noexcept;
     View& operator=(View&&) noexcept;
     View& operator=(const View&) = delete;
-    //    [[nodiscard]] static View create_depth_stencil(memory::Manager& mem_mgr) noexcept;
+    [[nodiscard]] static View create_depth_stencil(memory::Manager& mem_mgr) noexcept;
 };
 }
 #endif

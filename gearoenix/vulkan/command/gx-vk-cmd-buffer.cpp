@@ -11,10 +11,17 @@
 #define GX_VK_CMD_BUFF_DEBUG
 #endif
 
-gearoenix::vulkan::command::Buffer::Buffer(Pool* const pool, VkCommandBuffer vulkan_data) noexcept
+gearoenix::vulkan::command::Buffer::Buffer(Pool* const pool, const Type t) noexcept
     : pool(pool)
-    , vulkan_data(vulkan_data)
+    , type(t)
 {
+    VkCommandBufferAllocateInfo info;
+    GX_SET_ZERO(info)
+    info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    info.commandPool = pool->get_vulkan_data();
+    info.level = t == Type::Primary ? VK_COMMAND_BUFFER_LEVEL_PRIMARY : VK_COMMAND_BUFFER_LEVEL_SECONDARY;
+    info.commandBufferCount = 1;
+    GX_VK_CHK_L(vkAllocateCommandBuffers(pool->get_logical_device().get_vulkan_data(), &info, &vulkan_data))
 }
 
 gearoenix::vulkan::command::Buffer::~Buffer() noexcept
@@ -24,31 +31,8 @@ gearoenix::vulkan::command::Buffer::~Buffer() noexcept
         GX_UNEXPECTED
 #endif
     Loader::vkFreeCommandBuffers(
-        pool->get_logical_device()->get_vulkan_data(),
+        pool->get_logical_device().get_vulkan_data(),
         pool->get_vulkan_data(), 1, &vulkan_data);
-}
-
-gearoenix::vulkan::command::Buffer gearoenix::vulkan::command::Buffer::create(Pool* const pool, bool is_primary) noexcept
-{
-    VkCommandBufferAllocateInfo info;
-    GX_SET_ZERO(info)
-    info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    info.commandPool = pool->get_vulkan_data();
-    info.level = is_primary ? VK_COMMAND_BUFFER_LEVEL_PRIMARY : VK_COMMAND_BUFFER_LEVEL_SECONDARY;
-    info.commandBufferCount = 1;
-    VkCommandBuffer vulkan_data;
-    GX_VK_CHK_L(vkAllocateCommandBuffers(pool->get_logical_device()->get_vulkan_data(), &info, &vulkan_data))
-    return Buffer(pool, vulkan_data);
-}
-
-gearoenix::vulkan::command::Buffer gearoenix::vulkan::command::Buffer::create_primary(Pool* const pool) noexcept
-{
-    return create(pool, true);
-}
-
-gearoenix::vulkan::command::Buffer gearoenix::vulkan::command::Buffer::create_secondary(Pool* const pool) noexcept
-{
-    return create(pool, false);
 }
 
 void gearoenix::vulkan::command::Buffer::begin() noexcept
@@ -69,7 +53,7 @@ void gearoenix::vulkan::command::Buffer::flush() noexcept
     submit_info.commandBufferCount = 1;
     submit_info.pCommandBuffers = &vulkan_data;
     GX_VK_CHK_L(vkQueueSubmit(
-        pool->get_logical_device()->get_graphic_queue(),
+        pool->get_logical_device().get_graphic_queue(),
         1, &submit_info, fence.get_vulkan_data()))
     fence.wait();
 }
@@ -133,7 +117,7 @@ void gearoenix::vulkan::command::Buffer::end_render_pass() noexcept
 //    Loader::vkCmdBindIndexBuffer(vulkan_data, buf, offset, VK_INDEX_TYPE_UINT32);
 //}
 
-void gearoenix::vulkan::command::Buffer::draw_indexed(VkDeviceSize count) noexcept
+void gearoenix::vulkan::command::Buffer::draw_indices(VkDeviceSize count) noexcept
 {
     Loader::vkCmdDrawIndexed(vulkan_data, static_cast<std::uint32_t>(count), 1, 0, 0, 1);
 }

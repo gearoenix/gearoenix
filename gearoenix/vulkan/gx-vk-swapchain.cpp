@@ -6,7 +6,6 @@
 #include "gx-vk-check.hpp"
 #include "gx-vk-instance.hpp"
 #include "gx-vk-surface.hpp"
-#include "image/gx-vk-img-image.hpp"
 #include "sync/gx-vk-sync-semaphore.hpp"
 
 #ifdef GX_DEBUG_MODE
@@ -22,7 +21,6 @@ gearoenix::vulkan::Swapchain::Swapchain(const device::Logical& d) noexcept
 
 gearoenix::vulkan::Swapchain::~Swapchain() noexcept
 {
-    image_views.clear();
     Loader::vkDestroySwapchainKHR(logical_device.get_vulkan_data(), vulkan_data, nullptr);
 }
 

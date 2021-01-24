@@ -14,7 +14,7 @@ gearoenix::vulkan::image::View::View(Image&& img) noexcept
     GX_SET_ZERO(info)
     info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
     info.image = image.get_vulkan_data();
-    info.viewType = VK_IMAGE_VIEW_TYPE_2D;
+    info.viewType = image.get_image_depth() > 1 ? VK_IMAGE_VIEW_TYPE_3D : VK_IMAGE_VIEW_TYPE_2D;
     info.format = image.get_format();
     info.components.r = VK_COMPONENT_SWIZZLE_R;
     info.components.g = VK_COMPONENT_SWIZZLE_G;
@@ -40,19 +40,21 @@ gearoenix::vulkan::image::View::~View() noexcept
 
 gearoenix::vulkan::image::View& gearoenix::vulkan::image::View::operator=(View&&) noexcept = default;
 
-//gearoenix::vulkan::image::View gearoenix::vulkan::image::View::create_depth_stencil(
-//    memory::Manager& mem_mgr) noexcept
-//{
-//    const auto& physical_device = mem_mgr.get_logical_device().get_physical_device();
-//    const VkFormat depth_format = physical_device.get_supported_depth_format();
-//    const VkSurfaceCapabilitiesKHR& surf_cap = physical_device.get_surface_capabilities();
-//    return View(Image(
-//        surf_cap.currentExtent.width,
-//        surf_cap.currentExtent.height,
-//        1,
-//        1, 1, 1,
-//        VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT, 0,
-//        depth_format, mem_mgr));
-//}
+gearoenix::vulkan::image::View gearoenix::vulkan::image::View::create_depth_stencil(memory::Manager& mem_mgr) noexcept
+{
+    const auto& physical_device = mem_mgr.get_logical_device().get_physical_device();
+    const VkFormat depth_format = physical_device.get_supported_depth_format();
+    const VkSurfaceCapabilitiesKHR& surf_cap = physical_device.get_surface_capabilities();
+    return View(Image(
+        surf_cap.currentExtent.width,
+        surf_cap.currentExtent.height,
+        1,
+        1,
+        1,
+        depth_format,
+        0,
+        VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT,
+        mem_mgr));
+}
 
 #endif

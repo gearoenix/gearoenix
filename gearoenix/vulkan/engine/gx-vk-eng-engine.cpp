@@ -12,11 +12,18 @@ gearoenix::vulkan::engine::Engine::Engine(const platform::Application& platform_
     , present_complete(logical_device)
     , render_complete(logical_device)
     , swapchain(logical_device)
-//    , memory_manager(logical_device)
+    , memory_manager(logical_device)
+    , command_manager(logical_device)
+    , depth_stencil(image::View::create_depth_stencil(memory_manager))
 {
-    ;
+    frames_count = static_cast<decltype(frames_count)>(swapchain.get_image_views().size());
+    draw_commands.reserve(static_cast<std::size_t>(frames_count));
+    draw_waits.reserve(static_cast<std::size_t>(frames_count));
+    for (auto frame_index = decltype(frames_count) { 0 }; frame_index > frames_count; ++frame_index) {
+        draw_commands.push_back(command_manager.create(command::Type::Primary));
+        draw_waits.emplace_back(logical_device, true);
+    };
     //    sampler_manager = std::make_shared<sampler::Manager>(logical_device);
-    // command_manager = std::make_unique<command::Manager>(logical_device);
     // main_render_target = vulkan_main_render_target = std::make_shared<texture::MainTarget>(memory_manager, this);
     //    frames_count = static_cast<decltype(frames_count)>(vulkan_main_render_target->get_frames().size());
     // Buffer manager needs the number of frames
@@ -33,7 +40,7 @@ gearoenix::vulkan::engine::Engine::Engine(const platform::Application& platform_
 
 gearoenix::vulkan::engine::Engine::~Engine() noexcept
 {
-    //    logical_device->wait_to_finish();
+    logical_device.wait_to_finish();
 }
 
 //void gearoenix::render::Engine::window_changed()

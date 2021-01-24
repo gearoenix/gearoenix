@@ -11,11 +11,11 @@ struct Logical;
 
 namespace gearoenix::vulkan::sync {
 struct Fence {
-    GX_GET_REFC_PRV(std::shared_ptr<device::Logical>, logical_device)
+    GX_GET_CRRF_PRV(device::Logical, logical_device)
     GX_GET_VAL_PRV(VkFence, vulkan_data, nullptr)
 
 public:
-    explicit Fence(std::shared_ptr<device::Logical> logical_device, bool signaled = false) noexcept;
+    explicit Fence(const device::Logical& logical_device, bool signaled = false) noexcept;
     ~Fence() noexcept;
     void wait() noexcept;
     void reset() noexcept;

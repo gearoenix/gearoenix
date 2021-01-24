@@ -52,16 +52,16 @@ public:
         VkImageCreateFlags flags,
         VkImageUsageFlags usage,
         VkImage vulkan_data) noexcept;
-    //    Image(
-    //        std::uint32_t image_width,
-    //        std::uint32_t image_height,
-    //        std::uint32_t image_depth,
-    //        std::uint32_t mipmap_level,
-    //        std::uint32_t array_layers,
-    //        VkFormat format,
-    //        VkImageCreateFlags flags,
-    //        VkImageUsageFlags usage,
-    //        memory::Manager& memory_manager) noexcept;
+    Image(
+        std::uint32_t image_width,
+        std::uint32_t image_height,
+        std::uint32_t image_depth,
+        std::uint32_t mipmap_level,
+        std::uint32_t array_layers,
+        VkFormat format,
+        VkImageCreateFlags flags,
+        VkImageUsageFlags usage,
+        memory::Manager& memory_manager) noexcept;
     ~Image() noexcept;
     Image& operator=(const Image&) = delete;
     Image& operator=(Image&&) noexcept;

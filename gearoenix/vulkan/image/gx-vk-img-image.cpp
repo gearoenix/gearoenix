@@ -48,52 +48,57 @@ gearoenix::vulkan::image::Image::Image(
     , vulkan_data(vulkan_data)
 {
 }
-//
-//gearoenix::vulkan::image::Image::Image(
-//    const std::uint32_t image_width,
-//    const std::uint32_t image_height,
-//    const std::uint32_t image_depth,
-//    const std::uint32_t mipmap_level,
-//    const std::uint32_t array_layers,
-//    const VkImageUsageFlags usage,
-//    const VkImageCreateFlags flags,
-//    const VkFormat format,
-//    memory::Manager& mem_mgr) noexcept
-//    : logical_device(mem_mgr.get_logical_device())
-//    , image_width(image_width)
-//    , image_height(image_height)
-//    , format(format)
-//    , usage(usage)
-//{
-//    VkImageCreateInfo info;
-//    GX_SET_ZERO(info)
-//    info.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-//    info.imageType = VK_IMAGE_TYPE_2D;
-//    info.format = format;
-//    info.extent.width = image_width;
-//    info.extent.height = image_height;
-//    info.extent.depth = image_depth;
-//    info.mipLevels = mipmap_level;
-//    info.arrayLayers = array_layers;
-//    info.samples = VK_SAMPLE_COUNT_1_BIT;
-//    info.tiling = VK_IMAGE_TILING_OPTIMAL;
-//    info.usage = usage;
-//    info.flags = flags;
-//    info.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-//    VkDevice vk_dev = logical_device->get_vulkan_data();
-//    GX_VK_CHK_L(vkCreateImage(vk_dev, &info, nullptr, &vulkan_data))
-//    VkMemoryRequirements mem_req;
-//    GX_SET_ZERO(mem_req)
-//    Loader::vkGetImageMemoryRequirements(vk_dev, vulkan_data, &mem_req);
-//    allocated_memory = mem_mgr.allocate(mem_req.size, mem_req.memoryTypeBits, memory::Place::Gpu);
-//    GX_VK_CHK_L(vkBindImageMemory(
-//        vk_dev, vulkan_data, allocated_memory->get_vulkan_data(),
-//        allocated_memory->get_allocator()->get_root_offset()))
-//}
-//
+
+gearoenix::vulkan::image::Image::Image(
+    const std::uint32_t image_width,
+    const std::uint32_t image_height,
+    const std::uint32_t image_depth,
+    const std::uint32_t mipmap_level,
+    const std::uint32_t array_layers,
+    const VkFormat format,
+    const VkImageCreateFlags flags,
+    const VkImageUsageFlags usage,
+    memory::Manager& mem_mgr) noexcept
+    : logical_device(&mem_mgr.get_logical_device())
+    , image_width(image_width)
+    , image_height(image_height)
+    , image_depth(image_depth)
+    , mipmap_level(mipmap_level)
+    , array_layers(array_layers)
+    , format(format)
+    , flags(flags)
+    , usage(usage)
+{
+    VkImageCreateInfo info;
+    GX_SET_ZERO(info)
+    info.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+    info.imageType = image_depth <= 1 ? VK_IMAGE_TYPE_2D : VK_IMAGE_TYPE_3D;
+    info.format = format;
+    info.extent.width = image_width;
+    info.extent.height = image_height;
+    info.extent.depth = image_depth;
+    info.mipLevels = mipmap_level;
+    info.arrayLayers = array_layers;
+    info.samples = VK_SAMPLE_COUNT_1_BIT;
+    info.tiling = VK_IMAGE_TILING_OPTIMAL;
+    info.usage = usage;
+    info.flags = flags;
+    info.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    GX_VK_CHK_L(vkCreateImage(logical_device->get_vulkan_data(), &info, nullptr, &vulkan_data))
+    VkMemoryRequirements mem_req;
+    GX_SET_ZERO(mem_req)
+    Loader::vkGetImageMemoryRequirements(logical_device->get_vulkan_data(), vulkan_data, &mem_req);
+    allocated_memory = mem_mgr.allocate(mem_req.size, mem_req.memoryTypeBits, memory::Place::Gpu);
+    GX_VK_CHK_L(vkBindImageMemory(
+        logical_device->get_vulkan_data(),
+        vulkan_data,
+        allocated_memory->get_vulkan_data(),
+        allocated_memory->get_allocator().get_offset()))
+}
+
 gearoenix::vulkan::image::Image::~Image() noexcept
 {
-    if (!allocated_memory.has_value()) {
+    if (allocated_memory.has_value()) {
         Loader::vkDestroyImage(logical_device->get_vulkan_data(), vulkan_data, nullptr);
     }
 }
