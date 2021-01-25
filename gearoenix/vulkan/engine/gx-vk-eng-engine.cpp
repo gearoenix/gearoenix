@@ -15,6 +15,7 @@ gearoenix::vulkan::engine::Engine::Engine(const platform::Application& platform_
     , memory_manager(logical_device)
     , command_manager(logical_device)
     , depth_stencil(image::View::create_depth_stencil(memory_manager))
+    , render_pass(swapchain)
 {
     frames_count = static_cast<decltype(frames_count)>(swapchain.get_image_views().size());
     draw_commands.reserve(static_cast<std::size_t>(frames_count));

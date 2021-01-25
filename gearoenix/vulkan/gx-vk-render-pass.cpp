@@ -7,15 +7,15 @@
 #include "gx-vk-check.hpp"
 #include "gx-vk-swapchain.hpp"
 
-gearoenix::vulkan::RenderPass::RenderPass(std::shared_ptr<Swapchain> sw) noexcept
+gearoenix::vulkan::RenderPass::RenderPass(const Swapchain& sw) noexcept
     : swapchain(std::move(sw))
 {
-    const auto& d = swapchain->get_logical_device();
+    const auto& d = swapchain.get_logical_device();
     const auto& p = d.get_physical_device();
 
     VkAttachmentDescription attachment_descriptions[2];
     GX_SET_ZERO(attachment_descriptions)
-    attachment_descriptions[0].format = swapchain->get_format().format;
+    attachment_descriptions[0].format = swapchain.get_format().format;
     attachment_descriptions[0].samples = VK_SAMPLE_COUNT_1_BIT;
     attachment_descriptions[0].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
     attachment_descriptions[0].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
@@ -82,7 +82,8 @@ gearoenix::vulkan::RenderPass::RenderPass(std::shared_ptr<Swapchain> sw) noexcep
 
 gearoenix::vulkan::RenderPass::~RenderPass() noexcept
 {
-    Loader::vkDestroyRenderPass(swapchain->get_logical_device().get_vulkan_data(), vulkan_data, nullptr);
+    if (nullptr != vulkan_data)
+        Loader::vkDestroyRenderPass(swapchain.get_logical_device().get_vulkan_data(), vulkan_data, nullptr);
 }
 
 #endif
