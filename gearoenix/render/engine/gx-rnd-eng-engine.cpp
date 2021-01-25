@@ -88,7 +88,7 @@ gearoenix::render::engine::Engine::~Engine() noexcept = default;
 //    late_delete_assets[late_delete_index].push_back(std::move(asset));
 //}
 
-void gearoenix::render::engine::Engine::update() noexcept
+void gearoenix::render::engine::Engine::start_frame() noexcept
 {
     const std::chrono::time_point<std::chrono::high_resolution_clock> now = std::chrono::high_resolution_clock::now();
     const std::chrono::duration<double> delta_time_duration = now - last_frame_time;
@@ -96,8 +96,13 @@ void gearoenix::render::engine::Engine::update() noexcept
     last_frame_time = now;
     ++frame_number_from_start;
     frame_number = frame_number_from_start % frames_count;
+    next_frame_number = (frame_number_from_start + 1) % frames_count;
     //    function_loader->unload();
     //    physics_engine->update();
     //    kernels->do_steps();
     //    do_late_delete();
+}
+
+void gearoenix::render::engine::Engine::end_frame() noexcept
+{
 }

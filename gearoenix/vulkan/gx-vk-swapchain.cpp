@@ -24,22 +24,25 @@ gearoenix::vulkan::Swapchain::~Swapchain() noexcept
     Loader::vkDestroySwapchainKHR(logical_device.get_vulkan_data(), vulkan_data, nullptr);
 }
 
-std::uint32_t gearoenix::vulkan::Swapchain::get_next_image_index(const sync::Semaphore& semaphore) noexcept
+bool gearoenix::vulkan::Swapchain::get_next_image_index(const sync::Semaphore& semaphore) noexcept
 {
     std::uint32_t image_index = 0;
     const VkResult result = Loader::vkAcquireNextImageKHR(
         logical_device.get_vulkan_data(), vulkan_data,
         std::numeric_limits<std::uint64_t>::max(),
         semaphore.get_vulkan_data(), nullptr, &image_index);
+    GX_LOG_D(image_index)
     switch (result) {
     case VK_ERROR_OUT_OF_DATE_KHR:
     case VK_ERROR_INITIALIZATION_FAILED:
-        return 0xffffffff;
+        return true;
     case VK_SUCCESS:
-        return image_index;
+        return false;
     default:
-        GX_LOG_F("Swapchain failed to get the next image, result: " << result_to_string(result))
+        GX_LOG_E("Swapchain failed to get the next image")
+        GX_VK_CHK(result)
     }
+    return true;
 }
 
 void gearoenix::vulkan::Swapchain::initialize() noexcept

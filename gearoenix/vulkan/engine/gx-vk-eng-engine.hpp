@@ -23,12 +23,18 @@
 
 namespace gearoenix::vulkan::engine {
 struct Engine final : public render::engine::Engine {
+    struct Frame final {
+        command::Buffer draw_command;
+        sync::Fence draw_wait;
+        Framebuffer framebuffer;
+        sync::Semaphore present_complete;
+        sync::Semaphore render_complete;
+    };
+
     GX_GET_CREF_PRV(Instance, instance)
     GX_GET_CREF_PRV(Surface, surface)
     GX_GET_CREF_PRV(device::Physical, physical_device)
     GX_GET_CREF_PRV(device::Logical, logical_device)
-    GX_GET_CREF_PRV(sync::Semaphore, present_complete)
-    GX_GET_CREF_PRV(sync::Semaphore, render_complete)
     GX_GET_CREF_PRV(Swapchain, swapchain)
     GX_GET_CREF_PRV(memory::Manager, memory_manager)
     GX_GET_CREF_PRV(command::Manager, command_manager)
@@ -36,23 +42,26 @@ struct Engine final : public render::engine::Engine {
     GX_GET_CREF_PRV(pipeline::Manager, pipeline_manager)
     GX_GET_CREF_PRV(image::View, depth_stencil)
     GX_GET_CREF_PRV(RenderPass, render_pass)
-    GX_GET_CREF_PRV(std::vector<command::Buffer>, draw_commands)
-    GX_GET_CREF_PRV(std::vector<sync::Fence>, draw_waits)
-    GX_GET_CREF_PRV(std::vector<Framebuffer>, framebuffers)
+    GX_GET_CREF_PRV(std::vector<Frame>, frames)
     //    GX_GET_CREF_PRV(std::shared_ptr<sampler::Manager>, sampler_manager)
     //    GX_GET_CREF_PRV(std::shared_ptr<image::Manager>, image_manager)
     //    GX_GET_CREF_PRV(std::shared_ptr<buffer::Manager>, vulkan_buffer_manager)
     //    GX_GET_CREF_PRV(std::shared_ptr<texture::MainTarget>, vulkan_main_render_target)
     //    GX_GET_CREF_PRV(std::vector<std::shared_ptr<command::Buffer>>, upload_command_buffers)
     //    GX_GET_CREF_PRV(std::vector<std::shared_ptr<sync::Semaphore>>, upload_semaphore)
+private:
+    void setup_imgui() noexcept;
+    void vulkan_upload_imgui_fonts() noexcept;
+    void start_frame_imgui() noexcept;
 
 public:
     Engine(const Engine&) = delete;
     Engine(Engine&&) = delete;
     explicit Engine(const platform::Application& platform_application) noexcept;
     ~Engine() noexcept final;
-    void update() noexcept final;
-    //    [[nodiscard]] std::shared_ptr<render::sync::Semaphore> create_semaphore() const noexcept final;
+    void start_frame() noexcept final;
+    void end_frame() noexcept final;
+    void upload_imgui_fonts() noexcept final;
     //    [[nodiscard]] std::shared_ptr<render::texture::Texture2D> create_texture_2d(
     //        core::Id id,
     //        std::string name,

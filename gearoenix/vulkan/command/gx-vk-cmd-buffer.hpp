@@ -44,6 +44,7 @@ public:
     void bind_vertices(buffer::Buffer& buf) noexcept;
     void bind_indices(buffer::Buffer& buf) noexcept;
     void draw_indices(std::size_t count) noexcept;
+    [[nodiscard]] VkCommandBuffer* get_vulkan_data_ptr() noexcept;
 };
 }
 #endif

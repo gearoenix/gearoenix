@@ -48,5 +48,7 @@ void gearoenix::platform::BaseApplication::going_to_be_closed() noexcept
 
 void gearoenix::platform::BaseApplication::update() noexcept
 {
+    render_engine->start_frame();
     core_application->update();
+    render_engine->end_frame();
 }

@@ -29,7 +29,7 @@ public:
     ~Swapchain() noexcept;
     Swapchain& operator=(const Swapchain&) = delete;
     Swapchain& operator=(Swapchain&&) = delete;
-    [[nodiscard]] std::uint32_t get_next_image_index(const sync::Semaphore& semaphore) noexcept;
+    [[nodiscard]] bool get_next_image_index(const sync::Semaphore& semaphore) noexcept;
     void initialize() noexcept;
 };
 }

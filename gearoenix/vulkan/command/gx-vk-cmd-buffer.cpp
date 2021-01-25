@@ -122,4 +122,9 @@ void gearoenix::vulkan::command::Buffer::draw_indices(VkDeviceSize count) noexce
     Loader::vkCmdDrawIndexed(vulkan_data, static_cast<std::uint32_t>(count), 1, 0, 0, 1);
 }
 
+VkCommandBuffer* gearoenix::vulkan::command::Buffer::get_vulkan_data_ptr() noexcept
+{
+    return &vulkan_data;
+}
+
 #endif

@@ -57,6 +57,7 @@ struct Engine {
     GX_GET_CREF_PRT(Limitations, limitations)
     GX_GET_VAL_PRT(unsigned int, frames_count, 2)
     GX_GET_VAL_PRT(unsigned int, frame_number, 0)
+    GX_GET_VAL_PRT(unsigned int, next_frame_number, 1)
     GX_GET_VAL_PRT(unsigned int, frame_number_from_start, 0)
     GX_GET_VAL_PRT(double, delta_time, 0.0f)
 
@@ -72,7 +73,9 @@ public:
     [[nodiscard]] static std::unique_ptr<Engine> construct(const platform::Application& platform_application) noexcept;
     virtual ~Engine() noexcept;
     //    void late_delete(std::shared_ptr<core::asset::Asset> asset) noexcept;
-    virtual void update() noexcept;
+    virtual void start_frame() noexcept;
+    virtual void end_frame() noexcept;
+    virtual void upload_imgui_fonts() noexcept = 0;
     //    [[nodiscard]] virtual std::shared_ptr<sync::Semaphore> create_semaphore() const noexcept = 0;
     /// Function to create texture in the render engine
     ///

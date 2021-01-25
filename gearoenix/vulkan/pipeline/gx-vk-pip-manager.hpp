@@ -2,12 +2,12 @@
 #define GEAROENIX_VULKAN_PIPELINE_MANAGER_HPP
 #include "../../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
+#include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "gx-vk-pip-cache.hpp"
 
 namespace gearoenix::vulkan::pipeline {
 struct Manager final {
-private:
-    Cache cache;
+    GX_GET_CREF_PRV(Cache, cache)
 
 public:
     Manager(const Manager&) = delete;

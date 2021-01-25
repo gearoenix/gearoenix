@@ -1,7 +1,60 @@
 #include "gx-vk-eng-engine.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
+#include "../../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../../platform/gx-plt-application.hpp"
 #include "../../platform/gx-plt-log.hpp"
+#include "../gx-vk-check.hpp"
+#include <imgui.h>
+#include <imgui_impl_vulkan.h>
+
+void gearoenix::vulkan::engine::Engine::setup_imgui() noexcept
+{
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO();
+    ImGui::StyleColorsDark();
+    ImGui_ImplVulkan_InitInfo info {};
+    info.Instance = instance.get_vulkan_data();
+    info.PhysicalDevice = physical_device.get_vulkan_data();
+    info.Device = logical_device.get_vulkan_data();
+    info.QueueFamily = physical_device.get_graphics_queue_node_index();
+    info.Queue = logical_device.get_graphic_queue();
+    info.PipelineCache = pipeline_manager.get_cache().get_vulkan_data();
+    info.DescriptorPool = descriptor_manager.get_imgui().get_vulkan_data();
+    info.MinImageCount = static_cast<decltype(info.MinImageCount)>(swapchain.get_image_views().size());
+    info.ImageCount = info.MinImageCount;
+#ifdef GX_DEBUG_MODE
+    info.CheckVkResultFn = +[](VkResult result) {
+        GX_VK_CHK(result)
+    };
+#endif
+    ImGui_ImplVulkan_Init(&info, render_pass.get_vulkan_data());
+    io.Fonts->AddFontDefault();
+    vulkan_upload_imgui_fonts();
+}
+
+void gearoenix::vulkan::engine::Engine::vulkan_upload_imgui_fonts() noexcept
+{
+    command::Buffer command_buffer = command_manager.create(command::Type::Primary);
+    command_buffer.begin();
+    ImGui_ImplVulkan_CreateFontsTexture(command_buffer.get_vulkan_data());
+    VkSubmitInfo end_info = {};
+    end_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    end_info.commandBufferCount = 1;
+    end_info.pCommandBuffers = command_buffer.get_vulkan_data_ptr();
+    command_buffer.end();
+    GX_VK_CHK_L(vkQueueSubmit(logical_device.get_graphic_queue(), 1, &end_info, nullptr))
+    logical_device.wait_to_finish();
+    ImGui_ImplVulkan_DestroyFontUploadObjects();
+}
+
+void gearoenix::vulkan::engine::Engine::start_frame_imgui() noexcept
+{
+    ImGui_ImplVulkan_NewFrame();
+    // Maybe in future there is a need for platform interface to update in here
+    ImGui::NewFrame();
+    (void)this;
+}
 
 gearoenix::vulkan::engine::Engine::Engine(const platform::Application& platform_application) noexcept
     : render::engine::Engine(render::engine::Type::Vulkan, platform_application)
@@ -9,8 +62,6 @@ gearoenix::vulkan::engine::Engine::Engine(const platform::Application& platform_
     , surface(instance, platform_application)
     , physical_device(surface)
     , logical_device(physical_device)
-    , present_complete(logical_device)
-    , render_complete(logical_device)
     , swapchain(logical_device)
     , memory_manager(logical_device)
     , command_manager(logical_device)
@@ -20,13 +71,15 @@ gearoenix::vulkan::engine::Engine::Engine(const platform::Application& platform_
     , render_pass(swapchain)
 {
     frames_count = static_cast<decltype(frames_count)>(swapchain.get_image_views().size());
-    draw_commands.reserve(static_cast<std::size_t>(frames_count));
-    draw_waits.reserve(static_cast<std::size_t>(frames_count));
-    framebuffers.reserve(static_cast<std::size_t>(frames_count));
+    frames.reserve(static_cast<std::size_t>(frames_count));
     for (auto frame_index = decltype(frames_count) { 0 }; frame_index > frames_count; ++frame_index) {
-        draw_commands.push_back(command_manager.create(command::Type::Primary));
-        draw_waits.emplace_back(logical_device, true);
-        framebuffers.emplace_back(&swapchain.get_image_views()[frame_index], &depth_stencil, &render_pass);
+        frames.push_back(Frame {
+            command_manager.create(command::Type::Primary),
+            sync::Fence(logical_device, true),
+            Framebuffer(&swapchain.get_image_views()[frame_index], &depth_stencil, &render_pass),
+            sync::Semaphore(logical_device),
+            sync::Semaphore(logical_device),
+        });
     }
     //    sampler_manager = std::make_shared<sampler::Manager>(logical_device);
     // main_render_target = vulkan_main_render_target = std::make_shared<texture::MainTarget>(memory_manager, this);
@@ -41,6 +94,7 @@ gearoenix::vulkan::engine::Engine::Engine(const platform::Application& platform_
     //            dynamic_cast<command::Buffer*>(command_manager->create_primary_command_buffer()));
     //        upload_semaphore.push_back(std::make_shared<sync::Semaphore>(logical_device));
     //    }
+    setup_imgui();
 }
 
 gearoenix::vulkan::engine::Engine::~Engine() noexcept
@@ -65,9 +119,10 @@ gearoenix::vulkan::engine::Engine::~Engine() noexcept
 //    setup_draw_buffers();
 //}
 //
-void gearoenix::vulkan::engine::Engine::update() noexcept
+void gearoenix::vulkan::engine::Engine::start_frame() noexcept
 {
-    render::engine::Engine::update();
+    render::engine::Engine::start_frame();
+    start_frame_imgui();
     //    vulkan_main_render_target->update();
     //    auto* const up_cmd = upload_command_buffers[frame_number].get();
     //    up_cmd->begin();
@@ -77,6 +132,30 @@ void gearoenix::vulkan::engine::Engine::update() noexcept
     //    const render::sync::Semaphore* const nxt_sem = upload_semaphore[frame_number].get();
     //    const render::command::Buffer* const cmd = up_cmd;
     //    submit(1, &pre_sem, 1, &cmd, 1, &nxt_sem);
+}
+
+void gearoenix::vulkan::engine::Engine::end_frame() noexcept
+{
+    render::engine::Engine::end_frame();
+    auto& frame = frames[frame_number];
+    ImGui::Render();
+    ImDrawData* draw_data = ImGui::GetDrawData();
+    if (swapchain.get_next_image_index(frame.present_complete)) {
+        GX_UNIMPLEMENTED
+    }
+    frame.draw_wait.wait();
+    frame.draw_wait.reset();
+    frame.draw_command.begin();
+    frame.draw_command.begin(render_pass);
+    ImGui_ImplVulkan_RenderDrawData(draw_data, frame.draw_command.get_vulkan_data());
+    frame.draw_command.end_render_pass();
+    frame.draw_command.end();
+    //    FramePresent(wd);
+}
+
+void gearoenix::vulkan::engine::Engine::upload_imgui_fonts() noexcept
+{
+    vulkan_upload_imgui_fonts();
 }
 
 //    command::Buffer* gcmd = cmd_bufs[current_frame];
