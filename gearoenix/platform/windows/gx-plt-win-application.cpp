@@ -1,5 +1,6 @@
 #include "gx-plt-win-application.hpp"
 #ifdef GX_PLATFORM_WINDOWS
+#include "../../core/gx-cr-application.hpp"
 #include "../../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../../render/engine/gx-rnd-eng-engine.hpp"
 #include "../gx-plt-log.hpp"
@@ -269,21 +270,18 @@ gearoenix::platform::Application::Application(GX_MAIN_ENTRY_ARGS_DEF, const Runt
 
 gearoenix::platform::Application::~Application() noexcept = default;
 
-void gearoenix::platform::Application::run() noexcept
+void gearoenix::platform::Application::run(core::Application* core_app) noexcept
 {
+    base.core_application = nullptr == core_app ? std::make_unique<core::Application>(this) : std::unique_ptr<core::Application>(core_app);
     GX_LOG_D("Run function of WinApi interface called.")
-    //    this->core_app = core_app;
     MSG msg;
     while (base.running) {
         while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
             TranslateMessage(&msg);
             DispatchMessage(&msg);
         }
-        //        core_app->update();
-        //        render_engine->update();
+        base.update();
     }
-    //    core_app = nullptr;
-    //    render_engine = nullptr;
 }
 
 #endif
