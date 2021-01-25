@@ -5,6 +5,7 @@
 #include "../../render/engine/gx-rnd-eng-engine.hpp"
 #include "../command/gx-vk-cmd-buffer.hpp"
 #include "../command/gx-vk-cmd-manager.hpp"
+#include "../descriptor/gx-vk-des-manager.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../device/gx-vk-dev-physical.hpp"
 #include "../gx-vk-framebuffer.hpp"
@@ -31,6 +32,7 @@ struct Engine final : public render::engine::Engine {
     GX_GET_CREF_PRV(Swapchain, swapchain)
     GX_GET_CREF_PRV(memory::Manager, memory_manager)
     GX_GET_CREF_PRV(command::Manager, command_manager)
+    GX_GET_CREF_PRV(descriptor::Manager, descriptor_manager)
     GX_GET_CREF_PRV(pipeline::Manager, pipeline_manager)
     GX_GET_CREF_PRV(image::View, depth_stencil)
     GX_GET_CREF_PRV(RenderPass, render_pass)
