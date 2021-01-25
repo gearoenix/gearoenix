@@ -12,16 +12,13 @@ struct View;
 namespace gearoenix::vulkan {
 struct RenderPass;
 struct Framebuffer final {
-    GX_GET_REFC_PRV(std::shared_ptr<image::View>, view)
-    GX_GET_REFC_PRV(std::shared_ptr<image::View>, depth)
-    GX_GET_REFC_PRV(std::shared_ptr<RenderPass>, render_pass)
+    GX_GET_CPTRC_PRV(image::View, view)
+    GX_GET_CPTRC_PRV(image::View, depth)
+    GX_GET_CPTRC_PRV(RenderPass, render_pass)
     GX_GET_VAL_PRV(VkFramebuffer, vulkan_data, nullptr)
 
 public:
-    Framebuffer(
-        std::shared_ptr<image::View> view,
-        std::shared_ptr<image::View> depth,
-        std::shared_ptr<RenderPass> render_pass) noexcept;
+    Framebuffer(const image::View* view, const image::View* depth, const RenderPass* render_pass) noexcept;
     ~Framebuffer() noexcept;
 };
 }

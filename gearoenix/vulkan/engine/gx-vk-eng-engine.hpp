@@ -7,6 +7,7 @@
 #include "../command/gx-vk-cmd-manager.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../device/gx-vk-dev-physical.hpp"
+#include "../gx-vk-framebuffer.hpp"
 #include "../gx-vk-instance.hpp"
 #include "../gx-vk-render-pass.hpp"
 #include "../gx-vk-surface.hpp"
@@ -31,10 +32,11 @@ struct Engine final : public render::engine::Engine {
     GX_GET_CREF_PRV(memory::Manager, memory_manager)
     GX_GET_CREF_PRV(command::Manager, command_manager)
     GX_GET_CREF_PRV(pipeline::Manager, pipeline_manager)
-    GX_GET_CREF_PRV(std::vector<command::Buffer>, draw_commands)
-    GX_GET_CREF_PRV(std::vector<sync::Fence>, draw_waits)
     GX_GET_CREF_PRV(image::View, depth_stencil)
     GX_GET_CREF_PRV(RenderPass, render_pass)
+    GX_GET_CREF_PRV(std::vector<command::Buffer>, draw_commands)
+    GX_GET_CREF_PRV(std::vector<sync::Fence>, draw_waits)
+    GX_GET_CREF_PRV(std::vector<Framebuffer>, framebuffers)
     //    GX_GET_CREF_PRV(std::shared_ptr<sampler::Manager>, sampler_manager)
     //    GX_GET_CREF_PRV(std::shared_ptr<image::Manager>, image_manager)
     //    GX_GET_CREF_PRV(std::shared_ptr<buffer::Manager>, vulkan_buffer_manager)

@@ -54,6 +54,7 @@ gearoenix::vulkan::device::Logical::~Logical() noexcept
 {
     if (vulkan_data != nullptr)
         Loader::vkDestroyDevice(vulkan_data, nullptr);
+    vulkan_data = nullptr;
 }
 
 void gearoenix::vulkan::device::Logical::wait_to_finish() noexcept

@@ -8,12 +8,12 @@
 #include "image/gx-vk-img-view.hpp"
 
 gearoenix::vulkan::Framebuffer::Framebuffer(
-    std::shared_ptr<image::View> v,
-    std::shared_ptr<image::View> d,
-    std::shared_ptr<RenderPass> rp) noexcept
-    : view(std::move(v))
-    , depth(std::move(d))
-    , render_pass(std::move(rp))
+    const image::View* const v,
+    const image::View* const d,
+    const RenderPass* const rp) noexcept
+    : view(v)
+    , depth(d)
+    , render_pass(rp)
 {
     const auto& img = view->get_image();
     const auto& logical_device = img.get_logical_device();
@@ -35,7 +35,8 @@ gearoenix::vulkan::Framebuffer::Framebuffer(
 
 gearoenix::vulkan::Framebuffer::~Framebuffer() noexcept
 {
-    const auto& logical_device = view->get_image().get_logical_device();
-    Loader::vkDestroyFramebuffer(logical_device->get_vulkan_data(), vulkan_data, nullptr);
+    if (nullptr != vulkan_data)
+        Loader::vkDestroyFramebuffer(view->get_image().get_logical_device()->get_vulkan_data(), vulkan_data, nullptr);
+    vulkan_data = nullptr;
 }
 #endif
