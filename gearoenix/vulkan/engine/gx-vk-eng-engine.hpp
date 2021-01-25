@@ -13,6 +13,7 @@
 #include "../gx-vk-swapchain.hpp"
 #include "../image/gx-vk-img-view.hpp"
 #include "../memory/gx-vk-mem-manager.hpp"
+#include "../pipeline/gx-vk-pip-manager.hpp"
 #include "../sync/gx-vk-sync-fence.hpp"
 #include "../sync/gx-vk-sync-semaphore.hpp"
 #include <functional>
@@ -29,6 +30,7 @@ struct Engine final : public render::engine::Engine {
     GX_GET_CREF_PRV(Swapchain, swapchain)
     GX_GET_CREF_PRV(memory::Manager, memory_manager)
     GX_GET_CREF_PRV(command::Manager, command_manager)
+    GX_GET_CREF_PRV(pipeline::Manager, pipeline_manager)
     GX_GET_CREF_PRV(std::vector<command::Buffer>, draw_commands)
     GX_GET_CREF_PRV(std::vector<sync::Fence>, draw_waits)
     GX_GET_CREF_PRV(image::View, depth_stencil)

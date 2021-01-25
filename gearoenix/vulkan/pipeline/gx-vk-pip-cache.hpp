@@ -1,29 +1,24 @@
 #ifndef GEAROENIX_VULKAN_PIPELINE_CACHE_HPP
 #define GEAROENIX_VULKAN_PIPELINE_CACHE_HPP
-#include "../../core/gx-cr-build-configuration.hpp"
-#ifdef USE_VULKAN
-#include "../gx-vk-linker.hpp"
+#include "../../render/gx-rnd-build-configuration.hpp"
+#ifdef GX_RENDER_VULKAN_ENABLED
+#include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
+#include "../gx-vk-loader.hpp"
 
-namespace gearoenix {
-namespace render {
-    namespace device {
-        struct Logical;
-    }
-    namespace pipeline {
-        struct Cache {
-        private:
-            device::Logical* logical_device;
-            VkPipelineCache vulkan_data;
+namespace gearoenix::vulkan::device {
+struct Logical;
+}
 
-        public:
-            Cache(device::Logical* logical_device);
-            ~Cache();
-            const device::Logical* get_logical_device() const;
-            device::Logical* get_logical_device();
-            const VkPipelineCache& get_vulkan_data() const;
-        };
-    } // namespace pipeline
-} // namespace render
-} // namespace gearoenix
+namespace gearoenix::vulkan::pipeline {
+struct Cache {
+    GX_GET_CRRF_PRV(device::Logical, logical_device)
+    GX_GET_VAL_PRV(VkPipelineCache, vulkan_data, nullptr)
+
+public:
+    Cache(const Cache&) = delete;
+    explicit Cache(const device::Logical& logical_device) noexcept;
+    ~Cache() noexcept;
+};
+}
 #endif
-#endif // GEAROENIX_RENDER_PIPELINE_CACHE_HPP
+#endif

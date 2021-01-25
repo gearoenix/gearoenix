@@ -1,41 +1,22 @@
 #ifndef GEAROENIX_VULKAN_PIPELINE_MANAGER_HPP
 #define GEAROENIX_VULKAN_PIPELINE_MANAGER_HPP
-#include "../../core/gx-cr-build-configuration.hpp"
-#ifdef USE_VULKAN
-#include "../../render/shader/gx-rnd-shd-shader.hpp"
-#include <memory>
-namespace gearoenix {
-namespace core {
-    namespace cache {
-        struct Cacher;
-    }
-}
-namespace render {
-    struct Engine;
-    struct RenderPass;
-    namespace descriptor {
-        struct Pool;
-    }
-    namespace pipeline {
-        struct Cache;
-        struct Pipeline;
-        struct Manager {
-        private:
-            Cache* cache;
-            RenderPass* rndpass;
-            descriptor::Pool* despool;
-            core::cache::Cacher* cacher;
-            Engine* engine;
+#include "../../render/gx-rnd-build-configuration.hpp"
+#ifdef GX_RENDER_VULKAN_ENABLED
+#include "gx-vk-pip-cache.hpp"
 
-        public:
-            Manager(Engine* engine);
-            ~Manager();
-            std::shared_ptr<Pipeline> get_pipeline(shader::Id sid);
-            std::shared_ptr<Pipeline> get_cached_pipeline(shader::Id sid);
-            descriptor::Pool* get_descriptor_pool();
-        };
-    }
-}
+namespace gearoenix::vulkan::pipeline {
+struct Manager final {
+private:
+    Cache cache;
+
+public:
+    Manager(const Manager&) = delete;
+    Manager(Manager&&) = delete;
+    explicit Manager(const device::Logical& logical_device) noexcept;
+    ~Manager() noexcept;
+    Manager& operator=(const Manager&) = delete;
+    Manager& operator=(Manager&&) = delete;
+};
 }
 #endif
 #endif

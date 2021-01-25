@@ -1,45 +1,22 @@
 #include "gx-vk-pip-cache.hpp"
-#ifdef USE_VULKAN
-#include "../../core/gx-cr-static.hpp"
+#ifdef GX_RENDER_VULKAN_ENABLED
+#include "../../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
-#include "../device/gx-vk-dev-physical.hpp"
 #include "../gx-vk-check.hpp"
-#include "../gx-vk-instance.hpp"
 
-gearoenix::render::pipeline::Cache::Cache(device::Logical* logical_device)
+gearoenix::vulkan::pipeline::Cache::Cache(const device::Logical& logical_device) noexcept
     : logical_device(logical_device)
 {
-    const device::Physical* p = logical_device->get_physical_device();
-    const Linker* l = p->get_instance()->get_linker();
-    VkPipelineCacheCreateInfo pipeline_cache_create_info;
-    setz(pipeline_cache_create_info);
-    pipeline_cache_create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
-    VKC(l->vkCreatePipelineCache(logical_device->get_vulkan_data(),
-        &pipeline_cache_create_info, nullptr,
-        &vulkan_data));
+    VkPipelineCacheCreateInfo info;
+    GX_SET_ZERO(info)
+    info.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
+    GX_VK_CHK_L(vkCreatePipelineCache(logical_device.get_vulkan_data(), &info, nullptr, &vulkan_data))
 }
 
-gearoenix::render::pipeline::Cache::~Cache()
+gearoenix::vulkan::pipeline::Cache::~Cache() noexcept
 {
-    const device::Physical* p = logical_device->get_physical_device();
-    const Linker* l = p->get_instance()->get_linker();
-    l->vkDestroyPipelineCache(logical_device->get_vulkan_data(), vulkan_data,
-        nullptr);
-}
-
-const gearoenix::render::device::Logical* gearoenix::render::pipeline::Cache::get_logical_device() const
-{
-    return logical_device;
-}
-
-gearoenix::render::device::Logical* gearoenix::render::pipeline::Cache::get_logical_device()
-{
-    return logical_device;
-}
-
-const VkPipelineCache& gearoenix::render::pipeline::Cache::get_vulkan_data()
-    const
-{
-    return vulkan_data;
+    if (nullptr != vulkan_data)
+        Loader::vkDestroyPipelineCache(logical_device.get_vulkan_data(), vulkan_data, nullptr);
+    vulkan_data = nullptr;
 }
 #endif
