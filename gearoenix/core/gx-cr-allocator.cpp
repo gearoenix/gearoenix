@@ -52,6 +52,7 @@ gearoenix::core::Allocator::Allocator(Allocator&& o) noexcept
     , end_to_start(std::move(o.end_to_start))
     , parent(o.parent)
 {
+    o.parent = nullptr;
 }
 
 gearoenix::core::Allocator::~Allocator() noexcept
@@ -68,6 +69,7 @@ gearoenix::core::Allocator& gearoenix::core::Allocator::operator=(Allocator&& o)
     start_to_end = std::move(o.start_to_end);
     end_to_start = std::move(o.end_to_start);
     parent = o.parent;
+    o.parent = nullptr;
     return *this;
 }
 

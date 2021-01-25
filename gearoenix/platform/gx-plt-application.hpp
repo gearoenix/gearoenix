@@ -54,10 +54,11 @@ struct BaseApplication final {
     GX_GET_VAL_PRV(double, delta_mouse_x_nrm, 0.0)
     GX_GET_VAL_PRV(double, delta_mouse_y_nrm, 0.0)
 
-    GX_GET_CREF_PRV(std::shared_ptr<render::engine::Engine>, render_engine)
+    GX_GET_CREF_PRV(std::unique_ptr<render::engine::Engine>, render_engine)
 
 private:
     BaseApplication(GX_MAIN_ENTRY_ARGS_DEF, const RuntimeConfiguration& configuration) noexcept;
+    ~BaseApplication() noexcept;
 
     void initialize_window_position(int x, int y) noexcept;
 

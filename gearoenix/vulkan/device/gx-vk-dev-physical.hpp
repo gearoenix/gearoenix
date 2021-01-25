@@ -45,8 +45,12 @@ private:
     [[nodiscard]] int is_good(VkPhysicalDevice gpu) noexcept;
 
 public:
+    Physical(const Physical&) = delete;
+    Physical(Physical&&) = delete;
     explicit Physical(const Surface& surface) noexcept;
     ~Physical() noexcept;
+    Physical& operator=(const Physical&) = delete;
+    Physical& operator=(Physical&&) = delete;
     [[nodiscard]] std::uint32_t get_memory_type_index(std::uint32_t type_bits, std::uint32_t mem_properties) const noexcept;
     [[nodiscard]] std::size_t align_size(std::size_t size) const noexcept;
 };

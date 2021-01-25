@@ -23,8 +23,12 @@ struct Swapchain final {
     GX_GET_CREF_PRV(std::vector<image::View>, image_views)
 
 public:
+    Swapchain(const Swapchain&) = delete;
+    Swapchain(Swapchain&&) = delete;
     explicit Swapchain(const device::Logical& d) noexcept;
     ~Swapchain() noexcept;
+    Swapchain& operator=(const Swapchain&) = delete;
+    Swapchain& operator=(Swapchain&&) = delete;
     [[nodiscard]] std::uint32_t get_next_image_index(const sync::Semaphore& semaphore) noexcept;
     void initialize() noexcept;
 };

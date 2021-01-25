@@ -23,8 +23,12 @@ struct Instance final {
     GX_GET_VAL_PRV(VkDebugReportCallbackEXT, report_callback, nullptr)
 #endif
 public:
+    Instance(const Instance&) = delete;
+    Instance(Instance&&) = delete;
     explicit Instance(const platform::Application& platform_application) noexcept;
     ~Instance() noexcept;
+    Instance& operator=(const Instance&) = delete;
+    Instance& operator=(Instance&&) = delete;
 };
 }
 #endif

@@ -1,6 +1,5 @@
 #include "gx-vk-img-image.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
-#include "../../core/gx-cr-allocator.hpp"
 #include "../../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../buffer/gx-vk-buf-buffer.hpp"
 #include "../command/gx-vk-cmd-buffer.hpp"
@@ -8,7 +7,6 @@
 #include "../device/gx-vk-dev-physical.hpp"
 #include "../gx-vk-check.hpp"
 #include "../memory/gx-vk-mem-manager.hpp"
-#include "../memory/gx-vk-mem-memory.hpp"
 
 gearoenix::vulkan::image::Image::Image(Image&& o) noexcept
     : logical_device(o.logical_device)
@@ -23,6 +21,7 @@ gearoenix::vulkan::image::Image::Image(Image&& o) noexcept
     , usage(o.usage)
     , vulkan_data(o.vulkan_data)
 {
+    o.vulkan_data = nullptr;
 }
 
 gearoenix::vulkan::image::Image::Image(
@@ -98,7 +97,7 @@ gearoenix::vulkan::image::Image::Image(
 
 gearoenix::vulkan::image::Image::~Image() noexcept
 {
-    if (allocated_memory.has_value()) {
+    if (allocated_memory.has_value() && vulkan_data != nullptr) {
         Loader::vkDestroyImage(logical_device->get_vulkan_data(), vulkan_data, nullptr);
     }
 }
@@ -116,6 +115,7 @@ gearoenix::vulkan::image::Image& gearoenix::vulkan::image::Image::operator=(Imag
     flags = o.flags;
     usage = o.usage;
     vulkan_data = o.vulkan_data;
+    o.vulkan_data = nullptr;
     return *this;
 }
 //

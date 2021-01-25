@@ -35,7 +35,8 @@ gearoenix::vulkan::image::View::View(View&& o) noexcept = default;
 
 gearoenix::vulkan::image::View::~View() noexcept
 {
-    Loader::vkDestroyImageView(image.get_logical_device()->get_vulkan_data(), vulkan_data, nullptr);
+    if (vulkan_data != nullptr)
+        Loader::vkDestroyImageView(image.get_logical_device()->get_vulkan_data(), vulkan_data, nullptr);
 }
 
 gearoenix::vulkan::image::View& gearoenix::vulkan::image::View::operator=(View&&) noexcept = default;

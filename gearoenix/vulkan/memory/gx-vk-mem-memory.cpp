@@ -35,11 +35,12 @@ gearoenix::vulkan::memory::Memory::Memory(Memory&& o) noexcept
     , type_index(o.type_index)
     , vulkan_data(o.vulkan_data)
 {
+    o.vulkan_data = nullptr;
 }
 
 gearoenix::vulkan::memory::Memory::~Memory() noexcept
 {
-    if (parent == nullptr)
+    if (parent == nullptr && vulkan_data != nullptr)
         Loader::vkFreeMemory(manager->get_logical_device().get_vulkan_data(), vulkan_data, nullptr);
 }
 

@@ -39,6 +39,8 @@ struct Engine final : public render::engine::Engine {
     //    GX_GET_CREF_PRV(std::vector<std::shared_ptr<sync::Semaphore>>, upload_semaphore)
 
 public:
+    Engine(const Engine&) = delete;
+    Engine(Engine&&) = delete;
     explicit Engine(const platform::Application& platform_application) noexcept;
     ~Engine() noexcept final;
     void update() noexcept final;

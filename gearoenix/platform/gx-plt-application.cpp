@@ -1,4 +1,5 @@
 #include "gx-plt-application.hpp"
+#include "../render/engine/gx-rnd-eng-engine.hpp"
 #include "gx-plt-log.hpp"
 
 gearoenix::platform::BaseApplication::BaseApplication(GX_MAIN_ENTRY_ARGS_DEF, const RuntimeConfiguration& configuration) noexcept
@@ -11,6 +12,8 @@ gearoenix::platform::BaseApplication::BaseApplication(GX_MAIN_ENTRY_ARGS_DEF, co
             static_cast<decltype(window_height)>(configuration.get_window_height()));
     }
 }
+
+gearoenix::platform::BaseApplication::~BaseApplication() noexcept = default;
 
 void gearoenix::platform::BaseApplication::initialize_window_position(
     const int x, const int y) noexcept

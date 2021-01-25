@@ -37,6 +37,7 @@ gearoenix::platform::Application::Application(GX_MAIN_ENTRY_ARGS_DEF, const Runt
 
 gearoenix::platform::Application::~Application() noexcept
 {
+    base.render_engine = nullptr;
     XDestroyWindow(display, window);
     window = 0;
     XCloseDisplay(display);

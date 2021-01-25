@@ -18,8 +18,12 @@ struct Surface {
     GX_GET_VAL_PRV(VkSurfaceKHR, vulkan_data, nullptr)
 
 public:
+    Surface(const Surface&) = delete;
+    Surface(Surface&&) = delete;
     Surface(const Instance& instance, const platform::Application& platform_application) noexcept;
     ~Surface() noexcept;
+    Surface& operator=(const Surface&) = delete;
+    Surface& operator=(Surface&&) = delete;
 };
 }
 #endif

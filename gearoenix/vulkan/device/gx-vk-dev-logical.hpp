@@ -20,8 +20,12 @@ private:
     GX_GET_VAL_PRV(VkQueue, graphic_queue, nullptr)
 
 public:
+    Logical(const Logical&) = delete;
+    Logical(Logical&&) = delete;
     explicit Logical(const Physical& p) noexcept;
     ~Logical() noexcept;
+    Logical& operator=(const Logical&) = delete;
+    Logical& operator=(Logical&&) = delete;
     void wait_to_finish() noexcept;
 };
 }
