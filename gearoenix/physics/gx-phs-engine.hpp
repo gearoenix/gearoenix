@@ -25,7 +25,7 @@ struct Engine {
     GX_GET_UCPTR_PRV(animation::Manager, animation_manager)
     GX_GET_CREF_PRV(SceneMap, sorted_scenes)
 private:
-    platform::Application* const sys_app;
+    platform::Application* const platform_application;
     core::sync::KernelWorkers* const workers;
 
     /// It does:
@@ -45,7 +45,7 @@ private:
     void update_visibility_receiver() noexcept;
 
 public:
-    Engine(platform::Application* sys_app, core::sync::KernelWorkers* workers) noexcept;
+    Engine(platform::Application* platform_application, core::sync::KernelWorkers* workers) noexcept;
     ~Engine() noexcept;
     void update() noexcept;
 };

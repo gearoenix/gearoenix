@@ -49,8 +49,8 @@ gearoenix::platform::stream::Asset* gearoenix::platform::stream::Asset::construc
         return nullptr;
     }
 #elif defined(GX_PLATFORM_ANDROID)
-    asset->sys_app = sys_app;
-    asset->file = AAssetManager_open(sys_app->get_android_application()->activity->assetManager, name.c_str(), AASSET_MODE_BUFFER);
+    asset->platform_application = platform_application;
+    asset->file = AAssetManager_open(platform_application->get_android_application()->activity->assetManager, name.c_str(), AASSET_MODE_BUFFER);
     if (asset->file == nullptr) {
         GXLOGD("Asset not found! " << name)
         return nullptr;

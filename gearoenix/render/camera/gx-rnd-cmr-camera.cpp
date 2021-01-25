@@ -23,12 +23,12 @@
 
 void gearoenix::render::camera::Camera::initialize() noexcept
 {
-    auto* const sys_app = render_engine->get_platform_application();
-    uniform.aspect_ratio = static_cast<float>(sys_app->get_event_engine()->get_window_ratio());
-    uniform.clip_width = static_cast<float>(sys_app->get_event_engine()->get_window_width());
-    uniform.clip_height = static_cast<float>(sys_app->get_event_engine()->get_window_height());
+    auto* const platform_application = render_engine->get_platform_application();
+    uniform.aspect_ratio = static_cast<float>(platform_application->get_event_engine()->get_window_ratio());
+    uniform.clip_width = static_cast<float>(platform_application->get_event_engine()->get_window_width());
+    uniform.clip_height = static_cast<float>(platform_application->get_event_engine()->get_window_height());
     set_target(render_engine->get_main_render_target().get());
-    sys_app->get_event_engine()->add_listener(core::event::Id::SystemWindowSizeChange, 1.0f, this);
+    platform_application->get_event_engine()->add_listener(core::event::Id::SystemWindowSizeChange, 1.0f, this);
 }
 
 gearoenix::render::camera::Camera::Camera(const core::Id my_id, std::string name, engine::Engine* const e) noexcept
@@ -205,13 +205,13 @@ void gearoenix::render::camera::Camera::merge_seen_meshes() noexcept
 
 bool gearoenix::render::camera::Camera::on_event(const core::event::Data& d) noexcept
 {
-    const auto* sys_app = render_engine->get_platform_application();
+    const auto* platform_application = render_engine->get_platform_application();
     switch (d.get_source()) {
     case core::event::Id::SystemWindowSizeChange:
         if (target->get_attachments().empty())
             set_aspects(
-                sys_app->get_event_engine()->get_window_width(),
-                sys_app->get_event_engine()->get_window_height());
+                platform_application->get_event_engine()->get_window_width(),
+                platform_application->get_event_engine()->get_window_height());
         return false;
     default:
         GXLOGF("Unexpected event received this is a fatal bug.")

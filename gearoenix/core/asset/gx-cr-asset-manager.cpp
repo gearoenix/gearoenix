@@ -14,10 +14,10 @@
 #include "../../render/skybox/gx-rnd-sky-manager.hpp"
 #include "../../render/texture/gx-rnd-txt-manager.hpp"
 
-gearoenix::core::asset::Manager::Manager(platform::Application* const sys_app, const std::string& name) noexcept
-    : sys_app(sys_app)
-    , render_engine(sys_app->get_render_engine())
-    , file(platform::stream::Asset::construct(sys_app, name))
+gearoenix::core::asset::Manager::Manager(platform::Application* const platform_application, const std::string& name) noexcept
+    : platform_application(platform_application)
+    , render_engine(platform_application->get_render_engine())
+    , file(platform::stream::Asset::construct(platform_application, name))
 {
     if (file == nullptr) {
 #define GX_HELPER(a, n) a##_manager = std::make_unique<n::Manager>(nullptr, render_engine);
@@ -40,10 +40,10 @@ gearoenix::core::asset::Manager::Manager(platform::Application* const sys_app, c
         last_id = s->read<Id>();
         core::Count off;
 
-#define GX_HELPER(a, n)                                    \
-    off = s->tell();                                       \
-    s = platform::stream::Asset::construct(sys_app, name); \
-    s->seek(off);                                          \
+#define GX_HELPER(a, n)                                                 \
+    off = s->tell();                                                    \
+    s = platform::stream::Asset::construct(platform_application, name); \
+    s->seek(off);                                                       \
     a##_manager = std::make_unique<n::Manager>(std::unique_ptr<platform::stream::Stream>(s), render_engine);
 
         GX_HELPER(camera, render::camera)

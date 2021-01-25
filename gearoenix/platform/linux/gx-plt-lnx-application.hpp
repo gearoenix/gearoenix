@@ -9,7 +9,6 @@
 #include "../gx-plt-main-entry.hpp"
 #include "../gx-plt-runtime-configuration.hpp"
 #include <X11/Xlib.h>
-#include <memory>
 
 namespace gearoenix::core {
 struct Application;
@@ -17,7 +16,7 @@ struct Application;
 
 namespace gearoenix::platform {
 struct Application final {
-    GX_GET_CREF_PRV(BaseApplication, base)
+    GX_GET_REF_PRV(BaseApplication, base)
     GX_GET_PTR_PRV(Display, display)
     GX_GET_PTR_PRV(Screen, screen)
     GX_GET_VAL_PRV(Window, window, 0)
@@ -31,7 +30,7 @@ public:
     explicit Application(GX_MAIN_ENTRY_ARGS_DEF, const RuntimeConfiguration& config = RuntimeConfiguration()) noexcept;
     ~Application() noexcept;
 
-    void run() noexcept;
+    void run(core::Application* core_application = nullptr) noexcept;
 };
 }
 #endif

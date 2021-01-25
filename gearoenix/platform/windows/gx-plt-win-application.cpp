@@ -11,17 +11,17 @@ LRESULT CALLBACK gearoenix::platform::Application::static_handler(
     const WPARAM w_param,
     const LPARAM l_param) noexcept
 {
-    auto sys_app = reinterpret_cast<Application*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
+    auto platform_application = reinterpret_cast<Application*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
     if (WM_CREATE == message) {
         auto* const create_structure = reinterpret_cast<CREATESTRUCT*>(l_param);
-        sys_app = static_cast<Application*>(create_structure->lpCreateParams);
-        SetWindowLongPtr(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(sys_app));
+        platform_application = static_cast<Application*>(create_structure->lpCreateParams);
+        SetWindowLongPtr(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(platform_application));
     }
-    if (nullptr == sys_app) {
+    if (nullptr == platform_application) {
         GX_LOG_D("Unhandled message for nullptr interface, uMsg is: " << message)
         return DefWindowProc(hwnd, message, w_param, l_param);
     }
-    return sys_app->handler(hwnd, message, w_param, l_param);
+    return platform_application->handler(hwnd, message, w_param, l_param);
 }
 
 LRESULT gearoenix::platform::Application::handler(

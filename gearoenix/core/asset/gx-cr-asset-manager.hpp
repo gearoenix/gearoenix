@@ -72,7 +72,7 @@ struct File;
 
 namespace gearoenix::core::asset {
 struct Manager {
-    GX_GET_CPTR_PRV(platform::Application, sys_app)
+    GX_GET_CPTR_PRV(platform::Application, platform_application)
     GX_GET_CPTR_PRV(render::engine::Engine, render_engine)
     GX_GET_UCPTR_PRV(platform::stream::Asset, file)
     GX_GET_UPTR_PRV(render::camera::Manager, camera_manager)
@@ -94,7 +94,7 @@ private:
 #endif
 
 public:
-    Manager(platform::Application* sys_app, const std::string& file) noexcept;
+    Manager(platform::Application* platform_application, const std::string& file) noexcept;
     ~Manager() noexcept;
     static Id create_id() noexcept;
 };

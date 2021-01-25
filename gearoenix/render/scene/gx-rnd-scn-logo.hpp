@@ -62,7 +62,7 @@ private:
 public:
     ~Logo() noexcept;
     static std::shared_ptr<Logo> construct(
-        platform::Application* sys_app,
+        platform::Application* platform_application,
         PriorityIds next_scenes_priority_id,
         FinishCallback on_finished) noexcept;
     /// Hide the Logo scene

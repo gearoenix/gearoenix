@@ -1,4 +1,5 @@
 #include "gx-plt-application.hpp"
+#include "../core/gx-cr-application.hpp"
 #include "../render/engine/gx-rnd-eng-engine.hpp"
 #include "gx-plt-log.hpp"
 
@@ -43,4 +44,9 @@ void gearoenix::platform::BaseApplication::going_to_be_closed() noexcept
 {
     running = false;
     GX_TODO
+}
+
+void gearoenix::platform::BaseApplication::update() noexcept
+{
+    core_application->update();
 }

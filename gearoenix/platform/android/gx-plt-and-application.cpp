@@ -361,14 +361,14 @@ int32_t gearoenix::platform::Application::handle(android_app* const, AInputEvent
 
 void gearoenix::platform::Application::handle_cmd(android_app* const a, int32_t cmd) noexcept
 {
-    auto sys_app = static_cast<Application*>(a->userData);
-    sys_app->handle(a, cmd);
+    auto platform_application = static_cast<Application*>(a->userData);
+    platform_application->handle(a, cmd);
 }
 
 int32_t gearoenix::platform::Application::handle_input(android_app* const a, AInputEvent* const e) noexcept
 {
-    auto sys_app = static_cast<Application*>(a->userData);
-    return sys_app->handle(a, e);
+    auto platform_application = static_cast<Application*>(a->userData);
+    return platform_application->handle(a, e);
 }
 
 void gearoenix::platform::Application::on_check_ready_to_render(android_app* const a) noexcept

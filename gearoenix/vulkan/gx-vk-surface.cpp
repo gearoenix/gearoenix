@@ -17,7 +17,7 @@ gearoenix::vulkan::Surface::Surface(const Instance& ins, const platform::Applica
     VkAndroidSurfaceCreateInfoKHR info;
     GX_SET_ZERO(info)
     info.sType = VK_STRUCTURE_TYPE_ANDROID_SURFACE_CREATE_INFO_KHR;
-    info.window = sys_app->get_android_app()->window;
+    info.window = platform_application->get_android_app()->window;
     GX_VK_CHK_L(vkCreateAndroidSurfaceKHR(instance.get_vulkan_data(), &info, nullptr, &vulkan_data))
 #elif defined(GX_PLATFORM_LINUX)
     VkXlibSurfaceCreateInfoKHR info;

@@ -1,4 +1,5 @@
 #include "gx-plt-lnx-application.hpp"
+#include "../../core/gx-cr-application.hpp"
 #include "../../render/engine/gx-rnd-eng-engine.hpp"
 #include "../gx-plt-log.hpp"
 
@@ -44,9 +45,11 @@ gearoenix::platform::Application::~Application() noexcept
     display = nullptr;
 }
 
-void gearoenix::platform::Application::run() noexcept
+void gearoenix::platform::Application::run(core::Application* const core_app) noexcept
 {
+    base.core_application = nullptr == core_app ? std::make_unique<core::Application>(this) : std::unique_ptr<core::Application>(core_app);
     for (fetch_events(); base.running; fetch_events()) {
+        base.update();
     }
 }
 

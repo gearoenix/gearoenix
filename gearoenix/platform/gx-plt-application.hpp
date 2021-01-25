@@ -8,6 +8,10 @@
 #include "gx-plt-runtime-configuration.hpp"
 #include <memory>
 
+namespace gearoenix::core {
+struct Application;
+}
+
 namespace gearoenix::render::engine {
 struct Engine;
 }
@@ -54,7 +58,8 @@ struct BaseApplication final {
     GX_GET_VAL_PRV(double, delta_mouse_x_nrm, 0.0)
     GX_GET_VAL_PRV(double, delta_mouse_y_nrm, 0.0)
 
-    GX_GET_CREF_PRV(std::unique_ptr<render::engine::Engine>, render_engine)
+    GX_GET_UPTR_PRV(render::engine::Engine, render_engine)
+    GX_GET_UPTR_PRV(core::Application, core_application)
 
 private:
     BaseApplication(GX_MAIN_ENTRY_ARGS_DEF, const RuntimeConfiguration& configuration) noexcept;
@@ -69,6 +74,7 @@ private:
     void update_mouse_position(double x, double y) noexcept;
 
     void going_to_be_closed() noexcept;
+    void update() noexcept;
 };
 }
 

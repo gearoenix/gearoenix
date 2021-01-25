@@ -96,17 +96,17 @@ gearoenix::render::scene::Logo::~Logo() noexcept
 }
 
 std::shared_ptr<gearoenix::render::scene::Logo> gearoenix::render::scene::Logo::construct(
-    platform::Application* const sys_app,
+    platform::Application* const platform_application,
     PriorityIds next_scenes_priority_id,
     FinishCallback on_finished) noexcept
 {
 
-    auto* const ast_mgr = sys_app->get_asset_manager();
+    auto* const ast_mgr = platform_application->get_asset_manager();
     auto* const mdl_mgr = ast_mgr->get_model_manager();
     auto* const scn_mgr = ast_mgr->get_scene_manager();
 
     std::shared_ptr<Logo> result(new Logo(
-        mdl_mgr, sys_app->get_render_engine(), std::move(next_scenes_priority_id), std::move(on_finished)));
+        mdl_mgr, platform_application->get_render_engine(), std::move(next_scenes_priority_id), std::move(on_finished)));
     result->self = result;
 
     scn_mgr->get_gx3d("gearoenix-logo", core::sync::EndCaller<Scene>([result](const std::shared_ptr<Scene>& s) {

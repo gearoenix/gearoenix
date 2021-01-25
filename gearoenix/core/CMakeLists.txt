@@ -59,8 +59,8 @@ SET(GX_ENGINE_CORE_SRC
 #        ${GX_ENGINE_CORE_SRC_DIR}/sync/gx-cr-sync-work-waiter.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-allocator.cpp
         ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-allocator.hpp
-#        ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-application.cpp
-#        ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-application.hpp
+        ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-application.cpp
+        ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-application.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-build-configuration.hpp
 #        ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-disable-warnings.hpp
 #        ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-enable-warnings.hpp

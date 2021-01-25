@@ -45,12 +45,12 @@ gearoenix::render::reflection::Runtime::Runtime(
         .texture_type = texture::Type::TextureCube,
         .has_mipmap = true,
     };
-    auto* const sys_app = e->get_platform_application();
-    auto* const ast_mgr = sys_app->get_asset_manager();
+    auto* const platform_application = e->get_platform_application();
+    auto* const ast_mgr = platform_application->get_asset_manager();
     auto* const txt_mgr = ast_mgr->get_texture_manager();
     auto* const cam_mgr = ast_mgr->get_camera_manager();
     auto* const msh_mgr = ast_mgr->get_mesh_manager();
-    const auto& render_config = sys_app->get_configuration().get_render();
+    const auto& render_config = platform_application->get_configuration().get_render();
     const auto environment_resolution = static_cast<unsigned int>(render_config.get_runtime_reflection_environment_resolution());
     const auto irradiance_resolution = static_cast<unsigned int>(render_config.get_runtime_reflection_irradiance_resolution());
     const auto radiance_resolution = static_cast<unsigned int>(render_config.get_runtime_reflection_radiance_resolution());

@@ -216,9 +216,9 @@ void gearoenix::physics::Engine::update_visibility_receiver() noexcept
     }
 }
 
-gearoenix::physics::Engine::Engine(platform::Application* const sys_app, core::sync::KernelWorkers* const workers) noexcept
+gearoenix::physics::Engine::Engine(platform::Application* const platform_application, core::sync::KernelWorkers* const workers) noexcept
     : animation_manager(new animation::Manager(workers))
-    , sys_app(sys_app)
+    , platform_application(platform_application)
     , workers(workers)
 {
     workers->add_step(
@@ -232,7 +232,7 @@ gearoenix::physics::Engine::Engine(platform::Application* const sys_app, core::s
 void gearoenix::physics::Engine::update() noexcept
 {
     sorted_scenes.clear();
-    const auto& scenes = sys_app->get_asset_manager()->get_scene_manager()->get_scenes();
+    const auto& scenes = platform_application->get_asset_manager()->get_scene_manager()->get_scenes();
     for (const auto& id_scene : scenes) {
         const auto scene = id_scene.second.lock();
         if (scene == nullptr || !scene->get_enability())
