@@ -59,7 +59,7 @@ struct Engine {
     GX_GET_VAL_PRT(unsigned int, frame_number, 0)
     GX_GET_VAL_PRT(unsigned int, next_frame_number, 1)
     GX_GET_VAL_PRT(unsigned int, previous_frame_number, 1)
-    GX_GET_VAL_PRT(unsigned int, frame_number_from_start, -1)
+    GX_GET_VAL_PRT(unsigned int, frame_number_from_start, static_cast<decltype(frame_number)>(-1))
     GX_GET_VAL_PRT(double, delta_time, 0.0f)
 
 protected:

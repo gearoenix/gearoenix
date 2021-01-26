@@ -266,6 +266,7 @@ gearoenix::platform::Application::Application(GX_MAIN_ENTRY_ARGS_DEF, const Runt
     //    update_screen_sizes();
     //    update_mouse_position();
     base.render_engine = render::engine::Engine::construct(*this);
+    base.initialize_imgui();
 }
 
 gearoenix::platform::Application::~Application() noexcept = default;

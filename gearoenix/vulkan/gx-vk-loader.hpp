@@ -39,6 +39,7 @@ public:
     static void load(VkInstance instance) noexcept;
     static void load(VkDevice device) noexcept;
     static void unload() noexcept;
+    [[nodiscard]] static PFN_vkVoidFunction get(const char*) noexcept;
 
 #define GX_HELPER(x) static PFN_##x x
 

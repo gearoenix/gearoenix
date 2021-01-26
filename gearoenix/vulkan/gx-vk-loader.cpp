@@ -462,4 +462,9 @@ void gearoenix::vulkan::Loader::unload() noexcept
     lib = nullptr;
 }
 
+PFN_vkVoidFunction gearoenix::vulkan::Loader::get(const char* const name) noexcept
+{
+    return lib->load<PFN_vkVoidFunction>(name);
+}
+
 #endif

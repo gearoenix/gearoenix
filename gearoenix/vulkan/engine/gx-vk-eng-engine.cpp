@@ -4,7 +4,7 @@
 #include "../../platform/gx-plt-application.hpp"
 #include "../../platform/gx-plt-log.hpp"
 #include "../gx-vk-check.hpp"
-#include "../gx-vk-imgui.hpp"
+#include <imgui_impl_vulkan.h>
 
 gearoenix::vulkan::engine::Engine::Frame::Frame(
     command::Manager& command_manager,
@@ -41,6 +41,9 @@ void gearoenix::vulkan::engine::Engine::setup_imgui() noexcept
         GX_VK_CHK(result)
     };
 #endif
+    info.GetVulkanProcAddressFn = +[](void*, const char* name) noexcept {
+        return Loader::get(name);
+    };
     ImGui_ImplVulkan_Init(&info, render_pass.get_vulkan_data());
     io.Fonts->AddFontDefault();
     vulkan_upload_imgui_fonts();
