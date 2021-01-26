@@ -40,3 +40,6 @@ cmake-build-*/
 .settings
 .idea/
 sdk/
+
+gearoenix/vulkan/gx-vk-imgui.cpp
+gearoenix/vulkan/gx-vk-imgui.hpp

@@ -2,6 +2,7 @@
 #include "../core/gx-cr-application.hpp"
 #include "../render/engine/gx-rnd-eng-engine.hpp"
 #include "gx-plt-log.hpp"
+#include <imgui.h>
 
 gearoenix::platform::BaseApplication::BaseApplication(GX_MAIN_ENTRY_ARGS_DEF, const RuntimeConfiguration& configuration) noexcept
     : configuration(configuration)
@@ -51,4 +52,11 @@ void gearoenix::platform::BaseApplication::update() noexcept
     render_engine->start_frame();
     core_application->update();
     render_engine->end_frame();
+}
+
+void gearoenix::platform::BaseApplication::initialize_imgui() noexcept
+{
+    ImGuiIO& io = ImGui::GetIO();
+    io.DisplaySize.x = static_cast<decltype(io.DisplaySize.x)>(window_width);
+    io.DisplaySize.y = static_cast<decltype(io.DisplaySize.y)>(window_height);
 }

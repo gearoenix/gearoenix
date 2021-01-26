@@ -5,6 +5,13 @@
 #include "../device/gx-vk-dev-physical.hpp"
 #include "../gx-vk-check.hpp"
 
+gearoenix::vulkan::command::Pool::Pool(Pool&& o) noexcept
+    : logical_device(o.logical_device)
+    , vulkan_data(o.vulkan_data)
+{
+    o.vulkan_data = nullptr;
+}
+
 gearoenix::vulkan::command::Pool::Pool(const device::Logical& ld) noexcept
     : logical_device(ld)
 {
@@ -18,6 +25,10 @@ gearoenix::vulkan::command::Pool::Pool(const device::Logical& ld) noexcept
 
 gearoenix::vulkan::command::Pool::~Pool() noexcept
 {
-    Loader::vkDestroyCommandPool(logical_device.get_vulkan_data(), vulkan_data, nullptr);
+    if (nullptr != vulkan_data) {
+        Loader::vkDestroyCommandPool(logical_device.get_vulkan_data(), vulkan_data, nullptr);
+        vulkan_data = nullptr;
+    }
 }
+
 #endif

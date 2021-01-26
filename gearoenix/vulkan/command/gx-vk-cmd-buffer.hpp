@@ -6,16 +6,17 @@
 #include "../gx-vk-loader.hpp"
 #include "gx-vk-cmd-type.hpp"
 
-namespace gearoenix::vulkan::buffer {
-struct Buffer;
+namespace gearoenix::vulkan {
+struct DescriptorSet;
+struct Framebuffer;
+struct Pipeline;
+struct RenderPass;
+struct Scissor;
+struct Viewport;
 }
 
-namespace gearoenix::vulkan {
-struct RenderPass;
-struct Viewport;
-struct Scissor;
-struct Pipeline;
-struct DescriptorSet;
+namespace gearoenix::vulkan::buffer {
+struct Buffer;
 }
 
 namespace gearoenix::vulkan::command {
@@ -29,13 +30,13 @@ public:
     Buffer(Pool* pool, Type t) noexcept;
     Buffer(const Buffer&) noexcept = delete;
     Buffer& operator=(const Buffer&) noexcept = delete;
-    Buffer(Buffer&&) noexcept = default;
+    Buffer(Buffer&&) noexcept;
     ~Buffer() noexcept;
     void begin() noexcept;
     void flush() noexcept;
     void end() noexcept;
     void copy(buffer::Buffer& src, buffer::Buffer& des) noexcept;
-    void begin(const RenderPass& render_pass) noexcept;
+    void begin(const RenderPass& render_pass, const Framebuffer& framebuffer) noexcept;
     void end_render_pass() noexcept;
     void set(const Viewport& viewport) noexcept;
     void set(const Scissor& scissor) noexcept;
@@ -44,7 +45,7 @@ public:
     void bind_vertices(buffer::Buffer& buf) noexcept;
     void bind_indices(buffer::Buffer& buf) noexcept;
     void draw_indices(std::size_t count) noexcept;
-    [[nodiscard]] VkCommandBuffer* get_vulkan_data_ptr() noexcept;
+    [[nodiscard]] const VkCommandBuffer* get_vulkan_data_ptr() const noexcept;
 };
 }
 #endif

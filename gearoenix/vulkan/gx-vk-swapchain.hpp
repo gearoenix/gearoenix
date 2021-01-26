@@ -31,6 +31,7 @@ public:
     Swapchain& operator=(Swapchain&&) = delete;
     [[nodiscard]] bool get_next_image_index(const sync::Semaphore& semaphore) noexcept;
     void initialize() noexcept;
+    [[nodiscard]] const VkSwapchainKHR* get_vulkan_data_ptr() const noexcept;
 };
 }
 #endif

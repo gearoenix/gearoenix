@@ -4,8 +4,21 @@
 #include "../../platform/gx-plt-application.hpp"
 #include "../../platform/gx-plt-log.hpp"
 #include "../gx-vk-check.hpp"
-#include <imgui.h>
-#include <imgui_impl_vulkan.h>
+#include "../gx-vk-imgui.hpp"
+
+gearoenix::vulkan::engine::Engine::Frame::Frame(
+    command::Manager& command_manager,
+    const Swapchain& swapchain,
+    const image::View& depth_stencil,
+    const RenderPass& render_pass,
+    const unsigned int frame_index) noexcept
+    : draw_command(command_manager.create(command::Type::Primary))
+    , draw_wait(command_manager.get_logical_device(), true)
+    , framebuffer(&swapchain.get_image_views()[frame_index], &depth_stencil, &render_pass)
+    , present_complete(command_manager.get_logical_device())
+    , render_complete(command_manager.get_logical_device())
+{
+}
 
 void gearoenix::vulkan::engine::Engine::setup_imgui() noexcept
 {
@@ -24,7 +37,7 @@ void gearoenix::vulkan::engine::Engine::setup_imgui() noexcept
     info.MinImageCount = static_cast<decltype(info.MinImageCount)>(swapchain.get_image_views().size());
     info.ImageCount = info.MinImageCount;
 #ifdef GX_DEBUG_MODE
-    info.CheckVkResultFn = +[](VkResult result) {
+    info.CheckVkResultFn = +[](const VkResult result) noexcept {
         GX_VK_CHK(result)
     };
 #endif
@@ -72,14 +85,8 @@ gearoenix::vulkan::engine::Engine::Engine(const platform::Application& platform_
 {
     frames_count = static_cast<decltype(frames_count)>(swapchain.get_image_views().size());
     frames.reserve(static_cast<std::size_t>(frames_count));
-    for (auto frame_index = decltype(frames_count) { 0 }; frame_index > frames_count; ++frame_index) {
-        frames.push_back(Frame {
-            command_manager.create(command::Type::Primary),
-            sync::Fence(logical_device, true),
-            Framebuffer(&swapchain.get_image_views()[frame_index], &depth_stencil, &render_pass),
-            sync::Semaphore(logical_device),
-            sync::Semaphore(logical_device),
-        });
+    for (auto frame_index = decltype(frames_count) { 0 }; frame_index < frames_count; ++frame_index) {
+        frames.emplace_back(command_manager, swapchain, depth_stencil, render_pass, frame_index);
     }
     //    sampler_manager = std::make_shared<sampler::Manager>(logical_device);
     // main_render_target = vulkan_main_render_target = std::make_shared<texture::MainTarget>(memory_manager, this);
@@ -100,6 +107,8 @@ gearoenix::vulkan::engine::Engine::Engine(const platform::Application& platform_
 gearoenix::vulkan::engine::Engine::~Engine() noexcept
 {
     logical_device.wait_to_finish();
+    ImGui_ImplVulkan_Shutdown();
+    ImGui::DestroyContext();
 }
 
 //void gearoenix::render::Engine::window_changed()
@@ -123,6 +132,12 @@ void gearoenix::vulkan::engine::Engine::start_frame() noexcept
 {
     render::engine::Engine::start_frame();
     start_frame_imgui();
+    auto& frame = frames[frame_number];
+    if (swapchain.get_next_image_index(frame.present_complete)) {
+        GX_UNIMPLEMENTED
+    }
+    frame.draw_wait.wait();
+    frame.draw_wait.reset();
     //    vulkan_main_render_target->update();
     //    auto* const up_cmd = upload_command_buffers[frame_number].get();
     //    up_cmd->begin();
@@ -138,19 +153,39 @@ void gearoenix::vulkan::engine::Engine::end_frame() noexcept
 {
     render::engine::Engine::end_frame();
     auto& frame = frames[frame_number];
+    // ImGui
     ImGui::Render();
     ImDrawData* draw_data = ImGui::GetDrawData();
-    if (swapchain.get_next_image_index(frame.present_complete)) {
-        GX_UNIMPLEMENTED
-    }
-    frame.draw_wait.wait();
-    frame.draw_wait.reset();
+    // Record ImGui commands
     frame.draw_command.begin();
-    frame.draw_command.begin(render_pass);
+    frame.draw_command.begin(render_pass, frame.framebuffer);
     ImGui_ImplVulkan_RenderDrawData(draw_data, frame.draw_command.get_vulkan_data());
     frame.draw_command.end_render_pass();
     frame.draw_command.end();
-    //    FramePresent(wd);
+    // Submitting
+    const VkPipelineStageFlags wait_stage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    VkSubmitInfo submit_info;
+    GX_SET_ZERO(submit_info)
+    submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submit_info.waitSemaphoreCount = 1;
+    submit_info.pWaitSemaphores = frame.present_complete.get_vulkan_data_ptr();
+    submit_info.pWaitDstStageMask = &wait_stage;
+    submit_info.commandBufferCount = 1;
+    submit_info.pCommandBuffers = frame.draw_command.get_vulkan_data_ptr();
+    submit_info.signalSemaphoreCount = 1;
+    submit_info.pSignalSemaphores = frame.render_complete.get_vulkan_data_ptr();
+    GX_VK_CHK_L(vkQueueSubmit(logical_device.get_graphic_queue(), 1, &submit_info, frame.draw_wait.get_vulkan_data()))
+    // Presenting
+    const auto present_image_index = static_cast<std::uint32_t>(frame_number);
+    VkPresentInfoKHR present_info;
+    GX_SET_ZERO(present_info)
+    present_info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+    present_info.waitSemaphoreCount = 1;
+    present_info.pWaitSemaphores = frame.render_complete.get_vulkan_data_ptr();
+    present_info.swapchainCount = 1;
+    present_info.pSwapchains = swapchain.get_vulkan_data_ptr();
+    present_info.pImageIndices = &present_image_index;
+    GX_VK_CHK_L(vkQueuePresentKHR(logical_device.get_graphic_queue(), &present_info))
 }
 
 void gearoenix::vulkan::engine::Engine::upload_imgui_fonts() noexcept

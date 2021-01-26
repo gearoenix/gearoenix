@@ -29,6 +29,18 @@ struct Engine final : public render::engine::Engine {
         Framebuffer framebuffer;
         sync::Semaphore present_complete;
         sync::Semaphore render_complete;
+
+        Frame(const Frame&) = delete;
+        Frame(Frame&&) noexcept = default;
+        Frame& operator=(const Frame&) = delete;
+        Frame& operator=(Frame&&) = delete;
+
+        Frame(
+            command::Manager& command_manager,
+            const Swapchain&,
+            const image::View&,
+            const RenderPass&,
+            unsigned int) noexcept;
     };
 
     GX_GET_CREF_PRV(Instance, instance)

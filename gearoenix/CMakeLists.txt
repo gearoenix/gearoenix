@@ -27,8 +27,7 @@ SET(GX_ENGINE_SRC
         ${GX_IMGUI_PATH}/imgui_demo.cpp
         ${GX_IMGUI_PATH}/imgui_draw.cpp
         ${GX_IMGUI_PATH}/imgui_tables.cpp
-        ${GX_IMGUI_PATH}/imgui_widgets.cpp
-        ${GX_IMGUI_PATH}/backends/imgui_impl_vulkan.cpp)
+        ${GX_IMGUI_PATH}/imgui_widgets.cpp)
 
 SET(GX_ENGINE_TEST_SRC
         ${GX_ENGINE_AI_TEST_SRC}

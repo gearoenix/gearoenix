@@ -31,7 +31,6 @@ bool gearoenix::vulkan::Swapchain::get_next_image_index(const sync::Semaphore& s
         logical_device.get_vulkan_data(), vulkan_data,
         std::numeric_limits<std::uint64_t>::max(),
         semaphore.get_vulkan_data(), nullptr, &image_index);
-    GX_LOG_D(image_index)
     switch (result) {
     case VK_ERROR_OUT_OF_DATE_KHR:
     case VK_ERROR_INITIALIZATION_FAILED:
@@ -115,4 +114,10 @@ void gearoenix::vulkan::Swapchain::initialize() noexcept
         Loader::vkDestroySwapchainKHR(logical_device.get_vulkan_data(), old_swapchain, nullptr);
     }
 }
+
+const VkSwapchainKHR* gearoenix::vulkan::Swapchain::get_vulkan_data_ptr() const noexcept
+{
+    return &vulkan_data;
+}
+
 #endif

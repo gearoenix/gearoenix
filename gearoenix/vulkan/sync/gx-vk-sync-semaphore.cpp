@@ -5,6 +5,13 @@
 #include "../device/gx-vk-dev-physical.hpp"
 #include "../gx-vk-check.hpp"
 
+gearoenix::vulkan::sync::Semaphore::Semaphore(Semaphore&& o) noexcept
+    : logical_device(o.logical_device)
+    , vulkan_data(o.vulkan_data)
+{
+    o.vulkan_data = nullptr;
+}
+
 gearoenix::vulkan::sync::Semaphore::Semaphore(const device::Logical& ld) noexcept
     : logical_device(ld)
 {
@@ -16,7 +23,15 @@ gearoenix::vulkan::sync::Semaphore::Semaphore(const device::Logical& ld) noexcep
 
 gearoenix::vulkan::sync::Semaphore::~Semaphore() noexcept
 {
-    Loader::vkDestroySemaphore(logical_device.get_vulkan_data(), vulkan_data, nullptr);
+    if (nullptr == vulkan_data) {
+        Loader::vkDestroySemaphore(logical_device.get_vulkan_data(), vulkan_data, nullptr);
+        vulkan_data = nullptr;
+    }
+}
+
+const VkSemaphore* gearoenix::vulkan::sync::Semaphore::get_vulkan_data_ptr() const noexcept
+{
+    return &vulkan_data;
 }
 
 #endif

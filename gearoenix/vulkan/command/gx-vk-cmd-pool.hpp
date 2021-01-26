@@ -15,8 +15,12 @@ struct Pool final {
     GX_GET_VAL_PRV(VkCommandPool, vulkan_data, nullptr)
 
 public:
+    Pool(Pool&&) noexcept;
+    Pool(const Pool&) = delete;
     explicit Pool(const device::Logical& logical_device) noexcept;
     ~Pool() noexcept;
+    Pool& operator=(Pool&&) = delete;
+    Pool& operator=(const Pool&) = delete;
 };
 }
 #endif

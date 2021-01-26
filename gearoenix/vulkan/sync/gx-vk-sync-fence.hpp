@@ -15,10 +15,14 @@ struct Fence {
     GX_GET_VAL_PRV(VkFence, vulkan_data, nullptr)
 
 public:
+    Fence(const Fence&) = delete;
+    Fence(Fence&&) noexcept;
     explicit Fence(const device::Logical& logical_device, bool signaled = false) noexcept;
     ~Fence() noexcept;
     void wait() noexcept;
     void reset() noexcept;
+    Fence& operator=(const Fence&) = delete;
+    Fence& operator=(Fence&&) = delete;
 };
 }
 #endif

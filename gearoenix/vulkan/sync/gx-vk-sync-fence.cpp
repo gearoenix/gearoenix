@@ -5,6 +5,13 @@
 #include "../device/gx-vk-dev-physical.hpp"
 #include "../gx-vk-check.hpp"
 
+gearoenix::vulkan::sync::Fence::Fence(Fence&& o) noexcept
+    : logical_device(o.logical_device)
+    , vulkan_data(o.vulkan_data)
+{
+    o.vulkan_data = nullptr;
+}
+
 gearoenix::vulkan::sync::Fence::Fence(const device::Logical& ld, const bool signaled) noexcept
     : logical_device(ld)
 {
@@ -19,7 +26,9 @@ gearoenix::vulkan::sync::Fence::Fence(const device::Logical& ld, const bool sign
 
 gearoenix::vulkan::sync::Fence::~Fence() noexcept
 {
-    Loader::vkDestroyFence(logical_device.get_vulkan_data(), vulkan_data, nullptr);
+    if (nullptr != vulkan_data)
+        Loader::vkDestroyFence(logical_device.get_vulkan_data(), vulkan_data, nullptr);
+    vulkan_data = nullptr;
 }
 
 void gearoenix::vulkan::sync::Fence::wait() noexcept

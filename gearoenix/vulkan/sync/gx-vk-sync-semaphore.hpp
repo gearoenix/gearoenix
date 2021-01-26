@@ -15,8 +15,13 @@ struct Semaphore final {
     GX_GET_VAL_PRV(VkSemaphore, vulkan_data, nullptr)
 
 public:
+    Semaphore(Semaphore&&) noexcept;
+    Semaphore(const Semaphore&) = delete;
     explicit Semaphore(const device::Logical& logical_device) noexcept;
     ~Semaphore() noexcept;
+    [[nodiscard]] const VkSemaphore* get_vulkan_data_ptr() const noexcept;
+    Semaphore& operator=(Semaphore&&) = delete;
+    Semaphore& operator=(const Semaphore&) = delete;
 };
 }
 #endif

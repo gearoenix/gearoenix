@@ -4,6 +4,9 @@
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../device/gx-vk-dev-physical.hpp"
 #include "../gx-vk-check.hpp"
+#include "../gx-vk-framebuffer.hpp"
+#include "../gx-vk-render-pass.hpp"
+#include "../image/gx-vk-img-view.hpp"
 #include "../sync/gx-vk-sync-fence.hpp"
 #include "gx-vk-cmd-pool.hpp"
 
@@ -24,15 +27,22 @@ gearoenix::vulkan::command::Buffer::Buffer(Pool* const pool, const Type t) noexc
     GX_VK_CHK_L(vkAllocateCommandBuffers(pool->get_logical_device().get_vulkan_data(), &info, &vulkan_data))
 }
 
+gearoenix::vulkan::command::Buffer::Buffer(command::Buffer&& o) noexcept
+    : pool(o.pool)
+    , type(o.type)
+    , vulkan_data(o.vulkan_data)
+{
+    o.vulkan_data = nullptr;
+}
+
 gearoenix::vulkan::command::Buffer::~Buffer() noexcept
 {
-#ifdef GX_VK_CMD_BUFF_DEBUG
-    if (nullptr == vulkan_data)
-        GX_UNEXPECTED
-#endif
-    Loader::vkFreeCommandBuffers(
-        pool->get_logical_device().get_vulkan_data(),
-        pool->get_vulkan_data(), 1, &vulkan_data);
+    if (nullptr != vulkan_data) {
+        Loader::vkFreeCommandBuffers(
+            pool->get_logical_device().get_vulkan_data(),
+            pool->get_vulkan_data(), 1, &vulkan_data);
+        vulkan_data = nullptr;
+    }
 }
 
 void gearoenix::vulkan::command::Buffer::begin() noexcept
@@ -62,6 +72,22 @@ void gearoenix::vulkan::command::Buffer::end() noexcept
 {
     GX_VK_CHK_L(vkEndCommandBuffer(vulkan_data))
 }
+
+void gearoenix::vulkan::command::Buffer::begin(const RenderPass& render_pass, const Framebuffer& framebuffer) noexcept
+{
+    const auto& img = framebuffer.get_depth()->get_image();
+    VkRenderPassBeginInfo info;
+    GX_SET_ZERO(info)
+    info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+    info.renderPass = render_pass.get_vulkan_data();
+    info.framebuffer = framebuffer.get_vulkan_data();
+    info.renderArea.extent.width = img.get_image_width();
+    info.renderArea.extent.height = img.get_image_height();
+    info.clearValueCount = 2;
+    info.pClearValues = framebuffer.get_clear_colors().data();
+    Loader::vkCmdBeginRenderPass(vulkan_data, &info, VK_SUBPASS_CONTENTS_INLINE);
+}
+
 //
 //void gearoenix::vulkan::command::Buffer::copy_buffer(
 //    VkBuffer src, VkBuffer des, const VkBufferCopy& region) noexcept
@@ -122,7 +148,7 @@ void gearoenix::vulkan::command::Buffer::draw_indices(VkDeviceSize count) noexce
     Loader::vkCmdDrawIndexed(vulkan_data, static_cast<std::uint32_t>(count), 1, 0, 0, 1);
 }
 
-VkCommandBuffer* gearoenix::vulkan::command::Buffer::get_vulkan_data_ptr() noexcept
+const VkCommandBuffer* gearoenix::vulkan::command::Buffer::get_vulkan_data_ptr() const noexcept
 {
     return &vulkan_data;
 }

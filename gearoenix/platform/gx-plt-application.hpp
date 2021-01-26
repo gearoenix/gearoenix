@@ -75,6 +75,10 @@ private:
 
     void going_to_be_closed() noexcept;
     void update() noexcept;
+
+    void initialize_imgui() noexcept;
+
+public:
 };
 }
 

@@ -94,6 +94,7 @@ void gearoenix::render::engine::Engine::start_frame() noexcept
     const std::chrono::duration<double> delta_time_duration = now - last_frame_time;
     delta_time = delta_time_duration.count();
     last_frame_time = now;
+    previous_frame_number = frame_number_from_start % frames_count;
     ++frame_number_from_start;
     frame_number = frame_number_from_start % frames_count;
     next_frame_number = (frame_number_from_start + 1) % frames_count;

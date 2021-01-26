@@ -7,6 +7,16 @@
 #include "gx-vk-render-pass.hpp"
 #include "image/gx-vk-img-view.hpp"
 
+gearoenix::vulkan::Framebuffer::Framebuffer(Framebuffer&& o) noexcept
+    : view(o.view)
+    , depth(o.depth)
+    , render_pass(o.render_pass)
+    , vulkan_data(o.vulkan_data)
+    , clear_colors(std::move(o.clear_colors))
+{
+    o.vulkan_data = nullptr;
+}
+
 gearoenix::vulkan::Framebuffer::Framebuffer(
     const image::View* const v,
     const image::View* const d,
@@ -14,6 +24,10 @@ gearoenix::vulkan::Framebuffer::Framebuffer(
     : view(v)
     , depth(d)
     , render_pass(rp)
+    , clear_colors {
+        VkClearValue { .color = { 0.0f, 0.0f, 0.0f, 0.0f } },
+        VkClearValue { .color = { 0.0f, 0.0f, 0.0f, 0.0f } }
+    }
 {
     const auto& img = view->get_image();
     const auto& logical_device = img.get_logical_device();
@@ -35,8 +49,10 @@ gearoenix::vulkan::Framebuffer::Framebuffer(
 
 gearoenix::vulkan::Framebuffer::~Framebuffer() noexcept
 {
-    if (nullptr != vulkan_data)
+    if (nullptr != vulkan_data) {
         Loader::vkDestroyFramebuffer(view->get_image().get_logical_device()->get_vulkan_data(), vulkan_data, nullptr);
-    vulkan_data = nullptr;
+        vulkan_data = nullptr;
+    }
 }
+
 #endif

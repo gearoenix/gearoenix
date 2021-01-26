@@ -25,6 +25,7 @@ SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake/)
 INCLUDE(gx-compile-lib)
 INCLUDE(gx-download-file)
 INCLUDE(gx-flag-util)
+INCLUDE(gx-imgui)
 
 MESSAGE(STATUS "Gearoenix is going to be compiled for ${CMAKE_SYSTEM_NAME}")
 
@@ -74,8 +75,8 @@ INCLUDE_DIRECTORIES(${GX_VULKAN_HEADERS_INCLUDE_DIRS})
 
 SET(GX_IMGUI_PATH "${GX_SDK_PATH}/imgui")
 GX_DOWNLOAD_FILE("https://github.com/ocornut/imgui/archive/master.zip" "${GX_IMGUI_PATH}")
+GX_PREPARE_IMGUI(${GX_IMGUI_PATH})
 INCLUDE_DIRECTORIES(${GX_IMGUI_PATH})
-INCLUDE_DIRECTORIES(${GX_IMGUI_PATH}/backends)
 
 SET(GX_BOOST_PATH "${GX_SDK_PATH}/boost")
 GX_DOWNLOAD_FILE("https://dl.bintray.com/boostorg/release/1.74.0/source/boost_1_74_0.zip" "${GX_BOOST_PATH}")
