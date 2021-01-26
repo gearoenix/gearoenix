@@ -23,7 +23,7 @@ gearoenix::vulkan::sync::Semaphore::Semaphore(const device::Logical& ld) noexcep
 
 gearoenix::vulkan::sync::Semaphore::~Semaphore() noexcept
 {
-    if (nullptr == vulkan_data) {
+    if (nullptr != vulkan_data) {
         Loader::vkDestroySemaphore(logical_device.get_vulkan_data(), vulkan_data, nullptr);
         vulkan_data = nullptr;
     }

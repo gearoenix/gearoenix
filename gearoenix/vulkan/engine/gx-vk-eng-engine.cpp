@@ -109,6 +109,7 @@ gearoenix::vulkan::engine::Engine::~Engine() noexcept
     logical_device.wait_to_finish();
     ImGui_ImplVulkan_Shutdown();
     ImGui::DestroyContext();
+    frames.clear();
 }
 
 //void gearoenix::render::Engine::window_changed()
