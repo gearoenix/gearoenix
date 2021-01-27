@@ -8,6 +8,14 @@
 #include "../gx-vk-check.hpp"
 #include "../memory/gx-vk-mem-manager.hpp"
 
+void gearoenix::vulkan::image::Image::terminate() noexcept
+{
+    if (allocated_memory.has_value() && vulkan_data != nullptr) {
+        Loader::vkDestroyImage(logical_device->get_vulkan_data(), vulkan_data, nullptr);
+        vulkan_data = nullptr;
+    }
+}
+
 gearoenix::vulkan::image::Image::Image(Image&& o) noexcept
     : logical_device(o.logical_device)
     , allocated_memory(std::move(o.allocated_memory))
@@ -97,13 +105,12 @@ gearoenix::vulkan::image::Image::Image(
 
 gearoenix::vulkan::image::Image::~Image() noexcept
 {
-    if (allocated_memory.has_value() && vulkan_data != nullptr) {
-        Loader::vkDestroyImage(logical_device->get_vulkan_data(), vulkan_data, nullptr);
-    }
+    terminate();
 }
 
 gearoenix::vulkan::image::Image& gearoenix::vulkan::image::Image::operator=(Image&& o) noexcept
 {
+    terminate();
     logical_device = o.logical_device;
     allocated_memory = std::move(o.allocated_memory);
     image_width = o.image_width;

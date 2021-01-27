@@ -22,7 +22,6 @@ struct Physical final {
     GX_GET_CREF_PRV(VkPhysicalDeviceProperties, properties)
     GX_GET_CREF_PRV(VkPhysicalDeviceFeatures, features)
     GX_GET_CREF_PRV(VkPhysicalDeviceMemoryProperties, memory_properties)
-    GX_GET_CREF_PRV(VkSurfaceCapabilitiesKHR, surface_capabilities)
     GX_GET_CREF_PRV(std::vector<VkQueueFamilyProperties>, queue_family_properties)
     GX_GET_CREF_PRV(std::set<std::string>, supported_extensions)
     GX_GET_CREF_PRV(std::vector<VkSurfaceFormatKHR>, surface_formats)
@@ -53,6 +52,11 @@ public:
     Physical& operator=(Physical&&) = delete;
     [[nodiscard]] std::uint32_t get_memory_type_index(std::uint32_t type_bits, std::uint32_t mem_properties) const noexcept;
     [[nodiscard]] std::size_t align_size(std::size_t size) const noexcept;
+
+    /// It's going to fetch a new information about the surface every time.
+    ///
+    /// \note If you don't care about new information you can cache it for your future uses.
+    [[nodiscard]] VkSurfaceCapabilitiesKHR get_surface_capabilities() const noexcept;
 };
 }
 #endif

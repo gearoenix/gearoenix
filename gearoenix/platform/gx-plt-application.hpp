@@ -6,6 +6,7 @@
 #include "gx-plt-build-configuration.hpp"
 #include "gx-plt-main-entry.hpp"
 #include "gx-plt-runtime-configuration.hpp"
+#include <chrono>
 #include <memory>
 
 namespace gearoenix::core {
@@ -26,22 +27,18 @@ struct BaseApplication final {
 
     GX_GET_VAL_PRV(bool, running, true)
 
+    GX_GET_VAL_PRV(bool, window_resizing, false)
     GX_GET_VAL_PRV(int, window_width, -1)
     GX_GET_VAL_PRV(int, window_height, -1)
     GX_GET_VAL_PRV(double, window_aspect_ratio, 1)
-    GX_GET_VAL_PRV(int, pre_window_width, -1)
-    GX_GET_VAL_PRV(int, pre_window_height, -1)
-    GX_GET_VAL_PRV(double, pre_window_aspect_ratio, 1)
-    GX_GET_VAL_PRV(int, delta_window_width, 0)
-    GX_GET_VAL_PRV(int, delta_window_height, 0)
-    GX_GET_VAL_PRV(double, delta_window_aspect_ratio, 1)
+
     GX_GET_VAL_PRV(int, window_x, -1)
     GX_GET_VAL_PRV(int, window_y, -1)
     GX_GET_VAL_PRV(int, pre_window_x, -1)
     GX_GET_VAL_PRV(int, pre_window_y, -1)
     GX_GET_VAL_PRV(int, delta_window_x, 0)
     GX_GET_VAL_PRV(int, delta_window_y, 0)
-    GX_GET_VAL_PRV(bool, window_is_up, false)
+    GX_GET_VAL_PRV(bool, window_is_up, true)
 
     GX_GET_VAL_PRV(double, mouse_x, -1.0)
     GX_GET_VAL_PRV(double, mouse_y, -1.0)
@@ -62,6 +59,9 @@ struct BaseApplication final {
     GX_GET_UPTR_PRV(core::Application, core_application)
 
 private:
+    std::chrono::high_resolution_clock::time_point last_time_window_resized;
+
+private:
     BaseApplication(GX_MAIN_ENTRY_ARGS_DEF, const RuntimeConfiguration& configuration) noexcept;
     ~BaseApplication() noexcept;
 
@@ -75,8 +75,6 @@ private:
 
     void going_to_be_closed() noexcept;
     void update() noexcept;
-
-    void initialize_imgui() noexcept;
 
 public:
 };

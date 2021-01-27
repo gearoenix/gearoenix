@@ -25,7 +25,6 @@ struct Manager;
 
 namespace gearoenix::vulkan::image {
 struct Image final {
-private:
     GX_GET_CPTR_PRV(device::Logical, logical_device)
     GX_GET_CREF_PRV(std::optional<memory::Memory>, allocated_memory)
     GX_GET_VAL_PRV(std::uint32_t, image_width, 0)
@@ -37,6 +36,9 @@ private:
     GX_GET_VAL_PRV(VkImageCreateFlags, flags, 0)
     GX_GET_VAL_PRV(VkImageUsageFlags, usage, 0)
     GX_GET_VAL_PRV(VkImage, vulkan_data, nullptr)
+
+private:
+    void terminate() noexcept;
 
 public:
     Image(const Image&) = delete;

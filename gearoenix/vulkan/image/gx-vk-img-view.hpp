@@ -8,9 +8,11 @@
 
 namespace gearoenix::vulkan::image {
 struct View final {
-private:
     GX_GET_CREF_PRV(Image, image)
     GX_GET_VAL_PRV(VkImageView, vulkan_data, nullptr)
+
+private:
+    void terminate() noexcept;
 
 public:
     explicit View(Image&& img) noexcept;

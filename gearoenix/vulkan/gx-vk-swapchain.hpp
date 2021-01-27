@@ -5,6 +5,7 @@
 #include "../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "gx-vk-loader.hpp"
 #include "image/gx-vk-img-view.hpp"
+#include <optional>
 #include <vector>
 
 namespace gearoenix::vulkan::device {
@@ -29,7 +30,8 @@ public:
     ~Swapchain() noexcept;
     Swapchain& operator=(const Swapchain&) = delete;
     Swapchain& operator=(Swapchain&&) = delete;
-    [[nodiscard]] bool get_next_image_index(const sync::Semaphore& semaphore) noexcept;
+    /// If the frame is valid it return true otherwise false
+    [[nodiscard]] std::optional<std::uint32_t> get_next_image_index(const sync::Semaphore& semaphore) noexcept;
     void initialize() noexcept;
     [[nodiscard]] const VkSwapchainKHR* get_vulkan_data_ptr() const noexcept;
 };

@@ -10,9 +10,20 @@ void gearoenix::platform::Application::fetch_events() noexcept
     while (XPending(display) > 0) {
         XEvent event;
         XNextEvent(display, &event);
-        if (event.type == ClientMessage && event.xclient.data.l[0] == close_message) {
-            base.running = false;
-            return;
+        switch (event.type) {
+        case ClientMessage: {
+            if (event.xclient.data.l[0] == close_message) {
+                base.running = false;
+                return;
+            }
+            break;
+        }
+        case ConfigureNotify: {
+            const XConfigureEvent xce = event.xconfigure;
+            if (0 != xce.width && 0 != xce.height)
+                base.update_window_size(xce.width, xce.height);
+            break;
+        }
         }
     }
 }
@@ -30,22 +41,27 @@ gearoenix::platform::Application::Application(GX_MAIN_ENTRY_ARGS_DEF, const Runt
           0,
           config.get_window_width(),
           config.get_window_height(),
-          4,
+          0,
           black_pixel,
           black_pixel))
     , close_message(XInternAtom(display, "WM_DELETE_WINDOW", False))
 {
-    base.initialize_window_size(config.get_window_width(), config.get_window_height());
     base.initialize_window_position(
         (screen->width - static_cast<int>(config.get_window_width())) / 2,
         (screen->height - static_cast<int>(config.get_window_height())) / 2);
     XSelectInput(display, window, KeyPressMask | ButtonPressMask | ExposureMask | StructureNotifyMask);
-    XMoveWindow(display, window, base.window_x, base.window_y);
     XSetWMProtocols(display, window, &close_message, 1);
     XMapWindow(display, window);
+    XMoveWindow(display, window, base.window_x, base.window_y);
+
+    while (true) {
+        XEvent e;
+        XNextEvent(display, &e);
+        if (e.type == Expose)
+            break;
+    }
 
     base.render_engine = render::engine::Engine::construct(*this);
-    base.initialize_imgui();
 }
 
 gearoenix::platform::Application::~Application() noexcept

@@ -24,7 +24,7 @@ gearoenix::vulkan::Swapchain::~Swapchain() noexcept
     Loader::vkDestroySwapchainKHR(logical_device.get_vulkan_data(), vulkan_data, nullptr);
 }
 
-bool gearoenix::vulkan::Swapchain::get_next_image_index(const sync::Semaphore& semaphore) noexcept
+std::optional<std::uint32_t> gearoenix::vulkan::Swapchain::get_next_image_index(const sync::Semaphore& semaphore) noexcept
 {
     std::uint32_t image_index = 0;
     const VkResult result = Loader::vkAcquireNextImageKHR(
@@ -34,21 +34,20 @@ bool gearoenix::vulkan::Swapchain::get_next_image_index(const sync::Semaphore& s
     switch (result) {
     case VK_ERROR_OUT_OF_DATE_KHR:
     case VK_ERROR_INITIALIZATION_FAILED:
-        return true;
+        return std::nullopt;
     case VK_SUCCESS:
-        return false;
+        return image_index;
     default:
-        GX_LOG_E("Swapchain failed to get the next image")
-        GX_VK_CHK(result)
+        GX_LOG_F("Swapchain failed to get the next image, result: " << result_to_string(result))
     }
-    return true;
 }
 
 void gearoenix::vulkan::Swapchain::initialize() noexcept
 {
+    image_views.clear();
     const auto& physical_device = logical_device.get_physical_device();
     const auto& surface = physical_device.get_surface();
-    const VkSurfaceCapabilitiesKHR& caps = physical_device.get_surface_capabilities();
+    const auto caps = physical_device.get_surface_capabilities();
     const auto& formats = physical_device.get_surface_formats();
     const auto old_swapchain = vulkan_data;
     std::uint32_t chosen_format_index;

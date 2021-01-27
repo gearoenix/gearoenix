@@ -55,6 +55,8 @@ struct Engine final : public render::engine::Engine {
     GX_GET_CREF_PRV(image::View, depth_stencil)
     GX_GET_CREF_PRV(RenderPass, render_pass)
     GX_GET_CREF_PRV(std::vector<Frame>, frames)
+    GX_GET_VAL_PRV(std::uint32_t, swapchain_image_index, 0)
+    GX_GET_VAL_PRV(bool, swapchain_image_is_valid, true)
     //    GX_GET_CREF_PRV(std::shared_ptr<sampler::Manager>, sampler_manager)
     //    GX_GET_CREF_PRV(std::shared_ptr<image::Manager>, image_manager)
     //    GX_GET_CREF_PRV(std::shared_ptr<buffer::Manager>, vulkan_buffer_manager)
@@ -65,6 +67,7 @@ private:
     void setup_imgui() noexcept;
     void vulkan_upload_imgui_fonts() noexcept;
     void start_frame_imgui() noexcept;
+    void initialize_frame() noexcept;
 
 public:
     Engine(const Engine&) = delete;

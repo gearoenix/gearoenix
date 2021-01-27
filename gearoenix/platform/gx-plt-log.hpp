@@ -21,6 +21,7 @@ struct Log {
 }
 
 #define GX_PLT_LOG_SS_VAR GX_CONCAT_5(_gearoenix_platform_log_ss_, __LINE__)
+#define GX_PLT_LOG_STR_VAR GX_CONCAT_5(_gearoenix_platform_log_str_, __LINE__)
 
 #ifdef GX_DEBUG_MODE
 #define GX_PLT_LOG_FILE_LOCK_GUARD GX_GUARD_LOCK(gearoenix::platform::Log::log)
@@ -33,12 +34,13 @@ struct Log {
 #define GX_PLT_LOG_COMMON_STR(msg, msg_type)                                                              \
     std::stringstream GX_PLT_LOG_SS_VAR = gearoenix::platform::Log::header(__FILE__, __LINE__, msg_type); \
     GX_PLT_LOG_SS_VAR << msg << "\n";                                                                     \
+    const auto GX_PLT_LOG_STR_VAR = GX_PLT_LOG_SS_VAR.str();                                              \
     GX_PLT_LOG_FILE_LOCK_GUARD
 
-#define GX_PLT_LOG_COMMON(msg, msg_type)                                             \
-    GX_PLT_LOG_COMMON_STR(msg, msg_type)                                             \
-    gearoenix::platform::Log::file << GX_PLT_LOG_SS_VAR.str() GX_PLT_LOG_END_OF_MSG; \
-    std::cout << GX_PLT_LOG_SS_VAR.str() GX_PLT_LOG_END_OF_MSG;
+#define GX_PLT_LOG_COMMON(msg, msg_type)                                        \
+    GX_PLT_LOG_COMMON_STR(msg, msg_type)                                        \
+    gearoenix::platform::Log::file << GX_PLT_LOG_STR_VAR GX_PLT_LOG_END_OF_MSG; \
+    std::cout << GX_PLT_LOG_STR_VAR GX_PLT_LOG_END_OF_MSG;
 
 #define GX_LOG_I(s)                  \
     {                                \

@@ -75,7 +75,6 @@ gearoenix::vulkan::device::Physical::Physical(const Surface& surf) noexcept
     , properties {}
     , features {}
     , memory_properties {}
-    , surface_capabilities {}
 {
     const auto& instance = surface.get_instance();
     const auto vk_ins = instance.get_vulkan_data();
@@ -121,7 +120,6 @@ gearoenix::vulkan::device::Physical::Physical(const Surface& surf) noexcept
     for (auto& s : supported_extensions) {
         GX_LOG_D("    " << s)
     }
-    Loader::vkGetPhysicalDeviceSurfaceCapabilitiesKHR(vulkan_data, surface.get_vulkan_data(), &surface_capabilities);
     std::uint32_t count = 0;
     Loader::vkGetPhysicalDeviceSurfaceFormatsKHR(vulkan_data, surface.get_vulkan_data(), &count, nullptr);
     surface_formats.resize(static_cast<std::size_t>(count));
@@ -171,6 +169,13 @@ std::uint32_t gearoenix::vulkan::device::Physical::get_memory_type_index(
 std::size_t gearoenix::vulkan::device::Physical::align_size(const std::size_t size) const noexcept
 {
     return math::Numeric::align(size, static_cast<std::size_t>(max_memory_alignment));
+}
+
+VkSurfaceCapabilitiesKHR gearoenix::vulkan::device::Physical::get_surface_capabilities() const noexcept
+{
+    VkSurfaceCapabilitiesKHR info;
+    Loader::vkGetPhysicalDeviceSurfaceCapabilitiesKHR(vulkan_data, surface.get_vulkan_data(), &info);
+    return info;
 }
 
 #endif
