@@ -81,14 +81,26 @@ gearoenix::vulkan::device::Physical::Physical(const Surface& surf) noexcept
     std::uint32_t gpu_count = 0;
     GX_VK_CHK_L(vkEnumeratePhysicalDevices(vk_ins, &gpu_count, nullptr))
     std::vector<VkPhysicalDevice> gpus(static_cast<std::size_t>(gpu_count));
+    GX_LOG_D(gpu_count << " GPU(s) are available.")
     GX_VK_CHK_L(vkEnumeratePhysicalDevices(vk_ins, &gpu_count, gpus.data()))
     int best_device_index = -1;
     int best_device_point = -1;
     for (std::uint32_t i = 0; i < gpu_count; ++i) {
+        Loader::vkGetPhysicalDeviceProperties(gpus[i], &properties);
+        if(VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU != properties.deviceType) continue;
         const auto device_point = is_good(gpus[i]);
         if (device_point > best_device_point) {
             best_device_index = static_cast<int>(i);
             best_device_point = device_point;
+        }
+    }
+    if(-1 == best_device_index) {
+        for (std::uint32_t i = 0; i < gpu_count; ++i) {
+            const auto device_point = is_good(gpus[i]);
+            if (device_point > best_device_point) {
+                best_device_index = static_cast<int>(i);
+                best_device_point = device_point;
+            }
         }
     }
     if (best_device_index == -1 || best_device_point == -1) {
@@ -97,6 +109,7 @@ gearoenix::vulkan::device::Physical::Physical(const Surface& surf) noexcept
     vulkan_data = gpus[best_device_index];
     GX_LOG_D("Physical device point is: " << is_good(vulkan_data))
     Loader::vkGetPhysicalDeviceProperties(vulkan_data, &properties);
+    GX_LOG_D("Physical device name is: " << properties.deviceName)
     Loader::vkGetPhysicalDeviceFeatures(vulkan_data, &features);
     Loader::vkGetPhysicalDeviceMemoryProperties(vulkan_data, &memory_properties);
     uint32_t queue_family_count = 0;
