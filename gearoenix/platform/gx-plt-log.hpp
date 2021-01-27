@@ -4,44 +4,35 @@
 #include "../core/macro/gx-cr-mcr-concatenate.hpp"
 #include "gx-plt-build-configuration.hpp"
 #include "macro/gx-plt-mcr-lock.hpp"
-#include <ctime>
 #include <exception>
 #include <fstream>
-#include <iomanip>
 #include <iostream>
-#include <map>
 #include <mutex>
 #include <sstream>
-#include <thread>
+
+namespace gearoenix::platform {
+struct Log {
+#ifndef GX_PLATFORM_ANDROID
+    static std::ofstream file;
+#endif
+    GX_CREATE_GUARD_S(log)
+    static std::stringstream header(const char*, int, const char*);
+};
+}
 
 #define GX_PLT_LOG_SS_VAR GX_CONCAT_5(_gearoenix_platform_log_ss_, __LINE__)
-#define GX_PLT_LOG_TIME GX_CONCAT_5(_gearoenix_platform_log_time_, __LINE__)
-#define GX_PLT_LOG_LOCAL GX_CONCAT_5(_gearoenix_platform_log_local_, __LINE__)
 
 #ifdef GX_DEBUG_MODE
-#define GX_PLT_LOG_FILE_LOCK_GUARD GX_GUARD_LOCK(gearoenix::platform::Log::file)
+#define GX_PLT_LOG_FILE_LOCK_GUARD GX_GUARD_LOCK(gearoenix::platform::Log::log)
 #define GX_PLT_LOG_END_OF_MSG << std::flush
 #else
 #define GX_PLT_LOG_FILE_LOCK_GUARD
 #define GX_PLT_LOG_END_OF_MSG
 #endif
 
-#ifdef GX_PLATFORM_LINUX
-#define GX_PLT_LOG_CALL GX_PLT_LOG_LOCAL = *std::localtime(&GX_PLT_LOG_TIME);
-#elif defined(GX_PLATFORM_WINDOWS)
-#define GX_PLT_LOG_CALL localtime_s(&GX_PLT_LOG_LOCAL, &GX_PLT_LOG_TIME);
-#else
-#error "Unexpected platform interface."
-#endif
-
-#define GX_PLT_LOG_COMMON_STR(msg, msg_type)                                                      \
-    std::stringstream GX_PLT_LOG_SS_VAR;                                                          \
-    auto GX_PLT_LOG_TIME = std::time(nullptr);                                                    \
-    std::tm GX_PLT_LOG_LOCAL {};                                                                  \
-    GX_PLT_LOG_CALL                                                                               \
-    GX_PLT_LOG_SS_VAR << std::put_time(&GX_PLT_LOG_LOCAL, "%d-%m-%Y %H-%M-%S")                    \
-                      << " [thread:" << std::this_thread::get_id() << "]-["                       \
-                      << __FILE__ << ":" << __LINE__ << "]-[" << msg_type << "] " << msg << "\n"; \
+#define GX_PLT_LOG_COMMON_STR(msg, msg_type)                                                              \
+    std::stringstream GX_PLT_LOG_SS_VAR = gearoenix::platform::Log::header(__FILE__, __LINE__, msg_type); \
+    GX_PLT_LOG_SS_VAR << msg << "\n";                                                                     \
     GX_PLT_LOG_FILE_LOCK_GUARD
 
 #define GX_PLT_LOG_COMMON(msg, msg_type)                                             \
@@ -71,19 +62,10 @@
         std::terminate();             \
     }
 
-#ifdef GX_PLT_ANDROID
+#ifdef GX_PLATFORM_ANDROID
 #include "android/gx-plt-and-log.hpp"
 #elif defined(GX_PLATFORM_WINDOWS)
 #include "windows/gx-plt-win-log.hpp"
-#endif
-
-#ifndef GX_PLT_ANDROID
-namespace gearoenix::platform {
-struct Log {
-    static std::ofstream file;
-    GX_CREATE_GUARD_S(file)
-};
-}
 #endif
 
 #define GX_REACHED GX_LOG_D("REACHED <-- <-- <-- <-- <-- <-- <-- <--")

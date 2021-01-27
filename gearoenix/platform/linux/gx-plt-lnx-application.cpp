@@ -21,19 +21,29 @@ gearoenix::platform::Application::Application(GX_MAIN_ENTRY_ARGS_DEF, const Runt
     : base(GX_MAIN_ENTRY_ARGS, config)
     , display(XOpenDisplay(nullptr))
     , screen(XDefaultScreenOfDisplay(display))
+    , root_window(XRootWindowOfScreen(screen))
+    , black_pixel(XBlackPixelOfScreen(screen))
     , window(XCreateSimpleWindow(
-          display, XDefaultRootWindow(display), 0, 0,
-          config.get_window_width(), config.get_window_height(), 4, 0, 0))
+          display,
+          root_window,
+          0,
+          0,
+          config.get_window_width(),
+          config.get_window_height(),
+          4,
+          black_pixel,
+          black_pixel))
     , close_message(XInternAtom(display, "WM_DELETE_WINDOW", False))
 {
     base.initialize_window_size(config.get_window_width(), config.get_window_height());
     base.initialize_window_position(
         (screen->width - static_cast<int>(config.get_window_width())) / 2,
         (screen->height - static_cast<int>(config.get_window_height())) / 2);
-    XMapWindow(display, window);
+    XSelectInput(display, window, KeyPressMask | ButtonPressMask | ExposureMask | StructureNotifyMask);
     XMoveWindow(display, window, base.window_x, base.window_y);
-    XSelectInput(display, window, KeyPressMask | ButtonPressMask | ExposureMask);
     XSetWMProtocols(display, window, &close_message, 1);
+    XMapWindow(display, window);
+
     base.render_engine = render::engine::Engine::construct(*this);
     base.initialize_imgui();
 }
@@ -42,9 +52,7 @@ gearoenix::platform::Application::~Application() noexcept
 {
     base.render_engine = nullptr;
     XDestroyWindow(display, window);
-    window = 0;
     XCloseDisplay(display);
-    display = nullptr;
 }
 
 void gearoenix::platform::Application::run(core::Application* const core_app) noexcept

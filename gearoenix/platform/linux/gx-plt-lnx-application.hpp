@@ -17,10 +17,11 @@ struct Application;
 namespace gearoenix::platform {
 struct Application final {
     GX_GET_REF_PRV(BaseApplication, base)
-    GX_GET_PTR_PRV(Display, display)
-    GX_GET_PTR_PRV(Screen, screen)
-    GX_GET_VAL_PRV(Window, window, 0)
-
+    GX_GET_PTRC_PRV(Display, display)
+    GX_GET_PTRC_PRV(Screen, screen)
+    GX_GET_CVAL_PRV(Window, root_window)
+    GX_GET_CVAL_PRV(unsigned long, black_pixel)
+    GX_GET_CVAL_PRV(Window, window)
 private:
     Atom close_message;
 
