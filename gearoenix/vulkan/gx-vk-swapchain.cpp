@@ -60,7 +60,7 @@ void gearoenix::vulkan::Swapchain::initialize() noexcept
         chosen_format_index = 0;
     }
     format = formats[chosen_format_index];
-    auto swapchain_images_count = caps.minImageCount > 2 ? caps.minImageCount : 2;
+    std::uint32_t swapchain_images_count = caps.minImageCount > 2 ? 3 : 2;
     if ((caps.maxImageCount > 0) && (swapchain_images_count > caps.maxImageCount)) {
         swapchain_images_count = caps.maxImageCount;
     }

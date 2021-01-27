@@ -57,8 +57,10 @@ gearoenix::platform::Application::Application(GX_MAIN_ENTRY_ARGS_DEF, const Runt
     while (true) {
         XEvent e;
         XNextEvent(display, &e);
-        if (e.type == Expose)
+        if (e.type == Expose) {
+            base.window_is_up = true;
             break;
+        }
     }
 
     base.render_engine = render::engine::Engine::construct(*this);

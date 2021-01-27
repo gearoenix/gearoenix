@@ -47,18 +47,17 @@ void gearoenix::platform::BaseApplication::update_window_size(const int w, const
     last_time_window_resized = std::chrono::high_resolution_clock::now();
 }
 
-void gearoenix::platform::BaseApplication::initialize_mouse_position(
-    const double x, const double y) noexcept
+void gearoenix::platform::BaseApplication::initialize_mouse_position(const double x, const double y) noexcept
 {
     pre_mouse_x = mouse_x = x;
     pre_mouse_y = mouse_y = y;
-    GX_TODO
+    // TODO
 }
 
 void gearoenix::platform::BaseApplication::going_to_be_closed() noexcept
 {
     running = false;
-    GX_TODO
+    // TODO
 }
 
 void gearoenix::platform::BaseApplication::update() noexcept

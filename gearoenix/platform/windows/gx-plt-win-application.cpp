@@ -31,7 +31,6 @@ LRESULT gearoenix::platform::Application::handler(
     const WPARAM w_param,
     const LPARAM l_param) noexcept
 {
-    //    core::event::Event* event = nullptr;
     switch (message) {
     case WM_CLOSE:
         base.going_to_be_closed();
@@ -148,18 +147,11 @@ LRESULT gearoenix::platform::Application::handler(
         //        core_app->on_event(e);
         //        break;
         //    }
-    case WM_SIZE: {
+    case WM_SIZE:
         if (!base.window_is_up || w_param == SIZE_MINIMIZED)
             break;
-        //        core::Real pre_screen_width = (core::Real)screen_width;
-        //        core::Real pre_screen_height = (core::Real)screen_height;
-        //        update_screen_sizes();
-        //        core::event::WindowResize e(
-        //            pre_screen_width, pre_screen_height,
-        //            (core::Real)screen_width, (core::Real)screen_height);
-        //        render_engine->on_event(e);
+        update_window_size();
         break;
-    }
     case WM_SHOWWINDOW:
         base.window_is_up = true;
         break;
@@ -170,13 +162,9 @@ LRESULT gearoenix::platform::Application::handler(
         //        resizing = false;
         //        break;
     default:
-        GX_LOG_D("Unhandled message: " << message)
+        // GX_LOG_D("Unhandled message: " << message)
+        break;
     }
-    //    if (event != nullptr) {
-    //        render_engine->on_event(*event);
-    //        core_app->on_event(*event);
-    //        delete event;
-    //    }
     return DefWindowProc(hwnd, message, w_param, l_param);
 }
 
@@ -192,19 +180,14 @@ LRESULT gearoenix::platform::Application::handler(
 //        }
 //    }
 //}
-//
-//void gearoenix::platform::Application::update_screen_sizes()
-//{
-//    RECT rcc, rcw;
-//    GetClientRect(window, &rcc);
-//    GetWindowRect(window, &rcw);
-//    screen_width = rcc.right - rcc.left;
-//    screen_height = rcc.bottom - rcc.top;
-//    border_width = ((rcw.right - rcw.left) - screen_width) / 2;
-//    title_bar_height = ((rcw.bottom - rcw.top) - screen_height) - border_width;
-//    half_height_inversed = 2.0f / (core::Real)screen_height;
-//    screen_ratio = (core::Real)screen_width / (core::Real)screen_height;
-//}
+
+void gearoenix::platform::Application::update_window_size() noexcept
+{
+    RECT rcc, rcw;
+    GetClientRect(window, &rcc);
+    GetWindowRect(window, &rcw);
+    base.update_window_size(rcc.right - rcc.left, rcc.bottom - rcc.top);
+}
 
 gearoenix::platform::Application::Application(GX_MAIN_ENTRY_ARGS_DEF, const RuntimeConfiguration& config) noexcept
     : base(GX_MAIN_ENTRY_ARGS, config)
@@ -263,10 +246,8 @@ gearoenix::platform::Application::Application(GX_MAIN_ENTRY_ARGS_DEF, const Runt
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
-    //    update_screen_sizes();
     //    update_mouse_position();
     base.render_engine = render::engine::Engine::construct(*this);
-    base.initialize_imgui();
 }
 
 gearoenix::platform::Application::~Application() noexcept = default;

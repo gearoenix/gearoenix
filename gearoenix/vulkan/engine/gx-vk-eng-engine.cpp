@@ -2,7 +2,6 @@
 #ifdef GX_RENDER_VULKAN_ENABLED
 #include "../../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../../platform/gx-plt-application.hpp"
-#include "../../platform/gx-plt-log.hpp"
 #include "../gx-vk-check.hpp"
 #include <imgui_impl_vulkan.h>
 
@@ -37,9 +36,9 @@ void gearoenix::vulkan::engine::Engine::setup_imgui() noexcept
         GX_VK_CHK(result)
     };
 #endif
-    info.GetVulkanProcAddressFn = +[](void*, const char* name) noexcept {
+    ImGui_ImplVulkan_LoadFunctions(+[](const char* const name, void*) noexcept {
         return Loader::get(name);
-    };
+    });
     ImGui_ImplVulkan_Init(&info, render_pass.get_vulkan_data());
     vulkan_upload_imgui_fonts();
 }
@@ -90,19 +89,6 @@ gearoenix::vulkan::engine::Engine::Engine(const platform::Application& platform_
     , render_pass(swapchain)
 {
     initialize_frame();
-    //    sampler_manager = std::make_shared<sampler::Manager>(logical_device);
-    // main_render_target = vulkan_main_render_target = std::make_shared<texture::MainTarget>(memory_manager, this);
-    //    frames_count = static_cast<decltype(frames_count)>(vulkan_main_render_target->get_frames().size());
-    // Buffer manager needs the number of frames
-    //    image_manager = std::make_shared<image::Manager>(this);
-    // buffer_manager = vulkan_buffer_manager = std::make_shared<buffer::Manager>(memory_manager, this);
-    //    upload_command_buffers.reserve(static_cast<std::size_t>(frames_count));
-    //    upload_semaphore.reserve(static_cast<std::size_t>(frames_count));
-    //    for (auto fi = decltype(frames_count) { 0 }; fi < frames_count; ++fi) {
-    //        upload_command_buffers.emplace_back(
-    //            dynamic_cast<command::Buffer*>(command_manager->create_primary_command_buffer()));
-    //        upload_semaphore.push_back(std::make_shared<sync::Semaphore>(logical_device));
-    //    }
     setup_imgui();
 }
 
@@ -114,23 +100,6 @@ gearoenix::vulkan::engine::Engine::~Engine() noexcept
     frames.clear();
 }
 
-//void gearoenix::render::Engine::window_changed()
-//{
-//    logical_device->wait_to_finish();
-//    swapchain->initialize();
-//    depth_stencil = image::View::create_depth_stencil(mem_pool);
-//    render_pass = std::shared_ptr<RenderPass>(new RenderPass(swapchain));
-//    auto frame_views = swapchain->get_image_views();
-//    framebuffers.resize(frames_count);
-//    for (uint32_t i = 0; i < frames_count; ++i) {
-//        framebuffers[i] = std::shared_ptr<Framebuffer>(
-//            new Framebuffer(frame_views[i], depth_stencil, render_pass));
-//    }
-//    pipeline = std::shared_ptr<pipeline::Pipeline>(new pipeline::Pipeline(
-//        pipeline_cache, pipeline_layout, render_pass, shader_manager));
-//    setup_draw_buffers();
-//}
-//
 void gearoenix::vulkan::engine::Engine::start_frame() noexcept
 {
     render::engine::Engine::start_frame();
@@ -151,8 +120,8 @@ void gearoenix::vulkan::engine::Engine::start_frame() noexcept
         } else {
             swapchain_image_is_valid = false;
         }
-        auto& frame = frames[swapchain_image_index];
         if (swapchain_image_is_valid) {
+            auto& frame = frames[swapchain_image_index];
             frame.draw_wait.wait();
             frame.draw_wait.reset();
         }
@@ -197,7 +166,12 @@ void gearoenix::vulkan::engine::Engine::end_frame() noexcept
         present_info.swapchainCount = 1;
         present_info.pSwapchains = swapchain.get_vulkan_data_ptr();
         present_info.pImageIndices = &present_image_index;
-        GX_VK_CHK_L(vkQueuePresentKHR(logical_device.get_graphic_queue(), &present_info))
+        const auto present_result = Loader::vkQueuePresentKHR(logical_device.get_graphic_queue(), &present_info);
+        if (VK_ERROR_OUT_OF_DATE_KHR == present_result) {
+            swapchain_image_is_valid = false;
+        } else if (VK_SUCCESS != present_result) {
+            GX_LOG_F("Presentation failed with result: " << result_to_string(present_result))
+        }
     }
 }
 

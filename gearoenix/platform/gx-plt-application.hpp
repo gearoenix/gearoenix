@@ -38,7 +38,7 @@ struct BaseApplication final {
     GX_GET_VAL_PRV(int, pre_window_y, -1)
     GX_GET_VAL_PRV(int, delta_window_x, 0)
     GX_GET_VAL_PRV(int, delta_window_y, 0)
-    GX_GET_VAL_PRV(bool, window_is_up, true)
+    GX_GET_VAL_PRV(bool, window_is_up, false)
 
     GX_GET_VAL_PRV(double, mouse_x, -1.0)
     GX_GET_VAL_PRV(double, mouse_y, -1.0)

@@ -10,6 +10,12 @@
 #include <mutex>
 #include <sstream>
 
+// You can uses it for enabling log print in the std out
+//#define GX_PLATFORM_LOG_STD_OUT_ENABLED
+
+// You can uses it for appending to the log file
+//#define GX_PLATFORM_LOG_APPEND_FILE
+
 namespace gearoenix::platform {
 struct Log {
 #ifndef GX_PLATFORM_ANDROID
@@ -37,10 +43,16 @@ struct Log {
     const auto GX_PLT_LOG_STR_VAR = GX_PLT_LOG_SS_VAR.str();                                              \
     GX_PLT_LOG_FILE_LOCK_GUARD
 
+#ifdef GX_PLATFORM_LOG_STD_OUT_ENABLED
+#define GX_PLT_LOG_STD_PRINT std::cout << GX_PLT_LOG_STR_VAR GX_PLT_LOG_END_OF_MSG;
+#else
+#define GX_PLT_LOG_STD_PRINT
+#endif
+
 #define GX_PLT_LOG_COMMON(msg, msg_type)                                        \
     GX_PLT_LOG_COMMON_STR(msg, msg_type)                                        \
     gearoenix::platform::Log::file << GX_PLT_LOG_STR_VAR GX_PLT_LOG_END_OF_MSG; \
-    std::cout << GX_PLT_LOG_STR_VAR GX_PLT_LOG_END_OF_MSG;
+    GX_PLT_LOG_STD_PRINT
 
 #define GX_LOG_I(s)                  \
     {                                \
