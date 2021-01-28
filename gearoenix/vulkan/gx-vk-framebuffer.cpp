@@ -25,7 +25,7 @@ gearoenix::vulkan::Framebuffer::Framebuffer(
     , depth(d)
     , render_pass(rp)
     , clear_colors {
-        VkClearValue { .color = { 0.0f, 0.0f, 0.0f, 0.0f } },
+        VkClearValue { .color = { 0.2f, 0.2f, 0.2f, 1.0f } },
         VkClearValue { .color = { 0.0f, 0.0f, 0.0f, 0.0f } }
     }
 {

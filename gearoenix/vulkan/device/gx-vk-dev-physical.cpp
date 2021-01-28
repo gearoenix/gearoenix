@@ -87,14 +87,15 @@ gearoenix::vulkan::device::Physical::Physical(const Surface& surf) noexcept
     int best_device_point = -1;
     for (std::uint32_t i = 0; i < gpu_count; ++i) {
         Loader::vkGetPhysicalDeviceProperties(gpus[i], &properties);
-        if(VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU != properties.deviceType) continue;
+        if (VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU != properties.deviceType)
+            continue;
         const auto device_point = is_good(gpus[i]);
         if (device_point > best_device_point) {
             best_device_index = static_cast<int>(i);
             best_device_point = device_point;
         }
     }
-    if(-1 == best_device_index) {
+    if (-1 == best_device_index) {
         for (std::uint32_t i = 0; i < gpu_count; ++i) {
             const auto device_point = is_good(gpus[i]);
             if (device_point > best_device_point) {

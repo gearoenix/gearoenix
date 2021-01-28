@@ -148,7 +148,7 @@ LRESULT gearoenix::platform::Application::handler(
         //        break;
         //    }
     case WM_SIZE:
-        if (!base.window_is_up || w_param == SIZE_MINIMIZED)
+        if (w_param == SIZE_MINIMIZED)
             break;
         update_window_size();
         break;
@@ -183,10 +183,18 @@ LRESULT gearoenix::platform::Application::handler(
 
 void gearoenix::platform::Application::update_window_size() noexcept
 {
+    if (!base.window_is_up)
+        return;
     RECT rcc, rcw;
     GetClientRect(window, &rcc);
     GetWindowRect(window, &rcw);
-    base.update_window_size(rcc.right - rcc.left, rcc.bottom - rcc.top);
+    const int w = rcc.right - rcc.left;
+    if (0 >= w)
+        return;
+    const int h = rcc.bottom - rcc.top;
+    if (0 >= h)
+        return;
+    base.update_window_size(w, h);
 }
 
 gearoenix::platform::Application::Application(GX_MAIN_ENTRY_ARGS_DEF, const RuntimeConfiguration& config) noexcept

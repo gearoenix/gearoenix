@@ -61,7 +61,6 @@ struct BaseApplication final {
 private:
     std::chrono::high_resolution_clock::time_point last_time_window_resized;
 
-private:
     BaseApplication(GX_MAIN_ENTRY_ARGS_DEF, const RuntimeConfiguration& configuration) noexcept;
     ~BaseApplication() noexcept;
 
@@ -69,11 +68,13 @@ private:
 
     void initialize_window_size(int w, int h) noexcept;
     void update_window_size(int w, int h) noexcept;
+    void update_window() noexcept;
 
     void initialize_mouse_position(double x, double y) noexcept;
     void update_mouse_position(double x, double y) noexcept;
 
     void going_to_be_closed() noexcept;
+
     void update() noexcept;
 
 public:
