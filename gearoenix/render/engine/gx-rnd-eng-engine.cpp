@@ -16,6 +16,7 @@
 //#include "../../metal/engine/gx-mtl-eng-engine.hpp"
 //#include "../../opengl/engine/gx-gl-eng-engine.hpp"
 #include "../../core/macro/gx-cr-mcr-assert.hpp"
+#include <imgui.h>
 
 //void gearoenix::render::engine::Engine::do_late_delete() noexcept
 //{
@@ -93,6 +94,7 @@ void gearoenix::render::engine::Engine::start_frame() noexcept
     const std::chrono::time_point<std::chrono::high_resolution_clock> now = std::chrono::high_resolution_clock::now();
     const std::chrono::duration<double> delta_time_duration = now - last_frame_time;
     delta_time = delta_time_duration.count();
+    ImGui::GetIO().DeltaTime = static_cast<float>(delta_time);
     last_frame_time = now;
     previous_frame_number = frame_number_from_start % frames_count;
     ++frame_number_from_start;

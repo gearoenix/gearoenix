@@ -4,6 +4,7 @@
 #include "../../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../../render/engine/gx-rnd-eng-engine.hpp"
 #include "../gx-plt-log.hpp"
+#include "gx-plt-win-key.hpp"
 #include <Windows.h>
 
 LRESULT CALLBACK gearoenix::platform::Application::static_handler(
@@ -40,113 +41,41 @@ LRESULT gearoenix::platform::Application::handler(
     case WM_PAINT:
         ValidateRect(hwnd, nullptr);
         break;
-        //    case WM_KEYDOWN:
-        //        switch (wparam) {
-        //        case VK_DOWN:
-        //            event = new core::event::button::Keyboard(
-        //                core::event::button::Button::KeyType::DOWN,
-        //                core::event::button::Button::ActionType::PRESS);
-        //            break;
-        //        case VK_LEFT:
-        //            event = new core::event::button::Keyboard(
-        //                core::event::button::Button::KeyType::LEFT,
-        //                core::event::button::Button::ActionType::PRESS);
-        //            break;
-        //        case VK_RIGHT:
-        //            event = new core::event::button::Keyboard(
-        //                core::event::button::Button::KeyType::RIGHT,
-        //                core::event::button::Button::ActionType::PRESS);
-        //            break;
-        //        case VK_UP:
-        //            event = new core::event::button::Keyboard(
-        //                core::event::button::Button::KeyType::UP,
-        //                core::event::button::Button::ActionType::PRESS);
-        //            break;
-        //        case VK_F1:
-        //            //event = new core::event::button::Keyboard(
-        //            //	core::event::button::Button::KeyType::F1,
-        //            //	core::event::button::Button::ActionType::PRESS);
-        //            break;
-        //        case VK_ESCAPE:
-        //            running = false;
-        //            DestroyWindow(hwnd);
-        //            PostQuitMessage(0);
-        //            break;
-        //        default:
-        //            break;
-        //        }
-        //        break;
-        //    case WM_KEYUP:
-        //        break;
-        //    case WM_LBUTTONDBLCLK:
-        //    case WM_MBUTTONDBLCLK:
-        //    case WM_RBUTTONDBLCLK:
-        //    case WM_LBUTTONDOWN:
-        //    case WM_MBUTTONDOWN:
-        //    case WM_RBUTTONDOWN:
-        //    case WM_LBUTTONUP:
-        //    case WM_MBUTTONUP:
-        //    case WM_RBUTTONUP: {
-        //        update_mouse_position();
-        //        core::event::button::Button::KeyType k;
-        //        switch (umessage) {
-        //        case WM_LBUTTONDBLCLK:
-        //        case WM_LBUTTONDOWN:
-        //        case WM_LBUTTONUP:
-        //            k = core::event::button::Button::KeyType::LEFT;
-        //            break;
-        //        case WM_RBUTTONDBLCLK:
-        //        case WM_RBUTTONDOWN:
-        //        case WM_RBUTTONUP:
-        //            k = core::event::button::Button::KeyType::RIGHT;
-        //            break;
-        //        case WM_MBUTTONDBLCLK:
-        //        case WM_MBUTTONDOWN:
-        //        case WM_MBUTTONUP:
-        //            k = core::event::button::Button::KeyType::MIDDLE;
-        //            break;
-        //        default:
-        //            k = core::event::button::Button::KeyType::LEFT;
-        //            break;
-        //        }
-        //        core::event::button::Button::ActionType a;
-        //        switch (umessage) {
-        //        case WM_LBUTTONDBLCLK:
-        //        case WM_MBUTTONDBLCLK:
-        //        case WM_RBUTTONDBLCLK:
-        //            a = core::event::button::Button::ActionType::DOUBLE;
-        //            break;
-        //        case WM_LBUTTONDOWN:
-        //        case WM_MBUTTONDOWN:
-        //        case WM_RBUTTONDOWN:
-        //            a = core::event::button::Button::ActionType::PRESS;
-        //            break;
-        //        case WM_LBUTTONUP:
-        //        case WM_MBUTTONUP:
-        //        case WM_RBUTTONUP:
-        //            a = core::event::button::Button::ActionType::RELEASE;
-        //            break;
-        //        default:
-        //            a = core::event::button::Button::ActionType::PRESS;
-        //            break;
-        //        }
-        //        core::event::button::Mouse e(k, a, mouse_x, mouse_y);
-        //        render_engine->on_event(e);
-        //        core_app->on_event(e);
-        //        break;
-        //    }
-        //    case WM_MOUSEWHEEL:
-        //        //core_app->on_scroll(((core::Real)GET_WHEEL_DELTA_WPARAM(wparam)) * 0.01f);
-        //        break;
-        //    case WM_MOUSEMOVE: {
-        //        core::Real pre_x = mouse_x;
-        //        core::Real pre_y = mouse_y;
-        //        update_mouse_position();
-        //        core::event::movement::Mouse e(mouse_x, mouse_y, pre_x, pre_y);
-        //        render_engine->on_event(e);
-        //        core_app->on_event(e);
-        //        break;
-        //    }
+    case WM_SYSKEYDOWN:
+    case WM_KEYDOWN:
+        base.keyboard_key(convert_to_keyboard_key(w_param, l_param), key::Action::Press);
+        break;
+    case WM_SYSKEYUP:
+    case WM_KEYUP:
+        base.keyboard_key(convert_to_keyboard_key(w_param, l_param), key::Action::Release);
+        break;
+    case WM_CHAR:
+        base.character_input(static_cast<char16_t>(w_param));
+        break;
+    case WM_LBUTTONDOWN:
+        base.mouse_key(key::Id::Left, key::Action::Press);
+        break;
+    case WM_RBUTTONDOWN:
+        base.mouse_key(key::Id::Right, key::Action::Press);
+        break;
+    case WM_MBUTTONDOWN:
+        base.mouse_key(key::Id::Middle, key::Action::Press);
+        break;
+    case WM_LBUTTONUP:
+        base.mouse_key(key::Id::Left, key::Action::Release);
+        break;
+    case WM_RBUTTONUP:
+        base.mouse_key(key::Id::Right, key::Action::Release);
+        break;
+    case WM_MBUTTONUP:
+        base.mouse_key(key::Id::Middle, key::Action::Release);
+        break;
+    case WM_MOUSEWHEEL:
+        base.mouse_wheel(static_cast<double>(GET_WHEEL_DELTA_WPARAM(w_param)) / static_cast<double>(WHEEL_DELTA));
+        break;
+    case WM_MOUSEMOVE:
+        update_mouse_position();
+        break;
     case WM_SIZE:
         if (w_param == SIZE_MINIMIZED)
             break;
@@ -155,12 +84,9 @@ LRESULT gearoenix::platform::Application::handler(
     case WM_SHOWWINDOW:
         base.window_is_up = true;
         break;
-        //    case WM_ENTERSIZEMOVE:
-        //        resizing = true;
-        //        break;
-        //    case WM_EXITSIZEMOVE:
-        //        resizing = false;
-        //        break;
+    case WM_ENTERSIZEMOVE:
+        base.window_resizing = true;
+        break;
     default:
         // GX_LOG_D("Unhandled message: " << message)
         break;
@@ -168,26 +94,20 @@ LRESULT gearoenix::platform::Application::handler(
     return DefWindowProc(hwnd, message, w_param, l_param);
 }
 
-//void gearoenix::platform::Application::update_mouse_position()
-//{
-//    POINT p;
-//    if (GetCursorPos(&p)) {
-//        if (ScreenToClient(window, &p)) {
-//            mouse_x_pixel = p.x;
-//            mouse_y_pixel = p.y;
-//            mouse_x = pixel_to_normal_pos_x(mouse_x_pixel);
-//            mouse_y = pixel_to_normal_pos_y(mouse_y_pixel);
-//        }
-//    }
-//}
+void gearoenix::platform::Application::update_mouse_position() noexcept
+{
+    POINT p;
+    if (GetCursorPos(&p) && ScreenToClient(window, &p)) {
+        base.update_mouse_position(p.x, p.y);
+    }
+}
 
 void gearoenix::platform::Application::update_window_size() noexcept
 {
     if (!base.window_is_up)
         return;
-    RECT rcc, rcw;
+    RECT rcc;
     GetClientRect(window, &rcc);
-    GetWindowRect(window, &rcw);
     const int w = rcc.right - rcc.left;
     if (0 >= w)
         return;
@@ -218,11 +138,8 @@ gearoenix::platform::Application::Application(GX_MAIN_ENTRY_ARGS_DEF, const Runt
     wc.lpszClassName = config.get_application_name().c_str();
     wc.cbSize = sizeof(WNDCLASSEXA);
     RegisterClassExA(&wc);
-    DWORD style = static_cast<DWORD>(WS_VISIBLE) | static_cast<DWORD>(WS_OVERLAPPEDWINDOW);
+    DWORD style = WS_VISIBLE;
     if (config.get_fullscreen()) {
-        base.initialize_window_size(
-            GetSystemMetrics(SM_CXSCREEN),
-            GetSystemMetrics(SM_CYSCREEN));
         DEVMODE screen_settings;
         GX_SET_ZERO(screen_settings)
         screen_settings.dmSize = sizeof(screen_settings);
@@ -237,7 +154,7 @@ gearoenix::platform::Application::Application(GX_MAIN_ENTRY_ARGS_DEF, const Runt
         base.initialize_window_position(
             (GetSystemMetrics(SM_CXSCREEN) - base.window_width) / 2,
             (GetSystemMetrics(SM_CYSCREEN) - base.window_height) / 2);
-        style |= static_cast<DWORD>(WS_CAPTION) | static_cast<DWORD>(WS_SYSMENU) | static_cast<DWORD>(WS_THICKFRAME) | static_cast<DWORD>(WS_MINIMIZEBOX) | static_cast<DWORD>(WS_MAXIMIZEBOX);
+        style |= WS_OVERLAPPEDWINDOW;
     }
     window = CreateWindowExA(
         WS_EX_APPWINDOW, GX_APPLICATION_NAME, GX_APPLICATION_NAME, style,
@@ -254,7 +171,17 @@ gearoenix::platform::Application::Application(GX_MAIN_ENTRY_ARGS_DEF, const Runt
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
-    //    update_mouse_position();
+    POINT p;
+    if (GetCursorPos(&p) && ScreenToClient(window, &p))
+        base.initialize_mouse_position(p.x, p.y);
+    RECT rcc;
+    if (GetClientRect(window, &rcc)) {
+        const int w = rcc.right - rcc.left;
+        const int h = rcc.bottom - rcc.top;
+        if (0 < w && 0 < h) {
+            base.initialize_window_size(w, h);
+        }
+    }
     base.render_engine = render::engine::Engine::construct(*this);
 }
 

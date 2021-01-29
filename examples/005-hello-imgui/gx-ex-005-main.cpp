@@ -16,6 +16,9 @@ void GameApp::update() noexcept
 {
     static bool show_window = true;
     Application::update();
+
+    ImGui::ShowDemoWindow(&show_window);
+
     ImGui::Begin("Hello Window!", &show_window);
     ImGui::Text("Hello Label!");
     if (ImGui::Button("Close"))

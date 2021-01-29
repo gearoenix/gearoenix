@@ -21,6 +21,8 @@ SET(GX_ENGINE_PLATFORM_SRC
         ${GX_ENGINE_PLATFORM_SRC_DIR}/stream/gx-plt-stm-stream.hpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/windows/gx-plt-win-application.cpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/windows/gx-plt-win-application.hpp
+        ${GX_ENGINE_PLATFORM_SRC_DIR}/windows/gx-plt-win-key.cpp
+        ${GX_ENGINE_PLATFORM_SRC_DIR}/windows/gx-plt-win-key.hpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/windows/gx-plt-win-log.hpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/windows/gx-plt-win-main-entry.hpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/gx-plt-application.cpp
@@ -28,6 +30,8 @@ SET(GX_ENGINE_PLATFORM_SRC
         ${GX_ENGINE_PLATFORM_SRC_DIR}/gx-plt-arguments.cpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/gx-plt-arguments.hpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/gx-plt-build-configuration.hpp
+        ${GX_ENGINE_PLATFORM_SRC_DIR}/gx-plt-key.cpp
+        ${GX_ENGINE_PLATFORM_SRC_DIR}/gx-plt-key.hpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/gx-plt-library.cpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/gx-plt-library.hpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/gx-plt-log.cpp

@@ -4,6 +4,7 @@
 //#include "../core/event/gx-cr-ev-event.hpp"
 #include "gx-plt-arguments.hpp"
 #include "gx-plt-build-configuration.hpp"
+#include "gx-plt-key.hpp"
 #include "gx-plt-main-entry.hpp"
 #include "gx-plt-runtime-configuration.hpp"
 #include <chrono>
@@ -34,10 +35,6 @@ struct BaseApplication final {
 
     GX_GET_VAL_PRV(int, window_x, -1)
     GX_GET_VAL_PRV(int, window_y, -1)
-    GX_GET_VAL_PRV(int, pre_window_x, -1)
-    GX_GET_VAL_PRV(int, pre_window_y, -1)
-    GX_GET_VAL_PRV(int, delta_window_x, 0)
-    GX_GET_VAL_PRV(int, delta_window_y, 0)
     GX_GET_VAL_PRV(bool, window_is_up, false)
 
     GX_GET_VAL_PRV(double, mouse_x, -1.0)
@@ -72,6 +69,11 @@ private:
 
     void initialize_mouse_position(double x, double y) noexcept;
     void update_mouse_position(double x, double y) noexcept;
+    void mouse_key(key::Id, key::Action) noexcept;
+    void mouse_wheel(double v) noexcept;
+
+    void keyboard_key(key::Id, key::Action) noexcept;
+    void character_input(char16_t ch) noexcept;
 
     void going_to_be_closed() noexcept;
 
