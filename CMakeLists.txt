@@ -84,5 +84,6 @@ GX_DOWNLOAD_FILE("https://dl.bintray.com/boostorg/release/1.74.0/source/boost_1_
 INCLUDE_DIRECTORIES(${GX_BOOST_PATH})
 
 ADD_SUBDIRECTORY(gearoenix)
+ADD_SUBDIRECTORY(editor)
 ADD_SUBDIRECTORY(examples)
 ADD_SUBDIRECTORY(tests)
