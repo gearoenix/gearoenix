@@ -2,9 +2,13 @@
 #define GEAROENIX_PLATFORM_MAIN_ENTRY_HPP
 #include "gx-plt-build-configuration.hpp"
 
-#ifdef GX_PLATFORM_WINDOWS
+#ifdef GX_PLATFORM_INTERFACE_WIN32
 #include "windows/gx-plt-win-main-entry.hpp"
-#elif defined(GX_PLATFORM_LINUX)
+#else
+
+#ifdef GX_PLATFORM_INTERFACE_SDL2
+#include "sdl2/gx-plt-sdl2-main-entry.hpp"
+#endif
 
 #define GX_MAIN_ENTRY_ARGS_DEF \
     [[maybe_unused]] int argc, \
@@ -19,8 +23,6 @@
         return 0;                    \
     }
 
-#else
-#error "Unimplemented or unexpected platform interface."
 #endif
 
 #endif

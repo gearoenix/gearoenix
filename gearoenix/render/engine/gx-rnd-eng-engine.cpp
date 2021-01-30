@@ -52,6 +52,12 @@ gearoenix::render::engine::Engine::Engine(
     //        });
 }
 
+std::set<gearoenix::render::engine::Type> gearoenix::render::engine::Engine::get_available_engines() noexcept
+{
+    return { Type::Vulkan };
+    // TODO
+}
+
 std::unique_ptr<gearoenix::render::engine::Engine> gearoenix::render::engine::Engine::construct(
     const platform::Application& platform_application) noexcept
 {

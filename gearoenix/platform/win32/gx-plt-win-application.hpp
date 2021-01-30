@@ -1,7 +1,7 @@
-#ifndef GEAROENIX_PLATFORM_WINDOWS_APPLICATION_HPP
-#define GEAROENIX_PLATFORM_WINDOWS_APPLICATION_HPP
+#ifndef GEAROENIX_PLATFORM_WIN32_APPLICATION_HPP
+#define GEAROENIX_PLATFORM_WIN32_APPLICATION_HPP
 #include "../gx-plt-build-configuration.hpp"
-#ifdef GX_PLATFORM_WINDOWS
+#ifdef GX_PLATFORM_INTERFACE_WIN32
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../gx-plt-application.hpp"
 #include "../gx-plt-runtime-configuration.hpp"

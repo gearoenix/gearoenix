@@ -1,7 +1,6 @@
 #ifndef GEAROENIX_PLATFORM_APPLICATION_HPP
 #define GEAROENIX_PLATFORM_APPLICATION_HPP
 #include "../core/macro/gx-cr-mcr-getter-setter.hpp"
-//#include "../core/event/gx-cr-ev-event.hpp"
 #include "gx-plt-arguments.hpp"
 #include "gx-plt-build-configuration.hpp"
 #include "gx-plt-key.hpp"
@@ -83,13 +82,15 @@ public:
 };
 }
 
-#if defined(GX_PLT_ANDROID)
-#include "android/gx-plt-and-app.hpp"
-#elif defined(GX_PLATFORM_WINDOWS)
-#include "windows/gx-plt-win-application.hpp"
-#elif defined(GX_PLATFORM_LINUX)
-#include "linux/gx-plt-lnx-application.hpp"
+#if defined(GX_PLATFORM_INTERFACE_ANDROID)
+#include "android/gx-plt-and-application.hpp"
+#elif defined(GX_PLATFORM_INTERFACE_WIN32)
+#include "win32/gx-plt-win-application.hpp"
+#elif defined(GX_PLATFORM_INTERFACE_X11)
+#include "x11/gx-plt-x11-application.hpp"
+#elif defined(GX_PLATFORM_INTERFACE_SDL2)
+#include "sdl2/gx-plt-sdl2-application.hpp"
 #else
 #error "Unspecified platform application interface."
 #endif
-#endif // GEAROENIX_SYSTEM_APPLICATION_HPP
+#endif

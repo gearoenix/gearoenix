@@ -7,6 +7,7 @@
 #include "gx-rnd-eng-type.hpp"
 #include <chrono>
 #include <memory>
+#include <set>
 #include <vector>
 
 namespace gearoenix::core {
@@ -71,6 +72,7 @@ protected:
     //    void do_late_delete() noexcept;
 
 public:
+    [[nodiscard]] static std::set<Type> get_available_engines() noexcept;
     [[nodiscard]] static std::unique_ptr<Engine> construct(const platform::Application& platform_application) noexcept;
     virtual ~Engine() noexcept;
     //    void late_delete(std::shared_ptr<core::asset::Asset> asset) noexcept;

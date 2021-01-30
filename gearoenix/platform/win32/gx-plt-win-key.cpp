@@ -1,5 +1,5 @@
 #include "gx-plt-win-key.hpp"
-#ifdef GX_PLATFORM_WINDOWS
+#ifdef GX_PLATFORM_INTERFACE_WIN32
 #include "../gx-plt-log.hpp"
 
 gearoenix::platform::key::Id gearoenix::platform::convert_to_keyboard_key(const WPARAM wp, const LPARAM lp) noexcept

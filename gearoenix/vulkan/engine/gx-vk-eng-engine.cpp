@@ -183,7 +183,7 @@ void gearoenix::vulkan::engine::Engine::upload_imgui_fonts() noexcept
 bool gearoenix::vulkan::engine::Engine::is_supported() noexcept
 {
     Loader::load();
-    return true;
+    return Loader::is_loaded();
 }
 
 #endif

@@ -1,5 +1,5 @@
 #include "gx-plt-win-application.hpp"
-#ifdef GX_PLATFORM_WINDOWS
+#ifdef GX_PLATFORM_INTERFACE_WIN32
 #include "../../core/gx-cr-application.hpp"
 #include "../../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../../render/engine/gx-rnd-eng-engine.hpp"

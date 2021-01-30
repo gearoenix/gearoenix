@@ -5,12 +5,15 @@ SET(GX_ENGINE_PLATFORM_SRC
         ${GX_ENGINE_PLATFORM_SRC_DIR}/android/gx-plt-and-log.cpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/android/gx-plt-and-log.hpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/android/gx-plt-gl-context.cpp
-        ${GX_ENGINE_PLATFORM_SRC_DIR}/linux/gx-plt-lnx-application.cpp
-        ${GX_ENGINE_PLATFORM_SRC_DIR}/linux/gx-plt-lnx-application.hpp
-        ${GX_ENGINE_PLATFORM_SRC_DIR}/linux/gx-plt-lnx-log.hpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/macro/gx-plt-mcr-disable-warnings.hpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/macro/gx-plt-mcr-enable-warnings.hpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/macro/gx-plt-mcr-lock.hpp
+        ${GX_ENGINE_PLATFORM_SRC_DIR}/sdl2/gx-plt-sdl2-application.cpp
+        ${GX_ENGINE_PLATFORM_SRC_DIR}/sdl2/gx-plt-sdl2-application.hpp
+        ${GX_ENGINE_PLATFORM_SRC_DIR}/sdl2/gx-plt-sdl2-key.cpp
+        ${GX_ENGINE_PLATFORM_SRC_DIR}/sdl2/gx-plt-sdl2-key.hpp
+        ${GX_ENGINE_PLATFORM_SRC_DIR}/sdl2/gx-plt-sdl2-log.hpp
+        ${GX_ENGINE_PLATFORM_SRC_DIR}/sdl2/gx-plt-sdl2-main-entry.hpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/stream/gx-plt-stm-asset.cpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/stream/gx-plt-stm-asset.hpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/stream/gx-plt-stm-local.cpp
@@ -19,12 +22,17 @@ SET(GX_ENGINE_PLATFORM_SRC
         ${GX_ENGINE_PLATFORM_SRC_DIR}/stream/gx-plt-stm-memory.hpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/stream/gx-plt-stm-stream.cpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/stream/gx-plt-stm-stream.hpp
-        ${GX_ENGINE_PLATFORM_SRC_DIR}/windows/gx-plt-win-application.cpp
-        ${GX_ENGINE_PLATFORM_SRC_DIR}/windows/gx-plt-win-application.hpp
-        ${GX_ENGINE_PLATFORM_SRC_DIR}/windows/gx-plt-win-key.cpp
-        ${GX_ENGINE_PLATFORM_SRC_DIR}/windows/gx-plt-win-key.hpp
-        ${GX_ENGINE_PLATFORM_SRC_DIR}/windows/gx-plt-win-log.hpp
-        ${GX_ENGINE_PLATFORM_SRC_DIR}/windows/gx-plt-win-main-entry.hpp
+        ${GX_ENGINE_PLATFORM_SRC_DIR}/win32/gx-plt-win-application.cpp
+        ${GX_ENGINE_PLATFORM_SRC_DIR}/win32/gx-plt-win-application.hpp
+        ${GX_ENGINE_PLATFORM_SRC_DIR}/win32/gx-plt-win-key.cpp
+        ${GX_ENGINE_PLATFORM_SRC_DIR}/win32/gx-plt-win-key.hpp
+        ${GX_ENGINE_PLATFORM_SRC_DIR}/win32/gx-plt-win-log.hpp
+        ${GX_ENGINE_PLATFORM_SRC_DIR}/win32/gx-plt-win-main-entry.hpp
+        ${GX_ENGINE_PLATFORM_SRC_DIR}/x11/gx-plt-x11-application.cpp
+        ${GX_ENGINE_PLATFORM_SRC_DIR}/x11/gx-plt-x11-application.hpp
+        ${GX_ENGINE_PLATFORM_SRC_DIR}/x11/gx-plt-x11-key.cpp
+        ${GX_ENGINE_PLATFORM_SRC_DIR}/x11/gx-plt-x11-key.hpp
+        ${GX_ENGINE_PLATFORM_SRC_DIR}/x11/gx-plt-x11-log.hpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/gx-plt-application.cpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/gx-plt-application.hpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/gx-plt-arguments.cpp
