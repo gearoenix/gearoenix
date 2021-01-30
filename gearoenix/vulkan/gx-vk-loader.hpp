@@ -3,14 +3,13 @@
 #include "../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
 #include "../core/gx-cr-build-configuration.hpp"
+
 #ifdef GX_PLATFORM_ANDROID
 #define VK_USE_PLATFORM_ANDROID_KHR
-#elif defined(GX_PLATFORM_LINUX)
+#elif defined(GX_PLATFORM_INTERFACE_X11)
 #define VK_USE_PLATFORM_XLIB_KHR
-#elif defined(GX_PLATFORM_WINDOWS)
+#elif defined(GX_PLATFORM_INTERFACE_WIN32)
 #define VK_USE_PLATFORM_WIN32_KHR
-#else
-#error "It is not implemented yet!"
 #endif
 
 #ifdef GX_DEBUG_MODE
@@ -20,246 +19,254 @@
 #define VK_NO_PROTOTYPES 1
 #include <vulkan/vulkan.h>
 
-#include <memory>
+#ifdef GX_USE_DEBUG_EXTENSIONS
+#include <vulkan/vk_sdk_platform.h>
+#endif
 
-namespace gearoenix::platform {
-struct Library;
-}
+#ifdef VK_USE_PLATFORM_XLIB_KHR
+#define GX_VULKAN_XLIB_FUNCTIONS_MAP(GX_VULKAN_LOADER_MAPPED_FUNCTION) \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCreateXlibSurfaceKHR);          \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetPhysicalDeviceXlibPresentationSupportKHR);
+#else
+#define GX_VULKAN_XLIB_FUNCTIONS_MAP(GX_VULKAN_LOADER_MAPPED_FUNCTION)
+#endif
+
+#ifdef VK_USE_PLATFORM_XCB_KHR
+#define GX_VULKAN_XCB_FUNCTIONS_MAP(GX_VULKAN_LOADER_MAPPED_FUNCTION) \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCreateXcbSurfaceKHR);          \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetPhysicalDeviceXcbPresentationSupportKHR);
+#else
+#define GX_VULKAN_XCB_FUNCTIONS_MAP(GX_VULKAN_LOADER_MAPPED_FUNCTION)
+#endif
+
+#ifdef VK_USE_PLATFORM_WAYLAND_KHR
+#define GX_VULKAN_WAYLAND_FUNCTIONS_MAP(GX_VULKAN_LOADER_MAPPED_FUNCTION) \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCreateWaylandSurfaceKHR);          \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetPhysicalDeviceWaylandPresentationSupportKHR);
+#else
+#define GX_VULKAN_WAYLAND_FUNCTIONS_MAP(GX_VULKAN_LOADER_MAPPED_FUNCTION)
+#endif
+
+#ifdef VK_USE_PLATFORM_MIR_KHR
+#define GX_VULKAN_MIR_FUNCTIONS_MAP(GX_VULKAN_LOADER_MAPPED_FUNCTION) \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCreateMirSurfaceKHR);          \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetPhysicalDeviceMirPresentationSupportKHR);
+#else
+#define GX_VULKAN_MIR_FUNCTIONS_MAP(GX_VULKAN_LOADER_MAPPED_FUNCTION)
+#endif
+
+#ifdef VK_USE_PLATFORM_ANDROID_KHR
+#define GX_VULKAN_ANDROID_FUNCTIONS_MAP(GX_VULKAN_LOADER_MAPPED_FUNCTION) \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCreateAndroidSurfaceKHR);
+#else
+#define GX_VULKAN_ANDROID_FUNCTIONS_MAP(GX_VULKAN_LOADER_MAPPED_FUNCTION)
+#endif
+
+#ifdef VK_USE_PLATFORM_WIN32_KHR
+#define GX_VULKAN_WIN32_FUNCTIONS_MAP(GX_VULKAN_LOADER_MAPPED_FUNCTION) \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCreateWin32SurfaceKHR);          \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetPhysicalDeviceWin32PresentationSupportKHR);
+#else
+#define GX_VULKAN_WIN32_FUNCTIONS_MAP(GX_VULKAN_LOADER_MAPPED_FUNCTION)
+#endif
+
+#ifdef GX_USE_DEBUG_EXTENSIONS
+#define GX_VULKAN_DEBUG_FUNCTIONS_MAP(GX_VULKAN_LOADER_MAPPED_FUNCTION) \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCreateDebugReportCallbackEXT);   \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkDestroyDebugReportCallbackEXT);  \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkDebugReportMessageEXT);          \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkDebugMarkerSetObjectTagEXT);     \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkDebugMarkerSetObjectNameEXT);    \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdDebugMarkerBeginEXT);         \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdDebugMarkerEndEXT);           \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdDebugMarkerInsertEXT);
+#else
+#define GX_VULKAN_DEBUG_FUNCTIONS_MAP(GX_VULKAN_LOADER_MAPPED_FUNCTION)
+#endif
+
+#define GX_VULKAN_FUNCTIONS_MAP(GX_VULKAN_LOADER_MAPPED_FUNCTION)                     \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCreateInstance);                               \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkDestroyInstance);                              \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkEnumerateInstanceVersion);                     \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkEnumeratePhysicalDevices);                     \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetPhysicalDeviceFeatures);                    \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetPhysicalDeviceFormatProperties);            \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetPhysicalDeviceImageFormatProperties);       \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetPhysicalDeviceProperties);                  \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetPhysicalDeviceQueueFamilyProperties);       \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetPhysicalDeviceMemoryProperties);            \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetInstanceProcAddr);                          \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetDeviceProcAddr);                            \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCreateDevice);                                 \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkDestroyDevice);                                \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkEnumerateInstanceExtensionProperties);         \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkEnumerateDeviceExtensionProperties);           \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkEnumerateInstanceLayerProperties);             \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkEnumerateDeviceLayerProperties);               \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetDeviceQueue);                               \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkQueueSubmit);                                  \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkQueueWaitIdle);                                \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkDeviceWaitIdle);                               \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkAllocateMemory);                               \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkFreeMemory);                                   \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkMapMemory);                                    \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkUnmapMemory);                                  \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkFlushMappedMemoryRanges);                      \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkInvalidateMappedMemoryRanges);                 \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetDeviceMemoryCommitment);                    \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkBindBufferMemory);                             \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkBindImageMemory);                              \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetBufferMemoryRequirements);                  \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetImageMemoryRequirements);                   \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetImageSparseMemoryRequirements);             \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetPhysicalDeviceSparseImageFormatProperties); \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkQueueBindSparse);                              \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCreateFence);                                  \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkDestroyFence);                                 \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkResetFences);                                  \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetFenceStatus);                               \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkWaitForFences);                                \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCreateSemaphore);                              \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkDestroySemaphore);                             \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCreateEvent);                                  \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkDestroyEvent);                                 \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetEventStatus);                               \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkSetEvent);                                     \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkResetEvent);                                   \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCreateQueryPool);                              \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkDestroyQueryPool);                             \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetQueryPoolResults);                          \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCreateBuffer);                                 \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkDestroyBuffer);                                \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCreateBufferView);                             \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkDestroyBufferView);                            \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCreateImage);                                  \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkDestroyImage);                                 \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetImageSubresourceLayout);                    \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCreateImageView);                              \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkDestroyImageView);                             \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCreateShaderModule);                           \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkDestroyShaderModule);                          \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCreatePipelineCache);                          \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkDestroyPipelineCache);                         \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetPipelineCacheData);                         \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkMergePipelineCaches);                          \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCreateGraphicsPipelines);                      \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCreateComputePipelines);                       \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkDestroyPipeline);                              \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCreatePipelineLayout);                         \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkDestroyPipelineLayout);                        \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCreateSampler);                                \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkDestroySampler);                               \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCreateDescriptorSetLayout);                    \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkDestroyDescriptorSetLayout);                   \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCreateDescriptorPool);                         \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkDestroyDescriptorPool);                        \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkResetDescriptorPool);                          \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkAllocateDescriptorSets);                       \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkFreeDescriptorSets);                           \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkUpdateDescriptorSets);                         \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCreateFramebuffer);                            \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkDestroyFramebuffer);                           \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCreateRenderPass);                             \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkDestroyRenderPass);                            \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetRenderAreaGranularity);                     \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCreateCommandPool);                            \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkDestroyCommandPool);                           \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkResetCommandPool);                             \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkAllocateCommandBuffers);                       \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkFreeCommandBuffers);                           \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkBeginCommandBuffer);                           \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkEndCommandBuffer);                             \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkResetCommandBuffer);                           \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdBindPipeline);                              \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdSetViewport);                               \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdSetScissor);                                \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdSetLineWidth);                              \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdSetDepthBias);                              \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdSetBlendConstants);                         \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdSetDepthBounds);                            \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdSetStencilCompareMask);                     \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdSetStencilWriteMask);                       \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdSetStencilReference);                       \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdBindDescriptorSets);                        \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdBindIndexBuffer);                           \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdBindVertexBuffers);                         \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdDraw);                                      \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdDrawIndexed);                               \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdDrawIndirect);                              \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdDrawIndexedIndirect);                       \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdDispatch);                                  \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdDispatchIndirect);                          \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdCopyBuffer);                                \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdCopyImage);                                 \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdBlitImage);                                 \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdCopyBufferToImage);                         \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdCopyImageToBuffer);                         \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdUpdateBuffer);                              \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdFillBuffer);                                \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdClearColorImage);                           \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdClearDepthStencilImage);                    \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdClearAttachments);                          \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdResolveImage);                              \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdSetEvent);                                  \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdResetEvent);                                \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdWaitEvents);                                \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdPipelineBarrier);                           \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdBeginQuery);                                \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdEndQuery);                                  \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdResetQueryPool);                            \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdWriteTimestamp);                            \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdCopyQueryPoolResults);                      \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdPushConstants);                             \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdBeginRenderPass);                           \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdNextSubpass);                               \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdEndRenderPass);                             \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdExecuteCommands);                           \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkDestroySurfaceKHR);                            \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetPhysicalDeviceSurfaceSupportKHR);           \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetPhysicalDeviceSurfaceCapabilitiesKHR);      \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetPhysicalDeviceSurfaceFormatsKHR);           \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetPhysicalDeviceSurfacePresentModesKHR);      \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCreateSwapchainKHR);                           \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkDestroySwapchainKHR);                          \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetSwapchainImagesKHR);                        \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkAcquireNextImageKHR);                          \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkQueuePresentKHR);                              \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetPhysicalDeviceDisplayPropertiesKHR);        \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetPhysicalDeviceDisplayPlanePropertiesKHR);   \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetDisplayPlaneSupportedDisplaysKHR);          \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetDisplayModePropertiesKHR);                  \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCreateDisplayModeKHR);                         \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetDisplayPlaneCapabilitiesKHR);               \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCreateDisplayPlaneSurfaceKHR);                 \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCreateSharedSwapchainsKHR);                    \
+    GX_VULKAN_XLIB_FUNCTIONS_MAP(GX_VULKAN_LOADER_MAPPED_FUNCTION)                    \
+    GX_VULKAN_XCB_FUNCTIONS_MAP(GX_VULKAN_LOADER_MAPPED_FUNCTION)                     \
+    GX_VULKAN_WAYLAND_FUNCTIONS_MAP(GX_VULKAN_LOADER_MAPPED_FUNCTION)                 \
+    GX_VULKAN_MIR_FUNCTIONS_MAP(GX_VULKAN_LOADER_MAPPED_FUNCTION)                     \
+    GX_VULKAN_ANDROID_FUNCTIONS_MAP(GX_VULKAN_LOADER_MAPPED_FUNCTION)                 \
+    GX_VULKAN_WIN32_FUNCTIONS_MAP(GX_VULKAN_LOADER_MAPPED_FUNCTION)                   \
+    GX_VULKAN_DEBUG_FUNCTIONS_MAP(GX_VULKAN_LOADER_MAPPED_FUNCTION)
+
+#define GX_VULKAN_LOADER_DEF_FUNCTIONS(GX_VULKAN_LOADER_FUNCTION) \
+    extern PFN_##GX_VULKAN_LOADER_FUNCTION GX_VULKAN_LOADER_FUNCTION
+
+GX_VULKAN_FUNCTIONS_MAP(GX_VULKAN_LOADER_DEF_FUNCTIONS)
+
+#undef GX_VULKAN_LOADER_DEF_FUNCTIONS
 
 namespace gearoenix::vulkan {
 struct Loader {
-private:
-    static std::unique_ptr<platform::Library> lib;
-
-public:
     Loader() noexcept = delete;
-
     [[nodiscard]] static bool is_loaded() noexcept;
     static void load() noexcept;
     static void load(VkInstance instance) noexcept;
     static void load(VkDevice device) noexcept;
     static void unload() noexcept;
     [[nodiscard]] static PFN_vkVoidFunction get(const char*) noexcept;
-
-#define GX_HELPER(x) static PFN_##x x
-
-    GX_HELPER(vkCreateInstance);
-    GX_HELPER(vkDestroyInstance);
-    GX_HELPER(vkEnumerateInstanceVersion);
-    GX_HELPER(vkEnumeratePhysicalDevices);
-    GX_HELPER(vkGetPhysicalDeviceFeatures);
-    GX_HELPER(vkGetPhysicalDeviceFormatProperties);
-    GX_HELPER(vkGetPhysicalDeviceImageFormatProperties);
-    GX_HELPER(vkGetPhysicalDeviceProperties);
-    GX_HELPER(vkGetPhysicalDeviceQueueFamilyProperties);
-    GX_HELPER(vkGetPhysicalDeviceMemoryProperties);
-    GX_HELPER(vkGetInstanceProcAddr);
-    GX_HELPER(vkGetDeviceProcAddr);
-    GX_HELPER(vkCreateDevice);
-    GX_HELPER(vkDestroyDevice);
-    GX_HELPER(vkEnumerateInstanceExtensionProperties);
-    GX_HELPER(vkEnumerateDeviceExtensionProperties);
-    GX_HELPER(vkEnumerateInstanceLayerProperties);
-    GX_HELPER(vkEnumerateDeviceLayerProperties);
-    GX_HELPER(vkGetDeviceQueue);
-    GX_HELPER(vkQueueSubmit);
-    GX_HELPER(vkQueueWaitIdle);
-    GX_HELPER(vkDeviceWaitIdle);
-    GX_HELPER(vkAllocateMemory);
-    GX_HELPER(vkFreeMemory);
-    GX_HELPER(vkMapMemory);
-    GX_HELPER(vkUnmapMemory);
-    GX_HELPER(vkFlushMappedMemoryRanges);
-    GX_HELPER(vkInvalidateMappedMemoryRanges);
-    GX_HELPER(vkGetDeviceMemoryCommitment);
-    GX_HELPER(vkBindBufferMemory);
-    GX_HELPER(vkBindImageMemory);
-    GX_HELPER(vkGetBufferMemoryRequirements);
-    GX_HELPER(vkGetImageMemoryRequirements);
-    GX_HELPER(vkGetImageSparseMemoryRequirements);
-    GX_HELPER(vkGetPhysicalDeviceSparseImageFormatProperties);
-    GX_HELPER(vkQueueBindSparse);
-    GX_HELPER(vkCreateFence);
-    GX_HELPER(vkDestroyFence);
-    GX_HELPER(vkResetFences);
-    GX_HELPER(vkGetFenceStatus);
-    GX_HELPER(vkWaitForFences);
-    GX_HELPER(vkCreateSemaphore);
-    GX_HELPER(vkDestroySemaphore);
-    GX_HELPER(vkCreateEvent);
-    GX_HELPER(vkDestroyEvent);
-    GX_HELPER(vkGetEventStatus);
-    GX_HELPER(vkSetEvent);
-    GX_HELPER(vkResetEvent);
-    GX_HELPER(vkCreateQueryPool);
-    GX_HELPER(vkDestroyQueryPool);
-    GX_HELPER(vkGetQueryPoolResults);
-    GX_HELPER(vkCreateBuffer);
-    GX_HELPER(vkDestroyBuffer);
-    GX_HELPER(vkCreateBufferView);
-    GX_HELPER(vkDestroyBufferView);
-    GX_HELPER(vkCreateImage);
-    GX_HELPER(vkDestroyImage);
-    GX_HELPER(vkGetImageSubresourceLayout);
-    GX_HELPER(vkCreateImageView);
-    GX_HELPER(vkDestroyImageView);
-    GX_HELPER(vkCreateShaderModule);
-    GX_HELPER(vkDestroyShaderModule);
-    GX_HELPER(vkCreatePipelineCache);
-    GX_HELPER(vkDestroyPipelineCache);
-    GX_HELPER(vkGetPipelineCacheData);
-    GX_HELPER(vkMergePipelineCaches);
-    GX_HELPER(vkCreateGraphicsPipelines);
-    GX_HELPER(vkCreateComputePipelines);
-    GX_HELPER(vkDestroyPipeline);
-    GX_HELPER(vkCreatePipelineLayout);
-    GX_HELPER(vkDestroyPipelineLayout);
-    GX_HELPER(vkCreateSampler);
-    GX_HELPER(vkDestroySampler);
-    GX_HELPER(vkCreateDescriptorSetLayout);
-    GX_HELPER(vkDestroyDescriptorSetLayout);
-    GX_HELPER(vkCreateDescriptorPool);
-    GX_HELPER(vkDestroyDescriptorPool);
-    GX_HELPER(vkResetDescriptorPool);
-    GX_HELPER(vkAllocateDescriptorSets);
-    GX_HELPER(vkFreeDescriptorSets);
-    GX_HELPER(vkUpdateDescriptorSets);
-    GX_HELPER(vkCreateFramebuffer);
-    GX_HELPER(vkDestroyFramebuffer);
-    GX_HELPER(vkCreateRenderPass);
-    GX_HELPER(vkDestroyRenderPass);
-    GX_HELPER(vkGetRenderAreaGranularity);
-    GX_HELPER(vkCreateCommandPool);
-    GX_HELPER(vkDestroyCommandPool);
-    GX_HELPER(vkResetCommandPool);
-    GX_HELPER(vkAllocateCommandBuffers);
-    GX_HELPER(vkFreeCommandBuffers);
-    GX_HELPER(vkBeginCommandBuffer);
-    GX_HELPER(vkEndCommandBuffer);
-    GX_HELPER(vkResetCommandBuffer);
-    GX_HELPER(vkCmdBindPipeline);
-    GX_HELPER(vkCmdSetViewport);
-    GX_HELPER(vkCmdSetScissor);
-    GX_HELPER(vkCmdSetLineWidth);
-    GX_HELPER(vkCmdSetDepthBias);
-    GX_HELPER(vkCmdSetBlendConstants);
-    GX_HELPER(vkCmdSetDepthBounds);
-    GX_HELPER(vkCmdSetStencilCompareMask);
-    GX_HELPER(vkCmdSetStencilWriteMask);
-    GX_HELPER(vkCmdSetStencilReference);
-    GX_HELPER(vkCmdBindDescriptorSets);
-    GX_HELPER(vkCmdBindIndexBuffer);
-    GX_HELPER(vkCmdBindVertexBuffers);
-    GX_HELPER(vkCmdDraw);
-    GX_HELPER(vkCmdDrawIndexed);
-    GX_HELPER(vkCmdDrawIndirect);
-    GX_HELPER(vkCmdDrawIndexedIndirect);
-    GX_HELPER(vkCmdDispatch);
-    GX_HELPER(vkCmdDispatchIndirect);
-    GX_HELPER(vkCmdCopyBuffer);
-    GX_HELPER(vkCmdCopyImage);
-    GX_HELPER(vkCmdBlitImage);
-    GX_HELPER(vkCmdCopyBufferToImage);
-    GX_HELPER(vkCmdCopyImageToBuffer);
-    GX_HELPER(vkCmdUpdateBuffer);
-    GX_HELPER(vkCmdFillBuffer);
-    GX_HELPER(vkCmdClearColorImage);
-    GX_HELPER(vkCmdClearDepthStencilImage);
-    GX_HELPER(vkCmdClearAttachments);
-    GX_HELPER(vkCmdResolveImage);
-    GX_HELPER(vkCmdSetEvent);
-    GX_HELPER(vkCmdResetEvent);
-    GX_HELPER(vkCmdWaitEvents);
-    GX_HELPER(vkCmdPipelineBarrier);
-    GX_HELPER(vkCmdBeginQuery);
-    GX_HELPER(vkCmdEndQuery);
-    GX_HELPER(vkCmdResetQueryPool);
-    GX_HELPER(vkCmdWriteTimestamp);
-    GX_HELPER(vkCmdCopyQueryPoolResults);
-    GX_HELPER(vkCmdPushConstants);
-    GX_HELPER(vkCmdBeginRenderPass);
-    GX_HELPER(vkCmdNextSubpass);
-    GX_HELPER(vkCmdEndRenderPass);
-    GX_HELPER(vkCmdExecuteCommands);
-
-    // VK_KHR_surface
-    GX_HELPER(vkDestroySurfaceKHR);
-    GX_HELPER(vkGetPhysicalDeviceSurfaceSupportKHR);
-    GX_HELPER(vkGetPhysicalDeviceSurfaceCapabilitiesKHR);
-    GX_HELPER(vkGetPhysicalDeviceSurfaceFormatsKHR);
-    GX_HELPER(vkGetPhysicalDeviceSurfacePresentModesKHR);
-
-    // VK_KHR_swapchain
-    GX_HELPER(vkCreateSwapchainKHR);
-    GX_HELPER(vkDestroySwapchainKHR);
-    GX_HELPER(vkGetSwapchainImagesKHR);
-    GX_HELPER(vkAcquireNextImageKHR);
-    GX_HELPER(vkQueuePresentKHR);
-
-    // VK_KHR_display
-    GX_HELPER(vkGetPhysicalDeviceDisplayPropertiesKHR);
-    GX_HELPER(vkGetPhysicalDeviceDisplayPlanePropertiesKHR);
-    GX_HELPER(vkGetDisplayPlaneSupportedDisplaysKHR);
-    GX_HELPER(vkGetDisplayModePropertiesKHR);
-    GX_HELPER(vkCreateDisplayModeKHR);
-    GX_HELPER(vkGetDisplayPlaneCapabilitiesKHR);
-    GX_HELPER(vkCreateDisplayPlaneSurfaceKHR);
-
-    // VK_KHR_display_swapchain
-    GX_HELPER(vkCreateSharedSwapchainsKHR);
-
-#ifdef VK_USE_PLATFORM_XLIB_KHR
-    // VK_KHR_xlib_surface
-    GX_HELPER(vkCreateXlibSurfaceKHR);
-    GX_HELPER(vkGetPhysicalDeviceXlibPresentationSupportKHR);
-#endif
-
-#ifdef VK_USE_PLATFORM_XCB_KHR
-    // VK_KHR_xcb_surface
-    GX_HELPER(vkCreateXcbSurfaceKHR);
-    GX_HELPER(vkGetPhysicalDeviceXcbPresentationSupportKHR);
-#endif
-
-#ifdef VK_USE_PLATFORM_WAYLAND_KHR
-    // VK_KHR_wayland_surface
-    GX_HELPER(vkCreateWaylandSurfaceKHR);
-    GX_HELPER(vkGetPhysicalDeviceWaylandPresentationSupportKHR);
-#endif
-
-#ifdef VK_USE_PLATFORM_MIR_KHR
-    // VK_KHR_mir_surface
-    GX_HELPER(vkCreateMirSurfaceKHR);
-    GX_HELPER(vkGetPhysicalDeviceMirPresentationSupportKHR);
-#endif
-
-#ifdef VK_USE_PLATFORM_ANDROID_KHR
-    // VK_KHR_android_surface
-    GX_HELPER(vkCreateAndroidSurfaceKHR);
-#endif
-
-#ifdef VK_USE_PLATFORM_WIN32_KHR
-    // VK_KHR_win32_surface
-    GX_HELPER(vkCreateWin32SurfaceKHR);
-    GX_HELPER(vkGetPhysicalDeviceWin32PresentationSupportKHR);
-#endif
-
-#ifdef GX_USE_DEBUG_EXTENSIONS
-#include <vulkan/vk_sdk_platform.h>
-    // VK_EXT_debug_report
-    GX_HELPER(vkCreateDebugReportCallbackEXT);
-    GX_HELPER(vkDestroyDebugReportCallbackEXT);
-    GX_HELPER(vkDebugReportMessageEXT);
-    // VK_EXT_debug_marker
-    GX_HELPER(vkDebugMarkerSetObjectTagEXT);
-    GX_HELPER(vkDebugMarkerSetObjectNameEXT);
-    GX_HELPER(vkCmdDebugMarkerBeginEXT);
-    GX_HELPER(vkCmdDebugMarkerEndEXT);
-    GX_HELPER(vkCmdDebugMarkerInsertEXT);
-#endif
 };
 }
-
-#undef GX_HELPER
 
 #endif
 #endif

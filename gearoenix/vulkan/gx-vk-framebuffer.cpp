@@ -44,13 +44,13 @@ gearoenix::vulkan::Framebuffer::Framebuffer(
     info.pAttachments = attachments;
     info.width = img.get_image_width();
     info.height = img.get_image_height();
-    GX_VK_CHK_L(vkCreateFramebuffer(logical_device->get_vulkan_data(), &info, nullptr, &vulkan_data))
+    GX_VK_CHK(vkCreateFramebuffer(logical_device->get_vulkan_data(), &info, nullptr, &vulkan_data))
 }
 
 gearoenix::vulkan::Framebuffer::~Framebuffer() noexcept
 {
     if (nullptr != vulkan_data) {
-        Loader::vkDestroyFramebuffer(view->get_image().get_logical_device()->get_vulkan_data(), vulkan_data, nullptr);
+        vkDestroyFramebuffer(view->get_image().get_logical_device()->get_vulkan_data(), vulkan_data, nullptr);
         vulkan_data = nullptr;
     }
 }

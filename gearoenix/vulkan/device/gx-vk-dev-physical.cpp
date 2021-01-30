@@ -9,16 +9,16 @@
 int gearoenix::vulkan::device::Physical::is_good(VkPhysicalDevice gpu) noexcept
 {
     std::uint32_t queue_count = 0;
-    Loader::vkGetPhysicalDeviceQueueFamilyProperties(gpu, &queue_count, nullptr);
+    vkGetPhysicalDeviceQueueFamilyProperties(gpu, &queue_count, nullptr);
     if (queue_count == 0) {
         return -1;
     }
     std::vector<VkQueueFamilyProperties> queue_props(queue_count);
-    Loader::vkGetPhysicalDeviceQueueFamilyProperties(gpu, &queue_count,
+    vkGetPhysicalDeviceQueueFamilyProperties(gpu, &queue_count,
         queue_props.data());
     std::vector<VkBool32> supports_present(queue_count);
     for (uint32_t i = 0; i < queue_count; ++i) {
-        Loader::vkGetPhysicalDeviceSurfaceSupportKHR(gpu, i, surface.get_vulkan_data(), &(supports_present[i]));
+        vkGetPhysicalDeviceSurfaceSupportKHR(gpu, i, surface.get_vulkan_data(), &(supports_present[i]));
     }
     for (std::uint32_t i = 0; i < queue_count; i++) {
         if (GX_FLAG_CHECK(queue_props[i].queueFlags, VK_QUEUE_GRAPHICS_BIT) && GX_FLAG_CHECK(queue_props[i].queueFlags, VK_QUEUE_TRANSFER_BIT) && GX_FLAG_CHECK(queue_props[i].queueFlags, VK_QUEUE_COMPUTE_BIT) && supports_present[i] == VK_TRUE) {
@@ -79,14 +79,14 @@ gearoenix::vulkan::device::Physical::Physical(const Surface& surf) noexcept
     const auto& instance = surface.get_instance();
     const auto vk_ins = instance.get_vulkan_data();
     std::uint32_t gpu_count = 0;
-    GX_VK_CHK_L(vkEnumeratePhysicalDevices(vk_ins, &gpu_count, nullptr))
+    GX_VK_CHK(vkEnumeratePhysicalDevices(vk_ins, &gpu_count, nullptr))
     std::vector<VkPhysicalDevice> gpus(static_cast<std::size_t>(gpu_count));
     GX_LOG_D(gpu_count << " GPU(s) are available.")
-    GX_VK_CHK_L(vkEnumeratePhysicalDevices(vk_ins, &gpu_count, gpus.data()))
+    GX_VK_CHK(vkEnumeratePhysicalDevices(vk_ins, &gpu_count, gpus.data()))
     int best_device_index = -1;
     int best_device_point = -1;
     for (std::uint32_t i = 0; i < gpu_count; ++i) {
-        Loader::vkGetPhysicalDeviceProperties(gpus[i], &properties);
+        vkGetPhysicalDeviceProperties(gpus[i], &properties);
         if (VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU != properties.deviceType)
             continue;
         const auto device_point = is_good(gpus[i]);
@@ -109,22 +109,22 @@ gearoenix::vulkan::device::Physical::Physical(const Surface& surf) noexcept
     }
     vulkan_data = gpus[best_device_index];
     GX_LOG_D("Physical device point is: " << is_good(vulkan_data))
-    Loader::vkGetPhysicalDeviceProperties(vulkan_data, &properties);
+    vkGetPhysicalDeviceProperties(vulkan_data, &properties);
     GX_LOG_D("Physical device name is: " << properties.deviceName)
-    Loader::vkGetPhysicalDeviceFeatures(vulkan_data, &features);
-    Loader::vkGetPhysicalDeviceMemoryProperties(vulkan_data, &memory_properties);
+    vkGetPhysicalDeviceFeatures(vulkan_data, &features);
+    vkGetPhysicalDeviceMemoryProperties(vulkan_data, &memory_properties);
     uint32_t queue_family_count = 0;
-    Loader::vkGetPhysicalDeviceQueueFamilyProperties(vulkan_data, &queue_family_count, nullptr);
+    vkGetPhysicalDeviceQueueFamilyProperties(vulkan_data, &queue_family_count, nullptr);
     if (1 > queue_family_count) {
         GX_LOG_F("queue_family_count value is unexpected.")
     }
     queue_family_properties.resize(queue_family_count);
-    Loader::vkGetPhysicalDeviceQueueFamilyProperties(vulkan_data, &queue_family_count, queue_family_properties.data());
+    vkGetPhysicalDeviceQueueFamilyProperties(vulkan_data, &queue_family_count, queue_family_properties.data());
     std::uint32_t ext_count = 0;
-    Loader::vkEnumerateDeviceExtensionProperties(vulkan_data, nullptr, &ext_count, nullptr);
+    vkEnumerateDeviceExtensionProperties(vulkan_data, nullptr, &ext_count, nullptr);
     if (ext_count > 0) {
         std::vector<VkExtensionProperties> extensions(ext_count);
-        if (Loader::vkEnumerateDeviceExtensionProperties(vulkan_data, nullptr, &ext_count, &extensions.front()) == VK_SUCCESS) {
+        if (vkEnumerateDeviceExtensionProperties(vulkan_data, nullptr, &ext_count, &extensions.front()) == VK_SUCCESS) {
             for (auto ext : extensions) {
                 supported_extensions.emplace(ext.extensionName);
             }
@@ -135,12 +135,12 @@ gearoenix::vulkan::device::Physical::Physical(const Surface& surf) noexcept
         GX_LOG_D("    " << s)
     }
     std::uint32_t count = 0;
-    Loader::vkGetPhysicalDeviceSurfaceFormatsKHR(vulkan_data, surface.get_vulkan_data(), &count, nullptr);
+    vkGetPhysicalDeviceSurfaceFormatsKHR(vulkan_data, surface.get_vulkan_data(), &count, nullptr);
     surface_formats.resize(static_cast<std::size_t>(count));
-    Loader::vkGetPhysicalDeviceSurfaceFormatsKHR(vulkan_data, surface.get_vulkan_data(), &count, surface_formats.data());
+    vkGetPhysicalDeviceSurfaceFormatsKHR(vulkan_data, surface.get_vulkan_data(), &count, surface_formats.data());
     VkFormatProperties format_props;
     for (auto format : acceptable_depth_formats) {
-        Loader::vkGetPhysicalDeviceFormatProperties(vulkan_data, format, &format_props);
+        vkGetPhysicalDeviceFormatProperties(vulkan_data, format, &format_props);
         if GX_FLAG_CHECK (format_props.optimalTilingFeatures, VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT) {
             supported_depth_format = format;
             break;
@@ -188,7 +188,7 @@ std::size_t gearoenix::vulkan::device::Physical::align_size(const std::size_t si
 VkSurfaceCapabilitiesKHR gearoenix::vulkan::device::Physical::get_surface_capabilities() const noexcept
 {
     VkSurfaceCapabilitiesKHR info;
-    Loader::vkGetPhysicalDeviceSurfaceCapabilitiesKHR(vulkan_data, surface.get_vulkan_data(), &info);
+    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(vulkan_data, surface.get_vulkan_data(), &info);
     return info;
 }
 

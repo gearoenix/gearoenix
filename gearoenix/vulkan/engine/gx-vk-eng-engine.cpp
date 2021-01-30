@@ -53,7 +53,7 @@ void gearoenix::vulkan::engine::Engine::vulkan_upload_imgui_fonts() noexcept
     end_info.commandBufferCount = 1;
     end_info.pCommandBuffers = command_buffer.get_vulkan_data_ptr();
     command_buffer.end();
-    GX_VK_CHK_L(vkQueueSubmit(logical_device.get_graphic_queue(), 1, &end_info, nullptr))
+    GX_VK_CHK(vkQueueSubmit(logical_device.get_graphic_queue(), 1, &end_info, nullptr))
     logical_device.wait_to_finish();
     ImGui_ImplVulkan_DestroyFontUploadObjects();
 }
@@ -154,7 +154,7 @@ void gearoenix::vulkan::engine::Engine::end_frame() noexcept
         submit_info.pCommandBuffers = frame.draw_command.get_vulkan_data_ptr();
         submit_info.signalSemaphoreCount = 1;
         submit_info.pSignalSemaphores = frames[frame_number].render_complete.get_vulkan_data_ptr();
-        GX_VK_CHK_L(
+        GX_VK_CHK(
             vkQueueSubmit(logical_device.get_graphic_queue(), 1, &submit_info, frame.draw_wait.get_vulkan_data()))
         // Presenting
         const auto present_image_index = static_cast<std::uint32_t>(swapchain_image_index);
@@ -166,7 +166,7 @@ void gearoenix::vulkan::engine::Engine::end_frame() noexcept
         present_info.swapchainCount = 1;
         present_info.pSwapchains = swapchain.get_vulkan_data_ptr();
         present_info.pImageIndices = &present_image_index;
-        const auto present_result = Loader::vkQueuePresentKHR(logical_device.get_graphic_queue(), &present_info);
+        const auto present_result = vkQueuePresentKHR(logical_device.get_graphic_queue(), &present_info);
         if (VK_ERROR_OUT_OF_DATE_KHR == present_result) {
             swapchain_image_is_valid = false;
         } else if (VK_SUCCESS != present_result) {

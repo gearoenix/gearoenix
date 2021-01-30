@@ -19,7 +19,5 @@ const char* result_to_string(VkResult res) noexcept;
         }                                                               \
     }
 
-#define GX_VK_CHK_L(func) GX_VK_CHK(Loader::func)
-
 #endif
 #endif

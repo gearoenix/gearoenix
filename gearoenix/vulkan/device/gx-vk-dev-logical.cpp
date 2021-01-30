@@ -45,21 +45,21 @@ gearoenix::vulkan::device::Logical::Logical(const Physical& p) noexcept
     device_create_info.enabledExtensionCount = static_cast<std::uint32_t>(device_extensions.size());
     device_create_info.ppEnabledExtensionNames = device_extensions.data();
     device_create_info.pEnabledFeatures = &device_features;
-    GX_VK_CHK_L(vkCreateDevice(physical_device.get_vulkan_data(), &device_create_info, nullptr, &vulkan_data))
-    Loader::vkGetDeviceQueue(vulkan_data, physical_device.get_graphics_queue_node_index(), 0, &graphic_queue);
+    GX_VK_CHK(vkCreateDevice(physical_device.get_vulkan_data(), &device_create_info, nullptr, &vulkan_data))
+    vkGetDeviceQueue(vulkan_data, physical_device.get_graphics_queue_node_index(), 0, &graphic_queue);
     Loader::load(vulkan_data);
 }
 
 gearoenix::vulkan::device::Logical::~Logical() noexcept
 {
     if (vulkan_data != nullptr) {
-        Loader::vkDestroyDevice(vulkan_data, nullptr);
+        vkDestroyDevice(vulkan_data, nullptr);
         vulkan_data = nullptr;
     }
 }
 
 void gearoenix::vulkan::device::Logical::wait_to_finish() noexcept
 {
-    Loader::vkDeviceWaitIdle(vulkan_data);
+    vkDeviceWaitIdle(vulkan_data);
 }
 #endif

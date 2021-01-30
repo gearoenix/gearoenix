@@ -21,24 +21,25 @@ gearoenix::vulkan::sync::Fence::Fence(const device::Logical& ld, const bool sign
     if (signaled) {
         fence_create_info.flags = VK_FENCE_CREATE_SIGNALED_BIT;
     }
-    GX_VK_CHK_L(vkCreateFence(logical_device.get_vulkan_data(), &fence_create_info, nullptr, &vulkan_data))
+    GX_VK_CHK(vkCreateFence(logical_device.get_vulkan_data(), &fence_create_info, nullptr, &vulkan_data))
 }
 
 gearoenix::vulkan::sync::Fence::~Fence() noexcept
 {
-    if (nullptr != vulkan_data)
-        Loader::vkDestroyFence(logical_device.get_vulkan_data(), vulkan_data, nullptr);
-    vulkan_data = nullptr;
+    if (nullptr != vulkan_data) {
+        vkDestroyFence(logical_device.get_vulkan_data(), vulkan_data, nullptr);
+        vulkan_data = nullptr;
+    }
 }
 
 void gearoenix::vulkan::sync::Fence::wait() noexcept
 {
-    GX_VK_CHK_L(vkWaitForFences(logical_device.get_vulkan_data(), 1, &vulkan_data, VK_TRUE, UINT64_MAX))
+    GX_VK_CHK(vkWaitForFences(logical_device.get_vulkan_data(), 1, &vulkan_data, VK_TRUE, UINT64_MAX))
 }
 
 void gearoenix::vulkan::sync::Fence::reset() noexcept
 {
-    GX_VK_CHK_L(vkResetFences(logical_device.get_vulkan_data(), 1, &vulkan_data))
+    GX_VK_CHK(vkResetFences(logical_device.get_vulkan_data(), 1, &vulkan_data))
 }
 
 #endif

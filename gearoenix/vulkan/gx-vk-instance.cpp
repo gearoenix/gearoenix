@@ -154,8 +154,8 @@ static std::uint32_t find_api_version() noexcept
 {
     const std::uint32_t min_version = VK_MAKE_VERSION(1u, 0u, 0u);
     std::uint32_t result;
-    if (nullptr != Loader::vkEnumerateInstanceVersion) {
-        GX_VK_CHK_L(vkEnumerateInstanceVersion(&result))
+    if (nullptr != vkEnumerateInstanceVersion) {
+        GX_VK_CHK(vkEnumerateInstanceVersion(&result))
     }
     result = std::max(result, min_version);
     GX_LOG_D("Instance version is: " << VK_VERSION_MAJOR(result) << "." << VK_VERSION_MINOR(result))
@@ -180,17 +180,17 @@ gearoenix::vulkan::Instance::Instance(const platform::Application& platform_appl
 #elif defined(GX_PLATFORM_LINUX)
     instance_extensions.push_back(VK_KHR_XLIB_SURFACE_EXTENSION_NAME);
 #elif defined(GX_PLATFORM_WINDOWS)
-    instance_extensions.push_back(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
+//    instance_extensions.push_back(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
 #else
 #error "Not implemented yet!"
 #endif
 #ifdef GX_VULKAN_INSTANCE_DEBUG
     instance_extensions.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
     std::uint32_t layers_count = 0;
-    Loader::vkEnumerateInstanceLayerProperties(&layers_count, nullptr);
+    vkEnumerateInstanceLayerProperties(&layers_count, nullptr);
     std::vector<VkLayerProperties> properties(static_cast<std::size_t>(layers_count));
     std::set<std::string> available_layers;
-    Loader::vkEnumerateInstanceLayerProperties(&layers_count, properties.data());
+    vkEnumerateInstanceLayerProperties(&layers_count, properties.data());
     for (const auto& prop : properties) {
         GX_LOG_D("Available layer: " << prop.layerName)
         available_layers.emplace(prop.layerName);
@@ -219,7 +219,7 @@ gearoenix::vulkan::Instance::Instance(const platform::Application& platform_appl
     instance_create_info.enabledLayerCount = static_cast<uint32_t>(instance_layers.size());
     instance_create_info.ppEnabledLayerNames = instance_layers.data();
 #endif
-    GX_VK_CHK_L(vkCreateInstance(&instance_create_info, nullptr, &vulkan_data))
+    GX_VK_CHK(vkCreateInstance(&instance_create_info, nullptr, &vulkan_data))
     // Loading instance functions
     Loader::load(vulkan_data);
     VkDebugReportCallbackCreateInfoEXT dbg_info;
@@ -228,14 +228,14 @@ gearoenix::vulkan::Instance::Instance(const platform::Application& platform_appl
     dbg_info.flags = static_cast<decltype(dbg_info.flags)>(VK_DEBUG_REPORT_WARNING_BIT_EXT) | static_cast<decltype(dbg_info.flags)>(VK_DEBUG_REPORT_DEBUG_BIT_EXT) | static_cast<decltype(dbg_info.flags)>(VK_DEBUG_REPORT_INFORMATION_BIT_EXT) | static_cast<decltype(dbg_info.flags)>(VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT) | static_cast<decltype(dbg_info.flags)>(VK_DEBUG_REPORT_ERROR_BIT_EXT);
     dbg_info.pfnCallback = implVkDebugReportCallbackEXT;
     dbg_info.pUserData = this;
-    GX_VK_CHK_L(vkCreateDebugReportCallbackEXT(vulkan_data, &dbg_info, nullptr, &report_callback))
+    GX_VK_CHK(vkCreateDebugReportCallbackEXT(vulkan_data, &dbg_info, nullptr, &report_callback))
 }
 
 gearoenix::vulkan::Instance::~Instance() noexcept
 {
 #ifdef GX_VULKAN_INSTANCE_DEBUG
-    Loader::vkDestroyDebugReportCallbackEXT(vulkan_data, report_callback, nullptr);
+    vkDestroyDebugReportCallbackEXT(vulkan_data, report_callback, nullptr);
 #endif
-    Loader::vkDestroyInstance(vulkan_data, nullptr);
+    vkDestroyInstance(vulkan_data, nullptr);
 }
 #endif

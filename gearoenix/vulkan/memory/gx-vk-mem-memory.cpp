@@ -40,8 +40,10 @@ gearoenix::vulkan::memory::Memory::Memory(Memory&& o) noexcept
 
 gearoenix::vulkan::memory::Memory::~Memory() noexcept
 {
-    if (parent == nullptr && vulkan_data != nullptr)
-        Loader::vkFreeMemory(manager->get_logical_device().get_vulkan_data(), vulkan_data, nullptr);
+    if (parent == nullptr && vulkan_data != nullptr) {
+        vkFreeMemory(manager->get_logical_device().get_vulkan_data(), vulkan_data, nullptr);
+        vulkan_data = nullptr;
+    }
 }
 
 gearoenix::vulkan::memory::Memory& gearoenix::vulkan::memory::Memory::operator=(Memory&& o) noexcept

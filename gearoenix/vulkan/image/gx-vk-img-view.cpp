@@ -10,7 +10,7 @@
 void gearoenix::vulkan::image::View::terminate() noexcept
 {
     if (vulkan_data != nullptr) {
-        Loader::vkDestroyImageView(image.get_logical_device()->get_vulkan_data(), vulkan_data, nullptr);
+        vkDestroyImageView(image.get_logical_device()->get_vulkan_data(), vulkan_data, nullptr);
         vulkan_data = nullptr;
     }
 }
@@ -35,7 +35,7 @@ gearoenix::vulkan::image::View::View(Image&& img) noexcept
     } else {
         info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
     }
-    GX_VK_CHK_L(vkCreateImageView(
+    GX_VK_CHK(vkCreateImageView(
         image.get_logical_device()->get_vulkan_data(), &info, nullptr, &vulkan_data))
 }
 

@@ -24,7 +24,7 @@ gearoenix::vulkan::command::Buffer::Buffer(Pool* const pool, const Type t) noexc
     info.commandPool = pool->get_vulkan_data();
     info.level = t == Type::Primary ? VK_COMMAND_BUFFER_LEVEL_PRIMARY : VK_COMMAND_BUFFER_LEVEL_SECONDARY;
     info.commandBufferCount = 1;
-    GX_VK_CHK_L(vkAllocateCommandBuffers(pool->get_logical_device().get_vulkan_data(), &info, &vulkan_data))
+    GX_VK_CHK(vkAllocateCommandBuffers(pool->get_logical_device().get_vulkan_data(), &info, &vulkan_data))
 }
 
 gearoenix::vulkan::command::Buffer::Buffer(command::Buffer&& o) noexcept
@@ -38,7 +38,7 @@ gearoenix::vulkan::command::Buffer::Buffer(command::Buffer&& o) noexcept
 gearoenix::vulkan::command::Buffer::~Buffer() noexcept
 {
     if (nullptr != vulkan_data) {
-        Loader::vkFreeCommandBuffers(
+        vkFreeCommandBuffers(
             pool->get_logical_device().get_vulkan_data(),
             pool->get_vulkan_data(), 1, &vulkan_data);
         vulkan_data = nullptr;
@@ -50,19 +50,19 @@ void gearoenix::vulkan::command::Buffer::begin() noexcept
     VkCommandBufferBeginInfo info;
     GX_SET_ZERO(info)
     info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-    GX_VK_CHK_L(vkBeginCommandBuffer(vulkan_data, &info))
+    GX_VK_CHK(vkBeginCommandBuffer(vulkan_data, &info))
 }
 
 void gearoenix::vulkan::command::Buffer::flush() noexcept
 {
     sync::Fence fence(pool->get_logical_device());
-    GX_VK_CHK_L(vkEndCommandBuffer(vulkan_data))
+    GX_VK_CHK(vkEndCommandBuffer(vulkan_data))
     VkSubmitInfo submit_info;
     GX_SET_ZERO(submit_info)
     submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
     submit_info.commandBufferCount = 1;
     submit_info.pCommandBuffers = &vulkan_data;
-    GX_VK_CHK_L(vkQueueSubmit(
+    GX_VK_CHK(vkQueueSubmit(
         pool->get_logical_device().get_graphic_queue(),
         1, &submit_info, fence.get_vulkan_data()))
     fence.wait();
@@ -70,7 +70,7 @@ void gearoenix::vulkan::command::Buffer::flush() noexcept
 
 void gearoenix::vulkan::command::Buffer::end() noexcept
 {
-    GX_VK_CHK_L(vkEndCommandBuffer(vulkan_data))
+    GX_VK_CHK(vkEndCommandBuffer(vulkan_data))
 }
 
 void gearoenix::vulkan::command::Buffer::begin(const RenderPass& render_pass, const Framebuffer& framebuffer) noexcept
@@ -85,7 +85,7 @@ void gearoenix::vulkan::command::Buffer::begin(const RenderPass& render_pass, co
     info.renderArea.extent.height = img.get_image_height();
     info.clearValueCount = 2;
     info.pClearValues = framebuffer.get_clear_colors().data();
-    Loader::vkCmdBeginRenderPass(vulkan_data, &info, VK_SUBPASS_CONTENTS_INLINE);
+    vkCmdBeginRenderPass(vulkan_data, &info, VK_SUBPASS_CONTENTS_INLINE);
 }
 
 //
@@ -115,7 +115,7 @@ void gearoenix::vulkan::command::Buffer::begin(const RenderPass& render_pass, co
 
 void gearoenix::vulkan::command::Buffer::end_render_pass() noexcept
 {
-    Loader::vkCmdEndRenderPass(vulkan_data);
+    vkCmdEndRenderPass(vulkan_data);
 }
 
 //void gearoenix::vulkan::command::Buffer::bind_pipeline(VkPipeline pip) noexcept
@@ -145,7 +145,7 @@ void gearoenix::vulkan::command::Buffer::end_render_pass() noexcept
 
 void gearoenix::vulkan::command::Buffer::draw_indices(VkDeviceSize count) noexcept
 {
-    Loader::vkCmdDrawIndexed(vulkan_data, static_cast<std::uint32_t>(count), 1, 0, 0, 1);
+    vkCmdDrawIndexed(vulkan_data, static_cast<std::uint32_t>(count), 1, 0, 0, 1);
 }
 
 const VkCommandBuffer* gearoenix::vulkan::command::Buffer::get_vulkan_data_ptr() const noexcept

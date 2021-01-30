@@ -40,6 +40,6 @@ gearoenix::vulkan::Surface::Surface(const Instance& ins, const platform::Applica
 
 gearoenix::vulkan::Surface::~Surface() noexcept
 {
-    Loader::vkDestroySurfaceKHR(instance.get_vulkan_data(), vulkan_data, nullptr);
+    vkDestroySurfaceKHR(instance.get_vulkan_data(), vulkan_data, nullptr);
 }
 #endif

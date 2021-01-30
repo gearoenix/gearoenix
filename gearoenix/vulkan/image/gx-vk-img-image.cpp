@@ -11,7 +11,7 @@
 void gearoenix::vulkan::image::Image::terminate() noexcept
 {
     if (allocated_memory.has_value() && vulkan_data != nullptr) {
-        Loader::vkDestroyImage(logical_device->get_vulkan_data(), vulkan_data, nullptr);
+        vkDestroyImage(logical_device->get_vulkan_data(), vulkan_data, nullptr);
         vulkan_data = nullptr;
     }
 }
@@ -91,12 +91,12 @@ gearoenix::vulkan::image::Image::Image(
     info.usage = usage;
     info.flags = flags;
     info.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    GX_VK_CHK_L(vkCreateImage(logical_device->get_vulkan_data(), &info, nullptr, &vulkan_data))
+    GX_VK_CHK(vkCreateImage(logical_device->get_vulkan_data(), &info, nullptr, &vulkan_data))
     VkMemoryRequirements mem_req;
     GX_SET_ZERO(mem_req)
-    Loader::vkGetImageMemoryRequirements(logical_device->get_vulkan_data(), vulkan_data, &mem_req);
+    vkGetImageMemoryRequirements(logical_device->get_vulkan_data(), vulkan_data, &mem_req);
     allocated_memory = mem_mgr.allocate(mem_req.size, mem_req.memoryTypeBits, memory::Place::Gpu);
-    GX_VK_CHK_L(vkBindImageMemory(
+    GX_VK_CHK(vkBindImageMemory(
         logical_device->get_vulkan_data(),
         vulkan_data,
         allocated_memory->get_vulkan_data(),

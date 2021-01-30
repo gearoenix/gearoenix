@@ -77,13 +77,13 @@ gearoenix::vulkan::RenderPass::RenderPass(const Swapchain& sw) noexcept
     render_pass_create_info.dependencyCount = GX_COUNT_OF(dependencies);
     render_pass_create_info.pDependencies = dependencies;
 
-    GX_VK_CHK_L(vkCreateRenderPass(d.get_vulkan_data(), &render_pass_create_info, nullptr, &vulkan_data))
+    GX_VK_CHK(vkCreateRenderPass(d.get_vulkan_data(), &render_pass_create_info, nullptr, &vulkan_data))
 }
 
 gearoenix::vulkan::RenderPass::~RenderPass() noexcept
 {
     if (nullptr != vulkan_data)
-        Loader::vkDestroyRenderPass(swapchain.get_logical_device().get_vulkan_data(), vulkan_data, nullptr);
+        vkDestroyRenderPass(swapchain.get_logical_device().get_vulkan_data(), vulkan_data, nullptr);
 }
 
 #endif

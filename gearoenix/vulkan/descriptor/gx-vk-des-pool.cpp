@@ -29,12 +29,12 @@ gearoenix::vulkan::descriptor::Pool::Pool(const device::Logical& logical_device)
     info.poolSizeCount = GX_COUNT_OF(type_counts);
     info.pPoolSizes = type_counts;
     info.maxSets = 1000;
-    GX_VK_CHK_L(vkCreateDescriptorPool(logical_device.get_vulkan_data(), &info, nullptr, &vulkan_data))
+    GX_VK_CHK(vkCreateDescriptorPool(logical_device.get_vulkan_data(), &info, nullptr, &vulkan_data))
 }
 
 gearoenix::vulkan::descriptor::Pool::~Pool() noexcept
 {
-    Loader::vkDestroyDescriptorPool(logical_device.get_vulkan_data(), vulkan_data, nullptr);
+    vkDestroyDescriptorPool(logical_device.get_vulkan_data(), vulkan_data, nullptr);
 }
 
 gearoenix::vulkan::descriptor::Pool gearoenix::vulkan::descriptor::Pool::create_imgui(const device::Logical& logical_device) noexcept
@@ -60,7 +60,7 @@ gearoenix::vulkan::descriptor::Pool gearoenix::vulkan::descriptor::Pool::create_
     info.poolSizeCount = GX_COUNT_OF(pool_sizes);
     info.pPoolSizes = pool_sizes;
     VkDescriptorPool vulkan_data;
-    GX_VK_CHK_L(vkCreateDescriptorPool(logical_device.get_vulkan_data(), &info, nullptr, &vulkan_data))
+    GX_VK_CHK(vkCreateDescriptorPool(logical_device.get_vulkan_data(), &info, nullptr, &vulkan_data))
     return Pool(logical_device, vulkan_data);
 }
 

@@ -39,9 +39,9 @@ std::optional<gearoenix::vulkan::memory::Memory> gearoenix::vulkan::memory::Mana
         info.memoryTypeIndex = index.first;
         VkDeviceMemory vulkan_data = nullptr;
         void* data = nullptr;
-        GX_VK_CHK_L(vkAllocateMemory(logical_device.get_vulkan_data(), &info, nullptr, &vulkan_data))
+        GX_VK_CHK(vkAllocateMemory(logical_device.get_vulkan_data(), &info, nullptr, &vulkan_data))
         if (Place::Cpu == place) {
-            GX_VK_CHK_L(vkMapMemory(logical_device.get_vulkan_data(), vulkan_data, 0, static_cast<VkDeviceSize>(aligned_size), 0, &data))
+            GX_VK_CHK(vkMapMemory(logical_device.get_vulkan_data(), vulkan_data, 0, static_cast<VkDeviceSize>(aligned_size), 0, &data))
         }
         memories.emplace(index, Memory(this, nullptr, core::Allocator(aligned_size), data, place, index.first, vulkan_data));
         search = memories.find(index);

@@ -10,13 +10,14 @@ gearoenix::vulkan::pipeline::Cache::Cache(const device::Logical& logical_device)
     VkPipelineCacheCreateInfo info;
     GX_SET_ZERO(info)
     info.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
-    GX_VK_CHK_L(vkCreatePipelineCache(logical_device.get_vulkan_data(), &info, nullptr, &vulkan_data))
+    GX_VK_CHK(vkCreatePipelineCache(logical_device.get_vulkan_data(), &info, nullptr, &vulkan_data))
 }
 
 gearoenix::vulkan::pipeline::Cache::~Cache() noexcept
 {
-    if (nullptr != vulkan_data)
-        Loader::vkDestroyPipelineCache(logical_device.get_vulkan_data(), vulkan_data, nullptr);
-    vulkan_data = nullptr;
+    if (nullptr != vulkan_data) {
+        vkDestroyPipelineCache(logical_device.get_vulkan_data(), vulkan_data, nullptr);
+        vulkan_data = nullptr;
+    }
 }
 #endif
