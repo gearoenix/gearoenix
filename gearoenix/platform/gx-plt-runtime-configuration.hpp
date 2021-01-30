@@ -9,6 +9,7 @@ namespace gearoenix::platform {
 struct RuntimeConfiguration {
     GX_GETSET_CREF_PRV(std::string, application_name)
     GX_GETSET_VAL_PRV(bool, fullscreen, false)
+    GX_GETSET_VAL_PRV(bool, lanscape, true)
     GX_GETSET_VAL_PRV(std::uint16_t, window_width, 1000)
     GX_GETSET_VAL_PRV(std::uint16_t, window_height, 700)
     GX_GETSET_VAL_PRV(std::uint16_t, window_resizing_event_interval_ms, 500)

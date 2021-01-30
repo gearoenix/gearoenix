@@ -7,17 +7,8 @@ std::ostream& operator<<(std::ostream& os, const Type t) noexcept
     case Type::Vulkan:
         os << "Vulkan";
         break;
-    case Type::OpenGL43:
-        os << "OpenGL43";
-        break;
-    case Type::OpenGL33:
-        os << "OpenGL33";
-        break;
-    case Type::OpenGLES3:
-        os << "OpenGLES3";
-        break;
-    case Type::OpenGLES2:
-        os << "OpenGLES2";
+    case Type::OpenGL:
+        os << "OpenGL";
         break;
     case Type::DirectX11:
         os << "DirectX11";

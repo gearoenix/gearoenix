@@ -4,11 +4,9 @@
 
 #ifdef GX_PLATFORM_INTERFACE_WIN32
 #include "windows/gx-plt-win-main-entry.hpp"
-#else
-
-#ifdef GX_PLATFORM_INTERFACE_SDL2
+#elif defined(GX_PLATFORM_INTERFACE_SDL2)
 #include "sdl2/gx-plt-sdl2-main-entry.hpp"
-#endif
+#else
 
 #define GX_MAIN_ENTRY_ARGS_DEF \
     [[maybe_unused]] int argc, \

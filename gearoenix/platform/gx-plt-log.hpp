@@ -76,10 +76,10 @@ struct Log {
         std::terminate();             \
     }
 
-#ifdef GX_PLATFORM_ANDROID
+#ifdef GX_PLATFORM_INTERFACE_ANDROID
 #include "android/gx-plt-and-log.hpp"
-#elif defined(GX_PLATFORM_WINDOWS)
-#include "windows/gx-plt-win-log.hpp"
+#elif defined(GX_PLATFORM_INTERFACE_WIN32)
+#include "win32/gx-plt-win-log.hpp"
 #endif
 
 #define GX_REACHED GX_LOG_D("REACHED <-- <-- <-- <-- <-- <-- <-- <--")

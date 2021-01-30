@@ -30,6 +30,7 @@ INCLUDE(gx-imgui)
 MESSAGE(STATUS "Gearoenix is going to be compiled for ${CMAKE_SYSTEM_NAME}")
 
 IF (MSVC)
+    SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /NODEFAULTLIB:MSVCRT")
     SET(CMAKE_CXX_FLAGS "/std:c++latest ${CMAKE_CXX_FLAGS}")
     GX_REPLACE_FLAG(CMAKE_CXX_FLAGS "/W3" "/W4")
     SET(GEAROENIX_EXE_TARGET "WIN32")
@@ -60,7 +61,16 @@ SET(GX_SDL2_INCLUDE_DIRS "${GX_SDL2_PATH}/include")
 INCLUDE_DIRECTORIES(${GX_SDL2_INCLUDE_DIRS})
 SET(GX_SDL2_BUILD_DIRS "${GX_SDL2_PATH}/gx-build")
 IF(LINUX)
-    SET(GX_LIBS ${GX_LIBS} ${GX_SDL2_BUILD_DIRS}/libSDL2main.a ${GX_SDL2_BUILD_DIRS}/libSDL2.a)
+    SET(GX_LIBS
+            ${GX_LIBS}
+            ${GX_SDL2_BUILD_DIRS}/libSDL2main.a
+            ${GX_SDL2_BUILD_DIRS}/libSDL2.a)
+ELSEIF(MSVC)
+    SET(GX_LIBS
+            ${GX_LIBS}
+            ${GX_SDL2_BUILD_DIRS}/Release/SDL2-static.lib
+            ${GX_SDL2_BUILD_DIRS}/Release/SDL2main.lib
+            winmm version oleaut32 imm32 setupapi)
 ENDIF()
 
 SET(GX_STB_PATH "${GX_SDK_PATH}/stb")

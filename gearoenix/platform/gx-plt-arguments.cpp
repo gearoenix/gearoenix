@@ -21,7 +21,7 @@ std::string gearoenix::platform::Arguments::extract_process_directory(const std:
 
 gearoenix::platform::Arguments::Arguments(GX_MAIN_ENTRY_ARGS_DEF) noexcept
 {
-#ifdef GX_PLATFORM_WINDOWS
+#ifdef GX_PLATFORM_INTERFACE_WIN32
     int argc = 0;
     auto* const w_argv = CommandLineToArgvW(GetCommandLineW(), &argc);
     if (nullptr == w_argv) {
