@@ -33,13 +33,19 @@ gearoenix::vulkan::Surface::Surface(const Instance& ins, const platform::Applica
     info.hinstance = platform_application.get_instance();
     info.hwnd = platform_application.get_window();
     GX_VK_CHK_L(vkCreateWin32SurfaceKHR(instance.get_vulkan_data(), &info, nullptr, &vulkan_data))
+#elif defined(GX_PLATFORM_INTERFACE_SDL2)
+    platform_application.create_vulkan_surface(instance.get_vulkan_data(), &vulkan_data);
 #else
-//#error "Error not implemented yet!"
+#error "Error not implemented yet!"
 #endif
 }
 
 gearoenix::vulkan::Surface::~Surface() noexcept
 {
-    vkDestroySurfaceKHR(instance.get_vulkan_data(), vulkan_data, nullptr);
+    if (nullptr != vulkan_data) {
+        vkDestroySurfaceKHR(instance.get_vulkan_data(), vulkan_data, nullptr);
+        vulkan_data = nullptr;
+    }
 }
+
 #endif

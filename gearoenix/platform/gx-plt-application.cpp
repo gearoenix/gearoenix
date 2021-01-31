@@ -128,10 +128,21 @@ void gearoenix::platform::BaseApplication::character_input(const char16_t ch) no
     ImGui::GetIO().AddInputCharacterUTF16(ch);
 }
 
+void gearoenix::platform::BaseApplication::initialize_engine(Application& app) noexcept
+{
+    render_engine = render::engine::Engine::construct(app);
+}
+
 void gearoenix::platform::BaseApplication::going_to_be_closed() noexcept
 {
     running = false;
     // TODO
+}
+
+void gearoenix::platform::BaseApplication::terminate() noexcept
+{
+    core_application = nullptr;
+    render_engine = nullptr;
 }
 
 void gearoenix::platform::BaseApplication::update() noexcept
@@ -140,4 +151,15 @@ void gearoenix::platform::BaseApplication::update() noexcept
     render_engine->start_frame();
     core_application->update();
     render_engine->end_frame();
+}
+
+void gearoenix::platform::BaseApplication::initialize_core_application(
+    Application* const app,
+    core::Application* const core_app) noexcept
+{
+    if (nullptr == core_app) {
+        core_application = std::make_unique<core::Application>(app);
+    } else {
+        core_application = std::unique_ptr<core::Application>(core_app);
+    }
 }

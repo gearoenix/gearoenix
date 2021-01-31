@@ -32,6 +32,7 @@ public:
     ~Application() noexcept;
     void run(core::Application* = nullptr) noexcept;
     [[nodiscard]] std::vector<const char*> get_vulkan_extensions() noexcept;
+    void create_vulkan_surface(void* vulkan_instance, void* vulkan_data_ptr) const noexcept;
 };
 }
 #endif

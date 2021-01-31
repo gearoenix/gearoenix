@@ -182,14 +182,14 @@ gearoenix::platform::Application::Application(GX_MAIN_ENTRY_ARGS_DEF, const Runt
             base.initialize_window_size(w, h);
         }
     }
-    base.render_engine = render::engine::Engine::construct(*this);
+    base.initialize_engine(*this);
 }
 
 gearoenix::platform::Application::~Application() noexcept = default;
 
 void gearoenix::platform::Application::run(core::Application* core_app) noexcept
 {
-    base.core_application = nullptr == core_app ? std::make_unique<core::Application>(this) : std::unique_ptr<core::Application>(core_app);
+    base.initialize_core_application(this, core_app);
     GX_LOG_D("Run function of WinApi interface called.")
     MSG msg;
     while (base.running) {

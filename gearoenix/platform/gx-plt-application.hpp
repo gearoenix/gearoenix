@@ -74,7 +74,11 @@ private:
     void keyboard_key(key::Id, key::Action) noexcept;
     void character_input(char16_t ch) noexcept;
 
+    void initialize_engine(Application&) noexcept;
+    void initialize_core_application(Application*, core::Application*) noexcept;
+
     void going_to_be_closed() noexcept;
+    void terminate() noexcept;
 
     void update() noexcept;
 
