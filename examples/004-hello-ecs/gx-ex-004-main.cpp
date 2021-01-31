@@ -1,15 +1,29 @@
 #include <gearoenix/core/ecs/gx-cr-ecs-world.hpp>
-#include <gearoenix/platform/gx-plt-log.hpp>
 #include <gearoenix/platform/gx-plt-main-entry.hpp>
 
-struct Position {
+#define GX_PLATFORM_LOG_STD_OUT_ENABLED
+#include <gearoenix/platform/gx-plt-log.hpp>
+
+struct Position final : public gearoenix::core::ecs::Component {
     double x;
     double y;
+
+    Position(const double x, const double y) noexcept
+        : x(x)
+        , y(y)
+    {
+    }
 };
 
-struct Speed {
+struct Speed final : public gearoenix::core::ecs::Component {
     double x;
     double y;
+
+    Speed(const double x, const double y) noexcept
+        : x(x)
+        , y(y)
+    {
+    }
 };
 
 void start()

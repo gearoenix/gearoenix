@@ -1,11 +1,7 @@
-#ifndef GEAROENIX_CORE_ECS_TYPES_HPP
-#define GEAROENIX_CORE_ECS_TYPES_HPP
-
-#include <cstdint>
+#ifndef GEAROENIX_CORE_ECS_NOT_HPP
+#define GEAROENIX_CORE_ECS_NOT_HPP
 
 namespace gearoenix::core::ecs {
-typedef std::uint32_t entity_id_t;
-
 template <typename T>
 struct Not {
     typedef T type;

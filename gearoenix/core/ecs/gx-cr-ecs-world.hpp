@@ -3,14 +3,16 @@
 
 #include "../../platform/macro/gx-plt-mcr-lock.hpp"
 #include "../gx-cr-range.hpp"
-#include "gx-cr-ecs-types.hpp"
+#include "gx-cr-ecs-archetype.hpp"
+#include "gx-cr-ecs-component.hpp"
+#include "gx-cr-ecs-entity.hpp"
+#include "gx-cr-ecs-not.hpp"
 #include <algorithm>
 #include <array>
 #include <execution>
 #include <functional>
 #include <map>
 #include <string>
-#include <typeindex>
 #include <vector>
 
 namespace gearoenix::core::ecs {
@@ -26,13 +28,11 @@ private:
         bool satisfied_by_archetype = false;
         std::size_t index_in_archetype = 0;
     };
-    typedef std::uint32_t component_index_t;
     GX_CREATE_GUARD(this)
     entity_id_t latest_entity_id = 0;
-    // TODO: benchmark unordered map in future
-    std::map<std::type_index, std::vector<std::uint8_t>> components_storage;
-    std::map<std::vector<std::type_index>, std::vector<std::uint8_t>> archetypes;
-    std::map<entity_id_t, std::map<std::type_index, component_index_t>> entities_to_archetypes;
+    std::map<Archetype::id_t, Archetype> archetypes;
+    // id -> (archetype, index)
+    std::map<entity_id_t, std::pair<Archetype::id_t, std::size_t>> entities;
 
 public:
     template <typename... ComponentsTypes>
@@ -47,50 +47,30 @@ public:
 template <typename... ComponentsTypes>
 gearoenix::core::ecs::entity_id_t gearoenix::core::ecs::World::create_entity(ComponentsTypes&&... components) noexcept
 {
-    constexpr auto cms_sz = sizeof...(components);
-    std::map<std::type_index, component_index_t> archetype_indices;
-    GX_GUARD_LOCK(this)
-    (([&]<typename T>(T&& component) {
-        const auto type_index = std::type_index(typeid(component));
-        auto& vec = components_storage[type_index];
-        const auto index = vec.size();
-        archetype_indices[type_index] = static_cast<component_index_t>(index);
-        vec.resize(index + sizeof(T));
-        for (auto i = index; i < vec.size(); ++i)
-            vec[i] = 0;
-        auto* const com = reinterpret_cast<T*>(&vec[index]);
-        *com = std::forward<T>(component);
-    }(std::move(components))),
+    (([]<typename T>(T*) constexpr {
+        static_assert(!std::is_reference_v<T>, "Component argument(s) can not be reference types.");
+        static_assert(std::is_base_of_v<Component, T>, "Component argument(s) must be derived from Component struct.");
+        static_assert(!IsNot<T>::value, "Component argument(s) can not be Not type.");
+    }(reinterpret_cast<ComponentsTypes*>(0))),
         ...);
+    auto archetype_id = Archetype::create_id(components...);
+    GX_GUARD_LOCK(this)
     ++latest_entity_id;
-    std::vector<std::type_index> archetypes_index;
-    archetypes_index.reserve(cms_sz);
-    std::vector<component_index_t> indices;
-    indices.reserve(cms_sz);
-    for (const auto& ti : archetype_indices) {
-        archetypes_index.push_back(ti.first);
-        indices.push_back(ti.second);
+    auto search = archetypes.find(archetype_id);
+    if (archetypes.end() == search) {
+        search = archetypes.emplace(archetype_id, Archetype(components...)).first;
     }
-    auto& archetype = archetypes[std::move(archetypes_index)];
-    const auto archetype_index = archetype.size();
-    archetype.resize(archetype_index + sizeof(entity_id_t) + cms_sz * sizeof(component_index_t));
-    auto* const ent_ptr = archetype.data() + archetype_index;
-    *reinterpret_cast<entity_id_t*>(ent_ptr) = latest_entity_id;
-    auto* cms_ptr = ent_ptr + sizeof(entity_id_t);
-    for (const component_index_t index : indices) {
-        *reinterpret_cast<component_index_t*>(cms_ptr) = index;
-        cms_ptr += sizeof(component_index_t);
-    }
-    entities_to_archetypes[latest_entity_id] = std::move(archetype_indices);
+    auto& archetype = search->second;
+    const auto index = archetype.allocate(latest_entity_id, components...);
+    entities.emplace(latest_entity_id, std::make_pair(archetype_id, index));
     return latest_entity_id;
 }
 
 template <typename ComponentType>
-ComponentType& gearoenix::core::ecs::World::get_component(entity_id_t entity_id) noexcept
+ComponentType& gearoenix::core::ecs::World::get_component(const entity_id_t id) noexcept
 {
-    const auto ti = std::type_index(typeid(ComponentType));
-    const auto ci = entities_to_archetypes[entity_id][ti];
-    return *reinterpret_cast<ComponentType*>(components_storage[ti].data() + ci);
+    const auto& ti = entities[id];
+    return archetypes.find(ti.first)->second.get_component<ComponentType>(ti.second);
 }
 
 template <typename... ComponentsTypes>
