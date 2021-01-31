@@ -76,7 +76,7 @@ void gearoenix::vulkan::engine::Engine::initialize_frame() noexcept
 
 gearoenix::vulkan::engine::Engine::Engine(const platform::Application& platform_application) noexcept
     : render::engine::Engine(render::engine::Type::Vulkan, platform_application)
-    , instance(platform_application)
+    , instance(*Instance::construct(platform_application.get_base().get_configuration().get_application_name().c_str()))
     , surface(instance, platform_application)
     , physical_device(surface)
     , logical_device(physical_device)
@@ -182,8 +182,14 @@ void gearoenix::vulkan::engine::Engine::upload_imgui_fonts() noexcept
 
 bool gearoenix::vulkan::engine::Engine::is_supported() noexcept
 {
-    Loader::load();
-    return Loader::is_loaded();
+    if (!Loader::load())
+        return false;
+    auto instance_result = Instance::construct(GX_APPLICATION_NAME);
+    if (!instance_result.has_value())
+        return false;
+    auto& instance = instance_result.value();
+    const auto gpus = device::Physical::get_available_devices(instance.get_vulkan_data());
+    return !gpus.empty();
 }
 
 #endif

@@ -57,6 +57,7 @@ public:
     ///
     /// \note If you don't care about new information you can cache it for your future uses.
     [[nodiscard]] VkSurfaceCapabilitiesKHR get_surface_capabilities() const noexcept;
+    [[nodiscard]] static std::vector<VkPhysicalDevice> get_available_devices(VkInstance instance) noexcept;
 };
 }
 #endif

@@ -76,16 +76,10 @@ gearoenix::vulkan::device::Physical::Physical(const Surface& surf) noexcept
     , features {}
     , memory_properties {}
 {
-    const auto& instance = surface.get_instance();
-    const auto vk_ins = instance.get_vulkan_data();
-    std::uint32_t gpu_count = 0;
-    GX_VK_CHK(vkEnumeratePhysicalDevices(vk_ins, &gpu_count, nullptr))
-    std::vector<VkPhysicalDevice> gpus(static_cast<std::size_t>(gpu_count));
-    GX_LOG_D(gpu_count << " GPU(s) are available.")
-    GX_VK_CHK(vkEnumeratePhysicalDevices(vk_ins, &gpu_count, gpus.data()))
+    const auto gpus = get_available_devices(surface.get_instance().get_vulkan_data());
     int best_device_index = -1;
     int best_device_point = -1;
-    for (std::uint32_t i = 0; i < gpu_count; ++i) {
+    for (std::uint32_t i = 0; i < gpus.size(); ++i) {
         vkGetPhysicalDeviceProperties(gpus[i], &properties);
         if (VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU != properties.deviceType)
             continue;
@@ -96,7 +90,7 @@ gearoenix::vulkan::device::Physical::Physical(const Surface& surf) noexcept
         }
     }
     if (-1 == best_device_index) {
-        for (std::uint32_t i = 0; i < gpu_count; ++i) {
+        for (std::uint32_t i = 0; i < gpus.size(); ++i) {
             const auto device_point = is_good(gpus[i]);
             if (device_point > best_device_point) {
                 best_device_index = static_cast<int>(i);
@@ -190,6 +184,16 @@ VkSurfaceCapabilitiesKHR gearoenix::vulkan::device::Physical::get_surface_capabi
     VkSurfaceCapabilitiesKHR info;
     vkGetPhysicalDeviceSurfaceCapabilitiesKHR(vulkan_data, surface.get_vulkan_data(), &info);
     return info;
+}
+
+std::vector<VkPhysicalDevice> gearoenix::vulkan::device::Physical::get_available_devices(VkInstance instance) noexcept
+{
+    std::uint32_t gpu_count = 0;
+    GX_VK_CHK(vkEnumeratePhysicalDevices(instance, &gpu_count, nullptr))
+    std::vector<VkPhysicalDevice> gpus(static_cast<std::size_t>(gpu_count));
+    GX_LOG_D(gpu_count << " GPU(s) are available.")
+    GX_VK_CHK(vkEnumeratePhysicalDevices(instance, &gpu_count, gpus.data()))
+    return gpus;
 }
 
 #endif

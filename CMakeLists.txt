@@ -63,8 +63,9 @@ SET(GX_SDL2_BUILD_DIRS "${GX_SDL2_PATH}/gx-build")
 IF(LINUX)
     SET(GX_LIBS
             ${GX_LIBS}
+            ${GX_SDL2_BUILD_DIRS}/libSDL2.a
             ${GX_SDL2_BUILD_DIRS}/libSDL2main.a
-            ${GX_SDL2_BUILD_DIRS}/libSDL2.a)
+            pthread)
 ELSEIF(MSVC)
     SET(GX_LIBS
             ${GX_LIBS}

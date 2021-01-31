@@ -6,9 +6,9 @@
 
 #ifdef GX_PLATFORM_ANDROID
 #define VK_USE_PLATFORM_ANDROID_KHR
-#elif defined(GX_PLATFORM_INTERFACE_X11)
+#elif defined(GX_PLATFORM_LINUX)
 #define VK_USE_PLATFORM_XLIB_KHR
-#elif defined(GX_PLATFORM_INTERFACE_WIN32)
+#elif defined(GX_PLATFORM_WINDOWS)
 #define VK_USE_PLATFORM_WIN32_KHR
 #endif
 
@@ -260,7 +260,7 @@ namespace gearoenix::vulkan {
 struct Loader {
     Loader() noexcept = delete;
     [[nodiscard]] static bool is_loaded() noexcept;
-    static void load() noexcept;
+    [[nodiscard]] static bool load() noexcept;
     static void load(VkInstance instance) noexcept;
     static void load(VkDevice device) noexcept;
     static void unload() noexcept;

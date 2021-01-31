@@ -163,15 +163,25 @@ static std::uint32_t find_api_version() noexcept
 }
 }
 
-gearoenix::vulkan::Instance::Instance(const platform::Application& platform_application) noexcept
+gearoenix::vulkan::Instance::Instance(Instance&& o) noexcept
+    : vulkan_data(o.vulkan_data)
+    , report_callback(o.report_callback)
 {
+    o.vulkan_data = nullptr;
+    o.report_callback = nullptr;
+}
+
+std::optional<gearoenix::vulkan::Instance> gearoenix::vulkan::Instance::construct(
+    const char* const application_name) noexcept
+{
+    Instance instance;
     VkApplicationInfo app_info;
     GX_SET_ZERO(app_info)
     app_info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
     app_info.apiVersion = find_api_version();
     app_info.applicationVersion = VK_MAKE_VERSION(1u, 0u, 0u);
     app_info.engineVersion = VK_MAKE_VERSION(1u, 0u, 0u);
-    app_info.pApplicationName = platform_application.get_base().get_configuration().get_application_name().c_str();
+    app_info.pApplicationName = application_name;
     app_info.pEngineName = GX_ENGINE_NAME;
     std::vector<const char*> instance_extensions;
     instance_extensions.push_back(VK_KHR_SURFACE_EXTENSION_NAME);
@@ -180,7 +190,7 @@ gearoenix::vulkan::Instance::Instance(const platform::Application& platform_appl
 #elif defined(GX_PLATFORM_LINUX)
     instance_extensions.push_back(VK_KHR_XLIB_SURFACE_EXTENSION_NAME);
 #elif defined(GX_PLATFORM_WINDOWS)
-//    instance_extensions.push_back(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
+    instance_extensions.push_back(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
 #else
 #error "Not implemented yet!"
 #endif
@@ -219,23 +229,35 @@ gearoenix::vulkan::Instance::Instance(const platform::Application& platform_appl
     instance_create_info.enabledLayerCount = static_cast<uint32_t>(instance_layers.size());
     instance_create_info.ppEnabledLayerNames = instance_layers.data();
 #endif
-    GX_VK_CHK(vkCreateInstance(&instance_create_info, nullptr, &vulkan_data))
+    const auto create_result = vkCreateInstance(&instance_create_info, nullptr, &instance.vulkan_data);
+    if (VK_SUCCESS != create_result || nullptr == instance.vulkan_data) {
+        return std::nullopt;
+    }
     // Loading instance functions
-    Loader::load(vulkan_data);
+    Loader::load(instance.vulkan_data);
+#ifdef GX_VULKAN_INSTANCE_DEBUG
     VkDebugReportCallbackCreateInfoEXT dbg_info;
     GX_SET_ZERO(dbg_info)
     dbg_info.sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CREATE_INFO_EXT;
     dbg_info.flags = static_cast<decltype(dbg_info.flags)>(VK_DEBUG_REPORT_WARNING_BIT_EXT) | static_cast<decltype(dbg_info.flags)>(VK_DEBUG_REPORT_DEBUG_BIT_EXT) | static_cast<decltype(dbg_info.flags)>(VK_DEBUG_REPORT_INFORMATION_BIT_EXT) | static_cast<decltype(dbg_info.flags)>(VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT) | static_cast<decltype(dbg_info.flags)>(VK_DEBUG_REPORT_ERROR_BIT_EXT);
     dbg_info.pfnCallback = implVkDebugReportCallbackEXT;
-    dbg_info.pUserData = this;
-    GX_VK_CHK(vkCreateDebugReportCallbackEXT(vulkan_data, &dbg_info, nullptr, &report_callback))
+    GX_VK_CHK(vkCreateDebugReportCallbackEXT(instance.vulkan_data, &dbg_info, nullptr, &instance.report_callback))
+#endif
+    return instance;
 }
 
 gearoenix::vulkan::Instance::~Instance() noexcept
 {
+    if (nullptr != vulkan_data) {
 #ifdef GX_VULKAN_INSTANCE_DEBUG
-    vkDestroyDebugReportCallbackEXT(vulkan_data, report_callback, nullptr);
+        if (nullptr != report_callback) {
+            vkDestroyDebugReportCallbackEXT(vulkan_data, report_callback, nullptr);
+            report_callback = nullptr;
+        }
 #endif
-    vkDestroyInstance(vulkan_data, nullptr);
+        vkDestroyInstance(vulkan_data, nullptr);
+        vulkan_data = nullptr;
+    }
 }
+
 #endif

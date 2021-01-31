@@ -2,6 +2,7 @@
 #ifdef GX_RENDER_VULKAN_ENABLED
 #include "../platform/gx-plt-library.hpp"
 #include "../platform/gx-plt-log.hpp"
+#include <memory>
 
 #define GX_VULKAN_LOADER_DECL_FUNCTIONS(GX_VULKAN_LOADER_FUNCTION) \
     PFN_##GX_VULKAN_LOADER_FUNCTION GX_VULKAN_LOADER_FUNCTION = nullptr
@@ -17,10 +18,10 @@ bool gearoenix::vulkan::Loader::is_loaded() noexcept
     return vkCreateInstance != nullptr;
 }
 
-void gearoenix::vulkan::Loader::load() noexcept
+bool gearoenix::vulkan::Loader::load() noexcept
 {
     if (is_loaded())
-        return;
+        return true;
     vulkan_lib = std::unique_ptr<platform::Library>(platform::Library::construct(
 #ifdef GX_PLATFORM_WINDOWS
         "vulkan-1.dll"
@@ -31,7 +32,7 @@ void gearoenix::vulkan::Loader::load() noexcept
 
     if (nullptr == vulkan_lib) {
         GX_LOG_D("Vulkan library is not available.")
-        return;
+        return false;
     }
 
 #define GX_VULKAN_LOADER_LOAD_FUNCTION(GX_VULKAN_LOADER_FUNCTION) \
@@ -40,6 +41,7 @@ void gearoenix::vulkan::Loader::load() noexcept
     GX_VULKAN_FUNCTIONS_MAP(GX_VULKAN_LOADER_LOAD_FUNCTION)
 
 #undef GX_VULKAN_LOADER_LOAD_FUNCTION
+    return is_loaded();
 }
 
 void gearoenix::vulkan::Loader::load([[maybe_unused]] VkInstance instance) noexcept
