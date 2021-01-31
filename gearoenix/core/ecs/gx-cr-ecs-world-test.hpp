@@ -4,7 +4,7 @@
 #include "../../platform/gx-plt-log.hpp"
 #include "gx-cr-ecs-world.hpp"
 
-struct Position {
+struct Position final : public gearoenix::core::ecs::Component {
     double x;
     double y;
 
@@ -19,17 +19,18 @@ struct Position {
 
     Position(Position&&) noexcept = default;
 
-    Position& operator=(const Position&& o) noexcept
-    {
-        x = o.x;
-        y = o.y;
-        return *this;
-    }
+    Position& operator=(const Position&& o) noexcept = delete;
 };
 
-struct Speed {
+struct Speed final : public gearoenix::core::ecs::Component {
     double x;
     double y;
+
+    Speed(const double x, const double y) noexcept
+        : x(x)
+        , y(y)
+    {
+    }
 };
 
 BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)

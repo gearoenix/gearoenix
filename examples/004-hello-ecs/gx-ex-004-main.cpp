@@ -1,8 +1,6 @@
+#define GX_PLATFORM_LOG_STD_OUT_ENABLED
 #include <gearoenix/core/ecs/gx-cr-ecs-world.hpp>
 #include <gearoenix/platform/gx-plt-main-entry.hpp>
-
-#define GX_PLATFORM_LOG_STD_OUT_ENABLED
-#include <gearoenix/platform/gx-plt-log.hpp>
 
 struct Position final : public gearoenix::core::ecs::Component {
     double x;
