@@ -31,6 +31,15 @@ gearoenix::core::ecs::Archetype::Archetype(
 {
 }
 
+gearoenix::core::ecs::Archetype::Archetype(
+    const std::size_t components_size,
+    std::map<std::type_index, std::size_t> components_indices) noexcept
+    : components_size(components_size)
+    , components_indices(std::move(components_indices))
+    , entity_size(header_size + components_size)
+{
+}
+
 std::uint8_t* gearoenix::core::ecs::Archetype::allocate_size(const std::size_t sz) noexcept
 {
     const auto s = data.size();
@@ -61,4 +70,11 @@ void gearoenix::core::ecs::Archetype::delete_entity(const std::size_t index) noe
     for (const auto& ci : components_indices) {
         reinterpret_cast<Component*>(&data[index + ci.second])->~Component();
     }
+}
+
+gearoenix::core::ecs::Archetype::Archetype(Archetype&& o) noexcept
+    : components_size(o.components_size)
+    , components_indices(o.components_indices)
+    , entity_size(o.entity_size)
+{
 }

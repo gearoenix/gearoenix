@@ -28,150 +28,132 @@ private:
 
     std::vector<std::uint8_t> data;
 
-    template <ComponentConcept... ComponentsTypes>
-    [[nodiscard]] static id_t create_id() noexcept;
+    template <typename... ComponentsTypes>
+    [[nodiscard]] static id_t create_id() noexcept
+    {
+        Component::types_check<ComponentsTypes...>();
+        return {
+            std::type_index(typeid(ComponentsTypes))...,
+        };
+    }
 
-    template <ComponentQueryConcept... ComponentsTypes>
-    [[nodiscard]] static bool satisfy(const id_t&) noexcept;
+    template <typename... ComponentsTypes>
+    [[nodiscard]] static bool satisfy(const id_t& id) noexcept
+    {
+        Component::query_types_check<ComponentsTypes...>();
+        bool result = true;
+        (([&]<typename T>(T*) noexcept {
+            if (result) {
+                if (IsNot<T>::value) {
+                    result &= !id.contains(std::type_index(typeid(typename IsNot<T>::type)));
+                } else {
+                    result &= id.contains(std::type_index(typeid(T)));
+                }
+            }
+        }(reinterpret_cast<ComponentsTypes*>(0))),
+            ...);
+        return result;
+    }
 
-    template <ComponentConcept... ComponentsTypes>
-    [[nodiscard]] constexpr static std::size_t get_components_size() noexcept;
+    template <typename... ComponentsTypes>
+    [[nodiscard]] constexpr static std::size_t get_components_size() noexcept
+    {
+        Component::types_check<ComponentsTypes...>();
+        std::size_t size = 0;
+        ((size += sizeof(ComponentsTypes)), ...);
+        return size;
+    }
+
     [[nodiscard]] static std::size_t get_components_size(const std::vector<std::vector<std::uint8_t>>&) noexcept;
 
-    template <ComponentConcept... ComponentsTypes>
-    [[nodiscard]] static std::map<std::type_index, std::size_t> get_components_indices() noexcept;
+    template <typename... ComponentsTypes>
+    [[nodiscard]] static std::map<std::type_index, std::size_t> get_components_indices() noexcept
+    {
+        Component::types_check<ComponentsTypes...>();
+        std::size_t index = 0;
+        std::map<std::type_index, std::size_t> indices;
+        (([&]<typename T>(T*) constexpr noexcept {
+            indices[std::type_index(typeid(T))] = index;
+            index += sizeof(T);
+        }(reinterpret_cast<std::remove_reference_t<ComponentsTypes>*>(0))),
+            ...);
+        return indices;
+    }
+
     [[nodiscard]] static std::map<std::type_index, std::size_t> get_components_indices(
         const id_t&, const std::vector<std::vector<std::uint8_t>>&) noexcept;
 
-    template <ComponentConcept... ComponentsTypes>
-    explicit Archetype(ComponentsTypes&... components) noexcept;
-
     Archetype(const id_t&, const std::vector<std::vector<std::uint8_t>>&) noexcept;
+    Archetype(std::size_t, std::map<std::type_index, std::size_t>) noexcept;
+
+    template <typename... ComponentsTypes>
+    [[nodiscard]] static Archetype create() noexcept
+    {
+        Component::types_check<ComponentsTypes...>();
+        return Archetype(get_components_size<ComponentsTypes...>(), get_components_indices<ComponentsTypes...>());
+    }
 
     [[nodiscard]] std::uint8_t* allocate_size(std::size_t) noexcept;
 
     template <typename T>
-    T& allocate() noexcept;
+    T& allocate() noexcept
+    {
+        return *reinterpret_cast<T*>(allocate_size(sizeof(T)));
+    }
 
     void allocate_entity(entity_id_t) noexcept;
 
     [[nodiscard]] std::size_t allocate_entity(entity_id_t, const std::vector<std::vector<std::uint8_t>>&) noexcept;
 
-    template <ComponentConcept... ComponentsTypes>
-    [[nodiscard]] std::size_t allocate(entity_id_t, ComponentsTypes&&... components) noexcept;
+    template <typename... ComponentsTypes>
+    [[nodiscard]] std::size_t allocate(const entity_id_t id, ComponentsTypes&&... components) noexcept
+    {
+        Component::types_check<ComponentsTypes...>();
+        allocate_entity(id);
+        const auto result = data.size();
+        auto* const ptr = allocate_size(get_components_size<ComponentsTypes...>());
+        (([&]<typename T>(T&& component) noexcept {
+            const auto index = components_indices.find(std::type_index(typeid(T)))->second;
+            auto* const cp = reinterpret_cast<T*>(&ptr[index]);
+            new (cp) T(std::forward<T>(component));
+        }(std::move(components))),
+            ...);
+        return result;
+    }
 
     void delete_entity(std::size_t index) noexcept;
 
-    template <ComponentConcept ComponentsType>
-    [[nodiscard]] ComponentsType& get_component(std::size_t) noexcept;
+    template <typename ComponentType>
+    [[nodiscard]] ComponentType& get_component(const std::size_t index) noexcept
+    {
+        Component::type_check<ComponentType>();
+        return *reinterpret_cast<ComponentType*>(&data[index + components_indices.find(std::type_index(typeid(ComponentType)))->second]);
+    }
 
-    template <ComponentQueryConcept... ComponentsTypes>
-    void parallel_system(const std::function<void(entity_id_t, ComponentsTypes&...)>& fun) noexcept;
+    template <typename... ComponentsTypes>
+    void parallel_system(const std::function<void(entity_id_t, ComponentsTypes&...)>& fun) noexcept
+    {
+        Component::query_types_check<ComponentsTypes...>();
+        const std::size_t indices[] = {
+            (IsNot<ComponentsTypes>::value ? 0 : components_indices.find(std::type_index(typeid(ComponentsTypes)))->second)...,
+        };
+        auto range = PtrRange(data.data(), data.size(), entity_size);
+        std::for_each(std::execution::par_unseq, range.begin(), range.end(), [&](std::uint8_t* ptr) {
+            const auto flag = *reinterpret_cast<const flag_t*>(ptr);
+            if (deleted == (deleted & flag))
+                return;
+            ptr += sizeof(flag_t);
+            const auto entity_id = *reinterpret_cast<const entity_id_t*>(ptr);
+            ptr += sizeof(entity_id_t);
+            auto index = static_cast<std::size_t>(-1);
+            fun(entity_id, *reinterpret_cast<ComponentsTypes*>(&ptr[indices[++index]])...);
+        });
+    }
+
+public:
+    Archetype(Archetype&&) noexcept;
+    Archetype(const Archetype&) = delete;
 };
-}
-
-template <gearoenix::core::ecs::ComponentConcept... ComponentsTypes>
-gearoenix::core::ecs::Archetype::id_t gearoenix::core::ecs::Archetype::create_id() noexcept
-{
-    return {
-        std::type_index(typeid(std::remove_reference_t<ComponentsTypes>))...,
-    };
-}
-
-template <gearoenix::core::ecs::ComponentConcept... ComponentsTypes>
-constexpr std::size_t gearoenix::core::ecs::Archetype::get_components_size() noexcept
-{
-    std::size_t size = 0;
-    (([&]<typename T>(T*) constexpr noexcept {
-        size += sizeof(T);
-    }(reinterpret_cast<std::remove_reference_t<ComponentsTypes>*>(0))),
-        ...);
-    return size;
-}
-
-template <gearoenix::core::ecs::ComponentConcept... ComponentsTypes>
-std::map<std::type_index, std::size_t> gearoenix::core::ecs::Archetype::get_components_indices() noexcept
-{
-    std::size_t index = 0;
-    std::map<std::type_index, std::size_t> indices;
-    (([&]<typename T>(T*) constexpr noexcept {
-        indices[std::type_index(typeid(T))] = index;
-        index += sizeof(T);
-    }(reinterpret_cast<std::remove_reference_t<ComponentsTypes>*>(0))),
-        ...);
-    return indices;
-}
-
-template <gearoenix::core::ecs::ComponentConcept... ComponentsTypes>
-gearoenix::core::ecs::Archetype::Archetype(ComponentsTypes&...) noexcept
-    : components_size(get_components_size<ComponentsTypes...>())
-    , components_indices(get_components_indices<ComponentsTypes...>())
-    , entity_size(header_size + components_size)
-{
-}
-
-template <typename T>
-T& gearoenix::core::ecs::Archetype::allocate() noexcept
-{
-    return *reinterpret_cast<T*>(allocate_size(sizeof(T)));
-}
-
-template <gearoenix::core::ecs::ComponentConcept... ComponentsTypes>
-std::size_t gearoenix::core::ecs::Archetype::allocate(entity_id_t id, ComponentsTypes&&... components) noexcept
-{
-    allocate_entity(id);
-    const auto result = data.size();
-    auto* const ptr = allocate_size(get_components_size<ComponentsTypes...>());
-    (([&]<typename T>(T&& component) noexcept {
-        const auto index = components_indices.find(std::type_index(typeid(T)))->second;
-        auto* const cp = reinterpret_cast<T*>(&ptr[index]);
-        new (cp) T(std::forward<T>(component));
-    }(std::move(components))),
-        ...);
-    return result;
-}
-
-template <gearoenix::core::ecs::ComponentConcept ComponentsType>
-ComponentsType& gearoenix::core::ecs::Archetype::get_component(const std::size_t index) noexcept
-{
-    return *reinterpret_cast<ComponentsType*>(&data[index + components_indices.find(std::type_index(typeid(ComponentsType)))->second]);
-}
-
-template <gearoenix::core::ecs::ComponentQueryConcept... ComponentsTypes>
-bool gearoenix::core::ecs::Archetype::satisfy(const id_t& id) noexcept
-{
-    bool result = true;
-    (([&]<typename T>(T*) noexcept {
-        if (result) {
-            if (IsNot<T>::value) {
-                result &= !id.contains(std::type_index(typeid(typename IsNot<T>::type)));
-            } else {
-                result &= id.contains(std::type_index(typeid(T)));
-            }
-        }
-    }(reinterpret_cast<std::remove_reference_t<ComponentsTypes>*>(0))),
-        ...);
-    return result;
-}
-
-template <gearoenix::core::ecs::ComponentQueryConcept... ComponentsTypes>
-void gearoenix::core::ecs::Archetype::parallel_system(
-    const std::function<void(entity_id_t, ComponentsTypes&...)>& fun) noexcept
-{
-    const std::size_t indices[] = {
-        (IsNot<ComponentsTypes>::value ? 0 : components_indices.find(std::type_index(typeid(ComponentsTypes)))->second)...,
-    };
-    auto range = PtrRange(data.data(), data.size(), entity_size);
-    std::for_each(std::execution::par_unseq, range.begin(), range.end(), [&](std::uint8_t* ptr) {
-        const auto flag = *reinterpret_cast<const flag_t*>(ptr);
-        if (deleted == (deleted & flag))
-            return;
-        ptr += sizeof(flag_t);
-        const auto entity_id = *reinterpret_cast<const entity_id_t*>(ptr);
-        ptr += sizeof(entity_id_t);
-        auto index = static_cast<std::size_t>(-1);
-        fun(entity_id, *reinterpret_cast<std::remove_reference_t<ComponentsTypes>*>(&ptr[indices[++index]])...);
-    });
 }
 
 #endif

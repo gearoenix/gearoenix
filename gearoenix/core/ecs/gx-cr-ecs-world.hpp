@@ -31,38 +31,118 @@ private:
 public:
     //--------------------------------------Entity creation----------------------------------------------
     /// You must know your context (state of world lock), unless you want to end up being deadlocked
-    template <ComponentConcept... ComponentsTypes>
-    [[nodiscard]] Entity::id_t create_entity(ComponentsTypes&&... components) noexcept;
-    [[nodiscard]] Entity::id_t create_entity(Entity::Builder&&) noexcept;
+    [[nodiscard]] Entity::id_t create_entity_with_builder(Entity::Builder&&) noexcept;
+
+    template <typename... ComponentsTypes>
+    [[nodiscard]] Entity::id_t create_entity(ComponentsTypes&&... components) noexcept
+    {
+        Component::types_check<ComponentsTypes...>();
+        auto archetype_id = Archetype::create_id<ComponentsTypes...>();
+        GX_GUARD_LOCK(this)
+        const auto id = ++Entity::last_id;
+        auto search = archetypes.find(archetype_id);
+        if (archetypes.end() == search) {
+            search = archetypes.emplace(archetype_id, Archetype::create<ComponentsTypes...>()).first;
+        }
+        auto& archetype = search->second;
+        const auto index = archetype.allocate(id, std::forward<ComponentsTypes>(components)...);
+        entities.emplace(id, Entity(std::move(archetype_id), index));
+        return id;
+    }
+
     /// Recommended way to add an entity, in case you do not know the context you're in.
-    template <ComponentConcept... ComponentsTypes>
-    [[nodiscard]] Entity::id_t delayed_create_entity(ComponentsTypes&&... components) noexcept;
-    [[nodiscard]] Entity::id_t delayed_create_entity(Entity::Builder&&) noexcept;
+    [[nodiscard]] Entity::id_t delayed_create_entity_with_builder(Entity::Builder&&) noexcept;
+
+    template <typename... ComponentsTypes>
+    [[nodiscard]] Entity::id_t delayed_create_entity(ComponentsTypes&&... components) noexcept
+    {
+        Component::types_check<ComponentsTypes...>();
+        Entity::Builder b;
+        b.add_components(components...);
+        return delayed_create_entity(std::move(b));
+    }
     //--------------------------------------Entity deletion----------------------------------------------
     void delete_entity(Entity::id_t) noexcept;
+
     void delayed_delete_entity(Entity::id_t) noexcept;
     //--------------------------------------Component addition-------------------------------------------
-    template <ComponentConcept... ComponentsTypes>
-    void add_components(Entity::id_t, ComponentsTypes&&... components) noexcept;
-    void add_components(Entity::id_t, const std::map<std::type_index, std::vector<std::uint8_t>>&) noexcept;
-    template <ComponentConcept... ComponentsTypes>
-    void delayed_add_components(Entity::id_t, ComponentsTypes&&... components) noexcept;
-    void delayed_add_components(Entity::id_t, std::map<std::type_index, std::vector<std::uint8_t>>) noexcept;
+    void add_components_map(Entity::id_t, const std::map<std::type_index, std::vector<std::uint8_t>>&) noexcept;
+
+    template <typename... ComponentsTypes>
+    void add_components(const Entity::id_t ei, ComponentsTypes&&... components) noexcept
+    {
+        Component::types_check<ComponentsTypes...>();
+        Entity::Builder b(ei);
+        b.add_components(components...);
+        add_components_map(ei, b.components);
+    }
+
+    void delayed_add_components_map(Entity::id_t, std::map<std::type_index, std::vector<std::uint8_t>>) noexcept;
+
+    template <typename... ComponentsTypes>
+    void delayed_add_components(const Entity::id_t ei, ComponentsTypes&&... components) noexcept
+    {
+        Component::types_check<ComponentsTypes...>();
+        Entity::Builder b(ei);
+        b.add_components(components...);
+        delayed_add_components_map(ei, std::move(b.components));
+    }
     //--------------------------------------Component deletion-------------------------------------------
-    template <ComponentConcept... ComponentsTypes>
-    void remove_components(Entity::id_t) noexcept;
-    void remove_components(Entity::id_t, const std::type_index*, std::size_t) noexcept;
-    template <ComponentConcept... ComponentsTypes>
-    void delayed_remove_components(Entity::id_t) noexcept;
-    void delayed_remove_components(Entity::id_t, std::vector<std::type_index>) noexcept;
+    template <typename... ComponentsTypes>
+    void remove_components(const Entity::id_t ei) noexcept
+    {
+        Component::types_check<ComponentsTypes...>();
+        const std::type_index ts[] = {
+            std::type_index(typeid(ComponentsTypes))...,
+        };
+        remove_components(ei, ts, sizeof...(ComponentsTypes));
+    }
+
+    void remove_components_list(Entity::id_t, const std::type_index*, std::size_t) noexcept;
+
+    template <typename... ComponentsTypes>
+    void delayed_remove_components(const Entity::id_t ei) noexcept
+    {
+        Component::types_check<ComponentsTypes...>();
+        std::vector<std::type_index> ts = {
+            std::type_index(typeid(ComponentsTypes))...,
+        };
+        delayed_remove_components_list(ei, std::move(ts));
+    }
+
+    void delayed_remove_components_list(Entity::id_t, std::vector<std::type_index>) noexcept;
 
     /// Does not provide a good performance, use it wisely
-    template <ComponentConcept ComponentType>
-    [[nodiscard]] ComponentType& get_component(Entity::id_t entity_id) noexcept;
+    template <typename ComponentType>
+    [[nodiscard]] ComponentType& get_component(const Entity::id_t id) noexcept
+    {
+        Component::type_check<ComponentType>();
+        auto entity_search = entities.find(id);
+#ifdef GX_DEBUG_MODE
+        if (entities.end() == entity_search)
+            GX_LOG_F("Entity '" << id << "' not found.")
+#endif
+        const auto& e = entity_search->second;
+        auto archetype_search = archetypes.find(e.archetype);
+#ifdef GX_DEBUG_MODE
+        if (archetypes.end() == archetype_search)
+            GX_LOG_F("Archetype for entity '" << id << "' not found.")
+#endif
+        return archetype_search->second.get_component<ComponentType>(e.index_in_archetype);
+    }
 
     /// Highly optimized way of doing things
-    template <ComponentQueryConcept... ComponentsTypes>
-    void parallel_system(const std::function<void(Entity::id_t entity, ComponentsTypes&... components)>& fun) noexcept;
+    template <typename... ComponentsTypes>
+    void parallel_system(const std::function<void(Entity::id_t, ComponentsTypes&...)>& fun) noexcept
+    {
+        Component::query_types_check<ComponentsTypes...>();
+        GX_GUARD_LOCK(this)
+        for (auto& [a_id, archetype] : archetypes) {
+            if (!Archetype::satisfy<ComponentsTypes...>(a_id))
+                continue;
+            archetype.parallel_system(fun);
+        }
+    }
 
     /// It will do all the delayed actions
     void update() noexcept;
@@ -70,85 +150,6 @@ public:
     /// It's really a time consuming operation use it rarely, but it can be really helpful for performance
     void defragment() noexcept;
 };
-}
-
-template <gearoenix::core::ecs::ComponentConcept... ComponentsTypes>
-gearoenix::core::ecs::Entity::id_t gearoenix::core::ecs::World::create_entity(ComponentsTypes&&... components) noexcept
-{
-    auto archetype_id = Archetype::create_id<ComponentsTypes...>();
-    GX_GUARD_LOCK(this)
-    const auto id = ++Entity::last_id;
-    auto search = archetypes.find(archetype_id);
-    if (archetypes.end() == search) {
-        search = archetypes.emplace(archetype_id, Archetype(components...)).first;
-    }
-    auto& archetype = search->second;
-    const auto index = archetype.allocate(id, components...);
-    entities.emplace(id, std::make_pair(archetype_id, index));
-    return id;
-}
-
-template <gearoenix::core::ecs::ComponentConcept... ComponentsTypes>
-gearoenix::core::ecs::Entity::id_t gearoenix::core::ecs::World::delayed_create_entity(ComponentsTypes&&... components) noexcept
-{
-    Entity::Builder b;
-    b.add_components(components...);
-    return delayed_create_entity(std::move(b));
-}
-
-template <gearoenix::core::ecs::ComponentConcept... ComponentsTypes>
-void gearoenix::core::ecs::World::add_components(const Entity::id_t ei, ComponentsTypes&&... components) noexcept
-{
-    Entity::Builder b(ei);
-    b.add_components(components...);
-    add_components(ei, b.components);
-}
-
-template <gearoenix::core::ecs::ComponentConcept... ComponentsTypes>
-void gearoenix::core::ecs::World::delayed_add_components(const Entity::id_t ei, ComponentsTypes&&... components) noexcept
-{
-    Entity::Builder b(ei);
-    b.add_components(components...);
-    delayed_add_components(ei, std::move(b.components));
-}
-
-template <gearoenix::core::ecs::ComponentConcept... ComponentsTypes>
-void gearoenix::core::ecs::World::remove_components(const Entity::id_t ei) noexcept
-{
-    const std::type_index ts[] = {
-        std::type_index(typeid(ComponentsTypes))...,
-    };
-    remove_components(ei, ts, sizeof...(ComponentsTypes));
-}
-
-template <gearoenix::core::ecs::ComponentConcept... ComponentsTypes>
-void gearoenix::core::ecs::World::delayed_remove_components(const Entity::id_t ei) noexcept
-{
-    std::vector<std::type_index> ts = {
-        std::type_index(typeid(ComponentsTypes))...,
-    };
-    delayed_remove_components(ei, std::move(ts));
-}
-
-template <gearoenix::core::ecs::ComponentConcept ComponentType>
-ComponentType& gearoenix::core::ecs::World::get_component(const Entity::id_t id) noexcept
-{
-    const auto& e = entities[id];
-    return archetypes.find(e.archetype)->second.get_component<ComponentType>(e.index_in_archetype);
-}
-
-template <gearoenix::core::ecs::ComponentQueryConcept... ComponentsTypes>
-void gearoenix::core::ecs::World::parallel_system(
-    const std::function<void(Entity::id_t, ComponentsTypes&...)>& fun) noexcept
-{
-    constexpr auto all_components_count = sizeof...(ComponentsTypes);
-    static_assert(all_components_count != 0, "Number of queried components can not be zero!");
-    GX_GUARD_LOCK(this)
-    for (auto& [a_id, archetype] : archetypes) {
-        if (!Archetype::satisfy<ComponentsTypes...>(a_id))
-            continue;
-        archetype.parallel_system(fun);
-    }
 }
 
 #endif

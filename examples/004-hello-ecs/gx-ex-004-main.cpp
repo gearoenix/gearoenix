@@ -7,10 +7,16 @@ struct Position final : public gearoenix::core::ecs::Component {
     double y;
 
     Position(const double x, const double y) noexcept
-        : x(x)
+        : gearoenix::core::ecs::Component(this)
+        , x(x)
         , y(y)
     {
     }
+
+    Position(Position&&) noexcept = default;
+    Position(const Position&) = delete;
+    Position& operator=(Position&&) = delete;
+    Position& operator=(const Position&) = delete;
 };
 
 struct Speed final : public gearoenix::core::ecs::Component {
@@ -18,10 +24,16 @@ struct Speed final : public gearoenix::core::ecs::Component {
     double y;
 
     Speed(const double x, const double y) noexcept
-        : x(x)
+        : gearoenix::core::ecs::Component(this)
+        , x(x)
         , y(y)
     {
     }
+
+    Speed(Speed&&) noexcept = default;
+    Speed(const Speed&) = delete;
+    Speed& operator=(Speed&&) = delete;
+    Speed& operator=(const Speed&) = delete;
 };
 
 void start()

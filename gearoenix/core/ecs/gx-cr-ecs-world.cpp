@@ -1,6 +1,6 @@
 #include "gx-cr-ecs-world.hpp"
 
-gearoenix::core::ecs::Entity::id_t gearoenix::core::ecs::World::create_entity(Entity::Builder&& b) noexcept
+gearoenix::core::ecs::Entity::id_t gearoenix::core::ecs::World::create_entity_with_builder(Entity::Builder&& b) noexcept
 {
     Archetype::id_t archetype_id;
     std::vector<std::vector<std::uint8_t>> cs;
@@ -16,11 +16,11 @@ gearoenix::core::ecs::Entity::id_t gearoenix::core::ecs::World::create_entity(En
     }
     auto& archetype = search->second;
     const auto index = archetype.allocate_entity(b.id, cs);
-    entities.emplace(b.id, Entity(archetype_id, index));
+    entities.emplace(b.id, Entity(std::move(archetype_id), index));
     return b.id;
 }
 
-gearoenix::core::ecs::Entity::id_t gearoenix::core::ecs::World::delayed_create_entity(Entity::Builder&& b) noexcept
+gearoenix::core::ecs::Entity::id_t gearoenix::core::ecs::World::delayed_create_entity_with_builder(Entity::Builder&& b) noexcept
 {
     const auto id = b.id;
     GX_GUARD_LOCK(delayed_actions)
@@ -28,7 +28,7 @@ gearoenix::core::ecs::Entity::id_t gearoenix::core::ecs::World::delayed_create_e
     return id;
 }
 
-void gearoenix::core::ecs::World::delete_entity(const id_t id) noexcept
+void gearoenix::core::ecs::World::delete_entity(const Entity::id_t id) noexcept
 {
     GX_GUARD_LOCK(this)
     const auto search = entities.find(id);
@@ -41,28 +41,37 @@ void gearoenix::core::ecs::World::delete_entity(const id_t id) noexcept
     entities.erase(search);
 }
 
-void gearoenix::core::ecs::World::delayed_delete_entity(const id_t id) noexcept
+void gearoenix::core::ecs::World::delayed_delete_entity(const Entity::id_t id) noexcept
 {
     GX_GUARD_LOCK(delayed_actions)
     delayed_actions.emplace_back(id);
 }
 
-void gearoenix::core::ecs::World::add_components(
-    const id_t ei,
+void gearoenix::core::ecs::World::add_components_map(
+    const Entity::id_t,
     const std::map<std::type_index, std::vector<std::uint8_t>>&) noexcept
 {
     GX_UNIMPLEMENTED
 }
 
-void gearoenix::core::ecs::World::delayed_add_components(
-    const id_t ei,
+void gearoenix::core::ecs::World::delayed_add_components_map(
+    const Entity::id_t ei,
     std::map<std::type_index, std::vector<std::uint8_t>> cs) noexcept
 {
     GX_GUARD_LOCK(delayed_actions)
     delayed_actions.emplace_back(std::make_pair(ei, std::move(cs)));
 }
 
-void gearoenix::core::ecs::World::remove_components(id_t, const std::type_index*, std::size_t) noexcept
+void gearoenix::core::ecs::World::remove_components_list(
+    const Entity::id_t, const std::type_index*, std::size_t) noexcept
 {
     GX_UNIMPLEMENTED
+}
+
+void gearoenix::core::ecs::World::delayed_remove_components_list(
+    const Entity::id_t ei,
+    std::vector<std::type_index> cs) noexcept
+{
+    GX_GUARD_LOCK(delayed_actions)
+    delayed_actions.emplace_back(std::make_pair(ei, std::move(cs)));
 }

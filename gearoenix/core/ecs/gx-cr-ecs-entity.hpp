@@ -29,14 +29,30 @@ struct Entity final {
         Builder(const Builder&) = delete;
         Builder& operator=(Builder&&) = delete;
         Builder& operator=(const Builder&) = delete;
-        template <ComponentConcept ComponentType>
-        void add_component(ComponentType&&) noexcept;
-        template <ComponentConcept... ComponentType>
-        void add_components(ComponentType&&...) noexcept;
+
+        template <typename ComponentType>
+        void add_component(ComponentType&& component) noexcept
+        {
+            Component::types_check<ComponentType>();
+            const std::type_index type_index(typeid(ComponentType));
+#ifdef GX_DEBUG_MODE
+            if (components.contains(type_index))
+                GX_LOG_F("Component '" << typeid(ComponentType).name() << "' already exists in entity '" << id)
+#endif
+            std::vector<std::uint8_t> data(sizeof(ComponentType));
+            new (data.data()) ComponentType(std::forward<ComponentType>(component));
+            components.emplace(type_index, std::move(data));
+        }
+
+        template <typename... ComponentType>
+        void add_components(ComponentType&&... cs) noexcept
+        {
+            ((add_component(std::move(cs))), ...);
+        }
     };
 
 private:
-    Entity(archetype_id_t archetype, std::size_t index_in_archetype) noexcept;
+    Entity(archetype_id_t&& archetype, std::size_t index_in_archetype) noexcept;
     static std::atomic<id_t> last_id;
     archetype_id_t archetype;
     std::size_t index_in_archetype;
@@ -47,25 +63,6 @@ public:
     Entity& operator=(Entity&&) = delete;
     Entity& operator=(const Entity&) = delete;
 };
-}
-
-template <gearoenix::core::ecs::ComponentConcept ComponentType>
-void gearoenix::core::ecs::Entity::Builder::add_component(ComponentType&& component) noexcept
-{
-    const std::type_index type_index(typeid(ComponentType));
-#ifdef GX_DEBUG_MODE
-    if (components.contains(type_index))
-        GX_LOG_F("Component '" << typeid(ComponentType).name() << "' already exists in entity '" << id)
-#endif
-    std::vector<std::uint8_t> data(sizeof(ComponentType));
-    new (data.data()) ComponentType(std::forward<ComponentType>(component));
-    components.emplace(type_index, std::move(data));
-}
-
-template <gearoenix::core::ecs::ComponentConcept... ComponentType>
-void gearoenix::core::ecs::Entity::Builder::add_components(ComponentType&&... cs) noexcept
-{
-    ((add_component(std::move(cs))), ...);
 }
 
 #endif

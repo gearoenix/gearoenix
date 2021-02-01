@@ -18,7 +18,7 @@ gearoenix::core::ecs::Entity::Builder::Builder(Builder&& o) noexcept
 {
 }
 
-gearoenix::core::ecs::Entity::Entity(archetype_id_t archetype, const std::size_t index_in_archetype) noexcept
+gearoenix::core::ecs::Entity::Entity(archetype_id_t&& archetype, const std::size_t index_in_archetype) noexcept
     : archetype(std::move(archetype))
     , index_in_archetype(index_in_archetype)
 {
