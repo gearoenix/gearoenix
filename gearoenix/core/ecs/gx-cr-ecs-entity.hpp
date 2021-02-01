@@ -12,30 +12,46 @@ namespace gearoenix::core::ecs {
 struct World;
 struct Entity final {
     friend struct World;
-    typedef std::uint32_t id_t;
+    typedef entity_id_t id_t;
+
     struct Builder final {
+        friend struct World;
+
     private:
         const id_t id;
         std::map<std::type_index, std::vector<std::uint8_t>> components;
 
+        explicit Builder(id_t) noexcept;
+
     public:
         Builder() noexcept;
-        template <typename ComponentType>
-        void add(ComponentType&& component) noexcept;
+        Builder(Builder&&) noexcept;
+        Builder(const Builder&) = delete;
+        Builder& operator=(Builder&&) = delete;
+        Builder& operator=(const Builder&) = delete;
+        template <ComponentConcept ComponentType>
+        void add_component(ComponentType&&) noexcept;
+        template <ComponentConcept... ComponentType>
+        void add_components(ComponentType&&...) noexcept;
     };
 
 private:
+    Entity(archetype_id_t archetype, std::size_t index_in_archetype) noexcept;
     static std::atomic<id_t> last_id;
     archetype_id_t archetype;
     std::size_t index_in_archetype;
-    std::map<std::type_index, Component*> components;
+
+public:
+    Entity(Entity&&) noexcept;
+    Entity(const Entity&) = delete;
+    Entity& operator=(Entity&&) = delete;
+    Entity& operator=(const Entity&) = delete;
 };
 }
 
-template <typename ComponentType>
-void gearoenix::core::ecs::Entity::Builder::add(ComponentType&& component) noexcept
+template <gearoenix::core::ecs::ComponentConcept ComponentType>
+void gearoenix::core::ecs::Entity::Builder::add_component(ComponentType&& component) noexcept
 {
-    Component::type_check<ComponentType>();
     const std::type_index type_index(typeid(ComponentType));
 #ifdef GX_DEBUG_MODE
     if (components.contains(type_index))
@@ -44,6 +60,12 @@ void gearoenix::core::ecs::Entity::Builder::add(ComponentType&& component) noexc
     std::vector<std::uint8_t> data(sizeof(ComponentType));
     new (data.data()) ComponentType(std::forward<ComponentType>(component));
     components.emplace(type_index, std::move(data));
+}
+
+template <gearoenix::core::ecs::ComponentConcept... ComponentType>
+void gearoenix::core::ecs::Entity::Builder::add_components(ComponentType&&... cs) noexcept
+{
+    ((add_component(std::move(cs))), ...);
 }
 
 #endif
