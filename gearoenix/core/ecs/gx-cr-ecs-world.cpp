@@ -49,14 +49,14 @@ void gearoenix::core::ecs::World::delayed_delete_entity(const Entity::id_t id) n
 
 void gearoenix::core::ecs::World::add_components_map(
     const Entity::id_t,
-    const std::map<std::type_index, std::vector<std::uint8_t>>&) noexcept
+    std::map<std::type_index, std::vector<std::uint8_t>>&&) noexcept
 {
     GX_UNIMPLEMENTED
 }
 
 void gearoenix::core::ecs::World::delayed_add_components_map(
     const Entity::id_t ei,
-    std::map<std::type_index, std::vector<std::uint8_t>> cs) noexcept
+    std::map<std::type_index, std::vector<std::uint8_t>>&& cs) noexcept
 {
     GX_GUARD_LOCK(delayed_actions)
     delayed_actions.emplace_back(std::make_pair(ei, std::move(cs)));
@@ -70,7 +70,7 @@ void gearoenix::core::ecs::World::remove_components_list(
 
 void gearoenix::core::ecs::World::delayed_remove_components_list(
     const Entity::id_t ei,
-    std::vector<std::type_index> cs) noexcept
+    std::vector<std::type_index>&& cs) noexcept
 {
     GX_GUARD_LOCK(delayed_actions)
     delayed_actions.emplace_back(std::make_pair(ei, std::move(cs)));

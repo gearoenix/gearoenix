@@ -42,7 +42,11 @@ public:
         const auto id = ++Entity::last_id;
         auto search = archetypes.find(archetype_id);
         if (archetypes.end() == search) {
-            search = archetypes.emplace(archetype_id, Archetype::create<ComponentsTypes...>()).first;
+            bool is_ok = false;
+            std::tie(search, is_ok) = archetypes.emplace(archetype_id, Archetype::create<ComponentsTypes...>());
+            if (!is_ok) {
+                GX_LOG_F("Problem in allocation of archetype");
+            }
         }
         auto& archetype = search->second;
         const auto index = archetype.allocate(id, std::forward<ComponentsTypes>(components)...);
@@ -58,33 +62,33 @@ public:
     {
         Component::types_check<ComponentsTypes...>();
         Entity::Builder b;
-        b.add_components(components...);
-        return delayed_create_entity(std::move(b));
+        b.add_components(std::forward<ComponentsTypes>(components)...);
+        return delayed_create_entity_with_builder(std::move(b));
     }
     //--------------------------------------Entity deletion----------------------------------------------
     void delete_entity(Entity::id_t) noexcept;
 
     void delayed_delete_entity(Entity::id_t) noexcept;
     //--------------------------------------Component addition-------------------------------------------
-    void add_components_map(Entity::id_t, const std::map<std::type_index, std::vector<std::uint8_t>>&) noexcept;
+    void add_components_map(Entity::id_t, std::map<std::type_index, std::vector<std::uint8_t>>&&) noexcept;
 
     template <typename... ComponentsTypes>
     void add_components(const Entity::id_t ei, ComponentsTypes&&... components) noexcept
     {
         Component::types_check<ComponentsTypes...>();
         Entity::Builder b(ei);
-        b.add_components(components...);
-        add_components_map(ei, b.components);
+        b.add_components(std::forward<ComponentsTypes>(components)...);
+        add_components_map(ei, std::move(b.components));
     }
 
-    void delayed_add_components_map(Entity::id_t, std::map<std::type_index, std::vector<std::uint8_t>>) noexcept;
+    void delayed_add_components_map(Entity::id_t, std::map<std::type_index, std::vector<std::uint8_t>>&&) noexcept;
 
     template <typename... ComponentsTypes>
     void delayed_add_components(const Entity::id_t ei, ComponentsTypes&&... components) noexcept
     {
         Component::types_check<ComponentsTypes...>();
         Entity::Builder b(ei);
-        b.add_components(components...);
+        b.add_components(std::forward<ComponentsTypes>(components)...);
         delayed_add_components_map(ei, std::move(b.components));
     }
     //--------------------------------------Component deletion-------------------------------------------
@@ -95,7 +99,7 @@ public:
         const std::type_index ts[] = {
             std::type_index(typeid(ComponentsTypes))...,
         };
-        remove_components(ei, ts, sizeof...(ComponentsTypes));
+        remove_components_list(ei, ts, sizeof...(ComponentsTypes));
     }
 
     void remove_components_list(Entity::id_t, const std::type_index*, std::size_t) noexcept;
@@ -104,13 +108,12 @@ public:
     void delayed_remove_components(const Entity::id_t ei) noexcept
     {
         Component::types_check<ComponentsTypes...>();
-        std::vector<std::type_index> ts = {
-            std::type_index(typeid(ComponentsTypes))...,
-        };
-        delayed_remove_components_list(ei, std::move(ts));
+        delayed_remove_components_list(ei, {
+                                               std::type_index(typeid(ComponentsTypes))...,
+                                           });
     }
 
-    void delayed_remove_components_list(Entity::id_t, std::vector<std::type_index>) noexcept;
+    void delayed_remove_components_list(Entity::id_t, std::vector<std::type_index>&&) noexcept;
 
     /// Does not provide a good performance, use it wisely
     template <typename ComponentType>
