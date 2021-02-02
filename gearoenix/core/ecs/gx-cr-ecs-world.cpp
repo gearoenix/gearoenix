@@ -3,19 +3,17 @@
 gearoenix::core::ecs::Entity::id_t gearoenix::core::ecs::World::create_entity_with_builder(Entity::Builder&& b) noexcept
 {
     Archetype::id_t archetype_id;
-    std::vector<std::vector<std::uint8_t>> cs;
-    cs.reserve(b.components.size());
-    for (auto& [t, c] : b.components) {
-        archetype_id.emplace(t);
-        cs.push_back(std::move(c));
+    archetype_id.reserve(b.components.size());
+    for (const auto& c : b.components) {
+        archetype_id.emplace_back(c.first);
     }
     GX_GUARD_LOCK(this)
     auto search = archetypes.find(archetype_id);
     if (archetypes.end() == search) {
-        search = archetypes.emplace(archetype_id, Archetype(archetype_id, cs)).first;
+        search = archetypes.emplace(archetype_id, Archetype(b.components)).first;
     }
     auto& archetype = search->second;
-    const auto index = archetype.allocate_entity(b.id, cs);
+    const auto index = archetype.allocate_entity(b.id, b.components);
     entities.emplace(b.id, Entity(std::move(archetype_id), index));
     return b.id;
 }
@@ -47,16 +45,12 @@ void gearoenix::core::ecs::World::delayed_delete_entity(const Entity::id_t id) n
     delayed_actions.emplace_back(id);
 }
 
-void gearoenix::core::ecs::World::add_components_map(
-    const Entity::id_t,
-    std::map<std::type_index, std::vector<std::uint8_t>>&&) noexcept
+void gearoenix::core::ecs::World::add_components_map(const Entity::id_t, Entity::Builder::components_t&&) noexcept
 {
     GX_UNIMPLEMENTED
 }
 
-void gearoenix::core::ecs::World::delayed_add_components_map(
-    const Entity::id_t ei,
-    std::map<std::type_index, std::vector<std::uint8_t>>&& cs) noexcept
+void gearoenix::core::ecs::World::delayed_add_components_map(const Entity::id_t ei, Entity::Builder::components_t&& cs) noexcept
 {
     GX_GUARD_LOCK(delayed_actions)
     delayed_actions.emplace_back(std::make_pair(ei, std::move(cs)));

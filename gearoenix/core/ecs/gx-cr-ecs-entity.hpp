@@ -16,10 +16,17 @@ struct Entity final {
 
     struct Builder final {
         friend struct World;
+        typedef std::pair<std::type_index, std::vector<std::uint8_t>> component_t;
+        typedef std::vector<component_t> components_t;
 
     private:
         const id_t id;
-        std::map<std::type_index, std::vector<std::uint8_t>> components;
+        components_t components;
+
+        constexpr static auto component_less = +[](const component_t& l, const component_t& r) constexpr noexcept
+        {
+            return std::less()(l.first, r.first);
+        };
 
         explicit Builder(id_t) noexcept;
 
@@ -34,14 +41,15 @@ struct Entity final {
         void add_component(ComponentType&& component) noexcept
         {
             Component::types_check<ComponentType>();
-            const std::type_index type_index(typeid(ComponentType));
+            auto c = std::make_pair(
+                Component::create_type_index<ComponentType>(),
+                std::vector<std::uint8_t>(sizeof(ComponentType)));
 #ifdef GX_DEBUG_MODE
-            if (components.contains(type_index))
+            if (std::binary_search(components.begin(), components.end(), c, component_less))
                 GX_LOG_F("Component '" << typeid(ComponentType).name() << "' already exists in entity '" << id)
 #endif
-            std::vector<std::uint8_t> data(sizeof(ComponentType));
-            new (data.data()) ComponentType(std::forward<ComponentType>(component));
-            components.emplace(type_index, std::move(data));
+            new (c.second.data()) ComponentType(std::forward<ComponentType>(component));
+            components.push_back(std::move(c));
         }
 
         template <typename... ComponentType>

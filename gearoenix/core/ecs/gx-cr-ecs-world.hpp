@@ -24,7 +24,7 @@ private:
     std::vector<std::variant<
         Entity::Builder,
         Entity::id_t,
-        std::pair<Entity::id_t, std::map<std::type_index, std::vector<std::uint8_t>>>,
+        std::pair<Entity::id_t, Entity::Builder::components_t>,
         std::pair<Entity::id_t, std::vector<std::type_index>>>>
         delayed_actions;
 
@@ -42,7 +42,7 @@ public:
         const auto id = ++Entity::last_id;
         auto search = archetypes.find(archetype_id);
         if (archetypes.end() == search) {
-            bool is_ok = false;
+            bool is_ok;
             std::tie(search, is_ok) = archetypes.emplace(archetype_id, Archetype::create<ComponentsTypes...>());
             if (!is_ok) {
                 GX_LOG_F("Problem in allocation of archetype");
@@ -70,7 +70,7 @@ public:
 
     void delayed_delete_entity(Entity::id_t) noexcept;
     //--------------------------------------Component addition-------------------------------------------
-    void add_components_map(Entity::id_t, std::map<std::type_index, std::vector<std::uint8_t>>&&) noexcept;
+    void add_components_map(Entity::id_t, Entity::Builder::components_t&&) noexcept;
 
     template <typename... ComponentsTypes>
     void add_components(const Entity::id_t ei, ComponentsTypes&&... components) noexcept
@@ -81,7 +81,7 @@ public:
         add_components_map(ei, std::move(b.components));
     }
 
-    void delayed_add_components_map(Entity::id_t, std::map<std::type_index, std::vector<std::uint8_t>>&&) noexcept;
+    void delayed_add_components_map(Entity::id_t, Entity::Builder::components_t&&) noexcept;
 
     template <typename... ComponentsTypes>
     void delayed_add_components(const Entity::id_t ei, ComponentsTypes&&... components) noexcept
@@ -97,7 +97,7 @@ public:
     {
         Component::types_check<ComponentsTypes...>();
         const std::type_index ts[] = {
-            std::type_index(typeid(ComponentsTypes))...,
+            Component::create_type_index<ComponentsTypes>()...,
         };
         remove_components_list(ei, ts, sizeof...(ComponentsTypes));
     }
@@ -108,9 +108,11 @@ public:
     void delayed_remove_components(const Entity::id_t ei) noexcept
     {
         Component::types_check<ComponentsTypes...>();
-        delayed_remove_components_list(ei, {
-                                               std::type_index(typeid(ComponentsTypes))...,
-                                           });
+        delayed_remove_components_list(
+            ei,
+            {
+                Component::create_type_index<ComponentsTypes>()...,
+            });
     }
 
     void delayed_remove_components_list(Entity::id_t, std::vector<std::type_index>&&) noexcept;
@@ -141,7 +143,7 @@ public:
         Component::query_types_check<ComponentsTypes...>();
         GX_GUARD_LOCK(this)
         for (auto& [a_id, archetype] : archetypes) {
-            if (!Archetype::satisfy<ComponentsTypes...>(a_id))
+            if (!archetype.satisfy<ComponentsTypes...>())
                 continue;
             archetype.parallel_system(fun);
         }

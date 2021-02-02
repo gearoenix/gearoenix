@@ -1,39 +1,38 @@
 #include "gx-cr-ecs-archetype.hpp"
 
-std::size_t gearoenix::core::ecs::Archetype::get_components_size(const std::vector<std::vector<std::uint8_t>>& cs) noexcept
+std::size_t gearoenix::core::ecs::Archetype::get_components_size(const Entity::Builder::components_t& cs) noexcept
 {
     std::size_t s = 0;
     for (const auto& c : cs)
-        s += c.size();
+        s += c.second.size();
     return s;
 }
 
-std::map<std::type_index, std::size_t> gearoenix::core::ecs::Archetype::get_components_indices(
-    const id_t& id,
-    const std::vector<std::vector<std::uint8_t>>& cs) noexcept
+gearoenix::core::ecs::Archetype::components_indices_t gearoenix::core::ecs::Archetype::get_components_indices(
+    const Entity::Builder::components_t& cs) noexcept
 {
-    std::size_t s = 0, i = 0;
-    std::map<std::type_index, std::size_t> cis;
-    for (const auto t : id) {
-        cis.emplace(t, s);
-        s += cs[i].size();
-        ++i;
+    const auto css = cs.size();
+    components_indices_t cis;
+    cis.reserve(css);
+    for (std::size_t i = 0, index = 0; i < css; ++i) {
+        const auto& c = cs[i];
+        const auto s = c.second.size();
+        cis.emplace_back(c.first, index);
+        index += s;
     }
     return cis;
 }
 
-gearoenix::core::ecs::Archetype::Archetype(
-    const id_t& id,
-    const std::vector<std::vector<std::uint8_t>>& cs) noexcept
+gearoenix::core::ecs::Archetype::Archetype(const Entity::Builder::components_t& cs) noexcept
     : components_size(get_components_size(cs))
-    , components_indices(get_components_indices(id, cs))
+    , components_indices(get_components_indices(cs))
     , entity_size(header_size + components_size)
 {
 }
 
 gearoenix::core::ecs::Archetype::Archetype(
     const std::size_t components_size,
-    std::map<std::type_index, std::size_t> components_indices) noexcept
+    components_indices_t&& components_indices) noexcept
     : components_size(components_size)
     , components_indices(std::move(components_indices))
     , entity_size(header_size + components_size)
@@ -56,11 +55,11 @@ void gearoenix::core::ecs::Archetype::allocate_entity(const entity_id_t id) noex
 
 std::size_t gearoenix::core::ecs::Archetype::allocate_entity(
     const entity_id_t ei,
-    const std::vector<std::vector<std::uint8_t>>& cs) noexcept
+    const Entity::Builder::components_t& cs) noexcept
 {
     allocate_entity(ei);
     for (const auto& c : cs)
-        data.insert(data.end(), c.begin(), c.end());
+        data.insert(data.end(), c.second.begin(), c.second.end());
     return 0;
 }
 
