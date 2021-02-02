@@ -68,9 +68,9 @@ public:
         return delayed_create_entity_with_builder(std::move(b));
     }
     //--------------------------------------Entity deletion----------------------------------------------
-    void delete_entity(Entity::id_t) noexcept;
+    void remove_entity(Entity::id_t) noexcept;
 
-    void delayed_delete_entity(Entity::id_t) noexcept;
+    void delayed_remove_entity(Entity::id_t) noexcept;
     //--------------------------------------Component addition-------------------------------------------
     void add_components_map(Entity::id_t, Entity::Builder::components_t&&) noexcept;
 

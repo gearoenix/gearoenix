@@ -143,7 +143,7 @@ private:
         return result;
     }
 
-    void delete_entity(std::size_t index) noexcept;
+    void remove_entity(std::size_t index) noexcept;
 
     template <typename T>
     [[nodiscard]] std::size_t get_component_index() noexcept
@@ -194,6 +194,7 @@ private:
 public:
     Archetype(Archetype&&) noexcept;
     Archetype(const Archetype&) = delete;
+    ~Archetype() noexcept;
 };
 }
 

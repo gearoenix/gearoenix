@@ -61,11 +61,26 @@ std::size_t gearoenix::core::ecs::Archetype::allocate_entity(
     return 0;
 }
 
-void gearoenix::core::ecs::Archetype::delete_entity(const std::size_t index) noexcept
+void gearoenix::core::ecs::Archetype::remove_entity(std::size_t index) noexcept
 {
-    data[index - header_size] = deleted;
+    auto flag_index = index - header_size;
+    data[flag_index] = deleted;
     for (const auto& ci : components_indices) {
         reinterpret_cast<Component*>(&data[index + ci.second])->~Component();
+    }
+    auto end_index = flag_index + entity_size;
+    if (end_index < data.size())
+        return;
+#ifdef GX_DEBUG_MODE
+    if (end_index != data.size()) {
+        GX_UNEXPECTED
+    }
+#endif
+    data.resize(flag_index);
+    for (flag_index -= entity_size; flag_index >= 0; flag_index -= entity_size) {
+        if ((data[flag_index] & deleted) != deleted)
+            return;
+        data.resize(flag_index);
     }
 }
 
@@ -74,4 +89,16 @@ gearoenix::core::ecs::Archetype::Archetype(Archetype&& o) noexcept
     , entity_size(o.entity_size)
     , data(std::move(o.data))
 {
+}
+
+gearoenix::core::ecs::Archetype::~Archetype() noexcept
+{
+    for (std::size_t i = 0; i < data.size(); i += entity_size) {
+        if ((data[i] & deleted) == deleted)
+            continue;
+        const auto index = i + header_size;
+        for (const auto& ci : components_indices) {
+            reinterpret_cast<Component*>(&data[index + ci.second])->~Component();
+        }
+    }
 }

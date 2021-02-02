@@ -31,7 +31,7 @@ gearoenix::core::ecs::Entity::id_t gearoenix::core::ecs::World::delayed_create_e
     return id;
 }
 
-void gearoenix::core::ecs::World::delete_entity(const Entity::id_t id) noexcept
+void gearoenix::core::ecs::World::remove_entity(const Entity::id_t id) noexcept
 {
     GX_GUARD_LOCK(this)
     const auto search = entities.find(id);
@@ -40,11 +40,11 @@ void gearoenix::core::ecs::World::delete_entity(const Entity::id_t id) noexcept
         return;
     }
     auto& e = search->second;
-    archetypes[e.archetype].delete_entity(e.index_in_archetype);
+    archetypes[e.archetype].remove_entity(e.index_in_archetype);
     entities.erase(search);
 }
 
-void gearoenix::core::ecs::World::delayed_delete_entity(const Entity::id_t id) noexcept
+void gearoenix::core::ecs::World::delayed_remove_entity(const Entity::id_t id) noexcept
 {
     GX_GUARD_LOCK(delayed_actions)
     delayed_actions.emplace_back(id);
