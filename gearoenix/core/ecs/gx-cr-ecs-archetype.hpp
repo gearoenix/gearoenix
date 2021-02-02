@@ -20,12 +20,13 @@ struct Archetype final {
 private:
     typedef archetype_id_t id_t;
     typedef std::uint8_t flag_t;
+    typedef std::map<std::type_index, std::size_t> components_indices_t;
 
     constexpr static flag_t deleted = 1;
 
     constexpr static std::size_t header_size = sizeof(flag_t) + sizeof(entity_id_t);
     const std::size_t components_size;
-    const std::map<std::type_index, std::size_t> components_indices;
+    const components_indices_t components_indices;
     const std::size_t entity_size;
 
     std::vector<std::uint8_t> data;
@@ -74,27 +75,27 @@ private:
     [[nodiscard]] static std::size_t get_components_size(const std::vector<std::vector<std::uint8_t>>&) noexcept;
 
     template <typename... ComponentsTypes>
-    [[nodiscard]] static std::map<std::type_index, std::size_t> get_components_indices() noexcept
+    [[nodiscard]] static components_indices_t get_components_indices() noexcept
     {
         Component::types_check<ComponentsTypes...>();
         std::size_t index = 0;
-        constexpr auto f = [&]<typename T>(T*) constexpr noexcept
-        {
-            const auto i = index;
-            index += sizeof(T);
-            return i;
+        components_indices_t indices {
+            { std::type_index(typeid(ComponentsTypes)), sizeof(ComponentsTypes) }...,
         };
-        return {
-            { std::type_index(typeid(ComponentsTypes)),
-                f(reinterpret_cast<ComponentsTypes*>(0)) }...,
-        };
+        // TODO sort
+        for (auto& i : indices) {
+            auto s = i.second;
+            i.second = index;
+            index += s;
+        }
+        return indices;
     }
 
-    [[nodiscard]] static std::map<std::type_index, std::size_t> get_components_indices(
+    [[nodiscard]] static components_indices_t get_components_indices(
         const id_t&, const std::vector<std::vector<std::uint8_t>>&) noexcept;
 
     Archetype(const id_t&, const std::vector<std::vector<std::uint8_t>>&) noexcept;
-    Archetype(std::size_t, std::map<std::type_index, std::size_t>) noexcept;
+    Archetype(std::size_t, components_indices_t) noexcept;
 
     template <typename... ComponentsTypes>
     [[nodiscard]] static Archetype create() noexcept

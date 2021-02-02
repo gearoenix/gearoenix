@@ -122,6 +122,22 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
             BOOST_TEST(false);
         }
     });
+    w.parallel_system((std::function<void(entity_id_t, Not<Speed>&, Position&)>)[&](entity_id_t ent, Not<Speed>&, Position & p) {
+        if (e2 == ent) {
+            BOOST_TEST(6.0 == p.x);
+            BOOST_TEST(7.0 == p.y);
+        } else {
+            BOOST_TEST(false);
+        }
+    });
+    w.parallel_system((std::function<void(entity_id_t, Speed&, Not<Position>&)>)[&](entity_id_t ent, Speed & s, Not<Position>&) {
+        if (e4 == ent) {
+            BOOST_TEST(12.0 == s.x);
+            BOOST_TEST(13.0 == s.y);
+        } else {
+            BOOST_TEST(false);
+        }
+    });
 }
 
 #endif
