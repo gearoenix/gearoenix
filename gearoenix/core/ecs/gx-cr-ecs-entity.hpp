@@ -4,8 +4,8 @@
 #include "../gx-cr-build-configuration.hpp"
 #include "gx-cr-ecs-component.hpp"
 #include "gx-cr-ecs-types.hpp"
+#include <algorithm>
 #include <atomic>
-#include <map>
 #include <vector>
 
 namespace gearoenix::core::ecs {
