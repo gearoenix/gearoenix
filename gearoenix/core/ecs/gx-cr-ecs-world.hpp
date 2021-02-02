@@ -30,6 +30,7 @@ private:
         delayed_actions;
 
 public:
+    World() noexcept = default;
     //--------------------------------------Entity creation----------------------------------------------
     /// You must know your context (state of world lock), unless you want to end up being deadlocked
     [[nodiscard]] Entity::id_t create_entity_with_builder(Entity::Builder&&) noexcept;
@@ -44,14 +45,14 @@ public:
         auto search = archetypes_map.find(archetype_id);
         if (archetypes_map.end() == search) {
             bool is_ok;
-            std::tie(search, is_ok) = archetypes_map.emplace(archetype_id, archetypes.size());
+            std::tie(search, is_ok) = archetypes_map.emplace(std::move(archetype_id), archetypes.size());
             if (!is_ok) {
                 GX_LOG_F("Problem in allocation of archetype")
             }
             archetypes.push_back(Archetype::create<ComponentsTypes...>());
         }
         const auto ai = search->second;
-        const auto index = archetypes[ai].allocate(id, std::forward<ComponentsTypes>(components)...);
+        const auto index = archetypes[ai].allocate(id, std::move(components)...);
         entities.emplace(id, Entity(ai, index));
         return id;
     }
@@ -134,15 +135,15 @@ public:
     }
 
     /// Highly optimized way of doing things
-    template <typename... ComponentsTypes>
-    void parallel_system(const std::function<void(Entity::id_t, ComponentsTypes&...)>& fun) noexcept
+    template <typename... ComponentsTypes, typename F>
+    void parallel_system(F fun) noexcept
     {
         Component::query_types_check<ComponentsTypes...>();
         GX_GUARD_LOCK(this)
         for (auto& archetype : archetypes) {
             if (!archetype.satisfy<ComponentsTypes...>())
                 continue;
-            archetype.parallel_system(fun);
+            archetype.parallel_system<ComponentsTypes...>(fun);
         }
     }
 

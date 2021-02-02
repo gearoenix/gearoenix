@@ -22,6 +22,9 @@ struct IsNot<Not<T>> {
 template <typename T>
 inline constexpr bool is_not = IsNot<T>::value;
 
+template <typename T>
+using not_t = typename IsNot<T>::type;
+
 template <typename... Args>
 struct CountNot {
 };

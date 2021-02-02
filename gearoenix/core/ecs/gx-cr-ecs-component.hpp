@@ -72,7 +72,7 @@ template <typename T>
 std::type_index gearoenix::core::ecs::Component::create_type_index() noexcept
 {
     query_type_check<T>();
-    return std::type_index(typeid(T));
+    return std::type_index(typeid(not_t<T>));
 }
 
 #endif

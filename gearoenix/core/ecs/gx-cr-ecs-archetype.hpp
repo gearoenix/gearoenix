@@ -61,19 +61,7 @@ private:
         bool result = true;
         (([&]<typename T>(T*) constexpr noexcept {
             if (result) {
-                if (is_not<T>) {
-                    result &= !std::binary_search(
-                        components_indices.begin(),
-                        components_indices.end(),
-                        std::make_pair(Component::create_type_index<typename IsNot<T>::type>(), 0),
-                        component_index_less);
-                } else {
-                    result &= std::binary_search(
-                        components_indices.begin(),
-                        components_indices.end(),
-                        std::make_pair(Component::create_type_index<T>(), 0),
-                        component_index_less);
-                }
+                result &= (is_not<T> != std::binary_search(components_indices.begin(), components_indices.end(), std::make_pair(Component::create_type_index<T>(), 0), component_index_less));
             }
         }(reinterpret_cast<ComponentsTypes*>(0))),
             ...);
@@ -138,8 +126,10 @@ private:
         Component::types_check<ComponentsTypes...>();
         allocate_entity(id);
         const auto result = data.size();
-        auto* const ptr = allocate_size(get_components_size<ComponentsTypes...>());
-        ((new (&ptr[get_component_index<ComponentsTypes>()]) ComponentsTypes(std::move(components))), ...);
+        if constexpr (sizeof...(ComponentsTypes) > 0) {
+            auto* const ptr = allocate_size(get_components_size<ComponentsTypes...>());
+            ((new (&ptr[get_component_index<ComponentsTypes>()]) ComponentsTypes(std::move(components))), ...);
+        }
         return result;
     }
 
@@ -155,7 +145,7 @@ private:
             std::make_pair(Component::create_type_index<T>(), 0),
             component_index_less);
 #ifdef GX_DEBUG_MODE
-        if (components_indices.end() == search && search->first == Component::create_type_index<T>())
+        if (components_indices.end() == search || search->first != Component::create_type_index<T>())
             GX_LOG_F("Component '" << typeid(T).name() << "' not found in this archetype.")
 #endif
         return search->second;
@@ -168,8 +158,8 @@ private:
         return *reinterpret_cast<ComponentType*>(&data[index + get_component_index<ComponentType>()]);
     }
 
-    template <typename... ComponentsTypes>
-    void parallel_system(const std::function<void(Entity::id_t, ComponentsTypes&...)>& fun) noexcept
+    template <typename... ComponentsTypes, typename F>
+    void parallel_system(F fun) noexcept
     {
         const std::size_t indices[] = {
             (is_not<ComponentsTypes> ? 0 : (sizeof(Entity::id_t) + get_component_index<ComponentsTypes>()))...,
@@ -177,13 +167,17 @@ private:
         auto range = PtrRange(data.data(), data.size(), entity_size);
         std::for_each(std::execution::par_unseq, range.begin(), range.end(), [&](std::uint8_t* ptr) {
             const auto flag = *reinterpret_cast<const flag_t*>(ptr);
+#ifdef GX_DEBUG_MODE
+            if (flag != deleted && flag != 0)
+                GX_UNEXPECTED
+#endif
             if (deleted == (deleted & flag))
                 return;
             ptr += sizeof(flag_t);
             const auto entity_id = *reinterpret_cast<const Entity::id_t*>(ptr);
             std::size_t index = 0;
             auto index_finder = [&]<typename T>(T*) noexcept -> T& {
-                auto c = reinterpret_cast<T*>(&ptr[indices[index]]);
+                T* const c = reinterpret_cast<T*>(&ptr[indices[index]]);
                 ++index;
                 return *c;
             };

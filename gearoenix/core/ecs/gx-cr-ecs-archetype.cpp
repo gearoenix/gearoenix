@@ -63,24 +63,24 @@ std::size_t gearoenix::core::ecs::Archetype::allocate_entity(
 
 void gearoenix::core::ecs::Archetype::remove_entity(std::size_t index) noexcept
 {
-    auto flag_index = index - header_size;
+    auto flag_index = static_cast<int>(index - header_size);
     data[flag_index] = deleted;
     for (const auto& ci : components_indices) {
         reinterpret_cast<Component*>(&data[index + ci.second])->~Component();
     }
-    auto end_index = flag_index + entity_size;
-    if (end_index < data.size())
+    auto end_index = flag_index + static_cast<int>(entity_size);
+    if (end_index < static_cast<int>(data.size()))
         return;
 #ifdef GX_DEBUG_MODE
-    if (end_index != data.size()) {
+    if (end_index != static_cast<int>(data.size())) {
         GX_UNEXPECTED
     }
 #endif
-    data.resize(flag_index);
-    for (flag_index -= entity_size; flag_index >= 0; flag_index -= entity_size) {
+    data.resize(static_cast<std::size_t>(flag_index));
+    for (flag_index -= static_cast<int>(entity_size); flag_index >= 0; flag_index -= static_cast<int>(entity_size)) {
         if ((data[flag_index] & deleted) != deleted)
             return;
-        data.resize(flag_index);
+        data.resize(static_cast<std::size_t>(flag_index));
     }
 }
 
