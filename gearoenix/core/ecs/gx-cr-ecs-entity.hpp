@@ -12,7 +12,7 @@ namespace gearoenix::core::ecs {
 struct World;
 struct Entity final {
     friend struct World;
-    typedef entity_id_t id_t;
+    typedef std::uint32_t id_t;
 
     struct Builder final {
         friend struct World;
@@ -50,6 +50,7 @@ struct Entity final {
 #endif
             new (c.second.data()) ComponentType(std::forward<ComponentType>(component));
             components.push_back(std::move(c));
+            std::sort(components.begin(), components.end(), component_less);
         }
 
         template <typename... ComponentType>
@@ -60,9 +61,9 @@ struct Entity final {
     };
 
 private:
-    Entity(archetype_id_t&& archetype, std::size_t index_in_archetype) noexcept;
+    Entity(std::size_t archetype, std::size_t index_in_archetype) noexcept;
     static std::atomic<id_t> last_id;
-    archetype_id_t archetype;
+    const std::size_t archetype;
     std::size_t index_in_archetype;
 
 public:

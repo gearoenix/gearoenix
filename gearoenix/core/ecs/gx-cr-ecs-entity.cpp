@@ -18,14 +18,14 @@ gearoenix::core::ecs::Entity::Builder::Builder(Builder&& o) noexcept
 {
 }
 
-gearoenix::core::ecs::Entity::Entity(archetype_id_t&& archetype, const std::size_t index_in_archetype) noexcept
-    : archetype(std::move(archetype))
+gearoenix::core::ecs::Entity::Entity(std::size_t archetype, const std::size_t index_in_archetype) noexcept
+    : archetype(archetype)
     , index_in_archetype(index_in_archetype)
 {
 }
 
 gearoenix::core::ecs::Entity::Entity(Entity&& o) noexcept
-    : archetype(std::move(o.archetype))
+    : archetype(o.archetype)
     , index_in_archetype(o.index_in_archetype)
 {
 }

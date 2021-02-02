@@ -20,18 +20,17 @@ struct Archetype final {
     friend struct World;
 
 private:
-    typedef archetype_id_t id_t;
+    typedef std::vector<std::type_index> id_t;
     typedef std::uint8_t flag_t;
     typedef std::pair<std::type_index, std::size_t> component_index_t;
     typedef std::vector<component_index_t> components_indices_t;
 
     constexpr static flag_t deleted = 1;
 
-    constexpr static std::size_t header_size = sizeof(flag_t) + sizeof(entity_id_t);
-    const std::size_t components_size;
+    constexpr static std::size_t header_size = sizeof(flag_t) + sizeof(Entity::id_t);
+
     const components_indices_t components_indices;
     const std::size_t entity_size;
-
     std::vector<std::uint8_t> data;
 
     constexpr static auto component_index_less = +[](const component_index_t& l, const component_index_t& r) constexpr noexcept
@@ -129,12 +128,12 @@ private:
         return *reinterpret_cast<T*>(allocate_size(sizeof(T)));
     }
 
-    void allocate_entity(entity_id_t) noexcept;
+    void allocate_entity(Entity::id_t) noexcept;
 
-    [[nodiscard]] std::size_t allocate_entity(entity_id_t, const Entity::Builder::components_t&) noexcept;
+    [[nodiscard]] std::size_t allocate_entity(Entity::id_t, const Entity::Builder::components_t&) noexcept;
 
     template <typename... ComponentsTypes>
-    [[nodiscard]] std::size_t allocate(const entity_id_t id, ComponentsTypes&&... components) noexcept
+    [[nodiscard]] std::size_t allocate(const Entity::id_t id, ComponentsTypes&&... components) noexcept
     {
         Component::types_check<ComponentsTypes...>();
         allocate_entity(id);
@@ -156,7 +155,7 @@ private:
             std::make_pair(Component::create_type_index<T>(), 0),
             component_index_less);
 #ifdef GX_DEBUG_MODE
-        if (components_indices.end() == search)
+        if (components_indices.end() == search && search->first == Component::create_type_index<T>())
             GX_LOG_F("Component '" << typeid(T).name() << "' not found in this archetype.")
 #endif
         return search->second;
@@ -170,10 +169,10 @@ private:
     }
 
     template <typename... ComponentsTypes>
-    void parallel_system(const std::function<void(entity_id_t, ComponentsTypes&...)>& fun) noexcept
+    void parallel_system(const std::function<void(Entity::id_t, ComponentsTypes&...)>& fun) noexcept
     {
         const std::size_t indices[] = {
-            (is_not<ComponentsTypes> ? 0 : (sizeof(entity_id_t) + get_component_index<ComponentsTypes>()))...,
+            (is_not<ComponentsTypes> ? 0 : (sizeof(Entity::id_t) + get_component_index<ComponentsTypes>()))...,
         };
         auto range = PtrRange(data.data(), data.size(), entity_size);
         std::for_each(std::execution::par_unseq, range.begin(), range.end(), [&](std::uint8_t* ptr) {
@@ -181,7 +180,7 @@ private:
             if (deleted == (deleted & flag))
                 return;
             ptr += sizeof(flag_t);
-            const auto entity_id = *reinterpret_cast<const entity_id_t*>(ptr);
+            const auto entity_id = *reinterpret_cast<const Entity::id_t*>(ptr);
             std::size_t index = 0;
             auto index_finder = [&]<typename T>(T*) noexcept -> T& {
                 auto c = reinterpret_cast<T*>(&ptr[indices[index]]);

@@ -8,13 +8,18 @@ gearoenix::core::ecs::Entity::id_t gearoenix::core::ecs::World::create_entity_wi
         archetype_id.emplace_back(c.first);
     }
     GX_GUARD_LOCK(this)
-    auto search = archetypes.find(archetype_id);
-    if (archetypes.end() == search) {
-        search = archetypes.emplace(archetype_id, Archetype(b.components)).first;
+    auto search = archetypes_map.find(archetype_id);
+    if (archetypes_map.end() == search) {
+        bool is_ok;
+        std::tie(search, is_ok) = archetypes_map.emplace(archetype_id, archetypes.size());
+        if (!is_ok)
+            GX_LOG_F("Insertion in archetype map was not successful")
+        archetypes.push_back(Archetype(b.components));
     }
-    auto& archetype = search->second;
+    const auto ai = search->second;
+    auto& archetype = archetypes[ai];
     const auto index = archetype.allocate_entity(b.id, b.components);
-    entities.emplace(b.id, Entity(std::move(archetype_id), index));
+    entities.emplace(b.id, Entity(ai, index));
     return b.id;
 }
 
@@ -35,7 +40,7 @@ void gearoenix::core::ecs::World::delete_entity(const Entity::id_t id) noexcept
         return;
     }
     auto& e = search->second;
-    archetypes.find(e.archetype)->second.delete_entity(e.index_in_archetype);
+    archetypes[e.archetype].delete_entity(e.index_in_archetype);
     entities.erase(search);
 }
 

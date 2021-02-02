@@ -73,7 +73,7 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
         BOOST_TEST(s.y == 13.0);
     }
 
-    w.parallel_system((std::function<void(entity_id_t, Position&)>)[&](entity_id_t ent, Position & p) {
+    w.parallel_system((std::function<void(Entity::id_t, Position&)>)[&](Entity::id_t ent, Position & p) {
         if (e1 == ent) {
             BOOST_TEST(2.0 == p.x);
             BOOST_TEST(3.0 == p.y);
@@ -87,13 +87,13 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
             BOOST_TEST(false);
         }
     });
-    w.parallel_system((std::function<void(entity_id_t, Not<Speed>&)>)[&](entity_id_t ent, Not<Speed>&) {
+    w.parallel_system((std::function<void(Entity::id_t, Not<Speed>&)>)[&](Entity::id_t ent, Not<Speed>&) {
         BOOST_TEST(e2 == ent);
     });
-    w.parallel_system((std::function<void(entity_id_t, Not<Position>&)>)[&](entity_id_t ent, Not<Position>&) {
+    w.parallel_system((std::function<void(Entity::id_t, Not<Position>&)>)[&](Entity::id_t ent, Not<Position>&) {
         BOOST_TEST(e4 == ent);
     });
-    w.parallel_system((std::function<void(entity_id_t, Speed&)>)[&](entity_id_t ent, Speed & s) {
+    w.parallel_system((std::function<void(Entity::id_t, Speed&)>)[&](Entity::id_t ent, Speed & s) {
         if (e1 == ent) {
             BOOST_TEST(4.0 == s.x);
             BOOST_TEST(5.0 == s.y);
@@ -107,7 +107,7 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
             BOOST_TEST(false);
         }
     });
-    w.parallel_system((std::function<void(entity_id_t, Speed&, Position&)>)[&](entity_id_t ent, Speed & s, Position & p) {
+    w.parallel_system((std::function<void(Entity::id_t, Speed&, Position&)>)[&](Entity::id_t ent, Speed & s, Position & p) {
         if (e1 == ent) {
             BOOST_TEST(2.0 == p.x);
             BOOST_TEST(3.0 == p.y);
@@ -122,7 +122,7 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
             BOOST_TEST(false);
         }
     });
-    w.parallel_system((std::function<void(entity_id_t, Not<Speed>&, Position&)>)[&](entity_id_t ent, Not<Speed>&, Position & p) {
+    w.parallel_system((std::function<void(Entity::id_t, Not<Speed>&, Position&)>)[&](Entity::id_t ent, Not<Speed>&, Position & p) {
         if (e2 == ent) {
             BOOST_TEST(6.0 == p.x);
             BOOST_TEST(7.0 == p.y);
@@ -130,7 +130,7 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
             BOOST_TEST(false);
         }
     });
-    w.parallel_system((std::function<void(entity_id_t, Speed&, Not<Position>&)>)[&](entity_id_t ent, Speed & s, Not<Position>&) {
+    w.parallel_system((std::function<void(Entity::id_t, Speed&, Not<Position>&)>)[&](Entity::id_t ent, Speed & s, Not<Position>&) {
         if (e4 == ent) {
             BOOST_TEST(12.0 == s.x);
             BOOST_TEST(13.0 == s.y);

@@ -5,8 +5,6 @@
 #include <vector>
 
 namespace gearoenix::core::ecs {
-typedef std::vector<std::type_index> archetype_id_t;
-typedef std::uint32_t entity_id_t;
 }
 
 #endif

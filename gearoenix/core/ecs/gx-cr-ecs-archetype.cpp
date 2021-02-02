@@ -24,17 +24,15 @@ gearoenix::core::ecs::Archetype::components_indices_t gearoenix::core::ecs::Arch
 }
 
 gearoenix::core::ecs::Archetype::Archetype(const Entity::Builder::components_t& cs) noexcept
-    : components_size(get_components_size(cs))
-    , components_indices(get_components_indices(cs))
-    , entity_size(header_size + components_size)
+    : components_indices(get_components_indices(cs))
+    , entity_size(header_size + get_components_size(cs))
 {
 }
 
 gearoenix::core::ecs::Archetype::Archetype(
     const std::size_t components_size,
     components_indices_t&& components_indices) noexcept
-    : components_size(components_size)
-    , components_indices(std::move(components_indices))
+    : components_indices(std::move(components_indices))
     , entity_size(header_size + components_size)
 {
 }
@@ -47,14 +45,14 @@ std::uint8_t* gearoenix::core::ecs::Archetype::allocate_size(const std::size_t s
     return &data[s];
 }
 
-void gearoenix::core::ecs::Archetype::allocate_entity(const entity_id_t id) noexcept
+void gearoenix::core::ecs::Archetype::allocate_entity(const Entity::id_t id) noexcept
 {
     allocate<flag_t>() = 0;
-    allocate<entity_id_t>() = id;
+    allocate<Entity::id_t>() = id;
 }
 
 std::size_t gearoenix::core::ecs::Archetype::allocate_entity(
-    const entity_id_t ei,
+    const Entity::id_t ei,
     const Entity::Builder::components_t& cs) noexcept
 {
     allocate_entity(ei);
@@ -72,8 +70,8 @@ void gearoenix::core::ecs::Archetype::delete_entity(const std::size_t index) noe
 }
 
 gearoenix::core::ecs::Archetype::Archetype(Archetype&& o) noexcept
-    : components_size(o.components_size)
-    , components_indices(o.components_indices)
+    : components_indices(o.components_indices)
     , entity_size(o.entity_size)
+    , data(std::move(o.data))
 {
 }

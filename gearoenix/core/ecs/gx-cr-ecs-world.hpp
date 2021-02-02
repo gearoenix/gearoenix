@@ -12,7 +12,8 @@ namespace gearoenix::core::ecs {
 struct World {
 private:
     GX_CREATE_GUARD(this)
-    std::map<Archetype::id_t, Archetype> archetypes;
+    std::map<Archetype::id_t, std::size_t> archetypes_map;
+    std::vector<Archetype> archetypes;
     // id -> (archetype, index)
     std::map<Entity::id_t, Entity> entities;
 
@@ -40,17 +41,18 @@ public:
         auto archetype_id = Archetype::create_id<ComponentsTypes...>();
         GX_GUARD_LOCK(this)
         const auto id = ++Entity::last_id;
-        auto search = archetypes.find(archetype_id);
-        if (archetypes.end() == search) {
+        auto search = archetypes_map.find(archetype_id);
+        if (archetypes_map.end() == search) {
             bool is_ok;
-            std::tie(search, is_ok) = archetypes.emplace(archetype_id, Archetype::create<ComponentsTypes...>());
+            std::tie(search, is_ok) = archetypes_map.emplace(archetype_id, archetypes.size());
             if (!is_ok) {
-                GX_LOG_F("Problem in allocation of archetype");
+                GX_LOG_F("Problem in allocation of archetype")
             }
+            archetypes.push_back(Archetype::create<ComponentsTypes...>());
         }
-        auto& archetype = search->second;
-        const auto index = archetype.allocate(id, std::forward<ComponentsTypes>(components)...);
-        entities.emplace(id, Entity(std::move(archetype_id), index));
+        const auto ai = search->second;
+        const auto index = archetypes[ai].allocate(id, std::forward<ComponentsTypes>(components)...);
+        entities.emplace(id, Entity(ai, index));
         return id;
     }
 
@@ -128,12 +130,7 @@ public:
             GX_LOG_F("Entity '" << id << "' not found.")
 #endif
         const auto& e = entity_search->second;
-        auto archetype_search = archetypes.find(e.archetype);
-#ifdef GX_DEBUG_MODE
-        if (archetypes.end() == archetype_search)
-            GX_LOG_F("Archetype for entity '" << id << "' not found.")
-#endif
-        return archetype_search->second.get_component<ComponentType>(e.index_in_archetype);
+        return archetypes[e.archetype].get_component<ComponentType>(e.index_in_archetype);
     }
 
     /// Highly optimized way of doing things
@@ -142,7 +139,7 @@ public:
     {
         Component::query_types_check<ComponentsTypes...>();
         GX_GUARD_LOCK(this)
-        for (auto& [a_id, archetype] : archetypes) {
+        for (auto& archetype : archetypes) {
             if (!archetype.satisfy<ComponentsTypes...>())
                 continue;
             archetype.parallel_system(fun);
