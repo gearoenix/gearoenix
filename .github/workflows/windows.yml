@@ -1,4 +1,4 @@
-name: Windows-2019
+name: 'Windows-2019  '
 on:
   push:
     branches: [ master ]
