@@ -47,7 +47,8 @@ jobs:
         run: |
           New-Item -ItemType Directory -Force -Path debug-build
           Set-Location -Path debug-build
-          cmake .. -DCMAKE_BUILD_TYPE=Debug
+          cmake ..
           cmake --build . --config Debug
           Set-Location -Path tests
-          ctest
+          Set-Location -Path Debug
+          .\GearoenixGameEngineTests.exe
