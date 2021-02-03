@@ -158,6 +158,17 @@ private:
         return *reinterpret_cast<ComponentType*>(&data[index + get_component_index<ComponentType>()]);
     }
 
+    template <typename... C, std::size_t... I, std::size_t N, typename F>
+    static void call_function(
+        std::index_sequence<I...> const&,
+        const Entity::id_t id,
+        std::uint8_t* const ptr,
+        const std::size_t (&indices)[N],
+        F f) noexcept
+    {
+        f(id, *reinterpret_cast<C*>(&ptr[indices[I]])...);
+    }
+
     template <typename... ComponentsTypes, typename F>
     void parallel_system(F fun) noexcept
     {
@@ -174,14 +185,9 @@ private:
             if (deleted == (deleted & flag))
                 return;
             ptr += sizeof(flag_t);
-            const auto entity_id = *reinterpret_cast<const Entity::id_t*>(ptr);
-            std::size_t index = 0;
-            auto index_finder = [&]<typename T>(T*) noexcept -> T& {
-                T* const c = reinterpret_cast<T*>(&ptr[indices[index]]);
-                ++index;
-                return *c;
-            };
-            fun(entity_id, index_finder(reinterpret_cast<ComponentsTypes*>(0))...);
+            const auto id = *reinterpret_cast<const Entity::id_t*>(ptr);
+            call_function<ComponentsTypes...>(
+                std::make_index_sequence<sizeof...(ComponentsTypes)> {}, id, ptr, indices, fun);
         });
     }
 
