@@ -5,7 +5,7 @@ gearoenix::core::ecs::Entity::id_t gearoenix::core::ecs::World::create_entity_wi
     Archetype::id_t archetype_id;
     archetype_id.reserve(b.components.size());
     for (const auto& c : b.components) {
-        archetype_id.emplace_back(c.first);
+        archetype_id.push_back(c.first);
     }
     GX_GUARD_LOCK(this)
     auto search = archetypes_map.find(archetype_id);
@@ -17,8 +17,7 @@ gearoenix::core::ecs::Entity::id_t gearoenix::core::ecs::World::create_entity_wi
         archetypes.push_back(Archetype(b.components));
     }
     const auto ai = search->second;
-    auto& archetype = archetypes[ai];
-    const auto index = archetype.allocate_entity(b.id, b.components);
+    const auto index = archetypes[ai].allocate_entity(b.id, b.components);
     entities.emplace(b.id, Entity(ai, index));
     return b.id;
 }

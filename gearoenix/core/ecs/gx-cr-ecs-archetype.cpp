@@ -56,9 +56,10 @@ std::size_t gearoenix::core::ecs::Archetype::allocate_entity(
     const Entity::Builder::components_t& cs) noexcept
 {
     allocate_entity(ei);
+    const std::size_t result = data.size();
     for (const auto& c : cs)
         data.insert(data.end(), c.second.begin(), c.second.end());
-    return 0;
+    return result;
 }
 
 void gearoenix::core::ecs::Archetype::remove_entity(std::size_t index) noexcept
