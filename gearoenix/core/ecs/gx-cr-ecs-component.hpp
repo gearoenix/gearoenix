@@ -14,7 +14,6 @@ struct Component {
     explicit Component(T*) noexcept;
     virtual ~Component() noexcept = default;
     virtual void display() noexcept { }
-    virtual void address_changed() noexcept { }
 
     template <typename T>
     constexpr static void type_check() noexcept;

@@ -111,8 +111,6 @@ std::optional<std::pair<gearoenix::core::ecs::Entity::id_t, std::size_t>> gearoe
     if (start_index + entity_size < data.size()) {
         const auto end_index = data.size() - entity_size;
         std::memcpy(&data[start_index], &data[end_index], entity_size);
-        for (const auto& ci : components_indices)
-            reinterpret_cast<Component*>(&data[index + ci.second])->address_changed();
         data.resize(end_index);
         return std::make_pair(*reinterpret_cast<Entity::id_t*>(&data[start_index]), start_index + header_size);
     }
