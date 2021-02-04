@@ -132,6 +132,8 @@ public:
         return archetypes[e.archetype].get_component<ComponentType>(e.index_in_archetype);
     }
 
+    [[nodiscard]] std::size_t get_archetype_index(const Entity::Builder::components_t& cs) noexcept;
+
     /// Highly optimized way of doing things
     template <typename... ComponentsTypes, typename F>
     void parallel_system(F fun) noexcept
@@ -146,6 +148,8 @@ public:
 
     /// It will do all the delayed actions
     void update() noexcept;
+
+    void update_entity(std::optional<std::pair<Entity::id_t, std::size_t>>&&) noexcept;
 };
 }
 

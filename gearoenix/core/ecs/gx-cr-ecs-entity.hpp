@@ -50,7 +50,7 @@ struct Entity final {
 #endif
             new (c.second.data()) ComponentType(std::forward<ComponentType>(component));
             components.push_back(std::move(c));
-            std::sort(components.begin(), components.end(), component_less);
+            sort(components);
         }
 
         template <typename... ComponentType>
@@ -58,13 +58,15 @@ struct Entity final {
         {
             ((add_component(std::move(cs))), ...);
         }
+
+        static void sort(components_t&) noexcept;
     };
 
 private:
     Entity(std::size_t archetype, std::size_t index_in_archetype) noexcept;
     static std::atomic<id_t> last_id;
-    const std::size_t archetype;
-    std::size_t index_in_archetype;
+    std::size_t archetype = static_cast<std::size_t>(-1);
+    std::size_t index_in_archetype = static_cast<std::size_t>(-1);
 
 public:
     Entity(Entity&&) noexcept;

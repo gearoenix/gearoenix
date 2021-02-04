@@ -228,6 +228,19 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
     e5 = w.create_entity_with_builder(std::move(b5));
 
     end_of_step();
+
+    e1 = w.create_entity();
+    e2 = w.create_entity();
+    e3 = w.create_entity();
+    e4 = w.create_entity();
+    e5 = w.create_entity();
+
+    w.add_components(e1, Position { 2.0, 3.0 }, Speed { 4.0, 5.0 });
+    w.add_components(e2, Position { 6.0, 7.0 });
+    w.add_components(e3, Speed { 10.0, 11.0 }, Position { 8.0, 9.0 });
+    w.add_components(e4, Speed { 12.0, 13.0 });
+
+    end_of_step();
 }
 
 #endif

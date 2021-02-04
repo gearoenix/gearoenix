@@ -18,6 +18,11 @@ gearoenix::core::ecs::Entity::Builder::Builder(Builder&& o) noexcept
 {
 }
 
+void gearoenix::core::ecs::Entity::Builder::sort(components_t& cs) noexcept
+{
+    std::sort(cs.begin(), cs.end(), component_less);
+}
+
 gearoenix::core::ecs::Entity::Entity(std::size_t archetype, const std::size_t index_in_archetype) noexcept
     : archetype(archetype)
     , index_in_archetype(index_in_archetype)

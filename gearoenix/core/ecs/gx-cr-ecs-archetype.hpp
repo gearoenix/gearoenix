@@ -156,6 +156,10 @@ private:
         return *reinterpret_cast<ComponentType*>(&data[index + get_component_index<ComponentType>()]);
     }
 
+    void move_out_entity(std::size_t index, Entity::Builder::components_t& components) noexcept;
+
+    [[nodiscard]] std::optional<std::pair<Entity::id_t, std::size_t>> move_from_back(std::size_t index) noexcept;
+
     template <typename... C, std::size_t... I, std::size_t N, typename F>
     static inline void call_function(
         std::index_sequence<I...> const&,
