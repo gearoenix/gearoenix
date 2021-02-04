@@ -134,6 +134,8 @@ public:
 
     [[nodiscard]] std::size_t get_archetype_index(const Entity::Builder::components_t& cs) noexcept;
 
+    [[nodiscard]] Entity& get_entity(Entity::id_t) noexcept;
+
     /// Highly optimized way of doing things
     template <typename... ComponentsTypes, typename F>
     void parallel_system(F fun) noexcept

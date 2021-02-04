@@ -1,4 +1,5 @@
 #include "gx-cr-ecs-archetype.hpp"
+#include <cstring>
 
 std::size_t gearoenix::core::ecs::Archetype::get_components_size(const Entity::Builder::components_t& cs) noexcept
 {
