@@ -47,7 +47,6 @@ std::uint8_t* gearoenix::core::ecs::Archetype::allocate_size(const std::size_t s
 
 void gearoenix::core::ecs::Archetype::allocate_entity(const Entity::id_t id) noexcept
 {
-    allocate<flag_t>() = 0;
     allocate<Entity::id_t>() = id;
 }
 
@@ -62,27 +61,26 @@ std::size_t gearoenix::core::ecs::Archetype::allocate_entity(
     return result;
 }
 
-void gearoenix::core::ecs::Archetype::remove_entity(std::size_t index) noexcept
+std::optional<std::pair<gearoenix::core::ecs::Entity::id_t, std::size_t>>
+gearoenix::core::ecs::Archetype::remove_entity(const std::size_t index) noexcept
 {
-    auto flag_index = static_cast<int>(index - header_size);
-    data[flag_index] = deleted;
-    for (const auto& ci : components_indices) {
+    const auto start_index = index - header_size;
+    for (const auto& ci : components_indices)
         reinterpret_cast<Component*>(&data[index + ci.second])->~Component();
+    if (start_index + entity_size < data.size()) {
+        const auto end_index = data.size() - entity_size;
+        std::memcpy(&data[start_index], &data[end_index], entity_size);
+        for (const auto& ci : components_indices)
+            reinterpret_cast<Component*>(&data[index + ci.second])->address_changed();
+        data.resize(end_index);
+        return std::make_pair(*reinterpret_cast<Entity::id_t*>(&data[start_index]), start_index + header_size);
     }
-    auto end_index = flag_index + static_cast<int>(entity_size);
-    if (end_index < static_cast<int>(data.size()))
-        return;
 #ifdef GX_DEBUG_MODE
-    if (end_index != static_cast<int>(data.size())) {
+    if (start_index + entity_size != data.size())
         GX_UNEXPECTED
-    }
 #endif
-    data.resize(static_cast<std::size_t>(flag_index));
-    for (flag_index -= static_cast<int>(entity_size); flag_index >= 0; flag_index -= static_cast<int>(entity_size)) {
-        if ((data[flag_index] & deleted) != deleted)
-            return;
-        data.resize(static_cast<std::size_t>(flag_index));
-    }
+    data.resize(start_index);
+    return std::nullopt;
 }
 
 gearoenix::core::ecs::Archetype::Archetype(Archetype&& o) noexcept
@@ -94,12 +92,7 @@ gearoenix::core::ecs::Archetype::Archetype(Archetype&& o) noexcept
 
 gearoenix::core::ecs::Archetype::~Archetype() noexcept
 {
-    for (std::size_t i = 0; i < data.size(); i += entity_size) {
-        if ((data[i] & deleted) == deleted)
-            continue;
-        const auto index = i + header_size;
-        for (const auto& ci : components_indices) {
+    for (std::size_t index = header_size; index < data.size(); index += entity_size)
+        for (const auto& ci : components_indices)
             reinterpret_cast<Component*>(&data[index + ci.second])->~Component();
-        }
-    }
 }

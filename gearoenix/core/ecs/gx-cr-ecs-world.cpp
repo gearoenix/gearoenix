@@ -7,7 +7,6 @@ gearoenix::core::ecs::Entity::id_t gearoenix::core::ecs::World::create_entity_wi
     for (const auto& c : b.components) {
         archetype_id.push_back(c.first);
     }
-    GX_GUARD_LOCK(this)
     auto search = archetypes_map.find(archetype_id);
     if (archetypes_map.end() == search) {
         bool is_ok;
@@ -32,15 +31,26 @@ gearoenix::core::ecs::Entity::id_t gearoenix::core::ecs::World::delayed_create_e
 
 void gearoenix::core::ecs::World::remove_entity(const Entity::id_t id) noexcept
 {
-    GX_GUARD_LOCK(this)
-    const auto search = entities.find(id);
+    auto search = entities.find(id);
+#ifdef GX_DEBUG_MODE
     if (entities.end() == search) {
         GX_LOG_E("Deleting an already deleted entity: " << id)
         return;
     }
+#endif
     auto& e = search->second;
-    archetypes[e.archetype].remove_entity(e.index_in_archetype);
+    const auto r = archetypes[e.archetype].remove_entity(e.index_in_archetype);
     entities.erase(search);
+    if (!r.has_value())
+        return;
+    auto [mid, mi] = *r;
+    search = entities.find(mid);
+#ifdef GX_DEBUG_MODE
+    if (entities.end() == search)
+        GX_LOG_F("Can not found the moved entity: " << mid)
+#endif
+    auto& me = search->second;
+    me.index_in_archetype = mi;
 }
 
 void gearoenix::core::ecs::World::delayed_remove_entity(const Entity::id_t id) noexcept

@@ -11,6 +11,7 @@
 #include <execution>
 #include <functional>
 #include <map>
+#include <optional>
 #include <type_traits>
 #include <vector>
 
@@ -21,13 +22,10 @@ struct Archetype final {
 
 private:
     typedef std::vector<std::type_index> id_t;
-    typedef std::uint8_t flag_t;
     typedef std::pair<std::type_index, std::size_t> component_index_t;
     typedef std::vector<component_index_t> components_indices_t;
 
-    constexpr static flag_t deleted = 1;
-
-    constexpr static std::size_t header_size = sizeof(flag_t) + sizeof(Entity::id_t);
+    constexpr static std::size_t header_size = sizeof(Entity::id_t);
 
     const components_indices_t components_indices;
     const std::size_t entity_size;
@@ -133,7 +131,7 @@ private:
         return result;
     }
 
-    void remove_entity(std::size_t index) noexcept;
+    std::optional<std::pair<Entity::id_t, std::size_t>> remove_entity(std::size_t index) noexcept;
 
     template <typename T>
     [[nodiscard]] std::size_t get_component_index() noexcept
@@ -159,7 +157,7 @@ private:
     }
 
     template <typename... C, std::size_t... I, std::size_t N, typename F>
-    static void call_function(
+    static inline void call_function(
         std::index_sequence<I...> const&,
         const Entity::id_t id,
         std::uint8_t* const ptr,
@@ -177,14 +175,6 @@ private:
         };
         auto range = PtrRange(data.data(), data.size(), entity_size);
         std::for_each(std::execution::par_unseq, range.begin(), range.end(), [&](std::uint8_t* ptr) {
-            const auto flag = *reinterpret_cast<const flag_t*>(ptr);
-#ifdef GX_DEBUG_MODE
-            if (flag != deleted && flag != 0)
-                GX_UNEXPECTED
-#endif
-            if (deleted == (deleted & flag))
-                return;
-            ptr += sizeof(flag_t);
             const auto id = *reinterpret_cast<const Entity::id_t*>(ptr);
             call_function<ComponentsTypes...>(
                 std::make_index_sequence<sizeof...(ComponentsTypes)> {}, id, ptr, indices, fun);

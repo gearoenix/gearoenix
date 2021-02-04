@@ -188,6 +188,22 @@ static void check_systems() noexcept
     BOOST_TEST(e4s);
 }
 
+static void delete_entities() noexcept
+{
+    w.remove_entity(e1);
+    w.remove_entity(e2);
+    w.remove_entity(e3);
+    w.remove_entity(e4);
+    w.remove_entity(e5);
+}
+
+static void end_of_step() noexcept
+{
+    check_components();
+    check_systems();
+    delete_entities();
+}
+
 BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
 {
     e1 = w.create_entity(Position { 2.0, 3.0 }, Speed { 4.0, 5.0 });
@@ -196,14 +212,7 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
     e4 = w.create_entity(Speed { 12.0, 13.0 });
     e5 = w.create_entity();
 
-    check_components();
-    check_systems();
-
-    w.remove_entity(e1);
-    w.remove_entity(e2);
-    w.remove_entity(e3);
-    w.remove_entity(e4);
-    w.remove_entity(e5);
+    end_of_step();
 
     Entity::Builder b1, b2, b3, b4, b5;
 
@@ -218,8 +227,7 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
     e4 = w.create_entity_with_builder(std::move(b4));
     e5 = w.create_entity_with_builder(std::move(b5));
 
-    check_components();
-    check_systems();
+    end_of_step();
 }
 
 #endif

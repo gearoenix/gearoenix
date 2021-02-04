@@ -11,7 +11,6 @@ namespace gearoenix::core::ecs {
 /// Main focus of this struct is performance of systems and memory usage
 struct World {
 private:
-    GX_CREATE_GUARD(this)
     std::map<Archetype::id_t, std::size_t> archetypes_map;
     std::vector<Archetype> archetypes;
     // id -> (archetype, index)
@@ -32,7 +31,7 @@ private:
 public:
     World() noexcept = default;
     //--------------------------------------Entity creation----------------------------------------------
-    /// You must know your context (state of world lock), unless you want to end up being deadlocked
+    /// You must know your context (state of world), unless you want to end up having race
     [[nodiscard]] Entity::id_t create_entity_with_builder(Entity::Builder&&) noexcept;
 
     template <typename... ComponentsTypes>
@@ -40,7 +39,6 @@ public:
     {
         Component::types_check<ComponentsTypes...>();
         auto archetype_id = Archetype::create_id<ComponentsTypes...>();
-        GX_GUARD_LOCK(this)
         const auto id = ++Entity::last_id;
         auto search = archetypes_map.find(archetype_id);
         if (archetypes_map.end() == search) {
@@ -139,7 +137,6 @@ public:
     void parallel_system(F fun) noexcept
     {
         Component::query_types_check<ComponentsTypes...>();
-        GX_GUARD_LOCK(this)
         for (auto& archetype : archetypes) {
             if (!archetype.satisfy<ComponentsTypes...>())
                 continue;
@@ -149,9 +146,6 @@ public:
 
     /// It will do all the delayed actions
     void update() noexcept;
-
-    /// It's really a time consuming operation use it rarely, but it can be really helpful for performance
-    void defragment() noexcept;
 };
 }
 
