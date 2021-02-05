@@ -451,6 +451,17 @@ void gearoenix::platform::Application::run(core::Application* core_app) noexcept
     }
 }
 
+void gearoenix::platform::Application::set_caption(const std::string& s) noexcept
+{
+    SDL_SetWindowTitle(window, s.c_str());
+}
+
+void gearoenix::platform::Application::set_window_fullscreen(const bool b) noexcept
+{
+    SDL_SetWindowFullscreen(window, b ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
+    base.configuration.set_fullscreen(b);
+}
+
 std::vector<const char*> gearoenix::platform::Application::get_vulkan_extensions() noexcept
 {
     std::uint32_t extensions_count = 0;

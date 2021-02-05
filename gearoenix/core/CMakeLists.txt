@@ -69,12 +69,12 @@ SET(GX_ENGINE_CORE_SRC
         ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-application.cpp
         ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-application.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-build-configuration.hpp
-#        ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-disable-warnings.hpp
-#        ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-enable-warnings.hpp
 #        ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-function-loader.cpp
 #        ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-function-loader.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-language.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-pool.hpp
+        ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-project.cpp
+        ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-project.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-range.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-string.cpp
         ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-string.hpp

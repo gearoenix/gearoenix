@@ -31,6 +31,8 @@ public:
     Application(GX_MAIN_ENTRY_ARGS_DEF, const RuntimeConfiguration& config = RuntimeConfiguration()) noexcept;
     ~Application() noexcept;
     void run(core::Application* = nullptr) noexcept;
+    void set_caption(const std::string&) noexcept;
+    void set_window_fullscreen(bool b) noexcept;
     [[nodiscard]] std::vector<const char*> get_vulkan_extensions() noexcept;
     void create_vulkan_surface(void* vulkan_instance, void* vulkan_data_ptr) const noexcept;
 };
