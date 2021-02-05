@@ -259,6 +259,66 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
     w.remove_components<Position, Speed>(e5);
 
     end_of_step();
+
+    // Delayed tests -------------------------------------------------------------
+
+    e1 = w.delayed_create_entity(Position { 2.0, 3.0 }, Speed { 4.0, 5.0 });
+    e2 = w.delayed_create_entity(Position { 6.0, 7.0 });
+    e3 = w.delayed_create_entity(Speed { 10.0, 11.0 }, Position { 8.0, 9.0 });
+    e4 = w.delayed_create_entity(Speed { 12.0, 13.0 });
+    e5 = w.delayed_create_entity();
+
+    w.update();
+    end_of_step();
+
+    Entity::Builder b21, b22, b23, b24, b25;
+
+    b21.add_components(Position { 2.0, 3.0 }, Speed { 4.0, 5.0 });
+    b22.add_component(Position { 6.0, 7.0 });
+    b23.add_components(Speed { 10.0, 11.0 }, Position { 8.0, 9.0 });
+    b24.add_components(Speed { 12.0, 13.0 });
+
+    e1 = w.delayed_create_entity_with_builder(std::move(b21));
+    e2 = w.delayed_create_entity_with_builder(std::move(b22));
+    e3 = w.delayed_create_entity_with_builder(std::move(b23));
+    e4 = w.delayed_create_entity_with_builder(std::move(b24));
+    e5 = w.delayed_create_entity_with_builder(std::move(b25));
+
+    w.update();
+    end_of_step();
+
+    e1 = w.delayed_create_entity();
+    e2 = w.delayed_create_entity();
+    e3 = w.delayed_create_entity();
+    e4 = w.delayed_create_entity();
+    e5 = w.delayed_create_entity();
+
+    w.delayed_add_components(e1, Position { 2.0, 3.0 }, Speed { 4.0, 5.0 });
+    w.delayed_add_components(e2, Position { 6.0, 7.0 });
+    w.delayed_add_components(e3, Speed { 10.0, 11.0 }, Position { 8.0, 9.0 });
+    w.delayed_add_components(e4, Speed { 12.0, 13.0 });
+
+    w.update();
+    end_of_step();
+
+    e1 = w.delayed_create_entity();
+    e2 = w.delayed_create_entity();
+    e3 = w.delayed_create_entity();
+    e4 = w.delayed_create_entity();
+    e5 = w.delayed_create_entity();
+
+    w.delayed_add_components(e1, Position { 2.0, 3.0 }, Speed { 4.0, 5.0 });
+    w.delayed_add_components(e2, Position { 6.0, 7.0 }, Speed { -1.0, -1.0 });
+    w.delayed_add_components(e3, Speed { 10.0, 11.0 }, Position { 8.0, 9.0 });
+    w.delayed_add_components(e4, Speed { 12.0, 13.0 }, Position { -1.0, -1.0 });
+    w.delayed_add_components(e5, Speed { -1.0, -1.0 }, Position { -1.0, -1.0 });
+
+    w.delayed_remove_components<Speed>(e2);
+    w.delayed_remove_components<Position>(e4);
+    w.delayed_remove_components<Position, Speed>(e5);
+
+    w.update();
+    end_of_step();
 }
 
 #endif

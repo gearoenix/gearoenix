@@ -133,6 +133,37 @@ gearoenix::core::ecs::Entity& gearoenix::core::ecs::World::get_entity(const Enti
     return search->second;
 }
 
+void gearoenix::core::ecs::World::update() noexcept
+{
+    decltype(delayed_actions) actions;
+    {
+        GX_GUARD_LOCK(delayed_actions)
+        std::swap(actions, delayed_actions);
+    }
+    for (auto& action : actions) {
+        switch (action.index()) {
+        case 0:
+            (void)create_entity_with_builder(std::get<0>(std::move(action)));
+            break;
+        case 1:
+            remove_entity(std::get<1>(std::move(action)));
+            break;
+        case 2: {
+            auto&& [id, cs] = std::get<2>(std::move(action));
+            add_components_map(id, std::move(cs));
+            break;
+        }
+        case 3: {
+            auto&& [id, ct] = std::get<3>(std::move(action));
+            remove_components_list(id, ct.data(), ct.size());
+            break;
+        }
+        default:
+            GX_UNEXPECTED
+        }
+    }
+}
+
 void gearoenix::core::ecs::World::update_entity(std::optional<std::pair<Entity::id_t, std::size_t>>&& r) noexcept
 {
     if (!r.has_value())

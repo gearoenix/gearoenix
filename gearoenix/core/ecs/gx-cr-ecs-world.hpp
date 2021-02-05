@@ -9,7 +9,7 @@ namespace gearoenix::core::ecs {
 /// The World of ECS
 ///
 /// Main focus of this struct is performance of systems and memory usage
-struct World {
+struct World final {
 private:
     std::map<Archetype::id_t, std::size_t> archetypes_map;
     std::vector<Archetype> archetypes;
