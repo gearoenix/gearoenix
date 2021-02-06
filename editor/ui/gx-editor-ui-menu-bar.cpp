@@ -1,19 +1,26 @@
 #include "gx-editor-ui-menu-bar.hpp"
 #include "../control/gx-editor-ctrl-manager.hpp"
+
 #include <gearoenix/platform/gx-plt-log.hpp>
 #include <gearoenix/platform/gx-plt-application.hpp>
+
 #include <imgui.h>
+#include <imgui_stdlib.h>
+#include <ImGuiFileDialog.h>
+
+constexpr static const char *const key_gltf_file_chooser = "key_gltf_file_chooser";
+constexpr static const char *const  filter_gltf_file = ".gltf";
 
 void gearoenix::editor::ui::MenuBar::show_project() noexcept {
+    auto& project = control_manager->get_project();
     if (ImGui::BeginMenu("Project"))
     {
-        auto& project_ctrl = control_manager->get_project();
         if (ImGui::MenuItem("New", "Ctrl+N"))
-            show_new_project_popup = true;
+            show_project_new_popup = true;
 
         if (ImGui::MenuItem("Open", "Ctrl+O")) {}
 
-        const auto& recent_files = project_ctrl.get_recent_file_addresses();
+        const auto& recent_files = project.get_recent_file_addresses();
         if (ImGui::BeginMenu("Open Recent", !recent_files.empty()))
         {
             for(const auto& f: recent_files) {
@@ -22,51 +29,64 @@ void gearoenix::editor::ui::MenuBar::show_project() noexcept {
             ImGui::EndMenu();
         }
 
-        const auto& core_project = project_ctrl.get_project();
-        if (ImGui::MenuItem("Save", "Ctrl+S", false, core_project.has_value())) {}
-        if (ImGui::MenuItem("Save As..", "Ctrl+Shift+S", false, core_project.has_value())) {}
-        if (ImGui::MenuItem("Settings", "Ctrl+Alt+P", false, core_project.has_value())) {}
+        if (ImGui::MenuItem("Save", "Ctrl+S", false, project.is_project_opened())) {}
+        if (ImGui::MenuItem("Save As..", "Ctrl+Shift+S", false, project.is_project_opened())) {}
+        if (ImGui::MenuItem("Settings", "Ctrl+Alt+P", false, project.is_project_opened())) {}
         if (ImGui::MenuItem("Quit", "Ctrl+Shift+Q")) {}
         ImGui::EndMenu();
     }
 
 
 
-    if(show_new_project_popup) {
+    if(show_project_new_popup) {
         ImGui::OpenPopup("New Project");
         ImVec2 center(ImGui::GetIO().DisplaySize.x * 0.5f, ImGui::GetIO().DisplaySize.y * 0.5f);
         ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-        if (ImGui::BeginPopupModal("New Project", &show_new_project_popup, ImGuiWindowFlags_AlwaysAutoResize)) {
-            ImGui::Text("New project name:");
-//
-//            // Testing behavior of widgets stacking their own regular popups over the modal.
-//            static int item = 1;
-//            static float color[4] = { 0.4f, 0.7f, 0.0f, 0.5f };
-//            ImGui::Combo("Combo", &item, "aaaa\0bbbb\0cccc\0dddd\0eeee\0\0");
-//            ImGui::ColorEdit4("color", color);
-//
-//            if (ImGui::Button("Add another modal.."))
-//                ImGui::OpenPopup("Stacked 2");
-//
-//            // Also demonstrate passing a bool* to BeginPopupModal(), this will create a regular close button which
-//            // will close the popup. Note that the visibility state of popups is owned by imgui, so the input value
-//            // of the bool actually doesn't matter here.
-//            bool unused_open = true;
-//            if (ImGui::BeginPopupModal("Stacked 2", &unused_open))
-//            {
-//                ImGui::Text("Hello from Stacked The Second!");
-//                if (ImGui::Button("Close"))
-//                    ImGui::CloseCurrentPopup();
-//                ImGui::EndPopup();
-//            }
-
-            if (ImGui::Button("Close")) {
-                show_new_project_popup = false;
-                ImGui::CloseCurrentPopup();
+        if (ImGui::BeginPopupModal("New Project", &show_project_new_popup, ImGuiWindowFlags_AlwaysAutoResize)) {
+            ImGui::InputText("New project name", &project.get_project_name());
+            if(!project.get_project_name().empty()) {
+                if (ImGui::Button("Create")) {
+                    // TODO check for existence of a current unsaved project
+                    project.create_project();
+                    show_project_new_popup = false;
+                    ImGui::CloseCurrentPopup();
+                }
             }
             ImGui::EndPopup();
         }
     }
+}
+
+void gearoenix::editor::ui::MenuBar::show_scene() noexcept {
+    if (ImGui::BeginMenu("Scene"))
+    {
+        auto& project = control_manager->get_project();
+        if (ImGui::MenuItem("New", "Alt+S,Alt+N", false, project.is_project_opened())) {}
+        if (ImGui::MenuItem("Import", "Alt+S,Alt+I", false, project.is_project_opened())) {
+//            show_scene_import_popup = true;
+            ImGuiFileDialog::Instance()->OpenDialog(key_gltf_file_chooser, "Import GLTF file", filter_gltf_file, ".");
+        }
+        if (ImGui::MenuItem("Delete", "Alt+S,Alt+Del", false, false)) {}
+        if (ImGui::MenuItem("Settings", "Alt+S,Alt+S", false, false)) {}
+        ImGui::EndMenu();
+    }
+//    if(show_scene_import_popup) {
+
+        // display
+        if (ImGuiFileDialog::Instance()->Display(key_gltf_file_chooser))
+        {
+            // action if OK
+            if (ImGuiFileDialog::Instance()->IsOk())
+            {
+                std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+                std::string filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
+                // action
+            }
+
+            // close
+            ImGuiFileDialog::Instance()->Close();
+        }
+//    }
 }
 
 gearoenix::editor::ui::MenuBar::MenuBar(
@@ -80,15 +100,8 @@ gearoenix::editor::ui::MenuBar::MenuBar(
 void gearoenix::editor::ui::MenuBar::update() noexcept {
     if (ImGui::BeginMainMenuBar())
     {
-
         show_project();
-        if (ImGui::BeginMenu("Scene"))
-        {
-            if (ImGui::MenuItem("New", "Ctrl+Shift+N", false, false)) {}
-            if (ImGui::MenuItem("Delete", "Ctrl+Shift+Del", false, false)) {}
-            if (ImGui::MenuItem("Settings", "Ctrl+Alt+S", false, false)) {}
-            ImGui::EndMenu();
-        }
+        show_scene();
         if (ImGui::BeginMenu("Object"))
         {
             if (ImGui::MenuItem("New", "Alt+O,Alt+N", false, false)) {}

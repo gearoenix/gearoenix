@@ -15,6 +15,7 @@ namespace gearoenix::editor::control {
 
     public:
         explicit Manager(platform::Application* platform_application) noexcept;
+        void caption_changed() noexcept;
     };
 }
 

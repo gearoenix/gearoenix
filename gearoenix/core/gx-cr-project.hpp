@@ -15,9 +15,9 @@ public:
     explicit Project(std::string name) noexcept;
 
     Project(const Project&) = delete;
-    Project(const Project&&) = delete;
+    Project(Project&&) noexcept;
     Project& operator=(const Project&) = delete;
-    Project& operator=(const Project&&) = delete;
+    Project& operator=(Project&&) = delete;
 };
 }
 

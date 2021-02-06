@@ -93,6 +93,12 @@ GX_DOWNLOAD_FILE("https://github.com/ocornut/imgui/archive/master.zip" "${GX_IMG
 GX_PREPARE_IMGUI(${GX_IMGUI_PATH})
 INCLUDE_DIRECTORIES(${GX_IMGUI_PATH})
 INCLUDE_DIRECTORIES(${GX_IMGUI_PATH}/backends)
+INCLUDE_DIRECTORIES(${GX_IMGUI_PATH}/misc/cpp)
+
+SET(GX_IMGUI_FB_PATH "${GX_SDK_PATH}/imgui-fb")
+GX_DOWNLOAD_FILE("https://github.com/aiekick/ImGuiFileDialog/archive/Lib_Only.zip" "${GX_IMGUI_FB_PATH}")
+GX_PREPARE_IMGUI_FB(${GX_IMGUI_FB_PATH})
+INCLUDE_DIRECTORIES(${GX_IMGUI_FB_PATH})
 
 SET(GX_BOOST_PATH "${GX_SDK_PATH}/boost")
 GX_DOWNLOAD_FILE("https://dl.bintray.com/boostorg/release/1.74.0/source/boost_1_74_0.zip" "${GX_BOOST_PATH}")

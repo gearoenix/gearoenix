@@ -1,7 +1,7 @@
-#include <gearoenix/core/gx-cr-application.hpp>
-#include <gearoenix/platform/gx-plt-log.hpp>
 #include "ui/gx-editor-ui-manager.hpp"
 #include "control/gx-editor-ctrl-manager.hpp"
+
+#include <gearoenix/core/gx-cr-application.hpp>
 
 namespace gearoenix::editor {
     struct Application final : public core::Application {
@@ -20,7 +20,6 @@ gearoenix::editor::Application::Application(platform::Application* plt_app) noex
         , control_manager(plt_app)
         , ui_manager(plt_app, &control_manager)
 {
-    platform_application->set_caption("Gearoenix Game Engine Editor - [ no project ]");
 }
 
 void gearoenix::editor::Application::update() noexcept
