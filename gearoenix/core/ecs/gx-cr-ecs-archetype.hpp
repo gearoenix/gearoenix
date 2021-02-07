@@ -3,12 +3,12 @@
 #include "../../platform/gx-plt-log.hpp"
 #include "../gx-cr-build-configuration.hpp"
 #include "../gx-cr-range.hpp"
+#include "../sync/gx-cr-sync-parallel-for.hpp"
 #include "gx-cr-ecs-component.hpp"
 #include "gx-cr-ecs-entity.hpp"
 #include "gx-cr-ecs-not.hpp"
 #include "gx-cr-ecs-types.hpp"
 #include <algorithm>
-#include <execution>
 #include <functional>
 #include <map>
 #include <optional>
@@ -178,7 +178,7 @@ private:
             (is_not<ComponentsTypes> ? 0 : (sizeof(Entity::id_t) + get_component_index<ComponentsTypes>()))...,
         };
         auto range = PtrRange(data.data(), data.size(), entity_size);
-        std::for_each(std::execution::par_unseq, range.begin(), range.end(), [&](std::uint8_t* ptr) {
+        sync::ParallelFor::exec(range.begin(), range.end(), [&](std::uint8_t* ptr) {
             const auto id = *reinterpret_cast<const Entity::id_t*>(ptr);
             call_function<ComponentsTypes...>(
                 std::make_index_sequence<sizeof...(ComponentsTypes)> {}, id, ptr, indices, fun);

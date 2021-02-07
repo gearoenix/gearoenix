@@ -1,8 +1,9 @@
 #ifndef GEAROENIX_CORE_SYNC_PARALLEL_FOR_HPP
 #define GEAROENIX_CORE_SYNC_PARALLEL_FOR_HPP
 #include "../gx-cr-build-configuration.hpp"
-#include <functional>
+
 #ifndef GX_THREAD_NOT_SUPPORTED
+#include <functional>
 #include <map>
 #include <thread>
 
@@ -13,7 +14,7 @@ struct KernelWorkers;
 #endif
 
 namespace gearoenix::core::sync {
-struct ParallelFor {
+struct ParallelFor final {
 #ifndef GX_THREAD_NOT_SUPPORTED
 public:
     typedef std::map<std::thread::id, std::pair<std::unique_ptr<KernelWorkers>, std::function<void(unsigned int, unsigned int)>>> Map;
@@ -27,16 +28,16 @@ public:
     ParallelFor() = delete;
     ~ParallelFor() = delete;
 
-    template <typename Iter, struct Fun>
+    template <typename Iter, typename Fun>
     static void exec(Iter first, Iter end, Fun f)
     {
 #ifdef GX_THREAD_NOT_SUPPORTED
         for (; first != end; ++first)
-            f(first);
+            f(*first);
 #else
-        exec([f, first, end](unsigned int kernels_count, unsigned int kernel_index) noexcept {
-            for (Iter iter = first + kernel_index; iter < end; iter += kernels_count) {
-                f(iter);
+        exec([f, first, end](const unsigned int kernels_count, const unsigned int kernel_index) noexcept {
+            for (Iter iter = (first + kernel_index); iter != end; iter += kernels_count) {
+                f(*iter);
             }
         });
 #endif

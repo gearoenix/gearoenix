@@ -15,9 +15,9 @@ struct Semaphore;
 #endif
 
 namespace gearoenix::core::sync {
-struct KernelWorkers {
+struct KernelWorkers final {
 private:
-    struct Worker {
+    struct Worker final {
 #ifndef GX_THREAD_NOT_SUPPORTED
         const std::vector<std::shared_ptr<Semaphore>> waits;
         const std::vector<std::shared_ptr<Semaphore>> signals;

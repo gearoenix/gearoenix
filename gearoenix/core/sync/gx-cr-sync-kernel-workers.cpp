@@ -124,6 +124,7 @@ void gearoenix::core::sync::KernelWorkers::do_steps() noexcept
 unsigned int gearoenix::core::sync::KernelWorkers::get_threads_count() const noexcept
 {
 #ifdef GX_THREAD_NOT_SUPPORTED
+    (void)this;
     return static_cast<unsigned int>(1);
 #else
     return static_cast<unsigned int>(threads.size());

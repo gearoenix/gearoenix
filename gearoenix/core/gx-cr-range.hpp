@@ -7,14 +7,14 @@
 
 namespace gearoenix::core {
 template <typename T>
-struct PtrRange {
+struct PtrRange final {
 private:
     T* const ptr;
     T* const end_ptr;
     const std::size_t count, jump;
 
 public:
-    struct Iterator {
+    struct Iterator final {
     private:
         T* ptr = nullptr;
         T* end_ptr = nullptr;
@@ -37,6 +37,8 @@ public:
         constexpr reference operator*() noexcept;
         template <typename I>
         constexpr Iterator& operator+=(I increment) noexcept;
+        template <typename I>
+        constexpr Iterator operator+(I increment) const noexcept;
         [[nodiscard]] constexpr bool operator==(const Iterator& o) const noexcept;
         [[nodiscard]] constexpr bool operator!=(const Iterator& o) const noexcept;
         constexpr void swap(Iterator& o) noexcept;
@@ -101,6 +103,16 @@ constexpr typename gearoenix::core::PtrRange<T>::Iterator& gearoenix::core::PtrR
     if (end_ptr < ptr)
         ptr = end_ptr;
     return *this;
+}
+
+template <typename T>
+template <typename I>
+constexpr typename gearoenix::core::PtrRange<T>::Iterator gearoenix::core::PtrRange<T>::Iterator::operator+(const I increment) const noexcept
+{
+    auto new_ptr = ptr + (increment * jump);
+    if (end_ptr < new_ptr)
+        new_ptr = end_ptr;
+    return Iterator(new_ptr, jump, end_ptr);
 }
 
 template <typename T>
