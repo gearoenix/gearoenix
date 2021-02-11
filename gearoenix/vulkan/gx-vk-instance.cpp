@@ -185,6 +185,7 @@ std::optional<gearoenix::vulkan::Instance> gearoenix::vulkan::Instance::construc
     app_info.pEngineName = GX_ENGINE_NAME;
     std::vector<const char*> instance_extensions;
     instance_extensions.push_back(VK_KHR_SURFACE_EXTENSION_NAME);
+    instance_extensions.push_back(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
 #ifdef GX_PLATFORM_ANDROID
     instance_extensions.push_back(VK_KHR_ANDROID_SURFACE_EXTENSION_NAME);
 #elif defined(GX_PLATFORM_LINUX)

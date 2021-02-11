@@ -1,6 +1,8 @@
 #include "gx-vk-dev-physical.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
+#include "../../core/macro/gx-cr-mcr-assert.hpp"
 #include "../../core/macro/gx-cr-mcr-flagger.hpp"
+#include "../../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../../math/gx-math-numeric.hpp"
 #include "../gx-vk-check.hpp"
 #include "../gx-vk-instance.hpp"
@@ -70,6 +72,73 @@ int gearoenix::vulkan::device::Physical::is_good(VkPhysicalDevice gpu) noexcept
     return -1;
 }
 
+void gearoenix::vulkan::device::Physical::initialize_extensions() noexcept
+{
+    std::uint32_t ext_count = 0;
+    GX_VK_CHK(vkEnumerateDeviceExtensionProperties(vulkan_data, nullptr, &ext_count, nullptr))
+    if (ext_count <= 0)
+        return;
+    std::vector<VkExtensionProperties> extensions(static_cast<std::size_t>(ext_count));
+    GX_VK_CHK(vkEnumerateDeviceExtensionProperties(vulkan_data, nullptr, &ext_count, extensions.data()))
+    for (auto& ext : extensions) {
+        supported_extensions.emplace(ext.extensionName);
+    }
+    if (supported_extensions.contains(VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME) && supported_extensions.contains(VK_KHR_RAY_QUERY_EXTENSION_NAME) && supported_extensions.contains(VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME) && supported_extensions.contains(VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME)) {
+        rtx_supported = true;
+    }
+    GX_LOG_D("Supported extensions are:")
+    for (auto& s : supported_extensions) {
+        GX_LOG_D("    " << s)
+    }
+}
+
+void gearoenix::vulkan::device::Physical::initialize_features() noexcept
+{
+    vkGetPhysicalDeviceFeatures(vulkan_data, &features);
+    VkPhysicalDeviceFeatures2 info;
+    GX_SET_ZERO(info)
+    info.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
+
+    GX_SET_ZERO(ray_query_features)
+    ray_query_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_QUERY_FEATURES_KHR;
+
+    GX_SET_ZERO(ray_tracing_pipeline_features)
+    ray_tracing_pipeline_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR;
+
+    if (rtx_supported) {
+        info.pNext = &ray_query_features;
+        vkGetPhysicalDeviceFeatures2(vulkan_data, &info);
+
+        info.pNext = &ray_tracing_pipeline_features;
+        vkGetPhysicalDeviceFeatures2(vulkan_data, &info);
+    }
+}
+
+void gearoenix::vulkan::device::Physical::initialize_properties() noexcept
+{
+    vkGetPhysicalDeviceProperties(vulkan_data, &properties);
+    GX_LOG_D("Physical device name is: " << properties.deviceName)
+    vkGetPhysicalDeviceMemoryProperties(vulkan_data, &memory_properties);
+
+    std::uint32_t count = 0;
+    vkGetPhysicalDeviceQueueFamilyProperties(vulkan_data, &count, nullptr);
+    GX_CHECK_NOT_EQUAL_D(0, count)
+    queue_family_properties.resize(count);
+    vkGetPhysicalDeviceQueueFamilyProperties(vulkan_data, &count, queue_family_properties.data());
+
+    VkPhysicalDeviceProperties2 info;
+    GX_SET_ZERO(info)
+    info.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
+
+    GX_SET_ZERO(ray_tracing_pipeline_properties)
+    ray_tracing_pipeline_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_PROPERTIES_KHR;
+
+    if (rtx_supported) {
+        info.pNext = &ray_tracing_pipeline_properties;
+        vkGetPhysicalDeviceProperties2(vulkan_data, &info);
+    }
+}
+
 gearoenix::vulkan::device::Physical::Physical(const Surface& surf) noexcept
     : surface(surf)
     , properties {}
@@ -103,31 +172,9 @@ gearoenix::vulkan::device::Physical::Physical(const Surface& surf) noexcept
     }
     vulkan_data = gpus[best_device_index];
     GX_LOG_D("Physical device point is: " << is_good(vulkan_data))
-    vkGetPhysicalDeviceProperties(vulkan_data, &properties);
-    GX_LOG_D("Physical device name is: " << properties.deviceName)
-    vkGetPhysicalDeviceFeatures(vulkan_data, &features);
-    vkGetPhysicalDeviceMemoryProperties(vulkan_data, &memory_properties);
-    uint32_t queue_family_count = 0;
-    vkGetPhysicalDeviceQueueFamilyProperties(vulkan_data, &queue_family_count, nullptr);
-    if (1 > queue_family_count) {
-        GX_LOG_F("queue_family_count value is unexpected.")
-    }
-    queue_family_properties.resize(queue_family_count);
-    vkGetPhysicalDeviceQueueFamilyProperties(vulkan_data, &queue_family_count, queue_family_properties.data());
-    std::uint32_t ext_count = 0;
-    vkEnumerateDeviceExtensionProperties(vulkan_data, nullptr, &ext_count, nullptr);
-    if (ext_count > 0) {
-        std::vector<VkExtensionProperties> extensions(ext_count);
-        if (vkEnumerateDeviceExtensionProperties(vulkan_data, nullptr, &ext_count, &extensions.front()) == VK_SUCCESS) {
-            for (auto ext : extensions) {
-                supported_extensions.emplace(ext.extensionName);
-            }
-        }
-    }
-    GX_LOG_D("Supported extensions are:")
-    for (auto& s : supported_extensions) {
-        GX_LOG_D("    " << s)
-    }
+    initialize_extensions();
+    initialize_features();
+    initialize_properties();
     std::uint32_t count = 0;
     vkGetPhysicalDeviceSurfaceFormatsKHR(vulkan_data, surface.get_vulkan_data(), &count, nullptr);
     surface_formats.resize(static_cast<std::size_t>(count));

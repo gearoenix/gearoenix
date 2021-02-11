@@ -10,11 +10,24 @@ gearoenix::vulkan::device::Logical::Logical(const Physical& p) noexcept
 {
     std::vector<const char*> device_extensions;
     device_extensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
+    const auto& available_extensions = p.get_supported_extensions();
 #ifdef GX_VULKAN_DEVICE_DEBUG_MODE
-    if (p.get_supported_extensions().contains(VK_EXT_DEBUG_MARKER_EXTENSION_NAME)) {
+    if (available_extensions.contains(VK_EXT_DEBUG_MARKER_EXTENSION_NAME)) {
         device_extensions.push_back(VK_EXT_DEBUG_MARKER_EXTENSION_NAME);
     }
 #endif
+    if (p.get_rtx_supported()) {
+        device_extensions.push_back(VK_KHR_DEDICATED_ALLOCATION_EXTENSION_NAME);
+        device_extensions.push_back(VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME);
+        device_extensions.push_back(VK_KHR_MAINTENANCE3_EXTENSION_NAME);
+        device_extensions.push_back(VK_KHR_PIPELINE_LIBRARY_EXTENSION_NAME);
+        device_extensions.push_back(VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME);
+        device_extensions.push_back(VK_KHR_SHADER_CLOCK_EXTENSION_NAME);
+        device_extensions.push_back(VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME);
+        device_extensions.push_back(VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME);
+        device_extensions.push_back(VK_KHR_RAY_QUERY_EXTENSION_NAME);
+        device_extensions.push_back(VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME);
+    }
     const float queue_priorities[] = { 1.0f };
     std::set<std::uint32_t> queue_index_set;
     queue_index_set.insert(physical_device.get_graphics_queue_node_index());

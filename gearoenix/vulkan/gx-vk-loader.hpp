@@ -90,9 +90,11 @@
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkEnumerateInstanceVersion);                     \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkEnumeratePhysicalDevices);                     \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetPhysicalDeviceFeatures);                    \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetPhysicalDeviceFeatures2);                   \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetPhysicalDeviceFormatProperties);            \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetPhysicalDeviceImageFormatProperties);       \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetPhysicalDeviceProperties);                  \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetPhysicalDeviceProperties2);                 \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetPhysicalDeviceQueueFamilyProperties);       \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetPhysicalDeviceMemoryProperties);            \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetInstanceProcAddr);                          \
