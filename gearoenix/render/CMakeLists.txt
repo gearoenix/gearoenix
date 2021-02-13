@@ -28,6 +28,9 @@ SET(GX_ENGINE_RENDER_SRC
 #        ${GX_ENGINE_RENDER_SRC_DIR}/font/gx-rnd-fnt-manager.cpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/font/gx-rnd-fnt-manager.hpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/font/gx-rnd-fnt-type.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/gltf/gx-rnd-gltf-include.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/gltf/gx-rnd-gltf-loader.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/gltf/gx-rnd-gltf-loader.hpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/graph/node/gx-rnd-gr-nd-deferred.cpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/graph/node/gx-rnd-gr-nd-deferred.hpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/graph/node/gx-rnd-gr-nd-forward-pbr.cpp

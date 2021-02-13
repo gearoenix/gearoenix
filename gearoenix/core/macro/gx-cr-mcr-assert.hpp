@@ -3,6 +3,13 @@
 #include "../gx-cr-build-configuration.hpp"
 #include "gx-cr-mcr-stringifier.hpp"
 
+#define GX_ASSERT(x)                                       \
+    {                                                      \
+        if (!(x)) {                                        \
+            GX_LOG_F("Assertion failed: " GX_STRINGIFY(x)) \
+        }                                                  \
+    }
+
 #define GX_CHECK_NOT_EQUAL(x, y)                                                                  \
     {                                                                                             \
         if ((x) == (y)) {                                                                         \
@@ -16,9 +23,11 @@
         }                                                                                     \
     }
 #ifdef GX_DEBUG_MODE
+#define GX_ASSERT_D(x) GX_ASSERT(x)
 #define GX_CHECK_NOT_EQUAL_D(x, y) GX_CHECK_NOT_EQUAL(x, y)
 #define GX_CHECK_EQUAL_D(x, y) GX_CHECK_EQUAL(x, y)
 #else
+#define GX_ASSERT_D(x) (void)(x);
 #define GX_CHECK_NOT_EQUAL_D(x, y) \
     {                              \
         ((void)(x));               \

@@ -1,6 +1,7 @@
 #ifndef GEAROENIX_CORE_ECS_WORLD_TEST_HPP
 #define GEAROENIX_CORE_ECS_WORLD_TEST_HPP
 #include "gx-cr-ecs-world.hpp"
+#include <cmath>
 
 using namespace gearoenix::core::ecs;
 
@@ -144,16 +145,16 @@ static void check_systems() noexcept
     w.parallel_system<Speed, Position>([&](const Entity::id_t ent, Speed& s, Position& p) {
         if (e1 == ent) {
             e1s = true;
-            BOOST_TEST(2.0 == p.x);
-            BOOST_TEST(3.0 == p.y);
-            BOOST_TEST(4.0 == s.x);
-            BOOST_TEST(5.0 == s.y);
+            BOOST_TEST(2 == std::lround(p.x));
+            BOOST_TEST(3 == std::lround(p.y));
+            BOOST_TEST(4 == std::lround(s.x));
+            BOOST_TEST(5 == std::lround(s.y));
         } else if (e3 == ent) {
             e3s = true;
-            BOOST_TEST(8.0 == p.x);
-            BOOST_TEST(9.0 == p.y);
-            BOOST_TEST(10.0 == s.x);
-            BOOST_TEST(11.0 == s.y);
+            BOOST_TEST(8 == std::lround(p.x));
+            BOOST_TEST(9 == std::lround(p.y));
+            BOOST_TEST(10 == std::lround(s.x));
+            BOOST_TEST(11 == std::lround(s.y));
         } else {
             BOOST_TEST(false);
         }

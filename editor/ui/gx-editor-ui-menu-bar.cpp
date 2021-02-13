@@ -3,13 +3,14 @@
 
 #include <gearoenix/platform/gx-plt-log.hpp>
 #include <gearoenix/platform/gx-plt-application.hpp>
+#include <gearoenix/render/engine/gx-rnd-eng-engine.hpp>
 
 #include <imgui.h>
 #include <imgui_stdlib.h>
 #include <ImGuiFileDialog.h>
 
 constexpr static const char *const key_gltf_file_chooser = "key_gltf_file_chooser";
-constexpr static const char *const  filter_gltf_file = ".gltf";
+constexpr static const char *const  filter_gltf_file = ".gltf,.glb";
 
 void gearoenix::editor::ui::MenuBar::show_project() noexcept {
     auto& project = control_manager->get_project();
@@ -78,9 +79,8 @@ void gearoenix::editor::ui::MenuBar::show_scene() noexcept {
             // action if OK
             if (ImGuiFileDialog::Instance()->IsOk())
             {
-                std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
-                std::string filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
-                // action
+                std::string file_path_name = ImGuiFileDialog::Instance()->GetFilePathName();
+                platform_application->get_base().get_render_engine()->load_gltf(file_path_name);
             }
 
             // close

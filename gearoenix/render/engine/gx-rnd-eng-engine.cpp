@@ -16,6 +16,7 @@
 //#include "../../metal/engine/gx-mtl-eng-engine.hpp"
 //#include "../../opengl/engine/gx-gl-eng-engine.hpp"
 #include "../../core/macro/gx-cr-mcr-assert.hpp"
+#include "../gltf/gx-rnd-gltf-loader.hpp"
 #include <imgui.h>
 
 //void gearoenix::render::engine::Engine::do_late_delete() noexcept
@@ -114,4 +115,9 @@ void gearoenix::render::engine::Engine::start_frame() noexcept
 
 void gearoenix::render::engine::Engine::end_frame() noexcept
 {
+}
+
+void gearoenix::render::engine::Engine::load_gltf(const std::string& file_address) noexcept
+{
+    auto loader = std::make_shared<gltf::Loader>(file_address);
 }
