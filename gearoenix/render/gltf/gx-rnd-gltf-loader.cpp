@@ -1,6 +1,13 @@
 #include "gx-rnd-gltf-loader.hpp"
 #include "../../platform/gx-plt-log.hpp"
-#include "gx-rnd-gltf-include.hpp"
+#include "../../platform/stream/gx-plt-stm-path.hpp"
+#include "gx-rnd-gltf-node-manager.hpp"
+
+#define STB_IMAGE_IMPLEMENTATION
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#define TINYGLTF_NOEXCEPTION
+#define TINYGLTF_IMPLEMENTATION
+#include <tiny_gltf.h>
 
 void gearoenix::render::gltf::Loader::check(
     const bool result, const std::string& err, const std::string& warn) noexcept
@@ -13,12 +20,15 @@ void gearoenix::render::gltf::Loader::check(
         GX_LOG_F("Error in GLTF loader.")
 }
 
-gearoenix::render::gltf::Loader::Loader(const std::string& file_address) noexcept
+gearoenix::render::gltf::Loader::Loader(const platform::stream::Path& file) noexcept
     : context(new tinygltf::TinyGLTF)
     , data(new tinygltf::Model)
+    , node_manager(new NodeManager(*this))
 {
     bool result;
     std::string err, warn;
+    /// TODO better file import
+    const auto& file_address = file.get_raw_data();
     if (file_address.ends_with(".glb"))
         result = context->LoadBinaryFromFile(data.get(), &err, &warn, file_address);
     else if (file_address.ends_with(".gltf"))

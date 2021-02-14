@@ -4,19 +4,20 @@
 //#include "../../core/sync/gx-cr-sync-kernel-workers.hpp"
 //#include "../../core/sync/gx-cr-sync-update-manager.hpp"
 //#include "../../physics/gx-phs-engine.hpp"
-#include "../../platform/gx-plt-application.hpp"
-#include "../../platform/gx-plt-log.hpp"
 //#include "../buffer/gx-rnd-buf-manager.hpp"
 //#include "../command/gx-rnd-cmd-manager.hpp"
 //#include "../graph/tree/gx-rnd-gr-tr-pbr.hpp"
 //#include "../pipeline/gx-rnd-pip-manager.hpp"
-//#include "../scene/gx-rnd-scn-manager.hpp"
-#include "../../vulkan/engine/gx-vk-eng-engine.hpp"
 //#include "../../direct3dx/engine/gx-d3d-eng-engine.hpp"
 //#include "../../metal/engine/gx-mtl-eng-engine.hpp"
 //#include "../../opengl/engine/gx-gl-eng-engine.hpp"
+#include "../../core/ecs/gx-cr-ecs-world.hpp"
 #include "../../core/macro/gx-cr-mcr-assert.hpp"
+#include "../../platform/gx-plt-application.hpp"
+#include "../../platform/gx-plt-log.hpp"
+#include "../../vulkan/engine/gx-vk-eng-engine.hpp"
 #include "../gltf/gx-rnd-gltf-loader.hpp"
+#include "../scene/gx-rnd-scn-manager.hpp"
 #include <imgui.h>
 
 //void gearoenix::render::engine::Engine::do_late_delete() noexcept
@@ -31,6 +32,8 @@ gearoenix::render::engine::Engine::Engine(
     const platform::Application& platform_application) noexcept
     : engine_type(engine_type)
     , platform_application(platform_application)
+    , scene_manager(new scene::Manager(this))
+    , world(new core::ecs::World())
 //    , function_loader(new core::FunctionLoader())
 //    , kernels(new core::sync::KernelWorkers())
 //    , update_manager(new core::sync::UpdateManager(kernels.get()))
@@ -115,9 +118,4 @@ void gearoenix::render::engine::Engine::start_frame() noexcept
 
 void gearoenix::render::engine::Engine::end_frame() noexcept
 {
-}
-
-void gearoenix::render::engine::Engine::load_gltf(const std::string& file_address) noexcept
-{
-    auto loader = std::make_shared<gltf::Loader>(file_address);
 }

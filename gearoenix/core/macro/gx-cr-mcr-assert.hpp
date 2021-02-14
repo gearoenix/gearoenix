@@ -1,5 +1,6 @@
 #ifndef GEAROENIX_CORE_MACRO_ASSERT_HPP
 #define GEAROENIX_CORE_MACRO_ASSERT_HPP
+#include "../../platform/gx-plt-log.hpp"
 #include "../gx-cr-build-configuration.hpp"
 #include "gx-cr-mcr-stringifier.hpp"
 

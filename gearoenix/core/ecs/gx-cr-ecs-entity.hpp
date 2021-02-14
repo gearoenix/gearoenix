@@ -2,6 +2,7 @@
 #define GEAROENIX_CORE_ECS_ENTITY_HPP
 #include "../../platform/gx-plt-log.hpp"
 #include "../gx-cr-build-configuration.hpp"
+#include "../macro/gx-cr-mcr-getter-setter.hpp"
 #include "gx-cr-ecs-component.hpp"
 #include "gx-cr-ecs-types.hpp"
 #include <algorithm>
@@ -20,7 +21,7 @@ struct Entity final {
         typedef std::vector<component_t> components_t;
 
     private:
-        const id_t id;
+        GX_GET_CVAL_PRV(id_t, id)
         components_t components;
 
         constexpr static auto component_less = +[](const component_t& l, const component_t& r) constexpr noexcept

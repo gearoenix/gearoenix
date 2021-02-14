@@ -12,48 +12,46 @@ void gearoenix::core::sync::WorkWaiter::push(const std::function<void()>& f)
 }
 
 #else
-#include "../../platform/gx-plt-log.hpp"
+
 #include "../gx-cr-function-loader.hpp"
+#include "../macro/gx-cr-mcr-assert.hpp"
 #include "gx-cr-sync-semaphore.hpp"
 #include <utility>
 
-void gearoenix::core::sync::WorkWaiter::wait_loop()
+void gearoenix::core::sync::WorkWaiter::wait_loop() noexcept
 {
-    main_thread_state.store(State::Working);
-    while (main_thread_state.load() == State::Working) {
+    state = State::Working;
+    while (State::Working == state) {
         semaphore->lock();
-        if (main_thread_state.load() != State::Working)
+        if (State::Working != state)
             break;
         function_loader->unload();
     }
-    worker_thread_state.store(State::Terminated);
-    GXLOGD("Worker thread " << reinterpret_cast<std::size_t>(this) << " is finished.")
+    state = State::Terminated;
+    GX_LOG_D("Worker thread: " << std::this_thread::get_id() << " is finished.")
 }
 
-gearoenix::core::sync::WorkWaiter::WorkWaiter()
+gearoenix::core::sync::WorkWaiter::WorkWaiter() noexcept
     : semaphore(new Semaphore())
     , function_loader(new FunctionLoader())
     , thread([this] { wait_loop(); })
 {
 }
 
-gearoenix::core::sync::WorkWaiter::~WorkWaiter()
+gearoenix::core::sync::WorkWaiter::~WorkWaiter() noexcept
 {
-#ifdef GX_DEBUG_MODE
-    if (worker_thread_state.load() == State::Terminated)
-        GXLOGF("Error terminated sooner than expected.")
-#endif
+    GX_CHECK_NOT_EQUAL_D(state, State::Terminated)
     do {
-        main_thread_state.store(State::Finished);
+        state = State::Finished;
         semaphore->release();
-    } while (worker_thread_state.load() != State::Terminated);
+    } while (State::Terminated != state);
     thread.join();
-    main_thread_state = State::Terminated;
 }
 
-void gearoenix::core::sync::WorkWaiter::push(const std::function<void()>& f)
+void gearoenix::core::sync::WorkWaiter::push(const std::function<void()>& f) noexcept
 {
     function_loader->load(f);
     semaphore->release();
 }
+
 #endif

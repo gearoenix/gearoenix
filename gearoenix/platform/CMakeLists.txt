@@ -20,6 +20,8 @@ SET(GX_ENGINE_PLATFORM_SRC
         ${GX_ENGINE_PLATFORM_SRC_DIR}/stream/gx-plt-stm-local.hpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/stream/gx-plt-stm-memory.cpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/stream/gx-plt-stm-memory.hpp
+        ${GX_ENGINE_PLATFORM_SRC_DIR}/stream/gx-plt-stm-path.cpp
+        ${GX_ENGINE_PLATFORM_SRC_DIR}/stream/gx-plt-stm-path.hpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/stream/gx-plt-stm-stream.cpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/stream/gx-plt-stm-stream.hpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/win32/gx-plt-win-application.cpp

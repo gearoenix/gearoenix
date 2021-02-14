@@ -48,8 +48,7 @@ SET(GX_ENGINE_CORE_SRC
 #        ${GX_ENGINE_CORE_SRC_DIR}/sync/gx-cr-sync-channel.hpp
 #        ${GX_ENGINE_CORE_SRC_DIR}/sync/gx-cr-sync-channeled-workers.cpp
 #        ${GX_ENGINE_CORE_SRC_DIR}/sync/gx-cr-sync-channeled-workers.hpp
-#        ${GX_ENGINE_CORE_SRC_DIR}/sync/gx-cr-sync-end-caller.cpp
-#        ${GX_ENGINE_CORE_SRC_DIR}/sync/gx-cr-sync-end-caller.hpp
+        ${GX_ENGINE_CORE_SRC_DIR}/sync/gx-cr-sync-end-caller.hpp
 #        ${GX_ENGINE_CORE_SRC_DIR}/sync/gx-cr-sync-influence-manager.cpp
 #        ${GX_ENGINE_CORE_SRC_DIR}/sync/gx-cr-sync-influence-manager.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/sync/gx-cr-sync-kernel-workers.cpp
@@ -62,15 +61,15 @@ SET(GX_ENGINE_CORE_SRC
 #        ${GX_ENGINE_CORE_SRC_DIR}/sync/gx-cr-sync-stop-point.hpp
 #        ${GX_ENGINE_CORE_SRC_DIR}/sync/gx-cr-sync-update-manager.cpp
 #        ${GX_ENGINE_CORE_SRC_DIR}/sync/gx-cr-sync-update-manager.hpp
-#        ${GX_ENGINE_CORE_SRC_DIR}/sync/gx-cr-sync-work-waiter.cpp
-#        ${GX_ENGINE_CORE_SRC_DIR}/sync/gx-cr-sync-work-waiter.hpp
+        ${GX_ENGINE_CORE_SRC_DIR}/sync/gx-cr-sync-work-waiter.cpp
+        ${GX_ENGINE_CORE_SRC_DIR}/sync/gx-cr-sync-work-waiter.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-allocator.cpp
         ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-allocator.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-application.cpp
         ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-application.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-build-configuration.hpp
-#        ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-function-loader.cpp
-#        ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-function-loader.hpp
+        ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-function-loader.cpp
+        ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-function-loader.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-language.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-pool.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-project.cpp

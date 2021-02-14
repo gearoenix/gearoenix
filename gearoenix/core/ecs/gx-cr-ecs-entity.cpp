@@ -1,6 +1,6 @@
 #include "gx-cr-ecs-entity.hpp"
 
-std::atomic<gearoenix::core::ecs::Entity::id_t> gearoenix::core::ecs::Entity::last_id(0);
+std::atomic<gearoenix::core::ecs::Entity::id_t> gearoenix::core::ecs::Entity::last_id(1028);
 
 gearoenix::core::ecs::Entity::Builder::Builder(const id_t id) noexcept
     : id(id)

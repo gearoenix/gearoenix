@@ -31,6 +31,8 @@ SET(GX_ENGINE_RENDER_SRC
         ${GX_ENGINE_RENDER_SRC_DIR}/gltf/gx-rnd-gltf-include.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/gltf/gx-rnd-gltf-loader.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/gltf/gx-rnd-gltf-loader.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/gltf/gx-rnd-gltf-node-manager.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/gltf/gx-rnd-gltf-node-manager.hpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/graph/node/gx-rnd-gr-nd-deferred.cpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/graph/node/gx-rnd-gr-nd-deferred.hpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/graph/node/gx-rnd-gr-nd-forward-pbr.cpp
@@ -120,10 +122,10 @@ SET(GX_ENGINE_RENDER_SRC
 #        ${GX_ENGINE_RENDER_SRC_DIR}/scene/gx-rnd-scn-game.hpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/scene/gx-rnd-scn-logo.cpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/scene/gx-rnd-scn-logo.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/scene/gx-rnd-scn-manager.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/scene/gx-rnd-scn-manager.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/scene/gx-rnd-scn-scene.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/scene/gx-rnd-scn-scene.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/scene/gx-rnd-scn-manager.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/scene/gx-rnd-scn-manager.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/scene/gx-rnd-scn-scene.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/scene/gx-rnd-scn-scene.hpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/scene/gx-rnd-scn-type.cpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/scene/gx-rnd-scn-type.hpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/scene/gx-rnd-scn-ui.cpp

@@ -1,18 +1,19 @@
 #ifndef GEAROENIX_RENDER_SCENE_MANAGER_HPP
 #define GEAROENIX_RENDER_SCENE_MANAGER_HPP
-#include "../../core/asset/gx-cr-asset-manager.hpp"
-#include "../../core/cache/gx-cr-cache-file.hpp"
-#include "../../core/gx-cr-static.hpp"
+#include "../../core/ecs/gx-cr-ecs-entity.hpp"
+#include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../../core/sync/gx-cr-sync-end-caller.hpp"
-#include "gx-rnd-scn-scene.hpp"
+#include "../../platform/stream/gx-plt-stm-path.hpp"
+#include <map>
 #include <memory>
+#include <string>
 
 namespace gearoenix::core::sync {
 struct WorkWaiter;
 }
 
-namespace gearoenix::platform::stream {
-struct Stream;
+namespace gearoenix::render::gltf {
+struct Loader;
 }
 
 namespace gearoenix::render::engine {
@@ -20,37 +21,23 @@ struct Engine;
 }
 
 namespace gearoenix::render::scene {
-struct Manager {
+struct Manager final {
+    typedef std::map<std::string, core::ecs::Entity::id_t> NameToIdMap;
+    typedef std::map<core::ecs::Entity::id_t, std::string> IdToNameMap;
+
     GX_GET_PTRC_PRV(engine::Engine, e)
-    GX_GET_CREF_PRV(core::cache::File<Scene>, cache)
     GX_GET_UCPTR_PRV(core::sync::WorkWaiter, io_worker)
+    GX_GET_UPTR_PRV(gltf::Loader, loader)
+    GX_GET_VAL_PRV(core::ecs::Entity::id_t, default_scene, 0)
+    GX_GET_CREF_PRV(NameToIdMap, name_to_id)
+    GX_GET_CREF_PRV(IdToNameMap, id_to_name)
+
+    void load_gltf_worker(platform::stream::Path, const core::sync::EndCallerIgnored& c) noexcept;
 
 public:
-    Manager(std::unique_ptr<platform::stream::Stream> s, engine::Engine* e) noexcept;
+    explicit Manager(engine::Engine* e) noexcept;
     ~Manager() noexcept;
-    /// It is gonna load the scene (if exists) in another thread.
-    void get_gx3d(core::Id mid, core::sync::EndCaller<Scene> c) noexcept;
-    /// It is gonna load the scene (if exists) in another thread.
-    void get_gx3d(const std::string& name, const core::sync::EndCaller<Scene>& c) noexcept;
-    /// T must be derived from Scene and have the same constructor that Scene has.
-    template <typename T>
-    typename std::enable_if<std::is_base_of<Scene, T>::value, std::shared_ptr<T>>::type
-    create(std::string name, core::sync::EndCaller<T>& c) noexcept;
-    [[nodiscard]] const std::map<core::Id, std::weak_ptr<scene::Scene>>& get_scenes() const noexcept;
+    void load_gltf(platform::stream::Path, core::sync::EndCallerIgnored c = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
 };
 }
-
-template <typename T>
-typename std::enable_if<std::is_base_of<gearoenix::render::scene::Scene, T>::value, std::shared_ptr<T>>::type
-gearoenix::render::scene::Manager::create(std::string name, core::sync::EndCaller<T>& c) noexcept
-{
-    const core::Id id = core::asset::Manager::create_id();
-    const core::sync::EndCaller<core::sync::EndCallerIgnore> call([c] {});
-    const std::shared_ptr<T> result(new T(id, std::move(name), e, call));
-    c.set_data(result);
-    const std::weak_ptr<Scene> w = result;
-    cache.get_cacher().get_cacheds()[id] = w;
-    return result;
-}
-
 #endif

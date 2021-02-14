@@ -1,11 +1,11 @@
 #ifndef GEAROENIX_CORE_FUNCTION_LOADER_HPP
 #define GEAROENIX_CORE_FUNCTION_LOADER_HPP
-#include "gx-cr-static.hpp"
+#include "../platform/macro/gx-plt-mcr-lock.hpp"
 #include <functional>
 #include <vector>
 
 namespace gearoenix::core {
-struct FunctionLoader {
+struct FunctionLoader final {
 private:
     GX_CREATE_GUARD(load_functions)
     std::vector<std::function<void()>> load_functions;
@@ -15,7 +15,7 @@ public:
     ~FunctionLoader() noexcept;
     void load(const std::function<void()>& fun) noexcept;
     void unload() noexcept;
-    [[nodiscard]] unsigned int get_loaded_count() const noexcept;
+    [[nodiscard]] std::size_t get_loaded_count() const noexcept;
 };
 }
 #endif

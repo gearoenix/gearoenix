@@ -14,16 +14,8 @@ namespace gearoenix::core {
 struct FunctionLoader;
 }
 
-namespace gearoenix::core::asset {
-struct Asset;
-}
-
-namespace gearoenix::core::event {
-struct Event;
-}
-
-namespace gearoenix::core::sync {
-struct KernelWorkers;
+namespace gearoenix::core::ecs {
+struct World;
 }
 
 namespace gearoenix::physics {
@@ -34,18 +26,8 @@ namespace gearoenix::platform {
 struct Application;
 }
 
-namespace gearoenix::platform::stream {
-struct Stream;
-}
-
 namespace gearoenix::render::scene {
-struct Scene;
-}
-
-namespace gearoenix::render::texture {
-struct TextureCube;
-struct Target;
-struct Texture2D;
+struct Manager;
 }
 
 namespace gearoenix::render::engine {
@@ -60,6 +42,8 @@ struct Engine {
     GX_GET_VAL_PRT(unsigned int, previous_frame_number, 1)
     GX_GET_VAL_PRT(unsigned int, frame_number_from_start, static_cast<decltype(frame_number)>(-1))
     GX_GET_VAL_PRT(double, delta_time, 0.0f)
+    GX_GET_UPTR_PRT(scene::Manager, scene_manager)
+    GX_GET_UPTR_PRT(core::ecs::World, world)
 
 protected:
     std::chrono::time_point<std::chrono::high_resolution_clock> last_frame_time = std::chrono::high_resolution_clock::now();
@@ -72,7 +56,6 @@ public:
     virtual void start_frame() noexcept;
     virtual void end_frame() noexcept;
     virtual void upload_imgui_fonts() noexcept = 0;
-    void load_gltf(const std::string& file_address) noexcept;
 };
 }
 #endif

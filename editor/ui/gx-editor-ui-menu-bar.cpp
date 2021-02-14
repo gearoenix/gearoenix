@@ -4,6 +4,7 @@
 #include <gearoenix/platform/gx-plt-log.hpp>
 #include <gearoenix/platform/gx-plt-application.hpp>
 #include <gearoenix/render/engine/gx-rnd-eng-engine.hpp>
+#include <gearoenix/render/scene/gx-rnd-scn-manager.hpp>
 
 #include <imgui.h>
 #include <imgui_stdlib.h>
@@ -80,7 +81,8 @@ void gearoenix::editor::ui::MenuBar::show_scene() noexcept {
             if (ImGuiFileDialog::Instance()->IsOk())
             {
                 std::string file_path_name = ImGuiFileDialog::Instance()->GetFilePathName();
-                platform_application->get_base().get_render_engine()->load_gltf(file_path_name);
+                platform_application->get_base().get_render_engine()->get_scene_manager()->load_gltf(
+                        platform::stream::Path::create_absolute(file_path_name));
             }
 
             // close

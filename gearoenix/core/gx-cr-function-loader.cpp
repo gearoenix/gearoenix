@@ -7,7 +7,7 @@ gearoenix::core::FunctionLoader::~FunctionLoader() noexcept
 {
     if (load_functions.empty())
         return;
-    GXLOGE("Function loader queue was not empty when the deconstructor called.")
+    GX_LOG_E("Function loader queue was not empty when deconstructed.")
 }
 
 void gearoenix::core::FunctionLoader::load(const std::function<void()>& fun) noexcept
@@ -30,7 +30,7 @@ void gearoenix::core::FunctionLoader::unload() noexcept
     }
 }
 
-unsigned int gearoenix::core::FunctionLoader::get_loaded_count() const noexcept
+std::size_t gearoenix::core::FunctionLoader::get_loaded_count() const noexcept
 {
-    return static_cast<unsigned int>(load_functions.size());
+    return load_functions.size();
 }
