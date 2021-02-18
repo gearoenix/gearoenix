@@ -4,7 +4,7 @@
 #include <tiny_gltf.h>
 
 gearoenix::render::scene::Scene::Scene(
-    engine::Engine* const e,
+    engine::Engine* const,
     const std::size_t scene_index,
     gltf::Loader& loader,
     const core::sync::EndCallerIgnored& c) noexcept

@@ -35,11 +35,7 @@ public:
     {
     }
 
-    EndCaller(const EndCaller& o) noexcept
-        : caller(o.caller)
-    {
-    }
-
+    EndCaller(const EndCaller&) noexcept = default;
     EndCaller(EndCaller&&) noexcept = default;
 
     void set_data(std::shared_ptr<T> data) noexcept
@@ -75,13 +71,10 @@ public:
     {
     }
 
-    EndCaller(const EndCaller& o) noexcept
-        : caller(o.caller)
-    {
-    }
-
+    EndCaller(const EndCaller& o) noexcept = default;
     EndCaller(EndCaller&&) noexcept = default;
 };
+
 typedef EndCaller<EndCallerIgnore> EndCallerIgnored;
 }
 #endif

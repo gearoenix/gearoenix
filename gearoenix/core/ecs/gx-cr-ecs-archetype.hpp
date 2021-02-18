@@ -75,7 +75,7 @@ private:
         return size;
     }
 
-    [[nodiscard]] static std::size_t get_components_size(const Entity::Builder::components_t&) noexcept;
+    [[nodiscard]] static std::size_t get_components_size(const EntityBuilder::components_t&) noexcept;
 
     template <typename... ComponentsTypes>
     [[nodiscard]] static components_indices_t get_components_indices() noexcept
@@ -94,9 +94,9 @@ private:
         return indices;
     }
 
-    [[nodiscard]] static components_indices_t get_components_indices(const Entity::Builder::components_t&) noexcept;
+    [[nodiscard]] static components_indices_t get_components_indices(const EntityBuilder::components_t&) noexcept;
 
-    explicit Archetype(const Entity::Builder::components_t&) noexcept;
+    explicit Archetype(const EntityBuilder::components_t&) noexcept;
     Archetype(std::size_t, components_indices_t&&) noexcept;
 
     template <typename... ComponentsTypes>
@@ -116,7 +116,7 @@ private:
 
     void allocate_entity(Entity::id_t) noexcept;
 
-    [[nodiscard]] std::size_t allocate_entity(Entity::id_t, const Entity::Builder::components_t&) noexcept;
+    [[nodiscard]] std::size_t allocate_entity(Entity::id_t, const EntityBuilder::components_t&) noexcept;
 
     template <typename... ComponentsTypes>
     [[nodiscard]] std::size_t allocate(const Entity::id_t id, ComponentsTypes&&... components) noexcept
@@ -156,7 +156,7 @@ private:
         return *reinterpret_cast<ComponentType*>(&data[index + get_component_index<ComponentType>()]);
     }
 
-    void move_out_entity(std::size_t index, Entity::Builder::components_t& components) noexcept;
+    void move_out_entity(std::size_t index, EntityBuilder::components_t& components) noexcept;
 
     [[nodiscard]] std::optional<std::pair<Entity::id_t, std::size_t>> move_from_back(std::size_t index) noexcept;
 

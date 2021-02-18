@@ -5,7 +5,7 @@
 namespace gearoenix::math {
 /// It is a column major matrix
 template <typename Element>
-struct Mat4x4 {
+struct Mat4x4 final {
     Element data[4][4];
 
     constexpr Mat4x4() noexcept

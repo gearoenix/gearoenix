@@ -77,33 +77,11 @@ public:
     void start_frame() noexcept final;
     void end_frame() noexcept final;
     void upload_imgui_fonts() noexcept final;
-    //    [[nodiscard]] std::shared_ptr<render::texture::Texture2D> create_texture_2d(
-    //        core::Id id,
-    //        std::string name,
-    //        std::vector<std::vector<std::uint8_t>> data,
-    //        const render::texture::TextureInfo& info,
-    //        std::size_t img_width,
-    //        std::size_t img_height,
-    //        const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept final;
-    //    [[nodiscard]] std::shared_ptr<render::texture::TextureCube> create_texture_cube(
-    //        core::Id id,
-    //        std::string name,
-    //        std::vector<std::vector<std::vector<std::uint8_t>>> data,
-    //        const render::texture::TextureInfo& info,
-    //        std::size_t aspect,
-    //        const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept final;
-    //    [[nodiscard]] std::shared_ptr<render::texture::Target> create_render_target(
-    //        core::Id id,
-    //        const std::vector<render::texture::AttachmentInfo>& infos,
-    //        const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept final;
-    //    void submit(
-    //        std::size_t pres_count,
-    //        const render::sync::Semaphore* const* pres,
-    //        std::size_t cmds_count,
-    //        const render::command::Buffer* const* cmds,
-    //        std::size_t nxts_count,
-    //        const render::sync::Semaphore* const* nxts) noexcept final;
     [[nodiscard]] static bool is_supported() noexcept;
+    void create_mesh(
+        std::vector<math::BasicVertex> vertices,
+        std::vector<std::uint32_t> indices,
+        core::sync::EndCaller<render::mesh::Mesh>& c) noexcept final;
 };
 }
 #endif

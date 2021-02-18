@@ -15,6 +15,7 @@ private:
     std::vector<Archetype> archetypes;
     // id -> (archetype, index)
     std::map<Entity::id_t, Entity> entities;
+    std::map<std::string, Entity::id_t> name_to_entity_id;
 
     GX_CREATE_GUARD(delayed_actions)
     // 0 - Entity addition
@@ -22,9 +23,9 @@ private:
     // 2 - Component(s) addition
     // 3 - Component(s) deletion
     std::vector<std::variant<
-        Entity::Builder,
+        EntityBuilder,
         Entity::id_t,
-        std::pair<Entity::id_t, Entity::Builder::components_t>,
+        std::pair<Entity::id_t, EntityBuilder::components_t>,
         std::pair<Entity::id_t, std::vector<std::type_index>>>>
         delayed_actions;
 
@@ -32,7 +33,7 @@ public:
     World() noexcept = default;
     //--------------------------------------Entity creation----------------------------------------------
     /// You must know your context (state of world), unless you want to end up having race
-    [[nodiscard]] Entity::id_t create_entity_with_builder(Entity::Builder&&) noexcept;
+    void create_entity_with_builder(EntityBuilder&&) noexcept;
 
     template <typename... ComponentsTypes>
     [[nodiscard]] Entity::id_t create_entity(ComponentsTypes&&... components) noexcept
@@ -56,39 +57,41 @@ public:
     }
 
     /// Recommended way to add an entity, in case you do not know the context you're in.
-    [[nodiscard]] Entity::id_t delayed_create_entity_with_builder(Entity::Builder&&) noexcept;
+    void delayed_create_entity_with_builder(EntityBuilder&&) noexcept;
 
     template <typename... ComponentsTypes>
     [[nodiscard]] Entity::id_t delayed_create_entity(ComponentsTypes&&... components) noexcept
     {
         Component::types_check<ComponentsTypes...>();
-        Entity::Builder b;
+        EntityBuilder b;
         b.add_components(std::forward<ComponentsTypes>(components)...);
-        return delayed_create_entity_with_builder(std::move(b));
+        const auto id = b.get_id();
+        delayed_create_entity_with_builder(std::move(b));
+        return id;
     }
     //--------------------------------------Entity deletion----------------------------------------------
     void remove_entity(Entity::id_t) noexcept;
 
     void delayed_remove_entity(Entity::id_t) noexcept;
     //--------------------------------------Component addition-------------------------------------------
-    void add_components_map(Entity::id_t, Entity::Builder::components_t&&) noexcept;
+    void add_components_map(Entity::id_t, EntityBuilder::components_t&&) noexcept;
 
     template <typename... ComponentsTypes>
     void add_components(const Entity::id_t ei, ComponentsTypes&&... components) noexcept
     {
         Component::types_check<ComponentsTypes...>();
-        Entity::Builder b(ei);
+        EntityBuilder b(ei);
         b.add_components(std::forward<ComponentsTypes>(components)...);
         add_components_map(ei, std::move(b.components));
     }
 
-    void delayed_add_components_map(Entity::id_t, Entity::Builder::components_t&&) noexcept;
+    void delayed_add_components_map(Entity::id_t, EntityBuilder::components_t&&) noexcept;
 
     template <typename... ComponentsTypes>
     void delayed_add_components(const Entity::id_t ei, ComponentsTypes&&... components) noexcept
     {
         Component::types_check<ComponentsTypes...>();
-        Entity::Builder b(ei);
+        EntityBuilder b(ei);
         b.add_components(std::forward<ComponentsTypes>(components)...);
         delayed_add_components_map(ei, std::move(b.components));
     }
@@ -132,7 +135,7 @@ public:
         return archetypes[e.archetype].get_component<ComponentType>(e.index_in_archetype);
     }
 
-    [[nodiscard]] std::size_t get_archetype_index(const Entity::Builder::components_t& cs) noexcept;
+    [[nodiscard]] std::size_t get_archetype_index(const EntityBuilder::components_t& cs) noexcept;
 
     [[nodiscard]] Entity& get_entity(Entity::id_t) noexcept;
 
@@ -152,6 +155,8 @@ public:
     void update() noexcept;
 
     void update_entity(std::optional<std::pair<Entity::id_t, std::size_t>>&&) noexcept;
+
+    [[nodiscard]] std::shared_ptr<EntitySharedBuilder> create_shared_builder() noexcept;
 };
 }
 

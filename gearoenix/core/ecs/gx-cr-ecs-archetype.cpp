@@ -1,7 +1,7 @@
 #include "gx-cr-ecs-archetype.hpp"
 #include <cstring>
 
-std::size_t gearoenix::core::ecs::Archetype::get_components_size(const Entity::Builder::components_t& cs) noexcept
+std::size_t gearoenix::core::ecs::Archetype::get_components_size(const EntityBuilder::components_t& cs) noexcept
 {
     std::size_t s = 0;
     for (const auto& c : cs)
@@ -10,7 +10,7 @@ std::size_t gearoenix::core::ecs::Archetype::get_components_size(const Entity::B
 }
 
 gearoenix::core::ecs::Archetype::components_indices_t gearoenix::core::ecs::Archetype::get_components_indices(
-    const Entity::Builder::components_t& cs) noexcept
+    const EntityBuilder::components_t& cs) noexcept
 {
     const auto css = cs.size();
     components_indices_t cis;
@@ -24,7 +24,7 @@ gearoenix::core::ecs::Archetype::components_indices_t gearoenix::core::ecs::Arch
     return cis;
 }
 
-gearoenix::core::ecs::Archetype::Archetype(const Entity::Builder::components_t& cs) noexcept
+gearoenix::core::ecs::Archetype::Archetype(const EntityBuilder::components_t& cs) noexcept
     : components_indices(get_components_indices(cs))
     , entity_size(header_size + get_components_size(cs))
 {
@@ -53,7 +53,7 @@ void gearoenix::core::ecs::Archetype::allocate_entity(const Entity::id_t id) noe
 
 std::size_t gearoenix::core::ecs::Archetype::allocate_entity(
     const Entity::id_t ei,
-    const Entity::Builder::components_t& cs) noexcept
+    const EntityBuilder::components_t& cs) noexcept
 {
     allocate_entity(ei);
     const std::size_t result = data.size();
@@ -86,7 +86,7 @@ gearoenix::core::ecs::Archetype::~Archetype() noexcept
 
 void gearoenix::core::ecs::Archetype::move_out_entity(
     const std::size_t index,
-    Entity::Builder::components_t& components) noexcept
+    EntityBuilder::components_t& components) noexcept
 {
     for (std::size_t i = 0, j = 1; j < components_indices.size(); i = j, ++j) {
         const auto ci = components_indices[i].second;

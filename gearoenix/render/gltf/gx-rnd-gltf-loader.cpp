@@ -1,6 +1,7 @@
 #include "gx-rnd-gltf-loader.hpp"
 #include "../../platform/gx-plt-log.hpp"
 #include "../../platform/stream/gx-plt-stm-path.hpp"
+#include "gx-rnd-gltf-mesh-manager.hpp"
 #include "gx-rnd-gltf-node-manager.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -20,10 +21,12 @@ void gearoenix::render::gltf::Loader::check(
         GX_LOG_F("Error in GLTF loader.")
 }
 
-gearoenix::render::gltf::Loader::Loader(const platform::stream::Path& file) noexcept
-    : context(new tinygltf::TinyGLTF)
+gearoenix::render::gltf::Loader::Loader(engine::Engine* e, const platform::stream::Path& file) noexcept
+    : e(e)
+    , context(new tinygltf::TinyGLTF)
     , data(new tinygltf::Model)
-    , node_manager(new NodeManager(*this))
+    , mesh_manager(new MeshManager(*this))
+    , node_manager(new NodeManager(*this, *mesh_manager))
 {
     bool result;
     std::string err, warn;

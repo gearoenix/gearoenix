@@ -1,58 +1,18 @@
 #ifndef GEAROENIX_RENDER_MESH_MESH_HPP
 #define GEAROENIX_RENDER_MESH_MESH_HPP
-#include "../../core/asset/gx-cr-asset.hpp"
-#include "../../core/gx-cr-static.hpp"
-#include "../../core/gx-cr-types.hpp"
-#include "../../core/sync/gx-cr-sync-end-caller.hpp"
-#include "../../math/gx-math-aabb.hpp"
-#include "../../math/gx-math-vertex.hpp"
-#include "gx-rnd-msh-type.hpp"
+#include "../../core/ecs/gx-cr-ecs-component.hpp"
 
-namespace gearoenix::platform::stream {
-struct Stream;
-}
-
-namespace gearoenix::render::engine {
-struct Engine;
-}
-
-namespace gearoenix::render::buffer {
-struct Buffer;
+namespace gearoenix::core::ecs {
+struct EntitySharedBuilder;
 }
 
 namespace gearoenix::render::mesh {
-/// This struct right now have only one implementation and in future if it got another
-/// implementation it will become an interface (virtual function haver)
-struct Mesh final : public core::asset::Asset {
-    GX_GET_CVAL_PRT(Type, mesh_type)
-    GX_GET_CREF_PRT(math::Aabb3, box)
-    GX_GET_CREF_PRT(std::shared_ptr<buffer::Buffer>, vertex_buffer)
-    GX_GET_CREF_PRT(std::shared_ptr<buffer::Buffer>, index_buffer)
+struct Mesh : public core::ecs::Component {
 protected:
-    Mesh(core::Id my_id, std::string name, Type mesh_type) noexcept;
+    std::shared_ptr<Mesh> self;
 
 public:
-    Mesh(
-        core::Id my_id,
-        std::string name,
-        platform::stream::Stream* f,
-        engine::Engine* e,
-        const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
-    Mesh(
-        core::Id my_id,
-        std::string name,
-        const std::vector<math::BasicVertex>& vertices,
-        const std::vector<std::uint32_t>& indices,
-        const math::Aabb3& box,
-        engine::Engine* e,
-        const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
-    ~Mesh() noexcept final;
-    void set_vertices(
-        engine::Engine* e,
-        const std::vector<math::BasicVertex>& vertices,
-        const std::vector<std::uint32_t>& indices,
-        const math::Aabb3& box,
-        const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+    virtual void set_component(const std::shared_ptr<core::ecs::EntitySharedBuilder>&) noexcept = 0;
 };
 }
 #endif

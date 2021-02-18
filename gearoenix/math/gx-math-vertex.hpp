@@ -3,7 +3,7 @@
 #include "gx-math-vector-4d.hpp"
 
 namespace gearoenix::math {
-struct BasicVertex {
+struct BasicVertex final {
     Vec3<float> position;
     Vec3<float> normal;
     Vec4<float> tangent;

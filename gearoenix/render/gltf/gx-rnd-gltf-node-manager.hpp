@@ -6,19 +6,21 @@
 
 namespace gearoenix::render::gltf {
 struct Loader;
+struct MeshManager;
 struct NodeManager final {
 private:
     Loader& loader;
+    MeshManager& mesh_manager;
+
     std::map<std::size_t, core::ecs::Entity::id_t> loaded_nodes;
 
-    [[nodiscard]] core::ecs::Entity::id_t get_mesh(std::size_t, const core::sync::EndCallerIgnored& c) noexcept;
     [[nodiscard]] core::ecs::Entity::id_t get_camera(std::size_t, const core::sync::EndCallerIgnored& c) noexcept;
     [[nodiscard]] core::ecs::Entity::id_t get_camera(std::size_t, std::size_t, const core::sync::EndCallerIgnored& c) noexcept;
     [[nodiscard]] core::ecs::Entity::id_t get_skin(std::size_t, const core::sync::EndCallerIgnored& c) noexcept;
     [[nodiscard]] core::ecs::Entity::id_t get_light(std::size_t, std::size_t, const core::sync::EndCallerIgnored& c) noexcept;
 
 public:
-    explicit NodeManager(Loader& loader) noexcept;
+    NodeManager(Loader& loader, MeshManager& mesh_manager) noexcept;
 
     [[nodiscard]] core::ecs::Entity::id_t get(std::size_t, const core::sync::EndCallerIgnored& c) noexcept;
 };

@@ -215,18 +215,23 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
 
     end_of_step();
 
-    Entity::Builder b1, b2, b3, b4, b5;
+    EntityBuilder b1, b2, b3, b4, b5;
 
     b1.add_components(Position { 2.0, 3.0 }, Speed { 4.0, 5.0 });
     b2.add_component(Position { 6.0, 7.0 });
     b3.add_components(Speed { 10.0, 11.0 }, Position { 8.0, 9.0 });
     b4.add_components(Speed { 12.0, 13.0 });
 
-    e1 = w.create_entity_with_builder(std::move(b1));
-    e2 = w.create_entity_with_builder(std::move(b2));
-    e3 = w.create_entity_with_builder(std::move(b3));
-    e4 = w.create_entity_with_builder(std::move(b4));
-    e5 = w.create_entity_with_builder(std::move(b5));
+    e1 = b1.get_id();
+    w.create_entity_with_builder(std::move(b1));
+    e2 = b2.get_id();
+    w.create_entity_with_builder(std::move(b2));
+    e3 = b3.get_id();
+    w.create_entity_with_builder(std::move(b3));
+    e4 = b4.get_id();
+    w.create_entity_with_builder(std::move(b4));
+    e5 = b5.get_id();
+    w.create_entity_with_builder(std::move(b5));
 
     end_of_step();
 
@@ -272,18 +277,23 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
     w.update();
     end_of_step();
 
-    Entity::Builder b21, b22, b23, b24, b25;
+    EntityBuilder b21, b22, b23, b24, b25;
 
     b21.add_components(Position { 2.0, 3.0 }, Speed { 4.0, 5.0 });
     b22.add_component(Position { 6.0, 7.0 });
     b23.add_components(Speed { 10.0, 11.0 }, Position { 8.0, 9.0 });
     b24.add_components(Speed { 12.0, 13.0 });
 
-    e1 = w.delayed_create_entity_with_builder(std::move(b21));
-    e2 = w.delayed_create_entity_with_builder(std::move(b22));
-    e3 = w.delayed_create_entity_with_builder(std::move(b23));
-    e4 = w.delayed_create_entity_with_builder(std::move(b24));
-    e5 = w.delayed_create_entity_with_builder(std::move(b25));
+    e1 = b21.get_id();
+    w.delayed_create_entity_with_builder(std::move(b21));
+    e2 = b22.get_id();
+    w.delayed_create_entity_with_builder(std::move(b22));
+    e3 = b23.get_id();
+    w.delayed_create_entity_with_builder(std::move(b23));
+    e4 = b24.get_id();
+    w.delayed_create_entity_with_builder(std::move(b24));
+    e5 = b25.get_id();
+    w.delayed_create_entity_with_builder(std::move(b25));
 
     w.update();
     end_of_step();

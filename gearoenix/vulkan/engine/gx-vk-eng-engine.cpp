@@ -192,4 +192,12 @@ bool gearoenix::vulkan::engine::Engine::is_supported() noexcept
     return !gpus.empty();
 }
 
+void gearoenix::vulkan::engine::Engine::create_mesh(
+    std::vector<math::BasicVertex>,
+    std::vector<std::uint32_t>,
+    core::sync::EndCaller<gearoenix::render::mesh::Mesh>&) noexcept
+{
+    GX_UNIMPLEMENTED
+}
+
 #endif

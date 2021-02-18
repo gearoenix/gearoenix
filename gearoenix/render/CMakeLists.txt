@@ -30,6 +30,8 @@ SET(GX_ENGINE_RENDER_SRC
 #        ${GX_ENGINE_RENDER_SRC_DIR}/font/gx-rnd-fnt-type.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/gltf/gx-rnd-gltf-loader.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/gltf/gx-rnd-gltf-loader.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/gltf/gx-rnd-gltf-mesh-manager.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/gltf/gx-rnd-gltf-mesh-manager.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/gltf/gx-rnd-gltf-node-manager.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/gltf/gx-rnd-gltf-node-manager.hpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/graph/node/gx-rnd-gr-nd-deferred.cpp
@@ -91,8 +93,7 @@ SET(GX_ENGINE_RENDER_SRC
 #        ${GX_ENGINE_RENDER_SRC_DIR}/material/gx-rnd-mat-unlit.hpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/mesh/gx-rnd-msh-manager.cpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/mesh/gx-rnd-msh-manager.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/mesh/gx-rnd-msh-mesh.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/mesh/gx-rnd-msh-mesh.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/mesh/gx-rnd-msh-mesh.hpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/mesh/gx-rnd-msh-type.hpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/model/gx-rnd-mdl-dynamic.cpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/model/gx-rnd-mdl-dynamic.hpp

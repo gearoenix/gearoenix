@@ -1,6 +1,7 @@
 #ifndef GEAROENIX_RENDER_ENGINE_ENGINE_HPP
 #define GEAROENIX_RENDER_ENGINE_ENGINE_HPP
 #include "../../core/sync/gx-cr-sync-end-caller.hpp"
+#include "../../math/gx-math-vertex.hpp"
 #include "../gx-rnd-runtime-configuration.hpp"
 #include "../texture/gx-rnd-txt-attachment.hpp"
 #include "gx-rnd-eng-limitations.hpp"
@@ -24,6 +25,10 @@ struct Engine;
 
 namespace gearoenix::platform {
 struct Application;
+}
+
+namespace gearoenix::render::mesh {
+struct Mesh;
 }
 
 namespace gearoenix::render::scene {
@@ -56,6 +61,10 @@ public:
     virtual void start_frame() noexcept;
     virtual void end_frame() noexcept;
     virtual void upload_imgui_fonts() noexcept = 0;
+    virtual void create_mesh(
+        std::vector<math::BasicVertex> vertices,
+        std::vector<std::uint32_t> indices,
+        core::sync::EndCaller<mesh::Mesh>& c) noexcept = 0;
 };
 }
 #endif

@@ -1,19 +1,18 @@
 #include "gx-cr-ecs-world.hpp"
 
-gearoenix::core::ecs::Entity::id_t gearoenix::core::ecs::World::create_entity_with_builder(Entity::Builder&& b) noexcept
+void gearoenix::core::ecs::World::create_entity_with_builder(EntityBuilder&& b) noexcept
 {
     const auto ai = get_archetype_index(b.components);
     const auto index = archetypes[ai].allocate_entity(b.id, b.components);
     entities.emplace(b.id, Entity(ai, index));
-    return b.id;
+    if (b.name.has_value())
+        name_to_entity_id.emplace(*b.name, b.id);
 }
 
-gearoenix::core::ecs::Entity::id_t gearoenix::core::ecs::World::delayed_create_entity_with_builder(Entity::Builder&& b) noexcept
+void gearoenix::core::ecs::World::delayed_create_entity_with_builder(EntityBuilder&& b) noexcept
 {
-    const auto id = b.id;
     GX_GUARD_LOCK(delayed_actions)
     delayed_actions.emplace_back(std::move(b));
-    return id;
 }
 
 void gearoenix::core::ecs::World::remove_entity(const Entity::id_t id) noexcept
@@ -37,7 +36,7 @@ void gearoenix::core::ecs::World::delayed_remove_entity(const Entity::id_t id) n
     delayed_actions.emplace_back(id);
 }
 
-void gearoenix::core::ecs::World::add_components_map(const Entity::id_t id, Entity::Builder::components_t&& c) noexcept
+void gearoenix::core::ecs::World::add_components_map(const Entity::id_t id, EntityBuilder::components_t&& c) noexcept
 {
 #ifdef GX_DEBUG_MODE
     if (c.empty())
@@ -47,7 +46,7 @@ void gearoenix::core::ecs::World::add_components_map(const Entity::id_t id, Enti
     const auto old_archetype_index = entity.archetype;
     const auto old_index_in_archetype = entity.index_in_archetype;
     archetypes[old_archetype_index].move_out_entity(old_index_in_archetype, c);
-    Entity::Builder::sort(c);
+    EntityBuilder::sort(c);
     const auto new_archetype_index = get_archetype_index(c);
     entity.archetype = new_archetype_index;
     entity.index_in_archetype = archetypes[new_archetype_index].allocate_entity(id, c);
@@ -55,7 +54,7 @@ void gearoenix::core::ecs::World::add_components_map(const Entity::id_t id, Enti
     update_entity(std::move(r));
 }
 
-void gearoenix::core::ecs::World::delayed_add_components_map(const Entity::id_t ei, Entity::Builder::components_t&& cs) noexcept
+void gearoenix::core::ecs::World::delayed_add_components_map(const Entity::id_t ei, EntityBuilder::components_t&& cs) noexcept
 {
     GX_GUARD_LOCK(delayed_actions)
     delayed_actions.emplace_back(std::make_pair(ei, std::move(cs)));
@@ -71,7 +70,7 @@ void gearoenix::core::ecs::World::remove_components_list(
     auto& entity = get_entity(id);
     const auto old_archetype_index = entity.archetype;
     const auto old_index_in_archetype = entity.index_in_archetype;
-    Entity::Builder::components_t cs;
+    EntityBuilder::components_t cs;
     cs.reserve(archetypes[old_archetype_index].components_indices.size());
     archetypes[old_archetype_index].move_out_entity(old_index_in_archetype, cs);
     for (auto iter = cs.begin(); iter != cs.end();) {
@@ -89,7 +88,7 @@ void gearoenix::core::ecs::World::remove_components_list(
             ++iter;
         }
     }
-    Entity::Builder::sort(cs);
+    EntityBuilder::sort(cs);
     const auto new_archetype_index = get_archetype_index(cs);
     entity.archetype = new_archetype_index;
     entity.index_in_archetype = archetypes[new_archetype_index].allocate_entity(id, cs);
@@ -105,7 +104,7 @@ void gearoenix::core::ecs::World::delayed_remove_components_list(
     delayed_actions.emplace_back(std::make_pair(ei, std::move(cs)));
 }
 
-std::size_t gearoenix::core::ecs::World::get_archetype_index(const Entity::Builder::components_t& cs) noexcept
+std::size_t gearoenix::core::ecs::World::get_archetype_index(const EntityBuilder::components_t& cs) noexcept
 {
     Archetype::id_t archetype_id;
     archetype_id.reserve(cs.size());
@@ -170,4 +169,9 @@ void gearoenix::core::ecs::World::update_entity(std::optional<std::pair<Entity::
         return;
     const auto [id, i] = *r;
     get_entity(id).index_in_archetype = i;
+}
+
+std::shared_ptr<gearoenix::core::ecs::EntitySharedBuilder> gearoenix::core::ecs::World::create_shared_builder() noexcept
+{
+    return std::shared_ptr<EntitySharedBuilder>(new EntitySharedBuilder(this));
 }

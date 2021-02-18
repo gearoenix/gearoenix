@@ -5,7 +5,7 @@
 
 namespace gearoenix::math {
 template <typename Element>
-struct Vec3 {
+struct Vec3 final {
     Element x, y, z;
 
     constexpr Vec3() noexcept
