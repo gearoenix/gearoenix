@@ -12,7 +12,7 @@ struct Stream;
 namespace gearoenix::math {
 struct Ray3;
 struct Sphere;
-struct Aabb3 {
+struct Aabb3 final {
     GX_GET_CREF_PRV(Vec3<double>, upper)
     GX_GET_CREF_PRV(Vec3<double>, lower)
     GX_GET_CREF_PRV(Vec3<double>, diameter)

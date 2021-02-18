@@ -1,6 +1,7 @@
 #include "gx-rnd-gltf-mesh-manager.hpp"
 #include "../../core/ecs/gx-cr-ecs-entity.hpp"
 #include "../../math/gx-math-vertex.hpp"
+#include "../../physics/gx-phs-boundary.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "../mesh/gx-rnd-msh-mesh.hpp"
 #include "gx-rnd-gltf-loader.hpp"
@@ -84,6 +85,15 @@ void gearoenix::render::gltf::MeshManager::get(
     GX_CHECK_EQUAL_D(tng_a.componentType, TINYGLTF_COMPONENT_TYPE_FLOAT)
     GX_CHECK_EQUAL_D(txc_a.componentType, TINYGLTF_COMPONENT_TYPE_FLOAT)
     GX_CHECK_EQUAL_D(ids_a.componentType, TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT)
+
+    const auto& pos_max = pos_a.maxValues;
+    const auto& pos_min = pos_a.maxValues;
+    GX_CHECK_EQUAL_D(pos_max.size(), 3)
+    GX_CHECK_EQUAL_D(pos_min.size(), 3)
+
+    builder->get_builder().add_component(physics::Boundary(
+        math::Vec3(pos_max[0], pos_max[1], pos_max[2]),
+        math::Vec3(pos_min[0], pos_min[1], pos_min[2])));
 
     std::vector<math::BasicVertex> vertices(pos_a.count);
     std::vector<std::uint32_t> indices(ids_a.count);
