@@ -26,14 +26,25 @@ gearoenix::vulkan::buffer::Buffer gearoenix::vulkan::buffer::Buffer::construct(
     const memory::Place place,
     memory::Manager& memory_manager) noexcept
 {
-    auto* const logical_device = memory_manager.get_logical_device().get();
-    const auto aligned_size = logical_device->get_physical_device()->align_size(size);
+    const auto& logical_device = memory_manager.get_logical_device();
+    const auto& physical_device = logical_device.get_physical_device();
+    const auto aligned_size = physical_device.align_size(size);
     auto allocator = core::Allocator::construct(aligned_size, 0, 0);
     VkBufferCreateInfo info;
     GX_SET_ZERO(info)
     info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
     info.size = static_cast<VkDeviceSize>(aligned_size);
-    info.usage = place == memory::Place::Cpu ? VK_BUFFER_USAGE_TRANSFER_SRC_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT : VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
+    info.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+    info.usage |= VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
+    info.usage |= VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT if (memory::Place::Cpu == place)
+    {
+        info.usage |= VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+    }
+    else
+    {
+        if ()
+            info.usage |= VK_BUFFER_USAGE_TRANSFER_DST_BIT;
+    }
     VkBuffer vulkan_data = nullptr;
     VkDevice dev = logical_device->get_vulkan_data();
     GX_VK_CHK_L(vkCreateBuffer(dev, &info, nullptr, &vulkan_data))

@@ -3,6 +3,7 @@
 #include "../../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../../platform/gx-plt-application.hpp"
 #include "../gx-vk-check.hpp"
+#include "../gx-vk-mesh.hpp"
 #include <imgui_impl_vulkan.h>
 
 gearoenix::vulkan::engine::Engine::Frame::Frame(
@@ -193,11 +194,11 @@ bool gearoenix::vulkan::engine::Engine::is_supported() noexcept
 }
 
 void gearoenix::vulkan::engine::Engine::create_mesh(
-    std::vector<math::BasicVertex>,
-    std::vector<std::uint32_t>,
-    core::sync::EndCaller<gearoenix::render::mesh::Mesh>&) noexcept
+    std::vector<math::BasicVertex> vertices,
+    std::vector<std::uint32_t> indices,
+    core::sync::EndCaller<render::mesh::Mesh>& c) noexcept
 {
-    GX_UNIMPLEMENTED
+    c.set_data(std::make_shared<Mesh>(this, std::move(vertices), std::move(indices)));
 }
 
 #endif

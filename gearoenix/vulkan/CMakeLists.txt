@@ -1,11 +1,11 @@
 SET(GX_ENGINE_VULKAN_SRC_DIR ${GX_ENGINE_SRC_DIR}/vulkan)
 SET(GX_ENGINE_VULKAN_SRC
-#        ${GX_ENGINE_VULKAN_SRC_DIR}/buffer/gx-vk-buf-buffer.cpp
-#        ${GX_ENGINE_VULKAN_SRC_DIR}/buffer/gx-vk-buf-buffer.hpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/buffer/gx-vk-buf-buffer.cpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/buffer/gx-vk-buf-buffer.hpp
 #        ${GX_ENGINE_VULKAN_SRC_DIR}/buffer/gx-vk-buf-dynamic.cpp
 #        ${GX_ENGINE_VULKAN_SRC_DIR}/buffer/gx-vk-buf-dynamic.hpp
-#        ${GX_ENGINE_VULKAN_SRC_DIR}/buffer/gx-vk-buf-manager.cpp
-#        ${GX_ENGINE_VULKAN_SRC_DIR}/buffer/gx-vk-buf-manager.hpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/buffer/gx-vk-buf-manager.cpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/buffer/gx-vk-buf-manager.hpp
 #        ${GX_ENGINE_VULKAN_SRC_DIR}/buffer/gx-vk-buf-static.cpp
 #        ${GX_ENGINE_VULKAN_SRC_DIR}/buffer/gx-vk-buf-static.hpp
 #        ${GX_ENGINE_VULKAN_SRC_DIR}/buffer/gx-vk-buf-uniform.cpp
@@ -84,6 +84,8 @@ SET(GX_ENGINE_VULKAN_SRC
         ${GX_ENGINE_VULKAN_SRC_DIR}/gx-vk-instance.hpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/gx-vk-loader.cpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/gx-vk-loader.hpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/gx-vk-mesh.cpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/gx-vk-mesh.hpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/gx-vk-render-pass.cpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/gx-vk-render-pass.hpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/gx-vk-surface.cpp

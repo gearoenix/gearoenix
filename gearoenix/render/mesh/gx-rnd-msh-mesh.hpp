@@ -1,17 +1,19 @@
 #ifndef GEAROENIX_RENDER_MESH_MESH_HPP
 #define GEAROENIX_RENDER_MESH_MESH_HPP
-#include "../../core/ecs/gx-cr-ecs-component.hpp"
+#include <memory>
 
 namespace gearoenix::core::ecs {
 struct EntitySharedBuilder;
 }
 
 namespace gearoenix::render::mesh {
-struct Mesh : public core::ecs::Component {
+struct Mesh {
 protected:
-    std::shared_ptr<Mesh> self;
+    std::shared_ptr<Mesh> origin;
+    std::weak_ptr<Mesh> self;
 
 public:
+    virtual ~Mesh() noexcept = default;
     virtual void set_component(const std::shared_ptr<core::ecs::EntitySharedBuilder>&) noexcept = 0;
 };
 }

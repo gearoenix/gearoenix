@@ -32,21 +32,25 @@ private:
     std::vector<std::pair<Uniform, image::Image*>> copy_images;
 
     [[nodiscard]] std::vector<Buffer> create_per_frame_cpu_root_buffers() const noexcept;
-    [[nodiscard]] Static create_static(std::size_t size, const void* data) noexcept;
+    [[nodiscard]] Buffer create(const void* data, std::size_t size) noexcept;
 
 public:
+    Manager(Manager&&) = delete;
+    Manager(const Manager&) = delete;
+    Manager& operator=(Manager&&) = delete;
+    Manager& operator=(Manager&) = delete;
     Manager(memory::Manager* memory_manager, engine::Engine* e) noexcept;
     ~Manager() noexcept;
     [[nodiscard]] Uniform create_uniform(std::size_t size, std::size_t frame_number) noexcept;
     template <typename T>
-    [[nodiscard]] Static create_static(const std::vector<T>& data) noexcept;
+    [[nodiscard]] Buffer create(const std::vector<T>& data) noexcept;
 };
 }
 
 template <typename T>
-gearoenix::vulkan::buffer::Static gearoenix::vulkan::buffer::Manager::create_static(const std::vector<T>& data) noexcept
+gearoenix::vulkan::buffer::Buffer gearoenix::vulkan::buffer::Manager::create(const std::vector<T>& data) noexcept
 {
-    return create_static(data.size() * sizeof(std::remove_reference<decltype(data)>::type::value_type), data.data());
+    return create(data.data(), data.size() * sizeof(T));
 }
 
 #endif
