@@ -17,6 +17,7 @@ struct RuntimeConfiguration {
     GX_GETSET_VAL_PRV(std::uint32_t, maximum_cpu_render_memory_size, 512 * 1024 * 1024)
     GX_GETSET_VAL_PRV(std::uint32_t, maximum_gpu_render_memory_size, 256 * 1024 * 1024)
     GX_GETSET_VAL_PRV(std::uint32_t, maximum_gpu_buffer_size, 64 * 1024 * 1024)
+    GX_GETSET_VAL_PRV(std::uint32_t, maximum_dynamic_buffer_size, maximum_gpu_buffer_size >> 3u)
     GX_GETSET_VAL_PRV(std::uint16_t, brdflut_resolution, GX_RENDER_DEFAULT_BRDFLUT_RESOLUTION)
     GX_GET_VAL_PRV(std::uint16_t, runtime_reflection_radiance_resolution, GX_RENDER_DEFAULT_RUNTIME_REFLECTION_RADIANCE_RESOLUTION)
     GX_GET_VAL_PRV(std::uint8_t, runtime_reflection_radiance_levels, 1)

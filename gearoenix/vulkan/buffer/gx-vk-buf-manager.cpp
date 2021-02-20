@@ -7,6 +7,24 @@
 #include "../engine/gx-vk-eng-engine.hpp"
 #include <type_traits>
 
+gearoenix::vulkan::buffer::Manager::Manager(
+    memory::Manager& memory_manager,
+    engine::Engine& e,
+    Buffer&& upload_root_buffer,
+    Buffer&& gpu_root_buffer,
+    std::vector<Buffer>&& each_frame_upload_source,
+    Buffer&& each_frame_upload_destination) noexcept
+    : memory_manager(memory_manager)
+    , e(e)
+    , upload_root_buffer(std::move(upload_root_buffer))
+    , gpu_root_buffer(std::move(gpu_root_buffer))
+    , each_frame_upload_source(std::move(each_frame_upload_source))
+    , each_frame_upload_destination(std::move(each_frame_upload_destination))
+{
+}
+
+gearoenix::vulkan::buffer::Manager::Manager(Manager&&) noexcept = default;
+
 std::vector<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Manager::create_per_frame_cpu_root_buffers() const noexcept
 {
     const auto count = e->get_frames_count();
@@ -31,15 +49,16 @@ gearoenix::vulkan::buffer::Static gearoenix::vulkan::buffer::Manager::create_sta
     return Static(std::move(gpu_buff), size, e);
 }
 
-gearoenix::vulkan::buffer::Manager::Manager(
-    memory::Manager* const memory_manager,
-    engine::Engine* const e) noexcept
-    : memory_manager(memory_manager)
-    , e(e)
-    , per_frame_cpu_root_buffers(create_per_frame_cpu_root_buffers())
-    , upload_root_buffer(Buffer::construct(per_frame_cpu_root_buffers[0].get_allocator()->get_size(), memory::Place::Cpu, *memory_manager))
-    , gpu_root_buffer(Buffer::construct(e->get_platform_application()->get_base().get_configuration().get_render_configuration().get_maximum_gpu_buffer_size(), memory::Place::Gpu, *memory_manager))
+gearoenix::vulkan::buffer::Manager gearoenix::vulkan::buffer::Manager::construct(
+    memory::Manager& memory_manager,
+    engine::Engine& e) noexcept
 {
+    const auto& cfg = e.get_platform_application().get_base().get_configuration().get_render_configuration();
+    const auto& phs_dev = e.get_physical_device();
+    const auto dyn_sz = cfg.get_maximum_cpu_render_memory_size();
+    auto upload_root_buffer = *Buffer::construct(per_frame_cpu_root_buffers[0].get_allocator()->get_size(), memory::Place::Cpu, *memory_manager))
+    auto per_frame_cpu_root_buffers = create_per_frame_cpu_root_buffers())
+    , gpu_root_buffer(Buffer::construct(e->get_platform_application()->get_base().get_configuration().get_render_configuration().get_maximum_gpu_buffer_size(), memory::Place::Gpu, *memory_manager))
 }
 
 gearoenix::vulkan::buffer::Manager::~Manager() noexcept = default;

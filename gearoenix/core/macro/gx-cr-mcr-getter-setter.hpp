@@ -129,14 +129,16 @@ public:                         \
 #define GX_GETSET_AVAL_PRT(t, x, d) GX_GETSET_AVAL(protected, t, x, d)
 #define GX_GETSET_AVAL_PRV(t, x, d) GX_GETSET_AVAL(private, t, x, d)
 
-#define GX_GET_RRF(v, c, t, x) \
-    v:                         \
-    c t& x;                    \
-                               \
-public:                        \
+#define GX_GET_CRRF(v, c, t, x) \
+    v:                          \
+    c t& x;                     \
+                                \
+public:                         \
     [[nodiscard]] const t& get_##x() const noexcept { return x; }
-
-#define GX_GET_CRRF_PRT(t, x) GX_GET_RRF(protected, const, t, x)
-#define GX_GET_CRRF_PRV(t, x) GX_GET_RRF(private, const, t, x)
-#define GX_GET_RRF_PRV(t, x) GX_GET_RRF(private, , t, x)
+#define GX_GET_RRF(v, t, x) \
+    GX_GET_CRRF(v, , t, x)  \
+    [[nodiscard]] t& get_##x() noexcept { return x; }
+#define GX_GET_CRRF_PRT(t, x) GX_GET_CRRF(protected, const, t, x)
+#define GX_GET_CRRF_PRV(t, x) GX_GET_CRRF(private, const, t, x)
+#define GX_GET_RRF_PRV(t, x) GX_GET_RRF(private, t, x)
 #endif

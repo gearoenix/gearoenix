@@ -25,14 +25,14 @@ struct Manager;
 
 namespace gearoenix::vulkan::buffer {
 struct Buffer final {
-    GX_GET_REFC_PRT(std::shared_ptr<core::Allocator>, allocator)
+    GX_GET_CREF_PRT(core::Allocator, allocator)
     GX_GET_PTR_PRT(Buffer, parent)
-    GX_GET_REF_PRT(memory::Memory, allocated_memory)
+    GX_GET_CREF_PRT(memory::Memory, allocated_memory)
     GX_GET_VAL_PRT(VkBuffer, vulkan_data, nullptr)
 
 protected:
     Buffer(
-        std::shared_ptr<core::Allocator> allocator,
+        core::Allocator&& allocator,
         Buffer* parent,
         memory::Memory&& allocated_memory,
         VkBuffer vulkan_data) noexcept;
@@ -40,10 +40,10 @@ protected:
 public:
     Buffer(const Buffer&) noexcept = delete;
     Buffer(Buffer&&) noexcept;
-    [[nodiscard]] static Buffer construct(
-        std::size_t size, memory::Place place, memory::Manager& memory_manager) noexcept;
+    [[nodiscard]] static std::optional<Buffer> construct(
+        const std::string&, std::size_t size, memory::Place place, memory::Manager& memory_manager) noexcept;
     ~Buffer() noexcept;
-    [[nodiscard]] Buffer allocate(std::size_t size) noexcept;
+    [[nodiscard]] std::optional<Buffer> allocate(std::size_t size) noexcept;
     //void copy(command::Buffer& command, const Buffer& src) noexcept;
     //void push_memory_barrier(command::Buffer& command) const noexcept;
     //[[nodiscard]] static std::uint32_t get_memory_type_bits(device::Logical& device, bool in_gpu) noexcept;
