@@ -47,7 +47,7 @@ public:
     //void copy(command::Buffer& command, const Buffer& src) noexcept;
     //void push_memory_barrier(command::Buffer& command) const noexcept;
     //[[nodiscard]] static std::uint32_t get_memory_type_bits(device::Logical& device, bool in_gpu) noexcept;
-    //void write(const void* data, unsigned int data_size, unsigned int offset) noexcept;
+    void write(const void* data, std::size_t size) noexcept;
 };
 }
 #endif

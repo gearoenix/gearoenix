@@ -1,5 +1,5 @@
-#ifndef GEAROENIX_VULKAN_LINKER_HPP
-#define GEAROENIX_VULKAN_LINKER_HPP
+#ifndef GEAROENIX_VULKAN_MESH_HPP
+#define GEAROENIX_VULKAN_MESH_HPP
 #include "../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
 #include "../core/ecs/gx-cr-ecs-component.hpp"
@@ -20,7 +20,11 @@ private:
     Mesh(engine::Engine*, std::vector<math::BasicVertex> vertices, std::vector<std::uint32_t> indices) noexcept;
 
 public:
-    [[nodiscard]] static std::shared_ptr<Mesh> create(
+    Mesh(Mesh&&) noexcept;
+    Mesh(const Mesh&) = delete;
+    Mesh& operator=(Mesh&&) = delete;
+    Mesh& operator=(const Mesh&) = delete;
+    [[nodiscard]] static std::shared_ptr<Mesh> construct(
         engine::Engine*, std::vector<math::BasicVertex> vertices, std::vector<std::uint32_t> indices) noexcept;
     ~Mesh() noexcept final;
     void set_component(const std::shared_ptr<core::ecs::EntitySharedBuilder>&) noexcept final;

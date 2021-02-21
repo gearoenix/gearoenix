@@ -84,6 +84,8 @@ SET(GX_ENGINE_VULKAN_SRC
         ${GX_ENGINE_VULKAN_SRC_DIR}/gx-vk-instance.hpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/gx-vk-loader.cpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/gx-vk-loader.hpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/gx-vk-marker.cpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/gx-vk-marker.hpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/gx-vk-mesh.cpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/gx-vk-mesh.hpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/gx-vk-render-pass.cpp

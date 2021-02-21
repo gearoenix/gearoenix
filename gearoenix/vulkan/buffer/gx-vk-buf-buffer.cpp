@@ -1,9 +1,11 @@
 #include "gx-vk-buf-buffer.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
+#include "../../core/macro/gx-cr-mcr-assert.hpp"
 #include "../../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../device/gx-vk-dev-physical.hpp"
 #include "../gx-vk-check.hpp"
+#include "../gx-vk-marker.hpp"
 #include "../memory/gx-vk-mem-manager.hpp"
 
 gearoenix::vulkan::buffer::Buffer::Buffer(
@@ -18,9 +20,18 @@ gearoenix::vulkan::buffer::Buffer::Buffer(
 {
 }
 
-gearoenix::vulkan::buffer::Buffer::Buffer(Buffer&&) noexcept = default;
+gearoenix::vulkan::buffer::Buffer::Buffer(Buffer&& o) noexcept
+    : allocator(std::move(o.allocator))
+    , parent(o.parent)
+    , allocated_memory(std::move(o.allocated_memory))
+    , vulkan_data(o.vulkan_data)
+{
+    o.vulkan_data = nullptr;
+    o.parent = nullptr;
+}
 
 std::optional<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Buffer::construct(
+    const std::string& name,
     const std::size_t size,
     const memory::Place place,
     memory::Manager& memory_manager) noexcept
@@ -59,6 +70,7 @@ std::optional<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Buff
     auto allocated_memory = std::move(*_allocated_memory);
     GX_VK_CHK(vkBindBufferMemory(
         dev, vulkan_data, allocated_memory.get_vulkan_data(), allocated_memory.get_allocator().get_offset()))
+    GX_VK_MARK(name, vulkan_data, logical_device)
     return Buffer(std::move(allocator), nullptr, std::move(allocated_memory), vulkan_data);
 }
 
@@ -67,6 +79,7 @@ gearoenix::vulkan::buffer::Buffer::~Buffer() noexcept
     if (nullptr == parent && nullptr != vulkan_data) {
         vkDestroyBuffer(
             allocated_memory.get_manager()->get_logical_device().get_vulkan_data(), vulkan_data, nullptr);
+        vulkan_data = nullptr;
     }
 }
 
@@ -119,14 +132,11 @@ std::optional<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Buff
 //    l->vkDestroyBuffer(vkdev, vulkan_data, nullptr);
 //    return memreqs.memoryTypeBits;
 //}
-//
-//void gearoenix::render::buffer::Buffer::write(const void* data, unsigned int data_size, unsigned int offset)
-//{
-//#ifdef DEBUG_MODE
-//    if (nullptr == buffer_data) {
-//        LOGF("Unexpected");
-//    }
-//#endif
-//    std::memcpy((void*)((size_t)buffer_data + (size_t)offset), data, data_size);
-//}
+
+void gearoenix::vulkan::buffer::Buffer::write(const void* data, const std::size_t size) noexcept
+{
+    GX_CHECK_NOT_EQUAL_D(nullptr, allocated_memory.get_data())
+    std::memcpy(allocated_memory.get_data(), data, size);
+}
+
 #endif

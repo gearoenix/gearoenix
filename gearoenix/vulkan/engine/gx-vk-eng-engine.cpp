@@ -86,6 +86,7 @@ gearoenix::vulkan::engine::Engine::Engine(const platform::Application& platform_
     , command_manager(logical_device)
     , descriptor_manager(logical_device)
     , pipeline_manager(logical_device)
+    , buffer_manager(buffer::Manager::construct(memory_manager, *this))
     , depth_stencil(image::View::create_depth_stencil(memory_manager))
     , render_pass(swapchain)
 {
@@ -125,6 +126,7 @@ void gearoenix::vulkan::engine::Engine::start_frame() noexcept
             auto& frame = frames[swapchain_image_index];
             frame.draw_wait.wait();
             frame.draw_wait.reset();
+            frame.draw_command.begin();
         }
     }
 }
@@ -135,10 +137,11 @@ void gearoenix::vulkan::engine::Engine::end_frame() noexcept
     // ImGui
     ImGui::Render();
     ImDrawData* draw_data = ImGui::GetDrawData();
+
+    buffer_manager.do_copies();
     if (swapchain_image_is_valid) {
         auto& frame = frames[swapchain_image_index];
         // Record ImGui commands
-        frame.draw_command.begin();
         frame.draw_command.begin(render_pass, frame.framebuffer);
         ImGui_ImplVulkan_RenderDrawData(draw_data, frame.draw_command.get_vulkan_data());
         frame.draw_command.end_render_pass();
@@ -181,6 +184,19 @@ void gearoenix::vulkan::engine::Engine::upload_imgui_fonts() noexcept
     vulkan_upload_imgui_fonts();
 }
 
+void gearoenix::vulkan::engine::Engine::create_mesh(
+    std::vector<math::BasicVertex> vertices,
+    std::vector<std::uint32_t> indices,
+    core::sync::EndCaller<render::mesh::Mesh>& c) noexcept
+{
+    c.set_data(Mesh::construct(this, std::move(vertices), std::move(indices)));
+}
+
+gearoenix::vulkan::command::Buffer& gearoenix::vulkan::engine::Engine::get_current_frame_command_buffer() noexcept
+{
+    return frames[swapchain_image_index].draw_command;
+}
+
 bool gearoenix::vulkan::engine::Engine::is_supported() noexcept
 {
     if (!Loader::load())
@@ -191,14 +207,6 @@ bool gearoenix::vulkan::engine::Engine::is_supported() noexcept
     auto& instance = instance_result.value();
     const auto gpus = device::Physical::get_available_devices(instance.get_vulkan_data());
     return !gpus.empty();
-}
-
-void gearoenix::vulkan::engine::Engine::create_mesh(
-    std::vector<math::BasicVertex> vertices,
-    std::vector<std::uint32_t> indices,
-    core::sync::EndCaller<render::mesh::Mesh>& c) noexcept
-{
-    c.set_data(std::make_shared<Mesh>(this, std::move(vertices), std::move(indices)));
 }
 
 #endif

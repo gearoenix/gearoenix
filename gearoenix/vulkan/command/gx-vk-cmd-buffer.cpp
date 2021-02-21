@@ -1,6 +1,7 @@
 #include "gx-vk-cmd-buffer.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
 #include "../../core/macro/gx-cr-mcr-zeroer.hpp"
+#include "../buffer/gx-vk-buf-buffer.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../device/gx-vk-dev-physical.hpp"
 #include "../gx-vk-check.hpp"
@@ -73,6 +74,14 @@ void gearoenix::vulkan::command::Buffer::end() noexcept
     GX_VK_CHK(vkEndCommandBuffer(vulkan_data))
 }
 
+void gearoenix::vulkan::command::Buffer::copy(
+    buffer::Buffer& src,
+    buffer::Buffer& des,
+    const std::vector<VkBufferCopy>& info) noexcept
+{
+    vkCmdCopyBuffer(vulkan_data, src.get_vulkan_data(), des.get_vulkan_data(), info.size(), info.data());
+}
+
 void gearoenix::vulkan::command::Buffer::begin(const RenderPass& render_pass, const Framebuffer& framebuffer) noexcept
 {
     const auto& img = framebuffer.get_depth()->get_image();
@@ -88,13 +97,6 @@ void gearoenix::vulkan::command::Buffer::begin(const RenderPass& render_pass, co
     vkCmdBeginRenderPass(vulkan_data, &info, VK_SUBPASS_CONTENTS_INLINE);
 }
 
-//
-//void gearoenix::vulkan::command::Buffer::copy_buffer(
-//    VkBuffer src, VkBuffer des, const VkBufferCopy& region) noexcept
-//{
-//    Loader::vkCmdCopyBuffer(vulkan_data, src, des, 1, &region);
-//}
-//
 //void gearoenix::vulkan::command::Buffer::begin_render_pass_with_info(
 //    const VkRenderPassBeginInfo& render_pass_begin_info) noexcept
 //{

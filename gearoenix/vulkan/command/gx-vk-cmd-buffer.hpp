@@ -5,6 +5,7 @@
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../gx-vk-loader.hpp"
 #include "gx-vk-cmd-type.hpp"
+#include <vector>
 
 namespace gearoenix::vulkan {
 struct DescriptorSet;
@@ -35,7 +36,7 @@ public:
     void begin() noexcept;
     void flush() noexcept;
     void end() noexcept;
-    void copy(buffer::Buffer& src, buffer::Buffer& des) noexcept;
+    void copy(buffer::Buffer& src, buffer::Buffer& des, const std::vector<VkBufferCopy>&) noexcept;
     void begin(const RenderPass& render_pass, const Framebuffer& framebuffer) noexcept;
     void end_render_pass() noexcept;
     void set(const Viewport& viewport) noexcept;

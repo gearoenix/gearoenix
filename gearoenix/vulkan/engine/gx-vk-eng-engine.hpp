@@ -78,11 +78,12 @@ public:
     void start_frame() noexcept final;
     void end_frame() noexcept final;
     void upload_imgui_fonts() noexcept final;
-    [[nodiscard]] static bool is_supported() noexcept;
     void create_mesh(
         std::vector<math::BasicVertex> vertices,
         std::vector<std::uint32_t> indices,
         core::sync::EndCaller<render::mesh::Mesh>& c) noexcept final;
+    [[nodiscard]] command::Buffer& get_current_frame_command_buffer() noexcept;
+    [[nodiscard]] static bool is_supported() noexcept;
 };
 }
 #endif

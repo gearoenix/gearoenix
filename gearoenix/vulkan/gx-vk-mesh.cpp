@@ -8,14 +8,16 @@ gearoenix::vulkan::Mesh::Mesh(
     std::vector<std::uint32_t> indices) noexcept
     : core::ecs::Component(this)
     , render::mesh::Mesh()
-    , vertex(e->get_buffer_manager().create(vertices))
-    , index(e->get_buffer_manager().create(indices))
+    , vertex(*e->get_buffer_manager().create(vertices))
+    , index(*e->get_buffer_manager().create(indices))
 {
     vertices.clear();
     indices.clear();
 }
 
-std::shared_ptr<gearoenix::vulkan::Mesh> gearoenix::vulkan::Mesh::create(
+gearoenix::vulkan::Mesh::Mesh(gearoenix::vulkan::Mesh&&) noexcept = default;
+
+std::shared_ptr<gearoenix::vulkan::Mesh> gearoenix::vulkan::Mesh::construct(
     engine::Engine* const e,
     std::vector<math::BasicVertex> vertices,
     std::vector<std::uint32_t> indices) noexcept

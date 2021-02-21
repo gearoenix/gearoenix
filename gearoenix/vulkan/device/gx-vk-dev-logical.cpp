@@ -14,6 +14,7 @@ gearoenix::vulkan::device::Logical::Logical(const Physical& p) noexcept
 #ifdef GX_VULKAN_DEVICE_DEBUG_MODE
     if (available_extensions.contains(VK_EXT_DEBUG_MARKER_EXTENSION_NAME)) {
         device_extensions.push_back(VK_EXT_DEBUG_MARKER_EXTENSION_NAME);
+        debug_marker_is_available = true;
     }
 #endif
     if (p.get_rtx_supported()) {

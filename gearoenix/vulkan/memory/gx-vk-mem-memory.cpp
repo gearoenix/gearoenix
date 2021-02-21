@@ -66,7 +66,7 @@ std::optional<gearoenix::vulkan::memory::Memory> gearoenix::vulkan::memory::Memo
         GX_LOG_D("No more space left in this Vulkan memory")
         return std::nullopt;
     }
-    void* const new_data = reinterpret_cast<void*>(reinterpret_cast<std::size_t>(data) + alc->get_offset());
+    void* const new_data = (data == nullptr) ? nullptr : reinterpret_cast<void*>(reinterpret_cast<std::size_t>(data) + alc->get_offset());
     return Memory(manager, this, std::move(alc.value()), new_data, place, type_index, vulkan_data);
 }
 
