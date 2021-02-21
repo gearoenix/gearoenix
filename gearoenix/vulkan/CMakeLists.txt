@@ -42,6 +42,10 @@ SET(GX_ENGINE_VULKAN_SRC
         ${GX_ENGINE_VULKAN_SRC_DIR}/memory/gx-vk-mem-memory.cpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/memory/gx-vk-mem-memory.hpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/memory/gx-vk-mem-place.hpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/mesh/gx-vk-msh-manager.cpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/mesh/gx-vk-msh-manager.hpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/mesh/gx-vk-msh-mesh.cpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/mesh/gx-vk-msh-mesh.hpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/pipeline/gx-vk-pip-cache.cpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/pipeline/gx-vk-pip-cache.hpp
 #        ${GX_ENGINE_VULKAN_SRC_DIR}/pipeline/gx-vk-pip-layout.cpp
@@ -86,8 +90,6 @@ SET(GX_ENGINE_VULKAN_SRC
         ${GX_ENGINE_VULKAN_SRC_DIR}/gx-vk-loader.hpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/gx-vk-marker.cpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/gx-vk-marker.hpp
-        ${GX_ENGINE_VULKAN_SRC_DIR}/gx-vk-mesh.cpp
-        ${GX_ENGINE_VULKAN_SRC_DIR}/gx-vk-mesh.hpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/gx-vk-render-pass.cpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/gx-vk-render-pass.hpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/gx-vk-surface.cpp

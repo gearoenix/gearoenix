@@ -3,7 +3,6 @@
 #include "../../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../../platform/gx-plt-application.hpp"
 #include "../gx-vk-check.hpp"
-#include "../gx-vk-mesh.hpp"
 #include <imgui_impl_vulkan.h>
 
 gearoenix::vulkan::engine::Engine::Frame::Frame(
@@ -87,6 +86,7 @@ gearoenix::vulkan::engine::Engine::Engine(const platform::Application& platform_
     , descriptor_manager(logical_device)
     , pipeline_manager(logical_device)
     , buffer_manager(buffer::Manager::construct(memory_manager, *this))
+    , mesh_manager(*this)
     , depth_stencil(image::View::create_depth_stencil(memory_manager))
     , render_pass(swapchain)
 {
@@ -189,7 +189,7 @@ void gearoenix::vulkan::engine::Engine::create_mesh(
     std::vector<std::uint32_t> indices,
     core::sync::EndCaller<render::mesh::Mesh>& c) noexcept
 {
-    c.set_data(Mesh::construct(this, std::move(vertices), std::move(indices)));
+    mesh_manager.create(std::move(vertices), std::move(indices), c);
 }
 
 gearoenix::vulkan::command::Buffer& gearoenix::vulkan::engine::Engine::get_current_frame_command_buffer() noexcept
