@@ -29,9 +29,16 @@ std::shared_ptr<gearoenix::vulkan::mesh::Mesh> gearoenix::vulkan::mesh::Mesh::co
 
 gearoenix::vulkan::mesh::Mesh::~Mesh() noexcept = default;
 
-void gearoenix::vulkan::mesh::Mesh::set_component(const std::shared_ptr<core::ecs::EntitySharedBuilder>&) noexcept
-{
+void gearoenix::vulkan::mesh::Mesh::set_component(const std::shared_ptr<core::ecs::EntitySharedBuilder>&) noexcept {
     GX_UNIMPLEMENTED
+}
+
+std::pair<VkDeviceAddress, VkDeviceAddress> gearoenix::vulkan::mesh::Mesh::get_buffers_address() const noexcept
+{
+    return {
+        vertex.get_device_address(),
+        index.get_device_address(),
+    };
 }
 
 #endif

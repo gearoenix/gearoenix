@@ -139,4 +139,16 @@ void gearoenix::vulkan::buffer::Buffer::write(const void* data, const std::size_
     std::memcpy(allocated_memory.get_data(), data, size);
 }
 
+VkDeviceAddress gearoenix::vulkan::buffer::Buffer::get_device_address() const noexcept
+{
+    VkBufferDeviceAddressInfo info;
+    GX_SET_ZERO(info)
+    info.sType = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO;
+    info.buffer = vulkan_data;
+    return vkGetBufferDeviceAddress(
+               allocated_memory.get_manager()->get_logical_device().get_vulkan_data(),
+               &info)
+        + static_cast<VkDeviceAddress>(allocator.get_offset());
+}
+
 #endif

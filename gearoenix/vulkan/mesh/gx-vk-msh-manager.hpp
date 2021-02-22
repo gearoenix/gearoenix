@@ -5,6 +5,7 @@
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../../core/sync/gx-cr-sync-end-caller.hpp"
 #include "../../math/gx-math-vertex.hpp"
+#include "../gx-vk-loader.hpp"
 
 namespace gearoenix::vulkan::engine {
 struct Engine;
@@ -17,14 +18,19 @@ struct Mesh;
 namespace gearoenix::vulkan::mesh {
 struct Manager final {
     GX_GET_RRF_PRV(engine::Engine, e)
+private:
+    GX_CREATE_GUARD(blass_info)
+    std::vector<std::pair<VkAccelerationStructureGeometryKHR, VkAccelerationStructureBuildRangeInfoKHR>> blass_info;
 
 public:
     explicit Manager(engine::Engine& e) noexcept;
     ~Manager() noexcept;
     void create(
+        const std::string& name,
         std::vector<math::BasicVertex> vertices,
         std::vector<std::uint32_t> indices,
         core::sync::EndCaller<render::mesh::Mesh>& c) noexcept;
+    void create_accelerators() noexcept;
 };
 }
 

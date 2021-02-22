@@ -18,7 +18,9 @@ void mark(const std::string&, std::uint64_t, VkDebugReportObjectTypeEXT, const d
 template <typename T>
 void mark(const std::string& name, T o, const device::Logical& dev) noexcept
 {
-    if constexpr (std::is_same_v<T, VkBuffer>) {
+    if constexpr (std::is_same_v<T, VkAccelerationStructureKHR>) {
+        mark(name, reinterpret_cast<std::uint64_t>(o), VK_DEBUG_REPORT_OBJECT_TYPE_ACCELERATION_STRUCTURE_KHR_EXT, dev);
+    } else if constexpr (std::is_same_v<T, VkBuffer>) {
         mark(name, reinterpret_cast<std::uint64_t>(o), VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_EXT, dev);
     } else {
         static_assert("Unknown type for marking");

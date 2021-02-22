@@ -48,6 +48,7 @@ public:
     //void push_memory_barrier(command::Buffer& command) const noexcept;
     //[[nodiscard]] static std::uint32_t get_memory_type_bits(device::Logical& device, bool in_gpu) noexcept;
     void write(const void* data, std::size_t size) noexcept;
+    [[nodiscard]] VkDeviceAddress get_device_address() const noexcept;
 };
 }
 #endif

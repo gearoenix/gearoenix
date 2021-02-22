@@ -86,6 +86,7 @@
 
 #define GX_VULKAN_FUNCTIONS_MAP(GX_VULKAN_LOADER_MAPPED_FUNCTION)                     \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCreateInstance);                               \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCreateAccelerationStructureKHR);               \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkDestroyInstance);                              \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkEnumerateInstanceVersion);                     \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkEnumeratePhysicalDevices);                     \
@@ -226,6 +227,8 @@
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdEndRenderPass);                             \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdExecuteCommands);                           \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkDestroySurfaceKHR);                            \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetAccelerationStructureBuildSizesKHR);        \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetBufferDeviceAddress);                       \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetPhysicalDeviceSurfaceSupportKHR);           \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetPhysicalDeviceSurfaceCapabilitiesKHR);      \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetPhysicalDeviceSurfaceFormatsKHR);           \

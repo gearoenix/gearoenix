@@ -50,6 +50,7 @@ public:
     Manager& operator=(const Manager&) = delete;
     [[nodiscard]] static Manager construct(memory::Manager& memory_manager, engine::Engine& e) noexcept;
     ~Manager() noexcept;
+    [[nodiscard]] std::optional<Buffer> create_static(std::size_t size) noexcept;
     [[nodiscard]] std::optional<Buffer> create_dynamic(std::size_t size, std::size_t frame_number) noexcept;
     [[nodiscard]] std::optional<Uniform> create_uniform(std::size_t size) noexcept;
     [[nodiscard]] std::optional<Buffer> create(

@@ -28,6 +28,7 @@ public:
         engine::Engine&, std::vector<math::BasicVertex> vertices, std::vector<std::uint32_t> indices) noexcept;
     ~Mesh() noexcept final;
     void set_component(const std::shared_ptr<core::ecs::EntitySharedBuilder>&) noexcept final;
+    [[nodiscard]] std::pair<VkDeviceAddress, VkDeviceAddress> get_buffers_address() const noexcept;
 };
 }
 
