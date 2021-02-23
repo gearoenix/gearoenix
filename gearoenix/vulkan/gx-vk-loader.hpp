@@ -204,6 +204,7 @@
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdCopyBuffer);                                \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdCopyImage);                                 \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdBlitImage);                                 \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdBuildAccelerationStructuresKHR);            \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdCopyBufferToImage);                         \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdCopyImageToBuffer);                         \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdUpdateBuffer);                              \

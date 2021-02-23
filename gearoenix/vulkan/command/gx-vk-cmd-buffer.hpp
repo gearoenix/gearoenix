@@ -46,6 +46,9 @@ public:
     void bind_vertices(buffer::Buffer& buf) noexcept;
     void bind_indices(buffer::Buffer& buf) noexcept;
     void draw_indices(std::size_t count) noexcept;
+    void build_acceleration_structure(
+        const VkAccelerationStructureBuildGeometryInfoKHR&,
+        const VkAccelerationStructureBuildRangeInfoKHR&) noexcept;
     [[nodiscard]] const VkCommandBuffer* get_vulkan_data_ptr() const noexcept;
 };
 }

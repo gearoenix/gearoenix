@@ -4,16 +4,11 @@
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "../gx-vk-check.hpp"
 #include "../gx-vk-marker.hpp"
-#include "gx-vk-msh-mesh.hpp"
+#include "../query/gx-vk-qu-pool.hpp"
+#include "gx-vk-msh-accel.hpp"
+#include "gx-vk-msh-raster.hpp"
 
-gearoenix::vulkan::mesh::Manager::Manager(engine::Engine& e) noexcept
-    : e(e)
-{
-}
-
-gearoenix::vulkan::mesh::Manager::~Manager() noexcept = default;
-
-void gearoenix::vulkan::mesh::Manager::create(
+void gearoenix::vulkan::mesh::Manager::create_accel(
     const std::string& name,
     std::vector<math::BasicVertex> vertices,
     std::vector<std::uint32_t> indices,
@@ -22,9 +17,11 @@ void gearoenix::vulkan::mesh::Manager::create(
     const auto vertices_count = vertices.size();
     const auto indices_count = indices.size();
 
-    auto mesh = Mesh::construct(e, std::move(vertices), std::move(indices));
+    auto mesh = Accel::construct(e, std::move(vertices), std::move(indices));
 
-    const auto vk_device = e.get_logical_device().get_vulkan_data();
+    auto& logical_device = e.get_logical_device();
+    auto& command_manager = e.get_command_manager();
+    const auto vk_device = logical_device.get_vulkan_data();
 
     const auto [vba, iba] = mesh->get_buffers_address();
 
@@ -85,6 +82,13 @@ void gearoenix::vulkan::mesh::Manager::create(
 
     auto scratch_buf = std::move(*e.get_buffer_manager().create_static(static_cast<std::size_t>(bsz_info.buildScratchSize)));
     const auto scratch_address = scratch_buf.get_device_address();
+    bge_info.scratchData.deviceAddress = scratch_address;
+
+    query::Pool query_pool(logical_device, VK_QUERY_TYPE_ACCELERATION_STRUCTURE_COMPACTED_SIZE_KHR);
+
+    auto cmd = command_manager.create(command::Type::Primary);
+    cmd.begin();
+    cmd.build_acceleration_structure(bge_info, rng_info);
 
     {
         GX_GUARD_LOCK(blass_info)
@@ -93,4 +97,35 @@ void gearoenix::vulkan::mesh::Manager::create(
 
     c.set_data(std::move(mesh));
 }
+
+void gearoenix::vulkan::mesh::Manager::create_raster(
+    const std::string& name,
+    std::vector<math::BasicVertex> vertices,
+    std::vector<std::uint32_t> indices,
+    core::sync::EndCaller<render::mesh::Mesh>& c) noexcept
+{
+    c.set_data(Raster::construct(e, std::move(vertices), std::move(indices)));
+}
+
+gearoenix::vulkan::mesh::Manager::Manager(engine::Engine& e) noexcept
+    : e(e)
+    , use_accel(e.get_logical_device().get_physical_device().get_rtx_supported())
+{
+}
+
+gearoenix::vulkan::mesh::Manager::~Manager() noexcept = default;
+
+void gearoenix::vulkan::mesh::Manager::create(
+    const std::string& name,
+    std::vector<math::BasicVertex> vertices,
+    std::vector<std::uint32_t> indices,
+    core::sync::EndCaller<render::mesh::Mesh>& c) noexcept
+{
+    if (use_accel) {
+        create_accel(name, std::move(vertices), std::move(indices), c);
+    } else {
+        create_raster(name, std::move(vertices), std::move(indices), c);
+    }
+}
+
 #endif

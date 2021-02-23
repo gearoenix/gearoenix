@@ -8,10 +8,6 @@ struct EntitySharedBuilder;
 
 namespace gearoenix::render::mesh {
 struct Mesh {
-protected:
-    std::shared_ptr<Mesh> origin;
-    std::weak_ptr<Mesh> self;
-
 public:
     virtual ~Mesh() noexcept = default;
     virtual void set_component(const std::shared_ptr<core::ecs::EntitySharedBuilder>&) noexcept = 0;

@@ -18,9 +18,22 @@ struct Mesh;
 namespace gearoenix::vulkan::mesh {
 struct Manager final {
     GX_GET_RRF_PRV(engine::Engine, e)
+    GX_GET_CVAL_PRV(bool, use_accel)
+
 private:
     GX_CREATE_GUARD(blass_info)
     std::vector<std::pair<VkAccelerationStructureGeometryKHR, VkAccelerationStructureBuildRangeInfoKHR>> blass_info;
+
+    void create_accel(
+        const std::string& name,
+        std::vector<math::BasicVertex> vertices,
+        std::vector<std::uint32_t> indices,
+        core::sync::EndCaller<render::mesh::Mesh>& c) noexcept;
+    void create_raster(
+        const std::string& name,
+        std::vector<math::BasicVertex> vertices,
+        std::vector<std::uint32_t> indices,
+        core::sync::EndCaller<render::mesh::Mesh>& c) noexcept;
 
 public:
     explicit Manager(engine::Engine& e) noexcept;

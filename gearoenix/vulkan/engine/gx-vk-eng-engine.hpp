@@ -51,7 +51,7 @@ struct Engine final : public render::engine::Engine {
     GX_GET_CREF_PRV(device::Logical, logical_device)
     GX_GET_CREF_PRV(Swapchain, swapchain)
     GX_GET_CREF_PRV(memory::Manager, memory_manager)
-    GX_GET_CREF_PRV(command::Manager, command_manager)
+    GX_GET_REF_PRV(command::Manager, command_manager)
     GX_GET_CREF_PRV(descriptor::Manager, descriptor_manager)
     GX_GET_CREF_PRV(pipeline::Manager, pipeline_manager)
     GX_GET_REF_PRV(buffer::Manager, buffer_manager)

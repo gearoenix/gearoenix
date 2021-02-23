@@ -150,6 +150,14 @@ void gearoenix::vulkan::command::Buffer::draw_indices(VkDeviceSize count) noexce
     vkCmdDrawIndexed(vulkan_data, static_cast<std::uint32_t>(count), 1, 0, 0, 1);
 }
 
+void gearoenix::vulkan::command::Buffer::build_acceleration_structure(
+    const VkAccelerationStructureBuildGeometryInfoKHR& info,
+    const VkAccelerationStructureBuildRangeInfoKHR& range) noexcept
+{
+    const auto* const range_ptr = &range;
+    vkCmdBuildAccelerationStructuresKHR(vulkan_data, 1, &info, &range_ptr);
+}
+
 const VkCommandBuffer* gearoenix::vulkan::command::Buffer::get_vulkan_data_ptr() const noexcept
 {
     return &vulkan_data;

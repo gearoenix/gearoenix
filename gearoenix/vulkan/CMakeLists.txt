@@ -42,10 +42,16 @@ SET(GX_ENGINE_VULKAN_SRC
         ${GX_ENGINE_VULKAN_SRC_DIR}/memory/gx-vk-mem-memory.cpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/memory/gx-vk-mem-memory.hpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/memory/gx-vk-mem-place.hpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/mesh/gx-vk-msh-accel.cpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/mesh/gx-vk-msh-accel.hpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/mesh/gx-vk-msh-accel-component.cpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/mesh/gx-vk-msh-accel-component.hpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/mesh/gx-vk-msh-manager.cpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/mesh/gx-vk-msh-manager.hpp
-        ${GX_ENGINE_VULKAN_SRC_DIR}/mesh/gx-vk-msh-mesh.cpp
-        ${GX_ENGINE_VULKAN_SRC_DIR}/mesh/gx-vk-msh-mesh.hpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/mesh/gx-vk-msh-raster.cpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/mesh/gx-vk-msh-raster.hpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/mesh/gx-vk-msh-raster-component.cpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/mesh/gx-vk-msh-raster-component.hpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/pipeline/gx-vk-pip-cache.cpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/pipeline/gx-vk-pip-cache.hpp
 #        ${GX_ENGINE_VULKAN_SRC_DIR}/pipeline/gx-vk-pip-layout.cpp
@@ -54,6 +60,8 @@ SET(GX_ENGINE_VULKAN_SRC
         ${GX_ENGINE_VULKAN_SRC_DIR}/pipeline/gx-vk-pip-manager.hpp
 #        ${GX_ENGINE_VULKAN_SRC_DIR}/pipeline/gx-vk-pip-pipeline.cpp
 #        ${GX_ENGINE_VULKAN_SRC_DIR}/pipeline/gx-vk-pip-pipeline.hpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/query/gx-vk-qu-pool.cpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/query/gx-vk-qu-pool.hpp
 #        ${GX_ENGINE_VULKAN_SRC_DIR}/sampler/gx-vk-smp-manager.cpp
 #        ${GX_ENGINE_VULKAN_SRC_DIR}/sampler/gx-vk-smp-manager.hpp
 #        ${GX_ENGINE_VULKAN_SRC_DIR}/sampler/gx-vk-smp-sampler.cpp
