@@ -57,8 +57,10 @@ gearoenix::core::Allocator::Allocator(Allocator&& o) noexcept
 
 gearoenix::core::Allocator::~Allocator() noexcept
 {
-    if (nullptr != parent)
+    if (nullptr != parent) {
         parent->deallocate(size, offset);
+        parent = nullptr;
+    }
 }
 
 gearoenix::core::Allocator& gearoenix::core::Allocator::operator=(Allocator&& o) noexcept

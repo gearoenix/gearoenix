@@ -31,6 +31,8 @@ SET(GX_ENGINE_VULKAN_SRC
         ${GX_ENGINE_VULKAN_SRC_DIR}/device/gx-vk-dev-physical.hpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/engine/gx-vk-eng-engine.cpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/engine/gx-vk-eng-engine.hpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/engine/gx-vk-eng-frame.cpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/engine/gx-vk-eng-frame.hpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/image/gx-vk-img-image.cpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/image/gx-vk-img-image.hpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/image/gx-vk-img-manager.cpp

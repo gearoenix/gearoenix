@@ -5,20 +5,6 @@
 #include "../gx-vk-check.hpp"
 #include <imgui_impl_vulkan.h>
 
-gearoenix::vulkan::engine::Engine::Frame::Frame(
-    command::Manager& command_manager,
-    const Swapchain& swapchain,
-    const image::View& depth_stencil,
-    const RenderPass& render_pass,
-    const unsigned int frame_index) noexcept
-    : draw_command(command_manager.create(command::Type::Primary))
-    , draw_wait(command_manager.get_logical_device(), true)
-    , framebuffer(&swapchain.get_image_views()[frame_index], &depth_stencil, &render_pass)
-    , present_complete(command_manager.get_logical_device())
-    , render_complete(command_manager.get_logical_device())
-{
-}
-
 void gearoenix::vulkan::engine::Engine::setup_imgui() noexcept
 {
     ImGui_ImplVulkan_InitInfo info {};
@@ -123,10 +109,7 @@ void gearoenix::vulkan::engine::Engine::start_frame() noexcept
             swapchain_image_is_valid = false;
         }
         if (swapchain_image_is_valid) {
-            auto& frame = frames[swapchain_image_index];
-            frame.draw_wait.wait();
-            frame.draw_wait.reset();
-            frame.draw_command.begin();
+            frames[swapchain_image_index].begin();
         }
     }
 }

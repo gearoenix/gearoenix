@@ -4,47 +4,22 @@
 #ifdef GX_RENDER_VULKAN_ENABLED
 #include "../../render/engine/gx-rnd-eng-engine.hpp"
 #include "../buffer/gx-vk-buf-manager.hpp"
-#include "../command/gx-vk-cmd-buffer.hpp"
-#include "../command/gx-vk-cmd-manager.hpp"
 #include "../descriptor/gx-vk-des-manager.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../device/gx-vk-dev-physical.hpp"
-#include "../gx-vk-framebuffer.hpp"
 #include "../gx-vk-instance.hpp"
 #include "../gx-vk-render-pass.hpp"
 #include "../gx-vk-surface.hpp"
-#include "../gx-vk-swapchain.hpp"
 #include "../image/gx-vk-img-view.hpp"
 #include "../memory/gx-vk-mem-manager.hpp"
 #include "../mesh/gx-vk-msh-manager.hpp"
 #include "../pipeline/gx-vk-pip-manager.hpp"
-#include "../sync/gx-vk-sync-fence.hpp"
-#include "../sync/gx-vk-sync-semaphore.hpp"
+#include "gx-vk-eng-frame.hpp"
 #include <functional>
 #include <mutex>
 
 namespace gearoenix::vulkan::engine {
 struct Engine final : public render::engine::Engine {
-    struct Frame final {
-        command::Buffer draw_command;
-        sync::Fence draw_wait;
-        Framebuffer framebuffer;
-        sync::Semaphore present_complete;
-        sync::Semaphore render_complete;
-
-        Frame(const Frame&) = delete;
-        Frame(Frame&&) noexcept = default;
-        Frame& operator=(const Frame&) = delete;
-        Frame& operator=(Frame&&) = delete;
-
-        Frame(
-            command::Manager& command_manager,
-            const Swapchain&,
-            const image::View&,
-            const RenderPass&,
-            unsigned int) noexcept;
-    };
-
     GX_GET_CREF_PRV(Instance, instance)
     GX_GET_CREF_PRV(Surface, surface)
     GX_GET_CREF_PRV(device::Physical, physical_device)
