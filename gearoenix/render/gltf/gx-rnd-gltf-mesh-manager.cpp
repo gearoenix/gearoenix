@@ -124,5 +124,5 @@ void gearoenix::render::gltf::MeshManager::get(
     core::sync::EndCaller<mesh::Mesh> end([c, b { std::move(builder) }](const std::shared_ptr<mesh::Mesh>& m) noexcept {
         m->set_component(b);
     });
-    loader.get_e()->create_mesh(std::move(vertices), std::move(indices), end);
+    loader.get_e()->create_mesh(mesh.name, std::move(vertices), std::move(indices), end);
 }

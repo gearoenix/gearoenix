@@ -185,11 +185,12 @@ void gearoenix::vulkan::engine::Engine::upload_imgui_fonts() noexcept
 }
 
 void gearoenix::vulkan::engine::Engine::create_mesh(
+    const std::string& name,
     std::vector<math::BasicVertex> vertices,
     std::vector<std::uint32_t> indices,
     core::sync::EndCaller<render::mesh::Mesh>& c) noexcept
 {
-    mesh_manager.create(std::move(vertices), std::move(indices), c);
+    mesh_manager.create(name, std::move(vertices), std::move(indices), c);
 }
 
 gearoenix::vulkan::command::Buffer& gearoenix::vulkan::engine::Engine::get_current_frame_command_buffer() noexcept

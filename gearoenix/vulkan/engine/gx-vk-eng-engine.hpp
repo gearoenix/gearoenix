@@ -81,6 +81,7 @@ public:
     void end_frame() noexcept final;
     void upload_imgui_fonts() noexcept final;
     void create_mesh(
+        const std::string& name,
         std::vector<math::BasicVertex> vertices,
         std::vector<std::uint32_t> indices,
         core::sync::EndCaller<render::mesh::Mesh>& c) noexcept final;

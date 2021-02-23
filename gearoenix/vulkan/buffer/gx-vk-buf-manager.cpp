@@ -60,6 +60,13 @@ gearoenix::vulkan::buffer::Manager gearoenix::vulkan::buffer::Manager::construct
         std::move(each_frame_upload_destination));
 }
 
+gearoenix::vulkan::buffer::Manager::~Manager() noexcept = default;
+
+std::optional<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Manager::create_static(const std::size_t size) noexcept
+{
+    return gpu_root_buffer.allocate(size);
+}
+
 std::optional<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Manager::create(
     const void* const data, const std::size_t size, core::sync::EndCallerIgnored end) noexcept
 {
@@ -75,8 +82,6 @@ std::optional<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Mana
     upload_buffers.emplace_back(gpu.get_allocator().get_offset(), std::move(cpu), std::move(end));
     return std::move(gpu);
 }
-
-gearoenix::vulkan::buffer::Manager::~Manager() noexcept = default;
 
 void gearoenix::vulkan::buffer::Manager::do_copies() noexcept
 {
