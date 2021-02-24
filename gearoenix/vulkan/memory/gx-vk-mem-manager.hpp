@@ -18,7 +18,7 @@ public:
 private:
     GX_CREATE_GUARD(this)
     /// type-index -> memory
-    std::map<std::pair<std::uint32_t, Place>, Memory> memories;
+    std::map<std::pair<std::uint32_t, Place>, std::weak_ptr<Memory>> memories;
 
 public:
     Manager(const Manager&) = delete;

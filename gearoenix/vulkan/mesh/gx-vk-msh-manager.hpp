@@ -34,6 +34,8 @@ private:
         std::vector<math::BasicVertex> vertices,
         std::vector<std::uint32_t> indices,
         core::sync::EndCaller<render::mesh::Mesh>& c) noexcept;
+    void update_accel() noexcept;
+    void update_raster() noexcept;
 
 public:
     explicit Manager(engine::Engine& e) noexcept;
@@ -43,7 +45,7 @@ public:
         std::vector<math::BasicVertex> vertices,
         std::vector<std::uint32_t> indices,
         core::sync::EndCaller<render::mesh::Mesh>& c) noexcept;
-    void create_accelerators() noexcept;
+    void update() noexcept;
 };
 }
 

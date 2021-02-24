@@ -57,7 +57,7 @@ public:
         const void* data, std::size_t size, core::sync::EndCallerIgnored = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
     template <typename T>
     [[nodiscard]] std::optional<Buffer> create(const std::vector<T>& data) noexcept;
-    void do_copies() noexcept;
+    void do_copies(command::Buffer&) noexcept;
 };
 }
 

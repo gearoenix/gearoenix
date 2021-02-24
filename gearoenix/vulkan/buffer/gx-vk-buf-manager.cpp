@@ -83,7 +83,7 @@ std::optional<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Mana
     return std::move(gpu);
 }
 
-void gearoenix::vulkan::buffer::Manager::do_copies() noexcept
+void gearoenix::vulkan::buffer::Manager::do_copies(command::Buffer& cmd) noexcept
 {
     decltype(upload_buffers) up_bfs;
     {
@@ -102,7 +102,6 @@ void gearoenix::vulkan::buffer::Manager::do_copies() noexcept
             info.srcOffset = bf_alc.get_offset();
             info.dstOffset = std::get<0>(up_bf);
         }
-        auto& cmd = e.get_current_frame_command_buffer();
         cmd.copy(gpu_root_buffer, upload_root_buffer, copy_info);
     }
 }

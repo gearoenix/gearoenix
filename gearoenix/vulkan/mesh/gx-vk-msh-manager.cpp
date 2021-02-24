@@ -17,13 +17,13 @@ void gearoenix::vulkan::mesh::Manager::create_accel(
     const auto vertices_count = vertices.size();
     const auto indices_count = indices.size();
 
-    auto mesh = Accel::construct(e, std::move(vertices), std::move(indices));
+    auto result = Accel::construct(e, std::move(vertices), std::move(indices));
 
     auto& logical_device = e.get_logical_device();
     auto& command_manager = e.get_command_manager();
     const auto vk_device = logical_device.get_vulkan_data();
 
-    const auto [vba, iba] = mesh->get_buffers_address();
+    const auto [vba, iba] = result->get_buffers_address();
 
     VkAccelerationStructureGeometryKHR geo_info;
     GX_SET_ZERO(geo_info)
@@ -61,7 +61,7 @@ void gearoenix::vulkan::mesh::Manager::create_accel(
         VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR,
         &bge_info, &rng_info.primitiveCount, &bsz_info);
 
-    auto buf = std::move(*e.get_buffer_manager().create_static(static_cast<std::size_t>(bsz_info.accelerationStructureSize)));
+    result->accel = std::move(e.get_buffer_manager().create_static(static_cast<std::size_t>(bsz_info.accelerationStructureSize)));
 
     VkAccelerationStructureCreateInfoKHR asc_info;
     GX_SET_ZERO(asc_info)
@@ -107,6 +107,14 @@ void gearoenix::vulkan::mesh::Manager::create_raster(
     c.set_data(Raster::construct(e, std::move(vertices), std::move(indices)));
 }
 
+void gearoenix::vulkan::mesh::Manager::update_accel() noexcept
+{
+}
+
+void gearoenix::vulkan::mesh::Manager::update_raster() noexcept
+{
+}
+
 gearoenix::vulkan::mesh::Manager::Manager(engine::Engine& e) noexcept
     : e(e)
     , use_accel(e.get_logical_device().get_physical_device().get_rtx_supported())
@@ -125,6 +133,15 @@ void gearoenix::vulkan::mesh::Manager::create(
         create_accel(name, std::move(vertices), std::move(indices), c);
     } else {
         create_raster(name, std::move(vertices), std::move(indices), c);
+    }
+}
+
+void gearoenix::vulkan::mesh::Manager::update() noexcept
+{
+    if (use_accel) {
+        update_accel();
+    } else {
+        update_raster();
     }
 }
 

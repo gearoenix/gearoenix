@@ -121,9 +121,10 @@ void gearoenix::vulkan::engine::Engine::end_frame() noexcept
     ImGui::Render();
     ImDrawData* draw_data = ImGui::GetDrawData();
 
-    buffer_manager.do_copies();
     if (swapchain_image_is_valid) {
         auto& frame = frames[swapchain_image_index];
+        buffer_manager.do_copies(frame.copy_command);
+        mesh_manager.create_accelerators();
         // Record ImGui commands
         frame.draw_command.begin(render_pass, frame.framebuffer);
         ImGui_ImplVulkan_RenderDrawData(draw_data, frame.draw_command.get_vulkan_data());
@@ -176,9 +177,14 @@ void gearoenix::vulkan::engine::Engine::create_mesh(
     mesh_manager.create(name, std::move(vertices), std::move(indices), c);
 }
 
-gearoenix::vulkan::command::Buffer& gearoenix::vulkan::engine::Engine::get_current_frame_command_buffer() noexcept
+gearoenix::vulkan::engine::Frame& gearoenix::vulkan::engine::Engine::get_current_frame() noexcept
 {
-    return frames[swapchain_image_index].draw_command;
+    return frames[swapchain_image_index];
+}
+
+const gearoenix::vulkan::engine::Frame& gearoenix::vulkan::engine::Engine::get_current_frame() const noexcept
+{
+    return frames[swapchain_image_index];
 }
 
 bool gearoenix::vulkan::engine::Engine::is_supported() noexcept

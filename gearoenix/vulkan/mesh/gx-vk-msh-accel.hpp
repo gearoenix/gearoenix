@@ -12,11 +12,16 @@ struct Engine;
 }
 
 namespace gearoenix::vulkan::mesh {
+struct Manager;
 struct Accel final : public render::mesh::Mesh {
+    friend Manager;
     GX_GET_CREF_PRV(buffer::Buffer, vertex)
     GX_GET_CREF_PRV(buffer::Buffer, index)
 
 private:
+    VkAccelerationStructureKHR vulkan_data = nullptr;
+    std::optional<buffer::Buffer> accel = std::nullopt;
+
     std::weak_ptr<Accel> self;
 
     Accel(engine::Engine&, std::vector<math::BasicVertex> vertices, std::vector<std::uint32_t> indices) noexcept;

@@ -60,7 +60,8 @@ public:
         std::vector<math::BasicVertex> vertices,
         std::vector<std::uint32_t> indices,
         core::sync::EndCaller<render::mesh::Mesh>& c) noexcept final;
-    [[nodiscard]] command::Buffer& get_current_frame_command_buffer() noexcept;
+    [[nodiscard]] Frame& get_current_frame() noexcept;
+    [[nodiscard]] const Frame& get_current_frame() const noexcept;
     [[nodiscard]] static bool is_supported() noexcept;
 };
 }

@@ -20,16 +20,6 @@ gearoenix::vulkan::buffer::Buffer::Buffer(
 {
 }
 
-gearoenix::vulkan::buffer::Buffer::Buffer(Buffer&& o) noexcept
-    : allocator(std::move(o.allocator))
-    , parent(o.parent)
-    , allocated_memory(std::move(o.allocated_memory))
-    , vulkan_data(o.vulkan_data)
-{
-    o.vulkan_data = nullptr;
-    o.parent = nullptr;
-}
-
 std::optional<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Buffer::construct(
     const std::string& name,
     const std::size_t size,

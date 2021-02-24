@@ -7,7 +7,9 @@ gearoenix::vulkan::engine::Frame::Frame(
     const image::View& depth_stencil,
     const RenderPass& render_pass,
     const unsigned int frame_index) noexcept
-    : draw_command(command_manager.create(command::Type::Primary))
+    : copy_command(command_manager.create(command::Type::Primary))
+    , barrier_command(command_manager.create(command::Type::Primary))
+    , draw_command(command_manager.create(command::Type::Primary))
     , draw_wait(command_manager.get_logical_device(), true)
     , framebuffer(&swapchain.get_image_views()[frame_index], &depth_stencil, &render_pass)
     , present_complete(command_manager.get_logical_device())

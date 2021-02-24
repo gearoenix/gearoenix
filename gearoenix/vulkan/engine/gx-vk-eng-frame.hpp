@@ -11,6 +11,10 @@
 
 namespace gearoenix::vulkan::engine {
 struct Frame final {
+    command::Buffer copy_command;
+    std::vector<command::Buffer> blas_creation_commands;
+    std::vector<VkCommandBuffer> blas_creation_commands_vd;
+    command::Buffer barrier_command;
     command::Buffer draw_command;
     sync::Fence draw_wait;
     Framebuffer framebuffer;

@@ -3,34 +3,41 @@
 #include "../platform/macro/gx-plt-mcr-lock.hpp"
 #include "macro/gx-cr-mcr-getter-setter.hpp"
 #include <map>
+#include <memory>
 #include <optional>
 #include <set>
 
 namespace gearoenix::core {
-/// Allocator struct for implementing GC or other memory management mechanisms
-///
-/// \note Be careful about the movement operations, it may cause the parent pointer be incorrect.
+/// Allocator struct for memory management mechanisms
 struct Allocator final {
-    GX_GET_VAL_PRV(std::size_t, size, 0)
-    /// It is the offset from the direct parent not the origin parent
+    GX_GET_CVAL_PRV(std::size_t, size)
+    /// It is the offset from the origin parent
     GX_GET_VAL_PRV(std::size_t, offset, 0)
 private:
+    /// size, offset (within itself)
+    typedef std::pair<std::size_t, std::size_t> SizeOffset;
+    /// allocator that is before free space, allocator that is after space
+    typedef std::pair<Allocator*, Allocator*> Range;
     GX_CREATE_GUARD(this)
-    std::set<std::pair<std::size_t, std::size_t>> size_start;
-    std::map<std::size_t, std::size_t> start_to_end;
-    std::map<std::size_t, std::size_t> end_to_start;
-    Allocator* parent = nullptr;
+    std::map<SizeOffset, Range> ranges;
+    std::weak_ptr<Allocator> self;
+    const std::shared_ptr<Allocator> parent;
+    std::optional<SizeOffset> previous_key = std::nullopt;
+    std::optional<SizeOffset> next_key = std::nullopt;
+    Allocator* previous = nullptr;
+    Allocator* next = nullptr;
 
-    void deallocate(std::size_t size, std::size_t offset) noexcept;
+    explicit Allocator(std::size_t, std::shared_ptr<Allocator> parent = nullptr) noexcept;
+    void deallocate(const Allocator* child) noexcept;
 
 public:
-    explicit Allocator(std::size_t size, std::size_t offset = 0, Allocator* parent = nullptr) noexcept;
-    Allocator(Allocator&&) noexcept;
+    [[nodiscard]] static std::shared_ptr<Allocator> construct(std::size_t size) noexcept;
+    Allocator(Allocator&&) = delete;
     Allocator(const Allocator&) = delete;
-    ~Allocator() noexcept;
-    Allocator& operator=(Allocator&&) noexcept;
+    Allocator& operator=(Allocator&&) = delete;
     Allocator& operator=(const Allocator&) = delete;
-    [[nodiscard]] std::optional<Allocator> allocate(std::size_t size) noexcept;
+    ~Allocator() noexcept;
+    [[nodiscard]] std::shared_ptr<Allocator> allocate(std::size_t size) noexcept;
 };
 }
 #endif

@@ -32,19 +32,12 @@ std::optional<gearoenix::vulkan::memory::Memory> gearoenix::vulkan::memory::Mana
     if (memories.end() == search) {
         const auto& cfg = physical_device.get_surface().get_platform_application().get_base().get_configuration().get_render_configuration();
         const auto aligned_size = align(place == Place::Gpu ? cfg.get_maximum_gpu_render_memory_size() : cfg.get_maximum_cpu_render_memory_size());
-        VkMemoryAllocateInfo info;
-        GX_SET_ZERO(info)
-        info.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-        info.allocationSize = static_cast<VkDeviceSize>(aligned_size);
-        info.memoryTypeIndex = index.first;
-        VkDeviceMemory vulkan_data = nullptr;
-        void* data = nullptr;
-        GX_VK_CHK(vkAllocateMemory(logical_device.get_vulkan_data(), &info, nullptr, &vulkan_data))
-        if (Place::Cpu == place) {
-            GX_VK_CHK(vkMapMemory(logical_device.get_vulkan_data(), vulkan_data, 0, static_cast<VkDeviceSize>(aligned_size), 0, &data))
-        }
-        memories.emplace(index, Memory(this, nullptr, core::Allocator(aligned_size), data, place, index.first, vulkan_data));
+        //todo
+        memories.emplace(index, Memory::construct(*this, place, index.first, aligned_size));
         search = memories.find(index);
+    }
+    if (auto m = search->second.lock()) {
+        m->allocate(size);
     }
     return search->second.allocate(size);
 }
