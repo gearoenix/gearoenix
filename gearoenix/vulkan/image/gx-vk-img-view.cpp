@@ -4,6 +4,7 @@
 #include "../../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../device/gx-vk-dev-physical.hpp"
+#include "../engine/gx-vk-eng-engine.hpp"
 #include "../gx-vk-check.hpp"
 #include "../memory/gx-vk-mem-manager.hpp"
 
@@ -62,7 +63,7 @@ gearoenix::vulkan::image::View& gearoenix::vulkan::image::View::operator=(View&&
 
 gearoenix::vulkan::image::View gearoenix::vulkan::image::View::create_depth_stencil(memory::Manager& mem_mgr) noexcept
 {
-    const auto& physical_device = mem_mgr.get_logical_device().get_physical_device();
+    const auto& physical_device = mem_mgr.get_e().get_logical_device().get_physical_device();
     const VkFormat depth_format = physical_device.get_supported_depth_format();
     const auto surf_cap = physical_device.get_surface_capabilities();
     return View(Image(

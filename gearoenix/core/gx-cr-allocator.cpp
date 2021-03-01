@@ -1,5 +1,6 @@
 #include "gx-cr-allocator.hpp"
 #include "macro/gx-cr-mcr-assert.hpp"
+#include <algorithm>
 
 gearoenix::core::Allocator::Allocator(
     const std::size_t size, std::shared_ptr<Allocator> parent) noexcept

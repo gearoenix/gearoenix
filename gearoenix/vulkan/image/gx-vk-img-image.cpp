@@ -1,16 +1,18 @@
 #include "gx-vk-img-image.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
+#include "../../core/gx-cr-allocator.hpp"
 #include "../../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../buffer/gx-vk-buf-buffer.hpp"
 #include "../command/gx-vk-cmd-buffer.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../device/gx-vk-dev-physical.hpp"
+#include "../engine/gx-vk-eng-engine.hpp"
 #include "../gx-vk-check.hpp"
 #include "../memory/gx-vk-mem-manager.hpp"
 
 void gearoenix::vulkan::image::Image::terminate() noexcept
 {
-    if (allocated_memory.has_value() && vulkan_data != nullptr) {
+    if (nullptr != allocated_memory && vulkan_data != nullptr) {
         vkDestroyImage(logical_device->get_vulkan_data(), vulkan_data, nullptr);
         vulkan_data = nullptr;
     }
@@ -66,7 +68,7 @@ gearoenix::vulkan::image::Image::Image(
     const VkImageCreateFlags flags,
     const VkImageUsageFlags usage,
     memory::Manager& mem_mgr) noexcept
-    : logical_device(&mem_mgr.get_logical_device())
+    : logical_device(&mem_mgr.get_e().get_logical_device())
     , image_width(image_width)
     , image_height(image_height)
     , image_depth(image_depth)
@@ -100,7 +102,7 @@ gearoenix::vulkan::image::Image::Image(
         logical_device->get_vulkan_data(),
         vulkan_data,
         allocated_memory->get_vulkan_data(),
-        allocated_memory->get_allocator().get_offset()))
+        allocated_memory->get_allocator()->get_offset()))
 }
 
 gearoenix::vulkan::image::Image::~Image() noexcept

@@ -67,11 +67,11 @@ gearoenix::vulkan::engine::Engine::Engine(const platform::Application& platform_
     , physical_device(surface)
     , logical_device(physical_device)
     , swapchain(logical_device)
-    , memory_manager(logical_device)
+    , memory_manager(*this)
     , command_manager(logical_device)
     , descriptor_manager(logical_device)
     , pipeline_manager(logical_device)
-    , buffer_manager(buffer::Manager::construct(memory_manager, *this))
+    , buffer_manager(memory_manager, *this)
     , mesh_manager(*this)
     , depth_stencil(image::View::create_depth_stencil(memory_manager))
     , render_pass(swapchain)
@@ -124,9 +124,10 @@ void gearoenix::vulkan::engine::Engine::end_frame() noexcept
     if (swapchain_image_is_valid) {
         auto& frame = frames[swapchain_image_index];
         buffer_manager.do_copies(frame.copy_command);
-        mesh_manager.create_accelerators();
-        // Record ImGui commands
-        frame.draw_command.begin(render_pass, frame.framebuffer);
+        GX_TODO // TODO
+            // mesh_manager.create_accelerators();
+            // Record ImGui commands
+            frame.draw_command.begin(render_pass, frame.framebuffer);
         ImGui_ImplVulkan_RenderDrawData(draw_data, frame.draw_command.get_vulkan_data());
         frame.draw_command.end_render_pass();
         frame.draw_command.end();

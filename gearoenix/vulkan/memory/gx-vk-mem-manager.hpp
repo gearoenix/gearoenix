@@ -3,18 +3,19 @@
 #include "../../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
-#include "gx-vk-mem-memory.hpp"
+#include "../../platform/macro/gx-plt-mcr-lock.hpp"
 #include "gx-vk-mem-place.hpp"
 #include <map>
 
-namespace gearoenix::vulkan::device {
-struct Logical;
+namespace gearoenix::vulkan::engine {
+struct Engine;
 }
 
 namespace gearoenix::vulkan::memory {
+struct Memory;
 struct Manager final {
 public:
-    GX_GET_CRRF_PRV(device::Logical, logical_device)
+    GX_GET_CRRF_PRV(engine::Engine, e)
 private:
     GX_CREATE_GUARD(this)
     /// type-index -> memory
@@ -23,12 +24,11 @@ private:
 public:
     Manager(const Manager&) = delete;
     Manager(Manager&&) = delete;
-    explicit Manager(const device::Logical& logical_device) noexcept;
-    ~Manager() noexcept;
     Manager& operator=(const Manager&) = delete;
     Manager& operator=(Manager&&) = delete;
-    [[nodiscard]] std::size_t align(std::size_t) const noexcept;
-    [[nodiscard]] std::optional<Memory> allocate(std::size_t size, std::uint32_t type_bits, Place place) noexcept;
+    explicit Manager(const engine::Engine& e) noexcept;
+    ~Manager() noexcept;
+    [[nodiscard]] std::shared_ptr<Memory> allocate(std::size_t size, std::uint32_t type_bits, Place place) noexcept;
 };
 }
 #endif

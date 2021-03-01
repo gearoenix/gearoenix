@@ -7,13 +7,10 @@
 #include "../memory/gx-vk-mem-memory.hpp"
 #include "../memory/gx-vk-mem-place.hpp"
 #include <memory>
+#include <string>
 
 namespace gearoenix::core {
 struct Allocator;
-}
-
-namespace gearoenix::vulkan::command {
-struct Buffer;
 }
 
 namespace gearoenix::vulkan::engine {
@@ -27,7 +24,7 @@ struct Manager;
 namespace gearoenix::vulkan::buffer {
 struct Buffer final {
     GX_GET_CREF_PRT(std::shared_ptr<core::Allocator>, allocator)
-    GX_GET_CREF_PRT(std::shared_ptr<Buffer>, parent)
+    GX_GET_REFC_PRT(std::shared_ptr<const Buffer>, parent)
     GX_GET_CREF_PRT(std::shared_ptr<memory::Memory>, allocated_memory)
     GX_GET_VAL_PRT(VkBuffer, vulkan_data, nullptr)
 
@@ -36,7 +33,7 @@ private:
 
     Buffer(
         std::shared_ptr<core::Allocator> allocator,
-        std::shared_ptr<Buffer> parent,
+        std::shared_ptr<const Buffer> parent,
         std::shared_ptr<memory::Memory> allocated_memory,
         VkBuffer vulkan_data) noexcept;
 
@@ -45,11 +42,10 @@ public:
     Buffer(const Buffer&) = delete;
     Buffer& operator=(Buffer&&) = delete;
     Buffer& operator=(const Buffer&) = delete;
-    [[nodiscard]] static std::optional<std::shared_ptr<Buffer>> construct(
+    [[nodiscard]] static std::shared_ptr<Buffer> construct(
         const std::string&, std::size_t size, memory::Place place, memory::Manager& memory_manager) noexcept;
     ~Buffer() noexcept;
-    [[nodiscard]] std::optional<std::shared_ptr<Buffer>> allocate(std::size_t size) noexcept;
-    //void copy(command::Buffer& command, const Buffer& src) noexcept;
+    [[nodiscard]] std::shared_ptr<Buffer> allocate(std::size_t size) noexcept;
     //void push_memory_barrier(command::Buffer& command) const noexcept;
     //[[nodiscard]] static std::uint32_t get_memory_type_bits(device::Logical& device, bool in_gpu) noexcept;
     void write(const void* data, std::size_t size) noexcept;
