@@ -1,26 +1,27 @@
 #include "gx-vk-msh-accel.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
 #include "../../core/ecs/gx-cr-ecs-entity.hpp"
+#include "../buffer/gx-vk-buf-buffer.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "gx-vk-msh-accel-component.hpp"
 
 gearoenix::vulkan::mesh::Accel::Accel(
-    engine::Engine& e,
-    std::vector<math::BasicVertex> vertices,
-    std::vector<std::uint32_t> indices) noexcept
-    : vertex(*e.get_buffer_manager().create(vertices))
-    , index(*e.get_buffer_manager().create(indices))
+    std::shared_ptr<buffer::Buffer> vertex,
+    std::shared_ptr<buffer::Buffer> index) noexcept
+    : vertex(std::move(vertex))
+    , index(std::move(index))
 {
-    vertices.clear();
-    indices.clear();
 }
 
 std::shared_ptr<gearoenix::vulkan::mesh::Accel> gearoenix::vulkan::mesh::Accel::construct(
     engine::Engine& e,
-    std::vector<math::BasicVertex> vertices,
-    std::vector<std::uint32_t> indices) noexcept
+    const std::vector<math::BasicVertex>& vertices,
+    const std::vector<std::uint32_t>& indices) noexcept
 {
-    std::shared_ptr<Accel> result(new Accel(e, std::move(vertices), std::move(indices)));
+    auto& buf_mgr = e.get_buffer_manager();
+    auto vertex = buf_mgr.create(vertices);
+    auto index = buf_mgr.create(indices);
+    std::shared_ptr<Accel> result(new Accel(std::move(vertex), std::move(index)));
     result->self = result;
     return result;
 }
@@ -35,8 +36,8 @@ void gearoenix::vulkan::mesh::Accel::set_component(const std::shared_ptr<core::e
 std::pair<VkDeviceAddress, VkDeviceAddress> gearoenix::vulkan::mesh::Accel::get_buffers_address() const noexcept
 {
     return {
-        vertex.get_device_address(),
-        index.get_device_address(),
+        vertex->get_device_address(),
+        index->get_device_address(),
     };
 }
 

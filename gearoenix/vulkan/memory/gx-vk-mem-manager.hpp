@@ -6,6 +6,7 @@
 #include "../../platform/macro/gx-plt-mcr-lock.hpp"
 #include "gx-vk-mem-place.hpp"
 #include <map>
+#include <memory>
 
 namespace gearoenix::vulkan::engine {
 struct Engine;

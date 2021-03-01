@@ -17,6 +17,7 @@ struct Mesh;
 
 namespace gearoenix::vulkan::mesh {
 struct Manager final {
+    constexpr static const int max_attempts = 10;
     GX_GET_RRF_PRV(engine::Engine, e)
     GX_GET_CVAL_PRV(bool, use_accel)
 
@@ -24,15 +25,25 @@ private:
     GX_CREATE_GUARD(blass_info)
     std::vector<std::pair<VkAccelerationStructureGeometryKHR, VkAccelerationStructureBuildRangeInfoKHR>> blass_info;
 
+    GX_CREATE_GUARD(pending_accel_meshes)
+    std::vector<std::tuple<
+        std::string,
+        std::vector<math::BasicVertex>,
+        std::vector<std::uint32_t>,
+        core::sync::EndCaller<render::mesh::Mesh>,
+        int>>
+        pending_accel_meshes;
+    void create_pending_accels() noexcept;
     void create_accel(
         const std::string& name,
-        std::vector<math::BasicVertex> vertices,
-        std::vector<std::uint32_t> indices,
-        core::sync::EndCaller<render::mesh::Mesh>& c) noexcept;
+        const std::vector<math::BasicVertex>& vertices,
+        const std::vector<std::uint32_t>& indices,
+        core::sync::EndCaller<render::mesh::Mesh>& c,
+        int attempts = 0) noexcept;
     void create_raster(
         const std::string& name,
-        std::vector<math::BasicVertex> vertices,
-        std::vector<std::uint32_t> indices,
+        const std::vector<math::BasicVertex>& vertices,
+        const std::vector<std::uint32_t>& indices,
         core::sync::EndCaller<render::mesh::Mesh>& c) noexcept;
     void update_accel() noexcept;
     void update_raster() noexcept;
@@ -42,8 +53,8 @@ public:
     ~Manager() noexcept;
     void create(
         const std::string& name,
-        std::vector<math::BasicVertex> vertices,
-        std::vector<std::uint32_t> indices,
+        const std::vector<math::BasicVertex>& vertices,
+        const std::vector<std::uint32_t>& indices,
         core::sync::EndCaller<render::mesh::Mesh>& c) noexcept;
     void update() noexcept;
 };

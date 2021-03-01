@@ -1,6 +1,8 @@
 #include "gx-vk-msh-manager.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
+#include "../../core/gx-cr-allocator.hpp"
 #include "../../core/macro/gx-cr-mcr-zeroer.hpp"
+#include "../buffer/gx-vk-buf-buffer.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "../gx-vk-check.hpp"
 #include "../gx-vk-marker.hpp"
@@ -8,16 +10,43 @@
 #include "gx-vk-msh-accel.hpp"
 #include "gx-vk-msh-raster.hpp"
 
+void gearoenix::vulkan::mesh::Manager::create_pending_accels() noexcept
+{
+    decltype(pending_accel_meshes) inputs;
+    {
+        GX_GUARD_LOCK(pending_accel_meshes)
+        std::swap(pending_accel_meshes, inputs);
+    }
+    const auto fun = [this](
+                         const std::string& name,
+                         const std::vector<math::BasicVertex>& vertices,
+                         const std::vector<std::uint32_t>& indices,
+                         core::sync::EndCaller<render::mesh::Mesh>& c,
+                         const int attempts) noexcept {
+        create_accel(name, vertices, indices, c, attempts);
+    };
+    for (auto& args : inputs)
+        std::apply(fun, args);
+}
+
 void gearoenix::vulkan::mesh::Manager::create_accel(
     const std::string& name,
-    std::vector<math::BasicVertex> vertices,
-    std::vector<std::uint32_t> indices,
-    core::sync::EndCaller<render::mesh::Mesh>& c) noexcept
+    const std::vector<math::BasicVertex>& vertices,
+    const std::vector<std::uint32_t>& indices,
+    core::sync::EndCaller<render::mesh::Mesh>& c,
+    const int attempts) noexcept
 {
+    GX_CHECK_NOT_EQUAL(attempts, max_attempts)
+
     const auto vertices_count = vertices.size();
     const auto indices_count = indices.size();
 
-    auto result = Accel::construct(e, std::move(vertices), std::move(indices));
+    auto result = Accel::construct(e, vertices, indices);
+    if (nullptr == result) {
+        GX_GUARD_LOCK(pending_accel_meshes)
+        pending_accel_meshes.emplace_back(name, vertices, indices, c, attempts + 1);
+        return;
+    }
 
     auto& logical_device = e.get_logical_device();
     auto& command_manager = e.get_command_manager();
@@ -38,7 +67,7 @@ void gearoenix::vulkan::mesh::Manager::create_accel(
     trs_info.maxVertex = static_cast<std::uint32_t>(vertices_count);
     trs_info.vertexData.deviceAddress = vba;
     trs_info.vertexFormat = VK_FORMAT_R32G32B32_SFLOAT;
-    trs_info.vertexStride = sizeof(decltype(vertices)::value_type);
+    trs_info.vertexStride = sizeof(std::remove_reference_t<decltype(vertices)>::value_type);
 
     VkAccelerationStructureBuildRangeInfoKHR rng_info;
     GX_SET_ZERO(rng_info)
@@ -62,26 +91,34 @@ void gearoenix::vulkan::mesh::Manager::create_accel(
         &bge_info, &rng_info.primitiveCount, &bsz_info);
 
     result->accel = std::move(e.get_buffer_manager().create_static(static_cast<std::size_t>(bsz_info.accelerationStructureSize)));
+    if (nullptr == result->accel) {
+        GX_GUARD_LOCK(pending_accel_meshes)
+        pending_accel_meshes.emplace_back(name, vertices, indices, c, attempts + 1);
+        return;
+    }
 
     VkAccelerationStructureCreateInfoKHR asc_info;
     GX_SET_ZERO(asc_info)
     asc_info.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_CREATE_INFO_KHR;
     asc_info.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
     asc_info.size = bsz_info.accelerationStructureSize;
-    asc_info.buffer = buf.get_vulkan_data();
-    asc_info.offset = buf.get_allocator().get_offset();
+    asc_info.buffer = result->accel->get_vulkan_data();
+    asc_info.offset = result->accel->get_allocator()->get_offset();
     asc_info.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
 
-    VkAccelerationStructureKHR accel;
+    GX_VK_CHK(vkCreateAccelerationStructureKHR(vk_device, &asc_info, nullptr, &result->vulkan_data))
 
-    GX_VK_CHK(vkCreateAccelerationStructureKHR(vk_device, &asc_info, nullptr, &accel))
+    mark(name + "-blas", result->vulkan_data, e.get_logical_device());
 
-    mark(name + "-blas", accel, e.get_logical_device());
+    bge_info.dstAccelerationStructure = result->vulkan_data;
 
-    bge_info.dstAccelerationStructure = accel;
-
-    auto scratch_buf = std::move(*e.get_buffer_manager().create_static(static_cast<std::size_t>(bsz_info.buildScratchSize)));
-    const auto scratch_address = scratch_buf.get_device_address();
+    auto scratch_buf = e.get_buffer_manager().create_static(static_cast<std::size_t>(bsz_info.buildScratchSize));
+    if (nullptr == scratch_buf) {
+        GX_GUARD_LOCK(pending_accel_meshes)
+        pending_accel_meshes.emplace_back(name, vertices, indices, c, attempts + 1);
+        return;
+    }
+    const auto scratch_address = scratch_buf->get_device_address();
     bge_info.scratchData.deviceAddress = scratch_address;
 
     query::Pool query_pool(logical_device, VK_QUERY_TYPE_ACCELERATION_STRUCTURE_COMPACTED_SIZE_KHR);
@@ -95,16 +132,16 @@ void gearoenix::vulkan::mesh::Manager::create_accel(
         blass_info.emplace_back(geo_info, rng_info);
     }
 
-    c.set_data(std::move(mesh));
+    c.set_data(std::move(result));
 }
 
 void gearoenix::vulkan::mesh::Manager::create_raster(
     const std::string& name,
-    std::vector<math::BasicVertex> vertices,
-    std::vector<std::uint32_t> indices,
+    const std::vector<math::BasicVertex>& vertices,
+    const std::vector<std::uint32_t>& indices,
     core::sync::EndCaller<render::mesh::Mesh>& c) noexcept
 {
-    c.set_data(Raster::construct(e, std::move(vertices), std::move(indices)));
+    c.set_data(Raster::construct(e, vertices, indices));
 }
 
 void gearoenix::vulkan::mesh::Manager::update_accel() noexcept
@@ -125,20 +162,21 @@ gearoenix::vulkan::mesh::Manager::~Manager() noexcept = default;
 
 void gearoenix::vulkan::mesh::Manager::create(
     const std::string& name,
-    std::vector<math::BasicVertex> vertices,
-    std::vector<std::uint32_t> indices,
+    const std::vector<math::BasicVertex>& vertices,
+    const std::vector<std::uint32_t>& indices,
     core::sync::EndCaller<render::mesh::Mesh>& c) noexcept
 {
     if (use_accel) {
-        create_accel(name, std::move(vertices), std::move(indices), c);
+        create_accel(name, vertices, indices, c);
     } else {
-        create_raster(name, std::move(vertices), std::move(indices), c);
+        create_raster(name, vertices, indices, c);
     }
 }
 
 void gearoenix::vulkan::mesh::Manager::update() noexcept
 {
     if (use_accel) {
+        create_pending_accels();
         update_accel();
     } else {
         update_raster();
