@@ -1,4 +1,4 @@
-#include "gx-vk-qu-pool.hpp"
+#include "gx-vk-qry-pool.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
 #include "../../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../command/gx-vk-cmd-buffer.hpp"

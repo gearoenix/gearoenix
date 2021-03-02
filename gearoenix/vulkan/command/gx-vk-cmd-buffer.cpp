@@ -82,6 +82,14 @@ void gearoenix::vulkan::command::Buffer::copy(
     vkCmdCopyBuffer(vulkan_data, src.get_vulkan_data(), des.get_vulkan_data(), static_cast<std::uint32_t>(info.size()), info.data());
 }
 
+void gearoenix::vulkan::command::Buffer::copy(
+    buffer::Buffer& src,
+    buffer::Buffer& des,
+    const VkBufferCopy& info) noexcept
+{
+    vkCmdCopyBuffer(vulkan_data, src.get_vulkan_data(), des.get_vulkan_data(), 1, &info);
+}
+
 void gearoenix::vulkan::command::Buffer::begin(const RenderPass& render_pass, const Framebuffer& framebuffer) noexcept
 {
     const auto& img = framebuffer.get_depth()->get_image();

@@ -28,8 +28,8 @@ private:
         Terminated,
     };
 
-    const std::shared_ptr<Semaphore> semaphore;
-    const std::shared_ptr<FunctionLoader> function_loader;
+    const std::unique_ptr<Semaphore> semaphore;
+    const std::unique_ptr<FunctionLoader> function_loader;
     std::thread thread;
     State state = State::Working;
 

@@ -4,12 +4,10 @@
 #ifdef GX_RENDER_VULKAN_ENABLED
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../../core/sync/gx-cr-sync-end-caller.hpp"
-#include "../../platform/macro/gx-plt-mcr-lock.hpp"
 #include <memory>
-#include <tuple>
 
-namespace gearoenix::vulkan::command {
-struct Buffer;
+namespace gearoenix::core::sync {
+struct WorkWaiter;
 }
 
 namespace gearoenix::vulkan::engine {
@@ -36,12 +34,9 @@ private:
     const std::shared_ptr<Buffer> gpu_root_buffer;
     const std::vector<std::shared_ptr<Buffer>> each_frame_upload_source;
     const std::shared_ptr<Buffer> each_frame_upload_destination;
-    GX_CREATE_GUARD(upload_buffers)
-    std::vector<std::tuple<
-        std::shared_ptr<Buffer> /*destination*/,
-        std::shared_ptr<Buffer> /*source*/,
-        core::sync::EndCallerIgnored>>
-        upload_buffers;
+
+    std::unique_ptr<core::sync::WorkWaiter> uploader;
+    std::unique_ptr<core::sync::WorkWaiter> waiter;
 
     [[nodiscard]] std::shared_ptr<Buffer> create_upload_root_buffer() const noexcept;
     [[nodiscard]] std::shared_ptr<Buffer> create_gpu_root_buffer() const noexcept;
@@ -56,16 +51,20 @@ public:
     Manager(memory::Manager& memory_manager, engine::Engine& e) noexcept;
     ~Manager() noexcept;
     [[nodiscard]] std::shared_ptr<Buffer> create_static(std::size_t size) noexcept;
+    [[nodiscard]] std::shared_ptr<Buffer> create_staging(std::size_t size) noexcept;
     [[nodiscard]] std::shared_ptr<Buffer> create_dynamic(std::size_t size, std::size_t frame_number) noexcept;
     [[nodiscard]] std::shared_ptr<Uniform> create_uniform(std::size_t size) noexcept;
     [[nodiscard]] std::shared_ptr<Buffer> create(
-        const void* data, std::size_t size, core::sync::EndCallerIgnored = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
-    void do_copies(command::Buffer&) noexcept;
+        const void* data,
+        std::size_t size,
+        core::sync::EndCaller<Buffer> end = GX_DEFAULT_END_CALLER(Buffer)) noexcept;
 
     template <typename T>
-    [[nodiscard]] std::shared_ptr<Buffer> create(const std::vector<T>& data) noexcept
+    [[nodiscard]] std::shared_ptr<Buffer> create(
+        const std::vector<T>& data,
+        core::sync::EndCaller<Buffer> end = GX_DEFAULT_END_CALLER(Buffer)) noexcept
     {
-        return create(data.data(), data.size() * sizeof(T));
+        return create(data.data(), data.size() * sizeof(T), end);
     }
 };
 }

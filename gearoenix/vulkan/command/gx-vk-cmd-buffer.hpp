@@ -37,6 +37,7 @@ public:
     void flush() noexcept;
     void end() noexcept;
     void copy(buffer::Buffer& src, buffer::Buffer& des, const std::vector<VkBufferCopy>&) noexcept;
+    void copy(buffer::Buffer& src, buffer::Buffer& des, const VkBufferCopy&) noexcept;
     void begin(const RenderPass& render_pass, const Framebuffer& framebuffer) noexcept;
     void end_render_pass() noexcept;
     void set(const Viewport& viewport) noexcept;

@@ -1,6 +1,7 @@
 #include "gx-vk-buf-manager.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
 #include "../../core/gx-cr-allocator.hpp"
+#include "../../core/sync/gx-cr-sync-work-waiter.hpp"
 #include "../../platform/gx-plt-application.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../device/gx-vk-dev-physical.hpp"
@@ -54,6 +55,8 @@ gearoenix::vulkan::buffer::Manager::Manager(
     , gpu_root_buffer(create_gpu_root_buffer())
     , each_frame_upload_source(create_each_frame_upload_source())
     , each_frame_upload_destination(create_each_frame_upload_destination())
+    , uploader(new core::sync::WorkWaiter())
+    , waiter(new core::sync::WorkWaiter())
 {
 }
 
@@ -65,7 +68,9 @@ std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Ma
 }
 
 std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Manager::create(
-    const void* const data, const std::size_t size, core::sync::EndCallerIgnored end) noexcept
+    const void* const data,
+    const std::size_t size,
+    core::sync::EndCaller<Buffer> end) noexcept
 {
     auto cpu = upload_root_buffer->allocate(size);
     if (nullptr == cpu)
@@ -74,7 +79,18 @@ std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Ma
     if (nullptr == gpu)
         return nullptr;
     cpu->write(data, size);
-    upload_buffers.emplace_back(gpu, std::move(cpu), std::move(end));
+    end.set_data(gpu);
+    uploader->push([this, cpu, gpu, end { std::move(end) }] {
+        auto cmd = e.get_command_manager().create(command::Type::Primary);
+        VkBufferCopy info;
+        const auto& bf_alc = *cpu->get_allocator();
+        info.size = bf_alc.get_size();
+        info.srcOffset = bf_alc.get_offset();
+        info.dstOffset = gpu->get_allocator()->get_offset();
+        cmd.copy(*gpu_root_buffer, *upload_root_buffer, info);
+        // TODO submit and wait on it
+    });
+
     return std::move(gpu);
 }
 

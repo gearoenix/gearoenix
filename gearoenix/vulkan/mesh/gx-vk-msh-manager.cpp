@@ -6,7 +6,7 @@
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "../gx-vk-check.hpp"
 #include "../gx-vk-marker.hpp"
-#include "../query/gx-vk-qu-pool.hpp"
+#include "../query/gx-vk-qry-pool.hpp"
 #include "gx-vk-msh-accel.hpp"
 #include "gx-vk-msh-raster.hpp"
 

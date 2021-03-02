@@ -6,6 +6,7 @@
 #include <type_traits>
 
 #define GX_DEFAULT_IGNORED_END_CALLER gearoenix::core::sync::EndCaller<gearoenix::core::sync::EndCallerIgnore>([]() {})
+#define GX_DEFAULT_END_CALLER(x) gearoenix::core::sync::EndCaller<x>([](const std::shared_ptr<x>&) {})
 
 namespace gearoenix::core::sync {
 template <typename T>

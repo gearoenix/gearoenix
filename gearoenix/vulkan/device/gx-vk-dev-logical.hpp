@@ -11,22 +11,26 @@
 #define GX_VULKAN_DEVICE_DEBUG_MODE
 #endif
 
+namespace gearoenix::vulkan::queue {
+struct Queue;
+}
+
 namespace gearoenix::vulkan::device {
 struct Physical;
 struct Logical final {
 private:
     GX_GET_CRRF_PRV(Physical, physical_device)
     GX_GET_VAL_PRV(VkDevice, vulkan_data, nullptr)
-    GX_GET_VAL_PRV(VkQueue, graphic_queue, nullptr)
+    GX_GET_UPTR_PRV(queue::Queue, graphic_queue)
     GX_GET_VAL_PRV(bool, debug_marker_is_available, false)
 
 public:
     Logical(const Logical&) = delete;
     Logical(Logical&&) = delete;
-    explicit Logical(const Physical& p) noexcept;
-    ~Logical() noexcept;
     Logical& operator=(const Logical&) = delete;
     Logical& operator=(Logical&&) = delete;
+    explicit Logical(const Physical& p) noexcept;
+    ~Logical() noexcept;
     void wait_to_finish() noexcept;
 };
 }
