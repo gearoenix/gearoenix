@@ -7,6 +7,10 @@
 #include "../../math/gx-math-vertex.hpp"
 #include "../gx-vk-loader.hpp"
 
+namespace gearoenix::vulkan::buffer {
+struct Buffer;
+}
+
 namespace gearoenix::vulkan::engine {
 struct Engine;
 }
@@ -15,7 +19,12 @@ namespace gearoenix::render::mesh {
 struct Mesh;
 }
 
+namespace gearoenix::vulkan::query {
+struct Pool;
+}
+
 namespace gearoenix::vulkan::mesh {
+struct Accel;
 struct Manager final {
     constexpr static const int max_attempts = 10;
     GX_GET_RRF_PRV(engine::Engine, e)
@@ -23,7 +32,15 @@ struct Manager final {
 
 private:
     GX_CREATE_GUARD(blass_info)
-    std::vector<std::pair<VkAccelerationStructureGeometryKHR, VkAccelerationStructureBuildRangeInfoKHR>> blass_info;
+    std::vector<std::tuple<
+        VkAccelerationStructureGeometryKHR,
+        VkAccelerationStructureBuildRangeInfoKHR,
+        VkAccelerationStructureBuildGeometryInfoKHR,
+        std::shared_ptr<Accel>,
+        std::shared_ptr<query::Pool>,
+        std::shared_ptr<buffer::Buffer>,
+        core::sync::EndCaller<render::mesh::Mesh>>>
+        blass_info;
 
     GX_CREATE_GUARD(pending_accel_meshes)
     std::vector<std::tuple<

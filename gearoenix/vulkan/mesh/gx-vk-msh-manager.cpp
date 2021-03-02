@@ -121,18 +121,16 @@ void gearoenix::vulkan::mesh::Manager::create_accel(
     const auto scratch_address = scratch_buf->get_device_address();
     bge_info.scratchData.deviceAddress = scratch_address;
 
-    query::Pool query_pool(logical_device, VK_QUERY_TYPE_ACCELERATION_STRUCTURE_COMPACTED_SIZE_KHR);
+    std::shared_ptr<query::Pool> query_pool(new query::Pool(
+        logical_device, VK_QUERY_TYPE_ACCELERATION_STRUCTURE_COMPACTED_SIZE_KHR));
 
-    auto cmd = command_manager.create(command::Type::Primary);
-    cmd.begin();
-    cmd.build_acceleration_structure(bge_info, rng_info);
-
+    c.set_data(result);
     {
         GX_GUARD_LOCK(blass_info)
-        blass_info.emplace_back(geo_info, rng_info);
+        blass_info.emplace_back(
+            geo_info, rng_info, bge_info, std::move(result),
+            std::move(query_pool), std::move(scratch_buf), c);
     }
-
-    c.set_data(std::move(result));
 }
 
 void gearoenix::vulkan::mesh::Manager::create_raster(
@@ -146,6 +144,27 @@ void gearoenix::vulkan::mesh::Manager::create_raster(
 
 void gearoenix::vulkan::mesh::Manager::update_accel() noexcept
 {
+    decltype(blass_info) b_inf;
+    {
+        GX_GUARD_LOCK(blass_info)
+        std::swap(b_inf, blass_info);
+    }
+    if (b_inf.empty())
+        return;
+
+    auto& frame = e.get_current_frame();
+    auto& cmd_mgr = e.get_command_manager();
+    auto& blas_cmds = frame.blas_creation_commands;
+
+    for (auto& [geo_info, rng_info, bge_info, result, query_pool, scratch_buf, c] : b_inf) {
+        auto cmd = cmd_mgr.create(command::Type::Primary);
+        bge_info.pGeometries = &geo_info;
+        cmd.begin();
+        cmd.build_acceleration_structure(bge_info, rng_info);
+        query_pool->issue_acceleration_structure_compacted_size(cmd, result->vulkan_data);
+        cmd.end();
+        blas_cmds.push_back(std::move(cmd));
+    }
 }
 
 void gearoenix::vulkan::mesh::Manager::update_raster() noexcept

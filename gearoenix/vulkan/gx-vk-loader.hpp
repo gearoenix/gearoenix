@@ -220,13 +220,14 @@
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdBeginQuery);                                \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdEndQuery);                                  \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdResetQueryPool);                            \
-    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdWriteTimestamp);                            \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdCopyQueryPoolResults);                      \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdPushConstants);                             \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdBeginRenderPass);                           \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdNextSubpass);                               \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdEndRenderPass);                             \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdExecuteCommands);                           \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdWriteAccelerationStructuresPropertiesKHR);  \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdWriteTimestamp);                            \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkDestroySurfaceKHR);                            \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetAccelerationStructureBuildSizesKHR);        \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetBufferDeviceAddress);                       \
