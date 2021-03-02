@@ -54,21 +54,6 @@ void gearoenix::vulkan::command::Buffer::begin() noexcept
     GX_VK_CHK(vkBeginCommandBuffer(vulkan_data, &info))
 }
 
-void gearoenix::vulkan::command::Buffer::flush() noexcept
-{
-    sync::Fence fence(pool->get_logical_device());
-    GX_VK_CHK(vkEndCommandBuffer(vulkan_data))
-    VkSubmitInfo submit_info;
-    GX_SET_ZERO(submit_info)
-    submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    submit_info.commandBufferCount = 1;
-    submit_info.pCommandBuffers = &vulkan_data;
-    GX_VK_CHK(vkQueueSubmit(
-        pool->get_logical_device().get_graphic_queue(),
-        1, &submit_info, fence.get_vulkan_data()))
-    fence.wait();
-}
-
 void gearoenix::vulkan::command::Buffer::end() noexcept
 {
     GX_VK_CHK(vkEndCommandBuffer(vulkan_data))

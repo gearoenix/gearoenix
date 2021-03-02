@@ -34,7 +34,6 @@ public:
     Buffer(Buffer&&) noexcept;
     ~Buffer() noexcept;
     void begin() noexcept;
-    void flush() noexcept;
     void end() noexcept;
     void copy(buffer::Buffer& src, buffer::Buffer& des, const std::vector<VkBufferCopy>&) noexcept;
     void copy(buffer::Buffer& src, buffer::Buffer& des, const VkBufferCopy&) noexcept;

@@ -6,6 +6,8 @@
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../device/gx-vk-dev-physical.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
+#include "../queue/gx-vk-qu-queue.hpp"
+#include "../sync/gx-vk-sync-fence.hpp"
 #include "gx-vk-buf-buffer.hpp"
 
 std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Manager::create_upload_root_buffer() const noexcept
@@ -80,40 +82,29 @@ std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Ma
         return nullptr;
     cpu->write(data, size);
     end.set_data(gpu);
-    uploader->push([this, cpu, gpu, end { std::move(end) }] {
-        auto cmd = e.get_command_manager().create(command::Type::Primary);
+    uploader->push([this, cpu = std::move(cpu), gpu, end = std::move(end)]() mutable noexcept {
+        auto cmd = std::make_shared<command::Buffer>(e.get_command_manager().create(command::Type::Primary));
         VkBufferCopy info;
         const auto& bf_alc = *cpu->get_allocator();
         info.size = bf_alc.get_size();
         info.srcOffset = bf_alc.get_offset();
         info.dstOffset = gpu->get_allocator()->get_offset();
-        cmd.copy(*gpu_root_buffer, *upload_root_buffer, info);
-        // TODO submit and wait on it
+        cmd->copy(*gpu_root_buffer, *upload_root_buffer, info);
+        auto fence = std::make_shared<sync::Fence>(e.get_logical_device());
+        e.get_logical_device().get_graphic_queue()->submit(*cmd, *fence);
+        std::function<void()> f = [this,
+                                      cpu = std::move(cpu),
+                                      gpu = std::move(gpu),
+                                      end = std::move(end),
+                                      cmd = std::move(cmd),
+                                      fence = std::move(fence)]() mutable noexcept {
+            fence->wait();
+            std::function<void()> f = [cmd = std::move(cmd)]() mutable noexcept {};
+            uploader->push(std::move(f));
+        };
+        waiter->push(std::move(f));
     });
-
     return std::move(gpu);
-}
-
-void gearoenix::vulkan::buffer::Manager::do_copies(command::Buffer& cmd) noexcept
-{
-    decltype(upload_buffers) up_bfs;
-    {
-        GX_GUARD_LOCK(upload_buffers)
-        std::swap(upload_buffers, up_bfs);
-    }
-    const auto up_sz = up_bfs.size();
-    if (up_sz > 0) {
-        std::vector<VkBufferCopy> copy_info(up_sz);
-        for (std::size_t i = 0; i < up_sz; ++i) {
-            const auto& up_bf = up_bfs[i];
-            auto& info = copy_info[i];
-            const auto& bf_alc = *std::get<1>(up_bf)->get_allocator();
-            info.size = bf_alc.get_size();
-            info.srcOffset = bf_alc.get_offset();
-            info.dstOffset = std::get<0>(up_bf)->get_allocator()->get_offset();
-        }
-        cmd.copy(*gpu_root_buffer, *upload_root_buffer, copy_info);
-    }
 }
 
 #endif

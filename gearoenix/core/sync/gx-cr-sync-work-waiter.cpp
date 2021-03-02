@@ -48,9 +48,9 @@ gearoenix::core::sync::WorkWaiter::~WorkWaiter() noexcept
     thread.join();
 }
 
-void gearoenix::core::sync::WorkWaiter::push(const std::function<void()>& f) noexcept
+void gearoenix::core::sync::WorkWaiter::push(std::function<void()>&& f) noexcept
 {
-    function_loader->load(f);
+    function_loader->load(std::move(f));
     semaphore->release();
 }
 

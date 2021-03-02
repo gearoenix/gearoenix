@@ -40,7 +40,7 @@ private:
 public:
     WorkWaiter() noexcept;
     ~WorkWaiter() noexcept;
-    void push(const std::function<void()>& f) noexcept;
+    void push(std::function<void()>&& f) noexcept;
 };
 }
 

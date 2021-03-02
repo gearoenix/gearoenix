@@ -10,10 +10,10 @@ gearoenix::core::FunctionLoader::~FunctionLoader() noexcept
     GX_LOG_E("Function loader queue was not empty when deconstructed.")
 }
 
-void gearoenix::core::FunctionLoader::load(const std::function<void()>& fun) noexcept
+void gearoenix::core::FunctionLoader::load(std::function<void()>&& fun) noexcept
 {
     GX_GUARD_LOCK(load_functions)
-    load_functions.push_back(fun);
+    load_functions.push_back(std::move(fun));
 }
 
 void gearoenix::core::FunctionLoader::unload() noexcept

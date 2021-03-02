@@ -154,7 +154,6 @@ void gearoenix::vulkan::mesh::Manager::update_accel() noexcept
 
     auto& frame = e.get_current_frame();
     auto& cmd_mgr = e.get_command_manager();
-    auto& blas_cmds = frame.blas_creation_commands;
 
     for (auto& [geo_info, rng_info, bge_info, result, query_pool, scratch_buf, c] : b_inf) {
         auto cmd = cmd_mgr.create(command::Type::Primary);
@@ -163,7 +162,7 @@ void gearoenix::vulkan::mesh::Manager::update_accel() noexcept
         cmd.build_acceleration_structure(bge_info, rng_info);
         query_pool->issue_acceleration_structure_compacted_size(cmd, result->vulkan_data);
         cmd.end();
-        blas_cmds.push_back(std::move(cmd));
+        //        blas_cmds.push_back(std::move(cmd));
     }
 }
 

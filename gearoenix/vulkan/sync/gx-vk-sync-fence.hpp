@@ -16,13 +16,13 @@ struct Fence {
 
 public:
     Fence(const Fence&) = delete;
-    Fence(Fence&&) noexcept;
+    Fence(Fence&&) = delete;
+    Fence& operator=(const Fence&) = delete;
+    Fence& operator=(Fence&&) = delete;
     explicit Fence(const device::Logical& logical_device, bool signaled = false) noexcept;
     ~Fence() noexcept;
     void wait() noexcept;
     void reset() noexcept;
-    Fence& operator=(const Fence&) = delete;
-    Fence& operator=(Fence&&) = delete;
 };
 }
 #endif

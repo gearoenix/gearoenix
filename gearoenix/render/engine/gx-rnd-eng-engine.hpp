@@ -63,8 +63,8 @@ public:
     virtual void upload_imgui_fonts() noexcept = 0;
     virtual void create_mesh(
         const std::string& name,
-        std::vector<math::BasicVertex> vertices,
-        std::vector<std::uint32_t> indices,
+        const std::vector<math::BasicVertex>& vertices,
+        const std::vector<std::uint32_t>& indices,
         core::sync::EndCaller<mesh::Mesh>& c) noexcept = 0;
 };
 }
