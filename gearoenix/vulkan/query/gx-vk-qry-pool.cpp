@@ -54,4 +54,14 @@ void gearoenix::vulkan::query::Pool::issue_acceleration_structure_compacted_size
         cmd.get_vulkan_data(), 1, &accel, query_type, vulkan_data, register_request(query_type, issue_id));
 }
 
+VkDeviceSize gearoenix::vulkan::query::Pool::get_acceleration_structure_compacted_size(const std::uint32_t id) noexcept
+{
+    VkDeviceSize result = 0;
+    GX_VK_CHK(vkGetQueryPoolResults(
+        logical_device.get_vulkan_data(), vulkan_data,
+        indices[VK_QUERY_TYPE_ACCELERATION_STRUCTURE_COMPACTED_SIZE_KHR][id], 1,
+        sizeof(VkDeviceSize), &result, 0, VK_QUERY_RESULT_WAIT_BIT))
+    return result;
+}
+
 #endif

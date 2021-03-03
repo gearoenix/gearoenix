@@ -64,7 +64,7 @@ public:
         const std::vector<T>& data,
         core::sync::EndCaller<Buffer> end = GX_DEFAULT_END_CALLER(Buffer)) noexcept
     {
-        return create(data.data(), data.size() * sizeof(T), end);
+        return create(data.data(), data.size() * sizeof(T), std::move(end));
     }
 };
 }

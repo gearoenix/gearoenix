@@ -2,6 +2,7 @@
 #define GEAROENIX_VULKAN_MESH_ACCEL_HPP
 #include "../../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
+#include "../../core/sync/gx-cr-sync-end-caller.hpp"
 #include "../../math/gx-math-vertex.hpp"
 #include "../../render/mesh/gx-rnd-msh-mesh.hpp"
 #include "../gx-vk-loader.hpp"
@@ -33,7 +34,8 @@ public:
     [[nodiscard]] static std::shared_ptr<Accel> construct(
         engine::Engine&,
         const std::vector<math::BasicVertex>& vertices,
-        const std::vector<std::uint32_t>& indices) noexcept;
+        const std::vector<std::uint32_t>& indices,
+        core::sync::EndCaller<Accel>&) noexcept;
     ~Accel() noexcept final;
     void set_component(const std::shared_ptr<core::ecs::EntitySharedBuilder>&) noexcept final;
     [[nodiscard]] std::pair<VkDeviceAddress, VkDeviceAddress> get_buffers_address() const noexcept;

@@ -16,13 +16,16 @@ gearoenix::vulkan::mesh::Accel::Accel(
 std::shared_ptr<gearoenix::vulkan::mesh::Accel> gearoenix::vulkan::mesh::Accel::construct(
     engine::Engine& e,
     const std::vector<math::BasicVertex>& vertices,
-    const std::vector<std::uint32_t>& indices) noexcept
+    const std::vector<std::uint32_t>& indices,
+    core::sync::EndCaller<Accel>& c) noexcept
 {
+    core::sync::EndCaller<buffer::Buffer> end([c](const auto&) {});
     auto& buf_mgr = e.get_buffer_manager();
-    auto vertex = buf_mgr.create(vertices);
-    auto index = buf_mgr.create(indices);
+    auto vertex = buf_mgr.create(vertices, end);
+    auto index = buf_mgr.create(indices, std::move(end));
     std::shared_ptr<Accel> result(new Accel(std::move(vertex), std::move(index)));
     result->self = result;
+    c.set_data(result);
     return result;
 }
 

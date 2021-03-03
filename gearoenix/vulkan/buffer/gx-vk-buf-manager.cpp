@@ -89,20 +89,20 @@ std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Ma
         info.size = bf_alc.get_size();
         info.srcOffset = bf_alc.get_offset();
         info.dstOffset = gpu->get_allocator()->get_offset();
+        cmd->begin();
         cmd->copy(*gpu_root_buffer, *upload_root_buffer, info);
+        cmd->end();
         auto fence = std::make_shared<sync::Fence>(e.get_logical_device());
         e.get_logical_device().get_graphic_queue()->submit(*cmd, *fence);
-        std::function<void()> f = [this,
-                                      cpu = std::move(cpu),
-                                      gpu = std::move(gpu),
-                                      end = std::move(end),
-                                      cmd = std::move(cmd),
-                                      fence = std::move(fence)]() mutable noexcept {
+        waiter->push(std::move([this,
+                                   cpu = std::move(cpu),
+                                   gpu = std::move(gpu),
+                                   end = std::move(end),
+                                   cmd = std::move(cmd),
+                                   fence = std::move(fence)]() mutable noexcept {
             fence->wait();
-            std::function<void()> f = [cmd = std::move(cmd)]() mutable noexcept {};
-            uploader->push(std::move(f));
-        };
-        waiter->push(std::move(f));
+            uploader->push(std::move([cmd = std::move(cmd)]() mutable noexcept {}));
+        }));
     });
     return std::move(gpu);
 }

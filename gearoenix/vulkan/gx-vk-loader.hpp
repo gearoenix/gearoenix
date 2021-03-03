@@ -201,6 +201,7 @@
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdDrawIndexedIndirect);                       \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdDispatch);                                  \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdDispatchIndirect);                          \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdCopyAccelerationStructureKHR);              \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdCopyBuffer);                                \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdCopyImage);                                 \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdBlitImage);                                 \

@@ -35,6 +35,7 @@ public:
     Pool& operator=(Pool&&) = delete;
     Pool& operator=(const Pool&) = delete;
     void issue_acceleration_structure_compacted_size(command::Buffer&, VkAccelerationStructureKHR, std::uint32_t id = 0xFFFFFFFF) noexcept;
+    [[nodiscard]] VkDeviceSize get_acceleration_structure_compacted_size(std::uint32_t id = 0xFFFFFFFF) noexcept;
 };
 }
 
