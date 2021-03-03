@@ -11,10 +11,6 @@ namespace gearoenix::core::sync {
 struct WorkWaiter;
 }
 
-namespace gearoenix::vulkan::buffer {
-struct Buffer;
-}
-
 namespace gearoenix::vulkan::command {
 struct Buffer;
 }
@@ -38,23 +34,12 @@ struct Fence;
 namespace gearoenix::vulkan::mesh {
 struct Accel;
 struct Manager final {
-    constexpr static const int max_attempts = 10;
     GX_GET_RRF_PRV(engine::Engine, e)
     GX_GET_CVAL_PRV(bool, use_accel)
 
 private:
     std::unique_ptr<core::sync::WorkWaiter> accel_creator;
     std::unique_ptr<core::sync::WorkWaiter> accel_creation_waiter;
-    GX_CREATE_GUARD(blass_info)
-    std::vector<std::tuple<
-        VkAccelerationStructureGeometryKHR,
-        VkAccelerationStructureBuildRangeInfoKHR,
-        VkAccelerationStructureBuildGeometryInfoKHR,
-        std::shared_ptr<Accel>,
-        std::shared_ptr<query::Pool>,
-        std::shared_ptr<buffer::Buffer>,
-        core::sync::EndCaller<render::mesh::Mesh>>>
-        blass_info;
 
     void create_accel(
         const std::string& name,
@@ -79,12 +64,12 @@ private:
         core::sync::EndCaller<render::mesh::Mesh> c,
         std::shared_ptr<Accel> result,
         std::shared_ptr<query::Pool> query_pool) noexcept;
+
     void create_raster(
         const std::string& name,
         const std::vector<math::BasicVertex>& vertices,
         const std::vector<std::uint32_t>& indices,
         core::sync::EndCaller<render::mesh::Mesh>& c) noexcept;
-    void update_raster() noexcept;
 
 public:
     explicit Manager(engine::Engine& e) noexcept;
@@ -94,7 +79,6 @@ public:
         const std::vector<math::BasicVertex>& vertices,
         const std::vector<std::uint32_t>& indices,
         core::sync::EndCaller<render::mesh::Mesh>& c) noexcept;
-    void update() noexcept;
 };
 }
 

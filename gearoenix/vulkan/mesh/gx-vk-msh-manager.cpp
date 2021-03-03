@@ -20,8 +20,8 @@ void gearoenix::vulkan::mesh::Manager::create_accel(
     core::sync::EndCaller<render::mesh::Mesh>& c) noexcept
 {
     core::sync::EndCaller<Accel> end([this,
-                                         name,
-                                         c,
+                                         name = name,
+                                         c = c,
                                          vertices_count = vertices.size(),
                                          indices_count = indices.size()](const auto& result) mutable noexcept {
         accel_creator->push([this,
@@ -127,6 +127,8 @@ void gearoenix::vulkan::mesh::Manager::create_accel_after_vertices_ready(
         create_accel_after_blas_ready(
             std::move(cmd), std::move(fence), std::move(c), std::move(result), std::move(query_pool));
     });
+
+    name.clear();
 }
 
 void gearoenix::vulkan::mesh::Manager::create_accel_after_blas_ready(
@@ -165,7 +167,6 @@ void gearoenix::vulkan::mesh::Manager::create_accel_after_query_ready(
     std::shared_ptr<query::Pool> query_pool) noexcept
 {
     VkAccelerationStructureKHR old_accel = result->vulkan_data;
-    std::shared_ptr<buffer::Buffer> old_accel_buff = result->accel;
 
     auto& dev = e.get_logical_device();
     auto& cmd_mgr = e.get_command_manager();
@@ -200,18 +201,15 @@ void gearoenix::vulkan::mesh::Manager::create_accel_after_query_ready(
     cmd->end();
     fence = std::make_shared<sync::Fence>(dev);
     dev.get_graphic_queue()->submit(*cmd, *fence);
-    accel_creation_waiter->push([this,
-                                    cmd = std::move(cmd),
+    accel_creation_waiter->push([cmd = std::move(cmd),
                                     fence = std::move(fence),
-                                    result = std::move(result),
                                     c = std::move(c)]() mutable noexcept {
-        //////// TODO
-        GX_TODO
-        create_accel_after_query_ready(
-            std::move(cmd), std::move(fence), std::move(c), std::move(result), std::move(query_pool));
+        fence->wait();
     });
 
     query_cmd = nullptr;
+    query_pool = nullptr;
+    result = nullptr;
 }
 
 void gearoenix::vulkan::mesh::Manager::create_raster(
@@ -221,10 +219,6 @@ void gearoenix::vulkan::mesh::Manager::create_raster(
     core::sync::EndCaller<render::mesh::Mesh>& c) noexcept
 {
     c.set_data(Raster::construct(e, vertices, indices, core::sync::EndCallerIgnored([c] {})));
-}
-
-void gearoenix::vulkan::mesh::Manager::update_raster() noexcept
-{
 }
 
 gearoenix::vulkan::mesh::Manager::Manager(engine::Engine& e) noexcept
@@ -247,14 +241,6 @@ void gearoenix::vulkan::mesh::Manager::create(
         create_accel(name, vertices, indices, c);
     } else {
         create_raster(name, vertices, indices, c);
-    }
-}
-
-void gearoenix::vulkan::mesh::Manager::update() noexcept
-{
-    if (use_accel) {
-    } else {
-        update_raster();
     }
 }
 
