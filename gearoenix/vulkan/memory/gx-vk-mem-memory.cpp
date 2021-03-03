@@ -51,7 +51,9 @@ std::shared_ptr<gearoenix::vulkan::memory::Memory> gearoenix::vulkan::memory::Me
         return nullptr;
     }
     void* const new_data = (data == nullptr) ? nullptr : reinterpret_cast<void*>(reinterpret_cast<std::size_t>(data) + (alc->get_offset() - allocator->get_offset()));
-    return std::shared_ptr<Memory>(new Memory(e, self.lock(), std::move(alc), new_data, place, type_index, vulkan_data));
+    std::shared_ptr<Memory> result(new Memory(e, self.lock(), std::move(alc), new_data, place, type_index, vulkan_data));
+    result->self = result;
+    return result;
 }
 
 std::shared_ptr<gearoenix::vulkan::memory::Memory> gearoenix::vulkan::memory::Memory::construct(

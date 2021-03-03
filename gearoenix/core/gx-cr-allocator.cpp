@@ -6,6 +6,7 @@ gearoenix::core::Allocator::Allocator(
     const std::size_t size, std::shared_ptr<Allocator> parent) noexcept
     : size(size)
     , parent(std::move(parent))
+    , ranges { { { size, 0 }, { nullptr, nullptr } } }
 {
 }
 

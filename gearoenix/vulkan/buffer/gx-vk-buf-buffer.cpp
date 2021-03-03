@@ -8,7 +8,6 @@
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "../gx-vk-check.hpp"
 #include "../gx-vk-marker.hpp"
-#include "../memory/gx-vk-mem-manager.hpp"
 
 gearoenix::vulkan::buffer::Buffer::Buffer(
     std::shared_ptr<core::Allocator> allocator,
@@ -62,7 +61,9 @@ std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Bu
     GX_VK_CHK(vkBindBufferMemory(
         dev, vulkan_data, allocated_memory->get_vulkan_data(), allocated_memory->get_allocator()->get_offset()))
     GX_VK_MARK(name, vulkan_data, logical_device)
-    return std::shared_ptr<Buffer>(new Buffer(std::move(allocator), nullptr, std::move(allocated_memory), vulkan_data));
+    std::shared_ptr<Buffer> result(new Buffer(std::move(allocator), nullptr, std::move(allocated_memory), vulkan_data));
+    result->self = result;
+    return result;
 }
 
 gearoenix::vulkan::buffer::Buffer::~Buffer() noexcept
@@ -83,7 +84,9 @@ std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Bu
     auto alc_mem = allocated_memory->allocate(aligned_size);
     if (nullptr == alc_mem)
         return nullptr;
-    return std::shared_ptr<Buffer>(new Buffer(std::move(alc), self.lock(), std::move(alc_mem), vulkan_data));
+    std::shared_ptr<Buffer> result(new Buffer(std::move(alc), self.lock(), std::move(alc_mem), vulkan_data));
+    result->self = result;
+    return result;
 }
 
 void gearoenix::vulkan::buffer::Buffer::write(const void* data, const std::size_t size) noexcept
