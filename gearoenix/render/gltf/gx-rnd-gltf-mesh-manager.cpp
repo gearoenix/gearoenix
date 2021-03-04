@@ -35,7 +35,6 @@ void gearoenix::render::gltf::MeshManager::get(
     const auto& acs = data.accessors;
     const auto& bvs = data.bufferViews;
     const auto& bfs = data.buffers;
-    auto mesh_data_index = 0;
     GX_CHECK_EQUAL_D(pris.size(), 1) // Only one primitive for a mesh is acceptable
     const auto& pri = pris[0];
     auto pos_ai = static_cast<std::size_t>(-1);
@@ -56,10 +55,10 @@ void gearoenix::render::gltf::MeshManager::get(
         } else
             GX_UNEXPECTED
     }
-    GX_CHECK_EQUAL_D(pos_ai, static_cast<std::size_t>(-1))
-    GX_CHECK_EQUAL_D(nrm_ai, static_cast<std::size_t>(-1))
-    GX_CHECK_EQUAL_D(tng_ai, static_cast<std::size_t>(-1))
-    GX_CHECK_EQUAL_D(txc_ai, static_cast<std::size_t>(-1))
+    GX_CHECK_NOT_EQUAL_D(pos_ai, static_cast<std::size_t>(-1))
+    GX_CHECK_NOT_EQUAL_D(nrm_ai, static_cast<std::size_t>(-1))
+    GX_CHECK_NOT_EQUAL_D(tng_ai, static_cast<std::size_t>(-1))
+    GX_CHECK_NOT_EQUAL_D(txc_ai, static_cast<std::size_t>(-1))
 
     GX_CHECK_NOT_EQUAL_D(-1, pri.indices)
     GX_CHECK_NOT_EQUAL_D(-1, pri.material)
@@ -84,7 +83,6 @@ void gearoenix::render::gltf::MeshManager::get(
     GX_CHECK_EQUAL_D(nrm_a.componentType, TINYGLTF_COMPONENT_TYPE_FLOAT)
     GX_CHECK_EQUAL_D(tng_a.componentType, TINYGLTF_COMPONENT_TYPE_FLOAT)
     GX_CHECK_EQUAL_D(txc_a.componentType, TINYGLTF_COMPONENT_TYPE_FLOAT)
-    GX_CHECK_EQUAL_D(ids_a.componentType, TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT)
 
     const auto& pos_max = pos_a.maxValues;
     const auto& pos_min = pos_a.maxValues;
@@ -104,25 +102,85 @@ void gearoenix::render::gltf::MeshManager::get(
     const auto& txc_bv = bvs[txc_a.bufferView];
     const auto& ids_bv = bvs[ids_a.bufferView];
 
-    const auto* const pos_b = reinterpret_cast<const math::Vec3<float>*>(bfs[pos_bv.buffer].data.data());
-    const auto* const nrm_b = reinterpret_cast<const math::Vec3<float>*>(bfs[nrm_bv.buffer].data.data());
-    const auto* const tng_b = reinterpret_cast<const math::Vec4<float>*>(bfs[tng_bv.buffer].data.data());
-    const auto* const txc_b = reinterpret_cast<const math::Vec2<float>*>(bfs[txc_bv.buffer].data.data());
-    const auto* const ids_b = reinterpret_cast<const std::uint32_t*>(bfs[ids_bv.buffer].data.data());
-
+    const auto* const pos_b = &bfs[pos_bv.buffer].data[pos_bv.byteOffset];
+    const std::size_t pos_bi_inc = pos_bv.byteStride > 0 ? pos_bv.byteStride : sizeof(math::Vec3<float>);
     std::size_t bi = 0;
-
     for (auto& vertex : vertices) {
-        vertex.position = pos_b[bi];
-        vertex.normal = nrm_b[bi];
-        vertex.tangent = tng_b[bi];
-        vertex.uv = txc_b[bi];
-        ++bi;
+        vertex.position = *reinterpret_cast<const math::Vec3<float>*>(&pos_b[bi]);
+        bi += pos_bi_inc;
     }
-    std::memcpy(indices.data(), ids_b, indices.size() * sizeof(std::remove_reference_t<decltype(indices)>::value_type));
-    ++mesh_data_index;
+
+    const auto* const nrm_b = &bfs[nrm_bv.buffer].data[nrm_bv.byteOffset];
+    const std::size_t nrm_bi_inc = nrm_bv.byteStride > 0 ? nrm_bv.byteStride : sizeof(math::Vec3<float>);
+    bi = 0;
+    for (auto& vertex : vertices) {
+        vertex.normal = *reinterpret_cast<const math::Vec3<float>*>(&nrm_b[bi]);
+        bi += nrm_bi_inc;
+    }
+
+    const auto* const tng_b = &bfs[tng_bv.buffer].data[tng_bv.byteOffset];
+    const std::size_t tng_bi_inc = tng_bv.byteStride > 0 ? tng_bv.byteStride : sizeof(math::Vec4<float>);
+    bi = 0;
+    for (auto& vertex : vertices) {
+        vertex.tangent = *reinterpret_cast<const math::Vec4<float>*>(&tng_b[bi]);
+        bi += tng_bi_inc;
+    }
+
+    const auto* const txc_b = &bfs[txc_bv.buffer].data[txc_bv.byteOffset];
+    const std::size_t txc_bi_inc = txc_bv.byteStride > 0 ? txc_bv.byteStride : sizeof(math::Vec2<float>);
+    bi = 0;
+    for (auto& vertex : vertices) {
+        vertex.uv = *reinterpret_cast<const math::Vec2<float>*>(&txc_b[bi]);
+        bi += txc_bi_inc;
+    }
+
+    const auto* const ids_b = &bfs[ids_bv.buffer].data[ids_bv.byteOffset];
+    const std::size_t ids_bi_inc = [&]() noexcept {
+        if (ids_bv.byteStride > 0)
+            return ids_bv.byteStride;
+        switch (ids_a.componentType) {
+        case TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT:
+        case TINYGLTF_COMPONENT_TYPE_INT:
+            return sizeof(std::uint32_t);
+        case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT:
+        case TINYGLTF_COMPONENT_TYPE_SHORT:
+            return sizeof(std::uint16_t);
+        case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
+        case TINYGLTF_COMPONENT_TYPE_BYTE:
+            return sizeof(std::uint8_t);
+        default:
+            GX_UNEXPECTED
+        }
+    }();
+    bi = 0;
+    switch (ids_a.componentType) {
+    case TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT:
+    case TINYGLTF_COMPONENT_TYPE_INT:
+        for (auto& i : indices) {
+            i = *reinterpret_cast<const std::uint32_t*>(&ids_b[bi]);
+            bi += ids_bi_inc;
+        }
+        break;
+    case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT:
+    case TINYGLTF_COMPONENT_TYPE_SHORT:
+        for (auto& i : indices) {
+            i = *reinterpret_cast<const std::uint16_t*>(&ids_b[bi]);
+            bi += ids_bi_inc;
+        }
+        break;
+    case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
+    case TINYGLTF_COMPONENT_TYPE_BYTE:
+        for (auto& i : indices) {
+            i = *reinterpret_cast<const std::uint16_t*>(&ids_b[bi]);
+            bi += ids_bi_inc;
+        }
+        break;
+    default:
+        GX_UNEXPECTED
+    }
+
     core::sync::EndCaller<mesh::Mesh> end([c, b { std::move(builder) }](const std::shared_ptr<mesh::Mesh>& m) noexcept {
         m->set_component(b);
     });
-    loader.get_e()->create_mesh(mesh.name, std::move(vertices), std::move(indices), end);
+    loader.get_e()->create_mesh(mesh.name, vertices, indices, end);
 }
