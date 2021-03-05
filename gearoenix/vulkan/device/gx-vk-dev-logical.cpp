@@ -18,11 +18,24 @@ gearoenix::vulkan::device::Logical::Logical(const Physical& p) noexcept
     device_features_bda.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES;
     device_features_bda.bufferDeviceAddress = VK_TRUE;
 
+    VkPhysicalDeviceAccelerationStructureFeaturesKHR device_features_as;
+    GX_SET_ZERO(device_features_as)
+    device_features_as.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR;
+    device_features_as.accelerationStructure = VK_TRUE;
+    device_features_as.pNext = &device_features_bda;
+
+    VkPhysicalDeviceRayTracingPipelineFeaturesKHR device_features_rtp;
+    GX_SET_ZERO(device_features_rtp)
+    device_features_rtp.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR;
+    device_features_rtp.rayTracingPipeline = VK_TRUE;
+    device_features_rtp.rayTraversalPrimitiveCulling = VK_TRUE;
+    device_features_rtp.pNext = &device_features_as;
+
     VkPhysicalDeviceFeatures2 device_features2;
     GX_SET_ZERO(device_features2)
     device_features2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
-    device_features2.features.samplerAnisotropy = VK_TRUE;
-    device_features2.pNext = &device_features_bda;
+    device_features2.features = device_features;
+    device_features2.pNext = &device_features_rtp;
 
     std::vector<const char*> device_extensions;
     device_extensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
