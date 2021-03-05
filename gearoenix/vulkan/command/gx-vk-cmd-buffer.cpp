@@ -1,5 +1,6 @@
 #include "gx-vk-cmd-buffer.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
+#include "../../core/gx-cr-allocator.hpp"
 #include "../../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../buffer/gx-vk-buf-buffer.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
@@ -69,9 +70,13 @@ void gearoenix::vulkan::command::Buffer::copy(
 
 void gearoenix::vulkan::command::Buffer::copy(
     buffer::Buffer& src,
-    buffer::Buffer& des,
-    const VkBufferCopy& info) noexcept
+    buffer::Buffer& des) noexcept
 {
+    VkBufferCopy info;
+    const auto& bf_alc = *src.get_allocator();
+    info.size = bf_alc.get_size();
+    info.srcOffset = bf_alc.get_offset();
+    info.dstOffset = des.get_allocator()->get_offset();
     vkCmdCopyBuffer(vulkan_data, src.get_vulkan_data(), des.get_vulkan_data(), 1, &info);
 }
 

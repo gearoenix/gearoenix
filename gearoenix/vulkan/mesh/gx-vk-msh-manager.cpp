@@ -213,7 +213,7 @@ void gearoenix::vulkan::mesh::Manager::create_accel_after_query_ready(
 }
 
 void gearoenix::vulkan::mesh::Manager::create_raster(
-    const std::string& name,
+    const std::string&,
     const std::vector<math::BasicVertex>& vertices,
     const std::vector<std::uint32_t>& indices,
     core::sync::EndCaller<render::mesh::Mesh>& c) noexcept

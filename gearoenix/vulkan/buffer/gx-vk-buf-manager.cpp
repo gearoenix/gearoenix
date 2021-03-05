@@ -84,13 +84,8 @@ std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Ma
     end.set_data(gpu);
     uploader->push([this, cpu = std::move(cpu), gpu, end = std::move(end)]() mutable noexcept {
         auto cmd = std::make_shared<command::Buffer>(e.get_command_manager().create(command::Type::Primary));
-        VkBufferCopy info;
-        const auto& bf_alc = *cpu->get_allocator();
-        info.size = bf_alc.get_size();
-        info.srcOffset = bf_alc.get_offset();
-        info.dstOffset = gpu->get_allocator()->get_offset();
         cmd->begin();
-        cmd->copy(*upload_root_buffer, *gpu_root_buffer, info);
+        cmd->copy(*cpu, *gpu);
         cmd->end();
         auto fence = std::make_shared<sync::Fence>(e.get_logical_device());
         e.get_logical_device().get_graphic_queue()->submit(*cmd, *fence);
