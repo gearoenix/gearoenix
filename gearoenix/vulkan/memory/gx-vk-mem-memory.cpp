@@ -61,14 +61,21 @@ std::shared_ptr<gearoenix::vulkan::memory::Memory> gearoenix::vulkan::memory::Me
     const Place place,
     const std::uint32_t type_index) noexcept
 {
+    const auto is_gpu = place == Place::Gpu;
     const auto& cfg = e.get_platform_application().get_base().get_configuration().get_render_configuration();
-    const auto aligned_size = align(e, place == Place::Gpu ? cfg.get_maximum_gpu_render_memory_size() : cfg.get_maximum_cpu_render_memory_size());
+    const auto aligned_size = align(e, is_gpu ? cfg.get_maximum_gpu_render_memory_size() : cfg.get_maximum_cpu_render_memory_size());
     auto vk_dev = e.get_logical_device().get_vulkan_data();
+    const auto rtx_enabled = e.get_logical_device().get_physical_device().get_rtx_supported();
+    VkMemoryAllocateFlagsInfo mem_alloc_info;
+    GX_SET_ZERO(mem_alloc_info)
+    mem_alloc_info.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_FLAGS_INFO;
+    mem_alloc_info.flags = VK_MEMORY_ALLOCATE_DEVICE_ADDRESS_BIT;
     VkMemoryAllocateInfo info;
     GX_SET_ZERO(info)
     info.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
     info.allocationSize = static_cast<VkDeviceSize>(aligned_size);
     info.memoryTypeIndex = type_index;
+    info.pNext = is_gpu && rtx_enabled ? &mem_alloc_info : nullptr;
     VkDeviceMemory vulkan_data = nullptr;
     void* data = nullptr;
     GX_VK_CHK(vkAllocateMemory(vk_dev, &info, nullptr, &vulkan_data))

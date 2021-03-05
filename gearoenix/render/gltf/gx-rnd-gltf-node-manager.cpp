@@ -8,23 +8,31 @@
 #include <tiny_gltf.h>
 
 gearoenix::core::ecs::Entity::id_t gearoenix::render::gltf::NodeManager::get_camera(
-    const std::size_t, const gearoenix::core::sync::EndCallerIgnored&) noexcept {
-    GX_UNIMPLEMENTED
+    const std::size_t, const gearoenix::core::sync::EndCallerIgnored&) noexcept
+{
+    GX_TODO
+    return 0;
 }
 
 gearoenix::core::ecs::Entity::id_t gearoenix::render::gltf::NodeManager::get_camera(
-    const std::size_t, const std::size_t, const gearoenix::core::sync::EndCallerIgnored&) noexcept {
-    GX_UNIMPLEMENTED
+    const std::size_t, const std::size_t, const gearoenix::core::sync::EndCallerIgnored&) noexcept
+{
+    GX_TODO
+    return 0;
 }
 
 gearoenix::core::ecs::Entity::id_t gearoenix::render::gltf::NodeManager::get_skin(
-    const std::size_t, const gearoenix::core::sync::EndCallerIgnored&) noexcept {
-    GX_UNIMPLEMENTED
+    const std::size_t, const gearoenix::core::sync::EndCallerIgnored&) noexcept
+{
+    GX_TODO
+    return 0;
 }
 
 gearoenix::core::ecs::Entity::id_t gearoenix::render::gltf::NodeManager::get_light(
-    const std::size_t, const std::size_t, const gearoenix::core::sync::EndCallerIgnored&) noexcept {
-    GX_UNIMPLEMENTED
+    const std::size_t, const std::size_t, const gearoenix::core::sync::EndCallerIgnored&) noexcept
+{
+    GX_TODO
+    return 0;
 }
 
 gearoenix::render::gltf::NodeManager::NodeManager(Loader& loader, MeshManager& mesh_manager) noexcept
@@ -85,11 +93,10 @@ gearoenix::core::ecs::Entity::id_t gearoenix::render::gltf::NodeManager::get(
     if (node.skin >= 0)
         return get_skin(index, c);
 
-    GX_CHECK_NOT_EQUAL_D(node.children.size(), 1)
+    GX_CHECK_EQUAL_D(node.children.size(), 1)
 
     const std::size_t child_node_index = node.children[0];
-    auto child_node_search = loaded_nodes.find(child_node_index);
-    GX_CHECK_EQUAL_D(loaded_nodes.end(), child_node_search)
+    GX_CHECK_EQUAL_D(loaded_nodes.end(), loaded_nodes.find(child_node_index))
     const auto& child_node = nodes[child_node_index];
 
     if (child_node.camera >= 0)

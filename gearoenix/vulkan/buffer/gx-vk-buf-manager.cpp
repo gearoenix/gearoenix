@@ -90,7 +90,7 @@ std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Ma
         info.srcOffset = bf_alc.get_offset();
         info.dstOffset = gpu->get_allocator()->get_offset();
         cmd->begin();
-        cmd->copy(*gpu_root_buffer, *upload_root_buffer, info);
+        cmd->copy(*upload_root_buffer, *gpu_root_buffer, info);
         cmd->end();
         auto fence = std::make_shared<sync::Fence>(e.get_logical_device());
         e.get_logical_device().get_graphic_queue()->submit(*cmd, *fence);

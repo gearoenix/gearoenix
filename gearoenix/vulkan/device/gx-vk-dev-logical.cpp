@@ -9,6 +9,21 @@
 gearoenix::vulkan::device::Logical::Logical(const Physical& p) noexcept
     : physical_device(p)
 {
+    VkPhysicalDeviceFeatures device_features;
+    GX_SET_ZERO(device_features)
+    device_features.samplerAnisotropy = VK_TRUE;
+
+    VkPhysicalDeviceBufferDeviceAddressFeatures device_features_bda;
+    GX_SET_ZERO(device_features_bda)
+    device_features_bda.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES;
+    device_features_bda.bufferDeviceAddress = VK_TRUE;
+
+    VkPhysicalDeviceFeatures2 device_features2;
+    GX_SET_ZERO(device_features2)
+    device_features2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
+    device_features2.features.samplerAnisotropy = VK_TRUE;
+    device_features2.pNext = &device_features_bda;
+
     std::vector<const char*> device_extensions;
     device_extensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
     const auto& available_extensions = p.get_supported_extensions();
@@ -19,6 +34,7 @@ gearoenix::vulkan::device::Logical::Logical(const Physical& p) noexcept
     }
 #endif
     if (p.get_rtx_supported()) {
+        device_extensions.push_back(VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME);
         device_extensions.push_back(VK_KHR_DEDICATED_ALLOCATION_EXTENSION_NAME);
         device_extensions.push_back(VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME);
         device_extensions.push_back(VK_KHR_MAINTENANCE3_EXTENSION_NAME);
@@ -49,9 +65,6 @@ gearoenix::vulkan::device::Logical::Logical(const Physical& p) noexcept
         queue_create_info.pQueuePriorities = queue_priorities;
         GX_LOG_D("queue node index added is " << q)
     }
-    VkPhysicalDeviceFeatures device_features;
-    GX_SET_ZERO(device_features)
-    device_features.samplerAnisotropy = VK_TRUE;
     VkDeviceCreateInfo device_create_info;
     GX_SET_ZERO(device_create_info)
     device_create_info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
@@ -59,7 +72,11 @@ gearoenix::vulkan::device::Logical::Logical(const Physical& p) noexcept
     device_create_info.pQueueCreateInfos = queue_create_infos.data();
     device_create_info.enabledExtensionCount = static_cast<std::uint32_t>(device_extensions.size());
     device_create_info.ppEnabledExtensionNames = device_extensions.data();
-    device_create_info.pEnabledFeatures = &device_features;
+    if (p.get_rtx_supported()) {
+        device_create_info.pNext = &device_features2;
+    } else {
+        device_create_info.pEnabledFeatures = &device_features;
+    }
     GX_VK_CHK(vkCreateDevice(physical_device.get_vulkan_data(), &device_create_info, nullptr, &vulkan_data))
     Loader::load(vulkan_data);
     graphic_queue = std::make_unique<queue::Queue>(*this, physical_device.get_graphics_queue_node_index());
