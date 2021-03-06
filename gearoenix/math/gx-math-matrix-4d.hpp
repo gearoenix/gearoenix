@@ -416,46 +416,54 @@ struct Mat4x4 final {
         return r;
     }
 
-    [[nodiscard]] constexpr static Mat4x4<Element> orthographic(const Element width, const Element height, const Element near, const Element far) noexcept
+    [[nodiscard]] constexpr static Mat4x4<Element> orthographic(
+        const Element proj_width,
+        const Element proj_height,
+        const Element proj_near,
+        const Element proj_far) noexcept
     {
         Mat4x4 r;
-        r.data[0][0] = Element(2.0f / width);
+        r.data[0][0] = static_cast<Element>(2) / proj_width;
         r.data[0][1] = static_cast<Element>(0);
         r.data[0][2] = static_cast<Element>(0);
         r.data[0][3] = static_cast<Element>(0);
         r.data[1][0] = static_cast<Element>(0);
-        r.data[1][1] = Element(2.0f / height);
+        r.data[1][1] = static_cast<Element>(2) / proj_height;
         r.data[1][2] = static_cast<Element>(0);
         r.data[1][3] = static_cast<Element>(0);
         r.data[2][0] = static_cast<Element>(0);
         r.data[2][1] = static_cast<Element>(0);
-        r.data[2][2] = Element(2.0f / (near - far));
+        r.data[2][2] = static_cast<Element>(2) / (proj_near - proj_far);
         r.data[2][3] = static_cast<Element>(0);
         r.data[3][0] = static_cast<Element>(0);
         r.data[3][1] = static_cast<Element>(0);
-        r.data[3][2] = Element((far + near) / (near - far));
+        r.data[3][2] = (proj_far + proj_near) / (proj_near - proj_far);
         r.data[3][3] = static_cast<Element>(1);
         return r;
     }
 
-    [[nodiscard]] constexpr static Mat4x4<Element> perspective(const Element width, const Element height, const Element near, const Element far) noexcept
+    [[nodiscard]] constexpr static Mat4x4<Element> perspective(
+        const Element proj_width,
+        const Element proj_height,
+        const Element proj_near,
+        const Element proj_far) noexcept
     {
         Mat4x4 r;
-        r.data[0][0] = Element((2.0f * near) / width);
+        r.data[0][0] = (static_cast<Element>(2) * proj_near) / proj_width;
         r.data[0][1] = static_cast<Element>(0);
         r.data[0][2] = static_cast<Element>(0);
         r.data[0][3] = static_cast<Element>(0);
         r.data[1][0] = static_cast<Element>(0);
-        r.data[1][1] = Element((2.0f * near) / height);
+        r.data[1][1] = (static_cast<Element>(2) * proj_near) / proj_height;
         r.data[1][2] = static_cast<Element>(0);
         r.data[1][3] = static_cast<Element>(0);
         r.data[2][0] = static_cast<Element>(0);
         r.data[2][1] = static_cast<Element>(0);
-        r.data[2][2] = Element((far + near) / (near - far));
-        r.data[2][3] = Element(-1.0);
+        r.data[2][2] = (proj_far + proj_near) / (proj_near - proj_far);
+        r.data[2][3] = static_cast<Element>(-1);
         r.data[3][0] = static_cast<Element>(0);
         r.data[3][1] = static_cast<Element>(0);
-        r.data[3][2] = Element((2.0f * far * near) / (near - far));
+        r.data[3][2] = (static_cast<Element>(2) * proj_far * proj_near) / (proj_near - proj_far);
         r.data[3][3] = static_cast<Element>(0);
         return r;
     }

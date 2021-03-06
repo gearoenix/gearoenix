@@ -26,6 +26,9 @@ private:
         std::shared_ptr<buffer::Buffer> instances_cpu;
         std::shared_ptr<buffer::Buffer> instances_gpu;
         std::shared_ptr<command::Buffer> cmd;
+        std::shared_ptr<buffer::Buffer> tlas_buff;
+        std::shared_ptr<buffer::Buffer> tlas_scratch_buff;
+        VkAccelerationStructureKHR tlas_vulkan_data = nullptr;
     };
 
     std::unique_ptr<core::sync::WorkWaiter> accel_creator;

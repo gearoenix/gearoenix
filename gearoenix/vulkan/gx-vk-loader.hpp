@@ -88,6 +88,7 @@
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCreateInstance);                               \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCreateAccelerationStructureKHR);               \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkDestroyInstance);                              \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkDestroyAccelerationStructureKHR);              \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkEnumerateInstanceVersion);                     \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkEnumeratePhysicalDevices);                     \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetAccelerationStructureDeviceAddressKHR);     \

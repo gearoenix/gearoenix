@@ -70,14 +70,15 @@ void gearoenix::vulkan::command::Buffer::copy(
 
 void gearoenix::vulkan::command::Buffer::copy(
     buffer::Buffer& src,
-    buffer::Buffer& des) noexcept
+    buffer::Buffer& dst) noexcept
 {
     VkBufferCopy info;
-    const auto& bf_alc = *src.get_allocator();
-    info.size = bf_alc.get_size();
-    info.srcOffset = bf_alc.get_offset();
-    info.dstOffset = des.get_allocator()->get_offset();
-    vkCmdCopyBuffer(vulkan_data, src.get_vulkan_data(), des.get_vulkan_data(), 1, &info);
+    const auto& src_alc = *src.get_allocator();
+    const auto& dst_alc = *dst.get_allocator();
+    info.size = std::min(src_alc.get_size(), dst_alc.get_size());
+    info.srcOffset = src_alc.get_offset();
+    info.dstOffset = dst_alc.get_offset();
+    vkCmdCopyBuffer(vulkan_data, src.get_vulkan_data(), dst.get_vulkan_data(), 1, &info);
 }
 
 void gearoenix::vulkan::command::Buffer::barrier(

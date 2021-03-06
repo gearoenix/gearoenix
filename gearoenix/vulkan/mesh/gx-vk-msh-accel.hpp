@@ -33,6 +33,10 @@ private:
     void initialize_blas() noexcept;
 
 public:
+    Accel(Accel&&) = delete;
+    Accel(const Accel&) = delete;
+    Accel& operator=(Accel&&) = delete;
+    Accel& operator=(const Accel&) = delete;
     [[nodiscard]] static std::shared_ptr<Accel> construct(
         engine::Engine&,
         const std::vector<math::BasicVertex>& vertices,

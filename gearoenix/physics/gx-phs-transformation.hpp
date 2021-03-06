@@ -7,11 +7,11 @@
 
 namespace gearoenix::physics {
 struct Transformation final : public core::ecs::Component {
-    GX_GET_CREF_PRT(math::Vec3<double>, x_axis)
-    GX_GET_CREF_PRT(math::Vec3<double>, y_axis)
-    GX_GET_CREF_PRT(math::Vec3<double>, z_axis)
-    GX_GET_CREF_PRT(math::Vec3<double>, scale)
-    GX_GET_CREF_PRT(math::Mat4x4<double>, matrix)
+    GX_GET_CREF_PRV(math::Vec3<double>, x_axis)
+    GX_GET_CREF_PRV(math::Vec3<double>, y_axis)
+    GX_GET_CREF_PRV(math::Vec3<double>, z_axis)
+    GX_GET_CREF_PRV(math::Vec3<double>, scale)
+    GX_GET_CREF_PRV(math::Mat4x4<double>, matrix)
 
 public:
     Transformation() noexcept;

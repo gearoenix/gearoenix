@@ -69,6 +69,11 @@ std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Ma
     return gpu_root_buffer->allocate(size);
 }
 
+std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Manager::create_staging(const std::size_t size) noexcept
+{
+    return upload_root_buffer->allocate(size);
+}
+
 std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Manager::create(
     const void* const data,
     const std::size_t size,

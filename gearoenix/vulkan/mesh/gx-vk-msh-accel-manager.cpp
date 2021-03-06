@@ -224,7 +224,7 @@ void gearoenix::vulkan::mesh::AccelManager::create_accel_after_blas_copy(
 void gearoenix::vulkan::mesh::AccelManager::update_instances() noexcept
 {
     e.get_world()->parallel_system<AccelComponent, physics::Transformation>(
-        [this](AccelComponent& accel_com, physics::Transformation& tran, const unsigned int kernel_index) noexcept {
+        [this](core::ecs::Entity::id_t, AccelComponent& accel_com, physics::Transformation& tran, const unsigned int kernel_index) noexcept {
             update_instances_system(accel_com, tran, kernel_index);
         });
     instances.clear();
@@ -254,26 +254,97 @@ void gearoenix::vulkan::mesh::AccelManager::update_instances_system(
 void gearoenix::vulkan::mesh::AccelManager::update_instances_buffers() noexcept
 {
     auto& frame = frames[e.get_frame_number()];
+    auto& dev = e.get_logical_device();
+    auto vk_dev = dev.get_vulkan_data();
     frame.instances_size = instances.size() * sizeof(VkAccelerationStructureInstanceKHR);
     const auto& previous_frame = frames[e.get_previous_frame_number()];
     auto& buff_mgr = e.get_buffer_manager();
-    if (previous_frame.instances_size >= frame.instances_size) {
-        frame.instances_cpu = previous_frame.instances_cpu;
+    if (nullptr != previous_frame.instances_gpu && previous_frame.instances_gpu->get_allocator()->get_size() >= frame.instances_size) {
         frame.instances_gpu = previous_frame.instances_gpu;
     } else {
-        frame.instances_cpu = buff_mgr.create_staging(frame.instances_size);
         frame.instances_gpu = buff_mgr.create_static(frame.instances_size);
     }
+    if (nullptr == frame.instances_cpu || frame.instances_cpu->get_allocator()->get_size() < frame.instances_size) {
+        frame.instances_cpu = buff_mgr.create_staging(frame.instances_size);
+    }
     frame.instances_cpu->write(instances.data(), frame.instances_size);
+
     frame.cmd->begin();
     frame.cmd->copy(*frame.instances_cpu, *frame.instances_gpu);
     frame.cmd->barrier(
         *frame.instances_gpu,
         { VK_ACCESS_TRANSFER_WRITE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT },
         { VK_ACCESS_ACCELERATION_STRUCTURE_WRITE_BIT_KHR, VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR });
+
     const auto instances_device_address = frame.instances_gpu->get_device_address();
+
+    VkAccelerationStructureGeometryInstancesDataKHR instances_vk;
+    GX_SET_ZERO(instances_vk)
+    instances_vk.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_INSTANCES_DATA_KHR;
+    instances_vk.arrayOfPointers = VK_FALSE;
+    instances_vk.data.deviceAddress = instances_device_address;
+
+    VkAccelerationStructureGeometryKHR tlas_geo;
+    GX_SET_ZERO(tlas_geo)
+    tlas_geo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR;
+    tlas_geo.geometryType = VK_GEOMETRY_TYPE_INSTANCES_KHR;
+    tlas_geo.geometry.instances = instances_vk;
+
+    VkAccelerationStructureBuildGeometryInfoKHR bg_info;
+    GX_SET_ZERO(bg_info)
+    bg_info.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR;
+    bg_info.flags = VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR;
+    bg_info.geometryCount = 1;
+    bg_info.pGeometries = &tlas_geo;
+    bg_info.mode = VK_BUILD_ACCELERATION_STRUCTURE_MODE_BUILD_KHR;
+    bg_info.type = VK_ACCELERATION_STRUCTURE_TYPE_TOP_LEVEL_KHR;
+    bg_info.srcAccelerationStructure = VK_NULL_HANDLE;
+
+    const auto instances_count = static_cast<std::uint32_t>(instances.size());
+    VkAccelerationStructureBuildSizesInfoKHR sz_info;
+    GX_SET_ZERO(sz_info)
+    sz_info.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR;
+    vkGetAccelerationStructureBuildSizesKHR(
+        vk_dev, VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR, &bg_info, &instances_count, &sz_info);
+
+    if (nullptr != frame.tlas_vulkan_data) {
+        vkDestroyAccelerationStructureKHR(vk_dev, frame.tlas_vulkan_data, nullptr);
+        frame.tlas_vulkan_data = nullptr;
+    }
+
+    if (nullptr != previous_frame.tlas_buff && previous_frame.tlas_buff->get_allocator()->get_size() >= sz_info.accelerationStructureSize) {
+        frame.tlas_buff = previous_frame.tlas_buff;
+    } else {
+        frame.tlas_buff = buff_mgr.create_static(sz_info.accelerationStructureSize);
+    }
+
+    if (nullptr != previous_frame.tlas_scratch_buff && previous_frame.tlas_scratch_buff->get_allocator()->get_size() >= sz_info.buildScratchSize) {
+        frame.tlas_scratch_buff = previous_frame.tlas_scratch_buff;
+    } else {
+        frame.tlas_scratch_buff = buff_mgr.create_static(sz_info.buildScratchSize);
+    }
+
+    VkAccelerationStructureCreateInfoKHR create_info;
+    GX_SET_ZERO(create_info)
+    create_info.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_CREATE_INFO_KHR;
+    create_info.type = VK_ACCELERATION_STRUCTURE_TYPE_TOP_LEVEL_KHR;
+    create_info.size = sz_info.accelerationStructureSize;
+    create_info.buffer = frame.tlas_buff->get_vulkan_data();
+    create_info.offset = frame.tlas_buff->get_allocator()->get_offset();
+
+    GX_VK_CHK(vkCreateAccelerationStructureKHR(vk_dev, &create_info, nullptr, &frame.tlas_vulkan_data))
+    mark("tlas-" + std::to_string(e.get_frame_number_from_start()), frame.tlas_vulkan_data, dev);
+
+    bg_info.dstAccelerationStructure = frame.tlas_vulkan_data;
+    bg_info.scratchData.deviceAddress = frame.tlas_scratch_buff->get_device_address();
+
+    VkAccelerationStructureBuildRangeInfoKHR bo_info;
+    GX_SET_ZERO(bo_info)
+    bo_info.primitiveCount = instances_count;
+
+    frame.cmd->build_acceleration_structure(bg_info, bo_info);
+
     GX_UNIMPLEMENTED
-    // TODO
 }
 
 gearoenix::vulkan::mesh::AccelManager::AccelManager(engine::Engine& e) noexcept

@@ -20,7 +20,7 @@ void gearoenix::vulkan::mesh::Accel::initialize_blas() noexcept
     GX_SET_ZERO(info)
     info.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_DEVICE_ADDRESS_INFO_KHR;
     info.accelerationStructure = vulkan_data;
-    accel_addr = vkGetAccelerationStructureDeviceAddressKHR(
+    acceleration_address = vkGetAccelerationStructureDeviceAddressKHR(
         vertex->get_allocated_memory()->get_e().get_logical_device().get_vulkan_data(), &info);
 }
 
@@ -40,7 +40,12 @@ std::shared_ptr<gearoenix::vulkan::mesh::Accel> gearoenix::vulkan::mesh::Accel::
     return result;
 }
 
-gearoenix::vulkan::mesh::Accel::~Accel() noexcept = default;
+gearoenix::vulkan::mesh::Accel::~Accel() noexcept
+{
+    vkDestroyAccelerationStructureKHR(
+        vertex->get_allocated_memory()->get_e().get_logical_device().get_vulkan_data(), vulkan_data, nullptr);
+    vulkan_data = nullptr;
+}
 
 void gearoenix::vulkan::mesh::Accel::set_component(const std::shared_ptr<core::ecs::EntitySharedBuilder>& b) noexcept
 {
