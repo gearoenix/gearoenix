@@ -16,19 +16,21 @@ struct Engine;
 }
 
 namespace gearoenix::vulkan::mesh {
-struct Manager;
+struct AccelManager;
 struct Accel final : public render::mesh::Mesh {
-    friend Manager;
+    friend AccelManager;
     GX_GET_REFC_PRV(std::shared_ptr<buffer::Buffer>, vertex)
     GX_GET_REFC_PRV(std::shared_ptr<buffer::Buffer>, index)
 
 private:
     VkAccelerationStructureKHR vulkan_data = nullptr;
-    std::shared_ptr<buffer::Buffer> accel = nullptr;
+    std::shared_ptr<buffer::Buffer> accel_buff = nullptr;
+    VkDeviceAddress accel_addr = 0;
 
     std::weak_ptr<Accel> self;
 
     Accel(std::shared_ptr<buffer::Buffer> vertex, std::shared_ptr<buffer::Buffer> index) noexcept;
+    void initialize_blas() noexcept;
 
 public:
     [[nodiscard]] static std::shared_ptr<Accel> construct(

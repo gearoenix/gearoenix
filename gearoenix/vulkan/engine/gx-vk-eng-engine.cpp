@@ -1,7 +1,9 @@
 #include "gx-vk-eng-engine.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
+#include "../../core/ecs/gx-cr-ecs-world.hpp"
 #include "../../platform/gx-plt-application.hpp"
 #include "../gx-vk-check.hpp"
+#include "../mesh/gx-vk-msh-manager.hpp"
 #include "../queue/gx-vk-qu-queue.hpp"
 #include "../sync/gx-vk-sync-fence.hpp"
 #include "gx-vk-eng-frame.hpp"
@@ -71,7 +73,7 @@ gearoenix::vulkan::engine::Engine::Engine(const platform::Application& platform_
     , descriptor_manager(logical_device)
     , pipeline_manager(logical_device)
     , buffer_manager(memory_manager, *this)
-    , mesh_manager(*this)
+    , mesh_manager(mesh::Manager::construct(*this))
     , depth_stencil(image::View::create_depth_stencil(memory_manager))
     , render_pass(swapchain)
 {
@@ -81,6 +83,7 @@ gearoenix::vulkan::engine::Engine::Engine(const platform::Application& platform_
 
 gearoenix::vulkan::engine::Engine::~Engine() noexcept
 {
+    world = nullptr;
     logical_device.wait_to_finish();
     ImGui_ImplVulkan_Shutdown();
     ImGui::DestroyContext();
@@ -121,6 +124,8 @@ void gearoenix::vulkan::engine::Engine::end_frame() noexcept
     ImDrawData* draw_data = ImGui::GetDrawData();
 
     if (swapchain_image_is_valid) {
+        mesh_manager->update();
+
         auto& frame = *frames[swapchain_image_index];
         auto& sync_frame = *frames[frame_number];
         auto& cmd = *frame.draw_command;
@@ -148,7 +153,7 @@ void gearoenix::vulkan::engine::Engine::create_mesh(
     const std::vector<std::uint32_t>& indices,
     core::sync::EndCaller<render::mesh::Mesh>& c) noexcept
 {
-    mesh_manager.create(name, vertices, indices, c);
+    mesh_manager->create(name, vertices, indices, c);
 }
 
 gearoenix::vulkan::engine::Frame& gearoenix::vulkan::engine::Engine::get_current_frame() noexcept

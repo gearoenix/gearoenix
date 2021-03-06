@@ -140,5 +140,6 @@ public:                         \
     [[nodiscard]] t& get_##x() noexcept { return x; }
 #define GX_GET_CRRF_PRT(t, x) GX_GET_CRRF(protected, const, t, x)
 #define GX_GET_CRRF_PRV(t, x) GX_GET_CRRF(private, const, t, x)
+#define GX_GET_RRF_PRT(t, x) GX_GET_RRF(protected, t, x)
 #define GX_GET_RRF_PRV(t, x) GX_GET_RRF(private, t, x)
 #endif

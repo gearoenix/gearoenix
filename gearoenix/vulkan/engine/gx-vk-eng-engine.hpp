@@ -14,10 +14,13 @@
 #include "../gx-vk-swapchain.hpp"
 #include "../image/gx-vk-img-view.hpp"
 #include "../memory/gx-vk-mem-manager.hpp"
-#include "../mesh/gx-vk-msh-manager.hpp"
 #include "../pipeline/gx-vk-pip-manager.hpp"
 #include <functional>
 #include <mutex>
+
+namespace gearoenix::vulkan::mesh {
+struct Manager;
+}
 
 namespace gearoenix::vulkan::engine {
 struct Frame;
@@ -32,7 +35,7 @@ struct Engine final : public render::engine::Engine {
     GX_GET_CREF_PRV(descriptor::Manager, descriptor_manager)
     GX_GET_CREF_PRV(pipeline::Manager, pipeline_manager)
     GX_GET_REF_PRV(buffer::Manager, buffer_manager)
-    GX_GET_REF_PRV(mesh::Manager, mesh_manager)
+    GX_GET_CREF_PRV(std::shared_ptr<mesh::Manager>, mesh_manager)
     GX_GET_CREF_PRV(image::View, depth_stencil)
     GX_GET_CREF_PRV(RenderPass, render_pass)
     GX_GET_CREF_PRV(std::vector<std::unique_ptr<Frame>>, frames)

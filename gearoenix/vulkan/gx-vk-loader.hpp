@@ -90,6 +90,7 @@
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkDestroyInstance);                              \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkEnumerateInstanceVersion);                     \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkEnumeratePhysicalDevices);                     \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetAccelerationStructureDeviceAddressKHR);     \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetPhysicalDeviceFeatures);                    \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetPhysicalDeviceFeatures2);                   \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetPhysicalDeviceFormatProperties);            \

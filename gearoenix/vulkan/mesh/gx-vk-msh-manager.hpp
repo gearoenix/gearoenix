@@ -5,7 +5,6 @@
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../../core/sync/gx-cr-sync-end-caller.hpp"
 #include "../../math/gx-math-vertex.hpp"
-#include "../gx-vk-loader.hpp"
 
 namespace gearoenix::core::sync {
 struct WorkWaiter;
@@ -33,52 +32,21 @@ struct Fence;
 
 namespace gearoenix::vulkan::mesh {
 struct Accel;
-struct Manager final {
-    GX_GET_RRF_PRV(engine::Engine, e)
-    GX_GET_CVAL_PRV(bool, use_accel)
+struct Manager {
+    GX_GET_RRF_PRT(engine::Engine, e)
 
-private:
-    std::unique_ptr<core::sync::WorkWaiter> accel_creator;
-    std::unique_ptr<core::sync::WorkWaiter> accel_creation_waiter;
-
-    void create_accel(
-        const std::string& name,
-        const std::vector<math::BasicVertex>& vertices,
-        const std::vector<std::uint32_t>& indices,
-        core::sync::EndCaller<render::mesh::Mesh>& c) noexcept;
-    void create_accel_after_vertices_ready(
-        std::string name,
-        std::size_t vertices_count,
-        std::size_t indices_count,
-        core::sync::EndCaller<render::mesh::Mesh> c,
-        std::shared_ptr<Accel> result) noexcept;
-    void create_accel_after_blas_ready(
-        std::shared_ptr<command::Buffer> cmd,
-        std::shared_ptr<sync::Fence> fence,
-        core::sync::EndCaller<render::mesh::Mesh> c,
-        std::shared_ptr<Accel> result,
-        std::shared_ptr<query::Pool> query_pool) noexcept;
-    void create_accel_after_query_ready(
-        std::shared_ptr<command::Buffer> cmd,
-        std::shared_ptr<sync::Fence> fence,
-        core::sync::EndCaller<render::mesh::Mesh> c,
-        std::shared_ptr<Accel> result,
-        std::shared_ptr<query::Pool> query_pool) noexcept;
-
-    void create_raster(
-        const std::string& name,
-        const std::vector<math::BasicVertex>& vertices,
-        const std::vector<std::uint32_t>& indices,
-        core::sync::EndCaller<render::mesh::Mesh>& c) noexcept;
+protected:
+    explicit Manager(engine::Engine& e) noexcept;
 
 public:
-    explicit Manager(engine::Engine& e) noexcept;
-    ~Manager() noexcept;
-    void create(
+    [[nodiscard]] static std::shared_ptr<Manager> construct(engine::Engine& e) noexcept;
+    virtual ~Manager() noexcept;
+    virtual void create(
         const std::string& name,
         const std::vector<math::BasicVertex>& vertices,
         const std::vector<std::uint32_t>& indices,
-        core::sync::EndCaller<render::mesh::Mesh>& c) noexcept;
+        core::sync::EndCaller<render::mesh::Mesh>& c) noexcept = 0;
+    virtual void update() noexcept = 0;
 };
 }
 

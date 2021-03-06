@@ -1,6 +1,7 @@
 #include "gx-vk-msh-accel.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
 #include "../../core/ecs/gx-cr-ecs-entity.hpp"
+#include "../../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../buffer/gx-vk-buf-buffer.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "gx-vk-msh-accel-component.hpp"
@@ -11,6 +12,16 @@ gearoenix::vulkan::mesh::Accel::Accel(
     : vertex(std::move(vertex))
     , index(std::move(index))
 {
+}
+
+void gearoenix::vulkan::mesh::Accel::initialize_blas() noexcept
+{
+    VkAccelerationStructureDeviceAddressInfoKHR info;
+    GX_SET_ZERO(info)
+    info.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_DEVICE_ADDRESS_INFO_KHR;
+    info.accelerationStructure = vulkan_data;
+    accel_addr = vkGetAccelerationStructureDeviceAddressKHR(
+        vertex->get_allocated_memory()->get_e().get_logical_device().get_vulkan_data(), &info);
 }
 
 std::shared_ptr<gearoenix::vulkan::mesh::Accel> gearoenix::vulkan::mesh::Accel::construct(
