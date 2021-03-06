@@ -21,11 +21,11 @@ struct Accel final : public render::mesh::Mesh {
     friend AccelManager;
     GX_GET_REFC_PRV(std::shared_ptr<buffer::Buffer>, vertex)
     GX_GET_REFC_PRV(std::shared_ptr<buffer::Buffer>, index)
+    GX_GET_VAL_PRV(VkAccelerationStructureKHR, vulkan_data, nullptr)
+    GX_GET_VAL_PRV(VkDeviceAddress, acceleration_address, 0)
 
 private:
-    VkAccelerationStructureKHR vulkan_data = nullptr;
     std::shared_ptr<buffer::Buffer> accel_buff = nullptr;
-    VkDeviceAddress accel_addr = 0;
 
     std::weak_ptr<Accel> self;
 

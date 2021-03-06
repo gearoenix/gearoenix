@@ -37,6 +37,10 @@ public:
     void end() noexcept;
     void copy(buffer::Buffer& src, buffer::Buffer& des, const std::vector<VkBufferCopy>&) noexcept;
     void copy(buffer::Buffer& src, buffer::Buffer& des) noexcept;
+    void barrier(
+        buffer::Buffer& buff,
+        std::pair<VkAccessFlags, VkPipelineStageFlags> src_state,
+        std::pair<VkAccessFlags, VkPipelineStageFlags> des_state) noexcept;
     void begin(const RenderPass& render_pass, const Framebuffer& framebuffer) noexcept;
     void end_render_pass() noexcept;
     void set(const Viewport& viewport) noexcept;

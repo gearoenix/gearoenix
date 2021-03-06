@@ -1,8 +1,10 @@
 #include "gx-vk-msh-accel-manager.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
+#include "../../core/ecs/gx-cr-ecs-world.hpp"
 #include "../../core/gx-cr-allocator.hpp"
 #include "../../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../../core/sync/gx-cr-sync-work-waiter.hpp"
+#include "../../physics/gx-phs-transformation.hpp"
 #include "../buffer/gx-vk-buf-buffer.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "../gx-vk-check.hpp"
@@ -10,7 +12,9 @@
 #include "../query/gx-vk-qry-pool.hpp"
 #include "../queue/gx-vk-qu-queue.hpp"
 #include "../sync/gx-vk-sync-fence.hpp"
+#include "gx-vk-msh-accel-component.hpp"
 #include "gx-vk-msh-accel.hpp"
+#include <thread>
 
 void gearoenix::vulkan::mesh::AccelManager::create_accel(
     const std::string& name,
@@ -217,11 +221,71 @@ void gearoenix::vulkan::mesh::AccelManager::create_accel_after_blas_copy(
     result->initialize_blas();
 }
 
+void gearoenix::vulkan::mesh::AccelManager::update_instances() noexcept
+{
+    e.get_world()->parallel_system<AccelComponent, physics::Transformation>(
+        [this](AccelComponent& accel_com, physics::Transformation& tran, const unsigned int kernel_index) noexcept {
+            update_instances_system(accel_com, tran, kernel_index);
+        });
+    instances.clear();
+    for (auto& kernel : kernels) {
+        for (const auto& kernel_instance : kernel.instances) {
+            instances.push_back(kernel_instance);
+        }
+        kernel.instances.clear();
+    }
+}
+
+void gearoenix::vulkan::mesh::AccelManager::update_instances_system(
+    AccelComponent& accel_com,
+    const physics::Transformation& tran,
+    const unsigned int kernel_index) noexcept
+{
+    auto& ins = kernels[kernel_index].instances;
+    VkAccelerationStructureInstanceKHR info;
+    GX_SET_ZERO(info)
+    info.accelerationStructureReference = accel_com.get_acceleration_address();
+    info.flags = VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
+    const auto transform = tran.get_matrix().transposed();
+    std::memcpy(&info.transform, transform.data, sizeof(info.transform));
+    ins.push_back(info);
+}
+
+void gearoenix::vulkan::mesh::AccelManager::update_instances_buffers() noexcept
+{
+    auto& frame = frames[e.get_frame_number()];
+    frame.instances_size = instances.size() * sizeof(VkAccelerationStructureInstanceKHR);
+    const auto& previous_frame = frames[e.get_previous_frame_number()];
+    auto& buff_mgr = e.get_buffer_manager();
+    if (previous_frame.instances_size >= frame.instances_size) {
+        frame.instances_cpu = previous_frame.instances_cpu;
+        frame.instances_gpu = previous_frame.instances_gpu;
+    } else {
+        frame.instances_cpu = buff_mgr.create_staging(frame.instances_size);
+        frame.instances_gpu = buff_mgr.create_static(frame.instances_size);
+    }
+    frame.instances_cpu->write(instances.data(), frame.instances_size);
+    frame.cmd->begin();
+    frame.cmd->copy(*frame.instances_cpu, *frame.instances_gpu);
+    frame.cmd->barrier(
+        *frame.instances_gpu,
+        { VK_ACCESS_TRANSFER_WRITE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT },
+        { VK_ACCESS_ACCELERATION_STRUCTURE_WRITE_BIT_KHR, VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR });
+    const auto instances_device_address = frame.instances_gpu->get_device_address();
+    GX_UNIMPLEMENTED
+    // TODO
+}
+
 gearoenix::vulkan::mesh::AccelManager::AccelManager(engine::Engine& e) noexcept
     : Manager(e)
     , accel_creator(new core::sync::WorkWaiter())
     , accel_creation_waiter(new core::sync::WorkWaiter())
+    , kernels(std::thread::hardware_concurrency())
+    , frames(e.get_frames_count())
 {
+    auto& cmd_mgr = e.get_command_manager();
+    for (auto& frame : frames)
+        frame.cmd = std::make_shared<command::Buffer>(std::move(cmd_mgr.create(command::Type::Primary)));
 }
 
 gearoenix::vulkan::mesh::AccelManager::~AccelManager() noexcept = default;
@@ -237,7 +301,10 @@ void gearoenix::vulkan::mesh::AccelManager::create(
 
 void gearoenix::vulkan::mesh::AccelManager::update() noexcept
 {
-    //    e.get_world()->
+    update_instances();
+    if (instances.empty())
+        return;
+    update_instances_buffers();
 }
 
 #endif

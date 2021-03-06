@@ -2,13 +2,37 @@
 #define GEAROENIX_VULKAN_MESH_ACCEL_MANAGER_HPP
 #include "gx-vk-msh-manager.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
+#include "../gx-vk-loader.hpp"
+
+namespace gearoenix::physics {
+struct Transformation;
+}
+
+namespace gearoenix::vulkan::buffer {
+struct Buffer;
+}
 
 namespace gearoenix::vulkan::mesh {
 struct Accel;
+struct AccelComponent;
 struct AccelManager final : public Manager {
 private:
+    struct Kernel final {
+        std::vector<VkAccelerationStructureInstanceKHR> instances;
+    };
+
+    struct Frame final {
+        std::size_t instances_size = 0;
+        std::shared_ptr<buffer::Buffer> instances_cpu;
+        std::shared_ptr<buffer::Buffer> instances_gpu;
+        std::shared_ptr<command::Buffer> cmd;
+    };
+
     std::unique_ptr<core::sync::WorkWaiter> accel_creator;
     std::unique_ptr<core::sync::WorkWaiter> accel_creation_waiter;
+    std::vector<Kernel> kernels;
+    std::vector<Frame> frames;
+    std::vector<VkAccelerationStructureInstanceKHR> instances;
 
     void create_accel(
         const std::string& name,
@@ -36,6 +60,13 @@ private:
     void create_accel_after_blas_copy(
         core::sync::EndCaller<render::mesh::Mesh> c,
         std::shared_ptr<Accel> result) noexcept;
+
+    void update_instances() noexcept;
+    void update_instances_system(
+        AccelComponent& accel_com,
+        const physics::Transformation& tran,
+        unsigned int kernel_index) noexcept;
+    void update_instances_buffers() noexcept;
 
 public:
     explicit AccelManager(engine::Engine& e) noexcept;

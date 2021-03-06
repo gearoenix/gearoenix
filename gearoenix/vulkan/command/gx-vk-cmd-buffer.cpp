@@ -80,6 +80,23 @@ void gearoenix::vulkan::command::Buffer::copy(
     vkCmdCopyBuffer(vulkan_data, src.get_vulkan_data(), des.get_vulkan_data(), 1, &info);
 }
 
+void gearoenix::vulkan::command::Buffer::barrier(
+    buffer::Buffer& buff,
+    std::pair<VkAccessFlags, VkPipelineStageFlags> src_state,
+    std::pair<VkAccessFlags, VkPipelineStageFlags> des_state) noexcept
+{
+    const auto& alc = *buff.get_allocator();
+    VkBufferMemoryBarrier info;
+    GX_SET_ZERO(info)
+    info.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
+    info.buffer = buff.get_vulkan_data();
+    info.offset = alc.get_offset();
+    info.size = alc.get_size();
+    info.srcAccessMask = src_state.first;
+    info.dstAccessMask = des_state.first;
+    vkCmdPipelineBarrier(vulkan_data, src_state.second, des_state.second, 0, 0, nullptr, 1, &info, 0, nullptr);
+}
+
 void gearoenix::vulkan::command::Buffer::begin(const RenderPass& render_pass, const Framebuffer& framebuffer) noexcept
 {
     const auto& img = framebuffer.get_depth()->get_image();
