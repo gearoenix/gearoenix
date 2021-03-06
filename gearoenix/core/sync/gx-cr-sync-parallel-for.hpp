@@ -37,7 +37,7 @@ public:
 #else
         exec([f, first, end](const unsigned int kernels_count, const unsigned int kernel_index) noexcept {
             for (Iter iter = (first + kernel_index); iter != end; iter += kernels_count) {
-                f(*iter);
+                f(*iter, kernel_index);
             }
         });
 #endif

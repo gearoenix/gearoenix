@@ -76,7 +76,7 @@ static void check_systems() noexcept
 {
     bool e1s = false, e2s = false, e3s = false, e4s = false, e5s = false;
 
-    w.parallel_system<Position>([&](const Entity::id_t ent, Position& p) {
+    w.parallel_system<Position>([&](const Entity::id_t ent, Position& p, const unsigned int) noexcept {
         if (e1 == ent) {
             e1s = true;
             BOOST_TEST(2.0 == p.x);
@@ -97,7 +97,7 @@ static void check_systems() noexcept
     BOOST_TEST((e1s && e2s && e3s));
     e1s = e2s = e3s = false;
 
-    w.parallel_system<Not<Speed>>([&](const Entity::id_t ent, Not<Speed>&) {
+    w.parallel_system<Not<Speed>>([&](const Entity::id_t ent, Not<Speed>&, const unsigned int) noexcept {
         if (ent == e2)
             e2s = true;
         else if (ent == e5)
@@ -109,7 +109,7 @@ static void check_systems() noexcept
     BOOST_TEST((e2s && e5s));
     e2s = e5s = false;
 
-    w.parallel_system<Not<Position>>([&](const Entity::id_t ent, Not<Position>&) {
+    w.parallel_system<Not<Position>>([&](const Entity::id_t ent, Not<Position>&, const unsigned int) noexcept {
         if (ent == e4)
             e4s = true;
         else if (ent == e5)
@@ -121,7 +121,7 @@ static void check_systems() noexcept
     BOOST_TEST((e4s && e5s));
     e4s = e5s = false;
 
-    w.parallel_system<Speed>([&](const Entity::id_t ent, Speed& s) {
+    w.parallel_system<Speed>([&](const Entity::id_t ent, Speed& s, const unsigned int) noexcept {
         if (e1 == ent) {
             e1s = true;
             BOOST_TEST(4.0 == s.x);
@@ -142,7 +142,7 @@ static void check_systems() noexcept
     BOOST_TEST((e1s && e3s && e4s));
     e1s = e3s = e4s = false;
 
-    w.parallel_system<Speed, Position>([&](const Entity::id_t ent, Speed& s, Position& p) {
+    w.parallel_system<Speed, Position>([&](const Entity::id_t ent, Speed& s, Position& p, const unsigned int) noexcept {
         if (e1 == ent) {
             e1s = true;
             BOOST_TEST(2 == std::lround(p.x));
@@ -163,7 +163,7 @@ static void check_systems() noexcept
     BOOST_TEST((e1s && e3s));
     e1s = e3s = false;
 
-    w.parallel_system<Not<Speed>, Position>([&](const Entity::id_t ent, Not<Speed>&, Position& p) {
+    w.parallel_system<Not<Speed>, Position>([&](const Entity::id_t ent, Not<Speed>&, Position& p, const unsigned int) noexcept {
         if (e2 == ent) {
             e2s = true;
             BOOST_TEST(6.0 == p.x);
@@ -176,7 +176,7 @@ static void check_systems() noexcept
     BOOST_TEST(e2s);
     e2s = false;
 
-    w.parallel_system<Speed, Not<Position>>([&](const Entity::id_t ent, Speed& s, Not<Position>&) {
+    w.parallel_system<Speed, Not<Position>>([&](const Entity::id_t ent, Speed& s, Not<Position>&, const unsigned int) noexcept {
         if (e4 == ent) {
             e4s = true;
             BOOST_TEST(12.0 == s.x);

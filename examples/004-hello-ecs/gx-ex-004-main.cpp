@@ -44,11 +44,11 @@ void start()
     (void)w.create_entity(Position { 6.0, 7.0 });
     (void)w.create_entity(Speed { 10.0, 11.0 }, Position { 8.0, 9.0 });
     (void)w.create_entity(Speed { 12.0, 13.0 });
-    w.parallel_system<Position>([&](Entity::id_t ent, Position& p) { GX_LOG_D("Entity: " << ent << ", Position { " << p.x << ", " << p.y << " }") });
-    w.parallel_system<Not<Speed>>([&](Entity::id_t ent, Not<Speed>&) { GX_LOG_D("Entity: " << ent << ", Without Speed") });
-    w.parallel_system<Not<Position>>([&](Entity::id_t ent, Not<Position>&) { GX_LOG_D("Entity: " << ent << ", Without Position") });
-    w.parallel_system<Speed>([&](Entity::id_t ent, Speed& s) { GX_LOG_D("Entity: " << ent << ", Speed {" << s.x << ", " << s.y << "}") });
-    w.parallel_system<Speed, Position>([&](Entity::id_t ent, Speed& s, Position& p) { GX_LOG_D("Entity: " << ent << ", Speed {" << s.x << ", " << s.y << "}, Position {" << p.x << "," << p.y << "}") });
+    w.parallel_system<Position>([&](Entity::id_t ent, Position& p, const unsigned int kernel_index) noexcept { GX_LOG_D("In kernel: " << kernel_index << " Entity: " << ent << ", Position { " << p.x << ", " << p.y << " }") });
+    w.parallel_system<Not<Speed>>([&](Entity::id_t ent, Not<Speed>&, const unsigned int kernel_index) noexcept { GX_LOG_D("In kernel: " << kernel_index << " Entity: " << ent << ", Without Speed") });
+    w.parallel_system<Not<Position>>([&](Entity::id_t ent, Not<Position>&, const unsigned int kernel_index) noexcept { GX_LOG_D("In kernel: " << kernel_index << " Entity: " << ent << ", Without Position") });
+    w.parallel_system<Speed>([&](Entity::id_t ent, Speed& s, const unsigned int kernel_index) noexcept { GX_LOG_D("In kernel: " << kernel_index << " Entity: " << ent << ", Speed {" << s.x << ", " << s.y << "}") });
+    w.parallel_system<Speed, Position>([&](Entity::id_t ent, Speed& s, Position& p, const unsigned int kernel_index) noexcept { GX_LOG_D("In kernel: " << kernel_index << " Entity: " << ent << ", Speed {" << s.x << ", " << s.y << "}, Position {" << p.x << "," << p.y << "}") });
 
     // It is not a good practice to fetch components by entity id, it is better to use a system, however this
     // functionality is provided, for some use-cases.
