@@ -67,7 +67,6 @@ gearoenix::vulkan::engine::Engine::Engine(const platform::Application& platform_
     , surface(instance, platform_application)
     , physical_device(surface)
     , logical_device(physical_device)
-    , graphic_queue(new queue::Queue(*this))
     , swapchain(logical_device)
     , memory_manager(*this)
     , command_manager(logical_device)
@@ -77,6 +76,7 @@ gearoenix::vulkan::engine::Engine::Engine(const platform::Application& platform_
     , mesh_manager(mesh::Manager::construct(*this))
     , depth_stencil(image::View::create_depth_stencil(memory_manager))
     , render_pass(swapchain)
+    , graphic_queue(new queue::Queue(*this))
 {
     initialize_frame();
     setup_imgui();

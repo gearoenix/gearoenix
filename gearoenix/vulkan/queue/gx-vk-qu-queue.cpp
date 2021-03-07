@@ -1,5 +1,6 @@
 #include "gx-vk-qu-queue.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
+#include "../../core/macro/gx-cr-mcr-assert.hpp"
 #include "../../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../command/gx-vk-cmd-buffer.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
@@ -9,19 +10,63 @@
 #include "../sync/gx-vk-sync-fence.hpp"
 #include "../sync/gx-vk-sync-semaphore.hpp"
 
-gearoenix::vulkan::queue::Queue::Node::Node(const engine::Engine&) noexcept
+[[nodiscard]] static std::vector<std::shared_ptr<gearoenix::vulkan::sync::Semaphore>> create_frame_semaphores(
+    const gearoenix::vulkan::engine::Engine& e) noexcept
+{
+    std::vector<std::shared_ptr<gearoenix::vulkan::sync::Semaphore>> result(e.get_frames_count());
+    const auto& d = e.get_logical_device();
+    for (auto& s : result)
+        s = std::make_shared<gearoenix::vulkan::sync::Semaphore>(d);
+    return result;
+}
+
+[[nodiscard]] static std::vector<std::shared_ptr<gearoenix::vulkan::command::Buffer>> create_frame_cmds(
+    gearoenix::vulkan::engine::Engine& e) noexcept
+{
+    std::vector<std::shared_ptr<gearoenix::vulkan::command::Buffer>> result(e.get_frames_count());
+    auto& cmd_mgr = e.get_command_manager();
+    for (auto& c : result)
+        c = std::make_shared<gearoenix::vulkan::command::Buffer>(std::move(cmd_mgr.create(
+            gearoenix::vulkan::command::Type::Primary)));
+    return result;
+}
+
+gearoenix::vulkan::queue::Queue::Node::Node(engine::Engine& e, std::string name, VkPipelineStageFlags wait_stage) noexcept
+    : name(std::move(name))
+    , wait_stage(wait_stage)
+    , cmds(create_frame_cmds(e))
 {
 }
 
 gearoenix::vulkan::queue::Queue::Node::~Node() noexcept = default;
 
-gearoenix::vulkan::queue::Queue::Graph::Graph(const engine::Engine&) noexcept
+void gearoenix::vulkan::queue::Queue::Node::connect(
+    Node* const provider,
+    Node* const consumer,
+    engine::Engine& e) noexcept
 {
+    GX_CHECK_EQUAL_D(consumer->providers.end(), consumer->providers.find(provider->name))
+    GX_CHECK_EQUAL_D(provider->consumers.end(), provider->consumers.find(consumer->name))
+
+    consumer->providers.emplace(provider->name, provider);
+    provider->consumers.emplace(consumer->name, std::make_pair(consumer, create_frame_semaphores(e)));
+}
+
+gearoenix::vulkan::queue::Queue::Graph::Graph(engine::Engine& e) noexcept
+    : present(create_frame_semaphores(e))
+    , nodes {
+        { START_FRAME, Node(e, START_FRAME, 0) },
+        { END_FRAME, Node(e, END_FRAME, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT) }
+    }
+    , start(&nodes.find(START_FRAME)->second)
+    , end(&nodes.find(END_FRAME)->second)
+{
+    Node::connect(start, end, e);
 }
 
 gearoenix::vulkan::queue::Queue::Graph::~Graph() noexcept = default;
 
-gearoenix::vulkan::queue::Queue::Queue(const engine::Engine& e) noexcept
+gearoenix::vulkan::queue::Queue::Queue(engine::Engine& e) noexcept
     : e(e)
     , graph(e)
 {

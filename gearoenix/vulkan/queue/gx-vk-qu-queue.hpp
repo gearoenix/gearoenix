@@ -38,21 +38,25 @@ private:
     GX_CREATE_GUARD(this)
 
     struct Node final {
-        std::vector<std::shared_ptr<command::Buffer>> cmds;
+        const std::string name;
+        const VkPipelineStageFlags wait_stage;
+        const std::vector<std::shared_ptr<command::Buffer>> cmds;
         std::map<std::string, Node*> providers;
-        std::map<std::string, std::pair<Node*, std::vector<std::shared_ptr<sync::Semaphore>>>> consumers;
+        std::map<std::string, std::pair<Node*, const std::vector<std::shared_ptr<sync::Semaphore>>>> consumers;
 
-        explicit Node(const engine::Engine&) noexcept;
+        explicit Node(engine::Engine&, std::string name, VkPipelineStageFlags) noexcept;
         ~Node() noexcept;
+
+        static void connect(Node* provider, Node* consumer, engine::Engine& e) noexcept;
     };
 
     struct Graph final {
-        std::vector<std::shared_ptr<sync::Semaphore>> present;
-        std::shared_ptr<Node> start;
-        std::shared_ptr<Node> end;
-        std::map<std::string, std::shared_ptr<Node>> nodes;
+        const std::vector<std::shared_ptr<sync::Semaphore>> present;
+        std::map<std::string, Node> nodes;
+        Node* const start;
+        Node* const end;
 
-        explicit Graph(const engine::Engine&) noexcept;
+        explicit Graph(engine::Engine&) noexcept;
         ~Graph() noexcept;
     };
 
@@ -63,7 +67,7 @@ public:
     Queue(const Queue&) = delete;
     Queue& operator=(Queue&&) = delete;
     Queue& operator=(const Queue&) = delete;
-    explicit Queue(const engine::Engine& e) noexcept;
+    explicit Queue(engine::Engine& e) noexcept;
     ~Queue() noexcept;
     void submit(command::Buffer&, sync::Fence& fence) noexcept;
     void submit(
