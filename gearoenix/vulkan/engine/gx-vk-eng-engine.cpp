@@ -112,7 +112,6 @@ void gearoenix::vulkan::engine::Engine::start_frame() noexcept
             swapchain_image_is_valid = false;
         }
         if (swapchain_image_is_valid) {
-            //            frames[swapchain_image_index]->begin();
             frames[frame_number]->begin();
         }
     }
