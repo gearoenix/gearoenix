@@ -22,6 +22,10 @@ namespace gearoenix::vulkan::mesh {
 struct Manager;
 }
 
+namespace gearoenix::vulkan::queue {
+struct Queue;
+}
+
 namespace gearoenix::vulkan::engine {
 struct Frame;
 struct Engine final : public render::engine::Engine {
@@ -29,6 +33,7 @@ struct Engine final : public render::engine::Engine {
     GX_GET_CREF_PRV(Surface, surface)
     GX_GET_CREF_PRV(device::Physical, physical_device)
     GX_GET_REF_PRV(device::Logical, logical_device)
+    GX_GET_UPTR_PRV(queue::Queue, graphic_queue)
     GX_GET_CREF_PRV(Swapchain, swapchain)
     GX_GET_CREF_PRV(memory::Manager, memory_manager)
     GX_GET_REF_PRV(command::Manager, command_manager)

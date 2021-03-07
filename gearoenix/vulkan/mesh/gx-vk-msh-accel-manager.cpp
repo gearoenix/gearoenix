@@ -119,7 +119,7 @@ void gearoenix::vulkan::mesh::AccelManager::create_accel_after_vertices_ready(
     cmd->build_acceleration_structure(bge_info, rng_info);
     cmd->end();
     std::shared_ptr<sync::Fence> fence(new sync::Fence(dev));
-    dev.get_graphic_queue()->submit(*cmd, *fence);
+    e.get_graphic_queue()->submit(*cmd, *fence);
 
     accel_creation_waiter->push([this,
                                     cmd = std::move(cmd),
@@ -149,7 +149,7 @@ void gearoenix::vulkan::mesh::AccelManager::create_accel_after_blas_ready(
     query_pool->issue_acceleration_structure_compacted_size(*cmd, result->vulkan_data);
     cmd->end();
     fence = std::make_shared<sync::Fence>(dev);
-    dev.get_graphic_queue()->submit(*cmd, *fence);
+    e.get_graphic_queue()->submit(*cmd, *fence);
     accel_creation_waiter->push([this,
                                     cmd = std::move(cmd),
                                     fence = std::move(fence),
@@ -203,7 +203,7 @@ void gearoenix::vulkan::mesh::AccelManager::create_accel_after_query_ready(
     vkCmdCopyAccelerationStructureKHR(cmd->get_vulkan_data(), &copy_info);
     cmd->end();
     fence = std::make_shared<sync::Fence>(dev);
-    dev.get_graphic_queue()->submit(*cmd, *fence);
+    e.get_graphic_queue()->submit(*cmd, *fence);
     accel_creation_waiter->push([this,
                                     cmd = std::move(cmd),
                                     fence = std::move(fence),

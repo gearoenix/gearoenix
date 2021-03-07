@@ -16,7 +16,7 @@ void gearoenix::vulkan::engine::Engine::setup_imgui() noexcept
     info.PhysicalDevice = physical_device.get_vulkan_data();
     info.Device = logical_device.get_vulkan_data();
     info.QueueFamily = physical_device.get_graphics_queue_node_index();
-    info.Queue = logical_device.get_graphic_queue()->get_vulkan_data();
+    info.Queue = graphic_queue->get_vulkan_data();
     info.PipelineCache = pipeline_manager.get_cache().get_vulkan_data();
     info.DescriptorPool = descriptor_manager.get_imgui().get_vulkan_data();
     info.MinImageCount = static_cast<decltype(info.MinImageCount)>(swapchain.get_image_views().size());
@@ -40,7 +40,7 @@ void gearoenix::vulkan::engine::Engine::vulkan_upload_imgui_fonts() noexcept
     ImGui_ImplVulkan_CreateFontsTexture(cmd.get_vulkan_data());
     cmd.end();
     sync::Fence fence(logical_device);
-    logical_device.get_graphic_queue()->submit(cmd, fence);
+    graphic_queue->submit(cmd, fence);
     fence.wait();
     ImGui_ImplVulkan_DestroyFontUploadObjects();
 }
@@ -67,6 +67,7 @@ gearoenix::vulkan::engine::Engine::Engine(const platform::Application& platform_
     , surface(instance, platform_application)
     , physical_device(surface)
     , logical_device(physical_device)
+    , graphic_queue(new queue::Queue(*this))
     , swapchain(logical_device)
     , memory_manager(*this)
     , command_manager(logical_device)
@@ -111,7 +112,8 @@ void gearoenix::vulkan::engine::Engine::start_frame() noexcept
             swapchain_image_is_valid = false;
         }
         if (swapchain_image_is_valid) {
-            frames[swapchain_image_index]->begin();
+            //            frames[swapchain_image_index]->begin();
+            frames[frame_number]->begin();
         }
     }
 }
@@ -128,15 +130,15 @@ void gearoenix::vulkan::engine::Engine::end_frame() noexcept
 
         auto& frame = *frames[swapchain_image_index];
         auto& sync_frame = *frames[frame_number];
-        auto& cmd = *frame.draw_command;
+        auto& cmd = *sync_frame.draw_command;
         auto& render_complete = *sync_frame.render_complete;
-        auto& gqu = *logical_device.get_graphic_queue();
+        auto& gqu = *graphic_queue;
         cmd.begin(render_pass, *frame.framebuffer);
         ImGui_ImplVulkan_RenderDrawData(draw_data, cmd.get_vulkan_data());
         cmd.end_render_pass();
         cmd.end();
         gqu.submit(
-            *sync_frame.present_complete, cmd, render_complete, *frame.draw_wait,
+            *sync_frame.present_complete, cmd, render_complete, *sync_frame.draw_wait,
             VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT);
         swapchain_image_is_valid = gqu.present(render_complete, swapchain, swapchain_image_index);
     }

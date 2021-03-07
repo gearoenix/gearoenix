@@ -93,7 +93,7 @@ std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Ma
         cmd->copy(*cpu, *gpu);
         cmd->end();
         auto fence = std::make_shared<sync::Fence>(e.get_logical_device());
-        e.get_logical_device().get_graphic_queue()->submit(*cmd, *fence);
+        e.get_graphic_queue()->submit(*cmd, *fence);
         waiter->push(std::move([this,
                                    cpu = std::move(cpu),
                                    gpu = std::move(gpu),

@@ -3,7 +3,6 @@
 #include "../../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../gx-vk-check.hpp"
 #include "../gx-vk-instance.hpp"
-#include "../queue/gx-vk-qu-queue.hpp"
 #include "gx-vk-dev-physical.hpp"
 
 gearoenix::vulkan::device::Logical::Logical(const Physical& p) noexcept
@@ -92,12 +91,10 @@ gearoenix::vulkan::device::Logical::Logical(const Physical& p) noexcept
     }
     GX_VK_CHK(vkCreateDevice(physical_device.get_vulkan_data(), &device_create_info, nullptr, &vulkan_data))
     Loader::load(vulkan_data);
-    graphic_queue = std::make_unique<queue::Queue>(*this, physical_device.get_graphics_queue_node_index());
 }
 
 gearoenix::vulkan::device::Logical::~Logical() noexcept
 {
-    graphic_queue = nullptr;
     if (vulkan_data != nullptr) {
         vkDestroyDevice(vulkan_data, nullptr);
         vulkan_data = nullptr;

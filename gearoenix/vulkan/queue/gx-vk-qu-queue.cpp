@@ -3,23 +3,32 @@
 #include "../../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../command/gx-vk-cmd-buffer.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
+#include "../engine/gx-vk-eng-engine.hpp"
 #include "../gx-vk-check.hpp"
 #include "../gx-vk-swapchain.hpp"
 #include "../sync/gx-vk-sync-fence.hpp"
 #include "../sync/gx-vk-sync-semaphore.hpp"
 
-gearoenix::vulkan::queue::Queue::Queue(const device::Logical& logical_device, VkQueue vulkan_data) noexcept
-    : logical_device(logical_device)
-    , vulkan_data(vulkan_data)
+gearoenix::vulkan::queue::Queue::Node::Node(const engine::Engine&) noexcept
 {
 }
 
-gearoenix::vulkan::queue::Queue::Queue(
-    const device::Logical& logical_device,
-    const std::uint32_t node_index) noexcept
-    : logical_device(logical_device)
+gearoenix::vulkan::queue::Queue::Node::~Node() noexcept = default;
+
+gearoenix::vulkan::queue::Queue::Graph::Graph(const engine::Engine&) noexcept
 {
-    vkGetDeviceQueue(logical_device.get_vulkan_data(), node_index, 0, &vulkan_data);
+}
+
+gearoenix::vulkan::queue::Queue::Graph::~Graph() noexcept = default;
+
+gearoenix::vulkan::queue::Queue::Queue(const engine::Engine& e) noexcept
+    : e(e)
+    , graph(e)
+{
+    vkGetDeviceQueue(
+        e.get_logical_device().get_vulkan_data(),
+        e.get_physical_device().get_graphics_queue_node_index(),
+        0, &vulkan_data);
 }
 
 gearoenix::vulkan::queue::Queue::~Queue() noexcept = default;
