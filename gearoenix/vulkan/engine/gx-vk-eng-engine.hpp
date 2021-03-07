@@ -18,6 +18,10 @@
 #include <functional>
 #include <mutex>
 
+namespace gearoenix::vulkan {
+struct ImGuiManager;
+}
+
 namespace gearoenix::vulkan::mesh {
 struct Manager;
 }
@@ -43,6 +47,7 @@ struct Engine final : public render::engine::Engine {
     GX_GET_CREF_PRV(image::View, depth_stencil)
     GX_GET_CREF_PRV(RenderPass, render_pass)
     GX_GET_UPTR_PRV(queue::Queue, graphic_queue)
+    GX_GET_UPTR_PRV(ImGuiManager, imgui_manager)
     GX_GET_CREF_PRV(std::vector<std::unique_ptr<Frame>>, frames)
     GX_GET_VAL_PRV(std::uint32_t, swapchain_image_index, 0)
     GX_GET_VAL_PRV(bool, swapchain_image_is_valid, true)
@@ -52,9 +57,6 @@ struct Engine final : public render::engine::Engine {
     //    GX_GET_CREF_PRV(std::vector<std::shared_ptr<command::Buffer>>, upload_command_buffers)
     //    GX_GET_CREF_PRV(std::vector<std::shared_ptr<sync::Semaphore>>, upload_semaphore)
 private:
-    void setup_imgui() noexcept;
-    void vulkan_upload_imgui_fonts() noexcept;
-    void start_frame_imgui() noexcept;
     void initialize_frame() noexcept;
 
 public:
@@ -72,6 +74,7 @@ public:
         core::sync::EndCaller<render::mesh::Mesh>& c) noexcept final;
     [[nodiscard]] Frame& get_current_frame() noexcept;
     [[nodiscard]] const Frame& get_current_frame() const noexcept;
+    [[nodiscard]] const Framebuffer& get_current_framebuffer() const noexcept;
     [[nodiscard]] static bool is_supported() noexcept;
 };
 }

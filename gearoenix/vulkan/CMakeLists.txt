@@ -100,6 +100,8 @@ SET(GX_ENGINE_VULKAN_SRC
         ${GX_ENGINE_VULKAN_SRC_DIR}/gx-vk-check.hpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/gx-vk-framebuffer.cpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/gx-vk-framebuffer.hpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/gx-vk-imgui-manager.cpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/gx-vk-imgui-manager.hpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/gx-vk-instance.cpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/gx-vk-instance.hpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/gx-vk-loader.cpp

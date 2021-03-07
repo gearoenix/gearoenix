@@ -31,7 +31,7 @@ struct Queue final {
     constexpr static const auto* const START_FRAME = "start frame";
     constexpr static const auto* const END_FRAME = "end frame";
 
-    GX_GET_CRRF_PRV(engine::Engine, e)
+    GX_GET_RRF_PRV(engine::Engine, e)
     GX_GET_VAL_PRV(VkQueue, vulkan_data, nullptr)
 
 private:
@@ -57,6 +57,8 @@ private:
 
     struct Graph final {
         const std::vector<std::shared_ptr<sync::Semaphore>> start_semaphore;
+        const std::vector<std::shared_ptr<sync::Semaphore>> end_semaphore;
+        const std::vector<std::shared_ptr<sync::Fence>> fence;
         std::map<std::string, Node> nodes;
         Node* const start;
         Node* const end;
@@ -77,25 +79,6 @@ private:
 
     Graph graph;
 
-public:
-    Queue(Queue&&) = delete;
-    Queue(const Queue&) = delete;
-    Queue& operator=(Queue&&) = delete;
-    Queue& operator=(const Queue&) = delete;
-    explicit Queue(engine::Engine& e) noexcept;
-    ~Queue() noexcept;
-    void submit(command::Buffer&, sync::Fence& fence) noexcept;
-    void submit(
-        sync::Semaphore& wait,
-        command::Buffer& cmd,
-        sync::Semaphore& signal,
-        sync::Fence& fence,
-        VkPipelineStageFlags wait_stage) noexcept;
-    [[nodiscard]] bool present(
-        sync::Semaphore& wait,
-        Swapchain& swapchain,
-        std::uint32_t image_index) noexcept;
-    void submit() noexcept;
     void submit(
         std::size_t wait_semaphores_count,
         const VkSemaphore* wait_semaphores,
@@ -103,7 +86,34 @@ public:
         const VkCommandBuffer* commands,
         std::size_t signal_semaphores_count,
         const VkSemaphore* signal_semaphores,
-        VkPipelineStageFlags wait_stage) noexcept;
+        VkPipelineStageFlags wait_stage,
+        VkFence fence = nullptr) noexcept;
+    void submit() noexcept;
+
+public:
+    Queue(Queue&&) = delete;
+    Queue(const Queue&) = delete;
+    Queue& operator=(Queue&&) = delete;
+    Queue& operator=(const Queue&) = delete;
+
+    explicit Queue(engine::Engine& e) noexcept;
+    ~Queue() noexcept;
+    void submit(command::Buffer&, sync::Fence& fence) noexcept;
+    void start_frame() noexcept;
+    [[nodiscard]] bool present(
+        Swapchain& swapchain,
+        std::uint32_t image_index) noexcept;
+    [[nodiscard]] const sync::Semaphore& get_present_semaphore() noexcept;
+    [[nodiscard]] std::vector<std::shared_ptr<command::Buffer>> place_node_between(
+        const std::string& previous_node_name,
+        const std::string& node_name,
+        VkPipelineStageFlags wait_stage,
+        const std::string& next_node_name) noexcept;
+    [[nodiscard]] std::vector<std::shared_ptr<command::Buffer>> create_node_path(
+        const std::string& previous_node_name,
+        const std::string& node_name,
+        VkPipelineStageFlags wait_stage,
+        const std::string& next_node_name) noexcept;
 };
 }
 
