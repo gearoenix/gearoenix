@@ -57,7 +57,7 @@ void gearoenix::vulkan::mesh::AccelManager::create_accel_after_vertices_ready(
     GX_SET_ZERO(geo_info)
     geo_info.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR;
     geo_info.geometryType = VK_GEOMETRY_TYPE_TRIANGLES_KHR;
-    geo_info.flags = VK_GEOMETRY_OPAQUE_BIT_KHR;
+    geo_info.flags = VK_GEOMETRY_OPAQUE_BIT_KHR | VK_GEOMETRY_NO_DUPLICATE_ANY_HIT_INVOCATION_BIT_KHR;
 
     auto& trs_info = geo_info.geometry.triangles;
     trs_info.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_TRIANGLES_DATA_KHR;
