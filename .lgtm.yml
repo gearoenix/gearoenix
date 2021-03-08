@@ -26,13 +26,16 @@ extraction:
       - tar -xf "clang+llvm-11.0.1-x86_64-linux-gnu-ubuntu-20.10.tar.xz"
       - ls
       - mv "clang+llvm-11.0.1-x86_64-linux-gnu-ubuntu-20.10.tar.xz" compiler
-      - ls compiler
-      - export CC=clang-11
-      - export CXX=clang++-11
+      - ls compiler/*
+      - export CC="`pwd`/compiler/bin/clang-11"
+      - export CXX="`pwd`/compiler/bin/clang++-11"
+      - export PATH="`pwd`compiler/bin:${PATH}"
       - export CMAKE_BUILD_PARALLEL_LEVEL=16
     configure:
       command:
-        - mkdir build && cd build && cmake ..
+        - cd build
+        - cmake ..
     index:
       build_command:
-        - mkdir build && cd build && cmake --build . --config Release
+        - cd build
+        - cmake --build . --config Release
