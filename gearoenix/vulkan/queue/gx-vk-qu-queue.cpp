@@ -12,7 +12,7 @@
 [[nodiscard]] static std::vector<std::shared_ptr<gearoenix::vulkan::sync::Semaphore>> create_frame_semaphores(
     const gearoenix::vulkan::engine::Engine& e) noexcept
 {
-    std::vector<std::shared_ptr<gearoenix::vulkan::sync::Semaphore>> result(e.get_frames_count());
+    std::vector<std::shared_ptr<gearoenix::vulkan::sync::Semaphore>> result(e.get_swapchain().get_image_views().size());
     const auto& d = e.get_logical_device();
     for (auto& s : result)
         s = std::make_shared<gearoenix::vulkan::sync::Semaphore>(d);
@@ -22,7 +22,7 @@
 [[nodiscard]] static std::vector<std::shared_ptr<gearoenix::vulkan::sync::Fence>> create_frame_fences(
     gearoenix::vulkan::engine::Engine& e) noexcept
 {
-    std::vector<std::shared_ptr<gearoenix::vulkan::sync::Fence>> result(e.get_frames_count());
+    std::vector<std::shared_ptr<gearoenix::vulkan::sync::Fence>> result(e.get_swapchain().get_image_views().size());
     for (auto& f : result)
         f = std::make_shared<gearoenix::vulkan::sync::Fence>(e.get_logical_device(), true);
     return result;
@@ -31,7 +31,7 @@
 [[nodiscard]] static std::vector<std::shared_ptr<gearoenix::vulkan::command::Buffer>> create_frame_cmds(
     gearoenix::vulkan::engine::Engine& e) noexcept
 {
-    std::vector<std::shared_ptr<gearoenix::vulkan::command::Buffer>> result(e.get_frames_count());
+    std::vector<std::shared_ptr<gearoenix::vulkan::command::Buffer>> result(e.get_swapchain().get_image_views().size());
     auto& cmd_mgr = e.get_command_manager();
     for (auto& c : result)
         c = std::make_shared<gearoenix::vulkan::command::Buffer>(std::move(cmd_mgr.create(
