@@ -1,0 +1,25 @@
+path_classifiers:
+  test:
+    - "*/*/*_test.hpp"
+    - "tests/gx-test-main.cpp"
+#  docs:
+
+queries:
+#  - exclude: cpp/use-of-goto
+
+extraction:
+  cpp:
+    prepare:
+      packages:
+        - clang-11
+        - clang++-11
+    after_prepare:
+      - export CC=clang-11
+      - export CXX=clang++-11
+      - export CMAKE_BUILD_PARALLEL_LEVEL=16
+    configure:
+      command:
+        - mkdir build && cd build && cmake ..
+    index:
+      build_command:
+        - mkdir build && cd build && cmake --build . --config Release

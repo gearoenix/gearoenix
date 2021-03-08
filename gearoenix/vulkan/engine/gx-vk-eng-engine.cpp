@@ -30,11 +30,11 @@ gearoenix::vulkan::engine::Engine::Engine(const platform::Application& platform_
     , descriptor_manager(logical_device)
     , pipeline_manager(logical_device)
     , buffer_manager(memory_manager, *this)
-    , mesh_manager(mesh::Manager::construct(*this))
     , depth_stencil(image::View::create_depth_stencil(memory_manager))
     , render_pass(swapchain)
     , graphic_queue(new queue::Queue(*this))
     , imgui_manager(new ImGuiManager(*this))
+    , mesh_manager(mesh::Manager::construct(*this))
 {
     initialize_frame();
 }
