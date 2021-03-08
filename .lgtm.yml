@@ -12,6 +12,9 @@ extraction:
     prepare:
       packages:
         - wget
+        - clang
+        - g++
+        - cmake
     after_prepare:
       - wget "https://github.com/Kitware/CMake/releases/download/v3.19.2/cmake-3.19.2-Linux-x86_64.tar.gz"
       - tar -xf "cmake-3.19.2-Linux-x86_64.tar.gz"
