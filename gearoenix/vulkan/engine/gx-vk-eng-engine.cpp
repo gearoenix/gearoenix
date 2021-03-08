@@ -26,7 +26,7 @@ gearoenix::vulkan::engine::Engine::Engine(const platform::Application& platform_
     , logical_device(physical_device)
     , swapchain(logical_device)
     , memory_manager(*this)
-    , command_manager(logical_device)
+    , command_manager(*this)
     , descriptor_manager(logical_device)
     , pipeline_manager(logical_device)
     , buffer_manager(memory_manager, *this)

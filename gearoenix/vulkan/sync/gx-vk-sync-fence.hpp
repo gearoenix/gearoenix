@@ -4,9 +4,15 @@
 #ifdef GX_RENDER_VULKAN_ENABLED
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../gx-vk-loader.hpp"
+#include <memory>
+#include <vector>
 
 namespace gearoenix::vulkan::device {
 struct Logical;
+}
+
+namespace gearoenix::vulkan::engine {
+struct Engine;
 }
 
 namespace gearoenix::vulkan::sync {
@@ -23,6 +29,8 @@ public:
     ~Fence() noexcept;
     void wait() noexcept;
     void reset() noexcept;
+    [[nodiscard]] static std::vector<std::shared_ptr<Fence>> create_frame_based(
+        const engine::Engine& e, bool signaled = false) noexcept;
 };
 }
 #endif

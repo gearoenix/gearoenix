@@ -27,6 +27,7 @@ struct Semaphore;
 }
 
 namespace gearoenix::vulkan::queue {
+struct Graph;
 struct Queue final {
     constexpr static const auto* const START_FRAME = "start frame";
     constexpr static const auto* const END_FRAME = "end frame";
@@ -36,48 +37,7 @@ struct Queue final {
 
 private:
     GX_CREATE_GUARD(this)
-
-    struct Node final {
-        const std::string name;
-        const VkPipelineStageFlags wait_stage;
-        const std::vector<std::shared_ptr<command::Buffer>> cmds;
-        int traversal_level = -1;
-        bool traversed = false;
-        // semaphores belong to providers and only for performance they have been added in here
-        std::map<std::string, std::pair<Node*, const std::vector<std::shared_ptr<sync::Semaphore>>>> providers;
-        std::map<std::string, std::pair<Node*, const std::vector<std::shared_ptr<sync::Semaphore>>>> consumers;
-
-        explicit Node(engine::Engine&, std::string name, VkPipelineStageFlags) noexcept;
-        ~Node() noexcept;
-        void clear_traversing_level() noexcept;
-        void update_traversing_level(int) noexcept;
-
-        static void connect(Node* provider, Node* consumer, engine::Engine& e) noexcept;
-    };
-
-    struct Graph final {
-        const std::vector<std::shared_ptr<sync::Semaphore>> start_semaphore;
-        const std::vector<std::shared_ptr<sync::Semaphore>> end_semaphore;
-        const std::vector<std::shared_ptr<sync::Fence>> fence;
-        std::map<std::string, Node> nodes;
-        Node* const start;
-        Node* const end;
-
-        /// traversal-level -> pipeline-stage -> (waits, cmds, signals)
-        std::vector<std::map<VkPipelineStageFlags,
-            std::tuple<std::vector<VkSemaphore>, std::vector<VkCommandBuffer>, std::vector<VkSemaphore>>>>
-            submit_data;
-
-        explicit Graph(engine::Engine&) noexcept;
-        ~Graph() noexcept;
-
-        void update_traversing_level() noexcept;
-        void clear_submit_data() noexcept;
-        void update_submit_data(Node&, std::size_t frame_number) noexcept;
-        void update(std::size_t frame_number) noexcept;
-    };
-
-    Graph graph;
+    const std::unique_ptr<Graph> graph;
 
     void submit(
         std::size_t wait_semaphores_count,

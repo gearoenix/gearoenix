@@ -11,9 +11,13 @@
 #include <optional>
 #include <thread>
 
+namespace gearoenix::vulkan::engine {
+struct Engine;
+}
+
 namespace gearoenix::vulkan::command {
 struct Manager final {
-    GX_GET_CRRF_PRV(device::Logical, logical_device)
+    GX_GET_CRRF_PRV(engine::Engine, e)
 
 private:
     GX_CREATE_GUARD(this)
@@ -23,11 +27,12 @@ private:
 public:
     Manager(const Manager&) = delete;
     Manager(Manager&&) = delete;
-    explicit Manager(const device::Logical& logical_device) noexcept;
+    explicit Manager(const engine::Engine& e) noexcept;
     ~Manager() noexcept;
     Manager& operator=(const Manager&) = delete;
     Manager& operator=(Manager&&) = delete;
     [[nodiscard]] Buffer create(Type buffer_type, std::optional<std::size_t> thread_index = std::nullopt) noexcept;
+    [[nodiscard]] std::vector<std::shared_ptr<Buffer>> create_frame_based() noexcept;
 };
 }
 #endif

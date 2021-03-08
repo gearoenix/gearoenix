@@ -68,6 +68,10 @@ SET(GX_ENGINE_VULKAN_SRC
 #        ${GX_ENGINE_VULKAN_SRC_DIR}/pipeline/gx-vk-pip-pipeline.hpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/query/gx-vk-qry-pool.cpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/query/gx-vk-qry-pool.hpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/queue/gx-vk-qu-graph.cpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/queue/gx-vk-qu-graph.hpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/queue/gx-vk-qu-node.cpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/queue/gx-vk-qu-node.hpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/queue/gx-vk-qu-queue.cpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/queue/gx-vk-qu-queue.hpp
 #        ${GX_ENGINE_VULKAN_SRC_DIR}/sampler/gx-vk-smp-manager.cpp
