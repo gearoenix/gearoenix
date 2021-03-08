@@ -13,8 +13,6 @@ extraction:
       packages:
         - wget
     after_prepare:
-      - mkdir build
-      - cd build
       - wget "https://github.com/Kitware/CMake/releases/download/v3.19.2/cmake-3.19.2-Linux-x86_64.tar.gz"
       - tar -xf "cmake-3.19.2-Linux-x86_64.tar.gz"
       - rm "cmake-3.19.2-Linux-x86_64.tar.gz"
@@ -24,18 +22,19 @@ extraction:
       - tar -xf "clang+llvm-11.0.1-x86_64-linux-gnu-ubuntu-20.10.tar.xz"
       - rm "clang+llvm-11.0.1-x86_64-linux-gnu-ubuntu-20.10.tar.xz"
       - mv "clang+llvm-11.0.1-x86_64-linux-gnu-ubuntu-20.10" custom_clang
-      - ls custom_clang
-      - export CC="`pwd`/custom_clang/bin/clang-11"
-      - export CXX="`pwd`/custom_clang/bin/clang++-11"
+      - ls custom_clang/bin
+      - export CC="`pwd`/custom_clang/bin/clang"
+      - export CXX="`pwd`/custom_clang/bin/clang++"
       - export PATH="`pwd`/custom_clang/bin:${PATH}"
       - export CMAKE_BUILD_PARALLEL_LEVEL=16
     configure:
       command:
-        - cd build
+        - mkdir $LGTM_SRC/_lgtm_build_dir
+        - cd $LGTM_SRC/_lgtm_build_dir
         - cmake --version
         - cmake ..
     index:
       build_command:
-        - cd build
+        - cd $LGTM_SRC/_lgtm_build_dir
         - cmake --version
         - cmake --build . --config Release
