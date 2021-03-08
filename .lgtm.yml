@@ -12,7 +12,6 @@ extraction:
     prepare:
       packages:
         - wget
-        - clang-10
     after_prepare:
       - mkdir build
       - cd build
