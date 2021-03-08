@@ -8,6 +8,7 @@
 #include "../buffer/gx-vk-buf-buffer.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "../gx-vk-check.hpp"
+#include "../gx-vk-imgui-manager.hpp"
 #include "../gx-vk-marker.hpp"
 #include "../query/gx-vk-qry-pool.hpp"
 #include "../queue/gx-vk-qu-queue.hpp"
@@ -269,7 +270,6 @@ void gearoenix::vulkan::mesh::AccelManager::update_instances_buffers() noexcept
     }
     frame.instances_cpu->write(instances.data(), frame.instances_size);
 
-    frame.cmd->begin();
     frame.cmd->copy(*frame.instances_cpu, *frame.instances_gpu);
     frame.cmd->barrier(
         *frame.instances_gpu,
@@ -343,8 +343,6 @@ void gearoenix::vulkan::mesh::AccelManager::update_instances_buffers() noexcept
     bo_info.primitiveCount = instances_count;
 
     frame.cmd->build_acceleration_structure(bg_info, bo_info);
-
-    GX_UNIMPLEMENTED
 }
 
 gearoenix::vulkan::mesh::AccelManager::AccelManager(engine::Engine& e) noexcept
@@ -352,11 +350,16 @@ gearoenix::vulkan::mesh::AccelManager::AccelManager(engine::Engine& e) noexcept
     , accel_creator(new core::sync::WorkWaiter())
     , accel_creation_waiter(new core::sync::WorkWaiter())
     , kernels(std::thread::hardware_concurrency())
-    , frames(e.get_frames_count())
+    , frames(e.get_swapchain().get_image_views().size())
 {
-    auto& cmd_mgr = e.get_command_manager();
-    for (auto& frame : frames)
-        frame.cmd = std::make_shared<command::Buffer>(std::move(cmd_mgr.create(command::Type::Primary)));
+    auto cmds = e.get_graphic_queue()->place_node_between(
+        queue::Queue::START_FRAME,
+        NODE_NAME,
+        VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR,
+        ImGuiManager::NODE_NAME);
+    for (std::size_t frame_index = 0; frame_index < frames.size(); ++frame_index) {
+        frames[frame_index].cmd = std::move(cmds[frame_index]);
+    }
 }
 
 gearoenix::vulkan::mesh::AccelManager::~AccelManager() noexcept = default;
@@ -373,9 +376,12 @@ void gearoenix::vulkan::mesh::AccelManager::create(
 void gearoenix::vulkan::mesh::AccelManager::update() noexcept
 {
     update_instances();
-    if (instances.empty())
-        return;
-    update_instances_buffers();
+    auto& frame = frames[e.get_frame_number()];
+    auto& cmd = frame.cmd;
+    cmd->begin();
+    if (!instances.empty())
+        update_instances_buffers();
+    cmd->end();
 }
 
 #endif

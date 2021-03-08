@@ -33,6 +33,7 @@ struct Fence;
 namespace gearoenix::vulkan::mesh {
 struct Accel;
 struct Manager {
+    constexpr static const auto* const NODE_NAME = "mesh-manager";
     GX_GET_RRF_PRT(engine::Engine, e)
 
 protected:

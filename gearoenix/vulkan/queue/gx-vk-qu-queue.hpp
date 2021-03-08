@@ -29,8 +29,8 @@ struct Semaphore;
 namespace gearoenix::vulkan::queue {
 struct Graph;
 struct Queue final {
-    constexpr static const auto* const START_FRAME = "start frame";
-    constexpr static const auto* const END_FRAME = "end frame";
+    constexpr static const auto* const START_FRAME = "start-frame";
+    constexpr static const auto* const END_FRAME = "end-frame";
 
     GX_GET_RRF_PRV(engine::Engine, e)
     GX_GET_VAL_PRV(VkQueue, vulkan_data, nullptr)
