@@ -48,14 +48,8 @@ private:
         std::size_t indices_count,
         core::sync::EndCaller<render::mesh::Mesh> c,
         std::shared_ptr<Accel> result) noexcept;
-    void create_accel_after_blas_ready(
-        std::shared_ptr<command::Buffer> cmd,
-        std::shared_ptr<sync::Fence> fence,
-        core::sync::EndCaller<render::mesh::Mesh> c,
-        std::shared_ptr<Accel> result,
-        std::shared_ptr<query::Pool> query_pool) noexcept;
     void create_accel_after_query_ready(
-        std::shared_ptr<command::Buffer> cmd,
+        std::string name,
         std::shared_ptr<sync::Fence> fence,
         core::sync::EndCaller<render::mesh::Mesh> c,
         std::shared_ptr<Accel> result,

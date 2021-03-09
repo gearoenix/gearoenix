@@ -60,7 +60,7 @@ VkDeviceSize gearoenix::vulkan::query::Pool::get_acceleration_structure_compacte
     GX_VK_CHK(vkGetQueryPoolResults(
         logical_device.get_vulkan_data(), vulkan_data,
         indices[VK_QUERY_TYPE_ACCELERATION_STRUCTURE_COMPACTED_SIZE_KHR][id], 1,
-        sizeof(VkDeviceSize), &result, 0, VK_QUERY_RESULT_WAIT_BIT))
+        sizeof(VkDeviceSize), &result, sizeof(VkDeviceSize), VK_QUERY_RESULT_WAIT_BIT))
     return result;
 }
 
