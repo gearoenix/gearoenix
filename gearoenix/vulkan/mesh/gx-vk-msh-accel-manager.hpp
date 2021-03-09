@@ -21,8 +21,9 @@ private:
         std::vector<VkAccelerationStructureInstanceKHR> instances;
     };
 
+    std::size_t max_instances_size = 0;
+
     struct Frame final {
-        std::size_t instances_size = 0;
         std::shared_ptr<buffer::Buffer> instances_cpu;
         std::shared_ptr<buffer::Buffer> instances_gpu;
         std::shared_ptr<command::Buffer> cmd;

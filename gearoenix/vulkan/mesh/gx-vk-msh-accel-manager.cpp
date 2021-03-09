@@ -239,18 +239,20 @@ void gearoenix::vulkan::mesh::AccelManager::update_instances_buffers() noexcept
     auto& frame = frames[e.get_frame_number()];
     auto& dev = e.get_logical_device();
     auto vk_dev = dev.get_vulkan_data();
-    frame.instances_size = instances.size() * sizeof(VkAccelerationStructureInstanceKHR);
+    const auto instances_size = instances.size() * sizeof(VkAccelerationStructureInstanceKHR);
+    const bool needs_new_instances_buffer = (max_instances_size < instances_size);
+    max_instances_size = needs_new_instances_buffer ? instances_size : max_instances_size;
     const auto& previous_frame = frames[e.get_previous_frame_number()];
     auto& buff_mgr = e.get_buffer_manager();
-    if (nullptr != previous_frame.instances_gpu && previous_frame.instances_gpu->get_allocator()->get_size() >= frame.instances_size) {
-        frame.instances_gpu = previous_frame.instances_gpu;
+    if (nullptr == previous_frame.instances_gpu || needs_new_instances_buffer) {
+        frame.instances_gpu = buff_mgr.create_static(instances_size);
     } else {
-        frame.instances_gpu = buff_mgr.create_static(frame.instances_size);
+        frame.instances_gpu = previous_frame.instances_gpu;
     }
-    if (nullptr == frame.instances_cpu || frame.instances_cpu->get_allocator()->get_size() < frame.instances_size) {
-        frame.instances_cpu = buff_mgr.create_staging(frame.instances_size);
+    if (nullptr == frame.instances_cpu || needs_new_instances_buffer) {
+        frame.instances_cpu = buff_mgr.create_staging(instances_size);
     }
-    frame.instances_cpu->write(instances.data(), frame.instances_size);
+    frame.instances_cpu->write(instances.data(), instances_size);
 
     frame.cmd->copy(*frame.instances_cpu, *frame.instances_gpu);
     frame.cmd->barrier(

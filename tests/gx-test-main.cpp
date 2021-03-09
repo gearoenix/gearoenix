@@ -13,13 +13,5 @@
 //GX_TEST_PRINT_TYPE_VAL(math::IntersectionStatus)
 // Test units
 
-//#include "gx-test-ai-dijkstra.hpp"
-//#include "gx-test-ai-graph.hpp"
-//#include "gx-test-cr-allocator.hpp"
 #include <gearoenix/core/ecs/gx-cr-ecs-world-test.hpp>
-//#include "gx-test-cr-pool.hpp"
-//#include "gx-test-cr-sync-influence-manager.hpp"
-//#include "gx-test-math-frustum.hpp"
-//#include "gx-test-math-vector.hpp"
-//#include "gx-test-phs-acc-bvh.hpp"
-//#include "gx-test-rnd-texture.hpp"
+#include <gearoenix/core/gx-cr-allocator-test.hpp>

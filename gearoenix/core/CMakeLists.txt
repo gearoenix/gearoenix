@@ -82,4 +82,5 @@ SET(GX_ENGINE_CORE_SRC
 
 SET(GX_ENGINE_CORE_TEST_SRC
         ${GX_ENGINE_CORE_SRC_DIR}/ecs/gx-cr-ecs-world-test.hpp
+        ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-allocator-test.hpp
         PARENT_SCOPE)
