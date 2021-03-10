@@ -14,7 +14,11 @@ jobs:
         run: sudo apt-get update
       - name: Install dependancies
         run: |
-          sudo apt-get install clang++-10 clang-10 wget -y &&
+          sudo apt-get install clang++-10 clang-10 wget unzip -y &&
+          wget "https://sonarcloud.io/static/cpp/build-wrapper-linux-x86.zip" &&
+          unzip build-wrapper-linux-x86.zip &&
+          rm build-wrapper-linux-x86.zip &&
+          echo "`pwd`/build-wrapper-linux-x86/" >> $GITHUB_PATH
           echo "CC=/usr/bin/clang-10" >> $GITHUB_ENV &&
           echo "CXX=/usr/bin/clang++-10" >> $GITHUB_ENV &&
           echo "CMAKE_BUILD_PARALLEL_LEVEL=$(expr $(nproc --all) \* 8)" >> $GITHUB_ENV &&
@@ -39,7 +43,7 @@ jobs:
           mkdir build &&
           cd build &&
           cmake .. &&
-          cmake --build . --config Release
+          build-wrapper-linux-x86-64 --out-dir build_wrapper_output_directory cmake --build . --config Release
       - name: Building debug, tests and coverage
         run: |
           mkdir build-debug &&
