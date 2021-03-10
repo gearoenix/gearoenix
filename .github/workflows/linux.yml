@@ -43,7 +43,8 @@ jobs:
           mkdir build &&
           cd build &&
           cmake .. &&
-          build-wrapper-linux-x86-64 --out-dir build_wrapper_output_directory cmake --build . --config Release
+#          build-wrapper-linux-x86-64 --out-dir build_wrapper_output_directory cmake --build . --config Release
+          cmake --build . --config Release
       - name: Building debug, tests and coverage
         run: |
           mkdir build-debug &&
@@ -62,8 +63,8 @@ jobs:
           name: gearoenix-test-coverage
           fail_ci_if_error: true
           verbose: false
-      - name: sonalr scan
-        uses: SonarSource/sonarcloud-github-action@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+#      - name: sonalr scan
+#        uses: SonarSource/sonarcloud-github-action@master
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
