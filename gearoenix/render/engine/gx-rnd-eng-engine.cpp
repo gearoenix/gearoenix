@@ -110,6 +110,7 @@ void gearoenix::render::engine::Engine::start_frame() noexcept
     ++frame_number_from_start;
     frame_number = frame_number_from_start % frames_count;
     next_frame_number = (frame_number_from_start + 1) % frames_count;
+    world->update();
     //    function_loader->unload();
     //    physics_engine->update();
     //    kernels->do_steps();

@@ -27,7 +27,7 @@ private:
     Allocator* previous = nullptr;
     Allocator* next = nullptr;
 
-    explicit Allocator(std::size_t, std::shared_ptr<Allocator> parent = nullptr) noexcept;
+    Allocator(std::size_t, std::size_t, std::shared_ptr<Allocator> parent = nullptr) noexcept;
     void deallocate(const Allocator* child) noexcept;
 
 public:
