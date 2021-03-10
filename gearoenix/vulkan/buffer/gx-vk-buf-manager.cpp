@@ -6,6 +6,7 @@
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../device/gx-vk-dev-physical.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
+#include "../gx-vk-marker.hpp"
 #include "../queue/gx-vk-qu-queue.hpp"
 #include "../sync/gx-vk-sync-fence.hpp"
 #include "gx-vk-buf-buffer.hpp"
@@ -75,6 +76,7 @@ std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Ma
 }
 
 std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Manager::create(
+    const std::string& name,
     const void* const data,
     const std::size_t size,
     core::sync::EndCaller<Buffer> end) noexcept
@@ -87,8 +89,9 @@ std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Ma
         return nullptr;
     cpu->write(data, size);
     end.set_data(gpu);
-    uploader->push([this, cpu = std::move(cpu), gpu, end = std::move(end)]() mutable noexcept {
+    uploader->push([this, name, cpu = std::move(cpu), gpu, end = std::move(end)]() mutable noexcept {
         auto cmd = std::make_shared<command::Buffer>(e.get_command_manager().create(command::Type::Primary));
+        GX_VK_MARK(name + "-copy-buffer-cmd", cmd->get_vulkan_data(), e.get_logical_device())
         cmd->begin();
         cmd->copy(*cpu, *gpu);
         cmd->end();

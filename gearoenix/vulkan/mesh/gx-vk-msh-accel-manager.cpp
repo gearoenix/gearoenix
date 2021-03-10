@@ -37,7 +37,7 @@ void gearoenix::vulkan::mesh::AccelManager::create_accel(
             create_accel_after_vertices_ready(std::move(name), vertices_count, indices_count, std::move(c), std::move(result));
         });
     });
-    c.set_data(Accel::construct(e, vertices, indices, end));
+    c.set_data(Accel::construct(e, name, vertices, indices, end));
 }
 
 void gearoenix::vulkan::mesh::AccelManager::create_accel_after_vertices_ready(
@@ -101,7 +101,7 @@ void gearoenix::vulkan::mesh::AccelManager::create_accel_after_vertices_ready(
     asc_info.offset = result->accel_buff->get_allocator()->get_offset();
 
     GX_VK_CHK(vkCreateAccelerationStructureKHR(vk_dev, &asc_info, nullptr, &result->vulkan_data))
-    mark(name + "-blas-temp", result->vulkan_data, e.get_logical_device());
+    GX_VK_MARK(name + "-blas-temp", result->vulkan_data, e.get_logical_device());
 
     bge_info.dstAccelerationStructure = result->vulkan_data;
 
@@ -114,6 +114,7 @@ void gearoenix::vulkan::mesh::AccelManager::create_accel_after_vertices_ready(
         dev, VK_QUERY_TYPE_ACCELERATION_STRUCTURE_COMPACTED_SIZE_KHR));
 
     auto cmd = std::make_shared<command::Buffer>(std::move(cmd_mgr.create(command::Type::Primary)));
+    GX_VK_MARK(name + "-blas-temp-cmd", cmd->get_vulkan_data(), e.get_logical_device())
     cmd->begin();
     cmd->build_acceleration_structure(bge_info, rng_info);
     cmd->barrier(*result->accel_buff,
@@ -167,9 +168,10 @@ void gearoenix::vulkan::mesh::AccelManager::create_accel_after_query_ready(
     asc_info.offset = result->accel_buff->get_allocator()->get_offset();
 
     GX_VK_CHK(vkCreateAccelerationStructureKHR(vk_dev, &asc_info, nullptr, &result->vulkan_data))
-    mark(name + "-blas", result->vulkan_data, e.get_logical_device());
+    GX_VK_MARK(name + "-blas", result->vulkan_data, e.get_logical_device())
 
     auto cmd = std::make_shared<command::Buffer>(std::move(cmd_mgr.create(command::Type::Primary)));
+    GX_VK_MARK(name + "-blas-cmd", cmd->get_vulkan_data(), e.get_logical_device())
     cmd->begin();
     VkCopyAccelerationStructureInfoKHR copy_info;
     GX_SET_ZERO(copy_info)
@@ -229,13 +231,19 @@ void gearoenix::vulkan::mesh::AccelManager::update_instances_system(
     GX_SET_ZERO(info)
     info.accelerationStructureReference = accel_com.get_acceleration_address();
     info.flags = VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
-    const auto transform = tran.get_matrix().transposed();
-    std::memcpy(&info.transform, transform.data, sizeof(info.transform));
+    for (int i = 0; i < 3; ++i)
+        for (int j = 0; j < 4; ++j)
+            info.transform.matrix[i][j] = static_cast<float>(tran.get_matrix().data[j][i]);
     ins.push_back(info);
 }
 
 void gearoenix::vulkan::mesh::AccelManager::update_instances_buffers() noexcept
 {
+    static bool is_visited = false;
+    if (is_visited)
+        return;
+    is_visited = true;
+
     auto& frame = frames[e.get_frame_number()];
     auto& dev = e.get_logical_device();
     auto vk_dev = dev.get_vulkan_data();
@@ -282,7 +290,6 @@ void gearoenix::vulkan::mesh::AccelManager::update_instances_buffers() noexcept
     bg_info.pGeometries = &tlas_geo;
     bg_info.mode = VK_BUILD_ACCELERATION_STRUCTURE_MODE_BUILD_KHR;
     bg_info.type = VK_ACCELERATION_STRUCTURE_TYPE_TOP_LEVEL_KHR;
-    bg_info.srcAccelerationStructure = VK_NULL_HANDLE;
 
     const auto instances_count = static_cast<std::uint32_t>(instances.size());
     VkAccelerationStructureBuildSizesInfoKHR sz_info;
@@ -317,7 +324,7 @@ void gearoenix::vulkan::mesh::AccelManager::update_instances_buffers() noexcept
     create_info.offset = frame.tlas_buff->get_allocator()->get_offset();
 
     GX_VK_CHK(vkCreateAccelerationStructureKHR(vk_dev, &create_info, nullptr, &frame.tlas_vulkan_data))
-    mark("tlas-" + std::to_string(e.get_frame_number_from_start()), frame.tlas_vulkan_data, dev);
+    GX_VK_MARK("tlas-" + std::to_string(e.get_frame_number_from_start()), frame.tlas_vulkan_data, dev);
 
     bg_info.dstAccelerationStructure = frame.tlas_vulkan_data;
     bg_info.scratchData.deviceAddress = frame.tlas_scratch_buff->get_device_address();
@@ -342,7 +349,9 @@ gearoenix::vulkan::mesh::AccelManager::AccelManager(engine::Engine& e) noexcept
         VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR,
         ImGuiManager::NODE_NAME);
     for (std::size_t frame_index = 0; frame_index < frames.size(); ++frame_index) {
-        frames[frame_index].cmd = std::move(cmds[frame_index]);
+        auto& frame = frames[frame_index];
+        frame.cmd = std::move(cmds[frame_index]);
+        frame.tlas_vulkan_data = nullptr;
     }
 }
 

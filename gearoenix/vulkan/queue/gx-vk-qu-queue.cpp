@@ -30,7 +30,6 @@ void gearoenix::vulkan::queue::Queue::submit(
     info.pCommandBuffers = commands;
     info.signalSemaphoreCount = static_cast<std::uint32_t>(signal_semaphores_count);
     info.pSignalSemaphores = signal_semaphores;
-    GX_GUARD_LOCK(this)
     GX_VK_CHK(vkQueueSubmit(vulkan_data, 1, &info, fence))
 }
 
@@ -102,6 +101,7 @@ bool gearoenix::vulkan::queue::Queue::present(
     Swapchain& swapchain,
     const std::uint32_t image_index) noexcept
 {
+    GX_GUARD_LOCK(this)
     submit();
 
     VkPresentInfoKHR info;
@@ -132,6 +132,7 @@ std::vector<std::shared_ptr<gearoenix::vulkan::command::Buffer>> gearoenix::vulk
     const VkPipelineStageFlags wait_stage,
     const std::string& next_node_name) noexcept
 {
+    GX_GUARD_LOCK(this)
     auto& nodes = graph->nodes;
     auto previous_search = nodes.find(previous_node_name);
     auto next_search = nodes.find(next_node_name);

@@ -22,6 +22,8 @@ void mark(const std::string& name, T o, const device::Logical& dev) noexcept
         mark(name, reinterpret_cast<std::uint64_t>(o), VK_DEBUG_REPORT_OBJECT_TYPE_ACCELERATION_STRUCTURE_KHR_EXT, dev);
     } else if constexpr (std::is_same_v<T, VkBuffer>) {
         mark(name, reinterpret_cast<std::uint64_t>(o), VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_EXT, dev);
+    } else if constexpr (std::is_same_v<T, VkCommandBuffer>) {
+        mark(name, reinterpret_cast<std::uint64_t>(o), VK_DEBUG_REPORT_OBJECT_TYPE_COMMAND_BUFFER_EXT, dev);
     } else {
         static_assert("Unknown type for marking");
     }
@@ -31,12 +33,7 @@ void mark(const std::string& name, T o, const device::Logical& dev) noexcept
 #define GX_VK_MARK(name, obj, logical_device) mark(name, obj, logical_device);
 
 #else
-#define GX_VK_MARK(name, obj, logical_device) \
-    {                                         \
-        (void)(name);                         \
-        (void)(obj);                          \
-        (void)(logical_device);               \
-    }
+#define GX_VK_MARK(name, obj, logical_device)
 #endif
 #endif
 #endif

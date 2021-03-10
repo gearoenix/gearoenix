@@ -170,7 +170,7 @@ void gearoenix::vulkan::command::Buffer::build_acceleration_structure(
     const VkAccelerationStructureBuildGeometryInfoKHR& info,
     const VkAccelerationStructureBuildRangeInfoKHR& range) noexcept
 {
-    const auto* const range_ptr = &range;
+    const VkAccelerationStructureBuildRangeInfoKHR* const range_ptr = &range;
     vkCmdBuildAccelerationStructuresKHR(vulkan_data, 1, &info, &range_ptr);
 }
 

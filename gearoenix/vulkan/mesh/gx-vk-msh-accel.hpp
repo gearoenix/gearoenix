@@ -39,6 +39,7 @@ public:
     Accel& operator=(const Accel&) = delete;
     [[nodiscard]] static std::shared_ptr<Accel> construct(
         engine::Engine&,
+        const std::string& name,
         const std::vector<math::BasicVertex>& vertices,
         const std::vector<std::uint32_t>& indices,
         core::sync::EndCaller<Accel>&) noexcept;

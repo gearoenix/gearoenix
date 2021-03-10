@@ -3,12 +3,12 @@
 #include "gx-vk-msh-raster.hpp"
 
 void gearoenix::vulkan::mesh::RasterManager::create_raster(
-    const std::string&,
+    const std::string& name,
     const std::vector<math::BasicVertex>& vertices,
     const std::vector<std::uint32_t>& indices,
     core::sync::EndCaller<render::mesh::Mesh>& c) noexcept
 {
-    c.set_data(Raster::construct(e, vertices, indices, core::sync::EndCallerIgnored([c] {})));
+    c.set_data(Raster::construct(e, name, vertices, indices, core::sync::EndCallerIgnored([c] {})));
 }
 
 gearoenix::vulkan::mesh::RasterManager::RasterManager(engine::Engine& e) noexcept

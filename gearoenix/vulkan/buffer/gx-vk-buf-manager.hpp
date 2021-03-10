@@ -55,16 +55,18 @@ public:
     [[nodiscard]] std::shared_ptr<Buffer> create_dynamic(std::size_t size, std::size_t frame_number) noexcept;
     [[nodiscard]] std::shared_ptr<Uniform> create_uniform(std::size_t size) noexcept;
     [[nodiscard]] std::shared_ptr<Buffer> create(
+        const std::string& name,
         const void* data,
         std::size_t size,
         core::sync::EndCaller<Buffer> end = GX_DEFAULT_END_CALLER(Buffer)) noexcept;
 
     template <typename T>
     [[nodiscard]] std::shared_ptr<Buffer> create(
+        const std::string& name,
         const std::vector<T>& data,
         core::sync::EndCaller<Buffer> end = GX_DEFAULT_END_CALLER(Buffer)) noexcept
     {
-        return create(data.data(), data.size() * sizeof(T), std::move(end));
+        return create(name, data.data(), data.size() * sizeof(T), std::move(end));
     }
 };
 }
