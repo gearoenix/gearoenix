@@ -101,7 +101,7 @@ void gearoenix::vulkan::mesh::AccelManager::create_accel_after_vertices_ready(
     asc_info.offset = result->accel_buff->get_allocator()->get_offset();
 
     GX_VK_CHK(vkCreateAccelerationStructureKHR(vk_dev, &asc_info, nullptr, &result->vulkan_data))
-    GX_VK_MARK(name + "-blas-temp", result->vulkan_data, e.get_logical_device());
+    GX_VK_MARK(name + "-blas-temp", result->vulkan_data, e.get_logical_device())
 
     bge_info.dstAccelerationStructure = result->vulkan_data;
 
@@ -241,11 +241,6 @@ void gearoenix::vulkan::mesh::AccelManager::update_instances_system(
 
 void gearoenix::vulkan::mesh::AccelManager::update_instances_buffers() noexcept
 {
-    static bool is_visited = false;
-    if (is_visited)
-        return;
-    is_visited = true;
-
     auto& frame = frames[e.get_frame_number()];
     auto& dev = e.get_logical_device();
     auto vk_dev = dev.get_vulkan_data();
@@ -268,7 +263,7 @@ void gearoenix::vulkan::mesh::AccelManager::update_instances_buffers() noexcept
     frame.cmd->barrier(
         *frame.instances_gpu,
         { VK_ACCESS_TRANSFER_WRITE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT },
-        { VK_ACCESS_ACCELERATION_STRUCTURE_WRITE_BIT_KHR, VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR });
+        { VK_ACCESS_ACCELERATION_STRUCTURE_READ_BIT_KHR, VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR });
 
     const auto instances_device_address = frame.instances_gpu->get_device_address();
 
@@ -326,7 +321,7 @@ void gearoenix::vulkan::mesh::AccelManager::update_instances_buffers() noexcept
     create_info.offset = frame.tlas_buff->get_allocator()->get_offset();
 
     GX_VK_CHK(vkCreateAccelerationStructureKHR(vk_dev, &create_info, nullptr, &frame.tlas_vulkan_data))
-    GX_VK_MARK("tlas-" + std::to_string(e.get_frame_number_from_start()), frame.tlas_vulkan_data, dev);
+    GX_VK_MARK("tlas-" + std::to_string(e.get_frame_number_from_start()), frame.tlas_vulkan_data, dev)
 
     bg_info.dstAccelerationStructure = frame.tlas_vulkan_data;
     bg_info.scratchData.deviceAddress = frame.tlas_scratch_buff->get_device_address();
