@@ -116,7 +116,9 @@ void gearoenix::vulkan::mesh::AccelManager::create_accel_after_vertices_ready(
     auto cmd = std::make_shared<command::Buffer>(std::move(cmd_mgr.create(command::Type::Primary)));
     GX_VK_MARK(name + "-blas-temp-cmd", cmd->get_vulkan_data(), e.get_logical_device())
     cmd->begin();
-    cmd->build_acceleration_structure(bge_info, rng_info);
+    const auto* const rng_info_p = &rng_info;
+    const auto* const* const rng_info_pp = &rng_info_p;
+    cmd->build_acceleration_structure(bge_info, rng_info_pp);
     cmd->barrier(*result->accel_buff,
         { VK_ACCESS_ACCELERATION_STRUCTURE_WRITE_BIT_KHR, VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR },
         { VK_ACCESS_ACCELERATION_STRUCTURE_READ_BIT_KHR, VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR });
@@ -329,11 +331,13 @@ void gearoenix::vulkan::mesh::AccelManager::update_instances_buffers() noexcept
     bg_info.dstAccelerationStructure = frame.tlas_vulkan_data;
     bg_info.scratchData.deviceAddress = frame.tlas_scratch_buff->get_device_address();
 
-    VkAccelerationStructureBuildRangeInfoKHR bo_info;
-    GX_SET_ZERO(bo_info)
-    bo_info.primitiveCount = instances_count;
+    VkAccelerationStructureBuildRangeInfoKHR rng_info;
+    GX_SET_ZERO(rng_info)
+    rng_info.primitiveCount = instances_count;
 
-    frame.cmd->build_acceleration_structure(bg_info, bo_info);
+    const auto* const rng_info_p = &rng_info;
+    const auto* const* const rng_info_pp = &rng_info_p;
+    frame.cmd->build_acceleration_structure(bg_info, rng_info_pp);
 }
 
 gearoenix::vulkan::mesh::AccelManager::AccelManager(engine::Engine& e) noexcept
