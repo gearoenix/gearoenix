@@ -20,21 +20,19 @@ gearoenix::vulkan::queue::Graph::~Graph() noexcept = default;
 void gearoenix::vulkan::queue::Graph::update_traversing_level() noexcept
 {
     start->clear_traversing_level();
-    start->update_traversing_level(0);
+    const auto max_tl = start->update_traversing_level(0);
+    submit_data.resize(static_cast<std::size_t>(max_tl));
 }
 
 void gearoenix::vulkan::queue::Graph::clear_submit_data() noexcept
 {
-    //    for (auto& ps_map : submit_data) {
-    //        for (auto& [ps, data] : ps_map) {
-    //            (void)ps;
-    //            auto& [ws, cs, ss] = data;
-    //            ws.clear();
-    //            cs.clear();
-    //            ss.clear();
-    //        }
-    //    }
-    submit_data.clear();
+    for (auto& d : submit_data) {
+        auto& [ws, ps, cs, ss] = d;
+        ws.clear();
+        ps.clear();
+        cs.clear();
+        ss.clear();
+    }
 }
 
 void gearoenix::vulkan::queue::Graph::update_submit_data(Node& n, const std::size_t frame_number) noexcept
@@ -44,9 +42,11 @@ void gearoenix::vulkan::queue::Graph::update_submit_data(Node& n, const std::siz
     n.traversed = true;
     while (static_cast<std::size_t>(n.traversal_level) + 1 > submit_data.size())
         submit_data.emplace_back();
-    auto& [ws, cs, ss] = submit_data[n.traversal_level][n.wait_stage];
+    auto& [ws, ps, cs, ss] = submit_data[n.traversal_level];
     for (auto& p : n.providers) {
-        ws.emplace_back(p.second.second[frame_number]->get_vulkan_data());
+        auto& pd = p.second;
+        ws.emplace_back(pd.second[frame_number]->get_vulkan_data());
+        ps.push_back(pd.first->stage);
     }
     cs.emplace_back(n.cmds[frame_number]->get_vulkan_data());
     for (auto& c : n.consumers) {

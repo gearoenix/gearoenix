@@ -42,11 +42,11 @@ private:
     void submit(
         std::size_t wait_semaphores_count,
         const VkSemaphore* wait_semaphores,
+        const VkPipelineStageFlags* wait_stages,
         std::size_t commands_count,
         const VkCommandBuffer* commands,
         std::size_t signal_semaphores_count,
         const VkSemaphore* signal_semaphores,
-        VkPipelineStageFlags wait_stage,
         VkFence fence = nullptr) noexcept;
     void submit() noexcept;
 

@@ -168,10 +168,9 @@ void gearoenix::vulkan::command::Buffer::draw_indices(VkDeviceSize count) noexce
 
 void gearoenix::vulkan::command::Buffer::build_acceleration_structure(
     const VkAccelerationStructureBuildGeometryInfoKHR& info,
-    const VkAccelerationStructureBuildRangeInfoKHR& range) noexcept
+    const VkAccelerationStructureBuildRangeInfoKHR* const* const ranges) noexcept
 {
-    const VkAccelerationStructureBuildRangeInfoKHR* const range_ptr = &range;
-    vkCmdBuildAccelerationStructuresKHR(vulkan_data, 1, &info, &range_ptr);
+    vkCmdBuildAccelerationStructuresKHR(vulkan_data, 1, &info, ranges);
 }
 
 const VkCommandBuffer* gearoenix::vulkan::command::Buffer::get_vulkan_data_ptr() const noexcept

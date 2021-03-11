@@ -23,7 +23,7 @@ struct Semaphore;
 namespace gearoenix::vulkan::queue {
 struct Node final {
     const std::string name;
-    const VkPipelineStageFlags wait_stage;
+    const VkPipelineStageFlags stage;
     const std::vector<std::shared_ptr<command::Buffer>> cmds;
     int traversal_level = -1;
     bool traversed = false;
@@ -35,7 +35,7 @@ struct Node final {
 
     ~Node() noexcept;
     void clear_traversing_level() noexcept;
-    void update_traversing_level(int) noexcept;
+    [[nodiscard]] int update_traversing_level(int) noexcept;
     static void connect(Node* provider, Node* consumer, engine::Engine& e) noexcept;
 };
 }

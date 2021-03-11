@@ -18,8 +18,11 @@ struct Graph final {
     Node* const end;
 
     /// traversal-level -> pipeline-stage -> (waits, cmds, signals)
-    std::vector<std::map<VkPipelineStageFlags,
-        std::tuple<std::vector<VkSemaphore>, std::vector<VkCommandBuffer>, std::vector<VkSemaphore>>>>
+    std::vector<std::tuple<
+        std::vector<VkSemaphore>,
+        std::vector<VkPipelineStageFlags>,
+        std::vector<VkCommandBuffer>,
+        std::vector<VkSemaphore>>>
         submit_data;
 
     explicit Graph(engine::Engine&) noexcept;

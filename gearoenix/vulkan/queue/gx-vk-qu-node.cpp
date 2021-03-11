@@ -4,9 +4,9 @@
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "../sync/gx-vk-sync-semaphore.hpp"
 
-gearoenix::vulkan::queue::Node::Node(engine::Engine& e, std::string name, VkPipelineStageFlags wait_stage) noexcept
+gearoenix::vulkan::queue::Node::Node(engine::Engine& e, std::string name, VkPipelineStageFlags stage) noexcept
     : name(std::move(name))
-    , wait_stage(wait_stage)
+    , stage(stage)
     , cmds(e.get_command_manager().create_frame_based())
 {
 }
@@ -21,13 +21,18 @@ void gearoenix::vulkan::queue::Node::clear_traversing_level() noexcept
         c.second.first->clear_traversing_level();
 }
 
-void gearoenix::vulkan::queue::Node::update_traversing_level(const int tl) noexcept
+int gearoenix::vulkan::queue::Node::update_traversing_level(const int tl) noexcept
 {
+    int max_tl = tl;
     if (tl > traversal_level) {
         traversal_level = tl;
-        for (auto& c : consumers)
-            c.second.first->update_traversing_level(tl + 1);
+        for (auto& c : consumers) {
+            const auto child_max_tl = c.second.first->update_traversing_level(tl + 1);
+            if (child_max_tl > max_tl)
+                max_tl = child_max_tl;
+        }
     }
+    return max_tl;
 }
 
 void gearoenix::vulkan::queue::Node::connect(

@@ -52,7 +52,7 @@ public:
     void draw_indices(std::size_t count) noexcept;
     void build_acceleration_structure(
         const VkAccelerationStructureBuildGeometryInfoKHR&,
-        const VkAccelerationStructureBuildRangeInfoKHR&) noexcept;
+        const VkAccelerationStructureBuildRangeInfoKHR* const* const) noexcept;
     [[nodiscard]] const VkCommandBuffer* get_vulkan_data_ptr() const noexcept;
 };
 }

@@ -13,11 +13,11 @@
 void gearoenix::vulkan::queue::Queue::submit(
     const std::size_t wait_semaphores_count,
     const VkSemaphore* const wait_semaphores,
+    const VkPipelineStageFlags* const wait_stages,
     const std::size_t commands_count,
     const VkCommandBuffer* const commands,
     const std::size_t signal_semaphores_count,
     const VkSemaphore* const signal_semaphores,
-    const VkPipelineStageFlags wait_stage,
     VkFence fence) noexcept
 {
     VkSubmitInfo info;
@@ -25,7 +25,7 @@ void gearoenix::vulkan::queue::Queue::submit(
     info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
     info.waitSemaphoreCount = static_cast<std::uint32_t>(wait_semaphores_count);
     info.pWaitSemaphores = wait_semaphores;
-    info.pWaitDstStageMask = &wait_stage;
+    info.pWaitDstStageMask = wait_stages;
     info.commandBufferCount = static_cast<std::uint32_t>(commands_count);
     info.pCommandBuffers = commands;
     info.signalSemaphoreCount = static_cast<std::uint32_t>(signal_semaphores_count);
@@ -36,34 +36,23 @@ void gearoenix::vulkan::queue::Queue::submit(
 void gearoenix::vulkan::queue::Queue::submit() noexcept
 {
     graph->update(e.get_frame_number());
-    const auto& submit_data = graph->submit_data;
+    auto& submit_data = graph->submit_data;
+    auto& submit_data_front = submit_data.front();
+    auto& submit_data_back = submit_data.back();
+    std::get<0>(submit_data_front).push_back(graph->start_semaphore[e.get_frame_number()]->get_vulkan_data());
+    std::get<1>(submit_data_front).push_back(VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT);
+    std::get<2>(submit_data_front).clear();
+    std::get<2>(submit_data_back).clear();
+    std::get<3>(submit_data_back).push_back(graph->end_semaphore[e.get_frame_number()]->get_vulkan_data());
 
-    const auto& start_data_search = submit_data[0].begin();
-    const auto& start_data = start_data_search->second;
-    const auto& start_signal_semaphores = std::get<2>(start_data);
-    submit(
-        1, graph->start_semaphore[e.get_frame_number()]->get_vulkan_data_ptr(),
-        0, nullptr,
-        start_signal_semaphores.size(), start_signal_semaphores.data(),
-        start_data_search->first);
-
-    const auto sd_size = submit_data.size() - 1;
-    for (std::size_t i = 1; i < sd_size; ++i) {
-        const auto& sd = submit_data[i];
-        for (const auto& [wait_stage, wcs] : sd) {
-            const auto& [ws, cs, ss] = wcs;
-            submit(ws.size(), ws.data(), cs.size(), cs.data(), ss.size(), ss.data(), wait_stage);
-        }
+    const auto submit_data_end = submit_data.size() - 1;
+    for (std::size_t submit_data_index = 0; submit_data_index < submit_data_end; ++submit_data_index) {
+        const auto& [ws, ps, cs, ss] = submit_data[submit_data_index];
+        submit(ws.size(), ws.data(), ps.data(), cs.size(), cs.data(), ss.size(), ss.data());
     }
-
-    const auto& end_data_search = submit_data.back().begin();
-    const auto& end_data = end_data_search->second;
-    const auto& end_wait_semaphores = std::get<0>(end_data);
+    const auto& [ws, ps, cs, ss] = submit_data.back();
     submit(
-        end_wait_semaphores.size(), end_wait_semaphores.data(),
-        0, nullptr,
-        1, graph->end_semaphore[e.get_frame_number()]->get_vulkan_data_ptr(),
-        start_data_search->first,
+        ws.size(), ws.data(), ps.data(), cs.size(), cs.data(), ss.size(), ss.data(),
         graph->fence[e.get_frame_number()]->get_vulkan_data());
 }
 
