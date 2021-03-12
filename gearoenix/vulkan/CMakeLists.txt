@@ -6,8 +6,6 @@ SET(GX_ENGINE_VULKAN_SRC
 #        ${GX_ENGINE_VULKAN_SRC_DIR}/buffer/gx-vk-buf-dynamic.hpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/buffer/gx-vk-buf-manager.cpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/buffer/gx-vk-buf-manager.hpp
-#        ${GX_ENGINE_VULKAN_SRC_DIR}/buffer/gx-vk-buf-static.cpp
-#        ${GX_ENGINE_VULKAN_SRC_DIR}/buffer/gx-vk-buf-static.hpp
 #        ${GX_ENGINE_VULKAN_SRC_DIR}/buffer/gx-vk-buf-uniform.cpp
 #        ${GX_ENGINE_VULKAN_SRC_DIR}/buffer/gx-vk-buf-uniform.hpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/command/gx-vk-cmd-buffer.cpp
@@ -21,10 +19,10 @@ SET(GX_ENGINE_VULKAN_SRC
         ${GX_ENGINE_VULKAN_SRC_DIR}/descriptor/gx-vk-des-manager.hpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/descriptor/gx-vk-des-pool.cpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/descriptor/gx-vk-des-pool.hpp
-#        ${GX_ENGINE_VULKAN_SRC_DIR}/descriptor/gx-vk-des-set-layout.cpp
-#        ${GX_ENGINE_VULKAN_SRC_DIR}/descriptor/gx-vk-des-set-layout.hpp
-#        ${GX_ENGINE_VULKAN_SRC_DIR}/descriptor/gx-vk-des-set.cpp
-#        ${GX_ENGINE_VULKAN_SRC_DIR}/descriptor/gx-vk-des-set.hpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/descriptor/gx-vk-des-set.cpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/descriptor/gx-vk-des-set.hpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/descriptor/gx-vk-des-set-layout.cpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/descriptor/gx-vk-des-set-layout.hpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/device/gx-vk-dev-logical.cpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/device/gx-vk-dev-logical.hpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/device/gx-vk-dev-physical.cpp

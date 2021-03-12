@@ -10,20 +10,23 @@ struct Logical;
 }
 
 namespace gearoenix::vulkan::descriptor {
+struct Manager;
 struct Pool final {
+    friend struct Manager;
     GX_GET_CRRF_PRV(device::Logical, logical_device)
     GX_GET_VAL_PRV(VkDescriptorPool, vulkan_data, nullptr)
 
+private:
     Pool(const device::Logical& logical_device, VkDescriptorPool vulkan_data) noexcept;
+    explicit Pool(const device::Logical& logical_device) noexcept;
 
 public:
-    Pool(const Pool&) = delete;
     Pool(Pool&&) = delete;
-    explicit Pool(const device::Logical& logical_device) noexcept;
+    Pool(const Pool&) = delete;
+    Pool& operator=(Pool&&) = delete;
+    Pool& operator=(const Pool&) = delete;
     [[nodiscard]] static Pool create_imgui(const device::Logical& logical_device) noexcept;
     ~Pool() noexcept;
-    Pool& operator=(const Pool&) = delete;
-    Pool& operator=(Pool&&) = delete;
 };
 }
 #endif

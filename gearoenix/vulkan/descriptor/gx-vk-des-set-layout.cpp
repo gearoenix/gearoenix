@@ -1,19 +1,16 @@
 #include "gx-vk-des-set-layout.hpp"
-#ifdef USE_VULKAN
-#include "../../core/gx-cr-static.hpp"
+#ifdef GX_RENDER_VULKAN_ENABLED
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../device/gx-vk-dev-physical.hpp"
 #include "../gx-vk-check.hpp"
 #include "../gx-vk-instance.hpp"
 #include "gx-vk-des-pool.hpp"
 
-gearoenix::render::descriptor::SetLayout::SetLayout(
-    device::Logical* dev,
-    shader::Id shader_id)
-    : dev(dev)
+gearoenix::vulkan::descriptor::SetLayout::SetLayout(
+    const device::Logical& dev)
+    : logical_device(dev)
 {
-    const VkDevice vkdev = dev->get_vulkan_data();
-    const Linker* l = dev->get_physical_device()->get_instance()->get_linker();
+    auto vk_dev = dev.get_vulkan_data();
     const std::vector<shader::ResourceDescription> shader_resources = shader::Shader::get_resources_descriptions(
         static_cast<shader::Id>(shader_id));
     unsigned int shader_resources_size = shader_resources.size();
