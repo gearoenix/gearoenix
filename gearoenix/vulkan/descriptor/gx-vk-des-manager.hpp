@@ -24,7 +24,7 @@ struct Manager final {
 
 private:
     const device::Logical& logical_device;
-    std::map<std::vector<std::size_t>, std::unique_ptr<BindingsData>> bindings_data;
+    std::map<std::vector<std::uint8_t>, std::unique_ptr<BindingsData>> bindings_data;
 
 public:
     Manager(Manager&&) = delete;

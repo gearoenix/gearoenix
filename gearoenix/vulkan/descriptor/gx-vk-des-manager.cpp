@@ -17,14 +17,7 @@ std::shared_ptr<gearoenix::vulkan::descriptor::Set> gearoenix::vulkan::descripto
     const std::optional<std::size_t> kernel_index) noexcept
 {
     const auto bsz = bindings.size() * sizeof(bindings[0]);
-    auto sz = bsz / sizeof(std::size_t);
-    auto ksz = sz * sizeof(std::size_t);
-    if (bsz != ksz) {
-        ++sz;
-        ksz += sizeof(std::size_t);
-    }
-    std::vector<std::size_t> key(sz);
-    key.back() = 0;
+    std::vector<std::uint8_t> key(bsz);
     std::memcpy(key.data(), bindings.data(), bsz);
     auto& bd = bindings_data[key];
     if (nullptr == bd) {
