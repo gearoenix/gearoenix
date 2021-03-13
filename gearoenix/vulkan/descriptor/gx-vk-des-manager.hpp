@@ -2,7 +2,8 @@
 #define GEAROENIX_RENDER_DESCRIPTOR_MANAGER_HPP
 #include "../../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
-#include "gx-vk-des-pool.hpp"
+#include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
+#include "../gx-vk-loader.hpp"
 #include <map>
 #include <memory>
 #include <optional>
@@ -10,15 +11,20 @@
 #include <variant>
 #include <vector>
 
+namespace gearoenix::vulkan::device {
+struct Logical;
+}
+
 namespace gearoenix::vulkan::descriptor {
 struct BindingsData;
 struct Set;
+struct Pool;
 struct Manager final {
-    GX_GET_REF_PRV(Pool, imgui)
+    GX_GET_UPTR_PRV(Pool, imgui)
 
 private:
     const device::Logical& logical_device;
-    std::map<std::vector<VkDescriptorSetLayoutBinding>, std::map<std::variant<std::size_t, std::thread::id>, std::weak_ptr<BindingsData>>> bindings_data;
+    std::map<std::vector<std::size_t>, std::unique_ptr<BindingsData>> bindings_data;
 
 public:
     Manager(Manager&&) = delete;

@@ -2,23 +2,28 @@
 #define GEAROENIX_VULKAN_DESCRIPTOR_SET_LAYOUT_HPP
 #include "../../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
+#include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../gx-vk-loader.hpp"
+#include <vector>
 
 namespace gearoenix::vulkan::device {
 struct Logical;
 }
 
 namespace gearoenix::vulkan::descriptor {
-struct SetLayout {
+struct SetLayout final {
+    GX_GET_VAL_PRV(VkDescriptorSetLayout, vulkan_data, nullptr)
+
 private:
     const device::Logical& logical_device;
-    VkDescriptorSetLayout vulkan_data = nullptr;
 
 public:
-    SetLayout(const device::Logical& logical_device);
-    ~SetLayout();
-    const device::Logical* get_logical_device() const;
-    const VkDescriptorSetLayout& get_vulkan_data() const;
+    SetLayout(SetLayout&&) = delete;
+    SetLayout(const SetLayout&) = delete;
+    SetLayout& operator=(SetLayout&&) = delete;
+    SetLayout& operator=(const SetLayout&) = delete;
+    SetLayout(const device::Logical& logical_device, const std::vector<VkDescriptorSetLayoutBinding>& data) noexcept;
+    ~SetLayout() noexcept;
 };
 }
 #endif

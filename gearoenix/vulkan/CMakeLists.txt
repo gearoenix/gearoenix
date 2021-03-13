@@ -15,10 +15,14 @@ SET(GX_ENGINE_VULKAN_SRC
         ${GX_ENGINE_VULKAN_SRC_DIR}/command/gx-vk-cmd-pool.cpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/command/gx-vk-cmd-pool.hpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/command/gx-vk-cmd-type.hpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/descriptor/gx-vk-des-bindings-data.cpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/descriptor/gx-vk-des-bindings-data.hpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/descriptor/gx-vk-des-manager.cpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/descriptor/gx-vk-des-manager.hpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/descriptor/gx-vk-des-pool.cpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/descriptor/gx-vk-des-pool.hpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/descriptor/gx-vk-des-pool-manager.cpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/descriptor/gx-vk-des-pool-manager.hpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/descriptor/gx-vk-des-set.cpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/descriptor/gx-vk-des-set.hpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/descriptor/gx-vk-des-set-layout.cpp
