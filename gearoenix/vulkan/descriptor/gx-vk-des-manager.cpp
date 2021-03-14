@@ -3,6 +3,7 @@
 #include "gx-vk-des-bindings-data.hpp"
 #include "gx-vk-des-pool.hpp"
 #include "gx-vk-des-set.hpp"
+#include <cstring>
 
 gearoenix::vulkan::descriptor::Manager::Manager(const device::Logical& logical_device) noexcept
     : imgui(Pool::create_imgui(logical_device))

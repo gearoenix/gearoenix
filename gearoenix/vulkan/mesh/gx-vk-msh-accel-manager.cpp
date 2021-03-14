@@ -391,12 +391,12 @@ gearoenix::vulkan::mesh::AccelManager::AccelManager(engine::Engine& e) noexcept
     out_img_bindings.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
     out_img_bindings.descriptorCount = 1;
     out_img_bindings.stageFlags = VK_SHADER_STAGE_RAYGEN_BIT_KHR;
-    auto& vertex_bindings = descriptor_bindings[2];
-    GX_SET_ZERO(vertex_bindings)
-    vertex_bindings.binding = 2;
-    vertex_bindings.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-    vertex_bindings.descriptorCount = 1;
-    vertex_bindings.stageFlags = VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR;
+    auto& meshes_bindings = descriptor_bindings[2];
+    GX_SET_ZERO(meshes_bindings)
+    meshes_bindings.binding = 2;
+    meshes_bindings.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    meshes_bindings.descriptorCount = 1;
+    meshes_bindings.stageFlags = VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR;
     auto cmds = e.get_graphic_queue()->place_node_between(
         queue::Queue::START_FRAME,
         NODE_NAME,

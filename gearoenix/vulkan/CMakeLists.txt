@@ -80,6 +80,7 @@ SET(GX_ENGINE_VULKAN_SRC
 #        ${GX_ENGINE_VULKAN_SRC_DIR}/sampler/gx-vk-smp-manager.hpp
 #        ${GX_ENGINE_VULKAN_SRC_DIR}/sampler/gx-vk-smp-sampler.cpp
 #        ${GX_ENGINE_VULKAN_SRC_DIR}/sampler/gx-vk-smp-sampler.hpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/shader/gx-vk-shd-bindings.hpp
 #        ${GX_ENGINE_VULKAN_SRC_DIR}/shader/stage/gx-vk-shader-stage-fragment.cpp
 #        ${GX_ENGINE_VULKAN_SRC_DIR}/shader/stage/gx-vk-shader-stage-fragment.hpp
 #        ${GX_ENGINE_VULKAN_SRC_DIR}/shader/stage/gx-vk-shader-stage-vertex.cpp
