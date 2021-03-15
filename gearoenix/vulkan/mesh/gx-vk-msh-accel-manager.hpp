@@ -10,6 +10,7 @@ struct Transformation;
 
 namespace gearoenix::vulkan::buffer {
 struct Buffer;
+struct Uniform;
 }
 
 namespace gearoenix::vulkan::descriptor {
@@ -21,9 +22,18 @@ struct Accel;
 struct AccelComponent;
 struct AccelManager final : public Manager {
 private:
+    struct MeshData final {
+        VkAccelerationStructureInstanceKHR instance;
+        VkDescriptorBufferInfo mesh_descriptor_write_info;
+        VkDescriptorBufferInfo vertex_descriptor_write_info;
+        VkDescriptorBufferInfo index_descriptor_write_info;
+    };
+
     struct Kernel final {
-        std::vector<VkAccelerationStructureInstanceKHR> instances;
-        std::vector<VkDescriptorBufferInfo> mesh_descriptor_write_info;
+        std::vector<MeshData> mesh_info;
+        std::size_t latest_uniform_buffer_for_mesh_info = 0;
+        std::vector<std::shared_ptr<buffer::Uniform>> uniform_buffers_for_mesh_descriptors;
+        std::vector<std::pair<std::size_t, std::size_t>> material_mesh;
     };
 
     std::size_t max_instances_size = 0;
@@ -43,8 +53,16 @@ private:
     std::vector<Kernel> kernels;
     std::vector<Frame> frames;
     std::vector<VkAccelerationStructureInstanceKHR> instances;
-    std::vector<VkDescriptorBufferInfo> mesh_descriptor_write_info;
     std::vector<VkDescriptorSetLayoutBinding> descriptor_bindings;
+    std::vector<VkDescriptorBufferInfo> mesh_descriptor_write_info;
+    std::vector<VkDescriptorBufferInfo> vertex_descriptor_write_info;
+    std::vector<VkDescriptorBufferInfo> index_descriptor_write_info;
+    std::vector<VkDescriptorBufferInfo> material_descriptor_write_info;
+    std::vector<VkDescriptorImageInfo> texture_descriptor_write_info;
+    std::vector<VkDescriptorImageInfo> cube_texture_descriptor_write_info;
+    std::vector<std::pair<std::size_t, std::size_t>> material_mesh;
+    std::vector<std::pair<std::size_t, std::size_t>> texture_material;
+    std::vector<std::pair<std::size_t, std::size_t>> cube_texture_material;
 
     void create_accel(
         const std::string& name,

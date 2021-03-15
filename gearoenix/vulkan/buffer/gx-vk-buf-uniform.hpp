@@ -2,19 +2,24 @@
 #define GEAROENIX_VULKAN_BUFFER_UNIFORM_HPP
 #include "../../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
-#include "gx-vk-buf-buffer.hpp"
+#include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
+#include <memory>
+#include <vector>
+
+namespace gearoenix::vulkan::engine {
+struct Engine;
+}
 
 namespace gearoenix::vulkan::buffer {
+struct Buffer;
 struct Uniform final {
-    const std::size_t size;
-    const std::size_t frame_number;
-
-private:
-    vulkan::buffer::Buffer base;
+    GX_GET_CRRF_PRV(engine::Engine, e)
+    GX_GET_REFC_PRV(std::vector<std::shared_ptr<Buffer>>, cpu)
+    GX_GET_REFC_PRV(std::shared_ptr<Buffer>, gpu)
 
 public:
-    Uniform(vulkan::buffer::Buffer&& base, std::size_t size, std::size_t frame_number) noexcept;
-    ~Uniform() noexcept = default;
+    Uniform(const engine::Engine& e, std::vector<std::shared_ptr<Buffer>> cpu, std::shared_ptr<Buffer> gpu) noexcept;
+    ~Uniform() noexcept;
     void update(const void*) noexcept;
 };
 }

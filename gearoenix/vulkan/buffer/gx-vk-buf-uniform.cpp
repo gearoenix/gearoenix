@@ -1,22 +1,25 @@
 #include "gx-vk-buf-uniform.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
 #include "../../core/gx-cr-allocator.hpp"
-#include "../device/gx-vk-dev-logical.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
+#include "gx-vk-buf-buffer.hpp"
 
 gearoenix::vulkan::buffer::Uniform::Uniform(
-    vulkan::buffer::Buffer&& b,
-    const std::size_t size,
-    const std::size_t frame_number) noexcept
-    : size(size)
-    , frame_number(frame_number)
-    , base(std::move(b))
+    const engine::Engine& e,
+    std::vector<std::shared_ptr<Buffer>> cpu,
+    std::shared_ptr<Buffer> gpu) noexcept
+    : e(e)
+    , cpu(std::move(cpu))
+    , gpu(std::move(gpu))
 {
 }
 
-void gearoenix::vulkan::buffer::Uniform::update(const void* src) noexcept
+gearoenix::vulkan::buffer::Uniform::~Uniform() noexcept = default;
+
+void gearoenix::vulkan::buffer::Uniform::update(const void* const src) noexcept
 {
-    std::memcpy(base.get_allocated_memory().get_data(), src, size);
+    const auto& b = *cpu[e.get_frame_number()];
+    std::memcpy(b.get_allocated_memory()->get_data(), src, b.get_allocator()->get_size());
 }
 
 #endif

@@ -211,18 +211,33 @@ void gearoenix::vulkan::mesh::AccelManager::create_accel_after_blas_copy(
     result->initialize_blas();
 }
 
+// This is mainly for performance reason
+static VkBuffer gpu_buffer_vulkan_data = nullptr;
+
 void gearoenix::vulkan::mesh::AccelManager::update_instances() noexcept
 {
+    gpu_buffer_vulkan_data = e.get_buffer_manager().get_gpu_root_buffer()->get_vulkan_data();
     e.get_world()->parallel_system<AccelComponent, physics::Transformation>(
         [this](core::ecs::Entity::id_t, AccelComponent& accel_com, physics::Transformation& tran, const unsigned int kernel_index) noexcept {
             update_instances_system(accel_com, tran, kernel_index);
         });
     instances.clear();
+    mesh_descriptor_write_info.clear();
+    vertex_descriptor_write_info.clear();
+    index_descriptor_write_info.clear();
     for (auto& kernel : kernels) {
-        for (const auto& kernel_instance : kernel.instances) {
-            instances.push_back(kernel_instance);
+        auto& kernel_meshes_info = kernel.mesh_info;
+        for (const auto& kernel_mesh_info : kernel_meshes_info) {
+            instances.push_back(kernel_mesh_info.instance);
+            mesh_descriptor_write_info.push_back(kernel_mesh_info.mesh_descriptor_write_info);
+            vertex_descriptor_write_info.push_back(kernel_mesh_info.vertex_descriptor_write_info);
+            index_descriptor_write_info.push_back(kernel_mesh_info.index_descriptor_write_info);
+            // TODO: fill the mesh_descriptor_write_info
+            // TODO: fill uniform buffers of des_descriptors
+            // TODO: fill material to mesh vector
+            // TODO: sort material to mesh vector
         }
-        kernel.instances.clear();
+        kernel_meshes_info.clear();
     }
 }
 
@@ -231,15 +246,29 @@ void gearoenix::vulkan::mesh::AccelManager::update_instances_system(
     const physics::Transformation& tran,
     const unsigned int kernel_index) noexcept
 {
-    auto& ins = kernels[kernel_index].instances;
-    VkAccelerationStructureInstanceKHR info;
+    auto& meshes_info = kernels[kernel_index].mesh_info;
+    meshes_info.emplace_back();
+    auto& mesh_info = meshes_info.back();
+    auto& info = mesh_info.instance;
     GX_SET_ZERO(info)
     info.accelerationStructureReference = accel_com.get_acceleration_address();
     info.flags = VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
+    auto& matrix = info.transform.matrix;
     for (int i = 0; i < 3; ++i)
         for (int j = 0; j < 4; ++j)
-            info.transform.matrix[i][j] = static_cast<float>(tran.get_matrix().data[j][i]);
-    ins.push_back(info);
+            matrix[i][j] = static_cast<float>(tran.get_matrix().data[j][i]);
+    auto& vertex_info = mesh_info.vertex_descriptor_write_info;
+    vertex_info.offset = accel_com.get_vertex_buffer_offset();
+    vertex_info.range = accel_com.get_vertex_buffer_size();
+    vertex_info.buffer = gpu_buffer_vulkan_data;
+    auto& index_info = mesh_info.index_descriptor_write_info;
+    index_info.offset = accel_com.get_index_buffer_offset();
+    index_info.range = accel_com.get_index_buffer_size();
+    index_info.buffer = gpu_buffer_vulkan_data;
+    // TODO: fill the mesh_descriptor_write_info
+    // TODO: fill uniform buffers of des_descriptors
+    // TODO: fill material to mesh vector
+    // TODO: sort material to mesh vector
 }
 
 void gearoenix::vulkan::mesh::AccelManager::update_instances_buffers() noexcept

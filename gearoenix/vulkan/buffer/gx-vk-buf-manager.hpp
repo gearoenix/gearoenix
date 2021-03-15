@@ -4,6 +4,7 @@
 #ifdef GX_RENDER_VULKAN_ENABLED
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../../core/sync/gx-cr-sync-end-caller.hpp"
+#include "../gx-vk-loader.hpp"
 #include <memory>
 
 namespace gearoenix::core::sync {
@@ -28,10 +29,10 @@ struct Uniform;
 struct Manager final {
     GX_GET_RRF_PRV(memory::Manager, memory_manager)
     GX_GET_RRF_PRV(engine::Engine, e)
+    GX_GET_REFC_PRV(std::shared_ptr<Buffer>, upload_root_buffer)
+    GX_GET_REFC_PRV(std::shared_ptr<Buffer>, gpu_root_buffer)
 
 private:
-    const std::shared_ptr<Buffer> upload_root_buffer;
-    const std::shared_ptr<Buffer> gpu_root_buffer;
     const std::vector<std::shared_ptr<Buffer>> each_frame_upload_source;
     const std::shared_ptr<Buffer> each_frame_upload_destination;
 
@@ -52,7 +53,6 @@ public:
     ~Manager() noexcept;
     [[nodiscard]] std::shared_ptr<Buffer> create_static(std::size_t size) noexcept;
     [[nodiscard]] std::shared_ptr<Buffer> create_staging(std::size_t size) noexcept;
-    [[nodiscard]] std::shared_ptr<Buffer> create_dynamic(std::size_t size, std::size_t frame_number) noexcept;
     [[nodiscard]] std::shared_ptr<Uniform> create_uniform(std::size_t size) noexcept;
     [[nodiscard]] std::shared_ptr<Buffer> create(
         const std::string& name,

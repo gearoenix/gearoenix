@@ -13,6 +13,10 @@ struct AccelComponent final : public core::ecs::Component {
     GX_GET_VAL_PRV(VkAccelerationStructureKHR, acceleration_structure, nullptr)
     GX_GET_VAL_PRV(VkDeviceAddress, acceleration_address, 0)
     GX_GET_CREF_PRV(std::shared_ptr<Accel>, acceleration_mesh)
+    GX_GET_VAL_PRV(std::uint32_t, vertex_buffer_offset, 0)
+    GX_GET_VAL_PRV(std::uint32_t, vertex_buffer_size, 0)
+    GX_GET_VAL_PRV(std::uint32_t, index_buffer_offset, 0)
+    GX_GET_VAL_PRV(std::uint32_t, index_buffer_size, 0)
 
     explicit AccelComponent(std::shared_ptr<Accel> raster_mesh) noexcept;
     AccelComponent(AccelComponent&&) noexcept;

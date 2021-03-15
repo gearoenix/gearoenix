@@ -2,12 +2,10 @@ SET(GX_ENGINE_VULKAN_SRC_DIR ${GX_ENGINE_SRC_DIR}/vulkan)
 SET(GX_ENGINE_VULKAN_SRC
         ${GX_ENGINE_VULKAN_SRC_DIR}/buffer/gx-vk-buf-buffer.cpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/buffer/gx-vk-buf-buffer.hpp
-#        ${GX_ENGINE_VULKAN_SRC_DIR}/buffer/gx-vk-buf-dynamic.cpp
-#        ${GX_ENGINE_VULKAN_SRC_DIR}/buffer/gx-vk-buf-dynamic.hpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/buffer/gx-vk-buf-manager.cpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/buffer/gx-vk-buf-manager.hpp
-#        ${GX_ENGINE_VULKAN_SRC_DIR}/buffer/gx-vk-buf-uniform.cpp
-#        ${GX_ENGINE_VULKAN_SRC_DIR}/buffer/gx-vk-buf-uniform.hpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/buffer/gx-vk-buf-uniform.cpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/buffer/gx-vk-buf-uniform.hpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/command/gx-vk-cmd-buffer.cpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/command/gx-vk-cmd-buffer.hpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/command/gx-vk-cmd-manager.cpp
