@@ -14,6 +14,7 @@
 #include "../gx-vk-marker.hpp"
 #include "../query/gx-vk-qry-pool.hpp"
 #include "../queue/gx-vk-qu-queue.hpp"
+#include "../shader/gx-vk-shd-bindings.hpp"
 #include "../sync/gx-vk-sync-fence.hpp"
 #include "gx-vk-msh-accel-component.hpp"
 #include "gx-vk-msh-accel.hpp"
@@ -243,6 +244,9 @@ void gearoenix::vulkan::mesh::AccelManager::update_instances_system(
 
 void gearoenix::vulkan::mesh::AccelManager::update_instances_buffers() noexcept
 {
+    if (instances.empty())
+        return;
+
     auto& frame = frames[e.get_frame_number()];
     auto& dev = e.get_logical_device();
     auto vk_dev = dev.get_vulkan_data();
@@ -337,35 +341,34 @@ void gearoenix::vulkan::mesh::AccelManager::update_instances_buffers() noexcept
     frame.cmd->build_acceleration_structure(bg_info, rng_info_pp);
 
     auto descriptor_set = frame.descriptor_set->get_vulkan_data();
-    VkWriteDescriptorSet des_write_info[3];
+    VkWriteDescriptorSet des_write_info[GX_VK_BIND_RAY_MAX];
     GX_SET_ARRAY_ZERO(des_write_info)
+    for (auto i = 0; i < GX_VK_BIND_RAY_MAX; ++i) {
+        auto& wi = des_write_info[i];
+        wi.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        const auto& b = descriptor_bindings[i];
+        wi.descriptorCount = b.descriptorType;
+        wi.descriptorType = b.descriptorType;
+        wi.dstBinding = b.binding;
+        wi.dstSet = descriptor_set;
+    }
+
+    std::vector<VkDescriptorBufferInfo> vertices_wdis(static_cast<std::size_t>(descriptor_bindings[GX_VK_BIND_RAY_TLAS].descriptorCount));
+    for (auto& wi : vertices_wdis) {
+    }
 
     VkWriteDescriptorSetAccelerationStructureKHR tlas_wdi;
     GX_SET_ZERO(tlas_wdi)
     tlas_wdi.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET_ACCELERATION_STRUCTURE_KHR;
     tlas_wdi.accelerationStructureCount = 1;
     tlas_wdi.pAccelerationStructures = &frame.tlas_vulkan_data;
-
-    auto& tlas_wi = des_write_info[0];
-    tlas_wi.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-    tlas_wi.descriptorCount = 1;
-    tlas_wi.descriptorType = VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR;
-    tlas_wi.dstBinding = 0;
-    tlas_wi.dstSet = descriptor_set;
-    tlas_wi.pNext = &tlas_wdi;
+    des_write_info[GX_VK_BIND_RAY_TLAS].pNext = &tlas_wdi;
 
     VkDescriptorImageInfo out_img_wdi;
+    GX_SET_ZERO(out_img_wdi)
     out_img_wdi.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
     out_img_wdi.imageView = e.get_current_framebuffer().get_view()->get_vulkan_data();
-    out_img_wdi.sampler = nullptr;
-
-    auto& out_img_wi = des_write_info[1];
-    tlas_wi.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-    tlas_wi.descriptorCount = 1;
-    tlas_wi.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
-    tlas_wi.dstBinding = 1;
-    tlas_wi.dstSet = descriptor_set;
-    tlas_wi.pImageInfo = &out_img_wdi;
+    des_write_info[GX_VK_BIND_RAY_OUT_IMAGE].pImageInfo = &out_img_wdi;
 
     VkDescriptorBufferInfo vertex_wdi;
     //    vertex_wdi.
@@ -377,26 +380,64 @@ gearoenix::vulkan::mesh::AccelManager::AccelManager(engine::Engine& e) noexcept
     , accel_creation_waiter(new core::sync::WorkWaiter())
     , kernels(std::thread::hardware_concurrency())
     , frames(e.get_swapchain().get_image_views().size())
+    , descriptor_bindings(GX_VK_BIND_RAY_MAX)
 {
-    std::vector<VkDescriptorSetLayoutBinding> descriptor_bindings(3);
-    auto& tlas_bindings = descriptor_bindings[0];
+    auto& vertices_bindings = descriptor_bindings[GX_VK_BIND_RAY_VERTICES];
+    GX_SET_ZERO(vertices_bindings)
+    vertices_bindings.binding = GX_VK_BIND_RAY_VERTICES;
+    vertices_bindings.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    vertices_bindings.descriptorCount = 200;
+    vertices_bindings.stageFlags = VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR;
+
+    auto& indices_bindings = descriptor_bindings[GX_VK_BIND_RAY_INDICES];
+    GX_SET_ZERO(indices_bindings)
+    indices_bindings.binding = GX_VK_BIND_RAY_INDICES;
+    indices_bindings.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    indices_bindings.descriptorCount = 200;
+    indices_bindings.stageFlags = VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR;
+
+    auto& materials_bindings = descriptor_bindings[GX_VK_BIND_RAY_MATERIALS];
+    GX_SET_ZERO(materials_bindings)
+    materials_bindings.binding = GX_VK_BIND_RAY_MATERIALS;
+    materials_bindings.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    materials_bindings.descriptorCount = 200;
+    materials_bindings.stageFlags = VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR;
+
+    auto& meshes_bindings = descriptor_bindings[GX_VK_BIND_RAY_MESH];
+    GX_SET_ZERO(meshes_bindings)
+    meshes_bindings.binding = GX_VK_BIND_RAY_MESH;
+    meshes_bindings.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    meshes_bindings.descriptorCount = 200;
+    meshes_bindings.stageFlags = VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR;
+
+    auto& tlas_bindings = descriptor_bindings[GX_VK_BIND_RAY_TLAS];
     GX_SET_ZERO(tlas_bindings)
-    tlas_bindings.binding = 0;
+    tlas_bindings.binding = GX_VK_BIND_RAY_TLAS;
     tlas_bindings.descriptorType = VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR;
     tlas_bindings.descriptorCount = 1;
     tlas_bindings.stageFlags = VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;
-    auto& out_img_bindings = descriptor_bindings[1];
+
+    auto& textures_bindings = descriptor_bindings[GX_VK_BIND_RAY_2D_TEXTURES];
+    GX_SET_ZERO(textures_bindings)
+    textures_bindings.binding = GX_VK_BIND_RAY_2D_TEXTURES;
+    textures_bindings.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    textures_bindings.descriptorCount = 1000;
+    textures_bindings.stageFlags = VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR;
+
+    auto& cube_textures_bindings = descriptor_bindings[GX_VK_BIND_RAY_CUBE_TEXTURES];
+    GX_SET_ZERO(cube_textures_bindings)
+    cube_textures_bindings.binding = GX_VK_BIND_RAY_CUBE_TEXTURES;
+    cube_textures_bindings.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    cube_textures_bindings.descriptorCount = 10;
+    cube_textures_bindings.stageFlags = VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR;
+
+    auto& out_img_bindings = descriptor_bindings[GX_VK_BIND_RAY_OUT_IMAGE];
     GX_SET_ZERO(out_img_bindings)
-    out_img_bindings.binding = 1;
+    out_img_bindings.binding = GX_VK_BIND_RAY_OUT_IMAGE;
     out_img_bindings.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
     out_img_bindings.descriptorCount = 1;
-    out_img_bindings.stageFlags = VK_SHADER_STAGE_RAYGEN_BIT_KHR;
-    auto& meshes_bindings = descriptor_bindings[2];
-    GX_SET_ZERO(meshes_bindings)
-    meshes_bindings.binding = 2;
-    meshes_bindings.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-    meshes_bindings.descriptorCount = 1;
-    meshes_bindings.stageFlags = VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR;
+    out_img_bindings.stageFlags = VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;
+
     auto cmds = e.get_graphic_queue()->place_node_between(
         queue::Queue::START_FRAME,
         NODE_NAME,
@@ -428,8 +469,7 @@ void gearoenix::vulkan::mesh::AccelManager::update() noexcept
     auto& frame = frames[e.get_frame_number()];
     auto& cmd = frame.cmd;
     cmd->begin();
-    if (!instances.empty())
-        update_instances_buffers();
+    update_instances_buffers();
     cmd->end();
 }
 

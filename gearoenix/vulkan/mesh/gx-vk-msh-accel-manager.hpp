@@ -23,6 +23,7 @@ struct AccelManager final : public Manager {
 private:
     struct Kernel final {
         std::vector<VkAccelerationStructureInstanceKHR> instances;
+        std::vector<VkDescriptorBufferInfo> mesh_descriptor_write_info;
     };
 
     std::size_t max_instances_size = 0;
@@ -42,6 +43,8 @@ private:
     std::vector<Kernel> kernels;
     std::vector<Frame> frames;
     std::vector<VkAccelerationStructureInstanceKHR> instances;
+    std::vector<VkDescriptorBufferInfo> mesh_descriptor_write_info;
+    std::vector<VkDescriptorSetLayoutBinding> descriptor_bindings;
 
     void create_accel(
         const std::string& name,

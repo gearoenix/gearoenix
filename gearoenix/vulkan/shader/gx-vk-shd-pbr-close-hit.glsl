@@ -33,10 +33,11 @@ layout(location = 0) rayPayloadInEXT hitPayload prd;
 layout(location = 1) rayPayloadEXT bool isShadowed;
 
 
-layout(set = 1, binding = GX_VK_BIND_RAY_VERTICES) readonly buffer VerticisBuffer { Vertex vertices[]; };
-layout(set = 1, binding = GX_VK_BIND_RAY_INDICES) readonly buffer IndicesBuffer { uint indices[]; };
-layout(set = 1, binding = GX_VK_BIND_RAY_MATERIALS) readonly buffer MaterialBuffer { Material materials[]; };
-layout(set = 1, binding = GX_VK_BIND_RAY_MESH) readonly buffer MeshBuffer { Mesh meshes[]; };
+layout(set = 0, binding = GX_VK_BIND_RAY_VERTICES, scalar) readonly buffer VerticisBuffer { Vertex vertices[]; };
+layout(set = 0, binding = GX_VK_BIND_RAY_INDICES, scalar) readonly buffer IndicesBuffer { uint indices[]; };
+layout(set = 0, binding = GX_VK_BIND_RAY_MATERIALS, scalar) readonly buffer MaterialBuffer { Material materials[]; };
+layout(set = 0, binding = GX_VK_BIND_RAY_MESH, scalar) readonly buffer MeshBuffer { Mesh meshes[]; };
 layout(set = 0, binding = GX_VK_BIND_RAY_TLAS) uniform accelerationStructureEXT tlas;
-layout(set = 1, binding = GX_VK_BIND_RAY_2D_TEXTURES) uniform sampler2D textures[];
-layout(set = 1, binding = GX_VK_BIND_RAY_CUBE_TEXTURES) uniform samplerCube cube_textures[];
+layout(set = 0, binding = GX_VK_BIND_RAY_2D_TEXTURES) uniform sampler2D textures[];
+layout(set = 0, binding = GX_VK_BIND_RAY_CUBE_TEXTURES) uniform samplerCube cube_textures[];
+layout(set = 0, binding = GX_VK_BIND_RAY_OUT_IMAGE) uniform image2D out_image;
