@@ -20,6 +20,11 @@
 #include "gx-vk-msh-accel.hpp"
 #include <thread>
 
+constexpr static const std::size_t default_init_mesh_descriptor_count = 200;
+constexpr static const std::size_t default_init_material_descriptor_count = 100;
+constexpr static const std::size_t default_init_2d_texture_descriptor_count = 500;
+constexpr static const std::size_t default_init_cube_texture_descriptor_count = 10;
+
 void gearoenix::vulkan::mesh::AccelManager::create_accel(
     const std::string& name,
     const std::vector<math::BasicVertex>& vertices,
@@ -222,22 +227,37 @@ void gearoenix::vulkan::mesh::AccelManager::update_instances() noexcept
             update_instances_system(accel_com, tran, kernel_index);
         });
     instances.clear();
-    mesh_descriptor_write_info.clear();
-    vertex_descriptor_write_info.clear();
-    index_descriptor_write_info.clear();
     for (auto& kernel : kernels) {
         auto& kernel_meshes_info = kernel.mesh_info;
         for (const auto& kernel_mesh_info : kernel_meshes_info) {
             instances.push_back(kernel_mesh_info.instance);
-            mesh_descriptor_write_info.push_back(kernel_mesh_info.mesh_descriptor_write_info);
-            vertex_descriptor_write_info.push_back(kernel_mesh_info.vertex_descriptor_write_info);
-            index_descriptor_write_info.push_back(kernel_mesh_info.index_descriptor_write_info);
+        }
+    }
+    if (instances.size() > mesh_descriptor_write_info.size()) {
+        // TODO: update bindings info
+        // TODO: new descriptor set must be created for this frame and next frames
+        // TODO: (int frames_needs_new_des_set = frames_count)
+        // TODO: a better increase strategy and remove following lines
+        mesh_descriptor_write_info.resize(instances.size());
+        vertex_descriptor_write_info.resize(instances.size());
+        index_descriptor_write_info.resize(instances.size());
+    }
+    std::size_t index = 0;
+    for (auto& kernel : kernels) {
+        auto& kernel_meshes_info = kernel.mesh_info;
+        for (const auto& kernel_mesh_info : kernel_meshes_info) {
+            mesh_descriptor_write_info[index] = kernel_mesh_info.mesh_descriptor_write_info;
+            vertex_descriptor_write_info[index] = kernel_mesh_info.vertex_descriptor_write_info;
+            index_descriptor_write_info[index] = kernel_mesh_info.index_descriptor_write_info;
+            ++index;
             // TODO: fill the mesh_descriptor_write_info
             // TODO: fill uniform buffers of des_descriptors
             // TODO: fill material to mesh vector
             // TODO: sort material to mesh vector
         }
-        kernel_meshes_info.clear();
+    }
+    for (auto& kernel : kernels) {
+        kernel.mesh_info.clear();
     }
 }
 
@@ -265,6 +285,8 @@ void gearoenix::vulkan::mesh::AccelManager::update_instances_system(
     index_info.offset = accel_com.get_index_buffer_offset();
     index_info.range = accel_com.get_index_buffer_size();
     index_info.buffer = gpu_buffer_vulkan_data;
+    // TODO: remove following line
+    GX_SET_ZERO(mesh_info.mesh_descriptor_write_info)
     // TODO: fill the mesh_descriptor_write_info
     // TODO: fill uniform buffers of des_descriptors
     // TODO: fill material to mesh vector
@@ -369,6 +391,9 @@ void gearoenix::vulkan::mesh::AccelManager::update_instances_buffers() noexcept
     const auto* const* const rng_info_pp = &rng_info_p;
     frame.cmd->build_acceleration_structure(bg_info, rng_info_pp);
 
+    // TODO: check if the descriptor bindings needs any change (max numbers)
+    // TODO: create a new descriptor set based on the numbers of meshes materials and textures
+
     auto descriptor_set = frame.descriptor_set->get_vulkan_data();
     VkWriteDescriptorSet des_write_info[GX_VK_BIND_RAY_MAX];
     GX_SET_ARRAY_ZERO(des_write_info)
@@ -415,28 +440,28 @@ gearoenix::vulkan::mesh::AccelManager::AccelManager(engine::Engine& e) noexcept
     GX_SET_ZERO(vertices_bindings)
     vertices_bindings.binding = GX_VK_BIND_RAY_VERTICES;
     vertices_bindings.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-    vertices_bindings.descriptorCount = 200;
+    vertices_bindings.descriptorCount = default_init_mesh_descriptor_count;
     vertices_bindings.stageFlags = VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR;
 
     auto& indices_bindings = descriptor_bindings[GX_VK_BIND_RAY_INDICES];
     GX_SET_ZERO(indices_bindings)
     indices_bindings.binding = GX_VK_BIND_RAY_INDICES;
     indices_bindings.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-    indices_bindings.descriptorCount = 200;
+    indices_bindings.descriptorCount = default_init_mesh_descriptor_count;
     indices_bindings.stageFlags = VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR;
 
     auto& materials_bindings = descriptor_bindings[GX_VK_BIND_RAY_MATERIALS];
     GX_SET_ZERO(materials_bindings)
     materials_bindings.binding = GX_VK_BIND_RAY_MATERIALS;
     materials_bindings.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-    materials_bindings.descriptorCount = 200;
+    materials_bindings.descriptorCount = default_init_material_descriptor_count;
     materials_bindings.stageFlags = VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR;
 
     auto& meshes_bindings = descriptor_bindings[GX_VK_BIND_RAY_MESH];
     GX_SET_ZERO(meshes_bindings)
     meshes_bindings.binding = GX_VK_BIND_RAY_MESH;
     meshes_bindings.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-    meshes_bindings.descriptorCount = 200;
+    meshes_bindings.descriptorCount = default_init_mesh_descriptor_count;
     meshes_bindings.stageFlags = VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR;
 
     auto& tlas_bindings = descriptor_bindings[GX_VK_BIND_RAY_TLAS];
@@ -450,14 +475,14 @@ gearoenix::vulkan::mesh::AccelManager::AccelManager(engine::Engine& e) noexcept
     GX_SET_ZERO(textures_bindings)
     textures_bindings.binding = GX_VK_BIND_RAY_2D_TEXTURES;
     textures_bindings.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    textures_bindings.descriptorCount = 1000;
+    textures_bindings.descriptorCount = default_init_2d_texture_descriptor_count;
     textures_bindings.stageFlags = VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR;
 
     auto& cube_textures_bindings = descriptor_bindings[GX_VK_BIND_RAY_CUBE_TEXTURES];
     GX_SET_ZERO(cube_textures_bindings)
     cube_textures_bindings.binding = GX_VK_BIND_RAY_CUBE_TEXTURES;
     cube_textures_bindings.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    cube_textures_bindings.descriptorCount = 10;
+    cube_textures_bindings.descriptorCount = default_init_cube_texture_descriptor_count;
     cube_textures_bindings.stageFlags = VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR;
 
     auto& out_img_bindings = descriptor_bindings[GX_VK_BIND_RAY_OUT_IMAGE];

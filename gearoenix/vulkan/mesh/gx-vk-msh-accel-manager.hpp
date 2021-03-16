@@ -24,9 +24,9 @@ struct AccelManager final : public Manager {
 private:
     struct MeshData final {
         VkAccelerationStructureInstanceKHR instance;
-        VkDescriptorBufferInfo mesh_descriptor_write_info;
         VkDescriptorBufferInfo vertex_descriptor_write_info;
         VkDescriptorBufferInfo index_descriptor_write_info;
+        VkDescriptorBufferInfo mesh_descriptor_write_info;
     };
 
     struct Kernel final {

@@ -3,6 +3,7 @@
 #include "../../core/gx-cr-allocator.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "gx-vk-buf-buffer.hpp"
+#include <cstring>
 
 gearoenix::vulkan::buffer::Uniform::Uniform(
     const engine::Engine& e,
