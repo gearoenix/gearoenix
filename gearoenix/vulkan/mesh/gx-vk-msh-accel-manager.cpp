@@ -256,6 +256,12 @@ void gearoenix::vulkan::mesh::AccelManager::update_instances() noexcept
             // TODO: sort material to mesh vector
         }
     }
+    const auto max_dwi_count = static_cast<std::size_t>(descriptor_bindings[GX_VK_BIND_RAY_VERTICES].descriptorCount);
+    for (; index < max_dwi_count; ++index) {
+        GX_SET_ZERO(mesh_descriptor_write_info[index])
+        GX_SET_ZERO(vertex_descriptor_write_info[index])
+        GX_SET_ZERO(index_descriptor_write_info[index])
+    }
     for (auto& kernel : kernels) {
         kernel.mesh_info.clear();
     }
@@ -407,9 +413,12 @@ void gearoenix::vulkan::mesh::AccelManager::update_instances_buffers() noexcept
         wi.dstSet = descriptor_set;
     }
 
-    std::vector<VkDescriptorBufferInfo> vertices_wdis(static_cast<std::size_t>(descriptor_bindings[GX_VK_BIND_RAY_TLAS].descriptorCount));
-    for (auto& wi : vertices_wdis) {
-    }
+    des_write_info[GX_VK_BIND_RAY_VERTICES].pBufferInfo = vertex_descriptor_write_info.data();
+    des_write_info[GX_VK_BIND_RAY_INDICES].pBufferInfo = index_descriptor_write_info.data();
+    des_write_info[GX_VK_BIND_RAY_MESH].pBufferInfo = mesh_descriptor_write_info.data();
+    des_write_info[GX_VK_BIND_RAY_MATERIALS].pBufferInfo = material_descriptor_write_info.data();
+    des_write_info[GX_VK_BIND_RAY_2D_TEXTURES].pImageInfo = texture_descriptor_write_info.data();
+    des_write_info[GX_VK_BIND_RAY_CUBE_TEXTURES].pImageInfo = cube_texture_descriptor_write_info.data();
 
     VkWriteDescriptorSetAccelerationStructureKHR tlas_wdi;
     GX_SET_ZERO(tlas_wdi)
@@ -424,8 +433,7 @@ void gearoenix::vulkan::mesh::AccelManager::update_instances_buffers() noexcept
     out_img_wdi.imageView = e.get_current_framebuffer().get_view()->get_vulkan_data();
     des_write_info[GX_VK_BIND_RAY_OUT_IMAGE].pImageInfo = &out_img_wdi;
 
-    VkDescriptorBufferInfo vertex_wdi;
-    //    vertex_wdi.
+    frame.descriptor_set->write(des_write_info, GX_VK_BIND_RAY_MAX);
 }
 
 gearoenix::vulkan::mesh::AccelManager::AccelManager(engine::Engine& e) noexcept
@@ -435,7 +443,20 @@ gearoenix::vulkan::mesh::AccelManager::AccelManager(engine::Engine& e) noexcept
     , kernels(std::thread::hardware_concurrency())
     , frames(e.get_swapchain().get_image_views().size())
     , descriptor_bindings(GX_VK_BIND_RAY_MAX)
+    , mesh_descriptor_write_info(default_init_mesh_descriptor_count)
+    , vertex_descriptor_write_info(default_init_mesh_descriptor_count)
+    , index_descriptor_write_info(default_init_mesh_descriptor_count)
+    , material_descriptor_write_info(default_init_material_descriptor_count)
+    , texture_descriptor_write_info(default_init_2d_texture_descriptor_count)
+    , cube_texture_descriptor_write_info(default_init_cube_texture_descriptor_count)
 {
+    GX_SET_VECTOR_ZERO(mesh_descriptor_write_info)
+    GX_SET_VECTOR_ZERO(vertex_descriptor_write_info)
+    GX_SET_VECTOR_ZERO(index_descriptor_write_info)
+    GX_SET_VECTOR_ZERO(material_descriptor_write_info)
+    GX_SET_VECTOR_ZERO(texture_descriptor_write_info)
+    GX_SET_VECTOR_ZERO(cube_texture_descriptor_write_info)
+
     auto& vertices_bindings = descriptor_bindings[GX_VK_BIND_RAY_VERTICES];
     GX_SET_ZERO(vertices_bindings)
     vertices_bindings.binding = GX_VK_BIND_RAY_VERTICES;

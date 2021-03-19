@@ -18,7 +18,7 @@ void GameApp::update() noexcept
 {
     if (render_engine->get_frame_number_from_start() == 10)
         platform_application->get_base().get_render_engine()->get_scene_manager()->load_gltf(
-            gearoenix::platform::stream::Path::create_absolute("C:/Users/hossein/Documents/Projects/assets/1.gltf"));
+            gearoenix::platform::stream::Path::create_absolute("/home/thany/Projects/assets/1.gltf"));
 }
 
 GEAROENIX_START(GameApp)

@@ -24,14 +24,8 @@ private:
         Pool* pool, std::shared_ptr<PoolManager> pool_manager, VkDescriptorSetLayout layout) noexcept;
 
 public:
-    //    Set(Pool* pool, SetLayout* lay, const VkDescriptorBufferInfo& buff_info, const VkDescriptorImageInfo& img_info);
     ~Set() noexcept;
-    //    const Pool* get_pool() const;
-    //    Pool* get_pool();
-    //    unsigned int get_layouts_count() const;
-    //    const VkDescriptorSetLayout& get_layout() const;
-    //    const VkDescriptorSet& get_vulkan_data() const;
-    //    void bind(pipeline::Pipeline* p, command::Buffer* c);
+    void write(const VkWriteDescriptorSet* data, std::uint32_t count) noexcept;
 };
 }
 #endif

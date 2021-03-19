@@ -104,12 +104,10 @@ void gearoenix::vulkan::device::Physical::initialize_features() noexcept
 
     GX_SET_ZERO(ray_tracing_pipeline_features)
     ray_tracing_pipeline_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR;
+    ray_tracing_pipeline_features.pNext = &ray_query_features;
+    info.pNext = &ray_tracing_pipeline_features;
 
     if (rtx_supported) {
-        info.pNext = &ray_query_features;
-        vkGetPhysicalDeviceFeatures2(vulkan_data, &info);
-
-        info.pNext = &ray_tracing_pipeline_features;
         vkGetPhysicalDeviceFeatures2(vulkan_data, &info);
     }
 }

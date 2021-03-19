@@ -63,9 +63,11 @@ SET(GX_SDL2_BUILD_DIRS "${GX_SDL2_PATH}/gx-build")
 IF(LINUX)
     SET(GX_LIBS
             ${GX_LIBS}
-            ${GX_SDL2_BUILD_DIRS}/libSDL2.a
-            ${GX_SDL2_BUILD_DIRS}/libSDL2main.a
-            pthread)
+            # Workaround for a bug in ubuntu 21.04
+            # ${GX_SDL2_BUILD_DIRS}/libSDL2.a
+            # ${GX_SDL2_BUILD_DIRS}/libSDL2main.a
+            SDL2 m dl asound pthread pulse-simple pulse X11 Xext Xcursor Xinerama Xi Xrandr Xss Xxf86vm drm gbm
+            wayland-egl wayland-client wayland-cursor xkbcommon rt)
 ELSEIF(MSVC)
     SET(GX_LIBS
             ${GX_LIBS}
