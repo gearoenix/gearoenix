@@ -14,7 +14,7 @@ jobs:
         run: sudo apt-get update
       - name: Install dependancies
         run: |
-          sudo apt-get install clang++-10 clang-10 wget unzip libsdl2-dev -y &&
+          sudo apt-get install clang++-10 clang-10 wget unzip libsdl2-dev libdrm-dev -y &&
           wget "https://sonarcloud.io/static/cpp/build-wrapper-linux-x86.zip" &&
           unzip build-wrapper-linux-x86.zip &&
           rm build-wrapper-linux-x86.zip &&
