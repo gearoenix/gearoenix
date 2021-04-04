@@ -15,15 +15,15 @@ private:
     explicit Local(std::fstream file) noexcept;
 
 public:
-    Local(const Application* app, const std::string& name, bool writable = false) noexcept;
+    Local(const Application& app, const std::string& name, bool writable = false) noexcept;
     ~Local() noexcept final;
-    [[nodiscard]] static Local* open(const Application* app, const std::string& name, bool writable = false) noexcept;
+    [[nodiscard]] static Local* open(const Application& app, const std::string& name, bool writable = false) noexcept;
     [[nodiscard]] core::Count read(void* data, core::Count length) noexcept final;
     [[nodiscard]] core::Count write(const void* data, core::Count length) noexcept final;
     void seek(core::Count offset) noexcept final;
     [[nodiscard]] core::Count tell() noexcept final;
     [[nodiscard]] core::Count size() noexcept final;
-    [[nodiscard]] static bool exist(const Application* app, const std::string& name) noexcept;
+    [[nodiscard]] static bool exist(const Application& app, const std::string& name) noexcept;
 };
 }
 #endif

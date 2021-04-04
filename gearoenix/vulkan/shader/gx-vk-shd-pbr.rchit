@@ -41,3 +41,8 @@ layout(set = 0, binding = GX_VK_BIND_RAY_TLAS) uniform accelerationStructureEXT 
 layout(set = 0, binding = GX_VK_BIND_RAY_2D_TEXTURES) uniform sampler2D textures[];
 layout(set = 0, binding = GX_VK_BIND_RAY_CUBE_TEXTURES) uniform samplerCube cube_textures[];
 layout(set = 0, binding = GX_VK_BIND_RAY_OUT_IMAGE) uniform image2D out_image;
+
+void main()
+{
+    prd = vec3(0.2, 0.5, 0.5);
+}

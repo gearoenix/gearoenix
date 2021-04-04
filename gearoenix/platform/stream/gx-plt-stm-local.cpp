@@ -14,7 +14,7 @@ gearoenix::platform::stream::Local::Local(std::fstream file) noexcept
 {
 }
 
-static std::string create_path(const gearoenix::platform::Application* const app, const std::string& name) noexcept
+static std::string create_path(const gearoenix::platform::Application& app, const std::string& name) noexcept
 {
 #ifdef GX_PLATFORM_IOS
     (void)app;
@@ -31,7 +31,7 @@ static std::string create_path(const gearoenix::platform::Application* const app
 #endif
 }
 
-gearoenix::platform::stream::Local::Local(const Application* const app, const std::string& name, bool writable) noexcept
+gearoenix::platform::stream::Local::Local(const Application& app, const std::string& name, bool writable) noexcept
     : file(create_path(app, name), std::ios::binary | (writable ? std::ios::out : std::ios::in))
 {
     if (!file.is_open() || !file.good())
@@ -40,7 +40,7 @@ gearoenix::platform::stream::Local::Local(const Application* const app, const st
 
 gearoenix::platform::stream::Local::~Local() noexcept = default;
 
-gearoenix::platform::stream::Local* gearoenix::platform::stream::Local::open(const Application* const app, const std::string& name, const bool writable) noexcept
+gearoenix::platform::stream::Local* gearoenix::platform::stream::Local::open(const Application& app, const std::string& name, const bool writable) noexcept
 {
     std::fstream file(create_path(app, name), std::ios::binary | (writable ? std::ios::out : std::ios::in));
     if (!file.is_open() || !file.good())
@@ -84,7 +84,7 @@ gearoenix::core::Count gearoenix::platform::stream::Local::tell() noexcept
     return static_cast<core::Count>(file.tellg());
 }
 
-bool gearoenix::platform::stream::Local::exist(const Application* const app, const std::string& name) noexcept
+bool gearoenix::platform::stream::Local::exist(const Application& app, const std::string& name) noexcept
 {
     std::ifstream f(create_path(app, name));
     return f.is_open() && f.good();
