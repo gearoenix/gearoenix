@@ -9,6 +9,7 @@
 #define GX_VK_BIND_RAY_MESH 5
 #define GX_VK_BIND_RAY_TLAS 6
 #define GX_VK_BIND_RAY_OUT_IMAGE 7
-#define GX_VK_BIND_RAY_MAX 8
+#define GX_VK_BIND_RAY_CAMERA 8
+#define GX_VK_BIND_RAY_MAX 9
 
 #endif
