@@ -28,7 +28,7 @@ gearoenix::vulkan::engine::Engine::Engine(const platform::Application& platform_
     , memory_manager(*this)
     , command_manager(*this)
     , descriptor_manager(logical_device)
-    , pipeline_manager(logical_device)
+    , pipeline_manager(*this)
     , buffer_manager(memory_manager, *this)
     , depth_stencil(image::View::create_depth_stencil(memory_manager))
     , render_pass(swapchain)

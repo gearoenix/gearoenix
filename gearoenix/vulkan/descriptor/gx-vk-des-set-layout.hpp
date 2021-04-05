@@ -13,9 +13,7 @@ struct Logical;
 namespace gearoenix::vulkan::descriptor {
 struct SetLayout final {
     GX_GET_VAL_PRV(VkDescriptorSetLayout, vulkan_data, nullptr)
-
-private:
-    const device::Logical& logical_device;
+    GX_GET_CRRF_PRV(device::Logical, logical_device)
 
 public:
     SetLayout(SetLayout&&) = delete;
@@ -24,6 +22,7 @@ public:
     SetLayout& operator=(const SetLayout&) = delete;
     SetLayout(const device::Logical& logical_device, const std::vector<VkDescriptorSetLayoutBinding>& data) noexcept;
     ~SetLayout() noexcept;
+    [[nodiscard]] VkDescriptorSetLayout* get_vulkan_data_ptr() noexcept;
 };
 }
 #endif

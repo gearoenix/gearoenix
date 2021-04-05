@@ -21,4 +21,9 @@ gearoenix::vulkan::descriptor::SetLayout::~SetLayout() noexcept
     vkDestroyDescriptorSetLayout(logical_device.get_vulkan_data(), vulkan_data, nullptr);
 }
 
+VkDescriptorSetLayout* gearoenix::vulkan::descriptor::SetLayout::get_vulkan_data_ptr() noexcept
+{
+    return &vulkan_data;
+}
+
 #endif

@@ -60,8 +60,8 @@ SET(GX_ENGINE_VULKAN_SRC
         ${GX_ENGINE_VULKAN_SRC_DIR}/mesh/gx-vk-msh-raster-manager.hpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/pipeline/gx-vk-pip-cache.cpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/pipeline/gx-vk-pip-cache.hpp
-#        ${GX_ENGINE_VULKAN_SRC_DIR}/pipeline/gx-vk-pip-layout.cpp
-#        ${GX_ENGINE_VULKAN_SRC_DIR}/pipeline/gx-vk-pip-layout.hpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/pipeline/gx-vk-pip-layout.cpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/pipeline/gx-vk-pip-layout.hpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/pipeline/gx-vk-pip-manager.cpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/pipeline/gx-vk-pip-manager.hpp
 #        ${GX_ENGINE_VULKAN_SRC_DIR}/pipeline/gx-vk-pip-pipeline.cpp

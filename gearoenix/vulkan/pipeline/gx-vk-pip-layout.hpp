@@ -1,31 +1,24 @@
 #ifndef GEAROENIX_RENDER_PIPELINE_LAYOUT_HPP
 #define GEAROENIX_RENDER_PIPELINE_LAYOUT_HPP
-#include "../../core/gx-cr-build-configuration.hpp"
-#ifdef USE_VULKAN
-#include "../gx-vk-linker.hpp"
+#include "../../render/gx-rnd-build-configuration.hpp"
+#ifdef GX_RENDER_VULKAN_ENABLED
+#include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
+#include "../gx-vk-loader.hpp"
 #include <memory>
-namespace gearoenix {
-namespace render {
-    namespace device {
-        struct Logical;
-    }
-    namespace descriptor {
-        struct SetLayout;
-    }
-    namespace pipeline {
-        struct Layout {
-        private:
-            descriptor::SetLayout* dessetlay;
-            VkPipelineLayout vulkan_data;
 
-        public:
-            Layout(descriptor::SetLayout* dessetlay);
-            ~Layout();
-            const VkPipelineLayout& get_vulkan_data() const;
-            const descriptor::SetLayout* get_descriptor_set_layout() const;
-        };
-    } // namespace pipeline
-} // namespace render
-} // namespace gearoenix
+namespace gearoenix::vulkan::descriptor {
+struct SetLayout;
+}
+
+namespace gearoenix::vulkan::pipeline {
+struct Layout final {
+    GX_GET_VAL_PRV(VkPipelineLayout, vulkan_data, nullptr)
+    GX_GET_CREF_PRV(std::shared_ptr<descriptor::SetLayout>, des_set_layout)
+
+public:
+    Layout(std::shared_ptr<descriptor::SetLayout> des_set_layout) noexcept;
+    ~Layout() noexcept;
+};
+}
 #endif
-#endif // GEAROENIX_RENDER_PIPELINE_LAYOUT_HPP
+#endif
