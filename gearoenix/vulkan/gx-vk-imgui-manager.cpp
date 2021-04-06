@@ -3,6 +3,7 @@
 #include "descriptor/gx-vk-des-pool.hpp"
 #include "engine/gx-vk-eng-engine.hpp"
 #include "gx-vk-check.hpp"
+#include "pipeline/gx-vk-pip-cache.hpp"
 #include "queue/gx-vk-qu-queue.hpp"
 #include "sync/gx-vk-sync-fence.hpp"
 #include <imgui_impl_vulkan.h>
@@ -21,7 +22,7 @@ gearoenix::vulkan::ImGuiManager::ImGuiManager(engine::Engine& e) noexcept
     info.Device = e.get_logical_device().get_vulkan_data();
     info.QueueFamily = e.get_physical_device().get_graphics_queue_node_index();
     info.Queue = e.get_graphic_queue()->get_vulkan_data();
-    info.PipelineCache = e.get_pipeline_manager().get_cache().get_vulkan_data();
+    info.PipelineCache = e.get_pipeline_manager().get_cache()->get_vulkan_data();
     info.DescriptorPool = e.get_descriptor_manager().get_imgui()->get_vulkan_data();
     info.MinImageCount = static_cast<decltype(info.MinImageCount)>(e.get_swapchain().get_image_views().size());
     info.ImageCount = info.MinImageCount;

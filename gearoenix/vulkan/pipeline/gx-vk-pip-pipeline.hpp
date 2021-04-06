@@ -1,52 +1,36 @@
 #ifndef GEAROENIX_VULKAN_PIPELINE_PIPELINE_HPP
 #define GEAROENIX_VULKAN_PIPELINE_PIPELINE_HPP
-#include "../../core/gx-cr-build-configuration.hpp"
-#ifdef USE_VULKAN
-#include "../../core/cache/gx-cr-cache-cached.hpp"
-#include "../../render/shader/gx-rnd-shd-shader.hpp"
-#include "../gx-vk-linker.hpp"
-namespace gearoenix {
-namespace core {
-    struct Application;
-}
-namespace render {
-    namespace device {
-        struct Logical;
-    }
-    namespace descriptor {
-        struct SetLayout;
-    }
-    struct RenderPass;
-    namespace pipeline {
-        struct Cache;
-        struct Layout;
-        struct Pipeline : public core::cache::Cached {
-        private:
-            shader::Id sid;
-            device::Logical* dev;
-            Cache* cache;
-            descriptor::SetLayout* dessetlay;
-            Layout* layout;
-            RenderPass* rndpass;
-            std::shared_ptr<shader::Shader> shd;
-            VkPipeline vulkan_data;
-            Engine* eng;
+#include "../../render/gx-rnd-build-configuration.hpp"
+#ifdef GX_RENDER_VULKAN_ENABLED
+#include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
+#include "../gx-vk-loader.hpp"
+#include <memory>
+#include <vector>
 
-        public:
-            Pipeline(shader::Id sid,
-                Cache* cache,
-                RenderPass* rndpass,
-                const std::shared_ptr<shader::Shader>& shd,
-                descriptor::SetLayout* dessetlay,
-                Engine* eng);
-            ~Pipeline();
-            const VkPipeline& get_vulkan_data() const;
-            descriptor::SetLayout* get_descriptor_set_layout();
-            const Layout* get_layout() const;
-            void bind();
-        };
-    }
-}
+namespace gearoenix::vulkan::pipeline {
+struct Cache;
+struct Layout;
+struct Pipeline final {
+    GX_GET_CREF_PRV(std::shared_ptr<Layout>, layout)
+    GX_GET_CREF_PRV(std::shared_ptr<Cache>, cache)
+    GX_GET_VAL_PRV(VkPipeline, vulkan_data, nullptr)
+
+private:
+    Pipeline(std::shared_ptr<Layout>, std::shared_ptr<Cache>, VkPipeline) noexcept;
+
+public:
+    Pipeline(Pipeline&&) = delete;
+    Pipeline(const Pipeline&) = delete;
+    Pipeline& operator=(Pipeline&&) = delete;
+    Pipeline& operator=(const Pipeline&) = delete;
+    ~Pipeline() noexcept;
+
+    [[nodiscard]] static std::shared_ptr<Pipeline> construct_ray_tracing(
+        std::shared_ptr<Layout> layout,
+        std::shared_ptr<Cache> cache,
+        const std::vector<VkPipelineShaderStageCreateInfo>& stages_create_info,
+        const std::vector<VkRayTracingShaderGroupCreateInfoKHR>& shader_group_create_info) noexcept;
+};
 }
 #endif
 #endif

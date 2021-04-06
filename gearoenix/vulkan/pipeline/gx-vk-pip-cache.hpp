@@ -10,7 +10,7 @@ struct Logical;
 }
 
 namespace gearoenix::vulkan::pipeline {
-struct Cache {
+struct Cache final {
     GX_GET_CRRF_PRV(device::Logical, logical_device)
     GX_GET_VAL_PRV(VkPipelineCache, vulkan_data, nullptr)
 

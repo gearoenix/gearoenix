@@ -6,7 +6,9 @@
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "../shader/gx-vk-shd-manager.hpp"
 #include "../shader/gx-vk-shd-module.hpp"
+#include "gx-vk-pip-cache.hpp"
 #include "gx-vk-pip-layout.hpp"
+#include "gx-vk-pip-pipeline.hpp"
 
 static const char* const default_stage_entry = "main";
 
@@ -100,7 +102,7 @@ void gearoenix::vulkan::pipeline::Manager::initialize_ray_tracing() noexcept
 }
 
 gearoenix::vulkan::pipeline::Manager::Manager(const engine::Engine& e) noexcept
-    : cache(e.get_logical_device())
+    : cache(new Cache(e.get_logical_device()))
     , shader_manager(new shader::Manager(e))
 {
     if (e.get_physical_device().get_rtx_supported())
@@ -114,19 +116,8 @@ gearoenix::vulkan::pipeline::Manager::~Manager() noexcept = default;
 std::shared_ptr<gearoenix::vulkan::pipeline::Pipeline> gearoenix::vulkan::pipeline::Manager::create_ray_tracing_pbr(
     const std::shared_ptr<descriptor::SetLayout>& des_set_layout) noexcept
 {
-    auto layout = std::make_shared<Layout>(des_set_layout);
-    VkRayTracingPipelineCreateInfoKHR info;
-    GX_SET_ZERO(info)
-    info.sType = VK_STRUCTURE_TYPE_RAY_TRACING_PIPELINE_CREATE_INFO_KHR;
-    info.stageCount = static_cast<std::uint32_t>(stages_create_info.size());
-    info.pStages = stages_create_info.data();
-    info.groupCount = static_cast<uint32_t>(shader_group_create_info.size());
-    info.pGroups = shader_group_create_info.data();
-    info.maxPipelineRayRecursionDepth = 2; // Ray depth
-    info.layout = layout->get_vulkan_data();
-    //    m_rtPipeline = static_cast<const vk::Pipeline&>(
-    //            m_device.createRayTracingPipelineKHR({}, {}, rayPipelineInfo));
-    return std::shared_ptr<Pipeline>();
+    return Pipeline::construct_ray_tracing(
+        std::make_shared<Layout>(des_set_layout), cache, stages_create_info, shader_group_create_info);
 }
 
 #endif

@@ -64,8 +64,8 @@ SET(GX_ENGINE_VULKAN_SRC
         ${GX_ENGINE_VULKAN_SRC_DIR}/pipeline/gx-vk-pip-layout.hpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/pipeline/gx-vk-pip-manager.cpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/pipeline/gx-vk-pip-manager.hpp
-#        ${GX_ENGINE_VULKAN_SRC_DIR}/pipeline/gx-vk-pip-pipeline.cpp
-#        ${GX_ENGINE_VULKAN_SRC_DIR}/pipeline/gx-vk-pip-pipeline.hpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/pipeline/gx-vk-pip-pipeline.cpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/pipeline/gx-vk-pip-pipeline.hpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/query/gx-vk-qry-pool.cpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/query/gx-vk-qry-pool.hpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/queue/gx-vk-qu-graph.cpp

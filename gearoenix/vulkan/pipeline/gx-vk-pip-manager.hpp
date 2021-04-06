@@ -3,7 +3,7 @@
 #include "../../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
-#include "gx-vk-pip-cache.hpp"
+#include "../gx-vk-loader.hpp"
 #include <memory>
 #include <vector>
 
@@ -21,9 +21,10 @@ struct Module;
 }
 
 namespace gearoenix::vulkan::pipeline {
+struct Cache;
 struct Pipeline;
 struct Manager final {
-    GX_GET_CREF_PRV(Cache, cache)
+    GX_GET_CREF_PRV(std::shared_ptr<Cache>, cache)
     GX_GET_UCPTR_PRV(shader::Manager, shader_manager)
 
 private:

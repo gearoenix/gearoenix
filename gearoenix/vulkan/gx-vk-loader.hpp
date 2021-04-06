@@ -158,6 +158,7 @@
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkMergePipelineCaches);                          \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCreateGraphicsPipelines);                      \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCreateComputePipelines);                       \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCreateRayTracingPipelinesKHR);                 \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkDestroyPipeline);                              \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCreatePipelineLayout);                         \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkDestroyPipelineLayout);                        \
