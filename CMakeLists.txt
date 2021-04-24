@@ -11,6 +11,12 @@ SET(GX_VERSION "${GX_VERSION_MAJOR}.${GX_VERSION_MINOR}.${GX_VERSION_PATCH}")
 
 # Test coverage
 OPTION(GX_COVERAGE_ENABLED "Enables the measurement of test coverages" OFF)
+# BGFX
+OPTION(GX_BGFX_ENABLED "Enables the BGFX renderer" ON)
+
+IF (CMAKE_SYSTEM_NAME MATCHES "Linux")
+    SET(LINUX TRUE)
+ENDIF()
 
 IF (GX_COVERAGE_ENABLED)
     MESSAGE(STATUS "Coverage enabled")
@@ -22,10 +28,14 @@ IF (GX_COVERAGE_ENABLED)
 ENDIF (GX_COVERAGE_ENABLED)
 
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake/)
+INCLUDE(gx-builder)
 INCLUDE(gx-compile-lib)
 INCLUDE(gx-download-file)
 INCLUDE(gx-flag-util)
 INCLUDE(gx-imgui)
+INCLUDE(gx-bgfx)
+
+GX_FIND_BUILDER()
 
 MESSAGE(STATUS "Gearoenix is going to be compiled for ${CMAKE_SYSTEM_NAME}")
 
@@ -37,10 +47,6 @@ IF (MSVC)
 ELSE ()
     SET(CMAKE_CXX_FLAGS "-std=c++20 ${CMAKE_CXX_FLAGS}")
 ENDIF ()
-
-IF (CMAKE_SYSTEM_NAME MATCHES "Linux")
-    SET(LINUX TRUE)
-ENDIF()
 
 IF (APPLE)
     SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -x objective-c")
@@ -75,6 +81,8 @@ ELSEIF(MSVC)
             ${GX_SDL2_BUILD_DIRS}/Release/SDL2main.lib
             winmm version oleaut32 imm32 setupapi)
 ENDIF()
+
+GX_PREPARE_BGFX()
 
 SET(GX_STB_PATH "${GX_SDK_PATH}/stb")
 GX_DOWNLOAD_FILE("https://github.com/nothings/stb/archive/master.zip" "${GX_STB_PATH}")
