@@ -103,8 +103,12 @@ void gearoenix::vulkan::device::Physical::initialize_features() noexcept
     GX_SET_ZERO(info)
     info.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
 
+    GX_SET_ZERO(shader_clock_features)
+    shader_clock_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_CLOCK_FEATURES_KHR;
+
     GX_SET_ZERO(ray_query_features)
     ray_query_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_QUERY_FEATURES_KHR;
+    ray_query_features.pNext = &shader_clock_features;
 
     GX_SET_ZERO(ray_tracing_pipeline_features)
     ray_tracing_pipeline_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR;
@@ -152,6 +156,7 @@ gearoenix::vulkan::device::Physical::Physical(const Surface& surf) noexcept
     int best_device_point = -1;
     for (std::uint32_t i = 0; i < gpus.size(); ++i) {
         vkGetPhysicalDeviceProperties(gpus[i], &properties);
+        GX_LOG_D("GPU device " << i << ": " << properties.deviceName)
         if (VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU != properties.deviceType)
             continue;
         const auto device_point = is_good(gpus[i]);

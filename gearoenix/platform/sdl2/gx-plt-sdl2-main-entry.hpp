@@ -2,7 +2,7 @@
 #define GEAROENIX_PLATFORM_SDL2_MAIN_ENTRY_HPP
 #include "../gx-plt-build-configuration.hpp"
 #ifdef GX_PLATFORM_INTERFACE_SDL2
-#include <SDL_main.h>
+#include <SDL2/SDL_main.h>
 
 #define GX_MAIN_ENTRY_ARGS_DEF \
     [[maybe_unused]] int argc, \

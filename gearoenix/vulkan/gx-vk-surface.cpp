@@ -18,14 +18,14 @@ gearoenix::vulkan::Surface::Surface(const Instance& ins, const platform::Applica
     GX_SET_ZERO(info)
     info.sType = VK_STRUCTURE_TYPE_ANDROID_SURFACE_CREATE_INFO_KHR;
     info.window = platform_application->get_android_app()->window;
-    GX_VK_CHK_L(vkCreateAndroidSurfaceKHR(instance.get_vulkan_data(), &info, nullptr, &vulkan_data))
+    GX_VK_CHK(vkCreateAndroidSurfaceKHR(instance.get_vulkan_data(), &info, nullptr, &vulkan_data))
 #elif defined(GX_PLATFORM_INTERFACE_X11)
     VkXlibSurfaceCreateInfoKHR info;
     GX_SET_ZERO(info)
     info.sType = VK_STRUCTURE_TYPE_XLIB_SURFACE_CREATE_INFO_KHR;
     info.dpy = const_cast<Display*>(platform_application.get_display());
     info.window = platform_application.get_window();
-    GX_VK_CHK_L(vkCreateXlibSurfaceKHR(instance.get_vulkan_data(), &info, nullptr, &vulkan_data))
+    GX_VK_CHK(vkCreateXlibSurfaceKHR(instance.get_vulkan_data(), &info, nullptr, &vulkan_data))
 #elif defined(GX_PLATFORM_INTERFACE_WIN32)
     VkWin32SurfaceCreateInfoKHR info;
     GX_SET_ZERO(info)

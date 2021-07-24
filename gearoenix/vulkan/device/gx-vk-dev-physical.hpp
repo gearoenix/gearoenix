@@ -25,6 +25,7 @@ struct Physical final {
     GX_GET_CREF_PRV(VkPhysicalDeviceFeatures, features)
     GX_GET_CREF_PRV(VkPhysicalDeviceRayQueryFeaturesKHR, ray_query_features)
     GX_GET_CREF_PRV(VkPhysicalDeviceRayTracingPipelineFeaturesKHR, ray_tracing_pipeline_features)
+    GX_GET_CREF_PRV(VkPhysicalDeviceShaderClockFeaturesKHR, shader_clock_features)
 
     GX_GET_CREF_PRV(VkPhysicalDeviceProperties, properties)
     GX_GET_CREF_PRV(VkPhysicalDeviceMemoryProperties, memory_properties)

@@ -5,15 +5,10 @@
 
 layout(location = 0) rayPayloadInEXT hitPayload prd;
 
-layout(push_constant) uniform Constants
-{
-  vec4 clearColor;
-};
-
 void main()
 {
   if(prd.depth == 0)
-    prd.hitValue = clearColor.xyz * 0.8;
+    prd.hitValue = vec3(0.0);
   else
     prd.hitValue = vec3(0.01);  // No contribution from environment
   prd.depth = 100;              // Ending trace

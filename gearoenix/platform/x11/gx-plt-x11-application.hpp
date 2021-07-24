@@ -1,7 +1,7 @@
 #ifndef GEAROENIX_PLATFORM_X11_APPLICATION_HPP
 #define GEAROENIX_PLATFORM_X11_APPLICATION_HPP
 #include "../gx-plt-build-configuration.hpp"
-#ifdef GX_PLATFORM_INTERAFCE_X11
+#ifdef GX_PLATFORM_INTERFACE_X11
 
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../gx-plt-application.hpp"

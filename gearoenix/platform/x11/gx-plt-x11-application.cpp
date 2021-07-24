@@ -2,8 +2,7 @@
 #ifdef GX_PLATFORM_INTERFACE_X11
 #include "../../core/gx-cr-application.hpp"
 #include "../../render/engine/gx-rnd-eng-engine.hpp"
-#include "../gx-plt-log.hpp"
-#include "gx-plt-lnx-key.hpp"
+#include "gx-plt-x11-key.hpp"
 
 void gearoenix::platform::Application::fetch_events() noexcept
 {

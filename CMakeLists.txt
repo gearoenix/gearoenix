@@ -54,8 +54,6 @@ IF (LINUX)
     SET(GX_LIBS ${GX_LIBS} dl)
 ENDIF ()
 
-MESSAGE(STATUS "HHHHHHHHHHHHHHHH-- ${CMAKE_CXX_FLAGS}")
-
 SET(GX_SDK_PATH "${CMAKE_SOURCE_DIR}/sdk")
 SET(GX_SDK_LIB_PATH "${GX_SDK_PATH}/libs/")
 
@@ -69,10 +67,9 @@ SET(GX_SDL2_BUILD_DIRS "${GX_SDL2_PATH}/gx-build")
 IF(LINUX)
     SET(GX_DEBUG_LIBS
             ${GX_DEBUG_LIBS}
-            # Workaround for a bug in ubuntu 21.04
-            # ${GX_SDL2_BUILD_DIRS}/libSDL2.a
-            # ${GX_SDL2_BUILD_DIRS}/libSDL2main.a
-            SDL2 m dl asound pthread pulse-simple pulse X11 Xext Xcursor Xinerama Xi Xrandr Xss Xxf86vm drm gbm
+            ${GX_SDL2_BUILD_DIRS}/libSDL2.a
+            ${GX_SDL2_BUILD_DIRS}/libSDL2main.a
+            m dl asound pthread pulse-simple pulse X11 Xext Xcursor Xinerama Xi Xrandr Xss Xxf86vm drm gbm
             wayland-egl wayland-client wayland-cursor xkbcommon rt)
 ELSEIF(MSVC)
     SET(GX_DEBUG_LIBS
@@ -114,7 +111,7 @@ GX_PREPARE_IMGUI_FB(${GX_IMGUI_FB_PATH})
 INCLUDE_DIRECTORIES(${GX_IMGUI_FB_PATH})
 
 SET(GX_BOOST_PATH "${GX_SDK_PATH}/boost")
-GX_DOWNLOAD_FILE("https://dl.bintray.com/boostorg/release/1.74.0/source/boost_1_74_0.zip" "${GX_BOOST_PATH}")
+GX_DOWNLOAD_FILE("https://github.com/boostorg/boost/archive/refs/tags/boost-1.76.0.zip" "${GX_BOOST_PATH}")
 INCLUDE_DIRECTORIES(${GX_BOOST_PATH})
 
 SET(GX_TINYGLTF_PATH "${GX_SDK_PATH}/tinygltf")

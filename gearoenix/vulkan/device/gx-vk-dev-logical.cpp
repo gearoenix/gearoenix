@@ -11,11 +11,25 @@ gearoenix::vulkan::device::Logical::Logical(const Physical& p) noexcept
     VkPhysicalDeviceFeatures device_features;
     GX_SET_ZERO(device_features)
     device_features.samplerAnisotropy = VK_TRUE;
+    device_features.shaderInt64 = VK_TRUE;
+
+    VkPhysicalDeviceDescriptorIndexingFeatures descriptor_indexing_features;
+    GX_SET_ZERO(descriptor_indexing_features)
+    descriptor_indexing_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES;
+    descriptor_indexing_features.runtimeDescriptorArray = VK_TRUE;
+    descriptor_indexing_features.shaderSampledImageArrayNonUniformIndexing = VK_TRUE;
+
+    VkPhysicalDeviceShaderClockFeaturesKHR shader_clock_features;
+    GX_SET_ZERO(shader_clock_features)
+    shader_clock_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_CLOCK_FEATURES_KHR;
+    shader_clock_features.shaderSubgroupClock = VK_TRUE;
+    shader_clock_features.pNext = &descriptor_indexing_features;
 
     VkPhysicalDeviceScalarBlockLayoutFeatures layout_features;
     GX_SET_ZERO(layout_features)
     layout_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SCALAR_BLOCK_LAYOUT_FEATURES;
     layout_features.scalarBlockLayout = VK_TRUE;
+    layout_features.pNext = &shader_clock_features;
 
     VkPhysicalDeviceBufferDeviceAddressFeatures device_features_bda;
     GX_SET_ZERO(device_features_bda)

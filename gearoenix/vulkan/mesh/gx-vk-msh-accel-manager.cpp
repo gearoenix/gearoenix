@@ -463,28 +463,28 @@ gearoenix::vulkan::mesh::AccelManager::AccelManager(engine::Engine& e) noexcept
     vertices_bindings.binding = GX_VK_BIND_RAY_VERTICES;
     vertices_bindings.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
     vertices_bindings.descriptorCount = default_init_mesh_descriptor_count;
-    vertices_bindings.stageFlags = VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR;
+    vertices_bindings.stageFlags = VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;
 
     auto& indices_bindings = descriptor_bindings[GX_VK_BIND_RAY_INDICES];
     GX_SET_ZERO(indices_bindings)
     indices_bindings.binding = GX_VK_BIND_RAY_INDICES;
     indices_bindings.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
     indices_bindings.descriptorCount = default_init_mesh_descriptor_count;
-    indices_bindings.stageFlags = VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR;
+    indices_bindings.stageFlags = VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;
 
     auto& materials_bindings = descriptor_bindings[GX_VK_BIND_RAY_MATERIALS];
     GX_SET_ZERO(materials_bindings)
     materials_bindings.binding = GX_VK_BIND_RAY_MATERIALS;
     materials_bindings.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
     materials_bindings.descriptorCount = default_init_material_descriptor_count;
-    materials_bindings.stageFlags = VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR;
+    materials_bindings.stageFlags = VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;
 
     auto& meshes_bindings = descriptor_bindings[GX_VK_BIND_RAY_MESH];
     GX_SET_ZERO(meshes_bindings)
     meshes_bindings.binding = GX_VK_BIND_RAY_MESH;
     meshes_bindings.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
     meshes_bindings.descriptorCount = default_init_mesh_descriptor_count;
-    meshes_bindings.stageFlags = VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR;
+    meshes_bindings.stageFlags = VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;
 
     auto& tlas_bindings = descriptor_bindings[GX_VK_BIND_RAY_TLAS];
     GX_SET_ZERO(tlas_bindings)
@@ -498,14 +498,14 @@ gearoenix::vulkan::mesh::AccelManager::AccelManager(engine::Engine& e) noexcept
     textures_bindings.binding = GX_VK_BIND_RAY_2D_TEXTURES;
     textures_bindings.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
     textures_bindings.descriptorCount = default_init_2d_texture_descriptor_count;
-    textures_bindings.stageFlags = VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR;
+    textures_bindings.stageFlags = VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;
 
     auto& cube_textures_bindings = descriptor_bindings[GX_VK_BIND_RAY_CUBE_TEXTURES];
     GX_SET_ZERO(cube_textures_bindings)
     cube_textures_bindings.binding = GX_VK_BIND_RAY_CUBE_TEXTURES;
     cube_textures_bindings.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
     cube_textures_bindings.descriptorCount = default_init_cube_texture_descriptor_count;
-    cube_textures_bindings.stageFlags = VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR;
+    cube_textures_bindings.stageFlags = VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;
 
     auto& out_img_bindings = descriptor_bindings[GX_VK_BIND_RAY_OUT_IMAGE];
     GX_SET_ZERO(out_img_bindings)
@@ -513,6 +513,13 @@ gearoenix::vulkan::mesh::AccelManager::AccelManager(engine::Engine& e) noexcept
     out_img_bindings.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
     out_img_bindings.descriptorCount = 1;
     out_img_bindings.stageFlags = VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;
+
+    auto& camera_bindings = descriptor_bindings[GX_VK_BIND_RAY_CAMERA];
+    GX_SET_ZERO(camera_bindings)
+    camera_bindings.binding = GX_VK_BIND_RAY_CAMERA;
+    camera_bindings.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
+    camera_bindings.descriptorCount = 1;
+    camera_bindings.stageFlags = VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR;
 
     auto cmds = e.get_graphic_queue()->place_node_between(
         queue::Queue::START_FRAME,
