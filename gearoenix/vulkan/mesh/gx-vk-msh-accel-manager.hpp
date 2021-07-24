@@ -17,6 +17,10 @@ namespace gearoenix::vulkan::descriptor {
 struct Set;
 }
 
+namespace gearoenix::vulkan::pipeline {
+struct Pipeline;
+}
+
 namespace gearoenix::vulkan::mesh {
 struct Accel;
 struct AccelComponent;
@@ -46,6 +50,7 @@ private:
         std::shared_ptr<buffer::Buffer> tlas_scratch_buff;
         VkAccelerationStructureKHR tlas_vulkan_data = nullptr;
         std::shared_ptr<descriptor::Set> descriptor_set;
+        std::shared_ptr<pipeline::Pipeline> pipeline;
     };
 
     std::unique_ptr<core::sync::WorkWaiter> accel_creator;

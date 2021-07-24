@@ -83,6 +83,10 @@ void gearoenix::vulkan::device::Physical::initialize_extensions() noexcept
     for (auto& ext : extensions) {
         supported_extensions.emplace(ext.extensionName);
     }
+    //    supported_extensions.emplace(VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME);
+    //    supported_extensions.emplace(VK_KHR_RAY_QUERY_EXTENSION_NAME);
+    //    supported_extensions.emplace(VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME);
+    //    supported_extensions.emplace(VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME);
     if (supported_extensions.contains(VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME) && supported_extensions.contains(VK_KHR_RAY_QUERY_EXTENSION_NAME) && supported_extensions.contains(VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME) && supported_extensions.contains(VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME)) {
         rtx_supported = true;
     }

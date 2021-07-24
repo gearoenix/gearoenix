@@ -13,14 +13,20 @@ gearoenix::vulkan::descriptor::Manager::Manager(const device::Logical& logical_d
 
 gearoenix::vulkan::descriptor::Manager::~Manager() noexcept = default;
 
-std::shared_ptr<gearoenix::vulkan::descriptor::Set> gearoenix::vulkan::descriptor::Manager::create_set(
-    const std::vector<VkDescriptorSetLayoutBinding>& bindings,
-    const std::optional<std::size_t> kernel_index) noexcept
+std::unique_ptr<gearoenix::vulkan::descriptor::BindingsData>& gearoenix::vulkan::descriptor::Manager::get_bindings_data(
+    const std::vector<VkDescriptorSetLayoutBinding>& bindings) noexcept
 {
     const auto bsz = bindings.size() * sizeof(bindings[0]);
     std::vector<std::uint8_t> key(bsz);
     std::memcpy(key.data(), bindings.data(), bsz);
-    auto& bd = bindings_data[key];
+    return bindings_data[key];
+}
+
+std::shared_ptr<gearoenix::vulkan::descriptor::Set> gearoenix::vulkan::descriptor::Manager::create_set(
+    const std::vector<VkDescriptorSetLayoutBinding>& bindings,
+    const std::optional<std::size_t> kernel_index) noexcept
+{
+    auto& bd = get_bindings_data(bindings);
     if (nullptr == bd) {
         bd = std::unique_ptr<BindingsData>(new BindingsData(logical_device, bindings));
     }

@@ -213,8 +213,8 @@ std::optional<gearoenix::vulkan::Instance> gearoenix::vulkan::Instance::construc
         }
     };
     insert_layer("VK_LAYER_KHRONOS_validation");
-    insert_layer("VK_LAYER_LUNARG_monitor");
-    insert_layer("VK_LAYER_RENDERDOC_Capture");
+    // insert_layer("VK_LAYER_LUNARG_monitor");
+    // insert_layer("VK_LAYER_RENDERDOC_Capture");
     // insert_layer("VK_LAYER_NV_nomad_release_public_2021_1_1");
     // insert_layer("VK_LAYER_NV_GPU_Trace_release_public_2021_1_1");
     for (const char* const layer_name : instance_layers) {

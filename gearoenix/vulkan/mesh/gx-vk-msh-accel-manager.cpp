@@ -6,6 +6,7 @@
 #include "../../core/sync/gx-cr-sync-work-waiter.hpp"
 #include "../../physics/gx-phs-transformation.hpp"
 #include "../buffer/gx-vk-buf-buffer.hpp"
+#include "../descriptor/gx-vk-des-bindings-data.hpp"
 #include "../descriptor/gx-vk-des-set.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "../gx-vk-check.hpp"
@@ -524,6 +525,7 @@ gearoenix::vulkan::mesh::AccelManager::AccelManager(engine::Engine& e) noexcept
         frame.cmd = std::move(cmds[frame_index]);
         frame.tlas_vulkan_data = nullptr;
         frame.descriptor_set = des_mgr.create_set(descriptor_bindings);
+        frame.pipeline = e.get_pipeline_manager().create_ray_tracing_pbr(des_mgr.get_bindings_data(descriptor_bindings)->get_layout());
     }
 }
 

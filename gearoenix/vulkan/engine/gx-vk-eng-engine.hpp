@@ -41,7 +41,7 @@ struct Engine final : public render::engine::Engine {
     GX_GET_CREF_PRV(memory::Manager, memory_manager)
     GX_GET_REF_PRV(command::Manager, command_manager)
     GX_GET_REF_PRV(descriptor::Manager, descriptor_manager)
-    GX_GET_CREF_PRV(pipeline::Manager, pipeline_manager)
+    GX_GET_REF_PRV(pipeline::Manager, pipeline_manager)
     GX_GET_REF_PRV(buffer::Manager, buffer_manager)
     GX_GET_CREF_PRV(image::View, depth_stencil)
     GX_GET_CREF_PRV(RenderPass, render_pass)

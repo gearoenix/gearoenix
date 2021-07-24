@@ -12,10 +12,16 @@ gearoenix::vulkan::device::Logical::Logical(const Physical& p) noexcept
     GX_SET_ZERO(device_features)
     device_features.samplerAnisotropy = VK_TRUE;
 
+    VkPhysicalDeviceScalarBlockLayoutFeatures layout_features;
+    GX_SET_ZERO(layout_features)
+    layout_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SCALAR_BLOCK_LAYOUT_FEATURES;
+    layout_features.scalarBlockLayout = VK_TRUE;
+
     VkPhysicalDeviceBufferDeviceAddressFeatures device_features_bda;
     GX_SET_ZERO(device_features_bda)
     device_features_bda.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES;
     device_features_bda.bufferDeviceAddress = VK_TRUE;
+    device_features_bda.pNext = &layout_features;
 
     VkPhysicalDeviceAccelerationStructureFeaturesKHR device_features_as;
     GX_SET_ZERO(device_features_as)
