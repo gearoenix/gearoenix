@@ -10,6 +10,7 @@ enum struct Type : core::Id {
     DirectX11 = 3,
     DirectX12 = 4,
     Metal = 5,
+    BGFX = 6,
 };
 std::ostream& operator<<(std::ostream& os, Type t) noexcept;
 }

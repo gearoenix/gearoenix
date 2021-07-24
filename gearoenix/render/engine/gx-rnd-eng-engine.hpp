@@ -56,7 +56,7 @@ protected:
 
 public:
     [[nodiscard]] static std::set<Type> get_available_engines() noexcept;
-    [[nodiscard]] static std::unique_ptr<Engine> construct(const platform::Application& platform_application) noexcept;
+    [[nodiscard]] static std::unique_ptr<Engine> construct(platform::Application& platform_application) noexcept;
     virtual ~Engine() noexcept;
     virtual void start_frame() noexcept;
     virtual void end_frame() noexcept;

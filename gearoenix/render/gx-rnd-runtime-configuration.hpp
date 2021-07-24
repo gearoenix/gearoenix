@@ -11,6 +11,7 @@ struct RuntimeConfiguration {
     GX_GETSET_VAL_PRV(bool, direct3dx_render_backend_enabled, true)
     GX_GETSET_VAL_PRV(bool, metal_render_backend_enabled, true)
     GX_GETSET_VAL_PRV(bool, opengl_render_backend_enabled, true)
+    GX_GETSET_VAL_PRV(bool, bgfx_render_backend_enabled, true)
     GX_GETSET_VAL_PRV(std::int8_t, shadow_cascades_count, GX_RENDER_MAX_SHADOW_CASCADES)
     GX_GETSET_VAL_PRV(std::uint16_t, runtime_reflection_environment_resolution, GX_RENDER_DEFAULT_RUNTIME_REFLECTION_ENVIRONMENT_RESOLUTION)
     GX_GETSET_VAL_PRV(std::uint16_t, runtime_reflection_irradiance_resolution, GX_RENDER_DEFAULT_RUNTIME_REFLECTION_IRRADIANCE_RESOLUTION)

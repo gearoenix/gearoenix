@@ -1,31 +1,18 @@
 #include "gx-rnd-eng-engine.hpp"
-//#include "../../core/asset/gx-cr-asset-manager.hpp"
-//#include "../../core/gx-cr-function-loader.hpp"
-//#include "../../core/sync/gx-cr-sync-kernel-workers.hpp"
-//#include "../../core/sync/gx-cr-sync-update-manager.hpp"
-//#include "../../physics/gx-phs-engine.hpp"
-//#include "../buffer/gx-rnd-buf-manager.hpp"
-//#include "../command/gx-rnd-cmd-manager.hpp"
-//#include "../graph/tree/gx-rnd-gr-tr-pbr.hpp"
-//#include "../pipeline/gx-rnd-pip-manager.hpp"
-//#include "../../direct3dx/engine/gx-d3d-eng-engine.hpp"
-//#include "../../metal/engine/gx-mtl-eng-engine.hpp"
-//#include "../../opengl/engine/gx-gl-eng-engine.hpp"
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
-#include "../../core/macro/gx-cr-mcr-assert.hpp"
 #include "../../platform/gx-plt-application.hpp"
-#include "../../platform/gx-plt-log.hpp"
-#include "../../vulkan/engine/gx-vk-eng-engine.hpp"
 #include "../gltf/gx-rnd-gltf-loader.hpp"
 #include "../scene/gx-rnd-scn-manager.hpp"
-#include <imgui.h>
 
-//void gearoenix::render::engine::Engine::do_late_delete() noexcept
-//{
-//    ++late_delete_index;
-//    late_delete_index %= late_delete_assets.size();
-//    late_delete_assets[late_delete_index].clear();
-//}
+#ifdef GX_RENDER_VULKAN_ENABLED
+#include "../../vulkan/engine/gx-vk-eng-engine.hpp"
+#endif
+
+#ifdef GX_RENDER_BGFX_ENABLED
+#include "../../bgfx/gx-bgfx-engine.hpp"
+#endif
+
+#include <imgui.h>
 
 gearoenix::render::engine::Engine::Engine(
     const Type engine_type,
@@ -34,36 +21,23 @@ gearoenix::render::engine::Engine::Engine(
     , platform_application(platform_application)
     , scene_manager(new scene::Manager(this))
     , world(new core::ecs::World())
-//    , function_loader(new core::FunctionLoader())
-//    , kernels(new core::sync::KernelWorkers())
-//    , update_manager(new core::sync::UpdateManager(kernels.get()))
-//    , physics_engine(new physics::Engine(platform_application, kernels.get()))
-//    , late_delete_assets(10)
 {
-    //    kernels->add_step(
-    //        [this] {
-    //            function_loader->unload();
-    //            render_tree->update();
-    //            function_loader->unload();
-    //        },
-    //        [this](const unsigned int kernel_index) {
-    //            render_tree->record(kernel_index);
-    //        },
-    //        [] {},
-    //        [this] {
-    //            function_loader->unload();
-    //            render_tree->submit();
-    //        });
 }
 
 std::set<gearoenix::render::engine::Type> gearoenix::render::engine::Engine::get_available_engines() noexcept
 {
-    return { Type::Vulkan };
-    // TODO
+    return {
+#ifdef GX_RENDER_VULKAN_ENABLED
+        Type::Vulkan,
+#endif
+#ifdef GX_RENDER_BGFX_ENABLED
+        Type::BGFX,
+#endif
+    };
 }
 
 std::unique_ptr<gearoenix::render::engine::Engine> gearoenix::render::engine::Engine::construct(
-    const platform::Application& platform_application) noexcept
+    platform::Application& platform_application) noexcept
 {
     std::unique_ptr<Engine> result;
     const auto& configuration = platform_application.get_base().get_configuration().get_render_configuration();
@@ -87,17 +61,16 @@ std::unique_ptr<gearoenix::render::engine::Engine> gearoenix::render::engine::En
         result = opengl::engine::Engine::construct(configuration, std::move(platform_application));
     }
 #endif
+#ifdef GX_RENDER_BGFX_ENABLED
+    if (nullptr == result && configuration.get_bgfx_render_backend_enabled()) {
+        result = std::make_unique<bgfx::Engine>(platform_application);
+    }
+#endif
     GX_CHECK_NOT_EQUAL(result, nullptr)
     return result;
 }
 
 gearoenix::render::engine::Engine::~Engine() noexcept = default;
-
-//void gearoenix::render::engine::Engine::late_delete(std::shared_ptr<core::asset::Asset> asset) noexcept
-//{
-//    GX_GUARD_LOCK(late_delete_assets)
-//    late_delete_assets[late_delete_index].push_back(std::move(asset));
-//}
 
 void gearoenix::render::engine::Engine::start_frame() noexcept
 {
@@ -111,10 +84,7 @@ void gearoenix::render::engine::Engine::start_frame() noexcept
     frame_number = frame_number_from_start % frames_count;
     next_frame_number = (frame_number_from_start + 1) % frames_count;
     world->update();
-    //    function_loader->unload();
-    //    physics_engine->update();
-    //    kernels->do_steps();
-    //    do_late_delete();
+    // physics_engine->update();
 }
 
 void gearoenix::render::engine::Engine::end_frame() noexcept
