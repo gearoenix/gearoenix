@@ -24,9 +24,6 @@
 
 #include "../platform/gx-plt-build-configuration.hpp"
 
-#define GX_RENDER_BGFX_ENABLED
-
-#ifndef GX_RENDER_BGFX_ENABLED
 #ifdef GX_PLATFORM_WINDOWS
 #define GX_RENDER_VULKAN_ENABLED
 //#define GX_RENDER_DIRECT3DX_ENABLED
@@ -35,7 +32,6 @@
 #define GX_RENDER_VULKAN_ENABLED
 #else
 #error "Unexpected/unimplemented platform."
-#endif
 #endif
 
 #endif

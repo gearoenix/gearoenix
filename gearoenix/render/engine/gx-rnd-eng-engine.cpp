@@ -1,16 +1,9 @@
 #include "gx-rnd-eng-engine.hpp"
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
 #include "../../platform/gx-plt-application.hpp"
+#include "../../vulkan/engine/gx-vk-eng-engine.hpp"
 #include "../gltf/gx-rnd-gltf-loader.hpp"
 #include "../scene/gx-rnd-scn-manager.hpp"
-
-#ifdef GX_RENDER_VULKAN_ENABLED
-#include "../../vulkan/engine/gx-vk-eng-engine.hpp"
-#endif
-
-#ifdef GX_RENDER_BGFX_ENABLED
-#include "../../bgfx/gx-bgfx-engine.hpp"
-#endif
 
 #include <imgui.h>
 
@@ -28,10 +21,7 @@ std::set<gearoenix::render::engine::Type> gearoenix::render::engine::Engine::get
 {
     return {
 #ifdef GX_RENDER_VULKAN_ENABLED
-        Type::Vulkan,
-#endif
-#ifdef GX_RENDER_BGFX_ENABLED
-        Type::BGFX,
+        Type::Vulkan
 #endif
     };
 }
@@ -59,11 +49,6 @@ std::unique_ptr<gearoenix::render::engine::Engine> gearoenix::render::engine::En
 #ifdef GX_RENDER_OPENGL_ENABLED
     if (result == nullptr && configuration.get_opengl_render_backend_enabled() && opengl::engine::Engine::is_supported()) {
         result = opengl::engine::Engine::construct(configuration, std::move(platform_application));
-    }
-#endif
-#ifdef GX_RENDER_BGFX_ENABLED
-    if (nullptr == result && configuration.get_bgfx_render_backend_enabled()) {
-        result = std::make_unique<bgfx::Engine>(platform_application);
     }
 #endif
     GX_CHECK_NOT_EQUAL(result, nullptr)

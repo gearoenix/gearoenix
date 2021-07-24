@@ -50,11 +50,6 @@ void gearoenix::platform::Application::initialize_window() noexcept
             return;
         }
     }
-    if (available_engines.contains(render::engine::Type::BGFX))
-        if (create_window(core_flags)) {
-            GX_LOG_D("Gearoenix SDL2 window has been created by BGFX setting.")
-            return;
-        }
     if (available_engines.contains(render::engine::Type::OpenGL)) {
         std::uint32_t flags = core_flags | SDL_WINDOW_OPENGL;
         SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
