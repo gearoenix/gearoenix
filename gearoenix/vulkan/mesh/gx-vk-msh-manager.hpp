@@ -4,7 +4,7 @@
 #ifdef GX_RENDER_VULKAN_ENABLED
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../../core/sync/gx-cr-sync-end-caller.hpp"
-#include "../../math/gx-math-vertex.hpp"
+#include "../../render/gx-rnd-vertex.hpp"
 
 namespace gearoenix::core::sync {
 struct WorkWaiter;

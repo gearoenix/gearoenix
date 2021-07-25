@@ -3,8 +3,8 @@
 #include "../../platform/gx-plt-application.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "../material/gx-rnd-mat-material.hpp"
+#include "../mesh/gx-rnd-msh-builder.hpp"
 #include "../mesh/gx-rnd-msh-manager.hpp"
-#include "../mesh/gx-rnd-msh-mesh.hpp"
 
 void gearoenix::render::skybox::Skybox::init(const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
 {

@@ -91,10 +91,12 @@ SET(GX_ENGINE_RENDER_SRC
 #        ${GX_ENGINE_RENDER_SRC_DIR}/material/gx-rnd-mat-type.hpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/material/gx-rnd-mat-unlit.cpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/material/gx-rnd-mat-unlit.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/mesh/gx-rnd-msh-manager.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/mesh/gx-rnd-msh-manager.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/mesh/gx-rnd-msh-builder.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/mesh/gx-rnd-msh-builder.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/mesh/gx-rnd-msh-manager.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/mesh/gx-rnd-msh-manager.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/mesh/gx-rnd-msh-mesh.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/mesh/gx-rnd-msh-mesh.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/mesh/gx-rnd-msh-type.hpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/model/gx-rnd-mdl-dynamic.cpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/model/gx-rnd-mdl-dynamic.hpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/model/gx-rnd-mdl-manager.cpp
@@ -118,18 +120,12 @@ SET(GX_ENGINE_RENDER_SRC
 #        ${GX_ENGINE_RENDER_SRC_DIR}/reflection/gx-rnd-rfl-runtime.hpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/reflection/gx-rnd-rfl-type.cpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/reflection/gx-rnd-rfl-type.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/scene/gx-rnd-scn-game.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/scene/gx-rnd-scn-game.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/scene/gx-rnd-scn-logo.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/scene/gx-rnd-scn-logo.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/scene/gx-rnd-scn-builder.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/scene/gx-rnd-scn-builder.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/scene/gx-rnd-scn-manager.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/scene/gx-rnd-scn-manager.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/scene/gx-rnd-scn-scene.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/scene/gx-rnd-scn-scene.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/scene/gx-rnd-scn-type.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/scene/gx-rnd-scn-type.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/scene/gx-rnd-scn-ui.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/scene/gx-rnd-scn-ui.hpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/scene/gx-rnd-scn-uniform.hpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/skybox/gx-rnd-sky-cube.cpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/skybox/gx-rnd-sky-cube.hpp

@@ -9,7 +9,7 @@
 #include "../../command/gx-rnd-cmd-manager.hpp"
 #include "../../engine/gx-rnd-eng-engine.hpp"
 #include "../../material/gx-rnd-mat-material.hpp"
-#include "../../mesh/gx-rnd-msh-mesh.hpp"
+#include "../../mesh/gx-rnd-msh-builder.hpp"
 #include "../../model/gx-rnd-mdl-mesh.hpp"
 #include "../../model/gx-rnd-mdl-model.hpp"
 #include "../../pipeline/gx-rnd-pip-manager.hpp"

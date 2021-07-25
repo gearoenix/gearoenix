@@ -43,9 +43,8 @@ private:
     GX_GETSET_CREF_PRV(std::optional<std::string>, name)
     components_t components;
 
-    constexpr static auto component_less = +[](const component_t& l, const component_t& r) constexpr noexcept
-    {
-        return std::less()(l.first, r.first);
+    constexpr static auto component_less = +[](const component_t& l, const std::type_index r) noexcept {
+        return l.first < r;
     };
 
     explicit EntityBuilder(Entity::id_t) noexcept;
@@ -77,6 +76,18 @@ public:
     void add_components(ComponentType&&... cs) noexcept
     {
         ((add_component(std::move(cs))), ...);
+    }
+
+    [[nodiscard]] const void* get_component(std::type_index component_type) const noexcept;
+
+    template <typename ComponentType>
+    std::optional<const ComponentType&> get_component() const noexcept
+    {
+        const void* const ptr = get_component(std::type_index(typeid(ComponentType)));
+        if (nullptr == ptr)
+            return std::nullopt;
+        const ComponentType& comp = *reinterpret_cast<const ComponentType*>(ptr);
+        return comp;
     }
 
     static void sort(components_t&) noexcept;

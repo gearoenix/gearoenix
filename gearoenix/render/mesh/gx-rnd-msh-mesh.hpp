@@ -1,23 +1,19 @@
 #ifndef GEAROENIX_RENDER_MESH_MESH_HPP
 #define GEAROENIX_RENDER_MESH_MESH_HPP
-#include <memory>
+#include "../../core/ecs/gx-cr-ecs-component.hpp"
+#include "../../math/gx-math-aabb.hpp"
 
 namespace gearoenix::core::ecs {
-struct EntitySharedBuilder;
+struct World;
 }
 
 namespace gearoenix::render::mesh {
-struct Mesh {
-protected:
-    Mesh() noexcept = default;
-
-public:
-    Mesh(Mesh&&) = delete;
-    Mesh(const Mesh&) = delete;
-    Mesh& operator=(Mesh&&) = delete;
-    Mesh& operator=(const Mesh&) = delete;
-    virtual ~Mesh() noexcept = default;
-    virtual void set_component(const std::shared_ptr<core::ecs::EntitySharedBuilder>&) noexcept = 0;
+struct Builder;
+struct Mesh final : public core::ecs::Component {
+    std::type_index material_type_index;
+    math::Aabb3 original_box;
+    /// It is going to be used in BVH creation, picker and ...
+    math::Aabb3 updated_box;
 };
 }
 #endif

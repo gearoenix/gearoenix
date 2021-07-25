@@ -5,8 +5,11 @@ void gearoenix::core::ecs::World::create_entity_with_builder(EntityBuilder&& b) 
     const auto ai = get_archetype_index(b.components);
     const auto index = archetypes[ai].allocate_entity(b.id, b.components);
     entities.emplace(b.id, Entity(ai, index));
-    if (b.name.has_value())
+    if (b.name.has_value()) {
+        if (name_to_entity_id.contains(*b.name))
+            GX_LOG_F("Entity with name `" << *b.name << "' is already in the world.")
         name_to_entity_id.emplace(*b.name, b.id);
+    }
 }
 
 void gearoenix::core::ecs::World::delayed_create_entity_with_builder(EntityBuilder&& b) noexcept
@@ -142,7 +145,7 @@ void gearoenix::core::ecs::World::update() noexcept
     for (auto& action : actions) {
         switch (action.index()) {
         case 0:
-            (void)create_entity_with_builder(std::get<0>(std::move(action)));
+            create_entity_with_builder(std::get<0>(std::move(action)));
             break;
         case 1:
             remove_entity(std::get<1>(std::move(action)));

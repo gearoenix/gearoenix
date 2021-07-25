@@ -3,6 +3,7 @@
 #include "../../platform/gx-plt-application.hpp"
 #include "../../vulkan/engine/gx-vk-eng-engine.hpp"
 #include "../gltf/gx-rnd-gltf-loader.hpp"
+#include "../mesh/gx-rnd-msh-manager.hpp"
 #include "../scene/gx-rnd-scn-manager.hpp"
 
 #include <imgui.h>
@@ -12,7 +13,7 @@ gearoenix::render::engine::Engine::Engine(
     const platform::Application& platform_application) noexcept
     : engine_type(engine_type)
     , platform_application(platform_application)
-    , scene_manager(new scene::Manager(this))
+    , scene_manager(new scene::Manager(*this))
     , world(new core::ecs::World())
 {
 }

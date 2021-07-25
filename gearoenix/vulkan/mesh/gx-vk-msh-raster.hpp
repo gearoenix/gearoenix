@@ -3,8 +3,8 @@
 #include "../../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
 #include "../../core/sync/gx-cr-sync-end-caller.hpp"
-#include "../../math/gx-math-vertex.hpp"
-#include "../../render/mesh/gx-rnd-msh-mesh.hpp"
+#include "../../render/gx-rnd-vertex.hpp"
+#include "../../render/mesh/gx-rnd-msh-builder.hpp"
 
 namespace gearoenix::vulkan::buffer {
 struct Buffer;

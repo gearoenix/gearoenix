@@ -1,7 +1,6 @@
 #ifndef GEAROENIX_RENDER_ENGINE_ENGINE_HPP
 #define GEAROENIX_RENDER_ENGINE_ENGINE_HPP
 #include "../../core/sync/gx-cr-sync-end-caller.hpp"
-#include "../../math/gx-math-vertex.hpp"
 #include "../gx-rnd-runtime-configuration.hpp"
 #include "../texture/gx-rnd-txt-attachment.hpp"
 #include "gx-rnd-eng-limitations.hpp"
@@ -28,7 +27,7 @@ struct Application;
 }
 
 namespace gearoenix::render::mesh {
-struct Mesh;
+struct Manager;
 }
 
 namespace gearoenix::render::scene {
@@ -48,6 +47,7 @@ struct Engine {
     GX_GET_VAL_PRT(unsigned int, frame_number_from_start, static_cast<decltype(frame_number)>(-1))
     GX_GET_VAL_PRT(double, delta_time, 0.0f)
     GX_GET_UPTR_PRT(scene::Manager, scene_manager)
+    GX_GET_UPTR_PRT(mesh::Manager, mesh_manager)
     GX_GET_UPTR_PRT(core::ecs::World, world)
 
 protected:
@@ -61,11 +61,6 @@ public:
     virtual void start_frame() noexcept;
     virtual void end_frame() noexcept;
     virtual void upload_imgui_fonts() noexcept = 0;
-    virtual void create_mesh(
-        const std::string& name,
-        const std::vector<math::BasicVertex>& vertices,
-        const std::vector<std::uint32_t>& indices,
-        core::sync::EndCaller<mesh::Mesh>& c) noexcept = 0;
 };
 }
 #endif

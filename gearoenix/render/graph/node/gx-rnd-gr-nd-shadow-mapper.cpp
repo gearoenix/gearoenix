@@ -7,7 +7,7 @@
 #include "../../command/gx-rnd-cmd-manager.hpp"
 #include "../../material/gx-rnd-mat-pbr.hpp"
 #include "../../material/gx-rnd-mat-unlit.hpp"
-#include "../../mesh/gx-rnd-msh-mesh.hpp"
+#include "../../mesh/gx-rnd-msh-builder.hpp"
 #include "../../model/gx-rnd-mdl-mesh.hpp"
 #include "../../model/gx-rnd-mdl-model.hpp"
 #include "../../pipeline/gx-rnd-pip-shadow-mapper-resource-set.hpp"

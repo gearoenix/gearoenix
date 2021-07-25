@@ -1,9 +1,9 @@
 #include "gx-rnd-gltf-mesh-manager.hpp"
 #include "../../core/ecs/gx-cr-ecs-entity.hpp"
-#include "../../math/gx-math-vertex.hpp"
 #include "../../physics/gx-phs-boundary.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
-#include "../mesh/gx-rnd-msh-mesh.hpp"
+#include "../gx-rnd-vertex.hpp"
+#include "../mesh/gx-rnd-msh-builder.hpp"
 #include "gx-rnd-gltf-loader.hpp"
 #include <tiny_gltf.h>
 

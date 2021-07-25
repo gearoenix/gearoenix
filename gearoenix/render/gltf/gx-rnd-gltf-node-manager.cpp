@@ -1,8 +1,8 @@
 #include "gx-rnd-gltf-node-manager.hpp"
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
-#include "../../math/gx-math-vertex.hpp"
 #include "../../physics/gx-phs-transformation.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
+#include "../gx-rnd-vertex.hpp"
 #include "gx-rnd-gltf-loader.hpp"
 #include "gx-rnd-gltf-mesh-manager.hpp"
 #include <tiny_gltf.h>

@@ -9,7 +9,7 @@
 #include "../../command/gx-rnd-cmd-buffer.hpp"
 #include "../../command/gx-rnd-cmd-manager.hpp"
 #include "../../engine/gx-rnd-eng-engine.hpp"
-#include "../../mesh/gx-rnd-msh-mesh.hpp"
+#include "../../mesh/gx-rnd-msh-builder.hpp"
 #include "../../pipeline/gx-rnd-pip-manager.hpp"
 #include "../../pipeline/gx-rnd-pip-pipeline.hpp"
 #include "../../pipeline/gx-rnd-pip-radiance-convoluter-resource-set.hpp"

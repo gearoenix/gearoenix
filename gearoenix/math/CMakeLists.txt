@@ -24,6 +24,4 @@ SET(GX_ENGINE_MATH_SRC
         ${GX_ENGINE_MATH_SRC_DIR}/gx-math-vector-2d.hpp
         ${GX_ENGINE_MATH_SRC_DIR}/gx-math-vector-3d.hpp
         ${GX_ENGINE_MATH_SRC_DIR}/gx-math-vector-4d.hpp
-        ${GX_ENGINE_MATH_SRC_DIR}/gx-math-vertex.cpp
-        ${GX_ENGINE_MATH_SRC_DIR}/gx-math-vertex.hpp
         PARENT_SCOPE)
