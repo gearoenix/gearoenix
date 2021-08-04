@@ -3,7 +3,7 @@
 #include "../../../core/gx-cr-pool.hpp"
 #include "../../../core/sync/gx-cr-sync-end-caller.hpp"
 #include "../../../math/gx-math-matrix-4d.hpp"
-#include "../../material/gx-rnd-mat-translucency-mode.hpp"
+#include "gearoenix/render/gx-rnd-translucency-mode.hpp"
 #include "gx-rnd-gr-nd-node.hpp"
 #include <vector>
 

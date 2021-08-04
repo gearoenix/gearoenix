@@ -23,6 +23,7 @@ public:
         std::size_t scene_index,
         gltf::Loader& loader,
         const core::sync::EndCallerIgnored& c = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
+    Scene() noexcept;
     ~Scene() noexcept final;
     Scene(Scene&&) noexcept;
     void update() noexcept;

@@ -23,6 +23,7 @@ struct Pipeline;
 
 namespace gearoenix::vulkan::mesh {
 struct Accel;
+struct AccelBuilder;
 struct AccelComponent;
 struct AccelManager final : public Manager {
 private:
@@ -69,42 +70,50 @@ private:
     std::vector<std::pair<std::size_t, std::size_t>> texture_material;
     std::vector<std::pair<std::size_t, std::size_t>> cube_texture_material;
 
-    void create_accel(
+    [[nodiscard]] std::shared_ptr<AccelBuilder> create_accel(
         const std::string& name,
-        const std::vector<math::BasicVertex>& vertices,
+        const std::vector<render::PbrVertex>& vertices,
         const std::vector<std::uint32_t>& indices,
-        core::sync::EndCaller<render::mesh::Mesh>& c) noexcept;
+        math::Aabb3&& occlusion_box,
+        const core::sync::EndCallerIgnored& c) noexcept;
+
     void create_accel_after_vertices_ready(
-        std::string name,
+        std::string&& name,
         std::size_t vertices_count,
         std::size_t indices_count,
-        core::sync::EndCaller<render::mesh::Mesh> c,
-        std::shared_ptr<Accel> result) noexcept;
+        core::sync::EndCallerIgnored&& c,
+        std::shared_ptr<AccelBuilder>&& result) noexcept;
+
     void create_accel_after_query_ready(
-        std::string name,
-        std::shared_ptr<sync::Fence> fence,
-        core::sync::EndCaller<render::mesh::Mesh> c,
-        std::shared_ptr<Accel> result,
-        std::shared_ptr<query::Pool> query_pool) noexcept;
+        std::string&& name,
+        std::shared_ptr<sync::Fence>&& fence,
+        core::sync::EndCallerIgnored&& c,
+        std::shared_ptr<AccelBuilder>&& result,
+        std::shared_ptr<query::Pool>&& query_pool) noexcept;
+
     void create_accel_after_blas_copy(
-        core::sync::EndCaller<render::mesh::Mesh> c,
-        std::shared_ptr<Accel> result) noexcept;
+        core::sync::EndCallerIgnored&& c,
+        std::shared_ptr<AccelBuilder>&& result) noexcept;
 
     void update_instances() noexcept;
+
     void update_instances_system(
         AccelComponent& accel_com,
         const physics::Transformation& tran,
         unsigned int kernel_index) noexcept;
+
     void update_instances_buffers() noexcept;
+
+    std::shared_ptr<render::mesh::Builder> build(
+        const std::string& name,
+        const std::vector<render::PbrVertex>& vertices,
+        const std::vector<std::uint32_t>& indices,
+        math::Aabb3&& occlusion_box,
+        const core::sync::EndCallerIgnored& c) noexcept final;
 
 public:
     explicit AccelManager(engine::Engine& e) noexcept;
     ~AccelManager() noexcept final;
-    void create(
-        const std::string& name,
-        const std::vector<math::BasicVertex>& vertices,
-        const std::vector<std::uint32_t>& indices,
-        core::sync::EndCaller<render::mesh::Mesh>& c) noexcept final;
     void update() noexcept final;
 };
 }

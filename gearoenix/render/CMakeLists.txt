@@ -78,10 +78,8 @@ SET(GX_ENGINE_RENDER_SRC
 #        ${GX_ENGINE_RENDER_SRC_DIR}/light/gx-rnd-lt-point.cpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/light/gx-rnd-lt-point.hpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/light/gx-rnd-lt-type.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/material/gx-rnd-mat-material.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/material/gx-rnd-mat-material.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/material/gx-rnd-mat-pbr.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/material/gx-rnd-mat-pbr.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/material/gx-rnd-mat-pbr.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/material/gx-rnd-mat-pbr.hpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/material/gx-rnd-mat-skybox-cube.cpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/material/gx-rnd-mat-skybox-cube.hpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/material/gx-rnd-mat-skybox-equirectangular.cpp

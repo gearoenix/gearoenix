@@ -2,9 +2,7 @@
 #define GEAROENIX_VULKAN_MESH_MANAGER_HPP
 #include "../../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
-#include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
-#include "../../core/sync/gx-cr-sync-end-caller.hpp"
-#include "../../render/gx-rnd-vertex.hpp"
+#include "../../render/mesh/gx-rnd-msh-manager.hpp"
 
 namespace gearoenix::core::sync {
 struct WorkWaiter;
@@ -32,21 +30,16 @@ struct Fence;
 
 namespace gearoenix::vulkan::mesh {
 struct Accel;
-struct Manager {
-    constexpr static const auto* const NODE_NAME = "mesh-manager";
-    GX_GET_RRF_PRT(engine::Engine, e)
+struct Manager : public render::mesh::Manager {
+    constexpr static const char SUBMIT_NODE_NAME[] = "mesh-manager";
+    GX_GET_RRF_PRT(engine::Engine, vk_e)
 
 protected:
     explicit Manager(engine::Engine& e) noexcept;
 
 public:
     [[nodiscard]] static std::shared_ptr<Manager> construct(engine::Engine& e) noexcept;
-    virtual ~Manager() noexcept;
-    virtual void create(
-        const std::string& name,
-        const std::vector<math::BasicVertex>& vertices,
-        const std::vector<std::uint32_t>& indices,
-        core::sync::EndCaller<render::mesh::Mesh>& c) noexcept = 0;
+    ~Manager() noexcept override = default;
     virtual void update() noexcept = 0;
 };
 }

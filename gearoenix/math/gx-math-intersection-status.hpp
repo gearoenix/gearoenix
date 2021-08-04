@@ -1,6 +1,11 @@
-#ifndef GEAROENIX_MATH_INTERSECTION_SATUTS_HPP
-#define GEAROENIX_MATH_INTERSECTION_SATUTS_HPP
+#ifndef GEAROENIX_MATH_INTERSECTION_STATUS_HPP
+#define GEAROENIX_MATH_INTERSECTION_STATUS_HPP
 #include <ostream>
+
+#ifdef Above
+#undef Above
+#endif
+
 namespace gearoenix::math {
 enum struct IntersectionStatus {
     Above = 1,

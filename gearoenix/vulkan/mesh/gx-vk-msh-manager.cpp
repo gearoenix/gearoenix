@@ -2,10 +2,10 @@
 #ifdef GX_RENDER_VULKAN_ENABLED
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "gx-vk-msh-accel-manager.hpp"
-#include "gx-vk-msh-raster-manager.hpp"
 
 gearoenix::vulkan::mesh::Manager::Manager(engine::Engine& e) noexcept
-    : e(e)
+    : render::mesh::Manager(e)
+    , vk_e(e)
 {
 }
 
@@ -15,9 +15,6 @@ std::shared_ptr<gearoenix::vulkan::mesh::Manager> gearoenix::vulkan::mesh::Manag
     if (e.get_physical_device().get_rtx_supported())
         return std::make_shared<AccelManager>(e);
     else
-        return std::make_shared<RasterManager>(e);
+        GX_UNIMPLEMENTED
 }
-
-gearoenix::vulkan::mesh::Manager::~Manager() noexcept = default;
-
 #endif

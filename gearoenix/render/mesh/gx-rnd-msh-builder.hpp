@@ -9,8 +9,8 @@
 #include <string>
 #include <typeindex>
 
-namespace gearoenix::core::ecs {
-struct World;
+namespace gearoenix::render::engine {
+struct Engine;
 }
 
 namespace gearoenix::render::mesh {
@@ -22,13 +22,13 @@ protected:
     const math::Aabb3 occlusion_box;
 
     Builder(
-        core::ecs::World& world,
+        engine::Engine& e,
         const std::string& name,
         const std::vector<PbrVertex>& vertices,
         const std::vector<std::uint32_t>& indices,
-        const math::Aabb3& occlusion_box) noexcept;
+        math::Aabb3&& occlusion_box) noexcept;
 
-    void set_material(const std::type_index& material_type) noexcept;
+    virtual void set_material_type_index(const std::type_index& material_type) noexcept;
 
 public:
     Builder(Builder&&) = delete;
@@ -41,9 +41,8 @@ public:
     template <typename T>
     void set_material(T&& mat) noexcept
     {
-        static_assert(std::is_reference_v<T>, "Material type can not be reference.");
-        set_material(std::type_index(typeid(T)));
-        entity_builder->get_builder().add_component(std::move(mat));
+        entity_builder->get_builder().add_component(std::forward<T>(mat));
+        set_material_type_index(std::type_index(typeid(T)));
     }
 };
 }

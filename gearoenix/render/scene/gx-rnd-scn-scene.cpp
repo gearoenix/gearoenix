@@ -17,6 +17,11 @@ gearoenix::render::scene::Scene::Scene(
     std::sort(entities.begin(), entities.end());
 }
 
+gearoenix::render::scene::Scene::Scene() noexcept
+    : core::ecs::Component(this)
+{
+}
+
 gearoenix::render::scene::Scene::~Scene() noexcept = default;
 
 gearoenix::render::scene::Scene::Scene(Scene&&) noexcept = default;

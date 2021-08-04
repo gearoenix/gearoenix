@@ -87,15 +87,6 @@ void gearoenix::vulkan::engine::Engine::upload_imgui_fonts() noexcept
     imgui_manager->upload_fonts();
 }
 
-void gearoenix::vulkan::engine::Engine::create_mesh(
-    const std::string& name,
-    const std::vector<math::BasicVertex>& vertices,
-    const std::vector<std::uint32_t>& indices,
-    core::sync::EndCaller<render::mesh::Mesh>& c) noexcept
-{
-    mesh_manager->create(name, vertices, indices, c);
-}
-
 gearoenix::vulkan::engine::Frame& gearoenix::vulkan::engine::Engine::get_current_frame() noexcept
 {
     return *frames[swapchain_image_index];

@@ -43,10 +43,6 @@ private:
     GX_GETSET_CREF_PRV(std::optional<std::string>, name)
     components_t components;
 
-    constexpr static auto component_less = +[](const component_t& l, const std::type_index r) noexcept {
-        return l.first < r;
-    };
-
     explicit EntityBuilder(Entity::id_t) noexcept;
 
 public:
@@ -63,13 +59,15 @@ public:
         auto c = std::make_pair(
             Component::create_type_index<ComponentType>(),
             std::vector<std::uint8_t>(sizeof(ComponentType)));
-#ifdef GX_DEBUG_MODE
-        if (std::binary_search(components.begin(), components.end(), c, component_less))
+        const auto search = std::lower_bound(
+            components.begin(), components.end(), c.first,
+            [](const component_t& l, const std::type_index r) noexcept {
+                return l.first < r;
+            });
+        if (search != components.end() && search->first == c.first)
             GX_LOG_F("Component '" << typeid(ComponentType).name() << "' already exists in entity '" << id)
-#endif
         new (c.second.data()) ComponentType(std::forward<ComponentType>(component));
-        components.push_back(std::move(c));
-        sort(components);
+        components.insert(search, std::move(c));
     }
 
     template <typename... ComponentType>
@@ -81,7 +79,7 @@ public:
     [[nodiscard]] const void* get_component(std::type_index component_type) const noexcept;
 
     template <typename ComponentType>
-    std::optional<const ComponentType&> get_component() const noexcept
+    std::optional<std::reference_wrapper<const ComponentType>> get_component() const noexcept
     {
         const void* const ptr = get_component(std::type_index(typeid(ComponentType)));
         if (nullptr == ptr)

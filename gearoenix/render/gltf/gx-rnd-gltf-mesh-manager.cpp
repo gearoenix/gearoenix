@@ -23,7 +23,6 @@ void gearoenix::render::gltf::MeshManager::get(
         auto search = loaded_meshes.find(index);
         if (loaded_meshes.end() != search) {
             if (auto mesh = search->second.lock()) {
-                mesh->set_component(builder);
                 return;
             }
         }
@@ -93,7 +92,7 @@ void gearoenix::render::gltf::MeshManager::get(
         math::Vec3(pos_max[0], pos_max[1], pos_max[2]),
         math::Vec3(pos_min[0], pos_min[1], pos_min[2])));
 
-    std::vector<math::BasicVertex> vertices(pos_a.count);
+    std::vector<render::PbrVertex> vertices(pos_a.count);
     std::vector<std::uint32_t> indices(ids_a.count);
 
     const auto& pos_bv = bvs[pos_a.bufferView];
@@ -179,8 +178,8 @@ void gearoenix::render::gltf::MeshManager::get(
         GX_UNEXPECTED
     }
 
-    core::sync::EndCaller<mesh::Mesh> end([c, b { std::move(builder) }](const std::shared_ptr<mesh::Mesh>& m) noexcept {
-        m->set_component(b);
-    });
-    loader.get_e()->create_mesh(mesh.name, vertices, indices, end);
+    //    core::sync::EndCaller<mesh::Mesh> end([c, b { std::move(builder) }](const std::shared_ptr<mesh::Mesh>& m) noexcept {
+    //        m->set_component(b);
+    //    });
+    //    loader.get_e()->create_mesh(mesh.name, vertices, indices, end);
 }

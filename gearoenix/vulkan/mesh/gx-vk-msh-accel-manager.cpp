@@ -17,6 +17,7 @@
 #include "../queue/gx-vk-qu-queue.hpp"
 #include "../shader/gx-vk-shd-bindings.hpp"
 #include "../sync/gx-vk-sync-fence.hpp"
+#include "gx-vk-msh-accel-builder.hpp"
 #include "gx-vk-msh-accel-component.hpp"
 #include "gx-vk-msh-accel.hpp"
 #include <thread>
@@ -26,41 +27,34 @@ constexpr static const std::size_t default_init_material_descriptor_count = 100;
 constexpr static const std::size_t default_init_2d_texture_descriptor_count = 500;
 constexpr static const std::size_t default_init_cube_texture_descriptor_count = 10;
 
-void gearoenix::vulkan::mesh::AccelManager::create_accel(
+std::shared_ptr<gearoenix::vulkan::mesh::AccelBuilder> gearoenix::vulkan::mesh::AccelManager::create_accel(
     const std::string& name,
-    const std::vector<math::BasicVertex>& vertices,
+    const std::vector<render::PbrVertex>& vertices,
     const std::vector<std::uint32_t>& indices,
-    core::sync::EndCaller<render::mesh::Mesh>& c) noexcept
+    math::Aabb3&& occlusion_box,
+    const core::sync::EndCallerIgnored& c) noexcept
 {
-    core::sync::EndCaller<Accel> end([this,
-                                         name = name,
-                                         c = c,
-                                         vertices_count = vertices.size(),
-                                         indices_count = indices.size()](const auto& result) mutable noexcept {
-        accel_creator->push([this,
-                                name = std::move(name),
-                                c = std::move(c),
-                                vertices_count,
-                                indices_count,
-                                result]() mutable noexcept {
+    core::sync::EndCaller<AccelBuilder> end([this, name = name, c = c, vertices_count = vertices.size(), indices_count = indices.size()](const std::shared_ptr<AccelBuilder>& result) mutable noexcept {
+        accel_creator->push([this, name = std::move(name), c = std::move(c), vertices_count, indices_count, result = result]() mutable noexcept {
             create_accel_after_vertices_ready(std::move(name), vertices_count, indices_count, std::move(c), std::move(result));
         });
     });
-    c.set_data(Accel::construct(e, name, vertices, indices, end));
+    return AccelBuilder::construct(vk_e, name, vertices, indices, std::move(occlusion_box), end);
 }
 
 void gearoenix::vulkan::mesh::AccelManager::create_accel_after_vertices_ready(
-    std::string name,
+    std::string&& name,
     const std::size_t vertices_count,
     const std::size_t indices_count,
-    core::sync::EndCaller<render::mesh::Mesh> c,
-    std::shared_ptr<Accel> result) noexcept
+    core::sync::EndCallerIgnored&& c,
+    std::shared_ptr<AccelBuilder>&& result) noexcept
 {
-    auto& dev = e.get_logical_device();
-    auto& cmd_mgr = e.get_command_manager();
+    auto& dev = vk_e.get_logical_device();
+    auto& cmd_mgr = vk_e.get_command_manager();
     const auto vk_dev = dev.get_vulkan_data();
+    const auto& result_accel = result->get_accel();
 
-    const auto [vba, iba] = result->get_buffers_address();
+    const auto [vba, iba] = result_accel->get_buffers_address();
 
     VkAccelerationStructureGeometryKHR geo_info;
     GX_SET_ZERO(geo_info)
@@ -75,7 +69,7 @@ void gearoenix::vulkan::mesh::AccelManager::create_accel_after_vertices_ready(
     trs_info.maxVertex = static_cast<std::uint32_t>(vertices_count);
     trs_info.vertexData.deviceAddress = vba;
     trs_info.vertexFormat = VK_FORMAT_R32G32B32_SFLOAT;
-    trs_info.vertexStride = sizeof(math::BasicVertex);
+    trs_info.vertexStride = sizeof(render::PbrVertex);
 
     VkAccelerationStructureBuildRangeInfoKHR rng_info;
     GX_SET_ZERO(rng_info)
@@ -98,23 +92,23 @@ void gearoenix::vulkan::mesh::AccelManager::create_accel_after_vertices_ready(
         VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR,
         &bge_info, &rng_info.primitiveCount, &bsz_info);
 
-    result->accel_buff = std::move(e.get_buffer_manager().create_static(static_cast<std::size_t>(bsz_info.accelerationStructureSize)));
-    GX_CHECK_NOT_EQUAL_D(nullptr, result->accel_buff)
+    result_accel->accel_buff = std::move(vk_e.get_buffer_manager().create_static(static_cast<std::size_t>(bsz_info.accelerationStructureSize)));
+    GX_CHECK_NOT_EQUAL_D(nullptr, result_accel->accel_buff)
 
     VkAccelerationStructureCreateInfoKHR asc_info;
     GX_SET_ZERO(asc_info)
     asc_info.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_CREATE_INFO_KHR;
     asc_info.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
     asc_info.size = bsz_info.accelerationStructureSize;
-    asc_info.buffer = result->accel_buff->get_vulkan_data();
-    asc_info.offset = result->accel_buff->get_allocator()->get_offset();
+    asc_info.buffer = result_accel->accel_buff->get_vulkan_data();
+    asc_info.offset = result_accel->accel_buff->get_allocator()->get_offset();
 
-    GX_VK_CHK(vkCreateAccelerationStructureKHR(vk_dev, &asc_info, nullptr, &result->vulkan_data))
-    GX_VK_MARK(name + "-blas-temp", result->vulkan_data, e.get_logical_device())
+    GX_VK_CHK(vkCreateAccelerationStructureKHR(vk_dev, &asc_info, nullptr, &result_accel->vulkan_data))
+    GX_VK_MARK(name + "-blas-temp", result_accel->vulkan_data, vk_e.get_logical_device())
 
-    bge_info.dstAccelerationStructure = result->vulkan_data;
+    bge_info.dstAccelerationStructure = result_accel->vulkan_data;
 
-    auto scratch_buf = e.get_buffer_manager().create_static(static_cast<std::size_t>(bsz_info.buildScratchSize));
+    auto scratch_buf = vk_e.get_buffer_manager().create_static(static_cast<std::size_t>(bsz_info.buildScratchSize));
     GX_CHECK_NOT_EQUAL_D(nullptr, scratch_buf)
     const auto scratch_address = scratch_buf->get_device_address();
     bge_info.scratchData.deviceAddress = scratch_address;
@@ -123,43 +117,38 @@ void gearoenix::vulkan::mesh::AccelManager::create_accel_after_vertices_ready(
         dev, VK_QUERY_TYPE_ACCELERATION_STRUCTURE_COMPACTED_SIZE_KHR));
 
     auto cmd = std::make_shared<command::Buffer>(std::move(cmd_mgr.create(command::Type::Primary)));
-    GX_VK_MARK(name + "-blas-temp-cmd", cmd->get_vulkan_data(), e.get_logical_device())
+    GX_VK_MARK(name + "-blas-temp-cmd", cmd->get_vulkan_data(), vk_e.get_logical_device())
     cmd->begin();
     const auto* const rng_info_p = &rng_info;
     const auto* const* const rng_info_pp = &rng_info_p;
     cmd->build_acceleration_structure(bge_info, rng_info_pp);
-    cmd->barrier(*result->accel_buff,
+    cmd->barrier(*result_accel->accel_buff,
         { VK_ACCESS_ACCELERATION_STRUCTURE_WRITE_BIT_KHR, VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR },
         { VK_ACCESS_ACCELERATION_STRUCTURE_READ_BIT_KHR, VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR });
-    query_pool->issue_acceleration_structure_compacted_size(*cmd, result->vulkan_data);
+    query_pool->issue_acceleration_structure_compacted_size(*cmd, result_accel->vulkan_data);
     cmd->end();
     std::shared_ptr<sync::Fence> fence(new sync::Fence(dev));
-    e.get_graphic_queue()->submit(*cmd, *fence);
+    vk_e.get_graphic_queue()->submit(*cmd, *fence);
 
-    accel_creation_waiter->push([this,
-                                    name = std::move(name),
-                                    cmd = std::move(cmd),
-                                    fence = std::move(fence),
-                                    c = std::move(c),
-                                    result = std::move(result),
-                                    query_pool = std::move(query_pool)]() mutable noexcept {
+    accel_creation_waiter->push([this, name = std::move(name), cmd = std::move(cmd), fence = std::move(fence), c = std::move(c), result = std::move(result), query_pool = std::move(query_pool)]() mutable noexcept {
         create_accel_after_query_ready(std::move(name), std::move(fence), std::move(c), std::move(result), std::move(query_pool));
         accel_creator->push([cmd = std::move(cmd)] {});
     });
 }
 
 void gearoenix::vulkan::mesh::AccelManager::create_accel_after_query_ready(
-    std::string name,
-    std::shared_ptr<sync::Fence> fence,
-    core::sync::EndCaller<render::mesh::Mesh> c,
-    std::shared_ptr<Accel> result,
-    std::shared_ptr<query::Pool> query_pool) noexcept
+    std::string&& name,
+    std::shared_ptr<sync::Fence>&& fence,
+    core::sync::EndCallerIgnored&& c,
+    std::shared_ptr<AccelBuilder>&& result,
+    std::shared_ptr<query::Pool>&& query_pool) noexcept
 {
-    VkAccelerationStructureKHR old_accel = result->vulkan_data;
-    auto old_accel_buff = std::move(result->accel_buff);
+    const auto& result_accel = result->get_accel();
+    VkAccelerationStructureKHR old_accel = result_accel->vulkan_data;
+    auto old_accel_buff = std::move(result_accel->accel_buff);
 
-    auto& dev = e.get_logical_device();
-    auto& cmd_mgr = e.get_command_manager();
+    auto& dev = vk_e.get_logical_device();
+    auto& cmd_mgr = vk_e.get_command_manager();
     const auto vk_dev = dev.get_vulkan_data();
 
     fence->wait();
@@ -167,33 +156,33 @@ void gearoenix::vulkan::mesh::AccelManager::create_accel_after_query_ready(
 
     const auto compact_size = query_pool->get_acceleration_structure_compacted_size();
 
-    result->accel_buff = std::move(e.get_buffer_manager().create_static(static_cast<std::size_t>(compact_size)));
-    GX_CHECK_NOT_EQUAL_D(nullptr, result->accel_buff)
+    result_accel->accel_buff = std::move(vk_e.get_buffer_manager().create_static(static_cast<std::size_t>(compact_size)));
+    GX_CHECK_NOT_EQUAL_D(nullptr, result_accel->accel_buff)
 
     VkAccelerationStructureCreateInfoKHR asc_info;
     GX_SET_ZERO(asc_info)
     asc_info.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_CREATE_INFO_KHR;
     asc_info.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
     asc_info.size = compact_size;
-    asc_info.buffer = result->accel_buff->get_vulkan_data();
-    asc_info.offset = result->accel_buff->get_allocator()->get_offset();
+    asc_info.buffer = result_accel->accel_buff->get_vulkan_data();
+    asc_info.offset = result_accel->accel_buff->get_allocator()->get_offset();
 
-    GX_VK_CHK(vkCreateAccelerationStructureKHR(vk_dev, &asc_info, nullptr, &result->vulkan_data))
-    GX_VK_MARK(name + "-blas", result->vulkan_data, e.get_logical_device())
+    GX_VK_CHK(vkCreateAccelerationStructureKHR(vk_dev, &asc_info, nullptr, &result_accel->vulkan_data))
+    GX_VK_MARK(name + "-blas", result_accel->vulkan_data, vk_e.get_logical_device())
 
     auto cmd = std::make_shared<command::Buffer>(std::move(cmd_mgr.create(command::Type::Primary)));
-    GX_VK_MARK(name + "-blas-cmd", cmd->get_vulkan_data(), e.get_logical_device())
+    GX_VK_MARK(name + "-blas-cmd", cmd->get_vulkan_data(), vk_e.get_logical_device())
     cmd->begin();
     VkCopyAccelerationStructureInfoKHR copy_info;
     GX_SET_ZERO(copy_info)
     copy_info.sType = VK_STRUCTURE_TYPE_COPY_ACCELERATION_STRUCTURE_INFO_KHR;
     copy_info.src = old_accel;
-    copy_info.dst = result->vulkan_data;
+    copy_info.dst = result_accel->vulkan_data;
     copy_info.mode = VK_COPY_ACCELERATION_STRUCTURE_MODE_COMPACT_KHR;
     vkCmdCopyAccelerationStructureKHR(cmd->get_vulkan_data(), &copy_info);
     cmd->end();
 
-    e.get_graphic_queue()->submit(*cmd, *fence);
+    vk_e.get_graphic_queue()->submit(*cmd, *fence);
     accel_creation_waiter->push([this,
                                     old_accel = old_accel,
                                     old_accel_buff = std::move(old_accel_buff),
@@ -211,10 +200,10 @@ void gearoenix::vulkan::mesh::AccelManager::create_accel_after_query_ready(
 }
 
 void gearoenix::vulkan::mesh::AccelManager::create_accel_after_blas_copy(
-    core::sync::EndCaller<render::mesh::Mesh>,
-    std::shared_ptr<Accel> result) noexcept
+    [[maybe_unused]] core::sync::EndCallerIgnored&& c,
+    std::shared_ptr<AccelBuilder>&& result) noexcept
 {
-    result->initialize_blas();
+    result->get_accel()->initialize_blas();
 }
 
 // This is mainly for performance reason
@@ -222,7 +211,7 @@ static VkBuffer gpu_buffer_vulkan_data = nullptr;
 
 void gearoenix::vulkan::mesh::AccelManager::update_instances() noexcept
 {
-    gpu_buffer_vulkan_data = e.get_buffer_manager().get_gpu_root_buffer()->get_vulkan_data();
+    gpu_buffer_vulkan_data = vk_e.get_buffer_manager().get_gpu_root_buffer()->get_vulkan_data();
     e.get_world()->parallel_system<AccelComponent, physics::Transformation>(
         [this](core::ecs::Entity::id_t, AccelComponent& accel_com, physics::Transformation& tran, const unsigned int kernel_index) noexcept {
             update_instances_system(accel_com, tran, kernel_index);
@@ -306,13 +295,13 @@ void gearoenix::vulkan::mesh::AccelManager::update_instances_buffers() noexcept
         return;
 
     auto& frame = frames[e.get_frame_number()];
-    auto& dev = e.get_logical_device();
+    auto& dev = vk_e.get_logical_device();
     auto vk_dev = dev.get_vulkan_data();
     const auto instances_size = instances.size() * sizeof(VkAccelerationStructureInstanceKHR);
     const bool needs_new_instances_buffer = (max_instances_size < instances_size);
     max_instances_size = needs_new_instances_buffer ? instances_size : max_instances_size;
     const auto& previous_frame = frames[e.get_previous_frame_number()];
-    auto& buff_mgr = e.get_buffer_manager();
+    auto& buff_mgr = vk_e.get_buffer_manager();
     if (nullptr == previous_frame.instances_gpu || needs_new_instances_buffer) {
         frame.instances_gpu = buff_mgr.create_static(instances_size);
     } else {
@@ -431,7 +420,7 @@ void gearoenix::vulkan::mesh::AccelManager::update_instances_buffers() noexcept
     VkDescriptorImageInfo out_img_wdi;
     GX_SET_ZERO(out_img_wdi)
     out_img_wdi.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
-    out_img_wdi.imageView = e.get_current_framebuffer().get_view()->get_vulkan_data();
+    out_img_wdi.imageView = vk_e.get_current_framebuffer().get_view()->get_vulkan_data();
     des_write_info[GX_VK_BIND_RAY_OUT_IMAGE].pImageInfo = &out_img_wdi;
 
     frame.descriptor_set->write(des_write_info, GX_VK_BIND_RAY_MAX);
@@ -523,7 +512,7 @@ gearoenix::vulkan::mesh::AccelManager::AccelManager(engine::Engine& e) noexcept
 
     auto cmds = e.get_graphic_queue()->place_node_between(
         queue::Queue::START_FRAME,
-        NODE_NAME,
+        SUBMIT_NODE_NAME,
         VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR,
         ImGuiManager::NODE_NAME);
     auto& des_mgr = e.get_descriptor_manager();
@@ -538,13 +527,14 @@ gearoenix::vulkan::mesh::AccelManager::AccelManager(engine::Engine& e) noexcept
 
 gearoenix::vulkan::mesh::AccelManager::~AccelManager() noexcept = default;
 
-void gearoenix::vulkan::mesh::AccelManager::create(
+std::shared_ptr<gearoenix::render::mesh::Builder> gearoenix::vulkan::mesh::AccelManager::build(
     const std::string& name,
-    const std::vector<math::BasicVertex>& vertices,
+    const std::vector<render::PbrVertex>& vertices,
     const std::vector<std::uint32_t>& indices,
-    core::sync::EndCaller<render::mesh::Mesh>& c) noexcept
+    math::Aabb3&& occlusion_box,
+    const core::sync::EndCallerIgnored& c) noexcept
 {
-    create_accel(name, vertices, indices, c);
+    return create_accel(name, vertices, indices, std::move(occlusion_box), c);
 }
 
 void gearoenix::vulkan::mesh::AccelManager::update() noexcept

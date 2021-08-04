@@ -4,6 +4,7 @@
 #include "../../math/gx-math-aabb.hpp"
 #include "../gx-rnd-vertex.hpp"
 #include "../texture/gx-rnd-txt-face.hpp"
+#include <map>
 #include <memory>
 
 namespace gearoenix::platform::stream {
@@ -18,7 +19,7 @@ namespace gearoenix::render::mesh {
 struct Mesh;
 struct Builder;
 struct Manager {
-private:
+protected:
     engine::Engine& e;
 
     std::weak_ptr<Mesh> icosphere;
@@ -27,9 +28,13 @@ private:
     std::weak_ptr<Mesh> inward_cube;
     std::map<texture::Face, std::weak_ptr<Mesh>> face_squares;
 
+    explicit Manager(engine::Engine& e) noexcept
+        : e(e)
+    {
+    }
+
 public:
-    explicit Manager(engine::Engine& e) noexcept;
-    ~Manager() noexcept = default;
+    virtual ~Manager() noexcept;
 
     [[nodiscard]] std::shared_ptr<Builder> build_icosphere(const core::sync::EndCallerIgnored& c = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
     [[nodiscard]] std::shared_ptr<Builder> build_plate(const core::sync::EndCallerIgnored& c = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
@@ -41,7 +46,7 @@ public:
         const std::string& name,
         const std::vector<PbrVertex>& vertices,
         const std::vector<std::uint32_t>& indices,
-        const math::Aabb3& occlusion_box,
+        math::Aabb3&& occlusion_box,
         const core::sync::EndCallerIgnored& c) noexcept = 0;
 
     [[nodiscard]] std::shared_ptr<Builder> build(

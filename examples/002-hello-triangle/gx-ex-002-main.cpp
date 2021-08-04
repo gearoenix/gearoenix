@@ -23,7 +23,7 @@ struct GameApp final : public gearoenix::core::Application {
         std::vector<std::uint32_t> indices = { 0, 1, 2 };
 
         auto mesh_builder = render_engine->get_mesh_manager()->build("triangle", vertices, indices);
-        mesh_builder->add_material(gearoenix::render::material::Pbr(*render_engine));
+        mesh_builder->set_material(gearoenix::render::material::Pbr());
 
         auto camera_builder = render_engine->get_camera_manager()->build();
         camera_builder->get_transformation()->set_position(0.0f, 0.0f, 5.0f);

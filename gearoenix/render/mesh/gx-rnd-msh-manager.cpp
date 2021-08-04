@@ -1,12 +1,8 @@
 #include "gx-rnd-msh-manager.hpp"
 #include "../../core/asset/gx-cr-asset-manager.hpp"
 #include "gx-rnd-msh-builder.hpp"
-#include <utility>
 
-gearoenix::render::mesh::Manager::Manager(engine::Engine& e) noexcept
-    : e(e)
-{
-}
+gearoenix::render::mesh::Manager::~Manager() noexcept = default;
 
 //std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager::create_plate(core::sync::EndCaller<Mesh>& c) noexcept
 //{
@@ -543,5 +539,5 @@ std::shared_ptr<gearoenix::render::mesh::Builder> gearoenix::render::mesh::Manag
         occlusion_box.put_without_update(math::Vec3<double>(vertex.position));
     }
     occlusion_box.update();
-    return build(name, vertices, indices, occlusion_box, c);
+    return build(name, vertices, indices, std::move(occlusion_box), c);
 }
