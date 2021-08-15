@@ -1,6 +1,7 @@
 #include <gearoenix/core/gx-cr-application.hpp>
 #include <gearoenix/platform/gx-plt-application.hpp>
 #include <gearoenix/platform/gx-plt-log.hpp>
+#include <gearoenix/render/camera/gx-rnd-cmr-manager.hpp>
 #include <gearoenix/render/engine/gx-rnd-eng-engine.hpp>
 #include <gearoenix/render/gx-rnd-vertex.hpp>
 #include <gearoenix/render/material/gx-rnd-mat-pbr.hpp>
@@ -27,6 +28,7 @@ struct GameApp final : public gearoenix::core::Application {
 
         auto camera_builder = render_engine->get_camera_manager()->build();
         camera_builder->get_transformation()->set_position(0.0f, 0.0f, 5.0f);
+        camera_builder->set_projection();
 
         const auto scene_builder = render_engine->get_scene_manager()->build();
         scene_builder->add(std::move(mesh_builder));

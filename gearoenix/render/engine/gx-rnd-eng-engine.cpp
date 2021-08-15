@@ -2,10 +2,10 @@
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
 #include "../../platform/gx-plt-application.hpp"
 #include "../../vulkan/engine/gx-vk-eng-engine.hpp"
+#include "../camera/gx-rnd-cmr-manager.hpp"
 #include "../gltf/gx-rnd-gltf-loader.hpp"
 #include "../mesh/gx-rnd-msh-manager.hpp"
 #include "../scene/gx-rnd-scn-manager.hpp"
-
 #include <imgui.h>
 
 gearoenix::render::engine::Engine::Engine(
@@ -15,6 +15,7 @@ gearoenix::render::engine::Engine::Engine(
     , platform_application(platform_application)
     , scene_manager(new scene::Manager(*this))
     , world(new core::ecs::World())
+    , camera_manager(new camera::Manager(*this))
 {
 }
 

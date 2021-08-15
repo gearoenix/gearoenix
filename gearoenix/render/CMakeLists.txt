@@ -2,20 +2,20 @@ SET(GX_ENGINE_RENDER_SRC_DIR ${GX_ENGINE_SRC_DIR}/render)
 SET(GX_ENGINE_RENDER_SRC
 #        ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-arc-controller.cpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-arc-controller.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-builder.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-builder.hpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-camera.cpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-camera.hpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-jet-controller.cpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-jet-controller.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-manager.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-manager.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-manager.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-manager.hpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-orthographic.cpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-orthographic.hpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-perspective.cpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-perspective.hpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-transformation.cpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-transformation.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-uniform.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-uniform.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/engine/gx-rnd-eng-engine.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/engine/gx-rnd-eng-engine.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/engine/gx-rnd-eng-limitations.hpp

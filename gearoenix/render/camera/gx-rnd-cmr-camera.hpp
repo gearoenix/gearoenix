@@ -6,7 +6,7 @@
 #include "../../core/gx-cr-static.hpp"
 #include "../../math/gx-math-ray.hpp"
 #include "../material/gx-rnd-mat-type.hpp"
-#include "gx-rnd-cmr-uniform.hpp"
+#include "gx-rnd-cmr-builder.hpp"
 #include <array>
 #include <memory>
 #include <tuple>

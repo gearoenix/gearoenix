@@ -3,6 +3,7 @@
 #include "../../platform/macro/gx-plt-mcr-lock.hpp"
 #include "gx-cr-ecs-archetype.hpp"
 #include "gx-cr-ecs-entity.hpp"
+#include <memory>
 #include <variant>
 
 namespace gearoenix::core::ecs {
