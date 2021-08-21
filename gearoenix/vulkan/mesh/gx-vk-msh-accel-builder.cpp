@@ -31,6 +31,10 @@ std::shared_ptr<gearoenix::vulkan::mesh::AccelBuilder> gearoenix::vulkan::mesh::
     return result;
 }
 
+void gearoenix::vulkan::mesh::AccelBuilder::set_material_type_index(const std::type_index& material_type) noexcept {
+    GX_TODO
+}
+
 gearoenix::vulkan::mesh::AccelBuilder::~AccelBuilder() noexcept = default;
 
 #endif

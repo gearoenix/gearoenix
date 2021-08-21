@@ -1,5 +1,6 @@
 #ifndef GEAROENIX_RENDER_CAMERA_MANAGER_HPP
 #define GEAROENIX_RENDER_CAMERA_MANAGER_HPP
+#include "gx-rnd-cmr-builder.hpp"
 #include <memory>
 
 namespace gearoenix::render::engine {

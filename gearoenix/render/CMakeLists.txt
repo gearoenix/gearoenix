@@ -172,5 +172,7 @@ SET(GX_ENGINE_RENDER_SRC
 #        ${GX_ENGINE_RENDER_SRC_DIR}/widget/gx-rnd-wdg-widget.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/gx-rnd-build-configuration.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/gx-rnd-runtime-configuration.cpp
-        ${GX_ENGINE_RENDER_SRC_DIR}/gx-rnd-runtime-configuration.hpp)
+        ${GX_ENGINE_RENDER_SRC_DIR}/gx-rnd-runtime-configuration.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/gx-rnd-vertex.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/gx-rnd-vertex.hpp)
 SET(GX_ENGINE_RENDER_SRC ${GX_ENGINE_RENDER_SRC} PARENT_SCOPE)

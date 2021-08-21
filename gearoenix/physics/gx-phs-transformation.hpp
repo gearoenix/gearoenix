@@ -20,6 +20,7 @@ public:
     [[nodiscard]] math::Vec3<double> get_location() const noexcept;
     void get_location(math::Vec3<double>& l) const noexcept;
     void set_location(const math::Vec3<double>& l) noexcept;
+    void set_location(double x, double y, double z) noexcept;
     void translate(const math::Vec3<double>& t) noexcept;
     void local_x_translate(double v) noexcept;
     void local_y_translate(double v) noexcept;

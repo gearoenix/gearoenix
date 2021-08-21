@@ -26,6 +26,16 @@ gearoenix::render::scene::Scene::~Scene() noexcept = default;
 
 gearoenix::render::scene::Scene::Scene(Scene&&) noexcept = default;
 
+void gearoenix::render::scene::Scene::add_mesh(const core::ecs::Entity::id_t entity) noexcept
+{
+    mesh_entities.insert(std::upper_bound(mesh_entities.begin(), mesh_entities.end(), entity), entity);
+}
+
+void gearoenix::render::scene::Scene::add_camera(const core::ecs::Entity::id_t entity) noexcept
+{
+    camera_entities.insert(std::upper_bound(camera_entities.begin(), camera_entities.end(), entity), entity);
+}
+
 void gearoenix::render::scene::Scene::update() noexcept
 {
 }

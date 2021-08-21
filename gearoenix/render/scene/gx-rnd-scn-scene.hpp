@@ -16,6 +16,8 @@ struct Loader;
 namespace gearoenix::render::scene {
 struct Scene final : public core::ecs::Component {
     GX_GET_CREF_PRV(std::vector<core::ecs::Entity::id_t>, entities)
+    GX_GET_CREF_PRV(std::vector<core::ecs::Entity::id_t>, mesh_entities)
+    GX_GET_CREF_PRV(std::vector<core::ecs::Entity::id_t>, camera_entities)
 
 public:
     Scene(
@@ -26,6 +28,8 @@ public:
     Scene() noexcept;
     ~Scene() noexcept final;
     Scene(Scene&&) noexcept;
+    void add_mesh(core::ecs::Entity::id_t entity) noexcept;
+    void add_camera(core::ecs::Entity::id_t entity) noexcept;
     void update() noexcept;
 };
 }

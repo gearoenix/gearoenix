@@ -24,6 +24,11 @@ void gearoenix::physics::Transformation::set_location(const math::Vec3<double>& 
     matrix.set_location(l);
 }
 
+void gearoenix::physics::Transformation::set_location(const double x, const double y, const double z) noexcept
+{
+    matrix.set_location(math::Vec3(x, y, z));
+}
+
 void gearoenix::physics::Transformation::translate(const math::Vec3<double>& t) noexcept
 {
     matrix.translate(t);

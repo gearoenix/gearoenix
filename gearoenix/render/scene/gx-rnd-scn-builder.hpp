@@ -1,6 +1,7 @@
 #ifndef GEAROENIX_RENDER_SCENE_BUILDER_HPP
 #define GEAROENIX_RENDER_SCENE_BUILDER_HPP
 #include <memory>
+#include <vector>
 
 namespace gearoenix::core::ecs {
 struct World;
@@ -21,6 +22,8 @@ struct Builder final {
 
 private:
     const std::shared_ptr<core::ecs::EntitySharedBuilder> entity_builder;
+    std::vector<std::shared_ptr<mesh::Builder>> mesh_builders;
+    std::vector<std::shared_ptr<camera::Builder>> camera_builders;
 
     explicit Builder(core::ecs::World& world) noexcept;
 

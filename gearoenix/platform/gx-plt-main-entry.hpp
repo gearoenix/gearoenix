@@ -3,7 +3,7 @@
 #include "gx-plt-build-configuration.hpp"
 
 #ifdef GX_PLATFORM_INTERFACE_WIN32
-#include "windows/gx-plt-win-main-entry.hpp"
+#include "win32/gx-plt-win-main-entry.hpp"
 #elif defined(GX_PLATFORM_INTERFACE_SDL2)
 #include "sdl2/gx-plt-sdl2-main-entry.hpp"
 #else

@@ -1,8 +1,17 @@
 #ifndef GEAROENIX_RENDER_CAMERA_BUILDER_HPP
 #define GEAROENIX_RENDER_CAMERA_BUILDER_HPP
-#include "../../core/ecs/gx-cr-ecs-entity.hpp"
+#include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "gx-rnd-cmr-projection.hpp"
 #include <memory>
+#include <string>
+
+namespace gearoenix::core::ecs {
+struct EntitySharedBuilder;
+}
+
+namespace gearoenix::physics {
+struct Transformation;
+}
 
 namespace gearoenix::render::engine {
 struct Engine;
@@ -13,8 +22,7 @@ struct Manager;
 struct Builder final {
     friend struct Manager;
 
-private:
-    const std::shared_ptr<core::ecs::EntitySharedBuilder> entity_builder;
+    GX_GET_REFC_PRV(std::shared_ptr<core::ecs::EntitySharedBuilder>, entity_builder)
 
 public:
     Builder(Builder&&) = delete;
@@ -22,10 +30,12 @@ public:
     Builder& operator=(Builder&&) = delete;
     Builder& operator=(const Builder&) = delete;
 
-    Builder(engine::Engine& e) noexcept;
+    Builder(engine::Engine& e, const std::string& name) noexcept;
     ~Builder() noexcept;
 
-    void set_projection() noexcept;
+    [[nodiscard]] physics::Transformation& get_transformation() noexcept;
+    [[nodiscard]] const physics::Transformation& get_transformation() const noexcept;
+    void set(Projection) noexcept;
 };
 // struct Uniform {
 //     math::Vec3<float> position = math::Vec3(0.0f, 0.0f, 0.0f);

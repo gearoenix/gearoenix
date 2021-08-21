@@ -28,7 +28,7 @@ public:
 
     explicit Manager(engine::Engine& e) noexcept;
     ~Manager() noexcept;
-    [[nodiscard]] std::shared_ptr<Builder> create_builder() noexcept;
+    [[nodiscard]] std::shared_ptr<Builder> build() noexcept;
 };
 }
 #endif

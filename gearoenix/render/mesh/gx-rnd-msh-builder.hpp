@@ -17,7 +17,7 @@ namespace gearoenix::render::mesh {
 /// TODO add instancing later
 struct Builder {
 protected:
-    const std::shared_ptr<core::ecs::EntitySharedBuilder> entity_builder;
+    GX_GET_REFC_PRV(std::shared_ptr<core::ecs::EntitySharedBuilder>, entity_builder)
     const std::string name;
     const math::Aabb3 occlusion_box;
 

@@ -43,6 +43,18 @@ const void* gearoenix::core::ecs::EntityBuilder::get_component(const std::type_i
     return search->second.data();
 }
 
+void* gearoenix::core::ecs::EntityBuilder::get_component(const std::type_index component_type) noexcept
+{
+    const auto search = std::lower_bound(
+        components.begin(), components.end(), component_type,
+        [](const component_t& rhs, const std::type_index ti) noexcept -> bool {
+            return rhs.first < ti;
+        });
+    if (components.end() == search)
+        return nullptr;
+    return search->second.data();
+}
+
 void gearoenix::core::ecs::EntityBuilder::sort(components_t& cs) noexcept
 {
     std::sort(cs.begin(), cs.end(), [](const component_t& l, const component_t& r) noexcept -> bool {
