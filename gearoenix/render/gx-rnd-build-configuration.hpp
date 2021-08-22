@@ -25,8 +25,8 @@
 #include "../platform/gx-plt-build-configuration.hpp"
 
 #ifdef GX_PLATFORM_WINDOWS
-#define GX_RENDER_VULKAN_ENABLED
-//#define GX_RENDER_DIRECT3DX_ENABLED
+//#define GX_RENDER_VULKAN_ENABLED
+#define GX_RENDER_DIRECT3DX_ENABLED
 //#define GX_RENDER_OPENGL_ENABLED
 #elif defined(GX_PLATFORM_LINUX)
 #define GX_RENDER_VULKAN_ENABLED

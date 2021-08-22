@@ -1,0 +1,15 @@
+SET(GX_ENGINE_D3D_SRC_DIR ${GX_ENGINE_SRC_DIR}/direct3dx)
+SET(GX_ENGINE_D3D_SRC
+        ${GX_ENGINE_D3D_SRC_DIR}/gx-d3d-adapter.cpp
+        ${GX_ENGINE_D3D_SRC_DIR}/gx-d3d-adapter.hpp
+        ${GX_ENGINE_D3D_SRC_DIR}/gx-d3d-check.hpp
+        ${GX_ENGINE_D3D_SRC_DIR}/gx-d3d-device.cpp
+        ${GX_ENGINE_D3D_SRC_DIR}/gx-d3d-device.hpp
+        ${GX_ENGINE_D3D_SRC_DIR}/gx-d3d-engine.cpp
+        ${GX_ENGINE_D3D_SRC_DIR}/gx-d3d-engine.hpp
+        ${GX_ENGINE_D3D_SRC_DIR}/gx-d3d-loader.hpp
+        ${GX_ENGINE_D3D_SRC_DIR}/gx-d3d-queue.cpp
+        ${GX_ENGINE_D3D_SRC_DIR}/gx-d3d-queue.hpp
+        ${GX_ENGINE_D3D_SRC_DIR}/gx-d3d-swapchain.cpp
+        ${GX_ENGINE_D3D_SRC_DIR}/gx-d3d-swapchain.hpp
+        PARENT_SCOPE)

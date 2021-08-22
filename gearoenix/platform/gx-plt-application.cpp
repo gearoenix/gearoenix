@@ -1,7 +1,6 @@
 #include "gx-plt-application.hpp"
 #include "../core/gx-cr-application.hpp"
 #include "../render/engine/gx-rnd-eng-engine.hpp"
-#include "gx-plt-log.hpp"
 #include <imgui.h>
 
 gearoenix::platform::BaseApplication::BaseApplication(GX_MAIN_ENTRY_ARGS_DEF, const RuntimeConfiguration& configuration) noexcept

@@ -1,11 +1,19 @@
 #include "gx-rnd-eng-engine.hpp"
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
 #include "../../platform/gx-plt-application.hpp"
-#include "../../vulkan/engine/gx-vk-eng-engine.hpp"
 #include "../camera/gx-rnd-cmr-manager.hpp"
 #include "../gltf/gx-rnd-gltf-loader.hpp"
 #include "../mesh/gx-rnd-msh-manager.hpp"
 #include "../scene/gx-rnd-scn-manager.hpp"
+
+#ifdef GX_RENDER_VULKAN_ENABLED
+#include "../../vulkan/engine/gx-vk-eng-engine.hpp"
+#endif
+
+#ifdef GX_RENDER_DIRECT3DX_ENABLED
+#include "../../direct3dx/gx-d3d-engine.hpp"
+#endif
+
 #include <imgui.h>
 
 gearoenix::render::engine::Engine::Engine(
@@ -39,8 +47,8 @@ std::unique_ptr<gearoenix::render::engine::Engine> gearoenix::render::engine::En
     }
 #endif
 #ifdef GX_RENDER_DIRECT3DX_ENABLED
-    if (result == nullptr && configuration.get_direct3dx_render_backend_enabled() && direct3dx::engine::Engine::is_supported()) {
-        result = direct3dx::engine::Engine::construct(configuration, std::move(platform_application));
+    if (result == nullptr && configuration.get_direct3dx_render_backend_enabled() && direct3dx::Engine::is_supported()) {
+        result = direct3dx::Engine::construct(platform_application);
     }
 #endif
 #ifdef GX_RENDER_METAL_ENABLED

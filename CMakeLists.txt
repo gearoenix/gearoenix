@@ -72,22 +72,28 @@ IF(LINUX)
             m dl asound pthread pulse-simple pulse X11 Xext Xcursor Xinerama Xi Xrandr Xss Xxf86vm drm gbm
             wayland-egl wayland-client wayland-cursor xkbcommon rt)
 ELSEIF(MSVC)
+    SET(GX_COMMON_LIBS winmm version oleaut32 imm32 setupapi d3d12 dxgi dxguid)
     SET(GX_DEBUG_LIBS
             ${GX_DEBUG_LIBS}
             ${GX_SDL2_BUILD_DIRS}/Release/SDL2-static.lib
             ${GX_SDL2_BUILD_DIRS}/Release/SDL2main.lib
-            winmm version oleaut32 imm32 setupapi)
+            ${GX_COMMON_LIBS})
     SET(GX_RELEASE_LIBS
             ${GX_RELEASE_LIBS}
             ${GX_SDL2_BUILD_DIRS}/Release/SDL2-static.lib
             ${GX_SDL2_BUILD_DIRS}/Release/SDL2main.lib
-            winmm version oleaut32 imm32 setupapi)
+            ${GX_COMMON_LIBS})
 ENDIF()
 
 SET(GX_STB_PATH "${GX_SDK_PATH}/stb")
 GX_DOWNLOAD_FILE("https://github.com/nothings/stb/archive/master.zip" "${GX_STB_PATH}")
 SET(GX_STB_INCLUDE_DIRS "${GX_STB_PATH}")
 INCLUDE_DIRECTORIES(${GX_STB_INCLUDE_DIRS})
+
+SET(GX_D3D_PATH "${GX_SDK_PATH}/d3d")
+GX_DOWNLOAD_FILE("https://github.com/microsoft/DirectX-Headers/archive/refs/heads/main.zip" "${GX_D3D_PATH}")
+SET(GX_D3D_INCLUDE_DIRS "${GX_D3D_PATH}/include/directx")
+INCLUDE_DIRECTORIES(${GX_D3D_INCLUDE_DIRS})
 
 SET(GX_VULKAN_HEADERS_PATH "${GX_SDK_PATH}/vulkan-headers")
 GX_DOWNLOAD_FILE("https://github.com/KhronosGroup/Vulkan-Headers/archive/master.zip" "${GX_VULKAN_HEADERS_PATH}")

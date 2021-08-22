@@ -10,11 +10,8 @@ std::ostream& operator<<(std::ostream& os, const Type t) noexcept
     case Type::OpenGL:
         os << "OpenGL";
         break;
-    case Type::DirectX11:
-        os << "DirectX11";
-        break;
-    case Type::DirectX12:
-        os << "DirectX12";
+    case Type::Direct3DX:
+        os << "Direct3DX";
         break;
     case Type::Metal:
         os << "Metal";
