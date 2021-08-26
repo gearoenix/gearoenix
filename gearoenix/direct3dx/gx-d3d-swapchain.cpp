@@ -192,4 +192,9 @@ void gearoenix::direct3dx::Swapchain::wait_for_gpu() noexcept
     ++frames[back_buffer_index].fence_value;
 }
 
+const Microsoft::WRL::ComPtr<ID3D12CommandAllocator> gearoenix::direct3dx::Swapchain::get_current_command_allocator() const noexcept
+{
+    return frames[back_buffer_index].command_allocator;
+}
+
 #endif

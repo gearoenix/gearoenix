@@ -26,7 +26,7 @@ struct Swapchain final {
     GX_GET_REFC_PRV(std::shared_ptr<Device>, device)
     GX_GET_CREF_PRV(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>, rtv_descriptor_heap)
     GX_GET_CREF_PRV(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>, dsv_descriptor_heap)
-    GX_GET_CREF_PRV(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>, command_list)
+    GX_GET_CREF_PRV(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList6>, command_list)
     GX_GET_CREF_PRV(Microsoft::WRL::ComPtr<ID3D12Fence>, fence)
     GX_GET_CREF_PRV(Microsoft::WRL::ComPtr<IDXGISwapChain4>, swapchain)
     GX_GET_CREF_PRV(Microsoft::WRL::ComPtr<ID3D12Resource>, depth_stencil)
@@ -42,6 +42,7 @@ struct Swapchain final {
     /// Returns true if device is lost.
     [[nodiscard]] bool set_window_size(const platform::Application&) noexcept;
     void wait_for_gpu() noexcept;
+    [[nodiscard]] const Microsoft::WRL::ComPtr<ID3D12CommandAllocator> get_current_command_allocator() const noexcept;
 };
 }
 
