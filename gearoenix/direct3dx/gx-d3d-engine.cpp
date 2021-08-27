@@ -8,6 +8,7 @@
 #include "gx-d3d-check.hpp"
 #include "gx-d3d-device.hpp"
 #include "gx-d3d-queue.hpp"
+#include "gx-d3d-shader.hpp"
 #include "gx-d3d-swapchain.hpp"
 #include <d3dx12.h>
 #include <dxgidebug.h>
@@ -73,7 +74,7 @@ void gearoenix::direct3dx::Engine::initialize_ray_tracing_resources() noexcept
     // Build shader tables, which define shaders and their local root arguments.
     build_shader_tables();
     // Create an output 2D texture to store the raytracing result to.
-    //CreateRaytracingOutputResource();
+    //create_raytracing_output_resource();
 }
 
 enum struct GlobalRootSignatureParams {
@@ -85,18 +86,6 @@ enum struct GlobalRootSignatureParams {
 enum struct LocalRootSignatureParams {
     ViewportConstantSlot = 0,
     Count
-};
-
-struct Viewport final {
-    float left;
-    float top;
-    float right;
-    float bottom;
-};
-
-struct RayGenConstantBuffer final {
-    Viewport viewport;
-    Viewport stencil;
 };
 
 void gearoenix::direct3dx::Engine::create_root_signatures() noexcept
@@ -250,7 +239,9 @@ void gearoenix::direct3dx::Engine::create_descriptor_heap() noexcept
 typedef UINT16 GxIndex;
 
 struct GxVertex final {
-    float x, y, z;
+    float x = -1.0f;
+    float y = -1.0f;
+    float z = -1.0f;
 };
 
 void gearoenix::direct3dx::Engine::build_geometry() noexcept
@@ -422,8 +413,49 @@ void gearoenix::direct3dx::Engine::build_acceleration_structures() noexcept
     swapchain->wait_for_gpu();
 }
 
-void gearoenix::direct3dx::Engine::build_shader_tables()
+void gearoenix::direct3dx::Engine::build_shader_tables() noexcept
 {
+    auto* const dev = device->get_device().Get();
+
+    // Get shader identifiers.
+    Microsoft::WRL::ComPtr<ID3D12StateObjectProperties> state_object_properties;
+    GX_D3D_CHECK(state_object.As(&state_object_properties))
+    void* const ray_gen_shader_identifier = state_object_properties->GetShaderIdentifier(GX_RAYGEN_SHADER_NAME);
+    void* const miss_shader_identifier = state_object_properties->GetShaderIdentifier(GX_MISS_SHADER_NAME);
+    void* const hit_group_shader_identifier = state_object_properties->GetShaderIdentifier(GX_HIT_GROUP_NAME);
+    const UINT shader_identifier_size = D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
+
+    // Ray gen shader table
+    {
+        struct RootArguments final {
+            RayGenConstantBuffer cb;
+        } root_arguments;
+        root_arguments.cb = ray_gen_cb;
+
+        const UINT num_shader_records = 1;
+        const UINT shader_record_size = shader_identifier_size + sizeof(root_arguments);
+        ShaderTable ray_gen_shader_table_builder(dev, num_shader_records, shader_record_size, L"RayGenShaderTable");
+        ray_gen_shader_table_builder.push_back(ShaderRecord(ray_gen_shader_identifier, shader_identifier_size, &root_arguments, sizeof(root_arguments)));
+        ray_gen_shader_table = ray_gen_shader_table_builder.get_resource();
+    }
+
+    // Miss shader table
+    {
+        const UINT num_shader_records = 1;
+        const UINT shader_record_size = shader_identifier_size;
+        ShaderTable miss_shader_table_builder(dev, num_shader_records, shader_record_size, L"MissShaderTable");
+        miss_shader_table_builder.push_back(ShaderRecord(miss_shader_identifier, shader_identifier_size));
+        miss_shader_table = miss_shader_table_builder.get_resource();
+    }
+
+    // Hit group shader table
+    {
+        const UINT num_shader_records = 1;
+        const UINT shader_record_size = shader_identifier_size;
+        ShaderTable hit_group_shader_table_builder(dev, num_shader_records, shader_record_size, L"HitGroupShaderTable");
+        hit_group_shader_table_builder.push_back(ShaderRecord(hit_group_shader_identifier, shader_identifier_size));
+        hit_group_shader_table = hit_group_shader_table_builder.get_resource();
+    }
 }
 
 gearoenix::direct3dx::Engine::~Engine() noexcept

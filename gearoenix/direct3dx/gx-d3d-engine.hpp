@@ -14,7 +14,21 @@ struct Adapter;
 struct Device;
 struct Queue;
 struct Swapchain;
+
+struct Viewport final {
+    float left = -1.0f;
+    float top = -1.0f;
+    float right = 1.0f;
+    float bottom = 1.0f;
+};
+
+struct RayGenConstantBuffer final {
+    Viewport viewport;
+    Viewport stencil;
+};
+
 struct Engine final : public render::engine::Engine {
+    RayGenConstantBuffer ray_gen_cb;
     GX_GET_RRF_PRV(platform::Application, platform_application)
     GX_GET_CREF_PRV(std::shared_ptr<Adapter>, adapter)
     GX_GET_CREF_PRV(std::shared_ptr<Device>, device)
@@ -28,6 +42,9 @@ struct Engine final : public render::engine::Engine {
     Microsoft::WRL::ComPtr<ID3D12Resource> vertex_buffer;
     Microsoft::WRL::ComPtr<ID3D12Resource> bottom_level_acceleration_structure;
     Microsoft::WRL::ComPtr<ID3D12Resource> top_level_acceleration_structure;
+    Microsoft::WRL::ComPtr<ID3D12Resource> ray_gen_shader_table;
+    Microsoft::WRL::ComPtr<ID3D12Resource> miss_shader_table;
+    Microsoft::WRL::ComPtr<ID3D12Resource> hit_group_shader_table;
     UINT descriptor_size = 0;
 
 private:
