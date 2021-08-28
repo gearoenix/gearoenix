@@ -78,6 +78,8 @@ private:
     void build_shader_tables() noexcept;
     void create_raytracing_output_resource() noexcept;
     [[nodiscard]] UINT allocate_descriptor(D3D12_CPU_DESCRIPTOR_HANDLE& cpu_descriptor, UINT descriptor_index_to_use) noexcept;
+    void do_raytracing() noexcept;
+    void copy_raytracing_output_to_back_buffer() noexcept;
 
 public:
     Engine(Engine&&) = delete;

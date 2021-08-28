@@ -42,7 +42,13 @@ struct Swapchain final {
     /// Returns true if device is lost.
     [[nodiscard]] bool set_window_size(const platform::Application&) noexcept;
     void wait_for_gpu() noexcept;
-    [[nodiscard]] const Microsoft::WRL::ComPtr<ID3D12CommandAllocator> get_current_command_allocator() const noexcept;
+    [[nodiscard]] const Microsoft::WRL::ComPtr<ID3D12CommandAllocator>& get_current_command_allocator() const noexcept;
+    [[nodiscard]] const Microsoft::WRL::ComPtr<ID3D12Resource>& get_current_render_target() const noexcept;
+    void prepare(D3D12_RESOURCE_STATES before_state) noexcept;
+    [[nodiscard]] bool present(D3D12_RESOURCE_STATES before_state) noexcept;
+
+private:
+    void move_to_next_frame() noexcept;
 };
 }
 

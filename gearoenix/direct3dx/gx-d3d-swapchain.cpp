@@ -192,9 +192,69 @@ void gearoenix::direct3dx::Swapchain::wait_for_gpu() noexcept
     ++frames[back_buffer_index].fence_value;
 }
 
-const Microsoft::WRL::ComPtr<ID3D12CommandAllocator> gearoenix::direct3dx::Swapchain::get_current_command_allocator() const noexcept
+const Microsoft::WRL::ComPtr<ID3D12CommandAllocator>& gearoenix::direct3dx::Swapchain::get_current_command_allocator() const noexcept
 {
     return frames[back_buffer_index].command_allocator;
+}
+
+const Microsoft::WRL::ComPtr<ID3D12Resource>& gearoenix::direct3dx::Swapchain::get_current_render_target() const noexcept
+{
+    return frames[back_buffer_index].render_target;
+}
+
+void gearoenix::direct3dx::Swapchain::prepare(const D3D12_RESOURCE_STATES before_state) noexcept
+{
+    auto& frame = frames[back_buffer_index];
+    const auto& command_allocator = frame.command_allocator;
+    // Reset command list and allocator.
+    GX_D3D_CHECK(command_allocator->Reset())
+    GX_D3D_CHECK(command_list->Reset(command_allocator.Get(), nullptr))
+    if (D3D12_RESOURCE_STATE_RENDER_TARGET != before_state) {
+        // Transition the render target into the correct state to allow for drawing into it.
+        D3D12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+            frame.render_target.Get(), before_state, D3D12_RESOURCE_STATE_RENDER_TARGET);
+        command_list->ResourceBarrier(1, &barrier);
+    }
+}
+
+bool gearoenix::direct3dx::Swapchain::present(const D3D12_RESOURCE_STATES before_state) noexcept
+{
+    const auto& frame = frames[back_buffer_index];
+    auto* const render_target = frame.render_target.Get();
+    if (D3D12_RESOURCE_STATE_PRESENT != before_state) {
+        // Transition the render target to the state that allows it to be presented to the display.
+        const auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(render_target, before_state, D3D12_RESOURCE_STATE_PRESENT);
+        command_list->ResourceBarrier(1, &barrier);
+    }
+    GX_D3D_CHECK(command_list->Close())
+    ID3D12CommandList* command_lists[] = { command_list.Get() };
+    queue->get_command_queue()->ExecuteCommandLists(1, command_lists);
+    const auto hr = swapchain->Present(1, 0);
+    // If the device was reset we must completely reinitialize the renderer.
+    if (hr == DXGI_ERROR_DEVICE_REMOVED || hr == DXGI_ERROR_DEVICE_RESET) {
+        GX_LOG_D("Device lost.")
+        return true;
+    } else {
+        GX_D3D_CHECK(hr)
+        move_to_next_frame();
+    }
+    return false;
+}
+
+void gearoenix::direct3dx::Swapchain::move_to_next_frame() noexcept
+{
+    // Schedule a Signal command in the queue.
+    const UINT64 current_fence_value = frames[back_buffer_index].fence_value;
+    GX_D3D_CHECK(queue->get_command_queue()->Signal(fence.Get(), current_fence_value));
+    // Update the back buffer index.
+    back_buffer_index = swapchain->GetCurrentBackBufferIndex();
+    // If the next frame is not ready to be rendered yet, wait until it is ready.
+    if (fence->GetCompletedValue() < frames[back_buffer_index].fence_value) {
+        GX_D3D_CHECK(fence->SetEventOnCompletion(frames[back_buffer_index].fence_value, fence_event.Get()))
+        WaitForSingleObjectEx(fence_event.Get(), INFINITE, FALSE);
+    }
+    // Set the fence value for the next frame.
+    frames[back_buffer_index].fence_value = current_fence_value + 1;
 }
 
 #endif

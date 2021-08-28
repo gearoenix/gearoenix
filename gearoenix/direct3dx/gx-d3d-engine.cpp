@@ -499,6 +499,68 @@ UINT gearoenix::direct3dx::Engine::allocate_descriptor(
     return descriptor_index_to_use;
 }
 
+void gearoenix::direct3dx::Engine::do_raytracing() noexcept
+{
+    const auto& base_plt_app = platform_application.get_base();
+    auto* const command_list = swapchain->get_command_list().Get();
+    command_list->SetComputeRootSignature(raytracing_global_root_signature.Get());
+    // Bind the heaps, acceleration structure and dispatch rays.
+    D3D12_DISPATCH_RAYS_DESC dispatch_desc;
+    GX_SET_ZERO(dispatch_desc)
+    command_list->SetDescriptorHeaps(1, descriptor_heap.GetAddressOf());
+    command_list->SetComputeRootDescriptorTable(
+        static_cast<UINT>(GlobalRootSignatureParams::OutputViewSlot),
+        raytracing_output_resource_uav_gpu_descriptor);
+    command_list->SetComputeRootShaderResourceView(
+        static_cast<UINT>(GlobalRootSignatureParams::AccelerationStructureSlot),
+        top_level_acceleration_structure->GetGPUVirtualAddress());
+    // Since each shader table has only one shader record, the stride is same as the size.
+    dispatch_desc.HitGroupTable.StartAddress = hit_group_shader_table->GetGPUVirtualAddress();
+    dispatch_desc.HitGroupTable.SizeInBytes = hit_group_shader_table->GetDesc().Width;
+    dispatch_desc.HitGroupTable.StrideInBytes = dispatch_desc.HitGroupTable.SizeInBytes;
+    dispatch_desc.MissShaderTable.StartAddress = miss_shader_table->GetGPUVirtualAddress();
+    dispatch_desc.MissShaderTable.SizeInBytes = miss_shader_table->GetDesc().Width;
+    dispatch_desc.MissShaderTable.StrideInBytes = dispatch_desc.MissShaderTable.SizeInBytes;
+    dispatch_desc.RayGenerationShaderRecord.StartAddress = ray_gen_shader_table->GetGPUVirtualAddress();
+    dispatch_desc.RayGenerationShaderRecord.SizeInBytes = ray_gen_shader_table->GetDesc().Width;
+    dispatch_desc.Width = static_cast<UINT>(base_plt_app.get_window_width());
+    dispatch_desc.Height = static_cast<UINT>(base_plt_app.get_window_height());
+    dispatch_desc.Depth = 1;
+    command_list->SetPipelineState1(state_object.Get());
+    command_list->DispatchRays(&dispatch_desc);
+}
+
+void gearoenix::direct3dx::Engine::copy_raytracing_output_to_back_buffer() noexcept
+{
+    auto* const command_list = swapchain->get_command_list().Get();
+    auto* const render_target = swapchain->get_current_render_target().Get();
+
+    const D3D12_RESOURCE_BARRIER pre_copy_barriers[] {
+        CD3DX12_RESOURCE_BARRIER::Transition(
+            render_target,
+            D3D12_RESOURCE_STATE_RENDER_TARGET,
+            D3D12_RESOURCE_STATE_COPY_DEST),
+        CD3DX12_RESOURCE_BARRIER::Transition(
+            raytracing_output.Get(),
+            D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
+            D3D12_RESOURCE_STATE_COPY_SOURCE),
+    };
+    command_list->ResourceBarrier(GX_COUNT_OF(pre_copy_barriers), pre_copy_barriers);
+    command_list->CopyResource(render_target, raytracing_output.Get());
+
+    const D3D12_RESOURCE_BARRIER post_copy_barriers[] {
+        CD3DX12_RESOURCE_BARRIER::Transition(
+            render_target,
+            D3D12_RESOURCE_STATE_COPY_DEST,
+            D3D12_RESOURCE_STATE_PRESENT),
+        CD3DX12_RESOURCE_BARRIER::Transition(
+            raytracing_output.Get(),
+            D3D12_RESOURCE_STATE_COPY_SOURCE,
+            D3D12_RESOURCE_STATE_UNORDERED_ACCESS),
+    };
+    command_list->ResourceBarrier(GX_COUNT_OF(post_copy_barriers), post_copy_barriers);
+}
+
 gearoenix::direct3dx::Engine::~Engine() noexcept
 {
     world = nullptr;
@@ -525,6 +587,13 @@ void gearoenix::direct3dx::Engine::start_frame() noexcept
 void gearoenix::direct3dx::Engine::end_frame() noexcept
 {
     render::engine::Engine::end_frame();
+    // TODO: check window is available and shown and ready for render
+    swapchain->prepare(D3D12_RESOURCE_STATE_PRESENT);
+    do_raytracing();
+    copy_raytracing_output_to_back_buffer();
+    if (swapchain->present(D3D12_RESOURCE_STATE_PRESENT)) {
+        device_lost_handle();
+    }
 }
 
 void gearoenix::direct3dx::Engine::upload_imgui_fonts() noexcept
