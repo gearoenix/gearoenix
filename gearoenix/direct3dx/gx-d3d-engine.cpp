@@ -74,7 +74,7 @@ void gearoenix::direct3dx::Engine::initialize_ray_tracing_resources() noexcept
     // Build shader tables, which define shaders and their local root arguments.
     build_shader_tables();
     // Create an output 2D texture to store the raytracing result to.
-    //create_raytracing_output_resource();
+    create_raytracing_output_resource();
 }
 
 enum struct GlobalRootSignatureParams {
@@ -456,6 +456,47 @@ void gearoenix::direct3dx::Engine::build_shader_tables() noexcept
         hit_group_shader_table_builder.push_back(ShaderRecord(hit_group_shader_identifier, shader_identifier_size));
         hit_group_shader_table = hit_group_shader_table_builder.get_resource();
     }
+}
+
+void gearoenix::direct3dx::Engine::create_raytracing_output_resource() noexcept
+{
+    auto* const dev = device->get_device().Get();
+    auto& base_plt_app = platform_application.get_base();
+    // Create the output resource. The dimensions and format should match the swap-chain.
+    const auto uav_desc = CD3DX12_RESOURCE_DESC::Tex2D(
+        Swapchain::BACK_BUFFER_FORMAT,
+        static_cast<UINT64>(base_plt_app.get_window_width()),
+        static_cast<UINT64>(base_plt_app.get_window_height()),
+        1, 1, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
+    const auto default_heap_properties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
+    GX_D3D_CHECK(dev->CreateCommittedResource(
+        &default_heap_properties, D3D12_HEAP_FLAG_NONE, &uav_desc, D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
+        nullptr, IID_PPV_ARGS(&raytracing_output)))
+    raytracing_output->SetName(L"raytracing_output");
+    D3D12_CPU_DESCRIPTOR_HANDLE uav_descriptor_handle;
+    raytracing_output_resource_uav_descriptor_heap_index = allocate_descriptor(
+        uav_descriptor_handle, raytracing_output_resource_uav_descriptor_heap_index);
+    D3D12_UNORDERED_ACCESS_VIEW_DESC uav_description;
+    GX_SET_ZERO(uav_description)
+    uav_description.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
+    dev->CreateUnorderedAccessView(raytracing_output.Get(), nullptr, &uav_description, uav_descriptor_handle);
+    raytracing_output_resource_uav_gpu_descriptor = CD3DX12_GPU_DESCRIPTOR_HANDLE(
+        descriptor_heap->GetGPUDescriptorHandleForHeapStart(),
+        static_cast<INT>(raytracing_output_resource_uav_descriptor_heap_index),
+        descriptor_size);
+}
+
+UINT gearoenix::direct3dx::Engine::allocate_descriptor(
+    D3D12_CPU_DESCRIPTOR_HANDLE& cpu_descriptor,
+    UINT descriptor_index_to_use) noexcept
+{
+    const auto descriptor_heap_cpu_base = descriptor_heap->GetCPUDescriptorHandleForHeapStart();
+    if (descriptor_index_to_use >= descriptor_heap->GetDesc().NumDescriptors) {
+        descriptor_index_to_use = descriptors_allocated++;
+    }
+    cpu_descriptor = CD3DX12_CPU_DESCRIPTOR_HANDLE(
+        descriptor_heap_cpu_base, static_cast<INT>(descriptor_index_to_use), descriptor_size);
+    return descriptor_index_to_use;
 }
 
 gearoenix::direct3dx::Engine::~Engine() noexcept

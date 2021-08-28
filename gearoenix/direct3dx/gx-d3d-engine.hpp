@@ -45,7 +45,11 @@ struct Engine final : public render::engine::Engine {
     Microsoft::WRL::ComPtr<ID3D12Resource> ray_gen_shader_table;
     Microsoft::WRL::ComPtr<ID3D12Resource> miss_shader_table;
     Microsoft::WRL::ComPtr<ID3D12Resource> hit_group_shader_table;
-    UINT descriptor_size = 0;
+    Microsoft::WRL::ComPtr<ID3D12Resource> raytracing_output;
+    UINT raytracing_output_resource_uav_descriptor_heap_index = static_cast<UINT>(-1);
+    D3D12_GPU_DESCRIPTOR_HANDLE raytracing_output_resource_uav_gpu_descriptor { 0 };
+    UINT descriptor_size = static_cast<UINT>(-1);
+    UINT descriptors_allocated = 0;
 
 private:
     explicit Engine(platform::Application& platform_application) noexcept;
@@ -72,6 +76,8 @@ private:
         const wchar_t* resource_name) noexcept;
     void build_acceleration_structures() noexcept;
     void build_shader_tables() noexcept;
+    void create_raytracing_output_resource() noexcept;
+    [[nodiscard]] UINT allocate_descriptor(D3D12_CPU_DESCRIPTOR_HANDLE& cpu_descriptor, UINT descriptor_index_to_use) noexcept;
 
 public:
     Engine(Engine&&) = delete;
