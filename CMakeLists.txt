@@ -26,13 +26,10 @@ IF (GX_COVERAGE_ENABLED)
 ENDIF (GX_COVERAGE_ENABLED)
 
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake/)
-INCLUDE(gx-builder)
 INCLUDE(gx-compile-lib)
 INCLUDE(gx-download-file)
 INCLUDE(gx-flag-util)
 INCLUDE(gx-imgui)
-
-GX_FIND_BUILDER()
 
 MESSAGE(STATUS "Gearoenix is going to be compiled for ${CMAKE_SYSTEM_NAME}")
 
@@ -75,13 +72,9 @@ ELSEIF(MSVC)
     SET(GX_COMMON_LIBS winmm version oleaut32 imm32 setupapi d3d12 dxgi dxguid)
     SET(GX_DEBUG_LIBS
             ${GX_DEBUG_LIBS}
-            ${GX_SDL2_BUILD_DIRS}/Release/SDL2-static.lib
-            ${GX_SDL2_BUILD_DIRS}/Release/SDL2main.lib
             ${GX_COMMON_LIBS})
     SET(GX_RELEASE_LIBS
             ${GX_RELEASE_LIBS}
-            ${GX_SDL2_BUILD_DIRS}/Release/SDL2-static.lib
-            ${GX_SDL2_BUILD_DIRS}/Release/SDL2main.lib
             ${GX_COMMON_LIBS})
 ENDIF()
 

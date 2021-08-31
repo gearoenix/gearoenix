@@ -20,31 +20,38 @@ gearoenix::direct3dx::Adapter::Adapter() noexcept
         GX_D3D_CHECK(CreateDXGIFactory2(DXGI_CREATE_FACTORY_DEBUG, IID_PPV_ARGS(&factory)))
         dxgi_info_queue->SetBreakOnSeverity(DXGI_DEBUG_ALL, DXGI_INFO_QUEUE_MESSAGE_SEVERITY_ERROR, true);
         dxgi_info_queue->SetBreakOnSeverity(DXGI_DEBUG_ALL, DXGI_INFO_QUEUE_MESSAGE_SEVERITY_CORRUPTION, true);
+        dxgi_info_queue->SetBreakOnSeverity(DXGI_DEBUG_ALL, DXGI_INFO_QUEUE_MESSAGE_SEVERITY_WARNING, true);
     }
 #endif
     if (nullptr == factory) {
         GX_D3D_CHECK(CreateDXGIFactory1(IID_PPV_ARGS(&factory)))
     }
-    BOOL allow_tearing = FALSE;
-    if (FAILED(factory->CheckFeatureSupport(DXGI_FEATURE_PRESENT_ALLOW_TEARING, &allow_tearing, sizeof(allow_tearing))) || !allow_tearing) {
-        GX_LOG_E("Variable refresh rate displays are not supported.")
-    }
     bool adapter_not_found = true;
     for (UINT adapter_id = 0; DXGI_ERROR_NOT_FOUND != factory->EnumAdapterByGpuPreference(adapter_id, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE, IID_PPV_ARGS(&adapter)); ++adapter_id) {
         DXGI_ADAPTER_DESC1 desc;
+        GX_LOG_D("Adapter description: " << core::String::to_string(desc.Description))
         GX_D3D_CHECK(adapter->GetDesc1(&desc))
-        if (desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE)
+        if (desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE) {
+            GX_LOG_D("Adapter is software.")
             continue;
-        Microsoft::WRL::ComPtr<ID3D12Device> test_device;
-        if (FAILED(D3D12CreateDevice(adapter.Get(), MINIMUM_FEATURE_LEVEL, IID_PPV_ARGS(&test_device))))
+        }
+        Microsoft::WRL::ComPtr<ID3D12Device8> test_device;
+        if (FAILED(D3D12CreateDevice(adapter.Get(), MINIMUM_FEATURE_LEVEL, IID_PPV_ARGS(&test_device)))) {
+            GX_LOG_D("Adapter doesn't support minimum required feature level.")
             continue;
+        }
         D3D12_FEATURE_DATA_D3D12_OPTIONS5 feature_support_data;
         GX_SET_ZERO(feature_support_data)
-        if (FAILED(test_device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS5, &feature_support_data, sizeof(feature_support_data))))
+        if (FAILED(test_device->CheckFeatureSupport(
+                D3D12_FEATURE_D3D12_OPTIONS5, &feature_support_data, sizeof(feature_support_data)))) {
+            GX_LOG_D("Device doesn't support feature option 5.")
             continue;
-        if (feature_support_data.RaytracingTier == D3D12_RAYTRACING_TIER_NOT_SUPPORTED)
+        }
+        if (feature_support_data.RaytracingTier == D3D12_RAYTRACING_TIER_NOT_SUPPORTED) {
+            GX_LOG_D("Device doesn't support raytracing.")
             continue;
-        GX_LOG_D("Adapter description: " << core::String::to_string(desc.Description))
+        }
+        GX_LOG_D("Adapter with description: " << core::String::to_string(desc.Description) << " has been accepted")
         adapter_not_found = false;
         break;
     }

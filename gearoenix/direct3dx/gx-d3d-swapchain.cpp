@@ -63,7 +63,7 @@ bool gearoenix::direct3dx::Swapchain::set_window_size(const platform::Applicatio
             window_width,
             window_height,
             BACK_BUFFER_FORMAT,
-            DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING);
+            0);
 
         if (hr == DXGI_ERROR_DEVICE_REMOVED || hr == DXGI_ERROR_DEVICE_RESET) {
             GX_LOG_D("Device lost on resize.")
@@ -84,7 +84,6 @@ bool gearoenix::direct3dx::Swapchain::set_window_size(const platform::Applicatio
         swap_chain_desc.Scaling = DXGI_SCALING_STRETCH;
         swap_chain_desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
         swap_chain_desc.AlphaMode = DXGI_ALPHA_MODE_IGNORE;
-        swap_chain_desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
 
         DXGI_SWAP_CHAIN_FULLSCREEN_DESC fs_swapchain_desc;
         GX_SET_ZERO(fs_swapchain_desc)
@@ -111,9 +110,6 @@ bool gearoenix::direct3dx::Swapchain::set_window_size(const platform::Applicatio
             //    Win32Application::SetWindowZorderToTopMost(true);
             // }
             GX_D3D_CHECK(base_swapchain.As(&swapchain))
-            // With tearing support enabled we will handle ALT+Enter key presses in the
-            // window message loop rather than let DXGI handle it by calling SetFullscreenState.
-            factory->MakeWindowAssociation(platform_application.get_window(), DXGI_MWA_NO_ALT_ENTER);
     }
     // Obtain the back buffers for this window which will be the final render targets
     // and create render target views for each of them.
@@ -152,7 +148,7 @@ bool gearoenix::direct3dx::Swapchain::set_window_size(const platform::Applicatio
         D3D12_RESOURCE_STATE_DEPTH_WRITE,
         &depth_optimized_clear_value,
         IID_PPV_ARGS(&depth_stencil)))
-    depth_stencil->SetName(L"Depth stencil");
+    depth_stencil->SetName(L"DepthStencil");
     D3D12_DEPTH_STENCIL_VIEW_DESC dsv_desc;
     GX_SET_ZERO(dsv_desc)
     dsv_desc.Format = DEPTH_BUFFER_FORMAT;
@@ -160,8 +156,8 @@ bool gearoenix::direct3dx::Swapchain::set_window_size(const platform::Applicatio
     dev->CreateDepthStencilView(depth_stencil.Get(), &dsv_desc, dsv_descriptor_heap->GetCPUDescriptorHandleForHeapStart());
     // Set the 3D rendering viewport and scissor rectangle to target the entire window.
     screen_viewport.TopLeftX = screen_viewport.TopLeftY = 0.f;
-    screen_viewport.Width = static_cast<float>(window_width);
-    screen_viewport.Height = static_cast<float>(window_height);
+    screen_viewport.Width = static_cast<FLOAT>(window_width);
+    screen_viewport.Height = static_cast<FLOAT>(window_height);
     screen_viewport.MinDepth = D3D12_MIN_DEPTH;
     screen_viewport.MaxDepth = D3D12_MAX_DEPTH;
     scissor_rect.left = scissor_rect.top = 0;
