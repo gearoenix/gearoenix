@@ -10,8 +10,8 @@
 #include "../../vulkan/engine/gx-vk-eng-engine.hpp"
 #endif
 
-#ifdef GX_RENDER_DIRECT3DX_ENABLED
-#include "../../direct3dx/gx-d3d-engine.hpp"
+#ifdef GX_RENDER_DXR_ENABLED
+#include "../../dxr/gx-dxr-engine.hpp"
 #endif
 
 #include <imgui.h>
@@ -46,9 +46,9 @@ std::unique_ptr<gearoenix::render::engine::Engine> gearoenix::render::engine::En
         result = std::make_unique<vulkan::engine::Engine>(platform_application);
     }
 #endif
-#ifdef GX_RENDER_DIRECT3DX_ENABLED
-    if (result == nullptr && configuration.get_direct3dx_render_backend_enabled() && direct3dx::Engine::is_supported()) {
-        result = direct3dx::Engine::construct(platform_application);
+#ifdef GX_RENDER_DXR_ENABLED
+    if (result == nullptr && configuration.get_direct3dx_render_backend_enabled() && dxr::Engine::is_supported()) {
+        result = dxr::Engine::construct(platform_application);
     }
 #endif
 #ifdef GX_RENDER_METAL_ENABLED

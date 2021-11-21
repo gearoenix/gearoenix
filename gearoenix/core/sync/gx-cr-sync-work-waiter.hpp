@@ -4,7 +4,8 @@
 #include <functional>
 
 #ifndef GX_THREAD_NOT_SUPPORTED
-#include <memory>
+#include "../gx-cr-function-loader.hpp"
+#include "gx-cr-sync-semaphore.hpp"
 #include <thread>
 #endif
 
@@ -13,13 +14,7 @@ struct FunctionLoader;
 }
 
 namespace gearoenix::core::sync {
-
-#ifndef GX_THREAD_NOT_SUPPORTED
-struct Semaphore;
-#endif
-
 struct WorkWaiter final {
-
 #ifndef GX_THREAD_NOT_SUPPORTED
 private:
     enum struct State {
@@ -28,8 +23,8 @@ private:
         Terminated,
     };
 
-    const std::unique_ptr<Semaphore> semaphore;
-    const std::unique_ptr<FunctionLoader> function_loader;
+    Semaphore semaphore;
+    FunctionLoader function_loader;
     std::thread thread;
     State state = State::Working;
 

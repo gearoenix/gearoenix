@@ -1,13 +1,13 @@
-#include "gx-d3d-device.hpp"
-#ifdef GX_RENDER_DIRECT3DX_ENABLED
+#include "gx-dxr-device.hpp"
+#ifdef GX_RENDER_DXR_ENABLED
 #include "../core/gx-cr-build-configuration.hpp"
 #include "../core/macro/gx-cr-mcr-counter.hpp"
 #include "../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../platform/gx-plt-application.hpp"
-#include "gx-d3d-adapter.hpp"
-#include "gx-d3d-check.hpp"
+#include "gx-dxr-adapter.hpp"
+#include "gx-dxr-check.hpp"
 
-gearoenix::direct3dx::Device::Device(std::shared_ptr<Adapter> _adapter) noexcept
+gearoenix::dxr::Device::Device(std::shared_ptr<Adapter> _adapter) noexcept
     : adapter(std::move(_adapter))
 {
     if (FAILED(D3D12CreateDevice(

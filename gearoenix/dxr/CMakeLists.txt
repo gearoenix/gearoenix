@@ -1,0 +1,25 @@
+SET(GX_ENGINE_DXR_SRC_DIR ${GX_ENGINE_SRC_DIR}/dxr)
+SET(GX_ENGINE_DXR_SRC
+        ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-adapter.cpp
+        ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-adapter.hpp
+        ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-buffer.cpp
+        ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-buffer.hpp
+        ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-check.hpp
+        ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-descriptor.cpp
+        ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-descriptor.hpp
+        ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-device.cpp
+        ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-device.hpp
+        ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-engine.cpp
+        ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-engine.hpp
+        ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-loader.hpp
+        ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-queue.cpp
+        ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-queue.hpp
+        ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-shader.cpp
+        ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-shader.hpp
+        ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-swapchain.cpp
+        ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-swapchain.hpp
+        ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-texture.cpp
+        ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-texture.hpp
+        ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-uploader.cpp
+        ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-uploader.hpp
+        PARENT_SCOPE)

@@ -1,14 +1,14 @@
-#include "gx-d3d-swapchain.hpp"
-#ifdef GX_RENDER_DIRECT3DX_ENABLED
+#include "gx-dxr-swapchain.hpp"
+#ifdef GX_RENDER_DXR_ENABLED
 #include "../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../platform/gx-plt-application.hpp"
-#include "gx-d3d-adapter.hpp"
-#include "gx-d3d-check.hpp"
-#include "gx-d3d-device.hpp"
-#include "gx-d3d-queue.hpp"
+#include "gx-dxr-adapter.hpp"
+#include "gx-dxr-check.hpp"
+#include "gx-dxr-device.hpp"
+#include "gx-dxr-queue.hpp"
 #include <d3dx12.h>
 
-gearoenix::direct3dx::Swapchain::Swapchain(std::shared_ptr<Queue> q) noexcept
+gearoenix::dxr::Swapchain::Swapchain(std::shared_ptr<Queue> q) noexcept
     : queue(std::move(q))
     , device(queue->get_device())
     , screen_viewport {}
@@ -19,20 +19,15 @@ gearoenix::direct3dx::Swapchain::Swapchain(std::shared_ptr<Queue> q) noexcept
     GX_SET_ZERO(rtv_descriptor_heap_desc)
     rtv_descriptor_heap_desc.NumDescriptors = BACK_BUFFERS_COUNT;
     rtv_descriptor_heap_desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
-    GX_D3D_CHECK(dev->CreateDescriptorHeap(&rtv_descriptor_heap_desc, IID_PPV_ARGS(&rtv_descriptor_heap)))
+    GX_DXR_CHECK(dev->CreateDescriptorHeap(&rtv_descriptor_heap_desc, IID_PPV_ARGS(&rtv_descriptor_heap)))
     rtv_descriptor_size = dev->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
     D3D12_DESCRIPTOR_HEAP_DESC dsv_descriptor_heap_desc;
     GX_SET_ZERO(dsv_descriptor_heap_desc)
     dsv_descriptor_heap_desc.NumDescriptors = 1;
     dsv_descriptor_heap_desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
-    GX_D3D_CHECK(dev->CreateDescriptorHeap(&dsv_descriptor_heap_desc, IID_PPV_ARGS(&dsv_descriptor_heap)))
-    for (auto& frame : frames) {
-        GX_D3D_CHECK(dev->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&frame.command_allocator)))
-    }
-    GX_D3D_CHECK(dev->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, frames[0].command_allocator.Get(), nullptr, IID_PPV_ARGS(&command_list)))
-    GX_D3D_CHECK(command_list->Close())
+    GX_DXR_CHECK(dev->CreateDescriptorHeap(&dsv_descriptor_heap_desc, IID_PPV_ARGS(&dsv_descriptor_heap)))
     // Create a fence for tracking GPU execution progress.
-    GX_D3D_CHECK(dev->CreateFence(frames[back_buffer_index].fence_value, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence)))
+    GX_DXR_CHECK(dev->CreateFence(frames[back_buffer_index].fence_value, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence)))
     ++frames[back_buffer_index].fence_value;
     fence_event.Attach(CreateEvent(nullptr, FALSE, FALSE, nullptr));
     if (!fence_event.IsValid())
@@ -41,9 +36,9 @@ gearoenix::direct3dx::Swapchain::Swapchain(std::shared_ptr<Queue> q) noexcept
     GX_SET_ZERO(scissor_rect)
 }
 
-gearoenix::direct3dx::Swapchain::~Swapchain() noexcept = default;
+gearoenix::dxr::Swapchain::~Swapchain() noexcept = default;
 
-bool gearoenix::direct3dx::Swapchain::set_window_size(const platform::Application& platform_application) noexcept
+bool gearoenix::dxr::Swapchain::set_window_size(const platform::Application& platform_application) noexcept
 {
     auto* const dev = device->get_device().Get();
     const auto& base_plt_app = platform_application.get_base();
@@ -69,7 +64,7 @@ bool gearoenix::direct3dx::Swapchain::set_window_size(const platform::Applicatio
             GX_LOG_D("Device lost on resize.")
             return true;
         }
-        GX_D3D_CHECK(hr)
+        GX_DXR_CHECK(hr)
     } else {
         // Create a descriptor for the swap chain.
         DXGI_SWAP_CHAIN_DESC1 swap_chain_desc;
@@ -98,7 +93,7 @@ bool gearoenix::direct3dx::Swapchain::set_window_size(const platform::Applicatio
             const auto& factory
             = device->get_adapter()->get_factory();
         Microsoft::WRL::ComPtr<IDXGISwapChain1> base_swapchain;
-        GX_D3D_CHECK(factory->CreateSwapChainForHwnd(
+        GX_DXR_CHECK(factory->CreateSwapChainForHwnd(
             queue->get_command_queue().Get(),
             platform_application.get_window(),
             &swap_chain_desc,
@@ -109,14 +104,14 @@ bool gearoenix::direct3dx::Swapchain::set_window_size(const platform::Applicatio
             // if (prevIsFullscreen) {
             //    Win32Application::SetWindowZorderToTopMost(true);
             // }
-            GX_D3D_CHECK(base_swapchain.As(&swapchain))
+            GX_DXR_CHECK(base_swapchain.As(&swapchain))
     }
     // Obtain the back buffers for this window which will be the final render targets
     // and create render target views for each of them.
     for (UINT n = 0; n < BACK_BUFFERS_COUNT; ++n) {
         auto& frame = frames[n];
         auto& render_target = frame.render_target;
-        GX_D3D_CHECK(swapchain->GetBuffer(n, IID_PPV_ARGS(&render_target)))
+        GX_DXR_CHECK(swapchain->GetBuffer(n, IID_PPV_ARGS(&render_target)))
         const auto name = std::wstring(L"Render target ") + std::to_wstring(n);
         render_target->SetName(name.c_str());
 
@@ -141,7 +136,7 @@ bool gearoenix::direct3dx::Swapchain::set_window_size(const platform::Applicatio
     depth_optimized_clear_value.Format = DEPTH_BUFFER_FORMAT;
     depth_optimized_clear_value.DepthStencil.Depth = 1.0f;
     depth_optimized_clear_value.DepthStencil.Stencil = 0;
-    GX_D3D_CHECK(dev->CreateCommittedResource(
+    GX_DXR_CHECK(dev->CreateCommittedResource(
         &depth_heap_properties,
         D3D12_HEAP_FLAG_NONE,
         &depth_stencil_desc,
@@ -166,7 +161,7 @@ bool gearoenix::direct3dx::Swapchain::set_window_size(const platform::Applicatio
     return false;
 }
 
-void gearoenix::direct3dx::Swapchain::wait_for_gpu() noexcept
+void gearoenix::dxr::Swapchain::wait_for_gpu() noexcept
 {
     if (nullptr == fence || !fence_event.IsValid()) {
         GX_LOG_D("wait_for_gpu on invalid state.")
@@ -188,42 +183,34 @@ void gearoenix::direct3dx::Swapchain::wait_for_gpu() noexcept
     ++frames[back_buffer_index].fence_value;
 }
 
-const Microsoft::WRL::ComPtr<ID3D12CommandAllocator>& gearoenix::direct3dx::Swapchain::get_current_command_allocator() const noexcept
-{
-    return frames[back_buffer_index].command_allocator;
-}
-
-const Microsoft::WRL::ComPtr<ID3D12Resource>& gearoenix::direct3dx::Swapchain::get_current_render_target() const noexcept
+const Microsoft::WRL::ComPtr<ID3D12Resource>& gearoenix::dxr::Swapchain::get_current_render_target() const noexcept
 {
     return frames[back_buffer_index].render_target;
 }
 
-void gearoenix::direct3dx::Swapchain::prepare(const D3D12_RESOURCE_STATES before_state) noexcept
+void gearoenix::dxr::Swapchain::prepare(ID3D12GraphicsCommandList6* const cmd) noexcept
 {
     auto& frame = frames[back_buffer_index];
-    const auto& command_allocator = frame.command_allocator;
-    // Reset command list and allocator.
-    GX_D3D_CHECK(command_allocator->Reset())
-    GX_D3D_CHECK(command_list->Reset(command_allocator.Get(), nullptr))
-    if (D3D12_RESOURCE_STATE_RENDER_TARGET != before_state) {
-        // Transition the render target into the correct state to allow for drawing into it.
-        D3D12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
-            frame.render_target.Get(), before_state, D3D12_RESOURCE_STATE_RENDER_TARGET);
-        command_list->ResourceBarrier(1, &barrier);
-    }
+    // Transition the render target into the correct state to allow for drawing into it.
+    D3D12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+        frame.render_target.Get(),
+        D3D12_RESOURCE_STATE_PRESENT,
+        D3D12_RESOURCE_STATE_RENDER_TARGET);
+    cmd->ResourceBarrier(1, &barrier);
 }
 
-bool gearoenix::direct3dx::Swapchain::present(const D3D12_RESOURCE_STATES before_state) noexcept
+bool gearoenix::dxr::Swapchain::present(ID3D12GraphicsCommandList6* const cmd) noexcept
 {
     const auto& frame = frames[back_buffer_index];
     auto* const render_target = frame.render_target.Get();
-    if (D3D12_RESOURCE_STATE_PRESENT != before_state) {
-        // Transition the render target to the state that allows it to be presented to the display.
-        const auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(render_target, before_state, D3D12_RESOURCE_STATE_PRESENT);
-        command_list->ResourceBarrier(1, &barrier);
-    }
-    GX_D3D_CHECK(command_list->Close())
-    ID3D12CommandList* command_lists[] = { command_list.Get() };
+    // Transition the render target to the state that allows it to be presented to the display.
+    const auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+        render_target,
+        D3D12_RESOURCE_STATE_RENDER_TARGET,
+        D3D12_RESOURCE_STATE_PRESENT);
+    cmd->ResourceBarrier(1, &barrier);
+    GX_DXR_CHECK(cmd->Close())
+    ID3D12CommandList* command_lists[] = { cmd };
     queue->get_command_queue()->ExecuteCommandLists(1, command_lists);
     const auto hr = swapchain->Present(1, 0);
     // If the device was reset we must completely reinitialize the renderer.
@@ -231,22 +218,22 @@ bool gearoenix::direct3dx::Swapchain::present(const D3D12_RESOURCE_STATES before
         GX_LOG_D("Device lost.")
         return true;
     } else {
-        GX_D3D_CHECK(hr)
+        GX_DXR_CHECK(hr)
         move_to_next_frame();
     }
     return false;
 }
 
-void gearoenix::direct3dx::Swapchain::move_to_next_frame() noexcept
+void gearoenix::dxr::Swapchain::move_to_next_frame() noexcept
 {
     // Schedule a Signal command in the queue.
     const UINT64 current_fence_value = frames[back_buffer_index].fence_value;
-    GX_D3D_CHECK(queue->get_command_queue()->Signal(fence.Get(), current_fence_value));
+    GX_DXR_CHECK(queue->get_command_queue()->Signal(fence.Get(), current_fence_value));
     // Update the back buffer index.
     back_buffer_index = swapchain->GetCurrentBackBufferIndex();
     // If the next frame is not ready to be rendered yet, wait until it is ready.
     if (fence->GetCompletedValue() < frames[back_buffer_index].fence_value) {
-        GX_D3D_CHECK(fence->SetEventOnCompletion(frames[back_buffer_index].fence_value, fence_event.Get()))
+        GX_DXR_CHECK(fence->SetEventOnCompletion(frames[back_buffer_index].fence_value, fence_event.Get()))
         WaitForSingleObjectEx(fence_event.Get(), INFINITE, FALSE);
     }
     // Set the fence value for the next frame.

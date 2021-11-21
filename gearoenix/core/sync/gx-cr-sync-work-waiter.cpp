@@ -13,28 +13,24 @@ void gearoenix::core::sync::WorkWaiter::push(const std::function<void()>& f)
 
 #else
 
-#include "../gx-cr-function-loader.hpp"
 #include "../macro/gx-cr-mcr-assert.hpp"
-#include "gx-cr-sync-semaphore.hpp"
 #include <utility>
 
 void gearoenix::core::sync::WorkWaiter::wait_loop() noexcept
 {
     state = State::Working;
     while (State::Working == state) {
-        semaphore->lock();
+        semaphore.lock();
         if (State::Working != state)
             break;
-        function_loader->unload();
+        function_loader.unload();
     }
     state = State::Terminated;
     GX_LOG_D("Worker thread: " << std::this_thread::get_id() << " is finished.")
 }
 
 gearoenix::core::sync::WorkWaiter::WorkWaiter() noexcept
-    : semaphore(new Semaphore())
-    , function_loader(new FunctionLoader())
-    , thread([this] { wait_loop(); })
+    : thread([this] { wait_loop(); })
 {
 }
 
@@ -43,15 +39,15 @@ gearoenix::core::sync::WorkWaiter::~WorkWaiter() noexcept
     GX_CHECK_NOT_EQUAL_D(state, State::Terminated)
     do {
         state = State::Finished;
-        semaphore->release();
+        semaphore.release();
     } while (State::Terminated != state);
     thread.join();
 }
 
 void gearoenix::core::sync::WorkWaiter::push(std::function<void()>&& f) noexcept
 {
-    function_loader->load(std::move(f));
-    semaphore->release();
+    function_loader.load(std::move(f));
+    semaphore.release();
 }
 
 #endif
