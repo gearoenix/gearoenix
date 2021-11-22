@@ -22,7 +22,7 @@ public:
     explicit Manager(engine::Engine& e) noexcept;
     ~Manager() noexcept = default;
 
-    [[nodiscard]] std::shared_ptr<Builder> build() noexcept;
+    [[nodiscard]] std::shared_ptr<Builder> build(const std::string& name) noexcept;
 };
 }
 #endif

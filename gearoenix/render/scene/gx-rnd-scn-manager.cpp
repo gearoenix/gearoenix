@@ -13,7 +13,7 @@ gearoenix::render::scene::Manager::Manager(engine::Engine& e) noexcept
 
 gearoenix::render::scene::Manager::~Manager() noexcept = default;
 
-std::shared_ptr<gearoenix::render::scene::Builder> gearoenix::render::scene::Manager::build() noexcept
+std::shared_ptr<gearoenix::render::scene::Builder> gearoenix::render::scene::Manager::build(const std::string&) noexcept
 {
     return std::shared_ptr<Builder>(new Builder(*e.get_world()));
 }

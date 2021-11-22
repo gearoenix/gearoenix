@@ -6,7 +6,7 @@ gearoenix::render::camera::Manager::Manager(engine::Engine& e) noexcept
 {
 }
 
-std::shared_ptr<gearoenix::render::camera::Builder> gearoenix::render::camera::Manager::build() noexcept
+std::shared_ptr<gearoenix::render::camera::Builder> gearoenix::render::camera::Manager::build(const std::string& name) noexcept
 {
-    return std::shared_ptr<Builder>();
+    return std::shared_ptr<Builder>(new Builder(e, name));
 }

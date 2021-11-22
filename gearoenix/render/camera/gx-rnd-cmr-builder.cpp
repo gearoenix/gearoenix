@@ -15,7 +15,7 @@ gearoenix::render::camera::Builder::Builder(engine::Engine& e, const std::string
 gearoenix::render::camera::Builder::~Builder() noexcept = default;
 
 void gearoenix::render::camera::Builder::set(Projection) noexcept {
-    GX_UNIMPLEMENTED
+    GX_TODO
 }
 
 gearoenix::physics::Transformation& gearoenix::render::camera::Builder::get_transformation() noexcept

@@ -24,13 +24,14 @@ struct Builder final {
 
     GX_GET_REFC_PRV(std::shared_ptr<core::ecs::EntitySharedBuilder>, entity_builder)
 
+private:
+    Builder(engine::Engine& e, const std::string& name) noexcept;
+
 public:
     Builder(Builder&&) = delete;
     Builder(const Builder&) = delete;
     Builder& operator=(Builder&&) = delete;
     Builder& operator=(const Builder&) = delete;
-
-    Builder(engine::Engine& e, const std::string& name) noexcept;
     ~Builder() noexcept;
 
     [[nodiscard]] physics::Transformation& get_transformation() noexcept;

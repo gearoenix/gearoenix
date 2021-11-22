@@ -25,27 +25,27 @@ struct GameApp final : public gearoenix::core::Application {
         auto mesh_builder = render_engine->get_mesh_manager()->build("triangle", vertices, indices);
         mesh_builder->set_material(gearoenix::render::material::Pbr());
 
-        auto camera_builder = render_engine->get_camera_manager()->build();
+        auto camera_builder = render_engine->get_camera_manager()->build("camera");
         camera_builder->get_transformation().set_location(0.0f, 0.0f, 5.0f);
         camera_builder->set(gearoenix::render::camera::Projection::Perspective);
 
-        const auto scene_builder = render_engine->get_scene_manager()->build();
+        const auto scene_builder = render_engine->get_scene_manager()->build("scene");
         scene_builder->add(std::move(mesh_builder));
         scene_builder->add(std::move(camera_builder));
     }
 
     void update() noexcept final
     {
-        static bool show_window = true;
+        // static bool show_window = true;
         Application::update();
 
-        ImGui::ShowDemoWindow(&show_window);
+        // ImGui::ShowDemoWindow(&show_window);
 
-        ImGui::Begin("Hello Window!", &show_window);
-        ImGui::Text("Hello Label!");
-        if (ImGui::Button("Close"))
-            show_window = false;
-        ImGui::End();
+        // ImGui::Begin("Hello Window!", &show_window);
+        // ImGui::Text("Hello Label!");
+        // if (ImGui::Button("Close"))
+        //     show_window = false;
+        // ImGui::End();
     }
 };
 
