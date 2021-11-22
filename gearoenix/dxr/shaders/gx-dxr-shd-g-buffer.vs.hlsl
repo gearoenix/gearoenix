@@ -2,9 +2,9 @@
 
 struct PSInput
 {
-    float3 position : SV_POSITION;
-    float3 normal : SV_NORMAL;
-    float4 tangent : SV_TANGENT;
+    float4 position : SV_POSITION;
+    float3 normal : NORMAL;
+    float4 tangent : TANGENT;
     float2 uv : TEXCOORD;
 };
 
@@ -13,7 +13,7 @@ PSInput main(float3 position : POSITION, float3 normal : NORMAL, float4 tangent:
 {
     PSInput result;
 
-    result.position = position + ((normal + tangent.xyz) * 0.001);
+    result.position = float4(position + ((normal + tangent.xyz) * 0.001), 1.0);
     result.normal = normal;
     result.tangent = tangent;
     result.uv = uv;

@@ -13,7 +13,9 @@ namespace gearoenix::dxr {
 struct Adapter;
 struct DescriptorManager;
 struct Device;
+struct PipelineManager;
 struct Queue;
+struct SubmissionManager;
 struct Swapchain;
 struct Uploader;
 
@@ -25,6 +27,8 @@ struct Engine final : public render::engine::Engine {
     GX_GET_CREF_PRV(std::shared_ptr<Swapchain>, swapchain)
     GX_GET_CREF_PRV(std::shared_ptr<DescriptorManager>, descriptor_manager)
     GX_GET_CREF_PRV(std::shared_ptr<Uploader>, uploader)
+    GX_GET_CREF_PRV(std::shared_ptr<PipelineManager>, pipeline_manager)
+    GX_GET_CREF_PRV(std::shared_ptr<SubmissionManager>, submission_manager)
 
 private:
     explicit Engine(platform::Application& platform_application) noexcept;

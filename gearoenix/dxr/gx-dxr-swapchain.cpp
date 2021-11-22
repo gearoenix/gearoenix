@@ -11,8 +11,9 @@
 gearoenix::dxr::Swapchain::Swapchain(std::shared_ptr<Queue> q) noexcept
     : queue(std::move(q))
     , device(queue->get_device())
-    , screen_viewport {}
-    , scissor_rect {}
+    , viewport {}
+    , scissor {}
+    , clear_colour { 0.3f, 0.15f, 0.115f, 1.0f }
 {
     auto* const dev = device->get_device().Get();
     D3D12_DESCRIPTOR_HEAP_DESC rtv_descriptor_heap_desc;
@@ -32,8 +33,8 @@ gearoenix::dxr::Swapchain::Swapchain(std::shared_ptr<Queue> q) noexcept
     fence_event.Attach(CreateEvent(nullptr, FALSE, FALSE, nullptr));
     if (!fence_event.IsValid())
         GX_LOG_F("CreateEvent failed.")
-    GX_SET_ZERO(screen_viewport)
-    GX_SET_ZERO(scissor_rect)
+    GX_SET_ZERO(viewport)
+    GX_SET_ZERO(scissor)
 }
 
 gearoenix::dxr::Swapchain::~Swapchain() noexcept = default;
@@ -111,6 +112,7 @@ bool gearoenix::dxr::Swapchain::set_window_size(const platform::Application& pla
     for (UINT n = 0; n < BACK_BUFFERS_COUNT; ++n) {
         auto& frame = frames[n];
         auto& render_target = frame.render_target;
+        auto& rtv_descriptor = frame.rtv_descriptor;
         GX_DXR_CHECK(swapchain->GetBuffer(n, IID_PPV_ARGS(&render_target)))
         const auto name = std::wstring(L"Render target ") + std::to_wstring(n);
         render_target->SetName(name.c_str());
@@ -120,7 +122,7 @@ bool gearoenix::dxr::Swapchain::set_window_size(const platform::Application& pla
         rtv_desc.Format = BACK_BUFFER_FORMAT;
         rtv_desc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
 
-        CD3DX12_CPU_DESCRIPTOR_HANDLE rtv_descriptor(
+        rtv_descriptor = CD3DX12_CPU_DESCRIPTOR_HANDLE(
             rtv_descriptor_heap->GetCPUDescriptorHandleForHeapStart(),
             static_cast<INT>(n), rtv_descriptor_size);
         dev->CreateRenderTargetView(render_target.Get(), &rtv_desc, rtv_descriptor);
@@ -150,14 +152,14 @@ bool gearoenix::dxr::Swapchain::set_window_size(const platform::Application& pla
     dsv_desc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
     dev->CreateDepthStencilView(depth_stencil.Get(), &dsv_desc, dsv_descriptor_heap->GetCPUDescriptorHandleForHeapStart());
     // Set the 3D rendering viewport and scissor rectangle to target the entire window.
-    screen_viewport.TopLeftX = screen_viewport.TopLeftY = 0.f;
-    screen_viewport.Width = static_cast<FLOAT>(window_width);
-    screen_viewport.Height = static_cast<FLOAT>(window_height);
-    screen_viewport.MinDepth = D3D12_MIN_DEPTH;
-    screen_viewport.MaxDepth = D3D12_MAX_DEPTH;
-    scissor_rect.left = scissor_rect.top = 0;
-    scissor_rect.right = static_cast<LONG>(window_width);
-    scissor_rect.bottom = static_cast<LONG>(window_height);
+    viewport.TopLeftX = viewport.TopLeftY = 0.f;
+    viewport.Width = static_cast<FLOAT>(window_width);
+    viewport.Height = static_cast<FLOAT>(window_height);
+    viewport.MinDepth = D3D12_MIN_DEPTH;
+    viewport.MaxDepth = D3D12_MAX_DEPTH;
+    scissor.left = scissor.top = 0;
+    scissor.right = static_cast<LONG>(window_width);
+    scissor.bottom = static_cast<LONG>(window_height);
     return false;
 }
 
@@ -197,6 +199,10 @@ void gearoenix::dxr::Swapchain::prepare(ID3D12GraphicsCommandList6* const cmd) n
         D3D12_RESOURCE_STATE_PRESENT,
         D3D12_RESOURCE_STATE_RENDER_TARGET);
     cmd->ResourceBarrier(1, &barrier);
+    cmd->RSSetViewports(1, &viewport);
+    cmd->RSSetScissorRects(1, &scissor);
+    cmd->OMSetRenderTargets(1, &frame.rtv_descriptor, false, nullptr);
+    cmd->ClearRenderTargetView(frame.rtv_descriptor, clear_colour, 0, nullptr);
 }
 
 bool gearoenix::dxr::Swapchain::present(ID3D12GraphicsCommandList6* const cmd) noexcept

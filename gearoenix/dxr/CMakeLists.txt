@@ -14,10 +14,14 @@ SET(GX_ENGINE_DXR_SRC
         ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-loader.hpp
         ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-mesh.cpp
         ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-mesh.hpp
+        ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-pipeline.cpp
+        ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-pipeline.hpp
         ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-queue.cpp
         ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-queue.hpp
         ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-shader.cpp
         ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-shader.hpp
+        ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-submission.cpp
+        ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-submission.hpp
         ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-swapchain.cpp
         ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-swapchain.hpp
         ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-texture.cpp

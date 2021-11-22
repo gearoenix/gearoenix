@@ -18,6 +18,7 @@ struct Swapchain final {
 
     struct Frame final {
         Microsoft::WRL::ComPtr<ID3D12Resource> render_target;
+        D3D12_CPU_DESCRIPTOR_HANDLE rtv_descriptor;
         UINT64 fence_value = 0;
     };
 
@@ -29,9 +30,10 @@ struct Swapchain final {
     GX_GET_CREF_PRV(Microsoft::WRL::ComPtr<IDXGISwapChain4>, swapchain)
     GX_GET_CREF_PRV(Microsoft::WRL::ComPtr<ID3D12Resource>, depth_stencil)
     GX_GET_CREF_PRV(Microsoft::WRL::Wrappers::Event, fence_event)
-    GX_GET_CREF_PRV(D3D12_VIEWPORT, screen_viewport)
-    GX_GET_CREF_PRV(D3D12_RECT, scissor_rect)
+    GX_GET_CREF_PRV(D3D12_VIEWPORT, viewport)
+    GX_GET_CREF_PRV(D3D12_RECT, scissor)
     GX_GET_ARRC_PRV(Frame, frames, BACK_BUFFERS_COUNT)
+    GX_GET_ARRC_PRV(float, clear_colour, 4)
     GX_GET_VAL_PRV(UINT, back_buffer_index, 0)
     GX_GET_VAL_PRV(UINT, rtv_descriptor_size, 0)
 

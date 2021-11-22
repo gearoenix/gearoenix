@@ -9,8 +9,10 @@
 #include "gx-dxr-descriptor.hpp"
 #include "gx-dxr-device.hpp"
 #include "gx-dxr-mesh.hpp"
+#include "gx-dxr-pipeline.hpp"
 #include "gx-dxr-queue.hpp"
 #include "gx-dxr-shader.hpp"
+#include "gx-dxr-submission.hpp"
 #include "gx-dxr-swapchain.hpp"
 #include "gx-dxr-uploader.hpp"
 #include <d3dx12.h>
@@ -35,6 +37,8 @@ void gearoenix::dxr::Engine::device_lost_handle(const int failed_tries) noexcept
 {
     GX_ASSERT(failed_tries < 3)
 
+    submission_manager = nullptr;
+    pipeline_manager = nullptr;
     mesh_manager = nullptr;
     uploader = nullptr;
     descriptor_manager = nullptr;
@@ -57,6 +61,8 @@ void gearoenix::dxr::Engine::device_lost_handle(const int failed_tries) noexcept
     descriptor_manager = std::make_shared<DescriptorManager>(device);
     uploader = std::make_shared<Uploader>(device);
     mesh_manager = std::make_unique<MeshManager>(*this);
+    pipeline_manager = std::make_shared<PipelineManager>(device);
+    submission_manager = std::make_shared<SubmissionManager>(*this);
 
     window_resized(failed_tries);
 }
@@ -92,6 +98,8 @@ void gearoenix::dxr::Engine::start_frame() noexcept
 void gearoenix::dxr::Engine::end_frame() noexcept
 {
     render::engine::Engine::end_frame();
+    if (submission_manager->render_frame())
+        device_lost_handle();
 }
 
 void gearoenix::dxr::Engine::upload_imgui_fonts() noexcept
