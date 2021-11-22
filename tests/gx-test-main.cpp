@@ -10,8 +10,8 @@
 //        void operator()(std::ostream& os, const gearoenix::x v) { ::operator<<(os, v); } \
 //    };                                                                                   \
 //    }
-//GX_TEST_PRINT_TYPE_VAL(math::IntersectionStatus)
-// Test units
+// GX_TEST_PRINT_TYPE_VAL(math::IntersectionStatus)
+//  Test units
 
 #include <gearoenix/core/ecs/gx-cr-ecs-world-test.hpp>
 #include <gearoenix/core/gx-cr-allocator-test.hpp>

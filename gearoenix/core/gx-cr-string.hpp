@@ -16,6 +16,7 @@ public:
     [[nodiscard]] static bool is_character(event::button::KeyboardKeyId) noexcept;
     [[nodiscard]] static std::optional<wchar_t> to_character(event::button::KeyboardKeyId, bool shift_pressed = false, Language language = Language::English) noexcept;
     [[nodiscard]] static std::string to_string(const std::wstring& s) noexcept;
+    [[nodiscard]] static std::wstring to_wstring(const std::string& s) noexcept;
 
 #ifdef GX_IN_IOS
     [[nodiscard]] static NSString* to_objc_string(const std::string& s) noexcept;

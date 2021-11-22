@@ -22,28 +22,28 @@ void gearoenix::vulkan::image::Manager::upload(
     upload_images.emplace_back(std::move(img), std::move(buff), call);
 }
 
-//void gearoenix::vulkan::image::Manager::update(command::Buffer& cmd) noexcept
+// void gearoenix::vulkan::image::Manager::update(command::Buffer& cmd) noexcept
 //{
-//    auto& images = frame_upload_images[e->get_frame_number()];
-//    images.clear();
-//    {
-//        GX_GUARD_LOCK(upload_images)
-//        std::swap(upload_images, images);
-//    }
-//    GX_TODO
-//    // todo check for sync
-//    for (const auto& img_call : images) {
-//        std::get<0>(img_call)->transit_for_writing(cmd);
-//    }
-//    // todo sync check
-//    for (const auto& img_call : images) {
-//        std::get<0>(img_call)->copy_from_buffer(cmd, *std::get<1>(img_call));
-//    }
-//    // todo sync check
-//    for (const auto& img_call : images) {
-//        std::get<0>(img_call)->transit_for_reading(cmd);
-//    }
-//    // todo sync check
-//}
+//     auto& images = frame_upload_images[e->get_frame_number()];
+//     images.clear();
+//     {
+//         GX_GUARD_LOCK(upload_images)
+//         std::swap(upload_images, images);
+//     }
+//     GX_TODO
+//     // todo check for sync
+//     for (const auto& img_call : images) {
+//         std::get<0>(img_call)->transit_for_writing(cmd);
+//     }
+//     // todo sync check
+//     for (const auto& img_call : images) {
+//         std::get<0>(img_call)->copy_from_buffer(cmd, *std::get<1>(img_call));
+//     }
+//     // todo sync check
+//     for (const auto& img_call : images) {
+//         std::get<0>(img_call)->transit_for_reading(cmd);
+//     }
+//     // todo sync check
+// }
 
 #endif

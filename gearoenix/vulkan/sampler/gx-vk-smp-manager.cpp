@@ -15,7 +15,7 @@ const std::shared_ptr<gearoenix::vulkan::sampler::Sampler>& gearoenix::vulkan::s
     GX_GUARD_LOCK(samplers)
     auto& smp = samplers[info];
     //    if (nullptr == smp)
-    //smp = std::make_shared<Sampler>(logical_device, info);
+    // smp = std::make_shared<Sampler>(logical_device, info);
     return smp;
 }
 

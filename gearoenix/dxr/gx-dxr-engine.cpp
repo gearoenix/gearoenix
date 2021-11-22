@@ -6,10 +6,13 @@
 #include "../platform/gx-plt-application.hpp"
 #include "gx-dxr-adapter.hpp"
 #include "gx-dxr-check.hpp"
+#include "gx-dxr-descriptor.hpp"
 #include "gx-dxr-device.hpp"
+#include "gx-dxr-mesh.hpp"
 #include "gx-dxr-queue.hpp"
 #include "gx-dxr-shader.hpp"
 #include "gx-dxr-swapchain.hpp"
+#include "gx-dxr-uploader.hpp"
 #include <d3dx12.h>
 #include <dxgidebug.h>
 #include <fstream>
@@ -32,6 +35,9 @@ void gearoenix::dxr::Engine::device_lost_handle(const int failed_tries) noexcept
 {
     GX_ASSERT(failed_tries < 3)
 
+    mesh_manager = nullptr;
+    uploader = nullptr;
+    descriptor_manager = nullptr;
     swapchain = nullptr;
     queue = nullptr;
     device = nullptr;
@@ -48,6 +54,9 @@ void gearoenix::dxr::Engine::device_lost_handle(const int failed_tries) noexcept
     device = std::make_shared<Device>(adapter);
     queue = std::make_shared<Queue>(device, Queue::Type::Direct);
     swapchain = std::make_shared<Swapchain>(queue);
+    descriptor_manager = std::make_shared<DescriptorManager>(device);
+    uploader = std::make_shared<Uploader>(device);
+    mesh_manager = std::make_unique<MeshManager>(*this);
 
     window_resized(failed_tries);
 }

@@ -113,22 +113,22 @@ void gearoenix::vulkan::command::Buffer::begin(const RenderPass& render_pass, co
     vkCmdBeginRenderPass(vulkan_data, &info, VK_SUBPASS_CONTENTS_INLINE);
 }
 
-//void gearoenix::vulkan::command::Buffer::begin_render_pass_with_info(
-//    const VkRenderPassBeginInfo& render_pass_begin_info) noexcept
+// void gearoenix::vulkan::command::Buffer::begin_render_pass_with_info(
+//     const VkRenderPassBeginInfo& render_pass_begin_info) noexcept
 //{
-//    Loader::vkCmdBeginRenderPass(vulkan_data, &render_pass_begin_info, VK_SUBPASS_CONTENTS_INLINE);
-//}
+//     Loader::vkCmdBeginRenderPass(vulkan_data, &render_pass_begin_info, VK_SUBPASS_CONTENTS_INLINE);
+// }
 //
-//void gearoenix::vulkan::command::Buffer::set_viewport(
-//    const VkViewport& viewport) noexcept
+// void gearoenix::vulkan::command::Buffer::set_viewport(
+//     const VkViewport& viewport) noexcept
 //{
-//    Loader::vkCmdSetViewport(vulkan_data, 0, 1, &viewport);
-//}
+//     Loader::vkCmdSetViewport(vulkan_data, 0, 1, &viewport);
+// }
 //
-//void gearoenix::vulkan::command::Buffer::set_scissor(const VkRect2D& scissor) noexcept
+// void gearoenix::vulkan::command::Buffer::set_scissor(const VkRect2D& scissor) noexcept
 //{
-//    Loader::vkCmdSetScissor(vulkan_data, 0, 1, &scissor);
-//}
+//     Loader::vkCmdSetScissor(vulkan_data, 0, 1, &scissor);
+// }
 //
 
 void gearoenix::vulkan::command::Buffer::end_render_pass() noexcept
@@ -136,30 +136,30 @@ void gearoenix::vulkan::command::Buffer::end_render_pass() noexcept
     vkCmdEndRenderPass(vulkan_data);
 }
 
-//void gearoenix::vulkan::command::Buffer::bind_pipeline(VkPipeline pip) noexcept
+// void gearoenix::vulkan::command::Buffer::bind_pipeline(VkPipeline pip) noexcept
 //{
-//    Loader::vkCmdBindPipeline(vulkan_data, VK_PIPELINE_BIND_POINT_GRAPHICS, pip);
-//}
+//     Loader::vkCmdBindPipeline(vulkan_data, VK_PIPELINE_BIND_POINT_GRAPHICS, pip);
+// }
 //
-//void gearoenix::vulkan::command::Buffer::bind_descriptor_set(
-//    VkPipelineBindPoint pipeline_bind_point,
-//    VkPipelineLayout pipeline_layout,
-//    uint32_t first_set,
-//    const VkDescriptorSet& des_set) noexcept
+// void gearoenix::vulkan::command::Buffer::bind_descriptor_set(
+//     VkPipelineBindPoint pipeline_bind_point,
+//     VkPipelineLayout pipeline_layout,
+//     uint32_t first_set,
+//     const VkDescriptorSet& des_set) noexcept
 //{
-//    Loader::vkCmdBindDescriptorSets(
-//        vulkan_data, pipeline_bind_point, pipeline_layout, first_set, 1, &des_set, 0, nullptr);
-//}
+//     Loader::vkCmdBindDescriptorSets(
+//         vulkan_data, pipeline_bind_point, pipeline_layout, first_set, 1, &des_set, 0, nullptr);
+// }
 //
-//void gearoenix::vulkan::command::Buffer::bind_vertex_buffers(VkBuffer buf, VkDeviceSize offset) noexcept
+// void gearoenix::vulkan::command::Buffer::bind_vertex_buffers(VkBuffer buf, VkDeviceSize offset) noexcept
 //{
-//    Loader::vkCmdBindVertexBuffers(vulkan_data, 0, 1, &buf, &offset);
-//}
+//     Loader::vkCmdBindVertexBuffers(vulkan_data, 0, 1, &buf, &offset);
+// }
 //
-//void gearoenix::vulkan::command::Buffer::bind_index_buffer(VkBuffer buf, VkDeviceSize offset) noexcept
+// void gearoenix::vulkan::command::Buffer::bind_index_buffer(VkBuffer buf, VkDeviceSize offset) noexcept
 //{
-//    Loader::vkCmdBindIndexBuffer(vulkan_data, buf, offset, VK_INDEX_TYPE_UINT32);
-//}
+//     Loader::vkCmdBindIndexBuffer(vulkan_data, buf, offset, VK_INDEX_TYPE_UINT32);
+// }
 
 void gearoenix::vulkan::command::Buffer::draw_indices(VkDeviceSize count) noexcept
 {

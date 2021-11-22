@@ -3,6 +3,7 @@
 #include "../../core/ecs/gx-cr-ecs-component.hpp"
 #include "../../math/gx-math-aabb.hpp"
 #include "../gx-rnd-translucency-mode.hpp"
+#include "..\..\dxr\gx-dxr-mesh.hpp"
 
 namespace gearoenix::core::ecs {
 struct World;

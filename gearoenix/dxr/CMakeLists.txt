@@ -12,6 +12,8 @@ SET(GX_ENGINE_DXR_SRC
         ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-engine.cpp
         ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-engine.hpp
         ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-loader.hpp
+        ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-mesh.cpp
+        ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-mesh.hpp
         ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-queue.cpp
         ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-queue.hpp
         ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-shader.cpp

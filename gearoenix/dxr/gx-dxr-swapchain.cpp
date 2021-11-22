@@ -84,12 +84,12 @@ bool gearoenix::dxr::Swapchain::set_window_size(const platform::Application& pla
         GX_SET_ZERO(fs_swapchain_desc)
         fs_swapchain_desc.Windowed = TRUE;
         GX_TODO // We have to make sure the following commented is not necessary
-            //- DXGI does not allow creating a swapchain targeting a window which has fullscreen styles(no border + topmost).
-            //- Temporarily remove the topmost property for creating the swapchain.
-            // bool prevIsFullscreen = Win32Application::IsFullscreen();
-            // if (prevIsFullscreen) {
-            //    Win32Application::SetWindowZorderToTopMost(false);
-            // }
+                //- DXGI does not allow creating a swapchain targeting a window which has fullscreen styles(no border + topmost).
+                //- Temporarily remove the topmost property for creating the swapchain.
+                // bool prevIsFullscreen = Win32Application::IsFullscreen();
+                // if (prevIsFullscreen) {
+                //    Win32Application::SetWindowZorderToTopMost(false);
+                // }
             const auto& factory
             = device->get_adapter()->get_factory();
         Microsoft::WRL::ComPtr<IDXGISwapChain1> base_swapchain;
@@ -101,10 +101,10 @@ bool gearoenix::dxr::Swapchain::set_window_size(const platform::Application& pla
             nullptr,
             &base_swapchain))
         GX_TODO // We have to make sure the following commented is not necessary
-            // if (prevIsFullscreen) {
-            //    Win32Application::SetWindowZorderToTopMost(true);
-            // }
-            GX_DXR_CHECK(base_swapchain.As(&swapchain))
+                // if (prevIsFullscreen) {
+                //    Win32Application::SetWindowZorderToTopMost(true);
+                // }
+        GX_DXR_CHECK(base_swapchain.As(&swapchain))
     }
     // Obtain the back buffers for this window which will be the final render targets
     // and create render target views for each of them.

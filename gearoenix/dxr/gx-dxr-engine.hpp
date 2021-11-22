@@ -11,10 +11,11 @@ struct Application;
 
 namespace gearoenix::dxr {
 struct Adapter;
+struct DescriptorManager;
 struct Device;
 struct Queue;
 struct Swapchain;
-struct DescriptorManager;
+struct Uploader;
 
 struct Engine final : public render::engine::Engine {
     GX_GET_RRF_PRV(platform::Application, platform_application)
@@ -23,6 +24,7 @@ struct Engine final : public render::engine::Engine {
     GX_GET_CREF_PRV(std::shared_ptr<Queue>, queue)
     GX_GET_CREF_PRV(std::shared_ptr<Swapchain>, swapchain)
     GX_GET_CREF_PRV(std::shared_ptr<DescriptorManager>, descriptor_manager)
+    GX_GET_CREF_PRV(std::shared_ptr<Uploader>, uploader)
 
 private:
     explicit Engine(platform::Application& platform_application) noexcept;

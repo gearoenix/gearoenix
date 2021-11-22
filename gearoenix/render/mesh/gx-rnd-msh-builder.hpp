@@ -16,11 +16,11 @@ struct Engine;
 namespace gearoenix::render::mesh {
 /// TODO add instancing later
 struct Builder {
-protected:
-    GX_GET_REFC_PRV(std::shared_ptr<core::ecs::EntitySharedBuilder>, entity_builder)
-    const std::string name;
-    const math::Aabb3 occlusion_box;
+    GX_GET_REFC_PRT(std::shared_ptr<core::ecs::EntitySharedBuilder>, entity_builder)
+    GX_GET_REFC_PRT(std::string, name)
+    GX_GET_REFC_PRT(math::Aabb3, occlusion_box)
 
+protected:
     Builder(
         engine::Engine& e,
         const std::string& name,

@@ -4,529 +4,529 @@
 
 gearoenix::render::mesh::Manager::~Manager() noexcept = default;
 
-//std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager::create_plate(core::sync::EndCaller<Mesh>& c) noexcept
+// std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager::create_plate(core::sync::EndCaller<Mesh>& c) noexcept
 //{
-//    if (std::shared_ptr<Mesh> m = plate.lock()) {
-//        c.set_data(m);
-//        return m;
-//    }
-//    std::vector<math::BasicVertex> vertices = {
-//        math::BasicVertex {
-//            math::Vec3(-1.f, -1.0f, 0.0f),
-//            math::Vec3(0.0f, 0.0f, 1.0f),
-//            math::Vec4(1.0f, 0.0f, 0.0f, 1.0f),
-//            math::Vec2(0.0f, 0.0f),
-//        },
-//        math::BasicVertex {
-//            math::Vec3(1.0f, -1.0f, 0.0f),
-//            math::Vec3(0.0f, 0.0f, 1.0f),
-//            math::Vec4(1.0f, 0.0f, 0.0f, 1.0f),
-//            math::Vec2(1.0f, 0.0f),
-//        },
-//        math::BasicVertex {
-//            math::Vec3(-1.0f, 1.0f, 0.0f),
-//            math::Vec3(0.0f, 0.0f, 1.0f),
-//            math::Vec4(1.0f, 0.0f, 0.0f, 1.0f),
-//            math::Vec2(0.0f, 1.0f),
-//        },
-//        math::BasicVertex {
-//            math::Vec3(1.0f, 1.0f, 0.0f),
-//            math::Vec3(0.0f, 0.0f, 1.0f),
-//            math::Vec4(1.0f, 0.0f, 0.0f, 1.0f),
-//            math::Vec2(1.0f, 1.0f),
-//        },
-//    };
-//    std::vector<std::uint32_t> indices = { 0, 1, 2, 1, 3, 2 };
-//    const static double occlusion_radius = 1.4f;
-//    const auto id = core::asset::Manager::create_id();
-//    std::shared_ptr<Mesh> m(new Mesh(
-//        id, "plate", vertices, indices,
-//        math::Aabb3(math::Vec3(occlusion_radius), math::Vec3(-occlusion_radius)),
-//        e, core::sync::EndCaller<core::sync::EndCallerIgnore>([c] {})));
-//    c.set_data(m);
-//    plate = m;
-//    cache.get_cacher().get_cacheds()[id] = m;
-//    return m;
-//}
+//     if (std::shared_ptr<Mesh> m = plate.lock()) {
+//         c.set_data(m);
+//         return m;
+//     }
+//     std::vector<math::BasicVertex> vertices = {
+//         math::BasicVertex {
+//             math::Vec3(-1.f, -1.0f, 0.0f),
+//             math::Vec3(0.0f, 0.0f, 1.0f),
+//             math::Vec4(1.0f, 0.0f, 0.0f, 1.0f),
+//             math::Vec2(0.0f, 0.0f),
+//         },
+//         math::BasicVertex {
+//             math::Vec3(1.0f, -1.0f, 0.0f),
+//             math::Vec3(0.0f, 0.0f, 1.0f),
+//             math::Vec4(1.0f, 0.0f, 0.0f, 1.0f),
+//             math::Vec2(1.0f, 0.0f),
+//         },
+//         math::BasicVertex {
+//             math::Vec3(-1.0f, 1.0f, 0.0f),
+//             math::Vec3(0.0f, 0.0f, 1.0f),
+//             math::Vec4(1.0f, 0.0f, 0.0f, 1.0f),
+//             math::Vec2(0.0f, 1.0f),
+//         },
+//         math::BasicVertex {
+//             math::Vec3(1.0f, 1.0f, 0.0f),
+//             math::Vec3(0.0f, 0.0f, 1.0f),
+//             math::Vec4(1.0f, 0.0f, 0.0f, 1.0f),
+//             math::Vec2(1.0f, 1.0f),
+//         },
+//     };
+//     std::vector<std::uint32_t> indices = { 0, 1, 2, 1, 3, 2 };
+//     const static double occlusion_radius = 1.4f;
+//     const auto id = core::asset::Manager::create_id();
+//     std::shared_ptr<Mesh> m(new Mesh(
+//         id, "plate", vertices, indices,
+//         math::Aabb3(math::Vec3(occlusion_radius), math::Vec3(-occlusion_radius)),
+//         e, core::sync::EndCaller<core::sync::EndCallerIgnore>([c] {})));
+//     c.set_data(m);
+//     plate = m;
+//     cache.get_cacher().get_cacheds()[id] = m;
+//     return m;
+// }
 
-//std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager::create_cube(core::sync::EndCaller<Mesh>& c) noexcept
+// std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager::create_cube(core::sync::EndCaller<Mesh>& c) noexcept
 //{
-//    if (std::shared_ptr<Mesh> m = cube.lock()) {
-//        c.set_data(m);
-//        return m;
-//    }
-//    std::vector<math::BasicVertex> vertices = {
-//        math::BasicVertex {
-//            math::Vec3(-1.f, -1.0f, 1.0f),
-//            math::Vec3(0.0f, 0.0f, 1.0f),
-//            math::Vec4(1.0f, 0.0f, 0.0f, 1.0f),
-//            math::Vec2(0.0f, 0.0f),
-//        },
-//        math::BasicVertex {
-//            math::Vec3(1.0f, -1.0f, 1.0f),
-//            math::Vec3(0.0f, 0.0f, 1.0f),
-//            math::Vec4(1.0f, 0.0f, 0.0f, 1.0f),
-//            math::Vec2(1.0f, 0.0f),
-//        },
-//        math::BasicVertex {
-//            math::Vec3(-1.0f, 1.0f, 1.0f),
-//            math::Vec3(0.0f, 0.0f, 1.0f),
-//            math::Vec4(1.0f, 0.0f, 0.0f, 1.0f),
-//            math::Vec2(0.0f, 1.0f),
-//        },
-//        math::BasicVertex {
-//            math::Vec3(1.0f, 1.0f, 1.0f),
-//            math::Vec3(0.0f, 0.0f, 1.0f),
-//            math::Vec4(1.0f, 0.0f, 0.0f, 1.0f),
-//            math::Vec2(1.0f, 1.0f),
-//        },
-//        //------------------------------------------------------------------------------------------------
-//        math::BasicVertex {
-//            math::Vec3(-1.f, -1.0f, -1.0f),
-//            math::Vec3(0.0f, 0.0f, -1.0f),
-//            math::Vec4(-1.0f, 0.0f, 0.0f, 1.0f),
-//            math::Vec2(0.0f, 0.0f),
-//        },
-//        math::BasicVertex {
-//            math::Vec3(1.0f, -1.0f, -1.0f),
-//            math::Vec3(0.0f, 0.0f, -1.0f),
-//            math::Vec4(-1.0f, 0.0f, 0.0f, 1.0f),
-//            math::Vec2(1.0f, 0.0f),
-//        },
-//        math::BasicVertex {
-//            math::Vec3(-1.0f, 1.0f, -1.0f),
-//            math::Vec3(0.0f, 0.0f, -1.0f),
-//            math::Vec4(-1.0f, 0.0f, 0.0f, 1.0f),
-//            math::Vec2(0.0f, 1.0f),
-//        },
-//        math::BasicVertex {
-//            math::Vec3(1.0f, 1.0f, -1.0f),
-//            math::Vec3(0.0f, 0.0f, -1.0f),
-//            math::Vec4(-1.0f, 0.0f, 0.0f, 1.0f),
-//            math::Vec2(1.0f, 1.0f),
-//        },
-//        //------------------------------------------------------------------------------------------------
-//        math::BasicVertex {
-//            math::Vec3(-1.f, -1.0f, -1.0f),
-//            math::Vec3(-1.0f, 0.0f, 0.0f),
-//            math::Vec4(0.0f, 0.0f, 1.0f, 1.0f),
-//            math::Vec2(0.0f, 0.0f),
-//        },
-//        math::BasicVertex {
-//            math::Vec3(-1.0f, 1.0f, -1.0f),
-//            math::Vec3(-1.0f, 0.0f, 0.0f),
-//            math::Vec4(0.0f, 0.0f, 1.0f, 1.0f),
-//            math::Vec2(1.0f, 0.0f),
-//        },
-//        math::BasicVertex {
-//            math::Vec3(-1.0f, -1.0f, 1.0f),
-//            math::Vec3(-1.0f, 0.0f, 0.0f),
-//            math::Vec4(0.0f, 0.0f, 1.0f, 1.0f),
-//            math::Vec2(0.0f, 1.0f),
-//        },
-//        math::BasicVertex {
-//            math::Vec3(-1.0f, 1.0f, 1.0f),
-//            math::Vec3(-1.0f, 0.0f, 0.0f),
-//            math::Vec4(0.0f, 0.0f, 1.0f, 1.0f),
-//            math::Vec2(1.0f, 1.0f),
-//        },
-//        //------------------------------------------------------------------------------------------------
-//        math::BasicVertex {
-//            math::Vec3(1.f, -1.0f, -1.0f),
-//            math::Vec3(1.0f, 0.0f, 0.0f),
-//            math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
-//            math::Vec2(0.0f, 0.0f),
-//        },
-//        math::BasicVertex {
-//            math::Vec3(1.0f, 1.0f, -1.0f),
-//            math::Vec3(1.0f, 0.0f, 0.0f),
-//            math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
-//            math::Vec2(1.0f, 0.0f),
-//        },
-//        math::BasicVertex {
-//            math::Vec3(1.0f, -1.0f, 1.0f),
-//            math::Vec3(1.0f, 0.0f, 0.0f),
-//            math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
-//            math::Vec2(0.0f, 1.0f),
-//        },
-//        math::BasicVertex {
-//            math::Vec3(1.0f, 1.0f, 1.0f),
-//            math::Vec3(1.0f, 0.0f, 0.0f),
-//            math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
-//            math::Vec2(1.0f, 1.0f),
-//        },
-//        //------------------------------------------------------------------------------------------------
-//        math::BasicVertex {
-//            math::Vec3(-1.f, -1.0f, -1.0f),
-//            math::Vec3(0.0f, -1.0f, 0.0f),
-//            math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
-//            math::Vec2(0.0f, 0.0f),
-//        },
-//        math::BasicVertex {
-//            math::Vec3(1.0f, -1.0f, -1.0f),
-//            math::Vec3(0.0f, -1.0f, 0.0f),
-//            math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
-//            math::Vec2(1.0f, 0.0f),
-//        },
-//        math::BasicVertex {
-//            math::Vec3(-1.0f, -1.0f, 1.0f),
-//            math::Vec3(0.0f, -1.0f, 0.0f),
-//            math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
-//            math::Vec2(0.0f, 1.0f),
-//        },
-//        math::BasicVertex {
-//            math::Vec3(1.0f, -1.0f, 1.0f),
-//            math::Vec3(0.0f, -1.0f, 0.0f),
-//            math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
-//            math::Vec2(1.0f, 1.0f),
-//        },
-//        //------------------------------------------------------------------------------------------------
-//        math::BasicVertex {
-//            math::Vec3(-1.f, 1.0f, -1.0f),
-//            math::Vec3(0.0f, 1.0f, 0.0f),
-//            math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
-//            math::Vec2(0.0f, 0.0f),
-//        },
-//        math::BasicVertex {
-//            math::Vec3(1.0f, 1.0f, -1.0f),
-//            math::Vec3(0.0f, 1.0f, 0.0f),
-//            math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
-//            math::Vec2(1.0f, 0.0f),
-//        },
-//        math::BasicVertex {
-//            math::Vec3(-1.0f, 1.0f, 1.0f),
-//            math::Vec3(0.0f, 1.0f, 0.0f),
-//            math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
-//            math::Vec2(0.0f, 1.0f),
-//        },
-//        math::BasicVertex {
-//            math::Vec3(1.0f, 1.0f, 1.0f),
-//            math::Vec3(0.0f, 1.0f, 0.0f),
-//            math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
-//            math::Vec2(1.0f, 1.0f),
-//        },
-//    };
-//    std::vector<std::uint32_t> indices = {
-//        0,
-//        1,
-//        2,
-//        1,
-//        3,
-//        2,
-//        4,
-//        6,
-//        5,
-//        5,
-//        6,
-//        7,
-//        8,
-//        10,
-//        9,
-//        9,
-//        10,
-//        11,
-//        12,
-//        13,
-//        14,
-//        13,
-//        15,
-//        14,
-//        16,
-//        17,
-//        18,
-//        17,
-//        19,
-//        18,
-//        20,
-//        22,
-//        21,
-//        21,
-//        22,
-//        23,
-//    };
-//    const static double occlusion_radius = 1.7f;
-//    const auto id = core::asset::Manager::create_id();
-//    std::shared_ptr<Mesh> m(new Mesh(
-//        id, "cube", vertices, indices,
-//        math::Aabb3(math::Vec3(occlusion_radius), math::Vec3(-occlusion_radius)),
-//        e, core::sync::EndCaller<core::sync::EndCallerIgnore>([c] {})));
-//    c.set_data(m);
-//    cube = m;
-//    cache.get_cacher().get_cacheds()[id] = m;
-//    return m;
-//}
+//     if (std::shared_ptr<Mesh> m = cube.lock()) {
+//         c.set_data(m);
+//         return m;
+//     }
+//     std::vector<math::BasicVertex> vertices = {
+//         math::BasicVertex {
+//             math::Vec3(-1.f, -1.0f, 1.0f),
+//             math::Vec3(0.0f, 0.0f, 1.0f),
+//             math::Vec4(1.0f, 0.0f, 0.0f, 1.0f),
+//             math::Vec2(0.0f, 0.0f),
+//         },
+//         math::BasicVertex {
+//             math::Vec3(1.0f, -1.0f, 1.0f),
+//             math::Vec3(0.0f, 0.0f, 1.0f),
+//             math::Vec4(1.0f, 0.0f, 0.0f, 1.0f),
+//             math::Vec2(1.0f, 0.0f),
+//         },
+//         math::BasicVertex {
+//             math::Vec3(-1.0f, 1.0f, 1.0f),
+//             math::Vec3(0.0f, 0.0f, 1.0f),
+//             math::Vec4(1.0f, 0.0f, 0.0f, 1.0f),
+//             math::Vec2(0.0f, 1.0f),
+//         },
+//         math::BasicVertex {
+//             math::Vec3(1.0f, 1.0f, 1.0f),
+//             math::Vec3(0.0f, 0.0f, 1.0f),
+//             math::Vec4(1.0f, 0.0f, 0.0f, 1.0f),
+//             math::Vec2(1.0f, 1.0f),
+//         },
+//         //------------------------------------------------------------------------------------------------
+//         math::BasicVertex {
+//             math::Vec3(-1.f, -1.0f, -1.0f),
+//             math::Vec3(0.0f, 0.0f, -1.0f),
+//             math::Vec4(-1.0f, 0.0f, 0.0f, 1.0f),
+//             math::Vec2(0.0f, 0.0f),
+//         },
+//         math::BasicVertex {
+//             math::Vec3(1.0f, -1.0f, -1.0f),
+//             math::Vec3(0.0f, 0.0f, -1.0f),
+//             math::Vec4(-1.0f, 0.0f, 0.0f, 1.0f),
+//             math::Vec2(1.0f, 0.0f),
+//         },
+//         math::BasicVertex {
+//             math::Vec3(-1.0f, 1.0f, -1.0f),
+//             math::Vec3(0.0f, 0.0f, -1.0f),
+//             math::Vec4(-1.0f, 0.0f, 0.0f, 1.0f),
+//             math::Vec2(0.0f, 1.0f),
+//         },
+//         math::BasicVertex {
+//             math::Vec3(1.0f, 1.0f, -1.0f),
+//             math::Vec3(0.0f, 0.0f, -1.0f),
+//             math::Vec4(-1.0f, 0.0f, 0.0f, 1.0f),
+//             math::Vec2(1.0f, 1.0f),
+//         },
+//         //------------------------------------------------------------------------------------------------
+//         math::BasicVertex {
+//             math::Vec3(-1.f, -1.0f, -1.0f),
+//             math::Vec3(-1.0f, 0.0f, 0.0f),
+//             math::Vec4(0.0f, 0.0f, 1.0f, 1.0f),
+//             math::Vec2(0.0f, 0.0f),
+//         },
+//         math::BasicVertex {
+//             math::Vec3(-1.0f, 1.0f, -1.0f),
+//             math::Vec3(-1.0f, 0.0f, 0.0f),
+//             math::Vec4(0.0f, 0.0f, 1.0f, 1.0f),
+//             math::Vec2(1.0f, 0.0f),
+//         },
+//         math::BasicVertex {
+//             math::Vec3(-1.0f, -1.0f, 1.0f),
+//             math::Vec3(-1.0f, 0.0f, 0.0f),
+//             math::Vec4(0.0f, 0.0f, 1.0f, 1.0f),
+//             math::Vec2(0.0f, 1.0f),
+//         },
+//         math::BasicVertex {
+//             math::Vec3(-1.0f, 1.0f, 1.0f),
+//             math::Vec3(-1.0f, 0.0f, 0.0f),
+//             math::Vec4(0.0f, 0.0f, 1.0f, 1.0f),
+//             math::Vec2(1.0f, 1.0f),
+//         },
+//         //------------------------------------------------------------------------------------------------
+//         math::BasicVertex {
+//             math::Vec3(1.f, -1.0f, -1.0f),
+//             math::Vec3(1.0f, 0.0f, 0.0f),
+//             math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
+//             math::Vec2(0.0f, 0.0f),
+//         },
+//         math::BasicVertex {
+//             math::Vec3(1.0f, 1.0f, -1.0f),
+//             math::Vec3(1.0f, 0.0f, 0.0f),
+//             math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
+//             math::Vec2(1.0f, 0.0f),
+//         },
+//         math::BasicVertex {
+//             math::Vec3(1.0f, -1.0f, 1.0f),
+//             math::Vec3(1.0f, 0.0f, 0.0f),
+//             math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
+//             math::Vec2(0.0f, 1.0f),
+//         },
+//         math::BasicVertex {
+//             math::Vec3(1.0f, 1.0f, 1.0f),
+//             math::Vec3(1.0f, 0.0f, 0.0f),
+//             math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
+//             math::Vec2(1.0f, 1.0f),
+//         },
+//         //------------------------------------------------------------------------------------------------
+//         math::BasicVertex {
+//             math::Vec3(-1.f, -1.0f, -1.0f),
+//             math::Vec3(0.0f, -1.0f, 0.0f),
+//             math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
+//             math::Vec2(0.0f, 0.0f),
+//         },
+//         math::BasicVertex {
+//             math::Vec3(1.0f, -1.0f, -1.0f),
+//             math::Vec3(0.0f, -1.0f, 0.0f),
+//             math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
+//             math::Vec2(1.0f, 0.0f),
+//         },
+//         math::BasicVertex {
+//             math::Vec3(-1.0f, -1.0f, 1.0f),
+//             math::Vec3(0.0f, -1.0f, 0.0f),
+//             math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
+//             math::Vec2(0.0f, 1.0f),
+//         },
+//         math::BasicVertex {
+//             math::Vec3(1.0f, -1.0f, 1.0f),
+//             math::Vec3(0.0f, -1.0f, 0.0f),
+//             math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
+//             math::Vec2(1.0f, 1.0f),
+//         },
+//         //------------------------------------------------------------------------------------------------
+//         math::BasicVertex {
+//             math::Vec3(-1.f, 1.0f, -1.0f),
+//             math::Vec3(0.0f, 1.0f, 0.0f),
+//             math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
+//             math::Vec2(0.0f, 0.0f),
+//         },
+//         math::BasicVertex {
+//             math::Vec3(1.0f, 1.0f, -1.0f),
+//             math::Vec3(0.0f, 1.0f, 0.0f),
+//             math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
+//             math::Vec2(1.0f, 0.0f),
+//         },
+//         math::BasicVertex {
+//             math::Vec3(-1.0f, 1.0f, 1.0f),
+//             math::Vec3(0.0f, 1.0f, 0.0f),
+//             math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
+//             math::Vec2(0.0f, 1.0f),
+//         },
+//         math::BasicVertex {
+//             math::Vec3(1.0f, 1.0f, 1.0f),
+//             math::Vec3(0.0f, 1.0f, 0.0f),
+//             math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
+//             math::Vec2(1.0f, 1.0f),
+//         },
+//     };
+//     std::vector<std::uint32_t> indices = {
+//         0,
+//         1,
+//         2,
+//         1,
+//         3,
+//         2,
+//         4,
+//         6,
+//         5,
+//         5,
+//         6,
+//         7,
+//         8,
+//         10,
+//         9,
+//         9,
+//         10,
+//         11,
+//         12,
+//         13,
+//         14,
+//         13,
+//         15,
+//         14,
+//         16,
+//         17,
+//         18,
+//         17,
+//         19,
+//         18,
+//         20,
+//         22,
+//         21,
+//         21,
+//         22,
+//         23,
+//     };
+//     const static double occlusion_radius = 1.7f;
+//     const auto id = core::asset::Manager::create_id();
+//     std::shared_ptr<Mesh> m(new Mesh(
+//         id, "cube", vertices, indices,
+//         math::Aabb3(math::Vec3(occlusion_radius), math::Vec3(-occlusion_radius)),
+//         e, core::sync::EndCaller<core::sync::EndCallerIgnore>([c] {})));
+//     c.set_data(m);
+//     cube = m;
+//     cache.get_cacher().get_cacheds()[id] = m;
+//     return m;
+// }
 
-//std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager::create_inward_cube(core::sync::EndCaller<Mesh>& c) noexcept
+// std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager::create_inward_cube(core::sync::EndCaller<Mesh>& c) noexcept
 //{
-//    if (std::shared_ptr<Mesh> m = inward_cube.lock()) {
-//        c.set_data(m);
-//        return m;
-//    }
-//    const std::vector<math::BasicVertex> vertices = {
-//        math::BasicVertex {
-//            math::Vec3(-1.f, -1.0f, 1.0f),
-//            math::Vec3(0.0f, 0.0f, 1.0f),
-//            math::Vec4(1.0f, 0.0f, 0.0f, 1.0f),
-//            math::Vec2(0.0f, 0.0f),
-//        },
-//        math::BasicVertex {
-//            math::Vec3(1.0f, -1.0f, 1.0f),
-//            math::Vec3(0.0f, 0.0f, 1.0f),
-//            math::Vec4(1.0f, 0.0f, 0.0f, 1.0f),
-//            math::Vec2(1.0f, 0.0f),
-//        },
-//        math::BasicVertex {
-//            math::Vec3(-1.0f, 1.0f, 1.0f),
-//            math::Vec3(0.0f, 0.0f, 1.0f),
-//            math::Vec4(1.0f, 0.0f, 0.0f, 1.0f),
-//            math::Vec2(0.0f, 1.0f),
-//        },
-//        math::BasicVertex {
-//            math::Vec3(1.0f, 1.0f, 1.0f),
-//            math::Vec3(0.0f, 0.0f, 1.0f),
-//            math::Vec4(1.0f, 0.0f, 0.0f, 1.0f),
-//            math::Vec2(1.0f, 1.0f),
-//        },
-//        //------------------------------------------------------------------------------------------------
-//        math::BasicVertex {
-//            math::Vec3(-1.f, -1.0f, -1.0f),
-//            math::Vec3(0.0f, 0.0f, -1.0f),
-//            math::Vec4(-1.0f, 0.0f, 0.0f, 1.0f),
-//            math::Vec2(0.0f, 0.0f),
-//        },
-//        math::BasicVertex {
-//            math::Vec3(1.0f, -1.0f, -1.0f),
-//            math::Vec3(0.0f, 0.0f, -1.0f),
-//            math::Vec4(-1.0f, 0.0f, 0.0f, 1.0f),
-//            math::Vec2(1.0f, 0.0f),
-//        },
-//        math::BasicVertex {
-//            math::Vec3(-1.0f, 1.0f, -1.0f),
-//            math::Vec3(0.0f, 0.0f, -1.0f),
-//            math::Vec4(-1.0f, 0.0f, 0.0f, 1.0f),
-//            math::Vec2(0.0f, 1.0f),
-//        },
-//        math::BasicVertex {
-//            math::Vec3(1.0f, 1.0f, -1.0f),
-//            math::Vec3(0.0f, 0.0f, -1.0f),
-//            math::Vec4(-1.0f, 0.0f, 0.0f, 1.0f),
-//            math::Vec2(1.0f, 1.0f),
-//        },
-//        //------------------------------------------------------------------------------------------------
-//        math::BasicVertex {
-//            math::Vec3(-1.f, -1.0f, -1.0f),
-//            math::Vec3(-1.0f, 0.0f, 0.0f),
-//            math::Vec4(0.0f, 0.0f, 1.0f, 1.0f),
-//            math::Vec2(0.0f, 0.0f),
-//        },
-//        math::BasicVertex {
-//            math::Vec3(-1.0f, 1.0f, -1.0f),
-//            math::Vec3(-1.0f, 0.0f, 0.0f),
-//            math::Vec4(0.0f, 0.0f, 1.0f, 1.0f),
-//            math::Vec2(1.0f, 0.0f),
-//        },
-//        math::BasicVertex {
-//            math::Vec3(-1.0f, -1.0f, 1.0f),
-//            math::Vec3(-1.0f, 0.0f, 0.0f),
-//            math::Vec4(0.0f, 0.0f, 1.0f, 1.0f),
-//            math::Vec2(0.0f, 1.0f),
-//        },
-//        math::BasicVertex {
-//            math::Vec3(-1.0f, 1.0f, 1.0f),
-//            math::Vec3(-1.0f, 0.0f, 0.0f),
-//            math::Vec4(0.0f, 0.0f, 1.0f, 1.0f),
-//            math::Vec2(1.0f, 1.0f),
-//        },
-//        //------------------------------------------------------------------------------------------------
-//        math::BasicVertex {
-//            math::Vec3(1.f, -1.0f, -1.0f),
-//            math::Vec3(1.0f, 0.0f, 0.0f),
-//            math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
-//            math::Vec2(0.0f, 0.0f),
-//        },
-//        math::BasicVertex {
-//            math::Vec3(1.0f, 1.0f, -1.0f),
-//            math::Vec3(1.0f, 0.0f, 0.0f),
-//            math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
-//            math::Vec2(1.0f, 0.0f),
-//        },
-//        math::BasicVertex {
-//            math::Vec3(1.0f, -1.0f, 1.0f),
-//            math::Vec3(1.0f, 0.0f, 0.0f),
-//            math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
-//            math::Vec2(0.0f, 1.0f),
-//        },
-//        math::BasicVertex {
-//            math::Vec3(1.0f, 1.0f, 1.0f),
-//            math::Vec3(1.0f, 0.0f, 0.0f),
-//            math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
-//            math::Vec2(1.0f, 1.0f),
-//        },
-//        //------------------------------------------------------------------------------------------------
-//        math::BasicVertex {
-//            math::Vec3(-1.f, -1.0f, -1.0f),
-//            math::Vec3(0.0f, -1.0f, 0.0f),
-//            math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
-//            math::Vec2(0.0f, 0.0f),
-//        },
-//        math::BasicVertex {
-//            math::Vec3(1.0f, -1.0f, -1.0f),
-//            math::Vec3(0.0f, -1.0f, 0.0f),
-//            math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
-//            math::Vec2(1.0f, 0.0f),
-//        },
-//        math::BasicVertex {
-//            math::Vec3(-1.0f, -1.0f, 1.0f),
-//            math::Vec3(0.0f, -1.0f, 0.0f),
-//            math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
-//            math::Vec2(0.0f, 1.0f),
-//        },
-//        math::BasicVertex {
-//            math::Vec3(1.0f, -1.0f, 1.0f),
-//            math::Vec3(0.0f, -1.0f, 0.0f),
-//            math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
-//            math::Vec2(1.0f, 1.0f),
-//        },
-//        //------------------------------------------------------------------------------------------------
-//        math::BasicVertex {
-//            math::Vec3(-1.f, 1.0f, -1.0f),
-//            math::Vec3(0.0f, 1.0f, 0.0f),
-//            math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
-//            math::Vec2(0.0f, 0.0f),
-//        },
-//        math::BasicVertex {
-//            math::Vec3(1.0f, 1.0f, -1.0f),
-//            math::Vec3(0.0f, 1.0f, 0.0f),
-//            math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
-//            math::Vec2(1.0f, 0.0f),
-//        },
-//        math::BasicVertex {
-//            math::Vec3(-1.0f, 1.0f, 1.0f),
-//            math::Vec3(0.0f, 1.0f, 0.0f),
-//            math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
-//            math::Vec2(0.0f, 1.0f),
-//        },
-//        math::BasicVertex {
-//            math::Vec3(1.0f, 1.0f, 1.0f),
-//            math::Vec3(0.0f, 1.0f, 0.0f),
-//            math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
-//            math::Vec2(1.0f, 1.0f),
-//        },
-//    };
-//    const std::vector<std::uint32_t> indices = {
-//        0, 2, 1, // - 1
-//        1, 2, 3, // - 2
-//        4, 5, 6, // - 3
-//        5, 7, 6, // - 4
-//        8, 9, 10, // - 5
-//        9, 11, 10, // - 6
-//        12, 14, 13, // - 7
-//        13, 14, 15, // - 8
-//        16, 18, 17, // - 9
-//        17, 18, 19, // - 10
-//        20, 21, 22, // - 11
-//        21, 23, 22, // - 12
-//    };
-//    const auto id = core::asset::Manager::create_id();
-//    std::shared_ptr<Mesh> m(new Mesh(
-//        id, "inward-cube", vertices, indices,
-//        math::Aabb3(math::Vec3(1.0), math::Vec3(-1.0)),
-//        e, core::sync::EndCaller<core::sync::EndCallerIgnore>([c] {})));
-//    c.set_data(m);
-//    inward_cube = m;
-//    cache.get_cacher().get_cacheds()[id] = m;
-//    return m;
-//}
+//     if (std::shared_ptr<Mesh> m = inward_cube.lock()) {
+//         c.set_data(m);
+//         return m;
+//     }
+//     const std::vector<math::BasicVertex> vertices = {
+//         math::BasicVertex {
+//             math::Vec3(-1.f, -1.0f, 1.0f),
+//             math::Vec3(0.0f, 0.0f, 1.0f),
+//             math::Vec4(1.0f, 0.0f, 0.0f, 1.0f),
+//             math::Vec2(0.0f, 0.0f),
+//         },
+//         math::BasicVertex {
+//             math::Vec3(1.0f, -1.0f, 1.0f),
+//             math::Vec3(0.0f, 0.0f, 1.0f),
+//             math::Vec4(1.0f, 0.0f, 0.0f, 1.0f),
+//             math::Vec2(1.0f, 0.0f),
+//         },
+//         math::BasicVertex {
+//             math::Vec3(-1.0f, 1.0f, 1.0f),
+//             math::Vec3(0.0f, 0.0f, 1.0f),
+//             math::Vec4(1.0f, 0.0f, 0.0f, 1.0f),
+//             math::Vec2(0.0f, 1.0f),
+//         },
+//         math::BasicVertex {
+//             math::Vec3(1.0f, 1.0f, 1.0f),
+//             math::Vec3(0.0f, 0.0f, 1.0f),
+//             math::Vec4(1.0f, 0.0f, 0.0f, 1.0f),
+//             math::Vec2(1.0f, 1.0f),
+//         },
+//         //------------------------------------------------------------------------------------------------
+//         math::BasicVertex {
+//             math::Vec3(-1.f, -1.0f, -1.0f),
+//             math::Vec3(0.0f, 0.0f, -1.0f),
+//             math::Vec4(-1.0f, 0.0f, 0.0f, 1.0f),
+//             math::Vec2(0.0f, 0.0f),
+//         },
+//         math::BasicVertex {
+//             math::Vec3(1.0f, -1.0f, -1.0f),
+//             math::Vec3(0.0f, 0.0f, -1.0f),
+//             math::Vec4(-1.0f, 0.0f, 0.0f, 1.0f),
+//             math::Vec2(1.0f, 0.0f),
+//         },
+//         math::BasicVertex {
+//             math::Vec3(-1.0f, 1.0f, -1.0f),
+//             math::Vec3(0.0f, 0.0f, -1.0f),
+//             math::Vec4(-1.0f, 0.0f, 0.0f, 1.0f),
+//             math::Vec2(0.0f, 1.0f),
+//         },
+//         math::BasicVertex {
+//             math::Vec3(1.0f, 1.0f, -1.0f),
+//             math::Vec3(0.0f, 0.0f, -1.0f),
+//             math::Vec4(-1.0f, 0.0f, 0.0f, 1.0f),
+//             math::Vec2(1.0f, 1.0f),
+//         },
+//         //------------------------------------------------------------------------------------------------
+//         math::BasicVertex {
+//             math::Vec3(-1.f, -1.0f, -1.0f),
+//             math::Vec3(-1.0f, 0.0f, 0.0f),
+//             math::Vec4(0.0f, 0.0f, 1.0f, 1.0f),
+//             math::Vec2(0.0f, 0.0f),
+//         },
+//         math::BasicVertex {
+//             math::Vec3(-1.0f, 1.0f, -1.0f),
+//             math::Vec3(-1.0f, 0.0f, 0.0f),
+//             math::Vec4(0.0f, 0.0f, 1.0f, 1.0f),
+//             math::Vec2(1.0f, 0.0f),
+//         },
+//         math::BasicVertex {
+//             math::Vec3(-1.0f, -1.0f, 1.0f),
+//             math::Vec3(-1.0f, 0.0f, 0.0f),
+//             math::Vec4(0.0f, 0.0f, 1.0f, 1.0f),
+//             math::Vec2(0.0f, 1.0f),
+//         },
+//         math::BasicVertex {
+//             math::Vec3(-1.0f, 1.0f, 1.0f),
+//             math::Vec3(-1.0f, 0.0f, 0.0f),
+//             math::Vec4(0.0f, 0.0f, 1.0f, 1.0f),
+//             math::Vec2(1.0f, 1.0f),
+//         },
+//         //------------------------------------------------------------------------------------------------
+//         math::BasicVertex {
+//             math::Vec3(1.f, -1.0f, -1.0f),
+//             math::Vec3(1.0f, 0.0f, 0.0f),
+//             math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
+//             math::Vec2(0.0f, 0.0f),
+//         },
+//         math::BasicVertex {
+//             math::Vec3(1.0f, 1.0f, -1.0f),
+//             math::Vec3(1.0f, 0.0f, 0.0f),
+//             math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
+//             math::Vec2(1.0f, 0.0f),
+//         },
+//         math::BasicVertex {
+//             math::Vec3(1.0f, -1.0f, 1.0f),
+//             math::Vec3(1.0f, 0.0f, 0.0f),
+//             math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
+//             math::Vec2(0.0f, 1.0f),
+//         },
+//         math::BasicVertex {
+//             math::Vec3(1.0f, 1.0f, 1.0f),
+//             math::Vec3(1.0f, 0.0f, 0.0f),
+//             math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
+//             math::Vec2(1.0f, 1.0f),
+//         },
+//         //------------------------------------------------------------------------------------------------
+//         math::BasicVertex {
+//             math::Vec3(-1.f, -1.0f, -1.0f),
+//             math::Vec3(0.0f, -1.0f, 0.0f),
+//             math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
+//             math::Vec2(0.0f, 0.0f),
+//         },
+//         math::BasicVertex {
+//             math::Vec3(1.0f, -1.0f, -1.0f),
+//             math::Vec3(0.0f, -1.0f, 0.0f),
+//             math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
+//             math::Vec2(1.0f, 0.0f),
+//         },
+//         math::BasicVertex {
+//             math::Vec3(-1.0f, -1.0f, 1.0f),
+//             math::Vec3(0.0f, -1.0f, 0.0f),
+//             math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
+//             math::Vec2(0.0f, 1.0f),
+//         },
+//         math::BasicVertex {
+//             math::Vec3(1.0f, -1.0f, 1.0f),
+//             math::Vec3(0.0f, -1.0f, 0.0f),
+//             math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
+//             math::Vec2(1.0f, 1.0f),
+//         },
+//         //------------------------------------------------------------------------------------------------
+//         math::BasicVertex {
+//             math::Vec3(-1.f, 1.0f, -1.0f),
+//             math::Vec3(0.0f, 1.0f, 0.0f),
+//             math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
+//             math::Vec2(0.0f, 0.0f),
+//         },
+//         math::BasicVertex {
+//             math::Vec3(1.0f, 1.0f, -1.0f),
+//             math::Vec3(0.0f, 1.0f, 0.0f),
+//             math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
+//             math::Vec2(1.0f, 0.0f),
+//         },
+//         math::BasicVertex {
+//             math::Vec3(-1.0f, 1.0f, 1.0f),
+//             math::Vec3(0.0f, 1.0f, 0.0f),
+//             math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
+//             math::Vec2(0.0f, 1.0f),
+//         },
+//         math::BasicVertex {
+//             math::Vec3(1.0f, 1.0f, 1.0f),
+//             math::Vec3(0.0f, 1.0f, 0.0f),
+//             math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
+//             math::Vec2(1.0f, 1.0f),
+//         },
+//     };
+//     const std::vector<std::uint32_t> indices = {
+//         0, 2, 1, // - 1
+//         1, 2, 3, // - 2
+//         4, 5, 6, // - 3
+//         5, 7, 6, // - 4
+//         8, 9, 10, // - 5
+//         9, 11, 10, // - 6
+//         12, 14, 13, // - 7
+//         13, 14, 15, // - 8
+//         16, 18, 17, // - 9
+//         17, 18, 19, // - 10
+//         20, 21, 22, // - 11
+//         21, 23, 22, // - 12
+//     };
+//     const auto id = core::asset::Manager::create_id();
+//     std::shared_ptr<Mesh> m(new Mesh(
+//         id, "inward-cube", vertices, indices,
+//         math::Aabb3(math::Vec3(1.0), math::Vec3(-1.0)),
+//         e, core::sync::EndCaller<core::sync::EndCallerIgnore>([c] {})));
+//     c.set_data(m);
+//     inward_cube = m;
+//     cache.get_cacher().get_cacheds()[id] = m;
+//     return m;
+// }
 
-//std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager::create_face_square(
-//    const texture::Face f,
-//    core::sync::EndCaller<Mesh>& c) noexcept
+// std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager::create_face_square(
+//     const texture::Face f,
+//     core::sync::EndCaller<Mesh>& c) noexcept
 //{
-//    const auto search = face_squares.find(f);
-//    if (search != face_squares.end()) {
-//        if (std::shared_ptr<Mesh> m = search->second.lock()) {
-//            c.set_data(m);
-//            return m;
-//        }
-//    }
-//    std::vector<math::BasicVertex> vertices = {
-//        math::BasicVertex {
-//            math::Vec3(-1.f, -1.0f, 0.5f),
-//            math::Vec3(0.0f),
-//            math::Vec4(0.0f),
-//            math::Vec2(0.0f),
-//        },
-//        math::BasicVertex {
-//            math::Vec3(1.0f, -1.0f, 0.5f),
-//            math::Vec3(0.0f),
-//            math::Vec4(0.0f),
-//            math::Vec2(0.0f),
-//        },
-//        math::BasicVertex {
-//            math::Vec3(-1.0f, 1.0f, 0.5f),
-//            math::Vec3(0.0f),
-//            math::Vec4(0.0f),
-//            math::Vec2(0.0f),
-//        },
-//        math::BasicVertex {
-//            math::Vec3(1.0f, 1.0f, 0.5f),
-//            math::Vec3(0.0f),
-//            math::Vec4(0.0f),
-//            math::Vec2(0.0f),
-//        },
-//    };
-//    switch (f) {
-//    case texture::Face::PositiveX:
-//        vertices[0].normal = math::Vec3(1.0f, 1.0f, 1.0f);
-//        vertices[1].normal = math::Vec3(1.0f, 1.0f, -1.0f);
-//        vertices[2].normal = math::Vec3(1.0f, -1.0f, 1.0f);
-//        vertices[3].normal = math::Vec3(1.0f, -1.0f, -1.0f);
-//        break;
-//    case texture::Face::NegativeX:
-//        vertices[0].normal = math::Vec3(-1.0f, 1.0f, -1.0f);
-//        vertices[1].normal = math::Vec3(-1.0f, 1.0f, 1.0f);
-//        vertices[2].normal = math::Vec3(-1.0f, -1.0f, -1.0f);
-//        vertices[3].normal = math::Vec3(-1.0f, -1.0f, 1.0f);
-//        break;
-//    case texture::Face::PositiveY:
-//        vertices[0].normal = math::Vec3(-1.0f, 1.0f, -1.0f);
-//        vertices[1].normal = math::Vec3(1.0f, 1.0f, -1.0f);
-//        vertices[2].normal = math::Vec3(-1.0f, 1.0f, 1.0f);
-//        vertices[3].normal = math::Vec3(1.0f, 1.0f, 1.0f);
-//        break;
-//    case texture::Face::NegativeY:
-//        vertices[0].normal = math::Vec3(-1.0f, -1.0f, 1.0f);
-//        vertices[1].normal = math::Vec3(1.0f, -1.0f, 1.0f);
-//        vertices[2].normal = math::Vec3(-1.0f, -1.0f, -1.0f);
-//        vertices[3].normal = math::Vec3(1.0f, -1.0f, -1.0f);
-//        break;
-//    case texture::Face::PositiveZ:
-//        vertices[0].normal = math::Vec3(-1.0f, 1.0f, 1.0f);
-//        vertices[1].normal = math::Vec3(1.0f, 1.0f, 1.0f);
-//        vertices[2].normal = math::Vec3(-1.0f, -1.0f, 1.0f);
-//        vertices[3].normal = math::Vec3(1.0f, -1.0f, 1.0f);
-//        break;
-//    case texture::Face::NegativeZ:
-//        vertices[0].normal = math::Vec3(1.0f, 1.0f, -1.0f);
-//        vertices[1].normal = math::Vec3(-1.0f, 1.0f, -1.0f);
-//        vertices[2].normal = math::Vec3(1.0f, -1.0f, -1.0f);
-//        vertices[3].normal = math::Vec3(-1.0f, -1.0f, -1.0f);
-//        break;
-//    }
-//    const std::vector<std::uint32_t> indices = {
-//        0, 1, 2, // - 1
-//        1, 3, 2, // - 2
-//    };
-//    const auto id = core::asset::Manager::create_id();
-//    std::shared_ptr<Mesh> m(new Mesh(
-//        id, std::string("mesh-face-") + std::to_string(f), vertices, indices,
-//        math::Aabb3(math::Vec3(1.0), math::Vec3(-1.0)),
-//        e, core::sync::EndCaller<core::sync::EndCallerIgnore>([c] {})));
-//    c.set_data(m);
-//    cache.get_cacher().get_cacheds()[id] = m;
-//    face_squares[f] = m;
-//    return m;
-//}
+//     const auto search = face_squares.find(f);
+//     if (search != face_squares.end()) {
+//         if (std::shared_ptr<Mesh> m = search->second.lock()) {
+//             c.set_data(m);
+//             return m;
+//         }
+//     }
+//     std::vector<math::BasicVertex> vertices = {
+//         math::BasicVertex {
+//             math::Vec3(-1.f, -1.0f, 0.5f),
+//             math::Vec3(0.0f),
+//             math::Vec4(0.0f),
+//             math::Vec2(0.0f),
+//         },
+//         math::BasicVertex {
+//             math::Vec3(1.0f, -1.0f, 0.5f),
+//             math::Vec3(0.0f),
+//             math::Vec4(0.0f),
+//             math::Vec2(0.0f),
+//         },
+//         math::BasicVertex {
+//             math::Vec3(-1.0f, 1.0f, 0.5f),
+//             math::Vec3(0.0f),
+//             math::Vec4(0.0f),
+//             math::Vec2(0.0f),
+//         },
+//         math::BasicVertex {
+//             math::Vec3(1.0f, 1.0f, 0.5f),
+//             math::Vec3(0.0f),
+//             math::Vec4(0.0f),
+//             math::Vec2(0.0f),
+//         },
+//     };
+//     switch (f) {
+//     case texture::Face::PositiveX:
+//         vertices[0].normal = math::Vec3(1.0f, 1.0f, 1.0f);
+//         vertices[1].normal = math::Vec3(1.0f, 1.0f, -1.0f);
+//         vertices[2].normal = math::Vec3(1.0f, -1.0f, 1.0f);
+//         vertices[3].normal = math::Vec3(1.0f, -1.0f, -1.0f);
+//         break;
+//     case texture::Face::NegativeX:
+//         vertices[0].normal = math::Vec3(-1.0f, 1.0f, -1.0f);
+//         vertices[1].normal = math::Vec3(-1.0f, 1.0f, 1.0f);
+//         vertices[2].normal = math::Vec3(-1.0f, -1.0f, -1.0f);
+//         vertices[3].normal = math::Vec3(-1.0f, -1.0f, 1.0f);
+//         break;
+//     case texture::Face::PositiveY:
+//         vertices[0].normal = math::Vec3(-1.0f, 1.0f, -1.0f);
+//         vertices[1].normal = math::Vec3(1.0f, 1.0f, -1.0f);
+//         vertices[2].normal = math::Vec3(-1.0f, 1.0f, 1.0f);
+//         vertices[3].normal = math::Vec3(1.0f, 1.0f, 1.0f);
+//         break;
+//     case texture::Face::NegativeY:
+//         vertices[0].normal = math::Vec3(-1.0f, -1.0f, 1.0f);
+//         vertices[1].normal = math::Vec3(1.0f, -1.0f, 1.0f);
+//         vertices[2].normal = math::Vec3(-1.0f, -1.0f, -1.0f);
+//         vertices[3].normal = math::Vec3(1.0f, -1.0f, -1.0f);
+//         break;
+//     case texture::Face::PositiveZ:
+//         vertices[0].normal = math::Vec3(-1.0f, 1.0f, 1.0f);
+//         vertices[1].normal = math::Vec3(1.0f, 1.0f, 1.0f);
+//         vertices[2].normal = math::Vec3(-1.0f, -1.0f, 1.0f);
+//         vertices[3].normal = math::Vec3(1.0f, -1.0f, 1.0f);
+//         break;
+//     case texture::Face::NegativeZ:
+//         vertices[0].normal = math::Vec3(1.0f, 1.0f, -1.0f);
+//         vertices[1].normal = math::Vec3(-1.0f, 1.0f, -1.0f);
+//         vertices[2].normal = math::Vec3(1.0f, -1.0f, -1.0f);
+//         vertices[3].normal = math::Vec3(-1.0f, -1.0f, -1.0f);
+//         break;
+//     }
+//     const std::vector<std::uint32_t> indices = {
+//         0, 1, 2, // - 1
+//         1, 3, 2, // - 2
+//     };
+//     const auto id = core::asset::Manager::create_id();
+//     std::shared_ptr<Mesh> m(new Mesh(
+//         id, std::string("mesh-face-") + std::to_string(f), vertices, indices,
+//         math::Aabb3(math::Vec3(1.0), math::Vec3(-1.0)),
+//         e, core::sync::EndCaller<core::sync::EndCallerIgnore>([c] {})));
+//     c.set_data(m);
+//     cache.get_cacher().get_cacheds()[id] = m;
+//     face_squares[f] = m;
+//     return m;
+// }
 
 std::shared_ptr<gearoenix::render::mesh::Builder> gearoenix::render::mesh::Manager::build(
     const std::string& name,

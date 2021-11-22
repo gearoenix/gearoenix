@@ -16,22 +16,22 @@ void gearoenix::physics::body::Car::update_steering_angle() noexcept
 
 void gearoenix::physics::body::Car::update_axles() noexcept
 {
-    //front_slip_angle = (lateral_velocity + (wheels_angular_velocity * front_axle_center_of_gravity_distance)).atan() - (velocity.sign() * steering_angle);
-    //rear_slip_angle = (lateral_velocity - (wheels_angular_velocity * rear_axle_center_of_gravity_distance)).atan();
-    //front_lateral_force = front_slip_angle * cornering_stiffness;
-    //rear_lateral_force = rear_slip_angle * cornering_stiffness;
+    // front_slip_angle = (lateral_velocity + (wheels_angular_velocity * front_axle_center_of_gravity_distance)).atan() - (velocity.sign() * steering_angle);
+    // rear_slip_angle = (lateral_velocity - (wheels_angular_velocity * rear_axle_center_of_gravity_distance)).atan();
+    // front_lateral_force = front_slip_angle * cornering_stiffness;
+    // rear_lateral_force = rear_slip_angle * cornering_stiffness;
     //// TODO: compute & check that all tires all on ground
-    //front_friction_force = mass * gravitational_acceleration * (is_front_sliding ? tire_kinetic_friction_coefficient : tire_static_friction_coefficient) * 0.5;
-    //front_capped_lateral_force = front_lateral_force - front_friction_force;
-    //rear_friction_force = mass * gravitational_acceleration * (is_rear_sliding ? tire_kinetic_friction_coefficient : tire_static_friction_coefficient) * 0.5;
-    //rear_capped_lateral_force = rear_lateral_force - rear_friction_force;
+    // front_friction_force = mass * gravitational_acceleration * (is_front_sliding ? tire_kinetic_friction_coefficient : tire_static_friction_coefficient) * 0.5;
+    // front_capped_lateral_force = front_lateral_force - front_friction_force;
+    // rear_friction_force = mass * gravitational_acceleration * (is_rear_sliding ? tire_kinetic_friction_coefficient : tire_static_friction_coefficient) * 0.5;
+    // rear_capped_lateral_force = rear_lateral_force - rear_friction_force;
 }
 
 void gearoenix::physics::body::Car::update_engine() noexcept
 {
     velocity_attitude = velocity.length();
-    //wheels_angular_velocity = velocity_attitude / (2.0 * GX_PI * tire_radius);
-    //engine_angular_velocity = wheels_angular_velocity * gear_ratios[current_gear] * final_drive_ratio;
+    // wheels_angular_velocity = velocity_attitude / (2.0 * GX_PI * tire_radius);
+    // engine_angular_velocity = wheels_angular_velocity * gear_ratios[current_gear] * final_drive_ratio;
     engine_angular_velocity_rpm = engine_angular_velocity * 60.0;
     // check for transmission change base on engine_angular_velocity_rpm
     //

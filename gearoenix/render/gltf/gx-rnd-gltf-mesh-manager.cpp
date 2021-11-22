@@ -4,6 +4,7 @@
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "../gx-rnd-vertex.hpp"
 #include "../mesh/gx-rnd-msh-builder.hpp"
+#include "..\..\dxr\gx-dxr-mesh.hpp"
 #include "gx-rnd-gltf-loader.hpp"
 #include <tiny_gltf.h>
 
@@ -11,8 +12,6 @@ gearoenix::render::gltf::MeshManager::MeshManager(Loader& loader) noexcept
     : loader(loader)
 {
 }
-
-gearoenix::render::gltf::MeshManager::~MeshManager() noexcept = default;
 
 void gearoenix::render::gltf::MeshManager::get(
     const std::size_t index,

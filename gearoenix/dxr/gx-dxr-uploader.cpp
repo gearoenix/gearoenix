@@ -17,7 +17,7 @@ void gearoenix::dxr::Uploader::wait(const UINT64 fv) noexcept
     GX_ASSERT_D(0 != CloseHandle(fence_event))
 }
 
-gearoenix::dxr::Uploader::Uploader(std::shared_ptr<Device>&& _device) noexcept
+gearoenix::dxr::Uploader::Uploader(std::shared_ptr<Device> _device) noexcept
     : device(std::move(_device))
     , copy_queue(new Queue(device, Queue::Type::Copy))
     , direct_queue(new Queue(device, Queue::Type::Direct)) {
@@ -39,11 +39,9 @@ void gearoenix::dxr::Uploader::upload(
         GX_DXR_CHECK(dev->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_COPY, cal.Get(), nullptr, IID_PPV_ARGS(&cmd)))
         auto cb = std::make_shared<CpuBuffer>(dev.Get(), static_cast<UINT>(data.size()), nullptr);
         cb->copy(data.data(), data.size());
-        const auto t1 = CD3DX12_RESOURCE_BARRIER::Transition(buffer->get_resource().Get(), D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_COPY_DEST);
-        cmd->ResourceBarrier(1, &t1);
         cmd->CopyBufferRegion(buffer->get_resource().Get(), 0, cb->get_resource().Get(), 0, static_cast<UINT>(data.size()));
-        const auto t2 = CD3DX12_RESOURCE_BARRIER::Transition(buffer->get_resource().Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_COMMON);
-        cmd->ResourceBarrier(1, &t2);
+        const auto t = CD3DX12_RESOURCE_BARRIER::Transition(buffer->get_resource().Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_COMMON);
+        cmd->ResourceBarrier(1, &t);
         GX_DXR_CHECK(cmd->Close())
         ID3D12CommandList* const cmds[] = { static_cast<ID3D12CommandList*>(cmd.Get()) };
         copy_queue->get_command_queue()->ExecuteCommandLists(1, cmds);

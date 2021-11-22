@@ -128,7 +128,7 @@ gearoenix::vulkan::image::Image& gearoenix::vulkan::image::Image::operator=(Imag
     return *this;
 }
 //
-//void gearoenix::vulkan::image::Image::transit(command::Buffer& c, const VkImageLayout& old_lyt, const VkImageLayout& new_lyt) noexcept
+// void gearoenix::vulkan::image::Image::transit(command::Buffer& c, const VkImageLayout& old_lyt, const VkImageLayout& new_lyt) noexcept
 //{
 //    VkPipelineStageFlags src_stage;
 //    VkPipelineStageFlags dst_stage;
@@ -167,12 +167,12 @@ gearoenix::vulkan::image::Image& gearoenix::vulkan::image::Image::operator=(Imag
 //        1, &barrier);
 //}
 //
-//void gearoenix::vulkan::image::Image::transit_for_writing(command::Buffer& c) noexcept
+// void gearoenix::vulkan::image::Image::transit_for_writing(command::Buffer& c) noexcept
 //{
 //    transit(c, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 //}
 //
-//void gearoenix::vulkan::image::Image::copy_from_buffer(command::Buffer& c, const buffer::Buffer& b) noexcept
+// void gearoenix::vulkan::image::Image::copy_from_buffer(command::Buffer& c, const buffer::Buffer& b) noexcept
 //{
 //    VkBufferImageCopy region;
 //    GX_SET_ZERO(region)
@@ -210,7 +210,7 @@ gearoenix::vulkan::image::Image& gearoenix::vulkan::image::Image::operator=(Imag
 //        &region);
 //}
 //
-//void gearoenix::vulkan::image::Image::transit_for_reading(command::Buffer& c) noexcept
+// void gearoenix::vulkan::image::Image::transit_for_reading(command::Buffer& c) noexcept
 //{
 //    transit(c, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 //}

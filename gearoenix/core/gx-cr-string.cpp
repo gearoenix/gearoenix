@@ -3,6 +3,8 @@
 #include <codecvt>
 #include <locale>
 
+static std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
+
 bool gearoenix::core::String::is_character(const event::button::KeyboardKeyId ki) noexcept
 {
     return to_character(ki).has_value();
@@ -156,7 +158,12 @@ std::optional<wchar_t> gearoenix::core::String::to_character(const event::button
 
 std::string gearoenix::core::String::to_string(const std::wstring& s) noexcept
 {
-    return std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t>().to_bytes(s);
+    return converter.to_bytes(s);
+}
+
+std::wstring gearoenix::core::String::to_wstring(const std::string& s) noexcept
+{
+    return converter.from_bytes(s);
 }
 
 #ifdef GX_IN_IOS
