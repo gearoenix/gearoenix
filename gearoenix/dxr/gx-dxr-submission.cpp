@@ -1,10 +1,12 @@
 #include "gx-dxr-submission.hpp"
 
 #ifdef GX_RENDER_DXR_ENABLED
+#include "../core/ecs/gx-cr-ecs-world.hpp"
 #include "gx-dxr-check.hpp"
 #include "gx-dxr-descriptor.hpp"
 #include "gx-dxr-device.hpp"
 #include "gx-dxr-engine.hpp"
+#include "gx-dxr-mesh.hpp"
 #include "gx-dxr-pipeline.hpp"
 #include "gx-dxr-swapchain.hpp"
 
@@ -34,9 +36,14 @@ bool gearoenix::dxr::SubmissionManager::render_frame() noexcept
     GX_DXR_CHECK(f.cal->Reset())
     GX_DXR_CHECK(f.cmd->Reset(f.cal.Get(), pipeline_manager->get_g_buffer_filler_pipeline_state().Get()))
     f.cmd->SetGraphicsRootSignature(pipeline_manager->get_g_buffer_filler_root_signature().Get());
+    f.cmd->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     // TODO
     swapchain->prepare(f.cmd.Get());
-    // TODO
+    e.get_world()->parallel_system<Mesh>([&](const core::ecs::Entity::id_t, Mesh& m, const unsigned int) noexcept {
+        f.cmd->IASetVertexBuffers(0, 1, &m.get_vv());
+        f.cmd->IASetIndexBuffer(&m.get_iv());
+        f.cmd->DrawIndexedInstanced(m.get_indices_count(), 1, 0, 0, 0);
+    });
     return swapchain->present(f.cmd.Get());
 }
 

@@ -5,6 +5,7 @@
 #include "../core/ecs/gx-cr-ecs-component.hpp"
 #include "../render/mesh/gx-rnd-msh-builder.hpp"
 #include "../render/mesh/gx-rnd-msh-manager.hpp"
+#include "gx-dxr-loader.hpp"
 
 namespace gearoenix::dxr {
 struct Engine;
@@ -13,8 +14,16 @@ struct GpuBuffer;
 struct Mesh final : public core::ecs::Component {
     GX_GET_REFC_PRV(std::shared_ptr<GpuBuffer>, vb)
     GX_GET_REFC_PRV(std::shared_ptr<GpuBuffer>, ib)
+    GX_GET_CVAL_PRV(UINT, indices_count)
+    GX_GET_REFC_PRV(D3D12_VERTEX_BUFFER_VIEW, vv)
+    GX_GET_REFC_PRV(D3D12_INDEX_BUFFER_VIEW, iv)
 
-    Mesh(std::shared_ptr<GpuBuffer>&& vb, std::shared_ptr<GpuBuffer>&& ib) noexcept;
+    Mesh(
+        std::shared_ptr<GpuBuffer>&& vb,
+        std::shared_ptr<GpuBuffer>&& ib,
+        UINT vertex_size,
+        UINT vertices_size,
+        UINT indices_count) noexcept;
     ~Mesh() noexcept final;
     Mesh(Mesh&&) noexcept;
     Mesh(const Mesh&) = delete;

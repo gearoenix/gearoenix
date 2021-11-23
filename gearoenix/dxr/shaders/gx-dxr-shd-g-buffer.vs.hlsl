@@ -13,7 +13,7 @@ PSInput main(float3 position : POSITION, float3 normal : NORMAL, float4 tangent:
 {
     PSInput result;
 
-    result.position = float4(position + ((normal + tangent.xyz) * 0.001), 1.0);
+    result.position = float4(position, 1.0);
     result.normal = normal;
     result.tangent = tangent;
     result.uv = uv;

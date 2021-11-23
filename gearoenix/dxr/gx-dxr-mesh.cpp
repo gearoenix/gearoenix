@@ -6,10 +6,19 @@
 #include "gx-dxr-engine.hpp"
 #include "gx-dxr-uploader.hpp"
 
-gearoenix::dxr::Mesh::Mesh(std::shared_ptr<GpuBuffer>&& vb, std::shared_ptr<GpuBuffer>&& ib) noexcept
+gearoenix::dxr::Mesh::Mesh(
+    std::shared_ptr<GpuBuffer>&& _vb, std::shared_ptr<GpuBuffer>&& _ib,
+    const UINT vertex_size, const UINT vertices_size, const UINT indices_count) noexcept
     : core::ecs::Component(this)
-    , vb(std::move(vb))
-    , ib(std::move(ib))
+    , vb(std::move(_vb))
+    , ib(std::move(_ib))
+    , indices_count(indices_count)
+    , vv {
+        .BufferLocation = vb->get_resource()->GetGPUVirtualAddress(),
+        .SizeInBytes = vertices_size,
+        .StrideInBytes = vertex_size
+    }
+    , iv { .BufferLocation = ib->get_resource()->GetGPUVirtualAddress(), .SizeInBytes = indices_count * 4, .Format = DXGI_FORMAT_R32_UINT }
 {
 }
 
@@ -65,8 +74,10 @@ std::shared_ptr<gearoenix::render::mesh::Builder> gearoenix::dxr::MeshManager::b
     std::vector<std::uint8_t> ibd(isz);
     std::memcpy(ibd.data(), indices.data(), isz);
 
-    core::sync::EndCallerIgnored end([r, vb, ib, c]() mutable noexcept -> void {
-        r->get_entity_builder()->get_builder().add_component(Mesh(std::move(vb), std::move(ib)));
+    UINT vertex_size = sizeof(render::PbrVertex), vertices_size = vsz, indices_count = static_cast<UINT>(indices.size());
+
+    core::sync::EndCallerIgnored end([r, vb, ib, c, vertex_size, vertices_size, indices_count]() mutable noexcept -> void {
+        r->get_entity_builder()->get_builder().add_component(Mesh(std::move(vb), std::move(ib), vertex_size, vertices_size, indices_count));
         (void)c;
     });
 

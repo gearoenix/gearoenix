@@ -83,7 +83,7 @@ gearoenix::dxr::PipelineManager::PipelineManager(std::shared_ptr<Device> _device
     pso_desc.SampleMask = UINT_MAX;
     pso_desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
     pso_desc.NumRenderTargets = 1;
-    pso_desc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
+    pso_desc.RTVFormats[0] = DXGI_FORMAT_B8G8R8A8_UNORM;
     pso_desc.SampleDesc.Count = 1;
     GX_DXR_CHECK(d->CreateGraphicsPipelineState(&pso_desc, IID_PPV_ARGS(&g_buffer_filler_pipeline_state)))
 }

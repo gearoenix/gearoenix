@@ -11,5 +11,5 @@ struct PSInput
 [RootSignature(G_BUFFERS_FILLER_ROOT_SIGNATURE)]
 float4 main(PSInput input) : SV_TARGET
 {
-    return float4(input.position.xyz, 1.0);
+    return float4(input.position.xyz * 0.001, 1.0);
 }

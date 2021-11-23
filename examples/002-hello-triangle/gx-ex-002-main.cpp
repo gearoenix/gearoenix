@@ -16,11 +16,11 @@ struct GameApp final : public gearoenix::core::Application {
         : Application(plt_app)
     {
         std::vector<gearoenix::render::PbrVertex> vertices(3);
-        vertices[0].set_position(1.0f, 0.0f, 0.0f);
+        vertices[0].set_position(1.0f, -1.0f, 0.0f);
         vertices[1].set_position(0.0f, 1.0f, 0.0f);
-        vertices[2].set_position(-1.0f, 0.0f, 0.0f);
+        vertices[2].set_position(-1.0f, -1.0f, 0.0f);
 
-        std::vector<std::uint32_t> indices = { 0, 1, 2 };
+        std::vector<std::uint32_t> indices = { 0, 2, 1 };
 
         auto mesh_builder = render_engine->get_mesh_manager()->build("triangle", vertices, indices);
         mesh_builder->set_material(gearoenix::render::material::Pbr());
