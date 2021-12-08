@@ -30,7 +30,6 @@ gearoenix::dxr::Engine::Engine(platform::Application& platform_application) noex
     , platform_application(platform_application)
 {
     device_lost_handle();
-    GX_TODO
 }
 
 void gearoenix::dxr::Engine::device_lost_handle(const int failed_tries) noexcept
@@ -75,6 +74,7 @@ void gearoenix::dxr::Engine::window_resized(int failed_tries) noexcept
 
 gearoenix::dxr::Engine::~Engine() noexcept
 {
+    swapchain->wait_for_gpu();
     world = nullptr;
 }
 

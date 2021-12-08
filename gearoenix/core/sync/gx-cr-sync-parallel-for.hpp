@@ -33,11 +33,27 @@ public:
     {
 #ifdef GX_THREAD_NOT_SUPPORTED
         for (; first != end; ++first)
-            f(*first);
+            f(*first, 0);
 #else
         exec([f, first, end](const unsigned int kernels_count, const unsigned int kernel_index) noexcept {
             for (Iter iter = (first + kernel_index); iter != end; iter += kernels_count) {
                 f(*iter, kernel_index);
+            }
+        });
+#endif
+    }
+
+    template <typename Iter, typename Fun>
+    static void execi(Iter first, Iter end, Fun f)
+    {
+#ifdef GX_THREAD_NOT_SUPPORTED
+        for (unsigned int index = 0; first != end; ++first, ++index)
+            f(*first, index, 0);
+#else
+        exec([f, first, end](const unsigned int kernels_count, const unsigned int kernel_index) noexcept {
+            unsigned int index = kernel_index;
+            for (Iter iter = (first + kernel_index); iter != end; iter += kernels_count, index += kernels_count) {
+                f(*iter, index, kernel_index);
             }
         });
 #endif

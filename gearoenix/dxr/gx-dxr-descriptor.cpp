@@ -7,6 +7,7 @@
 #include "gx-dxr-device.hpp"
 
 gearoenix::dxr::DescriptorAllocator::DescriptorAllocator(Device& d) noexcept
+    : allocator(core::Allocator::construct(GPU_DESCRIPTORS_COUNT))
 {
     D3D12_DESCRIPTOR_HEAP_DESC desc;
     GX_SET_ZERO(desc);
@@ -29,8 +30,10 @@ gearoenix::dxr::DescriptorAllocator::~DescriptorAllocator() noexcept = default;
 
 gearoenix::dxr::Descriptor::Descriptor(
     D3D12_CPU_DESCRIPTOR_HANDLE&& cpu_handle,
+    D3D12_GPU_DESCRIPTOR_HANDLE&& gpu_handle,
     std::shared_ptr<core::Allocator>&& allocator) noexcept
     : cpu_handle(std::move(cpu_handle))
+    , gpu_handle(std::move(gpu_handle))
     , allocator(std::move(allocator))
 {
 }
@@ -49,10 +52,13 @@ gearoenix::dxr::DescriptorManager::~DescriptorManager() noexcept = default;
 
 gearoenix::dxr::Descriptor gearoenix::dxr::DescriptorManager::allocate() noexcept
 {
-    auto alc = allocator.allocator->allocate(1);
+    auto alc = allocator.allocator->allocate(allocator.size_increment);
     return Descriptor(
         D3D12_CPU_DESCRIPTOR_HANDLE {
             .ptr = allocator.cpu_starting_handle.ptr + alc->get_offset(),
+        },
+        D3D12_GPU_DESCRIPTOR_HANDLE {
+            .ptr = allocator.gpu_starting_handle.ptr + alc->get_offset(),
         },
         std::move(alc));
 }

@@ -66,7 +66,7 @@ struct Pixel {
         }
 
         template <typename I>
-        constexpr Element operator[](const I i) const noexcept
+        constexpr const Element& operator[](const I i) const noexcept
         {
             return reinterpret_cast<const Element*>(current_ptr)[i];
         }

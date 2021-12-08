@@ -1,12 +1,4 @@
-#include "gx-dxr-shd-root-signature.hlsli"
-
-struct PSInput
-{
-    float4 position : SV_POSITION;
-    float3 normal : NORMAL;
-    float4 tangent : TANGENT;
-    float2 uv : TEXCOORD;
-};
+#include "gx-dxr-shd-g-buffer-common.hlsli"
 
 [RootSignature(G_BUFFERS_FILLER_ROOT_SIGNATURE)]
 PSInput main(float3 position : POSITION, float3 normal : NORMAL, float4 tangent: TANGENT, float2 uv : TEXCOORD)

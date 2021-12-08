@@ -1,6 +1,5 @@
 #ifndef GEAROENIX_CORE_ASSET_ASSET_HPP
 #define GEAROENIX_CORE_ASSET_ASSET_HPP
-#include "../gx-cr-static.hpp"
 #include "../gx-cr-types.hpp"
 #include "gx-cr-asset-type.hpp"
 #include <optional>

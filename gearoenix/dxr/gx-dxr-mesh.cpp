@@ -1,10 +1,13 @@
 #include "gx-dxr-mesh.hpp"
 #ifdef GX_RENDER_DXR_ENABLED
 #include "../core/gx-cr-string.hpp"
+#include "../render/material/gx-rnd-mat-pbr.hpp"
+#include "../render/mesh/gx-rnd-msh-mesh.hpp"
 #include "gx-dxr-buffer.hpp"
 #include "gx-dxr-device.hpp"
 #include "gx-dxr-engine.hpp"
 #include "gx-dxr-uploader.hpp"
+#include <map>
 
 gearoenix::dxr::Mesh::Mesh(
     std::shared_ptr<GpuBuffer>&& _vb, std::shared_ptr<GpuBuffer>&& _ib,
@@ -26,6 +29,16 @@ gearoenix::dxr::Mesh::~Mesh() noexcept = default;
 
 gearoenix::dxr::Mesh::Mesh(Mesh&&) noexcept = default;
 
+gearoenix::dxr::MaterialBuffer::MaterialBuffer(Engine& e, UINT buffer_size, LPCWSTR entity_name) noexcept
+    : core::ecs::Component(this)
+    , uniform(e, buffer_size, entity_name)
+{
+}
+
+gearoenix::dxr::MaterialBuffer::~MaterialBuffer() noexcept = default;
+
+gearoenix::dxr::MaterialBuffer::MaterialBuffer(MaterialBuffer&&) noexcept = default;
+
 gearoenix::dxr::MeshBuilder::MeshBuilder(
     Engine& e,
     const std::string& name,
@@ -33,14 +46,28 @@ gearoenix::dxr::MeshBuilder::MeshBuilder(
     const std::vector<std::uint32_t>& indices,
     math::Aabb3&& occlusion_box) noexcept
     : render::mesh::Builder(e, name, vertices, indices, std::move(occlusion_box))
+    , e(e)
 {
 }
 
-void gearoenix::dxr::MeshBuilder::set_material_type_index(const std::type_index& material_type) noexcept {
-    GX_TODO
+void gearoenix::dxr::MeshBuilder::set_material_type_index(const std::type_index& material_type) noexcept
+{
+    render::mesh::Builder::set_material_type_index(material_type);
 }
 
-gearoenix::dxr::MeshBuilder::~MeshBuilder() noexcept = default;
+gearoenix::dxr::MeshBuilder::~MeshBuilder() noexcept
+{
+    static std::unordered_map<std::type_index, std::function<void()>> impls {
+        { std::type_index(typeid(render::material::Pbr)), [this]() {
+             const auto material_name = core::String::to_wstring(name + "-PBR-Material");
+             entity_builder->get_builder().add_component(MaterialBuffer(
+                 e,
+                 sizeof(render::material::Pbr),
+                 material_name.c_str()));
+         } },
+    };
+    impls[entity_builder->get_builder().get_component<render::mesh::Mesh>()->get().material_type_index]();
+}
 
 gearoenix::dxr::MeshManager::MeshManager(Engine& e) noexcept
     : render::mesh::Manager(e)
@@ -74,10 +101,13 @@ std::shared_ptr<gearoenix::render::mesh::Builder> gearoenix::dxr::MeshManager::b
     std::vector<std::uint8_t> ibd(isz);
     std::memcpy(ibd.data(), indices.data(), isz);
 
-    UINT vertex_size = sizeof(render::PbrVertex), vertices_size = vsz, indices_count = static_cast<UINT>(indices.size());
+    const auto vertex_size = static_cast<UINT>(sizeof(render::PbrVertex));
+    const auto vertices_size = static_cast<UINT>(vsz);
+    const auto indices_count = static_cast<UINT>(indices.size());
 
     core::sync::EndCallerIgnored end([r, vb, ib, c, vertex_size, vertices_size, indices_count]() mutable noexcept -> void {
-        r->get_entity_builder()->get_builder().add_component(Mesh(std::move(vb), std::move(ib), vertex_size, vertices_size, indices_count));
+        r->get_entity_builder()->get_builder().add_component(
+            Mesh(std::move(vb), std::move(ib), vertex_size, vertices_size, indices_count));
         (void)c;
     });
 

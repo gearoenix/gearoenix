@@ -1,6 +1,5 @@
 #ifndef GEAROENIX_RENDER_ENGINE_ENGINE_HPP
 #define GEAROENIX_RENDER_ENGINE_ENGINE_HPP
-#include "../../core/sync/gx-cr-sync-end-caller.hpp"
 #include "../gx-rnd-runtime-configuration.hpp"
 #include "../texture/gx-rnd-txt-attachment.hpp"
 #include "gx-rnd-eng-limitations.hpp"
@@ -38,6 +37,10 @@ namespace gearoenix::render::scene {
 struct Manager;
 }
 
+namespace gearoenix::render::texture {
+struct Manager;
+}
+
 namespace gearoenix::render::engine {
 struct Engine {
     GX_GET_CVAL_PRT(Type, engine_type)
@@ -53,6 +56,7 @@ struct Engine {
     GX_GET_UPTR_PRT(scene::Manager, scene_manager)
     GX_GET_UPTR_PRT(mesh::Manager, mesh_manager)
     GX_GET_UPTR_PRT(camera::Manager, camera_manager)
+    GX_GET_UPTR_PRT(texture::Manager, texture_manager)
     GX_GET_UPTR_PRT(core::ecs::World, world)
 
 protected:

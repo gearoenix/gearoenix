@@ -8,7 +8,10 @@ namespace gearoenix::render::texture {
 struct TextureInfo {
     TextureFormat format = TextureFormat::RgbaUint8;
     SamplerInfo sampler_info;
-    Type texture_type = Type::Texture2D;
+    std::size_t width = 0;
+    std::size_t height = 0;
+    std::size_t depth = 0;
+    Type type = Type::Texture2D;
     bool has_mipmap = true;
 };
 }

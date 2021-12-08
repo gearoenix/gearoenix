@@ -5,6 +5,7 @@
 #include "../gltf/gx-rnd-gltf-loader.hpp"
 #include "../mesh/gx-rnd-msh-manager.hpp"
 #include "../scene/gx-rnd-scn-manager.hpp"
+#include "../texture/gx-rnd-txt-manager.hpp"
 
 #ifdef GX_RENDER_VULKAN_ENABLED
 #include "../../vulkan/engine/gx-vk-eng-engine.hpp"

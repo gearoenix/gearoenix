@@ -1,6 +1,10 @@
 #include "gx-dxr-buffer.hpp"
 #ifdef GX_RENDER_DXR_ENABLED
+#include "../core/macro/gx-cr-mcr-zeroer.hpp"
+#include "../math/gx-math-numeric.hpp"
 #include "gx-dxr-check.hpp"
+#include "gx-dxr-device.hpp"
+#include "gx-dxr-engine.hpp"
 
 gearoenix::dxr::CpuBuffer::CpuBuffer(
     ID3D12Device* const device,
@@ -21,7 +25,16 @@ gearoenix::dxr::CpuBuffer::CpuBuffer(
 
 gearoenix::dxr::CpuBuffer::~CpuBuffer() noexcept
 {
-    resource->Unmap(0, nullptr);
+    if (nullptr != resource)
+        resource->Unmap(0, nullptr);
+}
+
+gearoenix::dxr::CpuBuffer::CpuBuffer(CpuBuffer&& o) noexcept
+    : resource(std::move(o.resource))
+    , pointer(o.pointer)
+{
+    o.resource = nullptr;
+    o.pointer = nullptr;
 }
 
 void gearoenix::dxr::CpuBuffer::copy(const void* data, std::size_t size) noexcept
@@ -40,6 +53,23 @@ gearoenix::dxr::GpuBuffer::GpuBuffer(
 #ifdef GX_DEBUG_MODE
     resource->SetName(resource_name);
 #endif
+}
+
+gearoenix::dxr::UniformBuffer::UniformBuffer(const Engine& e, UINT buffer_size, LPCWSTR resource_name) noexcept
+    : buffer(e.get_device()->get_device().Get(), math::Numeric::align(buffer_size, 256U), resource_name)
+    , descriptor(e.get_descriptor_manager()->allocate())
+{
+    D3D12_CONSTANT_BUFFER_VIEW_DESC desc;
+    GX_SET_ZERO(desc)
+    desc.BufferLocation = buffer.get_resource()->GetGPUVirtualAddress();
+    desc.SizeInBytes = math::Numeric::align(buffer_size, 256U);
+    e.get_device()->get_device()->CreateConstantBufferView(&desc, descriptor.cpu_handle);
+}
+
+gearoenix::dxr::UniformBuffer::UniformBuffer(UniformBuffer&& o) noexcept
+    : buffer(std::move(o.buffer))
+    , descriptor(std::move(o.descriptor))
+{
 }
 
 #endif

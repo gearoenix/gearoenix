@@ -39,7 +39,13 @@ bool gearoenix::dxr::SubmissionManager::render_frame() noexcept
     f.cmd->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     // TODO
     swapchain->prepare(f.cmd.Get());
-    e.get_world()->parallel_system<Mesh>([&](const core::ecs::Entity::id_t, Mesh& m, const unsigned int) noexcept {
+    e.get_world()->parallel_system<Mesh, MaterialBuffer>([&](const core::ecs::Entity::id_t, Mesh& m, MaterialBuffer& mb, const unsigned int) noexcept {
+        auto* colour = reinterpret_cast<math::Vec4<float>*>(mb.uniform.get_buffer().get_pointer());
+        colour->x = 1.0f;
+        colour->y = 1.0f;
+        colour->z = 0.0f;
+        colour->w = 1.0f;
+        f.cmd->SetGraphicsRootConstantBufferView(0, mb.uniform.get_buffer().get_resource()->GetGPUVirtualAddress());
         f.cmd->IASetVertexBuffers(0, 1, &m.get_vv());
         f.cmd->IASetIndexBuffer(&m.get_iv());
         f.cmd->DrawIndexedInstanced(m.get_indices_count(), 1, 0, 0, 0);

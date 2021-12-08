@@ -5,12 +5,10 @@
 #include "../core/ecs/gx-cr-ecs-component.hpp"
 #include "../render/mesh/gx-rnd-msh-builder.hpp"
 #include "../render/mesh/gx-rnd-msh-manager.hpp"
+#include "gx-dxr-buffer.hpp"
 #include "gx-dxr-loader.hpp"
 
 namespace gearoenix::dxr {
-struct Engine;
-struct GpuBuffer;
-
 struct Mesh final : public core::ecs::Component {
     GX_GET_REFC_PRV(std::shared_ptr<GpuBuffer>, vb)
     GX_GET_REFC_PRV(std::shared_ptr<GpuBuffer>, ib)
@@ -31,10 +29,26 @@ struct Mesh final : public core::ecs::Component {
     Mesh& operator=(const Mesh&) = delete;
 };
 
+struct MaterialBuffer final : public core::ecs::Component {
+    UniformBuffer uniform;
+
+    MaterialBuffer(
+        Engine& e,
+        UINT buffer_size,
+        LPCWSTR entity_name) noexcept;
+    ~MaterialBuffer() noexcept final;
+    MaterialBuffer(MaterialBuffer&&) noexcept;
+    MaterialBuffer(const MaterialBuffer&) = delete;
+    MaterialBuffer& operator=(MaterialBuffer&&) = delete;
+    MaterialBuffer& operator=(const MaterialBuffer&) = delete;
+};
+
 struct MeshBuilder final : render::mesh::Builder {
     friend struct MeshManager;
 
 private:
+    Engine& e;
+
     MeshBuilder(
         Engine& e,
         const std::string& name,

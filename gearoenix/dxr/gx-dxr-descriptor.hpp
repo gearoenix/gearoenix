@@ -29,11 +29,15 @@ struct Descriptor final {
     friend struct DescriptorManager;
 
     const D3D12_CPU_DESCRIPTOR_HANDLE cpu_handle;
+    const D3D12_GPU_DESCRIPTOR_HANDLE gpu_handle;
 
 private:
-    const std::shared_ptr<core::Allocator> allocator;
+    std::shared_ptr<core::Allocator> allocator;
 
-    Descriptor(D3D12_CPU_DESCRIPTOR_HANDLE&& cpu_handle, std::shared_ptr<core::Allocator>&& allocator) noexcept;
+    Descriptor(
+        D3D12_CPU_DESCRIPTOR_HANDLE&& cpu_handle,
+        D3D12_GPU_DESCRIPTOR_HANDLE&& gpu_handle,
+        std::shared_ptr<core::Allocator>&& allocator) noexcept;
 
 public:
     ~Descriptor() noexcept;

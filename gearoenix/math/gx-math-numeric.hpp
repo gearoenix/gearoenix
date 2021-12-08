@@ -69,8 +69,7 @@ constexpr T gearoenix::math::Numeric::raise_p2(const T v, const T maximum, const
 template <typename T>
 constexpr T gearoenix::math::Numeric::maximum(const T a, const T b) noexcept
 {
-
-    if (std::is_floating_point<T>::value) {
+    if constexpr (std::is_floating_point_v<T>) {
         if (std::isnan(a))
             return b;
         if (std::isnan(b))
@@ -82,7 +81,7 @@ constexpr T gearoenix::math::Numeric::maximum(const T a, const T b) noexcept
 template <typename T>
 constexpr T gearoenix::math::Numeric::minimum(const T a, const T b) noexcept
 {
-    if (std::is_floating_point<T>::value) {
+    if constexpr (std::is_floating_point_v<T>) {
         if (std::isnan(a))
             return b;
         if (std::isnan(b))

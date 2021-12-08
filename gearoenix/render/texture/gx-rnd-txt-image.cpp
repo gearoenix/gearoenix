@@ -3,7 +3,7 @@
 #include "../../platform/gx-plt-log.hpp"
 #include "../../platform/stream/gx-plt-stm-stream.hpp"
 // This is a workaround for warnings in stb
-#include "../../core/gx-cr-disable-warnings.hpp"
+#include "../../platform/macro/gx-plt-mcr-disable-warnings.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION
 #define STBI_NO_STDIO
@@ -12,7 +12,7 @@
 #define STBI_WRITE_NO_STDIO
 #include <stb_image_write.h>
 // Returning to our warning level
-#include "../../core/gx-cr-enable-warnings.hpp"
+#include "../../platform/macro/gx-plt-mcr-enable-warnings.hpp"
 
 #include <cstring>
 
@@ -47,7 +47,7 @@ void gearoenix::render::texture::Image::decode(
     unsigned char* dd = stbi_load_from_memory(data, static_cast<int>(size), &iw, &ih, &chs,
         static_cast<int>(requested_channels.has_value() ? requested_channels.value() : 0));
     if (dd == nullptr) {
-        GXLOGF("Image decoder error.")
+        GX_LOG_F("Image decoder error.")
     }
     img_width = static_cast<unsigned int>(iw);
     img_height = static_cast<unsigned int>(ih);
@@ -72,7 +72,7 @@ void gearoenix::render::texture::Image::decode(
     float* const dd = stbi_loadf_from_memory(data, static_cast<int>(size), &iw, &ih, &chs,
         static_cast<int>(requested_channels.has_value() ? requested_channels.value() : 0));
     if (dd == nullptr) {
-        GXLOGF("Image decoder error.")
+        GX_LOG_F("Image decoder error.")
     }
     img_width = static_cast<std::size_t>(iw);
     img_height = static_cast<std::size_t>(ih);
