@@ -18,7 +18,7 @@ struct Texture {
 protected:
     Texture(
         std::string name,
-        const TextureInfo& sample_info,
+        const TextureInfo& info,
         engine::Engine& e) noexcept;
 
 public:

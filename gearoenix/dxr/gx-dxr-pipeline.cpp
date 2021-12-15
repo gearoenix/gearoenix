@@ -61,7 +61,7 @@ gearoenix::dxr::PipelineManager::PipelineManager(std::shared_ptr<Device> _device
             .SemanticIndex = 0,
             .Format = DXGI_FORMAT_R32G32_FLOAT,
             .InputSlot = 0,
-            .AlignedByteOffset = 24,
+            .AlignedByteOffset = 40,
             .InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,
             .InstanceDataStepRate = 0,
         },

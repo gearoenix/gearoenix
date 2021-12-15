@@ -2,6 +2,7 @@
 
 #ifdef GX_RENDER_DXR_ENABLED
 #include "../core/ecs/gx-cr-ecs-world.hpp"
+#include "../core/macro/gx-cr-mcr-counter.hpp"
 #include "gx-dxr-check.hpp"
 #include "gx-dxr-descriptor.hpp"
 #include "gx-dxr-device.hpp"
@@ -36,6 +37,9 @@ bool gearoenix::dxr::SubmissionManager::render_frame() noexcept
     GX_DXR_CHECK(f.cal->Reset())
     GX_DXR_CHECK(f.cmd->Reset(f.cal.Get(), pipeline_manager->get_g_buffer_filler_pipeline_state().Get()))
     f.cmd->SetGraphicsRootSignature(pipeline_manager->get_g_buffer_filler_root_signature().Get());
+    ID3D12DescriptorHeap* heaps[] = { descriptor_manager->get_allocator().heap.Get() };
+    f.cmd->SetDescriptorHeaps(GX_COUNT_OF(heaps), heaps);
+    f.cmd->SetGraphicsRootDescriptorTable(1, descriptor_manager->get_texture_2d_region_gpu_handle());
     f.cmd->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     // TODO
     swapchain->prepare(f.cmd.Get());

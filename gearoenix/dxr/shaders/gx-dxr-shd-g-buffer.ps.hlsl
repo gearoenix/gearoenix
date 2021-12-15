@@ -3,5 +3,5 @@
 [RootSignature(G_BUFFERS_FILLER_ROOT_SIGNATURE)]
 float4 main(PSInput input) : SV_TARGET
 {
-    return colour_factor;
+    return tex2ds[0].Sample(samplers, input.uv * 10.0);
 }

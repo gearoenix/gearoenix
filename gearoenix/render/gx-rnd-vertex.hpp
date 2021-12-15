@@ -14,6 +14,7 @@ struct PbrVertex final {
     explicit PbrVertex(platform::stream::Stream& f) noexcept;
     void read(platform::stream::Stream& f) noexcept;
     void set_position(float x, float y, float z) noexcept;
+    void set_uv(float x, float y) noexcept;
 
     friend std::ostream& operator<<(std::ostream& os, const PbrVertex& v) noexcept
     {

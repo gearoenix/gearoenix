@@ -46,14 +46,14 @@ public:
 
 struct DescriptorManager final {
     GX_GET_CREF_PRV(std::shared_ptr<Device>, device)
+    GX_GET_CREF_PRV(DescriptorAllocator, allocator)
+    GX_GET_REFC_PRV(std::shared_ptr<core::Allocator>, texture_2d_region_allocator)
+    GX_GET_REFC_PRV(D3D12_GPU_DESCRIPTOR_HANDLE, texture_2d_region_gpu_handle)
 
-private:
-    DescriptorAllocator allocator;
-
-public:
     explicit DescriptorManager(std::shared_ptr<Device> device) noexcept;
     ~DescriptorManager() noexcept;
-    [[nodiscard]] Descriptor allocate() noexcept;
+    [[nodiscard]] Descriptor allocate_texture_2d() noexcept;
+    [[nodiscard]] Descriptor allocate_others() noexcept;
 };
 }
 

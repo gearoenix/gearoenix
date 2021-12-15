@@ -52,8 +52,6 @@ private:
     MeshBuilder(
         Engine& e,
         const std::string& name,
-        const std::vector<render::PbrVertex>& vertices,
-        const std::vector<std::uint32_t>& indices,
         math::Aabb3&& occlusion_box) noexcept;
 
     void set_material_type_index(const std::type_index& material_type) noexcept final;

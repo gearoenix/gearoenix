@@ -21,7 +21,10 @@ gearoenix::dxr::Device::Device(std::shared_ptr<Adapter> _adapter) noexcept
         d3d_info_queue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_WARNING, true);
         D3D12_MESSAGE_ID hide[] {
             D3D12_MESSAGE_ID_MAP_INVALID_NULLRANGE,
-            D3D12_MESSAGE_ID_UNMAP_INVALID_NULLRANGE
+            D3D12_MESSAGE_ID_UNMAP_INVALID_NULLRANGE,
+            // TODO: Remove it. Workarounds for debug layer issues on hybrid-graphics systems
+            D3D12_MESSAGE_ID_EXECUTECOMMANDLISTS_WRONGSWAPCHAINBUFFERREFERENCE,
+            D3D12_MESSAGE_ID_RESOURCE_BARRIER_MISMATCHING_COMMAND_LIST_TYPE,
         };
         D3D12_INFO_QUEUE_FILTER filter;
         GX_SET_ZERO(filter)

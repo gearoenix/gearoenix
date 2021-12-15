@@ -31,3 +31,9 @@ void gearoenix::render::PbrVertex::set_position(const float x, const float y, co
     position.y = y;
     position.z = z;
 }
+
+void gearoenix::render::PbrVertex::set_uv(const float x, const float y) noexcept
+{
+    uv.x = x;
+    uv.y = y;
+}

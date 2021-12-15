@@ -42,10 +42,8 @@ gearoenix::dxr::MaterialBuffer::MaterialBuffer(MaterialBuffer&&) noexcept = defa
 gearoenix::dxr::MeshBuilder::MeshBuilder(
     Engine& e,
     const std::string& name,
-    const std::vector<render::PbrVertex>& vertices,
-    const std::vector<std::uint32_t>& indices,
     math::Aabb3&& occlusion_box) noexcept
-    : render::mesh::Builder(e, name, vertices, indices, std::move(occlusion_box))
+    : render::mesh::Builder(e, name, std::move(occlusion_box))
     , e(e)
 {
 }
@@ -87,7 +85,7 @@ std::shared_ptr<gearoenix::render::mesh::Builder> gearoenix::dxr::MeshManager::b
     auto* const d = eng.get_device()->get_device().Get();
     const auto& u = eng.get_uploader();
 
-    std::shared_ptr<render::mesh::Builder> r(new MeshBuilder(eng, name, vertices, indices, std::move(occlusion_box)));
+    std::shared_ptr<render::mesh::Builder> r(new MeshBuilder(eng, name, std::move(occlusion_box)));
 
     const auto vbn = core::String::to_wstring(name + "-DXR-Vertex-Buffer");
     const auto vsz = vertices.size() * sizeof(render::PbrVertex);

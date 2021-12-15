@@ -7,8 +7,6 @@
 gearoenix::render::mesh::Builder::Builder(
     render::engine::Engine& e,
     const std::string& name,
-    const std::vector<PbrVertex>& vertices,
-    const std::vector<std::uint32_t>& indices,
     math::Aabb3&& occlusion_box) noexcept
     : entity_builder(e.get_world()->create_shared_builder())
     , name(name)

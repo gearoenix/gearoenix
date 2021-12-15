@@ -11,8 +11,7 @@
 #include "gx-rnd-txt-texture-cube.hpp"
 #include <array>
 
-gearoenix::render::texture::Manager::Manager(engine::Engine& e) noexcept
-    : e(e)
+gearoenix::render::texture::Manager::Manager() noexcept
 {
 }
 
@@ -53,6 +52,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
 std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::get_brdflut(
     const core::sync::EndCallerIgnored& c) noexcept
 {
+    GX_GUARD_LOCK(brdflut)
     constexpr std::size_t resolution = 256;
     if (nullptr != brdflut)
         return brdflut;
@@ -102,6 +102,48 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     std::vector<std::vector<std::uint8_t>> pixels { std::move(pixels0) };
     brdflut = create_2d_from_pixels("default-brdflut", std::move(pixels), texture_info, c);
     return brdflut;
+}
+
+std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::get_checker(
+    const core::sync::EndCallerIgnored& c) noexcept
+{
+    GX_GUARD_LOCK(checkers)
+    if (nullptr != checkers)
+        return checkers;
+    const TextureInfo texture_info {
+        .format = TextureFormat::RgbaUint8,
+        .sampler_info = SamplerInfo {
+            .min_filter = Filter::Nearest,
+            .mag_filter = Filter::Nearest,
+            .wrap_s = Wrap::Repeat,
+            .wrap_t = Wrap::Repeat,
+            .wrap_r = Wrap::Repeat,
+        },
+        .width = 2,
+        .height = 2,
+        .type = Type::Texture2D,
+        .has_mipmap = false
+    };
+    std::vector<std::vector<std::uint8_t>> pixels { {
+        0u,
+        0u,
+        0u,
+        255u,
+        255u,
+        255u,
+        255u,
+        255u,
+        255u,
+        255u,
+        255u,
+        255u,
+        0u,
+        0u,
+        0u,
+        255u,
+    } };
+    checkers = create_2d_from_pixels("default-checker", std::move(pixels), texture_info, c);
+    return checkers;
 }
 
 // std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::create_2d_from_formatted(

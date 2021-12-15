@@ -16,7 +16,7 @@ gearoenix::render::gltf::MeshManager::MeshManager(Loader& loader) noexcept
 void gearoenix::render::gltf::MeshManager::get(
     const std::size_t index,
     std::shared_ptr<core::ecs::EntitySharedBuilder> builder,
-    const gearoenix::core::sync::EndCallerIgnored& c) noexcept
+    const gearoenix::core::sync::EndCallerIgnored&) noexcept
 {
     {
         auto search = loaded_meshes.find(index);

@@ -17,13 +17,16 @@ struct GameApp final : public gearoenix::core::Application {
     {
         std::vector<gearoenix::render::PbrVertex> vertices(3);
         vertices[0].set_position(1.0f, -1.0f, 0.0f);
+        vertices[0].set_uv(1.0f, -1.0f);
         vertices[1].set_position(0.0f, 1.0f, 0.0f);
+        vertices[1].set_uv(0.0f, 1.0f);
         vertices[2].set_position(-1.0f, -1.0f, 0.0f);
+        vertices[2].set_uv(-1.0f, -1.0f);
 
         std::vector<std::uint32_t> indices = { 0, 2, 1 };
 
         auto mesh_builder = render_engine->get_mesh_manager()->build("triangle", vertices, indices);
-        mesh_builder->set_material(gearoenix::render::material::Pbr());
+        mesh_builder->set_material(gearoenix::render::material::Pbr(*render_engine));
 
         auto camera_builder = render_engine->get_camera_manager()->build("camera");
         camera_builder->get_transformation().set_location(0.0f, 0.0f, 5.0f);

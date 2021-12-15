@@ -1,5 +1,6 @@
 SET(GX_ENGINE_DXR_SRC_DIR ${GX_ENGINE_SRC_DIR}/dxr)
 SET(GX_ENGINE_DXR_SRC
+        ${GX_ENGINE_DXR_SRC_DIR}/shaders/gx-dxr-shd-common.hpp
         ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-adapter.cpp
         ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-adapter.hpp
         ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-buffer.cpp

@@ -2,6 +2,7 @@
 #define GEAROENIX_RENDER_TEXTURE_MANAGER_HPP
 #include "../../core/sync/gx-cr-sync-end-caller.hpp"
 #include "../../math/gx-math-vector-4d.hpp"
+#include "../../platform/macro/gx-plt-mcr-lock.hpp"
 #include "gx-rnd-txt-texture-info.hpp"
 #include <map>
 #include <memory>
@@ -20,18 +21,22 @@ struct Texture2D;
 struct TextureCube;
 struct Manager {
 protected:
-    engine::Engine& e;
     std::map<math::Vec4<float>, std::shared_ptr<Texture2D>> colours_2d;
     std::map<math::Vec4<float>, std::shared_ptr<TextureCube>> colours_cube;
+    GX_CREATE_GUARD(brdflut)
     std::shared_ptr<Texture2D> brdflut;
+    GX_CREATE_GUARD(checkers)
+    std::shared_ptr<Texture2D> checkers;
 
 public:
-    Manager(engine::Engine& e) noexcept;
+    Manager() noexcept;
     virtual ~Manager() noexcept;
     [[nodiscard]] std::shared_ptr<Texture2D> create_2d_from_colour(
         const math::Vec4<float>& colour,
         const core::sync::EndCallerIgnored& c) noexcept;
     [[nodiscard]] std::shared_ptr<Texture2D> get_brdflut(
+        const core::sync::EndCallerIgnored& c) noexcept;
+    [[nodiscard]] std::shared_ptr<Texture2D> get_checker(
         const core::sync::EndCallerIgnored& c) noexcept;
     [[nodiscard]] virtual std::shared_ptr<Texture2D> create_2d_from_pixels(
         std::string name,

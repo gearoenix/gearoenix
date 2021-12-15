@@ -2,6 +2,7 @@
 #ifdef GX_RENDER_DXR_ENABLED
 #include "../core/gx-cr-build-configuration.hpp"
 #include "../core/gx-cr-string.hpp"
+#include "../core/macro/gx-cr-mcr-counter.hpp"
 #include "../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "gx-dxr-check.hpp"
 #include <dxgidebug.h>
@@ -21,6 +22,14 @@ gearoenix::dxr::Adapter::Adapter() noexcept
         dxgi_info_queue->SetBreakOnSeverity(DXGI_DEBUG_ALL, DXGI_INFO_QUEUE_MESSAGE_SEVERITY_ERROR, true);
         dxgi_info_queue->SetBreakOnSeverity(DXGI_DEBUG_ALL, DXGI_INFO_QUEUE_MESSAGE_SEVERITY_CORRUPTION, true);
         dxgi_info_queue->SetBreakOnSeverity(DXGI_DEBUG_ALL, DXGI_INFO_QUEUE_MESSAGE_SEVERITY_WARNING, true);
+        DXGI_INFO_QUEUE_MESSAGE_ID hide[] = {
+            80 /* IDXGISwapChain::GetContainingOutput: The swapchain's adapter does not control the output on which the swapchain's window resides. */,
+        };
+        DXGI_INFO_QUEUE_FILTER filter;
+        GX_SET_ZERO(filter)
+        filter.DenyList.NumIDs = GX_COUNT_OF(hide);
+        filter.DenyList.pIDList = hide;
+        GX_DXR_CHECK(dxgi_info_queue->AddStorageFilterEntries(DXGI_DEBUG_DXGI, &filter))
     }
 #endif
     if (nullptr == factory) {

@@ -5,6 +5,7 @@
 #include "../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "gx-dxr-check.hpp"
 #include "gx-dxr-device.hpp"
+#include "shaders/gx-dxr-shd-common.hpp"
 
 gearoenix::dxr::DescriptorAllocator::DescriptorAllocator(Device& d) noexcept
     : allocator(core::Allocator::construct(GPU_DESCRIPTORS_COUNT))
@@ -45,12 +46,27 @@ gearoenix::dxr::Descriptor::Descriptor(Descriptor&&) noexcept = default;
 gearoenix::dxr::DescriptorManager::DescriptorManager(std::shared_ptr<Device> d) noexcept
     : device(std::move(d))
     , allocator(*device)
+    , texture_2d_region_allocator(allocator.allocator->allocate(allocator.size_increment * GX_DXR_TEXTURE_2DS_COUNT))
+    , texture_2d_region_gpu_handle { allocator.gpu_starting_handle.ptr + texture_2d_region_allocator->get_offset() }
 {
 }
 
 gearoenix::dxr::DescriptorManager::~DescriptorManager() noexcept = default;
 
-gearoenix::dxr::Descriptor gearoenix::dxr::DescriptorManager::allocate() noexcept
+gearoenix::dxr::Descriptor gearoenix::dxr::DescriptorManager::allocate_texture_2d() noexcept
+{
+    auto alc = texture_2d_region_allocator->allocate(allocator.size_increment);
+    return Descriptor(
+        D3D12_CPU_DESCRIPTOR_HANDLE {
+            .ptr = allocator.cpu_starting_handle.ptr + alc->get_offset(),
+        },
+        D3D12_GPU_DESCRIPTOR_HANDLE {
+            .ptr = allocator.gpu_starting_handle.ptr + alc->get_offset(),
+        },
+        std::move(alc));
+}
+
+gearoenix::dxr::Descriptor gearoenix::dxr::DescriptorManager::allocate_others() noexcept
 {
     auto alc = allocator.allocator->allocate(allocator.size_increment);
     return Descriptor(

@@ -3,6 +3,7 @@
 #include "../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_DXR_ENABLED
 #include "gx-dxr-loader.hpp"
+#include <queue>
 
 namespace gearoenix::platform {
 struct Application;
@@ -19,7 +20,6 @@ struct Swapchain final {
     struct Frame final {
         Microsoft::WRL::ComPtr<ID3D12Resource> render_target;
         D3D12_CPU_DESCRIPTOR_HANDLE rtv_descriptor;
-        UINT64 fence_value = 0;
     };
 
     GX_GET_REFC_PRV(std::shared_ptr<Queue>, queue)
@@ -48,6 +48,9 @@ struct Swapchain final {
 
 private:
     void move_to_next_frame() noexcept;
+
+    std::queue<UINT64> fence_values;
+    UINT64 current_fence_value = 0;
 };
 }
 

@@ -57,7 +57,7 @@ gearoenix::dxr::GpuBuffer::GpuBuffer(
 
 gearoenix::dxr::UniformBuffer::UniformBuffer(const Engine& e, UINT buffer_size, LPCWSTR resource_name) noexcept
     : buffer(e.get_device()->get_device().Get(), math::Numeric::align(buffer_size, 256U), resource_name)
-    , descriptor(e.get_descriptor_manager()->allocate())
+    , descriptor(e.get_descriptor_manager()->allocate_others())
 {
     D3D12_CONSTANT_BUFFER_VIEW_DESC desc;
     GX_SET_ZERO(desc)

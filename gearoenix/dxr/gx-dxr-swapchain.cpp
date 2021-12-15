@@ -1,5 +1,6 @@
 #include "gx-dxr-swapchain.hpp"
 #ifdef GX_RENDER_DXR_ENABLED
+#include "../core/macro/gx-cr-mcr-assert.hpp"
 #include "../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../platform/gx-plt-application.hpp"
 #include "gx-dxr-adapter.hpp"
@@ -28,11 +29,11 @@ gearoenix::dxr::Swapchain::Swapchain(std::shared_ptr<Queue> q) noexcept
     dsv_descriptor_heap_desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
     GX_DXR_CHECK(dev->CreateDescriptorHeap(&dsv_descriptor_heap_desc, IID_PPV_ARGS(&dsv_descriptor_heap)))
     // Create a fence for tracking GPU execution progress.
-    GX_DXR_CHECK(dev->CreateFence(frames[back_buffer_index].fence_value, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence)))
-    ++frames[back_buffer_index].fence_value;
+    GX_DXR_CHECK(dev->CreateFence(current_fence_value, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence)))
+    for (UINT i = 1; i <= BACK_BUFFERS_COUNT; ++i)
+        fence_values.push(current_fence_value);
     fence_event.Attach(CreateEvent(nullptr, FALSE, FALSE, nullptr));
-    if (!fence_event.IsValid())
-        GX_LOG_F("CreateEvent failed.")
+    GX_ASSERT(fence_event.IsValid())
     GX_SET_ZERO(viewport)
     GX_SET_ZERO(scissor)
 }
@@ -46,10 +47,9 @@ bool gearoenix::dxr::Swapchain::set_window_size(const platform::Application& pla
     const auto window_width = static_cast<UINT>(base_plt_app.get_window_width());
     const auto window_height = static_cast<UINT>(base_plt_app.get_window_height());
     wait_for_gpu();
-    // Release resources that are tied to the swap chain and update fence values.
+    // Release resources that are tied to the swap chain
     for (auto& frame : frames) {
         frame.render_target.Reset();
-        frame.fence_value = frames[back_buffer_index].fence_value;
     }
     // If the swap chain already exists, resize it, otherwise create one.
     if (swapchain) {
@@ -165,24 +165,14 @@ bool gearoenix::dxr::Swapchain::set_window_size(const platform::Application& pla
 
 void gearoenix::dxr::Swapchain::wait_for_gpu() noexcept
 {
-    if (nullptr == fence || !fence_event.IsValid()) {
-        GX_LOG_D("wait_for_gpu on invalid state.")
-        return;
-    }
-    // Schedule a Signal command in the GPU queue.
-    const UINT64 fence_value = frames[back_buffer_index].fence_value;
-    if (FAILED(queue->get_command_queue()->Signal(fence.Get(), fence_value))) {
-        GX_LOG_D("Signal failed.")
-        return;
-    }
-    // Wait until the Signal has been processed.
-    if (FAILED(fence->SetEventOnCompletion(fence_value, fence_event.Get()))) {
-        GX_LOG_D("Wait failed.")
-        return;
-    }
-    WaitForSingleObjectEx(fence_event.Get(), INFINITE, FALSE);
-    // Increment the fence value for the current frame.
-    ++frames[back_buffer_index].fence_value;
+    GX_ASSERT(nullptr != fence && fence_event.IsValid())
+    GX_DXR_CHECK(queue->get_command_queue()->Signal(fence.Get(), ++current_fence_value))
+    GX_DXR_CHECK(fence->SetEventOnCompletion(current_fence_value, fence_event.Get()))
+    GX_ASSERT(WAIT_OBJECT_0 == WaitForSingleObjectEx(fence_event.Get(), INFINITE, FALSE))
+    for (; !fence_values.empty(); fence_values.pop())
+        ;
+    for (UINT fi = 0; fi < BACK_BUFFERS_COUNT; ++fi)
+        fence_values.push(current_fence_value);
 }
 
 const Microsoft::WRL::ComPtr<ID3D12Resource>& gearoenix::dxr::Swapchain::get_current_render_target() const noexcept
@@ -232,18 +222,16 @@ bool gearoenix::dxr::Swapchain::present(ID3D12GraphicsCommandList6* const cmd) n
 
 void gearoenix::dxr::Swapchain::move_to_next_frame() noexcept
 {
-    // Schedule a Signal command in the queue.
-    const UINT64 current_fence_value = frames[back_buffer_index].fence_value;
-    GX_DXR_CHECK(queue->get_command_queue()->Signal(fence.Get(), current_fence_value));
+    GX_DXR_CHECK(queue->get_command_queue()->Signal(fence.Get(), ++current_fence_value));
     // Update the back buffer index.
     back_buffer_index = swapchain->GetCurrentBackBufferIndex();
     // If the next frame is not ready to be rendered yet, wait until it is ready.
-    if (fence->GetCompletedValue() < frames[back_buffer_index].fence_value) {
-        GX_DXR_CHECK(fence->SetEventOnCompletion(frames[back_buffer_index].fence_value, fence_event.Get()))
-        WaitForSingleObjectEx(fence_event.Get(), INFINITE, FALSE);
+    if (fence->GetCompletedValue() < fence_values.front()) {
+        GX_DXR_CHECK(fence->SetEventOnCompletion(fence_values.front(), fence_event.Get()))
+        GX_ASSERT(WAIT_OBJECT_0 != WaitForSingleObjectEx(fence_event.Get(), INFINITE, FALSE))
     }
-    // Set the fence value for the next frame.
-    frames[back_buffer_index].fence_value = current_fence_value + 1;
+    fence_values.pop();
+    fence_values.push(current_fence_value);
 }
 
 #endif

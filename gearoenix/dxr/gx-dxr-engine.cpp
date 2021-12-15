@@ -14,6 +14,7 @@
 #include "gx-dxr-shader.hpp"
 #include "gx-dxr-submission.hpp"
 #include "gx-dxr-swapchain.hpp"
+#include "gx-dxr-texture.hpp"
 #include "gx-dxr-uploader.hpp"
 #include <d3dx12.h>
 #include <dxgidebug.h>
@@ -36,6 +37,7 @@ void gearoenix::dxr::Engine::device_lost_handle(const int failed_tries) noexcept
 {
     GX_ASSERT(failed_tries < 3)
 
+    texture_manager = nullptr;
     submission_manager = nullptr;
     pipeline_manager = nullptr;
     mesh_manager = nullptr;
@@ -62,6 +64,7 @@ void gearoenix::dxr::Engine::device_lost_handle(const int failed_tries) noexcept
     mesh_manager = std::make_unique<MeshManager>(*this);
     pipeline_manager = std::make_shared<PipelineManager>(device);
     submission_manager = std::make_shared<SubmissionManager>(*this);
+    texture_manager = std::make_unique<TextureManager>(*this);
 
     window_resized(failed_tries);
 }
