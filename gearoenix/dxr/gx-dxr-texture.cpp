@@ -1,6 +1,7 @@
 #include "gx-dxr-texture.hpp"
 
 #ifdef GX_RENDER_DXR_ENABLED
+#include "../core/macro/gx-cr-mcr-assert.hpp"
 #include "../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "gx-dxr-check.hpp"
 #include "gx-dxr-device.hpp"
@@ -20,6 +21,27 @@ gearoenix::dxr::Texture2D::Texture2D(
 }
 
 gearoenix::dxr::Texture2D::~Texture2D() noexcept = default;
+
+const std::map<gearoenix::render::texture::SamplerInfo, UINT> gearoenix::dxr::TextureManager::samplers_indices {
+    { render::texture::SamplerInfo {
+          .min_filter = render::texture::Filter::Linear,
+          .mag_filter = render::texture::Filter::Linear,
+          .wrap_s = render::texture::Wrap::Repeat,
+          .wrap_t = render::texture::Wrap::Repeat,
+          .wrap_r = render::texture::Wrap::Repeat,
+          .anisotropic_level = 0,
+      },
+        0u },
+    { render::texture::SamplerInfo {
+          .min_filter = render::texture::Filter::Nearest,
+          .mag_filter = render::texture::Filter::Nearest,
+          .wrap_s = render::texture::Wrap::Repeat,
+          .wrap_t = render::texture::Wrap::Repeat,
+          .wrap_r = render::texture::Wrap::Repeat,
+          .anisotropic_level = 0,
+      },
+        1u }
+};
 
 gearoenix::dxr::TextureManager::TextureManager(
     Engine& e) noexcept
@@ -81,6 +103,44 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::dxr::TextureMa
         device->get_device()->CreateShaderResourceView(t->resource.Get(), &srv_desc, t->descriptor.cpu_handle);
     }));
     return t;
+}
+
+void gearoenix::dxr::TextureManager::convert(const render::texture::SamplerInfo& in, D3D12_SAMPLER_DESC& out) noexcept
+{
+    const static std::map<std::pair<render::texture::Filter, render::texture::Filter>, D3D12_FILTER> map_filter {
+        { { render::texture::Filter::Nearest, render::texture::Filter::Nearest }, D3D12_FILTER_MIN_MAG_MIP_POINT },
+        { { render::texture::Filter::Linear, render::texture::Filter::Linear }, D3D12_FILTER_MIN_MAG_LINEAR_MIP_POINT },
+    };
+
+    const static std::map<render::texture::Wrap, D3D12_TEXTURE_ADDRESS_MODE> map_address {
+        { render::texture::Wrap::Repeat, D3D12_TEXTURE_ADDRESS_MODE_WRAP },
+    };
+
+    GX_SET_ZERO(out)
+
+    if (const auto filter_search = map_filter.find(std::make_pair(in.mag_filter, in.min_filter)); map_filter.end() != filter_search)
+        out.Filter = filter_search->second;
+    else
+        GX_UNIMPLEMENTED
+
+    if (const auto s = map_address.find(in.wrap_s); map_address.end() != s)
+        out.AddressU = s->second;
+    else
+        GX_UNIMPLEMENTED
+    if (const auto s = map_address.find(in.wrap_t); map_address.end() != s)
+        out.AddressV = s->second;
+    else
+        GX_UNIMPLEMENTED
+    if (const auto s = map_address.find(in.wrap_r); map_address.end() != s)
+        out.AddressW = s->second;
+    else
+        GX_UNIMPLEMENTED
+
+    out.MinLOD = 0;
+    out.MaxLOD = D3D12_FLOAT32_MAX;
+    out.MipLODBias = 0.0f;
+    out.MaxAnisotropy = in.anisotropic_level;
+    out.ComparisonFunc = D3D12_COMPARISON_FUNC_ALWAYS;
 }
 
 #endif

@@ -10,6 +10,7 @@
 #include "gx-dxr-mesh.hpp"
 #include "gx-dxr-pipeline.hpp"
 #include "gx-dxr-swapchain.hpp"
+#include "shaders/gx-dxr-shd-common.hpp"
 
 gearoenix::dxr::SubmissionManager::SubmissionManager(Engine& e) noexcept
     : e(e)
@@ -37,18 +38,24 @@ bool gearoenix::dxr::SubmissionManager::render_frame() noexcept
     GX_DXR_CHECK(f.cal->Reset())
     GX_DXR_CHECK(f.cmd->Reset(f.cal.Get(), pipeline_manager->get_g_buffer_filler_pipeline_state().Get()))
     f.cmd->SetGraphicsRootSignature(pipeline_manager->get_g_buffer_filler_root_signature().Get());
-    ID3D12DescriptorHeap* heaps[] = { descriptor_manager->get_allocator().heap.Get() };
+    ID3D12DescriptorHeap* heaps[] = {
+        descriptor_manager->get_allocator().heap.Get(),
+        descriptor_manager->get_sampler_allocator().heap.Get()
+    };
     f.cmd->SetDescriptorHeaps(GX_COUNT_OF(heaps), heaps);
     f.cmd->SetGraphicsRootDescriptorTable(1, descriptor_manager->get_texture_2d_region_gpu_handle());
+    f.cmd->SetGraphicsRootDescriptorTable(2, descriptor_manager->get_samplers_region_gpu_handle());
     f.cmd->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     // TODO
     swapchain->prepare(f.cmd.Get());
-    e.get_world()->parallel_system<Mesh, MaterialBuffer>([&](const core::ecs::Entity::id_t, Mesh& m, MaterialBuffer& mb, const unsigned int) noexcept {
-        auto* colour = reinterpret_cast<math::Vec4<float>*>(mb.uniform.get_buffer().get_pointer());
-        colour->x = 1.0f;
-        colour->y = 1.0f;
-        colour->z = 0.0f;
-        colour->w = 1.0f;
+    e.get_world()->parallel_system<Mesh, MeshBuffer>([&](const core::ecs::Entity::id_t, Mesh& m, MeshBuffer& mb, const unsigned int) noexcept {
+        auto* buf = reinterpret_cast<MeshUniform*>(mb.uniform.get_buffer().get_pointer());
+        buf->colour_factor.x = 0.0f;
+        buf->colour_factor.y = 0.0f;
+        buf->colour_factor.z = 1.0f;
+        buf->colour_factor.w = 1.0f;
+        buf->sampler_albedo_normal_emission.x = 1;
+        buf->sampler_albedo_normal_emission.y = 0;
         f.cmd->SetGraphicsRootConstantBufferView(0, mb.uniform.get_buffer().get_resource()->GetGPUVirtualAddress());
         f.cmd->IASetVertexBuffers(0, 1, &m.get_vv());
         f.cmd->IASetIndexBuffer(&m.get_iv());

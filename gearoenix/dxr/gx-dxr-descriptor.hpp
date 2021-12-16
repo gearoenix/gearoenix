@@ -11,6 +11,7 @@ struct Allocator;
 namespace gearoenix::dxr {
 
 constexpr UINT GPU_DESCRIPTORS_COUNT = 10000;
+constexpr UINT SAMPLER_DESCRIPTORS_COUNT = 16;
 
 struct Device;
 
@@ -21,7 +22,7 @@ struct DescriptorAllocator final {
     D3D12_GPU_DESCRIPTOR_HANDLE gpu_starting_handle {};
     UINT size_increment = 0;
 
-    explicit DescriptorAllocator(Device& d) noexcept;
+    explicit DescriptorAllocator(Device& d, bool for_sampler = false) noexcept;
     ~DescriptorAllocator() noexcept;
 };
 
@@ -47,8 +48,10 @@ public:
 struct DescriptorManager final {
     GX_GET_CREF_PRV(std::shared_ptr<Device>, device)
     GX_GET_CREF_PRV(DescriptorAllocator, allocator)
+    GX_GET_CREF_PRV(DescriptorAllocator, sampler_allocator)
     GX_GET_REFC_PRV(std::shared_ptr<core::Allocator>, texture_2d_region_allocator)
     GX_GET_REFC_PRV(D3D12_GPU_DESCRIPTOR_HANDLE, texture_2d_region_gpu_handle)
+    GX_GET_REFC_PRV(D3D12_GPU_DESCRIPTOR_HANDLE, samplers_region_gpu_handle)
 
     explicit DescriptorManager(std::shared_ptr<Device> device) noexcept;
     ~DescriptorManager() noexcept;

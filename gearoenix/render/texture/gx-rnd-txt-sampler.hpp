@@ -20,6 +20,7 @@ struct SamplerInfo {
     void read(platform::stream::Stream* s) noexcept;
     [[nodiscard]] bool needs_mipmap() const noexcept;
     [[nodiscard]] bool operator<(const SamplerInfo& o) const noexcept;
+    [[nodiscard]] bool operator>(const SamplerInfo& o) const noexcept;
     [[nodiscard]] bool operator==(const SamplerInfo& o) const noexcept;
 };
 }

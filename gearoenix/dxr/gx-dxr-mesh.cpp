@@ -7,6 +7,7 @@
 #include "gx-dxr-device.hpp"
 #include "gx-dxr-engine.hpp"
 #include "gx-dxr-uploader.hpp"
+#include "shaders/gx-dxr-shd-common.hpp"
 #include <map>
 
 gearoenix::dxr::Mesh::Mesh(
@@ -29,15 +30,15 @@ gearoenix::dxr::Mesh::~Mesh() noexcept = default;
 
 gearoenix::dxr::Mesh::Mesh(Mesh&&) noexcept = default;
 
-gearoenix::dxr::MaterialBuffer::MaterialBuffer(Engine& e, UINT buffer_size, LPCWSTR entity_name) noexcept
+gearoenix::dxr::MeshBuffer::MeshBuffer(Engine& e, UINT buffer_size, LPCWSTR entity_name) noexcept
     : core::ecs::Component(this)
     , uniform(e, buffer_size, entity_name)
 {
 }
 
-gearoenix::dxr::MaterialBuffer::~MaterialBuffer() noexcept = default;
+gearoenix::dxr::MeshBuffer::~MeshBuffer() noexcept = default;
 
-gearoenix::dxr::MaterialBuffer::MaterialBuffer(MaterialBuffer&&) noexcept = default;
+gearoenix::dxr::MeshBuffer::MeshBuffer(MeshBuffer&&) noexcept = default;
 
 gearoenix::dxr::MeshBuilder::MeshBuilder(
     Engine& e,
@@ -58,9 +59,9 @@ gearoenix::dxr::MeshBuilder::~MeshBuilder() noexcept
     static std::unordered_map<std::type_index, std::function<void()>> impls {
         { std::type_index(typeid(render::material::Pbr)), [this]() {
              const auto material_name = core::String::to_wstring(name + "-PBR-Material");
-             entity_builder->get_builder().add_component(MaterialBuffer(
+             entity_builder->get_builder().add_component(MeshBuffer(
                  e,
-                 sizeof(render::material::Pbr),
+                 sizeof(MeshUniform),
                  material_name.c_str()));
          } },
     };

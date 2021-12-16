@@ -3,5 +3,6 @@
 [RootSignature(G_BUFFERS_FILLER_ROOT_SIGNATURE)]
 float4 main(PSInput input) : SV_TARGET
 {
-    return tex2ds[0].Sample(samplers, input.uv * 10.0);
+    return tex2ds[MeshUniform.sampler_albedo_normal_emission.y].Sample(
+        samplers[MeshUniform.sampler_albedo_normal_emission.x], input.uv * 10.0) * MeshUniform.colour_factor;
 }

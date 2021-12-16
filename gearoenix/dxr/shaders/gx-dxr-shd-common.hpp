@@ -17,6 +17,7 @@
 #ifdef __cplusplus
 namespace gearoenix::dxr {
 typedef math::Vec4<float> float4;
+typedef math::Vec4<std::uint32_t> uint4;
 #endif
 
 struct MeshUniform {
@@ -24,6 +25,7 @@ struct MeshUniform {
     float4 emission_factor__alpha_cutoff;
     float4 normal_scale__occlusion_strength;
     float4 metallic_factor__roughness_factor__radiance_lod_coefficient;
+    uint4 sampler_albedo_normal_emission;
 };
 
 #ifdef __cplusplus

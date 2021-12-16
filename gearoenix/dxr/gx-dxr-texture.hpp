@@ -34,6 +34,8 @@ struct TextureManager final : public render::texture::Manager {
     GX_GET_REFC_PRV(std::shared_ptr<Uploader>, uploader)
     GX_GET_REFC_PRV(std::shared_ptr<Device>, device)
 
+    const static std::map<render::texture::SamplerInfo, UINT> samplers_indices;
+
     TextureManager(Engine& e) noexcept;
     ~TextureManager() noexcept final;
     [[nodiscard]] std::shared_ptr<render::texture::Texture2D> create_2d_from_pixels(
@@ -41,6 +43,8 @@ struct TextureManager final : public render::texture::Manager {
         std::vector<std::vector<std::uint8_t>> pixels,
         const render::texture::TextureInfo& info,
         const core::sync::EndCallerIgnored& c) noexcept final;
+
+    static void convert(const render::texture::SamplerInfo& in, D3D12_SAMPLER_DESC& out) noexcept;
 };
 }
 

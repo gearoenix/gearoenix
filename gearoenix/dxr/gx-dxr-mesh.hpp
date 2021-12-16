@@ -29,18 +29,18 @@ struct Mesh final : public core::ecs::Component {
     Mesh& operator=(const Mesh&) = delete;
 };
 
-struct MaterialBuffer final : public core::ecs::Component {
+struct MeshBuffer final : public core::ecs::Component {
     UniformBuffer uniform;
 
-    MaterialBuffer(
+    MeshBuffer(
         Engine& e,
         UINT buffer_size,
         LPCWSTR entity_name) noexcept;
-    ~MaterialBuffer() noexcept final;
-    MaterialBuffer(MaterialBuffer&&) noexcept;
-    MaterialBuffer(const MaterialBuffer&) = delete;
-    MaterialBuffer& operator=(MaterialBuffer&&) = delete;
-    MaterialBuffer& operator=(const MaterialBuffer&) = delete;
+    ~MeshBuffer() noexcept final;
+    MeshBuffer(MeshBuffer&&) noexcept;
+    MeshBuffer(const MeshBuffer&) = delete;
+    MeshBuffer& operator=(MeshBuffer&&) = delete;
+    MeshBuffer& operator=(const MeshBuffer&) = delete;
 };
 
 struct MeshBuilder final : render::mesh::Builder {

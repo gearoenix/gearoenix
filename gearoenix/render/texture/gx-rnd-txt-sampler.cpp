@@ -41,6 +41,23 @@ bool gearoenix::render::texture::SamplerInfo::operator<(const SamplerInfo& o) co
 #undef GX_HELPER
 }
 
+bool gearoenix::render::texture::SamplerInfo::operator>(const SamplerInfo& o) const noexcept
+{
+#define GX_HELPER(x) \
+    if (x > o.x)     \
+        return true; \
+    if (x < o.x)     \
+        return false;
+    GX_HELPER(min_filter)
+    GX_HELPER(mag_filter)
+    GX_HELPER(wrap_s)
+    GX_HELPER(wrap_r)
+    GX_HELPER(wrap_t)
+    GX_HELPER(anisotropic_level)
+    return false;
+#undef GX_HELPER
+}
+
 bool gearoenix::render::texture::SamplerInfo::operator==(const SamplerInfo& o) const noexcept
 {
 #define GX_HELPER(x) (x == o.x)
