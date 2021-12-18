@@ -4,5 +4,5 @@
 float4 main(PSInput input) : SV_TARGET
 {
     return tex2ds[MeshUniform.sampler_albedo_normal_emission.y].Sample(
-        samplers[MeshUniform.sampler_albedo_normal_emission.x], input.uv * 10.0) * MeshUniform.colour_factor;
+        samplers[MeshUniform.sampler_albedo_normal_emission.x], input.uv) * MeshUniform.colour_factor;
 }

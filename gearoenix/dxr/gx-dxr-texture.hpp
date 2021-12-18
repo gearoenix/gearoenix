@@ -16,6 +16,7 @@ struct Uploader;
 struct Texture2D final : public render::texture::Texture2D {
     friend struct TextureManager;
 
+    GX_GET_VAL_PRV(UINT, sampler_index, 0)
     GX_GET_REFC_PRV(Microsoft::WRL::ComPtr<ID3D12Resource>, resource)
     GX_GET_REFC_PRV(Descriptor, descriptor)
 
@@ -23,6 +24,7 @@ struct Texture2D final : public render::texture::Texture2D {
         std::string name,
         const render::texture::TextureInfo& info,
         Engine& e,
+        UINT sampler_index,
         Microsoft::WRL::ComPtr<ID3D12Resource>&& resource,
         Descriptor&& descriptor) noexcept;
     ~Texture2D() noexcept final;

@@ -180,34 +180,39 @@ const Microsoft::WRL::ComPtr<ID3D12Resource>& gearoenix::dxr::Swapchain::get_cur
     return frames[back_buffer_index].render_target;
 }
 
-void gearoenix::dxr::Swapchain::prepare(ID3D12GraphicsCommandList6* const cmd) noexcept
+void gearoenix::dxr::Swapchain::transit_to_target(ID3D12GraphicsCommandList6* const cmd) noexcept
 {
-    auto& frame = frames[back_buffer_index];
-    // Transition the render target into the correct state to allow for drawing into it.
     D3D12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
-        frame.render_target.Get(),
+        frames[back_buffer_index].render_target.Get(),
         D3D12_RESOURCE_STATE_PRESENT,
         D3D12_RESOURCE_STATE_RENDER_TARGET);
     cmd->ResourceBarrier(1, &barrier);
+}
+
+void gearoenix::dxr::Swapchain::prepare(ID3D12GraphicsCommandList6* const cmd) noexcept
+{
+    auto& frame = frames[back_buffer_index];
     cmd->RSSetViewports(1, &viewport);
     cmd->RSSetScissorRects(1, &scissor);
     cmd->OMSetRenderTargets(1, &frame.rtv_descriptor, false, nullptr);
-    cmd->ClearRenderTargetView(frame.rtv_descriptor, clear_colour, 0, nullptr);
 }
 
-bool gearoenix::dxr::Swapchain::present(ID3D12GraphicsCommandList6* const cmd) noexcept
+void gearoenix::dxr::Swapchain::clear(ID3D12GraphicsCommandList6* const cmd) noexcept
 {
-    const auto& frame = frames[back_buffer_index];
-    auto* const render_target = frame.render_target.Get();
-    // Transition the render target to the state that allows it to be presented to the display.
+    cmd->ClearRenderTargetView(frames[back_buffer_index].rtv_descriptor, clear_colour, 0, nullptr);
+}
+
+void gearoenix::dxr::Swapchain::transit_to_present(ID3D12GraphicsCommandList6* const cmd) noexcept
+{
     const auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
-        render_target,
+        frames[back_buffer_index].render_target.Get(),
         D3D12_RESOURCE_STATE_RENDER_TARGET,
         D3D12_RESOURCE_STATE_PRESENT);
     cmd->ResourceBarrier(1, &barrier);
-    GX_DXR_CHECK(cmd->Close())
-    ID3D12CommandList* command_lists[] = { cmd };
-    queue->get_command_queue()->ExecuteCommandLists(1, command_lists);
+}
+
+bool gearoenix::dxr::Swapchain::present() noexcept
+{
     const auto hr = swapchain->Present(1, 0);
     // If the device was reset we must completely reinitialize the renderer.
     if (hr == DXGI_ERROR_DEVICE_REMOVED || hr == DXGI_ERROR_DEVICE_RESET) {

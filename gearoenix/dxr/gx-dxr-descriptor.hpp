@@ -29,6 +29,7 @@ struct DescriptorAllocator final {
 struct Descriptor final {
     friend struct DescriptorManager;
 
+    const UINT resource_index;
     const D3D12_CPU_DESCRIPTOR_HANDLE cpu_handle;
     const D3D12_GPU_DESCRIPTOR_HANDLE gpu_handle;
 
@@ -36,6 +37,7 @@ private:
     std::shared_ptr<core::Allocator> allocator;
 
     Descriptor(
+        UINT resource_index,
         D3D12_CPU_DESCRIPTOR_HANDLE&& cpu_handle,
         D3D12_GPU_DESCRIPTOR_HANDLE&& gpu_handle,
         std::shared_ptr<core::Allocator>&& allocator) noexcept;

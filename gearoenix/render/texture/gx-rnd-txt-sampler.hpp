@@ -14,7 +14,7 @@ struct SamplerInfo {
     Wrap wrap_s = Wrap::Repeat;
     Wrap wrap_t = Wrap::Repeat;
     Wrap wrap_r = Wrap::Repeat;
-    std::uint8_t anisotropic_level = 1;
+    std::uint8_t anisotropic_level = 0;
 
     void write(platform::stream::Stream* s) const noexcept;
     void read(platform::stream::Stream* s) noexcept;

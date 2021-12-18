@@ -19,6 +19,7 @@ struct Queue final {
     ~Queue() noexcept;
 
     void exe(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList6>& cmd) noexcept;
+    void exe(ID3D12CommandList** cmds, UINT count) noexcept;
 };
 }
 

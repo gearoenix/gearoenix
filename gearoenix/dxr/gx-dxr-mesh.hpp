@@ -54,7 +54,7 @@ private:
         const std::string& name,
         math::Aabb3&& occlusion_box) noexcept;
 
-    void set_material_type_index(const std::type_index& material_type) noexcept final;
+    void set_material(const render::material::Pbr& material_type) noexcept final;
 
 public:
     ~MeshBuilder() noexcept final;

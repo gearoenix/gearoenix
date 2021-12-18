@@ -43,8 +43,11 @@ struct Swapchain final {
     [[nodiscard]] bool set_window_size(const platform::Application&) noexcept;
     void wait_for_gpu() noexcept;
     [[nodiscard]] const Microsoft::WRL::ComPtr<ID3D12Resource>& get_current_render_target() const noexcept;
+    void transit_to_target(ID3D12GraphicsCommandList6* cmd) noexcept;
     void prepare(ID3D12GraphicsCommandList6* cmd) noexcept;
-    [[nodiscard]] bool present(ID3D12GraphicsCommandList6* cmd) noexcept;
+    void clear(ID3D12GraphicsCommandList6* cmd) noexcept;
+    void transit_to_present(ID3D12GraphicsCommandList6* cmd) noexcept;
+    [[nodiscard]] bool present() noexcept;
 
 private:
     void move_to_next_frame() noexcept;

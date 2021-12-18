@@ -125,22 +125,10 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
         .has_mipmap = false
     };
     std::vector<std::vector<std::uint8_t>> pixels { {
-        0u,
-        0u,
-        0u,
-        255u,
-        255u,
-        255u,
-        255u,
-        255u,
-        255u,
-        255u,
-        255u,
-        255u,
-        0u,
-        0u,
-        0u,
-        255u,
+        0u, 0u, 0u, 255u, // Pixel 0
+        255u, 255u, 255u, 255u, // Pixel 1
+        255u, 255u, 255u, 255u, // Pixel 2
+        0u, 0u, 0u, 255u, // Pixel 3
     } };
     checkers = create_2d_from_pixels("default-checker", std::move(pixels), texture_info, c);
     return checkers;

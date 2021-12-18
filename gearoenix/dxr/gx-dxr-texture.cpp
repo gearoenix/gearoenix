@@ -12,9 +12,11 @@ gearoenix::dxr::Texture2D::Texture2D(
     std::string name,
     const render::texture::TextureInfo& info,
     Engine& e,
+    const UINT sampler_index,
     Microsoft::WRL::ComPtr<ID3D12Resource>&& r,
     Descriptor&& d) noexcept
     : render::texture::Texture2D(std::move(name), info, e)
+    , sampler_index(sampler_index)
     , resource(std::move(r))
     , descriptor(std::move(d))
 {
@@ -60,6 +62,8 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::dxr::TextureMa
     const render::texture::TextureInfo& info,
     const core::sync::EndCallerIgnored& c) noexcept
 {
+    const auto sampler_search = samplers_indices.find(info.sampler_info);
+    GX_ASSERT(samplers_indices.end() != sampler_search)
     auto descriptor = descriptor_manager->allocate_texture_2d();
     Microsoft::WRL::ComPtr<ID3D12Resource> resource;
     D3D12_RESOURCE_DESC desc;
@@ -92,7 +96,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::dxr::TextureMa
     desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
     const auto p = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
     GX_DXR_CHECK(device->get_device()->CreateCommittedResource(&p, D3D12_HEAP_FLAG_NONE, &desc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&resource)))
-    auto t = std::make_shared<Texture2D>(std::move(name), info, e, std::move(resource), std::move(descriptor));
+    auto t = std::make_shared<Texture2D>(std::move(name), info, e, sampler_search->second, std::move(resource), std::move(descriptor));
     uploader->upload(std::move(pixels[0]), std::shared_ptr<Texture2D>(t), core::sync::EndCallerIgnored([this, t, desc, c]() {
         D3D12_SHADER_RESOURCE_VIEW_DESC srv_desc;
         GX_SET_ZERO(srv_desc)

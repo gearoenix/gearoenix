@@ -31,10 +31,12 @@ gearoenix::dxr::DescriptorAllocator::DescriptorAllocator(Device& d, const bool f
 gearoenix::dxr::DescriptorAllocator::~DescriptorAllocator() noexcept = default;
 
 gearoenix::dxr::Descriptor::Descriptor(
+    const UINT resource_index,
     D3D12_CPU_DESCRIPTOR_HANDLE&& cpu_handle,
     D3D12_GPU_DESCRIPTOR_HANDLE&& gpu_handle,
     std::shared_ptr<core::Allocator>&& allocator) noexcept
-    : cpu_handle(std::move(cpu_handle))
+    : resource_index(resource_index)
+    , cpu_handle(std::move(cpu_handle))
     , gpu_handle(std::move(gpu_handle))
     , allocator(std::move(allocator))
 {
@@ -66,6 +68,7 @@ gearoenix::dxr::Descriptor gearoenix::dxr::DescriptorManager::allocate_texture_2
 {
     auto alc = texture_2d_region_allocator->allocate(allocator.size_increment);
     return Descriptor(
+        alc->get_offset() / allocator.size_increment,
         D3D12_CPU_DESCRIPTOR_HANDLE {
             .ptr = allocator.cpu_starting_handle.ptr + alc->get_offset(),
         },
@@ -79,6 +82,7 @@ gearoenix::dxr::Descriptor gearoenix::dxr::DescriptorManager::allocate_others() 
 {
     auto alc = allocator.allocator->allocate(allocator.size_increment);
     return Descriptor(
+        alc->get_offset() / allocator.size_increment,
         D3D12_CPU_DESCRIPTOR_HANDLE {
             .ptr = allocator.cpu_starting_handle.ptr + alc->get_offset(),
         },

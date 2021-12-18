@@ -4,6 +4,7 @@
 #include "../core/macro/gx-cr-mcr-counter.hpp"
 #include "../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../platform/gx-plt-application.hpp"
+#include "../platform/gx-plt-library.hpp"
 #include "gx-dxr-adapter.hpp"
 #include "gx-dxr-check.hpp"
 #include "gx-dxr-descriptor.hpp"

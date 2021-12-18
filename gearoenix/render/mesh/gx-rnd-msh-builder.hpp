@@ -4,6 +4,7 @@
 #include "../../core/sync/gx-cr-sync-end-caller.hpp"
 #include "../../math/gx-math-aabb.hpp"
 #include "../gx-rnd-vertex.hpp"
+#include "../material/gx-rnd-mat-pbr.hpp"
 #include <memory>
 #include <optional>
 #include <string>
@@ -20,13 +21,14 @@ struct Builder {
     GX_GET_REFC_PRT(std::string, name)
     GX_GET_REFC_PRT(math::Aabb3, occlusion_box)
 
+private:
+    void set_material_type_index(const std::type_index& in_material_type) noexcept;
+
 protected:
     Builder(
         engine::Engine& e,
         const std::string& name,
         math::Aabb3&& occlusion_box) noexcept;
-
-    virtual void set_material_type_index(const std::type_index& material_type) noexcept;
 
 public:
     Builder(Builder&&) = delete;
@@ -35,13 +37,8 @@ public:
     Builder& operator=(const Builder&) = delete;
     virtual ~Builder() noexcept;
 
-    /// Sets the material of the mesh. It can be called only once
-    template <typename T>
-    void set_material(T&& mat) noexcept
-    {
-        entity_builder->get_builder().add_component(std::forward<T>(mat));
-        set_material_type_index(std::type_index(typeid(T)));
-    }
+    /// Sets the material of the mesh. It can be called only once, nd only one type of material must be set
+    virtual void set_material(const material::Pbr& mat) noexcept;
 };
 }
 #endif

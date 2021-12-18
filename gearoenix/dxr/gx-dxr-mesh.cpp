@@ -6,6 +6,7 @@
 #include "gx-dxr-buffer.hpp"
 #include "gx-dxr-device.hpp"
 #include "gx-dxr-engine.hpp"
+#include "gx-dxr-texture.hpp"
 #include "gx-dxr-uploader.hpp"
 #include "shaders/gx-dxr-shd-common.hpp"
 #include <map>
@@ -18,11 +19,13 @@ gearoenix::dxr::Mesh::Mesh(
     , ib(std::move(_ib))
     , indices_count(indices_count)
     , vv {
-        .BufferLocation = vb->get_resource()->GetGPUVirtualAddress(),
+        .BufferLocation = vb->get_resource()->GetGPUVirtualAddress(), // vertices
         .SizeInBytes = vertices_size,
         .StrideInBytes = vertex_size
     }
-    , iv { .BufferLocation = ib->get_resource()->GetGPUVirtualAddress(), .SizeInBytes = indices_count * 4, .Format = DXGI_FORMAT_R32_UINT }
+    , iv { .BufferLocation = ib->get_resource()->GetGPUVirtualAddress(), // indices
+        .SizeInBytes = indices_count * 4,
+        .Format = DXGI_FORMAT_R32_UINT }
 {
 }
 
@@ -49,24 +52,22 @@ gearoenix::dxr::MeshBuilder::MeshBuilder(
 {
 }
 
-void gearoenix::dxr::MeshBuilder::set_material_type_index(const std::type_index& material_type) noexcept
+void gearoenix::dxr::MeshBuilder::set_material(const render::material::Pbr& mat) noexcept
 {
-    render::mesh::Builder::set_material_type_index(material_type);
+    const auto material_name = core::String::to_wstring(name + "-PBR-Material");
+    MeshBuffer mb(e, sizeof(MeshUniform), material_name.c_str());
+    auto& b = *reinterpret_cast<MeshUniform*>(mb.uniform.get_buffer().get_pointer());
+    b.colour_factor = mat.get_albedo_factor();
+    b.emission_factor__alpha_cutoff = math::Vec4(mat.get_emission_factor(), mat.get_alpha_cutoff());
+    b.normal_scale__occlusion_strength = math::Vec4(mat.get_normal_scale(), mat.get_occlusion_strength());
+    b.metallic_factor__roughness_factor__radiance_lod_coefficient = math::Vec4(mat.get_metallic_factor(), mat.get_roughness_factor(), mat.get_radiance_lod_coefficient(), 0.0f);
+    const auto& at = *dynamic_cast<const Texture2D*>(mat.get_albedo().get());
+    b.sampler_albedo_normal_emission.x = at.get_sampler_index();
+    b.sampler_albedo_normal_emission.y = at.get_descriptor().resource_index;
+    entity_builder->get_builder().add_component(std::move(mb));
 }
 
-gearoenix::dxr::MeshBuilder::~MeshBuilder() noexcept
-{
-    static std::unordered_map<std::type_index, std::function<void()>> impls {
-        { std::type_index(typeid(render::material::Pbr)), [this]() {
-             const auto material_name = core::String::to_wstring(name + "-PBR-Material");
-             entity_builder->get_builder().add_component(MeshBuffer(
-                 e,
-                 sizeof(MeshUniform),
-                 material_name.c_str()));
-         } },
-    };
-    impls[entity_builder->get_builder().get_component<render::mesh::Mesh>()->get().material_type_index]();
-}
+gearoenix::dxr::MeshBuilder::~MeshBuilder() noexcept = default;
 
 gearoenix::dxr::MeshManager::MeshManager(Engine& e) noexcept
     : render::mesh::Manager(e)

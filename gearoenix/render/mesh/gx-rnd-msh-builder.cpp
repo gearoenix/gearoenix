@@ -28,3 +28,8 @@ void gearoenix::render::mesh::Builder::set_material_type_index(const std::type_i
 }
 
 gearoenix::render::mesh::Builder::~Builder() noexcept = default;
+
+void gearoenix::render::mesh::Builder::set_material(const material::Pbr&) noexcept
+{
+    set_material_type_index(std::type_index(typeid(material::Pbr)));
+}

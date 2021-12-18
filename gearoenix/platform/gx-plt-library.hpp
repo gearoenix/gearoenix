@@ -7,7 +7,7 @@
 #define GX_SHARED_LINKAGE_SUPPORTED
 
 namespace gearoenix::platform {
-struct Library {
+struct Library final {
 private:
     void* lib = nullptr;
     Library() noexcept;

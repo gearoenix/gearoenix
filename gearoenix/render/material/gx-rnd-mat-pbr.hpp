@@ -14,7 +14,7 @@ struct Texture2D;
 }
 
 namespace gearoenix::render::material {
-struct Pbr final : public core::ecs::Component {
+struct Pbr final {
     GX_GET_CREF_PRV(math::Vec4<float>, albedo_factor)
     GX_GET_CREF_PRV(math::Vec3<float>, emission_factor)
     GX_GET_CREF_PRV(math::Vec3<float>, normal_scale)
@@ -29,7 +29,7 @@ struct Pbr final : public core::ecs::Component {
 
 public:
     Pbr(engine::Engine& e, const core::sync::EndCallerIgnored& c = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
-    ~Pbr() noexcept final;
+    ~Pbr() noexcept;
 
     Pbr(const Pbr&) = delete;
     Pbr(Pbr&&) noexcept = default;
