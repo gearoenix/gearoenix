@@ -2,6 +2,7 @@
 #define GEAROENIX_RENDER_TEXTURE_MANAGER_HPP
 #include "../../core/sync/gx-cr-sync-end-caller.hpp"
 #include "../../math/gx-math-vector-4d.hpp"
+#include "../../platform/gx-plt-path.hpp"
 #include "../../platform/macro/gx-plt-mcr-lock.hpp"
 #include "gx-rnd-txt-texture-info.hpp"
 #include <map>
@@ -21,12 +22,16 @@ struct Texture2D;
 struct TextureCube;
 struct Manager {
 protected:
+    GX_CREATE_GUARD(colours_2d)
     std::map<math::Vec4<float>, std::shared_ptr<Texture2D>> colours_2d;
+    GX_CREATE_GUARD(colours_cube)
     std::map<math::Vec4<float>, std::shared_ptr<TextureCube>> colours_cube;
     GX_CREATE_GUARD(brdflut)
     std::shared_ptr<Texture2D> brdflut;
     GX_CREATE_GUARD(checkers)
     std::shared_ptr<Texture2D> checkers;
+    GX_CREATE_GUARD(textures_2d)
+    std::map<std::string, std::shared_ptr<Texture2D>> textures_2d;
 
 public:
     Manager() noexcept;
@@ -47,18 +52,13 @@ public:
         std::string name,
         const void* data,
         std::size_t size,
-        const TextureInfo& info,
-        const core::sync::EndCallerIgnored& c) noexcept;
+        const TextureInfo& info = TextureInfo(),
+        const core::sync::EndCallerIgnored& c = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
     [[nodiscard]] std::shared_ptr<Texture2D> create_2d_from_file(
         std::string name,
-        const std::wstring& file_address,
-        const TextureInfo& info,
-        const core::sync::EndCallerIgnored& c) noexcept;
-    [[nodiscard]] std::shared_ptr<Texture2D> create_2d_from_file(
-        std::string name,
-        const std::string& file_address,
-        const TextureInfo& info,
-        const core::sync::EndCallerIgnored& c) noexcept;
+        const platform::Path& path,
+        const TextureInfo& info = TextureInfo(),
+        const core::sync::EndCallerIgnored& c = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
     [[nodiscard]] std::shared_ptr<TextureCube> create_cube_from_colour(
         const math::Vec4<float>& colour,
         const core::sync::EndCallerIgnored& c) noexcept;

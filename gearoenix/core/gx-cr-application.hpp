@@ -7,7 +7,7 @@
 
 #define GEAROENIX_START(ApplicationMainClass) GX_MAIN_ENTRY(                               \
     auto plt_app = std::make_unique<gearoenix::platform::Application>(GX_MAIN_ENTRY_ARGS); \
-    plt_app->run(new ApplicationMainClass(plt_app.get())))
+    plt_app->run(new ApplicationMainClass(*plt_app.get())))
 
 namespace gearoenix::render::engine {
 struct Engine;
@@ -25,11 +25,11 @@ namespace gearoenix::core {
 struct Application {
 public:
 protected:
-    platform::Application* platform_application = nullptr;
-    render::engine::Engine* render_engine = nullptr;
+    platform::Application& platform_application;
+    render::engine::Engine& render_engine;
 
 public:
-    explicit Application(platform::Application* platform_application) noexcept;
+    explicit Application(platform::Application& platform_application) noexcept;
     virtual ~Application() noexcept;
     virtual void update() noexcept;
 };

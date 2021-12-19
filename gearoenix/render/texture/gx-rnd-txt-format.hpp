@@ -23,6 +23,8 @@ enum struct TextureFormat : core::TypeId {
     D16 = 14,
     D24 = 15,
     D32 = 16,
+
+    Unknown = 255,
 };
 
 constexpr bool format_has_float_component(const TextureFormat f) noexcept

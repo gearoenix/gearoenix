@@ -68,7 +68,7 @@ gearoenix::dxr::Descriptor gearoenix::dxr::DescriptorManager::allocate_texture_2
 {
     auto alc = texture_2d_region_allocator->allocate(allocator.size_increment);
     return Descriptor(
-        alc->get_offset() / allocator.size_increment,
+        static_cast<UINT>(alc->get_offset()) / allocator.size_increment,
         D3D12_CPU_DESCRIPTOR_HANDLE {
             .ptr = allocator.cpu_starting_handle.ptr + alc->get_offset(),
         },
@@ -82,7 +82,7 @@ gearoenix::dxr::Descriptor gearoenix::dxr::DescriptorManager::allocate_others() 
 {
     auto alc = allocator.allocator->allocate(allocator.size_increment);
     return Descriptor(
-        alc->get_offset() / allocator.size_increment,
+        static_cast<UINT>(alc->get_offset()) / allocator.size_increment,
         D3D12_CPU_DESCRIPTOR_HANDLE {
             .ptr = allocator.cpu_starting_handle.ptr + alc->get_offset(),
         },

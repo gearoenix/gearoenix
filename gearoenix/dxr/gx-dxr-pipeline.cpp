@@ -11,14 +11,14 @@ gearoenix::dxr::PipelineManager::PipelineManager(std::shared_ptr<Device> _device
     : device(std::move(_device))
 {
     std::fstream vf("../../../../assets/gx-dxr-shd-g-buffer.vs.cso", std::ios::binary | std::ios::in);
-    GX_ASSERT_D(vf.is_open() && vf.good());
+    GX_ASSERT(vf.is_open() && vf.good())
     vf.seekg(0, std::ios::end);
     std::vector<char> vsb(vf.tellg());
     vf.seekg(0);
     vf.read(vsb.data(), vsb.size());
 
     std::fstream pf("../../../../assets/gx-dxr-shd-g-buffer.ps.cso", std::ios::binary | std::ios::in);
-    GX_ASSERT_D(pf.is_open() && pf.good());
+    GX_ASSERT(pf.is_open() && pf.good())
     pf.seekg(0, std::ios::end);
     std::vector<char> psb(pf.tellg());
     pf.seekg(0);

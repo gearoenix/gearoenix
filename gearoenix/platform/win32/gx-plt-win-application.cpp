@@ -189,7 +189,7 @@ gearoenix::platform::Application::~Application() noexcept = default;
 
 void gearoenix::platform::Application::run(core::Application* core_app) noexcept
 {
-    base.initialize_core_application(this, core_app);
+    base.initialize_core_application(*this, core_app);
     GX_LOG_D("Run function of WinApi interface called.")
     MSG msg;
     while (base.running) {

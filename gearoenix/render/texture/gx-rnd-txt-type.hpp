@@ -7,6 +7,7 @@ enum struct Type : core::TypeId {
     Texture3D = 2,
     TextureCube = 3,
     Target = 4,
+    Unknown = 255,
 };
 }
 #endif

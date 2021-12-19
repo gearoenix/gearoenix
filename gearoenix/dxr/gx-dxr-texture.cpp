@@ -42,7 +42,16 @@ const std::map<gearoenix::render::texture::SamplerInfo, UINT> gearoenix::dxr::Te
           .wrap_r = render::texture::Wrap::Repeat,
           .anisotropic_level = 0,
       },
-        1u }
+        1u },
+    { render::texture::SamplerInfo {
+          .min_filter = render::texture::Filter::LinearMipmapLinear,
+          .mag_filter = render::texture::Filter::Linear,
+          .wrap_s = render::texture::Wrap::Repeat,
+          .wrap_t = render::texture::Wrap::Repeat,
+          .wrap_r = render::texture::Wrap::Repeat,
+          .anisotropic_level = 0,
+      },
+        2u }
 };
 
 gearoenix::dxr::TextureManager::TextureManager(
@@ -62,20 +71,24 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::dxr::TextureMa
     const render::texture::TextureInfo& info,
     const core::sync::EndCallerIgnored& c) noexcept
 {
+    GX_GUARD_LOCK(textures_2d)
+    auto textures_2d_search = textures_2d.find(name);
+    if (textures_2d.end() != textures_2d_search)
+        return textures_2d_search->second;
     const auto sampler_search = samplers_indices.find(info.sampler_info);
     GX_ASSERT(samplers_indices.end() != sampler_search)
     auto descriptor = descriptor_manager->allocate_texture_2d();
     Microsoft::WRL::ComPtr<ID3D12Resource> resource;
     D3D12_RESOURCE_DESC desc;
     GX_SET_ZERO(desc)
-    if (info.has_mipmap) {
-        desc.MipLevels = static_cast<UINT16>(render::texture::Texture::compute_mipmaps_count(
-            static_cast<std::size_t>(info.width),
-            static_cast<std::size_t>(info.height)));
-        GX_UNIMPLEMENTED
-    } else {
-        desc.MipLevels = 1;
-    }
+    // if (info.has_mipmap) {
+    //     desc.MipLevels = static_cast<UINT16>(render::texture::Texture::compute_mipmaps_count(
+    //         static_cast<std::size_t>(info.width),
+    //         static_cast<std::size_t>(info.height)));
+    //     GX_UNIMPLEMENTED
+    // } else {
+    desc.MipLevels = 1;
+    //}
     switch (info.format) {
     case render::texture::TextureFormat::RgbaUint8:
         desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -96,7 +109,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::dxr::TextureMa
     desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
     const auto p = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
     GX_DXR_CHECK(device->get_device()->CreateCommittedResource(&p, D3D12_HEAP_FLAG_NONE, &desc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&resource)))
-    auto t = std::make_shared<Texture2D>(std::move(name), info, e, sampler_search->second, std::move(resource), std::move(descriptor));
+    auto t = std::make_shared<Texture2D>(name, info, e, sampler_search->second, std::move(resource), std::move(descriptor));
     uploader->upload(std::move(pixels[0]), std::shared_ptr<Texture2D>(t), core::sync::EndCallerIgnored([this, t, desc, c]() {
         D3D12_SHADER_RESOURCE_VIEW_DESC srv_desc;
         GX_SET_ZERO(srv_desc)
@@ -106,6 +119,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::dxr::TextureMa
         srv_desc.Texture2D.MipLevels = 1;
         device->get_device()->CreateShaderResourceView(t->resource.Get(), &srv_desc, t->descriptor.cpu_handle);
     }));
+    textures_2d.emplace(std::move(name), t);
     return t;
 }
 
@@ -114,6 +128,7 @@ void gearoenix::dxr::TextureManager::convert(const render::texture::SamplerInfo&
     const static std::map<std::pair<render::texture::Filter, render::texture::Filter>, D3D12_FILTER> map_filter {
         { { render::texture::Filter::Nearest, render::texture::Filter::Nearest }, D3D12_FILTER_MIN_MAG_MIP_POINT },
         { { render::texture::Filter::Linear, render::texture::Filter::Linear }, D3D12_FILTER_MIN_MAG_LINEAR_MIP_POINT },
+        { { render::texture::Filter::Linear, render::texture::Filter::LinearMipmapLinear }, D3D12_FILTER_MIN_MAG_MIP_LINEAR },
     };
 
     const static std::map<render::texture::Wrap, D3D12_TEXTURE_ADDRESS_MODE> map_address {

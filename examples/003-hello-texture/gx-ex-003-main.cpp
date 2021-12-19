@@ -9,6 +9,7 @@
 #include <gearoenix/render/mesh/gx-rnd-msh-manager.hpp>
 #include <gearoenix/render/scene/gx-rnd-scn-builder.hpp>
 #include <gearoenix/render/scene/gx-rnd-scn-manager.hpp>
+#include <gearoenix/render/texture/gx-rnd-txt-manager.hpp>
 
 struct GameApp final : public gearoenix::core::Application {
     explicit GameApp(gearoenix::platform::Application& plt_app) noexcept
@@ -25,7 +26,11 @@ struct GameApp final : public gearoenix::core::Application {
         std::vector<std::uint32_t> indices = { 0, 2, 1 };
 
         auto mesh_builder = render_engine.get_mesh_manager()->build("triangle", vertices, indices);
-        mesh_builder->set_material(gearoenix::render::material::Pbr(render_engine));
+        gearoenix::render::material::Pbr material(render_engine);
+        material.set_albedo(render_engine.get_texture_manager()->create_2d_from_file(
+            "gearoenix-logo",
+            gearoenix::platform::AbsolutePath("../../../../assets/gearoenix-logo.png")));
+        mesh_builder->set_material(material);
 
         auto camera_builder = render_engine.get_camera_manager()->build("camera");
         camera_builder->get_transformation().set_location(0.0f, 0.0f, 5.0f);

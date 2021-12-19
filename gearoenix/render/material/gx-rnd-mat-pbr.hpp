@@ -23,9 +23,9 @@ struct Pbr final {
     GX_GET_VAL_PRV(float, metallic_factor, 0.5f)
     GX_GET_VAL_PRV(float, roughness_factor, 0.5f)
     GX_GET_VAL_PRV(float, radiance_lod_coefficient, 0.0f)
-    GX_GET_CREF_PRV(std::shared_ptr<texture::Texture2D>, albedo)
-    GX_GET_CREF_PRV(std::shared_ptr<texture::Texture2D>, normal__metallic)
-    GX_GET_CREF_PRV(std::shared_ptr<texture::Texture2D>, emission__roughness)
+    GX_GETSET_CREF_PRV(std::shared_ptr<texture::Texture2D>, albedo)
+    GX_GETSET_CREF_PRV(std::shared_ptr<texture::Texture2D>, normal__metallic)
+    GX_GETSET_CREF_PRV(std::shared_ptr<texture::Texture2D>, emission__roughness)
 
 public:
     Pbr(engine::Engine& e, const core::sync::EndCallerIgnored& c = GX_DEFAULT_IGNORED_END_CALLER) noexcept;

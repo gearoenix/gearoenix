@@ -4,12 +4,10 @@
 #include "../../platform/stream/gx-plt-stm-stream.hpp"
 // This is a workaround for warnings in stb
 #include "../../platform/macro/gx-plt-mcr-disable-warnings.hpp"
-
 #define STB_IMAGE_IMPLEMENTATION
 #define STBI_NO_STDIO
 #include <stb_image.h>
 #define STB_IMAGE_WRITE_IMPLEMENTATION
-#define STBI_WRITE_NO_STDIO
 #include <stb_image_write.h>
 // Returning to our warning level
 #include "../../platform/macro/gx-plt-mcr-enable-warnings.hpp"

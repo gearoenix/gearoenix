@@ -153,7 +153,7 @@ void gearoenix::platform::BaseApplication::update() noexcept
 }
 
 void gearoenix::platform::BaseApplication::initialize_core_application(
-    Application* const app,
+    Application& app,
     core::Application* const core_app) noexcept
 {
     if (nullptr == core_app) {

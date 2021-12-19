@@ -4,8 +4,6 @@
 #include "gx-rnd-gltf-mesh-manager.hpp"
 #include "gx-rnd-gltf-node-manager.hpp"
 
-#define STB_IMAGE_IMPLEMENTATION
-#define STB_IMAGE_WRITE_IMPLEMENTATION
 #define TINYGLTF_NOEXCEPTION
 #define TINYGLTF_IMPLEMENTATION
 #include <tiny_gltf.h>
