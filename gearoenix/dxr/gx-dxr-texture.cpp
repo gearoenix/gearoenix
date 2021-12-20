@@ -1,6 +1,7 @@
 #include "gx-dxr-texture.hpp"
 
 #ifdef GX_RENDER_DXR_ENABLED
+#include "../core/gx-cr-string.hpp"
 #include "../core/macro/gx-cr-mcr-assert.hpp"
 #include "../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "gx-dxr-check.hpp"
@@ -81,14 +82,19 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::dxr::TextureMa
     Microsoft::WRL::ComPtr<ID3D12Resource> resource;
     D3D12_RESOURCE_DESC desc;
     GX_SET_ZERO(desc)
-    // if (info.has_mipmap) {
-    //     desc.MipLevels = static_cast<UINT16>(render::texture::Texture::compute_mipmaps_count(
-    //         static_cast<std::size_t>(info.width),
-    //         static_cast<std::size_t>(info.height)));
-    //     GX_UNIMPLEMENTED
-    // } else {
-    desc.MipLevels = 1;
-    //}
+    bool needs_mipmap_generator = false;
+    if (info.has_mipmap) {
+        if (pixels.size() == 1) {
+            desc.MipLevels = static_cast<UINT16>(render::texture::Texture::compute_mipmaps_count(
+                static_cast<std::size_t>(info.width),
+                static_cast<std::size_t>(info.height)));
+            needs_mipmap_generator = true;
+        } else {
+            desc.MipLevels = static_cast<UINT16>(pixels.size());
+        }
+    } else {
+        desc.MipLevels = 1;
+    }
     switch (info.format) {
     case render::texture::TextureFormat::RgbaUint8:
         desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -109,6 +115,8 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::dxr::TextureMa
     desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
     const auto p = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
     GX_DXR_CHECK(device->get_device()->CreateCommittedResource(&p, D3D12_HEAP_FLAG_NONE, &desc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&resource)))
+    const auto w_name = core::String::to_wstring(name);
+    GX_DXR_CHECK(resource->SetName(w_name.c_str()))
     auto t = std::make_shared<Texture2D>(name, info, e, sampler_search->second, std::move(resource), std::move(descriptor));
     uploader->upload(std::move(pixels[0]), std::shared_ptr<Texture2D>(t), core::sync::EndCallerIgnored([this, t, desc, c]() {
         D3D12_SHADER_RESOURCE_VIEW_DESC srv_desc;
@@ -116,7 +124,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::dxr::TextureMa
         srv_desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
         srv_desc.Format = desc.Format;
         srv_desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-        srv_desc.Texture2D.MipLevels = 1;
+        srv_desc.Texture2D.MipLevels = desc.MipLevels;
         device->get_device()->CreateShaderResourceView(t->resource.Get(), &srv_desc, t->descriptor.cpu_handle);
     }));
     textures_2d.emplace(std::move(name), t);

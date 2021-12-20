@@ -10,23 +10,32 @@
 gearoenix::dxr::PipelineManager::PipelineManager(std::shared_ptr<Device> _device) noexcept
     : device(std::move(_device))
 {
-    std::fstream vf("../../../../assets/gx-dxr-shd-g-buffer.vs.cso", std::ios::binary | std::ios::in);
-    GX_ASSERT(vf.is_open() && vf.good())
-    vf.seekg(0, std::ios::end);
-    std::vector<char> vsb(vf.tellg());
-    vf.seekg(0);
-    vf.read(vsb.data(), vsb.size());
+    initialize_g_buffer_filler();
+    initialize_mipmap_generator();
+}
 
-    std::fstream pf("../../../../assets/gx-dxr-shd-g-buffer.ps.cso", std::ios::binary | std::ios::in);
-    GX_ASSERT(pf.is_open() && pf.good())
-    pf.seekg(0, std::ios::end);
-    std::vector<char> psb(pf.tellg());
-    pf.seekg(0);
-    pf.read(psb.data(), psb.size());
+gearoenix::dxr::PipelineManager::~PipelineManager() noexcept = default;
+
+void gearoenix::dxr::PipelineManager::initialize_g_buffer_filler() noexcept
+{
+    // TODO later they must come from asset path
+    std::fstream g_buffer_vs_f("../../../../assets/gx-dxr-shd-g-buffer.vs.cso", std::ios::binary | std::ios::in);
+    GX_ASSERT(g_buffer_vs_f.is_open() && g_buffer_vs_f.good())
+    g_buffer_vs_f.seekg(0, std::ios::end);
+    std::vector<char> g_buffer_vs_f_shader_bin(g_buffer_vs_f.tellg());
+    g_buffer_vs_f.seekg(0);
+    g_buffer_vs_f.read(g_buffer_vs_f_shader_bin.data(), g_buffer_vs_f_shader_bin.size());
+
+    std::fstream g_buffer_ps_f("../../../../assets/gx-dxr-shd-g-buffer.ps.cso", std::ios::binary | std::ios::in);
+    GX_ASSERT(g_buffer_ps_f.is_open() && g_buffer_ps_f.good())
+    g_buffer_ps_f.seekg(0, std::ios::end);
+    std::vector<char> g_buffer_ps_f_shader_bin(g_buffer_ps_f.tellg());
+    g_buffer_ps_f.seekg(0);
+    g_buffer_ps_f.read(g_buffer_ps_f_shader_bin.data(), g_buffer_ps_f_shader_bin.size());
 
     auto* const d = device->get_device().Get();
 
-    GX_DXR_CHECK(d->CreateRootSignature(0, vsb.data(), vsb.size(), IID_PPV_ARGS(&g_buffer_filler_root_signature)))
+    GX_DXR_CHECK(d->CreateRootSignature(0, g_buffer_vs_f_shader_bin.data(), g_buffer_vs_f_shader_bin.size(), IID_PPV_ARGS(&g_buffer_filler_root_signature)))
 
     const D3D12_INPUT_ELEMENT_DESC input_element_descs[] = {
         D3D12_INPUT_ELEMENT_DESC {
@@ -72,10 +81,10 @@ gearoenix::dxr::PipelineManager::PipelineManager(std::shared_ptr<Device> _device
     pso_desc.InputLayout.pInputElementDescs = input_element_descs;
     pso_desc.InputLayout.NumElements = GX_COUNT_OF(input_element_descs);
     pso_desc.pRootSignature = g_buffer_filler_root_signature.Get();
-    pso_desc.VS.pShaderBytecode = vsb.data();
-    pso_desc.VS.BytecodeLength = vsb.size();
-    pso_desc.PS.pShaderBytecode = psb.data();
-    pso_desc.PS.BytecodeLength = psb.size();
+    pso_desc.VS.pShaderBytecode = g_buffer_vs_f_shader_bin.data();
+    pso_desc.VS.BytecodeLength = g_buffer_vs_f_shader_bin.size();
+    pso_desc.PS.pShaderBytecode = g_buffer_ps_f_shader_bin.data();
+    pso_desc.PS.BytecodeLength = g_buffer_ps_f_shader_bin.size();
     pso_desc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
     pso_desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
     pso_desc.DepthStencilState.DepthEnable = FALSE;
@@ -88,6 +97,25 @@ gearoenix::dxr::PipelineManager::PipelineManager(std::shared_ptr<Device> _device
     GX_DXR_CHECK(d->CreateGraphicsPipelineState(&pso_desc, IID_PPV_ARGS(&g_buffer_filler_pipeline_state)))
 }
 
-gearoenix::dxr::PipelineManager::~PipelineManager() noexcept = default;
+void gearoenix::dxr::PipelineManager::initialize_mipmap_generator() noexcept
+{
+    std::fstream f("../../../../assets/gx-dxr-shd-mipmap-generator.cs.cso", std::ios::binary | std::ios::in);
+    GX_ASSERT(f.is_open() && f.good())
+    f.seekg(0, std::ios::end);
+    std::vector<char> b(f.tellg());
+    f.seekg(0);
+    f.read(b.data(), b.size());
+
+    auto* const d = device->get_device().Get();
+
+    GX_DXR_CHECK(d->CreateRootSignature(0, b.data(), b.size(), IID_PPV_ARGS(&mipmap_generator_root_signature)))
+
+    D3D12_COMPUTE_PIPELINE_STATE_DESC pso_desc;
+    GX_SET_ZERO(pso_desc)
+    pso_desc.pRootSignature = mipmap_generator_root_signature.Get();
+    pso_desc.CS.pShaderBytecode = b.data();
+    pso_desc.CS.BytecodeLength = b.size();
+    GX_DXR_CHECK(d->CreateComputePipelineState(&pso_desc, IID_PPV_ARGS(&mipmap_generator_pipeline_state)))
+}
 
 #endif
