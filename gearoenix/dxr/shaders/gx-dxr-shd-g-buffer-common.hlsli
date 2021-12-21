@@ -2,11 +2,11 @@
 
 #include "gx-dxr-shd-common.hpp"
 
-#define G_BUFFERS_FILLER_ROOT_SIGNATURE                                    \
-	"RootFlags(ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT), "                      \
-	"CBV(b0, space = 0), "                                                 \
-	"DescriptorTable(SRV(t0, space = 0, numDescriptors = unbounded)), "    \
-    "DescriptorTable(Sampler(s0, space = 0, numDescriptors = unbounded))"
+#define G_BUFFERS_FILLER_ROOT_SIGNATURE \
+	"RootFlags(ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT), " \
+	"CBV(b0, space = 0), " \
+	"DescriptorTable(SRV(t0, space = 0, numDescriptors = unbounded, flags = DESCRIPTORS_VOLATILE)), " \
+    "DescriptorTable(Sampler(s0, space = 0, numDescriptors = unbounded, flags = DESCRIPTORS_VOLATILE))"
 
 struct PSInput
 {

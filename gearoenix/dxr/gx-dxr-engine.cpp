@@ -22,11 +22,6 @@
 #include <fstream>
 #include <string>
 
-constexpr static const wchar_t* const GX_HIT_GROUP_NAME = L"GxHitGroup";
-constexpr static const wchar_t* const GX_RAYGEN_SHADER_NAME = L"GxRaygenShader";
-constexpr static const wchar_t* const GX_CLOSEST_HIT_SHADER_NAME = L"GxClosestHitShader";
-constexpr static const wchar_t* const GX_MISS_SHADER_NAME = L"GxMissShader";
-
 gearoenix::dxr::Engine::Engine(platform::Application& platform_application) noexcept
     : render::engine::Engine(render::engine::Type::Direct3DX, platform_application)
     , platform_application(platform_application)
@@ -74,6 +69,7 @@ void gearoenix::dxr::Engine::window_resized(int failed_tries) noexcept
 {
     if (swapchain->set_window_size(platform_application))
         device_lost_handle(++failed_tries);
+    submission_manager->clear_command_lists();
 }
 
 gearoenix::dxr::Engine::~Engine() noexcept

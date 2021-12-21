@@ -12,6 +12,7 @@ struct Engine;
 struct PipelineManager;
 struct Queue;
 struct Swapchain;
+struct Command;
 
 struct SubmissionManager final {
     GX_GET_RRF_PRV(Engine, e)
@@ -23,11 +24,9 @@ struct SubmissionManager final {
 
 private:
     struct Frame final {
-        std::vector<Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList6>> threads_g_buffer_filler_command_lists;
+        std::vector<std::unique_ptr<Command>> threads_g_buffer_filler_commands;
         std::vector<ID3D12CommandList*> threads_g_buffer_filler_command_lists_raw;
     };
-    Microsoft::WRL::ComPtr<ID3D12CommandAllocator> command_allocator;
-    std::vector<Microsoft::WRL::ComPtr<ID3D12CommandAllocator>> threads_command_allocators;
 
     std::uint64_t frame_number = 0;
     const std::uint64_t frames_count;
@@ -38,6 +37,7 @@ public:
     ~SubmissionManager() noexcept;
 
     [[nodiscard]] bool render_frame() noexcept;
+    void clear_command_lists() noexcept;
 };
 }
 
