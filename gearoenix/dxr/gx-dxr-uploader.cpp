@@ -68,9 +68,10 @@ void gearoenix::dxr::Uploader::upload(
 void gearoenix::dxr::Uploader::upload(
     std::vector<std::uint8_t>&& data,
     std::shared_ptr<Texture2D>&& texture,
-    core::sync::EndCallerIgnored&& end) noexcept
+    const UINT subresource_index,
+    core::sync::EndCallerIgnored end) noexcept
 {
-    uploader.push([this, data = std::move(data), texture = std::move(texture), end = std::move(end)]() {
+    uploader.push([this, data = std::move(data), texture = std::move(texture), end = std::move(end), subresource_index]() {
         const auto desc = texture->get_resource()->GetDesc();
         const auto dev = device->get_device();
         Microsoft::WRL::ComPtr<ID3D12CommandAllocator> cal;
@@ -88,13 +89,13 @@ void gearoenix::dxr::Uploader::upload(
         texture_data.pData = data.data();
         texture_data.RowPitch = data.size() / desc.Height;
         texture_data.SlicePitch = texture_data.RowPitch * desc.Height;
-        UpdateSubresources(cmd.Get(), texture->get_resource().Get(), cb->get_resource().Get(), 0, 0, 1, &texture_data);
+        UpdateSubresources(cmd.Get(), texture->get_resource().Get(), cb->get_resource().Get(), 0, subresource_index, 1, &texture_data);
         GX_DXR_CHECK(cmd->Close())
         copy_queue->exe(cmd);
         GX_DXR_CHECK(copy_queue->get_command_queue()->Signal(fence.Get(), fence_value))
         GX_DXR_CHECK(direct_queue->get_command_queue()->Wait(fence.Get(), fence_value))
         ++fence_value;
-        const auto t1 = CD3DX12_RESOURCE_BARRIER::Transition(texture->get_resource().Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+        const auto t1 = CD3DX12_RESOURCE_BARRIER::Transition(texture->get_resource().Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
         gcmd->ResourceBarrier(1, &t1);
         GX_DXR_CHECK(gcmd->Close())
         direct_queue->exe(gcmd);

@@ -27,9 +27,27 @@ struct GameApp final : public gearoenix::core::Application {
 
         auto mesh_builder = render_engine.get_mesh_manager()->build("triangle", vertices, indices);
         gearoenix::render::material::Pbr material(render_engine);
-        material.set_albedo(render_engine.get_texture_manager()->create_2d_from_file(
+        std::vector<std::vector<std::uint8_t>> pixels(3);
+        for (int j = 6, k = 0; k < 3; --j, ++k)
+            for (int i = 0; i < (1 << j) * (1 << j); ++i) {
+                pixels[k].push_back(k == 0 ? 255 : 0);
+                pixels[k].push_back(k == 1 ? 255 : 0);
+                pixels[k].push_back(k == 2 ? 255 : 0);
+                pixels[k].push_back(255);
+            }
+        material.set_albedo(render_engine.get_texture_manager()->create_2d_from_pixels(
             "gearoenix-logo",
-            gearoenix::platform::AbsolutePath("../../../../assets/gearoenix-logo.png")));
+            pixels,
+            gearoenix::render::texture::TextureInfo {
+                .format = gearoenix::render::texture::TextureFormat::RgbaUint8,
+                .width = 64,
+                .height = 64,
+                .type = gearoenix::render::texture::Type::Texture2D },
+            GX_DEFAULT_IGNORED_END_CALLER));
+        // Or you can load a image
+        /*material.set_albedo(render_engine.get_texture_manager()->create_2d_from_file(
+            "gearoenix-logo",
+            gearoenix::platform::AbsolutePath("../../../../assets/gearoenix-logo.png")));*/
         mesh_builder->set_material(material);
 
         auto camera_builder = render_engine.get_camera_manager()->build("camera");

@@ -26,7 +26,6 @@ gearoenix::dxr::SubmissionManager::SubmissionManager(Engine& e) noexcept
     , frames_count(Swapchain::BACK_BUFFERS_COUNT)
     , frames_data(frames_count)
 {
-    auto* const d = device->get_device().Get();
     const std::size_t threads_count = std::thread::hardware_concurrency();
     for (auto& f : frames_data) {
         f.threads_g_buffer_filler_commands.resize(threads_count);
