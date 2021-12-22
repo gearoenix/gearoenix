@@ -54,6 +54,7 @@ gearoenix::dxr::MeshBuilder::MeshBuilder(
 
 void gearoenix::dxr::MeshBuilder::set_material(const render::material::Pbr& mat) noexcept
 {
+    render::mesh::Builder::set_material(mat);
     const auto material_name = core::String::to_wstring(name + "-PBR-Material");
     MeshBuffer mb(e, sizeof(MeshUniform), material_name.c_str());
     auto& b = *reinterpret_cast<MeshUniform*>(mb.uniform.get_buffer().get_pointer());
@@ -105,11 +106,15 @@ std::shared_ptr<gearoenix::render::mesh::Builder> gearoenix::dxr::MeshManager::b
     const auto vertices_size = static_cast<UINT>(vsz);
     const auto indices_count = static_cast<UINT>(indices.size());
 
-    core::sync::EndCallerIgnored end([r, vb, ib, c, vertex_size, vertices_size, indices_count]() mutable noexcept -> void {
-        r->get_entity_builder()->get_builder().add_component(
-            Mesh(std::move(vb), std::move(ib), vertex_size, vertices_size, indices_count));
+    core::sync::EndCallerIgnored end([c, r]() noexcept -> void {
         (void)c;
+        (void)r;
     });
+
+    r->get_entity_builder()->get_builder().add_component(Mesh(
+        std::shared_ptr<GpuBuffer>(vb),
+        std::shared_ptr<GpuBuffer>(ib),
+        vertex_size, vertices_size, indices_count));
 
     u->upload(std::move(vbd), std::move(vb), core::sync::EndCallerIgnored(end));
     u->upload(std::move(ibd), std::move(ib), std::move(end));

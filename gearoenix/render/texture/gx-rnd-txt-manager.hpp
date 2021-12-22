@@ -22,16 +22,12 @@ struct Texture2D;
 struct TextureCube;
 struct Manager {
 protected:
-    GX_CREATE_GUARD(colours_2d)
-    std::map<math::Vec4<float>, std::shared_ptr<Texture2D>> colours_2d;
-    GX_CREATE_GUARD(colours_cube)
-    std::map<math::Vec4<float>, std::shared_ptr<TextureCube>> colours_cube;
     GX_CREATE_GUARD(brdflut)
     std::shared_ptr<Texture2D> brdflut;
     GX_CREATE_GUARD(checkers)
     std::shared_ptr<Texture2D> checkers;
     GX_CREATE_GUARD(textures_2d)
-    std::map<std::string, std::shared_ptr<Texture2D>> textures_2d;
+    std::map<std::string, std::weak_ptr<Texture2D>> textures_2d;
 
 public:
     Manager() noexcept;

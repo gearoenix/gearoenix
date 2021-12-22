@@ -135,10 +135,12 @@ SET(GX_ENGINE_RENDER_SRC
 #        ${GX_ENGINE_RENDER_SRC_DIR}/skybox/gx-rnd-sky-skybox.hpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/skybox/gx-rnd-sky-type.cpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/skybox/gx-rnd-sky-type.hpp
-        ${GX_ENGINE_RENDER_SRC_DIR}/texture/gx-rnd-txt-face.cpp
-        ${GX_ENGINE_RENDER_SRC_DIR}/texture/gx-rnd-txt-face.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/texture/gx-rnd-txt-attachment.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/texture/gx-rnd-txt-attachment.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/texture/gx-rnd-txt-binding-point.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/texture/gx-rnd-txt-binding-point.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/texture/gx-rnd-txt-face.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/texture/gx-rnd-txt-face.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/texture/gx-rnd-txt-filter.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/texture/gx-rnd-txt-format.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/texture/gx-rnd-txt-image.cpp

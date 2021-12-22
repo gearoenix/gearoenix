@@ -89,9 +89,9 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::dxr::TextureMa
     const core::sync::EndCallerIgnored& c) noexcept
 {
     GX_GUARD_LOCK(textures_2d)
-    auto textures_2d_search = textures_2d.find(name);
-    if (textures_2d.end() != textures_2d_search)
-        return textures_2d_search->second;
+    if (auto textures_2d_search = textures_2d.find(name); textures_2d.end() != textures_2d_search)
+        if (auto r = textures_2d_search->second.lock(); nullptr != r)
+            return r;
     const auto sampler_search = samplers_indices.find(info.sampler_info);
     GX_ASSERT(samplers_indices.end() != sampler_search)
     auto descriptor = descriptor_manager->allocate_texture_2d();
@@ -145,7 +145,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::dxr::TextureMa
         device->get_device()->CreateShaderResourceView(t->resource.Get(), &srv_desc, t->descriptor.cpu_handle);
     });
 
-    const core::sync::EndCallerIgnored on_upload_complete([this, t, desc, on_mipmap_complete = std::move(on_mipmap_complete), needs_mipmap_generator]() {
+    const core::sync::EndCallerIgnored on_upload_complete([this, t, desc, on_mipmap_complete = std::move(on_mipmap_complete), needs_mipmap_generator]() mutable noexcept {
         if (!needs_mipmap_generator)
             return;
         worker.push([this, t = std::move(t), desc, on_mipmap_complete = std::move(on_mipmap_complete)] {
@@ -238,8 +238,10 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::dxr::TextureMa
 
     for (std::size_t mipmap_index = 0; mipmap_index < pixels.size(); ++mipmap_index) {
         uploader->upload(
-            std::move(pixels[mipmap_index]), std::shared_ptr<Texture2D>(t),
-            static_cast<UINT>(mipmap_index), on_upload_complete);
+            std::move(pixels[mipmap_index]),
+            std::shared_ptr<Texture2D>(t),
+            static_cast<UINT>(mipmap_index),
+            core::sync::EndCallerIgnored(on_upload_complete));
     }
     textures_2d.emplace(std::move(name), t);
     return t;

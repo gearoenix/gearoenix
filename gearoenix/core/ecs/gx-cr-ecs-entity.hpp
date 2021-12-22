@@ -80,23 +80,15 @@ public:
     [[nodiscard]] void* get_component(std::type_index component_type) noexcept;
 
     template <typename ComponentType>
-    std::optional<std::reference_wrapper<const ComponentType>> get_component() const noexcept
+    const ComponentType* get_component() const noexcept
     {
-        const void* const ptr = get_component(std::type_index(typeid(ComponentType)));
-        if (nullptr == ptr)
-            return std::nullopt;
-        const ComponentType& comp = *reinterpret_cast<const ComponentType*>(ptr);
-        return comp;
+        return reinterpret_cast<const ComponentType*>(get_component(std::type_index(typeid(ComponentType))));
     }
 
     template <typename ComponentType>
-    std::optional<std::reference_wrapper<ComponentType>> get_component() noexcept
+    ComponentType* get_component() noexcept
     {
-        void* const ptr = get_component(std::type_index(typeid(ComponentType)));
-        if (nullptr == ptr)
-            return std::nullopt;
-        ComponentType& comp = *reinterpret_cast<ComponentType*>(ptr);
-        return comp;
+        return reinterpret_cast<ComponentType*>(get_component(std::type_index(typeid(ComponentType))));
     }
 
     static void sort(components_t&) noexcept;

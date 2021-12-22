@@ -3,23 +3,28 @@
 #include "../../core/ecs/gx-cr-ecs-component.hpp"
 #include "../../math/gx-math-aabb.hpp"
 #include "../gx-rnd-translucency-mode.hpp"
-#include "..\..\dxr\gx-dxr-mesh.hpp"
+#include "../texture/gx-rnd-txt-binding-point.hpp"
+#include <map>
 
 namespace gearoenix::core::ecs {
 struct World;
+}
+
+namespace gearoenix::render::texture {
+struct Texture;
 }
 
 namespace gearoenix::render::mesh {
 struct Builder;
 struct Mesh final : public core::ecs::Component {
     const math::Aabb3 original_box;
-    /// It is going to be used in BVH creation, picker and ...
-    math::Aabb3 updated_box;
+    math::Aabb3 updated_box; // It is going to be used in BVH creation, picker and ...
     std::type_index material_type_index;
     TranslucencyMode translucency = TranslucencyMode::Opaque;
     bool is_enabled_rendering = true;
     bool is_shadow_caster = true;
     bool is_shadow_receiver = true;
+    std::map<texture::BindingPoint, std::shared_ptr<texture::Texture>> bound_textures;
 
     Mesh(
         const math::Aabb3& original_box,

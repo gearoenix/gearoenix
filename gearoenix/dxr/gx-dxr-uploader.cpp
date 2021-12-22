@@ -69,7 +69,7 @@ void gearoenix::dxr::Uploader::upload(
     std::vector<std::uint8_t>&& data,
     std::shared_ptr<Texture2D>&& texture,
     const UINT subresource_index,
-    core::sync::EndCallerIgnored end) noexcept
+    core::sync::EndCallerIgnored&& end) noexcept
 {
     uploader.push([this, data = std::move(data), texture = std::move(texture), end = std::move(end), subresource_index]() {
         const auto desc = texture->get_resource()->GetDesc();

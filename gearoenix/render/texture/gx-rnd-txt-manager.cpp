@@ -21,15 +21,17 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     const math::Vec4<float>& colour, const core::sync::EndCallerIgnored& c) noexcept
 {
     static_assert(sizeof(float) == 4, "Only float 32 bit are supported.");
-    GX_GUARD_LOCK(colours_2d)
-    const auto search = colours_2d.find(colour);
-    if (colours_2d.end() != search) {
-        return search->second;
+    auto name = "colour{" + std::to_string(colour.x) + "," + std::to_string(colour.y) + "," + std::to_string(colour.z) + "," + std::to_string(colour.w) + "}";
+    {
+        GX_GUARD_LOCK(textures_2d)
+        if (const auto search = textures_2d.find(name); textures_2d.end() != search)
+            if (auto r = search->second.lock(); nullptr != r)
+                return r;
     }
     std::vector<std::vector<std::uint8_t>> pixels { std::vector<std::uint8_t>(sizeof(math::Vec4<float>)) };
     std::memcpy(pixels[0].data(), colour.data(), sizeof(math::Vec4<float>));
-    auto result = create_2d_from_pixels(
-        "colour{" + std::to_string(colour.x) + "," + std::to_string(colour.y) + "," + std::to_string(colour.z) + "," + std::to_string(colour.w) + "}",
+    return create_2d_from_pixels(
+        std::move(name),
         std::move(pixels),
         TextureInfo {
             .format = TextureFormat::RgbaFloat32,
@@ -46,8 +48,6 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
             .has_mipmap = false,
         },
         c);
-    colours_2d[colour] = result;
-    return result;
 }
 
 std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::get_brdflut(
@@ -145,7 +145,8 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     {
         GX_GUARD_LOCK(textures_2d)
         if (auto search = textures_2d.find(name); textures_2d.end() != search)
-            return search->second;
+            if (auto r = search->second.lock(); nullptr != r)
+                return r;
     }
     if (Type::Unknown != info.type)
         GX_UNIMPLEMENTED // type converting is not implemented and is not going to be implemented in near future.
@@ -180,7 +181,8 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     {
         GX_GUARD_LOCK(textures_2d)
         if (auto search = textures_2d.find(name); textures_2d.end() != search)
-            return search->second;
+            if (auto r = search->second.lock(); nullptr != r)
+                return r;
     }
     /// TODO: Later I have to add a good streaming support here.
     std::ifstream file(path.raw, std::ios::in | std::ios::binary);
