@@ -89,25 +89,16 @@ SET(GX_ENGINE_RENDER_SRC
 #        ${GX_ENGINE_RENDER_SRC_DIR}/material/gx-rnd-mat-type.hpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/material/gx-rnd-mat-unlit.cpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/material/gx-rnd-mat-unlit.hpp
-        ${GX_ENGINE_RENDER_SRC_DIR}/mesh/gx-rnd-msh-builder.cpp
-        ${GX_ENGINE_RENDER_SRC_DIR}/mesh/gx-rnd-msh-builder.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/mesh/gx-rnd-msh-manager.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/mesh/gx-rnd-msh-manager.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/mesh/gx-rnd-msh-mesh.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/mesh/gx-rnd-msh-mesh.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/model/gx-rnd-mdl-dynamic.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/model/gx-rnd-mdl-dynamic.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/model/gx-rnd-mdl-manager.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/model/gx-rnd-mdl-manager.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/model/gx-rnd-mdl-mesh.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/model/gx-rnd-mdl-mesh.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/model/gx-rnd-mdl-model.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/model/gx-rnd-mdl-model.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/model/gx-rnd-mdl-static.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/model/gx-rnd-mdl-static.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/model/gx-rnd-mdl-transformation.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/model/gx-rnd-mdl-transformation.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/model/gx-rnd-mdl-type.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/model/gx-rnd-mdl-builder.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/model/gx-rnd-mdl-builder.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/model/gx-rnd-mdl-manager.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/model/gx-rnd-mdl-manager.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/model/gx-rnd-mdl-model.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/model/gx-rnd-mdl-model.hpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/reflection/gx-rnd-rfl-baked.cpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/reflection/gx-rnd-rfl-baked.hpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/reflection/gx-rnd-rfl-manager.cpp

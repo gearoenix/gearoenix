@@ -1,6 +1,10 @@
 #include "gx-rnd-msh-manager.hpp"
 #include "../../core/asset/gx-cr-asset-manager.hpp"
-#include "gx-rnd-msh-builder.hpp"
+
+gearoenix::render::mesh::Manager::Manager(engine::Engine& e) noexcept
+    : e(e)
+{
+}
 
 gearoenix::render::mesh::Manager::~Manager() noexcept = default;
 
@@ -528,16 +532,22 @@ gearoenix::render::mesh::Manager::~Manager() noexcept = default;
 //     return m;
 // }
 
-std::shared_ptr<gearoenix::render::mesh::Builder> gearoenix::render::mesh::Manager::build(
-    const std::string& name,
-    const std::vector<PbrVertex>& vertices,
-    const std::vector<std::uint32_t>& indices,
-    const core::sync::EndCallerIgnored& c) noexcept
+std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager::build(
+    std::string&& name,
+    std::vector<PbrVertex>&& vertices,
+    std::vector<std::uint32_t>&& indices,
+    core::sync::EndCallerIgnored&& end_callback) noexcept
 {
+    {
+        GX_GUARD_LOCK(meshes)
+        if (auto search = meshes.find(name); meshes.end() != search)
+            if (auto m = search->second.lock(); nullptr != m)
+                return m;
+    }
     math::Aabb3 occlusion_box;
     for (const PbrVertex& vertex : vertices) {
         occlusion_box.put_without_update(math::Vec3<double>(vertex.position));
     }
     occlusion_box.update();
-    return build(name, vertices, indices, std::move(occlusion_box), c);
+    return build(std::move(name), std::move(vertices), std::move(indices), std::move(occlusion_box), std::move(end_callback));
 }

@@ -33,6 +33,10 @@ namespace gearoenix::render::mesh {
 struct Manager;
 }
 
+namespace gearoenix::render::model {
+struct Manager;
+}
+
 namespace gearoenix::render::scene {
 struct Manager;
 }
@@ -55,6 +59,7 @@ struct Engine {
     GX_GET_VAL_PRT(double, delta_time, 0.0f)
     GX_GET_UPTR_PRT(scene::Manager, scene_manager)
     GX_GET_UPTR_PRT(mesh::Manager, mesh_manager)
+    GX_GET_UPTR_PRT(model::Manager, model_manager)
     GX_GET_UPTR_PRT(camera::Manager, camera_manager)
     GX_GET_UPTR_PRT(texture::Manager, texture_manager)
     GX_GET_UPTR_PRT(core::ecs::World, world)

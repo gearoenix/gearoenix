@@ -5,8 +5,9 @@
 #include <gearoenix/render/engine/gx-rnd-eng-engine.hpp>
 #include <gearoenix/render/gx-rnd-vertex.hpp>
 #include <gearoenix/render/material/gx-rnd-mat-pbr.hpp>
-#include <gearoenix/render/mesh/gx-rnd-msh-builder.hpp>
 #include <gearoenix/render/mesh/gx-rnd-msh-manager.hpp>
+#include <gearoenix/render/model/gx-rnd-mdl-builder.hpp>
+#include <gearoenix/render/model/gx-rnd-mdl-manager.hpp>
 #include <gearoenix/render/scene/gx-rnd-scn-builder.hpp>
 #include <gearoenix/render/scene/gx-rnd-scn-manager.hpp>
 
@@ -24,15 +25,22 @@ struct GameApp final : public gearoenix::core::Application {
 
         std::vector<std::uint32_t> indices = { 0, 2, 1 };
 
-        auto mesh_builder = render_engine.get_mesh_manager()->build("triangle", vertices, indices);
-        mesh_builder->set_material(gearoenix::render::material::Pbr(render_engine));
+        const auto scene_builder = render_engine.get_scene_manager()->build("scene");
+
+        auto end_callback = gearoenix::core::sync::EndCallerIgnored([scene_builder] {});
+
+        auto model_builder = render_engine.get_model_manager()->build(
+            "triangle-model",
+            render_engine.get_mesh_manager()->build("triangle-mesh", std::move(vertices), std::move(indices)),
+            gearoenix::core::sync::EndCallerIgnored(end_callback),
+            true);
+        model_builder->set_material(gearoenix::render::material::Pbr(render_engine));
 
         auto camera_builder = render_engine.get_camera_manager()->build("camera");
         camera_builder->get_transformation().set_location(0.0f, 0.0f, 5.0f);
         camera_builder->set(gearoenix::render::camera::Projection::Perspective);
 
-        const auto scene_builder = render_engine.get_scene_manager()->build("scene");
-        scene_builder->add(std::move(mesh_builder));
+        scene_builder->add(std::move(model_builder));
         scene_builder->add(std::move(camera_builder));
     }
 

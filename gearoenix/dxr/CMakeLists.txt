@@ -5,6 +5,7 @@ SET(GX_ENGINE_DXR_SRC
         ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-adapter.hpp
         ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-buffer.cpp
         ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-buffer.hpp
+        ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-build-configuration.hpp
         ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-check.hpp
         ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-command.cpp
         ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-command.hpp
@@ -17,6 +18,8 @@ SET(GX_ENGINE_DXR_SRC
         ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-loader.hpp
         ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-mesh.cpp
         ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-mesh.hpp
+        ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-model.cpp
+        ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-model.hpp
         ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-pipeline.cpp
         ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-pipeline.hpp
         ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-queue.cpp

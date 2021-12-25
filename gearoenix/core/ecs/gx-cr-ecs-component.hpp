@@ -12,7 +12,13 @@ struct Component {
 
     template <typename T>
     explicit Component(T*) noexcept;
+
     virtual ~Component() noexcept = default;
+    Component(Component&&) noexcept = default;
+    Component(const Component&) = delete;
+    Component& operator=(Component&&) = delete;
+    Component& operator=(const Component&) = delete;
+
     virtual void display() noexcept { }
 
     template <typename T>

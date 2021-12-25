@@ -10,6 +10,7 @@
 #include "gx-dxr-descriptor.hpp"
 #include "gx-dxr-device.hpp"
 #include "gx-dxr-mesh.hpp"
+#include "gx-dxr-model.hpp"
 #include "gx-dxr-pipeline.hpp"
 #include "gx-dxr-queue.hpp"
 #include "gx-dxr-shader.hpp"
@@ -58,6 +59,7 @@ void gearoenix::dxr::Engine::device_lost_handle(const int failed_tries) noexcept
     descriptor_manager = std::make_shared<DescriptorManager>(device);
     uploader = std::make_shared<Uploader>(device);
     mesh_manager = std::make_unique<MeshManager>(*this);
+    model_manager = std::make_unique<ModelManager>(*this);
     pipeline_manager = std::make_shared<PipelineManager>(device);
     submission_manager = std::make_shared<SubmissionManager>(*this);
     texture_manager = std::make_unique<TextureManager>(*this);

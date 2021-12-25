@@ -166,6 +166,12 @@ std::wstring gearoenix::core::String::to_wstring(const std::string& s) noexcept
     return converter.from_bytes(s);
 }
 
+const wchar_t* gearoenix::core::String::to_wchar_ptr(const std::string& s) noexcept
+{
+    static thread_local auto w = to_wstring(s);
+    return w.c_str();
+}
+
 #ifdef GX_IN_IOS
 NSString* gearoenix::core::String::to_objc_string(const std::string& s) noexcept
 {

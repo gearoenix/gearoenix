@@ -19,7 +19,7 @@ gearoenix::dxr::Swapchain::Swapchain(std::shared_ptr<Queue> q) noexcept
     auto* const dev = device->get_device().Get();
     D3D12_DESCRIPTOR_HEAP_DESC rtv_descriptor_heap_desc;
     GX_SET_ZERO(rtv_descriptor_heap_desc)
-    rtv_descriptor_heap_desc.NumDescriptors = BACK_BUFFERS_COUNT;
+    rtv_descriptor_heap_desc.NumDescriptors = GX_DXR_FRAMES_BACKBUFFER_NUMBER;
     rtv_descriptor_heap_desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
     GX_DXR_CHECK(dev->CreateDescriptorHeap(&rtv_descriptor_heap_desc, IID_PPV_ARGS(&rtv_descriptor_heap)))
     rtv_descriptor_size = dev->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
@@ -30,7 +30,7 @@ gearoenix::dxr::Swapchain::Swapchain(std::shared_ptr<Queue> q) noexcept
     GX_DXR_CHECK(dev->CreateDescriptorHeap(&dsv_descriptor_heap_desc, IID_PPV_ARGS(&dsv_descriptor_heap)))
     // Create a fence for tracking GPU execution progress.
     GX_DXR_CHECK(dev->CreateFence(current_fence_value, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence)))
-    for (UINT i = 1; i <= BACK_BUFFERS_COUNT; ++i)
+    for (UINT i = 1; i <= GX_DXR_FRAMES_BACKBUFFER_NUMBER; ++i)
         fence_values.push(current_fence_value);
     fence_event.Attach(CreateEvent(nullptr, FALSE, FALSE, nullptr));
     GX_ASSERT(fence_event.IsValid())
@@ -55,7 +55,7 @@ bool gearoenix::dxr::Swapchain::set_window_size(const platform::Application& pla
     if (swapchain) {
         // If the swap chain already exists, resize it.
         HRESULT hr = swapchain->ResizeBuffers(
-            BACK_BUFFERS_COUNT,
+            GX_DXR_FRAMES_BACKBUFFER_NUMBER,
             window_width,
             window_height,
             BACK_BUFFER_FORMAT,
@@ -74,7 +74,7 @@ bool gearoenix::dxr::Swapchain::set_window_size(const platform::Application& pla
         swap_chain_desc.Height = window_height;
         swap_chain_desc.Format = BACK_BUFFER_FORMAT;
         swap_chain_desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-        swap_chain_desc.BufferCount = BACK_BUFFERS_COUNT;
+        swap_chain_desc.BufferCount = GX_DXR_FRAMES_BACKBUFFER_NUMBER;
         swap_chain_desc.SampleDesc.Count = 1;
         swap_chain_desc.SampleDesc.Quality = 0;
         swap_chain_desc.Scaling = DXGI_SCALING_STRETCH;
@@ -109,7 +109,7 @@ bool gearoenix::dxr::Swapchain::set_window_size(const platform::Application& pla
     }
     // Obtain the back buffers for this window which will be the final render targets
     // and create render target views for each of them.
-    for (UINT n = 0; n < BACK_BUFFERS_COUNT; ++n) {
+    for (UINT n = 0; n < GX_DXR_FRAMES_BACKBUFFER_NUMBER; ++n) {
         auto& frame = frames[n];
         auto& render_target = frame.render_target;
         auto& rtv_descriptor = frame.rtv_descriptor;
@@ -171,7 +171,7 @@ void gearoenix::dxr::Swapchain::wait_for_gpu() noexcept
     GX_ASSERT(WAIT_OBJECT_0 == WaitForSingleObjectEx(fence_event.Get(), INFINITE, FALSE))
     for (; !fence_values.empty(); fence_values.pop())
         ;
-    for (UINT fi = 0; fi < BACK_BUFFERS_COUNT; ++fi)
+    for (UINT fi = 0; fi < GX_DXR_FRAMES_BACKBUFFER_NUMBER; ++fi)
         fence_values.push(current_fence_value);
 }
 

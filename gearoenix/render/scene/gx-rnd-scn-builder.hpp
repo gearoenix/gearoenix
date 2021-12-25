@@ -12,7 +12,7 @@ namespace gearoenix::render::camera {
 struct Builder;
 }
 
-namespace gearoenix::render::mesh {
+namespace gearoenix::render::model {
 struct Builder;
 }
 
@@ -22,7 +22,7 @@ struct Builder final {
 
 private:
     const std::shared_ptr<core::ecs::EntitySharedBuilder> entity_builder;
-    std::vector<std::shared_ptr<mesh::Builder>> mesh_builders;
+    std::vector<std::shared_ptr<model::Builder>> model_builders;
     std::vector<std::shared_ptr<camera::Builder>> camera_builders;
 
     explicit Builder(core::ecs::World& world) noexcept;
@@ -34,7 +34,7 @@ public:
     Builder& operator=(const Builder&) = delete;
     ~Builder() noexcept;
 
-    void add(std::shared_ptr<mesh::Builder>&& mesh_builder) noexcept;
+    void add(std::shared_ptr<model::Builder>&& model_builder) noexcept;
     void add(std::shared_ptr<camera::Builder>&& camera_builder) noexcept;
 };
 }

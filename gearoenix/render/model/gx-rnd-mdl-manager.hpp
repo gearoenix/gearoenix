@@ -1,47 +1,39 @@
 #ifndef GEAROENIX_RENDER_MODEL_MANAGER_HPP
 #define GEAROENIX_RENDER_MODEL_MANAGER_HPP
-#include "../../core/asset/gx-cr-asset-manager.hpp"
-#include "../../core/cache/gx-cr-cache-file.hpp"
-#include "../../core/gx-cr-types.hpp"
 #include "../../core/sync/gx-cr-sync-end-caller.hpp"
-#include "gx-rnd-mdl-model.hpp"
+#include <map>
 #include <memory>
-
-namespace gearoenix::platform::stream {
-struct Stream;
-}
+#include <string>
 
 namespace gearoenix::render::engine {
 struct Engine;
 }
 
+namespace gearoenix::render::mesh {
+struct Mesh;
+}
+
 namespace gearoenix::render::model {
+struct Model;
+struct Builder;
 struct Manager {
-    GX_GET_CPTR_PRV(engine::Engine, e)
-    GX_GET_CREF_PRV(core::cache::File<Model>, cache)
+protected:
+    engine::Engine& e;
+
+    explicit Manager(engine::Engine& e) noexcept;
 
 public:
-    Manager(std::unique_ptr<platform::stream::Stream> s, engine::Engine* e) noexcept;
-    ~Manager() noexcept = default;
-    [[nodiscard]] std::shared_ptr<Model> get_gx3d(core::Id mid, core::sync::EndCaller<Model>& c) noexcept;
-    [[nodiscard]] std::shared_ptr<Model> get_gx3d(const std::string& name, core::sync::EndCaller<Model>& c) noexcept;
-    /// T must be derived from Model and have the same constructor that Model has.
-    template <typename T>
-    [[nodiscard]] typename std::enable_if<std::is_base_of<Model, T>::value, std::shared_ptr<T>>::type
-    create(std::string name, core::sync::EndCaller<T>& c) noexcept;
+    Manager(Manager&&) = delete;
+    Manager(const Manager&) = delete;
+    Manager& operator=(Manager&&) = delete;
+    Manager& operator=(const Manager&) = delete;
+    virtual ~Manager() noexcept;
+
+    [[nodiscard]] virtual std::shared_ptr<Builder> build(
+        std::string&& name,
+        std::shared_ptr<mesh::Mesh>&& bound_mesh,
+        core::sync::EndCallerIgnored&& c,
+        bool is_transformable) noexcept = 0;
 };
 }
-
-template <typename T>
-typename std::enable_if<std::is_base_of<gearoenix::render::model::Model, T>::value, std::shared_ptr<T>>::type
-gearoenix::render::model::Manager::create(std::string name, core::sync::EndCaller<T>& c) noexcept
-{
-    const core::Id id = core::asset::Manager::create_id();
-    const core::sync::EndCaller<core::sync::EndCallerIgnore> call([c] {});
-    const auto result = T::construct(id, std::move(name), e, call);
-    c.set_data(result);
-    cache.get_cacher().get_cacheds()[id] = result;
-    return result;
-}
-
 #endif

@@ -20,7 +20,7 @@ typedef math::Vec4<float> float4;
 typedef math::Vec4<std::uint32_t> uint4;
 #endif
 
-struct MeshUniform {
+struct ModelUniform {
     float4 colour_factor;
     float4 emission_factor__alpha_cutoff;
     float4 normal_scale__occlusion_strength;

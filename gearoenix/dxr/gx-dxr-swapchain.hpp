@@ -2,6 +2,7 @@
 
 #include "../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_DXR_ENABLED
+#include "gx-dxr-build-configuration.hpp"
 #include "gx-dxr-loader.hpp"
 #include <queue>
 
@@ -13,7 +14,6 @@ namespace gearoenix::dxr {
 struct Device;
 struct Queue;
 struct Swapchain final {
-    constexpr static UINT BACK_BUFFERS_COUNT = 3;
     constexpr static DXGI_FORMAT BACK_BUFFER_FORMAT = DXGI_FORMAT_B8G8R8A8_UNORM;
     constexpr static DXGI_FORMAT DEPTH_BUFFER_FORMAT = DXGI_FORMAT_D32_FLOAT;
 
@@ -32,7 +32,7 @@ struct Swapchain final {
     GX_GET_CREF_PRV(Microsoft::WRL::Wrappers::Event, fence_event)
     GX_GET_CREF_PRV(D3D12_VIEWPORT, viewport)
     GX_GET_CREF_PRV(D3D12_RECT, scissor)
-    GX_GET_ARRC_PRV(Frame, frames, BACK_BUFFERS_COUNT)
+    GX_GET_ARRC_PRV(Frame, frames, GX_DXR_FRAMES_BACKBUFFER_NUMBER)
     GX_GET_ARRC_PRV(float, clear_colour, 4)
     GX_GET_VAL_PRV(UINT, back_buffer_index, 0)
     GX_GET_VAL_PRV(UINT, rtv_descriptor_size, 0)
