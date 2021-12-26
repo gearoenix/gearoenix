@@ -14,7 +14,7 @@
 gearoenix::dxr::Mesh::Mesh(
     std::shared_ptr<GpuBuffer>&& in_vb,
     std::shared_ptr<GpuBuffer>&& in_ib,
-    math::Aabb3&& box,
+    math::Aabb3<double>&& box,
     const UINT vertex_size,
     const UINT vertices_size,
     const UINT indices_count) noexcept
@@ -48,7 +48,7 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::dxr::MeshManager::buil
     std::string&& name,
     std::vector<render::PbrVertex>&& vertices,
     std::vector<std::uint32_t>&& indices,
-    math::Aabb3&& occlusion_box,
+    math::Aabb3<double>&& occlusion_box,
     core::sync::EndCallerIgnored&& c) noexcept
 {
     auto& eng = dynamic_cast<Engine&>(e);

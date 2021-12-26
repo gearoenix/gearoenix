@@ -2,12 +2,13 @@
 #define GEAROENIX_MATH_FRUSTUM_HPP
 #include "gx-math-aabb.hpp"
 #include "gx-math-plane.hpp"
+#include <array>
 
 namespace gearoenix::math {
-template <typename Element = double>
-struct Frustum {
+template <typename Element>
+struct Frustum final {
     /// Inward planes
-    Plane<Element> planes[6];
+    std::array<Plane<Element>, 6> planes;
 
     Frustum() = delete;
 
@@ -19,7 +20,7 @@ struct Frustum {
     ///   | 6------7 |
     ///   |/        \|
     ///   2----------3
-    explicit Frustum(const Vec3<Element> (&points)[8]) noexcept
+    constexpr explicit Frustum(const std::array<Vec3<Element>, 8>& points) noexcept
         : planes {
             Plane(points[0], points[2], points[1]),
             Plane(points[0], points[1], points[4]),
@@ -31,8 +32,8 @@ struct Frustum {
     {
     }
 
-    explicit Frustum(const Plane<Element> (&planes)[6]) noexcept
-        : planes { planes[0], planes[1], planes[2], planes[3], planes[4], planes[5] }
+    constexpr explicit Frustum(const std::array<Plane<Element>, 6>& planes) noexcept
+        : planes(planes)
     {
     }
 
@@ -41,10 +42,10 @@ struct Frustum {
 
     /// This is not exact but rather fast, necessarily informative and conservatively includes objects
     /// It is not a completely correct, sometime it includes non-colliding objects
-    [[nodiscard]] IntersectionStatus check_intersection_status(const Aabb3& aabb) const noexcept
+    [[nodiscard]] constexpr IntersectionStatus check_intersection_status(const Aabb3<Element>& aabb) const noexcept
     {
         auto status = IntersectionStatus::In;
-        Vec3<Element> points[8];
+        std::array<Vec3<Element>, 8> points;
         aabb.get_all_corners(points);
         for (const auto& plane : planes) {
             int outs_count = 0;

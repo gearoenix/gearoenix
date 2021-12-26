@@ -544,7 +544,7 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager:
             if (auto m = search->second.lock(); nullptr != m)
                 return m;
     }
-    math::Aabb3 occlusion_box;
+    math::Aabb3<double> occlusion_box;
     for (const PbrVertex& vertex : vertices) {
         occlusion_box.put_without_update(math::Vec3<double>(vertex.position));
     }

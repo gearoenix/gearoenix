@@ -1,7 +1,7 @@
 #include "gx-rnd-msh-mesh.hpp"
 
-gearoenix::render::mesh::Mesh::Mesh(math::Aabb3&& box) noexcept
-    : box(std::move(box))
+gearoenix::render::mesh::Mesh::Mesh(const math::Aabb3<double>& box) noexcept
+    : box(box)
 {
 }
 

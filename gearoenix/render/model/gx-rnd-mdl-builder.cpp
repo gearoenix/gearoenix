@@ -1,5 +1,6 @@
 #include "gx-rnd-mdl-builder.hpp"
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
+#include "../../physics/collider/gx-phs-cld-aabb.hpp"
 #include "../../physics/gx-phs-transformation.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "../mesh/gx-rnd-msh-mesh.hpp"
@@ -9,13 +10,14 @@
 gearoenix::render::model::Builder::Builder(
     render::engine::Engine& e,
     const std::string& name,
-    std::shared_ptr<mesh::Mesh>&& bound_mesh,
+    std::shared_ptr<mesh::Mesh>&& _bound_mesh,
     bool is_transformable) noexcept
     : entity_builder(e.get_world()->create_shared_builder())
-    , bound_mesh(std::move(bound_mesh))
+    , bound_mesh(std::move(_bound_mesh))
 {
     auto& builder = entity_builder->get_builder();
     builder.set_name(name);
+    builder.add_component(physics::collider::Aabb3(bound_mesh->box));
     if (is_transformable)
         builder.add_component(physics::Transformation());
 }

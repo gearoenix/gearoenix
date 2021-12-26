@@ -1,7 +1,6 @@
 #ifndef GEAROENIX_CORE_SYNC_INFLUENCE_MANAGER_HPP
 #define GEAROENIX_CORE_SYNC_INFLUENCE_MANAGER_HPP
 
-#include "../gx-cr-static.hpp"
 #include "../gx-cr-types.hpp"
 
 #include <functional>

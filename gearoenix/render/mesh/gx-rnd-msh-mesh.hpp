@@ -4,10 +4,10 @@
 
 namespace gearoenix::render::mesh {
 struct Mesh {
-    const math::Aabb3 box;
+    const math::Aabb3<double> box;
 
 protected:
-    Mesh(math::Aabb3&& box) noexcept;
+    Mesh(const math::Aabb3<double>& box) noexcept;
 
 public:
     virtual ~Mesh() noexcept;

@@ -81,7 +81,7 @@ struct Vec2 {
 
     [[nodiscard]] constexpr Vec2<Element> operator-() const noexcept
     {
-        GX_SIGNEDNESS_CHECK(Element)
+        Numeric::check_signable<Element>();
         return Vec2(-x, -y);
     }
 
@@ -100,7 +100,7 @@ struct Vec2 {
 
     constexpr void operator-=(const Vec2<Element>& o) noexcept
     {
-        GX_SIGNEDNESS_CHECK(Element)
+        Numeric::check_signable<Element>();
         x -= o.x;
         y -= o.y;
     }

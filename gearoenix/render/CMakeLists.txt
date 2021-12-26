@@ -1,21 +1,20 @@
 SET(GX_ENGINE_RENDER_SRC_DIR ${GX_ENGINE_SRC_DIR}/render)
 SET(GX_ENGINE_RENDER_SRC
-#        ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-arc-controller.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-arc-controller.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-arc-controller.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-arc-controller.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-builder.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-builder.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-camera.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-camera.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-jet-controller.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-jet-controller.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-camera.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-camera.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-jet-controller.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-jet-controller.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-manager.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-manager.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-orthographic.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-orthographic.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-perspective.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-perspective.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-transformation.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-transformation.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-orthographic-controller.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-orthographic-controller.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-perspective-controller.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-perspective-controller.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-projection.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/engine/gx-rnd-eng-engine.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/engine/gx-rnd-eng-engine.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/engine/gx-rnd-eng-limitations.hpp
@@ -34,39 +33,6 @@ SET(GX_ENGINE_RENDER_SRC
         ${GX_ENGINE_RENDER_SRC_DIR}/gltf/gx-rnd-gltf-mesh-manager.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/gltf/gx-rnd-gltf-node-manager.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/gltf/gx-rnd-gltf-node-manager.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/graph/node/gx-rnd-gr-nd-deferred.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/graph/node/gx-rnd-gr-nd-deferred.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/graph/node/gx-rnd-gr-nd-forward-pbr.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/graph/node/gx-rnd-gr-nd-forward-pbr.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/graph/node/gx-rnd-gr-nd-frame-start.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/graph/node/gx-rnd-gr-nd-frame-start.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/graph/node/gx-rnd-gr-nd-g-buffer-filler.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/graph/node/gx-rnd-gr-nd-g-buffer-filler.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/graph/node/gx-rnd-gr-nd-irradiance-convoluter.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/graph/node/gx-rnd-gr-nd-irradiance-convoluter.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/graph/node/gx-rnd-gr-nd-mipmap-generator.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/graph/node/gx-rnd-gr-nd-mipmap-generator.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/graph/node/gx-rnd-gr-nd-node.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/graph/node/gx-rnd-gr-nd-node.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/graph/node/gx-rnd-gr-nd-radiance-convoluter.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/graph/node/gx-rnd-gr-nd-radiance-convoluter.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/graph/node/gx-rnd-gr-nd-shadow-accumulator.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/graph/node/gx-rnd-gr-nd-shadow-accumulator.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/graph/node/gx-rnd-gr-nd-shadow-mapper.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/graph/node/gx-rnd-gr-nd-shadow-mapper.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/graph/node/gx-rnd-gr-nd-skybox-cube.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/graph/node/gx-rnd-gr-nd-skybox-cube.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/graph/node/gx-rnd-gr-nd-skybox-equirectangular.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/graph/node/gx-rnd-gr-nd-skybox-equirectangular.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/graph/node/gx-rnd-gr-nd-ssao.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/graph/node/gx-rnd-gr-nd-ssao.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/graph/node/gx-rnd-gr-nd-type.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/graph/node/gx-rnd-gr-nd-unlit.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/graph/node/gx-rnd-gr-nd-unlit.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/graph/tree/gx-rnd-gr-tr-pbr.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/graph/tree/gx-rnd-gr-tr-pbr.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/graph/tree/gx-rnd-gr-tr-tree.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/graph/tree/gx-rnd-gr-tr-tree.hpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/light/gx-rnd-lt-cascade-info.hpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/light/gx-rnd-lt-cascade-info.cpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/light/gx-rnd-lt-directional.cpp
@@ -80,13 +46,6 @@ SET(GX_ENGINE_RENDER_SRC
 #        ${GX_ENGINE_RENDER_SRC_DIR}/light/gx-rnd-lt-type.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/material/gx-rnd-mat-pbr.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/material/gx-rnd-mat-pbr.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/material/gx-rnd-mat-skybox-cube.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/material/gx-rnd-mat-skybox-cube.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/material/gx-rnd-mat-skybox-equirectangular.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/material/gx-rnd-mat-skybox-equirectangular.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/material/gx-rnd-mat-translucency-mode.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/material/gx-rnd-mat-translucency-mode.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/material/gx-rnd-mat-type.hpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/material/gx-rnd-mat-unlit.cpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/material/gx-rnd-mat-unlit.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/mesh/gx-rnd-msh-manager.cpp

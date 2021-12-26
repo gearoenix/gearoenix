@@ -19,7 +19,7 @@ struct Mat2x2 {
     {
     }
 
-    Mat2x2(const Element e0, const Element e1, const Element e2, const Element e3) noexcept
+    constexpr Mat2x2(const Element e0, const Element e1, const Element e2, const Element e3) noexcept
         : e0(e0)
         , e1(e1)
         , e2(e2)

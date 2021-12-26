@@ -5,7 +5,7 @@
 
 namespace gearoenix::physics {
 struct Boundary final : public core::ecs::Component {
-    GX_GET_CREF_PRV(math::Aabb3, box)
+    GX_GET_CREF_PRV(math::Aabb3<double>, box)
 
     Boundary(const math::Vec3<double>& upper, const math::Vec3<double>& lower) noexcept;
     Boundary(Boundary&&) noexcept;

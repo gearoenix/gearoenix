@@ -4,26 +4,24 @@
 #include "../../math/gx-math-aabb.hpp"
 #include "../../math/gx-math-triangle.hpp"
 #include "../../math/gx-math-vector-3d.hpp"
-#include "gx-phs-cld-collider.hpp"
 #include <memory>
 #include <vector>
 
 namespace gearoenix::physics::collider {
-struct Mesh : public Collider {
+struct Mesh final {
 private:
     std::vector<std::uint32_t> indices;
     std::vector<math::Vec3<double>> vertices;
-    std::vector<math::Triangle3> ts;
-    math::Aabb3 box;
+    std::vector<math::Triangle3<double>> ts;
+    math::Aabb3<double> box;
 
 public:
-    explicit Mesh(platform::stream::Stream* f) noexcept;
-    [[nodiscard]] std::optional<double> hit(const math::Ray3& ray, double d_min) const noexcept final;
+    [[nodiscard]] std::optional<double> hit(const math::Ray3<double>& ray, double d_min) const noexcept;
 
     friend std::ostream& operator<<(std::ostream& os, const Mesh& m) noexcept
     {
         os << "{ 'object_class_name' : 'gearoenix::physics::collider::Mesh', 'triangles' : [";
-        for (const math::Triangle3& t : m.ts) {
+        for (const math::Triangle3<double>& t : m.ts) {
             os << " " << t << ",";
         }
         os << " ] }";

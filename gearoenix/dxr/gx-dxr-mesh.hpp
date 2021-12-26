@@ -19,7 +19,7 @@ struct Mesh final : public render::mesh::Mesh {
     Mesh(
         std::shared_ptr<GpuBuffer>&& vb,
         std::shared_ptr<GpuBuffer>&& ib,
-        math::Aabb3&& box,
+        math::Aabb3<double>&& box,
         UINT vertex_size,
         UINT vertices_size,
         UINT indices_count) noexcept;
@@ -33,7 +33,7 @@ struct MeshManager final : render::mesh::Manager {
         std::string&& name,
         std::vector<render::PbrVertex>&& vertices,
         std::vector<std::uint32_t>&& indices,
-        math::Aabb3&& occlusion_box,
+        math::Aabb3<double>&& occlusion_box,
         core::sync::EndCallerIgnored&& end_callback) noexcept final;
 };
 }

@@ -36,7 +36,7 @@ public:
         std::string&& name,
         std::vector<PbrVertex>&& vertices,
         std::vector<std::uint32_t>&& indices,
-        math::Aabb3&& occlusion_box,
+        math::Aabb3<double>&& occlusion_box,
         core::sync::EndCallerIgnored&& end_callback) noexcept = 0;
 
     [[nodiscard]] std::shared_ptr<Mesh> build(

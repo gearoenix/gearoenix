@@ -3,7 +3,6 @@
 
 #include "../../math/gx-math-vector-2d.hpp"
 #include "../gx-cr-build-configuration.hpp"
-#include "../gx-cr-static.hpp"
 #include "../gx-cr-types.hpp"
 #include "gx-cr-ev-event.hpp"
 #include "gx-cr-ev-id.hpp"

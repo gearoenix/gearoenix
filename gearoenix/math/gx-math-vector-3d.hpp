@@ -59,7 +59,7 @@ struct Vec3 final {
 
     constexpr Vec3<Element> operator-(const Vec3<Element>& o) const noexcept
     {
-        GX_SIGNEDNESS_CHECK(Element)
+        Numeric::check_signable<Element>();
         return Vec3<Element>(x - o.x, y - o.y, z - o.z);
     }
 
@@ -80,7 +80,7 @@ struct Vec3 final {
 
     constexpr Vec3<Element> operator-(const Element o) const noexcept
     {
-        GX_SIGNEDNESS_CHECK(Element)
+        Numeric::check_signable<Element>();
         return Vec3<Element>(x - o, y - o, z - o);
     }
 
@@ -112,7 +112,7 @@ struct Vec3 final {
 
     constexpr void operator-=(const Vec3<Element>& o) noexcept
     {
-        GX_SIGNEDNESS_CHECK(Element)
+        Numeric::check_signable<Element>();
         x -= o.x;
         y -= o.y;
         z -= o.z;
@@ -141,7 +141,7 @@ struct Vec3 final {
 
     constexpr void operator-=(const Element o) noexcept
     {
-        GX_SIGNEDNESS_CHECK(Element)
+        Numeric::check_signable<Element>();
         x -= o;
         y -= o;
         z -= o;

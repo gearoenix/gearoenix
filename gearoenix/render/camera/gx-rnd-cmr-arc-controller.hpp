@@ -1,7 +1,6 @@
 #ifndef GEAROENIX_RENDER_CAMERA_ARC_CONTROLLER_HPP
 #define GEAROENIX_RENDER_CAMERA_ARC_CONTROLLER_HPP
 #include "../../core/event/gx-cr-ev-listener.hpp"
-#include "../../core/gx-cr-static.hpp"
 #include "../../math/gx-math-vector-3d.hpp"
 #include <memory>
 

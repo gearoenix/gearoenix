@@ -10,8 +10,6 @@ gearoenix::render::model::Model::Model(
     const bool is_shadow_caster,
     const bool is_shadow_receiver) noexcept
     : core::ecs::Component(this)
-    , original_box(bound_mesh->box)
-    , transformed_box(bound_mesh->box)
     , material_type_index(material_type_index)
     , translucency(translucency)
     , is_enabled_rendering(is_enabled_rendering)

@@ -1,12 +1,11 @@
 #ifndef GEAROENIX_CORE_EVENT_POINT_HPP
 #define GEAROENIX_CORE_EVENT_POINT_HPP
 #include "../../math/gx-math-vector-3d.hpp"
-#include "../gx-cr-static.hpp"
 #include <chrono>
 
 namespace gearoenix::core::event {
 
-struct Point2D {
+struct Point2D final {
     GX_GET_CREF_PRV(std::chrono::high_resolution_clock::time_point, start_time)
     GX_GET_CREF_PRV(std::chrono::high_resolution_clock::time_point, previous_time)
     GX_GET_CREF_PRV(std::chrono::high_resolution_clock::time_point, current_time)
