@@ -171,7 +171,7 @@ void gearoenix::dxr::Swapchain::wait_for_gpu() noexcept
     GX_ASSERT(WAIT_OBJECT_0 == WaitForSingleObjectEx(fence_event.Get(), INFINITE, FALSE))
     for (; !fence_values.empty(); fence_values.pop())
         ;
-    for (UINT fi = 0; fi < GX_DXR_FRAMES_BACKBUFFER_NUMBER; ++fi)
+    for (UINT fi = 0; fi < GX_DXR_FRAMES_BACKBUFFER_NUMBER - 1; ++fi)
         fence_values.push(current_fence_value);
 }
 
@@ -233,7 +233,7 @@ void gearoenix::dxr::Swapchain::move_to_next_frame() noexcept
     // If the next frame is not ready to be rendered yet, wait until it is ready.
     if (fence->GetCompletedValue() < fence_values.front()) {
         GX_DXR_CHECK(fence->SetEventOnCompletion(fence_values.front(), fence_event.Get()))
-        GX_ASSERT(WAIT_OBJECT_0 != WaitForSingleObjectEx(fence_event.Get(), INFINITE, FALSE))
+        GX_ASSERT(WAIT_OBJECT_0 == WaitForSingleObjectEx(fence_event.Get(), INFINITE, FALSE))
     }
     fence_values.pop();
     fence_values.push(current_fence_value);
