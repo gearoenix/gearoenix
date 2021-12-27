@@ -1,16 +1,56 @@
 #include "gx-rnd-cmr-camera.hpp"
-//
-//
-//#define GX_CAMERA_INIT                                                                                                                                                 \
-//    core::asset::Asset(my_id, core::asset::Type::Camera, std::move(name)),                                                                                             \
-//        frustum_collider(new physics::collider::Frustum()),                                                                                                            \
-//        uniform_buffers(new buffer::FramedUniform(sizeof(Uniform), e)),                                                                                                \
-//        cascaded_shadow_frustum_partitions(static_cast<std::size_t>(e->get_platform_application()->get_configuration().get_render().get_shadow_cascades_count()) + 1), \
-//        transformation(new Transformation(&uniform, frustum_collider.get(), &cascaded_shadow_frustum_partitions)),                                                     \
-//        render_engine(e)
-//
-// void gearoenix::render::camera::Camera::initialize() noexcept
-//{
+
+gearoenix::render::camera::Camera::Camera(
+    const float target_aspect_ratio,
+    const Projection projection_type,
+    const float near,
+    const float far) noexcept
+    : core::ecs::Component(this)
+    , target_aspect_ratio(target_aspect_ratio)
+    , far(far)
+    , near(near)
+    , projection_type(projection_type)
+    , projection(Projection::Perspective == projection_type ? math::Mat4x4<float>::perspective(target_aspect_ratio, 1.0f, near, far) : math::Mat4x4<float>::orthographic(target_aspect_ratio, 1.0f, near, far))
+    , view_projection(projection)
+{
+}
+
+gearoenix::render::camera::Camera::Camera(Camera&&) noexcept = default;
+
+gearoenix::render::camera::Camera::~Camera() noexcept = default;
+
+void gearoenix::render::camera::Camera::set_view(const math::Mat4x4<float>& v) noexcept
+{
+    view = v;
+    view_projection = projection * v;
+}
+
+void gearoenix::render::camera::Camera::generate_frustum_points(
+    const math::Vec3<double>& l,
+    const math::Vec3<double>& x,
+    const math::Vec3<double>& y,
+    const math::Vec3<double>& z,
+    std::array<math::Vec3<double>, 8>& points) const noexcept
+{
+    const auto fpn = Projection::Perspective == projection_type ? (static_cast<double>(far) + static_cast<double>(near)) * static_cast<double>(scale) / static_cast<double>(near) : static_cast<double>(scale);
+    const auto far_x = static_cast<double>(target_aspect_ratio) * fpn;
+    const auto far_y = fpn;
+    const auto nz = z * -static_cast<double>(near);
+    const auto fz = z * -static_cast<double>(far);
+    const auto nx = x * (static_cast<double>(target_aspect_ratio) * static_cast<double>(scale));
+    const auto fx = x * far_x;
+    const auto ny = y * static_cast<double>(scale);
+    const auto fy = y * far_y;
+    points[0] = l - fx + fy + fz;
+    points[1] = l + fx + fy + fz;
+    points[2] = l - fx - fy + fz;
+    points[3] = l + fx - fy + fz;
+    points[4] = l - nx + ny + nz;
+    points[5] = l + nx + ny + nz;
+    points[6] = l - nx - ny + nz;
+    points[7] = l + nx - ny + nz;
+}
+
 //    auto* const platform_application = render_engine->get_platform_application();
 //    uniform.aspect_ratio = static_cast<float>(platform_application->get_event_engine()->get_window_ratio());
 //    uniform.clip_width = static_cast<float>(platform_application->get_event_engine()->get_window_width());

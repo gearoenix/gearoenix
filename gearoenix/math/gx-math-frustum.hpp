@@ -14,7 +14,7 @@ struct Frustum final {
 
     /// Points must be as following
     ///   0----------1
-    ///   |\        /|
+    ///   |\  far   /|
     ///   | 4------5 |
     ///   | | near | |
     ///   | 6------7 |

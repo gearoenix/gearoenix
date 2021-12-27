@@ -10,10 +10,6 @@ SET(GX_ENGINE_RENDER_SRC
         ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-jet-controller.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-manager.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-manager.hpp
-        ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-orthographic-controller.cpp
-        ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-orthographic-controller.hpp
-        ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-perspective-controller.cpp
-        ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-perspective-controller.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-projection.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/engine/gx-rnd-eng-engine.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/engine/gx-rnd-eng-engine.hpp

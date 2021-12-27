@@ -16,6 +16,6 @@ struct PSInput
     float2 uv : TEXCOORD;
 };
 
-ConstantBuffer<MeshUniform> MeshUniform : register(b0, space0);
+ConstantBuffer<ModelUniform> ModelUniform : register(b0, space0);
 Texture2D<float4> tex2ds[] : register(t0, space0);
 sampler samplers[] : register(s0, space0);

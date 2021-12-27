@@ -1,22 +1,34 @@
 #include "gx-rnd-cmr-builder.hpp"
 #include "../../core/ecs/gx-cr-ecs-entity.hpp"
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
+#include "../../physics/collider/gx-phs-cld-frustum.hpp"
 #include "../../physics/gx-phs-transformation.hpp"
+#include "../../platform/gx-plt-application.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
+#include "gx-rnd-cmr-camera.hpp"
 
 gearoenix::render::camera::Builder::Builder(engine::Engine& e, const std::string& name) noexcept
     : entity_builder(e.get_world()->create_shared_builder())
 {
     auto& builder = entity_builder->get_builder();
     builder.set_name(name);
-    builder.add_component(physics::Transformation());
+    physics::Transformation transform;
+    transform.local_z_translate(2.0);
+    Camera cam(static_cast<float>(e.get_platform_application().get_base().get_window_aspect_ratio()));
+    cam.set_view(math::Mat4x4<float>(transform.get_matrix().inverted()));
+    std::array<math::Vec3<double>, 8> frustum_points;
+    cam.generate_frustum_points(
+        transform.get_location(),
+        transform.get_x_axis(),
+        transform.get_y_axis(),
+        transform.get_z_axis(),
+        frustum_points);
+    builder.add_component(physics::collider::Frustum(frustum_points));
+    builder.add_component(std::move(cam));
+    builder.add_component(std::move(transform));
 }
 
 gearoenix::render::camera::Builder::~Builder() noexcept = default;
-
-void gearoenix::render::camera::Builder::set(Projection) noexcept
-{
-}
 
 gearoenix::physics::Transformation& gearoenix::render::camera::Builder::get_transformation() noexcept
 {

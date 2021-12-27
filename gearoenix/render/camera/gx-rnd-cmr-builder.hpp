@@ -19,6 +19,7 @@ struct Engine;
 
 namespace gearoenix::render::camera {
 struct Manager;
+struct Camera;
 struct Builder final {
     friend struct Manager;
 
@@ -36,7 +37,8 @@ public:
 
     [[nodiscard]] physics::Transformation& get_transformation() noexcept;
     [[nodiscard]] const physics::Transformation& get_transformation() const noexcept;
-    void set(Projection) noexcept;
+    [[nodiscard]] Camera& get_camera() noexcept;
+    [[nodiscard]] const Camera& get_camera() const noexcept;
 };
 }
 #endif

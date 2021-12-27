@@ -38,7 +38,6 @@ struct GameApp final : public gearoenix::core::Application {
 
         auto camera_builder = render_engine.get_camera_manager()->build("camera");
         camera_builder->get_transformation().set_location(0.0f, 0.0f, 5.0f);
-        camera_builder->set(gearoenix::render::camera::Projection::Perspective);
 
         scene_builder->add(std::move(model_builder));
         scene_builder->add(std::move(camera_builder));

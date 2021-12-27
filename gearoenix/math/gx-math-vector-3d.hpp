@@ -382,5 +382,23 @@ struct Vec3 final {
         return os;
     }
 };
+
+template <typename Element>
+constexpr Vec3<Element> X3D(
+    static_cast<Element>(1),
+    static_cast<Element>(0),
+    static_cast<Element>(0));
+
+template <typename Element>
+constexpr Vec3<Element> Y3D(
+    static_cast<Element>(0),
+    static_cast<Element>(1),
+    static_cast<Element>(0));
+
+template <typename Element>
+constexpr Vec3<Element> Z3D(
+    static_cast<Element>(0),
+    static_cast<Element>(0),
+    static_cast<Element>(1));
 }
 #endif
