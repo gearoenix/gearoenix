@@ -1,24 +1,14 @@
 #include "gx-rnd-scn-scene.hpp"
-#include "../gltf/gx-rnd-gltf-loader.hpp"
-#include "../gltf/gx-rnd-gltf-node-manager.hpp"
-#include <tiny_gltf.h>
+#include "../../core/ecs/gx-cr-ecs-world.hpp"
+#include "../../core/macro/gx-cr-mcr-assert.hpp"
+#include "../camera/gx-rnd-cmr-camera.hpp"
+#include "../engine/gx-rnd-eng-engine.hpp"
+#include <algorithm>
 
-gearoenix::render::scene::Scene::Scene(
-    engine::Engine* const,
-    const std::size_t scene_index,
-    gltf::Loader& loader,
-    const core::sync::EndCallerIgnored& c) noexcept
+gearoenix::render::scene::Scene::Scene(engine::Engine& e, const double layer) noexcept
     : core::ecs::Component(this)
-{
-    const auto& node_indices = loader.get_data()->scenes[scene_index].nodes;
-    for (const auto node_index : node_indices) {
-        entities.push_back(loader.get_node_manager()->get(node_index, c));
-    }
-    std::sort(entities.begin(), entities.end());
-}
-
-gearoenix::render::scene::Scene::Scene() noexcept
-    : core::ecs::Component(this)
+    , e(e)
+    , layer(layer)
 {
 }
 
@@ -26,14 +16,16 @@ gearoenix::render::scene::Scene::~Scene() noexcept = default;
 
 gearoenix::render::scene::Scene::Scene(Scene&&) noexcept = default;
 
-void gearoenix::render::scene::Scene::add_mesh(const core::ecs::Entity::id_t entity) noexcept
+void gearoenix::render::scene::Scene::add_model(const core::ecs::Entity::id_t entity, model::Model&) noexcept
 {
-    mesh_entities.insert(std::upper_bound(mesh_entities.begin(), mesh_entities.end(), entity), entity);
+    model_entities.insert(entity);
+    entities.insert(entity);
 }
 
-void gearoenix::render::scene::Scene::add_camera(const core::ecs::Entity::id_t entity) noexcept
+void gearoenix::render::scene::Scene::add_camera(const core::ecs::Entity::id_t entity, camera::Camera&) noexcept
 {
-    camera_entities.insert(std::upper_bound(camera_entities.begin(), camera_entities.end(), entity), entity);
+    camera_entities.insert(entity);
+    entities.insert(entity);
 }
 
 void gearoenix::render::scene::Scene::update() noexcept

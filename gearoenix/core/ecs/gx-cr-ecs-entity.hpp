@@ -7,6 +7,7 @@
 #include "gx-cr-ecs-types.hpp"
 #include <algorithm>
 #include <atomic>
+#include <boost/container/flat_map.hpp>
 #include <optional>
 #include <string>
 #include <vector>
@@ -21,26 +22,27 @@ struct Entity final {
     typedef std::uint32_t id_t;
 
 private:
-    Entity(std::size_t archetype, std::size_t index_in_archetype) noexcept;
+    Entity(std::size_t archetype, std::size_t index_in_archetype, std::optional<std::string> name) noexcept;
     static std::atomic<id_t> last_id;
     std::size_t archetype = static_cast<std::size_t>(-1);
     std::size_t index_in_archetype = static_cast<std::size_t>(-1);
+    std::optional<std::string> name;
 
 public:
     Entity(Entity&&) noexcept;
     Entity(const Entity&) = delete;
-    Entity& operator=(Entity&&) = delete;
+    Entity& operator=(Entity&&) noexcept = default;
     Entity& operator=(const Entity&) = delete;
 };
 
 struct EntityBuilder final {
     friend struct World;
-    typedef std::pair<std::type_index, std::vector<std::uint8_t>> component_t;
-    typedef std::vector<component_t> components_t;
+    typedef boost::container::flat_map<std::type_index, std::vector<std::uint8_t>> components_t;
 
-private:
     GX_GET_CVAL_PRV(Entity::id_t, id)
     GX_GETSET_CREF_PRV(std::optional<std::string>, name)
+
+private:
     components_t components;
 
     explicit EntityBuilder(Entity::id_t) noexcept;
@@ -59,15 +61,11 @@ public:
         auto c = std::make_pair(
             Component::create_type_index<ComponentType>(),
             std::vector<std::uint8_t>(sizeof(ComponentType)));
-        const auto search = std::lower_bound(
-            components.begin(), components.end(), c.first,
-            [](const component_t& l, const std::type_index r) noexcept {
-                return l.first < r;
-            });
-        if (search != components.end() && search->first == c.first)
+        const auto search = components.find(c.first);
+        if (search != components.end())
             GX_LOG_F("Component '" << typeid(ComponentType).name() << "' already exists in entity '" << id)
         new (c.second.data()) ComponentType(std::forward<ComponentType>(component));
-        components.insert(search, std::move(c));
+        components.emplace(std::move(c));
     }
 
     template <typename... ComponentType>
@@ -90,8 +88,6 @@ public:
     {
         return reinterpret_cast<ComponentType*>(get_component(std::type_index(typeid(ComponentType))));
     }
-
-    static void sort(components_t&) noexcept;
 };
 
 struct EntitySharedBuilder final {

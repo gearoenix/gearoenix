@@ -44,149 +44,123 @@ static World w;
 
 static void check_components() noexcept
 {
-    {
-        auto& p = w.get_component<Position>(e1);
-        auto& s = w.get_component<Speed>(e1);
-        BOOST_TEST(p.x == 2.0);
-        BOOST_TEST(p.y == 3.0);
-        BOOST_TEST(s.x == 4.0);
-        BOOST_TEST(s.y == 5.0);
+    if (auto* const p = w.get_component<Position>(e1); nullptr != p) {
+        BOOST_TEST(p->x == 2.0);
+        BOOST_TEST(p->y == 3.0);
     }
-    {
-        auto& p = w.get_component<Position>(e2);
-        BOOST_TEST(p.x == 6.0);
-        BOOST_TEST(p.y == 7.0);
+    if (auto* const s = w.get_component<Speed>(e1); nullptr != s) {
+        BOOST_TEST(s->x == 4.0);
+        BOOST_TEST(s->y == 5.0);
     }
-    {
-        auto& p = w.get_component<Position>(e3);
-        auto& s = w.get_component<Speed>(e3);
-        BOOST_TEST(p.x == 8.0);
-        BOOST_TEST(p.y == 9.0);
-        BOOST_TEST(s.x == 10.0);
-        BOOST_TEST(s.y == 11.0);
+    if (auto* const p = w.get_component<Position>(e2); nullptr != p) {
+        BOOST_TEST(p->x == 6.0);
+        BOOST_TEST(p->y == 7.0);
     }
-    {
-        auto& s = w.get_component<Speed>(e4);
-        BOOST_TEST(s.x == 12.0);
-        BOOST_TEST(s.y == 13.0);
+    if (auto* const p = w.get_component<Position>(e3); nullptr != p) {
+        BOOST_TEST(p->x == 8.0);
+        BOOST_TEST(p->y == 9.0);
+    }
+    if (auto* const s = w.get_component<Speed>(e3); nullptr != s) {
+        BOOST_TEST(s->x == 10.0);
+        BOOST_TEST(s->y == 11.0);
+    }
+    if (auto* const s = w.get_component<Speed>(e4); nullptr != s) {
+        BOOST_TEST(s->x == 12.0);
+        BOOST_TEST(s->y == 13.0);
     }
 }
 
 static void check_systems() noexcept
 {
-    bool e1s = false, e2s = false, e3s = false, e4s = false, e5s = false;
+    std::atomic<int> e1s = 0, e2s = 0, e3s = 0, e4s = 0, e5s = 0;
 
     w.parallel_system<Position>([&](const Entity::id_t ent, Position& p, const unsigned int) noexcept {
-        if (e1 == ent) {
-            e1s = true;
-            BOOST_TEST(2.0 == p.x);
-            BOOST_TEST(3.0 == p.y);
-        } else if (e2 == ent) {
-            e2s = true;
-            BOOST_TEST(6.0 == p.x);
-            BOOST_TEST(7.0 == p.y);
-        } else if (e3 == ent) {
-            e3s = true;
-            BOOST_TEST(8.0 == p.x);
-            BOOST_TEST(9.0 == p.y);
+        if (e1 == ent && 2.0 == p.x && 3.0 == p.y) {
+            ++e1s;
+        } else if (e2 == ent && 6.0 == p.x && 7.0 == p.y) {
+            ++e2s;
+        } else if (e3 == ent && 8.0 == p.x && 9.0 == p.y) {
+            ++e3s;
         } else {
             BOOST_TEST(false);
         }
     });
 
-    BOOST_TEST((e1s && e2s && e3s));
-    e1s = e2s = e3s = false;
+    BOOST_TEST((e1s == 1 && e2s == 1 && e3s == 1));
+    e1s = e2s = e3s = 0;
 
     w.parallel_system<Not<Speed>>([&](const Entity::id_t ent, Not<Speed>&, const unsigned int) noexcept {
         if (ent == e2)
-            e2s = true;
+            ++e2s;
         else if (ent == e5)
-            e5s = true;
+            ++e5s;
         else
             BOOST_TEST(false);
     });
 
-    BOOST_TEST((e2s && e5s));
-    e2s = e5s = false;
+    BOOST_TEST((e2s == 1 && e5s == 1));
+    e2s = e5s = 0;
 
     w.parallel_system<Not<Position>>([&](const Entity::id_t ent, Not<Position>&, const unsigned int) noexcept {
         if (ent == e4)
-            e4s = true;
+            ++e4s;
         else if (ent == e5)
-            e5s = true;
+            ++e5s;
         else
             BOOST_TEST(false);
     });
 
-    BOOST_TEST((e4s && e5s));
-    e4s = e5s = false;
+    BOOST_TEST((e4s == 1 && e5s == 1));
+    e4s = e5s = 0;
 
     w.parallel_system<Speed>([&](const Entity::id_t ent, Speed& s, const unsigned int) noexcept {
-        if (e1 == ent) {
-            e1s = true;
-            BOOST_TEST(4.0 == s.x);
-            BOOST_TEST(5.0 == s.y);
-        } else if (e3 == ent) {
-            e3s = true;
-            BOOST_TEST(10.0 == s.x);
-            BOOST_TEST(11.0 == s.y);
-        } else if (e4 == ent) {
-            e4s = true;
-            BOOST_TEST(12.0 == s.x);
-            BOOST_TEST(13.0 == s.y);
+        if (e1 == ent && 4.0 == s.x && 5.0 == s.y) {
+            ++e1s;
+        } else if (e3 == ent && 10.0 == s.x && 11.0 == s.y) {
+            ++e3s;
+        } else if (e4 == ent && 12.0 == s.x && 13.0 == s.y) {
+            ++e4s;
         } else {
             BOOST_TEST(false);
         }
     });
 
-    BOOST_TEST((e1s && e3s && e4s));
-    e1s = e3s = e4s = false;
+    BOOST_TEST((e1s == 1 && e3s == 1 && e4s == 1));
+    e1s = e3s = e4s = 0;
 
     w.parallel_system<Speed, Position>([&](const Entity::id_t ent, Speed& s, Position& p, const unsigned int) noexcept {
-        if (e1 == ent) {
-            e1s = true;
-            BOOST_TEST(2 == std::lround(p.x));
-            BOOST_TEST(3 == std::lround(p.y));
-            BOOST_TEST(4 == std::lround(s.x));
-            BOOST_TEST(5 == std::lround(s.y));
-        } else if (e3 == ent) {
-            e3s = true;
-            BOOST_TEST(8 == std::lround(p.x));
-            BOOST_TEST(9 == std::lround(p.y));
-            BOOST_TEST(10 == std::lround(s.x));
-            BOOST_TEST(11 == std::lround(s.y));
+        if (e1 == ent && 2 == std::lround(p.x) && 3 == std::lround(p.y) && 4 == std::lround(s.x) && 5 == std::lround(s.y)) {
+            ++e1s;
+        } else if (e3 == ent && 8 == std::lround(p.x) && 9 == std::lround(p.y) && 10 == std::lround(s.x) && 11 == std::lround(s.y)) {
+            ++e3s;
         } else {
             BOOST_TEST(false);
         }
     });
 
-    BOOST_TEST((e1s && e3s));
-    e1s = e3s = false;
+    BOOST_TEST((e1s == 1 && e3s == 1));
+    e1s = e3s = 0;
 
     w.parallel_system<Not<Speed>, Position>([&](const Entity::id_t ent, Not<Speed>&, Position& p, const unsigned int) noexcept {
-        if (e2 == ent) {
-            e2s = true;
-            BOOST_TEST(6.0 == p.x);
-            BOOST_TEST(7.0 == p.y);
+        if (e2 == ent && 6.0 == p.x && 7.0 == p.y) {
+            ++e2s;
         } else {
             BOOST_TEST(false);
         }
     });
 
-    BOOST_TEST(e2s);
-    e2s = false;
+    BOOST_TEST(e2s == 1);
+    e2s = 0;
 
     w.parallel_system<Speed, Not<Position>>([&](const Entity::id_t ent, Speed& s, Not<Position>&, const unsigned int) noexcept {
-        if (e4 == ent) {
-            e4s = true;
-            BOOST_TEST(12.0 == s.x);
-            BOOST_TEST(13.0 == s.y);
+        if (e4 == ent && 12.0 == s.x && 13.0 == s.y) {
+            ++e4s;
         } else {
             BOOST_TEST(false);
         }
     });
 
-    BOOST_TEST(e4s);
+    BOOST_TEST(e4s == 1);
 }
 
 static void delete_entities() noexcept

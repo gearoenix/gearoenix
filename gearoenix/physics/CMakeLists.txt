@@ -1,7 +1,6 @@
 SET(GX_ENGINE_PHYSICS_SRC_DIR ${GX_ENGINE_SRC_DIR}/physics)
 SET(GX_ENGINE_PHYSICS_SRC
-#        ${GX_ENGINE_PHYSICS_SRC_DIR}/accelerator/gx-phs-acc-bvh.cpp
-#        ${GX_ENGINE_PHYSICS_SRC_DIR}/accelerator/gx-phs-acc-bvh.hpp
+        ${GX_ENGINE_PHYSICS_SRC_DIR}/accelerator/gx-phs-acc-bvh.hpp
 #        ${GX_ENGINE_PHYSICS_SRC_DIR}/animation/gx-phs-anm-animation.cpp
 #        ${GX_ENGINE_PHYSICS_SRC_DIR}/animation/gx-phs-anm-animation.hpp
 #        ${GX_ENGINE_PHYSICS_SRC_DIR}/animation/gx-phs-anm-manager.cpp
@@ -38,4 +37,8 @@ SET(GX_ENGINE_PHYSICS_SRC
 #        ${GX_ENGINE_PHYSICS_SRC_DIR}/gx-phs-engine.hpp
         ${GX_ENGINE_PHYSICS_SRC_DIR}/gx-phs-transformation.cpp
         ${GX_ENGINE_PHYSICS_SRC_DIR}/gx-phs-transformation.hpp
+        PARENT_SCOPE)
+
+SET(GX_ENGINE_PHYSICS_TEST_SRC
+        ${GX_ENGINE_PHYSICS_SRC_DIR}/accelerator/gx-phs-acc-bvh-test.hpp
         PARENT_SCOPE)

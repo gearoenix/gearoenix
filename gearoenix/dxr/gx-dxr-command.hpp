@@ -15,6 +15,9 @@ private:
 public:
     Command(Device& device, D3D12_COMMAND_LIST_TYPE type) noexcept;
     ~Command() noexcept;
+    Command(Command&&) noexcept = default;
+    Command(const Command&) = delete;
+    Command& operator=(const Command&) = delete;
 
     [[nodiscard]] ID3D12GraphicsCommandList6* get_list() noexcept;
     void begin(ID3D12PipelineState* const pipeline_state) noexcept;

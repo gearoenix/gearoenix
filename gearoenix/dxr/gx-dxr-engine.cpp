@@ -71,7 +71,6 @@ void gearoenix::dxr::Engine::window_resized(int failed_tries) noexcept
 {
     if (swapchain->set_window_size(platform_application))
         device_lost_handle(++failed_tries);
-    submission_manager->clear_command_lists();
 }
 
 gearoenix::dxr::Engine::~Engine() noexcept

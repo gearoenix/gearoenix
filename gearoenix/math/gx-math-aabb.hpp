@@ -6,6 +6,14 @@
 #include <limits>
 #include <optional>
 
+#ifdef max
+#undef max
+#endif
+
+#ifdef min
+#undef min
+#endif
+
 namespace gearoenix::math {
 template <typename Element>
 struct Ray3;

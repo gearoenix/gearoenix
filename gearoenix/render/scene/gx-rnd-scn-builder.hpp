@@ -1,15 +1,19 @@
 #ifndef GEAROENIX_RENDER_SCENE_BUILDER_HPP
 #define GEAROENIX_RENDER_SCENE_BUILDER_HPP
 #include <memory>
+#include <string>
 #include <vector>
 
 namespace gearoenix::core::ecs {
-struct World;
 struct EntitySharedBuilder;
 }
 
 namespace gearoenix::render::camera {
 struct Builder;
+}
+
+namespace gearoenix::render::engine {
+struct Engine;
 }
 
 namespace gearoenix::render::model {
@@ -25,7 +29,7 @@ private:
     std::vector<std::shared_ptr<model::Builder>> model_builders;
     std::vector<std::shared_ptr<camera::Builder>> camera_builders;
 
-    explicit Builder(core::ecs::World& world) noexcept;
+    Builder(engine::Engine& e, const std::string& name, double layer) noexcept;
 
 public:
     Builder(Builder&&) = delete;

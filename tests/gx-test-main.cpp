@@ -15,3 +15,4 @@
 
 #include <gearoenix/core/ecs/gx-cr-ecs-world-test.hpp>
 #include <gearoenix/core/gx-cr-allocator-test.hpp>
+#include <gearoenix/physics/accelerator/gx-phs-acc-bvh-test.hpp>

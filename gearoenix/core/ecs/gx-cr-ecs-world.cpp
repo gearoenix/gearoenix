@@ -4,11 +4,11 @@ void gearoenix::core::ecs::World::create_entity_with_builder(EntityBuilder&& b) 
 {
     const auto ai = get_archetype_index(b.components);
     const auto index = archetypes[ai].allocate_entity(b.id, b.components);
-    entities.emplace(b.id, Entity(ai, index));
+    entities.emplace(b.id, Entity(ai, index, b.name));
     if (b.name.has_value()) {
         if (name_to_entity_id.contains(*b.name))
             GX_LOG_F("Entity with name `" << *b.name << "' is already in the world.")
-        name_to_entity_id.emplace(*b.name, b.id);
+        name_to_entity_id.emplace(std::move(*b.name), b.id);
     }
 }
 
@@ -41,18 +41,19 @@ void gearoenix::core::ecs::World::delayed_remove_entity(const Entity::id_t id) n
 
 void gearoenix::core::ecs::World::add_components_map(const Entity::id_t id, EntityBuilder::components_t&& c) noexcept
 {
-#ifdef GX_DEBUG_MODE
     if (c.empty())
-        GX_LOG_F("At least one component must be selected to add. Entity: " << id)
-#endif
-    auto& entity = get_entity(id);
-    const auto old_archetype_index = entity.archetype;
-    const auto old_index_in_archetype = entity.index_in_archetype;
+        return;
+    auto* const entity = get_entity(id);
+    if (nullptr == entity) {
+        GX_LOG_E("Entity: " << id << " does not exist.")
+        return;
+    }
+    const auto old_archetype_index = entity->archetype;
+    const auto old_index_in_archetype = entity->index_in_archetype;
     archetypes[old_archetype_index].move_out_entity(old_index_in_archetype, c);
-    EntityBuilder::sort(c);
     const auto new_archetype_index = get_archetype_index(c);
-    entity.archetype = new_archetype_index;
-    entity.index_in_archetype = archetypes[new_archetype_index].allocate_entity(id, c);
+    entity->archetype = new_archetype_index;
+    entity->index_in_archetype = archetypes[new_archetype_index].allocate_entity(id, c);
     auto r = archetypes[old_archetype_index].move_from_back(old_index_in_archetype);
     update_entity(std::move(r));
 }
@@ -66,35 +67,26 @@ void gearoenix::core::ecs::World::delayed_add_components_map(const Entity::id_t 
 void gearoenix::core::ecs::World::remove_components_list(
     const Entity::id_t id, const std::type_index* const ts, const std::size_t sz) noexcept
 {
-#ifdef GX_DEBUG_MODE
-    if (0 == sz)
-        GX_LOG_F("At least one component must be selected to remove. Entity: " << id)
-#endif
-    auto& entity = get_entity(id);
-    const auto old_archetype_index = entity.archetype;
-    const auto old_index_in_archetype = entity.index_in_archetype;
+    if (0 == sz) {
+        GX_LOG_E("At least one component must be selected to remove. Entity: " << id)
+        return;
+    }
+    auto* const entity = get_entity(id);
+    if (nullptr == entity) {
+        GX_LOG_E("Entity " << id << " does not exist.")
+        return;
+    }
+    const auto old_archetype_index = entity->archetype;
+    const auto old_index_in_archetype = entity->index_in_archetype;
     EntityBuilder::components_t cs;
     cs.reserve(archetypes[old_archetype_index].components_indices.size());
     archetypes[old_archetype_index].move_out_entity(old_index_in_archetype, cs);
-    for (auto iter = cs.begin(); iter != cs.end();) {
-        bool found = false;
-        for (std::size_t i = 0; i < sz; ++i) {
-            if (ts[i] == iter->first) {
-                found = true;
-                break;
-            }
-        }
-        if (found) {
-            reinterpret_cast<Component*>(iter->second.data())->~Component();
-            iter = cs.erase(iter);
-        } else {
-            ++iter;
-        }
+    for (std::size_t ti = 0; ti < sz; ++ti) {
+        cs.erase(ts[ti]);
     }
-    EntityBuilder::sort(cs);
     const auto new_archetype_index = get_archetype_index(cs);
-    entity.archetype = new_archetype_index;
-    entity.index_in_archetype = archetypes[new_archetype_index].allocate_entity(id, cs);
+    entity->archetype = new_archetype_index;
+    entity->index_in_archetype = archetypes[new_archetype_index].allocate_entity(id, cs);
     auto r = archetypes[old_archetype_index].move_from_back(old_index_in_archetype);
     update_entity(std::move(r));
 }
@@ -112,7 +104,7 @@ std::size_t gearoenix::core::ecs::World::get_archetype_index(const EntityBuilder
     Archetype::id_t archetype_id;
     archetype_id.reserve(cs.size());
     for (const auto& c : cs) {
-        archetype_id.push_back(c.first);
+        archetype_id.emplace(c.first);
     }
     auto search = archetypes_map.find(archetype_id);
     if (archetypes_map.end() == search) {
@@ -125,14 +117,20 @@ std::size_t gearoenix::core::ecs::World::get_archetype_index(const EntityBuilder
     return search->second;
 }
 
-gearoenix::core::ecs::Entity& gearoenix::core::ecs::World::get_entity(const Entity::id_t id) noexcept
+gearoenix::core::ecs::Entity* gearoenix::core::ecs::World::get_entity(const Entity::id_t id) noexcept
 {
     auto search = entities.find(id);
-#ifdef GX_DEBUG_MODE
     if (entities.end() == search)
-        GX_LOG_F("Can not found the moved entity: " << id)
-#endif
-    return search->second;
+        return nullptr;
+    return &search->second;
+}
+
+const gearoenix::core::ecs::Entity* gearoenix::core::ecs::World::get_entity(const Entity::id_t id) const noexcept
+{
+    const auto search = entities.find(id);
+    if (entities.end() == search)
+        return nullptr;
+    return &search->second;
 }
 
 void gearoenix::core::ecs::World::update() noexcept
@@ -171,7 +169,7 @@ void gearoenix::core::ecs::World::update_entity(std::optional<std::pair<Entity::
     if (!r.has_value())
         return;
     const auto [id, i] = *r;
-    get_entity(id).index_in_archetype = i;
+    get_entity(id)->index_in_archetype = i;
 }
 
 std::shared_ptr<gearoenix::core::ecs::EntitySharedBuilder> gearoenix::core::ecs::World::create_shared_builder() noexcept

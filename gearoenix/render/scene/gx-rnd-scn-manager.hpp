@@ -5,10 +5,6 @@
 #include <string>
 #include <vector>
 
-namespace gearoenix::core::sync {
-struct WorkWaiter;
-}
-
 namespace gearoenix::render::engine {
 struct Engine;
 }
@@ -18,17 +14,15 @@ struct Builder;
 struct Manager final {
 private:
     engine::Engine& e;
-    std::unique_ptr<core::sync::WorkWaiter> io_worker;
-    std::vector<std::pair<std::string, core::ecs::Entity::id_t>> name_to_id;
-    std::vector<std::pair<core::ecs::Entity::id_t, std::string>> id_to_name;
-    std::vector<std::pair<float, core::ecs::Entity::id_t>> render_layers;
 
 public:
-    constexpr static const float DEFAULT_RENDER_LAYER = 0.0f;
-
     explicit Manager(engine::Engine& e) noexcept;
     ~Manager() noexcept;
-    [[nodiscard]] std::shared_ptr<Builder> build(const std::string&) noexcept;
+    Manager(Manager&&) = delete;
+    Manager(const Manager&) = delete;
+    /// By layer you decide in what order scenes to be render on top of each other
+    [[nodiscard]] std::shared_ptr<Builder> build(const std::string& name, double layer = 0.0) noexcept;
+    void update() noexcept;
 };
 }
 #endif

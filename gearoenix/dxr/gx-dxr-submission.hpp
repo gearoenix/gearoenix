@@ -2,7 +2,12 @@
 
 #include "../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_DXR_ENABLED
-#include "gx-dxr-loader.hpp"
+#include "../core/ecs/gx-cr-ecs-entity.hpp"
+#include "../core/gx-cr-pool.hpp"
+#include "../physics/accelerator/gx-phs-acc-bvh.hpp"
+#include "gx-dxr-build-configuration.hpp"
+#include "gx-dxr-command.hpp"
+#include <boost/container/flat_map.hpp>
 #include <vector>
 
 namespace gearoenix::dxr {
@@ -12,9 +17,34 @@ struct Engine;
 struct PipelineManager;
 struct Queue;
 struct Swapchain;
-struct Command;
 
 struct SubmissionManager final {
+    struct ModelBvhData final {
+        D3D12_GPU_VIRTUAL_ADDRESS current_frame_uniform_address;
+        const D3D12_VERTEX_BUFFER_VIEW* vertex_view = nullptr;
+        const D3D12_INDEX_BUFFER_VIEW* index_view = nullptr;
+        UINT indices_count = 0;
+    };
+
+    struct CameraData final {
+        struct Frame final {
+            std::vector<Command> threads_g_buffer_filler_commands;
+            std::vector<ID3D12CommandList*> threads_g_buffer_filler_command_lists_raw;
+
+            Frame(Device&) noexcept;
+        };
+        std::vector<std::pair<double, ModelBvhData>> opaque_models_data;
+        std::vector<std::pair<double, ModelBvhData>> tranclucent_models_data;
+        std::array<Frame, GX_DXR_FRAMES_BACKBUFFER_NUMBER> frames;
+
+        CameraData(Device&) noexcept;
+    };
+
+    struct SceneData final {
+        std::size_t bvh_pool_index = 0;
+        boost::container::flat_map<std::pair<double /*layer*/, core::ecs::Entity::id_t /*camera-entity-id*/>, std::size_t /*camera-pool-index*/> cameras;
+    };
+
     GX_GET_RRF_PRV(Engine, e)
     GX_GET_REFC_PRV(std::shared_ptr<Device>, device)
     GX_GET_REFC_PRV(std::shared_ptr<DescriptorManager>, descriptor_manager)
@@ -23,21 +53,19 @@ struct SubmissionManager final {
     GX_GET_REFC_PRV(std::shared_ptr<Queue>, queue)
 
 private:
-    struct Frame final {
-        std::vector<std::unique_ptr<Command>> threads_g_buffer_filler_commands;
-        std::vector<ID3D12CommandList*> threads_g_buffer_filler_command_lists_raw;
-    };
+    core::Pool<physics::accelerator::Bvh<ModelBvhData>> bvh_pool;
+    core::Pool<CameraData> camera_pool;
+    core::Pool<SceneData> scene_pool;
 
-    std::uint64_t frame_number = 0;
-    const std::uint64_t frames_count;
-    std::vector<Frame> frames_data;
+    boost::container::flat_map<std::pair<double /*layer*/, core::ecs::Entity::id_t /*scene-entity-id*/>, std::size_t /*scene-pool-index*/> scenes;
+
+    [[nodiscard]] bool fill_g_buffer(const std::size_t camera_pool_index) noexcept;
 
 public:
     SubmissionManager(Engine& e) noexcept;
     ~SubmissionManager() noexcept;
 
     [[nodiscard]] bool render_frame() noexcept;
-    void clear_command_lists() noexcept;
 };
 }
 

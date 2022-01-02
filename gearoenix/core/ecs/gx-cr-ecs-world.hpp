@@ -3,6 +3,7 @@
 #include "../../platform/macro/gx-plt-mcr-lock.hpp"
 #include "gx-cr-ecs-archetype.hpp"
 #include "gx-cr-ecs-entity.hpp"
+#include <boost/container/flat_map.hpp>
 #include <memory>
 #include <variant>
 
@@ -12,11 +13,11 @@ namespace gearoenix::core::ecs {
 /// Main focus of this struct is performance of systems and memory usage
 struct World final {
 private:
-    std::map<Archetype::id_t, std::size_t> archetypes_map;
+    boost::container::flat_map<Archetype::id_t, std::size_t> archetypes_map;
     std::vector<Archetype> archetypes;
     // id -> (archetype, index)
-    std::map<Entity::id_t, Entity> entities;
-    std::map<std::string, Entity::id_t> name_to_entity_id;
+    boost::container::flat_map<Entity::id_t, Entity> entities;
+    boost::container::flat_map<std::string, Entity::id_t> name_to_entity_id;
 
     GX_CREATE_GUARD(delayed_actions)
     // 0 - Entity addition
@@ -53,7 +54,7 @@ public:
         }
         const auto ai = search->second;
         const auto index = archetypes[ai].allocate(id, std::move(components)...);
-        entities.emplace(id, Entity(ai, index));
+        entities.emplace(id, Entity(ai, index, std::nullopt));
         return id;
     }
 
@@ -122,33 +123,63 @@ public:
 
     void delayed_remove_components_list(Entity::id_t, std::vector<std::type_index>&&) noexcept;
 
-    /// Does not provide a good performance, use it wisely
+    /// It is better to not use it very much.
+    /// It is recommended to design your code in a way that batches all of your uses and
+    /// use the system callers instead of one-by-one use of this function.
+    /// Returns nullptr if entity or component does not exist.
     template <typename ComponentType>
-    [[nodiscard]] ComponentType& get_component(const Entity::id_t id) noexcept
+    [[nodiscard]] ComponentType* get_component(const Entity::id_t id) noexcept
     {
         Component::type_check<ComponentType>();
         auto entity_search = entities.find(id);
-#ifdef GX_DEBUG_MODE
         if (entities.end() == entity_search)
-            GX_LOG_F("Entity '" << id << "' not found.")
-#endif
+            return nullptr;
+        const auto& e = entity_search->second;
+        return archetypes[e.archetype].get_component<ComponentType>(e.index_in_archetype);
+    }
+
+    /// It is better to not use it very much.
+    /// It is recommended to design your code in a way that batches all of your uses and
+    /// use the system callers instead of one-by-one use of this function.
+    /// Returns nullptr if entity or component does not exist.
+    template <typename ComponentType>
+    [[nodiscard]] const ComponentType* get_component(const Entity::id_t id) const noexcept
+    {
+        Component::type_check<ComponentType>();
+        const auto entity_search = entities.find(id);
+        if (entities.end() == entity_search)
+            return nullptr;
         const auto& e = entity_search->second;
         return archetypes[e.archetype].get_component<ComponentType>(e.index_in_archetype);
     }
 
     [[nodiscard]] std::size_t get_archetype_index(const EntityBuilder::components_t& cs) noexcept;
 
-    [[nodiscard]] Entity& get_entity(Entity::id_t) noexcept;
+    [[nodiscard]] Entity* get_entity(Entity::id_t) noexcept;
+    [[nodiscard]] const Entity* get_entity(Entity::id_t) const noexcept;
 
-    /// Highly optimized way of doing things
+    /// Highly optimized way of system execution
     template <typename... ComponentsTypes, typename F>
-    void parallel_system(F fun) noexcept
+    void parallel_system(F&& fun) noexcept
     {
         Component::query_types_check<ComponentsTypes...>();
         for (auto& archetype : archetypes) {
             if (!archetype.satisfy<ComponentsTypes...>())
                 continue;
             archetype.parallel_system<ComponentsTypes...>(fun);
+        }
+    }
+
+    /// Less performant way of system execution.
+    /// Good for highly confilicting systems that can not be executed in parallel way.
+    template <typename... ComponentsTypes, typename F>
+    void synchronised_system(F&& fun) noexcept
+    {
+        Component::query_types_check<ComponentsTypes...>();
+        for (auto& archetype : archetypes) {
+            if (!archetype.satisfy<ComponentsTypes...>())
+                continue;
+            archetype.synchronised_system<ComponentsTypes...>(fun);
         }
     }
 

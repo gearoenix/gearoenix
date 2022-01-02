@@ -15,11 +15,10 @@ gearoenix::core::ecs::Archetype::components_indices_t gearoenix::core::ecs::Arch
     const auto css = cs.size();
     components_indices_t cis;
     cis.reserve(css);
-    for (std::size_t i = 0, index = 0; i < css; ++i) {
-        const auto& c = cs[i];
-        const auto s = c.second.size();
-        cis.emplace_back(c.first, index);
-        index += s;
+    std::size_t index = 0;
+    for (const auto& c : cs) {
+        cis[c.first] = index;
+        index += c.second.size();
     }
     return cis;
 }
@@ -27,14 +26,6 @@ gearoenix::core::ecs::Archetype::components_indices_t gearoenix::core::ecs::Arch
 gearoenix::core::ecs::Archetype::Archetype(const EntityBuilder::components_t& cs) noexcept
     : components_indices(get_components_indices(cs))
     , entity_size(header_size + get_components_size(cs))
-{
-}
-
-gearoenix::core::ecs::Archetype::Archetype(
-    const std::size_t components_size,
-    components_indices_t&& components_indices) noexcept
-    : components_indices(std::move(components_indices))
-    , entity_size(header_size + components_size)
 {
 }
 
@@ -88,21 +79,21 @@ void gearoenix::core::ecs::Archetype::move_out_entity(
     const std::size_t index,
     EntityBuilder::components_t& components) noexcept
 {
-    for (std::size_t i = 0, j = 1; j < components_indices.size(); i = j, ++j) {
-        const auto ci = components_indices[i].second;
-        const auto csz = components_indices[j].second - ci;
+    if (components_indices.empty())
+        return;
+    for (auto iter_first = components_indices.begin(), iter_second = iter_first + 1; iter_second != components_indices.end(); ++iter_first, ++iter_second) {
+        const auto ci = iter_first->second;
+        const auto csz = iter_second->second - ci;
         std::vector<std::uint8_t> cd(csz);
         std::memcpy(cd.data(), &data[index + ci], csz);
-        components.emplace_back(components_indices[i].first, std::move(cd));
+        components.emplace(iter_first->first, std::move(cd));
     }
-    if (!components_indices.empty()) {
-        auto& back = components_indices.back();
-        const auto ci = back.second;
-        const auto csz = (entity_size - header_size) - ci;
-        std::vector<std::uint8_t> cd(csz);
-        std::memcpy(cd.data(), &data[index + ci], csz);
-        components.emplace_back(back.first, std::move(cd));
-    }
+    auto back = components_indices.rbegin();
+    const auto ci = back->second;
+    const auto csz = (entity_size - header_size) - ci;
+    std::vector<std::uint8_t> cd(csz);
+    std::memcpy(cd.data(), &data[index + ci], csz);
+    components.emplace(back->first, std::move(cd));
 }
 
 std::optional<std::pair<gearoenix::core::ecs::Entity::id_t, std::size_t>> gearoenix::core::ecs::Archetype::move_from_back(
