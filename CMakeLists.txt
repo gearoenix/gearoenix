@@ -32,6 +32,7 @@ INCLUDE(gx-compile-lib)
 INCLUDE(gx-download-file)
 INCLUDE(gx-flag-util)
 INCLUDE(gx-imgui)
+INCLUDE(gx-compile-shader)
 
 MESSAGE(STATUS "Gearoenix is going to be compiled for ${CMAKE_SYSTEM_NAME}")
 
@@ -55,6 +56,8 @@ ENDIF ()
 
 SET(GX_SDK_PATH "${CMAKE_SOURCE_DIR}/sdk")
 SET(GX_SDK_LIB_PATH "${GX_SDK_PATH}/libs/")
+
+SET(GX_UNCOMPRESS_TOP_FOLDER "ON")
 
 SET(GX_SDL2_PATH "${GX_SDK_PATH}/sdl2")
 GX_DOWNLOAD_FILE("https://www.libsdl.org/release/SDL2-2.0.14.zip" "${GX_SDL2_PATH}")
@@ -130,6 +133,12 @@ FOREACH(GX_TINYGLTF_UNWANTED ${GX_TINYGLTF_UNWANTED_FILES})
     FILE(REMOVE_RECURSE ${GX_TINYGLTF_UNWANTED})
 ENDFOREACH()
 INCLUDE_DIRECTORIES(${GX_TINYGLTF_PATH})
+
+SET(GX_DXC_PATH "${GX_SDK_PATH}/dxc")
+SET(GX_UNCOMPRESS_TOP_FOLDER "OFF")
+GX_DOWNLOAD_FILE("https://github.com/microsoft/DirectXShaderCompiler/releases/download/v1.6.2106/dxc_2021_07_01.zip" "${GX_DXC_PATH}")
+SET(GX_DXC_BINARY_DIR "${GX_DXC_PATH}/bin/x64")
+SET(GX_UNCOMPRESS_TOP_FOLDER "ON")
 
 ADD_SUBDIRECTORY(gearoenix)
 ADD_SUBDIRECTORY(editor)
