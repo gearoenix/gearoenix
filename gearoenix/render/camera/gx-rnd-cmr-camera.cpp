@@ -25,6 +25,18 @@ void gearoenix::render::camera::Camera::set_view(const math::Mat4x4<float>& v) n
     view_projection = projection * v;
 }
 
+void gearoenix::render::camera::Camera::set_target_aspect_ratio(const float tap) noexcept
+{
+    target_aspect_ratio = tap;
+    set_projection(Projection::Perspective == projection_type ? math::Mat4x4<float>::perspective(target_aspect_ratio * scale, scale, near, far) : math::Mat4x4<float>::orthographic(target_aspect_ratio * scale, scale, near, far));
+}
+
+void gearoenix::render::camera::Camera::set_projection(const math::Mat4x4<float>& p) noexcept
+{
+    projection = p;
+    view_projection = p * view;
+}
+
 void gearoenix::render::camera::Camera::generate_frustum_points(
     const math::Vec3<double>& l,
     const math::Vec3<double>& x,
@@ -56,7 +68,7 @@ void gearoenix::render::camera::Camera::generate_frustum_points(
 //    uniform.clip_width = static_cast<float>(platform_application->get_event_engine()->get_window_width());
 //    uniform.clip_height = static_cast<float>(platform_application->get_event_engine()->get_window_height());
 //    set_target(render_engine->get_main_render_target().get());
-//    platform_application->get_event_engine()->add_listener(core::event::Id::SystemWindowSizeChange, 1.0f, this);
+//    platform_application->get_event_engine()->add_listener(core::event::Id::PlatformWindowSizeChange, 1.0f, this);
 //}
 //
 // gearoenix::render::camera::Camera::Camera(const core::Id my_id, std::string name, engine::Engine* const e) noexcept
@@ -104,7 +116,7 @@ void gearoenix::render::camera::Camera::generate_frustum_points(
 //{
 //    auto* const event_engine = render_engine->get_platform_application()->get_event_engine();
 //    if (nullptr != event_engine)
-//        event_engine->remove_listener(core::event::Id::SystemWindowSizeChange, this);
+//        event_engine->remove_listener(core::event::Id::PlatformWindowSizeChange, this);
 //}
 //
 // void gearoenix::render::camera::Camera::set_far(const float f) noexcept
@@ -235,7 +247,7 @@ void gearoenix::render::camera::Camera::generate_frustum_points(
 //{
 //    const auto* platform_application = render_engine->get_platform_application();
 //    switch (d.get_source()) {
-//    case core::event::Id::SystemWindowSizeChange:
+//    case core::event::Id::PlatformWindowSizeChange:
 //        if (target->get_attachments().empty())
 //            set_aspects(
 //                platform_application->get_event_engine()->get_window_width(),

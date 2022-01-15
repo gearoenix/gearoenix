@@ -32,8 +32,9 @@ struct Engine final : public render::engine::Engine {
 
 private:
     explicit Engine(platform::Application& platform_application) noexcept;
-    void device_lost_handle(int failed_tries = 0) noexcept;
-    void window_resized(int failed_tries = 0) noexcept;
+    void device_lost_handle(int failed_tries) noexcept;
+    void window_resized(int failed_tries) noexcept;
+    void window_resized() noexcept final;
 
 public:
     Engine(Engine&&) = delete;

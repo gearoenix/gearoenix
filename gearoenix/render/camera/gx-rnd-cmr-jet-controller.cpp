@@ -76,6 +76,14 @@ gearoenix::core::event::Listener::Response gearoenix::render::camera::JetControl
         }
         break;
     }
+    case core::event::Id::PlatformWindowSizeChange: {
+        const auto& data = std::get<gearoenix::core::event::platform::WindowSizeChangeData>(d.get_data());
+        auto* const cam = e.get_world()->get_component<Camera>(camera_entity_id);
+        if (nullptr != cam) {
+            cam->set_target_aspect_ratio(static_cast<float>(data.current_ratio));
+        }
+        break;
+    }
     default:
         GX_UNEXPECTED
     }
@@ -92,6 +100,7 @@ gearoenix::render::camera::JetController::JetController(engine::Engine& e, const
     event_engine->add_listener(core::event::Id::ButtonKeyboard, this);
     event_engine->add_listener(core::event::Id::ButtonMouse, this);
     event_engine->add_listener(core::event::Id::MovementMouse, this);
+    event_engine->add_listener(core::event::Id::PlatformWindowSizeChange, this);
 }
 
 gearoenix::render::camera::JetController::~JetController() noexcept
@@ -102,6 +111,7 @@ gearoenix::render::camera::JetController::~JetController() noexcept
     event_engine->remove_listener(core::event::Id::ButtonKeyboard, 0.0f, this);
     event_engine->remove_listener(core::event::Id::ButtonMouse, 0.0f, this);
     event_engine->remove_listener(core::event::Id::MovementMouse, 0.0f, this);
+    event_engine->remove_listener(core::event::Id::PlatformWindowSizeChange, 0.0f, this);
 }
 
 void gearoenix::render::camera::JetController::update() noexcept

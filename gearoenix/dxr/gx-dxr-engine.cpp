@@ -29,7 +29,7 @@ gearoenix::dxr::Engine::Engine(platform::Application& platform_application) noex
     , platform_application(platform_application)
 {
     frames_count = GX_DXR_FRAMES_BACKBUFFER_NUMBER;
-    device_lost_handle();
+    device_lost_handle(0);
 }
 
 void gearoenix::dxr::Engine::device_lost_handle(const int failed_tries) noexcept
@@ -78,6 +78,11 @@ void gearoenix::dxr::Engine::window_resized(int failed_tries) noexcept
         device_lost_handle(++failed_tries);
 }
 
+void gearoenix::dxr::Engine::window_resized() noexcept
+{
+    window_resized(0);
+}
+
 gearoenix::dxr::Engine::~Engine() noexcept
 {
     swapchain->wait_for_gpu();
@@ -105,7 +110,7 @@ void gearoenix::dxr::Engine::end_frame() noexcept
 {
     render::engine::Engine::end_frame();
     if (submission_manager->render_frame())
-        device_lost_handle();
+        device_lost_handle(0);
 }
 
 void gearoenix::dxr::Engine::upload_imgui_fonts() noexcept

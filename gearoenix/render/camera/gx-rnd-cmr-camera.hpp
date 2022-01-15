@@ -48,6 +48,8 @@ struct Camera final : public core::ecs::Component {
         const math::Vec3<double>& z,
         std::array<math::Vec3<double>, 8>& points) const noexcept;
     void set_view(const math::Mat4x4<float>& view) noexcept;
+    void set_target_aspect_ratio(float target_aspect_ratio) noexcept;
+    void set_projection(const math::Mat4x4<float>& projection) noexcept;
 };
 }
 #endif

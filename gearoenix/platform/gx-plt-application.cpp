@@ -55,7 +55,8 @@ void gearoenix::platform::BaseApplication::update_window() noexcept
 {
     if (window_resizing && std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - last_time_window_resized).count() > configuration.get_window_resizing_event_interval_ms()) {
         window_resizing = false;
-        event_engine->broadcast(core::event::Data(core::event::Id::SystemWindowSizeChange,
+        render_engine->window_resized();
+        event_engine->broadcast(core::event::Data(core::event::Id::PlatformWindowSizeChange,
             core::event::platform::WindowSizeChangeData(
                 previous_window_width,
                 previous_window_height,

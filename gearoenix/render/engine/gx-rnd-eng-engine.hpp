@@ -75,6 +75,7 @@ public:
     virtual ~Engine() noexcept;
     virtual void start_frame() noexcept;
     virtual void end_frame() noexcept;
+    virtual void window_resized() noexcept = 0;
     virtual void upload_imgui_fonts() noexcept = 0;
 };
 }
