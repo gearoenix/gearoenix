@@ -9,12 +9,34 @@ struct PbrVertex final {
     math::Vec4<float> tangent;
     math::Vec2<float> uv;
 
-    PbrVertex() noexcept = default;
-    PbrVertex(const math::Vec3<float>& position, const math::Vec3<float>& normal, const math::Vec4<float>& tangent, const math::Vec2<float>& uv) noexcept;
+    constexpr PbrVertex() noexcept = default;
+
+    constexpr PbrVertex(const math::Vec3<float>& position,
+        const math::Vec3<float>& normal,
+        const math::Vec4<float>& tangent,
+        const math::Vec2<float>& uv) noexcept
+        : position(position)
+        , normal(normal)
+        , tangent(tangent)
+        , uv(uv)
+    {
+    }
+
     explicit PbrVertex(platform::stream::Stream& f) noexcept;
     void read(platform::stream::Stream& f) noexcept;
-    void set_position(float x, float y, float z) noexcept;
-    void set_uv(float x, float y) noexcept;
+
+    constexpr void set_position(const float x, const float y, const float z) noexcept
+    {
+        position.x = x;
+        position.y = y;
+        position.z = z;
+    }
+
+    constexpr void set_uv(const float x, const float y) noexcept
+    {
+        uv.x = x;
+        uv.y = y;
+    }
 
     friend std::ostream& operator<<(std::ostream& os, const PbrVertex& v) noexcept
     {

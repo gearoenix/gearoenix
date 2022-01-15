@@ -7,5 +7,6 @@
 #define GX_CONCAT_3(x, y) GX_CONCAT_2(x, y)
 #define GX_CONCAT_4(x, y) GX_CONCAT_3(x, y)
 #define GX_CONCAT_5(x, y) GX_CONCAT_4(x, y)
+#define GX_CONCAT(x, y) GX_CONCAT_5(x, y)
 
 #endif

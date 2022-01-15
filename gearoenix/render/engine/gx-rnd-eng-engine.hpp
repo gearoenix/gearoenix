@@ -48,8 +48,8 @@ struct Manager;
 namespace gearoenix::render::engine {
 struct Engine {
     GX_GET_CVAL_PRT(Type, engine_type)
-    GX_GET_CRRF_PRT(platform::Application, platform_application)
-    // GX_GET_UPTR_PRT(physics::Engine, physics_engine)
+    GX_GET_RRF_PRT(platform::Application, platform_application)
+    GX_GET_UPTR_PRT(physics::Engine, physics_engine)
     GX_GET_CREF_PRT(Limitations, limitations)
     GX_GET_VAL_PRT(unsigned int, frames_count, 2)
     GX_GET_VAL_PRT(unsigned int, frame_number, 0)
@@ -66,7 +66,8 @@ struct Engine {
 
 protected:
     std::chrono::time_point<std::chrono::high_resolution_clock> last_frame_time = std::chrono::high_resolution_clock::now();
-    Engine(Type engine_type, const platform::Application& platform_application) noexcept;
+
+    Engine(Type engine_type, platform::Application& platform_application) noexcept;
 
 public:
     [[nodiscard]] static std::set<Type> get_available_engines() noexcept;

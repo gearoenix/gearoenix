@@ -1,62 +1,108 @@
 #define GX_PLATFORM_LOG_STD_OUT_ENABLED
 #include <gearoenix/core/ecs/gx-cr-ecs-world.hpp>
+#include <gearoenix/core/gx-cr-application.hpp>
+#include <gearoenix/physics/gx-phs-transformation.hpp>
+#include <gearoenix/platform/gx-plt-log.hpp>
 #include <gearoenix/platform/gx-plt-main-entry.hpp>
+#include <gearoenix/render/camera/gx-rnd-cmr-jet-controller.hpp>
+#include <gearoenix/render/camera/gx-rnd-cmr-manager.hpp>
+#include <gearoenix/render/engine/gx-rnd-eng-engine.hpp>
+#include <gearoenix/render/gx-rnd-vertex.hpp>
+#include <gearoenix/render/material/gx-rnd-mat-pbr.hpp>
+#include <gearoenix/render/mesh/gx-rnd-msh-manager.hpp>
+#include <gearoenix/render/model/gx-rnd-mdl-builder.hpp>
+#include <gearoenix/render/model/gx-rnd-mdl-manager.hpp>
+#include <gearoenix/render/scene/gx-rnd-scn-builder.hpp>
+#include <gearoenix/render/scene/gx-rnd-scn-manager.hpp>
+#include <gearoenix/render/texture/gx-rnd-txt-manager.hpp>
+#include <random>
 
-struct Position final : public gearoenix::core::ecs::Component {
-    double x;
-    double y;
+constexpr double position_limit = 10.0;
 
-    Position(const double x, const double y) noexcept
-        : gearoenix::core::ecs::Component(this)
-        , x(x)
-        , y(y)
+static std::random_device random_device;
+static std::default_random_engine random_engine;
+static std::uniform_real_distribution<double> space_distribution(-position_limit, position_limit);
+static std::uniform_real_distribution<double> speed_distribution(-1.0, 1.0);
+static std::uniform_real_distribution<float> colour_distribution(0.0f, 1.0f);
+
+struct GameApp final : public gearoenix::core::Application {
+    struct Speed final : public gearoenix::core::ecs::Component {
+        gearoenix::math::Vec3<double> value;
+
+        Speed() noexcept
+            : gearoenix::core::ecs::Component(this)
+            , value(
+                  speed_distribution(random_engine),
+                  speed_distribution(random_engine),
+                  speed_distribution(random_engine))
+        {
+        }
+
+        void update() noexcept
+        {
+            value.x = speed_distribution(random_engine);
+            value.y = speed_distribution(random_engine);
+            value.z = speed_distribution(random_engine);
+        }
+
+        Speed(Speed&&) noexcept = default;
+    };
+
+    struct Position final : public gearoenix::core::ecs::Component {
+        gearoenix::math::Vec3<double> value;
+
+        Position() noexcept
+            : gearoenix::core::ecs::Component(this)
+            , value(
+                  space_distribution(random_engine),
+                  space_distribution(random_engine),
+                  space_distribution(random_engine))
+        {
+        }
+
+        void update(const double delta_time, const Speed& speed) noexcept
+        {
+            value += speed.value * delta_time;
+            value.clamp(-position_limit, position_limit);
+        }
+
+        Position(Position&&) noexcept = default;
+    };
+
+    std::unique_ptr<gearoenix::render::camera::JetController> camera_controller;
+
+    explicit GameApp(gearoenix::platform::Application& plt_app) noexcept
+        : Application(plt_app)
     {
+        const auto scene_builder = render_engine.get_scene_manager()->build("scene");
+
+        auto end_callback = gearoenix::core::sync::EndCallerIgnored([scene_builder] {});
+
+        auto cube_mesh = render_engine.get_mesh_manager()->build_cube(
+            gearoenix::core::sync::EndCallerIgnored(end_callback));
+
+        auto model_builder = render_engine.get_model_manager()->build(
+            "triangle",
+            std::shared_ptr<gearoenix::render::mesh::Mesh>(cube_mesh),
+            gearoenix::core::sync::EndCallerIgnored(end_callback),
+            true);
+        gearoenix::render::material::Pbr material(render_engine);
+        model_builder->set_material(material);
+        scene_builder->add(std::move(model_builder));
+
+        auto camera_builder = render_engine.get_camera_manager()->build("camera");
+        camera_builder->get_transformation().set_location(0.0f, 0.0f, 5.0f);
+        camera_controller = std::make_unique<gearoenix::render::camera::JetController>(
+            render_engine,
+            camera_builder->get_entity_builder()->get_builder().get_id());
+        scene_builder->add(std::move(camera_builder));
     }
 
-    Position(Position&&) noexcept = default;
-    Position(const Position&) = delete;
-    Position& operator=(Position&&) = delete;
-    Position& operator=(const Position&) = delete;
-};
-
-struct Speed final : public gearoenix::core::ecs::Component {
-    double x;
-    double y;
-
-    Speed(const double x, const double y) noexcept
-        : gearoenix::core::ecs::Component(this)
-        , x(x)
-        , y(y)
+    void update() noexcept final
     {
+        Application::update();
+        camera_controller->update();
     }
-
-    Speed(Speed&&) noexcept = default;
-    Speed(const Speed&) = delete;
-    Speed& operator=(Speed&&) = delete;
-    Speed& operator=(const Speed&) = delete;
 };
 
-void start()
-{
-    using namespace gearoenix::core::ecs;
-    World w;
-    const auto entity = w.create_entity(Position { 2.0, 3.0 }, Speed { 4.0, 5.0 });
-    (void)w.create_entity(Position { 6.0, 7.0 });
-    (void)w.create_entity(Speed { 10.0, 11.0 }, Position { 8.0, 9.0 });
-    (void)w.create_entity(Speed { 12.0, 13.0 });
-    w.parallel_system<Position>([&](Entity::id_t ent, Position& p, const unsigned int kernel_index) noexcept { GX_LOG_D("In kernel: " << kernel_index << " Entity: " << ent << ", Position { " << p.x << ", " << p.y << " }") });
-    w.parallel_system<Not<Speed>>([&](Entity::id_t ent, Not<Speed>&, const unsigned int kernel_index) noexcept { GX_LOG_D("In kernel: " << kernel_index << " Entity: " << ent << ", Without Speed") });
-    w.parallel_system<Not<Position>>([&](Entity::id_t ent, Not<Position>&, const unsigned int kernel_index) noexcept { GX_LOG_D("In kernel: " << kernel_index << " Entity: " << ent << ", Without Position") });
-    w.parallel_system<Speed>([&](Entity::id_t ent, Speed& s, const unsigned int kernel_index) noexcept { GX_LOG_D("In kernel: " << kernel_index << " Entity: " << ent << ", Speed {" << s.x << ", " << s.y << "}") });
-    w.parallel_system<Speed, Position>([&](Entity::id_t ent, Speed& s, Position& p, const unsigned int kernel_index) noexcept { GX_LOG_D("In kernel: " << kernel_index << " Entity: " << ent << ", Speed {" << s.x << ", " << s.y << "}, Position {" << p.x << "," << p.y << "}") });
-
-    // It is not a good practice to fetch components by entity id, it is better to use a system, however this
-    // functionality is provided, for some use-cases.
-    auto& p = w.get_component<Position>(entity);
-    auto& s = w.get_component<Speed>(entity);
-    GX_LOG_D("Position { " << p.x << ", " << p.y << " }")
-    GX_LOG_D("Speed { " << s.x << ", " << s.y << " }")
-    GX_LOG_D("Ended!");
-}
-
-GX_MAIN_ENTRY(start())
+GEAROENIX_START(GameApp)

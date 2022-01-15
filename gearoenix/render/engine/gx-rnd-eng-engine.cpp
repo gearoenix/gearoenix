@@ -1,5 +1,6 @@
 #include "gx-rnd-eng-engine.hpp"
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
+#include "../../physics/gx-phs-engine.hpp"
 #include "../../platform/gx-plt-application.hpp"
 #include "../camera/gx-rnd-cmr-manager.hpp"
 #include "../gltf/gx-rnd-gltf-loader.hpp"
@@ -20,12 +21,12 @@
 
 gearoenix::render::engine::Engine::Engine(
     const Type engine_type,
-    const platform::Application& platform_application) noexcept
+    platform::Application& platform_application) noexcept
     : engine_type(engine_type)
     , platform_application(platform_application)
+    , physics_engine(new physics::Engine(*this))
     , scene_manager(new scene::Manager(*this))
     , world(new core::ecs::World())
-    , camera_manager(new camera::Manager(*this))
 {
 }
 
@@ -33,7 +34,10 @@ std::set<gearoenix::render::engine::Type> gearoenix::render::engine::Engine::get
 {
     return {
 #ifdef GX_RENDER_VULKAN_ENABLED
-        Type::Vulkan
+        Type::Vulkan,
+#endif
+#ifdef GX_RENDER_DXR_ENABLED
+        Type::Direct3DX,
 #endif
     };
 }
@@ -81,9 +85,11 @@ void gearoenix::render::engine::Engine::start_frame() noexcept
     frame_number = frame_number_from_start % frames_count;
     next_frame_number = (frame_number_from_start + 1) % frames_count;
     world->update();
-    // physics_engine->update();
 }
 
 void gearoenix::render::engine::Engine::end_frame() noexcept
 {
+    physics_engine->update();
+    camera_manager->update();
+    scene_manager->update();
 }

@@ -17,9 +17,12 @@ struct Engine;
 struct PipelineManager;
 struct Queue;
 struct Swapchain;
+struct ModelUniform;
 
 struct SubmissionManager final {
     struct ModelBvhData final {
+        std::uint64_t blocked_cameras_flags = static_cast<std::uint64_t>(-1);
+        ModelUniform* uniform_ptr = nullptr;
         D3D12_GPU_VIRTUAL_ADDRESS current_frame_uniform_address;
         const D3D12_VERTEX_BUFFER_VIEW* vertex_view = nullptr;
         const D3D12_INDEX_BUFFER_VIEW* index_view = nullptr;
@@ -33,6 +36,7 @@ struct SubmissionManager final {
 
             Frame(Device&) noexcept;
         };
+        D3D12_GPU_VIRTUAL_ADDRESS current_frame_uniform_address;
         std::vector<std::pair<double, ModelBvhData>> opaque_models_data;
         std::vector<std::pair<double, ModelBvhData>> tranclucent_models_data;
         std::array<Frame, GX_DXR_FRAMES_BACKBUFFER_NUMBER> frames;

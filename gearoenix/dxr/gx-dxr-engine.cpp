@@ -6,6 +6,7 @@
 #include "../platform/gx-plt-application.hpp"
 #include "../platform/gx-plt-library.hpp"
 #include "gx-dxr-adapter.hpp"
+#include "gx-dxr-camera.hpp"
 #include "gx-dxr-check.hpp"
 #include "gx-dxr-descriptor.hpp"
 #include "gx-dxr-device.hpp"
@@ -27,6 +28,7 @@ gearoenix::dxr::Engine::Engine(platform::Application& platform_application) noex
     : render::engine::Engine(render::engine::Type::Direct3DX, platform_application)
     , platform_application(platform_application)
 {
+    frames_count = GX_DXR_FRAMES_BACKBUFFER_NUMBER;
     device_lost_handle();
 }
 
@@ -37,6 +39,8 @@ void gearoenix::dxr::Engine::device_lost_handle(const int failed_tries) noexcept
     texture_manager = nullptr;
     submission_manager = nullptr;
     pipeline_manager = nullptr;
+    camera_manager = nullptr;
+    model_manager = nullptr;
     mesh_manager = nullptr;
     uploader = nullptr;
     descriptor_manager = nullptr;
@@ -63,6 +67,7 @@ void gearoenix::dxr::Engine::device_lost_handle(const int failed_tries) noexcept
     pipeline_manager = std::make_shared<PipelineManager>(device);
     submission_manager = std::make_shared<SubmissionManager>(*this);
     texture_manager = std::make_unique<TextureManager>(*this);
+    camera_manager = std::make_unique<CameraManager>(*this);
 
     window_resized(failed_tries);
 }

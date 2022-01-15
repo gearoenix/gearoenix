@@ -17,3 +17,7 @@ SET(GX_ENGINE_MATH_SRC
         ${GX_ENGINE_MATH_SRC_DIR}/gx-math-vector-3d.hpp
         ${GX_ENGINE_MATH_SRC_DIR}/gx-math-vector-4d.hpp
         PARENT_SCOPE)
+
+SET(GX_ENGINE_MATH_TEST_SRC
+        ${GX_ENGINE_MATH_SRC_DIR}/gx-math-matrix-4d-test.hpp
+        PARENT_SCOPE)

@@ -9,9 +9,11 @@ struct Engine;
 
 namespace gearoenix::render::camera {
 struct Builder;
-struct Manager final {
-private:
+struct Manager {
+protected:
     engine::Engine& e;
+
+    explicit Manager(engine::Engine& e) noexcept;
 
 public:
     Manager(Manager&&) = delete;
@@ -19,10 +21,10 @@ public:
     Manager& operator=(Manager&&) = delete;
     Manager& operator=(const Manager&) = delete;
 
-    explicit Manager(engine::Engine& e) noexcept;
-    ~Manager() noexcept = default;
+    virtual ~Manager() noexcept = default;
 
-    [[nodiscard]] std::shared_ptr<Builder> build(const std::string& name) noexcept;
+    [[nodiscard]] virtual std::shared_ptr<Builder> build(const std::string& name) noexcept = 0;
+    virtual void update() noexcept;
 };
 }
 #endif

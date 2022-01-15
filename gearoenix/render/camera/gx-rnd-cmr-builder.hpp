@@ -20,12 +20,12 @@ struct Engine;
 namespace gearoenix::render::camera {
 struct Manager;
 struct Camera;
-struct Builder final {
+struct Builder {
     friend struct Manager;
 
-    GX_GET_REFC_PRV(std::shared_ptr<core::ecs::EntitySharedBuilder>, entity_builder)
+    GX_GET_REFC_PRT(std::shared_ptr<core::ecs::EntitySharedBuilder>, entity_builder)
 
-private:
+protected:
     Builder(engine::Engine& e, const std::string& name) noexcept;
 
 public:
@@ -33,7 +33,7 @@ public:
     Builder(const Builder&) = delete;
     Builder& operator=(Builder&&) = delete;
     Builder& operator=(const Builder&) = delete;
-    ~Builder() noexcept;
+    virtual ~Builder() noexcept;
 
     [[nodiscard]] physics::Transformation& get_transformation() noexcept;
     [[nodiscard]] const physics::Transformation& get_transformation() const noexcept;

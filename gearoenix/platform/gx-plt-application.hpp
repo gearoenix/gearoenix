@@ -13,6 +13,10 @@ namespace gearoenix::core {
 struct Application;
 }
 
+namespace gearoenix::core::event {
+struct Engine;
+}
+
 namespace gearoenix::render::engine {
 struct Engine;
 }
@@ -28,9 +32,10 @@ struct BaseApplication final {
     GX_GET_VAL_PRV(bool, running, true)
 
     GX_GET_VAL_PRV(bool, window_resizing, false)
+    GX_GET_VAL_PRV(int, previous_window_width, -1)
+    GX_GET_VAL_PRV(int, previous_window_height, -1)
     GX_GET_VAL_PRV(int, window_width, -1)
     GX_GET_VAL_PRV(int, window_height, -1)
-    GX_GET_VAL_PRV(double, window_aspect_ratio, 1)
 
     GX_GET_VAL_PRV(int, window_x, -1)
     GX_GET_VAL_PRV(int, window_y, -1)
@@ -46,13 +51,14 @@ struct BaseApplication final {
     GX_GET_VAL_PRV(double, pre_mouse_y, -1.0)
     GX_GET_VAL_PRV(double, pre_mouse_x_nrm, -1.0)
     GX_GET_VAL_PRV(double, pre_mouse_y_nrm, -1.0)
-    GX_GET_VAL_PRV(double, delta_mouse_x, 0.0)
-    GX_GET_VAL_PRV(double, delta_mouse_y, 0.0)
-    GX_GET_VAL_PRV(double, delta_mouse_x_nrm, 0.0)
-    GX_GET_VAL_PRV(double, delta_mouse_y_nrm, 0.0)
 
     GX_GET_UPTR_PRV(render::engine::Engine, render_engine)
+    GX_GET_UPTR_PRV(core::event::Engine, event_engine)
     GX_GET_UPTR_PRV(core::Application, core_application)
+
+    // boost::container::flat_map<platform::key::Id, Point2D> pressed_mouse_buttons_state;
+    // boost::container::flat_map<touch::FingerId, Point2D> touch_states;
+    // boost::container::flat_set<platform::key::Id> pressed_keyboard_buttons;
 
 private:
     std::chrono::high_resolution_clock::time_point last_time_window_resized;

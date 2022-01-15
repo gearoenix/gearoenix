@@ -4,10 +4,16 @@
 
 namespace gearoenix::core::event {
 struct Listener {
+    enum struct Response {
+        Erase,
+        Continue,
+        Discontinue,
+    };
+
 public:
     virtual ~Listener() noexcept = default;
     /// If it returns true no more process on event will happen
-    [[nodiscard]] virtual bool on_event(const Data& event_data) noexcept = 0;
+    [[nodiscard]] virtual Response on_event(const Data& event_data) noexcept = 0;
 };
 }
 #endif

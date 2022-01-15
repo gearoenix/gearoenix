@@ -4,9 +4,9 @@
 PSInput main(float3 position : POSITION, float3 normal : NORMAL, float4 tangent: TANGENT, float2 uv : TEXCOORD)
 {
     PSInput result;
-
-    result.position = float4(position, 1.0);
-    result.normal = normal;
+    result.world_position = mul(ModelUniform.model, float4(position, 1.0));
+    result.position = mul(CameraUniform.view_projection, result.world_position);
+    result.normal = mul(ModelUniform.transposed_reversed_model, float4(normal, 1.0)).xyz;
     result.tangent = tangent;
     result.uv = uv;
 

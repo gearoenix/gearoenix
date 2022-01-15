@@ -4,7 +4,6 @@
 #ifdef GX_RENDER_DXR_ENABLED
 #include "../render/model/gx-rnd-mdl-builder.hpp"
 #include "../render/model/gx-rnd-mdl-manager.hpp"
-#include "../render/model/gx-rnd-mdl-model.hpp"
 #include "gx-dxr-buffer.hpp"
 #include "gx-dxr-build-configuration.hpp"
 #include "gx-dxr-loader.hpp"

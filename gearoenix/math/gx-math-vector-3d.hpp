@@ -329,6 +329,22 @@ struct Vec3 final {
         *this /= length();
     }
 
+    constexpr void clamp(const Element lower, const Element upper) noexcept
+    {
+        if (x < lower)
+            x = lower;
+        else if (x > upper)
+            x = upper;
+        if (y < lower)
+            y = lower;
+        else if (y > upper)
+            y = upper;
+        if (z < lower)
+            z = lower;
+        else if (z > upper)
+            z = upper;
+    }
+
     constexpr Vec3 atan() const noexcept
     {
         return Vec3(
@@ -382,6 +398,12 @@ struct Vec3 final {
         return os;
     }
 };
+
+template <typename Element>
+constexpr Vec3<Element> Origin3D(
+    static_cast<Element>(0),
+    static_cast<Element>(0),
+    static_cast<Element>(0));
 
 template <typename Element>
 constexpr Vec3<Element> X3D(

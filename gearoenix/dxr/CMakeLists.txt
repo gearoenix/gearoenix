@@ -6,6 +6,8 @@ SET(GX_ENGINE_DXR_SRC
         ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-buffer.cpp
         ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-buffer.hpp
         ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-build-configuration.hpp
+        ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-camera.cpp
+        ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-camera.hpp
         ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-check.hpp
         ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-command.cpp
         ${GX_ENGINE_DXR_SRC_DIR}/gx-dxr-command.hpp

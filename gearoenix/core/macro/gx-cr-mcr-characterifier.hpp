@@ -1,0 +1,6 @@
+#ifndef GEAROENIX_CORE_MACROS_CHARACTERIFIER_HPP
+#define GEAROENIX_CORE_MACROS_CHARACTERIFIER_HPP
+#include "gx-cr-mcr-stringifier.hpp"
+
+#define GX_CHARIFY(a) (GX_STRINGIFY(a))[0]
+#endif

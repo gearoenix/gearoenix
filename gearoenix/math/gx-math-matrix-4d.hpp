@@ -356,12 +356,11 @@ struct Mat4x4 final {
         return m;
     }
 
-    [[nodiscard]] constexpr static Mat4x4<Element> rotation(const Vec3<Element>& v, const Element degree) noexcept
+    [[nodiscard]] constexpr static Mat4x4<Element> rotation(const Vec3<Element>& w, const Element degree) noexcept
     {
         const auto sinus = static_cast<Element>(sin(static_cast<double>(degree)));
         const auto cosinus = static_cast<Element>(cos(static_cast<double>(degree)));
         const Element oneminuscos = 1.0f - cosinus;
-        const Vec3 w = v.normalized();
         const Element wx2 = w[0] * w[0];
         const Element wxy = w[0] * w[1];
         const Element wxz = w[0] * w[2];

@@ -5,6 +5,14 @@ ADD_EXECUTABLE (GearoenixGameEngineTests
         ${GX_ENGINE_TEST_SRC}
         gx-test-main.cpp)
 
+SET(GX_GLM_PATH "${GX_SDK_PATH}/glm")
+GX_DOWNLOAD_FILE("https://github.com/g-truc/glm/archive/master.zip" "${GX_GLM_PATH}")
+FILE(GLOB GX_GLM_UNWANTED_FILES ${GX_GLM_PATH}/*)
+LIST(REMOVE_ITEM GX_GLM_UNWANTED_FILES "${GX_GLM_PATH}/glm")
+FOREACH(GX_GLM_UNWANTED ${GX_GLM_UNWANTED_FILES})
+    FILE(REMOVE_RECURSE ${GX_GLM_UNWANTED})
+ENDFOREACH()
+
 TARGET_LINK_LIBRARIES (GearoenixGameEngineTests GearoenixGameEngine)
-TARGET_INCLUDE_DIRECTORIES (GearoenixGameEngineTests PRIVATE ${CMAKE_SOURCE_DIR})
+TARGET_INCLUDE_DIRECTORIES (GearoenixGameEngineTests PRIVATE ${CMAKE_SOURCE_DIR} ${GX_GLM_PATH})
 ADD_TEST (NAME GearoenixGameEngineTests COMMAND GearoenixGameEngineTests)

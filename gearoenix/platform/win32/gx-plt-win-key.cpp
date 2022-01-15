@@ -1,5 +1,6 @@
 #include "gx-plt-win-key.hpp"
 #ifdef GX_PLATFORM_INTERFACE_WIN32
+#include "../../core/macro/gx-cr-mcr-characterifier.hpp"
 #include "../gx-plt-log.hpp"
 
 gearoenix::platform::key::Id gearoenix::platform::convert_to_keyboard_key(const WPARAM wp, const LPARAM lp) noexcept
@@ -47,22 +48,36 @@ gearoenix::platform::key::Id gearoenix::platform::convert_to_keyboard_key(const 
         return key::Id::PageUp;
     case VK_NEXT:
         return key::Id::PageDown;
-    case static_cast<decltype(wp)>('A'):
-        return key::Id::A;
-    case static_cast<decltype(wp)>('B'):
-        return key::Id::B;
-    case static_cast<decltype(wp)>('C'):
-        return key::Id::C;
-    case static_cast<decltype(wp)>('V'):
-        return key::Id::V;
-    case static_cast<decltype(wp)>('W'):
-        return key::Id::W;
-    case static_cast<decltype(wp)>('X'):
-        return key::Id::X;
-    case static_cast<decltype(wp)>('Y'):
-        return key::Id::Y;
-    case static_cast<decltype(wp)>('Z'):
-        return key::Id::Z;
+#define GX_HELPER(chr)                               \
+    case static_cast<decltype(wp)>(GX_CHARIFY(chr)): \
+        return key::Id::chr
+        GX_HELPER(A);
+        GX_HELPER(B);
+        GX_HELPER(C);
+        GX_HELPER(D);
+        GX_HELPER(E);
+        GX_HELPER(F);
+        GX_HELPER(G);
+        GX_HELPER(H);
+        GX_HELPER(I);
+        GX_HELPER(J);
+        GX_HELPER(K);
+        GX_HELPER(L);
+        GX_HELPER(M);
+        GX_HELPER(N);
+        GX_HELPER(O);
+        GX_HELPER(P);
+        GX_HELPER(Q);
+        GX_HELPER(R);
+        GX_HELPER(S);
+        GX_HELPER(T);
+        GX_HELPER(U);
+        GX_HELPER(V);
+        GX_HELPER(W);
+        GX_HELPER(X);
+        GX_HELPER(Y);
+        GX_HELPER(Z);
+#undef GX_HELPER
     case VK_F1:
         return key::Id::F1;
     case VK_F2:

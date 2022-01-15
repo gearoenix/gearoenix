@@ -10,10 +10,10 @@
 #include <variant>
 
 namespace gearoenix::core::event {
-struct Data {
+struct Data final {
     typedef std::variant<
-        button::KeyboardData,
-        button::MouseData,
+        button::Keyboard,
+        button::Mouse,
         button::MouseScroll,
         gesture::Click,
         gesture::Drag2D,
@@ -23,6 +23,7 @@ struct Data {
         gesture::TouchDrag,
         gesture::TouchScale,
         movement::Base2D,
+        movement::Mouse,
         platform::WindowSizeChangeData,
         touch::Data,
         int>

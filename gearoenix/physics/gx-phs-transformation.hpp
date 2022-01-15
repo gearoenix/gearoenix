@@ -7,11 +7,15 @@
 
 namespace gearoenix::physics {
 struct Transformation final : public core::ecs::Component {
+    GX_GET_CREF_PRV(math::Mat4x4<double>, matrix)
+    /// This is useful for caching the calculation
+    /// It gets updated in each loop so be careful and check the `changed` variable
+    GX_GET_CREF_PRV(math::Mat4x4<double>, inverted_matrix)
     GX_GET_CREF_PRV(math::Vec3<double>, x_axis)
     GX_GET_CREF_PRV(math::Vec3<double>, y_axis)
     GX_GET_CREF_PRV(math::Vec3<double>, z_axis)
     GX_GET_CREF_PRV(math::Vec3<double>, scale)
-    GX_GET_CREF_PRV(math::Mat4x4<double>, matrix)
+    GX_GET_VAL_PRV(bool, changed, true)
 
 public:
     Transformation() noexcept;
@@ -37,6 +41,7 @@ public:
     void local_y_scale(double s) noexcept;
     void local_z_scale(double s) noexcept;
     void set_orientation(const math::Quat<double>& q) noexcept;
+    void update() noexcept;
 };
 }
 #endif

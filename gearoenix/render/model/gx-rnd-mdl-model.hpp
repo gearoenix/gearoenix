@@ -28,6 +28,7 @@ struct Model final : public core::ecs::Component {
     boost::container::flat_map<texture::BindingPoint, std::shared_ptr<texture::Texture>> bound_textures;
     const std::shared_ptr<mesh::Mesh> bound_mesh;
     boost::container::flat_set<core::ecs::Entity::id_t> blocked_cameras;
+    std::uint64_t block_cameras_flags = static_cast<std::uint64_t>(-1);
     core::ecs::Entity::id_t scene_id = 0;
 
     Model(

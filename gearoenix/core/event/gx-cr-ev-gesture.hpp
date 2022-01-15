@@ -45,9 +45,9 @@ struct Scale {
 
 struct MouseDrag {
     GX_GET_REFC_PRV(Drag2D, base)
-    GX_GET_CVAL_PRV(button::MouseKeyId, key)
+    GX_GET_CVAL_PRV(platform::key::Id, key)
 
-    MouseDrag(Drag2D d, const button::MouseKeyId k) noexcept
+    MouseDrag(Drag2D d, const platform::key::Id k) noexcept
         : base(std::move(d))
         , key(k)
     {

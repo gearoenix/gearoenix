@@ -5,149 +5,149 @@
 
 static std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
 
-bool gearoenix::core::String::is_character(const event::button::KeyboardKeyId ki) noexcept
+bool gearoenix::core::String::is_character(const platform::key::Id ki) noexcept
 {
     return to_character(ki).has_value();
 }
 
-std::optional<wchar_t> gearoenix::core::String::to_character(const event::button::KeyboardKeyId ki, const bool sp, const Language l) noexcept
+std::optional<wchar_t> gearoenix::core::String::to_character(const platform::key::Id ki, const bool sp, const Language l) noexcept
 {
     if (l == Language::English) {
         switch (ki) {
-        case event::button::KeyboardKeyId::Enter:
-        case event::button::KeyboardKeyId::NumpadEnter:
+        case platform::key::Id::Enter:
+        case platform::key::Id::NumpadEnter:
             return '\n';
-        case event::button::KeyboardKeyId::Tilda:
+        case platform::key::Id::Tilda:
             return sp ? '~' : '`';
-        case event::button::KeyboardKeyId::Less:
+        case platform::key::Id::Less:
             return '<';
-        case event::button::KeyboardKeyId::Greater:
+        case platform::key::Id::Greater:
             return '>';
-        case event::button::KeyboardKeyId::Tab:
+        case platform::key::Id::Tab:
             return '\t';
-        case event::button::KeyboardKeyId::Space:
+        case platform::key::Id::Space:
             return ' ';
-        case event::button::KeyboardKeyId::Minus:
+        case platform::key::Id::Minus:
             return sp ? '_' : '-';
-        case event::button::KeyboardKeyId::NumpadMinus:
+        case platform::key::Id::NumpadMinus:
             return '-';
-        case event::button::KeyboardKeyId::Equal:
+        case platform::key::Id::Equal:
             return sp ? '+' : '=';
-        case event::button::KeyboardKeyId::LeftBracket:
+        case platform::key::Id::LeftBracket:
             return sp ? '{' : '[';
-        case event::button::KeyboardKeyId::RightBracket:
+        case platform::key::Id::RightBracket:
             return sp ? '}' : ']';
-        case event::button::KeyboardKeyId::Semicolon:
+        case platform::key::Id::Semicolon:
             return sp ? ':' : ';';
-        case event::button::KeyboardKeyId::Quote:
+        case platform::key::Id::Quote:
             return sp ? '"' : '\'';
-        case event::button::KeyboardKeyId::Comma:
+        case platform::key::Id::Comma:
             return sp ? '<' : ',';
-        case event::button::KeyboardKeyId::Dot:
+        case platform::key::Id::Dot:
             return sp ? '>' : '.';
-        case event::button::KeyboardKeyId::NumpadDot:
+        case platform::key::Id::NumpadDot:
             return '.';
-        case event::button::KeyboardKeyId::Slash:
+        case platform::key::Id::Slash:
             return sp ? '?' : '/';
-        case event::button::KeyboardKeyId::NumpadSlash:
+        case platform::key::Id::NumpadSlash:
             return '/';
-        case event::button::KeyboardKeyId::Backslash:
+        case platform::key::Id::Backslash:
             return sp ? '|' : '\\';
-        case event::button::KeyboardKeyId::Num0:
+        case platform::key::Id::Num0:
             return sp ? ')' : '0';
-        case event::button::KeyboardKeyId::Numpad0:
+        case platform::key::Id::Numpad0:
             return '0';
-        case event::button::KeyboardKeyId::Num1:
+        case platform::key::Id::Num1:
             return sp ? '!' : '1';
-        case event::button::KeyboardKeyId::Numpad1:
+        case platform::key::Id::Numpad1:
             return '1';
-        case event::button::KeyboardKeyId::Num2:
+        case platform::key::Id::Num2:
             return sp ? '@' : '2';
-        case event::button::KeyboardKeyId::Numpad2:
+        case platform::key::Id::Numpad2:
             return '2';
-        case event::button::KeyboardKeyId::Num3:
+        case platform::key::Id::Num3:
             return sp ? '#' : '3';
-        case event::button::KeyboardKeyId::Numpad3:
+        case platform::key::Id::Numpad3:
             return '3';
-        case event::button::KeyboardKeyId::Num4:
+        case platform::key::Id::Num4:
             return sp ? '$' : '4';
-        case event::button::KeyboardKeyId::Numpad4:
+        case platform::key::Id::Numpad4:
             return '4';
-        case event::button::KeyboardKeyId::Num5:
+        case platform::key::Id::Num5:
             return sp ? '%' : '5';
-        case event::button::KeyboardKeyId::Numpad5:
+        case platform::key::Id::Numpad5:
             return '5';
-        case event::button::KeyboardKeyId::Num6:
+        case platform::key::Id::Num6:
             return sp ? '^' : '6';
-        case event::button::KeyboardKeyId::Numpad6:
+        case platform::key::Id::Numpad6:
             return '6';
-        case event::button::KeyboardKeyId::Num7:
+        case platform::key::Id::Num7:
             return sp ? '&' : '7';
-        case event::button::KeyboardKeyId::Numpad7:
+        case platform::key::Id::Numpad7:
             return '7';
-        case event::button::KeyboardKeyId::Num8:
+        case platform::key::Id::Num8:
             return sp ? '*' : '8';
-        case event::button::KeyboardKeyId::Numpad8:
+        case platform::key::Id::Numpad8:
             return '8';
-        case event::button::KeyboardKeyId::Num9:
+        case platform::key::Id::Num9:
             return sp ? '(' : '9';
-        case event::button::KeyboardKeyId::Numpad9:
+        case platform::key::Id::Numpad9:
             return '9';
-        case event::button::KeyboardKeyId::NumpadStar:
+        case platform::key::Id::NumpadStar:
             return '*';
-        case event::button::KeyboardKeyId::NumpadPlus:
+        case platform::key::Id::NumpadPlus:
             return '+';
-        case event::button::KeyboardKeyId::A:
+        case platform::key::Id::A:
             return sp ? 'A' : 'a';
-        case event::button::KeyboardKeyId::B:
+        case platform::key::Id::B:
             return sp ? 'B' : 'b';
-        case event::button::KeyboardKeyId::C:
+        case platform::key::Id::C:
             return sp ? 'C' : 'c';
-        case event::button::KeyboardKeyId::D:
+        case platform::key::Id::D:
             return sp ? 'D' : 'd';
-        case event::button::KeyboardKeyId::E:
+        case platform::key::Id::E:
             return sp ? 'E' : 'e';
-        case event::button::KeyboardKeyId::F:
+        case platform::key::Id::F:
             return sp ? 'F' : 'f';
-        case event::button::KeyboardKeyId::G:
+        case platform::key::Id::G:
             return sp ? 'G' : 'g';
-        case event::button::KeyboardKeyId::H:
+        case platform::key::Id::H:
             return sp ? 'H' : 'h';
-        case event::button::KeyboardKeyId::I:
+        case platform::key::Id::I:
             return sp ? 'I' : 'i';
-        case event::button::KeyboardKeyId::J:
+        case platform::key::Id::J:
             return sp ? 'J' : 'j';
-        case event::button::KeyboardKeyId::K:
+        case platform::key::Id::K:
             return sp ? 'K' : 'k';
-        case event::button::KeyboardKeyId::L:
+        case platform::key::Id::L:
             return sp ? 'L' : 'l';
-        case event::button::KeyboardKeyId::M:
+        case platform::key::Id::M:
             return sp ? 'M' : 'm';
-        case event::button::KeyboardKeyId::N:
+        case platform::key::Id::N:
             return sp ? 'N' : 'n';
-        case event::button::KeyboardKeyId::O:
+        case platform::key::Id::O:
             return sp ? 'O' : 'o';
-        case event::button::KeyboardKeyId::P:
+        case platform::key::Id::P:
             return sp ? 'P' : 'p';
-        case event::button::KeyboardKeyId::Q:
+        case platform::key::Id::Q:
             return sp ? 'Q' : 'q';
-        case event::button::KeyboardKeyId::R:
+        case platform::key::Id::R:
             return sp ? 'R' : 'r';
-        case event::button::KeyboardKeyId::S:
+        case platform::key::Id::S:
             return sp ? 'S' : 's';
-        case event::button::KeyboardKeyId::T:
+        case platform::key::Id::T:
             return sp ? 'T' : 't';
-        case event::button::KeyboardKeyId::U:
+        case platform::key::Id::U:
             return sp ? 'U' : 'u';
-        case event::button::KeyboardKeyId::V:
+        case platform::key::Id::V:
             return sp ? 'V' : 'v';
-        case event::button::KeyboardKeyId::W:
+        case platform::key::Id::W:
             return sp ? 'W' : 'w';
-        case event::button::KeyboardKeyId::X:
+        case platform::key::Id::X:
             return sp ? 'X' : 'x';
-        case event::button::KeyboardKeyId::Y:
+        case platform::key::Id::Y:
             return sp ? 'Y' : 'y';
-        case event::button::KeyboardKeyId::Z:
+        case platform::key::Id::Z:
             return sp ? 'Z' : 'z';
         default:
             return std::nullopt;
@@ -168,7 +168,8 @@ std::wstring gearoenix::core::String::to_wstring(const std::string& s) noexcept
 
 const wchar_t* gearoenix::core::String::to_wchar_ptr(const std::string& s) noexcept
 {
-    static thread_local auto w = to_wstring(s);
+    static thread_local std::wstring w;
+    w = to_wstring(s);
     return w.c_str();
 }
 

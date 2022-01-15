@@ -27,13 +27,16 @@ struct Scene final : public core::ecs::Component {
     GX_GETSET_VAL_PRV(double, layer, 0.0)
     GX_GETSET_VAL_PRV(bool, is_enabled, true)
 
+private:
+    boost::container::flat_map<core::ecs::Entity::id_t, std::uint64_t> cameras_flags;
+
 public:
     Scene(engine::Engine& e, double layer) noexcept;
     ~Scene() noexcept final;
     Scene(Scene&&) noexcept;
     void add_model(core::ecs::Entity::id_t entity, model::Model& m) noexcept;
     void add_camera(core::ecs::Entity::id_t entity, camera::Camera& c) noexcept;
-    void update() noexcept;
+    void update(core::ecs::Entity::id_t scene_entity_id) noexcept;
 };
 }
 #endif

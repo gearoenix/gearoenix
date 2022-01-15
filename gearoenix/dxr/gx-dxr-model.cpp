@@ -4,6 +4,7 @@
 #include "../core/gx-cr-string.hpp"
 #include "../render/material/gx-rnd-mat-pbr.hpp"
 #include "../render/mesh/gx-rnd-msh-mesh.hpp"
+#include "../render/model/gx-rnd-mdl-model.hpp"
 #include "gx-dxr-buffer.hpp"
 #include "gx-dxr-device.hpp"
 #include "gx-dxr-engine.hpp"
@@ -11,7 +12,6 @@
 #include "gx-dxr-texture.hpp"
 #include "gx-dxr-uploader.hpp"
 #include "shaders/gx-dxr-shd-common.hpp"
-#include <map>
 
 gearoenix::dxr::Model::Model(
     Engine& e,

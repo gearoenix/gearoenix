@@ -51,7 +51,7 @@ gearoenix::dxr::GpuBuffer::GpuBuffer(
     resource->SetName(resource_name);
 }
 
-gearoenix::dxr::UniformBuffer::UniformBuffer(const Engine& e, UINT buffer_size, LPCWSTR resource_name) noexcept
+gearoenix::dxr::UniformBuffer::UniformBuffer(const Engine& e, const UINT buffer_size, LPCWSTR resource_name) noexcept
     : buffer(e.get_device()->get_device().Get(), math::Numeric::align(buffer_size, 256U), resource_name)
     , descriptor(e.get_descriptor_manager()->allocate_others())
 {

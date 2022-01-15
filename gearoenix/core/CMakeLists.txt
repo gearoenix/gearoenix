@@ -17,16 +17,17 @@ SET(GX_ENGINE_CORE_SRC
         ${GX_ENGINE_CORE_SRC_DIR}/ecs/gx-cr-ecs-types.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/ecs/gx-cr-ecs-world.cpp
         ${GX_ENGINE_CORE_SRC_DIR}/ecs/gx-cr-ecs-world.hpp
-#        ${GX_ENGINE_CORE_SRC_DIR}/event/gx-cr-ev-engine.cpp
-#        ${GX_ENGINE_CORE_SRC_DIR}/event/gx-cr-ev-engine.hpp
-#        ${GX_ENGINE_CORE_SRC_DIR}/event/gx-cr-ev-event.hpp
-#        ${GX_ENGINE_CORE_SRC_DIR}/event/gx-cr-ev-gesture.hpp
-#        ${GX_ENGINE_CORE_SRC_DIR}/event/gx-cr-ev-id.hpp
-#        ${GX_ENGINE_CORE_SRC_DIR}/event/gx-cr-ev-listener.hpp
-#        ${GX_ENGINE_CORE_SRC_DIR}/event/gx-cr-ev-movement.hpp
-#        ${GX_ENGINE_CORE_SRC_DIR}/event/gx-cr-ev-point.hpp
-#        ${GX_ENGINE_CORE_SRC_DIR}/event/gx-cr-ev-system.hpp
-#        ${GX_ENGINE_CORE_SRC_DIR}/event/gx-cr-ev-touch.hpp
+        ${GX_ENGINE_CORE_SRC_DIR}/event/gx-cr-ev-button.hpp
+        ${GX_ENGINE_CORE_SRC_DIR}/event/gx-cr-ev-engine.cpp
+        ${GX_ENGINE_CORE_SRC_DIR}/event/gx-cr-ev-engine.hpp
+        ${GX_ENGINE_CORE_SRC_DIR}/event/gx-cr-ev-event.hpp
+        ${GX_ENGINE_CORE_SRC_DIR}/event/gx-cr-ev-gesture.hpp
+        ${GX_ENGINE_CORE_SRC_DIR}/event/gx-cr-ev-id.hpp
+        ${GX_ENGINE_CORE_SRC_DIR}/event/gx-cr-ev-listener.hpp
+        ${GX_ENGINE_CORE_SRC_DIR}/event/gx-cr-ev-movement.hpp
+        ${GX_ENGINE_CORE_SRC_DIR}/event/gx-cr-ev-point.hpp
+        ${GX_ENGINE_CORE_SRC_DIR}/event/gx-cr-ev-system.hpp
+        ${GX_ENGINE_CORE_SRC_DIR}/event/gx-cr-ev-touch.hpp
 #        ${GX_ENGINE_CORE_SRC_DIR}/graph/gx-cr-gr-graph.cpp
 #        ${GX_ENGINE_CORE_SRC_DIR}/graph/gx-cr-gr-graph.hpp
 #        ${GX_ENGINE_CORE_SRC_DIR}/graph/gx-cr-gr-link.cpp
@@ -38,6 +39,7 @@ SET(GX_ENGINE_CORE_SRC
 #        ${GX_ENGINE_CORE_SRC_DIR}/list/gx-cr-list.cpp
 #        ${GX_ENGINE_CORE_SRC_DIR}/list/gx-cr-list.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/macro/gx-cr-mcr-assert.hpp
+        ${GX_ENGINE_CORE_SRC_DIR}/macro/gx-cr-mcr-characterifier.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/macro/gx-cr-mcr-concatenate.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/macro/gx-cr-mcr-counter.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/macro/gx-cr-mcr-flagger.hpp
