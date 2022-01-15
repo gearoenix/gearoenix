@@ -17,12 +17,14 @@
 #include <gearoenix/render/texture/gx-rnd-txt-manager.hpp>
 #include <random>
 
-constexpr double position_limit = 10.0;
+constexpr static double position_limit = 2.0;
+constexpr static double cube_size = 0.05;
+constexpr static double max_speed = cube_size * 0.5;
 
 static std::random_device random_device;
 static std::default_random_engine random_engine;
 static std::uniform_real_distribution<double> space_distribution(-position_limit, position_limit);
-static std::uniform_real_distribution<double> speed_distribution(-1.0, 1.0);
+static std::uniform_real_distribution<double> speed_distribution(-max_speed, max_speed);
 static std::uniform_real_distribution<float> colour_distribution(0.0f, 1.0f);
 
 struct GameApp final : public gearoenix::core::Application {
@@ -40,9 +42,10 @@ struct GameApp final : public gearoenix::core::Application {
 
         void update() noexcept
         {
-            value.x = speed_distribution(random_engine);
-            value.y = speed_distribution(random_engine);
-            value.z = speed_distribution(random_engine);
+            value.x += speed_distribution(random_engine);
+            value.y += speed_distribution(random_engine);
+            value.z += speed_distribution(random_engine);
+            value *= 0.5;
         }
 
         Speed(Speed&&) noexcept = default;
@@ -81,14 +84,24 @@ struct GameApp final : public gearoenix::core::Application {
         auto cube_mesh = render_engine.get_mesh_manager()->build_cube(
             gearoenix::core::sync::EndCallerIgnored(end_callback));
 
-        auto model_builder = render_engine.get_model_manager()->build(
-            "triangle",
-            std::shared_ptr<gearoenix::render::mesh::Mesh>(cube_mesh),
-            gearoenix::core::sync::EndCallerIgnored(end_callback),
-            true);
-        gearoenix::render::material::Pbr material(render_engine);
-        model_builder->set_material(material);
-        scene_builder->add(std::move(model_builder));
+        const auto threads_count = std::thread::hardware_concurrency();
+        const auto models_count = threads_count * 1000;
+        for (auto model_index = decltype(threads_count) { 0 }; model_index < models_count; ++model_index) {
+            auto model_builder = render_engine.get_model_manager()->build(
+                "triangle" + std::to_string(model_index),
+                std::shared_ptr<gearoenix::render::mesh::Mesh>(cube_mesh),
+                gearoenix::core::sync::EndCallerIgnored(end_callback),
+                true);
+            gearoenix::render::material::Pbr material(render_engine);
+            model_builder->set_material(material);
+            Speed speed;
+            Position position;
+            auto& model_transformation = model_builder->get_transformation();
+            model_transformation.set_location(position.value);
+            model_transformation.local_scale(cube_size);
+            model_builder->get_entity_builder()->get_builder().add_components(std::move(speed), std::move(position));
+            scene_builder->add(std::move(model_builder));
+        }
 
         auto camera_builder = render_engine.get_camera_manager()->build("camera");
         camera_builder->get_transformation().set_location(0.0f, 0.0f, 5.0f);
@@ -102,6 +115,11 @@ struct GameApp final : public gearoenix::core::Application {
     {
         Application::update();
         camera_controller->update();
+        render_engine.get_world()->parallel_system<Speed, Position, gearoenix::physics::Transformation>([&](auto, Speed& speed, Position& position, gearoenix::physics::Transformation& trn, auto) noexcept {
+            position.update(render_engine.get_delta_time(), speed);
+            speed.update();
+            trn.set_location(position.value);
+        });
     }
 };
 

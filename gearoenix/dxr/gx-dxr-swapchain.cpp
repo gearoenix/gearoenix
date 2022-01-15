@@ -5,29 +5,21 @@
 #include "../platform/gx-plt-application.hpp"
 #include "gx-dxr-adapter.hpp"
 #include "gx-dxr-check.hpp"
+#include "gx-dxr-descriptor.hpp"
 #include "gx-dxr-device.hpp"
+#include "gx-dxr-engine.hpp"
 #include "gx-dxr-queue.hpp"
 #include <d3dx12.h>
 
-gearoenix::dxr::Swapchain::Swapchain(std::shared_ptr<Queue> q) noexcept
-    : queue(std::move(q))
-    , device(queue->get_device())
+gearoenix::dxr::Swapchain::Swapchain(Engine& e) noexcept
+    : queue(e.get_queue())
+    , device(e.get_device())
+    , descriptor_manager(e.get_descriptor_manager())
     , viewport {}
     , scissor {}
     , clear_colour { 0.3f, 0.15f, 0.115f, 1.0f }
 {
     auto* const dev = device->get_device().Get();
-    D3D12_DESCRIPTOR_HEAP_DESC rtv_descriptor_heap_desc;
-    GX_SET_ZERO(rtv_descriptor_heap_desc)
-    rtv_descriptor_heap_desc.NumDescriptors = GX_DXR_FRAMES_BACKBUFFER_NUMBER;
-    rtv_descriptor_heap_desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
-    GX_DXR_CHECK(dev->CreateDescriptorHeap(&rtv_descriptor_heap_desc, IID_PPV_ARGS(&rtv_descriptor_heap)))
-    rtv_descriptor_size = dev->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-    D3D12_DESCRIPTOR_HEAP_DESC dsv_descriptor_heap_desc;
-    GX_SET_ZERO(dsv_descriptor_heap_desc)
-    dsv_descriptor_heap_desc.NumDescriptors = 1;
-    dsv_descriptor_heap_desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
-    GX_DXR_CHECK(dev->CreateDescriptorHeap(&dsv_descriptor_heap_desc, IID_PPV_ARGS(&dsv_descriptor_heap)))
     // Create a fence for tracking GPU execution progress.
     GX_DXR_CHECK(dev->CreateFence(current_fence_value, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence)))
     for (UINT i = 1; i <= GX_DXR_FRAMES_BACKBUFFER_NUMBER; ++i)
@@ -47,13 +39,14 @@ bool gearoenix::dxr::Swapchain::set_window_size(const platform::Application& pla
     const auto window_width = static_cast<UINT>(base_plt_app.get_window_width());
     const auto window_height = static_cast<UINT>(base_plt_app.get_window_height());
     wait_for_gpu();
-    // Release resources that are tied to the swap chain
+    // Release resources that are tied to the swapchain
     for (auto& frame : frames) {
         frame.render_target.Reset();
+        frame.render_target_decriptor = nullptr;
     }
-    // If the swap chain already exists, resize it, otherwise create one.
+    // If the swapchain already exists, resize it, otherwise create one.
     if (swapchain) {
-        // If the swap chain already exists, resize it.
+        // If the swapchain already exists, resize it.
         HRESULT hr = swapchain->ResizeBuffers(
             GX_DXR_FRAMES_BACKBUFFER_NUMBER,
             window_width,
@@ -112,7 +105,7 @@ bool gearoenix::dxr::Swapchain::set_window_size(const platform::Application& pla
     for (UINT n = 0; n < GX_DXR_FRAMES_BACKBUFFER_NUMBER; ++n) {
         auto& frame = frames[n];
         auto& render_target = frame.render_target;
-        auto& rtv_descriptor = frame.rtv_descriptor;
+        auto& rtv_descriptor = frame.render_target_decriptor;
         GX_DXR_CHECK(swapchain->GetBuffer(n, IID_PPV_ARGS(&render_target)))
         const auto name = std::wstring(L"Render target ") + std::to_wstring(n);
         render_target->SetName(name.c_str());
@@ -122,10 +115,8 @@ bool gearoenix::dxr::Swapchain::set_window_size(const platform::Application& pla
         rtv_desc.Format = BACK_BUFFER_FORMAT;
         rtv_desc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
 
-        rtv_descriptor = CD3DX12_CPU_DESCRIPTOR_HANDLE(
-            rtv_descriptor_heap->GetCPUDescriptorHandleForHeapStart(),
-            static_cast<INT>(n), rtv_descriptor_size);
-        dev->CreateRenderTargetView(render_target.Get(), &rtv_desc, rtv_descriptor);
+        rtv_descriptor = std::make_unique<CpuDescriptor>(descriptor_manager->allocate_rtv());
+        dev->CreateRenderTargetView(render_target.Get(), &rtv_desc, rtv_descriptor->cpu_handle);
     }
     // Reset the index to the current back buffer.
     back_buffer_index = swapchain->GetCurrentBackBufferIndex();
@@ -145,12 +136,14 @@ bool gearoenix::dxr::Swapchain::set_window_size(const platform::Application& pla
         D3D12_RESOURCE_STATE_DEPTH_WRITE,
         &depth_optimized_clear_value,
         IID_PPV_ARGS(&depth_stencil)))
-    depth_stencil->SetName(L"DepthStencil");
+    depth_stencil->SetName(L"main-depth-stencil");
+    depth_stencil_descriptor = nullptr; // making space for new one
+    depth_stencil_descriptor = std::make_unique<CpuDescriptor>(descriptor_manager->allocate_dsv());
     D3D12_DEPTH_STENCIL_VIEW_DESC dsv_desc;
     GX_SET_ZERO(dsv_desc)
     dsv_desc.Format = DEPTH_BUFFER_FORMAT;
     dsv_desc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
-    dev->CreateDepthStencilView(depth_stencil.Get(), &dsv_desc, dsv_descriptor_heap->GetCPUDescriptorHandleForHeapStart());
+    dev->CreateDepthStencilView(depth_stencil.Get(), &dsv_desc, depth_stencil_descriptor->cpu_handle);
     // Set the 3D rendering viewport and scissor rectangle to target the entire window.
     viewport.TopLeftX = viewport.TopLeftY = 0.f;
     viewport.Width = static_cast<FLOAT>(window_width);
@@ -194,12 +187,13 @@ void gearoenix::dxr::Swapchain::prepare(ID3D12GraphicsCommandList6* const cmd) n
     auto& frame = frames[back_buffer_index];
     cmd->RSSetViewports(1, &viewport);
     cmd->RSSetScissorRects(1, &scissor);
-    cmd->OMSetRenderTargets(1, &frame.rtv_descriptor, false, nullptr);
+    cmd->OMSetRenderTargets(1, &frame.render_target_decriptor->cpu_handle, false, &depth_stencil_descriptor->cpu_handle);
 }
 
 void gearoenix::dxr::Swapchain::clear(ID3D12GraphicsCommandList6* const cmd) noexcept
 {
-    cmd->ClearRenderTargetView(frames[back_buffer_index].rtv_descriptor, clear_colour, 0, nullptr);
+    cmd->ClearRenderTargetView(frames[back_buffer_index].render_target_decriptor->cpu_handle, clear_colour, 0, nullptr);
+    cmd->ClearDepthStencilView(depth_stencil_descriptor->cpu_handle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 }
 
 void gearoenix::dxr::Swapchain::transit_to_present(ID3D12GraphicsCommandList6* const cmd) noexcept

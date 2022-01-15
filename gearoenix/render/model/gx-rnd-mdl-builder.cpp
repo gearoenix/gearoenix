@@ -41,3 +41,8 @@ void gearoenix::render::model::Builder::set_material(const material::Pbr& mat) n
     bts[texture::BindingPoint::NormalMetallic] = mat.get_normal__metallic();
     bts[texture::BindingPoint::EmissionRoughness] = mat.get_emission__roughness();
 }
+
+gearoenix::physics::Transformation& gearoenix::render::model::Builder::get_transformation() noexcept
+{
+    return *entity_builder->get_builder().get_component<physics::Transformation>();
+}

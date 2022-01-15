@@ -43,8 +43,8 @@ void gearoenix::dxr::Engine::device_lost_handle(const int failed_tries) noexcept
     model_manager = nullptr;
     mesh_manager = nullptr;
     uploader = nullptr;
-    descriptor_manager = nullptr;
     swapchain = nullptr;
+    descriptor_manager = nullptr;
     queue = nullptr;
     device = nullptr;
     adapter = nullptr;
@@ -59,8 +59,8 @@ void gearoenix::dxr::Engine::device_lost_handle(const int failed_tries) noexcept
     adapter = std::make_shared<Adapter>();
     device = std::make_shared<Device>(adapter);
     queue = std::make_shared<Queue>(device, Queue::Type::Direct);
-    swapchain = std::make_shared<Swapchain>(queue);
     descriptor_manager = std::make_shared<DescriptorManager>(device);
+    swapchain = std::make_shared<Swapchain>(*this);
     uploader = std::make_shared<Uploader>(device);
     mesh_manager = std::make_unique<MeshManager>(*this);
     model_manager = std::make_unique<ModelManager>(*this);

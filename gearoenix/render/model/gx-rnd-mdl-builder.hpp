@@ -10,6 +10,10 @@ namespace gearoenix::core::ecs {
 struct EntitySharedBuilder;
 }
 
+namespace gearoenix::physics {
+struct Transformation;
+}
+
 namespace gearoenix::render::engine {
 struct Engine;
 }
@@ -42,6 +46,7 @@ public:
 
     /// Sets the material of the mesh. It can be called only once and only one type of material must be set
     virtual void set_material(const material::Pbr& mat) noexcept;
+    [[nodiscard]] physics::Transformation& get_transformation() noexcept;
 };
 }
 #endif
