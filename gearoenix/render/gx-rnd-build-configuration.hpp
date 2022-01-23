@@ -30,6 +30,8 @@
 //#define GX_RENDER_OPENGL_ENABLED
 #elif defined(GX_PLATFORM_LINUX)
 #define GX_RENDER_VULKAN_ENABLED
+#elif defined(GX_PLATFORM_MACOS) || defined(GX_PLATFORM_IOS)
+#define GX_RENDER_METAL_ENABLED
 #else
 #error "Unexpected/unimplemented platform."
 #endif

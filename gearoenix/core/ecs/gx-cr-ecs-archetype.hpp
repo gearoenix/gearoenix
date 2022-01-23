@@ -94,7 +94,7 @@ private:
     }
 
     template <typename... ComponentsTypes>
-    [[nodiscard]] static constexpr Archetype create() noexcept
+    [[nodiscard]] static Archetype create() noexcept
     {
         Component::types_check<ComponentsTypes...>();
         return Archetype(get_components_size<ComponentsTypes...>(), get_components_indices<ComponentsTypes...>());

@@ -1,10 +1,14 @@
 SET(GX_ENGINE_PLATFORM_SRC_DIR ${GX_ENGINE_SRC_DIR}/platform)
+
+ADD_SUBDIRECTORY(macos)
+
 SET(GX_ENGINE_PLATFORM_SRC
         ${GX_ENGINE_PLATFORM_SRC_DIR}/android/gx-plt-and-application.cpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/android/gx-plt-and-application.hpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/android/gx-plt-and-log.cpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/android/gx-plt-and-log.hpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/android/gx-plt-gl-context.cpp
+        ${GX_ENGINE_PLATFORM_MACOS_SRC}
         ${GX_ENGINE_PLATFORM_SRC_DIR}/macro/gx-plt-mcr-disable-warnings.hpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/macro/gx-plt-mcr-enable-warnings.hpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/macro/gx-plt-mcr-lock.hpp

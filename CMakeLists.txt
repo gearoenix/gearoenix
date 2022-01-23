@@ -15,7 +15,7 @@ SET_PROPERTY(GLOBAL PROPERTY USE_FOLDERS ON)
 OPTION(GX_COVERAGE_ENABLED "Enables the measurement of test coverages" OFF)
 
 IF (CMAKE_SYSTEM_NAME MATCHES "Linux")
-    SET(LINUX TRUE)
+    SET(GX_IN_LINUX TRUE)
 ENDIF()
 
 IF (GX_COVERAGE_ENABLED)
@@ -45,14 +45,20 @@ ELSE ()
     SET(CMAKE_CXX_FLAGS "-std=c++20 ${CMAKE_CXX_FLAGS}")
 ENDIF ()
 
+SET(GX_IN_IOS OFF)
+
 IF (APPLE)
     SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -x objective-c")
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -x objective-c++")
-ENDIF ()
+    IF (CMAKE_SYSTEM_NAME MATCHES "iOS")
+        SET(GX_IN_IOS ON)
+    ENDIF (CMAKE_SYSTEM_NAME MATCHES "iOS")
+    MESSAGE(STATUS "Compilation for iOS activation status: ${GX_IN_IOS}")
+ENDIF (APPLE)
 
-IF (LINUX)
+IF (GX_IN_LINUX)
     SET(GX_LIBS ${GX_LIBS} dl)
-ENDIF ()
+ENDIF (GX_IN_LINUX)
 
 SET(GX_SDK_PATH "${CMAKE_SOURCE_DIR}/sdk")
 SET(GX_SDK_LIB_PATH "${GX_SDK_PATH}/libs/")
@@ -60,7 +66,7 @@ SET(GX_SDK_LIB_PATH "${GX_SDK_PATH}/libs/")
 SET(GX_UNCOMPRESS_TOP_FOLDER "ON")
 
 SET(GX_SDL2_PATH "${GX_SDK_PATH}/sdl2")
-GX_DOWNLOAD_FILE("https://www.libsdl.org/release/SDL2-2.0.14.zip" "${GX_SDL2_PATH}")
+GX_DOWNLOAD_FILE("https://www.libsdl.org/release/SDL2-2.0.20.zip" "${GX_SDL2_PATH}")
 GX_COMPILE_LIB(${GX_SDL2_PATH})
 SET(GX_SDL2_INCLUDE_DIRS "${GX_SDL2_PATH}/include")
 INCLUDE_DIRECTORIES(${GX_SDL2_INCLUDE_DIRS})
@@ -74,14 +80,13 @@ IF(LINUX)
             m dl asound pthread pulse-simple pulse X11 Xext Xcursor Xinerama Xi Xrandr Xss Xxf86vm drm gbm
             wayland-egl wayland-client wayland-cursor xkbcommon rt)
 ELSEIF(MSVC)
-    SET(GX_COMMON_LIBS winmm version oleaut32 imm32 setupapi d3d12 dxgi dxguid)
-    SET(GX_DEBUG_LIBS
-            ${GX_DEBUG_LIBS}
-            ${GX_COMMON_LIBS})
-    SET(GX_RELEASE_LIBS
-            ${GX_RELEASE_LIBS}
-            ${GX_COMMON_LIBS})
+    SET(GX_COMMON_LIBS ${GX_COMMON_LIBS} winmm version oleaut32 imm32 setupapi d3d12 dxgi dxguid)
+ELSEIF(APPLE)
+    SET(GX_COMMON_LIBS ${GX_COMMON_LIBS} iconv)
 ENDIF()
+
+SET(GX_DEBUG_LIBS ${GX_DEBUG_LIBS} ${GX_COMMON_LIBS})
+SET(GX_RELEASE_LIBS ${GX_RELEASE_LIBS} ${GX_COMMON_LIBS})
 
 SET(GX_STB_PATH "${GX_SDK_PATH}/stb")
 GX_DOWNLOAD_FILE("https://github.com/nothings/stb/archive/master.zip" "${GX_STB_PATH}")

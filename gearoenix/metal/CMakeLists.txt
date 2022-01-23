@@ -1,0 +1,5 @@
+SET(GX_ENGINE_METAL_SRC_DIR ${GX_ENGINE_SRC_DIR}/metal)
+SET(GX_ENGINE_METAL_SRC
+        ${GX_ENGINE_METAL_SRC_DIR}/gx-mtl-engine.hpp
+        ${GX_ENGINE_METAL_SRC_DIR}/gx-mtl-engine.mm
+        PARENT_SCOPE)

@@ -35,7 +35,7 @@
 #if TARGET_OS_IPHONE
 #define GX_PLATFORM_IOS
 #elif TARGET_OS_MAC
-#define GX_PLATFORM_MAC
+#define GX_PLATFORM_MACOS
 #define GX_PLATFORM_DESKTOP
 #else
 #error "Unknown Apple platform"

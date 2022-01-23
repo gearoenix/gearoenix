@@ -17,6 +17,10 @@
 #include "../../dxr/gx-dxr-engine.hpp"
 #endif
 
+#ifdef GX_RENDER_METAL_ENABLED
+#include "../../metal/gx-mtl-engine.hpp"
+#endif
+
 #include <imgui.h>
 
 gearoenix::render::engine::Engine::Engine(
@@ -58,8 +62,8 @@ std::unique_ptr<gearoenix::render::engine::Engine> gearoenix::render::engine::En
     }
 #endif
 #ifdef GX_RENDER_METAL_ENABLED
-    if (result == nullptr && configuration.get_metal_render_backend_enabled() && metal::engine::Engine::is_supported()) {
-        result = metal::engine::Engine::construct(configuration, std::move(platform_application));
+    if (result == nullptr && configuration.get_metal_render_backend_enabled() && metal::Engine::is_supported()) {
+        result = metal::Engine::construct(platform_application);
     }
 #endif
 #ifdef GX_RENDER_OPENGL_ENABLED
