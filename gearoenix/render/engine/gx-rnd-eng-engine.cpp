@@ -37,11 +37,14 @@ gearoenix::render::engine::Engine::Engine(
 std::set<gearoenix::render::engine::Type> gearoenix::render::engine::Engine::get_available_engines() noexcept
 {
     return {
-#ifdef GX_RENDER_VULKAN_ENABLED
-        Type::Vulkan,
-#endif
 #ifdef GX_RENDER_DXR_ENABLED
         Type::Direct3DX,
+#endif
+#ifdef GX_RENDER_METAL_ENABLED
+        Type::Metal,
+#endif
+#ifdef GX_RENDER_VULKAN_ENABLED
+        Type::Vulkan,
 #endif
     };
 }

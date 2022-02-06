@@ -1,9 +1,11 @@
 #include "gx-mtl-engine.hpp"
 #ifdef GX_RENDER_METAL_ENABLED
+#include "../platform/gx-plt-application.hpp"
 
 gearoenix::metal::Engine::Engine(platform::Application& platform_application) noexcept
     : render::engine::Engine(render::engine::Type::Metal, platform_application)
 {
+    
 }
 
 gearoenix::metal::Engine::~Engine() noexcept = default;

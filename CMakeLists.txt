@@ -32,7 +32,6 @@ INCLUDE(gx-compile-lib)
 INCLUDE(gx-download-file)
 INCLUDE(gx-flag-util)
 INCLUDE(gx-imgui)
-INCLUDE(gx-compile-shader)
 
 MESSAGE(STATUS "Gearoenix is going to be compiled for ${CMAKE_SYSTEM_NAME}")
 

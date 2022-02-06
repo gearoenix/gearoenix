@@ -34,7 +34,8 @@
     metal_kit_view = [[MTKView alloc] initWithFrame:[main_window contentLayoutRect] device:device];
     [metal_kit_view setClearColor:MTLClearColorMake(1, 1, 0, 1)];
     [metal_kit_view setColorPixelFormat:MTLPixelFormatBGRA8Unorm];
-    [metal_kit_view setDepthStencilPixelFormat:MTLPixelFormatDepth32Float];
+    [metal_kit_view setDepthStencilPixelFormat:MTLPixelFormatDepth32Float_Stencil8];
+    [metal_kit_view setSampleCount:1];
     [metal_kit_view addTrackingArea:[
         [NSTrackingArea alloc] initWithRect:[[NSScreen mainScreen] frame]
         options:NSTrackingMouseMoved | NSTrackingActiveAlways | NSTrackingAssumeInside | NSTrackingEnabledDuringMouseDrag
@@ -58,6 +59,7 @@
 
 - (void)drawInMTKView:(nonnull MTKView *)view {
     //NSLog(@"frame render has been started.");
+    os_app->update();
 }
 
 - (void)mtkView:(nonnull MTKView *)view drawableSizeWillChange:(CGSize)size {

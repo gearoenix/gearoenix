@@ -25,6 +25,7 @@ public:
     Application(GX_MAIN_ENTRY_ARGS_DEF, const RuntimeConfiguration& config = RuntimeConfiguration()) noexcept;
     ~Application() noexcept;
     void run(core::Application* = nullptr) noexcept;
+    void update() noexcept;
 };
 }
 #endif

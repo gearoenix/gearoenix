@@ -10,6 +10,7 @@ gearoenix::platform::Application::Application(GX_MAIN_ENTRY_ARGS_DEF, const Runt
     [NSApplication sharedApplication];
     [NSApp setDelegate:app_delegate];
     [app_delegate start:this config:config];
+    base.initialize_engine(*this);
 }
 
 gearoenix::platform::Application::~Application() noexcept 
@@ -19,6 +20,11 @@ void gearoenix::platform::Application::run(core::Application* const core_app) no
 {
     base.initialize_core_application(*this, core_app);
     [NSApp run];
+}
+
+void gearoenix::platform::Application::update() noexcept
+{
+    base.update();
 }
 
 #endif

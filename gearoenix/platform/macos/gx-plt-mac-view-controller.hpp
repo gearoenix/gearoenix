@@ -10,9 +10,9 @@ struct Application;
 }
 
 @interface GearoenixPlatformViewController : NSViewController<MTKViewDelegate>
-@property NSWindow * main_window;
+@property (assign, nonnull) NSWindow * main_window;
 @property (readonly, nonnull) MTKView* metal_kit_view;
-@property gearoenix::platform::Application* os_app;
+@property (assign, nonnull) gearoenix::platform::Application* os_app;
 @end
 
 #endif
