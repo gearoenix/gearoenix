@@ -1,12 +1,12 @@
 #include "gx-plt-stm-stream.hpp"
 
-void gearoenix::platform::stream::Stream::built_in_type_read(void* const data, const core::Count length) noexcept
+void gearoenix::platform::stream::Stream::built_in_type_read(void* const data, const std::size_t length) noexcept
 {
     (void)read(data, length);
     if (endian_compatibility)
         return;
     auto* const c_data = static_cast<std::uint8_t*>(data);
-    for (core::Count i = 0, j = length - 1; i < j; ++i, --j) {
+    for (std::size_t i = 0, j = length - 1; i < j; ++i, --j) {
         const std::uint8_t tmp = c_data[i];
         c_data[i] = c_data[j];
         c_data[j] = tmp;
@@ -15,7 +15,7 @@ void gearoenix::platform::stream::Stream::built_in_type_read(void* const data, c
 
 std::string gearoenix::platform::stream::Stream::read_string() noexcept
 {
-    core::Count c;
+    std::size_t c;
     (void)read(c);
     std::string s;
     s.resize(c);

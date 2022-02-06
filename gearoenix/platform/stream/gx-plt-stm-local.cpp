@@ -48,10 +48,10 @@ gearoenix::platform::stream::Local* gearoenix::platform::stream::Local::open(con
     return new Local(std::move(file));
 }
 
-gearoenix::core::Count gearoenix::platform::stream::Local::read(void* data, core::Count length) noexcept
+std::size_t gearoenix::platform::stream::Local::read(void* data, std::size_t length) noexcept
 {
     file.read((char*)data, static_cast<std::size_t>(length));
-    const auto result = (core::Count)file.gcount();
+    const auto result = (std::size_t)file.gcount();
 #ifdef GX_DEBUG_MODE
     if (0 == result)
         GX_UNEXPECTED
@@ -60,11 +60,11 @@ gearoenix::core::Count gearoenix::platform::stream::Local::read(void* data, core
     return result;
 }
 
-gearoenix::core::Count gearoenix::platform::stream::Local::write(const void* data, core::Count length) noexcept
+std::size_t gearoenix::platform::stream::Local::write(const void* data, std::size_t length) noexcept
 {
-    const core::Count before = (core::Count)file.tellp();
+    const std::size_t before = (std::size_t)file.tellp();
     file.write((const char*)data, static_cast<std::size_t>(length));
-    const core::Count result = ((core::Count)file.tellp()) - before;
+    const std::size_t result = ((std::size_t)file.tellp()) - before;
 #ifdef GX_DEBUG_MODE
     if (0 == result)
         GX_UNEXPECTED
@@ -73,15 +73,15 @@ gearoenix::core::Count gearoenix::platform::stream::Local::write(const void* dat
     return result;
 }
 
-void gearoenix::platform::stream::Local::seek(core::Count offset) noexcept
+void gearoenix::platform::stream::Local::seek(std::size_t offset) noexcept
 {
     file.seekg(offset);
     file.seekp(offset);
 }
 
-gearoenix::core::Count gearoenix::platform::stream::Local::tell() noexcept
+std::size_t gearoenix::platform::stream::Local::tell() noexcept
 {
-    return static_cast<core::Count>(file.tellg());
+    return static_cast<std::size_t>(file.tellg());
 }
 
 bool gearoenix::platform::stream::Local::exist(const Application& app, const std::string& name) noexcept
@@ -90,11 +90,11 @@ bool gearoenix::platform::stream::Local::exist(const Application& app, const std
     return f.is_open() && f.good();
 }
 
-gearoenix::core::Count gearoenix::platform::stream::Local::size() noexcept
+std::size_t gearoenix::platform::stream::Local::size() noexcept
 {
     const auto o = file.tellg();
     file.seekg(0, std::ios::end);
     const auto s = file.tellg();
     file.seekg(o);
-    return static_cast<core::Count>(s);
+    return static_cast<std::size_t>(s);
 }

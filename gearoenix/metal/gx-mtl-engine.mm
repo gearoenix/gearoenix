@@ -1,9 +1,12 @@
 #include "gx-mtl-engine.hpp"
 #ifdef GX_RENDER_METAL_ENABLED
 #include "../platform/gx-plt-application.hpp"
+#include "gx-mtl-pipeline.hpp"
 
 gearoenix::metal::Engine::Engine(platform::Application& platform_application) noexcept
     : render::engine::Engine(render::engine::Type::Metal, platform_application)
+    , device(platform_application.get_view_controller().metal_kit_view.device)
+    , pipeline_manager(new PipelineManager(*this))
 {
     
 }

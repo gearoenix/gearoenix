@@ -2,10 +2,16 @@
 #define GEAROENIX_METAL_ENGINE_HPP
 #include "../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_METAL_ENABLED
-#include "../render/engine/gx-rnd-eng-engine.hpp"
+#import "../render/engine/gx-rnd-eng-engine.hpp"
+#import "../core/macro/gx-cr-mcr-getter-setter.hpp"
+#import <Metal/MTLDevice.h>
 
 namespace gearoenix::metal {
+struct PipelineManager;
     struct Engine final: public render::engine::Engine {
+        GX_GET_VAL_PRV(id<MTLDevice>, device, nil)
+        GX_GET_UPTR_PRV(PipelineManager, pipeline_manager)
+        
         Engine(platform::Application& platform_application) noexcept;
         ~Engine() noexcept final;
         void start_frame() noexcept final;

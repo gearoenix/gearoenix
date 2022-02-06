@@ -7,10 +7,10 @@ gearoenix::platform::stream::Memory::Memory() noexcept = default;
 
 gearoenix::platform::stream::Memory::~Memory() noexcept = default;
 
-gearoenix::core::Count gearoenix::platform::stream::Memory::read(void* d, core::Count length) noexcept
+std::size_t gearoenix::platform::stream::Memory::read(void* d, std::size_t length) noexcept
 {
-    const core::Count sz = length + index;
-    const core::Count result = sz > mem_data.size() ? mem_data.size() - index : length;
+    const std::size_t sz = length + index;
+    const std::size_t result = sz > mem_data.size() ? mem_data.size() - index : length;
 #ifdef GX_DEBUG_MODE
     if (0 == result)
         GX_UNEXPECTED;
@@ -20,24 +20,24 @@ gearoenix::core::Count gearoenix::platform::stream::Memory::read(void* d, core::
     return result;
 }
 
-gearoenix::core::Count gearoenix::platform::stream::Memory::write(const void* d, core::Count length) noexcept
+std::size_t gearoenix::platform::stream::Memory::write(const void* d, std::size_t length) noexcept
 {
-    const core::Count sz = length + index;
+    const std::size_t sz = length + index;
     if (sz <= mem_data.size()) {
         std::memcpy(&(mem_data[index]), d, length);
         return length;
     }
-    const core::Count li = ((core::Count)mem_data.size()) - index;
+    const std::size_t li = ((std::size_t)mem_data.size()) - index;
     if (li != 0)
         std::memcpy(&(mem_data[index]), d, li);
     const char* cd = (const char*)d;
-    for (core::Count i = li; i < length; ++i)
+    for (std::size_t i = li; i < length; ++i)
         mem_data.push_back(cd[i]);
     index = sz;
     return length;
 }
 
-void gearoenix::platform::stream::Memory::seek(core::Count offset) noexcept
+void gearoenix::platform::stream::Memory::seek(std::size_t offset) noexcept
 {
 #ifdef GX_DEBUG_MODE
     if (offset > mem_data.size())
@@ -46,12 +46,12 @@ void gearoenix::platform::stream::Memory::seek(core::Count offset) noexcept
     index = offset;
 }
 
-gearoenix::core::Count gearoenix::platform::stream::Memory::tell() noexcept
+std::size_t gearoenix::platform::stream::Memory::tell() noexcept
 {
     return index;
 }
 
-gearoenix::core::Count gearoenix::platform::stream::Memory::size() noexcept
+std::size_t gearoenix::platform::stream::Memory::size() noexcept
 {
     return mem_data.size();
 }

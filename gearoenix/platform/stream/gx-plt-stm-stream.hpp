@@ -1,6 +1,5 @@
 #ifndef GEAROENIX_SYSTEM_STREAM_STREAM_HPP
 #define GEAROENIX_SYSTEM_STREAM_STREAM_HPP
-#include "../../core/gx-cr-types.hpp"
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include <string>
 #include <type_traits>
@@ -13,17 +12,18 @@ struct Application;
 namespace gearoenix::platform::stream {
 struct Stream {
     GX_GETSET_VAL_PRT(bool, endian_compatibility, true)
+    
 protected:
     Stream() noexcept = default;
-    void built_in_type_read(void* data, core::Count length) noexcept;
+    void built_in_type_read(void* data, std::size_t length) noexcept;
 
 public:
     virtual ~Stream() noexcept = default;
-    [[nodiscard]] virtual core::Count read(void* data, core::Count length) noexcept = 0;
-    [[nodiscard]] virtual core::Count write(const void* data, core::Count length) noexcept = 0;
-    virtual void seek(core::Count offset) noexcept = 0;
-    [[nodiscard]] virtual core::Count tell() noexcept = 0;
-    [[nodiscard]] virtual core::Count size() noexcept = 0;
+    [[nodiscard]] virtual std::size_t read(void* data, std::size_t length) noexcept = 0;
+    [[nodiscard]] virtual std::size_t write(const void* data, std::size_t length) noexcept = 0;
+    virtual void seek(std::size_t offset) noexcept = 0;
+    [[nodiscard]] virtual std::size_t tell() noexcept = 0;
+    [[nodiscard]] virtual std::size_t size() noexcept = 0;
     [[nodiscard]] std::string read_string() noexcept;
     [[nodiscard]] bool read_bool() noexcept;
 
@@ -31,10 +31,10 @@ public:
     typename std::enable_if<sizeof(T) != 1, void>::type
     read(std::vector<T>& data) noexcept
     {
-        core::Count c;
+        std::size_t c;
         read(c);
         data.resize((size_t)c);
-        for (core::Count i = 0; i < c; ++i) {
+        for (std::size_t i = 0; i < c; ++i) {
             read(data[i]);
         }
     }
@@ -43,10 +43,10 @@ public:
     typename std::enable_if<sizeof(T) == 1, void>::type
     read(std::vector<T>& data) noexcept
     {
-        core::Count c;
+        std::size_t c;
         read(c);
         data.resize((size_t)c);
-        for (core::Count i = 0; i < c; ++i) {
+        for (std::size_t i = 0; i < c; ++i) {
             read(data[i]);
         }
     }
@@ -75,7 +75,7 @@ public:
     }
 
     template <typename T>
-    [[nodiscard]] core::Count write(const T& d) noexcept
+    [[nodiscard]] std::size_t write(const T& d) noexcept
     {
         return write(&d, sizeof(T));
     }

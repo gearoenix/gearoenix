@@ -33,19 +33,18 @@ private:
 #else
 #error "File usage is not specified!"
 #endif
-    void check_endian_compatibility() noexcept;
 
     Asset();
 
 public:
     ~Asset() noexcept final;
     /// It will return null if file does not exist
-    [[nodiscard]] static Asset* construct(platform::Application* plt_app, const std::string& name, bool relative_path = true) noexcept;
-    [[nodiscard]] core::Count read(void* data, core::Count length) noexcept final;
-    [[nodiscard]] core::Count write(const void* data, core::Count length) noexcept final;
-    void seek(core::Count offset) noexcept final;
-    [[nodiscard]] core::Count tell() noexcept final;
-    [[nodiscard]] core::Count size() noexcept final;
+    [[nodiscard]] static Asset* construct(platform::Application& platform_application, const std::string& name) noexcept;
+    [[nodiscard]] std::size_t read(void* data, std::size_t length) noexcept final;
+    [[nodiscard]] std::size_t write(const void* data, std::size_t length) noexcept final;
+    [[nodiscard]] std::size_t tell() noexcept final;
+    [[nodiscard]] std::size_t size() noexcept final;
+    void seek(std::size_t offset) noexcept final;
 };
 }
 
