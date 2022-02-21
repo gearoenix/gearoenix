@@ -2,13 +2,20 @@
 #ifdef GX_RENDER_METAL_ENABLED
 #include "../platform/gx-plt-application.hpp"
 #include "gx-mtl-pipeline.hpp"
+#import "gx-mtl-camera.hpp"
+#import "gx-mtl-mesh.hpp"
+#import "gx-mtl-model.hpp"
+#import "gx-mtl-uploader.hpp"
 
 gearoenix::metal::Engine::Engine(platform::Application& platform_application) noexcept
     : render::engine::Engine(render::engine::Type::Metal, platform_application)
-    , device(platform_application.get_view_controller().metal_kit_view.device)
+    , device(platform_application.get_app_delegate().view_controller.metal_kit_view.device)
     , pipeline_manager(new PipelineManager(*this))
+    , uploader(new Uploader(*this))
 {
-    
+    camera_manager = std::make_unique<CameraManager>(*this);
+    mesh_manager = std::make_unique<MeshManager>(*this);
+    model_manager = std::make_unique<ModelManager>(*this);
 }
 
 gearoenix::metal::Engine::~Engine() noexcept = default;

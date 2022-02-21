@@ -8,9 +8,11 @@
 
 namespace gearoenix::metal {
 struct PipelineManager;
+struct Uploader;
     struct Engine final: public render::engine::Engine {
         GX_GET_VAL_PRV(id<MTLDevice>, device, nil)
         GX_GET_UPTR_PRV(PipelineManager, pipeline_manager)
+        GX_GET_UPTR_PRV(Uploader, uploader)
         
         Engine(platform::Application& platform_application) noexcept;
         ~Engine() noexcept final;

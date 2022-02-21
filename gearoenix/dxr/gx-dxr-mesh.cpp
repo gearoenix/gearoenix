@@ -9,7 +9,6 @@
 #include "gx-dxr-texture.hpp"
 #include "gx-dxr-uploader.hpp"
 #include "shaders/gx-dxr-shd-common.hpp"
-#include <map>
 
 gearoenix::dxr::Mesh::Mesh(
     std::shared_ptr<GpuBuffer>&& in_vb,
