@@ -5,16 +5,12 @@
 #import "../core/ecs/gx-cr-ecs-component.hpp"
 #import "../render/camera/gx-rnd-cmr-builder.hpp"
 #import "../render/camera/gx-rnd-cmr-manager.hpp"
-#import "shaders/gx-mtl-shd-common.hpp"
-#import <Metal/MTLBuffer.h>
-#import <array>
-#import <memory>
-#import <string>
+#import "gx-mtl-buffer.hpp"
 
 namespace gearoenix::metal {
 struct Engine;
 struct Camera final : public core::ecs::Component {
-    std::array<id<MTLBuffer>, GEAROENIX_METAL_FRAMES_COUNT> uniforms;
+    UniformBuffer uniform;
 
     Camera(Engine& e, const std::string& name) noexcept;
     ~Camera() noexcept final;

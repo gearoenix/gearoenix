@@ -15,13 +15,13 @@ gearoenix::metal::PipelineManager::PipelineManager(Engine& e) noexcept
     const auto all_shaders_lib_file_content = all_shaders_lib_asset->get_file_content();
     all_shaders_lib = [e.get_device() newLibraryWithData:dispatch_data_create(all_shaders_lib_file_content.data(), all_shaders_lib_file_content.size(), nil, nil) error:nil];
     MTKView* view = e.get_platform_application().get_app_delegate().view_controller.metal_kit_view;
-    id<MTLFunction> vertex_function = [all_shaders_lib newFunctionWithName:@"gbuffers_filler_vertex_shader"];
-    id<MTLFunction> fragment_function = [all_shaders_lib newFunctionWithName:@"gbuffers_filler_fragment_shader"];
+    gbuffers_filler_vertex_shader = [all_shaders_lib newFunctionWithName:@"gbuffers_filler_vertex_shader"];
+    gbuffers_filler_fragment_shader = [all_shaders_lib newFunctionWithName:@"gbuffers_filler_fragment_shader"];
     MTLRenderPipelineDescriptor *pipeline_state_descriptor = [MTLRenderPipelineDescriptor new];
     pipeline_state_descriptor.label = @"RT Pipeline";
     pipeline_state_descriptor.sampleCount = view.sampleCount;
-    pipeline_state_descriptor.vertexFunction = vertex_function;
-    pipeline_state_descriptor.fragmentFunction = fragment_function;
+    pipeline_state_descriptor.vertexFunction = gbuffers_filler_vertex_shader;
+    pipeline_state_descriptor.fragmentFunction = gbuffers_filler_fragment_shader;
     pipeline_state_descriptor.vertexDescriptor = vertex_descriptions.pbr;
     pipeline_state_descriptor.colorAttachments[0].pixelFormat = view.colorPixelFormat;
     pipeline_state_descriptor.depthAttachmentPixelFormat = view.depthStencilPixelFormat;
@@ -30,6 +30,11 @@ gearoenix::metal::PipelineManager::PipelineManager(Engine& e) noexcept
     gbuffers_filler_ps = [e.get_device() newRenderPipelineStateWithDescriptor:pipeline_state_descriptor error:&error];
     if(nil == gbuffers_filler_ps)
         GX_LOG_F("Failed to create gbuffers filler pipeline state: " << [error.localizedFailureReason UTF8String])
+        
+    MTLDepthStencilDescriptor *depth_state_desc = [[MTLDepthStencilDescriptor alloc] init];
+    depth_state_desc.depthCompareFunction = MTLCompareFunctionLess;
+    depth_state_desc.depthWriteEnabled = YES;
+    depth_state = [e.get_device() newDepthStencilStateWithDescriptor:depth_state_desc];
 }
 
 #endif

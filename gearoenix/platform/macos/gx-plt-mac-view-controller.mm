@@ -32,7 +32,7 @@
     if (nil == device) device = raster_device;
     
     metal_kit_view = [[MTKView alloc] initWithFrame:[main_window contentLayoutRect] device:device];
-    [metal_kit_view setClearColor:MTLClearColorMake(1, 1, 0, 1)];
+    [metal_kit_view setClearColor:MTLClearColorMake(1, 0.5, 1, 1)];
     [metal_kit_view setColorPixelFormat:MTLPixelFormatBGRA8Unorm];
     [metal_kit_view setDepthStencilPixelFormat:MTLPixelFormatDepth32Float_Stencil8];
     [metal_kit_view setSampleCount:1];

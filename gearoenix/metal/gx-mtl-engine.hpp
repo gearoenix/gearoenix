@@ -9,10 +9,14 @@
 namespace gearoenix::metal {
 struct PipelineManager;
 struct Uploader;
+struct HeapManager;
+struct SubmissionManager;
     struct Engine final: public render::engine::Engine {
         GX_GET_VAL_PRV(id<MTLDevice>, device, nil)
         GX_GET_UPTR_PRV(PipelineManager, pipeline_manager)
         GX_GET_UPTR_PRV(Uploader, uploader)
+        GX_GET_UPTR_PRV(HeapManager, heap_manager)
+        GX_GET_UPTR_PRV(SubmissionManager, submission_manager)
         
         Engine(platform::Application& platform_application) noexcept;
         ~Engine() noexcept final;

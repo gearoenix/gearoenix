@@ -15,11 +15,11 @@ private:
 
 public:
     struct iterator final {
-        using difference_type = std::vector<T>::iterator::difference_type;
-        using value_type = std::vector<T>::iterator::value_type;
-        using pointer = std::vector<T>::iterator::pointer;
-        using reference = std::vector<T>::iterator::reference;
-        using iterator_category = std::vector<T>::iterator::iterator_category;
+        using difference_type = typename std::vector<T>::iterator::difference_type;
+        using value_type = typename std::vector<T>::iterator::value_type;
+        using pointer = typename std::vector<T>::iterator::pointer;
+        using reference = typename std::vector<T>::iterator::reference;
+        using iterator_category = typename std::vector<T>::iterator::iterator_category;
 
         constexpr iterator(const std::size_t index, Pool* const pool) noexcept
             : index(index)
@@ -62,11 +62,11 @@ public:
     };
 
     struct const_iterator final {
-        using difference_type = std::vector<T>::const_iterator::difference_type;
-        using value_type = std::vector<T>::const_iterator::value_type;
-        using pointer = std::vector<T>::const_iterator::pointer;
-        using reference = std::vector<T>::const_iterator::reference;
-        using iterator_category = std::vector<T>::const_iterator::iterator_category;
+        using difference_type = typename std::vector<T>::const_iterator::difference_type;
+        using value_type = typename std::vector<T>::const_iterator::value_type;
+        using pointer = typename std::vector<T>::const_iterator::pointer;
+        using reference = typename std::vector<T>::const_iterator::reference;
+        using iterator_category = typename std::vector<T>::const_iterator::iterator_category;
 
         constexpr const_iterator(const std::size_t index, const Pool* const pool) noexcept
             : index(index)

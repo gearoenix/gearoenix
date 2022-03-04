@@ -5,6 +5,7 @@
 #import "../core/sync/gx-cr-sync-end-caller.hpp"
 #import "../core/sync/gx-cr-sync-work-waiter.hpp"
 #import <Metal/MTLBuffer.h>
+#import <Metal/MTLTexture.h>
 #import <Metal/MTLCommandQueue.h>
 
 namespace gearoenix::metal {
@@ -25,6 +26,12 @@ public:
     void upload(id<MTLBuffer> destination, const std::vector<T>& data, core::sync::EndCallerIgnored&& c) noexcept {
         upload(destination, data.data(), data.size() * sizeof(T), std::move(c));
     }
+    
+    void upload(
+                id<MTLTexture> destination,
+                MTLTextureDescriptor* texture_descriptor,
+                std::vector<std::vector<std::uint8_t>>&& pixels,
+                core::sync::EndCallerIgnored&& c) noexcept;
 };
 }
 

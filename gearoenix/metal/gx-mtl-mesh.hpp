@@ -14,9 +14,10 @@ struct Mesh final : public render::mesh::Mesh {
     const NSUInteger indices_count;
 
     Mesh(
-        id<MTLBuffer>&& vb, id<MTLBuffer>&& ib, math::Aabb3<double>&& box,
+        id<MTLBuffer> vb, id<MTLBuffer> ib, math::Aabb3<double>&& box,
         NSUInteger vertex_size, NSUInteger vertices_size, NSUInteger indices_count) noexcept;
     ~Mesh() noexcept final;
+    Mesh(const Mesh&) = delete;
 };
 
 struct MeshManager final : render::mesh::Manager {

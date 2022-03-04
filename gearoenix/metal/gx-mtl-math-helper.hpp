@@ -3,9 +3,35 @@
 #include "../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_METAL_ENABLED
 #import <simd/simd.h>
+#import "../math/gx-math-matrix-4d.hpp"
 #import "../math/gx-math-vector-4d.hpp"
 
 namespace gearoenix::metal {
+template<typename T>
+inline matrix_float4x4 simd_make_float4x4_t(const math::Mat4x4<T>& v) noexcept {
+    return ::simd_matrix(
+                         ::simd_make_float4(
+                                            static_cast<float>(v.data[0][0]),
+                                            static_cast<float>(v.data[0][1]),
+                                            static_cast<float>(v.data[0][2]),
+                                            static_cast<float>(v.data[0][3])),
+                         ::simd_make_float4(
+                                            static_cast<float>(v.data[1][0]),
+                                            static_cast<float>(v.data[1][1]),
+                                            static_cast<float>(v.data[1][2]),
+                                            static_cast<float>(v.data[1][3])),
+                         ::simd_make_float4(
+                                            static_cast<float>(v.data[2][0]),
+                                            static_cast<float>(v.data[2][1]),
+                                            static_cast<float>(v.data[2][2]),
+                                            static_cast<float>(v.data[2][3])),
+                         ::simd_make_float4(
+                                            static_cast<float>(v.data[3][0]),
+                                            static_cast<float>(v.data[3][1]),
+                                            static_cast<float>(v.data[3][2]),
+                                            static_cast<float>(v.data[3][3])));
+}
+
 inline vector_float4 simd_make_float4(const math::Vec4<float>& v) noexcept {
     return ::simd_make_float4(v.x, v.y, v.z, v.w);
 }

@@ -237,7 +237,7 @@ private:
         if (node.leaf) {
             const auto data_size = node.left;
             const auto min_dis = minimum_distance;
-            const auto* min_data = nullptr;
+            const Data* min_data = nullptr;
             for (
                 std::size_t data_index = 0, data_ptr = ptr + sizeof(Leaf);
                 data_index < data_size;

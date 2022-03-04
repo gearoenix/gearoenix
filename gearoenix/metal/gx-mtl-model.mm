@@ -1,10 +1,13 @@
 #include "gx-mtl-model.hpp"
 #ifdef GX_RENDER_METAL_ENABLED
 #import "../core/ecs/gx-cr-ecs-entity.hpp"
-#import "gx-mtl-mesh.hpp"
-#import "gx-mtl-engine.hpp"
 #import "../render/model/gx-rnd-mdl-model.hpp"
+#import "gx-mtl-engine.hpp"
 #import "gx-mtl-math-helper.hpp"
+#import "gx-mtl-mesh.hpp"
+#import "gx-mtl-pipeline.hpp"
+#import "gx-mtl-texture.hpp"
+#import "shaders/gx-mtl-shd-common.hpp"
 
 gearoenix::metal::Model::Model(
     Engine& e,
@@ -12,27 +15,15 @@ gearoenix::metal::Model::Model(
     const NSUInteger buffer_size,
     const std::string& name) noexcept
     : core::ecs::Component(this)
+    , uniform(e, sizeof(ModelUniform), name)
+    , gbuffers_filler_args(e, e.get_pipeline_manager()->get_gbuffers_filler_vertex_shader(), GEAROENIX_METAL_GBUFFERS_FILLER_ARGUMENT_BUFFER_BIND_INDEX, name)
     , bound_mesh(std::move(bound_mesh))
 {
-    for(std::size_t uniform_index = 0; uniform_index < uniforms.size(); ++uniform_index)
-    {
-        auto& uniform = uniforms[uniform_index];
-        uniform = [e.get_device() newBufferWithLength:buffer_size options:MTLResourceStorageModeShared];
-        uniform.label = [NSString stringWithFormat:@"Gearoenix-ModelUniform-%s-%lu", name.c_str(), uniform_index];
-    }
 }
 
-gearoenix::metal::Model::~Model() noexcept {
-    for(auto& uniform: uniforms) if(nil != uniform) [uniform release];
-}
+gearoenix::metal::Model::~Model() noexcept = default;
 
-gearoenix::metal::Model::Model(Model&& o) noexcept: core::ecs::Component(this) {
-    for(std::size_t uniform_index = 0; uniform_index < uniforms.size(); ++uniform_index) {
-        auto& uniform = o.uniforms[uniform_index];
-        uniforms[uniform_index] = uniform;
-        uniform = nil;
-    }
-}
+gearoenix::metal::Model::Model(Model&& o) noexcept = default;
 
 gearoenix::metal::ModelBuilder::ModelBuilder(
     Engine& e,
@@ -51,21 +42,30 @@ void gearoenix::metal::ModelBuilder::set_material(const render::material::Pbr& m
     Model m(
         e,
         std::dynamic_pointer_cast<Mesh>(b.get_component<render::model::Model>()->bound_mesh),
-        sizeof(ModelUniform),
-        *b.get_name());
-    for (auto& uniform : m.uniforms) {
-        auto& u = *reinterpret_cast<ModelUniform*>(uniform.contents);
+        sizeof(ModelUniform), *b.get_name());
+    for(std::size_t frame_index = 0; frame_index < GEAROENIX_METAL_FRAMES_COUNT; ++frame_index) {
+        auto& u = *reinterpret_cast<ModelUniform*>(m.uniform.data(frame_index));
         u.colour_factor = simd_make_float4(mat.get_albedo_factor());
         u.emission_factor__alpha_cutoff = simd_make_float4(mat.get_emission_factor(), mat.get_alpha_cutoff());
         u.normal_scale__occlusion_strength = simd_make_float4(mat.get_normal_scale(), mat.get_occlusion_strength());
         u.metallic_factor__roughness_factor__radiance_lod_coefficient = simd_make_float4(mat.get_metallic_factor(), mat.get_roughness_factor(), mat.get_radiance_lod_coefficient(), 0.0f);
-        //const auto& at = *dynamic_cast<const Texture2D*>(mat.get_albedo().get());
-        //u.sampler_albedo_normal_emission = vector_uint4(
-        //    at.get_sampler_index(),
-        //    at.get_descriptor().resource_index,
-        //    dynamic_cast<const Texture2D*>(mat.get_normal__metallic().get())->get_descriptor().resource_index,
-         //   dynamic_cast<const Texture2D*>(mat.get_emission__roughness().get())->get_descriptor().resource_index);
     }
+    [m.gbuffers_filler_args.encoder
+     setBuffer:m.uniform.gpu offset:0
+     atIndex:GEAROENIX_METAL_GBUFFERS_FILLER_MODEL_UNIFORM_BIND_ID];
+    const Texture2D& at = *dynamic_cast<const Texture2D*>(mat.get_albedo().get());
+    [m.gbuffers_filler_args.encoder
+     setSamplerState:at.sampler
+     atIndex:GEAROENIX_METAL_GBUFFERS_FILLER_SAMPLER_BIND_ID];
+    [m.gbuffers_filler_args.encoder
+     setTexture:at.resource
+     atIndex:GEAROENIX_METAL_GBUFFERS_FILLER_ALBEDO_TEXTURE_BIND_ID];
+    [m.gbuffers_filler_args.encoder
+     setTexture:dynamic_cast<const Texture2D*>(mat.get_normal__metallic().get())->resource
+     atIndex:GEAROENIX_METAL_GBUFFERS_FILLER_NORMAL_METALLIC_TEXTURE_BIND_ID];
+    [m.gbuffers_filler_args.encoder
+     setTexture:dynamic_cast<const Texture2D*>(mat.get_emission__roughness().get())->resource
+     atIndex:GEAROENIX_METAL_GBUFFERS_FILLER_EMISSION_ROUGHNESS_TEXTURE_BIND_ID];
     b.add_component(std::move(m));
 }
 

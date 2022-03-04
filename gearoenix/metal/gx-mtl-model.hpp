@@ -3,18 +3,17 @@
 #include "../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_METAL_ENABLED
 #import "../core/ecs/gx-cr-ecs-component.hpp"
-#import "shaders/gx-mtl-shd-common.hpp"
 #import "../render/model/gx-rnd-mdl-builder.hpp"
 #import "../render/model/gx-rnd-mdl-manager.hpp"
-#import <Metal/MTLBuffer.h>
-#import <array>
+#import "gx-mtl-buffer.hpp"
 
 namespace gearoenix::metal {
 struct Engine;
 struct Mesh;
 struct Model final : public core::ecs::Component {
-    std::array<id<MTLBuffer>, GEAROENIX_METAL_FRAMES_COUNT> uniforms;
-    const std::shared_ptr<Mesh> bound_mesh;
+    UniformBuffer uniform;
+    ArgsBuffer gbuffers_filler_args;
+    std::shared_ptr<Mesh> bound_mesh;
 
     Model(
         Engine& e,
