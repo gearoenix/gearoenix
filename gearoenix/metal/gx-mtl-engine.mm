@@ -1,11 +1,12 @@
 #include "gx-mtl-engine.hpp"
 #ifdef GX_RENDER_METAL_ENABLED
-#include "../platform/gx-plt-application.hpp"
-#include "gx-mtl-pipeline.hpp"
+#import "../platform/gx-plt-application.hpp"
+#import "gx-mtl-buffer.hpp"
 #import "gx-mtl-camera.hpp"
 #import "gx-mtl-heap.hpp"
 #import "gx-mtl-mesh.hpp"
 #import "gx-mtl-model.hpp"
+#import "gx-mtl-pipeline.hpp"
 #import "gx-mtl-submission.hpp"
 #import "gx-mtl-texture.hpp"
 #import "gx-mtl-uploader.hpp"
@@ -16,6 +17,7 @@ gearoenix::metal::Engine::Engine(platform::Application& platform_application) no
     , pipeline_manager(new PipelineManager(*this))
     , uploader(new Uploader(*this))
     , heap_manager(new HeapManager(*this))
+    , buffer_manager(new BufferManager(*this))
     , submission_manager(new SubmissionManager(*this))
 {
     frames_count = GEAROENIX_METAL_FRAMES_COUNT;

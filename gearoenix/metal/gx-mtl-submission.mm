@@ -8,6 +8,7 @@
 #import "../render/camera/gx-rnd-cmr-camera.hpp"
 #import "../render/model/gx-rnd-mdl-model.hpp"
 #import "../render/scene/gx-rnd-scn-scene.hpp"
+#import "gx-mtl-buffer.hpp"
 #import "gx-mtl-camera.hpp"
 #import "gx-mtl-engine.hpp"
 #import "gx-mtl-heap.hpp"
@@ -58,8 +59,8 @@ void gearoenix::metal::SubmissionManager::update() noexcept
                 return;
             const auto camera_pool_index = camera_pool.emplace([&] { return CameraData(); });
             auto& camera_pool_ref = camera_pool[camera_pool_index];
-            camera_pool_ref.cpu_buffer = metal_camera.uniform.cpu[frame_number];
-            camera_pool_ref.gpu_buffer = metal_camera.uniform.gpu;
+            camera_pool_ref.uniform_ptr = metal_camera.uniform.data[frame_number];
+            camera_pool_ref.uniform_gpu_offset = metal_camera.uniform.gpu_offset;
             scene_pool_ref.cameras.emplace(
                 std::make_pair(camera.get_layer(), camera_id),
                 camera_pool_index);
@@ -79,8 +80,7 @@ void gearoenix::metal::SubmissionManager::update() noexcept
             if (render_model.scene_id != scene_id)
                 return;
             auto& mesh = *model.bound_mesh;
-            id<MTLBuffer> uniform_buffer = model.uniform.cpu[frame_number];
-            auto* const uniform_ptr = reinterpret_cast<ModelUniform*>(uniform_buffer.contents);
+            auto* const uniform_ptr = reinterpret_cast<ModelUniform*>(model.uniform.data[frame_number]);
             uniform_ptr->model = simd_make_float4x4_t(model_transform.get_matrix());
             uniform_ptr->transposed_reversed_model = simd_make_float4x4_t(model_transform.get_inverted_matrix().transposed());
             bvh.add({
@@ -104,7 +104,7 @@ void gearoenix::metal::SubmissionManager::update() noexcept
                 return;
             const auto camera_location = transform.get_location();
             auto& camera_data = camera_pool[scene_data.cameras[std::make_pair(render_camera.get_layer(), camera_id)]];
-            auto* const uniform_ptr = reinterpret_cast<CameraUniform*>(camera_data.cpu_buffer.contents);
+            auto* const uniform_ptr = reinterpret_cast<CameraUniform*>(camera_data.uniform_ptr);
             uniform_ptr->view_projection = simd_make_float4x4_t(render_camera.get_view_projection());
             camera_data.opaque_models_data.clear();
             camera_data.tranclucent_models_data.clear();
@@ -125,29 +125,25 @@ void gearoenix::metal::SubmissionManager::update() noexcept
     blit.label = @"Copy of uniform buffers";
     [blit pushDebugGroup:@"Copy pass"];
     
-    world->synchronised_system<Model>([&](const core::ecs::Entity::id_t scene_id, Model& m) {
-        m.uniform.update(blit, frame_number);
-    });
-    
-    world->synchronised_system<Camera>([&](const core::ecs::Entity::id_t scene_id, Camera& c) {
-        c.uniform.update(blit, frame_number);
-    });
+    e.get_buffer_manager()->update(blit, frame_number);
     
     [blit popDebugGroup];
     [blit endEncoding];
     
-    // std::vector<std::pair<id<MTLParallelRenderCommandEncoder>, id<MTLRenderCommandEncoder>>> encoders(std::thread::hardware_concurrency());
-    std::vector<std::pair<id<MTLParallelRenderCommandEncoder>, id<MTLRenderCommandEncoder>>> encoders(1);
+    std::vector<id<MTLRenderCommandEncoder>> encoders(std::thread::hardware_concurrency());
     
     for (auto& scene_layer_entity_id_pool_index : scenes) {
         auto& scene = scene_pool[scene_layer_entity_id_pool_index.second];
         for (auto& camera_layer_entity_id_pool_index : scene.cameras) {
             auto& camera = camera_pool[camera_layer_entity_id_pool_index.second];
+            id<MTLParallelRenderCommandEncoder> parallel_encoder = [cmd parallelRenderCommandEncoderWithDescriptor:render_pass_descriptor];
             
-            for(auto& [parallel_encoder, encoder]: encoders)
+            std::uint32_t encoder_index = 0;
+            for(auto& encoder: encoders)
             {
-                parallel_encoder = [cmd parallelRenderCommandEncoderWithDescriptor:render_pass_descriptor];
                 encoder = [parallel_encoder renderCommandEncoder];
+                encoder.label = [NSString stringWithFormat:@"Render-frame-%lu-camera-%u-thread-%u", e.get_frame_number_from_start(), camera_layer_entity_id_pool_index.first.second, ++encoder_index];
+                [encoder pushDebugGroup:encoder.label];
                 [encoder useHeap:e.get_heap_manager()->gpu];
                 [encoder setCullMode:MTLCullModeBack];
                 [encoder setFrontFacingWinding:MTLWindingClockwise];
@@ -155,25 +151,24 @@ void gearoenix::metal::SubmissionManager::update() noexcept
                 [encoder setDepthStencilState:e.get_pipeline_manager()->get_depth_state()];
             }
 
-            // core::sync::ParallelFor::seq_ranges_exec(camera.opaque_models_data.begin(), camera.opaque_models_data.end(), [&](std::pair<double, ModelData>& distance_model_data, const unsigned int thread_index) {
-            for(auto& distance_model_data: camera.opaque_models_data) { const std::size_t thread_index = 0;
+            core::sync::ParallelFor::seq_ranges_exec(camera.opaque_models_data.begin(), camera.opaque_models_data.end(), [&](std::pair<double, ModelData>& distance_model_data, const unsigned int thread_index) {
                 auto& model_data = distance_model_data.second;
-                const auto& enc = encoders[thread_index].second;
+                const auto& enc = encoders[thread_index];
                 [enc setVertexBuffer:model_data.vertex offset:0 atIndex:GEAROENIX_METAL_GBUFFERS_FILLER_VERTEX_BUFFER_BIND_INDEX];
-                [enc setVertexBuffer:camera.gpu_buffer offset:0 atIndex:GEAROENIX_METAL_GBUFFERS_FILLER_CAMERA_UNIFORM_BIND_INDEX];
+                [enc setVertexBuffer:e.get_buffer_manager()->uniforms_gpu offset:camera.uniform_gpu_offset atIndex:GEAROENIX_METAL_GBUFFERS_FILLER_CAMERA_UNIFORM_BIND_INDEX];
                 [enc setVertexBuffer:model_data.args offset:0 atIndex:GEAROENIX_METAL_GBUFFERS_FILLER_ARGUMENT_BUFFER_BIND_INDEX];
-                [enc setFragmentBuffer:camera.gpu_buffer offset:0 atIndex:GEAROENIX_METAL_GBUFFERS_FILLER_CAMERA_UNIFORM_BIND_INDEX];
+                [enc setFragmentBuffer:e.get_buffer_manager()->uniforms_gpu offset:camera.uniform_gpu_offset atIndex:GEAROENIX_METAL_GBUFFERS_FILLER_CAMERA_UNIFORM_BIND_INDEX];
                 [enc setFragmentBuffer:model_data.args offset:0 atIndex:GEAROENIX_METAL_GBUFFERS_FILLER_ARGUMENT_BUFFER_BIND_INDEX];
                 [enc drawIndexedPrimitives:MTLPrimitiveTypeTriangle indexCount:model_data.indices_count indexType:MTLIndexTypeUInt32 indexBuffer:model_data.index indexBufferOffset:0];
-            //});
-            }
+            });
 
-            for(auto& [parallel_encoder, encoder]: encoders)
+            for(auto& encoder: encoders)
             {
                 [encoder popDebugGroup];
                 [encoder endEncoding];
-                [parallel_encoder endEncoding];
             }
+            
+            [parallel_encoder endEncoding];
         }
     }
     

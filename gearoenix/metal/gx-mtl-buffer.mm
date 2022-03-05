@@ -1,54 +1,36 @@
 #include "gx-mtl-buffer.hpp"
 #ifdef GX_RENDER_METAL_ENABLED
+#import "../core/gx-cr-allocator.hpp"
 #import "gx-mtl-engine.hpp"
 #import "gx-mtl-heap.hpp"
 
-gearoenix::metal::UniformBuffer::UniformBuffer(Engine& e, const NSUInteger size, [[maybe_unused]] const std::string& name) noexcept
-    : gpu([e.get_heap_manager()->gpu newBufferWithLength:size options:MTLResourceStorageModePrivate])
-    , cpu{
-        [e.get_device() newBufferWithLength:size options:MTLResourceStorageModeShared],
-        [e.get_device() newBufferWithLength:size options:MTLResourceStorageModeShared],
-        [e.get_device() newBufferWithLength:size options:MTLResourceStorageModeShared]
-    }
+gearoenix::metal::UniformBuffer::UniformBuffer(
+    std::shared_ptr<const core::Allocator>&& _gpu_range,
+    std::array<std::shared_ptr<const core::Allocator>, GEAROENIX_METAL_FRAMES_COUNT>&& _cpu_ranges,
+    std::array<std::uint8_t*, GEAROENIX_METAL_FRAMES_COUNT>&& data) noexcept
+    : gpu_range(std::move(_gpu_range))
+    , cpu_ranges(std::move(_cpu_ranges))
+    , gpu_offset(static_cast<NSUInteger>(gpu_range->get_offset()))
+    , cpu_offsets({
+        static_cast<NSUInteger>(cpu_ranges[0]->get_offset()),
+        static_cast<NSUInteger>(cpu_ranges[1]->get_offset()),
+        static_cast<NSUInteger>(cpu_ranges[2]->get_offset()),
+    })
+    , size(static_cast<NSUInteger>(gpu_range->get_size()))
+    , data(std::move(data))
 {
-#ifdef GEAROENIX_METAL_RESOURCE_NAMING
-    gpu.label = [NSString stringWithFormat:@"Gearoenix-UniformGPUBuffer-%s", name.c_str()];
-    std::uint32_t index = 0;
-    for(auto& b: cpu) {
-        b.label = [NSString stringWithFormat:@"Gearoenix-UniformCPUBuffer-%s-%u", name.c_str(), index];
-        ++index;
-    }
-#endif
 }
 
-gearoenix::metal::UniformBuffer::~UniformBuffer() noexcept
-{
-    if(nil != gpu)
-        [gpu release];
-    for(auto& b: cpu)
-        if(nil != b)
-            [b release];
-}
+gearoenix::metal::UniformBuffer::~UniformBuffer() noexcept = default;
 
 gearoenix::metal::UniformBuffer::UniformBuffer(UniformBuffer&& o) noexcept
+    : gpu_range(o.gpu_range)
+    , cpu_ranges(o.cpu_ranges)
+    , gpu_offset(o.gpu_offset)
+    , cpu_offsets(o.cpu_offsets)
+    , size(o.size)
+    , data(o.data)
 {
-    gpu = o.gpu;
-    o.gpu = nil;
-    for(std::size_t i = 0; i < cpu.size(); ++i)
-    {
-        cpu[i] = o.cpu[i];
-        o.cpu[i] = nil;
-    }
-}
-
-std::uint8_t* gearoenix::metal::UniformBuffer::data(const std::size_t index) noexcept
-{
-    return reinterpret_cast<std::uint8_t*>(cpu[index].contents);
-}
-
-void gearoenix::metal::UniformBuffer::update(const id<MTLBlitCommandEncoder> blit, const std::size_t frame_number) noexcept
-{
-    [blit copyFromBuffer:cpu[frame_number] sourceOffset:0 toBuffer:gpu destinationOffset:0 size:gpu.length];
 }
 
 gearoenix::metal::ArgsBuffer::ArgsBuffer(Engine& e, id<MTLFunction> func, const NSUInteger index, [[maybe_unused]] const std::string& name) noexcept
@@ -76,4 +58,52 @@ gearoenix::metal::ArgsBuffer::ArgsBuffer(ArgsBuffer&& o) noexcept
     o.encoder = nil;
 }
 
+gearoenix::metal::BufferManager::BufferManager(Engine& e) noexcept
+    : uniforms_gpu([e.get_heap_manager()->gpu newBufferWithLength:GEAROENIX_METAL_BUFFER_UNIFORM_MAX_SIZE options:MTLResourceStorageModePrivate])
+    , uniforms_cpu([e.get_device() newBufferWithLength:GEAROENIX_METAL_BUFFER_UNIFORM_MAX_SIZE * GEAROENIX_METAL_FRAMES_COUNT options:MTLResourceStorageModeShared])
+    , uniforms_gpu_range(core::Allocator::construct(GEAROENIX_METAL_BUFFER_UNIFORM_MAX_SIZE))
+    , uniforms_cpu_range(core::Allocator::construct(GEAROENIX_METAL_BUFFER_UNIFORM_MAX_SIZE * GEAROENIX_METAL_FRAMES_COUNT))
+    , uniforms_cpu_ranges {
+        uniforms_cpu_range->allocate(GEAROENIX_METAL_BUFFER_UNIFORM_MAX_SIZE),
+        uniforms_cpu_range->allocate(GEAROENIX_METAL_BUFFER_UNIFORM_MAX_SIZE),
+        uniforms_cpu_range->allocate(GEAROENIX_METAL_BUFFER_UNIFORM_MAX_SIZE),
+    } {
+#ifdef GEAROENIX_METAL_RESOURCE_NAMING
+    uniforms_gpu.label = @"Gearoenix-UniformGPUBuffer";
+    uniforms_cpu.label = @"Gearoenix-UniformCPUBuffer";
+#endif
+}
+
+gearoenix::metal::BufferManager::~BufferManager() noexcept
+{
+    [uniforms_cpu release];
+    [uniforms_gpu release];
+}
+
+gearoenix::metal::UniformBuffer gearoenix::metal::BufferManager::create_uniform(const NSUInteger unaligned_size) noexcept
+{
+    const auto size = (unaligned_size + 31) & ~31;
+    std::array<std::shared_ptr<const core::Allocator>, GEAROENIX_METAL_FRAMES_COUNT> cpu_ranges {
+        uniforms_cpu_ranges[0]->allocate(size),
+        uniforms_cpu_ranges[1]->allocate(size),
+        uniforms_cpu_ranges[2]->allocate(size),
+    };
+    auto base_ptr = reinterpret_cast<std::uint8_t*>(uniforms_cpu.contents);
+    std::array<std::uint8_t*, GEAROENIX_METAL_FRAMES_COUNT> data {
+        cpu_ranges[0]->get_offset() + base_ptr,
+        cpu_ranges[1]->get_offset() + base_ptr,
+        cpu_ranges[2]->get_offset() + base_ptr,
+    };
+    return UniformBuffer(uniforms_gpu_range->allocate(size), std::move(cpu_ranges), std::move(data));
+}
+
+void gearoenix::metal::BufferManager::update(id<MTLBlitCommandEncoder> blit, std::size_t frame_number) noexcept
+{
+    [blit
+     copyFromBuffer:uniforms_cpu
+     sourceOffset:static_cast<NSUInteger>(uniforms_cpu_ranges[frame_number]->get_offset())
+     toBuffer:uniforms_gpu
+     destinationOffset:0
+     size:uniforms_gpu.length];
+}
 #endif

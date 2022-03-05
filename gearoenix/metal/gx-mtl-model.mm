@@ -15,7 +15,7 @@ gearoenix::metal::Model::Model(
     const NSUInteger buffer_size,
     const std::string& name) noexcept
     : core::ecs::Component(this)
-    , uniform(e, sizeof(ModelUniform), name)
+    , uniform(e.get_buffer_manager()->create_uniform(sizeof(ModelUniform)))
     , gbuffers_filler_args(e, e.get_pipeline_manager()->get_gbuffers_filler_vertex_shader(), GEAROENIX_METAL_GBUFFERS_FILLER_ARGUMENT_BUFFER_BIND_INDEX, name)
     , bound_mesh(std::move(bound_mesh))
 {
@@ -44,14 +44,14 @@ void gearoenix::metal::ModelBuilder::set_material(const render::material::Pbr& m
         std::dynamic_pointer_cast<Mesh>(b.get_component<render::model::Model>()->bound_mesh),
         sizeof(ModelUniform), *b.get_name());
     for(std::size_t frame_index = 0; frame_index < GEAROENIX_METAL_FRAMES_COUNT; ++frame_index) {
-        auto& u = *reinterpret_cast<ModelUniform*>(m.uniform.data(frame_index));
+        auto& u = *reinterpret_cast<ModelUniform*>(m.uniform.data[frame_index]);
         u.colour_factor = simd_make_float4(mat.get_albedo_factor());
         u.emission_factor__alpha_cutoff = simd_make_float4(mat.get_emission_factor(), mat.get_alpha_cutoff());
         u.normal_scale__occlusion_strength = simd_make_float4(mat.get_normal_scale(), mat.get_occlusion_strength());
         u.metallic_factor__roughness_factor__radiance_lod_coefficient = simd_make_float4(mat.get_metallic_factor(), mat.get_roughness_factor(), mat.get_radiance_lod_coefficient(), 0.0f);
     }
     [m.gbuffers_filler_args.encoder
-     setBuffer:m.uniform.gpu offset:0
+     setBuffer:e.get_buffer_manager()->uniforms_gpu offset:m.uniform.gpu_offset
      atIndex:GEAROENIX_METAL_GBUFFERS_FILLER_MODEL_UNIFORM_BIND_ID];
     const Texture2D& at = *dynamic_cast<const Texture2D*>(mat.get_albedo().get());
     [m.gbuffers_filler_args.encoder

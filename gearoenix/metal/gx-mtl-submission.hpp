@@ -29,8 +29,8 @@ struct SubmissionManager final {
     };
 
     struct CameraData final {
-        id<MTLBuffer> cpu_buffer = nil;
-        id<MTLBuffer> gpu_buffer = nil;
+        std::uint8_t* uniform_ptr = nullptr;
+        NSUInteger uniform_gpu_offset = 0;
         std::vector<std::pair<double, ModelData>> opaque_models_data;
         std::vector<std::pair<double, ModelData>> tranclucent_models_data;
     };

@@ -6,7 +6,7 @@
 
 gearoenix::metal::Camera::Camera(Engine& e, const std::string& name) noexcept
     : core::ecs::Component(this)
-    , uniform(e, sizeof(CameraUniform), name)
+    , uniform(e.get_buffer_manager()->create_uniform(sizeof(CameraUniform)))
 {
 }
 

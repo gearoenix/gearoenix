@@ -7,6 +7,7 @@
 #import <Metal/MTLDevice.h>
 
 namespace gearoenix::metal {
+struct BufferManager;
 struct PipelineManager;
 struct Uploader;
 struct HeapManager;
@@ -16,6 +17,7 @@ struct SubmissionManager;
         GX_GET_UPTR_PRV(PipelineManager, pipeline_manager)
         GX_GET_UPTR_PRV(Uploader, uploader)
         GX_GET_UPTR_PRV(HeapManager, heap_manager)
+        GX_GET_UPTR_PRV(BufferManager, buffer_manager)
         GX_GET_UPTR_PRV(SubmissionManager, submission_manager)
         
         Engine(platform::Application& platform_application) noexcept;
