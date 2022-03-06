@@ -64,7 +64,7 @@ void gearoenix::dxr::Engine::device_lost_handle(const int failed_tries) noexcept
     uploader = std::make_shared<Uploader>(device);
     mesh_manager = std::make_unique<MeshManager>(*this);
     model_manager = std::make_unique<ModelManager>(*this);
-    pipeline_manager = std::make_shared<PipelineManager>(device);
+    pipeline_manager = std::make_shared<PipelineManager>(*this);
     submission_manager = std::make_shared<SubmissionManager>(*this);
     texture_manager = std::make_unique<TextureManager>(*this);
     camera_manager = std::make_unique<CameraManager>(*this);

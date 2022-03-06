@@ -1,6 +1,6 @@
-#import "gx-plt-mac-view-controller.hpp"
+#include "gx-plt-mac-view-controller.hpp"
 #ifdef GX_PLATFORM_MACOS
-#include "../gx-plt-log.hpp"
+#import "../gx-plt-log.hpp"
 #import "gx-plt-mac-application.hpp"
 #import <Metal/Metal.h>
 
