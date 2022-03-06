@@ -1,6 +1,6 @@
-#import "gx-plt-mac-app-delegate.hpp"
+#include "gx-plt-mac-app-delegate.hpp"
 #ifdef GX_PLATFORM_MACOS
-#include "../gx-plt-runtime-configuration.hpp"
+#import "../gx-plt-runtime-configuration.hpp"
 #import "gx-plt-mac-application.hpp"
 
 @implementation GearoenixPlatformAppDelegate {

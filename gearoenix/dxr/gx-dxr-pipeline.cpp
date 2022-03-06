@@ -3,12 +3,15 @@
 #include "../core/macro/gx-cr-mcr-assert.hpp"
 #include "../core/macro/gx-cr-mcr-counter.hpp"
 #include "../core/macro/gx-cr-mcr-zeroer.hpp"
+#include "../platform/stream/gx-plt-stm-asset.hpp"
 #include "gx-dxr-check.hpp"
 #include "gx-dxr-device.hpp"
+#include "gx-dxr-engine.hpp"
 #include <fstream>
 
-gearoenix::dxr::PipelineManager::PipelineManager(std::shared_ptr<Device> _device) noexcept
-    : device(std::move(_device))
+gearoenix::dxr::PipelineManager::PipelineManager(Engine& e) noexcept
+    : e(e)
+    , device(e.get_device())
 {
     initialize_g_buffer_filler();
     initialize_mipmap_generator();
@@ -18,20 +21,13 @@ gearoenix::dxr::PipelineManager::~PipelineManager() noexcept = default;
 
 void gearoenix::dxr::PipelineManager::initialize_g_buffer_filler() noexcept
 {
-    // TODO later they must come from asset path
-    std::fstream g_buffer_vs_f("../../../../assets/gx-dxr-shd-g-buffer.vs.cso", std::ios::binary | std::ios::in);
-    GX_ASSERT(g_buffer_vs_f.is_open() && g_buffer_vs_f.good())
-    g_buffer_vs_f.seekg(0, std::ios::end);
-    std::vector<char> g_buffer_vs_f_shader_bin(g_buffer_vs_f.tellg());
-    g_buffer_vs_f.seekg(0);
-    g_buffer_vs_f.read(g_buffer_vs_f_shader_bin.data(), g_buffer_vs_f_shader_bin.size());
+    const std::unique_ptr<platform::stream::Asset> g_buffer_vs_f(platform::stream::Asset::construct(e.get_platform_application(), "shaders/gx-dxr-shd-gbuffers-filler.vs.cso"));
+    GX_ASSERT(nullptr != g_buffer_vs_f)
+    const auto g_buffer_vs_f_shader_bin = g_buffer_vs_f->get_file_content();
 
-    std::fstream g_buffer_ps_f("../../../../assets/gx-dxr-shd-g-buffer.ps.cso", std::ios::binary | std::ios::in);
-    GX_ASSERT(g_buffer_ps_f.is_open() && g_buffer_ps_f.good())
-    g_buffer_ps_f.seekg(0, std::ios::end);
-    std::vector<char> g_buffer_ps_f_shader_bin(g_buffer_ps_f.tellg());
-    g_buffer_ps_f.seekg(0);
-    g_buffer_ps_f.read(g_buffer_ps_f_shader_bin.data(), g_buffer_ps_f_shader_bin.size());
+    const std::unique_ptr<platform::stream::Asset> g_buffer_ps_f(platform::stream::Asset::construct(e.get_platform_application(), "shaders/gx-dxr-shd-gbuffers-filler.ps.cso"));
+    GX_ASSERT(nullptr != g_buffer_ps_f)
+    const auto g_buffer_ps_f_shader_bin = g_buffer_ps_f->get_file_content();
 
     auto* const d = device->get_device().Get();
 
@@ -99,12 +95,9 @@ void gearoenix::dxr::PipelineManager::initialize_g_buffer_filler() noexcept
 
 void gearoenix::dxr::PipelineManager::initialize_mipmap_generator() noexcept
 {
-    std::fstream f("../../../../assets/gx-dxr-shd-mipmap-generator.cs.cso", std::ios::binary | std::ios::in);
-    GX_ASSERT(f.is_open() && f.good())
-    f.seekg(0, std::ios::end);
-    std::vector<char> b(f.tellg());
-    f.seekg(0);
-    f.read(b.data(), b.size());
+    const std::unique_ptr<platform::stream::Asset> f(platform::stream::Asset::construct(e.get_platform_application(), "shaders/gx-dxr-shd-mipmap-generator.cs.cso"));
+    GX_ASSERT(nullptr != f)
+    const auto b = f->get_file_content();
 
     auto* const d = device->get_device().Get();
 
