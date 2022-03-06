@@ -155,9 +155,9 @@ void gearoenix::metal::SubmissionManager::update() noexcept
                 auto& model_data = distance_model_data.second;
                 const auto& enc = encoders[thread_index];
                 [enc setVertexBuffer:model_data.vertex offset:0 atIndex:GEAROENIX_METAL_GBUFFERS_FILLER_VERTEX_BUFFER_BIND_INDEX];
-                [enc setVertexBuffer:e.get_buffer_manager()->uniforms_gpu offset:camera.uniform_gpu_offset atIndex:GEAROENIX_METAL_GBUFFERS_FILLER_CAMERA_UNIFORM_BIND_INDEX];
+                /*can be called once*/[enc setVertexBuffer:e.get_buffer_manager()->uniforms_gpu offset:camera.uniform_gpu_offset atIndex:GEAROENIX_METAL_GBUFFERS_FILLER_CAMERA_UNIFORM_BIND_INDEX];
                 [enc setVertexBuffer:model_data.args offset:0 atIndex:GEAROENIX_METAL_GBUFFERS_FILLER_ARGUMENT_BUFFER_BIND_INDEX];
-                [enc setFragmentBuffer:e.get_buffer_manager()->uniforms_gpu offset:camera.uniform_gpu_offset atIndex:GEAROENIX_METAL_GBUFFERS_FILLER_CAMERA_UNIFORM_BIND_INDEX];
+                /*can be called once*/[enc setFragmentBuffer:e.get_buffer_manager()->uniforms_gpu offset:camera.uniform_gpu_offset atIndex:GEAROENIX_METAL_GBUFFERS_FILLER_CAMERA_UNIFORM_BIND_INDEX];
                 [enc setFragmentBuffer:model_data.args offset:0 atIndex:GEAROENIX_METAL_GBUFFERS_FILLER_ARGUMENT_BUFFER_BIND_INDEX];
                 [enc drawIndexedPrimitives:MTLPrimitiveTypeTriangle indexCount:model_data.indices_count indexType:MTLIndexTypeUInt32 indexBuffer:model_data.index indexBufferOffset:0];
             });

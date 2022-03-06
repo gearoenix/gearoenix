@@ -41,8 +41,8 @@ struct GameApp final : public gearoenix::core::Application {
             true);
         gearoenix::render::material::Pbr material(render_engine);
         std::vector<std::vector<std::uint8_t>> pixels(3);
-        for (int j = 6, k = 0; k < 3; --j, ++k)
-            for (int i = 0; i < (1 << j) * (1 << j); ++i) {
+        for (int j = 64 * 64, k = 0; k < 3; j >>= 2, ++k)
+            for (int i = 0; i < j; ++i) {
                 pixels[k].push_back(k == 0 ? 255 : 0);
                 pixels[k].push_back(k == 1 ? 255 : 0);
                 pixels[k].push_back(k == 2 ? 255 : 0);
@@ -59,11 +59,12 @@ struct GameApp final : public gearoenix::core::Application {
             },
             end_callback));
         // Or you can load a image, before that make sure you have the image in the assets folder
-        /*material.set_albedo(render_engine.get_texture_manager()->create_2d_from_file(
+        material.set_albedo(render_engine.get_texture_manager()->create_2d_from_file(
             "gearoenix-logo",
-            gearoenix::platform::AbsolutePath("../../../../assets/gearoenix-logo.png"),
+            //gearoenix::platform::AbsolutePath("../../../../assets/gearoenix-logo.png"),
+            gearoenix::platform::AssetPath(plt_app, "logo.png"),
             gearoenix::render::texture::TextureInfo(),
-            end_callback));*/
+            end_callback));
         model_builder->set_material(material);
         scene_builder->add(std::move(model_builder));
 

@@ -37,8 +37,8 @@ void gearoenix::metal::Uploader::upload(id<MTLTexture> destination, MTLTextureDe
         buffer_size += ((width * pixel_size + align_mask) & ~align_mask) * height;
         width >>= 1;
         height >>= 1;
-        if(0 <= width) width = 1;
-        if(0 <= height) height = 1;
+        if(0 == width) width = 1;
+        if(0 == height) height = 1;
     }
     id<MTLBuffer> buffer = [e.get_device() newBufferWithLength:buffer_size options:MTLResourceStorageModeShared];
     buffer.label = [NSString stringWithFormat:@"Gearoenix-UploadBuffer-%@", destination.label];

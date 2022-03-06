@@ -54,5 +54,5 @@ fragment float4 gbuffers_filler_fragment_shader(
     GBuffersFillerVertexShaderOut in [[stage_in]],
     constant gearoenix::metal::CameraUniform& camera [[buffer(GEAROENIX_METAL_GBUFFERS_FILLER_CAMERA_UNIFORM_BIND_INDEX)]],
     device GBuffersFillerShaderArgs& args [[buffer(GEAROENIX_METAL_GBUFFERS_FILLER_ARGUMENT_BUFFER_BIND_INDEX)]]) {
-    return float4(0.3, 0.5, 0.1, 1.0);
+    return args.albedo.sample(args.texture_sampler, in.uv) * args.model->colour_factor;
 }

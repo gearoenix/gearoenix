@@ -4,6 +4,7 @@
 #include <string>
 
 namespace gearoenix::platform {
+struct Application;
 
 struct Path {
     const std::string raw;
@@ -26,7 +27,10 @@ struct AbsolutePath final : public Path {
     ~AbsolutePath() noexcept final = default;
 };
 
-/// TODO: Add asset path that can create the raw string for different kind of platform or a way of spawning stream
+struct AssetPath final : public Path {
+    AssetPath(const Application& app, const std::string& p) noexcept;
+    ~AssetPath() noexcept final = default;
+};
 }
 
 #endif
