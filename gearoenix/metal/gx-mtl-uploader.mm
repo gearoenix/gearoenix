@@ -58,8 +58,9 @@ void gearoenix::metal::Uploader::upload(id<MTLTexture> destination, MTLTextureDe
             const uint8_t* src = reinterpret_cast<const uint8_t*>(mip_pixel.data());
             const NSUInteger w_dst = (width * pixel_size + align_mask) & ~align_mask;
             const NSUInteger w_src = width * pixel_size;
+            src += w_src * (height - 1);
             const NSUInteger offset = offset_in_buffer;
-            for(NSUInteger hi = 0; hi < height; ++hi, src += w_src, dst += w_dst, offset_in_buffer += w_dst) {
+            for(NSUInteger hi = 0; hi < height; ++hi, src -= w_src, dst += w_dst, offset_in_buffer += w_dst) {
                 std::memcpy(dst, src, w_src);
             }
             [enc

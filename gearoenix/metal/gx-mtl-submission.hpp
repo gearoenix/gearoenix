@@ -46,6 +46,8 @@ private:
     core::Pool<SceneData> scene_pool;
 
     boost::container::flat_map<std::pair<double /*layer*/, core::ecs::Entity::id_t /*scene-entity-id*/>, std::size_t /*scene-pool-index*/> scenes;
+    
+    dispatch_semaphore_t present_semaphore;
 
     [[nodiscard]] bool fill_g_buffers(const std::size_t camera_pool_index) noexcept;
     

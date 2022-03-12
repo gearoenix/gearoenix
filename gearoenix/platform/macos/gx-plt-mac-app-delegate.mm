@@ -27,6 +27,8 @@
             | (is_fullscreen? NSWindowStyleMaskFullScreen: 0);
     const NSBackingStoreType backing = NSBackingStoreBuffered;
     window = [[NSWindow alloc] initWithContentRect:frame_rect styleMask:style_mask backing:backing defer:YES];
+    window.collectionBehavior = NSWindowCollectionBehaviorFullScreenPrimary;
+    window.acceptsMouseMovedEvents = YES;
     [window center];
     [window setTitle:[NSString stringWithCString:title.c_str() encoding:[NSString defaultCStringEncoding]]];
     view_controller = [[GearoenixPlatformViewController alloc] init];
@@ -34,6 +36,8 @@
     view_controller.os_app = os_app;
     [window setContentViewController:view_controller];
     [window makeKeyAndOrderFront:self];
+    const NSPoint mouse_pos = [window mouseLocationOutsideOfEventStream];
+    os_app->get_base().initialize_mouse_position(mouse_pos.x, mouse_pos.y);
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {

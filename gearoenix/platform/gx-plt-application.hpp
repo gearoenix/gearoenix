@@ -60,7 +60,6 @@ struct BaseApplication final {
     // boost::container::flat_map<touch::FingerId, Point2D> touch_states;
     // boost::container::flat_set<platform::key::Id> pressed_keyboard_buttons;
 
-private:
     std::chrono::high_resolution_clock::time_point last_time_window_resized;
 
     BaseApplication(GX_MAIN_ENTRY_ARGS_DEF, const RuntimeConfiguration& configuration) noexcept;
@@ -87,8 +86,6 @@ private:
     void terminate() noexcept;
 
     void update() noexcept;
-
-public:
 };
 }
 

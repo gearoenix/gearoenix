@@ -108,7 +108,7 @@ struct GameApp final : public gearoenix::core::Application {
         camera_controller = std::make_unique<gearoenix::render::camera::JetController>(
             render_engine,
             camera_builder->get_entity_builder()->get_builder().get_id());
-        scene_builder->add(std::move(camera_builder));
+        scene_builder->add(std::move(camera_builder));GX_LOG_D("dfffddfdfdfdf")
     }
 
     void update() noexcept final

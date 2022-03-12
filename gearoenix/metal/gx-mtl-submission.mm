@@ -21,6 +21,7 @@
 gearoenix::metal::SubmissionManager::SubmissionManager(Engine& e) noexcept
     : e(e)
     , queue([e.get_device() newCommandQueue])
+    , present_semaphore(dispatch_semaphore_create(GEAROENIX_METAL_FRAMES_COUNT))
 {}
 
 gearoenix::metal::SubmissionManager::~SubmissionManager() noexcept
@@ -30,10 +31,17 @@ gearoenix::metal::SubmissionManager::~SubmissionManager() noexcept
 
 void gearoenix::metal::SubmissionManager::update() noexcept
 {
+    dispatch_semaphore_wait(present_semaphore, DISPATCH_TIME_FOREVER);
+    
     auto* const world = e.get_world();
     const auto frame_number = e.get_frame_number();
     id <MTLCommandBuffer> cmd = [queue commandBuffer];
     cmd.label = @"Gearoenix-Command-Submission";
+    
+    __block dispatch_semaphore_t blocked_present_semaphore = present_semaphore;
+    [cmd addCompletedHandler:^(id<MTLCommandBuffer>) {
+        dispatch_semaphore_signal(blocked_present_semaphore);
+    }];
 
     auto view = e.get_platform_application().get_app_delegate().view_controller.metal_kit_view;
     MTLRenderPassDescriptor *render_pass_descriptor = view.currentRenderPassDescriptor; // TODO: it maybe needed to have different render-pass-desc for each camera
@@ -174,7 +182,6 @@ void gearoenix::metal::SubmissionManager::update() noexcept
     
     [cmd presentDrawable:view.currentDrawable];
     [cmd commit];
-    [cmd waitUntilCompleted];
 }
 
 #endif

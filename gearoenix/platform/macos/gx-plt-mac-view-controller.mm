@@ -41,7 +41,7 @@
         options:NSTrackingMouseMoved | NSTrackingActiveAlways | NSTrackingAssumeInside | NSTrackingEnabledDuringMouseDrag
         owner:self userInfo:nil]];
     metal_kit_view.delegate = self;
-    metal_kit_view.preferredFramesPerSecond = 120;
+    metal_kit_view.preferredFramesPerSecond = 60;
     metal_kit_view.device = device;
     self.view = metal_kit_view;
     [self mtkView:metal_kit_view drawableSizeWillChange:metal_kit_view.bounds.size];
@@ -63,6 +63,58 @@
 }
 
 - (void)mtkView:(nonnull MTKView *)view drawableSizeWillChange:(CGSize)size {
+}
+
+- (void)mouseMoved:(NSEvent *)event {
+    os_app->get_base().update_mouse_position(NSEvent.mouseLocation.x, NSEvent.mouseLocation.y);
+}
+
+- (void)mouseDragged:(NSEvent *)event {
+    os_app->get_base().update_mouse_position(NSEvent.mouseLocation.x, NSEvent.mouseLocation.y);
+}
+
+- (void)mouseDown:(NSEvent *)event {
+    gearoenix::platform::key::Id ki;
+    switch(event.type)
+    {
+        case NSEventTypeLeftMouseDown:
+            ki = gearoenix::platform::key::Id::Left;
+            break;
+        case NSEventTypeRightMouseDown:
+            ki = gearoenix::platform::key::Id::Right;
+            break;
+        case NSEventTypeOtherMouseDown:
+            ki = gearoenix::platform::key::Id::Middle;
+            break;
+        default:
+            GX_LOG_E("Unrecognized mouse button.")
+    }
+    os_app->get_base().mouse_key(ki, gearoenix::platform::key::Action::Press);
+}
+
+- (void)mouseUp:(NSEvent *)event {
+    gearoenix::platform::key::Id ki;
+    switch(event.type)
+    {
+        case NSEventTypeLeftMouseUp:
+            ki = gearoenix::platform::key::Id::Left;
+            break;
+        case NSEventTypeRightMouseUp:
+            ki = gearoenix::platform::key::Id::Right;
+            break;
+        case NSEventTypeOtherMouseUp:
+            ki = gearoenix::platform::key::Id::Middle;
+            break;
+        default:
+            GX_LOG_E("Unrecognized mouse button.")
+    }
+    os_app->get_base().mouse_key(ki, gearoenix::platform::key::Action::Release);
+}
+
+- (void)keyDown:(NSEvent *)event {
+    switch(event.keyCode) {
+        case
+    }
 }
 
 @end

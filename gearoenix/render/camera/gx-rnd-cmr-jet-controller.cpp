@@ -12,7 +12,7 @@ gearoenix::core::event::Listener::Response gearoenix::render::camera::JetControl
     switch (d.get_source()) {
     case core::event::Id::ButtonMouse: {
         const auto& data = std::get<gearoenix::core::event::button::Mouse>(d.get_data());
-        if (data.get_key() == platform::key::Id::Middle)
+        if (data.get_key() == platform::key::Id::Left)
             rotate = data.get_action() == platform::key::Action::Press;
         break;
     }
