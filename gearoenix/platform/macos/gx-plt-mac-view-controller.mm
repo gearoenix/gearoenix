@@ -2,6 +2,7 @@
 #ifdef GX_PLATFORM_MACOS
 #import "../gx-plt-log.hpp"
 #import "gx-plt-mac-application.hpp"
+#import "gx-plt-mac-key.hpp"
 #import <Metal/Metal.h>
 
 @implementation GearoenixPlatformViewController
@@ -112,9 +113,9 @@
 }
 
 - (void)keyDown:(NSEvent *)event {
-    switch(event.keyCode) {
-        case
-    }
+    os_app->get_base().keyboard_key(
+        gearoenix::platform::convert_key(event.keyCode),
+        gearoenix::platform::key::Action::Press);
 }
 
 @end

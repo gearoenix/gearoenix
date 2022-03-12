@@ -82,7 +82,7 @@ gearoenix::metal::BufferManager::~BufferManager() noexcept
 
 gearoenix::metal::UniformBuffer gearoenix::metal::BufferManager::create_uniform(const NSUInteger unaligned_size) noexcept
 {
-    const auto size = (unaligned_size + 31) & ~31;
+    const auto size = (unaligned_size + 255) & ~255;
     std::array<std::shared_ptr<const core::Allocator>, GEAROENIX_METAL_FRAMES_COUNT> cpu_ranges {
         uniforms_cpu_ranges[0]->allocate(size),
         uniforms_cpu_ranges[1]->allocate(size),
