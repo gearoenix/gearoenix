@@ -9,8 +9,8 @@ gearoenix::render::material::Pbr::Pbr(engine::Engine& e, const core::sync::EndCa
         static_cast<float>((std::rand() & 127) + 128) / 255.0f,
         static_cast<float>((std::rand() & 127) + 128) / 255.0f,
         1.0f)
-    , emission_factor(1.0f)
-    , normal_scale(1.0f)
+    , emission_roughness_factor(1.0f)
+    , normal_metallic_factor(1.0f)
 {
     const auto& tm = e.get_texture_manager();
     albedo = tm->get_checker(c);
@@ -19,3 +19,11 @@ gearoenix::render::material::Pbr::Pbr(engine::Engine& e, const core::sync::EndCa
 }
 
 gearoenix::render::material::Pbr::~Pbr() noexcept = default;
+
+gearoenix::render::material::Pbr::Pbr(const Pbr&) noexcept = default;
+
+gearoenix::render::material::Pbr::Pbr(Pbr&&) noexcept = default;
+
+gearoenix::render::material::Pbr& gearoenix::render::material::Pbr::operator=(Pbr&&) noexcept = default;
+
+gearoenix::render::material::Pbr& gearoenix::render::material::Pbr::operator=(const Pbr&) noexcept = default;

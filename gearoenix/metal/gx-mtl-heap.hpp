@@ -6,12 +6,12 @@
 
 namespace gearoenix::metal {
 struct Engine;
-    struct HeapManager final {
-        const id<MTLHeap> gpu;
-        
-        HeapManager(Engine& e) noexcept;
-        ~HeapManager() noexcept;
-    };
+struct HeapManager final {
+    const id<MTLHeap> gpu;
+
+    HeapManager(Engine& e) noexcept;
+    ~HeapManager() noexcept;
+};
 }
 
 #endif

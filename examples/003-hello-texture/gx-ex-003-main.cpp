@@ -61,7 +61,7 @@ struct GameApp final : public gearoenix::core::Application {
         // Or you can load a image, before that make sure you have the image in the assets folder
         material.set_albedo(render_engine.get_texture_manager()->create_2d_from_file(
             "gearoenix-logo",
-            //gearoenix::platform::AbsolutePath("../../../../assets/gearoenix-logo.png"),
+            // gearoenix::platform::AbsolutePath("../../../../assets/gearoenix-logo.png"),
             gearoenix::platform::AssetPath(plt_app, "logo.png"),
             gearoenix::render::texture::TextureInfo(),
             end_callback));

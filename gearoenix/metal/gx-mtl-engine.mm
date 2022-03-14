@@ -29,26 +29,32 @@ gearoenix::metal::Engine::Engine(platform::Application& platform_application) no
 
 gearoenix::metal::Engine::~Engine() noexcept = default;
 
-void gearoenix::metal::Engine::start_frame() noexcept {
+void gearoenix::metal::Engine::start_frame() noexcept
+{
     render::engine::Engine::start_frame();
 }
 
-void gearoenix::metal::Engine::end_frame() noexcept {
+void gearoenix::metal::Engine::end_frame() noexcept
+{
     render::engine::Engine::end_frame();
     submission_manager->update();
 }
 
-void gearoenix::metal::Engine::window_resized() noexcept {
+void gearoenix::metal::Engine::window_resized() noexcept
+{
 }
 
-void gearoenix::metal::Engine::upload_imgui_fonts() noexcept {
+void gearoenix::metal::Engine::upload_imgui_fonts() noexcept
+{
 }
 
-bool gearoenix::metal::Engine::is_supported() noexcept {
+bool gearoenix::metal::Engine::is_supported() noexcept
+{
     return true;
 }
 
-std::unique_ptr<gearoenix::metal::Engine> gearoenix::metal::Engine::construct(platform::Application& platform_application) noexcept {
+std::unique_ptr<gearoenix::metal::Engine> gearoenix::metal::Engine::construct(platform::Application& platform_application) noexcept
+{
     return std::make_unique<gearoenix::metal::Engine>(platform_application);
 }
 

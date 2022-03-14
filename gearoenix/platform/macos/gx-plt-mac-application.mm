@@ -13,8 +13,9 @@ gearoenix::platform::Application::Application(GX_MAIN_ENTRY_ARGS_DEF, const Runt
     base.initialize_engine(*this);
 }
 
-gearoenix::platform::Application::~Application() noexcept 
-{}
+gearoenix::platform::Application::~Application() noexcept
+{
+}
 
 void gearoenix::platform::Application::run(core::Application* const core_app) noexcept
 {

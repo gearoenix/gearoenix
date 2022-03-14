@@ -13,12 +13,16 @@
 #include "../../vulkan/engine/gx-vk-eng-engine.hpp"
 #endif
 
-#ifdef GX_RENDER_DXR_ENABLED
-#include "../../dxr/gx-dxr-engine.hpp"
+#ifdef GX_RENDER_DIRECT3D_ENABLED
+#include "../../direct3d/gx-d3d-engine.hpp"
 #endif
 
 #ifdef GX_RENDER_METAL_ENABLED
 #include "../../metal/gx-mtl-engine.hpp"
+#endif
+
+#ifdef GX_RENDER_OPENGL_ENABLED
+#include "../../opengl/gx-gl-engine.hpp"
 #endif
 
 #include <imgui.h>
@@ -36,17 +40,22 @@ gearoenix::render::engine::Engine::Engine(
 
 std::set<gearoenix::render::engine::Type> gearoenix::render::engine::Engine::get_available_engines() noexcept
 {
-    return {
-#ifdef GX_RENDER_DXR_ENABLED
-        Type::Direct3DX,
+    std::set<Type> result;
+#ifdef GX_RENDER_DIRECT3D_ENABLED
+    result.insert(Type::Direct3D);
 #endif
 #ifdef GX_RENDER_METAL_ENABLED
-        Type::Metal,
+    result.insert(Type::Metal);
 #endif
 #ifdef GX_RENDER_VULKAN_ENABLED
-        Type::Vulkan,
+    if (vulkan::engine::Engine::is_supported()) {
+        result.insert(Type::Vulkan);
+    }
 #endif
-    };
+#ifdef GX_RENDER_OPENGL_ENABLED
+    result.insert(Type::OpenGL);
+#endif
+    return result;
 }
 
 std::unique_ptr<gearoenix::render::engine::Engine> gearoenix::render::engine::Engine::construct(
@@ -59,9 +68,9 @@ std::unique_ptr<gearoenix::render::engine::Engine> gearoenix::render::engine::En
         result = std::make_unique<vulkan::engine::Engine>(platform_application);
     }
 #endif
-#ifdef GX_RENDER_DXR_ENABLED
-    if (result == nullptr && configuration.get_direct3dx_render_backend_enabled() && dxr::Engine::is_supported()) {
-        result = dxr::Engine::construct(platform_application);
+#ifdef GX_RENDER_DIRECT3D_ENABLED
+    if (result == nullptr && configuration.get_direct3dx_render_backend_enabled() && d3d::Engine::is_supported()) {
+        result = d3d::Engine::construct(platform_application);
     }
 #endif
 #ifdef GX_RENDER_METAL_ENABLED
@@ -70,8 +79,8 @@ std::unique_ptr<gearoenix::render::engine::Engine> gearoenix::render::engine::En
     }
 #endif
 #ifdef GX_RENDER_OPENGL_ENABLED
-    if (result == nullptr && configuration.get_opengl_render_backend_enabled() && opengl::engine::Engine::is_supported()) {
-        result = opengl::engine::Engine::construct(configuration, std::move(platform_application));
+    if (result == nullptr && configuration.get_opengl_render_backend_enabled() && gl::Engine::is_supported()) {
+        result = gl::Engine::construct(platform_application);
     }
 #endif
     GX_CHECK_NOT_EQUAL(result, nullptr)

@@ -14,7 +14,7 @@ struct Engine;
 struct SubmissionManager final {
     Engine& e;
     const id<MTLCommandQueue> queue;
-    
+
     struct ModelData final {
         // Cache render data here
         id<MTLBuffer> args = nil;
@@ -22,7 +22,7 @@ struct SubmissionManager final {
         id<MTLBuffer> index = nil;
         NSUInteger indices_count = 0;
     };
-    
+
     struct ModelBvhData final {
         std::uint64_t blocked_cameras_flags = static_cast<std::uint64_t>(-1);
         ModelData model;
@@ -46,11 +46,11 @@ private:
     core::Pool<SceneData> scene_pool;
 
     boost::container::flat_map<std::pair<double /*layer*/, core::ecs::Entity::id_t /*scene-entity-id*/>, std::size_t /*scene-pool-index*/> scenes;
-    
+
     dispatch_semaphore_t present_semaphore;
 
     [[nodiscard]] bool fill_g_buffers(const std::size_t camera_pool_index) noexcept;
-    
+
 public:
     SubmissionManager(Engine& e) noexcept;
     ~SubmissionManager() noexcept;
@@ -60,4 +60,3 @@ public:
 
 #endif
 #endif
-

@@ -5,7 +5,7 @@ PROJECT(Gearoenix)
 SET(PROJECT_DESCRIPTION "A cross-platform C++ game engine.")
 
 SET(GX_VERSION_MAJOR 0)
-SET(GX_VERSION_MINOR 3) # RTX version
+SET(GX_VERSION_MINOR 3) # RTX enabled version
 SET(GX_VERSION_PATCH 0)
 SET(GX_VERSION "${GX_VERSION_MAJOR}.${GX_VERSION_MINOR}.${GX_VERSION_PATCH}")
 
@@ -72,14 +72,24 @@ INCLUDE_DIRECTORIES(${GX_SDL2_INCLUDE_DIRS})
 SET(GX_SDL2_BUILD_DIRS "${GX_SDL2_PATH}/gx-build")
 
 IF(LINUX)
-    SET(GX_DEBUG_LIBS
-            ${GX_DEBUG_LIBS}
+    SET(GX_COMMON_LIBS
+            ${GX_COMMON_LIBS}
             ${GX_SDL2_BUILD_DIRS}/libSDL2.a
             ${GX_SDL2_BUILD_DIRS}/libSDL2main.a
             m dl asound pthread pulse-simple pulse X11 Xext Xcursor Xinerama Xi Xrandr Xss Xxf86vm drm gbm
             wayland-egl wayland-client wayland-cursor xkbcommon rt)
 ELSEIF(MSVC)
-    SET(GX_COMMON_LIBS ${GX_COMMON_LIBS} winmm version oleaut32 imm32 setupapi d3d12 dxgi dxguid)
+    SET(GX_COMMON_LIBS 
+            ${GX_COMMON_LIBS}
+            winmm version oleaut32 imm32 setupapi d3d12 dxgi dxguid)
+    SET(GX_DEBUG_LIBS
+            ${GX_DEBUG_LIBS}
+            ${GX_SDL2_BUILD_DIRS}/Debug/SDL2-staticd.lib
+            ${GX_SDL2_BUILD_DIRS}/Debug/SDL2maind.lib)
+    SET(GX_RELEASE_LIBS
+            ${GX_RELEASE_LIBS}
+            ${GX_SDL2_BUILD_DIRS}/Release/SDL2-static.lib
+            ${GX_SDL2_BUILD_DIRS}/Release/SDL2main.lib)
 ELSEIF(APPLE)
     SET(GX_COMMON_LIBS ${GX_COMMON_LIBS} iconv)
 ENDIF()
@@ -107,7 +117,7 @@ INCLUDE_DIRECTORIES(${GX_VULKAN_HEADERS_INCLUDE_DIRS})
 #GX_COMPILE_LIB(${GX_BULLET3_PATH})
 
 SET(GX_IMGUI_PATH "${GX_SDK_PATH}/imgui")
-GX_DOWNLOAD_FILE("https://github.com/ocornut/imgui/archive/master.zip" "${GX_IMGUI_PATH}")
+GX_DOWNLOAD_FILE("https://github.com/ocornut/imgui/archive/refs/tags/v1.87.zip" "${GX_IMGUI_PATH}")
 GX_PREPARE_IMGUI(${GX_IMGUI_PATH})
 INCLUDE_DIRECTORIES(${GX_IMGUI_PATH})
 INCLUDE_DIRECTORIES(${GX_IMGUI_PATH}/backends)

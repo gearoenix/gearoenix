@@ -22,7 +22,8 @@ gearoenix::metal::SubmissionManager::SubmissionManager(Engine& e) noexcept
     : e(e)
     , queue([e.get_device() newCommandQueue])
     , present_semaphore(dispatch_semaphore_create(GEAROENIX_METAL_FRAMES_COUNT))
-{}
+{
+}
 
 gearoenix::metal::SubmissionManager::~SubmissionManager() noexcept
 {
@@ -32,22 +33,22 @@ gearoenix::metal::SubmissionManager::~SubmissionManager() noexcept
 void gearoenix::metal::SubmissionManager::update() noexcept
 {
     dispatch_semaphore_wait(present_semaphore, DISPATCH_TIME_FOREVER);
-    
+
     auto* const world = e.get_world();
     const auto frame_number = e.get_frame_number();
-    id <MTLCommandBuffer> cmd = [queue commandBuffer];
+    id<MTLCommandBuffer> cmd = [queue commandBuffer];
     cmd.label = @"Gearoenix-Command-Submission";
-    
+
     __block dispatch_semaphore_t blocked_present_semaphore = present_semaphore;
     [cmd addCompletedHandler:^(id<MTLCommandBuffer>) {
         dispatch_semaphore_signal(blocked_present_semaphore);
     }];
 
     auto view = e.get_platform_application().get_app_delegate().view_controller.metal_kit_view;
-    MTLRenderPassDescriptor *render_pass_descriptor = view.currentRenderPassDescriptor; // TODO: it maybe needed to have different render-pass-desc for each camera
-    
+    MTLRenderPassDescriptor* render_pass_descriptor = view.currentRenderPassDescriptor; // TODO: it maybe needed to have different render-pass-desc for each camera
+
     GX_ASSERT(nullptr != render_pass_descriptor)
-    
+
     bvh_pool.clear();
     camera_pool.clear();
     scene_pool.clear();
@@ -91,8 +92,7 @@ void gearoenix::metal::SubmissionManager::update() noexcept
             auto* const uniform_ptr = reinterpret_cast<ModelUniform*>(model.uniform.data[frame_number]);
             uniform_ptr->model = simd_make_float4x4_t(model_transform.get_matrix());
             uniform_ptr->transposed_reversed_model = simd_make_float4x4_t(model_transform.get_inverted_matrix().transposed());
-            bvh.add({
-                collider.get_updated_box(),
+            bvh.add({ collider.get_updated_box(),
                 ModelBvhData {
                     .blocked_cameras_flags = render_model.block_cameras_flags,
                     .model = ModelData {
@@ -100,9 +100,7 @@ void gearoenix::metal::SubmissionManager::update() noexcept
                         .vertex = mesh.vertex_buffer,
                         .index = mesh.index_buffer,
                         .indices_count = mesh.indices_count,
-                    }
-                }
-            });
+                    } } });
         });
         bvh.create_nodes();
         world->parallel_system<render::camera::Camera, physics::collider::Frustum, physics::Transformation, Camera>([&](const core::ecs::Entity::id_t camera_id, render::camera::Camera& render_camera, physics::collider::Frustum& frustum, physics::Transformation& transform, Camera& metal_camera, const unsigned int) {
@@ -132,23 +130,22 @@ void gearoenix::metal::SubmissionManager::update() noexcept
     const auto blit = [cmd blitCommandEncoder];
     blit.label = @"Copy of uniform buffers";
     [blit pushDebugGroup:@"Copy pass"];
-    
+
     e.get_buffer_manager()->update(blit, frame_number);
-    
+
     [blit popDebugGroup];
     [blit endEncoding];
-    
+
     std::vector<id<MTLRenderCommandEncoder>> encoders(std::thread::hardware_concurrency());
-    
+
     for (auto& scene_layer_entity_id_pool_index : scenes) {
         auto& scene = scene_pool[scene_layer_entity_id_pool_index.second];
         for (auto& camera_layer_entity_id_pool_index : scene.cameras) {
             auto& camera = camera_pool[camera_layer_entity_id_pool_index.second];
             id<MTLParallelRenderCommandEncoder> parallel_encoder = [cmd parallelRenderCommandEncoderWithDescriptor:render_pass_descriptor];
-            
+
             std::uint32_t encoder_index = 0;
-            for(auto& encoder: encoders)
-            {
+            for (auto& encoder : encoders) {
                 encoder = [parallel_encoder renderCommandEncoder];
                 encoder.label = [NSString stringWithFormat:@"Render-frame-%lu-camera-%u-thread-%u", e.get_frame_number_from_start(), camera_layer_entity_id_pool_index.first.second, ++encoder_index];
                 [encoder pushDebugGroup:encoder.label];
@@ -163,23 +160,22 @@ void gearoenix::metal::SubmissionManager::update() noexcept
                 auto& model_data = distance_model_data.second;
                 const auto& enc = encoders[thread_index];
                 [enc setVertexBuffer:model_data.vertex offset:0 atIndex:GEAROENIX_METAL_GBUFFERS_FILLER_VERTEX_BUFFER_BIND_INDEX];
-                /*can be called once*/[enc setVertexBuffer:e.get_buffer_manager()->uniforms_gpu offset:camera.uniform_gpu_offset atIndex:GEAROENIX_METAL_GBUFFERS_FILLER_CAMERA_UNIFORM_BIND_INDEX];
+                /*can be called once*/ [enc setVertexBuffer:e.get_buffer_manager()->uniforms_gpu offset:camera.uniform_gpu_offset atIndex:GEAROENIX_METAL_GBUFFERS_FILLER_CAMERA_UNIFORM_BIND_INDEX];
                 [enc setVertexBuffer:model_data.args offset:0 atIndex:GEAROENIX_METAL_GBUFFERS_FILLER_ARGUMENT_BUFFER_BIND_INDEX];
-                /*can be called once*/[enc setFragmentBuffer:e.get_buffer_manager()->uniforms_gpu offset:camera.uniform_gpu_offset atIndex:GEAROENIX_METAL_GBUFFERS_FILLER_CAMERA_UNIFORM_BIND_INDEX];
+                /*can be called once*/ [enc setFragmentBuffer:e.get_buffer_manager()->uniforms_gpu offset:camera.uniform_gpu_offset atIndex:GEAROENIX_METAL_GBUFFERS_FILLER_CAMERA_UNIFORM_BIND_INDEX];
                 [enc setFragmentBuffer:model_data.args offset:0 atIndex:GEAROENIX_METAL_GBUFFERS_FILLER_ARGUMENT_BUFFER_BIND_INDEX];
                 [enc drawIndexedPrimitives:MTLPrimitiveTypeTriangle indexCount:model_data.indices_count indexType:MTLIndexTypeUInt32 indexBuffer:model_data.index indexBufferOffset:0];
             });
 
-            for(auto& encoder: encoders)
-            {
+            for (auto& encoder : encoders) {
                 [encoder popDebugGroup];
                 [encoder endEncoding];
             }
-            
+
             [parallel_encoder endEncoding];
         }
     }
-    
+
     [cmd presentDrawable:view.currentDrawable];
     [cmd commit];
 }

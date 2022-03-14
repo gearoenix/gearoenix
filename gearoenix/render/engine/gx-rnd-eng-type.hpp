@@ -7,7 +7,7 @@ namespace gearoenix::render::engine {
 enum struct Type : core::Id {
     Vulkan = 1,
     OpenGL = 2,
-    Direct3DX = 3,
+    Direct3D = 3,
     Metal = 4,
 };
 std::ostream& operator<<(std::ostream& os, Type t) noexcept;

@@ -13,8 +13,8 @@ struct Application;
 @interface GearoenixPlatformAppDelegate : NSObject <NSApplicationDelegate>
 - (void)start:(nonnull gearoenix::platform::Application*)os_app config:(const gearoenix::platform::RuntimeConfiguration&)config;
 
-@property (readonly, nonnull) NSWindow * window;
-@property (readonly, nonnull) GearoenixPlatformViewController * view_controller;
+@property (readonly, nonnull) NSWindow* window;
+@property (readonly, nonnull) GearoenixPlatformViewController* view_controller;
 @end
 
 #endif

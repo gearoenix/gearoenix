@@ -1,0 +1,25 @@
+SET(GX_ENGINE_OPENGL_SRC_DIR ${GX_ENGINE_SRC_DIR}/opengl)
+SET(GX_ENGINE_OPENGL_SRC
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-camera.cpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-camera.hpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-check.cpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-check.hpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-constants.hpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-engine.cpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-engine.hpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-gbuffers-filler-shader.cpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-gbuffers-filler-shader.hpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-loader.cpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-loader.hpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-mesh.cpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-mesh.hpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-model.cpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-model.hpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader.cpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader.hpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-submission.cpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-submission.hpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-texture.cpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-texture.hpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-types.hpp
+        PARENT_SCOPE)

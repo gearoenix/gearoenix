@@ -4,9 +4,9 @@
 #ifdef GX_RENDER_METAL_ENABLED
 #import "../render/texture/gx-rnd-txt-manager.hpp"
 #import "../render/texture/gx-rnd-txt-texture-2d.hpp"
-#include <boost/container/flat_map.hpp>
-#import <Metal/MTLTexture.h>
 #import <Metal/MTLSampler.h>
+#import <Metal/MTLTexture.h>
+#include <boost/container/flat_map.hpp>
 
 namespace gearoenix::metal {
 
@@ -16,7 +16,7 @@ struct Uploader;
 struct Texture2D final : public render::texture::Texture2D {
     const id<MTLTexture> resource;
     const id<MTLSamplerState> sampler;
-    
+
     Texture2D(
         Engine& e,
         id<MTLTexture> resource,

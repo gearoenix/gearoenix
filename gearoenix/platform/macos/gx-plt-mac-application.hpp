@@ -15,7 +15,7 @@ namespace gearoenix::platform {
 struct Application final {
     GX_GET_REF_PRV(BaseApplication, base)
     GX_GET_PTRC_PRV(GearoenixPlatformAppDelegate, app_delegate)
-    
+
 private:
     void update_window_size() noexcept;
     void update_mouse_position() noexcept;

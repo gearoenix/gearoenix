@@ -2,8 +2,8 @@
 #define GEAROENIX_METAL_MESH_HPP
 #include "../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_METAL_ENABLED
-#import "../render/mesh/gx-rnd-msh-mesh.hpp"
 #import "../render/mesh/gx-rnd-msh-manager.hpp"
+#import "../render/mesh/gx-rnd-msh-mesh.hpp"
 #import <Metal/MTLBuffer.h>
 
 namespace gearoenix::metal {

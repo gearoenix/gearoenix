@@ -8,7 +8,7 @@
 #include "../gx-vk-check.hpp"
 #include "../sync/gx-vk-sync-fence.hpp"
 #include "../sync/gx-vk-sync-semaphore.hpp"
-#include "..\..\dxr\gx-dxr-queue.hpp"
+#include "..\..\d3d\gx-d3d-queue.hpp"
 #include "gx-vk-qu-graph.hpp"
 
 void gearoenix::vulkan::queue::Queue::submit(

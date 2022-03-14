@@ -11,9 +11,9 @@ struct VertexDescriptions final {
     static constexpr int PbrAttrIndexTangent = 2;
     static constexpr int PbrAttrIndexUV = 3;
     static constexpr int PbrLayoutIndex = 0;
-    
-    MTLVertexDescriptor * const pbr;
-    
+
+    MTLVertexDescriptor* const pbr;
+
     VertexDescriptions() noexcept;
 };
 }

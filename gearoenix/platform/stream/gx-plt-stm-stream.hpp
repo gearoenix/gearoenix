@@ -12,7 +12,7 @@ struct Application;
 namespace gearoenix::platform::stream {
 struct Stream {
     GX_GETSET_VAL_PRT(bool, endian_compatibility, true)
-    
+
 protected:
     Stream() noexcept = default;
     void built_in_type_read(void* data, std::size_t length) noexcept;

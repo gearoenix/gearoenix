@@ -4,6 +4,8 @@
 #include "../gx-plt-log.hpp"
 #include <SDL_vulkan.h>
 
+#include "../../opengl/gx-gl-loader.hpp"
+
 static bool sdl_initialized = false;
 
 void gearoenix::platform::Application::initialize_sdl() noexcept
@@ -11,11 +13,9 @@ void gearoenix::platform::Application::initialize_sdl() noexcept
     if (sdl_initialized)
         return;
     sdl_initialized = true;
-    if (SDL_Init(
-            SDL_INIT_AUDIO | SDL_INIT_GAMECONTROLLER | SDL_INIT_TIMER | SDL_INIT_VIDEO)
-        != 0) {
+    if (SDL_Init(SDL_INIT_AUDIO | SDL_INIT_GAMECONTROLLER | SDL_INIT_TIMER | SDL_INIT_VIDEO) != 0) {
         GX_LOG_E("SDL_Init error: " << SDL_GetError())
-        std::exit(-1);
+        std::terminate();
     }
 }
 
@@ -113,6 +113,7 @@ bool gearoenix::platform::Application::create_gl_window(const int mj, const int 
     if (create_gl_sample_window(16, flags) || create_gl_sample_window(8, flags) || create_gl_sample_window(4, flags) || create_gl_sample_window(2, flags) || create_gl_sample_window(0, flags)) {
         gl_major = mj;
         gl_minor = mn;
+        GX_LOG_D("OpenGL context with major: " << mj << " and minor: " << mn << " has been created.")
         return true;
     }
     return false;
@@ -136,6 +137,7 @@ bool gearoenix::platform::Application::create_gl_depth_window(const int depth, c
         gl_context = SDL_GL_CreateContext(window);
         if (nullptr != gl_context) {
             gl_depth = depth;
+            SDL_GL_MakeCurrent(window, gl_context);
             return true;
         }
         SDL_DestroyWindow(window);
@@ -444,7 +446,7 @@ gearoenix::platform::Application::~Application() noexcept
 
 void gearoenix::platform::Application::run(core::Application* core_app) noexcept
 {
-    base.initialize_core_application(this, core_app);
+    base.initialize_core_application(*this, core_app);
     while (base.running) {
         fetch_events();
         base.update();

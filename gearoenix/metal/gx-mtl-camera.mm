@@ -14,13 +14,16 @@ gearoenix::metal::Camera::~Camera() noexcept = default;
 
 gearoenix::metal::Camera::Camera(Camera&& o) noexcept = default;
 
-gearoenix::metal::CameraBuilder::CameraBuilder(Engine& e, const std::string& name) noexcept : render::camera::Builder(e, name) {
+gearoenix::metal::CameraBuilder::CameraBuilder(Engine& e, const std::string& name) noexcept
+    : render::camera::Builder(e, name)
+{
     entity_builder->get_builder().add_component(Camera(e, name));
 }
 
 gearoenix::metal::CameraBuilder::~CameraBuilder() noexcept = default;
 
-std::shared_ptr<gearoenix::render::camera::Builder> gearoenix::metal::CameraManager::build(const std::string& name) noexcept {
+std::shared_ptr<gearoenix::render::camera::Builder> gearoenix::metal::CameraManager::build(const std::string& name) noexcept
+{
     return std::shared_ptr<render::camera::Builder>(new CameraBuilder(dynamic_cast<Engine&>(e), name));
 }
 

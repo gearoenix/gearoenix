@@ -9,22 +9,20 @@
 @synthesize window;
 @synthesize view_controller;
 
-- (void)start:(nonnull gearoenix::platform::Application*)os_app config:(const gearoenix::platform::RuntimeConfiguration&)config {
+- (void)start:(nonnull gearoenix::platform::Application*)os_app config:(const gearoenix::platform::RuntimeConfiguration&)config
+{
     const bool is_fullscreen = config.get_fullscreen();
-    const NSRect frame_rect = is_fullscreen? [[NSScreen mainScreen] frame]: NSRect{
-        CGPoint {0.0f, 0.0f },
-        CGSize {
-            static_cast<CGFloat>(config.get_window_width()),
-            static_cast<CGFloat>(config.get_window_height()),
-        }
-    };
+    const NSRect frame_rect = is_fullscreen ? [[NSScreen mainScreen] frame] : NSRect { CGPoint { 0.0f, 0.0f }, CGSize {
+                                                                                                                   static_cast<CGFloat>(config.get_window_width()),
+                                                                                                                   static_cast<CGFloat>(config.get_window_height()),
+                                                                                                               } };
     const std::string& title = config.get_application_name();
     const NSUInteger style_mask = NSWindowStyleMaskTitled
-            | NSWindowStyleMaskClosable
-            | NSWindowStyleMaskResizable
-            | NSWindowStyleMaskMiniaturizable
-            | NSWindowStyleMaskUnifiedTitleAndToolbar
-            | (is_fullscreen? NSWindowStyleMaskFullScreen: 0);
+        | NSWindowStyleMaskClosable
+        | NSWindowStyleMaskResizable
+        | NSWindowStyleMaskMiniaturizable
+        | NSWindowStyleMaskUnifiedTitleAndToolbar
+        | (is_fullscreen ? NSWindowStyleMaskFullScreen : 0);
     const NSBackingStoreType backing = NSBackingStoreBuffered;
     window = [[NSWindow alloc] initWithContentRect:frame_rect styleMask:style_mask backing:backing defer:YES];
     window.collectionBehavior = NSWindowCollectionBehaviorFullScreenPrimary;
@@ -40,15 +38,16 @@
     os_app->get_base().initialize_mouse_position(mouse_pos.x, mouse_pos.y);
 }
 
-- (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
+- (void)applicationDidFinishLaunching:(NSNotification*)aNotification
+{
 }
 
-
-- (void)applicationWillTerminate:(NSNotification *)aNotification {
+- (void)applicationWillTerminate:(NSNotification*)aNotification
+{
 }
 
-
-- (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)sender {
+- (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication*)sender
+{
     return YES;
 }
 

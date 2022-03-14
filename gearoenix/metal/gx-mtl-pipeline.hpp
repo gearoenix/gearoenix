@@ -17,7 +17,7 @@ struct PipelineManager final {
     GX_GET_VAL_PRV(id<MTLRenderPipelineState>, gbuffers_filler_ps, nil)
     GX_GET_VAL_PRV(id<MTLDepthStencilState>, depth_state, nil)
     GX_GET_CREF_PRV(VertexDescriptions, vertex_descriptions)
-    
+
     PipelineManager(Engine& e) noexcept;
 };
 }

@@ -12,10 +12,10 @@ gearoenix::metal::UniformBuffer::UniformBuffer(
     , cpu_ranges(std::move(_cpu_ranges))
     , gpu_offset(static_cast<NSUInteger>(gpu_range->get_offset()))
     , cpu_offsets({
-        static_cast<NSUInteger>(cpu_ranges[0]->get_offset()),
-        static_cast<NSUInteger>(cpu_ranges[1]->get_offset()),
-        static_cast<NSUInteger>(cpu_ranges[2]->get_offset()),
-    })
+          static_cast<NSUInteger>(cpu_ranges[0]->get_offset()),
+          static_cast<NSUInteger>(cpu_ranges[1]->get_offset()),
+          static_cast<NSUInteger>(cpu_ranges[2]->get_offset()),
+      })
     , size(static_cast<NSUInteger>(gpu_range->get_size()))
     , data(std::move(data))
 {
@@ -41,12 +41,14 @@ gearoenix::metal::ArgsBuffer::ArgsBuffer(Engine& e, id<MTLFunction> func, const 
     encoder.label = [NSString stringWithFormat:@"Gearoenix-ArgsEncoder-%s", name.c_str()];
     buffer.label = [NSString stringWithFormat:@"Gearoenix-ArgsCPUBuffer-%s", name.c_str()];
 #endif
-    [encoder setArgumentBuffer:buffer offset:0];
+    [encoder setArgumentBuffer:buffer
+                        offset:0];
 }
 
 gearoenix::metal::ArgsBuffer::~ArgsBuffer() noexcept
 {
-    if(nil == encoder) return;
+    if (nil == encoder)
+        return;
     [encoder release];
     [buffer release];
 }
@@ -67,7 +69,8 @@ gearoenix::metal::BufferManager::BufferManager(Engine& e) noexcept
         uniforms_cpu_range->allocate(GEAROENIX_METAL_BUFFER_UNIFORM_MAX_SIZE),
         uniforms_cpu_range->allocate(GEAROENIX_METAL_BUFFER_UNIFORM_MAX_SIZE),
         uniforms_cpu_range->allocate(GEAROENIX_METAL_BUFFER_UNIFORM_MAX_SIZE),
-    } {
+    }
+{
 #ifdef GEAROENIX_METAL_RESOURCE_NAMING
     uniforms_gpu.label = @"Gearoenix-UniformGPUBuffer";
     uniforms_cpu.label = @"Gearoenix-UniformCPUBuffer";
@@ -100,10 +103,10 @@ gearoenix::metal::UniformBuffer gearoenix::metal::BufferManager::create_uniform(
 void gearoenix::metal::BufferManager::update(id<MTLBlitCommandEncoder> blit, std::size_t frame_number) noexcept
 {
     [blit
-     copyFromBuffer:uniforms_cpu
-     sourceOffset:static_cast<NSUInteger>(uniforms_cpu_ranges[frame_number]->get_offset())
-     toBuffer:uniforms_gpu
-     destinationOffset:0
-     size:uniforms_gpu.length];
+           copyFromBuffer:uniforms_cpu
+             sourceOffset:static_cast<NSUInteger>(uniforms_cpu_ranges[frame_number]->get_offset())
+                 toBuffer:uniforms_gpu
+        destinationOffset:0
+                     size:uniforms_gpu.length];
 }
 #endif
