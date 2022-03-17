@@ -24,13 +24,18 @@ gearoenix::gl::Engine::~Engine() noexcept = default;
 
 void gearoenix::gl::Engine::start_frame() noexcept
 {
+    todos.unload();
     render::engine::Engine::start_frame();
+    todos.unload();
 }
 
 void gearoenix::gl::Engine::end_frame() noexcept
 {
+    todos.unload();
     render::engine::Engine::end_frame();
+    todos.unload();
     submission_manager->update();
+    todos.unload();
 }
 
 void gearoenix::gl::Engine::window_resized() noexcept
@@ -43,9 +48,7 @@ void gearoenix::gl::Engine::upload_imgui_fonts() noexcept
 
 bool gearoenix::gl::Engine::is_supported() noexcept
 {
-    if (load_library())
-        return false;
-    return glActiveTexture != nullptr;
+    return load_library();
 }
 
 std::unique_ptr<gearoenix::gl::Engine> gearoenix::gl::Engine::construct(platform::Application& platform_application) noexcept

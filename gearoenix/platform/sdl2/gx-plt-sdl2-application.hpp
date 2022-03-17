@@ -9,7 +9,7 @@
 namespace gearoenix::platform {
 struct Application final {
     //    GX_GET_VAL_PRV(HINSTANCE, instance, nullptr)
-    GX_GET_PTR_PRV(SDL_Window, window)
+    GX_GET_VAL_PRV(SDL_Window*, window, nullptr)
     GX_GET_REF_PRV(BaseApplication, base)
     GX_GET_VAL_PRV(int, gl_major, 0)
     GX_GET_VAL_PRV(int, gl_minor, 0)

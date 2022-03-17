@@ -59,6 +59,7 @@ public:                              \
 #define GX_GET_CPTR_PRT(t, x) GX_GET_PTR_C(protected, const, , t, x)
 #define GX_GET_CPTR_PRV(t, x) GX_GET_PTR_C(private, const, , t, x)
 #define GX_GET_CPTRC_PRV(t, x) GX_GET_PTR_C(private, const, const, t, x)
+#define GX_GET_CPTRC_PRT(t, x) GX_GET_PTR_C(protected, const, const, t, x)
 #define GX_GETSET_PTR(v, t, x) \
     GX_GET_PTR(v, , t, x)      \
     void set_##x(t* const _##x) noexcept { x = _##x; }

@@ -68,29 +68,6 @@
 
 #define GX_GL_SHADER_SET_TEXTURE_INDEX_ARRAY_UNIFORM(x) glUniform1iv(x, GX_COUNT_OF(x##_indices), x##_indices);
 
-#define GX_GL_SHADER_DEFAULT_DEFAULT_INIT             \
-    "#version 300 es\n"                               \
-    "#extension OES_texture_float_linear : require\n" \
-    "#define GX_PI 3.141592653589793238\n"            \
-    "precision highp float;\n"                        \
-    "precision highp int;\n"                          \
-    "precision highp sampler2D;\n"                    \
-    "precision highp samplerCube;\n"
-
-#define GX_GL_SHADER_SRC_DEFAULT_ATTRIBUTES    \
-    "layout(location = 0) in vec3 position;\n" \
-    "layout(location = 1) in vec3 normal;\n"   \
-    "layout(location = 2) in vec4 tangent;\n"  \
-    "layout(location = 3) in vec2 uv;\n"
-
-#define GX_GL_SHADER_SRC_DEFAULT_VERTEX_STARTING \
-    std::stringstream vertex_shader_code;        \
-    vertex_shader_code << GX_GL_SHADER_DEFAULT_DEFAULT_INIT << GX_GL_SHADER_SRC_DEFAULT_ATTRIBUTES
-
-#define GX_GL_SHADER_SRC_DEFAULT_FRAGMENT_STARTING \
-    std::stringstream fragment_shader_code;        \
-    fragment_shader_code << GX_GL_SHADER_DEFAULT_DEFAULT_INIT
-
 namespace gearoenix::gl {
 struct Engine;
 struct Shader {

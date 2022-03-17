@@ -53,29 +53,29 @@ void gearoenix::platform::Application::initialize_window() noexcept
     if (available_engines.contains(render::engine::Type::OpenGL)) {
         std::uint32_t flags = core_flags | SDL_WINDOW_OPENGL;
         SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
-        SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+        SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 2);
         SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
         SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
         SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
         SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
-        SDL_GL_SetSwapInterval(0);
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-        if (create_gl_window(4, 6, flags))
-            return;
-        if (create_gl_window(4, 5, flags))
-            return;
-        if (create_gl_window(4, 4, flags))
-            return;
-        if (create_gl_window(4, 3, flags))
-            return;
-        if (create_gl_window(4, 2, flags))
-            return;
-        if (create_gl_window(4, 1, flags))
-            return;
-        if (create_gl_window(4, 0, flags))
-            return;
-        if (create_gl_window(3, 3, flags))
-            return;
+        // SDL_GL_SetSwapInterval(0);
+        // SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+        // if (create_gl_window(4, 6, flags))
+        //     return;
+        // if (create_gl_window(4, 5, flags))
+        //     return;
+        // if (create_gl_window(4, 4, flags))
+        //     return;
+        // if (create_gl_window(4, 3, flags))
+        //     return;
+        // if (create_gl_window(4, 2, flags))
+        //     return;
+        // if (create_gl_window(4, 1, flags))
+        //     return;
+        // if (create_gl_window(4, 0, flags))
+        //     return;
+        // if (create_gl_window(3, 3, flags))
+        //     return;
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
         if (create_gl_window(3, 2, flags))
             return;
@@ -116,6 +116,7 @@ bool gearoenix::platform::Application::create_gl_window(const int mj, const int 
         GX_LOG_D("OpenGL context with major: " << mj << " and minor: " << mn << " has been created.")
         return true;
     }
+    GX_LOG_D("OpenGL window creatin with major: " << mj << " and minor: " << mn << " has been failed.")
     return false;
 }
 
@@ -138,7 +139,9 @@ bool gearoenix::platform::Application::create_gl_depth_window(const int depth, c
         if (nullptr != gl_context) {
             gl_depth = depth;
             SDL_GL_MakeCurrent(window, gl_context);
-            return true;
+            if (gl::load_library())
+                return true;
+            gl::unload_library();
         }
         SDL_DestroyWindow(window);
     }

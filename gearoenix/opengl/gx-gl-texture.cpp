@@ -165,7 +165,7 @@ gearoenix::gl::TextureManager::~TextureManager() noexcept = default;
             auto lh = static_cast<gl::sizei>(gl_img_height >> level_index);
             if (lh < 1)
                 lh = 1;
-            glTexImage2d(GL_TEXTURE_2D, li, internal_format, lw, lh, 0, format, data_format, pixels[level_index].data());
+            glTexImage2D(GL_TEXTURE_2D, li, internal_format, lw, lh, 0, format, data_format, pixels[level_index].data());
         }
         if (needs_mipmap_generation) {
             glGenerateMipmap(GL_TEXTURE_2D);

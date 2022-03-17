@@ -24,13 +24,13 @@ gearoenix::gl::SubmissionManager::SubmissionManager(Engine& e) noexcept
 {
     glClearColor(0.3f, 0.15f, 0.115f, 1.0f);
     // Pipeline settings
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_TRUE);
-    glEnable(GL_BLEND);
+    // glEnable(GL_CULL_FACE);
+    // glCullFace(GL_TRUE);
+    // glEnable(GL_BLEND);
     // glBlendFunc(gl_blend_mode.value().first, gl_blend_mode.value().second);
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_SCISSOR_TEST);
-    glEnable(GL_STENCIL_TEST);
+    // glEnable(GL_DEPTH_TEST);
+    // glEnable(GL_SCISSOR_TEST);
+    // glEnable(GL_STENCIL_TEST);
 }
 
 gearoenix::gl::SubmissionManager::~SubmissionManager() noexcept = default;
@@ -119,15 +119,18 @@ void gearoenix::gl::SubmissionManager::update() noexcept
         });
     });
 
+    const auto& os_app = e.get_platform_application();
+    const auto& base_os_app = os_app.get_base();
+
     // Bind target
     glBindRenderbuffer(GL_RENDERBUFFER, 0);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glViewport(
-        static_cast<gl::sizei>(0), static_cast<gl::sizei>(0),
-        static_cast<gl::sizei>(200), static_cast<gl::sizei>(200));
+        static_cast<sizei>(0), static_cast<sizei>(0),
+        static_cast<sizei>(base_os_app.get_window_width()), static_cast<sizei>(base_os_app.get_window_height()));
     glScissor(
-        static_cast<gl::sizei>(0), static_cast<gl::sizei>(0),
-        static_cast<gl::sizei>(200), static_cast<gl::sizei>(200));
+        static_cast<sizei>(0), static_cast<sizei>(0),
+        static_cast<sizei>(base_os_app.get_window_width()), static_cast<sizei>(base_os_app.get_window_height()));
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
     gbuffers_filler->bind();
@@ -165,7 +168,7 @@ void gearoenix::gl::SubmissionManager::update() noexcept
     }
 
 #ifdef GX_PLATFORM_INTERFACE_SDL2
-    SDL_GL_SwapWindow(e.get_platform_application().get_window());
+    SDL_GL_SwapWindow(os_app.get_window());
 #endif
 }
 

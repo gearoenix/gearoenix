@@ -13,6 +13,7 @@ typedef std::int32_t sint;
 typedef std::uint32_t sizei;
 typedef std::size_t sizeiptr;
 typedef std::int16_t sshort;
+typedef std::uint8_t ubyte;
 typedef std::uint32_t uint;
 typedef std::uint16_t ushort;
 }

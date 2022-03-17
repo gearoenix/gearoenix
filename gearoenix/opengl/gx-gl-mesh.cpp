@@ -41,13 +41,14 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::gl::MeshManager::build
 {
     auto& eng = dynamic_cast<Engine&>(e);
     auto m = std::make_shared<Mesh>(eng, occlusion_box);
-    const auto vs_size = static_cast<gl::sizeiptr>(sizeof(render::PbrVertex) * vertices.size());
-    const auto is_size = static_cast<gl::sizeiptr>(sizeof(std::uint32_t) * indices.size());
+    m->indices_count = static_cast<sizei>(indices.size());
+    const auto vs_size = static_cast<sizeiptr>(sizeof(render::PbrVertex) * vertices.size());
+    const auto is_size = static_cast<sizeiptr>(sizeof(std::uint32_t) * indices.size());
     eng.todos.load([c = std::move(c), m, vs = std::move(vertices), is = std::move(indices), vs_size, is_size] {
         GX_GL_CHECK_D;
-        glGenVertexArrays(1, &m->vertex_object);
+        glGenVertexArrays(1, &(m->vertex_object));
         glBindVertexArray(m->vertex_object);
-        glGenBuffers(1, &m->vertex_buffer);
+        glGenBuffers(1, &(m->vertex_buffer));
         glBindBuffer(GL_ARRAY_BUFFER, m->vertex_buffer);
         glBufferData(GL_ARRAY_BUFFER, vs_size, vs.data(), GL_STATIC_DRAW);
         glEnableVertexAttribArray(0);
@@ -58,7 +59,7 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::gl::MeshManager::build
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(render::PbrVertex), reinterpret_cast<void*>(3 * sizeof(float)));
         glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(render::PbrVertex), reinterpret_cast<void*>(6 * sizeof(float)));
         glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(render::PbrVertex), reinterpret_cast<void*>(10 * sizeof(float)));
-        glGenBuffers(1, &m->index_buffer);
+        glGenBuffers(1, &(m->index_buffer));
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m->index_buffer);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, is_size, is.data(), GL_STATIC_DRAW);
         glBindVertexArray(0);
